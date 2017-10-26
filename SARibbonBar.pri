@@ -1,4 +1,4 @@
 INCLUDEPATH += $$PWD/src
 DEPENDPATH += $$PWD/src
 
-LIBS += -L$$PWD/bin/SARibbonBarLibs/ -lSARibbonBar
+LIBS += -L$$PWD/bin/ -lSARibbonBar

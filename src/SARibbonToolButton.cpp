@@ -89,12 +89,12 @@ void SARibbonToolButton::mousePressEvent(QMouseEvent *e)
         }
     }
     m_menuButtonPressed = false;
-    QAbstractButton::mousePressEvent(e);
+    QToolButton::mousePressEvent(e);
 }
 
 void SARibbonToolButton::mouseReleaseEvent(QMouseEvent *e)
 {
-    QAbstractButton::mouseReleaseEvent(e);
+    QToolButton::mouseReleaseEvent(e);
     m_menuButtonPressed = false;
 }
 

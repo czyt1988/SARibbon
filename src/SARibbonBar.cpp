@@ -117,11 +117,15 @@ public:
 
     void setHideMode()
     {
+
         this->isHideMode = true;
         MainClass->setFixedHeight(ribbonTabBar->geometry().bottom());
         this->stackedContainerWidget->setWindowFlags(Qt::Popup);
         this->stackedContainerWidget->setFrameShape(QFrame::Panel);
+        this->stackedContainerWidget->clearFocus();
+        this->MainClass->setFocus();
         this->stackedContainerWidget->hide();
+
     }
 
     void setNormalMode()
@@ -130,6 +134,7 @@ public:
         MainClass->setFixedHeight(160);
         this->stackedContainerWidget->setWindowFlags(Qt::Widget);
         this->stackedContainerWidget->setFrameShape(QFrame::NoFrame);
+        this->stackedContainerWidget->setFocus();
         this->stackedContainerWidget->show();
     }
 };
@@ -340,6 +345,7 @@ void SARibbonBar::onWindowIconChanged(const QIcon &icon)
 ///
 void SARibbonBar::onCurrentRibbonTabChanged(int index)
 {
+    qDebug() << "onCurrentRibbonTabChanged";
     QVariant var = m_d->ribbonTabBar->tabData(index);
     SARibbonCategory* category = nullptr;
     if(var.isValid())
@@ -368,6 +374,7 @@ void SARibbonBar::onCurrentRibbonTabChanged(int index)
 ///
 void SARibbonBar::onCurrentRibbonTabClicked(int index)
 {
+    qDebug() << "onCurrentRibbonTabClicked";
     if(isRibbonBarHideMode())
     {
         QVariant var = m_d->ribbonTabBar->tabData(index);
@@ -386,10 +393,10 @@ void SARibbonBar::onCurrentRibbonTabClicked(int index)
                 m_d->stackedContainerWidget->show();
             }
         }
-        if(!m_d->currentShowingContextCategory.isEmpty())
-        {
-            repaint();
-        }
+//        if(!m_d->currentShowingContextCategory.isEmpty())
+//        {
+//            update();
+//        }
     }
 }
 ///
