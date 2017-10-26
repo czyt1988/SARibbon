@@ -12,6 +12,7 @@
 #include "SARibbonSeparatorWidget.h"
 #include "SARibbonGallery.h"
 #include "SARibbonElementManager.h"
+#include "SARibbonMenu.h"
 SARibbonPannel::SARibbonPannel(QWidget *parent):QWidget(parent)
   ,m_nextElementPosition(3,3)
   ,m_row(0)
@@ -101,6 +102,52 @@ SARibbonToolButton* SARibbonPannel::addSmallAction(QAction *action)
     if(m_row >= 5)
         m_row = 0;
     addAction(action);
+    return btn;
+}
+
+SARibbonToolButton *SARibbonPannel::addMediumAction(QAction *action)
+{
+    SARibbonToolButton* btn = RibbonSubElementDelegate->createRibbonToolButton(this);
+    btn->setButtonType(SARibbonToolButton::SmallButton);
+    btn->setAutoRaise(true);
+    btn->setDefaultAction(action);
+    QSize iconSize = maxHightIconSize(action->icon().actualSize(QSize(16,16)),16);
+    btn->setIconSize(iconSize);
+    if(action->menu())
+        btn->setPopupMode(QToolButton::MenuButtonPopup);
+    if(0 == m_row)
+    {
+        m_gridLayout->addWidget(btn,m_row,m_gridLayout->columnCount(),3,1);
+        m_row = 3;
+    }
+    else if(3 == m_row)
+    {
+        m_gridLayout->addWidget(btn,m_row,m_gridLayout->columnCount()-1,3,1);
+        m_row += 3;
+    }
+    else
+    {
+        m_gridLayout->addWidget(btn,m_row,m_gridLayout->columnCount(),3,1);
+        m_row = 0;
+    }
+
+    addAction(action);
+    return btn;
+}
+
+SARibbonToolButton *SARibbonPannel::addLargeMenu(SARibbonMenu *menu)
+{
+    SARibbonToolButton* btn = RibbonSubElementDelegate->createRibbonToolButton(this);
+    btn->setButtonType(SARibbonToolButton::LargeButton);
+    btn->setAutoRaise(true);
+    QSize iconSize = maxHightIconSize(menu->icon().actualSize(QSize(32,32)),32);
+    btn->setIconSize(iconSize);
+    btn->setIcon(menu->icon());
+    btn->setPopupMode(QToolButton::InstantPopup);
+    btn->setText(menu->title());
+    btn->setMenu(menu);
+    m_gridLayout->addWidget(btn,0,m_gridLayout->columnCount(),6,1);
+    m_row = 0;
     return btn;
 }
 

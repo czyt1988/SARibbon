@@ -3,6 +3,7 @@
 #include "SARibbonGlobal.h"
 #include <QWidget>
 #include "SARibbonToolButton.h"
+class SARibbonMenu;
 class SARibbonGallery;
 class QGridLayout;
 class SARibbonPannelOptionButton;
@@ -19,6 +20,8 @@ public:
     SARibbonToolButton* addLargeAction(QAction *action);
     SARibbonToolButton* addSmallToolButton(const QString& text,const QIcon& icon,QToolButton::ToolButtonPopupMode popMode);
     SARibbonToolButton *addSmallAction(QAction *action);
+    SARibbonToolButton *addMediumAction(QAction *action);
+    SARibbonToolButton *addLargeMenu(SARibbonMenu *menu);
     SARibbonGallery* addGallery();
     void addSeparator();
     void addWidget(QWidget* w);
