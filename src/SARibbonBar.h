@@ -58,6 +58,7 @@ signals:
 protected slots:
     void onWindowTitleChanged(const QString &title);
     void onWindowIconChanged(const QIcon &icon);
+    void onStackWidgetHided();
     virtual void onCurrentRibbonTabChanged(int index);
     virtual void onCurrentRibbonTabClicked(int index);
     virtual void onCurrentRibbonTabDoubleClicked(int index);

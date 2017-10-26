@@ -83,6 +83,8 @@ public:
                                             ,ribbonTabBar->geometry().bottom()+1
                                             ,MainClass->width()-widgetBord.left()-widgetBord.right()
                                             ,MainClass->height()-ribbonTabBar->geometry().bottom()-2-widgetBord.bottom());
+        stackedContainerWidget->connect(stackedContainerWidget,&SARibbonStackedWidget::hidWindow
+                                        ,MainClass,&SARibbonBar::onStackWidgetHided);
         setNormalMode();
     }
 
@@ -334,12 +336,19 @@ void SARibbonBar::onWindowIconChanged(const QIcon &icon)
     update();
 }
 ///
+/// \brief ribbon的显示界面隐藏
+///
+void SARibbonBar::onStackWidgetHided()
+{
+    qDebug() << "rec hide event";
+    m_d->ribbonTabBar->setCurrentIndex(-1);
+}
+///
 /// \brief ribbon tab bar改变
 /// \param index
 ///
 void SARibbonBar::onCurrentRibbonTabChanged(int index)
 {
-    qDebug() << "onCurrentRibbonTabChanged";
     QVariant var = m_d->ribbonTabBar->tabData(index);
     SARibbonCategory* category = nullptr;
     if(var.isValid())
@@ -372,7 +381,6 @@ void SARibbonBar::onCurrentRibbonTabChanged(int index)
 ///
 void SARibbonBar::onCurrentRibbonTabClicked(int index)
 {
-    qDebug() << "onCurrentRibbonTabClicked";
     if(isRibbonBarHideMode())
     {
         QVariant var = m_d->ribbonTabBar->tabData(index);
