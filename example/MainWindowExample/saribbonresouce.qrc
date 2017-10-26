@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/icon">
+        <file>icon/filter.png</file>
+        <file>icon/folder.png</file>
+        <file>icon/Graph-add.png</file>
+        <file>icon/save.png</file>
+    </qresource>
+</RCC>
