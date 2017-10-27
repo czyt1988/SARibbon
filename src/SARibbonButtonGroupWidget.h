@@ -13,13 +13,13 @@ public:
     SARibbonButtonGroupWidget(QWidget* parent=Q_NULLPTR);
     ~SARibbonButtonGroupWidget();
     void addButton(QAbstractButton* btn);
-    QSize sizeHint() const Q_DECL_OVERRIDE;
-    QSize minimumSizeHint() const Q_DECL_OVERRIDE;
+    //QSize sizeHint() const Q_DECL_OVERRIDE;
+    //QSize minimumSizeHint() const Q_DECL_OVERRIDE;
 protected:
-    void childEvent(QChildEvent* e);
-    bool eventFilter(QObject* child, QEvent* e);
+    //void childEvent(QChildEvent* e);
+    //bool eventFilter(QObject* child, QEvent* e);
 private:
-    void setChildVisibility(QWidget* childWidget);
+    //void setChildVisibility(QWidget* childWidget);
 private:
     SARibbonButtonGroupWidgetPrivate* m_d;
 };
