@@ -18,6 +18,17 @@ SARibbonToolButton::SARibbonToolButton(QWidget *parent)
     setButtonType(SmallButton);
 }
 
+SARibbonToolButton::SARibbonToolButton(QAction *defaultAction, QWidget *parent)
+    :QToolButton(parent)
+    ,m_buttonType(LargeButton)
+    ,m_mouseOnSubControl(false)
+    ,m_borderColor(242,202,88)
+    ,m_menuButtonPressed(false)
+{
+    setButtonType(SmallButton);
+    setDefaultAction(defaultAction);
+}
+
 void SARibbonToolButton::paintEvent(QPaintEvent *event)
 {
     switch(m_buttonType)

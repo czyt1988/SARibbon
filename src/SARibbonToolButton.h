@@ -18,6 +18,7 @@ public:
         ,SmallButton
     };
     SARibbonToolButton(QWidget *parent = Q_NULLPTR);
+    SARibbonToolButton(QAction* defaultAction,QWidget *parent = Q_NULLPTR);
     RibbonButtonType buttonType() const;
     void setButtonType(const RibbonButtonType &buttonType);
     virtual QSize minimumSizeHint() const Q_DECL_OVERRIDE;

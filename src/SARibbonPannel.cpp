@@ -173,8 +173,13 @@ void SARibbonPannel::addSeparator()
 #endif
 }
 
+///
+/// \brief 向pannel添加窗口，此窗口的所有权归SARibbonPannel所有
+/// \param w
+///
 void SARibbonPannel::addWidget(QWidget *w)
 {
+    w->setParent(this);
     int col = m_gridLayout->columnCount();
     if(0 != m_row)
     {
@@ -188,6 +193,7 @@ void SARibbonPannel::addWidget(QWidget *w)
 
 void SARibbonPannel::addWidget(QWidget *w, int row, int rowSpan)
 {
+    w->setParent(this);
     int col = m_gridLayout->columnCount();
     if(0 != row)
     {
@@ -201,6 +207,7 @@ void SARibbonPannel::addWidget(QWidget *w, int row, int rowSpan)
 
 void SARibbonPannel::addWidget(QWidget *w, int row, int rowSpan, int column, int columnSpan)
 {
+    w->setParent(this);
     m_gridLayout->addWidget(w,row,column,rowSpan,columnSpan);
     m_row = row + rowSpan;
     if(row >= 5)
@@ -287,11 +294,11 @@ void SARibbonPannel::setReduce(bool isReduce)
 {
     if(isReduce)
     {
-        setWindowFlags(Qt::Popup);
+        setWindowFlags(Qt::Popup | Qt::FramelessWindowHint);
     }
     else
     {
-        setWindowFlags( Qt::Widget);
+        setWindowFlags( Qt::Widget | Qt::FramelessWindowHint);
     }
 }
 

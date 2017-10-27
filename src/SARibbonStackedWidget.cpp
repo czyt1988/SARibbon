@@ -25,7 +25,7 @@ SARibbonStackedWidget::SARibbonStackedWidget(QWidget *parent)
     ,m_d(new SARibbonStackedWidgetPrivate(this))
 {
     m_d->init();
-
+    setNormalMode();
 }
 
 SARibbonStackedWidget::~SARibbonStackedWidget()
@@ -39,7 +39,7 @@ SARibbonStackedWidget::~SARibbonStackedWidget()
 
 void SARibbonStackedWidget::setPopupMode()
 {
-    setWindowFlags(Qt::Popup);
+    setWindowFlags(Qt::Popup|Qt::FramelessWindowHint);
     setFrameShape(QFrame::Panel);
 }
 
@@ -55,7 +55,7 @@ void SARibbonStackedWidget::setNormalMode()
         m_d->eventLoop->exit();
         m_d->eventLoop = nullptr;
     }
-    setWindowFlags(Qt::Widget);
+    setWindowFlags(Qt::Widget| Qt::FramelessWindowHint);
     setFrameShape(QFrame::NoFrame);
 }
 
