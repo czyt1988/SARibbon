@@ -140,9 +140,12 @@ SARibbonToolButton *SARibbonPannel::addLargeMenu(SARibbonMenu *menu)
     SARibbonToolButton* btn = RibbonSubElementDelegate->createRibbonToolButton(this);
     btn->setButtonType(SARibbonToolButton::LargeButton);
     btn->setAutoRaise(true);
-    QSize iconSize = maxHightIconSize(menu->icon().actualSize(QSize(32,32)),32);
-    btn->setIconSize(iconSize);
-    btn->setIcon(menu->icon());
+    if(!menu->icon().isNull())
+    {
+        QSize iconSize = maxHightIconSize(menu->icon().actualSize(QSize(32,32)),32);
+        btn->setIconSize(iconSize);
+        btn->setIcon(menu->icon());
+    }
     btn->setPopupMode(QToolButton::InstantPopup);
     btn->setText(menu->title());
     btn->setMenu(menu);
@@ -195,7 +198,7 @@ void SARibbonPannel::addWidget(QWidget *w, int row, int rowSpan)
 {
     w->setParent(this);
     int col = m_gridLayout->columnCount();
-    if(0 != row)
+    if(0 != row && 0 != col)
     {
         col -= 1;
     }
