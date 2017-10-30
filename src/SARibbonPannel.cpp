@@ -154,6 +154,14 @@ SARibbonToolButton *SARibbonPannel::addLargeMenu(SARibbonMenu *menu)
     return btn;
 }
 
+SARibbonToolButton *SARibbonPannel::addLargeActionMenu(QAction *action, SARibbonMenu *menu)
+{
+    SARibbonToolButton* btn = addLargeAction(action);
+    btn->setMenu(menu);
+    btn->setPopupMode(QToolButton::MenuButtonPopup);
+    return btn;
+}
+
 SARibbonGallery *SARibbonPannel::addGallery()
 {
     SARibbonGallery* gallery = RibbonSubElementDelegate->createRibbonGallery(this);
