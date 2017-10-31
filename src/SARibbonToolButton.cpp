@@ -15,6 +15,7 @@ SARibbonToolButton::SARibbonToolButton(QWidget *parent)
     ,m_borderColor(242,202,88)
     ,m_menuButtonPressed(false)
 {
+    setAutoRaise(true);
     setButtonType(SmallButton);
 }
 
@@ -25,6 +26,7 @@ SARibbonToolButton::SARibbonToolButton(QAction *defaultAction, QWidget *parent)
     ,m_borderColor(242,202,88)
     ,m_menuButtonPressed(false)
 {
+    setAutoRaise(true);
     setButtonType(SmallButton);
     setDefaultAction(defaultAction);
 }
