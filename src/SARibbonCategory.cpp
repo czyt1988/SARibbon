@@ -76,6 +76,11 @@ SARibbonPannel *SARibbonCategory::addPannel(const QString &title)
 {
     return proxy()->addPannel(title);
 }
+
+void SARibbonCategory::addPannel(SARibbonPannel *pannel)
+{
+    proxy()->addPannel(pannel);
+}
 ///
 /// \brief SARibbonCategory::setBackgroundBrush
 /// \param brush
@@ -135,6 +140,19 @@ SARibbonPannel *SARibbonCategoryProxy::addPannel(const QString &title)
     ribbonCategory()->layout()->addWidget(seprator);
 #endif
     return pannel;
+}
+
+void SARibbonCategoryProxy::addPannel(SARibbonPannel *pannel)
+{
+    pannel->setParent(ribbonCategory());
+    SARibbonSeparatorWidget* seprator = RibbonSubElementDelegate->createRibbonSeparatorWidget(ribbonCategory()->height(),ribbonCategory());
+#if NOT_USE_LAYOUT
+    m_d->pannelLists.append(pannel);
+    m_d->separatorLists.append(seprator);
+#else
+    ribbonCategory()->layout()->addWidget(pannel);
+    ribbonCategory()->layout()->addWidget(seprator);
+#endif
 }
 
 void SARibbonCategoryProxy::setBackgroundBrush(const QBrush &brush)

@@ -18,6 +18,7 @@ public:
     SARibbonCategory(QWidget* parent);
     ~SARibbonCategory();
     SARibbonPannel* addPannel(const QString& title);
+    void addPannel(SARibbonPannel* pannel);
     void setBackgroundBrush(const QBrush& brush);
     SARibbonCategoryProxy* proxy();
     void setProxy(SARibbonCategoryProxy* proxy);
@@ -40,6 +41,7 @@ public:
     virtual ~SARibbonCategoryProxy();
 
     virtual SARibbonPannel* addPannel(const QString& title);
+    virtual void addPannel(SARibbonPannel* pannel);
     virtual void setBackgroundBrush(const QBrush& brush);
     virtual void resizeEvent(QResizeEvent *event);
     virtual void paintEvent(QPaintEvent *event);
