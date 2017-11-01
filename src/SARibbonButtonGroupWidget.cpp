@@ -50,6 +50,13 @@ SARibbonToolButton *SARibbonButtonGroupWidget::addButton(QAction *action)
     return btn;
 }
 
+void SARibbonButtonGroupWidget::addWidget(QWidget *w)
+{
+    w->setParent(this);
+    layout()->addWidget(w);
+    layout()->setAlignment(w,Qt::AlignCenter);
+}
+
 QSize SARibbonButtonGroupWidget::sizeHint() const
 {
     return layout()->sizeHint();

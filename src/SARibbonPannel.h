@@ -22,6 +22,7 @@ public:
     SARibbonToolButton *addSmallAction(QAction *action);
     SARibbonToolButton *addMediumAction(QAction *action);
     SARibbonToolButton *addLargeMenu(SARibbonMenu *menu);
+    SARibbonToolButton *addSmallMenu(SARibbonMenu *menu);
     SARibbonToolButton* addLargeActionMenu(QAction *action,SARibbonMenu *menu);
     SARibbonGallery* addGallery();
     void addSeparator();

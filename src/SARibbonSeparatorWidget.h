@@ -10,6 +10,7 @@ class SA_RIBBON_EXPORT SARibbonSeparatorWidget : public QWidget
 {
 public:
     SARibbonSeparatorWidget(int height,QWidget* parent = nullptr);
+    SARibbonSeparatorWidget(QWidget* parent = nullptr);
     virtual QSize sizeHint() const Q_DECL_OVERRIDE;
 protected:
     void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;

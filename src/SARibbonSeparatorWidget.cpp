@@ -7,6 +7,11 @@ SARibbonSeparatorWidget::SARibbonSeparatorWidget(int height, QWidget *parent)
     setFixedSize(6,height);
 }
 
+SARibbonSeparatorWidget::SARibbonSeparatorWidget(QWidget *parent)
+    :QWidget(parent)
+{
+}
+
 QSize SARibbonSeparatorWidget::sizeHint() const
 {
     return QSize(6,height());

@@ -154,6 +154,24 @@ SARibbonToolButton *SARibbonPannel::addLargeMenu(SARibbonMenu *menu)
     return btn;
 }
 
+SARibbonToolButton *SARibbonPannel::addSmallMenu(SARibbonMenu *menu)
+{
+    SARibbonToolButton* btn = RibbonSubElementDelegate->createRibbonToolButton(this);
+    btn->setButtonType(SARibbonToolButton::SmallButton);
+    QSize iconSize = maxHightIconSize(menu->icon().actualSize(QSize(16,16)),16);
+    btn->setIconSize(iconSize);
+    btn->setMenu(menu);
+    btn->setPopupMode(QToolButton::InstantPopup);
+    if(0 == m_row)
+        m_gridLayout->addWidget(btn,m_row,m_gridLayout->columnCount(),2,1);
+    else
+        m_gridLayout->addWidget(btn,m_row,m_gridLayout->columnCount()-1,2,1);
+    m_row += 2;
+    if(m_row >= 5)
+        m_row = 0;
+    return btn;
+}
+
 SARibbonToolButton *SARibbonPannel::addLargeActionMenu(QAction *action, SARibbonMenu *menu)
 {
     SARibbonToolButton* btn = addLargeAction(action);

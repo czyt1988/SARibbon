@@ -12,6 +12,7 @@ class SARibbonBarPrivate;
 class QAbstractButton;
 class SARibbonTabBar;
 class SARibbonButtonGroupWidget;
+class SARibbonQuickAccessBar;
 ///
 /// \brief The SARibbonBar class
 ///
@@ -50,6 +51,8 @@ public:
     int tabBarHeight() const;
     //激活tabbar右边的按钮群
     SARibbonButtonGroupWidget* activeTabBarRightButtonGroup();
+    //快速响应栏
+    SARibbonQuickAccessBar* quickAccessBar();
 signals:
     void applitionButtonClicked();
     //

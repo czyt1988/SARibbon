@@ -14,6 +14,7 @@
 #include <QDesktopWidget>
 #include <SARibbonButtonGroupWidget.h>
 #include <QAction>
+#include "SARibbonQuickAccessBar.h"
 class ContextCategoryManagerData
 {
 public:
@@ -42,6 +43,7 @@ public:
     SARibbonControlButton* hidePannelButton;///< 隐藏面板按钮
     SARibbonButtonGroupWidget* tabBarRightSizeButtonGroupWidget;///< 在tab bar旁边的button group widget
     QColor tabBarBaseLineColor;///< tabbar底部的线条颜色
+    SARibbonQuickAccessBar* quickAccessBar;///< 快速响应栏
     SARibbonBarPrivate(SARibbonBar* par)
         :titleBarHight(30)
         ,widgetBord(1,1,1,0)
@@ -59,14 +61,14 @@ public:
         MainClass = par;
     }
 
-    void init(SARibbonBar* par)
+    void init()
     {
-        applitionButton = RibbonSubElementDelegate->createRibbonApplicationButton(par);
+        applitionButton = RibbonSubElementDelegate->createRibbonApplicationButton(MainClass);
         applitionButton->setGeometry(widgetBord.left(),titleBarHight+widgetBord.top(),56,30);
         MainClass->connect(applitionButton,&QAbstractButton::clicked
                      ,MainClass,&SARibbonBar::applitionButtonClicked);
         //
-        ribbonTabBar = RibbonSubElementDelegate->createRibbonTabBar(par);
+        ribbonTabBar = RibbonSubElementDelegate->createRibbonTabBar(MainClass);
         ribbonTabBar->setDrawBase(false);
         ribbonTabBar->setGeometry(applitionButton->geometry().right()
                                   ,titleBarHight+widgetBord.top()
@@ -86,6 +88,9 @@ public:
         stackedContainerWidget->connect(stackedContainerWidget,&SARibbonStackedWidget::hidWindow
                                         ,MainClass,&SARibbonBar::onStackWidgetHided);
         setNormalMode();
+        //
+        quickAccessBar = new SARibbonQuickAccessBar(MainClass);
+
     }
 
     void setApplitionButton(QAbstractButton *btn)
@@ -140,7 +145,7 @@ public:
 SARibbonBar::SARibbonBar(QWidget *parent):QWidget(parent)
   ,m_d(new SARibbonBarPrivate(this))
 {
-    m_d->init(this);
+    m_d->init();
     connect(parent,&QWidget::windowTitleChanged,this,&SARibbonBar::onWindowTitleChanged);
     connect(parent,&QWidget::windowIconChanged,this,&SARibbonBar::onWindowIconChanged);
 }
@@ -332,7 +337,12 @@ void SARibbonBar::onWindowTitleChanged(const QString &title)
 
 void SARibbonBar::onWindowIconChanged(const QIcon &icon)
 {
-    Q_UNUSED(icon);
+    if(!icon.isNull())
+    {
+        int iconMinSize = m_d->titleBarHight - 6;
+        QSize s = icon.actualSize(QSize(iconMinSize,iconMinSize));
+        m_d->iconRightBorderPosition = m_d->widgetBord.left()+s.width();
+    }
     update();
 }
 ///
@@ -340,7 +350,6 @@ void SARibbonBar::onWindowIconChanged(const QIcon &icon)
 ///
 void SARibbonBar::onStackWidgetHided()
 {
-    qDebug() << "rec hide event";
     m_d->ribbonTabBar->setCurrentIndex(-1);
 }
 ///
@@ -442,6 +451,11 @@ SARibbonButtonGroupWidget *SARibbonBar::activeTabBarRightButtonGroup()
     return m_d->tabBarRightSizeButtonGroupWidget;
 }
 
+SARibbonQuickAccessBar *SARibbonBar::quickAccessBar()
+{
+    return m_d->quickAccessBar;
+}
+
 
 void SARibbonBar::paintEvent(QPaintEvent *e)
 {
@@ -537,6 +551,10 @@ void SARibbonBar::resizeEvent(QResizeEvent *e)
 {
     Q_UNUSED(e);
     int x = m_d->widgetBord.left();
+    //quick access bar定位
+    QSize quickAccessBarSize = m_d->quickAccessBar->sizeHint();
+    m_d->quickAccessBar->setGeometry( x + m_d->iconRightBorderPosition+5,m_d->widgetBord.top()
+                                      ,quickAccessBarSize.width(),m_d->titleBarHight);
     //applitionButton 定位
     if(m_d->applitionButton)
     {
@@ -605,10 +623,10 @@ void SARibbonBar::paintBackground(QPainter &painter)
 void SARibbonBar::paintWindowTitle(QPainter &painter, const QString &title, const QPoint &contextCategoryRegion)
 {
     painter.save();
-    painter.setPen(m_d->titleTextColor);
+    painter.setPen(m_d->titleTextColor); 
+    int x = m_d->quickAccessBar->geometry().right();
     if(contextCategoryRegion.y() < 0)
     {
-        int x = m_d->iconRightBorderPosition;
         painter.drawText(x
                          ,m_d->widgetBord.top()
                          ,width()- m_d->iconRightBorderPosition - m_d->widgetBord.right()
@@ -616,10 +634,10 @@ void SARibbonBar::paintWindowTitle(QPainter &painter, const QString &title, cons
     }
     else
     {
-        if(width() - contextCategoryRegion.y() > contextCategoryRegion.x()-m_d->iconRightBorderPosition)
+        if(width() - contextCategoryRegion.y() > contextCategoryRegion.x()-x)
         {
             //说明左边的区域大一点，标题显示在坐标
-            int x = contextCategoryRegion.y();
+            x = contextCategoryRegion.y();
             painter.drawText(x
                              ,m_d->widgetBord.top()
                              ,width()-x
@@ -628,7 +646,7 @@ void SARibbonBar::paintWindowTitle(QPainter &painter, const QString &title, cons
         else
         {
             //说明右边的大一点
-            int x = m_d->iconRightBorderPosition;
+            x = m_d->iconRightBorderPosition;
             painter.drawText(x
                              ,m_d->widgetBord.top()
                              ,contextCategoryRegion.x()-m_d->iconRightBorderPosition
@@ -643,8 +661,8 @@ void SARibbonBar::paintWindowIcon(QPainter &painter, const QIcon &icon)
     painter.save();
     if(!icon.isNull())
     {
-        int iconMinSize = m_d->titleBarHight;
-        icon.paint(&painter,m_d->widgetBord.left(),m_d->widgetBord.top()
+        int iconMinSize = m_d->titleBarHight - 6;
+        icon.paint(&painter,m_d->widgetBord.left()+3,m_d->widgetBord.top()+3
                    ,iconMinSize,iconMinSize);
         m_d->iconRightBorderPosition = m_d->widgetBord.left()+iconMinSize;
     }

@@ -14,8 +14,8 @@ public:
     SARibbonButtonGroupWidget(QWidget* parent=Q_NULLPTR);
     ~SARibbonButtonGroupWidget();
     void addButton(QAbstractButton* btn);
-
     SARibbonToolButton* addButton(QAction* action);
+    void addWidget(QWidget* w);
     QSize sizeHint() const Q_DECL_OVERRIDE;
     QSize minimumSizeHint() const Q_DECL_OVERRIDE;
 private:
