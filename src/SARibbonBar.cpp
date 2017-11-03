@@ -15,6 +15,7 @@
 #include <SARibbonButtonGroupWidget.h>
 #include <QAction>
 #include "SARibbonQuickAccessBar.h"
+#include <QStyleOptionMenuItem>
 class ContextCategoryManagerData
 {
 public:
@@ -33,7 +34,6 @@ public:
     QMargins widgetBord;
     SARibbonBar* MainClass;
     const int tabBarHight;
-    QBrush ribbonBarBackground;
     QColor titleTextColor;
     QAbstractButton* applitionButton;
     SARibbonTabBar* ribbonTabBar;
@@ -48,7 +48,6 @@ public:
         :titleBarHight(30)
         ,widgetBord(1,1,1,0)
         ,tabBarHight(30)
-        ,ribbonBarBackground(QColor(227,227,229))
         ,titleTextColor(Qt::black)
         ,applitionButton(nullptr)
         ,ribbonTabBar(nullptr)
@@ -142,7 +141,7 @@ public:
 
 
 
-SARibbonBar::SARibbonBar(QWidget *parent):QWidget(parent)
+SARibbonBar::SARibbonBar(QWidget *parent):QMenuBar(parent)
   ,m_d(new SARibbonBarPrivate(this))
 {
     m_d->init();
@@ -150,11 +149,7 @@ SARibbonBar::SARibbonBar(QWidget *parent):QWidget(parent)
     connect(parent,&QWidget::windowIconChanged,this,&SARibbonBar::onWindowIconChanged);
 }
 
-void SARibbonBar::setRibbonBarBackground(const QBrush &brush)
-{
-    m_d->ribbonBarBackground = brush;
-    repaint();
-}
+
 
 QAbstractButton *SARibbonBar::applitionButton()
 {
@@ -443,6 +438,7 @@ SARibbonButtonGroupWidget *SARibbonBar::activeTabBarRightButtonGroup()
     {
         m_d->tabBarRightSizeButtonGroupWidget = RibbonSubElementDelegate->craeteButtonGroupWidget(this);
         m_d->tabBarRightSizeButtonGroupWidget->setFrameShape(QFrame::NoFrame);
+        m_d->tabBarRightSizeButtonGroupWidget->show();
     }
     if(!m_d->tabBarRightSizeButtonGroupWidget->isVisible())
     {
@@ -456,13 +452,29 @@ SARibbonQuickAccessBar *SARibbonBar::quickAccessBar()
     return m_d->quickAccessBar;
 }
 
+bool SARibbonBar::eventFilter(QObject *obj, QEvent *e)
+{
+    if(obj)
+    {
+        //调整多文档时在窗口模式下的按钮更新
+        if(0 == strcmp(obj->metaObject()->className(),"QMdi::ControllerWidget"))
+        {
+            if(QEvent::UpdateLater == e->type())
+            {
+                QResizeEvent rsEvent(size(),size());
+                resizeEvent(&rsEvent);
+            }
+        }
+    }
+    return QMenuBar::eventFilter(obj,e);
+}
+
 
 void SARibbonBar::paintEvent(QPaintEvent *e)
 {
     QPainter p(this);
     //!
     paintBackground(p);
-
     //! 显示上下文标签
     p.save();
     QList<ContextCategoryManagerData> contextCategoryDataList = m_d->currentShowingContextCategory;
@@ -518,7 +530,15 @@ void SARibbonBar::paintEvent(QPaintEvent *e)
         paintWindowTitle(p,parWindow->windowTitle(),contextCategoryRegion);
         paintWindowIcon(p,parWindow->windowIcon());
     }
-    QWidget::paintEvent(e);
+//    QStyleOptionMenuItem menuOpt;
+//    menuOpt.palette = palette();
+//    menuOpt.state = QStyle::State_None;
+//    menuOpt.menuItemType = QStyleOptionMenuItem::EmptyArea;
+//    menuOpt.checkType = QStyleOptionMenuItem::NotCheckable;
+//    menuOpt.rect = rect();
+//    menuOpt.menuRect = rect();
+//    style()->drawControl(QStyle::CE_MenuBarEmptyArea, &menuOpt, &p, this);
+//    QWidget::paintEvent(e);
 }
 void SARibbonBar::paintContextCategoryTab(QPainter &painter, const QString &title, QRect contextRect, const QColor &color)
 {
@@ -564,9 +584,21 @@ void SARibbonBar::resizeEvent(QResizeEvent *e)
     //tab bar 定位
     int tabBarWidth = width()-x-m_d->widgetBord.right();
     int tabBarY = m_d->titleBarHight+m_d->widgetBord.top();
+    if(QWidget* connerW = cornerWidget(Qt::TopRightCorner))
+    {
+        QSize connerSize = connerW->sizeHint();
+        connerW->setGeometry(width()-m_d->widgetBord.right()-connerSize.width(),tabBarY
+                             ,connerSize.width(),m_d->tabBarHight-2);
+        tabBarWidth -= connerW->width();
+    }
     if(m_d->tabBarRightSizeButtonGroupWidget && m_d->tabBarRightSizeButtonGroupWidget->isVisible())
     {
-        tabBarWidth -= (m_d->tabBarRightSizeButtonGroupWidget->sizeHint().width());
+        QSize wSize = m_d->tabBarRightSizeButtonGroupWidget->sizeHint();
+        m_d->tabBarRightSizeButtonGroupWidget->setGeometry(x+tabBarWidth
+                                                           ,tabBarY
+                                                           ,wSize.width()
+                                                           ,m_d->tabBarHight-2);
+        tabBarWidth -= wSize.width();
     }
     m_d->ribbonTabBar->setGeometry(x
                                    ,tabBarY
@@ -601,7 +633,8 @@ void SARibbonBar::resizeEvent(QResizeEvent *e)
 void SARibbonBar::paintBackground(QPainter &painter)
 {
     painter.save();
-    painter.setBrush(m_d->ribbonBarBackground);
+    QPalette pl = palette();
+    painter.setBrush(pl.background());
     painter.drawRect(rect());
     //在tabbar下绘制一条线
     const int lineY = m_d->ribbonTabBar->geometry().bottom();

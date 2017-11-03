@@ -16,6 +16,24 @@ public:
 
 void SARibbonMainWindowPrivate::init()
 {
+    ribbonStyleSheet[SARibbonMainWindow::RibbonBar]
+            = QString("SARibbonBar{"
+                      "background-color: #E3E6E8;"
+                      "}"
+                      "SARibbonCategory:focus{outline: none;}"
+                      );
+    ribbonStyleSheet[SARibbonMainWindow::RibbonCategory]
+            = QString("SARibbonCategory{"
+                      "background-color: white;"
+                      "}"
+                      "SARibbonCategory:focus{outline: none;}"
+                      );
+    ribbonStyleSheet[SARibbonMainWindow::RibbonStackedWidget]
+            = QString("SARibbonStackedWidget{"
+                      "background-color: white;"
+                      "}"
+                      "SARibbonStackedWidget:focus{outline: none;}"
+                      );
     ribbonStyleSheet[SARibbonMainWindow::RibbonApplicationButton]
             = QString("SARibbonApplicationButton{"
                       "color:white;  "

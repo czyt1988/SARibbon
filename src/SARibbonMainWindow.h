@@ -23,6 +23,8 @@ public:
     enum RibbonElement
     {
         RibbonApplicationButton = 0 ///< ApplicationButton
+        ,RibbonBar
+        ,RibbonCategory
         ,RibbonStackedWidget
         ,RibbonTabBar
         ,RibbonToolButton

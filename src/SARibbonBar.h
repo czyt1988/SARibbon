@@ -1,7 +1,7 @@
 #ifndef SARIBBONBAR_H
 #define SARIBBONBAR_H
 #include "SARibbonGlobal.h"
-#include <QWidget>
+#include <QMenuBar>
 #include <QVariant>
 #include "SARibbonCategory.h"
 #include "SARibbonContextCategory.h"
@@ -16,13 +16,12 @@ class SARibbonQuickAccessBar;
 ///
 /// \brief The SARibbonBar class
 ///
-class SA_RIBBON_EXPORT SARibbonBar : public QWidget
+class SA_RIBBON_EXPORT SARibbonBar : public QMenuBar
 {
     Q_OBJECT
 public:
     SARibbonBar(QWidget* parent);
-    //设置ribbon的背景
-    void setRibbonBarBackground(const QBrush& brush);
+
     //获取applitionButton
     QAbstractButton* applitionButton();
     //设置applitionButton
@@ -57,7 +56,8 @@ signals:
     void applitionButtonClicked();
     //
     void currentRibbonTabChanged(int index);
-
+protected:
+    bool eventFilter(QObject *obj, QEvent *e);
 protected slots:
     void onWindowTitleChanged(const QString &title);
     void onWindowIconChanged(const QIcon &icon);
