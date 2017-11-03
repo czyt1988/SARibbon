@@ -68,6 +68,7 @@ public:
                      ,MainClass,&SARibbonBar::applitionButtonClicked);
         //
         ribbonTabBar = RibbonSubElementDelegate->createRibbonTabBar(MainClass);
+        ribbonTabBar->setObjectName(QStringLiteral("objSARibbonTabBar"));
         ribbonTabBar->setDrawBase(false);
         ribbonTabBar->setGeometry(applitionButton->geometry().right()
                                   ,titleBarHight+widgetBord.top()
@@ -80,6 +81,7 @@ public:
                      ,MainClass,&SARibbonBar::onCurrentRibbonTabDoubleClicked);
         //
         stackedContainerWidget = RibbonSubElementDelegate->createRibbonStackedWidget(MainClass);
+        ribbonTabBar->setObjectName(QStringLiteral("objSAStackedContainerWidget"));
         stackedContainerWidget->setGeometry(widgetBord.left()
                                             ,ribbonTabBar->geometry().bottom()+1
                                             ,MainClass->width()-widgetBord.left()-widgetBord.right()
@@ -468,6 +470,8 @@ bool SARibbonBar::eventFilter(QObject *obj, QEvent *e)
     }
     return QMenuBar::eventFilter(obj,e);
 }
+
+
 
 
 void SARibbonBar::paintEvent(QPaintEvent *e)

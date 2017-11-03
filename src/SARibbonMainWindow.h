@@ -38,6 +38,7 @@ public:
     };
     QString ribbonElementStyleSheet(RibbonElement element) const;
     void setRibbonElementStyleSheet(RibbonElement element,const QString& styleSheet);
+    void loadTheme();
 protected:
     void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
 private:

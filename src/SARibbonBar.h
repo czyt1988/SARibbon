@@ -20,6 +20,7 @@ class SA_RIBBON_EXPORT SARibbonBar : public QMenuBar
 {
     Q_OBJECT
 public:
+
     SARibbonBar(QWidget* parent);
 
     //获取applitionButton

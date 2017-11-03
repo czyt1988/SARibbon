@@ -5,14 +5,22 @@
 #include <QApplication>
 #include <QDebug>
 #include <QHash>
-
+#include <QFile>
 class SARibbonMainWindowPrivate
 {
 public:
+    SARibbonMainWindowPrivate(SARibbonMainWindow* p);
     void init();
+    SARibbonMainWindow* Parent;
     SARibbonBar* ribbonBar;
     QHash<SARibbonMainWindow::RibbonElement,QString> ribbonStyleSheet;
 };
+
+SARibbonMainWindowPrivate::SARibbonMainWindowPrivate(SARibbonMainWindow *p)
+    :Parent(p)
+{
+
+}
 
 void SARibbonMainWindowPrivate::init()
 {
@@ -68,7 +76,7 @@ void SARibbonMainWindowPrivate::init()
                      " max-height:30px;"
                      ""
                      "}"
-                     "SARibbonTabBar::tab:selected, QTabBar::tab:hover "
+                     "SARibbonTabBar::tab:selected, SARibbonTabBar::tab:hover "
                      "{ "
                      " border-top-left-radius: 2px;"
                      " border-top-right-radius: 2px;"
@@ -218,14 +226,14 @@ void SARibbonMainWindowPrivate::init()
                     "   selection-background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,stop:0 #FEF9F4, stop:0.38 #FDE0BD,stop:0.39 #FFCE69, stop:1 #FFFFE7);"
                     "}"
                       );
+    Parent->setStyleSheet("");
 }
 
 SARibbonMainWindow::SARibbonMainWindow(QWidget *parent)
     :QMainWindow(parent)
-    ,m_d(new SARibbonMainWindowPrivate)
+    ,m_d(new SARibbonMainWindowPrivate(this))
 {
     m_d->init();
-    this->setStyleSheet("");
     FramelessHelper *pHelper = new FramelessHelper(this);
     pHelper->setTitleHeight(30);  //设置窗体的标题栏高度
     //
@@ -280,3 +288,12 @@ void SARibbonMainWindow::resizeEvent(QResizeEvent *event)
 }
 
 
+void SARibbonMainWindow::loadTheme()
+{
+    QFile file(":/theme/resource/default.qss");
+    if(!file.open(QIODevice::ReadOnly|QIODevice::Text))
+    {
+        return;
+    }
+    setStyleSheet(file.readAll());
+}

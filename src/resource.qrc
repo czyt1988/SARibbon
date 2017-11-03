@@ -5,4 +5,7 @@
         <file>resource/ArrowMore.png</file>
         <file>resource/ArrowUp.png</file>
     </qresource>
+    <qresource prefix="/theme">
+        <file>resource/default.qss</file>
+    </qresource>
 </RCC>
