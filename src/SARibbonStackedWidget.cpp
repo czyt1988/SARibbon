@@ -83,7 +83,9 @@ void SARibbonStackedWidget::mouseReleaseEvent(QMouseEvent *e)
     if(isPopupMode())
     {
         if (!rect().contains(e->pos()))
+        {
             hide();
+        }
     }
     else
     {

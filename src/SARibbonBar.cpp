@@ -89,6 +89,7 @@ public:
                                             ,MainClass->height()-ribbonTabBar->geometry().bottom()-2-widgetBord.bottom());
         stackedContainerWidget->connect(stackedContainerWidget,&SARibbonStackedWidget::hidWindow
                                         ,MainClass,&SARibbonBar::onStackWidgetHided);
+        stackedContainerWidget->installEventFilter(MainClass);
         setNormalMode();
         //
         quickAccessBar = new SARibbonQuickAccessBar(MainClass);
@@ -376,10 +377,10 @@ void SARibbonBar::onCurrentRibbonTabChanged(int index)
             }
         }
     }
-    if(!m_d->currentShowingContextCategory.isEmpty())
-    {
-        repaint();
-    }
+//    if(!m_d->currentShowingContextCategory.isEmpty())
+//    {
+//        repaint();
+//    }
     emit currentRibbonTabChanged(index);
 }
 ///
@@ -462,16 +463,34 @@ bool SARibbonBar::eventFilter(QObject *obj, QEvent *e)
         //调整多文档时在窗口模式下的按钮更新
         if(obj == cornerWidget(Qt::TopLeftCorner) || obj == cornerWidget(Qt::TopRightCorner))
         {
-            qDebug() <<obj->metaObject()->className()<< " :"<<e->type();
             if(QEvent::UpdateLater == e->type()
                     || QEvent::MouseButtonRelease == e->type()
                     || QEvent::WindowActivate == e->type())
             {
-//                QResizeEvent rsEvent(size(),size());
-//                QApplication::sendEvent(this, &rsEvent);
                 QApplication::postEvent(this, new QResizeEvent(size(),size()));
             }
         }
+//        else if(obj == m_d->stackedContainerWidget)
+//        {
+//            qDebug() << e->type();
+//            if(QEvent::MouseButtonRelease == e->type()
+//                    )
+//            {
+//                if(m_d->ribbonTabBar->geometry().contains(mapFromGlobal( QCursor::pos())))
+//                {
+//                    qDebug() << "mouse on tabbar:";
+//                    return true;
+//                }
+//                else
+//                {
+//                    qDebug() << "mouse not on tabbar";
+//                    qDebug() << "QCursor::pos()"<<QCursor::pos();
+//                    qDebug() << "mapFromGlobal( QCursor::pos())"<<mapFromGlobal( QCursor::pos());
+//                    qDebug() << "m_d->ribbonTabBar->geometry()"<<m_d->ribbonTabBar->geometry();
+//                    return false;
+//                }
+//            }
+//        }
     }
     return QMenuBar::eventFilter(obj,e);
 }
