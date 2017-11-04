@@ -1,4 +1,5 @@
 #include "SARibbonBar.h"
+#include <QApplication>
 #include <QPainter>
 #include "SARibbonApplicationButton.h"
 #include "SARibbonTabBar.h"
@@ -459,12 +460,16 @@ bool SARibbonBar::eventFilter(QObject *obj, QEvent *e)
     if(obj)
     {
         //调整多文档时在窗口模式下的按钮更新
-        if(0 == strcmp(obj->metaObject()->className(),"QMdi::ControllerWidget"))
+        if(obj == cornerWidget(Qt::TopLeftCorner) || obj == cornerWidget(Qt::TopRightCorner))
         {
-            if(QEvent::UpdateLater == e->type())
+            qDebug() <<obj->metaObject()->className()<< " :"<<e->type();
+            if(QEvent::UpdateLater == e->type()
+                    || QEvent::MouseButtonRelease == e->type()
+                    || QEvent::WindowActivate == e->type())
             {
-                QResizeEvent rsEvent(size(),size());
-                resizeEvent(&rsEvent);
+//                QResizeEvent rsEvent(size(),size());
+//                QApplication::sendEvent(this, &rsEvent);
+                QApplication::postEvent(this, new QResizeEvent(size(),size()));
             }
         }
     }
@@ -574,48 +579,73 @@ void SARibbonBar::paintContextCategoryTab(QPainter &painter, const QString &titl
 void SARibbonBar::resizeEvent(QResizeEvent *e)
 {
     Q_UNUSED(e);
+    qDebug() << "resize";
     int x = m_d->widgetBord.left();
+    int y = m_d->widgetBord.top();
+    //cornerWidget - TopLeftCorner
+    x += m_d->iconRightBorderPosition+5;
+    if(QWidget* connerL = cornerWidget(Qt::TopLeftCorner))
+    {
+        if(connerL->isVisible())
+        {
+            QSize connerSize = connerL->sizeHint();
+            int detal = (m_d->titleBarHight - connerSize.height()) / 2;
+            connerL->setGeometry(x,y+detal
+                                 ,connerSize.width(),m_d->titleBarHight);
+            x = connerL->geometry().right() + 5;
+        }
+    }
     //quick access bar定位
-    QSize quickAccessBarSize = m_d->quickAccessBar->sizeHint();
-    m_d->quickAccessBar->setGeometry( x + m_d->iconRightBorderPosition+5,m_d->widgetBord.top()
-                                      ,quickAccessBarSize.width(),m_d->titleBarHight);
+    if(m_d->quickAccessBar)
+    {
+        if(m_d->quickAccessBar->isVisible())
+        {
+            QSize quickAccessBarSize = m_d->quickAccessBar->sizeHint();
+            m_d->quickAccessBar->setGeometry( x,y
+                                              ,quickAccessBarSize.width(),m_d->titleBarHight);
+            x = m_d->quickAccessBar->geometry().right() + 5;
+        }
+    }
+    x = m_d->widgetBord.left();
+    y = m_d->titleBarHight+m_d->widgetBord.top();
     //applitionButton 定位
     if(m_d->applitionButton)
     {
-        m_d->applitionButton->move(m_d->widgetBord.left(),m_d->titleBarHight+m_d->widgetBord.top());
-        x = m_d->applitionButton->geometry().right();
+        if(m_d->applitionButton->isVisible())
+        {
+            m_d->applitionButton->move(x,y);
+            x = m_d->applitionButton->geometry().right();
+        }
     }
-    //tab bar 定位
-    int tabBarWidth = width()-x-m_d->widgetBord.right();
-    int tabBarY = m_d->titleBarHight+m_d->widgetBord.top();
+    //cornerWidget - TopRightCorner
+    int endX = width()-m_d->widgetBord.right();
     if(QWidget* connerW = cornerWidget(Qt::TopRightCorner))
     {
-        QSize connerSize = connerW->sizeHint();
-        connerW->setGeometry(width()-m_d->widgetBord.right()-connerSize.width(),tabBarY
-                             ,connerSize.width(),m_d->tabBarHight-2);
-        tabBarWidth -= connerW->width();
+        if(connerW->isVisible())
+        {
+            QSize connerSize = connerW->sizeHint();
+            endX -= connerSize.width();
+            connerW->setGeometry(endX,y
+                                 ,connerSize.width(),m_d->tabBarHight-2);
+        }
     }
+    //tab bar 定位
+    //tabBar 右边的附加按钮组
     if(m_d->tabBarRightSizeButtonGroupWidget && m_d->tabBarRightSizeButtonGroupWidget->isVisible())
     {
         QSize wSize = m_d->tabBarRightSizeButtonGroupWidget->sizeHint();
-        m_d->tabBarRightSizeButtonGroupWidget->setGeometry(x+tabBarWidth
-                                                           ,tabBarY
+        endX -= wSize.width();
+        m_d->tabBarRightSizeButtonGroupWidget->setGeometry(endX
+                                                           ,y
                                                            ,wSize.width()
                                                            ,m_d->tabBarHight-2);
-        tabBarWidth -= wSize.width();
     }
+    int tabBarWidth = endX - x;
     m_d->ribbonTabBar->setGeometry(x
-                                   ,tabBarY
+                                   ,y
                                    ,tabBarWidth
                                    ,m_d->tabBarHight);
-    //tab bar右边的按钮群
-    if(m_d->tabBarRightSizeButtonGroupWidget && m_d->tabBarRightSizeButtonGroupWidget->isVisible())
-    {
-        m_d->tabBarRightSizeButtonGroupWidget->setGeometry(m_d->ribbonTabBar->geometry().right()
-                                                           ,tabBarY
-                                                           ,m_d->tabBarRightSizeButtonGroupWidget->sizeHint().width()
-                                                           ,m_d->tabBarHight-2);
-    }
+
 
     if(m_d->stackedContainerWidget->isPopupMode())
     {
