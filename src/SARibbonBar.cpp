@@ -127,6 +127,7 @@ public:
     {
 
         this->stackedContainerWidget->setPopupMode();
+        this->stackedContainerWidget->setFocusPolicy(Qt::NoFocus);
         this->stackedContainerWidget->clearFocus();
         this->ribbonTabBar->setFocus();
         this->stackedContainerWidget->hide();
@@ -466,31 +467,40 @@ bool SARibbonBar::eventFilter(QObject *obj, QEvent *e)
             if(QEvent::UpdateLater == e->type()
                     || QEvent::MouseButtonRelease == e->type()
                     || QEvent::WindowActivate == e->type())
+//            if(QEvent::UpdateLater == e->type()
+//                    || QEvent::ShowToParent == e->type()
+//                    || QEvent::HideToParent == e->type())
             {
                 QApplication::postEvent(this, new QResizeEvent(size(),size()));
             }
         }
-//        else if(obj == m_d->stackedContainerWidget)
-//        {
-//            qDebug() << e->type();
-//            if(QEvent::MouseButtonRelease == e->type()
-//                    )
-//            {
-//                if(m_d->ribbonTabBar->geometry().contains(mapFromGlobal( QCursor::pos())))
-//                {
-//                    qDebug() << "mouse on tabbar:";
-//                    return true;
-//                }
-//                else
-//                {
-//                    qDebug() << "mouse not on tabbar";
-//                    qDebug() << "QCursor::pos()"<<QCursor::pos();
-//                    qDebug() << "mapFromGlobal( QCursor::pos())"<<mapFromGlobal( QCursor::pos());
-//                    qDebug() << "m_d->ribbonTabBar->geometry()"<<m_d->ribbonTabBar->geometry();
-//                    return false;
-//                }
-//            }
-//        }
+        else if(obj == m_d->stackedContainerWidget)
+        {
+            //在stack 是popup模式时，点击的是stackedContainerWidget区域外的时候，如果是在ribbonTabBar上点击
+            //那么忽略掉这次点击，把点击下发到ribbonTabBar,这样可以避免stackedContainerWidget在点击ribbonTabBar后
+            //隐藏又显示，出现闪烁
+            if(QEvent::MouseButtonPress == e->type())
+            {
+                if(m_d->stackedContainerWidget->isPopupMode())
+                {
+                    QMouseEvent* mouseEvent = static_cast<QMouseEvent*>(e);
+                    if (!m_d->stackedContainerWidget->rect().contains(mouseEvent->pos()))
+                    {
+                        QWidget* clickedWidget = QApplication::widgetAt(mouseEvent->globalPos());
+                        if (clickedWidget == m_d->ribbonTabBar)
+                        {
+                            const QPoint targetPoint = clickedWidget->mapFromGlobal(mouseEvent->globalPos());
+                            QMouseEvent evPress(mouseEvent->type(), targetPoint, mouseEvent->globalPos(), mouseEvent->button(), mouseEvent->buttons(), mouseEvent->modifiers());
+                            QApplication::sendEvent(clickedWidget, &evPress);
+
+//                            QMouseEvent eDblClick(QEvent::MouseButtonDblClick, targetPoint, mouseEvent->globalPos(), mouseEvent->button(), mouseEvent->buttons(), mouseEvent->modifiers());
+//                            QApplication::sendEvent(d.m_associativeTab, &eDblClick);
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
     }
     return QMenuBar::eventFilter(obj,e);
 }

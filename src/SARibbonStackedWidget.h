@@ -15,7 +15,7 @@ public:
     bool isNormalMode() const;
     void exec();
 protected:
-    void mouseReleaseEvent(QMouseEvent *e);
+//    void mouseReleaseEvent(QMouseEvent *e);
     void hideEvent(QHideEvent *e);
 signals:
     void hidWindow();
