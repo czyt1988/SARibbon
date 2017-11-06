@@ -15,9 +15,10 @@ public:
     virtual QSize minimumSizeHint() const Q_DECL_OVERRIDE;
     virtual SARibbonGalleryGroup* addGalleryGroup();
 protected slots:
-    void onPageDown();
-    void onPageUp();
-    void onShowMoreDetail();
+    virtual void onPageDown();
+    virtual void onPageUp();
+    virtual void onShowMoreDetail();
+
 protected:
     void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
     void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;

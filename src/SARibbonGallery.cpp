@@ -153,12 +153,6 @@ void SARibbonGallery::onPageDown()
     if(m_d->viewportGroup)
     {
         QScrollBar* vscrollBar = m_d->viewportGroup->verticalScrollBar();
-//        qDebug() << "singleStep:" << vscrollBar->singleStep()
-//                 << "pageStep:" << vscrollBar->pageStep()
-//                 << "max" << vscrollBar->maximum()
-//                 << "min" << vscrollBar->minimum()
-//                 << "value:" << vscrollBar->value()
-//                    ;
         int v = vscrollBar->value();
         v += vscrollBar->singleStep();
         vscrollBar->setValue(v);
@@ -170,12 +164,6 @@ void SARibbonGallery::onPageUp()
     if(m_d->viewportGroup)
     {
         QScrollBar* vscrollBar = m_d->viewportGroup->verticalScrollBar();
-//        qDebug() << "singleStep:" << vscrollBar->singleStep()
-//                 << "pageStep:" << vscrollBar->pageStep()
-//                 << "max" << vscrollBar->maximum()
-//                 << "min" << vscrollBar->minimum()
-//                 << "value:" << vscrollBar->value()
-//                    ;
         int v = vscrollBar->value();
         v -= vscrollBar->singleStep();
         vscrollBar->setValue(v);

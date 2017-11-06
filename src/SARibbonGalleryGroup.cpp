@@ -1,6 +1,21 @@
 #include "SARibbonGalleryGroup.h"
 #include <QPainter>
 #include <QDebug>
+
+class SARibbonGalleryGroupPrivate
+{
+public:
+    SARibbonGalleryGroup* Parent;
+    bool enableIconText;
+    SARibbonGalleryGroupPrivate(SARibbonGalleryGroup* p)
+        :Parent(p)
+        ,enableIconText(false)
+    {
+
+    }
+};
+
+
 ////////////////////////////////////////
 
 SARibbonGalleryGroupItemDelegate::SARibbonGalleryGroupItemDelegate(SARibbonGalleryGroup *group, QObject *parent)
@@ -11,6 +26,22 @@ SARibbonGalleryGroupItemDelegate::SARibbonGalleryGroupItemDelegate(SARibbonGalle
 }
 
 void SARibbonGalleryGroupItemDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    if(nullptr == m_group)
+    {
+        return;
+    }
+    if(m_group->enableIconText())
+    {
+        paintIconWithText(painter,option,index);
+    }
+    else
+    {
+        paintIconOnly(painter,option,index);
+    }
+}
+
+void SARibbonGalleryGroupItemDelegate::paintIconOnly(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     QStyle* style = m_group->style();
     painter->save();
@@ -24,12 +55,19 @@ void SARibbonGalleryGroupItemDelegate::paint(QPainter *painter, const QStyleOpti
     painter->restore();
 }
 
+void SARibbonGalleryGroupItemDelegate::paintIconWithText(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    QStyledItemDelegate::paint(painter,option,index);
+}
+
 QSize SARibbonGalleryGroupItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     //option.rect对应grid size
     Q_UNUSED(index);
     return QSize(option.rect.width(),option.rect.height());
 }
+
+
 
 
 //////////////////////////////////////////
@@ -133,6 +171,7 @@ void SARibbonGalleryGroupModel::append(SARibbonGalleryItem *item)
 ///////////////////////
 
 SARibbonGalleryGroup::SARibbonGalleryGroup(QWidget *w):QListView(w)
+  ,m_d(new SARibbonGalleryGroupPrivate(this))
 {
     setViewMode(QListView::IconMode);
     setResizeMode(QListView::Adjust);
@@ -142,11 +181,14 @@ SARibbonGalleryGroup::SARibbonGalleryGroup(QWidget *w):QListView(w)
     setIconSize(QSize(72,56));
     setGridSize(QSize(72,56));
     setItemDelegate(new SARibbonGalleryGroupItemDelegate(this,this));
+
+    connect(this,&QAbstractItemView::clicked
+            ,this,&SARibbonGalleryGroup::onItemClicked);
 }
 
 SARibbonGalleryGroup::~SARibbonGalleryGroup()
 {
-
+    delete m_d;
 }
 
 void SARibbonGalleryGroup::addItem(const QIcon& icon)
@@ -166,6 +208,28 @@ void SARibbonGalleryGroup::addItem(SARibbonGalleryItem *item)
     }
     groupModel()->append(item);
 }
+
+void SARibbonGalleryGroup::addAction(QAction *act)
+{
+    if(nullptr == groupModel())
+    {
+        return;
+    }
+    groupModel()->append(new SARibbonGalleryItem(act));
+}
+
+void SARibbonGalleryGroup::addActionList(const QList<QAction *> &acts)
+{
+    if(nullptr == groupModel())
+    {
+        return;
+    }
+    SARibbonGalleryGroupModel* model = groupModel();
+    for(int i=0;i<acts.size();++i)
+    {
+        model->append(new SARibbonGalleryItem(acts[i]));
+    }
+}
 ///
 /// \brief 构建一个model，这个model的父类是SARibbonGalleryGroup，如果要共享model，需要手动处理model的父类
 ///
@@ -177,6 +241,32 @@ void SARibbonGalleryGroup::setupGroupModel()
 SARibbonGalleryGroupModel *SARibbonGalleryGroup::groupModel()
 {
     return qobject_cast<SARibbonGalleryGroupModel*>(model());
+}
+
+void SARibbonGalleryGroup::setEnableIconText(bool enable)
+{
+    m_d->enableIconText = enable;
+}
+
+bool SARibbonGalleryGroup::enableIconText() const
+{
+    return m_d->enableIconText;
+}
+
+void SARibbonGalleryGroup::onItemClicked(const QModelIndex &index)
+{
+    if(index.isValid())
+    {
+        SARibbonGalleryItem* item = (SARibbonGalleryItem*)index.internalPointer();
+        if(item)
+        {
+            QAction* act = item->action();
+            if(act)
+            {
+                act->activate(QAction::Trigger);
+            }
+        }
+    }
 }
 
 

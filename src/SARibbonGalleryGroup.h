@@ -6,6 +6,7 @@
 #include <QListView>
 #include <QStyledItemDelegate>
 #include "SARibbonGalleryItem.h"
+
 ///
 /// \brief SARibbonGalleryGroup对应的显示代理
 ///
@@ -16,6 +17,8 @@ public:
     virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const Q_DECL_OVERRIDE;
 
     virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const Q_DECL_OVERRIDE;
+    virtual void paintIconOnly(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    virtual void paintIconWithText(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 private:
     SARibbonGalleryGroup* m_group;
 };
@@ -42,6 +45,10 @@ public:
 private:
     QList<SARibbonGalleryItem*> m_items;
 };
+
+
+
+class SARibbonGalleryGroupPrivate;
 ///
 /// \brief Gallery的组
 ///
@@ -51,6 +58,7 @@ private:
 class SA_RIBBON_EXPORT SARibbonGalleryGroup : public QListView
 {
     Q_OBJECT
+    Q_PROPERTY(bool enableIconText READ enableIconText WRITE setEnableIconText)
 public:
     SARibbonGalleryGroup(QWidget* w = 0);
 
@@ -58,9 +66,18 @@ public:
 
     void addItem(const QIcon& icon);
     void addItem(SARibbonGalleryItem *item);
+    void addAction(QAction* act);
+    void addActionList(const QList<QAction*>& acts);
     //构建一个model，这个model的父类是SARibbonGalleryGroup，如果要共享model，需要手动处理model的父类
     void setupGroupModel();
     SARibbonGalleryGroupModel* groupModel();
+    //是否在Gallery的图标下显示文字
+    void setEnableIconText(bool enable);
+    bool enableIconText() const;
+private slots:
+    void onItemClicked(const QModelIndex &index);
+private:
+    SARibbonGalleryGroupPrivate* m_d;
 };
 
 
