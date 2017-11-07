@@ -234,13 +234,14 @@ SARibbonMainWindow::SARibbonMainWindow(QWidget *parent)
     ,m_d(new SARibbonMainWindowPrivate(this))
 {
     m_d->init();
-    FramelessHelper *pHelper = new FramelessHelper(this);
-    pHelper->setTitleHeight(30);  //设置窗体的标题栏高度
     //
     m_d->ribbonBar = new SARibbonBar(this);
     setMenuWidget(m_d->ribbonBar);
+    m_d->ribbonBar->installEventFilter(this);
     //
     new SAWindowButtonGroup(this);
+    FramelessHelper *pHelper = new FramelessHelper(this);
+    pHelper->setTitleHeight(m_d->ribbonBar->titleBarHeight());  //设置窗体的标题栏高度
 }
 
 const SARibbonBar *SARibbonMainWindow::ribbonBar() const
@@ -285,6 +286,25 @@ void SARibbonMainWindow::resizeEvent(QResizeEvent *event)
         }
     }
     QMainWindow::resizeEvent(event);
+}
+
+bool SARibbonMainWindow::eventFilter(QObject *obj, QEvent *e)
+{
+    if(obj == m_d->ribbonBar)
+    {
+        switch (e->type())
+        {
+        case QEvent::MouseButtonPress:
+        case QEvent::MouseButtonRelease:
+        case QEvent::MouseMove:
+        case QEvent::Leave:
+        case QEvent::HoverMove:
+            QApplication::sendEvent(this,e);
+        default:
+            break;
+        }
+    }
+    return QMainWindow::eventFilter(obj,e);
 }
 
 

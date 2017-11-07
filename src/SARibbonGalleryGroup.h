@@ -66,16 +66,20 @@ public:
 
     void addItem(const QIcon& icon);
     void addItem(SARibbonGalleryItem *item);
-    void addAction(QAction* act);
-    void addActionList(const QList<QAction*>& acts);
+    void addActionItem(QAction* act);
+    void addActionItemList(const QList<QAction*>& acts);
     //构建一个model，这个model的父类是SARibbonGalleryGroup，如果要共享model，需要手动处理model的父类
     void setupGroupModel();
     SARibbonGalleryGroupModel* groupModel();
     //是否在Gallery的图标下显示文字
     void setEnableIconText(bool enable);
     bool enableIconText() const;
+    void setGroupTitle(const QString& title);
+    QString groupTitle() const;
 private slots:
     void onItemClicked(const QModelIndex &index);
+signals:
+    void groupTitleChanged(const QString& title);
 private:
     SARibbonGalleryGroupPrivate* m_d;
 };

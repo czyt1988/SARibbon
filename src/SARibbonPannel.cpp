@@ -13,22 +13,48 @@
 #include "SARibbonGallery.h"
 #include "SARibbonElementManager.h"
 #include "SARibbonMenu.h"
+
+class SARibbonPannelPrivate
+{
+public:
+    SARibbonPannelPrivate(SARibbonPannel* p);
+    SARibbonPannel* Parent;
+    QGridLayout* m_gridLayout;
+    QPoint m_nextElementPosition;
+    int m_row;
+    SARibbonPannelOptionButton* m_optionActionButton;
+    int m_titleOptionButtonSpace;///< 标题和项目按钮的间隔
+    int m_titleHeight;///< 标题的高度
+    int m_titleY;///< 标题栏的y距离
+    SARibbonToolButton* m_defaultReduceButton;///<在pannel无法显示全的时候，显示一个toolbutton用来弹出pannel
+};
+
+SARibbonPannelPrivate::SARibbonPannelPrivate(SARibbonPannel *p)
+    :Parent(p)
+    ,m_nextElementPosition(3,3)
+    ,m_row(0)
+    ,m_optionActionButton(nullptr)
+    ,m_titleOptionButtonSpace(6)
+    ,m_titleHeight(21)
+    ,m_titleY(77)
+    ,m_defaultReduceButton(nullptr)
+{
+    m_gridLayout = new QGridLayout(Parent);
+    m_gridLayout->setSpacing(0);
+    m_gridLayout->setContentsMargins(3,2,3,21);
+}
+
 SARibbonPannel::SARibbonPannel(QWidget *parent):QWidget(parent)
-  ,m_nextElementPosition(3,3)
-  ,m_row(0)
-  ,m_optionActionButton(nullptr)
-  ,m_titleOptionButtonSpace(6)
-  ,m_titleHeight(21)
-  ,m_titleY(77)
-  ,m_defaultReduceButton(nullptr)
+  ,m_d(new SARibbonPannelPrivate(this))
 {
     setFixedHeight(98);
     setMinimumWidth(50);
-    m_gridLayout = new QGridLayout(this);
-    m_gridLayout->setSpacing(0);
-    m_gridLayout->setContentsMargins(3,2,3,21);
     setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Fixed);
-    //setMouseTracking(true);
+}
+
+SARibbonPannel::~SARibbonPannel()
+{
+    delete m_d;
 }
 
 SARibbonToolButton *SARibbonPannel::addLargeAction(QAction *action)
@@ -41,8 +67,8 @@ SARibbonToolButton *SARibbonPannel::addLargeAction(QAction *action)
     btn->setIconSize(iconSize);
     if(action->menu())
         btn->setPopupMode(QToolButton::MenuButtonPopup);
-    m_gridLayout->addWidget(btn,0,m_gridLayout->columnCount(),6,1);
-    m_row = 0;
+    m_d->m_gridLayout->addWidget(btn,0,m_d->m_gridLayout->columnCount(),6,1);
+    m_d->m_row = 0;
     addAction(action);
     return btn;
 }
@@ -58,8 +84,8 @@ SARibbonToolButton *SARibbonPannel::addLargeToolButton(const QString& text,const
     btn->setIcon(icon);
     btn->setPopupMode(popMode);
     btn->setText(text);
-    m_gridLayout->addWidget(btn,0,m_gridLayout->columnCount(),6,1);
-    m_row = 0;
+    m_d->m_gridLayout->addWidget(btn,0,m_d->m_gridLayout->columnCount(),6,1);
+    m_d->m_row = 0;
     return btn;
 }
 
@@ -74,13 +100,13 @@ SARibbonToolButton *SARibbonPannel::addSmallToolButton(const QString &text, cons
     btn->setIcon(icon);
     btn->setPopupMode(popMode);
     btn->setText(text);
-    if(0 == m_row)
-        m_gridLayout->addWidget(btn,m_row,m_gridLayout->columnCount(),2,1);
+    if(0 == m_d->m_row)
+        m_d->m_gridLayout->addWidget(btn,m_d->m_row,m_d->m_gridLayout->columnCount(),2,1);
     else
-        m_gridLayout->addWidget(btn,m_row,m_gridLayout->columnCount()-1,2,1);
-    m_row += 2;
-    if(m_row >= 5)//
-        m_row = 0;
+        m_d->m_gridLayout->addWidget(btn,m_d->m_row,m_d->m_gridLayout->columnCount()-1,2,1);
+    m_d->m_row += 2;
+    if(m_d->m_row >= 5)//
+        m_d->m_row = 0;
     return btn;
 }
 
@@ -94,13 +120,13 @@ SARibbonToolButton* SARibbonPannel::addSmallAction(QAction *action)
     btn->setIconSize(iconSize);
     if(action->menu())
         btn->setPopupMode(QToolButton::MenuButtonPopup);
-    if(0 == m_row)
-        m_gridLayout->addWidget(btn,m_row,m_gridLayout->columnCount(),2,1);
+    if(0 == m_d->m_row)
+        m_d->m_gridLayout->addWidget(btn,m_d->m_row,m_d->m_gridLayout->columnCount(),2,1);
     else
-        m_gridLayout->addWidget(btn,m_row,m_gridLayout->columnCount()-1,2,1);
-    m_row += 2;
-    if(m_row >= 5)
-        m_row = 0;
+        m_d->m_gridLayout->addWidget(btn,m_d->m_row,m_d->m_gridLayout->columnCount()-1,2,1);
+    m_d->m_row += 2;
+    if(m_d->m_row >= 5)
+        m_d->m_row = 0;
     addAction(action);
     return btn;
 }
@@ -115,20 +141,20 @@ SARibbonToolButton *SARibbonPannel::addMediumAction(QAction *action)
     btn->setIconSize(iconSize);
     if(action->menu())
         btn->setPopupMode(QToolButton::MenuButtonPopup);
-    if(0 == m_row)
+    if(0 == m_d->m_row)
     {
-        m_gridLayout->addWidget(btn,m_row,m_gridLayout->columnCount(),3,1);
-        m_row = 3;
+        m_d->m_gridLayout->addWidget(btn,m_d->m_row,m_d->m_gridLayout->columnCount(),3,1);
+        m_d->m_row = 3;
     }
-    else if(3 == m_row)
+    else if(3 == m_d->m_row)
     {
-        m_gridLayout->addWidget(btn,m_row,m_gridLayout->columnCount()-1,3,1);
-        m_row += 3;
+        m_d->m_gridLayout->addWidget(btn,m_d->m_row,m_d->m_gridLayout->columnCount()-1,3,1);
+        m_d->m_row += 3;
     }
     else
     {
-        m_gridLayout->addWidget(btn,m_row,m_gridLayout->columnCount(),3,1);
-        m_row = 0;
+        m_d->m_gridLayout->addWidget(btn,m_d->m_row,m_d->m_gridLayout->columnCount(),3,1);
+        m_d->m_row = 0;
     }
 
     addAction(action);
@@ -149,8 +175,8 @@ SARibbonToolButton *SARibbonPannel::addLargeMenu(SARibbonMenu *menu)
     btn->setPopupMode(QToolButton::InstantPopup);
     btn->setText(menu->title());
     btn->setMenu(menu);
-    m_gridLayout->addWidget(btn,0,m_gridLayout->columnCount(),6,1);
-    m_row = 0;
+    m_d->m_gridLayout->addWidget(btn,0,m_d->m_gridLayout->columnCount(),6,1);
+    m_d->m_row = 0;
     return btn;
 }
 
@@ -162,13 +188,13 @@ SARibbonToolButton *SARibbonPannel::addSmallMenu(SARibbonMenu *menu)
     btn->setIconSize(iconSize);
     btn->setMenu(menu);
     btn->setPopupMode(QToolButton::InstantPopup);
-    if(0 == m_row)
-        m_gridLayout->addWidget(btn,m_row,m_gridLayout->columnCount(),2,1);
+    if(0 == m_d->m_row)
+        m_d->m_gridLayout->addWidget(btn,m_d->m_row,m_d->m_gridLayout->columnCount(),2,1);
     else
-        m_gridLayout->addWidget(btn,m_row,m_gridLayout->columnCount()-1,2,1);
-    m_row += 2;
-    if(m_row >= 5)
-        m_row = 0;
+        m_d->m_gridLayout->addWidget(btn,m_d->m_row,m_d->m_gridLayout->columnCount()-1,2,1);
+    m_d->m_row += 2;
+    if(m_d->m_row >= 5)
+        m_d->m_row = 0;
     return btn;
 }
 
@@ -183,8 +209,8 @@ SARibbonToolButton *SARibbonPannel::addLargeActionMenu(QAction *action, SARibbon
 SARibbonGallery *SARibbonPannel::addGallery()
 {
     SARibbonGallery* gallery = RibbonSubElementDelegate->createRibbonGallery(this);
-    m_gridLayout->addWidget(gallery,0,m_gridLayout->columnCount(),6,1);
-    m_row = 0;
+    m_d->m_gridLayout->addWidget(gallery,0,m_d->m_gridLayout->columnCount(),6,1);
+    m_d->m_row = 0;
     setExpanding();
     return gallery;
 }
@@ -197,8 +223,8 @@ void SARibbonPannel::addSeparator()
     addAction(action);
 #else
     SARibbonSeparatorWidget* sep = RibbonSubElementDelegate->createRibbonSeparatorWidget(height() - 10,this);
-    m_gridLayout->addWidget(sep,0,m_gridLayout->columnCount(),6,1);
-    m_row = 0;
+    m_d->m_gridLayout->addWidget(sep,0,m_d->m_gridLayout->columnCount(),6,1);
+    m_d->m_row = 0;
 #endif
 }
 
@@ -209,61 +235,61 @@ void SARibbonPannel::addSeparator()
 void SARibbonPannel::addWidget(QWidget *w)
 {
     w->setParent(this);
-    int col = m_gridLayout->columnCount();
-    if(0 != m_row)
+    int col = m_d->m_gridLayout->columnCount();
+    if(0 != m_d->m_row)
     {
         col -= 1;
     }
-    m_gridLayout->addWidget(w,m_row,col,2,1);
-    m_row += 2;
-    if(m_row >= 5)
-        m_row = 0;
+    m_d->m_gridLayout->addWidget(w,m_d->m_row,col,2,1);
+    m_d->m_row += 2;
+    if(m_d->m_row >= 5)
+        m_d->m_row = 0;
 }
 
 void SARibbonPannel::addWidget(QWidget *w, int row, int rowSpan)
 {
     w->setParent(this);
-    int col = m_gridLayout->columnCount();
+    int col = m_d->m_gridLayout->columnCount();
     if(0 != row && 0 != col)
     {
         col -= 1;
     }
-    m_gridLayout->addWidget(w,row,col,rowSpan,1);
-    m_row = row + rowSpan;
-    if(m_row >= 5)
-        m_row = 0;
+    m_d->m_gridLayout->addWidget(w,row,col,rowSpan,1);
+    m_d->m_row = row + rowSpan;
+    if(m_d->m_row >= 5)
+        m_d->m_row = 0;
 }
 
 void SARibbonPannel::addWidget(QWidget *w, int row, int rowSpan, int column, int columnSpan)
 {
     w->setParent(this);
-    m_gridLayout->addWidget(w,row,column,rowSpan,columnSpan);
-    m_row = row + rowSpan;
+    m_d->m_gridLayout->addWidget(w,row,column,rowSpan,columnSpan);
+    m_d->m_row = row + rowSpan;
     if(row >= 5)
-        m_row = 0;
+        m_d->m_row = 0;
 }
 
 int SARibbonPannel::gridLayoutColumnCount() const
 {
-    return m_gridLayout->columnCount();
+    return m_d->m_gridLayout->columnCount();
 }
 
 void SARibbonPannel::addOptionAction(QAction *action)
 {
     if(nullptr == action)
     {
-        if(m_optionActionButton)
+        if(m_d->m_optionActionButton)
         {
-            delete m_optionActionButton;
-            m_optionActionButton = nullptr;
+            delete m_d->m_optionActionButton;
+            m_d->m_optionActionButton = nullptr;
         }
         return;
     }
-    if(nullptr == m_optionActionButton)
+    if(nullptr == m_d->m_optionActionButton)
     {
-        m_optionActionButton = new SARibbonPannelOptionButton(this);
+        m_d->m_optionActionButton = new SARibbonPannelOptionButton(this);
     }
-    m_optionActionButton->connectAction(action);
+    m_d->m_optionActionButton->connectAction(action);
     repaint();
 }
 
@@ -283,15 +309,15 @@ void SARibbonPannel::paintEvent(QPaintEvent *event)
     QFont f = font();
     f.setPixelSize(11);
     p.setFont(f);
-    if(m_optionActionButton)
+    if(m_d->m_optionActionButton)
     {
-        p.drawText(0,m_titleY
-                   ,width()-m_optionActionButton->width() - m_titleOptionButtonSpace
-                   ,m_titleHeight,Qt::AlignCenter,windowTitle());
+        p.drawText(0,m_d->m_titleY
+                   ,width()-m_d->m_optionActionButton->width() - m_d->m_titleOptionButtonSpace
+                   ,m_d->m_titleHeight,Qt::AlignCenter,windowTitle());
     }
     else
     {
-        p.drawText(0,m_titleY,width(),m_titleHeight,Qt::AlignCenter,windowTitle());
+        p.drawText(0,m_d->m_titleY,width(),m_d->m_titleHeight,Qt::AlignCenter,windowTitle());
     }
 
     QWidget::paintEvent(event);
@@ -303,9 +329,9 @@ QSize SARibbonPannel::sizeHint() const
     QFontMetrics fm = fontMetrics();
     QSize titleSize = fm.size(Qt::TextShowMnemonic,windowTitle());
     int maxWidth = laySize.width();
-    if(m_defaultReduceButton)
+    if(m_d->m_defaultReduceButton)
     {
-        maxWidth = qMax(laySize.width(),titleSize.width()) + m_titleOptionButtonSpace + m_defaultReduceButton->width();
+        maxWidth = qMax(laySize.width(),titleSize.width()) + m_d->m_titleOptionButtonSpace + m_d->m_defaultReduceButton->width();
     }
     else
     {
@@ -343,21 +369,18 @@ bool SARibbonPannel::isExpanding() const
     return sp.horizontalPolicy() == QSizePolicy::Expanding;
 }
 
-bool SARibbonPannel::event(QEvent *event)
-{
-   // qDebug() << "SARibbonPannel event: "<<event->type();
-    return QWidget::event(event);
-}
+
 
 
 void SARibbonPannel::resizeEvent(QResizeEvent *event)
 {
-    if(m_optionActionButton)
+    if(m_d->m_optionActionButton)
     {
-        m_optionActionButton->move(width()-m_titleOptionButtonSpace/2 - m_optionActionButton->width()
-                                   ,m_titleY+(m_titleHeight-m_optionActionButton->height())/2);
+        m_d->m_optionActionButton->move(width()-m_d->m_titleOptionButtonSpace/2 - m_d->m_optionActionButton->width()
+                                   ,m_d->m_titleY+(m_d->m_titleHeight-m_d->m_optionActionButton->height())/2);
     }
     return QWidget::resizeEvent(event);
 }
+
 
 

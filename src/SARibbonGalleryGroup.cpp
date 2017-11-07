@@ -7,6 +7,7 @@ class SARibbonGalleryGroupPrivate
 public:
     SARibbonGalleryGroup* Parent;
     bool enableIconText;
+    QString groupTitle;
     SARibbonGalleryGroupPrivate(SARibbonGalleryGroup* p)
         :Parent(p)
         ,enableIconText(false)
@@ -184,6 +185,8 @@ SARibbonGalleryGroup::SARibbonGalleryGroup(QWidget *w):QListView(w)
 
     connect(this,&QAbstractItemView::clicked
             ,this,&SARibbonGalleryGroup::onItemClicked);
+
+
 }
 
 SARibbonGalleryGroup::~SARibbonGalleryGroup()
@@ -209,7 +212,7 @@ void SARibbonGalleryGroup::addItem(SARibbonGalleryItem *item)
     groupModel()->append(item);
 }
 
-void SARibbonGalleryGroup::addAction(QAction *act)
+void SARibbonGalleryGroup::addActionItem(QAction *act)
 {
     if(nullptr == groupModel())
     {
@@ -218,13 +221,13 @@ void SARibbonGalleryGroup::addAction(QAction *act)
     groupModel()->append(new SARibbonGalleryItem(act));
 }
 
-void SARibbonGalleryGroup::addActionList(const QList<QAction *> &acts)
+void SARibbonGalleryGroup::addActionItemList(const QList<QAction *> &acts)
 {
-    if(nullptr == groupModel())
+    SARibbonGalleryGroupModel* model = groupModel();
+    if(nullptr == model)
     {
         return;
     }
-    SARibbonGalleryGroupModel* model = groupModel();
     for(int i=0;i<acts.size();++i)
     {
         model->append(new SARibbonGalleryItem(acts[i]));
@@ -251,6 +254,17 @@ void SARibbonGalleryGroup::setEnableIconText(bool enable)
 bool SARibbonGalleryGroup::enableIconText() const
 {
     return m_d->enableIconText;
+}
+
+void SARibbonGalleryGroup::setGroupTitle(const QString &title)
+{
+    m_d->groupTitle = title;
+    emit groupTitleChanged(m_d->groupTitle);
+}
+
+QString SARibbonGalleryGroup::groupTitle() const
+{
+    return m_d->groupTitle;
 }
 
 void SARibbonGalleryGroup::onItemClicked(const QModelIndex &index)

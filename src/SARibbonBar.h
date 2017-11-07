@@ -49,6 +49,8 @@ public:
     bool isShowHideModeButton() const;
     //ribbon tab的高度
     int tabBarHeight() const;
+    //
+    int titleBarHeight() const;
     //激活tabbar右边的按钮群
     SARibbonButtonGroupWidget* activeTabBarRightButtonGroup();
     //快速响应栏

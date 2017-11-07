@@ -47,7 +47,7 @@ public:
     SARibbonQuickAccessBar* quickAccessBar;///< 快速响应栏
     SARibbonBarPrivate(SARibbonBar* par)
         :titleBarHight(30)
-        ,widgetBord(1,1,1,0)
+        ,widgetBord(0,0,0,0)
         ,tabBarHight(30)
         ,titleTextColor(Qt::black)
         ,applitionButton(nullptr)
@@ -321,6 +321,11 @@ bool SARibbonBar::isShowHideModeButton() const
 int SARibbonBar::tabBarHeight() const
 {
     return m_d->tabBarHight;
+}
+
+int SARibbonBar::titleBarHeight() const
+{
+    return m_d->titleBarHight;
 }
 
 

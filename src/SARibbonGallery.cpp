@@ -83,6 +83,8 @@ public:
         viewportGroup->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         viewportGroup->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         viewportGroup->setModel(v->model());
+        viewportGroup->setEnableIconText(v->enableIconText());
+        viewportGroup->show();
     }
 };
 
@@ -134,18 +136,46 @@ QSize SARibbonGallery::minimumSizeHint() const
 SARibbonGalleryGroup *SARibbonGallery::addGalleryGroup()
 {
     SARibbonGalleryGroup* group = RibbonSubElementDelegate->createRibbonGalleryGroup(this);
+    RibbonGalleryViewport* viewport = ensureGetPopupViewPort();
     SARibbonGalleryGroupModel* model = new SARibbonGalleryGroupModel(this);
     group->setModel(model);
-    if(nullptr == m_d->popupWidget)
-    {
-        m_d->createPopupWidget();
-    }
-    m_d->popupWidget->addWidget(group);
+    viewport->addWidget(group);
     if(nullptr == m_d->viewportGroup)
     {
-        m_d->setViewPort(group);
+        setCurrentViewGroup(group);
     }
+    connect(group,&QAbstractItemView::clicked
+            ,this,&SARibbonGallery::onItemClicked);
     return group;
+}
+
+SARibbonGalleryGroup* SARibbonGallery::addCategoryActions(const QString &title, QList<QAction *> actions)
+{
+    SARibbonGalleryGroup* group = RibbonSubElementDelegate->createRibbonGalleryGroup(this);
+    SARibbonGalleryGroupModel* model = new SARibbonGalleryGroupModel(this);
+    group->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Maximum);
+    group->setModel(model);
+    if(!title.isEmpty())
+    {
+        group->setGroupTitle(title);
+    }
+    group->addActionItemList(actions);
+    connect(group,&QAbstractItemView::clicked
+            ,this,&SARibbonGallery::onItemClicked);
+    RibbonGalleryViewport* viewport = ensureGetPopupViewPort();
+    viewport->addWidget(group);
+    return group;
+}
+
+void SARibbonGallery::setCurrentViewGroup(SARibbonGalleryGroup *group)
+{
+    m_d->setViewPort(group);
+    QApplication::postEvent(this,new QResizeEvent(size(),size()));
+}
+
+SARibbonGalleryGroup *SARibbonGallery::currentViewGroup() const
+{
+    return m_d->viewportGroup;
 }
 
 void SARibbonGallery::onPageDown()
@@ -176,10 +206,42 @@ void SARibbonGallery::onShowMoreDetail()
     {
         return;
     }
-    QSize popupMenuSize = m_d->popupWidget->sizeHint();
+    QSize popupMenuSize = m_d->popupWidget->minimumSizeHint();// sizeHint();
     QPoint start = mapToGlobal(QPoint(0,0));
     m_d->popupWidget->setGeometry(start.x(),start.y(),width(),popupMenuSize.height());
     m_d->popupWidget->show();
+}
+
+void SARibbonGallery::onItemClicked(const QModelIndex &index)
+{
+    QObject* obj = sender();
+    SARibbonGalleryGroup* group = qobject_cast<SARibbonGalleryGroup*>(obj);
+
+    if(group)
+    {
+        SARibbonGalleryGroup* curGroup = currentViewGroup();
+        if(nullptr == curGroup)
+        {
+            setCurrentViewGroup(group);
+            curGroup = currentViewGroup();
+        }
+        if(curGroup->model() != group->model())
+        {
+            curGroup->setModel(group->model());
+        }
+        curGroup->scrollTo(index);
+        curGroup->setCurrentIndex(index);
+        curGroup->repaint();
+    }
+}
+
+RibbonGalleryViewport *SARibbonGallery::ensureGetPopupViewPort()
+{
+    if(nullptr == m_d->popupWidget)
+    {
+        m_d->createPopupWidget();
+    }
+    return m_d->popupWidget;
 }
 
 void SARibbonGallery::resizeEvent(QResizeEvent *event)

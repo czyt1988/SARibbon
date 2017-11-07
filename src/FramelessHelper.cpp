@@ -195,6 +195,7 @@ bool WidgetData::handleWidgetEvent(QEvent *event)
     default:
         return false;
     }
+    return false;
 }
 
 void WidgetData::updateRubberBandStatus()

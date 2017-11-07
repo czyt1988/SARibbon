@@ -41,6 +41,7 @@ public:
     void loadTheme();
 protected:
     void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
+    bool eventFilter(QObject *obj, QEvent *e);
 private:
     SARibbonMainWindowPrivate* m_d;
 };

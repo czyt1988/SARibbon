@@ -5,6 +5,7 @@
 #include "SARibbonGalleryGroup.h"
 class QVBoxLayout;
 class SARibbonGalleryPrivate;
+class RibbonGalleryViewport;
 class SA_RIBBON_EXPORT SARibbonGallery : public QFrame
 {
     Q_OBJECT
@@ -13,12 +14,17 @@ public:
     virtual ~SARibbonGallery();
     virtual QSize sizeHint() const Q_DECL_OVERRIDE;
     virtual QSize minimumSizeHint() const Q_DECL_OVERRIDE;
-    virtual SARibbonGalleryGroup* addGalleryGroup();
+    SARibbonGalleryGroup* addGalleryGroup();
+    SARibbonGalleryGroup* addCategoryActions(const QString& title,QList<QAction *> actions);
+    void setCurrentViewGroup(SARibbonGalleryGroup* group);
+    SARibbonGalleryGroup* currentViewGroup() const;
 protected slots:
     virtual void onPageDown();
     virtual void onPageUp();
     virtual void onShowMoreDetail();
-
+    void onItemClicked(const QModelIndex &index);
+private:
+    RibbonGalleryViewport* ensureGetPopupViewPort();
 protected:
     void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
     void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
