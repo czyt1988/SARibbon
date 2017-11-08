@@ -5,7 +5,6 @@
 #include <QHoverEvent>
 #include <QApplication>
 
-
 class WidgetData;
 /*****
  * FramelessHelperPrivate
@@ -132,6 +131,8 @@ private:
     bool handleLeaveEvent(QEvent *event);
     // 处理鼠标进入
     bool handleHoverMoveEvent(QHoverEvent *event);
+    //处理鼠标双击事件
+    bool handleDoubleClickedMouseEvent(QMouseEvent *event);
 
 private:
     FramelessHelperPrivate *d;
@@ -192,8 +193,10 @@ bool WidgetData::handleWidgetEvent(QEvent *event)
         return handleLeaveEvent(static_cast<QMouseEvent*>(event));
     case QEvent::HoverMove:
         return handleHoverMoveEvent(static_cast<QHoverEvent*>(event));
+    case QEvent::MouseButtonDblClick:
+        return handleDoubleClickedMouseEvent(static_cast<QMouseEvent*>(event));
     default:
-        return false;
+        break;
     }
     return false;
 }
@@ -366,6 +369,11 @@ bool WidgetData::handleMousePressEvent(QMouseEvent *event)
 
         if (m_pressedMousePos.m_bOnEdges)
         {
+            if(m_pWidget->isMaximized())
+            {
+                //窗口在最大化状态时，点击边界不做任何处理
+                return false;
+            }
             if (d->m_bRubberBandOnResize)
             {
                 m_pRubberBand->setGeometry(frameRect);
@@ -375,6 +383,11 @@ bool WidgetData::handleMousePressEvent(QMouseEvent *event)
         }
         else if (d->m_bRubberBandOnMove && m_bLeftButtonTitlePressed)
         {
+            if(m_pWidget->isMaximized())
+            {
+                //窗口在最大化状态时，点击标题栏不做任何处理
+                return false;
+            }
             m_pRubberBand->setGeometry(frameRect);
             m_pRubberBand->show();
             return true;
@@ -406,11 +419,21 @@ bool WidgetData::handleMouseMoveEvent(QMouseEvent *event)
     {
         if (d->m_bWidgetResizable && m_pressedMousePos.m_bOnEdges)
         {
+            if(m_pWidget->isMaximized())
+            {
+                //窗口在最大化状态时，点击边界不做任何处理
+                return false;
+            }
             resizeWidget(event->globalPos());
             return true;
         }
         else if (d->m_bWidgetMovable && m_bLeftButtonTitlePressed)
         {
+            if(m_pWidget->isMaximized())
+            {
+                //窗口在最大化状态时，点击标题栏不做任何处理
+                return false;
+            }
             moveWidget(event->globalPos());
             return true;
         }
@@ -439,6 +462,30 @@ bool WidgetData::handleHoverMoveEvent(QHoverEvent *event)
     if (d->m_bWidgetResizable)
     {
         updateCursorShape(m_pWidget->mapToGlobal(event->pos()));
+    }
+    return false;
+}
+
+bool WidgetData::handleDoubleClickedMouseEvent(QMouseEvent *event)
+{
+    if(event->button() == Qt::LeftButton)
+    {
+        if(m_pWidget)
+        {
+            bool titlePressed = event->pos().y() < m_moveMousePos.m_nTitleHeight;
+            if(titlePressed)
+            {
+                if(m_pWidget->isMaximized())
+                {
+                    m_pWidget->showNormal();
+                }
+                else
+                {
+                    m_pWidget->showMaximized();
+                }
+                return true;
+            }
+        }
     }
     return false;
 }
@@ -486,6 +533,7 @@ bool FramelessHelper::eventFilter(QObject *obj, QEvent *event)
     case QEvent::HoverMove:
     case QEvent::MouseButtonPress:
     case QEvent::MouseButtonRelease:
+    case QEvent::MouseButtonDblClick:
     case QEvent::Leave:
     {
         WidgetData *data = d->m_widgetDataHash.value(static_cast<QWidget*>(obj));

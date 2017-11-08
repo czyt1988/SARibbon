@@ -34,8 +34,9 @@ private:
 /// \brief ribbon页的代理类
 /// 如果需要修改重绘SARibbonCategory，可以通过设置SARibbonCategory::setProxy
 ///
-class SA_RIBBON_EXPORT SARibbonCategoryProxy
+class SA_RIBBON_EXPORT SARibbonCategoryProxy : public QObject
 {
+    Q_OBJECT
 public:
     SARibbonCategoryProxy(SARibbonCategory* parent);
     virtual ~SARibbonCategoryProxy();

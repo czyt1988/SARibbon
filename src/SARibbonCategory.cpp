@@ -69,7 +69,7 @@ SARibbonCategory::~SARibbonCategory()
 
 ///
 /// \brief 添加一个面板
-/// \param title 明白名称
+/// \param title 面板名称
 /// \return
 ///
 SARibbonPannel *SARibbonCategory::addPannel(const QString &title)
@@ -203,6 +203,7 @@ void SARibbonCategoryProxy::resizePannels(const QSize &categorySize)
                 buildReduceModePannel(pannel,x,y);
             }
             pannel->setReduce(true);
+            pannel->setParent(ribbonCategory()->parentWidget());
             SARibbonCategoryProxyPrivate::ReduceActionInfo reduceInfo = m_d->m_pannelReduceInfo.value(pannel);
             QSize reducePannelSize = reduceInfo.reduceModeShowPannel->sizeHint();
             reduceInfo.reduceModeShowPannel->setVisible(true);
@@ -217,7 +218,10 @@ void SARibbonCategoryProxy::resizePannels(const QSize &categorySize)
         }
         else
         {
-
+            if(pannel->parentWidget() != ribbonCategory())
+            {
+                pannel->setParent(ribbonCategory());
+            }
             pannel->setReduce(false);
             if(m_d->m_pannelReduceInfo.contains(pannel))
             {
@@ -275,6 +279,8 @@ void SARibbonCategoryProxy::resizePannels(const QSize &categorySize)
     }
     //m_isChanged = false;
 }
+
+
 #endif
 
 
@@ -282,6 +288,8 @@ SARibbonCategory *SARibbonCategoryProxy::ribbonCategory()
 {
     return m_d->parent;
 }
+
+
 #if NOT_USE_LAYOUT
 int SARibbonCategoryProxy::buildReduceModePannel(SARibbonPannel *realPannel, int x, int y)
 {
@@ -296,8 +304,8 @@ int SARibbonCategoryProxy::buildReduceModePannel(SARibbonPannel *realPannel, int
     info.reduceModeShowPannel = reducePannel;
     reducePannel->move(x,y);
 
-    categoryPage->connect(btn,&SARibbonToolButton::clicked
-                                  ,categoryPage,[categoryPage,info](bool on){
+    connect(btn,&SARibbonToolButton::clicked
+                                  ,this,[categoryPage,info](bool on){
         Q_UNUSED(on);
         int pannelX = info.reduceModeShowPannel->geometry().x();
         QPoint pos = SARibbonCategoryProxy::calcPopupPannelPosition(categoryPage,info.realShowPannel,pannelX);
@@ -305,22 +313,11 @@ int SARibbonCategoryProxy::buildReduceModePannel(SARibbonPannel *realPannel, int
        //info.realShowPannel->move(pos);
         info.realShowPannel->setReduce(true);
         info.realShowPannel->setGeometry(pos.x(),pos.y(),info.realShowPannel->sizeHint().width(),info.realShowPannel->sizeHint().height());
-        info.realShowPannel->setVisible(true);
         info.realShowPannel->show();
         info.realShowPannel->setFocus();
         info.realShowPannel->raise();
         info.realShowPannel->activateWindow();
         info.realShowPannel->repaint();
-        if(nullptr == info.realShowPannel->paintEngine())
-        {
-            qDebug() << "info.realShowPannel->paintEngine() is null";
-        }
-        qDebug() << "realShowPannel geometry:"<<info.realShowPannel->geometry()
-                 << "\n window flag:"<<info.realShowPannel->windowFlags()
-        << "\n is active:"<<info.realShowPannel->isActiveWindow()
-           << "\n is visible:"<<info.realShowPannel->isVisible()
-              << "\n is visible to parent:"<<info.realShowPannel->isVisibleTo(categoryPage)
-           ;
     });
     m_d->m_pannelReduceInfo[realPannel] = info;
     return reducePannel->geometry().right();
