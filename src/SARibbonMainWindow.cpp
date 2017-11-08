@@ -292,10 +292,6 @@ bool SARibbonMainWindow::eventFilter(QObject *obj, QEvent *e)
 {
     if(obj == m_d->ribbonBar)
     {
-        if(QEvent::MouseButtonDblClick == e->type())
-        {
-            qDebug() << "bool SARibbonMainWindow::eventFilter(QObject *obj, QEvent *e)";
-        }
         switch (e->type())
         {
         case QEvent::MouseButtonPress:
