@@ -95,6 +95,15 @@ void SARibbonMainWindowPrivate::init()
                      " margin-top: 0px;"
                      "}"
                      "");
+    ribbonStyleSheet[SARibbonMainWindow::RibbonLineEdit]
+            = QString(
+                      "SARibbonLineEdit {"
+                      " border: 1px solid #C0C2C4;"
+                      " background: #FFF;"
+                      " selection-background-color: #9BBBF7;"
+                      " selection-color: #000;"
+                      "}"
+                      );
     ribbonStyleSheet[SARibbonMainWindow::RibbonToolButton]
             = QString(""
                      "SARibbonToolButton::pressed{"
@@ -188,24 +197,24 @@ void SARibbonMainWindowPrivate::init()
                       "    border: 2px solid #FDEEB3;"
                       "}"
                       );
-    ribbonStyleSheet[SARibbonMainWindow::Q_ComboBox]
+    ribbonStyleSheet[SARibbonMainWindow::RibbonComboBox]
             = QString(
-                      "QComboBox {  "
+                      "SARibbonComboBox {  "
                       " border: 1px solid #C0C2C4;"
                       //" background: white;"
                       "}"
-                      "QComboBox:hover{  "
+                      "SARibbonComboBox:hover{  "
                       "  border: 1px solid #FDEEB3;"
                       "  color : #000;"
-
                       //" background: white;"
                       "}"
-                      "QComboBox:editable {"
+                      "SARibbonComboBox:editable {"
                       "  color : #000;"
                       "  background: white;"
+                      "  selection-background-color: #9BBBF7;"
+                      "  selection-color: #000;"
                       "}"
-
-                      "QComboBox::drop-down {"
+                      "SARibbonComboBox::drop-down {"
                       "      subcontrol-origin: padding;"
                       "      subcontrol-position: top right;"
                       "      width: 15px;"
@@ -213,19 +222,20 @@ void SARibbonMainWindowPrivate::init()
                       "      border-top-right-radius: 0px;"
                       "      border-bottom-right-radius: 0px;"
                       "}"
-                      "QComboBox::drop-down:hover {"
+                      "SARibbonComboBox::drop-down:hover {"
                       "    border: 1px solid #FDEEB3;"
                       "    background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,stop:0 #FDEEB3, stop:0.1282 #FDE38A,stop:0.8333 #FCE58C, stop:1 #FDFDEB);  "
                       "}"
-                        "QComboBox::down-arrow {"
+                        "SARibbonComboBox::down-arrow {"
                         "    image: url(:/image/resource/ArrowDown.png);"
                         "}"
-                    "QComboBox QAbstractItemView {"
-                    "   border: 1px solid #C0C2C4;"
-                    "   selection-color:#000;"
-                    "   selection-background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,stop:0 #FEF9F4, stop:0.38 #FDE0BD,stop:0.39 #FFCE69, stop:1 #FFFFE7);"
-                    "}"
+//                    "SARibbonComboBox QAbstractItemView {"
+//                    "   border: 1px solid #C0C2C4;"
+//                    "   selection-color:#000;"
+//                    "   selection-background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,stop:0 #FEF9F4, stop:0.38 #FDE0BD,stop:0.39 #FFCE69, stop:1 #FFFFE7);"
+//                    "}"
                       );
+
     Parent->setStyleSheet("");
 }
 

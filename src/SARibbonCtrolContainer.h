@@ -14,8 +14,8 @@ public:
     QSize minimumSizeHint() const Q_DECL_OVERRIDE;
     QWidget* containerWidget();
     const QWidget* containerWidget() const;
-    void setEnableDrawIcon(bool b);
-    void setEnableDrawTitle(bool b);
+    void setEnableShowIcon(bool b);
+    void setEnableShowTitle(bool b);
 protected:
     void setContainerWidget(QWidget* w);
     void paintEvent(QPaintEvent *e) Q_DECL_OVERRIDE;

@@ -2,18 +2,14 @@
 #define SARIBBONLINEEDIT_H
 #include "SARibbonGlobal.h"
 #include <QLineEdit>
-#include "SARibbonCtrolContainer.h"
 
 
-class SA_RIBBON_EXPORT SARibbonLineEdit : public SARibbonCtrolContainer
+
+class SA_RIBBON_EXPORT SARibbonLineEdit : public QLineEdit
 {
+    Q_OBJECT
 public:
     SARibbonLineEdit(QWidget *parent = Q_NULLPTR);
-    QLineEdit* lineEdit();
-protected:
-    void initStyleOption(QStyleOption* opt) Q_DECL_OVERRIDE;
-private:
-    QLineEdit* m_w;
 };
 
 #endif // SARIBBONLINEEDIT_H

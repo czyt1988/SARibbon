@@ -49,6 +49,7 @@ MainWindow::MainWindow(QWidget *par):SARibbonMainWindow(par)
     PRINT_COST(cost,lastTimes,"add contextCategory page");
 #endif
     showMaximized();
+    //qDebug() << styleSheet();
 }
 
 void MainWindow::onShowContextCategory(bool on)
@@ -217,8 +218,8 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
     com->setWindowIcon(QIcon(":/icon/icon/Graph-add.png"));
     com->setWindowTitle("ComboBox");
     for (int i=0;i<40;++i)
-        com->comboBox()->addItem("SARibbonComboBox测试");
-    com->comboBox()->setEditable(true);
+        com->addItem("SARibbonComboBox测试");
+    com->setEditable(true);
     pannel->addWidget(com);
 
     com = new SARibbonComboBox(this);
@@ -227,7 +228,7 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
     com->setWindowIcon(QIcon(":/icon/icon/folder.png"));
     com->setWindowTitle("ComboBox Editable");
     for (int i=0;i<40;++i)
-        com->comboBox()->addItem("111111111111");
+        com->addItem("111111111111");
     pannel->addWidget(com);
 
     SARibbonLineEdit* lineEdit = new SARibbonLineEdit(this);
@@ -235,14 +236,19 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
                        QSizePolicy::Fixed);
     lineEdit->setWindowIcon(QIcon(":/icon/icon/folder.png"));
     lineEdit->setWindowTitle("Line Edit");
-    lineEdit->lineEdit()->setText("SARibbonLineEdit");
+    lineEdit->setText("SARibbonLineEdit");
     pannel->addWidget(lineEdit);
-
+QWidget* w = lineEdit->parentWidget();
+while(w)
+{
+    qDebug() << w->metaObject()->className();
+    w = w->parentWidget();
+}
     SARibbonCheckBox* checkBox = new SARibbonCheckBox(this);
     checkBox->setSizePolicy(QSizePolicy::Expanding,
                        QSizePolicy::Fixed);
     checkBox->setWindowIcon(QIcon(":/icon/icon/folder.png"));
-    checkBox->checkBox()->setText("checkBox");
+    checkBox->setText("checkBox");
     pannel->addWidget(checkBox);
 
     pannel->setExpanding();

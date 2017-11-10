@@ -105,13 +105,13 @@ const QWidget *SARibbonCtrolContainer::containerWidget() const
     return m_d->containerWidget;
 }
 
-void SARibbonCtrolContainer::setEnableDrawIcon(bool b)
+void SARibbonCtrolContainer::setEnableShowIcon(bool b)
 {
     m_d->enableDrawIcon = b;
     update();
 }
 
-void SARibbonCtrolContainer::setEnableDrawTitle(bool b)
+void SARibbonCtrolContainer::setEnableShowTitle(bool b)
 {
     m_d->enableDrawTitle = b;
     update();
@@ -121,6 +121,7 @@ void SARibbonCtrolContainer::setContainerWidget(QWidget *w)
 {
     if(m_d->containerWidget)
     {
+        m_d->containerWidget->hide();
         m_d->containerWidget->deleteLater();
     }
     if(w)

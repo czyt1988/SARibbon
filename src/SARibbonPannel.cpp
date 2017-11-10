@@ -40,7 +40,7 @@ SARibbonPannelPrivate::SARibbonPannelPrivate(SARibbonPannel *p)
     ,m_defaultReduceButton(nullptr)
 {
     m_gridLayout = new QGridLayout(Parent);
-    m_gridLayout->setSpacing(0);
+    m_gridLayout->setSpacing(1);
     m_gridLayout->setContentsMargins(3,2,3,21);
 }
 

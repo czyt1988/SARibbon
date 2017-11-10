@@ -34,7 +34,8 @@ public:
         ,RibbonControlButton
         ,RibbonGallery
         ,RibbonGalleryGroup
-        ,Q_ComboBox
+        ,RibbonComboBox
+        ,RibbonLineEdit
     };
     QString ribbonElementStyleSheet(RibbonElement element) const;
     void setRibbonElementStyleSheet(RibbonElement element,const QString& styleSheet);
