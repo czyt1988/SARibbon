@@ -178,9 +178,7 @@ SARibbonGalleryGroup::SARibbonGalleryGroup(QWidget *w):QListView(w)
     setResizeMode(QListView::Adjust);
     setSelectionRectVisible(true);
     setUniformItemSizes(true);
-
-    setIconSize(QSize(72,56));
-    setGridSize(QSize(72,56));
+    setPreinstallStyle(LargeIconWithText);
     setItemDelegate(new SARibbonGalleryGroupItemDelegate(this,this));
 
     connect(this,&QAbstractItemView::clicked
@@ -192,6 +190,36 @@ SARibbonGalleryGroup::SARibbonGalleryGroup(QWidget *w):QListView(w)
 SARibbonGalleryGroup::~SARibbonGalleryGroup()
 {
     delete m_d;
+}
+///
+/// \brief 设置默认的预设样式
+/// \param style
+///
+void SARibbonGalleryGroup::setPreinstallStyle(SARibbonGalleryGroup::PreinstallStyle style)
+{
+    switch(style)
+    {
+    case LargeIconWithText:
+    {
+        setIconSize(QSize(72,36));
+        setGridSize(QSize(72,56));
+        setEnableIconText(true);
+        break;
+    }
+    case LargeIconOnly:
+    {
+        setIconSize(QSize(72,56));
+        setGridSize(QSize(72,56));
+        setEnableIconText(false);
+        break;
+    }
+    default:
+    {
+        setIconSize(QSize(72,36));
+        setGridSize(QSize(72,56));
+        setEnableIconText(true);
+    }
+    }
 }
 
 void SARibbonGalleryGroup::addItem(const QIcon& icon)

@@ -60,10 +60,20 @@ class SA_RIBBON_EXPORT SARibbonGalleryGroup : public QListView
     Q_OBJECT
     Q_PROPERTY(bool enableIconText READ enableIconText WRITE setEnableIconText)
 public:
+    ///
+    /// \brief 预设样式
+    ///
+    enum PreinstallStyle
+    {
+        LargeIconWithText ///< 大图标带文字
+        ,LargeIconOnly
+
+    };
+
     SARibbonGalleryGroup(QWidget* w = 0);
 
     virtual ~SARibbonGalleryGroup();
-
+    void setPreinstallStyle(PreinstallStyle style);
     void addItem(const QIcon& icon);
     void addItem(SARibbonGalleryItem *item);
     void addActionItem(QAction* act);
