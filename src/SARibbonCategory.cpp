@@ -309,7 +309,7 @@ int SARibbonCategoryProxy::buildReduceModePannel(SARibbonPannel *realPannel, int
         Q_UNUSED(on);
         int pannelX = info.reduceModeShowPannel->geometry().x();
         QPoint pos = SARibbonCategoryProxy::calcPopupPannelPosition(categoryPage,info.realShowPannel,pannelX);
-        qDebug() << "pannelX:" << pannelX << " pos:" <<pos;
+        //qDebug() << "pannelX:" << pannelX << " pos:" <<pos;
        //info.realShowPannel->move(pos);
         info.realShowPannel->setReduce(true);
         info.realShowPannel->setGeometry(pos.x(),pos.y(),info.realShowPannel->sizeHint().width(),info.realShowPannel->sizeHint().height());

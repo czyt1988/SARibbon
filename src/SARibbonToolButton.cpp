@@ -111,6 +111,12 @@ void SARibbonToolButton::mouseReleaseEvent(QMouseEvent *e)
     m_menuButtonPressed = false;
 }
 
+void SARibbonToolButton::focusOutEvent(QFocusEvent *e)
+{
+    QToolButton::focusOutEvent(e);
+    m_mouseOnSubControl = false;
+}
+
 void SARibbonToolButton::leaveEvent(QEvent *e)
 {
     m_mouseOnSubControl = false;
@@ -249,6 +255,12 @@ void SARibbonToolButton::paintLargeButton(QPaintEvent *e)
     QPainter p(this);
     QStyleOptionToolButton opt;
     initStyleOption(&opt);
+//    if(objectName() == "ribbonButtonStartSelection")
+//    {
+//    qDebug() <<  "SARibbonToolButton::paintLargeButton "
+//              << opt;
+//    qDebug() <<"m_mouseOnSubControl:"<<m_mouseOnSubControl;
+//    }
 
     bool autoRaise = opt.state & QStyle::State_AutoRaise;
     QStyle::State bflags = opt.state;
@@ -416,40 +428,53 @@ void SARibbonToolButton::drawIconAndLabel(QPainter &p, const QStyleOptionToolBut
         {
             pm = SARibbonDrawHelper::iconToPixmap(opt.icon,this,&opt,opt.rect.size().boundedTo(opt.iconSize));
             pmSize = pm.size() / pm.devicePixelRatio();
+
+            if (opt.toolButtonStyle != Qt::ToolButtonIconOnly)
+            {
+                p.save();
+                p.setFont(opt.font);
+
+                QRect pr = m_iconRect;
+                QRect tr = opt.rect.adjusted(pr.width(),0,-8,0);
+                int alignment = Qt::TextShowMnemonic;
+                //快捷键的下划线
+                if (!style()->styleHint(QStyle::SH_UnderlineShortcut, &opt, this))
+                {
+                    alignment |= Qt::TextHideMnemonic;
+                }
+
+                if (opt.toolButtonStyle == Qt::ToolButtonTextUnderIcon)
+                {
+
+                }
+                else
+                {
+                    style()->drawItemPixmap(&p, QStyle::visualRect(opt.direction, opt.rect, pr), Qt::AlignCenter, pm);
+                    alignment |= Qt::AlignLeft | Qt::AlignVCenter;
+                }
+                style()->drawItemText(&p, QStyle::visualRect(opt.direction, opt.rect, tr), alignment, opt.palette,
+                                                 opt.state & QStyle::State_Enabled, opt.text,
+                                                 QPalette::ButtonText);
+                p.restore();
+            }
+            else
+            {
+                style()->drawItemPixmap(&p, opt.rect, Qt::AlignCenter, pm);
+            }
         }
-
-        if (opt.toolButtonStyle != Qt::ToolButtonIconOnly)
+        else // 只有文字
         {
-            p.save();
-            p.setFont(opt.font);
-
-            QRect pr = m_iconRect;
-            QRect tr = opt.rect.adjusted(pr.width(),0,-8,0);
             int alignment = Qt::TextShowMnemonic;
             //快捷键的下划线
             if (!style()->styleHint(QStyle::SH_UnderlineShortcut, &opt, this))
             {
                 alignment |= Qt::TextHideMnemonic;
             }
-
-            if (opt.toolButtonStyle == Qt::ToolButtonTextUnderIcon)
-            {
-
-            }
-            else
-            {
-                style()->drawItemPixmap(&p, QStyle::visualRect(opt.direction, opt.rect, pr), Qt::AlignCenter, pm);
-                alignment |= Qt::AlignLeft | Qt::AlignVCenter;
-            }
-            style()->drawItemText(&p, QStyle::visualRect(opt.direction, opt.rect, tr), alignment, opt.palette,
+            style()->drawItemText(&p, QStyle::visualRect(opt.direction, opt.rect, opt.rect.adjusted(2,1,-2,-1)), alignment, opt.palette,
                                              opt.state & QStyle::State_Enabled, opt.text,
                                              QPalette::ButtonText);
-            p.restore();
         }
-        else
-        {
-            style()->drawItemPixmap(&p, opt.rect, Qt::AlignCenter, pm);
-        }
+
 
         //绘制sub control 的下拉箭头
         if (opt.features & QStyleOptionToolButton::HasMenu)

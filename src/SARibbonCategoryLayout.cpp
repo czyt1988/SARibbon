@@ -153,7 +153,7 @@ int SARibbonCategoryLayout::buildReduceModePannel(SARibbonPannel *realPannel,int
         Q_UNUSED(on);
         int pannelX = info.reduceModeShowPannel->geometry().x();
         QPoint pos = SARibbonCategoryLayout::calcPopupPannelPosition(categoryPage,info.realShowPannel,pannelX);
-        qDebug() << "pannelX:" << pannelX << " pos:" <<pos;
+        //qDebug() << "pannelX:" << pannelX << " pos:" <<pos;
        //info.realShowPannel->move(pos);
         info.realShowPannel->setGeometry(pos.x(),pos.y(),info.realShowPannel->sizeHint().width(),info.realShowPannel->sizeHint().height());
         info.realShowPannel->setVisible(true);
@@ -164,12 +164,12 @@ int SARibbonCategoryLayout::buildReduceModePannel(SARibbonPannel *realPannel,int
         info.realShowPannel->repaint();
         QEvent event1(QEvent::UpdateRequest);
         QApplication::sendEvent(info.realShowPannel,&event1);
-        qDebug() << "realShowPannel geometry:"<<info.realShowPannel->geometry()
-                 << "\n window flag:"<<info.realShowPannel->windowFlags()
-        << "\n is active:"<<info.realShowPannel->isActiveWindow()
-           << "\n is visible:"<<info.realShowPannel->isVisible()
-              << "\n is visible to parent:"<<info.realShowPannel->isVisibleTo(categoryPage)
-           ;
+//        qDebug() << "realShowPannel geometry:"<<info.realShowPannel->geometry()
+//                 << "\n window flag:"<<info.realShowPannel->windowFlags()
+//        << "\n is active:"<<info.realShowPannel->isActiveWindow()
+//           << "\n is visible:"<<info.realShowPannel->isVisible()
+//              << "\n is visible to parent:"<<info.realShowPannel->isVisibleTo(categoryPage)
+//           ;
     });
     m_pannelReduceInfo[realPannel] = info;
     return reducePannel->geometry().right();

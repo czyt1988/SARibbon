@@ -28,6 +28,7 @@ protected:
     virtual void mouseMoveEvent(QMouseEvent *e) Q_DECL_OVERRIDE;
     virtual void mousePressEvent(QMouseEvent *e) Q_DECL_OVERRIDE;
     virtual void mouseReleaseEvent(QMouseEvent *e) Q_DECL_OVERRIDE;
+    virtual void focusOutEvent(QFocusEvent *e) Q_DECL_OVERRIDE;
     virtual void leaveEvent(QEvent *e) Q_DECL_OVERRIDE;
     virtual void paintLargeButton(QPaintEvent *e);
     virtual void paintSmallButton(QPaintEvent *e);

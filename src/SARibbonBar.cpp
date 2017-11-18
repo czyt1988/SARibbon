@@ -613,7 +613,6 @@ void SARibbonBar::paintContextCategoryTab(QPainter &painter, const QString &titl
 void SARibbonBar::resizeEvent(QResizeEvent *e)
 {
     Q_UNUSED(e);
-    qDebug() << "resize";
     int x = m_d->widgetBord.left();
     int y = m_d->widgetBord.top();
     //cornerWidget - TopLeftCorner
