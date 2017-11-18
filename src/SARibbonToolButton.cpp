@@ -512,4 +512,19 @@ QSize SARibbonToolButton::minimumSizeHint() const
     return sizeHint();
 }
 
+bool SARibbonToolButton::event(QEvent *e)
+{
+    //qDebug() << e->type();
+    switch(e->type())
+    {
+    case QEvent::WindowDeactivate:
+        m_mouseOnSubControl = false;
+        break;
+    default:
+        break;
+    }
+
+    return QToolButton::event(e);
+}
+
 

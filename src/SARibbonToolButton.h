@@ -23,6 +23,7 @@ public:
     void setButtonType(const RibbonButtonType &buttonType);
     virtual QSize minimumSizeHint() const Q_DECL_OVERRIDE;
 protected:
+    bool event(QEvent *e);
     virtual void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
     virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
     virtual void mouseMoveEvent(QMouseEvent *e) Q_DECL_OVERRIDE;
