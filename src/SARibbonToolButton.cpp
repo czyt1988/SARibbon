@@ -518,6 +518,9 @@ bool SARibbonToolButton::event(QEvent *e)
     switch(e->type())
     {
     case QEvent::WindowDeactivate:
+    case QEvent::ActionChanged:
+    case QEvent::ActionRemoved:
+    case QEvent::ActionAdded:
         m_mouseOnSubControl = false;
         break;
     default:
