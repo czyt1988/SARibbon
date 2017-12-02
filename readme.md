@@ -6,3 +6,12 @@
 这个Ribbon主要靠`QSS`实现而不是重写样式(`QStyle`)，主要是重写样式工作量巨大，一些`QSS`无法实现的，重写了界面，如RibbonToolButton，
 
 目前只完成了最基本的一些功能如:Ribbon的整体界面，Ribbon的ToolButton等基本功能，像RibbonGallery这样的功能仍然需要完善
+
+更多界面截图可看：
+
+[https://github.com/czyt1988/sa](https://github.com/czyt1988/sa)
+
+SARibbon项目是SA项目的子项
+
+具体Ribbon的生成代码可见：
+[https://github.com/czyt1988/sa/blob/master/src/signA/MainWindowPrivate.cpp](https://github.com/czyt1988/sa/blob/master/src/signA/MainWindowPrivate.cpp)
