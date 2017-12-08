@@ -26,7 +26,6 @@ public:
     QSize minimumSize() const Q_DECL_OVERRIDE;
     Qt::Orientations expandingDirections() const Q_DECL_OVERRIDE;
     void invalidate() Q_DECL_OVERRIDE;
-    bool eventFilter(QObject *watched, QEvent *event) Q_DECL_OVERRIDE;
 protected:
     int buildReduceModePannel(SARibbonPannel* realPannel, int x, int y);
     static QPoint calcPopupPannelPosition(SARibbonCategory* category,SARibbonPannel *pannel, int x);

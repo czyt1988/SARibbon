@@ -515,6 +515,7 @@ bool SARibbonBar::eventFilter(QObject *obj, QEvent *e)
 
 void SARibbonBar::paintEvent(QPaintEvent *e)
 {
+    Q_UNUSED(e);
     QPainter p(this);
     //!
     paintBackground(p);

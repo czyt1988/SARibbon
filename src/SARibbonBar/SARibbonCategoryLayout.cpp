@@ -119,20 +119,6 @@ void SARibbonCategoryLayout::invalidate()
     QLayout::invalidate();
 }
 
-bool SARibbonCategoryLayout::eventFilter(QObject *watched, QEvent *event)
-{
-//    qDebug() << "watched:"<<watched->metaObject()->className()
-//             << " event:"<< event->type();
-    if(QEvent::LayoutRequest == event->type())
-    {
-//        if(watched->isWidgetType())
-//        {
-//            setGeometry(qobject_cast<QWidget*>(watched)->rect());
-
-//        }
-    }
-    return false;
-}
 
 
 

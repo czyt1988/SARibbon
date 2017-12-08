@@ -27,7 +27,7 @@ MainWindow::MainWindow(QWidget *par):SARibbonMainWindow(par)
     QElapsedTimer cost;
     int lastTimes = 0;
     cost.start();
-    setWindowTitle(tr("ribbon test"));
+    setWindowTitle(QStringLiteral("ribbon test"));
     m_edit = new QTextEdit(this);
     setCentralWidget(m_edit);
     PRINT_COST(cost,lastTimes,"setCentralWidget & setWindowTitle");
@@ -35,17 +35,17 @@ MainWindow::MainWindow(QWidget *par):SARibbonMainWindow(par)
     QFont f = ribbon->font();
     f.setFamily("微软雅黑");
     ribbon->setFont(f);
-    ribbon->applitionButton()->setText(tr("File"));
-    SARibbonCategory* categoryMain = ribbon->addCategoryPage(tr("主页"));
+    ribbon->applitionButton()->setText(QStringLiteral("File"));
+    SARibbonCategory* categoryMain = ribbon->addCategoryPage(QStringLiteral("Main"));
     PRINT_COST(cost,lastTimes,"new main page");
     createCategoryMain(categoryMain);
     PRINT_COST(cost,lastTimes,"add main page element");
-    SARibbonCategory* categoryOther = ribbon->addCategoryPage(tr("其他"));
+    SARibbonCategory* categoryOther = ribbon->addCategoryPage(QStringLiteral("Other"));
     createCategoryOther(categoryOther);
     PRINT_COST(cost,lastTimes,"add other page");
-    m_contextCategory = ribbon->addContextCategory(tr("context"),Qt::red,1);
-    SARibbonCategory* contextCategoryPage1 = m_contextCategory->addCategoryPage(tr("页面1"));
-    SARibbonCategory* contextCategoryPage2 = m_contextCategory->addCategoryPage(tr("页面2"));
+    m_contextCategory = ribbon->addContextCategory(QStringLiteral("context"),Qt::red,1);
+    SARibbonCategory* contextCategoryPage1 = m_contextCategory->addCategoryPage(QStringLiteral("Page1"));
+    SARibbonCategory* contextCategoryPage2 = m_contextCategory->addCategoryPage(QStringLiteral("Page1"));
     PRINT_COST(cost,lastTimes,"add contextCategory page");
 #endif
     showMaximized();
@@ -63,24 +63,24 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
     cost.start();
     SARibbonToolButton * btn;
     SARibbonMenu* menu = new SARibbonMenu(this);
-    menu->addAction(QIcon(":/icon/icon/folder.png"),tr("1111111"));
-    menu->addAction(QIcon(":/icon/icon/folder.png"),tr("1"));
-    menu->addAction(QIcon(":/icon/icon/folder.png"),tr("11"));
-    menu->addAction(QIcon(":/icon/icon/folder.png"),tr("111"));
-    menu->addAction(QIcon(":/icon/icon/folder.png"),tr("11111"));
-    menu->addAction(QIcon(":/icon/icon/folder.png"),tr("1111111"));
-    menu->addAction(QIcon(":/icon/icon/folder.png"),tr("11111111"));
-    menu->addAction(QIcon(":/icon/icon/folder.png"),tr("1111111111"));
-    menu->addAction(QIcon(":/icon/icon/folder.png"),tr("1111111111111"));
-    menu->addAction(QIcon(":/icon/icon/folder.png"),tr("1111111111111111111111111111"));
+    menu->addAction(QIcon(":/icon/icon/folder.png"),QStringLiteral("1111111"));
+    menu->addAction(QIcon(":/icon/icon/folder.png"),QStringLiteral("1"));
+    menu->addAction(QIcon(":/icon/icon/folder.png"),QStringLiteral("11"));
+    menu->addAction(QIcon(":/icon/icon/folder.png"),QStringLiteral("111"));
+    menu->addAction(QIcon(":/icon/icon/folder.png"),QStringLiteral("11111"));
+    menu->addAction(QIcon(":/icon/icon/folder.png"),QStringLiteral("1111111"));
+    menu->addAction(QIcon(":/icon/icon/folder.png"),QStringLiteral("11111111"));
+    menu->addAction(QIcon(":/icon/icon/folder.png"),QStringLiteral("1111111111"));
+    menu->addAction(QIcon(":/icon/icon/folder.png"),QStringLiteral("1111111111111"));
+    menu->addAction(QIcon(":/icon/icon/folder.png"),QStringLiteral("1111111111111111111111111111"));
 
     int lastTimes = 0;
-    SARibbonPannel* pannel = page->addPannel(tr("面板1"));
+    SARibbonPannel* pannel = page->addPannel(QStringLiteral("Panel 1"));
     PRINT_COST(cost,lastTimes,"addPannel pannel 1");
 
     QAction* act = new QAction(this);
     act->setIcon(QIcon(":/icon/icon/save.png"));
-    act->setText(tr("保存"));
+    act->setText(QStringLiteral("SAve"));
     PRINT_COST(cost,lastTimes,"new Large Action");
     pannel->addLargeAction(act);
     connect(act,&QAction::triggered,this,[this](bool b){
@@ -90,7 +90,7 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
 
     act = new QAction(this);
     act->setIcon(QIcon(":/icon/icon/save.png"));
-    act->setText(tr("隐藏ribbon"));
+    act->setText(QStringLiteral("hide ribbon"));
     act->setCheckable(true);
     pannel->addSmallAction(act);
     connect(act,&QAction::triggered,this,[this](bool b){
@@ -99,7 +99,7 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
 
     act = new QAction(this);
     act->setIcon(QIcon(":/icon/icon/save.png"));
-    act->setText(tr("显示隐藏按钮"));
+    act->setText(QStringLiteral("show hide button"));
     act->setCheckable(true);
     pannel->addSmallAction(act);
     connect(act,&QAction::triggered,this,[this](bool b){
@@ -108,21 +108,21 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
 
     act = new QAction(this);
     act->setIcon(QIcon(":/icon/icon/filter.png"));
-    act->setText(tr("测试2"));
+    act->setText(QStringLiteral("test 2"));
     act->setMenu(menu);
     btn = pannel->addSmallAction(act);
     btn->setPopupMode(QToolButton::DelayedPopup);
 
     act = new QAction(this);
     act->setIcon(QIcon(":/icon/icon/folder.png"));
-    act->setText(tr("测试3"));
+    act->setText(QStringLiteral("test 3"));
     act->setMenu(menu);
     btn = pannel->addSmallAction(act);
     btn->setPopupMode(QToolButton::MenuButtonPopup);
 
     act = new QAction(this);
     act->setIcon(QIcon(":/icon/icon/folder.png"));
-    act->setText(tr("测试4"));
+    act->setText(QStringLiteral("test 4"));
     act->setMenu(menu);
     btn = pannel->addSmallAction(act);
     btn->setPopupMode(QToolButton::InstantPopup);
@@ -134,7 +134,7 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
 
     act = new QAction(this);
     act->setIcon(QIcon(":/icon/icon/folder.png"));
-    act->setText(tr("DelayedPopup"));
+    act->setText(QStringLiteral("DelayedPopup"));
     act->setMenu(menu);
     btn = pannel->addLargeAction(act);
     btn->setPopupMode(QToolButton::DelayedPopup);
@@ -142,7 +142,7 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
 
     act = new QAction(this);
     act->setIcon(QIcon(":/icon/icon/folder.png"));
-    act->setText(tr("MenuButtonPopup"));
+    act->setText(QStringLiteral("MenuButtonPopup"));
     act->setMenu(menu);
     btn = pannel->addLargeAction(act);
     btn->setPopupMode(QToolButton::MenuButtonPopup);
@@ -150,7 +150,7 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
 
     act = new QAction(this);
     act->setIcon(QIcon(":/icon/icon/Graph-add.png"));
-    act->setText(tr("InstantPopup"));
+    act->setText(QStringLiteral("InstantPopup"));
     act->setMenu(menu);
     btn = pannel->addLargeAction(act);
     btn->setPopupMode(QToolButton::InstantPopup);
@@ -159,7 +159,7 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
     act = new QAction(this);
     act->setCheckable(true);
     act->setIcon(QIcon(":/icon/icon/folder.png"));
-    act->setText(tr("DelayedPopup"));
+    act->setText(QStringLiteral("DelayedPopup"));
     act->setMenu(menu);
     btn = pannel->addLargeAction(act);
     btn->setPopupMode(QToolButton::DelayedPopup);
@@ -169,7 +169,7 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
     act = new QAction(this);
     act->setCheckable(true);
     act->setIcon(QIcon(":/icon/icon/folder.png"));
-    act->setText(tr("MenuButtonPopup\n checkable"));
+    act->setText(QStringLiteral("MenuButtonPopup\n checkable"));
     act->setMenu(menu);
     btn = pannel->addLargeAction(act);
     btn->setPopupMode(QToolButton::MenuButtonPopup);
@@ -179,18 +179,18 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
     act = new QAction(this);
     act->setCheckable(true);
     act->setIcon(QIcon(":/icon/icon/Graph-add.png"));
-    act->setText(tr("InstantPopup"));
+    act->setText(QStringLiteral("InstantPopup"));
     act->setMenu(menu);
     btn = pannel->addLargeAction(act);
     btn->setCheckable(true);
     btn->setPopupMode(QToolButton::InstantPopup);
     connect(act,&QAction::triggered,this,&MainWindow::onInstantPopupCheckableTest);
 
-    SARibbonPannel* panne2 = page->addPannel(tr("pannel 2"));
+    SARibbonPannel* panne2 = page->addPannel(QStringLiteral("pannel 2"));
     act = new QAction(this);
     act->setCheckable(true);
     act->setIcon(QIcon(":/icon/icon/Graph-add.png"));
-    act->setText(tr("显示\n上下文标签"));
+    act->setText(QStringLiteral("show\nContext"));
     btn = panne2->addLargeAction(act);
     btn->setCheckable(true);
     //btn->setPopupMode(QToolButton::InstantPopup);
@@ -204,7 +204,7 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
     act = new QAction(this);
     act->setCheckable(true);
     act->setIcon(QIcon(":/icon/icon/Graph-add.png"));
-    act->setText(tr("非激活"));
+    act->setText(QStringLiteral("unactive"));
     act->setMenu(menu);
     btn = panne2->addLargeAction(act);
     btn->setCheckable(true);
@@ -218,7 +218,7 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
     com->setWindowIcon(QIcon(":/icon/icon/Graph-add.png"));
     com->setWindowTitle("ComboBox");
     for (int i=0;i<40;++i)
-        com->addItem("SARibbonComboBox测试");
+        com->addItem("SARibbonComboBox test");
     com->setEditable(true);
     pannel->addWidget(com);
 
@@ -259,22 +259,22 @@ while(w)
 void MainWindow::createCategoryOther(SARibbonCategory *page)
 {
     SARibbonMenu* menu = new SARibbonMenu(this);
-    QAction * item = menu->addAction(QIcon(":/icon/icon/folder.png"),tr("1111111"));
-    menu->addAction(QIcon(":/icon/icon/folder.png"),tr("1111111"));
-    menu->addAction(QIcon(":/icon/icon/folder.png"),tr("1111111"));
-    menu->addAction(QIcon(":/icon/icon/folder.png"),tr("1111111"));
-    menu->addAction(QIcon(":/icon/icon/folder.png"),tr("1111111"));
-    menu->addAction(QIcon(":/icon/icon/folder.png"),tr("1111111"));
-    menu->addAction(QIcon(":/icon/icon/folder.png"),tr("1111111"));
-    menu->addAction(QIcon(":/icon/icon/folder.png"),tr("1111111"));
-    menu->addAction(QIcon(":/icon/icon/folder.png"),tr("1111111"));
-    menu->addAction(QIcon(":/icon/icon/folder.png"),tr("1111111"));
+    QAction * item = menu->addAction(QIcon(":/icon/icon/folder.png"),QStringLiteral("1111111"));
+    menu->addAction(QIcon(":/icon/icon/folder.png"),QStringLiteral("1111111"));
+    menu->addAction(QIcon(":/icon/icon/folder.png"),QStringLiteral("1111111"));
+    menu->addAction(QIcon(":/icon/icon/folder.png"),QStringLiteral("1111111"));
+    menu->addAction(QIcon(":/icon/icon/folder.png"),QStringLiteral("1111111"));
+    menu->addAction(QIcon(":/icon/icon/folder.png"),QStringLiteral("1111111"));
+    menu->addAction(QIcon(":/icon/icon/folder.png"),QStringLiteral("1111111"));
+    menu->addAction(QIcon(":/icon/icon/folder.png"),QStringLiteral("1111111"));
+    menu->addAction(QIcon(":/icon/icon/folder.png"),QStringLiteral("1111111"));
+    menu->addAction(QIcon(":/icon/icon/folder.png"),QStringLiteral("1111111"));
 
-    SARibbonPannel* pannel = page->addPannel(tr("pannel 1"));
+    SARibbonPannel* pannel = page->addPannel(QStringLiteral("pannel 1"));
     SARibbonToolButton* btn;
     btn = pannel->addLargeAction(item);
     btn->setIcon(QIcon(":/icon/icon/folder.png"));
-    btn->setText(tr("非标准\n图标"));
+    btn->setText(QStringLiteral("un format\nicon"));
     btn->setPopupMode(QToolButton::DelayedPopup);
     btn->setFixedHeight(78);
     btn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
@@ -283,7 +283,7 @@ void MainWindow::createCategoryOther(SARibbonCategory *page)
 
     btn = pannel->addLargeAction(item);
     btn->setIcon(QIcon(":/icon/icon/folder.png"));
-    btn->setText(tr("换页\n测试"));
+    btn->setText(QStringLiteral("change page\ntest"));
     btn->setPopupMode(QToolButton::MenuButtonPopup);
     btn->setFixedHeight(78);
     btn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
@@ -292,7 +292,7 @@ void MainWindow::createCategoryOther(SARibbonCategory *page)
 
     btn = pannel->addLargeAction(item);
     btn->setIcon(QIcon(":/icon/icon/folder.png"));
-    btn->setText(tr("大按钮"));
+    btn->setText(QStringLiteral("LargeBtn"));
     btn->setPopupMode(QToolButton::InstantPopup);
     btn->setFixedHeight(78);
     btn->setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
@@ -313,31 +313,31 @@ void MainWindow::createCategoryOther(SARibbonCategory *page)
 
 void MainWindow::onMenuButtonPopupCheckableTest(bool b)
 {
-    m_edit->append(tr("MenuButtonPopupCheckableTest : %1").arg(b));
+    m_edit->append(QStringLiteral("MenuButtonPopupCheckableTest : %1").arg(b));
 }
 
 void MainWindow::onInstantPopupCheckableTest(bool b)
 {
-    m_edit->append(tr("InstantPopupCheckableTest : %1").arg(b));
+    m_edit->append(QStringLiteral("InstantPopupCheckableTest : %1").arg(b));
 }
 
 void MainWindow::onDelayedPopupCheckableTest(bool b)
 {
-    m_edit->append(tr("DelayedPopupCheckableTest : %1").arg(b));
+    m_edit->append(QStringLiteral("DelayedPopupCheckableTest : %1").arg(b));
 }
 
 void MainWindow::onMenuButtonPopupCheckabletriggered(bool b)
 {
-    m_edit->append(tr("MenuButtonPopupCheckabletriggered : %1").arg(b));
+    m_edit->append(QStringLiteral("MenuButtonPopupCheckabletriggered : %1").arg(b));
 }
 
 void MainWindow::onInstantPopupCheckabletriggered(bool b)
 {
-    m_edit->append(tr("InstantPopupCheckabletriggered : %1").arg(b));
+    m_edit->append(QStringLiteral("InstantPopupCheckabletriggered : %1").arg(b));
 }
 
 void MainWindow::onDelayedPopupCheckabletriggered(bool b)
 {
-    m_edit->append(tr("DelayedPopupCheckabletriggered : %1").arg(b));
+    m_edit->append(QStringLiteral("DelayedPopupCheckabletriggered : %1").arg(b));
 }
 
