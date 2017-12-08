@@ -1,4 +1,4 @@
-#include "SARibbonElementManager.h"
+﻿#include "SARibbonElementManager.h"
 SARibbonElementManager* SARibbonElementManager::s_instance = nullptr;
 SARibbonElementManager::SARibbonElementManager():m_delegate(nullptr)
 {

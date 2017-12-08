@@ -1,4 +1,4 @@
-#ifndef SARIBBONCATEGORYLAYOUT_H
+﻿#ifndef SARIBBONCATEGORYLAYOUT_H
 #define SARIBBONCATEGORYLAYOUT_H
 #include "SARibbonGlobal.h"
 #include <QLayout>

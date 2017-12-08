@@ -1,4 +1,4 @@
-#ifndef SARIBBONGLOBAL_H
+﻿#ifndef SARIBBONGLOBAL_H
 #define SARIBBONGLOBAL_H
 #include <qglobal.h>
 #define SA_RIBBON_BAR_VERSION 1

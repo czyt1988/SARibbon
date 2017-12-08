@@ -1,4 +1,4 @@
-#include "SARibbonCheckBox.h"
+﻿#include "SARibbonCheckBox.h"
 #include <QStyleOption>
 SARibbonCheckBox::SARibbonCheckBox(QWidget *parent)
     :QCheckBox(parent)

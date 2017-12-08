@@ -1,4 +1,4 @@
-#include "SARibbonCategory.h"
+﻿#include "SARibbonCategory.h"
 #include <QList>
 #include <QResizeEvent>
 #include <QPainter>

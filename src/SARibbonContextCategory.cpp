@@ -1,4 +1,4 @@
-#include "SARibbonContextCategory.h"
+﻿#include "SARibbonContextCategory.h"
 #include <QList>
 #include <QVariant>
 #include "SARibbonElementManager.h"

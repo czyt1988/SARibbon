@@ -1,4 +1,4 @@
-#include "FramelessHelper.h"
+﻿#include "FramelessHelper.h"
 #include <QRect>
 #include <QRubberBand>
 #include <QMouseEvent>

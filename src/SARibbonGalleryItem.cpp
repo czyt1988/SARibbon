@@ -1,4 +1,4 @@
-#include "SARibbonGalleryItem.h"
+﻿#include "SARibbonGalleryItem.h"
 #include "SARibbonGalleryGroup.h"
 
 SARibbonGalleryItem::SARibbonGalleryItem()

@@ -1,4 +1,4 @@
-#ifndef SARIBBONMENU_H
+﻿#ifndef SARIBBONMENU_H
 #define SARIBBONMENU_H
 #include "SARibbonGlobal.h"
 #include <QMenu>

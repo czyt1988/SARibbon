@@ -1,4 +1,4 @@
-#include "SARibbonPannelOptionButton.h"
+﻿#include "SARibbonPannelOptionButton.h"
 #include <QAction>
 SARibbonPannelOptionButton::SARibbonPannelOptionButton(QWidget *parent)
     :QToolButton(parent)

@@ -1,4 +1,4 @@
-#ifndef SARIBBONLINEEDIT_H
+﻿#ifndef SARIBBONLINEEDIT_H
 #define SARIBBONLINEEDIT_H
 #include "SARibbonGlobal.h"
 #include <QLineEdit>

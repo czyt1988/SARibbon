@@ -1,4 +1,4 @@
-#include "SARibbonPannel.h"
+﻿#include "SARibbonPannel.h"
 #include "SARibbonToolButton.h"
 #include <QAction>
 #include <QIcon>

@@ -1,4 +1,4 @@
-#ifndef FRAMELESSHELPER_H
+﻿#ifndef FRAMELESSHELPER_H
 #define FRAMELESSHELPER_H
 
 

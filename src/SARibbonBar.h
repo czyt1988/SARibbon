@@ -1,4 +1,4 @@
-#ifndef SARIBBONBAR_H
+﻿#ifndef SARIBBONBAR_H
 #define SARIBBONBAR_H
 #include "SARibbonGlobal.h"
 #include <QMenuBar>

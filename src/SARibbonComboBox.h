@@ -1,4 +1,4 @@
-#ifndef SARIBBONCOMBOBOX_H
+﻿#ifndef SARIBBONCOMBOBOX_H
 #define SARIBBONCOMBOBOX_H
 #include "SARibbonGlobal.h"
 #include <QComboBox>

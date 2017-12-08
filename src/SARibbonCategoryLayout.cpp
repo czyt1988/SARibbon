@@ -1,4 +1,4 @@
-#include "SARibbonCategoryLayout.h"
+﻿#include "SARibbonCategoryLayout.h"
 #include <QLayoutItem>
 #include "SARibbonPannel.h"
 #include "SARibbonToolButton.h"

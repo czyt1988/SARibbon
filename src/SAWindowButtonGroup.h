@@ -1,4 +1,4 @@
-#ifndef SAWINDOWBUTTONGROUP_H
+﻿#ifndef SAWINDOWBUTTONGROUP_H
 #define SAWINDOWBUTTONGROUP_H
 #include "SARibbonGlobal.h"
 #include <QWidget>

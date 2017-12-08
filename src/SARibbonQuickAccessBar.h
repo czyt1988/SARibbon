@@ -1,4 +1,4 @@
-#ifndef SARIBBONQUICKACCESSBAR_H
+﻿#ifndef SARIBBONQUICKACCESSBAR_H
 #define SARIBBONQUICKACCESSBAR_H
 #include "SARibbonGlobal.h"
 #include "SARibbonCtrolContainer.h"

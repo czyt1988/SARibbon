@@ -1,4 +1,4 @@
-#include "SAWindowButtonGroup.h"
+﻿#include "SAWindowButtonGroup.h"
 #include <QPushButton>
 #include <QResizeEvent>
 #include <QStyle>

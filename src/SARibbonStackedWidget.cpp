@@ -1,4 +1,4 @@
-#include "SARibbonStackedWidget.h"
+﻿#include "SARibbonStackedWidget.h"
 #include <QEventLoop>
 #include <QMouseEvent>
 class SARibbonStackedWidgetPrivate

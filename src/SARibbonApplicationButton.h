@@ -1,4 +1,4 @@
-#ifndef SARIBBONAPPLICATIONBUTTON_H
+﻿#ifndef SARIBBONAPPLICATIONBUTTON_H
 #define SARIBBONAPPLICATIONBUTTON_H
 #include <QPushButton>
 #include "SARibbonGlobal.h"

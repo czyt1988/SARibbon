@@ -1,4 +1,4 @@
-#ifndef SARIBBONDRAWHELPER_H
+﻿#ifndef SARIBBONDRAWHELPER_H
 #define SARIBBONDRAWHELPER_H
 #include <QIcon>
 #include <QStylePainter>

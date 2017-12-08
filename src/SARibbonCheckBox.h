@@ -1,4 +1,4 @@
-#ifndef SARIBBONCHECKBOX_H
+﻿#ifndef SARIBBONCHECKBOX_H
 #define SARIBBONCHECKBOX_H
 #include "SARibbonGlobal.h"
 #include <QCheckBox>

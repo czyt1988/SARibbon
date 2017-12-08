@@ -1,4 +1,4 @@
-#include "SARibbonDrawHelper.h"
+﻿#include "SARibbonDrawHelper.h"
 
 SARibbonDrawHelper::SARibbonDrawHelper()
 {

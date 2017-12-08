@@ -1,4 +1,4 @@
-#ifndef SARIBBONGALLERY_H
+﻿#ifndef SARIBBONGALLERY_H
 #define SARIBBONGALLERY_H
 #include "SARibbonGlobal.h"
 #include <QFrame>

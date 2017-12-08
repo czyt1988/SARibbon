@@ -1,4 +1,4 @@
-#include "SARibbonElementCreateDelegate.h"
+﻿#include "SARibbonElementCreateDelegate.h"
 #include "SARibbonBar.h"
 #include "SARibbonApplicationButton.h"
 #include "SARibbonTabBar.h"

@@ -1,4 +1,4 @@
-#ifndef SARIBBONCATEGORY_H
+﻿#ifndef SARIBBONCATEGORY_H
 #define SARIBBONCATEGORY_H
 #include "SARibbonGlobal.h"
 #include <QWidget>

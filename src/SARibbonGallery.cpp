@@ -1,4 +1,4 @@
-#include "SARibbonGallery.h"
+﻿#include "SARibbonGallery.h"
 #include "SARibbonControlButton.h"
 #include <QIcon>
 #include <QApplication>

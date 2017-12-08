@@ -1,4 +1,4 @@
-#ifndef SARIBBONGALLERYITEM_H
+﻿#ifndef SARIBBONGALLERYITEM_H
 #define SARIBBONGALLERYITEM_H
 #include "SARibbonGlobal.h"
 #include <QIcon>

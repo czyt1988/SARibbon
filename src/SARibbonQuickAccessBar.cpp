@@ -1,4 +1,4 @@
-#include "SARibbonQuickAccessBar.h"
+﻿#include "SARibbonQuickAccessBar.h"
 #include "SARibbonButtonGroupWidget.h"
 #include "SARibbonSeparatorWidget.h"
 class SARibbonQuickAccessBarPrivate

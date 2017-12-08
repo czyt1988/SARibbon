@@ -1,4 +1,4 @@
-#ifndef SARIBBONELEMENTMANAGER_H
+﻿#ifndef SARIBBONELEMENTMANAGER_H
 #define SARIBBONELEMENTMANAGER_H
 #include "SARibbonElementCreateDelegate.h"
 #include "SARibbonGlobal.h"

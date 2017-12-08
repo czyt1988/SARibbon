@@ -1,4 +1,4 @@
-#include "SARibbonButtonGroupWidget.h"
+﻿#include "SARibbonButtonGroupWidget.h"
 #include <QHBoxLayout>
 #include <QDebug>
 #include <QMargins>

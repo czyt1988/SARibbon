@@ -1,4 +1,4 @@
-#ifndef SARIBBONGALLERYGROUP_H
+﻿#ifndef SARIBBONGALLERYGROUP_H
 #define SARIBBONGALLERYGROUP_H
 #include "SARibbonGlobal.h"
 #include <QList>

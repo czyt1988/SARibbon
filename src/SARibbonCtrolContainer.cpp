@@ -1,4 +1,4 @@
-#include "SARibbonCtrolContainer.h"
+﻿#include "SARibbonCtrolContainer.h"
 #include <QPainter>
 #include <QPaintEvent>
 #include <QStylePainter>

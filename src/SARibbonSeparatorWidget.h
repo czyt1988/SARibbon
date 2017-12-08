@@ -1,4 +1,4 @@
-#ifndef SARIBBONSEPARATORWIDGET_H
+﻿#ifndef SARIBBONSEPARATORWIDGET_H
 #define SARIBBONSEPARATORWIDGET_H
 #include "SARibbonGlobal.h"
 #include <QWidget>

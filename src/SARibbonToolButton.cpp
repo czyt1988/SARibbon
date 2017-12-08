@@ -1,4 +1,4 @@
-#include "SARibbonToolButton.h"
+﻿#include "SARibbonToolButton.h"
 #include <QStylePainter>
 #include <QStyleOptionToolButton>
 #include <QAction>

@@ -1,4 +1,4 @@
-#include "SARibbonMenu.h"
+﻿#include "SARibbonMenu.h"
 #include <QWidgetAction>
 SARibbonMenu::SARibbonMenu(QWidget *parent):QMenu(parent)
 {

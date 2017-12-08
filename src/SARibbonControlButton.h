@@ -1,4 +1,4 @@
-#ifndef SARIBBONCONTROLBUTTON_H
+﻿#ifndef SARIBBONCONTROLBUTTON_H
 #define SARIBBONCONTROLBUTTON_H
 #include <QToolButton>
 #include "SARibbonGlobal.h"

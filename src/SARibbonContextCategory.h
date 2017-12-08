@@ -1,4 +1,4 @@
-#ifndef SARIBBONCONTEXTCATEGORY_H
+﻿#ifndef SARIBBONCONTEXTCATEGORY_H
 #define SARIBBONCONTEXTCATEGORY_H
 #include "SARibbonGlobal.h"
 #include "SARibbonCategory.h"

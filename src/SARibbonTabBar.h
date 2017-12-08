@@ -1,4 +1,4 @@
-#ifndef SARIBBONTABBAR_H
+﻿#ifndef SARIBBONTABBAR_H
 #define SARIBBONTABBAR_H
 #include "SARibbonGlobal.h"
 #include <QTabBar>

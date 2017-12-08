@@ -1,4 +1,4 @@
-#include "SARibbonMainWindow.h"
+﻿#include "SARibbonMainWindow.h"
 #include "FramelessHelper.h"
 #include "SAWindowButtonGroup.h"
 #include "SARibbonBar.h"

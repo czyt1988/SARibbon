@@ -1,4 +1,4 @@
-#ifndef SARIBBONCTROLCONTAINER_H
+﻿#ifndef SARIBBONCTROLCONTAINER_H
 #define SARIBBONCTROLCONTAINER_H
 #include "SARibbonGlobal.h"
 #include <QWidget>

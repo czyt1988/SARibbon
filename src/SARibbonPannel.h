@@ -1,4 +1,4 @@
-#ifndef SARIBBONPANNEL_H
+﻿#ifndef SARIBBONPANNEL_H
 #define SARIBBONPANNEL_H
 #include "SARibbonGlobal.h"
 #include <QWidget>

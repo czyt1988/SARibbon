@@ -1,4 +1,4 @@
-#ifndef SARIBBONBUTTONGROUPWIDGET_H
+﻿#ifndef SARIBBONBUTTONGROUPWIDGET_H
 #define SARIBBONBUTTONGROUPWIDGET_H
 #include "SARibbonGlobal.h"
 #include "SARibbonToolButton.h"

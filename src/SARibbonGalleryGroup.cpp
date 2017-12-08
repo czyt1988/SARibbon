@@ -1,4 +1,4 @@
-#include "SARibbonGalleryGroup.h"
+﻿#include "SARibbonGalleryGroup.h"
 #include <QPainter>
 #include <QDebug>
 

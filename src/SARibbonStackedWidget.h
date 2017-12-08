@@ -1,4 +1,4 @@
-#ifndef SARIBBONSTACKEDWIDGET_H
+﻿#ifndef SARIBBONSTACKEDWIDGET_H
 #define SARIBBONSTACKEDWIDGET_H
 #include <QStackedWidget>
 #include "SARibbonGlobal.h"

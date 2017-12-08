@@ -1,4 +1,4 @@
-#ifndef SARIBBONMAINWINDOW_H
+﻿#ifndef SARIBBONMAINWINDOW_H
 #define SARIBBONMAINWINDOW_H
 #include "SARibbonGlobal.h"
 #include <QMainWindow>

@@ -1,4 +1,4 @@
-#include "SARibbonSeparatorWidget.h"
+﻿#include "SARibbonSeparatorWidget.h"
 #include <QStylePainter>
 #include <QPainter>
 SARibbonSeparatorWidget::SARibbonSeparatorWidget(int height, QWidget *parent)
