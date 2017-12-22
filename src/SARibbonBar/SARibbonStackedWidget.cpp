@@ -14,7 +14,7 @@ public:
     }
     void init()
     {
-        Parent->setFocusPolicy(Qt::StrongFocus);
+        //Parent->setFocusPolicy(Qt::StrongFocus);
     }
 };
 
