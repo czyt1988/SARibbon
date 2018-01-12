@@ -20,6 +20,14 @@ class SA_RIBBON_EXPORT SARibbonBar : public QMenuBar
 {
     Q_OBJECT
 public:
+    enum RibbonStyle{
+        OfficeStyle ///< 类似office 的ribbon风格
+        ,WpsLiteStyle ///< 类似wps的紧凑风格
+    };
+    enum RibbonMode{
+        MinimumRibbonMode ///< 缩小模式
+        ,NormalRibbonMode ///< 正常模式
+    };
 
     SARibbonBar(QWidget* parent);
 
@@ -55,6 +63,14 @@ public:
     SARibbonButtonGroupWidget* activeTabBarRightButtonGroup();
     //快速响应栏
     SARibbonQuickAccessBar* quickAccessBar();
+    //设置ribbon的风格
+    void setRibbonStyle(RibbonStyle v);
+    RibbonStyle currentRibbonStyle() const;
+    //当前的模式
+    RibbonMode currentRibbonMode() const;
+    //获取右边不可用区域，只有在wps模式下有用
+    int unusableTitleRegion() const;
+    void setUnusableTitleRegion(int v);
 signals:
     void applitionButtonClicked();
     //
@@ -69,7 +85,12 @@ protected slots:
     virtual void onCurrentRibbonTabClicked(int index);
     virtual void onCurrentRibbonTabDoubleClicked(int index);
     void onContextsCategoryPageAdded(SARibbonCategory* category);
-
+private:
+    void updateRibbonElementGeometry();
+    void resizeInNormalStyle();
+    void resizeInWpsLiteStyle();
+    void paintInNormalStyle();
+    void paintInWpsLiteStyle();
 protected:
     void paintEvent(QPaintEvent* e) Q_DECL_OVERRIDE;
     void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
