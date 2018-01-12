@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+﻿#include "mainwindow.h"
 #include <QTextEdit>
 #include <QAbstractButton>
 #include "SARibbonBar.h"
@@ -57,6 +57,15 @@ void MainWindow::onShowContextCategory(bool on)
     ribbonBar()->setContextCategoryVisible(m_contextCategory,on);
 }
 
+void MainWindow::onWpsStyle(bool on)
+{
+    if(on)
+        ribbonBar()->setRibbonStyle(SARibbonBar::WpsLiteStyle);
+    else
+        ribbonBar()->setRibbonStyle(SARibbonBar::OfficeStyle);
+    update();
+}
+
 void MainWindow::createCategoryMain(SARibbonCategory *page)
 {
     QElapsedTimer cost;
@@ -108,10 +117,11 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
 
     act = new QAction(this);
     act->setIcon(QIcon(":/icon/icon/filter.png"));
-    act->setText(QStringLiteral("test 2"));
-    act->setMenu(menu);
+    act->setText(QStringLiteral("use wps style"));
+    act->setCheckable(true);
+    act->setChecked(false);
     btn = pannel->addSmallAction(act);
-    btn->setPopupMode(QToolButton::DelayedPopup);
+    connect(act,SIGNAL(triggered(bool)),this,SLOT(onWpsStyle(bool)));
 
     act = new QAction(this);
     act->setIcon(QIcon(":/icon/icon/folder.png"));
