@@ -1,4 +1,4 @@
-#ifndef MAINWINDOW_H
+﻿#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 #include "SARibbonMainWindow.h"
 class SARibbonCategory;
@@ -11,6 +11,7 @@ public:
     MainWindow(QWidget* par=nullptr);
 private slots:
     void onShowContextCategory(bool on);
+    void onWpsStyle(bool on);
 private:
     void createCategoryMain(SARibbonCategory* page);
     void createCategoryOther(SARibbonCategory* page);
