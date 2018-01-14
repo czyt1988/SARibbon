@@ -15,12 +15,14 @@
 #include "SARibbonLineEdit.h"
 #include "SARibbonGallery.h"
 #include "SARibbonCheckBox.h"
+#include "SARibbonQuickAccessBar.h"
 #define PRINT_COST(ElapsedTimer,LastTime,STR) \
     do{\
     int ___TMP_INT = ElapsedTimer.elapsed();\
     qDebug() << STR << ___TMP_INT - LastTime << "(" << ___TMP_INT << ")";\
     LastTime = ___TMP_INT;\
     }while(0)
+
 MainWindow::MainWindow(QWidget *par):SARibbonMainWindow(par)
 {
 #if 1
@@ -48,6 +50,10 @@ MainWindow::MainWindow(QWidget *par):SARibbonMainWindow(par)
     SARibbonCategory* contextCategoryPage2 = m_contextCategory->addCategoryPage(QStringLiteral("Page1"));
     PRINT_COST(cost,lastTimes,"add contextCategory page");
 #endif
+    ribbon->quickAccessBar()->addButton(new QAction(QIcon(":/icon/icon/chartDataManager.png"),"action1",this));
+    ribbon->quickAccessBar()->addButton(new QAction(QIcon(":/icon/icon/figureIcon.png"),"action2",this));
+    ribbon->quickAccessBar()->addButton(new QAction(QIcon(":/icon/icon/information.png"),"action3",this));
+    ribbon->quickAccessBar()->addButton(new QAction(QIcon(":/icon/icon/inRangDataRemove.png"),"action4",this));
     showMaximized();
     //qDebug() << styleSheet();
 }

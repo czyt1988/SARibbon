@@ -234,7 +234,9 @@ SARibbonSeparatorWidget{
 
 /*SARibbonQuickAccessBar*/
 SARibbonQuickAccessBar{
-    background-color: transparent;
+    border: 1px solid #FDEEB3;
+    background-color: #000;
+    background: #000;
 }
 
 /*SARibbonButtonGroupWidget*/

@@ -173,7 +173,7 @@ void SARibbonCtrlContainer::paintEvent(QPaintEvent *e)
 
         }
     }
-    QWidget::paintEvent(e);
+   // QWidget::paintEvent(e);
 }
 
 void SARibbonCtrlContainer::resizeEvent(QResizeEvent *e)
