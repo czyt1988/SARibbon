@@ -96,7 +96,7 @@ protected:
     void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
 
     virtual void paintBackground(QPainter& painter);
-    virtual void paintWindowTitle(QPainter& painter, const QString &title,const QPoint& contextCategoryRegion);
+    virtual void paintWindowTitle(QPainter& painter, const QString &title, const QRect &titleRegion);
     virtual void paintWindowIcon(QPainter& painter, const QIcon &icon);
     virtual void paintContextCategoryTab(QPainter& painter,const QString& title, QRect contextRect, const QColor& color);
 private:

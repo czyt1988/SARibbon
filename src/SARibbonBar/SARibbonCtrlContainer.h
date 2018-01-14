@@ -4,12 +4,13 @@
 #include <QWidget>
 #include <QScopedPointer>
 class QStyleOption;
-class SARibbonCtrolContainerPrivate;
-class SA_RIBBON_EXPORT SARibbonCtrolContainer : public QWidget
+class SARibbonCtrlContainerPrivate;
+class SA_RIBBON_EXPORT SARibbonCtrlContainer : public QWidget
 {
+    Q_OBJECT
 public:
-    SARibbonCtrolContainer(QWidget *containerWidget,QWidget *parent = Q_NULLPTR);
-    ~SARibbonCtrolContainer();
+    SARibbonCtrlContainer(QWidget *containerWidget,QWidget *parent = Q_NULLPTR);
+    ~SARibbonCtrlContainer();
     QSize sizeHint() const Q_DECL_OVERRIDE;
     QSize minimumSizeHint() const Q_DECL_OVERRIDE;
     QWidget* containerWidget();
@@ -22,7 +23,7 @@ protected:
     void resizeEvent(QResizeEvent *e ) Q_DECL_OVERRIDE;
     virtual void initStyleOption(QStyleOption* opt) = 0;
 private:
-    SARibbonCtrolContainerPrivate*  m_d;
+    SARibbonCtrlContainerPrivate*  m_d;
 };
 
 #endif // SARIBBONCTROLCONTAINER_H

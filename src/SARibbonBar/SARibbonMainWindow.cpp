@@ -13,7 +13,9 @@ public:
     void init();
     SARibbonMainWindow* Parent;
     SARibbonBar* ribbonBar;
+#if 0
     QHash<SARibbonMainWindow::RibbonElement,QString> ribbonStyleSheet;
+#endif
 };
 
 SARibbonMainWindowPrivate::SARibbonMainWindowPrivate(SARibbonMainWindow *p)
@@ -24,12 +26,13 @@ SARibbonMainWindowPrivate::SARibbonMainWindowPrivate(SARibbonMainWindow *p)
 
 void SARibbonMainWindowPrivate::init()
 {
+#if 0
     ribbonStyleSheet[SARibbonMainWindow::RibbonBar]
             = QString("SARibbonBar{"
-                      "background-color: #E3E6E8;"
+                      " background-color: #E3E6E8;"
                       "}"
-                      "SARibbonCategory:focus{outline: none;}"
                       );
+
     ribbonStyleSheet[SARibbonMainWindow::RibbonCategory]
             = QString("SARibbonCategory{"
                       "background-color: white;"
@@ -63,8 +66,13 @@ void SARibbonMainWindowPrivate::init()
                       );
     ribbonStyleSheet[SARibbonMainWindow::RibbonTabBar]
             = QString(""
+                      "SARibbonTabBar{"
+                      " background: transparent;"
+                      "}"
                      "SARibbonTabBar::tab "
                      "{"
+                     " color:#444444;"
+                     " border:none;"
                      " background: transparent;"
                      " margin-top: 0px;"
                      " margin-right: 0px;"
@@ -74,7 +82,10 @@ void SARibbonMainWindowPrivate::init()
                      " max-width:200px;"
                      " min-height:30px;"
                      " max-height:30px;"
-                     ""
+                     " padding-left:1px;"
+                     " padding-right:1px;"
+                     " padding-top:1px;"
+                     " padding-bottom:1px;"
                      "}"
                      "SARibbonTabBar::tab:selected, SARibbonTabBar::tab:hover "
                      "{ "
@@ -82,6 +93,7 @@ void SARibbonMainWindowPrivate::init()
                      " border-top-right-radius: 2px;"
                      "}"
                      "SARibbonTabBar::tab:selected{"
+                     " color:#000000;"
                      " border: 1px solid #BAC9DB; "
                      " background: white;"
                      " border-bottom-color: #FFFFFF;"
@@ -89,6 +101,7 @@ void SARibbonMainWindowPrivate::init()
                      "SARibbonTabBar::tab:hover:!selected"
                      "{"
                      " border: 1px solid #ECBC3D;"
+                     " color: #000000;"
                      "}"
                      "SARibbonTabBar::tab:!selected "
                      "{"
@@ -106,30 +119,39 @@ void SARibbonMainWindowPrivate::init()
                       );
     ribbonStyleSheet[SARibbonMainWindow::RibbonToolButton]
             = QString(""
-                     "SARibbonToolButton::pressed{"
-                     " border: 1px solid #FFBF3E;"
-                     " background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,stop:0 #FDEDA3, stop:0.1282 #FDD36A,stop:0.8333 #FCD57C, stop:1 #FDFDEB);"
-                     "}"
-                     "SARibbonToolButton::checked{"
-                     " border: 1px solid #f2ca58;"
-                     " background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,stop:0 #FDEEB3, stop:0.1282 #FDE38A,stop:0.8333 #FCE58C, stop:1 #FDFDEB);"
-                     "}"
-                     "SARibbonToolButton::hover {"
-                     " border: 1px solid #f2ca58;"
-                     " background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,stop:0 #FDEEB3, stop:0.1282 #FDE38A,stop:0.8333 #FCE58C, stop:1 #FDFDEB);"
-                     " }"
-                     "");
+                      "SARibbonToolButton{"
+                      " border:none;"
+                      " color:#444444;"
+                      " background-color:transparent;"
+                      "}"
+                      "SARibbonToolButton::pressed{"
+                      " color:#444444;"
+                      " border: 1px solid #FFBF3E;"
+                      " background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,stop:0 #FDEDA3, stop:0.1282 #FDD36A,stop:0.8333 #FCD57C, stop:1 #FDFDEB);"
+                      "}"
+                      "SARibbonToolButton::checked{"
+                      " color:#444444;"
+                      " border: 1px solid #f2ca58;"
+                      " background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,stop:0 #FDEEB3, stop:0.1282 #FDE38A,stop:0.8333 #FCE58C, stop:1 #FDFDEB);"
+                      "}"
+                      "SARibbonToolButton::hover {"
+                      " color:#000000;"
+                      " border: 1px solid #f2ca58;"
+                      " background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,stop:0 #FDEEB3, stop:0.1282 #FDE38A,stop:0.8333 #FCE58C, stop:1 #FDFDEB);"
+                      "}"
+                      "");
     ribbonStyleSheet[SARibbonMainWindow::RibbonControlButton]
             = QString(""
                       "SARibbonControlButton{"
-                       " border: none;"
+                      "  background-color:transparent;"
+                      "  border: none;"
+                      "  color:#444444;"
                        "}"
                       "SARibbonControlButton#SARibbonGalleryButtonUp,#SARibbonGalleryButtonDown,#SARibbonGalleryButtonMore{"
                       "  border: 1px solid #C0C2C4;"
                       "}"
                       "SARibbonControlButton#SARibbonBarHidePannelButton{"
                       "  border: none;"
-                      "  background-color:none;"
                       "}"
                      "SARibbonControlButton::pressed{"
                      "  border: 1px solid #f2ca58;"
@@ -146,27 +168,32 @@ void SARibbonMainWindowPrivate::init()
                      "");
     ribbonStyleSheet[SARibbonMainWindow::RibbonMenu]
             = QString(
-                    "SARibbonMenu {  "
-                      "    background-color: #FCFCFC;  "
-                      "    border: 1px solid #8492A6;  "
-                      "}"
-                      "SARibbonMenu::item {  "
-                      "    padding: 5px 25px 5px 25px;"
-                      "    background-color: transparent;  "
-                      "}"
-                      "SARibbonMenu::item:selected {   "
-                      "    background-color: #654321;"
-                      "    background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,stop:0 #FEF9F4, stop:0.38 #FDE0BD,stop:0.39 #FFCE69, stop:1 #FFFFE7);"
-                      "}"
-                      "SARibbonMenu::item:hover {   "
-                      "    border: 1px solid #FFB700;"
-                      "}  "
-                      "SARibbonMenu::icon{"
-                      "margin-left: 5px;"
-                      "}"
+                    "SARibbonMenu { "
+                    "      color:#444444;"
+                    "    background-color: #FCFCFC;  "
+                    "    border: 1px solid #8492A6;  "
+                    "}"
+                    "SARibbonMenu::item {  "
+                    "    padding: 5px 25px 5px 25px;"
+                    "    background-color: transparent;  "
+                    "}"
+                    "SARibbonMenu::item:selected {   "
+                    "    background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,stop:0 #FEF9F4, stop:0.38 #FDE0BD,stop:0.39 #FFCE69, stop:1 #FFFFE7);"
+                    "}"
+                    "SARibbonMenu::item:hover {   "
+                    "      color:#000;"
+                    "    border: 1px solid #FFB700;"
+                    "}  "
+                    "SARibbonMenu::icon{"
+                    "margin-left: 5px;"
+                    "}"
                       );
     ribbonStyleSheet[SARibbonMainWindow::RibbonPannelOptionButton]
-            = QString(
+            = QString(""
+                      "SARibbonPannelOptionButton{"
+                      " background-color:transparent;"
+                      " color:#444444;"
+                      "}"
                       "SARibbonPannelOptionButton::hover {  "
                       "    background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,stop:0 #FDEEB3, stop:0.1282 #FDE38A,stop:0.8333 #FCE58C, stop:1 #FDFDEB);  "
                       "    border: 0px;"
@@ -182,6 +209,8 @@ void SARibbonMainWindowPrivate::init()
     ribbonStyleSheet[SARibbonMainWindow::RibbonGallery]
             = QString(
                       "SARibbonGallery {  "
+                      " background-color: transparent;"
+                      " color: #444444;"
                       " border: 1px solid #C0C2C4;"
                       "}"
                       );
@@ -189,6 +218,8 @@ void SARibbonMainWindowPrivate::init()
             = QString(
                       "SARibbonGalleryGroup {  "
                       " show-decoration-selected: 1;"
+                      " background-color: transparent;"
+                      " color: #444444;"
                       "}"
                       "SARibbonGalleryGroup::item:selected {  "
                       "    background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,stop:0 #FDEEB3, stop:0.1282 #FDE38A,stop:0.8333 #FCE58C, stop:1 #FDFDEB);  "
@@ -235,8 +266,29 @@ void SARibbonMainWindowPrivate::init()
 //                    "   selection-background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,stop:0 #FEF9F4, stop:0.38 #FDE0BD,stop:0.39 #FFCE69, stop:1 #FFFFE7);"
 //                    "}"
                       );
+    ribbonStyleSheet[SARibbonMainWindow::RibbonSeparatorWidget]
+            = QString("SARibbonSeparatorWidget{"
+                      " background-color: #E3E6E8;"
+                      "}"
+                      );
+    ribbonStyleSheet[SARibbonMainWindow::RibbonCtrlContainer]
+            = QString("SARibbonCtrlContainer{"
+                      " background-color: #E3E6E8;"
+                      "}"
+                      );
+    ribbonStyleSheet[SARibbonMainWindow::RibbonQuickAccessBar]
+            = QString("SARibbonQuickAccessBar{"
+                      " background-color: #E3E6E8;"
+                      "}"
+                      );
+    ribbonStyleSheet[SARibbonMainWindow::RibbonButtonGroupWidget]
+            = QString("SARibbonButtonGroupWidget{"
+                      " background-color: #E3E6E8;"
+                      "}"
+                      );
 
     Parent->setStyleSheet("");
+#endif
 }
 
 SARibbonMainWindow::SARibbonMainWindow(QWidget *parent)
@@ -244,6 +296,7 @@ SARibbonMainWindow::SARibbonMainWindow(QWidget *parent)
     ,m_d(new SARibbonMainWindowPrivate(this))
 {
     m_d->init();
+    loadTheme();
     //
     m_d->ribbonBar = new SARibbonBar(this);
     setMenuWidget(m_d->ribbonBar);
@@ -264,6 +317,7 @@ SARibbonBar *SARibbonMainWindow::ribbonBar()
     return m_d->ribbonBar;
 }
 
+#if 0
 void SARibbonMainWindow::setStyleSheet(const QString &styleSheet)
 {
     QString s = styleSheet;
@@ -271,9 +325,9 @@ void SARibbonMainWindow::setStyleSheet(const QString &styleSheet)
     {
         s += i.value();
     }
+    qDebug() << s;
     this->QMainWindow::setStyleSheet(s);
 }
-
 QString SARibbonMainWindow::ribbonElementStyleSheet(SARibbonMainWindow::RibbonElement element) const
 {
     return m_d->ribbonStyleSheet.value(element);
@@ -283,6 +337,8 @@ void SARibbonMainWindow::setRibbonElementStyleSheet(SARibbonMainWindow::RibbonEl
 {
     m_d->ribbonStyleSheet.insert(element,styleSheet);
 }
+#endif
+
 
 
 

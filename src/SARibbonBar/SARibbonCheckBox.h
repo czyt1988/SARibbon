@@ -4,6 +4,7 @@
 #include <QCheckBox>
 class SA_RIBBON_EXPORT SARibbonCheckBox : public QCheckBox
 {
+    Q_OBJECT
 public:
     SARibbonCheckBox(QWidget *parent = Q_NULLPTR);
 };

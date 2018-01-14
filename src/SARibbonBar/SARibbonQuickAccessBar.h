@@ -1,14 +1,15 @@
 ﻿#ifndef SARIBBONQUICKACCESSBAR_H
 #define SARIBBONQUICKACCESSBAR_H
 #include "SARibbonGlobal.h"
-#include "SARibbonCtrolContainer.h"
+#include "SARibbonCtrlContainer.h"
 class SARibbonToolButton;
 class SARibbonQuickAccessBarPrivate;
 ///
 /// \brief ribbon左上顶部的快速响应栏
 ///
-class SA_RIBBON_EXPORT SARibbonQuickAccessBar : public SARibbonCtrolContainer
+class SA_RIBBON_EXPORT SARibbonQuickAccessBar : public SARibbonCtrlContainer
 {
+    Q_OBJECT
 public:
     SARibbonQuickAccessBar(QWidget *parent = 0);
     ~SARibbonQuickAccessBar();

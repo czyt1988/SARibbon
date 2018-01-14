@@ -8,7 +8,7 @@ public:
 };
 
 SARibbonQuickAccessBar::SARibbonQuickAccessBar(QWidget *parent)
-    :SARibbonCtrolContainer(nullptr,parent)
+    :SARibbonCtrlContainer(nullptr,parent)
     ,m_d(new SARibbonQuickAccessBarPrivate)
 {
     m_d->groupWidget = new SARibbonButtonGroupWidget(this);

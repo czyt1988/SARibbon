@@ -10,6 +10,7 @@ class SARibbonButtonGroupWidgetPrivate;
 ///
 class SA_RIBBON_EXPORT SARibbonButtonGroupWidget : public QFrame
 {
+    Q_OBJECT
 public:
     SARibbonButtonGroupWidget(QWidget* parent=Q_NULLPTR);
     ~SARibbonButtonGroupWidget();

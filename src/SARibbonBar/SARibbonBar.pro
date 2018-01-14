@@ -38,12 +38,12 @@ SOURCES += \
     SARibbonElementCreateDelegate.cpp \
     SARibbonElementManager.cpp \
     SARibbonDrawHelper.cpp \
-    SARibbonCtrolContainer.cpp \
     SARibbonLineEdit.cpp \
     SARibbonCheckBox.cpp \
     SARibbonButtonGroupWidget.cpp \
     SARibbonStackedWidget.cpp \
-    SARibbonQuickAccessBar.cpp
+    SARibbonQuickAccessBar.cpp \
+    SARibbonCtrlContainer.cpp
 
 HEADERS  += \
     SARibbonBar.h \
@@ -69,12 +69,12 @@ HEADERS  += \
     SARibbonElementCreateDelegate.h \
     SARibbonElementManager.h \
     SARibbonDrawHelper.h \
-    SARibbonCtrolContainer.h \
     SARibbonLineEdit.h \
     SARibbonCheckBox.h \
     SARibbonButtonGroupWidget.h \
     SARibbonStackedWidget.h \
-    SARibbonQuickAccessBar.h
+    SARibbonQuickAccessBar.h \
+    SARibbonCtrlContainer.h
 
 RESOURCES += \
     resource.qrc
