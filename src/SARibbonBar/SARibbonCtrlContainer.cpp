@@ -133,6 +133,7 @@ void SARibbonCtrlContainer::setContainerWidget(QWidget *w)
 
 void SARibbonCtrlContainer::paintEvent(QPaintEvent *e)
 {
+    Q_UNUSED(e);
     QStylePainter painter(this);
 
     // draw the combobox frame, focusrect and selected etc.

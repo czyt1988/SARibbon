@@ -737,33 +737,25 @@ void SARibbonBar::paintInWpsLiteStyle()
     }
     p.restore();
     //! 显示标题等
-    int start = m_d->ribbonTabBar->x();
-    int lastTabIndex = m_d->ribbonTabBar->count() - 1;
-    if(lastTabIndex >= 0)
-    {
-        QRect lastTabRect = m_d->ribbonTabBar->tabRect(lastTabIndex);
-        start += lastTabRect.right();
-    }
+
 
     QWidget* parWindow = parentWidget();
     if(parWindow)
     {
+        int start = m_d->ribbonTabBar->x();
+        int lastTabIndex = m_d->ribbonTabBar->count() - 1;
+        if(lastTabIndex >= 0)
+        {
+            QRect lastTabRect = m_d->ribbonTabBar->tabRect(lastTabIndex);
+            start += lastTabRect.right();
+        }
         QRect titleRegion(start
                           ,m_d->widgetBord.top()
-                          ,width()-m_d->widgetBord.right()-m_d->unusableTitleRegion
+                          ,m_d->ribbonTabBar->geometry().right()-start
                           ,m_d->titleBarHight);
         paintWindowTitle(p,parWindow->windowTitle(),titleRegion);
         paintWindowIcon(p,parWindow->windowIcon());
     }
-//    QStyleOptionMenuItem menuOpt;
-//    menuOpt.palette = palette();
-//    menuOpt.state = QStyle::State_None;
-//    menuOpt.menuItemType = QStyleOptionMenuItem::EmptyArea;
-//    menuOpt.checkType = QStyleOptionMenuItem::NotCheckable;
-//    menuOpt.rect = rect();
-//    menuOpt.menuRect = rect();
-//    style()->drawControl(QStyle::CE_MenuBarEmptyArea, &menuOpt, &p, this);
-    //    QWidget::paintEvent(e);
 }
 
 

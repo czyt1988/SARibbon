@@ -15,6 +15,12 @@ public:
     //
     const SARibbonBar* ribbonBar() const;
     SARibbonBar* ribbonBar();
+    enum RibbonTheme{
+        NormalTheme  ///< 普通主题
+
+    };
+    void setRibbonTheme(RibbonTheme theme);
+    RibbonTheme ribbonTheme() const;
 #if 0
     //重写设置stylesheet
     void setStyleSheet(const QString &styleSheet);
@@ -46,7 +52,7 @@ public:
     void setRibbonElementStyleSheet(RibbonElement element,const QString& styleSheet);
 #endif
 protected:
-    void loadTheme();
+    void loadTheme(const QString &themeFile);
     void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
     bool eventFilter(QObject *obj, QEvent *e);
 private:

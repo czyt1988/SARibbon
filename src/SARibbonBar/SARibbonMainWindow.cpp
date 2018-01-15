@@ -13,6 +13,7 @@ public:
     void init();
     SARibbonMainWindow* Parent;
     SARibbonBar* ribbonBar;
+    SARibbonMainWindow::RibbonTheme currentRibbonTheme;
 #if 0
     QHash<SARibbonMainWindow::RibbonElement,QString> ribbonStyleSheet;
 #endif
@@ -20,6 +21,7 @@ public:
 
 SARibbonMainWindowPrivate::SARibbonMainWindowPrivate(SARibbonMainWindow *p)
     :Parent(p)
+    ,currentRibbonTheme(SARibbonMainWindow::NormalTheme)
 {
 
 }
@@ -296,7 +298,7 @@ SARibbonMainWindow::SARibbonMainWindow(QWidget *parent)
     ,m_d(new SARibbonMainWindowPrivate(this))
 {
     m_d->init();
-    loadTheme();
+    setRibbonTheme(ribbonTheme());
     //
     m_d->ribbonBar = new SARibbonBar(this);
     setMenuWidget(m_d->ribbonBar);
@@ -315,6 +317,24 @@ const SARibbonBar *SARibbonMainWindow::ribbonBar() const
 SARibbonBar *SARibbonMainWindow::ribbonBar()
 {
     return m_d->ribbonBar;
+}
+
+void SARibbonMainWindow::setRibbonTheme(SARibbonMainWindow::RibbonTheme theme)
+{
+    switch(ribbonTheme())
+    {
+    case NormalTheme:
+        loadTheme(":/theme/resource/default.qss");
+        break;
+    default:
+        loadTheme(":/theme/resource/default.qss");
+        break;
+    }
+}
+
+SARibbonMainWindow::RibbonTheme SARibbonMainWindow::ribbonTheme() const
+{
+    return m_d->currentRibbonTheme;
 }
 
 #if 0
@@ -375,9 +395,9 @@ bool SARibbonMainWindow::eventFilter(QObject *obj, QEvent *e)
 }
 
 
-void SARibbonMainWindow::loadTheme()
+void SARibbonMainWindow::loadTheme(const QString& themeFile)
 {
-    QFile file(":/theme/resource/default.qss");
+    QFile file(themeFile);
     if(!file.open(QIODevice::ReadOnly|QIODevice::Text))
     {
         return;

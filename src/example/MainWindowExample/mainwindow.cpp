@@ -16,6 +16,7 @@
 #include "SARibbonGallery.h"
 #include "SARibbonCheckBox.h"
 #include "SARibbonQuickAccessBar.h"
+#include "SARibbonButtonGroupWidget.h"
 #define PRINT_COST(ElapsedTimer,LastTime,STR) \
     do{\
     int ___TMP_INT = ElapsedTimer.elapsed();\
@@ -287,6 +288,12 @@ void MainWindow::createCategoryOther(SARibbonCategory *page)
     menu->addAction(QIcon(":/icon/icon/folder.png"),QStringLiteral("1111111"));
 
     SARibbonPannel* pannel = page->addPannel(QStringLiteral("pannel 1"));
+    SARibbonButtonGroupWidget* btnGroup = new SARibbonButtonGroupWidget(pannel);
+    btnGroup->setFrameShape(QFrame::Box);
+    btnGroup->addButton(new QAction(QIcon(":/icon/icon/figureIcon.png"),"",this));
+    btnGroup->addButton(new QAction(QIcon(":/icon/icon/information.png"),"",this));
+    pannel->addWidget(btnGroup,0,3);
+
     SARibbonToolButton* btn;
     btn = pannel->addLargeAction(item);
     btn->setIcon(QIcon(":/icon/icon/folder.png"));
