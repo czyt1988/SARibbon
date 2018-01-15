@@ -16,10 +16,6 @@ SARibbonQuickAccessBar{
     background-color: #FF0000;
 }
 
-/*SARibbonSeparatorWidget*/
-SARibbonSeparatorWidget{
-    background-color: transparent;
-}
 
 /*SARibbonCtrlContainer*/
 SARibbonCtrlContainer{
@@ -48,19 +44,24 @@ SARibbonApplicationButton{
   border-top-right-radius: 2px;  
   background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,stop:0 #467FBD, stop:0.5 #2A5FAC,stop:0.51 #1A4088, stop:1 #419ACF);
 }
+
 SARibbonApplicationButton::hover{  
   background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,stop:0 #7BB2EB, stop:0.5 #477ECD,stop:0.51 #114ECF, stop:1 #80E1FF);  
 }
+
 SARibbonApplicationButton::pressed{  
   background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,stop:0 #467BBB, stop:0.5 #2F63AE,stop:0.51 #1C438A, stop:1 #358BC9);  
 }  
+
 SARibbonApplicationButton:focus{
   outline: none;
 }
+
 /*SARibbonTabBar*/
 SARibbonTabBar{
     background-color: transparent;
 }
+
 SARibbonTabBar::tab {
     color:#444444;
     border:none;
@@ -78,20 +79,24 @@ SARibbonTabBar::tab {
     padding-top:1px;
     padding-bottom:1px;
 }
+
 SARibbonTabBar::tab:selected, QTabBar::tab:hover { 
   border-top-left-radius: 2px;
   border-top-right-radius: 2px;
 }
+
 SARibbonTabBar::tab:selected{
     color:#000000;
     border: 1px solid #BAC9DB;
     background: white;
     border-bottom-color: #FFFFFF;
 }
+
 SARibbonTabBar::tab:hover:!selected{
     border: 1px solid #ECBC3D;
     color: #000000;
 }
+
 SARibbonTabBar::tab:!selected {
     margin-top: 0px;
 }
@@ -220,7 +225,7 @@ SARibbonComboBox {
 
 }
 
-SARibbonComboBox:hover{{
+SARibbonComboBox:hover{
   border: 1px solid #FDEEB3;
   color : #000;
 }
@@ -240,6 +245,7 @@ SARibbonComboBox::drop-down {
   border-top-right-radius: 0px;
   border-bottom-right-radius: 0px;
 }
+
 SARibbonComboBox::drop-down:hover {
   border: 1px solid #FDEEB3;
   background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,stop:0 #FDEEB3, stop:0.1282 #FDE38A,stop:0.8333 #FCE58C, stop:1 #FDFDEB);  
@@ -249,3 +255,8 @@ SARibbonComboBox::down-arrow {
 }
 
 
+/*SARibbonSeparatorWidget*/
+SARibbonSeparatorWidget{
+    /*background-color: transparent;*/
+    background-color: #D3D3D3;
+}
