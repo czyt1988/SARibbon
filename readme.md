@@ -1,4 +1,4 @@
-# 简介
+﻿# 简介
  这是一个轻量级的Ribbon控件(Office样式UI),界面截图：
 
 ![](https://github.com/czyt1988/SARibbon/raw/master/doc/screenshot/001.gif)
@@ -29,3 +29,14 @@ SARibbon项目是SA项目的子项
 
 具体Ribbon的生成代码可见：
 [https://github.com/czyt1988/sa/blob/master/src/signA/MainWindowPrivate.cpp](https://github.com/czyt1988/sa/blob/master/src/signA/MainWindowPrivate.cpp)
+
+# news
+
+- 2018-01-15 添加了wps模式和office模式
+    office模式是最常见的ribbon模式了，就是我们经常看到的word模式，但office模式有个缺点，就是非常占位置
+
+![](https://github.com/czyt1988/SARibbon/raw/master/doc/screenshot/office-mode.png)
+
+    于是就有wps模式，wps模式是office模式的改良版，具体可看wps的软件，它为了减小ribbon的高度，甚至把pannel的按钮数目默认变为2行
+
+![](https://github.com/czyt1988/SARibbon/raw/master/doc/screenshot/wps-mode.png)

@@ -12,6 +12,7 @@
 #include "SARibbonControlButton.h"
 #include "SARibbonButtonGroupWidget.h"
 #include "SARibbonStackedWidget.h"
+#include "SARibbonQuickAccessBar.h"
 SARibbonElementCreateDelegate::SARibbonElementCreateDelegate()
 {
 
@@ -85,4 +86,9 @@ SARibbonControlButton *SARibbonElementCreateDelegate::createHidePannelButton(SAR
 SARibbonButtonGroupWidget *SARibbonElementCreateDelegate::craeteButtonGroupWidget(QWidget *parent)
 {
     return new SARibbonButtonGroupWidget(parent);
+}
+
+SARibbonQuickAccessBar *SARibbonElementCreateDelegate::createQuickAccessBar(QWidget *parent)
+{
+    return new SARibbonQuickAccessBar(parent);
 }

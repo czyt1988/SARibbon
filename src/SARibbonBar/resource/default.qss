@@ -1,10 +1,31 @@
-
+﻿
 /* start ribbon set*/
 /*SARibbonBar*/
 
 SARibbonBar{
   background-color: #E3E6E8;
 }
+
+/*SARibbonButtonGroupWidget*/
+SARibbonButtonGroupWidget{
+background-color: transparent;
+}
+
+/*SARibbonQuickAccessBar*/
+SARibbonQuickAccessBar{
+    background-color: #FF0000;
+}
+
+/*SARibbonSeparatorWidget*/
+SARibbonSeparatorWidget{
+    background-color: transparent;
+}
+
+/*SARibbonCtrlContainer*/
+SARibbonCtrlContainer{
+    background-color: transparent;
+}
+
 /*SARibbonCategory*/
 SARibbonCategory:focus{
   outline: none;
@@ -227,22 +248,4 @@ SARibbonComboBox::down-arrow {
   image: url(:/image/resource/ArrowDown.png);
 }
 
-/*SARibbonSeparatorWidget*/
-SARibbonSeparatorWidget{
-    background-color: transparent;
-}
 
-/*SARibbonQuickAccessBar*/
-SARibbonQuickAccessBar{
-    background-color: transparent;
-}
-
-/*SARibbonButtonGroupWidget*/
-SARibbonButtonGroupWidget{
-    background-color: transparent;
-}
-
-/*SARibbonCtrlContainer*/
-SARibbonCtrlContainer{
-    background-color: transparent;
-}

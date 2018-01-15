@@ -248,7 +248,10 @@ void SARibbonPannel::addWidget(QWidget *w)
 
 void SARibbonPannel::addWidget(QWidget *w, int row, int rowSpan)
 {
-    w->setParent(this);
+    if(this != w->parentWidget())
+    {
+        w->setParent(this);
+    }
     int col = m_d->m_gridLayout->columnCount();
     if(0 != row && 0 != col)
     {
