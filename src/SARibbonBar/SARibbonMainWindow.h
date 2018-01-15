@@ -15,6 +15,7 @@ public:
     //
     const SARibbonBar* ribbonBar() const;
     SARibbonBar* ribbonBar();
+#if 0
     //重写设置stylesheet
     void setStyleSheet(const QString &styleSheet);
     ///
@@ -36,11 +37,16 @@ public:
         ,RibbonGalleryGroup
         ,RibbonComboBox
         ,RibbonLineEdit
+        ,RibbonSeparatorWidget
+        ,RibbonCtrlContainer
+        ,RibbonQuickAccessBar
+        ,RibbonButtonGroupWidget
     };
     QString ribbonElementStyleSheet(RibbonElement element) const;
     void setRibbonElementStyleSheet(RibbonElement element,const QString& styleSheet);
-    void loadTheme();
+#endif
 protected:
+    void loadTheme();
     void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
     bool eventFilter(QObject *obj, QEvent *e);
 private:

@@ -1,17 +1,17 @@
-﻿#include "SARibbonCtrolContainer.h"
+﻿#include "SARibbonCtrlContainer.h"
 #include <QPainter>
 #include <QPaintEvent>
 #include <QStylePainter>
 #include <QDebug>
 #include "SARibbonDrawHelper.h"
-class SARibbonCtrolContainerPrivate
+class SARibbonCtrlContainerPrivate
 {
 public:
-    SARibbonCtrolContainer* Parent;
+    SARibbonCtrlContainer* Parent;
     QWidget* containerWidget;
     bool enableDrawIcon;
     bool enableDrawTitle;
-    SARibbonCtrolContainerPrivate(SARibbonCtrolContainer* p)
+    SARibbonCtrlContainerPrivate(SARibbonCtrlContainer* p)
         :containerWidget(Q_NULLPTR)
         ,enableDrawIcon(true)
         ,enableDrawTitle(true)
@@ -29,19 +29,19 @@ public:
     }
 };
 
-SARibbonCtrolContainer::SARibbonCtrolContainer(QWidget *containerWidget, QWidget *parent)
+SARibbonCtrlContainer::SARibbonCtrlContainer(QWidget *containerWidget, QWidget *parent)
     :QWidget(parent)
-    ,m_d(new SARibbonCtrolContainerPrivate(this))
+    ,m_d(new SARibbonCtrlContainerPrivate(this))
 {
     m_d->init(containerWidget);
 }
 
-SARibbonCtrolContainer::~SARibbonCtrolContainer()
+SARibbonCtrlContainer::~SARibbonCtrlContainer()
 {
     delete m_d;
 }
 
-QSize SARibbonCtrolContainer::sizeHint() const
+QSize SARibbonCtrlContainer::sizeHint() const
 {
     if(nullptr == m_d->containerWidget)
     {
@@ -68,7 +68,7 @@ QSize SARibbonCtrolContainer::sizeHint() const
     return containerSizeHint;
 }
 
-QSize SARibbonCtrolContainer::minimumSizeHint() const
+QSize SARibbonCtrlContainer::minimumSizeHint() const
 {
     if(nullptr == m_d->containerWidget)
     {
@@ -95,29 +95,29 @@ QSize SARibbonCtrolContainer::minimumSizeHint() const
     return containerHint;
 }
 
-QWidget *SARibbonCtrolContainer::containerWidget()
+QWidget *SARibbonCtrlContainer::containerWidget()
 {
     return m_d->containerWidget;
 }
 
-const QWidget *SARibbonCtrolContainer::containerWidget() const
+const QWidget *SARibbonCtrlContainer::containerWidget() const
 {
     return m_d->containerWidget;
 }
 
-void SARibbonCtrolContainer::setEnableShowIcon(bool b)
+void SARibbonCtrlContainer::setEnableShowIcon(bool b)
 {
     m_d->enableDrawIcon = b;
     update();
 }
 
-void SARibbonCtrolContainer::setEnableShowTitle(bool b)
+void SARibbonCtrlContainer::setEnableShowTitle(bool b)
 {
     m_d->enableDrawTitle = b;
     update();
 }
 
-void SARibbonCtrolContainer::setContainerWidget(QWidget *w)
+void SARibbonCtrlContainer::setContainerWidget(QWidget *w)
 {
     if(m_d->containerWidget)
     {
@@ -131,7 +131,7 @@ void SARibbonCtrolContainer::setContainerWidget(QWidget *w)
     m_d->containerWidget = w;
 }
 
-void SARibbonCtrolContainer::paintEvent(QPaintEvent *e)
+void SARibbonCtrlContainer::paintEvent(QPaintEvent *e)
 {
     QStylePainter painter(this);
 
@@ -176,7 +176,7 @@ void SARibbonCtrolContainer::paintEvent(QPaintEvent *e)
     QWidget::paintEvent(e);
 }
 
-void SARibbonCtrolContainer::resizeEvent(QResizeEvent *e)
+void SARibbonCtrlContainer::resizeEvent(QResizeEvent *e)
 {
     Q_UNUSED(e);
     QStyleOption opt;
@@ -219,7 +219,7 @@ void SARibbonCtrolContainer::resizeEvent(QResizeEvent *e)
 
 }
 
-void SARibbonCtrolContainer::initStyleOption(QStyleOption *opt)
+void SARibbonCtrlContainer::initStyleOption(QStyleOption *opt)
 {
     opt->initFrom(this);
 }

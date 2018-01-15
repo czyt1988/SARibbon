@@ -8,6 +8,7 @@
 ///
 class SA_RIBBON_EXPORT SARibbonSeparatorWidget : public QWidget
 {
+    Q_OBJECT
 public:
     SARibbonSeparatorWidget(int height,QWidget* parent = nullptr);
     SARibbonSeparatorWidget(QWidget* parent = nullptr);

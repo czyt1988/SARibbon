@@ -649,7 +649,36 @@ void SARibbonBar::paintInNormalStyle()
     QWidget* parWindow = parentWidget();
     if(parWindow)
     {
-        paintWindowTitle(p,parWindow->windowTitle(),contextCategoryRegion);
+        QRect titleRegion;
+        if(contextCategoryRegion.y() < 0)
+        {
+            titleRegion.setRect(m_d->quickAccessBar->geometry().right()
+                                ,m_d->widgetBord.top()
+                                ,width()- m_d->iconRightBorderPosition - m_d->widgetBord.right()
+                                ,m_d->titleBarHight);
+        }
+        else
+        {
+            int x=m_d->quickAccessBar->geometry().right();
+            if(width() - contextCategoryRegion.y() > contextCategoryRegion.x()-x)
+            {
+                //说明左边的区域大一点，标题显示在坐标
+                titleRegion.setRect(contextCategoryRegion.y()
+                                    ,m_d->widgetBord.top()
+                                    ,width()-x-m_d->unusableTitleRegion
+                                    ,m_d->titleBarHight);
+            }
+            else
+            {
+                //说明右边的大一点
+                titleRegion.setRect(m_d->iconRightBorderPosition
+                                    ,m_d->widgetBord.top()
+                                    ,contextCategoryRegion.x()-m_d->iconRightBorderPosition-m_d->unusableTitleRegion
+                                    ,m_d->titleBarHight);
+            }
+        }
+
+        paintWindowTitle(p,parWindow->windowTitle(),titleRegion);
         paintWindowIcon(p,parWindow->windowIcon());
     }
 //    QStyleOptionMenuItem menuOpt;
@@ -715,11 +744,15 @@ void SARibbonBar::paintInWpsLiteStyle()
         QRect lastTabRect = m_d->ribbonTabBar->tabRect(lastTabIndex);
         start += lastTabRect.right();
     }
-    QPoint contextCategoryRegion = QPoint(start,width()-m_d->widgetBord.right());
+
     QWidget* parWindow = parentWidget();
     if(parWindow)
     {
-        paintWindowTitle(p,parWindow->windowTitle(),contextCategoryRegion);
+        QRect titleRegion(start
+                          ,m_d->widgetBord.top()
+                          ,width()-m_d->widgetBord.right()-m_d->unusableTitleRegion
+                          ,m_d->titleBarHight);
+        paintWindowTitle(p,parWindow->windowTitle(),titleRegion);
         paintWindowIcon(p,parWindow->windowIcon());
     }
 //    QStyleOptionMenuItem menuOpt;
@@ -974,39 +1007,11 @@ void SARibbonBar::paintBackground(QPainter &painter)
 /// \param contextCategoryRegion 当前显示的上下文标签的范围，上下文标签是可以遮挡标题栏的，因此需要知道上下文标签的范围
 /// x表示左边界，y表示右边界
 ///
-void SARibbonBar::paintWindowTitle(QPainter &painter, const QString &title, const QPoint &contextCategoryRegion)
+void SARibbonBar::paintWindowTitle(QPainter &painter, const QString &title, const QRect &titleRegion)
 {
     painter.save();
     painter.setPen(m_d->titleTextColor); 
-    int x = m_d->quickAccessBar->geometry().right();
-    if(contextCategoryRegion.y() < 0)
-    {
-        painter.drawText(x
-                         ,m_d->widgetBord.top()
-                         ,width()- m_d->iconRightBorderPosition - m_d->widgetBord.right()
-                         ,m_d->titleBarHight,Qt::AlignCenter,title);
-    }
-    else
-    {
-        if(width() - contextCategoryRegion.y() > contextCategoryRegion.x()-x)
-        {
-            //说明左边的区域大一点，标题显示在坐标
-            x = contextCategoryRegion.y();
-            painter.drawText(x
-                             ,m_d->widgetBord.top()
-                             ,width()-x
-                             ,m_d->titleBarHight,Qt::AlignCenter,title);
-        }
-        else
-        {
-            //说明右边的大一点
-            x = m_d->iconRightBorderPosition;
-            painter.drawText(x
-                             ,m_d->widgetBord.top()
-                             ,contextCategoryRegion.x()-m_d->iconRightBorderPosition
-                             ,m_d->titleBarHight,Qt::AlignCenter,title);
-        }
-    }
+    painter.drawText(titleRegion,Qt::AlignCenter,title);
     painter.restore();
 }
 
