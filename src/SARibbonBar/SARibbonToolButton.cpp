@@ -255,20 +255,13 @@ void SARibbonToolButton::paintLargeButton(QPaintEvent *e)
     QPainter p(this);
     QStyleOptionToolButton opt;
     initStyleOption(&opt);
-//    if(objectName() == "ribbonButtonStartSelection")
-//    {
-//    qDebug() <<  "SARibbonToolButton::paintLargeButton "
-//              << opt;
-//    qDebug() <<"m_mouseOnSubControl:"<<m_mouseOnSubControl;
-//    }
+
 
     bool autoRaise = opt.state & QStyle::State_AutoRaise;
     QStyle::State bflags = opt.state;
-    QStyle::State mflags = bflags;
 
 //    bool autoRaise = opt.state & QStyle::State_AutoRaise;
 //    QStyle::State bflags = opt.state & ~QStyle::State_Sunken;
-//    QStyle::State mflags = bflags;
     if (autoRaise)
     {
         if (!(bflags & QStyle::State_MouseOver) || !(bflags & QStyle::State_Enabled)) {
@@ -281,17 +274,17 @@ void SARibbonToolButton::paintLargeButton(QPaintEvent *e)
         if (opt.activeSubControls & QStyle::SC_ToolButton)
         {
             bflags |= QStyle::State_Sunken;
-            mflags |= QStyle::State_MouseOver | QStyle::State_Sunken;
         }
         else if (opt.activeSubControls & QStyle::SC_ToolButtonMenu)
         {
-            mflags |= QStyle::State_Sunken;
             bflags |= QStyle::State_MouseOver;
         }
     }
+
 //绘制背景
     QStyleOption tool(0);
     tool.palette = opt.palette;
+
 
     if ((opt.subControls & QStyle::SC_ToolButton)
             &&
