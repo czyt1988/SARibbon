@@ -173,6 +173,13 @@ QAbstractButton *SARibbonBar::applitionButton()
 void SARibbonBar::setApplitionButton(QAbstractButton *btn)
 {
     m_d->setApplitionButton(btn);
+    if(btn)
+    {
+        if(btn->objectName().isEmpty())
+        {
+            btn->setObjectName(QStringLiteral("SARibbonApplitionButton"));
+        }
+    }
     repaint();
 }
 
@@ -381,21 +388,22 @@ void SARibbonBar::onCurrentRibbonTabChanged(int index)
     }
     if(category)
     {
-        m_d->stackedContainerWidget->setCurrentWidget(category);
-        if (isRibbonBarHideMode() && !m_d->stackedContainerWidget->isVisible())
+        if(m_d->stackedContainerWidget->currentWidget() != category)
         {
-            m_d->ribbonTabBar->clearFocus();
-            if(m_d->stackedContainerWidget->isPopupMode())
+            m_d->stackedContainerWidget->setCurrentWidget(category);
+        }
+        if (isRibbonBarHideMode())
+        {
+            if(!m_d->stackedContainerWidget->isVisible())
             {
-                m_d->stackedContainerWidget->setFocus();
-                m_d->stackedContainerWidget->exec();
+                if(m_d->stackedContainerWidget->isPopupMode())
+                {
+                    m_d->stackedContainerWidget->setFocus();
+                    m_d->stackedContainerWidget->exec();
+                }
             }
         }
     }
-//    if(!m_d->currentShowingContextCategory.isEmpty())
-//    {
-//        repaint();
-//    }
     emit currentRibbonTabChanged(index);
 }
 ///
@@ -406,31 +414,13 @@ void SARibbonBar::onCurrentRibbonTabClicked(int index)
 {
     if(isRibbonBarHideMode())
     {
-        QVariant var = m_d->ribbonTabBar->tabData(index);
-        SARibbonCategory* category = nullptr;
-        if(var.isValid())
+        if(!m_d->stackedContainerWidget->isVisible())
         {
-            quint64 p = var.value<quint64>();
-            category = (SARibbonCategory*)p;
-        }
-        if(category)
-        {
-            m_d->stackedContainerWidget->setCurrentWidget(category);
-            if (isRibbonBarHideMode() && !m_d->stackedContainerWidget->isVisible())
+            if(m_d->stackedContainerWidget->isPopupMode())
             {
-                m_d->ribbonTabBar->clearFocus();
-                if(m_d->stackedContainerWidget->isPopupMode())
-                {
-                    m_d->stackedContainerWidget->setFocus();
-                    m_d->stackedContainerWidget->exec();
-                }
+                m_d->ribbonTabBar->setCurrentIndex(index);
             }
-
         }
-//        if(!m_d->currentShowingContextCategory.isEmpty())
-//        {
-//            update();
-//        }
     }
 }
 ///
@@ -533,9 +523,6 @@ bool SARibbonBar::eventFilter(QObject *obj, QEvent *e)
             if(QEvent::UpdateLater == e->type()
                     || QEvent::MouseButtonRelease == e->type()
                     || QEvent::WindowActivate == e->type())
-//            if(QEvent::UpdateLater == e->type()
-//                    || QEvent::ShowToParent == e->type()
-//                    || QEvent::HideToParent == e->type())
             {
                 QApplication::postEvent(this, new QResizeEvent(size(),size()));
             }
@@ -556,11 +543,8 @@ bool SARibbonBar::eventFilter(QObject *obj, QEvent *e)
                         if (clickedWidget == m_d->ribbonTabBar)
                         {
                             const QPoint targetPoint = clickedWidget->mapFromGlobal(mouseEvent->globalPos());
-                            QMouseEvent evPress(mouseEvent->type(), targetPoint, mouseEvent->globalPos(), mouseEvent->button(), mouseEvent->buttons(), mouseEvent->modifiers());
-                            QApplication::sendEvent(clickedWidget, &evPress);
-
-//                            QMouseEvent eDblClick(QEvent::MouseButtonDblClick, targetPoint, mouseEvent->globalPos(), mouseEvent->button(), mouseEvent->buttons(), mouseEvent->modifiers());
-//                            QApplication::sendEvent(d.m_associativeTab, &eDblClick);
+                            QMouseEvent *evPress = new QMouseEvent(mouseEvent->type(), targetPoint, mouseEvent->globalPos(), mouseEvent->button(), mouseEvent->buttons(), mouseEvent->modifiers());
+                            QApplication::postEvent(clickedWidget, evPress);
                             return true;
                         }
                     }
@@ -819,7 +803,7 @@ void SARibbonBar::resizeInNormalStyle()
             QSize connerSize = connerL->sizeHint();
             int detal = (m_d->titleBarHight - connerSize.height()) / 2;
             connerL->setGeometry(x,y+detal
-                                 ,connerSize.width(),m_d->titleBarHight);
+                                 ,connerSize.width(),connerSize.height());
             x = connerL->geometry().right() + 5;
         }
     }
@@ -852,9 +836,10 @@ void SARibbonBar::resizeInNormalStyle()
         if(connerW->isVisible())
         {
             QSize connerSize = connerW->sizeHint();
+            int detal = (m_d->titleBarHight - connerSize.height()) / 2;
             endX -= connerSize.width();
-            connerW->setGeometry(endX,y
-                                 ,connerSize.width(),m_d->tabBarHight-2);
+            connerW->setGeometry(endX,y+detal
+                                 ,connerSize.width(),connerSize.height());
         }
     }
     //tab bar 定位
@@ -912,9 +897,10 @@ void SARibbonBar::resizeInWpsLiteStyle()
         if(connerW->isVisible())
         {
             QSize connerSize = connerW->sizeHint();
+            int detal = (validTitleBarHeight - connerSize.height()) / 2;
             endX -= connerSize.width();
-            connerW->setGeometry(endX,y
-                                 ,connerSize.width(),validTitleBarHeight);
+            connerW->setGeometry(endX,y+detal
+                                 ,connerSize.width(),connerSize.height());
         }
     }
     //quick access bar定位
@@ -934,9 +920,10 @@ void SARibbonBar::resizeInWpsLiteStyle()
         if(connerL->isVisible())
         {
             QSize connerSize = connerL->sizeHint();
+            int detal = (validTitleBarHeight - connerSize.height()) / 2;
             endX -= connerSize.width();
-            connerL->setGeometry(endX,y
-                                 ,connerSize.width(),validTitleBarHeight);
+            connerL->setGeometry(endX,y+detal
+                                 ,connerSize.width(),connerSize.height());
         }
     }
     //tab bar 定位 wps模式下applitionButton的右边就是tab bar

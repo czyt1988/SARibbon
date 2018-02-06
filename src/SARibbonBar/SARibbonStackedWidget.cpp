@@ -78,20 +78,6 @@ void SARibbonStackedWidget::exec()
     m_d->eventLoop = nullptr;
 }
 
-//void SARibbonStackedWidget::mouseReleaseEvent(QMouseEvent *e)
-//{
-//    if(isPopupMode())
-//    {
-//        if (!rect().contains(e->pos()))
-//        {
-//            hide();
-//        }
-//    }
-//    else
-//    {
-//        QStackedWidget::mouseReleaseEvent(e);
-//    }
-//}
 
 void SARibbonStackedWidget::hideEvent(QHideEvent *e)
 {
