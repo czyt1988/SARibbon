@@ -46,6 +46,7 @@ public:
     QColor tabBarBaseLineColor;///< tabbar底部的线条颜色
     SARibbonQuickAccessBar* quickAccessBar;///< 快速响应栏
     SARibbonBar::RibbonStyle ribbonStyle;///< ribbon的风格
+    SARibbonBar::RibbonStyle lastShowStyle;///< ribbon的风格
     int unusableTitleRegion;///<不可用的右边标题栏长度，主要是关闭按钮的位置
     int meanBarHeight;
     SARibbonBar::RibbonMode currentRibbonMode;///< 记录当前模式
@@ -62,6 +63,7 @@ public:
         ,tabBarRightSizeButtonGroupWidget(nullptr)
         ,tabBarBaseLineColor(186,201,219)
         ,ribbonStyle(SARibbonBar::OfficeStyle)
+        ,lastShowStyle(SARibbonBar::OfficeStyle)
         ,unusableTitleRegion(100)
         ,meanBarHeight(160)
         ,currentRibbonMode(SARibbonBar::NormalRibbonMode)
@@ -443,7 +445,12 @@ void SARibbonBar::onContextsCategoryPageAdded(SARibbonCategory *category)
 
 void SARibbonBar::updateRibbonElementGeometry()
 {
-    switch(m_d->ribbonStyle)
+    updateRibbonElementGeometry(m_d->ribbonStyle);
+}
+
+void SARibbonBar::updateRibbonElementGeometry(SARibbonBar::RibbonStyle style)
+{
+    switch(style)
     {
     case OfficeStyle:
         m_d->meanBarHeight = 160;
@@ -775,14 +782,22 @@ void SARibbonBar::paintContextCategoryTab(QPainter &painter, const QString &titl
 }
 void SARibbonBar::resizeEvent(QResizeEvent *e)
 {
-    Q_UNUSED(e);
+    Q_UNUSED(e)
     switch(m_d->ribbonStyle)
     {
     case OfficeStyle:
         resizeInNormalStyle();
         break;
     case WpsLiteStyle:
-        resizeInWpsLiteStyle();
+        if(parentWidget())
+        {
+            if(parentWidget()->isMaximized())
+            {
+                resizeInWpsLiteStyle();
+                break;
+            }
+        }
+        resizeInNormalStyle();
         break;
     default:
         resizeInNormalStyle();
@@ -792,6 +807,11 @@ void SARibbonBar::resizeEvent(QResizeEvent *e)
 
 void SARibbonBar::resizeInNormalStyle()
 {
+    if(WpsLiteStyle == m_d->lastShowStyle)
+    {
+        updateRibbonElementGeometry(OfficeStyle);
+    }
+    m_d->lastShowStyle = OfficeStyle;
     int x = m_d->widgetBord.left();
     int y = m_d->widgetBord.top();
     //cornerWidget - TopLeftCorner
@@ -878,6 +898,11 @@ void SARibbonBar::resizeInNormalStyle()
 
 void SARibbonBar::resizeInWpsLiteStyle()
 {
+    if(OfficeStyle == m_d->lastShowStyle)
+    {
+        updateRibbonElementGeometry(WpsLiteStyle);
+    }
+    m_d->lastShowStyle = WpsLiteStyle;
     int x = m_d->widgetBord.left();
     int y = m_d->widgetBord.top();
     int validTitleBarHeight = m_d->titleBarHight - m_d->widgetBord.top();

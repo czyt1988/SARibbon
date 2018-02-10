@@ -87,6 +87,7 @@ protected slots:
     void onContextsCategoryPageAdded(SARibbonCategory* category);
 private:
     void updateRibbonElementGeometry();
+    void updateRibbonElementGeometry(RibbonStyle style);
     void resizeInNormalStyle();
     void resizeInWpsLiteStyle();
     void paintInNormalStyle();
