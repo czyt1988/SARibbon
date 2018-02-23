@@ -428,7 +428,7 @@ void SARibbonToolButton::drawIconAndLabel(QPainter &p, const QStyleOptionToolBut
                 p.setFont(opt.font);
 
                 QRect pr = m_iconRect;
-                QRect tr = opt.rect.adjusted(pr.width(),0,-8,0);
+                QRect tr = opt.rect.adjusted(pr.width(),0,-1,0);
                 int alignment = Qt::TextShowMnemonic;
                 //快捷键的下划线
                 if (!style()->styleHint(QStyle::SH_UnderlineShortcut, &opt, this))

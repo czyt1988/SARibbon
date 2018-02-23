@@ -202,6 +202,7 @@ SARibbonCategory *SARibbonBar::addCategoryPage(const QString &title)
     int index = m_d->ribbonTabBar->addTab(title);
     m_d->ribbonTabBar->setTabData(index,QVariant((quint64)catagory));
     m_d->stackedContainerWidget->addWidget(catagory);
+    connect(catagory,&QWidget::windowTitleChanged,this,&SARibbonBar::onCategoryWindowTitleChanged);
     return catagory;
 }
 
@@ -368,6 +369,27 @@ void SARibbonBar::onWindowIconChanged(const QIcon &icon)
     }
     update();
 }
+
+void SARibbonBar::onCategoryWindowTitleChanged(const QString &title)
+{
+    QWidget* w = qobject_cast<QWidget*>(sender());
+    for(int i=0;i<m_d->ribbonTabBar->count();++i)
+    {
+        //鉴于tab不会很多，不考虑效率问题
+        QVariant var = m_d->ribbonTabBar->tabData(i);
+        QWidget* category = nullptr;
+        if(var.isValid())
+        {
+            quint64 p = var.value<quint64>();
+            category = (QWidget*)p;
+            if(w == category)
+            {
+                m_d->ribbonTabBar->setTabText(i,title);
+            }
+        }
+
+    }
+}
 ///
 /// \brief ribbon的显示界面隐藏
 ///
@@ -496,8 +518,7 @@ void SARibbonBar::setRibbonStyle(SARibbonBar::RibbonStyle v)
     updateRibbonElementGeometry();
     QSize oldSize = size();
     QSize newSize(oldSize.width(),m_d->meanBarHeight);
-    QResizeEvent re(newSize,oldSize);
-    QApplication::sendEvent(this,&re);
+    QApplication::postEvent(this,new QResizeEvent(newSize,oldSize));
 }
 
 SARibbonBar::RibbonStyle SARibbonBar::currentRibbonStyle() const
@@ -782,27 +803,27 @@ void SARibbonBar::paintContextCategoryTab(QPainter &painter, const QString &titl
 }
 void SARibbonBar::resizeEvent(QResizeEvent *e)
 {
-    Q_UNUSED(e)
+    Q_UNUSED(e);
     switch(m_d->ribbonStyle)
     {
     case OfficeStyle:
         resizeInNormalStyle();
-        break;
+        return;
     case WpsLiteStyle:
-        if(parentWidget())
+        if(QWidget*w = parentWidget())
         {
-            if(parentWidget()->isMaximized())
+            if(w->isMaximized() || w->isFullScreen())
             {
                 resizeInWpsLiteStyle();
-                break;
+                return;
             }
         }
-        resizeInNormalStyle();
         break;
     default:
         resizeInNormalStyle();
-        break;
+        return;
     }
+    resizeInNormalStyle();
 }
 
 void SARibbonBar::resizeInNormalStyle()

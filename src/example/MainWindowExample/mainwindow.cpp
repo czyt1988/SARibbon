@@ -56,7 +56,6 @@ MainWindow::MainWindow(QWidget *par):SARibbonMainWindow(par)
     ribbon->quickAccessBar()->addButton(new QAction(QIcon(":/icon/icon/information.png"),"action3",this));
     ribbon->quickAccessBar()->addButton(new QAction(QIcon(":/icon/icon/inRangDataRemove.png"),"action4",this));
     showMaximized();
-    //qDebug() << styleSheet();
 }
 
 void MainWindow::onShowContextCategory(bool on)

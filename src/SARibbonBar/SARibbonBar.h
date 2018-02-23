@@ -80,6 +80,7 @@ protected:
 protected slots:
     void onWindowTitleChanged(const QString &title);
     void onWindowIconChanged(const QIcon &icon);
+    void onCategoryWindowTitleChanged(const QString &title);
     void onStackWidgetHided();
     virtual void onCurrentRibbonTabChanged(int index);
     virtual void onCurrentRibbonTabClicked(int index);
