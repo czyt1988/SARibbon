@@ -515,6 +515,7 @@ SARibbonQuickAccessBar *SARibbonBar::quickAccessBar()
 void SARibbonBar::setRibbonStyle(SARibbonBar::RibbonStyle v)
 {
     m_d->ribbonStyle = v;
+    m_d->lastShowStyle = v;
     updateRibbonElementGeometry();
     QSize oldSize = size();
     QSize newSize(oldSize.width(),m_d->meanBarHeight);
@@ -801,15 +802,19 @@ void SARibbonBar::paintContextCategoryTab(QPainter &painter, const QString &titl
         painter.drawText(contextRect,Qt::AlignCenter,title);
     }
 }
+
 void SARibbonBar::resizeEvent(QResizeEvent *e)
 {
     Q_UNUSED(e);
     switch(m_d->ribbonStyle)
     {
     case OfficeStyle:
+    {
         resizeInNormalStyle();
         return;
+    }
     case WpsLiteStyle:
+    {
         if(QWidget*w = parentWidget())
         {
             if(w->isMaximized() || w->isFullScreen())
@@ -819,6 +824,7 @@ void SARibbonBar::resizeEvent(QResizeEvent *e)
             }
         }
         break;
+    }
     default:
         resizeInNormalStyle();
         return;

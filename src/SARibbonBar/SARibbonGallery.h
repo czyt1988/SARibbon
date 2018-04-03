@@ -6,6 +6,10 @@
 class QVBoxLayout;
 class SARibbonGalleryPrivate;
 class RibbonGalleryViewport;
+
+///
+/// \brief Gallery控件
+///
 class SA_RIBBON_EXPORT SARibbonGallery : public QFrame
 {
     Q_OBJECT
@@ -34,6 +38,9 @@ private:
     SARibbonGalleryPrivate* m_d;
 };
 
+///
+/// \brief SARibbonGallery的Viewport class
+///
 class RibbonGalleryViewport : public QWidget
 {
     Q_OBJECT
