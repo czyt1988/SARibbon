@@ -44,3 +44,4 @@ SARibbon项目是SA项目的子项
 # 已知BUG
 
 - 在缩放模式下，tabbar的点击有问题
+- 目前暂时无法获取通过qss设置的border 颜色属性

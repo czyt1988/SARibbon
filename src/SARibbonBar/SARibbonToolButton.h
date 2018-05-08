@@ -37,9 +37,12 @@ protected:
 
     virtual void drawIconAndLabel(QPainter& p,const QStyleOptionToolButton& opt);
 private:
+    static void drawArrow(const QStyle *style, const QStyleOptionToolButton *toolbutton,
+                          const QRect &rect, QPainter *painter, const QWidget *widget = 0);
+private:
     RibbonButtonType m_buttonType;
     bool m_mouseOnSubControl;
-    QColor m_borderColor;
+    QColor m_borderColor;//TODO 如何获取border的颜色，从而替代此变量
     bool m_menuButtonPressed;
     QRect m_iconRect;
 };
