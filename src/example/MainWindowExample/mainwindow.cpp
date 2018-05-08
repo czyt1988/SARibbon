@@ -169,6 +169,7 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
     act->setText(QStringLiteral("InstantPopup"));
     act->setMenu(menu);
     btn = pannel->addLargeAction(act);
+    btn->setObjectName("buttonInstantPopup");
     btn->setPopupMode(QToolButton::InstantPopup);
     connect(act,&QAction::triggered,this,&MainWindow::onInstantPopupCheckabletriggered);
 
