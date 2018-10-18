@@ -10,7 +10,12 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = SARibbonMainWindowExample
 TEMPLATE = app
-DESTDIR = $$PWD/../../../bin/
+
+CONFIG(debug, debug|release){
+    DESTDIR = $$PWD/../../../bin_qt$$[QT_VERSION]_debug
+}else {
+    DESTDIR = $$PWD/../../../bin_qt$$[QT_VERSION]_release
+}
 
 SOURCES += main.cpp\
     mainwindow.cpp 

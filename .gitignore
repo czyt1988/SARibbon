@@ -18,4 +18,5 @@
 build*
 /tmp
 /bin
+/bin_qt*
 Thumb.db
