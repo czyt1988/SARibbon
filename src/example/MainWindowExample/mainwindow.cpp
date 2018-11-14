@@ -154,6 +154,7 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
     act->setMenu(menu);
     btn = pannel->addLargeAction(act);
     btn->setPopupMode(QToolButton::DelayedPopup);
+    btn->setObjectName("SA_DelayedPopup");
     connect(act,&QAction::triggered,this,&MainWindow::onDelayedPopupCheckabletriggered);
 
     act = new QAction(this);
@@ -161,6 +162,7 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
     act->setText(QStringLiteral("MenuButtonPopup"));
     act->setMenu(menu);
     btn = pannel->addLargeAction(act);
+    btn->setObjectName(QStringLiteral("MenuButtonPopup"));
     btn->setPopupMode(QToolButton::MenuButtonPopup);
     connect(act,&QAction::triggered,this,&MainWindow::onMenuButtonPopupCheckabletriggered);
 

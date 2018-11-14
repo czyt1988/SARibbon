@@ -8,6 +8,34 @@
 #include <QPaintEvent>
 #include <QMouseEvent>
 #include "SARibbonDrawHelper.h"
+#include "QCursor"
+#define DEBUG_PRINT_SARibbonToolButton 0
+#if DEBUG_PRINT_SARibbonToolButton
+QDebug operator<<(QDebug debug, const QStyleOptionToolButton &opt)
+{
+    debug << "=============="
+          << "\nQStyleOption("
+            << (QStyleOption)opt
+            << ")"
+            << "\n  QStyleOptionComplex:"
+               "\n     subControls("
+            << opt.subControls
+            << " ) "
+               "\n     activeSubControls("
+            << opt.activeSubControls
+            << "\n  QStyleOptionToolButton"
+               "\n     features("
+            << opt.features
+            << ")"
+               "\n     toolButtonStyle("
+            << opt.toolButtonStyle
+            << ")"
+                       ;
+
+    return debug;
+}
+#endif
+
 SARibbonToolButton::SARibbonToolButton(QWidget *parent)
     :QToolButton(parent)
     ,m_buttonType(LargeButton)
@@ -40,6 +68,7 @@ void SARibbonToolButton::paintEvent(QPaintEvent *event)
     default:
         return;
     }
+
 }
 
 void SARibbonToolButton::resizeEvent(QResizeEvent *e)
@@ -130,6 +159,10 @@ void SARibbonToolButton::paintSmallButton(QPaintEvent *e)
     QStylePainter p(this);
     QStyleOptionToolButton opt;
     initStyleOption(&opt);
+    if(!this->geometry().contains(QCursor::pos()))
+    {
+        opt.state &= ~QStyle::State_MouseOver;
+    }
 #if 0
     p.drawComplexControl(QStyle::CC_ToolButton, opt);
 #else
@@ -248,6 +281,7 @@ void SARibbonToolButton::paintSmallButton(QPaintEvent *e)
 #endif
 }
 
+
 void SARibbonToolButton::paintLargeButton(QPaintEvent *e)
 {
     Q_UNUSED(e);
@@ -255,18 +289,21 @@ void SARibbonToolButton::paintLargeButton(QPaintEvent *e)
     QPainter p(this);
     QStyleOptionToolButton opt;
     initStyleOption(&opt);
+    if(!this->geometry().contains(QCursor::pos()))
+    {
+        opt.state &= ~QStyle::State_MouseOver;
+    }
 
-//if(this->objectName() == "buttonInstantPopup")
-//{
-//    qDebug() << opt;
-//}
     bool autoRaise = opt.state & QStyle::State_AutoRaise;
+#if 0
     QStyle::State bflags = opt.state;
+#else
+    QStyle::State bflags = opt.state & ~QStyle::State_Sunken;
+#endif
 
-//    bool autoRaise = opt.state & QStyle::State_AutoRaise;
-//    QStyle::State bflags = opt.state & ~QStyle::State_Sunken;
     if (autoRaise)
     {
+        //如果autoRaise，但鼠标不在按钮上或者按钮不是激活状态，去除raised状态
         if (!(bflags & QStyle::State_MouseOver) || !(bflags & QStyle::State_Enabled)) {
             bflags &= ~QStyle::State_Raised;
         }
@@ -315,6 +352,20 @@ void SARibbonToolButton::paintLargeButton(QPaintEvent *e)
             {
                 tool.rect.adjust(0,0,0,-tool.rect.height()/2);
             }
+
+#if DEBUG_PRINT_SARibbonToolButton
+            if(this->objectName() == "MenuButtonPopup")
+            {
+
+                static int s_e = 0;
+                qDebug() << s_e << " under mouse:" << this->underMouse()
+                         << " \ncontinue:" <<this->geometry().contains(QCursor::pos())
+                         << " \n rect:" << this->geometry()
+                         << " QCursor:" << QCursor::pos()
+                         << "   " <<autoRaise << opt;
+                ++s_e;
+            }
+#endif
 
             if (autoRaise)
             {
@@ -386,7 +437,6 @@ void SARibbonToolButton::paintLargeButton(QPaintEvent *e)
     //绘制Focus
     if (opt.state & QStyle::State_HasFocus)
     {
-        qDebug() << "HasFocus";
         QStyleOptionFocusRect fr;
         fr.QStyleOption::operator=(opt);
         fr.rect.adjust(3, 3, -3, -3);
@@ -631,7 +681,6 @@ QSize SARibbonToolButton::minimumSizeHint() const
 
 bool SARibbonToolButton::event(QEvent *e)
 {
-    //qDebug() << e->type();
     switch(e->type())
     {
     case QEvent::WindowDeactivate:
