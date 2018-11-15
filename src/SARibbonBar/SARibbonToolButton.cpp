@@ -9,7 +9,7 @@
 #include <QMouseEvent>
 #include "SARibbonDrawHelper.h"
 #include "QCursor"
-#define DEBUG_PRINT_SARibbonToolButton 0
+#define DEBUG_PRINT_SARibbonToolButton 1
 #if DEBUG_PRINT_SARibbonToolButton
 QDebug operator<<(QDebug debug, const QStyleOptionToolButton &opt)
 {
@@ -159,9 +159,15 @@ void SARibbonToolButton::paintSmallButton(QPaintEvent *e)
     QStylePainter p(this);
     QStyleOptionToolButton opt;
     initStyleOption(&opt);
-    if(!this->geometry().contains(QCursor::pos()))
+    if(opt.features & QStyleOptionToolButton::MenuButtonPopup
+            ||
+            opt.features & QStyleOptionToolButton::HasMenu
+            )
     {
-        opt.state &= ~QStyle::State_MouseOver;
+        if(!this->rect().contains(this->mapFromGlobal(QCursor::pos())))
+        {
+            opt.state &= ~QStyle::State_MouseOver;
+        }
     }
 #if 0
     p.drawComplexControl(QStyle::CC_ToolButton, opt);
@@ -289,10 +295,18 @@ void SARibbonToolButton::paintLargeButton(QPaintEvent *e)
     QPainter p(this);
     QStyleOptionToolButton opt;
     initStyleOption(&opt);
-    if(!this->geometry().contains(QCursor::pos()))
+
+    if(opt.features & QStyleOptionToolButton::MenuButtonPopup
+            ||
+            opt.features & QStyleOptionToolButton::HasMenu
+            )
     {
-        opt.state &= ~QStyle::State_MouseOver;
+        if(!this->rect().contains(this->mapFromGlobal(QCursor::pos())))
+        {
+            opt.state &= ~QStyle::State_MouseOver;
+        }
     }
+
 
     bool autoRaise = opt.state & QStyle::State_AutoRaise;
 #if 0
@@ -300,7 +314,6 @@ void SARibbonToolButton::paintLargeButton(QPaintEvent *e)
 #else
     QStyle::State bflags = opt.state & ~QStyle::State_Sunken;
 #endif
-
     if (autoRaise)
     {
         //如果autoRaise，但鼠标不在按钮上或者按钮不是激活状态，去除raised状态
@@ -359,9 +372,11 @@ void SARibbonToolButton::paintLargeButton(QPaintEvent *e)
 
                 static int s_e = 0;
                 qDebug() << s_e << " under mouse:" << this->underMouse()
-                         << " \ncontinue:" <<this->geometry().contains(QCursor::pos())
+                         << " \ncontinue:" <<this->rect().contains(this->mapFromGlobal(QCursor::pos()))
+                         //<< " \nmapFromGlobal continue:" <<this->geometry().contains(this->mapFromGlobal(QCursor::pos()))
                          << " \n rect:" << this->geometry()
-                         << " QCursor:" << QCursor::pos()
+                         << " \n QCursor:" << QCursor::pos()
+                         << " \n nmapFromGlobal QCursor:" << this->mapFromGlobal(QCursor::pos())
                          << "   " <<autoRaise << opt;
                 ++s_e;
             }
