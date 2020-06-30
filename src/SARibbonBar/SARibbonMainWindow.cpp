@@ -14,6 +14,7 @@ public:
     SARibbonMainWindow* Parent;
     SARibbonBar* ribbonBar;
     SARibbonMainWindow::RibbonTheme currentRibbonTheme;
+    SAWindowButtonGroup* windowButtonGroup;
 #if 0
     QHash<SARibbonMainWindow::RibbonElement,QString> ribbonStyleSheet;
 #endif
@@ -304,7 +305,7 @@ SARibbonMainWindow::SARibbonMainWindow(QWidget *parent)
     setMenuWidget(m_d->ribbonBar);
     m_d->ribbonBar->installEventFilter(this);
     //
-    new SAWindowButtonGroup(this);
+    m_d->windowButtonGroup = new SAWindowButtonGroup(this);
     FramelessHelper *pHelper = new FramelessHelper(this);
     pHelper->setTitleHeight(m_d->ribbonBar->titleBarHeight());  //设置窗体的标题栏高度
 }
@@ -321,7 +322,7 @@ SARibbonBar *SARibbonMainWindow::ribbonBar()
 
 void SARibbonMainWindow::setRibbonTheme(SARibbonMainWindow::RibbonTheme theme)
 {
-    switch(ribbonTheme())
+    switch(theme)
     {
     case NormalTheme:
         loadTheme(":/theme/resource/default.qss");
