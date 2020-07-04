@@ -61,7 +61,11 @@ QSize SARibbonCtrlContainer::sizeHint() const
         QString text = windowTitle();
         if(!text.isEmpty())
         {
+#if QT_DEPRECATED_SINCE(5, 11)
             int textWidth = fontMetrics().horizontalAdvance(text);
+#else
+            int textWidth = fontMetrics().width(text);
+#endif
             containerSizeHint.setWidth(containerSizeHint.width() + textWidth);
         }
     }
@@ -88,7 +92,11 @@ QSize SARibbonCtrlContainer::minimumSizeHint() const
         QString text = windowTitle();
         if(!text.isEmpty())
         {
+#if QT_DEPRECATED_SINCE(5, 11)
             int textWidth = fontMetrics().horizontalAdvance(text.at(0));
+#else
+            int textWidth = fontMetrics().width(text.at(0));
+#endif
             containerHint.setWidth(containerHint.width() + (2*textWidth));
         }
     }
@@ -159,7 +167,11 @@ void SARibbonCtrlContainer::paintEvent(QPaintEvent *e)
         QString text = windowTitle();
         if(!text.isEmpty())
         {
+#if QT_DEPRECATED_SINCE(5, 11)
             int textWidth = opt.fontMetrics.horizontalAdvance(text);
+#else
+            int textWidth = opt.fontMetrics.width(text);
+#endif
             if(textWidth > (opt.rect.width() - widgetHeight - x))
             {
                 textWidth = opt.rect.width() - widgetHeight - x;
@@ -200,7 +212,11 @@ void SARibbonCtrlContainer::resizeEvent(QResizeEvent *e)
         QString text = windowTitle();
         if(!text.isEmpty())
         {
+#if QT_DEPRECATED_SINCE(5, 11)
             int textWidth = opt.fontMetrics.horizontalAdvance(text);
+#else
+            int textWidth = opt.fontMetrics.width(text);
+#endif
             if(textWidth > (opt.rect.width() - widgetHeight - x))
             {
                 textWidth = opt.rect.width() - widgetHeight - x;

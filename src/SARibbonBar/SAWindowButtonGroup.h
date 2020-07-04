@@ -10,15 +10,15 @@ class SA_RIBBON_EXPORT SAWindowButtonGroup : public QWidget
 {
     Q_OBJECT
 public:
-    SAWindowButtonGroup(QWidget* parent);
+    SAWindowButtonGroup(QWidget* parent,qreal iconscale=0.5);
     ~SAWindowButtonGroup();
-    void setupMinimizeButton(bool on);
-    void setupMaximizeButton(bool on);
-    void setupCloseButton(bool on);
-    void updateWindowFlag();
+    void setupMinimizeButton(bool on,qreal iconscale = 0.5);
+    void setupMaximizeButton(bool on,qreal iconscale = 0.5);
+    void setupCloseButton(bool on,qreal iconscale = 0.5);
+    void updateWindowFlag(qreal iconscale = 0.5);
 protected:
-    QSize sizeHint();
-    virtual bool eventFilter(QObject *watched, QEvent *e);
+    QSize sizeHint() const override;
+    virtual bool eventFilter(QObject *watched, QEvent *e) override;
     virtual void parentResize();
 private:
     void updateMaximizeButtonIcon();

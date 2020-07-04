@@ -18,7 +18,7 @@ public:
 
     }
 
-    void setupMinimizeButton(SAWindowButtonGroup* par,bool on)
+    void setupMinimizeButton(SAWindowButtonGroup* par,bool on,qreal iconscale = 0.5)
     {
         if(on)
         {
@@ -26,7 +26,7 @@ public:
             {
                 buttonMinimize = new QPushButton(par);
                 buttonMinimize->setObjectName(QStringLiteral("SAMinimizeWindowButton"));
-                buttonMinimize->setFixedSize(30,30);
+                buttonMinimize->setFixedSize(30,28);
                 buttonMinimize->setStyleSheet(QString("QPushButton "
                                                    "{ "
                                                    "    background-color: #E3E3E5; "
@@ -36,6 +36,7 @@ public:
                                                    "QPushButton:pressed {background-color:#A5AF9B}"
                                                    "QPushButton:focus{outline: none;}"));
                 QIcon icon = par->style()->standardIcon(QStyle::SP_TitleBarMinButton);
+                buttonMinimize->setIconSize(buttonMinimize->size()*iconscale);
                 buttonMinimize->setIcon(icon);
                 par->connect(buttonMinimize,&QAbstractButton::clicked
                              ,par,&SAWindowButtonGroup::minimizeWindow);
@@ -50,7 +51,7 @@ public:
         }
         updateSize(par);
     }
-    void setupMaximizeButton(SAWindowButtonGroup* par,bool on)
+    void setupMaximizeButton(SAWindowButtonGroup* par,bool on,qreal iconscale = 0.5)
     {
         if(on)
         {
@@ -58,7 +59,7 @@ public:
             {
                 buttonMaximize = new QPushButton(par);
                 buttonMaximize->setObjectName(QStringLiteral("SAMaximizeWindowButton"));
-                buttonMaximize->setFixedSize(30,30);
+                buttonMaximize->setFixedSize(30,28);
                 buttonMaximize->setStyleSheet(QString("QPushButton "
                                                    "{ "
                                                    "    background-color: #E3E3E5; "
@@ -68,6 +69,7 @@ public:
                                                    "QPushButton:pressed {background-color:#A5AF9B}"
                                                    "QPushButton:focus{outline: none;}"));
                 QIcon icon = par->style()->standardIcon(QStyle::SP_TitleBarMaxButton);
+                buttonMaximize->setIconSize(buttonMaximize->size()*iconscale);
                 buttonMaximize->setIcon(icon);
                 par->connect(buttonMaximize,&QAbstractButton::clicked
                              ,par,&SAWindowButtonGroup::maximizeWindow);
@@ -82,7 +84,7 @@ public:
         }
         updateSize(par);
     }
-    void setupCloseButton(SAWindowButtonGroup* par,bool on)
+    void setupCloseButton(SAWindowButtonGroup* par,bool on,qreal iconscale = 0.5)
     {
         if(on)
         {
@@ -90,7 +92,7 @@ public:
             {
                 buttonClose = new QPushButton(par);
                 buttonClose->setObjectName(QStringLiteral("SACloseWindowButton"));
-                buttonClose->setFixedSize(40,30);
+                buttonClose->setFixedSize(40,28);
                 //buttonClose->setFlat(true);
                 par->connect(buttonClose,&QAbstractButton::clicked
                              ,par,&SAWindowButtonGroup::closeWindow);
@@ -103,6 +105,7 @@ public:
                                                    "QPushButton:pressed {background-color:#F0604D}"
                                                    "QPushButton:focus{outline: none;}"));
                 QIcon icon = par->style()->standardIcon(QStyle::SP_TitleBarCloseButton);
+                buttonClose->setIconSize(buttonClose->size()*iconscale);
                 buttonClose->setIcon(icon);
             }
         }
@@ -138,7 +141,7 @@ public:
         }
     }
 
-    QSize sizeHint()
+    QSize sizeHint() const
     {
         int width = 0;
         int height = 0;
@@ -162,10 +165,10 @@ public:
 
 };
 
-SAWindowButtonGroup::SAWindowButtonGroup(QWidget *parent):QWidget(parent)
-  ,m_d(new SAWindowButtonGroupPrivate)
+SAWindowButtonGroup::SAWindowButtonGroup(QWidget *parent, qreal iconscale):QWidget(parent)
+  ,m_d(new SAWindowButtonGroupPrivate())
 {
-    updateWindowFlag();
+    updateWindowFlag(iconscale);
     if(parent)
         parent->installEventFilter(this);
 }
@@ -175,36 +178,36 @@ SAWindowButtonGroup::~SAWindowButtonGroup()
     delete m_d;
 }
 
-void SAWindowButtonGroup::setupMinimizeButton(bool on)
+void SAWindowButtonGroup::setupMinimizeButton(bool on, qreal iconscale)
 {
-    m_d->setupMinimizeButton(this,on);
+    m_d->setupMinimizeButton(this,on,iconscale);
 }
 
-void SAWindowButtonGroup::setupMaximizeButton(bool on)
+void SAWindowButtonGroup::setupMaximizeButton(bool on,qreal iconscale)
 {
-    m_d->setupMaximizeButton(this,on);
+    m_d->setupMaximizeButton(this,on,iconscale);
     updateMaximizeButtonIcon();
 }
 
-void SAWindowButtonGroup::setupCloseButton(bool on)
+void SAWindowButtonGroup::setupCloseButton(bool on,qreal iconscale)
 {
-    m_d->setupCloseButton(this,on);
+    m_d->setupCloseButton(this,on,iconscale);
 }
 
-void SAWindowButtonGroup::updateWindowFlag()
+void SAWindowButtonGroup::updateWindowFlag(qreal iconscale)
 {
     Qt::WindowFlags flags = parentWidget()->windowFlags();
 
-    setupMinimizeButton(flags & Qt::WindowMinimizeButtonHint);
+    setupMinimizeButton(flags & Qt::WindowMinimizeButtonHint,iconscale);
 
-    setupMaximizeButton(flags & Qt::WindowMaximizeButtonHint);
+    setupMaximizeButton(flags & Qt::WindowMaximizeButtonHint,iconscale);
 
-    setupCloseButton(flags & Qt::WindowCloseButtonHint);
+    setupCloseButton(flags & Qt::WindowCloseButtonHint,iconscale);
 
 }
 
 
-QSize SAWindowButtonGroup::sizeHint()
+QSize SAWindowButtonGroup::sizeHint() const
 {
     return m_d->sizeHint();
 }
