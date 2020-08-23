@@ -114,6 +114,7 @@ public:
 
     void updateSize(SAWindowButtonGroup *par)
     {
+        par->setFixedSize(sizeHint());
         int span = 0;
 
         if (buttonClose) {
