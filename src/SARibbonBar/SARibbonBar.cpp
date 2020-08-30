@@ -223,7 +223,9 @@ SARibbonContextCategory *SARibbonBar::addContextCategory(const QString& title, c
     context->setContextColor(color);
     connect(context, &SARibbonContextCategory::categoryPageAdded
         , this, &SARibbonBar::onContextsCategoryPageAdded);
-    resizeInWpsLiteStyle();
+    if (currentRibbonStyle() == WpsLiteStyle) {
+        resizeInWpsLiteStyle();
+    }
     return (context);
 }
 
@@ -778,22 +780,6 @@ void SARibbonBar::paintInWpsLiteStyle()
 
     QWidget *parWindow = parentWidget();
 
-    /*
-     * if (parWindow) {
-     *  int start = m_d->ribbonTabBar->x();
-     *  int lastTabIndex = m_d->ribbonTabBar->count() - 1;
-     *  if (lastTabIndex >= 0) {
-     *      QRect lastTabRect = m_d->ribbonTabBar->tabRect(lastTabIndex);
-     *      start += lastTabRect.right();
-     *  }
-     *  QRect titleRegion(start
-     *      , m_d->widgetBord.top()
-     *      , m_d->ribbonTabBar->geometry().right()-start
-     *      , m_d->titleBarHight);
-     *  paintWindowTitle(p, parWindow->windowTitle(), titleRegion);
-     *  paintWindowIcon(p, parWindow->windowIcon());
-     * }
-     */
     if (parWindow) {
         int start = m_d->ribbonTabBar->x() +  m_d->ribbonTabBar->width();
         int width = m_d->quickAccessBar->x() - start;
@@ -864,6 +850,7 @@ void SARibbonBar::resizeEvent(QResizeEvent *e)
          *  }
          * }
          */
+
         resizeInWpsLiteStyle();
         return;
 
