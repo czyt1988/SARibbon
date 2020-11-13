@@ -1,6 +1,6 @@
 ﻿# 简介
 
- 这是Qt下一个轻量级的Ribbon控件(Office样式UI),界面截图：
+ 这是Qt（最低要求Qt5）下一个轻量级的Ribbon控件(Office样式UI),界面截图：
 
 ![](https://cdn.jsdelivr.net/gh/czyt1988/SARibbon/doc/screenshot/001.gif)
 
