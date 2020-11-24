@@ -91,6 +91,10 @@ public:
     void setUnusableTitleRegion(int v);
 
 signals:
+
+    /**
+     * @brief 应用按钮点击响应 - 左上角的按钮，通过关联此信号触发应用按钮点击的效果
+     */
     void applitionButtonClicked();
 
     //
