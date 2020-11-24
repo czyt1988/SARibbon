@@ -1,0 +1,94 @@
+
+set(LIB_NAME SARibbonBar)
+
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+qt5_add_resources(QRCS resource.qrc)
+
+SET(HEADER_FILES
+    FramelessHelper.h
+    SARibbonApplicationButton.h
+    SARibbonBar.h
+    SARibbonButtonGroupWidget.h
+    SARibbonCategory.h
+    SARibbonCategoryLayout.h
+    SARibbonCheckBox.h
+    SARibbonComboBox.h
+    SARibbonContextCategory.h
+    SARibbonControlButton.h
+    SARibbonCtrlContainer.h
+    SARibbonDrawHelper.h
+    SARibbonElementCreateDelegate.h
+    SARibbonElementManager.h
+    SARibbonGallery.h
+    SARibbonGalleryGroup.h
+    SARibbonGalleryItem.h
+    SARibbonGlobal.h
+    SARibbonLineEdit.h
+    SARibbonMainWindow.h
+    SARibbonMenu.h
+    SARibbonPannel.h
+    SARibbonPannelOptionButton.h
+    SARibbonQuickAccessBar.h
+    SARibbonSeparatorWidget.h
+    SARibbonStackedWidget.h
+    SARibbonTabBar.h
+    SARibbonToolButton.h
+    SAWindowButtonGroup.h
+)
+
+SET(SOURCE_FILES
+    FramelessHelper.cpp
+    SARibbonApplicationButton.cpp
+    SARibbonBar.cpp
+    SARibbonButtonGroupWidget.cpp
+    SARibbonCategory.cpp
+    SARibbonCategoryLayout.cpp
+    SARibbonCheckBox.cpp
+    SARibbonComboBox.cpp
+    SARibbonContextCategory.cpp
+    SARibbonControlButton.cpp
+    SARibbonCtrlContainer.cpp
+    SARibbonDrawHelper.cpp
+    SARibbonElementCreateDelegate.cpp
+    SARibbonElementManager.cpp
+    SARibbonGallery.cpp
+    SARibbonGalleryGroup.cpp
+    SARibbonGalleryItem.cpp
+    SARibbonLineEdit.cpp
+    SARibbonMainWindow.cpp
+    SARibbonMenu.cpp
+    SARibbonPannel.cpp
+    SARibbonPannelOptionButton.cpp
+    SARibbonQuickAccessBar.cpp
+    SARibbonSeparatorWidget.cpp
+    SARibbonStackedWidget.cpp
+    SARibbonTabBar.cpp
+    SARibbonToolButton.cpp
+    SAWindowButtonGroup.cpp
+)
+
+add_definitions(-DSA_RIBBON_BAR_MAKE_LIB)
+
+add_library(${LIB_NAME} SHARED
+    ${QRCS}
+    ${HEADER_FILES}
+    ${SOURCE_FILES}
+    )
+
+target_link_libraries(${LIB_NAME} ${Qt5Widgets_LIBRARIES})
+
+SET_TARGET_PROPERTIES(${LIB_NAME} PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
+
+INSTALL(
+		TARGETS ${LIB_NAME}
+		RUNTIME DESTINATION bin
+		LIBRARY DESTINATION bin
+		ARCHIVE DESTINATION lib
+	)
+
+INSTALL(
+		FILES       ${HEADER_FILES}
+		DESTINATION include
+	)
