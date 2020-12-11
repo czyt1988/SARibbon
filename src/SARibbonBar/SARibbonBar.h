@@ -7,9 +7,9 @@
 #include "SARibbonContextCategory.h"
 #include <QScopedPointer>
 
+class QAbstractButton;
 class SARibbonElementCreateDelegate;
 class SARibbonBarPrivate;
-class QAbstractButton;
 class SARibbonTabBar;
 class SARibbonButtonGroupWidget;
 class SARibbonQuickAccessBar;
@@ -70,7 +70,7 @@ public:
     //ribbon tab的高度
     int tabBarHeight() const;
 
-    //
+    //标题栏的高度
     int titleBarHeight() const;
 
     //激活tabbar右边的按钮群
@@ -90,6 +90,11 @@ public:
     int unusableTitleRegion() const;
     void setUnusableTitleRegion(int v);
 
+	//设置当前ribbon的index
+	void setCurrentIndex(int index);
+	
+	//确保标签显示出来
+	void raiseCategory(SARibbonCategory* category);
 signals:
 
     /**
@@ -97,7 +102,10 @@ signals:
      */
     void applitionButtonClicked();
 
-    //
+    /**
+     * @brief 标签页变化触发的信号
+     * @param index
+     */
     void currentRibbonTabChanged(int index);
 
 protected:

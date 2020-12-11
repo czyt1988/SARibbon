@@ -9,6 +9,8 @@
 #include <QMouseEvent>
 #include "SARibbonDrawHelper.h"
 #include "QCursor"
+int SARibbonToolButton::LargeButtonSize = 78;
+int SARibbonToolButton::SmallButtonSize = 24;
 #define DEBUG_PRINT_SARibbonToolButton 1
 #if DEBUG_PRINT_SARibbonToolButton
 QDebug operator<<(QDebug debug, const QStyleOptionToolButton &opt)
@@ -678,12 +680,13 @@ void SARibbonToolButton::setButtonType(const RibbonButtonType &buttonType)
     m_buttonType = buttonType;
     if(LargeButton == buttonType)
     {
-        setFixedHeight(78);
+		setFixedHeight(LargeButtonSize);
         setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
+		setIconSize(QSize(SARibbonToolButton::LargeButtonSize / 2, SARibbonToolButton::LargeButtonSize / 2));
     }
     else
     {
-        setFixedHeight(26);
+		setFixedHeight(SmallButtonSize);
         setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     }
     setMouseTracking(true);
