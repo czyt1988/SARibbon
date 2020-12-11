@@ -561,6 +561,29 @@ void SARibbonBar::setUnusableTitleRegion(int v)
     m_d->unusableTitleRegion = v;
 }
 
+///
+/// \brief 切换到对应标签
+/// \param index 标签索引
+///
+void SARibbonBar::setCurrentIndex(int index)
+{
+	m_d->ribbonTabBar->setCurrentIndex(index);
+	//onCurrentRibbonTabChanged(index);
+}
+
+
+///
+/// \brief 确保标签显示出来，tab并切换到对应页
+/// \param category 标签指针
+///
+void SARibbonBar::raiseCategory(SARibbonCategory* category)
+{
+	int index = m_d->stackedContainerWidget->indexOf(category);
+	if (index >= 0)
+	{
+		setCurrentIndex(index);
+	}
+}
 
 bool SARibbonBar::eventFilter(QObject *obj, QEvent *e)
 {

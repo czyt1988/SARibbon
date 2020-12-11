@@ -2,6 +2,7 @@
 #define SAWINDOWBUTTONGROUP_H
 #include "SARibbonGlobal.h"
 #include <QWidget>
+#include <QToolButton>
 class SAWindowButtonGroupPrivate;
 ///
 /// \brief 窗口的最大最小化按钮
@@ -31,4 +32,10 @@ private:
     SAWindowButtonGroupPrivate* m_d;
 };
 
+class SAWindowToolButton : public QToolButton
+{
+    Q_OBJECT
+public:
+    SAWindowToolButton(QWidget* p = nullptr);
+};
 #endif // SAWINDOWBUTTONGROUP_H

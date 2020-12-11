@@ -11,7 +11,7 @@ class SA_RIBBON_EXPORT SARibbonMainWindow : public QMainWindow
 {
     Q_OBJECT
 public:
-    SARibbonMainWindow(QWidget* parent = nullptr);
+    SARibbonMainWindow(QWidget* parent = nullptr,bool useRibbon = true);
     //
     const SARibbonBar* ribbonBar() const;
     SARibbonBar* ribbonBar();
@@ -21,36 +21,8 @@ public:
     };
     void setRibbonTheme(RibbonTheme theme);
     RibbonTheme ribbonTheme() const;
-#if 0
-    //重写设置stylesheet
-    void setStyleSheet(const QString &styleSheet);
-    ///
-    /// \brief 枚举所有ribbon的元素
-    ///
-    enum RibbonElement
-    {
-        RibbonApplicationButton = 0 ///< ApplicationButton
-        ,RibbonBar
-        ,RibbonCategory
-        ,RibbonStackedWidget
-        ,RibbonTabBar
-        ,RibbonToolButton
-        ,RibbonMenu
-        ,RibbonPannelOptionButton
-        ,RibbonPannel
-        ,RibbonControlButton
-        ,RibbonGallery
-        ,RibbonGalleryGroup
-        ,RibbonComboBox
-        ,RibbonLineEdit
-        ,RibbonSeparatorWidget
-        ,RibbonCtrlContainer
-        ,RibbonQuickAccessBar
-        ,RibbonButtonGroupWidget
-    };
-    QString ribbonElementStyleSheet(RibbonElement element) const;
-    void setRibbonElementStyleSheet(RibbonElement element,const QString& styleSheet);
-#endif
+	//判断当前是否使用ribbon模式
+	bool isUseRibbon() const;
 protected:
     void loadTheme(const QString &themeFile);
     void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;

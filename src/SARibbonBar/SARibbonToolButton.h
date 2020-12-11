@@ -22,6 +22,8 @@ public:
     RibbonButtonType buttonType() const;
     void setButtonType(const RibbonButtonType &buttonType);
     virtual QSize minimumSizeHint() const Q_DECL_OVERRIDE;
+	static int LargeButtonSize;
+	static int SmallButtonSize;
 protected:
     bool event(QEvent *e);
     virtual void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;

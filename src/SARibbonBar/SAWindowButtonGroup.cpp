@@ -1,15 +1,19 @@
 ﻿#include "SAWindowButtonGroup.h"
-#include <QPushButton>
+#include <QToolButton>
 #include <QResizeEvent>
 #include <QStyle>
 #include <QDebug>
+
+//为了避免使用此框架的app设置了全局的qpushbutton 的 qss样式影响此按钮，定义了一个类
+
+
 class SAWindowButtonGroupPrivate
 {
 public:
 
-    QPushButton *buttonClose;
-    QPushButton *buttonMinimize;
-    QPushButton *buttonMaximize;
+    SAWindowToolButton *buttonClose;
+    SAWindowToolButton *buttonMinimize;
+    SAWindowToolButton *buttonMaximize;
     SAWindowButtonGroupPrivate()
         : buttonClose(nullptr)
         , buttonMinimize(nullptr)
@@ -22,18 +26,19 @@ public:
     {
         if (on) {
             if (!buttonMinimize) {
-                buttonMinimize = new QPushButton(par);
+                buttonMinimize = new SAWindowToolButton(par);
                 buttonMinimize->setObjectName(QStringLiteral("SAMinimizeWindowButton"));
                 buttonMinimize->setFixedSize(30, 28);
                 buttonMinimize->setFocusPolicy(Qt::NoFocus);//避免铺抓到
-                buttonMinimize->setStyleSheet(QString("QPushButton "
+                buttonMinimize->setStyleSheet(QString(""
+                    "SAWindowToolButton"
                     "{ "
-                    "    background-color: #E3E3E5; "
+                    "    background-color: transparent; "
                     "    border:none;"
                     "}"
-                    "QPushButton:hover {background-color:#C1D1B8}"
-                    "QPushButton:pressed {background-color:#A5AF9B}"
-                    "QPushButton:focus{outline: none;}"));
+                    "SAWindowToolButton:hover {background-color:#C1D1B8;}"
+                    "SAWindowToolButton:pressed {background-color:#A5AF9B;}"
+                    "SAWindowToolButton:focus{outline: none}"));
                 QIcon icon = par->style()->standardIcon(QStyle::SP_TitleBarMinButton);
                 buttonMinimize->setIconSize(buttonMinimize->size()*iconscale);
                 buttonMinimize->setIcon(icon);
@@ -53,18 +58,19 @@ public:
     {
         if (on) {
             if (!buttonMaximize) {
-                buttonMaximize = new QPushButton(par);
+                buttonMaximize = new SAWindowToolButton(par);
                 buttonMaximize->setObjectName(QStringLiteral("SAMaximizeWindowButton"));
                 buttonMaximize->setFixedSize(30, 28);
                 buttonMaximize->setFocusPolicy(Qt::NoFocus);//避免铺抓到
-                buttonMaximize->setStyleSheet(QString("QPushButton "
+                buttonMaximize->setStyleSheet(QString(""
+                    "SAWindowToolButton"
                     "{ "
-                    "    background-color: #E3E3E5; "
+                    "    background-color: transparent; "
                     "    border:none;"
-                    "}"
-                    "QPushButton:hover {background-color:#C1D1B8}"
-                    "QPushButton:pressed {background-color:#A5AF9B}"
-                    "QPushButton:focus{outline: none;}"));
+                    "}\n"
+                    "SAWindowToolButton:hover {background-color:#C1D1B8;}"
+                    "SAWindowToolButton:pressed {background-color:#A5AF9B;}"
+                    "SAWindowToolButton:focus{outline: none;}"));
                 QIcon icon = par->style()->standardIcon(QStyle::SP_TitleBarMaxButton);
                 buttonMaximize->setIconSize(buttonMaximize->size()*iconscale);
                 buttonMaximize->setIcon(icon);
@@ -84,21 +90,22 @@ public:
     {
         if (on) {
             if (!buttonClose) {
-                buttonClose = new QPushButton(par);
+                buttonClose = new SAWindowToolButton(par);
                 buttonClose->setObjectName(QStringLiteral("SACloseWindowButton"));
                 buttonClose->setFixedSize(40, 28);
                 buttonClose->setFocusPolicy(Qt::NoFocus);//避免铺抓到
                 //buttonClose->setFlat(true);
                 par->connect(buttonClose, &QAbstractButton::clicked
                     , par, &SAWindowButtonGroup::closeWindow);
-                buttonClose->setStyleSheet(QString("QPushButton "
+                buttonClose->setStyleSheet(QString(""
+                    "SAWindowToolButton"
                     "{ "
-                    "    background-color: #E3E3E5; "
+                    "    background-color: transparent; "
                     "    border:none;"
                     "}"
-                    "QPushButton:hover {background-color:#F0604D}"
-                    "QPushButton:pressed {background-color:#F0604D}"
-                    "QPushButton:focus{outline: none;}"));
+                    "SAWindowToolButton:hover {background-color:#F0604D;}"
+                    "SAWindowToolButton:pressed {background-color:#F0604D;}"
+                    "SAWindowToolButton:focus{outline: none;}"));
                 QIcon icon = par->style()->standardIcon(QStyle::SP_TitleBarCloseButton);
                 buttonClose->setIconSize(buttonClose->size()*iconscale);
                 buttonClose->setIcon(icon);
@@ -154,6 +161,11 @@ public:
         return (QSize(width, height));
     }
 };
+
+SAWindowToolButton::SAWindowToolButton(QWidget *p):QToolButton(p)
+{
+    setAutoRaise(true);
+}
 
 SAWindowButtonGroup::SAWindowButtonGroup(QWidget *parent, qreal iconscale) : QWidget(parent)
     , m_d(new SAWindowButtonGroupPrivate())
@@ -283,3 +295,7 @@ void SAWindowButtonGroup::maximizeWindow()
         updateMaximizeButtonIcon();
     }
 }
+
+
+
+
