@@ -236,7 +236,7 @@ SARibbonContextCategory *SARibbonBar::addContextCategory(const QString& title, c
 ///
 void SARibbonBar::showContextCategory(SARibbonContextCategory *context)
 {
-    if ((nullptr == context) || m_d->isContainContextCategoryInList(context)) {
+    if (isContextCategoryVisible(context)) {
         return;
     }
     ContextCategoryManagerData contextCategoryData;
@@ -274,6 +274,16 @@ void SARibbonBar::hideContextCategory(SARibbonContextCategory *context)
         resizeInWpsLiteStyle();
     }
     repaint();
+}
+
+/**
+ * @brief 判断上下文是否在显示状态
+ * @param context
+ * @return 在显示状态返回true
+ */
+bool SARibbonBar::isContextCategoryVisible(SARibbonContextCategory *context)
+{
+    return m_d->isContainContextCategoryInList(context);
 }
 
 
