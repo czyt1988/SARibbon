@@ -52,6 +52,9 @@ public:
     //隐藏一个上下文标签
     void hideContextCategory(SARibbonContextCategory *context);
 
+    //判断上下文是否是在显示状态
+    bool isContextCategoryVisible(SARibbonContextCategory *context);
+
     //设置上下文标签的显示或隐藏
     void setContextCategoryVisible(SARibbonContextCategory *context, bool visible);
 

@@ -12,12 +12,9 @@ DEFINES += SA_RIBBON_BAR_MAKE_LIB #定义此宏将构建库
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = SARibbonBar
 TEMPLATE = lib
+include($$PWD/../../common.pri)
+DESTDIR = $$SA_RIBBON_DIR
 
-CONFIG(debug, debug|release){
-    DESTDIR = $$PWD/../../bin_qt$$[QT_VERSION]_debug
-}else {
-    DESTDIR = $$PWD/../../bin_qt$$[QT_VERSION]_release
-}
 
 SOURCES += \
     SARibbonBar.cpp \
