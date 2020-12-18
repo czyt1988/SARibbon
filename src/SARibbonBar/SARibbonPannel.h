@@ -9,7 +9,7 @@ class QGridLayout;
 class SARibbonPannelOptionButton;
 class SARibbonPannelPrivate;
 ///
-/// \brief The SARibbonPannel class
+/// \brief pannel页窗口，pannel是ribbon的面板用于盛放控件
 ///
 class SA_RIBBON_EXPORT SARibbonPannel : public QWidget
 {
