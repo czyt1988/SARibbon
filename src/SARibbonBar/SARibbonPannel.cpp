@@ -14,6 +14,13 @@
 #include "SARibbonElementManager.h"
 #include "SARibbonMenu.h"
 
+const int c_higherModehight = 98;
+const int c_lowerModehight = 72;
+const int c_iconHighForHigerLarge = 32;
+const QSize c_iconSizeForHigerLarge = QSize(c_iconHighForHigerLarge,c_iconHighForHigerLarge);
+const int c_iconHighForHigerSmall = 16;
+const QSize c_iconSizeForHigerSmall = QSize(c_iconHighForHigerSmall,c_iconHighForHigerSmall);
+
 class SARibbonPannelPrivate
 {
 public:
@@ -21,12 +28,13 @@ public:
     SARibbonPannel* Parent;
     QGridLayout* m_gridLayout;
     QPoint m_nextElementPosition;
-    int m_row;
+    int m_row;///< 记录小action所在的gridLayout行数，gridLayout总共划分为6行，用于满足3行或2行的按钮需求
     SARibbonPannelOptionButton* m_optionActionButton;
     int m_titleOptionButtonSpace;///< 标题和项目按钮的间隔
     int m_titleHeight;///< 标题的高度
     int m_titleY;///< 标题栏的y距离
     SARibbonToolButton* m_defaultReduceButton;///<在pannel无法显示全的时候，显示一个toolbutton用来弹出pannel
+    SARibbonPannel::PannelLayoutMode m_pannelLayoutMode;///< pannel的布局模式，默认为3行模式ThreeRowMode
 };
 
 SARibbonPannelPrivate::SARibbonPannelPrivate(SARibbonPannel *p)
@@ -38,18 +46,17 @@ SARibbonPannelPrivate::SARibbonPannelPrivate(SARibbonPannel *p)
     ,m_titleHeight(21)
     ,m_titleY(77)
     ,m_defaultReduceButton(nullptr)
+    ,m_pannelLayoutMode(SARibbonPannel::ThreeRowMode)
 {
     m_gridLayout = new QGridLayout(Parent);
     m_gridLayout->setSpacing(1);
-    m_gridLayout->setContentsMargins(3,2,3,21);
+    m_gridLayout->setContentsMargins(3,2,3,m_titleHeight);
 }
 
 SARibbonPannel::SARibbonPannel(QWidget *parent):QWidget(parent)
   ,m_d(new SARibbonPannelPrivate(this))
 {
-    setFixedHeight(98);
-    setMinimumWidth(50);
-    setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Fixed);
+    setPannelLayoutMode(ThreeRowMode);
 }
 
 SARibbonPannel::~SARibbonPannel()
@@ -63,7 +70,7 @@ SARibbonToolButton *SARibbonPannel::addLargeAction(QAction *action)
     btn->setButtonType(SARibbonToolButton::LargeButton);
     btn->setAutoRaise(true);
     btn->setDefaultAction(action);
-    QSize iconSize = maxHightIconSize(action->icon().actualSize(QSize(32,32)),32);
+    QSize iconSize = maxHightIconSize(action->icon().actualSize(c_iconSizeForHigerLarge),c_iconHighForHigerLarge);
     btn->setIconSize(iconSize);
     if(action->menu())
         btn->setPopupMode(QToolButton::MenuButtonPopup);
@@ -79,7 +86,7 @@ SARibbonToolButton *SARibbonPannel::addLargeToolButton(const QString& text,const
     SARibbonToolButton* btn = RibbonSubElementDelegate->createRibbonToolButton(this);
     btn->setButtonType(SARibbonToolButton::LargeButton);
     btn->setAutoRaise(true);
-    QSize iconSize = maxHightIconSize(icon.actualSize(QSize(32,32)),32);
+    QSize iconSize = maxHightIconSize(icon.actualSize(c_iconSizeForHigerLarge),c_iconHighForHigerLarge);
     btn->setIconSize(iconSize);
     btn->setIcon(icon);
     btn->setPopupMode(popMode);
@@ -116,7 +123,7 @@ SARibbonToolButton* SARibbonPannel::addSmallAction(QAction *action)
     btn->setButtonType(SARibbonToolButton::SmallButton);
     btn->setAutoRaise(true);
     btn->setDefaultAction(action);
-    QSize iconSize = maxHightIconSize(action->icon().actualSize(QSize(16,16)),16);
+    QSize iconSize = maxHightIconSize(action->icon().actualSize(c_iconSizeForHigerSmall),c_iconHighForHigerSmall);
     btn->setIconSize(iconSize);
     if(action->menu())
         btn->setPopupMode(QToolButton::MenuButtonPopup);
@@ -137,7 +144,7 @@ SARibbonToolButton *SARibbonPannel::addMediumAction(QAction *action)
     btn->setButtonType(SARibbonToolButton::SmallButton);
     btn->setAutoRaise(true);
     btn->setDefaultAction(action);
-    QSize iconSize = maxHightIconSize(action->icon().actualSize(QSize(16,16)),16);
+    QSize iconSize = maxHightIconSize(action->icon().actualSize(c_iconSizeForHigerSmall),c_iconHighForHigerSmall);
     btn->setIconSize(iconSize);
     if(action->menu())
         btn->setPopupMode(QToolButton::MenuButtonPopup);
@@ -168,7 +175,7 @@ SARibbonToolButton *SARibbonPannel::addLargeMenu(SARibbonMenu *menu)
     btn->setAutoRaise(true);
     if(!menu->icon().isNull())
     {
-        QSize iconSize = maxHightIconSize(menu->icon().actualSize(QSize(32,32)),32);
+        QSize iconSize = maxHightIconSize(menu->icon().actualSize(c_iconSizeForHigerLarge),c_iconHighForHigerLarge);
         btn->setIconSize(iconSize);
         btn->setIcon(menu->icon());
     }
@@ -184,7 +191,7 @@ SARibbonToolButton *SARibbonPannel::addSmallMenu(SARibbonMenu *menu)
 {
     SARibbonToolButton* btn = RibbonSubElementDelegate->createRibbonToolButton(this);
     btn->setButtonType(SARibbonToolButton::SmallButton);
-    QSize iconSize = maxHightIconSize(menu->icon().actualSize(QSize(16,16)),16);
+    QSize iconSize = maxHightIconSize(menu->icon().actualSize(c_iconSizeForHigerSmall),c_iconHighForHigerSmall);
     btn->setIconSize(iconSize);
     btn->setMenu(menu);
     btn->setPopupMode(QToolButton::InstantPopup);
@@ -213,6 +220,36 @@ SARibbonGallery *SARibbonPannel::addGallery()
     m_d->m_row = 0;
     setExpanding();
     return gallery;
+}
+
+void SARibbonPannel::setPannelLayoutMode(SARibbonPannel::PannelLayoutMode mode)
+{
+    if(m_d->m_pannelLayoutMode == mode)
+    {
+        return;
+    }
+    m_d->m_pannelLayoutMode = mode;
+    int high = c_higherModehight;
+    switch(mode)
+    {
+    case ThreeRowMode:
+        high = c_higherModehight;
+        break;
+    case TwoRowMode:
+        high = c_lowerModehight;
+        break;
+    default:
+        high = c_higherModehight;
+        break;
+    }
+    setFixedHeight(high);
+    setMinimumWidth(50);
+    setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Fixed);
+}
+
+SARibbonPannel::PannelLayoutMode SARibbonPannel::pannelLayoutMode() const
+{
+    return m_d->m_pannelLayoutMode;
 }
 
 void SARibbonPannel::addSeparator()
