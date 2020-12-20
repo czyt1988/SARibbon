@@ -18,6 +18,11 @@ public:
     SARibbonPannel(QWidget* parent = 0);
     ~SARibbonPannel();
     using QWidget::addAction;
+    enum PannelLayoutMode{
+        ThreeRowMode ///< 三行布局模式，office就是三行布局模式，pannel能布置3行小toolbutton，默认模式
+        ,TwoRowMode ///< 两行布局模式，wps的后续布局模式就是两行布局模式，pannel能布置2行小toolbutton
+    };
+
     SARibbonToolButton* addLargeToolButton(const QString& text,const QIcon& icon,QToolButton::ToolButtonPopupMode popMode);
     SARibbonToolButton* addLargeAction(QAction *action);
     SARibbonToolButton* addSmallToolButton(const QString& text,const QIcon& icon,QToolButton::ToolButtonPopupMode popMode);
@@ -27,6 +32,9 @@ public:
     SARibbonToolButton *addSmallMenu(SARibbonMenu *menu);
     SARibbonToolButton* addLargeActionMenu(QAction *action,SARibbonMenu *menu);
     SARibbonGallery* addGallery();
+    //设置PannelLayoutMode
+    void setPannelLayoutMode(PannelLayoutMode mode);
+    PannelLayoutMode pannelLayoutMode() const;
     void addSeparator();
     void addWidget(QWidget* w);
     void addWidget(QWidget* w, int row,int rowSpan);
