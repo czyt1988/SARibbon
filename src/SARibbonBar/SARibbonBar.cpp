@@ -17,6 +17,11 @@
 #include <QAction>
 #include "SARibbonQuickAccessBar.h"
 #include <QStyleOptionMenuItem>
+
+const int c_mainbarheightOfficeStyleThreeRow = 160;
+const int c_mainbarheightWPSStyleThreeRow = 130;
+const int c_mainbarheightOfficeStyleTwoRow = 134;
+const int c_mainbarheightWPSStyleTwoRow = 104;
 class ContextCategoryManagerData
 {
 public:
@@ -48,8 +53,8 @@ public:
     SARibbonBar::RibbonStyle ribbonStyle;                           ///< ribbon的风格
     SARibbonBar::RibbonStyle lastShowStyle;                         ///< ribbon的风格
     int unusableTitleRegion;                                        ///<不可用的右边标题栏长度，主要是关闭按钮的位置
-    int meanBarHeight;
-    SARibbonBar::RibbonMode currentRibbonMode;                      ///< 记录当前模式
+    int mainBarHeight;
+    SARibbonBar::RibbonState currentRibbonMode;                      ///< 记录当前模式
     SARibbonBarPrivate(SARibbonBar *par)
         : titleBarHight(30)
         , widgetBord(0, 0, 0, 0)
@@ -65,7 +70,7 @@ public:
         , ribbonStyle(SARibbonBar::OfficeStyle)
         , lastShowStyle(SARibbonBar::OfficeStyle)
         , unusableTitleRegion(100)
-        , meanBarHeight(160)
+        , mainBarHeight(160)
         , currentRibbonMode(SARibbonBar::NormalRibbonMode)
     {
         MainClass = par;
@@ -152,7 +157,7 @@ public:
         this->stackedContainerWidget->setNormalMode();
         this->stackedContainerWidget->setFocus();
         this->stackedContainerWidget->show();
-        MainClass->setFixedHeight(meanBarHeight);
+        MainClass->setFixedHeight(mainBarHeight);
     }
 };
 
@@ -499,19 +504,23 @@ void SARibbonBar::updateRibbonElementGeometry(SARibbonBar::RibbonStyle style)
     switch (style)
     {
     case OfficeStyle:
-        m_d->meanBarHeight = 160;
+        m_d->mainBarHeight = c_mainbarheightOfficeStyleThreeRow;
         break;
-
     case WpsLiteStyle:
-        m_d->meanBarHeight = 130;
+        m_d->mainBarHeight = c_mainbarheightWPSStyleThreeRow;
         break;
-
+    case OfficeStyleTwoRow:
+        m_d->mainBarHeight = c_mainbarheightOfficeStyleTwoRow;
+        break;
+    case WpsLiteStyleTwoRow:
+        m_d->mainBarHeight = c_mainbarheightWPSStyleTwoRow;
+        break;
     default:
-        m_d->meanBarHeight = 160;
+        m_d->mainBarHeight = c_mainbarheightOfficeStyleThreeRow;
         break;
     }
-    if (NormalRibbonMode == currentRibbonMode()) {
-        setFixedHeight(m_d->meanBarHeight);
+    if (NormalRibbonMode == currentRibbonState()) {
+        setFixedHeight(m_d->mainBarHeight);
     }
 }
 
@@ -542,7 +551,7 @@ void SARibbonBar::setRibbonStyle(SARibbonBar::RibbonStyle v)
     m_d->lastShowStyle = v;
     updateRibbonElementGeometry();
     QSize oldSize = size();
-    QSize newSize(oldSize.width(), m_d->meanBarHeight);
+    QSize newSize(oldSize.width(), m_d->mainBarHeight);
 
     QApplication::postEvent(this, new QResizeEvent(newSize, oldSize));
 }
@@ -554,7 +563,7 @@ SARibbonBar::RibbonStyle SARibbonBar::currentRibbonStyle() const
 }
 
 
-SARibbonBar::RibbonMode SARibbonBar::currentRibbonMode() const
+SARibbonBar::RibbonState SARibbonBar::currentRibbonState() const
 {
     return (m_d->currentRibbonMode);
 }
@@ -592,7 +601,7 @@ void SARibbonBar::raiseCategory(SARibbonCategory* category)
 	if (index >= 0)
 	{
 		setCurrentIndex(index);
-	}
+    }
 }
 
 bool SARibbonBar::eventFilter(QObject *obj, QEvent *e)
@@ -866,33 +875,13 @@ void SARibbonBar::resizeEvent(QResizeEvent *e)
     switch (m_d->ribbonStyle)
     {
     case OfficeStyle:
-    {
         resizeInNormalStyle();
         return;
-    }
-
     case WpsLiteStyle:
-    {
-        /*
-         * if(QWidget*w = parentWidget())
-         * {
-         *  if(w->isMaximized() || w->isFullScreen())
-         *  {
-         *      resizeInWpsLiteStyle();
-         *      return;
-         *  }
-         * }
-         */
-
         resizeInWpsLiteStyle();
         return;
-
-        break;
-    }
-
     default:
-        resizeInNormalStyle();
-        return;
+        break;
     }
     resizeInNormalStyle();
 }

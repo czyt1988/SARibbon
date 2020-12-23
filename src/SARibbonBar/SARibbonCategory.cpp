@@ -18,6 +18,7 @@ class SARibbonCategoryProxyPrivate
 {
 public:
     SARibbonCategory* parent;
+    SARibbonPannel::PannelLayoutMode m_defaultPannelLayoutMode;
 #if NOT_USE_LAYOUT
     QList<SARibbonPannel*> pannelLists;
     QList<SARibbonSeparatorWidget*> separatorLists;
@@ -47,6 +48,13 @@ public:
     };
     QMap<SARibbonPannel*,ReduceActionInfo> m_pannelReduceInfo;
 #endif
+
+    SARibbonCategoryProxyPrivate(SARibbonCategory* p):
+        parent(p)
+        ,m_defaultPannelLayoutMode(SARibbonPannel::ThreeRowMode)
+    {
+
+    }
 };
 
 SARibbonCategory::SARibbonCategory(QWidget *parent)
@@ -65,6 +73,20 @@ SARibbonCategory::SARibbonCategory(QWidget *parent)
 
 SARibbonCategory::~SARibbonCategory()
 {
+}
+
+/**
+ * @brief 设置pannel的模式
+ * @param m
+ */
+void SARibbonCategory::setRibbonPannelLayoutMode(SARibbonPannel::PannelLayoutMode m)
+{
+    proxy()->setRibbonPannelLayoutMode(m);
+}
+
+SARibbonPannel::PannelLayoutMode SARibbonCategory::ribbonPannelLayoutMode() const
+{
+    return proxy()->ribbonPannelLayoutMode();
 }
 
 ///
@@ -95,6 +117,11 @@ SARibbonCategoryProxy *SARibbonCategory::proxy()
     return m_proxy.data();
 }
 
+const SARibbonCategoryProxy *SARibbonCategory::proxy() const
+{
+    return m_proxy.data();
+}
+
 void SARibbonCategory::setProxy(SARibbonCategoryProxy *proxy)
 {
     m_proxy.reset(proxy);
@@ -117,9 +144,9 @@ void SARibbonCategory::paintEvent(QPaintEvent *event)
 //////////////////////////////////////////////////////////////////
 
 SARibbonCategoryProxy::SARibbonCategoryProxy(SARibbonCategory *parent)
-    :m_d(new SARibbonCategoryProxyPrivate)
+    :m_d(new SARibbonCategoryProxyPrivate(parent))
 {
-    m_d->parent = parent;
+
 }
 
 SARibbonCategoryProxy::~SARibbonCategoryProxy()
@@ -131,6 +158,7 @@ SARibbonPannel *SARibbonCategoryProxy::addPannel(const QString &title)
 {
     SARibbonPannel* pannel = RibbonSubElementDelegate->createRibbonPannel(ribbonCategory());
     pannel->setWindowTitle(title);
+    pannel->setPannelLayoutMode(ribbonPannelLayoutMode());
     SARibbonSeparatorWidget* seprator = RibbonSubElementDelegate->createRibbonSeparatorWidget(ribbonCategory()->height(),ribbonCategory());
 #if NOT_USE_LAYOUT
     m_d->pannelLists.append(pannel);
@@ -145,6 +173,7 @@ SARibbonPannel *SARibbonCategoryProxy::addPannel(const QString &title)
 void SARibbonCategoryProxy::addPannel(SARibbonPannel *pannel)
 {
     pannel->setParent(ribbonCategory());
+    pannel->setPannelLayoutMode(ribbonPannelLayoutMode());
     SARibbonSeparatorWidget* seprator = RibbonSubElementDelegate->createRibbonSeparatorWidget(ribbonCategory()->height(),ribbonCategory());
 #if NOT_USE_LAYOUT
     m_d->pannelLists.append(pannel);
@@ -287,6 +316,19 @@ void SARibbonCategoryProxy::resizePannels(const QSize &categorySize)
 SARibbonCategory *SARibbonCategoryProxy::ribbonCategory()
 {
     return m_d->parent;
+}
+
+void SARibbonCategoryProxy::setRibbonPannelLayoutMode(SARibbonPannel::PannelLayoutMode m)
+{
+    m_d->m_defaultPannelLayoutMode = m;
+    for(SARibbonPannel* p : m_d->pannelLists){
+        p->setPannelLayoutMode(m);
+    }
+}
+
+SARibbonPannel::PannelLayoutMode SARibbonCategoryProxy::ribbonPannelLayoutMode() const
+{
+    return m_d->m_defaultPannelLayoutMode;
 }
 
 
