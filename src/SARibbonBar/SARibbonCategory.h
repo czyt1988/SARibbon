@@ -17,17 +17,20 @@ class SA_RIBBON_EXPORT SARibbonCategory : public QWidget
 public:
     SARibbonCategory(QWidget* parent);
     ~SARibbonCategory();
+    void setRibbonPannelLayoutMode(SARibbonPannel::PannelLayoutMode m);
+    SARibbonPannel::PannelLayoutMode ribbonPannelLayoutMode() const;
+
     SARibbonPannel* addPannel(const QString& title);
     void addPannel(SARibbonPannel* pannel);
     void setBackgroundBrush(const QBrush& brush);
     SARibbonCategoryProxy* proxy();
+    const SARibbonCategoryProxy* proxy() const;
     void setProxy(SARibbonCategoryProxy* proxy);
 protected:
     void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
     void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
 private:
     QScopedPointer<SARibbonCategoryProxy> m_proxy;
-    QHBoxLayout* m_pannelLayout;
 };
 
 ///
@@ -47,6 +50,8 @@ public:
     virtual void resizeEvent(QResizeEvent *event);
     virtual void paintEvent(QPaintEvent *event);
     SARibbonCategory* ribbonCategory();
+    void setRibbonPannelLayoutMode(SARibbonPannel::PannelLayoutMode m);
+    SARibbonPannel::PannelLayoutMode ribbonPannelLayoutMode() const;
 #if NOT_USE_LAYOUT
     virtual void resizePannels(const QSize &categorySize);
 protected:

@@ -20,11 +20,20 @@ class SA_RIBBON_EXPORT SARibbonBar : public QMenuBar
 {
     Q_OBJECT
 public:
+    /**
+     * @brief 定义ribbon的风格
+     */
     enum RibbonStyle {
-        OfficeStyle     ///< 类似office 的ribbon风格
-        , WpsLiteStyle  ///< 类似wps的紧凑风格
+        OfficeStyle = 0x00         ///< 类似office 的ribbon风格
+        , WpsLiteStyle = 0x01      ///< 类似wps的紧凑风格
+        ,OfficeStyleTwoRow = 0x10  ///< 类似office 的ribbon风格 2行工具栏 三行布局模式，office就是三行布局模式，pannel能布置3行小toolbutton，默认模式
+        ,WpsLiteStyleTwoRow = 0x11 ///< 类似wps的紧凑风格  2行工具栏
     };
-    enum RibbonMode {
+    Q_FLAG(RibbonStyle)
+    /**
+     * @brief 定义当前ribbon 的状态
+     */
+    enum RibbonState {
         MinimumRibbonMode       ///< 缩小模式
         , NormalRibbonMode      ///< 正常模式
     };
@@ -87,7 +96,7 @@ public:
     RibbonStyle currentRibbonStyle() const;
 
     //当前的模式
-    RibbonMode currentRibbonMode() const;
+    RibbonState currentRibbonState() const;
 
     //获取右边不可用区域，只有在wps模式下有用
     int unusableTitleRegion() const;
