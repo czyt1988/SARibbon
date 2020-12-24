@@ -20,16 +20,18 @@ class SA_RIBBON_EXPORT SARibbonBar : public QMenuBar
 {
     Q_OBJECT
 public:
+
     /**
-     * @brief 定义ribbon的风格
+     * @brief 定义ribbon的风格,第一字节代表样式，第二字节代表是否是2行
      */
     enum RibbonStyle {
-        OfficeStyle = 0x00         ///< 类似office 的ribbon风格
-        , WpsLiteStyle = 0x01      ///< 类似wps的紧凑风格
-        ,OfficeStyleTwoRow = 0x10  ///< 类似office 的ribbon风格 2行工具栏 三行布局模式，office就是三行布局模式，pannel能布置3行小toolbutton，默认模式
-        ,WpsLiteStyleTwoRow = 0x11 ///< 类似wps的紧凑风格  2行工具栏
+        OfficeStyle		= 0x00          ///< 类似office 的ribbon风格
+        , WpsLiteStyle		= 0x01          ///< 类似wps的紧凑风格
+        , OfficeStyleTwoRow	= 0x0100        ///< 类似office 的ribbon风格 2行工具栏 三行布局模式，office就是三行布局模式，pannel能布置3行小toolbutton，默认模式
+        , WpsLiteStyleTwoRow	= 0x0101        ///< 类似wps的紧凑风格  2行工具栏
     };
     Q_FLAG(RibbonStyle)
+
     /**
      * @brief 定义当前ribbon 的状态
      */
@@ -37,6 +39,8 @@ public:
         MinimumRibbonMode       ///< 缩小模式
         , NormalRibbonMode      ///< 正常模式
     };
+    static bool isTwoRowStyle(RibbonStyle s);
+    static bool isOfficeStyle(RibbonStyle s);
 
     SARibbonBar(QWidget *parent);
 
@@ -51,6 +55,9 @@ public:
 
     //添加一个标签
     SARibbonCategory *addCategoryPage(const QString& title);
+
+    //获取当前显示的所有的SARibbonCategory，不含未显示的SARibbonContextCategory的SARibbonCategory
+    QList<SARibbonCategory *> categoryPages() const;
 
     //添加一个上下文标签
     SARibbonContextCategory *addContextCategory(const QString& title, const QColor& color, const QVariant& id = QVariant());
@@ -104,9 +111,16 @@ public:
 
 	//设置当前ribbon的index
 	void setCurrentIndex(int index);
-	
+
 	//确保标签显示出来
-	void raiseCategory(SARibbonCategory* category);
+    void raiseCategory(SARibbonCategory *category);
+
+    //判断当前的样式是否为两行
+    bool isTwoRowStyle() const;
+
+    //判断当前的样式是否为office样式
+    bool isOfficeStyle() const;
+
 signals:
 
     /**
@@ -137,9 +151,8 @@ protected slots:
     void onContextsCategoryPageAdded(SARibbonCategory *category);
 
 private:
-    void updateRibbonElementGeometry();
-    void updateRibbonElementGeometry(RibbonStyle style);
-    void resizeInNormalStyle();
+    void updateRibbonElementGeometry(RibbonStyle newStyle, RibbonStyle oldStyle);
+    void resizeInOfficeStyle();
     void resizeInWpsLiteStyle();
     void paintInNormalStyle();
     void paintInWpsLiteStyle();
