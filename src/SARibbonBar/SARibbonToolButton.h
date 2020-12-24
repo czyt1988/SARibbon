@@ -13,21 +13,22 @@ public:
     ///
     /// \brief 按钮样式
     ///
-    enum RibbonButtonType{
+    enum RibbonButtonType {
         LargeButton
-        ,SmallButton
+        , SmallButton
     };
     SARibbonToolButton(QWidget *parent = Q_NULLPTR);
-    SARibbonToolButton(QAction* defaultAction,QWidget *parent = Q_NULLPTR);
+    SARibbonToolButton(QAction *defaultAction, QWidget *parent = Q_NULLPTR);
     RibbonButtonType buttonType() const;
-    void setButtonType(const RibbonButtonType &buttonType);
+    void setButtonType(const RibbonButtonType& buttonType);
     virtual QSize minimumSizeHint() const Q_DECL_OVERRIDE;
+
 	static int LargeButtonSize;
 	static int SmallButtonSize;
 protected:
-    bool event(QEvent *e);
+    bool event(QEvent *e) Q_DECL_OVERRIDE;
     virtual void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
-    virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
+    virtual void resizeEvent(QResizeEvent *e) Q_DECL_OVERRIDE;
     virtual void mouseMoveEvent(QMouseEvent *e) Q_DECL_OVERRIDE;
     virtual void mousePressEvent(QMouseEvent *e) Q_DECL_OVERRIDE;
     virtual void mouseReleaseEvent(QMouseEvent *e) Q_DECL_OVERRIDE;
@@ -35,12 +36,14 @@ protected:
     virtual void leaveEvent(QEvent *e) Q_DECL_OVERRIDE;
     virtual void paintLargeButton(QPaintEvent *e);
     virtual void paintSmallButton(QPaintEvent *e);
-    virtual bool hitButton(const QPoint &pos) const Q_DECL_OVERRIDE;
+    virtual bool hitButton(const QPoint& pos) const Q_DECL_OVERRIDE;
 
-    virtual void drawIconAndLabel(QPainter& p,const QStyleOptionToolButton& opt);
+    virtual void drawIconAndLabel(QPainter& p, const QStyleOptionToolButton& opt);
+
 private:
     static void drawArrow(const QStyle *style, const QStyleOptionToolButton *toolbutton,
-                          const QRect &rect, QPainter *painter, const QWidget *widget = 0);
+        const QRect& rect, QPainter *painter, const QWidget *widget = 0);
+
 private:
     RibbonButtonType m_buttonType;
     bool m_mouseOnSubControl;

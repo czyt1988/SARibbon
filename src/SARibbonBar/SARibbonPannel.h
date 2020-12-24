@@ -15,43 +15,48 @@ class SA_RIBBON_EXPORT SARibbonPannel : public QWidget
 {
     Q_OBJECT
 public:
-    SARibbonPannel(QWidget* parent = 0);
+    SARibbonPannel(QWidget *parent = 0);
     ~SARibbonPannel();
     using QWidget::addAction;
-    enum PannelLayoutMode{
-        ThreeRowMode ///< 三行布局模式，office就是三行布局模式，pannel能布置3行小toolbutton，默认模式
-        ,TwoRowMode ///< 两行布局模式，wps的后续布局模式就是两行布局模式，pannel能布置2行小toolbutton
+    enum PannelLayoutMode {
+        ThreeRowMode    ///< 三行布局模式，office就是三行布局模式，pannel能布置3行小toolbutton，默认模式
+        , TwoRowMode    ///< 两行布局模式，wps的后续布局模式就是两行布局模式，pannel能布置2行小toolbutton
     };
 
-    SARibbonToolButton* addLargeToolButton(const QString& text,const QIcon& icon,QToolButton::ToolButtonPopupMode popMode);
-    SARibbonToolButton* addLargeAction(QAction *action);
-    SARibbonToolButton* addSmallToolButton(const QString& text,const QIcon& icon,QToolButton::ToolButtonPopupMode popMode);
+    SARibbonToolButton *addLargeToolButton(const QString& text, const QIcon& icon, QToolButton::ToolButtonPopupMode popMode);
+    SARibbonToolButton *addLargeAction(QAction *action);
+    SARibbonToolButton *addSmallToolButton(const QString& text, const QIcon& icon, QToolButton::ToolButtonPopupMode popMode);
     SARibbonToolButton *addSmallAction(QAction *action);
     SARibbonToolButton *addMediumAction(QAction *action);
     SARibbonToolButton *addLargeMenu(SARibbonMenu *menu);
     SARibbonToolButton *addSmallMenu(SARibbonMenu *menu);
-    SARibbonToolButton* addLargeActionMenu(QAction *action,SARibbonMenu *menu);
-    SARibbonGallery* addGallery();
+    SARibbonToolButton *addLargeActionMenu(QAction *action, SARibbonMenu *menu);
+    SARibbonGallery *addGallery();
+
     //设置PannelLayoutMode
     void setPannelLayoutMode(PannelLayoutMode mode);
     PannelLayoutMode pannelLayoutMode() const;
     void addSeparator();
-    void addWidget(QWidget* w);
-    void addWidget(QWidget* w, int row,int rowSpan);
-    void addWidget(QWidget* w, int row,int rowSpan,int column,int columnSpan);
+    void addSmallWidget(QWidget *w);
+    void addLargeWidget(QWidget *w);
     int gridLayoutColumnCount() const;
-    void addOptionAction(QAction* action);
+    void addOptionAction(QAction *action);
     virtual QSize sizeHint() const Q_DECL_OVERRIDE;
     virtual QSize minimumSizeHint() const Q_DECL_OVERRIDE;
     void setReduce(bool isReduce);
     void setExpanding(bool isExpanding = true);
     bool isExpanding() const;
+
 protected:
-    static QSize maxHightIconSize(const QSize& size,int height);
+    void addWidget(QWidget *w, int row, int rowSpan);
+    void addWidget(QWidget *w, int row, int rowSpan, int column, int columnSpan);
+    void resetLayout(PannelLayoutMode newmode);
+    static QSize maxHightIconSize(const QSize& size, int height);
     void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
     virtual void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
+
 private:
-    SARibbonPannelPrivate* m_d;
+    SARibbonPannelPrivate *m_d;
 };
 
 #endif // SARIBBONPANNEL_H
