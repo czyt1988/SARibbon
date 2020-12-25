@@ -10,22 +10,39 @@ class SA_RIBBON_EXPORT SARibbonToolButton : public QToolButton
     Q_OBJECT
     Q_ENUMS(RibbonButtonType)
 public:
-    ///
-    /// \brief 按钮样式
-    ///
+
+    /**
+     * @brief 按钮样式
+     */
     enum RibbonButtonType {
         LargeButton
         , SmallButton
     };
+
+    /**
+     * @brief LargeButton的显示样式，仅在LargeButton模式下，有mean的情况生效
+     */
+    enum LargeButtonType {
+        Normal  ///< icon占大按钮的一半区域,箭头在按钮最下方，文字可以换一行，对应于office的菜单按钮，下箭头在按钮最下方(默认)
+        , Lite  ///< icon占大按钮的60%，文字占40%，且文字不换行，对应于wps模式的ribbon菜单按钮，下箭头在文字旁边
+    };
+
     SARibbonToolButton(QWidget *parent = Q_NULLPTR);
     SARibbonToolButton(QAction *defaultAction, QWidget *parent = Q_NULLPTR);
     RibbonButtonType buttonType() const;
     void setButtonType(const RibbonButtonType& buttonType);
     virtual QSize minimumSizeHint() const Q_DECL_OVERRIDE;
 
+    void setLargeButtonType(LargeButtonType type);
+    LargeButtonType largeButtonType() const;
+
 	static int LargeButtonSize;
 	static int SmallButtonSize;
 protected:
+    void calcIconRect(const QStyleOptionToolButton& opt);
+    QRect calcTextRect(const QStyleOptionToolButton& opt);
+    QRect calcIndicatorArrowDownRect(const QStyleOptionToolButton& opt);
+    QPixmap createIconPixmap(const QStyleOptionToolButton& opt);
     bool event(QEvent *e) Q_DECL_OVERRIDE;
     virtual void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
     virtual void resizeEvent(QResizeEvent *e) Q_DECL_OVERRIDE;
@@ -38,7 +55,7 @@ protected:
     virtual void paintSmallButton(QPaintEvent *e);
     virtual bool hitButton(const QPoint& pos) const Q_DECL_OVERRIDE;
 
-    virtual void drawIconAndLabel(QPainter& p, const QStyleOptionToolButton& opt);
+    virtual void drawIconAndLabel(QPainter& p, QStyleOptionToolButton& opt);
 
 private:
     static void drawArrow(const QStyle *style, const QStyleOptionToolButton *toolbutton,
@@ -46,6 +63,7 @@ private:
 
 private:
     RibbonButtonType m_buttonType;
+    LargeButtonType m_largeButtonType;
     bool m_mouseOnSubControl;
     QColor m_borderColor;//TODO 如何获取border的颜色，从而替代此变量
     bool m_menuButtonPressed;
