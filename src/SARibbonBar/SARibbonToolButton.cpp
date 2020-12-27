@@ -554,7 +554,7 @@ void SARibbonToolButton::drawIconAndLabel(QPainter& p, QStyleOptionToolButton& o
         //绘制sub control 的下拉箭头
         if (opt.features & QStyleOptionToolButton::HasMenu) {
             QStyleOptionToolButton tool = opt;
-            tool.rect = opt.rect.adjusted(opt.rect.width()-8, 0, 0, 0);
+            tool.rect = calcIndicatorArrowDownRect(tool);
             style()->drawPrimitive(QStyle::PE_IndicatorArrowDown, &tool, &p, this);
         }
     }
@@ -667,6 +667,11 @@ void SARibbonToolButton::calcIconRect(const QStyleOptionToolButton& opt)
 }
 
 
+/**
+ * @brief 根据设定计算文本显示区域
+ * @param opt
+ * @return
+ */
 QRect SARibbonToolButton::calcTextRect(const QStyleOptionToolButton& opt)
 {
     QRect rect;
@@ -707,7 +712,15 @@ QRect SARibbonToolButton::calcIndicatorArrowDownRect(const QStyleOptionToolButto
     //预留8px绘制箭头，1px的上下边界
     QRect rect = opt.rect;
 
-    rect.adjust(1, rect.height()-10, 1, 1);
+    if (LargeButton == m_buttonType) {
+        if (Normal == m_largeButtonType) {
+            rect.adjust(1, rect.height()-10, 1, 1);
+        }else {
+            rect.adjust(rect.width()-10, rect.height()/2, 1, 1);
+        }
+    }else {
+        rect.adjust(rect.width()-10, 1, 1, 1);
+    }
     return (rect);
 }
 

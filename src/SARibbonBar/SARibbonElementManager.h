@@ -11,18 +11,20 @@ protected:
     SARibbonElementManager();
 public:
     virtual ~SARibbonElementManager();
-    static SARibbonElementManager* instance();
-    SARibbonElementCreateDelegate* delegate();
-    void setupDelegate(SARibbonElementCreateDelegate* delegate);
+    static SARibbonElementManager *instance();
+    SARibbonElementCreateDelegate *delegate();
+    void setupDelegate(SARibbonElementCreateDelegate *delegate);
 
 private:
-    static SARibbonElementManager* s_instance;
-    SARibbonElementCreateDelegate* m_delegate;
+    SARibbonElementCreateDelegate *m_delegate;
 };
 #ifndef RibbonSubElementMgr
-#define RibbonSubElementMgr SARibbonElementManager::instance()
+#define RibbonSubElementMgr		SARibbonElementManager::instance()
 #endif
 #ifndef RibbonSubElementDelegate
-#define RibbonSubElementDelegate SARibbonElementManager::instance()->delegate()
+#define RibbonSubElementDelegate	SARibbonElementManager::instance()->delegate()
+#endif
+#ifndef RibbonSubElementStyleOpt
+#define RibbonSubElementStyleOpt	SARibbonElementManager::instance()->delegate()->getRibbonStyleOption()
 #endif
 #endif // SARIBBONELEMENTMANAGER_H

@@ -13,82 +13,136 @@
 #include "SARibbonButtonGroupWidget.h"
 #include "SARibbonStackedWidget.h"
 #include "SARibbonQuickAccessBar.h"
-SARibbonElementCreateDelegate::SARibbonElementCreateDelegate()
-{
 
+SARibbonStyleOption::SARibbonStyleOption()
+{
+    mainbarHeightOfficeStyleThreeRow = 160;
+    mainbarHeightWPSStyleThreeRow = 130;
+    mainbarHeightOfficeStyleTwoRow = 134;
+    mainbarHeightWPSStyleTwoRow = 104;
+    titleBarHight = 30;
+    tabBarHight = 30;
+    unusableTitleRegion = 100;
+    titleTextColor = Qt::black;
+    widgetBord = QMargins(0, 0, 0, 0);
+    tabBarBaseLineColor = QColor(186, 201, 219);
 }
+
+
+SARibbonStyleOption::~SARibbonStyleOption()
+{
+}
+
+
+SARibbonElementCreateDelegate::SARibbonElementCreateDelegate()
+    : m_opt(new SARibbonStyleOption())
+{
+}
+
 
 SARibbonElementCreateDelegate::~SARibbonElementCreateDelegate()
 {
-
+    if (m_opt) {
+        delete m_opt;
+    }
+    m_opt = nullptr;
 }
 
-SARibbonTabBar *SARibbonElementCreateDelegate::createRibbonTabBar(QWidget* parent)
+
+SARibbonTabBar *SARibbonElementCreateDelegate::createRibbonTabBar(QWidget *parent)
 {
-    return new SARibbonTabBar(parent);
+    return (new SARibbonTabBar(parent));
 }
 
-SARibbonApplicationButton *SARibbonElementCreateDelegate::createRibbonApplicationButton(QWidget* parent)
+
+SARibbonApplicationButton *SARibbonElementCreateDelegate::createRibbonApplicationButton(QWidget *parent)
 {
-    return new SARibbonApplicationButton(parent);
+    return (new SARibbonApplicationButton(parent));
 }
 
-SARibbonCategory *SARibbonElementCreateDelegate::createRibbonCategory(QWidget* parent)
+
+SARibbonCategory *SARibbonElementCreateDelegate::createRibbonCategory(QWidget *parent)
 {
-    return new SARibbonCategory(parent);
+    return (new SARibbonCategory(parent));
 }
+
 
 SARibbonContextCategory *SARibbonElementCreateDelegate::createRibbonContextCategory(QWidget *parent)
 {
-    return new SARibbonContextCategory(parent);
+    return (new SARibbonContextCategory(parent));
 }
+
 
 SARibbonPannel *SARibbonElementCreateDelegate::createRibbonPannel(QWidget *parent)
 {
-    return new SARibbonPannel(parent);
+    return (new SARibbonPannel(parent));
 }
 
-SARibbonSeparatorWidget *SARibbonElementCreateDelegate::createRibbonSeparatorWidget(int value,QWidget *parent)
+
+SARibbonSeparatorWidget *SARibbonElementCreateDelegate::createRibbonSeparatorWidget(int value, QWidget *parent)
 {
-    return new SARibbonSeparatorWidget(value,parent);
+    return (new SARibbonSeparatorWidget(value, parent));
 }
+
 
 SARibbonGallery *SARibbonElementCreateDelegate::createRibbonGallery(QWidget *parent)
 {
-    return new SARibbonGallery(parent);
+    return (new SARibbonGallery(parent));
 }
+
 
 SARibbonGalleryGroup *SARibbonElementCreateDelegate::createRibbonGalleryGroup(QWidget *parent)
 {
-    return new SARibbonGalleryGroup(parent);
+    return (new SARibbonGalleryGroup(parent));
 }
+
 
 SARibbonToolButton *SARibbonElementCreateDelegate::createRibbonToolButton(QWidget *parent)
 {
-    return new SARibbonToolButton(parent);
+    return (new SARibbonToolButton(parent));
 }
+
 
 SARibbonStackedWidget *SARibbonElementCreateDelegate::createRibbonStackedWidget(SARibbonBar *parent)
 {
-    return new SARibbonStackedWidget(parent);
+    return (new SARibbonStackedWidget(parent));
 }
+
 
 SARibbonControlButton *SARibbonElementCreateDelegate::createHidePannelButton(SARibbonBar *parent)
 {
-    SARibbonControlButton* btn = new SARibbonControlButton(parent);
+    SARibbonControlButton *btn = new SARibbonControlButton(parent);
+
     btn->setAutoRaise(false);
     btn->setObjectName(QStringLiteral("SARibbonBarHidePannelButton"));
     btn->setToolButtonStyle(Qt::ToolButtonIconOnly);
-    btn->setFixedSize(parent->tabBarHeight()-4,parent->tabBarHeight()-4);
-    return btn;
+    btn->setFixedSize(parent->tabBarHeight()-4, parent->tabBarHeight()-4);
+    return (btn);
 }
+
 
 SARibbonButtonGroupWidget *SARibbonElementCreateDelegate::craeteButtonGroupWidget(QWidget *parent)
 {
-    return new SARibbonButtonGroupWidget(parent);
+    return (new SARibbonButtonGroupWidget(parent));
 }
+
 
 SARibbonQuickAccessBar *SARibbonElementCreateDelegate::createQuickAccessBar(QWidget *parent)
 {
-    return new SARibbonQuickAccessBar(parent);
+    return (new SARibbonQuickAccessBar(parent));
+}
+
+
+const SARibbonStyleOption& SARibbonElementCreateDelegate::getRibbonStyleOption() const
+{
+    return (*m_opt);
+}
+
+
+void SARibbonElementCreateDelegate::setRibbonStyleOption(SARibbonStyleOption *opt)
+{
+    if (m_opt) {
+        delete m_opt;
+    }
+    m_opt = opt;
 }
