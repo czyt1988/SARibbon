@@ -107,7 +107,6 @@ public:
 
     //获取右边不可用区域，只有在wps模式下有用
     int unusableTitleRegion() const;
-    void setUnusableTitleRegion(int v);
 
 	//设置当前ribbon的index
 	void setCurrentIndex(int index);
