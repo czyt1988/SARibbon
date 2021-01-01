@@ -18,6 +18,17 @@
 #include "SARibbonQuickAccessBar.h"
 #include <QStyleOptionMenuItem>
 
+#define HELP_DRAW_RECT(p, rect)			    \
+    do{					    \
+        p.save();			    \
+        QPen _pen(Qt::DashDotDotLine);	    \
+        _pen.setColor(QColor(219, 26, 59)); \
+        p.setPen(_pen);			    \
+        p.setBrush(QBrush());		    \
+        p.drawRect(rect);		    \
+        p.restore();			    \
+    }while(0)
+
 class ContextCategoryManagerData
 {
 public:
@@ -211,6 +222,7 @@ SARibbonCategory *SARibbonBar::addCategoryPage(const QString& title)
 {
     SARibbonCategory *catagory = RibbonSubElementDelegate->createRibbonCategory(this);
 
+    catagory->setFixedHeight(categoryHeight());
     catagory->setWindowTitle(title);
     int index = m_d->ribbonTabBar->addTab(title);
 
@@ -556,6 +568,10 @@ void SARibbonBar::updateRibbonElementGeometry(SARibbonBar::RibbonStyle newStyle,
     for (SARibbonCategory *c : categorys)
     {
         c->setRibbonPannelLayoutMode(SARibbonBar::isTwoRowStyle(newStyle) ? SARibbonPannel::TwoRowMode : SARibbonPannel::ThreeRowMode);
+        int h = categoryHeight();
+        if (h != c->height()) {
+            c->setFixedHeight(h);
+        }
     }
 
     if (NormalRibbonMode == currentRibbonState()) {
@@ -717,6 +733,12 @@ int SARibbonBar::calcMinTabBarWidth() const
 }
 
 
+int SARibbonBar::categoryHeight() const
+{
+    return (height() - m_d->ribbonTabBar->height() - 2);
+}
+
+
 void SARibbonBar::paintEvent(QPaintEvent *e)
 {
     Q_UNUSED(e);
@@ -734,6 +756,12 @@ void SARibbonBar::paintEvent(QPaintEvent *e)
         paintInNormalStyle();
         break;
     }
+#ifdef SA_RIBBON_DEBUG_HELP_DRAW
+    QPainter p(this);
+    HELP_DRAW_RECT(p, m_d->quickAccessBar->geometry());
+    HELP_DRAW_RECT(p, m_d->ribbonTabBar->geometry());
+    HELP_DRAW_RECT(p, m_d->stackedContainerWidget->geometry());
+#endif
 }
 
 
@@ -1106,7 +1134,7 @@ void SARibbonBar::resizeInWpsLiteStyle()
         , tabBarWidth
         , tabBarHight);
 
-
+    //调整整个stackedContainer
     if (m_d->stackedContainerWidget->isPopupMode()) {
         QPoint absPosition = mapToGlobal(QPoint(RibbonSubElementStyleOpt.widgetBord.left(), m_d->ribbonTabBar->geometry().bottom()+1));
         m_d->stackedContainerWidget->setGeometry(QRect(absPosition.x(), absPosition.y()

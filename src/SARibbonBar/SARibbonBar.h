@@ -139,6 +139,9 @@ protected:
     //根据情况重置tabbar的宽度，主要针对wps模式
     int calcMinTabBarWidth() const;
 
+    //计算category的高度
+    virtual int categoryHeight() const;
+
 protected slots:
     void onWindowTitleChanged(const QString& title);
     void onWindowIconChanged(const QIcon& icon);

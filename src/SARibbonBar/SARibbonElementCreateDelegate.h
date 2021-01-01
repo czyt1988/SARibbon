@@ -38,6 +38,8 @@ public:
     QColor titleTextColor;                  ///< 标题颜色
     QMargins widgetBord;                    ///< 整个ribbonbar的四个边框，默认为0
     QColor tabBarBaseLineColor;             ///< tabbar 底部线条颜色
+    int pannelTitleHeight;                  ///< ribbon的标题高度，在3行模式下才会显示标题
+    int pannelTitleOptionButtonSpace;       ///< pannel标题栏的操作按钮和标题的间隔
 };
 
 ///
