@@ -16,6 +16,18 @@
 #include "SARibbonElementManager.h"
 #include "SARibbonMenu.h"
 
+
+#define HELP_DRAW_RECT(p, rect)		 \
+    do{				 \
+        p.save();		 \
+        QPen _pen(Qt::DashLine); \
+        _pen.setColor(Qt::blue); \
+        p.setPen(_pen);		 \
+        p.setBrush(QBrush());	 \
+        p.drawRect(rect);	 \
+        p.restore();		 \
+    }while(0)
+
 const int c_higherModehight = 98;
 const int c_lowerModehight = 72;
 const int c_iconHighForHigerLarge = 32;
@@ -30,14 +42,13 @@ public:
     //根据m_pannelLayoutMode返回gridLayout应该增加的行数
     int rowadded();
     void createLayout();
+    void recalcTitleY();
 
     SARibbonPannel *Parent;
     QGridLayout *m_gridLayout;
     QPoint m_nextElementPosition;
     int m_row;                                              ///< 记录小action所在的gridLayout行数，gridLayout总共划分为6行，用于满足3行或2行的按钮需求
     SARibbonPannelOptionButton *m_optionActionButton;
-    int m_titleOptionButtonSpace;                           ///< 标题和项目按钮的间隔
-    int m_titleHeight;                                      ///< 标题的高度
     int m_titleY;                                           ///< 标题栏的y距离
     SARibbonToolButton *m_defaultReduceButton;              ///<在pannel无法显示全的时候，显示一个toolbutton用来弹出pannel
     SARibbonPannel::PannelLayoutMode m_pannelLayoutMode;    ///< pannel的布局模式，默认为3行模式ThreeRowMode
@@ -49,13 +60,12 @@ SARibbonPannelPrivate::SARibbonPannelPrivate(SARibbonPannel *p)
     , m_nextElementPosition(3, 3)
     , m_row(0)
     , m_optionActionButton(nullptr)
-    , m_titleOptionButtonSpace(6)
-    , m_titleHeight(21)
     , m_titleY(77)
     , m_defaultReduceButton(nullptr)
     , m_pannelLayoutMode(SARibbonPannel::ThreeRowMode)
 {
     createLayout();
+    recalcTitleY();
 }
 
 
@@ -86,7 +96,17 @@ void SARibbonPannelPrivate::createLayout()
     if (SARibbonPannel::TwoRowMode == m_pannelLayoutMode) {
         m_gridLayout->setContentsMargins(3, 2, 3, 2);
     }else{
-        m_gridLayout->setContentsMargins(3, 2, 3, m_titleHeight);
+        m_gridLayout->setContentsMargins(3, 2, 3, RibbonSubElementStyleOpt.pannelTitleHeight);
+    }
+}
+
+
+void SARibbonPannelPrivate::recalcTitleY()
+{
+    if (SARibbonPannel::ThreeRowMode == m_pannelLayoutMode) {
+        m_titleY = Parent->height()-RibbonSubElementStyleOpt.pannelTitleHeight;
+    }else {
+        m_titleY = Parent->height()*0.94;
     }
 }
 
@@ -320,6 +340,7 @@ void SARibbonPannel::setPannelLayoutMode(SARibbonPannel::PannelLayoutMode mode)
         break;
     }
     setFixedHeight(high);
+    m_d->recalcTitleY();
     setMinimumWidth(50);
     resetLayout(mode);
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
@@ -460,16 +481,41 @@ QSize SARibbonPannel::maxHightIconSize(const QSize& size, int height)
 void SARibbonPannel::paintEvent(QPaintEvent *event)
 {
     QPainter p(this);
-    QFont f = font();
 
-    f.setPixelSize(11);
-    p.setFont(f);
-    if (m_d->m_optionActionButton) {
-        p.drawText(0, m_d->m_titleY
-            , width()-m_d->m_optionActionButton->width() - m_d->m_titleOptionButtonSpace
-            , m_d->m_titleHeight, Qt::AlignCenter, windowTitle());
-    }else {
-        p.drawText(0, m_d->m_titleY, width(), m_d->m_titleHeight, Qt::AlignCenter, windowTitle());
+#ifdef SA_RIBBON_DEBUG_HELP_DRAW
+    HELP_DRAW_RECT(p, rect());
+#endif
+    if (ThreeRowMode == pannelLayoutMode()) {
+        QFont f = font();
+        f.setPixelSize(RibbonSubElementStyleOpt.pannelTitleHeight * 0.6);
+        p.setFont(f);
+        if (m_d->m_optionActionButton) {
+            p.drawText(1, height()-RibbonSubElementStyleOpt.pannelTitleHeight
+                , width()-m_d->m_optionActionButton->width() - RibbonSubElementStyleOpt.pannelTitleOptionButtonSpace
+                , RibbonSubElementStyleOpt.pannelTitleHeight
+                , Qt::AlignCenter
+                , windowTitle());
+#ifdef SA_RIBBON_DEBUG_HELP_DRAW
+            QRect r = QRect(1, height()-RibbonSubElementStyleOpt.pannelTitleHeight
+                , width()-m_d->m_optionActionButton->width() - RibbonSubElementStyleOpt.pannelTitleOptionButtonSpace
+                , RibbonSubElementStyleOpt.pannelTitleHeight-2);
+            qDebug() << r;
+            HELP_DRAW_RECT(p, r);
+#endif
+        }else {
+            p.drawText(1, height()-RibbonSubElementStyleOpt.pannelTitleHeight
+                , width()
+                , RibbonSubElementStyleOpt.pannelTitleHeight
+                , Qt::AlignCenter
+                , windowTitle());
+#ifdef SA_RIBBON_DEBUG_HELP_DRAW
+            QRect r = QRect(1, height()-RibbonSubElementStyleOpt.pannelTitleHeight
+                , width()
+                , RibbonSubElementStyleOpt.pannelTitleHeight);
+            qDebug() << r;
+            HELP_DRAW_RECT(p, r);
+#endif
+        }
     }
 
     QWidget::paintEvent(event);
@@ -484,7 +530,7 @@ QSize SARibbonPannel::sizeHint() const
     int maxWidth = laySize.width();
 
     if (m_d->m_defaultReduceButton) {
-        maxWidth = qMax(laySize.width(), titleSize.width()) + m_d->m_titleOptionButtonSpace + m_d->m_defaultReduceButton->width();
+        maxWidth = qMax(laySize.width(), titleSize.width()) + RibbonSubElementStyleOpt.pannelTitleOptionButtonSpace + m_d->m_defaultReduceButton->width();
     }else {
         maxWidth = qMax(laySize.width(), titleSize.width());
     }
@@ -618,8 +664,9 @@ void SARibbonPannel::resetLayout(PannelLayoutMode newmode)
 void SARibbonPannel::resizeEvent(QResizeEvent *event)
 {
     if (m_d->m_optionActionButton) {
-        m_d->m_optionActionButton->move(width()-m_d->m_titleOptionButtonSpace/2 - m_d->m_optionActionButton->width()
-            , m_d->m_titleY+(m_d->m_titleHeight-m_d->m_optionActionButton->height())/2);
+        m_d->m_optionActionButton->move(width()-RibbonSubElementStyleOpt.pannelTitleOptionButtonSpace/2 - m_d->m_optionActionButton->width()
+            , height()-RibbonSubElementStyleOpt.pannelTitleHeight
+            +(RibbonSubElementStyleOpt.pannelTitleHeight-m_d->m_optionActionButton->height())/2);
     }
     return (QWidget::resizeEvent(event));
 }
