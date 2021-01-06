@@ -54,7 +54,6 @@ public:
     SARibbonQuickAccessBar *quickAccessBar;                         ///< 快速响应栏
     SARibbonBar::RibbonStyle ribbonStyle;                           ///< ribbon的风格
     SARibbonBar::RibbonStyle lastShowStyle;                         ///< ribbon的风格
-    int mainBarHeight;
     SARibbonBar::RibbonState currentRibbonMode;                     ///< 记录当前模式
     SARibbonBarPrivate(SARibbonBar *par)
         : applitionButton(nullptr)
@@ -65,7 +64,6 @@ public:
         , tabBarRightSizeButtonGroupWidget(nullptr)
         , ribbonStyle(SARibbonBar::OfficeStyle)
         , lastShowStyle(SARibbonBar::OfficeStyle)
-        , mainBarHeight(RibbonSubElementStyleOpt.mainbarHeightOfficeStyleThreeRow)
         , currentRibbonMode(SARibbonBar::NormalRibbonMode)
     {
         MainClass = par;
@@ -152,7 +150,6 @@ public:
         this->stackedContainerWidget->setNormalMode();
         this->stackedContainerWidget->setFocus();
         this->stackedContainerWidget->show();
-        MainClass->setFixedHeight(mainBarHeight);
     }
 };
 
@@ -183,6 +180,7 @@ SARibbonBar::SARibbonBar(QWidget *parent) : QMenuBar(parent)
     , m_d(new SARibbonBarPrivate(this))
 {
     m_d->init();
+    setFixedHeight(mainBarHeight());
     connect(parent, &QWidget::windowTitleChanged, this, &SARibbonBar::onWindowTitleChanged);
     connect(parent, &QWidget::windowIconChanged, this, &SARibbonBar::onWindowIconChanged);
 }
@@ -222,7 +220,7 @@ SARibbonCategory *SARibbonBar::addCategoryPage(const QString& title)
 {
     SARibbonCategory *catagory = RibbonSubElementDelegate->createRibbonCategory(this);
 
-    catagory->setFixedHeight(categoryHeight());
+    //catagory->setFixedHeight(categoryHeight());
     catagory->setWindowTitle(title);
     int index = m_d->ribbonTabBar->addTab(title);
 
@@ -291,6 +289,8 @@ void SARibbonBar::showContextCategory(SARibbonContextCategory *context)
     {
         SARibbonCategory *category = context->categoryPage(i);
         category->setRibbonPannelLayoutMode(isTwoRowStyle() ? SARibbonPannel::TwoRowMode : SARibbonPannel::ThreeRowMode);
+        //切换模式后会改变高度，上下文标签显示时要保证显示出来
+        //category->setFixedHeight(categoryHeight());
         int index = m_d->ribbonTabBar->addTab(category->windowTitle());
         contextCategoryData.tabPageIndex.append(index);
         m_d->ribbonTabBar->setTabData(index, QVariant((quint64)category));
@@ -355,7 +355,9 @@ void SARibbonBar::setHideMode(bool isHide)
     }else {
         m_d->setNormalMode();
     }
-    update();
+    QResizeEvent resizeEvent(size(), size());
+
+    QApplication::sendEvent(this, &resizeEvent);
 }
 
 
@@ -535,47 +537,19 @@ void SARibbonBar::onContextsCategoryPageAdded(SARibbonCategory *category)
 }
 
 
-void SARibbonBar::updateRibbonElementGeometry(SARibbonBar::RibbonStyle newStyle, RibbonStyle oldStyle)
+void SARibbonBar::updateRibbonElementGeometry()
 {
-    //根据样式调整bar的高度
-    switch (newStyle)
-    {
-    case OfficeStyle:
-        m_d->mainBarHeight = RibbonSubElementStyleOpt.mainbarHeightOfficeStyleThreeRow;
-        break;
-
-    case WpsLiteStyle:
-        m_d->mainBarHeight = RibbonSubElementStyleOpt.mainbarHeightWPSStyleThreeRow;
-        break;
-
-    case OfficeStyleTwoRow:
-        //之前如果是3行，要改变所有的Category行数
-        m_d->mainBarHeight = RibbonSubElementStyleOpt.mainbarHeightOfficeStyleTwoRow;
-        break;
-
-    case WpsLiteStyleTwoRow:
-        m_d->mainBarHeight = RibbonSubElementStyleOpt.mainbarHeightWPSStyleTwoRow;
-        break;
-
-    default:
-        m_d->mainBarHeight = RibbonSubElementStyleOpt.mainbarHeightOfficeStyleThreeRow;
-        break;
-    }
-
     //根据样式调整SARibbonCategory的布局形式
     QList<SARibbonCategory *> categorys = categoryPages();
 
     for (SARibbonCategory *c : categorys)
     {
-        c->setRibbonPannelLayoutMode(SARibbonBar::isTwoRowStyle(newStyle) ? SARibbonPannel::TwoRowMode : SARibbonPannel::ThreeRowMode);
-        int h = categoryHeight();
-        if (h != c->height()) {
-            c->setFixedHeight(h);
-        }
+        c->setRibbonPannelLayoutMode(SARibbonBar::isTwoRowStyle(currentRibbonStyle()) ? SARibbonPannel::TwoRowMode : SARibbonPannel::ThreeRowMode);
     }
 
+    //根据样式调整bar的高度
     if (NormalRibbonMode == currentRibbonState()) {
-        setFixedHeight(m_d->mainBarHeight);
+        setFixedHeight(mainBarHeight());
     }
 }
 
@@ -602,13 +576,11 @@ SARibbonQuickAccessBar *SARibbonBar::quickAccessBar()
 
 void SARibbonBar::setRibbonStyle(SARibbonBar::RibbonStyle v)
 {
-    SARibbonBar::RibbonStyle old = m_d->ribbonStyle;
-
     m_d->ribbonStyle = v;
     m_d->lastShowStyle = v;
-    updateRibbonElementGeometry(v, old);
+    updateRibbonElementGeometry();
     QSize oldSize = size();
-    QSize newSize(oldSize.width(), m_d->mainBarHeight);
+    QSize newSize(oldSize.width(), mainBarHeight());
 
     QApplication::postEvent(this, new QResizeEvent(newSize, oldSize));
 }
@@ -673,7 +645,7 @@ bool SARibbonBar::isTwoRowStyle() const
  */
 bool SARibbonBar::isOfficeStyle() const
 {
-    return (SARibbonBar::isOfficeStyle(m_d->ribbonStyle));
+    return (SARibbonBar::isOfficeStyle(currentRibbonStyle()));
 }
 
 
@@ -733,9 +705,33 @@ int SARibbonBar::calcMinTabBarWidth() const
 }
 
 
-int SARibbonBar::categoryHeight() const
+/**
+ * @brief mainBarHeight的计算高度
+ *
+ * 有可能SARibbonBar::height和mainBarHeight不相等，这种情况发生在RibbonState::MinimumRibbonMode状态下
+ * @return 高度
+ */
+int SARibbonBar::mainBarHeight() const
 {
-    return (height() - m_d->ribbonTabBar->height() - 2);
+    switch (currentRibbonStyle())
+    {
+    case OfficeStyle:
+        return (RibbonSubElementStyleOpt.mainbarHeightOfficeStyleThreeRow);
+
+    case WpsLiteStyle:
+        return (RibbonSubElementStyleOpt.mainbarHeightWPSStyleThreeRow);
+
+    case OfficeStyleTwoRow:
+        //之前如果是3行，要改变所有的Category行数
+        return (RibbonSubElementStyleOpt.mainbarHeightOfficeStyleTwoRow);
+
+    case WpsLiteStyleTwoRow:
+        return (RibbonSubElementStyleOpt.mainbarHeightWPSStyleTwoRow);
+
+    default:
+        break;
+    }
+    return (RibbonSubElementStyleOpt.mainbarHeightOfficeStyleThreeRow);
 }
 
 
@@ -964,17 +960,36 @@ void SARibbonBar::resizeEvent(QResizeEvent *e)
     }
 }
 
+/**
+ * @brief 重写moveevent是为了在移动时调整isPopupMode状态下的stackedContainerWidget位置
+ * @param event
+ */
+void SARibbonBar::moveEvent(QMoveEvent *event)
+{
+    if(m_d->stackedContainerWidget)
+    {
+        if (m_d->stackedContainerWidget->isPopupMode()) {
+            //弹出模式时，高度
+            QPoint absPosition = mapToGlobal(QPoint(RibbonSubElementStyleOpt.widgetBord.left(), m_d->ribbonTabBar->geometry().bottom()+1));
+            m_d->stackedContainerWidget->setGeometry(QRect(absPosition.x(), absPosition.y()
+                , width()-RibbonSubElementStyleOpt.widgetBord.left()-RibbonSubElementStyleOpt.widgetBord.right()
+                , mainBarHeight()-m_d->ribbonTabBar->geometry().bottom()-2-RibbonSubElementStyleOpt.widgetBord.bottom()));
+        }
+    }
+    QWidget::moveEvent(event);
+}
+
 
 void SARibbonBar::resizeInOfficeStyle()
 {
-    RibbonStyle s = m_d->lastShowStyle;
+//    RibbonStyle s = m_d->lastShowStyle;
 
-    if (!SARibbonBar::isOfficeStyle(s)) {
-        //强制设置为office style
-        s = static_cast<RibbonStyle>(s & 0xFF00);
-        updateRibbonElementGeometry(s, m_d->lastShowStyle);
-    }
-    m_d->lastShowStyle = s;
+//    if (!SARibbonBar::isOfficeStyle(s)) {
+//        //强制设置为office style
+//        s = static_cast<RibbonStyle>(s & 0xFF00);
+//    }
+//    m_d->lastShowStyle = s;
+    updateRibbonElementGeometry();
     int x = RibbonSubElementStyleOpt.widgetBord.left();
     int y = RibbonSubElementStyleOpt.widgetBord.top();
 
@@ -1038,30 +1053,31 @@ void SARibbonBar::resizeInOfficeStyle()
 
 
     if (m_d->stackedContainerWidget->isPopupMode()) {
+        //弹出模式时，高度
         QPoint absPosition = mapToGlobal(QPoint(RibbonSubElementStyleOpt.widgetBord.left(), m_d->ribbonTabBar->geometry().bottom()+1));
         m_d->stackedContainerWidget->setGeometry(QRect(absPosition.x(), absPosition.y()
             , width()-RibbonSubElementStyleOpt.widgetBord.left()-RibbonSubElementStyleOpt.widgetBord.right()
-            , height()-m_d->ribbonTabBar->geometry().bottom()-2-RibbonSubElementStyleOpt.widgetBord.bottom()));
+            , mainBarHeight()-m_d->ribbonTabBar->geometry().bottom()-2-RibbonSubElementStyleOpt.widgetBord.bottom()));
     }else {
         m_d->stackedContainerWidget->setGeometry(RibbonSubElementStyleOpt.widgetBord.left()
             , m_d->ribbonTabBar->geometry().bottom()+1
             , width()-RibbonSubElementStyleOpt.widgetBord.left()-RibbonSubElementStyleOpt.widgetBord.right()
-            , height()-m_d->ribbonTabBar->geometry().bottom()-2-RibbonSubElementStyleOpt.widgetBord.bottom());
+            , mainBarHeight()-m_d->ribbonTabBar->geometry().bottom()-2-RibbonSubElementStyleOpt.widgetBord.bottom());
     }
 }
 
 
 void SARibbonBar::resizeInWpsLiteStyle()
 {
-    RibbonStyle s = m_d->lastShowStyle;
+//    RibbonStyle s = m_d->lastShowStyle;
 
-    if (SARibbonBar::isOfficeStyle(s)) {
-        //强制设置为wps style
-        s = static_cast<RibbonStyle>(s & 0xFF01);
-        updateRibbonElementGeometry(s, m_d->lastShowStyle);
-    }
-    m_d->lastShowStyle = s;
-    m_d->lastShowStyle = WpsLiteStyle;
+//    if (SARibbonBar::isOfficeStyle(s)) {
+//        //强制设置为wps style
+//        s = static_cast<RibbonStyle>(s & 0xFF01);
+//    }
+//    m_d->lastShowStyle = s;
+    updateRibbonElementGeometry();
+    //m_d->lastShowStyle = WpsLiteStyle;
     int x = RibbonSubElementStyleOpt.widgetBord.left();
     int y = RibbonSubElementStyleOpt.widgetBord.top();
     int validTitleBarHeight = RibbonSubElementStyleOpt.titleBarHight - RibbonSubElementStyleOpt.widgetBord.top();
@@ -1139,12 +1155,12 @@ void SARibbonBar::resizeInWpsLiteStyle()
         QPoint absPosition = mapToGlobal(QPoint(RibbonSubElementStyleOpt.widgetBord.left(), m_d->ribbonTabBar->geometry().bottom()+1));
         m_d->stackedContainerWidget->setGeometry(QRect(absPosition.x(), absPosition.y()
             , width()-RibbonSubElementStyleOpt.widgetBord.left()-RibbonSubElementStyleOpt.widgetBord.right()
-            , height()-m_d->ribbonTabBar->geometry().bottom()-2-RibbonSubElementStyleOpt.widgetBord.bottom()));
+            , mainBarHeight()-m_d->ribbonTabBar->geometry().bottom()-2-RibbonSubElementStyleOpt.widgetBord.bottom()));
     }else {
         m_d->stackedContainerWidget->setGeometry(RibbonSubElementStyleOpt.widgetBord.left()
             , m_d->ribbonTabBar->geometry().bottom()+1
             , width()-RibbonSubElementStyleOpt.widgetBord.left()-RibbonSubElementStyleOpt.widgetBord.right()
-            , height()-m_d->ribbonTabBar->geometry().bottom()-2-RibbonSubElementStyleOpt.widgetBord.bottom());
+            , mainBarHeight()-m_d->ribbonTabBar->geometry().bottom()-2-RibbonSubElementStyleOpt.widgetBord.bottom());
     }
 }
 

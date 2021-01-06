@@ -55,3 +55,8 @@ SARibbon项目是SA项目的子项
     于是就有wps模式，wps模式是office模式的改良版，具体可看wps的软件，它为了减小ribbon的高度，甚至把pannel的按钮数目默认变为2行
 
 ![](https://cdn.jsdelivr.net/gh/czyt1988/SARibbon/doc/screenshot/wps-mode.png)
+
+
+# 已知bug
+
+- 在非最大化模式，pannel变为缩小时，点击不弹出stacked
