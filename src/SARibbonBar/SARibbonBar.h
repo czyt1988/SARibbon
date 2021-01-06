@@ -139,8 +139,8 @@ protected:
     //根据情况重置tabbar的宽度，主要针对wps模式
     int calcMinTabBarWidth() const;
 
-    //计算category的高度
-    virtual int categoryHeight() const;
+    //根据currentRibbonStyle计算mainBar的高度
+    virtual int mainBarHeight() const;
 
 protected slots:
     void onWindowTitleChanged(const QString& title);
@@ -153,7 +153,7 @@ protected slots:
     void onContextsCategoryPageAdded(SARibbonCategory *category);
 
 private:
-    void updateRibbonElementGeometry(RibbonStyle newStyle, RibbonStyle oldStyle);
+    void updateRibbonElementGeometry();
     void resizeInOfficeStyle();
     void resizeInWpsLiteStyle();
     void paintInNormalStyle();
@@ -162,7 +162,7 @@ private:
 protected:
     void paintEvent(QPaintEvent *e) Q_DECL_OVERRIDE;
     void resizeEvent(QResizeEvent *e) Q_DECL_OVERRIDE;
-
+    void moveEvent(QMoveEvent *event) Q_DECL_OVERRIDE;
     virtual void paintBackground(QPainter& painter);
     virtual void paintWindowTitle(QPainter& painter, const QString& title, const QRect& titleRegion);
     virtual void paintWindowIcon(QPainter& painter, const QIcon& icon);

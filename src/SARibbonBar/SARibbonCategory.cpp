@@ -19,7 +19,6 @@ class SARibbonCategoryProxyPrivate
 public:
     SARibbonCategory *parent;
     SARibbonPannel::PannelLayoutMode m_defaultPannelLayoutMode;
-#if NOT_USE_LAYOUT
     QList<SARibbonPannel *> pannelLists;
     QList<SARibbonSeparatorWidget *> separatorLists;
     class ReduceActionInfo
@@ -46,7 +45,6 @@ public:
         }
     };
     QMap<SARibbonPannel *, ReduceActionInfo> m_pannelReduceInfo;
-#endif
 
     SARibbonCategoryProxyPrivate(SARibbonCategory *p) :
         parent(p)
@@ -59,12 +57,6 @@ SARibbonCategory::SARibbonCategory(QWidget *parent)
     : QWidget(parent)
     , m_proxy(new SARibbonCategoryProxy(this))
 {
-#if NOT_USE_LAYOUT
-#else
-    SARibbonCategoryLayout *layout = new SARibbonCategoryLayout(this);
-    installEventFilter(layout);
-#endif
-    setFixedHeight(98);
     setAutoFillBackground(true);
     setBackgroundBrush(Qt::white);
 }
@@ -172,13 +164,8 @@ SARibbonPannel *SARibbonCategoryProxy::addPannel(const QString& title)
     pannel->setPannelLayoutMode(ribbonPannelLayoutMode());
     SARibbonSeparatorWidget *seprator = RibbonSubElementDelegate->createRibbonSeparatorWidget(ribbonCategory()->height(), ribbonCategory());
 
-#if NOT_USE_LAYOUT
     m_d->pannelLists.append(pannel);
     m_d->separatorLists.append(seprator);
-#else
-    ribbonCategory()->layout()->addWidget(pannel);
-    ribbonCategory()->layout()->addWidget(seprator);
-#endif
     return (pannel);
 }
 
@@ -189,13 +176,8 @@ void SARibbonCategoryProxy::addPannel(SARibbonPannel *pannel)
     pannel->setPannelLayoutMode(ribbonPannelLayoutMode());
     SARibbonSeparatorWidget *seprator = RibbonSubElementDelegate->createRibbonSeparatorWidget(ribbonCategory()->height(), ribbonCategory());
 
-#if NOT_USE_LAYOUT
     m_d->pannelLists.append(pannel);
     m_d->separatorLists.append(seprator);
-#else
-    ribbonCategory()->layout()->addWidget(pannel);
-    ribbonCategory()->layout()->addWidget(seprator);
-#endif
 }
 
 
@@ -210,11 +192,7 @@ void SARibbonCategoryProxy::setBackgroundBrush(const QBrush& brush)
 
 void SARibbonCategoryProxy::resizeEvent(QResizeEvent *event)
 {
-#if NOT_USE_LAYOUT
     resizePannels(event->size());
-#else
-    Q_UNUSED(event);
-#endif
 }
 
 
@@ -225,7 +203,6 @@ void SARibbonCategoryProxy::paintEvent(QPaintEvent *event)
 }
 
 
-#if NOT_USE_LAYOUT
 void SARibbonCategoryProxy::resizePannels(const QSize& categorySize)
 {
     int x = 1;
@@ -319,9 +296,6 @@ void SARibbonCategoryProxy::resizePannels(const QSize& categorySize)
 }
 
 
-#endif
-
-
 SARibbonCategory *SARibbonCategoryProxy::ribbonCategory()
 {
     return (m_d->parent);
@@ -347,7 +321,6 @@ SARibbonPannel::PannelLayoutMode SARibbonCategoryProxy::ribbonPannelLayoutMode()
 }
 
 
-#if NOT_USE_LAYOUT
 int SARibbonCategoryProxy::buildReduceModePannel(SARibbonPannel *realPannel, int x, int y)
 {
     SARibbonCategory *categoryPage = ribbonCategory();
@@ -394,6 +367,3 @@ QPoint SARibbonCategoryProxy::calcPopupPannelPosition(SARibbonCategory *category
     }
     return (QPoint(r.width()-  pannel->sizeHint().width(), absPosition.y()));
 }
-
-
-#endif
