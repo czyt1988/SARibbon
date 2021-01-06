@@ -119,7 +119,8 @@ public:
 
     //判断当前的样式是否为office样式
     bool isOfficeStyle() const;
-
+    //告诉saribbonbar，window button的尺寸
+    void setWindowButtonSize(const QSize& size);
 signals:
 
     /**
@@ -142,6 +143,7 @@ protected:
     //根据currentRibbonStyle计算mainBar的高度
     virtual int mainBarHeight() const;
 
+    virtual QRect applitionButtonGeometry() const;
 protected slots:
     void onWindowTitleChanged(const QString& title);
     void onWindowIconChanged(const QIcon& icon);
@@ -158,7 +160,8 @@ private:
     void resizeInWpsLiteStyle();
     void paintInNormalStyle();
     void paintInWpsLiteStyle();
-
+    void resizeStackedContainerWidget();
+    void resizeTabbar();
 protected:
     void paintEvent(QPaintEvent *e) Q_DECL_OVERRIDE;
     void resizeEvent(QResizeEvent *e) Q_DECL_OVERRIDE;

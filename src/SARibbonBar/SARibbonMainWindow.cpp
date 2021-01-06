@@ -48,11 +48,12 @@ SARibbonMainWindow::SARibbonMainWindow(QWidget *parent,bool useRibbon)
 		setRibbonTheme(ribbonTheme());
 		//
 		m_d->ribbonBar = new SARibbonBar(this);
+
 		setMenuWidget(m_d->ribbonBar);
 		m_d->ribbonBar->installEventFilter(this);
 		//
-		m_d->windowButtonGroup = new SAWindowButtonGroup(this);
 		FramelessHelper *pHelper = new FramelessHelper(this);
+        m_d->windowButtonGroup = new SAWindowButtonGroup(this);
 
 		pHelper->setTitleHeight(m_d->ribbonBar->titleBarHeight()); //设置窗体的标题栏高度
 	}
@@ -102,6 +103,10 @@ void SARibbonMainWindow::resizeEvent(QResizeEvent *event)
     if (m_d->ribbonBar) {
         if (m_d->ribbonBar->size().width() != this->size().width()) {
             m_d->ribbonBar->setFixedWidth(this->size().width());
+        }
+        if(m_d->windowButtonGroup){
+            qDebug() << "==========="<<m_d->windowButtonGroup->size();
+            m_d->ribbonBar->setWindowButtonSize(m_d->windowButtonGroup->size());
         }
     }
     QMainWindow::resizeEvent(event);
