@@ -858,25 +858,30 @@ void SARibbonBar::paintInNormalStyle()
                 , width()- m_d->iconRightBorderPosition - RibbonSubElementStyleOpt.widgetBord.right()-m_d->windowButtonSize.width()-m_d->quickAccessBar->geometry().right()-1
                 , RibbonSubElementStyleOpt.titleBarHight);
         }else {
-            int x = m_d->quickAccessBar->geometry().right();
-            if (width() - contextCategoryRegion.y() > contextCategoryRegion.x()-x) {
-                //说明左边的区域大一点，标题显示在坐标，显示在左边需要减去windowbutton宽度
+            int leftwidth = contextCategoryRegion.x() - m_d->quickAccessBar->geometry().right()-m_d->iconRightBorderPosition;
+            int rightwidth = width()-contextCategoryRegion.y()-m_d->windowButtonSize.width();
+//            if (width() - contextCategoryRegion.y() > contextCategoryRegion.x()-x) {
+            if (rightwidth > leftwidth) {
+                //说明右边的区域大一点，标题显示在右，显示在右边需要减去windowbutton宽度
                 titleRegion.setRect(contextCategoryRegion.y()
                     , RibbonSubElementStyleOpt.widgetBord.top()
-                    , width()-x-RibbonSubElementStyleOpt.unusableTitleRegion-m_d->windowButtonSize.width()-contextCategoryRegion.y()
+                    , rightwidth
                     , RibbonSubElementStyleOpt.titleBarHight);
             }else {
-                //说明右边的大一点
-                titleRegion.setRect(m_d->iconRightBorderPosition
+                //说明左边的大一点
+                titleRegion.setRect(m_d->iconRightBorderPosition+m_d->quickAccessBar->geometry().right()
                     , RibbonSubElementStyleOpt.widgetBord.top()
-                    , contextCategoryRegion.x()-m_d->iconRightBorderPosition-RibbonSubElementStyleOpt.unusableTitleRegion
+                    , leftwidth
                     , RibbonSubElementStyleOpt.titleBarHight);
             }
         }
 #ifdef SA_RIBBON_DEBUG_HELP_DRAW
         qDebug() <<"+++++++++=" << m_d->windowButtonSize.width() << " " << titleRegion
                 << "m_d->iconRightBorderPosition " << m_d->iconRightBorderPosition
-                << "RibbonSubElementStyleOpt.widgetBord.right():" << RibbonSubElementStyleOpt.widgetBord.right();
+                << "RibbonSubElementStyleOpt.widgetBord.right():" << RibbonSubElementStyleOpt.widgetBord.right()
+                << "contextCategoryRegion:"<<contextCategoryRegion
+                << " m_d->quickAccessBar->geometry().right()" <<m_d->quickAccessBar->geometry().right()
+                   ;
         p.save();
         p.setBrush(QColor(255,0,0,120));
         p.drawRect(titleRegion);
