@@ -32,7 +32,8 @@ public:
     SARibbonToolButton *addSmallMenu(SARibbonMenu *menu);
     SARibbonToolButton *addLargeActionMenu(QAction *action, SARibbonMenu *menu);
     SARibbonGallery *addGallery();
-
+    //获取所有的buttons
+    QList<SARibbonToolButton*> toolButtons() const;
     //设置PannelLayoutMode
     void setPannelLayoutMode(PannelLayoutMode mode);
     PannelLayoutMode pannelLayoutMode() const;
@@ -51,6 +52,7 @@ protected:
     void addWidget(QWidget *w, int row, int rowSpan);
     void addWidget(QWidget *w, int row, int rowSpan, int column, int columnSpan);
     void resetLayout(PannelLayoutMode newmode);
+    void resetLargeToolButtonStyle();
     static QSize maxHightIconSize(const QSize& size, int height);
     void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
     virtual void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;

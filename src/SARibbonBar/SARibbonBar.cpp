@@ -876,12 +876,6 @@ void SARibbonBar::paintInNormalStyle()
             }
         }
 #ifdef SA_RIBBON_DEBUG_HELP_DRAW
-        qDebug() <<"+++++++++=" << m_d->windowButtonSize.width() << " " << titleRegion
-                << "m_d->iconRightBorderPosition " << m_d->iconRightBorderPosition
-                << "RibbonSubElementStyleOpt.widgetBord.right():" << RibbonSubElementStyleOpt.widgetBord.right()
-                << "contextCategoryRegion:"<<contextCategoryRegion
-                << " m_d->quickAccessBar->geometry().right()" <<m_d->quickAccessBar->geometry().right()
-                   ;
         p.save();
         p.setBrush(QColor(255,0,0,120));
         p.drawRect(titleRegion);

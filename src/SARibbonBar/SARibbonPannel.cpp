@@ -129,6 +129,7 @@ SARibbonToolButton *SARibbonPannel::addLargeAction(QAction *action)
     SARibbonToolButton *btn = RibbonSubElementDelegate->createRibbonToolButton(this);
 
     btn->setButtonType(SARibbonToolButton::LargeButton);
+    btn->setLargeButtonType(((ThreeRowMode==m_d->m_pannelLayoutMode) ? SARibbonToolButton::Normal : SARibbonToolButton::Lite));
     btn->setAutoRaise(true);
     btn->setDefaultAction(action);
     QSize iconSize = maxHightIconSize(action->icon().actualSize(c_iconSizeForHigerLarge), c_iconHighForHigerLarge);
@@ -149,6 +150,7 @@ SARibbonToolButton *SARibbonPannel::addLargeToolButton(const QString& text, cons
     SARibbonToolButton *btn = RibbonSubElementDelegate->createRibbonToolButton(this);
 
     btn->setButtonType(SARibbonToolButton::LargeButton);
+    btn->setLargeButtonType(((ThreeRowMode==m_d->m_pannelLayoutMode) ? SARibbonToolButton::Normal : SARibbonToolButton::Lite));
     btn->setAutoRaise(true);
     QSize iconSize = maxHightIconSize(icon.actualSize(c_iconSizeForHigerLarge), c_iconHighForHigerLarge);
 
@@ -256,6 +258,7 @@ SARibbonToolButton *SARibbonPannel::addLargeMenu(SARibbonMenu *menu)
     SARibbonToolButton *btn = RibbonSubElementDelegate->createRibbonToolButton(this);
 
     btn->setButtonType(SARibbonToolButton::LargeButton);
+    btn->setLargeButtonType(((ThreeRowMode==m_d->m_pannelLayoutMode) ? SARibbonToolButton::Normal : SARibbonToolButton::Lite));
     btn->setAutoRaise(true);
     if (!menu->icon().isNull()) {
         QSize iconSize = maxHightIconSize(menu->icon().actualSize(c_iconSizeForHigerLarge), c_iconHighForHigerLarge);
@@ -314,6 +317,23 @@ SARibbonGallery *SARibbonPannel::addGallery()
     return (gallery);
 }
 
+/**
+ * @brief 获取pannel下面的所有toolbutton
+ * @return
+ */
+QList<SARibbonToolButton *> SARibbonPannel::toolButtons() const
+{
+    const QObjectList& objs = children();
+    QList<SARibbonToolButton *> res;
+    for (QObject* o : objs) {
+        SARibbonToolButton* b = qobject_cast<SARibbonToolButton *>(o);
+        if(b){
+            res.append(b);
+        }
+    }
+    return res;
+}
+
 
 void SARibbonPannel::setPannelLayoutMode(SARibbonPannel::PannelLayoutMode mode)
 {
@@ -343,6 +363,7 @@ void SARibbonPannel::setPannelLayoutMode(SARibbonPannel::PannelLayoutMode mode)
     m_d->recalcTitleY();
     setMinimumWidth(50);
     resetLayout(mode);
+    resetLargeToolButtonStyle();
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     //QApplication::postEvent(this, new QResizeEvent(newSize, oldSize));
 }
@@ -656,6 +677,33 @@ void SARibbonPannel::resetLayout(PannelLayoutMode newmode)
                     << " c:" << ttt.column
                     << " rspan:" << ttt.rowSpan
                     << " colspan:"<<ttt.columnSpan;
+        }
+    }
+}
+
+/**
+ * @brief 重置大按钮的类型
+ */
+void SARibbonPannel::resetLargeToolButtonStyle()
+{
+    QList<SARibbonToolButton*> btns = toolButtons();
+    for (SARibbonToolButton* b : btns){
+        if(b){
+            if(SARibbonToolButton::LargeButton == b->buttonType()){
+                if(ThreeRowMode)
+                {
+                    if(SARibbonToolButton::Normal != b->largeButtonType())
+                    {
+                        b->setLargeButtonType(SARibbonToolButton::Normal);
+                    }
+                }else{
+                    if(SARibbonToolButton::Lite != b->largeButtonType())
+                    {
+                        b->setLargeButtonType(SARibbonToolButton::Lite);
+                    }
+                }
+
+            }
         }
     }
 }
