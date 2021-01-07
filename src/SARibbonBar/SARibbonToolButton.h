@@ -38,6 +38,8 @@ public:
 
 	static int LargeButtonSize;
 	static int SmallButtonSize;
+    //lite模式下的分割线
+    virtual int liteLargeButtonSplitLine(const QStyleOptionToolButton& opt) const;
 protected:
     void calcIconRect(const QStyleOptionToolButton& opt);
     QRect calcTextRect(const QStyleOptionToolButton& opt);
