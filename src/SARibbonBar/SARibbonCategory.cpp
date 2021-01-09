@@ -83,11 +83,13 @@ SARibbonPannel::PannelLayoutMode SARibbonCategory::ribbonPannelLayoutMode() cons
 }
 
 
-///
-/// \brief 添加一个面板
-/// \param title 面板名称
-/// \return
-///
+/**
+ * @brief 添加pannel
+ *
+ * @note SARibbonPannel* 由SARibbonCategory来管理，请不要在外部对其进行销毁
+ * @param title pannel的标题，在office/wps的三行模式下会显示在pannel的下方
+ * @return
+ */
 SARibbonPannel *SARibbonCategory::addPannel(const QString& title)
 {
     return (proxy()->addPannel(title));

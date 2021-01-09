@@ -85,7 +85,12 @@ void SARibbonStackedWidget::exec()
     m_d->eventLoop = nullptr;
 }
 
-
+/**
+ * @brief 设置stacked管理的窗口会随着stacked的大小变化而变化大小
+ *
+ * 默认为true
+ * @param autoresize
+ */
 void SARibbonStackedWidget::setAutoResize(bool autoresize)
 {
     m_d->isAutoResize = autoresize;

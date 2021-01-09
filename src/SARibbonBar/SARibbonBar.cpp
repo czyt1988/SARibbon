@@ -55,7 +55,7 @@ public:
     SARibbonBar::RibbonStyle ribbonStyle;                           ///< ribbon的风格
     SARibbonBar::RibbonStyle lastShowStyle;                         ///< ribbon的风格
     SARibbonBar::RibbonState currentRibbonMode;                     ///< 记录当前模式
-    QSize windowButtonSize;///< 由SARibbonMainWindow告诉的windowbutton的尺寸
+    QSize windowButtonSize;                                         ///< 由SARibbonMainWindow告诉的windowbutton的尺寸
     SARibbonBarPrivate(SARibbonBar *par)
         : applitionButton(nullptr)
         , ribbonTabBar(nullptr)
@@ -66,7 +66,7 @@ public:
         , ribbonStyle(SARibbonBar::OfficeStyle)
         , lastShowStyle(SARibbonBar::OfficeStyle)
         , currentRibbonMode(SARibbonBar::NormalRibbonMode)
-        , windowButtonSize(100,RibbonSubElementStyleOpt.titleBarHight)
+        , windowButtonSize(100, RibbonSubElementStyleOpt.titleBarHight)
     {
         MainClass = par;
     }
@@ -151,7 +151,6 @@ public:
         this->stackedContainerWidget->setFocus();
         this->stackedContainerWidget->show();
     }
-
 };
 
 
@@ -512,10 +511,17 @@ void SARibbonBar::onCurrentRibbonTabChanged(int index)
 ///
 void SARibbonBar::onCurrentRibbonTabClicked(int index)
 {
+    if (m_d->ribbonTabBar->currentIndex() != index) {
+        // 如果点击的和currentIndex返回不一致，会触发onCurrentRibbonTabChanged，
+        // 不需要进行onCurrentRibbonTabClicked的响应，onCurrentRibbonTabClicked的响应是为了
+        // 在隐藏模式下点击同一个tab还弹出
+        return;
+    }
     if (isRibbonBarHideMode()) {
         if (!m_d->stackedContainerWidget->isVisible()) {
             if (m_d->stackedContainerWidget->isPopupMode()) {
-                m_d->ribbonTabBar->setCurrentIndex(index);
+                m_d->stackedContainerWidget->setFocus();
+                m_d->stackedContainerWidget->exec();
             }
         }
     }
@@ -651,12 +657,13 @@ bool SARibbonBar::isOfficeStyle() const
     return (SARibbonBar::isOfficeStyle(currentRibbonStyle()));
 }
 
+
 /**
  * @brief 告诉saribbonbar，window button的尺寸,此值由SARibbonMainWindow传入，
  * 告诉最大，最小，关闭按钮的大小，在显示标题栏的时候好计算尺寸
  * @param size
  */
-void SARibbonBar::setWindowButtonSize(const QSize &size)
+void SARibbonBar::setWindowButtonSize(const QSize& size)
 {
     m_d->windowButtonSize = size;
 }
@@ -751,23 +758,22 @@ int SARibbonBar::mainBarHeight() const
 QRect SARibbonBar::applitionButtonGeometry() const
 {
     if (isOfficeStyle()) {
-        return QRect(RibbonSubElementStyleOpt.widgetBord.left()
-                     ,RibbonSubElementStyleOpt.widgetBord.top() + RibbonSubElementStyleOpt.titleBarHight
-                     ,56
-                     ,30);
+        return (QRect(RibbonSubElementStyleOpt.widgetBord.left()
+               , RibbonSubElementStyleOpt.widgetBord.top() + RibbonSubElementStyleOpt.titleBarHight
+               , 56
+               , 30));
     }
-    return QRect(RibbonSubElementStyleOpt.widgetBord.left()
-                 ,RibbonSubElementStyleOpt.widgetBord.top(),
-                 56
-                 ,30);
+    return (QRect(RibbonSubElementStyleOpt.widgetBord.left()
+           , RibbonSubElementStyleOpt.widgetBord.top(),
+           56
+           , 30));
 }
 
 
 void SARibbonBar::paintEvent(QPaintEvent *e)
 {
     Q_UNUSED(e);
-    if(isOfficeStyle())
-    {
+    if (isOfficeStyle()) {
         paintInNormalStyle();
     }else{
         paintInWpsLiteStyle();
@@ -877,7 +883,7 @@ void SARibbonBar::paintInNormalStyle()
         }
 #ifdef SA_RIBBON_DEBUG_HELP_DRAW
         p.save();
-        p.setBrush(QColor(255,0,0,120));
+        p.setBrush(QColor(255, 0, 0, 120));
         p.drawRect(titleRegion);
         p.restore();
 #endif
@@ -958,6 +964,7 @@ void SARibbonBar::paintInWpsLiteStyle()
     }
 }
 
+
 void SARibbonBar::resizeStackedContainerWidget()
 {
     if (m_d->stackedContainerWidget->isPopupMode()) {
@@ -974,9 +981,9 @@ void SARibbonBar::resizeStackedContainerWidget()
     }
 }
 
+
 void SARibbonBar::resizeTabbar()
 {
-
 }
 
 
@@ -1022,14 +1029,14 @@ void SARibbonBar::resizeEvent(QResizeEvent *e)
     }
 }
 
+
 /**
  * @brief 重写moveevent是为了在移动时调整isPopupMode状态下的stackedContainerWidget位置
  * @param event
  */
 void SARibbonBar::moveEvent(QMoveEvent *event)
 {
-    if(m_d->stackedContainerWidget)
-    {
+    if (m_d->stackedContainerWidget) {
         if (m_d->stackedContainerWidget->isPopupMode()) {
             //弹出模式时，窗口发生了移动，同步调整StackedContainerWidget的位置
             resizeStackedContainerWidget();
