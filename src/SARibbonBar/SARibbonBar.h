@@ -13,9 +13,81 @@ class SARibbonBarPrivate;
 class SARibbonTabBar;
 class SARibbonButtonGroupWidget;
 class SARibbonQuickAccessBar;
-///
-/// \brief The SARibbonBar class
-///
+
+/**
+ * @brief SARibbonBar继承于QMenuBar,在SARibbonMainWindow中直接替换了原来的QMenuBar
+ *
+ * 通过setRibbonStyle函数设置ribbon的风格:
+ *
+ * @code
+ * void setRibbonStyle(RibbonStyle v);
+ * @endcode
+ *
+ * SARibbonBar参考office和wps，提供了四种风格的Ribbon模式,@sa RibbonStyle
+ *
+ * 如果想ribbon占用的空间足够小，WpsLiteStyleTwoRow模式能比OfficeStyle节省35%的高度空间
+ *
+ * 如何生成ribbon?先看看一个传统的Menu/ToolBar是如何生成的：
+ *
+ * @code
+ * void MainWindow::MainWindow()
+ * {
+ *    QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
+ *    QToolBar *fileToolBar = addToolBar(tr("File"));
+ *    //生成action
+ *    QAction *newAct = new QAction(newIcon, tr("&New"), this);
+ *    fileMenu->addAction(newAct);
+ *    fileToolBar->addAction(newAct);
+ *
+ *    QAction *openAct = new QAction(openIcon, tr("&Open..."), this);
+ *    fileMenu->addAction(openAct);
+ *    fileToolBar->addAction(openAct);
+ * }
+ * @endcode
+ *
+ * 传统的Menu/ToolBar主要通过QMenu的addMenu添加菜单,通过QMainWindow::addToolBar生成QToolBar,
+ * 再把QAction设置进QMenu和QToolBar中
+ *
+ * SARibbonBar和传统方法相似，不过相对于传统的Menu/ToolBar QMenu和QToolBar是平级的，
+ * Ribbon是有明显的层级关系，SARibbonBar下面是 @sa SARibbonCategory，
+ * SARibbonCategory下面是@sa SARibbonPannel，SARibbonPannel下面是@sa SARibbonToolButton，
+ * SARibbonToolButton管理着QAction
+ *
+ * 因此，生成一个ribbon只需以下几个函数：
+ * @code
+ * SARibbonCategory * SARibbonBar::addCategoryPage(const QString& title);
+ * SARibbonPannel * SARibbonCategory::addPannel(const QString& title);
+ * SARibbonToolButton * SARibbonPannel::addLargeAction(QAction *action);
+ * SARibbonToolButton * SARibbonPannel::addSmallAction(QAction *action);
+ * @endcode
+ *
+ * 因此生成步骤如下：
+ *
+ * @code
+ * //成员变量
+ * SARibbonCategory* categoryMain;
+ * SARibbonPannel* FilePannel;
+ *
+ * //建立ui
+ * void setupRibbonUi()
+ * {
+ *     ......
+ *     //ribbonwindow为SARibbonMainWindow
+ *     SARibbonBar* ribbon = ribbonwindow->ribbonBar();
+ *     ribbon->setRibbonStyle(SARibbonBar::WpsLiteStyle);
+ *     //添加一个Main标签
+ *     categoryMain = ribbon->addCategoryPage(QStringLiteral("Main"));
+ *     //Main标签下添加一个File Pannel
+ *     FilePannel = categoryMain->addPannel(QStringLiteral("FilePannel"));
+ *     //开始为File Pannel添加action
+ *     FilePannel->addLargeAction(actionNew);
+ *     FilePannel->addLargeAction(actionOpen);
+ *     FilePannel->addLargeAction(actionSave);
+ *     FilePannel->addSmallAction(actionImportMesh);
+ *     FilePannel->addSmallAction(actionImportGeometry);
+ * }
+ * @endcode
+ */
 class SA_RIBBON_EXPORT SARibbonBar : public QMenuBar
 {
     Q_OBJECT
@@ -119,8 +191,10 @@ public:
 
     //判断当前的样式是否为office样式
     bool isOfficeStyle() const;
+
     //告诉saribbonbar，window button的尺寸
     void setWindowButtonSize(const QSize& size);
+
 signals:
 
     /**
@@ -144,6 +218,7 @@ protected:
     virtual int mainBarHeight() const;
 
     virtual QRect applitionButtonGeometry() const;
+
 protected slots:
     void onWindowTitleChanged(const QString& title);
     void onWindowIconChanged(const QIcon& icon);
@@ -162,6 +237,7 @@ private:
     void paintInWpsLiteStyle();
     void resizeStackedContainerWidget();
     void resizeTabbar();
+
 protected:
     void paintEvent(QPaintEvent *e) Q_DECL_OVERRIDE;
     void resizeEvent(QResizeEvent *e) Q_DECL_OVERRIDE;

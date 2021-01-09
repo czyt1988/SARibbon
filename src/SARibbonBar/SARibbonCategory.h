@@ -19,7 +19,7 @@ public:
     ~SARibbonCategory();
     void setRibbonPannelLayoutMode(SARibbonPannel::PannelLayoutMode m);
     SARibbonPannel::PannelLayoutMode ribbonPannelLayoutMode() const;
-
+    //添加pannel
     SARibbonPannel *addPannel(const QString& title);
     void addPannel(SARibbonPannel *pannel);
     void setBackgroundBrush(const QBrush& brush);
