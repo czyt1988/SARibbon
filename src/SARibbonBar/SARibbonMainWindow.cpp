@@ -17,9 +17,6 @@ public:
     SARibbonMainWindow::RibbonTheme currentRibbonTheme;
     SAWindowButtonGroup *windowButtonGroup;
 	bool useRibbon;
-#if 0
-    QHash<SARibbonMainWindow::RibbonElement, QString> ribbonStyleSheet;
-#endif
 };
 
 SARibbonMainWindowPrivate::SARibbonMainWindowPrivate(SARibbonMainWindow *p)
@@ -37,14 +34,13 @@ void SARibbonMainWindowPrivate::init()
 }
 
 
-SARibbonMainWindow::SARibbonMainWindow(QWidget *parent,bool useRibbon)
+SARibbonMainWindow::SARibbonMainWindow(QWidget *parent, bool useRibbon)
     : QMainWindow(parent)
     , m_d(new SARibbonMainWindowPrivate(this))
 {
     m_d->init();
 	m_d->useRibbon = useRibbon;
-	if (useRibbon)
-	{
+    if (useRibbon) {
 		setRibbonTheme(ribbonTheme());
 		//
 		m_d->ribbonBar = new SARibbonBar(this);
@@ -95,8 +91,9 @@ SARibbonMainWindow::RibbonTheme SARibbonMainWindow::ribbonTheme() const
 
 bool SARibbonMainWindow::isUseRibbon() const
 {
-	return m_d->useRibbon;
+    return (m_d->useRibbon);
 }
+
 
 void SARibbonMainWindow::resizeEvent(QResizeEvent *event)
 {
@@ -104,8 +101,7 @@ void SARibbonMainWindow::resizeEvent(QResizeEvent *event)
         if (m_d->ribbonBar->size().width() != this->size().width()) {
             m_d->ribbonBar->setFixedWidth(this->size().width());
         }
-        if(m_d->windowButtonGroup){
-            qDebug() << "==========="<<m_d->windowButtonGroup->size();
+        if (m_d->windowButtonGroup) {
             m_d->ribbonBar->setWindowButtonSize(m_d->windowButtonGroup->size());
         }
     }

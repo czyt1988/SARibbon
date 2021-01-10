@@ -583,6 +583,12 @@ SARibbonQuickAccessBar *SARibbonBar::quickAccessBar()
 }
 
 
+/**
+ * @brief 设置ribbonbar的风格，此函数会重新设置所有元素，包括button的布局方式，
+ * 尤其是从三行变到两行的过程，重设的内容较多
+ * @note 此函数会自动触发ResizeEvent，不需要手动调用
+ * @param v 样式，见@sa SARibbonBar::RibbonStyle
+ */
 void SARibbonBar::setRibbonStyle(SARibbonBar::RibbonStyle v)
 {
     m_d->ribbonStyle = v;
