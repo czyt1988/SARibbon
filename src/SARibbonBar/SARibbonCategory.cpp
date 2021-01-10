@@ -69,6 +69,9 @@ SARibbonCategory::~SARibbonCategory()
 
 /**
  * @brief 设置pannel的模式
+ *
+ * 在@sa SARibbonBar调用@sa SARibbonBar::setRibbonStyle 函数时，会对所有的SARibbonCategory调用此函数
+ * 把新的SARibbonPannel::PannelLayoutMode设置进去
  * @param m
  */
 void SARibbonCategory::setRibbonPannelLayoutMode(SARibbonPannel::PannelLayoutMode m)
@@ -124,6 +127,14 @@ const SARibbonCategoryProxy *SARibbonCategory::proxy() const
 }
 
 
+/**
+ * @brief 设置SARibbonCategory的代理
+ *
+ * 由于SARibbonCategory是由SARibbonBar生成的，如果用户想做修改，继承SARibbonCategory是没有用的
+ * 因此可通过代理设置进当前的SARibbonCategory，SARibbonCategory的大部分工作都是由代理完成
+ * 这样替代了继承SARibbonCategory的方式
+ * @param proxy
+ */
 void SARibbonCategory::setProxy(SARibbonCategoryProxy *proxy)
 {
     m_proxy.reset(proxy);
@@ -174,7 +185,9 @@ SARibbonPannel *SARibbonCategoryProxy::addPannel(const QString& title)
 
 void SARibbonCategoryProxy::addPannel(SARibbonPannel *pannel)
 {
-    pannel->setParent(ribbonCategory());
+    if (pannel->parent() != ribbonCategory()) {
+        pannel->setParent(ribbonCategory());
+    }
     pannel->setPannelLayoutMode(ribbonPannelLayoutMode());
     SARibbonSeparatorWidget *seprator = RibbonSubElementDelegate->createRibbonSeparatorWidget(ribbonCategory()->height(), ribbonCategory());
 
@@ -218,6 +231,7 @@ void SARibbonCategoryProxy::resizePannels(const QSize& categorySize)
     {
         SARibbonPannel *pannel = m_d->pannelLists[i];
         SARibbonSeparatorWidget *separator = m_d->separatorLists[i];
+        separator->setFixedHeight(categorySize.height());
         QSize widSize = pannel->sizeHint();
         int nextX = x + widSize.width();
         if (nextX > categorySize.width()) {
@@ -304,6 +318,16 @@ SARibbonCategory *SARibbonCategoryProxy::ribbonCategory()
 }
 
 
+/**
+ * @brief 设置pannel的模式
+ *
+ * 在@sa SARibbonBar调用@sa SARibbonBar::setRibbonStyle 函数时，会对所有的SARibbonCategory调用此函数
+ * 把新的SARibbonPannel::PannelLayoutMode设置进去
+ *
+ * 此函数为SARibbonCategory::setRibbonPannelLayoutMode的代理，
+ * 在SARibbonCategory类中，此函数为protected，主要在SARibbonBar::setRibbonStyle时才会触发
+ * @param m
+ */
 void SARibbonCategoryProxy::setRibbonPannelLayoutMode(SARibbonPannel::PannelLayoutMode m)
 {
     if (m_d->m_defaultPannelLayoutMode == m) {

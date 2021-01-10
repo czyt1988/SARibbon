@@ -32,16 +32,20 @@ public:
     SARibbonToolButton *addSmallMenu(SARibbonMenu *menu);
     SARibbonToolButton *addLargeActionMenu(QAction *action, SARibbonMenu *menu);
     SARibbonGallery *addGallery();
-    //获取所有的buttons
-    QList<SARibbonToolButton*> toolButtons() const;
-    //设置PannelLayoutMode
-    void setPannelLayoutMode(PannelLayoutMode mode);
-    PannelLayoutMode pannelLayoutMode() const;
+
+    //添加分割线
     void addSeparator();
     void addSmallWidget(QWidget *w);
     void addLargeWidget(QWidget *w);
-    int gridLayoutColumnCount() const;
     void addOptionAction(QAction *action);
+
+    //获取所有的buttons
+    QList<SARibbonToolButton *> toolButtons() const;
+
+    //设置PannelLayoutMode
+    void setPannelLayoutMode(PannelLayoutMode mode);
+    PannelLayoutMode pannelLayoutMode() const;
+    int gridLayoutColumnCount() const;
     virtual QSize sizeHint() const Q_DECL_OVERRIDE;
     virtual QSize minimumSizeHint() const Q_DECL_OVERRIDE;
     void setReduce(bool isReduce);
@@ -53,9 +57,10 @@ protected:
     void addWidget(QWidget *w, int row, int rowSpan, int column, int columnSpan);
     void resetLayout(PannelLayoutMode newmode);
     void resetLargeToolButtonStyle();
-    static QSize maxHightIconSize(const QSize& size, int height);
+    static QSize maxHightIconSize(const QSize& size, int h);
     void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
     virtual void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
+    virtual int separatorHeight() const;
 
 private:
     SARibbonPannelPrivate *m_d;

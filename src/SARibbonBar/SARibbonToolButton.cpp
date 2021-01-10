@@ -45,6 +45,8 @@ QDebug operator<<(QDebug debug, const QStyleOptionToolButton& opt)
 
     return (debug);
 }
+
+
 #endif
 
 SARibbonToolButton::SARibbonToolButton(QWidget *parent)
@@ -276,7 +278,6 @@ void SARibbonToolButton::paintSmallButton(QPaintEvent *e)
 void SARibbonToolButton::paintLargeButton(QPaintEvent *e)
 {
     Q_UNUSED(e);
-
     QPainter p(this);
     QStyleOptionToolButton opt;
 
@@ -330,23 +331,22 @@ void SARibbonToolButton::paintLargeButton(QPaintEvent *e)
             p.setPen(m_borderColor);
             p.setBrush(Qt::NoBrush);
             p.drawRect(opt.rect.adjusted(1, 1, -1, -1));
-            if(Normal == m_largeButtonType){
-                p.drawLine(0, opt.rect.height()/2, opt.rect.width(), opt.rect.height()/2);//分界线
-            }else
-            {
-                p.drawLine(0, liteSplitLineHeight, opt.rect.width(), liteSplitLineHeight);//分界线
+            if (Normal == m_largeButtonType) {
+                p.drawLine(0, opt.rect.height()/2, opt.rect.width(), opt.rect.height()/2);      //分界线
+            }else{
+                p.drawLine(0, liteSplitLineHeight, opt.rect.width(), liteSplitLineHeight);      //分界线
             }
 
             p.restore();
         }else {
             if (m_mouseOnSubControl) {//此时鼠标在下半部分
-                if(Normal == m_largeButtonType){
+                if (Normal == m_largeButtonType) {
                     tool.rect.adjust(0, tool.rect.height()/2, 0, 0);
                 }else{
                     tool.rect.adjust(0, liteSplitLineHeight, 0, 0);
                 }
             }else {
-                if(Normal == m_largeButtonType){
+                if (Normal == m_largeButtonType) {
                     tool.rect.adjust(0, 0, 0, -tool.rect.height()/2);
                 }else{
                     tool.rect.adjust(0, 0, 0, -(tool.rect.height()-liteSplitLineHeight));
@@ -406,10 +406,10 @@ void SARibbonToolButton::paintLargeButton(QPaintEvent *e)
         p.setPen(m_borderColor);
         p.setBrush(Qt::NoBrush);
         p.drawRect(opt.rect.adjusted(1, 1, -1, -1));
-        if(Normal == m_largeButtonType){
-            p.drawLine(0, opt.rect.height()/2, opt.rect.width(), opt.rect.height()/2);//分界线
+        if (Normal == m_largeButtonType) {
+            p.drawLine(0, opt.rect.height()/2, opt.rect.width(), opt.rect.height()/2);      //分界线
         }else{
-            p.drawLine(0, liteSplitLineHeight, opt.rect.width(), liteSplitLineHeight);//分界线
+            p.drawLine(0, liteSplitLineHeight, opt.rect.width(), liteSplitLineHeight);      //分界线
         }
         p.restore();
     }
@@ -494,12 +494,11 @@ void SARibbonToolButton::drawIconAndLabel(QPainter& p, QStyleOptionToolButton& o
 #if SA_RIBBON_DEBUG_HELP_DRAW
                     HELP_DRAW_RECT(p, textRect);
 #endif
-                    if(Normal == m_largeButtonType){
+                    if (Normal == m_largeButtonType) {
                         alignment |= Qt::AlignHCenter | Qt::AlignTop;//文字是顶部对齐
                     }else{
                         alignment |= Qt::AlignCenter;
                     }
-
                 }else {
                     //文字在icon其他位置
                     //不支持此类设置
@@ -644,9 +643,10 @@ SARibbonToolButton::LargeButtonType SARibbonToolButton::largeButtonType() const
     return (m_largeButtonType);
 }
 
-int SARibbonToolButton::liteLargeButtonSplitLine(const QStyleOptionToolButton &opt) const
+
+int SARibbonToolButton::liteLargeButtonSplitLine(const QStyleOptionToolButton& opt) const
 {
-    return opt.rect.height()*0.55+2;
+    return (opt.rect.height()*0.55+2);
 }
 
 

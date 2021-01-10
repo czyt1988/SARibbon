@@ -7,27 +7,40 @@
 class SARibbonCategoryProxyPrivate;
 class SARibbonCategoryProxy;
 class QHBoxLayout;
-#define NOT_USE_LAYOUT    1
-///
-/// \brief 一项ribbon页
-///
+
+
+/**
+ * @brief 一项ribbon tab页
+ */
 class SA_RIBBON_EXPORT SARibbonCategory : public QWidget
 {
     Q_OBJECT
+    friend class SARibbonBar;
 public:
     SARibbonCategory(QWidget *parent);
     ~SARibbonCategory();
-    void setRibbonPannelLayoutMode(SARibbonPannel::PannelLayoutMode m);
+
     SARibbonPannel::PannelLayoutMode ribbonPannelLayoutMode() const;
+
     //添加pannel
     SARibbonPannel *addPannel(const QString& title);
+
+    //添加pannel
     void addPannel(SARibbonPannel *pannel);
+
+    //设置背景
     void setBackgroundBrush(const QBrush& brush);
+
+    //返回SARibbonCategory的代理
     SARibbonCategoryProxy *proxy();
     const SARibbonCategoryProxy *proxy() const;
+
+    //设置SARibbonCategory的代理
     void setProxy(SARibbonCategoryProxy *proxy);
 
 protected:
+    //设置pannel的模式
+    void setRibbonPannelLayoutMode(SARibbonPannel::PannelLayoutMode m);
     void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
     void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
 
