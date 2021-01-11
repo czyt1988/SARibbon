@@ -19,6 +19,7 @@
 #include "SARibbonCheckBox.h"
 #include "SARibbonQuickAccessBar.h"
 #include "SARibbonButtonGroupWidget.h"
+#include "SARibbonApplicationButton.h"
 #define PRINT_COST(ElapsedTimer, LastTime, STR)					      \
     do{									      \
         int ___TMP_INT = ElapsedTimer.elapsed();			      \
@@ -370,6 +371,19 @@ void MainWindow::createCategoryOther(SARibbonCategory *page)
 
     pannel->addOptionAction(optAct);
     pannel->setObjectName("debug");
+
+    pannel->addSeparator();
+    QAction *appBtn = new QAction(QIcon(":/icon/icon/icon2.png"), tr("no \napplication button"), this);
+
+    appBtn->setCheckable(true);
+    connect(appBtn, &QAction::triggered, this, [&](bool b) {
+        if (b) {
+            this->ribbonBar()->setApplitionButton(nullptr);
+        }else{
+            this->ribbonBar()->setApplitionButton(new SARibbonApplicationButton());
+        }
+    });
+    pannel->addLargeAction(appBtn);
 }
 
 

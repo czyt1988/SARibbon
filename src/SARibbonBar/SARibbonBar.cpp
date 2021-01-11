@@ -111,12 +111,15 @@ public:
         if (applitionButton) {
             delete applitionButton;
         }
-        applitionButton = btn;
-        if (applitionButton) {
-            applitionButton->move(0, RibbonSubElementStyleOpt.titleBarHight);
+        if (btn) {
+            if (btn->parent() != MainClass) {
+                btn->setParent(MainClass);
+            }
+            btn->move(0, RibbonSubElementStyleOpt.titleBarHight);
             MainClass->connect(applitionButton, &QAbstractButton::clicked
                 , MainClass, &SARibbonBar::applitionButtonClicked);
         }
+        applitionButton = btn;
     }
 
 
@@ -157,7 +160,7 @@ public:
 /**
  * @brief 判断样式是否为两行
  * @param s
- * @return
+ * @return 两行返回true，返回false代表当前是3行
  */
 bool SARibbonBar::isTwoRowStyle(SARibbonBar::RibbonStyle s)
 {
