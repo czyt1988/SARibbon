@@ -111,6 +111,7 @@ public:
         MinimumRibbonMode       ///< 缩小模式
         , NormalRibbonMode      ///< 正常模式
     };
+    //判断RibbonStyle是否为2行模式
     static bool isTwoRowStyle(RibbonStyle s);
     static bool isOfficeStyle(RibbonStyle s);
 
