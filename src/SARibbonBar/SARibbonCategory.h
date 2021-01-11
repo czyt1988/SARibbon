@@ -38,6 +38,10 @@ public:
     //设置SARibbonCategory的代理
     void setProxy(SARibbonCategoryProxy *proxy);
 
+    //返回所有的Pannel
+    const QList<SARibbonPannel *>& pannelList() const;
+    QList<SARibbonPannel *>& pannelList();
+
 protected:
     //设置pannel的模式
     void setRibbonPannelLayoutMode(SARibbonPannel::PannelLayoutMode m);
@@ -68,6 +72,10 @@ public:
     void setRibbonPannelLayoutMode(SARibbonPannel::PannelLayoutMode m);
     SARibbonPannel::PannelLayoutMode ribbonPannelLayoutMode() const;
     virtual void resizePannels(const QSize& categorySize);
+
+    //返回所有的Pannel
+    virtual const QList<SARibbonPannel *>& pannelList() const;
+    virtual QList<SARibbonPannel *>& pannelList();
 
 protected:
     int buildReduceModePannel(SARibbonPannel *realPannel, int x, int y);

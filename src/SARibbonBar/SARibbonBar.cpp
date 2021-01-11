@@ -185,19 +185,33 @@ SARibbonBar::SARibbonBar(QWidget *parent) : QMenuBar(parent)
     m_d->init();
     connect(parent, &QWidget::windowTitleChanged, this, &SARibbonBar::onWindowTitleChanged);
     connect(parent, &QWidget::windowIconChanged, this, &SARibbonBar::onWindowIconChanged);
-    setFixedHeight(mainBarHeight());
+    setRibbonStyle(OfficeStyle);
+    //setFixedHeight(mainBarHeight());
     //刷新界面
-    QApplication::postEvent(this, new QResizeEvent(size(), size()));
+    //QApplication::postEvent(this, new QResizeEvent(size(), size()));
 }
 
 
-QAbstractButton *SARibbonBar::applitionButton()
+/**
+ * @brief 返回applicationButton
+ * @return 默认的applicationButton是@sa SARibbonApplicationButton生成，通过@sa setApplicationButton 可设置为其他button
+ */
+QAbstractButton *SARibbonBar::applicationButton()
 {
     return (m_d->applitionButton);
 }
 
 
-void SARibbonBar::setApplitionButton(QAbstractButton *btn)
+/**
+ * @brief 设置applicationButton,如果想隐藏，可以传入nullptr
+ *
+ * 默认会有一个SARibbonApplicationButton，如果想取消，可传入nullptr，或者自定义的button也可以传入
+ *
+ * @note applicationButton的所有权归SARibbonBar所有，不要在外部对applicationButton进行delete操作
+ * @param btn applicationButton指针，可以传入@sa SARibbonApplicationButton，
+ * SA已经对SARibbonApplicationButton进行了样式设置
+ */
+void SARibbonBar::setApplicationButton(QAbstractButton *btn)
 {
     m_d->setApplitionButton(btn);
     if (btn) {
@@ -1057,13 +1071,6 @@ void SARibbonBar::moveEvent(QMoveEvent *event)
 
 void SARibbonBar::resizeInOfficeStyle()
 {
-//    RibbonStyle s = m_d->lastShowStyle;
-
-//    if (!SARibbonBar::isOfficeStyle(s)) {
-//        //强制设置为office style
-//        s = static_cast<RibbonStyle>(s & 0xFF00);
-//    }
-//    m_d->lastShowStyle = s;
     updateRibbonElementGeometry();
     int x = RibbonSubElementStyleOpt.widgetBord.left();
     int y = RibbonSubElementStyleOpt.widgetBord.top();

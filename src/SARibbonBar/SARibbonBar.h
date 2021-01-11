@@ -97,8 +97,8 @@ public:
      * @brief 定义ribbon的风格,第一字节代表样式，第二字节代表是否是2行
      */
     enum RibbonStyle {
-        OfficeStyle		= 0x00          ///< 类似office 的ribbon风格
-        , WpsLiteStyle		= 0x01          ///< 类似wps的紧凑风格
+        OfficeStyle		= 0x0000        ///< 类似office 的ribbon风格
+        , WpsLiteStyle		= 0x0001        ///< 类似wps的紧凑风格
         , OfficeStyleTwoRow	= 0x0100        ///< 类似office 的ribbon风格 2行工具栏 三行布局模式，office就是三行布局模式，pannel能布置3行小toolbutton，默认模式
         , WpsLiteStyleTwoRow	= 0x0101        ///< 类似wps的紧凑风格  2行工具栏
     };
@@ -118,10 +118,10 @@ public:
     SARibbonBar(QWidget *parent);
 
     //获取applitionButton
-    QAbstractButton *applitionButton();
+    QAbstractButton *applicationButton();
 
     //设置applitionButton
-    void setApplitionButton(QAbstractButton *btn);
+    void setApplicationButton(QAbstractButton *btn);
 
     //获取tabbar
     SARibbonTabBar *ribbonTabBar();
