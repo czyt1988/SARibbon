@@ -141,6 +141,26 @@ void SARibbonCategory::setProxy(SARibbonCategoryProxy *proxy)
 }
 
 
+/**
+ * @brief 返回Category下的所有pannel
+ * @return
+ */
+const QList<SARibbonPannel *>& SARibbonCategory::pannelList() const
+{
+    return (m_proxy->pannelList());
+}
+
+
+/**
+ * @brief 返回Category下的所有pannel
+ * @return
+ */
+QList<SARibbonPannel *>& SARibbonCategory::pannelList()
+{
+    return (m_proxy->pannelList());
+}
+
+
 void SARibbonCategory::resizeEvent(QResizeEvent *event)
 {
     proxy()->resizeEvent(event);
@@ -221,7 +241,7 @@ void SARibbonCategoryProxy::paintEvent(QPaintEvent *event)
 void SARibbonCategoryProxy::resizePannels(const QSize& categorySize)
 {
     int x = 1;
-    int y = 2;
+    int y = 1;
     //TODO 此处应有更好的处理方式 QUESTION[SARibbonCategoryLayout::setGeometry-1]
     QList<QPair<QWidget *, QRect> > expandingItem;  //记录所有伸展的条目
     QList<QPair<QWidget *, QRect> > widgetItems;    //记录所有当前显示的条目
@@ -233,6 +253,8 @@ void SARibbonCategoryProxy::resizePannels(const QSize& categorySize)
         SARibbonSeparatorWidget *separator = m_d->separatorLists[i];
         separator->setFixedHeight(categorySize.height());
         QSize widSize = pannel->sizeHint();
+        //在Category里的所有的窗体高度都和Category一致
+        widSize.setHeight(categorySize.height()-1);
         int nextX = x + widSize.width();
         if (nextX > categorySize.width()) {
             //说明超出边界
@@ -309,6 +331,18 @@ void SARibbonCategoryProxy::resizePannels(const QSize& categorySize)
         widgetItems[i].first->setGeometry(widgetItems[i].second);
     }
     //m_isChanged = false;
+}
+
+
+const QList<SARibbonPannel *>& SARibbonCategoryProxy::pannelList() const
+{
+    return (m_d->pannelLists);
+}
+
+
+QList<SARibbonPannel *>& SARibbonCategoryProxy::pannelList()
+{
+    return (m_d->pannelLists);
 }
 
 

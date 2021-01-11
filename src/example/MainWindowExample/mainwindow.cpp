@@ -41,7 +41,7 @@ MainWindow::MainWindow(QWidget *par) : SARibbonMainWindow(par)
     QFont f = ribbon->font();
     f.setFamily("微软雅黑");
     ribbon->setFont(f);
-    ribbon->applitionButton()->setText(QStringLiteral("File"));
+    ribbon->applicationButton()->setText(QStringLiteral("File"));
     SARibbonCategory *categoryMain = ribbon->addCategoryPage(QStringLiteral("Main"));
     PRINT_COST(cost, lastTimes, "new main page");
     createCategoryMain(categoryMain);
@@ -378,9 +378,9 @@ void MainWindow::createCategoryOther(SARibbonCategory *page)
     appBtn->setCheckable(true);
     connect(appBtn, &QAction::triggered, this, [&](bool b) {
         if (b) {
-            this->ribbonBar()->setApplitionButton(nullptr);
+            this->ribbonBar()->setApplicationButton(nullptr);
         }else{
-            this->ribbonBar()->setApplitionButton(new SARibbonApplicationButton());
+            this->ribbonBar()->setApplicationButton(new SARibbonApplicationButton());
         }
     });
     pannel->addLargeAction(appBtn);
