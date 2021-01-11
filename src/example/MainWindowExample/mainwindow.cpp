@@ -376,7 +376,7 @@ void MainWindow::createCategoryOther(SARibbonCategory *page)
     QAction *appBtn = new QAction(QIcon(":/icon/icon/icon2.png"), tr("no \napplication button"), this);
 
     appBtn->setCheckable(true);
-    connect(appBtn, &QAction::triggered, this, [&](bool b) {
+    connect(appBtn, &QAction::toggled, this, [&](bool b) {
         if (b) {
             this->ribbonBar()->setApplicationButton(nullptr);
         }else{

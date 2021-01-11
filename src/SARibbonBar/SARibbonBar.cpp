@@ -218,8 +218,11 @@ void SARibbonBar::setApplicationButton(QAbstractButton *btn)
         if (btn->objectName().isEmpty()) {
             btn->setObjectName(QStringLiteral("SARibbonApplitionButton"));
         }
+        btn->setVisible(true);
+        btn->setGeometry(applitionButtonGeometry());
     }
-    repaint();
+    //无论设置为什么都触发resize
+    QApplication::postEvent(this, new QResizeEvent(size(), size()));
 }
 
 
@@ -315,7 +318,7 @@ void SARibbonBar::showContextCategory(SARibbonContextCategory *context)
         m_d->ribbonTabBar->setTabData(index, QVariant((quint64)category));
     }
     m_d->currentShowingContextCategory.append(contextCategoryData);
-    if (currentRibbonStyle() == WpsLiteStyle) {
+    if (!isOfficeStyle()) {
         resizeInWpsLiteStyle();
     }
     repaint();
@@ -335,7 +338,7 @@ void SARibbonBar::hideContextCategory(SARibbonContextCategory *context)
             m_d->currentShowingContextCategory.removeAt(i);
         }
     }
-    if (currentRibbonStyle() == WpsLiteStyle) {
+    if (!isOfficeStyle()) {
         resizeInWpsLiteStyle();
     }
     repaint();
@@ -346,6 +349,7 @@ void SARibbonBar::hideContextCategory(SARibbonContextCategory *context)
  * @brief 判断上下文是否在显示状态
  * @param context
  * @return 在显示状态返回true
+ * @sa setContextCategoryVisible
  */
 bool SARibbonBar::isContextCategoryVisible(SARibbonContextCategory *context)
 {
@@ -353,6 +357,13 @@ bool SARibbonBar::isContextCategoryVisible(SARibbonContextCategory *context)
 }
 
 
+/**
+ * @brief 设置上下文标签的显示状态
+ *
+ * 上下文标签的当前显示状态可通过 @sa isContextCategoryVisible 进行判断
+ * @param context 上下文标签
+ * @param visible 显示状态，true为显示
+ */
 void SARibbonBar::setContextCategoryVisible(SARibbonContextCategory *context, bool visible)
 {
     if (visible) {
