@@ -36,13 +36,13 @@ public:
     void setLargeButtonType(LargeButtonType type);
     LargeButtonType largeButtonType() const;
 
-	static int LargeButtonSize;
-	static int SmallButtonSize;
     //lite模式下的分割线
-    virtual int liteLargeButtonSplitLine(const QStyleOptionToolButton& opt) const;
+    virtual int liteLargeButtonSplitLine(int buttonHeight) const;
+
 protected:
     void calcIconRect(const QStyleOptionToolButton& opt);
-    QRect calcTextRect(const QStyleOptionToolButton& opt);
+    QRect calcTextRect(const QStyleOptionToolButton& opt) const;
+    QRect calcTextRect(const QRect& buttonRect) const;
     QRect calcIndicatorArrowDownRect(const QStyleOptionToolButton& opt);
     QPixmap createIconPixmap(const QStyleOptionToolButton& opt);
     bool event(QEvent *e) Q_DECL_OVERRIDE;
@@ -56,7 +56,7 @@ protected:
     virtual void paintLargeButton(QPaintEvent *e);
     virtual void paintSmallButton(QPaintEvent *e);
     virtual bool hitButton(const QPoint& pos) const Q_DECL_OVERRIDE;
-
+    virtual QSize sizeHint() const Q_DECL_OVERRIDE;
     virtual void drawIconAndLabel(QPainter& p, QStyleOptionToolButton& opt);
 
 private:

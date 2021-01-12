@@ -171,7 +171,7 @@ bool SARibbonBar::isTwoRowStyle(SARibbonBar::RibbonStyle s)
 /**
  * @brief 判断是否是office样式
  * @param s
- * @return
+ * @return Office样式返回true，否则就是wps样式
  */
 bool SARibbonBar::isOfficeStyle(SARibbonBar::RibbonStyle s)
 {
@@ -179,6 +179,10 @@ bool SARibbonBar::isOfficeStyle(SARibbonBar::RibbonStyle s)
 }
 
 
+/**
+ * @brief SARibbonBar构造函数
+ * @param parent
+ */
 SARibbonBar::SARibbonBar(QWidget *parent) : QMenuBar(parent)
     , m_d(new SARibbonBarPrivate(this))
 {
@@ -194,7 +198,7 @@ SARibbonBar::SARibbonBar(QWidget *parent) : QMenuBar(parent)
 
 /**
  * @brief 返回applicationButton
- * @return 默认的applicationButton是@sa SARibbonApplicationButton生成，通过@sa setApplicationButton 可设置为其他button
+ * @return 默认的applicationButton是@ref SARibbonApplicationButton 生成，通过@ref setApplicationButton 可设置为其他button
  */
 QAbstractButton *SARibbonBar::applicationButton()
 {
@@ -208,7 +212,7 @@ QAbstractButton *SARibbonBar::applicationButton()
  * 默认会有一个SARibbonApplicationButton，如果想取消，可传入nullptr，或者自定义的button也可以传入
  *
  * @note applicationButton的所有权归SARibbonBar所有，不要在外部对applicationButton进行delete操作
- * @param btn applicationButton指针，可以传入@sa SARibbonApplicationButton，
+ * @param btn applicationButton指针，可以传入@ref SARibbonApplicationButton，
  * SA已经对SARibbonApplicationButton进行了样式设置
  */
 void SARibbonBar::setApplicationButton(QAbstractButton *btn)
@@ -226,18 +230,23 @@ void SARibbonBar::setApplicationButton(QAbstractButton *btn)
 }
 
 
+/**
+ * @brief 返回tabbar
+ * @return SARibbonTabBar指针
+ * @sa SARibbonTabBar
+ */
 SARibbonTabBar *SARibbonBar::ribbonTabBar()
 {
     return (m_d->ribbonTabBar);
 }
 
 
-///
-/// \brief 添加一个标签
-/// \param title 标签名字
-/// \return 返回一个窗口容器，在Category里可以添加其他控件
-/// \see SARibbonCategory
-///
+/**
+ * @brief 添加一个标签
+ * @param title 标签名字
+ * @return 返回一个窗口容器，在Category里可以添加其他控件
+ * @sa SARibbonCategory
+ */
 SARibbonCategory *SARibbonBar::addCategoryPage(const QString& title)
 {
     SARibbonCategory *catagory = RibbonSubElementDelegate->createRibbonCategory(this);
@@ -360,7 +369,7 @@ bool SARibbonBar::isContextCategoryVisible(SARibbonContextCategory *context)
 /**
  * @brief 设置上下文标签的显示状态
  *
- * 上下文标签的当前显示状态可通过 @sa isContextCategoryVisible 进行判断
+ * 上下文标签的当前显示状态可通过 @ref isContextCategoryVisible 进行判断
  * @param context 上下文标签
  * @param visible 显示状态，true为显示
  */
@@ -615,7 +624,7 @@ SARibbonQuickAccessBar *SARibbonBar::quickAccessBar()
  * @brief 设置ribbonbar的风格，此函数会重新设置所有元素，包括button的布局方式，
  * 尤其是从三行变到两行的过程，重设的内容较多
  * @note 此函数会自动触发ResizeEvent，不需要手动调用
- * @param v 样式，见@sa SARibbonBar::RibbonStyle
+ * @param v 样式，见@ref SARibbonBar::RibbonStyle
  */
 void SARibbonBar::setRibbonStyle(SARibbonBar::RibbonStyle v)
 {

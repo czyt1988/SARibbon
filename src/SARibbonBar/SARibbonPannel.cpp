@@ -458,7 +458,7 @@ void SARibbonPannel::addWidget(QWidget *w, int row, int rowSpan)
  * @param w
  * @param row gridlayout的行数，pannel的gridllayout一共有6行用于分割
  * @param rowSpan 窗口所占的行数，类似QGridLayout的rowSpan
- * @param column 列位置，使用前先用 @sa gridLayoutColumnCount 返回当前的列数
+ * @param column 列位置，使用前先用 @ref gridLayoutColumnCount 返回当前的列数
  * @param columnSpan 窗口所占的列数，类似QGridLayout的columnSpan
  */
 void SARibbonPannel::addWidget(QWidget *w, int row, int rowSpan, int column, int columnSpan)

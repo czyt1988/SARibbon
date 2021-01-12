@@ -9,8 +9,6 @@
 #include <QMouseEvent>
 #include "SARibbonDrawHelper.h"
 #include "QCursor"
-int SARibbonToolButton::LargeButtonSize = 78;
-int SARibbonToolButton::SmallButtonSize = 24;
 
 #ifdef SA_RIBBON_DEBUG_HELP_DRAW
 #define HELP_DRAW_RECT(p, rect)	      \
@@ -318,7 +316,7 @@ void SARibbonToolButton::paintLargeButton(QPaintEvent *e)
 //绘制背景
     QStyleOption tool(0);
     tool.palette = opt.palette;
-    int liteSplitLineHeight = liteLargeButtonSplitLine(opt);
+    int liteSplitLineHeight = liteLargeButtonSplitLine(opt.rect.height());
 
     if ((opt.subControls & QStyle::SC_ToolButton)
         &&
@@ -439,6 +437,43 @@ bool SARibbonToolButton::hitButton(const QPoint& pos) const
 }
 
 
+QSize SARibbonToolButton::sizeHint() const
+{
+    QSize s = QToolButton::sizeHint();
+    QString objName = "DelayedPopup checkable";
+
+    if (LargeButton == buttonType()) {
+        //计算最佳大小
+        if (objName == objectName()) {
+            qDebug() << " ===  " << objName << ":" << s;
+        }
+        if (s.width() > s.height()*1.4) {
+            //文本对齐方式
+            int alignment = Qt::TextShowMnemonic | Qt::TextWordWrap;
+            //如果宽度大于高度，就看看换行是否能满足
+            QFontMetrics fm = fontMetrics();
+            //计算默认的文本区域
+            QRect textRange = calcTextRect(QRect(0, 0, s.width()/2, s.height()));
+            textRange.moveTo(0, 0);
+            if (objName == objectName()) {
+                qDebug() << " ===  " << objName << " origin textRange:" << textRange;
+            }
+            //计算换行后的最大文本区域
+            textRange = fm.boundingRect(textRange, alignment, text());
+            //把区域设置给size
+            s.setWidth(textRange.width()+4);
+            if (objName == objectName()) {
+                qDebug() << " ===  " << objName << " textRange:" << textRange;
+            }
+        }
+    }
+    if (objName == objectName()) {
+        qDebug() << " ===  " << objName << " new:" << s;
+    }
+    return (s);
+}
+
+
 /**
  * @brief SARibbonToolButton::drawIconAndLabel
  *
@@ -462,8 +497,8 @@ void SARibbonToolButton::drawIconAndLabel(QPainter& p, QStyleOptionToolButton& o
         QRect textRect = calcTextRect(opt);
         bool hasArrow = opt.features & QStyleOptionToolButton::Arrow;
         if (((!hasArrow && opt.icon.isNull()) && !opt.text.isEmpty()) ||
-            (opt.toolButtonStyle == Qt::ToolButtonTextOnly)) {          //没有箭头 且 没图标 有文字 || 只有文字模式
-            int alignment = Qt::AlignCenter | Qt::TextShowMnemonic; //纯文本下，居中对齐
+            (opt.toolButtonStyle == Qt::ToolButtonTextOnly)) {                                  //没有箭头 且 没图标 有文字 || 只有文字模式
+            int alignment = Qt::AlignCenter | Qt::TextShowMnemonic | Qt::TextWordWrap;      //纯文本下，居中对齐,换行
             if (!style()->styleHint(QStyle::SH_UnderlineShortcut, &opt, this)) {
                 alignment |= Qt::TextHideMnemonic;
             }
@@ -475,7 +510,7 @@ void SARibbonToolButton::drawIconAndLabel(QPainter& p, QStyleOptionToolButton& o
             if (opt.toolButtonStyle != Qt::ToolButtonIconOnly) {
                 //文本加图标情况
                 p.setFont(opt.font);
-                int alignment = Qt::TextShowMnemonic;
+                int alignment = Qt::TextShowMnemonic | Qt::TextWordWrap; // 换行
                 if (!style()->styleHint(QStyle::SH_UnderlineShortcut, &opt, this)) {
                     alignment |= Qt::TextHideMnemonic;
                 }
@@ -615,11 +650,10 @@ void SARibbonToolButton::setButtonType(const RibbonButtonType& buttonType)
 {
     m_buttonType = buttonType;
     if (LargeButton == buttonType) {
-		setFixedHeight(LargeButtonSize);
         setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-		setIconSize(QSize(SARibbonToolButton::LargeButtonSize / 2, SARibbonToolButton::LargeButtonSize / 2));
+        setIconSize(QSize(32, 32));
+        setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Expanding);
     }else {
-		setFixedHeight(SmallButtonSize);
         setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     }
     setMouseTracking(true);
@@ -644,9 +678,9 @@ SARibbonToolButton::LargeButtonType SARibbonToolButton::largeButtonType() const
 }
 
 
-int SARibbonToolButton::liteLargeButtonSplitLine(const QStyleOptionToolButton& opt) const
+int SARibbonToolButton::liteLargeButtonSplitLine(int buttonHeight) const
 {
-    return (opt.rect.height()*0.55+2);
+    return (buttonHeight*0.55+2);
 }
 
 
@@ -690,7 +724,7 @@ void SARibbonToolButton::calcIconRect(const QStyleOptionToolButton& opt)
  * @param opt
  * @return
  */
-QRect SARibbonToolButton::calcTextRect(const QStyleOptionToolButton& opt)
+QRect SARibbonToolButton::calcTextRect(const QStyleOptionToolButton& opt) const
 {
     QRect rect;
     int shiftX = 0;
@@ -707,7 +741,7 @@ QRect SARibbonToolButton::calcTextRect(const QStyleOptionToolButton& opt)
             if (Normal == m_largeButtonType) {
                 rect.adjust(1, opt.rect.height()/2, -1, -10);//预留8px绘制箭头，1px的上下边界
             }else if (Lite == m_largeButtonType) {
-                rect.adjust(1, liteLargeButtonSplitLine(opt), -10, -1);
+                rect.adjust(1, liteLargeButtonSplitLine(opt.rect.height()), -10, -1);
             }
         }
     }else {
@@ -716,6 +750,24 @@ QRect SARibbonToolButton::calcTextRect(const QStyleOptionToolButton& opt)
         }
     }
     rect.translate(shiftX, shiftY);
+    return (rect);
+}
+
+
+QRect SARibbonToolButton::calcTextRect(const QRect& buttonRect) const
+{
+    QRect rect;
+
+    if (LargeButton == m_buttonType) {
+        rect = buttonRect;
+        if (Normal == m_largeButtonType) {
+            rect.adjust(1, buttonRect.height()/2, -1, -10);//预留8px绘制箭头，1px的上下边界
+        }else if (Lite == m_largeButtonType) {
+            rect.adjust(1, liteLargeButtonSplitLine(buttonRect.height()), -10, -1);
+        }
+    }else {
+        rect = buttonRect.adjusted(m_iconRect.width(), 0, -1, 0);
+    }
     return (rect);
 }
 
@@ -734,7 +786,7 @@ QRect SARibbonToolButton::calcIndicatorArrowDownRect(const QStyleOptionToolButto
         if (Normal == m_largeButtonType) {
             rect.adjust(1, rect.height()-10, 1, 1);
         }else {
-            rect.adjust(rect.width()-10, liteLargeButtonSplitLine(opt), 1, 1);
+            rect.adjust(rect.width()-10, liteLargeButtonSplitLine(opt.rect.height()), 1, 1);
         }
     }else {
         rect.adjust(rect.width()-10, 1, 1, 1);
