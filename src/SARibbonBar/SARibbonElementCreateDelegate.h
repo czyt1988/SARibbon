@@ -21,7 +21,7 @@ class SARibbonQuickAccessBar;
 
 /**
  * @brief 定义了saribbon所有尺寸相关信息，saribbon的建立都基于此类的尺寸，如果想调整，
- * 可以重载 @sa SARibbonElementCreateDelegate 的 @sa getRibbonStyleOption 函数
+ * 可以重载 @ref SARibbonElementCreateDelegate 的 @ref getRibbonStyleOption 函数
  * 会重新
  */
 class SA_RIBBON_EXPORT SARibbonStyleOption {

@@ -23,7 +23,7 @@ class SARibbonQuickAccessBar;
  * void setRibbonStyle(RibbonStyle v);
  * @endcode
  *
- * SARibbonBar参考office和wps，提供了四种风格的Ribbon模式,@sa RibbonStyle
+ * SARibbonBar参考office和wps，提供了四种风格的Ribbon模式,@ref SARibbonBar::RibbonStyle
  *
  * 如果想ribbon占用的空间足够小，WpsLiteStyleTwoRow模式能比OfficeStyle节省35%的高度空间
  *
@@ -49,8 +49,8 @@ class SARibbonQuickAccessBar;
  * 再把QAction设置进QMenu和QToolBar中
  *
  * SARibbonBar和传统方法相似，不过相对于传统的Menu/ToolBar QMenu和QToolBar是平级的，
- * Ribbon是有明显的层级关系，SARibbonBar下面是 @sa SARibbonCategory，
- * SARibbonCategory下面是@sa SARibbonPannel，SARibbonPannel下面是@sa SARibbonToolButton，
+ * Ribbon是有明显的层级关系，SARibbonBar下面是 @ref SARibbonCategory，
+ * SARibbonCategory下面是@ref SARibbonPannel ，SARibbonPannel下面是@ref SARibbonToolButton ，
  * SARibbonToolButton管理着QAction
  *
  * 因此，生成一个ribbon只需以下几个函数：
@@ -113,9 +113,12 @@ public:
     };
     //判断RibbonStyle是否为2行模式
     static bool isTwoRowStyle(RibbonStyle s);
+
+    //判断是否是office样式
     static bool isOfficeStyle(RibbonStyle s);
 
-    SARibbonBar(QWidget *parent);
+    //构造函数
+    SARibbonBar(QWidget *parent = nullptr);
 
     //获取applitionButton
     QAbstractButton *applicationButton();

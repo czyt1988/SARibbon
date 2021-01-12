@@ -70,7 +70,7 @@ SARibbonCategory::~SARibbonCategory()
 /**
  * @brief 设置pannel的模式
  *
- * 在@sa SARibbonBar调用@sa SARibbonBar::setRibbonStyle 函数时，会对所有的SARibbonCategory调用此函数
+ * 在@ref SARibbonBar 调用@ref SARibbonBar::setRibbonStyle 函数时，会对所有的SARibbonCategory调用此函数
  * 把新的SARibbonPannel::PannelLayoutMode设置进去
  * @param m
  */
@@ -268,6 +268,7 @@ void SARibbonCategoryProxy::resizePannels(const QSize& categorySize)
             pannel->setParent(ribbonCategory()->parentWidget());
             SARibbonCategoryProxyPrivate::ReduceActionInfo reduceInfo = m_d->m_pannelReduceInfo.value(pannel);
             QSize reducePannelSize = reduceInfo.reduceModeShowPannel->sizeHint();
+            reducePannelSize.setHeight(categorySize.height()-1);
             reduceInfo.reduceModeShowPannel->setVisible(true);
             widgetItems.append(qMakePair(reduceInfo.reduceModeShowPannel, QRect(x, y, reducePannelSize.width(), reducePannelSize.height())));
             x = x + reducePannelSize.width();
@@ -355,7 +356,7 @@ SARibbonCategory *SARibbonCategoryProxy::ribbonCategory()
 /**
  * @brief 设置pannel的模式
  *
- * 在@sa SARibbonBar调用@sa SARibbonBar::setRibbonStyle 函数时，会对所有的SARibbonCategory调用此函数
+ * 在@ref SARibbonBar调用@ref SARibbonBar::setRibbonStyle 函数时，会对所有的SARibbonCategory调用此函数
  * 把新的SARibbonPannel::PannelLayoutMode设置进去
  *
  * 此函数为SARibbonCategory::setRibbonPannelLayoutMode的代理，
