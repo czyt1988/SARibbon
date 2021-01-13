@@ -4,6 +4,7 @@
 #include <QWidget>
 #include "SARibbonPannel.h"
 #include <QScopedPointer>
+#include <QPushButton>
 class SARibbonCategoryProxyPrivate;
 class SARibbonCategoryProxy;
 class QHBoxLayout;
@@ -84,18 +85,42 @@ public:
     void setRibbonPannelLayoutMode(SARibbonPannel::PannelLayoutMode m);
     SARibbonPannel::PannelLayoutMode ribbonPannelLayoutMode() const;
     virtual void resizePannels(const QSize& categorySize);
+    virtual void resizePannels();
 
     //返回所有的Pannel
     virtual const QList<SARibbonPannel *>& pannelList() const;
     virtual QList<SARibbonPannel *>& pannelList();
 
-protected:
-    virtual bool isReduce(SARibbonPannel *pannle);
-    int buildReduceModePannel(SARibbonPannel *realPannel, int x, int y);
-    static QPoint calcPopupPannelPosition(SARibbonCategory *category, SARibbonPannel *pannel, int x);
+    virtual bool eventFilter(QObject *watched, QEvent *event) override;
+
+public slots:
+    virtual void onLeftScrollButtonClicked();
+    virtual void onRightScrollButtonClicked();
+
+private:
+    //获取category所有窗口的尺寸
+    QList<QPair<QWidget *, QSize> > allVisibleCategoryWidgetSizes() const;
 
 private:
     SARibbonCategoryProxyPrivate *m_d;
+};
+
+/**
+ * @brief SARibbonCategory无法完全显示时，显示的调整按钮
+ *
+ * 重新定义是为了防止被外部的样式影响
+ */
+class SA_RIBBON_EXPORT SARibbonCategoryScrollButton : public QPushButton
+{
+    Q_OBJECT
+public:
+    using QPushButton::QPushButton;
+    SARibbonCategoryScrollButton(Qt::ArrowType arr, QWidget *p = nullptr);
+protected:
+    virtual void paintEvent(QPaintEvent *e) override;
+
+private:
+    Qt::ArrowType m_arrType;
 };
 
 #endif // SARIBBONCATEGORY_H
