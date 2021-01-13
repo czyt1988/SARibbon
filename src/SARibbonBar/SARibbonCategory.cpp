@@ -89,9 +89,10 @@ SARibbonPannel::PannelLayoutMode SARibbonCategory::ribbonPannelLayoutMode() cons
 /**
  * @brief 添加pannel
  *
- * @note SARibbonPannel* 由SARibbonCategory来管理，请不要在外部对其进行销毁
+ * @note pannel的所有权由SARibbonCategory来管理，请不要在外部对其进行销毁
  * @param title pannel的标题，在office/wps的三行模式下会显示在pannel的下方
- * @return
+ * @return 返回生成的@ref SARibbonPannel 指针
+ * @see 对SARibbonPannel的其他操作，参考 @ref SARibbonCategory::takePannel
  */
 SARibbonPannel *SARibbonCategory::addPannel(const QString& title)
 {
@@ -99,9 +100,44 @@ SARibbonPannel *SARibbonCategory::addPannel(const QString& title)
 }
 
 
+/**
+ * @brief 添加pannel
+ * @param pannel的所有权SARibbonCategory来管理
+ */
 void SARibbonCategory::addPannel(SARibbonPannel *pannel)
 {
     proxy()->addPannel(pannel);
+}
+
+
+/**
+ * @brief 把pannel脱离SARibbonCategory的管理
+ * @param 需要提取的pannel
+ * @return 成功返回true，否则返回false
+ */
+bool SARibbonCategory::takePannel(SARibbonPannel *pannel)
+{
+    return (proxy()->takePannel(pannel));
+}
+
+
+/**
+ * @brief 移除Pannel，Category会直接回收SARibbonPannel内存
+ * @param pannel 需要移除的pannel
+ * @note 移除后pannel为野指针，一般操作完建议把pannel指针设置为nullptr
+ *
+ * 此操作等同于：
+ *
+ * @code
+ * SARibbonPannel* pannel;
+ * ...
+ * category->takePannel(pannel);
+ * delete pannel;
+ * @endcode
+ */
+bool SARibbonCategory::removePannel(SARibbonPannel *pannel)
+{
+    return (proxy()->removePannel(pannel));
 }
 
 
@@ -216,6 +252,33 @@ void SARibbonCategoryProxy::addPannel(SARibbonPannel *pannel)
 }
 
 
+bool SARibbonCategoryProxy::takePannel(SARibbonPannel *pannel)
+{
+    if (m_d->pannelLists.removeOne(pannel)) {
+        return (true);
+    }
+    //还有一种可能，此时pannel处于缩减状态
+    auto i = m_d->m_pannelReduceInfo.find(pannel);
+
+    if (i != m_d->m_pannelReduceInfo.end()) {
+        SARibbonCategoryProxyPrivate::ReduceActionInfo info = m_d->m_pannelReduceInfo.take(pannel);
+        info.release();
+        return (true);
+    }
+    return (false);
+}
+
+
+bool SARibbonCategoryProxy::removePannel(SARibbonPannel *pannel)
+{
+    if (takePannel(pannel)) {
+        delete pannel;
+        return (true);
+    }
+    return (false);
+}
+
+
 void SARibbonCategoryProxy::setBackgroundBrush(const QBrush& brush)
 {
     QPalette p = ribbonCategory()->palette();
@@ -240,6 +303,9 @@ void SARibbonCategoryProxy::paintEvent(QPaintEvent *event)
 
 void SARibbonCategoryProxy::resizePannels(const QSize& categorySize)
 {
+#ifdef SA_RIBBON_DEBUG_HELP_DRAW
+    qDebug() << "SARibbonCategoryProxy::resizePannels";
+#endif
     int x = 1;
     int y = 1;
     //TODO 此处应有更好的处理方式 QUESTION[SARibbonCategoryLayout::setGeometry-1]
@@ -255,6 +321,7 @@ void SARibbonCategoryProxy::resizePannels(const QSize& categorySize)
         QSize widSize = pannel->sizeHint();
         //在Category里的所有的窗体高度都和Category一致
         widSize.setHeight(categorySize.height()-1);
+
         int nextX = x + widSize.width();
         if (nextX > categorySize.width()) {
             //说明超出边界
@@ -265,6 +332,7 @@ void SARibbonCategoryProxy::resizePannels(const QSize& categorySize)
                 buildReduceModePannel(pannel, x, y);
             }
             pannel->setReduce(true);
+            //此时的parent要设置为mainwindow
             pannel->setParent(ribbonCategory()->parentWidget());
             SARibbonCategoryProxyPrivate::ReduceActionInfo reduceInfo = m_d->m_pannelReduceInfo.value(pannel);
             QSize reducePannelSize = reduceInfo.reduceModeShowPannel->sizeHint();
@@ -278,11 +346,22 @@ void SARibbonCategoryProxy::resizePannels(const QSize& categorySize)
             QSize separatorSize = separator->sizeHint();
             widgetItems.append(qMakePair(separator, QRect(x, y, separatorSize.width(), separatorSize.height())));
             x = x + separatorSize.width();
+#ifdef SA_RIBBON_DEBUG_HELP_DRAW
+            qDebug()	<< QStringLiteral("超长的pannel，建立了Reduce模式：")<< pannel->windowTitle()
+                    << " x:" << x
+                    << " y:" << y
+                    << " size:" << widSize
+            ;
+#endif
         }else {
-            if (pannel->parentWidget() != ribbonCategory()) {
-                pannel->setParent(ribbonCategory());
+            if (pannel->isReduce()) {
+                if (pannel->parentWidget() != ribbonCategory()) {
+                    pannel->setParent(ribbonCategory());
+                }
+                pannel->setReduce(false);
+                pannel->setVisible(true);
             }
-            pannel->setReduce(false);
+
             if (m_d->m_pannelReduceInfo.contains(pannel)) {
                 //把reduce信息删除
                 m_d->m_pannelReduceInfo[pannel].release();
@@ -291,11 +370,13 @@ void SARibbonCategoryProxy::resizePannels(const QSize& categorySize)
             if (pannel->isExpanding()) {
                 expandingItem.append(qMakePair(pannel, QRect(x, y, widSize.width(), widSize.height())));
             }
-
-
-            if (!(pannel->isVisible())) {
-                pannel->setVisible(true);
-            }
+#ifdef SA_RIBBON_DEBUG_HELP_DRAW
+            qDebug()	<< QStringLiteral("正常的pannel：")<< pannel->windowTitle()
+                    << " x:" << x
+                    << " y:" << y
+                    << " size:" << widSize
+            ;
+#endif
             widgetItems.append(qMakePair(pannel, QRect(x, y, widSize.width(), widSize.height())));
             x = nextX;
             separator->setVisible(true);
@@ -344,6 +425,12 @@ const QList<SARibbonPannel *>& SARibbonCategoryProxy::pannelList() const
 QList<SARibbonPannel *>& SARibbonCategoryProxy::pannelList()
 {
     return (m_d->pannelLists);
+}
+
+
+bool SARibbonCategoryProxy::isReduce(SARibbonPannel *pannle)
+{
+    return (m_d->m_pannelReduceInfo.contains(pannle));
 }
 
 
@@ -405,8 +492,10 @@ int SARibbonCategoryProxy::buildReduceModePannel(SARibbonPannel *realPannel, int
         Q_UNUSED(on);
         int pannelX = info.reduceModeShowPannel->geometry().x();
         QPoint pos = SARibbonCategoryProxy::calcPopupPannelPosition(categoryPage, info.realShowPannel, pannelX);
+#ifdef SA_RIBBON_DEBUG_HELP_DRAW
         //qDebug() << "pannelX:" << pannelX << " pos:" <<pos;
         //info.realShowPannel->move(pos);
+#endif
         info.realShowPannel->setReduce(true);
         info.realShowPannel->setGeometry(pos.x(), pos.y(), info.realShowPannel->sizeHint().width(), info.realShowPannel->sizeHint().height());
         info.realShowPannel->show();

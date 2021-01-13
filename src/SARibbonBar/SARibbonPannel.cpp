@@ -581,6 +581,12 @@ void SARibbonPannel::setReduce(bool isReduce)
 }
 
 
+bool SARibbonPannel::isReduce() const
+{
+    return (windowFlags() & Qt::Popup);
+}
+
+
 void SARibbonPannel::setExpanding(bool isExpanding)
 {
     setSizePolicy(isExpanding ? QSizePolicy::Expanding : QSizePolicy::Preferred

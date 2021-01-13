@@ -28,6 +28,12 @@ public:
     //添加pannel
     void addPannel(SARibbonPannel *pannel);
 
+    //把pannel从Category中移除，不会销毁，此时pannel的所有权归还操作者
+    bool takePannel(SARibbonPannel *pannel);
+
+    //移除Pannel，Category会直接回收SARibbonPannel内存
+    bool removePannel(SARibbonPannel *pannel);
+
     //设置背景
     void setBackgroundBrush(const QBrush& brush);
 
@@ -65,6 +71,12 @@ public:
 
     virtual SARibbonPannel *addPannel(const QString& title);
     virtual void addPannel(SARibbonPannel *pannel);
+
+    //把pannel从Category中移除，不会销毁，此时pannel的所有权归还操作者
+    bool takePannel(SARibbonPannel *pannel);
+
+    //移除Pannel，Category会直接回收SARibbonPannel内存
+    bool removePannel(SARibbonPannel *pannel);
     virtual void setBackgroundBrush(const QBrush& brush);
     virtual void resizeEvent(QResizeEvent *event);
     virtual void paintEvent(QPaintEvent *event);
@@ -78,6 +90,7 @@ public:
     virtual QList<SARibbonPannel *>& pannelList();
 
 protected:
+    virtual bool isReduce(SARibbonPannel *pannle);
     int buildReduceModePannel(SARibbonPannel *realPannel, int x, int y);
     static QPoint calcPopupPannelPosition(SARibbonCategory *category, SARibbonPannel *pannel, int x);
 
