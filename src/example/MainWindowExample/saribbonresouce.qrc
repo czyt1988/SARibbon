@@ -11,5 +11,11 @@
         <file>icon/layerBarChart.png</file>
         <file>icon/openProject.png</file>
         <file>icon/icon2.png</file>
+        <file>icon/529398.png</file>
+        <file>icon/530120.png</file>
+        <file>icon/530150.png</file>
+        <file>icon/530767.png</file>
+        <file>icon/arror.png</file>
+        <file>icon/warning.png</file>
     </qresource>
 </RCC>
