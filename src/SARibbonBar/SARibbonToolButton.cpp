@@ -293,7 +293,7 @@ void SARibbonToolButton::paintLargeButton(QPaintEvent *e)
 
     bool autoRaise = opt.state & QStyle::State_AutoRaise;
 
-#if 0
+#if 1
     QStyle::State bflags = opt.state;
 #else
     QStyle::State bflags = opt.state & ~QStyle::State_Sunken;
@@ -321,6 +321,7 @@ void SARibbonToolButton::paintLargeButton(QPaintEvent *e)
     if ((opt.subControls & QStyle::SC_ToolButton)
         &&
         (opt.features & QStyleOptionToolButton::MenuButtonPopup)) {
+        //此时按钮的菜单弹出
         tool.rect = opt.rect;
         tool.state = bflags;
         if (opt.activeSubControls &= QStyle::SC_ToolButtonMenu) {
@@ -374,6 +375,7 @@ void SARibbonToolButton::paintLargeButton(QPaintEvent *e)
     }else if ((opt.subControls & QStyle::SC_ToolButton) &&
         (opt.features & QStyleOptionToolButton::HasMenu)
         ) {
+        //按钮含有菜单
         tool.rect = opt.rect;
         tool.state = bflags;
         if (autoRaise) {
@@ -440,13 +442,9 @@ bool SARibbonToolButton::hitButton(const QPoint& pos) const
 QSize SARibbonToolButton::sizeHint() const
 {
     QSize s = QToolButton::sizeHint();
-    QString objName = "DelayedPopup checkable";
 
     if (LargeButton == buttonType()) {
         //计算最佳大小
-        if (objName == objectName()) {
-            qDebug() << " ===  " << objName << ":" << s;
-        }
         if (s.width() > s.height()*1.4) {
             //文本对齐方式
             int alignment = Qt::TextShowMnemonic | Qt::TextWordWrap;
@@ -455,9 +453,6 @@ QSize SARibbonToolButton::sizeHint() const
             //计算默认的文本区域
             QRect textRange = calcTextRect(QRect(0, 0, s.width()/2, s.height()));
             textRange.moveTo(0, 0);
-            if (objName == objectName()) {
-                qDebug() << " ===  " << objName << " origin textRange:" << textRange;
-            }
             //计算换行后的最大文本区域
             textRange = fm.boundingRect(textRange, alignment, text());
             //把区域设置给size
@@ -470,13 +465,7 @@ QSize SARibbonToolButton::sizeHint() const
                     s.rwidth() += 10;
                 }
             }
-            if (objName == objectName()) {
-                qDebug() << " ===  " << objName << " textRange:" << textRange;
-            }
         }
-    }
-    if (objName == objectName()) {
-        qDebug() << " ===  " << objName << " new:" << s;
     }
     return (s);
 }
