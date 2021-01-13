@@ -42,7 +42,7 @@ public:
 protected:
     void calcIconRect(const QStyleOptionToolButton& opt);
     QRect calcTextRect(const QStyleOptionToolButton& opt) const;
-    QRect calcTextRect(const QRect& buttonRect) const;
+    QRect calcTextRect(const QRect& buttonRect, bool hasMenu = false) const;
     QRect calcIndicatorArrowDownRect(const QStyleOptionToolButton& opt);
     QPixmap createIconPixmap(const QStyleOptionToolButton& opt);
     bool event(QEvent *e) Q_DECL_OVERRIDE;
