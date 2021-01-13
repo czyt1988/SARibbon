@@ -388,7 +388,9 @@ int SARibbonCategoryProxy::buildReduceModePannel(SARibbonPannel *realPannel, int
     SARibbonCategoryProxyPrivate::ReduceActionInfo info;
 
     info.realShowPannel = realPannel;
-    SARibbonPannel *reducePannel = new SARibbonPannel(categoryPage);
+    SARibbonPannel *reducePannel = RibbonSubElementDelegate->createRibbonPannel(categoryPage);
+
+    reducePannel->setPannelLayoutMode(ribbonPannelLayoutMode());
 
     reducePannel->setWindowTitle(realPannel->windowTitle());
     reducePannel->setWindowIcon(realPannel->windowIcon());
