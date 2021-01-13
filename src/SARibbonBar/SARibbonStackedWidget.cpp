@@ -1,6 +1,8 @@
 ﻿#include "SARibbonStackedWidget.h"
 #include <QEventLoop>
 #include <QMouseEvent>
+#include <QDebug>
+#include <QApplication>
 class SARibbonStackedWidgetPrivate
 {
 public:
@@ -85,6 +87,7 @@ void SARibbonStackedWidget::exec()
     m_d->eventLoop = nullptr;
 }
 
+
 /**
  * @brief 设置stacked管理的窗口会随着stacked的大小变化而变化大小
  *
@@ -125,6 +128,13 @@ void SARibbonStackedWidget::resizeEvent(QResizeEvent *event)
         {
             QWidget *w = widget(i);
             if (w) {
+//                qDebug()	<< "SARibbonStackedWidget::resizeEvent "
+//                        << w->metaObject()->className()
+//                        << " old size:" << w->size()
+//                        << " new size:" << event->size()
+//                ;
+//                QResizeEvent categorySizeEvent(event->size(), w->size());
+//                QApplication::sendEvent(w, &categorySizeEvent);
                 w->resize(event->size());
             }
         }
