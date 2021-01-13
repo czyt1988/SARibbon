@@ -51,7 +51,9 @@ MainWindow::MainWindow(QWidget *par) : SARibbonMainWindow(par)
     PRINT_COST(cost, lastTimes, "add other page");
     m_contextCategory = ribbon->addContextCategory(QStringLiteral("context"), Qt::red, 1);
     SARibbonCategory *contextCategoryPage1 = m_contextCategory->addCategoryPage(QStringLiteral("Page1"));
+    createContextCategoryPage1(contextCategoryPage1);
     SARibbonCategory *contextCategoryPage2 = m_contextCategory->addCategoryPage(QStringLiteral("Page1"));
+    createContextCategoryPage2(contextCategoryPage2);
     PRINT_COST(cost, lastTimes, "add contextCategory page");
 #endif
     ribbon->quickAccessBar()->addButton(new QAction(QIcon(":/icon/icon/chartDataManager.png"), "action1", this));
@@ -297,6 +299,7 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
     QAction *optAct = new QAction(this);
 
     pannel->addOptionAction(optAct);
+    pannel->setVisible(true);
 }
 
 
@@ -315,7 +318,7 @@ void MainWindow::createCategoryOther(SARibbonCategory *page)
     menu->addAction(QIcon(":/icon/icon/folder.png"), QStringLiteral("8"));
     menu->addAction(QIcon(":/icon/icon/folder.png"), QStringLiteral("9"));
 
-    SARibbonPannel *pannel = page->addPannel(QStringLiteral("pannel 1"));
+    SARibbonPannel *pannel = page->addPannel(QStringLiteral("pannel one"));
     SARibbonButtonGroupWidget *btnGroup = new SARibbonButtonGroupWidget(pannel);
 
     btnGroup->setFrameShape(QFrame::Box);
@@ -378,6 +381,79 @@ void MainWindow::createCategoryOther(SARibbonCategory *page)
     SARibbonToolButton *b = pannel->addLargeAction(appBtn);
 
     b->setObjectName("ApplicationButtonTest");
+}
+
+
+void MainWindow::createContextCategoryPage1(SARibbonCategory *page)
+{
+    SARibbonPannel *pannel = page->addPannel(QStringLiteral("显示隐藏操作"));
+    QAction *act = new QAction(this);
+
+    act->setCheckable(true);
+    act->setIcon(QIcon(":/icon/icon/530150.png"));
+    act->setText(QStringLiteral("隐藏pannel"));
+    pannel->addLargeAction(act);
+
+    QAction *act2 = new QAction(this);
+
+    act2->setDisabled(false);
+    act2->setIcon(QIcon(":/icon/icon/529398.png"));
+    act2->setText(QStringLiteral("disable 测试"));
+    pannel->addLargeAction(act2);
+    connect(act2, &QAction::toggled, this, [act2](bool b) {
+        act2->setDisabled(true);
+    });
+
+    QAction *act21 = new QAction(this);
+
+    act21->setDisabled(false);
+    act21->setIcon(QIcon(":/icon/icon/529398.png"));
+    act21->setText(QStringLiteral("解锁左边的按钮"));
+    pannel->addLargeAction(act21);
+    connect(act21, &QAction::toggled, this, [act2](bool b) {
+        act2->setDisabled(false);
+    });
+
+    QAction *act3 = new QAction(this);
+
+    act3->setCheckable(true);
+    act3->setIcon(QIcon(":/icon/icon/530767.png"));
+    act3->setText(QStringLiteral("setText测试"));
+    pannel->addLargeAction(act3);
+
+    connect(act3, &QAction::toggled, this, [act3](bool b) {
+        if (b) {
+            act3->setText(QStringLiteral("点击了"));
+        }else{
+            act3->setText(QStringLiteral("setText测试"));
+        }
+    });
+    //隐藏pannel
+    QAction *act4 = new QAction(this);
+
+    act4->setCheckable(true);
+    act4->setIcon(QIcon(":/icon/icon/arror.png"));
+    act4->setText(QStringLiteral("显示旁边的pannel"));
+    pannel->addLargeAction(act4);
+
+    SARibbonPannel *pannel2 = page->addPannel(QStringLiteral("用于隐藏显示的测试"));
+
+    pannel2->addLargeAction(act2);
+
+    connect(act4, &QAction::toggled, this, [act4, pannel2, this](bool b) {
+        pannel2->setVisible(!b);
+        if (b) {
+            act4->setText(QStringLiteral("隐藏旁边的pannel"));
+        }else{
+            act4->setText(QStringLiteral("显示旁边的pannel"));
+        }
+        ribbonBar()->repaint();
+    });
+}
+
+
+void MainWindow::createContextCategoryPage2(SARibbonCategory *page)
+{
 }
 
 

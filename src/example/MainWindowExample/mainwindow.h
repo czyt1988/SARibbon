@@ -17,6 +17,8 @@ private slots:
 private:
     void createCategoryMain(SARibbonCategory *page);
     void createCategoryOther(SARibbonCategory *page);
+    void createContextCategoryPage1(SARibbonCategory *page);
+    void createContextCategoryPage2(SARibbonCategory *page);
 
 private slots:
     void onMenuButtonPopupCheckableTest(bool b);
