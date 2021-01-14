@@ -28,10 +28,13 @@ public:
     void setContextTitle(const QString &contextTitle);
     //获取对应的tab页
     SARibbonCategory* categoryPage(int index);
+    //获取所有的SARibbonCategory*
+    QList<SARibbonCategory*> categoryList() const;
 signals:
     void categoryPageAdded(SARibbonCategory* category);
 protected:
     QWidget* parentWidget() const;
+    virtual bool eventFilter(QObject *watched, QEvent *e) override;
 private:
     SARibbonContextCategoryPrivate* m_d;
 };

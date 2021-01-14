@@ -48,6 +48,7 @@ public:
     SARibbonTabBar *ribbonTabBar;
     SARibbonStackedWidget *stackedContainerWidget;
     QList<ContextCategoryManagerData> currentShowingContextCategory;
+    QList<SARibbonContextCategory*> mContextCategoryList; ///< 存放所有的上下文标签
     int iconRightBorderPosition;                                    ///< 标题栏x值得最小值，在有图标和快捷启动按钮，此值都需要变化
     SARibbonControlButton *minimumCaterogyButton;                        ///< 隐藏面板按钮
     SARibbonButtonGroupWidget *tabBarRightSizeButtonGroupWidget;    ///< 在tab bar旁边的button group widget                                    ///< tabbar底部的线条颜色
@@ -80,9 +81,6 @@ public:
         ribbonTabBar = RibbonSubElementDelegate->createRibbonTabBar(MainClass);
         ribbonTabBar->setObjectName(QStringLiteral("objSARibbonTabBar"));
         ribbonTabBar->setDrawBase(false);
-//        ribbonTabBar->setGeometry(applitionButton->geometry().right()
-//            , RibbonSubElementStyleOpt.titleBarHight+RibbonSubElementStyleOpt.widgetBord.top()
-//            , MainClass->width(), RibbonSubElementStyleOpt.tabBarHight);
         MainClass->connect(ribbonTabBar, &QTabBar::currentChanged
             , MainClass, &SARibbonBar::onCurrentRibbonTabChanged);
         MainClass->connect(ribbonTabBar, &QTabBar::tabBarClicked
@@ -92,10 +90,6 @@ public:
         //
         stackedContainerWidget = RibbonSubElementDelegate->createRibbonStackedWidget(MainClass);
         ribbonTabBar->setObjectName(QStringLiteral("objSAStackedContainerWidget"));
-//        stackedContainerWidget->setGeometry(RibbonSubElementStyleOpt.widgetBord.left()
-//            , ribbonTabBar->geometry().bottom()+1
-//            , MainClass->width()-RibbonSubElementStyleOpt.widgetBord.left()-RibbonSubElementStyleOpt.widgetBord.right()
-//            , MainClass->height()-ribbonTabBar->geometry().bottom()-2-RibbonSubElementStyleOpt.widgetBord.bottom());
         stackedContainerWidget->connect(stackedContainerWidget, &SARibbonStackedWidget::hidWindow
             , MainClass, &SARibbonBar::onStackWidgetHided);
         stackedContainerWidget->installEventFilter(MainClass);
@@ -190,9 +184,11 @@ SARibbonBar::SARibbonBar(QWidget *parent) : QMenuBar(parent)
     connect(parent, &QWidget::windowTitleChanged, this, &SARibbonBar::onWindowTitleChanged);
     connect(parent, &QWidget::windowIconChanged, this, &SARibbonBar::onWindowIconChanged);
     setRibbonStyle(OfficeStyle);
-    //setFixedHeight(mainBarHeight());
-    //刷新界面
-    //QApplication::postEvent(this, new QResizeEvent(size(), size()));
+}
+
+SARibbonBar::~SARibbonBar()
+{
+    delete m_d;
 }
 
 
@@ -243,6 +239,7 @@ SARibbonTabBar *SARibbonBar::ribbonTabBar()
 
 /**
  * @brief 添加一个标签
+ * 如果需要删除，直接delete即可，SARibbonBar会对其进行处理
  * @param title 标签名字
  * @return 返回一个窗口容器，在Category里可以添加其他控件
  * @sa SARibbonCategory
@@ -263,6 +260,7 @@ SARibbonCategory *SARibbonBar::addCategoryPage(const QString& title)
     if (currentRibbonStyle() == WpsLiteStyle) {
         resizeInWpsLiteStyle();
     }
+    //销毁时移除tab
     return (catagory);
 }
 
@@ -287,7 +285,36 @@ QList<SARibbonCategory *> SARibbonBar::categoryPages() const
     return (res);
 }
 
+/**
+ * @brief 移除SARibbonCategory
+ *
+ * SARibbonBar不会delete SARibbonCategory*，但这个SARibbonCategory会脱离SARibbonBar的管理
+ * 表现在tabbar会移除，面板会移除，使用此函数后可以对SARibbonCategory进行delete
+ * @param category
+ */
+void SARibbonBar::removeCategory(SARibbonCategory *category)
+{
+    int index = tabIndex(category);
+    if (index >= 0)
+    {
+        m_d->ribbonTabBar->removeTab(index);
+    }
+    m_d->stackedContainerWidget->removeWidget(category);
+}
 
+/**
+ * @brief 添加上下文标签
+ *
+ * 上下文标签是特殊时候触发的标签，需要用户手动触发
+ *
+ * 调用@ref SARibbonContextCategory::addCategoryPage 可在上下文标签中添加SARibbonCategory，
+ * 在上下文标签添加的SARibbonCategory，只有在上下文标签显示的时候才会显示
+ * @param title 上下文标签的标题，在Office模式下会显示，在wps模式下不显示
+ * @param color 上下文标签的颜色
+ * @param id 上下文标签的id，以便进行查找
+ * @return 返回上下文标签指针
+ * @note SARibbonBar拥有SARibbonContextCategory的管理权，用户避免在外部直接delete,如果要删除，调用@ref destroyContextCategory 函数
+ */
 SARibbonContextCategory *SARibbonBar::addContextCategory(const QString& title, const QColor& color, const QVariant& id)
 {
     SARibbonContextCategory *context = RibbonSubElementDelegate->createRibbonContextCategory(this);
@@ -304,10 +331,10 @@ SARibbonContextCategory *SARibbonBar::addContextCategory(const QString& title, c
 }
 
 
-///
-/// \brief 显示上下文标签
-/// \param context 上下文标签指针
-///
+/**
+ * @brief 显示上下文标签
+ * @param context 上下文标签指针
+ */
 void SARibbonBar::showContextCategory(SARibbonContextCategory *context)
 {
     if (isContextCategoryVisible(context)) {
@@ -333,7 +360,10 @@ void SARibbonBar::showContextCategory(SARibbonContextCategory *context)
     repaint();
 }
 
-
+/**
+ * @brief 隐藏上下文标签
+ * @param context 上下文标签指针
+ */
 void SARibbonBar::hideContextCategory(SARibbonContextCategory *context)
 {
     for (int i = 0; i < m_d->currentShowingContextCategory.size(); ++i)
@@ -380,6 +410,36 @@ void SARibbonBar::setContextCategoryVisible(SARibbonContextCategory *context, bo
     }else {
         hideContextCategory(context);
     }
+}
+
+/**
+ * @brief 获取所有的上下文标签
+ * @return 返回上下文标签列表
+ */
+QList<SARibbonContextCategory *> SARibbonBar::contextCategoryList() const
+{
+    return m_d->mContextCategoryList;
+}
+
+/**
+ * @brief 销毁上下文标签，上下文标签的SARibbonCategory也会随之销毁
+ * @param context 需要销毁的上下文标签指针
+ */
+void SARibbonBar::destroyContextCategory(SARibbonContextCategory *context)
+{
+    //! 1、如果上下文标签显示中，先隐藏
+    if(isContextCategoryVisible(context))
+    {
+        hideContextCategory(context);
+    }
+    //! 2、删除上下文标签的相关内容
+    m_d->mContextCategoryList.removeAll(context);
+    //!
+    QList<SARibbonCategory*> res = context->categoryList();
+    for(SARibbonCategory* c : res){
+        delete c;
+    }
+    context->deleteLater();
 }
 
 /**
@@ -595,6 +655,35 @@ void SARibbonBar::onContextsCategoryPageAdded(SARibbonCategory *category)
 {
     Q_ASSERT_X(category != nullptr, "onContextsCategoryPageAdded", "add nullptr page");
     m_d->stackedContainerWidget->addWidget(category);
+}
+
+
+/**
+ * @brief 根据QObject*指针查找tabbar的index
+ *
+ * @param c SARibbonCategory对应的QObject指针
+ * @return 如果没有找到，返回-1
+ * @note 此函数不会调用SARibbonCategory*的任何方法，因此可以在SARibbonCategory的destroyed槽中调用
+ */
+int SARibbonBar::tabIndex(SARibbonCategory *obj)
+{
+    quint64 tabdata = (quint64)obj;
+    const int size = m_d->ribbonTabBar->count();
+    for(int i=0;i<size;++i)
+    {
+        QVariant v = m_d->ribbonTabBar->tabData(i);
+        if(v.isValid())
+        {
+            quint64 innervalue = v.value<quint64>();
+            if(innervalue == tabdata)
+            {
+                return i;
+            }
+        }
+    }
+    //如果找不到就从stackedwidget中找
+
+    return -1;
 }
 
 
