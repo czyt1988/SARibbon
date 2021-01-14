@@ -50,7 +50,6 @@ public:
     int m_row;                                              ///< 记录小action所在的gridLayout行数，gridLayout总共划分为6行，用于满足3行或2行的按钮需求
     SARibbonPannelOptionButton *m_optionActionButton;
     int m_titleY;                                           ///< 标题栏的y距离
-    SARibbonToolButton *m_defaultReduceButton;              ///<在pannel无法显示全的时候，显示一个toolbutton用来弹出pannel
     SARibbonPannel::PannelLayoutMode m_pannelLayoutMode;    ///< pannel的布局模式，默认为3行模式ThreeRowMode
 };
 
@@ -61,7 +60,6 @@ SARibbonPannelPrivate::SARibbonPannelPrivate(SARibbonPannel *p)
     , m_row(0)
     , m_optionActionButton(nullptr)
     , m_titleY(77)
-    , m_defaultReduceButton(nullptr)
     , m_pannelLayoutMode(SARibbonPannel::ThreeRowMode)
 {
     createLayout();
@@ -552,13 +550,8 @@ QSize SARibbonPannel::sizeHint() const
     QSize laySize = layout()->sizeHint();
     QFontMetrics fm = fontMetrics();
     QSize titleSize = fm.size(Qt::TextShowMnemonic, windowTitle());
-    int maxWidth = laySize.width();
-
-    if (m_d->m_defaultReduceButton) {
-        maxWidth = qMax(laySize.width(), titleSize.width()) + RibbonSubElementStyleOpt.pannelTitleOptionButtonSpace + m_d->m_defaultReduceButton->width();
-    }else {
-        maxWidth = qMax(laySize.width(), titleSize.width());
-    }
+    int maxWidth = laySize.width() + 2;
+    maxWidth = qMax(maxWidth, titleSize.width()) + RibbonSubElementStyleOpt.pannelTitleOptionButtonSpace;
     return (QSize(maxWidth, laySize.height()));
 }
 
@@ -568,21 +561,6 @@ QSize SARibbonPannel::minimumSizeHint() const
     return (layout()->minimumSize());
 }
 
-
-void SARibbonPannel::setReduce(bool isReduce)
-{
-    if (isReduce) {
-        setWindowFlags(Qt::Popup | Qt::FramelessWindowHint);
-    }else {
-        setWindowFlags(Qt::Widget | Qt::FramelessWindowHint);
-    }
-}
-
-
-bool SARibbonPannel::isReduce() const
-{
-    return (windowFlags() & Qt::Popup);
-}
 
 
 void SARibbonPannel::setExpanding(bool isExpanding)
@@ -706,17 +684,16 @@ void SARibbonPannel::resetLargeToolButtonStyle()
 
     for (SARibbonToolButton *b : btns)
     {
-        if (b) {
-            if (SARibbonToolButton::LargeButton == b->buttonType()) {
-                if (ThreeRowMode == pannelLayoutMode()) {
-                    if (SARibbonToolButton::Normal != b->largeButtonType()) {
-                        b->setLargeButtonType(SARibbonToolButton::Normal);
-                    }
-                }else{
-                    if (SARibbonToolButton::Lite != b->largeButtonType()) {
-                        b->setLargeButtonType(SARibbonToolButton::Lite);
-                    }
-                }
+        if (nullptr == b || (SARibbonToolButton::LargeButton != b->buttonType())) {
+            continue;
+        }
+        if (ThreeRowMode == pannelLayoutMode()) {
+            if (SARibbonToolButton::Normal != b->largeButtonType()) {
+                b->setLargeButtonType(SARibbonToolButton::Normal);
+            }
+        }else{
+            if (SARibbonToolButton::Lite != b->largeButtonType()) {
+                b->setLargeButtonType(SARibbonToolButton::Lite);
             }
         }
     }
