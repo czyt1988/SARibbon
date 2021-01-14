@@ -28,9 +28,9 @@ public:
 };
 
 SARibbonCategoryScrollButton::SARibbonCategoryScrollButton(Qt::ArrowType arr, QWidget *p)
-    : QPushButton(p)
-    , m_arrType(arr)
+    : QToolButton(p)
 {
+    setArrowType(arr);
 }
 
 
@@ -40,40 +40,6 @@ SARibbonCategory::SARibbonCategory(QWidget *parent)
 {
     setAutoFillBackground(true);
     setBackgroundBrush(Qt::white);
-}
-
-
-void SARibbonCategoryScrollButton::paintEvent(QPaintEvent *e)
-{
-    QPainter p(this);
-    QStyleOptionButton opt;
-
-    initStyleOption(&opt);
-    QStyle::PrimitiveElement ele;
-
-    switch (m_arrType)
-    {
-    case Qt::LeftArrow:
-        ele = QStyle::PE_IndicatorArrowLeft;
-        break;
-
-    case Qt::RightArrow:
-        ele = QStyle::PE_IndicatorArrowRight;
-        break;
-
-    case Qt::UpArrow:
-        ele = QStyle::PE_IndicatorArrowUp;
-        break;
-
-    case Qt::DownArrow:
-        ele = QStyle::PE_IndicatorArrowDown;
-        break;
-
-    default:
-        ele = QStyle::PE_IndicatorArrowLeft;
-    }
-    style()->drawPrimitive(ele, &opt, &p, this);
-    return (QPushButton::paintEvent(e));
 }
 
 
@@ -285,7 +251,7 @@ void SARibbonCategoryProxy::addPannel(SARibbonPannel *pannel)
     }
     pannel->setPannelLayoutMode(ribbonPannelLayoutMode());
     SARibbonSeparatorWidget *seprator = RibbonSubElementDelegate->createRibbonSeparatorWidget(ribbonCategory()->height(), ribbonCategory());
-
+    //建立监控，监控show,hide事件，用于触发重新布局
     pannel->installEventFilter(this);
     m_d->mPannelLists.append(pannel);
     m_d->mSeparatorLists.append(seprator);
@@ -296,6 +262,8 @@ bool SARibbonCategoryProxy::takePannel(SARibbonPannel *pannel)
 {
     if (m_d->mPannelLists.removeOne(pannel)) {
         resizePannels(m_d->mParent->size());
+        //一定要移除事件监控
+        pannel->removeEventFilter(this);
         return (true);
     }
     return (false);
@@ -351,10 +319,12 @@ void SARibbonCategoryProxy::resizePannels(const QSize& categorySize)
         primitiveWidgetSize[i].second.setHeight(categorySize.height() - dy);
     }
 #ifdef SA_RIBBON_DEBUG_HELP_DRAW
-    qDebug()	<< "SARibbonCategoryProxy::resizePannels,name:" << m_d->mParent->windowTitle()
-            << " categorySize:" << categorySize
-            << " totalWidth:" << totalWidth
-            << " primitiveWidgetSize size:" << primitiveWidgetSize.size();
+//    qDebug()	<< "SARibbonCategoryProxy::resizePannels,name:" << m_d->mParent->windowTitle()
+//            << " categorySize:" << categorySize
+//            << " totalWidth:" << totalWidth
+//            << " primitiveWidgetSize size:" << primitiveWidgetSize.size()
+//            << " m_d->mBaseX:" << m_d->mBaseX
+//               ;
 #endif
     //判断是否超过总长度
     if (totalWidth > categorySize.width()) {
@@ -365,7 +335,7 @@ void SARibbonCategoryProxy::resizePannels(const QSize& categorySize)
             m_d->mLeftScrollBtn->setVisible(false);
             m_d->mRightScrollBtn->raise();
             m_d->mRightScrollBtn->show();
-        }else if (m_d->mBaseX <= totalWidth - categorySize.width()) {
+        }else if (m_d->mBaseX <= (categorySize.width() - totalWidth)) {
             //已经移动到最右，需要可以向左移动
             m_d->mRightScrollBtn->setVisible(false);
             m_d->mLeftScrollBtn->setVisible(true);
@@ -400,11 +370,11 @@ void SARibbonCategoryProxy::resizePannels(const QSize& categorySize)
         }
         x += s.width() + 1;
 #ifdef SA_RIBBON_DEBUG_HELP_DRAW
-        qDebug()	<< "==> w:" << w->metaObject()->className()
-                << " isVisible "<< w->isVisible()
-                << " is isHidden:" << w->isHidden()
-                << " Geometry" << w->geometry()
-        ;
+//        qDebug()	<< "==> w:" << w->metaObject()->className()
+//                << " isVisible "<< w->isVisible()
+//                << " is isHidden:" << w->isHidden()
+//                << " Geometry" << w->geometry()
+//        ;
 #endif
     }
 }
@@ -438,22 +408,6 @@ bool SARibbonCategoryProxy::eventFilter(QObject *watched, QEvent *event)
     if (pannel) {
         switch (event->type())
         {
-//        case QEvent::Hide:
-//        {
-//            //隐藏和显示都要重新布局
-//            int i = m_d->mPannelLists.indexOf(pannel);
-//            if ((i >= 0) && (i < m_d->mSeparatorLists.size())) {
-//                m_d->mSeparatorLists[i]->hide();
-//            }
-//#ifdef SA_RIBBON_DEBUG_HELP_DRAW
-//            qDebug()	<< "SARibbonCategoryProxy::eventFilter pannel:"
-//                    << pannel->windowTitle()
-//                    << " Hide Event"
-//            ;
-//#endif
-//            resizePannels();
-//        }
-//        break;
 
         case QEvent::HideToParent:
         {
@@ -472,29 +426,12 @@ bool SARibbonCategoryProxy::eventFilter(QObject *watched, QEvent *event)
         }
         break;
 
-//        case QEvent::Show:
-//        {
-//            //隐藏和显示都要重新布局
-//            int i = m_d->mPannelLists.indexOf(pannel);
-//            if ((i >= 0) && (i < m_d->mSeparatorLists.size())) {
-//                m_d->mSeparatorLists[i]->hide();
-//            }
-//#ifdef SA_RIBBON_DEBUG_HELP_DRAW
-//            qDebug()	<< "SARibbonCategoryProxy::eventFilter pannel:"
-//                    << pannel->windowTitle()
-//                    << " Show Event"
-//            ;
-//#endif
-//            resizePannels();
-//        }
-//        break;
-
         case QEvent::ShowToParent:
         {
             //隐藏和显示都要重新布局
             int i = m_d->mPannelLists.indexOf(pannel);
             if ((i >= 0) && (i < m_d->mSeparatorLists.size())) {
-                m_d->mSeparatorLists[i]->hide();
+                m_d->mSeparatorLists[i]->show();
             }
 #ifdef SA_RIBBON_DEBUG_HELP_DRAW
             qDebug()	<< "SARibbonCategoryProxy::eventFilter pannel:"
@@ -520,11 +457,17 @@ void SARibbonCategoryProxy::onLeftScrollButtonClicked()
     QList<QPair<QWidget *, QSize> > w = allVisibleCategoryWidgetSizes();
     //求总宽
     int totalWidth = 0;
-
     for (QPair<QWidget *, QSize> r : w)
     {
         totalWidth += r.second.width();
     }
+#ifdef SA_RIBBON_DEBUG_HELP_DRAW
+    qDebug() << "= SARibbonCategoryProxy::onLeftScrollButtonClicked totalWidth:"
+             << totalWidth
+             << " width:"<<width
+             << " m_d->mBaseX" << m_d->mBaseX
+                ;
+#endif
     if (totalWidth > width) {
         int tmp = m_d->mBaseX + width;
         if (tmp > 0) {
@@ -549,6 +492,13 @@ void SARibbonCategoryProxy::onRightScrollButtonClicked()
     {
         totalWidth += r.second.width();
     }
+#ifdef SA_RIBBON_DEBUG_HELP_DRAW
+    qDebug() << "= SARibbonCategoryProxy::onRightScrollButtonClicked totalWidth:"
+             << totalWidth
+             << " width:"<<width
+             << " m_d->mBaseX" << m_d->mBaseX
+                ;
+#endif
     if (totalWidth > width) {
         int tmp = m_d->mBaseX - width;
         if (tmp < (width - totalWidth)) {

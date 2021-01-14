@@ -49,7 +49,7 @@ public:
     SARibbonStackedWidget *stackedContainerWidget;
     QList<ContextCategoryManagerData> currentShowingContextCategory;
     int iconRightBorderPosition;                                    ///< 标题栏x值得最小值，在有图标和快捷启动按钮，此值都需要变化
-    SARibbonControlButton *hidePannelButton;                        ///< 隐藏面板按钮
+    SARibbonControlButton *minimumCaterogyButton;                        ///< 隐藏面板按钮
     SARibbonButtonGroupWidget *tabBarRightSizeButtonGroupWidget;    ///< 在tab bar旁边的button group widget                                    ///< tabbar底部的线条颜色
     SARibbonQuickAccessBar *quickAccessBar;                         ///< 快速响应栏
     SARibbonBar::RibbonStyle ribbonStyle;                           ///< ribbon的风格
@@ -61,7 +61,7 @@ public:
         , ribbonTabBar(nullptr)
         , stackedContainerWidget(nullptr)
         , iconRightBorderPosition(1)
-        , hidePannelButton(nullptr)
+        , minimumCaterogyButton(nullptr)
         , tabBarRightSizeButtonGroupWidget(nullptr)
         , ribbonStyle(SARibbonBar::OfficeStyle)
         , lastShowStyle(SARibbonBar::OfficeStyle)
@@ -382,14 +382,23 @@ void SARibbonBar::setContextCategoryVisible(SARibbonContextCategory *context, bo
     }
 }
 
-
-///
-/// \brief 设置为隐藏/显示模式
-/// \param isHide
-///
-void SARibbonBar::setHideMode(bool isHide)
+/**
+ * @brief 设置为最小/正常模式
+ *
+ * 隐藏模式下，只会显示tabbar，不会显示内容，默认状态是显示模式
+ *
+ * 默认下双击tabbar会切换隐藏显示模式，如果想禁用此功能，可以重载 @ref onCurrentRibbonTabDoubleClicked
+ * 函数，不对函数进行任何处理即可
+ *
+ * @param isMinimum 参数为true时，切换为Minimum模式
+ * @see 此函数会改变@ref RibbonState 状态，通过@ref currentRibbonState 函数可以查看当前状态
+ */
+void SARibbonBar::setMinimumMode(bool isMinimum)
 {
-    if (isHide) {
+#ifdef SA_RIBBON_DEBUG_HELP_DRAW
+    qDebug() << "SARibbonBar::setHideMode " << isMinimum;
+#endif
+    if (isMinimum) {
         m_d->setHideMode();
     }else {
         m_d->setNormalMode();
@@ -404,7 +413,7 @@ void SARibbonBar::setHideMode(bool isHide)
 /// \brief 当前ribbon是否是隐藏模式
 /// \return
 ///
-bool SARibbonBar::isRibbonBarHideMode() const
+bool SARibbonBar::isMinimumMode() const
 {
     return (m_d->stackedContainerWidget->isPopupMode());
 }
@@ -413,28 +422,28 @@ bool SARibbonBar::isRibbonBarHideMode() const
 ///
 /// \brief 设置显示隐藏ribbon按钮
 ///
-void SARibbonBar::showHideModeButton(bool isShow)
+void SARibbonBar::showMinimumModeButton(bool isShow)
 {
     if (isShow) {
         activeTabBarRightButtonGroup();
-        if (nullptr == m_d->hidePannelButton) {
-            m_d->hidePannelButton = RibbonSubElementDelegate->createHidePannelButton(this);
-            QAction *action = new QAction(m_d->hidePannelButton);
+        if (nullptr == m_d->minimumCaterogyButton) {
+            m_d->minimumCaterogyButton = RibbonSubElementDelegate->createHidePannelButton(this);
+            QAction *action = new QAction(m_d->minimumCaterogyButton);
             action->setCheckable(true);
-            action->setChecked(isRibbonBarHideMode());
+            action->setChecked(isMinimumMode());
             action->setIcon(QIcon(":/icon/icon/save.png"));
             connect(action, &QAction::triggered, this, [this](bool on) {
-                this->setHideMode(on);
+                this->setMinimumMode(on);
             });
-            m_d->hidePannelButton->setDefaultAction(action);
-            m_d->tabBarRightSizeButtonGroupWidget->addButton(m_d->hidePannelButton);
+            m_d->minimumCaterogyButton->setDefaultAction(action);
+            m_d->tabBarRightSizeButtonGroupWidget->addButton(m_d->minimumCaterogyButton);
             update();
         }
     }else {
-        if (nullptr != m_d->hidePannelButton) {
-            m_d->hidePannelButton->hide();
-            m_d->hidePannelButton->deleteLater();
-            m_d->hidePannelButton = nullptr;
+        if (nullptr != m_d->minimumCaterogyButton) {
+            m_d->minimumCaterogyButton->hide();
+            m_d->minimumCaterogyButton->deleteLater();
+            m_d->minimumCaterogyButton = nullptr;
         }
     }
     QResizeEvent resizeEvent(size(), size());
@@ -447,9 +456,9 @@ void SARibbonBar::showHideModeButton(bool isShow)
 /// \brief 是否显示隐藏ribbon按钮
 /// \return
 ///
-bool SARibbonBar::isShowHideModeButton() const
+bool SARibbonBar::haveShowMinimumModeButton() const
 {
-    return (nullptr != m_d->hidePannelButton);
+    return (nullptr != m_d->minimumCaterogyButton);
 }
 
 
@@ -512,12 +521,14 @@ void SARibbonBar::onStackWidgetHided()
 }
 
 
-///
-/// \brief ribbon tab bar改变
-/// \param index
-///
+
+/**
+ * @brief 标签切换触发槽函数
+ * @param index
+ */
 void SARibbonBar::onCurrentRibbonTabChanged(int index)
 {
+    qDebug() << "============" << "current index changed:" << index;
     QVariant var = m_d->ribbonTabBar->tabData(index);
     SARibbonCategory *category = nullptr;
 
@@ -529,11 +540,14 @@ void SARibbonBar::onCurrentRibbonTabChanged(int index)
         if (m_d->stackedContainerWidget->currentWidget() != category) {
             m_d->stackedContainerWidget->setCurrentWidget(category);
         }
-        if (isRibbonBarHideMode()) {
+        if (isMinimumMode()) {
             if (!m_d->stackedContainerWidget->isVisible()) {
                 if (m_d->stackedContainerWidget->isPopupMode()) {
                     m_d->stackedContainerWidget->setFocus();
                     m_d->stackedContainerWidget->exec();
+                    //在最小模式下，每次显示完stackedContainerWidget后把tab的
+                    //的index设置为-1，这样每次点击都会触发onCurrentRibbonTabChanged
+                    m_d->ribbonTabBar->setCurrentIndex(-1);
                 }
             }
         }
@@ -541,38 +555,39 @@ void SARibbonBar::onCurrentRibbonTabChanged(int index)
     emit currentRibbonTabChanged(index);
 }
 
-
-///
-/// \brief ribbon tab bar点击
-/// \param index
-///
+/**
+ * @brief ribbon tab bar单击
+ *
+ * 如果点击的和currentIndex返回不一致，会触发onCurrentRibbonTabChanged，
+ * 不需要进行onCurrentRibbonTabClicked的响应，onCurrentRibbonTabClicked的响应是为了
+ * 在隐藏模式下点击同一个tab还弹出
+ * @param index
+ */
 void SARibbonBar::onCurrentRibbonTabClicked(int index)
 {
-    if (m_d->ribbonTabBar->currentIndex() != index) {
-        // 如果点击的和currentIndex返回不一致，会触发onCurrentRibbonTabChanged，
-        // 不需要进行onCurrentRibbonTabClicked的响应，onCurrentRibbonTabClicked的响应是为了
-        // 在隐藏模式下点击同一个tab还弹出
-        return;
-    }
-    if (isRibbonBarHideMode()) {
-        if (!m_d->stackedContainerWidget->isVisible()) {
-            if (m_d->stackedContainerWidget->isPopupMode()) {
-                m_d->stackedContainerWidget->setFocus();
-                m_d->stackedContainerWidget->exec();
-            }
-        }
-    }
+    //不能在clicked里触发m_d->stackedContainerWidget->exec()
+    //这样会阻断整个消息循环，导致无法触发doublecliked
+    //    if (isMinimumMode()) {
+    //        if (!m_d->stackedContainerWidget->isVisible()) {
+    //            if (m_d->stackedContainerWidget->isPopupMode()) {
+    //                m_d->stackedContainerWidget->setFocus();
+    //                m_d->stackedContainerWidget->exec();
+    //            }
+    //        }
+    //    }
 }
 
 
-///
-/// \brief ribbon tab bar双击
-/// \param index
-///
+/**
+ * @brief ribbon tab bar双击
+ *
+ * 默认情况下双击会切换最小和正常模式
+ * @param index
+ */
 void SARibbonBar::onCurrentRibbonTabDoubleClicked(int index)
 {
     Q_UNUSED(index);
-    setHideMode(!isRibbonBarHideMode());
+    setMinimumMode(!isMinimumMode());
 }
 
 
@@ -637,7 +652,10 @@ void SARibbonBar::setRibbonStyle(SARibbonBar::RibbonStyle v)
     QApplication::postEvent(this, new QResizeEvent(newSize, oldSize));
 }
 
-
+/**
+ * @brief 返回当前ribbon的风格
+ * @return 返回当前ribbon的风格
+ */
 SARibbonBar::RibbonStyle SARibbonBar::currentRibbonStyle() const
 {
     return (m_d->ribbonStyle);

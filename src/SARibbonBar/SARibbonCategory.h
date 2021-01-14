@@ -12,6 +12,8 @@ class QHBoxLayout;
 
 /**
  * @brief 一项ribbon tab页
+ * @note SARibbonCategory的windowTitle影响了其在SARibbonBar的标签显示，
+ * 如果要改标签名字，直接调用SARibbonCategory的setWindowTitle函数
  */
 class SA_RIBBON_EXPORT SARibbonCategory : public QWidget
 {
@@ -110,17 +112,12 @@ private:
  *
  * 重新定义是为了防止被外部的样式影响
  */
-class SA_RIBBON_EXPORT SARibbonCategoryScrollButton : public QPushButton
+class SA_RIBBON_EXPORT SARibbonCategoryScrollButton : public QToolButton
 {
     Q_OBJECT
 public:
-    using QPushButton::QPushButton;
+    using QToolButton::QToolButton;
     SARibbonCategoryScrollButton(Qt::ArrowType arr, QWidget *p = nullptr);
-protected:
-    virtual void paintEvent(QPaintEvent *e) override;
-
-private:
-    Qt::ArrowType m_arrType;
 };
 
 #endif // SARIBBONCATEGORY_H
