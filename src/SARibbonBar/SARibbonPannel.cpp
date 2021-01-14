@@ -380,14 +380,19 @@ SARibbonPannel::PannelLayoutMode SARibbonPannel::pannelLayoutMode() const
     return (m_d->m_pannelLayoutMode);
 }
 
-
-void SARibbonPannel::addSeparator()
+/**
+ * @brief 添加分割线
+ * @param top 上边距 @default 6
+ * @param bottom 下边距 @default 6
+ */
+void SARibbonPannel::addSeparator(int top,int bottom)
 {
-    SARibbonSeparatorWidget *sep = RibbonSubElementDelegate->createRibbonSeparatorWidget(separatorHeight(), this);
+    SARibbonSeparatorWidget *sep = RibbonSubElementDelegate->createRibbonSeparatorWidget(this);
 #ifdef SA_RIBBON_DEBUG_HELP_DRAW
     qDebug() << "SARibbonPannel height:" << height() << " sizeHint:" << sizeHint() << " geometry" << geometry();
     qDebug() << "SARibbonPannel addSeparator:" << separatorHeight();
 #endif
+    sep->setTopBottomMargins(6,6);
     m_d->m_gridLayout->addWidget(sep, 0, m_d->m_gridLayout->columnCount(), 6, 1);
     m_d->m_row = 0;
 }

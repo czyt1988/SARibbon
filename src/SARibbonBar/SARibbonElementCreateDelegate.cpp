@@ -88,6 +88,11 @@ SARibbonSeparatorWidget *SARibbonElementCreateDelegate::createRibbonSeparatorWid
     return (new SARibbonSeparatorWidget(value, parent));
 }
 
+SARibbonSeparatorWidget *SARibbonElementCreateDelegate::createRibbonSeparatorWidget(QWidget *parent)
+{
+    return (new SARibbonSeparatorWidget(parent));
+}
+
 
 SARibbonGallery *SARibbonElementCreateDelegate::createRibbonGallery(QWidget *parent)
 {
