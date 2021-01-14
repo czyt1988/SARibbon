@@ -526,7 +526,6 @@ void SARibbonPannel::paintEvent(QPaintEvent *event)
             QRect r = QRect(1, height()-RibbonSubElementStyleOpt.pannelTitleHeight
                 , width()-m_d->m_optionActionButton->width() - RibbonSubElementStyleOpt.pannelTitleOptionButtonSpace
                 , RibbonSubElementStyleOpt.pannelTitleHeight-2);
-            qDebug() << r;
             HELP_DRAW_RECT(p, r);
 #endif
         }else {
@@ -539,7 +538,6 @@ void SARibbonPannel::paintEvent(QPaintEvent *event)
             QRect r = QRect(1, height()-RibbonSubElementStyleOpt.pannelTitleHeight
                 , width()
                 , RibbonSubElementStyleOpt.pannelTitleHeight);
-            qDebug() << r;
             HELP_DRAW_RECT(p, r);
 #endif
         }

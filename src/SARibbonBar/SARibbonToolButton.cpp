@@ -352,19 +352,19 @@ void SARibbonToolButton::paintLargeButton(QPaintEvent *e)
                 }
             }
 
-#if SA_RIBBON_DEBUG_HELP_DRAW
-            if (this->objectName() == "MenuButtonPopup") {
-                static int s_e = 0;
-                qDebug()	<< s_e << " under mouse:" << this->underMouse()
-                        << " \ncontinue:" <<this->rect().contains(this->mapFromGlobal(QCursor::pos()))
-                        //<< " \nmapFromGlobal continue:" <<this->geometry().contains(this->mapFromGlobal(QCursor::pos()))
-                        << " \n rect:" << this->geometry()
-                        << " \n QCursor:" << QCursor::pos()
-                        << " \n nmapFromGlobal QCursor:" << this->mapFromGlobal(QCursor::pos())
-                        << "   " <<autoRaise << opt;
-                ++s_e;
-            }
-#endif
+//#if SA_RIBBON_DEBUG_HELP_DRAW
+//            if (this->objectName() == "MenuButtonPopup") {
+//                static int s_e = 0;
+//                qDebug()	<< s_e << " under mouse:" << this->underMouse()
+//                        << " \ncontinue:" <<this->rect().contains(this->mapFromGlobal(QCursor::pos()))
+//                        //<< " \nmapFromGlobal continue:" <<this->geometry().contains(this->mapFromGlobal(QCursor::pos()))
+//                        << " \n rect:" << this->geometry()
+//                        << " \n QCursor:" << QCursor::pos()
+//                        << " \n nmapFromGlobal QCursor:" << this->mapFromGlobal(QCursor::pos())
+//                        << "   " <<autoRaise << opt;
+//                ++s_e;
+//            }
+//#endif
 
             if (autoRaise) {
                 style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
@@ -511,7 +511,6 @@ void SARibbonToolButton::drawIconAndLabel(QPainter& p, QStyleOptionToolButton& o
                     if (!hasArrow) {
 #if SA_RIBBON_DEBUG_HELP_DRAW
                         HELP_DRAW_RECT(p, m_iconRect);
-                        qDebug() << "m_iconRect:" << m_iconRect;
 #endif
                         style()->drawItemPixmap(&p, m_iconRect, Qt::AlignCenter, pm);
                     }else {

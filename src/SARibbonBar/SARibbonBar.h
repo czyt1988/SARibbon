@@ -102,7 +102,7 @@ public:
         , OfficeStyleTwoRow	= 0x0100        ///< 类似office 的ribbon风格 2行工具栏 三行布局模式，office就是三行布局模式，pannel能布置3行小toolbutton，默认模式
         , WpsLiteStyleTwoRow	= 0x0101        ///< 类似wps的紧凑风格  2行工具栏
     };
-    Q_FLAG(RibbonStyle)
+    Q_FLAGS(RibbonStyle)
 
     /**
      * @brief 定义当前ribbon 的状态
@@ -151,16 +151,16 @@ public:
     void setContextCategoryVisible(SARibbonContextCategory *context, bool visible);
 
     //设置为隐藏模式
-    void setHideMode(bool isHide);
+    void setMinimumMode(bool isHide);
 
     //当前Ribbon是否是隐藏模式
-    bool isRibbonBarHideMode() const;
+    bool isMinimumMode() const;
 
     //设置显示隐藏ribbon按钮
-    void showHideModeButton(bool isShow = true);
+    void showMinimumModeButton(bool isShow = true);
 
     //是否显示隐藏ribbon按钮
-    bool isShowHideModeButton() const;
+    bool haveShowMinimumModeButton() const;
 
     //ribbon tab的高度
     int tabBarHeight() const;
@@ -176,6 +176,8 @@ public:
 
     //设置ribbon的风格
     void setRibbonStyle(RibbonStyle v);
+
+    //当前ribbon的风格
     RibbonStyle currentRibbonStyle() const;
 
     //当前的模式
@@ -221,6 +223,7 @@ protected:
     //根据currentRibbonStyle计算mainBar的高度
     virtual int mainBarHeight() const;
 
+    //返回应用按钮的位置，用于确定应用按钮方位
     virtual QRect applitionButtonGeometry() const;
 
 protected slots:
