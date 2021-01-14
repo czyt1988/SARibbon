@@ -48,8 +48,6 @@ public:
     int gridLayoutColumnCount() const;
     virtual QSize sizeHint() const Q_DECL_OVERRIDE;
     virtual QSize minimumSizeHint() const Q_DECL_OVERRIDE;
-    void setReduce(bool isReduce);
-    bool isReduce() const;
     void setExpanding(bool isExpanding = true);
     bool isExpanding() const;
 

@@ -209,7 +209,6 @@ void SARibbonCategoryLayout::setGeometry(const QRect &rect)
                     //建立一个最小显示方案
                     buildReduceModePannel(pannel,x,y);
                 }
-                pannel->setReduce(true);
                 SARibbonReduceActionInfo reduceInfo = m_pannelReduceInfo.value(pannel);
                 QSize reducePannelSize = reduceInfo.reduceModeShowPannel->sizeHint();
                 widgetItems.append(qMakePair(reduceInfo.reduceModeShowPannel,QRect(x,y,reducePannelSize.width(),reducePannelSize.height())));
@@ -224,7 +223,6 @@ void SARibbonCategoryLayout::setGeometry(const QRect &rect)
             //此时能显示全一个pannel
             if(SARibbonPannel* pannel = qobject_cast<SARibbonPannel*>(wid))
             {
-                pannel->setReduce(false);
                 //layoutNormalPannel(pannel,x,y,widSize.width(),widSize.height());
                 //widgetItems.append(qMakePair(pannel,QRect(x,y,widSize.width(),widSize.height())));
                 if(m_pannelReduceInfo.contains(pannel))
