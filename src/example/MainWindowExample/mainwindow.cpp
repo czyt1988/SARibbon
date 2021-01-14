@@ -410,7 +410,7 @@ void MainWindow::createContextCategoryPage1(SARibbonCategory *page)
 
     act2->setDisabled(true);
     act2->setIcon(QIcon(":/icon/icon/529398.png"));
-    act2->setText(QStringLiteral("disable 测试"));
+    act2->setText(QStringLiteral("disable"));
     pannel->addLargeAction(act2);
     connect(act2, &QAction::toggled, this, [act2](bool b) {
         act2->setDisabled(true);
@@ -422,7 +422,9 @@ void MainWindow::createContextCategoryPage1(SARibbonCategory *page)
     act21->setText(QStringLiteral("解锁左边的按钮"));
     pannel->addLargeAction(act21);
     connect(act21, &QAction::toggled, this, [act2](bool b) {
-        act2->setDisabled(false);
+        qDebug() << "act2->setEnabled(true);";
+        act2->setEnabled(true);
+        act2->setText(QStringLiteral("Enabled"));
     });
 
     QAction *act3 = new QAction(this);
@@ -449,7 +451,7 @@ void MainWindow::createContextCategoryPage1(SARibbonCategory *page)
 
     SARibbonPannel *pannel2 = page->addPannel(QStringLiteral("用于隐藏显示的测试"));
 
-    pannel2->addLargeAction(act2);
+    pannel2->addLargeAction(act3);
 
     connect(act4, &QAction::toggled, this, [act4, pannel2, this](bool b) {
         pannel2->setVisible(!b);

@@ -293,7 +293,7 @@ void SARibbonToolButton::paintLargeButton(QPaintEvent *e)
 
     bool autoRaise = opt.state & QStyle::State_AutoRaise;
 
-#if 1
+#if 0
     QStyle::State bflags = opt.state;
 #else
     QStyle::State bflags = opt.state & ~QStyle::State_Sunken;
