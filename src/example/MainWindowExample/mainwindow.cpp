@@ -237,6 +237,18 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
         }
     });
 
+    QAction* act2 = new QAction(this);
+    act2->setIcon(QIcon(":/icon/icon/529398.png"));
+    act2->setText(QStringLiteral("delete Context"));
+    btn = panne2->addLargeAction(act2);
+    connect(act2, &QAction::triggered, this, [this,act](bool on) {
+        if(this->m_contextCategory){
+            this->ribbonBar()->destroyContextCategory(this->m_contextCategory);
+            this->m_contextCategory = nullptr;
+            act->setDisabled(true);
+        }
+    });
+
     act = new QAction(this);
     act->setCheckable(true);
     act->setIcon(QIcon(":/icon/icon/Graph-add.png"));
@@ -396,7 +408,7 @@ void MainWindow::createContextCategoryPage1(SARibbonCategory *page)
 
     QAction *act2 = new QAction(this);
 
-    act2->setDisabled(false);
+    act2->setDisabled(true);
     act2->setIcon(QIcon(":/icon/icon/529398.png"));
     act2->setText(QStringLiteral("disable 测试"));
     pannel->addLargeAction(act2);
@@ -406,7 +418,6 @@ void MainWindow::createContextCategoryPage1(SARibbonCategory *page)
 
     QAction *act21 = new QAction(this);
 
-    act21->setDisabled(false);
     act21->setIcon(QIcon(":/icon/icon/529398.png"));
     act21->setText(QStringLiteral("解锁左边的按钮"));
     pannel->addLargeAction(act21);
@@ -449,11 +460,50 @@ void MainWindow::createContextCategoryPage1(SARibbonCategory *page)
         }
         ribbonBar()->repaint();
     });
+
+    SARibbonPannel *pannel3 = page->addPannel(QStringLiteral("action隐藏显示的测试"));
+    QAction *act31 = new QAction(this);
+    act31->setCheckable(true);
+    act31->setChecked(true);
+    act31->setIcon(QIcon(":/icon/icon/arror.png"));
+    act31->setText(QStringLiteral("隐藏action2"));
+    QAction *act32 = new QAction(this);
+    act32->setIcon(QIcon(":/icon/icon/arror.png"));
+    act32->setText(QStringLiteral("action 2"));
+    QAction *act33 = new QAction(this);
+    act33->setIcon(QIcon(":/icon/icon/arror.png"));
+    act33->setText(QStringLiteral("action 3"));
+    QAction *act34 = new QAction(this);
+    act34->setIcon(QIcon(":/icon/icon/arror.png"));
+    act34->setText(QStringLiteral("action 4"));
+    pannel3->addLargeAction(act31);
+    pannel3->addSmallAction(act32);
+    pannel3->addSmallAction(act33);
+    pannel3->addSmallAction(act34);
+    connect(act31,&QAction::triggered,this,[act31,act32](bool b){
+        if(b){
+            act32->setVisible(true);
+            act31->setText(QStringLiteral("隐藏action2"));
+        }else{
+            act32->setVisible(false);
+            act31->setText(QStringLiteral("显示action2"));
+        }
+
+    });
 }
 
 
 void MainWindow::createContextCategoryPage2(SARibbonCategory *page)
 {
+    SARibbonPannel *pannel1 = page->addPannel(QStringLiteral("删除CategoryPage测试"));
+    QAction *act11 = new QAction(this);
+    act11->setIcon(QIcon(":/icon/icon/529398.png"));
+    act11->setText(QStringLiteral("删除本页"));
+    pannel1->addLargeAction(act11);
+    connect(act11,&QAction::triggered,this,[this,page](){
+        this->ribbonBar()->removeCategory(page);
+        delete page;
+    });
 }
 
 

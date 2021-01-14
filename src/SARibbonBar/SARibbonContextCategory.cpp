@@ -2,6 +2,7 @@
 #include <QList>
 #include <QVariant>
 #include "SARibbonElementManager.h"
+#include <QDebug>
 class SARibbonCategoryData
 {
 public:
@@ -34,6 +35,7 @@ SARibbonCategory *SARibbonContextCategory::addCategoryPage(const QString &title)
     category->setWindowTitle(title);
     catData.categoryPage = category;
     m_d->categoryDataList.append(catData);
+    category->installEventFilter(this);
     emit categoryPageAdded(category);
     return category;
 }
@@ -68,6 +70,35 @@ QWidget *SARibbonContextCategory::parentWidget() const
     return qobject_cast<QWidget*>(parent());
 }
 
+bool SARibbonContextCategory::eventFilter(QObject *watched, QEvent *e)
+{
+    if(nullptr == watched)
+    {
+        return false;
+    }
+    switch(e->type())
+    {
+    case QEvent::Close:
+    {
+        SARibbonCategory* c = qobject_cast<SARibbonCategory*>(watched);
+        if(c)
+        {
+            qDebug()<<" -----------> close event";
+            for(int i=0;i<m_d->categoryDataList.size();++i){
+                if(m_d->categoryDataList[i].categoryPage == c)
+                {
+                    m_d->categoryDataList.removeAt(i);
+                }
+            }
+        }
+    }
+        break;
+    default:
+        break;
+    }
+    return false;
+}
+
 QString SARibbonContextCategory::contextTitle() const
 {
     return m_d->contextTitle;
@@ -77,12 +108,26 @@ void SARibbonContextCategory::setContextTitle(const QString &contextTitle)
 {
     m_d->contextTitle = contextTitle;
 }
-///
-/// \brief 获取对应的tab页
-/// \param index
-/// \return
-///
+
+/**
+ * @brief 获取对应的tab页
+ * @param index
+ * @return
+ */
 SARibbonCategory *SARibbonContextCategory::categoryPage(int index)
 {
     return m_d->categoryDataList[index].categoryPage;
+}
+
+/**
+ * @brief 获取所有的SARibbonCategory*
+ * @return
+ */
+QList<SARibbonCategory *> SARibbonContextCategory::categoryList() const
+{
+    QList<SARibbonCategory *> res;
+    for(SARibbonCategoryData & c : m_d->categoryDataList){
+        res.append(c.categoryPage);
+    }
+    return res;
 }

@@ -119,7 +119,7 @@ public:
 
     //构造函数
     SARibbonBar(QWidget *parent = nullptr);
-
+    ~SARibbonBar();
     //获取applitionButton
     QAbstractButton *applicationButton();
 
@@ -135,6 +135,9 @@ public:
     //获取当前显示的所有的SARibbonCategory，不含未显示的SARibbonContextCategory的SARibbonCategory
     QList<SARibbonCategory *> categoryPages() const;
 
+    //移除SARibbonCategory
+    void removeCategory(SARibbonCategory *category);
+
     //添加一个上下文标签
     SARibbonContextCategory *addContextCategory(const QString& title, const QColor& color, const QVariant& id = QVariant());
 
@@ -149,6 +152,12 @@ public:
 
     //设置上下文标签的显示或隐藏
     void setContextCategoryVisible(SARibbonContextCategory *context, bool visible);
+
+    //获取所有的上下文标签
+    QList<SARibbonContextCategory*> contextCategoryList() const;
+
+    //移除ContextCategory
+    void destroyContextCategory(SARibbonContextCategory *context);
 
     //设置为隐藏模式
     void setMinimumMode(bool isHide);
@@ -235,8 +244,8 @@ protected slots:
     virtual void onCurrentRibbonTabClicked(int index);
     virtual void onCurrentRibbonTabDoubleClicked(int index);
     void onContextsCategoryPageAdded(SARibbonCategory *category);
-
 private:
+    int tabIndex(SARibbonCategory *obj);
     void updateRibbonElementGeometry();
     void resizeInOfficeStyle();
     void resizeInWpsLiteStyle();
