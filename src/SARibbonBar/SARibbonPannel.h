@@ -34,7 +34,7 @@ public:
     SARibbonGallery *addGallery();
 
     //添加分割线
-    void addSeparator();
+    void addSeparator(int top=6, int bottom=6);
     void addSmallWidget(QWidget *w);
     void addLargeWidget(QWidget *w);
     //添加操作action，如果要去除，传入nullptr指针即可，SARibbonPannel不会对QAction的所有权进行管理
