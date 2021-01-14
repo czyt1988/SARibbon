@@ -117,7 +117,7 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
     act->setCheckable(true);
     pannel->addSmallAction(act);
     connect(act, &QAction::triggered, this, [this](bool b) {
-        this->ribbonBar()->setHideMode(b);
+        this->ribbonBar()->setMinimumMode(b);
     });
 
     act = new QAction(this);
@@ -126,7 +126,7 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
     act->setCheckable(true);
     pannel->addSmallAction(act);
     connect(act, &QAction::triggered, this, [this](bool b) {
-        this->ribbonBar()->showHideModeButton(b);
+        this->ribbonBar()->showMinimumModeButton(b);
     });
     QButtonGroup *g = new QButtonGroup(page);
     QRadioButton *r = new QRadioButton();
