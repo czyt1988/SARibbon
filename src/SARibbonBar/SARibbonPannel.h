@@ -37,6 +37,7 @@ public:
     void addSeparator();
     void addSmallWidget(QWidget *w);
     void addLargeWidget(QWidget *w);
+    //添加操作action，如果要去除，传入nullptr指针即可，SARibbonPannel不会对QAction的所有权进行管理
     void addOptionAction(QAction *action);
 
     //获取所有的buttons
