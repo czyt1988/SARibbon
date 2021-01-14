@@ -18,6 +18,7 @@ class SARibbonControlButton;
 class SARibbonButtonGroupWidget;
 class SARibbonStackedWidget;
 class SARibbonQuickAccessBar;
+class SARibbonPannelOptionButton;
 
 /**
  * @brief 定义了saribbon所有尺寸相关信息，saribbon的建立都基于此类的尺寸，如果想调整，
@@ -39,7 +40,8 @@ public:
     QMargins widgetBord;                    ///< 整个ribbonbar的四个边框，默认为0
     QColor tabBarBaseLineColor;             ///< tabbar 底部线条颜色
     int pannelTitleHeight;                  ///< ribbon的标题高度，在3行模式下才会显示标题
-    int pannelTitleOptionButtonSpace;       ///< pannel标题栏的操作按钮和标题的间隔
+    QMargins pannelLayoutMargins2Rows; ///< 针对2 row模式下SARibbonPannel的layout的ContentsMargins
+    QMargins pannelLayoutMargins3Rows; ///< 针对3 row模式下SARibbonPannel的layout的ContentsMargins
 };
 
 ///
@@ -70,6 +72,9 @@ public:
     //
     virtual const SARibbonStyleOption& getRibbonStyleOption() const;
     virtual void setRibbonStyleOption(SARibbonStyleOption *opt);
+
+    //创建SARibbonPannelOptionButton
+    virtual SARibbonPannelOptionButton* createRibbonPannelOptionButton(SARibbonPannel* pannel);
 
 private:
     SARibbonStyleOption *m_opt;

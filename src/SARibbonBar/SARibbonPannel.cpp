@@ -92,9 +92,9 @@ void SARibbonPannelPrivate::createLayout()
     m_gridLayout = new QGridLayout(Parent);
     m_gridLayout->setSpacing(2);
     if (SARibbonPannel::TwoRowMode == m_pannelLayoutMode) {
-        m_gridLayout->setContentsMargins(3, 3, 6, 2);
+        m_gridLayout->setContentsMargins(RibbonSubElementStyleOpt.pannelLayoutMargins2Rows);
     }else{
-        m_gridLayout->setContentsMargins(3, 2, 3, RibbonSubElementStyleOpt.pannelTitleHeight);
+        m_gridLayout->setContentsMargins(RibbonSubElementStyleOpt.pannelLayoutMargins3Rows);
     }
 }
 
@@ -343,11 +343,11 @@ QList<SARibbonToolButton *> SARibbonPannel::toolButtons() const
 void SARibbonPannel::setPannelLayoutMode(SARibbonPannel::PannelLayoutMode mode)
 {
     if (m_d->m_pannelLayoutMode == mode) {
+#ifdef SA_RIBBON_DEBUG_HELP_DRAW
         qDebug() << QStringLiteral("setPannelLayoutMode 多次调用同一函数，跳过");
+#endif
         return;
     }
-    //PannelLayoutMode old = m_d->m_pannelLayoutMode;
-
     m_d->m_pannelLayoutMode = mode;
     int high = c_higherModehight;
 
@@ -384,9 +384,10 @@ SARibbonPannel::PannelLayoutMode SARibbonPannel::pannelLayoutMode() const
 void SARibbonPannel::addSeparator()
 {
     SARibbonSeparatorWidget *sep = RibbonSubElementDelegate->createRibbonSeparatorWidget(separatorHeight(), this);
-
+#ifdef SA_RIBBON_DEBUG_HELP_DRAW
     qDebug() << "SARibbonPannel height:" << height() << " sizeHint:" << sizeHint() << " geometry" << geometry();
     qDebug() << "SARibbonPannel addSeparator:" << separatorHeight();
+#endif
     m_d->m_gridLayout->addWidget(sep, 0, m_d->m_gridLayout->columnCount(), 6, 1);
     m_d->m_row = 0;
 }
@@ -475,7 +476,12 @@ int SARibbonPannel::gridLayoutColumnCount() const
     return (m_d->m_gridLayout->columnCount());
 }
 
-
+/**
+ * @brief 添加操作action，如果要去除，传入nullptr指针即可，SARibbonPannel不会对QAction的所有权进行管理
+ * @param action
+ * @note 要去除OptionAction直接传入nullptr即可
+ * @note SARibbonPannel不对QAction的destroy进行关联，如果外部对action进行delete，需要先传入nullptr给addOptionAction
+ */
 void SARibbonPannel::addOptionAction(QAction *action)
 {
     if (nullptr == action) {
@@ -486,7 +492,12 @@ void SARibbonPannel::addOptionAction(QAction *action)
         return;
     }
     if (nullptr == m_d->m_optionActionButton) {
-        m_d->m_optionActionButton = new SARibbonPannelOptionButton(this);
+        m_d->m_optionActionButton = RibbonSubElementDelegate->createRibbonPannelOptionButton(this);
+        if (SARibbonPannel::TwoRowMode == pannelLayoutMode()) {
+            QMargins m = RibbonSubElementStyleOpt.pannelLayoutMargins2Rows;
+            m.setRight(m_d->m_optionActionButton->width());
+            m_d->m_gridLayout->setContentsMargins(m);
+        }
     }
     m_d->m_optionActionButton->connectAction(action);
     repaint();
@@ -516,13 +527,13 @@ void SARibbonPannel::paintEvent(QPaintEvent *event)
         p.setFont(f);
         if (m_d->m_optionActionButton) {
             p.drawText(1, height()-RibbonSubElementStyleOpt.pannelTitleHeight
-                , width()-m_d->m_optionActionButton->width() - RibbonSubElementStyleOpt.pannelTitleOptionButtonSpace
+                , width()- m_d->m_optionActionButton->width() - 4
                 , RibbonSubElementStyleOpt.pannelTitleHeight
                 , Qt::AlignCenter
                 , windowTitle());
 #ifdef SA_RIBBON_DEBUG_HELP_DRAW
             QRect r = QRect(1, height()-RibbonSubElementStyleOpt.pannelTitleHeight
-                , width()-m_d->m_optionActionButton->width() - RibbonSubElementStyleOpt.pannelTitleOptionButtonSpace
+                , width()- m_d->m_optionActionButton->width() - 4
                 , RibbonSubElementStyleOpt.pannelTitleHeight-2);
             HELP_DRAW_RECT(p, r);
 #endif
@@ -548,10 +559,18 @@ void SARibbonPannel::paintEvent(QPaintEvent *event)
 QSize SARibbonPannel::sizeHint() const
 {
     QSize laySize = layout()->sizeHint();
-    QFontMetrics fm = fontMetrics();
-    QSize titleSize = fm.size(Qt::TextShowMnemonic, windowTitle());
     int maxWidth = laySize.width() + 2;
-    maxWidth = qMax(maxWidth, titleSize.width()) + RibbonSubElementStyleOpt.pannelTitleOptionButtonSpace;
+    if(ThreeRowMode == pannelLayoutMode()){
+        //三行模式
+        QFontMetrics fm = fontMetrics();
+        QSize titleSize = fm.size(Qt::TextShowMnemonic, windowTitle());
+        if(m_d->m_optionActionButton)
+        {
+            //optionActionButton的宽度需要预留
+            titleSize.setWidth(titleSize.width() + m_d->m_optionActionButton->width() + 4);
+        }
+        maxWidth = qMax(maxWidth, titleSize.width());
+    }
     return (QSize(maxWidth, laySize.height()));
 }
 
@@ -704,9 +723,14 @@ void SARibbonPannel::resizeEvent(QResizeEvent *event)
 {
     //! 1.移动操作按钮到角落
     if (m_d->m_optionActionButton) {
-        m_d->m_optionActionButton->move(width()-RibbonSubElementStyleOpt.pannelTitleOptionButtonSpace/2 - m_d->m_optionActionButton->width()
-            , height()-RibbonSubElementStyleOpt.pannelTitleHeight
-            +(RibbonSubElementStyleOpt.pannelTitleHeight-m_d->m_optionActionButton->height())/2);
+        if(ThreeRowMode == pannelLayoutMode()){
+            m_d->m_optionActionButton->move(width() - m_d->m_optionActionButton->width() - 2
+                , height()-RibbonSubElementStyleOpt.pannelTitleHeight
+                +(RibbonSubElementStyleOpt.pannelTitleHeight-m_d->m_optionActionButton->height())/2);
+        }else{
+            m_d->m_optionActionButton->move(width() - m_d->m_optionActionButton->width()
+                , height()-m_d->m_optionActionButton->height());
+        }
     }
     //! 2.resize后，重新设置分割线的高度
     //! 由于分割线在布局中，只要分割线足够高就可以，不需要重新设置

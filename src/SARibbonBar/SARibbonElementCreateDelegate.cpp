@@ -13,6 +13,7 @@
 #include "SARibbonButtonGroupWidget.h"
 #include "SARibbonStackedWidget.h"
 #include "SARibbonQuickAccessBar.h"
+#include "SARibbonPannelOptionButton.h"
 
 SARibbonStyleOption::SARibbonStyleOption()
 {
@@ -27,7 +28,8 @@ SARibbonStyleOption::SARibbonStyleOption()
     widgetBord = QMargins(0, 0, 0, 0);
     tabBarBaseLineColor = QColor(186, 201, 219);
     pannelTitleHeight = 21;
-    pannelTitleOptionButtonSpace = 6;
+    pannelLayoutMargins2Rows = QMargins(3, 3, 3, 2);
+    pannelLayoutMargins3Rows = QMargins(3, 2, 3, pannelTitleHeight);
 }
 
 
@@ -147,4 +149,15 @@ void SARibbonElementCreateDelegate::setRibbonStyleOption(SARibbonStyleOption *op
         delete m_opt;
     }
     m_opt = opt;
+}
+
+/**
+ * @brief 创建SARibbonPannelOptionButton
+ * @param pannel 附属的pannel
+ * @return
+ * @sa @ref SARibbonPannelOptionButton
+ */
+SARibbonPannelOptionButton *SARibbonElementCreateDelegate::createRibbonPannelOptionButton(SARibbonPannel *pannel)
+{
+    return new SARibbonPannelOptionButton(pannel);
 }

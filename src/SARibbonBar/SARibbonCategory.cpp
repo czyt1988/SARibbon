@@ -353,6 +353,10 @@ void SARibbonCategoryProxy::resizePannels(const QSize& categorySize)
     }else{
         m_d->mRightScrollBtn->setVisible(false);
         m_d->mLeftScrollBtn->setVisible(false);
+        //这个是避免一开始totalWidth > categorySize.width()，通过滚动按钮调整了m_d->mBaseX
+        //随之调整了窗体尺寸，调整后totalWidth < categorySize.width()导致category在原来位置
+        //无法显示，必须这里把mBaseX设置为0
+        m_d->mBaseX = 0;
     }
     //调整两个滚动按钮的位置
     m_d->mLeftScrollBtn->setGeometry(0, 0, 12, categorySize.height());
