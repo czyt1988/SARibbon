@@ -15,7 +15,7 @@
 #include "SARibbonGallery.h"
 #include "SARibbonElementManager.h"
 #include "SARibbonMenu.h"
-
+#include <QWidgetAction>
 
 #define HELP_DRAW_RECT(p, rect)		 \
     do{				 \
@@ -34,6 +34,9 @@ const int c_iconHighForHigerLarge = 32;
 const QSize c_iconSizeForHigerLarge = QSize(c_iconHighForHigerLarge, c_iconHighForHigerLarge);
 const int c_iconHighForHigerSmall = 16;
 const QSize c_iconSizeForHigerSmall = QSize(c_iconHighForHigerSmall, c_iconHighForHigerSmall);
+
+
+
 
 class SARibbonPannelPrivate
 {
@@ -109,6 +112,198 @@ void SARibbonPannelPrivate::recalcTitleY()
 }
 
 
+
+
+SARibbonPannelItem::SARibbonPannelItem(QWidget *widget):QWidgetItem(widget)
+    ,action(nullptr)
+    ,customWidget(false)
+{
+
+}
+
+bool SARibbonPannelItem::isEmpty() const
+{
+    return action == 0 || !action->isVisible();
+}
+
+
+
+
+SARibbonPannelLayout::SARibbonPannelLayout(QWidget *p):QLayout(p)
+  ,m_expandFlag(false)
+{
+    SARibbonPannel *tb = qobject_cast<SARibbonPannel*>(p);
+    if (!tb){
+        return;
+    }
+
+}
+
+SARibbonPannelLayout::~SARibbonPannelLayout()
+{
+
+}
+
+void SARibbonPannelLayout::addItem(QLayoutItem *item)
+{
+    qWarning(tr("SARibbonPannelLayout::addItem(): please use addAction() instead"));
+    return;
+}
+
+QLayoutItem *SARibbonPannelLayout::itemAt(int index) const
+{
+    if (index < 0 || index >= m_items.count())
+        return nullptr;
+    return m_items.at(index);
+}
+
+QLayoutItem *SARibbonPannelLayout::takeAt(int index)
+{
+    if (index < 0 || index >= m_items.count()){
+        return nullptr;
+    }
+    SARibbonPannelItem *item = m_items.takeAt(index);
+
+    QWidgetAction *widgetAction = qobject_cast<QWidgetAction*>(item->action);
+    if (widgetAction != 0 && item->customWidget) {
+        widgetAction->releaseWidget(item->widget());
+    } else {
+        // destroy the QToolButton/QToolBarSeparator
+        item->widget()->hide();
+        item->widget()->deleteLater();
+    }
+
+    invalidate();
+    return item;
+}
+
+int SARibbonPannelLayout::count() const
+{
+    return m_items.count();
+}
+
+bool SARibbonPannelLayout::isEmpty() const
+{
+    return m_items.isEmpty();
+}
+
+void SARibbonPannelLayout::invalidate()
+{
+    QLayout::invalidate();
+}
+
+Qt::Orientations SARibbonPannelLayout::expandingDirections() const
+{
+    return Qt::Horizontal;
+}
+
+QSize SARibbonPannelLayout::minimumSize() const
+{
+
+}
+
+QSize SARibbonPannelLayout::sizeHint() const
+{
+
+}
+
+bool SARibbonPannelLayout::isExpand() const
+{
+
+}
+
+/**
+ * @brief 把action转换为item，此函数会创建SARibbonToolButton
+ *
+ * 此函数参考QToolBarItem *QToolBarLayout::createItem(QAction *action)
+ * @param action
+ * @return
+ */
+SARibbonPannelItem *SARibbonPannelLayout::createItem(QAction *action)
+{
+    bool customWidget = false;
+    QWidget *widget = nullptr;
+    SARibbonPannel *pannel = qobject_cast<SARibbonPannel*>(parentWidget());
+    if (!pannel){
+            return nullptr;
+    }
+    if (QWidgetAction *widgetAction = qobject_cast<QWidgetAction *>(action)) {
+        widget = widgetAction->requestWidget(pannel);
+        if (widget != nullptr) {
+            widget->setAttribute(Qt::WA_LayoutUsesWidgetRect);
+            customWidget = true;
+        }
+    } else if (action->isSeparator()) {
+        SARibbonSeparatorWidget *sep = new SARibbonSeparatorWidget(pannel);
+        widget = sep;
+    }
+    //不是widget，自动生成SARibbonToolbutton
+    if (!widget) {
+        SARibbonToolButton *button = RibbonSubElementDelegate->createRibbonToolButton(pannel);
+        button->setAutoRaise(true);
+        button->setFocusPolicy(Qt::NoFocus);
+
+        button->setDefaultAction(action);
+        QObject::connect(button, &SARibbonToolButton::triggered
+                         , pannel,&SARibbonPannel::actionTriggered);
+        widget = button;
+    }
+    //这时总会有widget
+    widget->hide();
+    SARibbonPannelItem *result = new SARibbonPannelItem(widget);
+    result->customWidget = customWidget;
+    result->action = action;
+    return result;
+}
+
+/**
+ * @brief 更新尺寸
+ */
+void SARibbonPannelLayout::updateGeomArray() const
+{
+    SARibbonPannel *pannel = qobject_cast<SARibbonPannel*>(parentWidget());
+    if (!pannel)
+        return;
+    QMargins mag = this->contentsMargins();
+    const int margin = this->margin();
+    const int spacing = this->spacing();
+    for (int i = 0; i < m_items.count(); ++i) {
+        SARibbonPannelItem *item = m_items.at(i);
+        QSize max = item->maximumSize();
+        QSize min = item->minimumSize();
+        QSize hint = item->sizeHint();
+        Qt::Orientations exp = item->expandingDirections();
+        if (item->widget()) {
+            //有窗口是水平扩展，则标记为扩展
+            if ((item->widget()->sizePolicy().horizontalPolicy() & QSizePolicy::ExpandFlag)) {
+                m_expandFlag = true;
+            }
+        }
+    }
+}
+
+
+void SARibbonPannelLayout::setGeometry(const QRect &rect)
+{
+    int left, top, right, bottom;
+    getContentsMargins(&left, &top, &right, &bottom);
+    QRect effectiveRect = rect.adjusted(+left, +top, -right, -bottom);
+    const int margin = this->margin();
+    const int spacing = this->spacing();
+    for (int i = 0; i < m_items.count(); ++i) {
+        SARibbonPannelItem *item = m_items.at(i);
+    }
+}
+
+
+
+
+
+
+
+
+
+
 SARibbonPannel::SARibbonPannel(QWidget *parent) : QWidget(parent)
     , m_d(new SARibbonPannelPrivate(this))
 {
@@ -158,6 +353,11 @@ SARibbonToolButton *SARibbonPannel::addLargeToolButton(const QString& text, cons
     btn->setText(text);
     m_d->m_gridLayout->addWidget(btn, 0, m_d->m_gridLayout->columnCount(), 6, 1);
     m_d->m_row = 0;
+    QWidgetAction* action = new QWidgetAction(this);
+    action->setDefaultWidget(btn);
+    addAction(action);
+    action->requestWidget(this);
+    btn->setVisible(true);
     return (btn);
 }
 
@@ -184,6 +384,11 @@ SARibbonToolButton *SARibbonPannel::addSmallToolButton(const QString& text, cons
     if (m_d->m_row >= 5) {//
         m_d->m_row = 0;
     }
+    QWidgetAction* action = new QWidgetAction(this);
+    action->setDefaultWidget(btn);
+    addAction(action);
+    action->requestWidget(this);
+    btn->setVisible(true);
     return (btn);
 }
 
@@ -268,6 +473,11 @@ SARibbonToolButton *SARibbonPannel::addLargeMenu(SARibbonMenu *menu)
     btn->setMenu(menu);
     m_d->m_gridLayout->addWidget(btn, 0, m_d->m_gridLayout->columnCount(), 6, 1);
     m_d->m_row = 0;
+    QWidgetAction* action = new QWidgetAction(this);
+    action->setDefaultWidget(btn);
+    addAction(action);
+    action->requestWidget(this);
+    btn->setVisible(true);
     return (btn);
 }
 
@@ -291,6 +501,11 @@ SARibbonToolButton *SARibbonPannel::addSmallMenu(SARibbonMenu *menu)
     if (m_d->m_row >= 5) {
         m_d->m_row = 0;
     }
+    QWidgetAction* action = new QWidgetAction(this);
+    action->setDefaultWidget(btn);
+    addAction(action);
+    action->requestWidget(this);
+    btn->setVisible(true);
     return (btn);
 }
 
@@ -312,6 +527,11 @@ SARibbonGallery *SARibbonPannel::addGallery()
     m_d->m_gridLayout->addWidget(gallery, 0, m_d->m_gridLayout->columnCount(), 6, 1);
     m_d->m_row = 0;
     setExpanding();
+    QWidgetAction* action = new QWidgetAction(this);
+    action->setDefaultWidget(gallery);
+    addAction(action);
+    action->requestWidget(this);
+    gallery->setVisible(true);
     return (gallery);
 }
 
@@ -395,6 +615,11 @@ void SARibbonPannel::addSeparator(int top,int bottom)
     sep->setTopBottomMargins(6,6);
     m_d->m_gridLayout->addWidget(sep, 0, m_d->m_gridLayout->columnCount(), 6, 1);
     m_d->m_row = 0;
+    QWidgetAction* action = new QWidgetAction(this);
+    action->setDefaultWidget(sep);
+    addAction(action);
+    action->requestWidget(this);
+    sep->setVisible(true);
 }
 
 
@@ -418,6 +643,11 @@ void SARibbonPannel::addSmallWidget(QWidget *w)
     if (m_d->m_row >= 5) {
         m_d->m_row = 0;
     }
+    QWidgetAction* action = new QWidgetAction(this);
+    action->setDefaultWidget(w);
+    addAction(action);
+    action->requestWidget(this);
+    w->setVisible(true);
 }
 
 
@@ -430,6 +660,11 @@ void SARibbonPannel::addLargeWidget(QWidget *w)
 
     m_d->m_gridLayout->addWidget(w, 0, col, 6, 1);
     m_d->m_row = 0;
+    QWidgetAction* action = new QWidgetAction(this);
+    action->setDefaultWidget(w);
+    addAction(action);
+    action->requestWidget(this);
+    w->setVisible(true);
 }
 
 
@@ -454,6 +689,11 @@ void SARibbonPannel::addWidget(QWidget *w, int row, int rowSpan)
     if (m_d->m_row >= 5) {
         m_d->m_row = 0;
     }
+    QWidgetAction* action = new QWidgetAction(this);
+    action->setDefaultWidget(w);
+    addAction(action);
+    action->requestWidget(this);
+    w->setVisible(true);
 }
 
 
@@ -473,6 +713,11 @@ void SARibbonPannel::addWidget(QWidget *w, int row, int rowSpan, int column, int
     if (row >= 5) {
         m_d->m_row = 0;
     }
+    QWidgetAction* action = new QWidgetAction(this);
+    action->setDefaultWidget(w);
+    addAction(action);
+    action->requestWidget(this);
+    w->setVisible(true);
 }
 
 
@@ -742,19 +987,21 @@ void SARibbonPannel::resizeEvent(QResizeEvent *event)
     return (QWidget::resizeEvent(event));
 }
 
-
 /**
- * @brief 返回分割线的高度
- *
- * 默认为：
- *
- * @code
- * return (sizeHint().height() - 10);
- * @endcode
- *
- * @return 返回分割线的高度
+ * @brief 处理action的事件
+ * @param e
  */
-int SARibbonPannel::separatorHeight() const
+void SARibbonPannel::actionEvent(QActionEvent *e)
 {
-    return (sizeHint().height() - 10);
+    QAction *action = e->action();
+    switch (e->type()) {
+    case QEvent::ActionChanged:
+
+        break;
+    }
 }
+
+
+
+
+
