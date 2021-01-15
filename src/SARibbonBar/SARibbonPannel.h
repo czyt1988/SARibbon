@@ -2,6 +2,7 @@
 #define SARIBBONPANNEL_H
 #include "SARibbonGlobal.h"
 #include <QWidget>
+#include <QLayout>
 #include "SARibbonToolButton.h"
 class SARibbonMenu;
 class SARibbonGallery;
@@ -51,7 +52,12 @@ public:
     virtual QSize minimumSizeHint() const Q_DECL_OVERRIDE;
     void setExpanding(bool isExpanding = true);
     bool isExpanding() const;
-
+signals:
+    /**
+     * @brief 等同于QToolBar::actionTriggered
+     * @param action
+     */
+    void actionTriggered(QAction *action);
 protected:
     void addWidget(QWidget *w, int row, int rowSpan);
     void addWidget(QWidget *w, int row, int rowSpan, int column, int columnSpan);
@@ -60,10 +66,52 @@ protected:
     static QSize maxHightIconSize(const QSize& size, int h);
     void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
     virtual void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
-    virtual int separatorHeight() const;
+    virtual void actionEvent(QActionEvent *e) Q_DECL_OVERRIDE;
 
 private:
     SARibbonPannelPrivate *m_d;
 };
+
+class SARibbonPannelItem : public QWidgetItem
+{
+public:
+    SARibbonPannelItem(QWidget *widget);
+    bool isEmpty() const Q_DECL_OVERRIDE;
+
+    QAction *action;
+    bool customWidget;
+};
+
+class SA_RIBBON_EXPORT SARibbonPannelLayout : public QLayout
+{
+    Q_OBJECT
+public:
+    SARibbonPannelLayout(QWidget *p = 0);
+    ~SARibbonPannelLayout();
+    //SARibbonPannelLayout additem 无效
+    void addItem(QLayoutItem *item) Q_DECL_OVERRIDE;
+    //
+    QLayoutItem *itemAt(int index) const Q_DECL_OVERRIDE;
+    QLayoutItem *takeAt(int index) Q_DECL_OVERRIDE;
+    int count() const Q_DECL_OVERRIDE;
+
+    bool isEmpty() const Q_DECL_OVERRIDE;
+    void invalidate() Q_DECL_OVERRIDE;
+    Qt::Orientations expandingDirections() const Q_DECL_OVERRIDE;
+
+    void setGeometry(const QRect &rect) Q_DECL_OVERRIDE;
+    QSize minimumSize() const Q_DECL_OVERRIDE;
+    QSize sizeHint() const Q_DECL_OVERRIDE;
+public:
+    bool isExpand() const;
+protected:
+    //把action转换为item，此函数会创建SARibbonToolButton
+    SARibbonPannelItem* createItem(QAction* action);
+    void updateGeomArray() const;
+private:
+    QList<SARibbonPannelItem*> m_items;
+    bool m_expandFlag; ///< 标记是否是会扩展的
+};
+
 
 #endif // SARIBBONPANNEL_H
