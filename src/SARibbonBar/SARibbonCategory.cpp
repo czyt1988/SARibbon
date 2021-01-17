@@ -251,6 +251,7 @@ void SARibbonCategoryProxy::addPannel(SARibbonPannel *pannel)
     }
     pannel->setPannelLayoutMode(ribbonPannelLayoutMode());
     SARibbonSeparatorWidget *seprator = RibbonSubElementDelegate->createRibbonSeparatorWidget(ribbonCategory()->height(), ribbonCategory());
+
     //建立监控，监控show,hide事件，用于触发重新布局
     pannel->installEventFilter(this);
     m_d->mPannelLists.append(pannel);
@@ -412,7 +413,6 @@ bool SARibbonCategoryProxy::eventFilter(QObject *watched, QEvent *event)
     if (pannel) {
         switch (event->type())
         {
-
         case QEvent::HideToParent:
         {
             //隐藏和显示都要重新布局
@@ -461,16 +461,17 @@ void SARibbonCategoryProxy::onLeftScrollButtonClicked()
     QList<QPair<QWidget *, QSize> > w = allVisibleCategoryWidgetSizes();
     //求总宽
     int totalWidth = 0;
+
     for (QPair<QWidget *, QSize> r : w)
     {
         totalWidth += r.second.width();
     }
 #ifdef SA_RIBBON_DEBUG_HELP_DRAW
-    qDebug() << "= SARibbonCategoryProxy::onLeftScrollButtonClicked totalWidth:"
-             << totalWidth
-             << " width:"<<width
-             << " m_d->mBaseX" << m_d->mBaseX
-                ;
+    qDebug()	<< "= SARibbonCategoryProxy::onLeftScrollButtonClicked totalWidth:"
+            << totalWidth
+            << " width:"<<width
+            << " m_d->mBaseX" << m_d->mBaseX
+    ;
 #endif
     if (totalWidth > width) {
         int tmp = m_d->mBaseX + width;
@@ -497,11 +498,11 @@ void SARibbonCategoryProxy::onRightScrollButtonClicked()
         totalWidth += r.second.width();
     }
 #ifdef SA_RIBBON_DEBUG_HELP_DRAW
-    qDebug() << "= SARibbonCategoryProxy::onRightScrollButtonClicked totalWidth:"
-             << totalWidth
-             << " width:"<<width
-             << " m_d->mBaseX" << m_d->mBaseX
-                ;
+    qDebug()	<< "= SARibbonCategoryProxy::onRightScrollButtonClicked totalWidth:"
+            << totalWidth
+            << " width:"<<width
+            << " m_d->mBaseX" << m_d->mBaseX
+    ;
 #endif
     if (totalWidth > width) {
         int tmp = m_d->mBaseX - width;
