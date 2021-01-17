@@ -43,9 +43,19 @@ public:
     //返回所有的Pannel
     QList<SARibbonPannel *> pannelList() const;
 
+    //
+    QSize sizeHint() const Q_DECL_OVERRIDE;
+
+protected slots:
+    void onLeftScrollButtonClicked();
+    void onRightScrollButtonClicked();
+
 protected:
     //事件处理
     bool event(QEvent *e) Q_DECL_OVERRIDE;
+
+    //
+    void resizeEvent(QResizeEvent *e) Q_DECL_OVERRIDE;
 
     //设置pannel的模式
     void setRibbonPannelLayoutMode(SARibbonPannel::PannelLayoutMode m);
