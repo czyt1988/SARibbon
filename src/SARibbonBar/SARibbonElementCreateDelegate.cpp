@@ -27,9 +27,6 @@ SARibbonStyleOption::SARibbonStyleOption()
     titleTextColor = Qt::black;
     widgetBord = QMargins(0, 0, 0, 0);
     tabBarBaseLineColor = QColor(186, 201, 219);
-    pannelTitleHeight = 21;
-    pannelLayoutMargins2Rows = QMargins(3, 3, 3, 2);
-    pannelLayoutMargins3Rows = QMargins(3, 2, 3, pannelTitleHeight);
 }
 
 
@@ -87,6 +84,7 @@ SARibbonSeparatorWidget *SARibbonElementCreateDelegate::createRibbonSeparatorWid
 {
     return (new SARibbonSeparatorWidget(value, parent));
 }
+
 
 SARibbonSeparatorWidget *SARibbonElementCreateDelegate::createRibbonSeparatorWidget(QWidget *parent)
 {
@@ -156,6 +154,7 @@ void SARibbonElementCreateDelegate::setRibbonStyleOption(SARibbonStyleOption *op
     m_opt = opt;
 }
 
+
 /**
  * @brief 创建SARibbonPannelOptionButton
  * @param pannel 附属的pannel
@@ -164,5 +163,5 @@ void SARibbonElementCreateDelegate::setRibbonStyleOption(SARibbonStyleOption *op
  */
 SARibbonPannelOptionButton *SARibbonElementCreateDelegate::createRibbonPannelOptionButton(SARibbonPannel *pannel)
 {
-    return new SARibbonPannelOptionButton(pannel);
+    return (new SARibbonPannelOptionButton(pannel));
 }

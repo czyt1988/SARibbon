@@ -39,9 +39,6 @@ public:
     QColor titleTextColor;                  ///< 标题颜色
     QMargins widgetBord;                    ///< 整个ribbonbar的四个边框，默认为0
     QColor tabBarBaseLineColor;             ///< tabbar 底部线条颜色
-    int pannelTitleHeight;                  ///< ribbon的标题高度，在3行模式下才会显示标题
-    QMargins pannelLayoutMargins2Rows; ///< 针对2 row模式下SARibbonPannel的layout的ContentsMargins
-    QMargins pannelLayoutMargins3Rows; ///< 针对3 row模式下SARibbonPannel的layout的ContentsMargins
 };
 
 ///
@@ -75,7 +72,7 @@ public:
     virtual void setRibbonStyleOption(SARibbonStyleOption *opt);
 
     //创建SARibbonPannelOptionButton
-    virtual SARibbonPannelOptionButton* createRibbonPannelOptionButton(SARibbonPannel* pannel);
+    virtual SARibbonPannelOptionButton *createRibbonPannelOptionButton(SARibbonPannel *pannel);
 
 private:
     SARibbonStyleOption *m_opt;
