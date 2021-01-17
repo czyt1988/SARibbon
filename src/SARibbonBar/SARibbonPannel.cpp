@@ -353,6 +353,8 @@ void SARibbonPannelLayout::layoutActions()
             hideWidgets << item->widget();
         }else{
             item->setGeometry(item->itemWillSetGeometry);
+//            item->widget()->setFixedSize(item->itemWillSetGeometry.size());
+//            item->widget()->move(item->itemWillSetGeometry.topLeft());
             showWidgets << item->widget();
 #ifdef SA_RIBBON_DEBUG_HELP_DRAW
             qDebug()	<< "[" << item->rowIndex<<","<<item->columnIndex<<"]"
