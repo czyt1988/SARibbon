@@ -6,7 +6,7 @@
 #include <QScopedPointer>
 #include <QPushButton>
 class SARibbonCategoryProxyPrivate;
-class SARibbonCategoryProxy;
+class SARibbonCategoryPrivate;
 class QHBoxLayout;
 
 
@@ -40,72 +40,21 @@ public:
     //设置背景
     void setBackgroundBrush(const QBrush& brush);
 
-    //返回SARibbonCategory的代理
-    SARibbonCategoryProxy *proxy();
-    const SARibbonCategoryProxy *proxy() const;
-
-    //设置SARibbonCategory的代理
-    void setProxy(SARibbonCategoryProxy *proxy);
-
     //返回所有的Pannel
-    const QList<SARibbonPannel *>& pannelList() const;
-    QList<SARibbonPannel *>& pannelList();
+    QList<SARibbonPannel *> pannelList() const;
 
 protected:
+    //事件处理
+    bool event(QEvent *e) Q_DECL_OVERRIDE;
+
     //设置pannel的模式
     void setRibbonPannelLayoutMode(SARibbonPannel::PannelLayoutMode m);
-    void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
-    void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
+    bool eventFilter(QObject *watched, QEvent *event) Q_DECL_OVERRIDE;
 
 private:
-    QScopedPointer<SARibbonCategoryProxy> m_proxy;
+    SARibbonCategoryPrivate *m_d;
 };
 
-///
-/// \brief ribbon页的代理类
-/// 如果需要修改重绘SARibbonCategory，可以通过设置SARibbonCategory::setProxy
-///
-class SA_RIBBON_EXPORT SARibbonCategoryProxy : public QObject
-{
-    Q_OBJECT
-public:
-    SARibbonCategoryProxy(SARibbonCategory *parent);
-    virtual ~SARibbonCategoryProxy();
-
-    virtual SARibbonPannel *addPannel(const QString& title);
-    virtual void addPannel(SARibbonPannel *pannel);
-
-    //把pannel从Category中移除，不会销毁，此时pannel的所有权归还操作者
-    bool takePannel(SARibbonPannel *pannel);
-
-    //移除Pannel，Category会直接回收SARibbonPannel内存
-    bool removePannel(SARibbonPannel *pannel);
-    virtual void setBackgroundBrush(const QBrush& brush);
-    virtual void resizeEvent(QResizeEvent *event);
-    virtual void paintEvent(QPaintEvent *event);
-    SARibbonCategory *ribbonCategory();
-    void setRibbonPannelLayoutMode(SARibbonPannel::PannelLayoutMode m);
-    SARibbonPannel::PannelLayoutMode ribbonPannelLayoutMode() const;
-    virtual void resizePannels(const QSize& categorySize);
-    virtual void resizePannels();
-
-    //返回所有的Pannel
-    virtual const QList<SARibbonPannel *>& pannelList() const;
-    virtual QList<SARibbonPannel *>& pannelList();
-
-    virtual bool eventFilter(QObject *watched, QEvent *event) override;
-
-public slots:
-    virtual void onLeftScrollButtonClicked();
-    virtual void onRightScrollButtonClicked();
-
-private:
-    //获取category所有窗口的尺寸
-    QList<QPair<QWidget *, QSize> > allVisibleCategoryWidgetSizes() const;
-
-private:
-    SARibbonCategoryProxyPrivate *m_d;
-};
 
 /**
  * @brief SARibbonCategory无法完全显示时，显示的调整按钮

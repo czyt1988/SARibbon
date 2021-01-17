@@ -10,6 +10,7 @@
 #include <QPainter>
 #include <QApplication>
 #include <QDesktopWidget>
+#include "SARibbonCategory.h"
 #include "SARibbonPannelOptionButton.h"
 #include "SARibbonSeparatorWidget.h"
 #include "SARibbonGallery.h"
@@ -301,12 +302,41 @@ QWidget *SARibbonPannelLayout::lastWidget() const
 
 
 /**
+ * @brief 根据pannel的默认参数得到的pannel高度
+ * @return
+ */
+int SARibbonPannelLayout::defaultPannelHeight() const
+{
+    SARibbonPannel *pannel = qobject_cast<SARibbonPannel *>(parentWidget());
+    int high = c_higherModehight;
+
+    if (pannel) {
+        switch (pannel->pannelLayoutMode())
+        {
+        case SARibbonPannel::ThreeRowMode:
+            high = c_higherModehight;
+            break;
+
+        case SARibbonPannel::TwoRowMode:
+            high = c_lowerModehight;
+            break;
+
+        default:
+            high = c_higherModehight;
+            break;
+        }
+    }
+    return (high);
+}
+
+
+/**
  * @brief 布局所有action
  */
 void SARibbonPannelLayout::layoutActions()
 {
     if (m_dirty) {
-        updateGeomArray();
+        updateGeomArray(geometry());
     }
     QList<QWidget *> showWidgets, hideWidgets;
 
@@ -414,13 +444,17 @@ SARibbonPannelItem *SARibbonPannelLayout::createItem(QAction *action, SARibbonPa
 /**
  * @brief 更新尺寸
  */
-void SARibbonPannelLayout::updateGeomArray()
+void SARibbonPannelLayout::updateGeomArray(const QRect& setrect)
 {
     SARibbonPannel *pannel = qobject_cast<SARibbonPannel *>(parentWidget());
 
     if (!pannel) {
         return;
     }
+//    QWidget *pannelPar = pannel->parentWidget();
+//    if(pannelPar)
+//    defaultPannelHeight();
+    int height = setrect.height();
     const QMargins mag = this->contentsMargins();
     const int spacing = this->spacing();
     int x = mag.left();
@@ -428,7 +462,7 @@ void SARibbonPannelLayout::updateGeomArray()
     //rowcount 是ribbon的行，有2行和3行两种
     const short rowCount = (pannel->pannelLayoutMode() == SARibbonPannel::ThreeRowMode) ? 3 : 2;
     // largeHeight是对应large占比的高度
-    const int largeHeight = pannel->height() - mag.top() - mag.bottom() - pannel->titleHeight();
+    const int largeHeight = height - mag.top() - mag.bottom() - pannel->titleHeight();
     //计算smallHeight的高度
     const int smallHeight = (largeHeight - (rowCount-1)*spacing) / rowCount;
     //Medium行的y位置
@@ -454,6 +488,7 @@ void SARibbonPannelLayout::updateGeomArray()
 #ifdef SA_RIBBON_DEBUG_HELP_DRAW
     qDebug()	<< "\r\n\r\n============================================="
             << "\r\nSARibbonPannelLayout::updateGeomArray()"
+            << " setrect:" << setrect
             << "\r\npannel name:" << pannel->windowTitle()
             << "\r\n largeHeight:" << largeHeight
             << "\r\n smallHeight:" <<smallHeight
@@ -660,14 +695,15 @@ void SARibbonPannelLayout::updateGeomArray()
             totalWidth += pannel->optionActionButtonSize().width();
         }
     }
-    this->m_sizeHint = QSize(totalWidth, pannel->height());
+    this->m_sizeHint = QSize(totalWidth, height);
 }
 
 
 void SARibbonPannelLayout::setGeometry(const QRect& rect)
 {
+    qDebug() << " /////SARibbonPannelLayout::setGeometry: " << rect;
     m_dirty = false;
-    updateGeomArray();
+    updateGeomArray(rect);
     QLayout::setGeometry(rect);
     layoutActions();
 }
@@ -979,27 +1015,27 @@ void SARibbonPannel::setPannelLayoutMode(SARibbonPannel::PannelLayoutMode mode)
         return;
     }
     m_d->m_pannelLayoutMode = mode;
-    int high = c_higherModehight;
+//    int high = c_higherModehight;
 
-    switch (mode)
-    {
-    case ThreeRowMode:
-        high = c_higherModehight;
-        break;
+//    switch (mode)
+//    {
+//    case ThreeRowMode:
+//        high = c_higherModehight;
+//        break;
 
-    case TwoRowMode:
-        high = c_lowerModehight;
-        break;
+//    case TwoRowMode:
+//        high = c_lowerModehight;
+//        break;
 
-    default:
-        high = c_higherModehight;
-        break;
-    }
-    setFixedHeight(high);
-    setMinimumWidth(50);
+//    default:
+//        high = c_higherModehight;
+//        break;
+//    }
+//    setFixedHeight(high);
+//    setMinimumWidth(50);
     resetLayout(mode);
     resetLargeToolButtonStyle();
-    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+//    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     //QApplication::postEvent(this, new QResizeEvent(newSize, oldSize));
 }
 

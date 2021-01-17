@@ -210,6 +210,9 @@ public:
     //获取最后生成的窗口
     QWidget *lastWidget() const;
 
+    //根据pannel的默认参数得到的pannel高度
+    int defaultPannelHeight() const;
+
 protected:
     //布局action
     void layoutActions();
@@ -217,7 +220,7 @@ protected:
     //把action转换为item，对于纯Action，此函数会创建SARibbonToolButton,
     //rp用于告诉Layout生成什么样的窗口，详细见SARibbonPannelItem::RowProportion
     SARibbonPannelItem *createItem(QAction *action, SARibbonPannelItem::RowProportion rp = SARibbonPannelItem::None);
-    void updateGeomArray();
+    void updateGeomArray(const QRect& setrect);
 
 private:
     QList<SARibbonPannelItem *> m_items;
