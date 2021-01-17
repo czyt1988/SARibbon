@@ -9,85 +9,7 @@ class SARibbonGallery;
 class QGridLayout;
 class SARibbonPannelOptionButton;
 class SARibbonPannelPrivate;
-///
-/// \brief pannel页窗口，pannel是ribbon的面板用于盛放控件
-///
-class SA_RIBBON_EXPORT SARibbonPannel : public QWidget
-{
-    Q_OBJECT
-public:
-    SARibbonPannel(QWidget *parent = 0);
-    ~SARibbonPannel();
-    using QWidget::addAction;
-    enum PannelLayoutMode {
-        ThreeRowMode    ///< 三行布局模式，office就是三行布局模式，pannel能布置3行小toolbutton，默认模式
-        , TwoRowMode    ///< 两行布局模式，wps的后续布局模式就是两行布局模式，pannel能布置2行小toolbutton
-    };
 
-    SARibbonToolButton *addLargeToolButton(const QString& text, const QIcon& icon, QToolButton::ToolButtonPopupMode popMode);
-    SARibbonToolButton *addLargeAction(QAction *action);
-    SARibbonToolButton *addSmallToolButton(const QString& text, const QIcon& icon, QToolButton::ToolButtonPopupMode popMode);
-    SARibbonToolButton *addSmallAction(QAction *action);
-    SARibbonToolButton *addMediumAction(QAction *action);
-    SARibbonToolButton *addLargeMenu(SARibbonMenu *menu);
-    SARibbonToolButton *addSmallMenu(SARibbonMenu *menu);
-    SARibbonToolButton *addLargeActionMenu(QAction *action, SARibbonMenu *menu);
-    SARibbonGallery *addGallery();
-
-    //添加分割线
-    void addSeparator(int top = 6, int bottom = 6);
-    void addSmallWidget(QWidget *w);
-    void addLargeWidget(QWidget *w);
-
-    //添加操作action，如果要去除，传入nullptr指针即可，SARibbonPannel不会对QAction的所有权进行管理
-    void addOptionAction(QAction *action);
-
-    //获取所有的buttons
-    QList<SARibbonToolButton *> toolButtons() const;
-
-    //设置PannelLayoutMode
-    void setPannelLayoutMode(PannelLayoutMode mode);
-    PannelLayoutMode pannelLayoutMode() const;
-
-    //判断是否为2行模式
-    bool isTwoRow() const { return (TwoRowMode == pannelLayoutMode()); }
-    int gridLayoutColumnCount() const;
-    virtual QSize sizeHint() const Q_DECL_OVERRIDE;
-    virtual QSize minimumSizeHint() const Q_DECL_OVERRIDE;
-
-    //把pannel设置为扩展模式，此时会撑大水平区域
-    void setExpanding(bool isExpanding = true);
-
-    //是否是扩展模式
-    bool isExpanding() const;
-
-    //标题栏高度，仅在3行模式下生效
-    virtual int titleHeight() const;
-
-    //optionActionButton的尺寸
-    virtual QSize optionActionButtonSize() const;
-
-signals:
-
-    /**
-     * @brief 等同于QToolBar::actionTriggered
-     * @param action
-     */
-    void actionTriggered(QAction *action);
-
-protected:
-    void addWidget(QWidget *w, int row, int rowSpan);
-    void addWidget(QWidget *w, int row, int rowSpan, int column, int columnSpan);
-    void resetLayout(PannelLayoutMode newmode);
-    void resetLargeToolButtonStyle();
-    static QSize maxHightIconSize(const QSize& size, int h);
-    void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
-    virtual void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
-    virtual void actionEvent(QActionEvent *e) Q_DECL_OVERRIDE;
-
-private:
-    SARibbonPannelPrivate *m_d;
-};
 
 /**
  * @brief 是对pannel所有子窗口的抽象，参考qt的toolbar
@@ -122,6 +44,124 @@ public:
     SARibbonPannelItem::RowProportion rowProportion;        ///< 行的占比，ribbon中有large，media和small三种占比,见@ref RowProportion
 };
 
+
+///
+/// \brief pannel页窗口，pannel是ribbon的面板用于盛放控件
+///
+class SA_RIBBON_EXPORT SARibbonPannel : public QWidget
+{
+    Q_OBJECT
+public:
+    SARibbonPannel(QWidget *parent = 0);
+    ~SARibbonPannel();
+    using QWidget::addAction;
+    enum PannelLayoutMode {
+        ThreeRowMode    ///< 三行布局模式，office就是三行布局模式，pannel能布置3行小toolbutton，默认模式
+        , TwoRowMode    ///< 两行布局模式，wps的后续布局模式就是两行布局模式，pannel能布置2行小toolbutton
+    };
+    //设置action的行行为，行属性决定了ribbon pannel的显示方式
+    void setActionRowProportion(QAction *action, SARibbonPannelItem::RowProportion rp);
+
+    //把action加入到pannel
+    SARibbonToolButton *addAction(QAction *action, SARibbonPannelItem::RowProportion rp);
+
+    //把action加入到pannel，并以大图标显示
+    SARibbonToolButton *addLargeAction(QAction *action);
+
+    //把action加入到pannel，在三行模式下会以中图标显示
+    SARibbonToolButton *addMediumAction(QAction *action);
+
+    //把action加入到pannel，并以小图标显示
+    SARibbonToolButton *addSmallAction(QAction *action);
+
+    //生成并添加一个action
+    QAction *addAction(const QString& text, const QIcon& icon
+        , QToolButton::ToolButtonPopupMode popMode
+        , SARibbonPannelItem::RowProportion rp = SARibbonPannelItem::Large);
+
+    //添加menu
+    SARibbonToolButton *addMenu(QMenu *menu
+        , SARibbonPannelItem::RowProportion rp
+        , QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
+
+    //添加action menu
+    SARibbonToolButton *addActionMenu(QAction *action, QMenu *menu, SARibbonPannelItem::RowProportion rp);
+
+    //action menu,action menu是一个特殊的menu,即可点击触发action，也可弹出菜单
+    SARibbonToolButton *addLargeActionMenu(QAction *action, QMenu *menu);
+
+    //添加普通大菜单
+    SARibbonToolButton *addLargeMenu(QMenu *menu, QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
+
+    //添加普通小按钮菜单
+    SARibbonToolButton *addSmallMenu(QMenu *menu, QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
+
+    //添加窗口
+    QAction *addWidget(QWidget *w, SARibbonPannelItem::RowProportion rp);
+
+    //添加窗口,占用ribbon的一行
+    QAction *addSmallWidget(QWidget *w);
+
+    //添加窗口，占用所有行
+    QAction *addLargeWidget(QWidget *w);
+
+    //添加一个Gallery
+    SARibbonGallery *addGallery();
+
+    //添加分割线
+    QAction *addSeparator(int top = 6, int bottom = 6);
+
+    //从pannel中把action对应的button提取出来，如果action没有对应的button，就返回nullptr
+    SARibbonToolButton *actionToRibbonToolButton(QAction *action);
+
+    //添加操作action，如果要去除，传入nullptr指针即可，SARibbonPannel不会对QAction的所有权进行管理
+    void addOptionAction(QAction *action);
+
+    //获取所有的buttons
+    QList<SARibbonToolButton *> ribbonToolButtons() const;
+
+    //设置PannelLayoutMode
+    void setPannelLayoutMode(PannelLayoutMode mode);
+    PannelLayoutMode pannelLayoutMode() const;
+
+    //判断是否为2行模式
+    bool isTwoRow() const { return (TwoRowMode == pannelLayoutMode()); }
+
+    virtual QSize sizeHint() const Q_DECL_OVERRIDE;
+    virtual QSize minimumSizeHint() const Q_DECL_OVERRIDE;
+
+    //把pannel设置为扩展模式，此时会撑大水平区域
+    void setExpanding(bool isExpanding = true);
+
+    //是否是扩展模式
+    bool isExpanding() const;
+
+    //标题栏高度，仅在3行模式下生效
+    virtual int titleHeight() const;
+
+    //optionActionButton的尺寸
+    virtual QSize optionActionButtonSize() const;
+
+signals:
+
+    /**
+     * @brief 等同于QToolBar::actionTriggered
+     * @param action
+     */
+    void actionTriggered(QAction *action);
+
+protected:
+    void resetLayout(PannelLayoutMode newmode);
+    void resetLargeToolButtonStyle();
+    static QSize maxHightIconSize(const QSize& size, int h);
+    void paintEvent(QPaintEvent *event) Q_DECL_OVERRIDE;
+    virtual void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
+    virtual void actionEvent(QActionEvent *e) Q_DECL_OVERRIDE;
+
+private:
+    SARibbonPannelPrivate *m_d;
+};
+
 /**
  * @brief 针对SARibbonPannel的布局
  *
@@ -137,8 +177,13 @@ public:
 
     SARibbonPannelLayout(QWidget *p = 0);
     ~SARibbonPannelLayout();
+    virtual int indexOf(QAction *action) const;
+
     //SARibbonPannelLayout additem 无效
     void addItem(QLayoutItem *item) Q_DECL_OVERRIDE;
+
+    //SARibbonPannel主要通过此函数来添加action
+    void insertAction(int index, QAction *act, SARibbonPannelItem::RowProportion rp = SARibbonPannelItem::None);
 
     //
     QLayoutItem *itemAt(int index) const Q_DECL_OVERRIDE;
@@ -153,6 +198,14 @@ public:
     QSize minimumSize() const Q_DECL_OVERRIDE;
     QSize sizeHint() const Q_DECL_OVERRIDE;
 
+    //通过action获取SARibbonPannelItem
+    SARibbonPannelItem *pannelItem(QAction *action) const;
+
+    //获取最后一个添加的item
+    SARibbonPannelItem *lastItem() const;
+
+    //获取最后生成的窗口
+    QWidget *lastWidget() const;
 
 protected:
     //布局action
@@ -160,7 +213,7 @@ protected:
 
     //把action转换为item，对于纯Action，此函数会创建SARibbonToolButton,
     //rp用于告诉Layout生成什么样的窗口，详细见SARibbonPannelItem::RowProportion
-    SARibbonPannelItem *createItem(QAction *action, SARibbonPannelItem::RowProportion rp = SARibbonPannelItem::Large);
+    SARibbonPannelItem *createItem(QAction *action, SARibbonPannelItem::RowProportion rp = SARibbonPannelItem::None);
     void updateGeomArray();
 
 private:
