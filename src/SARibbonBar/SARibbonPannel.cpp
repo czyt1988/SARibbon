@@ -310,6 +310,13 @@ void SARibbonPannelLayout::layoutActions()
     }
     QList<QWidget *> showWidgets, hideWidgets;
 
+#ifdef SA_RIBBON_DEBUG_HELP_DRAW
+    qDebug()	<< "\r\n\r\n =============================================="
+        "\r\n SARibbonPannelLayout::layoutActions"
+            << " \r\n name:" << parentWidget()->windowTitle()
+            << " sizehint:" << this->sizeHint()
+    ;
+#endif
     for (SARibbonPannelItem *item:m_items)
     {
         if (item->isEmpty()) {
@@ -317,6 +324,12 @@ void SARibbonPannelLayout::layoutActions()
         }else{
             item->setGeometry(item->itemWillSetGeometry);
             showWidgets << item->widget();
+#ifdef SA_RIBBON_DEBUG_HELP_DRAW
+            qDebug()	<< "[" << item->rowIndex<<","<<item->columnIndex<<"]"
+                    << " -> " << item->itemWillSetGeometry
+                    <<":"<<item->widget()->metaObject()->className()
+            ;
+#endif
         }
     }
 
@@ -445,6 +458,7 @@ void SARibbonPannelLayout::updateGeomArray()
             << "\r\npannel name:" << pannel->windowTitle()
             << "\r\n largeHeight:" << largeHeight
             << "\r\n smallHeight:" <<smallHeight
+            << "\r\n rowCount:"<<rowCount
     ;
 #endif
     for (int i = 0; i < itemCount; ++i)
@@ -618,12 +632,15 @@ void SARibbonPannelLayout::updateGeomArray()
         }
 #ifdef SA_RIBBON_DEBUG_HELP_DRAW
         qDebug()	<< item->widget()->metaObject()->className()
+                << " rp:" << rp
                 << " row:" << item->rowIndex << " col:" << item->columnIndex
                 << " new row:" << row << " new column:" << column
                 << " itemWillSetGeometry:" << item->itemWillSetGeometry
                 << " sizeHint:" << hint
+                << " x:" << x
         ;
 #endif
+        //最后一个元素，更新列数
         if (i == (itemCount-1)) { //最后一个元素，更新totalWidth
             if (item->columnIndex != column) {
                 //说明最后一个元素处于最后位置，触发了换列，此时真实列数需要减1，直接等于column索引
@@ -638,8 +655,12 @@ void SARibbonPannelLayout::updateGeomArray()
             }
         }
     }
-    //更新列数
-
+    //在有optionButton情况下，的2行模式，需要调整totalWidth
+    if (pannel->isTwoRow()) {
+        if (pannel->isHaveOptionAction()) {
+            totalWidth += pannel->optionActionButtonSize().width();
+        }
+    }
     this->m_sizeHint = QSize(totalWidth, pannel->height());
 }
 
@@ -1013,6 +1034,16 @@ void SARibbonPannel::addOptionAction(QAction *action)
     m_d->m_optionActionButton->connectAction(action);
     updateGeometry(); //通知layout进行重新布局
     repaint();
+}
+
+
+/**
+ * @brief 判断是否存在OptionAction
+ * @return 存在返回true
+ */
+bool SARibbonPannel::isHaveOptionAction() const
+{
+    return (m_d->m_optionActionButton != nullptr);
 }
 
 
