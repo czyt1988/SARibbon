@@ -371,12 +371,11 @@ SARibbonPannelItem *SARibbonPannelLayout::createItem(QAction *action, SARibbonPa
         widget = widgetAction->requestWidget(pannel);
         if (widget != nullptr) {
             widget->setAttribute(Qt::WA_LayoutUsesWidgetRect);
-            customWidget = true;
+            customWidget = true;//标记为true，在移除的时候是不会对这个窗口进行删除，false默认会进行删除如SARibbonSeparatorWidget和SARibbonToolButton
         }
     } else if (action->isSeparator()) {
         SARibbonSeparatorWidget *sep = RibbonSubElementDelegate->createRibbonSeparatorWidget(pannel);
         widget = sep;
-        customWidget = true;
     }
     //不是widget，自动生成SARibbonToolbutton
     if (!widget) {
