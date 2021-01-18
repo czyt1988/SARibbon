@@ -298,6 +298,7 @@ void SARibbonToolButton::paintLargeButton(QPaintEvent *e)
 #else
     QStyle::State bflags = opt.state & ~QStyle::State_Sunken;
 #endif
+
     if (autoRaise) {
         //如果autoRaise，但鼠标不在按钮上或者按钮不是激活状态，去除raised状态
         if (!(bflags & QStyle::State_MouseOver) || !(bflags & QStyle::State_Enabled)) {
@@ -442,7 +443,6 @@ bool SARibbonToolButton::hitButton(const QPoint& pos) const
 QSize SARibbonToolButton::sizeHint() const
 {
     QSize s = QToolButton::sizeHint();
-
     if (LargeButton == buttonType()) {
         //计算最佳大小
         if (s.width() > s.height()*1.4) {
@@ -461,7 +461,7 @@ QSize SARibbonToolButton::sizeHint() const
             if (LargeButtonType::Lite == largeButtonType()) {
                 QStyleOptionToolButton opt;
                 initStyleOption(&opt);
-                if (opt.features | QStyleOptionToolButton::HasMenu) {
+                if (opt.features | QStyleOptionToolButton::MenuButtonPopup) {
                     s.rwidth() += 10;
                 }
             }
@@ -546,6 +546,7 @@ void SARibbonToolButton::drawIconAndLabel(QPainter& p, QStyleOptionToolButton& o
             }
         }
     }else {
+        //小图标
         QPixmap pm;
         QSize pmSize = opt.iconSize;
         if (!opt.icon.isNull()) {
@@ -556,8 +557,8 @@ void SARibbonToolButton::drawIconAndLabel(QPainter& p, QStyleOptionToolButton& o
                 p.save();
                 p.setFont(opt.font);
 
-                QRect pr = m_iconRect;
-                QRect tr = opt.rect.adjusted(pr.width(), 0, -1, 0);
+                QRect pr = m_iconRect;//图标区域
+                QRect tr = opt.rect.adjusted(pr.width()+2, 0, -1 , 0);//文本区域
                 int alignment = Qt::TextShowMnemonic;
                 //快捷键的下划线
                 if (!style()->styleHint(QStyle::SH_UnderlineShortcut, &opt, this)) {
@@ -565,6 +566,7 @@ void SARibbonToolButton::drawIconAndLabel(QPainter& p, QStyleOptionToolButton& o
                 }
 
                 if (opt.toolButtonStyle == Qt::ToolButtonTextUnderIcon) {
+                    //ribbonbutton在小图标下，不支持ToolButtonTextUnderIcon
                 }else {
                     style()->drawItemPixmap(&p, QStyle::visualRect(opt.direction, opt.rect, pr), Qt::AlignCenter, pm);
                     alignment |= Qt::AlignLeft | Qt::AlignVCenter;
@@ -645,6 +647,7 @@ void SARibbonToolButton::setButtonType(const RibbonButtonType& buttonType)
         setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Expanding);
     }else {
         setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+        setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Preferred);
     }
     setMouseTracking(true);
 }
@@ -702,7 +705,8 @@ void SARibbonToolButton::calcIconRect(const QStyleOptionToolButton& opt)
         if (opt.toolButtonStyle == Qt::ToolButtonIconOnly) {
             m_iconRect = opt.rect;
         }else {
-            m_iconRect = QRect(0, 0, qMax(opt.rect.height(), opt.iconSize.width()), opt.rect.height());
+            //m_iconRect = QRect(0, 0, qMax(opt.rect.height(), opt.iconSize.width()), opt.rect.height());
+            m_iconRect = QRect(0, 0, opt.iconSize.width(), opt.rect.height());
         }
     }
     m_iconRect.translate(shiftX, shiftY);
@@ -751,7 +755,11 @@ QRect SARibbonToolButton::calcTextRect(const QRect& buttonRect, bool hasMenu) co
         }
     }else {
         if (!(Qt::ToolButtonIconOnly == toolButtonStyle())) {
-            rect = buttonRect.adjusted(m_iconRect.width(), 0, -1, 0);
+            if (hasMenu){
+                rect = buttonRect.adjusted(m_iconRect.width(), 0, -10, 0);
+            }else{
+                rect = buttonRect.adjusted(m_iconRect.width(), 0, -1, 0);
+            }
         }
     }
     return (rect);
