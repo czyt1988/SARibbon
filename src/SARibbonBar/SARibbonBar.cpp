@@ -48,9 +48,9 @@ public:
     SARibbonTabBar *ribbonTabBar;
     SARibbonStackedWidget *stackedContainerWidget;
     QList<ContextCategoryManagerData> currentShowingContextCategory;
-    QList<SARibbonContextCategory*> mContextCategoryList; ///< 存放所有的上下文标签
+    QList<SARibbonContextCategory *> mContextCategoryList;          ///< 存放所有的上下文标签
     int iconRightBorderPosition;                                    ///< 标题栏x值得最小值，在有图标和快捷启动按钮，此值都需要变化
-    SARibbonControlButton *minimumCaterogyButton;                        ///< 隐藏面板按钮
+    SARibbonControlButton *minimumCaterogyButton;                   ///< 隐藏面板按钮
     SARibbonButtonGroupWidget *tabBarRightSizeButtonGroupWidget;    ///< 在tab bar旁边的button group widget                                    ///< tabbar底部的线条颜色
     SARibbonQuickAccessBar *quickAccessBar;                         ///< 快速响应栏
     SARibbonBar::RibbonStyle ribbonStyle;                           ///< ribbon的风格
@@ -186,6 +186,7 @@ SARibbonBar::SARibbonBar(QWidget *parent) : QMenuBar(parent)
     setRibbonStyle(OfficeStyle);
 }
 
+
 SARibbonBar::~SARibbonBar()
 {
     delete m_d;
@@ -285,6 +286,7 @@ QList<SARibbonCategory *> SARibbonBar::categoryPages() const
     return (res);
 }
 
+
 /**
  * @brief 移除SARibbonCategory
  *
@@ -295,19 +297,20 @@ QList<SARibbonCategory *> SARibbonBar::categoryPages() const
 void SARibbonBar::removeCategory(SARibbonCategory *category)
 {
     int index = tabIndex(category);
-    if (index >= 0)
-    {
+
+    if (index >= 0) {
         m_d->ribbonTabBar->removeTab(index);
     }
     m_d->stackedContainerWidget->removeWidget(category);
     //同时验证这个category是否是contexcategory里的
-    for(SARibbonContextCategory* c : m_d->mContextCategoryList)
+    for (SARibbonContextCategory *c : m_d->mContextCategoryList)
     {
         c->takeCategory(category);
     }
     //移除完后需要重绘
     repaint();
 }
+
 
 /**
  * @brief 添加上下文标签
@@ -368,6 +371,7 @@ void SARibbonBar::showContextCategory(SARibbonContextCategory *context)
     repaint();
 }
 
+
 /**
  * @brief 隐藏上下文标签
  * @param context 上下文标签指针
@@ -420,14 +424,16 @@ void SARibbonBar::setContextCategoryVisible(SARibbonContextCategory *context, bo
     }
 }
 
+
 /**
  * @brief 获取所有的上下文标签
  * @return 返回上下文标签列表
  */
 QList<SARibbonContextCategory *> SARibbonBar::contextCategoryList() const
 {
-    return m_d->mContextCategoryList;
+    return (m_d->mContextCategoryList);
 }
+
 
 /**
  * @brief 销毁上下文标签，上下文标签的SARibbonCategory也会随之销毁
@@ -436,20 +442,22 @@ QList<SARibbonContextCategory *> SARibbonBar::contextCategoryList() const
 void SARibbonBar::destroyContextCategory(SARibbonContextCategory *context)
 {
     //! 1、如果上下文标签显示中，先隐藏
-    if(isContextCategoryVisible(context))
-    {
+    if (isContextCategoryVisible(context)) {
         hideContextCategory(context);
     }
     //! 2、删除上下文标签的相关内容
     m_d->mContextCategoryList.removeAll(context);
     //!
-    QList<SARibbonCategory*> res = context->categoryList();
-    for(SARibbonCategory* c : res){
+    QList<SARibbonCategory *> res = context->categoryList();
+
+    for (SARibbonCategory *c : res)
+    {
         c->hide();
         c->deleteLater();
     }
     context->deleteLater();
 }
+
 
 /**
  * @brief 设置为最小/正常模式
@@ -590,7 +598,6 @@ void SARibbonBar::onStackWidgetHided()
 }
 
 
-
 /**
  * @brief 标签切换触发槽函数
  * @param index
@@ -623,6 +630,7 @@ void SARibbonBar::onCurrentRibbonTabChanged(int index)
     }
     emit currentRibbonTabChanged(index);
 }
+
 
 /**
  * @brief ribbon tab bar单击
@@ -678,21 +686,20 @@ int SARibbonBar::tabIndex(SARibbonCategory *obj)
 {
     quint64 tabdata = (quint64)obj;
     const int size = m_d->ribbonTabBar->count();
-    for(int i=0;i<size;++i)
+
+    for (int i = 0; i < size; ++i)
     {
         QVariant v = m_d->ribbonTabBar->tabData(i);
-        if(v.isValid())
-        {
+        if (v.isValid()) {
             quint64 innervalue = v.value<quint64>();
-            if(innervalue == tabdata)
-            {
-                return i;
+            if (innervalue == tabdata) {
+                return (i);
             }
         }
     }
     //如果找不到就从stackedwidget中找
 
-    return -1;
+    return (-1);
 }
 
 
@@ -749,6 +756,7 @@ void SARibbonBar::setRibbonStyle(SARibbonBar::RibbonStyle v)
 
     QApplication::postEvent(this, new QResizeEvent(newSize, oldSize));
 }
+
 
 /**
  * @brief 返回当前ribbon的风格
@@ -1267,7 +1275,7 @@ void SARibbonBar::resizeInOfficeStyle()
     m_d->ribbonTabBar->setGeometry(x
         , y
         , tabBarWidth
-        , RibbonSubElementStyleOpt.tabBarHight);
+        , tabBarHeight());
 
 
     resizeStackedContainerWidget();
@@ -1291,6 +1299,7 @@ void SARibbonBar::resizeInWpsLiteStyle()
 
     //applitionButton 定位
     if (m_d->applitionButton) {
+        QRect rcapp = applitionButtonGeometry();
         if (m_d->applitionButton->isVisible()) {
             m_d->applitionButton->setGeometry(applitionButtonGeometry());
             x = m_d->applitionButton->geometry().right();
@@ -1355,7 +1364,7 @@ void SARibbonBar::resizeInWpsLiteStyle()
     m_d->ribbonTabBar->setGeometry(x
         , y
         , tabBarWidth
-        , tabBarHight);
+        , tabBarHeight());
 
     //调整整个stackedContainer
     resizeStackedContainerWidget();

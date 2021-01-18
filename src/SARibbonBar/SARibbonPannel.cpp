@@ -1168,7 +1168,7 @@ bool SARibbonPannel::isExpanding() const
  */
 int SARibbonPannel::titleHeight() const
 {
-    return (isTwoRow() ? 0 : 20);
+    return (isTwoRow() ? 0 : 21);
 }
 
 
@@ -1185,6 +1185,7 @@ QSize SARibbonPannel::optionActionButtonSize() const
 void SARibbonPannel::resetLayout(PannelLayoutMode newmode)
 {
     Q_UNUSED(newmode);
+    layout()->setSpacing(TwoRowMode == newmode ? 4 : 2);
     updateGeometry(); //通知layout进行重新布局
 }
 
