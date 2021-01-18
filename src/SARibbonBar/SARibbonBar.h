@@ -154,7 +154,7 @@ public:
     void setContextCategoryVisible(SARibbonContextCategory *context, bool visible);
 
     //获取所有的上下文标签
-    QList<SARibbonContextCategory*> contextCategoryList() const;
+    QList<SARibbonContextCategory *> contextCategoryList() const;
 
     //移除ContextCategory
     void destroyContextCategory(SARibbonContextCategory *context);
@@ -244,6 +244,7 @@ protected slots:
     virtual void onCurrentRibbonTabClicked(int index);
     virtual void onCurrentRibbonTabDoubleClicked(int index);
     void onContextsCategoryPageAdded(SARibbonCategory *category);
+
 private:
     int tabIndex(SARibbonCategory *obj);
     void updateRibbonElementGeometry();
@@ -253,6 +254,7 @@ private:
     void paintInWpsLiteStyle();
     void resizeStackedContainerWidget();
     void resizeTabbar();
+
 
 protected:
     void paintEvent(QPaintEvent *e) Q_DECL_OVERRIDE;
