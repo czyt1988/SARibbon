@@ -70,6 +70,7 @@ private:
     QColor m_borderColor;//TODO 如何获取border的颜色，从而替代此变量
     bool m_menuButtonPressed;
     QRect m_iconRect;
+    QSize m_sizeHint;//< 存放sizesizeHint
 };
 
 #endif // SARIBBONTOOLBUTTON_H

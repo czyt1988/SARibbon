@@ -413,7 +413,7 @@ void MainWindow::createContextCategoryPage1(SARibbonCategory *page)
     act2->setIcon(QIcon(":/icon/icon/529398.png"));
     act2->setText(QStringLiteral("disable"));
     pannel->addLargeAction(act2);
-    connect(act2, &QAction::toggled, this, [act2](bool b) {
+    connect(act2, &QAction::triggered, this, [act2](bool b) {
         act2->setDisabled(true);
     });
 
@@ -422,7 +422,7 @@ void MainWindow::createContextCategoryPage1(SARibbonCategory *page)
     act21->setIcon(QIcon(":/icon/icon/529398.png"));
     act21->setText(QStringLiteral("解锁左边的按钮"));
     pannel->addLargeAction(act21);
-    connect(act21, &QAction::toggled, this, [act2](bool b) {
+    connect(act21, &QAction::triggered, this, [act2](bool b) {
         qDebug() << "act2->setEnabled(true);";
         act2->setEnabled(true);
         act2->setText(QStringLiteral("Enabled"));
@@ -511,6 +511,30 @@ void MainWindow::createContextCategoryPage2(SARibbonCategory *page)
         this->ribbonBar()->removeCategory(page);
         page->deleteLater();
     });
+    SARibbonPannel *pannel2 = page->addPannel(QStringLiteral("特殊布局"));
+    pannel2->addAction(QStringLiteral("Large"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Large);
+    pannel2->addAction(QStringLiteral("Small"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Small);
+    pannel2->addAction(QStringLiteral("Small"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Small);
+    pannel2->addSeparator();
+    pannel2->addAction(QStringLiteral("Small"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Small);
+    pannel2->addAction(QStringLiteral("Small"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Small);
+    pannel2->addAction(QStringLiteral("Small"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Small);
+    pannel2->addAction(QStringLiteral("Small"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Small);
+    pannel2->addSeparator();
+    pannel2->addAction(QStringLiteral("Large"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Large);
+    pannel2->addAction(QStringLiteral("Medium"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Medium);
+    pannel2->addAction(QStringLiteral("Medium"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Medium);
+    pannel2->addAction(QStringLiteral("Large"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Small);
+    pannel2->addAction(QStringLiteral("Large"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Small);
+    pannel2->addAction(QStringLiteral("Large"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Small);
+    pannel2->addAction(QStringLiteral("Medium"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Medium);
+    pannel2->addAction(QStringLiteral("Medium"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Medium);
+    pannel2->addAction(QStringLiteral("Large"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Large);
+    pannel2->addSeparator();
+    pannel2->addAction(QStringLiteral("Medium"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Medium);
+    pannel2->addAction(QStringLiteral("Large"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Large);
+    pannel2->addAction(QStringLiteral("Medium"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Medium);
+    pannel2->addAction(QStringLiteral("Small"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Small);
 }
 
 

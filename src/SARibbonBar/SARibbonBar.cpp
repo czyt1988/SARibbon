@@ -300,6 +300,13 @@ void SARibbonBar::removeCategory(SARibbonCategory *category)
         m_d->ribbonTabBar->removeTab(index);
     }
     m_d->stackedContainerWidget->removeWidget(category);
+    //同时验证这个category是否是contexcategory里的
+    for(SARibbonContextCategory* c : m_d->mContextCategoryList)
+    {
+        c->takeCategory(category);
+    }
+    //移除完后需要重绘
+    repaint();
 }
 
 /**
@@ -327,6 +334,7 @@ SARibbonContextCategory *SARibbonBar::addContextCategory(const QString& title, c
     if (currentRibbonStyle() == WpsLiteStyle) {
         resizeInWpsLiteStyle();
     }
+    m_d->mContextCategoryList.append(context);
     return (context);
 }
 
@@ -437,7 +445,8 @@ void SARibbonBar::destroyContextCategory(SARibbonContextCategory *context)
     //!
     QList<SARibbonCategory*> res = context->categoryList();
     for(SARibbonCategory* c : res){
-        delete c;
+        c->hide();
+        c->deleteLater();
     }
     context->deleteLater();
 }

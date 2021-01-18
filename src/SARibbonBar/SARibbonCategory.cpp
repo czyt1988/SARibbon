@@ -265,12 +265,12 @@ bool SARibbonCategory::event(QEvent *e)
 void SARibbonCategory::resizeEvent(QResizeEvent *e)
 {
     QWidget::resizeEvent(e);
-    QSize delta = e->size() - e->oldSize();
+//    QSize delta = e->size() - e->oldSize();
 
-    //尺寸没变就不用管
-    if (delta.isNull()) {
-        return;
-    }
+//    //尺寸没变就不用管
+//    if (delta.isNull()) {
+//        return;
+//    }
     m_d->updateItemGeometry();
 }
 

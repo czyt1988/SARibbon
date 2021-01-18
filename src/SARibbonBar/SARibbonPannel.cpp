@@ -1011,34 +1011,11 @@ QList<SARibbonToolButton *> SARibbonPannel::ribbonToolButtons() const
 void SARibbonPannel::setPannelLayoutMode(SARibbonPannel::PannelLayoutMode mode)
 {
     if (m_d->m_pannelLayoutMode == mode) {
-#ifdef SA_RIBBON_DEBUG_HELP_DRAW
-        qDebug() << QStringLiteral("setPannelLayoutMode 多次调用同一函数，跳过");
-#endif
         return;
     }
     m_d->m_pannelLayoutMode = mode;
-//    int high = c_higherModehight;
-
-//    switch (mode)
-//    {
-//    case ThreeRowMode:
-//        high = c_higherModehight;
-//        break;
-
-//    case TwoRowMode:
-//        high = c_lowerModehight;
-//        break;
-
-//    default:
-//        high = c_higherModehight;
-//        break;
-//    }
-//    setFixedHeight(high);
-//    setMinimumWidth(50);
     resetLayout(mode);
     resetLargeToolButtonStyle();
-//    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-    //QApplication::postEvent(this, new QResizeEvent(newSize, oldSize));
 }
 
 
