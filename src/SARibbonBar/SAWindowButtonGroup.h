@@ -11,31 +11,45 @@ class SA_RIBBON_EXPORT SAWindowButtonGroup : public QWidget
 {
     Q_OBJECT
 public:
-    SAWindowButtonGroup(QWidget* parent,qreal iconscale=0.5);
+    SAWindowButtonGroup(QWidget *parent);
     ~SAWindowButtonGroup();
-    void setupMinimizeButton(bool on,qreal iconscale = 0.5);
-    void setupMaximizeButton(bool on,qreal iconscale = 0.5);
-    void setupCloseButton(bool on,qreal iconscale = 0.5);
-    void updateWindowFlag(qreal iconscale = 0.5);
+    void setupMinimizeButton(bool on);
+    void setupMaximizeButton(bool on);
+    void setupCloseButton(bool on);
+    void updateWindowFlag();
+
+    //设置按钮的宽度比例,最终按钮宽度将按照此比例进行设置
+    void setButtonWidthStretch(int close = 4, int max = 3, int min = 3);
+
+    //设置按钮的缩放比例
+    void setIconScale(qreal iconscale = 0.5);
+
+    //设置Qt::WindowStates
+    void setWindowStates(Qt::WindowStates s);
+
 protected:
-    QSize sizeHint() const override;
-    virtual bool eventFilter(QObject *watched, QEvent *e) override;
+    virtual QSize sizeHint() const Q_DECL_OVERRIDE;
+    virtual bool eventFilter(QObject *watched, QEvent *e) Q_DECL_OVERRIDE;
     virtual void parentResize();
+    virtual void resizeEvent(QResizeEvent *e) Q_DECL_OVERRIDE;
+
 private:
-    void updateMaximizeButtonIcon();
+    //void updateMaximizeButtonIcon();
+
 protected slots:
     Q_SLOT void closeWindow();
     Q_SLOT void minimizeWindow();
     Q_SLOT void maximizeWindow();
+
 private:
     friend class SAWindowButtonGroupPrivate;
-    SAWindowButtonGroupPrivate* m_d;
+    SAWindowButtonGroupPrivate *m_d;
 };
 
 class SAWindowToolButton : public QToolButton
 {
     Q_OBJECT
 public:
-    SAWindowToolButton(QWidget* p = nullptr);
+    SAWindowToolButton(QWidget *p = nullptr);
 };
 #endif // SAWINDOWBUTTONGROUP_H

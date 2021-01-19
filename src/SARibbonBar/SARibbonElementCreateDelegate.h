@@ -35,7 +35,6 @@ public:
     int mainbarHeightWPSStyleTwoRow;        ///< WpsLiteStyleTwoRow 样式下的mainbar高度
     int titleBarHight;                      ///< 标题栏高度
     int tabBarHight;                        ///< ribbon tab 的高度
-    int unusableTitleRegion;                ///<不可用的右边标题栏长度，主要是关闭按钮所占用的位置
     QColor titleTextColor;                  ///< 标题颜色
     QMargins widgetBord;                    ///< 整个ribbonbar的四个边框，默认为0
     QColor tabBarBaseLineColor;             ///< tabbar 底部线条颜色

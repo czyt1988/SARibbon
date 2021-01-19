@@ -84,12 +84,7 @@ bool SARibbonContextCategory::eventFilter(QObject *watched, QEvent *e)
         if(c)
         {
             qDebug()<<" -----------> close event";
-            for(int i=0;i<m_d->categoryDataList.size();++i){
-                if(m_d->categoryDataList[i].categoryPage == c)
-                {
-                    m_d->categoryDataList.removeAt(i);
-                }
-            }
+            takeCategory(c);
         }
     }
         break;
@@ -130,4 +125,22 @@ QList<SARibbonCategory *> SARibbonContextCategory::categoryList() const
         res.append(c.categoryPage);
     }
     return res;
+}
+
+/**
+ * @brief 移除这个category，这时SARibbonContextCategory不再管理这个category
+ * @param category
+ * @return 成功移除返回true
+ */
+bool SARibbonContextCategory::takeCategory(SARibbonCategory *category)
+{
+    for(int i = 0;i<m_d->categoryDataList.size();++i)
+    {
+        if(m_d->categoryDataList[i].categoryPage == category)
+        {
+            m_d->categoryDataList.takeAt(i);
+            return true;
+        }
+    }
+    return false;
 }

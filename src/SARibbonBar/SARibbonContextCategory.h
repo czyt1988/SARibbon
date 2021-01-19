@@ -30,6 +30,8 @@ public:
     SARibbonCategory* categoryPage(int index);
     //获取所有的SARibbonCategory*
     QList<SARibbonCategory*> categoryList() const;
+    //移除category
+    bool takeCategory(SARibbonCategory *category);
 signals:
     void categoryPageAdded(SARibbonCategory* category);
 protected:
