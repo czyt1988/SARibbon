@@ -29,6 +29,7 @@ class SA_RIBBON_EXPORT SARibbonMainWindow : public QMainWindow
     Q_OBJECT
 public:
     SARibbonMainWindow(QWidget *parent = nullptr, bool useRibbon = true);
+    ~SARibbonMainWindow();
     //返回SARibbonBar
     const SARibbonBar *ribbonBar() const;
     SARibbonBar *ribbonBar();
@@ -46,6 +47,7 @@ protected:
     void loadTheme(const QString& themeFile);
     void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
     bool eventFilter(QObject *obj, QEvent *e) Q_DECL_OVERRIDE;
+    bool event(QEvent *e) Q_DECL_OVERRIDE;
 
 private:
     SARibbonMainWindowPrivate *m_d;
