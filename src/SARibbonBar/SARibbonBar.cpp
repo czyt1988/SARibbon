@@ -1,4 +1,5 @@
 ﻿#include "SARibbonBar.h"
+#include "SAWindowButtonGroup.h"
 #include <QApplication>
 #include <QPainter>
 #include "SARibbonApplicationButton.h"
@@ -220,7 +221,7 @@ void SARibbonBar::setApplicationButton(QAbstractButton *btn)
             btn->setObjectName(QStringLiteral("SARibbonApplitionButton"));
         }
         btn->setVisible(true);
-        btn->setGeometry(applitionButtonGeometry());
+        //btn->setGeometry(applitionButtonGeometry());
     }
     //无论设置为什么都触发resize
     QApplication::postEvent(this, new QResizeEvent(size(), size()));
@@ -774,12 +775,6 @@ SARibbonBar::RibbonState SARibbonBar::currentRibbonState() const
 }
 
 
-int SARibbonBar::unusableTitleRegion() const
-{
-    return (RibbonSubElementStyleOpt.unusableTitleRegion);
-}
-
-
 ///
 /// \brief 切换到对应标签
 /// \param index 标签索引
@@ -865,6 +860,11 @@ bool SARibbonBar::eventFilter(QObject *obj, QEvent *e)
                 }
             }
         }
+        if (SAWindowButtonGroup *g = qobject_cast<SAWindowButtonGroup *>(obj)) {
+            if (e->type() == QEvent::Resize) {
+                m_d->windowButtonSize = g->size();
+            }
+        }
     }
     return (QMenuBar::eventFilter(obj, e));
 }
@@ -922,18 +922,9 @@ int SARibbonBar::mainBarHeight() const
 }
 
 
-QRect SARibbonBar::applitionButtonGeometry() const
+int SARibbonBar::applitionButtonWidth() const
 {
-    if (isOfficeStyle()) {
-        return (QRect(RibbonSubElementStyleOpt.widgetBord.left()
-               , RibbonSubElementStyleOpt.widgetBord.top() + RibbonSubElementStyleOpt.titleBarHight
-               , 56
-               , 30));
-    }
-    return (QRect(RibbonSubElementStyleOpt.widgetBord.left()
-           , RibbonSubElementStyleOpt.widgetBord.top(),
-           56
-           , 30));
+    return (56);
 }
 
 
@@ -1137,14 +1128,15 @@ void SARibbonBar::resizeStackedContainerWidget()
     if (m_d->stackedContainerWidget->isPopupMode()) {
         //弹出模式时，高度
         QPoint absPosition = mapToGlobal(QPoint(RibbonSubElementStyleOpt.widgetBord.left(), m_d->ribbonTabBar->geometry().bottom()+1));
-        m_d->stackedContainerWidget->setGeometry(QRect(absPosition.x(), absPosition.y()
+        m_d->stackedContainerWidget->setGeometry(absPosition.x()
+            , absPosition.y()
             , width()-RibbonSubElementStyleOpt.widgetBord.left()-RibbonSubElementStyleOpt.widgetBord.right()
-            , mainBarHeight()-m_d->ribbonTabBar->geometry().bottom()-2-RibbonSubElementStyleOpt.widgetBord.bottom()));
+            , mainBarHeight()-m_d->ribbonTabBar->geometry().bottom()-RibbonSubElementStyleOpt.widgetBord.bottom()-1);
     }else {
         m_d->stackedContainerWidget->setGeometry(RibbonSubElementStyleOpt.widgetBord.left()
             , m_d->ribbonTabBar->geometry().bottom()+1
             , width()-RibbonSubElementStyleOpt.widgetBord.left()-RibbonSubElementStyleOpt.widgetBord.right()
-            , mainBarHeight()-m_d->ribbonTabBar->geometry().bottom()-2-RibbonSubElementStyleOpt.widgetBord.bottom());
+            , mainBarHeight()-m_d->ribbonTabBar->geometry().bottom()-RibbonSubElementStyleOpt.widgetBord.bottom()-1);
     }
 }
 
@@ -1220,13 +1212,20 @@ void SARibbonBar::resizeInOfficeStyle()
     int y = RibbonSubElementStyleOpt.widgetBord.top();
 
     //cornerWidget - TopLeftCorner
+    const int titleH = titleBarHeight();
+    const int validTitleBarHeight = titleH - RibbonSubElementStyleOpt.widgetBord.top();
+    const int tabH = tabBarHeight();
+
     x += m_d->iconRightBorderPosition+5;
     if (QWidget *connerL = cornerWidget(Qt::TopLeftCorner)) {
         if (connerL->isVisible()) {
             QSize connerSize = connerL->sizeHint();
-            int detal = (RibbonSubElementStyleOpt.titleBarHight - connerSize.height()) / 2;
-            connerL->setGeometry(x, y+detal
-                , connerSize.width(), connerSize.height());
+            if (connerSize.height() < validTitleBarHeight) {
+                int detal = (validTitleBarHeight - connerSize.height()) / 2;
+                connerL->setGeometry(x, y+detal, connerSize.width(), connerSize.height());
+            }else{
+                connerL->setGeometry(x, y, connerSize.width(), validTitleBarHeight);
+            }
             x = connerL->geometry().right() + 5;
         }
     }
@@ -1234,48 +1233,50 @@ void SARibbonBar::resizeInOfficeStyle()
     if (m_d->quickAccessBar) {
         if (m_d->quickAccessBar->isVisible()) {
             QSize quickAccessBarSize = m_d->quickAccessBar->sizeHint();
-            m_d->quickAccessBar->setGeometry(x, y
-                , quickAccessBarSize.width(), RibbonSubElementStyleOpt.titleBarHight);
-            x = m_d->quickAccessBar->geometry().right() + 5;
+            m_d->quickAccessBar->setGeometry(x, y, quickAccessBarSize.width(), validTitleBarHeight);
         }
     }
+    //第二行，开始布局applitionButton，tabbar，tabBarRightSizeButtonGroupWidget，TopRightCorner
     x = RibbonSubElementStyleOpt.widgetBord.left();
-    y = RibbonSubElementStyleOpt.titleBarHight+RibbonSubElementStyleOpt.widgetBord.top();
+    y = titleH+RibbonSubElementStyleOpt.widgetBord.top();
     //applitionButton 定位
     if (m_d->applitionButton) {
         if (m_d->applitionButton->isVisible()) {
-            m_d->applitionButton->setGeometry(applitionButtonGeometry());
+            m_d->applitionButton->setGeometry(x, y, applitionButtonWidth(), tabH);
             x = m_d->applitionButton->geometry().right();
         }
     }
+    //top right是一定要配置的，对于多文档窗口，子窗口的缩放等按钮就是通过这个窗口实现，
+    //由于这个窗口一定要在最右，因此先对这个窗口进行布局
     //cornerWidget - TopRightCorner
+    //获取最右边的位置
     int endX = width()-RibbonSubElementStyleOpt.widgetBord.right();
 
     if (QWidget *connerW = cornerWidget(Qt::TopRightCorner)) {
         if (connerW->isVisible()) {
             QSize connerSize = connerW->sizeHint();
-            int detal = (RibbonSubElementStyleOpt.titleBarHight - connerSize.height()) / 2;
             endX -= connerSize.width();
-            connerW->setGeometry(endX, y+detal
-                , connerSize.width(), connerSize.height());
+            if (connerSize.height() < tabH) {
+                int detal = (tabH - connerSize.height()) / 2;
+                connerW->setGeometry(endX, y+detal, connerSize.width(), connerSize.height());
+            }else{
+                connerW->setGeometry(endX, y, connerSize.width(), tabH);
+            }
         }
     }
+    //applitionButton和TopRightCorner完成定位，才可以定位tab bar
     //tab bar 定位
-    //tabBar 右边的附加按钮组
+
+    //tabBar 右边的附加按钮组，这里一般会附加一些类似登录等按钮组
     if (m_d->tabBarRightSizeButtonGroupWidget && m_d->tabBarRightSizeButtonGroupWidget->isVisible()) {
         QSize wSize = m_d->tabBarRightSizeButtonGroupWidget->sizeHint();
         endX -= wSize.width();
-        m_d->tabBarRightSizeButtonGroupWidget->setGeometry(endX
-            , y
-            , wSize.width()
-            , RibbonSubElementStyleOpt.tabBarHight-2);
+        m_d->tabBarRightSizeButtonGroupWidget->setGeometry(endX, y, wSize.width(), tabH);
     }
+    //最后确定tabbar宽度
     int tabBarWidth = endX - x;
 
-    m_d->ribbonTabBar->setGeometry(x
-        , y
-        , tabBarWidth
-        , tabBarHeight());
+    m_d->ribbonTabBar->setGeometry(x, y, tabBarWidth, tabH);
 
 
     resizeStackedContainerWidget();
@@ -1284,37 +1285,34 @@ void SARibbonBar::resizeInOfficeStyle()
 
 void SARibbonBar::resizeInWpsLiteStyle()
 {
-//    RibbonStyle s = m_d->lastShowStyle;
-
-//    if (SARibbonBar::isOfficeStyle(s)) {
-//        //强制设置为wps style
-//        s = static_cast<RibbonStyle>(s & 0xFF01);
-//    }
-//    m_d->lastShowStyle = s;
     updateRibbonElementGeometry();
     //m_d->lastShowStyle = WpsLiteStyle;
     int x = RibbonSubElementStyleOpt.widgetBord.left();
     int y = RibbonSubElementStyleOpt.widgetBord.top();
-    int validTitleBarHeight = RibbonSubElementStyleOpt.titleBarHight - RibbonSubElementStyleOpt.widgetBord.top();
+    const int titleH = titleBarHeight();
+    const int validTitleBarHeight = titleH - RibbonSubElementStyleOpt.widgetBord.top();
 
     //applitionButton 定位
     if (m_d->applitionButton) {
-        QRect rcapp = applitionButtonGeometry();
         if (m_d->applitionButton->isVisible()) {
-            m_d->applitionButton->setGeometry(applitionButtonGeometry());
-            x = m_d->applitionButton->geometry().right();
+            m_d->applitionButton->setGeometry(x, y, applitionButtonWidth(), titleH);
+            x = m_d->applitionButton->geometry().right()+2;
         }
     }
+    //applitionButton定位完后先布局右边内容
     //cornerWidget - TopRightCorner
-    int endX = width() - RibbonSubElementStyleOpt.widgetBord.right()-RibbonSubElementStyleOpt.unusableTitleRegion;
+    int endX = width() - RibbonSubElementStyleOpt.widgetBord.right()-m_d->windowButtonSize.width();
 
     if (QWidget *connerW = cornerWidget(Qt::TopRightCorner)) {
         if (connerW->isVisible()) {
             QSize connerSize = connerW->sizeHint();
-            int detal = (validTitleBarHeight - connerSize.height()) / 2;
             endX -= connerSize.width();
-            connerW->setGeometry(endX, y+detal
-                , connerSize.width(), connerSize.height());
+            if (connerSize.height() < validTitleBarHeight) {
+                int detal = (validTitleBarHeight - connerSize.height()) / 2;
+                connerW->setGeometry(endX, y+detal, connerSize.width(), connerSize.height());
+            }else{
+                connerW->setGeometry(endX, y, connerSize.width(), validTitleBarHeight);
+            }
         }
     }
     //quick access bar定位
@@ -1322,33 +1320,30 @@ void SARibbonBar::resizeInWpsLiteStyle()
         if (m_d->quickAccessBar->isVisible()) {
             QSize quickAccessBarSize = m_d->quickAccessBar->sizeHint();
             endX -= quickAccessBarSize.width();
-            m_d->quickAccessBar->setGeometry(endX, y
-                , quickAccessBarSize.width(), validTitleBarHeight);
+            m_d->quickAccessBar->setGeometry(endX, y, quickAccessBarSize.width(), validTitleBarHeight);
         }
     }
     //cornerWidget - TopLeftCorner
     if (QWidget *connerL = cornerWidget(Qt::TopLeftCorner)) {
         if (connerL->isVisible()) {
             QSize connerSize = connerL->sizeHint();
-            int detal = (validTitleBarHeight - connerSize.height()) / 2;
             endX -= connerSize.width();
-            connerL->setGeometry(endX, y+detal
-                , connerSize.width(), connerSize.height());
+            if (connerSize.height() < validTitleBarHeight) {
+                int detal = (validTitleBarHeight - connerSize.height()) / 2;
+                connerL->setGeometry(endX, y+detal, connerSize.width(), connerSize.height());
+            }else{
+                connerL->setGeometry(endX, y, connerSize.width(), validTitleBarHeight);
+            }
         }
     }
+    //开始定位tabbar以及tabBarRightSizeButtonGroupWidget
     //tab bar 定位 wps模式下applitionButton的右边就是tab bar
     //tabBar 右边的附加按钮组
     if (m_d->tabBarRightSizeButtonGroupWidget && m_d->tabBarRightSizeButtonGroupWidget->isVisible()) {
         QSize wSize = m_d->tabBarRightSizeButtonGroupWidget->sizeHint();
         endX -= wSize.width();
-        m_d->tabBarRightSizeButtonGroupWidget->setGeometry(endX
-            , y
-            , wSize.width()
-            , validTitleBarHeight);
+        m_d->tabBarRightSizeButtonGroupWidget->setGeometry(endX, y, wSize.width(), validTitleBarHeight);
     }
-
-
-    int tabBarHight = validTitleBarHeight - 2;
     int tabBarWidth = endX - x;
     //20200831
     //tabBarWidth的宽度原来为endX - x;，现需要根据实际进行调整
@@ -1360,11 +1355,15 @@ void SARibbonBar::resizeInWpsLiteStyle()
     if (mintabBarWidth < tabBarWidth) {
         tabBarWidth = mintabBarWidth;
     }
-    y += 2;
-    m_d->ribbonTabBar->setGeometry(x
-        , y
-        , tabBarWidth
-        , tabBarHeight());
+    //tab 的y值需要重新计算
+    int tabH = tabBarHeight();
+
+    if (tabH > validTitleBarHeight) {
+        //这种直接把tabH设置为validTitleBarHeight
+        tabH = validTitleBarHeight;
+    }
+    y = y + validTitleBarHeight - tabH;//如果tabH较小，则下以，让tab底部和title的底部对齐
+    m_d->ribbonTabBar->setGeometry(x, y, tabBarWidth, tabH);
 
     //调整整个stackedContainer
     resizeStackedContainerWidget();

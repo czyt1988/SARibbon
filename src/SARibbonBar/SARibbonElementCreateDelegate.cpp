@@ -23,7 +23,6 @@ SARibbonStyleOption::SARibbonStyleOption()
     mainbarHeightWPSStyleTwoRow = 104;
     titleBarHight = 30;
     tabBarHight = 25;
-    unusableTitleRegion = 100;
     titleTextColor = Qt::black;
     widgetBord = QMargins(0, 0, 0, 0);
     tabBarBaseLineColor = QColor(186, 201, 219);
