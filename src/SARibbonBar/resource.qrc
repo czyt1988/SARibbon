@@ -7,5 +7,6 @@
     </qresource>
     <qresource prefix="/theme">
         <file>resource/default.qss</file>
+        <file>resource/office2013.qss</file>
     </qresource>
 </RCC>

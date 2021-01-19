@@ -35,7 +35,8 @@ public:
     SARibbonBar *ribbonBar();
 
     enum RibbonTheme {
-        NormalTheme ///< 普通主题
+        NormalTheme     ///< 普通主题
+        , Office2013    ///< office2013主题
     };
     void setRibbonTheme(RibbonTheme theme);
     RibbonTheme ribbonTheme() const;
