@@ -24,10 +24,10 @@ public:
 SARibbonMainWindowPrivate::SARibbonMainWindowPrivate(SARibbonMainWindow *p)
     : Parent(p)
 	, ribbonBar(nullptr)
-    , currentRibbonTheme(SARibbonMainWindow::NormalTheme)
+    , currentRibbonTheme(SARibbonMainWindow::Office2013)
 	, windowButtonGroup(nullptr)
-	, useRibbon(true)
     , pFramelessHelper(nullptr)
+    , useRibbon(true)
 {
 }
 
@@ -89,6 +89,10 @@ void SARibbonMainWindow::setRibbonTheme(SARibbonMainWindow::RibbonTheme theme)
     {
     case NormalTheme:
         loadTheme(":/theme/resource/default.qss");
+        break;
+
+    case Office2013:
+        loadTheme(":/theme/resource/office2013.qss");
         break;
 
     default:
