@@ -20,3 +20,4 @@ build*
 /bin
 /bin_qt*
 Thumb.db
+~*
