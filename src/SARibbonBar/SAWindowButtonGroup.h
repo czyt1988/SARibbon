@@ -24,6 +24,9 @@ public:
     //设置按钮的缩放比例
     void setIconScale(qreal iconscale = 0.5);
 
+    //设置Qt::WindowStates
+    void setWindowStates(Qt::WindowStates s);
+
 protected:
     virtual QSize sizeHint() const Q_DECL_OVERRIDE;
     virtual bool eventFilter(QObject *watched, QEvent *e) Q_DECL_OVERRIDE;
@@ -31,7 +34,7 @@ protected:
     virtual void resizeEvent(QResizeEvent *e) Q_DECL_OVERRIDE;
 
 private:
-    void updateMaximizeButtonIcon();
+    //void updateMaximizeButtonIcon();
 
 protected slots:
     Q_SLOT void closeWindow();

@@ -243,7 +243,6 @@ void SAWindowButtonGroup::setupMinimizeButton(bool on)
 void SAWindowButtonGroup::setupMaximizeButton(bool on)
 {
     m_d->setupMaximizeButton(on);
-    updateMaximizeButtonIcon();
 }
 
 
@@ -289,6 +288,32 @@ void SAWindowButtonGroup::setIconScale(qreal iconscale)
 }
 
 
+/**
+ * @brief 设置窗口状态（最大最小化按钮状态）
+ * @param s
+ */
+void SAWindowButtonGroup::setWindowStates(Qt::WindowStates s)
+{
+    switch (s)
+    {
+    case Qt::WindowNoState:
+        if (m_d->buttonMaximize) {
+            m_d->buttonMaximize->setIcon(style()->standardIcon(QStyle::SP_TitleBarNormalButton));
+        }
+        break;
+
+    case Qt::WindowMaximized:
+        if (m_d->buttonMaximize) {
+            m_d->buttonMaximize->setIcon(style()->standardIcon(QStyle::SP_TitleBarMaxButton));
+        }
+        break;
+
+    default:
+        break;
+    }
+}
+
+
 QSize SAWindowButtonGroup::sizeHint() const
 {
     return (m_d->sizeHint());
@@ -330,22 +355,22 @@ void SAWindowButtonGroup::resizeEvent(QResizeEvent *e)
 }
 
 
-void SAWindowButtonGroup::updateMaximizeButtonIcon()
-{
-    QWidget *par = parentWidget();
+//void SAWindowButtonGroup::updateMaximizeButtonIcon()
+//{
+//    QWidget *par = parentWidget();
 
-    if (par) {
-        if (par->isMaximized()) {
-            if (m_d->buttonMaximize) {
-                m_d->buttonMaximize->setIcon(style()->standardIcon(QStyle::SP_TitleBarNormalButton));
-            }
-        }else {
-            if (m_d->buttonMaximize) {
-                m_d->buttonMaximize->setIcon(style()->standardIcon(QStyle::SP_TitleBarMaxButton));
-            }
-        }
-    }
-}
+//    if (par) {
+//        if (par->isMaximized()) {
+//            if (m_d->buttonMaximize) {
+//                m_d->buttonMaximize->setIcon(style()->standardIcon(QStyle::SP_TitleBarNormalButton));
+//            }
+//        }else {
+//            if (m_d->buttonMaximize) {
+//                m_d->buttonMaximize->setIcon(style()->standardIcon(QStyle::SP_TitleBarMaxButton));
+//            }
+//        }
+//    }
+//}
 
 
 void SAWindowButtonGroup::closeWindow()
@@ -374,6 +399,6 @@ void SAWindowButtonGroup::maximizeWindow()
         }else {
             par->showMaximized();
         }
-        updateMaximizeButtonIcon();
+        //updateMaximizeButtonIcon();
     }
 }

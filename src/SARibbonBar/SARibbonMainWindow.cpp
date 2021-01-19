@@ -1,4 +1,5 @@
 ﻿#include "SARibbonMainWindow.h"
+#include <QWindowStateChangeEvent>
 #include "FramelessHelper.h"
 #include "SAWindowButtonGroup.h"
 #include "SARibbonBar.h"
@@ -16,6 +17,7 @@ public:
     SARibbonBar *ribbonBar;
     SARibbonMainWindow::RibbonTheme currentRibbonTheme;
     SAWindowButtonGroup *windowButtonGroup;
+    FramelessHelper *pFramelessHelper;
 	bool useRibbon;
 };
 
@@ -25,6 +27,7 @@ SARibbonMainWindowPrivate::SARibbonMainWindowPrivate(SARibbonMainWindow *p)
     , currentRibbonTheme(SARibbonMainWindow::NormalTheme)
 	, windowButtonGroup(nullptr)
 	, useRibbon(true)
+    , pFramelessHelper(nullptr)
 {
 }
 
@@ -48,16 +51,23 @@ SARibbonMainWindow::SARibbonMainWindow(QWidget *parent, bool useRibbon)
 		setMenuWidget(m_d->ribbonBar);
 		m_d->ribbonBar->installEventFilter(this);
         //设置窗体的标题栏高度
-		FramelessHelper *pHelper = new FramelessHelper(this);
-        pHelper->setTitleHeight(m_d->ribbonBar->titleBarHeight());
+        m_d->pFramelessHelper = new FramelessHelper(this);
+        m_d->pFramelessHelper->setTitleHeight(m_d->ribbonBar->titleBarHeight());
         //设置window按钮
         m_d->windowButtonGroup = new SAWindowButtonGroup(this);
         //在ribbonBar捕获windowButtonGroup，主要捕获其尺寸
-        m_d->windowButtonGroup->installEventFilter(m_d->ribbonBar);
+        //m_d->windowButtonGroup->installEventFilter(m_d->ribbonBar);
         QSize s = m_d->windowButtonGroup->size();
         s.setHeight(m_d->ribbonBar->titleBarHeight());
         m_d->windowButtonGroup->setFixedSize(s);
-	}
+        m_d->windowButtonGroup->setWindowStates(windowState());
+    }
+}
+
+
+SARibbonMainWindow::~SARibbonMainWindow()
+{
+    delete m_d;
 }
 
 
@@ -132,6 +142,27 @@ bool SARibbonMainWindow::eventFilter(QObject *obj, QEvent *e)
         }
     }
     return (QMainWindow::eventFilter(obj, e));
+}
+
+
+bool SARibbonMainWindow::event(QEvent *e)
+{
+    if (e) {
+        switch (e->type())
+        {
+        case QEvent::WindowStateChange:
+        {
+            if (isUseRibbon()) {
+                m_d->windowButtonGroup->setWindowStates(windowState());
+            }
+        }
+        break;
+
+        default:
+            break;
+        }
+    }
+    return (QMainWindow::event(e));
 }
 
 
