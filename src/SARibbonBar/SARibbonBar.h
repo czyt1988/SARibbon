@@ -192,9 +192,6 @@ public:
     //当前的模式
     RibbonState currentRibbonState() const;
 
-    //获取右边不可用区域，只有在wps模式下有用
-    int unusableTitleRegion() const;
-
 	//设置当前ribbon的index
 	void setCurrentIndex(int index);
 
@@ -232,8 +229,8 @@ protected:
     //根据currentRibbonStyle计算mainBar的高度
     virtual int mainBarHeight() const;
 
-    //返回应用按钮的位置，用于确定应用按钮方位
-    virtual QRect applitionButtonGeometry() const;
+    //应用按钮的宽度
+    virtual int applitionButtonWidth() const;
 
 protected slots:
     void onWindowTitleChanged(const QString& title);
@@ -254,7 +251,6 @@ private:
     void paintInWpsLiteStyle();
     void resizeStackedContainerWidget();
     void resizeTabbar();
-
 
 protected:
     void paintEvent(QPaintEvent *e) Q_DECL_OVERRIDE;
