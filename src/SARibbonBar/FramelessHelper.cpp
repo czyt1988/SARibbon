@@ -4,7 +4,7 @@
 #include <QMouseEvent>
 #include <QHoverEvent>
 #include <QApplication>
-
+#include <QDebug>
 class WidgetData;
 
 /*****
@@ -413,8 +413,16 @@ bool WidgetData::handleMouseMoveEvent(QMouseEvent *event)
             return (true);
         }else if (d->m_bWidgetMovable && m_bLeftButtonTitlePressed)  {
             if (m_pWidget->isMaximized()) {
-                //窗口在最大化状态时，点击标题栏不做任何处理
-                return (false);
+                //先求出窗口到鼠标的相对位置
+                QRect normalGeometry = m_pWidget->normalGeometry();
+                m_pWidget->showNormal();
+                QPoint p = event->globalPos();
+                p.ry() -= 10;
+                p.rx() -= (normalGeometry.width() / 2);
+                m_pWidget->move(p);
+                //这时要重置m_ptDragPos
+                m_ptDragPos = QPoint(normalGeometry.width()/2,10);
+                return (true);
             }
             moveWidget(event->globalPos());
             return (true);
