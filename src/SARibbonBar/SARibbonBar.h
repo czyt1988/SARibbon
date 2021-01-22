@@ -250,8 +250,8 @@ private:
     void paintInNormalStyle();
     void paintInWpsLiteStyle();
     void resizeStackedContainerWidget();
-    void resizeTabbar();
-
+    //刷新所有ContextCategoryManagerData，这个在单独一个Category删除时调用
+    void updateContextCategoryManagerData();
 protected:
     void paintEvent(QPaintEvent *e) Q_DECL_OVERRIDE;
     void resizeEvent(QResizeEvent *e) Q_DECL_OVERRIDE;
