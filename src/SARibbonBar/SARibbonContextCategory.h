@@ -34,6 +34,7 @@ public:
     bool takeCategory(SARibbonCategory *category);
 signals:
     void categoryPageAdded(SARibbonCategory* category);
+    void categoryPageRemoved(SARibbonCategory* category);
 protected:
     QWidget* parentWidget() const;
     virtual bool eventFilter(QObject *watched, QEvent *e) override;
