@@ -298,13 +298,13 @@ void SAWindowButtonGroup::setWindowStates(Qt::WindowStates s)
     {
     case Qt::WindowNoState:
         if (m_d->buttonMaximize) {
-            m_d->buttonMaximize->setIcon(style()->standardIcon(QStyle::SP_TitleBarNormalButton));
+            m_d->buttonMaximize->setIcon(style()->standardIcon(QStyle::SP_TitleBarMaxButton));
         }
         break;
 
     case Qt::WindowMaximized:
         if (m_d->buttonMaximize) {
-            m_d->buttonMaximize->setIcon(style()->standardIcon(QStyle::SP_TitleBarMaxButton));
+            m_d->buttonMaximize->setIcon(style()->standardIcon(QStyle::SP_TitleBarNormalButton));
         }
         break;
 
