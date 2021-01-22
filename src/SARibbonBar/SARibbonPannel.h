@@ -45,9 +45,19 @@ public:
 };
 
 
-///
-/// \brief pannel页窗口，pannel是ribbon的面板用于盛放控件
-///
+
+/**
+ * @brief pannel页窗口，pannel是ribbon的面板用于承放控件
+ *
+ * ribbon的pannel分为两行模式和三行模式，以office为代表的ribbon为3行模式，以WPS为代表的“紧凑派”就是2行模式，
+ * SARibbon可通过SARibbonBar的@ref SARibbonBar::RibbonStyle 来指定模式(通过函数@ref SARibbonBar::setRibbonStyle )
+ *
+ * 在pannel中，可以通过@ref setExpanding 函数指定pannel水平扩展，如果pannel里面没有能水平扩展的控件，将会留白，因此，
+ * 建议在pannel里面有水平扩展的控件如（@ref SARibbonGallery ）才指定这个函数
+ *
+ * pannel的布局通过@ref SARibbonPannelLayout 来实现，如果有其他布局，可以通过继承@ref SARibbonElementCreateDelegate::createRibbonPannel
+ * 函数返回带有自己布局的pannel，但你必须继承对应的虚函数
+ */
 class SA_RIBBON_EXPORT SARibbonPannel : public QWidget
 {
     Q_OBJECT
@@ -221,13 +231,20 @@ protected:
     //rp用于告诉Layout生成什么样的窗口，详细见SARibbonPannelItem::RowProportion
     SARibbonPannelItem *createItem(QAction *action, SARibbonPannelItem::RowProportion rp = SARibbonPannelItem::None);
     void updateGeomArray(const QRect& setrect);
-
+    //重新计算扩展条码，此函数必须在updateGeomArray函数之后调用
+    void recalcExpandGeomArray(const QRect& setrect);
+private:
+    //返回所有列的区域
+    //QMap<int,QRect> columnsGeometry() const;
+    //根据列数，计算窗口的宽度，以及最大宽度
+    void columnWidthInfo(int colindex,int& width,int& maximum) const;
 private:
     QList<SARibbonPannelItem *> m_items;
     int m_columnCount;      ///< 记录有多少列
     bool m_expandFlag;      ///< 标记是否是会扩展的
     QSize m_sizeHint;       ///< sizeHint返回的尺寸
     bool m_dirty;           ///< 用于标记是否需要刷新元素，参考QToolBarLayout源码
+    int m_largeHeight;///< 记录大图标的高度
 };
 
 

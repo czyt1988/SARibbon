@@ -20,6 +20,7 @@
 #include "SARibbonQuickAccessBar.h"
 #include "SARibbonButtonGroupWidget.h"
 #include "SARibbonApplicationButton.h"
+#include <QCalendarWidget>
 #define PRINT_COST(ElapsedTimer, LastTime, STR)					      \
     do{									      \
         int ___TMP_INT = ElapsedTimer.elapsed();			      \
@@ -301,17 +302,20 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
         w = w->parentWidget();
     }
     SARibbonCheckBox *checkBox = new SARibbonCheckBox(this);
-
-    checkBox->setSizePolicy(QSizePolicy::Expanding,
-        QSizePolicy::Fixed);
     checkBox->setWindowIcon(QIcon(":/icon/icon/folder.png"));
     checkBox->setText("checkBox");
     pannel->addSmallWidget(checkBox);
-
+    pannel->addSeparator();
+    QCalendarWidget* calendarWidget = new QCalendarWidget(this);
+    calendarWidget->setSizePolicy(QSizePolicy::Expanding,
+        QSizePolicy::Expanding);
+    calendarWidget->setObjectName(QStringLiteral("calendarWidget"));
+    pannel->addLargeWidget(calendarWidget);
     pannel->setExpanding();
     QAction *optAct = new QAction(this);
 
     pannel->addOptionAction(optAct);
+
     pannel->setVisible(true);
 }
 
