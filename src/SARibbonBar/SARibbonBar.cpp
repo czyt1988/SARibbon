@@ -605,7 +605,6 @@ void SARibbonBar::onStackWidgetHided()
  */
 void SARibbonBar::onCurrentRibbonTabChanged(int index)
 {
-    qDebug() << "============" << "current index changed:" << index;
     QVariant var = m_d->ribbonTabBar->tabData(index);
     SARibbonCategory *category = nullptr;
 
