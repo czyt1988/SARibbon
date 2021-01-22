@@ -259,9 +259,7 @@ SARibbonCategory *SARibbonBar::addCategoryPage(const QString& title)
     m_d->ribbonTabBar->setTabData(index, QVariant((quint64)catagory));
     m_d->stackedContainerWidget->addWidget(catagory);
     connect(catagory, &QWidget::windowTitleChanged, this, &SARibbonBar::onCategoryWindowTitleChanged);
-    if (currentRibbonStyle() == WpsLiteStyle) {
-        resizeInWpsLiteStyle();
-    }
+    QApplication::postEvent(this, new QResizeEvent(size(), size()));
     //销毁时移除tab
     return (catagory);
 }
@@ -307,9 +305,11 @@ void SARibbonBar::removeCategory(SARibbonCategory *category)
     for (SARibbonContextCategory *c : m_d->mContextCategoryList)
     {
         c->takeCategory(category);
+        updateContextCategoryManagerData();
     }
     //移除完后需要重绘
     repaint();
+    QApplication::postEvent(this, new QResizeEvent(size(), size()));
 }
 
 
@@ -366,9 +366,7 @@ void SARibbonBar::showContextCategory(SARibbonContextCategory *context)
         m_d->ribbonTabBar->setTabData(index, QVariant((quint64)category));
     }
     m_d->currentShowingContextCategory.append(contextCategoryData);
-    if (!isOfficeStyle()) {
-        resizeInWpsLiteStyle();
-    }
+    QApplication::postEvent(this, new QResizeEvent(size(), size()));
     repaint();
 }
 
@@ -390,9 +388,7 @@ void SARibbonBar::hideContextCategory(SARibbonContextCategory *context)
             m_d->currentShowingContextCategory.removeAt(i);
         }
     }
-    if (!isOfficeStyle()) {
-        resizeInWpsLiteStyle();
-    }
+    QApplication::postEvent(this, new QResizeEvent(size(), size()));
     repaint();
 }
 
@@ -457,6 +453,7 @@ void SARibbonBar::destroyContextCategory(SARibbonContextCategory *context)
         c->deleteLater();
     }
     context->deleteLater();
+    QApplication::postEvent(this, new QResizeEvent(size(), size()));
 }
 
 
@@ -1140,8 +1137,32 @@ void SARibbonBar::resizeStackedContainerWidget()
 }
 
 
-void SARibbonBar::resizeTabbar()
+/**
+ * @brief 刷新所有ContextCategoryManagerData，这个在单独一个Category删除时调用
+ */
+void SARibbonBar::updateContextCategoryManagerData()
 {
+    const int c = m_d->ribbonTabBar->count();
+    for(ContextCategoryManagerData& cd : m_d->currentShowingContextCategory)
+    {
+        cd.tabPageIndex.clear();
+        for (int i = 0; i < cd.contextCategory->categoryCount(); ++i)
+        {
+            SARibbonCategory *category = cd.contextCategory->categoryPage(i);
+            for(int t=0;t<c;++t)
+            {
+                QVariant v = m_d->ribbonTabBar->tabData(t);
+                if(v.isValid()){
+                    quint64 d = v.value<quint64>();
+                    if(d == (quint64)category){
+                        cd.tabPageIndex.append(t);
+                    }
+                }else{
+                    cd.tabPageIndex.append(-1);
+                }
+            }
+        }
+    }
 }
 
 

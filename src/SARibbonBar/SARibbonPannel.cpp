@@ -940,6 +940,12 @@ SARibbonToolButton *SARibbonPannel::addSmallAction(QAction *action)
 
 /**
  * @brief 生成并添加一个action
+ *
+ * 如果不对此action做操作，SARibbonPannel将管理此action
+ *
+ * @note action的父对象将设置为SARibbonPannel，SARibbonPannel在删除时将会删除子对象，会把这个action也删除，
+ * 如果不想此action也删除，需要对action重新设置父对象
+ *
  * @param text action的文字
  * @param icon action的图标
  * @param popMode 按钮的样式
@@ -1026,9 +1032,11 @@ SARibbonToolButton *SARibbonPannel::addSmallMenu(QMenu *menu, QToolButton::ToolB
 
 /**
  * @brief 添加窗口
+ *
  * @param w
  * @param rp
  * @return 返回action(QWidgetAction)
+ * @note SARibbonPannel并不会管理此窗口内存，在delete SARibbonPannel时，此窗口如果父对象不是SARibbonPannel将不会被删除
  */
 QAction *SARibbonPannel::addWidget(QWidget *w, SARibbonPannelItem::RowProportion rp)
 {
@@ -1067,6 +1075,7 @@ QAction *SARibbonPannel::addLargeWidget(QWidget *w)
 /**
  * @brief SARibbonPannel::addGallery
  * @return
+ * @note SARibbonPannel将拥有SARibbonGallery的管理权
  */
 SARibbonGallery *SARibbonPannel::addGallery()
 {

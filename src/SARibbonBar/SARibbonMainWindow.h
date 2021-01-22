@@ -23,6 +23,10 @@ class SARibbonBar;
  * @code
  * bool isUseRibbon() const;
  * @endcode
+ *
+ * @ref SARibbonMainWindow 提供了几种常用的ribbon样式，样式可见@ref RibbonTheme
+ * 通过@ref setRibbonTheme 可改变ribbon的样式，用户也可通过qss自己定义自己的样式
+ *
  */
 class SA_RIBBON_EXPORT SARibbonMainWindow : public QMainWindow
 {
