@@ -1,4 +1,5 @@
 ﻿#include "mainwindow.h"
+#include <QFile>
 #include <QTextEdit>
 #include <QAbstractButton>
 #include "SARibbonBar.h"
@@ -394,6 +395,18 @@ void MainWindow::createCategoryOther(SARibbonCategory *page)
     SARibbonToolButton *b = pannel->addLargeAction(appBtn);
 
     b->setObjectName("ApplicationButtonTest");
+
+    QAction *useqss = new QAction(QIcon(":/icon/icon/icon2.png"), tr("use qss"), this);
+
+    pannel->addLargeAction(useqss);
+    connect(useqss, &QAction::triggered, this, [&]() {
+        QFile f("ribbon.qss");
+        if (!f.open(QIODevice::ReadWrite)) {
+            return;
+        }
+        QString qss(f.readAll());
+        this->ribbonBar()->setStyleSheet(qss);
+    });
 }
 
 
@@ -512,29 +525,30 @@ void MainWindow::createContextCategoryPage2(SARibbonCategory *page)
         page->deleteLater();
     });
     SARibbonPannel *pannel2 = page->addPannel(QStringLiteral("特殊布局"));
-    pannel2->addAction(QStringLiteral("Large"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Large);
-    pannel2->addAction(QStringLiteral("Small"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Small);
-    pannel2->addAction(QStringLiteral("Small"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Small);
+
+    pannel2->addAction(QStringLiteral("Large"), QIcon(":/icon/icon/530767.png"), QToolButton::InstantPopup, SARibbonPannelItem::Large);
+    pannel2->addAction(QStringLiteral("Small"), QIcon(":/icon/icon/530767.png"), QToolButton::InstantPopup, SARibbonPannelItem::Small);
+    pannel2->addAction(QStringLiteral("Small"), QIcon(":/icon/icon/530767.png"), QToolButton::InstantPopup, SARibbonPannelItem::Small);
     pannel2->addSeparator();
-    pannel2->addAction(QStringLiteral("Small"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Small);
-    pannel2->addAction(QStringLiteral("Small"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Small);
-    pannel2->addAction(QStringLiteral("Small"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Small);
-    pannel2->addAction(QStringLiteral("Small"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Small);
+    pannel2->addAction(QStringLiteral("Small"), QIcon(":/icon/icon/530767.png"), QToolButton::InstantPopup, SARibbonPannelItem::Small);
+    pannel2->addAction(QStringLiteral("Small"), QIcon(":/icon/icon/530767.png"), QToolButton::InstantPopup, SARibbonPannelItem::Small);
+    pannel2->addAction(QStringLiteral("Small"), QIcon(":/icon/icon/530767.png"), QToolButton::InstantPopup, SARibbonPannelItem::Small);
+    pannel2->addAction(QStringLiteral("Small"), QIcon(":/icon/icon/530767.png"), QToolButton::InstantPopup, SARibbonPannelItem::Small);
     pannel2->addSeparator();
-    pannel2->addAction(QStringLiteral("Large"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Large);
-    pannel2->addAction(QStringLiteral("Medium"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Medium);
-    pannel2->addAction(QStringLiteral("Medium"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Medium);
-    pannel2->addAction(QStringLiteral("Large"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Small);
-    pannel2->addAction(QStringLiteral("Large"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Small);
-    pannel2->addAction(QStringLiteral("Large"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Small);
-    pannel2->addAction(QStringLiteral("Medium"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Medium);
-    pannel2->addAction(QStringLiteral("Medium"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Medium);
-    pannel2->addAction(QStringLiteral("Large"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Large);
+    pannel2->addAction(QStringLiteral("Large"), QIcon(":/icon/icon/530767.png"), QToolButton::InstantPopup, SARibbonPannelItem::Large);
+    pannel2->addAction(QStringLiteral("Medium"), QIcon(":/icon/icon/530767.png"), QToolButton::InstantPopup, SARibbonPannelItem::Medium);
+    pannel2->addAction(QStringLiteral("Medium"), QIcon(":/icon/icon/530767.png"), QToolButton::InstantPopup, SARibbonPannelItem::Medium);
+    pannel2->addAction(QStringLiteral("Large"), QIcon(":/icon/icon/530767.png"), QToolButton::InstantPopup, SARibbonPannelItem::Small);
+    pannel2->addAction(QStringLiteral("Large"), QIcon(":/icon/icon/530767.png"), QToolButton::InstantPopup, SARibbonPannelItem::Small);
+    pannel2->addAction(QStringLiteral("Large"), QIcon(":/icon/icon/530767.png"), QToolButton::InstantPopup, SARibbonPannelItem::Small);
+    pannel2->addAction(QStringLiteral("Medium"), QIcon(":/icon/icon/530767.png"), QToolButton::InstantPopup, SARibbonPannelItem::Medium);
+    pannel2->addAction(QStringLiteral("Medium"), QIcon(":/icon/icon/530767.png"), QToolButton::InstantPopup, SARibbonPannelItem::Medium);
+    pannel2->addAction(QStringLiteral("Large"), QIcon(":/icon/icon/530767.png"), QToolButton::InstantPopup, SARibbonPannelItem::Large);
     pannel2->addSeparator();
-    pannel2->addAction(QStringLiteral("Medium"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Medium);
-    pannel2->addAction(QStringLiteral("Large"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Large);
-    pannel2->addAction(QStringLiteral("Medium"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Medium);
-    pannel2->addAction(QStringLiteral("Small"),QIcon(":/icon/icon/530767.png"),QToolButton::InstantPopup,SARibbonPannelItem::Small);
+    pannel2->addAction(QStringLiteral("Medium"), QIcon(":/icon/icon/530767.png"), QToolButton::InstantPopup, SARibbonPannelItem::Medium);
+    pannel2->addAction(QStringLiteral("Large"), QIcon(":/icon/icon/530767.png"), QToolButton::InstantPopup, SARibbonPannelItem::Large);
+    pannel2->addAction(QStringLiteral("Medium"), QIcon(":/icon/icon/530767.png"), QToolButton::InstantPopup, SARibbonPannelItem::Medium);
+    pannel2->addAction(QStringLiteral("Small"), QIcon(":/icon/icon/530767.png"), QToolButton::InstantPopup, SARibbonPannelItem::Small);
 }
 
 

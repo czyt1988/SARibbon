@@ -66,8 +66,7 @@ private:
 private:
     RibbonButtonType m_buttonType;
     LargeButtonType m_largeButtonType;
-    bool m_mouseOnSubControl;
-    QColor m_borderColor;//TODO 如何获取border的颜色，从而替代此变量
+    bool m_mouseOnSubControl;   ///< 这个用于标记MenuButtonPopup模式下，鼠标在文本区域
     bool m_menuButtonPressed;
     QRect m_iconRect;
     QSize m_sizeHint;//< 存放sizesizeHint
