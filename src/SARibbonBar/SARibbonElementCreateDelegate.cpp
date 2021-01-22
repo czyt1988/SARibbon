@@ -24,7 +24,7 @@ SARibbonStyleOption::SARibbonStyleOption()
     titleBarHight = 30;
     tabBarHight = 25;
     titleTextColor = Qt::black;
-    widgetBord = QMargins(0, 0, 0, 0);
+    widgetBord = QMargins(2, 1, 4, 0);
     tabBarBaseLineColor = QColor(186, 201, 219);
 }
 

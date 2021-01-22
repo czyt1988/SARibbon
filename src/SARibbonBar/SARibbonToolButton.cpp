@@ -8,6 +8,7 @@
 #include <QPaintEvent>
 #include <QMouseEvent>
 #include "SARibbonDrawHelper.h"
+#include "SARibbonElementManager.h"
 #include "QCursor"
 
 #ifdef SA_RIBBON_DEBUG_HELP_DRAW
@@ -52,7 +53,6 @@ SARibbonToolButton::SARibbonToolButton(QWidget *parent)
     , m_buttonType(LargeButton)
     , m_largeButtonType(Normal)
     , m_mouseOnSubControl(false)
-    , m_borderColor(242, 202, 88)
     , m_menuButtonPressed(false)
 {
     setAutoRaise(true);
@@ -64,7 +64,6 @@ SARibbonToolButton::SARibbonToolButton(QAction *defaultAction, QWidget *parent)
     : QToolButton(parent)
     , m_buttonType(LargeButton)
     , m_mouseOnSubControl(false)
-    , m_borderColor(242, 202, 88)
     , m_menuButtonPressed(false)
 {
     setAutoRaise(true);
@@ -207,31 +206,59 @@ void SARibbonToolButton::paintSmallButton(QPaintEvent *e)
     QStyleOption tool(0);
     tool.palette = opt.palette;
 
+    // 绘制边框
+//    if (((opt.state & QStyle::State_MouseOver) && (opt.features & QStyleOptionToolButton::MenuButtonPopup))
+//        ||
+//        ((isChecked()) && (opt.features & QStyleOptionToolButton::MenuButtonPopup))) {//checked
+////        p.save();
+////        p.setPen(m_borderColor);
+////        p.setBrush(Qt::NoBrush);
+////        p.drawRect(opt.rect.adjusted(0, 0, -1, -1));
+////        p.drawRect(m_iconRect);//分界线
+////        p.restore();
+//        tool.rect = opt.rect;
+//        tool.state = bflags;
+//        style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
+//    }
+
     if ((opt.subControls & QStyle::SC_ToolButton)
         &&
         (opt.features & QStyleOptionToolButton::MenuButtonPopup)) {
         tool.rect = opt.rect;
         tool.state = bflags;
         if (opt.activeSubControls &= QStyle::SC_ToolButtonMenu) {
+            //菜单激活
             style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
-            p.save();
-            p.setPen(m_borderColor);
-            p.setBrush(Qt::NoBrush);
-            p.drawRect(opt.rect.adjusted(0, 0, 0, -1));
-            p.drawRect(m_iconRect);//分界线
-            p.restore();
-        }else {
-            if (m_mouseOnSubControl) {//此时鼠标在indecater那
-                tool.rect.adjust(m_iconRect.width(), 0, 0, 0);
-            }else {
-                tool.rect = m_iconRect;
-            }
-
-
+            tool.rect = m_iconRect.adjusted(1, 1, -1, -1);
+            tool.state = (QStyle::State_Raised);//把图标区域显示为正常
             if (autoRaise) {
                 style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
             }else {
                 style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tool, &p, this);
+            }
+        }else {
+            style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
+            if (tool.state & QStyle::State_MouseOver) {
+                if (m_mouseOnSubControl) { //此时鼠标在indecater那
+                    //鼠标在文字区，把图标显示为正常
+                    tool.rect = m_iconRect.adjusted(1, 1, -1, -1);
+                    tool.state = (QStyle::State_Raised);//把图标区域显示为正常
+                    if (autoRaise) {
+                        style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
+                    }else {
+                        style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tool, &p, this);
+                    }
+                }else {
+                    //鼠标在图标区，把文字显示为正常
+                    tool.state = (QStyle::State_Raised);//把图标区域显示为正常
+                    tool.rect = opt.rect.adjusted(m_iconRect.width()+1, 1, -1, -1);
+                    if (autoRaise) {
+                        style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
+                    }else {
+                        style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tool, &p, this);
+                    }
+                    qDebug() << __LINE__;
+                }
             }
         }
     }else if ((opt.subControls & QStyle::SC_ToolButton) &&
@@ -257,17 +284,7 @@ void SARibbonToolButton::paintSmallButton(QPaintEvent *e)
         }
     }
 
-    // 绘制边框
-    if (((opt.state & QStyle::State_MouseOver) && (opt.features & QStyleOptionToolButton::MenuButtonPopup))
-        ||
-        ((isChecked()) && (opt.features & QStyleOptionToolButton::MenuButtonPopup))) {//checked
-        p.save();
-        p.setPen(m_borderColor);
-        p.setBrush(Qt::NoBrush);
-        p.drawRect(opt.rect.adjusted(0, 0, -1, -1));
-        p.drawRect(m_iconRect);//分界线
-        p.restore();
-    }
+
     drawIconAndLabel(p, opt);
 #endif
 }
@@ -317,8 +334,8 @@ void SARibbonToolButton::paintLargeButton(QPaintEvent *e)
 //绘制背景
     QStyleOption tool(0);
     tool.palette = opt.palette;
-    int liteSplitLineHeight = liteLargeButtonSplitLine(opt.rect.height());
 
+    //MenuButtonPopup特殊处理
     if ((opt.subControls & QStyle::SC_ToolButton)
         &&
         (opt.features & QStyleOptionToolButton::MenuButtonPopup)) {
@@ -327,50 +344,38 @@ void SARibbonToolButton::paintLargeButton(QPaintEvent *e)
         tool.state = bflags;
         if (opt.activeSubControls &= QStyle::SC_ToolButtonMenu) {
             style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
-            p.save();
-            p.setPen(m_borderColor);
-            p.setBrush(Qt::NoBrush);
-            p.drawRect(opt.rect.adjusted(1, 1, -1, -1));
-            if (Normal == m_largeButtonType) {
-                p.drawLine(0, opt.rect.height()/2, opt.rect.width(), opt.rect.height()/2);      //分界线
-            }else{
-                p.drawLine(0, liteSplitLineHeight, opt.rect.width(), liteSplitLineHeight);      //分界线
-            }
-
-            p.restore();
-        }else {
-            if (m_mouseOnSubControl) {//此时鼠标在下半部分
-                if (Normal == m_largeButtonType) {
-                    tool.rect.adjust(0, tool.rect.height()/2, 0, 0);
-                }else{
-                    tool.rect.adjust(0, liteSplitLineHeight, 0, 0);
-                }
-            }else {
-                if (Normal == m_largeButtonType) {
-                    tool.rect.adjust(0, 0, 0, -tool.rect.height()/2);
-                }else{
-                    tool.rect.adjust(0, 0, 0, -(tool.rect.height()-liteSplitLineHeight));
-                }
-            }
-
-//#if SA_RIBBON_DEBUG_HELP_DRAW
-//            if (this->objectName() == "MenuButtonPopup") {
-//                static int s_e = 0;
-//                qDebug()	<< s_e << " under mouse:" << this->underMouse()
-//                        << " \ncontinue:" <<this->rect().contains(this->mapFromGlobal(QCursor::pos()))
-//                        //<< " \nmapFromGlobal continue:" <<this->geometry().contains(this->mapFromGlobal(QCursor::pos()))
-//                        << " \n rect:" << this->geometry()
-//                        << " \n QCursor:" << QCursor::pos()
-//                        << " \n nmapFromGlobal QCursor:" << this->mapFromGlobal(QCursor::pos())
-//                        << "   " <<autoRaise << opt;
-//                ++s_e;
-//            }
-//#endif
-
+            //菜单激活
+            style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
+            tool.rect = m_iconRect.adjusted(1, 1, -1, -1);
+            tool.state = (QStyle::State_Raised);//把图标区域显示为正常
             if (autoRaise) {
                 style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
             }else {
                 style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tool, &p, this);
+            }
+        }else {
+            style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
+            if (tool.state & QStyle::State_MouseOver) {
+                if (m_mouseOnSubControl) { //此时鼠标在indecater那
+                    //鼠标在文字区，把图标显示为正常
+                    tool.rect = m_iconRect.adjusted(1, 1, -1, -1);
+                    tool.state = (QStyle::State_Raised);//把图标区域显示为正常
+                    if (autoRaise) {
+                        style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
+                    }else {
+                        style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tool, &p, this);
+                    }
+                }else {
+                    //鼠标在图标区，把文字显示为正常
+                    tool.state = (QStyle::State_Raised);//把图标区域显示为正常
+                    tool.rect = opt.rect.adjusted(1, m_iconRect.height()+1, -1, -1);
+                    if (autoRaise) {
+                        style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
+                    }else {
+                        style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tool, &p, this);
+                    }
+                    qDebug() << __LINE__;
+                }
             }
         }
     }else if ((opt.subControls & QStyle::SC_ToolButton) &&
@@ -397,23 +402,6 @@ void SARibbonToolButton::paintLargeButton(QPaintEvent *e)
         }
     }
 
-
-
-    // 绘制边框
-    if (((opt.state & QStyle::State_MouseOver) && (opt.features & QStyleOptionToolButton::MenuButtonPopup))
-        ||
-        ((isChecked()) && (opt.features & QStyleOptionToolButton::MenuButtonPopup))) {//checked
-        p.save();
-        p.setPen(m_borderColor);
-        p.setBrush(Qt::NoBrush);
-        p.drawRect(opt.rect.adjusted(1, 1, -1, -1));
-        if (Normal == m_largeButtonType) {
-            p.drawLine(0, opt.rect.height()/2, opt.rect.width(), opt.rect.height()/2);      //分界线
-        }else{
-            p.drawLine(0, liteSplitLineHeight, opt.rect.width(), liteSplitLineHeight);      //分界线
-        }
-        p.restore();
-    }
 
     //绘制Focus
     if (opt.state & QStyle::State_HasFocus) {
@@ -698,13 +686,13 @@ int SARibbonToolButton::liteLargeButtonSplitLine(int buttonHeight) const
  */
 void SARibbonToolButton::calcIconRect(const QStyleOptionToolButton& opt)
 {
-    int shiftX = 0;
-    int shiftY = 0;
+//    int shiftX = 0;
+//    int shiftY = 0;
 
-    if (opt.state & (QStyle::State_Sunken | QStyle::State_On)) {
-        shiftX = style()->pixelMetric(QStyle::PM_ButtonShiftHorizontal, &opt, this);
-        shiftY = style()->pixelMetric(QStyle::PM_ButtonShiftVertical, &opt, this);
-    }
+//    if (opt.state & (QStyle::State_Sunken | QStyle::State_On)) {
+//        shiftX = style()->pixelMetric(QStyle::PM_ButtonShiftHorizontal, &opt, this);
+//        shiftY = style()->pixelMetric(QStyle::PM_ButtonShiftVertical, &opt, this);
+//    }
 
     if (LargeButton == m_buttonType) {
         m_iconRect = opt.rect;
@@ -723,7 +711,7 @@ void SARibbonToolButton::calcIconRect(const QStyleOptionToolButton& opt)
             //m_iconRect = QRect(0, 0, opt.iconSize.width(), opt.rect.height());
         }
     }
-    m_iconRect.translate(shiftX, shiftY);
+//    m_iconRect.translate(shiftX, shiftY);
 }
 
 
