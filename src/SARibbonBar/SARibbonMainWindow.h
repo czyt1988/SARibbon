@@ -50,9 +50,9 @@ public:
 
 protected:
     void loadTheme(const QString& themeFile);
-    void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
-    bool eventFilter(QObject *obj, QEvent *e) Q_DECL_OVERRIDE;
-    bool event(QEvent *e) Q_DECL_OVERRIDE;
+    virtual void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
+    virtual bool eventFilter(QObject *obj, QEvent *e) Q_DECL_OVERRIDE;
+    virtual bool event(QEvent *e) Q_DECL_OVERRIDE;
 
 private:
     SARibbonMainWindowPrivate *m_d;
