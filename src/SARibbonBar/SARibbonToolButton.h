@@ -2,9 +2,12 @@
 #define SARIBBONTOOLBUTTON_H
 #include "SARibbonGlobal.h"
 #include <QToolButton>
-///
-/// \brief Ribbon界面适用的toolButton
-///
+
+/**
+ * @brief Ribbon界面适用的toolButton
+ *
+ * 相对于普通toolbutton，主要多了两个类型设置，@ref setButtonType 和 @ref setLargeButtonType
+ */
 class SA_RIBBON_EXPORT SARibbonToolButton : public QToolButton
 {
     Q_OBJECT
@@ -37,7 +40,7 @@ public:
     LargeButtonType largeButtonType() const;
 
     //lite模式下的分割线
-    virtual int liteLargeButtonSplitLine(int buttonHeight) const;
+    virtual int liteLargeButtonIconHeight(int buttonHeight) const;
 
 protected:
     void calcIconRect(const QStyleOptionToolButton& opt);
@@ -66,10 +69,10 @@ private:
 private:
     RibbonButtonType m_buttonType;
     LargeButtonType m_largeButtonType;
-    bool m_mouseOnSubControl;   ///< 这个用于标记MenuButtonPopup模式下，鼠标在文本区域
+    bool m_mouseOnSubControl; ///< 这个用于标记MenuButtonPopup模式下，鼠标在文本区域
     bool m_menuButtonPressed;
     QRect m_iconRect;
-    QSize m_sizeHint;//< 存放sizesizeHint
+    bool m_isWordWrap;///< 标记是否文字换行 @default false
 };
 
 #endif // SARIBBONTOOLBUTTON_H

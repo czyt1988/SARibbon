@@ -20,19 +20,19 @@ void log_out_put(QtMsgType type, const QMessageLogContext& context, const QStrin
     switch (type)
     {
     case QtDebugMsg:
-        fprintf(stdout, "Debug: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+        fprintf(stdout, "[Debug] %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
         break;
 
     case QtInfoMsg:
-        fprintf(stdout, "Info: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+        fprintf(stdout, "[Info] %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
         break;
 
     case QtWarningMsg:
-        fprintf(stdout, "Warning: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+        fprintf(stdout, "[Warning] %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
         break;
 
     case QtCriticalMsg:
-        fprintf(stdout, "Critical: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+        fprintf(stdout, "[Critical] %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
         break;
 
     case QtFatalMsg:
@@ -44,15 +44,23 @@ void log_out_put(QtMsgType type, const QMessageLogContext& context, const QStrin
 #endif
 }
 
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+
     qInstallMessageHandler(log_out_put);
+    QFont f = a.font();
+
+    f.setFamily("微软雅黑");
+    a.setFont(f);
     QElapsedTimer cost;
+
     cost.start();
     MainWindow w;
+
     qDebug() <<"window build cost:"<<cost.elapsed()<<" ms";
     w.show();
 
-    return a.exec();
+    return (a.exec());
 }

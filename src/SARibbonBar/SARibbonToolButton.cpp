@@ -10,7 +10,8 @@
 #include "SARibbonDrawHelper.h"
 #include "SARibbonElementManager.h"
 #include "QCursor"
-
+#define LITE_LARGE_BUTTON_ICON_HIGHT_RATE	0.52
+#define ARROW_WIDTH				10
 #ifdef SA_RIBBON_DEBUG_HELP_DRAW
 #define HELP_DRAW_RECT(p, rect)	      \
     do{			      \
@@ -54,6 +55,7 @@ SARibbonToolButton::SARibbonToolButton(QWidget *parent)
     , m_largeButtonType(Normal)
     , m_mouseOnSubControl(false)
     , m_menuButtonPressed(false)
+    , m_isWordWrap(false)
 {
     setAutoRaise(true);
     setButtonType(SmallButton);
@@ -65,6 +67,7 @@ SARibbonToolButton::SARibbonToolButton(QAction *defaultAction, QWidget *parent)
     , m_buttonType(LargeButton)
     , m_mouseOnSubControl(false)
     , m_menuButtonPressed(false)
+    , m_isWordWrap(false)
 {
     setAutoRaise(true);
     setButtonType(SmallButton);
@@ -374,7 +377,6 @@ void SARibbonToolButton::paintLargeButton(QPaintEvent *e)
                     }else {
                         style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tool, &p, this);
                     }
-                    qDebug() << __LINE__;
                 }
             }
         }
@@ -435,6 +437,7 @@ QSize SARibbonToolButton::sizeHint() const
     //QToolButton的sizeHint已经考虑了菜单箭头的位置
     if (LargeButton == buttonType()) {
         //计算最佳大小
+        SARibbonToolButton *that = const_cast<SARibbonToolButton *>(this);
         if (s.width() > s.height()*1.4) {
             //文本对齐方式
             int alignment = Qt::TextShowMnemonic | Qt::TextWordWrap;
@@ -447,14 +450,27 @@ QSize SARibbonToolButton::sizeHint() const
             textRange = fm.boundingRect(textRange, alignment, text());
             //把区域设置给size
             s.setWidth(textRange.width()+4);
-            //在lite模式下，含有menu的话需要扩充10px
-            if (LargeButtonType::Lite == largeButtonType()) {
-                QStyleOptionToolButton opt;
-                initStyleOption(&opt);
-                if (opt.features | QStyleOptionToolButton::MenuButtonPopup) {
-                    s.rwidth() += 10;
+            //确认是否换行
+            that->m_isWordWrap = (textRange.height() > fm.lineSpacing());
+
+            QStyleOptionToolButton opt;
+            initStyleOption(&opt);
+            if ((opt.features & QStyleOptionToolButton::Menu) ||
+                (opt.features & QStyleOptionToolButton::PopupDelay) ||
+                (opt.features & QStyleOptionToolButton::HasMenu)) {
+                //如果有菜单
+                if (largeButtonType() == Lite) {
+                    //lite模式下都要偏移
+                    s.rwidth() += ARROW_WIDTH;
+                }else{
+                    //Normal模式下，仅对换行的偏移
+                    if (m_isWordWrap) {
+                        s.rwidth() += ARROW_WIDTH;
+                    }
                 }
             }
+        }else{
+            that->m_isWordWrap = false;
         }
     }else{
         //通过QToolButton源码的分析，在iconbeside模式下，宽度是opt.iconSize.width + 4 + textSize.width() + IndicatorWidth
@@ -489,8 +505,9 @@ void SARibbonToolButton::drawIconAndLabel(QPainter& p, QStyleOptionToolButton& o
         QRect textRect = calcTextRect(opt);
         bool hasArrow = opt.features & QStyleOptionToolButton::Arrow;
         if (((!hasArrow && opt.icon.isNull()) && !opt.text.isEmpty()) ||
-            (opt.toolButtonStyle == Qt::ToolButtonTextOnly)) {                                  //没有箭头 且 没图标 有文字 || 只有文字模式
-            int alignment = Qt::AlignCenter | Qt::TextShowMnemonic | Qt::TextWordWrap;      //纯文本下，居中对齐,换行
+            (opt.toolButtonStyle == Qt::ToolButtonTextOnly)) {
+            //没有箭头 且 没图标 有文字 || 只有文字模式
+            int alignment = Qt::AlignCenter | Qt::TextShowMnemonic | Qt::TextWordWrap; //纯文本下，居中对齐,换行
             if (!style()->styleHint(QStyle::SH_UnderlineShortcut, &opt, this)) {
                 alignment |= Qt::TextHideMnemonic;
             }
@@ -498,7 +515,8 @@ void SARibbonToolButton::drawIconAndLabel(QPainter& p, QStyleOptionToolButton& o
             style()->drawItemText(&p, textRect, alignment, opt.palette,
                 opt.state & QStyle::State_Enabled, opt.text,
                 QPalette::ButtonText);
-        }else {//非纯文本
+        }else {
+            //非纯文本
             if (opt.toolButtonStyle != Qt::ToolButtonIconOnly) {
                 //文本加图标情况
                 p.setFont(opt.font);
@@ -506,29 +524,26 @@ void SARibbonToolButton::drawIconAndLabel(QPainter& p, QStyleOptionToolButton& o
                 if (!style()->styleHint(QStyle::SH_UnderlineShortcut, &opt, this)) {
                     alignment |= Qt::TextHideMnemonic;
                 }
-
-                if (opt.toolButtonStyle == Qt::ToolButtonTextUnderIcon) {
-                    //文字在icon下
-                    if (!hasArrow) {
+                //文字在icon下
+                //先绘制图标
+                if (!hasArrow) {
 #if SA_RIBBON_DEBUG_HELP_DRAW
-                        HELP_DRAW_RECT(p, m_iconRect);
+                    HELP_DRAW_RECT(p, m_iconRect);
 #endif
-                        style()->drawItemPixmap(&p, m_iconRect, Qt::AlignCenter, pm);
-                    }else {
-                        drawArrow(style(), &opt, m_iconRect, &p, this);
-                    }
-#if SA_RIBBON_DEBUG_HELP_DRAW
-                    HELP_DRAW_RECT(p, textRect);
-#endif
-                    if (Normal == m_largeButtonType) {
-                        alignment |= Qt::AlignHCenter | Qt::AlignTop;//文字是顶部对齐
-                    }else{
-                        alignment |= Qt::AlignCenter;
-                    }
+                    style()->drawItemPixmap(&p, m_iconRect, Qt::AlignCenter, pm);
                 }else {
-                    //文字在icon其他位置
-                    //不支持此类设置
+                    drawArrow(style(), &opt, m_iconRect, &p, this);
                 }
+#if SA_RIBBON_DEBUG_HELP_DRAW
+                HELP_DRAW_RECT(p, textRect);
+#endif
+                if (Normal == m_largeButtonType) {
+                    alignment |= Qt::AlignHCenter | Qt::AlignTop;//文字是顶部对齐
+                }else{
+                    alignment |= Qt::AlignCenter;
+                }
+
+                //再绘制文本，对于Normal模式下的Largebutton，如果有菜单，且m_isWordWrap是true，箭头将在文本旁边
                 style()->drawItemText(&p, QStyle::visualRect(opt.direction, opt.rect, textRect), alignment, opt.palette,
                     opt.state & QStyle::State_Enabled, opt.text,
                     QPalette::ButtonText);
@@ -548,10 +563,8 @@ void SARibbonToolButton::drawIconAndLabel(QPainter& p, QStyleOptionToolButton& o
         }
     }else {
         //小图标
-        QPixmap pm;
         QSize pmSize = opt.iconSize;
         if (!opt.icon.isNull()) {
-            pm = SARibbonDrawHelper::iconToPixmap(opt.icon, this, &opt, opt.rect.size().boundedTo(opt.iconSize));
             pmSize = pm.size() / pm.devicePixelRatio();
 
             if (opt.toolButtonStyle != Qt::ToolButtonIconOnly) {
@@ -673,9 +686,9 @@ SARibbonToolButton::LargeButtonType SARibbonToolButton::largeButtonType() const
 }
 
 
-int SARibbonToolButton::liteLargeButtonSplitLine(int buttonHeight) const
+int SARibbonToolButton::liteLargeButtonIconHeight(int buttonHeight) const
 {
-    return (buttonHeight*0.55+2);
+    return (buttonHeight*LITE_LARGE_BUTTON_ICON_HIGHT_RATE);
 }
 
 
@@ -700,7 +713,7 @@ void SARibbonToolButton::calcIconRect(const QStyleOptionToolButton& opt)
             if (Normal == m_largeButtonType) {
                 m_iconRect.setHeight(opt.rect.height()/2);
             }else if (Lite == m_largeButtonType) {
-                m_iconRect.setHeight(opt.rect.height()*0.6);
+                m_iconRect.setHeight(liteLargeButtonIconHeight(opt.rect.height()));
             }
         }
     }else {
@@ -738,6 +751,21 @@ QRect SARibbonToolButton::calcTextRect(const QStyleOptionToolButton& opt) const
 }
 
 
+/**
+ * @brief 根据按钮区域计算文字范围
+ *
+ * 在大按钮模式下，有几种情况:
+ *
+ * 第一种，文字没有菜单，此时文本矩形占满下半矩形
+ *
+ * 第二种，文本带有菜单，但没换行，此时下拉箭头在底部预留的10像素区域
+ *
+ * 第三种，文本带有菜单，且换行了，此时下拉箭头在旁边
+ *
+ * @param buttonRect 按钮的几何区域
+ * @param hasMenu 是否有菜单
+ * @return 返回文字区域
+ */
 QRect SARibbonToolButton::calcTextRect(const QRect& buttonRect, bool hasMenu) const
 {
     QRect rect(buttonRect);
@@ -747,18 +775,26 @@ QRect SARibbonToolButton::calcTextRect(const QRect& buttonRect, bool hasMenu) co
     }
     if (LargeButton == m_buttonType) {
         if (Normal == m_largeButtonType) {
-            rect.adjust(1, buttonRect.height()/2, -1, -10);//预留8px绘制箭头，1px的上下边界
+            if (hasMenu) {
+                if (m_isWordWrap) {
+                    rect.adjust(1, buttonRect.height()/2, -ARROW_WIDTH, -1);        //预留8px绘制箭头，1px的上下边界
+                }else{
+                    rect.adjust(1, buttonRect.height()/2, -1, -ARROW_WIDTH);        //预留8px绘制箭头，1px的上下边界
+                }
+            }else{
+                rect.adjust(1, buttonRect.height()/2, -1, -1); //没有菜单不用预留箭头，1px的上下边界
+            }
         }else if (Lite == m_largeButtonType) {
             if (hasMenu) {
-                rect.adjust(1, liteLargeButtonSplitLine(buttonRect.height()), -10, -1);
+                rect.adjust(1, liteLargeButtonIconHeight(buttonRect.height()), -ARROW_WIDTH, -1);
             }else{
-                rect.adjust(1, liteLargeButtonSplitLine(buttonRect.height()), -1, -1);
+                rect.adjust(1, liteLargeButtonIconHeight(buttonRect.height()), -1, -1);
             }
         }
     }else {
         if (!(Qt::ToolButtonIconOnly == toolButtonStyle())) {
             if (hasMenu) {
-                rect = buttonRect.adjusted(m_iconRect.width(), 0, -10, 0);
+                rect = buttonRect.adjusted(m_iconRect.width(), 0, -ARROW_WIDTH, 0);
             }else{
                 rect = buttonRect.adjusted(m_iconRect.width(), 0, -1, 0);
             }
@@ -780,12 +816,16 @@ QRect SARibbonToolButton::calcIndicatorArrowDownRect(const QStyleOptionToolButto
 
     if (LargeButton == m_buttonType) {
         if (Normal == m_largeButtonType) {
-            rect.adjust(1, rect.height()-10, 1, 1);
+            if (m_isWordWrap) {
+                rect.adjust(rect.width()-ARROW_WIDTH, rect.height()/2, 1, 1);
+            }else{
+                rect.adjust(1, rect.height()-ARROW_WIDTH, 1, 1);
+            }
         }else {
-            rect.adjust(rect.width()-10, liteLargeButtonSplitLine(opt.rect.height()), 1, 1);
+            rect.adjust(rect.width()-ARROW_WIDTH, liteLargeButtonIconHeight(opt.rect.height()), 1, 1);
         }
     }else {
-        rect.adjust(rect.width()-10, 1, 1, 1);
+        rect.adjust(rect.width()-ARROW_WIDTH, 1, 1, 1);
     }
     return (rect);
 }
