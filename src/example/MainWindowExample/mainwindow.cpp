@@ -40,9 +40,6 @@ MainWindow::MainWindow(QWidget *par) : SARibbonMainWindow(par)
     setCentralWidget(m_edit);
     PRINT_COST(cost, lastTimes, "setCentralWidget & setWindowTitle");
     SARibbonBar *ribbon = ribbonBar();
-    QFont f = ribbon->font();
-    f.setFamily("微软雅黑");
-    ribbon->setFont(f);
     ribbon->applicationButton()->setText(QStringLiteral("File"));
     SARibbonCategory *categoryMain = ribbon->addCategoryPage(QStringLiteral("Main"));
     PRINT_COST(cost, lastTimes, "new main page");
@@ -303,11 +300,13 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
         w = w->parentWidget();
     }
     SARibbonCheckBox *checkBox = new SARibbonCheckBox(this);
+
     checkBox->setWindowIcon(QIcon(":/icon/icon/folder.png"));
     checkBox->setText("checkBox");
     pannel->addSmallWidget(checkBox);
     pannel->addSeparator();
-    QCalendarWidget* calendarWidget = new QCalendarWidget(this);
+    QCalendarWidget *calendarWidget = new QCalendarWidget(this);
+
     calendarWidget->setSizePolicy(QSizePolicy::Expanding,
         QSizePolicy::Expanding);
     calendarWidget->setObjectName(QStringLiteral("calendarWidget"));
