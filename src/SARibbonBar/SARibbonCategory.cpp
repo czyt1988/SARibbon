@@ -608,16 +608,6 @@ void SARibbonCategoryPrivate::updateItemGeometry()
     QWidget *cp = category->parentWidget();
     int parentHeight = (nullptr == cp) ? height : cp->height();
     int parentWidth = (nullptr == cp) ? total : cp->width();
-//#ifdef SA_RIBBON_DEBUG_HELP_DRAW
-//    qDebug() << "\r\n mSizeHint:[ "<< parentHeight<<","<<parentWidth;
-//    for (int i = 0; i < mItemList.size(); ++i)
-//    {
-//        qDebug()	<< "\r\n [ "<< i << "]"
-//                << " geo:" << mItemList[i].mWillSetGeometry
-//                << " sep geo:" <<mItemList[i].mWillSetSeparatorGeometry
-//        ;
-//    }
-//#endif
     mSizeHint = QSize(parentWidth, parentHeight);
     doItemLayout();
 }
@@ -628,8 +618,8 @@ void SARibbonCategoryPrivate::doItemLayout()
     SARibbonCategory *category = ribbonCategory();
 
     //两个滚动按钮的位置永远不变
-    mLeftScrollBtn->setGeometry(0, 0, 12, category->height());
-    mRightScrollBtn->setGeometry(category->width()-12, 0, 12, category->height());
+    mLeftScrollBtn->setGeometry(5, 4, 12, category->height()-8);
+    mRightScrollBtn->setGeometry(category->width()-12-5, 4, 12, category->height()-8);
     QList<QWidget *> showWidgets, hideWidgets;
 
     for (const SARibbonCategoryItem& item : mItemList)
