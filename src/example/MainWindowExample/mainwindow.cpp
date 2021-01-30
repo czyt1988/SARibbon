@@ -103,6 +103,7 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
 
     act->setIcon(QIcon(":/icon/icon/save.png"));
     act->setText(QStringLiteral("SAve"));
+    act->setShortcut(QKeySequence(QLatin1String("Ctrl+S")));
     PRINT_COST(cost, lastTimes, "new Large Action");
     pannel->addLargeAction(act);
     connect(act, &QAction::triggered, this, [this](bool b) {
@@ -437,6 +438,7 @@ void MainWindow::createContextCategoryPage1(SARibbonCategory *page)
 
     act21->setIcon(QIcon(":/icon/icon/529398.png"));
     act21->setText(QStringLiteral("解锁左边的按钮"));
+    act21->setShortcut(QKeySequence(QLatin1String("Ctrl+E")));
     pannel->addLargeAction(act21);
     connect(act21, &QAction::triggered, this, [act2](bool b) {
         qDebug() << "act2->setEnabled(true);";
@@ -448,7 +450,8 @@ void MainWindow::createContextCategoryPage1(SARibbonCategory *page)
 
     act3->setCheckable(true);
     act3->setIcon(QIcon(":/icon/icon/530767.png"));
-    act3->setText(QStringLiteral("setText测试"));
+    act3->setText(QStringLiteral("setText测试\r\nCtrl+D"));
+    act3->setShortcut(QKeySequence(QLatin1String("Ctrl+D")));
     pannel->addLargeAction(act3);
 
     connect(act3, &QAction::toggled, this, [act3](bool b) {

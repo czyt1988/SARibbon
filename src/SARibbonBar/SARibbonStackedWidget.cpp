@@ -45,6 +45,7 @@ SARibbonStackedWidget::~SARibbonStackedWidget()
 
 void SARibbonStackedWidget::setPopupMode()
 {
+    setMouseTracking(true);
     setWindowFlags(Qt::Popup|Qt::FramelessWindowHint);
     setFrameShape(QFrame::Panel);
 }
@@ -62,6 +63,7 @@ void SARibbonStackedWidget::setNormalMode()
         m_d->eventLoop->exit();
         m_d->eventLoop = nullptr;
     }
+    setMouseTracking(false);
     setWindowFlags(Qt::Widget | Qt::FramelessWindowHint);
     setFrameShape(QFrame::NoFrame);
 }
@@ -128,13 +130,6 @@ void SARibbonStackedWidget::resizeEvent(QResizeEvent *event)
         {
             QWidget *w = widget(i);
             if (w) {
-//                qDebug()	<< "SARibbonStackedWidget::resizeEvent "
-//                        << w->metaObject()->className()
-//                        << " old size:" << w->size()
-//                        << " new size:" << event->size()
-//                ;
-//                QResizeEvent categorySizeEvent(event->size(), w->size());
-//                QApplication::sendEvent(w, &categorySizeEvent);
                 w->resize(event->size());
             }
         }
