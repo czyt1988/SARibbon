@@ -592,8 +592,7 @@ void SARibbonBar::onCategoryWindowTitleChanged(const QString& title)
 ///
 void SARibbonBar::onStackWidgetHided()
 {
-    qDebug()<<"onStackWidgetHided";
-    m_d->ribbonTabBar->repaint();
+    //m_d->ribbonTabBar->repaint();
 }
 
 
@@ -1150,7 +1149,6 @@ void SARibbonBar::resizeStackedContainerWidget()
             , absPosition.y()
             , width()-RibbonSubElementStyleOpt.widgetBord.left()-RibbonSubElementStyleOpt.widgetBord.right()
             , mainBarHeight()-m_d->ribbonTabBar->geometry().bottom()-RibbonSubElementStyleOpt.widgetBord.bottom()-1);
-        qDebug() << "stackedContainerWidget->isPopupMode()" << m_d->stackedContainerWidget->geometry();
     }else {
         m_d->stackedContainerWidget->setGeometry(RibbonSubElementStyleOpt.widgetBord.left()
             , m_d->ribbonTabBar->geometry().bottom()+1
