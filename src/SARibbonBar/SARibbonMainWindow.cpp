@@ -130,6 +130,8 @@ void SARibbonMainWindow::resizeEvent(QResizeEvent *event)
 
 bool SARibbonMainWindow::eventFilter(QObject *obj, QEvent *e)
 {
+    //这个过滤是为了把ribbonBar上的动作传递到mainwindow，再传递到frameless，
+    //由于ribbonbar会遮挡刁frameless的区域，导致frameless无法捕获这些消息
     if (obj == m_d->ribbonBar) {
         switch (e->type())
         {

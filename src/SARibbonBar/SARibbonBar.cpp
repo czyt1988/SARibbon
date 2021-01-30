@@ -16,6 +16,7 @@
 #include <QDesktopWidget>
 #include <SARibbonButtonGroupWidget.h>
 #include <QAction>
+#include <QHoverEvent>
 #include "SARibbonQuickAccessBar.h"
 #include <QStyleOptionMenuItem>
 
@@ -479,7 +480,6 @@ void SARibbonBar::setMinimumMode(bool isMinimum)
         m_d->setNormalMode();
     }
     QResizeEvent resizeEvent(size(), size());
-
     QApplication::sendEvent(this, &resizeEvent);
 }
 
@@ -592,7 +592,8 @@ void SARibbonBar::onCategoryWindowTitleChanged(const QString& title)
 ///
 void SARibbonBar::onStackWidgetHided()
 {
-    m_d->ribbonTabBar->setCurrentIndex(-1);
+    qDebug()<<"onStackWidgetHided";
+    m_d->ribbonTabBar->repaint();
 }
 
 
@@ -614,14 +615,23 @@ void SARibbonBar::onCurrentRibbonTabChanged(int index)
             m_d->stackedContainerWidget->setCurrentWidget(category);
         }
         if (isMinimumMode()) {
+            m_d->ribbonTabBar->clearFocus();
             if (!m_d->stackedContainerWidget->isVisible()) {
                 if (m_d->stackedContainerWidget->isPopupMode()) {
+                    //在stackedContainerWidget弹出前，先给tabbar一个外围的点击，让tabbar知道鼠标不在当前的tab上
+                    QPoint tagp = m_d->ribbonTabBar->geometry().topRight();
+                    QHoverEvent ehl(QEvent::HoverLeave
+                        , m_d->ribbonTabBar->mapToGlobal(QCursor::pos())
+                        , m_d->ribbonTabBar->mapToGlobal(QCursor::pos())
+                        );
+                    QApplication::sendEvent(m_d->ribbonTabBar, &ehl);
+                    resizeStackedContainerWidget();
                     m_d->stackedContainerWidget->setFocus();
                     m_d->stackedContainerWidget->exec();
                     //在最小模式下，每次显示完stackedContainerWidget后把tab的
                     //的index设置为-1，这样每次点击都会触发onCurrentRibbonTabChanged
-                    m_d->ribbonTabBar->setCurrentIndex(-1);
                 }
+            }else{
             }
         }
     }
@@ -635,20 +645,22 @@ void SARibbonBar::onCurrentRibbonTabChanged(int index)
  * 如果点击的和currentIndex返回不一致，会触发onCurrentRibbonTabChanged，
  * 不需要进行onCurrentRibbonTabClicked的响应，onCurrentRibbonTabClicked的响应是为了
  * 在隐藏模式下点击同一个tab还弹出
+ *
+ * 由于双击tab，触发顺序是先触发onCurrentRibbonTabClicked，再触发onCurrentRibbonTabDoubleClicked，再触发onCurrentRibbonTabClicked
  * @param index
  */
 void SARibbonBar::onCurrentRibbonTabClicked(int index)
 {
-    //不能在clicked里触发m_d->stackedContainerWidget->exec()
-    //这样会阻断整个消息循环，导致无法触发doublecliked
-    //    if (isMinimumMode()) {
-    //        if (!m_d->stackedContainerWidget->isVisible()) {
-    //            if (m_d->stackedContainerWidget->isPopupMode()) {
-    //                m_d->stackedContainerWidget->setFocus();
-    //                m_d->stackedContainerWidget->exec();
-    //            }
-    //        }
-    //    }
+//    不能在clicked里触发m_d->stackedContainerWidget->exec()
+//    这样会阻断整个消息循环，导致无法触发doublecliked
+//    if (isMinimumMode()) {
+//        if (!m_d->stackedContainerWidget->isVisible()) {
+//            if (m_d->stackedContainerWidget->isPopupMode()) {
+//                m_d->stackedContainerWidget->setFocus();
+//                m_d->stackedContainerWidget->exec();
+//            }
+//        }
+//    }
 }
 
 
@@ -714,6 +726,11 @@ void SARibbonBar::updateRibbonElementGeometry()
     if (NormalRibbonMode == currentRibbonState()) {
         setFixedHeight(mainBarHeight());
     }
+//    //最小模式时，bar的高度在resize之后调整
+//    else if(MinimumRibbonMode == currentRibbonState()){
+//        //处于最小模式下时，bar的高度为tabbar的bottom
+//        setFixedHeight(m_d->ribbonTabBar->geometry().bottom());
+//    }
 }
 
 
@@ -750,8 +767,13 @@ void SARibbonBar::setRibbonStyle(SARibbonBar::RibbonStyle v)
     updateRibbonElementGeometry();
     QSize oldSize = size();
     QSize newSize(oldSize.width(), mainBarHeight());
+    QResizeEvent es(newSize, oldSize);
 
-    QApplication::postEvent(this, new QResizeEvent(newSize, oldSize));
+    QApplication::sendEvent(this, &es);
+    if (MinimumRibbonMode == currentRibbonState()) {
+        //处于最小模式下时，bar的高度为tabbar的bottom,这个调整必须在resize event之后
+        setFixedHeight(m_d->ribbonTabBar->geometry().bottom());
+    }
 }
 
 
@@ -1128,6 +1150,7 @@ void SARibbonBar::resizeStackedContainerWidget()
             , absPosition.y()
             , width()-RibbonSubElementStyleOpt.widgetBord.left()-RibbonSubElementStyleOpt.widgetBord.right()
             , mainBarHeight()-m_d->ribbonTabBar->geometry().bottom()-RibbonSubElementStyleOpt.widgetBord.bottom()-1);
+        qDebug() << "stackedContainerWidget->isPopupMode()" << m_d->stackedContainerWidget->geometry();
     }else {
         m_d->stackedContainerWidget->setGeometry(RibbonSubElementStyleOpt.widgetBord.left()
             , m_d->ribbonTabBar->geometry().bottom()+1
@@ -1143,18 +1166,19 @@ void SARibbonBar::resizeStackedContainerWidget()
 void SARibbonBar::updateContextCategoryManagerData()
 {
     const int c = m_d->ribbonTabBar->count();
-    for(ContextCategoryManagerData& cd : m_d->currentShowingContextCategory)
+
+    for (ContextCategoryManagerData& cd : m_d->currentShowingContextCategory)
     {
         cd.tabPageIndex.clear();
         for (int i = 0; i < cd.contextCategory->categoryCount(); ++i)
         {
             SARibbonCategory *category = cd.contextCategory->categoryPage(i);
-            for(int t=0;t<c;++t)
+            for (int t = 0; t < c; ++t)
             {
                 QVariant v = m_d->ribbonTabBar->tabData(t);
-                if(v.isValid()){
+                if (v.isValid()) {
                     quint64 d = v.value<quint64>();
-                    if(d == (quint64)category){
+                    if (d == (quint64)category) {
                         cd.tabPageIndex.append(t);
                     }
                 }else{
@@ -1218,6 +1242,7 @@ void SARibbonBar::moveEvent(QMoveEvent *event)
     if (m_d->stackedContainerWidget) {
         if (m_d->stackedContainerWidget->isPopupMode()) {
             //弹出模式时，窗口发生了移动，同步调整StackedContainerWidget的位置
+            qDebug() << "moveEvent";
             resizeStackedContainerWidget();
         }
     }
