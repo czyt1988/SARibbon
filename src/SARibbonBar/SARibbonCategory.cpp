@@ -85,6 +85,7 @@ public:
     //
     void onLeftScrollButtonClicked();
     void onRightScrollButtonClicked();
+    void doWheelEvent(QWheelEvent *event);
 
 public:
     SARibbonCategory *mParent;
@@ -453,6 +454,16 @@ bool SARibbonCategory::eventFilter(QObject *watched, QEvent *event)
 }
 
 
+/**
+ * @brief 在超出边界情况下，滚轮可滚动pannel
+ * @param event
+ */
+void SARibbonCategory::wheelEvent(QWheelEvent *event)
+{
+    m_d->doWheelEvent(event);
+}
+
+
 SARibbonCategory *SARibbonCategoryPrivate::ribbonCategory()
 {
     return (mParent);
@@ -709,4 +720,36 @@ void SARibbonCategoryPrivate::onRightScrollButtonClicked()
         mXBase = 0;
     }
     updateItemGeometry();
+}
+
+
+void SARibbonCategoryPrivate::doWheelEvent(QWheelEvent *event)
+{
+    SARibbonCategory *category = ribbonCategory();
+    int width = category->width();
+    //求总宽
+    int totalWidth = mTotalWidth;
+
+    if (totalWidth > width) {
+        //这个时候滚动有效
+        int scrollpix = event->delta() / 4;
+        if (scrollpix > 0) { //当滚轮向上滑，SARibbonCategory向左走
+            int tmp = mXBase - scrollpix;
+            if (tmp < (width - totalWidth)) {
+                tmp = width - totalWidth;
+            }
+            mXBase = tmp;
+        }else {                                 //当滚轮向下滑，SARibbonCategory向右走
+            int tmp = mXBase - scrollpix;   //此时numDegrees为负数
+            if (tmp > 0) {
+                tmp = 0;
+            }
+            mXBase = tmp;
+        }
+        updateItemGeometry();
+    }else {
+        //这时候无需处理事件，把滚动事件上发让父级也能接收
+        event->ignore();
+        mXBase = 0;
+    }
 }

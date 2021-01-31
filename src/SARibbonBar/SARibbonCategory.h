@@ -5,9 +5,11 @@
 #include "SARibbonPannel.h"
 #include <QScopedPointer>
 #include <QPushButton>
+#include <QWheelEvent>
 class SARibbonCategoryProxyPrivate;
 class SARibbonCategoryPrivate;
 class QHBoxLayout;
+class QWheelEvent;
 
 
 /**
@@ -60,6 +62,9 @@ protected:
     //设置pannel的模式
     void setRibbonPannelLayoutMode(SARibbonPannel::PannelLayoutMode m);
     bool eventFilter(QObject *watched, QEvent *event) Q_DECL_OVERRIDE;
+
+    //处理滚轮事件
+    void wheelEvent(QWheelEvent *event) Q_DECL_OVERRIDE;
 
 private:
     SARibbonCategoryPrivate *m_d;
