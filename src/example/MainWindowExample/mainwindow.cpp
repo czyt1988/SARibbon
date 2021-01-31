@@ -269,7 +269,7 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
     com->setWindowTitle("ComboBox");
     for (int i = 0; i < 40; ++i)
     {
-        com->addItem("SARibbonComboBox test");
+        com->addItem(QString("SARibbonComboBox test%1").arg(i+1));
     }
     com->setEditable(true);
     pannel->addSmallWidget(com);
@@ -281,7 +281,7 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
     com->setWindowTitle("ComboBox Editable");
     for (int i = 0; i < 40; ++i)
     {
-        com->addItem("111111111111");
+        com->addItem(QString("item %1").arg(i+1));
     }
     pannel->addSmallWidget(com);
 

@@ -69,7 +69,7 @@ private:
 /**
  * @brief SARibbonCategory无法完全显示时，显示的调整按钮
  *
- * 重新定义是为了防止被外部的样式影响
+ * 重新定义是为了防止被外部的样式影响,同时可以使用SARibbonCategoryScrollButton的样式定义
  */
 class SA_RIBBON_EXPORT SARibbonCategoryScrollButton : public QToolButton
 {
