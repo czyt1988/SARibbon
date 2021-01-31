@@ -961,20 +961,6 @@ void SARibbonBar::paintEvent(QPaintEvent *e)
     }else{
         paintInWpsLiteStyle();
     }
-//    switch (m_d->ribbonStyle)
-//    {
-//    case OfficeStyle:
-
-//        break;
-
-//    case WpsLiteStyle:
-
-//        break;
-
-//    default:
-//        paintInNormalStyle();
-//        break;
-//    }
 #ifdef SA_RIBBON_DEBUG_HELP_DRAW
     QPainter p(this);
     HELP_DRAW_RECT(p, m_d->quickAccessBar->geometry());
@@ -1073,15 +1059,6 @@ void SARibbonBar::paintInNormalStyle()
         paintWindowTitle(p, parWindow->windowTitle(), titleRegion);
         paintWindowIcon(p, parWindow->windowIcon());
     }
-//    QStyleOptionMenuItem menuOpt;
-//    menuOpt.palette = palette();
-//    menuOpt.state = QStyle::State_None;
-//    menuOpt.menuItemType = QStyleOptionMenuItem::EmptyArea;
-//    menuOpt.checkType = QStyleOptionMenuItem::NotCheckable;
-//    menuOpt.rect = rect();
-//    menuOpt.menuRect = rect();
-//    style()->drawControl(QStyle::CE_MenuBarEmptyArea, &menuOpt, &p, this);
-    //    QWidget::paintEvent(e);
 }
 
 
@@ -1435,7 +1412,7 @@ void SARibbonBar::paintBackground(QPainter& painter)
     pen.setWidth(1);
     pen.setStyle(Qt::SolidLine);
     painter.setPen(pen);
-    painter.drawLine(QPoint(RibbonSubElementStyleOpt.widgetBord.left(), lineY), QPoint(width() - RibbonSubElementStyleOpt.widgetBord.right(), lineY));
+    painter.drawLine(QPoint(RibbonSubElementStyleOpt.widgetBord.left(), lineY), QPoint(width() - RibbonSubElementStyleOpt.widgetBord.right()-1, lineY));
     painter.restore();
 }
 
