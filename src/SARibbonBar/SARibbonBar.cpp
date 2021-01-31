@@ -19,6 +19,7 @@
 #include <QHoverEvent>
 #include "SARibbonQuickAccessBar.h"
 #include <QStyleOptionMenuItem>
+#include <QTimer>
 
 #define HELP_DRAW_RECT(p, rect)			    \
     do{					    \
@@ -617,8 +618,7 @@ void SARibbonBar::onCurrentRibbonTabChanged(int index)
             m_d->ribbonTabBar->clearFocus();
             if (!m_d->stackedContainerWidget->isVisible()) {
                 if (m_d->stackedContainerWidget->isPopupMode()) {
-                    //在stackedContainerWidget弹出前，先给tabbar一个外围的点击，让tabbar知道鼠标不在当前的tab上
-                    QPoint tagp = m_d->ribbonTabBar->geometry().topRight();
+                    //在stackedContainerWidget弹出前，先给tabbar一个QHoverEvent,让tabbar知道鼠标已经移开
                     QHoverEvent ehl(QEvent::HoverLeave
                         , m_d->ribbonTabBar->mapToGlobal(QCursor::pos())
                         , m_d->ribbonTabBar->mapToGlobal(QCursor::pos())
@@ -641,25 +641,33 @@ void SARibbonBar::onCurrentRibbonTabChanged(int index)
 /**
  * @brief ribbon tab bar单击
  *
- * 如果点击的和currentIndex返回不一致，会触发onCurrentRibbonTabChanged，
- * 不需要进行onCurrentRibbonTabClicked的响应，onCurrentRibbonTabClicked的响应是为了
- * 在隐藏模式下点击同一个tab还弹出
+ * 此实现必须在eventfilter中传递stackedwidget的QEvent::MouseButtonDblClick事件到tabbar中，否则会导致双击变两次单击
  *
- * 由于双击tab，触发顺序是先触发onCurrentRibbonTabClicked，再触发onCurrentRibbonTabDoubleClicked，再触发onCurrentRibbonTabClicked
+ * 单击事件仅用于响应点击同一个tab时
  * @param index
  */
 void SARibbonBar::onCurrentRibbonTabClicked(int index)
 {
-//    不能在clicked里触发m_d->stackedContainerWidget->exec()
-//    这样会阻断整个消息循环，导致无法触发doublecliked
-//    if (isMinimumMode()) {
-//        if (!m_d->stackedContainerWidget->isVisible()) {
-//            if (m_d->stackedContainerWidget->isPopupMode()) {
-//                m_d->stackedContainerWidget->setFocus();
-//                m_d->stackedContainerWidget->exec();
-//            }
-//        }
-//    }
+    if (index != m_d->ribbonTabBar->currentIndex()) {
+        //点击的标签不一致通过changed槽去处理
+        return;
+    }
+    if (this->isMinimumMode()) {
+        if (!this->m_d->stackedContainerWidget->isVisible()) {
+            if (this->m_d->stackedContainerWidget->isPopupMode()) {
+                //在stackedContainerWidget弹出前，先给tabbar一个QHoverEvent,让tabbar知道鼠标已经移开
+                QHoverEvent ehl(QEvent::HoverLeave
+                    , m_d->ribbonTabBar->mapToGlobal(QCursor::pos())
+                    , m_d->ribbonTabBar->mapToGlobal(QCursor::pos())
+                    );
+                QApplication::sendEvent(m_d->ribbonTabBar, &ehl);
+                //弹出前都调整一下位置，避免移动后位置异常
+                resizeStackedContainerWidget();
+                this->m_d->stackedContainerWidget->setFocus();
+                this->m_d->stackedContainerWidget->exec();
+            }
+        }
+    }
 }
 
 
@@ -862,7 +870,7 @@ bool SARibbonBar::eventFilter(QObject *obj, QEvent *e)
             //在stack 是popup模式时，点击的是stackedContainerWidget区域外的时候，如果是在ribbonTabBar上点击
             //那么忽略掉这次点击，把点击下发到ribbonTabBar,这样可以避免stackedContainerWidget在点击ribbonTabBar后
             //隐藏又显示，出现闪烁
-            if (QEvent::MouseButtonPress == e->type()) {
+            if ((QEvent::MouseButtonPress == e->type()) || (QEvent::MouseButtonDblClick == e->type())) {
                 if (m_d->stackedContainerWidget->isPopupMode()) {
                     QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(e);
                     if (!m_d->stackedContainerWidget->rect().contains(mouseEvent->pos())) {
