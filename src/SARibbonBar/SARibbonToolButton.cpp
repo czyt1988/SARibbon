@@ -438,6 +438,7 @@ QSize SARibbonToolButton::sizeHint() const
     if (LargeButton == buttonType()) {
         //计算最佳大小
         SARibbonToolButton *that = const_cast<SARibbonToolButton *>(this);
+
         if (s.width() > s.height()*1.4) {
             //文本对齐方式
             int alignment = Qt::TextShowMnemonic | Qt::TextWordWrap;
@@ -470,7 +471,18 @@ QSize SARibbonToolButton::sizeHint() const
                 }
             }
         }else{
-            that->m_isWordWrap = false;
+            //TODO : 还有一种情况，显示的使用\n导致误判
+            that->m_isWordWrap = text().contains('\n');
+            QStyleOptionToolButton opt;
+            initStyleOption(&opt);
+            if ((opt.features & QStyleOptionToolButton::Menu) ||
+                (opt.features & QStyleOptionToolButton::PopupDelay) ||
+                (opt.features & QStyleOptionToolButton::HasMenu)) {
+                //如果有菜单
+                if ((largeButtonType() == Normal) && m_isWordWrap) {
+                    s.rwidth() += ARROW_WIDTH;
+                }
+            }
         }
     }else{
         //通过QToolButton源码的分析，在iconbeside模式下，宽度是opt.iconSize.width + 4 + textSize.width() + IndicatorWidth

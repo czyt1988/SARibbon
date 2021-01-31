@@ -44,6 +44,7 @@ SARibbonMainWindow::SARibbonMainWindow(QWidget *parent, bool useRibbon)
     m_d->init();
 	m_d->useRibbon = useRibbon;
     if (useRibbon) {
+        qDebug() << "SARibbon v0.3.1";
 		setRibbonTheme(ribbonTheme());
 		//
 		m_d->ribbonBar = new SARibbonBar(this);
