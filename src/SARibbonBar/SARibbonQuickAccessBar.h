@@ -2,6 +2,8 @@
 #define SARIBBONQUICKACCESSBAR_H
 #include "SARibbonGlobal.h"
 #include "SARibbonCtrlContainer.h"
+#include <QMenu>
+#include <QToolButton>
 class SARibbonToolButton;
 class SARibbonQuickAccessBarPrivate;
 ///
@@ -14,12 +16,15 @@ public:
     SARibbonQuickAccessBar(QWidget *parent = 0);
     ~SARibbonQuickAccessBar();
     void addSeparator();
-    SARibbonToolButton *addButton(QAction* act);
-    void addWidget(QWidget* w);
+    void addAction(QAction *act);
+    void addWidget(QWidget *w);
+    void addMenu(QMenu *m, QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
+
 protected:
-    virtual void initStyleOption(QStyleOption* opt);
+    virtual void initStyleOption(QStyleOption *opt);
+
 private:
-    SARibbonQuickAccessBarPrivate* m_d;
+    SARibbonQuickAccessBarPrivate *m_d;
 };
 
 #endif // SARIBBONQUICKACCESSBAR_H

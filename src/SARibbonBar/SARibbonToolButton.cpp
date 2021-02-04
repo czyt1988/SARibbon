@@ -649,6 +649,11 @@ SARibbonToolButton::RibbonButtonType SARibbonToolButton::buttonType() const
 }
 
 
+/**
+ * @brief 设置按钮样式
+ * @note 设置按钮样式过程会调用setToolButtonStyle，如果要改变toolButtonStyle,如设置为Qt::ToolButtonIconOnly,需要在此函数之后设置
+ * @param buttonType
+ */
 void SARibbonToolButton::setButtonType(const RibbonButtonType& buttonType)
 {
     m_buttonType = buttonType;

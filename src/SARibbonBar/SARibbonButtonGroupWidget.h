@@ -1,12 +1,10 @@
 ﻿#ifndef SARIBBONBUTTONGROUPWIDGET_H
 #define SARIBBONBUTTONGROUPWIDGET_H
 #include "SARibbonGlobal.h"
-#include "SARibbonToolButton.h"
+#include <QToolButton>
+#include <QMenu>
 #include <QFrame>
-#include <QAbstractButton>
 class SARibbonButtonGroupWidgetPrivate;
-
-
 
 /**
  * @brief 用于管理一组Action,类似于QToolBar
@@ -17,11 +15,25 @@ class SA_RIBBON_EXPORT SARibbonButtonGroupWidget : public QFrame
 public:
     SARibbonButtonGroupWidget(QWidget *parent = Q_NULLPTR);
     ~SARibbonButtonGroupWidget();
-    void addButton(QAbstractButton *btn);
-    SARibbonToolButton *addButton(QAction *action);
-    void addWidget(QWidget *w);
+
+    //生成并添加一个action
+    void addAction(QAction *a);
+    QAction *addAction(const QString& text, const QIcon& icon, QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
+    void addMenu(QMenu *menu, QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
+    QAction *addWidget(QWidget *w);
     QSize sizeHint() const Q_DECL_OVERRIDE;
     QSize minimumSizeHint() const Q_DECL_OVERRIDE;
+
+signals:
+
+    /**
+     * @brief 参考QToolBar::actionTriggered的信号
+     * @param action
+     */
+    void actionTriggered(QAction *action);
+
+protected:
+    virtual void actionEvent(QActionEvent *e) Q_DECL_OVERRIDE;
 
 private:
     SARibbonButtonGroupWidgetPrivate *m_d;
