@@ -185,12 +185,10 @@ void SARibbonToolButton::paintSmallButton(QPaintEvent *e)
             opt.state &= ~QStyle::State_MouseOver;
         }
     }
-#if 0
-    p.drawComplexControl(QStyle::CC_ToolButton, opt);
-#else
     bool autoRaise = opt.state & QStyle::State_AutoRaise;
     QStyle::State bflags = opt.state & ~QStyle::State_Sunken;
     QStyle::State mflags = bflags;
+
     if (autoRaise) {
         if (!(bflags & QStyle::State_MouseOver) || !(bflags & QStyle::State_Enabled)) {
             bflags &= ~QStyle::State_Raised;
@@ -207,22 +205,8 @@ void SARibbonToolButton::paintSmallButton(QPaintEvent *e)
     }
     //绘制背景
     QStyleOption tool(0);
-    tool.palette = opt.palette;
 
-    // 绘制边框
-//    if (((opt.state & QStyle::State_MouseOver) && (opt.features & QStyleOptionToolButton::MenuButtonPopup))
-//        ||
-//        ((isChecked()) && (opt.features & QStyleOptionToolButton::MenuButtonPopup))) {//checked
-////        p.save();
-////        p.setPen(m_borderColor);
-////        p.setBrush(Qt::NoBrush);
-////        p.drawRect(opt.rect.adjusted(0, 0, -1, -1));
-////        p.drawRect(m_iconRect);//分界线
-////        p.restore();
-//        tool.rect = opt.rect;
-//        tool.state = bflags;
-//        style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
-//    }
+    tool.palette = opt.palette;
 
     if ((opt.subControls & QStyle::SC_ToolButton)
         &&
@@ -260,7 +244,6 @@ void SARibbonToolButton::paintSmallButton(QPaintEvent *e)
                     }else {
                         style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tool, &p, this);
                     }
-                    qDebug() << __LINE__;
                 }
             }
         }
@@ -287,9 +270,7 @@ void SARibbonToolButton::paintSmallButton(QPaintEvent *e)
         }
     }
 
-
     drawIconAndLabel(p, opt);
-#endif
 }
 
 
@@ -433,7 +414,9 @@ bool SARibbonToolButton::hitButton(const QPoint& pos) const
 QSize SARibbonToolButton::sizeHint() const
 {
     QSize s = QToolButton::sizeHint();
+    QStyleOptionToolButton opt;
 
+    initStyleOption(&opt);
     //QToolButton的sizeHint已经考虑了菜单箭头的位置
     if (LargeButton == buttonType()) {
         //计算最佳大小
@@ -454,10 +437,7 @@ QSize SARibbonToolButton::sizeHint() const
             //确认是否换行
             that->m_isWordWrap = (textRange.height() > fm.lineSpacing());
 
-            QStyleOptionToolButton opt;
-            initStyleOption(&opt);
             if ((opt.features & QStyleOptionToolButton::Menu) ||
-                (opt.features & QStyleOptionToolButton::PopupDelay) ||
                 (opt.features & QStyleOptionToolButton::HasMenu)) {
                 //如果有菜单
                 if (largeButtonType() == Lite) {
@@ -476,7 +456,6 @@ QSize SARibbonToolButton::sizeHint() const
             QStyleOptionToolButton opt;
             initStyleOption(&opt);
             if ((opt.features & QStyleOptionToolButton::Menu) ||
-                (opt.features & QStyleOptionToolButton::PopupDelay) ||
                 (opt.features & QStyleOptionToolButton::HasMenu)) {
                 //如果有菜单
                 if ((largeButtonType() == Normal) && m_isWordWrap) {
@@ -485,16 +464,22 @@ QSize SARibbonToolButton::sizeHint() const
             }
         }
     }else{
-        //通过QToolButton源码的分析，在iconbeside模式下，宽度是opt.iconSize.width + 4 + textSize.width() + IndicatorWidth
-        //由于实际在pannel的toolbutton会把iconsize设置到高度一致，因此，sizeHint需要进行一定调整
-//        QStyleOptionToolButton opt;
-//        initStyleOption(&opt);
-//        if (opt.toolButtonStyle != Qt::ToolButtonTextOnly) {
-//            if (opt.iconSize.width() < s.height()) {
-//                //需要补齐宽度
-//                s.rwidth() += (s.height() - opt.iconSize.width());
-//            }
-//        }
+        // InstantPopup在qtoolbutton不会添加控件来放下箭头，这里处理的和MenuButtonPopup一致
+        // 在仅有图标的小模式显示时，预留一个下拉箭头位置
+        if (Qt::ToolButtonIconOnly == toolButtonStyle()) {
+            if (opt.features & QStyleOptionToolButton::Menu ||
+                opt.features & QStyleOptionToolButton::HasMenu) {
+                //如果有菜单
+                //            s.rwidth() += style()->pixelMetric(QStyle::PM_MenuButtonIndicator, &opt, this);
+                s.rwidth() += ARROW_WIDTH;
+            }
+        }else{
+            if (opt.features & QStyleOptionToolButton::Menu ||
+                opt.features & QStyleOptionToolButton::HasMenu) {
+            }else{
+                s.rwidth() -= 4;// QToolButton::sizeHint()预留了4像素，有点稀疏
+            }
+        }
     }
     return (s);
 }
@@ -602,7 +587,7 @@ void SARibbonToolButton::drawIconAndLabel(QPainter& p, QStyleOptionToolButton& o
                     QPalette::ButtonText);
                 p.restore();
             }else {
-                style()->drawItemPixmap(&p, opt.rect, Qt::AlignCenter, pm);
+                style()->drawItemPixmap(&p, m_iconRect, Qt::AlignCenter, pm);
             }
         }else {// 只有文字
             int alignment = Qt::TextShowMnemonic;
@@ -711,14 +696,6 @@ int SARibbonToolButton::liteLargeButtonIconHeight(int buttonHeight) const
  */
 void SARibbonToolButton::calcIconRect(const QStyleOptionToolButton& opt)
 {
-//    int shiftX = 0;
-//    int shiftY = 0;
-
-//    if (opt.state & (QStyle::State_Sunken | QStyle::State_On)) {
-//        shiftX = style()->pixelMetric(QStyle::PM_ButtonShiftHorizontal, &opt, this);
-//        shiftY = style()->pixelMetric(QStyle::PM_ButtonShiftVertical, &opt, this);
-//    }
-
     if (LargeButton == m_buttonType) {
         m_iconRect = opt.rect;
         if (opt.toolButtonStyle != Qt::ToolButtonIconOnly) {
@@ -730,13 +707,19 @@ void SARibbonToolButton::calcIconRect(const QStyleOptionToolButton& opt)
         }
     }else {
         if (opt.toolButtonStyle == Qt::ToolButtonIconOnly) {
-            m_iconRect = opt.rect;
+            // InstantPopup在qtoolbutton不会添加控件来放下箭头，这里处理的和MenuButtonPopup一致
+            // 在仅有图标的小模式显示时，预留一个下拉箭头位置
+            m_iconRect = rect();
+            if (opt.features & QStyleOptionToolButton::Menu ||
+                opt.features & QStyleOptionToolButton::HasMenu) {
+                //如果有菜单
+                //            s.rwidth() += style()->pixelMetric(QStyle::PM_MenuButtonIndicator, &opt, this);
+                m_iconRect.adjust(0, 0, -ARROW_WIDTH, 0);
+            }
         }else {
             m_iconRect = QRect(0, 0, qMax(opt.rect.height(), opt.iconSize.width()), opt.rect.height());
-            //m_iconRect = QRect(0, 0, opt.iconSize.width(), opt.rect.height());
         }
     }
-//    m_iconRect.translate(shiftX, shiftY);
 }
 
 
@@ -756,7 +739,7 @@ QRect SARibbonToolButton::calcTextRect(const QStyleOptionToolButton& opt) const
     }
 
     QRect rect = calcTextRect(opt.rect
-        , (opt.features & QStyleOptionToolButton::HasMenu));
+        , (opt.features & QStyleOptionToolButton::HasMenu || opt.features & QStyleOptionToolButton::Menu));
 
     rect.translate(shiftX, shiftY);
     return (rect);
@@ -789,9 +772,9 @@ QRect SARibbonToolButton::calcTextRect(const QRect& buttonRect, bool hasMenu) co
         if (Normal == m_largeButtonType) {
             if (hasMenu) {
                 if (m_isWordWrap) {
-                    rect.adjust(1, buttonRect.height()/2, -ARROW_WIDTH, -1);        //预留8px绘制箭头，1px的上下边界
+                    rect.adjust(1, buttonRect.height()/2, -ARROW_WIDTH, -1);        //预留ARROW_WIDTH绘制箭头，1px的上下边界
                 }else{
-                    rect.adjust(1, buttonRect.height()/2, -1, -ARROW_WIDTH);        //预留8px绘制箭头，1px的上下边界
+                    rect.adjust(1, buttonRect.height()/2, -1, -ARROW_WIDTH);        //预留ARROW_WIDTH绘制箭头，1px的上下边界
                 }
             }else{
                 rect.adjust(1, buttonRect.height()/2, -1, -1); //没有菜单不用预留箭头，1px的上下边界

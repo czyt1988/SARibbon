@@ -31,34 +31,50 @@
 
 MainWindow::MainWindow(QWidget *par) : SARibbonMainWindow(par)
 {
-#if 1
     QElapsedTimer cost;
     int lastTimes = 0;
+
     cost.start();
     setWindowTitle(QStringLiteral("ribbon test"));
     m_edit = new QTextEdit(this);
     setCentralWidget(m_edit);
     PRINT_COST(cost, lastTimes, "setCentralWidget & setWindowTitle");
     SARibbonBar *ribbon = ribbonBar();
+
     ribbon->applicationButton()->setText(QStringLiteral("File"));
     SARibbonCategory *categoryMain = ribbon->addCategoryPage(QStringLiteral("Main"));
+
     PRINT_COST(cost, lastTimes, "new main page");
     createCategoryMain(categoryMain);
     PRINT_COST(cost, lastTimes, "add main page element");
     SARibbonCategory *categoryOther = ribbon->addCategoryPage(QStringLiteral("Other"));
+
     createCategoryOther(categoryOther);
     PRINT_COST(cost, lastTimes, "add other page");
     m_contextCategory = ribbon->addContextCategory(QStringLiteral("context"), Qt::red, 1);
     SARibbonCategory *contextCategoryPage1 = m_contextCategory->addCategoryPage(QStringLiteral("Page1"));
+
     createContextCategoryPage1(contextCategoryPage1);
     SARibbonCategory *contextCategoryPage2 = m_contextCategory->addCategoryPage(QStringLiteral("Page1"));
+
     createContextCategoryPage2(contextCategoryPage2);
     PRINT_COST(cost, lastTimes, "add contextCategory page");
-#endif
-    ribbon->quickAccessBar()->addButton(new QAction(QIcon(":/icon/icon/chartDataManager.png"), "action1", this));
-    ribbon->quickAccessBar()->addButton(new QAction(QIcon(":/icon/icon/figureIcon.png"), "action2", this));
-    ribbon->quickAccessBar()->addButton(new QAction(QIcon(":/icon/icon/information.png"), "action3", this));
-    ribbon->quickAccessBar()->addButton(new QAction(QIcon(":/icon/icon/inRangDataRemove.png"), "action4", this));
+    SARibbonQuickAccessBar *quickAccessBar = ribbon->quickAccessBar();
+
+    quickAccessBar->addButton(new QAction(QIcon(":/icon/icon/chartDataManager.png"), "action1", this));
+    quickAccessBar->addButton(new QAction(QIcon(":/icon/icon/figureIcon.png"), "action2", this));
+    quickAccessBar->addButton(new QAction(QIcon(":/icon/icon/information.png"), "action3", this));
+    QMenu *m = new QMenu("action menu", this);
+
+    m->setIcon(QIcon(":/icon/icon/inRangDataRemove.png"));
+    m->addAction("1");
+    m->addAction("2");
+    m->addAction("3");
+    m->addAction("4");
+    m->addAction("5");
+    auto b = quickAccessBar->addButton(m->menuAction());
+
+    b->setObjectName("quickAccessBarMenu");
     showMaximized();
 }
 

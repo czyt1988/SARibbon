@@ -43,6 +43,7 @@ SARibbonMainWindow::SARibbonMainWindow(QWidget *parent, bool useRibbon)
 {
     m_d->init();
 	m_d->useRibbon = useRibbon;
+    qDebug() << windowFlags();
     if (useRibbon) {
         qDebug() << "SARibbon v0.3.1";
 		setRibbonTheme(ribbonTheme());
@@ -62,6 +63,11 @@ SARibbonMainWindow::SARibbonMainWindow(QWidget *parent, bool useRibbon)
         s.setHeight(m_d->ribbonBar->titleBarHeight());
         m_d->windowButtonGroup->setFixedSize(s);
         m_d->windowButtonGroup->setWindowStates(windowState());
+#ifdef Q_OS_UNIX
+        //某些系统会对FramelessWindowHint异常
+        //FramelessHelper用如下这种setWindowFlags(w->windowFlags()|Qt::FramelessWindowHint);方式设置，改为强制取消其他
+        setWindowFlags(Qt::Window|Qt::FramelessWindowHint);
+#endif
     }
 }
 

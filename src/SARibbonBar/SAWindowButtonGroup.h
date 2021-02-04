@@ -12,6 +12,7 @@ class SA_RIBBON_EXPORT SAWindowButtonGroup : public QWidget
     Q_OBJECT
 public:
     SAWindowButtonGroup(QWidget *parent);
+    SAWindowButtonGroup(QWidget *parent, Qt::WindowFlags flags);
     ~SAWindowButtonGroup();
     void setupMinimizeButton(bool on);
     void setupMaximizeButton(bool on);
