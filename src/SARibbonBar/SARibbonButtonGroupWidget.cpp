@@ -140,6 +140,16 @@ void SARibbonButtonGroupWidget::addMenu(QMenu *menu, QToolButton::ToolButtonPopu
 }
 
 
+QAction *SARibbonButtonGroupWidget::addSeparator()
+{
+    QAction *a = new QAction();
+
+    a->setSeparator(true);
+    addAction(a);
+    return (a);
+}
+
+
 QAction *SARibbonButtonGroupWidget::addWidget(QWidget *w)
 {
     QWidgetAction *a = new QWidgetAction(this);
@@ -193,7 +203,9 @@ void SARibbonButtonGroupWidget::actionEvent(QActionEvent *e)
                 item.customWidget = true;
             }
         } else if (item.action->isSeparator()) {
-            item.widget = RibbonSubElementDelegate->createRibbonSeparatorWidget(this);
+            SARibbonSeparatorWidget *sp = RibbonSubElementDelegate->createRibbonSeparatorWidget(this);
+            sp->setTopBottomMargins(3, 3);
+            item.widget = sp;
         }
         //不是widget，自动生成SARibbonToolbutton
         if (!item.widget) {

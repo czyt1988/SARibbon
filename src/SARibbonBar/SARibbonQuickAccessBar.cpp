@@ -24,9 +24,7 @@ SARibbonQuickAccessBar::~SARibbonQuickAccessBar()
 
 void SARibbonQuickAccessBar::addSeparator()
 {
-        SARibbonSeparatorWidget *w = new SARibbonSeparatorWidget(this);
-
-        m_d->groupWidget->addWidget(w);
+        m_d->groupWidget->addSeparator();
 }
 
 
