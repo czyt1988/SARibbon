@@ -3,6 +3,7 @@
 #include <QResizeEvent>
 #include <QStyle>
 #include <QDebug>
+#include <QScopedPointer>
 
 //为了避免使用此框架的app设置了全局的qpushbutton 的 qss样式影响此按钮，定义了一个类
 
@@ -18,6 +19,7 @@ public:
     int mMaxStretch;
     int mMinStretch;
     qreal mIconscale;
+    QScopedPointer<Qt::WindowFlags> mFlags;
     SAWindowButtonGroupPrivate(SAWindowButtonGroup *p)
         : q_d(p)
         , buttonClose(nullptr)
@@ -228,6 +230,23 @@ SAWindowButtonGroup::SAWindowButtonGroup(QWidget *parent) : QWidget(parent)
 }
 
 
+/**
+ * @brief 构造函数，强制使用flags，而不是用parent的flags进行构造
+ * @param parent
+ * @param flags
+ */
+SAWindowButtonGroup::SAWindowButtonGroup(QWidget *parent, Qt::WindowFlags flags) : QWidget(parent)
+    , m_d(new SAWindowButtonGroupPrivate(this))
+{
+    m_d->mFlags.reset(new Qt::WindowFlags);
+    *m_d->mFlags = flags;
+    updateWindowFlag();
+    if (parent) {
+        parent->installEventFilter(this);
+    }
+}
+
+
 SAWindowButtonGroup::~SAWindowButtonGroup()
 {
     delete m_d;
@@ -255,6 +274,10 @@ void SAWindowButtonGroup::setupCloseButton(bool on)
 void SAWindowButtonGroup::updateWindowFlag()
 {
     Qt::WindowFlags flags = parentWidget()->windowFlags();
+
+    if (!m_d->mFlags.isNull()) {
+        flags = *(m_d->mFlags);
+    }
 
     setupMinimizeButton(flags & Qt::WindowMinimizeButtonHint);
 

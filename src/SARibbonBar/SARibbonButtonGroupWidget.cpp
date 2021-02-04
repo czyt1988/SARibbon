@@ -51,7 +51,7 @@ SARibbonToolButton *SARibbonButtonGroupWidget::addButton(QAction *action)
     SARibbonToolButton *btn = new SARibbonToolButton(action, this);
 
     btn->setToolButtonStyle(Qt::ToolButtonIconOnly);
-    btn->setFixedSize(26, 26);
+//    btn->setFixedSize(26, 26);
     layout()->addWidget(btn);
     layout()->setAlignment(btn, Qt::AlignCenter);
     return (btn);
