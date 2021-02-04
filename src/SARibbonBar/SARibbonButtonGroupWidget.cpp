@@ -3,10 +3,31 @@
 #include <QDebug>
 #include <QMargins>
 #include <QChildEvent>
+#include <QActionEvent>
+#include <QWidgetAction>
+#include <QApplication>
+#include "SARibbonToolButton.h"
+#include "SARibbonElementManager.h"
+#include "SARibbonSeparatorWidget.h"
+
+class SARibbonButtonGroupWidgetItem {
+public:
+    QAction *action;
+    QWidget *widget;
+    bool customWidget;
+    bool operator ==(QAction *action);
+    bool operator ==(const SARibbonButtonGroupWidgetItem& w);
+
+    SARibbonButtonGroupWidgetItem();
+    SARibbonButtonGroupWidgetItem(QAction *a, QWidget *w, bool cw);
+};
+
+
 class SARibbonButtonGroupWidgetPrivate
 {
 public:
     SARibbonButtonGroupWidget *Parent;
+    QList<SARibbonButtonGroupWidgetItem> mItems;///< 用于记录所有管理的item
     SARibbonButtonGroupWidgetPrivate(SARibbonButtonGroupWidget *p)
     {
         Parent = p;
@@ -24,6 +45,40 @@ public:
     }
 };
 
+
+//////////////////////////////////////////////
+
+
+bool SARibbonButtonGroupWidgetItem::operator ==(QAction *action)
+{
+    return (this->action == action);
+}
+
+
+bool SARibbonButtonGroupWidgetItem::operator ==(const SARibbonButtonGroupWidgetItem& w)
+{
+    return (this->action == w.action);
+}
+
+
+SARibbonButtonGroupWidgetItem::SARibbonButtonGroupWidgetItem()
+    : action(nullptr)
+    , widget(nullptr)
+    , customWidget(false)
+{
+}
+
+
+SARibbonButtonGroupWidgetItem::SARibbonButtonGroupWidgetItem(QAction *a, QWidget *w, bool cw)
+    : action(a)
+    , widget(w)
+    , customWidget(cw)
+{
+}
+
+
+//////////////////////////////////////////////
+
 SARibbonButtonGroupWidget::SARibbonButtonGroupWidget(QWidget *parent)
     : QFrame(parent)
     , m_d(new SARibbonButtonGroupWidgetPrivate(this))
@@ -34,35 +89,65 @@ SARibbonButtonGroupWidget::SARibbonButtonGroupWidget(QWidget *parent)
 
 SARibbonButtonGroupWidget::~SARibbonButtonGroupWidget()
 {
+    for (SARibbonButtonGroupWidgetItem& item : m_d->mItems)
+    {
+        if (QWidgetAction *widgetAction = qobject_cast<QWidgetAction *>(item.action)) {
+            if (item.customWidget) {
+                widgetAction->releaseWidget(item.widget);
+            }
+        }
+    }
     delete m_d;
 }
 
 
-void SARibbonButtonGroupWidget::addButton(QAbstractButton *btn)
+void SARibbonButtonGroupWidget::addAction(QAction *a)
 {
-    btn->setParent(this);
-    layout()->addWidget(btn);
-    layout()->setAlignment(btn, Qt::AlignCenter);
+    QWidget::addAction(a);
 }
 
 
-SARibbonToolButton *SARibbonButtonGroupWidget::addButton(QAction *action)
+/**
+ * @brief 生成action
+ * @note action的所有权归SARibbonButtonGroupWidget
+ * @param text
+ * @param icon
+ * @param popMode
+ * @return
+ */
+QAction *SARibbonButtonGroupWidget::addAction(const QString& text, const QIcon& icon, QToolButton::ToolButtonPopupMode popMode)
 {
-    SARibbonToolButton *btn = new SARibbonToolButton(action, this);
+    QAction *a = new QAction(icon, text, this);
 
-    btn->setToolButtonStyle(Qt::ToolButtonIconOnly);
-//    btn->setFixedSize(26, 26);
-    layout()->addWidget(btn);
-    layout()->setAlignment(btn, Qt::AlignCenter);
-    return (btn);
+
+    SARibbonToolButton *btn = qobject_cast<SARibbonToolButton *>(m_d->mItems.back().widget);
+
+    if (btn) {
+        btn->setPopupMode(popMode);
+    }
+    return (a);
 }
 
 
-void SARibbonButtonGroupWidget::addWidget(QWidget *w)
+void SARibbonButtonGroupWidget::addMenu(QMenu *menu, QToolButton::ToolButtonPopupMode popMode)
 {
-    w->setParent(this);
-    layout()->addWidget(w);
-    layout()->setAlignment(w, Qt::AlignCenter);
+    QAction *a = menu->menuAction();
+
+    addAction(a);
+    SARibbonToolButton *btn = qobject_cast<SARibbonToolButton *>(m_d->mItems.back().widget);
+
+    btn->setPopupMode(popMode);
+}
+
+
+QAction *SARibbonButtonGroupWidget::addWidget(QWidget *w)
+{
+    QWidgetAction *a = new QWidgetAction(this);
+
+    a->setDefaultWidget(w);
+    w->setAttribute(Qt::WA_Hover);
+    addAction(a);
+    return (a);
 }
 
 
@@ -75,4 +160,88 @@ QSize SARibbonButtonGroupWidget::sizeHint() const
 QSize SARibbonButtonGroupWidget::minimumSizeHint() const
 {
     return (layout()->minimumSize());
+}
+
+
+/**
+ * @brief 处理action的事件
+ *
+ * 这里处理了ActionAdded，ActionChanged，ActionRemoved三个事件
+ * ActionAdded时会生成窗口
+ * @param e
+ */
+void SARibbonButtonGroupWidget::actionEvent(QActionEvent *e)
+{
+    SARibbonButtonGroupWidgetItem item;
+
+    item.action = e->action();
+    QWidgetAction *widgetAction = qobject_cast<QWidgetAction *>(item.action);
+
+    switch (e->type())
+    {
+    case QEvent::ActionAdded:
+    {
+        if (nullptr != widgetAction) {
+            if (widgetAction->parent() != this) {
+                widgetAction->setParent(this);
+            }
+        }
+        if (QWidgetAction *widgetAction = qobject_cast<QWidgetAction *>(item.action)) {
+            item.widget = widgetAction->requestWidget(this);
+            if (item.widget != nullptr) {
+                item.widget->setAttribute(Qt::WA_LayoutUsesWidgetRect);
+                item.customWidget = true;
+            }
+        } else if (item.action->isSeparator()) {
+            item.widget = RibbonSubElementDelegate->createRibbonSeparatorWidget(this);
+        }
+        //不是widget，自动生成SARibbonToolbutton
+        if (!item.widget) {
+            SARibbonToolButton *button = RibbonSubElementDelegate->createRibbonToolButton(this);
+            button->setAutoRaise(true);
+            button->setFocusPolicy(Qt::NoFocus);
+            button->setButtonType(SARibbonToolButton::SmallButton);
+            button->setToolButtonStyle(Qt::ToolButtonIconOnly);
+            button->setDefaultAction(item.action);
+            //根据QAction的属性设置按钮的大小
+
+            QObject::connect(button, &SARibbonToolButton::triggered
+                , this, &SARibbonButtonGroupWidget::actionTriggered);
+            item.widget = button;
+        }
+        layout()->addWidget(item.widget);
+        m_d->mItems.append(item);
+    }
+    break;
+
+    case QEvent::ActionChanged:
+    {
+        //让布局重新绘制
+        layout()->invalidate();
+    }
+    break;
+
+    case QEvent::ActionRemoved:
+    {
+        item.action->disconnect(this);
+        auto i = m_d->mItems.begin();
+        for ( ; i != m_d->mItems.end();)
+        {
+            QWidgetAction *widgetAction = qobject_cast<QWidgetAction *>(i->action);
+            if ((widgetAction != 0) && i->customWidget) {
+                widgetAction->releaseWidget(i->widget);
+            } else {
+                // destroy the QToolButton/QToolBarSeparator
+                i->widget->hide();
+                i->widget->deleteLater();
+            }
+            i = m_d->mItems.erase(i);
+        }
+        layout()->invalidate();
+    }
+    break;
+
+    default:
+        break;
+    }
 }
