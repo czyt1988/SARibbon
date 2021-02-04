@@ -63,6 +63,7 @@ MainWindow::MainWindow(QWidget *par) : SARibbonMainWindow(par)
 
         quickAccessBar->addAction(new QAction(QIcon(":/icon/icon/chartDataManager.png"), "action1", this));
         quickAccessBar->addAction(new QAction(QIcon(":/icon/icon/figureIcon.png"), "action2", this));
+        quickAccessBar->addSeparator();
         quickAccessBar->addAction(new QAction(QIcon(":/icon/icon/information.png"), "action3", this));
         QMenu *m = new QMenu("action menu", this);
 

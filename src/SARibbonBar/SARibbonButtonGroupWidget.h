@@ -20,6 +20,7 @@ public:
     void addAction(QAction *a);
     QAction *addAction(const QString& text, const QIcon& icon, QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
     void addMenu(QMenu *menu, QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
+    QAction *addSeparator();
     QAction *addWidget(QWidget *w);
     QSize sizeHint() const Q_DECL_OVERRIDE;
     QSize minimumSizeHint() const Q_DECL_OVERRIDE;
