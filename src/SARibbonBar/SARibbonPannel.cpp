@@ -466,6 +466,7 @@ void SARibbonPannelLayout::updateGeomArray(const QRect& setrect)
     const short rowCount = (pannel->pannelLayoutMode() == SARibbonPannel::ThreeRowMode) ? 3 : 2;
     // largeHeight是对应large占比的高度
     const int largeHeight = height - mag.top() - mag.bottom() - pannel->titleHeight();
+
     m_largeHeight = largeHeight;
     //计算smallHeight的高度
     const int smallHeight = (largeHeight - (rowCount-1)*spacing) / rowCount;
@@ -702,56 +703,58 @@ void SARibbonPannelLayout::updateGeomArray(const QRect& setrect)
         }
     }
     //在设置完所有窗口后，再设置扩展属性的窗口
-    if(totalWidth < setrect.width()){
+    if (totalWidth < setrect.width()) {
         //说明可以设置扩展属性的窗口
         recalcExpandGeomArray(setrect);
     }
     this->m_sizeHint = QSize(totalWidth, height);
 }
 
-void SARibbonPannelLayout::recalcExpandGeomArray(const QRect &setrect)
+
+void SARibbonPannelLayout::recalcExpandGeomArray(const QRect& setrect)
 {
     //计算能扩展的尺寸
     int expandwidth = setrect.width() - this->m_sizeHint.width();
-    if(expandwidth<=0){
+
+    if (expandwidth <= 0) {
         //没有必要设置
         return;
     }
     //列扩展信息
-    struct _columnExpandInfo
-    {
-        int oldColumnWidth=0;///< 原来的列宽
-        int columnMaximumWidth=-1; ///< 列的最大宽度
-        int columnExpandedWidth=0; ///< 扩展后列的宽度
-        QList<SARibbonPannelItem *> expandItems;
+    struct _columnExpandInfo {
+        int				oldColumnWidth = 0;             ///< 原来的列宽
+        int				columnMaximumWidth = -1;        ///< 列的最大宽度
+        int				columnExpandedWidth = 0;        ///< 扩展后列的宽度
+        QList<SARibbonPannelItem *>	expandItems;
     };
     //此变量用于记录可以水平扩展的列和控件，在布局结束后，如果还有空间，就把水平扩展的控件进行扩展
-    QMap<int,_columnExpandInfo> columnExpandInfo;
-    for (SARibbonPannelItem *item:m_items){
-        if((!item->isEmpty()) && item->expandingDirections() & Qt::Horizontal)
-        {
+    QMap<int, _columnExpandInfo> columnExpandInfo;
+
+    for (SARibbonPannelItem *item:m_items)
+    {
+        if ((!item->isEmpty()) && item->expandingDirections() & Qt::Horizontal) {
             //只获取可见的
-            QMap<int,_columnExpandInfo>::iterator i = columnExpandInfo.find(item->columnIndex);
-            if(i == columnExpandInfo.end())
-            {
-                i = columnExpandInfo.insert(item->columnIndex,_columnExpandInfo());
+            QMap<int, _columnExpandInfo>::iterator i = columnExpandInfo.find(item->columnIndex);
+            if (i == columnExpandInfo.end()) {
+                i = columnExpandInfo.insert(item->columnIndex, _columnExpandInfo());
             }
             i.value().expandItems.append(item);
         }
     }
-    if(columnExpandInfo.size() <= 0){
+    if (columnExpandInfo.size() <= 0) {
         //没有需要扩展的就退出
         return;
     }
     //获取完可扩展的列和控件后，计算对应的列的尺寸
     //计算能扩展的尺寸
     int oneColCanexpandWidth = expandwidth / columnExpandInfo.size();
-    for(auto i = columnExpandInfo.begin();i!=columnExpandInfo.end();)
+
+    for (auto i = columnExpandInfo.begin(); i != columnExpandInfo.end();)
     {
         int& oldColumnWidth = i.value().oldColumnWidth;
         int& columnMaximumWidth = i.value().columnMaximumWidth;
-        columnWidthInfo(i.key(),oldColumnWidth,columnMaximumWidth);
-        if(oldColumnWidth <= 0 || oldColumnWidth > columnMaximumWidth){
+        columnWidthInfo(i.key(), oldColumnWidth, columnMaximumWidth);
+        if ((oldColumnWidth <= 0) || (oldColumnWidth > columnMaximumWidth)) {
             //如果小于0说明没有这个列，这种属于异常，删除继续
             //oldColumnWidth > columnMaximumWidth也是异常
             i = columnExpandInfo.erase(i);
@@ -759,7 +762,7 @@ void SARibbonPannelLayout::recalcExpandGeomArray(const QRect &setrect)
         }
         //开始调整
         int colwidth = oneColCanexpandWidth+oldColumnWidth;//先扩展了
-        if(colwidth >= columnMaximumWidth){
+        if (colwidth >= columnMaximumWidth) {
             //过最大宽度要求
             i.value().columnExpandedWidth = columnMaximumWidth;
         }else{
@@ -769,18 +772,18 @@ void SARibbonPannelLayout::recalcExpandGeomArray(const QRect &setrect)
     }
     //从新调整尺寸
     //由于会涉及其他列的变更，因此需要所有都遍历一下
-    for(auto i=columnExpandInfo.begin();i != columnExpandInfo.end();++i)
+    for (auto i = columnExpandInfo.begin(); i != columnExpandInfo.end(); ++i)
     {
         int moveXLen = i.value().columnExpandedWidth - i.value().oldColumnWidth;
-        for(SARibbonPannelItem *item:m_items)
+        for (SARibbonPannelItem *item:m_items)
         {
-            if(item->isEmpty() || item->columnIndex < i.key()){
+            if (item->isEmpty() || (item->columnIndex < i.key())) {
                 //之前的列不用管
                 continue;
             }
-            if(item->columnIndex == i.key()){
+            if (item->columnIndex == i.key()) {
                 //此列的扩展
-                if(i.value().expandItems.contains(item)){
+                if (i.value().expandItems.contains(item)) {
                     //此列需要扩展的item才扩展尺寸
                     item->itemWillSetGeometry.setWidth(i.value().columnExpandedWidth);
                 }else{
@@ -789,11 +792,12 @@ void SARibbonPannelLayout::recalcExpandGeomArray(const QRect &setrect)
                 }
             }else{
                 //后面的移动
-               item->itemWillSetGeometry.moveLeft(item->itemWillSetGeometry.x()+moveXLen);
+                item->itemWillSetGeometry.moveLeft(item->itemWillSetGeometry.x()+moveXLen);
             }
         }
     }
 }
+
 
 /**
  * @brief 返回所有列的区域
@@ -827,15 +831,15 @@ void SARibbonPannelLayout::recalcExpandGeomArray(const QRect &setrect)
  * @param width 如果传入没有这个列，返回-1
  * @param maximum 如果传入没有这个列，返回-1
  */
-void SARibbonPannelLayout::columnWidthInfo(int colindex,int& width,int& maximum) const
+void SARibbonPannelLayout::columnWidthInfo(int colindex, int& width, int& maximum) const
 {
     width = -1;
     maximum = -1;
-    for (SARibbonPannelItem *item:m_items){
-        if(!item->isEmpty() && item->columnIndex == colindex)
-        {
-            width = qMax(width,item->itemWillSetGeometry.width());
-            maximum = qMax(maximum,item->widget()->maximumWidth());
+    for (SARibbonPannelItem *item:m_items)
+    {
+        if (!item->isEmpty() && (item->columnIndex == colindex)) {
+            width = qMax(width, item->itemWillSetGeometry.width());
+            maximum = qMax(maximum, item->widget()->maximumWidth());
         }
     }
 }
@@ -1153,7 +1157,7 @@ QList<SARibbonToolButton *> SARibbonPannel::ribbonToolButtons() const
 
 
 /**
- * @brief SARibbonPannel::setPannelLayoutMode
+ * @brief 设置PannelLayoutMode
  * @param mode
  */
 void SARibbonPannel::setPannelLayoutMode(SARibbonPannel::PannelLayoutMode mode)
