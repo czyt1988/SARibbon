@@ -91,6 +91,7 @@ class SARibbonQuickAccessBar;
 class SA_RIBBON_EXPORT SARibbonBar : public QMenuBar
 {
     Q_OBJECT
+    friend class SARibbonBarPrivate;
 public:
 
     /**
@@ -250,8 +251,10 @@ private:
     void paintInNormalStyle();
     void paintInWpsLiteStyle();
     void resizeStackedContainerWidget();
+
     //刷新所有ContextCategoryManagerData，这个在单独一个Category删除时调用
     void updateContextCategoryManagerData();
+
 protected:
     void paintEvent(QPaintEvent *e) Q_DECL_OVERRIDE;
     void resizeEvent(QResizeEvent *e) Q_DECL_OVERRIDE;
@@ -262,7 +265,6 @@ protected:
     virtual void paintContextCategoryTab(QPainter& painter, const QString& title, QRect contextRect, const QColor& color);
 
 private:
-    friend class SARibbonBarPrivate;
     SARibbonBarPrivate *m_d;
 };
 

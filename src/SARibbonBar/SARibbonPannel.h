@@ -61,6 +61,8 @@ public:
 class SA_RIBBON_EXPORT SARibbonPannel : public QWidget
 {
     Q_OBJECT
+    friend class SARibbonCategory;
+    friend class SARibbonCategoryPrivate;
 public:
     SARibbonPannel(QWidget *parent = 0);
     ~SARibbonPannel();
@@ -133,8 +135,7 @@ public:
     //获取所有的buttons
     QList<SARibbonToolButton *> ribbonToolButtons() const;
 
-    //设置PannelLayoutMode
-    void setPannelLayoutMode(PannelLayoutMode mode);
+    //获取PannelLayoutMode
     PannelLayoutMode pannelLayoutMode() const;
 
     //判断是否为2行模式
@@ -164,6 +165,8 @@ signals:
     void actionTriggered(QAction *action);
 
 protected:
+    //设置PannelLayoutMode，此函数设置为protect避免误调用
+    void setPannelLayoutMode(PannelLayoutMode mode);
     void resetLayout(PannelLayoutMode newmode);
     void resetLargeToolButtonStyle();
     static QSize maxHightIconSize(const QSize& size, int h);
@@ -231,20 +234,23 @@ protected:
     //rp用于告诉Layout生成什么样的窗口，详细见SARibbonPannelItem::RowProportion
     SARibbonPannelItem *createItem(QAction *action, SARibbonPannelItem::RowProportion rp = SARibbonPannelItem::None);
     void updateGeomArray(const QRect& setrect);
+
     //重新计算扩展条码，此函数必须在updateGeomArray函数之后调用
     void recalcExpandGeomArray(const QRect& setrect);
+
 private:
     //返回所有列的区域
     //QMap<int,QRect> columnsGeometry() const;
     //根据列数，计算窗口的宽度，以及最大宽度
-    void columnWidthInfo(int colindex,int& width,int& maximum) const;
+    void columnWidthInfo(int colindex, int& width, int& maximum) const;
+
 private:
     QList<SARibbonPannelItem *> m_items;
     int m_columnCount;      ///< 记录有多少列
     bool m_expandFlag;      ///< 标记是否是会扩展的
     QSize m_sizeHint;       ///< sizeHint返回的尺寸
     bool m_dirty;           ///< 用于标记是否需要刷新元素，参考QToolBarLayout源码
-    int m_largeHeight;///< 记录大图标的高度
+    int m_largeHeight;      ///< 记录大图标的高度
 };
 
 
