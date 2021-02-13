@@ -17,6 +17,7 @@ MIT协议，欢迎大家使用并提出意见
 ![](https://cdn.jsdelivr.net/gh/czyt1988/SARibbon/doc/screenshot/office-mode.png)
 
  另两种参考wps设计的wps模式，wps模式是office模式的改良版，它为了减小ribbon的高度，把标签和标题栏设置在一起
+ 
 ![](https://cdn.jsdelivr.net/gh/czyt1988/SARibbon/doc/screenshot/wps-mode.png)
 
  office模式和wps模式都支持两行和3行设计，满足不同界面需求。
@@ -33,7 +34,34 @@ MIT协议，欢迎大家使用并提出意见
 include($$PWD/SARibbonBar/SARibbon/SARibbonBar.pri)
 ```
 
-使用cmakefile的话自己手撸
+
+# 更多截图
+
+![](https://cdn.jsdelivr.net/gh/czyt1988/SARibbon/doc/screenshot/SARibbonBar-screenshot-01.gif)
+
+- 支持最小化模式，ribbon只显示标签（默认双击标签会进行切换）
+
+![](https://cdn.jsdelivr.net/gh/czyt1988/SARibbon/doc/screenshot/SARibbonBar-screenshot-minMode.gif)
+
+- 支持quickAccessBar（word快速菜单），在wps模式和office模式下会有不同的显示效果
+
+![](https://cdn.jsdelivr.net/gh/czyt1988/SARibbon/doc/screenshot/SARibbonBar-screenshot-quickAccessBar.gif)
+
+- 支持4种不同的ribbon button，普通按钮，延迟弹出菜单按钮，菜单按钮，action菜单按钮（action菜单按钮是此ribbon控件最主要解决的问题之一）
+
+![](https://cdn.jsdelivr.net/gh/czyt1988/SARibbon/doc/screenshot/SARibbonBar-screenshot-ribbonbutton.gif)
+
+- 支持qss对ribbon进行设置
+
+![](https://cdn.jsdelivr.net/gh/czyt1988/SARibbon/doc/screenshot/SARibbonBar-screenshot-useqss.gif)
+
+- 这是使用此控件的本人另外一个开源软件的截图
+
+![](https://cdn.jsdelivr.net/gh/czyt1988/SARibbon/doc/screenshot/sa-screenshot.gif)
+
+[github - https://github.com/czyt1988/sa](https://github.com/czyt1988/sa)
+
+[gitee - https://gitee.com/czyt1988/SA](https://gitee.com/czyt1988/SA)
 
 # 题外
 
@@ -77,3 +105,7 @@ SARibbon项目是SA项目的子项
 - 【解决】小按钮的位置过于紧凑
 - 【解决】分割线显示异常
 - 【解决】在非最大化模式，pannel变为缩小时，点击不弹出stacked
+
+# 其他
+
+> 感谢[FastCAE](http://www.fastcae.com/product.html)项目使用了本控件，并找到了许多bug和建议，FastCAE国产CAE软件集成开发平台，免费开源，是面向求解器开发者提供CAE软件界面与通用功能模块快速研发集成框架，[其开源仓库（github）:https://github.com/DISOGitHub/FastCAE](https://github.com/DISOGitHub/FastCAE)，[gitee:https://gitee.com/DISOGitee/FastCAE](https://gitee.com/DISOGitee/FastCAE)，[官网见:http://www.fastcae.com/product.html](http://www.fastcae.com/product.html)
