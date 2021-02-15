@@ -67,6 +67,7 @@ public:
     bool removePannel(SARibbonPannel *pannel);
     void setBackgroundBrush(const QBrush& brush);
     SARibbonCategory *ribbonCategory();
+    const SARibbonCategory *ribbonCategory() const;
     void setRibbonPannelLayoutMode(SARibbonPannel::PannelLayoutMode m);
     SARibbonPannel::PannelLayoutMode ribbonPannelLayoutMode() const;
 
@@ -75,6 +76,9 @@ public:
 
     //计算所有元素的SizeHint宽度总和
     int totalSizeHintWidth() const;
+
+    //返回category内容区的宽度，去除边界
+    QSize categoryContentSize() const;
 
     //更新item的布局,此函数会调用doItemLayout
     void updateItemGeometry();
@@ -327,6 +331,20 @@ int SARibbonCategoryPrivate::totalSizeHintWidth() const
 }
 
 
+QSize SARibbonCategoryPrivate::categoryContentSize() const
+{
+    const SARibbonCategory *category = ribbonCategory();
+    QSize s = category->size();
+    QMargins mag = mContentsMargins;
+
+    if (!mag.isNull()) {
+        s.rheight() -= (mag.top() + mag.bottom());
+        s.rwidth() -= (mag.right() + mag.left());
+    }
+    return (s);
+}
+
+
 SARibbonPannel *SARibbonCategoryPrivate::addPannel(const QString& title)
 {
     SARibbonPannel *pannel = RibbonSubElementDelegate->createRibbonPannel(ribbonCategory());
@@ -470,6 +488,12 @@ SARibbonCategory *SARibbonCategoryPrivate::ribbonCategory()
 }
 
 
+const SARibbonCategory *SARibbonCategoryPrivate::ribbonCategory() const
+{
+    return (mParent);
+}
+
+
 /**
  * @brief 设置pannel的模式
  *
@@ -505,16 +529,11 @@ SARibbonPannel::PannelLayoutMode SARibbonCategoryPrivate::ribbonPannelLayoutMode
 void SARibbonCategoryPrivate::updateItemGeometry()
 {
     SARibbonCategory *category = ribbonCategory();
-
-    int categoryWidth = category->width();
-    QMargins mag = mContentsMargins;
-    int height = category->height();
+    QSize contentSize = categoryContentSize();
     int y = 0;
 
-    if (!mag.isNull()) {
-        y = mag.top();
-        height -= (mag.top() + mag.bottom());
-        categoryWidth -= (mag.right() + mag.left());
+    if (!mContentsMargins.isNull()) {
+        y = mContentsMargins.top();
     }
     //total 是总宽，不是x坐标系，x才是坐标系
     int total = totalSizeHintWidth();
@@ -535,31 +554,12 @@ void SARibbonCategoryPrivate::updateItemGeometry()
             << "\r\n expandWidth:" << expandWidth
     ;
 #endif
-    if (total > categoryWidth) {
-        //超过总长度，需要显示滚动按钮
-        if (0 == mXBase) {
-            //已经移动到最左，需要可以向右移动
-            mIsRightScrollBtnShow = true;
-            mIsLeftScrollBtnShow = false;
-        }else if (mXBase <= (categoryWidth - total)) {
-            //已经移动到最右，需要可以向左移动
-            mIsRightScrollBtnShow = false;
-            mIsLeftScrollBtnShow = true;
-        }else {
-            //移动到中间两边都可以动
-            mIsRightScrollBtnShow = true;
-            mIsLeftScrollBtnShow = true;
-        }
-    }else{
-        //说明total 小于 categoryWidth
-        mIsRightScrollBtnShow = false;
-        mIsLeftScrollBtnShow = false;
+    if (total <= contentSize.width()) {
         //这个是避免一开始totalWidth > categorySize.width()，通过滚动按钮调整了m_d->mBaseX
         //随之调整了窗体尺寸，调整后totalWidth < categorySize.width()导致category在原来位置
         //无法显示，必须这里把mBaseX设置为0
         mXBase = 0;
         //
-
         for (const SARibbonCategoryItem& item : mItemList)
         {
             if (!item.isEmpty()) {
@@ -571,7 +571,7 @@ void SARibbonCategoryPrivate::updateItemGeometry()
         }
         //计算可扩展的宽度
         if (canExpandingCount > 0) {
-            expandWidth = (categoryWidth - total) / canExpandingCount;
+            expandWidth = (contentSize.width() - total) / canExpandingCount;
         }else{
             expandWidth = 0;
         }
@@ -607,17 +607,38 @@ void SARibbonCategoryPrivate::updateItemGeometry()
             pannelSize.setWidth(pannelSize.width()+expandWidth);
         }
         int w = pannelSize.width();
-        item.mWillSetGeometry = QRect(x, y, w, height);
+        item.mWillSetGeometry = QRect(x, y, w, contentSize.height());
         x += w;
         total += w;
         w = SeparatorSize.width();
-        item.mWillSetSeparatorGeometry = QRect(x, y, w, height);
+        item.mWillSetSeparatorGeometry = QRect(x, y, w, contentSize.height());
         x += w;
         total += w;
     }
     mTotalWidth = total;
+    //判断滚动按钮是否显示
+    if (total > contentSize.width()) {
+        //超过总长度，需要显示滚动按钮
+        if (0 == mXBase) {
+            //已经移动到最左，需要可以向右移动
+            mIsRightScrollBtnShow = true;
+            mIsLeftScrollBtnShow = false;
+        }else if (mXBase <= (contentSize.width() - total)) {
+            //已经移动到最右，需要可以向左移动
+            mIsRightScrollBtnShow = false;
+            mIsLeftScrollBtnShow = true;
+        }else {
+            //移动到中间两边都可以动
+            mIsRightScrollBtnShow = true;
+            mIsLeftScrollBtnShow = true;
+        }
+    }else{
+        //说明total 小于 categoryWidth
+        mIsRightScrollBtnShow = false;
+        mIsLeftScrollBtnShow = false;
+    }
     QWidget *cp = category->parentWidget();
-    int parentHeight = (nullptr == cp) ? height : cp->height();
+    int parentHeight = (nullptr == cp) ? contentSize.height() : cp->height();
     int parentWidth = (nullptr == cp) ? total : cp->width();
     mSizeHint = QSize(parentWidth, parentHeight);
     doItemLayout();
@@ -685,8 +706,7 @@ void SARibbonCategoryPrivate::doItemLayout()
 
 void SARibbonCategoryPrivate::onLeftScrollButtonClicked()
 {
-    SARibbonCategory *category = ribbonCategory();
-    int width = category->width();
+    int width = categoryContentSize().width();
     //求总宽
     int totalWidth = mTotalWidth;
 
@@ -705,8 +725,7 @@ void SARibbonCategoryPrivate::onLeftScrollButtonClicked()
 
 void SARibbonCategoryPrivate::onRightScrollButtonClicked()
 {
-    SARibbonCategory *category = ribbonCategory();
-    int width = category->width();
+    int width = categoryContentSize().width();
     //求总宽
     int totalWidth = mTotalWidth;
 
@@ -725,18 +744,17 @@ void SARibbonCategoryPrivate::onRightScrollButtonClicked()
 
 void SARibbonCategoryPrivate::doWheelEvent(QWheelEvent *event)
 {
-    SARibbonCategory *category = ribbonCategory();
-    int width = category->width();
+    QSize contentSize = categoryContentSize();
     //求总宽
     int totalWidth = mTotalWidth;
 
-    if (totalWidth > width) {
+    if (totalWidth > contentSize.width()) {
         //这个时候滚动有效
         int scrollpix = event->delta() / 4;
         if (scrollpix > 0) { //当滚轮向上滑，SARibbonCategory向左走
             int tmp = mXBase - scrollpix;
-            if (tmp < (width - totalWidth)) {
-                tmp = width - totalWidth;
+            if (tmp < (contentSize.width() - totalWidth)) {
+                tmp = contentSize.width() - totalWidth;
             }
             mXBase = tmp;
         }else {                                 //当滚轮向下滑，SARibbonCategory向右走
