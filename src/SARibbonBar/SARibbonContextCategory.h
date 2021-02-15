@@ -4,9 +4,10 @@
 #include "SARibbonCategory.h"
 #include <QWidget>
 class SARibbonContextCategoryPrivate;
-///
-/// \brief 管理上下文标签的类
-///
+
+/**
+ * @brief 管理上下文标签的类
+ */
 class SA_RIBBON_EXPORT SARibbonContextCategory : public QObject
 {
     Q_OBJECT
