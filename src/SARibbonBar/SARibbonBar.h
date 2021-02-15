@@ -140,7 +140,7 @@ public:
     void removeCategory(SARibbonCategory *category);
 
     //添加一个上下文标签
-    SARibbonContextCategory *addContextCategory(const QString& title, const QColor& color, const QVariant& id = QVariant());
+    SARibbonContextCategory *addContextCategory(const QString& title, const QColor& color = QColor(), const QVariant& id = QVariant());
 
     //显示一个上下文标签
     void showContextCategory(SARibbonContextCategory *context);

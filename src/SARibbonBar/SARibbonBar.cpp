@@ -60,6 +60,8 @@ public:
     SARibbonBar::RibbonStyle lastShowStyle;                         ///< ribbon的风格
     SARibbonBar::RibbonState currentRibbonMode;                     ///< 记录当前模式
     QSize windowButtonSize;                                         ///< 由SARibbonMainWindow告诉的windowbutton的尺寸
+    QList<QColor> mContextCategoryColorList;                        ///< contextCategory的色系
+    int mContextCategoryColorListIndex;                             ///< 记录contextCategory色系索引
     SARibbonBarPrivate(SARibbonBar *par)
         : applitionButton(nullptr)
         , ribbonTabBar(nullptr)
@@ -71,8 +73,16 @@ public:
         , lastShowStyle(SARibbonBar::OfficeStyle)
         , currentRibbonMode(SARibbonBar::NormalRibbonMode)
         , windowButtonSize(100, RibbonSubElementStyleOpt.titleBarHight)
+        , mContextCategoryColorListIndex(-1)
     {
         MainClass = par;
+        mContextCategoryColorList	<< QColor(201, 89, 156) // 玫红
+                        << QColor(242, 203, 29) // 黄
+                        << QColor(255, 157, 0)  // 橙
+                        << QColor(14, 81, 167)  // 蓝
+                        << QColor(228, 0, 69)   // 红
+                        << QColor(67, 148, 0)   // 绿
+        ;
     }
 
 
@@ -150,6 +160,21 @@ public:
         this->stackedContainerWidget->setNormalMode();
         this->stackedContainerWidget->setFocus();
         this->stackedContainerWidget->show();
+    }
+
+
+    QColor getContextCategoryColor()
+    {
+        if (mContextCategoryColorList.isEmpty()) {
+            mContextCategoryColorListIndex = -1;
+            return (QColor());
+        }
+        ++mContextCategoryColorListIndex;
+        if ((mContextCategoryColorListIndex >= mContextCategoryColorList.size()) ||
+            (mContextCategoryColorListIndex < 0)) {
+            mContextCategoryColorListIndex = 0;
+        }
+        return (mContextCategoryColorList.at(mContextCategoryColorListIndex));
     }
 };
 
@@ -323,7 +348,7 @@ void SARibbonBar::removeCategory(SARibbonCategory *category)
  * 调用@ref SARibbonContextCategory::addCategoryPage 可在上下文标签中添加SARibbonCategory，
  * 在上下文标签添加的SARibbonCategory，只有在上下文标签显示的时候才会显示
  * @param title 上下文标签的标题，在Office模式下会显示，在wps模式下不显示
- * @param color 上下文标签的颜色
+ * @param color 上下文标签的颜色，如果指定为空QColor(),将会使用SARibbonBar的默认色系
  * @param id 上下文标签的id，以便进行查找
  * @return 返回上下文标签指针
  * @note SARibbonBar拥有SARibbonContextCategory的管理权，用户避免在外部直接delete,如果要删除，调用@ref destroyContextCategory 函数
@@ -334,7 +359,7 @@ SARibbonContextCategory *SARibbonBar::addContextCategory(const QString& title, c
 
     context->setContextTitle(title);
     context->setId(id);
-    context->setContextColor(color);
+    context->setContextColor(color.isValid() ? color : m_d->getContextCategoryColor());
     connect(context, &SARibbonContextCategory::categoryPageAdded
         , this, &SARibbonBar::onContextsCategoryPageAdded);
     if (currentRibbonStyle() == WpsLiteStyle) {
@@ -993,7 +1018,7 @@ void SARibbonBar::paintInNormalStyle()
             QRect endRect = m_d->ribbonTabBar->tabRect(indexs.last());
             contextTitleRect.setRight(endRect.right());
             contextTitleRect.translate(m_d->ribbonTabBar->x(), m_d->ribbonTabBar->y());
-            contextTitleRect.setHeight(m_d->ribbonTabBar->height());
+            contextTitleRect.setHeight(m_d->ribbonTabBar->height()-1);//减1像素，避免tabbar基线覆盖
             contextTitleRect -= m_d->ribbonTabBar->tabMargin();
             //把区域顶部扩展到窗口顶部
             contextTitleRect.setTop(RibbonSubElementStyleOpt.widgetBord.top());
@@ -1083,7 +1108,7 @@ void SARibbonBar::paintInWpsLiteStyle()
             QRect endRect = m_d->ribbonTabBar->tabRect(indexs.last());
             contextTitleRect.setRight(endRect.right());
             contextTitleRect.translate(m_d->ribbonTabBar->x(), m_d->ribbonTabBar->y());
-            contextTitleRect.setHeight(m_d->ribbonTabBar->height());
+            contextTitleRect.setHeight(m_d->ribbonTabBar->height()-1);
             contextTitleRect -= m_d->ribbonTabBar->tabMargin();
             //把区域顶部扩展到窗口顶部
             contextTitleRect.setTop(RibbonSubElementStyleOpt.widgetBord.top());
@@ -1173,35 +1198,38 @@ void SARibbonBar::updateContextCategoryManagerData()
 }
 
 
+/**
+ * @brief 绘制上下文标签的背景
+ * @param painter 绘图QPainter
+ * @param title 上下文标签的title
+ * @param contextRect 上下文标签的绘制区域
+ * @param color 上下文标签赋予的颜色
+ */
 void SARibbonBar::paintContextCategoryTab(QPainter& painter, const QString& title, QRect contextRect, const QColor& color)
 {
     //绘制上下文标签
-    //首先有5像素的实体
+    //首先有5像素的实体粗线位于顶部
+    painter.save();
     painter.setPen(Qt::NoPen);
     painter.setBrush(color);
     painter.drawRect(QRect(contextRect.x(), RibbonSubElementStyleOpt.widgetBord.top(), contextRect.width(), 5));
-    int yStart = contextRect.y()+5;
 
-    //剩下的是渐变颜色
+    //剩下把颜色变亮90%
+    QColor gColor = color.light(190);
+
+    //减去之前的5像素
     contextRect -= QMargins(0, 5, 0, 0);
-    QColor gColor = color;
-    QLinearGradient lineGradient;
+    painter.fillRect(contextRect, gColor);
 
-    lineGradient.setStart(contextRect.x(), yStart);
-    lineGradient.setFinalStop(contextRect.x(), contextRect.bottom());
-    gColor.setAlpha(150);
-    lineGradient.setColorAt(0, gColor);
-    gColor.setAlpha(0);
-    lineGradient.setColorAt(0.9, gColor);
-    painter.fillRect(contextRect, lineGradient);
-    //绘制标题
-    //TODO 判断如果颜色很接近，需要替换为白色
-    if (!title.isEmpty()) {
-        contextRect.setBottom(m_d->ribbonTabBar->geometry().top());
-        painter.setPen(Qt::black);
-        painter.setBrush(Qt::NoBrush);
-        painter.drawText(contextRect, Qt::AlignCenter, title);
+    //只有在office模式下才需要绘制标题
+    if (isOfficeStyle()) {
+        if (!title.isEmpty()) {
+            contextRect.setBottom(m_d->ribbonTabBar->geometry().top());
+            painter.setPen(color);
+            painter.drawText(contextRect, Qt::AlignCenter, title);
+        }
     }
+    painter.restore();
 }
 
 
