@@ -21,6 +21,7 @@
 #include "SARibbonQuickAccessBar.h"
 #include "SARibbonButtonGroupWidget.h"
 #include "SARibbonApplicationButton.h"
+#include "SARibbonCustomizeWidget.h"
 #include <QCalendarWidget>
 #define PRINT_COST(ElapsedTimer, LastTime, STR)					      \
     do{									      \
@@ -30,6 +31,7 @@
     }while(0)
 
 MainWindow::MainWindow(QWidget *par) : SARibbonMainWindow(par)
+    , m_customizeWidget(nullptr)
 {
     QElapsedTimer cost;
     int lastTimes = 0;
@@ -74,6 +76,18 @@ MainWindow::MainWindow(QWidget *par) : SARibbonMainWindow(par)
     m->addAction("4");
     m->addAction("5");
     quickAccessBar->addMenu(m);
+
+    QAction *customize = new QAction(QIcon(":/icon/icon/chartDataManager.png"), "customize", this);
+
+    quickAccessBar->addAction(customize);
+    connect(customize, &QAction::triggered, this, [&]() {
+        if (nullptr == m_customizeWidget) {
+            m_customizeWidget = new SARibbonCustomizeWidget(this, this, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint | Qt::Dialog);
+            m_customizeWidget->setWindowModality(Qt::ApplicationModal);     //设置阻塞类型
+            m_customizeWidget->setAttribute(Qt::WA_ShowModal, true);        //属性设置 true:模态 false:非模态
+            m_customizeWidget->show();
+        }
+    });
     showMaximized();
 }
 

@@ -3,6 +3,7 @@
 #include "SARibbonMainWindow.h"
 class SARibbonCategory;
 class SARibbonContextCategory;
+class SARibbonCustomizeWidget;
 class QTextEdit;
 class MainWindow : public SARibbonMainWindow
 {
@@ -31,6 +32,7 @@ private slots:
 
 private:
     SARibbonContextCategory *m_contextCategory;
+    SARibbonCustomizeWidget *m_customizeWidget;
     QTextEdit *m_edit;
 };
 
