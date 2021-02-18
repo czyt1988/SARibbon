@@ -5,6 +5,7 @@ class SARibbonCategory;
 class SARibbonContextCategory;
 class SARibbonCustomizeWidget;
 class QTextEdit;
+class SARibbonActionsManager;
 class MainWindow : public SARibbonMainWindow
 {
     Q_OBJECT
@@ -20,6 +21,7 @@ private:
     void createCategoryOther(SARibbonCategory *page);
     void createContextCategoryPage1(SARibbonCategory *page);
     void createContextCategoryPage2(SARibbonCategory *page);
+    void addSomeOtherAction();
 
 private slots:
     void onMenuButtonPopupCheckableTest(bool b);
@@ -34,6 +36,9 @@ private:
     SARibbonContextCategory *m_contextCategory;
     SARibbonCustomizeWidget *m_customizeWidget;
     QTextEdit *m_edit;
+    SARibbonActionsManager *m_actMgr;
+    int m_actionTagText;
+    int m_actionTagWithIcon;
 };
 
 #endif // MAINWINDOW_H

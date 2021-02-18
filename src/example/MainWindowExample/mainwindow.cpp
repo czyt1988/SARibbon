@@ -77,6 +77,7 @@ MainWindow::MainWindow(QWidget *par) : SARibbonMainWindow(par)
     m->addAction("5");
     quickAccessBar->addMenu(m);
 
+    addSomeOtherAction();
     QAction *customize = new QAction(QIcon(":/icon/icon/chartDataManager.png"), "customize", this);
 
     quickAccessBar->addAction(customize);
@@ -85,9 +86,11 @@ MainWindow::MainWindow(QWidget *par) : SARibbonMainWindow(par)
             m_customizeWidget = new SARibbonCustomizeWidget(this, this, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint | Qt::Dialog);
             m_customizeWidget->setWindowModality(Qt::ApplicationModal);     //设置阻塞类型
             m_customizeWidget->setAttribute(Qt::WA_ShowModal, true);        //属性设置 true:模态 false:非模态
-            m_customizeWidget->show();
+            m_customizeWidget->setupActionsManager(m_actMgr);
         }
+        m_customizeWidget->show();
     });
+    //
     showMaximized();
 }
 
@@ -584,6 +587,46 @@ void MainWindow::createContextCategoryPage2(SARibbonCategory *page)
     pannel2->addAction(QStringLiteral("Large"), QIcon(":/icon/icon/530767.png"), QToolButton::InstantPopup, SARibbonPannelItem::Large);
     pannel2->addAction(QStringLiteral("Medium"), QIcon(":/icon/icon/530767.png"), QToolButton::InstantPopup, SARibbonPannelItem::Medium);
     pannel2->addAction(QStringLiteral("Small"), QIcon(":/icon/icon/530767.png"), QToolButton::InstantPopup, SARibbonPannelItem::Small);
+}
+
+
+void MainWindow::addSomeOtherAction()
+{
+    m_actMgr = new SARibbonActionsManager(this);
+    //添加其他的action，这些action并不在ribbon管理范围，主要用于SARibbonCustomizeWidget自定义用
+    QAction *acttext1 = new QAction(QStringLiteral("纯文本action1"));
+    QAction *acttext2 = new QAction(QStringLiteral("纯文本action2"));
+    QAction *acttext3 = new QAction(QStringLiteral("纯文本action3"));
+    QAction *acttext4 = new QAction(QStringLiteral("纯文本action4"));
+    QAction *acttext5 = new QAction(QStringLiteral("纯文本action5"));
+
+    QAction *actIcon1 = new QAction(QIcon(":/icon/icon/506353.png"), QStringLiteral("带图标action1"));
+    QAction *actIcon2 = new QAction(QIcon(":/icon/icon/506354.png"), QStringLiteral("带图标action2"));
+    QAction *actIcon3 = new QAction(QIcon(":/icon/icon/506355.png"), QStringLiteral("带图标action3"));
+    QAction *actIcon4 = new QAction(QIcon(":/icon/icon/506356.png"), QStringLiteral("带图标action4"));
+
+    m_actionTagText = SARibbonActionsManager::UserDefineActionTag+1;
+    m_actionTagWithIcon = SARibbonActionsManager::UserDefineActionTag+2;
+    m_actMgr->registeAction(acttext1, SARibbonActionsManager::CommonlyUsedActionTag);
+    m_actMgr->registeAction(acttext3, SARibbonActionsManager::CommonlyUsedActionTag);
+    m_actMgr->registeAction(acttext5, SARibbonActionsManager::CommonlyUsedActionTag);
+    m_actMgr->registeAction(actIcon1, SARibbonActionsManager::CommonlyUsedActionTag);
+    m_actMgr->registeAction(actIcon3, SARibbonActionsManager::CommonlyUsedActionTag);
+
+    m_actMgr->registeAction(acttext1, m_actionTagText);
+    m_actMgr->registeAction(acttext2, m_actionTagText);
+    m_actMgr->registeAction(acttext3, m_actionTagText);
+    m_actMgr->registeAction(acttext4, m_actionTagText);
+    m_actMgr->registeAction(acttext5, m_actionTagText);
+
+    m_actMgr->registeAction(actIcon1, m_actionTagWithIcon);
+    m_actMgr->registeAction(actIcon2, m_actionTagWithIcon);
+    m_actMgr->registeAction(actIcon3, m_actionTagWithIcon);
+    m_actMgr->registeAction(actIcon4, m_actionTagWithIcon);
+
+    m_actMgr->setTagName(SARibbonActionsManager::CommonlyUsedActionTag, QStringLiteral("常用"));
+    m_actMgr->setTagName(m_actionTagText, QStringLiteral("无图标action"));
+    m_actMgr->setTagName(m_actionTagWithIcon, QStringLiteral("有图标action"));
 }
 
 

@@ -2,7 +2,7 @@
 #define SARIBBONCUSTOMIZEWIDGET_H
 #include "SARibbonGlobal.h"
 #include <QWidget>
-#include <QAbstractItemModel>
+#include <QAbstractListModel>
 #include "SARibbonMainWindow.h"
 //SARibbonActionsManager 特有
 class SARibbonActionsManagerPrivate;
@@ -15,7 +15,7 @@ class SARibbonCustomizeWidgetPrivate;
 /**
  * @brief 用于管理SARibbon的所有Action，
  */
-class SARibbonActionsManager : public QObject
+class SA_RIBBON_EXPORT SARibbonActionsManager : public QObject
 {
     Q_OBJECT
     friend class SARibbonActionsModel;
@@ -33,6 +33,12 @@ public:
     typedef QMap<int, QList<QAction *> >::iterator ActionRef;
     SARibbonActionsManager(QObject *p = nullptr);
     ~SARibbonActionsManager();
+    //设置tag对应的名字
+    void setTagName(int tag, const QString& name);
+
+    //获取tag对应的名字
+    QString tagName(int tag) const;
+
     //注册action
     void registeAction(QAction *act, int tag);
 
@@ -47,6 +53,9 @@ public:
 
     //直接得到一个无效的ActionRefs
     ActionRef invalidActionRefs() const;
+
+    //获取所有的标签
+    QList<int> actionTags() const;
 
 signals:
 
@@ -65,21 +74,21 @@ private:
 /**
  * @brief SARibbonActionsManager 对应的model
  */
-class SA_RIBBON_EXPORT SARibbonActionsModel : public QAbstractItemModel
+class SA_RIBBON_EXPORT SARibbonActionsModel : public QAbstractListModel
 {
     Q_OBJECT
 public:
+    explicit SARibbonActionsModel(QObject *p = nullptr);
     explicit SARibbonActionsModel(SARibbonActionsManager *m, QObject *p = nullptr);
     ~SARibbonActionsModel();
-    QModelIndex index(int row, int column, const QModelIndex& parent) const override;
-    QModelIndex parent(const QModelIndex& index) const override;
     virtual int rowCount(const QModelIndex& parent) const override;
-    virtual int columnCount(const QModelIndex& parent) const override;
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
     virtual Qt::ItemFlags flags(const QModelIndex& index) const override;
     virtual QVariant data(const QModelIndex& index, int role) const override;
     void setFilter(int tag);
     void update();
+    void setupActionsManager(SARibbonActionsManager *m);
+    void uninstallActionsManager();
 
 private slots:
     void onActionTagChanged(int tag, bool isdelete);
@@ -106,6 +115,12 @@ public:
 
     //把定义的内容转换为xml
     virtual QString toXml() const;
+
+private slots:
+    void onComboBoxActionIndexCurrentIndexChanged(int index);
+
+private:
+    void initConnection();
 
 private:
     SARibbonCustomizeWidgetUi *ui;

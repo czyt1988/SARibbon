@@ -12,6 +12,7 @@
 #include <QtWidgets/QRadioButton>
 #include <QtWidgets/QSpacerItem>
 #include <QtWidgets/QTreeView>
+#include <QtWidgets/QListView>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
 
@@ -26,7 +27,7 @@ class SARibbonActionsManagerPrivate
 public:
     SARibbonActionsManager *mParent;
     QMap<int, QList<QAction *> > mTagToActions;     ///< tag : QSet<QAction*>
-    QMap<QAction *, int> mActionToTags;             ///< QAction:tags
+    QMap<int, QString> mTagToName;                  ///< tag对应的名字
     SARibbonActionsManagerPrivate(SARibbonActionsManager *p);
 };
 
@@ -49,6 +50,29 @@ SARibbonActionsManager::~SARibbonActionsManager()
 
 
 /**
+ * @brief 设置tag对应的名字，通过这个可以得到tag和文本的映射
+ * @param tag
+ * @param name
+ * @note 在支持多语言的环境下，在语言切换时需要重新设置，以更新名字
+ */
+void SARibbonActionsManager::setTagName(int tag, const QString& name)
+{
+    m_d->mTagToName[tag] = name;
+}
+
+
+/**
+ * @brief 获取tag对应的中文名字
+ * @param tag
+ * @return
+ */
+QString SARibbonActionsManager::tagName(int tag) const
+{
+    return (m_d->mTagToName.value(tag, ""));
+}
+
+
+/**
  * @brief 把action注册到管理器中，实现action的管理
  * @param act
  * @param tag tag是可以按照位进行叠加，见 @ref ActionTag 如果
@@ -66,7 +90,6 @@ void SARibbonActionsManager::registeAction(QAction *act, int tag)
     bool isneedemit = !(m_d->mTagToActions.contains(tag));//记录是否需要发射信号
 
     m_d->mTagToActions[tag].append(act);
-    m_d->mActionToTags[act] = tag;
     //绑定槽
     connect(act, &QObject::destroyed, this, &SARibbonActionsManager::onActionDestroyed);
     if (isneedemit) {
@@ -90,7 +113,6 @@ void SARibbonActionsManager::unregisteAction(QAction *act)
     }
     //绑定槽
     disconnect(act, &QObject::destroyed, this, &SARibbonActionsManager::onActionDestroyed);
-    m_d->mActionToTags.remove(act);
     auto i = m_d->mTagToActions.begin();
 
     while (i != m_d->mTagToActions.end())
@@ -143,6 +165,16 @@ SARibbonActionsManager::ActionRef SARibbonActionsManager::invalidActionRefs() co
 
 
 /**
+ * @brief 获取所有的标签
+ * @return
+ */
+QList<int> SARibbonActionsManager::actionTags() const
+{
+    return (m_d->mTagToActions.keys());
+}
+
+
+/**
  * @brief action 被delete时，将触发此槽把管理的action删除
  * @param o
  * @note 这个函数不会触发actionTagChanged信号
@@ -151,7 +183,6 @@ void SARibbonActionsManager::onActionDestroyed(QObject *o)
 {
     QAction *act = static_cast<QAction *>(o);
 
-    m_d->mActionToTags.remove(act);
     auto i = m_d->mTagToActions.begin();
 
     while (i != m_d->mTagToActions.end())
@@ -185,28 +216,40 @@ public:
     void updateRef();
     int count() const;
     QAction *at(int index);
+    bool isNull() const;
 };
 
 SARibbonActionsModelPrivete::SARibbonActionsModelPrivete(SARibbonActionsModel *m)
     : mParent(m)
+    , mMgr(nullptr)
+    , mTag(SARibbonActionsManager::CommonlyUsedActionTag)
 {
 }
 
 
 bool SARibbonActionsModelPrivete::isValidRef() const
 {
+    if (isNull()) {
+        return (false);
+    }
     return (mMgr->isActionRefsValid(mActionRef));
 }
 
 
 void SARibbonActionsModelPrivete::updateRef()
 {
+    if (isNull()) {
+        return;
+    }
     mActionRef = mMgr->filter(mTag);
 }
 
 
 int SARibbonActionsModelPrivete::count() const
 {
+    if (isNull()) {
+        return (0);
+    }
     if (isValidRef()) {
         return (mActionRef.value().size());
     }
@@ -216,6 +259,9 @@ int SARibbonActionsModelPrivete::count() const
 
 QAction *SARibbonActionsModelPrivete::at(int index)
 {
+    if (isNull()) {
+        return (nullptr);
+    }
     if (!isValidRef()) {
         return (nullptr);
     }
@@ -226,46 +272,28 @@ QAction *SARibbonActionsModelPrivete::at(int index)
 }
 
 
-SARibbonActionsModel::SARibbonActionsModel(SARibbonActionsManager *m, QObject *p) : QAbstractItemModel(p)
+bool SARibbonActionsModelPrivete::isNull() const
+{
+    return (mMgr == nullptr);
+}
+
+
+SARibbonActionsModel::SARibbonActionsModel(QObject *p) : QAbstractListModel(p)
     , m_d(new SARibbonActionsModelPrivete(this))
 {
-    m_d->mMgr = m;
-    m_d->mTag = SARibbonActionsManager::CommonlyUsedActionTag;
-    m_d->mActionRef = m->filter(m_d->mTag);
-    connect(m, &SARibbonActionsManager::actionTagChanged
-        , this, &SARibbonActionsModel::onActionTagChanged);
+}
+
+
+SARibbonActionsModel::SARibbonActionsModel(SARibbonActionsManager *m, QObject *p) : QAbstractListModel(p)
+    , m_d(new SARibbonActionsModelPrivete(this))
+{
+    setupActionsManager(m);
 }
 
 
 SARibbonActionsModel::~SARibbonActionsModel()
 {
     delete m_d;
-}
-
-
-QModelIndex SARibbonActionsModel::index(int row, int column, const QModelIndex& parent) const
-{
-    if ((row < 0) || (column < 0) || parent.isValid()) {
-        return (QModelIndex());
-    }
-    if (column >= 1) {//只能有一列，大于的都是异常
-        return (QModelIndex());
-    }
-    QAction *act = m_d->at(row);
-
-    //范围内
-    if (act) {
-        return (createIndex(row, column, act));
-    }
-    return (QModelIndex());
-}
-
-
-QModelIndex SARibbonActionsModel::parent(const QModelIndex& index) const
-{
-    Q_UNUSED(index);
-    //列表无层级
-    return (QModelIndex());
 }
 
 
@@ -279,18 +307,9 @@ int SARibbonActionsModel::rowCount(const QModelIndex& parent) const
 }
 
 
-int SARibbonActionsModel::columnCount(const QModelIndex& parent) const
-{
-    if (parent.isValid()) {//非顶层
-        return (0);
-    }
-    //顶层
-    return (1);
-}
-
-
 QVariant SARibbonActionsModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
+    Q_UNUSED(section);
     if (role != Qt::DisplayRole) {
         return (QVariant());
     }
@@ -312,6 +331,26 @@ Qt::ItemFlags SARibbonActionsModel::flags(const QModelIndex& index) const
 
 QVariant SARibbonActionsModel::data(const QModelIndex& index, int role) const
 {
+    if (!index.isValid()) {
+        return (QVariant());
+    }
+    if (index.row() >= m_d->count()) {
+        return (QVariant());
+    }
+    QAction *act = m_d->at(index.row());
+
+    switch (role)
+    {
+    case Qt::DisplayRole:
+        return (act->text());
+
+    case Qt::DecorationRole:
+        return (act->icon());
+
+    default:
+        break;
+    }
+    return (QVariant());
 }
 
 
@@ -327,6 +366,29 @@ void SARibbonActionsModel::update()
     beginResetModel();
     m_d->updateRef();
     endResetModel();
+}
+
+
+void SARibbonActionsModel::setupActionsManager(SARibbonActionsManager *m)
+{
+    m_d->mMgr = m;
+    m_d->mTag = SARibbonActionsManager::CommonlyUsedActionTag;
+    m_d->mActionRef = m->filter(m_d->mTag);
+    connect(m, &SARibbonActionsManager::actionTagChanged
+        , this, &SARibbonActionsModel::onActionTagChanged);
+    update();
+}
+
+
+void SARibbonActionsModel::uninstallActionsManager()
+{
+    if (!m_d->isNull()) {
+        disconnect(m_d->mMgr, &SARibbonActionsManager::actionTagChanged
+            , this, &SARibbonActionsModel::onActionTagChanged);
+        m_d->mMgr = nullptr;
+        m_d->mTag = SARibbonActionsManager::CommonlyUsedActionTag;
+    }
+    update();
 }
 
 
@@ -360,7 +422,7 @@ public:
     QHBoxLayout *horizontalLayoutSearch;
     QComboBox *comboBoxActionIndex;
     QLineEdit *lineEditSearchAction;
-    QTreeView *treeViewSelect;
+    QListView *listViewSelect;
     QVBoxLayout *verticalLayoutMidButtons;
     QSpacerItem *verticalSpacerUp;
     QPushButton *pushButtonAdd;
@@ -407,10 +469,10 @@ public:
 
         verticalLayoutSelect->addLayout(horizontalLayoutSearch);
 
-        treeViewSelect = new QTreeView(customizeWidget);
-        treeViewSelect->setObjectName(QStringLiteral("treeViewSelect"));
+        listViewSelect = new QListView(customizeWidget);
+        listViewSelect->setObjectName(QStringLiteral("listViewSelect"));
 
-        verticalLayoutSelect->addWidget(treeViewSelect);
+        verticalLayoutSelect->addWidget(listViewSelect);
 
 
         horizontalLayoutMain->addLayout(verticalLayoutSelect);
@@ -524,6 +586,7 @@ public:
     SARibbonMainWindow *mRibbonWindow;      ///< 保存SARibbonMainWindow的指针
     bool mIsChanged;                        ///< 判断用户是否有改动内容
     SARibbonActionsManager *mActionMgr;     ///< action管理器
+    SARibbonActionsModel *mAcionModel;      ///< action管理器对应的model
     SARibbonCustomizeWidgetPrivate(SARibbonCustomizeWidget *p);
 };
 
@@ -531,6 +594,8 @@ SARibbonCustomizeWidgetPrivate::SARibbonCustomizeWidgetPrivate(SARibbonCustomize
     : mParent(p)
     , mRibbonWindow(nullptr)
     , mIsChanged(false)
+    , mActionMgr(nullptr)
+    , mAcionModel(nullptr)
 {
 }
 
@@ -547,6 +612,9 @@ SARibbonCustomizeWidget::SARibbonCustomizeWidget(SARibbonMainWindow *ribbonWindo
 {
     ui->setupUi(this);
     m_d->mRibbonWindow = ribbonWindow;
+    m_d->mAcionModel = new SARibbonActionsModel(this);
+    ui->listViewSelect->setModel(m_d->mAcionModel);
+    initConnection();
 }
 
 
@@ -557,6 +625,13 @@ SARibbonCustomizeWidget::~SARibbonCustomizeWidget()
 }
 
 
+void SARibbonCustomizeWidget::initConnection()
+{
+    connect(ui->comboBoxActionIndex, QOverload<int>::of(&QComboBox::currentIndexChanged)
+        , this, &SARibbonCustomizeWidget::onComboBoxActionIndexCurrentIndexChanged);
+}
+
+
 /**
  * @brief 设置action管理器
  * @param mgr
@@ -564,6 +639,18 @@ SARibbonCustomizeWidget::~SARibbonCustomizeWidget()
 void SARibbonCustomizeWidget::setupActionsManager(SARibbonActionsManager *mgr)
 {
     m_d->mActionMgr = mgr;
+    if (m_d->mActionMgr) {
+        m_d->mAcionModel->uninstallActionsManager();
+    }
+    m_d->mAcionModel->setupActionsManager(mgr);
+    //更新左边复选框
+    QList<int> tags = mgr->actionTags();
+
+    ui->comboBoxActionIndex->clear();
+    for (int tag : tags)
+    {
+        ui->comboBoxActionIndex->addItem(mgr->tagName(tag), tag);
+    }
 }
 
 
@@ -580,4 +667,13 @@ bool SARibbonCustomizeWidget::isChanged() const
 QString SARibbonCustomizeWidget::toXml() const
 {
     //TODO
+    return (QString());
+}
+
+
+void SARibbonCustomizeWidget::onComboBoxActionIndexCurrentIndexChanged(int index)
+{
+    int tag = ui->comboBoxActionIndex->itemData(index).toInt();
+
+    m_d->mAcionModel->setFilter(tag);
 }
