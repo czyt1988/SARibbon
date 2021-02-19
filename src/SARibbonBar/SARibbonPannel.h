@@ -63,6 +63,7 @@ class SA_RIBBON_EXPORT SARibbonPannel : public QWidget
     Q_OBJECT
     friend class SARibbonCategory;
     friend class SARibbonCategoryPrivate;
+    friend class SARibbonCustomizeWidgetPrivate;
 public:
     SARibbonPannel(QWidget *parent = 0);
     ~SARibbonPannel();
@@ -135,6 +136,8 @@ public:
     //获取所有的buttons
     QList<SARibbonToolButton *> ribbonToolButtons() const;
 
+
+
     //获取PannelLayoutMode
     PannelLayoutMode pannelLayoutMode() const;
 
@@ -174,6 +177,9 @@ protected:
     virtual void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
     virtual void actionEvent(QActionEvent *e) Q_DECL_OVERRIDE;
 
+    //获取布局对应的item
+    const QList<SARibbonPannelItem *>& ribbonPannelItem() const;
+
 private:
     SARibbonPannelPrivate *m_d;
 };
@@ -189,6 +195,7 @@ private:
 class SA_RIBBON_EXPORT SARibbonPannelLayout : public QLayout
 {
     Q_OBJECT
+    friend class SARibbonPannel;
 public:
 
     SARibbonPannelLayout(QWidget *p = 0);

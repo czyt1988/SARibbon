@@ -15,7 +15,9 @@
 #include <QtWidgets/QListView>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QWidget>
-
+#include "SARibbonMainWindow.h"
+#include "SARibbonPannel.h"
+#include <QStandardItemModel>
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// SARibbonActionsManager
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -207,11 +209,11 @@ void SARibbonActionsManager::onActionDestroyed(QObject *o)
 class SARibbonActionsModelPrivete
 {
 public:
-    SARibbonActionsModel *mParent;
+    SARibbonActionsManagerModel *mParent;
     SARibbonActionsManager *mMgr;
     int mTag;
     SARibbonActionsManager::ActionRef mActionRef;
-    SARibbonActionsModelPrivete(SARibbonActionsModel *m);
+    SARibbonActionsModelPrivete(SARibbonActionsManagerModel *m);
     bool isValidRef() const;
     void updateRef();
     int count() const;
@@ -219,7 +221,7 @@ public:
     bool isNull() const;
 };
 
-SARibbonActionsModelPrivete::SARibbonActionsModelPrivete(SARibbonActionsModel *m)
+SARibbonActionsModelPrivete::SARibbonActionsModelPrivete(SARibbonActionsManagerModel *m)
     : mParent(m)
     , mMgr(nullptr)
     , mTag(SARibbonActionsManager::CommonlyUsedActionTag)
@@ -278,26 +280,26 @@ bool SARibbonActionsModelPrivete::isNull() const
 }
 
 
-SARibbonActionsModel::SARibbonActionsModel(QObject *p) : QAbstractListModel(p)
+SARibbonActionsManagerModel::SARibbonActionsManagerModel(QObject *p) : QAbstractListModel(p)
     , m_d(new SARibbonActionsModelPrivete(this))
 {
 }
 
 
-SARibbonActionsModel::SARibbonActionsModel(SARibbonActionsManager *m, QObject *p) : QAbstractListModel(p)
+SARibbonActionsManagerModel::SARibbonActionsManagerModel(SARibbonActionsManager *m, QObject *p) : QAbstractListModel(p)
     , m_d(new SARibbonActionsModelPrivete(this))
 {
     setupActionsManager(m);
 }
 
 
-SARibbonActionsModel::~SARibbonActionsModel()
+SARibbonActionsManagerModel::~SARibbonActionsManagerModel()
 {
     delete m_d;
 }
 
 
-int SARibbonActionsModel::rowCount(const QModelIndex& parent) const
+int SARibbonActionsManagerModel::rowCount(const QModelIndex& parent) const
 {
     if (parent.isValid()) {//非顶层
         return (0);
@@ -307,7 +309,7 @@ int SARibbonActionsModel::rowCount(const QModelIndex& parent) const
 }
 
 
-QVariant SARibbonActionsModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant SARibbonActionsManagerModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     Q_UNUSED(section);
     if (role != Qt::DisplayRole) {
@@ -320,7 +322,7 @@ QVariant SARibbonActionsModel::headerData(int section, Qt::Orientation orientati
 }
 
 
-Qt::ItemFlags SARibbonActionsModel::flags(const QModelIndex& index) const
+Qt::ItemFlags SARibbonActionsManagerModel::flags(const QModelIndex& index) const
 {
     if (!index.isValid()) {
         return (Qt::NoItemFlags);
@@ -329,7 +331,7 @@ Qt::ItemFlags SARibbonActionsModel::flags(const QModelIndex& index) const
 }
 
 
-QVariant SARibbonActionsModel::data(const QModelIndex& index, int role) const
+QVariant SARibbonActionsManagerModel::data(const QModelIndex& index, int role) const
 {
     if (!index.isValid()) {
         return (QVariant());
@@ -354,14 +356,14 @@ QVariant SARibbonActionsModel::data(const QModelIndex& index, int role) const
 }
 
 
-void SARibbonActionsModel::setFilter(int tag)
+void SARibbonActionsManagerModel::setFilter(int tag)
 {
     m_d->mTag = tag;
     update();
 }
 
 
-void SARibbonActionsModel::update()
+void SARibbonActionsManagerModel::update()
 {
     beginResetModel();
     m_d->updateRef();
@@ -369,22 +371,22 @@ void SARibbonActionsModel::update()
 }
 
 
-void SARibbonActionsModel::setupActionsManager(SARibbonActionsManager *m)
+void SARibbonActionsManagerModel::setupActionsManager(SARibbonActionsManager *m)
 {
     m_d->mMgr = m;
     m_d->mTag = SARibbonActionsManager::CommonlyUsedActionTag;
     m_d->mActionRef = m->filter(m_d->mTag);
     connect(m, &SARibbonActionsManager::actionTagChanged
-        , this, &SARibbonActionsModel::onActionTagChanged);
+        , this, &SARibbonActionsManagerModel::onActionTagChanged);
     update();
 }
 
 
-void SARibbonActionsModel::uninstallActionsManager()
+void SARibbonActionsManagerModel::uninstallActionsManager()
 {
     if (!m_d->isNull()) {
         disconnect(m_d->mMgr, &SARibbonActionsManager::actionTagChanged
-            , this, &SARibbonActionsModel::onActionTagChanged);
+            , this, &SARibbonActionsManagerModel::onActionTagChanged);
         m_d->mMgr = nullptr;
         m_d->mTag = SARibbonActionsManager::CommonlyUsedActionTag;
     }
@@ -392,7 +394,7 @@ void SARibbonActionsModel::uninstallActionsManager()
 }
 
 
-void SARibbonActionsModel::onActionTagChanged(int tag, bool isdelete)
+void SARibbonActionsManagerModel::onActionTagChanged(int tag, bool isdelete)
 {
     if (isdelete && (tag == m_d->mTag)) {
         m_d->mTag = SARibbonActionsManager::InvalidActionTag;
@@ -582,12 +584,18 @@ public:
 class SARibbonCustomizeWidgetPrivate
 {
 public:
+    enum ItemRole {
+        LevelRole	= Qt::UserRole + 1      ///< 代表这是层级，有0：category 1：pannel 2：item
+        , PointerRole	= Qt::UserRole + 2      ///< 代表这是存放指针。根据LevelRole来进行转
+    };
     SARibbonCustomizeWidget *mParent;
-    SARibbonMainWindow *mRibbonWindow;      ///< 保存SARibbonMainWindow的指针
-    bool mIsChanged;                        ///< 判断用户是否有改动内容
-    SARibbonActionsManager *mActionMgr;     ///< action管理器
-    SARibbonActionsModel *mAcionModel;      ///< action管理器对应的model
+    SARibbonMainWindow *mRibbonWindow;              ///< 保存SARibbonMainWindow的指针
+    bool mIsChanged;                                ///< 判断用户是否有改动内容
+    SARibbonActionsManager *mActionMgr;             ///< action管理器
+    SARibbonActionsManagerModel *mAcionModel;       ///< action管理器对应的model
+    QStandardItemModel *mRibbonModel;               ///< 用于很成ribbon的树
     SARibbonCustomizeWidgetPrivate(SARibbonCustomizeWidget *p);
+    void updateModel();
 };
 
 SARibbonCustomizeWidgetPrivate::SARibbonCustomizeWidgetPrivate(SARibbonCustomizeWidget *p)
@@ -595,8 +603,62 @@ SARibbonCustomizeWidgetPrivate::SARibbonCustomizeWidgetPrivate(SARibbonCustomize
     , mRibbonWindow(nullptr)
     , mIsChanged(false)
     , mActionMgr(nullptr)
-    , mAcionModel(nullptr)
 {
+    mAcionModel = new SARibbonActionsManagerModel(p);
+    mRibbonModel = new QStandardItemModel(p);
+}
+
+
+void SARibbonCustomizeWidgetPrivate::updateModel()
+{
+    if (mRibbonWindow == nullptr) {
+        return;
+    }
+    mRibbonModel->clear();
+    SARibbonBar *ribbonbar = mRibbonWindow->ribbonBar();
+    QList<SARibbonCategory *> categorys = ribbonbar->categoryPages();
+
+    for (SARibbonCategory *c : categorys)
+    {
+        QStandardItem *ci = new QStandardItem();
+        if (c->isContextCategory()) {
+            ci->setText(QString("[%1]").arg(c->windowTitle()));
+        }else{
+            ci->setText(c->windowTitle());
+        }
+        ci->setCheckable(true);
+        ci->setCheckState(Qt::Checked);
+        ci->setData(0, LevelRole);
+        ci->setData(QVariant::fromValue<qintptr>(qintptr(c)), PointerRole);
+        QList<SARibbonPannel *> pannels = c->pannelList();
+        for (SARibbonPannel *p : pannels)
+        {
+            QStandardItem *pi = new QStandardItem(p->windowTitle());
+            pi->setData(1, LevelRole);
+            pi->setData(QVariant::fromValue<qintptr>(qintptr(p)), PointerRole);
+            ci->appendRow(pi);
+            const QList<SARibbonPannelItem *>& items = p->ribbonPannelItem();
+            for (SARibbonPannelItem *i : items)
+            {
+                if (i->action->isSeparator()) {
+                    continue;
+                }
+                QStandardItem *ii = new QStandardItem();
+                if (i->customWidget) {
+                    //如果是自定义窗口
+                    ii->setText(i->widget()->windowTitle());
+                    ii->setIcon(i->widget()->windowIcon());
+                }else{
+                    ii->setText(i->action->text());
+                    ii->setIcon(i->action->icon());
+                }
+                ii->setData(2, LevelRole);
+                ii->setData(QVariant::fromValue<qintptr>(qintptr(i)), PointerRole);
+                pi->appendRow(ii);
+            }
+        }
+        mRibbonModel->appendRow(ci);
+    }
 }
 
 
@@ -610,10 +672,11 @@ SARibbonCustomizeWidget::SARibbonCustomizeWidget(SARibbonMainWindow *ribbonWindo
     , ui(new SARibbonCustomizeWidgetUi)
     , m_d(new SARibbonCustomizeWidgetPrivate(this))
 {
-    ui->setupUi(this);
     m_d->mRibbonWindow = ribbonWindow;
-    m_d->mAcionModel = new SARibbonActionsModel(this);
+    m_d->updateModel();
+    ui->setupUi(this);
     ui->listViewSelect->setModel(m_d->mAcionModel);
+    ui->treeViewResult->setModel(m_d->mRibbonModel);
     initConnection();
 }
 

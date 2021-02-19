@@ -133,7 +133,7 @@ public:
     //添加一个标签
     SARibbonCategory *addCategoryPage(const QString& title);
 
-    //获取当前显示的所有的SARibbonCategory，不含未显示的SARibbonContextCategory的SARibbonCategory
+    //获取当前显示的所有的SARibbonCategory，包含未显示的SARibbonContextCategory的SARibbonCategory也一并返回
     QList<SARibbonCategory *> categoryPages() const;
 
     //移除SARibbonCategory

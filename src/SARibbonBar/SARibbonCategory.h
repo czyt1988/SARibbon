@@ -21,6 +21,7 @@ class SA_RIBBON_EXPORT SARibbonCategory : public QWidget
 {
     Q_OBJECT
     friend class SARibbonBar;
+    friend class SARibbonContextCategory;
 public:
     SARibbonCategory(QWidget *parent);
     ~SARibbonCategory();
@@ -48,6 +49,9 @@ public:
     //
     QSize sizeHint() const Q_DECL_OVERRIDE;
 
+    //如果是ContextCategory，此函数返回true
+    bool isContextCategory() const;
+
 protected slots:
     void onLeftScrollButtonClicked();
     void onRightScrollButtonClicked();
@@ -65,6 +69,9 @@ protected:
 
     //处理滚轮事件
     void wheelEvent(QWheelEvent *event) Q_DECL_OVERRIDE;
+
+    //标记这个是上下文标签
+    void markIsContextCategory(bool isContextCategory = true);
 
 private:
     SARibbonCategoryPrivate *m_d;
