@@ -1459,3 +1459,13 @@ void SARibbonPannel::actionEvent(QActionEvent *e)
         break;
     }
 }
+
+
+/**
+ * @brief 获取布局item
+ * @return
+ */
+const QList<SARibbonPannelItem *>& SARibbonPannel::ribbonPannelItem() const
+{
+    return (m_d->m_layout->m_items);
+}

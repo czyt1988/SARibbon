@@ -103,6 +103,7 @@ public:
     bool mIsRightScrollBtnShow;     ///< 标记右滚动按钮是否需要显示
     bool mIsLeftScrollBtnShow;      ///< 标记左滚动按钮是否需要显示
     QMargins mContentsMargins;
+    bool mIsContextCategory;        ///< 标记是否是上下文标签
 };
 
 SARibbonCategoryScrollButton::SARibbonCategoryScrollButton(Qt::ArrowType arr, QWidget *p)
@@ -233,6 +234,16 @@ QSize SARibbonCategory::sizeHint() const
 }
 
 
+/**
+ * @brief 如果是ContextCategory，此函数返回true
+ * @return
+ */
+bool SARibbonCategory::isContextCategory() const
+{
+    return (m_d->mIsContextCategory);
+}
+
+
 void SARibbonCategory::onLeftScrollButtonClicked()
 {
     m_d->onLeftScrollButtonClicked();
@@ -291,6 +302,7 @@ SARibbonCategoryPrivate::SARibbonCategoryPrivate(SARibbonCategory *parent)
     , mIsRightScrollBtnShow(false)
     , mIsLeftScrollBtnShow(false)
     , mContentsMargins(1, 1, 1, 1)
+    , mIsContextCategory(false)
 {
 }
 
@@ -479,6 +491,16 @@ bool SARibbonCategory::eventFilter(QObject *watched, QEvent *event)
 void SARibbonCategory::wheelEvent(QWheelEvent *event)
 {
     m_d->doWheelEvent(event);
+}
+
+
+/**
+ * @brief 标记这个是上下文标签
+ * @param isContextCategory
+ */
+void SARibbonCategory::markIsContextCategory(bool isContextCategory)
+{
+    m_d->mIsContextCategory = isContextCategory;
 }
 
 

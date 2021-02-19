@@ -35,6 +35,7 @@ SARibbonCategory *SARibbonContextCategory::addCategoryPage(const QString& title)
     SARibbonCategoryData catData;
     SARibbonCategory *category = RibbonSubElementDelegate->createRibbonCategory(parentWidget());
 
+    category->markIsContextCategory(true);
     category->setWindowTitle(title);
     catData.categoryPage = category;
     m_d->categoryDataList.append(catData);

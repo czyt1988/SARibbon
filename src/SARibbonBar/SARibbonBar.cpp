@@ -293,8 +293,8 @@ SARibbonCategory *SARibbonBar::addCategoryPage(const QString& title)
 
 
 /**
- * @brief 获取当前显示的所有的SARibbonCategory，不含未显示的SARibbonContextCategory的SARibbonCategory，
- * 如果SARibbonContextCategory已经显示，则SARibbonContextCategory里的SARibbonCategory也会返回
+ * @brief 获取当前显示的所有的SARibbonCategory，包含未显示的SARibbonContextCategory的SARibbonCategory也一并返回
+ *
  * @return
  */
 QList<SARibbonCategory *> SARibbonBar::categoryPages() const
@@ -362,6 +362,7 @@ SARibbonContextCategory *SARibbonBar::addContextCategory(const QString& title, c
     context->setContextColor(color.isValid() ? color : m_d->getContextCategoryColor());
     connect(context, &SARibbonContextCategory::categoryPageAdded
         , this, &SARibbonBar::onContextsCategoryPageAdded);
+    //remove并没有绑定，主要是remove后在stacked里也不会显示，remove且delete的话，stacked里也会删除
     if (currentRibbonStyle() == WpsLiteStyle) {
         resizeInWpsLiteStyle();
     }

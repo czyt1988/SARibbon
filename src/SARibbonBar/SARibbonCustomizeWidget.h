@@ -3,14 +3,17 @@
 #include "SARibbonGlobal.h"
 #include <QWidget>
 #include <QAbstractListModel>
-#include "SARibbonMainWindow.h"
+#include "SARibbonBar.h"
 //SARibbonActionsManager 特有
 class SARibbonActionsManagerPrivate;
 //SARibbonActionsModel 特有
 class SARibbonActionsModelPrivete;
+//SARibbonBarModel 特有
+class SARibbonBarModelPrivate;
 //SARibbonCustomizeWidget 特有
 class SARibbonCustomizeWidgetUi;
 class SARibbonCustomizeWidgetPrivate;
+class SARibbonMainWindow;
 
 /**
  * @brief 用于管理SARibbon的所有Action，
@@ -18,7 +21,7 @@ class SARibbonCustomizeWidgetPrivate;
 class SA_RIBBON_EXPORT SARibbonActionsManager : public QObject
 {
     Q_OBJECT
-    friend class SARibbonActionsModel;
+    friend class SARibbonActionsManagerModel;
 public:
 
     /**
@@ -74,13 +77,13 @@ private:
 /**
  * @brief SARibbonActionsManager 对应的model
  */
-class SA_RIBBON_EXPORT SARibbonActionsModel : public QAbstractListModel
+class SA_RIBBON_EXPORT SARibbonActionsManagerModel : public QAbstractListModel
 {
     Q_OBJECT
 public:
-    explicit SARibbonActionsModel(QObject *p = nullptr);
-    explicit SARibbonActionsModel(SARibbonActionsManager *m, QObject *p = nullptr);
-    ~SARibbonActionsModel();
+    explicit SARibbonActionsManagerModel(QObject *p = nullptr);
+    explicit SARibbonActionsManagerModel(SARibbonActionsManager *m, QObject *p = nullptr);
+    ~SARibbonActionsManagerModel();
     virtual int rowCount(const QModelIndex& parent) const override;
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
     virtual Qt::ItemFlags flags(const QModelIndex& index) const override;
