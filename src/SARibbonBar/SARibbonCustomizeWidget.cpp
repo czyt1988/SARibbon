@@ -18,6 +18,9 @@
 #include "SARibbonMainWindow.h"
 #include "SARibbonPannel.h"
 #include <QStandardItemModel>
+#include <QButtonGroup>
+#include <QInputDialog>
+#include <QLineEdit>
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// SARibbonActionsManager
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -435,6 +438,7 @@ public:
     QHBoxLayout *horizontalLayoutCategorySelect;
     QRadioButton *radioButtonMainCategory;
     QRadioButton *radioButtonAllCategory;
+    QButtonGroup *radioButtonGroup;
     QTreeView *treeViewResult;
     QHBoxLayout *horizontalLayoutActionOptBtns;
     QPushButton *pushButtonNewCategory;
@@ -513,20 +517,26 @@ public:
         horizontalLayoutCategorySelect->setObjectName(QStringLiteral("horizontalLayoutCategorySelect"));
         radioButtonMainCategory = new QRadioButton(customizeWidget);
         radioButtonMainCategory->setObjectName(QStringLiteral("radioButtonMainCategory"));
-        radioButtonMainCategory->setChecked(true);
+        radioButtonMainCategory->setChecked(false);
 
         horizontalLayoutCategorySelect->addWidget(radioButtonMainCategory);
 
         radioButtonAllCategory = new QRadioButton(customizeWidget);
         radioButtonAllCategory->setObjectName(QStringLiteral("radioButtonAllCategory"));
+        radioButtonAllCategory->setChecked(true);
 
         horizontalLayoutCategorySelect->addWidget(radioButtonAllCategory);
 
+        radioButtonGroup = new QButtonGroup(customizeWidget);
+        radioButtonGroup->addButton(radioButtonMainCategory);
+        radioButtonGroup->addButton(radioButtonAllCategory);
 
         verticalLayoutResult->addLayout(horizontalLayoutCategorySelect);
 
         treeViewResult = new QTreeView(customizeWidget);
         treeViewResult->setObjectName(QStringLiteral("treeViewResult"));
+        treeViewResult->setHeaderHidden(true);
+        treeViewResult->setSelectionMode(QAbstractItemView::SingleSelection);
 
         verticalLayoutResult->addWidget(treeViewResult);
 
@@ -584,22 +594,20 @@ public:
 class SARibbonCustomizeWidgetPrivate
 {
 public:
-    enum ItemRole {
-        LevelRole	= Qt::UserRole + 1      ///< 代表这是层级，有0：category 1：pannel 2：item
-        , PointerRole	= Qt::UserRole + 2      ///< 代表这是存放指针。根据LevelRole来进行转
-    };
     SARibbonCustomizeWidget *mParent;
-    SARibbonMainWindow *mRibbonWindow;              ///< 保存SARibbonMainWindow的指针
-    bool mIsChanged;                                ///< 判断用户是否有改动内容
-    SARibbonActionsManager *mActionMgr;             ///< action管理器
-    SARibbonActionsManagerModel *mAcionModel;       ///< action管理器对应的model
-    QStandardItemModel *mRibbonModel;               ///< 用于很成ribbon的树
+    SARibbonCustomizeWidget::RibbonTreeShowType mShowType;  ///< 显示类型
+    SARibbonMainWindow *mRibbonWindow;                      ///< 保存SARibbonMainWindow的指针
+    bool mIsChanged;                                        ///< 判断用户是否有改动内容
+    SARibbonActionsManager *mActionMgr;                     ///< action管理器
+    SARibbonActionsManagerModel *mAcionModel;               ///< action管理器对应的model
+    QStandardItemModel *mRibbonModel;                       ///< 用于很成ribbon的树
     SARibbonCustomizeWidgetPrivate(SARibbonCustomizeWidget *p);
     void updateModel();
 };
 
 SARibbonCustomizeWidgetPrivate::SARibbonCustomizeWidgetPrivate(SARibbonCustomizeWidget *p)
     : mParent(p)
+    , mShowType(SARibbonCustomizeWidget::ShowAllCategory)
     , mRibbonWindow(nullptr)
     , mIsChanged(false)
     , mActionMgr(nullptr)
@@ -620,6 +628,10 @@ void SARibbonCustomizeWidgetPrivate::updateModel()
 
     for (SARibbonCategory *c : categorys)
     {
+        if ((mShowType == SARibbonCustomizeWidget::ShowMainCategory) && c->isContextCategory()) {
+            //如果是只显示主内容，如果是上下文标签就忽略
+            continue;
+        }
         QStandardItem *ci = new QStandardItem();
         if (c->isContextCategory()) {
             ci->setText(QString("[%1]").arg(c->windowTitle()));
@@ -628,14 +640,14 @@ void SARibbonCustomizeWidgetPrivate::updateModel()
         }
         ci->setCheckable(true);
         ci->setCheckState(Qt::Checked);
-        ci->setData(0, LevelRole);
-        ci->setData(QVariant::fromValue<qintptr>(qintptr(c)), PointerRole);
+        ci->setData(0, SARibbonCustomizeWidget::LevelRole);
+        ci->setData(QVariant::fromValue<qintptr>(qintptr(c)), SARibbonCustomizeWidget::PointerRole);
         QList<SARibbonPannel *> pannels = c->pannelList();
         for (SARibbonPannel *p : pannels)
         {
             QStandardItem *pi = new QStandardItem(p->windowTitle());
-            pi->setData(1, LevelRole);
-            pi->setData(QVariant::fromValue<qintptr>(qintptr(p)), PointerRole);
+            pi->setData(1, SARibbonCustomizeWidget::LevelRole);
+            pi->setData(QVariant::fromValue<qintptr>(qintptr(p)), SARibbonCustomizeWidget::PointerRole);
             ci->appendRow(pi);
             const QList<SARibbonPannelItem *>& items = p->ribbonPannelItem();
             for (SARibbonPannelItem *i : items)
@@ -652,8 +664,8 @@ void SARibbonCustomizeWidgetPrivate::updateModel()
                     ii->setText(i->action->text());
                     ii->setIcon(i->action->icon());
                 }
-                ii->setData(2, LevelRole);
-                ii->setData(QVariant::fromValue<qintptr>(qintptr(i)), PointerRole);
+                ii->setData(2, SARibbonCustomizeWidget::LevelRole);
+                ii->setData(QVariant::fromValue<qintptr>(qintptr(i)), SARibbonCustomizeWidget::PointerRole);
                 pi->appendRow(ii);
             }
         }
@@ -673,11 +685,11 @@ SARibbonCustomizeWidget::SARibbonCustomizeWidget(SARibbonMainWindow *ribbonWindo
     , m_d(new SARibbonCustomizeWidgetPrivate(this))
 {
     m_d->mRibbonWindow = ribbonWindow;
-    m_d->updateModel();
     ui->setupUi(this);
     ui->listViewSelect->setModel(m_d->mAcionModel);
     ui->treeViewResult->setModel(m_d->mRibbonModel);
     initConnection();
+    updateModel();
 }
 
 
@@ -692,6 +704,14 @@ void SARibbonCustomizeWidget::initConnection()
 {
     connect(ui->comboBoxActionIndex, QOverload<int>::of(&QComboBox::currentIndexChanged)
         , this, &SARibbonCustomizeWidget::onComboBoxActionIndexCurrentIndexChanged);
+    connect(ui->radioButtonGroup, QOverload<QAbstractButton *>::of(&QButtonGroup::buttonClicked)
+        , this, &SARibbonCustomizeWidget::onRadioButtonGroupButtonClicked);
+    connect(ui->pushButtonNewCategory, &QPushButton::clicked
+        , this, &SARibbonCustomizeWidget::onPushButtonNewCategoryClicked);
+    connect(ui->pushButtonNewPannel, &QPushButton::clicked
+        , this, &SARibbonCustomizeWidget::onPushButtonNewPannelClicked);
+    connect(ui->pushButtonRename, &QPushButton::clicked
+        , this, &SARibbonCustomizeWidget::onPushButtonRenameClicked);
 }
 
 
@@ -724,6 +744,35 @@ bool SARibbonCustomizeWidget::isChanged() const
 
 
 /**
+ * @brief 获取model
+ * @return
+ */
+const QStandardItemModel *SARibbonCustomizeWidget::model() const
+{
+    return (m_d->mRibbonModel);
+}
+
+
+/**
+ * @brief 根据当前的radiobutton选项来更新model
+ */
+void SARibbonCustomizeWidget::updateModel()
+{
+    updateModel(ui->radioButtonAllCategory->isChecked() ? ShowAllCategory : ShowMainCategory);
+}
+
+
+/**
+ * @brief 更新model
+ */
+void SARibbonCustomizeWidget::updateModel(RibbonTreeShowType type)
+{
+    m_d->mShowType = type;
+    m_d->updateModel();
+}
+
+
+/**
  * @brief 把定义的内容转换为xml
  * @return xml
  */
@@ -739,4 +788,102 @@ void SARibbonCustomizeWidget::onComboBoxActionIndexCurrentIndexChanged(int index
     int tag = ui->comboBoxActionIndex->itemData(index).toInt();
 
     m_d->mAcionModel->setFilter(tag);
+}
+
+
+void SARibbonCustomizeWidget::onRadioButtonGroupButtonClicked(QAbstractButton *b)
+{
+    updateModel(b == ui->radioButtonAllCategory ? ShowAllCategory : ShowMainCategory);
+}
+
+
+void SARibbonCustomizeWidget::onPushButtonNewCategoryClicked()
+{
+    int row = m_d->mRibbonModel->rowCount();
+    QItemSelectionModel *m = ui->treeViewResult->selectionModel();
+
+    if (m && m->hasSelection()) {
+        QModelIndex i = m->currentIndex();
+        while (i.parent().isValid())
+        {
+            i = i.parent();
+        }
+        //获取选中的最顶层item
+        row = i.row()+1;
+    }
+    QStandardItem *ni = new QStandardItem(tr("new category[customize]"));
+
+    ni->setData(0, SARibbonCustomizeWidget::LevelRole);
+    ni->setData(true, SARibbonCustomizeWidget::CustomizeRole);
+    m_d->mRibbonModel->insertRow(row, ni);
+    ui->treeViewResult->scrollTo(ni->index());
+    //设置新增的为选中
+    if (m) {
+        m->select(ni->index(), QItemSelectionModel::ClearAndSelect);
+    }
+}
+
+
+void SARibbonCustomizeWidget::onPushButtonNewPannelClicked()
+{
+    QItemSelectionModel *m = ui->treeViewResult->selectionModel();
+
+    if ((nullptr == m) || !m->hasSelection()) {
+        return;
+    }
+    QModelIndex i = m->currentIndex();
+    QStandardItem *item = m_d->mRibbonModel->itemFromIndex(i);
+    int level = item->data(SARibbonCustomizeWidget::LevelRole).toInt();
+
+    QStandardItem *ni = new QStandardItem(tr("new pannel[customize]"));
+
+    if (0 == level) {
+        //说明是category,插入到最后
+        ni->setData(1, SARibbonCustomizeWidget::LevelRole);
+        ni->setData(true, SARibbonCustomizeWidget::CustomizeRole);
+        item->appendRow(ni);
+    }else if (1 == level) {
+        //说明选择的是pannel，插入到此pannel之后
+        QStandardItem *categoryItem = item->parent();
+        if (nullptr == categoryItem) {
+            return;
+        }
+        ni->setData(1, SARibbonCustomizeWidget::LevelRole);
+        ni->setData(true, SARibbonCustomizeWidget::CustomizeRole);
+        categoryItem->insertRow(item->row()+1, ni);
+    }else{
+        delete ni;
+    }
+    ui->treeViewResult->scrollTo(ni->index());
+    if (m) {
+        m->clearSelection();
+        m->select(ni->index(), QItemSelectionModel::Select);
+        ui->treeViewResult->setSelectionModel(m);
+    }
+}
+
+
+void SARibbonCustomizeWidget::onPushButtonRenameClicked()
+{
+    QItemSelectionModel *m = ui->treeViewResult->selectionModel();
+    QString text = "";
+
+    if ((nullptr == m) || !m->hasSelection()) {
+        return;
+    }
+    QModelIndex i = m->currentIndex();
+
+    text = i.data().toString();
+    bool ok;
+
+    text = QInputDialog::getText(this, tr("rename"),
+        tr("name:"), QLineEdit::Normal,
+        text, &ok);
+
+    if (ok && !text.isEmpty()) {
+        QStandardItem *item = m_d->mRibbonModel->itemFromIndex(i);
+        if (item) {
+            item->setText(text);
+        }
+    }
 }

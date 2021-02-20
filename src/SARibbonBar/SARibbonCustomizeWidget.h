@@ -14,6 +14,7 @@ class SARibbonBarModelPrivate;
 class SARibbonCustomizeWidgetUi;
 class SARibbonCustomizeWidgetPrivate;
 class SARibbonMainWindow;
+class QStandardItemModel;
 
 /**
  * @brief 用于管理SARibbon的所有Action，
@@ -110,17 +111,47 @@ class SA_RIBBON_EXPORT SARibbonCustomizeWidget : public QWidget
 public:
     SARibbonCustomizeWidget(SARibbonMainWindow *ribbonWindow, QWidget *parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
     ~SARibbonCustomizeWidget();
+
+    /**
+     * @brief 定义ribbon树的显示类型
+     */
+    enum RibbonTreeShowType {
+        ShowAllCategory         ///< 显示所有Category，包括contextcategory
+        , ShowMainCategory      ///< 显示主要的category，不包含上下文
+    };
+
+    /**
+     * @brief QStandardItem对应的role
+     */
+    enum ItemRole {
+        LevelRole	= Qt::UserRole + 1      ///< 代表这是层级，有0：category 1：pannel 2：item
+        , PointerRole	= Qt::UserRole + 2      ///< 代表这是存放指针。根据LevelRole来进行转
+        , CustomizeRole = Qt::UserRole + 3      ///< 代表这个是自定义的item
+    };
     //设置action管理器
     void setupActionsManager(SARibbonActionsManager *mgr);
 
     //判断用户是否有改动内容
     bool isChanged() const;
 
+    //获取model
+    const QStandardItemModel *model() const;
+
+    //根据当前的radiobutton选项来更新model
+    void updateModel();
+
+    //更新model
+    void updateModel(RibbonTreeShowType type);
+
     //把定义的内容转换为xml
     virtual QString toXml() const;
 
 private slots:
     void onComboBoxActionIndexCurrentIndexChanged(int index);
+    void onRadioButtonGroupButtonClicked(QAbstractButton *b);
+    void onPushButtonNewCategoryClicked();
+    void onPushButtonNewPannelClicked();
+    void onPushButtonRenameClicked();
 
 private:
     void initConnection();
