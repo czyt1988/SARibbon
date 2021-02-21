@@ -712,6 +712,14 @@ void SARibbonCustomizeWidget::initConnection()
         , this, &SARibbonCustomizeWidget::onPushButtonNewPannelClicked);
     connect(ui->pushButtonRename, &QPushButton::clicked
         , this, &SARibbonCustomizeWidget::onPushButtonRenameClicked);
+    connect(ui->pushButtonAdd, &QPushButton::clicked
+        , this, &SARibbonCustomizeWidget::onPushButtonAddClicked);
+    connect(ui->pushButtonDelete, &QPushButton::clicked
+        , this, &SARibbonCustomizeWidget::onPushButtonDeleteClicked);
+    connect(ui->listViewSelect, &QAbstractItemView::clicked
+        , this, &SARibbonCustomizeWidget::onListViewSelectClicked);
+    connect(ui->treeViewResult, &QAbstractItemView::clicked
+        , this, &SARibbonCustomizeWidget::onTreeViewResultClicked);
 }
 
 
@@ -783,6 +791,59 @@ QString SARibbonCustomizeWidget::toXml() const
 }
 
 
+/**
+ * @brief 获取ribbon tree选中的item
+ * @return
+ */
+QStandardItem *SARibbonCustomizeWidget::selectedItem() const
+{
+    QItemSelectionModel *m = ui->treeViewResult->selectionModel();
+
+    if ((nullptr == m) || !m->hasSelection()) {
+        return (nullptr);
+    }
+    QModelIndex i = m->currentIndex();
+
+    return (m_d->mRibbonModel->itemFromIndex(i));
+}
+
+
+/**
+ * @brief 获取选中的ribbon tree 的level
+ * @return -1为选中异常，0代表选中了category 1代表选中了pannel 2代表选中了action
+ */
+int SARibbonCustomizeWidget::selectedRibbonLevel() const
+{
+    QStandardItem *item = selectedItem();
+
+    if (item) {
+        return (item->data(SARibbonCustomizeWidget::LevelRole).toInt());
+    }
+    return (-1);
+}
+
+
+/**
+ * @brief 设置某个item被选中
+ * @param item
+ */
+void SARibbonCustomizeWidget::setSelectItem(QStandardItem *item, bool ensureVisible)
+{
+    QItemSelectionModel *m = ui->treeViewResult->selectionModel();
+
+    if (nullptr == m) {
+        return;
+    }
+    if (m) {
+        m->clearSelection();
+        m->select(item->index(), QItemSelectionModel::Select);
+    }
+    if (ensureVisible) {
+        ui->treeViewResult->scrollTo(item->index());
+    }
+}
+
+
 void SARibbonCustomizeWidget::onComboBoxActionIndexCurrentIndexChanged(int index)
 {
     int tag = ui->comboBoxActionIndex->itemData(index).toInt();
@@ -814,33 +875,26 @@ void SARibbonCustomizeWidget::onPushButtonNewCategoryClicked()
     QStandardItem *ni = new QStandardItem(tr("new category[customize]"));
 
     ni->setData(0, SARibbonCustomizeWidget::LevelRole);
-    ni->setData(true, SARibbonCustomizeWidget::CustomizeRole);
+    ni->setData((int)AddCustomizeAction, SARibbonCustomizeWidget::CustomizeRole);
     m_d->mRibbonModel->insertRow(row, ni);
-    ui->treeViewResult->scrollTo(ni->index());
+
     //设置新增的为选中
-    if (m) {
-        m->select(ni->index(), QItemSelectionModel::ClearAndSelect);
-    }
+    setSelectItem(ni);
 }
 
 
 void SARibbonCustomizeWidget::onPushButtonNewPannelClicked()
 {
-    QItemSelectionModel *m = ui->treeViewResult->selectionModel();
-
-    if ((nullptr == m) || !m->hasSelection()) {
-        return;
-    }
-    QModelIndex i = m->currentIndex();
-    QStandardItem *item = m_d->mRibbonModel->itemFromIndex(i);
-    int level = item->data(SARibbonCustomizeWidget::LevelRole).toInt();
+    QStandardItem *item = selectedItem();
+    int level = selectedRibbonLevel();
 
     QStandardItem *ni = new QStandardItem(tr("new pannel[customize]"));
 
+    ni->setData(1, SARibbonCustomizeWidget::LevelRole);
+    ni->setData((int)AddCustomizeAction, SARibbonCustomizeWidget::CustomizeRole);
+
     if (0 == level) {
         //说明是category,插入到最后
-        ni->setData(1, SARibbonCustomizeWidget::LevelRole);
-        ni->setData(true, SARibbonCustomizeWidget::CustomizeRole);
         item->appendRow(ni);
     }else if (1 == level) {
         //说明选择的是pannel，插入到此pannel之后
@@ -848,42 +902,60 @@ void SARibbonCustomizeWidget::onPushButtonNewPannelClicked()
         if (nullptr == categoryItem) {
             return;
         }
-        ni->setData(1, SARibbonCustomizeWidget::LevelRole);
-        ni->setData(true, SARibbonCustomizeWidget::CustomizeRole);
         categoryItem->insertRow(item->row()+1, ni);
     }else{
+        //不符合就删除退出
         delete ni;
+        return;
     }
-    ui->treeViewResult->scrollTo(ni->index());
-    if (m) {
-        m->clearSelection();
-        m->select(ni->index(), QItemSelectionModel::Select);
-        ui->treeViewResult->setSelectionModel(m);
-    }
+    setSelectItem(ni);
 }
 
 
 void SARibbonCustomizeWidget::onPushButtonRenameClicked()
 {
-    QItemSelectionModel *m = ui->treeViewResult->selectionModel();
-    QString text = "";
+    QStandardItem *item = selectedItem();
 
-    if ((nullptr == m) || !m->hasSelection()) {
+    if (nullptr == item) {
         return;
     }
-    QModelIndex i = m->currentIndex();
-
-    text = i.data().toString();
     bool ok;
+    QString text = "";
 
     text = QInputDialog::getText(this, tr("rename"),
         tr("name:"), QLineEdit::Normal,
-        text, &ok);
+        item->text(), &ok);
 
     if (ok && !text.isEmpty()) {
-        QStandardItem *item = m_d->mRibbonModel->itemFromIndex(i);
-        if (item) {
-            item->setText(text);
+        item->setText(text);
+        int oldCustomizeAction = 0;
+        QVariant v = item->data(SARibbonCustomizeWidget::CustomizeRole);
+        if (v.isValid()) {
+            oldCustomizeAction = v.toInt();
         }
+        item->setData(((int)AddCustomizeAction)|oldCustomizeAction, SARibbonCustomizeWidget::CustomizeRole);
     }
+}
+
+
+void SARibbonCustomizeWidget::onPushButtonAddClicked()
+{
+}
+
+
+void SARibbonCustomizeWidget::onPushButtonDeleteClicked()
+{
+}
+
+
+void SARibbonCustomizeWidget::onListViewSelectClicked(const QModelIndex& index)
+{
+    //每次点击，判断是否可以进行操作，决定pushButtonAdd和pushButtonDelete的显示状态
+    //点击了listview，判断treeview的状态
+}
+
+
+void SARibbonCustomizeWidget::onTreeViewResultClicked(const QModelIndex& index)
+{
+    //每次点击，判断是否可以进行操作，决定pushButtonAdd和pushButtonDelete的显示状态
 }

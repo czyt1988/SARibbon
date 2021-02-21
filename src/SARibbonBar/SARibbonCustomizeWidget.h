@@ -15,6 +15,7 @@ class SARibbonCustomizeWidgetUi;
 class SARibbonCustomizeWidgetPrivate;
 class SARibbonMainWindow;
 class QStandardItemModel;
+class QStandardItem;
 
 /**
  * @brief 用于管理SARibbon的所有Action，
@@ -128,6 +129,16 @@ public:
         , PointerRole	= Qt::UserRole + 2      ///< 代表这是存放指针。根据LevelRole来进行转
         , CustomizeRole = Qt::UserRole + 3      ///< 代表这个是自定义的item
     };
+
+    /**
+     * @brief 定义自定义的动作 对应CustomizeRole的值
+     */
+    enum CustomizeAction {
+        AddCustomizeAction	= 0x01  ///< 添加
+        , RemoveCustomizeAction = 0x02  ///< 删除
+        , RenameCustomizeAction = 0x04  ///< 重命名
+    };
+
     //设置action管理器
     void setupActionsManager(SARibbonActionsManager *mgr);
 
@@ -146,12 +157,25 @@ public:
     //把定义的内容转换为xml
     virtual QString toXml() const;
 
+protected:
+    QStandardItem *selectedItem() const;
+
+    //获取选中的ribbon tree 的level
+    int selectedRibbonLevel() const;
+
+    //设置某个item被选中
+    void setSelectItem(QStandardItem *item, bool ensureVisible = true);
+
 private slots:
     void onComboBoxActionIndexCurrentIndexChanged(int index);
     void onRadioButtonGroupButtonClicked(QAbstractButton *b);
     void onPushButtonNewCategoryClicked();
     void onPushButtonNewPannelClicked();
     void onPushButtonRenameClicked();
+    void onPushButtonAddClicked();
+    void onPushButtonDeleteClicked();
+    void onListViewSelectClicked(const QModelIndex& index);
+    void onTreeViewResultClicked(const QModelIndex& index);
 
 private:
     void initConnection();
