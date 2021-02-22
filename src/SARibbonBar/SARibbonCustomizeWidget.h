@@ -94,6 +94,7 @@ public:
     void update();
     void setupActionsManager(SARibbonActionsManager *m);
     void uninstallActionsManager();
+    QAction *indexToAction(QModelIndex index) const;
 
 private slots:
     void onActionTagChanged(int tag, bool isdelete);
@@ -134,7 +135,8 @@ public:
      * @brief 定义自定义的动作 对应CustomizeRole的值
      */
     enum CustomizeAction {
-        AddCustomizeAction	= 0x01  ///< 添加
+        Unknow			= 0     ///< 未知
+        , AddCustomizeAction	= 0x01  ///< 添加
         , RemoveCustomizeAction = 0x02  ///< 删除
         , RenameCustomizeAction = 0x04  ///< 重命名
     };
@@ -158,13 +160,26 @@ public:
     virtual QString toXml() const;
 
 protected:
+    QAction *selectedAction() const;
+
     QStandardItem *selectedItem() const;
+
 
     //获取选中的ribbon tree 的level
     int selectedRibbonLevel() const;
 
+    //根据选中的item判断
+    int selectedRibbonLevel(QStandardItem *item) const;
+
     //设置某个item被选中
     void setSelectItem(QStandardItem *item, bool ensureVisible = true);
+
+    //判断itemn能否改动，可以改动返回true
+    bool isItemCanCustomize(QStandardItem *item) const;
+    bool isSelectedItemCanCustomize() const;
+
+    //删除一个item
+    void removeItem(QStandardItem *item);
 
 private slots:
     void onComboBoxActionIndexCurrentIndexChanged(int index);

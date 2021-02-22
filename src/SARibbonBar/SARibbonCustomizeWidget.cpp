@@ -336,13 +336,11 @@ Qt::ItemFlags SARibbonActionsManagerModel::flags(const QModelIndex& index) const
 
 QVariant SARibbonActionsManagerModel::data(const QModelIndex& index, int role) const
 {
-    if (!index.isValid()) {
+    QAction *act = indexToAction(index);
+
+    if (nullptr == act) {
         return (QVariant());
     }
-    if (index.row() >= m_d->count()) {
-        return (QVariant());
-    }
-    QAction *act = m_d->at(index.row());
 
     switch (role)
     {
@@ -394,6 +392,18 @@ void SARibbonActionsManagerModel::uninstallActionsManager()
         m_d->mTag = SARibbonActionsManager::CommonlyUsedActionTag;
     }
     update();
+}
+
+
+QAction *SARibbonActionsManagerModel::indexToAction(QModelIndex index) const
+{
+    if (!index.isValid()) {
+        return (nullptr);
+    }
+    if (index.row() >= m_d->count()) {
+        return (nullptr);
+    }
+    return (m_d->at(index.row()));
 }
 
 
@@ -491,11 +501,13 @@ public:
 
         pushButtonAdd = new QPushButton(customizeWidget);
         pushButtonAdd->setObjectName(QStringLiteral("pushButtonAdd"));
+        pushButtonAdd->setEnabled(false);
 
         verticalLayoutMidButtons->addWidget(pushButtonAdd);
 
         pushButtonDelete = new QPushButton(customizeWidget);
         pushButtonDelete->setObjectName(QStringLiteral("pushButtonDelete"));
+        pushButtonDelete->setEnabled(false);
 
         verticalLayoutMidButtons->addWidget(pushButtonDelete);
 
@@ -792,6 +804,23 @@ QString SARibbonCustomizeWidget::toXml() const
 
 
 /**
+ * @brief 获取选中的action
+ * @return
+ */
+QAction *SARibbonCustomizeWidget::selectedAction() const
+{
+    QItemSelectionModel *m = ui->listViewSelect->selectionModel();
+
+    if ((nullptr == m) || !m->hasSelection()) {
+        return (nullptr);
+    }
+    QModelIndex i = m->currentIndex();
+
+    return (m_d->mAcionModel->indexToAction(i));
+}
+
+
+/**
  * @brief 获取ribbon tree选中的item
  * @return
  */
@@ -824,6 +853,17 @@ int SARibbonCustomizeWidget::selectedRibbonLevel() const
 
 
 /**
+ * @brief 获取StandardItem 的level
+ * @param item
+ * @return
+ */
+int SARibbonCustomizeWidget::selectedRibbonLevel(QStandardItem *item) const
+{
+    return (item->data(SARibbonCustomizeWidget::LevelRole).toInt());
+}
+
+
+/**
  * @brief 设置某个item被选中
  * @param item
  */
@@ -840,6 +880,36 @@ void SARibbonCustomizeWidget::setSelectItem(QStandardItem *item, bool ensureVisi
     }
     if (ensureVisible) {
         ui->treeViewResult->scrollTo(item->index());
+    }
+}
+
+
+/**
+ * @brief 判断itemn能否改动，可以改动返回true
+ * @param item
+ * @return
+ */
+bool SARibbonCustomizeWidget::isItemCanCustomize(QStandardItem *item) const
+{
+    if (nullptr == item) {
+        return (false);
+    }
+    return (item->data(SARibbonCustomizeWidget::CustomizeRole).isValid());
+}
+
+
+bool SARibbonCustomizeWidget::isSelectedItemCanCustomize() const
+{
+    return (isItemCanCustomize(selectedItem()));
+}
+
+
+void SARibbonCustomizeWidget::removeItem(QStandardItem *item)
+{
+    if (item->parent()) {
+        item->parent()->removeRow(item->row());
+    }else{
+        m_d->mRibbonModel->removeRow(item->row());
     }
 }
 
@@ -945,6 +1015,11 @@ void SARibbonCustomizeWidget::onPushButtonAddClicked()
 
 void SARibbonCustomizeWidget::onPushButtonDeleteClicked()
 {
+    QStandardItem *item = selectedItem();
+
+    if (isItemCanCustomize(item)) {
+        removeItem(item);
+    }
 }
 
 
@@ -952,10 +1027,21 @@ void SARibbonCustomizeWidget::onListViewSelectClicked(const QModelIndex& index)
 {
     //每次点击，判断是否可以进行操作，决定pushButtonAdd和pushButtonDelete的显示状态
     //点击了listview，判断treeview的状态
+    Q_UNUSED(index);
+    ui->pushButtonAdd->setEnabled(isSelectedItemCanCustomize() && selectedRibbonLevel() > 0);
+    ui->pushButtonDelete->setEnabled(isSelectedItemCanCustomize());
 }
 
 
 void SARibbonCustomizeWidget::onTreeViewResultClicked(const QModelIndex& index)
 {
+    Q_UNUSED(index);
     //每次点击，判断是否可以进行操作，决定pushButtonAdd和pushButtonDelete的显示状态
+    QStandardItem *item = selectedItem();
+
+    if (nullptr == item) {
+        return;
+    }
+    ui->pushButtonAdd->setEnabled(selectedAction() && (selectedRibbonLevel(item) > 0) && isItemCanCustomize(item));
+    ui->pushButtonDelete->setEnabled(isItemCanCustomize(item));
 }
