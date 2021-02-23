@@ -45,10 +45,10 @@ public:
     QString tagName(int tag) const;
 
     //注册action
-    void registeAction(QAction *act, int tag);
+    bool registeAction(QAction *act, int tag, const QString& key = QString());
 
     //取消action的注册
-    void unregisteAction(QAction *act);
+    void unregisteAction(QAction *act, bool enableEmit = true);
 
     //过滤得到actions对应的引用，实际是一个迭代器
     ActionRef filter(int tag);
@@ -62,6 +62,12 @@ public:
     //获取所有的标签
     QList<int> actionTags() const;
 
+    //通过key获取action
+    QAction *action(const QString& key) const;
+
+    //返回所有管理的action数
+    int count() const;
+
 signals:
 
     /**
@@ -71,6 +77,9 @@ signals:
 
 private slots:
     void onActionDestroyed(QObject *o);
+
+private:
+    void removeAction(QAction *act, bool enableEmit = true);
 
 private:
     SARibbonActionsManagerPrivate *m_d;
@@ -103,6 +112,20 @@ private:
     SARibbonActionsModelPrivete *m_d;
 };
 
+/**
+ * @brief 记录所有自定义操作的数据类
+ * @note 此数据依赖于@ref SARibbonActionsManager 要在SARibbonActionsManager之后使用此类
+ */
+class SA_RIBBON_EXPORT SARibbonCustomizeData {
+public:
+    SARibbonCustomizeData();
+private:
+    int m_level;            ///< 标记这个data是category还是pannel亦或是action
+    int m_categoryIndex;    ///< 在level为pannel和action时有效
+    int m_pannelIndex;      ///< 在level为action时有效
+    QString m_key;          ///< 在level为category时，key为category标题，level为pannel时key为pannel标题，level为aciton时，key为action的查询依据，基于SARibbonActionsManager查询
+    SARibbonActionsManager *m_mgr;
+};
 
 /**
  * @brief 自定义界面窗口
@@ -155,9 +178,6 @@ public:
 
     //更新model
     void updateModel(RibbonTreeShowType type);
-
-    //把定义的内容转换为xml
-    virtual QString toXml() const;
 
 protected:
     QAction *selectedAction() const;
