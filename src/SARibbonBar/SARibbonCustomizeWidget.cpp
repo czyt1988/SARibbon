@@ -1,4 +1,5 @@
 #include "SARibbonCustomizeWidget.h"
+#include <QDebug>
 #include <QtCore/QVariant>
 #include <QtWidgets/QAction>
 #include <QtWidgets/QApplication>
@@ -25,19 +26,23 @@
 /// SARibbonActionsManager
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 #include <QMap>
-#include <QSet>
+#include <QHash>
 
 class SARibbonActionsManagerPrivate
 {
 public:
     SARibbonActionsManager *mParent;
-    QMap<int, QList<QAction *> > mTagToActions;     ///< tag : QSet<QAction*>
+    QMap<int, QList<QAction *> > mTagToActions;     ///< tag : QList<QAction*>
+    QMap<int, QList<QString> > mTagToActionKeys;    ///< tag : keys
     QMap<int, QString> mTagToName;                  ///< tag对应的名字
+    QHash<QString, QAction *> mKeyToAction;         ///< key对应action
+    int mSale;                                      ///< 盐用于生成固定的id，在用户不主动设置key时，id基于msale生成，只要SARibbonActionsManager的调用registeAction顺序不变，生成的id都不变，因为它是基于自增实现的
     SARibbonActionsManagerPrivate(SARibbonActionsManager *p);
 };
 
 SARibbonActionsManagerPrivate::SARibbonActionsManagerPrivate(SARibbonActionsManager *p)
     : mParent(p)
+    , mSale(0)
 {
 }
 
@@ -83,24 +88,38 @@ QString SARibbonActionsManager::tagName(int tag) const
  * @param tag tag是可以按照位进行叠加，见 @ref ActionTag 如果
  * 要定义自己的标签，建议定义大于@ref ActionTag::UserDefineActionTag 的值，
  * registeAction的tag是直接记录进去的，如果要多个标签并存，在registe之前先或好tag
+ * @param key key是action对应的key，一个key只对应一个action，是查找action的关键
+ * ,默认情况为一个QString(),这时key是QAction的objectName
  * @note 同一个action多次注册不同的tag可以通过tag索引到action，但通过action只能索引到最后一个注册的tag
  * @note tag的新增会触发actionTagChanged信号
  */
-void SARibbonActionsManager::registeAction(QAction *act, int tag)
+bool SARibbonActionsManager::registeAction(QAction *act, int tag, const QString& key)
 {
     if (nullptr == act) {
-        return;
+        return (false);
     }
+    QString k = key;
+
+    if (k.isEmpty()) {
+        k = QString("id_%1_%2").arg(m_d->mSale++).arg(act->objectName());
+    }
+    if (m_d->mKeyToAction.contains(k)) {
+        qDebug() << "key " << k << "have been exist,you can set key in an unique value when use SARibbonActionsManager::registeAction";
+        return (false);
+    }
+    m_d->mKeyToAction[k] = act;
     //记录tag 对 action
     bool isneedemit = !(m_d->mTagToActions.contains(tag));//记录是否需要发射信号
 
     m_d->mTagToActions[tag].append(act);
+    m_d->mTagToActionKeys[tag].append(k);//key也记录
     //绑定槽
     connect(act, &QObject::destroyed, this, &SARibbonActionsManager::onActionDestroyed);
     if (isneedemit) {
         //说明新增tag
         emit actionTagChanged(tag, false);
     }
+    return (true);
 }
 
 
@@ -110,28 +129,73 @@ void SARibbonActionsManager::registeAction(QAction *act, int tag)
  * 如果tag对应的最后一个action被撤销，tag也将一块删除
  * @param act
  * @note tag的删除会触发actionTagChanged信号
+ * @note 如果action关联了多个tag，这些tag里的action都会被删除，对应的key也同理
  */
-void SARibbonActionsManager::unregisteAction(QAction *act)
+void SARibbonActionsManager::unregisteAction(QAction *act, bool enableEmit)
 {
     if (nullptr == act) {
         return;
     }
     //绑定槽
     disconnect(act, &QObject::destroyed, this, &SARibbonActionsManager::onActionDestroyed);
-    auto i = m_d->mTagToActions.begin();
+    removeAction(act, enableEmit);
+}
 
-    while (i != m_d->mTagToActions.end())
+
+/**
+ * @brief 移除action
+ *
+ * 仅移除内存内容
+ * @param act
+ * @param enableEmit
+ */
+void SARibbonActionsManager::removeAction(QAction *act, bool enableEmit)
+{
+    QList<int> deletedTags;                         //记录删除的tag，用于触发actionTagChanged
+    QMap<int, QList<QAction *> > tagToActions;      ///< tag : QList<QAction*>
+    QMap<int, QList<QString> > tagToActionKeys;     ///< tag : keys
+
+    for (auto i = m_d->mTagToActions.begin(); i != m_d->mTagToActions.end(); ++i)
     {
-        while (i.value().removeOne(act))
+        //把不是act的内容转移到tagToActions和tagToActionKeys中，之后再和m_d里的替换
+        auto k = m_d->mTagToActionKeys.find(i.key());
+        auto tmpi = tagToActions.insert(i.key(), QList<QAction *>());
+        auto tmpk = tagToActionKeys.insert(i.key(), QList<QString>());
+        int count = 0;
+        for (int j = 0; j < i.value().size(); ++j)
         {
-            //把所有都删除一直到找不到为止
+            if (i.value()[j] != act) {
+                tmpi.value().append(act);
+                tmpk.value().append(k.value()[j]);
+                ++count;
+            }
         }
-        if (i.value().size() > 0) {
-            ++i;
+        if (0 == count) {
+            //说明这个tag没有内容
+            tagToActions.erase(tmpi);
+            tagToActionKeys.erase(tmpk);
+            deletedTags.append(i.key());
+        }
+    }
+    //删除mKeyToAction
+    auto k = m_d->mKeyToAction.begin();
+
+    for ( ; k != m_d->mKeyToAction.end();)
+    {
+        if (k.value() == act) {
+            k = m_d->mKeyToAction.erase(k);
         }else{
-            //如果tag对应的actions空了，顺便把tag也删除了
-            i = m_d->mTagToActions.erase(i);
-            emit actionTagChanged(i.key(), true);
+            ++k;
+        }
+    }
+    //置换
+    m_d->mTagToActions.swap(tagToActions);
+    m_d->mTagToActionKeys.swap(tagToActionKeys);
+    //发射信号
+    if (enableEmit) {
+        for (int tagdelete : deletedTags)
+        {
+            emit actionTagChanged(tagdelete, true);
         }
     }
 }
@@ -180,6 +244,27 @@ QList<int> SARibbonActionsManager::actionTags() const
 
 
 /**
+ * @brief 通过key获取action
+ * @param key
+ * @return 如果没有key，返回nullptr
+ */
+QAction *SARibbonActionsManager::action(const QString& key) const
+{
+    return (m_d->mKeyToAction.value(key, nullptr));
+}
+
+
+/**
+ * @brief 返回所有管理的action数
+ * @return
+ */
+int SARibbonActionsManager::count() const
+{
+    return (m_d->mKeyToAction.size());
+}
+
+
+/**
  * @brief action 被delete时，将触发此槽把管理的action删除
  * @param o
  * @note 这个函数不会触发actionTagChanged信号
@@ -188,21 +273,7 @@ void SARibbonActionsManager::onActionDestroyed(QObject *o)
 {
     QAction *act = static_cast<QAction *>(o);
 
-    auto i = m_d->mTagToActions.begin();
-
-    while (i != m_d->mTagToActions.end())
-    {
-        while (i.value().removeOne(act))
-        {
-            //把所有都删除一直到找不到为止
-        }
-        if (i.value().size() > 0) {
-            ++i;
-        }else{
-            //如果tag对应的actions空了，顺便把tag也删除了
-            i = m_d->mTagToActions.erase(i);
-        }
-    }
+    removeAction(act, false);
 }
 
 
@@ -417,6 +488,16 @@ void SARibbonActionsManagerModel::onActionTagChanged(int tag, bool isdelete)
             update();
         }
     }
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+/// SARibbonCustomizeData
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+SARibbonCustomizeData::SARibbonCustomizeData()
+{
 }
 
 
@@ -793,17 +874,6 @@ void SARibbonCustomizeWidget::updateModel(RibbonTreeShowType type)
 
 
 /**
- * @brief 把定义的内容转换为xml
- * @return xml
- */
-QString SARibbonCustomizeWidget::toXml() const
-{
-    //TODO
-    return (QString());
-}
-
-
-/**
  * @brief 获取选中的action
  * @return
  */
@@ -1019,6 +1089,9 @@ void SARibbonCustomizeWidget::onPushButtonDeleteClicked()
 
     if (isItemCanCustomize(item)) {
         removeItem(item);
+        //删除后重新识别
+        ui->pushButtonAdd->setEnabled(selectedAction() && isSelectedItemCanCustomize() && selectedRibbonLevel() > 0);
+        ui->pushButtonDelete->setEnabled(isSelectedItemCanCustomize());
     }
 }
 
