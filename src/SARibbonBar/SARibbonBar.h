@@ -133,8 +133,23 @@ public:
     //添加一个标签
     SARibbonCategory *addCategoryPage(const QString& title);
 
+    //添加一个category，category的位置在index，如果当前category数量少于index，将插入到最后
+    SARibbonCategory *insertCategoryPage(const QString& title, int index);
+
+    //通过名字查找Category
+    SARibbonCategory *categoryByName(const QString& title) const;
+
+    //通过ObjectName查找Category
+    SARibbonCategory *categoryByObjectName(const QString& objname) const;
+
+    //通过索引找到category，如果超过索引范围，会返回nullptr
+    SARibbonCategory *categoryByIndex(int index) const;
+
+    //移动一个Category从from index到to index
+    void moveCategory(int from, int to);
+
     //获取当前显示的所有的SARibbonCategory，包含未显示的SARibbonContextCategory的SARibbonCategory也一并返回
-    QList<SARibbonCategory *> categoryPages() const;
+    QList<SARibbonCategory *> categoryPages(bool getAll = true) const;
 
     //移除SARibbonCategory
     void removeCategory(SARibbonCategory *category);
@@ -242,6 +257,7 @@ protected slots:
     virtual void onCurrentRibbonTabClicked(int index);
     virtual void onCurrentRibbonTabDoubleClicked(int index);
     void onContextsCategoryPageAdded(SARibbonCategory *category);
+    void onTabMoved(int from, int to);
 
 private:
     int tabIndex(SARibbonCategory *obj);

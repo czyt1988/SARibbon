@@ -24,6 +24,7 @@ public:
     //设置stacked管理的窗口会随着stacked的大小变化而变化大小
     void setAutoResize(bool autoresize);
     bool isAutoResize() const;
+    void moveWidget(int from, int to);
 
 protected:
 //    void mouseReleaseEvent(QMouseEvent *e);

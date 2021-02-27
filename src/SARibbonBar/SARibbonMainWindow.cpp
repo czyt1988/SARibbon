@@ -84,6 +84,10 @@ const SARibbonBar *SARibbonMainWindow::ribbonBar() const
 }
 
 
+/**
+ * @brief 如果useRibbon为false，会返回nullptr
+ * @return
+ */
 SARibbonBar *SARibbonMainWindow::ribbonBar()
 {
     return (m_d->ribbonBar);

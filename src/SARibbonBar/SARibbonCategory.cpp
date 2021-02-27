@@ -57,6 +57,7 @@ public:
     virtual ~SARibbonCategoryPrivate();
 
     SARibbonPannel *addPannel(const QString& title);
+    SARibbonPannel *insertPannel(const QString& title, int index);
     void addPannel(SARibbonPannel *pannel);
     void insertPannel(int index, SARibbonPannel *pannel);
 
@@ -164,6 +165,19 @@ SARibbonPannel::PannelLayoutMode SARibbonCategory::ribbonPannelLayoutMode() cons
 SARibbonPannel *SARibbonCategory::addPannel(const QString& title)
 {
     return (m_d->addPannel(title));
+}
+
+
+/**
+ * @brief 新建一个pannel，并插入到index位置
+ * @param title pannel的title
+ * @param index 插入的位置，如果index超出category里pannel的个数，将插入到最后
+ * @return 返回生成的@ref SARibbonPannel 指针
+ * @note 如果
+ */
+SARibbonPannel *SARibbonCategory::insertPannel(const QString& title, int index)
+{
+    return (m_d->insertPannel(title, index));
 }
 
 
@@ -359,12 +373,18 @@ QSize SARibbonCategoryPrivate::categoryContentSize() const
 
 SARibbonPannel *SARibbonCategoryPrivate::addPannel(const QString& title)
 {
+    return (insertPannel(title, mItemList.size()));
+}
+
+
+SARibbonPannel *SARibbonCategoryPrivate::insertPannel(const QString& title, int index)
+{
     SARibbonPannel *pannel = RibbonSubElementDelegate->createRibbonPannel(ribbonCategory());
 
     pannel->setWindowTitle(title);
     pannel->setPannelLayoutMode(ribbonPannelLayoutMode());
     pannel->installEventFilter(mParent);
-    addPannel(pannel);
+    insertPannel(index, pannel);
     return (pannel);
 }
 
