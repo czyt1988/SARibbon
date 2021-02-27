@@ -4,12 +4,15 @@
 #include <QWidget>
 #include <QAbstractListModel>
 #include "SARibbonBar.h"
+
 //SARibbonActionsManager 特有
 class SARibbonActionsManagerPrivate;
 //SARibbonActionsModel 特有
 class SARibbonActionsModelPrivete;
 //SARibbonBarModel 特有
 class SARibbonBarModelPrivate;
+//SARibbonCustomizeData 特有
+class SARibbonMainWindow;
 //SARibbonCustomizeWidget 特有
 class SARibbonCustomizeWidgetUi;
 class SARibbonCustomizeWidgetPrivate;
@@ -118,14 +121,82 @@ private:
  */
 class SA_RIBBON_EXPORT SARibbonCustomizeData {
 public:
+    enum ActionType {
+        UnknowActionType = 0            ///< 未知操作
+        , AddCategoryActionType         ///< 添加category操作
+        , AddPannelActionType           ///< 添加pannel操作
+        , AddActionActionType           ///< 添加action操作
+        , RemoveCategoryActionType      ///< 删除category操作
+        , RemovePannelActionType        ///< 删除pannel操作
+        , RemoveActionActionType        ///< 删除action操作
+        , ChangeCategoryOrderActionType ///< 改变category顺序的操作
+        , ChangePannelOrderActionType   ///< 改变pannel顺序的操作
+        , ChangeActionOrderActionType   ///< 改变action顺序的操作
+        , RenameCategoryActionType      ///< 对category更名操作
+        , RenamePannelActionType        ///< 对Pannel更名操作
+    };
     SARibbonCustomizeData();
+    SARibbonCustomizeData(ActionType type, SARibbonActionsManager *mgr = nullptr);
+    //获取CustomizeData的action type
+    ActionType actionType() const;
+
+    //判断是否是一个正常的CustomizeData
+    bool isValid() const;
+
+    //应用SARibbonCustomizeData
+    bool apply(SARibbonMainWindow *m) const;
+
+    //对应AddCategoryActionType
+    static SARibbonCustomizeData makeAddCategoryCustomizeData(const QString& title
+        , int index
+        , const QString& objName);
+
+    //对应AddPannelActionType
+    static SARibbonCustomizeData makeAddPannelCustomizeData(const QString& title
+        , int index
+        , const QString& categoryobjName
+        , const QString& objName);
+
+    //对应RenameCategoryActionType
+    static SARibbonCustomizeData makeRenameCategoryCustomizeData(const QString& newname, const QString& categoryobjName);
+
+    //对应RenamePannelActionType
+    static SARibbonCustomizeData makeRenamePannelCustomizeData(const QString& newname, int pannelIndex, const QString& categoryobjName);
+
+public:
+
+    /**
+     * @brief 记录顺序的参数
+     *
+     * 在actionType==AddCategoryActionType时，此参数记录Category的insert位置,
+     * 在actionType==AddPannelActionType时，此参数记录pannel的insert位置,
+     * 在actionType==AddActionActionType时，此参数记录pannel的insert位置
+     */
+    int indexValue;
+
+    /**
+     * @brief 记录标题、索引等参数
+     *
+     * 在actionType==AddCategoryActionType时，key为category标题，
+     * 在actionType==AddPannelActionType时，key为pannel标题，
+     * 在actionType==AddActionActionType时，key为action的查询依据，基于SARibbonActionsManager::action查询
+     */
+    QString keyValue;
+
+    /**
+     * @brief 记录categoryObjName，用于定位Category
+     */
+    QString categoryObjNameValue;
+
+    /**
+     * @brief 记录pannelObjName，saribbon的Customize索引大部分基于objname
+     */
+    QString pannelObjNameValue;
 private:
-    int m_level;            ///< 标记这个data是category还是pannel亦或是action
-    int m_categoryIndex;    ///< 在level为pannel和action时有效
-    int m_pannelIndex;      ///< 在level为action时有效
-    QString m_key;          ///< 在level为category时，key为category标题，level为pannel时key为pannel标题，level为aciton时，key为action的查询依据，基于SARibbonActionsManager查询
-    SARibbonActionsManager *m_mgr;
+    ActionType m_type; ///< 标记这个data是category还是pannel亦或是action
+    SARibbonActionsManager *m_actionsManagerPointer;
 };
+Q_DECLARE_METATYPE(SARibbonCustomizeData)
 
 /**
  * @brief 自定义界面窗口
@@ -149,20 +220,13 @@ public:
      * @brief QStandardItem对应的role
      */
     enum ItemRole {
-        LevelRole	= Qt::UserRole + 1      ///< 代表这是层级，有0：category 1：pannel 2：item
-        , PointerRole	= Qt::UserRole + 2      ///< 代表这是存放指针。根据LevelRole来进行转
-        , CustomizeRole = Qt::UserRole + 3      ///< 代表这个是自定义的item
+        LevelRole		= Qt::UserRole + 1      ///< 代表这是层级，有0：category 1：pannel 2：item
+        , PointerRole		= Qt::UserRole + 2      ///< 代表这是存放指针。根据LevelRole来进行转
+        , CustomizeRole		= Qt::UserRole + 3      ///< 代表这个是自定义的item,bool
+        , CustomizeObjNameRole	= Qt::UserRole + 4      ///< 记录了临时的自定义内容的obj名 QString
     };
 
-    /**
-     * @brief 定义自定义的动作 对应CustomizeRole的值
-     */
-    enum CustomizeAction {
-        Unknow			= 0     ///< 未知
-        , AddCustomizeAction	= 0x01  ///< 添加
-        , RemoveCustomizeAction = 0x02  ///< 删除
-        , RenameCustomizeAction = 0x04  ///< 重命名
-    };
+
 
     //设置action管理器
     void setupActionsManager(SARibbonActionsManager *mgr);
@@ -179,6 +243,9 @@ public:
     //更新model
     void updateModel(RibbonTreeShowType type);
 
+    //应用所有的设定
+    bool applys();
+
 protected:
     QAction *selectedAction() const;
 
@@ -189,7 +256,7 @@ protected:
     int selectedRibbonLevel() const;
 
     //根据选中的item判断
-    int selectedRibbonLevel(QStandardItem *item) const;
+    int itemLevel(QStandardItem *item) const;
 
     //设置某个item被选中
     void setSelectItem(QStandardItem *item, bool ensureVisible = true);
@@ -211,6 +278,8 @@ private slots:
     void onPushButtonDeleteClicked();
     void onListViewSelectClicked(const QModelIndex& index);
     void onTreeViewResultClicked(const QModelIndex& index);
+    void onToolButtonUpClicked();
+    void onToolButtonDownClicked();
 
 private:
     void initConnection();

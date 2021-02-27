@@ -100,6 +100,8 @@ public:
             , MainClass, &SARibbonBar::onCurrentRibbonTabClicked);
         MainClass->connect(ribbonTabBar, &QTabBar::tabBarDoubleClicked
             , MainClass, &SARibbonBar::onCurrentRibbonTabDoubleClicked);
+        MainClass->connect(ribbonTabBar, &QTabBar::tabMoved
+            , MainClass, &SARibbonBar::onTabMoved);
         //
         stackedContainerWidget = RibbonSubElementDelegate->createRibbonStackedWidget(MainClass);
         ribbonTabBar->setObjectName(QStringLiteral("objSAStackedContainerWidget"));
@@ -269,7 +271,7 @@ SARibbonTabBar *SARibbonBar::ribbonTabBar()
 /**
  * @brief 添加一个标签
  * 如果需要删除，直接delete即可，SARibbonBar会对其进行处理
- * @param title 标签名字
+ * @param title 标签名字，默认情况下SARibbonCategory的object name也被设置为title
  * @return 返回一个窗口容器，在Category里可以添加其他控件
  * @sa SARibbonCategory
  */
@@ -278,13 +280,15 @@ SARibbonCategory *SARibbonBar::addCategoryPage(const QString& title)
     SARibbonCategory *catagory = RibbonSubElementDelegate->createRibbonCategory(this);
 
     //catagory->setFixedHeight(categoryHeight());
+    catagory->setObjectName(title);
     catagory->setWindowTitle(title);
     int index = m_d->ribbonTabBar->addTab(title);
 
     catagory->setRibbonPannelLayoutMode(isTwoRowStyle() ? SARibbonPannel::TwoRowMode : SARibbonPannel::ThreeRowMode);
 
     m_d->ribbonTabBar->setTabData(index, QVariant((quint64)catagory));
-    m_d->stackedContainerWidget->addWidget(catagory);
+
+    m_d->stackedContainerWidget->insertWidget(index, catagory);
     connect(catagory, &QWidget::windowTitleChanged, this, &SARibbonBar::onCategoryWindowTitleChanged);
     QApplication::postEvent(this, new QResizeEvent(size(), size()));
     //销毁时移除tab
@@ -293,11 +297,118 @@ SARibbonCategory *SARibbonBar::addCategoryPage(const QString& title)
 
 
 /**
+ * @brief 添加一个category，category的位置在index，如果当前category数量少于index，将插入到最后
+ * @param title category的标题
+ * @param index category的位置
+ * @return
+ */
+SARibbonCategory *SARibbonBar::insertCategoryPage(const QString& title, int index)
+{
+    SARibbonCategory *catagory = RibbonSubElementDelegate->createRibbonCategory(this);
+
+    catagory->setObjectName(title);
+    catagory->setWindowTitle(title);
+    catagory->setRibbonPannelLayoutMode(isTwoRowStyle() ? SARibbonPannel::TwoRowMode : SARibbonPannel::ThreeRowMode);
+    int i = m_d->ribbonTabBar->insertTab(index, title);
+
+    m_d->ribbonTabBar->setTabData(i, QVariant((quint64)catagory));
+    m_d->stackedContainerWidget->insertWidget(index, catagory);
+
+    connect(catagory, &QWidget::windowTitleChanged, this, &SARibbonBar::onCategoryWindowTitleChanged);
+    QApplication::postEvent(this, new QResizeEvent(size(), size()));
+    //销毁时移除tab
+    return (catagory);
+}
+
+
+/**
+ * @brief 通过名字查找Category
+ * @param title Category的名字，既标签的标题
+ * @return 如果没有找到，将返回nullptr，如果有重名，将返回第一个查询到的名字，因此，尽量避免重名标签
+ * @note 由于翻译等原因，可能title会变化，因此如果想通过固定内容查找category，应该使用 @ref categoryByObjectName
+ * @see categoryByObjectName
+ */
+SARibbonCategory *SARibbonBar::categoryByName(const QString& title) const
+{
+    int c = m_d->stackedContainerWidget->count();
+
+    for (int i = 0; i < c; ++i)
+    {
+        SARibbonCategory *w = qobject_cast<SARibbonCategory *>(m_d->stackedContainerWidget->widget(i));
+        if (w) {
+            if (w->windowTitle() == title) {
+                return (w);
+            }
+        }
+    }
+    return (nullptr);
+}
+
+
+/**
+ * @brief 通过ObjectName查找Category
+ * @param objname
+ * @return 如果没有找到，将返回nullptr，如果有同样的ObjectName，将返回第一个查询到的名字，因此，尽量避免ObjectName重名
+ * @see categoryByName
+ */
+SARibbonCategory *SARibbonBar::categoryByObjectName(const QString& objname) const
+{
+    int c = m_d->stackedContainerWidget->count();
+
+    for (int i = 0; i < c; ++i)
+    {
+        SARibbonCategory *w = qobject_cast<SARibbonCategory *>(m_d->stackedContainerWidget->widget(i));
+        if (w) {
+            if (w->objectName() == objname) {
+                return (w);
+            }
+        }
+    }
+    return (nullptr);
+}
+
+
+/**
+ * @brief 通过索引找到category，如果超过索引范围，会返回nullptr
+ * @param index 索引
+ * @return 如果超过索引范围，会返回nullptr
+ * @note 如果此时有上下文标签，上下文的标签也会返回
+ */
+SARibbonCategory *SARibbonBar::categoryByIndex(int index) const
+{
+    int c = m_d->stackedContainerWidget->count();
+
+    for (int i = 0; i < c; ++i)
+    {
+        SARibbonCategory *w = qobject_cast<SARibbonCategory *>(m_d->stackedContainerWidget->widget(i));
+        if (w) {
+            if (i == index) {
+                return (w);
+            }
+        }
+    }
+    return (nullptr);
+}
+
+
+/**
+ * @brief 移动一个Category从from index到to index
+ * @param from
+ * @param to
+ */
+void SARibbonBar::moveCategory(int from, int to)
+{
+    m_d->ribbonTabBar->moveTab(from, to);
+    //这里会触发tabMoved信号，在tabMoved信号中调整stacked里窗口的位置
+}
+
+
+/**
  * @brief 获取当前显示的所有的SARibbonCategory，包含未显示的SARibbonContextCategory的SARibbonCategory也一并返回
  *
  * @return
  */
-QList<SARibbonCategory *> SARibbonBar::categoryPages() const
+QList<SARibbonCategory *> SARibbonBar::categoryPages(bool getAll) const
 {
     int c = m_d->stackedContainerWidget->count();
     QList<SARibbonCategory *> res;
@@ -306,6 +417,10 @@ QList<SARibbonCategory *> SARibbonBar::categoryPages() const
     {
         SARibbonCategory *w = qobject_cast<SARibbonCategory *>(m_d->stackedContainerWidget->widget(i));
         if (w) {
+            if (!getAll && w->isContextCategory()) {
+                //不是getall且是上下文时跳过
+                continue;
+            }
             res.append(w);
         }
     }
@@ -347,7 +462,7 @@ void SARibbonBar::removeCategory(SARibbonCategory *category)
  *
  * 调用@ref SARibbonContextCategory::addCategoryPage 可在上下文标签中添加SARibbonCategory，
  * 在上下文标签添加的SARibbonCategory，只有在上下文标签显示的时候才会显示
- * @param title 上下文标签的标题，在Office模式下会显示，在wps模式下不显示
+ * @param title 上下文标签的标题，在Office模式下会显示，在wps模式下不显示。默认情况下SARibbonContextCategory的object name也被设置为title
  * @param color 上下文标签的颜色，如果指定为空QColor(),将会使用SARibbonBar的默认色系
  * @param id 上下文标签的id，以便进行查找
  * @return 返回上下文标签指针
@@ -357,6 +472,7 @@ SARibbonContextCategory *SARibbonBar::addContextCategory(const QString& title, c
 {
     SARibbonContextCategory *context = RibbonSubElementDelegate->createRibbonContextCategory(this);
 
+    context->setObjectName(title);
     context->setContextTitle(title);
     context->setId(id);
     context->setContextColor(color.isValid() ? color : m_d->getContextCategoryColor());
@@ -713,7 +829,19 @@ void SARibbonBar::onCurrentRibbonTabDoubleClicked(int index)
 void SARibbonBar::onContextsCategoryPageAdded(SARibbonCategory *category)
 {
     Q_ASSERT_X(category != nullptr, "onContextsCategoryPageAdded", "add nullptr page");
-    m_d->stackedContainerWidget->addWidget(category);
+    m_d->stackedContainerWidget->addWidget(category);//这里stackedWidget用append，其他地方都应该使用insert
+}
+
+
+/**
+ * @brief 标签移动的信号
+ * @param from
+ * @param to
+ */
+void SARibbonBar::onTabMoved(int from, int to)
+{
+    //调整stacked widget的顺序，调整顺序是为了调用categoryPages函数返回的QList<SARibbonCategory *>顺序和tabbar一致
+    m_d->stackedContainerWidget->moveWidget(from, to);
 }
 
 

@@ -31,6 +31,9 @@ public:
     //添加pannel
     SARibbonPannel *addPannel(const QString& title);
 
+    //插入pannel
+    SARibbonPannel *insertPannel(const QString& title, int index);
+
     //添加pannel
     void addPannel(SARibbonPannel *pannel);
 
