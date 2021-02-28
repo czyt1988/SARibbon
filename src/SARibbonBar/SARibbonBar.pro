@@ -18,6 +18,7 @@ DESTDIR = $$SA_RIBBON_DIR
 
 SOURCES += \
     SARibbonBar.cpp \
+    SARibbonCustomizeDialog.cpp \
     SARibbonCustomizeWidget.cpp \
     SARibbonMainWindow.cpp \
     FramelessHelper.cpp \
@@ -49,6 +50,7 @@ SOURCES += \
 
 HEADERS  += \
     SARibbonBar.h \
+    SARibbonCustomizeDialog.h \
     SARibbonCustomizeWidget.h \
     SARibbonMainWindow.h \
     FramelessHelper.h \

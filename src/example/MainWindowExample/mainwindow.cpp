@@ -23,6 +23,7 @@
 #include "SARibbonApplicationButton.h"
 #include "SARibbonCustomizeWidget.h"
 #include <QCalendarWidget>
+#include "SARibbonCustomizeDialog.h"
 #define PRINT_COST(ElapsedTimer, LastTime, STR)					      \
     do{									      \
         int ___TMP_INT = ElapsedTimer.elapsed();			      \
@@ -81,6 +82,7 @@ MainWindow::MainWindow(QWidget *par) : SARibbonMainWindow(par)
     QAction *customize = new QAction(QIcon(":/icon/icon/chartDataManager.png"), "customize", this);
 
     quickAccessBar->addAction(customize);
+
     connect(customize, &QAction::triggered, this, [&]() {
         if (nullptr == m_customizeWidget) {
             m_customizeWidget = new SARibbonCustomizeWidget(this, this, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint | Qt::Dialog);
@@ -89,6 +91,18 @@ MainWindow::MainWindow(QWidget *par) : SARibbonMainWindow(par)
             m_customizeWidget->setupActionsManager(m_actMgr);
         }
         m_customizeWidget->show();
+        m_customizeWidget->applys();
+    });
+
+    QAction *customize2 = new QAction(QIcon(":/icon/icon/chartDataManager.png"), "customize2", this);
+
+    quickAccessBar->addAction(customize2);
+    connect(customize2, &QAction::triggered, this, [&]() {
+        SARibbonCustomizeDialog dlg(this);
+        dlg.setupActionsManager(m_actMgr);
+        if (SARibbonCustomizeDialog::Accepted == dlg.exec()) {
+            dlg.applys();
+        }
     });
     //
     showMaximized();

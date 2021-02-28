@@ -182,6 +182,55 @@ SARibbonPannel *SARibbonCategory::insertPannel(const QString& title, int index)
 
 
 /**
+ * @brief 通过名字查找pannel
+ * @param title
+ * @return 如果有重名，只会返回第一个符合条件的
+ */
+SARibbonPannel *SARibbonCategory::pannelByName(const QString& title) const
+{
+    auto pl = pannelList();
+
+    for (SARibbonPannel *p : pl)
+    {
+        if (p->windowTitle() == title) {
+            return (p);
+        }
+    }
+    return (nullptr);
+}
+
+
+/**
+ * @brief 通过ObjectName查找pannel
+ * @param objname
+ * @return
+ */
+SARibbonPannel *SARibbonCategory::pannelByObjectName(const QString& objname) const
+{
+    auto pl = pannelList();
+
+    for (SARibbonPannel *p : pl)
+    {
+        if (p->objectName() == objname) {
+            return (p);
+        }
+    }
+    return (nullptr);
+}
+
+
+/**
+ * @brief 通过索引找到pannel，如果超过索引范围，会返回nullptr
+ * @param index
+ * @return 如果超过索引范围，会返回nullptr
+ */
+SARibbonPannel *SARibbonCategory::pannelByIndex(int index) const
+{
+    return (pannelList().value(index, nullptr));
+}
+
+
+/**
  * @brief 添加pannel
  * @param pannel的所有权SARibbonCategory来管理
  */
