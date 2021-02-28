@@ -22,7 +22,7 @@
  * 默认不会有此属性，仅在有此属性且为true时才会在SARibbonCustomizeWidget中能显示为可设置
  */
 #ifndef SA_RIBBON_BAR_PROP_CAN_CUSTOMIZE
-#define SA_RIBBON_BAR_PROP_CAN_CUSTOMIZE    "canCustomize"
+#define SA_RIBBON_BAR_PROP_CAN_CUSTOMIZE    "_sa_isCanCustomize"
 #endif
 
 #ifndef SA_RIBBON_BAR_NO_EXPORT

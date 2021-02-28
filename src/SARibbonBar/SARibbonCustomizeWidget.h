@@ -180,6 +180,10 @@ public:
         , const QString& categoryobjName
         , const QString& pannelObjName);
 
+    //判断是否可以自定义
+    static bool isCanCustomize(QObject *obj);
+    static void setCanCustomize(QObject *obj, bool canbe = true);
+
 public:
 
     /**
@@ -241,8 +245,9 @@ public:
     enum ItemRole {
         LevelRole		= Qt::UserRole + 1      ///< 代表这是层级，有0：category 1：pannel 2：item
         , PointerRole		= Qt::UserRole + 2      ///< 代表这是存放指针。根据LevelRole来进行转
-        , CustomizeRole		= Qt::UserRole + 3      ///< 代表这个是自定义的item,bool
-        , CustomizeObjNameRole	= Qt::UserRole + 4      ///< 记录了临时的自定义内容的obj名 QString
+        , CanCustomizeRole	= Qt::UserRole + 3      ///< 代表个item是可以自定义的.bool
+        , CustomizeRole		= Qt::UserRole + 4      ///< 代表这个是自定义的item,bool,主要用于那些自己添加的标签和pannel，有此角色必有CanCustomizeRole
+        , CustomizeObjNameRole	= Qt::UserRole + 5      ///< 记录了临时的自定义内容的obj名 QString
     };
 
 
@@ -285,6 +290,10 @@ protected:
     //判断itemn能否改动，可以改动返回true
     bool isItemCanCustomize(QStandardItem *item) const;
     bool isSelectedItemCanCustomize() const;
+
+    //判断item是否是自定义的item
+    bool isCustomizeItem(QStandardItem *item) const;
+    bool isSelectedItemIsCustomize() const;
 
     //删除一个item
     void removeItem(QStandardItem *item);
