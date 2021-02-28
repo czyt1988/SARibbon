@@ -34,6 +34,15 @@ public:
     //插入pannel
     SARibbonPannel *insertPannel(const QString& title, int index);
 
+    //通过名字查找pannel
+    SARibbonPannel *pannelByName(const QString& title) const;
+
+    //通过ObjectName查找pannel
+    SARibbonPannel *pannelByObjectName(const QString& objname) const;
+
+    //通过索引找到pannel，如果超过索引范围，会返回nullptr
+    SARibbonPannel *pannelByIndex(int index) const;
+
     //添加pannel
     void addPannel(SARibbonPannel *pannel);
 

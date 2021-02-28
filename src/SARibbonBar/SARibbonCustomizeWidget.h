@@ -20,6 +20,8 @@ class SARibbonMainWindow;
 class QStandardItemModel;
 class QStandardItem;
 
+
+
 /**
  * @brief 用于管理SARibbon的所有Action，
  */
@@ -67,6 +69,9 @@ public:
 
     //通过key获取action
     QAction *action(const QString& key) const;
+
+    //通过action找到key
+    QString key(QAction *act) const;
 
     //返回所有管理的action数
     int count() const;
@@ -146,6 +151,7 @@ public:
     //应用SARibbonCustomizeData
     bool apply(SARibbonMainWindow *m) const;
 
+
     //对应AddCategoryActionType
     static SARibbonCustomizeData makeAddCategoryCustomizeData(const QString& title
         , int index
@@ -157,11 +163,22 @@ public:
         , const QString& categoryobjName
         , const QString& objName);
 
+    //对应AddActionActionType
+    static SARibbonCustomizeData makeAddActionCustomizeData(const QString& key
+        , SARibbonActionsManager *mgr
+        , SARibbonPannelItem::RowProportion rp
+        , const QString& categoryObjName
+        , const QString& pannelObjName
+        );
+
     //对应RenameCategoryActionType
-    static SARibbonCustomizeData makeRenameCategoryCustomizeData(const QString& newname, const QString& categoryobjName);
+    static SARibbonCustomizeData makeRenameCategoryCustomizeData(const QString& newname
+        , const QString& categoryobjName);
 
     //对应RenamePannelActionType
-    static SARibbonCustomizeData makeRenamePannelCustomizeData(const QString& newname, int pannelIndex, const QString& categoryobjName);
+    static SARibbonCustomizeData makeRenamePannelCustomizeData(const QString& newname
+        , const QString& categoryobjName
+        , const QString& pannelObjName);
 
 public:
 
@@ -192,8 +209,10 @@ public:
      * @brief 记录pannelObjName，saribbon的Customize索引大部分基于objname
      */
     QString pannelObjNameValue;
+
+    SARibbonPannelItem::RowProportion actionRowProportionValue;     ///< 行的占比，ribbon中有large，media和small三种占比,见@ref RowProportion
 private:
-    ActionType m_type; ///< 标记这个data是category还是pannel亦或是action
+    ActionType m_type;                                              ///< 标记这个data是category还是pannel亦或是action
     SARibbonActionsManager *m_actionsManagerPointer;
 };
 Q_DECLARE_METATYPE(SARibbonCustomizeData)
@@ -247,6 +266,8 @@ public:
     bool applys();
 
 protected:
+    SARibbonPannelItem::RowProportion selectedRowProportion() const;
+
     QAction *selectedAction() const;
 
     QStandardItem *selectedItem() const;
