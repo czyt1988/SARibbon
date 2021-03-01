@@ -180,6 +180,21 @@ public:
         , const QString& categoryobjName
         , const QString& pannelObjName);
 
+    //对应RemoveCategoryActionType
+    static SARibbonCustomizeData makeRemoveCategoryCustomizeData(const QString& categoryobjName);
+
+    //对应ChangeCategoryOrderActionType
+    static SARibbonCustomizeData makeChangeCategoryOrderCustomizeData(const QString& categoryobjName, int moveindex);
+
+    //对应RemovePannelActionType
+    static SARibbonCustomizeData makeRemovePannelCustomizeData(const QString& categoryobjName, const QString& pannelObjName);
+
+    //对应RemoveActionActionType
+    static SARibbonCustomizeData makeRemoveActionCustomizeData(const QString& categoryobjName
+        , const QString& pannelObjName
+        , const QString& key
+        , SARibbonActionsManager *mgr);
+
     //判断是否可以自定义
     static bool isCanCustomize(QObject *obj);
     static void setCanCustomize(QObject *obj, bool canbe = true);
@@ -274,6 +289,7 @@ protected:
     SARibbonPannelItem::RowProportion selectedRowProportion() const;
 
     QAction *selectedAction() const;
+    QAction *itemToAction(QStandardItem *item) const;
 
     QStandardItem *selectedItem() const;
 

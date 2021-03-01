@@ -145,6 +145,9 @@ public:
     //通过索引找到category，如果超过索引范围，会返回nullptr
     SARibbonCategory *categoryByIndex(int index) const;
 
+    //获取category的索引
+    int categoryIndex(SARibbonCategory *c) const;
+
     //移动一个Category从from index到to index
     void moveCategory(int from, int to);
 
