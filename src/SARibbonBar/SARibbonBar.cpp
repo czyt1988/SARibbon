@@ -376,18 +376,36 @@ SARibbonCategory *SARibbonBar::categoryByObjectName(const QString& objname) cons
  */
 SARibbonCategory *SARibbonBar::categoryByIndex(int index) const
 {
-    int c = m_d->stackedContainerWidget->count();
+    QVariant var = m_d->ribbonTabBar->tabData(index);
 
-    for (int i = 0; i < c; ++i)
+    if (var.isValid()) {
+        quint64 p = var.value<quint64>();
+        return (reinterpret_cast<SARibbonCategory *>(p));
+    }
+    return (nullptr);
+}
+
+
+/**
+ * @brief 获取category的索引
+ * @param c
+ * @return 如果找不到，返回-1
+ */
+int SARibbonBar::categoryIndex(SARibbonCategory *c) const
+{
+    int tabcount = m_d->ribbonTabBar->count();
+
+    for (int i = 0; i < tabcount; ++i)
     {
-        SARibbonCategory *w = qobject_cast<SARibbonCategory *>(m_d->stackedContainerWidget->widget(i));
-        if (w) {
-            if (i == index) {
-                return (w);
+        QVariant var = m_d->ribbonTabBar->tabData(i);
+        if (var.isValid()) {
+            quint64 p = var.value<quint64>();
+            if (p == (quint64)c) {
+                return (i);
             }
         }
     }
-    return (nullptr);
+    return (-1);
 }
 
 

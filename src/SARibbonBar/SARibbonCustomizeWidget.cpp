@@ -600,6 +600,62 @@ bool SARibbonCustomizeData::apply(SARibbonMainWindow *m) const
         return (true);
     }
 
+    case RemoveCategoryActionType:
+    {
+        SARibbonCategory *c = bar->categoryByObjectName(categoryObjNameValue);
+        if (nullptr == c) {
+            return (false);
+        }
+        bar->removeCategory(c);
+        return (true);
+    }
+
+    case RemovePannelActionType:
+    {
+        SARibbonCategory *c = bar->categoryByObjectName(categoryObjNameValue);
+        if (nullptr == c) {
+            return (false);
+        }
+        SARibbonPannel *pannel = c->pannelByObjectName(pannelObjNameValue);
+        if (nullptr == pannel) {
+            return (false);
+        }
+        c->removePannel(pannel);
+        return (true);
+    }
+
+    case RemoveActionActionType:
+    {
+        SARibbonCategory *c = bar->categoryByObjectName(categoryObjNameValue);
+        if (nullptr == c) {
+            return (false);
+        }
+        SARibbonPannel *pannel = c->pannelByObjectName(pannelObjNameValue);
+        if (nullptr == pannel) {
+            return (false);
+        }
+        QAction *act = m_actionsManagerPointer->action(keyValue);
+        if (nullptr == act) {
+            return (false);
+        }
+        pannel->removeAction(act);
+    }
+
+    case ChangeCategoryOrderActionType:
+    {
+        SARibbonCategory *c = bar->categoryByObjectName(categoryObjNameValue);
+        if (nullptr == c) {
+            return (false);
+        }
+        int currentindex = bar->categoryIndex(c);
+        if (-1 == currentindex) {
+            return (false);
+        }
+        int toindex = currentindex+indexValue;
+        bar->moveCategory(currentindex, toindex);
+        return (true);
+    }
+
     case RenameCategoryActionType:
     {
         SARibbonCategory *c = bar->categoryByObjectName(categoryObjNameValue);
@@ -722,6 +778,72 @@ SARibbonCustomizeData SARibbonCustomizeData::makeRenamePannelCustomizeData(const
     d.keyValue = newname;
     d.pannelObjNameValue = pannelObjName;
     d.categoryObjNameValue = categoryobjName;
+    return (d);
+}
+
+
+/**
+ * @brief 对应RemoveCategoryActionType
+ * @param categoryobjName 需要移除的objname
+ * @return
+ */
+SARibbonCustomizeData SARibbonCustomizeData::makeRemoveCategoryCustomizeData(const QString& categoryobjName)
+{
+    SARibbonCustomizeData d(RemoveCategoryActionType);
+
+    d.categoryObjNameValue = categoryobjName;
+    return (d);
+}
+
+
+/**
+ * @brief 对应ChangeCategoryOrderActionType
+ * @param categoryobjName 需要移动的categoryobjName
+ * @param moveindex 移动位置，-1代表向上（向左）移动一个位置，1带表向下（向右）移动一个位置
+ * @return
+ */
+SARibbonCustomizeData SARibbonCustomizeData::makeChangeCategoryOrderCustomizeData(const QString& categoryobjName, int moveindex)
+{
+    SARibbonCustomizeData d(ChangeCategoryOrderActionType);
+
+    d.categoryObjNameValue = categoryobjName;
+    d.indexValue = moveindex;
+    return (d);
+}
+
+
+/**
+ * @brief 对应RemovePannelActionType
+ * @param categoryobjName pannel对应的category的obj name
+ * @param pannelObjName pannel对应的 obj name
+ * @return
+ */
+SARibbonCustomizeData SARibbonCustomizeData::makeRemovePannelCustomizeData(const QString& categoryobjName, const QString& pannelObjName)
+{
+    SARibbonCustomizeData d(RemovePannelActionType);
+
+    d.categoryObjNameValue = categoryobjName;
+    d.pannelObjNameValue = pannelObjName;
+    return (d);
+}
+
+
+/**
+ * @brief 对应RemoveActionActionType
+ * @param categoryobjName pannel对应的category的obj name
+ * @param pannelObjName pannel对应的 obj name
+ * @param key SARibbonActionsManager管理的key名
+ * @param mgr SARibbonActionsManager指针
+ * @return
+ */
+SARibbonCustomizeData SARibbonCustomizeData::makeRemoveActionCustomizeData(const QString& categoryobjName, const QString& pannelObjName, const QString& key, SARibbonActionsManager *mgr)
+{
+    SARibbonCustomizeData d(RemoveActionActionType);
+
+    d.categoryObjNameValue = categoryobjName;
+    d.pannelObjNameValue = pannelObjName;
+    d.keyValue = key;
+    d.m_actionsManagerPointer = mgr;
     return (d);
 }
 
@@ -1013,6 +1135,9 @@ public:
 
     //判断是否可以自定义
     bool isItemCanCustomize(QStandardItem *item) const;
+
+    //从item转为action
+    QAction *itemToAction(QStandardItem *item) const;
 };
 
 SARibbonCustomizeWidgetPrivate::SARibbonCustomizeWidgetPrivate(SARibbonCustomizeWidget *p)
@@ -1050,8 +1175,8 @@ void SARibbonCustomizeWidgetPrivate::updateModel()
             ci->setText(c->windowTitle());
         }
         if (SARibbonCustomizeData::isCanCustomize(c)) {
-            ci->setCheckable(true);
-            ci->setCheckState(Qt::Checked);
+//            ci->setCheckable(true);
+//            ci->setCheckState(Qt::Checked);
             ci->setData(true, SARibbonCustomizeWidget::CanCustomizeRole);//标记这个是可以自定义的
         }
         ci->setData(0, SARibbonCustomizeWidget::LevelRole);
@@ -1221,6 +1346,30 @@ bool SARibbonCustomizeWidgetPrivate::isItemCanCustomize(QStandardItem *item) con
 
 
 /**
+ * @brief 从item 转为action
+ * @param item
+ * @return
+ */
+QAction *SARibbonCustomizeWidgetPrivate::itemToAction(QStandardItem *item) const
+{
+    if (2 != itemLevel(item)) {
+        return (nullptr);
+    }
+    //这里要非常注意，SARibbonCustomizeWidget::CustomizeRole为true时，说明这个是自定义的内容，
+    //这时PointerRole里存放的是action指针，不是SARibbonPannelItem
+    QAction *act = nullptr;
+
+    if (item->data(SARibbonCustomizeWidget::CustomizeRole).toBool()) {
+        act = reinterpret_cast<QAction *>(item->data(SARibbonCustomizeWidget::PointerRole).value<qintptr>());
+    }else{
+        SARibbonPannelItem *pi = reinterpret_cast<SARibbonPannelItem *>(item->data(SARibbonCustomizeWidget::PointerRole).value<qintptr>());
+        act = (pi->action);
+    }
+    return (act);
+}
+
+
+/**
  * @brief SARibbonCustomizeWidget::SARibbonCustomizeWidget
  * @param ribbonWindow 传入需要管理的SARibbonMainWindow指针
  * @param parent 用于界面生成的parent，可以和SARibbonMainWindow一样
@@ -1231,6 +1380,7 @@ SARibbonCustomizeWidget::SARibbonCustomizeWidget(SARibbonMainWindow *ribbonWindo
     , m_d(new SARibbonCustomizeWidgetPrivate(this))
 {
     m_d->mRibbonWindow = ribbonWindow;
+
     ui->setupUi(this);
     ui->listViewSelect->setModel(m_d->mAcionModel);
     ui->treeViewResult->setModel(m_d->mRibbonModel);
@@ -1373,8 +1523,9 @@ SARibbonPannelItem::RowProportion SARibbonCustomizeWidget::selectedRowProportion
 
 
 /**
- * @brief 获取选中的action
- * @return
+ * @brief 获取listview中选中的action
+ * @return 如果没有选中action，返回nullptr
+ * @note 如果要获取treeview选中的action，使用@ref itemToAction 函数
  */
 QAction *SARibbonCustomizeWidget::selectedAction() const
 {
@@ -1386,6 +1537,17 @@ QAction *SARibbonCustomizeWidget::selectedAction() const
     QModelIndex i = m->currentIndex();
 
     return (m_d->mAcionModel->indexToAction(i));
+}
+
+
+/**
+ * @brief 把item转换为action
+ * @param item
+ * @return 如果没有action可转换，返回nullptr
+ */
+QAction *SARibbonCustomizeWidget::itemToAction(QStandardItem *item) const
+{
+    return (m_d->itemToAction(item));
 }
 
 
@@ -1659,6 +1821,7 @@ void SARibbonCustomizeWidget::onPushButtonAddClicked()
     actItem->setData(true, SARibbonCustomizeWidget::CanCustomizeRole);//有CustomizeRole，必有CanCustomizeRole
     actItem->setData(true, SARibbonCustomizeWidget::CustomizeRole);
     actItem->setData(act->objectName(), SARibbonCustomizeWidget::CustomizeObjNameRole);
+    actItem->setData(qintptr(act), SARibbonCustomizeWidget::PointerRole);//把action指针传入
     item->appendRow(actItem);
 }
 
@@ -1667,12 +1830,42 @@ void SARibbonCustomizeWidget::onPushButtonDeleteClicked()
 {
     QStandardItem *item = selectedItem();
 
-    if (isCustomizeItem(item)) {
-        removeItem(item);
-        //删除后重新识别
-        ui->pushButtonAdd->setEnabled(selectedAction() && isSelectedItemIsCustomize() && selectedRibbonLevel() > 0);
-        ui->pushButtonDelete->setEnabled(isSelectedItemIsCustomize());
+    if (!isItemCanCustomize(item)) {
+        return;
     }
+    int level = itemLevel(item);
+
+    if (0 == level) {
+        //删除category
+        SARibbonCustomizeData d = SARibbonCustomizeData::makeRemoveCategoryCustomizeData(m_d->itemObjectName(item));
+        m_d->mCustomizeDatas.append(d);
+    }else if (1 == level) {
+        //删除pannel
+        QString catObjName = m_d->itemObjectName(item->parent());
+        QString pannelObjName = m_d->itemObjectName(item);
+        SARibbonCustomizeData d = SARibbonCustomizeData::makeRemovePannelCustomizeData(catObjName, pannelObjName);
+        m_d->mCustomizeDatas.append(d);
+    }else if (2 == level) {
+        //删除Action
+        QString catObjName = m_d->itemObjectName(item->parent()->parent());
+        QString pannelObjName = m_d->itemObjectName(item->parent());
+        QAction *act = itemToAction(item);
+        QString key = m_d->mActionMgr->key(act);
+        if (key.isEmpty() || catObjName.isEmpty() || pannelObjName.isEmpty()) {
+            return;
+        }
+
+        SARibbonCustomizeData d = SARibbonCustomizeData::makeRemoveActionCustomizeData(catObjName
+            , pannelObjName
+            , key
+            , m_d->mActionMgr);
+        m_d->mCustomizeDatas.append(d);
+    }
+    //执行删除操作
+    removeItem(item);
+    //删除后重新识别
+    ui->pushButtonAdd->setEnabled(selectedAction() && isSelectedItemIsCustomize() && selectedRibbonLevel() > 0);
+    ui->pushButtonDelete->setEnabled(isSelectedItemIsCustomize());
 }
 
 
@@ -1705,9 +1898,47 @@ void SARibbonCustomizeWidget::onTreeViewResultClicked(const QModelIndex& index)
 
 void SARibbonCustomizeWidget::onToolButtonUpClicked()
 {
+    QStandardItem *item = selectedItem();
+
+    if ((nullptr == item) || (0 == item->row())) {
+        return;
+    }
+    int level = itemLevel(item);
+
+    if (0 == level) {
+        //移动category
+        SARibbonCustomizeData d = SARibbonCustomizeData::makeChangeCategoryOrderCustomizeData(m_d->itemObjectName(item), -1);
+        m_d->mCustomizeDatas.append(d);
+        int r = item->row();
+        item = m_d->mRibbonModel->takeItem(item->row());
+        m_d->mRibbonModel->removeRow(r);
+        m_d->mRibbonModel->insertRow(r-1, item);
+    }
 }
 
 
 void SARibbonCustomizeWidget::onToolButtonDownClicked()
 {
+    QStandardItem *item = selectedItem();
+    int count = 0;
+
+    if (item->parent()) {
+        count = item->parent()->rowCount();
+    }else{
+        count = m_d->mRibbonModel->rowCount();
+    }
+    if ((nullptr == item) || ((count-1) == item->row())) {
+        return;
+    }
+    int level = itemLevel(item);
+
+    if (0 == level) {
+        //移动category
+        SARibbonCustomizeData d = SARibbonCustomizeData::makeChangeCategoryOrderCustomizeData(m_d->itemObjectName(item), 1);
+        m_d->mCustomizeDatas.append(d);
+        int r = item->row();
+        item = m_d->mRibbonModel->takeItem(item->row());
+        m_d->mRibbonModel->removeRow(r);
+        m_d->mRibbonModel->insertRow(r+1, item);
+    }
 }
