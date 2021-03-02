@@ -332,6 +332,38 @@ int SARibbonPannelLayout::defaultPannelHeight() const
 
 
 /**
+ * @brief 移动两个item
+ * @param from
+ * @param to
+ * @note 移动完后所有都失效，需要重新布局
+ */
+void SARibbonPannelLayout::move(int from, int to)
+{
+    if (from == to) {
+        return;
+    }
+    if (to < 0) {
+        to = 0;
+    }
+    if (to >= count()) {
+        to = count()-1;
+    }
+    m_items.move(from, to);
+    invalidate();
+}
+
+
+/**
+ * @brief 判断是否需要重新布局
+ * @return
+ */
+bool SARibbonPannelLayout::isDirty() const
+{
+    return (m_dirty);
+}
+
+
+/**
  * @brief 布局所有action
  */
 void SARibbonPannelLayout::layoutActions()
@@ -1331,6 +1363,29 @@ int SARibbonPannel::titleHeight() const
 QSize SARibbonPannel::optionActionButtonSize() const
 {
     return (isTwoRow() ? QSize(12, 12) : QSize(16, 16));
+}
+
+
+/**
+ * @brief action对应的布局index，此操作一般用于移动，其他意义不大
+ * @param act
+ * @return 没有查到返回-1
+ */
+int SARibbonPannel::actionIndex(QAction *act) const
+{
+    return (m_d->m_layout->indexOf(act));
+}
+
+
+/**
+ * @brief 移动action
+ * @param from 要移动action的位置，通过@ref actionIndex 获取
+ * @param to 要移动的位置
+ */
+void SARibbonPannel::moveAction(int from, int to)
+{
+    m_d->m_layout->move(from, to);
+    updateGeometry(); //通知layout进行重新布局
 }
 
 
