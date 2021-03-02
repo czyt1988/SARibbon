@@ -106,7 +106,7 @@ bool SARibbonActionsManager::registeAction(QAction *act, int tag, const QString&
         k = QString("id_%1_%2").arg(m_d->mSale++).arg(act->objectName());
     }
     if (m_d->mKeyToAction.contains(k)) {
-        qDebug() << "key " << k << "have been exist,you can set key in an unique value when use SARibbonActionsManager::registeAction";
+        qWarning() << "key: " << k << " have been exist,you can set key in an unique value when use SARibbonActionsManager::registeAction";
         return (false);
     }
     m_d->mKeyToAction[k] = act;
@@ -656,6 +656,46 @@ bool SARibbonCustomizeData::apply(SARibbonMainWindow *m) const
         return (true);
     }
 
+    case ChangePannelOrderActionType:
+    {
+        SARibbonCategory *c = bar->categoryByObjectName(categoryObjNameValue);
+        if (nullptr == c) {
+            return (false);
+        }
+        SARibbonPannel *pannel = c->pannelByObjectName(pannelObjNameValue);
+        if (nullptr == pannel) {
+            return (false);
+        }
+        int pannelIndex = c->pannelIndex(pannel);
+        if (-1 == pannelIndex) {
+            return (false);
+        }
+        c->movePannel(pannelIndex, pannelIndex+indexValue);
+        return (true);
+    }
+
+    case ChangeActionOrderActionType:
+    {
+        SARibbonCategory *c = bar->categoryByObjectName(categoryObjNameValue);
+        if (nullptr == c) {
+            return (false);
+        }
+        SARibbonPannel *pannel = c->pannelByObjectName(pannelObjNameValue);
+        if (nullptr == pannel) {
+            return (false);
+        }
+        QAction *act = m_actionsManagerPointer->action(keyValue);
+        if (nullptr == act) {
+            return (false);
+        }
+        int actindex = pannel->actionIndex(act);
+        if (actindex <= -1) {
+            return (false);
+        }
+        pannel->moveAction(actindex, actindex+indexValue);
+        return (true);
+    }
+
     case RenameCategoryActionType:
     {
         SARibbonCategory *c = bar->categoryByObjectName(categoryObjNameValue);
@@ -813,6 +853,45 @@ SARibbonCustomizeData SARibbonCustomizeData::makeChangeCategoryOrderCustomizeDat
 
 
 /**
+ * @brief 对应ChangePannelOrderActionType
+ * @param categoryobjName 需要移动的pannel对应的categoryobjName
+ * @param pannelObjName 需要移动的pannelObjName
+ * @param moveindex 移动位置，-1代表向上（向左）移动一个位置，1带表向下（向右）移动一个位置
+ * @return
+ */
+SARibbonCustomizeData SARibbonCustomizeData::makeChangePannelOrderCustomizeData(const QString& categoryobjName, const QString& pannelObjName, int moveindex)
+{
+    SARibbonCustomizeData d(ChangePannelOrderActionType);
+
+    d.categoryObjNameValue = categoryobjName;
+    d.pannelObjNameValue = pannelObjName;
+    d.indexValue = moveindex;
+    return (d);
+}
+
+
+/**
+ * @brief 对应ChangeActionOrderActionType
+ * @param categoryobjName 需要移动的pannel对应的categoryobjName
+ * @param pannelObjName 需要移动的pannelObjName
+ * @param key SARibbonActionsManager管理的key名
+ * @param mgr SARibbonActionsManager指针
+ * @param moveindex 移动位置，-1代表向上（向左）移动一个位置，1带表向下（向右）移动一个位置
+ * @return
+ */
+SARibbonCustomizeData SARibbonCustomizeData::makeChangeActionOrderCustomizeData(const QString& categoryobjName, const QString& pannelObjName, const QString& key, SARibbonActionsManager *mgr, int moveindex)
+{
+    SARibbonCustomizeData d(ChangeActionOrderActionType, mgr);
+
+    d.categoryObjNameValue = categoryobjName;
+    d.pannelObjNameValue = pannelObjName;
+    d.keyValue = key;
+    d.indexValue = moveindex;
+    return (d);
+}
+
+
+/**
  * @brief 对应RemovePannelActionType
  * @param categoryobjName pannel对应的category的obj name
  * @param pannelObjName pannel对应的 obj name
@@ -838,12 +917,11 @@ SARibbonCustomizeData SARibbonCustomizeData::makeRemovePannelCustomizeData(const
  */
 SARibbonCustomizeData SARibbonCustomizeData::makeRemoveActionCustomizeData(const QString& categoryobjName, const QString& pannelObjName, const QString& key, SARibbonActionsManager *mgr)
 {
-    SARibbonCustomizeData d(RemoveActionActionType);
+    SARibbonCustomizeData d(RemoveActionActionType, mgr);
 
     d.categoryObjNameValue = categoryobjName;
     d.pannelObjNameValue = pannelObjName;
     d.keyValue = key;
-    d.m_actionsManagerPointer = mgr;
     return (d);
 }
 
@@ -1336,6 +1414,9 @@ QString SARibbonCustomizeWidgetPrivate::itemObjectName(QStandardItem *item) cons
  */
 bool SARibbonCustomizeWidgetPrivate::isItemCanCustomize(QStandardItem *item) const
 {
+    if (nullptr == item) {
+        return (false);
+    }
     QVariant v = item->data(SARibbonCustomizeWidget::CanCustomizeRole);
 
     if (v.isValid()) {
@@ -1708,6 +1789,10 @@ void SARibbonCustomizeWidget::onPushButtonNewCategoryClicked()
 void SARibbonCustomizeWidget::onPushButtonNewPannelClicked()
 {
     QStandardItem *item = selectedItem();
+
+    if (nullptr == item) {
+        return;
+    }
     int level = selectedRibbonLevel();
 
     QStandardItem *ni = new QStandardItem(tr("new pannel[customize]%1").arg(++(m_d->mCustomizePannelCount)));
@@ -1830,6 +1915,9 @@ void SARibbonCustomizeWidget::onPushButtonDeleteClicked()
 {
     QStandardItem *item = selectedItem();
 
+    if (nullptr == item) {
+        return;
+    }
     if (!isItemCanCustomize(item)) {
         return;
     }
@@ -1910,9 +1998,39 @@ void SARibbonCustomizeWidget::onToolButtonUpClicked()
         SARibbonCustomizeData d = SARibbonCustomizeData::makeChangeCategoryOrderCustomizeData(m_d->itemObjectName(item), -1);
         m_d->mCustomizeDatas.append(d);
         int r = item->row();
-        item = m_d->mRibbonModel->takeItem(item->row());
+        item = m_d->mRibbonModel->takeItem(r);
         m_d->mRibbonModel->removeRow(r);
         m_d->mRibbonModel->insertRow(r-1, item);
+    }else if (1 == level) {
+        QStandardItem *paritem = item->parent();
+        SARibbonCustomizeData d = SARibbonCustomizeData::makeChangePannelOrderCustomizeData(
+            m_d->itemObjectName(paritem)
+            , m_d->itemObjectName(item)
+            , -1);
+        m_d->mCustomizeDatas.append(d);
+        int r = item->row();
+        item = paritem->takeChild(r);
+        paritem->removeRow(r);
+        paritem->insertRow(r-1, item);
+    }else if (2 == level) {
+        QStandardItem *pannelItem = item->parent();
+        QStandardItem *categoryItem = pannelItem->parent();
+        QAction *act = itemToAction(item);
+        if (!act) {
+            return;
+        }
+        QString key = m_d->mActionMgr->key(act);
+        SARibbonCustomizeData d = SARibbonCustomizeData::makeChangeActionOrderCustomizeData(
+            m_d->itemObjectName(categoryItem)
+            , m_d->itemObjectName(pannelItem)
+            , key
+            , m_d->mActionMgr
+            , -1);
+        m_d->mCustomizeDatas.append(d);
+        int r = item->row();
+        item = pannelItem->takeChild(r);
+        pannelItem->removeRow(r);
+        pannelItem->insertRow(r-1, item);
     }
 }
 
@@ -1920,6 +2038,10 @@ void SARibbonCustomizeWidget::onToolButtonUpClicked()
 void SARibbonCustomizeWidget::onToolButtonDownClicked()
 {
     QStandardItem *item = selectedItem();
+
+    if (item == nullptr) {
+        return;
+    }
     int count = 0;
 
     if (item->parent()) {
@@ -1940,5 +2062,35 @@ void SARibbonCustomizeWidget::onToolButtonDownClicked()
         item = m_d->mRibbonModel->takeItem(item->row());
         m_d->mRibbonModel->removeRow(r);
         m_d->mRibbonModel->insertRow(r+1, item);
+    }else if (1 == level) {
+        QStandardItem *paritem = item->parent();
+        SARibbonCustomizeData d = SARibbonCustomizeData::makeChangePannelOrderCustomizeData(
+            m_d->itemObjectName(paritem)
+            , m_d->itemObjectName(item)
+            , 1);
+        m_d->mCustomizeDatas.append(d);
+        int r = item->row();
+        item = paritem->takeChild(r);
+        paritem->removeRow(r);
+        paritem->insertRow(r+1, item);
+    }else if (2 == level) {
+        QStandardItem *pannelItem = item->parent();
+        QStandardItem *categoryItem = pannelItem->parent();
+        QAction *act = itemToAction(item);
+        if (!act) {
+            return;
+        }
+        QString key = m_d->mActionMgr->key(act);
+        SARibbonCustomizeData d = SARibbonCustomizeData::makeChangeActionOrderCustomizeData(
+            m_d->itemObjectName(categoryItem)
+            , m_d->itemObjectName(pannelItem)
+            , key
+            , m_d->mActionMgr
+            , -1);
+        m_d->mCustomizeDatas.append(d);
+        int r = item->row();
+        item = pannelItem->takeChild(r);
+        pannelItem->removeRow(r);
+        pannelItem->insertRow(r+1, item);
     }
 }

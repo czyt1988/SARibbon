@@ -136,8 +136,6 @@ public:
     //获取所有的buttons
     QList<SARibbonToolButton *> ribbonToolButtons() const;
 
-
-
     //获取PannelLayoutMode
     PannelLayoutMode pannelLayoutMode() const;
 
@@ -158,6 +156,12 @@ public:
 
     //optionActionButton的尺寸
     virtual QSize optionActionButtonSize() const;
+
+    //action对应的布局index，此操作一般用于移动moveAction，其他意义不大
+    int actionIndex(QAction *act) const;
+
+    //移动action
+    void moveAction(int from, int to);
 
 signals:
 
@@ -232,6 +236,12 @@ public:
 
     //根据pannel的默认参数得到的pannel高度
     int defaultPannelHeight() const;
+
+    //移动两个item
+    void move(int from, int to);
+
+    //判断是否需要重新布局
+    bool isDirty() const;
 
 protected:
     //布局action

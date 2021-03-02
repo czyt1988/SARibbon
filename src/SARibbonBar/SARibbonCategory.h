@@ -43,6 +43,12 @@ public:
     //通过索引找到pannel，如果超过索引范围，会返回nullptr
     SARibbonPannel *pannelByIndex(int index) const;
 
+    //查找pannel的index
+    int pannelIndex(SARibbonPannel *p) const;
+
+    //移动一个Pannel从from index到to index
+    void movePannel(int from, int to);
+
     //添加pannel
     void addPannel(SARibbonPannel *pannel);
 
@@ -63,6 +69,9 @@ public:
 
     //如果是ContextCategory，此函数返回true
     bool isContextCategory() const;
+
+    //pannel的个数
+    int pannelCount() const;
 
 protected slots:
     void onLeftScrollButtonClicked();

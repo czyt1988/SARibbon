@@ -188,12 +188,12 @@ SARibbonPannel *SARibbonCategory::insertPannel(const QString& title, int index)
  */
 SARibbonPannel *SARibbonCategory::pannelByName(const QString& title) const
 {
-    auto pl = pannelList();
-
-    for (SARibbonPannel *p : pl)
+    for (SARibbonCategoryItem& i : m_d->mItemList)
     {
-        if (p->windowTitle() == title) {
-            return (p);
+        if (i.pannelWidget) {
+            if (i.pannelWidget->windowTitle() == title) {
+                return (i.pannelWidget);
+            }
         }
     }
     return (nullptr);
@@ -207,12 +207,12 @@ SARibbonPannel *SARibbonCategory::pannelByName(const QString& title) const
  */
 SARibbonPannel *SARibbonCategory::pannelByObjectName(const QString& objname) const
 {
-    auto pl = pannelList();
-
-    for (SARibbonPannel *p : pl)
+    for (SARibbonCategoryItem& i : m_d->mItemList)
     {
-        if (p->objectName() == objname) {
-            return (p);
+        if (i.pannelWidget) {
+            if (i.pannelWidget->objectName() == objname) {
+                return (i.pannelWidget);
+            }
         }
     }
     return (nullptr);
@@ -226,7 +226,47 @@ SARibbonPannel *SARibbonCategory::pannelByObjectName(const QString& objname) con
  */
 SARibbonPannel *SARibbonCategory::pannelByIndex(int index) const
 {
-    return (pannelList().value(index, nullptr));
+    return (m_d->mItemList.value(index).pannelWidget);
+}
+
+
+/**
+ * @brief 查找pannel对应的索引
+ * @param p
+ * @return 如果找不到，返回-1
+ */
+int SARibbonCategory::pannelIndex(SARibbonPannel *p) const
+{
+    int c = pannelCount();
+
+    for (int i = 0; i < c; ++i)
+    {
+        if (m_d->mItemList[i].pannelWidget == p) {
+            return (i);
+        }
+    }
+    return (-1);
+}
+
+
+/**
+ * @brief 移动一个Pannel从from index到to index
+ * @param from 要移动pannel的index
+ * @param to 要移动到的位置
+ */
+void SARibbonCategory::movePannel(int from, int to)
+{
+    if (from == to) {
+        return;
+    }
+    if (to < 0) {
+        to = 0;
+    }
+    if (to >= pannelCount()) {
+        to = pannelCount()-1;
+    }
+    m_d->mItemList.move(from, to);
+    m_d->updateItemGeometry();
 }
 
 
@@ -304,6 +344,16 @@ QSize SARibbonCategory::sizeHint() const
 bool SARibbonCategory::isContextCategory() const
 {
     return (m_d->mIsContextCategory);
+}
+
+
+/**
+ * @brief 返回pannel的个数
+ * @return
+ */
+int SARibbonCategory::pannelCount() const
+{
+    return (m_d->mItemList.size());
 }
 
 
@@ -431,6 +481,7 @@ SARibbonPannel *SARibbonCategoryPrivate::insertPannel(const QString& title, int 
     SARibbonPannel *pannel = RibbonSubElementDelegate->createRibbonPannel(ribbonCategory());
 
     pannel->setWindowTitle(title);
+    pannel->setObjectName(title);
     pannel->setPannelLayoutMode(ribbonPannelLayoutMode());
     pannel->installEventFilter(mParent);
     insertPannel(index, pannel);

@@ -184,10 +184,24 @@ public:
     static SARibbonCustomizeData makeRemoveCategoryCustomizeData(const QString& categoryobjName);
 
     //对应ChangeCategoryOrderActionType
-    static SARibbonCustomizeData makeChangeCategoryOrderCustomizeData(const QString& categoryobjName, int moveindex);
+    static SARibbonCustomizeData makeChangeCategoryOrderCustomizeData(const QString& categoryobjName
+        , int moveindex);
+
+    //对应ChangePannelOrderActionType
+    static SARibbonCustomizeData makeChangePannelOrderCustomizeData(const QString& categoryobjName
+        , const QString& pannelObjName
+        , int moveindex);
+
+    //对应ChangeActionOrderActionType
+    static SARibbonCustomizeData makeChangeActionOrderCustomizeData(const QString& categoryobjName
+        , const QString& pannelObjName
+        , const QString& key
+        , SARibbonActionsManager *mgr
+        , int moveindex);
 
     //对应RemovePannelActionType
-    static SARibbonCustomizeData makeRemovePannelCustomizeData(const QString& categoryobjName, const QString& pannelObjName);
+    static SARibbonCustomizeData makeRemovePannelCustomizeData(const QString& categoryobjName
+        , const QString& pannelObjName);
 
     //对应RemoveActionActionType
     static SARibbonCustomizeData makeRemoveActionCustomizeData(const QString& categoryobjName
