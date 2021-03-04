@@ -22,6 +22,7 @@ class SA_RIBBON_EXPORT SARibbonCategory : public QWidget
     Q_OBJECT
     friend class SARibbonBar;
     friend class SARibbonContextCategory;
+    Q_PROPERTY(bool isCanCustomize READ isCanCustomize WRITE setCanCustomize)
 public:
     SARibbonCategory(QWidget *parent);
     ~SARibbonCategory();
@@ -72,6 +73,10 @@ public:
 
     //pannel的个数
     int pannelCount() const;
+
+    //判断是否可以自定义
+    bool isCanCustomize() const;
+    void setCanCustomize(bool b);
 
 protected slots:
     void onLeftScrollButtonClicked();

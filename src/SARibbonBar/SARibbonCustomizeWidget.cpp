@@ -720,6 +720,20 @@ bool SARibbonCustomizeData::apply(SARibbonMainWindow *m) const
         return (true);
     }
 
+    case VisibleCategoryActionType:
+    {
+        SARibbonCategory *c = bar->categoryByObjectName(categoryObjNameValue);
+        if (nullptr == c) {
+            return (false);
+        }
+        if (1 == indexValue) {
+            bar->showCategory(c);
+        }else{
+            bar->hideCategory(c);
+        }
+        return (true);
+    }
+
     default:
         break;
     }
@@ -922,6 +936,22 @@ SARibbonCustomizeData SARibbonCustomizeData::makeRemoveActionCustomizeData(const
     d.categoryObjNameValue = categoryobjName;
     d.pannelObjNameValue = pannelObjName;
     d.keyValue = key;
+    return (d);
+}
+
+
+/**
+ * @brief SARibbonCustomizeData::makeVisibleCategoryCustomizeData
+ * @param categoryobjName
+ * @param isShow
+ * @return
+ */
+SARibbonCustomizeData SARibbonCustomizeData::makeVisibleCategoryCustomizeData(const QString& categoryobjName, bool isShow)
+{
+    SARibbonCustomizeData d(VisibleCategoryActionType);
+
+    d.categoryObjNameValue = categoryobjName;
+    d.indexValue = isShow ? 1 : 0;
     return (d);
 }
 
@@ -1252,9 +1282,10 @@ void SARibbonCustomizeWidgetPrivate::updateModel()
         }else{
             ci->setText(c->windowTitle());
         }
-        if (SARibbonCustomizeData::isCanCustomize(c)) {
-//            ci->setCheckable(true);
-//            ci->setCheckState(Qt::Checked);
+        if (c->isCanCustomize() && !c->isContextCategory()) {
+            //上下文标签不做显示隐藏处理
+            ci->setCheckable(true);
+            ci->setCheckState(ribbonbar->isCategoryVisible(c) ? Qt::Checked : Qt::Unchecked);
             ci->setData(true, SARibbonCustomizeWidget::CanCustomizeRole);//标记这个是可以自定义的
         }
         ci->setData(0, SARibbonCustomizeWidget::LevelRole);
@@ -1265,7 +1296,7 @@ void SARibbonCustomizeWidgetPrivate::updateModel()
             QStandardItem *pi = new QStandardItem(p->windowTitle());
             pi->setData(1, SARibbonCustomizeWidget::LevelRole);
             pi->setData(QVariant::fromValue<qintptr>(qintptr(p)), SARibbonCustomizeWidget::PointerRole);
-            if (SARibbonCustomizeData::isCanCustomize(p)) {
+            if (p->isCanCustomize()) {
                 pi->setData(true, SARibbonCustomizeWidget::CanCustomizeRole);//标记这个是可以自定义的
             }
             ci->appendRow(pi);
@@ -1501,6 +1532,8 @@ void SARibbonCustomizeWidget::initConnection()
         , this, &SARibbonCustomizeWidget::onToolButtonUpClicked);
     connect(ui->toolButtonDown, &QToolButton::clicked
         , this, &SARibbonCustomizeWidget::onToolButtonDownClicked);
+    connect(m_d->mRibbonModel, &QStandardItemModel::itemChanged
+        , this, &SARibbonCustomizeWidget::onItemChanged);
 }
 
 
@@ -2092,5 +2125,22 @@ void SARibbonCustomizeWidget::onToolButtonDownClicked()
         item = pannelItem->takeChild(r);
         pannelItem->removeRow(r);
         pannelItem->insertRow(r+1, item);
+    }
+}
+
+
+void SARibbonCustomizeWidget::onItemChanged(QStandardItem *item)
+{
+    if (item == nullptr) {
+        return;
+    }
+    int level = itemLevel(item);
+
+    if (0 == level) {
+        if (item->isCheckable()) {
+            QString objname = m_d->itemObjectName(item);
+            SARibbonCustomizeData d = SARibbonCustomizeData::makeVisibleCategoryCustomizeData(objname, item->checkState() == Qt::Checked);
+            m_d->mCustomizeDatas.append(d);
+        }
     }
 }

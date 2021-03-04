@@ -139,6 +139,7 @@ public:
         , ChangeActionOrderActionType   ///< 改变action顺序的操作
         , RenameCategoryActionType      ///< 对category更名操作
         , RenamePannelActionType        ///< 对Pannel更名操作
+        , VisibleCategoryActionType     ///< 对category执行隐藏/显示操作
     };
     SARibbonCustomizeData();
     SARibbonCustomizeData(ActionType type, SARibbonActionsManager *mgr = nullptr);
@@ -209,7 +210,10 @@ public:
         , const QString& key
         , SARibbonActionsManager *mgr);
 
-    //判断是否可以自定义
+    //对应VisibleCategoryActionType
+    static SARibbonCustomizeData makeVisibleCategoryCustomizeData(const QString& categoryobjName, bool isShow);
+
+    //判断是否可以自定义,如果某个action不想被编辑，可以通过此函数设置
     static bool isCanCustomize(QObject *obj);
     static void setCanCustomize(QObject *obj, bool canbe = true);
 
@@ -340,6 +344,7 @@ private slots:
     void onTreeViewResultClicked(const QModelIndex& index);
     void onToolButtonUpClicked();
     void onToolButtonDownClicked();
+    void onItemChanged(QStandardItem *item);
 
 private:
     void initConnection();
