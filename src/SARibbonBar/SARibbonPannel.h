@@ -64,6 +64,8 @@ class SA_RIBBON_EXPORT SARibbonPannel : public QWidget
     friend class SARibbonCategory;
     friend class SARibbonCategoryPrivate;
     friend class SARibbonCustomizeWidgetPrivate;
+    Q_PROPERTY(bool isCanCustomize READ isCanCustomize WRITE setCanCustomize)
+    Q_PROPERTY(bool isExpanding READ isExpanding WRITE setExpanding)
 public:
     SARibbonPannel(QWidget *parent = 0);
     ~SARibbonPannel();
@@ -162,6 +164,10 @@ public:
 
     //移动action
     void moveAction(int from, int to);
+
+    //判断是否可以自定义
+    bool isCanCustomize() const;
+    void setCanCustomize(bool b);
 
 signals:
 

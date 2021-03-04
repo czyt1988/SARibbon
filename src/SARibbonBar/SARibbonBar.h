@@ -145,6 +145,15 @@ public:
     //通过索引找到category，如果超过索引范围，会返回nullptr
     SARibbonCategory *categoryByIndex(int index) const;
 
+    //隐藏category,并不会删除或者取走，只是隐藏
+    void hideCategory(SARibbonCategory *category);
+
+    //显示被隐藏的category
+    void showCategory(SARibbonCategory *category);
+
+    //判断这个category是否在显示状态，也就是tabbar有这个category
+    bool isCategoryVisible(SARibbonCategory *category) const;
+
     //获取category的索引
     int categoryIndex(SARibbonCategory *c) const;
 

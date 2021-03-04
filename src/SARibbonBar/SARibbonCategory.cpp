@@ -105,6 +105,7 @@ public:
     bool mIsLeftScrollBtnShow;      ///< 标记左滚动按钮是否需要显示
     QMargins mContentsMargins;
     bool mIsContextCategory;        ///< 标记是否是上下文标签
+    bool isCanCustomize;            ///< 标记是否可以自定义
 };
 
 SARibbonCategoryScrollButton::SARibbonCategoryScrollButton(Qt::ArrowType arr, QWidget *p)
@@ -357,6 +358,26 @@ int SARibbonCategory::pannelCount() const
 }
 
 
+/**
+ * @brief 判断是否可以自定义
+ * @return
+ */
+bool SARibbonCategory::isCanCustomize() const
+{
+    return (m_d->isCanCustomize);
+}
+
+
+/**
+ * @brief 设置是否可以自定义
+ * @param b
+ */
+void SARibbonCategory::setCanCustomize(bool b)
+{
+    m_d->isCanCustomize = b;
+}
+
+
 void SARibbonCategory::onLeftScrollButtonClicked()
 {
     m_d->onLeftScrollButtonClicked();
@@ -416,6 +437,7 @@ SARibbonCategoryPrivate::SARibbonCategoryPrivate(SARibbonCategory *parent)
     , mIsLeftScrollBtnShow(false)
     , mContentsMargins(1, 1, 1, 1)
     , mIsContextCategory(false)
+    , isCanCustomize(true)
 {
 }
 

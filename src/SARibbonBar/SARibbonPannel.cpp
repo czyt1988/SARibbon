@@ -54,9 +54,10 @@ public:
     SARibbonPannel *Parent;
     SARibbonPannelLayout *m_layout;
     QPoint m_nextElementPosition;
-    int m_row;                                                      ///< 记录小action所在的gridLayout行数，gridLayout总共划分为6行，用于满足3行或2行的按钮需求
-    SARibbonPannelOptionButton *m_optionActionButton;               ///< 标题栏的y距离
-    SARibbonPannel::PannelLayoutMode m_pannelLayoutMode;            ///< pannel的布局模式，默认为3行模式ThreeRowMode
+    int m_row;                                              ///< 记录小action所在的gridLayout行数，gridLayout总共划分为6行，用于满足3行或2行的按钮需求
+    SARibbonPannelOptionButton *m_optionActionButton;       ///< 标题栏的y距离
+    SARibbonPannel::PannelLayoutMode m_pannelLayoutMode;    ///< pannel的布局模式，默认为3行模式ThreeRowMode
+    bool m_isCanCustomize;                                  ///< 记录是否可自定义
 };
 
 SARibbonPannelPrivate::SARibbonPannelPrivate(SARibbonPannel *p)
@@ -66,6 +67,7 @@ SARibbonPannelPrivate::SARibbonPannelPrivate(SARibbonPannel *p)
     , m_row(0)
     , m_optionActionButton(nullptr)
     , m_pannelLayoutMode(SARibbonPannel::ThreeRowMode)
+    , m_isCanCustomize(true)
 {
     createLayout();
 }
@@ -1386,6 +1388,26 @@ void SARibbonPannel::moveAction(int from, int to)
 {
     m_d->m_layout->move(from, to);
     updateGeometry(); //通知layout进行重新布局
+}
+
+
+/**
+ * @brief 判断是否可以自定义
+ * @return
+ */
+bool SARibbonPannel::isCanCustomize() const
+{
+    return (m_d->m_isCanCustomize);
+}
+
+
+/**
+ * @brief 设置是否可以自定义
+ * @param b
+ */
+void SARibbonPannel::setCanCustomize(bool b)
+{
+    m_d->m_isCanCustomize = b;
 }
 
 
