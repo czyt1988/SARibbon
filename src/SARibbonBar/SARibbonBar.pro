@@ -17,7 +17,9 @@ DESTDIR = $$SA_RIBBON_DIR
 
 
 SOURCES += \
+    SARibbonActionsManager.cpp \
     SARibbonBar.cpp \
+    SARibbonCustomizeData.cpp \
     SARibbonCustomizeDialog.cpp \
     SARibbonCustomizeWidget.cpp \
     SARibbonMainWindow.cpp \
@@ -49,7 +51,9 @@ SOURCES += \
     SARibbonCtrlContainer.cpp
 
 HEADERS  += \
+    SARibbonActionsManager.h \
     SARibbonBar.h \
+    SARibbonCustomizeData.h \
     SARibbonCustomizeDialog.h \
     SARibbonCustomizeWidget.h \
     SARibbonMainWindow.h \
