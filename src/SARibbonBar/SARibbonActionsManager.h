@@ -23,11 +23,10 @@ public:
      */
     enum ActionTag {
         InvalidActionTag		= 0             ///< 无效的tag
-        , CommonlyUsedActionTag		= 0x01          ///< 常用命令
-        , NotInFunctionalAreaActionTag	= 0x02          ///< 不在功能区命令
-        , UserDefineActionTag		= 0x8000        ///< 自定义标签
+        , CommonlyUsedActionTag		= 0x01          ///< 预设tag-常用命令
+        , NotInFunctionalAreaActionTag	= 0x02          ///< 预设tag-不在功能区命令
+        , UserDefineActionTag		= 0x8000        ///< 自定义标签，所有用户自定义tag要大于此tag
     };
-    typedef QMap<int, QList<QAction *> >::iterator ActionRef;
     SARibbonActionsManager(QObject *p = nullptr);
     ~SARibbonActionsManager();
     //设置tag对应的名字
@@ -43,13 +42,11 @@ public:
     void unregisteAction(QAction *act, bool enableEmit = true);
 
     //过滤得到actions对应的引用，实际是一个迭代器
-    ActionRef filter(int tag);
+    QList<QAction *>& filter(int tag);
 
-    //判断返回的ActionRefs是否有效，如果没有tag，返回的ActionRefs是无效的
-    bool isActionRefsValid(ActionRef r) const;
-
-    //直接得到一个无效的ActionRefs
-    ActionRef invalidActionRefs() const;
+    //通过tag筛选出系列action
+    QList<QAction *>& actions(int tag);
+    const QList<QAction *> actions(int tag) const;
 
     //获取所有的标签
     QList<int> actionTags() const;
