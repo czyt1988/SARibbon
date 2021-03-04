@@ -9,10 +9,10 @@ class SARibbonActionsManagerPrivate
 public:
     SARibbonActionsManager *mParent;
     QMap<int, QList<QAction *> > mTagToActions;     ///< tag : QList<QAction*>
-    QMap<int, QList<QString> > mTagToActionKeys;    ///< tag : keys
     QMap<int, QString> mTagToName;                  ///< tag对应的名字
     QHash<QString, QAction *> mKeyToAction;         ///< key对应action
     QMap<QAction *, QString> mActionToKey;          ///< action对应key
+
     int mSale;                                      ///< 盐用于生成固定的id，在用户不主动设置key时，id基于msale生成，只要SARibbonActionsManager的调用registeAction顺序不变，生成的id都不变，因为它是基于自增实现的
     SARibbonActionsManagerPrivate(SARibbonActionsManager *p);
 };
@@ -90,7 +90,6 @@ bool SARibbonActionsManager::registeAction(QAction *act, int tag, const QString&
     bool isneedemit = !(m_d->mTagToActions.contains(tag));//记录是否需要发射信号
 
     m_d->mTagToActions[tag].append(act);
-    m_d->mTagToActionKeys[tag].append(k);//key也记录
     //绑定槽
     connect(act, &QObject::destroyed, this, &SARibbonActionsManager::onActionDestroyed);
     if (isneedemit) {
@@ -131,27 +130,22 @@ void SARibbonActionsManager::removeAction(QAction *act, bool enableEmit)
 {
     QList<int> deletedTags;                         //记录删除的tag，用于触发actionTagChanged
     QMap<int, QList<QAction *> > tagToActions;      ///< tag : QList<QAction*>
-    QMap<int, QList<QString> > tagToActionKeys;     ///< tag : keys
 
     for (auto i = m_d->mTagToActions.begin(); i != m_d->mTagToActions.end(); ++i)
     {
         //把不是act的内容转移到tagToActions和tagToActionKeys中，之后再和m_d里的替换
-        auto k = m_d->mTagToActionKeys.find(i.key());
         auto tmpi = tagToActions.insert(i.key(), QList<QAction *>());
-        auto tmpk = tagToActionKeys.insert(i.key(), QList<QString>());
         int count = 0;
         for (int j = 0; j < i.value().size(); ++j)
         {
             if (i.value()[j] != act) {
                 tmpi.value().append(act);
-                tmpk.value().append(k.value()[j]);
                 ++count;
             }
         }
         if (0 == count) {
             //说明这个tag没有内容
             tagToActions.erase(tmpi);
-            tagToActionKeys.erase(tmpk);
             deletedTags.append(i.key());
         }
     }
@@ -163,7 +157,6 @@ void SARibbonActionsManager::removeAction(QAction *act, bool enableEmit)
 
     //置换
     m_d->mTagToActions.swap(tagToActions);
-    m_d->mTagToActionKeys.swap(tagToActionKeys);
     //发射信号
     if (enableEmit) {
         for (int tagdelete : deletedTags)
@@ -175,34 +168,30 @@ void SARibbonActionsManager::removeAction(QAction *act, bool enableEmit)
 
 
 /**
- * @brief 过滤得到actions对应的引用，实际是一个迭代器
+ * @brief 等同actions
  * @param tag
  * @return
  */
-SARibbonActionsManager::ActionRef SARibbonActionsManager::filter(int tag)
+QList<QAction *>& SARibbonActionsManager::filter(int tag)
 {
-    return (m_d->mTagToActions.find(tag));
+    return (actions(tag));
 }
 
 
 /**
- * @brief 判断返回的ActionRefs是否有效，如果没有tag，返回的ActionRefs是无效的
- * @param r
- * @return 有效返回true
- */
-bool SARibbonActionsManager::isActionRefsValid(SARibbonActionsManager::ActionRef r) const
-{
-    return (r != m_d->mTagToActions.end());
-}
-
-
-/**
- * @brief 直接得到一个无效的ActionRefs
+ * @brief 根据tag得到actions
+ * @param tag
  * @return
  */
-SARibbonActionsManager::ActionRef SARibbonActionsManager::invalidActionRefs() const
+QList<QAction *>& SARibbonActionsManager::actions(int tag)
 {
-    return (m_d->mTagToActions.end());
+    return (m_d->mTagToActions[tag]);
+}
+
+
+const QList<QAction *> SARibbonActionsManager::actions(int tag) const
+{
+    return (m_d->mTagToActions[tag]);
 }
 
 
@@ -270,9 +259,8 @@ public:
     SARibbonActionsManagerModel *mParent;
     SARibbonActionsManager *mMgr;
     int mTag;
-    SARibbonActionsManager::ActionRef mActionRef;
+    QList<QAction *> mActions;
     SARibbonActionsModelPrivete(SARibbonActionsManagerModel *m);
-    bool isValidRef() const;
     void updateRef();
     int count() const;
     QAction *at(int index);
@@ -287,21 +275,12 @@ SARibbonActionsModelPrivete::SARibbonActionsModelPrivete(SARibbonActionsManagerM
 }
 
 
-bool SARibbonActionsModelPrivete::isValidRef() const
-{
-    if (isNull()) {
-        return (false);
-    }
-    return (mMgr->isActionRefsValid(mActionRef));
-}
-
-
 void SARibbonActionsModelPrivete::updateRef()
 {
     if (isNull()) {
         return;
     }
-    mActionRef = mMgr->filter(mTag);
+    mActions = mMgr->actions(mTag);
 }
 
 
@@ -310,10 +289,7 @@ int SARibbonActionsModelPrivete::count() const
     if (isNull()) {
         return (0);
     }
-    if (isValidRef()) {
-        return (mActionRef.value().size());
-    }
-    return (0);
+    return (mActions.size());
 }
 
 
@@ -322,13 +298,10 @@ QAction *SARibbonActionsModelPrivete::at(int index)
     if (isNull()) {
         return (nullptr);
     }
-    if (!isValidRef()) {
-        return (nullptr);
-    }
     if (index >= count()) {
         return (nullptr);
     }
-    return (mActionRef.value().at(index));
+    return (mActions.at(index));
 }
 
 
@@ -431,7 +404,7 @@ void SARibbonActionsManagerModel::setupActionsManager(SARibbonActionsManager *m)
 {
     m_d->mMgr = m;
     m_d->mTag = SARibbonActionsManager::CommonlyUsedActionTag;
-    m_d->mActionRef = m->filter(m_d->mTag);
+    m_d->mActions = m->filter(m_d->mTag);
     connect(m, &SARibbonActionsManager::actionTagChanged
         , this, &SARibbonActionsManagerModel::onActionTagChanged);
     update();
