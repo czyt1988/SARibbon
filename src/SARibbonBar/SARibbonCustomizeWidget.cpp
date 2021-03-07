@@ -577,6 +577,8 @@ void SARibbonCustomizeWidget::initConnection()
         , this, &SARibbonCustomizeWidget::onToolButtonDownClicked);
     connect(m_d->mRibbonModel, &QStandardItemModel::itemChanged
         , this, &SARibbonCustomizeWidget::onItemChanged);
+    connect(ui->lineEditSearchAction, &QLineEdit::textEdited
+        , this, &SARibbonCustomizeWidget::onLineEditSearchActionTextEdited);
 }
 
 
@@ -1186,4 +1188,10 @@ void SARibbonCustomizeWidget::onItemChanged(QStandardItem *item)
             m_d->mCustomizeDatas.append(d);
         }
     }
+}
+
+
+void SARibbonCustomizeWidget::onLineEditSearchActionTextEdited(const QString& text)
+{
+    m_d->mAcionModel->search(text);
 }

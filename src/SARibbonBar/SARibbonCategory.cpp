@@ -137,6 +137,26 @@ SARibbonCategory::~SARibbonCategory()
 
 
 /**
+ * @brief category的名字,等同windowTitle函数
+ * @return
+ */
+QString SARibbonCategory::categoryName() const
+{
+    return (windowTitle());
+}
+
+
+/**
+ * @brief 设置category名字，等同setWindowTitle
+ * @param title
+ */
+void SARibbonCategory::setCategoryName(const QString& title)
+{
+    setWindowTitle(title);
+}
+
+
+/**
  * @brief 设置pannel的模式
  *
  * 在@ref SARibbonBar 调用@ref SARibbonBar::setRibbonStyle 函数时，会对所有的SARibbonCategory调用此函数

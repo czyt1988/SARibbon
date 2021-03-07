@@ -2,8 +2,8 @@
 #include <QMap>
 #include <QHash>
 #include <QDebug>
-
-
+#include "SARibbonMainWindow.h"
+#include "SARibbonBar.h"
 class SARibbonActionsManagerPrivate
 {
 public:
@@ -70,7 +70,7 @@ QString SARibbonActionsManager::tagName(int tag) const
  * @note 同一个action多次注册不同的tag可以通过tag索引到action，但通过action只能索引到最后一个注册的tag
  * @note tag的新增会触发actionTagChanged信号
  */
-bool SARibbonActionsManager::registeAction(QAction *act, int tag, const QString& key)
+bool SARibbonActionsManager::registeAction(QAction *act, int tag, const QString& key, bool enableEmit)
 {
     if (nullptr == act) {
         return (false);
@@ -92,7 +92,7 @@ bool SARibbonActionsManager::registeAction(QAction *act, int tag, const QString&
     m_d->mTagToActions[tag].append(act);
     //绑定槽
     connect(act, &QObject::destroyed, this, &SARibbonActionsManager::onActionDestroyed);
-    if (isneedemit) {
+    if (isneedemit && enableEmit) {
         //说明新增tag
         emit actionTagChanged(tag, false);
     }
@@ -238,6 +238,142 @@ int SARibbonActionsManager::count() const
 
 
 /**
+ * @brief 返回所有管理的actions
+ * @return
+ */
+QList<QAction *> SARibbonActionsManager::allActions() const
+{
+    return (m_d->mKeyToAction.values());
+}
+
+
+/**
+ * @brief 自动加载SARibbonMainWindow的action
+ * 此函数会遍历@ref SARibbonMainWindow 下的所有子object，找到action注册，
+ * 并会遍历所有@ref SARibbonCategory,把SARibbonCategory下的action按SARibbonCategory的title name进行分类
+ *
+ * 此函数会把所有category下的action生成tag并注册，返回的QMap<int, SARibbonCategory *>是记录了category对应的tag
+ *
+ * 此函数还会把SARibbonMainWindow下面的action，但不在任何一个category下的作为NotInRibbonCategoryTag标签注册，默认名字会赋予not in ribbon，
+ * 可以通过@ref setTagName 改变
+ *
+ * @param w
+ * @return
+ * @note 此函数的调用最好在category设置了标题后调用，因为会以category的标题作为标签的命名
+ */
+QMap<int, SARibbonCategory *> SARibbonActionsManager::autoRegisteActions(SARibbonMainWindow *w)
+{
+    QMap<int, SARibbonCategory *> res;
+    //先遍历SARibbonMainWindow下的所有子对象，把所有action找到
+    QSet<QAction *> mainwindowActions;
+
+    for (QObject *o : w->children())
+    {
+        if (QAction *a = qobject_cast<QAction *>(o)) {
+            //说明是action
+            if (!a->objectName().isEmpty()) {
+                mainwindowActions.insert(a);
+            }
+        }
+    }
+    //开始遍历每个category，加入action
+    SARibbonBar *bar = w->ribbonBar();
+
+    if (nullptr == bar) {
+        //非ribbon模式，直接退出
+        return (res);
+    }
+    QSet<QAction *> categoryActions;
+    QList<SARibbonCategory *> categorys = bar->categoryPages();
+    int tag = AutoCategoryDistinguishBeginTag;
+
+    for (SARibbonCategory *c : categorys)
+    {
+        QList<SARibbonPannel *> pannels = c->pannelList();
+        for (SARibbonPannel *p : pannels)
+        {
+            categoryActions += autoRegisteWidgetActions(p, tag, false);
+        }
+        setTagName(tag, c->windowTitle());
+        res[tag] = c;
+        ++tag;
+    }
+    //找到不在功能区的actions
+    QSet<QAction *> notincategory = mainwindowActions - categoryActions;
+
+    for (QAction *a : notincategory)
+    {
+        if (!a->objectName().isEmpty()) {
+            registeAction(a, NotInRibbonCategoryTag, a->objectName(), false);
+        }
+    }
+    if (notincategory.size() > 0) {
+        setTagName(NotInRibbonCategoryTag, tr("not in ribbon"));
+    }
+    return (res);
+}
+
+
+/**
+ * @brief 自动加载action
+ * @param w
+ * @param tag
+ * @param enableEmit
+ * @return 返回成功加入SARibbonActionsManager管理的action
+ */
+QSet<QAction *> SARibbonActionsManager::autoRegisteWidgetActions(QWidget *w, int tag, bool enableEmit)
+{
+    QSet<QAction *> res;
+    QList<QAction *> was = w->actions();
+
+    for (QAction *a : was)
+    {
+        if (res.contains(a) || a->objectName().isEmpty()) {
+            //重复内容不重复加入
+            //没有object name不加入
+            continue;
+        }
+        if (registeAction(a, tag, a->objectName(), enableEmit)) {
+            res.insert(a);
+        }
+    }
+    return (res);
+}
+
+
+/**
+ * @brief 根据标题查找action
+ * @param text
+ * @return
+ */
+QList<QAction *> SARibbonActionsManager::search(const QString& text)
+{
+    QList<QAction *> res;
+
+    if (text.isEmpty()) {
+        return (res);
+    }
+    QStringList kws = text.split(" ");
+
+    if (kws.isEmpty()) {
+        kws.append(text);
+    }
+    QList<QAction *> acts = m_d->mActionToKey.keys();
+
+    for (const QString& k : kws)
+    {
+        for (auto i = m_d->mActionToKey.begin(); i != m_d->mActionToKey.end(); ++i)
+        {
+            if (i.key()->text().contains(k, Qt::CaseInsensitive)) {
+                res.append(i.key());
+            }
+        }
+    }
+    return (res);
+}
+
+
+/**
  * @brief action 被delete时，将触发此槽把管理的action删除
  * @param o
  * @note 这个函数不会触发actionTagChanged信号
@@ -259,6 +395,7 @@ public:
     SARibbonActionsManagerModel *mParent;
     SARibbonActionsManager *mMgr;
     int mTag;
+    QString mSeatchText;
     QList<QAction *> mActions;
     SARibbonActionsModelPrivete(SARibbonActionsManagerModel *m);
     void updateRef();
@@ -271,6 +408,7 @@ SARibbonActionsModelPrivete::SARibbonActionsModelPrivete(SARibbonActionsManagerM
     : mParent(m)
     , mMgr(nullptr)
     , mTag(SARibbonActionsManager::CommonlyUsedActionTag)
+    , mSeatchText(QString())
 {
 }
 
@@ -280,7 +418,11 @@ void SARibbonActionsModelPrivete::updateRef()
     if (isNull()) {
         return;
     }
-    mActions = mMgr->actions(mTag);
+    if (!mSeatchText.isEmpty()) {
+        mActions = mMgr->search(mSeatchText);
+    }else{
+        mActions = mMgr->actions(mTag);
+    }
 }
 
 
@@ -435,10 +577,21 @@ QAction *SARibbonActionsManagerModel::indexToAction(QModelIndex index) const
 }
 
 
+/**
+ * @brief 查找
+ * @param text
+ */
+void SARibbonActionsManagerModel::search(const QString& text)
+{
+    m_d->mSeatchText = text;
+    update();
+}
+
+
 void SARibbonActionsManagerModel::onActionTagChanged(int tag, bool isdelete)
 {
     if (isdelete && (tag == m_d->mTag)) {
-        m_d->mTag = SARibbonActionsManager::InvalidActionTag;
+        m_d->mTag = SARibbonActionsManager::UnknowActionTag;
         update();
     }else{
         if (tag == m_d->mTag) {

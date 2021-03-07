@@ -5,6 +5,10 @@
 #include <QAbstractListModel>
 #include <QAction>
 #include <QMap>
+#include <QString>
+#include <QSet>
+class SARibbonMainWindow;
+class SARibbonCategory;
 class SARibbonActionsManagerPrivate;
 //SARibbonActionsModel 特有
 class SARibbonActionsModelPrivete;
@@ -22,10 +26,13 @@ public:
      * @brief 定义action的标签
      */
     enum ActionTag {
-        InvalidActionTag		= 0             ///< 无效的tag
-        , CommonlyUsedActionTag		= 0x01          ///< 预设tag-常用命令
-        , NotInFunctionalAreaActionTag	= 0x02          ///< 预设tag-不在功能区命令
-        , UserDefineActionTag		= 0x8000        ///< 自定义标签，所有用户自定义tag要大于此tag
+        UnknowActionTag				= 0             ///< 未知的tag
+        , CommonlyUsedActionTag			= 0x01          ///< 预设tag-常用命令
+        , NotInFunctionalAreaActionTag		= 0x02          ///< 预设tag-不在功能区命令
+        , AutoCategoryDistinguishBeginTag	= 0x1000        ///< 自动按Category划分的标签起始，在@ref autoRegisteActions 函数会用到
+        , AutoCategoryDistinguishEndTag		= 0x2000        ///< 自动按Category划分的标签结束，在@ref autoRegisteActions 函数会用到
+        , NotInRibbonCategoryTag		= 0x2001        ///< 不在功能区的标签@ref autoRegisteActions 函数会遍历所有category的action以及SARibbonMainWindow下的action，如果两个
+        , UserDefineActionTag			= 0x8000        ///< 自定义标签，所有用户自定义tag要大于此tag
     };
     SARibbonActionsManager(QObject *p = nullptr);
     ~SARibbonActionsManager();
@@ -36,7 +43,7 @@ public:
     QString tagName(int tag) const;
 
     //注册action
-    bool registeAction(QAction *act, int tag, const QString& key = QString());
+    bool registeAction(QAction *act, int tag, const QString& key = QString(), bool enableEmit = true);
 
     //取消action的注册
     void unregisteAction(QAction *act, bool enableEmit = true);
@@ -59,6 +66,18 @@ public:
 
     //返回所有管理的action数
     int count() const;
+
+    //返回所有管理的actions
+    QList<QAction *> allActions() const;
+
+    //自动加载action,返回tag对应的Category指针
+    QMap<int, SARibbonCategory *> autoRegisteActions(SARibbonMainWindow *w);
+
+    //自动加载widget下的actions函数返回的action,返回加载的数量，这些
+    QSet<QAction *> autoRegisteWidgetActions(QWidget *w, int tag, bool enableEmit = false);
+
+    //根据标题查找action
+    QList<QAction *> search(const QString& text);
 
 signals:
 
@@ -98,6 +117,7 @@ public:
     void setupActionsManager(SARibbonActionsManager *m);
     void uninstallActionsManager();
     QAction *indexToAction(QModelIndex index) const;
+    void search(const QString& text);
 
 private slots:
     void onActionTagChanged(int tag, bool isdelete);

@@ -27,6 +27,13 @@ public:
     SARibbonCategory(QWidget *parent);
     ~SARibbonCategory();
 
+    //category的名字
+    QString categoryName() const;
+
+    //设置category名字，等同setWindowTitle
+    void setCategoryName(const QString& title);
+
+    //布局模式
     SARibbonPannel::PannelLayoutMode ribbonPannelLayoutMode() const;
 
     //添加pannel

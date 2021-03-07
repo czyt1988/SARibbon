@@ -82,7 +82,7 @@ MainWindow::MainWindow(QWidget *par) : SARibbonMainWindow(par)
     QAction *customize = new QAction(QIcon(":/icon/icon/chartDataManager.png"), "customize", this);
 
     quickAccessBar->addAction(customize);
-
+    m_actMgr->autoRegisteActions(this);
     connect(customize, &QAction::triggered, this, [&]() {
         if (nullptr == m_customizeWidget) {
             m_customizeWidget = new SARibbonCustomizeWidget(this, this, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint | Qt::Dialog);
@@ -128,17 +128,28 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
     cost.start();
     SARibbonToolButton *btn;
     SARibbonMenu *menu = new SARibbonMenu(this);
+    QAction *a = nullptr;
 
-    menu->addAction(QIcon(":/icon/icon/folder.png"), QStringLiteral("1111111"));
-    menu->addAction(QIcon(":/icon/icon/folder.png"), QStringLiteral("1"));
-    menu->addAction(QIcon(":/icon/icon/folder.png"), QStringLiteral("11"));
-    menu->addAction(QIcon(":/icon/icon/folder.png"), QStringLiteral("111"));
-    menu->addAction(QIcon(":/icon/icon/folder.png"), QStringLiteral("11111"));
-    menu->addAction(QIcon(":/icon/icon/folder.png"), QStringLiteral("1111111"));
-    menu->addAction(QIcon(":/icon/icon/folder.png"), QStringLiteral("11111111"));
-    menu->addAction(QIcon(":/icon/icon/folder.png"), QStringLiteral("1111111111"));
-    menu->addAction(QIcon(":/icon/icon/folder.png"), QStringLiteral("1111111111111"));
-    menu->addAction(QIcon(":/icon/icon/folder.png"), QStringLiteral("1111111111111111111111111111"));
+    a = menu->addAction(QIcon(":/icon/icon/folder.png"), QStringLiteral("item 1"));
+    a->setObjectName(QStringLiteral("item 1"));
+    a = menu->addAction(QIcon(":/icon/icon/folder.png"), QStringLiteral("item 2"));
+    a->setObjectName(QStringLiteral("item 2"));
+    a = menu->addAction(QIcon(":/icon/icon/folder.png"), QStringLiteral("item 3"));
+    a->setObjectName(QStringLiteral("item 3"));
+    a = menu->addAction(QIcon(":/icon/icon/folder.png"), QStringLiteral("item 4"));
+    a->setObjectName(QStringLiteral("item 4"));
+    a = menu->addAction(QIcon(":/icon/icon/folder.png"), QStringLiteral("item 5"));
+    a->setObjectName(QStringLiteral("item 5"));
+    a = menu->addAction(QIcon(":/icon/icon/folder.png"), QStringLiteral("item 6"));
+    a->setObjectName(QStringLiteral("item 6"));
+    a = menu->addAction(QIcon(":/icon/icon/folder.png"), QStringLiteral("item 7"));
+    a->setObjectName(QStringLiteral("item 7"));
+    a = menu->addAction(QIcon(":/icon/icon/folder.png"), QStringLiteral("item 8"));
+    a->setObjectName(QStringLiteral("item 8"));
+    a = menu->addAction(QIcon(":/icon/icon/folder.png"), QStringLiteral("item 9"));
+    a->setObjectName(QStringLiteral("item 9"));
+    a = menu->addAction(QIcon(":/icon/icon/folder.png"), QStringLiteral("item 10"));
+    a->setObjectName(QStringLiteral("item 10"));
 
     int lastTimes = 0;
     SARibbonPannel *pannel = page->addPannel(QStringLiteral("Panel 1"));
@@ -147,6 +158,7 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
 
     QAction *act = new QAction(this);
 
+    act->setObjectName(QStringLiteral("Save"));
     act->setIcon(QIcon(":/icon/icon/save.png"));
     act->setText(QStringLiteral("Save"));
     act->setShortcut(QKeySequence(QLatin1String("Ctrl+S")));
@@ -158,6 +170,7 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
     PRINT_COST(cost, lastTimes, "add 1 Large Action");
 
     act = new QAction(this);
+    act->setObjectName(QStringLiteral("hide ribbon"));
     act->setIcon(QIcon(":/icon/icon/save.png"));
     act->setText(QStringLiteral("hide ribbon"));
     act->setCheckable(true);
@@ -167,6 +180,7 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
     });
 
     act = new QAction(this);
+    act->setObjectName(QStringLiteral("show hide button"));
     act->setIcon(QIcon(":/icon/icon/save.png"));
     act->setText(QStringLiteral("show hide button"));
     act->setCheckable(true);
@@ -178,20 +192,24 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
     QRadioButton *r = new QRadioButton();
 
     r->setText(QStringLiteral("use office style"));
+    r->setObjectName(QStringLiteral("use office style"));
     r->setChecked(true);
     pannel->addSmallWidget(r);
     g->addButton(r, SARibbonBar::OfficeStyle);
     r = new QRadioButton();
+    r->setObjectName(QStringLiteral("use wps style"));
     r->setText(QStringLiteral("use wps style"));
     r->setChecked(false);
     pannel->addSmallWidget(r);
     g->addButton(r, SARibbonBar::WpsLiteStyle);
     r = new QRadioButton();
+    r->setObjectName(QStringLiteral("use office 2row style"));
     r->setText(QStringLiteral("use office 2row style"));
     r->setChecked(false);
     pannel->addSmallWidget(r);
     g->addButton(r, SARibbonBar::OfficeStyleTwoRow);
     r = new QRadioButton();
+    r->setObjectName(QStringLiteral("use wps 2row style"));
     r->setText(QStringLiteral("use wps 2row style"));
     r->setChecked(false);
     pannel->addSmallWidget(r);
@@ -200,15 +218,17 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
     connect(g, QOverload<int>::of(&QButtonGroup::buttonClicked), this, &MainWindow::onStyleClicked);
 
     act = new QAction(this);
+    act->setObjectName(QStringLiteral("test 1"));
     act->setIcon(QIcon(":/icon/icon/folder.png"));
-    act->setText(QStringLiteral("test 3"));
+    act->setText(QStringLiteral("test 1"));
     act->setMenu(menu);
     btn = pannel->addSmallAction(act);
     btn->setPopupMode(QToolButton::MenuButtonPopup);
 
     act = new QAction(this);
+    act->setObjectName(QStringLiteral("test 2"));
     act->setIcon(QIcon(":/icon/icon/folder.png"));
-    act->setText(QStringLiteral("test 4"));
+    act->setText(QStringLiteral("test 2"));
     act->setMenu(menu);
     btn = pannel->addSmallAction(act);
     btn->setPopupMode(QToolButton::InstantPopup);
@@ -218,6 +238,7 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
 
 
     act = new QAction(this);
+    act->setObjectName(QStringLiteral("DelayedPopup"));
     act->setIcon(QIcon(":/icon/icon/folder.png"));
     act->setText(QStringLiteral("DelayedPopup"));
     act->setMenu(menu);
