@@ -69,13 +69,21 @@ public:
     //转换为xml
     bool toXml(QXmlStreamWriter *xml) const;
 
+    //从xml中加载QList<SARibbonCustomizeData>，对于基于配置文件的设置，对话框显示前建议调用此函数，保证叠加设置的正确记录
+    void fromXml(QXmlStreamReader *xml);
+    void fromXml(const QString& xmlpath);
+
     //应用xml配置，可以结合customize_datas_from_xml和customize_datas_apply函数
     static bool fromXml(QXmlStreamReader *xml, SARibbonMainWindow *w, SARibbonActionsManager *mgr);
 
     //清除所有动作，在执行applys函数后，如果要继续调用，应该clear，否则会导致异常
     void clear();
 
+
 protected:
+    // TODO 简化，把QList<SARibbonCustomizeData>进行裁剪,把一些动作合并
+    // void simplify();
+
     SARibbonPannelItem::RowProportion selectedRowProportion() const;
 
     QAction *selectedAction() const;
