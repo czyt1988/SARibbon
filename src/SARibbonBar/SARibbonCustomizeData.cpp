@@ -7,22 +7,40 @@
 
 
 SARibbonCustomizeData::SARibbonCustomizeData()
-    : m_type(UnknowActionType)
+    : indexValue(-1)
+    , actionRowProportionValue(SARibbonPannelItem::Large)
+    , m_type(UnknowActionType)
     , m_actionsManagerPointer(nullptr)
 {
 }
 
 
 SARibbonCustomizeData::SARibbonCustomizeData(ActionType type, SARibbonActionsManager *mgr)
-    : m_type(type)
+    : indexValue(-1)
+    , actionRowProportionValue(SARibbonPannelItem::Large)
+    , m_type(type)
     , m_actionsManagerPointer(mgr)
 {
 }
 
 
+/**
+ * @brief 获取CustomizeData的action type
+ * @return
+ */
 SARibbonCustomizeData::ActionType SARibbonCustomizeData::actionType() const
 {
     return (m_type);
+}
+
+
+/**
+ * @brief 设置CustomizeData的action type
+ * @param a
+ */
+void SARibbonCustomizeData::setActionType(SARibbonCustomizeData::ActionType a)
+{
+    m_type = a;
 }
 
 
@@ -239,6 +257,26 @@ bool SARibbonCustomizeData::apply(SARibbonMainWindow *m) const
         break;
     }
     return (false);
+}
+
+
+/**
+ * @brief 获取actionmanager指针
+ * @return
+ */
+SARibbonActionsManager *SARibbonCustomizeData::actionManager()
+{
+    return (m_actionsManagerPointer);
+}
+
+
+/**
+ * @brief 设置ActionsManager
+ * @param mgr
+ */
+void SARibbonCustomizeData::setActionsManager(SARibbonActionsManager *mgr)
+{
+    m_actionsManagerPointer = mgr;
 }
 
 

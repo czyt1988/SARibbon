@@ -32,12 +32,20 @@ public:
     //获取CustomizeData的action type
     ActionType actionType() const;
 
+    //设置CustomizeData的action type
+    void setActionType(ActionType a);
+
     //判断是否是一个正常的CustomizeData
     bool isValid() const;
 
     //应用SARibbonCustomizeData
     bool apply(SARibbonMainWindow *m) const;
 
+    //获取actionmanager指针
+    SARibbonActionsManager *actionManager();
+
+    //设置ActionsManager
+    void setActionsManager(SARibbonActionsManager *mgr);
 
     //对应AddCategoryActionType
     static SARibbonCustomizeData makeAddCategoryCustomizeData(const QString& title
