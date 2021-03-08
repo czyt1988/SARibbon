@@ -24,6 +24,8 @@
 #include "SARibbonCustomizeWidget.h"
 #include <QCalendarWidget>
 #include "SARibbonCustomizeDialog.h"
+#include <QXmlStreamWriter>
+#include <QTextStream>
 #define PRINT_COST(ElapsedTimer, LastTime, STR)					      \
     do{									      \
         int ___TMP_INT = ElapsedTimer.elapsed();			      \
@@ -102,6 +104,25 @@ MainWindow::MainWindow(QWidget *par) : SARibbonMainWindow(par)
         dlg.setupActionsManager(m_actMgr);
         if (SARibbonCustomizeDialog::Accepted == dlg.exec()) {
             dlg.applys();
+            QByteArray str;
+            QXmlStreamWriter xml(&str);
+            xml.setAutoFormatting(true);
+            xml.setAutoFormattingIndent(2);
+            xml.setCodec("utf-8");
+            xml.writeStartDocument();
+            bool isok = dlg.toXml(&xml);
+            xml.writeEndDocument();
+            if (isok) {
+                QFile f("customize.xml");
+                if (f.open(QIODevice::ReadWrite|QIODevice::Text|QIODevice::Truncate)) {
+                    QTextStream s(&f);
+                    s.setCodec("utf-8");
+                    s << str;
+                    s.flush();
+                }
+                m_edit->append("write xml:");
+                m_edit->append(str);
+            }
         }
     });
     //
@@ -391,8 +412,9 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
 void MainWindow::createCategoryOther(SARibbonCategory *page)
 {
     SARibbonMenu *menu = new SARibbonMenu(this);
-    QAction *item = menu->addAction(QIcon(":/icon/icon/folder.png"), QStringLiteral("1111111"));
+    QAction *item = menu->addAction(QIcon(":/icon/icon/folder.png"), QStringLiteral("menu item test"));
 
+    item->setObjectName(QStringLiteral("menu item test"));
     menu->addAction(QIcon(":/icon/icon/folder.png"), QStringLiteral("1"));
     menu->addAction(QIcon(":/icon/icon/folder.png"), QStringLiteral("2"));
     menu->addAction(QIcon(":/icon/icon/folder.png"), QStringLiteral("3"));
@@ -449,12 +471,14 @@ void MainWindow::createCategoryOther(SARibbonCategory *page)
     }
     QAction *optAct = new QAction(this);
 
+    optAct->setObjectName(QStringLiteral("debug"));
     pannel->addOptionAction(optAct);
     pannel->setObjectName("debug");
 
     pannel->addSeparator();
     QAction *appBtn = new QAction(QIcon(":/icon/icon/icon2.png"), tr("no application button and very long word test"), this);
 
+    appBtn->setObjectName(QStringLiteral("no application button and very long word test"));
     appBtn->setCheckable(true);
     connect(appBtn, &QAction::toggled, this, [&](bool b) {
         if (b) {
@@ -469,6 +493,7 @@ void MainWindow::createCategoryOther(SARibbonCategory *page)
 
     QAction *useqss = new QAction(QIcon(":/icon/icon/icon2.png"), tr("use qss"), this);
 
+    useqss->setObjectName(QStringLiteral("use qss"));
     pannel->addLargeAction(useqss);
     connect(useqss, &QAction::triggered, this, [&]() {
         QFile f("ribbon.qss");
@@ -477,6 +502,18 @@ void MainWindow::createCategoryOther(SARibbonCategory *page)
         }
         QString qss(f.readAll());
         this->ribbonBar()->setStyleSheet(qss);
+    });
+
+    QAction *useCustomize = new QAction(QIcon(":/icon/icon/506407.png"), tr("use customize from xml file"), this);
+
+    useCustomize->setObjectName(QStringLiteral("useCustomize"));
+    pannel->addLargeAction(useCustomize);
+    connect(useCustomize, &QAction::triggered, this, [&]() {
+        //只能调用一次
+        static bool has_call = false;
+        if (!has_call) {
+            has_call = sa_apply_customize_from_xml_file("customize.xml", this, m_actMgr);
+        }
     });
 }
 

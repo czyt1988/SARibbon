@@ -62,6 +62,12 @@ SARibbonCustomizeDialog::SARibbonCustomizeDialog(SARibbonMainWindow *ribbonWindo
 }
 
 
+/**
+ * @brief 设置action管理器
+ *
+ * 等同@ref SARibbonCustomizeWidget::setupActionsManager
+ * @param mgr
+ */
 void SARibbonCustomizeDialog::setupActionsManager(SARibbonActionsManager *mgr)
 {
     ui->customWidget->setupActionsManager(mgr);
@@ -75,7 +81,50 @@ void SARibbonCustomizeDialog::initConnection()
 }
 
 
+/**
+ * @brief 等同SARibbonCustomizeWidget::applys
+ *
+ * @ref SARibbonCustomizeWidget::applys
+ * @return
+ */
 bool SARibbonCustomizeDialog::applys()
 {
     return (ui->customWidget->applys());
+}
+
+
+/**
+ * @brief 清除所有动作
+ *
+ * @ref SARibbonCustomizeWidget::clear
+ */
+void SARibbonCustomizeDialog::clear()
+{
+    ui->customWidget->clear();
+}
+
+
+/**
+ * @brief 转换为xml
+ *
+ * @ref SARibbonCustomizeWidget::toXml
+ * @param xml
+ * @return
+ */
+bool SARibbonCustomizeDialog::toXml(QXmlStreamWriter *xml) const
+{
+    return (ui->customWidget->toXml(xml));
+}
+
+
+/**
+ * @brief 返回SARibbonCustomizeWidget窗口指针
+ *
+ * 通过SARibbonCustomizeWidget窗口可以操作更多的内容
+ *
+ * @return SARibbonCustomizeWidget指针，参考@ref SARibbonCustomizeWidget
+ */
+SARibbonCustomizeWidget *SARibbonCustomizeDialog::customizeWidget() const
+{
+    return (ui->customWidget);
 }

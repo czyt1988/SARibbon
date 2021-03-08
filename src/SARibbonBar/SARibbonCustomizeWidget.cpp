@@ -23,12 +23,134 @@
 #include <QInputDialog>
 #include <QLineEdit>
 #include <QDateTime>
+#include <QXmlStreamWriter>
+#include <QXmlStreamReader>
 #include "SARibbonCustomizeData.h"
 #include "SARibbonBar.h"
-
+#include <QFile>
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///SARibbonCustomizeWidget
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
+bool sa_customize_datas_to_xml(QXmlStreamWriter *xml, const QList<SARibbonCustomizeData>& cds)
+{
+    if (cds.size() <= 0) {
+        return (false);
+    }
+
+    xml->writeStartElement("sa-ribbon-customize");
+    for (const SARibbonCustomizeData& d : cds)
+    {
+        xml->writeStartElement("customize-data");
+        xml->writeAttribute("type", QString::number(d.actionType()));
+        xml->writeAttribute("index", QString::number(d.indexValue));
+        xml->writeAttribute("key", d.keyValue);
+        xml->writeAttribute("category", d.categoryObjNameValue);
+        xml->writeAttribute("pannel", d.pannelObjNameValue);
+        xml->writeAttribute("row-prop", QString::number(d.actionRowProportionValue));
+        xml->writeEndElement();
+    }
+    xml->writeEndElement();
+    if (xml->hasError()) {
+        qWarning() << "write has error";
+    }
+    return (true);
+}
+
+
+QList<SARibbonCustomizeData> sa_customize_datas_from_xml(QXmlStreamReader *xml, SARibbonActionsManager *mgr)
+{
+    //先找到"sa-ribbon-customize"
+    while (!xml->atEnd())
+    {
+        qDebug()<<"name:" << xml->name() << " qualifiedName:" << xml->qualifiedName();
+
+        if (xml->isStartElement() && (xml->name() == "sa-ribbon-customize")) {
+            break;
+        }
+        xml->readNext();
+    }
+    QList<SARibbonCustomizeData> res;
+
+    //开始遍历"customize-data"
+    while (!xml->atEnd())
+    {
+        if (xml->isStartElement() && (xml->name() == "customize-data")) {
+            //首先读取属性type
+            SARibbonCustomizeData d;
+            QXmlStreamAttributes attrs = xml->attributes();
+            if (!attrs.hasAttribute("type")) {
+                //说明异常，跳过这个
+                xml->readNextStartElement();
+                continue;
+            }
+            bool isOk = false;
+            int v = xml->attributes().value("type").toInt(&isOk);
+            if (!isOk) {
+                //说明异常，跳过这个
+                xml->readNextStartElement();
+                continue;
+            }
+            d.setActionType(static_cast<SARibbonCustomizeData::ActionType>(v));
+            //开始读取子对象
+            if (attrs.hasAttribute("index")) {
+                v = xml->attributes().value("index").toInt(&isOk);
+                if (isOk) {
+                    d.indexValue = v;
+                }
+            }
+            if (attrs.hasAttribute("key")) {
+                d.keyValue = attrs.value("key").toString();
+            }
+            if (attrs.hasAttribute("category")) {
+                d.categoryObjNameValue = attrs.value("category").toString();
+            }
+            if (attrs.hasAttribute("pannel")) {
+                d.pannelObjNameValue = attrs.value("pannel").toString();
+            }
+            if (attrs.hasAttribute("row-prop")) {
+                v = xml->attributes().value("row-prop").toInt(&isOk);
+                if (isOk) {
+                    d.actionRowProportionValue = static_cast<SARibbonPannelItem::RowProportion>(v);
+                }
+            }
+            d.setActionsManager(mgr);
+            res.append(d);
+        }
+        xml->readNext();
+    }
+    if (xml->hasError()) {
+        qWarning() << xml->errorString();
+    }
+    return (res);
+}
+
+
+int sa_customize_datas_apply(const QList<SARibbonCustomizeData>& cds, SARibbonMainWindow *w)
+{
+    int c = 0;
+
+    for (const SARibbonCustomizeData& d : cds)
+    {
+        if (d.apply(w)) {
+            ++c;
+        }
+    }
+    return (c);
+}
+
+
+bool sa_apply_customize_from_xml_file(const QString& filePath, SARibbonMainWindow *w, SARibbonActionsManager *mgr)
+{
+    QFile f(filePath);
+
+    if (!f.open(QIODevice::ReadOnly|QIODevice::Text)) {
+        return (false);
+    }
+    f.seek(0);
+    QXmlStreamReader xml(&f);
+
+    return (SARibbonCustomizeWidget::fromXml(&xml, w, mgr));
+}
 
 
 /**
@@ -660,14 +782,93 @@ void SARibbonCustomizeWidget::updateModel(RibbonTreeShowType type)
  */
 bool SARibbonCustomizeWidget::applys()
 {
-    bool isSucc = false;
+    return (sa_customize_datas_apply(m_d->mCustomizeDatas, m_d->mRibbonWindow) > 0);
+}
 
-    for (SARibbonCustomizeData& d : m_d->mCustomizeDatas)
-    {
-        isSucc |= (d.apply(m_d->mRibbonWindow));
-    }
-    qDebug() << "applys "<<m_d->mCustomizeDatas.size() << " customize data";
-    return (isSucc);
+
+/**
+ * @brief 转换为xml
+ *
+ * 此函数仅会写element，不会写document相关内容，因此如果需要写document，
+ * 需要在此函数前调用QXmlStreamWriter::writeStartDocument(),在此函数后调用QXmlStreamWriter::writeEndDocument()
+ *
+ * @note 注意，在传入QXmlStreamWriter之前，需要设置编码为utf-8:xml->setCodec("utf-8");
+ * @note 由于QXmlStreamWriter在QString作为io时，是不支持编码的，而此又无法保证自定义过程不出现中文字符，
+ * 因此，QXmlStreamWriter不应该通过QString进行构造，如果需要用到string，也需要通过QByteArray构造，如：
+ * @code
+ * SARibbonCustomizeDialog dlg(this);//this为SARibbonMainWindow的窗口
+ * dlg.setupActionsManager(m_actMgr);
+ * if (SARibbonCustomizeDialog::Accepted == dlg.exec()) {
+ *    dlg.applys();
+ *    QByteArray str;
+ *    QXmlStreamWriter xml(&str);//QXmlStreamWriter不建议通过QString构造，遇到中文会异常
+ *    xml.setAutoFormatting(true);
+ *    xml.setAutoFormattingIndent(2);
+ *    xml.setCodec("utf-8");//在writeStartDocument之前指定编码
+ *    xml.writeStartDocument();
+ *    bool isok = dlg.toXml(&xml);
+ *    xml.writeEndDocument();
+ *    if (isok) {
+ *        QFile f("customize.xml");
+ *        if (f.open(QIODevice::ReadWrite|QIODevice::Text|QIODevice::Truncate)) {
+ *            QTextStream s(&f);
+ *            s.setCodec("utf-8");//指定编码输出
+ *            s << str;
+ *            s.flush();
+ *        }
+ *        m_edit->append("write xml:");//m_edit的定义为：QTextEdit *m_edit;
+ *        m_edit->append(str);
+ *    }
+ * }
+ * @endcode
+ * @return 如果出现异常，返回false,如果没有自定义数据也会返回false
+ * @see sa_customize_datas_to_xml
+ */
+bool SARibbonCustomizeWidget::toXml(QXmlStreamWriter *xml) const
+{
+    return (sa_customize_datas_to_xml(xml, m_d->mCustomizeDatas));
+}
+
+
+/**
+ * @brief 应用xml配置
+ *
+ * @note 重复加载一个配置文件会发生异常，为了避免此类事件发生，一般通过一个变量保证只加载一次，如：
+ * @code
+ * //只能调用一次
+ * static bool has_call = false;
+ * if (!has_call) {
+ *     QFile f("customize.xml");
+ *     if (!f.open(QIODevice::ReadWrite|QIODevice::Text)) {
+ *         return;
+ *     }
+ *     f.seek(0);
+ *     QXmlStreamReader xml(&f);
+ *     has_call = SARibbonCustomizeWidget::fromXml(&xml, this, m_actMgr);
+ * }
+ * @endcode
+ * @param xml
+ * @param w
+ * @return 所有设定有一个应用成功都会返回true
+ * @see sa_customize_datas_from_xml sa_customize_datas_apply sa_apply_customize_from_xml_file
+ */
+bool SARibbonCustomizeWidget::fromXml(QXmlStreamReader *xml, SARibbonMainWindow *w, SARibbonActionsManager *mgr)
+{
+    //先找到sa-ribbon-customize标签
+    QList<SARibbonCustomizeData> cds = sa_customize_datas_from_xml(xml, mgr);
+
+    return (sa_customize_datas_apply(cds, w) > 0);
+}
+
+
+/**
+ * @brief 清除所有动作
+ *
+ * 在执行applys函数后，如果要继续调用，应该clear，否则会导致异常
+ */
+void SARibbonCustomizeWidget::clear()
+{
+    m_d->mCustomizeDatas.clear();
 }
 
 

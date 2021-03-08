@@ -4,7 +4,7 @@
 #include <QWidget>
 #include "SARibbonActionsManager.h"
 #include "SARibbonPannel.h"
-
+#include "SARibbonCustomizeData.h"
 
 //SARibbonCustomizeWidget 特有
 class SARibbonCustomizeWidgetUi;
@@ -13,7 +13,9 @@ class SARibbonMainWindow;
 class QStandardItemModel;
 class QStandardItem;
 class QAbstractButton;
-
+//
+class QXmlStreamWriter;
+class QXmlStreamReader;
 
 /**
  * @brief 自定义界面窗口
@@ -63,6 +65,15 @@ public:
 
     //应用所有的设定
     bool applys();
+
+    //转换为xml
+    bool toXml(QXmlStreamWriter *xml) const;
+
+    //应用xml配置，可以结合customize_datas_from_xml和customize_datas_apply函数
+    static bool fromXml(QXmlStreamReader *xml, SARibbonMainWindow *w, SARibbonActionsManager *mgr);
+
+    //清除所有动作，在执行applys函数后，如果要继续调用，应该clear，否则会导致异常
+    void clear();
 
 protected:
     SARibbonPannelItem::RowProportion selectedRowProportion() const;
@@ -117,5 +128,49 @@ private:
 };
 
 
+/**
+ * @brief 转换为xml
+ *
+ * 此函数仅会写element，不会写document相关内容，因此如果需要写document，
+ * 需要在此函数前调用QXmlStreamWriter::writeStartDocument(),在此函数后调用QXmlStreamWriter::writeEndDocument()
+ * @param xml QXmlStreamWriter指针
+ * @note 注意，在传入QXmlStreamWriter之前，需要设置编码为utf-8:xml->setCodec("utf-8");
+ * @note 由于QXmlStreamWriter在QString作为io时，是不支持编码的，而此又无法保证自定义过程不出现中文字符，
+ * 因此，QXmlStreamWriter不应该通过QString进行构造，如果需要用到string，也需要通过QByteArray构造，如：
+ * @param cds 基于QList<SARibbonCustomizeData>生成的步骤
+ * @return 如果出现异常，返回false,如果没有自定义数据也会返回false
+ */
+bool SA_RIBBON_EXPORT sa_customize_datas_to_xml(QXmlStreamWriter *xml, const QList<SARibbonCustomizeData>& cds);
+
+/**
+ * @brief 通过xml获取QList<SARibbonCustomizeData>
+ * @param xml
+ * @return QList<SARibbonCustomizeData>
+ */
+QList<SARibbonCustomizeData> SA_RIBBON_EXPORT sa_customize_datas_from_xml(QXmlStreamReader *xml, SARibbonActionsManager *mgr);
+
+/**
+ * @brief 应用QList<SARibbonCustomizeData>
+ * @param cds
+ * @param w SARibbonMainWindow指针
+ * @return 成功应用的个数
+ */
+int SA_RIBBON_EXPORT sa_customize_datas_apply(const QList<SARibbonCustomizeData>& cds, SARibbonMainWindow *w);
+
+/**
+ * @brief 直接加载xml自定义ribbon配置文件用于ribbon的自定义显示
+ * @param filePath xml配置文件
+ * @param w 主窗体
+ * @param mgr action管理器
+ * @return 成功返回true
+ * @note 重复加载一个配置文件会发生异常，为了避免此类事件发生，一般通过一个变量保证只加载一次，如：
+ * @code
+ * static bool has_call = false;
+ * if (!has_call) {
+ *     has_call = sa_apply_customize_from_xml_file("customize.xml", this, m_actMgr);
+ * }
+ * @endcode
+ */
+bool SA_RIBBON_EXPORT sa_apply_customize_from_xml_file(const QString& filePath, SARibbonMainWindow *w, SARibbonActionsManager *mgr);
 
 #endif // SARIBBONCUSTOMIZEWIDGET_H
