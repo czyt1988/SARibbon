@@ -118,6 +118,26 @@ bool SARibbonCustomizeDialog::toXml(QXmlStreamWriter *xml) const
 
 
 /**
+ * @brief 等同SARibbonCustomizeWidget::fromXml
+ * @param xml
+ */
+void SARibbonCustomizeDialog::fromXml(QXmlStreamReader *xml)
+{
+    ui->customWidget->fromXml(xml);
+}
+
+
+/**
+ * @brief 等同SARibbonCustomizeWidget::fromXml
+ * @param xmlpath
+ */
+void SARibbonCustomizeDialog::fromXml(const QString& xmlpath)
+{
+    ui->customWidget->fromXml(xmlpath);
+}
+
+
+/**
  * @brief 返回SARibbonCustomizeWidget窗口指针
  *
  * 通过SARibbonCustomizeWidget窗口可以操作更多的内容

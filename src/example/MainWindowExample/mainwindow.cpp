@@ -102,6 +102,7 @@ MainWindow::MainWindow(QWidget *par) : SARibbonMainWindow(par)
     connect(customize2, &QAction::triggered, this, [&]() {
         SARibbonCustomizeDialog dlg(this);
         dlg.setupActionsManager(m_actMgr);
+        dlg.fromXml("customize.xml");
         if (SARibbonCustomizeDialog::Accepted == dlg.exec()) {
             dlg.applys();
             QByteArray str;

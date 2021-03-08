@@ -831,6 +831,43 @@ bool SARibbonCustomizeWidget::toXml(QXmlStreamWriter *xml) const
 
 
 /**
+ * @brief 从xml中加载QList<SARibbonCustomizeData>
+ *
+ * 对于基于配置文件的设置，对话框显示前建议调用此函数，保证叠加设置的正确记录
+ * @param xml
+ * @return
+ * @note 此函数要在@ref setupActionsManager 函数之后调用
+ */
+void SARibbonCustomizeWidget::fromXml(QXmlStreamReader *xml)
+{
+    QList<SARibbonCustomizeData> cds = sa_customize_datas_from_xml(xml, m_d->mActionMgr);
+
+    m_d->mCustomizeDatas = cds;
+}
+
+
+/**
+ * @brief 从xml中加载QList<SARibbonCustomizeData>
+ *
+ * 对于基于配置文件的设置，对话框显示前建议调用此函数，保证叠加设置的正确记录
+ * @param xmlpath
+ * @note 此函数要在@ref setupActionsManager 函数之后调用
+ */
+void SARibbonCustomizeWidget::fromXml(const QString& xmlpath)
+{
+    QFile f(xmlpath);
+
+    if (!f.open(QIODevice::ReadOnly|QIODevice::Text)) {
+        return;
+    }
+    f.seek(0);
+    QXmlStreamReader xml(&f);
+
+    fromXml(&xml);
+}
+
+
+/**
  * @brief 应用xml配置
  *
  * @note 重复加载一个配置文件会发生异常，为了避免此类事件发生，一般通过一个变量保证只加载一次，如：
