@@ -118,6 +118,18 @@ bool SARibbonCustomizeDialog::toXml(QXmlStreamWriter *xml) const
 
 
 /**
+ * @brief 等同SARibbonCustomizeWidget::toXml
+ * @ref SARibbonCustomizeWidget::toXml
+ * @param xmlpath
+ * @return
+ */
+bool SARibbonCustomizeDialog::toXml(const QString& xmlpath) const
+{
+    return (ui->customWidget->toXml(xmlpath));
+}
+
+
+/**
  * @brief 等同SARibbonCustomizeWidget::fromXml
  * @param xml
  */

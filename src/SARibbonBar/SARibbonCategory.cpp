@@ -526,6 +526,7 @@ SARibbonPannel *SARibbonCategoryPrivate::insertPannel(const QString& title, int 
     pannel->setObjectName(title);
     pannel->setPannelLayoutMode(ribbonPannelLayoutMode());
     pannel->installEventFilter(mParent);
+    pannel->setVisible(true);
     insertPannel(index, pannel);
     return (pannel);
 }

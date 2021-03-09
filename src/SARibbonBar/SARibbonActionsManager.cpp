@@ -12,7 +12,7 @@ public:
     QMap<int, QString> mTagToName;                  ///< tag对应的名字
     QHash<QString, QAction *> mKeyToAction;         ///< key对应action
     QMap<QAction *, QString> mActionToKey;          ///< action对应key
-
+    QMap<int, SARibbonCategory *> mTagToCategory;   ///< 仅仅在autoRegisteActions函数会有用
     int mSale;                                      ///< 盐用于生成固定的id，在用户不主动设置key时，id基于msale生成，只要SARibbonActionsManager的调用registeAction顺序不变，生成的id都不变，因为它是基于自增实现的
     SARibbonActionsManagerPrivate(SARibbonActionsManager *p);
 };
@@ -56,6 +56,44 @@ void SARibbonActionsManager::setTagName(int tag, const QString& name)
 QString SARibbonActionsManager::tagName(int tag) const
 {
     return (m_d->mTagToName.value(tag, ""));
+}
+
+
+/**
+ * @brief 移除tag
+ * @note 注意，这个函数非常耗时
+ * @param tag
+ */
+void SARibbonActionsManager::removeTag(int tag)
+{
+    QList<QAction *> oldacts = actions(tag);
+
+    //开始移除
+    m_d->mTagToActions.remove(tag);
+    m_d->mTagToName.remove(tag);
+    //开始查找需要移出总表的action
+    QList<QAction *> needRemoveAct;
+    QList<QAction *> total;
+
+    for (auto i = m_d->mTagToActions.begin(); i != m_d->mTagToActions.end(); ++i)
+    {
+        total += i.value();
+    }
+    for (QAction *a : oldacts)
+    {
+        if (!total.contains(a)) {
+            needRemoveAct.append(a);
+        }
+    }
+    //从总表移除action
+    for (QAction *a:needRemoveAct)
+    {
+        auto i = m_d->mActionToKey.find(a);
+        if (i != m_d->mActionToKey.end()) {
+            m_d->mKeyToAction.remove(i.value());
+            m_d->mActionToKey.erase(i);
+        }
+    }
 }
 
 
@@ -310,6 +348,12 @@ QMap<int, SARibbonCategory *> SARibbonActionsManager::autoRegisteActions(SARibbo
     if (notincategory.size() > 0) {
         setTagName(NotInRibbonCategoryTag, tr("not in ribbon"));
     }
+    for (auto i = res.begin(); i != res.end(); ++i)
+    {
+        connect(i.value(), &SARibbonCategory::windowTitleChanged
+            , this, &SARibbonActionsManager::onCategoryTitleChanged);
+    }
+    m_d->mTagToCategory = res;
     return (res);
 }
 
@@ -383,6 +427,26 @@ void SARibbonActionsManager::onActionDestroyed(QObject *o)
     QAction *act = static_cast<QAction *>(o);
 
     removeAction(act, false);
+}
+
+
+/**
+ * @brief autoRegisteActions函数会关联此槽，在标签内容改变时改变tag 对应 文本
+ * @param title
+ */
+void SARibbonActionsManager::onCategoryTitleChanged(const QString& title)
+{
+    SARibbonCategory *c = qobject_cast<SARibbonCategory *>(sender());
+
+    if (nullptr == c) {
+        return;
+    }
+    int tag = m_d->mTagToCategory.key(c, -1);
+
+    if (tag == -1) {
+        return;
+    }
+    setTagName(tag, title);
 }
 
 
