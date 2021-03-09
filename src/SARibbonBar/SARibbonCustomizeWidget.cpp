@@ -388,7 +388,8 @@ public:
     SARibbonCustomizeWidgetPrivate(SARibbonCustomizeWidget *p);
     void updateModel();
 
-    QList<SARibbonCustomizeData> mCustomizeDatas; ///< 记录所有的自定义动作
+    QList<SARibbonCustomizeData> mCustomizeDatas;           ///< 记录所有的自定义动作
+    QList<SARibbonCustomizeData> mOldCustomizeDatas;        ///< 记录旧的自定义动作
     //创建一个随机id，形如：pre_QDateTime::currentMSecsSinceEpoch_suf
     static QString makeRandomObjName(const QString& pre);
 
@@ -826,7 +827,36 @@ bool SARibbonCustomizeWidget::applys()
  */
 bool SARibbonCustomizeWidget::toXml(QXmlStreamWriter *xml) const
 {
-    return (sa_customize_datas_to_xml(xml, m_d->mCustomizeDatas));
+    QList<SARibbonCustomizeData> res;
+
+    res = m_d->mOldCustomizeDatas + m_d->mCustomizeDatas;
+    return (sa_customize_datas_to_xml(xml, res));
+}
+
+
+/**
+ * @brief 把配置写入文件中
+ * @param xmlpath
+ * @return
+ */
+bool SARibbonCustomizeWidget::toXml(const QString& xmlpath) const
+{
+    QFile f(xmlpath);
+
+    if (!f.open(QIODevice::ReadWrite|QIODevice::Truncate|QIODevice::Text)) {
+        return (false);
+    }
+    QXmlStreamWriter xml(&f);
+
+    xml.setAutoFormatting(true);
+    xml.setAutoFormattingIndent(2);
+    xml.setCodec("utf-8");//在writeStartDocument之前指定编码
+    xml.writeStartDocument();
+    bool isOK = toXml(&xml);
+
+    xml.writeEndDocument();
+    f.close();
+    return (isOK);
 }
 
 
@@ -842,7 +872,7 @@ void SARibbonCustomizeWidget::fromXml(QXmlStreamReader *xml)
 {
     QList<SARibbonCustomizeData> cds = sa_customize_datas_from_xml(xml, m_d->mActionMgr);
 
-    m_d->mCustomizeDatas = cds;
+    m_d->mOldCustomizeDatas = cds;
 }
 
 
@@ -852,6 +882,8 @@ void SARibbonCustomizeWidget::fromXml(QXmlStreamReader *xml)
  * 对于基于配置文件的设置，对话框显示前建议调用此函数，保证叠加设置的正确记录
  * @param xmlpath
  * @note 此函数要在@ref setupActionsManager 函数之后调用
+ * @note 如果程序启动后加载了自定义配置，再调用此窗口时需要调用此函数，把原来的配置加载进来，
+ * 在生成新动作时会把旧动作保存，但在调用applys时不会调用此加载的动作
  */
 void SARibbonCustomizeWidget::fromXml(const QString& xmlpath)
 {

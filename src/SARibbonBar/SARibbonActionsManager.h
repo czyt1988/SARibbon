@@ -15,6 +15,26 @@ class SARibbonActionsModelPrivete;
 
 /**
  * @brief 用于管理SARibbon的所有Action
+ *
+ * SARibbonActionsManager维护着两个表，一个是tag（标签）对应的Action list，
+ * 一个是所有接受SARibbonActionsManager管理的action list。
+ *
+ * SARibbonActionsManager的标签对应一组actions，每个标签对应的action可以重复出现，
+ * 但SARibbonActionsManager维护的action list里只有一份action，不会重复出现。
+ *
+ * tag用于对action list分组，每个tag的实体名字通过@ref setTagName 进行设置，在语言变化时需要及时调用
+ * setTagName设置新的标签对应的文本。
+ *
+ * SARibbonActionsManager默认预设了6个常用标签见@ref SARibbonActionsManager::ActionTag ，用户自定义标签需要在
+ * SARibbonActionsManager::UserDefineActionTag值的基础上进行累加。
+ *
+ * @ref filter （等同@ref actions ）函数用于提取标签管理的action list，@ref allActions 函数返回SARibbonActionsManager
+ * 管理的所有标签。
+ *
+ * 通过@ref autoRegisteActions 函数可以快速的建立action的管理，此函数会遍历@ref SARibbonMainWindow 下的所有子object，
+ * 同时遍历SARibbonMainWindow下所有@ref SARibbonPannel 添加的action,并给予Category建立tag，正常使用用户仅需关注此autoRegisteActions函数即可
+ *
+ *
  */
 class SA_RIBBON_EXPORT SARibbonActionsManager : public QObject
 {
@@ -41,6 +61,9 @@ public:
 
     //获取tag对应的名字
     QString tagName(int tag) const;
+
+    //移除tag，注意，这个函数非常耗时
+    void removeTag(int tag);
 
     //注册action
     bool registeAction(QAction *act, int tag, const QString& key = QString(), bool enableEmit = true);
@@ -88,6 +111,7 @@ signals:
 
 private slots:
     void onActionDestroyed(QObject *o);
+    void onCategoryTitleChanged(const QString& title);
 
 private:
     void removeAction(QAction *act, bool enableEmit = true);
