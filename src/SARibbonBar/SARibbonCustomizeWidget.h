@@ -85,8 +85,8 @@ public:
 
 
 protected:
-    // TODO 简化，把QList<SARibbonCustomizeData>进行裁剪,把一些动作合并
-    // void simplify();
+    //把QList<SARibbonCustomizeData>进行裁剪,把一些动作合并
+    void simplify();
 
     SARibbonPannelItem::RowProportion selectedRowProportion() const;
 

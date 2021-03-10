@@ -3,6 +3,8 @@
 #include "SARibbonGlobal.h"
 #include "SARibbonActionsManager.h"
 #include "SARibbonPannel.h"
+#include <QList>
+
 class SARibbonMainWindow;
 
 
@@ -14,18 +16,18 @@ class SA_RIBBON_EXPORT SARibbonCustomizeData {
 public:
     enum ActionType {
         UnknowActionType = 0            ///< 未知操作
-        , AddCategoryActionType         ///< 添加category操作
-        , AddPannelActionType           ///< 添加pannel操作
-        , AddActionActionType           ///< 添加action操作
-        , RemoveCategoryActionType      ///< 删除category操作
-        , RemovePannelActionType        ///< 删除pannel操作
-        , RemoveActionActionType        ///< 删除action操作
-        , ChangeCategoryOrderActionType ///< 改变category顺序的操作
-        , ChangePannelOrderActionType   ///< 改变pannel顺序的操作
-        , ChangeActionOrderActionType   ///< 改变action顺序的操作
-        , RenameCategoryActionType      ///< 对category更名操作
-        , RenamePannelActionType        ///< 对Pannel更名操作
-        , VisibleCategoryActionType     ///< 对category执行隐藏/显示操作
+        , AddCategoryActionType         ///< 添加category操作(1)
+        , AddPannelActionType           ///< 添加pannel操作(2)
+        , AddActionActionType           ///< 添加action操作(3)
+        , RemoveCategoryActionType      ///< 删除category操作(4)
+        , RemovePannelActionType        ///< 删除pannel操作(5)
+        , RemoveActionActionType        ///< 删除action操作(6)
+        , ChangeCategoryOrderActionType ///< 改变category顺序的操作(7)
+        , ChangePannelOrderActionType   ///< 改变pannel顺序的操作(8)
+        , ChangeActionOrderActionType   ///< 改变action顺序的操作(9)
+        , RenameCategoryActionType      ///< 对category更名操作(10)
+        , RenamePannelActionType        ///< 对Pannel更名操作(11)
+        , VisibleCategoryActionType     ///< 对category执行隐藏/显示操作(12)
     };
     SARibbonCustomizeData();
     SARibbonCustomizeData(ActionType type, SARibbonActionsManager *mgr = nullptr);
@@ -111,6 +113,9 @@ public:
     static bool isCanCustomize(QObject *obj);
     static void setCanCustomize(QObject *obj, bool canbe = true);
 
+    //对QList<SARibbonCustomizeData>进行简化
+    static QList<SARibbonCustomizeData> simplify(const QList<SARibbonCustomizeData>& csd);
+
 public:
 
     /**
@@ -148,5 +153,6 @@ private:
 };
 Q_DECLARE_METATYPE(SARibbonCustomizeData)
 
+typedef QList<SARibbonCustomizeData> SARibbonCustomizeDataList;
 
 #endif // SARIBBONCUSTOMIZEDATA_H

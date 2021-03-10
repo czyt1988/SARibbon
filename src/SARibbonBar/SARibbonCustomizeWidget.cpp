@@ -783,6 +783,7 @@ void SARibbonCustomizeWidget::updateModel(RibbonTreeShowType type)
  */
 bool SARibbonCustomizeWidget::applys()
 {
+    simplify();
     return (sa_customize_datas_apply(m_d->mCustomizeDatas, m_d->mRibbonWindow) > 0);
 }
 
@@ -830,6 +831,7 @@ bool SARibbonCustomizeWidget::toXml(QXmlStreamWriter *xml) const
     QList<SARibbonCustomizeData> res;
 
     res = m_d->mOldCustomizeDatas + m_d->mCustomizeDatas;
+    res = SARibbonCustomizeData::simplify(res);
     return (sa_customize_datas_to_xml(xml, res));
 }
 
@@ -938,6 +940,15 @@ bool SARibbonCustomizeWidget::fromXml(QXmlStreamReader *xml, SARibbonMainWindow 
 void SARibbonCustomizeWidget::clear()
 {
     m_d->mCustomizeDatas.clear();
+}
+
+
+/**
+ * @brief 精简
+ */
+void SARibbonCustomizeWidget::simplify()
+{
+    m_d->mCustomizeDatas = SARibbonCustomizeData::simplify(m_d->mCustomizeDatas);
 }
 
 
