@@ -676,9 +676,15 @@ SARibbonCustomizeWidget::~SARibbonCustomizeWidget()
 
 void SARibbonCustomizeWidget::initConnection()
 {
-    connect(ui->comboBoxActionIndex, QOverload<int>::of(&QComboBox::currentIndexChanged)
+//    这个需要qt5.8以上支持
+//    connect(ui->comboBoxActionIndex, QOverload<int>::of(&QComboBox::currentIndexChanged)
+//        , this, &SARibbonCustomizeWidget::onComboBoxActionIndexCurrentIndexChanged);
+    connect(ui->comboBoxActionIndex, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged)
         , this, &SARibbonCustomizeWidget::onComboBoxActionIndexCurrentIndexChanged);
-    connect(ui->radioButtonGroup, QOverload<QAbstractButton *>::of(&QButtonGroup::buttonClicked)
+//    这个需要qt5.8以上支持
+//    connect(ui->radioButtonGroup, QOverload<QAbstractButton *>::of(&QButtonGroup::buttonClicked)
+//        , this, &SARibbonCustomizeWidget::onRadioButtonGroupButtonClicked);
+    connect(ui->radioButtonGroup, static_cast<void (QButtonGroup::*)(QAbstractButton *)>(&QButtonGroup::buttonClicked)
         , this, &SARibbonCustomizeWidget::onRadioButtonGroupButtonClicked);
     connect(ui->pushButtonNewCategory, &QPushButton::clicked
         , this, &SARibbonCustomizeWidget::onPushButtonNewCategoryClicked);

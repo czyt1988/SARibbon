@@ -237,8 +237,8 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
     pannel->addSmallWidget(r);
     g->addButton(r, SARibbonBar::WpsLiteStyleTwoRow);
 
-    connect(g, QOverload<int>::of(&QButtonGroup::buttonClicked), this, &MainWindow::onStyleClicked);
-
+//    connect(g, QOverload<int>::of(&QButtonGroup::buttonClicked), this, &MainWindow::onStyleClicked);
+    connect(g, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked), this, &MainWindow::onStyleClicked);
     act = new QAction(this);
     act->setObjectName(QStringLiteral("test 1"));
     act->setIcon(QIcon(":/icon/icon/folder.png"));
