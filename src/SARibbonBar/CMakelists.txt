@@ -1,4 +1,4 @@
-
+﻿
 set(LIB_NAME SARibbonBar)
 
 set(CMAKE_AUTOMOC ON)
@@ -8,6 +8,7 @@ qt5_add_resources(QRCS resource.qrc)
 
 SET(HEADER_FILES
     FramelessHelper.h
+    SARibbonActionsManager.h
     SARibbonApplicationButton.h
     SARibbonBar.h
     SARibbonButtonGroupWidget.h
@@ -18,6 +19,9 @@ SET(HEADER_FILES
     SARibbonContextCategory.h
     SARibbonControlButton.h
     SARibbonCtrlContainer.h
+    SARibbonCustomizeData.h
+    SARibbonCustomizeDialog.h
+    SARibbonCustomizeWidget.h
     SARibbonDrawHelper.h
     SARibbonElementCreateDelegate.h
     SARibbonElementManager.h
@@ -42,6 +46,7 @@ SET(HEADER_FILES
 
 SET(SOURCE_FILES
     FramelessHelper.cpp
+    SARibbonActionsManager.cpp
     SARibbonApplicationButton.cpp
     SARibbonBar.cpp
     SARibbonButtonGroupWidget.cpp
@@ -52,6 +57,9 @@ SET(SOURCE_FILES
     SARibbonContextCategory.cpp
     SARibbonControlButton.cpp
     SARibbonCtrlContainer.cpp
+    SARibbonCustomizeData.cpp
+    SARibbonCustomizeDialog.cpp
+    SARibbonCustomizeWidget.cpp
     SARibbonDrawHelper.cpp
     SARibbonElementCreateDelegate.cpp
     SARibbonElementManager.cpp
@@ -96,3 +104,24 @@ INSTALL(
 		FILES       ${HEADER_FILES}
 		DESTINATION include
 	)
+
+#=============Copy SARibbonBar Dll FILES to MainWindowExample Project================================
+SET(MainWindowExample_SubProject_DIR ${CMAKE_CURRENT_BINARY_DIR}/../example/MainWindowExample)	#目标目录
+
+SET(SARibbonBar_Debug_DLL_FILE 
+    ${CMAKE_CURRENT_BINARY_DIR}/Debug/${LIB_NAME}d.dll
+)
+SET(SARibbonBar_Release_DLL_FILE 
+    ${CMAKE_CURRENT_BINARY_DIR}/Release/${LIB_NAME}.dll
+)
+
+add_custom_command(TARGET ${LIB_NAME}
+    POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E 
+            make_directory "${MainWindowExample_SubProject_DIR}/$<$<CONFIG:Release>:Release>$<$<CONFIG:Debug>:Debug>/"	#因创建子项目顺序，需先创建目标目录再进行复制操作
+    COMMAND ${CMAKE_COMMAND} -E
+			copy_if_different 
+				"$<$<CONFIG:Release>:${SARibbonBar_Release_DLL_FILE}>" 
+				"$<$<CONFIG:Debug>:${SARibbonBar_Debug_DLL_FILE}>" 
+				"${MainWindowExample_SubProject_DIR}/$<$<CONFIG:Release>:Release>$<$<CONFIG:Debug>:Debug>/"
+)
