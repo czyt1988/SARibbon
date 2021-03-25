@@ -28,6 +28,8 @@ SET(HEADER_FILES
     SARibbonLineEdit.h
     SARibbonMainWindow.h
     SARibbonMenu.h
+    SARibbonPannelItem.h
+    SARibbonPannelLayout.h
     SARibbonPannel.h
     SARibbonPannelOptionButton.h
     SARibbonQuickAccessBar.h
@@ -59,6 +61,8 @@ SET(SOURCE_FILES
     SARibbonLineEdit.cpp
     SARibbonMainWindow.cpp
     SARibbonMenu.cpp
+    SARibbonPannelItem.cpp
+    SARibbonPannelLayout.cpp
     SARibbonPannel.cpp
     SARibbonPannelOptionButton.cpp
     SARibbonQuickAccessBar.cpp

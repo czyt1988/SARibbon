@@ -23,9 +23,9 @@ void log_out_put(QtMsgType type, const QMessageLogContext& context, const QStrin
         fprintf(stdout, "[Debug] %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
         break;
 
-    case QtInfoMsg:
-        fprintf(stdout, "[Info] %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
-        break;
+//    case QtInfoMsg:
+//        fprintf(stdout, "[Info] %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+//        break;
 
     case QtWarningMsg:
         fprintf(stdout, "[Warning] %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
@@ -38,6 +38,10 @@ void log_out_put(QtMsgType type, const QMessageLogContext& context, const QStrin
     case QtFatalMsg:
         fprintf(stdout, "Fatal: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
         abort();
+        break;
+    default:
+        fprintf(stdout, "[Debug] %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+        break;
     }
 #ifndef QT_NO_DEBUG_OUTPUT
     fflush(stdout);

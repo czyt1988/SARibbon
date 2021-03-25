@@ -48,7 +48,9 @@ SOURCES += \
     SARibbonButtonGroupWidget.cpp \
     SARibbonStackedWidget.cpp \
     SARibbonQuickAccessBar.cpp \
-    SARibbonCtrlContainer.cpp
+    SARibbonCtrlContainer.cpp \
+    SARibbonPannelLayout.cpp \
+    SARibbonPannelItem.cpp
 
 HEADERS  += \
     SARibbonActionsManager.h \
@@ -83,7 +85,9 @@ HEADERS  += \
     SARibbonButtonGroupWidget.h \
     SARibbonStackedWidget.h \
     SARibbonQuickAccessBar.h \
-    SARibbonCtrlContainer.h
+    SARibbonCtrlContainer.h \
+    SARibbonPannelLayout.h \
+    SARibbonPannelItem.h
 
 RESOURCES += \
     resource.qrc
