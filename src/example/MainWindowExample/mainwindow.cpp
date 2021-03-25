@@ -667,16 +667,16 @@ void MainWindow::addSomeOtherAction()
 {
     m_actMgr = new SARibbonActionsManager(this);
     //添加其他的action，这些action并不在ribbon管理范围，主要用于SARibbonCustomizeWidget自定义用
-    QAction *acttext1 = new QAction(QStringLiteral("纯文本action1"));
-    QAction *acttext2 = new QAction(QStringLiteral("纯文本action2"));
-    QAction *acttext3 = new QAction(QStringLiteral("纯文本action3"));
-    QAction *acttext4 = new QAction(QStringLiteral("纯文本action4"));
-    QAction *acttext5 = new QAction(QStringLiteral("纯文本action5"));
+    QAction *acttext1 = new QAction(QStringLiteral("纯文本action1"),this);
+    QAction *acttext2 = new QAction(QStringLiteral("纯文本action2"),this);
+    QAction *acttext3 = new QAction(QStringLiteral("纯文本action3"),this);
+    QAction *acttext4 = new QAction(QStringLiteral("纯文本action4"),this);
+    QAction *acttext5 = new QAction(QStringLiteral("纯文本action5"),this);
 
-    QAction *actIcon1 = new QAction(QIcon(":/icon/icon/506353.png"), QStringLiteral("带图标action1"));
-    QAction *actIcon2 = new QAction(QIcon(":/icon/icon/506354.png"), QStringLiteral("带图标action2"));
-    QAction *actIcon3 = new QAction(QIcon(":/icon/icon/506355.png"), QStringLiteral("带图标action3"));
-    QAction *actIcon4 = new QAction(QIcon(":/icon/icon/506356.png"), QStringLiteral("带图标action4"));
+    QAction *actIcon1 = new QAction(QIcon(":/icon/icon/506353.png"), QStringLiteral("带图标action1"),this);
+    QAction *actIcon2 = new QAction(QIcon(":/icon/icon/506354.png"), QStringLiteral("带图标action2"),this);
+    QAction *actIcon3 = new QAction(QIcon(":/icon/icon/506355.png"), QStringLiteral("带图标action3"),this);
+    QAction *actIcon4 = new QAction(QIcon(":/icon/icon/506356.png"), QStringLiteral("带图标action4"),this);
 
     m_actionTagText = SARibbonActionsManager::UserDefineActionTag+1;
     m_actionTagWithIcon = SARibbonActionsManager::UserDefineActionTag+2;

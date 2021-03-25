@@ -120,7 +120,6 @@ class SA_RIBBON_EXPORT SARibbonCategoryScrollButton : public QToolButton
 {
     Q_OBJECT
 public:
-    using QToolButton::QToolButton;
     SARibbonCategoryScrollButton(Qt::ArrowType arr, QWidget *p = nullptr);
 };
 

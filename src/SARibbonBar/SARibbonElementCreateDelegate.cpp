@@ -14,6 +14,7 @@
 #include "SARibbonStackedWidget.h"
 #include "SARibbonQuickAccessBar.h"
 #include "SARibbonPannelOptionButton.h"
+#include "SARibbonPannelLayout.h"
 
 SARibbonStyleOption::SARibbonStyleOption()
 {

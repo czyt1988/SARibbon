@@ -142,7 +142,7 @@ void SARibbonButtonGroupWidget::addMenu(QMenu *menu, QToolButton::ToolButtonPopu
 
 QAction *SARibbonButtonGroupWidget::addSeparator()
 {
-    QAction *a = new QAction();
+    QAction *a = new QAction(this);
 
     a->setSeparator(true);
     addAction(a);
