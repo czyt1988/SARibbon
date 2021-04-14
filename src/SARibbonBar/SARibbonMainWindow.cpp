@@ -124,6 +124,30 @@ bool SARibbonMainWindow::isUseRibbon() const
     return (m_d->useRibbon);
 }
 
+/**
+ * @brief 此函数仅用于控制最小最大化和关闭按钮的显示
+ */
+void SARibbonMainWindow::updateWindowFlag(Qt::WindowFlags flags)
+{
+    if(isUseRibbon()){
+        m_d->windowButtonGroup->updateWindowFlag(flags);
+    }
+    repaint();
+}
+
+/**
+ * @brief 此函数返回的flags仅包括 Qt::WindowCloseButtonHint，Qt::WindowMaximizeButtonHint，Qt::WindowMinimizeButtonHint
+ * 三个
+ * @return
+ */
+Qt::WindowFlags SARibbonMainWindow::windowButtonFlags() const
+{
+    if(isUseRibbon()){
+        return m_d->windowButtonGroup->windowButtonFlags();
+    }
+    return windowFlags();
+}
+
 
 void SARibbonMainWindow::resizeEvent(QResizeEvent *event)
 {
@@ -181,6 +205,7 @@ bool SARibbonMainWindow::event(QEvent *e)
     }
     return (QMainWindow::event(e));
 }
+
 
 
 void SARibbonMainWindow::loadTheme(const QString& themeFile)

@@ -19,7 +19,7 @@ public:
     int mMaxStretch;
     int mMinStretch;
     qreal mIconscale;
-    QScopedPointer<Qt::WindowFlags> mFlags;
+    Qt::WindowFlags mFlags;
     SAWindowButtonGroupPrivate(SAWindowButtonGroup *p)
         : q_d(p)
         , buttonClose(nullptr)
@@ -40,6 +40,7 @@ public:
         if (on) {
             if (buttonMinimize) {
                 buttonMinimize->deleteLater();
+                buttonMinimize = nullptr;
             }
             buttonMinimize = new SAWindowToolButton(par);
             buttonMinimize->setObjectName(QStringLiteral("SAMinimizeWindowButton"));
@@ -57,11 +58,13 @@ public:
             QIcon icon = par->style()->standardIcon(QStyle::SP_TitleBarMinButton);
             buttonMinimize->setIconSize(buttonMinimize->size()*mIconscale);
             buttonMinimize->setIcon(icon);
+            buttonMinimize->show();
             par->connect(buttonMinimize, &QAbstractButton::clicked
                 , par, &SAWindowButtonGroup::minimizeWindow);
         }else {
             if (buttonMinimize) {
                 delete buttonMinimize;
+                buttonMinimize = nullptr;
             }
         }
         updateSize();
@@ -75,6 +78,7 @@ public:
         if (on) {
             if (buttonMaximize) {
                 buttonMaximize->deleteLater();
+                buttonMaximize = nullptr;
             }
             buttonMaximize = new SAWindowToolButton(par);
             buttonMaximize->setObjectName(QStringLiteral("SAMaximizeWindowButton"));
@@ -92,11 +96,13 @@ public:
             QIcon icon = par->style()->standardIcon(QStyle::SP_TitleBarMaxButton);
             buttonMaximize->setIconSize(buttonMaximize->size()*mIconscale);
             buttonMaximize->setIcon(icon);
+            buttonMaximize->show();
             par->connect(buttonMaximize, &QAbstractButton::clicked
                 , par, &SAWindowButtonGroup::maximizeWindow);
         }else {
             if (buttonMaximize) {
                 delete buttonMaximize;
+                buttonMaximize = nullptr;
             }
         }
         updateSize();
@@ -110,6 +116,7 @@ public:
         if (on) {
             if (buttonClose) {
                 buttonClose->deleteLater();
+                buttonClose = nullptr;
             }
             buttonClose = new SAWindowToolButton(par);
             buttonClose->setObjectName(QStringLiteral("SACloseWindowButton"));
@@ -130,9 +137,11 @@ public:
             QIcon icon = par->style()->standardIcon(QStyle::SP_TitleBarCloseButton);
             buttonClose->setIconSize(buttonClose->size()*mIconscale);
             buttonClose->setIcon(icon);
+            buttonClose->show();
         }else {
             if (buttonClose) {
                 delete buttonClose;
+                buttonClose = nullptr;
             }
         }
         updateSize();
@@ -238,8 +247,7 @@ SAWindowButtonGroup::SAWindowButtonGroup(QWidget *parent) : QWidget(parent)
 SAWindowButtonGroup::SAWindowButtonGroup(QWidget *parent, Qt::WindowFlags flags) : QWidget(parent)
     , m_d(new SAWindowButtonGroupPrivate(this))
 {
-    m_d->mFlags.reset(new Qt::WindowFlags);
-    *m_d->mFlags = flags;
+    m_d->mFlags = flags;
     updateWindowFlag();
     if (parent) {
         parent->installEventFilter(this);
@@ -274,11 +282,38 @@ void SAWindowButtonGroup::setupCloseButton(bool on)
 void SAWindowButtonGroup::updateWindowFlag()
 {
     Qt::WindowFlags flags = parentWidget()->windowFlags();
+    m_d->mFlags = flags;
 
-    if (!m_d->mFlags.isNull()) {
-        flags = *(m_d->mFlags);
+    setupMinimizeButton(flags & Qt::WindowMinimizeButtonHint);
+
+    setupMaximizeButton(flags & Qt::WindowMaximizeButtonHint);
+
+    setupCloseButton(flags & Qt::WindowCloseButtonHint);
+}
+
+/**
+ * @brief 此函数仅用于控制最小最大化和关闭按钮的显示
+ * @param flags
+ */
+void SAWindowButtonGroup::updateWindowFlag(Qt::WindowFlags flags)
+{
+    if(flags & Qt::WindowCloseButtonHint){
+        m_d->mFlags |= Qt::WindowCloseButtonHint;
+    }else{
+        m_d->mFlags &= (~Qt::WindowCloseButtonHint);
     }
 
+    if(flags & Qt::WindowMaximizeButtonHint){
+        m_d->mFlags |= Qt::WindowMaximizeButtonHint;
+    }else{
+        m_d->mFlags &= (~Qt::WindowMaximizeButtonHint);
+    }
+
+    if(flags & Qt::WindowMinimizeButtonHint){
+        m_d->mFlags |= Qt::WindowMinimizeButtonHint;
+    }else{
+        m_d->mFlags &= (~Qt::WindowMinimizeButtonHint);
+    }
     setupMinimizeButton(flags & Qt::WindowMinimizeButtonHint);
 
     setupMaximizeButton(flags & Qt::WindowMaximizeButtonHint);
@@ -334,6 +369,27 @@ void SAWindowButtonGroup::setWindowStates(Qt::WindowStates s)
     default:
         break;
     }
+}
+
+/**
+ * @brief 此函数返回的flags仅包括 Qt::WindowCloseButtonHint，Qt::WindowMaximizeButtonHint，Qt::WindowMinimizeButtonHint
+ * 三个
+ *
+ * @return
+ */
+Qt::WindowFlags SAWindowButtonGroup::windowButtonFlags() const
+{
+    Qt::WindowFlags f = Qt::Widget;//widget是000
+    if(m_d->mFlags & Qt::WindowCloseButtonHint){
+        f |= Qt::WindowCloseButtonHint;
+    }
+    if(m_d->mFlags & Qt::WindowMaximizeButtonHint){
+        f |= Qt::WindowMaximizeButtonHint;
+    }
+    if(m_d->mFlags & Qt::WindowMinimizeButtonHint){
+        f |= Qt::WindowMinimizeButtonHint;
+    }
+    return f;
 }
 
 

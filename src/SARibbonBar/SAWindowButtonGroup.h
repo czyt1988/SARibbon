@@ -18,7 +18,7 @@ public:
     void setupMaximizeButton(bool on);
     void setupCloseButton(bool on);
     void updateWindowFlag();
-
+    void updateWindowFlag(Qt::WindowFlags flags);
     //设置按钮的宽度比例,最终按钮宽度将按照此比例进行设置
     void setButtonWidthStretch(int close = 4, int max = 3, int min = 3);
 
@@ -28,6 +28,8 @@ public:
     //设置Qt::WindowStates
     void setWindowStates(Qt::WindowStates s);
 
+    //仅获取按钮的状态
+    Qt::WindowFlags windowButtonFlags() const;
 protected:
     virtual QSize sizeHint() const Q_DECL_OVERRIDE;
     virtual bool eventFilter(QObject *watched, QEvent *e) Q_DECL_OVERRIDE;

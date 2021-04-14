@@ -48,6 +48,11 @@ public:
 	//判断当前是否使用ribbon模式
 	bool isUseRibbon() const;
 
+    //此函数仅用于控制最小最大化和关闭按钮的显示
+    void updateWindowFlag(Qt::WindowFlags flags);
+
+    //获取系统按钮的状态
+    Qt::WindowFlags windowButtonFlags() const;
 protected:
     void loadTheme(const QString& themeFile);
     virtual void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;

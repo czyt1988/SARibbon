@@ -1,4 +1,4 @@
-#include "SARibbonPannelLayout.h"
+﻿#include "SARibbonPannelLayout.h"
 #include "SARibbonCategory.h"
 #include "SARibbonPannelOptionButton.h"
 #include "SARibbonSeparatorWidget.h"
@@ -10,6 +10,7 @@
 #include <set>
 #include "SARibbonPannel.h"
 #include "SARibbonPannelItem.h"
+
 
 const int c_higherModehight = 98;
 const int c_lowerModehight = 72;
