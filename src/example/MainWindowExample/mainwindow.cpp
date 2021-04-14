@@ -516,6 +516,27 @@ void MainWindow::createCategoryOther(SARibbonCategory *page)
             has_call = sa_apply_customize_from_xml_file("customize.xml", this, m_actMgr);
         }
     });
+
+    QAction* normalButton = new QAction(QIcon(":/icon/icon/506354.png"),QStringLiteral("正常模式"),this);
+    normalButton->setObjectName(QStringLiteral("normalButton"));
+    pannel->addLargeAction(normalButton);
+    connect(normalButton, &QAction::triggered, this, [&]() {
+        //最大最小关闭按钮都有
+        Qt::WindowFlags f = windowFlags();
+        f |= (Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint);
+        updateWindowFlag(f);
+    });
+
+    QAction* noneButton = new QAction(QIcon(":/icon/icon/506462.png"),QStringLiteral("无按钮模式"),this);
+    noneButton->setObjectName(QStringLiteral("noneButton"));
+    pannel->addLargeAction(noneButton);
+    connect(noneButton, &QAction::triggered, this, [&]() {
+        //由于已经处于frameless状态，这个最大最小设置是无效的
+        //setWindowFlags(windowFlags()&~Qt::WindowMaximizeButtonHint&~Qt::WindowMinimizeButtonHint);
+        Qt::WindowFlags f = windowFlags();
+        f &= ~Qt::WindowMinMaxButtonsHint & ~Qt::WindowCloseButtonHint;
+        updateWindowFlag(f);
+    });
 }
 
 

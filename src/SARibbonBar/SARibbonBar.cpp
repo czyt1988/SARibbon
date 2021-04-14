@@ -634,6 +634,7 @@ void SARibbonBar::showContextCategory(SARibbonContextCategory *context)
  */
 void SARibbonBar::hideContextCategory(SARibbonContextCategory *context)
 {
+    bool ishide = false;
     for (int i = 0; i < m_d->currentShowingContextCategory.size(); ++i)
     {
         if (m_d->currentShowingContextCategory[i].contextCategory == context) {
@@ -643,10 +644,13 @@ void SARibbonBar::hideContextCategory(SARibbonContextCategory *context)
                 m_d->ribbonTabBar->removeTab(indexs[j]);
             }
             m_d->currentShowingContextCategory.removeAt(i);
+            ishide = true;
         }
     }
-    QApplication::postEvent(this, new QResizeEvent(size(), size()));
-    repaint();
+    if(ishide){
+        QApplication::postEvent(this, new QResizeEvent(size(), size()));
+        repaint();
+    }
 }
 
 

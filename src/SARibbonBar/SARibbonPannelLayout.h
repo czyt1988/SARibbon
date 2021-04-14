@@ -1,9 +1,10 @@
-#ifndef SARIBBONPANNELLAYOUT_H
+﻿#ifndef SARIBBONPANNELLAYOUT_H
 #define SARIBBONPANNELLAYOUT_H
 #include "SARibbonGlobal.h"
 #include <QLayout>
 #include "SARibbonPannelItem.h"
 class SARibbonPannel;
+
 /**
  * @brief 针对SARibbonPannel的布局
  *

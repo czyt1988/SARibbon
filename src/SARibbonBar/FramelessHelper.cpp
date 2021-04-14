@@ -5,6 +5,7 @@
 #include <QHoverEvent>
 #include <QApplication>
 #include <QDebug>
+#include "SARibbonMainWindow.h"
 class WidgetData;
 
 /*****
@@ -459,14 +460,22 @@ bool WidgetData::handleDoubleClickedMouseEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
         if (m_pWidget) {
-            bool titlePressed = event->pos().y() < m_moveMousePos.m_nTitleHeight;
-            if (titlePressed) {
-                if (m_pWidget->isMaximized()) {
-                    m_pWidget->showNormal();
-                }else {
-                    m_pWidget->showMaximized();
+            SARibbonMainWindow* mainwindow = qobject_cast<SARibbonMainWindow*>(m_pWidget);
+            if(mainwindow)
+            {
+                if(mainwindow->windowButtonFlags() & Qt::WindowMaximizeButtonHint)
+                {
+                    //在最大化按钮显示时才进行shownormal处理
+                    bool titlePressed = event->pos().y() < m_moveMousePos.m_nTitleHeight;
+                    if (titlePressed) {
+                        if (m_pWidget->isMaximized()) {
+                            m_pWidget->showNormal();
+                        }else {
+                            m_pWidget->showMaximized();
+                        }
+                        return (true);
+                    }
                 }
-                return (true);
             }
         }
     }
