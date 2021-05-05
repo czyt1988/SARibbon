@@ -1,6 +1,6 @@
 ﻿#include "SARibbonMainWindow.h"
 #include <QWindowStateChangeEvent>
-#include "FramelessHelper.h"
+#include "SAFramelessHelper.h"
 #include "SAWindowButtonGroup.h"
 #include "SARibbonBar.h"
 #include <QApplication>
@@ -17,7 +17,7 @@ public:
     SARibbonBar *ribbonBar;
     SARibbonMainWindow::RibbonTheme currentRibbonTheme;
     SAWindowButtonGroup *windowButtonGroup;
-    FramelessHelper *pFramelessHelper;
+    SAFramelessHelper *pFramelessHelper;
 	bool useRibbon;
 };
 
@@ -53,7 +53,7 @@ SARibbonMainWindow::SARibbonMainWindow(QWidget *parent, bool useRibbon)
 		setMenuWidget(m_d->ribbonBar);
 		m_d->ribbonBar->installEventFilter(this);
         //设置窗体的标题栏高度
-        m_d->pFramelessHelper = new FramelessHelper(this);
+        m_d->pFramelessHelper = new SAFramelessHelper(this);
         m_d->pFramelessHelper->setTitleHeight(m_d->ribbonBar->titleBarHeight());
         //设置window按钮
         m_d->windowButtonGroup = new SAWindowButtonGroup(this);

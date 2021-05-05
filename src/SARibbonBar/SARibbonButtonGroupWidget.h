@@ -14,7 +14,7 @@ class SA_RIBBON_EXPORT SARibbonButtonGroupWidget : public QFrame
     Q_OBJECT
 public:
     SARibbonButtonGroupWidget(QWidget *parent = Q_NULLPTR);
-    ~SARibbonButtonGroupWidget();
+    ~SARibbonButtonGroupWidget() Q_DECL_OVERRIDE;
 
     //生成并添加一个action
     void addAction(QAction *a);

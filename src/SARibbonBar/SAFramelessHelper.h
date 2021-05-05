@@ -1,5 +1,5 @@
-﻿#ifndef FRAMELESSHELPER_H
-#define FRAMELESSHELPER_H
+﻿#ifndef SAFRAMELESSHELPER_H
+#define SAFRAMELESSHELPER_H
 
 
 #include <QObject>
@@ -7,27 +7,34 @@
 class QWidget;
 class FramelessHelperPrivate;
 
-class FramelessHelper : public QObject
+class SAFramelessHelper : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit FramelessHelper(QObject *parent);
-    ~FramelessHelper();
+    explicit SAFramelessHelper(QObject *parent);
+    ~SAFramelessHelper();
     // 激活窗体
     void activateOn(QWidget *topLevelWidget);
+
     // 移除窗体
     void removeFrom(QWidget *topLevelWidget);
+
     // 设置窗体移动
     void setWidgetMovable(bool movable);
+
     // 设置窗体缩放
     void setWidgetResizable(bool resizable);
+
     // 设置橡皮筋移动
     void setRubberBandOnMove(bool movable);
+
     // 设置橡皮筋缩放
     void setRubberBandOnResize(bool resizable);
+
     // 设置边框的宽度
     void setBorderWidth(uint width);
+
     // 设置标题栏高度
     void setTitleHeight(uint height);
     bool widgetResizable();
