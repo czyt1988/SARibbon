@@ -1,4 +1,4 @@
-﻿#include "FramelessHelper.h"
+﻿#include "SAFramelessHelper.h"
 #include <QRect>
 #include <QRubberBand>
 #include <QMouseEvent>
@@ -483,7 +483,7 @@ bool WidgetData::handleDoubleClickedMouseEvent(QMouseEvent *event)
 }
 
 
-FramelessHelper::FramelessHelper(QObject *parent)
+SAFramelessHelper::SAFramelessHelper(QObject *parent)
     : QObject(parent),
     d(new FramelessHelperPrivate())
 {
@@ -505,7 +505,7 @@ FramelessHelper::FramelessHelper(QObject *parent)
 }
 
 
-FramelessHelper::~FramelessHelper()
+SAFramelessHelper::~SAFramelessHelper()
 {
     QList<QWidget *> keys = d->m_widgetDataHash.keys();
     int size = keys.size();
@@ -519,7 +519,7 @@ FramelessHelper::~FramelessHelper()
 }
 
 
-bool FramelessHelper::eventFilter(QObject *obj, QEvent *event)
+bool SAFramelessHelper::eventFilter(QObject *obj, QEvent *event)
 {
     switch (event->type())
     {
@@ -544,7 +544,7 @@ bool FramelessHelper::eventFilter(QObject *obj, QEvent *event)
 }
 
 
-void FramelessHelper::activateOn(QWidget *topLevelWidget)
+void SAFramelessHelper::activateOn(QWidget *topLevelWidget)
 {
     if (!d->m_widgetDataHash.contains(topLevelWidget)) {
         WidgetData *data = new WidgetData(d, topLevelWidget);
@@ -555,7 +555,7 @@ void FramelessHelper::activateOn(QWidget *topLevelWidget)
 }
 
 
-void FramelessHelper::removeFrom(QWidget *topLevelWidget)
+void SAFramelessHelper::removeFrom(QWidget *topLevelWidget)
 {
     WidgetData *data = d->m_widgetDataHash.take(topLevelWidget);
 
@@ -566,7 +566,7 @@ void FramelessHelper::removeFrom(QWidget *topLevelWidget)
 }
 
 
-void FramelessHelper::setRubberBandOnMove(bool movable)
+void SAFramelessHelper::setRubberBandOnMove(bool movable)
 {
     d->m_bRubberBandOnMove = movable;
     QList<WidgetData *> list = d->m_widgetDataHash.values();
@@ -578,19 +578,19 @@ void FramelessHelper::setRubberBandOnMove(bool movable)
 }
 
 
-void FramelessHelper::setWidgetMovable(bool movable)
+void SAFramelessHelper::setWidgetMovable(bool movable)
 {
     d->m_bWidgetMovable = movable;
 }
 
 
-void FramelessHelper::setWidgetResizable(bool resizable)
+void SAFramelessHelper::setWidgetResizable(bool resizable)
 {
     d->m_bWidgetResizable = resizable;
 }
 
 
-void FramelessHelper::setRubberBandOnResize(bool resizable)
+void SAFramelessHelper::setRubberBandOnResize(bool resizable)
 {
     d->m_bRubberBandOnResize = resizable;
     QList<WidgetData *> list = d->m_widgetDataHash.values();
@@ -602,7 +602,7 @@ void FramelessHelper::setRubberBandOnResize(bool resizable)
 }
 
 
-void FramelessHelper::setBorderWidth(uint width)
+void SAFramelessHelper::setBorderWidth(uint width)
 {
     if (width > 0) {
         CursorPosCalculator::m_nBorderWidth = width;
@@ -610,7 +610,7 @@ void FramelessHelper::setBorderWidth(uint width)
 }
 
 
-void FramelessHelper::setTitleHeight(uint height)
+void SAFramelessHelper::setTitleHeight(uint height)
 {
     if (height > 0) {
         CursorPosCalculator::m_nTitleHeight = height;
@@ -618,37 +618,37 @@ void FramelessHelper::setTitleHeight(uint height)
 }
 
 
-bool FramelessHelper::widgetMovable()
+bool SAFramelessHelper::widgetMovable()
 {
     return (d->m_bWidgetMovable);
 }
 
 
-bool FramelessHelper::widgetResizable()
+bool SAFramelessHelper::widgetResizable()
 {
     return (d->m_bWidgetResizable);
 }
 
 
-bool FramelessHelper::rubberBandOnMove()
+bool SAFramelessHelper::rubberBandOnMove()
 {
     return (d->m_bRubberBandOnMove);
 }
 
 
-bool FramelessHelper::rubberBandOnResisze()
+bool SAFramelessHelper::rubberBandOnResisze()
 {
     return (d->m_bRubberBandOnResize);
 }
 
 
-uint FramelessHelper::borderWidth()
+uint SAFramelessHelper::borderWidth()
 {
     return (CursorPosCalculator::m_nBorderWidth);
 }
 
 
-uint FramelessHelper::titleHeight()
+uint SAFramelessHelper::titleHeight()
 {
     return (CursorPosCalculator::m_nTitleHeight);
 }

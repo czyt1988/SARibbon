@@ -6,20 +6,20 @@
 #include "SARibbonTabBar.h"
 #include <QSet>
 #include <QResizeEvent>
-#include "SARibbonStackedWidget.h"
 #include <QVariant>
 #include <QLinearGradient>
 #include <QDebug>
-#include "SARibbonElementManager.h"
-#include "SARibbonControlButton.h"
 #include <QApplication>
 #include <QDesktopWidget>
-#include <SARibbonButtonGroupWidget.h>
 #include <QAction>
 #include <QHoverEvent>
-#include "SARibbonQuickAccessBar.h"
-#include <QStyleOptionMenuItem>
 #include <QTimer>
+#include <QStyleOptionMenuItem>
+#include "SARibbonStackedWidget.h"
+#include "SARibbonElementManager.h"
+#include "SARibbonControlButton.h"
+#include "SARibbonButtonGroupWidget.h"
+#include "SARibbonQuickAccessBar.h"
 
 #define HELP_DRAW_RECT(p, rect)			    \
     do{					    \
@@ -635,6 +635,7 @@ void SARibbonBar::showContextCategory(SARibbonContextCategory *context)
 void SARibbonBar::hideContextCategory(SARibbonContextCategory *context)
 {
     bool ishide = false;
+
     for (int i = 0; i < m_d->currentShowingContextCategory.size(); ++i)
     {
         if (m_d->currentShowingContextCategory[i].contextCategory == context) {
@@ -647,7 +648,7 @@ void SARibbonBar::hideContextCategory(SARibbonContextCategory *context)
             ishide = true;
         }
     }
-    if(ishide){
+    if (ishide) {
         QApplication::postEvent(this, new QResizeEvent(size(), size()));
         repaint();
     }
