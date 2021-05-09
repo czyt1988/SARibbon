@@ -33,10 +33,10 @@ public:
     void setRubberBandOnResize(bool resizable);
 
     // 设置边框的宽度
-    void setBorderWidth(uint width);
+    void setBorderWidth(int width);
 
     // 设置标题栏高度
-    void setTitleHeight(uint height);
+    void setTitleHeight(int height);
     bool widgetResizable();
     bool widgetMovable();
     bool rubberBandOnMove();

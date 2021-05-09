@@ -254,13 +254,13 @@ void WidgetData::updateCursorShape(const QPoint& gMousePos)
     if (m_moveMousePos.m_bOnTopLeftEdge || m_moveMousePos.m_bOnBottomRightEdge) {
         m_pWidget->setCursor(Qt::SizeFDiagCursor);
         m_bCursorShapeChanged = true;
-    }else if (m_moveMousePos.m_bOnTopRightEdge || m_moveMousePos.m_bOnBottomLeftEdge)   {
+    }else if (m_moveMousePos.m_bOnTopRightEdge || m_moveMousePos.m_bOnBottomLeftEdge) {
         m_pWidget->setCursor(Qt::SizeBDiagCursor);
         m_bCursorShapeChanged = true;
-    }else if (m_moveMousePos.m_bOnLeftEdge || m_moveMousePos.m_bOnRightEdge)   {
+    }else if (m_moveMousePos.m_bOnLeftEdge || m_moveMousePos.m_bOnRightEdge) {
         m_pWidget->setCursor(Qt::SizeHorCursor);
         m_bCursorShapeChanged = true;
-    }else if (m_moveMousePos.m_bOnTopEdge || m_moveMousePos.m_bOnBottomEdge)   {
+    }else if (m_moveMousePos.m_bOnTopEdge || m_moveMousePos.m_bOnBottomEdge) {
         m_pWidget->setCursor(Qt::SizeVerCursor);
         m_bCursorShapeChanged = true;
     }else {
@@ -295,22 +295,22 @@ void WidgetData::resizeWidget(const QPoint& gMousePos)
     if (m_pressedMousePos.m_bOnTopLeftEdge) {
         left = gMousePos.x();
         top = gMousePos.y();
-    }else if (m_pressedMousePos.m_bOnBottomLeftEdge)  {
+    }else if (m_pressedMousePos.m_bOnBottomLeftEdge) {
         left = gMousePos.x();
         bottom = gMousePos.y();
-    }else if (m_pressedMousePos.m_bOnTopRightEdge)  {
+    }else if (m_pressedMousePos.m_bOnTopRightEdge) {
         right = gMousePos.x();
         top = gMousePos.y();
-    }else if (m_pressedMousePos.m_bOnBottomRightEdge)  {
+    }else if (m_pressedMousePos.m_bOnBottomRightEdge) {
         right = gMousePos.x();
         bottom = gMousePos.y();
-    }else if (m_pressedMousePos.m_bOnLeftEdge)  {
+    }else if (m_pressedMousePos.m_bOnLeftEdge) {
         left = gMousePos.x();
-    }else if (m_pressedMousePos.m_bOnRightEdge)  {
+    }else if (m_pressedMousePos.m_bOnRightEdge) {
         right = gMousePos.x();
-    }else if (m_pressedMousePos.m_bOnTopEdge)  {
+    }else if (m_pressedMousePos.m_bOnTopEdge) {
         top = gMousePos.y();
-    }else if (m_pressedMousePos.m_bOnBottomEdge)  {
+    }else if (m_pressedMousePos.m_bOnBottomEdge) {
         bottom = gMousePos.y();
     }
 
@@ -372,7 +372,7 @@ bool WidgetData::handleMousePressEvent(QMouseEvent *event)
                 m_pRubberBand->show();
                 return (true);
             }
-        }else if (d->m_bRubberBandOnMove && m_bLeftButtonTitlePressed)  {
+        }else if (d->m_bRubberBandOnMove && m_bLeftButtonTitlePressed) {
             if (m_pWidget->isMaximized()) {
                 //窗口在最大化状态时，点击标题栏不做任何处理
                 return (false);
@@ -412,7 +412,7 @@ bool WidgetData::handleMouseMoveEvent(QMouseEvent *event)
             }
             resizeWidget(event->globalPos());
             return (true);
-        }else if (d->m_bWidgetMovable && m_bLeftButtonTitlePressed)  {
+        }else if (d->m_bWidgetMovable && m_bLeftButtonTitlePressed) {
             if (m_pWidget->isMaximized()) {
                 //先求出窗口到鼠标的相对位置
                 QRect normalGeometry = m_pWidget->normalGeometry();
@@ -422,14 +422,14 @@ bool WidgetData::handleMouseMoveEvent(QMouseEvent *event)
                 p.rx() -= (normalGeometry.width() / 2);
                 m_pWidget->move(p);
                 //这时要重置m_ptDragPos
-                m_ptDragPos = QPoint(normalGeometry.width()/2,10);
+                m_ptDragPos = QPoint(normalGeometry.width()/2, 10);
                 return (true);
             }
             moveWidget(event->globalPos());
             return (true);
         }
         return (false);
-    }else if (d->m_bWidgetResizable)  {
+    }else if (d->m_bWidgetResizable) {
         updateCursorShape(event->globalPos());
     }
     return (false);
@@ -460,11 +460,9 @@ bool WidgetData::handleDoubleClickedMouseEvent(QMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton) {
         if (m_pWidget) {
-            SARibbonMainWindow* mainwindow = qobject_cast<SARibbonMainWindow*>(m_pWidget);
-            if(mainwindow)
-            {
-                if(mainwindow->windowButtonFlags() & Qt::WindowMaximizeButtonHint)
-                {
+            SARibbonMainWindow *mainwindow = qobject_cast<SARibbonMainWindow *>(m_pWidget);
+            if (mainwindow) {
+                if (mainwindow->windowButtonFlags() & Qt::WindowMaximizeButtonHint) {
                     //在最大化按钮显示时才进行shownormal处理
                     bool titlePressed = event->pos().y() < m_moveMousePos.m_nTitleHeight;
                     if (titlePressed) {
@@ -602,7 +600,7 @@ void SAFramelessHelper::setRubberBandOnResize(bool resizable)
 }
 
 
-void SAFramelessHelper::setBorderWidth(uint width)
+void SAFramelessHelper::setBorderWidth(int width)
 {
     if (width > 0) {
         CursorPosCalculator::m_nBorderWidth = width;
@@ -610,7 +608,7 @@ void SAFramelessHelper::setBorderWidth(uint width)
 }
 
 
-void SAFramelessHelper::setTitleHeight(uint height)
+void SAFramelessHelper::setTitleHeight(int height)
 {
     if (height > 0) {
         CursorPosCalculator::m_nTitleHeight = height;
