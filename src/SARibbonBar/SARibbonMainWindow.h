@@ -53,6 +53,13 @@ public:
 
     //获取系统按钮的状态
     Qt::WindowFlags windowButtonFlags() const;
+
+    //覆写setMenuWidget
+    void setMenuWidget(QWidget *menubar);
+
+    //覆写setMenuBar
+    void setMenuBar(QMenuBar *menuBar);
+
 protected:
     void loadTheme(const QString& themeFile);
     virtual void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;

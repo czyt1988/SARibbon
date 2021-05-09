@@ -3,11 +3,17 @@
 #include <QStatusBar>
 #include <QDockWidget>
 #include <QLayout>
+#include <QToolBar>
+#include <QMenuBar>
+#include "SARibbonBar.h"
+#include "SARibbonPluginDebugHelper.h"
 using namespace SA_PLUGIN;
 SARibbonMainWindowContainerExtension::SARibbonMainWindowContainerExtension(SARibbonMainWindow *w, QObject *p)
     : QObject(p)
     , m_mainwindow(w)
 {
+    m_mainwindow->setObjectName(QLatin1String("mainwindow"));
+    m_mainwindow->setWindowTitle(tr("MainWindow"));
 }
 
 
@@ -17,8 +23,43 @@ SARibbonMainWindowContainerExtension::SARibbonMainWindowContainerExtension(SARib
  */
 void SARibbonMainWindowContainerExtension::addWidget(QWidget *widget)
 {
+    if (widget) {
+        SA_PLUGIN_LOG("widget class name:%s", widget->metaObject()->className());
+    }else{
+        SA_PLUGIN_LOG("widget nullptr");
+    }
     m_widgets.removeAll(widget);
-    if (QStatusBar *statusBar = qobject_cast<QStatusBar *>(widget)) {
+    if (QToolBar *toolBar = qobject_cast<QToolBar *>(widget)) {
+        m_widgets.append(widget);
+        const QMainWindow *mw = qobject_cast<const QMainWindow *>(widget->parentWidget());
+        if (!mw || !mw->layout() || (mw->layout()->indexOf(widget) == -1)) {
+            m_mainwindow->addToolBar(Qt::TopToolBarArea, toolBar);
+        }else{
+            Qt::ToolBarArea area = Qt::TopToolBarArea;
+            area = mw->toolBarArea(toolBar);
+            m_mainwindow->addToolBar(area, toolBar);
+            if (mw->toolBarBreak(toolBar)) {
+                m_mainwindow->insertToolBarBreak(toolBar);
+            }
+        }
+        toolBar->show();
+    }else if (SARibbonBar *ribbonBar = qobject_cast<SARibbonBar *>(widget)) {
+        SA_PLUGIN_LOG("begin add ribbon");
+//        if (m_mainwindow->isUseRibbon()) {
+//            SA_PLUGIN_LOG("isUseRibbon");
+//            return;
+//        }
+        m_mainwindow->setMenuWidget(ribbonBar);
+        if (!m_widgets.contains(widget)) {
+            m_widgets.append(widget);
+        }
+        SA_PLUGIN_LOG("end add ribbon");
+        ribbonBar->show();
+    }else if (QMenuBar *menuBar = qobject_cast<QMenuBar *>(widget)) {
+        m_mainwindow->setMenuBar(menuBar);
+        m_widgets.append(widget);
+        menuBar->show();
+    }else if (QStatusBar *statusBar = qobject_cast<QStatusBar *>(widget)) {
         //if (statusBar != m_mainWindow->statusBar())
         m_mainwindow->setStatusBar(statusBar);
         if (!m_widgets.contains(widget)) {
@@ -77,9 +118,20 @@ void SARibbonMainWindowContainerExtension::insertWidget(int index, QWidget *widg
 
 void SARibbonMainWindowContainerExtension::remove(int index)
 {
+    SA_PLUGIN_LOG("remove index:%d", index);
     QWidget *widget = m_widgets.at(index);
 
-    if (QStatusBar *statusBar = qobject_cast<QStatusBar *>(widget)) {
+    if (QToolBar *toolBar = qobject_cast<QToolBar *>(widget)) {
+        m_mainwindow->removeToolBar(toolBar);
+    }else if (SARibbonBar *ribbonBar = qobject_cast<SARibbonBar *>(widget)) {
+        ribbonBar->hide();
+        ribbonBar->setParent(nullptr);
+        m_mainwindow->setMenuWidget(nullptr);
+    }else if (QMenuBar *menuBar = qobject_cast<QMenuBar *>(widget)) {
+        menuBar->hide();
+        menuBar->setParent(nullptr);
+        m_mainwindow->setMenuBar(nullptr);
+    }else if (QStatusBar *statusBar = qobject_cast<QStatusBar *>(widget)) {
         statusBar->hide();
         statusBar->setParent(nullptr);
         m_mainwindow->setStatusBar(nullptr);

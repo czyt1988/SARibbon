@@ -27,17 +27,24 @@ DEFINES += SA_RIBBON_BAR_MAKE_LIB #定义此宏将构建库
 include($$PWD/../SARibbonBar/SARibbonBar.pri)
 
 HEADERS += \
+    SARibbonBarCommands.h \
     SARibbonBarDesignerPlugin.h \
     SARibbonMainWindowContainerExtension.h \
     SARibbonMainWindowContainerFactory.h \
     SARibbonMainWindowDesignerPlugin.h \
-    SARibbonPluginCollection.h
+    SARibbonMainWindowTaskMenuExtension.h \
+    SARibbonMainWindowTaskMenuExtensionFactory.h \
+    SARibbonPluginCollection.h \
+    SARibbonPluginDebugHelper.h
 
 SOURCES += \
+    SARibbonBarCommands.cpp \
     SARibbonBarDesignerPlugin.cpp \
     SARibbonMainWindowContainerExtension.cpp \
     SARibbonMainWindowContainerFactory.cpp \
     SARibbonMainWindowDesignerPlugin.cpp \
+    SARibbonMainWindowTaskMenuExtension.cpp \
+    SARibbonMainWindowTaskMenuExtensionFactory.cpp \
     SARibbonPluginCollection.cpp
 
 RESOURCES += \

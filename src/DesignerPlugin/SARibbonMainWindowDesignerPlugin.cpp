@@ -10,8 +10,10 @@
 #include <QExtensionManager>
 #include <QMessageBox>
 //
+#include "SARibbonPluginDebugHelper.h"
 #include "SARibbonMainWindowContainerExtension.h"
 #include "SARibbonMainWindowContainerFactory.h"
+#include "SARibbonMainWindowTaskMenuExtensionFactory.h"
 using namespace SA_PLUGIN;
 SARibbonMainWindowDesignerPlugin::SARibbonMainWindowDesignerPlugin(QObject *p) : QObject(p)
     , m_isInitialized(false)
@@ -38,14 +40,15 @@ bool SARibbonMainWindowDesignerPlugin::isInitialized() const
 
 QIcon SARibbonMainWindowDesignerPlugin::icon() const
 {
-    return (QIcon(":/icon/icon/saribbonmainwindow.svg"));
+    return (QPixmap(":/icon/icon/saribbonmainwindow.svg"));
 }
 
 
 QString SARibbonMainWindowDesignerPlugin::domXml() const
 {
+    SA_PLUGIN_MARK();
     return ("<ui language=\"c++\">\n"
-           " <widget class=\"SARibbonMainWindow\" name=\"MainWindow\">\n"
+           " <widget class=\"SARibbonMainWindow\" name=\"mainWindow\">\n"
            "  <property name=\"geometry\">\n"
            "   <rect>\n"
            "    <x>0</x>\n"
@@ -54,6 +57,7 @@ QString SARibbonMainWindowDesignerPlugin::domXml() const
            "    <height>500</height>\n"
            "   </rect>\n"
            "  </property>\n"
+           "  <widget class=\"QWidget\" name=\"centralwidget\"/>\n"
            " </widget>\n"
            "</ui>\n");
 }
@@ -73,7 +77,7 @@ QString SARibbonMainWindowDesignerPlugin::includeFile() const
 
 QString SARibbonMainWindowDesignerPlugin::name() const
 {
-    return (tr("Ribbon MainWindow"));
+    return (QStringLiteral("SARibbonMainWindow"));
 }
 
 
@@ -91,38 +95,48 @@ QString SARibbonMainWindowDesignerPlugin::whatsThis() const
 
 QWidget *SARibbonMainWindowDesignerPlugin::createWidget(QWidget *parent)
 {
-    SARibbonMainWindow *w = new SARibbonMainWindow(parent);
+    if (parent) {
+        SA_PLUGIN_LOG("createWidget parent class:%s", parent->metaObject()->className());
+    }else {
+        SA_PLUGIN_LOG("createWidget parent is nullptr");
+    }
+    SARibbonMainWindow *w = new SARibbonMainWindow(parent, false);
 
     w->setObjectName(QStringLiteral("SARibbonMainWindow"));
     w->setWindowTitle(QStringLiteral("SARibbonMainWindow"));
-    SARibbonBar *bar = w->ribbonBar();
-    SARibbonCategory *category = bar->addCategoryPage(tr("Main"));
-    SARibbonPannel *pannel = category->addPannel(tr("pannel 1"));
-    QAction *act = new QAction(w);
+//    SARibbonBar *bar = w->ribbonBar();
+//    SARibbonCategory *category = bar->addCategoryPage(tr("Main"));
+//    SARibbonPannel *pannel = category->addPannel(tr("pannel 1"));
+//    QAction *act = new QAction(w);
 
-    act->setText(tr("abiut"));
-    act->setIcon(QIcon(":/icon/icon/about.svg"));
-    act->connect(act, &QAction::triggered, w, [w](bool checked) {
-        Q_UNUSED(checked);
-        QMessageBox::information(w, tr("about")
-        , tr("SARibbon\n"
-        "https://github.com/czyt1988/SARibbon"));
-    });
-    pannel->addLargeAction(act);
+//    act->setText(tr("about"));
+//    act->setIcon(QIcon(":/icon/icon/about.svg"));
+//    act->connect(act, &QAction::triggered, w, [w](bool checked) {
+//        Q_UNUSED(checked);
+//        QMessageBox::information(w, tr("about")
+//        , tr("SARibbon\n"
+//        "https://github.com/czyt1988/SARibbon"));
+//    });
+//    pannel->addLargeAction(act);
     return (w);
 }
 
 
 void SARibbonMainWindowDesignerPlugin::initialize(QDesignerFormEditorInterface *core)
 {
+    SA_PLUGIN_MARK();
     if (m_isInitialized) {
         return;
     }
     QExtensionManager *mgr = core->extensionManager();
 
     if (mgr) {
+        //注册窗口容器，可以实现子窗口的创建
         mgr->registerExtensions(new SARibbonMainWindowContainerFactory(mgr)
             , Q_TYPEID(QDesignerContainerExtension));
+        //注册右键菜单
+        mgr->registerExtensions(new SARibbonMainWindowTaskMenuExtensionFactory(mgr)
+            , Q_TYPEID(QDesignerTaskMenuExtension));
     }
     m_formEditor = core;
     m_isInitialized = true;

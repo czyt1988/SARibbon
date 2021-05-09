@@ -47,22 +47,7 @@ SARibbonMainWindow::SARibbonMainWindow(QWidget *parent, bool useRibbon)
     if (useRibbon) {
         qDebug() << "SARibbon v0.3.1";
 		setRibbonTheme(ribbonTheme());
-		//
-		m_d->ribbonBar = new SARibbonBar(this);
-
-		setMenuWidget(m_d->ribbonBar);
-		m_d->ribbonBar->installEventFilter(this);
-        //设置窗体的标题栏高度
-        m_d->pFramelessHelper = new SAFramelessHelper(this);
-        m_d->pFramelessHelper->setTitleHeight(m_d->ribbonBar->titleBarHeight());
-        //设置window按钮
-        m_d->windowButtonGroup = new SAWindowButtonGroup(this);
-        //在ribbonBar捕获windowButtonGroup，主要捕获其尺寸
-        //m_d->windowButtonGroup->installEventFilter(m_d->ribbonBar);
-        QSize s = m_d->windowButtonGroup->size();
-        s.setHeight(m_d->ribbonBar->titleBarHeight());
-        m_d->windowButtonGroup->setFixedSize(s);
-        m_d->windowButtonGroup->setWindowStates(windowState());
+        setMenuWidget(new SARibbonBar(this));
 #ifdef Q_OS_UNIX
         //某些系统会对FramelessWindowHint异常
         //FramelessHelper用如下这种setWindowFlags(w->windowFlags()|Qt::FramelessWindowHint);方式设置，改为强制取消其他
@@ -124,16 +109,18 @@ bool SARibbonMainWindow::isUseRibbon() const
     return (m_d->useRibbon);
 }
 
+
 /**
  * @brief 此函数仅用于控制最小最大化和关闭按钮的显示
  */
 void SARibbonMainWindow::updateWindowFlag(Qt::WindowFlags flags)
 {
-    if(isUseRibbon()){
+    if (isUseRibbon()) {
         m_d->windowButtonGroup->updateWindowFlag(flags);
     }
     repaint();
 }
+
 
 /**
  * @brief 此函数返回的flags仅包括 Qt::WindowCloseButtonHint，Qt::WindowMaximizeButtonHint，Qt::WindowMinimizeButtonHint
@@ -142,10 +129,62 @@ void SARibbonMainWindow::updateWindowFlag(Qt::WindowFlags flags)
  */
 Qt::WindowFlags SARibbonMainWindow::windowButtonFlags() const
 {
-    if(isUseRibbon()){
-        return m_d->windowButtonGroup->windowButtonFlags();
+    if (isUseRibbon()) {
+        return (m_d->windowButtonGroup->windowButtonFlags());
     }
-    return windowFlags();
+    return (windowFlags());
+}
+
+
+void SARibbonMainWindow::setMenuWidget(QWidget *menubar)
+{
+    SARibbonBar *bar = qobject_cast<SARibbonBar *>(menubar);
+
+    if (bar) {
+        m_d->ribbonBar = bar;
+        m_d->ribbonBar->installEventFilter(this);
+        //设置窗体的标题栏高度
+        if (nullptr == m_d->pFramelessHelper) {
+            m_d->pFramelessHelper = new SAFramelessHelper(this);
+        }
+        m_d->pFramelessHelper->setTitleHeight(m_d->ribbonBar->titleBarHeight());
+        //设置window按钮
+        if (nullptr == m_d->windowButtonGroup) {
+            m_d->windowButtonGroup = new SAWindowButtonGroup(this);
+        }
+        QSize s = m_d->windowButtonGroup->size();
+        s.setHeight(m_d->ribbonBar->titleBarHeight());
+        m_d->windowButtonGroup->setFixedSize(s);
+        m_d->windowButtonGroup->setWindowStates(windowState());
+        m_d->useRibbon = true;
+    }
+    QMainWindow::setMenuWidget(menubar);
+}
+
+
+void SARibbonMainWindow::setMenuBar(QMenuBar *menuBar)
+{
+    SARibbonBar *bar = qobject_cast<SARibbonBar *>(menuBar);
+
+    if (bar) {
+        m_d->ribbonBar = bar;
+        m_d->ribbonBar->installEventFilter(this);
+        //设置窗体的标题栏高度
+        if (nullptr == m_d->pFramelessHelper) {
+            m_d->pFramelessHelper = new SAFramelessHelper(this);
+        }
+        m_d->pFramelessHelper->setTitleHeight(m_d->ribbonBar->titleBarHeight());
+        //设置window按钮
+        if (nullptr == m_d->windowButtonGroup) {
+            m_d->windowButtonGroup = new SAWindowButtonGroup(this);
+        }
+        QSize s = m_d->windowButtonGroup->size();
+        s.setHeight(m_d->ribbonBar->titleBarHeight());
+        m_d->windowButtonGroup->setFixedSize(s);
+        m_d->windowButtonGroup->setWindowStates(windowState());
+        m_d->useRibbon = true;
+    }
+    QMainWindow::setMenuBar(menuBar);
 }
 
 
@@ -205,7 +244,6 @@ bool SARibbonMainWindow::event(QEvent *e)
     }
     return (QMainWindow::event(e));
 }
-
 
 
 void SARibbonMainWindow::loadTheme(const QString& themeFile)
