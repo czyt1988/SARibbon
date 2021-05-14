@@ -23,8 +23,9 @@ class SA_RIBBON_EXPORT SARibbonCategory : public QWidget
     friend class SARibbonBar;
     friend class SARibbonContextCategory;
     Q_PROPERTY(bool isCanCustomize READ isCanCustomize WRITE setCanCustomize)
+    Q_PROPERTY(QString categoryTitle READ categoryTitle WRITE setCategoryTitle)
 public:
-    SARibbonCategory(QWidget *parent);
+    SARibbonCategory(QWidget *p = nullptr);
     ~SARibbonCategory();
 
     //category的名字
@@ -38,6 +39,9 @@ public:
 
     //添加pannel
     SARibbonPannel *addPannel(const QString& title);
+
+    //添加pannel
+    void addPannel(SARibbonPannel *pannel);
 
     //插入pannel
     SARibbonPannel *insertPannel(const QString& title, int index);
@@ -57,8 +61,6 @@ public:
     //移动一个Pannel从from index到to index
     void movePannel(int from, int to);
 
-    //添加pannel
-    void addPannel(SARibbonPannel *pannel);
 
     //把pannel从Category中移除，不会销毁，此时pannel的所有权归还操作者
     bool takePannel(SARibbonPannel *pannel);
@@ -84,6 +86,10 @@ public:
     //判断是否可以自定义
     bool isCanCustomize() const;
     void setCanCustomize(bool b);
+
+    //标题
+    QString categoryTitle() const;
+    void setCategoryTitle(const QString& title);
 
 protected slots:
     void onLeftScrollButtonClicked();

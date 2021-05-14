@@ -90,8 +90,11 @@ class SARibbonQuickAccessBar;
  */
 class SA_RIBBON_EXPORT SARibbonBar : public QMenuBar
 {
-    Q_OBJECT
     friend class SARibbonBarPrivate;
+    Q_OBJECT
+    Q_PROPERTY(RibbonStyle ribbonStyle READ currentRibbonStyle WRITE setRibbonStyle)
+    Q_PROPERTY(bool minimumMode READ isMinimumMode WRITE setMinimumMode)
+    Q_PROPERTY(bool minimumModeButton READ haveShowMinimumModeButton WRITE showMinimumModeButton)
 public:
 
     /**
@@ -103,7 +106,7 @@ public:
         , OfficeStyleTwoRow	= 0x0100        ///< 类似office 的ribbon风格 2行工具栏 三行布局模式，office就是三行布局模式，pannel能布置3行小toolbutton，默认模式
         , WpsLiteStyleTwoRow	= 0x0101        ///< 类似wps的紧凑风格  2行工具栏
     };
-    Q_FLAGS(RibbonStyle)
+    Q_ENUM(RibbonStyle)
 
     /**
      * @brief 定义当前ribbon 的状态
@@ -112,6 +115,10 @@ public:
         MinimumRibbonMode       ///< 缩小模式
         , NormalRibbonMode      ///< 正常模式
     };
+    Q_ENUM(RibbonState)
+public:
+
+public:
     //判断RibbonStyle是否为2行模式
     static bool isTwoRowStyle(RibbonStyle s);
 
@@ -120,7 +127,7 @@ public:
 
     //构造函数
     SARibbonBar(QWidget *parent = nullptr);
-    ~SARibbonBar();
+    ~SARibbonBar() Q_DECL_OVERRIDE;
     //获取applitionButton
     QAbstractButton *applicationButton();
 
@@ -132,9 +139,11 @@ public:
 
     //添加一个标签
     SARibbonCategory *addCategoryPage(const QString& title);
+    void addCategoryPage(SARibbonCategory *category);
 
     //添加一个category，category的位置在index，如果当前category数量少于index，将插入到最后
     SARibbonCategory *insertCategoryPage(const QString& title, int index);
+    void insertCategoryPage(SARibbonCategory *category, int index);
 
     //通过名字查找Category
     SARibbonCategory *categoryByName(const QString& title) const;
@@ -168,6 +177,7 @@ public:
 
     //添加一个上下文标签
     SARibbonContextCategory *addContextCategory(const QString& title, const QColor& color = QColor(), const QVariant& id = QVariant());
+    void addContextCategory(SARibbonContextCategory *context);
 
     //显示一个上下文标签
     void showContextCategory(SARibbonContextCategory *context);
@@ -223,6 +233,9 @@ public:
 	//设置当前ribbon的index
 	void setCurrentIndex(int index);
 
+    //返回当前的tab索引
+    int currentIndex();
+
 	//确保标签显示出来
     void raiseCategory(SARibbonCategory *category);
 
@@ -234,6 +247,7 @@ public:
 
     //告诉saribbonbar，window button的尺寸
     void setWindowButtonSize(const QSize& size);
+
 
 signals:
 

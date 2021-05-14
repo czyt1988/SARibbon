@@ -289,26 +289,35 @@ SARibbonTabBar *SARibbonBar::ribbonTabBar()
  */
 SARibbonCategory *SARibbonBar::addCategoryPage(const QString& title)
 {
-    SARibbonCategory *catagory = RibbonSubElementDelegate->createRibbonCategory(this);
+    SARibbonCategory *category = RibbonSubElementDelegate->createRibbonCategory(this);
 
     //catagory->setFixedHeight(categoryHeight());
-    catagory->setObjectName(title);
-    catagory->setWindowTitle(title);
-    int index = m_d->ribbonTabBar->addTab(title);
+    category->setObjectName(title);
+    category->setWindowTitle(title);
+    addCategoryPage(category);
+    return (category);
+}
 
-    catagory->setRibbonPannelLayoutMode(isTwoRowStyle() ? SARibbonPannel::TwoRowMode : SARibbonPannel::ThreeRowMode);
+
+/**
+ * @brief 添加一个标签
+ * @param category
+ */
+void SARibbonBar::addCategoryPage(SARibbonCategory *category)
+{
+    int index = m_d->ribbonTabBar->addTab(category->windowTitle());
+
+    category->setRibbonPannelLayoutMode(isTwoRowStyle() ? SARibbonPannel::TwoRowMode : SARibbonPannel::ThreeRowMode);
 
     _SARibbonTabData tabdata;
 
-    tabdata.category = catagory;
+    tabdata.category = category;
     tabdata.index = index;
     m_d->ribbonTabBar->setTabData(index, QVariant::fromValue(tabdata));
 
-    m_d->stackedContainerWidget->insertWidget(index, catagory);
-    connect(catagory, &QWidget::windowTitleChanged, this, &SARibbonBar::onCategoryWindowTitleChanged);
+    m_d->stackedContainerWidget->insertWidget(index, category);
+    connect(category, &QWidget::windowTitleChanged, this, &SARibbonBar::onCategoryWindowTitleChanged);
     QApplication::postEvent(this, new QResizeEvent(size(), size()));
-    //销毁时移除tab
-    return (catagory);
 }
 
 
@@ -320,24 +329,29 @@ SARibbonCategory *SARibbonBar::addCategoryPage(const QString& title)
  */
 SARibbonCategory *SARibbonBar::insertCategoryPage(const QString& title, int index)
 {
-    SARibbonCategory *catagory = RibbonSubElementDelegate->createRibbonCategory(this);
+    SARibbonCategory *category = RibbonSubElementDelegate->createRibbonCategory(this);
 
-    catagory->setObjectName(title);
-    catagory->setWindowTitle(title);
-    catagory->setRibbonPannelLayoutMode(isTwoRowStyle() ? SARibbonPannel::TwoRowMode : SARibbonPannel::ThreeRowMode);
-    int i = m_d->ribbonTabBar->insertTab(index, title);
+    category->setObjectName(title);
+    category->setWindowTitle(title);
+    insertCategoryPage(category, index);
+    return (category);
+}
+
+
+void SARibbonBar::insertCategoryPage(SARibbonCategory *category, int index)
+{
+    category->setRibbonPannelLayoutMode(isTwoRowStyle() ? SARibbonPannel::TwoRowMode : SARibbonPannel::ThreeRowMode);
+    int i = m_d->ribbonTabBar->insertTab(index, category->windowTitle());
 
     _SARibbonTabData tabdata;
 
-    tabdata.category = catagory;
+    tabdata.category = category;
     tabdata.index = i;
     m_d->ribbonTabBar->setTabData(i, QVariant::fromValue(tabdata));
-    m_d->stackedContainerWidget->insertWidget(index, catagory);
+    m_d->stackedContainerWidget->insertWidget(index, category);
 
-    connect(catagory, &QWidget::windowTitleChanged, this, &SARibbonBar::onCategoryWindowTitleChanged);
+    connect(category, &QWidget::windowTitleChanged, this, &SARibbonBar::onCategoryWindowTitleChanged);
     QApplication::postEvent(this, new QResizeEvent(size(), size()));
-    //销毁时移除tab
-    return (catagory);
 }
 
 
@@ -585,6 +599,17 @@ SARibbonContextCategory *SARibbonBar::addContextCategory(const QString& title, c
     context->setContextTitle(title);
     context->setId(id);
     context->setContextColor(color.isValid() ? color : m_d->getContextCategoryColor());
+    addContextCategory(context);
+    return (context);
+}
+
+
+/**
+ * @brief 添加上下文标签
+ * @param context
+ */
+void SARibbonBar::addContextCategory(SARibbonContextCategory *context)
+{
     connect(context, &SARibbonContextCategory::categoryPageAdded
         , this, &SARibbonBar::onContextsCategoryPageAdded);
     //remove并没有绑定，主要是remove后在stacked里也不会显示，remove且delete的话，stacked里也会删除
@@ -592,7 +617,6 @@ SARibbonContextCategory *SARibbonBar::addContextCategory(const QString& title, c
         resizeInWpsLiteStyle();
     }
     m_d->mContextCategoryList.append(context);
-    return (context);
 }
 
 
@@ -1080,6 +1104,16 @@ void SARibbonBar::setCurrentIndex(int index)
 {
 	m_d->ribbonTabBar->setCurrentIndex(index);
 	//onCurrentRibbonTabChanged(index);
+}
+
+
+/**
+ * @brief 返回当前的tab索引
+ * @return 当前的索引
+ */
+int SARibbonBar::currentIndex()
+{
+    return (m_d->ribbonTabBar->currentIndex());
 }
 
 

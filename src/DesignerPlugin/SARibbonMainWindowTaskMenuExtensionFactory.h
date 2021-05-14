@@ -4,6 +4,9 @@
 #include <QDesignerFormWindowInterface>
 #include <QDesignerTaskMenuExtension>
 namespace SA_PLUGIN {
+/**
+ * @brief SARibbonMainWindowTaskMenuExtension的工厂
+ */
 class SARibbonMainWindowTaskMenuExtensionFactory : public QExtensionFactory
 {
     Q_OBJECT

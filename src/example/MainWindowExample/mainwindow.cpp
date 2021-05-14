@@ -46,13 +46,20 @@ MainWindow::MainWindow(QWidget *par) : SARibbonMainWindow(par)
     PRINT_COST(cost, lastTimes, "setCentralWidget & setWindowTitle");
     SARibbonBar *ribbon = ribbonBar();
 
+    //添加方法1
     ribbon->applicationButton()->setText(QStringLiteral("File"));
     SARibbonCategory *categoryMain = ribbon->addCategoryPage(QStringLiteral("Main"));
 
     PRINT_COST(cost, lastTimes, "new main page");
     createCategoryMain(categoryMain);
     PRINT_COST(cost, lastTimes, "add main page element");
-    SARibbonCategory *categoryOther = ribbon->addCategoryPage(QStringLiteral("Other"));
+
+    //添加方法2
+    SARibbonCategory *categoryOther = new SARibbonCategory();
+
+    categoryOther->setWindowTitle(QStringLiteral("Other"));
+    categoryOther->setObjectName(QStringLiteral("categoryOther"));
+    ribbon->addCategoryPage(categoryOther);
 
     createCategoryOther(categoryOther);
     PRINT_COST(cost, lastTimes, "add other page");
@@ -499,7 +506,6 @@ void MainWindow::createCategoryOther(SARibbonCategory *page)
     connect(useqss, &QAction::triggered, this, [&]() {
         QFile f("ribbon.qss");
         if (!f.open(QIODevice::ReadWrite)) {
-            return;
         }
         QString qss(f.readAll());
         this->ribbonBar()->setStyleSheet(qss);
@@ -517,7 +523,8 @@ void MainWindow::createCategoryOther(SARibbonCategory *page)
         }
     });
 
-    QAction* normalButton = new QAction(QIcon(":/icon/icon/506354.png"),QStringLiteral("正常模式"),this);
+    QAction *normalButton = new QAction(QIcon(":/icon/icon/506354.png"), QStringLiteral("正常模式"), this);
+
     normalButton->setObjectName(QStringLiteral("normalButton"));
     pannel->addLargeAction(normalButton);
     connect(normalButton, &QAction::triggered, this, [&]() {
@@ -527,14 +534,15 @@ void MainWindow::createCategoryOther(SARibbonCategory *page)
         updateWindowFlag(f);
     });
 
-    QAction* noneButton = new QAction(QIcon(":/icon/icon/506462.png"),QStringLiteral("无按钮模式"),this);
+    QAction *noneButton = new QAction(QIcon(":/icon/icon/506462.png"), QStringLiteral("无按钮模式"), this);
+
     noneButton->setObjectName(QStringLiteral("noneButton"));
     pannel->addLargeAction(noneButton);
     connect(noneButton, &QAction::triggered, this, [&]() {
         //由于已经处于frameless状态，这个最大最小设置是无效的
         //setWindowFlags(windowFlags()&~Qt::WindowMaximizeButtonHint&~Qt::WindowMinimizeButtonHint);
         Qt::WindowFlags f = windowFlags();
-        f &= ~Qt::WindowMinMaxButtonsHint & ~Qt::WindowCloseButtonHint;
+        f &= ~Qt::WindowMinMaxButtonsHint& ~Qt::WindowCloseButtonHint;
         updateWindowFlag(f);
     });
 }
@@ -688,16 +696,16 @@ void MainWindow::addSomeOtherAction()
 {
     m_actMgr = new SARibbonActionsManager(this);
     //添加其他的action，这些action并不在ribbon管理范围，主要用于SARibbonCustomizeWidget自定义用
-    QAction *acttext1 = new QAction(QStringLiteral("纯文本action1"),this);
-    QAction *acttext2 = new QAction(QStringLiteral("纯文本action2"),this);
-    QAction *acttext3 = new QAction(QStringLiteral("纯文本action3"),this);
-    QAction *acttext4 = new QAction(QStringLiteral("纯文本action4"),this);
-    QAction *acttext5 = new QAction(QStringLiteral("纯文本action5"),this);
+    QAction *acttext1 = new QAction(QStringLiteral("纯文本action1"), this);
+    QAction *acttext2 = new QAction(QStringLiteral("纯文本action2"), this);
+    QAction *acttext3 = new QAction(QStringLiteral("纯文本action3"), this);
+    QAction *acttext4 = new QAction(QStringLiteral("纯文本action4"), this);
+    QAction *acttext5 = new QAction(QStringLiteral("纯文本action5"), this);
 
-    QAction *actIcon1 = new QAction(QIcon(":/icon/icon/506353.png"), QStringLiteral("带图标action1"),this);
-    QAction *actIcon2 = new QAction(QIcon(":/icon/icon/506354.png"), QStringLiteral("带图标action2"),this);
-    QAction *actIcon3 = new QAction(QIcon(":/icon/icon/506355.png"), QStringLiteral("带图标action3"),this);
-    QAction *actIcon4 = new QAction(QIcon(":/icon/icon/506356.png"), QStringLiteral("带图标action4"),this);
+    QAction *actIcon1 = new QAction(QIcon(":/icon/icon/506353.png"), QStringLiteral("带图标action1"), this);
+    QAction *actIcon2 = new QAction(QIcon(":/icon/icon/506354.png"), QStringLiteral("带图标action2"), this);
+    QAction *actIcon3 = new QAction(QIcon(":/icon/icon/506355.png"), QStringLiteral("带图标action3"), this);
+    QAction *actIcon4 = new QAction(QIcon(":/icon/icon/506356.png"), QStringLiteral("带图标action4"), this);
 
     m_actionTagText = SARibbonActionsManager::UserDefineActionTag+1;
     m_actionTagWithIcon = SARibbonActionsManager::UserDefineActionTag+2;

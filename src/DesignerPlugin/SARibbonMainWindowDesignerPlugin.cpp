@@ -104,6 +104,9 @@ QWidget *SARibbonMainWindowDesignerPlugin::createWidget(QWidget *parent)
 
     w->setObjectName(QStringLiteral("SARibbonMainWindow"));
     w->setWindowTitle(QStringLiteral("SARibbonMainWindow"));
+    w->setAcceptDrops(true);
+    w->setMouseTracking(true);
+    w->setRibbonTheme(SARibbonMainWindow::Office2013);
 //    SARibbonBar *bar = w->ribbonBar();
 //    SARibbonCategory *category = bar->addCategoryPage(tr("Main"));
 //    SARibbonPannel *pannel = category->addPannel(tr("pannel 1"));

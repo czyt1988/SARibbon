@@ -9,6 +9,8 @@
 #include <QMessageBox>
 #include <QDesignerMetaDataBaseInterface>
 #include "SARibbonPluginDebugHelper.h"
+#include "SARibbonBarContainerFactory.h"
+#include "SARibbonBarTaskMenuExtensionFactory.h"
 using namespace SA_PLUGIN;
 SARibbonBarDesignerPlugin::SARibbonBarDesignerPlugin(QObject *p)
     : QObject(p)
@@ -35,6 +37,10 @@ QIcon SARibbonBarDesignerPlugin::icon() const
 }
 
 
+/**
+ * @brief addCategoryPage这个是关键，制定了子窗口的调用方法
+ * @return
+ */
 QString SARibbonBarDesignerPlugin::domXml() const
 {
     return ("<ui language=\"c++\">\n"
@@ -89,6 +95,7 @@ QWidget *SARibbonBarDesignerPlugin::createWidget(QWidget *parent)
     }
     SARibbonBar *bar = new SARibbonBar(parent);
 
+    bar->setAcceptDrops(true);
     return (bar);
 }
 
@@ -101,6 +108,10 @@ void SARibbonBarDesignerPlugin::initialize(QDesignerFormEditorInterface *core)
     QExtensionManager *mgr = core->extensionManager();
 
     if (mgr) {
+        mgr->registerExtensions(new SARibbonBarContainerFactory(mgr)
+            , Q_TYPEID(QDesignerContainerExtension));
+        mgr->registerExtensions(new SARibbonBarTaskMenuExtensionFactory(mgr)
+            , Q_TYPEID(QDesignerTaskMenuExtension));
     }
     m_formEditor = core;
     m_isInitialized = true;
@@ -129,6 +140,10 @@ void SARibbonBarDesignerPlugin::onFormWindowRemoved(QDesignerFormWindowInterface
 }
 
 
+/**
+ * @brief 所有的窗体添加都会触发此槽函数
+ * @param widget
+ */
 void SARibbonBarDesignerPlugin::onWidgetManaged(QWidget *widget)
 {
     if (widget) {

@@ -1,6 +1,8 @@
 ﻿#include "SARibbonMainWindowTaskMenuExtensionFactory.h"
 #include "SARibbonMainWindowTaskMenuExtension.h"
+#include "SARibbonBarTaskMenuExtension.h"
 #include "SARibbonMainWindow.h"
+#include "SARibbonBar.h"
 using namespace SA_PLUGIN;
 SARibbonMainWindowTaskMenuExtensionFactory::SARibbonMainWindowTaskMenuExtensionFactory(QExtensionManager *mgr)
     : QExtensionFactory(mgr)
@@ -10,11 +12,16 @@ SARibbonMainWindowTaskMenuExtensionFactory::SARibbonMainWindowTaskMenuExtensionF
 
 QObject *SARibbonMainWindowTaskMenuExtensionFactory::createExtension(QObject *obj, const QString& iid, QObject *p) const
 {
-    SARibbonMainWindow *widget = qobject_cast<SARibbonMainWindow *>(obj);
-
-    if (widget && (iid == Q_TYPEID(QDesignerTaskMenuExtension))) {
-        return (new SARibbonMainWindowTaskMenuExtension(widget, p));
-    }else{
-        return (nullptr);
+    if (iid == Q_TYPEID(QDesignerTaskMenuExtension)) {
+        if (SARibbonMainWindow *widget = qobject_cast<SARibbonMainWindow *>(obj)) {
+            //在SARibbonMainWindow上触发
+            return (new SARibbonMainWindowTaskMenuExtension(widget, p));
+        }
+//        else if (SARibbonBar *widget = qobject_cast<SARibbonBar *>(obj)) {
+//            //在ribbonbar上点击
+//            return (new SARibbonBarTaskMenuExtension(widget, p));
+//        }
     }
+
+    return (nullptr);
 }

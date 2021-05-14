@@ -14,7 +14,6 @@ class SARibbonPannelPrivate;
 
 
 
-
 /**
  * @brief pannel页窗口，pannel是ribbon的面板用于承放控件
  *
@@ -35,6 +34,7 @@ class SA_RIBBON_EXPORT SARibbonPannel : public QWidget
     friend class SARibbonCustomizeWidgetPrivate;
     Q_PROPERTY(bool isCanCustomize READ isCanCustomize WRITE setCanCustomize)
     Q_PROPERTY(bool isExpanding READ isExpanding WRITE setExpanding)
+    Q_PROPERTY(QString pannelTitle READ pannelTitle WRITE setPannelTitle)
 public:
     SARibbonPannel(QWidget *parent = 0);
     ~SARibbonPannel();
@@ -137,6 +137,10 @@ public:
     //判断是否可以自定义
     bool isCanCustomize() const;
     void setCanCustomize(bool b);
+
+    //标题
+    QString pannelTitle() const;
+    void setPannelTitle(const QString& title);
 
 signals:
 
