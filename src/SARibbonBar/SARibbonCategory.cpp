@@ -115,8 +115,8 @@ SARibbonCategoryScrollButton::SARibbonCategoryScrollButton(Qt::ArrowType arr, QW
 }
 
 
-SARibbonCategory::SARibbonCategory(QWidget *parent)
-    : QWidget(parent)
+SARibbonCategory::SARibbonCategory(QWidget *p)
+    : QWidget(p)
     , m_d(new SARibbonCategoryPrivate(this))
 {
     setAutoFillBackground(true);
@@ -293,7 +293,7 @@ void SARibbonCategory::movePannel(int from, int to)
 
 /**
  * @brief 添加pannel
- * @param pannel的所有权SARibbonCategory来管理
+ * @param pannel pannel的所有权SARibbonCategory来管理
  */
 void SARibbonCategory::addPannel(SARibbonPannel *pannel)
 {
@@ -303,7 +303,7 @@ void SARibbonCategory::addPannel(SARibbonPannel *pannel)
 
 /**
  * @brief 把pannel脱离SARibbonCategory的管理
- * @param 需要提取的pannel
+ * @param pannel 需要提取的pannel
  * @return 成功返回true，否则返回false
  */
 bool SARibbonCategory::takePannel(SARibbonPannel *pannel)
@@ -395,6 +395,23 @@ bool SARibbonCategory::isCanCustomize() const
 void SARibbonCategory::setCanCustomize(bool b)
 {
     m_d->isCanCustomize = b;
+}
+
+
+QString SARibbonCategory::categoryTitle() const
+{
+    return (windowTitle());
+}
+
+
+/**
+ * @brief SARibbonCategory::setCategoryTitle 等同setWindowTitle
+ * @note 会触发titleChange信号
+ * @param title 标题
+ */
+void SARibbonCategory::setCategoryTitle(const QString& title)
+{
+    setWindowTitle(title);
 }
 
 

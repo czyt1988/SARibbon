@@ -622,6 +622,23 @@ void SARibbonPannel::setCanCustomize(bool b)
 }
 
 
+QString SARibbonPannel::pannelTitle() const
+{
+    return (windowTitle());
+}
+
+
+/**
+ * @brief SARibbonPannel::setPannelTitle pannel的标题
+ * @note 注意会触发windowTitleChange信号
+ * @param title 标题
+ */
+void SARibbonPannel::setPannelTitle(const QString& title)
+{
+    setWindowTitle(title);
+}
+
+
 void SARibbonPannel::resetLayout(PannelLayoutMode newmode)
 {
     Q_UNUSED(newmode);

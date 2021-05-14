@@ -31,17 +31,21 @@ class SARibbonBar;
 class SA_RIBBON_EXPORT SARibbonMainWindow : public QMainWindow
 {
     Q_OBJECT
+    Q_PROPERTY(RibbonTheme ribbonTheme READ ribbonTheme WRITE setRibbonTheme)
 public:
-    SARibbonMainWindow(QWidget *parent = nullptr, bool useRibbon = true);
-    ~SARibbonMainWindow();
-    //返回SARibbonBar
-    const SARibbonBar *ribbonBar() const;
-    SARibbonBar *ribbonBar();
-
     enum RibbonTheme {
         NormalTheme     ///< 普通主题
         , Office2013    ///< office2013主题
     };
+    Q_ENUM(RibbonTheme)
+public:
+    SARibbonMainWindow(QWidget *parent = nullptr, bool useRibbon = true);
+    ~SARibbonMainWindow() Q_DECL_OVERRIDE;
+    //返回SARibbonBar
+    const SARibbonBar *ribbonBar() const;
+    SARibbonBar *ribbonBar();
+
+
     void setRibbonTheme(RibbonTheme theme);
     RibbonTheme ribbonTheme() const;
 

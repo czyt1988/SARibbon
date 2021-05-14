@@ -11,6 +11,7 @@
 
 #include "SARibbonMainWindow.h"
 #include "SARibbonBar.h"
+#include "SARibbonCategory.h"
 
 #include "SARibbonPluginDebugHelper.h"
 using namespace SA_PLUGIN;
@@ -40,14 +41,7 @@ void SARibbonMainWindowTaskMenuExtension::initActions()
     m_useRibbon->setObjectName(QStringLiteral("use_ribbon"));
     connect(m_useRibbon, &QAction::triggered, this, &SARibbonMainWindowTaskMenuExtension::onUseRibbon);
 
-    QAction *addCategory = new QAction(tr("add category"), this);
-
-    addCategory->setObjectName(QStringLiteral("add_category"));
-    addCategory->setIcon(QIcon(":/icon/icon/addcategory.svg"));
-    connect(addCategory, &QAction::triggered, this, &SARibbonMainWindowTaskMenuExtension::onAddCategory);
-
     m_actions.append(m_useRibbon);
-    m_actions.append(addCategory);
 }
 
 
@@ -70,8 +64,12 @@ QDesignerFormEditorInterface *SARibbonMainWindowTaskMenuExtension::core() const
 }
 
 
+/**
+ * @brief SARibbonMainWindowTaskMenuExtension::onUseRibbon
+ */
 void SARibbonMainWindowTaskMenuExtension::onUseRibbon()
 {
+    SA_PLUGIN_MARK();
     QDesignerFormWindowInterface *fw = formWindowInterface();
 
     if (nullptr == fw) {
@@ -90,6 +88,7 @@ void SARibbonMainWindowTaskMenuExtension::onUseRibbon()
     if (!core) {
         return;
     }
+    SA_PLUGIN_LOG("add ribbon bar");
     //在QMainWindow下创建SARibbonBar，将调用
     QDesignerContainerExtension *c = qt_extension<QDesignerContainerExtension *>(core->extensionManager(), mw);
 
@@ -108,14 +107,6 @@ void SARibbonMainWindowTaskMenuExtension::onUseRibbon()
     fw->emitSelectionChanged();
     //
     m_bar->setFocus();
-}
-
-
-void SARibbonMainWindowTaskMenuExtension::onAddCategory()
-{
-}
-
-
-void SARibbonMainWindowTaskMenuExtension::onAddContextCategory()
-{
+    //
+    m_useRibbon->setEnabled(false);
 }

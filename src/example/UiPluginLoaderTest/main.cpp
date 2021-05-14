@@ -1,11 +1,13 @@
-#include "UiLoad.h"
+﻿#include "UiLoad.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    UiLoad w;
-    w.show();
+    QWidget *w = load();
 
-    return a.exec();
+    if (w) {
+        w->show();
+    }
+    return (a.exec());
 }

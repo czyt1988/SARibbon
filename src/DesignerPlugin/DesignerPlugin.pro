@@ -28,24 +28,37 @@ include($$PWD/../SARibbonBar/SARibbonBar.pri)
 
 HEADERS += \
     SARibbonBarCommands.h \
+    SARibbonBarContainerExtension.h \
+    SARibbonBarContainerFactory.h \
     SARibbonBarDesignerPlugin.h \
+    SARibbonBarTaskMenuExtension.h \
+    SARibbonBarTaskMenuExtensionFactory.h \
+    SARibbonCategoryDesignerPlugin.h \
     SARibbonMainWindowContainerExtension.h \
     SARibbonMainWindowContainerFactory.h \
     SARibbonMainWindowDesignerPlugin.h \
     SARibbonMainWindowTaskMenuExtension.h \
     SARibbonMainWindowTaskMenuExtensionFactory.h \
+    SARibbonPannelDesignerPlugin.h \
     SARibbonPluginCollection.h \
     SARibbonPluginDebugHelper.h
 
 SOURCES += \
     SARibbonBarCommands.cpp \
+    SARibbonBarContainerExtension.cpp \
+    SARibbonBarContainerFactory.cpp \
     SARibbonBarDesignerPlugin.cpp \
+    SARibbonBarTaskMenuExtension.cpp \
+    SARibbonBarTaskMenuExtensionFactory.cpp \
+    SARibbonCategoryDesignerPlugin.cpp \
     SARibbonMainWindowContainerExtension.cpp \
     SARibbonMainWindowContainerFactory.cpp \
     SARibbonMainWindowDesignerPlugin.cpp \
     SARibbonMainWindowTaskMenuExtension.cpp \
     SARibbonMainWindowTaskMenuExtensionFactory.cpp \
-    SARibbonPluginCollection.cpp
+    SARibbonPannelDesignerPlugin.cpp \
+    SARibbonPluginCollection.cpp \
+    SARibbonPluginDebugHelper.cpp
 
 RESOURCES += \
     icon.qrc
