@@ -10,7 +10,7 @@
 #include <QDesignerMetaDataBaseInterface>
 #include "SARibbonPluginDebugHelper.h"
 #include "SARibbonBarContainerFactory.h"
-#include "SARibbonBarTaskMenuExtensionFactory.h"
+#include "SARibbonBarTaskMenuFactory.h"
 using namespace SA_PLUGIN;
 SARibbonBarDesignerPlugin::SARibbonBarDesignerPlugin(QObject *p)
     : QObject(p)
@@ -110,7 +110,7 @@ void SARibbonBarDesignerPlugin::initialize(QDesignerFormEditorInterface *core)
     if (mgr) {
         mgr->registerExtensions(new SARibbonBarContainerFactory(mgr)
             , Q_TYPEID(QDesignerContainerExtension));
-        mgr->registerExtensions(new SARibbonBarTaskMenuExtensionFactory(mgr)
+        mgr->registerExtensions(new SARibbonBarTaskMenuFactory(mgr)
             , Q_TYPEID(QDesignerTaskMenuExtension));
     }
     m_formEditor = core;

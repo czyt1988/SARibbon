@@ -8,8 +8,10 @@
 #include <QDesignerContainerExtension>
 #include <QMessageBox>
 #include <QDesignerMetaDataBaseInterface>
+#include "SARibbonCategoryContainerFactory.h"
 #include "SARibbonPluginDebugHelper.h"
 #include "SARibbonCategory.h"
+#include "SARibbonBarTaskMenuFactory.h"
 using namespace SA_PLUGIN;
 SARibbonCategoryDesignerPlugin::SARibbonCategoryDesignerPlugin(QObject *p)
     : QObject(p)
@@ -102,5 +104,9 @@ void SARibbonCategoryDesignerPlugin::initialize(QDesignerFormEditorInterface *co
     QExtensionManager *mgr = core->extensionManager();
 
     if (mgr) {
+        mgr->registerExtensions(new SARibbonCategoryContainerFactory(mgr)
+            , Q_TYPEID(QDesignerContainerExtension));
+        mgr->registerExtensions(new SARibbonBarTaskMenuFactory(mgr)
+            , Q_TYPEID(QDesignerTaskMenuExtension));
     }
 }

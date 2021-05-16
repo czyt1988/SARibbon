@@ -323,12 +323,29 @@ bool SARibbonCategory::takePannel(SARibbonPannel *pannel)
  * SARibbonPannel* pannel;
  * ...
  * category->takePannel(pannel);
- * delete pannel;
+ * pannel->hide();
+ * pannel->deleteLater();
  * @endcode
  */
 bool SARibbonCategory::removePannel(SARibbonPannel *pannel)
 {
     return (m_d->removePannel(pannel));
+}
+
+
+/**
+ * @brief 移除pannel
+ * @param index pannel的索引，如果超出会返回false
+ * @return 成功返回true
+ */
+bool SARibbonCategory::removePannel(int index)
+{
+    SARibbonPannel *p = pannelByIndex(index);
+
+    if (nullptr == p) {
+        return (false);
+    }
+    return (removePannel(p));
 }
 
 
@@ -395,23 +412,6 @@ bool SARibbonCategory::isCanCustomize() const
 void SARibbonCategory::setCanCustomize(bool b)
 {
     m_d->isCanCustomize = b;
-}
-
-
-QString SARibbonCategory::categoryTitle() const
-{
-    return (windowTitle());
-}
-
-
-/**
- * @brief SARibbonCategory::setCategoryTitle 等同setWindowTitle
- * @note 会触发titleChange信号
- * @param title 标题
- */
-void SARibbonCategory::setCategoryTitle(const QString& title)
-{
-    setWindowTitle(title);
 }
 
 
@@ -602,7 +602,8 @@ bool SARibbonCategoryPrivate::takePannel(SARibbonPannel *pannel)
 bool SARibbonCategoryPrivate::removePannel(SARibbonPannel *pannel)
 {
     if (takePannel(pannel)) {
-        delete pannel;
+        pannel->hide();
+        pannel->deleteLater();
         return (true);
     }
     return (false);

@@ -81,4 +81,10 @@ QWidget *SARibbonPannelDesignerPlugin::createWidget(QWidget *parent)
 
 void SARibbonPannelDesignerPlugin::initialize(QDesignerFormEditorInterface *core)
 {
+    if (m_isInitialized) {
+        return;
+    }
+
+    m_isInitialized = true;
+    m_formEditor = core;
 }
