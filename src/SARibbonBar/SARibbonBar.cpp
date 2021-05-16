@@ -313,6 +313,7 @@ void SARibbonBar::addCategoryPage(SARibbonCategory *category)
 
     tabdata.category = category;
     tabdata.index = index;
+    category->setRibbonBar(this);
     m_d->ribbonTabBar->setTabData(index, QVariant::fromValue(tabdata));
 
     m_d->stackedContainerWidget->insertWidget(index, category);

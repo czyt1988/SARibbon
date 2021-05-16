@@ -19,6 +19,7 @@ private slots:
 private:
     void createCategoryMain(SARibbonCategory *page);
     void createCategoryOther(SARibbonCategory *page);
+    void createCategoryDelete(SARibbonCategory *page);
     void createContextCategoryPage1(SARibbonCategory *page);
     void createContextCategoryPage2(SARibbonCategory *page);
     void addSomeOtherAction();

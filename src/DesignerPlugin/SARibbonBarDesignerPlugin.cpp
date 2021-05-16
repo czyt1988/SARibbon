@@ -178,7 +178,7 @@ void SARibbonBarDesignerPlugin::onWidgetManaged(QWidget *widget)
 //                return;
 //            }
 //        }
-        container->addWidget(widget);
-        formWindow->core()->metaDataBase()->add(widget);
+//        container->addWidget(widget);
+//        formWindow->core()->metaDataBase()->add(widget);
     }
 }

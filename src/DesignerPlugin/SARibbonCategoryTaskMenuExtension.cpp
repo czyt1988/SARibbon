@@ -10,6 +10,7 @@
 #include "SARibbonCategory.h"
 #include "SARibbonPannel.h"
 #include "SARibbonPluginDebugHelper.h"
+
 using namespace SA_PLUGIN;
 SARibbonCategoryTaskMenuExtension::SARibbonCategoryTaskMenuExtension(QWidget *w, QObject *p)
     : QObject(p)
@@ -44,7 +45,7 @@ void SARibbonCategoryTaskMenuExtension::initActions()
 }
 
 
-QDesignerFormWindowInterface *SARibbonCategoryTaskMenuExtension::formWindowInterface() const
+QDesignerFormWindowInterface *SARibbonCategoryTaskMenuExtension::ribbonCategoryFormWindowInterface() const
 {
     QDesignerFormWindowInterface *result = QDesignerFormWindowInterface::findFormWindow(m_widget);
 
@@ -52,9 +53,33 @@ QDesignerFormWindowInterface *SARibbonCategoryTaskMenuExtension::formWindowInter
 }
 
 
-QDesignerFormEditorInterface *SARibbonCategoryTaskMenuExtension::core() const
+QDesignerFormEditorInterface *SARibbonCategoryTaskMenuExtension::ribbonCategoryCore() const
 {
-    QDesignerFormWindowInterface *fw = formWindowInterface();
+    QDesignerFormWindowInterface *fw = ribbonCategoryFormWindowInterface();
+
+    if (nullptr == fw) {
+        return (nullptr);
+    }
+    return (fw->core());
+}
+
+
+QDesignerFormWindowInterface *SARibbonCategoryTaskMenuExtension::ribbonBarFormWindowInterface() const
+{
+    SARibbonCategory *c = qobject_cast<SARibbonCategory *>(m_widget);
+
+    if ((nullptr == c) || (nullptr == c->ribbonBar())) {
+        return (nullptr);
+    }
+    QDesignerFormWindowInterface *result = QDesignerFormWindowInterface::findFormWindow(c->ribbonBar());
+
+    return (result);
+}
+
+
+QDesignerFormEditorInterface *SARibbonCategoryTaskMenuExtension::ribbonBarCore() const
+{
+    QDesignerFormWindowInterface *fw = ribbonBarFormWindowInterface();
 
     if (nullptr == fw) {
         return (nullptr);
@@ -72,7 +97,7 @@ void SARibbonCategoryTaskMenuExtension::onAddPannel()
         SA_PLUGIN_LOG("null SARibbonCategory");
         return;
     }
-    QDesignerFormWindowInterface *fw = formWindowInterface();
+    QDesignerFormWindowInterface *fw = ribbonCategoryFormWindowInterface();
 
     if (nullptr == fw) {
         SA_PLUGIN_LOG("null formWindowInterface");
@@ -103,10 +128,20 @@ void SARibbonCategoryTaskMenuExtension::onRemoveCategory()
     SA_PLUGIN_MARK();
     SARibbonCategory *category = qobject_cast<SARibbonCategory *>(m_widget);
 
-    QDesignerFormWindowInterface *fw = formWindowInterface();
+    if (nullptr == category) {
+        SA_PLUGIN_LOG("null SARibbonCategory");
+        return;
+    }
+    SARibbonBar *bar = category->ribbonBar();
+
+    if (nullptr == bar) {
+        SA_PLUGIN_LOG("null SARibbonBar");
+        return;
+    }
+    QDesignerFormWindowInterface *fw = ribbonBarFormWindowInterface();
 
     if (nullptr == fw) {
-        SA_PLUGIN_LOG("null formWindowInterface");
+        SA_PLUGIN_LOG("null ribbonBarFormWindowInterface");
         return;
     }
     QDesignerFormEditorInterface *core = fw->core();
@@ -115,16 +150,18 @@ void SARibbonCategoryTaskMenuExtension::onRemoveCategory()
         SA_PLUGIN_LOG("core is null");
         return;
     }
-    core->metaDataBase()->remove(category);
-    QDesignerContainerExtension *c = qt_extension<QDesignerContainerExtension *>(core->extensionManager(), category->parent());
+    core->metaDataBase()->remove(m_widget);
+    QDesignerContainerExtension *c = qt_extension<QDesignerContainerExtension *>(core->extensionManager(), bar);
 
-    for (int i = 0; i < c->count(); ++i)
-    {
-        if (c->widget(i) == category) {
-            SA_PLUGIN_LOG("category success remove");
-            c->remove(i);
-            break;
+    if (c) {
+        for (int i = 0; i < c->count(); ++i)
+        {
+            if (c->widget(i) == m_widget) {
+                c->remove(i);
+                break;
+            }
         }
+        fw->emitSelectionChanged();
+        //成功移除窗口后，需要在metaData里面移除
     }
-    fw->emitSelectionChanged();
 }

@@ -8,6 +8,7 @@
 #include <QDesignerContainerExtension>
 #include <QMessageBox>
 #include <QDesignerMetaDataBaseInterface>
+#include <QDesignerPropertySheetExtension>
 #include "SARibbonCategoryContainerFactory.h"
 #include "SARibbonPluginDebugHelper.h"
 #include "SARibbonCategory.h"
@@ -92,6 +93,8 @@ QWidget *SARibbonCategoryDesignerPlugin::createWidget(QWidget *parent)
     }
     SARibbonCategory *category = new SARibbonCategory(parent);
 
+    connect(category, &SARibbonCategory::windowTitleChanged
+        , this, &SARibbonCategoryDesignerPlugin::onWindowTitleChanged);
     return (category);
 }
 
@@ -108,5 +111,22 @@ void SARibbonCategoryDesignerPlugin::initialize(QDesignerFormEditorInterface *co
             , Q_TYPEID(QDesignerContainerExtension));
         mgr->registerExtensions(new SARibbonBarTaskMenuFactory(mgr)
             , Q_TYPEID(QDesignerTaskMenuExtension));
+    }
+}
+
+
+void SARibbonCategoryDesignerPlugin::onWindowTitleChanged(const QString& title)
+{
+    Q_UNUSED(title);
+    if (SARibbonCategory *ribbonPage = qobject_cast<SARibbonCategory *>(sender())) {
+        if (QDesignerFormWindowInterface *form = QDesignerFormWindowInterface::findFormWindow(ribbonPage)) {
+            QDesignerFormEditorInterface *editor = form->core();
+            QExtensionManager *manager = editor->extensionManager();
+            QDesignerPropertySheetExtension *sheet = qt_extension<QDesignerPropertySheetExtension *>(manager, ribbonPage);
+            const int propertyIndex = sheet->indexOf(QLatin1String("categoryName"));
+            if (propertyIndex >= 0) {
+                sheet->setChanged(propertyIndex, true);
+            }
+        }
     }
 }

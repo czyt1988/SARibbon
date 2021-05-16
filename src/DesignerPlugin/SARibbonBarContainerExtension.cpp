@@ -57,7 +57,9 @@ void SARibbonBarContainerExtension::remove(int index)
     if (category) {
         m_ribbonbar->removeCategory(category);
         category->hide();
-        category->deleteLater();
+        //这里不能调用category.deletelater,会奔溃
+        QDesignerFormWindowInterface *fw = QDesignerFormWindowInterface::findFormWindow(m_ribbonbar);
+        category->setParent(fw);
     }
 }
 

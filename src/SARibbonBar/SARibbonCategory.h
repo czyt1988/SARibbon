@@ -10,7 +10,7 @@ class SARibbonCategoryProxyPrivate;
 class SARibbonCategoryPrivate;
 class QHBoxLayout;
 class QWheelEvent;
-
+class SARibbonBar;
 
 /**
  * @brief 一项ribbon tab页
@@ -88,6 +88,9 @@ public:
     bool isCanCustomize() const;
     void setCanCustomize(bool b);
 
+    //获取对应的ribbonbar，如果没有加入ribbonbar的管理，此值为null
+    SARibbonBar *ribbonBar() const;
+
 protected slots:
     void onLeftScrollButtonClicked();
     void onRightScrollButtonClicked();
@@ -110,6 +113,8 @@ protected:
     void markIsContextCategory(bool isContextCategory = true);
 
 private:
+    void setRibbonBar(SARibbonBar *bar);
+
     SARibbonCategoryPrivate *m_d;
 };
 

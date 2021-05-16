@@ -74,7 +74,8 @@ QWidget *SARibbonPannelDesignerPlugin::createWidget(QWidget *parent)
 {
     SARibbonPannel *pannel = new SARibbonPannel(parent);
 
-    pannel->setAcceptDrops(true);
+    pannel->setPannelName(QStringLiteral("pannel 1"));
+//    pannel->setAcceptDrops(true);
     return (pannel);
 }
 

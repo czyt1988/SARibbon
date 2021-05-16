@@ -19,11 +19,12 @@ void SARibbonCategoryContainerExtension::addWidget(QWidget *widget)
         SA_PLUGIN_LOG("widget nullptr");
     }
     if (SARibbonPannel *pannel = qobject_cast<SARibbonPannel *>(widget)) {
-        if (pannel->windowTitle().isEmpty()) {
-            QString title = QObject::tr("Category %1").arg(count());
+        if (pannel->pannelName().isEmpty()) {
+            QString title = QObject::tr("pannel %1").arg(count());
             pannel->setPannelName(title);
         }
         m_category->addPannel(pannel);
+        pannel->show();
         QDesignerFormWindowInterface::findFormWindow(m_category)->manageWidget(pannel);
     }
 }
