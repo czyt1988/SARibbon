@@ -4,7 +4,9 @@
 
 # 引入SA_RIBBON_DIR变量
 include($${PWD}/../../common.pri)
-
+message(Qt path is:$$[QT_INSTALL_PREFIX])
+message(Qt libs path is:$$[QT_INSTALL_LIBS])
+message(Qt plugin path is:$$[QT_INSTALL_PLUGINS])
 #CONFIG( debug_and_release ) {
 #    # 插件建议只用release模式编译
 #    message("debug_and_release: 插件建议只用release模式编译")
@@ -69,3 +71,13 @@ SOURCES += \
 RESOURCES += \
     icon.qrc
 
+# 编译完成后自动把dll移动到$$[QT_INSTALL_PLUGINS]/designer下面
+win32 {
+    PLUGINDLL_FULL_PATH = $${SA_RIBBON_DIR}/$${TARGET}.dll
+    PLUGINDLL_FULL_PATH = $$replace(PLUGINDLL_FULL_PATH, /, \\)
+    PLUGINDLL_DESIGNER_PATH = $$[QT_INSTALL_PLUGINS]/designer/$${TARGET}.dll
+    PLUGINDLL_DESIGNER_PATH = $$replace(PLUGINDLL_DESIGNER_PATH, /, \\)
+    CMD_CPY = $${QMAKE_COPY} $${PLUGINDLL_FULL_PATH} $${PLUGINDLL_DESIGNER_PATH}
+    message(cmd:$${CMD_CPY})
+    QMAKE_POST_LINK += $${CMD_CPY}
+}

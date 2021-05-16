@@ -60,9 +60,18 @@ MainWindow::MainWindow(QWidget *par) : SARibbonMainWindow(par)
     categoryOther->setCategoryName(QStringLiteral("Other"));
     categoryOther->setObjectName(QStringLiteral("categoryOther"));
     ribbon->addCategoryPage(categoryOther);
-
     createCategoryOther(categoryOther);
     PRINT_COST(cost, lastTimes, "add other page");
+
+    //添加第三个标签，用于测试删除
+    SARibbonCategory *categoryDelete = new SARibbonCategory();
+
+    categoryDelete->setCategoryName(QStringLiteral("Delete"));
+    categoryDelete->setObjectName(QStringLiteral("categoryDelete"));
+    ribbon->addCategoryPage(categoryDelete);
+    createCategoryDelete(categoryDelete);
+
+    //上下文标签
     m_contextCategory = ribbon->addContextCategory(QStringLiteral("context"), QColor(), 1);
     SARibbonCategory *contextCategoryPage1 = m_contextCategory->addCategoryPage(QStringLiteral("Page1"));
 
@@ -554,6 +563,36 @@ void MainWindow::createCategoryOther(SARibbonCategory *page)
     connect(changename, &QAction::triggered, this, [pannel]() {
         pannel->setPannelName(QStringLiteral("改变pannel名字"));
     });
+}
+
+
+void MainWindow::createCategoryDelete(SARibbonCategory *page)
+{
+    SARibbonPannel *pannel1 = new SARibbonPannel(QStringLiteral("pannel 1"));
+    SARibbonPannel *pannel2 = new SARibbonPannel(QStringLiteral("pannel 2"));
+    QAction *act1 = new QAction(QStringLiteral("删除Pannel2"), this);
+
+    act1->setObjectName(QStringLiteral("删除Pannel2"));
+    act1->setIcon(QIcon(":/icon/icon/506356.png"));
+    connect(act1, &QAction::triggered, this, [page, pannel2]() {
+        page->removePannel(pannel2);
+    });
+    pannel1->addLargeAction(act1);
+
+    QAction *act2 = new QAction(QStringLiteral("删除本页"), this);
+
+    act2->setObjectName(QStringLiteral("删除本页"));
+    act2->setIcon(QIcon(":/icon/icon/506357.png"));
+    connect(act2, &QAction::triggered, this, [this, page, act2]() {
+        this->ribbonBar()->removeCategory(page);
+        page->hide();
+        page->deleteLater();
+        act2->setDisabled(true);
+    });
+    pannel2->addLargeAction(act2);
+
+    page->addPannel(pannel1);
+    page->addPannel(pannel2);
 }
 
 

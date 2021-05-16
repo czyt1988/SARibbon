@@ -15,8 +15,10 @@ public:
 
 private:
     void initActions();
-    QDesignerFormWindowInterface *formWindowInterface() const;
-    QDesignerFormEditorInterface *core() const;
+    QDesignerFormWindowInterface *ribbonCategoryFormWindowInterface() const;
+    QDesignerFormEditorInterface *ribbonCategoryCore() const;
+    QDesignerFormWindowInterface *ribbonBarFormWindowInterface() const;
+    QDesignerFormEditorInterface *ribbonBarCore() const;
 
 private slots:
     void onAddPannel();

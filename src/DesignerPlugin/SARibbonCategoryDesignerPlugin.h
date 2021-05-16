@@ -29,6 +29,9 @@ public:
     QWidget *createWidget(QWidget *parent) Q_DECL_OVERRIDE;
     void initialize(QDesignerFormEditorInterface *core) Q_DECL_OVERRIDE;
 
+private slots:
+    void onWindowTitleChanged(const QString& title);
+
 private:
     bool m_isInitialized;
     QDesignerFormEditorInterface *m_formEditor;

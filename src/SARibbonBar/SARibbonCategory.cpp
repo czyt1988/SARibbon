@@ -94,6 +94,7 @@ public:
 
 public:
     SARibbonCategory *mParent;
+    SARibbonBar *mBar;
     SARibbonPannel::PannelLayoutMode mDefaultPannelLayoutMode;
     SARibbonCategoryScrollButton *mLeftScrollBtn;
     SARibbonCategoryScrollButton *mRightScrollBtn;
@@ -415,6 +416,16 @@ void SARibbonCategory::setCanCustomize(bool b)
 }
 
 
+/**
+ * @brief 获取对应的ribbonbar
+ * @return 如果没有加入ribbonbar的管理，此值为null
+ */
+SARibbonBar *SARibbonCategory::ribbonBar() const
+{
+    return (m_d->mBar);
+}
+
+
 void SARibbonCategory::onLeftScrollButtonClicked()
 {
     m_d->onLeftScrollButtonClicked();
@@ -466,6 +477,7 @@ void SARibbonCategory::resizeEvent(QResizeEvent *e)
 
 SARibbonCategoryPrivate::SARibbonCategoryPrivate(SARibbonCategory *parent)
     : mParent(parent)
+    , mBar(nullptr)
     , mDefaultPannelLayoutMode(SARibbonPannel::ThreeRowMode)
     , mLeftScrollBtn(nullptr)
     , mRightScrollBtn(nullptr)
@@ -682,6 +694,16 @@ void SARibbonCategory::wheelEvent(QWheelEvent *event)
 void SARibbonCategory::markIsContextCategory(bool isContextCategory)
 {
     m_d->mIsContextCategory = isContextCategory;
+}
+
+
+/**
+ * @brief 设置ribbonbar，此函数仅提供给ribbonbar调用
+ * @param bar ribbonbar指针
+ */
+void SARibbonCategory::setRibbonBar(SARibbonBar *bar)
+{
+    m_d->mBar = bar;
 }
 
 
