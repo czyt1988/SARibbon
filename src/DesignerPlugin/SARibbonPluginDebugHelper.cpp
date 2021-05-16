@@ -20,7 +20,7 @@ private:
 
 SARibbonPluginDebugHelperPrivate::SARibbonPluginDebugHelperPrivate(SARibbonPluginDebugHelper *p)
     : q_d(p)
-    , mFile(new QFile("sa-ribbon-plugn-debug.log"))
+    , mFile(new QFile("sa-ribbon-plugn.log"))
 {
     if (!mFile->open(QIODevice::WriteOnly | QIODevice::Text)) { \
         mFile.reset();					    \

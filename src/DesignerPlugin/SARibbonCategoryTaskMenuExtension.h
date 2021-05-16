@@ -1,15 +1,16 @@
-﻿#ifndef SARIBBONBARTASKMENUEXTENSION_H
-#define SARIBBONBARTASKMENUEXTENSION_H
+﻿#ifndef SARIBBONCATEGORYTASKMENUEXTENSION_H
+#define SARIBBONCATEGORYTASKMENUEXTENSION_H
 #include <QDesignerTaskMenuExtension>
 class QDesignerFormWindowInterface;
 class QDesignerFormEditorInterface;
+class SARibbonBar;
 namespace SA_PLUGIN {
-class SARibbonBarTaskMenuExtension : public QObject, public QDesignerTaskMenuExtension
+class SARibbonCategoryTaskMenuExtension : public QObject, public QDesignerTaskMenuExtension
 {
     Q_OBJECT
     Q_INTERFACES(QDesignerTaskMenuExtension)
 public:
-    SARibbonBarTaskMenuExtension(QWidget *w, QObject *p = nullptr);
+    SARibbonCategoryTaskMenuExtension(QWidget *w, QObject *p = nullptr);
     QList<QAction *> taskActions() const;
 
 private:
@@ -18,12 +19,12 @@ private:
     QDesignerFormEditorInterface *core() const;
 
 private slots:
-    void onAddCategory();
-    void onAddContextCategory();
+    void onAddPannel();
+    void onRemoveCategory();
 
 private:
     QList<QAction *> m_actions;
     QWidget *m_widget;
 };
 }
-#endif // SARIBBONBARTASKMENUEXTENSION_H
+#endif // SARIBBONCATEGORYTASKMENUEXTENSION_H

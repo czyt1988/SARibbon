@@ -1,16 +1,16 @@
-﻿#include "SARibbonMainWindowTaskMenuExtensionFactory.h"
+﻿#include "SARibbonMainWindowTaskMenuFactory.h"
 #include "SARibbonMainWindowTaskMenuExtension.h"
 #include "SARibbonBarTaskMenuExtension.h"
 #include "SARibbonMainWindow.h"
 #include "SARibbonBar.h"
 using namespace SA_PLUGIN;
-SARibbonMainWindowTaskMenuExtensionFactory::SARibbonMainWindowTaskMenuExtensionFactory(QExtensionManager *mgr)
+SARibbonMainWindowTaskMenuFactory::SARibbonMainWindowTaskMenuFactory(QExtensionManager *mgr)
     : QExtensionFactory(mgr)
 {
 }
 
 
-QObject *SARibbonMainWindowTaskMenuExtensionFactory::createExtension(QObject *obj, const QString& iid, QObject *p) const
+QObject *SARibbonMainWindowTaskMenuFactory::createExtension(QObject *obj, const QString& iid, QObject *p) const
 {
     if (iid == Q_TYPEID(QDesignerTaskMenuExtension)) {
         if (SARibbonMainWindow *widget = qobject_cast<SARibbonMainWindow *>(obj)) {

@@ -1,5 +1,5 @@
-﻿#ifndef SARIBBONMAINWINDOWTASKMENUEXTENSIONFACTORY_H
-#define SARIBBONMAINWINDOWTASKMENUEXTENSIONFACTORY_H
+﻿#ifndef SARIBBONMAINWINDOWTASKMENUFACTORY_H
+#define SARIBBONMAINWINDOWTASKMENUFACTORY_H
 #include <QExtensionFactory>
 #include <QDesignerFormWindowInterface>
 #include <QDesignerTaskMenuExtension>
@@ -7,11 +7,11 @@ namespace SA_PLUGIN {
 /**
  * @brief SARibbonMainWindowTaskMenuExtension的工厂
  */
-class SARibbonMainWindowTaskMenuExtensionFactory : public QExtensionFactory
+class SARibbonMainWindowTaskMenuFactory : public QExtensionFactory
 {
     Q_OBJECT
 public:
-    SARibbonMainWindowTaskMenuExtensionFactory(QExtensionManager *mgr = nullptr);
+    SARibbonMainWindowTaskMenuFactory(QExtensionManager *mgr = nullptr);
 protected:
     QObject *createExtension(QObject *obj, const QString& iid, QObject *p) const;
 };

@@ -13,7 +13,7 @@
 #include "SARibbonPluginDebugHelper.h"
 #include "SARibbonMainWindowContainerExtension.h"
 #include "SARibbonMainWindowContainerFactory.h"
-#include "SARibbonMainWindowTaskMenuExtensionFactory.h"
+#include "SARibbonMainWindowTaskMenuFactory.h"
 using namespace SA_PLUGIN;
 SARibbonMainWindowDesignerPlugin::SARibbonMainWindowDesignerPlugin(QObject *p) : QObject(p)
     , m_isInitialized(false)
@@ -138,7 +138,7 @@ void SARibbonMainWindowDesignerPlugin::initialize(QDesignerFormEditorInterface *
         mgr->registerExtensions(new SARibbonMainWindowContainerFactory(mgr)
             , Q_TYPEID(QDesignerContainerExtension));
         //注册右键菜单
-        mgr->registerExtensions(new SARibbonMainWindowTaskMenuExtensionFactory(mgr)
+        mgr->registerExtensions(new SARibbonMainWindowTaskMenuFactory(mgr)
             , Q_TYPEID(QDesignerTaskMenuExtension));
     }
     m_formEditor = core;

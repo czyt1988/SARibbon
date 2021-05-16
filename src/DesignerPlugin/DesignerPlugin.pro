@@ -32,13 +32,16 @@ HEADERS += \
     SARibbonBarContainerFactory.h \
     SARibbonBarDesignerPlugin.h \
     SARibbonBarTaskMenuExtension.h \
-    SARibbonBarTaskMenuExtensionFactory.h \
+    SARibbonBarTaskMenuFactory.h \
+    SARibbonCategoryContainerExtension.h \
+    SARibbonCategoryContainerFactory.h \
     SARibbonCategoryDesignerPlugin.h \
+    SARibbonCategoryTaskMenuExtension.h \
     SARibbonMainWindowContainerExtension.h \
     SARibbonMainWindowContainerFactory.h \
     SARibbonMainWindowDesignerPlugin.h \
     SARibbonMainWindowTaskMenuExtension.h \
-    SARibbonMainWindowTaskMenuExtensionFactory.h \
+    SARibbonMainWindowTaskMenuFactory.h \
     SARibbonPannelDesignerPlugin.h \
     SARibbonPluginCollection.h \
     SARibbonPluginDebugHelper.h
@@ -49,13 +52,16 @@ SOURCES += \
     SARibbonBarContainerFactory.cpp \
     SARibbonBarDesignerPlugin.cpp \
     SARibbonBarTaskMenuExtension.cpp \
-    SARibbonBarTaskMenuExtensionFactory.cpp \
+    SARibbonBarTaskMenuFactory.cpp \
+    SARibbonCategoryContainerExtension.cpp \
+    SARibbonCategoryContainerFactory.cpp \
     SARibbonCategoryDesignerPlugin.cpp \
+    SARibbonCategoryTaskMenuExtension.cpp \
     SARibbonMainWindowContainerExtension.cpp \
     SARibbonMainWindowContainerFactory.cpp \
     SARibbonMainWindowDesignerPlugin.cpp \
     SARibbonMainWindowTaskMenuExtension.cpp \
-    SARibbonMainWindowTaskMenuExtensionFactory.cpp \
+    SARibbonMainWindowTaskMenuFactory.cpp \
     SARibbonPannelDesignerPlugin.cpp \
     SARibbonPluginCollection.cpp \
     SARibbonPluginDebugHelper.cpp

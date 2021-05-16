@@ -57,7 +57,7 @@ MainWindow::MainWindow(QWidget *par) : SARibbonMainWindow(par)
     //添加方法2
     SARibbonCategory *categoryOther = new SARibbonCategory();
 
-    categoryOther->setWindowTitle(QStringLiteral("Other"));
+    categoryOther->setCategoryName(QStringLiteral("Other"));
     categoryOther->setObjectName(QStringLiteral("categoryOther"));
     ribbon->addCategoryPage(categoryOther);
 
@@ -433,7 +433,9 @@ void MainWindow::createCategoryOther(SARibbonCategory *page)
     menu->addAction(QIcon(":/icon/icon/folder.png"), QStringLiteral("8"));
     menu->addAction(QIcon(":/icon/icon/folder.png"), QStringLiteral("9"));
 
-    SARibbonPannel *pannel = page->addPannel(QStringLiteral("pannel one"));
+    SARibbonPannel *pannel = new SARibbonPannel(QStringLiteral("pannel one"));
+
+    page->addPannel(pannel);
     SARibbonButtonGroupWidget *btnGroup = new SARibbonButtonGroupWidget(pannel);
 
     btnGroup->setFrameShape(QFrame::Box);
@@ -544,6 +546,13 @@ void MainWindow::createCategoryOther(SARibbonCategory *page)
         Qt::WindowFlags f = windowFlags();
         f &= ~Qt::WindowMinMaxButtonsHint& ~Qt::WindowCloseButtonHint;
         updateWindowFlag(f);
+    });
+    QAction *changename = new QAction(QIcon(":/icon/icon/529398.png"), QStringLiteral("改变pannel名字"), this);
+
+    changename->setObjectName(QStringLiteral("changename"));
+    pannel->addLargeAction(changename);
+    connect(changename, &QAction::triggered, this, [pannel]() {
+        pannel->setPannelName(QStringLiteral("改变pannel名字"));
     });
 }
 

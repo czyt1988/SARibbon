@@ -21,7 +21,7 @@ void SARibbonBarContainerExtension::addWidget(QWidget *widget)
     if (SARibbonCategory *category = qobject_cast<SARibbonCategory *>(widget)) {
         if (category->windowTitle().isEmpty()) {
             QString title = QObject::tr("Category %1").arg(count());
-            category->setWindowTitle(title);
+            category->setCategoryName(title);
         }
         m_ribbonbar->addCategoryPage(category);
         QDesignerFormWindowInterface::findFormWindow(m_ribbonbar)->manageWidget(category);
@@ -51,6 +51,7 @@ void SARibbonBarContainerExtension::insertWidget(int index, QWidget *widget)
 
 void SARibbonBarContainerExtension::remove(int index)
 {
+    SA_PLUGIN_LOG("remove category:%d", index);
     SARibbonCategory *category = m_ribbonbar->categoryByIndex(index);
 
     if (category) {

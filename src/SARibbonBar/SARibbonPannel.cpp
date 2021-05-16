@@ -112,6 +112,14 @@ SARibbonPannel::SARibbonPannel(QWidget *parent) : QWidget(parent)
 }
 
 
+SARibbonPannel::SARibbonPannel(const QString& name, QWidget *parent) : QWidget(parent)
+    , m_d(new SARibbonPannelPrivate(this))
+{
+    setPannelLayoutMode(ThreeRowMode);
+    setPannelName(name);
+}
+
+
 SARibbonPannel::~SARibbonPannel()
 {
     delete m_d;
@@ -622,7 +630,7 @@ void SARibbonPannel::setCanCustomize(bool b)
 }
 
 
-QString SARibbonPannel::pannelTitle() const
+QString SARibbonPannel::pannelName() const
 {
     return (windowTitle());
 }
@@ -633,9 +641,10 @@ QString SARibbonPannel::pannelTitle() const
  * @note 注意会触发windowTitleChange信号
  * @param title 标题
  */
-void SARibbonPannel::setPannelTitle(const QString& title)
+void SARibbonPannel::setPannelName(const QString& title)
 {
     setWindowTitle(title);
+    update();
 }
 
 

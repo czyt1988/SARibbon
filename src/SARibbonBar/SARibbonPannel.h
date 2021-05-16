@@ -34,10 +34,11 @@ class SA_RIBBON_EXPORT SARibbonPannel : public QWidget
     friend class SARibbonCustomizeWidgetPrivate;
     Q_PROPERTY(bool isCanCustomize READ isCanCustomize WRITE setCanCustomize)
     Q_PROPERTY(bool isExpanding READ isExpanding WRITE setExpanding)
-    Q_PROPERTY(QString pannelTitle READ pannelTitle WRITE setPannelTitle)
+    Q_PROPERTY(QString pannelName READ pannelName WRITE setPannelName)
 public:
-    SARibbonPannel(QWidget *parent = 0);
-    ~SARibbonPannel();
+    SARibbonPannel(QWidget *parent = nullptr);
+    SARibbonPannel(const QString& name, QWidget *parent = nullptr);
+    ~SARibbonPannel() Q_DECL_OVERRIDE;
     using QWidget::addAction;
     enum PannelLayoutMode {
         ThreeRowMode    ///< 三行布局模式，office就是三行布局模式，pannel能布置3行小toolbutton，默认模式
@@ -139,8 +140,8 @@ public:
     void setCanCustomize(bool b);
 
     //标题
-    QString pannelTitle() const;
-    void setPannelTitle(const QString& title);
+    QString pannelName() const;
+    void setPannelName(const QString& title);
 
 signals:
 
