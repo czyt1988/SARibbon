@@ -95,7 +95,7 @@ SARibbonTabBar::tab {
   padding-bottom: 1px;
 }
 
-SARibbonTabBar::tab:selected, QTabBar::tab:hover {
+SARibbonTabBar::tab:selected, SARibbonTabBar::tab:hover {
   border-top-left-radius: 0px;
   border-top-right-radius: 0px;
 }
