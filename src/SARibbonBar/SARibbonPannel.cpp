@@ -742,7 +742,9 @@ void SARibbonPannel::actionEvent(QActionEvent *e)
         lay->insertAction(index, action, m_d->m_lastRp);
         m_d->m_lastRp = SARibbonPannelItem::None; //插入完后重置为None
         //由于pannel的尺寸发生变化，需要让category也调整
-        QApplication::postEvent(parentWidget(), new QEvent(QEvent::LayoutRequest));
+        if (parentWidget()) {
+            QApplication::postEvent(parentWidget(), new QEvent(QEvent::LayoutRequest));
+        }
     }
     break;
 
@@ -751,7 +753,9 @@ void SARibbonPannel::actionEvent(QActionEvent *e)
         //让布局重新绘制
         layout()->invalidate();
         //由于pannel的尺寸发生变化，需要让category也调整
-        QApplication::postEvent(parentWidget(), new QEvent(QEvent::LayoutRequest));
+        if (parentWidget()) {
+            QApplication::postEvent(parentWidget(), new QEvent(QEvent::LayoutRequest));
+        }
     }
     break;
 
@@ -765,7 +769,9 @@ void SARibbonPannel::actionEvent(QActionEvent *e)
             delete  item;
         }
         //由于pannel的尺寸发生变化，需要让category也调整
-        QApplication::postEvent(parentWidget(), new QEvent(QEvent::LayoutRequest));
+        if (parentWidget()) {
+            QApplication::postEvent(parentWidget(), new QEvent(QEvent::LayoutRequest));
+        }
     }
     break;
 

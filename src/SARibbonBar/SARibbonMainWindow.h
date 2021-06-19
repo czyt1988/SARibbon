@@ -37,7 +37,7 @@ public:
         NormalTheme     ///< 普通主题
         , Office2013    ///< office2013主题
     };
-    Q_ENUM(RibbonTheme)
+    Q_ENUMS(RibbonTheme)
 public:
     SARibbonMainWindow(QWidget *parent = nullptr, bool useRibbon = true);
     ~SARibbonMainWindow() Q_DECL_OVERRIDE;

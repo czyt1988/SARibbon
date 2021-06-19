@@ -106,7 +106,7 @@ public:
         , OfficeStyleTwoRow	= 0x0100        ///< 类似office 的ribbon风格 2行工具栏 三行布局模式，office就是三行布局模式，pannel能布置3行小toolbutton，默认模式
         , WpsLiteStyleTwoRow	= 0x0101        ///< 类似wps的紧凑风格  2行工具栏
     };
-    Q_ENUM(RibbonStyle)
+    Q_ENUMS(RibbonStyle)
 
     /**
      * @brief 定义当前ribbon 的状态
@@ -115,7 +115,7 @@ public:
         MinimumRibbonMode       ///< 缩小模式
         , NormalRibbonMode      ///< 正常模式
     };
-    Q_ENUM(RibbonState)
+    Q_ENUMS(RibbonState)
 public:
 
 public:
@@ -230,13 +230,13 @@ public:
     //当前的模式
     RibbonState currentRibbonState() const;
 
-	//设置当前ribbon的index
-	void setCurrentIndex(int index);
+    //设置当前ribbon的index
+    void setCurrentIndex(int index);
 
     //返回当前的tab索引
     int currentIndex();
 
-	//确保标签显示出来
+    //确保标签显示出来
     void raiseCategory(SARibbonCategory *category);
 
     //判断当前的样式是否为两行

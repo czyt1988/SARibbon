@@ -464,6 +464,7 @@ void SARibbonBar::showCategory(SARibbonCategory *category)
             return;
         }
     }
+    raiseCategory(category);
 }
 
 
@@ -1124,10 +1125,10 @@ int SARibbonBar::currentIndex()
 ///
 void SARibbonBar::raiseCategory(SARibbonCategory *category)
 {
-	int index = m_d->stackedContainerWidget->indexOf(category);
+    int index = m_d->stackedContainerWidget->indexOf(category);
 
     if (index >= 0) {
-		setCurrentIndex(index);
+        setCurrentIndex(index);
     }
 }
 

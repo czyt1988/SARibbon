@@ -19,9 +19,19 @@ public:
     virtual QSize sizeHint() const Q_DECL_OVERRIDE;
     virtual QSize minimumSizeHint() const Q_DECL_OVERRIDE;
     SARibbonGalleryGroup* addGalleryGroup();
+    void addGalleryGroup(SARibbonGalleryGroup* group);
     SARibbonGalleryGroup* addCategoryActions(const QString& title,QList<QAction *> actions);
     void setCurrentViewGroup(SARibbonGalleryGroup* group);
     SARibbonGalleryGroup* currentViewGroup() const;
+    QActionGroup* getActionGroup() const;
+signals:
+    /**
+     * @brief 等同QActionGroup的triggered
+     * 所有加入SARibbonGallery的action都会被一个QActionGroup管理,可以通过@sa getActionGroup 获取到对应的actiongroup
+     * @param action
+     */
+    void triggered(QAction *action);
+    void hovered(QAction *action);
 protected slots:
     virtual void onPageDown();
     virtual void onPageUp();
