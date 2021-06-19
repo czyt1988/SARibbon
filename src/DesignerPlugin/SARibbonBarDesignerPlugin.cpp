@@ -43,8 +43,8 @@ QIcon SARibbonBarDesignerPlugin::icon() const
  */
 QString SARibbonBarDesignerPlugin::domXml() const
 {
-    return ("<ui language=\"c++\">\n"
-           " <widget class=\"SARibbonBar\" name=\"ribbonbar\"/>\n"
+    return (QString("<ui language=\"c++\">\n"
+           " <widget class=\"%1\" name=\"ribbonbar\"/>\n"
            " <customwidgets>\n"
            "   <customwidget>\n"
            "       <class>SARibbonBar</class>\n"
@@ -52,7 +52,7 @@ QString SARibbonBarDesignerPlugin::domXml() const
            "       <addpagemethod>addCategoryPage</addpagemethod>\n"
            "   </customwidget>\n"
            " </customwidgets>\n"
-           "</ui>\n");
+           "</ui>\n").arg(name()));
 }
 
 

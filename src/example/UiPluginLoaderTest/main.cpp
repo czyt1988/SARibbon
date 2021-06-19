@@ -8,6 +8,9 @@ int main(int argc, char *argv[])
 
     if (w) {
         w->show();
+    }else{
+        //用户放弃选择就退出
+        exit(0);
     }
     return (a.exec());
 }

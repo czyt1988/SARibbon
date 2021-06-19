@@ -21,6 +21,11 @@ QWidget *load()
         return (nullptr);
     }
     QUiLoader loader;
+    QWidget *res = loader.load(&file, nullptr);
 
-    return (loader.load(&file, nullptr));
+    if (res == nullptr) {
+        QMessageBox::critical(nullptr, QObject::tr("critical")
+            , QObject::tr("can not open ui file:%1").arg(loader.errorString()));
+    }
+    return (res);
 }

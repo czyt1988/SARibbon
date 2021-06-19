@@ -138,8 +138,12 @@ public:
     SARibbonTabBar *ribbonTabBar();
 
     //添加一个标签
+
     SARibbonCategory *addCategoryPage(const QString& title);
     void addCategoryPage(SARibbonCategory *category);
+
+    //为了支持Qt designer,添加的一个重载函数
+    Q_INVOKABLE void addCategoryPage(QWidget *category);
 
     //添加一个category，category的位置在index，如果当前category数量少于index，将插入到最后
     SARibbonCategory *insertCategoryPage(const QString& title, int index);
