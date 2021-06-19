@@ -303,6 +303,20 @@ void SARibbonCategory::addPannel(SARibbonPannel *pannel)
 
 
 /**
+ * @brief qt designer专用
+ * @param pannel
+ */
+void SARibbonCategory::addPannel(QWidget *pannel)
+{
+    SARibbonPannel *p = qobject_cast<SARibbonPannel *>(pannel);
+
+    if (p) {
+        addPannel(p);
+    }
+}
+
+
+/**
  * @brief 把pannel脱离SARibbonCategory的管理
  * @param pannel 需要提取的pannel
  * @return 成功返回true，否则返回false

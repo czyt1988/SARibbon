@@ -323,6 +323,20 @@ void SARibbonBar::addCategoryPage(SARibbonCategory *category)
 
 
 /**
+ * @brief qtdesigner专用
+ * @param category
+ */
+void SARibbonBar::addCategoryPage(QWidget *category)
+{
+    SARibbonCategory *c = qobject_cast<SARibbonCategory *>(category);
+
+    if (c) {
+        addCategoryPage(c);
+    }
+}
+
+
+/**
  * @brief 添加一个category，category的位置在index，如果当前category数量少于index，将插入到最后
  * @param title category的标题
  * @param index category的位置

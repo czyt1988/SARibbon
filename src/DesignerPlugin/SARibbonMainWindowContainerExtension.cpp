@@ -68,7 +68,7 @@ void SARibbonMainWindowContainerExtension::addWidget(QWidget *widget)
         statusBar->show();
     }else if (QDockWidget *dockWidget = qobject_cast<QDockWidget *>(widget)) {
         m_widgets.append(widget);
-        //下面这段判断dockarea参考了QtnRibbon
+        //下面这段判断dockarea参考了QtDesginer 源码
         Qt::DockWidgetArea area = Qt::LeftDockWidgetArea;
         if (const QMainWindow *mw = qobject_cast<const QMainWindow *>(dockWidget->parentWidget())) {
             QList<QLayout *> candidates;

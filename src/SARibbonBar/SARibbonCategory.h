@@ -43,6 +43,9 @@ public:
     //添加pannel
     void addPannel(SARibbonPannel *pannel);
 
+    //qt designer专用
+    Q_INVOKABLE void addPannel(QWidget *pannel);
+
     //插入pannel
     SARibbonPannel *insertPannel(const QString& title, int index);
 
