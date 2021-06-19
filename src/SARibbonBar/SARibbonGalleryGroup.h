@@ -13,14 +13,15 @@
 class SA_RIBBON_EXPORT SARibbonGalleryGroupItemDelegate : public QStyledItemDelegate
 {
 public:
-    SARibbonGalleryGroupItemDelegate(SARibbonGalleryGroup* group,QObject *parent = Q_NULLPTR);
-    virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const Q_DECL_OVERRIDE;
+    SARibbonGalleryGroupItemDelegate(SARibbonGalleryGroup *group, QObject *parent = Q_NULLPTR);
+    virtual void paint(QPainter *painter, const QStyleOptionViewItem& option, const QModelIndex& index) const Q_DECL_OVERRIDE;
 
-    virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const Q_DECL_OVERRIDE;
-    virtual void paintIconOnly(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-    virtual void paintIconWithText(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    virtual QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const Q_DECL_OVERRIDE;
+    virtual void paintIconOnly(QPainter *painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
+    virtual void paintIconWithText(QPainter *painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
+
 private:
-    SARibbonGalleryGroup* m_group;
+    SARibbonGalleryGroup *m_group;
 };
 
 ///
@@ -32,18 +33,19 @@ class SA_RIBBON_EXPORT SARibbonGalleryGroupModel : public QAbstractListModel
 public:
     SARibbonGalleryGroupModel(QObject *parent = Q_NULLPTR);
     ~SARibbonGalleryGroupModel();
-    virtual int rowCount(const QModelIndex &parent) const Q_DECL_OVERRIDE;
-    virtual Qt::ItemFlags flags(const QModelIndex &index) const Q_DECL_OVERRIDE;
-    virtual QVariant data(const QModelIndex &index, int role) const Q_DECL_OVERRIDE;
-    virtual QModelIndex index(int row, int column, const QModelIndex &parent) const Q_DECL_OVERRIDE;
-    virtual bool setData(const QModelIndex &index, const QVariant &value, int role) Q_DECL_OVERRIDE;
+    virtual int rowCount(const QModelIndex& parent) const Q_DECL_OVERRIDE;
+    virtual Qt::ItemFlags flags(const QModelIndex& index) const Q_DECL_OVERRIDE;
+    virtual QVariant data(const QModelIndex& index, int role) const Q_DECL_OVERRIDE;
+    virtual QModelIndex index(int row, int column, const QModelIndex& parent) const Q_DECL_OVERRIDE;
+    virtual bool setData(const QModelIndex& index, const QVariant& value, int role) Q_DECL_OVERRIDE;
     void clear();
-    SARibbonGalleryItem * at(int row) const;
+    SARibbonGalleryItem *at(int row) const;
     void insert(int row, SARibbonGalleryItem *item);
-    SARibbonGalleryItem * take(int row);
+    SARibbonGalleryItem *take(int row);
     void append(SARibbonGalleryItem *item);
+
 private:
-    QList<SARibbonGalleryItem*> m_items;
+    QList<SARibbonGalleryItem *> m_items;
 };
 
 
@@ -63,35 +65,39 @@ public:
     ///
     /// \brief 预设样式
     ///
-    enum PreinstallStyle
-    {
+    enum PreinstallStyle {
         LargeIconWithText ///< 大图标带文字
-        ,LargeIconOnly
-
+        , LargeIconOnly
     };
 
-    SARibbonGalleryGroup(QWidget* w = 0);
+    SARibbonGalleryGroup(QWidget *w = 0);
 
     virtual ~SARibbonGalleryGroup();
     void setPreinstallStyle(PreinstallStyle style);
     void addItem(const QIcon& icon);
     void addItem(SARibbonGalleryItem *item);
-    void addActionItem(QAction* act);
-    void addActionItemList(const QList<QAction*>& acts);
+    void addActionItem(QAction *act);
+    void addActionItemList(const QList<QAction *>& acts);
+
     //构建一个model，这个model的父类是SARibbonGalleryGroup，如果要共享model，需要手动处理model的父类
     void setupGroupModel();
-    SARibbonGalleryGroupModel* groupModel();
+    SARibbonGalleryGroupModel *groupModel();
+
     //是否在Gallery的图标下显示文字
     void setEnableIconText(bool enable);
     bool enableIconText() const;
     void setGroupTitle(const QString& title);
     QString groupTitle() const;
+    void selectByIndex(int i);
+
 private slots:
-    void onItemClicked(const QModelIndex &index);
+    void onItemClicked(const QModelIndex& index);
+
 signals:
     void groupTitleChanged(const QString& title);
+
 private:
-    SARibbonGalleryGroupPrivate* m_d;
+    SARibbonGalleryGroupPrivate *m_d;
 };
 
 

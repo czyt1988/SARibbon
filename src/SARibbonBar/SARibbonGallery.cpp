@@ -11,7 +11,7 @@
 #include <QVBoxLayout>
 #include <QScrollBar>
 #include "SARibbonElementManager.h"
-
+#include <QActionGroup>
 class SARibbonGalleryPrivate
 {
 public:
@@ -25,6 +25,7 @@ public:
     RibbonGalleryViewport* popupWidget;
 #endif
     SARibbonGalleryGroup* viewportGroup;
+    QActionGroup* actionGroup;//所有gallery管理的actions都由这个actiongroup管理
     SARibbonGalleryPrivate():Parent(nullptr)
     {
     }
@@ -35,6 +36,7 @@ public:
         buttonUp = new SARibbonControlButton(parent);
         buttonDown = new SARibbonControlButton(parent);
         buttonMore = new SARibbonControlButton(parent);
+        actionGroup = new QActionGroup(parent);
         buttonUp->setToolButtonStyle(Qt::ToolButtonIconOnly);
         buttonDown->setToolButtonStyle(Qt::ToolButtonIconOnly);
         buttonMore->setToolButtonStyle(Qt::ToolButtonIconOnly);
@@ -53,6 +55,11 @@ public:
                         ,Parent,&SARibbonGallery::onPageDown);
         Parent->connect(buttonMore,&QAbstractButton::clicked
                         ,Parent,&SARibbonGallery::onShowMoreDetail);
+        //信号转发
+        Parent->connect(actionGroup,&QActionGroup::triggered
+                        ,Parent,&SARibbonGallery::triggered);
+        Parent->connect(actionGroup,&QActionGroup::hovered
+                        ,Parent,&SARibbonGallery::hovered);
         popupWidget = nullptr;
         viewportGroup = nullptr;
     }
@@ -136,6 +143,12 @@ QSize SARibbonGallery::minimumSizeHint() const
 SARibbonGalleryGroup *SARibbonGallery::addGalleryGroup()
 {
     SARibbonGalleryGroup* group = RibbonSubElementDelegate->createRibbonGalleryGroup(this);
+    addGalleryGroup(group);
+    return group;
+}
+
+void SARibbonGallery::addGalleryGroup(SARibbonGalleryGroup *group)
+{
     RibbonGalleryViewport* viewport = ensureGetPopupViewPort();
     SARibbonGalleryGroupModel* model = new SARibbonGalleryGroupModel(this);
     group->setModel(model);
@@ -146,7 +159,6 @@ SARibbonGalleryGroup *SARibbonGallery::addGalleryGroup()
     }
     connect(group,&QAbstractItemView::clicked
             ,this,&SARibbonGallery::onItemClicked);
-    return group;
 }
 
 SARibbonGalleryGroup* SARibbonGallery::addCategoryActions(const QString &title, QList<QAction *> actions)
@@ -159,11 +171,15 @@ SARibbonGalleryGroup* SARibbonGallery::addCategoryActions(const QString &title, 
     {
         group->setGroupTitle(title);
     }
+    for(QAction* a : actions){
+        m_d->actionGroup->addAction(a);
+    }
     group->addActionItemList(actions);
     connect(group,&QAbstractItemView::clicked
             ,this,&SARibbonGallery::onItemClicked);
     RibbonGalleryViewport* viewport = ensureGetPopupViewPort();
     viewport->addWidget(group);
+    setCurrentViewGroup(group);
     return group;
 }
 
@@ -176,6 +192,11 @@ void SARibbonGallery::setCurrentViewGroup(SARibbonGalleryGroup *group)
 SARibbonGalleryGroup *SARibbonGallery::currentViewGroup() const
 {
     return m_d->viewportGroup;
+}
+
+QActionGroup *SARibbonGallery::getActionGroup() const
+{
+    return m_d->actionGroup;
 }
 
 void SARibbonGallery::onPageDown()
