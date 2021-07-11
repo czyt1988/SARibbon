@@ -224,7 +224,6 @@ SARibbonBar::SARibbonBar(QWidget *parent) : QMenuBar(parent)
 {
     m_d->init();
     connect(parent, &QWidget::windowTitleChanged, this, &SARibbonBar::onWindowTitleChanged);
-    connect(parent, &QWidget::windowIconChanged, this, &SARibbonBar::onWindowIconChanged);
     setRibbonStyle(OfficeStyle);
 }
 
@@ -857,17 +856,6 @@ void SARibbonBar::onWindowTitleChanged(const QString& title)
 }
 
 
-void SARibbonBar::onWindowIconChanged(const QIcon& icon)
-{
-    if (!icon.isNull()) {
-        int iconMinSize = RibbonSubElementStyleOpt.titleBarHight - 6;
-        QSize s = icon.actualSize(QSize(iconMinSize, iconMinSize));
-        m_d->iconRightBorderPosition = RibbonSubElementStyleOpt.widgetBord.left()+s.width();
-    }
-    update();
-}
-
-
 void SARibbonBar::onCategoryWindowTitleChanged(const QString& title)
 {
     SARibbonCategory *w = qobject_cast<SARibbonCategory *>(sender());
@@ -1379,7 +1367,6 @@ void SARibbonBar::paintInNormalStyle()
         p.restore();
 #endif
         paintWindowTitle(p, parWindow->windowTitle(), titleRegion);
-        paintWindowIcon(p, parWindow->windowIcon());
     }
 }
 
@@ -1441,7 +1428,6 @@ void SARibbonBar::paintInWpsLiteStyle()
                 , width
                 , RibbonSubElementStyleOpt.titleBarHight);
             paintWindowTitle(p, parWindow->windowTitle(), titleRegion);
-            paintWindowIcon(p, parWindow->windowIcon());
         }
     }
 }
@@ -1754,20 +1740,5 @@ void SARibbonBar::paintWindowTitle(QPainter& painter, const QString& title, cons
     painter.save();
     painter.setPen(RibbonSubElementStyleOpt.titleTextColor);
     painter.drawText(titleRegion, Qt::AlignCenter, title);
-    painter.restore();
-}
-
-
-void SARibbonBar::paintWindowIcon(QPainter& painter, const QIcon& icon)
-{
-    painter.save();
-    if (!icon.isNull()) {
-        int iconMinSize = RibbonSubElementStyleOpt.titleBarHight - 6;
-        icon.paint(&painter, RibbonSubElementStyleOpt.widgetBord.left()+3, RibbonSubElementStyleOpt.widgetBord.top()+3
-            , iconMinSize, iconMinSize);
-        m_d->iconRightBorderPosition = RibbonSubElementStyleOpt.widgetBord.left()+iconMinSize;
-    }else {
-        m_d->iconRightBorderPosition = RibbonSubElementStyleOpt.widgetBord.left();
-    }
     painter.restore();
 }

@@ -280,7 +280,6 @@ protected:
 
 protected slots:
     void onWindowTitleChanged(const QString& title);
-    void onWindowIconChanged(const QIcon& icon);
     void onCategoryWindowTitleChanged(const QString& title);
     void onStackWidgetHided();
     virtual void onCurrentRibbonTabChanged(int index);
@@ -307,7 +306,6 @@ protected:
     void moveEvent(QMoveEvent *event) Q_DECL_OVERRIDE;
     virtual void paintBackground(QPainter& painter);
     virtual void paintWindowTitle(QPainter& painter, const QString& title, const QRect& titleRegion);
-    virtual void paintWindowIcon(QPainter& painter, const QIcon& icon);
     virtual void paintContextCategoryTab(QPainter& painter, const QString& title, QRect contextRect, const QColor& color);
 
 private:

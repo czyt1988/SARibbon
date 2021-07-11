@@ -144,6 +144,8 @@ MainWindow::MainWindow(QWidget *par) : SARibbonMainWindow(par)
     });
     //
     showMaximized();
+    //
+    setWindowIcon(QIcon(":/icon/icon/icon2.png"));
 }
 
 
