@@ -76,7 +76,7 @@ MainWindow::MainWindow(QWidget *par) : SARibbonMainWindow(par)
     SARibbonCategory *contextCategoryPage1 = m_contextCategory->addCategoryPage(QStringLiteral("Page1"));
 
     createContextCategoryPage1(contextCategoryPage1);
-    SARibbonCategory *contextCategoryPage2 = m_contextCategory->addCategoryPage(QStringLiteral("Page1"));
+    SARibbonCategory *contextCategoryPage2 = m_contextCategory->addCategoryPage(QStringLiteral("Page2"));
 
     createContextCategoryPage2(contextCategoryPage2);
     PRINT_COST(cost, lastTimes, "add contextCategory page");
@@ -142,6 +142,7 @@ MainWindow::MainWindow(QWidget *par) : SARibbonMainWindow(par)
             }
         }
     });
+    setMinimumWidth(500);
     //
     showMaximized();
     //
@@ -505,7 +506,9 @@ void MainWindow::createCategoryOther(SARibbonCategory *page)
         if (b) {
             this->ribbonBar()->setApplicationButton(nullptr);
         }else{
-            this->ribbonBar()->setApplicationButton(new SARibbonApplicationButton());
+            SARibbonApplicationButton * appBtn=new SARibbonApplicationButton();
+            appBtn->setText(tr("File"));
+            this->ribbonBar()->setApplicationButton(appBtn);
         }
     });
     SARibbonToolButton *b = pannel->addLargeAction(appBtn);
@@ -728,9 +731,9 @@ void MainWindow::createContextCategoryPage2(SARibbonCategory *page)
     pannel2->addAction(QStringLiteral("Large"), QIcon(":/icon/icon/530767.png"), QToolButton::InstantPopup, SARibbonPannelItem::Large);
     pannel2->addAction(QStringLiteral("Medium"), QIcon(":/icon/icon/530767.png"), QToolButton::InstantPopup, SARibbonPannelItem::Medium);
     pannel2->addAction(QStringLiteral("Medium"), QIcon(":/icon/icon/530767.png"), QToolButton::InstantPopup, SARibbonPannelItem::Medium);
-    pannel2->addAction(QStringLiteral("Large"), QIcon(":/icon/icon/530767.png"), QToolButton::InstantPopup, SARibbonPannelItem::Small);
-    pannel2->addAction(QStringLiteral("Large"), QIcon(":/icon/icon/530767.png"), QToolButton::InstantPopup, SARibbonPannelItem::Small);
-    pannel2->addAction(QStringLiteral("Large"), QIcon(":/icon/icon/530767.png"), QToolButton::InstantPopup, SARibbonPannelItem::Small);
+    pannel2->addAction(QStringLiteral("Small"), QIcon(":/icon/icon/530767.png"), QToolButton::InstantPopup, SARibbonPannelItem::Small);
+    pannel2->addAction(QStringLiteral("Medium"), QIcon(":/icon/icon/530767.png"), QToolButton::InstantPopup, SARibbonPannelItem::Medium);
+    pannel2->addAction(QStringLiteral("Large"), QIcon(":/icon/icon/530767.png"), QToolButton::InstantPopup, SARibbonPannelItem::Large);
     pannel2->addAction(QStringLiteral("Medium"), QIcon(":/icon/icon/530767.png"), QToolButton::InstantPopup, SARibbonPannelItem::Medium);
     pannel2->addAction(QStringLiteral("Medium"), QIcon(":/icon/icon/530767.png"), QToolButton::InstantPopup, SARibbonPannelItem::Medium);
     pannel2->addAction(QStringLiteral("Large"), QIcon(":/icon/icon/530767.png"), QToolButton::InstantPopup, SARibbonPannelItem::Large);
