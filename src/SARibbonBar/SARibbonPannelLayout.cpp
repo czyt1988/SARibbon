@@ -449,6 +449,9 @@ void SARibbonPannelLayout::updateGeomArray(const QRect& setrect)
     ;
 #endif
 
+    //本列第一、二行占比
+    SARibbonPannelItem::RowProportion thisColumnRP0=SARibbonPannelItem::None;
+    SARibbonPannelItem::RowProportion thisColumnRP1=SARibbonPannelItem::None;
     for (int i = 0; i < itemCount; ++i)
     {
         SARibbonPannelItem *item = m_items.at(i);
@@ -514,6 +517,8 @@ void SARibbonPannelLayout::updateGeomArray(const QRect& setrect)
                     item->rowIndex = 0;
                     item->columnIndex = column;
                     item->itemWillSetGeometry = QRect(x, yMediumRow0, hint.width(), smallHeight);
+                    thisColumnRP0=SARibbonPannelItem::Medium;
+                    thisColumnRP1=SARibbonPannelItem::None;
                     columMaxWidth = hint.width();
                     //下个row为1
                     row = 1;
@@ -522,6 +527,7 @@ void SARibbonPannelLayout::updateGeomArray(const QRect& setrect)
                     item->rowIndex = 1;
                     item->columnIndex = column;
                     item->itemWillSetGeometry = QRect(x, yMediumRow1, hint.width(), smallHeight);
+                    thisColumnRP1=SARibbonPannelItem::Medium;
                     //和上个进行比较得到最长宽度
                     columMaxWidth = qMax(columMaxWidth, hint.width());
                     //换列，x自动递增到下个坐标，列数增加，行数归零，最大列宽归零
@@ -536,6 +542,8 @@ void SARibbonPannelLayout::updateGeomArray(const QRect& setrect)
                     item->rowIndex = 0;
                     item->columnIndex = column;
                     item->itemWillSetGeometry = QRect(x, yMediumRow0, hint.width(), smallHeight);
+                    thisColumnRP0=SARibbonPannelItem::Medium;
+                    thisColumnRP1=SARibbonPannelItem::None;
                     columMaxWidth = hint.width();
                     row = 1;
                     //x不变
@@ -543,6 +551,7 @@ void SARibbonPannelLayout::updateGeomArray(const QRect& setrect)
                     item->rowIndex = 1;
                     item->columnIndex = column;
                     item->itemWillSetGeometry = QRect(x, yMediumRow1, hint.width(), smallHeight);
+                    thisColumnRP1=SARibbonPannelItem::Medium;
                     columMaxWidth = qMax(columMaxWidth, hint.width());
                     //换列，x自动递增到下个坐标，列数增加，行数归零，最大列宽归零
                     x += (columMaxWidth + spacing);
@@ -561,6 +570,8 @@ void SARibbonPannelLayout::updateGeomArray(const QRect& setrect)
                     item->rowIndex = 0;
                     item->columnIndex = column;
                     item->itemWillSetGeometry = QRect(x, yMediumRow0, hint.width(), smallHeight);
+                    thisColumnRP0=SARibbonPannelItem::Medium;
+                    thisColumnRP1=SARibbonPannelItem::None;
                     columMaxWidth = hint.width();
                     row = 1;
                 }
@@ -575,6 +586,8 @@ void SARibbonPannelLayout::updateGeomArray(const QRect& setrect)
                 item->rowIndex = 0;
                 item->columnIndex = column;
                 item->itemWillSetGeometry = QRect(x, ySmallRow0, hint.width(), smallHeight);
+                thisColumnRP0=SARibbonPannelItem::Small;
+                thisColumnRP1=SARibbonPannelItem::None;
                 columMaxWidth = hint.width();
                 //下个row为1
                 row = 1;
@@ -584,6 +597,11 @@ void SARibbonPannelLayout::updateGeomArray(const QRect& setrect)
                 item->rowIndex = 1;
                 item->columnIndex = column;
                 item->itemWillSetGeometry = QRect(x, ySmallRow1, hint.width(), smallHeight);
+                if(3 == rowCount&&SARibbonPannelItem::Medium==thisColumnRP0){
+                    //三行模式，并且第一行是Medium
+                    item->itemWillSetGeometry = QRect(x, yMediumRow1, hint.width(), smallHeight);
+                }
+                thisColumnRP1=SARibbonPannelItem::Small;
                 //和上个进行比较得到最长宽度
                 columMaxWidth = qMax(columMaxWidth, hint.width());
                 //这里要看两行还是三行，确定是否要换列
@@ -598,6 +616,14 @@ void SARibbonPannelLayout::updateGeomArray(const QRect& setrect)
                     //三行模式，继续增加行数
                     row = 2;
                     //x不变
+                }
+                if (3 == rowCount&&SARibbonPannelItem::Medium==thisColumnRP0) {
+                    //三行模式，并且第一行是Medium，换列
+                    //换列，x自动递增到下个坐标，列数增加，行数归零，最大列宽归零
+                    x += (columMaxWidth + spacing);
+                    row = 0;
+                    columMaxWidth = 0;
+                    ++column;
                 }
             }else{
                 //第三行
