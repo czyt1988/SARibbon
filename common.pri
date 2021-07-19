@@ -11,3 +11,8 @@ CONFIG(debug, debug|release){
         SA_RIBBON_DIR = $$PWD/bin_qt$$[QT_VERSION]_release_64
     }
 }
+
+msvc {
+    QMAKE_CFLAGS += /utf-8
+    QMAKE_CXXFLAGS += /utf-8
+}
