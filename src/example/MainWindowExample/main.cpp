@@ -1,4 +1,4 @@
-#include "MainWindow.h"
+﻿#include "MainWindow.h"
 #include <QApplication>
 #include <QElapsedTimer>
 #include <QDebug>
@@ -39,6 +39,7 @@ void log_out_put(QtMsgType type, const QMessageLogContext& context, const QStrin
         fprintf(stdout, "Fatal: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
         abort();
         break;
+
     default:
         fprintf(stdout, "[Debug] %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
         break;
