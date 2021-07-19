@@ -20,6 +20,7 @@
 #include "SARibbonGallery.h"
 #include "SARibbonElementManager.h"
 #include "SARibbonMenu.h"
+
 #define HELP_DRAW_RECT(p, rect)		 \
     do{				 \
         p.save();		 \

@@ -3,12 +3,19 @@
 #include <QVariant>
 #include "SARibbonElementManager.h"
 #include <QDebug>
+
+/**
+ * @brief The SARibbonCategoryData class
+ */
 class SARibbonCategoryData
 {
 public:
     SARibbonCategory *categoryPage;
 };
 
+/**
+ * @brief The SARibbonContextCategoryPrivate class
+ */
 class SARibbonContextCategoryPrivate
 {
 public:

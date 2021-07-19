@@ -5,6 +5,7 @@
 #include <QWidget>
 class SARibbonContextCategoryPrivate;
 
+
 /**
  * @brief 管理上下文标签的类
  */

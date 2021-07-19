@@ -16,6 +16,7 @@
 #include "SARibbonPannelOptionButton.h"
 #include "SARibbonPannelLayout.h"
 
+
 SARibbonStyleOption::SARibbonStyleOption()
 {
     mainbarHeightOfficeStyleThreeRow = 160;

@@ -6,6 +6,7 @@
 #include <QFrame>
 class SARibbonButtonGroupWidgetPrivate;
 
+
 /**
  * @brief 用于管理一组Action,类似于QToolBar
  */

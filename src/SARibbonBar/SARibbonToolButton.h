@@ -3,6 +3,7 @@
 #include "SARibbonGlobal.h"
 #include <QToolButton>
 
+
 /**
  * @brief Ribbon界面适用的toolButton
  *

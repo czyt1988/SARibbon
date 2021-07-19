@@ -2,6 +2,10 @@
 #include <QPainter>
 #include <QDebug>
 #include <QItemSelectionModel>
+
+/**
+ * @brief The SARibbonGalleryGroupPrivate class
+ */
 class SARibbonGalleryGroupPrivate
 {
 public:

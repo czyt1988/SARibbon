@@ -2,9 +2,9 @@
 #include "SARibbonControlButton.h"
 #include <QIcon>
 #include <QApplication>
-#define ICON_ARROW_UP QIcon(":/image/resource/ArrowUp.png")
-#define ICON_ARROW_DOWN QIcon(":/image/resource/ArrowDown.png")
-#define ICON_ARROW_MORE QIcon(":/image/resource/ArrowMore.png")
+#define ICON_ARROW_UP		QIcon(":/image/resource/ArrowUp.png")
+#define ICON_ARROW_DOWN		QIcon(":/image/resource/ArrowDown.png")
+#define ICON_ARROW_MORE		QIcon(":/image/resource/ArrowMore.png")
 #include "SARibbonMenu.h"
 #include <QResizeEvent>
 #include <QDebug>
@@ -12,25 +12,30 @@
 #include <QScrollBar>
 #include "SARibbonElementManager.h"
 #include <QActionGroup>
+
+/**
+ * @brief The SARibbonGalleryPrivate class
+ */
 class SARibbonGalleryPrivate
 {
 public:
-    SARibbonControlButton* buttonUp;
-    SARibbonControlButton* buttonDown;
-    SARibbonControlButton* buttonMore;
-    SARibbonGallery* Parent;
+    SARibbonControlButton *buttonUp;
+    SARibbonControlButton *buttonDown;
+    SARibbonControlButton *buttonMore;
+    SARibbonGallery *Parent;
 #if 0
-    SARibbonMenu* popupWidget;
+    SARibbonMenu *popupWidget;
 #else
-    RibbonGalleryViewport* popupWidget;
+    RibbonGalleryViewport *popupWidget;
 #endif
-    SARibbonGalleryGroup* viewportGroup;
-    QActionGroup* actionGroup;//所有gallery管理的actions都由这个actiongroup管理
-    SARibbonGalleryPrivate():Parent(nullptr)
+    SARibbonGalleryGroup *viewportGroup;
+    QActionGroup *actionGroup;//所有gallery管理的actions都由这个actiongroup管理
+    SARibbonGalleryPrivate() : Parent(nullptr)
     {
     }
 
-    void init(SARibbonGallery* parent)
+
+    void init(SARibbonGallery *parent)
     {
         Parent = parent;
         buttonUp = new SARibbonControlButton(parent);
@@ -43,36 +48,37 @@ public:
         buttonUp->setObjectName(QStringLiteral("SARibbonGalleryButtonUp"));
         buttonDown->setObjectName(QStringLiteral("SARibbonGalleryButtonDown"));
         buttonMore->setObjectName(QStringLiteral("SARibbonGalleryButtonMore"));
-        buttonUp->setFixedSize(15,20);
-        buttonDown->setFixedSize(15,20);
-        buttonMore->setFixedSize(15,20);
+        buttonUp->setFixedSize(15, 20);
+        buttonDown->setFixedSize(15, 20);
+        buttonMore->setFixedSize(15, 20);
         buttonUp->setIcon(ICON_ARROW_UP);
         buttonDown->setIcon(ICON_ARROW_DOWN);
         buttonMore->setIcon(ICON_ARROW_MORE);
-        Parent->connect(buttonUp,&QAbstractButton::clicked
-                        ,Parent,&SARibbonGallery::onPageUp);
-        Parent->connect(buttonDown,&QAbstractButton::clicked
-                        ,Parent,&SARibbonGallery::onPageDown);
-        Parent->connect(buttonMore,&QAbstractButton::clicked
-                        ,Parent,&SARibbonGallery::onShowMoreDetail);
+        Parent->connect(buttonUp, &QAbstractButton::clicked
+            , Parent, &SARibbonGallery::onPageUp);
+        Parent->connect(buttonDown, &QAbstractButton::clicked
+            , Parent, &SARibbonGallery::onPageDown);
+        Parent->connect(buttonMore, &QAbstractButton::clicked
+            , Parent, &SARibbonGallery::onShowMoreDetail);
         //信号转发
-        Parent->connect(actionGroup,&QActionGroup::triggered
-                        ,Parent,&SARibbonGallery::triggered);
-        Parent->connect(actionGroup,&QActionGroup::hovered
-                        ,Parent,&SARibbonGallery::hovered);
+        Parent->connect(actionGroup, &QActionGroup::triggered
+            , Parent, &SARibbonGallery::triggered);
+        Parent->connect(actionGroup, &QActionGroup::hovered
+            , Parent, &SARibbonGallery::hovered);
         popupWidget = nullptr;
         viewportGroup = nullptr;
     }
 
+
     bool isValid() const
     {
-        return Parent != nullptr;
+        return (Parent != nullptr);
     }
+
 
     void createPopupWidget()
     {
-        if(nullptr == popupWidget)
-        {
+        if (nullptr == popupWidget) {
 #if 0
             popupWidget = new SARibbonMenu(Parent);
 #else
@@ -81,10 +87,10 @@ public:
         }
     }
 
-    void setViewPort(SARibbonGalleryGroup* v)
+
+    void setViewPort(SARibbonGalleryGroup *v)
     {
-        if(nullptr == viewportGroup)
-        {
+        if (nullptr == viewportGroup) {
             viewportGroup = RibbonSubElementDelegate->createRibbonGalleryGroup(Parent);
         }
         viewportGroup->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -99,7 +105,7 @@ public:
 //////////////////////////////////////////////
 
 
-RibbonGalleryViewport::RibbonGalleryViewport(QWidget *parent):QWidget(parent)
+RibbonGalleryViewport::RibbonGalleryViewport(QWidget *parent) : QWidget(parent)
 {
     setWindowFlags(Qt::Popup);
     m_layout = new QVBoxLayout(this);
@@ -107,147 +113,160 @@ RibbonGalleryViewport::RibbonGalleryViewport(QWidget *parent):QWidget(parent)
     m_layout->setMargin(1);
 }
 
+
 void RibbonGalleryViewport::addWidget(QWidget *w)
 {
     m_layout->addWidget(w);
 }
 
+
 //////////////////////////////////////////////
 
-SARibbonGallery::SARibbonGallery(QWidget *parent):QFrame(parent)
-  ,m_d(new SARibbonGalleryPrivate)
+SARibbonGallery::SARibbonGallery(QWidget *parent) : QFrame(parent)
+    , m_d(new SARibbonGalleryPrivate)
 {
     m_d->init(this);
     setFrameShape(QFrame::Box);
     //setFrameShape(QFrame::Panel);
     setFixedHeight(60);
-    setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Fixed);
+    setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     setMinimumWidth(88);
 }
+
 
 SARibbonGallery::~SARibbonGallery()
 {
     delete m_d;
 }
 
+
 QSize SARibbonGallery::sizeHint() const
 {
-    return QSize(232,60);
+    return (QSize(232, 60));
 }
+
 
 QSize SARibbonGallery::minimumSizeHint() const
 {
-    return QSize(88,60);
+    return (QSize(88, 60));
 }
+
 
 SARibbonGalleryGroup *SARibbonGallery::addGalleryGroup()
 {
-    SARibbonGalleryGroup* group = RibbonSubElementDelegate->createRibbonGalleryGroup(this);
+    SARibbonGalleryGroup *group = RibbonSubElementDelegate->createRibbonGalleryGroup(this);
+
     addGalleryGroup(group);
-    return group;
+    return (group);
 }
+
 
 void SARibbonGallery::addGalleryGroup(SARibbonGalleryGroup *group)
 {
-    RibbonGalleryViewport* viewport = ensureGetPopupViewPort();
-    SARibbonGalleryGroupModel* model = new SARibbonGalleryGroupModel(this);
+    RibbonGalleryViewport *viewport = ensureGetPopupViewPort();
+    SARibbonGalleryGroupModel *model = new SARibbonGalleryGroupModel(this);
+
     group->setModel(model);
     viewport->addWidget(group);
-    if(nullptr == m_d->viewportGroup)
-    {
+    if (nullptr == m_d->viewportGroup) {
         setCurrentViewGroup(group);
     }
-    connect(group,&QAbstractItemView::clicked
-            ,this,&SARibbonGallery::onItemClicked);
+    connect(group, &QAbstractItemView::clicked
+        , this, &SARibbonGallery::onItemClicked);
 }
 
-SARibbonGalleryGroup* SARibbonGallery::addCategoryActions(const QString &title, QList<QAction *> actions)
+
+SARibbonGalleryGroup *SARibbonGallery::addCategoryActions(const QString& title, QList<QAction *> actions)
 {
-    SARibbonGalleryGroup* group = RibbonSubElementDelegate->createRibbonGalleryGroup(this);
-    SARibbonGalleryGroupModel* model = new SARibbonGalleryGroupModel(this);
-    group->setSizePolicy(QSizePolicy::Preferred,QSizePolicy::Maximum);
+    SARibbonGalleryGroup *group = RibbonSubElementDelegate->createRibbonGalleryGroup(this);
+    SARibbonGalleryGroupModel *model = new SARibbonGalleryGroupModel(this);
+
+    group->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
     group->setModel(model);
-    if(!title.isEmpty())
-    {
+    if (!title.isEmpty()) {
         group->setGroupTitle(title);
     }
-    for(QAction* a : actions){
+    for (QAction *a : actions)
+    {
         m_d->actionGroup->addAction(a);
     }
     group->addActionItemList(actions);
-    connect(group,&QAbstractItemView::clicked
-            ,this,&SARibbonGallery::onItemClicked);
-    RibbonGalleryViewport* viewport = ensureGetPopupViewPort();
+    connect(group, &QAbstractItemView::clicked
+        , this, &SARibbonGallery::onItemClicked);
+    RibbonGalleryViewport *viewport = ensureGetPopupViewPort();
+
     viewport->addWidget(group);
     setCurrentViewGroup(group);
-    return group;
+    return (group);
 }
+
 
 void SARibbonGallery::setCurrentViewGroup(SARibbonGalleryGroup *group)
 {
     m_d->setViewPort(group);
-    QApplication::postEvent(this,new QResizeEvent(size(),size()));
+    QApplication::postEvent(this, new QResizeEvent(size(), size()));
 }
+
 
 SARibbonGalleryGroup *SARibbonGallery::currentViewGroup() const
 {
-    return m_d->viewportGroup;
+    return (m_d->viewportGroup);
 }
+
 
 QActionGroup *SARibbonGallery::getActionGroup() const
 {
-    return m_d->actionGroup;
+    return (m_d->actionGroup);
 }
+
 
 void SARibbonGallery::onPageDown()
 {
-    if(m_d->viewportGroup)
-    {
-        QScrollBar* vscrollBar = m_d->viewportGroup->verticalScrollBar();
+    if (m_d->viewportGroup) {
+        QScrollBar *vscrollBar = m_d->viewportGroup->verticalScrollBar();
         int v = vscrollBar->value();
         v += vscrollBar->singleStep();
         vscrollBar->setValue(v);
     }
 }
 
+
 void SARibbonGallery::onPageUp()
 {
-    if(m_d->viewportGroup)
-    {
-        QScrollBar* vscrollBar = m_d->viewportGroup->verticalScrollBar();
+    if (m_d->viewportGroup) {
+        QScrollBar *vscrollBar = m_d->viewportGroup->verticalScrollBar();
         int v = vscrollBar->value();
         v -= vscrollBar->singleStep();
         vscrollBar->setValue(v);
     }
 }
 
+
 void SARibbonGallery::onShowMoreDetail()
 {
-    if(nullptr == m_d->popupWidget)
-    {
+    if (nullptr == m_d->popupWidget) {
         return;
     }
     QSize popupMenuSize = m_d->popupWidget->minimumSizeHint();// sizeHint();
-    QPoint start = mapToGlobal(QPoint(0,0));
-    m_d->popupWidget->setGeometry(start.x(),start.y(),width(),popupMenuSize.height());
+    QPoint start = mapToGlobal(QPoint(0, 0));
+
+    m_d->popupWidget->setGeometry(start.x(), start.y(), width(), popupMenuSize.height());
     m_d->popupWidget->show();
 }
 
-void SARibbonGallery::onItemClicked(const QModelIndex &index)
-{
-    QObject* obj = sender();
-    SARibbonGalleryGroup* group = qobject_cast<SARibbonGalleryGroup*>(obj);
 
-    if(group)
-    {
-        SARibbonGalleryGroup* curGroup = currentViewGroup();
-        if(nullptr == curGroup)
-        {
+void SARibbonGallery::onItemClicked(const QModelIndex& index)
+{
+    QObject *obj = sender();
+    SARibbonGalleryGroup *group = qobject_cast<SARibbonGalleryGroup *>(obj);
+
+    if (group) {
+        SARibbonGalleryGroup *curGroup = currentViewGroup();
+        if (nullptr == curGroup) {
             setCurrentViewGroup(group);
             curGroup = currentViewGroup();
         }
-        if(curGroup->model() != group->model())
-        {
+        if (curGroup->model() != group->model()) {
             curGroup->setModel(group->model());
         }
         curGroup->scrollTo(index);
@@ -256,40 +275,38 @@ void SARibbonGallery::onItemClicked(const QModelIndex &index)
     }
 }
 
+
 RibbonGalleryViewport *SARibbonGallery::ensureGetPopupViewPort()
 {
-    if(nullptr == m_d->popupWidget)
-    {
+    if (nullptr == m_d->popupWidget) {
         m_d->createPopupWidget();
     }
-    return m_d->popupWidget;
+    return (m_d->popupWidget);
 }
+
 
 void SARibbonGallery::resizeEvent(QResizeEvent *event)
 {
-    if(!m_d->isValid())
-    {
+    if (!m_d->isValid()) {
         return;
     }
     const QSize r = event->size();
     int subW = 0;
-    m_d->buttonUp->move(r.width() - m_d->buttonUp->width(),0);
-    subW = qMax(subW,m_d->buttonUp->width());
-    m_d->buttonDown->move(r.width() - m_d->buttonDown->width(),m_d->buttonUp->height());
-    subW = qMax(subW,m_d->buttonDown->width());
-    m_d->buttonMore->move(r.width() - m_d->buttonMore->width(),m_d->buttonDown->geometry().bottom());
-    subW = qMax(subW,m_d->buttonMore->width());
-    if(m_d->viewportGroup)
-    {
-        m_d->viewportGroup->setGeometry(0,0,r.width()-subW,r.height());
+
+    m_d->buttonUp->move(r.width() - m_d->buttonUp->width(), 0);
+    subW = qMax(subW, m_d->buttonUp->width());
+    m_d->buttonDown->move(r.width() - m_d->buttonDown->width(), m_d->buttonUp->height());
+    subW = qMax(subW, m_d->buttonDown->width());
+    m_d->buttonMore->move(r.width() - m_d->buttonMore->width(), m_d->buttonDown->geometry().bottom());
+    subW = qMax(subW, m_d->buttonMore->width());
+    if (m_d->viewportGroup) {
+        m_d->viewportGroup->setGeometry(0, 0, r.width()-subW, r.height());
     }
     QFrame::resizeEvent(event);
 }
 
+
 void SARibbonGallery::paintEvent(QPaintEvent *event)
 {
     QFrame::paintEvent(event);
-
 }
-
-

@@ -7,7 +7,9 @@
 
 //为了避免使用此框架的app设置了全局的qpushbutton 的 qss样式影响此按钮，定义了一个类
 
-
+/**
+ * @brief The SAWindowButtonGroupPrivate class
+ */
 class SAWindowButtonGroupPrivate
 {
 public:
@@ -282,6 +284,7 @@ void SAWindowButtonGroup::setupCloseButton(bool on)
 void SAWindowButtonGroup::updateWindowFlag()
 {
     Qt::WindowFlags flags = parentWidget()->windowFlags();
+
     m_d->mFlags = flags;
 
     setupMinimizeButton(flags & Qt::WindowMinimizeButtonHint);
@@ -291,25 +294,26 @@ void SAWindowButtonGroup::updateWindowFlag()
     setupCloseButton(flags & Qt::WindowCloseButtonHint);
 }
 
+
 /**
  * @brief 此函数仅用于控制最小最大化和关闭按钮的显示
  * @param flags
  */
 void SAWindowButtonGroup::updateWindowFlag(Qt::WindowFlags flags)
 {
-    if(flags & Qt::WindowCloseButtonHint){
+    if (flags & Qt::WindowCloseButtonHint) {
         m_d->mFlags |= Qt::WindowCloseButtonHint;
     }else{
         m_d->mFlags &= (~Qt::WindowCloseButtonHint);
     }
 
-    if(flags & Qt::WindowMaximizeButtonHint){
+    if (flags & Qt::WindowMaximizeButtonHint) {
         m_d->mFlags |= Qt::WindowMaximizeButtonHint;
     }else{
         m_d->mFlags &= (~Qt::WindowMaximizeButtonHint);
     }
 
-    if(flags & Qt::WindowMinimizeButtonHint){
+    if (flags & Qt::WindowMinimizeButtonHint) {
         m_d->mFlags |= Qt::WindowMinimizeButtonHint;
     }else{
         m_d->mFlags &= (~Qt::WindowMinimizeButtonHint);
@@ -371,6 +375,7 @@ void SAWindowButtonGroup::setWindowStates(Qt::WindowStates s)
     }
 }
 
+
 /**
  * @brief 此函数返回的flags仅包括 Qt::WindowCloseButtonHint，Qt::WindowMaximizeButtonHint，Qt::WindowMinimizeButtonHint
  * 三个
@@ -380,16 +385,17 @@ void SAWindowButtonGroup::setWindowStates(Qt::WindowStates s)
 Qt::WindowFlags SAWindowButtonGroup::windowButtonFlags() const
 {
     Qt::WindowFlags f = Qt::Widget;//widget是000
-    if(m_d->mFlags & Qt::WindowCloseButtonHint){
+
+    if (m_d->mFlags & Qt::WindowCloseButtonHint) {
         f |= Qt::WindowCloseButtonHint;
     }
-    if(m_d->mFlags & Qt::WindowMaximizeButtonHint){
+    if (m_d->mFlags & Qt::WindowMaximizeButtonHint) {
         f |= Qt::WindowMaximizeButtonHint;
     }
-    if(m_d->mFlags & Qt::WindowMinimizeButtonHint){
+    if (m_d->mFlags & Qt::WindowMinimizeButtonHint) {
         f |= Qt::WindowMinimizeButtonHint;
     }
-    return f;
+    return (f);
 }
 
 

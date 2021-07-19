@@ -2,6 +2,10 @@
 #define SARIBBONCHECKBOX_H
 #include "SARibbonGlobal.h"
 #include <QCheckBox>
+
+/**
+ * @brief The SARibbonCheckBox class
+ */
 class SA_RIBBON_EXPORT SARibbonCheckBox : public QCheckBox
 {
     Q_OBJECT

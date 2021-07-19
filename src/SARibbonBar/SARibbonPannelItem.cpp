@@ -1,5 +1,4 @@
-#include "SARibbonPannelItem.h"
-
+﻿#include "SARibbonPannelItem.h"
 
 SARibbonPannelItem::SARibbonPannelItem(QWidget *widget) : QWidgetItem(widget)
     , action(nullptr)
@@ -12,5 +11,3 @@ bool SARibbonPannelItem::isEmpty() const
 {
     return (action == 0 || !action->isVisible());
 }
-
-

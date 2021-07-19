@@ -2,6 +2,10 @@
 #define SARIBBONAPPLICATIONBUTTON_H
 #include <QPushButton>
 #include "SARibbonGlobal.h"
+
+/**
+ * @brief The SARibbonApplicationButton class
+ */
 class SA_RIBBON_EXPORT SARibbonApplicationButton : public QPushButton
 {
     Q_OBJECT

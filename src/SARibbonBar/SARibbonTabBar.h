@@ -3,6 +3,10 @@
 #include "SARibbonGlobal.h"
 #include <QTabBar>
 #include <QMargins>
+
+/**
+ * @brief The SARibbonTabBar class
+ */
 class SA_RIBBON_EXPORT SARibbonTabBar : public QTabBar
 {
     Q_OBJECT

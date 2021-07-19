@@ -1,5 +1,6 @@
 ﻿#include "SARibbonElementManager.h"
 
+
 SARibbonElementManager::SARibbonElementManager() : m_delegate(nullptr)
 {
     m_delegate = new SARibbonElementCreateDelegate();

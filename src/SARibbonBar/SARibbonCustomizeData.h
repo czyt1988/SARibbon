@@ -1,4 +1,4 @@
-#ifndef SARIBBONCUSTOMIZEDATA_H
+﻿#ifndef SARIBBONCUSTOMIZEDATA_H
 #define SARIBBONCUSTOMIZEDATA_H
 #include "SARibbonGlobal.h"
 #include "SARibbonActionsManager.h"
@@ -6,6 +6,7 @@
 #include <QList>
 
 class SARibbonMainWindow;
+
 
 
 /**

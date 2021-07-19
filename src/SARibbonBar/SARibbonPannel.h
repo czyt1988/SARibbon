@@ -13,7 +13,6 @@ class SARibbonPannelOptionButton;
 class SARibbonPannelPrivate;
 
 
-
 /**
  * @brief pannel页窗口，pannel是ribbon的面板用于承放控件
  *
