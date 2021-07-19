@@ -15,6 +15,9 @@
 #include <QList>
 #include <QMap>
 
+/**
+ * @brief The SARibbonCategoryItem class
+ */
 class SARibbonCategoryItem {
 public:
     SARibbonCategoryItem()

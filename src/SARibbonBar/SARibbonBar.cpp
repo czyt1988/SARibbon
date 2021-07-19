@@ -21,6 +21,7 @@
 #include "SARibbonButtonGroupWidget.h"
 #include "SARibbonQuickAccessBar.h"
 
+
 #define HELP_DRAW_RECT(p, rect)			    \
     do{					    \
         p.save();			    \

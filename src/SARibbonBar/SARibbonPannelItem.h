@@ -1,8 +1,9 @@
-#ifndef SARIBBONPANNELITEM_H
+﻿#ifndef SARIBBONPANNELITEM_H
 #define SARIBBONPANNELITEM_H
 #include "SARibbonGlobal.h"
 #include <QWidgetItem>
 #include <QAction>
+
 /**
  * @brief 是对pannel所有子窗口的抽象，参考qt的toolbar
  *

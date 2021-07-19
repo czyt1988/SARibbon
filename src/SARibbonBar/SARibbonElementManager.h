@@ -2,6 +2,7 @@
 #define SARIBBONELEMENTMANAGER_H
 #include "SARibbonElementCreateDelegate.h"
 #include "SARibbonGlobal.h"
+
 ///
 /// \brief 此类是一个全局单例，用于管理SARibbonElementCreateDelegate
 ///

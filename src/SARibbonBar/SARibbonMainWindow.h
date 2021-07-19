@@ -5,6 +5,7 @@
 class SARibbonMainWindowPrivate;
 class SARibbonBar;
 
+
 /**
  * @brief 如果要使用SARibbonBar，必须使用此类代替QMainWindow
  *

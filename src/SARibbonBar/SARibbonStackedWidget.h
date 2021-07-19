@@ -6,6 +6,7 @@ class QHideEvent;
 class QResizeEvent;
 class SARibbonStackedWidgetPrivate;
 
+
 /**
  * @brief 有qdialog功能的stackwidget，用于在最小化时stack能像dialog那样弹出来
  */

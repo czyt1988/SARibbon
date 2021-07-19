@@ -1,10 +1,11 @@
-#ifndef SARIBBONCUSTOMIZEWIDGET_H
+﻿#ifndef SARIBBONCUSTOMIZEWIDGET_H
 #define SARIBBONCUSTOMIZEWIDGET_H
 #include "SARibbonGlobal.h"
 #include <QWidget>
 #include "SARibbonActionsManager.h"
 #include "SARibbonPannel.h"
 #include "SARibbonCustomizeData.h"
+
 
 //SARibbonCustomizeWidget 特有
 class SARibbonCustomizeWidgetUi;

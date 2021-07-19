@@ -6,6 +6,7 @@
 #include <QToolButton>
 class SARibbonToolButton;
 class SARibbonQuickAccessBarPrivate;
+
 ///
 /// \brief ribbon左上顶部的快速响应栏
 ///

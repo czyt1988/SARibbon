@@ -1,8 +1,12 @@
-#include "SARibbonCustomizeDialog.h"
+﻿#include "SARibbonCustomizeDialog.h"
 #include <QApplication>
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QSpacerItem>
+
+/**
+ * @brief The SARibbonCustomizeDialogUi class
+ */
 class SARibbonCustomizeDialogUi {
 public:
     SARibbonCustomizeWidget *customWidget;

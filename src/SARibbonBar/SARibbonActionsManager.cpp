@@ -1,9 +1,10 @@
-#include "SARibbonActionsManager.h"
+﻿#include "SARibbonActionsManager.h"
 #include <QMap>
 #include <QHash>
 #include <QDebug>
 #include "SARibbonMainWindow.h"
 #include "SARibbonBar.h"
+
 class SARibbonActionsManagerPrivate
 {
 public:

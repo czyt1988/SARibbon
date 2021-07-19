@@ -10,8 +10,10 @@
 #include "SARibbonDrawHelper.h"
 #include "SARibbonElementManager.h"
 #include "QCursor"
+
 #define LITE_LARGE_BUTTON_ICON_HIGHT_RATE	0.52
 #define ARROW_WIDTH				10
+
 #ifdef SA_RIBBON_DEBUG_HELP_DRAW
 #define HELP_DRAW_RECT(p, rect)	      \
     do{			      \

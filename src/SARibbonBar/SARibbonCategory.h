@@ -12,6 +12,7 @@ class QHBoxLayout;
 class QWheelEvent;
 class SARibbonBar;
 
+
 /**
  * @brief 一项ribbon tab页
  * @note SARibbonCategory的windowTitle影响了其在SARibbonBar的标签显示，

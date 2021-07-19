@@ -7,6 +7,10 @@
 #include <QDebug>
 #include <QHash>
 #include <QFile>
+
+/**
+ * @brief The SARibbonMainWindowPrivate class
+ */
 class SARibbonMainWindowPrivate
 {
 public:

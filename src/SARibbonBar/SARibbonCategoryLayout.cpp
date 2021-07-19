@@ -8,7 +8,9 @@
 #include <QDesktopWidget>
 #include <QDebug>
 
-
+/**
+ * @brief The SARibbonCategoryLayoutPrivate class
+ */
 class SARibbonCategoryLayoutPrivate {
 public:
     SARibbonCategoryLayoutPrivate(SARibbonCategoryLayout *par);

@@ -3,6 +3,10 @@
 #include <QMouseEvent>
 #include <QDebug>
 #include <QApplication>
+
+/**
+ * @brief The SARibbonStackedWidgetPrivate class
+ */
 class SARibbonStackedWidgetPrivate
 {
 public:

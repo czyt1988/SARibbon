@@ -10,6 +10,10 @@ class SARibbonPannel;
 class SARibbonCategoryLayoutItem;
 class SARibbonSeparatorWidget;
 class SARibbonCategoryLayoutPrivate;
+
+/**
+ * @brief The SARibbonCategoryLayout class
+ */
 class SA_RIBBON_EXPORT SARibbonCategoryLayout : public QLayout
 {
     Q_OBJECT

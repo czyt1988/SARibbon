@@ -3,6 +3,7 @@
 #include <QToolButton>
 #include "SARibbonGlobal.h"
 
+
 /**
  * @brief 用于SARibbonPannel的control button
  *

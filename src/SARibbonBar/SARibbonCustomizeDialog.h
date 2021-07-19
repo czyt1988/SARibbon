@@ -1,4 +1,4 @@
-#ifndef SARIBBONCUSTOMIZEDIALOG_H
+﻿#ifndef SARIBBONCUSTOMIZEDIALOG_H
 #define SARIBBONCUSTOMIZEDIALOG_H
 #include "SARibbonGlobal.h"
 #include <QDialog>
@@ -6,6 +6,7 @@
 class SARibbonActionsManager;
 class SARibbonCustomizeDialogUi;
 class QXmlStreamWriter;
+
 
 /**
  * @brief SARibbonCustomizeWidget的对话框封装

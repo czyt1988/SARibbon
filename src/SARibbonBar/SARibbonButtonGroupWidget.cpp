@@ -10,6 +10,7 @@
 #include "SARibbonElementManager.h"
 #include "SARibbonSeparatorWidget.h"
 
+
 class SARibbonButtonGroupWidgetItem {
 public:
     QAction *action;

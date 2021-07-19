@@ -7,6 +7,7 @@
 #include <QStyledItemDelegate>
 #include "SARibbonGalleryItem.h"
 
+
 ///
 /// \brief SARibbonGalleryGroup对应的显示代理
 ///

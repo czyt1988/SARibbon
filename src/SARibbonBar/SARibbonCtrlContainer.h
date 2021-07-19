@@ -6,6 +6,7 @@
 class QStyleOption;
 class SARibbonCtrlContainerPrivate;
 
+
 /**
  * @brief 用于装载一个窗体的容器，这个窗体会布满整个SARibbonCtrlContainer，但会预留空间显示icon或者title
  */

@@ -1,5 +1,6 @@
 ﻿#include "SARibbonTabBar.h"
 
+
 SARibbonTabBar::SARibbonTabBar(QWidget *parent) : QTabBar(parent)
     , m_tabMargin(6, 0, 0, 0)
 {

@@ -1,4 +1,4 @@
-#ifndef SARIBBONACTIONSMANAGER_H
+﻿#ifndef SARIBBONACTIONSMANAGER_H
 #define SARIBBONACTIONSMANAGER_H
 #include "SARibbonGlobal.h"
 #include <QObject>
