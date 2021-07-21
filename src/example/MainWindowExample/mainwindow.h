@@ -35,6 +35,7 @@ private slots:
 
 private:
     SARibbonContextCategory *m_contextCategory;
+    SARibbonContextCategory *m_contextCategory2;
     SARibbonCustomizeWidget *m_customizeWidget;
     QTextEdit *m_edit;
     SARibbonActionsManager *m_actMgr;

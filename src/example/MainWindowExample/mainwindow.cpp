@@ -82,6 +82,10 @@ MainWindow::MainWindow(QWidget *par) : SARibbonMainWindow(par)
 
     createContextCategoryPage2(contextCategoryPage2);
     PRINT_COST(cost, lastTimes, "add contextCategory page");
+
+    m_contextCategory2 = ribbon->addContextCategory(("context2"), QColor(), 2);
+    m_contextCategory2->addCategoryPage(("context2 Page1"));
+    m_contextCategory2->addCategoryPage(("context2 Page2"));
     SARibbonQuickAccessBar *quickAccessBar = ribbon->quickAccessBar();
 
     quickAccessBar->addAction(new QAction(QIcon(":/icon/icon/chartDataManager.png"), "action1", this));
@@ -570,6 +574,23 @@ void MainWindow::createCategoryOther(SARibbonCategory *page)
     connect(changename, &QAction::triggered, this, [pannel]() {
         pannel->setPannelName(("改变pannel名字"));
     });
+
+    pannel = new SARibbonPannel(("ContextCategory"));
+    QAction *a1 = new QAction(QIcon(":/icon/icon/529398.png"), ("Context Category 1"), this);
+
+    a1->setCheckable(true);
+    connect(a1, &QAction::triggered, this, [this](bool c) {
+        this->ribbonBar()->setContextCategoryVisible(m_contextCategory, c);
+    });
+    QAction *a2 = new QAction(QIcon(":/icon/icon/529398.png"), ("Context Category 2"), this);
+
+    a2->setCheckable(true);
+    connect(a2, &QAction::triggered, this, [this](bool c) {
+        this->ribbonBar()->setContextCategoryVisible(m_contextCategory2, c);
+    });
+    pannel->addLargeAction(a1);
+    pannel->addLargeAction(a2);
+    page->addPannel(pannel);
 }
 
 
