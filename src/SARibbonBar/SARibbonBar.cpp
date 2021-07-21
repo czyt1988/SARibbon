@@ -675,6 +675,7 @@ void SARibbonBar::showContextCategory(SARibbonContextCategory *context)
 void SARibbonBar::hideContextCategory(SARibbonContextCategory *context)
 {
     bool ishide = false;
+    int indexOffset = 0;
 
     for (int i = 0; i < m_d->currentShowingContextCategory.size(); ++i)
     {
@@ -683,9 +684,22 @@ void SARibbonBar::hideContextCategory(SARibbonContextCategory *context)
             for (int j = indexs.size()-1; j >= 0; --j)
             {
                 m_d->ribbonTabBar->removeTab(indexs[j]);
+                ++indexOffset;
             }
-            m_d->currentShowingContextCategory.removeAt(i);
+            //注意，再删除ContextCategory后，tab的序号就会改变，这时，这个tab后面的都要调整它的序号
+
+            //这时需要迭代后面的currentShowingContextCategory
+            for (int j = i+1; j < m_d->currentShowingContextCategory.size(); ++j)
+            {
+                for (int& oldindex: m_d->currentShowingContextCategory[j].tabPageIndex)
+                {
+                    oldindex -= indexOffset;
+                }
+            }
             ishide = true;
+            m_d->currentShowingContextCategory.removeAt(i);
+            //移除了ContextCategory后需要break
+            break;
         }
     }
     if (ishide) {
