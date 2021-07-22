@@ -1,4 +1,4 @@
-﻿#include "SARibbonSeparatorWidget.h"
+#include "SARibbonSeparatorWidget.h"
 #include <QStylePainter>
 #include <QPainter>
 #include <QDebug>
@@ -14,6 +14,8 @@ SARibbonSeparatorWidget::SARibbonSeparatorWidget(int height, QWidget *parent)
 
 SARibbonSeparatorWidget::SARibbonSeparatorWidget(QWidget *parent)
     : QWidget(parent)
+    , m_topMargins(4)
+    , m_bottomMargins(4)
 {
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
     setFixedWidth(6);
