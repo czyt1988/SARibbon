@@ -1651,14 +1651,7 @@ void SARibbonBar::resizeInWpsLiteStyle()
     const int titleH = titleBarHeight();
     const int validTitleBarHeight = titleH - RibbonSubElementStyleOpt.widgetBord.top();
 
-    //applitionButton 定位
-    if (m_d->applitionButton) {
-        if (m_d->applitionButton->isVisible()) {
-            m_d->applitionButton->setGeometry(x, y, applitionButtonWidth(), titleH);
-            x = m_d->applitionButton->geometry().right()+2;
-        }
-    }
-    //applitionButton定位完后先布局右边内容
+    //先布局右边内容
     //cornerWidget - TopRightCorner
     int endX = width() - RibbonSubElementStyleOpt.widgetBord.right()-m_d->windowButtonSize.width();
 
@@ -1703,6 +1696,22 @@ void SARibbonBar::resizeInWpsLiteStyle()
         endX -= wSize.width();
         m_d->tabBarRightSizeButtonGroupWidget->setGeometry(endX, y, wSize.width(), validTitleBarHeight);
     }
+
+    //tab 的y值需要重新计算
+    int tabH = tabBarHeight();
+    if (tabH > validTitleBarHeight) {
+        //这种直接把tabH设置为validTitleBarHeight
+        tabH = validTitleBarHeight;
+    }
+    y = y + validTitleBarHeight - tabH;//如果tabH较小，则下以，让tab底部和title的底部对齐
+
+    //applitionButton 定位，与TabBar同高
+    if (m_d->applitionButton) {
+        if (m_d->applitionButton->isVisible()) {
+            m_d->applitionButton->setGeometry(x, y, applitionButtonWidth(), tabH);
+            x = m_d->applitionButton->geometry().right()+2;
+        }
+    }
     int tabBarWidth = endX - x;
     //20200831
     //tabBarWidth的宽度原来为endX - x;，现需要根据实际进行调整
@@ -1714,14 +1723,6 @@ void SARibbonBar::resizeInWpsLiteStyle()
     if (mintabBarWidth < tabBarWidth) {
         tabBarWidth = mintabBarWidth;
     }
-    //tab 的y值需要重新计算
-    int tabH = tabBarHeight();
-
-    if (tabH > validTitleBarHeight) {
-        //这种直接把tabH设置为validTitleBarHeight
-        tabH = validTitleBarHeight;
-    }
-    y = y + validTitleBarHeight - tabH;//如果tabH较小，则下以，让tab底部和title的底部对齐
     m_d->ribbonTabBar->setGeometry(x, y, tabBarWidth, tabH);
 
     //调整整个stackedContainer
