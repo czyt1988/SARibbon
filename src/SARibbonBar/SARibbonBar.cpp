@@ -1084,6 +1084,7 @@ void SARibbonBar::setRibbonStyle(SARibbonBar::RibbonStyle v)
 {
     m_d->ribbonStyle = v;
     m_d->lastShowStyle = v;
+    m_d->quickAccessBar->setEnableShowIcon(isOfficeStyle(v));
     updateRibbonElementGeometry();
     QSize oldSize = size();
     QSize newSize(oldSize.width(), mainBarHeight());
