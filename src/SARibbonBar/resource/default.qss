@@ -1,5 +1,11 @@
 ﻿
 /* start ribbon set*/
+
+SARibbonMainWindow {
+  background-color: white;
+  border: 1px solid #707070;
+}
+
 /*SARibbonBar*/
 
 SARibbonBar{
