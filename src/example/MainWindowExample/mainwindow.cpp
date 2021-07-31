@@ -9,6 +9,7 @@
 #include "SARibbonToolButton.h"
 #include <QAction>
 #include <QMenu>
+#include <QStatusBar>
 #include <QDebug>
 #include <QElapsedTimer>
 #include <QRadioButton>
@@ -45,6 +46,7 @@ MainWindow::MainWindow(QWidget *par) : SARibbonMainWindow(par)
     setWindowTitle(("ribbon test"));
     m_edit = new QTextEdit(this);
     setCentralWidget(m_edit);
+    setStatusBar(new QStatusBar());
     PRINT_COST(cost, lastTimes, "setCentralWidget & setWindowTitle");
     SARibbonBar *ribbon = ribbonBar();
 
