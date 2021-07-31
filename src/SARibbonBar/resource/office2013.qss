@@ -54,18 +54,17 @@ SARibbonStackedWidget:focus {
 
 SARibbonApplicationButton {
   color: white;
-  border: 1px solid #2b579a;
   border-top-left-radius: 2px;
   border-top-right-radius: 2px;
   background-color: #2b579a;
 }
 
 SARibbonApplicationButton::hover {
-  background-color: #155889;
+  background-color: #487dcc;
 }
 
 SARibbonApplicationButton::pressed {
-  background-color: #155889;
+  background-color: #487dcc;
 }
 
 SARibbonApplicationButton:focus {
