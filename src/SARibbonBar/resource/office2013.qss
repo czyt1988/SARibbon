@@ -4,7 +4,8 @@
 
 SARibbonBar {
   background-color: white;
-  border: 1px solid #2b579a;
+  border: solid #707070;
+  border-width: 1px 1px 0px 1px;
 }
 
 /*SARibbonButtonGroupWidget*/

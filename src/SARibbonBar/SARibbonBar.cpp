@@ -1733,10 +1733,6 @@ void SARibbonBar::resizeInWpsLiteStyle()
 void SARibbonBar::paintBackground(QPainter& painter)
 {
     painter.save();
-    QPalette pl = palette();
-
-    painter.setBrush(pl.background());
-    painter.drawRect(rect());
     //在tabbar下绘制一条线
     const int lineY = m_d->ribbonTabBar->geometry().bottom();
     QPen pen(RibbonSubElementStyleOpt.tabBarBaseLineColor);
