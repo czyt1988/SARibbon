@@ -664,7 +664,6 @@ void SARibbonBar::showContextCategory(SARibbonContextCategory *context)
     }
     m_d->currentShowingContextCategory.append(contextCategoryData);
     QApplication::postEvent(this, new QResizeEvent(size(), size()));
-    repaint();
 }
 
 
@@ -704,7 +703,6 @@ void SARibbonBar::hideContextCategory(SARibbonContextCategory *context)
     }
     if (ishide) {
         QApplication::postEvent(this, new QResizeEvent(size(), size()));
-        repaint();
     }
 }
 
@@ -1442,6 +1440,12 @@ void SARibbonBar::paintInWpsLiteStyle()
                 , RibbonSubElementStyleOpt.widgetBord.top()
                 , width
                 , RibbonSubElementStyleOpt.titleBarHight);
+#ifdef SA_RIBBON_DEBUG_HELP_DRAW
+            p.save();
+            p.setBrush(QColor(255, 0, 0, 120));
+            p.drawRect(titleRegion);
+            p.restore();
+#endif
             paintWindowTitle(p, parWindow->windowTitle(), titleRegion);
         }
     }
@@ -1539,6 +1543,7 @@ void SARibbonBar::resizeEvent(QResizeEvent *e)
     }else {
         resizeInWpsLiteStyle();
     }
+    update();
 }
 
 
