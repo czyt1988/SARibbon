@@ -319,6 +319,46 @@ SARibbonCategoryScrollButton::hover {
   background-color: #cee7fc;
 }
 
+SAWindowToolButton { 
+  background-color: transparent; 
+  border:none;
+}
+
+SAWindowToolButton:focus {
+  outline: none
+}
+
+#SAMinimizeWindowButton {
+  icon: url(:/image/resource/Titlebar_Min.png);
+}
+
+#SAMaximizeWindowButton {
+  icon: url(:/image/resource/Titlebar_Max.png),
+    url(:/image/resource/Titlebar_Normal.png) on;
+}
+
+#SAMinimizeWindowButton:hover,#SAMaximizeWindowButton:hover {
+  background-color: #e5e5e5;
+}
+
+#SAMinimizeWindowButton:pressed,#SAMaximizeWindowButton:pressed {
+  background-color: #cacacb;
+}
+
+#SACloseWindowButton {
+  icon: url(:/image/resource/Titlebar_Close.png);
+}
+
+#SACloseWindowButton:hover {
+  background-color: #e81123;
+  icon: url(:/image/resource/Titlebar_Close_Hover.png);
+}
+
+#SACloseWindowButton:pressed {
+  background-color: #f1707a;
+  icon: url(:/image/resource/Titlebar_Close_Hover.png);
+}
+
 #SARibbonBarHidePannelButton {
   titlebar-shade-icon: url(:/image/resource/Titlebar_Shade.png);
   titlebar-unshade-icon: url(:/image/resource/Titlebar_Unshade.png);
