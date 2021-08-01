@@ -48,18 +48,7 @@ public:
             buttonMinimize->setObjectName(QStringLiteral("SAMinimizeWindowButton"));
             buttonMinimize->setFixedSize(30, 28);
             buttonMinimize->setFocusPolicy(Qt::NoFocus);//避免铺抓到
-            buttonMinimize->setStyleSheet(QString(""
-                "SAWindowToolButton"
-                "{ "
-                "    background-color: transparent; "
-                "    border:none;"
-                "}"
-                "SAWindowToolButton:hover {background-color:#C1D1B8;}"
-                "SAWindowToolButton:pressed {background-color:#A5AF9B;}"
-                "SAWindowToolButton:focus{outline: none}"));
-            QIcon icon = par->style()->standardIcon(QStyle::SP_TitleBarMinButton);
             buttonMinimize->setIconSize(buttonMinimize->size()*mIconscale);
-            buttonMinimize->setIcon(icon);
             buttonMinimize->show();
             par->connect(buttonMinimize, &QAbstractButton::clicked
                 , par, &SAWindowButtonGroup::minimizeWindow);
@@ -85,19 +74,9 @@ public:
             buttonMaximize = new SAWindowToolButton(par);
             buttonMaximize->setObjectName(QStringLiteral("SAMaximizeWindowButton"));
             buttonMaximize->setFixedSize(30, 28);
+            buttonMaximize->setCheckable(true);
             buttonMaximize->setFocusPolicy(Qt::NoFocus);//避免铺抓到
-            buttonMaximize->setStyleSheet(QString(""
-                "SAWindowToolButton"
-                "{ "
-                "    background-color: transparent; "
-                "    border:none;"
-                "}\n"
-                "SAWindowToolButton:hover {background-color:#C1D1B8;}"
-                "SAWindowToolButton:pressed {background-color:#A5AF9B;}"
-                "SAWindowToolButton:focus{outline: none;}"));
-            QIcon icon = par->style()->standardIcon(QStyle::SP_TitleBarMaxButton);
             buttonMaximize->setIconSize(buttonMaximize->size()*mIconscale);
-            buttonMaximize->setIcon(icon);
             buttonMaximize->show();
             par->connect(buttonMaximize, &QAbstractButton::clicked
                 , par, &SAWindowButtonGroup::maximizeWindow);
@@ -127,18 +106,7 @@ public:
             //buttonClose->setFlat(true);
             par->connect(buttonClose, &QAbstractButton::clicked
                 , par, &SAWindowButtonGroup::closeWindow);
-            buttonClose->setStyleSheet(QString(""
-                "SAWindowToolButton"
-                "{ "
-                "    background-color: transparent; "
-                "    border:none;"
-                "}"
-                "SAWindowToolButton:hover {background-color:#F0604D;}"
-                "SAWindowToolButton:pressed {background-color:#F0604D;}"
-                "SAWindowToolButton:focus{outline: none;}"));
-            QIcon icon = par->style()->standardIcon(QStyle::SP_TitleBarCloseButton);
             buttonClose->setIconSize(buttonClose->size()*mIconscale);
-            buttonClose->setIcon(icon);
             buttonClose->show();
         }else {
             if (buttonClose) {
@@ -225,9 +193,9 @@ public:
     }
 };
 
-SAWindowToolButton::SAWindowToolButton(QWidget *p) : QToolButton(p)
+SAWindowToolButton::SAWindowToolButton(QWidget *p) : QPushButton(p)
 {
-    setAutoRaise(true);
+    setFlat(true);
 }
 
 
@@ -356,22 +324,8 @@ void SAWindowButtonGroup::setIconScale(qreal iconscale)
  */
 void SAWindowButtonGroup::setWindowStates(Qt::WindowStates s)
 {
-    switch (s)
-    {
-    case Qt::WindowNoState:
-        if (m_d->buttonMaximize) {
-            m_d->buttonMaximize->setIcon(style()->standardIcon(QStyle::SP_TitleBarMaxButton));
-        }
-        break;
-
-    case Qt::WindowMaximized:
-        if (m_d->buttonMaximize) {
-            m_d->buttonMaximize->setIcon(style()->standardIcon(QStyle::SP_TitleBarNormalButton));
-        }
-        break;
-
-    default:
-        break;
+    if (m_d->buttonMaximize) {
+        m_d->buttonMaximize->setChecked(s.testFlag(Qt::WindowMaximized));
     }
 }
 
@@ -440,24 +394,6 @@ void SAWindowButtonGroup::resizeEvent(QResizeEvent *e)
 }
 
 
-//void SAWindowButtonGroup::updateMaximizeButtonIcon()
-//{
-//    QWidget *par = parentWidget();
-
-//    if (par) {
-//        if (par->isMaximized()) {
-//            if (m_d->buttonMaximize) {
-//                m_d->buttonMaximize->setIcon(style()->standardIcon(QStyle::SP_TitleBarNormalButton));
-//            }
-//        }else {
-//            if (m_d->buttonMaximize) {
-//                m_d->buttonMaximize->setIcon(style()->standardIcon(QStyle::SP_TitleBarMaxButton));
-//            }
-//        }
-//    }
-//}
-
-
 void SAWindowButtonGroup::closeWindow()
 {
     if (parentWidget()) {
@@ -484,6 +420,5 @@ void SAWindowButtonGroup::maximizeWindow()
         }else {
             par->showMaximized();
         }
-        //updateMaximizeButtonIcon();
     }
 }

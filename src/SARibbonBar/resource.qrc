@@ -4,6 +4,11 @@
         <file>resource/ArrowDown.png</file>
         <file>resource/ArrowMore.png</file>
         <file>resource/ArrowUp.png</file>
+        <file>resource/Titlebar_Close.png</file>
+        <file>resource/Titlebar_Close_Hover.png</file>
+        <file>resource/Titlebar_Max.png</file>
+        <file>resource/Titlebar_Min.png</file>
+        <file>resource/Titlebar_Normal.png</file>
         <file>resource/Titlebar_Shade.png</file>
         <file>resource/Titlebar_Unshade.png</file>
     </qresource>

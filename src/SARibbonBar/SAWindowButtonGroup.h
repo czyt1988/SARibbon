@@ -2,7 +2,7 @@
 #define SAWINDOWBUTTONGROUP_H
 #include "SARibbonGlobal.h"
 #include <QWidget>
-#include <QToolButton>
+#include <QPushButton>
 class SAWindowButtonGroupPrivate;
 
 ///
@@ -39,9 +39,6 @@ protected:
     virtual void parentResize();
     virtual void resizeEvent(QResizeEvent *e) Q_DECL_OVERRIDE;
 
-private:
-    //void updateMaximizeButtonIcon();
-
 protected slots:
     Q_SLOT void closeWindow();
     Q_SLOT void minimizeWindow();
@@ -55,7 +52,7 @@ private:
 /**
  * @brief The SAWindowToolButton class
  */
-class SAWindowToolButton : public QToolButton
+class SAWindowToolButton : public QPushButton
 {
     Q_OBJECT
 public:
