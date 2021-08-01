@@ -277,3 +277,8 @@ SARibbonSeparatorWidget{
     /*background-color: transparent;*/
     background-color: #D3D3D3;
 }
+
+#SARibbonBarHidePannelButton {
+  titlebar-shade-icon: url(:/image/resource/Titlebar_Shade.png);
+  titlebar-unshade-icon: url(:/image/resource/Titlebar_Unshade.png);
+}

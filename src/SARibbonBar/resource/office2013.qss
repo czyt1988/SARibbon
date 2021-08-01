@@ -318,3 +318,8 @@ SARibbonCategoryScrollButton::hover {
   border: 1px solid #badffa;
   background-color: #cee7fc;
 }
+
+#SARibbonBarHidePannelButton {
+  titlebar-shade-icon: url(:/image/resource/Titlebar_Shade.png);
+  titlebar-unshade-icon: url(:/image/resource/Titlebar_Unshade.png);
+}

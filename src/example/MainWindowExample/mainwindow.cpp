@@ -237,6 +237,7 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
     connect(act, &QAction::triggered, this, [this](bool b) {
         this->ribbonBar()->showMinimumModeButton(b);
     });
+    act->trigger();
     QButtonGroup *g = new QButtonGroup(page);
     QRadioButton *r = new QRadioButton();
 

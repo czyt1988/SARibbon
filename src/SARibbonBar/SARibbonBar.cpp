@@ -816,15 +816,14 @@ void SARibbonBar::showMinimumModeButton(bool isShow)
         activeTabBarRightButtonGroup();
         if (nullptr == m_d->minimumCaterogyButton) {
             m_d->minimumCaterogyButton = RibbonSubElementDelegate->createHidePannelButton(this);
+            m_d->minimumCaterogyButton->ensurePolished(); // 载入样式图标
             QAction *action = new QAction(m_d->minimumCaterogyButton);
-            action->setCheckable(true);
-            action->setChecked(isMinimumMode());
             action->setIcon(style()->standardIcon(isMinimumMode()?
-                QStyle::SP_TitleBarUnshadeButton:QStyle::SP_TitleBarShadeButton));
-            connect(action, &QAction::triggered, this, [=](bool on) {
-                action->setIcon(style()->standardIcon(on?
-                    QStyle::SP_TitleBarUnshadeButton:QStyle::SP_TitleBarShadeButton));
-                this->setMinimumMode(on);
+                QStyle::SP_TitleBarUnshadeButton:QStyle::SP_TitleBarShadeButton, 0, m_d->minimumCaterogyButton));
+            connect(action, &QAction::triggered, this, [=]() {
+                this->setMinimumMode(!isMinimumMode());
+                action->setIcon(style()->standardIcon(isMinimumMode()?
+                    QStyle::SP_TitleBarUnshadeButton:QStyle::SP_TitleBarShadeButton, 0, m_d->minimumCaterogyButton));
             });
             m_d->minimumCaterogyButton->setDefaultAction(action);
             m_d->tabBarRightSizeButtonGroupWidget->addWidget(m_d->minimumCaterogyButton);
