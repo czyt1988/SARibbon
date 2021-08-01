@@ -819,8 +819,11 @@ void SARibbonBar::showMinimumModeButton(bool isShow)
             QAction *action = new QAction(m_d->minimumCaterogyButton);
             action->setCheckable(true);
             action->setChecked(isMinimumMode());
-            action->setIcon(QIcon(":/icon/icon/save.png"));
-            connect(action, &QAction::triggered, this, [this](bool on) {
+            action->setIcon(style()->standardIcon(isMinimumMode()?
+                QStyle::SP_TitleBarUnshadeButton:QStyle::SP_TitleBarShadeButton));
+            connect(action, &QAction::triggered, this, [=](bool on) {
+                action->setIcon(style()->standardIcon(on?
+                    QStyle::SP_TitleBarUnshadeButton:QStyle::SP_TitleBarShadeButton));
                 this->setMinimumMode(on);
             });
             m_d->minimumCaterogyButton->setDefaultAction(action);
