@@ -186,21 +186,17 @@ void SARibbonButtonGroupWidget::actionEvent(QActionEvent *e)
     SARibbonButtonGroupWidgetItem item;
 
     item.action = e->action();
-    QWidgetAction *widgetAction = qobject_cast<QWidgetAction *>(item.action);
 
     switch (e->type())
     {
     case QEvent::ActionAdded:
     {
-        if (nullptr != widgetAction) {
-            if (widgetAction->parent() != this) {
-                widgetAction->setParent(this);
-            }
-        }
         if (QWidgetAction *widgetAction = qobject_cast<QWidgetAction *>(item.action)) {
+            widgetAction->setParent(this);
             item.widget = widgetAction->requestWidget(this);
             if (item.widget != nullptr) {
                 item.widget->setAttribute(Qt::WA_LayoutUsesWidgetRect);
+                item.widget->show();
                 item.customWidget = true;
             }
         } else if (item.action->isSeparator()) {
