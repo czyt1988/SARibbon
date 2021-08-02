@@ -330,7 +330,7 @@ SAWindowToolButton:focus {
 }
 
 #SAMinimizeWindowButton:hover,#SAMaximizeWindowButton:hover {
-  background-color: #e5e5e5;
+  background-color: #d5d5d5;
 }
 
 #SAMinimizeWindowButton:pressed,#SAMaximizeWindowButton:pressed {
