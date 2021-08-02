@@ -9,10 +9,11 @@ SARibbonGalleryItem::SARibbonGalleryItem()
 }
 
 
-SARibbonGalleryItem::SARibbonGalleryItem(const QIcon& icon)
+SARibbonGalleryItem::SARibbonGalleryItem(const QString& text, const QIcon& icon)
     : m_flags(Qt::ItemIsEnabled|Qt::ItemIsSelectable)
     , m_action(nullptr)
 {
+    setText(text);
     setIcon(icon);
 }
 

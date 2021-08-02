@@ -14,7 +14,7 @@ class SA_RIBBON_EXPORT SARibbonGalleryItem
 {
 public:
     SARibbonGalleryItem();
-    SARibbonGalleryItem(const QIcon& icon);
+    SARibbonGalleryItem(const QString& text, const QIcon& icon);
     SARibbonGalleryItem(QAction *act);
     virtual ~SARibbonGalleryItem();
     //设置角色
