@@ -27,6 +27,7 @@
 #include "SARibbonCustomizeDialog.h"
 #include <QXmlStreamWriter>
 #include <QTextStream>
+#include "SAFramelessHelper.h"
 
 
 #define PRINT_COST(ElapsedTimer, LastTime, STR)					      \
@@ -39,6 +40,9 @@
 MainWindow::MainWindow(QWidget *par) : SARibbonMainWindow(par)
     , m_customizeWidget(nullptr)
 {
+    SAFramelessHelper *helper = framelessHelper();
+    helper->setRubberBandOnResize(false);
+
     QElapsedTimer cost;
     int lastTimes = 0;
 

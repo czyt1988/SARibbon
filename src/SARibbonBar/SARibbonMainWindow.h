@@ -4,6 +4,7 @@
 #include <QMainWindow>
 class SARibbonMainWindowPrivate;
 class SARibbonBar;
+class SAFramelessHelper;
 
 
 /**
@@ -46,6 +47,8 @@ public:
     const SARibbonBar *ribbonBar() const;
     SARibbonBar *ribbonBar();
 
+    //返回SAFramelessHelper
+    SAFramelessHelper *framelessHelper();
 
     void setRibbonTheme(RibbonTheme theme);
     RibbonTheme ribbonTheme() const;
