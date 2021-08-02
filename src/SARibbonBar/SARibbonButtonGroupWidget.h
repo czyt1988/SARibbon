@@ -18,9 +18,9 @@ public:
     ~SARibbonButtonGroupWidget() Q_DECL_OVERRIDE;
 
     //生成并添加一个action
-    void addAction(QAction *a);
+    QAction *addAction(QAction *a);
     QAction *addAction(const QString& text, const QIcon& icon, QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
-    void addMenu(QMenu *menu, QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
+    QAction *addMenu(QMenu *menu, QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
     QAction *addSeparator();
     QAction *addWidget(QWidget *w);
     QSize sizeHint() const Q_DECL_OVERRIDE;
