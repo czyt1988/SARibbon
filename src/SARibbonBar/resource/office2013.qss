@@ -235,7 +235,6 @@ SARibbonPannel {
 SARibbonGallery {
   background-color: transparent;
   color: #333;
-  border: 1px solid #c2d0df;
 }
 
 /*SARibbonGalleryGroup*/
@@ -244,15 +243,23 @@ SARibbonGalleryGroup {
   show-decoration-selected: 1;
   background-color: transparent;
   color: #333;
+  border: 1px solid #c2d0df;
 }
 
 SARibbonGalleryGroup::item:selected {
   background-color: #9ed2f9;
+  color: black;
 }
 
 SARibbonGalleryGroup::item:hover {
   border: 2px solid #badffa;
   background-color: #cee7fc;
+}
+
+/*RibbonGalleryViewport*/
+
+RibbonGalleryViewport {
+  background-color: white;
 }
 
 /*SARibbonLineEdit*/
