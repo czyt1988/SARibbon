@@ -50,7 +50,7 @@ public:
         buttonMore->setObjectName(QStringLiteral("SARibbonGalleryButtonMore"));
         buttonUp->setFixedSize(15, 20);
         buttonDown->setFixedSize(15, 20);
-        buttonMore->setFixedSize(15, 21);
+        buttonMore->setFixedSize(15, 20);
         buttonUp->setIcon(ICON_ARROW_UP);
         buttonDown->setIcon(ICON_ARROW_DOWN);
         buttonMore->setIcon(ICON_ARROW_MORE);
