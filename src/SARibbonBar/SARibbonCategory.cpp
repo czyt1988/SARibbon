@@ -892,8 +892,8 @@ void SARibbonCategoryPrivate::doItemLayout()
     SARibbonCategory *category = ribbonCategory();
 
     //两个滚动按钮的位置永远不变
-    mLeftScrollBtn->setGeometry(5, 4, 12, category->height()-8);
-    mRightScrollBtn->setGeometry(category->width()-12-5, 4, 12, category->height()-8);
+    mLeftScrollBtn->setGeometry(0, 0, 12, category->height());
+    mRightScrollBtn->setGeometry(category->width()-12, 0, 12, category->height());
     QList<QWidget *> showWidgets, hideWidgets;
 
     for (const SARibbonCategoryItem& item : mItemList)
