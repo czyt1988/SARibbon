@@ -129,10 +129,10 @@ public:
     //构造函数
     SARibbonBar(QWidget *parent = nullptr);
     ~SARibbonBar() Q_DECL_OVERRIDE;
-    //获取applitionButton
+    //获取applicationButton
     QAbstractButton *applicationButton();
 
-    //设置applitionButton
+    //设置applicationButton
     void setApplicationButton(QAbstractButton *btn);
 
     //获取tabbar
@@ -262,7 +262,7 @@ signals:
     /**
      * @brief 应用按钮点击响应 - 左上角的按钮，通过关联此信号触发应用按钮点击的效果
      */
-    void applitionButtonClicked();
+    void applicationButtonClicked();
 
     /**
      * @brief 标签页变化触发的信号
@@ -280,7 +280,7 @@ protected:
     virtual int mainBarHeight() const;
 
     //应用按钮的宽度
-    virtual int applitionButtonWidth() const;
+    virtual int applicationButtonWidth() const;
 
 protected slots:
     void onWindowTitleChanged(const QString& title);
