@@ -466,10 +466,10 @@ void MainWindow::createCategoryOther(SARibbonCategory *page)
 
     page->addPannel(pannel);
     SARibbonButtonGroupWidget *btnGroup = new SARibbonButtonGroupWidget(pannel);
-
-    btnGroup->setFrameShape(QFrame::Box);
     btnGroup->addAction(new QAction(QIcon(":/icon/icon/figureIcon.png"), "", this));
     btnGroup->addAction(new QAction(QIcon(":/icon/icon/information.png"), "", this));
+    btnGroup->addAction(new QAction(QIcon(":/icon/icon/chartDataManager.png"), "", this));
+    btnGroup->addAction(new QAction(QIcon(":/icon/icon/inRangDataRemove.png"), "", this));
     pannel->addLargeWidget(btnGroup);
 
     SARibbonToolButton *btn;

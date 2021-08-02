@@ -19,6 +19,10 @@ SARibbonButtonGroupWidget{
 background-color: transparent;
 }
 
+SARibbonPannel > SARibbonButtonGroupWidget {
+  border: 1px solid #c2d0df;
+}
+
 /*SARibbonQuickAccessBar*/
 SARibbonQuickAccessBar{
     background-color: #FF0000;
