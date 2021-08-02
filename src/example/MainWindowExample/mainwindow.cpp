@@ -150,6 +150,10 @@ MainWindow::MainWindow(QWidget *par) : SARibbonMainWindow(par)
             }
         }
     });
+
+    SARibbonButtonGroupWidget *rightBar = ribbon->activeTabBarRightButtonGroup();
+    rightBar->addAction("Help", QIcon(":/icon/icon/help.png"));
+
     setMinimumWidth(500);
     //
     showMaximized();
