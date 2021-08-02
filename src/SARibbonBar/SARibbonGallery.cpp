@@ -247,10 +247,12 @@ void SARibbonGallery::onShowMoreDetail()
     if (nullptr == m_d->popupWidget) {
         return;
     }
-    QSize popupMenuSize = m_d->popupWidget->minimumSizeHint();// sizeHint();
-    QPoint start = mapToGlobal(QPoint(0, 0));
+    QSize popupMenuSize = m_d->popupWidget->sizeHint();
+    QPoint start = mapToGlobal(QPoint(-1, -1)); // 考虑margin，弹出viewport像素对齐
 
-    m_d->popupWidget->setGeometry(start.x(), start.y(), width(), popupMenuSize.height());
+    int width = m_d->viewportGroup->width() + 2; // viewport + margin
+    width += qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent); // scrollbar
+    m_d->popupWidget->setGeometry(start.x(), start.y(), width, popupMenuSize.height());
     m_d->popupWidget->show();
 }
 
