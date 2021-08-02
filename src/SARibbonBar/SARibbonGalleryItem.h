@@ -14,7 +14,7 @@ class SA_RIBBON_EXPORT SARibbonGalleryItem
 {
 public:
     SARibbonGalleryItem();
-    SARibbonGalleryItem(const QIcon& icon);
+    SARibbonGalleryItem(const QString& text, const QIcon& icon);
     SARibbonGalleryItem(QAction *act);
     virtual ~SARibbonGalleryItem();
     //设置角色
@@ -52,7 +52,7 @@ public:
 private:
     friend class SARibbonGalleryGroupModel;
     QMap<int, QVariant> m_datas;
-    Qt::ItemFlags m_flsgs;
+    Qt::ItemFlags m_flags;
     QAction *m_action;
 };
 

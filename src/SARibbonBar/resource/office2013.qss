@@ -1,16 +1,26 @@
 ﻿/* start ribbon set*/
 
+SARibbonMainWindow {
+  background-color: white;
+  border: 1px solid #707070;
+}
+
 /*SARibbonBar*/
 
 SARibbonBar {
   background-color: white;
-  border: 1px solid #2b579a;
+  border: solid #707070;
+  border-width: 1px 1px 0px 1px;
 }
 
 /*SARibbonButtonGroupWidget*/
 
 SARibbonButtonGroupWidget {
   background-color: transparent;
+}
+
+SARibbonPannel > SARibbonButtonGroupWidget {
+  border: 1px solid #c2d0df;
 }
 
 /*SARibbonQuickAccessBar*/
@@ -53,18 +63,17 @@ SARibbonStackedWidget:focus {
 
 SARibbonApplicationButton {
   color: white;
-  border: 1px solid #2b579a;
   border-top-left-radius: 2px;
   border-top-right-radius: 2px;
   background-color: #2b579a;
 }
 
 SARibbonApplicationButton::hover {
-  background-color: #155889;
+  background-color: #487dcc;
 }
 
 SARibbonApplicationButton::pressed {
-  background-color: #155889;
+  background-color: #487dcc;
 }
 
 SARibbonApplicationButton:focus {
@@ -230,7 +239,6 @@ SARibbonPannel {
 SARibbonGallery {
   background-color: transparent;
   color: #333;
-  border: 1px solid #c2d0df;
 }
 
 /*SARibbonGalleryGroup*/
@@ -239,15 +247,23 @@ SARibbonGalleryGroup {
   show-decoration-selected: 1;
   background-color: transparent;
   color: #333;
+  border: 1px solid #c2d0df;
 }
 
 SARibbonGalleryGroup::item:selected {
   background-color: #9ed2f9;
+  color: black;
 }
 
 SARibbonGalleryGroup::item:hover {
   border: 2px solid #badffa;
   background-color: #cee7fc;
+}
+
+/*RibbonGalleryViewport*/
+
+RibbonGalleryViewport {
+  background-color: white;
 }
 
 /*SARibbonLineEdit*/
@@ -312,4 +328,49 @@ SARibbonCategoryScrollButton::hover {
   color: #000000;
   border: 1px solid #badffa;
   background-color: #cee7fc;
+}
+
+SAWindowToolButton { 
+  background-color: transparent; 
+  border:none;
+}
+
+SAWindowToolButton:focus {
+  outline: none
+}
+
+#SAMinimizeWindowButton {
+  icon: url(:/image/resource/Titlebar_Min.png);
+}
+
+#SAMaximizeWindowButton {
+  icon: url(:/image/resource/Titlebar_Max.png),
+    url(:/image/resource/Titlebar_Normal.png) on;
+}
+
+#SAMinimizeWindowButton:hover,#SAMaximizeWindowButton:hover {
+  background-color: #e5e5e5;
+}
+
+#SAMinimizeWindowButton:pressed,#SAMaximizeWindowButton:pressed {
+  background-color: #cacacb;
+}
+
+#SACloseWindowButton {
+  icon: url(:/image/resource/Titlebar_Close.png);
+}
+
+#SACloseWindowButton:hover {
+  background-color: #e81123;
+  icon: url(:/image/resource/Titlebar_Close_Hover.png);
+}
+
+#SACloseWindowButton:pressed {
+  background-color: #f1707a;
+  icon: url(:/image/resource/Titlebar_Close_Hover.png);
+}
+
+#SARibbonBarHidePannelButton {
+  titlebar-shade-icon: url(:/image/resource/Titlebar_Shade.png);
+  titlebar-unshade-icon: url(:/image/resource/Titlebar_Unshade.png);
 }

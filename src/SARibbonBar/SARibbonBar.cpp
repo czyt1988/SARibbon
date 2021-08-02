@@ -59,7 +59,7 @@ class SARibbonBarPrivate
 {
 public:
     SARibbonBar *MainClass;
-    QAbstractButton *applitionButton;
+    QAbstractButton *applicationButton;
     SARibbonTabBar *ribbonTabBar;
     SARibbonStackedWidget *stackedContainerWidget;
     QList<_SAContextCategoryManagerData> currentShowingContextCategory;
@@ -67,7 +67,7 @@ public:
     QList<_SARibbonTabData> mHidedCategory;
     int iconRightBorderPosition;                                    ///< 标题栏x值得最小值，在有图标和快捷启动按钮，此值都需要变化
     SARibbonControlButton *minimumCaterogyButton;                   ///< 隐藏面板按钮
-    SARibbonButtonGroupWidget *tabBarRightSizeButtonGroupWidget;    ///< 在tab bar旁边的button group widget                                    ///< tabbar底部的线条颜色
+    SARibbonButtonGroupWidget *rightButtonGroup;                    ///< 在tab bar右边的按钮群
     SARibbonQuickAccessBar *quickAccessBar;                         ///< 快速响应栏
     SARibbonBar::RibbonStyle ribbonStyle;                           ///< ribbon的风格
     SARibbonBar::RibbonStyle lastShowStyle;                         ///< ribbon的风格
@@ -76,12 +76,12 @@ public:
     QList<QColor> mContextCategoryColorList;                        ///< contextCategory的色系
     int mContextCategoryColorListIndex;                             ///< 记录contextCategory色系索引
     SARibbonBarPrivate(SARibbonBar *par)
-        : applitionButton(nullptr)
+        : applicationButton(nullptr)
         , ribbonTabBar(nullptr)
         , stackedContainerWidget(nullptr)
         , iconRightBorderPosition(1)
         , minimumCaterogyButton(nullptr)
-        , tabBarRightSizeButtonGroupWidget(nullptr)
+        , rightButtonGroup(nullptr)
         , ribbonStyle(SARibbonBar::OfficeStyle)
         , lastShowStyle(SARibbonBar::OfficeStyle)
         , currentRibbonMode(SARibbonBar::NormalRibbonMode)
@@ -101,9 +101,9 @@ public:
 
     void init()
     {
-        applitionButton = RibbonSubElementDelegate->createRibbonApplicationButton(MainClass);
-        MainClass->connect(applitionButton, &QAbstractButton::clicked
-            , MainClass, &SARibbonBar::applitionButtonClicked);
+        applicationButton = RibbonSubElementDelegate->createRibbonApplicationButton(MainClass);
+        MainClass->connect(applicationButton, &QAbstractButton::clicked
+            , MainClass, &SARibbonBar::applicationButtonClicked);
         ribbonTabBar = RibbonSubElementDelegate->createRibbonTabBar(MainClass);
         ribbonTabBar->setObjectName(QStringLiteral("objSARibbonTabBar"));
         ribbonTabBar->setDrawBase(false);
@@ -128,20 +128,20 @@ public:
     }
 
 
-    void setApplitionButton(QAbstractButton *btn)
+    void setApplicationButton(QAbstractButton *btn)
     {
-        if (applitionButton) {
-            delete applitionButton;
+        if (applicationButton) {
+            delete applicationButton;
         }
         if (btn) {
             if (btn->parent() != MainClass) {
                 btn->setParent(MainClass);
             }
             btn->move(0, RibbonSubElementStyleOpt.titleBarHight);
-            MainClass->connect(applitionButton, &QAbstractButton::clicked
-                , MainClass, &SARibbonBar::applitionButtonClicked);
+            MainClass->connect(applicationButton, &QAbstractButton::clicked
+                , MainClass, &SARibbonBar::applicationButtonClicked);
         }
-        applitionButton = btn;
+        applicationButton = btn;
     }
 
 
@@ -241,7 +241,7 @@ SARibbonBar::~SARibbonBar()
  */
 QAbstractButton *SARibbonBar::applicationButton()
 {
-    return (m_d->applitionButton);
+    return (m_d->applicationButton);
 }
 
 
@@ -256,13 +256,13 @@ QAbstractButton *SARibbonBar::applicationButton()
  */
 void SARibbonBar::setApplicationButton(QAbstractButton *btn)
 {
-    m_d->setApplitionButton(btn);
+    m_d->setApplicationButton(btn);
     if (btn) {
         if (btn->objectName().isEmpty()) {
-            btn->setObjectName(QStringLiteral("SARibbonApplitionButton"));
+            btn->setObjectName(QStringLiteral("SARibbonApplicationButton"));
         }
         btn->setVisible(true);
-        //btn->setGeometry(applitionButtonGeometry());
+        //btn->setGeometry(applicationButtonGeometry());
     }
     //无论设置为什么都触发resize
     QApplication::postEvent(this, new QResizeEvent(size(), size()));
@@ -664,7 +664,6 @@ void SARibbonBar::showContextCategory(SARibbonContextCategory *context)
     }
     m_d->currentShowingContextCategory.append(contextCategoryData);
     QApplication::postEvent(this, new QResizeEvent(size(), size()));
-    repaint();
 }
 
 
@@ -704,7 +703,6 @@ void SARibbonBar::hideContextCategory(SARibbonContextCategory *context)
     }
     if (ishide) {
         QApplication::postEvent(this, new QResizeEvent(size(), size()));
-        repaint();
     }
 }
 
@@ -815,18 +813,20 @@ bool SARibbonBar::isMinimumMode() const
 void SARibbonBar::showMinimumModeButton(bool isShow)
 {
     if (isShow) {
-        activeTabBarRightButtonGroup();
+        activeRightButtonGroup();
         if (nullptr == m_d->minimumCaterogyButton) {
             m_d->minimumCaterogyButton = RibbonSubElementDelegate->createHidePannelButton(this);
+            m_d->minimumCaterogyButton->ensurePolished(); // 载入样式图标
             QAction *action = new QAction(m_d->minimumCaterogyButton);
-            action->setCheckable(true);
-            action->setChecked(isMinimumMode());
-            action->setIcon(QIcon(":/icon/icon/save.png"));
-            connect(action, &QAction::triggered, this, [this](bool on) {
-                this->setMinimumMode(on);
+            action->setIcon(style()->standardIcon(isMinimumMode()?
+                QStyle::SP_TitleBarUnshadeButton:QStyle::SP_TitleBarShadeButton, 0, m_d->minimumCaterogyButton));
+            connect(action, &QAction::triggered, this, [=]() {
+                this->setMinimumMode(!isMinimumMode());
+                action->setIcon(style()->standardIcon(isMinimumMode()?
+                    QStyle::SP_TitleBarUnshadeButton:QStyle::SP_TitleBarShadeButton, 0, m_d->minimumCaterogyButton));
             });
             m_d->minimumCaterogyButton->setDefaultAction(action);
-            m_d->tabBarRightSizeButtonGroupWidget->addWidget(m_d->minimumCaterogyButton);
+            m_d->rightButtonGroup->addWidget(m_d->minimumCaterogyButton);
             update();
         }
     }else {
@@ -1056,17 +1056,19 @@ void SARibbonBar::updateRibbonElementGeometry()
 }
 
 
-SARibbonButtonGroupWidget *SARibbonBar::activeTabBarRightButtonGroup()
+void SARibbonBar::activeRightButtonGroup()
 {
-    if (nullptr == m_d->tabBarRightSizeButtonGroupWidget) {
-        m_d->tabBarRightSizeButtonGroupWidget = RibbonSubElementDelegate->craeteButtonGroupWidget(this);
-        m_d->tabBarRightSizeButtonGroupWidget->setFrameShape(QFrame::NoFrame);
-        m_d->tabBarRightSizeButtonGroupWidget->show();
+    if (nullptr == m_d->rightButtonGroup) {
+        m_d->rightButtonGroup = RibbonSubElementDelegate->craeteButtonGroupWidget(this);
+        m_d->rightButtonGroup->setFrameShape(QFrame::NoFrame);
     }
-    if (!m_d->tabBarRightSizeButtonGroupWidget->isVisible()) {
-        m_d->tabBarRightSizeButtonGroupWidget->setVisible(true);
-    }
-    return (m_d->tabBarRightSizeButtonGroupWidget);
+    m_d->rightButtonGroup->show();
+}
+
+SARibbonButtonGroupWidget *SARibbonBar::rightButtonGroup()
+{
+    activeRightButtonGroup();
+    return (m_d->rightButtonGroup);
 }
 
 
@@ -1086,6 +1088,7 @@ void SARibbonBar::setRibbonStyle(SARibbonBar::RibbonStyle v)
 {
     m_d->ribbonStyle = v;
     m_d->lastShowStyle = v;
+    m_d->quickAccessBar->setEnableShowIcon(isOfficeStyle(v));
     updateRibbonElementGeometry();
     QSize oldSize = size();
     QSize newSize(oldSize.width(), mainBarHeight());
@@ -1272,7 +1275,7 @@ int SARibbonBar::mainBarHeight() const
 }
 
 
-int SARibbonBar::applitionButtonWidth() const
+int SARibbonBar::applicationButtonWidth() const
 {
     return (56);
 }
@@ -1442,6 +1445,12 @@ void SARibbonBar::paintInWpsLiteStyle()
                 , RibbonSubElementStyleOpt.widgetBord.top()
                 , width
                 , RibbonSubElementStyleOpt.titleBarHight);
+#ifdef SA_RIBBON_DEBUG_HELP_DRAW
+            p.save();
+            p.setBrush(QColor(255, 0, 0, 120));
+            p.drawRect(titleRegion);
+            p.restore();
+#endif
             paintWindowTitle(p, parWindow->windowTitle(), titleRegion);
         }
     }
@@ -1539,6 +1548,7 @@ void SARibbonBar::resizeEvent(QResizeEvent *e)
     }else {
         resizeInWpsLiteStyle();
     }
+    update();
 }
 
 
@@ -1590,14 +1600,14 @@ void SARibbonBar::resizeInOfficeStyle()
             m_d->quickAccessBar->setGeometry(x, y, quickAccessBarSize.width(), validTitleBarHeight);
         }
     }
-    //第二行，开始布局applitionButton，tabbar，tabBarRightSizeButtonGroupWidget，TopRightCorner
+    //第二行，开始布局applicationButton，tabbar，tabBarRightSizeButtonGroupWidget，TopRightCorner
     x = RibbonSubElementStyleOpt.widgetBord.left();
     y = titleH+RibbonSubElementStyleOpt.widgetBord.top();
-    //applitionButton 定位
-    if (m_d->applitionButton) {
-        if (m_d->applitionButton->isVisible()) {
-            m_d->applitionButton->setGeometry(x, y, applitionButtonWidth(), tabH);
-            x = m_d->applitionButton->geometry().right();
+    //applicationButton 定位
+    if (m_d->applicationButton) {
+        if (m_d->applicationButton->isVisible()) {
+            m_d->applicationButton->setGeometry(x, y, applicationButtonWidth(), tabH);
+            x = m_d->applicationButton->geometry().right();
         }
     }
     //top right是一定要配置的，对于多文档窗口，子窗口的缩放等按钮就是通过这个窗口实现，
@@ -1618,14 +1628,14 @@ void SARibbonBar::resizeInOfficeStyle()
             }
         }
     }
-    //applitionButton和TopRightCorner完成定位，才可以定位tab bar
+    //applicationButton和TopRightCorner完成定位，才可以定位tab bar
     //tab bar 定位
 
     //tabBar 右边的附加按钮组，这里一般会附加一些类似登录等按钮组
-    if (m_d->tabBarRightSizeButtonGroupWidget && m_d->tabBarRightSizeButtonGroupWidget->isVisible()) {
-        QSize wSize = m_d->tabBarRightSizeButtonGroupWidget->sizeHint();
+    if (m_d->rightButtonGroup && m_d->rightButtonGroup->isVisible()) {
+        QSize wSize = m_d->rightButtonGroup->sizeHint();
         endX -= wSize.width();
-        m_d->tabBarRightSizeButtonGroupWidget->setGeometry(endX, y, wSize.width(), tabH);
+        m_d->rightButtonGroup->setGeometry(endX, y, wSize.width(), tabH);
     }
     //最后确定tabbar宽度
     int tabBarWidth = endX - x;
@@ -1646,14 +1656,7 @@ void SARibbonBar::resizeInWpsLiteStyle()
     const int titleH = titleBarHeight();
     const int validTitleBarHeight = titleH - RibbonSubElementStyleOpt.widgetBord.top();
 
-    //applitionButton 定位
-    if (m_d->applitionButton) {
-        if (m_d->applitionButton->isVisible()) {
-            m_d->applitionButton->setGeometry(x, y, applitionButtonWidth(), titleH);
-            x = m_d->applitionButton->geometry().right()+2;
-        }
-    }
-    //applitionButton定位完后先布局右边内容
+    //先布局右边内容
     //cornerWidget - TopRightCorner
     int endX = width() - RibbonSubElementStyleOpt.widgetBord.right()-m_d->windowButtonSize.width();
 
@@ -1691,12 +1694,28 @@ void SARibbonBar::resizeInWpsLiteStyle()
         }
     }
     //开始定位tabbar以及tabBarRightSizeButtonGroupWidget
-    //tab bar 定位 wps模式下applitionButton的右边就是tab bar
+    //tab bar 定位 wps模式下applicationButton的右边就是tab bar
     //tabBar 右边的附加按钮组
-    if (m_d->tabBarRightSizeButtonGroupWidget && m_d->tabBarRightSizeButtonGroupWidget->isVisible()) {
-        QSize wSize = m_d->tabBarRightSizeButtonGroupWidget->sizeHint();
+    if (m_d->rightButtonGroup && m_d->rightButtonGroup->isVisible()) {
+        QSize wSize = m_d->rightButtonGroup->sizeHint();
         endX -= wSize.width();
-        m_d->tabBarRightSizeButtonGroupWidget->setGeometry(endX, y, wSize.width(), validTitleBarHeight);
+        m_d->rightButtonGroup->setGeometry(endX, y, wSize.width(), validTitleBarHeight);
+    }
+
+    //tab 的y值需要重新计算
+    int tabH = tabBarHeight();
+    if (tabH > validTitleBarHeight) {
+        //这种直接把tabH设置为validTitleBarHeight
+        tabH = validTitleBarHeight;
+    }
+    y = y + validTitleBarHeight - tabH;//如果tabH较小，则下以，让tab底部和title的底部对齐
+
+    //applicationButton 定位，与TabBar同高
+    if (m_d->applicationButton) {
+        if (m_d->applicationButton->isVisible()) {
+            m_d->applicationButton->setGeometry(x, y, applicationButtonWidth(), tabH);
+            x = m_d->applicationButton->geometry().right()+2;
+        }
     }
     int tabBarWidth = endX - x;
     //20200831
@@ -1709,14 +1728,6 @@ void SARibbonBar::resizeInWpsLiteStyle()
     if (mintabBarWidth < tabBarWidth) {
         tabBarWidth = mintabBarWidth;
     }
-    //tab 的y值需要重新计算
-    int tabH = tabBarHeight();
-
-    if (tabH > validTitleBarHeight) {
-        //这种直接把tabH设置为validTitleBarHeight
-        tabH = validTitleBarHeight;
-    }
-    y = y + validTitleBarHeight - tabH;//如果tabH较小，则下以，让tab底部和title的底部对齐
     m_d->ribbonTabBar->setGeometry(x, y, tabBarWidth, tabH);
 
     //调整整个stackedContainer
@@ -1727,10 +1738,6 @@ void SARibbonBar::resizeInWpsLiteStyle()
 void SARibbonBar::paintBackground(QPainter& painter)
 {
     painter.save();
-    QPalette pl = palette();
-
-    painter.setBrush(pl.background());
-    painter.drawRect(rect());
     //在tabbar下绘制一条线
     const int lineY = m_d->ribbonTabBar->geometry().bottom();
     QPen pen(RibbonSubElementStyleOpt.tabBarBaseLineColor);

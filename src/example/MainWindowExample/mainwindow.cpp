@@ -9,6 +9,7 @@
 #include "SARibbonToolButton.h"
 #include <QAction>
 #include <QMenu>
+#include <QStatusBar>
 #include <QDebug>
 #include <QElapsedTimer>
 #include <QRadioButton>
@@ -26,6 +27,7 @@
 #include "SARibbonCustomizeDialog.h"
 #include <QXmlStreamWriter>
 #include <QTextStream>
+#include "SAFramelessHelper.h"
 
 
 #define PRINT_COST(ElapsedTimer, LastTime, STR)					      \
@@ -38,6 +40,9 @@
 MainWindow::MainWindow(QWidget *par) : SARibbonMainWindow(par)
     , m_customizeWidget(nullptr)
 {
+    SAFramelessHelper *helper = framelessHelper();
+    helper->setRubberBandOnResize(false);
+
     QElapsedTimer cost;
     int lastTimes = 0;
 
@@ -45,6 +50,7 @@ MainWindow::MainWindow(QWidget *par) : SARibbonMainWindow(par)
     setWindowTitle(("ribbon test"));
     m_edit = new QTextEdit(this);
     setCentralWidget(m_edit);
+    setStatusBar(new QStatusBar());
     PRINT_COST(cost, lastTimes, "setCentralWidget & setWindowTitle");
     SARibbonBar *ribbon = ribbonBar();
 
@@ -148,6 +154,10 @@ MainWindow::MainWindow(QWidget *par) : SARibbonMainWindow(par)
             }
         }
     });
+
+    SARibbonButtonGroupWidget *rightBar = ribbon->rightButtonGroup();
+    rightBar->addAction("Help", QIcon(":/icon/icon/help.png"));
+
     setMinimumWidth(500);
     //
     showMaximized();
@@ -235,6 +245,7 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
     connect(act, &QAction::triggered, this, [this](bool b) {
         this->ribbonBar()->showMinimumModeButton(b);
     });
+    act->trigger();
     QButtonGroup *g = new QButtonGroup(page);
     QRadioButton *r = new QRadioButton();
 
@@ -455,10 +466,10 @@ void MainWindow::createCategoryOther(SARibbonCategory *page)
 
     page->addPannel(pannel);
     SARibbonButtonGroupWidget *btnGroup = new SARibbonButtonGroupWidget(pannel);
-
-    btnGroup->setFrameShape(QFrame::Box);
     btnGroup->addAction(new QAction(QIcon(":/icon/icon/figureIcon.png"), "", this));
     btnGroup->addAction(new QAction(QIcon(":/icon/icon/information.png"), "", this));
+    btnGroup->addAction(new QAction(QIcon(":/icon/icon/chartDataManager.png"), "", this));
+    btnGroup->addAction(new QAction(QIcon(":/icon/icon/inRangDataRemove.png"), "", this));
     pannel->addLargeWidget(btnGroup);
 
     SARibbonToolButton *btn;
@@ -495,7 +506,7 @@ void MainWindow::createCategoryOther(SARibbonCategory *page)
 
     for (int i = 0; i < 100; ++i)
     {
-        group->addItem(QIcon(":/icon/icon/folder.png"));
+        group->addItem(QString::number(i+1), QIcon(":/icon/icon/folder.png"));
     }
     QAction *optAct = new QAction(this);
 

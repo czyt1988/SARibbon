@@ -82,6 +82,10 @@ SARibbonBar *SARibbonMainWindow::ribbonBar()
     return (m_d->ribbonBar);
 }
 
+SAFramelessHelper *SARibbonMainWindow::framelessHelper()
+{
+    return (m_d->pFramelessHelper);
+}
 
 void SARibbonMainWindow::setRibbonTheme(SARibbonMainWindow::RibbonTheme theme)
 {

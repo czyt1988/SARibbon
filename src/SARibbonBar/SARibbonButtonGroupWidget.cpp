@@ -37,11 +37,19 @@ public:
 
     void init()
     {
-        QHBoxLayout *layout = new QHBoxLayout;
 
-        layout->setMargin(0);
-        layout->setSpacing(0);
-        Parent->setLayout(layout);
+        bool isInPanel = Parent->parent() && Parent->parent()->inherits("SARibbonPannel");
+        if (isInPanel) {
+            QGridLayout *layout = new QGridLayout(Parent);
+            layout->setDefaultPositioning(2, Qt::Vertical);
+            Parent->setFixedHeight(60);
+            layout->setMargin(isInPanel?5:0);
+            layout->setSpacing(isInPanel?5:0);
+        } else {
+            QHBoxLayout *layout = new QHBoxLayout(Parent);
+            layout->setMargin(0);
+            layout->setSpacing(0);
+        }
         Parent->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
     }
 };
@@ -102,9 +110,10 @@ SARibbonButtonGroupWidget::~SARibbonButtonGroupWidget()
 }
 
 
-void SARibbonButtonGroupWidget::addAction(QAction *a)
+QAction *SARibbonButtonGroupWidget::addAction(QAction *a)
 {
     QWidget::addAction(a);
+    return (a);
 }
 
 
@@ -120,24 +129,21 @@ QAction *SARibbonButtonGroupWidget::addAction(const QString& text, const QIcon& 
 {
     QAction *a = new QAction(icon, text, this);
 
-
+    addAction(a);
     SARibbonToolButton *btn = qobject_cast<SARibbonToolButton *>(m_d->mItems.back().widget);
-
-    if (btn) {
-        btn->setPopupMode(popMode);
-    }
+    btn->setPopupMode(popMode);
     return (a);
 }
 
 
-void SARibbonButtonGroupWidget::addMenu(QMenu *menu, QToolButton::ToolButtonPopupMode popMode)
+QAction *SARibbonButtonGroupWidget::addMenu(QMenu *menu, QToolButton::ToolButtonPopupMode popMode)
 {
     QAction *a = menu->menuAction();
 
     addAction(a);
     SARibbonToolButton *btn = qobject_cast<SARibbonToolButton *>(m_d->mItems.back().widget);
-
     btn->setPopupMode(popMode);
+    return (a);
 }
 
 
@@ -186,21 +192,17 @@ void SARibbonButtonGroupWidget::actionEvent(QActionEvent *e)
     SARibbonButtonGroupWidgetItem item;
 
     item.action = e->action();
-    QWidgetAction *widgetAction = qobject_cast<QWidgetAction *>(item.action);
 
     switch (e->type())
     {
     case QEvent::ActionAdded:
     {
-        if (nullptr != widgetAction) {
-            if (widgetAction->parent() != this) {
-                widgetAction->setParent(this);
-            }
-        }
         if (QWidgetAction *widgetAction = qobject_cast<QWidgetAction *>(item.action)) {
+            widgetAction->setParent(this);
             item.widget = widgetAction->requestWidget(this);
             if (item.widget != nullptr) {
                 item.widget->setAttribute(Qt::WA_LayoutUsesWidgetRect);
+                item.widget->show();
                 item.customWidget = true;
             }
         } else if (item.action->isSeparator()) {

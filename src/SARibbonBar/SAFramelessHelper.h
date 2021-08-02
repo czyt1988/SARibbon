@@ -2,12 +2,13 @@
 #define SAFRAMELESSHELPER_H
 
 
+#include "SARibbonGlobal.h"
 #include <QObject>
 
 class QWidget;
 class FramelessHelperPrivate;
 
-class SAFramelessHelper : public QObject
+class SA_RIBBON_EXPORT SAFramelessHelper : public QObject
 {
     Q_OBJECT
 
