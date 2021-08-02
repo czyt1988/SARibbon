@@ -67,11 +67,11 @@ SARibbonApplicationButton {
 }
 
 SARibbonApplicationButton::hover {
-  background-color: #487dcc;
+  background-color: #5888d0;
 }
 
 SARibbonApplicationButton::pressed {
-  background-color: #487dcc;
+  background-color: #3369b9;
 }
 
 SARibbonApplicationButton:focus {
