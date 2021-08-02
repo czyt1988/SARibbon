@@ -243,12 +243,12 @@ void SARibbonGalleryGroup::setPreinstallStyle(SARibbonGalleryGroup::PreinstallSt
 }
 
 
-void SARibbonGalleryGroup::addItem(const QIcon& icon)
+void SARibbonGalleryGroup::addItem(const QString& text, const QIcon& icon)
 {
     if (nullptr == groupModel()) {
         return;
     }
-    addItem(new SARibbonGalleryItem(icon));
+    addItem(new SARibbonGalleryItem(text, icon));
 }
 
 

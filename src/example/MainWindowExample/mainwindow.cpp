@@ -506,7 +506,7 @@ void MainWindow::createCategoryOther(SARibbonCategory *page)
 
     for (int i = 0; i < 100; ++i)
     {
-        group->addItem(QIcon(":/icon/icon/folder.png"));
+        group->addItem(QString::number(i+1), QIcon(":/icon/icon/folder.png"));
     }
     QAction *optAct = new QAction(this);
 
