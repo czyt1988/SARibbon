@@ -102,9 +102,10 @@ SARibbonButtonGroupWidget::~SARibbonButtonGroupWidget()
 }
 
 
-void SARibbonButtonGroupWidget::addAction(QAction *a)
+QAction *SARibbonButtonGroupWidget::addAction(QAction *a)
 {
     QWidget::addAction(a);
+    return (a);
 }
 
 
@@ -120,24 +121,21 @@ QAction *SARibbonButtonGroupWidget::addAction(const QString& text, const QIcon& 
 {
     QAction *a = new QAction(icon, text, this);
 
-
+    addAction(a);
     SARibbonToolButton *btn = qobject_cast<SARibbonToolButton *>(m_d->mItems.back().widget);
-
-    if (btn) {
-        btn->setPopupMode(popMode);
-    }
+    btn->setPopupMode(popMode);
     return (a);
 }
 
 
-void SARibbonButtonGroupWidget::addMenu(QMenu *menu, QToolButton::ToolButtonPopupMode popMode)
+QAction *SARibbonButtonGroupWidget::addMenu(QMenu *menu, QToolButton::ToolButtonPopupMode popMode)
 {
     QAction *a = menu->menuAction();
 
     addAction(a);
     SARibbonToolButton *btn = qobject_cast<SARibbonToolButton *>(m_d->mItems.back().widget);
-
     btn->setPopupMode(popMode);
+    return (a);
 }
 
 
