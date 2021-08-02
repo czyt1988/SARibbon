@@ -75,7 +75,7 @@ public:
 
     virtual ~SARibbonGalleryGroup();
     void setPreinstallStyle(PreinstallStyle style);
-    void addItem(const QIcon& icon);
+    void addItem(const QString& text, const QIcon& icon);
     void addItem(SARibbonGalleryItem *item);
     void addActionItem(QAction *act);
     void addActionItemList(const QList<QAction *>& acts);

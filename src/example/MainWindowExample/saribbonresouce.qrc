@@ -58,5 +58,6 @@
         <file>icon/506517.png</file>
         <file>icon/506518.png</file>
         <file>icon/506519.png</file>
+        <file>icon/help.png</file>
     </qresource>
 </RCC>

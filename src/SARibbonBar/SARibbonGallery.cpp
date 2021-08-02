@@ -50,7 +50,7 @@ public:
         buttonMore->setObjectName(QStringLiteral("SARibbonGalleryButtonMore"));
         buttonUp->setFixedSize(15, 20);
         buttonDown->setFixedSize(15, 20);
-        buttonMore->setFixedSize(15, 20);
+        buttonMore->setFixedSize(15, 21);
         buttonUp->setIcon(ICON_ARROW_UP);
         buttonDown->setIcon(ICON_ARROW_DOWN);
         buttonMore->setIcon(ICON_ARROW_MORE);
@@ -110,7 +110,7 @@ RibbonGalleryViewport::RibbonGalleryViewport(QWidget *parent) : QWidget(parent)
     setWindowFlags(Qt::Popup);
     m_layout = new QVBoxLayout(this);
     m_layout->setSpacing(0);
-    m_layout->setMargin(1);
+    m_layout->setMargin(0);
 }
 
 
@@ -247,10 +247,12 @@ void SARibbonGallery::onShowMoreDetail()
     if (nullptr == m_d->popupWidget) {
         return;
     }
-    QSize popupMenuSize = m_d->popupWidget->minimumSizeHint();// sizeHint();
+    QSize popupMenuSize = m_d->popupWidget->sizeHint();
     QPoint start = mapToGlobal(QPoint(0, 0));
 
-    m_d->popupWidget->setGeometry(start.x(), start.y(), width(), popupMenuSize.height());
+    int width = m_d->viewportGroup->width(); // viewport
+    width += qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent); // scrollbar
+    m_d->popupWidget->setGeometry(start.x(), start.y(), width, popupMenuSize.height());
     m_d->popupWidget->show();
 }
 
@@ -297,7 +299,7 @@ void SARibbonGallery::resizeEvent(QResizeEvent *event)
     subW = qMax(subW, m_d->buttonUp->width());
     m_d->buttonDown->move(r.width() - m_d->buttonDown->width(), m_d->buttonUp->height());
     subW = qMax(subW, m_d->buttonDown->width());
-    m_d->buttonMore->move(r.width() - m_d->buttonMore->width(), m_d->buttonDown->geometry().bottom());
+    m_d->buttonMore->move(r.width() - m_d->buttonMore->width(), m_d->buttonDown->geometry().bottom()+1);
     subW = qMax(subW, m_d->buttonMore->width());
     if (m_d->viewportGroup) {
         m_d->viewportGroup->setGeometry(0, 0, r.width()-subW, r.height());
