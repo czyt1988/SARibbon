@@ -221,7 +221,10 @@ public:
     int titleBarHeight() const;
 
     //激活tabbar右边的按钮群
-    SARibbonButtonGroupWidget *activeTabBarRightButtonGroup();
+    void activeRightButtonGroup();
+
+    //右侧按钮群
+    SARibbonButtonGroupWidget *rightButtonGroup();
 
     //快速响应栏
     SARibbonQuickAccessBar *quickAccessBar();

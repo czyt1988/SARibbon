@@ -67,7 +67,7 @@ public:
     QList<_SARibbonTabData> mHidedCategory;
     int iconRightBorderPosition;                                    ///< 标题栏x值得最小值，在有图标和快捷启动按钮，此值都需要变化
     SARibbonControlButton *minimumCaterogyButton;                   ///< 隐藏面板按钮
-    SARibbonButtonGroupWidget *tabBarRightSizeButtonGroupWidget;    ///< 在tab bar旁边的button group widget                                    ///< tabbar底部的线条颜色
+    SARibbonButtonGroupWidget *rightButtonGroup;                    ///< 在tab bar右边的按钮群
     SARibbonQuickAccessBar *quickAccessBar;                         ///< 快速响应栏
     SARibbonBar::RibbonStyle ribbonStyle;                           ///< ribbon的风格
     SARibbonBar::RibbonStyle lastShowStyle;                         ///< ribbon的风格
@@ -81,7 +81,7 @@ public:
         , stackedContainerWidget(nullptr)
         , iconRightBorderPosition(1)
         , minimumCaterogyButton(nullptr)
-        , tabBarRightSizeButtonGroupWidget(nullptr)
+        , rightButtonGroup(nullptr)
         , ribbonStyle(SARibbonBar::OfficeStyle)
         , lastShowStyle(SARibbonBar::OfficeStyle)
         , currentRibbonMode(SARibbonBar::NormalRibbonMode)
@@ -813,7 +813,7 @@ bool SARibbonBar::isMinimumMode() const
 void SARibbonBar::showMinimumModeButton(bool isShow)
 {
     if (isShow) {
-        activeTabBarRightButtonGroup();
+        activeRightButtonGroup();
         if (nullptr == m_d->minimumCaterogyButton) {
             m_d->minimumCaterogyButton = RibbonSubElementDelegate->createHidePannelButton(this);
             m_d->minimumCaterogyButton->ensurePolished(); // 载入样式图标
@@ -826,7 +826,7 @@ void SARibbonBar::showMinimumModeButton(bool isShow)
                     QStyle::SP_TitleBarUnshadeButton:QStyle::SP_TitleBarShadeButton, 0, m_d->minimumCaterogyButton));
             });
             m_d->minimumCaterogyButton->setDefaultAction(action);
-            m_d->tabBarRightSizeButtonGroupWidget->addWidget(m_d->minimumCaterogyButton);
+            m_d->rightButtonGroup->addWidget(m_d->minimumCaterogyButton);
             update();
         }
     }else {
@@ -1056,17 +1056,19 @@ void SARibbonBar::updateRibbonElementGeometry()
 }
 
 
-SARibbonButtonGroupWidget *SARibbonBar::activeTabBarRightButtonGroup()
+void SARibbonBar::activeRightButtonGroup()
 {
-    if (nullptr == m_d->tabBarRightSizeButtonGroupWidget) {
-        m_d->tabBarRightSizeButtonGroupWidget = RibbonSubElementDelegate->craeteButtonGroupWidget(this);
-        m_d->tabBarRightSizeButtonGroupWidget->setFrameShape(QFrame::NoFrame);
-        m_d->tabBarRightSizeButtonGroupWidget->show();
+    if (nullptr == m_d->rightButtonGroup) {
+        m_d->rightButtonGroup = RibbonSubElementDelegate->craeteButtonGroupWidget(this);
+        m_d->rightButtonGroup->setFrameShape(QFrame::NoFrame);
     }
-    if (!m_d->tabBarRightSizeButtonGroupWidget->isVisible()) {
-        m_d->tabBarRightSizeButtonGroupWidget->setVisible(true);
-    }
-    return (m_d->tabBarRightSizeButtonGroupWidget);
+    m_d->rightButtonGroup->show();
+}
+
+SARibbonButtonGroupWidget *SARibbonBar::rightButtonGroup()
+{
+    activeRightButtonGroup();
+    return (m_d->rightButtonGroup);
 }
 
 
@@ -1630,10 +1632,10 @@ void SARibbonBar::resizeInOfficeStyle()
     //tab bar 定位
 
     //tabBar 右边的附加按钮组，这里一般会附加一些类似登录等按钮组
-    if (m_d->tabBarRightSizeButtonGroupWidget && m_d->tabBarRightSizeButtonGroupWidget->isVisible()) {
-        QSize wSize = m_d->tabBarRightSizeButtonGroupWidget->sizeHint();
+    if (m_d->rightButtonGroup && m_d->rightButtonGroup->isVisible()) {
+        QSize wSize = m_d->rightButtonGroup->sizeHint();
         endX -= wSize.width();
-        m_d->tabBarRightSizeButtonGroupWidget->setGeometry(endX, y, wSize.width(), tabH);
+        m_d->rightButtonGroup->setGeometry(endX, y, wSize.width(), tabH);
     }
     //最后确定tabbar宽度
     int tabBarWidth = endX - x;
@@ -1694,10 +1696,10 @@ void SARibbonBar::resizeInWpsLiteStyle()
     //开始定位tabbar以及tabBarRightSizeButtonGroupWidget
     //tab bar 定位 wps模式下applitionButton的右边就是tab bar
     //tabBar 右边的附加按钮组
-    if (m_d->tabBarRightSizeButtonGroupWidget && m_d->tabBarRightSizeButtonGroupWidget->isVisible()) {
-        QSize wSize = m_d->tabBarRightSizeButtonGroupWidget->sizeHint();
+    if (m_d->rightButtonGroup && m_d->rightButtonGroup->isVisible()) {
+        QSize wSize = m_d->rightButtonGroup->sizeHint();
         endX -= wSize.width();
-        m_d->tabBarRightSizeButtonGroupWidget->setGeometry(endX, y, wSize.width(), validTitleBarHeight);
+        m_d->rightButtonGroup->setGeometry(endX, y, wSize.width(), validTitleBarHeight);
     }
 
     //tab 的y值需要重新计算
