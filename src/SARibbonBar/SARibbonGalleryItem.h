@@ -52,7 +52,7 @@ public:
 private:
     friend class SARibbonGalleryGroupModel;
     QMap<int, QVariant> m_datas;
-    Qt::ItemFlags m_flsgs;
+    Qt::ItemFlags m_flags;
     QAction *m_action;
 };
 

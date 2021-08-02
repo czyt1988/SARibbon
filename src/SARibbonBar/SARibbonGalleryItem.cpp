@@ -3,14 +3,14 @@
 
 
 SARibbonGalleryItem::SARibbonGalleryItem()
-    : m_flsgs(Qt::ItemIsEnabled|Qt::ItemIsSelectable)
+    : m_flags(Qt::ItemIsEnabled|Qt::ItemIsSelectable)
     , m_action(nullptr)
 {
 }
 
 
 SARibbonGalleryItem::SARibbonGalleryItem(const QIcon& icon)
-    : m_flsgs(Qt::ItemIsEnabled|Qt::ItemIsSelectable)
+    : m_flags(Qt::ItemIsEnabled|Qt::ItemIsSelectable)
     , m_action(nullptr)
 {
     setIcon(icon);
@@ -18,7 +18,7 @@ SARibbonGalleryItem::SARibbonGalleryItem(const QIcon& icon)
 
 
 SARibbonGalleryItem::SARibbonGalleryItem(QAction *act)
-    : m_flsgs(Qt::ItemIsEnabled|Qt::ItemIsSelectable)
+    : m_flags(Qt::ItemIsEnabled|Qt::ItemIsSelectable)
 {
     setAction(act);
 }
@@ -104,16 +104,16 @@ QIcon SARibbonGalleryItem::icon() const
 
 bool SARibbonGalleryItem::isSelectable() const
 {
-    return (m_flsgs & Qt::ItemIsSelectable);
+    return (m_flags & Qt::ItemIsSelectable);
 }
 
 
 void SARibbonGalleryItem::setSelectable(bool isSelectable)
 {
     if (isSelectable) {
-        m_flsgs |= Qt::ItemIsSelectable;
+        m_flags |= Qt::ItemIsSelectable;
     }else {
-        m_flsgs = (m_flsgs & (~Qt::ItemIsSelectable));
+        m_flags = (m_flags & (~Qt::ItemIsSelectable));
     }
 }
 
@@ -123,7 +123,7 @@ bool SARibbonGalleryItem::isEnable() const
     if (m_action) {
         return (m_action->isEnabled());
     }
-    return (m_flsgs & Qt::ItemIsEnabled);
+    return (m_flags & Qt::ItemIsEnabled);
 }
 
 
@@ -134,16 +134,16 @@ void SARibbonGalleryItem::setEnable(bool isEnable)
     }
 
     if (isEnable) {
-        m_flsgs |= Qt::ItemIsEnabled;
+        m_flags |= Qt::ItemIsEnabled;
     }else {
-        m_flsgs = (m_flsgs & (~Qt::ItemIsEnabled));
+        m_flags = (m_flags & (~Qt::ItemIsEnabled));
     }
 }
 
 
 void SARibbonGalleryItem::setFlags(Qt::ItemFlags flag)
 {
-    m_flsgs = flag;
+    m_flags = flag;
     if (m_action) {
         m_action->setEnabled(flag & Qt::ItemIsEnabled);
     }
@@ -152,7 +152,7 @@ void SARibbonGalleryItem::setFlags(Qt::ItemFlags flag)
 
 Qt::ItemFlags SARibbonGalleryItem::flags() const
 {
-    return (m_flsgs);
+    return (m_flags);
 }
 
 
@@ -160,9 +160,9 @@ void SARibbonGalleryItem::setAction(QAction *act)
 {
     m_action = act;
     if (act->isEnabled()) {
-        m_flsgs |= Qt::ItemIsEnabled;
+        m_flags |= Qt::ItemIsEnabled;
     }else {
-        m_flsgs = (m_flsgs & (~Qt::ItemIsEnabled));
+        m_flags = (m_flags & (~Qt::ItemIsEnabled));
     }
 }
 
