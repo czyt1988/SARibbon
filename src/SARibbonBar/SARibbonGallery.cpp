@@ -50,7 +50,7 @@ public:
         buttonMore->setObjectName(QStringLiteral("SARibbonGalleryButtonMore"));
         buttonUp->setFixedSize(15, 20);
         buttonDown->setFixedSize(15, 20);
-        buttonMore->setFixedSize(15, 20);
+        buttonMore->setFixedSize(15, 21);
         buttonUp->setIcon(ICON_ARROW_UP);
         buttonDown->setIcon(ICON_ARROW_DOWN);
         buttonMore->setIcon(ICON_ARROW_MORE);
@@ -110,7 +110,7 @@ RibbonGalleryViewport::RibbonGalleryViewport(QWidget *parent) : QWidget(parent)
     setWindowFlags(Qt::Popup);
     m_layout = new QVBoxLayout(this);
     m_layout->setSpacing(0);
-    m_layout->setMargin(1);
+    m_layout->setMargin(0);
 }
 
 
@@ -248,9 +248,9 @@ void SARibbonGallery::onShowMoreDetail()
         return;
     }
     QSize popupMenuSize = m_d->popupWidget->sizeHint();
-    QPoint start = mapToGlobal(QPoint(-1, -1)); // 考虑margin，弹出viewport像素对齐
+    QPoint start = mapToGlobal(QPoint(0, 0));
 
-    int width = m_d->viewportGroup->width() + 2; // viewport + margin
+    int width = m_d->viewportGroup->width(); // viewport
     width += qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent); // scrollbar
     m_d->popupWidget->setGeometry(start.x(), start.y(), width, popupMenuSize.height());
     m_d->popupWidget->show();
