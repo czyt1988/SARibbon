@@ -37,11 +37,19 @@ public:
 
     void init()
     {
-        QHBoxLayout *layout = new QHBoxLayout;
 
-        layout->setMargin(0);
-        layout->setSpacing(0);
-        Parent->setLayout(layout);
+        bool isInPanel = Parent->parent() && Parent->parent()->inherits("SARibbonPannel");
+        if (isInPanel) {
+            QGridLayout *layout = new QGridLayout(Parent);
+            layout->setDefaultPositioning(2, Qt::Vertical);
+            Parent->setFixedHeight(60);
+            layout->setMargin(isInPanel?5:0);
+            layout->setSpacing(isInPanel?5:0);
+        } else {
+            QHBoxLayout *layout = new QHBoxLayout(Parent);
+            layout->setMargin(0);
+            layout->setSpacing(0);
+        }
         Parent->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
     }
 };
