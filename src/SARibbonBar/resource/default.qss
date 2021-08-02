@@ -41,9 +41,12 @@ SARibbonCategory:focus{
 SARibbonCategory{
   background-color: white;
 }
+
 /*SARibbonStackedWidget*/
 SARibbonStackedWidget{
   background-color: white;
+  border: 1px solid #c5d2e0;
+  border-top-width: 0px;
 }
 SARibbonStackedWidget:focus{
   outline: none;
@@ -287,6 +290,25 @@ SARibbonComboBox::down-arrow {
 SARibbonSeparatorWidget{
     /*background-color: transparent;*/
     background-color: #D3D3D3;
+}
+
+SARibbonCategoryScrollButton {
+  border: 0px solid #c5d2e0;
+  color: #333;
+  background-color: white;
+}
+
+SARibbonCategoryScrollButton[arrowType="3"] {
+  border-right-width: 1px;
+}
+
+SARibbonCategoryScrollButton[arrowType="4"] {
+  border-left-width: 1px;
+}
+
+SARibbonCategoryScrollButton::hover {
+  color: #000000;
+  background-color: #cee7fc;
 }
 
 SAWindowToolButton { 
