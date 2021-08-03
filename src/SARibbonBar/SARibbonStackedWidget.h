@@ -30,7 +30,6 @@ public:
 protected:
 //    void mouseReleaseEvent(QMouseEvent *e);
     void hideEvent(QHideEvent *e) override;
-    void resizeEvent(QResizeEvent *event) override;
 
 signals:
     void hidWindow();

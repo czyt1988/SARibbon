@@ -139,19 +139,3 @@ void SARibbonStackedWidget::hideEvent(QHideEvent *e)
 
     QStackedWidget::hideEvent(e);
 }
-
-
-void SARibbonStackedWidget::resizeEvent(QResizeEvent *event)
-{
-    if (m_d->isAutoResize) {
-        int c = count();
-        for (int i = 0; i < c; ++i)
-        {
-            QWidget *w = widget(i);
-            if (w) {
-                w->resize(event->size());
-            }
-        }
-    }
-    return (QStackedWidget::resizeEvent(event));
-}
