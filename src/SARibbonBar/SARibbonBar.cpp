@@ -1672,6 +1672,13 @@ void SARibbonBar::resizeInWpsLiteStyle()
             }
         }
     }
+
+    //tabBar 右边的附加按钮组
+    if (m_d->rightButtonGroup && m_d->rightButtonGroup->isVisible()) {
+        QSize wSize = m_d->rightButtonGroup->sizeHint();
+        endX -= wSize.width();
+        m_d->rightButtonGroup->setGeometry(endX, y, wSize.width(), validTitleBarHeight);
+    }
     //quick access bar定位
     if (m_d->quickAccessBar) {
         if (m_d->quickAccessBar->isVisible()) {
@@ -1693,14 +1700,6 @@ void SARibbonBar::resizeInWpsLiteStyle()
             }
         }
     }
-    //开始定位tabbar以及tabBarRightSizeButtonGroupWidget
-    //tab bar 定位 wps模式下applicationButton的右边就是tab bar
-    //tabBar 右边的附加按钮组
-    if (m_d->rightButtonGroup && m_d->rightButtonGroup->isVisible()) {
-        QSize wSize = m_d->rightButtonGroup->sizeHint();
-        endX -= wSize.width();
-        m_d->rightButtonGroup->setGeometry(endX, y, wSize.width(), validTitleBarHeight);
-    }
 
     //tab 的y值需要重新计算
     int tabH = tabBarHeight();
@@ -1717,6 +1716,7 @@ void SARibbonBar::resizeInWpsLiteStyle()
             x = m_d->applicationButton->geometry().right()+2;
         }
     }
+    //tab bar 定位 wps模式下applicationButton的右边就是tab bar
     int tabBarWidth = endX - x;
     //20200831
     //tabBarWidth的宽度原来为endX - x;，现需要根据实际进行调整
