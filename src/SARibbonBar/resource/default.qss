@@ -317,20 +317,23 @@ SAWindowToolButton {
 }
 
 SAWindowToolButton:focus {
-  outline: none
+  outline: none;
 }
 
 #SAMinimizeWindowButton {
-  icon: url(:/image/resource/Titlebar_Min.png);
+  image: url(:/image/resource/Titlebar_Min.png);
+}
+
+#SAMaximizeWindowButton:checked {
+  image:url(:/image/resource/Titlebar_Normal.png);
 }
 
 #SAMaximizeWindowButton {
-  icon: url(:/image/resource/Titlebar_Max.png),
-    url(:/image/resource/Titlebar_Normal.png) on;
+  image:url(:/image/resource/Titlebar_Max.png);
 }
 
 #SAMinimizeWindowButton:hover,#SAMaximizeWindowButton:hover {
-  background-color: #d5d5d5;
+  background-color: #e5e5e5;
 }
 
 #SAMinimizeWindowButton:pressed,#SAMaximizeWindowButton:pressed {
@@ -338,17 +341,17 @@ SAWindowToolButton:focus {
 }
 
 #SACloseWindowButton {
-  icon: url(:/image/resource/Titlebar_Close.png);
+  image: url(:/image/resource/Titlebar_Close.png);
 }
 
 #SACloseWindowButton:hover {
   background-color: #e81123;
-  icon: url(:/image/resource/Titlebar_Close_Hover.png);
+  image: url(:/image/resource/Titlebar_Close_Hover.png);
 }
 
 #SACloseWindowButton:pressed {
   background-color: #f1707a;
-  icon: url(:/image/resource/Titlebar_Close_Hover.png);
+  image: url(:/image/resource/Titlebar_Close_Hover.png);
 }
 
 #SARibbonBarHidePannelButton {

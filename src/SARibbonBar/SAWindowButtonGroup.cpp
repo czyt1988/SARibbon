@@ -325,7 +325,9 @@ void SAWindowButtonGroup::setIconScale(qreal iconscale)
 void SAWindowButtonGroup::setWindowStates(Qt::WindowStates s)
 {
     if (m_d->buttonMaximize) {
-        m_d->buttonMaximize->setChecked(s.testFlag(Qt::WindowMaximized));
+        bool on = s.testFlag(Qt::WindowMaximized);
+        m_d->buttonMaximize->setChecked(on);
+        m_d->buttonMaximize->setToolTip(on ? tr("Restore"):tr("Maximize"));
     }
 }
 
