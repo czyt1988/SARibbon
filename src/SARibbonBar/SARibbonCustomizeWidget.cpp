@@ -32,6 +32,8 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///SARibbonCustomizeWidget
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 bool sa_customize_datas_to_xml(QXmlStreamWriter *xml, const QList<SARibbonCustomizeData>& cds)
 {
     if (cds.size() <= 0) {
@@ -48,6 +50,7 @@ bool sa_customize_datas_to_xml(QXmlStreamWriter *xml, const QList<SARibbonCustom
         xml->writeAttribute("category", d.categoryObjNameValue);
         xml->writeAttribute("pannel", d.pannelObjNameValue);
         xml->writeAttribute("row-prop", QString::number(d.actionRowProportionValue));
+
         xml->writeEndElement();
     }
     xml->writeEndElement();
@@ -486,6 +489,7 @@ void SARibbonCustomizeWidgetPrivate::updateModel()
                         ii->setData(true, SARibbonCustomizeWidget::CanCustomizeRole);//标记这个是可以自定义的
                     }
                 }else{
+                    //不是自定义，说明是action
                     ii->setText(i->action->text());
                     ii->setIcon(i->action->icon());
                     if (SARibbonCustomizeData::isCanCustomize(i->action)) {
