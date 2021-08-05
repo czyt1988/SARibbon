@@ -8,6 +8,9 @@
 class SARibbonActionsManagerPrivate
 {
 public:
+    SARibbonActionsManagerPrivate(SARibbonActionsManager *p);
+    void clear();
+
     SARibbonActionsManager *mParent;
     QMap<int, QList<QAction *> > mTagToActions;     ///< tag : QList<QAction*>
     QMap<int, QString> mTagToName;                  ///< tag对应的名字
@@ -15,7 +18,6 @@ public:
     QMap<QAction *, QString> mActionToKey;          ///< action对应key
     QMap<int, SARibbonCategory *> mTagToCategory;   ///< 仅仅在autoRegisteActions函数会有用
     int mSale;                                      ///< 盐用于生成固定的id，在用户不主动设置key时，id基于msale生成，只要SARibbonActionsManager的调用registeAction顺序不变，生成的id都不变，因为它是基于自增实现的
-    SARibbonActionsManagerPrivate(SARibbonActionsManager *p);
 };
 
 SARibbonActionsManagerPrivate::SARibbonActionsManagerPrivate(SARibbonActionsManager *p)
@@ -25,9 +27,21 @@ SARibbonActionsManagerPrivate::SARibbonActionsManagerPrivate(SARibbonActionsMana
 }
 
 
-SARibbonActionsManager::SARibbonActionsManager(QObject *p) : QObject(p)
+void SARibbonActionsManagerPrivate::clear()
+{
+    mTagToActions.clear();
+    mTagToName.clear();
+    mKeyToAction.clear();
+    mActionToKey.clear();
+    mTagToCategory.clear();
+    mSale = 0;
+}
+
+
+SARibbonActionsManager::SARibbonActionsManager(SARibbonMainWindow *p) : QObject(p)
     , m_d(new SARibbonActionsManagerPrivate(this))
 {
+    autoRegisteActions(p);
 }
 
 
@@ -415,6 +429,18 @@ QList<QAction *> SARibbonActionsManager::search(const QString& text)
         }
     }
     return (res);
+}
+
+
+void SARibbonActionsManager::clear()
+{
+    m_d->clear();
+}
+
+
+SARibbonMainWindow *SARibbonActionsManager::ribbonWindow() const
+{
+    return (qobject_cast<SARibbonMainWindow *>(parent()));
 }
 
 

@@ -41,6 +41,7 @@ MainWindow::MainWindow(QWidget *par) : SARibbonMainWindow(par)
     , m_customizeWidget(nullptr)
 {
     SAFramelessHelper *helper = framelessHelper();
+
     helper->setRubberBandOnResize(false);
 
     QElapsedTimer cost;
@@ -107,12 +108,14 @@ MainWindow::MainWindow(QWidget *par) : SARibbonMainWindow(par)
     m->addAction("4");
     m->addAction("5");
     quickAccessBar->addMenu(m);
+    SARibbonButtonGroupWidget *rightBar = ribbon->rightButtonGroup();
 
-    addSomeOtherAction();
+    rightBar->addAction("Help", QIcon(":/icon/icon/help.png"));
     QAction *customize = new QAction(QIcon(":/icon/icon/chartDataManager.png"), "customize", this);
 
     quickAccessBar->addAction(customize);
-    m_actMgr->autoRegisteActions(this);
+    addSomeOtherAction();
+
     connect(customize, &QAction::triggered, this, [&]() {
         if (nullptr == m_customizeWidget) {
             m_customizeWidget = new SARibbonCustomizeWidget(this, this, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint | Qt::Dialog);
@@ -155,8 +158,7 @@ MainWindow::MainWindow(QWidget *par) : SARibbonMainWindow(par)
         }
     });
 
-    SARibbonButtonGroupWidget *rightBar = ribbon->rightButtonGroup();
-    rightBar->addAction("Help", QIcon(":/icon/icon/help.png"));
+
 
     setMinimumWidth(500);
     //
@@ -466,6 +468,7 @@ void MainWindow::createCategoryOther(SARibbonCategory *page)
 
     page->addPannel(pannel);
     SARibbonButtonGroupWidget *btnGroup = new SARibbonButtonGroupWidget(pannel);
+
     btnGroup->addAction(new QAction(QIcon(":/icon/icon/figureIcon.png"), "", this));
     btnGroup->addAction(new QAction(QIcon(":/icon/icon/information.png"), "", this));
     btnGroup->addAction(new QAction(QIcon(":/icon/icon/chartDataManager.png"), "", this));
@@ -781,7 +784,6 @@ void MainWindow::createContextCategoryPage2(SARibbonCategory *page)
 
 void MainWindow::addSomeOtherAction()
 {
-    m_actMgr = new SARibbonActionsManager(this);
     //添加其他的action，这些action并不在ribbon管理范围，主要用于SARibbonCustomizeWidget自定义用
     QAction *acttext1 = new QAction(("纯文本action1"), this);
     QAction *acttext2 = new QAction(("纯文本action2"), this);
@@ -796,6 +798,10 @@ void MainWindow::addSomeOtherAction()
 
     m_actionTagText = SARibbonActionsManager::UserDefineActionTag+1;
     m_actionTagWithIcon = SARibbonActionsManager::UserDefineActionTag+2;
+
+    m_actMgr = new SARibbonActionsManager(this);//申明过程已经自动注册所有action
+
+    //以下注册特别的action
     m_actMgr->registeAction(acttext1, SARibbonActionsManager::CommonlyUsedActionTag);
     m_actMgr->registeAction(acttext3, SARibbonActionsManager::CommonlyUsedActionTag);
     m_actMgr->registeAction(acttext5, SARibbonActionsManager::CommonlyUsedActionTag);

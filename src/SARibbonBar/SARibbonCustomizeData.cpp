@@ -116,6 +116,7 @@ bool SARibbonCustomizeData::apply(SARibbonMainWindow *m) const
         if (nullptr == act) {
             return (false);
         }
+        SARibbonCustomizeData::setCanCustomize(act);
         pannel->addAction(act, actionRowProportionValue);
         return (true);
     }
