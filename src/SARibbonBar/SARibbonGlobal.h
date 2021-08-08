@@ -6,14 +6,14 @@
  * @def ribbon的数字版本
  */
 #ifndef SA_RIBBON_BAR_VERSION
-#define SA_RIBBON_BAR_VERSION    1
+#define SA_RIBBON_BAR_VERSION    0.2
 #endif
 
 /**
  * @def ribbon 的文字版本
  */
 #ifndef SA_RIBBON_BAR_VERSION_STR
-#define SA_RIBBON_BAR_VERSION_STR    "0.1"
+#define SA_RIBBON_BAR_VERSION_STR    "0.2"
 #endif
 
 /**

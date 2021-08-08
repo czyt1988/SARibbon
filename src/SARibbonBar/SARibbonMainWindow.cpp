@@ -49,7 +49,7 @@ SARibbonMainWindow::SARibbonMainWindow(QWidget *parent, bool useRibbon)
 	m_d->useRibbon = useRibbon;
     qDebug() << windowFlags();
     if (useRibbon) {
-        qDebug() << "SARibbon v0.3.1";
+        qDebug() << "sa ribbon version:" << SA_RIBBON_BAR_VERSION_STR;
 		setRibbonTheme(ribbonTheme());
         setMenuWidget(new SARibbonBar(this));
 #ifdef Q_OS_UNIX
@@ -82,10 +82,12 @@ SARibbonBar *SARibbonMainWindow::ribbonBar()
     return (m_d->ribbonBar);
 }
 
+
 SAFramelessHelper *SARibbonMainWindow::framelessHelper()
 {
     return (m_d->pFramelessHelper);
 }
+
 
 void SARibbonMainWindow::setRibbonTheme(SARibbonMainWindow::RibbonTheme theme)
 {

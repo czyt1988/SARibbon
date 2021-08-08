@@ -1,7 +1,8 @@
 ﻿#include "SARibbonCustomizeData.h"
 #include "SARibbonBar.h"
 #include "SARibbonMainWindow.h"
-
+#include <QDebug>
+#include <QObject>
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 /// SARibbonCustomizeData
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -354,6 +355,12 @@ SARibbonCustomizeData SARibbonCustomizeData::makeRenameCategoryCustomizeData(con
 {
     SARibbonCustomizeData d(RenameCategoryActionType);
 
+    if (categoryobjName.isEmpty()) {
+        qDebug() << QObject::tr("SARibbon Warning !!! customize rename category,"
+            "but get an empty category object name,"
+            "if you want to customize SARibbon,"
+            "please make sure every element has been set object name.");
+    }
     d.keyValue = newname;
     d.categoryObjNameValue = categoryobjName;
     return (d);
@@ -371,22 +378,14 @@ SARibbonCustomizeData SARibbonCustomizeData::makeRenamePannelCustomizeData(const
 {
     SARibbonCustomizeData d(RenamePannelActionType);
 
+    if (pannelObjName.isEmpty() || categoryobjName.isEmpty()) {
+        qDebug() << QObject::tr("SARibbon Warning !!! customize rename pannel,"
+            "but get an empty category/pannel object name,"
+            "if you want to customize SARibbon,"
+            "please make sure every element has been set object name.");
+    }
     d.keyValue = newname;
     d.pannelObjNameValue = pannelObjName;
-    d.categoryObjNameValue = categoryobjName;
-    return (d);
-}
-
-
-/**
- * @brief 对应RemoveCategoryActionType
- * @param categoryobjName 需要移除的objname
- * @return
- */
-SARibbonCustomizeData SARibbonCustomizeData::makeRemoveCategoryCustomizeData(const QString& categoryobjName)
-{
-    SARibbonCustomizeData d(RemoveCategoryActionType);
-
     d.categoryObjNameValue = categoryobjName;
     return (d);
 }
@@ -402,6 +401,12 @@ SARibbonCustomizeData SARibbonCustomizeData::makeChangeCategoryOrderCustomizeDat
 {
     SARibbonCustomizeData d(ChangeCategoryOrderActionType);
 
+    if (categoryobjName.isEmpty()) {
+        qDebug() << QObject::tr("SARibbon Warning !!! customize change category order,"
+            "but get an empty category object name,"
+            "if you want to customize SARibbon,"
+            "please make sure every element has been set object name.");
+    }
     d.categoryObjNameValue = categoryobjName;
     d.indexValue = moveindex;
     return (d);
@@ -419,6 +424,12 @@ SARibbonCustomizeData SARibbonCustomizeData::makeChangePannelOrderCustomizeData(
 {
     SARibbonCustomizeData d(ChangePannelOrderActionType);
 
+    if (categoryobjName.isEmpty() || pannelObjName.isEmpty()) {
+        qDebug() << QObject::tr("SARibbon Warning !!! customize change pannel order,"
+            "but get an empty category/pannel object name,"
+            "if you want to customize SARibbon,"
+            "please make sure every element has been set object name.");
+    }
     d.categoryObjNameValue = categoryobjName;
     d.pannelObjNameValue = pannelObjName;
     d.indexValue = moveindex;
@@ -439,10 +450,36 @@ SARibbonCustomizeData SARibbonCustomizeData::makeChangeActionOrderCustomizeData(
 {
     SARibbonCustomizeData d(ChangeActionOrderActionType, mgr);
 
+    if (categoryobjName.isEmpty() || pannelObjName.isEmpty() || key.isEmpty()) {
+        qDebug() << QObject::tr("SARibbon Warning !!! customize change action order,"
+            "but get an empty category/pannel/action object name,"
+            "if you want to customize SARibbon,"
+            "please make sure every element has been set object name.");
+    }
     d.categoryObjNameValue = categoryobjName;
     d.pannelObjNameValue = pannelObjName;
     d.keyValue = key;
     d.indexValue = moveindex;
+    return (d);
+}
+
+
+/**
+ * @brief 对应RemoveCategoryActionType
+ * @param categoryobjName 需要移除的objname
+ * @return
+ */
+SARibbonCustomizeData SARibbonCustomizeData::makeRemoveCategoryCustomizeData(const QString& categoryobjName)
+{
+    SARibbonCustomizeData d(RemoveCategoryActionType);
+
+    if (categoryobjName.isEmpty()) {
+        qDebug() << QObject::tr("SARibbon Warning !!! customize remove category,"
+            "but get an empty category object name,"
+            "if you want to customize SARibbon,"
+            "please make sure every element has been set object name.");
+    }
+    d.categoryObjNameValue = categoryobjName;
     return (d);
 }
 
@@ -457,6 +494,12 @@ SARibbonCustomizeData SARibbonCustomizeData::makeRemovePannelCustomizeData(const
 {
     SARibbonCustomizeData d(RemovePannelActionType);
 
+    if (categoryobjName.isEmpty() || pannelObjName.isEmpty()) {
+        qDebug() << QObject::tr("SARibbon Warning !!! customize remove pannel,"
+            "but get an empty category/pannel object name,"
+            "if you want to customize SARibbon,"
+            "please make sure every element has been set object name.");
+    }
     d.categoryObjNameValue = categoryobjName;
     d.pannelObjNameValue = pannelObjName;
     return (d);
@@ -475,6 +518,12 @@ SARibbonCustomizeData SARibbonCustomizeData::makeRemoveActionCustomizeData(const
 {
     SARibbonCustomizeData d(RemoveActionActionType, mgr);
 
+    if (categoryobjName.isEmpty() || pannelObjName.isEmpty() || key.isEmpty()) {
+        qDebug() << QObject::tr("SARibbon Warning !!! customize remove action,"
+            "but get an empty category/pannel/action object name,"
+            "if you want to customize SARibbon,"
+            "please make sure every element has been set object name.");
+    }
     d.categoryObjNameValue = categoryobjName;
     d.pannelObjNameValue = pannelObjName;
     d.keyValue = key;
@@ -492,6 +541,12 @@ SARibbonCustomizeData SARibbonCustomizeData::makeVisibleCategoryCustomizeData(co
 {
     SARibbonCustomizeData d(VisibleCategoryActionType);
 
+    if (categoryobjName.isEmpty()) {
+        qDebug() << QObject::tr("SARibbon Warning !!! customize visible category,"
+            "but get an empty category object name,"
+            "if you want to customize SARibbon,"
+            "please make sure every element has been set object name.");
+    }
     d.categoryObjNameValue = categoryobjName;
     d.indexValue = isShow ? 1 : 0;
     return (d);
@@ -577,12 +632,15 @@ QList<SARibbonCustomizeData> SARibbonCustomizeData::simplify(const QList<SARibbo
             }
         }else if ((csd[i-1].actionType() == AddPannelActionType) &&
             (csd[i].actionType() == RemovePannelActionType)) {
-            if (csd[i-1].pannelObjNameValue == csd[i].pannelObjNameValue) {
+            if ((csd[i-1].pannelObjNameValue == csd[i].pannelObjNameValue) &&
+                (csd[i-1].categoryObjNameValue == csd[i].categoryObjNameValue)) {
                 willremoveIndex << i-1 << i;
             }
         }else if ((csd[i-1].actionType() == AddActionActionType) &&
             (csd[i].actionType() == RemoveActionActionType)) {
-            if (csd[i-1].keyValue == csd[i].keyValue) {
+            if ((csd[i-1].keyValue == csd[i].keyValue) &&
+                (csd[i-1].pannelObjNameValue == csd[i].pannelObjNameValue) &&
+                (csd[i-1].categoryObjNameValue == csd[i].categoryObjNameValue)) {
                 willremoveIndex << i-1 << i;
             }
         }
@@ -596,7 +654,10 @@ QList<SARibbonCustomizeData> SARibbonCustomizeData::simplify(const QList<SARibbo
     {
         if ((res[i-1].actionType() == VisibleCategoryActionType) &&
             (res[i].actionType() == VisibleCategoryActionType)) {
-            willremoveIndex << i-1;//删除前一个只保留最后一个
+            if (res[i-1].categoryObjNameValue == res[i].categoryObjNameValue) {
+                //要保证操作的是同一个内容
+                willremoveIndex << i-1;//删除前一个只保留最后一个
+            }
         }
     }
     res = remove_indexs(res, willremoveIndex);
@@ -620,7 +681,8 @@ QList<SARibbonCustomizeData> SARibbonCustomizeData::simplify(const QList<SARibbo
             for (int j = i+1; j < size; ++j)
             {
                 if ((res[j].actionType() == RenamePannelActionType) &&
-                    (res[i].pannelObjNameValue == res[j].pannelObjNameValue)) {
+                    (res[i].pannelObjNameValue == res[j].pannelObjNameValue) &&
+                    (res[i].categoryObjNameValue == res[j].categoryObjNameValue)) {
                     willremoveIndex<<i;
                 }
             }
@@ -641,13 +703,16 @@ QList<SARibbonCustomizeData> SARibbonCustomizeData::simplify(const QList<SARibbo
             willremoveIndex<<i-1;
         }else if ((res[i-1].actionType() == ChangePannelOrderActionType) &&
             (res[i].actionType() == ChangePannelOrderActionType) &&
-            (res[i-1].pannelObjNameValue == res[i].pannelObjNameValue)) {
+            (res[i-1].pannelObjNameValue == res[i].pannelObjNameValue) &&
+            (res[i-1].categoryObjNameValue == res[i].categoryObjNameValue)) {
             //说明连续两个顺序调整，把前一个indexvalue和后一个indexvalue相加，前一个删除
             res[i].indexValue += res[i-1].indexValue;
             willremoveIndex<<i-1;
         }else if ((res[i-1].actionType() == ChangeActionOrderActionType) &&
             (res[i].actionType() == ChangeActionOrderActionType) &&
-            (res[i-1].keyValue == res[i].keyValue)) {
+            (res[i-1].keyValue == res[i].keyValue) &&
+            (res[i-1].pannelObjNameValue == res[i].pannelObjNameValue) &&
+            (res[i-1].categoryObjNameValue == res[i].categoryObjNameValue)) {
             //说明连续两个顺序调整，把前一个indexvalue和后一个indexvalue相加，前一个删除
             res[i].indexValue += res[i-1].indexValue;
             willremoveIndex<<i-1;
