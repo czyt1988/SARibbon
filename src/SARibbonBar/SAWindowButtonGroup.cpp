@@ -160,17 +160,26 @@ public:
 
         if (buttonMinimize) {
             int w = (mMinStretch / tw) * size.width();
-            buttonMinimize->setGeometry(x, 0, w, size.height());
+            //buttonMinimize->setGeometry(x, 0, w, size.height());
+            //受到qss样式影响会导致最小宽度、高度设置不了，因此要设置fixsize再move
+            buttonMinimize->setFixedSize(w, size.height());
+            buttonMinimize->move(x, 0);
             x += w;
         }
         if (buttonMaximize) {
             int w = (mMaxStretch / tw) * size.width();
-            buttonMaximize->setGeometry(x, 0, w, size.height());
+            //buttonMaximize->setGeometry(x, 0, w, size.height());
+            //受到qss样式影响会导致最小宽度、高度设置不了，因此要设置fixsize再move
+            buttonMaximize->setFixedSize(w, size.height());
+            buttonMaximize->move(x, 0);
             x += w;
         }
         if (buttonClose) {
             int w = (mCloseStretch / tw) * size.width();
-            buttonClose->setGeometry(x, 0, w, size.height());
+            //buttonClose->setGeometry(x, 0, w, size.height());
+            //受到qss样式影响会导致最小宽度、高度设置不了，因此要设置fixsize再move
+            buttonClose->setFixedSize(w, size.height());
+            buttonClose->move(x, 0);
         }
     }
 
