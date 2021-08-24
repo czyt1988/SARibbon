@@ -112,6 +112,8 @@ void SARibbonCategoryDesignerPlugin::initialize(QDesignerFormEditorInterface *co
         mgr->registerExtensions(new SARibbonBarTaskMenuFactory(mgr)
             , Q_TYPEID(QDesignerTaskMenuExtension));
     }
+
+    m_isInitialized = true;
 }
 
 
