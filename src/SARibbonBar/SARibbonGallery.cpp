@@ -30,6 +30,8 @@ public:
 #endif
     SARibbonGalleryGroup *viewportGroup;
     QActionGroup *actionGroup;//所有gallery管理的actions都由这个actiongroup管理
+    QBoxLayout *btnLayout;
+    QBoxLayout *layout;
     SARibbonGalleryPrivate() : Parent(nullptr)
     {
     }
@@ -67,6 +69,18 @@ public:
             , Parent, &SARibbonGallery::hovered);
         popupWidget = nullptr;
         viewportGroup = nullptr;
+        btnLayout=new QBoxLayout(QBoxLayout::TopToBottom);
+        btnLayout->setSpacing(0);
+        btnLayout->setMargin(0);
+        btnLayout->addWidget(buttonUp);
+        btnLayout->addWidget(buttonDown);
+        btnLayout->addWidget(buttonMore);
+        layout=new QBoxLayout(QBoxLayout::RightToLeft);
+        layout->setSpacing(0);
+        layout->setMargin(0);
+        layout->addLayout(btnLayout);
+        layout->addStretch();
+        parent->setLayout(layout);
     }
 
 
@@ -92,6 +106,7 @@ public:
     {
         if (nullptr == viewportGroup) {
             viewportGroup = RibbonSubElementDelegate->createRibbonGalleryGroup(Parent);
+            layout->addWidget(viewportGroup,1);
         }
         viewportGroup->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         viewportGroup->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -289,21 +304,21 @@ RibbonGalleryViewport *SARibbonGallery::ensureGetPopupViewPort()
 
 void SARibbonGallery::resizeEvent(QResizeEvent *event)
 {
-    if (!m_d->isValid()) {
-        return;
-    }
-    const QSize r = event->size();
-    int subW = 0;
+//    if (!m_d->isValid()) {
+//        return;
+//    }
+//    const QSize r = event->size();
+//    int subW = 0;
 
-    m_d->buttonUp->move(r.width() - m_d->buttonUp->width(), 0);
-    subW = qMax(subW, m_d->buttonUp->width());
-    m_d->buttonDown->move(r.width() - m_d->buttonDown->width(), m_d->buttonUp->height());
-    subW = qMax(subW, m_d->buttonDown->width());
-    m_d->buttonMore->move(r.width() - m_d->buttonMore->width(), m_d->buttonDown->geometry().bottom()+1);
-    subW = qMax(subW, m_d->buttonMore->width());
-    if (m_d->viewportGroup) {
-        m_d->viewportGroup->setGeometry(0, 0, r.width()-subW, r.height());
-    }
+//    m_d->buttonUp->move(r.width() - m_d->buttonUp->width(), 0);
+//    subW = qMax(subW, m_d->buttonUp->width());
+//    m_d->buttonDown->move(r.width() - m_d->buttonDown->width(), m_d->buttonUp->height());
+//    subW = qMax(subW, m_d->buttonDown->width());
+//    m_d->buttonMore->move(r.width() - m_d->buttonMore->width(), m_d->buttonDown->geometry().bottom()+1);
+//    subW = qMax(subW, m_d->buttonMore->width());
+//    if (m_d->viewportGroup) {
+//        m_d->viewportGroup->setGeometry(0, 0, r.width()-subW, r.height());
+//    }
     QFrame::resizeEvent(event);
 }
 

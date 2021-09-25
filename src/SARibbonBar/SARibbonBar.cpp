@@ -66,7 +66,7 @@ public:
     QList<SARibbonContextCategory *> mContextCategoryList;          ///< 存放所有的上下文标签
     QList<_SARibbonTabData> mHidedCategory;
     int iconRightBorderPosition;                                    ///< 标题栏x值得最小值，在有图标和快捷启动按钮，此值都需要变化
-    SARibbonControlButton *minimumCaterogyButton;                   ///< 隐藏面板按钮
+    SARibbonControlButton *minimumCategoryButton;                   ///< 隐藏面板按钮
     SARibbonButtonGroupWidget *rightButtonGroup;                    ///< 在tab bar右边的按钮群
     SARibbonQuickAccessBar *quickAccessBar;                         ///< 快速响应栏
     SARibbonBar::RibbonStyle ribbonStyle;                           ///< ribbon的风格
@@ -80,7 +80,7 @@ public:
         , ribbonTabBar(nullptr)
         , stackedContainerWidget(nullptr)
         , iconRightBorderPosition(1)
-        , minimumCaterogyButton(nullptr)
+        , minimumCategoryButton(nullptr)
         , rightButtonGroup(nullptr)
         , ribbonStyle(SARibbonBar::OfficeStyle)
         , lastShowStyle(SARibbonBar::OfficeStyle)
@@ -305,6 +305,7 @@ SARibbonCategory *SARibbonBar::addCategoryPage(const QString& title)
  */
 void SARibbonBar::addCategoryPage(SARibbonCategory *category)
 {
+    if ( nullptr == category ) return ;
     int index = m_d->ribbonTabBar->addTab(category->windowTitle());
 
     category->setRibbonPannelLayoutMode(isTwoRowStyle() ? SARibbonPannel::TwoRowMode : SARibbonPannel::ThreeRowMode);
@@ -355,6 +356,7 @@ SARibbonCategory *SARibbonBar::insertCategoryPage(const QString& title, int inde
 
 void SARibbonBar::insertCategoryPage(SARibbonCategory *category, int index)
 {
+    if ( nullptr == category ) return ;
     category->setRibbonPannelLayoutMode(isTwoRowStyle() ? SARibbonPannel::TwoRowMode : SARibbonPannel::ThreeRowMode);
     int i = m_d->ribbonTabBar->insertTab(index, category->windowTitle());
 
@@ -626,6 +628,7 @@ SARibbonContextCategory *SARibbonBar::addContextCategory(const QString& title, c
  */
 void SARibbonBar::addContextCategory(SARibbonContextCategory *context)
 {
+    if ( nullptr == context ) return ;
     connect(context, &SARibbonContextCategory::categoryPageAdded
         , this, &SARibbonBar::onContextsCategoryPageAdded);
     //remove并没有绑定，主要是remove后在stacked里也不会显示，remove且delete的话，stacked里也会删除
@@ -728,6 +731,7 @@ bool SARibbonBar::isContextCategoryVisible(SARibbonContextCategory *context)
  */
 void SARibbonBar::setContextCategoryVisible(SARibbonContextCategory *context, bool visible)
 {
+    if ( nullptr == context ) return ;
     if (visible) {
         showContextCategory(context);
     }else {
@@ -752,6 +756,7 @@ QList<SARibbonContextCategory *> SARibbonBar::contextCategoryList() const
  */
 void SARibbonBar::destroyContextCategory(SARibbonContextCategory *context)
 {
+    if ( nullptr == context ) return ;
     //! 1、如果上下文标签显示中，先隐藏
     if (isContextCategoryVisible(context)) {
         hideContextCategory(context);
@@ -814,26 +819,26 @@ void SARibbonBar::showMinimumModeButton(bool isShow)
 {
     if (isShow) {
         activeRightButtonGroup();
-        if (nullptr == m_d->minimumCaterogyButton) {
-            m_d->minimumCaterogyButton = RibbonSubElementDelegate->createHidePannelButton(this);
-            m_d->minimumCaterogyButton->ensurePolished(); // 载入样式图标
-            QAction *action = new QAction(m_d->minimumCaterogyButton);
+        if (nullptr == m_d->minimumCategoryButton) {
+            m_d->minimumCategoryButton = RibbonSubElementDelegate->createHidePannelButton(this);
+            m_d->minimumCategoryButton->ensurePolished(); // 载入样式图标
+            QAction *action = new QAction(m_d->minimumCategoryButton);
             action->setIcon(style()->standardIcon(isMinimumMode()?
-                QStyle::SP_TitleBarUnshadeButton:QStyle::SP_TitleBarShadeButton, 0, m_d->minimumCaterogyButton));
+                QStyle::SP_TitleBarUnshadeButton:QStyle::SP_TitleBarShadeButton, 0, m_d->minimumCategoryButton));
             connect(action, &QAction::triggered, this, [=]() {
                 this->setMinimumMode(!isMinimumMode());
                 action->setIcon(style()->standardIcon(isMinimumMode()?
-                    QStyle::SP_TitleBarUnshadeButton:QStyle::SP_TitleBarShadeButton, 0, m_d->minimumCaterogyButton));
+                    QStyle::SP_TitleBarUnshadeButton:QStyle::SP_TitleBarShadeButton, 0, m_d->minimumCategoryButton));
             });
-            m_d->minimumCaterogyButton->setDefaultAction(action);
-            m_d->rightButtonGroup->addWidget(m_d->minimumCaterogyButton);
+            m_d->minimumCategoryButton->setDefaultAction(action);
+            m_d->rightButtonGroup->addWidget(m_d->minimumCategoryButton);
             update();
         }
     }else {
-        if (nullptr != m_d->minimumCaterogyButton) {
-            m_d->minimumCaterogyButton->hide();
-            m_d->minimumCaterogyButton->deleteLater();
-            m_d->minimumCaterogyButton = nullptr;
+        if (nullptr != m_d->minimumCategoryButton) {
+            m_d->minimumCategoryButton->hide();
+            m_d->minimumCategoryButton->deleteLater();
+            m_d->minimumCategoryButton = nullptr;
         }
     }
     QResizeEvent resizeEvent(size(), size());
@@ -848,7 +853,7 @@ void SARibbonBar::showMinimumModeButton(bool isShow)
 ///
 bool SARibbonBar::haveShowMinimumModeButton() const
 {
-    return (nullptr != m_d->minimumCaterogyButton);
+    return (nullptr != m_d->minimumCategoryButton);
 }
 
 
