@@ -11,7 +11,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = SARibbonMainWindowExample
 TEMPLATE = app
 include($$PWD/../../../common.pri)
-DESTDIR = $$SA_RIBBON_DIR
+DESTDIR = $${SARIBBON_BIN_DIR}
 
 SOURCES += main.cpp\
     mainwindow.cpp 

@@ -1,5 +1,5 @@
+include($$PWD/common.pri)
 INCLUDEPATH += $$PWD/src/SARibbonBar
 DEPENDPATH += $$PWD/src/SARibbonBar
-include($$PWD/common.pri)
-LIBS += -L$${SA_RIBBON_DIR} -lSARibbonBar
+LIBS += -L$${SARIBBON_BIN_DIR} -l$${SARIBBON_LIB_NAME}
 
