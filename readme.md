@@ -88,23 +88,11 @@ SARibbon项目是SA项目的子项
 
 ## 计划
 
-- 添加自定义窗口，支撑自定义，并能生成xml/json等配置文件
-- context category 的背景添加一个底层窗口，使得其支撑自定义
-- 可以设置title的背景，类似office未注册时的显示
+- 正在实现designer plugin
 
 ## 已知bug
 
 - 在ubuntu下会有文字换行显示不全问题
-
-## 已解决
-
-- 【解决】在缩小模式下tabbar无法响应鼠标经过，导致鼠标经过无法绘制
-        由于stacked widget在缩小模式下时popup，弹出后即阻断了消息，需要主动给tabbar发送一个hover事件，高速tabbar鼠标已经移开
-- 【解决】pannel在内容过多时，需要针对性的重新计算整个Category，以便得到最优的布局尺寸
-- 【解决】pannel布局过于紧凑
-- 【解决】小按钮的位置过于紧凑
-- 【解决】分割线显示异常
-- 【解决】在非最大化模式，pannel变为缩小时，点击不弹出stacked
 
 # 其他
 
