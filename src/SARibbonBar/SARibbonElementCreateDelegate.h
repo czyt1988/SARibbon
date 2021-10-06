@@ -3,6 +3,7 @@
 #include "SARibbonGlobal.h"
 #include <QColor>
 #include <QMargins>
+#include <QSize>
 class QWidget;
 class SARibbonBar;
 class SARibbonTabBar;
@@ -24,13 +25,13 @@ class SARibbonPannelOptionButton;
 
 /**
  * @brief 定义了saribbon所有尺寸相关信息，saribbon的建立都基于此类的尺寸，如果想调整，
- * 可以重载 @ref SARibbonElementCreateDelegate 的 @ref getRibbonStyleOption 函数
- * 会重新
+ * 可以通过 @ref SARibbonElementCreateDelegate 的 @ref setRibbonStyleOption 函数设置自己的SARibbonStyleOption
+ *
+ * 一般SARibbonElementCreateDelegate::setRibbonStyleOption函数最好在ribbonbar构建之前调用
  */
 class SA_RIBBON_EXPORT SARibbonStyleOption {
 public:
     SARibbonStyleOption();
-    virtual ~SARibbonStyleOption();
     int mainbarHeightOfficeStyleThreeRow;   ///< OfficeStyle 样式下的mainbar高度
     int mainbarHeightWPSStyleThreeRow;      ///< WpsLiteStyle 样式下的mainbar高度
     int mainbarHeightOfficeStyleTwoRow;     ///< OfficeStyleTwoRow 样式下的mainbar高度
@@ -40,6 +41,13 @@ public:
     QColor titleTextColor;                  ///< 标题颜色
     QMargins widgetBord;                    ///< 整个ribbonbar的四个边框，默认为0
     QColor tabBarBaseLineColor;             ///< tabbar 底部线条颜色
+    int applicationButtonWidth;             ///< applicationButton的宽度，高度随tab bar高度
+    int galleryFixedHeight;                 ///< SARibbonGallery控件的高度
+    int galleryMinimumWidth;                ///< SARibbonGallery控件的最小宽度
+    int galleryButtonMaximumWidth;          ///< SARibbonGallery控件的最右边三个按钮的最大宽度，默认为15
+    int pannelTitleHeight;                  ///< SARibbonPannel标题栏的高度
+    QSize toolButtonLargeIconSize;          ///< SARibbonToolButton的Large模式的icon 尺寸
+    QSize toolButtonSmallIconSize;          ///< SARibbonToolButton的Medium和small模式的icon 尺寸
 };
 
 ///

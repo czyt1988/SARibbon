@@ -603,7 +603,7 @@ bool SARibbonPannel::isExpanding() const
  */
 int SARibbonPannel::titleHeight() const
 {
-    return (isTwoRow() ? 0 : 21);
+    return (isTwoRow() ? 0 : RibbonSubElementStyleOpt.pannelTitleHeight);
 }
 
 
