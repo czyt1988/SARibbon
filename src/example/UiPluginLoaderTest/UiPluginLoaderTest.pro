@@ -1,6 +1,9 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2021-05-09T21:53:41
+# 此例子用于验证通过ui plugin加载ribbon的ui功能，程序运行后需要选择一个ui文件，已经设置好的ui文件位于
+# SARibbon\src\example\UiPluginLoaderTest\ribbonMainWindow.ui 下
+#
+# 使用本例子之前，需要先编译DesignerPlugin
 #
 #-------------------------------------------------
 
@@ -10,17 +13,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = UiPluginLoaderTest
 TEMPLATE = app
-
-# The following define makes your compiler emit warnings if you use
-# any feature of Qt which has been marked as deprecated (the exact warnings
-# depend on your compiler). Please consult the documentation of the
-# deprecated API in order to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
-
-# You can also make your code fail to compile if you use deprecated APIs.
-# In order to do so, uncomment the following line.
-# You can also select to disable deprecated APIs only up to a certain version of Qt.
-#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 CONFIG += c++11
 
@@ -36,4 +29,6 @@ qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
-include($$PWD/../../../SARibbonBar.pri)
+include($$PWD/../../../common.pri)
+DESTDIR = $${SARIBBON_BIN_DIR}
+include($${SARIBBONBAR_PRI_FILE_PATH})

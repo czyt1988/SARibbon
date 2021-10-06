@@ -2,8 +2,8 @@ TEMPLATE = subdirs
 SUBDIRS += \
            src/SARibbonBar \
            src/example/MainWindowExample \
- \#           src/example/UiPluginLoaderTest
-    src/example/UseDesginerMainWindowExample
+ #           src/example/UiPluginLoaderTest
+#    src/example/UseDesginerMainWindowExample
 
 CONFIG += ordered
 

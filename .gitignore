@@ -6,6 +6,8 @@ build*
 *.lib
 *.zip
 *.user.*
+~*.pptx
+~*.docx
 
 # vscode 的隐藏文件
 /.vscode

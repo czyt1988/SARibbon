@@ -224,7 +224,9 @@ SARibbonBar::SARibbonBar(QWidget *parent) : QMenuBar(parent)
     , m_d(new SARibbonBarPrivate(this))
 {
     m_d->init();
-    connect(parent, &QWidget::windowTitleChanged, this, &SARibbonBar::onWindowTitleChanged);
+    if (parent) {
+        connect(parent, &QWidget::windowTitleChanged, this, &SARibbonBar::onWindowTitleChanged);
+    }
     setRibbonStyle(OfficeStyle);
 }
 
