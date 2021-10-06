@@ -30,4 +30,5 @@ defineReplace(saRibbonLibNameMake) {
 
 
 SARIBBON_SRC_DIR = $$PWD/src # 源代码路径
+SARIBBONBAR_PRI_FILE_PATH = $$PWD/SARibbonBar.pri # 源代码路径
 SARIBBON_LIB_NAME=$$saRibbonLibNameMake(SARibbonBar)

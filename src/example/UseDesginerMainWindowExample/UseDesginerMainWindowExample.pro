@@ -1,3 +1,5 @@
+# 此例子用于展示使用ui designer实现ribbon的方案
+
 QT       += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -23,9 +25,13 @@ HEADERS += \
     MainWindow.h
 
 FORMS += \
-    MainWindow.ui
+    mainwindow.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+include($$PWD/../../../common.pri)
+DESTDIR = $${SARIBBON_BIN_DIR}
+include($${SARIBBONBAR_PRI_FILE_PATH})

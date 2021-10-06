@@ -47,8 +47,8 @@ QIcon SARibbonMainWindowDesignerPlugin::icon() const
 QString SARibbonMainWindowDesignerPlugin::domXml() const
 {
     SA_PLUGIN_MARK();
-    return ("<ui language=\"c++\">\n"
-           " <widget class=\"SARibbonMainWindow\" name=\"mainWindow\">\n"
+    return ("<ui language=\"c++\" displayname=\"SA Ribbon MainWindow\">\n"
+           " <widget class=\"SARibbonMainWindow\" name=\"MainWindow\">\n"
            "  <property name=\"geometry\">\n"
            "   <rect>\n"
            "    <x>0</x>\n"

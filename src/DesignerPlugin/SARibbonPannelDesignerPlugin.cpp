@@ -31,7 +31,7 @@ QIcon SARibbonPannelDesignerPlugin::icon() const
 
 QString SARibbonPannelDesignerPlugin::domXml() const
 {
-    return ("<ui language=\"c++\">\n"
+    return ("<ui language=\"c++\" displayname=\"Ribbon Pannel\">\n"
            " <widget class=\"SARibbonPannel\" name=\"ribbonPannel\"/>\n"
            " <customwidgets>\n"
            "   <customwidget>\n"
