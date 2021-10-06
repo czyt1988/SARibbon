@@ -280,9 +280,6 @@ protected:
     //根据currentRibbonStyle计算mainBar的高度
     virtual int mainBarHeight() const;
 
-    //应用按钮的宽度
-    virtual int applicationButtonWidth() const;
-
 protected slots:
     void onWindowTitleChanged(const QString& title);
     void onCategoryWindowTitleChanged(const QString& title);

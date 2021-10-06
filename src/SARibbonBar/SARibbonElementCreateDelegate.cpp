@@ -23,16 +23,18 @@ SARibbonStyleOption::SARibbonStyleOption()
     mainbarHeightWPSStyleThreeRow = 130;
     mainbarHeightOfficeStyleTwoRow = 134;
     mainbarHeightWPSStyleTwoRow = 104;
-    titleBarHight = 30;
-    tabBarHight = 25;
-    titleTextColor = Qt::black;
     widgetBord = QMargins(5, 1, 5, 5);
+    titleBarHight = 30;
+    titleTextColor = Qt::black;
+    tabBarHight = 25;
     tabBarBaseLineColor = QColor(186, 201, 219);
-}
-
-
-SARibbonStyleOption::~SARibbonStyleOption()
-{
+    applicationButtonWidth = 60;
+    galleryFixedHeight = 60;
+    galleryMinimumWidth = 120;
+    galleryButtonMaximumWidth = 15;
+    pannelTitleHeight = 21;
+    toolButtonLargeIconSize = QSize(32, 32);
+    toolButtonSmallIconSize = QSize(18, 18);
 }
 
 
@@ -147,6 +149,10 @@ const SARibbonStyleOption& SARibbonElementCreateDelegate::getRibbonStyleOption()
 }
 
 
+/**
+ * @brief 设置style配置类，SARibbonElementCreateDelegate将保留SARibbonStyleOption的所有权
+ * @param opt
+ */
 void SARibbonElementCreateDelegate::setRibbonStyleOption(SARibbonStyleOption *opt)
 {
     if (m_opt) {

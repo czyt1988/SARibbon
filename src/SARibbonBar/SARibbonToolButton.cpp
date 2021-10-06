@@ -661,11 +661,11 @@ void SARibbonToolButton::setButtonType(const RibbonButtonType& buttonType)
     m_buttonType = buttonType;
     if (LargeButton == buttonType) {
         setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-        setIconSize(QSize(32, 32));
+        setIconSize(RibbonSubElementStyleOpt.toolButtonLargeIconSize);
         setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Expanding);
     }else {
         setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-        setIconSize(QSize(18, 18));
+        setIconSize(RibbonSubElementStyleOpt.toolButtonSmallIconSize);
         setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
     }
     setMouseTracking(true);
