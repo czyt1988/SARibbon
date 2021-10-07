@@ -118,4 +118,31 @@ class SARibbonMainWindowDesignerPlugin : public QObject,
 
 `<customwidgets>`是对一些特殊的窗口设置标签，例如对容器类窗口，需要指定添加子页面的方法`<addpagemethod>`，那么对于
 
-`displayname`属性给予了对控件命名的方式，对于`SARibbonMainWindow`这种控件，
+> `<ui>`标签下的`displayname`属性是qt designer中的显示名字，`<widget>`标签的`name`属性是对象的object name
+
+### initialize
+
+这是一个非常关键的函数之一，控件在初始化的时候会调用，为什么会放到最后讲这个函数呢，主要是这个函数是给予控件附加的高级功能，普通的控件不需要对此函数做特殊处理，按固定模式走就行
+
+**要确保的是调用`initialize`函数之前`isInitialized`返回`false`，调用`initialize`函数之后`isInitialized`返回`true`**
+
+要实现上述效果，其实只要一个bool成员变量记录一下就行，因此，无特殊需求的控件，`initialize`函数和`isInitialized`的写法如下：
+
+头文件通过成员变量`bool m_initialized;`记录状态
+```cpp
+class XXXPlugin : public QDesignerCustomWidgetInterface
+{
+    ......
+private:
+    bool m_initialized;
+}
+```
+cpp文件
+```cpp
+class ADC_Para_BoolWidgetPlugin : public QDesignerCustomWidgetInterface
+{
+    ......
+private:
+    bool m_initialized;
+}
+```
