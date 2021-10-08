@@ -2,7 +2,7 @@
 
  这是Qt（最低要求Qt5，支持C++11的编译器）下一个轻量级的Ribbon控件(Office样式UI),界面截图：
 
-![](https://cdn.jsdelivr.net/gh/czyt1988/SARibbon/doc/screenshot/001.gif)
+![](./doc/screenshot/001.gif)
 
 MIT协议，欢迎大家使用并提出意见
 
@@ -14,11 +14,11 @@ MIT协议，欢迎大家使用并提出意见
 
  包括2种office模式，office模式是最常见的ribbon模式了，就是我们经常看到的word模式，office模式的tab和标题栏占用位置较多。
 
-![](https://cdn.jsdelivr.net/gh/czyt1988/SARibbon/doc/screenshot/office-mode.png)
+![](./doc/screenshot/office-mode.png)
 
  另两种参考wps设计的wps模式，wps模式是office模式的改良版，它为了减小ribbon的高度，把标签和标题栏设置在一起
  
-![](https://cdn.jsdelivr.net/gh/czyt1988/SARibbon/doc/screenshot/wps-mode.png)
+![](./doc/screenshot/wps-mode.png)
 
  office模式和wps模式都支持两行和3行设计，满足不同界面需求。
 
@@ -28,40 +28,64 @@ MIT协议，欢迎大家使用并提出意见
 
 # 使用方法
 
-可以把编译好的整个目录移动到需要的工程目录下，然后在项目的pro文件中,`include SARibbonBar.pri`即可，示例如下：
+## 方法1（适合动态库）：
+
+可以把编译好的整个目录移动到需要的工程目录下，然后在项目的pro文件中,`include SARibbonBar.pri`即可(**注意是SARibbon/SARibbonBar.pri**)，示例如下：
 
 ```shell
-include($$PWD/SARibbonBar/SARibbon/SARibbonBar.pri)
+# 假如在你把SARibbon拷贝到你的工程目录下：你的工程目录/SARibbon
+include($$PWD/SARibbon/SARibbonBar.pri)
 ```
+
+## 方法2（适合静态）： 
+
+`SARibbon/src/SARibbonBar/`目录下面也有个`SARibbonBar.pri`,如果直接：
+
+```shell
+include($$PWD/SARibbon/src/SARibbonBar/SARibbonBar.pri)
+```
+
+那么就是静态编译了
+
+## qmake过程变量
+
+`SARibbon`提供了`common.pri`文件，这里把`SARibbon`的一些主要目录做了描述：
+
+`SARIBBON_SRC_DIR`是源码路径,`SARIBBON_LIB_NAME`是库名称，会根据编译模式决定后面是否带d
 
 
 # 更多截图
 
-![](https://cdn.jsdelivr.net/gh/czyt1988/SARibbon/doc/screenshot/SARibbonBar-screenshot-01.gif)
+![](./doc/screenshot/SARibbonBar-screenshot-01.gif)
 
 - 支持最小化模式，ribbon只显示标签（默认双击标签会进行切换）
 
-![](https://cdn.jsdelivr.net/gh/czyt1988/SARibbon/doc/screenshot/SARibbonBar-screenshot-minMode.gif)
+![](./doc/screenshot/SARibbonBar-screenshot-minMode.gif)
 
 - 支持quickAccessBar（word快速菜单），在wps模式和office模式下会有不同的显示效果
 
-![](https://cdn.jsdelivr.net/gh/czyt1988/SARibbon/doc/screenshot/SARibbonBar-screenshot-quickAccessBar.gif)
+![](./doc/screenshot/SARibbonBar-screenshot-quickAccessBar.gif)
 
 - 支持4种不同的ribbon button，普通按钮，延迟弹出菜单按钮，菜单按钮，action菜单按钮（action菜单按钮是此ribbon控件最主要解决的问题之一）
 
-![](https://cdn.jsdelivr.net/gh/czyt1988/SARibbon/doc/screenshot/SARibbonBar-screenshot-ribbonbutton.gif)
+![](./doc/screenshot/SARibbonBar-screenshot-ribbonbutton.gif)
 
 - 支持qss对ribbon进行设置
 
-![](https://cdn.jsdelivr.net/gh/czyt1988/SARibbon/doc/screenshot/SARibbonBar-screenshot-useqss.gif)
+![](./doc/screenshot/SARibbonBar-screenshot-useqss.gif)
 
 - 这是使用此控件的本人另外一个开源软件的截图
 
-![](https://cdn.jsdelivr.net/gh/czyt1988/SARibbon/doc/screenshot/sa-screenshot.gif)
+![](./doc/screenshot/sa-screenshot.gif)
 
 [github - https://github.com/czyt1988/sa](https://github.com/czyt1988/sa)
 
 [gitee - https://gitee.com/czyt1988/SA](https://gitee.com/czyt1988/SA)
+
+# 使用教程
+
+- [SARibbon介绍](./doc/saribbon-guide.md)
+- [SARibbon自定义介绍](./doc/saribbon-customize.md)
 
 # 题外
 
@@ -84,16 +108,3 @@ SARibbon项目是SA项目的子项
 
 若有空会把这个`SARibbon`和`SA`一起打包讲讲如何开发，其中遇到的一些坑啊和注意的问题。
 
-# 计划及进度
-
-## 计划
-
-- 正在实现designer plugin
-
-## 已知bug
-
-- 在ubuntu下会有文字换行显示不全问题
-
-# 其他
-
-> 感谢[FastCAE](http://www.fastcae.com/product.html)项目使用了本控件，并找到了许多bug和建议，FastCAE国产CAE软件集成开发平台，免费开源，是面向求解器开发者提供CAE软件界面与通用功能模块快速研发集成框架，[其开源仓库（github）:https://github.com/DISOGitHub/FastCAE](https://github.com/DISOGitHub/FastCAE)，[gitee:https://gitee.com/DISOGitee/FastCAE](https://gitee.com/DISOGitee/FastCAE)，[官网见:http://www.fastcae.com/product.html](http://www.fastcae.com/product.html)

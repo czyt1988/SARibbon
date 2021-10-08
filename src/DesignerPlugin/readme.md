@@ -1,30 +1,56 @@
 ﻿# 简介
 
-这里将介绍SARibbon的qt designer插件是如何实现的
+这里将介绍SARibbon的`Qt Designer`插件是如何实现的
 
-这个插件比较复杂，它的`bool isContainer()`函数返回`true`，表明它能接收qt designer一些拖曳窗口的事件。
-qt 帮助文档中有个较为详细的例子：Container Extension Example介绍了此类插件的编写。
+和一般的插件不同，一般插件只需要把窗口生成就完事了，但SARibbon是一个组合插件，需要实现类似`QTabbar`的插入标签页功能，需要实现类似`QToolBar`的添加`QAction`功能，还要支持redo/undo等等，这就需要涉及对`Qt Designer`的深度操作了。
 
-在插件的`isContainer`为`true`时，插件除了需要继承`QDesignerCustomWidgetInterface`以外，还需要面对几个重要类：
+qt 帮助文档中有个较为详细的例子：Container Extension Example介绍了此类插件的编写。但很多内容讲的非常粗，导致许多细节无法了解，都是通过看源码慢慢摸索，这篇主要记录SARibbon的`Qt Designer`插件编写过程遇到的一些问题，以及看`Qt Designer`源码了解到的一些细节。
+
+Qt帮助文档搜：`Creating Custom Widgets for Qt Designer`能获得官方文档对插件的介绍，对于写一般插件，完全足够，但要实现`SARibbon`的功能，还远远不够。
+
+插件相关的几个类主要如下：
+
+插件基本类有两个：
+
+- **`QDesignerCustomWidgetInterface`**
+- `QDesignerCustomWidgetCollectionInterface`
+
+扩展相关类有6个：
 
 - `QExtensionManager`
 - `QExtensionFactory`
 - `QDesignerContainerExtension`
-- `QDesignerFormEditorInterface`
-- `QDesignerFormWindowInterface`
 - `QDesignerPropertySheetExtension`
+- `QDesignerMemberSheetExtension`
+- `QDesignerTaskMenuExtension`
+
+操作Qt Desginer的接口,大概有9个，通过下面这9个接口可以操作`Qt Designer`的许多窗体
+
+- **`QDesignerFormEditorInterface`**
+- **`QDesignerFormWindowInterface`**
+- `QDesignerPropertyEditorInterface`
+- `QDesignerFormWindowManagerInterface`
+- `QDesignerWidgetFactoryInterface`
+- `QDesignerActionEditorInterface`
+- `QDesignerIntegrationInterface`
+- `QDesignerObjectInspectorInterface`
+- `QDesignerMetaDataBaseInterface`
+
+上面加粗的是需要比较关注的类
+
+如果仅仅是单一的窗体控件，实际用到的不多，也就`QDesignerCustomWidgetInterface`或者`QDesignerFormEditorInterface`,但要是复杂的控件，如`SARibbon`又要支持redo/undo，就要面对更多的接口，而Qt在一些不常用的接口说明极少，只能看源码来摸索。
 
 # 一些问题
 
-如果没有成功加载插件，可以通过qt designer的“帮助”->“关于插件”中查看错误信息
+如果没有成功加载插件，可以通过`Qt Designer`的“帮助”->“关于插件”中查看错误信息
 
-![](https://cdn.jsdelivr.net/gh/czyt1988/SARibbon/src/DesignerPlugin/doc/pic/01-aboutplugin.png)
+![](./doc/pic/01-aboutplugin.png)
 
 # 编写插件注意事项
 
 注意插件类要导出信息，通过`Q_PLUGIN_METADATA`宏，如果没有使用这个宏，在designer里将不会显示，且会提示错误：
 
-![](https://cdn.jsdelivr.net/gh/czyt1988/SARibbon/src/DesignerPlugin/doc/pic/02-fault-info.png)
+![](./doc/pic/02-fault-info.png)
 
 这时只需加入`Q_PLUGIN_METADATA`宏即可
 
@@ -39,7 +65,7 @@ class SARibbonMainWindowDesignerPlugin : public QObject,
 
 这是因为作为一个lib，自定义的plugin没有任何导出的描述符，只能通过某些操作通知qt哪些类需要导出。
 
-当然，如果定义了`QDesignerCustomWidgetCollectionInterface`插件集合，只需在继承`QDesignerCustomWidgetCollectionInterface`的类中申明一次`Q_PLUGIN_METADATA`即可，这里会通过customWidgets告诉qt designer有哪些plugin要导出，这样就不需要每个plugin类都定义一下`Q_PLUGIN_METADATA`,如果要导出多个控件，建议使用这种方法。
+当然，如果定义了`QDesignerCustomWidgetCollectionInterface`插件集合，只需在继承`QDesignerCustomWidgetCollectionInterface`的类中申明一次`Q_PLUGIN_METADATA`即可，这里会通过customWidgets告诉`Qt Designer`有哪些plugin要导出，这样就不需要每个plugin类都定义一下`Q_PLUGIN_METADATA`,如果要导出多个控件，建议使用这种方法，可见`QDesignerCustomWidgetCollectionInterface`类的介绍。
 
 # 插件相关的几个类
 
@@ -61,11 +87,11 @@ class SARibbonMainWindowDesignerPlugin : public QObject,
 
 ###  createWidget
 
-这三个函数对控件的生成非常重要，`createWidget`决定了在qt designer里的显示，qt designer里会调用这个函数获得这个控件，并显示的designer里，因此，这个函数只是提供给qt designer生成控件显示用的，并不会体现在你实际设计好的代码中，因此，有时候为了给qt designer的控件提供一些额外的操作，可以在`createWidget`函数中创建出来的窗体再设置一个事件过滤器，提供一些为qt designer额外赋予的操作，最典型的就是在设计QMainWindow时，能动态操作工具栏和菜单栏dockwidget，查看Qt Designer的源码，大部分的常用控件在`createWidget`都返回一个特定的窗体，处理一些拖曳事件修改事件。
+这三个函数对控件的生成非常重要，`createWidget`决定了在`Qt Designer`里的显示，`Qt Designer`里会调用这个函数获得这个控件，并显示的designer里，因此，这个函数只是提供给`Qt Designer`生成控件显示用的，并不会体现在你实际设计好的代码中，因此，有时候为了给`Qt Designer`的控件提供一些额外的操作，可以在`createWidget`函数中创建出来的窗体再设置一个事件过滤器，提供一些为`Qt Designer`额外赋予的操作，最典型的就是在设计QMainWindow时，能动态操作工具栏和菜单栏dockwidget，查看`Qt Designer`的源码，大部分的常用控件在`createWidget`都返回一个特定的窗体，处理一些拖曳事件修改事件。
 
 ###  domXml
 
-`domXml`函数是真正关系到设计好的窗体和我们最后显示的效果，因为它是决定了*.ui文件是如何生成的，官方对这个函数说明比较少，需要看源码慢慢摸索，如果仅仅只是普通的单一窗口，不涉及嵌套窗体，这个函数还是比较套路化的，但是如果是类似于`QTabBar`、`QStackedWidget`这种，在qt designer中还可以添加子窗口，就比较复杂了属于`Container`类型。
+`domXml`函数是真正关系到设计好的窗体和我们最后显示的效果，因为它是决定了*.ui文件是如何生成的，官方对这个函数说明比较少，需要看源码慢慢摸索，如果仅仅只是普通的单一窗口，不涉及嵌套窗体，这个函数还是比较套路化的，但是如果是类似于`QTabBar`、`QStackedWidget`这种，在`Qt Designer`中还可以添加子窗口，就比较复杂了属于`Container`类型。
 
 最简单的套路化的domXml返回如下：
 ``` xml
@@ -118,7 +144,7 @@ class SARibbonMainWindowDesignerPlugin : public QObject,
 
 `<customwidgets>`是对一些特殊的窗口设置标签，例如对容器类窗口，需要指定添加子页面的方法`<addpagemethod>`，那么对于
 
-> `<ui>`标签下的`displayname`属性是qt designer中的显示名字，`<widget>`标签的`name`属性是对象的object name
+> `<ui>`标签下的`displayname`属性是`Qt Designer`中的显示名字，`<widget>`标签的`name`属性是对象的object name
 
 ### initialize
 
@@ -134,15 +160,175 @@ class XXXPlugin : public QDesignerCustomWidgetInterface
 {
     ......
 private:
-    bool m_initialized;
+    bool m_initialized;///< 用来记录控件是否完成初始化的
 }
 ```
+
 cpp文件
+
 ```cpp
-class ADC_Para_BoolWidgetPlugin : public QDesignerCustomWidgetInterface
+void XXXPlugin::initialize(QDesignerFormEditorInterface *  core )
 {
-    ......
+    //保证只初始化一遍
+    if (m_initialized)
+        return;
+    m_initialized = true;
+}
+```
+
+这是简单控件的做法，那`initialize`有什么用呢，这里的主要作用是告诉`Qt Designer`是否需要一些特殊的操作，如控件的右键菜单涉及到`QDesignerTaskMenuExtension`,是否能添加子窗体，涉及到`QDesignerContainerExtension`等等`Extension`的操作都需要在这里执行，因此，对于一些复杂控件，这里一般是这样写的：
+
+```cpp
+void XXXPlugin::initialize(QDesignerFormEditorInterface *core)
+{
+    if (m_isInitialized) {
+        return;
+    }
+    QExtensionManager *mgr = core->extensionManager();
+
+    if (mgr) {
+        //添加附加功能
+        mgr->registerExtensions(new XXXContainerFactory(mgr)
+            , Q_TYPEID(QDesignerContainerExtension));
+        mgr->registerExtensions(new XXXTaskMenuFactory(mgr)
+            , Q_TYPEID(QDesignerTaskMenuExtension));
+    }
+    m_isInitialized = true;
+}
+```
+
+## QDesignerCustomWidgetCollectionInterface
+
+这个类比较简单，所有放到前面先讲，这是一个管理类，看名字就知道，目的是管理一堆`QDesignerCustomWidgetInterface`,如果你的控件有很多，要按照一组暴露给`Qt Designer`，那么最好就用这个类。
+
+这个类写法比较固定，以SARibbon为例，PluginCollection写法如下：
+
+头文件基本不用改，除了IID
+```cpp
+#include <QDesignerCustomWidgetInterface>
+class SARibbonPluginCollection : public QObject, public QDesignerCustomWidgetCollectionInterface
+{
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "SA.SARibbon.SARibbonPluginCollection")//给一个iid
+    Q_INTERFACES(QDesignerCustomWidgetCollectionInterface)
+public:
+    SARibbonPluginCollection(QObject *p = nullptr);
+    QList<QDesignerCustomWidgetInterface *> customWidgets() const Q_DECL_OVERRIDE;
+
 private:
-    bool m_initialized;
+    QList<QDesignerCustomWidgetInterface *> m_widgets;
+};
+
+```
+
+cpp文件就是用于注册插件
+
+```cpp
+#include "SARibbonPluginCollection.h"
+//以下是自己插件的头文件
+#include "SARibbonMainWindowDesignerPlugin.h"
+#include "SARibbonBarDesignerPlugin.h"
+#include "SARibbonCategoryDesignerPlugin.h"
+#include "SARibbonPannelDesignerPlugin.h"
+
+SARibbonPluginCollection::SARibbonPluginCollection(QObject *p) : QObject(p)
+{
+    m_widgets.append(new SARibbonMainWindowDesignerPlugin(this));
+    m_widgets.append(new SARibbonBarDesignerPlugin(this));
+    m_widgets.append(new SARibbonCategoryDesignerPlugin(this));
+    m_widgets.append(new SARibbonPannelDesignerPlugin(this));
+}
+
+
+QList<QDesignerCustomWidgetInterface *> SARibbonPluginCollection::customWidgets() const
+{
+    return (m_widgets);
+}
+```
+
+你有多少个插件，就在构造函数里构造多少个，通过此类就可以导出所有插件。
+
+# 插件扩展相关的几个类
+
+## QExtensionManager 和 QExtensionFactory
+
+扩展都是使用抽象工厂设计模式实现的，所有的扩展（`Extension`）都是由扩展工厂(`ExtensionFactory`)生成，所有的工厂由`QExtensionManager`进行管理，因此，要给控件提供扩展，需要实现一个扩展工厂和一个扩展类，扩展工厂负责生成扩展类，然后把扩展工厂注册到扩展管理器中。
+
+扩展工厂注册到扩展管理器是在`QDesignerCustomWidgetInterface`类的`initialize`方法中进行。
+
+在会触发到扩展的场景就会调用工厂的工厂函数：
+
+```cpp
+ QObject *QExtensionFactory::createExtension(QObject *object, const QString &iid, QObject *parent) const
+```
+
+这个函数用于判断是否需要生成扩展，函数的第二个参数iid用于判断当前是什么情况触发的扩展，可以通过`Q_TYPEID`宏来判断，例如：
+
+```cpp
+if (iid == Q_TYPEID(QDesignerTaskMenuExtension)){
+    //说明这个是在请求右键菜单扩展
+}
+```
+
+目前`Qt Designer`提供了4种默认扩展: `QDesignerContainerExtension` , `QDesignerMemberSheetExtension`, `QDesignerPropertySheetExtension` 和 `QDesignerTaskMenuExtension`。
+
+## QDesignerTaskMenuExtension
+
+这个扩展最好理解，就是为插件提供右键扩展的，当在自己的插件上点右键时就会调用这个扩展
+
+我们要把自己想要的菜单（`QAction`）添加到这个类里，这个抽象类的关键接口函数是：
+
+```cpp
+virtual QList<QAction *> taskActions() const = 0
+```
+
+在这个函数里生成想要的菜单即可，常规套路如下：
+
+头文件
+
+```cpp
+class SARibbonMainWindowTaskMenuExtension : public QObject, public QDesignerTaskMenuExtension
+{
+    Q_OBJECT
+    Q_INTERFACES(QDesignerTaskMenuExtension)
+public:
+    SARibbonMainWindowTaskMenuExtension(QWidget *w, QObject *p = nullptr);
+    QList<QAction *> taskActions() const;
+private:
+    void initActions();
+    QDesignerFormWindowInterface *formWindowInterface() const;
+    QDesignerFormEditorInterface *core() const;
+private:
+    void initActions();
+private:
+    QList<QAction *> m_actions;
+    QWidget *m_widget;///< 一般会传入一个控件的指针保存
+};
+```
+
+cpp文件：
+
+```cpp
+SARibbonMainWindowTaskMenuExtension::SARibbonMainWindowTaskMenuExtension(QWidget *w, QObject *p)
+    : QObject(p)
+    , m_widget(w)
+{
+    initActions();
+}
+
+
+QList<QAction *> SARibbonMainWindowTaskMenuExtension::taskActions() const
+{
+    return (m_actions);
+}
+
+void SARibbonMainWindowTaskMenuExtension::initActions()
+{
+    m_useRibbon = new QAction(tr("use ribbon"), this);
+
+    m_useRibbon->setObjectName(QStringLiteral("use_ribbon"));
+    connect(m_useRibbon, &QAction::triggered, this, &SARibbonMainWindowTaskMenuExtension::onUseRibbon);
+
+    m_actions.append(m_useRibbon);
 }
 ```
