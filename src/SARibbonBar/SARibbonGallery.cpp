@@ -71,13 +71,13 @@ public:
         viewportGroup = nullptr;
         btnLayout = new QBoxLayout(QBoxLayout::TopToBottom);
         btnLayout->setSpacing(0);
-        btnLayout->setMargin(0);
+        btnLayout->setContentsMargins(0, 0, 0, 0);
         btnLayout->addWidget(buttonUp);
         btnLayout->addWidget(buttonDown);
         btnLayout->addWidget(buttonMore);
         layout = new QBoxLayout(QBoxLayout::RightToLeft);
         layout->setSpacing(0);
-        layout->setMargin(0);
+        layout->setContentsMargins(0, 0, 0, 0);
         layout->addLayout(btnLayout);
         layout->addStretch();
         parent->setLayout(layout);
@@ -125,7 +125,7 @@ RibbonGalleryViewport::RibbonGalleryViewport(QWidget *parent) : QWidget(parent)
     setWindowFlags(Qt::Popup);
     m_layout = new QVBoxLayout(this);
     m_layout->setSpacing(0);
-    m_layout->setMargin(0);
+    m_layout->setContentsMargins(0, 0, 0, 0);
 }
 
 
