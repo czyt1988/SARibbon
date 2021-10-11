@@ -5,7 +5,6 @@
 #include <QLinearGradient>
 #include <QDebug>
 #include <QApplication>
-#include <QDesktopWidget>
 #include "SARibbonToolButton.h"
 #include <QHBoxLayout>
 #include "SARibbonCategoryLayout.h"
