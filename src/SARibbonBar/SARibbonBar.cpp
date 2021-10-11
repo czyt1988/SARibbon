@@ -10,7 +10,6 @@
 #include <QLinearGradient>
 #include <QDebug>
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QAction>
 #include <QHoverEvent>
 #include <QTimer>

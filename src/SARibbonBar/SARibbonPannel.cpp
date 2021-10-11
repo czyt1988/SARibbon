@@ -9,7 +9,6 @@
 #include <QFontMetrics>
 #include <QPainter>
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QWidgetAction>
 #include <QMenu>
 #include "SARibbonPannelLayout.h"
