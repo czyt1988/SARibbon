@@ -45,7 +45,7 @@ void SARibbonSeparatorWidget::paintEvent(QPaintEvent *event)
     Q_UNUSED(event);
     QPainter painter(this);
 
-    painter.setPen(palette().background().color().darker(114));
+    painter.setPen(palette().window().color().darker(114));
     int x1 = rect().center().x();
 
     painter.drawLine(QPoint(x1, rect().top() + m_topMargins), QPoint(x1, rect().bottom() - m_bottomMargins));

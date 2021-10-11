@@ -642,7 +642,7 @@ void SARibbonCategoryPrivate::setBackgroundBrush(const QBrush& brush)
 {
     QPalette p = ribbonCategory()->palette();
 
-    p.setBrush(QPalette::Background, brush);
+    p.setBrush(QPalette::Window, brush);
     ribbonCategory()->setPalette(p);
 }
 
