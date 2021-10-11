@@ -69,7 +69,7 @@ QList<SARibbonCustomizeData> sa_customize_datas_from_xml(QXmlStreamReader *xml, 
     {
         qDebug()<<"name:" << xml->name() << " qualifiedName:" << xml->qualifiedName();
 
-        if (xml->isStartElement() && (xml->name() == "sa-ribbon-customize")) {
+        if (xml->isStartElement() && (xml->name().toString() == "sa-ribbon-customize")) {
             break;
         }
         xml->readNext();
@@ -79,7 +79,7 @@ QList<SARibbonCustomizeData> sa_customize_datas_from_xml(QXmlStreamReader *xml, 
     //开始遍历"customize-data"
     while (!xml->atEnd())
     {
-        if (xml->isStartElement() && (xml->name() == "customize-data")) {
+        if (xml->isStartElement() && (xml->name().toString() == "customize-data")) {
             //首先读取属性type
             SARibbonCustomizeData d;
             QXmlStreamAttributes attrs = xml->attributes();
