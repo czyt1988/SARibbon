@@ -4,10 +4,10 @@ set(LIB_NAME SARibbonBar)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-qt5_add_resources(QRCS resource.qrc)
+qt_add_resources(QRCS resource.qrc)
 
 SET(HEADER_FILES
-    FramelessHelper.h
+    SAFramelessHelper.h
     SARibbonActionsManager.h
     SARibbonApplicationButton.h
     SARibbonBar.h
@@ -45,7 +45,7 @@ SET(HEADER_FILES
 )
 
 SET(SOURCE_FILES
-    FramelessHelper.cpp
+    SAFramelessHelper.cpp
     SARibbonActionsManager.cpp
     SARibbonApplicationButton.cpp
     SARibbonBar.cpp
@@ -89,7 +89,7 @@ add_library(${LIB_NAME} SHARED
     ${SOURCE_FILES}
     )
 
-target_link_libraries(${LIB_NAME} ${Qt5Widgets_LIBRARIES})
+target_link_libraries(${LIB_NAME} ${Qt${QT_VERSION_MAJOR}Widgets_LIBRARIES})
 
 SET_TARGET_PROPERTIES(${LIB_NAME} PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
 
