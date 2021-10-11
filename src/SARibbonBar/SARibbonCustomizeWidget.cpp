@@ -871,7 +871,9 @@ bool SARibbonCustomizeWidget::toXml(const QString& xmlpath) const
 
     xml.setAutoFormatting(true);
     xml.setAutoFormattingIndent(2);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0) // QXmlStreamWriter always encodes XML in UTF-8.
     xml.setCodec("utf-8");//在writeStartDocument之前指定编码
+#endif
     xml.writeStartDocument();
     bool isOK = toXml(&xml);
 
