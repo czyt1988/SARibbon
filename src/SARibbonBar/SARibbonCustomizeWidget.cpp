@@ -1,7 +1,7 @@
 ﻿#include "SARibbonCustomizeWidget.h"
 #include <QDebug>
 #include <QtCore/QVariant>
-#include <QtWidgets/QAction>
+#include <QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QComboBox>
