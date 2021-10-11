@@ -43,11 +43,11 @@ public:
             QGridLayout *layout = new QGridLayout(Parent);
             layout->setDefaultPositioning(2, Qt::Vertical);
             Parent->setFixedHeight(60);
-            layout->setMargin(isInPanel?5:0);
+            layout->setContentsMargins(isInPanel ? 5 : 0, isInPanel ? 5 : 0, isInPanel ? 5 : 0, isInPanel ? 5 : 0);
             layout->setSpacing(isInPanel?5:0);
         } else {
             QHBoxLayout *layout = new QHBoxLayout(Parent);
-            layout->setMargin(0);
+            layout->setContentsMargins(0, 0, 0, 0);
             layout->setSpacing(0);
         }
         Parent->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
