@@ -1,7 +1,7 @@
 ﻿#include "SARibbonCustomizeWidget.h"
 #include <QDebug>
 #include <QtCore/QVariant>
-#include <QtWidgets/QAction>
+#include <QAction>
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QButtonGroup>
 #include <QtWidgets/QComboBox>
@@ -69,7 +69,7 @@ QList<SARibbonCustomizeData> sa_customize_datas_from_xml(QXmlStreamReader *xml, 
     {
         qDebug()<<"name:" << xml->name() << " qualifiedName:" << xml->qualifiedName();
 
-        if (xml->isStartElement() && (xml->name() == "sa-ribbon-customize")) {
+        if (xml->isStartElement() && (xml->name().toString() == "sa-ribbon-customize")) {
             break;
         }
         xml->readNext();
@@ -79,7 +79,7 @@ QList<SARibbonCustomizeData> sa_customize_datas_from_xml(QXmlStreamReader *xml, 
     //开始遍历"customize-data"
     while (!xml->atEnd())
     {
-        if (xml->isStartElement() && (xml->name() == "customize-data")) {
+        if (xml->isStartElement() && (xml->name().toString() == "customize-data")) {
             //首先读取属性type
             SARibbonCustomizeData d;
             QXmlStreamAttributes attrs = xml->attributes();
@@ -871,7 +871,9 @@ bool SARibbonCustomizeWidget::toXml(const QString& xmlpath) const
 
     xml.setAutoFormatting(true);
     xml.setAutoFormattingIndent(2);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0) // QXmlStreamWriter always encodes XML in UTF-8.
     xml.setCodec("utf-8");//在writeStartDocument之前指定编码
+#endif
     xml.writeStartDocument();
     bool isOK = toXml(&xml);
 

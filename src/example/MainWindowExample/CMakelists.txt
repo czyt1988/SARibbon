@@ -6,7 +6,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 include_directories(${CMAKE_SOURCE_DIR}/src/SARibbonBar/)
 
-qt5_add_resources(QRCS saribbonresouce.qrc)
+qt_add_resources(QRCS saribbonresouce.qrc)
 
 add_executable(${EXPAMPLE_NAME} 
     ${QRCS}
@@ -16,7 +16,7 @@ add_executable(${EXPAMPLE_NAME}
     )
 
 target_link_libraries(${EXPAMPLE_NAME} 
-	${Qt5Widgets_LIBRARIES}
+        ${Qt${QT_VERSION_MAJOR}Widgets_LIBRARIES}
 	SARibbonBar
 	)
 
