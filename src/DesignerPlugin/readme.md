@@ -36,6 +36,7 @@ Qt帮助文档搜：`Creating Custom Widgets for Qt Designer`能获得官方文�
 - `QDesignerObjectInspectorInterface`
 - `QDesignerMetaDataBaseInterface`
 
+
 上面加粗的是需要比较关注的类
 
 如果仅仅是单一的窗体控件，实际用到的不多，也就`QDesignerCustomWidgetInterface`或者`QDesignerFormEditorInterface`,但要是复杂的控件，如`SARibbon`又要支持redo/undo，就要面对更多的接口，而Qt在一些不常用的接口说明极少，只能看源码来摸索。
@@ -332,3 +333,105 @@ void SARibbonMainWindowTaskMenuExtension::initActions()
     m_actions.append(m_useRibbon);
 }
 ```
+
+## QDesignerContainerExtension
+
+这个是针对“容器”类窗体的扩展，容器类窗体就是有一些特殊的方法，可以添加“页面”，典型的如`QTabbar`和`QStackedWidget`，他们是可以添加widget作为其子页面，例如：`QStackedWidget::addWidget(QWidget *widget)`，在designer里，这种窗体在ui文件里会调用他们他有的添加窗体函数进行窗体的添加，这个扩展有如下几个接口需要实现：
+
+```cpp
+virtual int count() const = 0;
+virtual QWidget *widget(int index) const = 0;
+virtual int currentIndex() const = 0;
+virtual void setCurrentIndex(int index) = 0;
+virtual void addWidget(QWidget *widget) = 0;
+virtual void insertWidget(int index, QWidget *widget) = 0;
+virtual void remove(int index) = 0;
+```
+
+看这几个函数感觉就是`QStackedWidget`的翻版~~。
+
+要支持`QDesignerContainerExtension`，`QDesignerCustomWidgetInterface`的`bool isContainer() const`接口必须返回true，同时`QDesignerCustomWidgetInterface`的`domXml`生成的ui描述文件要指定`<addpagemethod>`标签，声明添加页面的函数名是啥，通过这个标签，qmake过程中生成的ui_xx.h文件会形成:`窗体指针->addpagemethod(widget);`这样的代码。
+
+这里以一个例子介绍`QDesignerContainerExtension`的使用方法，SARibbon中的层级关系非常明显，最顶层是`SARibbonBar`，下面`SARibbonCategory`，再下层是`SARibbonPannel`，他们就是典型的“容器”，以`SARibbonCategory`为例子，更好理解，`SARibbonCategory`相当于一个tab标签页，标签页下要添加一个或多个`SARibbonPannel`，因此`SARibbonCategory`对应的`QDesignerCustomWidgetInterface`的`bool isContainer() const`接口返回true
+
+```cpp
+bool SARibbonCategoryDesignerPlugin::isContainer() const
+{
+    return (false);
+}
+
+QString SARibbonCategoryDesignerPlugin::domXml() const
+{
+    return ("<ui language=\"c++\" displayname=\"Ribbon Category Page\">\n"
+           " <widget class=\"SARibbonCategory\" name=\"ribbonCategoryPage\"/>\n"
+           " <customwidgets>\n"
+           "   <customwidget>\n"
+           "       <class>SARibbonCategory</class>\n"
+           "       <extends>QWidget</extends>\n"
+           "       <addpagemethod>addPannel</addpagemethod>\n"
+           "   </customwidget>\n"
+           " </customwidgets>\n"
+           "</ui>\n");
+}
+```
+
+其`domXml`函数指定`<addpagemethod>`标签的方法名为`addPannel`
+
+```cpp
+    //添加pannel
+    SARibbonPannel *addPannel(const QString& title);
+
+    //添加pannel
+    void addPannel(SARibbonPannel *pannel);
+
+    //qt designer专用
+    void addPannel(QWidget *pannel);
+```
+
+`SARibbonCategory`的`addPannel`函数专门提供了通用版的`void addPannel(QWidget *pannel);`，以便`Qt Designer`使用
+
+在`SARibbonCategoryDesignerPlugin`的initialize函数中，注册插件工厂`SARibbonCategoryContainerFactory`：
+
+```cpp
+void SARibbonCategoryDesignerPlugin::initialize(QDesignerFormEditorInterface *core)
+{
+    if (m_isInitialized) {
+        return;
+    }
+    QExtensionManager *mgr = core->extensionManager();
+
+    if (mgr) {
+        mgr->registerExtensions(new SARibbonCategoryContainerFactory(mgr)
+            , Q_TYPEID(QDesignerContainerExtension));
+        mgr->registerExtensions(new SARibbonBarTaskMenuFactory(mgr)
+            , Q_TYPEID(QDesignerTaskMenuExtension));
+    }
+
+    m_isInitialized = true;
+}
+```
+
+基本上`SARibbonCategoryDesignerPlugin`的工作就完成，剩下的是`SARibbonCategoryContainerExtension`的工作
+
+关键函数`addWidget(QWidget *widget)`，这个函数是在此窗体体检子窗体时调用
+
+```cpp
+void SARibbonCategoryContainerExtension::addWidget(QWidget *widget)
+{
+    if (SARibbonPannel *pannel = qobject_cast<SARibbonPannel *>(widget)) {
+        if (pannel->pannelName().isEmpty()) {
+            QString title = QObject::tr("pannel %1").arg(count());
+            pannel->setPannelName(title);
+        }
+        m_category->addPannel(pannel);
+        pannel->show();
+        QDesignerFormWindowInterface::findFormWindow(m_category)->manageWidget(pannel);
+    }
+}
+```
+
+这里要做的是判断窗口能否添加，由于`SARibbonCategory`只允许添加`SARibbonPannel`,因此需要做一层判断，如果判断成功，可以添加，需要通知`QDesignerFormWindowInterface`把这个窗口管理起来：`QDesignerFormWindowInterface::findFormWindow(m_category)->manageWidget(pannel);`
+
+另外的几个函数只需窗体实现对应功能即可，不需要操作`Qt Designer`的接口，直接对应的窗体也实现对应的功能即可。
+
+`void insertWidget(int index, QWidget *widget) Q_DECL_OVERRIDE;`这个接口如果有些不支持的话，直接继承不处理即可

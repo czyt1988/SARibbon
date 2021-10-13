@@ -110,10 +110,13 @@ void SARibbonCategoryTaskMenuExtension::onAddPannel()
         return;
     }
     SA_PLUGIN_LOG("start add pannel");
-    QDesignerContainerExtension *c = qt_extension<QDesignerContainerExtension *>(core->extensionManager(), category);
+
     SARibbonPannel *pannel = qobject_cast<SARibbonPannel *>(core->widgetFactory()->createWidget("SARibbonPannel", category));
 
     core->widgetFactory()->initialize(pannel);
+
+    QDesignerContainerExtension *c = qt_extension<QDesignerContainerExtension *>(core->extensionManager(), category);
+
     c->addWidget(pannel);
     pannel->setObjectName(QLatin1String("ribbonPannel"));
     fw->ensureUniqueObjectName(pannel);
