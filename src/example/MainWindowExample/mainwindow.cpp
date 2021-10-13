@@ -140,7 +140,9 @@ MainWindow::MainWindow(QWidget *par) : SARibbonMainWindow(par)
             QXmlStreamWriter xml(&str);
             xml.setAutoFormatting(true);
             xml.setAutoFormattingIndent(2);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0) // QXmlStreamWriter always encodes XML in UTF-8.
             xml.setCodec("utf-8");
+#endif
             xml.writeStartDocument();
             bool isok = dlg.toXml(&xml);
             xml.writeEndDocument();
@@ -148,7 +150,9 @@ MainWindow::MainWindow(QWidget *par) : SARibbonMainWindow(par)
                 QFile f("customize.xml");
                 if (f.open(QIODevice::ReadWrite|QIODevice::Text|QIODevice::Truncate)) {
                     QTextStream s(&f);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0) // QTextStream always encodes XML in UTF-8.
                     s.setCodec("utf-8");
+#endif
                     s << str;
                     s.flush();
                 }
@@ -276,7 +280,11 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
     g->addButton(r, SARibbonBar::WpsLiteStyleTwoRow);
 
 //    connect(g, QOverload<int>::of(&QButtonGroup::buttonClicked), this, &MainWindow::onStyleClicked);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    connect(g, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::idClicked), this, &MainWindow::onStyleClicked);
+#else
     connect(g, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked), this, &MainWindow::onStyleClicked);
+#endif
     act = new QAction(this);
     act->setObjectName(("test 1"));
     act->setIcon(QIcon(":/icon/icon/folder.png"));

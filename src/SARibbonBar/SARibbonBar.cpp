@@ -10,7 +10,6 @@
 #include <QLinearGradient>
 #include <QDebug>
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QAction>
 #include <QHoverEvent>
 #include <QTimer>
@@ -1534,7 +1533,7 @@ void SARibbonBar::paintContextCategoryTab(QPainter& painter, const QString& titl
     painter.drawRect(QRect(contextRect.x(), RibbonSubElementStyleOpt.widgetBord.top(), contextRect.width(), 5));
 
     //剩下把颜色变亮90%
-    QColor gColor = color.light(190);
+    QColor gColor = color.lighter(190);
 
     //减去之前的5像素
     contextRect -= QMargins(0, 5, 0, 0);

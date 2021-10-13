@@ -8,7 +8,7 @@ SARibbonLineWidgetContainer::SARibbonLineWidgetContainer(QWidget *par) : QWidget
     m_labelSuffix = new QLabel(this);
     QHBoxLayout *lay = new QHBoxLayout();
 
-    lay->setMargin(0);
+    lay->setContentsMargins(0, 0, 0, 0);
     lay->setSpacing(0);
     lay->addWidget(m_labelPrefix);
     lay->addWidget(m_labelSuffix);
