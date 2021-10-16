@@ -268,7 +268,7 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
     g->addButton(r, SARibbonBar::WpsLiteStyle);
     r = new QRadioButton();
     r->setObjectName(("use office 2row style"));
-    r->setText(("use office 2row style"));
+    r->setText(("use office 2 row style"));
     r->setChecked(false);
     pannel->addSmallWidget(r);
     g->addButton(r, SARibbonBar::OfficeStyleTwoRow);
@@ -308,7 +308,7 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
     act = new QAction(this);
     act->setObjectName(("DelayedPopup"));
     act->setIcon(QIcon(":/icon/icon/folder.png"));
-    act->setText(("DelayedPopup"));
+    act->setText(("Delayed Popup"));
     act->setMenu(menu);
     btn = pannel->addLargeAction(act);
     btn->setPopupMode(QToolButton::DelayedPopup);
@@ -317,37 +317,37 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
 
     act = new QAction(this);
     act->setIcon(QIcon(":/icon/icon/folder.png"));
-    act->setText(("MenuButtonPopup"));
+    act->setText(("Menu Button Popup"));
     act->setMenu(menu);
     btn = pannel->addLargeAction(act);
-    btn->setObjectName(("MenuButtonPopup"));
+    btn->setObjectName(("Menu Button Popup"));
     btn->setPopupMode(QToolButton::MenuButtonPopup);
     connect(act, &QAction::triggered, this, &MainWindow::onMenuButtonPopupCheckabletriggered);
 
     act = new QAction(this);
     act->setIcon(QIcon(":/icon/icon/Graph-add.png"));
-    act->setText(("InstantPopup"));
+    act->setText(("Instant Popup"));
     act->setMenu(menu);
     btn = pannel->addLargeAction(act);
-    btn->setObjectName("buttonInstantPopup");
+    btn->setObjectName("button Instant Popup");
     btn->setPopupMode(QToolButton::InstantPopup);
     connect(act, &QAction::triggered, this, &MainWindow::onInstantPopupCheckabletriggered);
 
     act = new QAction(this);
     act->setCheckable(true);
     act->setIcon(QIcon(":/icon/icon/folder.png"));
-    act->setText(("DelayedPopup checkable"));
+    act->setText(("Delayed Popup checkable"));
     act->setMenu(menu);
     btn = pannel->addLargeAction(act);
     btn->setPopupMode(QToolButton::DelayedPopup);
     btn->setCheckable(true);
-    btn->setObjectName("DelayedPopup checkable");
+    btn->setObjectName("Delayed Popup checkable");
     connect(act, &QAction::triggered, this, &MainWindow::onDelayedPopupCheckableTest);
 
     act = new QAction(this);
     act->setCheckable(true);
     act->setIcon(QIcon(":/icon/icon/folder.png"));
-    act->setText(("MenuButtonPopup checkable"));
+    act->setText(("Menu Button Popup checkable"));
     act->setMenu(menu);
     btn = pannel->addLargeAction(act);
     btn->setPopupMode(QToolButton::MenuButtonPopup);
@@ -542,6 +542,10 @@ void MainWindow::createCategoryOther(SARibbonCategory *page)
     SARibbonToolButton *b = pannel->addLargeAction(appBtn);
 
     b->setObjectName("ApplicationButtonTest");
+
+    appBtn = new QAction(QIcon(":/icon/icon/icon2.png"), tr("Show Infomation Window"), this);
+    appBtn->setObjectName(("Show Infomation Window"));
+    pannel->addLargeAction(appBtn);
 
     QAction *useqss = new QAction(QIcon(":/icon/icon/icon2.png"), tr("use qss"), this);
 
