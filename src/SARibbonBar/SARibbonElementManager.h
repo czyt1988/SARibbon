@@ -4,20 +4,20 @@
 #include "SARibbonGlobal.h"
 
 ///
-/// \brief 此类是一个全局单例，用于管理SARibbonElementCreateDelegate
+/// \brief SARibbonElementCreateDelegate
 ///
 class SA_RIBBON_EXPORT SARibbonElementManager
 {
 protected:
-    SARibbonElementManager();
+	SARibbonElementManager();
 public:
-    virtual ~SARibbonElementManager();
-    static SARibbonElementManager *instance();
-    SARibbonElementCreateDelegate *delegate();
-    void setupDelegate(SARibbonElementCreateDelegate *delegate);
+	virtual ~SARibbonElementManager();
+	static SARibbonElementManager *instance();
+	SARibbonElementCreateDelegate *delegate();
+	void setupDelegate(SARibbonElementCreateDelegate *delegate);
 
 private:
-    SARibbonElementCreateDelegate *m_delegate;
+	SARibbonElementCreateDelegate *m_delegate;
 };
 #ifndef RibbonSubElementMgr
 #define RibbonSubElementMgr		SARibbonElementManager::instance()

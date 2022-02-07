@@ -2,19 +2,19 @@
 
 
 SARibbonTabBar::SARibbonTabBar(QWidget *parent) : QTabBar(parent)
-    , m_tabMargin(6, 0, 0, 0)
+, m_tabMargin(6, 0, 0, 0)
 {
-    setExpanding(false);
+	setExpanding(false);
 }
 
 
 const QMargins& SARibbonTabBar::tabMargin() const
 {
-    return (m_tabMargin);
+	return (m_tabMargin);
 }
 
 
 void SARibbonTabBar::setTabMargin(const QMargins& tabMargin)
 {
-    m_tabMargin = tabMargin;
+	m_tabMargin = tabMargin;
 }

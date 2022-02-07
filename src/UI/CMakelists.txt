@@ -1,0 +1,21 @@
+set(EXPAMPLE_NAME MainWindowExample)
+
+set(CMAKE_AUTOMOC ON)
+
+include_directories(${CMAKE_SOURCE_DIR}/sources/SARibbonBar)
+LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/sources/SARibbon/lib)
+
+qt5_add_resources(QRCS saribbonresouce.qrc)
+
+add_executable(${EXPAMPLE_NAME} 
+    ${QRCS}
+    mainwindow.h
+    mainwindow.cpp
+    main.cpp
+    )
+
+target_link_libraries(${EXPAMPLE_NAME} PUBLIC
+        Qt5::Widgets
+		SARibbonBar
+	)
+

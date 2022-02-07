@@ -2,24 +2,24 @@
 
 
 SARibbonApplicationButton::SARibbonApplicationButton(QWidget *parent)
-    : QPushButton(parent)
+	: QPushButton(parent)
 {
-    setFocusPolicy(Qt::NoFocus);
-    setFlat(true);
+	setFocusPolicy(Qt::NoFocus);
+	setFlat(true);
 }
 
 
 SARibbonApplicationButton::SARibbonApplicationButton(const QString& text, QWidget *parent)
-    : QPushButton(text, parent)
+	: QPushButton(text, parent)
 {
-    setFocusPolicy(Qt::NoFocus);
-    setFlat(true);
+	setFocusPolicy(Qt::NoFocus);
+	setFlat(true);
 }
 
 
 SARibbonApplicationButton::SARibbonApplicationButton(const QIcon& icon, const QString& text, QWidget *parent)
-    : QPushButton(icon, text, parent)
+	: QPushButton(icon, text, parent)
 {
-    setFocusPolicy(Qt::NoFocus);
-    setFlat(true);
+	setFocusPolicy(Qt::NoFocus);
+	setFlat(true);
 }

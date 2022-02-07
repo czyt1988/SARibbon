@@ -2,6 +2,6 @@
 
 
 SARibbonControlButton::SARibbonControlButton(QWidget *parent)
-    : QToolButton(parent)
+	: QToolButton(parent)
 {
 }

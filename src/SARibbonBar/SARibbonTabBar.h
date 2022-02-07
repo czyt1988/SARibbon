@@ -9,14 +9,14 @@
  */
 class SA_RIBBON_EXPORT SARibbonTabBar : public QTabBar
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    SARibbonTabBar(QWidget *parent = Q_NULLPTR);
-    const QMargins& tabMargin() const;
-    void setTabMargin(const QMargins& tabMargin);
+	SARibbonTabBar(QWidget *parent = Q_NULLPTR);
+	const QMargins& tabMargin() const;
+	void setTabMargin(const QMargins& tabMargin);
 
 private:
-    QMargins m_tabMargin;
+	QMargins m_tabMargin;
 };
 
 #endif // SARIBBONTABBAR_H

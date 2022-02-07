@@ -1,34 +1,55 @@
-cmake_minimum_required(VERSION 3.15)
+#cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.12)
 project(SARibbon)
 
-include(CPack)
+set(CMAKE_CXX_STANDARD 11)
+message ("CMAKE_BUILD_TYPE" ${CMAKE_BUILD_TYPE})
 
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core REQUIRED)
-message(STATUS "QT: ${QT_VERSION_MAJOR}")
-
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS
-    Widgets
-    GUI
-    )
-
-include_directories(
-    ${Qt${QT_VERSION_MAJOR}Widgets_INCLUDE_DIRS}
-    )
-    
-add_definitions(
-    ${Qt${QT_VERSION_MAJOR}Widgets_DEFINITIONS}
-    )
+if(${CMAKE_BUILD_TYPE} MATCHES Debug)
+	message("Debug mode")
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/out/bin/debug)
+elseif(${CMAKE_BUILD_TYPE} MATCHES RelWithDebInfo)
+	message("Release mode")
+	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/out/bin/release)
+endif(${CMAKE_BUILD_TYPE} MATCHES RELEASE)
 
 
-SET(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "add a postfix, usually d on windows")
-SET(CMAKE_RELEASE_POSTFIX "" CACHE STRING "add a postfix, usually empty on windows")
-SET(CMAKE_RELWITHDEBINFO_POSTFIX "rd" CACHE STRING "add a postfix, usually empty on windows")
-SET(CMAKE_MINSIZEREL_POSTFIX "s" CACHE STRING "add a postfix, usually empty on windows")
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/out/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/out/lib)
+
+message("CMAKE_CURRENT_BINARY_DIR" ${CMAKE_CURRENT_BINARY_DIR}/bin)
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/UI)
+
+message("CMAKE_CURRENT_SOURCE_DIR" ${CMAKE_CURRENT_SOURCE_DIR})
+message("CMAKE_SOURCE_DIR" ${CMAKE_SOURCE_DIR})
+# set(Qt5_DIR "D:/_MySoftwares/Work/Qt5.12.0/5.12.0/msvc2017_64/lib/cmake/Qt5")
+#set(CMAKE_PREFIX_PATH "/Qt/5.12.12/msvc2017_64")
+set(Qt5_DIR "/Qt/5.12.12/msvc2017_64/lib/cmake/Qt5")
+
+# find_package(Coin REQUIRED)
+# find_package(Boost REQUIRED)
+# find_package(Python REQUIRED COMPONENTS Interpreter Development)
+find_package(Qt5 REQUIRED COMPONENTS Widgets Svg Xml Designer PrintSupport UiTools)
+# find_package(SoQt REQUIRED)
+# find_package(SIMVoleon REQUIRED)
 
 if(MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4819")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4819 /wd4244 /wd4805")
 endif()
 
 add_subdirectory(src)
+
+if(${CMAKE_BUILD_TYPE} MATCHES Debug)
+	message("Debug mode")
+	install(FILES "${CMAKE_SOURCE_DIR}/needed_dlls/Qt5Cored.dll" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+	install(FILES "${CMAKE_SOURCE_DIR}/needed_dlls/Qt5Guid.dll" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+	install(FILES "${CMAKE_SOURCE_DIR}/needed_dlls/Qt5Widgetsd.dll" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+elseif(${CMAKE_BUILD_TYPE} MATCHES RelWithDebInfo)
+	message("Release mode")			   
+	install(FILES "${CMAKE_SOURCE_DIR}/needed_dlls/Qt5Core.dll" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+	install(FILES "${CMAKE_SOURCE_DIR}/needed_dlls/Qt5Gui.dll" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+	install(FILES "${CMAKE_SOURCE_DIR}/needed_dlls/Qt5Widgets.dll" DESTINATION "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}")
+endif(${CMAKE_BUILD_TYPE} MATCHES RelWithDebInfo)
 

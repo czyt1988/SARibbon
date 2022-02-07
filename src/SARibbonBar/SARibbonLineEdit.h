@@ -9,9 +9,9 @@
  */
 class SA_RIBBON_EXPORT SARibbonLineEdit : public QLineEdit
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    SARibbonLineEdit(QWidget *parent = Q_NULLPTR);
+	SARibbonLineEdit(QWidget *parent = Q_NULLPTR);
 };
 
 #endif // SARIBBONLINEEDIT_H

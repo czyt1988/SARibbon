@@ -16,60 +16,55 @@ class SARibbonCategoryLayoutPrivate;
  */
 class SA_RIBBON_EXPORT SARibbonCategoryLayout : public QLayout
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    SARibbonCategoryLayout(SARibbonCategory *parent);
-    ~SARibbonCategoryLayout();
+	SARibbonCategoryLayout(SARibbonCategory *parent);
+	~SARibbonCategoryLayout();
 
-    SARibbonCategory *ribbonCategory();
+	SARibbonCategory *ribbonCategory();
 
-    virtual void addItem(QLayoutItem *item) Q_DECL_OVERRIDE;
-    virtual QLayoutItem *itemAt(int index) const Q_DECL_OVERRIDE;
-    virtual QLayoutItem *takeAt(int index) Q_DECL_OVERRIDE;
-    SARibbonCategoryLayoutItem *takePannelItem(int index);
-    SARibbonCategoryLayoutItem *takePannel(SARibbonPannel *pannel);
-    virtual int count() const Q_DECL_OVERRIDE;
+	virtual void addItem(QLayoutItem *item) Q_DECL_OVERRIDE;
+	virtual QLayoutItem *itemAt(int index) const Q_DECL_OVERRIDE;
+	virtual QLayoutItem *takeAt(int index) Q_DECL_OVERRIDE;
+	SARibbonCategoryLayoutItem *takePannelItem(int index);
+	SARibbonCategoryLayoutItem *takePannel(SARibbonPannel *pannel);
+	virtual int count() const Q_DECL_OVERRIDE;
 
-    //追加一个pannel
-    void addPannel(SARibbonPannel *pannel);
+	void addPannel(SARibbonPannel *pannel);
 
-    //插入一个pannel
-    void insertPannel(int index, SARibbonPannel *pannel);
+	void insertPannel(int index, SARibbonPannel *pannel);
 
-    void setGeometry(const QRect& rect) Q_DECL_OVERRIDE;
-    QSize sizeHint() const Q_DECL_OVERRIDE;
-    QSize minimumSize() const Q_DECL_OVERRIDE;
-    Qt::Orientations expandingDirections() const Q_DECL_OVERRIDE;
-    void invalidate() Q_DECL_OVERRIDE;
+	void setGeometry(const QRect& rect) Q_DECL_OVERRIDE;
+	QSize sizeHint() const Q_DECL_OVERRIDE;
+	QSize minimumSize() const Q_DECL_OVERRIDE;
+	Qt::Orientations expandingDirections() const Q_DECL_OVERRIDE;
+	void invalidate() Q_DECL_OVERRIDE;
 
-    //更新尺寸
-    void updateGeometryArr();
+	void updateGeometryArr();
 
-    //执行位置调整
-    void doLayout();
+	void doLayout();
 
-    //返回所有pannels
-    QList<SARibbonPannel *> pannels() const;
+	QList<SARibbonPannel *> pannels() const;
 
 private slots:
-    void onLeftScrollButtonClicked();
-    void onRightScrollButtonClicked();
+	void onLeftScrollButtonClicked();
+	void onRightScrollButtonClicked();
 
 private:
-    SARibbonCategoryLayoutPrivate *m_d;
+	SARibbonCategoryLayoutPrivate *m_d;
 };
 
 
 
 /**
- * @brief SARibbonCategoryLayoutItem，用于标识SARibbonCategoryLayout的item
+ * @brief SARibbonCategoryLayoutItem，SARibbonCategoryLayoutitem
  */
 class SA_RIBBON_EXPORT SARibbonCategoryLayoutItem : public QWidgetItem
 {
 public:
-    SARibbonCategoryLayoutItem(SARibbonPannel *w);
-    SARibbonSeparatorWidget *separatorWidget;
-    QRect mWillSetGeometry;                 ///< pannel将要设置的Geometry
-    QRect mWillSetSeparatorGeometry;        ///< pannel将要设置的Separator的Geometry
+	SARibbonCategoryLayoutItem(SARibbonPannel *w);
+	SARibbonSeparatorWidget *separatorWidget;
+	QRect mWillSetGeometry;                 ///< pannel,Geometry
+	QRect mWillSetSeparatorGeometry;        ///< pannel,Separato,Geometry
 };
 #endif // SARIBBONCATEGORYLAYOUT_H
