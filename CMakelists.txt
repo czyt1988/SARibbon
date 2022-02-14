@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.12)
 project(SARibbon)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 17)
 message ("CMAKE_BUILD_TYPE" ${CMAKE_BUILD_TYPE})
 
 if(${CMAKE_BUILD_TYPE} MATCHES Debug)
@@ -16,7 +16,7 @@ elseif(${CMAKE_BUILD_TYPE} MATCHES RelWithDebInfo)
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/out/bin/relwithdebug)
 endif()
 
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/out/l ib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/out/lib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/out/lib)
 
 message("CMAKE_CURRENT_BINARY_DIR" ${CMAKE_CURRENT_BINARY_DIR}/bin)
@@ -24,6 +24,7 @@ message("CMAKE_CURRENT_BINARY_DIR" ${CMAKE_CURRENT_BINARY_DIR}/bin)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/UI)
 
+# Include settings file
 include(CMakeListsSettings_$ENV{USERNAME}.txt OPTIONAL RESULT_VARIABLE LOCAL_PATH_SETTING_OK)
 if(LOCAL_PATH_SETTING_OK)
     message("-- using local path overwriting settings of user $ENV{USERNAME}")
