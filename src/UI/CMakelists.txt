@@ -2,8 +2,8 @@ set(EXPAMPLE_NAME MainWindowExample)
 
 set(CMAKE_AUTOMOC ON)
 
-include_directories(${CMAKE_SOURCE_DIR}/sources/SARibbonBar)
-LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/sources/SARibbon/lib)
+include_directories(${CMAKE_SOURCE_DIR}/src/SARibbonBar)
+LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/SARibbon/lib)
 
 qt5_add_resources(QRCS saribbonresouce.qrc)
 

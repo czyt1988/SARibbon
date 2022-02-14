@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.12)
 project(SARibbon)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 14)
 message ("CMAKE_BUILD_TYPE" ${CMAKE_BUILD_TYPE})
 
 if(${CMAKE_BUILD_TYPE} MATCHES Debug)
@@ -16,7 +16,7 @@ elseif(${CMAKE_BUILD_TYPE} MATCHES RelWithDebInfo)
 	set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/out/bin/relwithdebug)
 endif()
 
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/out/lib)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/out/l ib)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/out/lib)
 
 message("CMAKE_CURRENT_BINARY_DIR" ${CMAKE_CURRENT_BINARY_DIR}/bin)
@@ -28,7 +28,7 @@ message("CMAKE_CURRENT_SOURCE_DIR" ${CMAKE_CURRENT_SOURCE_DIR})
 message("CMAKE_SOURCE_DIR" ${CMAKE_SOURCE_DIR})
 # set(Qt5_DIR "D:/_MySoftwares/Work/Qt5.12.0/5.12.0/msvc2017_64/lib/cmake/Qt5")
 #set(CMAKE_PREFIX_PATH "/Qt/5.12.12/msvc2017_64")
-set(Qt5_DIR "/Qt/5.12.12/msvc2017_64/lib/cmake/Qt5")
+set(Qt5_DIR "C:/Qt/5.12.12/msvc2017_64/lib/cmake/Qt5")
 
 # find_package(Coin REQUIRED)
 # find_package(Boost REQUIRED)
