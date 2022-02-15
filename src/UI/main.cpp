@@ -6,8 +6,6 @@
 
 void log_out_put(QtMsgType type, const QMessageLogContext& context, const QString& msg);
 
-
-
 void log_out_put(QtMsgType type, const QMessageLogContext& context, const QString& msg)
 {
     QByteArray localMsg = msg.toLocal8Bit();

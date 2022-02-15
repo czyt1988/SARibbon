@@ -5,10 +5,6 @@ set(CMAKE_AUTOMOC ON)
 include_directories(${CMAKE_SOURCE_DIR}/src/SARibbonBar)
 LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/SARibbon/lib)
 
-
-message("TESTT" ${PROJECT_SOURCE_DIR})
-
-
 include_directories(
                     ${PROJECT_SOURCE_DIR}/src/MultitargetTracker
                     ${PROJECT_SOURCE_DIR}/src/MultitargetTracker/common
@@ -18,6 +14,7 @@ include_directories(
                     ${PROJECT_SOURCE_DIR}/src/MultitargetTracker/Tracker
                     ${PROJECT_SOURCE_DIR}/src/MultitargetTracker/Tracker/HungarianAlg
                     ${PROJECT_SOURCE_DIR}/thirdparty
+					${PROJECT_SOURCE_DIR}/src/ExampleMTTracker
 )
 
 set(LIBS
@@ -27,6 +24,7 @@ set(LIBS
     inih
 	Qt5::Widgets
 	SARibbonBar
+	MultitargetTrackerLib
 )
 
 qt5_add_resources(QRCS saribbonresouce.qrc)

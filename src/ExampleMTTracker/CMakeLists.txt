@@ -3,7 +3,7 @@ cmake_minimum_required (VERSION 3.5)
 project(MultitargetTracker)
 
 set(SOURCES
-    main.cpp
+#    main.cpp
     VideoExample.cpp
 )
 
@@ -62,7 +62,11 @@ if (BUILD_CARS_COUNTING)
     add_definitions(-DBUILD_CARS_COUNTING)
 endif(BUILD_CARS_COUNTING)
 
+add_library(${PROJECT_NAME}Lib STATIC ${HEADERS} ${SOURCES})
 
-ADD_EXECUTABLE(${PROJECT_NAME} ${SOURCES} ${HEADERS})
+ADD_EXECUTABLE(${PROJECT_NAME} main.cpp)
 
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${LIBS})
+TARGET_LINK_LIBRARIES(${PROJECT_NAME}Lib ${LIBS})
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_NAME}Lib)
+
+
