@@ -1,2 +1,7 @@
 add_subdirectory(SARibbonBar)
 add_subdirectory(UI)
+add_subdirectory(MultiTargetTracker)
+
+if (BUILD_EXAMPLES)
+    add_subdirectory(ExampleMTTracker)
+endif(BUILD_EXAMPLES)

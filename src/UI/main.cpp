@@ -3,6 +3,7 @@
 #include <QElapsedTimer>
 #include <QDebug>
 
+
 void log_out_put(QtMsgType type, const QMessageLogContext& context, const QString& msg);
 
 

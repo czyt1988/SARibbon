@@ -5,6 +5,30 @@ set(CMAKE_AUTOMOC ON)
 include_directories(${CMAKE_SOURCE_DIR}/src/SARibbonBar)
 LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/SARibbon/lib)
 
+
+message("TESTT" ${PROJECT_SOURCE_DIR})
+
+
+include_directories(
+                    ${PROJECT_SOURCE_DIR}/src/MultitargetTracker
+                    ${PROJECT_SOURCE_DIR}/src/MultitargetTracker/common
+                    ${PROJECT_SOURCE_DIR}/src/MultitargetTracker/Detector
+                    ${PROJECT_SOURCE_DIR}/src/MultitargetTracker/Detector/vibe_src
+                    ${PROJECT_SOURCE_DIR}/src/MultitargetTracker/Detector/Subsense
+                    ${PROJECT_SOURCE_DIR}/src/MultitargetTracker/Tracker
+                    ${PROJECT_SOURCE_DIR}/src/MultitargetTracker/Tracker/HungarianAlg
+                    ${PROJECT_SOURCE_DIR}/thirdparty
+)
+
+set(LIBS
+    ${OpenCV_LIBS}
+    mtracking
+    mdetection
+    inih
+	Qt5::Widgets
+	SARibbonBar
+)
+
 qt5_add_resources(QRCS saribbonresouce.qrc)
 
 add_executable(${EXPAMPLE_NAME} 
@@ -14,8 +38,5 @@ add_executable(${EXPAMPLE_NAME}
     main.cpp
     )
 
-target_link_libraries(${EXPAMPLE_NAME} PUBLIC
-        Qt5::Widgets
-		SARibbonBar
-	)
+target_link_libraries(${EXPAMPLE_NAME} PUBLIC ${LIBS})
 
