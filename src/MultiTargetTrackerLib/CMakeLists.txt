@@ -1,0 +1,3 @@
+add_subdirectory(Detector)
+add_subdirectory(Tracker)
+add_subdirectory(examples)

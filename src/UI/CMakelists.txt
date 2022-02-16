@@ -6,22 +6,19 @@ include_directories(${CMAKE_SOURCE_DIR}/src/SARibbonBar)
 LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/SARibbon/lib)
 
 include_directories(
-                    ${PROJECT_SOURCE_DIR}/src/MultitargetTracker
-                    ${PROJECT_SOURCE_DIR}/src/MultitargetTracker/common
-                    ${PROJECT_SOURCE_DIR}/src/MultitargetTracker/Detector
-                    ${PROJECT_SOURCE_DIR}/src/MultitargetTracker/Detector/vibe_src
-                    ${PROJECT_SOURCE_DIR}/src/MultitargetTracker/Detector/Subsense
-                    ${PROJECT_SOURCE_DIR}/src/MultitargetTracker/Tracker
-                    ${PROJECT_SOURCE_DIR}/src/MultitargetTracker/Tracker/HungarianAlg
+                    ${PROJECT_SOURCE_DIR}/src/MultitargetTrackerLib
+                    ${PROJECT_SOURCE_DIR}/src/MultitargetTrackerLib/common
+                    ${PROJECT_SOURCE_DIR}/src/MultitargetTrackerLib/Detector
+                    ${PROJECT_SOURCE_DIR}/src/MultitargetTrackerLib/Detector/vibe_src
+                    ${PROJECT_SOURCE_DIR}/src/MultitargetTrackerLib/Detector/Subsense
+                    ${PROJECT_SOURCE_DIR}/src/MultitargetTrackerLib/Tracker
+                    ${PROJECT_SOURCE_DIR}/src/MultitargetTrackerLib/Tracker/HungarianAlg
                     ${PROJECT_SOURCE_DIR}/thirdparty
 					${PROJECT_SOURCE_DIR}/src/ExampleMTTracker
 )
 
 set(LIBS
     ${OpenCV_LIBS}
-    mtracking
-    mdetection
-    inih
 	Qt5::Widgets
 	SARibbonBar
 	MultitargetTrackerLib

@@ -1,9 +1,8 @@
 cmake_minimum_required (VERSION 3.5)
 
-project(MultitargetTracker)
+project(MultitargetTrackerLib)
 
 set(SOURCES
-#    main.cpp
     VideoExample.cpp
 )
 
@@ -23,14 +22,14 @@ endif(BUILD_CARS_COUNTING)
 # добавляем include директории
 # ----------------------------------------------------------------------------
 INCLUDE_DIRECTORIES(
-                    ${PROJECT_SOURCE_DIR}/../MultitargetTracker
-                    ${PROJECT_SOURCE_DIR}/../MultitargetTracker/common
-                    ${PROJECT_SOURCE_DIR}/../MultitargetTracker/Detector
-                    ${PROJECT_SOURCE_DIR}/../MultitargetTracker/Detector/vibe_src
-                    ${PROJECT_SOURCE_DIR}/../MultitargetTracker/Detector/Subsense
-                    ${PROJECT_SOURCE_DIR}/../MultitargetTracker/Tracker
-                    ${PROJECT_SOURCE_DIR}/../MultitargetTracker/Tracker/HungarianAlg
-                    ${PROJECT_SOURCE_DIR}/../../thirdparty
+                    ${PROJECT_SOURCE_DIR}/..
+                    ${PROJECT_SOURCE_DIR}/../common
+                    ${PROJECT_SOURCE_DIR}/../Detector
+                    ${PROJECT_SOURCE_DIR}/../Detector/vibe_src
+                    ${PROJECT_SOURCE_DIR}/../Detector/Subsense
+                    ${PROJECT_SOURCE_DIR}/../Tracker
+                    ${PROJECT_SOURCE_DIR}/../Tracker/HungarianAlg
+                    ${PROJECT_SOURCE_DIR}/../../../thirdparty
 )
 
 set(LIBS
@@ -62,11 +61,6 @@ if (BUILD_CARS_COUNTING)
     add_definitions(-DBUILD_CARS_COUNTING)
 endif(BUILD_CARS_COUNTING)
 
-add_library(${PROJECT_NAME}Lib STATIC ${HEADERS} ${SOURCES})
+add_library(${PROJECT_NAME} STATIC ${HEADERS} ${SOURCES})
 
-ADD_EXECUTABLE(${PROJECT_NAME} main.cpp)
-
-TARGET_LINK_LIBRARIES(${PROJECT_NAME}Lib ${LIBS})
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${PROJECT_NAME}Lib)
-
-
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${LIBS})
