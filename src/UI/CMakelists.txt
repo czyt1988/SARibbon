@@ -7,6 +7,7 @@ LINK_DIRECTORIES(${CMAKE_SOURCE_DIR}/src/SARibbon/lib)
 
 include_directories(
                     ${PROJECT_SOURCE_DIR}/src/MultitargetTrackerLib
+					${PROJECT_SOURCE_DIR}/src/MultitargetTrackerLib/examples
                     ${PROJECT_SOURCE_DIR}/src/MultitargetTrackerLib/common
                     ${PROJECT_SOURCE_DIR}/src/MultitargetTrackerLib/Detector
                     ${PROJECT_SOURCE_DIR}/src/MultitargetTrackerLib/Detector/vibe_src
@@ -14,7 +15,6 @@ include_directories(
                     ${PROJECT_SOURCE_DIR}/src/MultitargetTrackerLib/Tracker
                     ${PROJECT_SOURCE_DIR}/src/MultitargetTrackerLib/Tracker/HungarianAlg
                     ${PROJECT_SOURCE_DIR}/thirdparty
-					${PROJECT_SOURCE_DIR}/src/ExampleMTTracker
 )
 
 set(LIBS
