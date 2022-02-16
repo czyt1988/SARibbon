@@ -1,0 +1,11 @@
+# PathSettings
+
+set(Qt5_DIR "C:/Qt/5.12.12/msvc2017_64/lib/cmake/Qt5")
+set (OpenCV_DIR "C:/opencv-4.5.5_and_opencv_contrib-4.5.5/opencv_lib")
+
+# Options for MultitargetTracker
+#option(BUILD_EXAMPLES "Should compiled examples (motion detection, pedestrians, faces, DNNs etc)?" ON)
+option(BUILD_CARS_COUNTING "Should compiled Cars counting example?" OFF)
+option(BUILD_ASYNC_DETECTOR "Should compiled async example with low fps Detector?" OFF)
+option(BUILD_YOLO_LIB "Should compiled standalone yolo_lib with original darknet?" OFF)
+option(BUILD_YOLO_TENSORRT "Should compiled TensorRT binding for YOLO?" OFF)
