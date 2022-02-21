@@ -4,6 +4,8 @@
 #include "SARibbonBar.h"
 #include "SARibbonPluginDebugHelper.h"
 #include "SARibbonCategoryTaskMenuExtension.h"
+#include "SARibbonPannelTaskMenuExtension.h"
+#include "SARibbonPannel.h"
 using namespace SA_PLUGIN;
 SARibbonBarTaskMenuFactory::SARibbonBarTaskMenuFactory(QExtensionManager *mgr)
     : QExtensionFactory(mgr)
@@ -21,8 +23,11 @@ QObject *SARibbonBarTaskMenuFactory::createExtension(QObject *obj, const QString
             //在ribbonbar上点击
             return (new SARibbonBarTaskMenuExtension(bar, p));
         }else if (SARibbonCategory *category = qobject_cast<SARibbonCategory *>(obj)) {
-            //在ribbonbar上点击
+            //在SARibbonCategory上点击
             return (new SARibbonCategoryTaskMenuExtension(category, p));
+        }else if (SARibbonPannel *pannel = qobject_cast<SARibbonPannel *>(obj)) {
+            //在SARibbonPannel上点击
+            return (new SARibbonPannelTaskMenuExtension(pannel, p));
         }
     }
 

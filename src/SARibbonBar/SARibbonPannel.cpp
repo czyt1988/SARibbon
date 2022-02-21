@@ -128,6 +128,34 @@ SARibbonPannel::~SARibbonPannel()
 
 
 /**
+ * @brief 把action的行属性设置进action中，action自身携带了行属性
+ * @param action
+ * @param rp
+ */
+void SARibbonPannel::setActionRowProportionProperty(QAction *action, SARibbonPannelItem::RowProportion rp)
+{
+    action->setProperty(SARibbonPannelItemRowProportionPropertyName, int(rp));
+}
+
+
+/**
+ * @brief 获取action的行属性
+ * @param action
+ * @return
+ */
+SARibbonPannelItem::RowProportion SARibbonPannel::getActionRowProportionProperty(QAction *action)
+{
+    bool isok = false;
+    int r = action->property(SARibbonPannelItemRowProportionPropertyName).toInt(&isok);
+
+    if (isok) {
+        return (static_cast<SARibbonPannelItem::RowProportion>(r));
+    }
+    return (SARibbonPannelItem::Large);
+}
+
+
+/**
  * @brief 设置action的行行为，行属性决定了ribbon pannel的显示方式
  * @param action 需要设置的action，此action必须已经被pannel添加过
  * @param rp 行为
@@ -136,6 +164,7 @@ void SARibbonPannel::setActionRowProportion(QAction *action, SARibbonPannelItem:
 {
     SARibbonPannelLayout *lay = m_d->m_layout;
 
+    setActionRowProportionProperty(action, rp);
     if (lay) {
         SARibbonPannelItem *it = lay->pannelItem(action);
         if (it) {
@@ -154,8 +183,9 @@ void SARibbonPannel::setActionRowProportion(QAction *action, SARibbonPannelItem:
  */
 SARibbonToolButton *SARibbonPannel::addAction(QAction *action, SARibbonPannelItem::RowProportion rp)
 {
-    m_d->m_lastRp = rp;
+    setActionRowProportionProperty(action, rp);
     addAction(action);
+
     return (m_d->lastAddActionButton());
 }
 
@@ -216,7 +246,7 @@ QAction *SARibbonPannel::addAction(const QString& text, const QIcon& icon
 {
     QAction *action = new QAction(icon, text, this);
 
-    m_d->m_lastRp = rp;
+    setActionRowProportionProperty(action, rp);
     addAction(action);
     SARibbonToolButton *btn = m_d->lastAddActionButton();
 
@@ -302,7 +332,7 @@ QAction *SARibbonPannel::addWidget(QWidget *w, SARibbonPannelItem::RowProportion
 
     action->setDefaultWidget(w);
     w->setAttribute(Qt::WA_Hover);
-    m_d->m_lastRp = rp;
+    setActionRowProportionProperty(action, rp);
     addAction(action);
     return (action);
 }
@@ -356,7 +386,7 @@ QAction *SARibbonPannel::addSeparator(int top, int bottom)
     QAction *action = new QAction(this);
 
     action->setSeparator(true);
-    m_d->m_lastRp = SARibbonPannelItem::Large;
+    setActionRowProportionProperty(action, SARibbonPannelItem::Large);
     addAction(action);
     QWidget *w = m_d->m_layout->lastWidget();
     SARibbonSeparatorWidget *sep = qobject_cast<SARibbonSeparatorWidget *>(w);
@@ -740,8 +770,7 @@ void SARibbonPannel::actionEvent(QActionEvent *e)
                 index = layout()->count(); //找不到的时候就插入到最后
             }
         }
-        lay->insertAction(index, action, m_d->m_lastRp);
-        m_d->m_lastRp = SARibbonPannelItem::None; //插入完后重置为None
+        lay->insertAction(index, action, getActionRowProportionProperty(action));
         //由于pannel的尺寸发生变化，需要让category也调整
         if (parentWidget()) {
             QApplication::postEvent(parentWidget(), new QEvent(QEvent::LayoutRequest));

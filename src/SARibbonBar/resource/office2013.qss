@@ -235,6 +235,7 @@ SARibbonPannel {
 /*SARibbonGallery*/
 
 SARibbonGallery {
+  border: 1px solid #c2d0df;
   background-color: transparent;
   color: #333;
 }

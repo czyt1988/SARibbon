@@ -96,6 +96,7 @@ class SA_RIBBON_EXPORT SARibbonBar : public QMenuBar
     Q_PROPERTY(RibbonStyle ribbonStyle READ currentRibbonStyle WRITE setRibbonStyle)
     Q_PROPERTY(bool minimumMode READ isMinimumMode WRITE setMinimumMode)
     Q_PROPERTY(bool minimumModeButton READ haveShowMinimumModeButton WRITE showMinimumModeButton)
+
 public:
 
     /**

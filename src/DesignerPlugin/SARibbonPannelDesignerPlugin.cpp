@@ -1,5 +1,8 @@
 ﻿#include "SARibbonPannelDesignerPlugin.h"
+#include <QExtensionManager>
 #include "SARibbonPannel.h"
+#include "SARibbonBarTaskMenuFactory.h"
+#include <QDesignerFormEditorInterface>
 using namespace SA_PLUGIN;
 SARibbonPannelDesignerPlugin::SARibbonPannelDesignerPlugin(QObject *p)
     : QObject(p)
@@ -73,9 +76,11 @@ QString SARibbonPannelDesignerPlugin::whatsThis() const
 QWidget *SARibbonPannelDesignerPlugin::createWidget(QWidget *parent)
 {
     SARibbonPannel *pannel = new SARibbonPannel(parent);
+    static int s_pannel_count = 0;
 
-    pannel->setPannelName(QStringLiteral("pannel 1"));
+    pannel->setPannelName(QStringLiteral("pannel %1").arg(s_pannel_count));
 //    pannel->setAcceptDrops(true);
+    ++s_pannel_count;
     return (pannel);
 }
 
@@ -85,7 +90,12 @@ void SARibbonPannelDesignerPlugin::initialize(QDesignerFormEditorInterface *core
     if (m_isInitialized) {
         return;
     }
+    QExtensionManager *mgr = core->extensionManager();
 
+    if (mgr) {
+        mgr->registerExtensions(new SARibbonBarTaskMenuFactory(mgr)
+            , Q_TYPEID(QDesignerTaskMenuExtension));
+    }
     m_isInitialized = true;
     m_formEditor = core;
 }

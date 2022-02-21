@@ -131,6 +131,7 @@ private slots:
     void onToolButtonDownClicked();
     void onItemChanged(QStandardItem *item);
     void onLineEditSearchActionTextEdited(const QString& text);
+    void onPushButtonResetClicked();
 
 private:
     void initConnection();

@@ -43,6 +43,13 @@ public:
         ThreeRowMode    ///< 三行布局模式，office就是三行布局模式，pannel能布置3行小toolbutton，默认模式
         , TwoRowMode    ///< 两行布局模式，wps的后续布局模式就是两行布局模式，pannel能布置2行小toolbutton
     };
+
+    //把action的行属性设置进action中，action自身携带了行属性
+    static void setActionRowProportionProperty(QAction *action, SARibbonPannelItem::RowProportion rp);
+
+    //获取action的行属性
+    static SARibbonPannelItem::RowProportion getActionRowProportionProperty(QAction *action);
+
     //设置action的行行为，行属性决定了ribbon pannel的显示方式
     void setActionRowProportion(QAction *action, SARibbonPannelItem::RowProportion rp);
 
