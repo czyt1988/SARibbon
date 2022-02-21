@@ -13,7 +13,11 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = SARibbonBar
 TEMPLATE = lib
 include($$PWD/../../common.pri)
-DESTDIR = $$SA_RIBBON_DIR
+
+TARGET = $${SARIBBON_LIB_NAME}
+TEMPLATE = lib
+DESTDIR = $${SARIBBON_BIN_DIR}
+
 
 include($$PWD/SARibbonBar.pri)
 

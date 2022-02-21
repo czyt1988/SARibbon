@@ -28,6 +28,7 @@
 #include "SARibbonCustomizeData.h"
 #include "SARibbonBar.h"
 #include <QFile>
+#include <QMessageBox>
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///SARibbonCustomizeWidget
@@ -174,6 +175,7 @@ public:
     QSpacerItem *verticalSpacerUp;
     QPushButton *pushButtonAdd;
     QPushButton *pushButtonDelete;
+    QPushButton *pushButtonReset;
     QSpacerItem *verticalSpacerDown;
     QLabel *labelProportion;
     QComboBox *comboBoxActionProportion;
@@ -319,6 +321,9 @@ public:
 
         horizontalLayoutActionOptBtns->addWidget(pushButtonRename);
 
+        pushButtonReset = new QPushButton(customizeWidget);
+        pushButtonReset->setObjectName(QStringLiteral("pushButtonReset"));
+        horizontalLayoutActionOptBtns->addWidget(pushButtonReset);
 
         verticalLayoutResult->addLayout(horizontalLayoutActionOptBtns);
 
@@ -371,6 +376,7 @@ public:
         pushButtonNewCategory->setText(QApplication::translate("SARibbonCustomizeWidget", "\346\226\260\345\273\272\351\200\211\351\241\271\345\215\241", Q_NULLPTR));
         pushButtonNewPannel->setText(QApplication::translate("SARibbonCustomizeWidget", "\346\226\260\345\273\272\347\273\204", Q_NULLPTR));
         pushButtonRename->setText(QApplication::translate("SARibbonCustomizeWidget", "\351\207\215\345\221\275\345\220\215", Q_NULLPTR));
+        pushButtonReset->setText(QApplication::translate("SARibbonCustomizeWidget", "reset", Q_NULLPTR));
         labelProportion->setText(QApplication::translate("SARibbonCustomizeWidget", "proportion:", Q_NULLPTR));
     } // retranslateUi
 };
@@ -713,6 +719,8 @@ void SARibbonCustomizeWidget::initConnection()
         , this, &SARibbonCustomizeWidget::onItemChanged);
     connect(ui->lineEditSearchAction, &QLineEdit::textEdited
         , this, &SARibbonCustomizeWidget::onLineEditSearchActionTextEdited);
+    connect(ui->pushButtonReset, &QPushButton::clicked
+        , this, &SARibbonCustomizeWidget::onPushButtonResetClicked);
 }
 
 
@@ -1486,4 +1494,14 @@ void SARibbonCustomizeWidget::onItemChanged(QStandardItem *item)
 void SARibbonCustomizeWidget::onLineEditSearchActionTextEdited(const QString& text)
 {
     m_d->mAcionModel->search(text);
+}
+
+
+void SARibbonCustomizeWidget::onPushButtonResetClicked()
+{
+    int btn = QMessageBox::warning(this, tr("Warning"), tr("Are you sure reset all customize setting?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::No);
+
+    if (btn == QMessageBox::Yes) {
+        clear();
+    }
 }

@@ -7,29 +7,38 @@
 #include <QMutex>
 
 #ifndef SA_PLUGIN_MARK
-#define SA_PLUGIN_MARK()															     \
-    do{																	     \
-        QString info = QString("[%1],[%2],[%3]").arg(QDateTime::currentDateTime().toString("HH:mm:ss.zzz")).arg(__FUNCTION__).arg(__LINE__); \
-        SARibbonPluginDebugHelper::instance().append(info);										     \
-    }while(0)
+#define SA_PLUGIN_MARK()							\
+    do {									\
+        QString info = QString("[%1],[%2],[%3]-(%4)")			\
+            .arg(QDateTime::currentDateTime().toString("HH:mm:ss.zzz"))	\
+            .arg(__FUNCTION__)						\
+            .arg(__LINE__)						\
+            .arg(__FILE__);						\
+        SARibbonPluginDebugHelper::instance().append(info);		\
+    } while (0)
 #endif
 
 #ifndef SA_PLUGIN_LOG
-#define SA_PLUGIN_LOG(...)															      \
-    do{																	      \
-        QString info = QString("[%1],[%2],[%3],").arg(QDateTime::currentDateTime().toString("HH:mm:ss.zzz")).arg(__FUNCTION__).arg(__LINE__); \
-        info += QString::asprintf(__VA_ARGS__);												      \
-        SARibbonPluginDebugHelper::instance().append(info);										      \
-    }while(0)
+#define SA_PLUGIN_LOG(...)							\
+    do {									\
+        QString info = QString("[%1],[%2],[%3],")			\
+            .arg(QDateTime::currentDateTime().toString("HH:mm:ss.zzz"))	\
+            .arg(__FUNCTION__)						\
+            .arg(__LINE__);						\
+        info += QString::asprintf(__VA_ARGS__);				\
+        SARibbonPluginDebugHelper::instance().append(info);		\
+    } while (0)
 #endif
 class SARibbonPluginDebugHelperPrivate;
 
 /**
  * @brief The SARibbonPluginDebugHelper class
  */
-class SARibbonPluginDebugHelper {
+class SARibbonPluginDebugHelper
+{
 private:
     SARibbonPluginDebugHelper();
+
 public:
     static SARibbonPluginDebugHelper& instance();
 

@@ -18,11 +18,11 @@ message(Qt plugin path is:$$[QT_INSTALL_PLUGINS])
 QT          += widgets uiplugin designer core gui
 CONFIG      += plugin
 TEMPLATE        = lib
-TARGET          = SARibbonBarDesignerPlugin
+TARGET          = $$saRibbonLibNameMake(SARibbonBarDesignerPlugin)
 
 target.path = $$[QT_INSTALL_PLUGINS]/designer
 #生成的dll路径
-DESTDIR         = $${SA_RIBBON_DIR}
+DESTDIR         = $${SARIBBON_BIN_DIR}
 
 #所有参与编译，这样导入designer里才可以用
 DEFINES += SA_RIBBON_BAR_MAKE_LIB #定义此宏将构建库
@@ -45,6 +45,7 @@ HEADERS += \
     SARibbonMainWindowTaskMenuExtension.h \
     SARibbonMainWindowTaskMenuFactory.h \
     SARibbonPannelDesignerPlugin.h \
+    SARibbonPannelTaskMenuExtension.h \
     SARibbonPluginCollection.h \
     SARibbonPluginDebugHelper.h
 
@@ -65,6 +66,7 @@ SOURCES += \
     SARibbonMainWindowTaskMenuExtension.cpp \
     SARibbonMainWindowTaskMenuFactory.cpp \
     SARibbonPannelDesignerPlugin.cpp \
+    SARibbonPannelTaskMenuExtension.cpp \
     SARibbonPluginCollection.cpp \
     SARibbonPluginDebugHelper.cpp
 
@@ -73,7 +75,7 @@ RESOURCES += \
 
 # 编译完成后自动把dll移动到$$[QT_INSTALL_PLUGINS]/designer下面
 win32 {
-    PLUGINDLL_FULL_PATH = $${SA_RIBBON_DIR}/$${TARGET}.dll
+    PLUGINDLL_FULL_PATH = $${SARIBBON_BIN_DIR}/$${TARGET}.dll
     PLUGINDLL_FULL_PATH = $$replace(PLUGINDLL_FULL_PATH, /, \\)
     PLUGINDLL_DESIGNER_PATH = $$[QT_INSTALL_PLUGINS]/designer/$${TARGET}.dll
     PLUGINDLL_DESIGNER_PATH = $$replace(PLUGINDLL_DESIGNER_PATH, /, \\)
