@@ -1,9 +1,0 @@
-{
-    "files.associations": {
-        "*.m": "matlab",
-        "*.qss": "css",
-        "qobject": "cpp",
-        "qabstractlistmodel": "cpp",
-        "chrono": "cpp"
-    }
-}

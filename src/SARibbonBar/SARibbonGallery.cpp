@@ -50,9 +50,9 @@ public:
         buttonUp->setObjectName(QStringLiteral("SARibbonGalleryButtonUp"));
         buttonDown->setObjectName(QStringLiteral("SARibbonGalleryButtonDown"));
         buttonMore->setObjectName(QStringLiteral("SARibbonGalleryButtonMore"));
-        buttonUp->setFixedSize(15, 20);
-        buttonDown->setFixedSize(15, 20);
-        buttonMore->setFixedSize(15, 20);
+        buttonUp->setMaximumWidth(RibbonSubElementStyleOpt.galleryButtonMaximumWidth);
+        buttonDown->setMaximumWidth(RibbonSubElementStyleOpt.galleryButtonMaximumWidth);
+        buttonMore->setMaximumWidth(RibbonSubElementStyleOpt.galleryButtonMaximumWidth);
         buttonUp->setIcon(ICON_ARROW_UP);
         buttonDown->setIcon(ICON_ARROW_DOWN);
         buttonMore->setIcon(ICON_ARROW_MORE);
@@ -69,15 +69,15 @@ public:
             , Parent, &SARibbonGallery::hovered);
         popupWidget = nullptr;
         viewportGroup = nullptr;
-        btnLayout=new QBoxLayout(QBoxLayout::TopToBottom);
+        btnLayout = new QBoxLayout(QBoxLayout::TopToBottom);
         btnLayout->setSpacing(0);
-        btnLayout->setMargin(0);
+        btnLayout->setContentsMargins(0, 0, 0, 0);
         btnLayout->addWidget(buttonUp);
         btnLayout->addWidget(buttonDown);
         btnLayout->addWidget(buttonMore);
-        layout=new QBoxLayout(QBoxLayout::RightToLeft);
+        layout = new QBoxLayout(QBoxLayout::RightToLeft);
         layout->setSpacing(0);
-        layout->setMargin(0);
+        layout->setContentsMargins(0, 0, 0, 0);
         layout->addLayout(btnLayout);
         layout->addStretch();
         parent->setLayout(layout);
@@ -106,7 +106,7 @@ public:
     {
         if (nullptr == viewportGroup) {
             viewportGroup = RibbonSubElementDelegate->createRibbonGalleryGroup(Parent);
-            layout->addWidget(viewportGroup,1);
+            layout->addWidget(viewportGroup, 1);
         }
         viewportGroup->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
         viewportGroup->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -125,7 +125,7 @@ RibbonGalleryViewport::RibbonGalleryViewport(QWidget *parent) : QWidget(parent)
     setWindowFlags(Qt::Popup);
     m_layout = new QVBoxLayout(this);
     m_layout->setSpacing(0);
-    m_layout->setMargin(0);
+    m_layout->setContentsMargins(0, 0, 0, 0);
 }
 
 
@@ -142,10 +142,9 @@ SARibbonGallery::SARibbonGallery(QWidget *parent) : QFrame(parent)
 {
     m_d->init(this);
     setFrameShape(QFrame::Box);
-    //setFrameShape(QFrame::Panel);
-    setFixedHeight(60);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    setMinimumWidth(88);
+    setFixedHeight(RibbonSubElementStyleOpt.galleryFixedHeight);
+    setMinimumWidth(RibbonSubElementStyleOpt.galleryMinimumWidth);
 }
 
 
@@ -157,13 +156,13 @@ SARibbonGallery::~SARibbonGallery()
 
 QSize SARibbonGallery::sizeHint() const
 {
-    return (QSize(232, 60));
+    return (QSize(232, RibbonSubElementStyleOpt.galleryFixedHeight));
 }
 
 
 QSize SARibbonGallery::minimumSizeHint() const
 {
-    return (QSize(88, 60));
+    return (QSize(RibbonSubElementStyleOpt.galleryMinimumWidth, RibbonSubElementStyleOpt.galleryFixedHeight));
 }
 
 
@@ -265,8 +264,9 @@ void SARibbonGallery::onShowMoreDetail()
     QSize popupMenuSize = m_d->popupWidget->sizeHint();
     QPoint start = mapToGlobal(QPoint(0, 0));
 
-    int width = m_d->viewportGroup->width(); // viewport
-    width += qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent); // scrollbar
+    int width = m_d->viewportGroup->width();                                // viewport
+
+    width += qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent);        // scrollbar
     m_d->popupWidget->setGeometry(start.x(), start.y(), width, popupMenuSize.height());
     m_d->popupWidget->show();
 }

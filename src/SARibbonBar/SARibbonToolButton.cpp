@@ -11,8 +11,9 @@
 #include "SARibbonElementManager.h"
 #include "QCursor"
 
-#define LITE_LARGE_BUTTON_ICON_HIGHT_RATE	0.52
-#define ARROW_WIDTH				10
+#define LITE_LARGE_BUTTON_ICON_HIGHT_RATE		0.52
+#define ARROW_WIDTH					10
+#define DebugSARibbonToolButton_TextDrawPrint		0
 
 #ifdef SA_RIBBON_DEBUG_HELP_DRAW
 #define HELP_DRAW_RECT(p, rect)	      \
@@ -420,25 +421,45 @@ QSize SARibbonToolButton::sizeHint() const
 
     initStyleOption(&opt);
     //QToolButton的sizeHint已经考虑了菜单箭头的位置
+    //从源码看，QToolButton的sizeHint是不会考虑换行的
     if (LargeButton == buttonType()) {
         //计算最佳大小
         SARibbonToolButton *that = const_cast<SARibbonToolButton *>(this);
 
         if (s.width() > s.height()*1.4) {
             //文本对齐方式
-            int alignment = Qt::TextShowMnemonic | Qt::TextWordWrap;
             //如果宽度大于高度，就看看换行是否能满足
             QFontMetrics fm = fontMetrics();
-            //计算默认的文本区域
-            QRect textRange = calcTextRect(QRect(0, 0, s.width()/2, s.height()));
-            textRange.moveTo(0, 0);
-            //计算换行后的最大文本区域
-            textRange = fm.boundingRect(textRange, alignment, text());
-            //把区域设置给size
-            s.setWidth(textRange.width()+4);
-            //确认是否换行
-            that->m_isWordWrap = (textRange.height() > fm.lineSpacing());
+            QRect textRange(0, 0, s.width(), s.height());
+            int trywidth = 0;
+            do
+            {
+                textRange = calcTextRect(QRect(0, 0, s.width()*((3.0+trywidth)/6.0), s.height()));
+#if DebugSARibbonToolButton_TextDrawPrint
+                qDebug()	<< "SARibbonToolButton::sizeHint:" << text() << "  | default size:" << s
+                        << "\ntry:" <<trywidth+1
+                        << "\n  textRange:" << textRange
+                        << "\n  fm.lineSpacing:" << fm.lineSpacing()
+                        << "\n  fm.height" << fm.height()
+                        << "\n  fm.leading" << fm.leading()
+                        << "\n  fm.boundingRect:"<<fm.boundingRect(textRange, Qt::TextShowMnemonic | Qt::TextWordWrap, text());
+#endif
 
+                int alignment = Qt::TextShowMnemonic | Qt::TextWordWrap;
+                //计算默认的文本区域
+                textRange.moveTo(0, 0);
+                //计算换行后的最大文本区域
+                textRange = fm.boundingRect(textRange, alignment, text());
+                if (textRange.height() <= (fm.lineSpacing()*2)) {
+                    //保证在两行
+                    that->m_isWordWrap = (textRange.height() > fm.lineSpacing());
+                    break;
+                }
+                ++trywidth;
+            }while(trywidth < 3);
+            s.setWidth(textRange.width()+4);
+            //把区域设置给size
+            //确认是否换行
             if ((opt.features & QStyleOptionToolButton::Menu) ||
                 (opt.features & QStyleOptionToolButton::HasMenu)) {
                 //如果有菜单
@@ -661,11 +682,11 @@ void SARibbonToolButton::setButtonType(const RibbonButtonType& buttonType)
     m_buttonType = buttonType;
     if (LargeButton == buttonType) {
         setToolButtonStyle(Qt::ToolButtonTextUnderIcon);
-        setIconSize(QSize(32, 32));
+        setIconSize(RibbonSubElementStyleOpt.toolButtonLargeIconSize);
         setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Expanding);
     }else {
         setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-        setIconSize(QSize(18, 18));
+        setIconSize(RibbonSubElementStyleOpt.toolButtonSmallIconSize);
         setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
     }
     setMouseTracking(true);
@@ -692,7 +713,10 @@ SARibbonToolButton::LargeButtonType SARibbonToolButton::largeButtonType() const
 
 int SARibbonToolButton::liteLargeButtonIconHeight(int buttonHeight) const
 {
-    return (buttonHeight*LITE_LARGE_BUTTON_ICON_HIGHT_RATE);
+    QFontMetrics fm = fontMetrics();
+    int maxheight = buttonHeight - (fm.height()*2+fm.leading());
+
+    return ((buttonHeight*LITE_LARGE_BUTTON_ICON_HIGHT_RATE) < maxheight ? (buttonHeight*LITE_LARGE_BUTTON_ICON_HIGHT_RATE) : maxheight);
 }
 
 
@@ -707,7 +731,10 @@ void SARibbonToolButton::calcIconRect(const QStyleOptionToolButton& opt)
         m_iconRect = opt.rect;
         if (opt.toolButtonStyle != Qt::ToolButtonIconOnly) {
             if (Normal == m_largeButtonType) {
-                m_iconRect.setHeight(opt.rect.height()/2);
+                //保证能显示两行文本
+                QFontMetrics fm = fontMetrics();
+                int maxheight = opt.rect.height() - (fm.height()*2+fm.leading());
+                m_iconRect.setHeight(((opt.rect.height()/2) < maxheight) ? (opt.rect.height()/2) : maxheight);
             }else if (Lite == m_largeButtonType) {
                 m_iconRect.setHeight(liteLargeButtonIconHeight(opt.rect.height()));
             }

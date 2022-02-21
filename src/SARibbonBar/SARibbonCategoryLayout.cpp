@@ -5,7 +5,6 @@
 #include "SARibbonElementManager.h"
 #include "SARibbonSeparatorWidget.h"
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QDebug>
 
 /**

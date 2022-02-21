@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>mainwindow</class>
+ <widget class="SARibbonMainWindow" name="mainwindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>662</width>
+    <height>492</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget"/>
+  <widget class="SARibbonBar" name="ribbonbar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>662</width>
+     <height>160</height>
+    </rect>
+   </property>
+   <widget class="SARibbonCategory" name="ribbonCategory">
+    <property name="categoryName">
+     <string>Category 0</string>
+    </property>
+    <widget class="SARibbonPannel" name="ribbonPannel">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>1</y>
+       <width>150</width>
+       <height>96</height>
+      </rect>
+     </property>
+     <addaction name="action"/>
+     <addaction name="action_2"/>
+     <addaction name="action_3"/>
+     <addaction name="action_4"/>
+     <addaction name="action_5"/>
+     <addaction name="action_6"/>
+    </widget>
+    <widget class="SARibbonPannel" name="ribbonPannel_2">
+     <property name="geometry">
+      <rect>
+       <x>156</x>
+       <y>1</y>
+       <width>234</width>
+       <height>96</height>
+      </rect>
+     </property>
+     <addaction name="action_7"/>
+     <addaction name="action_8"/>
+     <addaction name="action_9"/>
+     <addaction name="action_10"/>
+     <addaction name="action_11"/>
+     <addaction name="action_12"/>
+     <addaction name="action_13"/>
+    </widget>
+   </widget>
+   <widget class="SARibbonCategory" name="ribbonCategory_2">
+    <property name="categoryName">
+     <string>Category 1</string>
+    </property>
+    <widget class="SARibbonPannel" name="ribbonPannel_3">
+     <property name="geometry">
+      <rect>
+       <x>0</x>
+       <y>1</y>
+       <width>90</width>
+       <height>96</height>
+      </rect>
+     </property>
+     <addaction name="action_14"/>
+     <addaction name="action_15"/>
+    </widget>
+    <widget class="SARibbonPannel" name="ribbonPannel_4">
+     <property name="geometry">
+      <rect>
+       <x>96</x>
+       <y>1</y>
+       <width>150</width>
+       <height>96</height>
+      </rect>
+     </property>
+     <addaction name="action_16"/>
+     <addaction name="action_17"/>
+     <addaction name="action_18"/>
+     <addaction name="action_19"/>
+     <addaction name="action_20"/>
+     <addaction name="action_21"/>
+    </widget>
+   </widget>
+  </widget>
+  <action name="action">
+   <property name="text">
+    <string>action</string>
+   </property>
+   <property name="SARibbonPannelItem_RowProportion" stdset="0">
+    <number>1</number>
+   </property>
+  </action>
+  <action name="action_2">
+   <property name="text">
+    <string>action</string>
+   </property>
+   <property name="SARibbonPannelItem_RowProportion" stdset="0">
+    <number>2</number>
+   </property>
+  </action>
+  <action name="action_3">
+   <property name="text">
+    <string>action</string>
+   </property>
+   <property name="SARibbonPannelItem_RowProportion" stdset="0">
+    <number>2</number>
+   </property>
+  </action>
+  <action name="action_4">
+   <property name="text">
+    <string>action</string>
+   </property>
+   <property name="SARibbonPannelItem_RowProportion" stdset="0">
+    <number>3</number>
+   </property>
+  </action>
+  <action name="action_5">
+   <property name="text">
+    <string>action</string>
+   </property>
+   <property name="SARibbonPannelItem_RowProportion" stdset="0">
+    <number>3</number>
+   </property>
+  </action>
+  <action name="action_6">
+   <property name="text">
+    <string>action</string>
+   </property>
+   <property name="SARibbonPannelItem_RowProportion" stdset="0">
+    <number>3</number>
+   </property>
+  </action>
+  <action name="action_7">
+   <property name="text">
+    <string>action</string>
+   </property>
+   <property name="SARibbonPannelItem_RowProportion" stdset="0">
+    <number>1</number>
+   </property>
+  </action>
+  <action name="action_8">
+   <property name="text">
+    <string>action</string>
+   </property>
+   <property name="SARibbonPannelItem_RowProportion" stdset="0">
+    <number>1</number>
+   </property>
+  </action>
+  <action name="action_9">
+   <property name="text">
+    <string>action</string>
+   </property>
+   <property name="SARibbonPannelItem_RowProportion" stdset="0">
+    <number>3</number>
+   </property>
+  </action>
+  <action name="action_10">
+   <property name="text">
+    <string>action</string>
+   </property>
+   <property name="SARibbonPannelItem_RowProportion" stdset="0">
+    <number>3</number>
+   </property>
+  </action>
+  <action name="action_11">
+   <property name="text">
+    <string>action</string>
+   </property>
+   <property name="SARibbonPannelItem_RowProportion" stdset="0">
+    <number>1</number>
+   </property>
+  </action>
+  <action name="action_12">
+   <property name="text">
+    <string>action</string>
+   </property>
+   <property name="SARibbonPannelItem_RowProportion" stdset="0">
+    <number>2</number>
+   </property>
+  </action>
+  <action name="action_13">
+   <property name="text">
+    <string>action</string>
+   </property>
+   <property name="SARibbonPannelItem_RowProportion" stdset="0">
+    <number>2</number>
+   </property>
+  </action>
+  <action name="action_14">
+   <property name="text">
+    <string>action</string>
+   </property>
+   <property name="SARibbonPannelItem_RowProportion" stdset="0">
+    <number>1</number>
+   </property>
+  </action>
+  <action name="action_15">
+   <property name="text">
+    <string>action</string>
+   </property>
+   <property name="SARibbonPannelItem_RowProportion" stdset="0">
+    <number>1</number>
+   </property>
+  </action>
+  <action name="action_16">
+   <property name="text">
+    <string>action</string>
+   </property>
+   <property name="SARibbonPannelItem_RowProportion" stdset="0">
+    <number>2</number>
+   </property>
+  </action>
+  <action name="action_17">
+   <property name="text">
+    <string>action</string>
+   </property>
+   <property name="SARibbonPannelItem_RowProportion" stdset="0">
+    <number>2</number>
+   </property>
+  </action>
+  <action name="action_18">
+   <property name="text">
+    <string>action</string>
+   </property>
+   <property name="SARibbonPannelItem_RowProportion" stdset="0">
+    <number>3</number>
+   </property>
+  </action>
+  <action name="action_19">
+   <property name="text">
+    <string>action</string>
+   </property>
+   <property name="SARibbonPannelItem_RowProportion" stdset="0">
+    <number>3</number>
+   </property>
+  </action>
+  <action name="action_20">
+   <property name="text">
+    <string>action</string>
+   </property>
+   <property name="SARibbonPannelItem_RowProportion" stdset="0">
+    <number>3</number>
+   </property>
+  </action>
+  <action name="action_21">
+   <property name="text">
+    <string>action</string>
+   </property>
+   <property name="SARibbonPannelItem_RowProportion" stdset="0">
+    <number>1</number>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>SARibbonMainWindow</class>
+   <extends>QMainWindow</extends>
+   <header>SARibbonMainWindow.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>SARibbonBar</class>
+   <extends>QMenuBar</extends>
+   <header>SARibbonBar.h</header>
+   <addpagemethod>addCategoryPage</addpagemethod>
+  </customwidget>
+  <customwidget>
+   <class>SARibbonCategory</class>
+   <extends>QWidget</extends>
+   <header>SARibbonCategory.h</header>
+   <addpagemethod>addPannel</addpagemethod>
+  </customwidget>
+  <customwidget>
+   <class>SARibbonPannel</class>
+   <extends>QWidget</extends>
+   <header>SARibbonPannel.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

@@ -5,7 +5,6 @@
 #include <QLinearGradient>
 #include <QDebug>
 #include <QApplication>
-#include <QDesktopWidget>
 #include "SARibbonToolButton.h"
 #include <QHBoxLayout>
 #include "SARibbonCategoryLayout.h"
@@ -643,7 +642,7 @@ void SARibbonCategoryPrivate::setBackgroundBrush(const QBrush& brush)
 {
     QPalette p = ribbonCategory()->palette();
 
-    p.setBrush(QPalette::Background, brush);
+    p.setBrush(QPalette::Window, brush);
     ribbonCategory()->setPalette(p);
 }
 
@@ -992,7 +991,14 @@ void SARibbonCategoryPrivate::doWheelEvent(QWheelEvent *event)
 
     if (totalWidth > contentSize.width()) {
         //这个时候滚动有效
-        int scrollpix = event->delta() / 4;
+        QPoint numPixels = event->pixelDelta();
+        QPoint numDegrees = event->angleDelta() / 8;
+        int scrollpix = 0;
+        if (!numPixels.isNull())
+            scrollpix = numPixels.x() / 4;
+        else if (!numDegrees.isNull())
+            scrollpix = numDegrees.x() / 15;
+        else {}
         if (scrollpix > 0) { //当滚轮向上滑，SARibbonCategory向左走
             int tmp = mXBase - scrollpix;
             if (tmp < (contentSize.width() - totalWidth)) {

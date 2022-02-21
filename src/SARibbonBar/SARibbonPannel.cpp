@@ -9,7 +9,6 @@
 #include <QFontMetrics>
 #include <QPainter>
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QWidgetAction>
 #include <QMenu>
 #include "SARibbonPannelLayout.h"
@@ -44,7 +43,6 @@ public:
     //返回最后一个添加的action对应的button，前提是最后一个是toolbutton，否则返回nullptr
     SARibbonToolButton *lastAddActionButton();
 
-    SARibbonPannelItem::RowProportion m_lastRp; ///< 记录addAction等函数设置的rp，用于actionEvent添加
     SARibbonPannel *Parent;
     SARibbonPannelLayout *m_layout;
     QPoint m_nextElementPosition;
@@ -604,7 +602,7 @@ bool SARibbonPannel::isExpanding() const
  */
 int SARibbonPannel::titleHeight() const
 {
-    return (isTwoRow() ? 0 : 21);
+    return (isTwoRow() ? 0 : RibbonSubElementStyleOpt.pannelTitleHeight);
 }
 
 

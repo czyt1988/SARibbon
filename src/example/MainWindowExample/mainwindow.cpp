@@ -140,7 +140,9 @@ MainWindow::MainWindow(QWidget *par) : SARibbonMainWindow(par)
             QXmlStreamWriter xml(&str);
             xml.setAutoFormatting(true);
             xml.setAutoFormattingIndent(2);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0) // QXmlStreamWriter always encodes XML in UTF-8.
             xml.setCodec("utf-8");
+#endif
             xml.writeStartDocument();
             bool isok = dlg.toXml(&xml);
             xml.writeEndDocument();
@@ -148,7 +150,9 @@ MainWindow::MainWindow(QWidget *par) : SARibbonMainWindow(par)
                 QFile f("customize.xml");
                 if (f.open(QIODevice::ReadWrite|QIODevice::Text|QIODevice::Truncate)) {
                     QTextStream s(&f);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0) // QTextStream always encodes XML in UTF-8.
                     s.setCodec("utf-8");
+#endif
                     s << str;
                     s.flush();
                 }
@@ -264,7 +268,7 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
     g->addButton(r, SARibbonBar::WpsLiteStyle);
     r = new QRadioButton();
     r->setObjectName(("use office 2row style"));
-    r->setText(("use office 2row style"));
+    r->setText(("use office 2 row style"));
     r->setChecked(false);
     pannel->addSmallWidget(r);
     g->addButton(r, SARibbonBar::OfficeStyleTwoRow);
@@ -276,7 +280,11 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
     g->addButton(r, SARibbonBar::WpsLiteStyleTwoRow);
 
 //    connect(g, QOverload<int>::of(&QButtonGroup::buttonClicked), this, &MainWindow::onStyleClicked);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    connect(g, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::idClicked), this, &MainWindow::onStyleClicked);
+#else
     connect(g, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked), this, &MainWindow::onStyleClicked);
+#endif
     act = new QAction(this);
     act->setObjectName(("test 1"));
     act->setIcon(QIcon(":/icon/icon/folder.png"));
@@ -300,7 +308,7 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
     act = new QAction(this);
     act->setObjectName(("DelayedPopup"));
     act->setIcon(QIcon(":/icon/icon/folder.png"));
-    act->setText(("DelayedPopup"));
+    act->setText(("Delayed Popup"));
     act->setMenu(menu);
     btn = pannel->addLargeAction(act);
     btn->setPopupMode(QToolButton::DelayedPopup);
@@ -309,37 +317,37 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
 
     act = new QAction(this);
     act->setIcon(QIcon(":/icon/icon/folder.png"));
-    act->setText(("MenuButtonPopup"));
+    act->setText(("Menu Button Popup"));
     act->setMenu(menu);
     btn = pannel->addLargeAction(act);
-    btn->setObjectName(("MenuButtonPopup"));
+    btn->setObjectName(("Menu Button Popup"));
     btn->setPopupMode(QToolButton::MenuButtonPopup);
     connect(act, &QAction::triggered, this, &MainWindow::onMenuButtonPopupCheckabletriggered);
 
     act = new QAction(this);
     act->setIcon(QIcon(":/icon/icon/Graph-add.png"));
-    act->setText(("InstantPopup"));
+    act->setText(("Instant Popup"));
     act->setMenu(menu);
     btn = pannel->addLargeAction(act);
-    btn->setObjectName("buttonInstantPopup");
+    btn->setObjectName("button Instant Popup");
     btn->setPopupMode(QToolButton::InstantPopup);
     connect(act, &QAction::triggered, this, &MainWindow::onInstantPopupCheckabletriggered);
 
     act = new QAction(this);
     act->setCheckable(true);
     act->setIcon(QIcon(":/icon/icon/folder.png"));
-    act->setText(("DelayedPopup checkable"));
+    act->setText(("Delayed Popup checkable"));
     act->setMenu(menu);
     btn = pannel->addLargeAction(act);
     btn->setPopupMode(QToolButton::DelayedPopup);
     btn->setCheckable(true);
-    btn->setObjectName("DelayedPopup checkable");
+    btn->setObjectName("Delayed Popup checkable");
     connect(act, &QAction::triggered, this, &MainWindow::onDelayedPopupCheckableTest);
 
     act = new QAction(this);
     act->setCheckable(true);
     act->setIcon(QIcon(":/icon/icon/folder.png"));
-    act->setText(("MenuButtonPopup checkable"));
+    act->setText(("Menu Button Popup checkable"));
     act->setMenu(menu);
     btn = pannel->addLargeAction(act);
     btn->setPopupMode(QToolButton::MenuButtonPopup);
@@ -534,6 +542,10 @@ void MainWindow::createCategoryOther(SARibbonCategory *page)
     SARibbonToolButton *b = pannel->addLargeAction(appBtn);
 
     b->setObjectName("ApplicationButtonTest");
+
+    appBtn = new QAction(QIcon(":/icon/icon/icon2.png"), tr("Show Infomation Window"), this);
+    appBtn->setObjectName(("Show Infomation Window"));
+    pannel->addLargeAction(appBtn);
 
     QAction *useqss = new QAction(QIcon(":/icon/icon/icon2.png"), tr("use qss"), this);
 

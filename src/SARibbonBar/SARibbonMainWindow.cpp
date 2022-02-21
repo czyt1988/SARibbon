@@ -148,6 +148,7 @@ Qt::WindowFlags SARibbonMainWindow::windowButtonFlags() const
 
 void SARibbonMainWindow::setMenuWidget(QWidget *menubar)
 {
+    QMainWindow::setMenuWidget(menubar);
     SARibbonBar *bar = qobject_cast<SARibbonBar *>(menubar);
 
     if (bar) {
@@ -167,13 +168,24 @@ void SARibbonMainWindow::setMenuWidget(QWidget *menubar)
         m_d->windowButtonGroup->setFixedSize(s);
         m_d->windowButtonGroup->setWindowStates(windowState());
         m_d->useRibbon = true;
+        m_d->windowButtonGroup->show();
+    }else{
+        m_d->ribbonBar = nullptr;
+        m_d->useRibbon = false;
+        if (m_d->pFramelessHelper) {
+            delete m_d->pFramelessHelper;
+            m_d->pFramelessHelper = nullptr;
+        }
+        if (m_d->windowButtonGroup) {
+            m_d->windowButtonGroup->hide();
+        }
     }
-    QMainWindow::setMenuWidget(menubar);
 }
 
 
 void SARibbonMainWindow::setMenuBar(QMenuBar *menuBar)
 {
+    QMainWindow::setMenuBar(menuBar);
     SARibbonBar *bar = qobject_cast<SARibbonBar *>(menuBar);
 
     if (bar) {
@@ -193,8 +205,18 @@ void SARibbonMainWindow::setMenuBar(QMenuBar *menuBar)
         m_d->windowButtonGroup->setFixedSize(s);
         m_d->windowButtonGroup->setWindowStates(windowState());
         m_d->useRibbon = true;
+        m_d->windowButtonGroup->show();
+    }else{
+        m_d->ribbonBar = nullptr;
+        m_d->useRibbon = false;
+        if (m_d->pFramelessHelper) {
+            delete m_d->pFramelessHelper;
+            m_d->pFramelessHelper = nullptr;
+        }
+        if (m_d->windowButtonGroup) {
+            m_d->windowButtonGroup->hide();
+        }
     }
-    QMainWindow::setMenuBar(menuBar);
 }
 
 
