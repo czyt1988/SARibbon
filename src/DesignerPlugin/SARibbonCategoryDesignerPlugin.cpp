@@ -41,7 +41,7 @@ QIcon SARibbonCategoryDesignerPlugin::icon() const
 
 QString SARibbonCategoryDesignerPlugin::domXml() const
 {
-    return ("<ui language=\"c++\">\n"
+    return ("<ui language=\"c++\" displayname=\"Ribbon Category Page\">\n"
            " <widget class=\"SARibbonCategory\" name=\"ribbonCategoryPage\"/>\n"
            " <customwidgets>\n"
            "   <customwidget>\n"

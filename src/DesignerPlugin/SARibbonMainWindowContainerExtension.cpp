@@ -55,6 +55,7 @@ void SARibbonMainWindowContainerExtension::addWidget(QWidget *widget)
         }
         SA_PLUGIN_LOG("end add ribbon");
         ribbonBar->show();
+        SA_PLUGIN_LOG("ribbonBar show");
     }else if (QMenuBar *menuBar = qobject_cast<QMenuBar *>(widget)) {
         m_mainwindow->setMenuBar(menuBar);
         m_widgets.append(widget);

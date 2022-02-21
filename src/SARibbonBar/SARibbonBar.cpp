@@ -10,7 +10,6 @@
 #include <QLinearGradient>
 #include <QDebug>
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QAction>
 #include <QHoverEvent>
 #include <QTimer>
@@ -224,7 +223,9 @@ SARibbonBar::SARibbonBar(QWidget *parent) : QMenuBar(parent)
     , m_d(new SARibbonBarPrivate(this))
 {
     m_d->init();
-    connect(parent, &QWidget::windowTitleChanged, this, &SARibbonBar::onWindowTitleChanged);
+    if (parent) {
+        connect(parent, &QWidget::windowTitleChanged, this, &SARibbonBar::onWindowTitleChanged);
+    }
     setRibbonStyle(OfficeStyle);
 }
 
@@ -305,7 +306,9 @@ SARibbonCategory *SARibbonBar::addCategoryPage(const QString& title)
  */
 void SARibbonBar::addCategoryPage(SARibbonCategory *category)
 {
-    if ( nullptr == category ) return ;
+    if (nullptr == category) {
+        return;
+    }
     int index = m_d->ribbonTabBar->addTab(category->windowTitle());
 
     category->setRibbonPannelLayoutMode(isTwoRowStyle() ? SARibbonPannel::TwoRowMode : SARibbonPannel::ThreeRowMode);
@@ -356,7 +359,9 @@ SARibbonCategory *SARibbonBar::insertCategoryPage(const QString& title, int inde
 
 void SARibbonBar::insertCategoryPage(SARibbonCategory *category, int index)
 {
-    if ( nullptr == category ) return ;
+    if (nullptr == category) {
+        return;
+    }
     category->setRibbonPannelLayoutMode(isTwoRowStyle() ? SARibbonPannel::TwoRowMode : SARibbonPannel::ThreeRowMode);
     int i = m_d->ribbonTabBar->insertTab(index, category->windowTitle());
 
@@ -628,7 +633,9 @@ SARibbonContextCategory *SARibbonBar::addContextCategory(const QString& title, c
  */
 void SARibbonBar::addContextCategory(SARibbonContextCategory *context)
 {
-    if ( nullptr == context ) return ;
+    if (nullptr == context) {
+        return;
+    }
     connect(context, &SARibbonContextCategory::categoryPageAdded
         , this, &SARibbonBar::onContextsCategoryPageAdded);
     //remove并没有绑定，主要是remove后在stacked里也不会显示，remove且delete的话，stacked里也会删除
@@ -731,7 +738,9 @@ bool SARibbonBar::isContextCategoryVisible(SARibbonContextCategory *context)
  */
 void SARibbonBar::setContextCategoryVisible(SARibbonContextCategory *context, bool visible)
 {
-    if ( nullptr == context ) return ;
+    if (nullptr == context) {
+        return;
+    }
     if (visible) {
         showContextCategory(context);
     }else {
@@ -756,7 +765,9 @@ QList<SARibbonContextCategory *> SARibbonBar::contextCategoryList() const
  */
 void SARibbonBar::destroyContextCategory(SARibbonContextCategory *context)
 {
-    if ( nullptr == context ) return ;
+    if (nullptr == context) {
+        return;
+    }
     //! 1、如果上下文标签显示中，先隐藏
     if (isContextCategoryVisible(context)) {
         hideContextCategory(context);
@@ -825,10 +836,10 @@ void SARibbonBar::showMinimumModeButton(bool isShow)
             QAction *action = new QAction(m_d->minimumCategoryButton);
             action->setIcon(style()->standardIcon(isMinimumMode()?
                 QStyle::SP_TitleBarUnshadeButton:QStyle::SP_TitleBarShadeButton, 0, m_d->minimumCategoryButton));
-            connect(action, &QAction::triggered, this, [=]() {
+            connect(action, &QAction::triggered, this, [ = ]() {
                 this->setMinimumMode(!isMinimumMode());
                 action->setIcon(style()->standardIcon(isMinimumMode()?
-                    QStyle::SP_TitleBarUnshadeButton:QStyle::SP_TitleBarShadeButton, 0, m_d->minimumCategoryButton));
+                QStyle::SP_TitleBarUnshadeButton:QStyle::SP_TitleBarShadeButton, 0, m_d->minimumCategoryButton));
             });
             m_d->minimumCategoryButton->setDefaultAction(action);
             m_d->rightButtonGroup->addWidget(m_d->minimumCategoryButton);
@@ -1070,6 +1081,7 @@ void SARibbonBar::activeRightButtonGroup()
     m_d->rightButtonGroup->show();
 }
 
+
 SARibbonButtonGroupWidget *SARibbonBar::rightButtonGroup()
 {
     activeRightButtonGroup();
@@ -1277,12 +1289,6 @@ int SARibbonBar::mainBarHeight() const
         break;
     }
     return (RibbonSubElementStyleOpt.mainbarHeightOfficeStyleThreeRow);
-}
-
-
-int SARibbonBar::applicationButtonWidth() const
-{
-    return (56);
 }
 
 
@@ -1527,7 +1533,7 @@ void SARibbonBar::paintContextCategoryTab(QPainter& painter, const QString& titl
     painter.drawRect(QRect(contextRect.x(), RibbonSubElementStyleOpt.widgetBord.top(), contextRect.width(), 5));
 
     //剩下把颜色变亮90%
-    QColor gColor = color.light(190);
+    QColor gColor = color.lighter(190);
 
     //减去之前的5像素
     contextRect -= QMargins(0, 5, 0, 0);
@@ -1611,7 +1617,7 @@ void SARibbonBar::resizeInOfficeStyle()
     //applicationButton 定位
     if (m_d->applicationButton) {
         if (m_d->applicationButton->isVisible()) {
-            m_d->applicationButton->setGeometry(x, y, applicationButtonWidth(), tabH);
+            m_d->applicationButton->setGeometry(x, y, RibbonSubElementStyleOpt.applicationButtonWidth, tabH);
             x = m_d->applicationButton->geometry().right();
         }
     }
@@ -1708,6 +1714,7 @@ void SARibbonBar::resizeInWpsLiteStyle()
 
     //tab 的y值需要重新计算
     int tabH = tabBarHeight();
+
     if (tabH > validTitleBarHeight) {
         //这种直接把tabH设置为validTitleBarHeight
         tabH = validTitleBarHeight;
@@ -1717,7 +1724,7 @@ void SARibbonBar::resizeInWpsLiteStyle()
     //applicationButton 定位，与TabBar同高
     if (m_d->applicationButton) {
         if (m_d->applicationButton->isVisible()) {
-            m_d->applicationButton->setGeometry(x, y, applicationButtonWidth(), tabH);
+            m_d->applicationButton->setGeometry(x, y, RibbonSubElementStyleOpt.applicationButtonWidth, tabH);
             x = m_d->applicationButton->geometry().right()+2;
         }
     }

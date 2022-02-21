@@ -83,3 +83,4 @@ win32 {
     message(cmd:$${CMD_CPY})
     QMAKE_POST_LINK += $${CMD_CPY}
 }
+
