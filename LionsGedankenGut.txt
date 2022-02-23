@@ -1,0 +1,30 @@
+Lions Gedanken zu Multitargettracker und SARibbon
+
+// CommandLineParser
+CommanlineParser in VideoExample muss ersetzt werden da dieser nur für die Konsole ausgelegt ist,
+wenn wir die Parameter in der UI setzen wollen müssen wir uns da was anderes ausdenken.
+Dieser Parser wird aber nur in dem Konstruktur - und natürlich in allen anderen Klassen die von
+VideoExample erben(z.B. MotionDetectorExample, FaceDetectorExample, eigentlich alle Klassen in der examples.h Datei -
+genutzt => sollte recht "simple" sein diesen zu ersetzten.
+
+// Programmablauf
+
+main.cpp main
+std::unique_ptr<VideoExample> detector wird erstellt
+detector->SyncProcess();
+
+
+// VideoExample
+
+SyncProcess() is die "main"-Methode von VideoExample, dort werden alle Berechnungen mit Hilfe des Trackers und Detectors angestellt und gezeichnet,
+diese Methode läuft bis das Video zu Ende ist.
+
+Detection wird in der Methode Detection() verarbeitet diese nutzt die virtuelle Methode Detect() der Klasse BaseDetection.
+
+Die virtuellen Methoden InitDetector() und InitTracker() müssen von den erbenden Klassen überschrieben werden
+und abhängig von Tracker oder Detector die Parameter entsprechend setzen.
+
+InitDetector() und InitTracker() werden das erste Mal in der SyncProcess() Methode aufgerufen falls diese noch nicht gestzt sind.
+
+
+

@@ -24,23 +24,23 @@ static void Help()
 const char* keys =
 {
     "{ @1               |../../data/atrium.avi  | movie file | }"
-    "{ e  example       |1                   | number of example 0 - MouseTracking, 1 - MotionDetector, 2 - FaceDetector, 3 - PedestrianDetector, 4 - OpenCV dnn objects detector, 5 - YOLO Darknet detector, 6 - YOLO TensorRT Detector, 7 - Cars counting | }"
-    "{ sf start_frame   |0                   | Start a video from this position | }"
-    "{ ef end_frame     |0                   | Play a video to this position (if 0 then played to the end of file) | }"
-    "{ ed end_delay     |0                   | Delay in milliseconds after video ending | }"
-    "{ o  out           |                    | Name of result video file | }"
-    "{ sl show_logs     |1                   | Show Trackers logs | }"
-    "{ g gpu            |0                   | Use OpenCL acceleration | }"
-    "{ a async          |1                   | Use 2 theads for processing pipeline | }"
-    "{ r res            |                    | Path to the csv file with tracking result | }"
-    "{ s settings       |                    | Path to the init file with tracking settings | }"
-	"{ bs batch_size    |1                   | Batch size - frames count for processing | }"
-    "{ inf inference    |darknet             | For CarsCounting: Type of inference framework: darknet, ocvdnn | }"
-	"{ w weights        |                    | For CarsCounting: Weights of neural network: yolov4.weights | }"
-	"{ c config         |                    | For CarsCounting: Config file of neural network: yolov4.cfg | }"
-	"{ n names          |                    | For CarsCounting: File with classes names: coco.names | }"
-    "{ wf write_n_frame |1                   | Write logs on each N frame: 1 for writing each frame | }"
- 	"{ hm heat_map      |0                   | For CarsCounting: Draw heat map | }"
+    "{ e  example       |1						| number of example 0 - MouseTracking, 1 - MotionDetector, 2 - FaceDetector, 3 - PedestrianDetector, 4 - OpenCV dnn objects detector, 5 - YOLO Darknet detector, 6 - YOLO TensorRT Detector, 7 - Cars counting | }"
+    "{ sf start_frame   |0						| Start a video from this position | }"
+    "{ ef end_frame     |0						| Play a video to this position (if 0 then played to the end of file) | }"
+    "{ ed end_delay     |0						| Delay in milliseconds after video ending | }"
+    "{ o  out           |						| Name of result video file | }"
+    "{ sl show_logs     |1						| Show Trackers logs | }"
+    "{ g gpu            |0						| Use OpenCL acceleration | }"
+    "{ a async          |0						| Use 2 theads for processing pipeline | }"
+    "{ r res            |						| Path to the csv file with tracking result | }"
+    "{ s settings       |../../data/settings.ini| Path to the init file with tracking settings | }"
+	"{ bs batch_size    |1						| Batch size - frames count for processing | }"
+    "{ inf inference    |darknet				| For CarsCounting: Type of inference framework: darknet, ocvdnn | }"
+	"{ w weights        |						| For CarsCounting: Weights of neural network: yolov4.weights | }"
+	"{ c config         |						| For CarsCounting: Config file of neural network: yolov4.cfg | }"
+	"{ n names          |						| For CarsCounting: File with classes names: coco.names | }"
+    "{ wf write_n_frame |1						| Write logs on each N frame: 1 for writing each frame | }"
+ 	"{ hm heat_map      |0						| For CarsCounting: Draw heat map | }"
 };
 
 // ----------------------------------------------------------------------
@@ -110,6 +110,7 @@ int main(int argc, char** argv)
         std::cerr << "Wrong example number: " << exampleNum << std::endl;
         break;
     }
+
 
 	if (detector.get())
 		asyncPipeline ? detector->AsyncProcess() : detector->SyncProcess();
