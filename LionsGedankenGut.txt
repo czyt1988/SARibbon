@@ -27,4 +27,48 @@ und abhängig von Tracker oder Detector die Parameter entsprechend setzen.
 InitDetector() und InitTracker() werden das erste Mal in der SyncProcess() Methode aufgerufen falls diese noch nicht gestzt sind.
 
 
+// MotionDetector.InitDetector()
+
+config_t datenTyp ist eine std::multimap<std::string, std::string>
+diese config wird dann in der Funktion CreateDetector übergeben und in der Init() Funktion des Detectors verarbeitet.
+
+
+// Parameter für die Detectoren
+
+# TrackerSettings
+
+siehe TrackerSettings.h in src/MultiTargetTrackerLib/Tracker/TrackerSettings.h
+dort alle Parameter vonhaden und kurz beschrieben
+
+
+
+# Moition Detector
+
+unabhähangig von Algorithmus Type
+	- useRootatedRect 		(int)
+
+-- ALG_VIBE
+	- samples 				(int)
+	- pixelNeigbour			(int)
+	- distanceThreshold		(int)
+	- updateFactor			(int)
+	
+-- ALG_MOG
+   ALG_GMG
+   ALG_CNT
+	- not implemented
+   
+-- ALG_SuBSENSE
+	- default parameters
+	
+-- ALG_LOBSTER
+	- default parameters
+	
+-- ALG_MOG2
+	- history				(int)
+	- varThreshold			(int)
+	- detectShadows			(int)
+
+
+
 
