@@ -69,7 +69,7 @@ public:
     SARibbonQuickAccessBar* quickAccessBar;        ///< 快速响应栏
     SARibbonBar::RibbonStyle ribbonStyle;          ///< ribbon的风格
     SARibbonBar::RibbonStyle lastShowStyle;        ///< ribbon的风格
-    SARibbonBar::RibbonMode currentRibbonMode;    ///< 记录当前模式
+    SARibbonBar::RibbonMode currentRibbonMode;     ///< 记录当前模式
     QSize windowButtonSize;                        ///< 由SARibbonMainWindow告诉的windowbutton的尺寸
     QList< QColor > mContextCategoryColorList;     ///< contextCategory的色系
     int mContextCategoryColorListIndex;            ///< 记录contextCategory色系索引
@@ -194,6 +194,15 @@ bool SARibbonBar::isTwoRowStyle(SARibbonBar::RibbonStyle s)
 bool SARibbonBar::isOfficeStyle(SARibbonBar::RibbonStyle s)
 {
     return ((s & 0xFF) == 0);
+}
+
+/**
+ * @brief 获取版本信息
+ * @return {SA_RIBBON_BAR_VERSION_MAJ}.{SA_RIBBON_BAR_VERSION_MIN}.{SA_RIBBON_BAR_VERSION_PAT}
+ */
+QString SARibbonBar::versionString()
+{
+    return QString("%1.%2.%3").arg(SA_RIBBON_BAR_VERSION_MAJ).arg(SA_RIBBON_BAR_VERSION_MIN).arg(SA_RIBBON_BAR_VERSION_PAT);
 }
 
 /**
