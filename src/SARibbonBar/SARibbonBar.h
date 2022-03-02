@@ -118,13 +118,16 @@ public:
         NormalRibbonMode    ///< 正常模式
     };
     Q_ENUMS(RibbonMode)
-public:
+
 public:
     //判断RibbonStyle是否为2行模式
     static bool isTwoRowStyle(RibbonStyle s);
 
     //判断是否是office样式
     static bool isOfficeStyle(RibbonStyle s);
+
+    //获取版本信息
+    static QString versionString();
 
     //构造函数
     SARibbonBar(QWidget* parent = nullptr);

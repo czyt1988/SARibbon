@@ -75,5 +75,46 @@
         <file>icon/showContext.svg</file>
         <file>icon/deleteContext.svg</file>
         <file>icon/disable.svg</file>
+        <file>icon/customize.svg</file>
+        <file>icon/customize0.svg</file>
+        <file>icon/undo.svg</file>
+        <file>icon/redo.svg</file>
+        <file>icon/presentationFile.svg</file>
+        <file>icon/file.svg</file>
+        <file>icon/SA.svg</file>
+        <file>icon/help.svg</file>
+        <file>icon/Decrease-Margin.svg</file>
+        <file>icon/Decrease-Indent.svg</file>
+        <file>icon/Align-Right.svg</file>
+        <file>icon/Align-Left.svg</file>
+        <file>icon/Align-Center.svg</file>
+        <file>icon/Wrap-Image Left.svg</file>
+        <file>icon/Wrap-Image Right.svg</file>
+        <file>icon/remove-app-btn.svg</file>
+        <file>icon/long-text.svg</file>
+        <file>icon/useqss.svg</file>
+        <file>icon/useCustomize.svg</file>
+        <file>icon/windowsflag-normal.svg</file>
+        <file>icon/chinese-char.svg</file>
+        <file>icon/ContextCategory.svg</file>
+    </qresource>
+    <qresource prefix="/gallery-icon">
+        <file>icon/gallery/Document-File.svg</file>
+        <file>icon/gallery/Download-File.svg</file>
+        <file>icon/gallery/Drive-File.svg</file>
+        <file>icon/gallery/Dropbox-File.svg</file>
+        <file>icon/gallery/Email-File.svg</file>
+        <file>icon/gallery/Encode-File.svg</file>
+        <file>icon/gallery/Favorit-File.svg</file>
+        <file>icon/gallery/File-Error.svg</file>
+        <file>icon/gallery/File-Readonly.svg</file>
+        <file>icon/gallery/File-Settings.svg</file>
+        <file>icon/gallery/Presentation-File.svg</file>
+        <file>icon/gallery/Photoshop.svg</file>
+        <file>icon/gallery/Internet-Explorer.svg</file>
+        <file>icon/gallery/Illustrator.svg</file>
+        <file>icon/gallery/Google-Maps.svg</file>
+        <file>icon/gallery/Adobe.svg</file>
+        <file>icon/gallery/Word.svg</file>
     </qresource>
 </RCC>

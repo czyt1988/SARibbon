@@ -4,8 +4,10 @@
 class SARibbonCategory;
 class SARibbonContextCategory;
 class SARibbonCustomizeWidget;
-class QTextEdit;
 class SARibbonActionsManager;
+class SARibbonQuickAccessBar;
+class SARibbonButtonGroupWidget;
+class QTextEdit;
 class MainWindow : public SARibbonMainWindow
 {
     Q_OBJECT
@@ -21,6 +23,8 @@ private:
     void createContextCategory2();
     void createContextCategoryPage1(SARibbonCategory* page);
     void createContextCategoryPage2(SARibbonCategory* page);
+    void createQuickAccessBar(SARibbonQuickAccessBar* quickAccessBar);
+    void createRightButtonGroup(SARibbonButtonGroupWidget* rightBar);
     void addSomeOtherAction();
     QAction* createAction(const QString& text, const QString& iconurl, const QString& objName);
     QAction* createAction(const QString& text, const QString& iconurl);
@@ -33,6 +37,13 @@ private slots:
     void onDelayedPopupCheckabletriggered(bool b);
     void onShowContextCategory(bool on);
     void onStyleClicked(int id);
+    void onActionCustomizeTriggered(bool b);
+    void onActionCustomizeAndSaveTriggered(bool b);
+    void onActionHelpTriggered();
+    void onActionRemoveAppBtnTriggered(bool b);
+    void onActionUseQssTriggered();
+    void onActionLoadCustomizeXmlFileTriggered();
+    void onActionWindowFlagNormalButtonTriggered(bool b);
 
 private:
     SARibbonContextCategory* m_contextCategory;
