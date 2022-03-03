@@ -1,7 +1,7 @@
 <RCC>
     <qresource prefix="/icon">
         <file>icon/largerFont.svg</file>
-        <file>icon/smallFontsvg</file>
+        <file>icon/smallFont.svg</file>
         <file>icon/save.svg</file>
         <file>icon/hideRibbon.svg</file>
         <file>icon/showHideButton.svg</file>

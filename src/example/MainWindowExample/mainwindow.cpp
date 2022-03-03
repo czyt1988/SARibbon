@@ -630,7 +630,7 @@ void MainWindow::createCategorySize(SARibbonCategory* page)
 
     QAction* actSmallFontSize = new QAction(this);
     actSmallFontSize->setObjectName(QStringLiteral(u"actSmallFontSize"));
-    actSmallFontSize->setIcon(QIcon(":/icon/icon/smallFontsvg"));
+    actSmallFontSize->setIcon(QIcon(":/icon/icon/smallFont.svg"));
     actSmallFontSize->setText(QStringLiteral(u"Smaller"));
     pannel->addLargeAction(actSmallFontSize);
 }
