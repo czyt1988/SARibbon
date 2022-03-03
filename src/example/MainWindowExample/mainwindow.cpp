@@ -236,6 +236,10 @@ void MainWindow::onActionWindowFlagNormalButtonTriggered(bool b)
     }
 }
 
+void MainWindow::onFontComWidgetCurrentFontChanged(const QFont& font)
+{
+}
+
 void MainWindow::createCategoryMain(SARibbonCategory* page)
 {
     //! 1
@@ -611,11 +615,11 @@ void MainWindow::createCategorySize(SARibbonCategory* page)
     act = pannel->addWidget(labelFontSize, SARibbonPannelItem::Small);
     act->setObjectName(labelFontSize->objectName());
 
-    QFontComboBox* comWidget = new QFontComboBox(this);
-    comWidget->setObjectName(QStringLiteral(u"fontComboBox"));
-    act = pannel->addWidget(comWidget, SARibbonPannelItem::Small);
-    act->setObjectName(comWidget->objectName());
-
+    QFontComboBox* fontComWidget = new QFontComboBox(this);
+    fontComWidget->setObjectName(QStringLiteral(u"fontComboBox"));
+    act = pannel->addWidget(fontComWidget, SARibbonPannelItem::Small);
+    act->setObjectName(fontComWidget->objectName());
+    connect(fontComWidget, &QFontComboBox::currentFontChanged, this, &MainWindow::onFontComWidgetCurrentFontChanged);
     pannel->addSeparator();
 
     QAction* actLargerFontSize = new QAction(this);
