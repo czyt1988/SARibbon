@@ -45,6 +45,8 @@ private slots:
     void onActionLoadCustomizeXmlFileTriggered();
     void onActionWindowFlagNormalButtonTriggered(bool b);
 
+    void onFontComWidgetCurrentFontChanged(const QFont& font);
+
 private:
     SARibbonContextCategory* m_contextCategory;
     SARibbonContextCategory* m_contextCategory2;
