@@ -14,85 +14,75 @@
 class SARibbonMainWindowPrivate
 {
 public:
-    SARibbonMainWindowPrivate(SARibbonMainWindow *p);
+    SARibbonMainWindowPrivate(SARibbonMainWindow* p);
     void init();
 
-    SARibbonMainWindow *Parent;
-    SARibbonBar *ribbonBar;
+    SARibbonMainWindow* Parent;
+    SARibbonBar* ribbonBar;
     SARibbonMainWindow::RibbonTheme currentRibbonTheme;
-    SAWindowButtonGroup *windowButtonGroup;
-    SAFramelessHelper *pFramelessHelper;
-	bool useRibbon;
+    SAWindowButtonGroup* windowButtonGroup;
+    SAFramelessHelper* pFramelessHelper;
+    bool useRibbon;
 };
 
-SARibbonMainWindowPrivate::SARibbonMainWindowPrivate(SARibbonMainWindow *p)
+SARibbonMainWindowPrivate::SARibbonMainWindowPrivate(SARibbonMainWindow* p)
     : Parent(p)
-	, ribbonBar(nullptr)
+    , ribbonBar(nullptr)
     , currentRibbonTheme(SARibbonMainWindow::Office2013)
-	, windowButtonGroup(nullptr)
+    , windowButtonGroup(nullptr)
     , pFramelessHelper(nullptr)
     , useRibbon(true)
 {
 }
 
-
 void SARibbonMainWindowPrivate::init()
 {
 }
 
-
-SARibbonMainWindow::SARibbonMainWindow(QWidget *parent, bool useRibbon)
-    : QMainWindow(parent)
-    , m_d(new SARibbonMainWindowPrivate(this))
+SARibbonMainWindow::SARibbonMainWindow(QWidget* parent, bool useRibbon)
+    : QMainWindow(parent), m_d(new SARibbonMainWindowPrivate(this))
 {
     m_d->init();
-	m_d->useRibbon = useRibbon;
+    m_d->useRibbon = useRibbon;
     qDebug() << windowFlags();
     if (useRibbon) {
-        qDebug() << "sa ribbon version:" << SA_RIBBON_BAR_VERSION_STR;
-		setRibbonTheme(ribbonTheme());
+        setRibbonTheme(ribbonTheme());
         setMenuWidget(new SARibbonBar(this));
 #ifdef Q_OS_UNIX
         //某些系统会对FramelessWindowHint异常
-        //FramelessHelper用如下这种setWindowFlags(w->windowFlags()|Qt::FramelessWindowHint);方式设置，改为强制取消其他
-        setWindowFlags(Qt::Window|Qt::FramelessWindowHint);
+        // FramelessHelper用如下这种setWindowFlags(w->windowFlags()|Qt::FramelessWindowHint);方式设置，改为强制取消其他
+        setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
 #endif
     }
 }
-
 
 SARibbonMainWindow::~SARibbonMainWindow()
 {
     delete m_d;
 }
 
-
-const SARibbonBar *SARibbonMainWindow::ribbonBar() const
+const SARibbonBar* SARibbonMainWindow::ribbonBar() const
 {
     return (m_d->ribbonBar);
 }
-
 
 /**
  * @brief 如果useRibbon为false，会返回nullptr
  * @return
  */
-SARibbonBar *SARibbonMainWindow::ribbonBar()
+SARibbonBar* SARibbonMainWindow::ribbonBar()
 {
     return (m_d->ribbonBar);
 }
 
-
-SAFramelessHelper *SARibbonMainWindow::framelessHelper()
+SAFramelessHelper* SARibbonMainWindow::framelessHelper()
 {
     return (m_d->pFramelessHelper);
 }
 
-
 void SARibbonMainWindow::setRibbonTheme(SARibbonMainWindow::RibbonTheme theme)
 {
-    switch (theme)
-    {
+    switch (theme) {
     case NormalTheme:
         loadTheme(":/theme/resource/default.qss");
         break;
@@ -107,18 +97,15 @@ void SARibbonMainWindow::setRibbonTheme(SARibbonMainWindow::RibbonTheme theme)
     }
 }
 
-
 SARibbonMainWindow::RibbonTheme SARibbonMainWindow::ribbonTheme() const
 {
     return (m_d->currentRibbonTheme);
 }
 
-
 bool SARibbonMainWindow::isUseRibbon() const
 {
     return (m_d->useRibbon);
 }
-
 
 /**
  * @brief 此函数仅用于控制最小最大化和关闭按钮的显示
@@ -130,7 +117,6 @@ void SARibbonMainWindow::updateWindowFlag(Qt::WindowFlags flags)
     }
     repaint();
 }
-
 
 /**
  * @brief 此函数返回的flags仅包括 Qt::WindowCloseButtonHint，Qt::WindowMaximizeButtonHint，Qt::WindowMinimizeButtonHint
@@ -145,11 +131,10 @@ Qt::WindowFlags SARibbonMainWindow::windowButtonFlags() const
     return (windowFlags());
 }
 
-
-void SARibbonMainWindow::setMenuWidget(QWidget *menubar)
+void SARibbonMainWindow::setMenuWidget(QWidget* menubar)
 {
     QMainWindow::setMenuWidget(menubar);
-    SARibbonBar *bar = qobject_cast<SARibbonBar *>(menubar);
+    SARibbonBar* bar = qobject_cast< SARibbonBar* >(menubar);
 
     if (bar) {
         m_d->ribbonBar = bar;
@@ -169,7 +154,7 @@ void SARibbonMainWindow::setMenuWidget(QWidget *menubar)
         m_d->windowButtonGroup->setWindowStates(windowState());
         m_d->useRibbon = true;
         m_d->windowButtonGroup->show();
-    }else{
+    } else {
         m_d->ribbonBar = nullptr;
         m_d->useRibbon = false;
         if (m_d->pFramelessHelper) {
@@ -182,11 +167,10 @@ void SARibbonMainWindow::setMenuWidget(QWidget *menubar)
     }
 }
 
-
-void SARibbonMainWindow::setMenuBar(QMenuBar *menuBar)
+void SARibbonMainWindow::setMenuBar(QMenuBar* menuBar)
 {
     QMainWindow::setMenuBar(menuBar);
-    SARibbonBar *bar = qobject_cast<SARibbonBar *>(menuBar);
+    SARibbonBar* bar = qobject_cast< SARibbonBar* >(menuBar);
 
     if (bar) {
         m_d->ribbonBar = bar;
@@ -206,7 +190,7 @@ void SARibbonMainWindow::setMenuBar(QMenuBar *menuBar)
         m_d->windowButtonGroup->setWindowStates(windowState());
         m_d->useRibbon = true;
         m_d->windowButtonGroup->show();
-    }else{
+    } else {
         m_d->ribbonBar = nullptr;
         m_d->useRibbon = false;
         if (m_d->pFramelessHelper) {
@@ -219,8 +203,7 @@ void SARibbonMainWindow::setMenuBar(QMenuBar *menuBar)
     }
 }
 
-
-void SARibbonMainWindow::resizeEvent(QResizeEvent *event)
+void SARibbonMainWindow::resizeEvent(QResizeEvent* event)
 {
     if (m_d->ribbonBar) {
         if (m_d->ribbonBar->size().width() != this->size().width()) {
@@ -233,14 +216,12 @@ void SARibbonMainWindow::resizeEvent(QResizeEvent *event)
     QMainWindow::resizeEvent(event);
 }
 
-
-bool SARibbonMainWindow::eventFilter(QObject *obj, QEvent *e)
+bool SARibbonMainWindow::eventFilter(QObject* obj, QEvent* e)
 {
     //这个过滤是为了把ribbonBar上的动作传递到mainwindow，再传递到frameless，
     //由于ribbonbar会遮挡刁frameless的区域，导致frameless无法捕获这些消息
     if (obj == m_d->ribbonBar) {
-        switch (e->type())
-        {
+        switch (e->type()) {
         case QEvent::MouseButtonPress:
         case QEvent::MouseButtonRelease:
         case QEvent::MouseMove:
@@ -256,19 +237,15 @@ bool SARibbonMainWindow::eventFilter(QObject *obj, QEvent *e)
     return (QMainWindow::eventFilter(obj, e));
 }
 
-
-bool SARibbonMainWindow::event(QEvent *e)
+bool SARibbonMainWindow::event(QEvent* e)
 {
     if (e) {
-        switch (e->type())
-        {
-        case QEvent::WindowStateChange:
-        {
+        switch (e->type()) {
+        case QEvent::WindowStateChange: {
             if (isUseRibbon()) {
                 m_d->windowButtonGroup->setWindowStates(windowState());
             }
-        }
-        break;
+        } break;
 
         default:
             break;
@@ -277,12 +254,11 @@ bool SARibbonMainWindow::event(QEvent *e)
     return (QMainWindow::event(e));
 }
 
-
 void SARibbonMainWindow::loadTheme(const QString& themeFile)
 {
     QFile file(themeFile);
 
-    if (!file.open(QIODevice::ReadOnly|QIODevice::Text)) {
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         return;
     }
     setStyleSheet(file.readAll());
