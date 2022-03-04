@@ -3,17 +3,22 @@
 #include <qglobal.h>
 
 /**
- * @def ribbon的数字版本
+ * @def ribbon的数字版本 MAJ.MIN.PAT
  */
-#ifndef SA_RIBBON_BAR_VERSION
-#define SA_RIBBON_BAR_VERSION    0.2
+#ifndef SA_RIBBON_BAR_VERSION_MAJ
+#define SA_RIBBON_BAR_VERSION_MAJ 0
 #endif
-
 /**
- * @def ribbon 的文字版本
+ * @def ribbon的数字版本 MAJ.MIN.PAT
  */
-#ifndef SA_RIBBON_BAR_VERSION_STR
-#define SA_RIBBON_BAR_VERSION_STR    "0.2"
+#ifndef SA_RIBBON_BAR_VERSION_MIN
+#define SA_RIBBON_BAR_VERSION_MIN 3
+#endif
+/**
+ * @def ribbon的数字版本 MAJ.MIN.PAT
+ */
+#ifndef SA_RIBBON_BAR_VERSION_PAT
+#define SA_RIBBON_BAR_VERSION_PAT 0
 #endif
 
 /**
@@ -22,14 +27,14 @@
  * 默认不会有此属性，仅在有此属性且为true时才会在SARibbonCustomizeWidget中能显示为可设置
  */
 #ifndef SA_RIBBON_BAR_PROP_CAN_CUSTOMIZE
-#define SA_RIBBON_BAR_PROP_CAN_CUSTOMIZE    "_sa_isCanCustomize"
+#define SA_RIBBON_BAR_PROP_CAN_CUSTOMIZE "_sa_isCanCustomize"
 #endif
 
 #ifndef SA_RIBBON_BAR_NO_EXPORT
-#if defined(SA_RIBBON_BAR_MAKE_LIB)         // 定义此宏将构建library
-#define SA_RIBBON_EXPORT	Q_DECL_EXPORT
+#if defined(SA_RIBBON_BAR_MAKE_LIB)  // 定义此宏将构建library
+#define SA_RIBBON_EXPORT Q_DECL_EXPORT
 #else
-#define SA_RIBBON_EXPORT	Q_DECL_IMPORT
+#define SA_RIBBON_EXPORT Q_DECL_IMPORT
 #endif
 #endif
 
@@ -37,6 +42,4 @@
 #define SA_RIBBON_EXPORT
 #endif
 
-
-
-#endif // SARIBBONGLOBAL_H
+#endif  // SARIBBONGLOBAL_H
