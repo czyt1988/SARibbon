@@ -3,14 +3,9 @@ project(SARibbon)
 
 include(CPack)
 
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core REQUIRED)
-message(STATUS "QT: ${QT_VERSION_MAJOR}")
+set(QtLibs Core Widgets GUI)
 
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS
-    Widgets
-    GUI
-    )
+find_package(Qt5 COMPONENTS ${QtLibs} REQUIRED)
 
 include_directories(
     ${Qt${QT_VERSION_MAJOR}Widgets_INCLUDE_DIRS}

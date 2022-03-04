@@ -27,7 +27,6 @@ public:
     //设置后缀
     void setSuffix(const QString& str);
 
-    //前缀文本框
     QLabel *labelPrefix() const;
     QLabel *labelSuffix() const;
 
