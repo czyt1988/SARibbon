@@ -4,7 +4,11 @@ set(LIB_NAME SARibbonBar)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-qt5_add_resources(QRCS resource.qrc)
+if(SARIBBON_QT_VERSION VERSION_EQUAL 5)
+	qt5_add_resources(QRCS saribbonresouce.qrc)
+else()
+	qt_add_resources(QRCS saribbonresouce.qrc)
+endif()
 
 SET(HEADER_FILES
     SAFramelessHelper.h
