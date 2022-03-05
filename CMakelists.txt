@@ -3,19 +3,22 @@ project(SARibbon)
 
 include(CPack)
 
-set(QtLibs Core Widgets GUI)
 
-find_package(Qt5 COMPONENTS ${QtLibs} REQUIRED)
+set(SARIBBON_QT_VERSION 5 CACHE STRING "Expected Qt version")
+set_property(CACHE SARIBBON_QT_VERSION PROPERTY STRINGS 5 6)
+
+set(SARIBBON_QT_COMPONENTS Core Widgets GUI)
+find_package(Qt${SARIBBON_QT_VERSION} COMPONENTS ${SARIBBON_QT_COMPONENTS} REQUIRED)
 
 include_directories(
-    ${Qt${QT_VERSION_MAJOR}Widgets_INCLUDE_DIRS}
-    )
+    ${Qt${SARIBBON_QT_VERSION}Widgets_INCLUDE_DIRS}
+)
     
 add_definitions(
-    ${Qt${QT_VERSION_MAJOR}Widgets_DEFINITIONS}
-    )
+    ${Qt${SARIBBON_QT_VERSION}Widgets_DEFINITIONS}
+)
 
-
+option(BUILD_EXAMPLES "build the examples" OFF)
 SET(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "add a postfix, usually d on windows")
 SET(CMAKE_RELEASE_POSTFIX "" CACHE STRING "add a postfix, usually empty on windows")
 SET(CMAKE_RELWITHDEBINFO_POSTFIX "rd" CACHE STRING "add a postfix, usually empty on windows")
