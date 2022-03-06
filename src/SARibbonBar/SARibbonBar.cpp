@@ -1316,7 +1316,6 @@ void SARibbonBar::paintInNormalStyle()
 void SARibbonBar::paintInWpsLiteStyle()
 {
     QPainter p(this);
-
     //!
     paintBackground(p);
     //! 显示上下文标签

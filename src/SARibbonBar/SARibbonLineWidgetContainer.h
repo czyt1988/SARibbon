@@ -1,4 +1,4 @@
-#ifndef SARIBBONLINEWIDGETCONTAINER_H
+﻿#ifndef SARIBBONLINEWIDGETCONTAINER_H
 #define SARIBBONLINEWIDGETCONTAINER_H
 
 #include <QtCore/qglobal.h>
@@ -17,9 +17,10 @@
 class SA_RIBBON_EXPORT SARibbonLineWidgetContainer : public QWidget
 {
 public:
-    SARibbonLineWidgetContainer(QWidget *par = nullptr);
+    SARibbonLineWidgetContainer(QWidget* par = nullptr);
+
     //设置widget,不允许设置一个nullptr
-    void setWidget(QWidget *innerWidget);
+    void setWidget(QWidget* innerWidget);
 
     //设置前缀
     void setPrefix(const QString& str);
@@ -28,14 +29,16 @@ public:
     void setSuffix(const QString& str);
 
     //前缀文本框
-    QLabel *labelPrefix() const;
-    QLabel *labelSuffix() const;
+    QLabel* labelPrefix() const;
+
+    //后缀文本框
+    QLabel* labelSuffix() const;
 
 private:
     //两个文本
-    QLabel *m_labelPrefix;
-    QLabel *m_labelSuffix;
-    QWidget *m_innerWidget;
+    QLabel* m_labelPrefix;
+    QLabel* m_labelSuffix;
+    QWidget* m_innerWidget;
 };
 
-#endif // SARIBBONWIDGETCONTAINER_H
+#endif  // SARIBBONWIDGETCONTAINER_H
