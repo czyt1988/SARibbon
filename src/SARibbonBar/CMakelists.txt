@@ -115,22 +115,24 @@ INSTALL(
 	)
 
 #=============Copy SARibbonBar Dll FILES to MainWindowExample Project================================
-SET(MainWindowExample_SubProject_DIR ${CMAKE_CURRENT_BINARY_DIR}/../example/MainWindowExample)	#目标目录
+if(BUILD_EXAMPLES)
+    SET(MainWindowExample_SubProject_DIR ${CMAKE_CURRENT_BINARY_DIR}/../example/MainWindowExample)	#目标目录
 
-SET(SARibbonBar_Debug_DLL_FILE 
-    ${CMAKE_CURRENT_BINARY_DIR}/Debug/${LIB_NAME}d.dll
-)
-SET(SARibbonBar_Release_DLL_FILE 
-    ${CMAKE_CURRENT_BINARY_DIR}/Release/${LIB_NAME}.dll
-)
+    SET(SARibbonBar_Debug_DLL_FILE 
+        ${CMAKE_CURRENT_BINARY_DIR}/Debug/${LIB_NAME}d.dll
+    )
+    SET(SARibbonBar_Release_DLL_FILE 
+        ${CMAKE_CURRENT_BINARY_DIR}/Release/${LIB_NAME}.dll
+    )
 
-add_custom_command(TARGET ${LIB_NAME}
-    POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E 
-            make_directory "${MainWindowExample_SubProject_DIR}/$<$<CONFIG:Release>:Release>$<$<CONFIG:Debug>:Debug>/"	#因创建子项目顺序，需先创建目标目录再进行复制操作
-    COMMAND ${CMAKE_COMMAND} -E
-			copy_if_different 
-				"$<$<CONFIG:Release>:${SARibbonBar_Release_DLL_FILE}>" 
-				"$<$<CONFIG:Debug>:${SARibbonBar_Debug_DLL_FILE}>" 
-				"${MainWindowExample_SubProject_DIR}/$<$<CONFIG:Release>:Release>$<$<CONFIG:Debug>:Debug>/"
-)
+    add_custom_command(TARGET ${LIB_NAME}
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E 
+                make_directory "${MainWindowExample_SubProject_DIR}/$<$<CONFIG:Release>:Release>$<$<CONFIG:Debug>:Debug>/"	#因创建子项目顺序，需先创建目标目录再进行复制操作
+        COMMAND ${CMAKE_COMMAND} -E
+                copy_if_different 
+                    "$<$<CONFIG:Release>:${SARibbonBar_Release_DLL_FILE}>" 
+                    "$<$<CONFIG:Debug>:${SARibbonBar_Debug_DLL_FILE}>" 
+                    "${MainWindowExample_SubProject_DIR}/$<$<CONFIG:Release>:Release>$<$<CONFIG:Debug>:Debug>/"
+    )
+endif(BUILD_EXAMPLES)
