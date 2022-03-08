@@ -1,8 +1,16 @@
 cmake_minimum_required(VERSION 3.15)
 project(SARibbon)
 
-include(CPack)
+set(PROJECT_VERSION_MAJOR 0)
+set(PROJECT_VERSION_MINOR 0)
+set(PROJECT_VERSION_PATCH 1)
 
+set (PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
+if(PROJECT_VERSION_PATCH GREATER 0)
+  set (PROJECT_VERSION "${PROJECT_VERSION}.${PROJECT_VERSION_PATCH}")
+endif ()
+
+include(CPack)
 
 set(SARIBBON_QT_VERSION 5 CACHE STRING "Expected Qt version")
 set_property(CACHE SARIBBON_QT_VERSION PROPERTY STRINGS 5 6)
@@ -29,4 +37,4 @@ if(MSVC)
 endif()
 
 add_subdirectory(src)
-
+add_subdirectory(cmake)
