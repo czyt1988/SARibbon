@@ -1,4 +1,6 @@
 ﻿#include "SARibbonElementCreateDelegate.h"
+#include <QApplication>
+#include <QFontMetrics>
 #include "SARibbonBar.h"
 #include "SARibbonApplicationButton.h"
 #include "SARibbonTabBar.h"
@@ -144,4 +146,10 @@ void SARibbonElementCreateDelegate::setRibbonStyleOption(const SARibbonStyleOpti
 SARibbonPannelOptionButton* SARibbonElementCreateDelegate::createRibbonPannelOptionButton(SARibbonPannel* pannel)
 {
     return (new SARibbonPannelOptionButton(pannel));
+}
+
+SARibbonStyleOption sa_calc_default_ribbon_style_option()
+{
+    //    QFontMetrics fm = QApplication::fontMetrics();
+    return SARibbonStyleOption();
 }

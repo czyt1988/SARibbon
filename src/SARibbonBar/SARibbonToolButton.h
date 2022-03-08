@@ -81,7 +81,8 @@ private:
     LargeButtonType m_largeButtonType;
     bool m_mouseOnSubControl;  ///< 这个用于标记MenuButtonPopup模式下，鼠标在文本区域
     bool m_menuButtonPressed;
-    QRect m_iconRect;
+    QRect m_iconRect;   ///< 记录icon的绘制位置
+    QRect m_textRect;   ///< 记录text的绘制位置
     bool m_isWordWrap;  ///< 标记是否文字换行 @default false
 };
 

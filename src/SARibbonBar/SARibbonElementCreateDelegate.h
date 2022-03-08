@@ -51,6 +51,12 @@ public:
     bool isToolButtonTextShift;  ///< 配置SARibbonToolButton文字在点击时是否会轻微改变位置而达到一种类似跳动的效果,@default 默认为false
 };
 
+/**
+ * @brief 通过系统字体信息计算默认的ribbon style option
+ * @return
+ */
+SA_RIBBON_EXPORT SARibbonStyleOption sa_calc_default_ribbon_style_option();
+
 ///
 /// \brief SARibbon的子元素创建的代理，SARibbon内部创建子元素都通过SARibbonElementCreateDelegate来创建
 /// 如果有些子元素重载，如SARibbonCategory，可以重载此类的createRibbonCategory,返回重载的类来进行重载
