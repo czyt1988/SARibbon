@@ -1,4 +1,5 @@
 ﻿#include "mainwindow.h"
+#include <QApplication>
 #include <QFile>
 #include <QTextEdit>
 #include <QAbstractButton>
@@ -236,8 +237,29 @@ void MainWindow::onActionWindowFlagNormalButtonTriggered(bool b)
     }
 }
 
-void MainWindow::onFontComWidgetCurrentFontChanged(const QFont& font)
+void MainWindow::onFontComWidgetCurrentFontChanged(const QFont& f)
 {
+    qDebug() << "set font:" << f;
+    ribbonBar()->setFont(f);
+    update();
+}
+
+void MainWindow::onActionFontLargerTriggered()
+{
+    QFont f = font();
+    f.setPointSize(f.pointSize() + 1);
+    ribbonBar()->setFont(f);
+    update();
+    qDebug() << "set font:" << f;
+}
+
+void MainWindow::onActionFontSmallerTriggered()
+{
+    QFont f = font();
+    f.setPointSize(f.pointSize() - 1);
+    ribbonBar()->setFont(f);
+    update();
+    qDebug() << "set font:" << f;
 }
 
 void MainWindow::createCategoryMain(SARibbonCategory* page)
@@ -256,7 +278,6 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
         Q_UNUSED(b);
         this->m_edit->append("actSaveion clicked");
     });
-
     QAction* actHideRibbon = createAction(tr("hide ribbon"), ":/icon/icon/hideRibbon.svg", "actHideRibbon");
     actHideRibbon->setCheckable(true);
     pannel1->addSmallAction(actHideRibbon);
@@ -622,17 +643,14 @@ void MainWindow::createCategorySize(SARibbonCategory* page)
     connect(fontComWidget, &QFontComboBox::currentFontChanged, this, &MainWindow::onFontComWidgetCurrentFontChanged);
     pannel->addSeparator();
 
-    QAction* actLargerFontSize = new QAction(this);
-    actLargerFontSize->setObjectName(QStringLiteral(u"actLargerFontSize"));
-    actLargerFontSize->setIcon(QIcon(":/icon/icon/largerFont.svg"));
-    actLargerFontSize->setText(QStringLiteral(u"Larger"));
+    QAction* actLargerFontSize = createAction(tr("Larger"), ":/icon/icon/largerFont.svg", "actLargerFontSize");
     pannel->addLargeAction(actLargerFontSize);
 
-    QAction* actSmallFontSize = new QAction(this);
-    actSmallFontSize->setObjectName(QStringLiteral(u"actSmallFontSize"));
-    actSmallFontSize->setIcon(QIcon(":/icon/icon/smallFont.svg"));
-    actSmallFontSize->setText(QStringLiteral(u"Smaller"));
+    QAction* actSmallFontSize = createAction(tr("Smaller"), ":/icon/icon/smallFont.svg", "actSmallFontSize");
     pannel->addLargeAction(actSmallFontSize);
+
+    connect(actLargerFontSize, &QAction::triggered, this, &MainWindow::onActionFontLargerTriggered);
+    connect(actSmallFontSize, &QAction::triggered, this, &MainWindow::onActionFontSmallerTriggered);
 }
 
 /**
