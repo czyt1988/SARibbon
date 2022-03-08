@@ -12,6 +12,7 @@ SOURCES += \
     $$PWD/SARibbonCustomizeDialog.cpp \
     $$PWD/SARibbonCustomizeWidget.cpp \
     $$PWD/SARibbonMainWindow.cpp \
+    $$PWD/SARibbonStyleOption.cpp \
     $$PWD/SAWindowButtonGroup.cpp \
     $$PWD/SARibbonApplicationButton.cpp \
     $$PWD/SARibbonTabBar.cpp \
@@ -49,6 +50,7 @@ HEADERS  += \
     $$PWD/SARibbonCustomizeDialog.h \
     $$PWD/SARibbonCustomizeWidget.h \
     $$PWD/SARibbonMainWindow.h \
+    $$PWD/SARibbonStyleOption.h \
     $$PWD/SAWindowButtonGroup.h \
     $$PWD/SARibbonApplicationButton.h \
     $$PWD/SARibbonTabBar.h \

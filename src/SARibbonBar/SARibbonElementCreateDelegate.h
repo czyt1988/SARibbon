@@ -5,6 +5,9 @@
 #include <QMargins>
 #include <QSize>
 #include <QScopedPointer>
+#include "SARibbonBar.h"
+#include "SARibbonPannel.h"
+#include "SARibbonStyleOption.h"
 class QWidget;
 class SARibbonBar;
 class SARibbonTabBar;
@@ -21,41 +24,6 @@ class SARibbonButtonGroupWidget;
 class SARibbonStackedWidget;
 class SARibbonQuickAccessBar;
 class SARibbonPannelOptionButton;
-
-/**
- * @brief 定义了saribbon所有尺寸相关信息，saribbon的建立都基于此类的尺寸，如果想调整，
- * 可以通过 @ref SARibbonElementCreateDelegate 的 @ref setRibbonStyleOption 函数设置自己的SARibbonStyleOption
- *
- * 一般SARibbonElementCreateDelegate::setRibbonStyleOption函数最好在ribbonbar构建之前调用
- */
-class SA_RIBBON_EXPORT SARibbonStyleOption
-{
-public:
-    SARibbonStyleOption();
-    int mainbarHeightOfficeStyleThreeRow;  ///< OfficeStyle 样式下的mainbar高度
-    int mainbarHeightWPSStyleThreeRow;     ///< WpsLiteStyle 样式下的mainbar高度
-    int mainbarHeightOfficeStyleTwoRow;    ///< OfficeStyleTwoRow 样式下的mainbar高度
-    int mainbarHeightWPSStyleTwoRow;       ///< WpsLiteStyleTwoRow 样式下的mainbar高度
-    int titleBarHight;                     ///< 标题栏高度
-    int tabBarHight;                       ///< ribbon tab 的高度
-    QColor titleTextColor;                 ///< 标题颜色
-    QMargins widgetBord;                   ///< 整个ribbonbar的四个边框，默认为0
-    QColor tabBarBaseLineColor;            ///< tabbar 底部线条颜色
-    int applicationButtonWidth;            ///< applicationButton的宽度，高度随tab bar高度
-    int galleryFixedHeight;                ///< SARibbonGallery控件的高度
-    int galleryMinimumWidth;               ///< SARibbonGallery控件的最小宽度
-    int galleryButtonMaximumWidth;  ///< SARibbonGallery控件的最右边三个按钮的最大宽度，默认为15
-    int pannelTitleHeight;          ///< SARibbonPannel标题栏的高度
-    QSize toolButtonLargeIconSize;  ///< SARibbonToolButton的Large模式的icon 尺寸
-    QSize toolButtonSmallIconSize;  ///< SARibbonToolButton的Medium和small模式的icon 尺寸
-    bool isToolButtonTextShift;  ///< 配置SARibbonToolButton文字在点击时是否会轻微改变位置而达到一种类似跳动的效果,@default 默认为false
-};
-
-/**
- * @brief 通过系统字体信息计算默认的ribbon style option
- * @return
- */
-SA_RIBBON_EXPORT SARibbonStyleOption sa_calc_default_ribbon_style_option();
 
 ///
 /// \brief SARibbon的子元素创建的代理，SARibbon内部创建子元素都通过SARibbonElementCreateDelegate来创建

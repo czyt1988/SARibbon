@@ -1,8 +1,7 @@
 ﻿#include "SARibbonPannelOptionButton.h"
 #include <QAction>
 
-SARibbonPannelOptionButton::SARibbonPannelOptionButton(QWidget *parent)
-    : QToolButton(parent)
+SARibbonPannelOptionButton::SARibbonPannelOptionButton(QWidget* parent) : QToolButton(parent)
 {
     setAutoRaise(true);
     setCheckable(false);
@@ -12,9 +11,7 @@ SARibbonPannelOptionButton::SARibbonPannelOptionButton(QWidget *parent)
     setIcon(QIcon(":/image/resource/ribbonPannelOptionButton.png"));
 }
 
-
-void SARibbonPannelOptionButton::connectAction(QAction *action)
+void SARibbonPannelOptionButton::connectAction(QAction* action)
 {
-    connect(this, &SARibbonPannelOptionButton::clicked
-        , action, &QAction::toggle);
+    connect(this, &SARibbonPannelOptionButton::clicked, action, &QAction::trigger);
 }

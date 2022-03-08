@@ -49,7 +49,10 @@ public:
     SARibbonPannelOptionButton* m_optionActionButton;     ///< 标题栏的y距离
     SARibbonPannel::PannelLayoutMode m_pannelLayoutMode;  ///< pannel的布局模式，默认为3行模式ThreeRowMode
     bool m_isCanCustomize;                                ///< 记录是否可自定义
+    static int s_pannelTitleHeight;                       ///< pannel标题栏的全局高度,默认为21
 };
+
+int SARibbonPannelPrivate::s_pannelTitleHeight = 21;
 
 SARibbonPannelPrivate::SARibbonPannelPrivate(SARibbonPannel* p)
     : Parent(p)
@@ -554,7 +557,7 @@ bool SARibbonPannel::isExpanding() const
  */
 int SARibbonPannel::titleHeight() const
 {
-    return (isTwoRow() ? 0 : RibbonSubElementStyleOpt.pannelTitleHeight);
+    return (isTwoRow() ? 0 : pannelTitleHeight());
 }
 
 /**
@@ -619,6 +622,26 @@ void SARibbonPannel::setPannelName(const QString& title)
 {
     setWindowTitle(title);
     update();
+}
+
+/**
+ * @brief 定义所有的pannel的标题栏高度，有别于@sa titleHeight 此函数是静态函数，获取的是全局的高度
+ * 而 @sa titleHeight 函数会根据当前的行情况返回标题栏高度，在2行情况下返回0
+ *
+ * @return
+ */
+int SARibbonPannel::pannelTitleHeight()
+{
+    return SARibbonPannelPrivate::s_pannelTitleHeight;
+}
+
+/**
+ * @brief 设置pannel的全局高度，此函数是个全局的影响
+ * @param h
+ */
+void SARibbonPannel::setPannelTitleHeight(int h)
+{
+    SARibbonPannelPrivate::s_pannelTitleHeight = h;
 }
 
 void SARibbonPannel::resetLayout(PannelLayoutMode newmode)
