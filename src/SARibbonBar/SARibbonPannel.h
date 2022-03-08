@@ -137,7 +137,7 @@ public:
     bool isExpanding() const;
 
     //标题栏高度，仅在3行模式下生效
-    virtual int titleHeight() const;
+    int titleHeight() const;
 
     // optionActionButton的尺寸
     virtual QSize optionActionButtonSize() const;
@@ -156,6 +156,9 @@ public:
     QString pannelName() const;
     void setPannelName(const QString& title);
 
+    //全局的标题栏高度
+    static int pannelTitleHeight();
+    static void setPannelTitleHeight(int h);
 signals:
 
     /**
