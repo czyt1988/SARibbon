@@ -8,6 +8,7 @@ class SARibbonActionsManager;
 class SARibbonQuickAccessBar;
 class SARibbonButtonGroupWidget;
 class QTextEdit;
+
 class MainWindow : public SARibbonMainWindow
 {
     Q_OBJECT
