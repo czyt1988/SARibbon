@@ -1,6 +1,9 @@
 ﻿#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 #include "SARibbonMainWindow.h"
+#include "VideoExample.h"
+#include <QLabel>;
+
 class SARibbonCategory;
 class SARibbonContextCategory;
 class SARibbonCustomizeWidget;
@@ -14,10 +17,19 @@ public:
 private slots:
     void onShowContextCategory(bool on);
     void onStyleClicked(int id);
+	void onFrameChanged(const cv::Mat& frame) 
+	{
+		QImage img((uchar*)frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888);
+		QSize size = this->size();
+		int width = size.width();
+		int height = size.height();
+		m_label->setPixmap(QPixmap::fromImage(img).scaled(width, height, Qt::KeepAspectRatio));
+	}
 
 
 private:
     void createCategoryMain(SARibbonCategory *page);
+	void createCategoryVideo(SARibbonCategory *page);
     void createCategoryOther(SARibbonCategory *page);
     void createCategoryDelete(SARibbonCategory *page);
     void createContextCategoryPage1(SARibbonCategory *page);
@@ -38,9 +50,11 @@ private:
     SARibbonContextCategory *m_contextCategory2;
     SARibbonCustomizeWidget *m_customizeWidget;
     QTextEdit *m_edit;
+	QLabel *m_label;
     SARibbonActionsManager *m_actMgr;
     int m_actionTagText;
     int m_actionTagWithIcon;
+	std::unique_ptr<VideoExample> m_videoExample;
 };
 
 #endif // MAINWINDOW_H

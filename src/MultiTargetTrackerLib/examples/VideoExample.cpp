@@ -48,7 +48,7 @@ void VideoExample::SyncProcess()
     cv::VideoWriter writer;
 
 #ifndef SILENT_WORK
-    cv::namedWindow("Video", cv::WINDOW_NORMAL | cv::WINDOW_KEEPRATIO);
+    //cv::namedWindow("Video", cv::WINDOW_NORMAL | cv::WINDOW_KEEPRATIO);
     bool manualMode = false;
 #endif
 
@@ -71,7 +71,7 @@ void VideoExample::SyncProcess()
     int64 startLoopTime = cv::getTickCount();
 
     for (;;)
-    {
+    {	
 		size_t i = 0;
 		for (; i < m_batchSize; ++i)
 		{
@@ -128,7 +128,8 @@ void VideoExample::SyncProcess()
 			DrawData(frameInfo.m_frames[i].GetMatBGR(), frameInfo.m_tracks[i], frameInfo.m_frameInds[i], currTime);
 
 #ifndef SILENT_WORK
-			cv::imshow("Video", frameInfo.m_frames[i].GetMatBGR());
+			//cv::imshow("Video", frameInfo.m_frames[i].GetMatBGR());
+			emit FrameChanged(frameInfo.m_frames[i].GetMatBGR());
 
 			int waitTime = manualMode ? 0 : 1;// std::max<int>(1, cvRound(1000 / m_fps - currTime));
 			int k = cv::waitKey(waitTime);
@@ -427,7 +428,7 @@ void VideoExample::DrawTrack(cv::Mat frame,
                              bool drawTrajectory,
                              int framesCounter)
 {
-    cv::Scalar color = track.m_isStatic ? cv::Scalar(255, 0, 255) : cv::Scalar(0, 255, 0);
+    cv::Scalar color = track.m_isStatic ? cv::Scalar(255, 0, 255) : m_boundingBoxDefaultColor;
     cv::Point2f rectPoints[4];
     track.m_rrect.points(rectPoints);
     for (int i = 0; i < 4; ++i)

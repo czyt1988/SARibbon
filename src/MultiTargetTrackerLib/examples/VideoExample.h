@@ -8,6 +8,8 @@
 #include <condition_variable>
 #include <atomic>
 
+#include <QObject>
+
 #include "BaseDetector.h"
 #include "Ctracker.h"
 #include "FileLogger.h"
@@ -174,8 +176,19 @@ struct FrameInfo
 ///
 /// \brief The VideoExample class
 ///
-class VideoExample
+class VideoExample : public QObject
 {
+	Q_OBJECT
+
+public slots:
+
+	virtual void UpdateParameters() {};
+	virtual void ChangeBoundingBoxColor(cv::Scalar color) { m_boundingBoxDefaultColor = color; }
+
+signals:
+
+	void FrameChanged(const cv::Mat& frame);
+
 public:
     VideoExample(const cv::CommandLineParser& parser);
     VideoExample(const VideoExample&) = delete;
@@ -191,6 +204,8 @@ public:
 protected:
     std::unique_ptr<BaseDetector> m_detector;
     std::unique_ptr<BaseTracker> m_tracker;
+
+	cv::Scalar m_boundingBoxDefaultColor = cv::Scalar(255,255,255);
 
     bool m_showLogs = true;
     float m_fps = 25;

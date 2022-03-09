@@ -13,6 +13,8 @@ set(HEADERS
     FileLogger.h
 )
 
+qt5_wrap_cpp(HEADER_MOC ${HEADERS})
+
 if (BUILD_CARS_COUNTING)
     set(SOURCES ${SOURCES} CarsCounting.cpp)
     set(HEADERS ${HEADERS} CarsCounting.h)
@@ -34,6 +36,7 @@ INCLUDE_DIRECTORIES(
 
 set(LIBS
     ${OpenCV_LIBS}
+	Qt5::Core
     mtracking
     mdetection
     inih
@@ -61,6 +64,6 @@ if (BUILD_CARS_COUNTING)
     add_definitions(-DBUILD_CARS_COUNTING)
 endif(BUILD_CARS_COUNTING)
 
-add_library(${PROJECT_NAME} STATIC ${HEADERS} ${SOURCES})
+add_library(${PROJECT_NAME} STATIC ${HEADERS} ${SOURCES} ${HEADER_MOC})
 
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${LIBS})

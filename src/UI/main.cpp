@@ -2,7 +2,6 @@
 #include <QApplication>
 #include <QElapsedTimer>
 #include <QDebug>
-#include "examples.h"
 
 
 void log_out_put(QtMsgType type, const QMessageLogContext& context, const QString& msg);
