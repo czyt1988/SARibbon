@@ -32,6 +32,8 @@
 
 #include "examples.h"
 #include <QObject>
+#include <QFileDialog>
+#include <QString>
 
 
 #define PRINT_COST(ElapsedTimer, LastTime, STR)					      \
@@ -455,44 +457,22 @@ void MainWindow::createCategoryMain(SARibbonCategory *page)
     pannel->setVisible(true);
 }
 
-const char* keys =
-{
-	"{ @1               |../../data/atrium.avi  | movie file | }"
-	"{ e  example       |1						| number of example 0 - MouseTracking, 1 - MotionDetector, 2 - FaceDetector, 3 - PedestrianDetector, 4 - OpenCV dnn objects detector, 5 - YOLO Darknet detector, 6 - YOLO TensorRT Detector, 7 - Cars counting | }"
-	"{ sf start_frame   |0						| Start a video from this position | }"
-	"{ ef end_frame     |0						| Play a video to this position (if 0 then played to the end of file) | }"
-	"{ ed end_delay     |0						| Delay in milliseconds after video ending | }"
-	"{ o  out           |						| Name of result video file | }"
-	"{ sl show_logs     |1						| Show Trackers logs | }"
-	"{ g gpu            |0						| Use OpenCL acceleration | }"
-	"{ a async          |0						| Use 2 theads for processing pipeline | }"
-	"{ r res            |						| Path to the csv file with tracking result | }"
-	"{ s settings       |../../data/settings.ini| Path to the init file with tracking settings | }"
-	"{ bs batch_size    |1						| Batch size - frames count for processing | }"
-	"{ inf inference    |darknet				| For CarsCounting: Type of inference framework: darknet, ocvdnn | }"
-	"{ w weights        |						| For CarsCounting: Weights of neural network: yolov4.weights | }"
-	"{ c config         |						| For CarsCounting: Config file of neural network: yolov4.cfg | }"
-	"{ n names          |						| For CarsCounting: File with classes names: coco.names | }"
-	"{ wf write_n_frame |1						| Write logs on each N frame: 1 for writing each frame | }"
-	"{ hm heat_map      |0						| For CarsCounting: Draw heat map | }"
-};
-
 void MainWindow::createCategoryVideo(SARibbonCategory *page)
 {
-	const char* arg = "C:\\Projekte\\SARibbon\\build\\Debug\\MultiTargetTracker.exe";
-	cv::CommandLineParser parser(0, &arg, keys);
-
-	m_videoExample = std::make_unique<MotionDetectorExample>(parser);
-	connect(m_videoExample.get(), &VideoExample::FrameChanged, this, &MainWindow::onFrameChanged);
+	m_videoExampleTest = std::make_unique<VideoExampleTest>("../../data/atrium.avi");
+	connect(m_videoExampleTest.get(), &VideoExampleTest::FrameChanged, this, &MainWindow::onFrameChanged);
 
 	SARibbonPannel *pannel = page->addPannel(("File"));
 
 	QAction* act = new QAction(this);
-	act->setObjectName(("OpenFileCV"));
+	act->setObjectName(("OpenFile"));
 	act->setIcon(QIcon(":/icon/icon/folder.png"));
 	act->setText(("Open File"));
 	act->setCheckable(false);
 	pannel->addLargeAction(act);
+	connect(act, &QAction::triggered, this, [=]() {
+		m_videoExampleTest->SetInFile(QFileDialog::getOpenFileName(this, tr("Dieser PC"), "../../data", "Video File(*.*)").toStdString());
+	});
 
 	act = new QAction(this);
 	act->setObjectName(("Play"));
@@ -501,7 +481,7 @@ void MainWindow::createCategoryVideo(SARibbonCategory *page)
 	act->setCheckable(false);
 	pannel->addLargeAction(act);
 
-	connect(act, &QAction::triggered, this, [=]() { m_videoExample->SyncProcess(); });
+	connect(act, &QAction::triggered, m_videoExampleTest.get(), &VideoExampleTest::Start);
 
 
 	act = new QAction(this);
@@ -510,13 +490,23 @@ void MainWindow::createCategoryVideo(SARibbonCategory *page)
 	act->setText(("Pause"));
 	act->setCheckable(false);
 	pannel->addLargeAction(act);
+	connect(act, &QAction::triggered, m_videoExampleTest.get(), &VideoExampleTest::Pause);
 
 	act = new QAction(this);
-	act->setObjectName(("Stop"));
+	act->setObjectName(("Continue"));
 	act->setIcon(QIcon(":/icon/icon/folder.png"));
-	act->setText(("Stop"));
+	act->setText(("Continue"));
 	act->setCheckable(false);
 	pannel->addLargeAction(act);
+	connect(act, &QAction::triggered, m_videoExampleTest.get(), &VideoExampleTest::Continue);
+
+	act = new QAction(this);
+	act->setObjectName(("Break"));
+	act->setIcon(QIcon(":/icon/icon/folder.png"));
+	act->setText(("Break"));
+	act->setCheckable(false);
+	pannel->addLargeAction(act);
+	connect(act, &QAction::triggered, m_videoExampleTest.get(), &VideoExampleTest::Break);
 
 	act = new QAction(this);
 	act->setObjectName(("Green"));
@@ -524,7 +514,7 @@ void MainWindow::createCategoryVideo(SARibbonCategory *page)
 	act->setText(("Green"));
 	act->setCheckable(false);
 	pannel->addLargeAction(act);
-	connect(act, &QAction::triggered, this, [=]() {m_videoExample->ChangeBoundingBoxColor(cv::Scalar(0, 255, 0));});
+	//connect(act, &QAction::triggered, this, [=]() {m_videoExampleTest->ChangeBoundingBoxColor(cv::Scalar(0, 255, 0));});
 
 	act = new QAction(this);
 	act->setObjectName(("Blue"));
@@ -532,7 +522,7 @@ void MainWindow::createCategoryVideo(SARibbonCategory *page)
 	act->setText(("Blue"));
 	act->setCheckable(false);
 	pannel->addLargeAction(act);
-	connect(act, &QAction::triggered, this, [=]() {m_videoExample->ChangeBoundingBoxColor(cv::Scalar(255, 0, 0));});
+	//connect(act, &QAction::triggered, this, [=]() {m_videoExample->ChangeBoundingBoxColor(cv::Scalar(255, 0, 0));});
 
 	act = new QAction(this);
 	act->setObjectName(("Red"));
@@ -540,7 +530,7 @@ void MainWindow::createCategoryVideo(SARibbonCategory *page)
 	act->setText(("Red"));
 	act->setCheckable(false);
 	pannel->addLargeAction(act);
-	connect(act, &QAction::triggered, this, [=]() {m_videoExample->ChangeBoundingBoxColor(cv::Scalar(0, 0, 255));});
+	//connect(act, &QAction::triggered, this, [=]() {m_videoExample->ChangeBoundingBoxColor(cv::Scalar(0, 0, 255));});
 }
 
 

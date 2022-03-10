@@ -1,8 +1,12 @@
 ﻿#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 #include "SARibbonMainWindow.h"
-#include "VideoExample.h"
+#include "VideoExampleTest.h"
 #include <QLabel>;
+#include <iostream>
+#include <chrono>
+#include <ctime> 
+#include <QApplication>
 
 class SARibbonCategory;
 class SARibbonContextCategory;
@@ -19,6 +23,9 @@ private slots:
     void onStyleClicked(int id);
 	void onFrameChanged(const cv::Mat& frame) 
 	{
+		std::cout << std::chrono::system_clock::to_time_t(std::chrono::system_clock::now()) << std::endl;
+		QCoreApplication::processEvents();
+
 		QImage img((uchar*)frame.data, frame.cols, frame.rows, frame.step, QImage::Format_RGB888);
 		QSize size = this->size();
 		int width = size.width();
@@ -54,7 +61,7 @@ private:
     SARibbonActionsManager *m_actMgr;
     int m_actionTagText;
     int m_actionTagWithIcon;
-	std::unique_ptr<VideoExample> m_videoExample;
+	std::unique_ptr<VideoExampleTest> m_videoExampleTest;
 };
 
 #endif // MAINWINDOW_H

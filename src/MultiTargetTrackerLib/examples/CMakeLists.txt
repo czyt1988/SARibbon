@@ -4,6 +4,7 @@ project(MultitargetTrackerLib)
 
 set(SOURCES
     VideoExample.cpp
+	VideoExampleTest.cpp
 )
 
 set(HEADERS
@@ -11,6 +12,7 @@ set(HEADERS
     VideoExample.h
     examples.h
     FileLogger.h
+	VideoExampleTest.h
 )
 
 qt5_wrap_cpp(HEADER_MOC ${HEADERS})
@@ -37,6 +39,7 @@ INCLUDE_DIRECTORIES(
 set(LIBS
     ${OpenCV_LIBS}
 	Qt5::Core
+	Qt5::Widgets
     mtracking
     mdetection
     inih
