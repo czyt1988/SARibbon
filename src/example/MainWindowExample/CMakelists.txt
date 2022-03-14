@@ -12,11 +12,15 @@ else()
 	qt_add_resources(QRCS saribbonresouce.qrc)
 endif()
 
+
+qt5_wrap_cpp(Moced "mainwindow.h")
+
 add_executable(${EXPAMPLE_NAME} 
     ${QRCS}
     mainwindow.h
     mainwindow.cpp
     main.cpp
+	${Moced}
 )
 
 target_link_libraries(${EXPAMPLE_NAME} 
