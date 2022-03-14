@@ -1,0 +1,30 @@
+# This module defines
+# @PROJECT_NAME@_FOUND, if false, do not try to link to @PROJECT_NAME@
+# @PROJECT_NAME@_INCLUDE_DIRS, where to find the headers
+# @PROJECT_NAME@_LIBRARY_DIRS, where to find the libs
+
+message(STATUS "Reading ${CMAKE_CURRENT_LIST_FILE}")
+set(@PROJECT_NAME@_Version 0.0.1)
+message(STATUS "@PROJECT_NAME@ configuration, version ${@PROJECT_NAME@_Version}")
+
+get_filename_component(_DIR ${CMAKE_CURRENT_LIST_FILE} PATH)
+get_filename_component(_ROOT ${_DIR}/.. ABSOLUTE)
+set(@PROJECT_NAME@_INCLUDE_DIRS "${_ROOT}/include")
+set(@PROJECT_NAME@_LIBRARY_DIRS "${_ROOT}/lib")
+set(@PROJECT_NAME@_LIBRARIES "")
+
+set(SARIBBON_LIBS "SARibbonBar")
+foreach(_var ${SARIBBON_LIBS})
+    find_library (_var_path ${_var}
+        PATHS "${_ROOT}/lib")
+    list(APPEND @PROJECT_NAME@_LIBRARIES ${_var_path})
+endforeach(_var ${SARIBBON_LIBS})
+
+find_library ( @LIB_NAME@
+  PATHS "${_ROOT}/lib")
+
+set(@PROJECT_NAME@_BINARY_DIRS "${_ROOT}/bin")
+set(@PROJECT_NAME@_FOUND TRUE)
+
+unset (_ROOT)
+unset (_DIR)
