@@ -66,7 +66,9 @@ SARibbonMainWindow(QWidget *parent = nullptr, bool useRibbon = true);
 
 ![](./doc/pic/saribbonbar-level.png)
 
-因此创建ribbon过程先创建类别，再创建面板，最后创建对应的toolbutton（action）
+### 创建Category和Pannel
+
+创建ribbon过程先创建类别，再创建面板，最后创建对应的toolbutton（action）
 
 ```cpp
 //添加主标签页 - 通过addCategoryPage工厂函数添加
@@ -88,6 +90,117 @@ pannel1->addLargeAction(actSave);
 通过`addLargeAction`、`addMediumAction`、`addSmallAction`可以组合出不同的布局样式。具体可见[./src/example/MainWindowExample/mainwindow.cpp](./src/example/MainWindowExample/mainwindow.cpp)
 
 更加具体复杂的例子可见[SARibbon的布局](#SARibbon的布局)章节
+
+### 不同的“按钮”布局
+
+`SARibbonPannel`提供了三个添加action的方法：
+- `addLargeAction`
+- `addMediumAction`
+- `addSmallAction`
+
+不同的方法添加的action最后在pannel里显示的效果不一样，具体见[pannel的布局](#pannel的布局)
+
+### ContextCategory 上下文标签
+
+所谓上下文标签是指在特殊情况下才出现的标签/标签组，例如office word在选中图片时会出现图片编辑的上下文标签，如下图所示：
+
+![上下文标签](doc/pic/word-contextcategory.png)
+
+SARibbon中上下文标签对应的类为`SARibbonContextCategory`
+
+上下文标签一般在程序初始化的时候就创建好，平时隐藏，等待需要显示的时候再显示，创建上下文标签如下：
+
+由于上下文标签需要使用时唤起，因此，用一个成员变量保存起来是一个比较好的选择，当然也可以遍历查找（`SARibbonBar::contextCategoryList`可以例举所有的`SARibbonContextCategory`）
+
+头文件：
+
+```cpp
+SARibbonContextCategory* m_contextCategory;
+```
+
+cpp文件:
+```cpp
+SARibbonBar* ribbon = ribbonBar();
+//创建一个contextCategory，颜色随机
+m_contextCategory   = ribbon->addContextCategory(tr("context"), QColor());
+SARibbonCategory* contextCategoryPage1 = m_contextCategory->addCategoryPage(tr("Page1"));
+//对contextCategoryPage1进行操作
+......
+SARibbonCategory* contextCategoryPage2 = m_contextCategory->addCategoryPage(tr("Page2"));
+//对contextCategoryPage2进行操作
+......
+```
+
+由`SARibbonContextCategory`创建的`SARibbonCategory`归`SARibbonContextCategory`管理，只有`SARibbonContextCategory`“显示了”,其管理的`SARibbonCategory`才显示，**注意：** `SARibbonContextCategory`并不是一个窗口，所以，它的“显示”打了引号
+
+要显示一个上下文只需要调用`SARibbonBar::showContextCategory`/`SARibbonBar::hideContextCategory`即可:
+
+```cpp
+void MainWindow::onShowContextCategory(bool on)
+{
+    if (on) {
+        this->ribbonBar()->showContextCategory(m_contextCategory);
+    } else {
+        this->ribbonBar()->hideContextCategory(m_contextCategory);
+    }
+}
+```
+
+**注意：** 如果要删除`contextCategory`需要调用`SARibbonBar::destroyContextCategory`，而不是直接delete，调用`SARibbonBar::destroyContextCategory`之后无需再对ContextCategory的指针delete
+
+不同样式的contextCategory有不一样的风格，具体可见：[SARibbon样式](#SARibbon样式)以及[不同样式下的显示对比](#不同样式下的显示对比)
+
+### ApplicationButton
+
+ribbon界面左上角有个特殊且明显的按钮，称之为`applicationButton`，这个按钮一般用于调出菜单，SARibbonBar在构造时默认就创建了`applicationButton`，可以通过如下方式设置其字体：
+
+```cpp
+SARibbonBar* ribbon = ribbonBar();
+ribbon->applicationButton()->setText(("File"));
+```
+
+默认的applicationButton继承自`SARibbonApplicationButton`,而`SARibbonApplicationButton`继承自`QPushButton`，因此你可以对其进行`QPushButton`所有的操作，当然如果想设置自己的Button作为applicationButton也是可以的，只需要调用`SARibbonBar::setApplicationButton`函数即可
+
+### QuickAccessBar和rightButtonGroup
+
+QuickAccessBar是左上角的快速工具栏，rightButtonGroup是右上角的快速工具栏，在office模式下分左右两边，在wps模式下，左右将合起来，统一放到右边
+
+![QuickAccessBar And RightButtonGroup](./doc/screenshot/QuickAccessBarAndRightButtonGroup.png)
+
+SARibbon中：
+
+- QuickAccessBar对应`SARibbonQuickAccessBar`类
+- rightButtonGroup对应`SARibbonButtonGroupWidget`类
+
+SARibbonBar在初始化时会默认创建QuickAccessBar和RightButtonGroup，通过`SARibbonBar::quickAccessBar`和`SARibbonBar::rightButtonGroup`即可获取其指针进行操作，示例如下：
+
+```cpp
+QAction* MainWindow::createAction(const QString& text, const QString& iconurl, const QString& objName)
+{
+    QAction* act = new QAction(this);
+    act->setText(text);
+    act->setIcon(QIcon(iconurl));
+    act->setObjectName(objName);
+    return act;
+}
+
+void MainWindow::initQuickAccessBar(){
+    SARibbonBar* ribbon = ribbonBar();
+    SARibbonQuickAccessBar* quickAccessBar = ribbon->quickAccessBar();
+    quickAccessBar->addAction(createAction("save", ":/icon/icon/save.svg", "save-quickbar"));
+    quickAccessBar->addSeparator();
+    quickAccessBar->addAction(createAction("undo", ":/icon/icon/undo.svg"),"undo");
+    quickAccessBar->addAction(createAction("redo", ":/icon/icon/redo.svg"),"redo");
+    quickAccessBar->addSeparator();
+}
+void MainWindow::initRightButtonGroup(){
+    SARibbonBar* ribbon = ribbonBar();
+    SARibbonButtonGroupWidget* rightBar = ribbon->rightButtonGroup();
+    QAction* actionHelp = createAction("help", ":/icon/icon/help.svg","help");
+    connect(actionHelp, &QAction::triggered, this, &MainWindow::onActionHelpTriggered);
+    rightBar->addAction(actionHelp);
+}
+```
 
 # SARibbon样式
 
@@ -121,6 +234,21 @@ SARibbon的`SARibbonBar::WpsLiteStyle`样式
 针对上面样式的布局，见[SARibbon的布局](#SARibbon的布局)
 
 在正常屏幕下，WPS 样式会比 Office 样式减少至少30像素左右的垂直高度，相比1920*1080的屏幕来说，相当于节约了接近3%的垂直空间
+
+## 不同样式下的显示对比：
+
+`SARibbonBar::OfficeStyle`
+![](doc/screenshot/office-3-style.png)
+
+`SARibbonBar::OfficeStyleTwoRow`
+![](doc/screenshot/office-2-style.png)
+
+`SARibbonBar::WpsLiteStyle`
+![](doc/screenshot/wps-3-style.png)
+
+`SARibbonBar::WpsLiteStyleTwoRow`
+![](doc/screenshot/wps-2-style.png)
+
 
 ## 更小的垂直空间
 
@@ -236,9 +364,82 @@ SARibbonPannel里管理的每个action都会带有一个占位的属性（`SARib
 
 > 注意：两行模式的category的title是不显示的
 
-# 更多例子
+# SARibbon的自定义功能
 
-TODO
+ribbon的自定义是ribbon的一个特色，参考了office和wps的自定义界面，用户可以为自己的ribbon定义非常多的内容，甚至可以定义出一个完全和原来不一样的界面。
+
+以下是office的自定义界面
+
+![office的自定义界面](./doc/screenshot/customize/customization-office-ui.png)
+
+以下是wps的自定义界面
+
+![wps的自定义界面](./doc/screenshot/customize/customization-wps-ui.png)
+
+SARibbon参考office和wps的界面，封装了方便使用的`SARibbonCustomize**`类，包括如下5个类：
+
+> - SARibbonCustomizeDialog
+> - SARibbonCustomizeWidget
+> - SARibbonCustomizeData
+> - SARibbonActionsManager
+> - SARibbonActionsManagerModel
+
+实际用户使用仅会面对`SARibbonActionsManager`和`SARibbonCustomizeDialog`/`SARibbonCustomizeWidget`，其余类用户正常不会使用。
+
+`SARibbonActionsManager`是用来管理`QAction`，把想要自定义的`QAction`添加到`SARibbonActionsManager`中管理，并可以对`QAction`进行分类，以便在`SARibbonCustomizeDialog`/`SARibbonCustomizeWidget`中显示
+
+`SARibbonCustomizeDialog`/`SARibbonCustomizeWidget`是具体的显示窗口，`SARibbonCustomizeDialog`把`SARibbonCustomizeWidget`封装为对话框，如果要实现office那样集成到配置对话框中可以使用`SARibbonCustomizeWidget`，`SARibbonCustomizeDialog`的效果如下图所示：
+
+![SARibbon的自定义界面](./doc/screenshot/customize/customization-saribbon-ui.png)
+
+
+# 如何给界面添加自定义功能
+
+这里演示如何添加自定义功能
+
+首先定义`SARibbonActionsManager`作为MainWindow的成员变量
+
+```cpp
+//MainWindow.h 中定义成员变量
+SARibbonActionsManager* m_ribbonActionMgr;///< 用于管理所有action
+```
+在MainWindow的初始化过程中，还需要创建大量的`QAction`，`QAction`的父对象指定为MainWindow，另外还会生成ribbon布局，例如添加category，添加pannel等操作，在上述操作完成后添加如下步骤，自动让`SARibbonActionsManager`管理所有的`QAction`
+
+```cpp
+//MainWindow的初始化，生成QAction
+//生成ribbon布局
+m_ribbonActionMgr = new SARibbonActionsManager(mainWinowPtr);
+m_ribbonActionMgr->autoRegisteActions(mainWinowPtr);
+```
+
+`SARibbonActionsManager`的关键函数`autoRegisteActions`可以遍历 `SARibbonMainWindow`下的所有子object，找到action并注册，并会遍历所有`SARibbonCategory`,把`SARibbonCategory`下的action按`SARibbonCategory`的title name进行分类，此函数还会把`SARibbonMainWindow`下面的action，但不在任何一个category下的作为NotInRibbonCategoryTag标签注册，默认名字会赋予not in ribbon
+
+在需要调用`SARibbonCustomizeDialog`的地方如下操作：
+
+```cpp
+QString cfgpath = "customization.xml";
+SARibbonCustomizeDialog dlg(this, this);
+
+dlg.setupActionsManager(m_ribbonActionMgr);
+dlg.fromXml(cfgpath);//调用这一步是为了把已经存在的自定义步骤加载进来，在保存时能基于原有的自定义步骤上追加
+if (QDialog::Accepted == dlg.exec()) {
+    dlg.applys();//应用自定义步骤
+    dlg.toXml(cfgpath);//把自定义步骤保存到文件中
+}
+```
+
+在MainWindow生成前还需要把自定义的内容加载，因此在构造函数最后应该加入如下语句：
+
+```cpp
+//MainWindow的构造函数最后
+sa_apply_customize_from_xml_file("customization.xml", this, m_ribbonActionMgr);
+```
+
+`sa_apply_customize_from_xml_file`是`SARibbonCustomizeWidget.h`中提供的函数，直接把配置文件中的自定义内容应用到MainWindow中。
+
+这样软件每次启动都会按照配置文件加载。
+
+SARibbon实现自定义只需上述几步即可实现。
 
 # 更多截图
 
