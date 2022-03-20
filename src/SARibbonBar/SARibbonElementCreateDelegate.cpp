@@ -1,10 +1,10 @@
 ﻿#include "SARibbonElementCreateDelegate.h"
-#include "SARibbonBar.h"
+#include <QApplication>
+#include <QFontMetrics>
 #include "SARibbonApplicationButton.h"
 #include "SARibbonTabBar.h"
 #include "SARibbonCategory.h"
 #include "SARibbonContextCategory.h"
-#include "SARibbonPannel.h"
 #include "SARibbonSeparatorWidget.h"
 #include "SARibbonGallery.h"
 #include "SARibbonGalleryGroup.h"
@@ -15,27 +15,6 @@
 #include "SARibbonQuickAccessBar.h"
 #include "SARibbonPannelOptionButton.h"
 #include "SARibbonPannelLayout.h"
-
-SARibbonStyleOption::SARibbonStyleOption()
-{
-    mainbarHeightOfficeStyleThreeRow = 160;
-    mainbarHeightWPSStyleThreeRow    = 130;
-    mainbarHeightOfficeStyleTwoRow   = 134;
-    mainbarHeightWPSStyleTwoRow      = 104;
-    widgetBord                       = QMargins(5, 1, 5, 5);
-    titleBarHight                    = 30;
-    titleTextColor                   = Qt::black;
-    tabBarHight                      = 25;
-    tabBarBaseLineColor              = QColor(186, 201, 219);
-    applicationButtonWidth           = 60;
-    galleryFixedHeight               = 60;
-    galleryMinimumWidth              = 120;
-    galleryButtonMaximumWidth        = 15;
-    pannelTitleHeight                = 21;
-    toolButtonLargeIconSize          = QSize(32, 32);
-    toolButtonSmallIconSize          = QSize(18, 18);
-    isToolButtonTextShift            = false;
-}
 
 SARibbonElementCreateDelegate::SARibbonElementCreateDelegate() : m_opt(new SARibbonStyleOption())
 {

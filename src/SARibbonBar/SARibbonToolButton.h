@@ -42,15 +42,23 @@ public:
     void setLargeButtonType(LargeButtonType type);
     LargeButtonType largeButtonType() const;
 
-    // lite模式下的分割线
-    virtual int liteLargeButtonIconHeight(int buttonHeight) const;
+    //设置运行文字换行，这主要针对大模式按钮以及lite模式下，默认为true
+    void setEnableWordWrap(bool on = true);
+    void reCalcSizeHint();
+
+public:
+    //设置按钮点击时文字会闪烁一下
+    static void setToolButtonTextShift(bool on);
+    static bool isToolButtonTextShift();
 
 protected:
-    void calcIconRect(const QStyleOptionToolButton& opt);
-    QRect calcTextRect(const QStyleOptionToolButton& opt) const;
-    QRect calcTextRect(const QRect& buttonRect, bool hasMenu = false) const;
+    //此函数用来计算icon和text的尺寸
+    //注意icon的尺寸依赖text，且只要知道字体大小就可以确定icon的高度
+    void calcIconAndTextRect(const QStyleOptionToolButton& opt);
+    //在需要绘制文字的时候调用此函数，有些效果需要文字的文字改变
+    QRect adjustedTextRect(const QStyleOptionToolButton& opt) const;
     QRect calcIndicatorArrowDownRect(const QStyleOptionToolButton& opt);
-    QPixmap createIconPixmap(const QStyleOptionToolButton& opt, const QSize& realConSize);
+    QPixmap createIconPixmap(const QStyleOptionToolButton& opt, const QSize& iconsize);
     bool event(QEvent* e) Q_DECL_OVERRIDE;
     virtual void paintEvent(QPaintEvent* event) Q_DECL_OVERRIDE;
     virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
@@ -77,12 +85,17 @@ protected:
     void changeEvent(QEvent* e) Q_DECL_OVERRIDE;
 
 private:
+    static bool s_isToolButtonTextShift;  ///< 配置SARibbonToolButton文字在点击时是否会轻微改变位置而达到一种类似跳动的效果,@default 默认为false
     RibbonButtonType m_buttonType;
     LargeButtonType m_largeButtonType;
     bool m_mouseOnSubControl;  ///< 这个用于标记MenuButtonPopup模式下，鼠标在文本区域
     bool m_menuButtonPressed;
-    QRect m_iconRect;
-    bool m_isWordWrap;  ///< 标记是否文字换行 @default false
+    QRect m_iconRect;         ///< 记录icon的绘制位置
+    QRect m_textRect;         ///< 记录text的绘制位置
+    bool m_isWordWrap;        ///< 标记是否文字换行 @default false
+    int m_iconAndTextSpace;   ///< 按钮和边框的距离
+    bool m_isEnableWordWrap;  ///< 是否允许文字换行
+    QSize m_sizeHint;         ///< 保存计算好的sizehint
 };
 
 #endif  // SARIBBONTOOLBUTTON_H
