@@ -1,4 +1,5 @@
 ﻿#include "mainwindow.h"
+#include <QApplication>
 #include <QFile>
 #include <QTextEdit>
 #include <QAbstractButton>
@@ -236,8 +237,29 @@ void MainWindow::onActionWindowFlagNormalButtonTriggered(bool b)
     }
 }
 
-void MainWindow::onFontComWidgetCurrentFontChanged(const QFont& font)
+void MainWindow::onFontComWidgetCurrentFontChanged(const QFont& f)
 {
+    qDebug() << "set font:" << f;
+    ribbonBar()->setFont(f);
+    update();
+}
+
+void MainWindow::onActionFontLargerTriggered()
+{
+    QFont f = font();
+    f.setPointSize(f.pointSize() + 1);
+    ribbonBar()->setFont(f);
+    update();
+    qDebug() << "set font:" << f;
+}
+
+void MainWindow::onActionFontSmallerTriggered()
+{
+    QFont f = font();
+    f.setPointSize(f.pointSize() - 1);
+    ribbonBar()->setFont(f);
+    update();
+    qDebug() << "set font:" << f;
 }
 
 void MainWindow::createCategoryMain(SARibbonCategory* page)
@@ -525,18 +547,16 @@ void MainWindow::createCategoryOther(SARibbonCategory* page)
 
     QAction* actionUseQss = createAction(tr("use qss"), ":/icon/icon/useqss.svg");
     connect(actionUseQss, &QAction::triggered, this, &MainWindow::onActionUseQssTriggered);
-    pannelStyle->addLargeAction(actionUseQss);
+    pannelStyle->addSmallAction(actionUseQss);
 
     QAction* actionLoadCustomizeXmlFile = createAction(tr("load customize from xml file"), ":/icon/icon/useCustomize.svg");
     connect(actionLoadCustomizeXmlFile, &QAction::triggered, this, &MainWindow::onActionLoadCustomizeXmlFileTriggered);
-    pannelStyle->addLargeAction(actionLoadCustomizeXmlFile);
-
-    pannelStyle->addSeparator();
+    pannelStyle->addSmallAction(actionLoadCustomizeXmlFile);
 
     QAction* actionWindowFlagNormalButton = createAction(tr("window normal button"), ":/icon/icon/windowsflag-normal.svg");
     actionWindowFlagNormalButton->setCheckable(true);
     actionWindowFlagNormalButton->setChecked(true);
-    pannelStyle->addLargeAction(actionWindowFlagNormalButton);
+    pannelStyle->addSmallAction(actionWindowFlagNormalButton);
     connect(actionWindowFlagNormalButton, &QAction::triggered, this, &MainWindow::onActionWindowFlagNormalButtonTriggered);
 
     SARibbonPannel* pannelUtf8 = new SARibbonPannel(QStringLiteral(u"中文显示测试"));
@@ -621,17 +641,14 @@ void MainWindow::createCategorySize(SARibbonCategory* page)
     connect(fontComWidget, &QFontComboBox::currentFontChanged, this, &MainWindow::onFontComWidgetCurrentFontChanged);
     pannel->addSeparator();
 
-    QAction* actLargerFontSize = new QAction(this);
-    actLargerFontSize->setObjectName(QStringLiteral(u"actLargerFontSize"));
-    actLargerFontSize->setIcon(QIcon(":/icon/icon/largerFont.svg"));
-    actLargerFontSize->setText(QStringLiteral(u"Larger"));
+    QAction* actLargerFontSize = createAction(tr("Larger"), ":/icon/icon/largerFont.svg", "actLargerFontSize");
     pannel->addLargeAction(actLargerFontSize);
 
-    QAction* actSmallFontSize = new QAction(this);
-    actSmallFontSize->setObjectName(QStringLiteral(u"actSmallFontSize"));
-    actSmallFontSize->setIcon(QIcon(":/icon/icon/smallFont.svg"));
-    actSmallFontSize->setText(QStringLiteral(u"Smaller"));
+    QAction* actSmallFontSize = createAction(tr("Smaller"), ":/icon/icon/smallFont.svg", "actSmallFontSize");
     pannel->addLargeAction(actSmallFontSize);
+
+    connect(actLargerFontSize, &QAction::triggered, this, &MainWindow::onActionFontLargerTriggered);
+    connect(actSmallFontSize, &QAction::triggered, this, &MainWindow::onActionFontSmallerTriggered);
 }
 
 /**
