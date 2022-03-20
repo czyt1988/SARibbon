@@ -1,26 +1,33 @@
 cmake_minimum_required(VERSION 3.15)
 project(SARibbon)
 
+set(PROJECT_VERSION_MAJOR 0)
+set(PROJECT_VERSION_MINOR 0)
+set(PROJECT_VERSION_PATCH 1)
+
+set (PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
+if(PROJECT_VERSION_PATCH GREATER 0)
+  set (PROJECT_VERSION "${PROJECT_VERSION}.${PROJECT_VERSION_PATCH}")
+endif ()
+
 include(CPack)
 
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Core REQUIRED)
-message(STATUS "QT: ${QT_VERSION_MAJOR}")
+set(SARIBBON_QT_VERSION 5 CACHE STRING "Expected Qt version")
+set_property(CACHE SARIBBON_QT_VERSION PROPERTY STRINGS 5 6)
 
-find_package(Qt${QT_VERSION_MAJOR} COMPONENTS
-    Widgets
-    GUI
-    )
+set(SARIBBON_QT_COMPONENTS Core Widgets GUI)
+find_package(Qt${SARIBBON_QT_VERSION} COMPONENTS ${SARIBBON_QT_COMPONENTS} REQUIRED)
+
 
 include_directories(
-    ${Qt${QT_VERSION_MAJOR}Widgets_INCLUDE_DIRS}
-    )
+    ${Qt${SARIBBON_QT_VERSION}Widgets_INCLUDE_DIRS}
+)
     
 add_definitions(
-    ${Qt${QT_VERSION_MAJOR}Widgets_DEFINITIONS}
-    )
+    ${Qt${SARIBBON_QT_VERSION}Widgets_DEFINITIONS}
+)
 
-
+option(BUILD_EXAMPLES "build the examples" OFF)
 SET(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "add a postfix, usually d on windows")
 SET(CMAKE_RELEASE_POSTFIX "" CACHE STRING "add a postfix, usually empty on windows")
 SET(CMAKE_RELWITHDEBINFO_POSTFIX "rd" CACHE STRING "add a postfix, usually empty on windows")
@@ -31,4 +38,4 @@ if(MSVC)
 endif()
 
 add_subdirectory(src)
-
+add_subdirectory(cmake)
