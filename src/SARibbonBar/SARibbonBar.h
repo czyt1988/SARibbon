@@ -259,6 +259,11 @@ public:
     //告诉saribbonbar，window button的尺寸
     void setWindowButtonSize(const QSize& size);
 
+    //设置标题颜色
+    void setTitleTextColor(const QColor& clr);
+
+    // tabbar 底部会绘制一条线条，此接口定义线条颜色
+    void setTabBarBaseLineColor(const QColor& clr);
 signals:
 
     /**
@@ -293,6 +298,8 @@ protected:
     //根据currentRibbonStyle计算mainBar的高度
     virtual int mainBarHeight() const;
 
+    // ribbon相对widget的Margins
+    virtual const QMargins& widgetBord() const;
 protected slots:
     void onWindowTitleChanged(const QString& title);
     void onCategoryWindowTitleChanged(const QString& title);

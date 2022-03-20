@@ -333,7 +333,7 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     QAction* a         = nullptr;
     {
         QIcon itemicon = QIcon(":/icon/icon/item.svg");
-        for (int i = 0; i < 30; ++i) {
+        for (int i = 0; i < 5; ++i) {
             a = menu->addAction(itemicon, tr("item %1").arg(i + 1));
             a->setObjectName(QStringLiteral("item %1").arg(i + 1));
         }
