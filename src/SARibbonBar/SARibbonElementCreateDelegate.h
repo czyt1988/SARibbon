@@ -51,9 +51,9 @@ public:
     virtual SARibbonButtonGroupWidget* craeteButtonGroupWidget(QWidget* parent);
     virtual SARibbonQuickAccessBar* createQuickAccessBar(QWidget* parent);
 
-    //
-    virtual const SARibbonStyleOption& getRibbonStyleOption() const;
-    virtual void setRibbonStyleOption(const SARibbonStyleOption& opt);
+    // SARibbonStyleOption可以进行继承，此函数无需设置为虚函数
+    SARibbonStyleOption& getRibbonStyleOption();
+    void setRibbonStyleOption(SARibbonStyleOption* opt);
 
     //创建SARibbonPannelOptionButton
     virtual SARibbonPannelOptionButton* createRibbonPannelOptionButton(SARibbonPannel* pannel);

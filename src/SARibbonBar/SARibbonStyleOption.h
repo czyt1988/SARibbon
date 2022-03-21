@@ -11,8 +11,7 @@
  *
  * 一般SARibbonElementCreateDelegate::setRibbonStyleOption函数最好在ribbonbar构建之前调用
  *
- * @note 此类定义了ribbonbar和pannel的高度信息，并通过字体提前计算好一些布局信息，
- * 以便给SARibbonToolButton使用，所以都定义在这里
+ * @note 此类定义了ribbonbar和pannel的高度信息，并通过字体提前计算好一些布局信息
  *
  * @todo 后续开发通过配置文件定义ribbon的尺寸布局
  */
@@ -22,32 +21,20 @@ public:
     SARibbonStyleOption();
 
 public:
-    //所有设置函数设置完后都建议调用recalc
-    //设置标题栏高度
-    void setTitleBarHeight(int h);
-
-    //设置office 3行模式的高度，其他模式的高度会根据这个高度以及titleBarHight，tabBarHight，widgetBord计算出来
-    void setRibbonBarHeightOfficeStyleThreeRow(int h);
-
-    //设置边界偏移
-    void setWidgetBord(const QMargins& m);
-
-public:
     // ribbonBar的高度
-    int ribbonBarHeight(SARibbonBar::RibbonStyle s) const;
+    virtual int ribbonBarHeight(SARibbonBar::RibbonStyle s) const;
 
     //标题栏的高度，对于wps模式，此参数没有用
-    int titleBarHeight() const;
+    virtual int titleBarHeight() const;
 
     //标签栏高度
-    int tabBarHeight() const;
+    virtual int tabBarHeight() const;
 
     // saribbonbar和窗体四周间距
-    const QMargins& widgetBord() const;
+    virtual const QMargins& widgetBord() const;
 
-public:
     //在改变了参数后对需要计算的变量从新计算
-    void recalc();
+    virtual void recalc();
 
 protected:
     //通过已有参数计算pannel的高度
@@ -64,11 +51,5 @@ private:
     int m_ribbonbarHeightWPSStyleTwoRow;       ///< wps样式2行的高度
     int m_ribbonbarHeightOfficeStyleTwoRow;    ///< office样式2行的高度
 };
-
-/**
- * @brief 通过系统字体信息计算默认的ribbon style option
- * @return
- */
-SA_RIBBON_EXPORT SARibbonStyleOption sa_calc_default_ribbon_style_option();
 
 #endif  // SARIBBONSTYLEOPTION_H

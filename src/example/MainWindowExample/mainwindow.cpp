@@ -26,6 +26,7 @@
 #include "SARibbonButtonGroupWidget.h"
 #include "SARibbonApplicationButton.h"
 #include "SARibbonCustomizeWidget.h"
+#include "SARibbonElementManager.h"
 #include <QCalendarWidget>
 #include "SARibbonCustomizeDialog.h"
 #include <QXmlStreamWriter>
@@ -35,12 +36,14 @@
 #include "SAFramelessHelper.h"
 #define PRINT_COST_START()                                                                                             \
     QElapsedTimer __TMP_COST;                                                                                          \
+    __TMP_COST.start();                                                                                                \
     int __TMP_LASTTIMES = 0
 
 #define PRINT_COST(STR)                                                                                                \
     do {                                                                                                               \
         int ___TMP_INT = __TMP_COST.elapsed();                                                                         \
         qDebug() << STR << " cost " << ___TMP_INT - __TMP_LASTTIMES << " ms (" << ___TMP_INT << ")";                   \
+        m_edit->append(QString("%1 cost %2 ms(%3)").arg(STR).arg(___TMP_INT - __TMP_LASTTIMES).arg(___TMP_INT));       \
         __TMP_LASTTIMES = ___TMP_INT;                                                                                  \
     } while (0)
 
@@ -262,6 +265,16 @@ void MainWindow::onActionFontSmallerTriggered()
     qDebug() << "set font:" << f;
 }
 
+void MainWindow::onActionwordWrapIn2rowTriggered(bool b)
+{
+    SARibbonToolButton::setLiteStyleEnableWordWrap(b);  //设置是否允许2行模式下文字换行，换行的话图标会较小
+    //换行设定后需要重新计算样式尺寸
+    RibbonSubElementStyleOpt.recalc();
+    //通过setRibbonStyle来让ribbonbar重绘
+    //由于关键尺寸变化了，需要重新布局
+    ribbonBar()->updateRibbonGeometry();
+}
+
 void MainWindow::createCategoryMain(SARibbonCategory* page)
 {
     //! 1
@@ -269,18 +282,18 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     //!
 
     //使用addPannel函数来创建SARibbonPannel，效果和new SARibbonPannel再addPannel一样
-    SARibbonPannel* pannel1 = page->addPannel(("Panel 1"));
+    SARibbonPannel* pannelStyle = page->addPannel(("ribbon style"));
 
     QAction* actSave = createAction(tr("Save"), ":/icon/icon/save.svg");
     actSave->setShortcut(QKeySequence(QLatin1String("Ctrl+S")));
-    pannel1->addLargeAction(actSave);
+    pannelStyle->addLargeAction(actSave);
     connect(actSave, &QAction::triggered, this, [this](bool b) {
         Q_UNUSED(b);
         this->m_edit->append("actSaveion clicked");
     });
     QAction* actHideRibbon = createAction(tr("hide ribbon"), ":/icon/icon/hideRibbon.svg", "actHideRibbon");
     actHideRibbon->setCheckable(true);
-    pannel1->addSmallAction(actHideRibbon);
+    pannelStyle->addSmallAction(actHideRibbon);
     connect(actHideRibbon, &QAction::triggered, this, [this](bool b) { this->ribbonBar()->setMinimumMode(b); });
     connect(ribbonBar(), &SARibbonBar::ribbonModeChanged, this, [actHideRibbon](SARibbonBar::RibbonMode nowNode) {
         actHideRibbon->setChecked(nowNode == SARibbonBar::MinimumRibbonMode);
@@ -288,9 +301,16 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
 
     QAction* actShowHideButton = createAction(tr("show hide button"), ":/icon/icon/showHideButton.svg", "show hide button");
     actShowHideButton->setCheckable(true);
-    pannel1->addSmallAction(actShowHideButton);
-    connect(actShowHideButton, &QAction::triggered, this, [this](bool b) { this->ribbonBar()->showMinimumModeButton(b); });
+    pannelStyle->addSmallAction(actShowHideButton);
+    connect(actShowHideButton, &QAction::triggered, this, [this](bool b) {
+        this->ribbonBar()->showMinimumModeButton(b);  //显示ribbon最小化按钮
+    });
     actShowHideButton->trigger();
+
+    QAction* actwordWrapIn2row = createAction(tr("word wrap in 2row"), ":/icon/icon/wordwrap.svg");
+    actwordWrapIn2row->setCheckable(true);
+    pannelStyle->addSmallAction(actwordWrapIn2row);
+    connect(actwordWrapIn2row, &QAction::triggered, this, &MainWindow::onActionwordWrapIn2rowTriggered);
 
     QButtonGroup* g = new QButtonGroup(page);
 
@@ -298,28 +318,28 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     r->setText(tr("use office style"));
     r->setObjectName(("use office style"));
     r->setChecked(true);
-    pannel1->addSmallWidget(r);
+    pannelStyle->addSmallWidget(r);
     g->addButton(r, SARibbonBar::OfficeStyle);
 
     r = new QRadioButton();
     r->setObjectName(("use wps style"));
     r->setText(tr("use wps style"));
     r->setChecked(false);
-    pannel1->addSmallWidget(r);
+    pannelStyle->addSmallWidget(r);
     g->addButton(r, SARibbonBar::WpsLiteStyle);
 
     r = new QRadioButton();
     r->setObjectName(("use office 2row style"));
     r->setText(tr("use office 2 row style"));
     r->setChecked(false);
-    pannel1->addSmallWidget(r);
+    pannelStyle->addSmallWidget(r);
     g->addButton(r, SARibbonBar::OfficeStyleTwoRow);
 
     r = new QRadioButton();
     r->setObjectName(("use wps 2row style"));
     r->setText(tr("use wps 2row style"));
     r->setChecked(false);
-    pannel1->addSmallWidget(r);
+    pannelStyle->addSmallWidget(r);
     g->addButton(r, SARibbonBar::WpsLiteStyleTwoRow);
 
 //    connect(g, QOverload<int>::of(&QButtonGroup::buttonClicked), this, &MainWindow::onStyleClicked);
@@ -328,6 +348,9 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
 #else
     connect(g, static_cast< void (QButtonGroup::*)(int) >(&QButtonGroup::buttonClicked), this, &MainWindow::onStyleClicked);
 #endif
+
+    SARibbonPannel* pannelToolButtonStyle = page->addPannel(("sa ribbon toolbutton style"));
+
     SARibbonToolButton* btn;
     SARibbonMenu* menu = new SARibbonMenu(this);
     QAction* a         = nullptr;
@@ -342,46 +365,46 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     QAction* act = createAction(tr("test 1"), ":/icon/icon/test1.svg");
     act->setMenu(menu);
     act->setToolTip(tr("use QToolButton::MenuButtonPopup mode"));
-    btn = pannel1->addSmallAction(act);
+    btn = pannelToolButtonStyle->addSmallAction(act);
     btn->setPopupMode(QToolButton::MenuButtonPopup);
 
     act = createAction(tr("test 2"), ":/icon/icon/test2.svg");
     act->setMenu(menu);
     act->setToolTip(tr("use QToolButton::InstantPopup mode"));
-    btn = pannel1->addSmallAction(act);
+    btn = pannelToolButtonStyle->addSmallAction(act);
     btn->setPopupMode(QToolButton::InstantPopup);
 
-    pannel1->addSeparator();
+    pannelToolButtonStyle->addSeparator();
 
     act = createAction(tr("Delayed Popup"), ":/icon/icon/folder-cog.svg");
     act->setMenu(menu);
-    btn = pannel1->addLargeAction(act);
+    btn = pannelToolButtonStyle->addLargeAction(act);
     btn->setPopupMode(QToolButton::DelayedPopup);
     connect(act, &QAction::triggered, this, &MainWindow::onDelayedPopupCheckabletriggered);
 
     act = createAction(tr("Menu Button Popup"), ":/icon/icon/folder-star.svg");
     act->setMenu(menu);
-    btn = pannel1->addLargeAction(act);
+    btn = pannelToolButtonStyle->addLargeAction(act);
     btn->setPopupMode(QToolButton::MenuButtonPopup);
     connect(act, &QAction::triggered, this, &MainWindow::onMenuButtonPopupCheckabletriggered);
 
     act = createAction(tr("Instant Popup"), ":/icon/icon/folder-stats.svg");
     act->setMenu(menu);
-    btn = pannel1->addLargeAction(act);
+    btn = pannelToolButtonStyle->addLargeAction(act);
     btn->setPopupMode(QToolButton::InstantPopup);
     connect(act, &QAction::triggered, this, &MainWindow::onInstantPopupCheckabletriggered);
 
     act = createAction(tr("Delayed Popup checkable"), ":/icon/icon/folder-table.svg");
     act->setCheckable(true);
     act->setMenu(menu);
-    btn = pannel1->addLargeAction(act);
+    btn = pannelToolButtonStyle->addLargeAction(act);
     btn->setPopupMode(QToolButton::DelayedPopup);
     connect(act, &QAction::triggered, this, &MainWindow::onDelayedPopupCheckableTest);
 
     act = createAction(tr("Menu Button Popup checkable"), ":/icon/icon/folder-checkmark.svg");
     act->setCheckable(true);
     act->setMenu(menu);
-    btn = pannel1->addLargeAction(act);
+    btn = pannelToolButtonStyle->addLargeAction(act);
     btn->setPopupMode(QToolButton::MenuButtonPopup);
     connect(act, &QAction::triggered, this, &MainWindow::onMenuButtonPopupCheckableTest);
 
@@ -389,14 +412,14 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     act->setCheckable(true);
     act->setMenu(menu);
     act->setEnabled(false);
-    pannel1->addLargeAction(act);
+    pannelToolButtonStyle->addLargeAction(act);
 
     QAction* optAct = new QAction(this);
     connect(optAct, &QAction::triggered, this, [this](bool on) {
         Q_UNUSED(on);
         QMessageBox::information(this, tr("Option Action Triggered"), tr("Option Action Triggered"));
     });
-    pannel1->addOptionAction(optAct);
+    pannelToolButtonStyle->addOptionAction(optAct);
     //! 2
     //! pannel 2 start
     //!
@@ -410,6 +433,7 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     QAction* actDeleteContext = createAction(tr("delete Context"), ":/icon/icon/deleteContext.svg");
     btn                       = pannel2->addLargeAction(actDeleteContext);
     connect(actDeleteContext, &QAction::triggered, this, [this, act](bool on) {
+        Q_UNUSED(on);
         if (this->m_contextCategory) {
             this->ribbonBar()->destroyContextCategory(this->m_contextCategory);
             this->m_contextCategory = nullptr;
@@ -687,12 +711,16 @@ void MainWindow::createContextCategoryPage1(SARibbonCategory* page)
 
     actionDisable->setDisabled(true);
     pannel->addLargeAction(actionDisable);
-    connect(actionDisable, &QAction::triggered, this, [actionDisable](bool b) { actionDisable->setDisabled(true); });
+    connect(actionDisable, &QAction::triggered, this, [actionDisable](bool b) {
+        Q_UNUSED(b);
+        actionDisable->setDisabled(true);
+    });
 
     QAction* actionUnlock = createAction(tr("unlock"), ":/icon/icon/unlock.svg");
     actionUnlock->setShortcut(QKeySequence(QLatin1String("Ctrl+E")));
     pannel->addLargeAction(actionUnlock);
     connect(actionUnlock, &QAction::triggered, this, [actionDisable](bool b) {
+        Q_UNUSED(b);
         actionDisable->setEnabled(true);
         actionDisable->setText(("Enabled"));
     });

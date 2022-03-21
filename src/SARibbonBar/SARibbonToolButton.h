@@ -35,6 +35,7 @@ public:
 
     SARibbonToolButton(QWidget* parent = Q_NULLPTR);
     SARibbonToolButton(QAction* defaultAction, QWidget* parent = Q_NULLPTR);
+    //标记按钮的样式，按钮的样式有不同的渲染方式
     RibbonButtonType buttonType() const;
     void setButtonType(const RibbonButtonType& buttonType);
     virtual QSize minimumSizeHint() const Q_DECL_OVERRIDE;
@@ -42,15 +43,16 @@ public:
     void setLargeButtonType(LargeButtonType type);
     LargeButtonType largeButtonType() const;
 
-    //设置运行文字换行，这主要针对大模式按钮以及lite模式下，默认为true
-    void setEnableWordWrap(bool on = true);
     void reCalcSizeHint();
     void reCalcSizeHint(QSize s);
 
 public:
-    //设置按钮点击时文字会闪烁一下
+    //按钮点击时文字是否会闪烁一下
     static void setToolButtonTextShift(bool on);
     static bool isToolButtonTextShift();
+    //在lite模式下是否允许文字换行
+    static void setLiteStyleEnableWordWrap(bool on);
+    static bool isLiteStyleEnableWordWrap();
 
 protected:
     //此函数用来计算icon和text的尺寸
@@ -89,16 +91,16 @@ protected:
 
 private:
     static bool s_isToolButtonTextShift;  ///< 配置SARibbonToolButton文字在点击时是否会轻微改变位置而达到一种类似跳动的效果,@default 默认为false
+    static bool s_liteStyleEnableWordWrap;  ///< 在lite模式下是否允许文字换行，如果允许，则图标相对比较小，默认不允许
     RibbonButtonType m_buttonType;
     LargeButtonType m_largeButtonType;
     bool m_mouseOnSubControl;  ///< 这个用于标记MenuButtonPopup模式下，鼠标在文本区域
     bool m_menuButtonPressed;
-    QRect m_iconRect;         ///< 记录icon的绘制位置
-    QRect m_textRect;         ///< 记录text的绘制位置
-    bool m_isWordWrap;        ///< 标记是否文字换行 @default false
-    int m_iconAndTextSpace;   ///< 按钮和边框的距离
-    bool m_isEnableWordWrap;  ///< 是否允许文字换行
-    QSize m_sizeHint;         ///< 保存计算好的sizehint
+    QRect m_iconRect;        ///< 记录icon的绘制位置
+    QRect m_textRect;        ///< 记录text的绘制位置
+    bool m_isWordWrap;       ///< 标记是否文字换行 @default false
+    int m_iconAndTextSpace;  ///< 按钮和边框的距离
+    QSize m_sizeHint;        ///< 保存计算好的sizehint
 };
 
 #endif  // SARIBBONTOOLBUTTON_H

@@ -1,4 +1,4 @@
-﻿# 简介
+﻿﻿# 简介
 
  这是Qt（最低要求Qt5，支持C++11的编译器）下一个轻量级的Ribbon控件(Office样式UI),界面截图：
 
@@ -226,7 +226,7 @@ SARibbon的`SARibbonBar::OfficeStyle`样式
 wps设计的ribbon模式进行了改良，它为了减小ribbon的高度，把标签和标题栏设置在一起，这样减少了一个标题栏高度，有效利用了垂直空间，这是WPS对ribbon的第一次改动
 
 ![Wps 改动了ribbon的布局方式，第1次改动](./doc/pic/wps-change-ribbon-1.jpg)
- 
+
 SARibbon的`SARibbonBar::WpsLiteStyle`样式
 
 ![](./doc/screenshot/wps-mode.png)
@@ -248,6 +248,19 @@ SARibbon的`SARibbonBar::WpsLiteStyle`样式
 
 `SARibbonBar::WpsLiteStyleTwoRow`
 ![](doc/screenshot/wps-2-style.png)
+
+另外，改变2行模式下字体是否换行，还能出现2种样式，通过静态函数`SARibbonToolButton::setLiteStyleEnableWordWrap`可以进行设置
+
+文字不换行的2行模式显示效果如下：
+
+`SARibbonBar::OfficeStyleTwoRow and SARibbonToolButton::setLiteStyleEnableWordWrap(false)`
+![](doc/screenshot/office-2-style-nowrap.png)
+
+`SARibbonBar::WpsLiteStyleTwoRow and SARibbonToolButton::setLiteStyleEnableWordWrap(false)`
+![](doc/screenshot/wps-2-style-nowrap.png)
+
+工具栏文字不换行，会使图标显示的更大，显示效果会更好，这个看具体需求而定，使用`SARibbonToolButton::setLiteStyleEnableWordWrap(false)`并不会改变ribbon bar的高度，但图标会变更大一点
+
 
 
 ## 更小的垂直空间
@@ -495,10 +508,12 @@ SARibbon项目是SA项目的子项
 ## 计划
 
 - 正在实现designer plugin
+- 完善Gallery控件（`SARibbonGallery`）
 
 ## 已知bug
 
 - 在ubuntu下会有文字换行显示不全问题
+- 某些Ubuntu系统无法显示
 
 # 其他
 

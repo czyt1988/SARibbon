@@ -1145,6 +1145,20 @@ void SARibbonBar::setTabBarBaseLineColor(const QColor& clr)
     m_d->mTabBarBaseLineColor = clr;
 }
 
+/**
+ * @brief 更新ribbon的布局数据，此函数适用于一些关键性尺寸变化，换起ribbon下面元素的布局
+ *
+ * @note 此函数调用较慢，避免在高速要求场合调用
+ */
+void SARibbonBar::updateRibbonGeometry()
+{
+    updateRibbonElementGeometry();
+    QList< SARibbonCategory* > categorys = categoryPages();
+    for (SARibbonCategory* c : categorys) {
+        c->updateItemGeometry();
+    }
+}
+
 bool SARibbonBar::eventFilter(QObject* obj, QEvent* e)
 {
     if (obj) {
