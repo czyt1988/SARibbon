@@ -58,6 +58,9 @@ public:
     //判断是否需要重新布局
     bool isDirty() const;
 
+    //计算大图标的高度
+    static int calcLargeHeight(const QRect& setrect, const SARibbonPannel* pannel);
+
 public:
     //全局的contentsMargins
     static const QMargins& pannelContentsMargins();

@@ -11,9 +11,8 @@
 #include "SARibbonElementManager.h"
 #include "QCursor"
 
-#define LITE_LARGE_BUTTON_ICON_HIGHT_RATE 0.52
-#define ARROW_WIDTH 8
-
+#define SA_INDICATOR_ARROW_WIDTH 8
+#define SA_WIDTH_HEIGHT_RATIO 1.2
 /**
  * @def 开启此宏会打印一些常见信息
  */
@@ -378,13 +377,15 @@ void SARibbonToolButton::resizeEvent(QResizeEvent* e)
 
 /**
  * @brief toolbutton的尺寸确定是先定下字体的尺寸，再定下icon的尺寸，自底向上，保证字体能显示两行
+ * @note m_sizeHint的刷新需要注意
  * @return
  */
 QSize SARibbonToolButton::sizeHint() const
 {
-    if (m_sizeHint.isValid()) {
-        return m_sizeHint;
-    }
+    //    if (m_sizeHint.isValid()) {
+    //        return m_sizeHint;
+    //    }
+
     SARibbonToolButton* that = const_cast< SARibbonToolButton* >(this);
     that->reCalcSizeHint();
     return m_sizeHint;
@@ -400,19 +401,22 @@ QSize SARibbonToolButton::sizeHint() const
  *
  * 一般布局前调用sizehint，布局后会调用resizeevent，尤其字体信息会计算两遍，这里后续可以有更好的优化空间
  */
-void SARibbonToolButton::reCalcSizeHint()
+void SARibbonToolButton::reCalcSizeHint(QSize s)
 {
-    QSize s = QToolButton::sizeHint();
+
     QStyleOptionToolButton opt;
 
     initStyleOption(&opt);
     // QToolButton的sizeHint已经考虑了菜单箭头的位置
     //从源码看，QToolButton的sizeHint是不会考虑换行的
-    SARibbonToolButton* that = const_cast< SARibbonToolButton* >(this);
     if (LargeButton == buttonType()) {
         //计算最佳大小
-
-        if (s.width() > s.height() * 1.4) {
+        if (SARibbonPannel* pannel = qobject_cast< SARibbonPannel* >(parent())) {
+            //对于建立在SARibbonPannel的基础上的大按钮，把高度设置为SARibbonPannel计算的大按钮高度
+            s.setHeight(pannel->largeHeight());
+        }
+        qDebug() << "reCalcSizeHint:default size=" << s;
+        if (s.width() > s.height() * SA_WIDTH_HEIGHT_RATIO) {
             //说明是一个长方形按钮
             //文本对齐方式
             //如果宽度大于高度，就看看换行是否能满足
@@ -431,7 +435,7 @@ void SARibbonToolButton::reCalcSizeHint()
                     textRange = fm.boundingRect(textRange, alignment, text());
                     if (textRange.height() <= (fm.lineSpacing() * 2)) {
                         //保证在两行
-                        that->m_isWordWrap = (textRange.height() > fm.lineSpacing());
+                        m_isWordWrap = (textRange.height() > fm.lineSpacing());
                         break;
                     }
                     ++trycount;
@@ -446,21 +450,21 @@ void SARibbonToolButton::reCalcSizeHint()
                 //如果有菜单
                 if (largeButtonType() == Lite) {
                     // lite模式下都要偏移
-                    s.rwidth() += ARROW_WIDTH;
+                    s.rwidth() += SA_INDICATOR_ARROW_WIDTH;
 
                 } else {
                     // Normal模式下，仅对换行的偏移
                     if (m_isWordWrap) {
-                        s.rwidth() += ARROW_WIDTH;
+                        s.rwidth() += SA_INDICATOR_ARROW_WIDTH;
                     }
                 }
             }
         } else {
-            that->m_isWordWrap = text().contains('\n');
+            m_isWordWrap = text().contains('\n');
             if ((opt.features & QStyleOptionToolButton::Menu) || (opt.features & QStyleOptionToolButton::HasMenu)) {
                 //如果有菜单
                 if ((largeButtonType() == Normal) && m_isWordWrap) {
-                    s.rwidth() += ARROW_WIDTH;
+                    s.rwidth() += SA_INDICATOR_ARROW_WIDTH;
                 }
             }
         }
@@ -475,7 +479,7 @@ void SARibbonToolButton::reCalcSizeHint()
             if (opt.features & QStyleOptionToolButton::Menu || opt.features & QStyleOptionToolButton::HasMenu) {
                 //如果有菜单
                 //            s.rwidth() += style()->pixelMetric(QStyle::PM_MenuButtonIndicator, &opt, this);
-                s.rwidth() += ARROW_WIDTH;
+                s.rwidth() += SA_INDICATOR_ARROW_WIDTH;
                 //无需在这里进行计算，在resizeevent里进行计算
                 // that->m_textRect = textRange.m (QPoint(s.width() - m_iconAndTextSpace, s.height() - m_iconAndTextSpace));
             }
@@ -692,6 +696,20 @@ void SARibbonToolButton::changeEvent(QEvent* e)
     QToolButton::changeEvent(e);
 }
 
+void SARibbonToolButton::actionEvent(QActionEvent* e)
+{
+    QToolButton::actionEvent(e);
+    if (e) {
+        // action发生变化
+        if (e->action()) {
+            if (!e->action()->text().isEmpty()) {
+                qDebug() << text() << ":actionEvent,sizehint=" << m_sizeHint;
+                reCalcSizeHint();
+            }
+        }
+    }
+}
+
 SARibbonToolButton::RibbonButtonType SARibbonToolButton::buttonType() const
 {
     return (m_buttonType);
@@ -726,11 +744,6 @@ QSize SARibbonToolButton::minimumSizeHint() const
 void SARibbonToolButton::setLargeButtonType(SARibbonToolButton::LargeButtonType type)
 {
     m_largeButtonType = type;
-    //    if (type == Lite) {
-    //        setIconSize(RibbonSubElementStyleOpt.toolButtonLargeIconSize - QSize(3, 3));
-    //    } else {
-    //        setIconSize(RibbonSubElementStyleOpt.toolButtonLargeIconSize);
-    //    }
 }
 
 SARibbonToolButton::LargeButtonType SARibbonToolButton::largeButtonType() const
@@ -748,6 +761,12 @@ SARibbonToolButton::LargeButtonType SARibbonToolButton::largeButtonType() const
 void SARibbonToolButton::setEnableWordWrap(bool on)
 {
     m_isEnableWordWrap = on;
+}
+
+void SARibbonToolButton::reCalcSizeHint()
+{
+    QSize s = QToolButton::sizeHint();
+    reCalcSizeHint(s);
 }
 
 /**
@@ -796,7 +815,7 @@ void SARibbonToolButton::calcIconAndTextRect(const QStyleOptionToolButton& opt)
             //下面确定文字区域
             if ((opt.features & QStyleOptionToolButton::Menu) || (opt.features & QStyleOptionToolButton::HasMenu)) {
                 //有菜单,宽度偏移ARROW_WIDTH
-                m_textRect.adjust(0, 0, -ARROW_WIDTH, 0);
+                m_textRect.adjust(0, 0, -SA_INDICATOR_ARROW_WIDTH, 0);
             }
 
         } else {
@@ -808,7 +827,7 @@ void SARibbonToolButton::calcIconAndTextRect(const QStyleOptionToolButton& opt)
             // 在仅有图标的小模式显示时，预留一个下拉箭头位置
             m_iconRect = opt.rect.adjusted(m_iconAndTextSpace, m_iconAndTextSpace, -m_iconAndTextSpace, -m_iconAndTextSpace);
             if (opt.features & QStyleOptionToolButton::Menu || opt.features & QStyleOptionToolButton::HasMenu) {
-                m_iconRect.adjust(0, 0, -ARROW_WIDTH, 0);
+                m_iconRect.adjust(0, 0, -SA_INDICATOR_ARROW_WIDTH, 0);
             }
             //确定文本区域
             m_textRect = QRect();
@@ -824,7 +843,7 @@ void SARibbonToolButton::calcIconAndTextRect(const QStyleOptionToolButton& opt)
             //确定文本区域
             if ((opt.features & QStyleOptionToolButton::Menu) || (opt.features & QStyleOptionToolButton::HasMenu)) {
                 //有菜单,宽度偏移ARROW_WIDTH
-                m_textRect.adjust(0, 0, -ARROW_WIDTH, 0);
+                m_textRect.adjust(0, 0, -SA_INDICATOR_ARROW_WIDTH, 0);
             }
         }
     }
@@ -881,14 +900,14 @@ QRect SARibbonToolButton::calcIndicatorArrowDownRect(const QStyleOptionToolButto
                          m_textRect.height() / 2);
         } else {
             rect.setRect(m_textRect.left(),
-                         m_textRect.bottom() - ARROW_WIDTH,  // 这里ARROW_WIDTH也作为高度
+                         m_textRect.bottom() - SA_INDICATOR_ARROW_WIDTH,  // 这里ARROW_WIDTH也作为高度
                          m_textRect.width(),
-                         ARROW_WIDTH);
+                         SA_INDICATOR_ARROW_WIDTH);
         }
     } else {
-        rect.setRect(rect.width() - ARROW_WIDTH - m_iconAndTextSpace,
+        rect.setRect(rect.width() - SA_INDICATOR_ARROW_WIDTH - m_iconAndTextSpace,
                      m_iconAndTextSpace,
-                     ARROW_WIDTH,  // 箭头宽度
+                     SA_INDICATOR_ARROW_WIDTH,  // 箭头宽度
                      rect.height() - 2 * m_iconAndTextSpace);
     }
     return (rect);
@@ -917,8 +936,6 @@ bool SARibbonToolButton::event(QEvent* e)
     switch (e->type()) {
     case QEvent::WindowDeactivate:
     case QEvent::ActionChanged:
-        // todo 文字改变
-
     case QEvent::ActionRemoved:
     case QEvent::ActionAdded:
         m_mouseOnSubControl = false;

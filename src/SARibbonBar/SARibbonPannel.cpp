@@ -625,6 +625,15 @@ void SARibbonPannel::setPannelName(const QString& title)
 }
 
 /**
+ * @brief 获取大图标的高度
+ * @return
+ */
+int SARibbonPannel::largeHeight() const
+{
+    return SARibbonPannelLayout::calcLargeHeight(rect(), this);
+}
+
+/**
  * @brief 定义所有的pannel的标题栏高度，有别于@sa titleHeight 此函数是静态函数，获取的是全局的高度
  * 而 @sa titleHeight 函数会根据当前的行情况返回标题栏高度，在2行情况下返回0
  *

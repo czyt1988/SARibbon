@@ -12,6 +12,7 @@ endif()
 
 SET(HEADER_FILES
     SAFramelessHelper.h
+    SARibbonStyleOption.h
     SARibbonActionsManager.h
     SARibbonBar.h
     SARibbonCustomizeData.h
@@ -53,6 +54,7 @@ qt5_wrap_cpp(MOC_HEADER_FILES ${HEADER_FILES})
 
 SET(SOURCE_FILES
     SAFramelessHelper.cpp
+    SARibbonStyleOption.cpp
     SARibbonActionsManager.cpp
     SARibbonBar.cpp
     SARibbonCustomizeData.cpp

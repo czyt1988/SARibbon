@@ -220,6 +220,18 @@ bool SARibbonPannelLayout::isDirty() const
 }
 
 /**
+ * @brief 计算大图标的高度
+ * @param setrect
+ * @param pannel
+ * @return
+ */
+int SARibbonPannelLayout::calcLargeHeight(const QRect& setrect, const SARibbonPannel* pannel)
+{
+    const QMargins& mag = pannelContentsMargins();
+    return setrect.height() - mag.top() - mag.bottom() - pannel->titleHeight();
+}
+
+/**
  * @brief 全局的contentsMargins
  *
  * 由于ribbonbar的高度估算需要预先知道pannel的contentsMargins，所有需要设置为全局，
@@ -362,7 +374,7 @@ void SARibbonPannelLayout::updateGeomArray(const QRect& setrect)
     // rowcount 是ribbon的行，有2行和3行两种
     const short rowCount = (pannel->pannelLayoutMode() == SARibbonPannel::ThreeRowMode) ? 3 : 2;
     // largeHeight是对应large占比的高度,pannel->titleHeight()在两行模式返回0
-    const int largeHeight = height - mag.top() - mag.bottom() - pannel->titleHeight();
+    const int largeHeight = calcLargeHeight(setrect, pannel);
 
     m_largeHeight = largeHeight;
     //计算smallHeight的高度

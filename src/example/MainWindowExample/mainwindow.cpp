@@ -104,7 +104,7 @@ MainWindow::MainWindow(QWidget* par) : SARibbonMainWindow(par), m_customizeWidge
     //
     showMaximized();
     //
-    setWindowIcon(QIcon(":/icon/icon/SA.svg"));
+    //    setWindowIcon(QIcon(":/icon/icon/SA.svg"));
 }
 
 void MainWindow::onShowContextCategory(bool on)

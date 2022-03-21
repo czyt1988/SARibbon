@@ -45,6 +45,7 @@ public:
     //设置运行文字换行，这主要针对大模式按钮以及lite模式下，默认为true
     void setEnableWordWrap(bool on = true);
     void reCalcSizeHint();
+    void reCalcSizeHint(QSize s);
 
 public:
     //设置按钮点击时文字会闪烁一下
@@ -59,7 +60,7 @@ protected:
     QRect adjustedTextRect(const QStyleOptionToolButton& opt) const;
     QRect calcIndicatorArrowDownRect(const QStyleOptionToolButton& opt);
     QPixmap createIconPixmap(const QStyleOptionToolButton& opt, const QSize& iconsize);
-    bool event(QEvent* e) Q_DECL_OVERRIDE;
+
     virtual void paintEvent(QPaintEvent* event) Q_DECL_OVERRIDE;
     virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
     virtual void mouseMoveEvent(QMouseEvent* e) Q_DECL_OVERRIDE;
@@ -81,8 +82,10 @@ private:
                           const QWidget* widget = 0);
 
 protected:
+    bool event(QEvent* e) Q_DECL_OVERRIDE;
     //事件改变 - 主要为了捕获字体的改变
     void changeEvent(QEvent* e) Q_DECL_OVERRIDE;
+    virtual void actionEvent(QActionEvent* e) Q_DECL_OVERRIDE;
 
 private:
     static bool s_isToolButtonTextShift;  ///< 配置SARibbonToolButton文字在点击时是否会轻微改变位置而达到一种类似跳动的效果,@default 默认为false
