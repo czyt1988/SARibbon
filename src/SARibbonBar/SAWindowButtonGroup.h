@@ -12,8 +12,8 @@ class SA_RIBBON_EXPORT SAWindowButtonGroup : public QWidget
 {
     Q_OBJECT
 public:
-    SAWindowButtonGroup(QWidget *parent);
-    SAWindowButtonGroup(QWidget *parent, Qt::WindowFlags flags);
+    SAWindowButtonGroup(QWidget* parent);
+    SAWindowButtonGroup(QWidget* parent, Qt::WindowFlags flags);
     ~SAWindowButtonGroup();
     void setupMinimizeButton(bool on);
     void setupMaximizeButton(bool on);
@@ -33,11 +33,12 @@ public:
     //仅获取按钮的状态
     Qt::WindowFlags windowButtonFlags() const;
 
-protected:
     virtual QSize sizeHint() const Q_DECL_OVERRIDE;
-    virtual bool eventFilter(QObject *watched, QEvent *e) Q_DECL_OVERRIDE;
+
+protected:
+    virtual bool eventFilter(QObject* watched, QEvent* e) Q_DECL_OVERRIDE;
     virtual void parentResize();
-    virtual void resizeEvent(QResizeEvent *e) Q_DECL_OVERRIDE;
+    virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
 
 protected slots:
     Q_SLOT void closeWindow();
@@ -46,7 +47,7 @@ protected slots:
 
 private:
     friend class SAWindowButtonGroupPrivate;
-    SAWindowButtonGroupPrivate *m_d;
+    SAWindowButtonGroupPrivate* m_d;
 };
 
 /**
@@ -56,6 +57,6 @@ class SAWindowToolButton : public QPushButton
 {
     Q_OBJECT
 public:
-    SAWindowToolButton(QWidget *p = nullptr);
+    SAWindowToolButton(QWidget* p = nullptr);
 };
-#endif // SAWINDOWBUTTONGROUP_H
+#endif  // SAWINDOWBUTTONGROUP_H

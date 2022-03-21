@@ -1498,8 +1498,7 @@ void SARibbonBar::resizeInOfficeStyle()
     int y = widgetBord().top();
 
     // cornerWidget - TopLeftCorner
-    const int titleH              = titleBarHeight();
-    const int validTitleBarHeight = titleH - widgetBord().top();
+    const int validTitleBarHeight = titleBarHeight();
     const int tabH                = tabBarHeight();
 
     x += m_d->iconRightBorderPosition + 5;
@@ -1524,7 +1523,7 @@ void SARibbonBar::resizeInOfficeStyle()
     }
     //第二行，开始布局applicationButton，tabbar，tabBarRightSizeButtonGroupWidget，TopRightCorner
     x = widgetBord().left();
-    y = titleH + widgetBord().top();
+    y += validTitleBarHeight;
     // applicationButton 定位
     if (m_d->applicationButton) {
         if (m_d->applicationButton->isVisible()) {
@@ -1570,11 +1569,9 @@ void SARibbonBar::resizeInOfficeStyle()
 void SARibbonBar::resizeInWpsLiteStyle()
 {
     updateRibbonElementGeometry();
-    // m_d->lastShowStyle = WpsLiteStyle;
     int x                         = widgetBord().left();
     int y                         = widgetBord().top();
-    const int titleH              = titleBarHeight();
-    const int validTitleBarHeight = titleH - widgetBord().top();
+    const int validTitleBarHeight = titleBarHeight();
 
     //先布局右边内容
     // cornerWidget - TopRightCorner

@@ -5,7 +5,9 @@
 
 /**
  * @brief 定义了saribbon所有尺寸相关信息，saribbon的建立都基于此类的尺寸，如果想调整，
- * 可以通过 @ref SARibbonElementCreateDelegate 的 @ref setRibbonStyleOption 函数设置自己的SARibbonStyleOption
+ * 可以通过 @ref SARibbonElementCreateDelegate（通过SARibbonElementManager单例管理） 的 @ref setRibbonStyleOption 函数设置自己的SARibbonStyleOption
+ *
+ * @sa SARibbonElementManager
  *
  * 一般SARibbonElementCreateDelegate::setRibbonStyleOption函数最好在ribbonbar构建之前调用
  *
