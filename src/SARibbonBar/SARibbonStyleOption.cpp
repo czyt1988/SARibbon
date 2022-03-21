@@ -104,10 +104,6 @@ void SARibbonStyleOption::recalc()
     //    m_pannelHeightTwoRow               = calcPannelHeight(SARibbonPannel::TwoRowMode);
 }
 
-void SARibbonStyleOption::recalcFontRefSize(const QFont& f)
-{
-}
-
 /**
  * @brief 通过固有参数计算pannel的高度
  * @param lm
@@ -141,14 +137,13 @@ int SARibbonStyleOption::calcMainbarHeight(SARibbonBar::RibbonStyle s) const
     case SARibbonBar::WpsLiteStyle:
         // 不是减去m_titleBarHeight原因是绘制wps的样式时，标题栏是存在，只是把bar画在标题栏上，相当于没有bar
         return m_ribbonbarHeightOfficeStyleThreeRow - m_tabBarHeight;
-    case SARibbonBar::WpsLiteStyleTwoRow: {
+    case SARibbonBar::WpsLiteStyleTwoRow:
         //两行模式把标题栏去掉
         return m_ribbonbarHeightOfficeStyleThreeRow * 0.95 - m_tabBarHeight - SARibbonPannel::pannelTitleHeight();
-    }
-    case SARibbonBar::OfficeStyleTwoRow: {
-
+    case SARibbonBar::OfficeStyleTwoRow:
         return m_ribbonbarHeightOfficeStyleThreeRow * 0.95 - SARibbonPannel::pannelTitleHeight();
-    }
+    default:
+        break;
     }
     return m_ribbonbarHeightOfficeStyleThreeRow;
 }

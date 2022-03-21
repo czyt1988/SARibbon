@@ -156,6 +156,9 @@ public:
     QString pannelName() const;
     void setPannelName(const QString& title);
 
+    //大图标的高度
+    int largeHeight() const;
+
     //全局的标题栏高度
     static int pannelTitleHeight();
     static void setPannelTitleHeight(int h);
