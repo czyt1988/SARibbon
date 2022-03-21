@@ -246,6 +246,8 @@ const QMargins& SARibbonPannelLayout::pannelContentsMargins()
 
 /**
  * @brief 全局的contentsMargins
+ * @note SARibbonStyleOption会用到此函数，调用设置函数后需要手动重新计算SARibbonStyleOption的内容,@sa SARibbonStyleOption::recalc
+ * @sa SARibbonStyleOption
  * @param m
  */
 void SARibbonPannelLayout::setPannelContentsMargins(const QMargins& m)

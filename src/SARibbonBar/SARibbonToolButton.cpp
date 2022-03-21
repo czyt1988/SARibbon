@@ -52,7 +52,9 @@ QDebug operator<<(QDebug debug, const QStyleOptionToolButton& opt)
 
 #endif
 
-bool SARibbonToolButton::s_isToolButtonTextShift = false;
+//静态参数初始化
+bool SARibbonToolButton::s_isToolButtonTextShift   = false;
+bool SARibbonToolButton::s_liteStyleEnableWordWrap = false;
 
 SARibbonToolButton::SARibbonToolButton(QWidget* parent)
     : QToolButton(parent)
@@ -415,57 +417,65 @@ void SARibbonToolButton::reCalcSizeHint(QSize s)
             //对于建立在SARibbonPannel的基础上的大按钮，把高度设置为SARibbonPannel计算的大按钮高度
             s.setHeight(pannel->largeHeight());
         }
-        qDebug() << "reCalcSizeHint:default size=" << s;
-        if (s.width() > s.height() * SA_WIDTH_HEIGHT_RATIO) {
-            //说明是一个长方形按钮
-            //文本对齐方式
-            //如果宽度大于高度，就看看换行是否能满足
-            QFontMetrics fm = fontMetrics();
-            QRect textRange(0, 0, s.width(), s.height());
+        if (Normal == m_largeButtonType || (Lite == m_largeButtonType && s_liteStyleEnableWordWrap)) {
+            //普通模式下才涉及到文字换行，或者lite模式下指定了文字换行
+            if (s.width() > s.height() * SA_WIDTH_HEIGHT_RATIO) {
+                //说明是一个长方形按钮
+                //文本对齐方式
+                //如果宽度大于高度，就看看换行是否能满足
+                QFontMetrics fm = fontMetrics();
+                QRect textRange(0, 0, s.width(), s.height());
 
-            //! 1 先获取最优的文字textRange
-            {
-                const int maxTrycount = 3;
-                int trycount          = 0;
-                int alignment         = Qt::TextShowMnemonic | Qt::TextWordWrap;
-                do {
-                    //先计算两行文本的紧凑矩形
-                    //从一半开始逐渐递增
-                    textRange.setWidth(s.width() / 2 + (s.width() / 2) * (float(trycount) / maxTrycount));
-                    textRange = fm.boundingRect(textRange, alignment, text());
-                    if (textRange.height() <= (fm.lineSpacing() * 2)) {
-                        //保证在两行
-                        m_isWordWrap = (textRange.height() > fm.lineSpacing());
-                        break;
+                //! 1 先获取最优的文字textRange
+                {
+                    const int maxTrycount = 3;
+                    int trycount          = 0;
+                    int alignment         = Qt::TextShowMnemonic | Qt::TextWordWrap;
+                    do {
+                        //先计算两行文本的紧凑矩形
+                        //从一半开始逐渐递增
+                        textRange.setWidth(s.width() / 2 + (s.width() / 2) * (float(trycount) / maxTrycount));
+                        textRange = fm.boundingRect(textRange, alignment, text());
+                        if (textRange.height() <= (fm.lineSpacing() * 2)) {
+                            //保证在两行
+                            m_isWordWrap = (textRange.height() > fm.lineSpacing());
+                            break;
+                        }
+                        ++trycount;
+                    } while (trycount < 3);
+                }
+                //左右留2像素
+                s.setWidth(textRange.width() + m_iconAndTextSpace * 2);
+                //! 2再判断箭头来调整textRange
+                //把区域设置给size
+                //确认是否换行
+                if ((opt.features & QStyleOptionToolButton::Menu) || (opt.features & QStyleOptionToolButton::HasMenu)) {
+                    //如果有菜单
+                    if (largeButtonType() == Lite) {
+                        // lite模式下都要偏移
+                        s.rwidth() += SA_INDICATOR_ARROW_WIDTH;
+
+                    } else {
+                        // Normal模式下，仅对换行的偏移
+                        if (m_isWordWrap) {
+                            s.rwidth() += SA_INDICATOR_ARROW_WIDTH;
+                        }
                     }
-                    ++trycount;
-                } while (trycount < 3);
-            }
-            //左右留2像素
-            s.setWidth(textRange.width() + m_iconAndTextSpace * 2);
-            //! 2再判断箭头来调整textRange
-            //把区域设置给size
-            //确认是否换行
-            if ((opt.features & QStyleOptionToolButton::Menu) || (opt.features & QStyleOptionToolButton::HasMenu)) {
-                //如果有菜单
-                if (largeButtonType() == Lite) {
-                    // lite模式下都要偏移
-                    s.rwidth() += SA_INDICATOR_ARROW_WIDTH;
-
-                } else {
-                    // Normal模式下，仅对换行的偏移
+                }
+            } else {
+                m_isWordWrap = text().contains('\n');
+                if ((opt.features & QStyleOptionToolButton::Menu) || (opt.features & QStyleOptionToolButton::HasMenu)) {
+                    //如果有菜单
                     if (m_isWordWrap) {
                         s.rwidth() += SA_INDICATOR_ARROW_WIDTH;
                     }
                 }
             }
         } else {
-            m_isWordWrap = text().contains('\n');
+            //否则就是lite模式，只允许1行，有菜单就偏移
             if ((opt.features & QStyleOptionToolButton::Menu) || (opt.features & QStyleOptionToolButton::HasMenu)) {
                 //如果有菜单
-                if ((largeButtonType() == Normal) && m_isWordWrap) {
-                    s.rwidth() += SA_INDICATOR_ARROW_WIDTH;
-                }
+                s.rwidth() += SA_INDICATOR_ARROW_WIDTH;
             }
         }
         //无需在这里进行计算，在resizeevent里进行计算
@@ -480,32 +490,8 @@ void SARibbonToolButton::reCalcSizeHint(QSize s)
                 //如果有菜单
                 //            s.rwidth() += style()->pixelMetric(QStyle::PM_MenuButtonIndicator, &opt, this);
                 s.rwidth() += SA_INDICATOR_ARROW_WIDTH;
-                //无需在这里进行计算，在resizeevent里进行计算
-                // that->m_textRect = textRange.m (QPoint(s.width() - m_iconAndTextSpace, s.height() - m_iconAndTextSpace));
             }
-            //无需在这里进行计算，在resizeevent里进行计算
-            //            that->m_textRect = QRect(0, 0, 0, 0);
-        } else {
-            if (opt.features & QStyleOptionToolButton::Menu || opt.features & QStyleOptionToolButton::HasMenu) {
-                //无需在这里进行计算，在resizeevent里进行计算
-                // QToolButton::sizeHint已经计算了
-                //
-                //                int wIndicator   = style()->pixelMetric(QStyle::PM_MenuButtonIndicator, &opt, this);
-                //                that->m_textRect = QRect(m_iconAndTextSpace + opt.iconSize.width(),
-                //                                         opt.iconSize.width(),
-                //                                         s.width() - opt.iconSize.width(),
-                //                                         s.height() - m_iconAndTextSpace * 2);
-            } else {
-                //                s.rwidth() -= 2*m_iconAndTextSpace;  // QToolButton::sizeHint()预留了4像素，有点稀疏
-            }
-            //            that->m_textRect = QRect(m_iconAndTextSpace,
-            //                                     opt.iconSize.width(),
-            //                                     s.width() - opt.iconSize.width(),
-            //                                     s.height() - m_iconAndTextSpace * 2);
         }
-        //! 3在这时候能确定m_textRect,m_iconRect
-
-        //        that->calcIconRect(QRect(0, 0, s.width(), s.height()), m_textRect, opt);
     }
     m_sizeHint = s;
 }
@@ -699,17 +685,23 @@ void SARibbonToolButton::changeEvent(QEvent* e)
 void SARibbonToolButton::actionEvent(QActionEvent* e)
 {
     QToolButton::actionEvent(e);
-    if (e) {
-        // action发生变化
-        if (e->action()) {
-            if (!e->action()->text().isEmpty()) {
-                qDebug() << text() << ":actionEvent,sizehint=" << m_sizeHint;
-                reCalcSizeHint();
-            }
-        }
-    }
+    // action的文字发生变更时要重新计算尺寸--sizehint实时计算情况下，此处不需要这样设置
+    //    if (e) {
+    //        // action发生变化
+    //        if (e->action()) {
+    //            if (!e->action()->text().isEmpty()) {
+    //                qDebug() << text() << ":actionEvent,sizehint=" << m_sizeHint;
+    //                reCalcSizeHint();
+    //            }
+    //        }
+    //    }
 }
 
+/**
+ * @brief 按钮样式
+ * @sa setButtonType
+ * @return
+ */
 SARibbonToolButton::RibbonButtonType SARibbonToolButton::buttonType() const
 {
     return (m_buttonType);
@@ -751,18 +743,6 @@ SARibbonToolButton::LargeButtonType SARibbonToolButton::largeButtonType() const
     return (m_largeButtonType);
 }
 
-/**
- * @brief 是否允许文字换行
- *
- * 默认为true，允许换行会尝试换为两行（最多两行）从而节省宽度空间。
- * @param on
- * @todo 目前还未实现预留接口
- */
-void SARibbonToolButton::setEnableWordWrap(bool on)
-{
-    m_isEnableWordWrap = on;
-}
-
 void SARibbonToolButton::reCalcSizeHint()
 {
     QSize s = QToolButton::sizeHint();
@@ -788,6 +768,28 @@ bool SARibbonToolButton::isToolButtonTextShift()
 }
 
 /**
+ * @brief 设置在lite模式下是否允许文字换行，如果允许，则图标相对比较小，默认不允许
+ * @param on
+ * @note 此函数的调用最好在ribbonbar布局之前设置，且调用之后需要调用@sa SARibbonStyleOption::recalc 刷新
+ * @code
+ * RibbonSubElementStyleOpt.recalc();
+ * @endcode
+ */
+void SARibbonToolButton::setLiteStyleEnableWordWrap(bool on)
+{
+    s_liteStyleEnableWordWrap = on;
+}
+
+/**
+ * @brief 在lite模式下是否允许文字换行
+ * @return
+ */
+bool SARibbonToolButton::isLiteStyleEnableWordWrap()
+{
+    return s_liteStyleEnableWordWrap;
+}
+
+/**
  * @brief 根据设定计算图标的绘制区域
  * @param opt
  * @return
@@ -800,9 +802,18 @@ void SARibbonToolButton::calcIconAndTextRect(const QStyleOptionToolButton& opt)
             // sizehint已经保证宽度能显示两行
             // icon 的区域就是文字以外的区域，如果m_isEnableWordWrap=true，就保证有两行文本的空间
             QFontMetrics fm = fontMetrics();
-            int maxheight = opt.rect.height() - (fm.height() * 2 + fm.leading() * 2) - 2 * m_iconAndTextSpace  //减去赏析边距
+            int maxheight   = 30;
+            if (Normal == m_largeButtonType || (Lite == m_largeButtonType && s_liteStyleEnableWordWrap)) {
+                maxheight = opt.rect.height() - (fm.lineSpacing() * 2)  //减去2行文本
+                            - 2 * m_iconAndTextSpace                    //减去赏析边距
                             - m_iconAndTextSpace  //这里减去m_iconAndTextSpace，m_iconAndTextSpace是icon和text的分隔距离
-                    ;
+                        ;
+            } else {
+                maxheight = opt.rect.height() - (fm.lineSpacing() * 1.2)  //减去1行文本
+                            - 2 * m_iconAndTextSpace                      //减去赏析边距
+                            - m_iconAndTextSpace  //这里减去m_iconAndTextSpace，m_iconAndTextSpace是icon和text的分隔距离
+                        ;
+            }
             m_iconRect.setHeight(maxheight);
 
             //没有菜单
@@ -814,8 +825,10 @@ void SARibbonToolButton::calcIconAndTextRect(const QStyleOptionToolButton& opt)
             //保证能显示两行文本
             //下面确定文字区域
             if ((opt.features & QStyleOptionToolButton::Menu) || (opt.features & QStyleOptionToolButton::HasMenu)) {
-                //有菜单,宽度偏移ARROW_WIDTH
-                m_textRect.adjust(0, 0, -SA_INDICATOR_ARROW_WIDTH, 0);
+                //有菜单且换行,宽度偏移ARROW_WIDTH
+                if (m_isWordWrap) {
+                    m_textRect.adjust(0, 0, -SA_INDICATOR_ARROW_WIDTH, 0);
+                }
             }
 
         } else {
@@ -892,13 +905,22 @@ QRect SARibbonToolButton::calcIndicatorArrowDownRect(const QStyleOptionToolButto
     //预留ARROW_WIDTHpx绘制箭头，1px的上下边界
     QRect rect = opt.rect;
     if (LargeButton == m_buttonType) {
-        if (m_isWordWrap) {
+        if ((Lite == m_largeButtonType && !s_liteStyleEnableWordWrap)) {
+            //首先判断是否为lite且不允许换行
+            rect.setRect(m_textRect.right(),
+                         m_textRect.top(),
+                         opt.rect.right() - m_iconAndTextSpace - m_textRect.right(),
+                         m_textRect.height());
+        } else if (m_isWordWrap) {
+            //如果不是lite，且允许换行，那么就在文本第二行最后端
             //菜单的下拉箭头位于第二行文本的矩形区域
             rect.setRect(m_textRect.right(),
                          m_textRect.top() + m_textRect.height() / 2,
                          opt.rect.right() - m_iconAndTextSpace - m_textRect.right(),
                          m_textRect.height() / 2);
+
         } else {
+            //都不是的情况下就第二行文本位置
             rect.setRect(m_textRect.left(),
                          m_textRect.bottom() - SA_INDICATOR_ARROW_WIDTH,  // 这里ARROW_WIDTH也作为高度
                          m_textRect.width(),

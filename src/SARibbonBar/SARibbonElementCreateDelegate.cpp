@@ -100,7 +100,7 @@ SARibbonQuickAccessBar* SARibbonElementCreateDelegate::createQuickAccessBar(QWid
     return (new SARibbonQuickAccessBar(parent));
 }
 
-const SARibbonStyleOption& SARibbonElementCreateDelegate::getRibbonStyleOption() const
+SARibbonStyleOption& SARibbonElementCreateDelegate::getRibbonStyleOption()
 {
     return (*m_opt);
 }
@@ -109,9 +109,9 @@ const SARibbonStyleOption& SARibbonElementCreateDelegate::getRibbonStyleOption()
  * @brief 设置style配置
  * @param opt
  */
-void SARibbonElementCreateDelegate::setRibbonStyleOption(const SARibbonStyleOption& opt)
+void SARibbonElementCreateDelegate::setRibbonStyleOption(SARibbonStyleOption* opt)
 {
-    *m_opt = opt;
+    m_opt.reset(opt);
 }
 
 /**

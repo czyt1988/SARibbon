@@ -49,6 +49,7 @@ private slots:
     void onFontComWidgetCurrentFontChanged(const QFont& f);
     void onActionFontLargerTriggered();
     void onActionFontSmallerTriggered();
+    void onActionwordWrapIn2rowTriggered(bool b);
 
 private:
     SARibbonContextCategory* m_contextCategory;

@@ -51,6 +51,7 @@
         <file>icon/enableTest.svg</file>
         <file>icon/delete.svg</file>
         <file>icon/layout.svg</file>
+        <file>icon/wordwrap.svg</file>
     </qresource>
     <qresource prefix="/gallery-icon">
         <file>icon/gallery/Document-File.svg</file>

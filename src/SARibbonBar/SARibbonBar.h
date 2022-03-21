@@ -264,6 +264,9 @@ public:
 
     // tabbar 底部会绘制一条线条，此接口定义线条颜色
     void setTabBarBaseLineColor(const QColor& clr);
+
+    //更新ribbon的布局数据，此函数适用于一些关键性尺寸变化，换起ribbon下面元素的布局
+    void updateRibbonGeometry();
 signals:
 
     /**
@@ -312,7 +315,6 @@ protected slots:
 
 private:
     int tabIndex(SARibbonCategory* obj);
-    void updateRibbonElementGeometry();
     void resizeInOfficeStyle();
     void resizeInWpsLiteStyle();
     void paintInNormalStyle();
@@ -321,6 +323,7 @@ private:
 
     //刷新所有ContextCategoryManagerData，这个在单独一个Category删除时调用
     void updateContextCategoryManagerData();
+    void updateRibbonElementGeometry();
 
 protected:
     void paintEvent(QPaintEvent* e) Q_DECL_OVERRIDE;
