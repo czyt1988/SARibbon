@@ -76,9 +76,9 @@ public:
 
 	SARibbonBar(QWidget *parent = nullptr);
 	~SARibbonBar() Q_DECL_OVERRIDE;
-	QAbstractButton *applicationButton();
+	//QAbstractButton *applicationButton();
 
-	void setApplicationButton(QAbstractButton *btn);
+	//void setApplicationButton(QAbstractButton *btn);
 
 	SARibbonTabBar *ribbonTabBar();
 

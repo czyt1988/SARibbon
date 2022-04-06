@@ -61,7 +61,8 @@ MainWindow::MainWindow(QWidget *par) : SARibbonMainWindow(par)
     PRINT_COST(cost, lastTimes, "setCentralWidget & setWindowTitle");
     SARibbonBar *ribbon = ribbonBar();
 
-    ribbon->applicationButton()->setText(("File"));
+	// der Applicationbutton war der blaue Button mit dem Tittle "File"
+    //ribbon->applicationButton()->setText(("File"));
     SARibbonCategory *categoryMain = ribbon->addCategoryPage(("Main"));
 
     PRINT_COST(cost, lastTimes, "new main page");
@@ -608,15 +609,15 @@ void MainWindow::createCategoryOther(SARibbonCategory *page)
 
     appBtn->setObjectName(("no application button and very long word test"));
     appBtn->setCheckable(true);
-    connect(appBtn, &QAction::toggled, this, [&](bool b) {
-        if (b) {
-            this->ribbonBar()->setApplicationButton(nullptr);
-        }else{
-            SARibbonApplicationButton *appBtn = new SARibbonApplicationButton();
-            appBtn->setText(tr("File"));
-            this->ribbonBar()->setApplicationButton(appBtn);
-        }
-    });
+    //connect(appBtn, &QAction::toggled, this, [&](bool b) {
+    //    if (b) {
+    //        this->ribbonBar()->setApplicationButton(nullptr);
+    //    }else{
+    //        SARibbonApplicationButton *appBtn = new SARibbonApplicationButton();
+    //        appBtn->setText(tr("File"));
+    //        this->ribbonBar()->setApplicationButton(appBtn);
+    //    }
+    //});
     SARibbonToolButton *b = pannel->addLargeAction(appBtn);
 
     b->setObjectName("ApplicationButtonTest");

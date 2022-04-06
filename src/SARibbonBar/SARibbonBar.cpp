@@ -58,7 +58,7 @@ class SARibbonBarPrivate
 {
 public:
 	SARibbonBar *MainClass;
-	QAbstractButton *applicationButton;
+	//QAbstractButton *applicationButton;
 	SARibbonTabBar *ribbonTabBar;
 	SARibbonStackedWidget *stackedContainerWidget;
 	QList<_SAContextCategoryManagerData> currentShowingContextCategory;
@@ -75,8 +75,8 @@ public:
 	QList<QColor> mContextCategoryColorList;
 	int mContextCategoryColorListIndex;
 	SARibbonBarPrivate(SARibbonBar *par)
-		: applicationButton(nullptr)
-		, ribbonTabBar(nullptr)
+		//: applicationButton(nullptr) der Applicationbutton war der blaue Button mit dem Tittle "File"
+		: ribbonTabBar(nullptr)
 		, stackedContainerWidget(nullptr)
 		, iconRightBorderPosition(1)
 		, minimumCategoryButton(nullptr)
@@ -100,9 +100,9 @@ public:
 
 	void init()
 	{
-		applicationButton = RibbonSubElementDelegate->createRibbonApplicationButton(MainClass);
-		MainClass->connect(applicationButton, &QAbstractButton::clicked
-			, MainClass, &SARibbonBar::applicationButtonClicked);
+		//applicationButton = RibbonSubElementDelegate->createRibbonApplicationButton(MainClass);
+		//MainClass->connect(applicationButton, &QAbstractButton::clicked
+		//	, MainClass, &SARibbonBar::applicationButtonClicked);
 		ribbonTabBar = RibbonSubElementDelegate->createRibbonTabBar(MainClass);
 		ribbonTabBar->setObjectName(QStringLiteral("objSARibbonTabBar"));
 		ribbonTabBar->setDrawBase(false);
@@ -127,21 +127,21 @@ public:
 	}
 
 
-	void setApplicationButton(QAbstractButton *btn)
-	{
-		if (applicationButton) {
-			delete applicationButton;
-		}
-		if (btn) {
-			if (btn->parent() != MainClass) {
-				btn->setParent(MainClass);
-			}
-			btn->move(0, RibbonSubElementStyleOpt.titleBarHight);
-			MainClass->connect(applicationButton, &QAbstractButton::clicked
-				, MainClass, &SARibbonBar::applicationButtonClicked);
-		}
-		applicationButton = btn;
-	}
+	//void setApplicationButton(QAbstractButton *btn)
+	//{
+	//	if (applicationButton) {
+	//		delete applicationButton;
+	//	}
+	//	if (btn) {
+	//		if (btn->parent() != MainClass) {
+	//			btn->setParent(MainClass);
+	//		}
+	//		btn->move(0, RibbonSubElementStyleOpt.titleBarHight);
+	//		MainClass->connect(applicationButton, &QAbstractButton::clicked
+	//			, MainClass, &SARibbonBar::applicationButtonClicked);
+	//	}
+	//	applicationButton = btn;
+	//}
 
 
 	bool isContainContextCategoryInList(SARibbonContextCategory *contextCategory)
@@ -222,25 +222,25 @@ SARibbonBar::~SARibbonBar()
 }
 
 
-QAbstractButton *SARibbonBar::applicationButton()
-{
-	return (m_d->applicationButton);
-}
+//QAbstractButton *SARibbonBar::applicationButton()
+//{
+//	return (m_d->applicationButton);
+//}
 
 
-void SARibbonBar::setApplicationButton(QAbstractButton *btn)
-{
-	m_d->setApplicationButton(btn);
-	if (btn) {
-		if (btn->objectName().isEmpty()) {
-			btn->setObjectName(QStringLiteral("SARibbonApplicationButton"));
-		}
-		btn->setVisible(true);
-		//btn->setGeometry(applicationButtonGeometry());
-	}
-	//resize
-	QApplication::postEvent(this, new QResizeEvent(size(), size()));
-}
+//void SARibbonBar::setApplicationButton(QAbstractButton *btn)
+//{
+//	m_d->setApplicationButton(btn);
+//	if (btn) {
+//		if (btn->objectName().isEmpty()) {
+//			btn->setObjectName(QStringLiteral("SARibbonApplicationButton"));
+//		}
+//		btn->setVisible(true);
+//		//btn->setGeometry(applicationButtonGeometry());
+//	}
+//	//resize
+//	QApplication::postEvent(this, new QResizeEvent(size(), size()));
+//}
 
 
 SARibbonTabBar *SARibbonBar::ribbonTabBar()
@@ -1293,12 +1293,12 @@ void SARibbonBar::resizeInOfficeStyle()
 	x = RibbonSubElementStyleOpt.widgetBord.left();
 	y = titleH + RibbonSubElementStyleOpt.widgetBord.top();
 	//applicationButton 
-	if (m_d->applicationButton) {
-		if (m_d->applicationButton->isVisible()) {
-			m_d->applicationButton->setGeometry(x, y, RibbonSubElementStyleOpt.applicationButtonWidth, tabH);
-			x = m_d->applicationButton->geometry().right();
-		}
-	}
+	//if (m_d->applicationButton) {
+	//	if (m_d->applicationButton->isVisible()) {
+	//		m_d->applicationButton->setGeometry(x, y, RibbonSubElementStyleOpt.applicationButtonWidth, tabH);
+	//		x = m_d->applicationButton->geometry().right();
+	//	}
+	//}
 	//top right
 	//cornerWidget - TopRightCorner
 	int endX = width() - RibbonSubElementStyleOpt.widgetBord.right();
@@ -1394,12 +1394,12 @@ void SARibbonBar::resizeInWpsLiteStyle()
 	}
 	y = y + validTitleBarHeight - tabH;
 
-	if (m_d->applicationButton) {
-		if (m_d->applicationButton->isVisible()) {
-			m_d->applicationButton->setGeometry(x, y, RibbonSubElementStyleOpt.applicationButtonWidth, tabH);
-			x = m_d->applicationButton->geometry().right() + 2;
-		}
-	}
+	//if (m_d->applicationButton) {
+	//	if (m_d->applicationButton->isVisible()) {
+	//		m_d->applicationButton->setGeometry(x, y, RibbonSubElementStyleOpt.applicationButtonWidth, tabH);
+	//		x = m_d->applicationButton->geometry().right() + 2;
+	//	}
+	//}
 
 	int tabBarWidth = endX - x;
 	//20200831
