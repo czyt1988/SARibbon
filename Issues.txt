@@ -1,0 +1,5 @@
+- Skalierung des Videos bzw. der Kamera:
+  Beim Verkleinern bzw. Vergrößern der GUI, soll sich das Frame "besser"(Mario fragen) anpassen.
+
+
+- Das Tittle des Mainwindow sollte vielleicht linksbündig stehen
