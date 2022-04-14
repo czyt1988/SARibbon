@@ -85,7 +85,7 @@ public:
         , ribbonStyle(SARibbonBar::OfficeStyle)
         , lastShowStyle(SARibbonBar::OfficeStyle)
         , currentRibbonMode(SARibbonBar::NormalRibbonMode)
-        , windowButtonSize(100, RibbonSubElementStyleOpt.titleBarHeight())
+        , windowButtonSize(RibbonSubElementStyleOpt.titleBarHeight() * 4, RibbonSubElementStyleOpt.titleBarHeight())
         , mContextCategoryColorListIndex(-1)
         , mTitleTextColor(Qt::black)
         , mTabBarBaseLineColor(186, 201, 219)

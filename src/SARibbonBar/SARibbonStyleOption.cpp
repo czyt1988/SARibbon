@@ -87,3 +87,22 @@ int SARibbonStyleOption::calcMainbarHeight(SARibbonBar::RibbonStyle s) const
     }
     return m_ribbonbarHeightOfficeStyleThreeRow;
 }
+
+/**
+ * @brief 对SARibbonStyleOption输出
+ * @param debug
+ * @param c
+ * @return
+ */
+QDebug operator<<(QDebug debug, const SARibbonStyleOption& c)
+{
+    QDebugStateSaver saver(debug);
+    Q_UNUSED(saver);
+    debug.nospace() << "SARibbonStyleOption(titleBarHeight=" << c.titleBarHeight()
+                    << ",tabBarHeight=" << c.tabBarHeight() << ",widgetBord=" << c.widgetBord()
+                    << "\n,ribbonBarHeight(OfficeStyle)=" << c.ribbonBarHeight(SARibbonBar::OfficeStyle)
+                    << "\n,ribbonBarHeight(OfficeStyleTwoRow)=" << c.ribbonBarHeight(SARibbonBar::OfficeStyleTwoRow)
+                    << "\n,ribbonBarHeight(WpsLiteStyle)=" << c.ribbonBarHeight(SARibbonBar::WpsLiteStyle)
+                    << "\n,ribbonBarHeight(WpsLiteStyleTwoRow)=" << c.ribbonBarHeight(SARibbonBar::WpsLiteStyleTwoRow);
+    return debug;
+}
