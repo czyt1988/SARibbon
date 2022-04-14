@@ -119,8 +119,8 @@ SARibbonTabBar::tab {
   max-height: 1.2em;
   padding-left: 1pt;
   padding-right: 1pt;
-  padding-top: 1pt;
-  padding-bottom: 1pt;
+  padding-top: 0.2em;
+  padding-bottom: 0pt;
 }
 
 SARibbonTabBar::tab:selected, SARibbonTabBar::tab:hover {
