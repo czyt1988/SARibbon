@@ -7,7 +7,7 @@
 #include <QDebug>
 #include <QHash>
 #include <QFile>
-
+#include "SARibbonElementManager.h"
 /**
  * @brief The SARibbonMainWindowPrivate class
  */
@@ -47,6 +47,7 @@ SARibbonMainWindow::SARibbonMainWindow(QWidget* parent, bool useRibbon)
     if (useRibbon) {
         setRibbonTheme(ribbonTheme());
         setMenuWidget(new SARibbonBar(this));
+        qDebug() << RibbonSubElementStyleOpt;
 #ifdef Q_OS_UNIX
         //某些系统会对FramelessWindowHint异常
         // FramelessHelper用如下这种setWindowFlags(w->windowFlags()|Qt::FramelessWindowHint);方式设置，改为强制取消其他

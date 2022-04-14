@@ -20,7 +20,7 @@ SARibbonButtonGroupWidget {
 }
 
 SARibbonPannel > SARibbonButtonGroupWidget {
-  border: 1px solid #c2d0df;
+  border: 1pt solid #c2d0df;
 }
 
 /*SARibbonQuickAccessBar*/
@@ -49,7 +49,7 @@ SARibbonCategory {
 
 SARibbonStackedWidget {
   background-color: white;
-  border: 1px solid #c5d2e0;
+  border: 1pt solid #c5d2e0;
   border-top-width: 0px;
 }
 
@@ -84,13 +84,15 @@ SARibbonTabBar {
   background-color: transparent;
 }
 
+/*
+高清屏幕不能使用px
 SARibbonTabBar::tab {
   color: #5779af;
   border: none;
   background: transparent;
   margin-top: 0px;
   margin-right: 0px;
-  margin-left: 6px;
+  margin-left: 1em;
   margin-bottom: 0px;
   min-width: 60px;
   max-width: 200px;
@@ -100,6 +102,25 @@ SARibbonTabBar::tab {
   padding-right: 1px;
   padding-top: 1px;
   padding-bottom: 1px;
+}
+*/
+
+SARibbonTabBar::tab {
+  color: #5779af;
+  border: none;
+  background: transparent;
+  margin-top: 0pt;
+  margin-right: 0pt;
+  margin-left: 0.2em;
+  margin-bottom: 0pt;
+  min-width: 3em;
+  max-width: 10em;
+  min-height: 1.2em;
+  max-height: 1.2em;
+  padding-left: 1pt;
+  padding-right: 1pt;
+  padding-top: 1pt;
+  padding-bottom: 1pt;
 }
 
 SARibbonTabBar::tab:selected, SARibbonTabBar::tab:hover {
@@ -115,7 +136,8 @@ SARibbonTabBar::tab:selected {
 }
 
 SARibbonTabBar::tab:hover:!selected {
-  border: 1px solid #c5d2e0;
+  border:1px solid #c5d2e0;
+  border-bottom-color: #FFFFFF;
   color: #5779af;
 }
 
@@ -195,7 +217,7 @@ SARibbonMenu {
 }
 
 SARibbonMenu::item {
-  padding: 5px 25px 5px 25px;
+  padding: 5px 5px 5px 5px;
   background-color: transparent;
 }
 
