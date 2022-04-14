@@ -1574,7 +1574,6 @@ void SARibbonBar::resizeInOfficeStyle()
     }
     //最后确定tabbar宽度
     int tabBarWidth = endX - x;
-
     m_d->ribbonTabBar->setGeometry(x, y, tabBarWidth, tabH);
 
     resizeStackedContainerWidget();
