@@ -109,18 +109,18 @@ SARibbonTabBar::tab {
   color: #5779af;
   border: none;
   background: transparent;
-  margin-top: 0pt;
+  margin-top: 0em;
   margin-right: 0pt;
   margin-left: 0.2em;
-  margin-bottom: 0pt;
+  margin-bottom: 0em;
   min-width: 3em;
   max-width: 10em;
   min-height: 1.2em;
   max-height: 1.2em;
-  padding-left: 1pt;
-  padding-right: 1pt;
-  padding-top: 0.2em;
-  padding-bottom: 0pt;
+  padding-left: 0.2em;
+  padding-right: 0.2em;
+  padding-top: 0.3em;
+  padding-bottom: 0.1em;
 }
 
 SARibbonTabBar::tab:selected, SARibbonTabBar::tab:hover {
@@ -133,6 +133,8 @@ SARibbonTabBar::tab:selected {
   border: 1px solid #c5d2e0;
   background: white;
   border-bottom-color: #FFFFFF;
+  padding-top: 0.3em;
+  padding-bottom: 0.1em;
 }
 
 SARibbonTabBar::tab:hover:!selected {

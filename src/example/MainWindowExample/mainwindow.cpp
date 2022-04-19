@@ -86,7 +86,7 @@ MainWindow::MainWindow(QWidget* par) : SARibbonMainWindow(par), m_customizeWidge
     //添加尺寸标签页
     SARibbonCategory* categorySize = new SARibbonCategory();
 
-    categorySize->setCategoryName(("Size"));
+    categorySize->setCategoryName(("Size(example long category)"));
     categorySize->setObjectName(("categorySize"));
     ribbon->addCategoryPage(categorySize);
     createCategorySize(categorySize);
