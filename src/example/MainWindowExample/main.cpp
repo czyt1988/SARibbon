@@ -6,7 +6,6 @@
 //重定向qdebug的打印
 void log_out_put(QtMsgType type, const QMessageLogContext& context, const QString& msg);
 
-
 /**
  * @brief 重定向qdebug的打印
  * @param type
@@ -17,15 +16,14 @@ void log_out_put(QtMsgType type, const QMessageLogContext& context, const QStrin
 {
     QByteArray localMsg = msg.toLocal8Bit();
 
-    switch (type)
-    {
+    switch (type) {
     case QtDebugMsg:
         fprintf(stdout, "[Debug] %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
         break;
 
-//    case QtInfoMsg:
-//        fprintf(stdout, "[Info] %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
-//        break;
+        //    case QtInfoMsg:
+        //        fprintf(stdout, "[Info] %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line,
+        //        context.function); break;
 
     case QtWarningMsg:
         fprintf(stdout, "[Warning] %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
@@ -49,11 +47,12 @@ void log_out_put(QtMsgType type, const QMessageLogContext& context, const QStrin
 #endif
 }
 
-
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     QApplication a(argc, argv);
-
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
+    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+#endif
     qInstallMessageHandler(log_out_put);
     QFont f = a.font();
 
@@ -64,7 +63,7 @@ int main(int argc, char *argv[])
     cost.start();
     MainWindow w;
 
-    qDebug() <<"window build cost:"<<cost.elapsed()<<" ms";
+    qDebug() << "window build cost:" << cost.elapsed() << " ms";
     w.show();
 
     return (a.exec());

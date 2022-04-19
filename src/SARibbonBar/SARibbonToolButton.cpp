@@ -475,7 +475,12 @@ void SARibbonToolButton::reCalcSizeHint(QSize s)
             //否则就是lite模式，只允许1行，有菜单就偏移
             if ((opt.features & QStyleOptionToolButton::Menu) || (opt.features & QStyleOptionToolButton::HasMenu)) {
                 //如果有菜单
+                if (s.width() > s.height() * 1.5) {
+                    //过于宽的按钮，把文字用...来替代
+                    s.rwidth() = s.height() * 1.5;
+                }
                 s.rwidth() += SA_INDICATOR_ARROW_WIDTH;
+                //
             }
         }
         //无需在这里进行计算，在resizeevent里进行计算
@@ -547,6 +552,11 @@ void SARibbonToolButton::drawIconAndLabel(QPainter& p, QStyleOptionToolButton& o
                 }
 
                 //再绘制文本，对于Normal模式下的Largebutton，如果有菜单，且m_isWordWrap是true，箭头将在文本旁边
+                if (Lite == m_largeButtonType && !s_liteStyleEnableWordWrap) {
+                    // lite 模式，文字不换行
+                    //显示的内容需要进行省略处理
+                    opt.text = fontMetrics().elidedText(opt.text, Qt::ElideRight, textRect.width(), Qt::TextShowMnemonic);
+                }
                 style()->drawItemText(&p,
                                       QStyle::visualRect(opt.direction, opt.rect, textRect),
                                       alignment,
