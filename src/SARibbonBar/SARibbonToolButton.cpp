@@ -473,14 +473,13 @@ void SARibbonToolButton::reCalcSizeHint(QSize s)
             }
         } else {
             //否则就是lite模式，只允许1行，有菜单就偏移
+            if (s.width() > s.height() * 1.5) {
+                //过于宽的按钮，把文字用...来替代
+                s.rwidth() = s.height() * 1.5;
+            }
             if ((opt.features & QStyleOptionToolButton::Menu) || (opt.features & QStyleOptionToolButton::HasMenu)) {
                 //如果有菜单
-                if (s.width() > s.height() * 1.5) {
-                    //过于宽的按钮，把文字用...来替代
-                    s.rwidth() = s.height() * 1.5;
-                }
                 s.rwidth() += SA_INDICATOR_ARROW_WIDTH;
-                //
             }
         }
         //无需在这里进行计算，在resizeevent里进行计算
@@ -845,6 +844,7 @@ void SARibbonToolButton::calcIconAndTextRect(const QStyleOptionToolButton& opt)
             m_textRect = QRect();
         }
     } else {
+        //小按钮
         if (opt.toolButtonStyle == Qt::ToolButtonIconOnly) {
             // InstantPopup在qtoolbutton不会添加控件来放下箭头，这里处理的和MenuButtonPopup一致
             // 在仅有图标的小模式显示时，预留一个下拉箭头位置
