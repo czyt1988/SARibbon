@@ -449,7 +449,7 @@ void SARibbonToolButton::reCalcSizeHint(QSize s)
                 //! 2再判断箭头来调整textRange
                 //把区域设置给size
                 //确认是否换行
-                if ((opt.features & QStyleOptionToolButton::Menu) || (opt.features & QStyleOptionToolButton::HasMenu)) {
+                if ((opt.features & QStyleOptionToolButton::MenuButtonPopup) || (opt.features & QStyleOptionToolButton::HasMenu)) {
                     //如果有菜单
                     if (largeButtonType() == Lite) {
                         // lite模式下都要偏移
@@ -464,7 +464,7 @@ void SARibbonToolButton::reCalcSizeHint(QSize s)
                 }
             } else {
                 m_isWordWrap = text().contains('\n');
-                if ((opt.features & QStyleOptionToolButton::Menu) || (opt.features & QStyleOptionToolButton::HasMenu)) {
+                if ((opt.features & QStyleOptionToolButton::MenuButtonPopup) || (opt.features & QStyleOptionToolButton::HasMenu)) {
                     //如果有菜单
                     if (m_isWordWrap) {
                         s.rwidth() += SA_INDICATOR_ARROW_WIDTH;
@@ -477,7 +477,7 @@ void SARibbonToolButton::reCalcSizeHint(QSize s)
                 //过于宽的按钮，把文字用...来替代
                 s.rwidth() = s.height() * 1.5;
             }
-            if ((opt.features & QStyleOptionToolButton::Menu) || (opt.features & QStyleOptionToolButton::HasMenu)) {
+            if ((opt.features & QStyleOptionToolButton::MenuButtonPopup) || (opt.features & QStyleOptionToolButton::HasMenu)) {
                 //如果有菜单
                 s.rwidth() += SA_INDICATOR_ARROW_WIDTH;
             }
@@ -490,7 +490,7 @@ void SARibbonToolButton::reCalcSizeHint(QSize s)
         // InstantPopup在qtoolbutton不会添加控件来放下箭头，这里处理的和MenuButtonPopup一致
         // 在仅有图标的小模式显示时，预留一个下拉箭头位置
         if (Qt::ToolButtonIconOnly == toolButtonStyle()) {
-            if (opt.features & QStyleOptionToolButton::Menu || opt.features & QStyleOptionToolButton::HasMenu) {
+            if (opt.features & QStyleOptionToolButton::MenuButtonPopup || opt.features & QStyleOptionToolButton::HasMenu) {
                 //如果有菜单
                 //            s.rwidth() += style()->pixelMetric(QStyle::PM_MenuButtonIndicator, &opt, this);
                 s.rwidth() += SA_INDICATOR_ARROW_WIDTH;
@@ -573,7 +573,7 @@ void SARibbonToolButton::drawIconAndLabel(QPainter& p, QStyleOptionToolButton& o
                 }
             }
             //绘制sub control 的下拉箭头
-            if (opt.features & QStyleOptionToolButton::HasMenu) {
+            if (opt.features & QStyleOptionToolButton::MenuButtonPopup || opt.features & QStyleOptionToolButton::HasMenu) {
                 opt.rect = calcIndicatorArrowDownRect(opt);
 #ifdef SA_RIBBON_DEBUG_HELP_DRAW
                 HELP_DRAW_RECT(p, opt.rect);
@@ -633,7 +633,7 @@ void SARibbonToolButton::drawIconAndLabel(QPainter& p, QStyleOptionToolButton& o
         }
 
         //绘制sub control 的下拉箭头
-        if (opt.features & QStyleOptionToolButton::HasMenu) {
+        if (opt.features & QStyleOptionToolButton::MenuButtonPopup || opt.features & QStyleOptionToolButton::HasMenu) {
             QStyleOptionToolButton tool = opt;
             tool.rect                   = calcIndicatorArrowDownRect(tool);
 #ifdef SA_RIBBON_DEBUG_HELP_DRAW
@@ -833,9 +833,12 @@ void SARibbonToolButton::calcIconAndTextRect(const QStyleOptionToolButton& opt)
             );
             //保证能显示两行文本
             //下面确定文字区域
-            if ((opt.features & QStyleOptionToolButton::Menu) || (opt.features & QStyleOptionToolButton::HasMenu)) {
+            if ((opt.features & QStyleOptionToolButton::MenuButtonPopup) || (opt.features & QStyleOptionToolButton::HasMenu)) {
                 //有菜单且换行,宽度偏移ARROW_WIDTH
                 if (m_isWordWrap) {
+                    m_textRect.adjust(0, 0, -SA_INDICATOR_ARROW_WIDTH, 0);
+                }else if(Lite == m_largeButtonType && !s_liteStyleEnableWordWrap){
+                    //在lite模式下，不允许换行的时候，也需要偏移下三角
                     m_textRect.adjust(0, 0, -SA_INDICATOR_ARROW_WIDTH, 0);
                 }
             }
@@ -849,7 +852,7 @@ void SARibbonToolButton::calcIconAndTextRect(const QStyleOptionToolButton& opt)
             // InstantPopup在qtoolbutton不会添加控件来放下箭头，这里处理的和MenuButtonPopup一致
             // 在仅有图标的小模式显示时，预留一个下拉箭头位置
             m_iconRect = opt.rect.adjusted(m_iconAndTextSpace, m_iconAndTextSpace, -m_iconAndTextSpace, -m_iconAndTextSpace);
-            if (opt.features & QStyleOptionToolButton::Menu || opt.features & QStyleOptionToolButton::HasMenu) {
+            if (opt.features & QStyleOptionToolButton::MenuButtonPopup || opt.features & QStyleOptionToolButton::HasMenu) {
                 m_iconRect.adjust(0, 0, -SA_INDICATOR_ARROW_WIDTH, 0);
             }
             //确定文本区域
@@ -864,7 +867,7 @@ void SARibbonToolButton::calcIconAndTextRect(const QStyleOptionToolButton& opt)
                                opt.rect.right() - m_iconRect.right() - 2 * m_iconAndTextSpace,
                                opt.rect.height() - 2 * m_iconAndTextSpace);
             //确定文本区域
-            if ((opt.features & QStyleOptionToolButton::Menu) || (opt.features & QStyleOptionToolButton::HasMenu)) {
+            if ((opt.features & QStyleOptionToolButton::MenuButtonPopup) || (opt.features & QStyleOptionToolButton::HasMenu)) {
                 //有菜单,宽度偏移ARROW_WIDTH
                 m_textRect.adjust(0, 0, -SA_INDICATOR_ARROW_WIDTH, 0);
             }
