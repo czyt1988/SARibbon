@@ -15,7 +15,7 @@ class SA_RIBBON_EXPORT SARibbonGalleryItem
 public:
     SARibbonGalleryItem();
     SARibbonGalleryItem(const QString& text, const QIcon& icon);
-    SARibbonGalleryItem(QAction *act);
+    SARibbonGalleryItem(QAction* act);
     virtual ~SARibbonGalleryItem();
     //设置角色
     void setData(int role, const QVariant& data);
@@ -46,14 +46,18 @@ public:
     virtual Qt::ItemFlags flags() const;
 
     //设置action
-    void setAction(QAction *act);
-    QAction *action();
+    void setAction(QAction* act);
+    QAction* action();
+
+    //文字对齐方式
+    void setTextAlignment(Qt::Alignment a);
+    Qt::Alignment getTextAlignment() const;
 
 private:
     friend class SARibbonGalleryGroupModel;
-    QMap<int, QVariant> m_datas;
+    QMap< int, QVariant > m_datas;
     Qt::ItemFlags m_flags;
-    QAction *m_action;
+    QAction* m_action;
 };
 
-#endif // SARIBBONGALLERYITEM_H
+#endif  // SARIBBONGALLERYITEM_H
