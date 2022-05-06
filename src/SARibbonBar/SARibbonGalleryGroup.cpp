@@ -80,9 +80,6 @@ void SARibbonGalleryGroupItemDelegate::paintIconWithTextWordWrap(QPainter* paint
         paintIconWithText(painter, option, index);
     } else {
         paintIconWithText(painter, option, index);
-        //        QStyleOptionViewItem opt = option;
-        //        initStyleOption(&opt, index);
-        //        m_group->style()->drawControl(QStyle::CE_ItemViewItem, &opt, painter, m_group);
     }
 }
 
@@ -198,7 +195,7 @@ SARibbonGalleryGroup::SARibbonGalleryGroup(QWidget* w) : QListView(w), m_d(new S
     setSelectionRectVisible(true);
     setUniformItemSizes(true);
     setSpacing(5);
-    setItemDelegate(new SARibbonGalleryGroupItemDelegate(this, this));
+    //    setItemDelegate(new SARibbonGalleryGroupItemDelegate(this, this));
     connect(this, &QAbstractItemView::clicked, this, &SARibbonGalleryGroup::onItemClicked);
 }
 
@@ -261,7 +258,7 @@ void SARibbonGalleryGroup::recalcGridSize(int galleryHeight)
     }
     case IconWithWordWrapText: {
         int textHeight = fontMetrics().lineSpacing() * 2;
-        int iconHeight = h - textHeight - 2 * spacing() - 4;
+        int iconHeight = h - textHeight - 4;
         if (iconHeight > 0) {
             setIconSize(QSize(iconHeight, iconHeight));
         } else {
@@ -280,10 +277,9 @@ void SARibbonGalleryGroup::recalcGridSize(int galleryHeight)
         break;
     }
     }
-    updateGeometry();
-    updateGeometries();
-    qDebug() << "recalcGridSize(" << galleryHeight << ") recalcGridSize gridSize = " << gridSize()
-             << " , iconSize = " << iconSize();
+#if 0
+
+#endif
 }
 
 ///

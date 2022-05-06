@@ -10,10 +10,12 @@ SARibbonGalleryItem::SARibbonGalleryItem(const QString& text, const QIcon& icon)
 {
     setText(text);
     setIcon(icon);
+    setTextAlignment(Qt::AlignTop | Qt::AlignHCenter);
 }
 
 SARibbonGalleryItem::SARibbonGalleryItem(QAction* act) : m_flags(Qt::ItemIsEnabled | Qt::ItemIsSelectable)
 {
+    setTextAlignment(Qt::AlignTop | Qt::AlignHCenter);
     setAction(act);
 }
 
@@ -38,7 +40,6 @@ QVariant SARibbonGalleryItem::data(int role) const
 
         case Qt::DecorationRole:
             return (m_action->icon());
-
         default:
             break;
         }
@@ -149,4 +150,14 @@ void SARibbonGalleryItem::setAction(QAction* act)
 QAction* SARibbonGalleryItem::action()
 {
     return (m_action);
+}
+
+void SARibbonGalleryItem::setTextAlignment(Qt::Alignment a)
+{
+    setData(Qt::TextAlignmentRole, (int)a);
+}
+
+Qt::Alignment SARibbonGalleryItem::getTextAlignment() const
+{
+    return qvariant_cast< Qt::Alignment >(data(Qt::TextAlignmentRole));
 }
