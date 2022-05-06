@@ -431,7 +431,7 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     connect(actShowContext, &QAction::triggered, this, &MainWindow::onShowContextCategory);
 
     QAction* actDeleteContext = createAction(tr("delete Context"), ":/icon/icon/deleteContext.svg");
-    btn                       = pannel2->addLargeAction(actDeleteContext);
+    pannel2->addLargeAction(actDeleteContext);
     connect(actDeleteContext, &QAction::triggered, this, [ this, act ](bool on) {
         Q_UNUSED(on);
         if (this->m_contextCategory) {
@@ -529,13 +529,13 @@ void MainWindow::createCategoryOther(SARibbonCategory* page)
     };
     galleryActions.append(lambdaCreateGalleryAction("Document File", ":/gallery-icon/icon/gallery/Document-File.svg"));
     galleryActions.append(lambdaCreateGalleryAction("Download File", ":/gallery-icon/icon/gallery/Download-File.svg"));
-    galleryActions.append(lambdaCreateGalleryAction("Drive File", ":/gallery-icon/icon/gallery/Drive-File.svg"));
+    galleryActions.append(lambdaCreateGalleryAction("Drive File Four Word", ":/gallery-icon/icon/gallery/Drive-File.svg"));
     galleryActions.append(lambdaCreateGalleryAction("Dropbox File", ":/gallery-icon/icon/gallery/Dropbox-File.svg"));
     galleryActions.append(lambdaCreateGalleryAction("Email File", ":/gallery-icon/icon/gallery/Email-File.svg"));
     galleryActions.append(lambdaCreateGalleryAction("Encode File", ":/gallery-icon/icon/gallery/Encode-File.svg"));
     galleryActions.append(lambdaCreateGalleryAction("Favorit File", ":/gallery-icon/icon/gallery/Favorit-File.svg"));
     galleryActions.append(lambdaCreateGalleryAction("File Error", ":/gallery-icon/icon/gallery/File-Error.svg"));
-    galleryActions.append(lambdaCreateGalleryAction("File Readonly", ":/gallery-icon/icon/gallery/File-Readonly.svg"));
+    galleryActions.append(lambdaCreateGalleryAction("File Read Only", ":/gallery-icon/icon/gallery/File-Readonly.svg"));
     galleryActions.append(lambdaCreateGalleryAction("File Settings", ":/gallery-icon/icon/gallery/File-Settings.svg"));
     galleryActions.append(lambdaCreateGalleryAction("Presentation File", ":/gallery-icon/icon/gallery/Presentation-File.svg"));
     SARibbonGalleryGroup* group1 = gallery->addCategoryActions(tr("Files"), galleryActions);
