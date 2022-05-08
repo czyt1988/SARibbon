@@ -101,7 +101,7 @@ public:
     SARibbonGalleryGroupModel* groupModel();
     // 标题
     void setGroupTitle(const QString& title);
-    QString groupTitle() const;
+    QString getGroupTitle() const;
     void selectByIndex(int i);
     //设置显示的行数
     void setDisplayRow(DisplayRow r);

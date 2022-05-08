@@ -200,6 +200,8 @@ SARibbonGalleryGroup::SARibbonGalleryGroup(QWidget* w) : QListView(w), m_d(new S
     setSpacing(1);
     setItemDelegate(new SARibbonGalleryGroupItemDelegate(this, this));
     connect(this, &QAbstractItemView::clicked, this, &SARibbonGalleryGroup::onItemClicked);
+    SARibbonGalleryGroupModel* m = new SARibbonGalleryGroupModel(this);
+    setModel(m);
 }
 
 SARibbonGalleryGroup::~SARibbonGalleryGroup()
@@ -373,7 +375,7 @@ void SARibbonGalleryGroup::setGroupTitle(const QString& title)
     emit groupTitleChanged(m_d->_groupTitle);
 }
 
-QString SARibbonGalleryGroup::groupTitle() const
+QString SARibbonGalleryGroup::getGroupTitle() const
 {
     return (m_d->_groupTitle);
 }
