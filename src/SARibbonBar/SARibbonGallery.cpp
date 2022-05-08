@@ -105,6 +105,8 @@ public:
         viewportGroup->setGalleryGroupStyle(v->getGalleryGroupStyle());
         viewportGroup->setDisplayRow(v->getDisplayRow());
         viewportGroup->setSpacing(v->spacing());
+        viewportGroup->setGridMaximumWidth(v->getGridMaximumWidth());
+        viewportGroup->setGridMinimumWidth(v->getGridMinimumWidth());
         viewportGroup->setRecalcGridSizeBlock(false);
         viewportGroup->recalcGridSize(viewportGroup->height());
         viewportGroup->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);

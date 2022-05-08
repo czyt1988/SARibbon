@@ -540,6 +540,7 @@ void MainWindow::createCategoryOther(SARibbonCategory* page)
     galleryActions.append(lambdaCreateGalleryAction("Presentation File", ":/gallery-icon/icon/gallery/Presentation-File.svg"));
     SARibbonGalleryGroup* group1 = gallery->addCategoryActions(tr("Files"), galleryActions);
     group1->setGalleryGroupStyle(SARibbonGalleryGroup::IconWithWordWrapText);
+    group1->setGridMinimumWidth(80);
     galleryActions.clear();
     galleryActions.append(lambdaCreateGalleryAction("Photoshop", ":/gallery-icon/icon/gallery/Photoshop.svg"));
     galleryActions.append(lambdaCreateGalleryAction("Internet-Explorer", ":/gallery-icon/icon/gallery/Internet-Explorer.svg"));
@@ -547,7 +548,8 @@ void MainWindow::createCategoryOther(SARibbonCategory* page)
     galleryActions.append(lambdaCreateGalleryAction("Google-Maps", ":/gallery-icon/icon/gallery/Google-Maps.svg"));
     galleryActions.append(lambdaCreateGalleryAction("Adobe", ":/gallery-icon/icon/gallery/Adobe.svg"));
     galleryActions.append(lambdaCreateGalleryAction("Word", ":/gallery-icon/icon/gallery/Word.svg"));
-    gallery->addCategoryActions(tr("Apps"), galleryActions);
+    SARibbonGalleryGroup* group2 = gallery->addCategoryActions(tr("Apps"), galleryActions);
+    group2->setGridMinimumWidth(80);
     gallery->setCurrentViewGroup(group1);
 
     QAction* optAct = new QAction(this);
