@@ -10,6 +10,7 @@
 #include <QDebug>
 #include <QVBoxLayout>
 #include <QScrollBar>
+#include <QLabel>
 #include "SARibbonElementManager.h"
 #include <QActionGroup>
 
@@ -136,9 +137,66 @@ SARibbonGalleryViewport::SARibbonGalleryViewport(QWidget* parent) : QWidget(pare
     m_layout->setContentsMargins(0, 0, 0, 0);
 }
 
+/**
+ * @brief 添加窗口不带标题
+ * @param w
+ */
 void SARibbonGalleryViewport::addWidget(QWidget* w)
 {
+    w->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
     m_layout->addWidget(w);
+}
+
+/**
+ * @brief 添加窗口，带标题
+ * @param w
+ * @param title
+ */
+void SARibbonGalleryViewport::addWidget(QWidget* w, const QString& title)
+{
+    QLabel* label = new QLabel(this);
+    label->setText(title);
+    label->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+    m_layout->addWidget(label);
+    w->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
+    m_layout->addWidget(w);
+    _widgetToTitleLable[ w ] = label;
+}
+
+/**
+ * @brief 通过SARibbonGalleryGroup获取对应的标题，用户可以通过此函数设置QLabel的属性
+ * @param g
+ * @return 如果没有管理group，将返回nullptr
+ */
+QLabel* SARibbonGalleryViewport::getWidgetTitleLabel(QWidget* w)
+{
+    return _widgetToTitleLable.value(w, nullptr);
+}
+
+/**
+ * @brief 移除窗口
+ * @param w
+ */
+void SARibbonGalleryViewport::removeWidget(QWidget* w)
+{
+    QLabel* label = getWidgetTitleLabel(w);
+    if (label) {
+        m_layout->removeWidget(label);
+    }
+    m_layout->removeWidget(w);
+}
+
+/**
+ * @brief widget的标题改变
+ * @param g
+ * @param title
+ */
+void SARibbonGalleryViewport::widgetTitleChanged(QWidget* w, const QString& title)
+{
+    QLabel* l = getWidgetTitleLabel(w);
+    if (l) {
+        l->setText(title);
+    }
 }
 
 //////////////////////////////////////////////
@@ -172,24 +230,19 @@ SARibbonGalleryGroup* SARibbonGallery::addGalleryGroup()
 
 void SARibbonGallery::addGalleryGroup(SARibbonGalleryGroup* group)
 {
+    group->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     SARibbonGalleryViewport* viewport = ensureGetPopupViewPort();
-    SARibbonGalleryGroupModel* model  = new SARibbonGalleryGroupModel(group);
-
-    group->setModel(model);
-    viewport->addWidget(group);
-    if (nullptr == m_d->viewportGroup) {
-        setCurrentViewGroup(group);
-    }
+    viewport->addWidget(group, group->getGroupTitle());
     connect(group, &QAbstractItemView::clicked, this, &SARibbonGallery::onItemClicked);
+    connect(group, &SARibbonGalleryGroup::groupTitleChanged, this, [ group, viewport ](const QString& t) {
+        viewport->widgetTitleChanged(group, t);
+    });
+    setCurrentViewGroup(group);
 }
 
 SARibbonGalleryGroup* SARibbonGallery::addCategoryActions(const QString& title, QList< QAction* > actions)
 {
-    SARibbonGalleryGroup* group      = RibbonSubElementDelegate->createRibbonGalleryGroup(this);
-    SARibbonGalleryGroupModel* model = new SARibbonGalleryGroupModel(group);
-
-    group->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
-    group->setModel(model);
+    SARibbonGalleryGroup* group = RibbonSubElementDelegate->createRibbonGalleryGroup(this);
     if (!title.isEmpty()) {
         group->setGroupTitle(title);
     }
@@ -197,11 +250,13 @@ SARibbonGalleryGroup* SARibbonGallery::addCategoryActions(const QString& title, 
         m_d->actionGroup->addAction(a);
     }
     group->addActionItemList(actions);
-    connect(group, &QAbstractItemView::clicked, this, &SARibbonGallery::onItemClicked);
-    SARibbonGalleryViewport* viewport = ensureGetPopupViewPort();
+    addGalleryGroup(group);
 
-    viewport->addWidget(group);
-    setCurrentViewGroup(group);
+    //    connect(group, &QAbstractItemView::clicked, this, &SARibbonGallery::onItemClicked);
+    //    SARibbonGalleryViewport* viewport = ensureGetPopupViewPort();
+
+    //    viewport->addWidget(group);
+    //    setCurrentViewGroup(group);
     return (group);
 }
 
@@ -305,25 +360,27 @@ void SARibbonGallery::resizeEvent(QResizeEvent* event)
         h = m_d->viewportGroup->height();
         m_d->viewportGroup->recalcGridSize();
     }
-    QLayout* lay = m_d->popupWidget->layout();
-    if (!lay) {
-        return;
-    }
-    int c = lay->count();
-    for (int i = 0; i < c; ++i) {
-        QLayoutItem* item = lay->itemAt(i);
-        if (!item) {
-            continue;
+    if (m_d->popupWidget) {
+        QLayout* lay = m_d->popupWidget->layout();
+        if (!lay) {
+            return;
         }
-        QWidget* w = item->widget();
-        if (!w) {
-            continue;
+        int c = lay->count();
+        for (int i = 0; i < c; ++i) {
+            QLayoutItem* item = lay->itemAt(i);
+            if (!item) {
+                continue;
+            }
+            QWidget* w = item->widget();
+            if (!w) {
+                continue;
+            }
+            SARibbonGalleryGroup* g = qobject_cast< SARibbonGalleryGroup* >(w);
+            if (!g) {
+                continue;
+            }
+            g->recalcGridSize(h);
         }
-        SARibbonGalleryGroup* g = qobject_cast< SARibbonGalleryGroup* >(w);
-        if (!g) {
-            continue;
-        }
-        g->recalcGridSize(h);
     }
 }
 

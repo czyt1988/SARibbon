@@ -3,6 +3,7 @@
 #include "SARibbonGlobal.h"
 #include <QFrame>
 #include "SARibbonGalleryGroup.h"
+class QLabel;
 class QVBoxLayout;
 class SARibbonGalleryPrivate;
 class SARibbonGalleryViewport;
@@ -82,10 +83,20 @@ class SARibbonGalleryViewport : public QWidget
     Q_OBJECT
 public:
     SARibbonGalleryViewport(QWidget* parent);
+    //添加窗口不带标题
     void addWidget(QWidget* w);
+    //添加窗口，带标题
+    void addWidget(QWidget* w, const QString& title);
+    //通过SARibbonGalleryGroup获取对应的标题，用户可以通过此函数设置QLabel的属性
+    QLabel* getWidgetTitleLabel(QWidget* w);
+    //移除窗口
+    void removeWidget(QWidget* w);
+public slots:
+    void widgetTitleChanged(QWidget* w, const QString& title);
 
 private:
     QVBoxLayout* m_layout;
+    QMap< QWidget*, QLabel* > _widgetToTitleLable;  ///< QWidget和lable的对应
 };
 
 #endif  // SARIBBONGALLERY_H
