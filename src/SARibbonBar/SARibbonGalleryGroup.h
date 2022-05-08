@@ -106,6 +106,12 @@ public:
     //设置显示的行数
     void setDisplayRow(DisplayRow r);
     DisplayRow getDisplayRow() const;
+    //设置grid最小的宽度，默认为0（不限制），可以限定grid的宽度
+    void setGridMinimumWidth(int w);
+    int getGridMinimumWidth() const;
+    //设置grid最大的宽度，默认为0（不限制），可以限定grid的宽度
+    void setGridMaximumWidth(int w);
+    int getGridMaximumWidth() const;
 private slots:
     void onItemClicked(const QModelIndex& index);
 

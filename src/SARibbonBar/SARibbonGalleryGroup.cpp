@@ -15,8 +15,15 @@ public:
     SARibbonGalleryGroup::GalleryGroupStyle _preStyle;
     SARibbonGalleryGroup::DisplayRow _displayRow;
     bool _blockRecalc;
+    int _gridMinimumWidth;  ///< grid最小宽度
+    int _gridMaximumWidth;  ///< grid最大宽度
     SARibbonGalleryGroupPrivate(SARibbonGalleryGroup* p)
-        : Parent(p), _preStyle(SARibbonGalleryGroup::IconWithText), _displayRow(SARibbonGalleryGroup::DisplayOneRow), _blockRecalc(false)
+        : Parent(p)
+        , _preStyle(SARibbonGalleryGroup::IconWithText)
+        , _displayRow(SARibbonGalleryGroup::DisplayOneRow)
+        , _blockRecalc(false)
+        , _gridMinimumWidth(0)
+        , _gridMaximumWidth(0)
     {
     }
 };
@@ -76,18 +83,14 @@ void SARibbonGalleryGroupItemDelegate::paintIconWithTextWordWrap(QPainter* paint
                                                                  const QStyleOptionViewItem& option,
                                                                  const QModelIndex& index) const
 {
-    if (m_group->getDisplayRow() != SARibbonGalleryGroup::DisplayOneRow) {
-        paintIconWithText(painter, option, index);
-    } else {
-        paintIconWithText(painter, option, index);
-    }
+    QStyledItemDelegate::paint(painter, option, index);
 }
 
 QSize SARibbonGalleryGroupItemDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
-    // option.rect对应grid size
     Q_UNUSED(index);
-    return option.rect.size();
+    Q_UNUSED(option);
+    return m_group->gridSize();
 }
 
 //////////////////////////////////////////
@@ -194,8 +197,8 @@ SARibbonGalleryGroup::SARibbonGalleryGroup(QWidget* w) : QListView(w), m_d(new S
     setResizeMode(QListView::Adjust);
     setSelectionRectVisible(true);
     setUniformItemSizes(true);
-    setSpacing(5);
-    //    setItemDelegate(new SARibbonGalleryGroupItemDelegate(this, this));
+    setSpacing(1);
+    setItemDelegate(new SARibbonGalleryGroupItemDelegate(this, this));
     connect(this, &QAbstractItemView::clicked, this, &SARibbonGalleryGroup::onItemClicked);
 }
 
@@ -242,43 +245,53 @@ void SARibbonGalleryGroup::recalcGridSize(int galleryHeight)
     if (h <= 1) {
         h = galleryHeight;
     }
-    setGridSize(QSize(h, h));
+    int w = h;
+    if (getGridMinimumWidth() > 0) {
+        if (w < getGridMinimumWidth()) {
+            w = getGridMinimumWidth();
+        }
+    }
+    if (getGridMaximumWidth() > 0) {
+        if (w > getGridMaximumWidth()) {
+            w = getGridMaximumWidth();
+        }
+    }
+    setGridSize(QSize(w, h));
     //在通过GalleryGroupStyle确定icon的尺寸
-
+    const int shiftpix = 4;  // 这个是移动像素，qt在鼠标移动到图标上时会移动一下，给用户明确的动态，导致如果布局很满会超出显示范围，因此要在此基础上缩放一点
     switch (getGalleryGroupStyle()) {
     case IconWithText: {
         int textHeight = fontMetrics().lineSpacing();
-        int iconHeight = h - textHeight - 2 * spacing() - 4;
+        int iconHeight = h - textHeight - 2 * spacing() - shiftpix;
         if (iconHeight > 0) {
-            setIconSize(QSize(iconHeight, iconHeight));
+            setIconSize(QSize(w - 2 * spacing() - shiftpix, iconHeight));
         } else {
-            setIconSize(QSize(h, h));
+            setIconSize(QSize(w - 2 * spacing() - shiftpix, h - 2 * spacing() - shiftpix));
         }
         break;
     }
     case IconWithWordWrapText: {
         int textHeight = fontMetrics().lineSpacing() * 2;
-        int iconHeight = h - textHeight - 4;
+        int iconHeight = h - textHeight;
         if (iconHeight > 0) {
-            setIconSize(QSize(iconHeight, iconHeight));
+            setIconSize(QSize(w - 2 * spacing() - shiftpix, iconHeight - 2 * spacing() - shiftpix));
         } else {
-            setIconSize(QSize(h, h));
+            setIconSize(QSize(w - 2 * spacing() - shiftpix, h - 2 * spacing() - shiftpix));
         }
         break;
     }
     case IconOnly: {
-        int ih = h - 2 * spacing() - 4;
-        setIconSize(QSize(ih, ih));
+        setIconSize(QSize(w - 2 * spacing() - shiftpix, h - 2 * spacing() - shiftpix));
         break;
     }
     default: {
-        int ih = h - 2 * spacing() - 4;
-        setIconSize(QSize(ih, ih));
+        setIconSize(QSize(w - 2 * spacing() - shiftpix, h - 2 * spacing() - shiftpix));
         break;
     }
     }
-#if 0
-
+#if 1
+    qDebug() << "SARibbonGalleryGroup::recalcGridSize(" << galleryHeight << "): gridSize=" << gridSize()
+             << " iconSize=" << iconSize();
 #endif
 }
 
@@ -397,6 +410,42 @@ void SARibbonGalleryGroup::setDisplayRow(DisplayRow r)
 SARibbonGalleryGroup::DisplayRow SARibbonGalleryGroup::getDisplayRow() const
 {
     return m_d->_displayRow;
+}
+
+/**
+ * @brief 设置grid最小的宽度，默认为0（不限制）
+ * @param w
+ */
+void SARibbonGalleryGroup::setGridMinimumWidth(int w)
+{
+    m_d->_gridMinimumWidth = w;
+}
+
+/**
+ * @brief grid最小的宽度，默认为0（不限制）
+ * @return
+ */
+int SARibbonGalleryGroup::getGridMinimumWidth() const
+{
+    return m_d->_gridMinimumWidth;
+}
+
+/**
+ * @brief 设置grid最大的宽度，默认为0（不限制）
+ * @param w
+ */
+void SARibbonGalleryGroup::setGridMaximumWidth(int w)
+{
+    m_d->_gridMaximumWidth = w;
+}
+
+/**
+ * @brief grid最大的的宽度，默认为0（不限制）
+ * @param w
+ */
+int SARibbonGalleryGroup::getGridMaximumWidth() const
+{
+    return m_d->_gridMaximumWidth;
 }
 
 void SARibbonGalleryGroup::onItemClicked(const QModelIndex& index)
