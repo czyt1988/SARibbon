@@ -296,7 +296,7 @@ void SARibbonGalleryGroup::recalcGridSize(int galleryHeight)
         break;
     }
     }
-#if 1
+#if 0
     qDebug() << "SARibbonGalleryGroup::recalcGridSize(" << galleryHeight << "): gridSize=" << gridSize()
              << " iconSize=" << iconSize();
 #endif
