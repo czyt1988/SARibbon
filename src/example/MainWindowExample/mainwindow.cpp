@@ -764,14 +764,16 @@ void MainWindow::createContextCategoryPage1(SARibbonCategory* page)
     SARibbonPannel* pannel3 = page->addPannel(("show/hide action test"));
 
     QAction* actionHideAction2 = createAction("hide action 2", ":/icon/icon/action.svg");
-
+    QAction* actionHideAction4 = createAction("hide action 4", ":/icon/icon/action.svg");
     actionHideAction2->setCheckable(true);
     actionHideAction2->setChecked(true);
-
+    actionHideAction4->setCheckable(true);
+    actionHideAction4->setChecked(true);
     QAction* act2 = createAction("action2", ":/icon/icon/action2.svg");
     QAction* act3 = createAction("action3", ":/icon/icon/action3.svg");
     QAction* act4 = createAction("action4", ":/icon/icon/action4.svg");
     pannel3->addLargeAction(actionHideAction2);
+    pannel3->addLargeAction(actionHideAction4);
     pannel3->addSmallAction(act2);
     pannel3->addSmallAction(act3);
     pannel3->addSmallAction(act4);
@@ -782,6 +784,15 @@ void MainWindow::createContextCategoryPage1(SARibbonCategory* page)
         } else {
             act2->setVisible(false);
             actionHideAction2->setText(tr("show action2"));
+        }
+    });
+    connect(actionHideAction4, &QAction::triggered, this, [ actionHideAction4, act4 ](bool b) {
+        if (b) {
+            act4->setVisible(true);
+            actionHideAction4->setText(tr("hide action4"));
+        } else {
+            act4->setVisible(false);
+            actionHideAction4->setText(tr("show action4"));
         }
     });
 }

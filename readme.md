@@ -1,6 +1,6 @@
 ﻿﻿﻿# 简介
 
- 这是Qt（最低要求Qt5，支持C++11的编译器）下一个轻量级的Ribbon控件(Office样式UI),界面截图：
+ 这是Qt（最低要求Qt5(Qt5.7以上)，支持C++11的编译器）下一个轻量级的Ribbon控件(Office样式UI),界面截图：
 
 ![](./doc/screenshot/001.gif)
 
