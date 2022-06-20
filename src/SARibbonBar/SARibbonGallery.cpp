@@ -31,7 +31,6 @@ public:
     SARibbonGalleryViewport* popupWidget;
 #endif
     SARibbonGalleryGroup* viewportGroup;
-    QActionGroup* actionGroup;  //所有gallery管理的actions都由这个actiongroup管理
     QBoxLayout* btnLayout;
     QBoxLayout* layout;
     SARibbonGalleryPrivate() : Parent(nullptr)
@@ -40,11 +39,10 @@ public:
 
     void init(SARibbonGallery* parent)
     {
-        Parent      = parent;
-        buttonUp    = new SARibbonControlButton(parent);
-        buttonDown  = new SARibbonControlButton(parent);
-        buttonMore  = new SARibbonControlButton(parent);
-        actionGroup = new QActionGroup(parent);
+        Parent     = parent;
+        buttonUp   = new SARibbonControlButton(parent);
+        buttonDown = new SARibbonControlButton(parent);
+        buttonMore = new SARibbonControlButton(parent);
         buttonUp->setToolButtonStyle(Qt::ToolButtonIconOnly);
         buttonDown->setToolButtonStyle(Qt::ToolButtonIconOnly);
         buttonMore->setToolButtonStyle(Qt::ToolButtonIconOnly);
@@ -57,13 +55,11 @@ public:
         buttonUp->setIcon(ICON_ARROW_UP);
         buttonDown->setIcon(ICON_ARROW_DOWN);
         buttonMore->setIcon(ICON_ARROW_MORE);
-        Parent->connect(buttonUp, &QAbstractButton::clicked, Parent, &SARibbonGallery::onPageUp);
-        Parent->connect(buttonDown, &QAbstractButton::clicked, Parent, &SARibbonGallery::onPageDown);
-        Parent->connect(buttonMore, &QAbstractButton::clicked, Parent, &SARibbonGallery::onShowMoreDetail);
-        Parent->connect(actionGroup, &QActionGroup::triggered, Parent, &SARibbonGallery::onTriggered);
+        Parent->connect(buttonUp, &QAbstractButton::clicked, Parent, &SARibbonGallery::pageUp);
+        Parent->connect(buttonDown, &QAbstractButton::clicked, Parent, &SARibbonGallery::pageDown);
+        Parent->connect(buttonMore, &QAbstractButton::clicked, Parent, &SARibbonGallery::showMoreDetail);
         //信号转发
-        Parent->connect(actionGroup, &QActionGroup::triggered, Parent, &SARibbonGallery::triggered);
-        Parent->connect(actionGroup, &QActionGroup::hovered, Parent, &SARibbonGallery::hovered);
+        Parent->connect(Parent, &SARibbonGallery::triggered, Parent, &SARibbonGallery::onTriggered);
         popupWidget   = nullptr;
         viewportGroup = nullptr;
         btnLayout     = new QBoxLayout(QBoxLayout::TopToBottom);
@@ -216,18 +212,24 @@ SARibbonGallery::~SARibbonGallery()
 
 QSize SARibbonGallery::sizeHint() const
 {
-    // return (QSize(232, RibbonSubElementStyleOpt.galleryFixedHeight));
-    return (QSize(0, 0));
+    return (QSize(100, 62));
 }
 
+/**
+ * @brief 获取一个空白SARibbonGalleryGroup
+ * @return
+ */
 SARibbonGalleryGroup* SARibbonGallery::addGalleryGroup()
 {
     SARibbonGalleryGroup* group = RibbonSubElementDelegate->createRibbonGalleryGroup(this);
-
     addGalleryGroup(group);
     return (group);
 }
 
+/**
+ * @brief 添加一组SARibbonGalleryGroup
+ * @param group
+ */
 void SARibbonGallery::addGalleryGroup(SARibbonGalleryGroup* group)
 {
     group->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
@@ -237,26 +239,25 @@ void SARibbonGallery::addGalleryGroup(SARibbonGalleryGroup* group)
     connect(group, &SARibbonGalleryGroup::groupTitleChanged, this, [ group, viewport ](const QString& t) {
         viewport->widgetTitleChanged(group, t);
     });
+    connect(group, &SARibbonGalleryGroup::triggered, this, &SARibbonGallery::triggered);
+    connect(group, &SARibbonGalleryGroup::hovered, this, &SARibbonGallery::hovered);
     setCurrentViewGroup(group);
 }
 
+/**
+ * @brief 添加一组actions
+ * @param title actions组的名字
+ * @param actions
+ * @return 返回SARibbonGalleryGroup，用户可以通过修改SARibbonGalleryGroup属性控制其显示方法
+ */
 SARibbonGalleryGroup* SARibbonGallery::addCategoryActions(const QString& title, QList< QAction* > actions)
 {
     SARibbonGalleryGroup* group = RibbonSubElementDelegate->createRibbonGalleryGroup(this);
     if (!title.isEmpty()) {
         group->setGroupTitle(title);
     }
-    for (QAction* a : actions) {
-        m_d->actionGroup->addAction(a);
-    }
     group->addActionItemList(actions);
     addGalleryGroup(group);
-
-    //    connect(group, &QAbstractItemView::clicked, this, &SARibbonGallery::onItemClicked);
-    //    SARibbonGalleryViewport* viewport = ensureGetPopupViewPort();
-
-    //    viewport->addWidget(group);
-    //    setCurrentViewGroup(group);
     return (group);
 }
 
@@ -271,9 +272,13 @@ SARibbonGalleryGroup* SARibbonGallery::currentViewGroup() const
     return (m_d->viewportGroup);
 }
 
-QActionGroup* SARibbonGallery::getActionGroup() const
+/**
+ * @brief 获取弹出窗口
+ * @return
+ */
+SARibbonGalleryViewport* SARibbonGallery::getPopupViewPort() const
 {
-    return (m_d->actionGroup);
+    return m_d->popupWidget;
 }
 
 /**
@@ -285,7 +290,10 @@ void SARibbonGallery::setGalleryButtonMaximumWidth(int w)
     SARibbonGalleryPrivate::sGalleryButtonMaximumWidth = w;
 }
 
-void SARibbonGallery::onPageDown()
+/**
+ * @brief 上翻页
+ */
+void SARibbonGallery::pageDown()
 {
     if (m_d->viewportGroup) {
         QScrollBar* vscrollBar = m_d->viewportGroup->verticalScrollBar();
@@ -295,7 +303,10 @@ void SARibbonGallery::onPageDown()
     }
 }
 
-void SARibbonGallery::onPageUp()
+/**
+ * @brief 下翻页
+ */
+void SARibbonGallery::pageUp()
 {
     if (m_d->viewportGroup) {
         QScrollBar* vscrollBar = m_d->viewportGroup->verticalScrollBar();
@@ -305,7 +316,10 @@ void SARibbonGallery::onPageUp()
     }
 }
 
-void SARibbonGallery::onShowMoreDetail()
+/**
+ * @brief 显示更多触发，默认弹出内部管理的SARibbonGalleryViewport，用户可重载此函数实现自定义的弹出
+ */
+void SARibbonGallery::showMoreDetail()
 {
     if (nullptr == m_d->popupWidget) {
         return;

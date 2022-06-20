@@ -1,4 +1,4 @@
-﻿﻿# 简介
+﻿﻿﻿# 简介
 
  这是Qt（最低要求Qt5，支持C++11的编译器）下一个轻量级的Ribbon控件(Office样式UI),界面截图：
 
@@ -73,7 +73,7 @@ SARibbonMainWindow(QWidget *parent = nullptr, bool useRibbon = true);
 ```cpp
 //添加主标签页 - 通过addCategoryPage工厂函数添加
 SARibbonCategory* categoryMain = ribbon->addCategoryPage(tr("Main"));
- //使用addPannel函数来创建SARibbonPannel，效果和new SARibbonPannel再addPannel一样
+//使用SARibbonCategory::addPannel函数来创建SARibbonPannel，效果和new SARibbonPannel再调用SARibbonCategory::addPannel的效果是一样的
 SARibbonPannel* pannel1 = categoryMain->addPannel(("Panel 1"));
 QAction* actSave = new QAction(this);
 actSave->setText("save");
