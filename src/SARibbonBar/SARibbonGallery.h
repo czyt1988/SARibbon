@@ -3,6 +3,7 @@
 #include "SARibbonGlobal.h"
 #include <QFrame>
 #include "SARibbonGalleryGroup.h"
+#include <QSizeGrip>
 class QLabel;
 class QVBoxLayout;
 class SARibbonGalleryPrivate;
@@ -36,30 +37,44 @@ public:
     SARibbonGallery(QWidget* parent = 0);
     virtual ~SARibbonGallery();
     virtual QSize sizeHint() const Q_DECL_OVERRIDE;
+    //添加一个GalleryGroup
     SARibbonGalleryGroup* addGalleryGroup();
+    //添加一个GalleryGroup
     void addGalleryGroup(SARibbonGalleryGroup* group);
     //快速添加一组actions
     SARibbonGalleryGroup* addCategoryActions(const QString& title, QList< QAction* > actions);
+    //设置当前显示的SARibbonGalleryGroup
     void setCurrentViewGroup(SARibbonGalleryGroup* group);
+    //获取当前显示的SARibbonGalleryGroup
     SARibbonGalleryGroup* currentViewGroup() const;
-    QActionGroup* getActionGroup() const;
+    //获取弹出窗口指针
+    SARibbonGalleryViewport* getPopupViewPort() const;
 
 public:
     //设置最右边三个控制按钮的最大宽度（默认15）
     static void setGalleryButtonMaximumWidth(int w);
 signals:
     /**
-     * @brief 等同QActionGroup的triggered
+     * @brief 转发管理的SARibbonGalleryGroup::triggered
      * 所有加入SARibbonGallery的action都会被一个QActionGroup管理,可以通过@sa getActionGroup 获取到对应的actiongroup
      * @param action
      */
     void triggered(QAction* action);
+    /**
+     * @brief 转发管理的SARibbonGalleryGroup::hovered
+     * @note 此属性需要确保SARibbonGalleryGroup::setMouseTracking(true)
+     * @param action
+     */
     void hovered(QAction* action);
 
+public slots:
+    //上翻页
+    virtual void pageUp();
+    //下翻页
+    virtual void pageDown();
+    //显示更多触发，默认弹出内部管理的SARibbonGalleryViewport，用户可重载此函数实现自定义的弹出
+    virtual void showMoreDetail();
 protected slots:
-    virtual void onPageDown();
-    virtual void onPageUp();
-    virtual void onShowMoreDetail();
     void onItemClicked(const QModelIndex& index);
     virtual void onTriggered(QAction* action);
 

@@ -1,6 +1,7 @@
 ﻿#include "SARibbonGalleryGroup.h"
 #include <QPainter>
 #include <QDebug>
+#include <QActionGroup>
 #include <QItemSelectionModel>
 #include "SARibbonElementManager.h"
 #include "SARibbonStyleOption.h"
@@ -15,8 +16,9 @@ public:
     SARibbonGalleryGroup::GalleryGroupStyle _preStyle;
     SARibbonGalleryGroup::DisplayRow _displayRow;
     bool _blockRecalc;
-    int _gridMinimumWidth;  ///< grid最小宽度
-    int _gridMaximumWidth;  ///< grid最大宽度
+    int _gridMinimumWidth;       ///< grid最小宽度
+    int _gridMaximumWidth;       ///< grid最大宽度
+    QActionGroup* _actionGroup;  ///< 所有GalleryGroup管理的actions都由这个actiongroup管理
     SARibbonGalleryGroupPrivate(SARibbonGalleryGroup* p)
         : Parent(p)
         , _preStyle(SARibbonGalleryGroup::IconWithText)
@@ -25,6 +27,9 @@ public:
         , _gridMinimumWidth(0)
         , _gridMaximumWidth(0)
     {
+        _actionGroup = new QActionGroup(p);
+        p->connect(_actionGroup, &QActionGroup::triggered, p, &SARibbonGalleryGroup::triggered);
+        p->connect(_actionGroup, &QActionGroup::hovered, p, &SARibbonGalleryGroup::hovered);
     }
 };
 
@@ -341,6 +346,7 @@ void SARibbonGalleryGroup::addActionItem(QAction* act)
     if (nullptr == groupModel()) {
         return;
     }
+    m_d->_actionGroup->addAction(act);
     groupModel()->append(new SARibbonGalleryItem(act));
 }
 
@@ -350,6 +356,9 @@ void SARibbonGalleryGroup::addActionItemList(const QList< QAction* >& acts)
 
     if (nullptr == model) {
         return;
+    }
+    for (QAction* a : acts) {
+        m_d->_actionGroup->addAction(a);
     }
     for (int i = 0; i < acts.size(); ++i) {
         model->append(new SARibbonGalleryItem(acts[ i ]));
@@ -450,6 +459,15 @@ int SARibbonGalleryGroup::getGridMaximumWidth() const
     return m_d->_gridMaximumWidth;
 }
 
+/**
+ * @brief 获取SARibbonGalleryGroup管理的actiongroup
+ * @return
+ */
+QActionGroup* SARibbonGalleryGroup::getActionGroup() const
+{
+    return m_d->_actionGroup;
+}
+
 void SARibbonGalleryGroup::onItemClicked(const QModelIndex& index)
 {
     if (index.isValid()) {
@@ -458,6 +476,19 @@ void SARibbonGalleryGroup::onItemClicked(const QModelIndex& index)
             QAction* act = item->action();
             if (act) {
                 act->activate(QAction::Trigger);
+            }
+        }
+    }
+}
+
+void SARibbonGalleryGroup::onItemEntered(const QModelIndex& index)
+{
+    if (index.isValid()) {
+        SARibbonGalleryItem* item = (SARibbonGalleryItem*)index.internalPointer();
+        if (item) {
+            QAction* act = item->action();
+            if (act) {
+                act->activate(QAction::Hover);
             }
         }
     }
