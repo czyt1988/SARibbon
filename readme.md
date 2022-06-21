@@ -1,4 +1,4 @@
-﻿
+
 [中文文档点击这里](./readme-cn.md)
 
 This is a lightweight Ribbon control (Officestyle UI) based on Qt (minimum Qt5, compiler supporting C++ 11). Screenshot of the interface:
