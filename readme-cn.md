@@ -1,4 +1,5 @@
-﻿
+﻿[Click here for English](./readme.md)
+
  这是基于Qt（最低要求Qt5，支持C++11的编译器）开发的一个轻量级的Ribbon控件(Office样式UI)
 
  界面截图：
