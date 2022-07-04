@@ -1,5 +1,4 @@
 cmake_minimum_required(VERSION 3.15)
-project(SARibbon)
 
 set(PROJECT_VERSION_MAJOR 0)
 set(PROJECT_VERSION_MINOR 0)
@@ -10,32 +9,31 @@ if(PROJECT_VERSION_PATCH GREATER 0)
   set (PROJECT_VERSION "${PROJECT_VERSION}.${PROJECT_VERSION_PATCH}")
 endif ()
 
-include(CPack)
+project(SARibbon VERSION ${PROJECT_VERSION} LANGUAGES CXX)
 
-set(SARIBBON_QT_VERSION 5 CACHE STRING "Expected Qt version")
-set_property(CACHE SARIBBON_QT_VERSION PROPERTY STRINGS 5 6)
-
-set(SARIBBON_QT_COMPONENTS Core Widgets GUI)
-find_package(Qt${SARIBBON_QT_VERSION} COMPONENTS ${SARIBBON_QT_COMPONENTS} REQUIRED)
-
-
-include_directories(
-    ${Qt${SARIBBON_QT_VERSION}Widgets_INCLUDE_DIRS}
-)
-    
-add_definitions(
-    ${Qt${SARIBBON_QT_VERSION}Widgets_DEFINITIONS}
-)
-
-option(BUILD_EXAMPLES "build the examples" OFF)
-SET(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "add a postfix, usually d on windows")
-SET(CMAKE_RELEASE_POSTFIX "" CACHE STRING "add a postfix, usually empty on windows")
-SET(CMAKE_RELWITHDEBINFO_POSTFIX "rd" CACHE STRING "add a postfix, usually empty on windows")
-SET(CMAKE_MINSIZEREL_POSTFIX "s" CACHE STRING "add a postfix, usually empty on windows")
-
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "add a postfix, usually d on windows")
+set(CMAKE_RELEASE_POSTFIX "" CACHE STRING "add a postfix, usually empty on windows")
+set(CMAKE_RELWITHDEBINFO_POSTFIX "rd" CACHE STRING "add a postfix, usually empty on windows")
+set(CMAKE_MINSIZEREL_POSTFIX "s" CACHE STRING "add a postfix, usually empty on windows")
 if(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4819")
 endif()
 
+include(CPack)
+
+find_package(Qt6 COMPONENTS Core Widgets GUI)
+if (NOT Qt6_FOUND)
+    find_package(Qt5 5.15 REQUIRED COMPONENTS Core Widgets GUI)
+endif()
+
+option(BUILD_EXAMPLES "build the examples" OFF)
+
+include(cmake/WinResource.cmake)
 add_subdirectory(src)
 add_subdirectory(cmake)

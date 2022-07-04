@@ -1,19 +1,7 @@
-
 set(EXPAMPLE_NAME MainWindowExample)
 
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
-include_directories(${CMAKE_SOURCE_DIR}/src/SARibbonBar/)
-
-if(SARIBBON_QT_VERSION VERSION_EQUAL 5)
-	qt5_add_resources(QRCS saribbonresouce.qrc)
-else()
-	qt_add_resources(QRCS saribbonresouce.qrc)
-endif()
-
-
-qt5_wrap_cpp(Moced "mainwindow.h")
+qt_add_resources(QRCS saribbonresouce.qrc)
+qt_wrap_cpp(Moced "mainwindow.h")
 
 add_executable(${EXPAMPLE_NAME} 
     ${QRCS}
@@ -23,17 +11,25 @@ add_executable(${EXPAMPLE_NAME}
 	${Moced}
 )
 
-target_link_libraries(${EXPAMPLE_NAME} 
-        ${Qt${QT_VERSION_MAJOR}Widgets_LIBRARIES}
-	SARibbonBar
-)
+target_link_libraries(${EXPAMPLE_NAME} SARibbonBar Qt::Widgets)
 
-SET_TARGET_PROPERTIES(${EXPAMPLE_NAME} PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
+set_target_properties(${EXPAMPLE_NAME} PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
 
-INSTALL(
-		TARGETS ${LIB_NAME}
-		RUNTIME DESTINATION bin
-		LIBRARY DESTINATION bin
-		ARCHIVE DESTINATION lib
+install(TARGETS ${EXPAMPLE_NAME} RUNTIME DESTINATION bin LIBRARY DESTINATION bin ARCHIVE DESTINATION lib)
+
+if(WIN32)
+    add_custom_command(TARGET ${EXPAMPLE_NAME}
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E
+                copy_if_different 
+                    "$<TARGET_FILE:SARibbonBar>" 
+                    "$<TARGET_FILE_DIR:${EXPAMPLE_NAME}>"
+    )
+	create_win32_resource_version(
+		TARGET ${EXPAMPLE_NAME}
+		FILENAME ${EXPAMPLE_NAME}
+		EXT "exe"
+		DESCRIPTION "Example application for Qt Ribbon Control"
 	)
-
+	visual_studio_qt_helper(${EXPAMPLE_NAME})
+endif()
