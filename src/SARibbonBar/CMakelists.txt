@@ -1,14 +1,9 @@
-﻿
-set(LIB_NAME SARibbonBar)
+﻿set(LIB_NAME SARibbonBar)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-if(SARIBBON_QT_VERSION VERSION_EQUAL 5)
-	qt5_add_resources(QRCS resource.qrc)
-else()
-	qt_add_resources(QRCS resource.qrc)
-endif()
+qt_add_resources(QRCS resource.qrc)
 
 SET(HEADER_FILES
     SAFramelessHelper.h
@@ -50,7 +45,7 @@ SET(HEADER_FILES
     SARibbonLineWidgetContainer.h
 )
 
-qt5_wrap_cpp(MOC_HEADER_FILES ${HEADER_FILES})
+qt_wrap_cpp(MOC_HEADER_FILES ${HEADER_FILES})
 
 SET(SOURCE_FILES
     SAFramelessHelper.cpp
@@ -98,43 +93,31 @@ add_library(${LIB_NAME} SHARED
     ${MOC_HEADER_FILES}
     ${HEADER_FILES}
     ${SOURCE_FILES}
-    )
+)
 
-target_link_libraries(${LIB_NAME} ${Qt${SARIBBON_QT_VERSION}Widgets_LIBRARIES})
+target_link_libraries(${LIB_NAME} Qt::Widgets)
 
-SET_TARGET_PROPERTIES(${LIB_NAME} PROPERTIES AUTOMOC TRUE AUTOUIC TRUE AUTORCC TRUE DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
+set_target_properties(${LIB_NAME} PROPERTIES
+	AUTOMOC TRUE
+	AUTOUIC TRUE
+	AUTORCC TRUE
+	DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX}
+	VERSION ${PROJECT_VERSION}
+	SOVERSION ${PROJECT_VERSION}
+)
+target_include_directories(${LIB_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
+install(TARGETS ${LIB_NAME}
+	RUNTIME DESTINATION bin
+	LIBRARY DESTINATION bin
+	ARCHIVE DESTINATION lib
+)
+install(FILES ${HEADER_FILES} DESTINATION include)
 
-INSTALL(
-		TARGETS ${LIB_NAME}
-		RUNTIME DESTINATION bin
-		LIBRARY DESTINATION bin
-		ARCHIVE DESTINATION lib
+if(WIN32)
+	create_win32_resource_version(
+		TARGET ${LIB_NAME}
+		FILENAME ${LIB_NAME}
+		EXT "dll"
+		DESCRIPTION "Ribbon control library for Qt"
 	)
-
-INSTALL(
-		FILES       ${HEADER_FILES}
-		DESTINATION include
-	)
-
-#=============Copy SARibbonBar Dll FILES to MainWindowExample Project================================
-if(BUILD_EXAMPLES)
-    SET(MainWindowExample_SubProject_DIR ${CMAKE_CURRENT_BINARY_DIR}/../example/MainWindowExample)	#目标目录
-
-    SET(SARibbonBar_Debug_DLL_FILE 
-        ${CMAKE_CURRENT_BINARY_DIR}/Debug/${LIB_NAME}d.dll
-    )
-    SET(SARibbonBar_Release_DLL_FILE 
-        ${CMAKE_CURRENT_BINARY_DIR}/Release/${LIB_NAME}.dll
-    )
-
-    add_custom_command(TARGET ${LIB_NAME}
-        POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E 
-                make_directory "${MainWindowExample_SubProject_DIR}/$<$<CONFIG:Release>:Release>$<$<CONFIG:Debug>:Debug>/"	#因创建子项目顺序，需先创建目标目录再进行复制操作
-        COMMAND ${CMAKE_COMMAND} -E
-                copy_if_different 
-                    "$<$<CONFIG:Release>:${SARibbonBar_Release_DLL_FILE}>" 
-                    "$<$<CONFIG:Debug>:${SARibbonBar_Debug_DLL_FILE}>" 
-                    "${MainWindowExample_SubProject_DIR}/$<$<CONFIG:Release>:Release>$<$<CONFIG:Debug>:Debug>/"
-    )
-endif(BUILD_EXAMPLES)
+endif()
