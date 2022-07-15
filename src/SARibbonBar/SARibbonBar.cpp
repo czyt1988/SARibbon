@@ -134,7 +134,7 @@ public:
                 btn->setParent(_mainClass);
             }
             btn->move(0, _mainClass->titleBarHeight());
-            _mainClass->connect(_applicationButton, &QAbstractButton::clicked, _mainClass, &SARibbonBar::applicationButtonClicked);
+            _mainClass->connect(btn, &QAbstractButton::clicked, _mainClass, &SARibbonBar::applicationButtonClicked);
         }
         _applicationButton = btn;
     }
@@ -220,6 +220,7 @@ SARibbonBar::SARibbonBar(QWidget* parent) : QMenuBar(parent), m_d(new SARibbonBa
     m_d->init();
     if (parent) {
         connect(parent, &QWidget::windowTitleChanged, this, &SARibbonBar::onWindowTitleChanged);
+        connect(parent, &QWidget::windowIconChanged, this, &SARibbonBar::onWindowIconChanged);
     }
     setRibbonStyle(OfficeStyle);
 }
@@ -789,7 +790,7 @@ void SARibbonBar::showMinimumModeButton(bool isShow)
             action->setIcon(style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton,
                                                   0,
                                                   m_d->_minimumCategoryButton));
-            connect(action, &QAction::triggered, this, [=]() {
+            connect(action, &QAction::triggered, this, [ = ]() {
                 this->setMinimumMode(!isMinimumMode());
                 action->setIcon(style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton,
                                                       0,
@@ -834,6 +835,13 @@ void SARibbonBar::onWindowTitleChanged(const QString& title)
 {
     Q_UNUSED(title);
     update();
+}
+
+void SARibbonBar::onWindowIconChanged(const QIcon& i)
+{
+    if (quickAccessBar()) {
+        quickAccessBar()->setWindowIcon(i);
+    }
 }
 
 void SARibbonBar::onCategoryWindowTitleChanged(const QString& title)
