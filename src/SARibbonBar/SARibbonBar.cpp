@@ -1,4 +1,4 @@
-﻿#include "SARibbonBar.h"
+#include "SARibbonBar.h"
 #include "SAWindowButtonGroup.h"
 #include <QApplication>
 #include <QPainter>
@@ -132,7 +132,7 @@ public:
                 btn->setParent(MainClass);
             }
             btn->move(0, MainClass->titleBarHeight());
-            MainClass->connect(applicationButton, &QAbstractButton::clicked, MainClass, &SARibbonBar::applicationButtonClicked);
+            MainClass->connect(btn, &QAbstractButton::clicked, MainClass, &SARibbonBar::applicationButtonClicked);
         }
         applicationButton = btn;
     }
