@@ -305,9 +305,6 @@ protected:
 
     //根据currentRibbonStyle计算mainBar的高度
     virtual int mainBarHeight() const;
-
-    // ribbon相对widget的Margins
-    virtual const QMargins& widgetBord() const;
 protected slots:
     void onWindowTitleChanged(const QString& title);
     void onCategoryWindowTitleChanged(const QString& title);
