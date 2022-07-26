@@ -1278,15 +1278,6 @@ int SARibbonBar::mainBarHeight() const
     return RibbonSubElementStyleOpt.ribbonBarHeight(currentRibbonStyle());
 }
 
-/**
- * @brief ribbon相对widget的Margins
- * @return
- */
-const QMargins& SARibbonBar::widgetBord() const
-{
-    return RibbonSubElementStyleOpt.widgetBord();
-}
-
 void SARibbonBar::paintEvent(QPaintEvent* e)
 {
     Q_UNUSED(e);
@@ -1315,7 +1306,7 @@ void SARibbonBar::paintInNormalStyle()
     bool isCurrentSelectContextCategoryPage                        = false;
 
     QPoint contextCategoryRegion(width(), -1);
-
+    QMargins border = contentsMargins();
     for (int i = 0; i < contextCategoryDataList.size(); ++i) {
         QRect contextTitleRect;
         QList< int > indexs = contextCategoryDataList[ i ].tabPageIndex;
@@ -1328,7 +1319,7 @@ void SARibbonBar::paintInNormalStyle()
             contextTitleRect.setHeight(m_d->_ribbonTabBar->height() - 1);  //减1像素，避免tabbar基线覆盖
             contextTitleRect -= m_d->_ribbonTabBar->tabMargin();
             //把区域顶部扩展到窗口顶部
-            contextTitleRect.setTop(widgetBord().top());
+            contextTitleRect.setTop(border.top());
             //绘制
             paintContextCategoryTab(p, contextCategoryDataList[ i ].contextCategory->contextTitle(), contextTitleRect, clr);
             //更新上下文标签的范围，用于控制标题栏的显示
@@ -1358,8 +1349,8 @@ void SARibbonBar::paintInNormalStyle()
         QRect titleRegion;
         if (contextCategoryRegion.y() < 0) {
             titleRegion.setRect(m_d->_quickAccessBar->geometry().right() + 1,
-                                widgetBord().top(),
-                                width() - m_d->_iconRightBorderPosition - widgetBord().right()
+                                border.top(),
+                                width() - m_d->_iconRightBorderPosition - border.right()
                                         - m_d->_windowButtonSize.width() - m_d->_quickAccessBar->geometry().right() - 1,
                                 titleBarHeight());
         } else {
@@ -1368,11 +1359,11 @@ void SARibbonBar::paintInNormalStyle()
             //            if (width() - contextCategoryRegion.y() > contextCategoryRegion.x()-x) {
             if (rightwidth > leftwidth) {
                 //说明右边的区域大一点，标题显示在右，显示在右边需要减去windowbutton宽度
-                titleRegion.setRect(contextCategoryRegion.y(), widgetBord().top(), rightwidth, titleBarHeight());
+                titleRegion.setRect(contextCategoryRegion.y(), border.top(), rightwidth, titleBarHeight());
             } else {
                 //说明左边的大一点
                 titleRegion.setRect(m_d->_iconRightBorderPosition + m_d->_quickAccessBar->geometry().right(),
-                                    widgetBord().top(),
+                                    border.top(),
                                     leftwidth,
                                     titleBarHeight());
             }
@@ -1396,7 +1387,7 @@ void SARibbonBar::paintInWpsLiteStyle()
     p.save();
     QList< _SAContextCategoryManagerData > contextCategoryDataList = m_d->_currentShowingContextCategory;
     bool isCurrentSelectContextCategoryPage                        = false;
-
+    QMargins border                                                = contentsMargins();
     for (int i = 0; i < contextCategoryDataList.size(); ++i) {
         QRect contextTitleRect;
         QList< int > indexs = contextCategoryDataList[ i ].tabPageIndex;
@@ -1409,7 +1400,7 @@ void SARibbonBar::paintInWpsLiteStyle()
             contextTitleRect.setHeight(m_d->_ribbonTabBar->height() - 1);
             contextTitleRect -= m_d->_ribbonTabBar->tabMargin();
             //把区域顶部扩展到窗口顶部
-            contextTitleRect.setTop(widgetBord().top());
+            contextTitleRect.setTop(border.top());
             //绘制
             paintContextCategoryTab(p, QString(), contextTitleRect, clr);
         }
@@ -1433,7 +1424,7 @@ void SARibbonBar::paintInWpsLiteStyle()
         int start = m_d->_ribbonTabBar->x() + m_d->_ribbonTabBar->width();
         int width = m_d->_quickAccessBar->x() - start;
         if (width > 20) {
-            QRect titleRegion(start, widgetBord().top(), width, titleBarHeight());
+            QRect titleRegion(start, border.top(), width, titleBarHeight());
 #ifdef SA_RIBBON_DEBUG_HELP_DRAW
             p.save();
             p.setBrush(QColor(255, 0, 0, 120));
@@ -1447,20 +1438,19 @@ void SARibbonBar::paintInWpsLiteStyle()
 
 void SARibbonBar::resizeStackedContainerWidget()
 {
+    QMargins border = contentsMargins();
     if (m_d->_stackedContainerWidget->isPopupMode()) {
         //弹出模式时，高度
-        QPoint absPosition = mapToGlobal(QPoint(widgetBord().left(), m_d->_ribbonTabBar->geometry().bottom() + 1));
+        QPoint absPosition = mapToGlobal(QPoint(border.left(), m_d->_ribbonTabBar->geometry().bottom() + 1));
         m_d->_stackedContainerWidget->setGeometry(absPosition.x(),
                                                   absPosition.y(),
-                                                  width() - widgetBord().left() - widgetBord().right(),
-                                                  mainBarHeight() - m_d->_ribbonTabBar->geometry().bottom()
-                                                          - widgetBord().bottom() - 1);
+                                                  width() - border.left() - border.right(),
+                                                  mainBarHeight() - m_d->_ribbonTabBar->geometry().bottom() - border.bottom() - 1);
     } else {
-        m_d->_stackedContainerWidget->setGeometry(widgetBord().left(),
+        m_d->_stackedContainerWidget->setGeometry(border.left(),
                                                   m_d->_ribbonTabBar->geometry().bottom() + 1,
-                                                  width() - widgetBord().left() - widgetBord().right(),
-                                                  mainBarHeight() - m_d->_ribbonTabBar->geometry().bottom()
-                                                          - widgetBord().bottom() - 1);
+                                                  width() - border.left() - border.right(),
+                                                  mainBarHeight() - m_d->_ribbonTabBar->geometry().bottom() - border.bottom() - 1);
     }
 }
 
@@ -1501,10 +1491,11 @@ void SARibbonBar::paintContextCategoryTab(QPainter& painter, const QString& titl
 {
     //绘制上下文标签
     //首先有5像素的实体粗线位于顶部
+    QMargins border = contentsMargins();
     painter.save();
     painter.setPen(Qt::NoPen);
     painter.setBrush(color);
-    painter.drawRect(QRect(contextRect.x(), widgetBord().top(), contextRect.width(), 5));
+    painter.drawRect(QRect(contextRect.x(), border.top(), contextRect.width(), 5));
 
     //剩下把颜色变亮90%
     QColor gColor = color.lighter(190);
@@ -1554,8 +1545,9 @@ void SARibbonBar::moveEvent(QMoveEvent* event)
 void SARibbonBar::resizeInOfficeStyle()
 {
     updateRibbonElementGeometry();
-    int x = widgetBord().left();
-    int y = widgetBord().top();
+    QMargins border = contentsMargins();
+    int x           = border.left();
+    int y           = border.top();
 
     // cornerWidget - TopLeftCorner
     const int validTitleBarHeight = titleBarHeight();
@@ -1582,7 +1574,7 @@ void SARibbonBar::resizeInOfficeStyle()
         }
     }
     //第二行，开始布局applicationButton，tabbar，tabBarRightSizeButtonGroupWidget，TopRightCorner
-    x = widgetBord().left();
+    x = border.left();
     y += validTitleBarHeight;
     // applicationButton 定位
     if (m_d->_applicationButton) {
@@ -1595,7 +1587,7 @@ void SARibbonBar::resizeInOfficeStyle()
     //由于这个窗口一定要在最右，因此先对这个窗口进行布局
     // cornerWidget - TopRightCorner
     //获取最右边的位置
-    int endX = width() - widgetBord().right();
+    int endX = width() - border.right();
 
     if (QWidget* connerW = cornerWidget(Qt::TopRightCorner)) {
         if (connerW->isVisible()) {
@@ -1628,13 +1620,15 @@ void SARibbonBar::resizeInOfficeStyle()
 void SARibbonBar::resizeInWpsLiteStyle()
 {
     updateRibbonElementGeometry();
-    int x                         = widgetBord().left();
-    int y                         = widgetBord().top();
+    QMargins border = contentsMargins();
+    int x           = border.left();
+    int y           = border.top();
+
     const int validTitleBarHeight = titleBarHeight();
 
     //先布局右边内容
     // cornerWidget - TopRightCorner
-    int endX = width() - widgetBord().right() - m_d->_windowButtonSize.width();
+    int endX = width() - border.right() - m_d->_windowButtonSize.width();
 
     if (QWidget* connerW = cornerWidget(Qt::TopRightCorner)) {
         if (connerW->isVisible()) {
@@ -1717,11 +1711,12 @@ void SARibbonBar::paintBackground(QPainter& painter)
     //在tabbar下绘制一条线
     const int lineY = m_d->_ribbonTabBar->geometry().bottom();
     QPen pen(m_d->_tabBarBaseLineColor);
+    QMargins border = contentsMargins();
 
     pen.setWidth(1);
     pen.setStyle(Qt::SolidLine);
     painter.setPen(pen);
-    painter.drawLine(QPoint(widgetBord().left(), lineY), QPoint(width() - widgetBord().right() - 1, lineY));
+    painter.drawLine(QPoint(border.left(), lineY), QPoint(width() - border.right() - 1, lineY));
     painter.restore();
 }
 
