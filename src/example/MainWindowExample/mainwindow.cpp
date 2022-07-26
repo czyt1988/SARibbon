@@ -58,6 +58,9 @@ MainWindow::MainWindow(QWidget* par) : SARibbonMainWindow(par), m_customizeWidge
     setStatusBar(new QStatusBar());
 
     SARibbonBar* ribbon = ribbonBar();
+    //通过setContentsMargins设置ribbon四周的间距
+    ribbon->setContentsMargins(5, 0, 5, 0);
+    //设置applicationButton
     PRINT_COST("setCentralWidget & setWindowTitle");
     ribbon->applicationButton()->setText(("File"));
 
@@ -308,6 +311,7 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
         Q_UNUSED(b);
         this->m_edit->append("actSaveion clicked");
     });
+
     QAction* actHideRibbon = createAction(tr("hide ribbon"), ":/icon/icon/hideRibbon.svg", "actHideRibbon");
     actHideRibbon->setCheckable(true);
     pannelStyle->addSmallAction(actHideRibbon);
