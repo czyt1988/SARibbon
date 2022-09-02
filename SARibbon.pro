@@ -9,4 +9,5 @@ CONFIG += ordered
 
 OTHER_FILES += \
            readme.md \
-           doc/saribbon-guide.md \
+           readme-cn.md \
+           update-record.md \

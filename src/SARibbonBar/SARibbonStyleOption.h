@@ -30,9 +30,6 @@ public:
     //标签栏高度
     virtual int tabBarHeight() const;
 
-    // saribbonbar和窗体四周间距
-    virtual const QMargins& widgetBord() const;
-
     //在改变了参数后对需要计算的变量从新计算
     virtual void recalc();
 
@@ -43,7 +40,6 @@ protected:
     int calcMainbarHeight(SARibbonBar::RibbonStyle s) const;
 
 private:
-    QMargins m_widgetBord;                     ///< 整个ribbonbar的四个边框
     int m_tabBarHeight;                        ///< ribbon tab 的高度
     int m_titleBarHeight;                      ///< 标题栏高度
     int m_ribbonbarHeightOfficeStyleThreeRow;  ///< office样式的3行高度

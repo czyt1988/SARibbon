@@ -3,8 +3,6 @@
 #include <QDebug>
 SARibbonStyleOption::SARibbonStyleOption()
 {
-    m_widgetBord = QMargins(5, 1, 5, 5);
-
     QFontMetrics fm = QApplication::fontMetrics();
     int lineSpacing = fm.lineSpacing();
 
@@ -46,15 +44,6 @@ int SARibbonStyleOption::titleBarHeight() const
 int SARibbonStyleOption::tabBarHeight() const
 {
     return m_tabBarHeight;
-}
-
-/**
- * @brief 整个ribbonbar的四个边框
- * @return
- */
-const QMargins& SARibbonStyleOption::widgetBord() const
-{
-    return m_widgetBord;
 }
 
 void SARibbonStyleOption::recalc()
@@ -99,8 +88,7 @@ QDebug operator<<(QDebug debug, const SARibbonStyleOption& c)
     QDebugStateSaver saver(debug);
     Q_UNUSED(saver);
     debug.nospace() << "fontMetrics.lineSpacing=" << QApplication::fontMetrics().lineSpacing()
-                    << ",SARibbonStyleOption(titleBarHeight=" << c.titleBarHeight()
-                    << ",tabBarHeight=" << c.tabBarHeight() << ",widgetBord=" << c.widgetBord()
+                    << ",SARibbonStyleOption(titleBarHeight=" << c.titleBarHeight() << ",tabBarHeight=" << c.tabBarHeight()
                     << "\n,ribbonBarHeight(OfficeStyle)=" << c.ribbonBarHeight(SARibbonBar::OfficeStyle)
                     << "\n,ribbonBarHeight(OfficeStyleTwoRow)=" << c.ribbonBarHeight(SARibbonBar::OfficeStyleTwoRow)
                     << "\n,ribbonBarHeight(WpsLiteStyle)=" << c.ribbonBarHeight(SARibbonBar::WpsLiteStyle)
