@@ -58,6 +58,9 @@ MainWindow::MainWindow(QWidget* par) : SARibbonMainWindow(par), m_customizeWidge
     setStatusBar(new QStatusBar());
 
     SARibbonBar* ribbon = ribbonBar();
+    //通过setContentsMargins设置ribbon四周的间距
+    ribbon->setContentsMargins(5, 0, 5, 0);
+    //设置applicationButton
     PRINT_COST("setCentralWidget & setWindowTitle");
     ribbon->applicationButton()->setText(("File"));
 
@@ -107,7 +110,7 @@ MainWindow::MainWindow(QWidget* par) : SARibbonMainWindow(par), m_customizeWidge
     //
     showMaximized();
     //
-    //    setWindowIcon(QIcon(":/icon/icon/SA.svg"));
+    setWindowIcon(QIcon(":/icon/icon/SA.svg"));
 }
 
 void MainWindow::onShowContextCategory(bool on)
@@ -275,6 +278,23 @@ void MainWindow::onActionwordWrapIn2rowTriggered(bool b)
     ribbonBar()->updateRibbonGeometry();
 }
 
+/**
+ * @brief 测试SARibbonButtonGroupWidget和标题对齐
+ * @param act
+ */
+void MainWindow::onButtonGroupActionTriggered(QAction* act)
+{
+    QVariant v = act->property("align");
+    if (v.isValid()) {
+        Qt::Alignment al = static_cast< Qt::Alignment >(v.toInt());
+        if (!ribbonBar()) {
+            return;
+        }
+        ribbonBar()->setWindowTitleAligment(al);
+        ribbonBar()->repaint();
+    }
+}
+
 void MainWindow::createCategoryMain(SARibbonCategory* page)
 {
     //! 1
@@ -291,6 +311,7 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
         Q_UNUSED(b);
         this->m_edit->append("actSaveion clicked");
     });
+
     QAction* actHideRibbon = createAction(tr("hide ribbon"), ":/icon/icon/hideRibbon.svg", "actHideRibbon");
     actHideRibbon->setCheckable(true);
     pannelStyle->addSmallAction(actHideRibbon);
@@ -513,10 +534,17 @@ void MainWindow::createCategoryOther(SARibbonCategory* page)
     btnGroup1->addAction(createAction(tr("Wrap Image Right"), ":/icon/icon/Wrap-Image Right.svg"));
     pannel1->addWidget(btnGroup1, SARibbonPannelItem::Medium);
     SARibbonButtonGroupWidget* btnGroup2 = new SARibbonButtonGroupWidget(pannel1);
-    btnGroup2->addAction(createAction(tr("Align Right"), ":/icon/icon/Align-Right.svg"));
-    btnGroup2->addAction(createAction(tr("Align Left"), ":/icon/icon/Align-Left.svg"));
-    btnGroup2->addAction(createAction(tr("Align Center"), ":/icon/icon/Align-Center.svg"));
+    QAction* titleAlgnment               = createAction(tr("Align Right"), ":/icon/icon/Align-Right.svg");
+    titleAlgnment->setProperty("align", (int)Qt::AlignRight | Qt::AlignVCenter);
+    btnGroup2->addAction(titleAlgnment);
+    titleAlgnment = createAction(tr("Align Left"), ":/icon/icon/Align-Left.svg");
+    titleAlgnment->setProperty("align", (int)Qt::AlignLeft | Qt::AlignVCenter);
+    btnGroup2->addAction(titleAlgnment);
+    titleAlgnment = createAction(tr("Align Center"), ":/icon/icon/Align-Center.svg");
+    titleAlgnment->setProperty("align", (int)Qt::AlignCenter);
+    btnGroup2->addAction(titleAlgnment);
     pannel1->addWidget(btnGroup2, SARibbonPannelItem::Medium);
+    connect(btnGroup2, &SARibbonButtonGroupWidget::actionTriggered, this, &MainWindow::onButtonGroupActionTriggered);
     // Gallery
     SARibbonGallery* gallery = pannel1->addGallery();
     QList< QAction* > galleryActions;
