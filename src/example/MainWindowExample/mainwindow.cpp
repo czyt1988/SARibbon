@@ -183,7 +183,7 @@ void MainWindow::onActionHelpTriggered()
                                 "\n Author:czy"
                                 "\n Email:czy.t@163.com"
                                 "\n ===============")
-                                     .arg(SARibbonBar::versionString()));
+                             .arg(SARibbonBar::versionString()));
 }
 
 void MainWindow::onActionRemoveAppBtnTriggered(bool b)
@@ -506,15 +506,17 @@ void MainWindow::createCategoryOther(SARibbonCategory* page)
     pannel1->setObjectName("CategoryOther-pannel1");
     page->addPannel(pannel1);
     //按钮组
-    SARibbonButtonGroupWidget* btnGroup = new SARibbonButtonGroupWidget(pannel1);
-    btnGroup->addAction(createAction(tr("Decrease Margin"), ":/icon/icon/Decrease-Margin.svg"));
-    btnGroup->addAction(createAction(tr("Decrease Indent"), ":/icon/icon/Decrease-Indent.svg"));
-    btnGroup->addAction(createAction(tr("Align Right"), ":/icon/icon/Align-Right.svg"));
-    btnGroup->addAction(createAction(tr("Align Left"), ":/icon/icon/Align-Left.svg"));
-    btnGroup->addAction(createAction(tr("Align Center"), ":/icon/icon/Align-Center.svg"));
-    btnGroup->addAction(createAction(tr("Wrap Image Left"), ":/icon/icon/Wrap-Image Left.svg"));
-    btnGroup->addAction(createAction(tr("Wrap Image Right"), ":/icon/icon/Wrap-Image Right.svg"));
-    pannel1->addLargeWidget(btnGroup);
+    SARibbonButtonGroupWidget* btnGroup1 = new SARibbonButtonGroupWidget(pannel1);
+    btnGroup1->addAction(createAction(tr("Decrease Margin"), ":/icon/icon/Decrease-Margin.svg"));
+    btnGroup1->addAction(createAction(tr("Decrease Indent"), ":/icon/icon/Decrease-Indent.svg"));
+    btnGroup1->addAction(createAction(tr("Wrap Image Left"), ":/icon/icon/Wrap-Image Left.svg"));
+    btnGroup1->addAction(createAction(tr("Wrap Image Right"), ":/icon/icon/Wrap-Image Right.svg"));
+    pannel1->addWidget(btnGroup1, SARibbonPannelItem::Medium);
+    SARibbonButtonGroupWidget* btnGroup2 = new SARibbonButtonGroupWidget(pannel1);
+    btnGroup2->addAction(createAction(tr("Align Right"), ":/icon/icon/Align-Right.svg"));
+    btnGroup2->addAction(createAction(tr("Align Left"), ":/icon/icon/Align-Left.svg"));
+    btnGroup2->addAction(createAction(tr("Align Center"), ":/icon/icon/Align-Center.svg"));
+    pannel1->addWidget(btnGroup2, SARibbonPannelItem::Medium);
     // Gallery
     SARibbonGallery* gallery = pannel1->addGallery();
     QList< QAction* > galleryActions;
@@ -651,21 +653,33 @@ void MainWindow::createCategoryDelete(SARibbonCategory* page)
  */
 void MainWindow::createCategorySize(SARibbonCategory* page)
 {
-    QAction* act = nullptr;
-
-    SARibbonPannel* pannel = page->addPannel(tr("Font"));
-
-    QLabel* labelFontSize = new QLabel(this);
+    QAction* act                      = nullptr;
+    SARibbonPannel* pannel            = page->addPannel(tr("Font"));
+    SARibbonButtonGroupWidget* group1 = new SARibbonButtonGroupWidget(pannel);
+    group1->setObjectName(QStringLiteral(u"group1"));
+    QLabel* labelFontSize = new QLabel(group1);
     labelFontSize->setText(tr("select font"));
     labelFontSize->setObjectName(QStringLiteral(u"labelFontSize"));
-    act = pannel->addWidget(labelFontSize, SARibbonPannelItem::Small);
+    group1->addWidget(labelFontSize);
+    QFontComboBox* fontComWidget = new QFontComboBox(group1);
+    fontComWidget->setObjectName(QStringLiteral(u"fontComboBox"));
+    connect(fontComWidget, &QFontComboBox::currentFontChanged, this, &MainWindow::onFontComWidgetCurrentFontChanged);
+    group1->addWidget(fontComWidget);
+    act = pannel->addWidget(group1, SARibbonPannelItem::Medium);
     act->setObjectName(labelFontSize->objectName());
 
-    QFontComboBox* fontComWidget = new QFontComboBox(this);
-    fontComWidget->setObjectName(QStringLiteral(u"fontComboBox"));
-    act = pannel->addWidget(fontComWidget, SARibbonPannelItem::Small);
-    act->setObjectName(fontComWidget->objectName());
-    connect(fontComWidget, &QFontComboBox::currentFontChanged, this, &MainWindow::onFontComWidgetCurrentFontChanged);
+    SARibbonButtonGroupWidget* group2 = new SARibbonButtonGroupWidget(pannel);
+    group2->setObjectName(QStringLiteral(u"group2"));
+    group2->addAction(createAction("Bold", ":/icon/icon/bold.svg"));
+    group2->addAction(createAction("Italic", ":/icon/icon/Italic.svg"));
+    group2->addSeparator();
+    group2->addAction(createAction("left alignment", ":/icon/icon/al-left.svg"));
+    group2->addAction(createAction("center alignment", ":/icon/icon/al-center.svg"));
+    group2->addAction(createAction("right alignment", ":/icon/icon/al-right.svg"));
+    group2->addAction(createAction("line up on both sides", ":/icon/icon/al-bothside.svg"));
+    act = pannel->addWidget(group2, SARibbonPannelItem::Medium);
+    act->setObjectName(group2->objectName());
+
     pannel->addSeparator();
 
     QAction* actLargerFontSize = createAction(tr("Larger"), ":/icon/icon/largerFont.svg", "actLargerFontSize");
