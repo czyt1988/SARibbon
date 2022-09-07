@@ -52,6 +52,13 @@
         <file>icon/delete.svg</file>
         <file>icon/layout.svg</file>
         <file>icon/wordwrap.svg</file>
+        <file>icon/al-bothside.svg</file>
+        <file>icon/al-left.svg</file>
+        <file>icon/al-center.svg</file>
+        <file>icon/al-right.svg</file>
+        <file>icon/Underline.svg</file>
+        <file>icon/Italic.svg</file>
+        <file>icon/bold.svg</file>
     </qresource>
     <qresource prefix="/gallery-icon">
         <file>icon/gallery/Document-File.svg</file>
