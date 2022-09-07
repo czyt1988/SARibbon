@@ -27,9 +27,9 @@ endif()
 
 include(CPack)
 
-find_package(Qt6 COMPONENTS Core Widgets GUI)
+find_package(Qt6 COMPONENTS Core Widgets Gui)
 if (NOT Qt6_FOUND)
-    find_package(Qt5 5.15 REQUIRED COMPONENTS Core Widgets GUI)
+    find_package(Qt5 5.15 REQUIRED COMPONENTS Core Widgets Gui)
 endif()
 
 option(BUILD_EXAMPLES "build the examples" OFF)
