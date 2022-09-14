@@ -220,6 +220,7 @@ SARibbonBar::SARibbonBar(QWidget* parent) : QMenuBar(parent), m_d(new SARibbonBa
     m_d->init();
     if (parent) {
         connect(parent, &QWidget::windowTitleChanged, this, &SARibbonBar::onWindowTitleChanged);
+        connect(parent, &QWidget::windowIconChanged, this, &SARibbonBar::onWindowIconChanged);
     }
     setRibbonStyle(OfficeStyle);
 }
@@ -834,6 +835,13 @@ void SARibbonBar::onWindowTitleChanged(const QString& title)
 {
     Q_UNUSED(title);
     update();
+}
+
+void SARibbonBar::onWindowIconChanged(const QIcon& i)
+{
+    if (quickAccessBar()) {
+        quickAccessBar()->setWindowIcon(i);
+    }
 }
 
 void SARibbonBar::onCategoryWindowTitleChanged(const QString& title)
