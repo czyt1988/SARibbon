@@ -1561,6 +1561,9 @@ void SARibbonBar::resizeInOfficeStyle()
     // quick access bar定位
     if (m_d->_quickAccessBar) {
         if (m_d->_quickAccessBar->isVisible()) {
+            if (m_d->_quickAccessBar->height() != validTitleBarHeight) {
+                m_d->_quickAccessBar->setFixedHeight(validTitleBarHeight);
+            }
             QSize quickAccessBarSize = m_d->_quickAccessBar->sizeHint();
             m_d->_quickAccessBar->setGeometry(x, y, quickAccessBarSize.width(), validTitleBarHeight);
         }
