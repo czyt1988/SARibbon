@@ -307,6 +307,7 @@ protected:
     virtual int mainBarHeight() const;
 protected slots:
     void onWindowTitleChanged(const QString& title);
+    void onWindowIconChanged(const QIcon& i);
     void onCategoryWindowTitleChanged(const QString& title);
     void onStackWidgetHided();
     virtual void onCurrentRibbonTabChanged(int index);
