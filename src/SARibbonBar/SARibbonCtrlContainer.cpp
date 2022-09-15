@@ -56,7 +56,6 @@ QSize SARibbonCtrlContainer::sizeHint() const
         // 同时又存在图标，要把图标显示，那么给定一个默认的大小
         if (containerSizeHint.isEmpty()) {
             containerSizeHint.setHeight(30);
-            containerSizeHint.setWidth(30);
         }
         if (!icon.isNull()) {
             //有图标就把宽度加长一个高度
@@ -186,11 +185,7 @@ void SARibbonCtrlContainer::paintEvent(QPaintEvent* e)
                 text      = opt.fontMetrics.elidedText(text, Qt::ElideRight, textWidth);
             }
             if (textWidth > 0) {
-                SARibbonDrawHelper::drawText(text,
-                                             &painter,
-                                             &opt,
-                                             Qt::AlignLeft | Qt::AlignVCenter,
-                                             QRect(x, 0, textWidth, opt.rect.height()));
+                SARibbonDrawHelper::drawText(text, &painter, &opt, Qt::AlignLeft | Qt::AlignVCenter, QRect(x, 0, textWidth, opt.rect.height()));
             }
         }
     }
