@@ -86,14 +86,18 @@ SET(SOURCE_FILES
     SARibbonLineWidgetContainer.cpp
 )
 
-add_definitions(-DSA_RIBBON_BAR_MAKE_LIB)
-
-add_library(${LIB_NAME} SHARED
+add_library(${LIB_NAME}
     ${QRCS}
     ${MOC_HEADER_FILES}
     ${HEADER_FILES}
     ${SOURCE_FILES}
 )
+
+if (BUILD_SHARED_LIBS)
+    target_compile_definitions(${LIB_NAME} PRIVATE SA_RIBBON_BAR_MAKE_LIB)
+else()
+    target_compile_definitions(${LIB_NAME} PUBLIC SA_RIBBON_BAR_NO_EXPORT)    
+endif()
 
 target_link_libraries(${LIB_NAME} Qt::Widgets)
 

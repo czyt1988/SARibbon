@@ -33,6 +33,7 @@ if (NOT Qt6_FOUND)
 endif()
 
 option(BUILD_EXAMPLES "build the examples" OFF)
+option(BUILD_SHARED_LIBS "Build in shared lib mode" ON)
 
 include(cmake/WinResource.cmake)
 add_subdirectory(src)
