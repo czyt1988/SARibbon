@@ -531,9 +531,6 @@ SARibbonPannel* SARibbonCategoryPrivate::insertPannel(const QString& title, int 
 
     pannel->setWindowTitle(title);
     pannel->setObjectName(title);
-    pannel->setPannelLayoutMode(ribbonPannelLayoutMode());
-    pannel->installEventFilter(mParent);
-    pannel->setVisible(true);
     insertPannel(index, pannel);
     return (pannel);
 }
@@ -551,6 +548,8 @@ void SARibbonCategoryPrivate::insertPannel(int index, SARibbonPannel* pannel)
     if (pannel->parentWidget() != mParent) {
         pannel->setParent(mParent);
     }
+    pannel->setPannelLayoutMode(ribbonPannelLayoutMode());
+    pannel->installEventFilter(mParent);
     index = qMax(0, index);
     index = qMin(mItemList.size(), index);
     SARibbonCategoryItem item;
@@ -562,6 +561,7 @@ void SARibbonCategoryPrivate::insertPannel(int index, SARibbonPannel* pannel)
     mItemList.insert(index, item);
     //标记需要重新计算尺寸
     updateItemGeometry();
+    pannel->setVisible(true);
 }
 
 bool SARibbonCategoryPrivate::takePannel(SARibbonPannel* pannel)

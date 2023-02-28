@@ -144,7 +144,6 @@ public:
     SARibbonTabBar* ribbonTabBar();
 
     //添加一个标签
-
     SARibbonCategory* addCategoryPage(const QString& title);
     void addCategoryPage(SARibbonCategory* category);
 

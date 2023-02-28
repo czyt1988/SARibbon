@@ -10,7 +10,7 @@
 #include <set>
 #include "SARibbonPannel.h"
 #include "SARibbonPannelItem.h"
-
+#define SARibbonPannelLayout_DEBUG_PRINT 0
 #define HELP_DRAW_RECT(p, rect)                                                                                        \
     do {                                                                                                               \
         p.save();                                                                                                      \
@@ -265,7 +265,7 @@ void SARibbonPannelLayout::layoutActions()
     }
     QList< QWidget* > showWidgets, hideWidgets;
 
-#ifdef SA_RIBBON_DEBUG_HELP_DRAW
+#if SARibbonPannelLayout_DEBUG_PRINT
     qDebug() << "\r\n\r\n =============================================="
                 "\r\n SARibbonPannelLayout::layoutActions"
              << " \r\n name:" << parentWidget()->windowTitle() << " sizehint:" << this->sizeHint();
@@ -278,7 +278,7 @@ void SARibbonPannelLayout::layoutActions()
             //            item->widget()->setFixedSize(item->itemWillSetGeometry.size());
             //            item->widget()->move(item->itemWillSetGeometry.topLeft());
             showWidgets << item->widget();
-#ifdef SA_RIBBON_DEBUG_HELP_DRAW
+#if SARibbonPannelLayout_DEBUG_PRINT
             qDebug() << "[" << item->rowIndex << "," << item->columnIndex << "]"
                      << " -> " << item->itemWillSetGeometry << ":" << item->widget()->metaObject()->className();
 #endif
@@ -366,6 +366,9 @@ void SARibbonPannelLayout::updateGeomArray(const QRect& setrect)
         return;
     }
 
+#if SARibbonPannelLayout_DEBUG_PRINT
+    qDebug() << "SARibbonPannelLayout::updateGeomArray(" << setrect << ")";
+#endif
     int height          = setrect.height();
     const QMargins& mag = pannelContentsMargins();
     const int spacing   = this->spacing();
@@ -398,7 +401,7 @@ void SARibbonPannelLayout::updateGeomArray(const QRect& setrect)
 
     int itemCount = m_items.count();
 
-#ifdef SA_RIBBON_DEBUG_HELP_DRAW
+#if SARibbonPannelLayout_DEBUG_PRINT
     qDebug() << "\r\n\r\n============================================="
              << "\r\nSARibbonPannelLayout::updateGeomArray()"
              << " setrect:" << setrect << "\r\npannel name:" << pannel->windowTitle()
@@ -412,7 +415,7 @@ void SARibbonPannelLayout::updateGeomArray(const QRect& setrect)
         SARibbonPannelItem* item = m_items.at(i);
         if (item->isEmpty()) {
             //如果是hide就直接跳过
-#ifdef SA_RIBBON_DEBUG_HELP_DRAW
+#if SARibbonPannelLayout_DEBUG_PRINT
             qDebug() << item->widget()->metaObject()->className() << "is hide"
                      << " row:" << row << " col:" << column;
 #endif
@@ -587,7 +590,7 @@ void SARibbonPannelLayout::updateGeomArray(const QRect& setrect)
             break;
         }
         lastGeomItem = item;
-#ifdef SA_RIBBON_DEBUG_HELP_DRAW
+#if SARibbonPannelLayout_DEBUG_PRINT
         qDebug() << item->widget()->metaObject()->className() << " rp:" << rp << " row:" << item->rowIndex
                  << " col:" << item->columnIndex << " new row:" << row << " new column:" << column
                  << " itemWillSetGeometry:" << item->itemWillSetGeometry << " sizeHint:" << hint << " x:" << x;
