@@ -180,6 +180,38 @@ public:
         }
         return (_contextCategoryColorList.at(_contextCategoryColorListIndex));
     }
+
+    void updateTabData()
+    {
+        int tabcount = _ribbonTabBar->count();
+
+        for (int i = 0; i < tabcount; ++i) {
+            QVariant var = _ribbonTabBar->tabData(i);
+            if (var.isValid()) {
+                _SARibbonTabData p = var.value< _SARibbonTabData >();
+                p.index            = i;
+                _ribbonTabBar->setTabData(i, QVariant::fromValue(p));
+            }
+        }
+        //刷新完tabdata信息也要接着刷新ContextCategory信息
+        for (_SAContextCategoryManagerData& cd : _currentShowingContextCategory) {
+            cd.tabPageIndex.clear();
+            for (int i = 0; i < cd.contextCategory->categoryCount(); ++i) {
+                SARibbonCategory* category = cd.contextCategory->categoryPage(i);
+                for (int t = 0; t < tabcount; ++t) {
+                    QVariant v = _ribbonTabBar->tabData(t);
+                    if (v.isValid()) {
+                        _SARibbonTabData d = v.value< _SARibbonTabData >();
+                        if (d.category == category) {
+                            cd.tabPageIndex.append(t);
+                        }
+                    } else {
+                        cd.tabPageIndex.append(-1);
+                    }
+                }
+            }
+        }
+    }
 };
 
 /**
@@ -360,6 +392,8 @@ void SARibbonBar::insertCategoryPage(SARibbonCategory* category, int index)
     m_d->_stackedContainerWidget->insertWidget(index, category);
 
     connect(category, &QWidget::windowTitleChanged, this, &SARibbonBar::onCategoryWindowTitleChanged);
+    //更新index信息
+    m_d->updateTabData();
     QApplication::postEvent(this, new QResizeEvent(size(), size()));
 }
 
@@ -442,6 +476,9 @@ void SARibbonBar::hideCategory(SARibbonCategory* category)
             if (p.category == category) {
                 m_d->_hidedCategory.append(p);
                 m_d->_ribbonTabBar->removeTab(i);  //仅仅把tab移除
+                //注意Category隐藏后，contex的位置就会发生变化，需要更新
+                m_d->updateTabData();
+                return;
             }
         }
     }
@@ -460,6 +497,9 @@ void SARibbonBar::showCategory(SARibbonCategory* category)
             i->index  = index;
             m_d->_ribbonTabBar->setTabData(index, QVariant::fromValue(*i));
             m_d->_hidedCategory.erase(i);  //移除
+            //更新index信息
+            m_d->updateTabData();
+            raiseCategory(category);
             return;
         }
     }
@@ -508,16 +548,7 @@ void SARibbonBar::moveCategory(int from, int to)
 {
     m_d->_ribbonTabBar->moveTab(from, to);
     //这时要刷新所有tabdata的index信息
-    int tabcount = m_d->_ribbonTabBar->count();
-
-    for (int i = 0; i < tabcount; ++i) {
-        QVariant var = m_d->_ribbonTabBar->tabData(i);
-        if (var.isValid()) {
-            _SARibbonTabData p = var.value< _SARibbonTabData >();
-            p.index            = i;
-            m_d->_ribbonTabBar->setTabData(i, QVariant::fromValue(p));
-        }
-    }
+    m_d->updateTabData();
     //这里会触发tabMoved信号，在tabMoved信号中调整stacked里窗口的位置
 }
 
@@ -553,16 +584,20 @@ QList< SARibbonCategory* > SARibbonBar::categoryPages(bool getAll) const
  */
 void SARibbonBar::removeCategory(SARibbonCategory* category)
 {
-    int index = tabIndex(category);
-
+    int index     = tabIndex(category);
+    bool isupdate = false;
     if (index >= 0) {
         m_d->_ribbonTabBar->removeTab(index);
+        isupdate = true;
     }
     m_d->_stackedContainerWidget->removeWidget(category);
     //同时验证这个category是否是contexcategory里的
     for (SARibbonContextCategory* c : m_d->_contextCategoryList) {
         c->takeCategory(category);
-        updateContextCategoryManagerData();
+    }
+    //这时要刷新所有tabdata的index信息
+    if (isupdate) {
+        m_d->updateTabData();
     }
     //移除完后需要重绘
     repaint();
@@ -625,6 +660,7 @@ void SARibbonBar::showContextCategory(SARibbonContextCategory* context)
     contextCategoryData.contextCategory = context;
     for (int i = 0; i < context->categoryCount(); ++i) {
         SARibbonCategory* category = context->categoryPage(i);
+        //此句如果模式重复设置不会进行多余操作
         category->setRibbonPannelLayoutMode(isTwoRowStyle() ? SARibbonPannel::TwoRowMode : SARibbonPannel::ThreeRowMode);
         //切换模式后会改变高度，上下文标签显示时要保证显示出来
         // category->setFixedHeight(categoryHeight());
@@ -637,6 +673,7 @@ void SARibbonBar::showContextCategory(SARibbonContextCategory* context)
         m_d->_ribbonTabBar->setTabData(index, QVariant::fromValue(tabdata));
     }
     m_d->_currentShowingContextCategory.append(contextCategoryData);
+    //由于上下文都是在最后追加，不需要调用updateTabData();
     QApplication::postEvent(this, new QResizeEvent(size(), size()));
 }
 
@@ -646,7 +683,7 @@ void SARibbonBar::showContextCategory(SARibbonContextCategory* context)
  */
 void SARibbonBar::hideContextCategory(SARibbonContextCategory* context)
 {
-    bool ishide     = false;
+    bool needResize = false;
     int indexOffset = 0;
 
     for (int i = 0; i < m_d->_currentShowingContextCategory.size(); ++i) {
@@ -657,20 +694,14 @@ void SARibbonBar::hideContextCategory(SARibbonContextCategory* context)
                 ++indexOffset;
             }
             //注意，再删除ContextCategory后，tab的序号就会改变，这时，这个tab后面的都要调整它的序号
-
-            //这时需要迭代后面的currentShowingContextCategory
-            for (int j = i + 1; j < m_d->_currentShowingContextCategory.size(); ++j) {
-                for (int& oldindex : m_d->_currentShowingContextCategory[ j ].tabPageIndex) {
-                    oldindex -= indexOffset;
-                }
-            }
-            ishide = true;
+            needResize = true;
             m_d->_currentShowingContextCategory.removeAt(i);
             //移除了ContextCategory后需要break
             break;
         }
     }
-    if (ishide) {
+    if (needResize) {
+        m_d->updateTabData();
         QApplication::postEvent(this, new QResizeEvent(size(), size()));
     }
 }
