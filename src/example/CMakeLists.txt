@@ -1,1 +1,2 @@
 add_subdirectory(MainWindowExample)
+add_subdirectory(UseDesginerMainWindowExample)
