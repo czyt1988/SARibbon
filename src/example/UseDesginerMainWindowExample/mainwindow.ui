@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>mainwindow</class>
+ <class>MainWindow</class>
  <widget class="SARibbonMainWindow" name="mainwindow">
   <property name="geometry">
    <rect>
@@ -44,6 +44,16 @@
      <height>160</height>
     </rect>
    </property>
+   <widget class="SARibbonCategory" name="widget" native="true">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>90</y>
+      <width>120</width>
+      <height>80</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
   <widget class="QStatusBar" name="statusBar"/>
  </widget>
@@ -59,6 +69,11 @@
    <extends>QMenuBar</extends>
    <header>SARibbonBar.h</header>
    <addpagemethod>addCategoryPage</addpagemethod>
+  </customwidget>
+  <customwidget>
+   <class>SARibbonCategory</class>
+   <extends>QWidget</extends>
+   <header>SARibbonCategory.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
