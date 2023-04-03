@@ -186,7 +186,7 @@ void MainWindow::onActionHelpTriggered()
                                 "\n Author:czy"
                                 "\n Email:czy.t@163.com"
                                 "\n ===============")
-                             .arg(SARibbonBar::versionString()));
+                                     .arg(SARibbonBar::versionString()));
 }
 
 void MainWindow::onActionRemoveAppBtnTriggered(bool b)
@@ -950,9 +950,9 @@ void MainWindow::addSomeOtherAction()
 
     m_actMgr->registeAction(actIcon1, m_actionTagWithIcon);
 
-    m_actMgr->setTagName(SARibbonActionsManager::CommonlyUsedActionTag, ("常用"));
-    m_actMgr->setTagName(m_actionTagText, ("无图标action"));
-    m_actMgr->setTagName(m_actionTagWithIcon, ("有图标action"));
+    m_actMgr->setTagName(SARibbonActionsManager::CommonlyUsedActionTag, tr("in common use"));  //
+    m_actMgr->setTagName(m_actionTagText, tr("no icon action"));
+    m_actMgr->setTagName(m_actionTagWithIcon, tr("have icon action"));
 }
 
 QAction* MainWindow::createAction(const QString& text, const QString& iconurl, const QString& objName)
