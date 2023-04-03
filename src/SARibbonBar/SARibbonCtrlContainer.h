@@ -28,7 +28,7 @@ protected:
     void setContainerWidget(QWidget* w);
     void paintEvent(QPaintEvent* e) Q_DECL_OVERRIDE;
     void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
-    virtual void initStyleOption(QStyleOption* opt) = 0;
+    virtual void initStyleOption(QStyleOption* opt);
 
 private:
     SARibbonCtrlContainerPrivate* m_d;
