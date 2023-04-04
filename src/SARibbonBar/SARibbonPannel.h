@@ -97,6 +97,9 @@ public:
     //添加窗口,占用ribbon的一行
     QAction* addSmallWidget(QWidget* w);
 
+    //添加窗口,占用ribbon的一行
+    QAction* addMediumWidget(QWidget* w);
+
     //添加窗口，占用所有行
     QAction* addLargeWidget(QWidget* w);
 

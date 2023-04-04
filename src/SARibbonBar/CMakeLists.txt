@@ -3,9 +3,13 @@
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-qt_add_resources(QRCS resource.qrc)
+if(SARIBBON_QT_VERSION EQUAL 5)
+    qt5_add_resources(SARIBBON_QRCS resource.qrc)
+else()
+    qt5_add_resources(SARIBBON_QRCS resource.qrc)
+endif()
 
-SET(HEADER_FILES
+SET(SARIBBON_HEADER_FILES
     SAFramelessHelper.h
     SARibbonStyleOption.h
     SARibbonActionsManager.h
@@ -45,9 +49,13 @@ SET(HEADER_FILES
     SARibbonLineWidgetContainer.h
 )
 
-qt_wrap_cpp(MOC_HEADER_FILES ${HEADER_FILES})
+if(SARIBBON_QT_VERSION EQUAL 5)
+    qt5_wrap_cpp(SARIBBON_MOC_HEADER_FILES ${SARIBBON_HEADER_FILES})
+else()
+    qt6_wrap_cpp(SARIBBON_MOC_HEADER_FILES ${SARIBBON_HEADER_FILES})
+endif()
 
-SET(SOURCE_FILES
+SET(SARIBBON_SOURCE_FILES
     SAFramelessHelper.cpp
     SARibbonStyleOption.cpp
     SARibbonActionsManager.cpp
@@ -87,11 +95,17 @@ SET(SOURCE_FILES
 )
 
 add_library(${LIB_NAME}
-    ${QRCS}
-    ${MOC_HEADER_FILES}
-    ${HEADER_FILES}
-    ${SOURCE_FILES}
+    ${SARIBBON_QRCS}
+    ${SARIBBON_MOC_HEADER_FILES}
+    ${SARIBBON_HEADER_FILES}
+    ${SARIBBON_SOURCE_FILES}
 )
+
+if(SARIBBON_QT_VERSION EQUAL 5)
+    target_link_libraries(${LIB_NAME} Qt5::Widgets)
+else()
+    target_link_libraries(${LIB_NAME} Qt6::Widgets)
+endif()
 
 if (BUILD_SHARED_LIBS)
     target_compile_definitions(${LIB_NAME} PRIVATE SA_RIBBON_BAR_MAKE_LIB)
@@ -99,7 +113,6 @@ else()
     target_compile_definitions(${LIB_NAME} PUBLIC SA_RIBBON_BAR_NO_EXPORT)    
 endif()
 
-target_link_libraries(${LIB_NAME} Qt::Widgets)
 
 set_target_properties(${LIB_NAME} PROPERTIES
 	AUTOMOC TRUE
@@ -115,7 +128,7 @@ install(TARGETS ${LIB_NAME}
 	LIBRARY DESTINATION bin
 	ARCHIVE DESTINATION lib
 )
-install(FILES ${HEADER_FILES} DESTINATION include)
+install(FILES ${SARIBBON_HEADER_FILES} DESTINATION include)
 
 if(WIN32)
 	create_win32_resource_version(

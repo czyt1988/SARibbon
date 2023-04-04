@@ -348,6 +348,16 @@ QAction* SARibbonPannel::addSmallWidget(QWidget* w)
 }
 
 /**
+ * @brief 添加窗口,占用ribbon的一行
+ * @param w
+ * @return
+ */
+QAction* SARibbonPannel::addMediumWidget(QWidget* w)
+{
+    return (addWidget(w, SARibbonPannelItem::Medium));
+}
+
+/**
  * @brief 添加窗口，占用所有行
  * @param w
  * @return 返回action(QWidgetAction)
