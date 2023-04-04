@@ -12,7 +12,7 @@
  * @def ribbon的数字版本 MAJ.MIN.PAT
  */
 #ifndef SA_RIBBON_BAR_VERSION_MIN
-#define SA_RIBBON_BAR_VERSION_MIN 3
+#define SA_RIBBON_BAR_VERSION_MIN 4
 #endif
 /**
  * @def ribbon的数字版本 MAJ.MIN.PAT

@@ -1,9 +1,8 @@
-cmake_minimum_required(VERSION 3.15)
+﻿cmake_minimum_required(VERSION 3.15)
 
 set(PROJECT_VERSION_MAJOR 0)
-set(PROJECT_VERSION_MINOR 0)
-set(PROJECT_VERSION_PATCH 1)
-
+set(PROJECT_VERSION_MINOR 4)
+set(PROJECT_VERSION_PATCH 0)
 set (PROJECT_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
 if(PROJECT_VERSION_PATCH GREATER 0)
   set (PROJECT_VERSION "${PROJECT_VERSION}.${PROJECT_VERSION_PATCH}")
@@ -27,13 +26,26 @@ endif()
 
 include(CPack)
 
+
+message(STATUS "SARibbon ${PROJECT_VERSION}")
 find_package(Qt6 COMPONENTS Core Widgets Gui)
 if (NOT Qt6_FOUND)
-    find_package(Qt5 5.15 REQUIRED COMPONENTS Core Widgets Gui)
+    message(STATUS "Qt6 Not Found,Start Load Qt5")
+    find_package(Qt5 REQUIRED COMPONENTS Core Widgets Gui)
+    if(NOT Qt5_FOUND)
+        message(FATAL_ERROR "Qt5 Not Found")
+    else()
+        message(STATUS "Success Load Qt5")
+        set(SARIBBON_QT_VERSION 5)
+    endif()
+else()
+    message(STATUS "Success Load Qt6")
+    set(SARIBBON_QT_VERSION 6)
 endif()
 
-option(BUILD_EXAMPLES "build the examples" OFF)
-option(BUILD_SHARED_LIBS "Build in shared lib mode" ON)
+option(BUILD_EXAMPLES "build the examples" ON)
+option(BUILD_SHARED_LIBS "build the SARibbonBar in shared lib mode" ON)
+option(BUILD_DESIGNERPLUGIN "build the Designer Plugin" OFF)
 
 include(cmake/WinResource.cmake)
 add_subdirectory(src)

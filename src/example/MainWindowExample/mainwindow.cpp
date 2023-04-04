@@ -17,6 +17,8 @@
 #include <QElapsedTimer>
 #include <QRadioButton>
 #include <QButtonGroup>
+#include <QSpinBox>
+#include <QLineEdit>
 #include "SARibbonMenu.h"
 #include "SARibbonComboBox.h"
 #include "SARibbonLineEdit.h"
@@ -837,6 +839,21 @@ void MainWindow::createContextCategoryPage1(SARibbonCategory* page)
             actionHideAction4->setText(tr("show action4"));
         }
     });
+    //
+    SARibbonPannel* pannel4               = page->addPannel(("widget"));
+    QSpinBox* spinbox                     = new QSpinBox(this);
+    SARibbonCtrlContainer* ctrlContainer1 = new SARibbonCtrlContainer(pannel4);
+    ctrlContainer1->setContainerWidget(spinbox);
+    ctrlContainer1->setText(tr("spinbox:"));
+    ctrlContainer1->setEnableShowIcon(false);
+    pannel4->addMediumWidget(ctrlContainer1);
+
+    QLineEdit* linedit                    = new QLineEdit(this);
+    SARibbonCtrlContainer* ctrlContainer2 = new SARibbonCtrlContainer(pannel4);
+    ctrlContainer2->setContainerWidget(linedit);
+    ctrlContainer2->setText(tr("linedit:"));
+    ctrlContainer2->setEnableShowIcon(false);
+    pannel4->addMediumWidget(ctrlContainer2);
 }
 
 void MainWindow::createContextCategoryPage2(SARibbonCategory* page)

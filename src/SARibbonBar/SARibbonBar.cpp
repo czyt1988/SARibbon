@@ -1,4 +1,4 @@
-#include "SARibbonBar.h"
+﻿#include "SARibbonBar.h"
 #include "SAWindowButtonGroup.h"
 #include <QApplication>
 #include <QPainter>
@@ -99,7 +99,7 @@ public:
                                   << QColor(14, 81, 167)   // 蓝
                                   << QColor(228, 0, 69)    // 红
                                   << QColor(67, 148, 0)    // 绿
-        ;
+                ;
     }
 
     void init()
@@ -122,6 +122,7 @@ public:
         //
         _quickAccessBar = RibbonSubElementDelegate->createQuickAccessBar(_mainClass);
         _quickAccessBar->setObjectName(QStringLiteral("objSARibbonQuickAccessBar"));
+        _quickAccessBar->setIcon(_mainClass->windowIcon());
     }
 
     void setApplicationButton(QAbstractButton* btn)
@@ -871,7 +872,7 @@ void SARibbonBar::onWindowTitleChanged(const QString& title)
 void SARibbonBar::onWindowIconChanged(const QIcon& i)
 {
     if (quickAccessBar()) {
-        quickAccessBar()->setWindowIcon(i);
+        quickAccessBar()->setIcon(i);
     }
 }
 
@@ -1382,7 +1383,7 @@ void SARibbonBar::paintInNormalStyle()
             titleRegion.setRect(m_d->_quickAccessBar->geometry().right() + 1,
                                 border.top(),
                                 width() - m_d->_iconRightBorderPosition - border.right()
-                                - m_d->_windowButtonSize.width() - m_d->_quickAccessBar->geometry().right() - 1,
+                                        - m_d->_windowButtonSize.width() - m_d->_quickAccessBar->geometry().right() - 1,
                                 titleBarHeight());
         } else {
             int leftwidth = contextCategoryRegion.x() - m_d->_quickAccessBar->geometry().right() - m_d->_iconRightBorderPosition;
