@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         ubuntu_version: [20.04, 22.04]
-        qt_version: [5.15.2, 6.4.0]
+        qt_version: [5.8.0, 6.4.0]
         shared: [ON, OFF]
 
     steps:
@@ -30,7 +30,7 @@ jobs:
           dir: ${{ github.workspace }}/Qt
 
     - name: Configure CMake
-      run: cmake -DCMAKE_BUILD_TYPE="${{env.BUILD_TYPE}}" -DBUILD_SHARED_LIBS=${{ matrix.shared }} -DBUILD_EXAMPLES=ON -B "${{github.workspace}}/build"
+      run: cmake -DCMAKE_BUILD_TYPE="${{env.BUILD_TYPE}}" -DBUILD_SHARED_LIBS=${{ matrix.shared }} -DBUILD_EXAMPLES=OFF -B "${{github.workspace}}/build"
 
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
@@ -42,7 +42,7 @@ jobs:
       fail-fast: false
       matrix:
         win_version: [2019, 2022]
-        qt_version: [5.15.2, 6.4.0]
+        qt_version: [5.8.0, 6.5.0]
         shared: [ON, OFF]
 
     steps:
@@ -58,7 +58,7 @@ jobs:
             dir: ${{ github.workspace }}/Qt
 
       - name: Configure CMake
-        run: cmake -DCMAKE_BUILD_TYPE="${{env.BUILD_TYPE}}" -DBUILD_SHARED_LIBS=${{ matrix.shared }} -DBUILD_EXAMPLES=ON -B "${{github.workspace}}/build"
+        run: cmake -DCMAKE_BUILD_TYPE="${{env.BUILD_TYPE}}" -DBUILD_SHARED_LIBS=${{ matrix.shared }} -DBUILD_EXAMPLES=OFF -B "${{github.workspace}}/build"
 
       - name: Build
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
@@ -70,7 +70,7 @@ jobs:
       fail-fast: false
       matrix:
         macos_version: [11, 12]
-        qt_version: [5.15.2, 6.4.0]
+        qt_version: [5.8.0, 6.5.0]
         shared: [ON, OFF]
 
     steps:
@@ -86,7 +86,7 @@ jobs:
             dir: ${{ github.workspace }}/Qt
 
       - name: Configure CMake
-        run: cmake -DCMAKE_BUILD_TYPE="${{env.BUILD_TYPE}}" -DBUILD_SHARED_LIBS=${{ matrix.shared }} -DBUILD_EXAMPLES=ON -B "${{github.workspace}}/build"
+        run: cmake -DCMAKE_BUILD_TYPE="${{env.BUILD_TYPE}}" -DBUILD_SHARED_LIBS=${{ matrix.shared }} -DBUILD_EXAMPLES=OFF -B "${{github.workspace}}/build"
 
       - name: Build
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
