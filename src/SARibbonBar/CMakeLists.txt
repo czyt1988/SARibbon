@@ -1,14 +1,12 @@
-﻿set(LIB_NAME SARibbonBar)
+﻿cmake_minimum_required(VERSION 3.5)
+project(SARibbonBar LANGUAGES CXX VERSION ${SARIBBON_VERSION})
+set(LIB_NAME SARibbonBar)
 
-set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-if(SARIBBON_QT_VERSION EQUAL 5)
-    qt5_add_resources(SARIBBON_QRCS resource.qrc)
-else()
-    qt5_add_resources(SARIBBON_QRCS resource.qrc)
-endif()
 
+# header files
+# cn:头文件
 SET(SARIBBON_HEADER_FILES
     SAFramelessHelper.h
     SARibbonStyleOption.h
@@ -49,12 +47,8 @@ SET(SARIBBON_HEADER_FILES
     SARibbonLineWidgetContainer.h
 )
 
-if(SARIBBON_QT_VERSION EQUAL 5)
-    qt5_wrap_cpp(SARIBBON_MOC_HEADER_FILES ${SARIBBON_HEADER_FILES})
-else()
-    qt6_wrap_cpp(SARIBBON_MOC_HEADER_FILES ${SARIBBON_HEADER_FILES})
-endif()
-
+# source files
+# cn:cpp文件
 SET(SARIBBON_SOURCE_FILES
     SAFramelessHelper.cpp
     SARibbonStyleOption.cpp
@@ -94,18 +88,36 @@ SET(SARIBBON_SOURCE_FILES
     SARibbonLineWidgetContainer.cpp
 )
 
-add_library(${LIB_NAME}
-    ${SARIBBON_QRCS}
-    ${SARIBBON_MOC_HEADER_FILES}
-    ${SARIBBON_HEADER_FILES}
-    ${SARIBBON_SOURCE_FILES}
+# resource files
+# cn:资源文件
+SET(SARIBBON_RESOURCE_FILES
+    resource.qrc
 )
 
-if(SARIBBON_QT_VERSION EQUAL 5)
-    target_link_libraries(${LIB_NAME} Qt5::Widgets)
-else()
-    target_link_libraries(${LIB_NAME} Qt6::Widgets)
-endif()
+add_library(${LIB_NAME} SHARED
+    ${SARIBBON_HEADER_FILES}
+    ${SARIBBON_SOURCE_FILES}
+    ${SARIBBON_RESOURCE_FILES}
+)
+
+
+target_link_libraries(${LIB_NAME} PUBLIC
+                      Qt${QT_VERSION_MAJOR}::Core
+                      Qt${QT_VERSION_MAJOR}::Gui
+                      Qt${QT_VERSION_MAJOR}::Widgets)
+
+set_target_properties(${LIB_NAME} PROPERTIES
+    AUTOMOC ON
+    AUTOUIC ON
+    AUTORCC ON
+    CXX_EXTENSIONS OFF
+    DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX}
+    VERSION ${SARIBBON_VERSION}
+    EXPORT_NAME ${LIB_NAME}
+    ARCHIVE_OUTPUT_DIRECTORY "${SARIBBON_BIN_DIR}"
+    LIBRARY_OUTPUT_DIRECTORY "${SARIBBON_BIN_DIR}"
+    RUNTIME_OUTPUT_DIRECTORY "${SARIBBON_BIN_DIR}"
+)
 
 if (BUILD_SHARED_LIBS)
     target_compile_definitions(${LIB_NAME} PRIVATE SA_RIBBON_BAR_MAKE_LIB)
@@ -114,14 +126,7 @@ else()
 endif()
 
 
-set_target_properties(${LIB_NAME} PROPERTIES
-	AUTOMOC TRUE
-	AUTOUIC TRUE
-	AUTORCC TRUE
-	DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX}
-	VERSION ${PROJECT_VERSION}
-	SOVERSION ${PROJECT_VERSION}
-)
+
 target_include_directories(${LIB_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
 install(TARGETS ${LIB_NAME}
 	RUNTIME DESTINATION bin

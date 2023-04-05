@@ -1,6 +1,6 @@
 ﻿add_subdirectory(SARibbonBar)
 if(BUILD_EXAMPLES)
-    message(STATUS "add example")
+    message(STATUS "build example")
     add_subdirectory(example)
 endif()
 #if(BUILD_DESIGNERPLUGIN)
