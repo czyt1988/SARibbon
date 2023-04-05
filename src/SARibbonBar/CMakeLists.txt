@@ -119,11 +119,8 @@ set_target_properties(${LIB_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${SARIBBON_BIN_DIR}"
 )
 
-if (BUILD_SHARED_LIBS)
-    target_compile_definitions(${LIB_NAME} PRIVATE SA_RIBBON_BAR_MAKE_LIB)
-else()
-    target_compile_definitions(${LIB_NAME} PUBLIC SA_RIBBON_BAR_NO_EXPORT)    
-endif()
+target_compile_definitions(${LIB_NAME} PRIVATE SA_RIBBON_BAR_MAKE_LIB)
+
 
 
 

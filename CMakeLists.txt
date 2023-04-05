@@ -6,7 +6,7 @@ set(SARIBBON_VERSION_PATCH 0)
 set(SARIBBON_VERSION "${SARIBBON_VERSION_MAJOR}.${SARIBBON_VERSION_MINOR}.${SARIBBON_VERSION_PATCH}")
 project(SARibbon VERSION ${SARIBBON_VERSION} LANGUAGES CXX)
 
-option(BUILD_SHARED_LIBS "build the SARibbonBar in shared lib mode" ON)
+# option(BUILD_SHARED_LIBS "build the SARibbonBar in shared lib mode" ON)
 option(BUILD_EXAMPLES "build the examples" OFF)
 option(BUILD_DESIGNERPLUGIN "build the Designer Plugin" OFF)
 
