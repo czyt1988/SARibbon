@@ -7,7 +7,7 @@ This is a lightweight Ribbon control (Officestyle UI) based on Qt (minimum Qt5, 
 
 MIT protocol, welcome to use and make comments
 
-[gitee]- https://gitee.com/czyt1988/SARibbon ] ( https://gitee.com/czyt1988/SARibbon )
+[gitee - https://gitee.com/czyt1988/SARibbon ] ( https://gitee.com/czyt1988/SARibbon )
 
 [github - https://github.com/czyt1988/SARibbon ] ( https://github.com/czyt1988/SARibbon )
 
@@ -16,6 +16,8 @@ MIT protocol, welcome to use and make comments
 Open `SARibbon.pro` directly using Qt Creator, and compile it.  The SARibbonBar library and an example (there is only one example at present) will be compiled.  The directories of lib and examples are located in bin_ Qt{Qt version}_ {debug/release}_ {32/64}` under directory.
 
 > 'd' will be added after the library compiled in debug mode for distinction
+
+> Note:The minimum Qt version is 5.8
 
 # Usage
 
