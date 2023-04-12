@@ -481,11 +481,11 @@ SARibbon实现自定义只需上述几步即可实现。
 
 - 这是使用此控件的本人另外一个开源软件的截图
 
-![](./doc/screenshot/sa-screenshot.gif)
+![](./doc/screenshot/data-workbench-screenshot1-cn.gif)
+![](./doc/screenshot/data-workbench-screenshot01-en.png)
+[github - https://github.com/czyt1988/data-workbench](https://github.com/czyt1988/data-workbench)
 
-[github - https://github.com/czyt1988/sa](https://github.com/czyt1988/sa)
-
-[gitee - https://gitee.com/czyt1988/SA](https://gitee.com/czyt1988/SA)
+[gitee - https://gitee.com/czyt1988/data-workbench](https://gitee.com/czyt1988/data-workbench)
 
 # 题外
 
@@ -495,20 +495,21 @@ SARibbon实现自定义只需上述几步即可实现。
 
 更多界面截图可看：
 
-[github - https://github.com/czyt1988/sa](https://github.com/czyt1988/sa)
+[github - https://github.com/czyt1988/data-workbench](https://github.com/czyt1988/data-workbench)
 
-[gitee - https://gitee.com/czyt1988/SA](https://gitee.com/czyt1988/SA)
+[gitee - https://gitee.com/czyt1988/data-workbench](https://gitee.com/czyt1988/data-workbench)
 
 SARibbon项目是SA项目的子项
 
 具体Ribbon的生成代码可见：
-[https://github.com/czyt1988/sa/blob/master/src/signA/MainWindowPrivate.cpp](https://github.com/czyt1988/sa/blob/master/src/signA/MainWindowPrivate.cpp)
+[https://github.com/czyt1988/data-workbench/blob/master/src/APP/DAAppRibbonArea.cpp](https://github.com/czyt1988/data-workbench/blob/master/src/APP/DAAppRibbonArea.cpp)
 
 这个ribbon主要通过QTabbar和QStackWidget实现，按照微软MFCRibbbon的接口命名方式来写，主要通过qss来控制，默认qss在资源文件中，理论上能满足各种样式，可以实现样式的切换(换肤)
 
-若有空会把这个`SARibbon`和`SA`一起打包讲讲如何开发，其中遇到的一些坑啊和注意的问题。
 
 # 计划及进度
+
+目前我的开发精力主要在[data-workbench](https://github.com/czyt1988/data-workbench)中，我会在开发过程遇到的问题对SARibbon进行修正，也会针对Issues进行修正
 
 ## 计划
 
