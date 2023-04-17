@@ -106,4 +106,5 @@ void SAColorGridWidget::setIconSize(const QSize& s)
  */
 QSize SAColorGridWidget::getIconSize() const
 {
+    return QSize();
 }

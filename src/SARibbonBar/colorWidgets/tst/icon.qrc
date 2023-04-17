@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/colorWidgetTst">
+        <file>icon/text.svg</file>
+    </qresource>
+</RCC>

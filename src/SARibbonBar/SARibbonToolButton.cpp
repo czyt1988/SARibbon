@@ -583,10 +583,8 @@ void SARibbonToolButton::drawIconAndLabel(QPainter& p, QStyleOptionToolButton& o
         }
     } else {
         //小图标
-        QSize pmSize = opt.iconSize;
         if (!opt.icon.isNull()) {
             QPixmap pm = createIconPixmap(opt, m_iconRect.size());
-            pmSize     = pm.size() / pm.devicePixelRatio();
 
             if (opt.toolButtonStyle != Qt::ToolButtonIconOnly) {
                 p.save();
