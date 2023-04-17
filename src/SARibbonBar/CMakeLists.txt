@@ -87,7 +87,21 @@ SET(SARIBBON_SOURCE_FILES
     SARibbonPannelItem.cpp
     SARibbonLineWidgetContainer.cpp
 )
-
+# 颜色组件SAColorWidgets
+# https://github.com/czyt1988/SAColorWidgets
+SET(SACOLOR_HEADER_FILES
+    ./colorWidgets/SAColorWidgetsGlobal.h
+    ./colorWidgets/SAColorToolButton.h
+    ./colorWidgets/SAColorGridWidget.h
+    ./colorWidgets/SAColorPaletteGridWidget.h
+    ./colorWidgets/SAColorMenu.h
+)
+SET(SACOLOR_SOURCE_FILES
+    ./colorWidgets/SAColorToolButton.cpp
+    ./colorWidgets/SAColorGridWidget.cpp
+    ./colorWidgets/SAColorPaletteGridWidget.cpp
+    ./colorWidgets/SAColorMenu.cpp
+)
 # resource files
 # cn:资源文件
 SET(SARIBBON_RESOURCE_FILES
@@ -97,6 +111,8 @@ SET(SARIBBON_RESOURCE_FILES
 add_library(${LIB_NAME} SHARED
     ${SARIBBON_HEADER_FILES}
     ${SARIBBON_SOURCE_FILES}
+    ${SACOLOR_HEADER_FILES}
+    ${SACOLOR_SOURCE_FILES}
     ${SARIBBON_RESOURCE_FILES}
 )
 
@@ -118,9 +134,10 @@ set_target_properties(${LIB_NAME} PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY "${SARIBBON_BIN_DIR}"
     RUNTIME_OUTPUT_DIRECTORY "${SARIBBON_BIN_DIR}"
 )
-
+# 构建库定义的宏
 target_compile_definitions(${LIB_NAME} PRIVATE SA_RIBBON_BAR_MAKE_LIB)
-
+# 使用SAColorWidgets但不作为库使用定义的宏
+target_compile_definitions(${LIB_NAME} PRIVATE SA_COLOR_WIDGETS_NO_DLL)
 
 
 

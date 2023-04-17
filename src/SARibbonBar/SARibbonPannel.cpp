@@ -31,10 +31,11 @@
         p.restore();                                                                                                   \
     } while (0)
 
-class SARibbonPannelPrivate
+class SARibbonPannel::PrivateData
 {
+    SA_RIBBON_DECLARE_PUBLIC(SARibbonPannel)
 public:
-    SARibbonPannelPrivate(SARibbonPannel* p);
+    PrivateData(SARibbonPannel* p);
     //根据m_pannelLayoutMode返回gridLayout应该增加的行数
     int rowadded();
     void createLayout();
@@ -42,31 +43,24 @@ public:
     //返回最后一个添加的action对应的button，前提是最后一个是toolbutton，否则返回nullptr
     SARibbonToolButton* lastAddActionButton();
 
-    SARibbonPannel* Parent;
-    SARibbonPannelLayout* m_layout;
+public:
+    bool m_isCanCustomize { true };  ///< 记录是否可自定义
+    int m_row { 0 };  ///< 记录小action所在的gridLayout行数，gridLayout总共划分为6行，用于满足3行或2行的按钮需求
+    SARibbonPannel::PannelLayoutMode m_pannelLayoutMode { SARibbonPannel::ThreeRowMode };  ///< pannel的布局模式，默认为3行模式ThreeRowMode
+    SARibbonPannelLayout* m_layout { nullptr };
+    SARibbonPannelOptionButton* m_optionActionButton { nullptr };  ///< 标题栏的y距离
     QPoint m_nextElementPosition;
-    int m_row;  ///< 记录小action所在的gridLayout行数，gridLayout总共划分为6行，用于满足3行或2行的按钮需求
-    SARibbonPannelOptionButton* m_optionActionButton;     ///< 标题栏的y距离
-    SARibbonPannel::PannelLayoutMode m_pannelLayoutMode;  ///< pannel的布局模式，默认为3行模式ThreeRowMode
-    bool m_isCanCustomize;                                ///< 记录是否可自定义
-    static int s_pannelTitleHeight;                       ///< pannel标题栏的全局高度,默认为21
+    static int s_pannelTitleHeight;  ///< pannel标题栏的全局高度,默认为21
 };
 
-int SARibbonPannelPrivate::s_pannelTitleHeight = 21;
+int SARibbonPannel::PrivateData::s_pannelTitleHeight = 21;
 
-SARibbonPannelPrivate::SARibbonPannelPrivate(SARibbonPannel* p)
-    : Parent(p)
-    , m_layout(nullptr)
-    , m_nextElementPosition(3, 3)
-    , m_row(0)
-    , m_optionActionButton(nullptr)
-    , m_pannelLayoutMode(SARibbonPannel::ThreeRowMode)
-    , m_isCanCustomize(true)
+SARibbonPannel::PrivateData::PrivateData(SARibbonPannel* p) : q_ptr(p)
 {
     createLayout();
 }
 
-int SARibbonPannelPrivate::rowadded()
+int SARibbonPannel::PrivateData::rowadded()
 {
     switch (m_pannelLayoutMode) {
     case SARibbonPannel::ThreeRowMode:
@@ -81,14 +75,14 @@ int SARibbonPannelPrivate::rowadded()
     return (2);
 }
 
-void SARibbonPannelPrivate::createLayout()
+void SARibbonPannel::PrivateData::createLayout()
 {
-    m_layout = new SARibbonPannelLayout(Parent);
+    m_layout = new SARibbonPannelLayout(q_ptr);
     m_layout->setSpacing(2);
     m_layout->setContentsMargins(2, 2, 2, 2);
 }
 
-SARibbonToolButton* SARibbonPannelPrivate::lastAddActionButton()
+SARibbonToolButton* SARibbonPannel::PrivateData::lastAddActionButton()
 {
     QWidget* w = m_layout->lastWidget();
 
@@ -99,13 +93,13 @@ SARibbonToolButton* SARibbonPannelPrivate::lastAddActionButton()
 // SARibbonPannel
 //==================================================
 
-SARibbonPannel::SARibbonPannel(QWidget* parent) : QWidget(parent), m_d(new SARibbonPannelPrivate(this))
+SARibbonPannel::SARibbonPannel(QWidget* parent) : QWidget(parent), d_ptr(new SARibbonPannel::PrivateData(this))
 {
     setPannelLayoutMode(ThreeRowMode);
 }
 
 SARibbonPannel::SARibbonPannel(const QString& name, QWidget* parent)
-    : QWidget(parent), m_d(new SARibbonPannelPrivate(this))
+    : QWidget(parent), d_ptr(new SARibbonPannel::PrivateData(this))
 {
     setPannelLayoutMode(ThreeRowMode);
     setPannelName(name);
@@ -113,7 +107,6 @@ SARibbonPannel::SARibbonPannel(const QString& name, QWidget* parent)
 
 SARibbonPannel::~SARibbonPannel()
 {
-    delete m_d;
 }
 
 /**
@@ -155,7 +148,7 @@ void SARibbonPannel::setActionRowProportion(QAction* action, SARibbonPannelItem:
     if (action == nullptr) {
         return;
     }
-    SARibbonPannelLayout* lay = m_d->m_layout;
+    SARibbonPannelLayout* lay = d_ptr->m_layout;
 
     setActionRowProportionProperty(action, rp);
     if (lay) {
@@ -181,7 +174,7 @@ SARibbonToolButton* SARibbonPannel::addAction(QAction* action, SARibbonPannelIte
     setActionRowProportionProperty(action, rp);
     addAction(action);
 
-    return (m_d->lastAddActionButton());
+    return (d_ptr->lastAddActionButton());
 }
 
 /**
@@ -230,7 +223,7 @@ void SARibbonPannel::addAction(QAction* act, QToolButton::ToolButtonPopupMode po
     }
     setActionRowProportionProperty(act, rp);
     addAction(act);
-    SARibbonToolButton* btn = m_d->lastAddActionButton();
+    SARibbonToolButton* btn = d_ptr->lastAddActionButton();
 
     if (btn) {
         btn->setPopupMode(popMode);
@@ -273,7 +266,7 @@ SARibbonToolButton* SARibbonPannel::addMenu(QMenu* menu, SARibbonPannelItem::Row
     QAction* action = menu->menuAction();
 
     addAction(action, rp);
-    SARibbonToolButton* btn = m_d->lastAddActionButton();
+    SARibbonToolButton* btn = d_ptr->lastAddActionButton();
 
     btn->setPopupMode(popMode);
     return (btn);
@@ -394,7 +387,7 @@ QAction* SARibbonPannel::addSeparator(int top, int bottom)
     action->setSeparator(true);
     setActionRowProportionProperty(action, SARibbonPannelItem::Large);
     addAction(action);
-    QWidget* w                   = m_d->m_layout->lastWidget();
+    QWidget* w                   = d_ptr->m_layout->lastWidget();
     SARibbonSeparatorWidget* sep = qobject_cast< SARibbonSeparatorWidget* >(w);
 
     if (sep) {
@@ -448,17 +441,17 @@ QList< SARibbonToolButton* > SARibbonPannel::ribbonToolButtons() const
  */
 void SARibbonPannel::setPannelLayoutMode(SARibbonPannel::PannelLayoutMode mode)
 {
-    if (m_d->m_pannelLayoutMode == mode) {
+    if (d_ptr->m_pannelLayoutMode == mode) {
         return;
     }
-    m_d->m_pannelLayoutMode = mode;
+    d_ptr->m_pannelLayoutMode = mode;
     resetLayout(mode);
     resetLargeToolButtonStyle();
 }
 
 SARibbonPannel::PannelLayoutMode SARibbonPannel::pannelLayoutMode() const
 {
-    return (m_d->m_pannelLayoutMode);
+    return (d_ptr->m_pannelLayoutMode);
 }
 
 /**
@@ -470,18 +463,18 @@ SARibbonPannel::PannelLayoutMode SARibbonPannel::pannelLayoutMode() const
 void SARibbonPannel::addOptionAction(QAction* action)
 {
     if (nullptr == action) {
-        if (m_d->m_optionActionButton) {
-            delete m_d->m_optionActionButton;
-            m_d->m_optionActionButton = nullptr;
+        if (d_ptr->m_optionActionButton) {
+            delete d_ptr->m_optionActionButton;
+            d_ptr->m_optionActionButton = nullptr;
         }
         return;
     }
-    if (nullptr == m_d->m_optionActionButton) {
-        m_d->m_optionActionButton = RibbonSubElementDelegate->createRibbonPannelOptionButton(this);
+    if (nullptr == d_ptr->m_optionActionButton) {
+        d_ptr->m_optionActionButton = RibbonSubElementDelegate->createRibbonPannelOptionButton(this);
     }
-    m_d->m_optionActionButton->setFixedSize(optionActionButtonSize());
-    m_d->m_optionActionButton->setIconSize(optionActionButtonSize() - QSize(-2, -2));
-    m_d->m_optionActionButton->connectAction(action);
+    d_ptr->m_optionActionButton->setFixedSize(optionActionButtonSize());
+    d_ptr->m_optionActionButton->setIconSize(optionActionButtonSize() - QSize(-2, -2));
+    d_ptr->m_optionActionButton->connectAction(action);
     updateGeometry();  //通知layout进行重新布局
     repaint();
 }
@@ -492,7 +485,7 @@ void SARibbonPannel::addOptionAction(QAction* action)
  */
 bool SARibbonPannel::isHaveOptionAction() const
 {
-    return (m_d->m_optionActionButton != nullptr);
+    return (d_ptr->m_optionActionButton != nullptr);
 }
 
 QSize SARibbonPannel::maxHightIconSize(const QSize& size, int h)
@@ -516,8 +509,8 @@ void SARibbonPannel::paintEvent(QPaintEvent* event)
         QFont f      = font();
         f.setPixelSize(th * 0.6);
         p.setFont(f);
-        if (m_d->m_optionActionButton) {
-            p.drawText(1, height() - th, width() - m_d->m_optionActionButton->width() - 4, th, Qt::AlignCenter, windowTitle());
+        if (d_ptr->m_optionActionButton) {
+            p.drawText(1, height() - th, width() - d_ptr->m_optionActionButton->width() - 4, th, Qt::AlignCenter, windowTitle());
 #ifdef SA_RIBBON_DEBUG_HELP_DRAW
             QRect r = QRect(1, height() - th, width() - m_d->m_optionActionButton->width() - 4, th - 2);
             HELP_DRAW_RECT(p, r);
@@ -543,9 +536,9 @@ QSize SARibbonPannel::sizeHint() const
         //三行模式
         QFontMetrics fm = fontMetrics();
         QSize titleSize = fm.size(Qt::TextShowMnemonic, windowTitle());
-        if (m_d->m_optionActionButton) {
+        if (d_ptr->m_optionActionButton) {
             // optionActionButton的宽度需要预留
-            titleSize.setWidth(titleSize.width() + m_d->m_optionActionButton->width() + 4);
+            titleSize.setWidth(titleSize.width() + d_ptr->m_optionActionButton->width() + 4);
         }
         maxWidth = qMax(maxWidth, titleSize.width());
     }
@@ -602,7 +595,7 @@ QSize SARibbonPannel::optionActionButtonSize() const
  */
 int SARibbonPannel::actionIndex(QAction* act) const
 {
-    return (m_d->m_layout->indexOf(act));
+    return (d_ptr->m_layout->indexOf(act));
 }
 
 /**
@@ -612,7 +605,7 @@ int SARibbonPannel::actionIndex(QAction* act) const
  */
 void SARibbonPannel::moveAction(int from, int to)
 {
-    m_d->m_layout->move(from, to);
+    d_ptr->m_layout->move(from, to);
     updateGeometry();  //通知layout进行重新布局
 }
 
@@ -622,7 +615,7 @@ void SARibbonPannel::moveAction(int from, int to)
  */
 bool SARibbonPannel::isCanCustomize() const
 {
-    return (m_d->m_isCanCustomize);
+    return (d_ptr->m_isCanCustomize);
 }
 
 /**
@@ -631,7 +624,7 @@ bool SARibbonPannel::isCanCustomize() const
  */
 void SARibbonPannel::setCanCustomize(bool b)
 {
-    m_d->m_isCanCustomize = b;
+    d_ptr->m_isCanCustomize = b;
 }
 
 QString SARibbonPannel::pannelName() const
@@ -667,7 +660,7 @@ int SARibbonPannel::largeHeight() const
  */
 int SARibbonPannel::pannelTitleHeight()
 {
-    return SARibbonPannelPrivate::s_pannelTitleHeight;
+    return SARibbonPannel::PrivateData::s_pannelTitleHeight;
 }
 
 /**
@@ -678,7 +671,7 @@ int SARibbonPannel::pannelTitleHeight()
  */
 void SARibbonPannel::setPannelTitleHeight(int h)
 {
-    SARibbonPannelPrivate::s_pannelTitleHeight = h;
+    SARibbonPannel::PrivateData::s_pannelTitleHeight = h;
 }
 
 void SARibbonPannel::resetLayout(PannelLayoutMode newmode)
@@ -714,13 +707,14 @@ void SARibbonPannel::resetLargeToolButtonStyle()
 void SARibbonPannel::resizeEvent(QResizeEvent* event)
 {
     //! 1.移动操作按钮到角落
-    if (m_d->m_optionActionButton) {
+    if (d_ptr->m_optionActionButton) {
         if (ThreeRowMode == pannelLayoutMode()) {
-            m_d->m_optionActionButton->move(width() - m_d->m_optionActionButton->width() - 2,
-                                            height() - titleHeight() + (titleHeight() - m_d->m_optionActionButton->height()) / 2);
+            d_ptr->m_optionActionButton->move(width() - d_ptr->m_optionActionButton->width() - 2,
+                                              height() - titleHeight()
+                                                      + (titleHeight() - d_ptr->m_optionActionButton->height()) / 2);
         } else {
-            m_d->m_optionActionButton->move(width() - m_d->m_optionActionButton->width(),
-                                            height() - m_d->m_optionActionButton->height());
+            d_ptr->m_optionActionButton->move(width() - d_ptr->m_optionActionButton->width(),
+                                              height() - d_ptr->m_optionActionButton->height());
         }
     }
     //! 2.resize后，重新设置分割线的高度
@@ -751,7 +745,7 @@ void SARibbonPannel::actionEvent(QActionEvent* e)
 
     switch (e->type()) {
     case QEvent::ActionAdded: {
-        SARibbonPannelLayout* lay = m_d->m_layout;
+        SARibbonPannelLayout* lay = d_ptr->m_layout;
         if (nullptr != widgetAction) {
             if (widgetAction->parent() != this) {
                 widgetAction->setParent(this);
@@ -782,7 +776,7 @@ void SARibbonPannel::actionEvent(QActionEvent* e)
     } break;
 
     case QEvent::ActionRemoved: {
-        SARibbonPannelLayout* lay = m_d->m_layout;
+        SARibbonPannelLayout* lay = d_ptr->m_layout;
         action->disconnect(this);
         int index = lay->indexOf(action);
         if (index != -1) {
@@ -806,5 +800,5 @@ void SARibbonPannel::actionEvent(QActionEvent* e)
  */
 const QList< SARibbonPannelItem* >& SARibbonPannel::ribbonPannelItem() const
 {
-    return (m_d->m_layout->m_items);
+    return (d_ptr->m_layout->m_items);
 }

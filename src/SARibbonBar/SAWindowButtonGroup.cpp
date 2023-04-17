@@ -10,33 +10,25 @@
 /**
  * @brief The SAWindowButtonGroupPrivate class
  */
-class SAWindowButtonGroupPrivate
+class SAWindowButtonGroup::PrivateData
 {
+    SA_RIBBON_DECLARE_PUBLIC(SAWindowButtonGroup)
 public:
-    SAWindowButtonGroup* q_d;
-    SAWindowToolButton* buttonClose;
-    SAWindowToolButton* buttonMinimize;
-    SAWindowToolButton* buttonMaximize;
-    int mCloseStretch;
-    int mMaxStretch;
-    int mMinStretch;
-    qreal mIconscale;
+    SAWindowToolButton* buttonClose { nullptr };
+    SAWindowToolButton* buttonMinimize { nullptr };
+    SAWindowToolButton* buttonMaximize { nullptr };
+    int mCloseStretch { 4 };
+    int mMaxStretch { 3 };
+    int mMinStretch { 3 };
+    qreal mIconscale { 0.5 };
     Qt::WindowFlags mFlags;
-    SAWindowButtonGroupPrivate(SAWindowButtonGroup* p)
-        : q_d(p)
-        , buttonClose(nullptr)
-        , buttonMinimize(nullptr)
-        , buttonMaximize(nullptr)
-        , mCloseStretch(4)
-        , mMaxStretch(3)
-        , mMinStretch(3)
-        , mIconscale(0.5)
+    PrivateData(SAWindowButtonGroup* p) : q_ptr(p), mFlags(Qt::WindowFlags())
     {
     }
 
     void setupMinimizeButton(bool on)
     {
-        SAWindowButtonGroup* par = q_d;
+        SAWindowButtonGroup* par = q_ptr;
 
         if (on) {
             if (buttonMinimize) {
@@ -61,7 +53,7 @@ public:
 
     void setupMaximizeButton(bool on)
     {
-        SAWindowButtonGroup* par = q_d;
+        SAWindowButtonGroup* par = q_ptr;
 
         if (on) {
             if (buttonMaximize) {
@@ -87,7 +79,7 @@ public:
 
     void setupCloseButton(bool on)
     {
-        SAWindowButtonGroup* par = q_d;
+        SAWindowButtonGroup* par = q_ptr;
 
         if (on) {
             if (buttonClose) {
@@ -113,8 +105,8 @@ public:
 
     void updateSize()
     {
-        q_d->setFixedSize(sizeHint());
-        resize(q_d->size());
+        q_ptr->setFixedSize(sizeHint());
+        resize(q_ptr->size());
         //        int span = 0;
 
         //        if (buttonClose) {
@@ -193,12 +185,16 @@ public:
     }
 };
 
+//===================================================
+// SAWindowToolButton
+//===================================================
 SAWindowToolButton::SAWindowToolButton(QWidget* p) : QPushButton(p)
 {
     setFlat(true);
 }
 
-SAWindowButtonGroup::SAWindowButtonGroup(QWidget* parent) : QWidget(parent), m_d(new SAWindowButtonGroupPrivate(this))
+SAWindowButtonGroup::SAWindowButtonGroup(QWidget* parent)
+    : QWidget(parent), d_ptr(new SAWindowButtonGroup::PrivateData(this))
 {
     updateWindowFlag();
     if (parent) {
@@ -212,9 +208,9 @@ SAWindowButtonGroup::SAWindowButtonGroup(QWidget* parent) : QWidget(parent), m_d
  * @param flags
  */
 SAWindowButtonGroup::SAWindowButtonGroup(QWidget* parent, Qt::WindowFlags flags)
-    : QWidget(parent), m_d(new SAWindowButtonGroupPrivate(this))
+    : QWidget(parent), d_ptr(new SAWindowButtonGroup::PrivateData(this))
 {
-    m_d->mFlags = flags;
+    d_ptr->mFlags = flags;
     updateWindowFlag();
     if (parent) {
         parent->installEventFilter(this);
@@ -223,29 +219,28 @@ SAWindowButtonGroup::SAWindowButtonGroup(QWidget* parent, Qt::WindowFlags flags)
 
 SAWindowButtonGroup::~SAWindowButtonGroup()
 {
-    delete m_d;
 }
 
 void SAWindowButtonGroup::setupMinimizeButton(bool on)
 {
-    m_d->setupMinimizeButton(on);
+    d_ptr->setupMinimizeButton(on);
 }
 
 void SAWindowButtonGroup::setupMaximizeButton(bool on)
 {
-    m_d->setupMaximizeButton(on);
+    d_ptr->setupMaximizeButton(on);
 }
 
 void SAWindowButtonGroup::setupCloseButton(bool on)
 {
-    m_d->setupCloseButton(on);
+    d_ptr->setupCloseButton(on);
 }
 
 void SAWindowButtonGroup::updateWindowFlag()
 {
     Qt::WindowFlags flags = parentWidget()->windowFlags();
 
-    m_d->mFlags = flags;
+    d_ptr->mFlags = flags;
 
     setupMinimizeButton(flags & Qt::WindowMinimizeButtonHint);
 
@@ -261,21 +256,21 @@ void SAWindowButtonGroup::updateWindowFlag()
 void SAWindowButtonGroup::updateWindowFlag(Qt::WindowFlags flags)
 {
     if (flags & Qt::WindowCloseButtonHint) {
-        m_d->mFlags |= Qt::WindowCloseButtonHint;
+        d_ptr->mFlags |= Qt::WindowCloseButtonHint;
     } else {
-        m_d->mFlags &= (~Qt::WindowCloseButtonHint);
+        d_ptr->mFlags &= (~Qt::WindowCloseButtonHint);
     }
 
     if (flags & Qt::WindowMaximizeButtonHint) {
-        m_d->mFlags |= Qt::WindowMaximizeButtonHint;
+        d_ptr->mFlags |= Qt::WindowMaximizeButtonHint;
     } else {
-        m_d->mFlags &= (~Qt::WindowMaximizeButtonHint);
+        d_ptr->mFlags &= (~Qt::WindowMaximizeButtonHint);
     }
 
     if (flags & Qt::WindowMinimizeButtonHint) {
-        m_d->mFlags |= Qt::WindowMinimizeButtonHint;
+        d_ptr->mFlags |= Qt::WindowMinimizeButtonHint;
     } else {
-        m_d->mFlags &= (~Qt::WindowMinimizeButtonHint);
+        d_ptr->mFlags &= (~Qt::WindowMinimizeButtonHint);
     }
     setupMinimizeButton(flags & Qt::WindowMinimizeButtonHint);
 
@@ -292,9 +287,9 @@ void SAWindowButtonGroup::updateWindowFlag(Qt::WindowFlags flags)
  */
 void SAWindowButtonGroup::setButtonWidthStretch(int close, int max, int min)
 {
-    m_d->mMaxStretch   = max;
-    m_d->mMinStretch   = min;
-    m_d->mCloseStretch = close;
+    d_ptr->mMaxStretch   = max;
+    d_ptr->mMinStretch   = min;
+    d_ptr->mCloseStretch = close;
 }
 
 /**
@@ -303,7 +298,7 @@ void SAWindowButtonGroup::setButtonWidthStretch(int close, int max, int min)
  */
 void SAWindowButtonGroup::setIconScale(qreal iconscale)
 {
-    m_d->mIconscale = iconscale;
+    d_ptr->mIconscale = iconscale;
 }
 
 /**
@@ -312,10 +307,10 @@ void SAWindowButtonGroup::setIconScale(qreal iconscale)
  */
 void SAWindowButtonGroup::setWindowStates(Qt::WindowStates s)
 {
-    if (m_d->buttonMaximize) {
+    if (d_ptr->buttonMaximize) {
         bool on = s.testFlag(Qt::WindowMaximized);
-        m_d->buttonMaximize->setChecked(on);
-        m_d->buttonMaximize->setToolTip(on ? tr("Restore") : tr("Maximize"));
+        d_ptr->buttonMaximize->setChecked(on);
+        d_ptr->buttonMaximize->setToolTip(on ? tr("Restore") : tr("Maximize"));
     }
 }
 
@@ -329,13 +324,13 @@ Qt::WindowFlags SAWindowButtonGroup::windowButtonFlags() const
 {
     Qt::WindowFlags f = Qt::Widget;  // widget是000
 
-    if (m_d->mFlags & Qt::WindowCloseButtonHint) {
+    if (d_ptr->mFlags & Qt::WindowCloseButtonHint) {
         f |= Qt::WindowCloseButtonHint;
     }
-    if (m_d->mFlags & Qt::WindowMaximizeButtonHint) {
+    if (d_ptr->mFlags & Qt::WindowMaximizeButtonHint) {
         f |= Qt::WindowMaximizeButtonHint;
     }
-    if (m_d->mFlags & Qt::WindowMinimizeButtonHint) {
+    if (d_ptr->mFlags & Qt::WindowMinimizeButtonHint) {
         f |= Qt::WindowMinimizeButtonHint;
     }
     return (f);
@@ -343,7 +338,7 @@ Qt::WindowFlags SAWindowButtonGroup::windowButtonFlags() const
 
 QSize SAWindowButtonGroup::sizeHint() const
 {
-    return (m_d->sizeHint());
+    return (d_ptr->sizeHint());
 }
 
 bool SAWindowButtonGroup::eventFilter(QObject* watched, QEvent* e)
@@ -374,7 +369,7 @@ void SAWindowButtonGroup::parentResize()
 
 void SAWindowButtonGroup::resizeEvent(QResizeEvent* e)
 {
-    m_d->resize(e->size());
+    d_ptr->resize(e->size());
 }
 
 void SAWindowButtonGroup::closeWindow()

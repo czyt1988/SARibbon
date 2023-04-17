@@ -6,7 +6,6 @@
 #include <QSizeGrip>
 class QLabel;
 class QVBoxLayout;
-class SARibbonGalleryPrivate;
 class SARibbonGalleryViewport;
 
 /**
@@ -33,6 +32,7 @@ class SARibbonGalleryViewport;
 class SA_RIBBON_EXPORT SARibbonGallery : public QFrame
 {
     Q_OBJECT
+    SA_RIBBON_DECLARE_PRIVATE(SARibbonGallery)
 public:
     SARibbonGallery(QWidget* parent = 0);
     virtual ~SARibbonGallery();
@@ -84,10 +84,6 @@ private:
 protected:
     void resizeEvent(QResizeEvent* event) Q_DECL_OVERRIDE;
     void paintEvent(QPaintEvent* event) Q_DECL_OVERRIDE;
-
-private:
-    friend class SARibbonGalleryPrivate;
-    SARibbonGalleryPrivate* m_d;
 };
 
 ///

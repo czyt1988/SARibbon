@@ -13,7 +13,7 @@
 class SA_RIBBON_EXPORT SARibbonToolButton : public QToolButton
 {
     Q_OBJECT
-    Q_ENUMS(RibbonButtonType)
+
 public:
     /**
      * @brief 按钮样式
@@ -23,7 +23,7 @@ public:
         LargeButton,
         SmallButton
     };
-
+    Q_ENUM(RibbonButtonType)
     /**
      * @brief LargeButton的显示样式，仅在LargeButton模式下，有mean的情况生效
      */
@@ -32,7 +32,8 @@ public:
         Normal,  ///< icon占大按钮的一半区域,箭头在按钮最下方，文字可以换一行，对应于office的菜单按钮，下箭头在按钮最下方(默认)
         Lite  ///< icon占大按钮的60%，文字占40%，且文字不换行，对应于wps模式的ribbon菜单按钮，下箭头在文字旁边
     };
-
+    Q_ENUM(LargeButtonType)
+public:
     SARibbonToolButton(QWidget* parent = Q_NULLPTR);
     SARibbonToolButton(QAction* defaultAction, QWidget* parent = Q_NULLPTR);
     //标记按钮的样式，按钮的样式有不同的渲染方式

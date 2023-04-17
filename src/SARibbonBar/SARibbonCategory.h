@@ -6,8 +6,7 @@
 #include <QScopedPointer>
 #include <QPushButton>
 #include <QWheelEvent>
-class SARibbonCategoryProxyPrivate;
-class SARibbonCategoryPrivate;
+
 class QHBoxLayout;
 class QWheelEvent;
 class SARibbonBar;
@@ -20,6 +19,7 @@ class SARibbonBar;
 class SA_RIBBON_EXPORT SARibbonCategory : public QWidget
 {
     Q_OBJECT
+    SA_RIBBON_DECLARE_PRIVATE(SARibbonCategory)
     friend class SARibbonBar;
     friend class SARibbonContextCategory;
     Q_PROPERTY(bool isCanCustomize READ isCanCustomize WRITE setCanCustomize)
@@ -118,8 +118,6 @@ protected:
 
 private:
     void setRibbonBar(SARibbonBar* bar);
-
-    SARibbonCategoryPrivate* m_d;
 };
 
 /**

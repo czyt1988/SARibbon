@@ -2,10 +2,8 @@
 #define SARIBBONMAINWINDOW_H
 #include "SARibbonGlobal.h"
 #include <QMainWindow>
-class SARibbonMainWindowPrivate;
 class SARibbonBar;
 class SAFramelessHelper;
-
 
 /**
  * @brief 如果要使用SARibbonBar，必须使用此类代替QMainWindow
@@ -33,28 +31,31 @@ class SAFramelessHelper;
 class SA_RIBBON_EXPORT SARibbonMainWindow : public QMainWindow
 {
     Q_OBJECT
+    SA_RIBBON_DECLARE_PRIVATE(SARibbonMainWindow)
     Q_PROPERTY(RibbonTheme ribbonTheme READ ribbonTheme WRITE setRibbonTheme)
 public:
-    enum RibbonTheme {
-        NormalTheme     ///< 普通主题
-        , Office2013    ///< office2013主题
+    enum RibbonTheme
+    {
+        NormalTheme  ///< 普通主题
+        ,
+        Office2013  ///< office2013主题
     };
     Q_ENUMS(RibbonTheme)
 public:
-    SARibbonMainWindow(QWidget *parent = nullptr, bool useRibbon = true);
+    SARibbonMainWindow(QWidget* parent = nullptr, bool useRibbon = true);
     ~SARibbonMainWindow() Q_DECL_OVERRIDE;
     //返回SARibbonBar
-    const SARibbonBar *ribbonBar() const;
-    SARibbonBar *ribbonBar();
+    const SARibbonBar* ribbonBar() const;
+    SARibbonBar* ribbonBar();
 
     //返回SAFramelessHelper
-    SAFramelessHelper *framelessHelper();
+    SAFramelessHelper* framelessHelper();
 
     void setRibbonTheme(RibbonTheme theme);
     RibbonTheme ribbonTheme() const;
 
-	//判断当前是否使用ribbon模式
-	bool isUseRibbon() const;
+    //判断当前是否使用ribbon模式
+    bool isUseRibbon() const;
 
     //此函数仅用于控制最小最大化和关闭按钮的显示
     void updateWindowFlag(Qt::WindowFlags flags);
@@ -63,19 +64,16 @@ public:
     Qt::WindowFlags windowButtonFlags() const;
 
     //覆写setMenuWidget
-    void setMenuWidget(QWidget *menubar);
+    void setMenuWidget(QWidget* menubar);
 
     //覆写setMenuBar
-    void setMenuBar(QMenuBar *menuBar);
+    void setMenuBar(QMenuBar* menuBar);
 
 protected:
     void loadTheme(const QString& themeFile);
-    virtual void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
-    virtual bool eventFilter(QObject *obj, QEvent *e) Q_DECL_OVERRIDE;
-    virtual bool event(QEvent *e) Q_DECL_OVERRIDE;
-
-private:
-    SARibbonMainWindowPrivate *m_d;
+    virtual void resizeEvent(QResizeEvent* event) Q_DECL_OVERRIDE;
+    virtual bool eventFilter(QObject* obj, QEvent* e) Q_DECL_OVERRIDE;
+    virtual bool event(QEvent* e) Q_DECL_OVERRIDE;
 };
 
-#endif // SARIBBONMAINWINDOW_H
+#endif  // SARIBBONMAINWINDOW_H

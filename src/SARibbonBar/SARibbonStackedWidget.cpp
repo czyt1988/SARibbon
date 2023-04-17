@@ -7,92 +7,79 @@
 /**
  * @brief The SARibbonStackedWidgetPrivate class
  */
-class SARibbonStackedWidgetPrivate
+class SARibbonStackedWidget::PrivateData
 {
+    SA_RIBBON_DECLARE_PUBLIC(SARibbonStackedWidget)
 public:
-    SARibbonStackedWidget *Parent;
-    QEventLoop *eventLoop;
-    bool isAutoResize;
-    SARibbonStackedWidgetPrivate(SARibbonStackedWidget *p)
-        : Parent(p)
-        , eventLoop(nullptr)
-        , isAutoResize(true)
+    QEventLoop* eventLoop { nullptr };
+    bool isAutoResize { true };
+
+public:
+    PrivateData(SARibbonStackedWidget* p) : q_ptr(p)
     {
     }
-
 
     void init()
     {
-        //Parent->setFocusPolicy(Qt::StrongFocus);
+        // Parent->setFocusPolicy(Qt::StrongFocus);
     }
 };
 
-
-
-SARibbonStackedWidget::SARibbonStackedWidget(QWidget *parent)
-    : QStackedWidget(parent)
-    , m_d(new SARibbonStackedWidgetPrivate(this))
+SARibbonStackedWidget::SARibbonStackedWidget(QWidget* parent)
+    : QStackedWidget(parent), d_ptr(new SARibbonStackedWidget::PrivateData(this))
 {
-    m_d->init();
+    d_ptr->init();
     setNormalMode();
 }
 
-
 SARibbonStackedWidget::~SARibbonStackedWidget()
 {
-    if (m_d->eventLoop) {
-        m_d->eventLoop->exit();
+    if (d_ptr->eventLoop) {
+        d_ptr->eventLoop->exit();
     }
-    delete m_d;
 }
-
 
 void SARibbonStackedWidget::setPopupMode()
 {
     setMouseTracking(true);
-    setWindowFlags(Qt::Popup|Qt::FramelessWindowHint);
+    setWindowFlags(Qt::Popup | Qt::FramelessWindowHint);
     setFrameShape(QFrame::Panel);
 }
 
-
 bool SARibbonStackedWidget::isPopupMode() const
 {
-    return (windowFlags()&Qt::Popup);
+    return (windowFlags() & Qt::Popup);
 }
-
 
 void SARibbonStackedWidget::setNormalMode()
 {
-    if (m_d->eventLoop) {
-        m_d->eventLoop->exit();
-        m_d->eventLoop = nullptr;
+    if (d_ptr->eventLoop) {
+        d_ptr->eventLoop->exit();
+        d_ptr->eventLoop = nullptr;
     }
     setMouseTracking(false);
     setWindowFlags(Qt::Widget | Qt::FramelessWindowHint);
     setFrameShape(QFrame::NoFrame);
 }
 
-
 bool SARibbonStackedWidget::isNormalMode() const
 {
     return (!isPopupMode());
 }
 
-
 void SARibbonStackedWidget::exec()
 {
     show();
     if (!isPopupMode()) {
-        m_d->eventLoop = nullptr;
+        d_ptr->eventLoop = nullptr;
         return;
     }
     QEventLoop event;
 
-    m_d->eventLoop = &event;
+    d_ptr->eventLoop = &event;
     event.exec();
-    m_d->eventLoop = nullptr;
+    d_ptr->eventLoop = nullptr;
 }
-
 
 /**
  * @brief 设置stacked管理的窗口会随着stacked的大小变化而变化大小
@@ -102,15 +89,13 @@ void SARibbonStackedWidget::exec()
  */
 void SARibbonStackedWidget::setAutoResize(bool autoresize)
 {
-    m_d->isAutoResize = autoresize;
+    d_ptr->isAutoResize = autoresize;
 }
-
 
 bool SARibbonStackedWidget::isAutoResize() const
 {
-    return (m_d->isAutoResize);
+    return (d_ptr->isAutoResize);
 }
-
 
 /**
  * @brief 类似tabbar的moveTab函数，交换两个窗口的index
@@ -120,18 +105,17 @@ bool SARibbonStackedWidget::isAutoResize() const
  */
 void SARibbonStackedWidget::moveWidget(int from, int to)
 {
-    QWidget *w = widget(from);
+    QWidget* w = widget(from);
 
     removeWidget(w);
     insertWidget(to, w);
 }
 
-
-void SARibbonStackedWidget::hideEvent(QHideEvent *e)
+void SARibbonStackedWidget::hideEvent(QHideEvent* e)
 {
     if (isPopupMode()) {
-        if (m_d->eventLoop) {
-            m_d->eventLoop->exit();
+        if (d_ptr->eventLoop) {
+            d_ptr->eventLoop->exit();
         }
     }
     setFocus();

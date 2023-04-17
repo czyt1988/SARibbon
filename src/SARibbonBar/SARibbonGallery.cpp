@@ -17,32 +17,31 @@
 /**
  * @brief The SARibbonGalleryPrivate class
  */
-class SARibbonGalleryPrivate
+class SARibbonGallery::PrivateData
 {
+    SA_RIBBON_DECLARE_PUBLIC(SARibbonGallery)
 public:
     static int sGalleryButtonMaximumWidth;
-    SARibbonControlButton* buttonUp;
-    SARibbonControlButton* buttonDown;
-    SARibbonControlButton* buttonMore;
-    SARibbonGallery* Parent;
+    SARibbonControlButton* buttonUp { nullptr };
+    SARibbonControlButton* buttonDown { nullptr };
+    SARibbonControlButton* buttonMore { nullptr };
 #if 0
     SARibbonMenu *popupWidget;
 #else
-    SARibbonGalleryViewport* popupWidget;
+    SARibbonGalleryViewport* popupWidget { nullptr };
 #endif
-    SARibbonGalleryGroup* viewportGroup;
-    QBoxLayout* btnLayout;
-    QBoxLayout* layout;
-    SARibbonGalleryPrivate() : Parent(nullptr)
+    SARibbonGalleryGroup* viewportGroup { nullptr };
+    QBoxLayout* btnLayout { nullptr };
+    QBoxLayout* layout { nullptr };
+    SARibbonGallery::PrivateData(SARibbonGallery* p) : q_ptr(p)
     {
     }
 
-    void init(SARibbonGallery* parent)
+    void init()
     {
-        Parent     = parent;
-        buttonUp   = new SARibbonControlButton(parent);
-        buttonDown = new SARibbonControlButton(parent);
-        buttonMore = new SARibbonControlButton(parent);
+        buttonUp   = new SARibbonControlButton(q_ptr);
+        buttonDown = new SARibbonControlButton(q_ptr);
+        buttonMore = new SARibbonControlButton(q_ptr);
         buttonUp->setToolButtonStyle(Qt::ToolButtonIconOnly);
         buttonDown->setToolButtonStyle(Qt::ToolButtonIconOnly);
         buttonMore->setToolButtonStyle(Qt::ToolButtonIconOnly);
@@ -55,11 +54,11 @@ public:
         buttonUp->setIcon(ICON_ARROW_UP);
         buttonDown->setIcon(ICON_ARROW_DOWN);
         buttonMore->setIcon(ICON_ARROW_MORE);
-        Parent->connect(buttonUp, &QAbstractButton::clicked, Parent, &SARibbonGallery::pageUp);
-        Parent->connect(buttonDown, &QAbstractButton::clicked, Parent, &SARibbonGallery::pageDown);
-        Parent->connect(buttonMore, &QAbstractButton::clicked, Parent, &SARibbonGallery::showMoreDetail);
+        q_ptr->connect(buttonUp, &QAbstractButton::clicked, q_ptr, &SARibbonGallery::pageUp);
+        q_ptr->connect(buttonDown, &QAbstractButton::clicked, q_ptr, &SARibbonGallery::pageDown);
+        q_ptr->connect(buttonMore, &QAbstractButton::clicked, q_ptr, &SARibbonGallery::showMoreDetail);
         //信号转发
-        Parent->connect(Parent, &SARibbonGallery::triggered, Parent, &SARibbonGallery::onTriggered);
+        q_ptr->connect(q_ptr, &SARibbonGallery::triggered, q_ptr, &SARibbonGallery::onTriggered);
         popupWidget   = nullptr;
         viewportGroup = nullptr;
         btnLayout     = new QBoxLayout(QBoxLayout::TopToBottom);
@@ -73,12 +72,12 @@ public:
         layout->setContentsMargins(0, 0, 0, 0);
         layout->addLayout(btnLayout);
         layout->addStretch();
-        parent->setLayout(layout);
+        q_ptr->setLayout(layout);
     }
 
     bool isValid() const
     {
-        return (Parent != nullptr);
+        return (q_ptr != nullptr);
     }
 
     void createPopupWidget()
@@ -87,7 +86,7 @@ public:
 #if 0
             popupWidget = new SARibbonMenu(Parent);
 #else
-            popupWidget = new SARibbonGalleryViewport(Parent);
+            popupWidget = new SARibbonGalleryViewport(q_ptr);
 #endif
         }
     }
@@ -95,7 +94,7 @@ public:
     void setViewPort(SARibbonGalleryGroup* v)
     {
         if (nullptr == viewportGroup) {
-            viewportGroup = RibbonSubElementDelegate->createRibbonGalleryGroup(Parent);
+            viewportGroup = RibbonSubElementDelegate->createRibbonGalleryGroup(q_ptr);
             layout->addWidget(viewportGroup, 1);
         }
         viewportGroup->setRecalcGridSizeBlock(true);
@@ -118,9 +117,11 @@ public:
 /**
  * @brief SARibbonGalleryPrivate::sGalleryButtonMaximumWidth
  */
-int SARibbonGalleryPrivate::sGalleryButtonMaximumWidth = 15;
+int SARibbonGallery::PrivateData::sGalleryButtonMaximumWidth = 15;
 
-//////////////////////////////////////////////
+//===================================================
+// SARibbonGalleryViewport
+//===================================================
 
 SARibbonGalleryViewport::SARibbonGalleryViewport(QWidget* parent) : QWidget(parent)
 {
@@ -195,11 +196,13 @@ void SARibbonGalleryViewport::widgetTitleChanged(QWidget* w, const QString& titl
     }
 }
 
-//////////////////////////////////////////////
+//===================================================
+// SARibbonGallery
+//===================================================
 
-SARibbonGallery::SARibbonGallery(QWidget* parent) : QFrame(parent), m_d(new SARibbonGalleryPrivate)
+SARibbonGallery::SARibbonGallery(QWidget* parent) : QFrame(parent), d_ptr(new SARibbonGallery::PrivateData(this))
 {
-    m_d->init(this);
+    d_ptr->init();
     setFrameShape(QFrame::Box);
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     setMinimumWidth(200);
@@ -207,7 +210,6 @@ SARibbonGallery::SARibbonGallery(QWidget* parent) : QFrame(parent), m_d(new SARi
 
 SARibbonGallery::~SARibbonGallery()
 {
-    delete m_d;
 }
 
 QSize SARibbonGallery::sizeHint() const
@@ -263,13 +265,13 @@ SARibbonGalleryGroup* SARibbonGallery::addCategoryActions(const QString& title, 
 
 void SARibbonGallery::setCurrentViewGroup(SARibbonGalleryGroup* group)
 {
-    m_d->setViewPort(group);
+    d_ptr->setViewPort(group);
     QApplication::postEvent(this, new QResizeEvent(size(), size()));
 }
 
 SARibbonGalleryGroup* SARibbonGallery::currentViewGroup() const
 {
-    return (m_d->viewportGroup);
+    return (d_ptr->viewportGroup);
 }
 
 /**
@@ -278,7 +280,7 @@ SARibbonGalleryGroup* SARibbonGallery::currentViewGroup() const
  */
 SARibbonGalleryViewport* SARibbonGallery::getPopupViewPort() const
 {
-    return m_d->popupWidget;
+    return d_ptr->popupWidget;
 }
 
 /**
@@ -287,7 +289,7 @@ SARibbonGalleryViewport* SARibbonGallery::getPopupViewPort() const
  */
 void SARibbonGallery::setGalleryButtonMaximumWidth(int w)
 {
-    SARibbonGalleryPrivate::sGalleryButtonMaximumWidth = w;
+    SARibbonGallery::PrivateData::sGalleryButtonMaximumWidth = w;
 }
 
 /**
@@ -295,8 +297,8 @@ void SARibbonGallery::setGalleryButtonMaximumWidth(int w)
  */
 void SARibbonGallery::pageDown()
 {
-    if (m_d->viewportGroup) {
-        QScrollBar* vscrollBar = m_d->viewportGroup->verticalScrollBar();
+    if (d_ptr->viewportGroup) {
+        QScrollBar* vscrollBar = d_ptr->viewportGroup->verticalScrollBar();
         int v                  = vscrollBar->value();
         v += vscrollBar->singleStep();
         vscrollBar->setValue(v);
@@ -308,8 +310,8 @@ void SARibbonGallery::pageDown()
  */
 void SARibbonGallery::pageUp()
 {
-    if (m_d->viewportGroup) {
-        QScrollBar* vscrollBar = m_d->viewportGroup->verticalScrollBar();
+    if (d_ptr->viewportGroup) {
+        QScrollBar* vscrollBar = d_ptr->viewportGroup->verticalScrollBar();
         int v                  = vscrollBar->value();
         v -= vscrollBar->singleStep();
         vscrollBar->setValue(v);
@@ -321,17 +323,17 @@ void SARibbonGallery::pageUp()
  */
 void SARibbonGallery::showMoreDetail()
 {
-    if (nullptr == m_d->popupWidget) {
+    if (nullptr == d_ptr->popupWidget) {
         return;
     }
-    QSize popupMenuSize = m_d->popupWidget->sizeHint();
+    QSize popupMenuSize = d_ptr->popupWidget->sizeHint();
     QPoint start        = mapToGlobal(QPoint(0, 0));
 
-    int width = m_d->viewportGroup->width();  // viewport
+    int width = d_ptr->viewportGroup->width();  // viewport
 
     width += qApp->style()->pixelMetric(QStyle::PM_ScrollBarExtent);  // scrollbar
-    m_d->popupWidget->setGeometry(start.x(), start.y(), width, popupMenuSize.height());
-    m_d->popupWidget->show();
+    d_ptr->popupWidget->setGeometry(start.x(), start.y(), width, popupMenuSize.height());
+    d_ptr->popupWidget->show();
 }
 
 void SARibbonGallery::onItemClicked(const QModelIndex& index)
@@ -350,19 +352,19 @@ void SARibbonGallery::onTriggered(QAction* action)
 {
     Q_UNUSED(action);
     //点击后关闭弹出窗口
-    if (m_d->popupWidget) {
-        if (m_d->popupWidget->isVisible()) {
-            m_d->popupWidget->hide();
+    if (d_ptr->popupWidget) {
+        if (d_ptr->popupWidget->isVisible()) {
+            d_ptr->popupWidget->hide();
         }
     }
 }
 
 SARibbonGalleryViewport* SARibbonGallery::ensureGetPopupViewPort()
 {
-    if (nullptr == m_d->popupWidget) {
-        m_d->createPopupWidget();
+    if (nullptr == d_ptr->popupWidget) {
+        d_ptr->createPopupWidget();
     }
-    return (m_d->popupWidget);
+    return (d_ptr->popupWidget);
 }
 
 void SARibbonGallery::resizeEvent(QResizeEvent* event)
@@ -370,12 +372,12 @@ void SARibbonGallery::resizeEvent(QResizeEvent* event)
     QFrame::resizeEvent(event);
     //对SARibbonGalleryViewport所有SARibbonGalleryGroup重置尺寸
     int h = layout()->contentsRect().height();
-    if (m_d->viewportGroup) {
-        h = m_d->viewportGroup->height();
-        m_d->viewportGroup->recalcGridSize();
+    if (d_ptr->viewportGroup) {
+        h = d_ptr->viewportGroup->height();
+        d_ptr->viewportGroup->recalcGridSize();
     }
-    if (m_d->popupWidget) {
-        QLayout* lay = m_d->popupWidget->layout();
+    if (d_ptr->popupWidget) {
+        QLayout* lay = d_ptr->popupWidget->layout();
         if (!lay) {
             return;
         }
