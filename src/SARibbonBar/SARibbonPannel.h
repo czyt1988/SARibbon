@@ -10,7 +10,6 @@ class SARibbonMenu;
 class SARibbonGallery;
 class QGridLayout;
 class SARibbonPannelOptionButton;
-class SARibbonPannelPrivate;
 
 /**
  * @brief pannel页窗口，pannel是ribbon的面板用于承放控件
@@ -27,6 +26,7 @@ class SARibbonPannelPrivate;
 class SA_RIBBON_EXPORT SARibbonPannel : public QWidget
 {
     Q_OBJECT
+    SA_RIBBON_DECLARE_PRIVATE(SARibbonPannel)
     friend class SARibbonCategory;
     friend class SARibbonCategoryPrivate;
     friend class SARibbonCustomizeWidgetPrivate;
@@ -161,7 +161,8 @@ public:
 
     //大图标的高度
     int largeHeight() const;
-
+    //获取布局对应的item
+    const QList< SARibbonPannelItem* >& ribbonPannelItem() const;
     //全局的标题栏高度
     static int pannelTitleHeight();
     static void setPannelTitleHeight(int h);
@@ -182,12 +183,6 @@ protected:
     void paintEvent(QPaintEvent* event) Q_DECL_OVERRIDE;
     virtual void resizeEvent(QResizeEvent* event) Q_DECL_OVERRIDE;
     virtual void actionEvent(QActionEvent* e) Q_DECL_OVERRIDE;
-
-    //获取布局对应的item
-    const QList< SARibbonPannelItem* >& ribbonPannelItem() const;
-
-private:
-    SARibbonPannelPrivate* m_d;
 };
 
 #endif  // SARIBBONPANNEL_H

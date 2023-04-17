@@ -1,25 +1,25 @@
 ﻿#ifndef SAFRAMELESSHELPER_H
 #define SAFRAMELESSHELPER_H
 
-
 #include "SARibbonGlobal.h"
 #include <QObject>
 
 class QWidget;
-class FramelessHelperPrivate;
 
 class SA_RIBBON_EXPORT SAFramelessHelper : public QObject
 {
     Q_OBJECT
+    SA_RIBBON_DECLARE_PRIVATE(SAFramelessHelper)
+    friend class SAPrivateFramelessWidgetData;
 
 public:
-    explicit SAFramelessHelper(QObject *parent);
+    explicit SAFramelessHelper(QObject* parent);
     ~SAFramelessHelper();
     // 激活窗体
-    void activateOn(QWidget *topLevelWidget);
+    void activateOn(QWidget* topLevelWidget);
 
     // 移除窗体
-    void removeFrom(QWidget *topLevelWidget);
+    void removeFrom(QWidget* topLevelWidget);
 
     // 设置窗体移动
     void setWidgetMovable(bool movable);
@@ -47,10 +47,7 @@ public:
 
 protected:
     // 事件过滤，进行移动、缩放等
-    virtual bool eventFilter(QObject *obj, QEvent *event);
-
-private:
-    FramelessHelperPrivate *d;
+    virtual bool eventFilter(QObject* obj, QEvent* event);
 };
 
-#endif // FRAMELESSHELPER_H
+#endif  // FRAMELESSHELPER_H

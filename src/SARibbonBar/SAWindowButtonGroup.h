@@ -3,7 +3,6 @@
 #include "SARibbonGlobal.h"
 #include <QWidget>
 #include <QPushButton>
-class SAWindowButtonGroupPrivate;
 
 ///
 /// \brief 窗口的最大最小化按钮
@@ -11,6 +10,7 @@ class SAWindowButtonGroupPrivate;
 class SA_RIBBON_EXPORT SAWindowButtonGroup : public QWidget
 {
     Q_OBJECT
+    SA_RIBBON_DECLARE_PRIVATE(SAWindowButtonGroup)
 public:
     SAWindowButtonGroup(QWidget* parent);
     SAWindowButtonGroup(QWidget* parent, Qt::WindowFlags flags);
@@ -44,10 +44,6 @@ protected slots:
     Q_SLOT void closeWindow();
     Q_SLOT void minimizeWindow();
     Q_SLOT void maximizeWindow();
-
-private:
-    friend class SAWindowButtonGroupPrivate;
-    SAWindowButtonGroupPrivate* m_d;
 };
 
 /**

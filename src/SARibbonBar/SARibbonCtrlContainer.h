@@ -4,7 +4,6 @@
 #include <QWidget>
 #include <QScopedPointer>
 class QStyleOption;
-class SARibbonCtrlContainerPrivate;
 
 /**
  * @brief 用于装载一个窗体的容器，这个窗体会布满整个SARibbonCtrlContainer，但会预留空间显示icon或者title
@@ -16,6 +15,7 @@ class SARibbonCtrlContainerPrivate;
 class SA_RIBBON_EXPORT SARibbonCtrlContainer : public QWidget
 {
     Q_OBJECT
+    SA_RIBBON_DECLARE_PRIVATE(SARibbonCtrlContainer)
 public:
     SARibbonCtrlContainer(QWidget* parent = Q_NULLPTR);
     ~SARibbonCtrlContainer();
@@ -34,9 +34,6 @@ public:
     void setContainerWidget(QWidget* w);
     QWidget* getContainerWidget();
     const QWidget* getContainerWidget() const;
-
-private:
-    SARibbonCtrlContainerPrivate* m_d;
 };
 
 #endif  // SARIBBONCTROLCONTAINER_H

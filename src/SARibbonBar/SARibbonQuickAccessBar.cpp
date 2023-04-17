@@ -6,40 +6,49 @@
 /**
  * @brief The SARibbonQuickAccessBarPrivate class
  */
-class SARibbonQuickAccessBarPrivate
+class SARibbonQuickAccessBar::PrivateData
 {
+    SA_RIBBON_DECLARE_PUBLIC(SARibbonQuickAccessBar)
 public:
-    SARibbonButtonGroupWidget* groupWidget;
-};
+    PrivateData(SARibbonQuickAccessBar* p);
 
-SARibbonQuickAccessBar::SARibbonQuickAccessBar(QWidget* parent)
-    : SARibbonCtrlContainer(parent), m_d(new SARibbonQuickAccessBarPrivate)
+public:
+    SARibbonButtonGroupWidget* groupWidget { nullptr };
+};
+SARibbonQuickAccessBar::PrivateData::PrivateData(SARibbonQuickAccessBar* p) : q_ptr(p)
 {
-    m_d->groupWidget = new SARibbonButtonGroupWidget(this);
-    setContainerWidget(m_d->groupWidget);
+}
+
+//===================================================
+// SARibbonQuickAccessBar
+//===================================================
+SARibbonQuickAccessBar::SARibbonQuickAccessBar(QWidget* parent)
+    : SARibbonCtrlContainer(parent), d_ptr(new SARibbonQuickAccessBar::PrivateData(this))
+{
+    d_ptr->groupWidget = new SARibbonButtonGroupWidget(this);
+    setContainerWidget(d_ptr->groupWidget);
 }
 
 SARibbonQuickAccessBar::~SARibbonQuickAccessBar()
 {
-    delete m_d;
 }
 
 void SARibbonQuickAccessBar::addSeparator()
 {
-    m_d->groupWidget->addSeparator();
+    d_ptr->groupWidget->addSeparator();
 }
 
 void SARibbonQuickAccessBar::addAction(QAction* act)
 {
-    m_d->groupWidget->addAction(act);
+    d_ptr->groupWidget->addAction(act);
 }
 
 void SARibbonQuickAccessBar::addWidget(QWidget* w)
 {
-    m_d->groupWidget->addWidget(w);
+    d_ptr->groupWidget->addWidget(w);
 }
 
 void SARibbonQuickAccessBar::addMenu(QMenu* m, QToolButton::ToolButtonPopupMode popMode)
 {
-    m_d->groupWidget->addMenu(m, popMode);
+    d_ptr->groupWidget->addMenu(m, popMode);
 }

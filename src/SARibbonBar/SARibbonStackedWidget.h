@@ -4,8 +4,6 @@
 #include "SARibbonGlobal.h"
 class QHideEvent;
 class QResizeEvent;
-class SARibbonStackedWidgetPrivate;
-
 
 /**
  * @brief 有qdialog功能的stackwidget，用于在最小化时stack能像dialog那样弹出来
@@ -13,8 +11,9 @@ class SARibbonStackedWidgetPrivate;
 class SA_RIBBON_EXPORT SARibbonStackedWidget : public QStackedWidget
 {
     Q_OBJECT
+    SA_RIBBON_DECLARE_PRIVATE(SARibbonStackedWidget)
 public:
-    SARibbonStackedWidget(QWidget *parent);
+    SARibbonStackedWidget(QWidget* parent);
     ~SARibbonStackedWidget();
     void setPopupMode();
     bool isPopupMode() const;
@@ -28,14 +27,14 @@ public:
     void moveWidget(int from, int to);
 
 protected:
-//    void mouseReleaseEvent(QMouseEvent *e);
-    void hideEvent(QHideEvent *e) override;
+    //    void mouseReleaseEvent(QMouseEvent *e);
+    void hideEvent(QHideEvent* e) override;
 
 signals:
+    /**
+     * @brief hidWindow
+     */
     void hidWindow();
-
-private:
-    SARibbonStackedWidgetPrivate *m_d;
 };
 
-#endif // SARIBBONSTACKEDWIDGET_H
+#endif  // SARIBBONSTACKEDWIDGET_H

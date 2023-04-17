@@ -84,5 +84,11 @@ HEADERS  += \
 RESOURCES += \
     $$PWD/resource.qrc
 
+# 加入SAColorWidgets组件
+# 定义此宏将不会使用Color Widgets DLL
+
+DEFINES += SA_COLOR_WIDGETS_NO_DLL
+include($$PWD/colorWidgets/SAColorWidgets.pri)
+
 INCLUDEPATH += $$PWD
 DEPENDPATH += $$PWD

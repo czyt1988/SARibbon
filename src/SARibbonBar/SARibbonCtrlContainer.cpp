@@ -10,19 +10,18 @@
 /**
  * @brief The SARibbonCtrlContainerPrivate class
  */
-class SARibbonCtrlContainerPrivate
+class SARibbonCtrlContainer::PrivateData
 {
+    SA_RIBBON_DECLARE_PUBLIC(SARibbonCtrlContainer)
 public:
-    SARibbonCtrlContainer* q_ptr;
-    QWidget* containerWidget;
-    QHBoxLayout* horizontalLayout;
-    QLabel* labelPixmap;
-    QLabel* labelText;
+    QWidget* containerWidget { nullptr };
+    QHBoxLayout* horizontalLayout { nullptr };
+    QLabel* labelPixmap { nullptr };
+    QLabel* labelText { nullptr };
+    QSize iconSize { 24, 24 };
     QIcon icon;
-    QSize iconSize;
-    SARibbonCtrlContainerPrivate(SARibbonCtrlContainer* p) : containerWidget(Q_NULLPTR), iconSize(24, 24)
+    PrivateData(SARibbonCtrlContainer* p) : q_ptr(p)
     {
-        q_ptr            = p;
         horizontalLayout = new QHBoxLayout(p);
         horizontalLayout->setSpacing(0);
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
@@ -71,34 +70,36 @@ public:
     }
 };
 
+//===================================================
+// SARibbonCtrlContainer
+//===================================================
 SARibbonCtrlContainer::SARibbonCtrlContainer(QWidget* parent)
-    : QWidget(parent), m_d(new SARibbonCtrlContainerPrivate(this))
+    : QWidget(parent), d_ptr(new SARibbonCtrlContainer::PrivateData(this))
 {
 }
 
 SARibbonCtrlContainer::~SARibbonCtrlContainer()
 {
-    delete m_d;
 }
 
 QWidget* SARibbonCtrlContainer::getContainerWidget()
 {
-    return (m_d->containerWidget);
+    return (d_ptr->containerWidget);
 }
 
 const QWidget* SARibbonCtrlContainer::getContainerWidget() const
 {
-    return (m_d->containerWidget);
+    return (d_ptr->containerWidget);
 }
 
 void SARibbonCtrlContainer::setEnableShowIcon(bool b)
 {
-    m_d->labelPixmap->setVisible(b);
+    d_ptr->labelPixmap->setVisible(b);
 }
 
 void SARibbonCtrlContainer::setEnableShowTitle(bool b)
 {
-    m_d->labelText->setVisible(b);
+    d_ptr->labelText->setVisible(b);
 }
 
 /**
@@ -107,7 +108,7 @@ void SARibbonCtrlContainer::setEnableShowTitle(bool b)
  */
 bool SARibbonCtrlContainer::hasContainerWidget() const
 {
-    return (m_d->containerWidget != nullptr);
+    return (d_ptr->containerWidget != nullptr);
 }
 
 /**
@@ -116,8 +117,8 @@ bool SARibbonCtrlContainer::hasContainerWidget() const
  */
 void SARibbonCtrlContainer::setIcon(const QIcon& i)
 {
-    m_d->icon = i;
-    m_d->labelPixmap->setPixmap(i.pixmap(m_d->iconSize));
+    d_ptr->icon = i;
+    d_ptr->labelPixmap->setPixmap(i.pixmap(d_ptr->iconSize));
 }
 
 /**
@@ -126,7 +127,7 @@ void SARibbonCtrlContainer::setIcon(const QIcon& i)
  */
 QIcon SARibbonCtrlContainer::getIcon() const
 {
-    return m_d->icon;
+    return d_ptr->icon;
 }
 
 /**
@@ -135,7 +136,7 @@ QIcon SARibbonCtrlContainer::getIcon() const
  */
 void SARibbonCtrlContainer::setText(const QString& t)
 {
-    m_d->labelText->setText(t);
+    d_ptr->labelText->setText(t);
 }
 
 /**
@@ -144,10 +145,10 @@ void SARibbonCtrlContainer::setText(const QString& t)
  */
 QString SARibbonCtrlContainer::getText() const
 {
-    return m_d->labelText->text();
+    return d_ptr->labelText->text();
 }
 
 void SARibbonCtrlContainer::setContainerWidget(QWidget* w)
 {
-    m_d->setContainerWidget(w);
+    d_ptr->setContainerWidget(w);
 }
