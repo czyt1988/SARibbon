@@ -22,6 +22,14 @@ Widget::Widget(QWidget* parent) : QWidget(parent), ui(new Ui::Widget)
     ui->toolButtonIconOnlyHaveIconMenuPopupMode->setMenu(menu);
     ui->toolButtonIconOnlyHaveIconMenuPopupMode2->setColor(Qt::blue);
     ui->toolButtonIconOnlyHaveIconMenuPopupMode2->setMenu(menu);
+    ui->toolButtonIconOnlyHaveIconInstantPop->setColor(Qt::blue);
+    ui->toolButtonIconOnlyHaveIconInstantPop->setMenu(menu);
+    ui->toolButtonIconOnlyHaveIconInstantPop2->setColor(Qt::blue);
+    ui->toolButtonIconOnlyHaveIconInstantPop2->setMenu(menu);
+    ui->toolButtonIconOnlyHaveIconDelayedPop->setColor(Qt::blue);
+    ui->toolButtonIconOnlyHaveIconDelayedPop->setMenu(menu);
+    ui->toolButtonIconOnlyHaveIconDelayedPop2->setColor(Qt::blue);
+    ui->toolButtonIconOnlyHaveIconDelayedPop2->setMenu(menu);
 }
 
 Widget::~Widget()

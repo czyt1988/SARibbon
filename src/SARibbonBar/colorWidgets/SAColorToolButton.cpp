@@ -265,30 +265,26 @@ void SAColorToolButton::paintEvent(QPaintEvent* e)
     QStyleOptionToolButton opt;
 
     initStyleOption(&opt);
-    QStyleOption tool = opt;
-    tool.rect         = d_ptr->getButtonRect(opt);
-    tool.state        = d_ptr->getButtonStyleState(opt);
+
     qDebug() << "paintEvent subControls=" << opt.subControls << ",activeSubControls=" << opt.activeSubControls;
     bool autoRaise = opt.state & QStyle::State_AutoRaise;
     //先
-    if (autoRaise) {
-        style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
-    } else {
-        style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tool, &p, this);
-    }
+
     //绘制focus
     if (opt.state & QStyle::State_HasFocus) {
         QStyleOptionFocusRect fr;
         fr.QStyleOption::operator=(opt);
         fr.rect.adjust(3, 3, -3, -3);
-        if (opt.features & QStyleOptionToolButton::MenuButtonPopup)
+        if (opt.features & QStyleOptionToolButton::MenuButtonPopup) {
             fr.rect.adjust(0, 0, style()->pixelMetric(QStyle::PM_MenuButtonIndicator, &opt, this), 0);
+        }
         style()->drawPrimitive(QStyle::PE_FrameFocusRect, &fr, &p, this);
     }
 
     //绘制按钮
     if ((opt.subControls & QStyle::SC_ToolButton) && (opt.features & QStyleOptionToolButton::MenuButtonPopup)) {
-        tool.rect = opt.rect;
+        QStyleOption tool = opt;
+        //        tool.rect         = d_ptr->getButtonRect(opt);
         if (opt.activeSubControls &= QStyle::SC_ToolButtonMenu) {
             //菜单激活,整个按钮都绘制为选中
             style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
@@ -296,21 +292,17 @@ void SAColorToolButton::paintEvent(QPaintEvent* e)
             //菜单没有激活
             style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
         }
-    } else if ((opt.subControls & QStyle::SC_ToolButton) && (opt.features & QStyleOptionToolButton::HasMenu)) {
-        tool.rect = opt.rect;
+        tool.state = d_ptr->getButtonMenuStyleState(opt);
+        tool.rect  = d_ptr->getIndicatorRect(opt);
+        //        if (tool.state & (QStyle::State_Sunken | QStyle::State_On | QStyle::State_Raised)) {
+        //            style()->drawPrimitive(QStyle::PE_IndicatorButtonDropDown, &tool, &p, this);
+        //        }
+        style()->drawPrimitive(QStyle::PE_IndicatorArrowDown, &tool, &p, this);
+    } else {
         if (autoRaise) {
-            style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
+            style()->drawPrimitive(QStyle::PE_PanelButtonTool, &opt, &p, this);
         } else {
-            style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tool, &p, this);
-        }
-    } else if (opt.subControls & QStyle::SC_ToolButton) {
-        if (opt.state & QStyle::State_Sunken) {
-            tool.state &= ~QStyle::State_MouseOver;
-        }
-        if (autoRaise) {
-            style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
-        } else {
-            style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tool, &p, this);
+            style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &opt, &p, this);
         }
     }
 
