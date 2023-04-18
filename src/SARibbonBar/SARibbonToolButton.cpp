@@ -192,6 +192,7 @@ void SARibbonToolButton::paintSmallButton(QPaintEvent* e)
             //菜单激活,整个按钮都绘制为选中
             style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
         } else {
+            //菜单没有激活，就要判断鼠标所在的区域
             style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
             if (tool.state & QStyle::State_MouseOver) {
                 if (m_mouseOnSubControl) {  //此时鼠标在indecater那
@@ -835,7 +836,7 @@ void SARibbonToolButton::calcIconAndTextRect(const QStyleOptionToolButton& opt)
                 //有菜单且换行,宽度偏移ARROW_WIDTH
                 if (m_isWordWrap) {
                     m_textRect.adjust(0, 0, -SA_INDICATOR_ARROW_WIDTH, 0);
-                }else if(Lite == m_largeButtonType && !s_liteStyleEnableWordWrap){
+                } else if (Lite == m_largeButtonType && !s_liteStyleEnableWordWrap) {
                     //在lite模式下，不允许换行的时候，也需要偏移下三角
                     m_textRect.adjust(0, 0, -SA_INDICATOR_ARROW_WIDTH, 0);
                 }
