@@ -4,6 +4,7 @@
 #include "SAColorWidgetsGlobal.h"
 class QPaintEvent;
 class QResizeEvent;
+class QStylePainter;
 /**
  * @brief 这是一个只显示颜色的toolbutton
  *
@@ -47,8 +48,14 @@ public slots:
     void setColor(const QColor& c);
 
 protected:
+    //获取关键的三个rect位置
+    virtual void calcRect(const QStyleOptionToolButton& opt, QRect& iconRect, QRect& textRect, QRect& colorRect);
     virtual void paintEvent(QPaintEvent* e) Q_DECL_OVERRIDE;
     virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
+    virtual void paintButton(QStylePainter* p, const QStyleOptionToolButton& opt);
+    virtual void paintIcon(QStylePainter* p, const QRect& iconRect, const QStyleOptionToolButton& opt);
+    virtual void paintText(QStylePainter* p, const QRect& textRect, const QStyleOptionToolButton& opt);
+    virtual void paintColor(QStylePainter* p, const QRect& colorRect, const QColor& color, const QStyleOptionToolButton& opt);
 };
 
 #endif  // SACOLORTOOLBUTTON_H

@@ -13,9 +13,12 @@
   <property name="windowTitle">
    <string>Widget</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
+  <layout class="QGridLayout" name="gridLayout_2">
+   <item row="0" column="0">
     <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>1</number>
+     </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
        <string>ToolButtonIconOnly</string>
@@ -301,8 +304,328 @@
      </widget>
      <widget class="QWidget" name="tab_2">
       <attribute name="title">
-       <string>Tab 2</string>
+       <string>ToolButtonTextOnly</string>
       </attribute>
+      <layout class="QGridLayout" name="gridLayout_3">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_12">
+         <property name="text">
+          <string>No Icon</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="SAColorToolButton" name="toolButtonIconOnlyNoIcon_2">
+         <property name="text">
+          <string>Text Only</string>
+         </property>
+         <property name="toolButtonStyle">
+          <enum>Qt::ToolButtonTextOnly</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <widget class="SAColorToolButton" name="toolButtonIconOnlyNoIcon2_2">
+         <property name="text">
+          <string>Text Only</string>
+         </property>
+         <property name="toolButtonStyle">
+          <enum>Qt::ToolButtonTextOnly</enum>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_10">
+         <property name="text">
+          <string>Have Icon</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="SAColorToolButton" name="toolButtonIconOnlyHaveIcon_2">
+         <property name="text">
+          <string>Text Only</string>
+         </property>
+         <property name="icon">
+          <iconset resource="icon.qrc">
+           <normaloff>:/colorWidgetTst/icon/text.svg</normaloff>:/colorWidgetTst/icon/text.svg</iconset>
+         </property>
+         <property name="toolButtonStyle">
+          <enum>Qt::ToolButtonTextOnly</enum>
+         </property>
+         <property name="autoRaise">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="2">
+        <widget class="SAColorToolButton" name="toolButtonIconOnlyHaveIcon2_2">
+         <property name="text">
+          <string>Text Only</string>
+         </property>
+         <property name="icon">
+          <iconset resource="icon.qrc">
+           <normaloff>:/colorWidgetTst/icon/text.svg</normaloff>:/colorWidgetTst/icon/text.svg</iconset>
+         </property>
+         <property name="toolButtonStyle">
+          <enum>Qt::ToolButtonTextOnly</enum>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_9">
+         <property name="text">
+          <string>Have Icon(small)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="SAColorToolButton" name="toolButtonIconOnlyHaveIconSmall_2">
+         <property name="maximumSize">
+          <size>
+           <width>16</width>
+           <height>16</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Text Only</string>
+         </property>
+         <property name="icon">
+          <iconset resource="icon.qrc">
+           <normaloff>:/colorWidgetTst/icon/text.svg</normaloff>:/colorWidgetTst/icon/text.svg</iconset>
+         </property>
+         <property name="toolButtonStyle">
+          <enum>Qt::ToolButtonTextOnly</enum>
+         </property>
+         <property name="autoRaise">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="2">
+        <widget class="SAColorToolButton" name="toolButtonIconOnlyHaveIconSmall2_2">
+         <property name="maximumSize">
+          <size>
+           <width>16</width>
+           <height>16</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Text Only</string>
+         </property>
+         <property name="icon">
+          <iconset resource="icon.qrc">
+           <normaloff>:/colorWidgetTst/icon/text.svg</normaloff>:/colorWidgetTst/icon/text.svg</iconset>
+         </property>
+         <property name="toolButtonStyle">
+          <enum>Qt::ToolButtonTextOnly</enum>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_11">
+         <property name="text">
+          <string>Have Icon(large)</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="SAColorToolButton" name="toolButtonIconOnlyHaveIconLarge_2">
+         <property name="minimumSize">
+          <size>
+           <width>60</width>
+           <height>60</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Text Only</string>
+         </property>
+         <property name="icon">
+          <iconset resource="icon.qrc">
+           <normaloff>:/colorWidgetTst/icon/text.svg</normaloff>:/colorWidgetTst/icon/text.svg</iconset>
+         </property>
+         <property name="toolButtonStyle">
+          <enum>Qt::ToolButtonTextOnly</enum>
+         </property>
+         <property name="autoRaise">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="2">
+        <widget class="SAColorToolButton" name="toolButtonIconOnlyHaveIconLarge2_2">
+         <property name="minimumSize">
+          <size>
+           <width>60</width>
+           <height>60</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Text Only</string>
+         </property>
+         <property name="icon">
+          <iconset resource="icon.qrc">
+           <normaloff>:/colorWidgetTst/icon/text.svg</normaloff>:/colorWidgetTst/icon/text.svg</iconset>
+         </property>
+         <property name="toolButtonStyle">
+          <enum>Qt::ToolButtonTextOnly</enum>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_14">
+         <property name="text">
+          <string>MenuPopMode</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="SAColorToolButton" name="toolButtonIconOnlyHaveIconMenuPopupMode_2">
+         <property name="text">
+          <string>Text Only</string>
+         </property>
+         <property name="icon">
+          <iconset resource="icon.qrc">
+           <normaloff>:/colorWidgetTst/icon/text.svg</normaloff>:/colorWidgetTst/icon/text.svg</iconset>
+         </property>
+         <property name="popupMode">
+          <enum>QToolButton::MenuButtonPopup</enum>
+         </property>
+         <property name="toolButtonStyle">
+          <enum>Qt::ToolButtonTextOnly</enum>
+         </property>
+         <property name="autoRaise">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="2">
+        <widget class="SAColorToolButton" name="toolButtonIconOnlyHaveIconMenuPopupMode2_2">
+         <property name="text">
+          <string>Text Only</string>
+         </property>
+         <property name="icon">
+          <iconset resource="icon.qrc">
+           <normaloff>:/colorWidgetTst/icon/text.svg</normaloff>:/colorWidgetTst/icon/text.svg</iconset>
+         </property>
+         <property name="popupMode">
+          <enum>QToolButton::MenuButtonPopup</enum>
+         </property>
+         <property name="toolButtonStyle">
+          <enum>Qt::ToolButtonTextOnly</enum>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_13">
+         <property name="text">
+          <string>InstantPop</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="SAColorToolButton" name="toolButtonIconOnlyHaveIconInstantPop_2">
+         <property name="text">
+          <string>Text Only</string>
+         </property>
+         <property name="icon">
+          <iconset resource="icon.qrc">
+           <normaloff>:/colorWidgetTst/icon/text.svg</normaloff>:/colorWidgetTst/icon/text.svg</iconset>
+         </property>
+         <property name="popupMode">
+          <enum>QToolButton::InstantPopup</enum>
+         </property>
+         <property name="toolButtonStyle">
+          <enum>Qt::ToolButtonTextOnly</enum>
+         </property>
+         <property name="autoRaise">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="2">
+        <widget class="SAColorToolButton" name="toolButtonIconOnlyHaveIconInstantPop2_2">
+         <property name="text">
+          <string>Text Only</string>
+         </property>
+         <property name="icon">
+          <iconset resource="icon.qrc">
+           <normaloff>:/colorWidgetTst/icon/text.svg</normaloff>:/colorWidgetTst/icon/text.svg</iconset>
+         </property>
+         <property name="popupMode">
+          <enum>QToolButton::InstantPopup</enum>
+         </property>
+         <property name="toolButtonStyle">
+          <enum>Qt::ToolButtonTextOnly</enum>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="0">
+        <widget class="QLabel" name="label_8">
+         <property name="text">
+          <string>DelayedPop</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1">
+        <widget class="SAColorToolButton" name="toolButtonIconOnlyHaveIconDelayedPop_2">
+         <property name="text">
+          <string>Text Only</string>
+         </property>
+         <property name="icon">
+          <iconset resource="icon.qrc">
+           <normaloff>:/colorWidgetTst/icon/text.svg</normaloff>:/colorWidgetTst/icon/text.svg</iconset>
+         </property>
+         <property name="popupMode">
+          <enum>QToolButton::DelayedPopup</enum>
+         </property>
+         <property name="toolButtonStyle">
+          <enum>Qt::ToolButtonTextOnly</enum>
+         </property>
+         <property name="autoRaise">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="2">
+        <widget class="SAColorToolButton" name="toolButtonIconOnlyHaveIconDelayedPop2_2">
+         <property name="text">
+          <string>Text Only</string>
+         </property>
+         <property name="icon">
+          <iconset resource="icon.qrc">
+           <normaloff>:/colorWidgetTst/icon/text.svg</normaloff>:/colorWidgetTst/icon/text.svg</iconset>
+         </property>
+         <property name="popupMode">
+          <enum>QToolButton::DelayedPopup</enum>
+         </property>
+         <property name="toolButtonStyle">
+          <enum>Qt::ToolButtonTextOnly</enum>
+         </property>
+         <property name="autoRaise">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </widget>
    </item>
