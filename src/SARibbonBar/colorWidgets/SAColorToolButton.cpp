@@ -67,7 +67,7 @@ void SAColorToolButton::PrivateData::calcSizeOfToolButtonTextOnly(const QStyleOp
 {
     QRect buttonRect = getButtonRect(opt);
     calcIconAndColorRect(opt.icon, opt.iconSize, buttonRect, opt.toolButtonStyle, iconRect, colorRect);
-    mTextRect = buttonRect.adjusted(mColorRect.right(), mSpacing, -mSpacing, -mSpacing);
+    textRect = buttonRect.adjusted(mColorRect.right(), mSpacing, -mSpacing, -mSpacing);
 }
 
 void SAColorToolButton::PrivateData::calcSizeOfToolButtonTextBesideIcon(const QStyleOptionToolButton& opt,
@@ -76,6 +76,8 @@ void SAColorToolButton::PrivateData::calcSizeOfToolButtonTextBesideIcon(const QS
                                                                         QRect& colorRect)
 {
     QRect buttonRect = getButtonRect(opt);
+    calcIconAndColorRect(opt.icon, opt.iconSize, buttonRect, opt.toolButtonStyle, iconRect, colorRect);
+    textRect = buttonRect.adjusted(iconRect.right() + mSpacing, mSpacing, -mSpacing, -mSpacing);
 }
 
 void SAColorToolButton::PrivateData::calcSizeOfToolButtonTextUnderIcon(const QStyleOptionToolButton& opt,
@@ -168,6 +170,15 @@ QStyle::State SAColorToolButton::PrivateData::getButtonMenuStyleState(const QSty
     return mflags;
 }
 
+/**
+ * @brief 计算图标和颜色区域的矩形区域
+ * @param icon
+ * @param iconSize
+ * @param buttonRect
+ * @param s
+ * @param iconRect
+ * @param colorRect
+ */
 void SAColorToolButton::PrivateData::calcIconAndColorRect(const QIcon& icon,
                                                           const QSize& iconSize,
                                                           const QRect& buttonRect,
@@ -181,6 +192,7 @@ void SAColorToolButton::PrivateData::calcIconAndColorRect(const QIcon& icon,
         colorRect = QRect(2 * mSpacing, 2 * mSpacing, 5, buttonRect.height() - 4 * mSpacing);
     } break;
     case Qt::ToolButtonTextBesideIcon: {
+        QSize colorSize = iconSize;
         if (colorSize.isNull()) {
             colorSize = QSize(16, 16);
         }
@@ -188,7 +200,7 @@ void SAColorToolButton::PrivateData::calcIconAndColorRect(const QIcon& icon,
             // 说明没有icon
             // 这时所有都是color
             // iconRect=Null
-            QSize colorSize = iconSize;
+
             if (colorSize.height() > buttonRect.height()) {
                 colorSize.setHeight(buttonRect.height() - 2 * mSpacing);
             }
@@ -196,14 +208,13 @@ void SAColorToolButton::PrivateData::calcIconAndColorRect(const QIcon& icon,
                 colorSize.setWidth(buttonRect.width() - 2 * mSpacing);
             }
             iconRect  = QRect();
-            colorRect = QRect(mSpacing * 2,
-                              buttonRect.height() - colorSize.height() - 2 * mSpacing / 2,
+            colorRect = QRect(mSpacing,
+                              (buttonRect.height() - colorSize.height() - 2 * mSpacing) / 2,
                               colorSize.width(),
                               colorSize.height());
         } else {
             //有icon，颜色位于图标下面
             int h = (buttonRect.height() - 3 * mSpacing) / 3.0;  //计算按钮1/3高度,有一个spacing是图标和按钮之间
-
             //说明有iconsize
             if (iconSize.height() < 2 * h) {
                 //说明iconsize比较小
@@ -214,7 +225,7 @@ void SAColorToolButton::PrivateData::calcIconAndColorRect(const QIcon& icon,
                     colorHeight = 5;
                 }
                 int y     = (buttonRect.height() - 2 * mSpacing - iconSize.height() - colorHeight - mSpacing) / 2;  // 3个spacing，其中一个是icon和colorbar之间
-                int x     = (buttonRect.width() - iconSize.width()) / 2;  //居中
+                int x     = mSpacing;  //左对齐
                 iconRect  = QRect(x, y, iconSize.width(), iconSize.height());
                 colorRect = QRect(iconRect.x(), iconRect.bottom() + mSpacing, iconRect.width(), colorHeight);
             } else {
@@ -222,9 +233,9 @@ void SAColorToolButton::PrivateData::calcIconAndColorRect(const QIcon& icon,
                 //保证iconsize的高度是h，宽度等比例
                 int sizeW = 0;
                 if (iconSize.height() > 0) {
-                    sizeW = h * iconSize.width() / iconSize.height();
+                    sizeW = (2 * h) * iconSize.width() / iconSize.height();
                 }
-                int x     = (buttonRect.width() - sizeW) / 2;  //居中
+                int x     = mSpacing;  //左对齐
                 iconRect  = QRect(x, mSpacing, sizeW, 2 * h);
                 colorRect = QRect(iconRect.x(), iconRect.bottom() + mSpacing, iconRect.width(), h);
             }
@@ -238,40 +249,41 @@ void SAColorToolButton::PrivateData::calcIconAndColorRect(const QIcon& icon,
         if (icon.isNull()) {
             colorRect = buttonRect.adjusted(mSpacing, mSpacing, -mSpacing, -mSpacing);
             iconRect  = QRect();
-        }
-        int h = (buttonRect.height() - 3 * mSpacing) / 3.0;  //计算按钮1/3高度,有一个spacing是图标和按钮之间
-        if (iconSize.isNull()) {
-            // 如果定义了iconsize,需要判断iconsize，iconsize设置的比较小，图标会跟随比较小，如果不设置iconsize，或者设置了一个null
-            // size 则icon rect，会和tool button相关
-            iconRect  = buttonRect.adjusted(mSpacing, mSpacing, -mSpacing, -mSpacing - h);
-            colorRect = buttonRect.adjusted(mSpacing,
-                                            mSpacing + 2 * h + mSpacing,  //这里加mSpacing是为了把颜色和图标分开
-                                            -mSpacing,
-                                            -mSpacing);
         } else {
-            //说明有iconsize
-            if (iconSize.height() < 2 * h) {
-                //说明iconsize比较小
-                //这时以iconsize为主
-                //先计算颜色条的高度
-                int colorHeight = iconSize.height() / 4;
-                if (colorHeight < 5) {
-                    colorHeight = 5;
-                }
-                int y     = (buttonRect.height() - 2 * mSpacing - iconSize.height() - colorHeight - mSpacing) / 2;  // 3个spacing，其中一个是icon和colorbar之间
-                int x     = (buttonRect.width() - iconSize.width()) / 2;  //居中
-                iconRect  = QRect(x, y, iconSize.width(), iconSize.height());
-                colorRect = QRect(iconRect.x(), iconRect.bottom() + mSpacing, iconRect.width(), colorHeight);
+            int h = (buttonRect.height() - 3 * mSpacing) / 3.0;  //计算按钮1/3高度,有一个spacing是图标和按钮之间
+            if (iconSize.isNull()) {
+                // 如果定义了iconsize,需要判断iconsize，iconsize设置的比较小，图标会跟随比较小，如果不设置iconsize，或者设置了一个null
+                // size 则icon rect，会和tool button相关
+                iconRect  = buttonRect.adjusted(mSpacing, mSpacing, -mSpacing, -mSpacing - h);
+                colorRect = buttonRect.adjusted(mSpacing,
+                                                mSpacing + 2 * h + mSpacing,  //这里加mSpacing是为了把颜色和图标分开
+                                                -mSpacing,
+                                                -mSpacing);
             } else {
-                //说明iconsize比较大，则要进行缩放了
-                //保证iconsize的高度是h，宽度等比例
-                int sizeW = 0;
-                if (iconSize.height() > 0) {
-                    sizeW = h * iconSize.width() / iconSize.height();
+                //说明有iconsize
+                if (iconSize.height() < 2 * h) {
+                    //说明iconsize比较小
+                    //这时以iconsize为主
+                    //先计算颜色条的高度
+                    int colorHeight = iconSize.height() / 4;
+                    if (colorHeight < 5) {
+                        colorHeight = 5;
+                    }
+                    int y     = (buttonRect.height() - 2 * mSpacing - iconSize.height() - colorHeight - mSpacing) / 2;  // 3个spacing，其中一个是icon和colorbar之间
+                    int x     = (buttonRect.width() - iconSize.width()) / 2;  //居中
+                    iconRect  = QRect(x, y, iconSize.width(), iconSize.height());
+                    colorRect = QRect(iconRect.x(), iconRect.bottom() + mSpacing, iconRect.width(), colorHeight);
+                } else {
+                    //说明iconsize比较大，则要进行缩放了
+                    //保证iconsize的高度是h，宽度等比例
+                    int sizeW = 0;
+                    if (iconSize.height() > 0) {
+                        sizeW = (2 * h) * iconSize.width() / iconSize.height();
+                    }
+                    int x     = (buttonRect.width() - sizeW) / 2;  //居中
+                    iconRect  = QRect(x, mSpacing, sizeW, 2 * h);
+                    colorRect = QRect(iconRect.x(), iconRect.bottom() + mSpacing, iconRect.width(), h);
                 }
-                int x     = (buttonRect.width() - sizeW) / 2;  //居中
-                iconRect  = QRect(x, mSpacing, sizeW, 2 * h);
-                colorRect = QRect(iconRect.x(), iconRect.bottom() + mSpacing, iconRect.width(), h);
             }
         }
     } break;
