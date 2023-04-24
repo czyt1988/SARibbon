@@ -8,6 +8,7 @@ build*
 *.user.*
 ~*.pptx
 ~*.docx
+*.drawio.bkp
 
 # vscode 的隐藏文件
 /.vscode
