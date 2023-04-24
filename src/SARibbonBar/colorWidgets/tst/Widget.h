@@ -18,6 +18,10 @@ public:
     Widget(QWidget* parent = nullptr);
     ~Widget();
     QColor makeRandColor() const;
+    //
+    void setColor(const QColor& clr);
+private slots:
+    void onGridColorWidgetClicked(const QColor& c);
 
 private:
     Ui::Widget* ui;

@@ -25,7 +25,7 @@ public:
 public:
     QColor mColor { Qt::white };
     int mSpacing { 2 };                ///< 间隔
-    QMargins mMargins { 2, 2, 2, 2 };  ///< box
+    QMargins mMargins { 3, 3, 3, 3 };  ///< box
 
     static int s_indicatorArrorWidth;  ///< 菜单宽度
 };
@@ -291,6 +291,21 @@ SAColorToolButton::SAColorToolButton(QWidget* parent) : QToolButton(parent), d_p
 QColor SAColorToolButton::getColor() const
 {
     return d_ptr->mColor;
+}
+
+/**
+ * @brief 设置Margins
+ * @param mg
+ */
+void SAColorToolButton::setMargins(const QMargins& mg)
+{
+    d_ptr->mMargins = mg;
+    repaint();
+}
+
+QMargins SAColorToolButton::getMargins() const
+{
+    return d_ptr->mMargins;
 }
 
 /**

@@ -43,6 +43,9 @@ public:
     explicit SAColorToolButton(QWidget* parent = nullptr);
     //获取颜色
     QColor getColor() const;
+    //设置Margins
+    void setMargins(const QMargins& mg);
+    QMargins getMargins() const;
 public slots:
     //设置颜色,会发射colorChanged信号
     void setColor(const QColor& c);
