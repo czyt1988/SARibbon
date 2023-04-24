@@ -44,18 +44,34 @@ public:
     //获取颜色
     QColor getColor() const;
 public slots:
-    //设置颜色
+    //设置颜色,会发射colorChanged信号
     void setColor(const QColor& c);
 
 protected:
     //获取关键的三个rect位置
     virtual void calcRect(const QStyleOptionToolButton& opt, QRect& iconRect, QRect& textRect, QRect& colorRect);
-    virtual void paintEvent(QPaintEvent* e) Q_DECL_OVERRIDE;
-    virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
     virtual void paintButton(QStylePainter* p, const QStyleOptionToolButton& opt);
     virtual void paintIcon(QStylePainter* p, const QRect& iconRect, const QStyleOptionToolButton& opt);
     virtual void paintText(QStylePainter* p, const QRect& textRect, const QStyleOptionToolButton& opt);
     virtual void paintColor(QStylePainter* p, const QRect& colorRect, const QColor& color, const QStyleOptionToolButton& opt);
+
+protected:
+    virtual void paintEvent(QPaintEvent* e) Q_DECL_OVERRIDE;
+    virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
+    virtual QSize sizeHint() const Q_DECL_OVERRIDE;
+private slots:
+    void onButtonClicked(bool checked = false);
+signals:
+    /**
+     * @brief 颜色被点击的响应
+     * @param color
+     */
+    void colorClicked(const QColor& color, bool checked = false);
+    /**
+     * @brief 颜色改变信号
+     * @param color
+     */
+    void colorChanged(const QColor& color);
 };
 
 #endif  // SACOLORTOOLBUTTON_H

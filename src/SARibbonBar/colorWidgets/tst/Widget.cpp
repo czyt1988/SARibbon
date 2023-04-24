@@ -1,6 +1,10 @@
 ﻿#include "Widget.h"
 #include "ui_Widget.h"
 #include <QMenu>
+#include <cstdlib>
+#include <iostream>
+#include <ctime>
+#include <QDebug>
 Widget::Widget(QWidget* parent) : QWidget(parent), ui(new Ui::Widget)
 {
     QColor clr(Qt::blue);
@@ -20,16 +24,17 @@ Widget::Widget(QWidget* parent) : QWidget(parent), ui(new Ui::Widget)
     menu->addAction("4");
     menu->addAction("5");
     ui->toolButtonIconOnlyHaveIconMenuPopupMode->setColor(clr);
-    ui->toolButtonIconOnlyHaveIconMenuPopupMode->setMenu(menu);
     ui->toolButtonIconOnlyHaveIconMenuPopupMode2->setColor(clr);
-    ui->toolButtonIconOnlyHaveIconMenuPopupMode2->setMenu(menu);
     ui->toolButtonIconOnlyHaveIconInstantPop->setColor(clr);
-    ui->toolButtonIconOnlyHaveIconInstantPop->setMenu(menu);
     ui->toolButtonIconOnlyHaveIconInstantPop2->setColor(clr);
-    ui->toolButtonIconOnlyHaveIconInstantPop2->setMenu(menu);
     ui->toolButtonIconOnlyHaveIconDelayedPop->setColor(clr);
-    ui->toolButtonIconOnlyHaveIconDelayedPop->setMenu(menu);
     ui->toolButtonIconOnlyHaveIconDelayedPop2->setColor(clr);
+
+    ui->toolButtonIconOnlyHaveIconMenuPopupMode->setMenu(menu);
+    ui->toolButtonIconOnlyHaveIconMenuPopupMode2->setMenu(menu);
+    ui->toolButtonIconOnlyHaveIconInstantPop->setMenu(menu);
+    ui->toolButtonIconOnlyHaveIconInstantPop2->setMenu(menu);
+    ui->toolButtonIconOnlyHaveIconDelayedPop->setMenu(menu);
     ui->toolButtonIconOnlyHaveIconDelayedPop2->setMenu(menu);
 
     // Text Only
@@ -42,16 +47,17 @@ Widget::Widget(QWidget* parent) : QWidget(parent), ui(new Ui::Widget)
     ui->toolButtonIconOnlyTextHaveIconLarge->setColor(clr);
     ui->toolButtonIconOnlyTextHaveIconLarge_1->setColor(clr);
     ui->toolButtonIconOnlyTextHaveIconMenuPopupMode->setColor(clr);
-    ui->toolButtonIconOnlyTextHaveIconMenuPopupMode->setMenu(menu);
     ui->toolButtonIconOnlyTextHaveIconMenuPopupMode_1->setColor(clr);
-    ui->toolButtonIconOnlyTextHaveIconMenuPopupMode_1->setMenu(menu);
     ui->toolButtonIconOnlyTextHaveIconDelayedPop->setColor(clr);
-    ui->toolButtonIconOnlyTextHaveIconDelayedPop->setMenu(menu);
     ui->toolButtonIconOnlyTextHaveIconDelayedPop_1->setColor(clr);
-    ui->toolButtonIconOnlyTextHaveIconDelayedPop_1->setMenu(menu);
     ui->toolButtonIconOnlyTextHaveIconInstantPop->setColor(clr);
-    ui->toolButtonIconOnlyTextHaveIconInstantPop->setMenu(menu);
     ui->toolButtonIconOnlyTextHaveIconInstantPop_1->setColor(clr);
+
+    ui->toolButtonIconOnlyTextHaveIconMenuPopupMode->setMenu(menu);
+    ui->toolButtonIconOnlyTextHaveIconMenuPopupMode_1->setMenu(menu);
+    ui->toolButtonIconOnlyTextHaveIconDelayedPop->setMenu(menu);
+    ui->toolButtonIconOnlyTextHaveIconDelayedPop_1->setMenu(menu);
+    ui->toolButtonIconOnlyTextHaveIconInstantPop->setMenu(menu);
     ui->toolButtonIconOnlyTextHaveIconInstantPop_1->setMenu(menu);
 
     // Text beside
@@ -69,9 +75,50 @@ Widget::Widget(QWidget* parent) : QWidget(parent), ui(new Ui::Widget)
     ui->toolButtonTextBesideHaveIconDelayedPop1->setColor(clr);
     ui->toolButtonTextBesideMenuPopupMode->setColor(clr);
     ui->toolButtonTextBesideMenuPopupMode1->setColor(clr);
+
+    // TextUnderIcon
+    ui->toolButtonTextUnderIcon->setColor(clr);
+    ui->toolButtonTextUnderIcon1->setColor(clr);
+    ui->toolButtonTextUnderIconHaveIcon->setColor(clr);
+    ui->toolButtonTextUnderIconHaveIcon1->setColor(clr);
+    ui->toolButtonTextUnderIconHaveIconSmall->setColor(clr);
+    ui->toolButtonTextUnderIconHaveIconSmall1->setColor(clr);
+    ui->toolButtonTextUnderIconHaveIconLarge->setColor(clr);
+    ui->toolButtonTextUnderIconHaveIconLarge1->setColor(clr);
+    ui->toolButtonTextUnderIconMenuPopupMode->setColor(clr);
+    ui->toolButtonTextUnderIconMenuPopupMode1->setColor(clr);
+    ui->toolButtonTextUnderIconInstantPop->setColor(clr);
+    ui->toolButtonTextUnderIconInstantPop1->setColor(clr);
+    ui->toolButtonTextUnderIconDelayedPop->setColor(clr);
+    ui->toolButtonTextUnderIconDelayedPop1->setColor(clr);
+    //
+    QList< QColor > clrs;
+    for (int i = 0; i < 8; ++i) {
+        clrs.append(makeRandColor());
+    }
+    ui->colorGrid1->setColumnCount(0);
+    ui->colorGrid1->setColorList(clrs);
+
+    QList< QColor > clrs2;
+    for (int i = 0; i < 30; ++i) {
+        clrs2.append(makeRandColor());
+    }
+    ui->colorGrid2->setColumnCount(5);
+    ui->colorGrid2->setColorList(clrs2);
 }
 
 Widget::~Widget()
 {
     delete ui;
+}
+
+QColor Widget::makeRandColor() const
+{
+    QColor res;
+    std::srand(std::time(nullptr));
+    res.setRed(std::rand() * 255 / RAND_MAX);
+    res.setGreen(std::rand() * 255 / RAND_MAX);
+    res.setBlue(std::rand() * 255 / RAND_MAX);
+    qDebug() << std::rand() << " " << std::rand() << " " << std::rand();
+    return res;
 }
