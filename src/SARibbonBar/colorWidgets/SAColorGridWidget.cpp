@@ -2,6 +2,8 @@
 #include "SAColorToolButton.h"
 #include <QGridLayout>
 #include <cmath>
+#include <QButtonGroup>
+#include <functional>
 class SAColorGridWidget::PrivateData
 {
     SA_DECLARE_PUBLIC(SAColorGridWidget)
@@ -12,14 +14,18 @@ public:
     SAColorToolButton* getColorToolButtonAt(int r, int c);
     void updateGridColor();
     void updateGridColorSize();
+    void updateGridColorCheckable();
+    void updateGridColorBtns(std::function< void(SAColorToolButton*) > fn);
     void removeAt(int r, int c);
     void setColorAt(const QColor& clr, int r, int c);
 
 public:
     QList< QColor > mColors;
     QGridLayout* mGridLayout { nullptr };
+    QButtonGroup* mButtonGroup { nullptr };
     QSize mIconSize { 16, 16 };
     int mColumnCount { 8 };  ///< 列数，行数量会根据列数量来匹配,如果设置-1或者0，说明不限定列数量，这样会只有一行
+    bool mColorCheckable;    ///<设置颜色是否是checkable
 };
 
 SAColorGridWidget::PrivateData::PrivateData(SAColorGridWidget* p) : q_ptr(p)
@@ -27,6 +33,8 @@ SAColorGridWidget::PrivateData::PrivateData(SAColorGridWidget* p) : q_ptr(p)
     mGridLayout = new QGridLayout(q_ptr);
     q_ptr->setLayout(mGridLayout);
     mGridLayout->setSpacing(4);
+    mButtonGroup = new QButtonGroup(q_ptr);
+    mButtonGroup->setExclusive(true);
 }
 
 SAColorToolButton* SAColorGridWidget::PrivateData::getColorToolButtonAt(int index)
@@ -77,12 +85,34 @@ void SAColorGridWidget::PrivateData::updateGridColor()
  */
 void SAColorGridWidget::PrivateData::updateGridColorSize()
 {
+    QSize s = mIconSize;
+    updateGridColorBtns([ s ](SAColorToolButton* btn) {
+        if (btn) {
+            btn->setIconSize(s);
+        }
+    });
+}
+
+void SAColorGridWidget::PrivateData::updateGridColorCheckable()
+{
+    bool v = mColorCheckable;
+    updateGridColorBtns([ v ](SAColorToolButton* btn) {
+        if (btn) {
+            btn->setCheckable(v);
+        }
+    });
+}
+
+/**
+ * @brief 遍历所有的button
+ * @param fn
+ */
+void SAColorGridWidget::PrivateData::updateGridColorBtns(std::function< void(SAColorToolButton*) > fn)
+{
     int cnt = mGridLayout->count();
     for (int i = 0; i < cnt; ++i) {
         SAColorToolButton* tl = getColorToolButtonAt(i);
-        if (tl) {
-            tl->setIconSize(mIconSize);
-        }
+        fn(tl);
     }
 }
 
@@ -114,7 +144,11 @@ void SAColorGridWidget::PrivateData::setColorAt(const QColor& clr, int r, int c)
         SAColorToolButton* tl = new SAColorToolButton(q_ptr);
         tl->setToolButtonStyle(Qt::ToolButtonIconOnly);
         tl->setIconSize(mIconSize);
+        tl->setMargins(QMargins(4, 4, 4, 4));
         tl->setColor(clr);
+        tl->setCheckable(true);
+        tl->setAutoRaise(true);
+        mButtonGroup->addButton(tl, r + c);
         mGridLayout->addWidget(tl, r, c);
     }
 }
@@ -125,6 +159,10 @@ void SAColorGridWidget::PrivateData::setColorAt(const QColor& clr, int r, int c)
 
 SAColorGridWidget::SAColorGridWidget(QWidget* par) : QWidget(par), d_ptr(new SAColorGridWidget::PrivateData(this))
 {
+    connect(d_ptr->mButtonGroup, QOverload< QAbstractButton* >::of(&QButtonGroup::buttonClicked), this, &SAColorGridWidget::onButtonClicked);
+    connect(d_ptr->mButtonGroup, QOverload< QAbstractButton* >::of(&QButtonGroup::buttonPressed), this, &SAColorGridWidget::onButtonPressed);
+    connect(d_ptr->mButtonGroup, QOverload< QAbstractButton* >::of(&QButtonGroup::buttonReleased), this, &SAColorGridWidget::onButtonReleased);
+    connect(d_ptr->mButtonGroup, QOverload< QAbstractButton*, bool >::of(&QButtonGroup::buttonToggled), this, &SAColorGridWidget::onButtonToggled);
 }
 
 SAColorGridWidget::~SAColorGridWidget()
@@ -198,5 +236,105 @@ void SAColorGridWidget::setColorIconSize(const QSize& s)
  */
 QSize SAColorGridWidget::getColorIconSize() const
 {
-    return QSize();
+    return d_ptr->mIconSize;
+}
+
+/**
+ * @brief 设置颜色是否是checkable
+ *
+ * checkable的颜色按钮是可checked的
+ * @param on
+ */
+void SAColorGridWidget::setColorCheckable(bool on)
+{
+    d_ptr->mColorCheckable = on;
+    d_ptr->updateGridColorCheckable();
+}
+
+/**
+ * @brief 颜色是否是checkable
+ * @return
+ */
+bool SAColorGridWidget::isColorCheckable() const
+{
+    return d_ptr->mColorCheckable;
+}
+
+/**
+ * @brief 获取当前选中的颜色
+ * @return
+ */
+QColor SAColorGridWidget::getCurrentCheckedColor() const
+{
+    QAbstractButton* btn = d_ptr->mButtonGroup->checkedButton();
+    if (nullptr == btn) {
+        return QColor();
+    }
+    SAColorToolButton* t = qobject_cast< SAColorToolButton* >(btn);
+    if (nullptr == t) {
+        return QColor();
+    }
+    return t->getColor();
+}
+
+/**
+ * @brief 获取index对应的colorbutton
+ * @param index
+ * @return 如果没有返回nullptr
+ */
+SAColorToolButton* SAColorGridWidget::getColorButton(int index) const
+{
+    return d_ptr->getColorToolButtonAt(index);
+}
+
+void SAColorGridWidget::onButtonClicked(QAbstractButton* btn)
+{
+    SAColorToolButton* t = qobject_cast< SAColorToolButton* >(btn);
+    if (t) {
+        emit colorClicked(t->getColor());
+    }
+}
+
+void SAColorGridWidget::onButtonPressed(QAbstractButton* btn)
+{
+    SAColorToolButton* t = qobject_cast< SAColorToolButton* >(btn);
+    if (t) {
+        emit colorPressed(t->getColor());
+    }
+}
+
+void SAColorGridWidget::onButtonToggled(QAbstractButton* btn, bool on)
+{
+    SAColorToolButton* t = qobject_cast< SAColorToolButton* >(btn);
+    if (t) {
+        emit colorToggled(t->getColor(), on);
+    }
+}
+
+void SAColorGridWidget::onButtonReleased(QAbstractButton* btn)
+{
+    SAColorToolButton* t = qobject_cast< SAColorToolButton* >(btn);
+    if (t) {
+        emit colorReleased(t->getColor());
+    }
+}
+
+namespace SA
+{
+
+QList< QColor > getStandardColorList()
+{
+    static QList< QColor > s_standardColorList({ QColor(192, 0, 0),
+                                                 QColor(255, 0, 0),
+                                                 QColor(255, 192, 0),
+                                                 QColor(192, 0, 0),
+                                                 QColor(255, 255, 0),
+                                                 QColor(146, 208, 80),
+                                                 QColor(0, 176, 80),
+                                                 QColor(0, 176, 240),
+                                                 QColor(0, 112, 192),
+                                                 QColor(0, 32, 96),
+                                                 QColor(112, 48, 160) });
+    return s_standardColorList;
+}
 }

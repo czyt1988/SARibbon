@@ -17,12 +17,14 @@ DEFINES += QT_DEPRECATED_WARNINGS
 INCLUDEPATH += $$PWD/../
 SOURCES += \
     ../SAColorGridWidget.cpp \
+    ../SAColorPaletteGridWidget.cpp \
     ../SAColorToolButton.cpp \
     main.cpp \
     Widget.cpp
 
 HEADERS += \
     ../SAColorGridWidget.h \
+    ../SAColorPaletteGridWidget.h \
     ../SAColorToolButton.h \
     ../SAColorWidgetsGlobal.h \
     Widget.h

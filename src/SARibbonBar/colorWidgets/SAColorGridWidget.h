@@ -2,9 +2,18 @@
 #define SACOLORGRIDWIDGET_H
 #include <QWidget>
 #include "SAColorWidgetsGlobal.h"
-
+class QAbstractButton;
+class SAColorToolButton;
 /**
  * @brief 一个grid的Color布局
+ *
+ * 一个形如下面的颜色grid：
+ *
+ * □□□□□□□□□
+ *
+ * □□□□□□□□□
+ *
+ * □□□□□□□□□
  */
 class SAColorGridWidget : public QWidget
 {
@@ -28,7 +37,36 @@ public:
     //图标的尺寸
     void setColorIconSize(const QSize& s);
     QSize getColorIconSize() const;
-    //
-};
+    //设置颜色是否是checkable
+    void setColorCheckable(bool on = true);
+    bool isColorCheckable() const;
+    //获取当前选中的颜色
+    QColor getCurrentCheckedColor() const;
+    //获取index对于的colorbutton
+    SAColorToolButton* getColorButton(int index) const;
+private slots:
+    void onButtonClicked(QAbstractButton* btn);
+    void onButtonPressed(QAbstractButton* btn);
+    void onButtonReleased(QAbstractButton* btn);
+    void onButtonToggled(QAbstractButton* btn, bool on);
 
+signals:
+    /**
+     * @brief 对于check模式，check的颜色触发的信号
+     * @param c
+     * @param on
+     */
+    void colorClicked(const QColor& c);
+    void colorPressed(const QColor& c);
+    void colorReleased(const QColor& c);
+    void colorToggled(const QColor& c, bool on);
+};
+namespace SA
+{
+/**
+ * @brief 获取标准色列表（一共10种颜色）
+ * @return
+ */
+QList< QColor > getStandardColorList();
+}
 #endif  // SACOLORGRIDWIDGET_H

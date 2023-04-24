@@ -13,8 +13,11 @@
   <property name="windowTitle">
    <string>Widget</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout_2">
-   <item row="0" column="0">
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="SAColorGridWidget" name="colorGrid1" native="true"/>
+   </item>
+   <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
       <number>4</number>
@@ -1281,52 +1284,25 @@
       <attribute name="title">
        <string>ColorGridWidget</string>
       </attribute>
-      <widget class="SAColorGridWidget" name="colorGrid1" native="true">
-       <property name="geometry">
-        <rect>
-         <x>70</x>
-         <y>60</y>
-         <width>481</width>
-         <height>80</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_29">
-       <property name="geometry">
-        <rect>
-         <x>30</x>
-         <y>30</y>
-         <width>54</width>
-         <height>12</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>col=0</string>
-       </property>
-      </widget>
-      <widget class="SAColorGridWidget" name="colorGrid2" native="true">
-       <property name="geometry">
-        <rect>
-         <x>70</x>
-         <y>210</y>
-         <width>481</width>
-         <height>161</height>
-        </rect>
-       </property>
-      </widget>
-      <widget class="QLabel" name="label_30">
-       <property name="geometry">
-        <rect>
-         <x>30</x>
-         <y>180</y>
-         <width>111</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>row=5,col=5</string>
-       </property>
-      </widget>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_30">
+         <property name="text">
+          <string>row=5,col=5</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="SAColorGridWidget" name="colorGrid2" native="true">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </widget>
     </widget>
    </item>
