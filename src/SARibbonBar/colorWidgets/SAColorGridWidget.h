@@ -1,6 +1,7 @@
 ﻿#ifndef SACOLORGRIDWIDGET_H
 #define SACOLORGRIDWIDGET_H
 #include <QWidget>
+#include <functional>
 #include "SAColorWidgetsGlobal.h"
 class QAbstractButton;
 class SAColorToolButton;
@@ -20,6 +21,9 @@ class SAColorGridWidget : public QWidget
     Q_OBJECT
     SA_DECLARE_PRIVATE(SAColorGridWidget)
     Q_PROPERTY(int spacing READ getSpacing WRITE setSpacing)
+public:
+    using FunColorBtn = std::function< void(SAColorToolButton*) >;
+
 public:
     SAColorGridWidget(QWidget* par = nullptr);
     ~SAColorGridWidget();
@@ -44,6 +48,16 @@ public:
     QColor getCurrentCheckedColor() const;
     //获取index对于的colorbutton
     SAColorToolButton* getColorButton(int index) const;
+    //垂直间距
+    void setVerticalSpacing(int v);
+    int getVerticalSpacing() const;
+    //水平间距
+    void setHorizontalSpacing(int v);
+    int getHorizontalSpacing() const;
+    //清除当前选中状态，这时没有颜色是选中的
+    void clearCheckedState();
+    //对所有的colorbtn就行遍历处理，可以通过此函数进行tooltip设置等操作
+    void iterationColorBtns(FunColorBtn fn);
 private slots:
     void onButtonClicked(QAbstractButton* btn);
     void onButtonPressed(QAbstractButton* btn);

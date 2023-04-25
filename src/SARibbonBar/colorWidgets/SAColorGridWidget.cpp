@@ -3,7 +3,7 @@
 #include <QGridLayout>
 #include <cmath>
 #include <QButtonGroup>
-#include <functional>
+
 class SAColorGridWidget::PrivateData
 {
     SA_DECLARE_PUBLIC(SAColorGridWidget)
@@ -12,10 +12,11 @@ public:
     //获取ColorToolButton
     SAColorToolButton* getColorToolButtonAt(int index);
     SAColorToolButton* getColorToolButtonAt(int r, int c);
+    SAColorToolButton* getCheckedButton() const;
     void updateGridColor();
     void updateGridColorSize();
     void updateGridColorCheckable();
-    void updateGridColorBtns(std::function< void(SAColorToolButton*) > fn);
+    void iterationColorBtns(SAColorGridWidget::FunColorBtn fn);
     void removeAt(int r, int c);
     void setColorAt(const QColor& clr, int r, int c);
 
@@ -55,6 +56,11 @@ SAColorToolButton* SAColorGridWidget::PrivateData::getColorToolButtonAt(int r, i
     return qobject_cast< SAColorToolButton* >(item->widget());
 }
 
+SAColorToolButton* SAColorGridWidget::PrivateData::getCheckedButton() const
+{
+    return qobject_cast< SAColorToolButton* >(mButtonGroup->checkedButton());
+}
+
 /**
  * @brief 根据mColors更新布局
  */
@@ -86,7 +92,7 @@ void SAColorGridWidget::PrivateData::updateGridColor()
 void SAColorGridWidget::PrivateData::updateGridColorSize()
 {
     QSize s = mIconSize;
-    updateGridColorBtns([ s ](SAColorToolButton* btn) {
+    iterationColorBtns([ s ](SAColorToolButton* btn) {
         if (btn) {
             btn->setIconSize(s);
         }
@@ -96,7 +102,7 @@ void SAColorGridWidget::PrivateData::updateGridColorSize()
 void SAColorGridWidget::PrivateData::updateGridColorCheckable()
 {
     bool v = mColorCheckable;
-    updateGridColorBtns([ v ](SAColorToolButton* btn) {
+    iterationColorBtns([ v ](SAColorToolButton* btn) {
         if (btn) {
             btn->setCheckable(v);
         }
@@ -107,7 +113,7 @@ void SAColorGridWidget::PrivateData::updateGridColorCheckable()
  * @brief 遍历所有的button
  * @param fn
  */
-void SAColorGridWidget::PrivateData::updateGridColorBtns(std::function< void(SAColorToolButton*) > fn)
+void SAColorGridWidget::PrivateData::iterationColorBtns(FunColorBtn fn)
 {
     int cnt = mGridLayout->count();
     for (int i = 0; i < cnt; ++i) {
@@ -285,6 +291,65 @@ QColor SAColorGridWidget::getCurrentCheckedColor() const
 SAColorToolButton* SAColorGridWidget::getColorButton(int index) const
 {
     return d_ptr->getColorToolButtonAt(index);
+}
+
+/**
+ * @brief 等同GridLayout的VerticalSpacing属性
+ * @param v
+ */
+void SAColorGridWidget::setVerticalSpacing(int v)
+{
+    d_ptr->mGridLayout->setVerticalSpacing(v);
+}
+/**
+ * @brief 等同GridLayout的VerticalSpacing属性
+ * @return
+ */
+int SAColorGridWidget::getVerticalSpacing() const
+{
+    return d_ptr->mGridLayout->verticalSpacing();
+}
+/**
+ * @brief 等同GridLayout的HorizontalSpacing属性
+ * @param v
+ */
+void SAColorGridWidget::setHorizontalSpacing(int v)
+{
+    d_ptr->mGridLayout->setHorizontalSpacing(v);
+}
+/**
+ * @brief 等同GridLayout的HorizontalSpacing属性
+ * @return
+ */
+int SAColorGridWidget::getHorizontalSpacing() const
+{
+    return d_ptr->mGridLayout->horizontalSpacing();
+}
+
+/**
+ * @brief 清除选中状态，这时没有颜色是选中的
+ */
+void SAColorGridWidget::clearCheckedState()
+{
+    if (d_ptr->mButtonGroup->exclusive()) {
+        SAColorToolButton* btn = d_ptr->getCheckedButton();
+        if (btn) {
+            d_ptr->mButtonGroup->setExclusive(false);
+            btn->setChecked(false);
+            d_ptr->mButtonGroup->setExclusive(true);
+        }
+    } else {
+        d_ptr->iterationColorBtns([](SAColorToolButton* btn) {
+            if (btn->isChecked()) {
+                btn->setChecked(false);
+            }
+        });
+    }
+}
+
+void SAColorGridWidget::iterationColorBtns(SAColorGridWidget::FunColorBtn fn)
+{
+    d_ptr->iterationColorBtns(fn);
 }
 
 void SAColorGridWidget::onButtonClicked(QAbstractButton* btn)
