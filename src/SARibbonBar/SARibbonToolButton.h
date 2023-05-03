@@ -8,12 +8,12 @@
  *
  * 相对于普通toolbutton，主要多了两个类型设置，@ref setButtonType 和 @ref setLargeButtonType
  *
- * @note @sa setIconSize 函数不在起作用
+ * @note @sa setIconSize 函数不在起作用，iconsize是根据当前尺寸动态调整的
  */
 class SA_RIBBON_EXPORT SARibbonToolButton : public QToolButton
 {
     Q_OBJECT
-
+    SA_RIBBON_DECLARE_PRIVATE(SARibbonToolButton)
 public:
     /**
      * @brief 按钮样式
@@ -36,6 +36,7 @@ public:
 public:
     SARibbonToolButton(QWidget* parent = Q_NULLPTR);
     SARibbonToolButton(QAction* defaultAction, QWidget* parent = Q_NULLPTR);
+    ~SARibbonToolButton();
     //标记按钮的样式，按钮的样式有不同的渲染方式
     RibbonButtonType buttonType() const;
     void setButtonType(const RibbonButtonType& buttonType);
@@ -62,9 +63,8 @@ protected:
     //在需要绘制文字的时候调用此函数，有些效果需要文字的文字改变
     QRect adjustedTextRect(const QStyleOptionToolButton& opt) const;
     QRect calcIndicatorArrowDownRect(const QStyleOptionToolButton& opt);
-    QPixmap createIconPixmap(const QStyleOptionToolButton& opt, const QSize& iconsize);
 
-    virtual void paintEvent(QPaintEvent* event) Q_DECL_OVERRIDE;
+    virtual void paintEvent(QPaintEvent* e) Q_DECL_OVERRIDE;
     virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
     virtual void mouseMoveEvent(QMouseEvent* e) Q_DECL_OVERRIDE;
     virtual void mousePressEvent(QMouseEvent* e) Q_DECL_OVERRIDE;
@@ -75,7 +75,20 @@ protected:
     virtual void paintSmallButton(QPaintEvent* e);
     virtual bool hitButton(const QPoint& pos) const Q_DECL_OVERRIDE;
     virtual QSize sizeHint() const Q_DECL_OVERRIDE;
+    //绘制按钮
+    virtual void paintButton(QPainter& p, const QStyleOptionToolButton& opt);
+    //绘制图标
+    virtual void paintIcon(QPainter& p, const QStyleOptionToolButton& opt);
+    //绘制文本
+    virtual void paintText(QPainter& p, const QStyleOptionToolButton& opt);
+
     virtual void drawIconAndLabel(QPainter& p, QStyleOptionToolButton& opt);
+    //绘制MenuButtonPopup模式下的菜单箭头
+    virtual void drawMenuButtonPopupIndicatorArrow(QPainter& p, const QStyleOptionToolButton& opt);
+    //获取button的尺寸
+    QRect getIconDrawRect(const QStyleOptionToolButton& opt);
+    //获取
+    QRect getIndicatorDrawRect(const QStyleOptionToolButton& opt);
 
 private:
     static void drawArrow(const QStyle* style,
@@ -89,19 +102,6 @@ protected:
     //事件改变 - 主要为了捕获字体的改变
     void changeEvent(QEvent* e) Q_DECL_OVERRIDE;
     virtual void actionEvent(QActionEvent* e) Q_DECL_OVERRIDE;
-
-private:
-    static bool s_isToolButtonTextShift;  ///< 配置SARibbonToolButton文字在点击时是否会轻微改变位置而达到一种类似跳动的效果,@default 默认为false
-    static bool s_liteStyleEnableWordWrap;  ///< 在lite模式下是否允许文字换行，如果允许，则图标相对比较小，默认不允许
-    RibbonButtonType m_buttonType;
-    LargeButtonType m_largeButtonType;
-    bool m_mouseOnSubControl;  ///< 这个用于标记MenuButtonPopup模式下，鼠标在文本区域
-    bool m_menuButtonPressed;
-    QRect m_iconRect;        ///< 记录icon的绘制位置
-    QRect m_textRect;        ///< 记录text的绘制位置
-    bool m_isWordWrap;       ///< 标记是否文字换行 @default false
-    int m_iconAndTextSpace;  ///< 按钮和边框的距离
-    QSize m_sizeHint;        ///< 保存计算好的sizehint
 };
 
 #endif  // SARIBBONTOOLBUTTON_H
