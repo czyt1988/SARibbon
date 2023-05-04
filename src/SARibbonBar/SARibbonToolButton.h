@@ -45,9 +45,6 @@ public:
     void setLargeButtonType(LargeButtonType type);
     LargeButtonType largeButtonType() const;
 
-    void reCalcSizeHint();
-    void reCalcSizeHint(QSize s);
-
 public:
     //按钮点击时文字是否会闪烁一下
     static void setToolButtonTextShift(bool on);
@@ -57,12 +54,8 @@ public:
     static bool isLiteStyleEnableWordWrap();
 
 protected:
-    //此函数用来计算icon和text的尺寸
-    //注意icon的尺寸依赖text，且只要知道字体大小就可以确定icon的高度
-    void calcIconAndTextRect(const QStyleOptionToolButton& opt);
     //在需要绘制文字的时候调用此函数，有些效果需要文字的文字改变
     QRect adjustedTextRect(const QStyleOptionToolButton& opt) const;
-    QRect calcIndicatorArrowDownRect(const QStyleOptionToolButton& opt);
 
     virtual void paintEvent(QPaintEvent* e) Q_DECL_OVERRIDE;
     virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
@@ -71,20 +64,17 @@ protected:
     virtual void mouseReleaseEvent(QMouseEvent* e) Q_DECL_OVERRIDE;
     virtual void focusOutEvent(QFocusEvent* e) Q_DECL_OVERRIDE;
     virtual void leaveEvent(QEvent* e) Q_DECL_OVERRIDE;
-    virtual void paintLargeButton(QPaintEvent* e);
-    virtual void paintSmallButton(QPaintEvent* e);
     virtual bool hitButton(const QPoint& pos) const Q_DECL_OVERRIDE;
     virtual QSize sizeHint() const Q_DECL_OVERRIDE;
     //绘制按钮
     virtual void paintButton(QPainter& p, const QStyleOptionToolButton& opt);
     //绘制图标
-    virtual void paintIcon(QPainter& p, const QStyleOptionToolButton& opt);
+    virtual void paintIcon(QPainter& p, const QStyleOptionToolButton& opt, const QRect& iconDrawRect);
     //绘制文本
-    virtual void paintText(QPainter& p, const QStyleOptionToolButton& opt);
+    virtual void paintText(QPainter& p, const QStyleOptionToolButton& opt, const QRect& textDrawRect);
+    //绘制Indicator
+    virtual void paintIndicator(QPainter& p, const QStyleOptionToolButton& opt, const QRect& indicatorDrawRect);
 
-    virtual void drawIconAndLabel(QPainter& p, QStyleOptionToolButton& opt);
-    //绘制MenuButtonPopup模式下的菜单箭头
-    virtual void drawMenuButtonPopupIndicatorArrow(QPainter& p, const QStyleOptionToolButton& opt);
     //获取button的尺寸
     QRect getIconDrawRect(const QStyleOptionToolButton& opt);
     //获取
