@@ -57,9 +57,9 @@ int SARibbonStyleOption::calcMainbarHeight(SARibbonBar::RibbonStyle s) const
         return m_ribbonbarHeightOfficeStyleThreeRow - m_tabBarHeight;
     case SARibbonBar::WpsLiteStyleTwoRow:
         //两行模式把标题栏去掉
-        return m_ribbonbarHeightOfficeStyleThreeRow * 0.95 - m_tabBarHeight - SARibbonPannel::pannelTitleHeight();
+        return m_ribbonbarHeightOfficeStyleThreeRow * 0.9 - m_tabBarHeight - SARibbonPannel::pannelTitleHeight();
     case SARibbonBar::OfficeStyleTwoRow:
-        return m_ribbonbarHeightOfficeStyleThreeRow * 0.95 - SARibbonPannel::pannelTitleHeight();
+        return m_ribbonbarHeightOfficeStyleThreeRow - SARibbonPannel::pannelTitleHeight();
     default:
         break;
     }
