@@ -34,6 +34,7 @@ class SA_RIBBON_EXPORT SARibbonPannel : public QWidget
     Q_PROPERTY(bool isExpanding READ isExpanding WRITE setExpanding)
     Q_PROPERTY(QString pannelName READ pannelName WRITE setPannelName)
 public:
+public:
     SARibbonPannel(QWidget* parent = nullptr);
     SARibbonPannel(const QString& name, QWidget* parent = nullptr);
     ~SARibbonPannel() Q_DECL_OVERRIDE;

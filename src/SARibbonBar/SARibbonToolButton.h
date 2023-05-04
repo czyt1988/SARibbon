@@ -46,17 +46,11 @@ public:
     LargeButtonType largeButtonType() const;
 
 public:
-    //按钮点击时文字是否会闪烁一下
-    static void setToolButtonTextShift(bool on);
-    static bool isToolButtonTextShift();
     //在lite模式下是否允许文字换行
     static void setLiteStyleEnableWordWrap(bool on);
     static bool isLiteStyleEnableWordWrap();
 
 protected:
-    //在需要绘制文字的时候调用此函数，有些效果需要文字的文字改变
-    QRect adjustedTextRect(const QStyleOptionToolButton& opt) const;
-
     virtual void paintEvent(QPaintEvent* e) Q_DECL_OVERRIDE;
     virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
     virtual void mouseMoveEvent(QMouseEvent* e) Q_DECL_OVERRIDE;
@@ -66,6 +60,12 @@ protected:
     virtual void leaveEvent(QEvent* e) Q_DECL_OVERRIDE;
     virtual bool hitButton(const QPoint& pos) const Q_DECL_OVERRIDE;
     virtual QSize sizeHint() const Q_DECL_OVERRIDE;
+    virtual bool event(QEvent* e) Q_DECL_OVERRIDE;
+    //事件改变 - 主要为了捕获字体的改变
+    virtual void changeEvent(QEvent* e) Q_DECL_OVERRIDE;
+    virtual void actionEvent(QActionEvent* e) Q_DECL_OVERRIDE;
+
+protected:
     //绘制按钮
     virtual void paintButton(QPainter& p, const QStyleOptionToolButton& opt);
     //绘制图标
@@ -75,11 +75,6 @@ protected:
     //绘制Indicator
     virtual void paintIndicator(QPainter& p, const QStyleOptionToolButton& opt, const QRect& indicatorDrawRect);
 
-    //获取button的尺寸
-    QRect getIconDrawRect(const QStyleOptionToolButton& opt);
-    //获取
-    QRect getIndicatorDrawRect(const QStyleOptionToolButton& opt);
-
 private:
     static void drawArrow(const QStyle* style,
                           const QStyleOptionToolButton* toolbutton,
@@ -88,10 +83,6 @@ private:
                           const QWidget* widget = 0);
 
 protected:
-    bool event(QEvent* e) Q_DECL_OVERRIDE;
-    //事件改变 - 主要为了捕获字体的改变
-    void changeEvent(QEvent* e) Q_DECL_OVERRIDE;
-    virtual void actionEvent(QActionEvent* e) Q_DECL_OVERRIDE;
 };
 
 #endif  // SARIBBONTOOLBUTTON_H
