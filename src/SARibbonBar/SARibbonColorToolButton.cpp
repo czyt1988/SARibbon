@@ -1,10 +1,13 @@
 ﻿#include "SARibbonColorToolButton.h"
 #include <QStylePainter>
 #include <QStyleOptionToolButton>
+#include <QDebug>
+#include "colorWidgets/SAColorMenu.h"
 //===================================================
 // SARibbonColorToolButton::PrivateData
 //===================================================
 const int c_ribbonbutton_color_height = 4;  ///< 颜色块的高度
+
 class SARibbonColorToolButton::PrivateData
 {
     SA_RIBBON_DECLARE_PUBLIC(SARibbonColorToolButton)
@@ -77,13 +80,13 @@ QIcon SARibbonColorToolButton::PrivateData::createColorIcon(const QColor& c, con
 SARibbonColorToolButton::SARibbonColorToolButton(QWidget* parent)
     : SARibbonToolButton(parent), d_ptr(new SARibbonColorToolButton::PrivateData(this))
 {
-    connect(this, &SARibbonColorToolButton::clicked, this, &SARibbonColorToolButton::onButtonClicked);
+    connect(this, &QAbstractButton::clicked, this, &SARibbonColorToolButton::onButtonClicked);
 }
 
 SARibbonColorToolButton::SARibbonColorToolButton(QAction* defaultAction, QWidget* parent)
     : SARibbonToolButton(defaultAction, parent), d_ptr(new SARibbonColorToolButton::PrivateData(this))
 {
-    connect(this, &SARibbonColorToolButton::clicked, this, &SARibbonColorToolButton::onButtonClicked);
+    connect(this, &QAbstractButton::clicked, this, &SARibbonColorToolButton::onButtonClicked);
 }
 
 SARibbonColorToolButton::~SARibbonColorToolButton()
@@ -125,6 +128,25 @@ void SARibbonColorToolButton::setColorStyle(SARibbonColorToolButton::ColorStyle 
 SARibbonColorToolButton::ColorStyle SARibbonColorToolButton::colorStyle() const
 {
     return d_ptr->mColorStyle;
+}
+
+/**
+ * @brief 建立标准的颜色菜单
+ * @return
+ */
+SAColorMenu* SARibbonColorToolButton::setupStandardColorMenu()
+{
+    setPopupMode(QToolButton::MenuButtonPopup);
+    SAColorMenu* m       = new SAColorMenu(this);
+    QAction* customColor = m->getCustomColorAction();
+    if (customColor) {
+        customColor->setIcon(QIcon(":/image/resource/define-color.svg"));
+    }
+    connect(m, &SAColorMenu::selectedColor, this, &SARibbonColorToolButton::setColor);
+    setMenu(m);
+
+    updateRect();
+    return m;
 }
 
 /**

@@ -2,7 +2,7 @@
 #define SARIBBONTOOLBUTTON_H
 #include "SARibbonGlobal.h"
 #include <QToolButton>
-
+#include <QDebug>
 /**
  * @brief Ribbon界面适用的toolButton
  *
@@ -46,6 +46,8 @@ public:
     LargeButtonType largeButtonType() const;
     //获取间距
     int spacing() const;
+    //更新尺寸
+    void updateRect();
 
 public:
     //在lite模式下是否允许文字换行
@@ -87,4 +89,8 @@ private:
 protected:
 };
 
+namespace SA
+{
+QDebug operator<<(QDebug debug, const QStyleOptionToolButton& opt);
+}
 #endif  // SARIBBONTOOLBUTTON_H
