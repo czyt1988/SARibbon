@@ -10,11 +10,24 @@ class SA_RIBBON_EXPORT SARibbonColorToolButton : public SARibbonToolButton
     Q_OBJECT
     SA_RIBBON_DECLARE_PRIVATE(SARibbonColorToolButton)
 public:
+    /**
+     * @brief 颜色样式
+     */
+    enum ColorStyle
+    {
+        ColorUnderIcon,  ///< 颜色在icon下方，这个要求必须设置icon
+        ColorFillToIcon  ///< 颜色作为icon，这个模式下在setColor会自动生成一个颜色icon替换掉原来的icon，因此setIcon函数没有作用
+    };
+
+public:
     SARibbonColorToolButton(QWidget* parent = Q_NULLPTR);
     SARibbonColorToolButton(QAction* defaultAction, QWidget* parent = Q_NULLPTR);
     ~SARibbonColorToolButton();
     //获取颜色
     QColor getColor() const;
+    //
+    void setColorStyle(ColorStyle s);
+    ColorStyle colorStyle() const;
 public slots:
     //设置颜色,会发射colorChanged信号
     void setColor(const QColor& c);
@@ -33,8 +46,7 @@ signals:
     void colorChanged(const QColor& color);
 
 protected:
-    //绘制图标
-    virtual void paintIcon(QPainter& p, const QStyleOptionToolButton& opt, const QRect& iconDrawRect) Q_DECL_OVERRIDE;
+    void paintIcon(QPainter& p, const QStyleOptionToolButton& opt, const QRect& iconDrawRect);
 };
 
 #endif  // SARIBBONCOLORTOOLBUTTON_H

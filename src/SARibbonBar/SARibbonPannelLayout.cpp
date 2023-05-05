@@ -332,7 +332,6 @@ SARibbonPannelItem* SARibbonPannelLayout::createItem(QAction* action, SARibbonPa
                                                                                              : SARibbonToolButton::SmallButton);
 
         SARibbonToolButton* button = RibbonSubElementDelegate->createRibbonToolButton(pannel);
-        button->setAutoRaise(true);
         button->setFocusPolicy(Qt::NoFocus);
         button->setButtonType(buttonType);
         if (SARibbonToolButton::LargeButton == buttonType) {
