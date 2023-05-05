@@ -144,6 +144,21 @@ QSize SAColorPaletteGridWidget::getColorIconSize() const
     return d_ptr->mMainColorList->getColorIconSize();
 }
 
+/**
+ * @brief 设置颜色块是否能被checked
+ * @param on
+ */
+void SAColorPaletteGridWidget::setColorCheckable(bool on)
+{
+    d_ptr->mMainColorList->setColorCheckable(on);
+    d_ptr->mPaletteColorGrid->setColorCheckable(on);
+}
+
+bool SAColorPaletteGridWidget::isColorCheckable() const
+{
+    return d_ptr->mMainColorList->isColorCheckable();
+}
+
 void SAColorPaletteGridWidget::onMainColorClicked(const QColor& c)
 {
     d_ptr->mPaletteColorGrid->clearCheckedState();

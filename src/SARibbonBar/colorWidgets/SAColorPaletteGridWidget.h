@@ -24,6 +24,9 @@ public:
     //设置iconsize
     void setColorIconSize(const QSize& s);
     QSize getColorIconSize() const;
+    //设置颜色是否是checkable
+    void setColorCheckable(bool on = true);
+    bool isColorCheckable() const;
 private slots:
     void onMainColorClicked(const QColor& c);
     void onPaletteColorClicked(const QColor& c);

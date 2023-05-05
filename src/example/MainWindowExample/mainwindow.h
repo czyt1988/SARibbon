@@ -52,6 +52,7 @@ private slots:
     void onActionFontSmallerTriggered();
     void onActionwordWrapIn2rowTriggered(bool b);
     void onButtonGroupActionTriggered(QAction* act);
+    void onColorButtonColorClicked(const QColor& c, bool on);
 
 private:
     SARibbonContextCategory* m_contextCategory;

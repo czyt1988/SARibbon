@@ -13,12 +13,13 @@ public:
     SAColorToolButton* getColorToolButtonAt(int index);
     SAColorToolButton* getColorToolButtonAt(int r, int c);
     SAColorToolButton* getCheckedButton() const;
-    void updateGridColor();
+    void updateGridColor(bool isRemoveSpacer = false);
     void updateGridColorSize();
     void updateGridColorCheckable();
     void iterationColorBtns(SAColorGridWidget::FunColorBtn fn);
     void removeAt(int r, int c);
     void setColorAt(const QColor& clr, int r, int c);
+    bool isSpacer(int r, int c) const;
 
 public:
     QList< QColor > mColors;
@@ -27,6 +28,7 @@ public:
     QSize mIconSize { 16, 16 };
     int mColumnCount { 8 };  ///< 列数，行数量会根据列数量来匹配,如果设置-1或者0，说明不限定列数量，这样会只有一行
     bool mColorCheckable;    ///<设置颜色是否是checkable
+    bool mHorizontalSpacerToRight { false };  ///< 最右边是否有弹簧
 };
 
 SAColorGridWidget::PrivateData::PrivateData(SAColorGridWidget* p) : q_ptr(p)
@@ -67,7 +69,7 @@ SAColorToolButton* SAColorGridWidget::PrivateData::getCheckedButton() const
 /**
  * @brief 根据mColors更新布局
  */
-void SAColorGridWidget::PrivateData::updateGridColor()
+void SAColorGridWidget::PrivateData::updateGridColor(bool isRemoveSpacer)
 {
     int row = 1;
     int col = mColumnCount;
@@ -102,7 +104,13 @@ void SAColorGridWidget::PrivateData::updateGridColor()
         //多余的列清除
         for (int r = 0; r < row; ++r) {
             for (int c = col; c < nowGridCol; ++c) {
-                removeAt(r, c);
+                if (isRemoveSpacer) {
+                    removeAt(r, c);
+                } else {
+                    if (!isSpacer(r, c)) {
+                        removeAt(r, c);
+                    }
+                }
             }
         }
     }
@@ -156,7 +164,9 @@ void SAColorGridWidget::PrivateData::removeAt(int r, int c)
         QWidget* w = item->widget();
         mGridLayout->removeItem(item);
         delete item;
-        w->deleteLater();
+        if (w) {
+            w->deleteLater();
+        }
     }
 }
 
@@ -174,11 +184,22 @@ void SAColorGridWidget::PrivateData::setColorAt(const QColor& clr, int r, int c)
         tl->setIconSize(mIconSize);
         tl->setMargins(QMargins(4, 4, 4, 4));
         tl->setColor(clr);
-        tl->setCheckable(true);
+        tl->setCheckable(mColorCheckable);
         tl->setAutoRaise(true);
         mButtonGroup->addButton(tl, r + c);
         mGridLayout->addWidget(tl, r, c);
     }
+}
+
+bool SAColorGridWidget::PrivateData::isSpacer(int r, int c) const
+{
+    QLayoutItem* item = mGridLayout->itemAtPosition(r, c);
+    if (item) {
+        if (QSpacerItem* si = dynamic_cast< QSpacerItem* >(item)) {
+            return true;
+        }
+    }
+    return false;
 }
 
 //==============================================================
@@ -197,9 +218,18 @@ SAColorGridWidget::~SAColorGridWidget()
 {
 }
 
+/**
+ * @brief 设置列数，行数量会根据列数量来匹配,如果设置-1或者0，说明不限定列数量，这样会只有一行
+ * @param c
+ */
 void SAColorGridWidget::setColumnCount(int c)
 {
     d_ptr->mColumnCount = c;
+    d_ptr->updateGridColor(true);
+    if (d_ptr->mHorizontalSpacerToRight) {
+        setHorizontalSpacerToRight();
+    }
+    updateGeometry();
 }
 
 /**
@@ -377,6 +407,22 @@ void SAColorGridWidget::iterationColorBtns(SAColorGridWidget::FunColorBtn fn)
     d_ptr->iterationColorBtns(fn);
 }
 
+void SAColorGridWidget::setRowMinimumHeight(int row, int minSize)
+{
+    d_ptr->mGridLayout->setRowMinimumHeight(row, minSize);
+}
+
+void SAColorGridWidget::setHorizontalSpacerToRight(bool on)
+{
+    if (on) {
+        QSpacerItem* horizontalSpacer = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        d_ptr->mGridLayout->addItem(horizontalSpacer, 0, d_ptr->mColumnCount, 1, 1);
+    } else {
+        d_ptr->removeAt(0, d_ptr->mColumnCount);
+    }
+    d_ptr->mHorizontalSpacerToRight = on;
+}
+
 void SAColorGridWidget::onButtonClicked(QAbstractButton* btn)
 {
     SAColorToolButton* t = qobject_cast< SAColorToolButton* >(btn);
@@ -399,6 +445,23 @@ void SAColorGridWidget::onButtonToggled(QAbstractButton* btn, bool on)
     if (t) {
         emit colorToggled(t->getColor(), on);
     }
+}
+
+QSize SAColorGridWidget::sizeHint() const
+{
+    return d_ptr->mGridLayout->sizeHint();
+    //    int w = d_ptr->mIconSize.width() + d_ptr->mGridLayout->verticalSpacing();
+    //    int h = d_ptr->mIconSize.height();
+    //    if (d_ptr->mColumnCount > 0) {
+    //        h *= d_ptr->mColumnCount;
+    //        if (!d_ptr->mColors.empty()) {
+    //            int r = std::ceil(d_ptr->mColors.size() / (float)(d_ptr->mColumnCount));
+    //            if (r > 0) {
+    //                w *= r;
+    //            }
+    //        }
+    //    }
+    //    return QSize(w, h);
 }
 
 void SAColorGridWidget::onButtonReleased(QAbstractButton* btn)

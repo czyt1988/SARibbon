@@ -58,6 +58,10 @@ public:
     void clearCheckedState();
     //对所有的colorbtn就行遍历处理，可以通过此函数进行tooltip设置等操作
     void iterationColorBtns(FunColorBtn fn);
+    //设置行最小高度
+    void setRowMinimumHeight(int row, int minSize);
+    //让颜色块左对齐
+    void setHorizontalSpacerToRight(bool on = true);
 private slots:
     void onButtonClicked(QAbstractButton* btn);
     void onButtonPressed(QAbstractButton* btn);
@@ -74,6 +78,9 @@ signals:
     void colorPressed(const QColor& c);
     void colorReleased(const QColor& c);
     void colorToggled(const QColor& c, bool on);
+
+public:
+    virtual QSize sizeHint() const Q_DECL_OVERRIDE;
 };
 namespace SA
 {

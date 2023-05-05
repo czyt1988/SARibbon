@@ -306,6 +306,16 @@ void MainWindow::onButtonGroupActionTriggered(QAction* act)
     }
 }
 
+/**
+ * @brief 颜色按钮点击
+ * @param c
+ * @param on
+ */
+void MainWindow::onColorButtonColorClicked(const QColor& c, bool on)
+{
+    m_edit->append(QString("color click %1").arg(c.name()));
+}
+
 void MainWindow::createCategoryMain(SARibbonCategory* page)
 {
     //! 1
@@ -738,19 +748,20 @@ void MainWindow::createCategoryColor(SARibbonCategory* page)
     auto fpCreateBtn = [ this, pannel ](const QColor& defaultColor = Qt::red) -> SARibbonColorToolButton* {
         SARibbonColorToolButton* colorButton = new SARibbonColorToolButton(pannel);
         colorButton->setColor(defaultColor);
-        this->connect(colorButton, &SARibbonColorToolButton::colorChanged, this, [ this ](const QColor& c) {
-            this->m_edit->append(QString("color changed to %1").arg(c.name()));
-        });
+        colorButton->setupStandardColorMenu();
+        this->connect(colorButton, &SARibbonColorToolButton::colorClicked, this, &MainWindow::onColorButtonColorClicked);
         return colorButton;
     };
     // No Icon No text
     SARibbonColorToolButton* colorButton = fpCreateBtn();
+    colorButton->setObjectName("ColorFillToIcon-NoIconNoText");
     colorButton->setColorStyle(SARibbonColorToolButton::ColorFillToIcon);
     pannel->addSmallWidget(colorButton);
 
     // No Icon have text
     colorButton = fpCreateBtn(Qt::blue);
     colorButton->setColorStyle(SARibbonColorToolButton::ColorFillToIcon);
+    colorButton->setObjectName("ColorFillToIcon-NoIconHaveText");
     colorButton->setText("No Icon have text");
     pannel->addSmallWidget(colorButton);
 
@@ -764,6 +775,20 @@ void MainWindow::createCategoryColor(SARibbonCategory* page)
     colorButton->setIcon(QIcon(":/icon/icon/long-text.svg"));
     colorButton->setText("have Icon have text");
     pannel->addSmallWidget(colorButton);
+
+    colorButton = fpCreateBtn(Qt::darkBlue);
+    colorButton->setButtonType(SARibbonToolButton::LargeButton);
+    colorButton->setObjectName("ColorFillToIcon-LargeColorButton");
+    colorButton->setColorStyle(SARibbonColorToolButton::ColorFillToIcon);
+    colorButton->setText("Large Color Button");
+    pannel->addLargeWidget(colorButton);
+
+    colorButton = fpCreateBtn(Qt::darkRed);
+    colorButton->setButtonType(SARibbonToolButton::LargeButton);
+    colorButton->setIcon(QIcon(":/icon/icon/long-text.svg"));
+    colorButton->setObjectName("ColorUnderIcon-LargeColorButton");
+    colorButton->setText("Large Color Button");
+    pannel->addLargeWidget(colorButton);
 }
 
 /**

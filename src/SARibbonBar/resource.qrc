@@ -11,6 +11,7 @@
         <file>resource/Titlebar_Normal.png</file>
         <file>resource/Titlebar_Shade.png</file>
         <file>resource/Titlebar_Unshade.png</file>
+        <file>resource/define-color.svg</file>
     </qresource>
     <qresource prefix="/theme">
         <file>resource/default.qss</file>

@@ -2,6 +2,7 @@
 #define SARIBBONCOLORTOOLBUTTON_H
 #include "SARibbonToolButton.h"
 #include "SARibbonGlobal.h"
+class SAColorMenu;
 /**
  * @brief Refer to the color setting button in the office, which can display the color below the icon(参考office的颜色设置按钮，可以显示颜色在图标下方)
  */
@@ -25,9 +26,11 @@ public:
     ~SARibbonColorToolButton();
     //获取颜色
     QColor getColor() const;
-    //
+    //设置颜色显示方案
     void setColorStyle(ColorStyle s);
     ColorStyle colorStyle() const;
+    //建立标准的颜色菜单
+    SAColorMenu* setupStandardColorMenu();
 public slots:
     //设置颜色,会发射colorChanged信号
     void setColor(const QColor& c);
