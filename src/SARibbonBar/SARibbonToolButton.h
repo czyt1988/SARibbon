@@ -44,6 +44,8 @@ public:
 
     void setLargeButtonType(LargeButtonType type);
     LargeButtonType largeButtonType() const;
+    //获取间距
+    int spacing() const;
 
 public:
     //在lite模式下是否允许文字换行
