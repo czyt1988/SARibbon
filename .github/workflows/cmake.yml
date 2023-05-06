@@ -13,8 +13,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        ubuntu_version: [20.04, 22.04]
-        qt_version: [5.8.0,5.15.2,6.4.0]
+        ubuntu_version: [16.04, 18.04, 20.04, 22.04]
+        qt_version: [5.9.0,5.12.0,5.15.0,6.2.0,6.5.0]
         shared: [ON]
 
     steps:
@@ -41,8 +41,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        win_version: [2019, 2022]
-        qt_version: [5.8.0,5.15.2,6.4.0]
+        win_version: [7, 10, 2019, 2022]
+        qt_version: [5.9.0,5.12.0,5.15.0,6.2.0,6.5.0]
         shared: [ON]
 
     steps:
@@ -70,7 +70,7 @@ jobs:
       fail-fast: false
       matrix:
         macos_version: [11, 12]
-        qt_version: [5.8.0,5.15.2,6.4.0]
+        qt_version: [5.9.0,5.12.0,5.15.0,6.2.0,6.5.0]
         shared: [ON]
 
     steps:
