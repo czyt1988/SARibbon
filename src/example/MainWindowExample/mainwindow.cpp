@@ -19,6 +19,11 @@
 #include <QButtonGroup>
 #include <QSpinBox>
 #include <QLineEdit>
+#include <QCalendarWidget>
+#include <QXmlStreamWriter>
+#include <QTextStream>
+#include <QFontComboBox>
+#include <QLabel>
 #include "SARibbonMenu.h"
 #include "SARibbonComboBox.h"
 #include "SARibbonLineEdit.h"
@@ -29,12 +34,8 @@
 #include "SARibbonApplicationButton.h"
 #include "SARibbonCustomizeWidget.h"
 #include "SARibbonElementManager.h"
-#include <QCalendarWidget>
 #include "SARibbonCustomizeDialog.h"
-#include <QXmlStreamWriter>
-#include <QTextStream>
-#include <QFontComboBox>
-#include <QLabel>
+#include "SARibbonColorToolButton.h"
 #include "SAFramelessHelper.h"
 #define PRINT_COST_START()                                                                                             \
     QElapsedTimer __TMP_COST;                                                                                          \
@@ -82,20 +83,28 @@ MainWindow::MainWindow(QWidget* par) : SARibbonMainWindow(par), m_customizeWidge
 
     //添加删除标签页
     SARibbonCategory* categoryDelete = new SARibbonCategory();
-
     categoryDelete->setCategoryName(("Delete"));
     categoryDelete->setObjectName(("categoryDelete"));
     ribbon->addCategoryPage(categoryDelete);
     createCategoryDelete(categoryDelete);
     PRINT_COST("add category delete page");
+
     //添加尺寸标签页
     SARibbonCategory* categorySize = new SARibbonCategory();
-
     categorySize->setCategoryName(("Size(example long category)"));
     categorySize->setObjectName(("categorySize"));
     ribbon->addCategoryPage(categorySize);
     createCategorySize(categorySize);
-    PRINT_COST("add category delete page");
+    PRINT_COST("add category size page");
+
+    //添加颜色标签页
+    SARibbonCategory* categoryColor = new SARibbonCategory();
+    categoryColor->setCategoryName(("Color"));
+    categoryColor->setObjectName(("categoryColor"));
+    ribbon->addCategoryPage(categoryColor);
+    createCategoryColor(categoryColor);
+    PRINT_COST("add category color page");
+
     createContextCategory1();
     PRINT_COST("add context1 category page");
     createContextCategory2();
@@ -295,6 +304,16 @@ void MainWindow::onButtonGroupActionTriggered(QAction* act)
         ribbonBar()->setWindowTitleAligment(al);
         ribbonBar()->repaint();
     }
+}
+
+/**
+ * @brief 颜色按钮点击
+ * @param c
+ * @param on
+ */
+void MainWindow::onColorButtonColorClicked(const QColor& c, bool on)
+{
+    m_edit->append(QString("color click %1").arg(c.name()));
 }
 
 void MainWindow::createCategoryMain(SARibbonCategory* page)
@@ -720,6 +739,56 @@ void MainWindow::createCategorySize(SARibbonCategory* page)
 
     connect(actLargerFontSize, &QAction::triggered, this, &MainWindow::onActionFontLargerTriggered);
     connect(actSmallFontSize, &QAction::triggered, this, &MainWindow::onActionFontSmallerTriggered);
+}
+
+void MainWindow::createCategoryColor(SARibbonCategory* page)
+{
+    SARibbonPannel* pannel = page->addPannel(tr("color"));
+
+    auto fpCreateBtn = [ this, pannel ](const QColor& defaultColor = Qt::red) -> SARibbonColorToolButton* {
+        SARibbonColorToolButton* colorButton = new SARibbonColorToolButton(pannel);
+        colorButton->setColor(defaultColor);
+        colorButton->setupStandardColorMenu();
+        this->connect(colorButton, &SARibbonColorToolButton::colorClicked, this, &MainWindow::onColorButtonColorClicked);
+        return colorButton;
+    };
+    // No Icon No text
+    SARibbonColorToolButton* colorButton = fpCreateBtn();
+    colorButton->setObjectName("ColorFillToIcon-NoIconNoText");
+    colorButton->setColorStyle(SARibbonColorToolButton::ColorFillToIcon);
+    pannel->addSmallWidget(colorButton);
+
+    // No Icon have text
+    colorButton = fpCreateBtn(Qt::blue);
+    colorButton->setColorStyle(SARibbonColorToolButton::ColorFillToIcon);
+    colorButton->setObjectName("ColorFillToIcon-NoIconHaveText");
+    colorButton->setText("No Icon have text");
+    pannel->addSmallWidget(colorButton);
+
+    // have Icon No text
+    colorButton = fpCreateBtn(QColor());
+    colorButton->setIcon(QIcon(":/icon/icon/long-text.svg"));
+    pannel->addSmallWidget(colorButton);
+
+    // have Icon have text
+    colorButton = fpCreateBtn(Qt::red);
+    colorButton->setIcon(QIcon(":/icon/icon/long-text.svg"));
+    colorButton->setText("have Icon have text");
+    pannel->addSmallWidget(colorButton);
+
+    colorButton = fpCreateBtn(QColor());
+    colorButton->setButtonType(SARibbonToolButton::LargeButton);
+    colorButton->setObjectName("ColorFillToIcon-LargeColorButton");
+    colorButton->setColorStyle(SARibbonColorToolButton::ColorFillToIcon);
+    colorButton->setText("Large Color Button");
+    pannel->addLargeWidget(colorButton);
+
+    colorButton = fpCreateBtn(QColor());
+    colorButton->setButtonType(SARibbonToolButton::LargeButton);
+    colorButton->setIcon(QIcon(":/icon/icon/long-text.svg"));
+    colorButton->setObjectName("ColorUnderIcon-LargeColorButton");
+    colorButton->setText("Large Color Button");
+    pannel->addLargeWidget(colorButton);
 }
 
 /**

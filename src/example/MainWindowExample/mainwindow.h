@@ -20,6 +20,7 @@ private:
     void createCategoryOther(SARibbonCategory* page);
     void createCategoryDelete(SARibbonCategory* page);
     void createCategorySize(SARibbonCategory* page);
+    void createCategoryColor(SARibbonCategory* page);
     void createContextCategory1();
     void createContextCategory2();
     void createContextCategoryPage1(SARibbonCategory* page);
@@ -51,6 +52,7 @@ private slots:
     void onActionFontSmallerTriggered();
     void onActionwordWrapIn2rowTriggered(bool b);
     void onButtonGroupActionTriggered(QAction* act);
+    void onColorButtonColorClicked(const QColor& c, bool on);
 
 private:
     SARibbonContextCategory* m_contextCategory;

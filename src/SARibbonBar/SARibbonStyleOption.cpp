@@ -3,16 +3,7 @@
 #include <QDebug>
 SARibbonStyleOption::SARibbonStyleOption()
 {
-    QFontMetrics fm = QApplication::fontMetrics();
-    int lineSpacing = fm.lineSpacing();
-
-    m_titleBarHeight                     = lineSpacing * 1.8;
-    m_tabBarHeight                       = lineSpacing * 1.5;
-    m_ribbonbarHeightOfficeStyleThreeRow = m_titleBarHeight + m_tabBarHeight + (lineSpacing * 1.5) * 3
-                                           + SARibbonPannel::pannelTitleHeight()
-                                           + SARibbonPannelLayout::pannelContentsMargins().bottom()
-                                           + SARibbonPannelLayout::pannelContentsMargins().top();
-    recalc();
+    init();
 }
 
 int SARibbonStyleOption::ribbonBarHeight(SARibbonBar::RibbonStyle s) const
@@ -48,9 +39,7 @@ int SARibbonStyleOption::tabBarHeight() const
 
 void SARibbonStyleOption::recalc()
 {
-    m_ribbonbarHeightWPSStyleThreeRow  = calcMainbarHeight(SARibbonBar::WpsLiteStyle);
-    m_ribbonbarHeightOfficeStyleTwoRow = calcMainbarHeight(SARibbonBar::OfficeStyleTwoRow);
-    m_ribbonbarHeightWPSStyleTwoRow    = calcMainbarHeight(SARibbonBar::WpsLiteStyleTwoRow);
+    updateMainbarHeight();
 }
 
 /**
@@ -68,13 +57,34 @@ int SARibbonStyleOption::calcMainbarHeight(SARibbonBar::RibbonStyle s) const
         return m_ribbonbarHeightOfficeStyleThreeRow - m_tabBarHeight;
     case SARibbonBar::WpsLiteStyleTwoRow:
         //两行模式把标题栏去掉
-        return m_ribbonbarHeightOfficeStyleThreeRow * 0.95 - m_tabBarHeight - SARibbonPannel::pannelTitleHeight();
+        return m_ribbonbarHeightOfficeStyleThreeRow * 0.9 - m_tabBarHeight - SARibbonPannel::pannelTitleHeight();
     case SARibbonBar::OfficeStyleTwoRow:
-        return m_ribbonbarHeightOfficeStyleThreeRow * 0.95 - SARibbonPannel::pannelTitleHeight();
+        return m_ribbonbarHeightOfficeStyleThreeRow - SARibbonPannel::pannelTitleHeight();
     default:
         break;
     }
     return m_ribbonbarHeightOfficeStyleThreeRow;
+}
+
+void SARibbonStyleOption::init()
+{
+    QFontMetrics fm = QApplication::fontMetrics();
+    int lineSpacing = fm.lineSpacing();
+
+    m_titleBarHeight                     = lineSpacing * 1.8;
+    m_tabBarHeight                       = lineSpacing * 1.5;
+    m_ribbonbarHeightOfficeStyleThreeRow = m_titleBarHeight + m_tabBarHeight + (lineSpacing * 1.5) * 3
+                                           + SARibbonPannel::pannelTitleHeight()
+                                           + SARibbonPannelLayout::pannelContentsMargins().bottom()
+                                           + SARibbonPannelLayout::pannelContentsMargins().top();
+    updateMainbarHeight();
+}
+
+void SARibbonStyleOption::updateMainbarHeight()
+{
+    m_ribbonbarHeightWPSStyleThreeRow  = calcMainbarHeight(SARibbonBar::WpsLiteStyle);
+    m_ribbonbarHeightOfficeStyleTwoRow = calcMainbarHeight(SARibbonBar::OfficeStyleTwoRow);
+    m_ribbonbarHeightWPSStyleTwoRow    = calcMainbarHeight(SARibbonBar::WpsLiteStyleTwoRow);
 }
 
 /**

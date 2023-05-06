@@ -18,7 +18,7 @@ void log_out_put(QtMsgType type, const QMessageLogContext& context, const QStrin
 
     switch (type) {
     case QtDebugMsg:
-        fprintf(stdout, "[Debug] %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+        fprintf(stdout, "[Debug] %s \n-------------->(%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
         break;
 
         //    case QtInfoMsg:
@@ -26,20 +26,20 @@ void log_out_put(QtMsgType type, const QMessageLogContext& context, const QStrin
         //        context.function); break;
 
     case QtWarningMsg:
-        fprintf(stdout, "[Warning] %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+        fprintf(stdout, "[Warning] %s \n-------------->(%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
         break;
 
     case QtCriticalMsg:
-        fprintf(stdout, "[Critical] %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+        fprintf(stdout, "[Critical] %s \n-------------->(%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
         break;
 
     case QtFatalMsg:
-        fprintf(stdout, "Fatal: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+        fprintf(stdout, "Fatal: %s \n-------------->(%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
         abort();
         break;
 
     default:
-        fprintf(stdout, "[Debug] %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+        fprintf(stdout, "[Debug] %s \n-------------->(%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
         break;
     }
 #ifndef QT_NO_DEBUG_OUTPUT

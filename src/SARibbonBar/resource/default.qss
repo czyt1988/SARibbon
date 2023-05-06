@@ -94,7 +94,7 @@ SARibbonTabBar::tab {
     max-height:30px;
     padding-left:1px;
     padding-right:1px;
-    padding-top:1px;
+    padding-top:-3px;
     padding-bottom:1px;
 }
 
@@ -132,6 +132,11 @@ SARibbonToolButton{
     border:1px solid transparent;
     color:#444444;
     background-color:transparent;
+}
+SARibbonToolButton:focus {
+  border: 1px solid #FCBF21;
+  color: #333;
+  background-color: #FCD364;
 }
 SARibbonToolButton::pressed{
     color:#444444;
@@ -215,6 +220,7 @@ SARibbonPannelOptionButton::hover {
 SARibbonPannel {
   background-color: #FFFFFF;
   border: 0px;
+  color: #666666;
 }
 /*SARibbonPannel*/
 SARibbonPannel {

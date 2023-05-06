@@ -32,6 +32,7 @@ signals:
 private slots:
     void onCustomColorActionTriggered(bool on);
     void onThemeColorsSelected(const QColor& c);
+    void onCustomColorsSelected(const QColor& c);
 
 private:
     void init(const QList< QColor >& themeCls);

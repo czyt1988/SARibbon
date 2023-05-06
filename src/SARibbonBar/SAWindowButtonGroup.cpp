@@ -37,7 +37,7 @@ public:
             }
             buttonMinimize = new SAWindowToolButton(par);
             buttonMinimize->setObjectName(QStringLiteral("SAMinimizeWindowButton"));
-            buttonMinimize->setFixedSize(30, RibbonSubElementStyleOpt.titleBarHeight());
+            buttonMinimize->setFixedSize(30, RibbonSubElementStyleOpt.titleBarHeight() - 2);
             buttonMinimize->setFocusPolicy(Qt::NoFocus);  //避免铺抓到
             buttonMinimize->setIconSize(buttonMinimize->size() * mIconscale);
             buttonMinimize->show();
@@ -62,7 +62,7 @@ public:
             }
             buttonMaximize = new SAWindowToolButton(par);
             buttonMaximize->setObjectName(QStringLiteral("SAMaximizeWindowButton"));
-            buttonMaximize->setFixedSize(30, RibbonSubElementStyleOpt.titleBarHeight());
+            buttonMaximize->setFixedSize(30, RibbonSubElementStyleOpt.titleBarHeight() - 2);
             buttonMaximize->setCheckable(true);
             buttonMaximize->setFocusPolicy(Qt::NoFocus);  //避免铺抓到
             buttonMaximize->setIconSize(buttonMaximize->size() * mIconscale);
@@ -88,7 +88,7 @@ public:
             }
             buttonClose = new SAWindowToolButton(par);
             buttonClose->setObjectName(QStringLiteral("SACloseWindowButton"));
-            buttonClose->setFixedSize(40, RibbonSubElementStyleOpt.titleBarHeight());
+            buttonClose->setFixedSize(40, RibbonSubElementStyleOpt.titleBarHeight() - 2);
             buttonClose->setFocusPolicy(Qt::NoFocus);  //避免铺抓到
             // buttonClose->setFlat(true);
             par->connect(buttonClose, &QAbstractButton::clicked, par, &SAWindowButtonGroup::closeWindow);
@@ -363,7 +363,7 @@ void SAWindowButtonGroup::parentResize()
 
     if (par) {
         QSize parSize = par->size();
-        move(parSize.width() - width() - 1, 1);
+        move(parSize.width() - width() - 1, 0);
     }
 }
 
