@@ -1,7 +1,7 @@
 ﻿#ifndef SARIBBONGLOBAL_H
 #define SARIBBONGLOBAL_H
 #include <qglobal.h>
-
+#include <memory>
 /**
  * @def ribbon的数字版本 MAJ.MIN.PAT
  */
@@ -40,6 +40,24 @@
 
 #ifndef SA_RIBBON_EXPORT
 #define SA_RIBBON_EXPORT
+#endif
+
+/**
+ * @def   模仿Q_DECLARE_PRIVATE，但不用前置声明而是作为一个内部类
+ */
+#ifndef SA_RIBBON_DECLARE_PRIVATE
+#define SA_RIBBON_DECLARE_PRIVATE(classname)                                                                           \
+    class PrivateData;                                                                                                 \
+    friend class classname::PrivateData;                                                                               \
+    std::unique_ptr< PrivateData > d_ptr;
+#endif
+/**
+ * @def   模仿Q_DECLARE_PUBLIC
+ */
+#ifndef SA_RIBBON_DECLARE_PUBLIC
+#define SA_RIBBON_DECLARE_PUBLIC(classname)                                                                            \
+    friend class classname;                                                                                            \
+    classname* q_ptr { nullptr };
 #endif
 
 #endif  // SARIBBONGLOBAL_H

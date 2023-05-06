@@ -1,4 +1,4 @@
-bin_*
+﻿bin_*
 build*
 *.user
 *.autosave
@@ -9,6 +9,7 @@ build*
 ~*.pptx
 ~*.docx
 *.drawio.bkp
+tmp
 
 # vscode 的隐藏文件
 /.vscode

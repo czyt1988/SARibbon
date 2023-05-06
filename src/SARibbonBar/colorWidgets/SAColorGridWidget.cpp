@@ -6,7 +6,7 @@
 
 class SAColorGridWidget::PrivateData
 {
-    SA_DECLARE_PUBLIC(SAColorGridWidget)
+    SA_COLOR_WIDGETS_DECLARE_PUBLIC(SAColorGridWidget)
 public:
     PrivateData(SAColorGridWidget* p);
     //获取ColorToolButton
@@ -31,11 +31,14 @@ public:
 
 SAColorGridWidget::PrivateData::PrivateData(SAColorGridWidget* p) : q_ptr(p)
 {
-    mGridLayout = new QGridLayout(q_ptr);
-    q_ptr->setLayout(mGridLayout);
-    mGridLayout->setSpacing(4);
-    mButtonGroup = new QButtonGroup(q_ptr);
+    mGridLayout = new QGridLayout(p);
+    p->setLayout(mGridLayout);
+    mGridLayout->setSpacing(0);
+    mGridLayout->setContentsMargins(1, 1, 1, 1);
+    mButtonGroup = new QButtonGroup(p);
     mButtonGroup->setExclusive(true);
+    p->setMinimumHeight(mIconSize.height());
+    p->setMinimumWidth(mIconSize.width());
 }
 
 SAColorToolButton* SAColorGridWidget::PrivateData::getColorToolButtonAt(int index)
@@ -80,6 +83,25 @@ void SAColorGridWidget::PrivateData::updateGridColor()
                 setColorAt(mColors[ index ], r, c);
                 ++index;
             } else {
+                removeAt(r, c);
+            }
+        }
+    }
+    //清除多余单元格
+    int nowGridRow = mGridLayout->rowCount();
+    int nowGridCol = mGridLayout->columnCount();
+    if (nowGridRow > row) {
+        //多余的清除
+        for (int r = row; r < nowGridRow; ++r) {
+            for (int c = 0; c < nowGridCol; ++c) {
+                removeAt(r, c);
+            }
+        }
+    }
+    if (nowGridCol > col) {
+        //多余的列清除
+        for (int r = 0; r < row; ++r) {
+            for (int c = col; c < nowGridCol; ++c) {
                 removeAt(r, c);
             }
         }
@@ -188,6 +210,7 @@ void SAColorGridWidget::setColorList(const QList< QColor >& cls)
 {
     d_ptr->mColors = cls;
     d_ptr->updateGridColor();
+    updateGeometry();
 }
 
 /**
@@ -233,6 +256,8 @@ int SAColorGridWidget::getColorCount() const
 void SAColorGridWidget::setColorIconSize(const QSize& s)
 {
     d_ptr->mIconSize = s;
+    setMinimumHeight(s.height());
+    setMinimumWidth(s.width());
     d_ptr->updateGridColorSize();
 }
 
@@ -392,7 +417,6 @@ QList< QColor > getStandardColorList()
     static QList< QColor > s_standardColorList({ QColor(192, 0, 0),
                                                  QColor(255, 0, 0),
                                                  QColor(255, 192, 0),
-                                                 QColor(192, 0, 0),
                                                  QColor(255, 255, 0),
                                                  QColor(146, 208, 80),
                                                  QColor(0, 176, 80),

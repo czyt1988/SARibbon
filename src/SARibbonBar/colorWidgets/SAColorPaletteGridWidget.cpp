@@ -1,9 +1,15 @@
 ﻿#include "SAColorPaletteGridWidget.h"
+// Qt
+#include <QMenu>
+#include <QWidgetAction>
+#include <QVBoxLayout>
+#include <QColorDialog>
+// SA
 #include "SAColorGridWidget.h"
-#include "QVBoxLayout"
+#include "SAColorToolButton.h"
 class SAColorPaletteGridWidget::PrivateData
 {
-    SA_DECLARE_PUBLIC(SAColorPaletteGridWidget)
+    SA_COLOR_WIDGETS_DECLARE_PUBLIC(SAColorPaletteGridWidget)
 public:
     PrivateData(SAColorPaletteGridWidget* p);
     //生成color palette
@@ -24,6 +30,8 @@ SAColorPaletteGridWidget::PrivateData::PrivateData(SAColorPaletteGridWidget* p) 
     mPaletteColorGrid = new SAColorGridWidget(p);
     mLayout->addWidget(mMainColorList);
     mLayout->addWidget(mPaletteColorGrid);
+    mLayout->setContentsMargins(1, 1, 1, 1);
+    mLayout->setSpacing(8);
     QSizePolicy sizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
     mMainColorList->setSizePolicy(sizePolicy);
     mPaletteColorGrid->setSizePolicy(sizePolicy);
@@ -44,29 +52,66 @@ QList< QColor > SAColorPaletteGridWidget::PrivateData::makeColorPalette(const QL
 //==============================================================
 // name
 //==============================================================
+
+/**
+ * @brief 使用默认的标准颜色生成一个color palette
+ * @param par
+ */
 SAColorPaletteGridWidget::SAColorPaletteGridWidget(QWidget* par) : QWidget(par), d_ptr(new PrivateData(this))
 {
-    setColorIconSize(QSize(10, 10));
+    init();
     setColorList(SA::getStandardColorList());
-    connect(d_ptr->mMainColorList, &SAColorGridWidget::colorClicked, this, &SAColorPaletteGridWidget::onMainColorClicked);
-    connect(d_ptr->mPaletteColorGrid, &SAColorGridWidget::colorClicked, this, &SAColorPaletteGridWidget::onPaletteColorClicked);
+}
+
+/**
+ * @brief 根据指定的颜色生成一个color palette
+ * @param cls
+ * @param par
+ */
+SAColorPaletteGridWidget::SAColorPaletteGridWidget(const QList< QColor >& cls, QWidget* par)
+    : QWidget(par), d_ptr(new PrivateData(this))
+{
+    init();
+    setColorList(cls);
 }
 
 SAColorPaletteGridWidget::~SAColorPaletteGridWidget()
 {
 }
+void SAColorPaletteGridWidget::init()
+{
+    connect(d_ptr->mMainColorList, &SAColorGridWidget::colorClicked, this, &SAColorPaletteGridWidget::onMainColorClicked);
+    connect(d_ptr->mPaletteColorGrid, &SAColorGridWidget::colorClicked, this, &SAColorPaletteGridWidget::onPaletteColorClicked);
+    QSizePolicy sizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    setSizePolicy(sizePolicy);
+    setColorIconSize(QSize(10, 10));
+}
 
+/**
+ * @brief 设置颜色系列，颜色系列的个数决定了主色卡的数量，palette色卡会根据factor进行生成
+ * @param cls
+ */
 void SAColorPaletteGridWidget::setColorList(const QList< QColor >& cls)
 {
+    d_ptr->mMainColorList->setColumnCount(0);
     d_ptr->mMainColorList->setColorList(cls);
     d_ptr->mPaletteColorGrid->setColumnCount(cls.size());
     d_ptr->mPaletteColorGrid->setColorList(d_ptr->makeColorPalette(cls));
 }
 
 /**
- * @brief 设置颜色深浅比例factor
+ * @brief 获取颜色系列
+ * @return
+ */
+QList< QColor > SAColorPaletteGridWidget::getColorList() const
+{
+    return d_ptr->mMainColorList->getColorList();
+}
+
+/**
+ * @brief 设置颜色深浅比例factor，factor决定了palette的行数，factor有5个，就有5行
  *
- * 默认为{ 180, 160, 140, 75, 50 },相当于会有5行
+ * 默认为{ 180, 160, 140, 75, 50 },相当于会有5行，每个系数会对标准颜色执行QColor::lighter操作
  * @param factor
  */
 void SAColorPaletteGridWidget::setFactor(const QList< int >& factor)
@@ -75,11 +120,19 @@ void SAColorPaletteGridWidget::setFactor(const QList< int >& factor)
     d_ptr->mPaletteColorGrid->setColorList(d_ptr->makeColorPalette(d_ptr->mMainColorList->getColorList()));
 }
 
+/**
+ * @brief 获取色卡
+ * @return
+ */
 QList< int > SAColorPaletteGridWidget::getFactor() const
 {
     return d_ptr->mFactor;
 }
 
+/**
+ * @brief 设置颜色块的尺寸，默认为10*10
+ * @param s
+ */
 void SAColorPaletteGridWidget::setColorIconSize(const QSize& s)
 {
     d_ptr->mMainColorList->setColorIconSize(s);

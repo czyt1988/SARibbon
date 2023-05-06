@@ -16,10 +16,10 @@ class SAColorToolButton;
  *
  * □□□□□□□□□
  */
-class SAColorGridWidget : public QWidget
+class SA_COLOR_WIDGETS_API SAColorGridWidget : public QWidget
 {
     Q_OBJECT
-    SA_DECLARE_PRIVATE(SAColorGridWidget)
+    SA_COLOR_WIDGETS_DECLARE_PRIVATE(SAColorGridWidget)
     Q_PROPERTY(int spacing READ getSpacing WRITE setSpacing)
 public:
     using FunColorBtn = std::function< void(SAColorToolButton*) >;

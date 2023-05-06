@@ -10,77 +10,91 @@
 #include "SARibbonElementManager.h"
 #include "SARibbonSeparatorWidget.h"
 
-class SARibbonButtonGroupWidgetItem
+//===================================================
+// SAPrivateRibbonButtonGroupWidgetItem
+//===================================================
+class SAPrivateRibbonButtonGroupWidgetItem
 {
 public:
     QAction* action;
     QWidget* widget;
     bool customWidget;
     bool operator==(QAction* action);
-    bool operator==(const SARibbonButtonGroupWidgetItem& w);
+    bool operator==(const SAPrivateRibbonButtonGroupWidgetItem& w);
 
-    SARibbonButtonGroupWidgetItem();
-    SARibbonButtonGroupWidgetItem(QAction* a, QWidget* w, bool cw);
+    SAPrivateRibbonButtonGroupWidgetItem();
+    SAPrivateRibbonButtonGroupWidgetItem(QAction* a, QWidget* w, bool cw);
 };
 
-class SARibbonButtonGroupWidgetPrivate
+//===================================================
+// SARibbonButtonGroupWidget::PrivateData
+//===================================================
+class SARibbonButtonGroupWidget::PrivateData
 {
+    SA_RIBBON_DECLARE_PUBLIC(SARibbonButtonGroupWidget)
 public:
-    SARibbonButtonGroupWidget* Parent;
-    QList< SARibbonButtonGroupWidgetItem > mItems;  ///< 用于记录所有管理的item
-    SARibbonButtonGroupWidgetPrivate(SARibbonButtonGroupWidget* p)
-    {
-        Parent = p;
-    }
+    PrivateData(SARibbonButtonGroupWidget* p);
+    void init();
 
-    void init()
-    {
-        QHBoxLayout* layout = new QHBoxLayout(Parent);
-        layout->setContentsMargins(0, 0, 0, 0);
-        layout->setSpacing(0);
-        Parent->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-    }
+public:
+    QList< SAPrivateRibbonButtonGroupWidgetItem > mItems;  ///< 用于记录所有管理的item
 };
 
-//////////////////////////////////////////////
+SARibbonButtonGroupWidget::PrivateData::PrivateData(SARibbonButtonGroupWidget* p) : q_ptr(p)
+{
+}
 
-bool SARibbonButtonGroupWidgetItem::operator==(QAction* action)
+void SARibbonButtonGroupWidget::PrivateData::init()
+{
+    QHBoxLayout* layout = new QHBoxLayout(q_ptr);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
+    q_ptr->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+}
+
+//===================================================
+// SARibbonButtonGroupWidgetItem
+//===================================================
+
+bool SAPrivateRibbonButtonGroupWidgetItem::operator==(QAction* action)
 {
     return (this->action == action);
 }
 
-bool SARibbonButtonGroupWidgetItem::operator==(const SARibbonButtonGroupWidgetItem& w)
+bool SAPrivateRibbonButtonGroupWidgetItem::operator==(const SAPrivateRibbonButtonGroupWidgetItem& w)
 {
     return (this->action == w.action);
 }
 
-SARibbonButtonGroupWidgetItem::SARibbonButtonGroupWidgetItem() : action(nullptr), widget(nullptr), customWidget(false)
+SAPrivateRibbonButtonGroupWidgetItem::SAPrivateRibbonButtonGroupWidgetItem()
+    : action(nullptr), widget(nullptr), customWidget(false)
 {
 }
 
-SARibbonButtonGroupWidgetItem::SARibbonButtonGroupWidgetItem(QAction* a, QWidget* w, bool cw)
+SAPrivateRibbonButtonGroupWidgetItem::SAPrivateRibbonButtonGroupWidgetItem(QAction* a, QWidget* w, bool cw)
     : action(a), widget(w), customWidget(cw)
 {
 }
 
-//////////////////////////////////////////////
+//===================================================
+// SARibbonButtonGroupWidget
+//===================================================
 
 SARibbonButtonGroupWidget::SARibbonButtonGroupWidget(QWidget* parent)
-    : QFrame(parent), m_d(new SARibbonButtonGroupWidgetPrivate(this))
+    : QFrame(parent), d_ptr(new SARibbonButtonGroupWidget::PrivateData(this))
 {
-    m_d->init();
+    d_ptr->init();
 }
 
 SARibbonButtonGroupWidget::~SARibbonButtonGroupWidget()
 {
-    for (SARibbonButtonGroupWidgetItem& item : m_d->mItems) {
+    for (SAPrivateRibbonButtonGroupWidgetItem& item : d_ptr->mItems) {
         if (QWidgetAction* widgetAction = qobject_cast< QWidgetAction* >(item.action)) {
             if (item.customWidget) {
                 widgetAction->releaseWidget(item.widget);
             }
         }
     }
-    delete m_d;
 }
 
 QAction* SARibbonButtonGroupWidget::addAction(QAction* a)
@@ -102,7 +116,7 @@ QAction* SARibbonButtonGroupWidget::addAction(const QString& text, const QIcon& 
     QAction* a = new QAction(icon, text, this);
 
     addAction(a);
-    SARibbonToolButton* btn = qobject_cast< SARibbonToolButton* >(m_d->mItems.back().widget);
+    SARibbonToolButton* btn = qobject_cast< SARibbonToolButton* >(d_ptr->mItems.back().widget);
     btn->setPopupMode(popMode);
     return (a);
 }
@@ -112,7 +126,7 @@ QAction* SARibbonButtonGroupWidget::addMenu(QMenu* menu, QToolButton::ToolButton
     QAction* a = menu->menuAction();
 
     addAction(a);
-    SARibbonToolButton* btn = qobject_cast< SARibbonToolButton* >(m_d->mItems.back().widget);
+    SARibbonToolButton* btn = qobject_cast< SARibbonToolButton* >(d_ptr->mItems.back().widget);
     btn->setPopupMode(popMode);
     return (a);
 }
@@ -155,7 +169,7 @@ QSize SARibbonButtonGroupWidget::minimumSizeHint() const
  */
 void SARibbonButtonGroupWidget::actionEvent(QActionEvent* e)
 {
-    SARibbonButtonGroupWidgetItem item;
+    SAPrivateRibbonButtonGroupWidgetItem item;
 
     item.action = e->action();
 
@@ -188,7 +202,7 @@ void SARibbonButtonGroupWidget::actionEvent(QActionEvent* e)
             item.widget = button;
         }
         layout()->addWidget(item.widget);
-        m_d->mItems.append(item);
+        d_ptr->mItems.append(item);
     } break;
 
     case QEvent::ActionChanged: {
@@ -198,8 +212,8 @@ void SARibbonButtonGroupWidget::actionEvent(QActionEvent* e)
 
     case QEvent::ActionRemoved: {
         item.action->disconnect(this);
-        auto i = m_d->mItems.begin();
-        for (; i != m_d->mItems.end();) {
+        auto i = d_ptr->mItems.begin();
+        for (; i != d_ptr->mItems.end();) {
             QWidgetAction* widgetAction = qobject_cast< QWidgetAction* >(i->action);
             if ((widgetAction != 0) && i->customWidget) {
                 widgetAction->releaseWidget(i->widget);
@@ -208,7 +222,7 @@ void SARibbonButtonGroupWidget::actionEvent(QActionEvent* e)
                 i->widget->hide();
                 i->widget->deleteLater();
             }
-            i = m_d->mItems.erase(i);
+            i = d_ptr->mItems.erase(i);
         }
         layout()->invalidate();
     } break;
