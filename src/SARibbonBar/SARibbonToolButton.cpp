@@ -399,7 +399,7 @@ QSize SARibbonToolButton::PrivateData::calcSmallButtonSizeHint(const QStyleOptio
     } break;
     case Qt::ToolButtonTextOnly: {
         QSize textSize = opt.fontMetrics.size(Qt::TextShowMnemonic, opt.text);
-        textSize.setWidth(textSize.width() + opt.fontMetrics.horizontalAdvance(QLatin1Char(' ')) * 2);
+        textSize.setWidth(textSize.width() + SA_FONTMETRICS_WIDTH(opt.fontMetrics, (QLatin1Char(' '))) * 2);
         textSize.setHeight(calcTextDrawRectHeight(opt));
         w = textSize.width() + 2 * mSpacing;
         h = textSize.height() + 2 * mSpacing;
@@ -411,7 +411,7 @@ QSize SARibbonToolButton::PrivateData::calcSmallButtonSizeHint(const QStyleOptio
         //再加入文本的长度
         if (!opt.text.isEmpty()) {
             QSize textSize = opt.fontMetrics.size(Qt::TextShowMnemonic, opt.text);
-            textSize.setWidth(textSize.width() + opt.fontMetrics.horizontalAdvance(QLatin1Char(' ')) * 2);
+            textSize.setWidth(textSize.width() + SA_FONTMETRICS_WIDTH(opt.fontMetrics, (QLatin1Char(' '))) * 2);
             textSize.setHeight(calcTextDrawRectHeight(opt));
             w += mSpacing;
             w += textSize.width();
@@ -505,7 +505,7 @@ int SARibbonToolButton::PrivateData::estimateLargeButtonTextWidth(int buttonHeig
                                                                   int maxTrycount) const
 {
     QSize textSize = fm.size(Qt::TextShowMnemonic, text);
-    textSize.setWidth(textSize.width() + fm.horizontalAdvance(QLatin1Char(' ')) * 2);
+    textSize.setWidth(textSize.width() + SA_FONTMETRICS_WIDTH(fm, (QLatin1Char(' '))) * 2);
 
     if (textSize.width() < buttonHeight * widthHeightRatio) {
         //范围合理，直接返回

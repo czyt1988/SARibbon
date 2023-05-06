@@ -45,6 +45,9 @@ public:
         buttonUp->setToolButtonStyle(Qt::ToolButtonIconOnly);
         buttonDown->setToolButtonStyle(Qt::ToolButtonIconOnly);
         buttonMore->setToolButtonStyle(Qt::ToolButtonIconOnly);
+        buttonUp->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+        buttonDown->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
+        buttonMore->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
         buttonUp->setObjectName(QStringLiteral("SARibbonGalleryButtonUp"));
         buttonDown->setObjectName(QStringLiteral("SARibbonGalleryButtonDown"));
         buttonMore->setObjectName(QStringLiteral("SARibbonGalleryButtonMore"));

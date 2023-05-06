@@ -51,8 +51,6 @@ QPixmap SARibbonColorToolButton::PrivateData::createIconPixmap(const QStyleOptio
     QRect rpixmap = QRect(xpixmap, ypixmap, pixmap.width(), pixmap.height());
     painter.drawPixmap(rpixmap, pixmap);
     QRect colorRect = rpixmap.adjusted(0, pixmap.height() + 1, 0, c_ribbonbutton_color_height + 1);
-    qDebug() << "rpixmap=" << rpixmap << ",colorRect=" << colorRect << ",colorRect.bottomLeft=" << colorRect.bottomLeft()
-             << ",colorRect.topRight=" << colorRect.topRight() << ",res.size()=" << res.size();
     if (mColor.isValid()) {
         painter.fillRect(colorRect, mColor);
     } else {

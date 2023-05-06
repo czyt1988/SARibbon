@@ -6,6 +6,19 @@
 #include <QPixmap>
 #include "SARibbonGlobal.h"
 
+/**
+ * @def QFontMetrics::horizontalAdvance(str)/QFontMetrics::width(str) 为了兼容5.11以下的qt版本，定义的兼容宏
+ */
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
+#ifndef SA_FONTMETRICS_WIDTH
+#define SA_FONTMETRICS_WIDTH(fm, str) fm.horizontalAdvance(str)
+#endif
+#else
+#ifndef SA_FONTMETRICS_WIDTH
+#define SA_FONTMETRICS_WIDTH(fm, str) fm.width(str)
+#endif
+#endif
+
 ///
 /// \brief 绘图辅助
 ///
@@ -13,17 +26,13 @@ class SA_RIBBON_EXPORT SARibbonDrawHelper
 {
 public:
     SARibbonDrawHelper();
-    static QPixmap iconToPixmap(const QIcon& icon, QWidget *widget, const QStyleOption *opt, const QSize& icoSize);
-    static void drawIcon(const QIcon& icon, QPainter *painter, const QStyleOption *opt
-        , int x, int y, int width, int height);
-    static void drawIcon(const QIcon& icon, QPainter *painter, const QStyleOption *opt
-        , const QRect& rect);
-    static QSize iconActualSize(const QIcon& icon, const QStyleOption *opt, const QSize& iconSize);
+    static QPixmap iconToPixmap(const QIcon& icon, QWidget* widget, const QStyleOption* opt, const QSize& icoSize);
+    static void drawIcon(const QIcon& icon, QPainter* painter, const QStyleOption* opt, int x, int y, int width, int height);
+    static void drawIcon(const QIcon& icon, QPainter* painter, const QStyleOption* opt, const QRect& rect);
+    static QSize iconActualSize(const QIcon& icon, const QStyleOption* opt, const QSize& iconSize);
 
-    static void drawText(const QString& text, QStylePainter *painter, const QStyleOption *opt
-        , Qt::Alignment al, int x, int y, int width, int height);
-    static void drawText(const QString& text, QStylePainter *painter, const QStyleOption *opt
-        , Qt::Alignment al, const QRect& rect);
+    static void drawText(const QString& text, QStylePainter* painter, const QStyleOption* opt, Qt::Alignment al, int x, int y, int width, int height);
+    static void drawText(const QString& text, QStylePainter* painter, const QStyleOption* opt, Qt::Alignment al, const QRect& rect);
 };
 
-#endif // SARIBBONDRAWHELPER_H
+#endif  // SARIBBONDRAWHELPER_H
