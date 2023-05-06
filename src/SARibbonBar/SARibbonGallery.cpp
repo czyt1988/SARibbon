@@ -33,7 +33,7 @@ public:
     SARibbonGalleryGroup* viewportGroup { nullptr };
     QBoxLayout* btnLayout { nullptr };
     QBoxLayout* layout { nullptr };
-    SARibbonGallery::PrivateData(SARibbonGallery* p) : q_ptr(p)
+    PrivateData(SARibbonGallery* p) : q_ptr(p)
     {
     }
 
