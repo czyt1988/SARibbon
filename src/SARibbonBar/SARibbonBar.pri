@@ -8,6 +8,7 @@ SOURCES += \
     $$PWD/SAFramelessHelper.cpp \
     $$PWD/SARibbonActionsManager.cpp \
     $$PWD/SARibbonBar.cpp \
+    $$PWD/SARibbonColorToolButton.cpp \
     $$PWD/SARibbonCustomizeData.cpp \
     $$PWD/SARibbonCustomizeDialog.cpp \
     $$PWD/SARibbonCustomizeWidget.cpp \
@@ -46,6 +47,7 @@ HEADERS  += \
     $$PWD/SAFramelessHelper.h \
     $$PWD/SARibbonActionsManager.h \
     $$PWD/SARibbonBar.h \
+    $$PWD/SARibbonColorToolButton.h \
     $$PWD/SARibbonCustomizeData.h \
     $$PWD/SARibbonCustomizeDialog.h \
     $$PWD/SARibbonCustomizeWidget.h \

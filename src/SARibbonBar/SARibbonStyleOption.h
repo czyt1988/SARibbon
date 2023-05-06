@@ -40,6 +40,12 @@ protected:
     int calcMainbarHeight(SARibbonBar::RibbonStyle s) const;
 
 private:
+    //初始化
+    void init();
+    //计算pannel的高度
+    void updateMainbarHeight();
+
+private:
     int m_tabBarHeight;                        ///< ribbon tab 的高度
     int m_titleBarHeight;                      ///< 标题栏高度
     int m_ribbonbarHeightOfficeStyleThreeRow;  ///< office样式的3行高度

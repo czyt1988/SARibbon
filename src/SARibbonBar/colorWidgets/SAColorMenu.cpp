@@ -2,6 +2,8 @@
 #include <QWidgetAction>
 #include <QColorDialog>
 #include <QDebug>
+#include <QLabel>
+#include <QGridLayout>
 #include "SAColorGridWidget.h"
 #include "SAColorPaletteGridWidget.h"
 #include "SAColorToolButton.h"
@@ -12,13 +14,16 @@ public:
     PrivateData(SAColorMenu* p);
     QColor getColorByDialog();
     void recordCustomColor(const QColor& c);
+    QWidgetAction* addWidget(QWidget* w);
 
 public:
-    SAColorPaletteGridWidget* mThemeColors { nullptr };    ///< 主题颜色
-    QWidgetAction* mThemeColorPaletteAction { nullptr };   ///< ThemeColorsPalette对应的action
-    QAction* mCustomColorAction { nullptr };               ///< 自定义颜色action
-    SAColorGridWidget* mCustomColorsWidget { nullptr };    ///< 自定义颜色记录
-    QWidgetAction* mCustomColorsWidgetAction { nullptr };  ///< 自定义颜色窗口对应的action
+    QLabel* mTitleLabel { nullptr };  ///< 主题颜色标题
+    QWidgetAction* mTitleLabelAction { nullptr };
+    SAColorPaletteGridWidget* mThemeColorsWidget { nullptr };  ///< 主题颜色
+    QWidgetAction* mThemeColorPaletteAction { nullptr };       ///< ThemeColorsPalette对应的action
+    QAction* mCustomColorAction { nullptr };                   ///< 自定义颜色action
+    SAColorGridWidget* mCustomColorsWidget { nullptr };        ///< 自定义颜色记录
+    QWidgetAction* mCustomColorsWidgetAction { nullptr };      ///< 自定义颜色窗口对应的action
     QList< QColor > mCustomColors;
     int mMaxCustomColorSize { 10 };                        ///< 记录最多的自定义颜色数量
     QScopedPointer< QColorDialog > mColorDlg { nullptr };  ///<颜色对话框
@@ -51,6 +56,14 @@ void SAColorMenu::PrivateData::recordCustomColor(const QColor& c)
         mCustomColors.back() = c;
     }
 }
+
+QWidgetAction* SAColorMenu::PrivateData::addWidget(QWidget* w)
+{
+    QWidgetAction* wa = new QWidgetAction(q_ptr);
+    wa->setDefaultWidget(w);
+    q_ptr->addAction(wa);
+    return wa;
+}
 //===================================================
 // SAColorMenu
 //===================================================
@@ -76,6 +89,9 @@ SAColorMenu::~SAColorMenu()
  */
 void SAColorMenu::bindToColorToolButton(SAColorToolButton* btn)
 {
+    if (!btn) {
+        return;
+    }
     if (btn->menu() != this) {
         btn->setMenu(this);
     }
@@ -106,27 +122,34 @@ QAction* SAColorMenu::getCustomColorAction() const
  */
 SAColorPaletteGridWidget* SAColorMenu::getColorPaletteGridWidget() const
 {
-    return d_ptr->mThemeColors;
+    return d_ptr->mThemeColorsWidget;
 }
 
 void SAColorMenu::init(const QList< QColor >& themeCls)
 {
-    d_ptr->mThemeColors             = new SAColorPaletteGridWidget(themeCls, this);
-    d_ptr->mThemeColorPaletteAction = new QWidgetAction(this);
-    d_ptr->mThemeColorPaletteAction->setDefaultWidget(d_ptr->mThemeColors);
-    addAction(d_ptr->mThemeColorPaletteAction);
+    d_ptr->mTitleLabel = new QLabel(this);
+    d_ptr->mTitleLabel->setText(tr("Theme Colors"));
+    d_ptr->mTitleLabelAction = d_ptr->addWidget(d_ptr->mTitleLabel);
+
+    d_ptr->mThemeColorsWidget = new SAColorPaletteGridWidget(themeCls, this);
+    d_ptr->mThemeColorsWidget->setColorCheckable(false);
+    d_ptr->mThemeColorPaletteAction = d_ptr->addWidget(d_ptr->mThemeColorsWidget);
 
     d_ptr->mCustomColorAction = new QAction(tr("Custom Color"), this);  // cn:自定义颜色
     addAction(d_ptr->mCustomColorAction);
+
+    QSize clrSize              = d_ptr->mThemeColorsWidget->getColorIconSize();
     d_ptr->mCustomColorsWidget = new SAColorGridWidget(this);
-    d_ptr->mCustomColorsWidget->setColorIconSize(d_ptr->mThemeColors->getColorIconSize());
+    d_ptr->mCustomColorsWidget->setRowMinimumHeight(0, clrSize.height());
+    d_ptr->mCustomColorsWidget->setHorizontalSpacerToRight();
+    d_ptr->mCustomColorsWidget->setColorIconSize(clrSize);
     d_ptr->mCustomColorsWidget->setColumnCount(d_ptr->mMaxCustomColorSize);
-    d_ptr->mCustomColorsWidgetAction = new QWidgetAction(this);
-    d_ptr->mCustomColorsWidgetAction->setDefaultWidget(d_ptr->mCustomColorsWidget);
-    addAction(d_ptr->mCustomColorsWidgetAction);
+    d_ptr->mCustomColorsWidget->setColorCheckable(false);
+    d_ptr->mCustomColorsWidgetAction = d_ptr->addWidget(d_ptr->mCustomColorsWidget);
 
     connect(d_ptr->mCustomColorAction, &QAction::triggered, this, &SAColorMenu::onCustomColorActionTriggered);
-    connect(d_ptr->mThemeColors, &SAColorPaletteGridWidget::colorClicked, this, &SAColorMenu::onThemeColorsSelected);
+    connect(d_ptr->mThemeColorsWidget, &SAColorPaletteGridWidget::colorClicked, this, &SAColorMenu::onThemeColorsSelected);
+    connect(d_ptr->mCustomColorsWidget, &SAColorGridWidget::colorClicked, this, &SAColorMenu::onCustomColorsSelected);
 }
 
 /**
@@ -140,6 +163,7 @@ void SAColorMenu::onCustomColorActionTriggered(bool on)
     if (c.isValid()) {
         d_ptr->recordCustomColor(c);
         d_ptr->mCustomColorsWidget->setColorList(d_ptr->mCustomColors);
+        updateGeometry();
         emit selectedColor(c);
         hide();
     }
@@ -150,6 +174,16 @@ void SAColorMenu::onCustomColorActionTriggered(bool on)
  * @param c
  */
 void SAColorMenu::onThemeColorsSelected(const QColor& c)
+{
+    emit selectedColor(c);
+    hide();
+}
+
+/**
+ * @brief 自定义颜色被选中
+ * @param c
+ */
+void SAColorMenu::onCustomColorsSelected(const QColor& c)
 {
     emit selectedColor(c);
     hide();

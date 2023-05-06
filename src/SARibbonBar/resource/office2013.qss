@@ -84,28 +84,27 @@ SARibbonTabBar {
   background-color: transparent;
 }
 
-/*
-高清屏幕不能使用px
+
 SARibbonTabBar::tab {
   color: #5779af;
   border: none;
   background: transparent;
   margin-top: 0px;
   margin-right: 0px;
-  margin-left: 1em;
+  margin-left: 6px;
   margin-bottom: 0px;
   min-width: 60px;
   max-width: 200px;
-  min-height: 25px;
-  max-height: 25px;
+  min-height: 30px;
+  max-height: 30px;
   padding-left: 1px;
   padding-right: 1px;
-  padding-top: 1px;
+  padding-top: -3px;
   padding-bottom: 1px;
 }
-*/
 
-SARibbonTabBar::tab {
+
+/* SARibbonTabBar::tab {
   color: #5779af;
   border: none;
   background: transparent;
@@ -119,9 +118,9 @@ SARibbonTabBar::tab {
   max-height: 1.2em;
   padding-left: 0.2em;
   padding-right: 0.2em;
-  padding-top: 0.3em;
-  padding-bottom: 0.1em;
-}
+  padding-top: -0.3em;
+  padding-bottom: 0em;
+} */
 
 SARibbonTabBar::tab:selected, SARibbonTabBar::tab:hover {
   border-top-left-radius: 0px;
@@ -133,8 +132,6 @@ SARibbonTabBar::tab:selected {
   border: 1px solid #c5d2e0;
   background: white;
   border-bottom-color: #FFFFFF;
-  padding-top: 0.3em;
-  padding-bottom: 0.1em;
 }
 
 SARibbonTabBar::tab:hover:!selected {
@@ -254,6 +251,7 @@ SARibbonPannelOptionButton::hover {
 SARibbonPannel {
   background-color: white;
   border: 0px;
+  color: #666666;
 }
 
 /*SARibbonGallery*/
