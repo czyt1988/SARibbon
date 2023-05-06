@@ -206,7 +206,7 @@ QPixmap SAColorToolButton::PrivateData::createIconPixmap(const QStyleOptionToolB
         mode = QIcon::Normal;
     }
     // return (opt.icon.pixmap(this->window()->windowHandle(), opt.rect.size().boundedTo(realConSize), mode, state));
-    return (opt.icon.pixmap(q_ptr->window()->windowHandle(), iconRect.size(), mode, state));
+    return (opt.icon.pixmap(iconRect.size(), mode, state));
 }
 
 /**
@@ -419,7 +419,8 @@ QSize SAColorToolButton::sizeHint() const
     if (opt.features & QStyleOptionToolButton::MenuButtonPopup || opt.features & QStyleOptionToolButton::HasMenu) {
         w += style()->pixelMetric(QStyle::PM_MenuButtonIndicator, &opt, this);
     }
-    return style()->sizeFromContents(QStyle::CT_ToolButton, &opt, QSize(w, h), this).expandedTo(QApplication::globalStrut());
+    //! Qt6.4 取消了QApplication::globalStrut
+    return style()->sizeFromContents(QStyle::CT_ToolButton, &opt, QSize(w, h), this).expandedTo(QSize(2, 2));
 }
 
 void SAColorToolButton::onButtonClicked(bool checked)

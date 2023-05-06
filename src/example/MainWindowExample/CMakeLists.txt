@@ -12,7 +12,7 @@ add_executable(${SARIBBON_EXPAMPLE_NAME}
     saribbonresouce.qrc
 )
 
-target_include_directories(${SARIBBON_EXPAMPLE_NAME}  PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../../SARibbonBar")
+target_include_directories(${SARIBBON_EXPAMPLE_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../../SARibbonBar")
 message(STATUS "SARIBBON_BIN_DIR=${SARIBBON_BIN_DIR}")
 find_library(SARIBBONBAR_LIB NAMES SARibbonBar HINTS ${SARIBBON_BIN_DIR})
 target_link_libraries(${EXPAMPLE_NAME} PRIVATE ${SARIBBONBAR_LIB})

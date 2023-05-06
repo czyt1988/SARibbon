@@ -140,14 +140,42 @@ target_compile_definitions(${LIB_NAME} PRIVATE SA_RIBBON_BAR_MAKE_LIB)
 target_compile_definitions(${LIB_NAME} PRIVATE SA_COLOR_WIDGETS_NO_DLL)
 
 
-
-target_include_directories(${LIB_NAME} INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
-install(TARGETS ${LIB_NAME}
-	RUNTIME DESTINATION bin
-	LIBRARY DESTINATION bin
-	ARCHIVE DESTINATION lib
+target_include_directories(${LIB_NAME} PUBLIC
+    $<INSTALL_INTERFACE:include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 )
-install(FILES ${SARIBBON_HEADER_FILES} DESTINATION include)
+# ------------------------------- install script -------------------------------
+set(SARIBBON_INSTALL_DIR SARibbon)
+set(CMAKE_INSTALL_PREFIX ${SARIBBON_BIN_DIR})
+# Generate library version info which will generate xxxConfigVersion.cmake,
+# the ${PACKAGE_VERSION} is the version defined in project()
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+    "${LIB_NAME}ConfigVersion.cmake"
+    VERSION ${VERSION_SHORT}
+    COMPATIBILITY SameMajorVersion
+)
+install(FILES
+    ${SARIBBON_HEADER_FILES}
+    DESTINATION include/${SARIBBON_INSTALL_DIR}
+    COMPONENT headers
+)
+install(FILES
+    ${SACOLOR_HEADER_FILES}
+    DESTINATION include/${SARIBBON_INSTALL_DIR}/colorWidgets
+    COMPONENT headers
+)
+install(TARGETS ${LIB_NAME}
+    EXPORT SARibbonTargets
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+    INCLUDES DESTINATION include/${SARIBBON_INSTALL_DIR}
+)
+install(EXPORT SARibbonTargets
+    FILE SARibbonTargets.cmake
+    DESTINATION lib/cmake/${SARIBBON_INSTALL_DIR}
+)
 
 if(WIN32)
 	create_win32_resource_version(

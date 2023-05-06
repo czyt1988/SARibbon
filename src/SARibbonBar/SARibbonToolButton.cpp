@@ -426,7 +426,8 @@ QSize SARibbonToolButton::PrivateData::calcSmallButtonSizeHint(const QStyleOptio
     if (w < 16) {
         w = 16;
     }
-    return QSize(w, h).expandedTo(QApplication::globalStrut());
+    //! Qt6.4 取消了QApplication::globalStrut
+    return QSize(w, h).expandedTo(QSize(2, 2));
 }
 
 QSize SARibbonToolButton::PrivateData::calcLargeButtonNormalSizeHint(const QStyleOptionToolButton& opt) const
@@ -442,7 +443,8 @@ QSize SARibbonToolButton::PrivateData::calcLargeButtonNormalSizeHint(const QStyl
     if (w < 22) {
         w = 22;
     }
-    return QSize(w, h).expandedTo(QApplication::globalStrut());
+    //! Qt6.4 取消了QApplication::globalStrut
+    return QSize(w, h).expandedTo(QSize(2, 2));
 }
 
 QSize SARibbonToolButton::PrivateData::calcLargeButtonLiteSizeHint(const QStyleOptionToolButton& opt) const
@@ -462,7 +464,8 @@ QSize SARibbonToolButton::PrivateData::calcLargeButtonLiteSizeHint(const QStyleO
     if (w < 22) {
         w = 22;
     }
-    return QSize(w, h).expandedTo(QApplication::globalStrut());
+    //! Qt6.4 取消了QApplication::globalStrut
+    return QSize(w, h).expandedTo(QSize(2, 2));
 }
 
 /**
@@ -546,11 +549,11 @@ QPixmap SARibbonToolButton::PrivateData::createIconPixmap(const QStyleOptionTool
         mode = QIcon::Normal;
     }
     // return (opt.icon.pixmap(this->window()->windowHandle(), opt.rect.size().boundedTo(realConSize), mode, state));
-    if (mButtonType == SARibbonToolButton::Lite && !s_liteStyleEnableWordWrap) {
+    if (mLargeButtonType == SARibbonToolButton::Lite && !s_liteStyleEnableWordWrap) {
         // lite模式，图标不用过于饱满,减去2px
-        return (opt.icon.pixmap(q_ptr->window()->windowHandle(), iconsize - QSize(2, 2), mode, state));
+        return (opt.icon.pixmap(iconsize - QSize(2, 2), mode, state));
     }
-    return (opt.icon.pixmap(q_ptr->window()->windowHandle(), iconsize, mode, state));
+    return (opt.icon.pixmap(iconsize, mode, state));
 }
 
 int SARibbonToolButton::PrivateData::getTextAlignment() const
