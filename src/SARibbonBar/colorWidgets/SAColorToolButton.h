@@ -35,12 +35,13 @@ class QStylePainter;
  * 如果有图标，颜色条会在图标下方，为图标高度的1/4 为图标宽度一致，如若超过控件的大小，会自动缩小体积
  *
  */
-class SAColorToolButton : public QToolButton
+class SA_COLOR_WIDGETS_API SAColorToolButton : public QToolButton
 {
     Q_OBJECT
-    SA_DECLARE_PRIVATE(SAColorToolButton)
+    SA_COLOR_WIDGETS_DECLARE_PRIVATE(SAColorToolButton)
 public:
     explicit SAColorToolButton(QWidget* parent = nullptr);
+    ~SAColorToolButton();
     //获取颜色
     QColor getColor() const;
     //设置Margins

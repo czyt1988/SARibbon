@@ -8,32 +8,29 @@
 /**
  * @brief The SARibbonGalleryGroupPrivate class
  */
-class SARibbonGalleryGroupPrivate
+class SARibbonGalleryGroup::PrivateData
 {
 public:
-    SARibbonGalleryGroup* Parent;
-    QString _groupTitle;
-    SARibbonGalleryGroup::GalleryGroupStyle _preStyle;
-    SARibbonGalleryGroup::DisplayRow _displayRow;
-    bool _blockRecalc;
-    int _gridMinimumWidth;       ///< grid最小宽度
-    int _gridMaximumWidth;       ///< grid最大宽度
-    QActionGroup* _actionGroup;  ///< 所有GalleryGroup管理的actions都由这个actiongroup管理
-    SARibbonGalleryGroupPrivate(SARibbonGalleryGroup* p)
-        : Parent(p)
-        , _preStyle(SARibbonGalleryGroup::IconWithText)
-        , _displayRow(SARibbonGalleryGroup::DisplayOneRow)
-        , _blockRecalc(false)
-        , _gridMinimumWidth(0)
-        , _gridMaximumWidth(0)
+    SARibbonGalleryGroup* q_ptr;
+    QString mGroupTitle;
+    SARibbonGalleryGroup::GalleryGroupStyle mPreStyle { SARibbonGalleryGroup::IconWithText };
+    SARibbonGalleryGroup::DisplayRow mDisplayRow { SARibbonGalleryGroup::DisplayOneRow };
+    bool mBlockRecalc { false };
+    int mGridMinimumWidth { 0 };             ///< grid最小宽度
+    int mGridMaximumWidth { 0 };             ///< grid最大宽度
+    QActionGroup* mActionGroup { nullptr };  ///< 所有GalleryGroup管理的actions都由这个actiongroup管理
+public:
+    PrivateData(SARibbonGalleryGroup* p) : q_ptr(p)
     {
-        _actionGroup = new QActionGroup(p);
-        p->connect(_actionGroup, &QActionGroup::triggered, p, &SARibbonGalleryGroup::triggered);
-        p->connect(_actionGroup, &QActionGroup::hovered, p, &SARibbonGalleryGroup::hovered);
+        mActionGroup = new QActionGroup(p);
+        p->connect(mActionGroup, &QActionGroup::triggered, p, &SARibbonGalleryGroup::triggered);
+        p->connect(mActionGroup, &QActionGroup::hovered, p, &SARibbonGalleryGroup::hovered);
     }
 };
 
-////////////////////////////////////////
+//===================================================
+// SARibbonGalleryGroupItemDelegate
+//===================================================
 
 SARibbonGalleryGroupItemDelegate::SARibbonGalleryGroupItemDelegate(SARibbonGalleryGroup* group, QObject* parent)
     : QStyledItemDelegate(parent), m_group(group)
@@ -98,7 +95,9 @@ QSize SARibbonGalleryGroupItemDelegate::sizeHint(const QStyleOptionViewItem& opt
     return m_group->gridSize();
 }
 
-//////////////////////////////////////////
+//===================================================
+// SARibbonGalleryGroupModel
+//===================================================
 
 SARibbonGalleryGroupModel::SARibbonGalleryGroupModel(QObject* parent) : QAbstractListModel(parent)
 {
@@ -192,11 +191,11 @@ void SARibbonGalleryGroupModel::append(SARibbonGalleryItem* item)
     endInsertRows();
 }
 
-//////////////////////////
-/// \brief SARibbonGalleryGroup::SARibbonGalleryGroup
-/// \param w
-
-SARibbonGalleryGroup::SARibbonGalleryGroup(QWidget* w) : QListView(w), m_d(new SARibbonGalleryGroupPrivate(this))
+//===================================================
+// SARibbonGalleryGroup
+//===================================================
+SARibbonGalleryGroup::SARibbonGalleryGroup(QWidget* w)
+    : QListView(w), d_ptr(new SARibbonGalleryGroup::PrivateData(this))
 {
     setViewMode(QListView::IconMode);
     setResizeMode(QListView::Adjust);
@@ -211,7 +210,6 @@ SARibbonGalleryGroup::SARibbonGalleryGroup(QWidget* w) : QListView(w), m_d(new S
 
 SARibbonGalleryGroup::~SARibbonGalleryGroup()
 {
-    delete m_d;
 }
 
 /**
@@ -220,12 +218,12 @@ SARibbonGalleryGroup::~SARibbonGalleryGroup()
  */
 void SARibbonGalleryGroup::setRecalcGridSizeBlock(bool on)
 {
-    m_d->_blockRecalc = on;
+    d_ptr->mBlockRecalc = on;
 }
 
 bool SARibbonGalleryGroup::isRecalcGridSizeBlock() const
 {
-    return m_d->_blockRecalc;
+    return d_ptr->mBlockRecalc;
 }
 
 /**
@@ -308,7 +306,7 @@ void SARibbonGalleryGroup::recalcGridSize(int galleryHeight)
 ///
 void SARibbonGalleryGroup::setGalleryGroupStyle(SARibbonGalleryGroup::GalleryGroupStyle style)
 {
-    m_d->_preStyle = style;
+    d_ptr->mPreStyle = style;
     if (style == IconWithWordWrapText) {
         setWordWrap(true);
     }
@@ -317,7 +315,7 @@ void SARibbonGalleryGroup::setGalleryGroupStyle(SARibbonGalleryGroup::GalleryGro
 
 SARibbonGalleryGroup::GalleryGroupStyle SARibbonGalleryGroup::getGalleryGroupStyle() const
 {
-    return m_d->_preStyle;
+    return d_ptr->mPreStyle;
 }
 
 void SARibbonGalleryGroup::addItem(const QString& text, const QIcon& icon)
@@ -346,7 +344,7 @@ void SARibbonGalleryGroup::addActionItem(QAction* act)
     if (nullptr == groupModel()) {
         return;
     }
-    m_d->_actionGroup->addAction(act);
+    d_ptr->mActionGroup->addAction(act);
     groupModel()->append(new SARibbonGalleryItem(act));
 }
 
@@ -358,7 +356,7 @@ void SARibbonGalleryGroup::addActionItemList(const QList< QAction* >& acts)
         return;
     }
     for (QAction* a : acts) {
-        m_d->_actionGroup->addAction(a);
+        d_ptr->mActionGroup->addAction(a);
     }
     for (int i = 0; i < acts.size(); ++i) {
         model->append(new SARibbonGalleryItem(acts[ i ]));
@@ -380,13 +378,13 @@ SARibbonGalleryGroupModel* SARibbonGalleryGroup::groupModel()
 
 void SARibbonGalleryGroup::setGroupTitle(const QString& title)
 {
-    m_d->_groupTitle = title;
-    emit groupTitleChanged(m_d->_groupTitle);
+    d_ptr->mGroupTitle = title;
+    emit groupTitleChanged(d_ptr->mGroupTitle);
 }
 
 QString SARibbonGalleryGroup::getGroupTitle() const
 {
-    return (m_d->_groupTitle);
+    return (d_ptr->mGroupTitle);
 }
 
 void SARibbonGalleryGroup::selectByIndex(int i)
@@ -410,7 +408,7 @@ void SARibbonGalleryGroup::selectByIndex(int i)
  */
 void SARibbonGalleryGroup::setDisplayRow(DisplayRow r)
 {
-    m_d->_displayRow = r;
+    d_ptr->mDisplayRow = r;
     recalcGridSize();
 }
 
@@ -420,7 +418,7 @@ void SARibbonGalleryGroup::setDisplayRow(DisplayRow r)
  */
 SARibbonGalleryGroup::DisplayRow SARibbonGalleryGroup::getDisplayRow() const
 {
-    return m_d->_displayRow;
+    return d_ptr->mDisplayRow;
 }
 
 /**
@@ -429,7 +427,7 @@ SARibbonGalleryGroup::DisplayRow SARibbonGalleryGroup::getDisplayRow() const
  */
 void SARibbonGalleryGroup::setGridMinimumWidth(int w)
 {
-    m_d->_gridMinimumWidth = w;
+    d_ptr->mGridMinimumWidth = w;
 }
 
 /**
@@ -438,7 +436,7 @@ void SARibbonGalleryGroup::setGridMinimumWidth(int w)
  */
 int SARibbonGalleryGroup::getGridMinimumWidth() const
 {
-    return m_d->_gridMinimumWidth;
+    return d_ptr->mGridMinimumWidth;
 }
 
 /**
@@ -447,7 +445,7 @@ int SARibbonGalleryGroup::getGridMinimumWidth() const
  */
 void SARibbonGalleryGroup::setGridMaximumWidth(int w)
 {
-    m_d->_gridMaximumWidth = w;
+    d_ptr->mGridMaximumWidth = w;
 }
 
 /**
@@ -456,7 +454,7 @@ void SARibbonGalleryGroup::setGridMaximumWidth(int w)
  */
 int SARibbonGalleryGroup::getGridMaximumWidth() const
 {
-    return m_d->_gridMaximumWidth;
+    return d_ptr->mGridMaximumWidth;
 }
 
 /**
@@ -465,7 +463,7 @@ int SARibbonGalleryGroup::getGridMaximumWidth() const
  */
 QActionGroup* SARibbonGalleryGroup::getActionGroup() const
 {
-    return m_d->_actionGroup;
+    return d_ptr->mActionGroup;
 }
 
 void SARibbonGalleryGroup::onItemClicked(const QModelIndex& index)

@@ -9,7 +9,6 @@
 class SARibbonPannel;
 class SARibbonCategoryLayoutItem;
 class SARibbonSeparatorWidget;
-class SARibbonCategoryLayoutPrivate;
 
 /**
  * @brief The SARibbonCategoryLayout class
@@ -17,24 +16,25 @@ class SARibbonCategoryLayoutPrivate;
 class SA_RIBBON_EXPORT SARibbonCategoryLayout : public QLayout
 {
     Q_OBJECT
+    SA_RIBBON_DECLARE_PRIVATE(SARibbonCategoryLayout)
 public:
-    SARibbonCategoryLayout(SARibbonCategory *parent);
+    SARibbonCategoryLayout(SARibbonCategory* parent);
     ~SARibbonCategoryLayout();
 
-    SARibbonCategory *ribbonCategory();
+    SARibbonCategory* ribbonCategory();
 
-    virtual void addItem(QLayoutItem *item) Q_DECL_OVERRIDE;
-    virtual QLayoutItem *itemAt(int index) const Q_DECL_OVERRIDE;
-    virtual QLayoutItem *takeAt(int index) Q_DECL_OVERRIDE;
-    SARibbonCategoryLayoutItem *takePannelItem(int index);
-    SARibbonCategoryLayoutItem *takePannel(SARibbonPannel *pannel);
+    virtual void addItem(QLayoutItem* item) Q_DECL_OVERRIDE;
+    virtual QLayoutItem* itemAt(int index) const Q_DECL_OVERRIDE;
+    virtual QLayoutItem* takeAt(int index) Q_DECL_OVERRIDE;
+    SARibbonCategoryLayoutItem* takePannelItem(int index);
+    SARibbonCategoryLayoutItem* takePannel(SARibbonPannel* pannel);
     virtual int count() const Q_DECL_OVERRIDE;
 
     //追加一个pannel
-    void addPannel(SARibbonPannel *pannel);
+    void addPannel(SARibbonPannel* pannel);
 
     //插入一个pannel
-    void insertPannel(int index, SARibbonPannel *pannel);
+    void insertPannel(int index, SARibbonPannel* pannel);
 
     void setGeometry(const QRect& rect) Q_DECL_OVERRIDE;
     QSize sizeHint() const Q_DECL_OVERRIDE;
@@ -49,17 +49,12 @@ public:
     void doLayout();
 
     //返回所有pannels
-    QList<SARibbonPannel *> pannels() const;
+    QList< SARibbonPannel* > pannels() const;
 
 private slots:
     void onLeftScrollButtonClicked();
     void onRightScrollButtonClicked();
-
-private:
-    SARibbonCategoryLayoutPrivate *m_d;
 };
-
-
 
 /**
  * @brief SARibbonCategoryLayoutItem，用于标识SARibbonCategoryLayout的item
@@ -67,9 +62,9 @@ private:
 class SA_RIBBON_EXPORT SARibbonCategoryLayoutItem : public QWidgetItem
 {
 public:
-    SARibbonCategoryLayoutItem(SARibbonPannel *w);
-    SARibbonSeparatorWidget *separatorWidget;
-    QRect mWillSetGeometry;                 ///< pannel将要设置的Geometry
-    QRect mWillSetSeparatorGeometry;        ///< pannel将要设置的Separator的Geometry
+    SARibbonCategoryLayoutItem(SARibbonPannel* w);
+    SARibbonSeparatorWidget* separatorWidget;
+    QRect mWillSetGeometry;           ///< pannel将要设置的Geometry
+    QRect mWillSetSeparatorGeometry;  ///< pannel将要设置的Separator的Geometry
 };
-#endif // SARIBBONCATEGORYLAYOUT_H
+#endif  // SARIBBONCATEGORYLAYOUT_H

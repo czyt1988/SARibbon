@@ -9,7 +9,7 @@
 #define SAColorToolButton_DEBUG_PRINT 0
 class SAColorToolButton::PrivateData
 {
-    SA_DECLARE_PUBLIC(SAColorToolButton)
+    SA_COLOR_WIDGETS_DECLARE_PUBLIC(SAColorToolButton)
 public:
     PrivateData(SAColorToolButton* p);
     void calcSizeOfToolButtonIconOnly(const QStyleOptionToolButton& opt, QRect& iconRect, QRect& textRect, QRect& colorRect);
@@ -282,6 +282,10 @@ SAColorToolButton::SAColorToolButton(QWidget* parent) : QToolButton(parent), d_p
     QStyleOptionToolButton opt;
     initStyleOption(&opt);
     connect(this, &QToolButton::clicked, this, &SAColorToolButton::onButtonClicked);
+}
+
+SAColorToolButton::~SAColorToolButton()
+{
 }
 
 /**

@@ -2,7 +2,6 @@
 #define SARIBBONGALLERYGROUP_H
 #include "SARibbonGlobal.h"
 #include <QList>
-#include "SARibbonGalleryItem.h"
 #include <QListView>
 #include <QStyledItemDelegate>
 #include "SARibbonGalleryItem.h"
@@ -49,16 +48,15 @@ private:
     QList< SARibbonGalleryItem* > m_items;
 };
 
-class SARibbonGalleryGroupPrivate;
-
-///
-/// \brief Gallery的组
-///
-/// 组负责显示管理Gallery Item
-///
+/**
+ * @brief Gallery的组
+ *
+ * 组负责显示管理Gallery Item
+ */
 class SA_RIBBON_EXPORT SARibbonGalleryGroup : public QListView
 {
     Q_OBJECT
+    SA_RIBBON_DECLARE_PRIVATE(SARibbonGalleryGroup)
 public:
     /**
      * @brief GalleryGroup显示的样式
@@ -134,9 +132,6 @@ signals:
      * @param action
      */
     void hovered(QAction* action);
-
-private:
-    SARibbonGalleryGroupPrivate* m_d;
 };
 
 #endif  // SARIBBONGALLERYGROUP_H

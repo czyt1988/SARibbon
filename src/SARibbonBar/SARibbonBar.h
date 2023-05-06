@@ -9,7 +9,6 @@
 
 class QAbstractButton;
 class SARibbonElementCreateDelegate;
-class SARibbonBarPrivate;
 class SARibbonTabBar;
 class SARibbonButtonGroupWidget;
 class SARibbonQuickAccessBar;
@@ -90,8 +89,8 @@ class SARibbonQuickAccessBar;
  */
 class SA_RIBBON_EXPORT SARibbonBar : public QMenuBar
 {
-    friend class SARibbonBarPrivate;
     Q_OBJECT
+    SA_RIBBON_DECLARE_PRIVATE(SARibbonBar)
     Q_PROPERTY(RibbonStyle ribbonStyle READ currentRibbonStyle WRITE setRibbonStyle)
     Q_PROPERTY(bool minimumMode READ isMinimumMode WRITE setMinimumMode)
     Q_PROPERTY(bool minimumModeButton READ haveShowMinimumModeButton WRITE showMinimumModeButton)
@@ -170,10 +169,10 @@ public:
     void showCategory(SARibbonCategory* category);
 
     //判断这个category是否在显示状态，也就是tabbar有这个category
-    bool isCategoryVisible(SARibbonCategory* category) const;
+    bool isCategoryVisible(const SARibbonCategory* c) const;
 
     //获取category的索引
-    int categoryIndex(SARibbonCategory* c) const;
+    int categoryIndex(const SARibbonCategory* c) const;
 
     //移动一个Category从from index到to index
     void moveCategory(int from, int to);
@@ -334,9 +333,6 @@ protected:
     virtual void paintBackground(QPainter& painter);
     virtual void paintWindowTitle(QPainter& painter, const QString& title, const QRect& titleRegion);
     virtual void paintContextCategoryTab(QPainter& painter, const QString& title, QRect contextRect, const QColor& color);
-
-private:
-    SARibbonBarPrivate* m_d;
 };
 
 #endif  // SARIBBONBAR_H
