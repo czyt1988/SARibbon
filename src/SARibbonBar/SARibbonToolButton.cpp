@@ -122,7 +122,7 @@ public:
     bool mWordWrap { false };           ///< 标记是否文字换行 @default false
     SARibbonToolButton::RibbonButtonType mButtonType { SARibbonToolButton::LargeButton };
     SARibbonToolButton::LargeButtonType mLargeButtonType { SARibbonToolButton::Normal };
-    int mSpacing { 2 };             ///< 按钮和边框的距离
+    int mSpacing { 1 };             ///< 按钮和边框的距离
     int mIndicatorLen { 8 };        ///< Indicator的长度
     QRect mDrawIconRect;            ///< 记录icon的绘制位置
     QRect mDrawTextRect;            ///< 记录text的绘制位置
@@ -143,24 +143,10 @@ void SARibbonToolButton::PrivateData::updateStatusByMousePosition(const QPoint& 
 {
     bool isMouseOnSubControl(false);
     if (SARibbonToolButton::LargeButton == mButtonType) {
-        if (SARibbonToolButton::Normal == mLargeButtonType) {
-            //三行模式
-            //大按钮模式下，图标绘制区域是非SubControl(Indicator)
-            if (mDrawIconRect.isValid()) {
-                //获取Indicator的区域
-                isMouseOnSubControl = q_ptr->rect().adjusted(0, mDrawIconRect.height() + 2 * mSpacing, 0, 0).contains(pos);
-            }
-        } else {
-            //两行模式
-            if (mDrawIconRect.isValid()) {
-                //获取Indicator的区域
-                //两行模式icon和text之间没有spacing
-                isMouseOnSubControl = q_ptr->rect().adjusted(0, mDrawIconRect.height() + mSpacing, 0, 0).contains(pos);
-            }
-        }
+        isMouseOnSubControl = mDrawTextRect.united(mDrawIndicatorArrowRect).contains(pos);
     } else {
         //小按钮模式就和普通toolbutton一样
-        isMouseOnSubControl = !q_ptr->rect().adjusted(0, 0, -mIndicatorLen, 0).contains(pos);
+        isMouseOnSubControl = mDrawIndicatorArrowRect.contains(pos);
     }
 
     if (mMouseOnSubControl != isMouseOnSubControl) {
@@ -235,7 +221,7 @@ void SARibbonToolButton::PrivateData::calcSmallButtonDrawRects(const QStyleOptio
         if (hasIndicator(opt)) {
             // 在仅有图标的小模式显示时，预留一个下拉箭头位置
             iconRect           = opt.rect.adjusted(spacing, spacing, -indicatorLen - spacing, -spacing);
-            indicatorArrowRect = QRect(iconRect.right(), iconRect.y(), indicatorLen, iconRect.height());
+            indicatorArrowRect = QRect(opt.rect.right() - indicatorLen - spacing, iconRect.y(), indicatorLen, iconRect.height());
         } else {
             iconRect           = opt.rect.adjusted(spacing, spacing, -spacing, -spacing);
             indicatorArrowRect = QRect();
@@ -247,7 +233,7 @@ void SARibbonToolButton::PrivateData::calcSmallButtonDrawRects(const QStyleOptio
         if (hasIndicator(opt)) {
             // 在仅有图标的小模式显示时，预留一个下拉箭头位置
             textRect           = opt.rect.adjusted(spacing, spacing, -indicatorLen - spacing, -spacing);
-            indicatorArrowRect = QRect(iconRect.right(), spacing, indicatorLen, iconRect.height());
+            indicatorArrowRect = QRect(opt.rect.right() - indicatorLen - spacing, spacing, indicatorLen, textRect.height());
         } else {
             textRect           = opt.rect.adjusted(spacing, spacing, -spacing, -spacing);
             indicatorArrowRect = QRect();
@@ -283,9 +269,9 @@ void SARibbonToolButton::PrivateData::calcSmallButtonDrawRects(const QStyleOptio
         //最后设置Indicator
         if (hasInd) {
             if (textRect.isValid()) {
-                indicatorArrowRect = QRect(textRect.right(), textRect.y(), indicatorLen, textRect.height());
+                indicatorArrowRect = QRect(buttonRect.right() - indicatorLen + 1, textRect.y(), indicatorLen, textRect.height());
             } else if (iconRect.isValid()) {
-                indicatorArrowRect = QRect(iconRect.right(), iconRect.y(), indicatorLen, iconRect.height());
+                indicatorArrowRect = QRect(buttonRect.right() - indicatorLen + 1, iconRect.y(), indicatorLen, iconRect.height());
             } else {
                 indicatorArrowRect = buttonRect;
             }
@@ -344,7 +330,7 @@ void SARibbonToolButton::PrivateData::calcLargeButtonLiteDrawRects(const QStyleO
     if (hasIndicator(opt)) {
         textRect = opt.rect.adjusted(spacing, opt.rect.height() - textHeight - spacing, -indicatorLen - spacing, -spacing);
         //计算indicator
-        indicatorArrowRect = QRect(textRect.right(), textRect.top(), indicatorLen, textRect.height());
+        indicatorArrowRect = QRect(textRect.right() + 1, textRect.top(), indicatorLen, textRect.height());
     } else {
         textRect = opt.rect.adjusted(spacing, opt.rect.height() - textHeight - spacing, -spacing, -spacing);
         //计算indicator
@@ -637,9 +623,7 @@ void SARibbonToolButton::mousePressEvent(QMouseEvent* e)
             d_ptr->mMenuButtonPressed = true;
             showMenu();
             // showmenu结束后，在判断当前的鼠标位置是否是在subcontrol
-
             d_ptr->updateStatusByMousePosition(mapFromGlobal(QCursor::pos()));
-
             return;
         }
     }
@@ -713,6 +697,12 @@ void SARibbonToolButton::paintEvent(QPaintEvent* e)
     QPainter p(this);
     QStyleOptionToolButton opt;
     initStyleOption(&opt);
+    if (opt.features & QStyleOptionToolButton::MenuButtonPopup || opt.features & QStyleOptionToolButton::HasMenu) {
+        //在菜单弹出消失后，需要通过此方法取消掉鼠标停留
+        if (!rect().contains(mapFromGlobal(QCursor::pos()))) {
+            opt.state &= ~QStyle::State_MouseOver;
+        }
+    }
     paintButton(p, opt);
     paintIcon(p, opt, d_ptr->mDrawIconRect);
     paintText(p, opt, d_ptr->mDrawTextRect);
@@ -733,12 +723,6 @@ void SARibbonToolButton::paintButton(QPainter& p, const QStyleOptionToolButton& 
     } else {
         style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &opt, &p, this);
     }
-    //    if (defaultAction()) {
-    //        if (defaultAction()->objectName() == "Menu Button Popup") {
-    //            qDebug() << opt;
-    //            qDebug() << "mMouseOnSubControl=" << d_ptr->mMouseOnSubControl;
-    //        }
-    //    }
     //针对MenuButtonPopup的ribbon样式的特殊绘制
     if ((opt.subControls & QStyle::SC_ToolButton) && (opt.features & QStyleOptionToolButton::MenuButtonPopup)) {
         if (opt.state & QStyle::State_MouseOver) {                       //鼠标在按钮上才进行绘制
@@ -746,47 +730,47 @@ void SARibbonToolButton::paintButton(QPainter& p, const QStyleOptionToolButton& 
                 if (LargeButton == d_ptr->mButtonType) {                 //大按钮模式
                     if (d_ptr->mMouseOnSubControl) {                     //此时鼠标在indecater那
                         //鼠标在文字区，把图标显示为正常
-                        QStyleOption tool = opt;
-                        tool.rect         = d_ptr->mDrawIconRect;
-                        tool.state        = (QStyle::State_Raised);  //把图标区域显示为正常
+                        QStyleOption tmp = opt;
+                        tmp.rect         = d_ptr->mDrawIconRect;
+                        tmp.state        = (QStyle::State_Raised);  //把图标区域显示为正常
                         if (autoRaise) {
-                            style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
+                            style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tmp, &p, this);
                         } else {
-                            style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tool, &p, this);
+                            style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tmp, &p, this);
                         }
                     } else {
                         //鼠标在图标区，把文字显示为正常
-                        QStyleOption tool = opt;
-                        tool.state        = (QStyle::State_Raised);  //把图标区域显示为正常
+                        QStyleOption tmp = opt;
+                        tmp.state        = (QStyle::State_Raised);  //把图标区域显示为正常
                         //文字和Indicator都显示正常
-                        tool.rect = d_ptr->mDrawTextRect.united(d_ptr->mDrawIndicatorArrowRect);
+                        tmp.rect = d_ptr->mDrawTextRect.united(d_ptr->mDrawIndicatorArrowRect);
                         if (autoRaise) {
-                            style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
+                            style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tmp, &p, this);
                         } else {
-                            style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tool, &p, this);
+                            style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tmp, &p, this);
                         }
                     }
                 } else {                              //小按钮模式
                     if (d_ptr->mMouseOnSubControl) {  //此时鼠标在indecater那
                         //鼠标在文字区，把图标和文字显示为正常
-                        QStyleOption tool = opt;
-                        tool.rect         = d_ptr->mDrawIconRect.united(d_ptr->mDrawTextRect);
-                        tool.state        = (QStyle::State_Raised);  //把图标区域显示为正常
+                        QStyleOption tmp = opt;
+                        tmp.rect         = d_ptr->mDrawIconRect.united(d_ptr->mDrawTextRect);
+                        tmp.state        = (QStyle::State_Raised);  //把图标区域显示为正常
                         if (autoRaise) {
-                            style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
+                            style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tmp, &p, this);
                         } else {
-                            style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tool, &p, this);
+                            style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tmp, &p, this);
                         }
                     } else {
                         //鼠标在图标区，把文字显示为正常
-                        QStyleOption tool = opt;
-                        tool.state        = (QStyle::State_Raised);  //把图标区域显示为正常
+                        QStyleOption tmp = opt;
+                        tmp.state        = (QStyle::State_Raised);  //把图标区域显示为正常
                         //文字和Indicator都显示正常
-                        tool.rect = d_ptr->mDrawIndicatorArrowRect;
+                        tmp.rect = d_ptr->mDrawIndicatorArrowRect;
                         if (autoRaise) {
-                            style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
+                            style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tmp, &p, this);
                         } else {
-                            style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tool, &p, this);
+                            style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tmp, &p, this);
                         }
                     }
                 }
@@ -794,12 +778,12 @@ void SARibbonToolButton::paintButton(QPainter& p, const QStyleOptionToolButton& 
         }
     }
     //绘制Focus
-    if (opt.state & QStyle::State_HasFocus) {
-        QStyleOptionFocusRect fr;
-        fr.QStyleOption::operator=(opt);
-        fr.rect.adjust(d_ptr->mSpacing, d_ptr->mSpacing, -d_ptr->mSpacing, -d_ptr->mSpacing);
-        style()->drawPrimitive(QStyle::PE_FrameFocusRect, &fr, &p, this);
-    }
+    //    if (opt.state & QStyle::State_HasFocus) {
+    //        QStyleOptionFocusRect fr;
+    //        fr.QStyleOption::operator=(opt);
+    //        fr.rect.adjust(d_ptr->mSpacing, d_ptr->mSpacing, -d_ptr->mSpacing, -d_ptr->mSpacing);
+    //        style()->drawPrimitive(QStyle::PE_FrameFocusRect, &fr, &p, this);
+    //    }
 }
 
 /**

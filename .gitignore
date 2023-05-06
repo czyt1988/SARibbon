@@ -10,6 +10,7 @@ build*
 ~*.docx
 *.drawio.bkp
 tmp
+tmp-file
 
 # vscode 的隐藏文件
 /.vscode

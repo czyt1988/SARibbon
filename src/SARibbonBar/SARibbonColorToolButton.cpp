@@ -6,7 +6,7 @@
 //===================================================
 // SARibbonColorToolButton::PrivateData
 //===================================================
-const int c_ribbonbutton_color_height = 4;  ///< 颜色块的高度
+const int c_ribbonbutton_color_height = 5;  ///< 颜色块的高度
 
 class SARibbonColorToolButton::PrivateData
 {
@@ -43,21 +43,28 @@ QPixmap SARibbonColorToolButton::PrivateData::createIconPixmap(const QStyleOptio
     }
     QSize realIconSize = iconsize - QSize(0, c_ribbonbutton_color_height + 1);
     QPixmap pixmap     = opt.icon.pixmap(q_ptr->window()->windowHandle(), realIconSize, mode, state);
-    QPixmap res(pixmap.size() + QSize(2, c_ribbonbutton_color_height + 1));  //宽度上，颜色块多出2px
+    QPixmap res(pixmap.size() + QSize(4, c_ribbonbutton_color_height + 4));  //宽度上，颜色块多出2px
     res.fill(Qt::transparent);
     QPainter painter(&res);
-    int xpixmap   = (res.width() - pixmap.width() - 1) / 2;
-    int ypixmap   = (res.height() - c_ribbonbutton_color_height - 1 - pixmap.height()) / 2;
+    int xpixmap   = (res.width() - pixmap.width()) / 2;
+    int ypixmap   = (res.height() - c_ribbonbutton_color_height - 2 - pixmap.height()) / 2;  //这里要减去2而不是1，这样奇数偶数都不会影响
     QRect rpixmap = QRect(xpixmap, ypixmap, pixmap.width(), pixmap.height());
     painter.drawPixmap(rpixmap, pixmap);
-    QRect colorRect = rpixmap.adjusted(-1, pixmap.height() + 1, 1, c_ribbonbutton_color_height + 1);
+    QRect colorRect = rpixmap.adjusted(0, pixmap.height() + 1, 0, c_ribbonbutton_color_height + 1);
+    qDebug() << "rpixmap=" << rpixmap << ",colorRect=" << colorRect << ",colorRect.bottomLeft=" << colorRect.bottomLeft()
+             << ",colorRect.topRight=" << colorRect.topRight() << ",res.size()=" << res.size();
     if (mColor.isValid()) {
         painter.fillRect(colorRect, mColor);
     } else {
-        painter.setPen(QPen(Qt::red));
-        painter.drawLine(colorRect.bottomLeft(), colorRect.topRight());
-        painter.setPen(QPen(Qt::black));
-        painter.drawRect(colorRect.adjusted(1, 1, -1, -1));
+        QPen pen(Qt::red, 1, Qt::SolidLine, Qt::RoundCap);
+        painter.setPen(pen);
+        painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+        painter.setRenderHint(QPainter::Antialiasing, true);
+        int ss = colorRect.width() / 3;
+        painter.drawLine(QPoint(colorRect.x() + ss, colorRect.bottom()), QPoint(colorRect.right() - ss, colorRect.top()));
+        pen.setColor(Qt::black);
+        painter.setPen(pen);
+        painter.drawRect(colorRect);
     }
     return res;
 }
@@ -66,9 +73,18 @@ QIcon SARibbonColorToolButton::PrivateData::createColorIcon(const QColor& c, con
 {
     QPixmap res(size);
     res.fill(Qt::transparent);
-    {
-        QPainter painter(&res);
+    QPainter painter(&res);
+    if (c.isValid()) {
         painter.fillRect(QRect(1, 1, res.height() - 2, res.width() - 2), c);
+    } else {
+        QPen pen(Qt::black, 1, Qt::SolidLine, Qt::RoundCap);
+        painter.setPen(pen);
+        painter.drawRect(QRect(1, 1, res.height() - 2, res.width() - 2));
+        pen.setColor(Qt::red);
+        painter.setPen(pen);
+        painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+        painter.setRenderHint(QPainter::Antialiasing, true);
+        painter.drawLine(QPoint(1, size.height()), QPoint(size.width() - 1, 1));
     }
     return QIcon(res);
 }

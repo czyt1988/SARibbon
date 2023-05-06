@@ -776,14 +776,14 @@ void MainWindow::createCategoryColor(SARibbonCategory* page)
     colorButton->setText("have Icon have text");
     pannel->addSmallWidget(colorButton);
 
-    colorButton = fpCreateBtn(Qt::darkBlue);
+    colorButton = fpCreateBtn(QColor());
     colorButton->setButtonType(SARibbonToolButton::LargeButton);
     colorButton->setObjectName("ColorFillToIcon-LargeColorButton");
     colorButton->setColorStyle(SARibbonColorToolButton::ColorFillToIcon);
     colorButton->setText("Large Color Button");
     pannel->addLargeWidget(colorButton);
 
-    colorButton = fpCreateBtn(Qt::darkRed);
+    colorButton = fpCreateBtn(QColor());
     colorButton->setButtonType(SARibbonToolButton::LargeButton);
     colorButton->setIcon(QIcon(":/icon/icon/long-text.svg"));
     colorButton->setObjectName("ColorUnderIcon-LargeColorButton");
