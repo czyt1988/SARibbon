@@ -4,6 +4,7 @@
 #include "SAColorWidgetsGlobal.h"
 class QPaintEvent;
 class QResizeEvent;
+class QPainter;
 class QStylePainter;
 /**
  * @brief 这是一个只显示颜色的toolbutton
@@ -47,6 +48,8 @@ public:
     //设置Margins
     void setMargins(const QMargins& mg);
     QMargins getMargins() const;
+    //绘制无颜色
+    static void paintNoneColor(QPainter* p, const QRect& colorRect);
 public slots:
     //设置颜色,会发射colorChanged信号
     void setColor(const QColor& c);

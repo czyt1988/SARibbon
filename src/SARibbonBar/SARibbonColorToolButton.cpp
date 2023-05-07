@@ -151,7 +151,8 @@ SARibbonColorToolButton::ColorStyle SARibbonColorToolButton::colorStyle() const
 SAColorMenu* SARibbonColorToolButton::setupStandardColorMenu()
 {
     setPopupMode(QToolButton::MenuButtonPopup);
-    SAColorMenu* m       = new SAColorMenu(this);
+    SAColorMenu* m = new SAColorMenu(this);
+    m->enableNoneColorAction(true);
     QAction* customColor = m->getCustomColorAction();
     if (customColor) {
         customColor->setIcon(QIcon(":/image/resource/define-color.svg"));

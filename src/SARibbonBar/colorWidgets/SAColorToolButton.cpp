@@ -313,6 +313,26 @@ QMargins SAColorToolButton::getMargins() const
 }
 
 /**
+ * @brief 绘制无颜色表示
+ * @param p
+ * @param colorRect 绘制的区域
+ */
+void SAColorToolButton::paintNoneColor(QPainter* p, const QRect& colorRect)
+{
+    p->save();
+    QPen pen(Qt::red, 1, Qt::SolidLine, Qt::RoundCap);
+    p->setPen(pen);
+    p->setRenderHint(QPainter::SmoothPixmapTransform, true);
+    p->setRenderHint(QPainter::Antialiasing, true);
+    int ss = colorRect.width() / 3;
+    p->drawLine(QPoint(colorRect.x() + ss, colorRect.bottom()), QPoint(colorRect.right() - ss, colorRect.top()));
+    pen.setColor(Qt::black);
+    p->setPen(pen);
+    p->drawRect(colorRect);
+    p->restore();
+}
+
+/**
  * @brief 设置颜色
  * @note 会发射@sa colorChanged 信号
  * @param c
@@ -519,8 +539,13 @@ void SAColorToolButton::paintText(QStylePainter* p, const QRect& textRect, const
 void SAColorToolButton::paintColor(QStylePainter* p, const QRect& colorRect, const QColor& color, const QStyleOptionToolButton& opt)
 {
     Q_UNUSED(opt);
-    if (!colorRect.isNull()) {
-        //绘制颜色
+    if (colorRect.isNull()) {
+        return;
+    }
+    //绘制颜色
+    if (color.isValid()) {
         p->fillRect(colorRect, color);
+    } else {
+        paintNoneColor(p, colorRect);
     }
 }

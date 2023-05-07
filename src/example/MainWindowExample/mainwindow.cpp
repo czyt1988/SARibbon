@@ -37,6 +37,8 @@
 #include "SARibbonCustomizeDialog.h"
 #include "SARibbonColorToolButton.h"
 #include "SAFramelessHelper.h"
+#include "colorWidgets/SAColorPaletteGridWidget.h"
+#include "colorWidgets/SAColorGridWidget.h"
 #define PRINT_COST_START()                                                                                             \
     QElapsedTimer __TMP_COST;                                                                                          \
     __TMP_COST.start();                                                                                                \
@@ -789,6 +791,11 @@ void MainWindow::createCategoryColor(SARibbonCategory* page)
     colorButton->setObjectName("ColorUnderIcon-LargeColorButton");
     colorButton->setText("Large Color Button");
     pannel->addLargeWidget(colorButton);
+    //
+    pannel->addSeparator();
+    SAColorPaletteGridWidget* pw = new SAColorPaletteGridWidget(SA::getStandardColorList(), pannel);
+    pw->setFactor({ 75, 120 });
+    pannel->addLargeWidget(pw);
 }
 
 /**

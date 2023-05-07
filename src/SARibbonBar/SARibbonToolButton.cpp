@@ -11,7 +11,7 @@
 #include "SARibbonDrawHelper.h"
 #include "SARibbonElementManager.h"
 
-#define SA_WIDTH_HEIGHT_RATIO 1.2
+#define SA_WIDTH_HEIGHT_RATIO 1.4
 /**
  * @def 开启此宏会打印一些常见信息
  */
@@ -416,6 +416,10 @@ QSize SARibbonToolButton::PrivateData::calcSmallButtonSizeHint(const QStyleOptio
             w += mSpacing;
             w += textSize.width();
             h = qMax(h, (textSize.height() + (2 * mSpacing)));
+        } else {
+            //没有文本的时候也要设置一下高度
+            QSize textSize = opt.fontMetrics.size(Qt::TextShowMnemonic, " ");
+            h              = qMax(h, (textSize.height() + (2 * mSpacing)));
         }
     }
     }
