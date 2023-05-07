@@ -88,6 +88,6 @@ namespace SA
  * @brief 获取标准色列表（一共10种颜色）
  * @return
  */
-QList< QColor > getStandardColorList();
+SA_COLOR_WIDGETS_API QList< QColor > getStandardColorList();
 }
 #endif  // SACOLORGRIDWIDGET_H

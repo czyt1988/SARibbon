@@ -95,7 +95,7 @@ public:
     bool mIsLeftScrollBtnShow { false };   ///< 标记左滚动按钮是否需要显示
     bool mIsContextCategory { false };     ///< 标记是否是上下文标签
     bool mIsCanCustomize { true };         ///< 标记是否可以自定义
-    int mTotalWidth { 0 };
+    int mTotalWidth { 0 };                 ///< category的总长
     int mXBase { 0 };
     SARibbonPannel::PannelLayoutMode mDefaultPannelLayoutMode { SARibbonPannel::ThreeRowMode };
     SARibbonBar* mBar { nullptr };
@@ -492,27 +492,15 @@ void SARibbonCategory::PrivateData::doWheelEvent(QWheelEvent* event)
 
     if (totalWidth > contentSize.width()) {
         //这个时候滚动有效
-        QPoint numPixels  = event->pixelDelta();
-        QPoint numDegrees = event->angleDelta() / 8;
-        int scrollpix     = 0;
-        if (!numPixels.isNull())
-            scrollpix = numPixels.x() / 4;
-        else if (!numDegrees.isNull())
-            scrollpix = numDegrees.x() / 15;
-        else {
+        int scrollpix = 40;
+        if (event->delta() < 0) {
+            scrollpix = -scrollpix;
         }
-        if (scrollpix > 0) {  //当滚轮向上滑，SARibbonCategory向左走
-            int tmp = mXBase - scrollpix;
-            if (tmp < (contentSize.width() - totalWidth)) {
-                tmp = contentSize.width() - totalWidth;
-            }
-            mXBase = tmp;
-        } else {                           //当滚轮向下滑，SARibbonCategory向右走
-            int tmp = mXBase - scrollpix;  //此时numDegrees为负数
-            if (tmp > 0) {
-                tmp = 0;
-            }
-            mXBase = tmp;
+        mXBase += scrollpix;
+        if (mXBase > 0) {
+            mXBase = 0;
+        } else if ((mXBase + totalWidth) < contentSize.width()) {
+            mXBase = contentSize.width() - totalWidth;
         }
         updateItemGeometry();
     } else {
