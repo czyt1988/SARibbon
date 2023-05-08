@@ -1,5 +1,7 @@
 ﻿[Click here for English](./readme.md)
 
+[![CMake](https://github.com/czyt1988/SARibbon/actions/workflows/cmake.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake.yml)
+
  这是基于Qt（最低要求Qt5，支持C++11的编译器）开发的一个轻量级的Ribbon控件(Office样式UI)
 
  界面截图：

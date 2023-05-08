@@ -1,5 +1,7 @@
-
+﻿
 [中文文档点击这里](./readme-cn.md)
+
+[![CMake](https://github.com/czyt1988/SARibbon/actions/workflows/cmake.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake.yml)
 
 This is a lightweight Ribbon control (Officestyle UI) based on Qt (minimum Qt5, compiler supporting C++ 11). Screenshot of the interface:
 
