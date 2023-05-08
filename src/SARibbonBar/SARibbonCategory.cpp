@@ -493,8 +493,20 @@ void SARibbonCategory::PrivateData::doWheelEvent(QWheelEvent* event)
     if (totalWidth > contentSize.width()) {
         //这个时候滚动有效
         int scrollpix = 40;
-        if (event->delta() < 0) {
-            scrollpix = -scrollpix;
+        // Qt6 取消了QWheelEvent::delta函数
+        //是要下面方法可兼容qt5/6
+        QPoint numPixels  = event->pixelDelta();
+        QPoint numDegrees = event->angleDelta() / 8;
+        if (!numPixels.isNull()) {
+            if (numDegrees.y() < 0) {
+                scrollpix = -scrollpix;
+            }
+            qDebug() << "numPixels=" << numPixels;
+        } else if (!numDegrees.isNull()) {
+            if (numDegrees.y() < 0) {
+                scrollpix = -scrollpix;
+            }
+            qDebug() << "numDegrees=" << numDegrees;
         }
         mXBase += scrollpix;
         if (mXBase > 0) {
