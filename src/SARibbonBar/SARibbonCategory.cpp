@@ -501,12 +501,10 @@ void SARibbonCategory::PrivateData::doWheelEvent(QWheelEvent* event)
             if (numDegrees.y() < 0) {
                 scrollpix = -scrollpix;
             }
-            qDebug() << "numPixels=" << numPixels;
         } else if (!numDegrees.isNull()) {
             if (numDegrees.y() < 0) {
                 scrollpix = -scrollpix;
             }
-            qDebug() << "numDegrees=" << numDegrees;
         }
         mXBase += scrollpix;
         if (mXBase > 0) {
