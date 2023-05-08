@@ -3,19 +3,19 @@
 #include <QScopedPointer>
 
 /**
- * @def ribbon的数字版本 MAJ.MIN.PAT
+ * @def color-widgets的数字版本 MAJ.MIN.PAT
  */
 #ifndef SA_COLOR_WIDGETS_VERSION_MAJ
 #define SA_COLOR_WIDGETS_VERSION_MAJ 0
 #endif
 /**
- * @def ribbon的数字版本 MAJ.MIN.PAT
+ * @def color-widgets的数字版本 MAJ.MIN.PAT
  */
 #ifndef SA_COLOR_WIDGETS_VERSION_MIN
 #define SA_COLOR_WIDGETS_VERSION_MIN 1
 #endif
 /**
- * @def ribbon的数字版本 MAJ.MIN.PAT
+ * @def color-widgets的数字版本 MAJ.MIN.PAT
  */
 #ifndef SA_COLOR_WIDGETS_VERSION_PAT
 #define SA_COLOR_WIDGETS_VERSION_PAT 0
