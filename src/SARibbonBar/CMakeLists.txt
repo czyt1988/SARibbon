@@ -45,6 +45,7 @@ SET(SARIBBON_HEADER_FILES
     SARibbonPannelLayout.h
     SARibbonPannelItem.h
     SARibbonLineWidgetContainer.h
+    SARibbonColorToolButton.h
 )
 
 # source files
@@ -86,6 +87,7 @@ SET(SARIBBON_SOURCE_FILES
     SARibbonPannelLayout.cpp
     SARibbonPannelItem.cpp
     SARibbonLineWidgetContainer.cpp
+    SARibbonColorToolButton.cpp
 )
 # 颜色组件SAColorWidgets
 # https://github.com/czyt1988/SAColorWidgets

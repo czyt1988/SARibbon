@@ -43,9 +43,9 @@ include(cmake/WinResource.cmake)
 
 # The bin file directory is one level above the current directory
 # cn:bin文件目录在当前目录的上上一级
-if(${CMAKE_BUILD_TYPE} STREQUAL "Debug")
+if(${CMAKE_BUILD_TYPE} AND ${CMAKE_BUILD_TYPE} STREQUAL "Debug")
     set(SARIBBON_BUILD_TYPE debug)
-elseif(${CMAKE_BUILD_TYPE} STREQUAL "Release")
+elseif(${CMAKE_BUILD_TYPE} AND ${CMAKE_BUILD_TYPE} STREQUAL "Release")
     set(SARIBBON_BUILD_TYPE release)
 else()
     set(SARIBBON_BUILD_TYPE unknow)
