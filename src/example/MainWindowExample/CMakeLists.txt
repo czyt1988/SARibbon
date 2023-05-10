@@ -43,7 +43,7 @@ if(WIN32)
         COMMAND ${CMAKE_COMMAND} -E
                 copy_if_different 
                     "$<TARGET_FILE:SARibbonBar>" 
-                    "$<TARGET_FILE_DIR:${EXPAMPLE_NAME}>"
+                    "$<TARGET_FILE_DIR:${SARIBBON_EXPAMPLE_NAME}>"
     )
 	create_win32_resource_version(
 		TARGET ${SARIBBON_EXPAMPLE_NAME}
