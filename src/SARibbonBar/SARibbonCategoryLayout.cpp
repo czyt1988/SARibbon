@@ -51,7 +51,7 @@ int SARibbonCategoryLayout::PrivateData::totalSizeHintWidth() const
         total += (mag.left() + mag.right());
     }
     //先计算总长
-    for (SARibbonCategoryLayoutItem* item : mItemList) {
+    for (SARibbonCategoryLayoutItem* item : qAsConst(mItemList)) {
         if (item->isEmpty()) {
             //如果是hide就直接跳过
             continue;
@@ -267,7 +267,7 @@ void SARibbonCategoryLayout::updateGeometryArr()
         d_ptr->mXBase = 0;
         //
 
-        for (SARibbonCategoryLayoutItem* item : d_ptr->mItemList) {
+        for (SARibbonCategoryLayoutItem* item : qAsConst(d_ptr->mItemList)) {
             if (SARibbonPannel* p = qobject_cast< SARibbonPannel* >(item->widget())) {
                 if (p->isExpanding()) {
                     // pannel可扩展
@@ -286,7 +286,7 @@ void SARibbonCategoryLayout::updateGeometryArr()
     int x = d_ptr->mXBase;
 
     //先按照sizeHint设置所有的尺寸
-    for (SARibbonCategoryLayoutItem* item : d_ptr->mItemList) {
+    for (SARibbonCategoryLayoutItem* item : qAsConst(d_ptr->mItemList)) {
         if (item->isEmpty()) {
             //如果是hide就直接跳过
             if (item->separatorWidget) {
@@ -350,7 +350,7 @@ void SARibbonCategoryLayout::doLayout()
     d_ptr->mRightScrollBtn->setGeometry(category->width() - 12, 0, 12, category->height());
     QList< QWidget* > showWidgets, hideWidgets;
 
-    for (SARibbonCategoryLayoutItem* item : d_ptr->mItemList) {
+    for (SARibbonCategoryLayoutItem* item : qAsConst(d_ptr->mItemList)) {
         if (item->isEmpty()) {
             hideWidgets << item->widget();
             if (item->separatorWidget) {
@@ -382,10 +382,10 @@ void SARibbonCategoryLayout::doLayout()
         d_ptr->mLeftScrollBtn->raise();
     }
     // 不在上面那里进行show和hide因为这会触发SARibbonPannelLayout的重绘，导致循环绘制，非常影响效率
-    for (QWidget* w : showWidgets) {
+    for (QWidget* w : qAsConst(showWidgets)) {
         w->show();
     }
-    for (QWidget* w : hideWidgets) {
+    for (QWidget* w : qAsConst(hideWidgets)) {
         w->hide();
     }
 }
@@ -398,7 +398,7 @@ QList< SARibbonPannel* > SARibbonCategoryLayout::pannels() const
 {
     QList< SARibbonPannel* > res;
 
-    for (SARibbonCategoryLayoutItem* item : d_ptr->mItemList) {
+    for (SARibbonCategoryLayoutItem* item : qAsConst(d_ptr->mItemList)) {
         SARibbonPannel* p = qobject_cast< SARibbonPannel* >(item->widget());
         res.append(p);
     }

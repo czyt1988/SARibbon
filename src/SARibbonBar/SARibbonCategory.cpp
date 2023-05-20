@@ -122,7 +122,7 @@ int SARibbonCategory::PrivateData::totalSizeHintWidth() const
         total += (mag.left() + mag.right());
     }
     //先计算总长
-    for (SAPrivateRibbonCategoryItem item : qAsConst(mItemList)) {
+    for (const SAPrivateRibbonCategoryItem& item : qAsConst(mItemList)) {
         if (item.isEmpty()) {
             //如果是hide就直接跳过
             continue;
@@ -273,7 +273,7 @@ void SARibbonCategory::PrivateData::setRibbonPannelLayoutMode(SARibbonPannel::Pa
     mDefaultPannelLayoutMode    = m;
     QList< SARibbonPannel* > ps = pannelList();
 
-    for (SARibbonPannel* p : ps) {
+    for (SARibbonPannel* p : qAsConst(ps)) {
         p->setPannelLayoutMode(m);
     }
     updateItemGeometry();
@@ -314,7 +314,7 @@ void SARibbonCategory::PrivateData::updateItemGeometry()
         //无法显示，必须这里把mBaseX设置为0
         mXBase = 0;
         //
-        for (const SAPrivateRibbonCategoryItem& item : mItemList) {
+        for (const SAPrivateRibbonCategoryItem& item : qAsConst(mItemList)) {
             if (!item.isEmpty()) {
                 if (item.pannelWidget->isExpanding()) {
                     // pannel可扩展
@@ -405,7 +405,7 @@ void SARibbonCategory::PrivateData::doItemLayout()
     mRightScrollBtn->setGeometry(category->width() - 12, 0, 12, category->height());
     QList< QWidget* > showWidgets, hideWidgets;
 
-    for (const SAPrivateRibbonCategoryItem& item : mItemList) {
+    for (const SAPrivateRibbonCategoryItem& item : qAsConst(mItemList)) {
         if (item.isNull()) {
             continue;
         }
@@ -440,10 +440,10 @@ void SARibbonCategory::PrivateData::doItemLayout()
         mLeftScrollBtn->raise();
     }
     // 不在上面那里进行show和hide因为这会触发SARibbonPannelLayout的重绘，导致循环绘制，非常影响效率
-    for (QWidget* w : showWidgets) {
+    for (QWidget* w : qAsConst(showWidgets)) {
         w->show();
     }
-    for (QWidget* w : hideWidgets) {
+    for (QWidget* w : qAsConst(hideWidgets)) {
         w->hide();
     }
 }
@@ -603,7 +603,7 @@ SARibbonPannel* SARibbonCategory::insertPannel(const QString& title, int index)
  */
 SARibbonPannel* SARibbonCategory::pannelByName(const QString& title) const
 {
-    for (SAPrivateRibbonCategoryItem& i : d_ptr->mItemList) {
+    for (const SAPrivateRibbonCategoryItem& i : qAsConst(d_ptr->mItemList)) {
         if (i.pannelWidget) {
             if (i.pannelWidget->windowTitle() == title) {
                 return (i.pannelWidget);
@@ -620,7 +620,7 @@ SARibbonPannel* SARibbonCategory::pannelByName(const QString& title) const
  */
 SARibbonPannel* SARibbonCategory::pannelByObjectName(const QString& objname) const
 {
-    for (SAPrivateRibbonCategoryItem& i : d_ptr->mItemList) {
+    for (const SAPrivateRibbonCategoryItem& i : qAsConst(d_ptr->mItemList)) {
         if (i.pannelWidget) {
             if (i.pannelWidget->objectName() == objname) {
                 return (i.pannelWidget);
@@ -818,7 +818,7 @@ SARibbonBar* SARibbonCategory::ribbonBar() const
 void SARibbonCategory::updateItemGeometry()
 {
     QList< SARibbonPannel* > ps = pannelList();
-    for (SARibbonPannel* p : ps) {
+    for (SARibbonPannel* p : qAsConst(ps)) {
         p->updateGeometry();
     }
     d_ptr->updateItemGeometry();

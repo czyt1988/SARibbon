@@ -686,7 +686,7 @@ void SARibbonPannelLayout::recalcExpandGeomArray(const QRect& setrect)
     //由于会涉及其他列的变更，因此需要所有都遍历一下
     for (auto i = columnExpandInfo.begin(); i != columnExpandInfo.end(); ++i) {
         int moveXLen = i.value().columnExpandedWidth - i.value().oldColumnWidth;
-        for (SARibbonPannelItem* item : this->m_items) {
+        for (SARibbonPannelItem* item : qAsConst(m_items)) {
             if (item->isEmpty() || (item->columnIndex < i.key())) {
                 //之前的列不用管
                 continue;
