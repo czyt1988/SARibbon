@@ -688,7 +688,7 @@ void SARibbonPannel::resetLargeToolButtonStyle()
 {
     QList< SARibbonToolButton* > btns = ribbonToolButtons();
 
-    for (SARibbonToolButton* b : btns) {
+    for (SARibbonToolButton* b : qAsConst(btns)) {
         if ((nullptr == b) || (SARibbonToolButton::LargeButton != b->buttonType())) {
             continue;
         }

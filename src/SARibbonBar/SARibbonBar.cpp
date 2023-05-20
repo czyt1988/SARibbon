@@ -595,7 +595,8 @@ void SARibbonBar::removeCategory(SARibbonCategory* category)
     }
     d_ptr->mStackedContainerWidget->removeWidget(category);
     //同时验证这个category是否是contexcategory里的
-    for (SARibbonContextCategory* c : d_ptr->mContextCategoryList) {
+
+    for (SARibbonContextCategory* c : qAsConst(d_ptr->mContextCategoryList)) {
         c->takeCategory(category);
     }
     //这时要刷新所有tabdata的index信息
@@ -766,7 +767,7 @@ void SARibbonBar::destroyContextCategory(SARibbonContextCategory* context)
     //!
     QList< SARibbonCategory* > res = context->categoryList();
 
-    for (SARibbonCategory* c : res) {
+    for (SARibbonCategory* c : qAsConst(res)) {
         c->hide();
         c->deleteLater();
     }
@@ -1034,7 +1035,7 @@ void SARibbonBar::updateRibbonElementGeometry()
     //根据样式调整SARibbonCategory的布局形式
     QList< SARibbonCategory* > categorys = categoryPages();
 
-    for (SARibbonCategory* c : categorys) {
+    for (SARibbonCategory* c : qAsConst(categorys)) {
         c->setRibbonPannelLayoutMode(SARibbonBar::isTwoRowStyle(currentRibbonStyle()) ? SARibbonPannel::TwoRowMode
                                                                                       : SARibbonPannel::ThreeRowMode);
     }
@@ -1216,7 +1217,7 @@ void SARibbonBar::updateRibbonGeometry()
 {
     updateRibbonElementGeometry();
     QList< SARibbonCategory* > categorys = categoryPages();
-    for (SARibbonCategory* c : categorys) {
+    for (SARibbonCategory* c : qAsConst(categorys)) {
         c->updateItemGeometry();
     }
 }
