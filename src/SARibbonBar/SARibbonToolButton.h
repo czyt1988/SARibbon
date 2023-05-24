@@ -51,8 +51,9 @@ public:
 
 public:
     //在lite模式下是否允许文字换行
-    static void setLiteStyleEnableWordWrap(bool on);
-    static bool isLiteStyleEnableWordWrap();
+    static void setEnableWordWrap(bool on);
+    static bool isEnableWordWrap();
+    //
 
 protected:
     virtual void paintEvent(QPaintEvent* e) Q_DECL_OVERRIDE;

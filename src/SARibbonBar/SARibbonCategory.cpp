@@ -267,9 +267,10 @@ const SARibbonCategory* SARibbonCategory::PrivateData::ribbonCategory() const
  */
 void SARibbonCategory::PrivateData::setRibbonPannelLayoutMode(SARibbonPannel::PannelLayoutMode m)
 {
-    if (mDefaultPannelLayoutMode == m) {
-        return;
-    }
+    // 不做相同判断，这样可以通过此函数强制重新布局
+    //    if (mDefaultPannelLayoutMode == m) {
+    //        return;
+    //    }
     mDefaultPannelLayoutMode    = m;
     QList< SARibbonPannel* > ps = pannelList();
 

@@ -129,11 +129,11 @@ public:
     QRect mDrawIndicatorArrowRect;  ///< 记录IndicatorArrow的绘制位置
     QSize mSizeHint;                ///< 保存计算好的sizehint
 public:
-    static bool s_liteStyleEnableWordWrap;  ///< 在lite模式下是否允许文字换行，如果允许，则图标相对比较小，默认不允许
+    static bool s_enableWordWrap;  ///< 在lite模式下是否允许文字换行，如果允许，则图标相对比较小，默认不允许
 };
 
 //静态参数初始化
-bool SARibbonToolButton::PrivateData::s_liteStyleEnableWordWrap = false;
+bool SARibbonToolButton::PrivateData::s_enableWordWrap = false;
 
 SARibbonToolButton::PrivateData::PrivateData(SARibbonToolButton* p) : q_ptr(p)
 {
@@ -480,13 +480,10 @@ QSize SARibbonToolButton::PrivateData::calcLargeButtonLiteSizeHint(const QStyleO
 int SARibbonToolButton::PrivateData::calcTextDrawRectHeight(const QStyleOptionToolButton& opt) const
 {
     if (SARibbonToolButton::LargeButton == mButtonType) {
-        if (SARibbonToolButton::Lite == mLargeButtonType) {
-            if (SARibbonToolButton::PrivateData::s_liteStyleEnableWordWrap) {
-                return opt.fontMetrics.lineSpacing() * 2.05;
-            }
-            return opt.fontMetrics.lineSpacing() * 1.3;
+        if (SARibbonToolButton::PrivateData::s_enableWordWrap) {
+            return opt.fontMetrics.lineSpacing() * 2.05;
         }
-        return opt.fontMetrics.lineSpacing() * 2.05;
+        return opt.fontMetrics.lineSpacing() * 1.3;
     }
     //小按钮
     return opt.fontMetrics.lineSpacing() * 1.4;
@@ -552,28 +549,14 @@ QPixmap SARibbonToolButton::PrivateData::createIconPixmap(const QStyleOptionTool
     } else {
         mode = QIcon::Normal;
     }
-    // return (opt.icon.pixmap(this->window()->windowHandle(), opt.rect.size().boundedTo(realConSize), mode, state));
-    if (mLargeButtonType == SARibbonToolButton::Lite && !s_liteStyleEnableWordWrap) {
-        // lite模式，图标不用过于饱满,减去2px
-        return (opt.icon.pixmap(iconsize - QSize(2, 2), mode, state));
-    }
-    return (opt.icon.pixmap(iconsize, mode, state));
+    return (opt.icon.pixmap(iconsize - QSize(2, 2), mode, state));
 }
 
 int SARibbonToolButton::PrivateData::getTextAlignment() const
 {
-    int alignment = Qt::TextShowMnemonic;
-    if (LargeButton == mButtonType) {
-        if (Lite == mLargeButtonType) {
-            alignment |= (Qt::AlignLeft | Qt::AlignVCenter);
-            if (isLiteStyleEnableWordWrap()) {
-                alignment |= Qt::TextWordWrap;
-            }
-        } else {
-            alignment |= Qt::TextWordWrap | Qt::AlignHCenter | Qt::AlignTop;  //文字是顶部对齐;
-        }
-    } else {
-        alignment |= Qt::AlignLeft | Qt::AlignVCenter;
+    int alignment = Qt::TextShowMnemonic | Qt::AlignLeft | Qt::AlignVCenter;
+    if (isEnableWordWrap()) {
+        alignment |= Qt::TextWordWrap | Qt::AlignTop;  //换行的情况下，顶部对齐
     }
     return alignment;
 }
@@ -821,9 +804,10 @@ void SARibbonToolButton::paintText(QPainter& p, const QStyleOptionToolButton& op
     if (!style()->styleHint(QStyle::SH_UnderlineShortcut, &opt, this)) {
         alignment |= Qt::TextHideMnemonic;
     }
-    if (Lite == d_ptr->mLargeButtonType && !isLiteStyleEnableWordWrap()) {
-        // lite 模式，文字不换行
-        //显示的内容需要进行省略处理
+
+    if (isEnableWordWrap()) {
+        style()->drawItemText(&p, textDrawRect, alignment, opt.palette, opt.state & QStyle::State_Enabled, opt.text, QPalette::ButtonText);
+    } else {
         style()->drawItemText(&p,
                               textDrawRect,
                               alignment,
@@ -831,8 +815,6 @@ void SARibbonToolButton::paintText(QPainter& p, const QStyleOptionToolButton& op
                               opt.state & QStyle::State_Enabled,
                               opt.fontMetrics.elidedText(opt.text, Qt::ElideRight, textDrawRect.width(), alignment),
                               QPalette::ButtonText);
-    } else {
-        style()->drawItemText(&p, textDrawRect, alignment, opt.palette, opt.state & QStyle::State_Enabled, opt.text, QPalette::ButtonText);
     }
     SARIBBONTOOLBUTTON_DEBUG_DRAW_RECT(p, textDrawRect);
 }
@@ -977,18 +959,18 @@ void SARibbonToolButton::updateRect()
  * RibbonSubElementStyleOpt.recalc();
  * @endcode
  */
-void SARibbonToolButton::setLiteStyleEnableWordWrap(bool on)
+void SARibbonToolButton::setEnableWordWrap(bool on)
 {
-    SARibbonToolButton::PrivateData::s_liteStyleEnableWordWrap = on;
+    SARibbonToolButton::PrivateData::s_enableWordWrap = on;
 }
 
 /**
  * @brief 在lite模式下是否允许文字换行
  * @return
  */
-bool SARibbonToolButton::isLiteStyleEnableWordWrap()
+bool SARibbonToolButton::isEnableWordWrap()
 {
-    return SARibbonToolButton::PrivateData::s_liteStyleEnableWordWrap;
+    return SARibbonToolButton::PrivateData::s_enableWordWrap;
 }
 
 bool SARibbonToolButton::event(QEvent* e)

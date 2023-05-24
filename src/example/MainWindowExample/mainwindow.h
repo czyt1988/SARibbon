@@ -50,7 +50,7 @@ private slots:
     void onFontComWidgetCurrentFontChanged(const QFont& f);
     void onActionFontLargerTriggered();
     void onActionFontSmallerTriggered();
-    void onActionwordWrapIn2rowTriggered(bool b);
+    void onActionwordWrapTriggered(bool b);
     void onButtonGroupActionTriggered(QAction* act);
     void onColorButtonColorClicked(const QColor& c, bool on);
 
