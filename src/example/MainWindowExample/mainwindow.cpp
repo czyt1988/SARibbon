@@ -281,9 +281,9 @@ void MainWindow::onActionFontSmallerTriggered()
     qDebug() << "set font:" << f;
 }
 
-void MainWindow::onActionwordWrapIn2rowTriggered(bool b)
+void MainWindow::onActionwordWrapTriggered(bool b)
 {
-    SARibbonToolButton::setLiteStyleEnableWordWrap(b);  //设置是否允许2行模式下文字换行，换行的话图标会较小
+    SARibbonToolButton::setEnableWordWrap(b);  //设置是否允许2行模式下文字换行，换行的话图标会较小
     //换行设定后需要重新计算样式尺寸
     RibbonSubElementStyleOpt.recalc();
     //通过setRibbonStyle来让ribbonbar重绘
@@ -351,10 +351,10 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     });
     actShowHideButton->trigger();
 
-    QAction* actwordWrapIn2row = createAction(tr("word wrap in 2row"), ":/icon/icon/wordwrap.svg");
-    actwordWrapIn2row->setCheckable(true);
-    pannelStyle->addSmallAction(actwordWrapIn2row);
-    connect(actwordWrapIn2row, &QAction::triggered, this, &MainWindow::onActionwordWrapIn2rowTriggered);
+    QAction* actwordWrap = createAction(tr("word wrap"), ":/icon/icon/wordwrap.svg");
+    actwordWrap->setCheckable(true);
+    pannelStyle->addSmallAction(actwordWrap);
+    connect(actwordWrap, &QAction::triggered, this, &MainWindow::onActionwordWrapTriggered);
 
     QButtonGroup* g = new QButtonGroup(page);
 

@@ -441,9 +441,10 @@ QList< SARibbonToolButton* > SARibbonPannel::ribbonToolButtons() const
  */
 void SARibbonPannel::setPannelLayoutMode(SARibbonPannel::PannelLayoutMode mode)
 {
-    if (d_ptr->m_pannelLayoutMode == mode) {
-        return;
-    }
+    //不做相同判断，这样可以进行强制布局
+    //    if (d_ptr->m_pannelLayoutMode == mode) {
+    //        return;
+    //    }
     d_ptr->m_pannelLayoutMode = mode;
     resetLayout(mode);
     resetLargeToolButtonStyle();
@@ -701,6 +702,8 @@ void SARibbonPannel::resetLargeToolButtonStyle()
                 b->setLargeButtonType(SARibbonToolButton::Lite);
             }
         }
+        b->updateRect();
+        b->repaint();
     }
 }
 
