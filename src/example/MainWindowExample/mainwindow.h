@@ -50,7 +50,7 @@ private slots:
     void onFontComWidgetCurrentFontChanged(const QFont& f);
     void onActionFontLargerTriggered();
     void onActionFontSmallerTriggered();
-    void onActionwordWrapTriggered(bool b);
+    void onActionWordWrapToggled(bool b);
     void onButtonGroupActionTriggered(QAction* act);
     void onColorButtonColorClicked(const QColor& c, bool on);
 
@@ -62,6 +62,8 @@ private:
     SARibbonActionsManager* m_actMgr;
     int m_actionTagText;
     int m_actionTagWithIcon;
+    //
+    QAction* mActionWordWrap { nullptr };
 };
 
 #endif  // MAINWINDOW_H
