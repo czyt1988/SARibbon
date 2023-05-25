@@ -1075,6 +1075,8 @@ SARibbonQuickAccessBar* SARibbonBar::quickAccessBar()
  * @brief 设置ribbonbar的风格，此函数会重新设置所有元素，包括button的布局方式，
  * 尤其是从三行变到两行的过程，重设的内容较多
  * @note 此函数会自动触发ResizeEvent，不需要手动调用
+ * @note 默认情况下2行模式不换行,如果想在两行模式换行，在调用SARibbonBar::setRibbonStyle后，再SARibbonToolButton::setEnableWordWrap(true)
+ * ,同时再调用updateRibbonElementGeometry()刷新布局
  * @param v 样式，见@ref SARibbonBar::RibbonStyle
  */
 void SARibbonBar::setRibbonStyle(SARibbonBar::RibbonStyle v)
@@ -1082,6 +1084,10 @@ void SARibbonBar::setRibbonStyle(SARibbonBar::RibbonStyle v)
     d_ptr->mRibbonStyle   = v;
     d_ptr->mLastShowStyle = v;
     d_ptr->mQuickAccessBar->setEnableShowIcon(isOfficeStyle(v));
+    //默认情况下2行模式不换行
+    //如果想在两行模式换行，在调用SARibbonBar::setRibbonStyle后，再SARibbonToolButton::setEnableWordWrap(true)
+    SARibbonToolButton::setEnableWordWrap(!isTwoRowStyle(v));
+
     updateRibbonElementGeometry();
     QSize oldSize = size();
     QSize newSize(oldSize.width(), mainBarHeight());
