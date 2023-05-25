@@ -554,9 +554,11 @@ QPixmap SARibbonToolButton::PrivateData::createIconPixmap(const QStyleOptionTool
 
 int SARibbonToolButton::PrivateData::getTextAlignment() const
 {
-    int alignment = Qt::TextShowMnemonic | Qt::AlignLeft | Qt::AlignVCenter;
+    int alignment = Qt::TextShowMnemonic;
     if (isEnableWordWrap()) {
-        alignment |= Qt::TextWordWrap | Qt::AlignTop;  //换行的情况下，顶部对齐
+        alignment |= Qt::TextWordWrap | Qt::AlignTop | Qt::AlignHCenter;  //换行的情况下，顶部对齐
+    } else {
+        alignment |= Qt::AlignVCenter | Qt::AlignLeft;
     }
     return alignment;
 }

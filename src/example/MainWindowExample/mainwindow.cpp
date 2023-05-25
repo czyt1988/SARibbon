@@ -122,6 +122,7 @@ MainWindow::MainWindow(QWidget* par) : SARibbonMainWindow(par), m_customizeWidge
     setMinimumWidth(500);
     //
     showMaximized();
+    onStyleClicked(SARibbonBar::OfficeStyle);
     //
     setWindowIcon(QIcon(":/icon/icon/SA.svg"));
 }
@@ -140,7 +141,42 @@ void MainWindow::onShowContextCategory(bool on)
 
 void MainWindow::onStyleClicked(int id)
 {
-    ribbonBar()->setRibbonStyle(static_cast< SARibbonBar::RibbonStyle >(id));
+
+    SARibbonBar::RibbonStyle ribbonStyle = static_cast< SARibbonBar::RibbonStyle >(id);
+    ribbonBar()->setRibbonStyle(ribbonStyle);
+    switch (ribbonStyle) {
+    case SARibbonBar::OfficeStyle:
+        mActionWordWrap->setChecked(true);
+        m_edit->append(
+                tr("\nchange ribbon style to office style,The standard office style text display is line wrapped, "
+                   "and you can also control whether it wrap through SARibbonToolButton::setEnableWordWrap"));  // cn:标准的office样式的文字显示是换行的，你也可以通过SARibbonToolButton::setEnableWordWrap来控制它是否换行
+        m_edit->append(tr("SARibbonToolButton::setEnableWordWrap(true);"));
+        m_edit->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::OfficeStyle);"));
+        break;
+    case SARibbonBar::OfficeStyleTwoRow:
+        mActionWordWrap->setChecked(false);
+        m_edit->append(tr("\nchange ribbon style to office style 2 row,All text in 2-line mode does not wrap, and you "
+                          "can also control whether it wraps through SARibbonToolButton: setEnableWordWrap"));  // cn:所有2行模式的文字都是不换行的，你也可以通过SARibbonToolButton::setEnableWordWrap来控制它是否换行
+        m_edit->append(tr("SARibbonToolButton::setEnableWordWrap(false);"));
+        m_edit->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::OfficeStyleTwoRow);"));
+        break;
+    case SARibbonBar::WpsLiteStyle:
+        mActionWordWrap->setChecked(true);
+        m_edit->append(tr("\nchange ribbon style to wps style,The standard wps style text display is line wrapped, "
+                          "and you can also control whether it wrap through SARibbonToolButton::setEnableWordWrap"));  // cn:标准的wps样式的文字显示是换行的，你也可以通过SARibbonToolButton::setEnableWordWrap来控制它是否换行
+        m_edit->append(tr("SARibbonToolButton::setEnableWordWrap(false);"));
+        m_edit->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::OfficeStyleTwoRow);"));
+        break;
+    case SARibbonBar::WpsLiteStyleTwoRow:
+        mActionWordWrap->setChecked(false);
+        m_edit->append(tr("\nchange ribbon style to wps style 2 row,All text in 2-line mode does not wrap, and you "
+                          "can also control whether it wraps through SARibbonToolButton: setEnableWordWrap"));  // cn:所有2行模式的文字都是不换行的，你也可以通过SARibbonToolButton::setEnableWordWrap来控制它是否换行
+        m_edit->append(tr("SARibbonToolButton::setEnableWordWrap(false);"));
+        m_edit->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::OfficeStyleTwoRow);"));
+        break;
+    default:
+        break;
+    }
 }
 
 void MainWindow::onActionCustomizeTriggered(bool b)
@@ -281,12 +317,9 @@ void MainWindow::onActionFontSmallerTriggered()
     qDebug() << "set font:" << f;
 }
 
-void MainWindow::onActionwordWrapTriggered(bool b)
+void MainWindow::onActionWordWrapToggled(bool b)
 {
     SARibbonToolButton::setEnableWordWrap(b);  //设置是否允许2行模式下文字换行，换行的话图标会较小
-    //换行设定后需要重新计算样式尺寸
-    RibbonSubElementStyleOpt.recalc();
-    //通过setRibbonStyle来让ribbonbar重绘
     //由于关键尺寸变化了，需要重新布局
     ribbonBar()->updateRibbonGeometry();
 }
@@ -315,6 +348,7 @@ void MainWindow::onButtonGroupActionTriggered(QAction* act)
  */
 void MainWindow::onColorButtonColorClicked(const QColor& c, bool on)
 {
+    Q_UNUSED(on);
     m_edit->append(QString("color click %1").arg(c.name()));
 }
 
@@ -351,10 +385,10 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     });
     actShowHideButton->trigger();
 
-    QAction* actwordWrap = createAction(tr("word wrap"), ":/icon/icon/wordwrap.svg");
-    actwordWrap->setCheckable(true);
-    pannelStyle->addSmallAction(actwordWrap);
-    connect(actwordWrap, &QAction::triggered, this, &MainWindow::onActionwordWrapTriggered);
+    mActionWordWrap = createAction(tr("word wrap"), ":/icon/icon/wordwrap.svg");
+    mActionWordWrap->setCheckable(true);
+    pannelStyle->addSmallAction(mActionWordWrap);
+    connect(mActionWordWrap, &QAction::toggled, this, &MainWindow::onActionWordWrapToggled);
 
     QButtonGroup* g = new QButtonGroup(page);
 
@@ -922,6 +956,7 @@ void MainWindow::createContextCategoryPage1(SARibbonCategory* page)
     ctrlContainer1->setContainerWidget(spinbox);
     ctrlContainer1->setText(tr("spinbox:"));
     ctrlContainer1->setEnableShowIcon(false);
+    ctrlContainer1->setMaximumHeight(fontMetrics().lineSpacing() * 1.5);
     pannel4->addMediumWidget(ctrlContainer1);
 
     QLineEdit* linedit                    = new QLineEdit(this);
@@ -929,6 +964,7 @@ void MainWindow::createContextCategoryPage1(SARibbonCategory* page)
     ctrlContainer2->setContainerWidget(linedit);
     ctrlContainer2->setText(tr("linedit:"));
     ctrlContainer2->setEnableShowIcon(false);
+    ctrlContainer2->setMaximumHeight(fontMetrics().lineSpacing() * 1.5);
     pannel4->addMediumWidget(ctrlContainer2);
 }
 
