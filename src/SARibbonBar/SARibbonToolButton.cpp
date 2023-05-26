@@ -558,7 +558,7 @@ int SARibbonToolButton::PrivateData::getTextAlignment() const
     if (isEnableWordWrap()) {
         alignment |= Qt::TextWordWrap | Qt::AlignTop | Qt::AlignHCenter;  //换行的情况下，顶部对齐
     } else {
-        alignment |= Qt::AlignVCenter | Qt::AlignLeft;
+        alignment |= Qt::AlignVCenter | Qt::AlignHCenter;
     }
     return alignment;
 }

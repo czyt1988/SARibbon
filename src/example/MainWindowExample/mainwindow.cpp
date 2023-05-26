@@ -315,6 +315,18 @@ void MainWindow::onActionWordWrapTriggered(bool b)
     SARibbonToolButton::setEnableWordWrap(b);  //设置是否允许2行模式下文字换行，换行的话图标会较小
     //由于关键尺寸变化了，需要重新布局
     ribbonBar()->updateRibbonGeometry();
+
+    m_edit->append(tr("By using the SARibbonToolButton::setenableWordWrap static function, "
+                      "you can set whether text breaks or not.\n"
+                      "By default, the two line mode will not wrap, the three line mode will wrap.\n"
+                      "You can force the two line mode to wrap, or the three line mode to not wrap"));
+    // cn:通过SARibbonToolButton::setEnableWordWrap这个静态函数可以设置文字是否换行。\n
+    // 默认情况下，两行模式都不会换行，三行模式下都会换行。\n
+    // 可以强制设置两行模式也换行，或者三行模式不换行
+    m_edit->append(tr("If the ribbon ui has been built, after calling the static function "
+                      "SARibbonToolButton::setenableWordWrap, "
+                      "the function SARibbonBar::updateRibbonGeometry() needs to be called for relayout"));
+    // cn:如果ribbon界面已经构建完成，调用SARibbonToolButton::setEnableWordWrap这个静态函数之后需要调用SARibbonBar::updateRibbonGeometry()重新布局
 }
 
 /**
