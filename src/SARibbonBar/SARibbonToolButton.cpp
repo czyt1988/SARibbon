@@ -956,9 +956,9 @@ void SARibbonToolButton::updateRect()
 /**
  * @brief 设置在lite模式下是否允许文字换行，如果允许，则图标相对比较小，默认不允许
  * @param on
- * @note 此函数的调用最好在ribbonbar布局之前设置，且调用之后需要调用@sa SARibbonStyleOption::recalc 刷新
+ * @note 此函数的调用最好在ribbonbar布局之前设置，且调用之后需要调用@sa ribbonBar()->updateRibbonGeometry(); 刷新
  * @code
- * RibbonSubElementStyleOpt.recalc();
+ * ribbonBar()->updateRibbonGeometry();
  * @endcode
  */
 void SARibbonToolButton::setEnableWordWrap(bool on)
