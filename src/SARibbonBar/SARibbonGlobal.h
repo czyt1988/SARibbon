@@ -9,6 +9,9 @@
 //! 调整了大按钮模式下的显示方案，去除了原来SARibbonToolButton的Lite和Normal模式，以WordWrap来表征
 //! 支持文字自定义换行
 //! 调整了RibbonPannel的标题栏的高度计算方案
+//!
+//! 0.5.1
+//! 不使用QString::simplified,而是简单的仅仅替换\n的simplified，这样中文换行不会多出空格
 
 /**
  * @def ribbon的数字版本 MAJ.MIN.PAT
@@ -26,7 +29,7 @@
  * @def ribbon的数字版本 MAJ.MIN.PAT
  */
 #ifndef SA_RIBBON_BAR_VERSION_PAT
-#define SA_RIBBON_BAR_VERSION_PAT 0
+#define SA_RIBBON_BAR_VERSION_PAT 1
 #endif
 
 /**

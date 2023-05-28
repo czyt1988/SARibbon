@@ -137,6 +137,8 @@ public:
     int getTextAlignment() const;
     //确认文字是否确切要换行显示
     bool isTextNeedWrap() const;
+    //仅仅对\n进行剔除，和QString::simplified不一样
+    static QString simplified(const QString& str);
 
 public:
     bool mMouseOnSubControl { false };  ///< 这个用于标记MenuButtonPopup模式下，鼠标在文本区域
@@ -441,7 +443,7 @@ QSize SARibbonToolButton::PrivateData::calcSmallButtonSizeHint(const QStyleOptio
         h = opt.iconSize.height() + 2 * mSpacing;
     } break;
     case Qt::ToolButtonTextOnly: {
-        QSize textSize = opt.fontMetrics.size(Qt::TextShowMnemonic, opt.text.simplified());
+        QSize textSize = opt.fontMetrics.size(Qt::TextShowMnemonic, simplified(opt.text));
         textSize.setWidth(textSize.width() + SA_FONTMETRICS_WIDTH(opt.fontMetrics, (QLatin1Char(' '))) * 2);
         textSize.setHeight(calcTextDrawRectHeight(opt));
         w = textSize.width() + 2 * mSpacing;
@@ -453,7 +455,7 @@ QSize SARibbonToolButton::PrivateData::calcSmallButtonSizeHint(const QStyleOptio
         h = opt.iconSize.height() + 2 * mSpacing;
         //再加入文本的长度
         if (!opt.text.isEmpty()) {
-            QSize textSize = opt.fontMetrics.size(Qt::TextShowMnemonic, opt.text.simplified());
+            QSize textSize = opt.fontMetrics.size(Qt::TextShowMnemonic, simplified(opt.text));
             textSize.setWidth(textSize.width() + SA_FONTMETRICS_WIDTH(opt.fontMetrics, (QLatin1Char(' '))) * 2);
             textSize.setHeight(calcTextDrawRectHeight(opt));
             w += mSpacing;
@@ -589,7 +591,7 @@ int SARibbonToolButton::PrivateData::estimateLargeButtonTextWidth(int buttonHeig
 
     mIsTextNeedWrap = false;  // 文字不需要换行显示，标记起来
     //文字不换行情况下，做simplified处理
-    textSize = fm.size(Qt::TextShowMnemonic, text.simplified());
+    textSize = fm.size(Qt::TextShowMnemonic, simplified(text));
     textSize.setWidth(textSize.width() + space);
     if (textSize.width() < hintMaxWidth) {
         //范围合理，直接返回
@@ -641,6 +643,18 @@ int SARibbonToolButton::PrivateData::getTextAlignment() const
 bool SARibbonToolButton::PrivateData::isTextNeedWrap() const
 {
     return mIsTextNeedWrap;
+}
+
+/**
+ * @brief 仅仅对\n进行剔除
+ * @param str
+ * @return
+ */
+QString SARibbonToolButton::PrivateData::simplified(const QString& str)
+{
+    QString res = str;
+    res.remove('\n');
+    return res;
 }
 //===================================================
 // SARibbonToolButton
@@ -894,7 +908,7 @@ void SARibbonToolButton::paintText(QPainter& p, const QStyleOptionToolButton& op
                               alignment,
                               opt.palette,
                               opt.state & QStyle::State_Enabled,
-                              opt.fontMetrics.elidedText(opt.text.simplified(), Qt::ElideRight, textDrawRect.width(), alignment),
+                              opt.fontMetrics.elidedText(PrivateData::simplified(opt.text), Qt::ElideRight, textDrawRect.width(), alignment),
                               QPalette::ButtonText);
     }
     SARIBBONTOOLBUTTON_DEBUG_DRAW_RECT(p, textDrawRect);
