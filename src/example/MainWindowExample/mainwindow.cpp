@@ -312,21 +312,14 @@ void MainWindow::onActionFontSmallerTriggered()
 
 void MainWindow::onActionWordWrapTriggered(bool b)
 {
-    SARibbonToolButton::setEnableWordWrap(b);  //设置是否允许2行模式下文字换行，换行的话图标会较小
-    //由于关键尺寸变化了，需要重新布局
-    ribbonBar()->updateRibbonGeometry();
-
-    m_edit->append(tr("By using the SARibbonToolButton::setenableWordWrap static function, "
+    ribbonBar()->setEnableWordWrap(b);
+    m_edit->append(tr("By using the SARibbonBar::setEnableWordWrap function, "
                       "you can set whether text breaks or not.\n"
                       "By default, the two line mode will not wrap, the three line mode will wrap.\n"
                       "You can force the two line mode to wrap, or the three line mode to not wrap"));
-    // cn:通过SARibbonToolButton::setEnableWordWrap这个静态函数可以设置文字是否换行。\n
+    // cn:通过SARibbonBar::setEnableWordWrap函数可以设置文字是否换行。\n
     // 默认情况下，两行模式都不会换行，三行模式下都会换行。\n
     // 可以强制设置两行模式也换行，或者三行模式不换行
-    m_edit->append(tr("If the ribbon ui has been built, after calling the static function "
-                      "SARibbonToolButton::setenableWordWrap, "
-                      "the function SARibbonBar::updateRibbonGeometry() needs to be called for relayout"));
-    // cn:如果ribbon界面已经构建完成，调用SARibbonToolButton::setEnableWordWrap这个静态函数之后需要调用SARibbonBar::updateRibbonGeometry()重新布局
 }
 
 /**
@@ -391,7 +384,7 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     actShowHideButton->trigger();
 
     mActionWordWrap = createAction(tr("word wrap"), ":/icon/icon/wordwrap.svg");
-    mActionWordWrap->setCheckable(true);
+    mActionWordWrap->setCheckable(ribbonBar()->isEnableWordWrap());
     pannelStyle->addSmallAction(mActionWordWrap);
     connect(mActionWordWrap, &QAction::triggered, this, &MainWindow::onActionWordWrapTriggered);
 
@@ -459,10 +452,11 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
 
     pannelToolButtonStyle->addSeparator();
 
-    act = createAction(tr("Delayed Popup"), ":/icon/icon/folder-cog.svg");
+    act = createAction(tr("Delayed\nPopup"), ":/icon/icon/folder-cog.svg");
     act->setMenu(menu);
     btn = pannelToolButtonStyle->addLargeAction(act);
     btn->setPopupMode(QToolButton::DelayedPopup);
+
     connect(act, &QAction::triggered, this, &MainWindow::onDelayedPopupCheckabletriggered);
 
     act = createAction(tr("Menu Button Popup"), ":/icon/icon/folder-star.svg");
@@ -524,6 +518,22 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
         }
     });
 
+    act = createAction(tr("Word\nWrap"), ":/icon/icon/setText.svg");
+    pannel2->addLargeAction(act);
+    connect(act, &QAction::triggered, this, [ this ](bool on) {
+        Q_UNUSED(on);
+        this->m_edit->append(tr("Text can be manually wrapped(use \\n), and will appear as 1 line in the case of "
+                                "SARibbonBar::setEnableWordWrap (false)"));  // cn:文本中手动换行
+    });
+
+    act = createAction(tr("Word\nWrap"), ":/icon/icon/setText.svg");
+    act->setMenu(menu);
+    pannel2->addLargeAction(act);
+    connect(act, &QAction::triggered, this, [ this ](bool on) {
+        Q_UNUSED(on);
+        this->m_edit->append(tr("Text can be manually wrapped(use \\n), and will appear as 1 line in the case of "
+                                "SARibbonBar::setEnableWordWrap (false)"));  // cn:文本中手动换行
+    });
     //! 3
     //! pannel 3 start -> widget test
     //!
@@ -1134,5 +1144,9 @@ void MainWindow::onInstantPopupCheckabletriggered(bool b)
 
 void MainWindow::onDelayedPopupCheckabletriggered(bool b)
 {
-    m_edit->append(QString("DelayedPopupCheckabletriggered : %1").arg(b));
+    Q_UNUSED(b);
+    m_edit->append(tr("The SARibbonToolButton::setPopupMode(QToolButton::DelayedPopup) method "
+                      "can be used to set the menu pop-up method to delayed pop-up. "
+                      "This also demonstrates manually setting text wrapping"));
+    // cn:使用SARibbonToolButton::setPopupMode(QToolButton::DelayedPopup)方法可以设置菜单弹出方式为延迟弹出，这里也演示了手动设置文本的换行
 }

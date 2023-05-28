@@ -270,6 +270,9 @@ public:
     //设置标题的对齐方式
     void setWindowTitleAligment(Qt::Alignment al);
     Qt::Alignment windowTitleAligment() const;
+    //设置按钮允许换行
+    void setEnableWordWrap(bool on);
+    bool isEnableWordWrap() const;
 signals:
 
     /**
