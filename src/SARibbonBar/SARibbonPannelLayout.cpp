@@ -334,10 +334,6 @@ SARibbonPannelItem* SARibbonPannelLayout::createItem(QAction* action, SARibbonPa
         SARibbonToolButton* button = RibbonSubElementDelegate->createRibbonToolButton(pannel);
         button->setFocusPolicy(Qt::NoFocus);
         button->setButtonType(buttonType);
-        if (SARibbonToolButton::LargeButton == buttonType) {
-            //根据pannel的模式设置button样式
-            button->setLargeButtonType((pannel->isTwoRow()) ? SARibbonToolButton::Lite : SARibbonToolButton::Normal);
-        }
         button->setDefaultAction(action);
         //根据QAction的属性设置按钮的大小
 

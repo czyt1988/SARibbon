@@ -181,7 +181,7 @@ protected:
     void resetLayout(PannelLayoutMode newmode);
     void resetLargeToolButtonStyle();
     static QSize maxHightIconSize(const QSize& size, int h);
-    void paintEvent(QPaintEvent* event) Q_DECL_OVERRIDE;
+    virtual void paintEvent(QPaintEvent* event) Q_DECL_OVERRIDE;
     virtual void resizeEvent(QResizeEvent* event) Q_DECL_OVERRIDE;
     virtual void actionEvent(QActionEvent* e) Q_DECL_OVERRIDE;
 };
