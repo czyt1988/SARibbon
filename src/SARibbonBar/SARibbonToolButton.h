@@ -32,6 +32,11 @@ public:
     //标记按钮的样式，按钮的样式有不同的渲染方式
     RibbonButtonType buttonType() const;
     void setButtonType(const RibbonButtonType& buttonType);
+    //是否是小按钮
+    bool isSmallRibbonButton() const;
+    //是否是大按钮
+    bool isLargeRibbonButton() const;
+    //最小尺寸提示
     virtual QSize minimumSizeHint() const Q_DECL_OVERRIDE;
 
     //获取间距

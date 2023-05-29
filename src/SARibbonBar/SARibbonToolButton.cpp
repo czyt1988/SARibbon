@@ -900,17 +900,19 @@ void SARibbonToolButton::paintText(QPainter& p, const QStyleOptionToolButton& op
     if (!style()->styleHint(QStyle::SH_UnderlineShortcut, &opt, this)) {
         alignment |= Qt::TextHideMnemonic;
     }
-    if (isEnableWordWrap()) {
-        style()->drawItemText(&p, textDrawRect, alignment, opt.palette, opt.state & QStyle::State_Enabled, opt.text, QPalette::ButtonText);
+    QString text;
+    if (isSmallRibbonButton()) {
+        text = opt.fontMetrics.elidedText(PrivateData::simplified(opt.text), Qt::ElideRight, textDrawRect.width(), alignment);
     } else {
-        style()->drawItemText(&p,
-                              textDrawRect,
-                              alignment,
-                              opt.palette,
-                              opt.state & QStyle::State_Enabled,
-                              opt.fontMetrics.elidedText(PrivateData::simplified(opt.text), Qt::ElideRight, textDrawRect.width(), alignment),
-                              QPalette::ButtonText);
+        if (!isEnableWordWrap()) {
+            text = opt.fontMetrics.elidedText(PrivateData::simplified(opt.text), Qt::ElideRight, textDrawRect.width(), alignment);
+        } else {
+            text = opt.text;
+        }
     }
+
+    style()->drawItemText(&p, textDrawRect, alignment, opt.palette, opt.state & QStyle::State_Enabled, text, QPalette::ButtonText);
+
     SARIBBONTOOLBUTTON_DEBUG_DRAW_RECT(p, textDrawRect);
 }
 
@@ -1010,6 +1012,24 @@ void SARibbonToolButton::setButtonType(const RibbonButtonType& buttonType)
     }
 
     updateRect();
+}
+
+/**
+ * @brief 是否是小按钮
+ * @return
+ */
+bool SARibbonToolButton::isSmallRibbonButton() const
+{
+    return (d_ptr->mButtonType == SmallButton);
+}
+
+/**
+ * @brief 是否是大按钮
+ * @return
+ */
+bool SARibbonToolButton::isLargeRibbonButton() const
+{
+    return (d_ptr->mButtonType == LargeButton);
 }
 
 QSize SARibbonToolButton::minimumSizeHint() const
