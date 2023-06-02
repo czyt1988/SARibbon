@@ -2,6 +2,7 @@
 #include <QApplication>
 #include <QElapsedTimer>
 #include <QDebug>
+//#include "SARibbonElementManager.h"
 
 //重定向qdebug的打印
 void log_out_put(QtMsgType type, const QMessageLogContext& context, const QString& msg);
@@ -61,6 +62,7 @@ int main(int argc, char* argv[])
     QElapsedTimer cost;
 
     cost.start();
+//    RibbonSubElementDelegate->setRibbonStyleOption(new SARibbonStyleOption(true));
     MainWindow w;
 
     qDebug() << "window build cost:" << cost.elapsed() << " ms";

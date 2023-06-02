@@ -1,8 +1,14 @@
 ﻿#include "SARibbonStyleOption.h"
 #include <QApplication>
+#include <QDir>
+#include <QSettings>
 #include <QDebug>
-SARibbonStyleOption::SARibbonStyleOption()
+SARibbonStyleOption::SARibbonStyleOption(bool isUseSetting):m_tabBarHeightScaling(1.5),m_titleBarHeightScaling(1.8)
 {
+    if(isUseSetting)
+    {
+        setParamFromIni("");
+    }
     init();
 }
 
@@ -43,6 +49,37 @@ void SARibbonStyleOption::recalc()
 }
 
 /**
+ * @brief SARibbonStyleOption::setParamFromIni 通过ini文件更改相关参数
+ * @param iniPath ini的路径
+ */
+bool SARibbonStyleOption::setParamFromIni(QString iniPath)
+{
+    if(iniPath.isEmpty())
+    {
+        iniPath=qApp->applicationDirPath()+"/setting.ini";
+    }
+
+    QFileInfo fileParse(iniPath);
+
+    //目前是不存在直接返回
+    if((!fileParse.exists()))
+        return false;
+
+    QSettings setting(iniPath,QSettings::IniFormat);
+    m_tabBarHeightScaling=setting.value("/SARibbonStyleOption/tabBarHeightScaling").toDouble();
+    m_titleBarHeightScaling=setting.value("/SARibbonStyleOption/titleBarHeightScaling").toDouble();
+
+    //先判断存不存在文件夹，不存在直接返回失败（防止写错，造成创建大量文件夹）
+    //但是如果不存在ini配置文件，则新建一个
+//    QDir folder;
+//    if(!folder.exists(fileParse.path()))
+//        return false;
+    //仔细想了下，创建文件还是先不要考虑，如果以后需要创建的话，应该就需要保存，目前只需要读取
+
+    return true;
+}
+
+/**
  * @brief 计算ribbon的高度
  *
  * @note 调用此函数之前必须调用
@@ -71,8 +108,8 @@ void SARibbonStyleOption::init()
     QFontMetrics fm = QApplication::fontMetrics();
     int lineSpacing = fm.lineSpacing();
 
-    m_titleBarHeight                     = lineSpacing * 1.8;
-    m_tabBarHeight                       = lineSpacing * 1.5;
+    m_titleBarHeight                     = lineSpacing * m_titleBarHeightScaling;
+    m_tabBarHeight                       = lineSpacing * m_tabBarHeightScaling;
     m_ribbonbarHeightOfficeStyleThreeRow = m_titleBarHeight + m_tabBarHeight + (lineSpacing * 1.5) * 3
                                            + SARibbonPannel::pannelTitleHeight()
                                            + SARibbonPannelLayout::pannelContentsMargins().bottom()

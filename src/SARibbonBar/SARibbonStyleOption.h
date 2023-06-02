@@ -10,6 +10,7 @@
  * @sa SARibbonElementManager
  *
  * 一般SARibbonElementCreateDelegate::setRibbonStyleOption函数最好在ribbonbar构建之前调用
+ * 更换SARibbonStyleOption请使用SARibbonElementCreateDelegate::setRibbonStyleOption
  *
  * @note 此类定义了ribbonbar和pannel的高度信息，并通过字体提前计算好一些布局信息
  *
@@ -18,7 +19,9 @@
 class SA_RIBBON_EXPORT SARibbonStyleOption
 {
 public:
-    SARibbonStyleOption();
+    //参数为是否使用配置文件定义ribbon的尺寸布局
+    //目前这样写只考虑了单次设置ribbon尺寸布局，不考虑动态变更
+    SARibbonStyleOption(bool isUseSetting=false);
 
 public:
     // ribbonBar的高度
@@ -39,6 +42,10 @@ protected:
     //计算ribbon的高度
     int calcMainbarHeight(SARibbonBar::RibbonStyle s) const;
 
+    //通过ini设置相关参数
+    //目前先定义为protected，主要是因为m_tabBarHeight、m_titleBarHeight、m_ribbonbarHeightOfficeStyleThreeRow这三个参数并没有重新计算
+    bool setParamFromIni(QString iniPath="");
+
 private:
     //初始化
     void init();
@@ -47,7 +54,9 @@ private:
 
 private:
     int m_tabBarHeight;                        ///< ribbon tab 的高度
+    double m_tabBarHeightScaling;              ///< ribbon tab 的高度缩放系数
     int m_titleBarHeight;                      ///< 标题栏高度
+    double m_titleBarHeightScaling;            ///< 标题栏高度缩放系数
     int m_ribbonbarHeightOfficeStyleThreeRow;  ///< office样式的3行高度
     int m_ribbonbarHeightWPSStyleThreeRow;     ///< wps样式3行的高度
     int m_ribbonbarHeightWPSStyleTwoRow;       ///< wps样式2行的高度
