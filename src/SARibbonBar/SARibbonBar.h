@@ -8,7 +8,7 @@
 #include <QScopedPointer>
 
 class QAbstractButton;
-class SARibbonElementCreateDelegate;
+class SARibbonElementFactory;
 class SARibbonTabBar;
 class SARibbonButtonGroupWidget;
 class SARibbonQuickAccessBar;

@@ -1,5 +1,5 @@
-﻿#ifndef SARIBBONELEMENTCREATEDELEGATE_H
-#define SARIBBONELEMENTCREATEDELEGATE_H
+﻿#ifndef SARIBBONELEMENTFACTORY_H
+#define SARIBBONELEMENTFACTORY_H
 #include "SARibbonGlobal.h"
 #include <QColor>
 #include <QMargins>
@@ -26,14 +26,16 @@ class SARibbonQuickAccessBar;
 class SARibbonPannelOptionButton;
 
 ///
-/// \brief SARibbon的子元素创建的代理，SARibbon内部创建子元素都通过SARibbonElementCreateDelegate来创建
-/// 如果有些子元素重载，如SARibbonCategory，可以重载此类的createRibbonCategory,返回重载的类来进行重载
+/// \brief SARibbon的子元素创建的工厂，SARibbon内部创建子元素都通过SARibbonElementFactory来创建
 ///
-class SA_RIBBON_EXPORT SARibbonElementCreateDelegate
+/// 由于SARibbonBar是一个复合控件，很多子窗口组合而成，有些部件的创建如果想继承，那么就需要这个工厂类来处理
+/// 如SARibbonCategory，可以重载此类的createRibbonCategory,返回重载的类的实例
+///
+class SA_RIBBON_EXPORT SARibbonElementFactory
 {
 public:
-    SARibbonElementCreateDelegate();
-    virtual ~SARibbonElementCreateDelegate();
+    SARibbonElementFactory();
+    virtual ~SARibbonElementFactory();
     virtual SARibbonTabBar* createRibbonTabBar(QWidget* parent);
     virtual SARibbonApplicationButton* createRibbonApplicationButton(QWidget* parent);
     virtual SARibbonCategory* createRibbonCategory(QWidget* parent);
@@ -59,7 +61,7 @@ public:
     virtual SARibbonPannelOptionButton* createRibbonPannelOptionButton(SARibbonPannel* pannel);
 
 private:
-    QScopedPointer< SARibbonStyleOption > m_opt;
+    QScopedPointer< SARibbonStyleOption > mStyleOption;
 };
 
 #endif  // SARIBBONELEMENTCREATEDELEGATE_H

@@ -6,6 +6,10 @@ SARibbonStyleOption::SARibbonStyleOption()
     init();
 }
 
+SARibbonStyleOption::~SARibbonStyleOption()
+{
+}
+
 int SARibbonStyleOption::ribbonBarHeight(SARibbonBar::RibbonStyle s) const
 {
     switch (s) {
