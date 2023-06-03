@@ -229,8 +229,7 @@ void SARibbonCategoryLayout::updateGeometryArr()
     }
     // total 是总宽，不是x坐标系，x才是坐标系
     int total = d_ptr->totalSizeHintWidth();
-    //记录可以扩展的数量
-    int canExpandingCount = 0;
+
     //扩展的宽度
     int expandWidth = 0;
 
@@ -258,6 +257,8 @@ void SARibbonCategoryLayout::updateGeometryArr()
             d_ptr->mIsLeftScrollBtnShow  = true;
         }
     } else {
+        //记录可以扩展的数量
+        int canExpandingCount = 0;
         //说明total 小于 categoryWidth
         d_ptr->mIsRightScrollBtnShow = false;
         d_ptr->mIsLeftScrollBtnShow  = false;
