@@ -32,7 +32,7 @@ QPixmap SARibbonColorToolButton::PrivateData::createIconPixmap(const QStyleOptio
         return QPixmap();
     }
     //有icon，在icon下方加入颜色
-    QIcon::State state = opt.state & QStyle::State_On ? QIcon::On : QIcon::Off;
+    QIcon::State state = (opt.state & QStyle::State_On) ? QIcon::On : QIcon::Off;
     QIcon::Mode mode;
     if (!(opt.state & QStyle::State_Enabled)) {
         mode = QIcon::Disabled;

@@ -609,7 +609,7 @@ QPixmap SARibbonToolButton::PrivateData::createIconPixmap(const QStyleOptionTool
     if (opt.icon.isNull()) {  //没有有图标
         return (QPixmap());
     }
-    QIcon::State state = opt.state & QStyle::State_On ? QIcon::On : QIcon::Off;
+    QIcon::State state = (opt.state & QStyle::State_On) ? QIcon::On : QIcon::Off;
     QIcon::Mode mode;
     if (!(opt.state & QStyle::State_Enabled)) {
         mode = QIcon::Disabled;

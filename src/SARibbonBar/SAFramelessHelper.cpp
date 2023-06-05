@@ -20,10 +20,10 @@ class SAFramelessHelper::PrivateData
 public:
     PrivateData(SAFramelessHelper* p);
     QHash< QWidget*, SAPrivateFramelessWidgetData* > m_widgetDataHash;
-    bool m_bWidgetMovable : true;
-    bool m_bWidgetResizable : true;
-    bool m_bRubberBandOnResize : true;
-    bool m_bRubberBandOnMove : true;
+    bool m_bWidgetMovable { true };
+    bool m_bWidgetResizable { true };
+    bool m_bRubberBandOnResize { true };
+    bool m_bRubberBandOnMove { true };
 };
 
 SAFramelessHelper::PrivateData::PrivateData(SAFramelessHelper* p) : q_ptr(p)
@@ -42,15 +42,15 @@ public:
     void recalculate(const QPoint& globalMousePos, const QRect& frameRect);
 
 public:
-    bool m_bOnEdges : true;
-    bool m_bOnLeftEdge : true;
-    bool m_bOnRightEdge : true;
-    bool m_bOnTopEdge : true;
-    bool m_bOnBottomEdge : true;
-    bool m_bOnTopLeftEdge : true;
-    bool m_bOnBottomLeftEdge : true;
-    bool m_bOnTopRightEdge : true;
-    bool m_bOnBottomRightEdge : true;
+    bool m_bOnEdges { true };
+    bool m_bOnLeftEdge { true };
+    bool m_bOnRightEdge { true };
+    bool m_bOnTopEdge { true };
+    bool m_bOnBottomEdge { true };
+    bool m_bOnTopLeftEdge { true };
+    bool m_bOnBottomLeftEdge { true };
+    bool m_bOnTopRightEdge { true };
+    bool m_bOnBottomRightEdge { true };
 
     static int m_nBorderWidth;
     static int m_nTitleHeight;

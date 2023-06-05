@@ -33,7 +33,7 @@ SET(SARIBBON_HEADER_FILES
     SARibbonGalleryGroup.h
     SARibbonGalleryItem.h
     SARibbonComboBox.h
-    SARibbonElementCreateDelegate.h
+    SARibbonElementFactory.h
     SARibbonElementManager.h
     SARibbonDrawHelper.h
     SARibbonLineEdit.h
@@ -75,7 +75,7 @@ SET(SARIBBON_SOURCE_FILES
     SARibbonGalleryGroup.cpp
     SARibbonGalleryItem.cpp
     SARibbonComboBox.cpp
-    SARibbonElementCreateDelegate.cpp
+    SARibbonElementFactory.cpp
     SARibbonElementManager.cpp
     SARibbonDrawHelper.cpp
     SARibbonLineEdit.cpp
