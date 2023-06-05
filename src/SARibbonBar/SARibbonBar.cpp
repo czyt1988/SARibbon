@@ -1246,6 +1246,25 @@ Qt::Alignment SARibbonBar::windowTitleAligment() const
     return d_ptr->mTitleAligment;
 }
 
+/**
+ * @brief 设置ribbonbar的按钮文字允许换行
+ * @param on
+ */
+void SARibbonBar::setEnableWordWrap(bool on)
+{
+    SARibbonToolButton::setEnableWordWrap(on);
+    updateRibbonGeometry();
+}
+
+/**
+ * @brief 判断是否允许换行
+ * @return
+ */
+bool SARibbonBar::isEnableWordWrap() const
+{
+    return SARibbonToolButton::isEnableWordWrap();
+}
+
 bool SARibbonBar::eventFilter(QObject* obj, QEvent* e)
 {
     if (obj) {

@@ -12,6 +12,10 @@ SARibbonStyleOption::SARibbonStyleOption(bool isUseSetting):m_tabBarHeightScalin
     init();
 }
 
+SARibbonStyleOption::~SARibbonStyleOption()
+{
+}
+
 int SARibbonStyleOption::ribbonBarHeight(SARibbonBar::RibbonStyle s) const
 {
     switch (s) {

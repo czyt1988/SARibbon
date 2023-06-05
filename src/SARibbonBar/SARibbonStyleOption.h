@@ -23,6 +23,8 @@ public:
     //目前这样写只考虑了单次设置ribbon尺寸布局，不考虑动态变更
     SARibbonStyleOption(bool isUseSetting=false);
 
+    virtual ~SARibbonStyleOption();
+
 public:
     // ribbonBar的高度
     virtual int ribbonBarHeight(SARibbonBar::RibbonStyle s) const;

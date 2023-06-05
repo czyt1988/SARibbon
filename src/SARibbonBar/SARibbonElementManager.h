@@ -1,6 +1,6 @@
 ﻿#ifndef SARIBBONELEMENTMANAGER_H
 #define SARIBBONELEMENTMANAGER_H
-#include "SARibbonElementCreateDelegate.h"
+#include "SARibbonElementFactory.h"
 #include "SARibbonGlobal.h"
 
 ///
@@ -10,22 +10,23 @@ class SA_RIBBON_EXPORT SARibbonElementManager
 {
 protected:
     SARibbonElementManager();
+
 public:
     virtual ~SARibbonElementManager();
-    static SARibbonElementManager *instance();
-    SARibbonElementCreateDelegate *delegate();
-    void setupDelegate(SARibbonElementCreateDelegate *delegate);
+    static SARibbonElementManager* instance();
+    SARibbonElementFactory* factory();
+    void setupFactory(SARibbonElementFactory* fac);
 
 private:
-    SARibbonElementCreateDelegate *m_delegate;
+    QScopedPointer< SARibbonElementFactory > mFactory;
 };
 #ifndef RibbonSubElementMgr
-#define RibbonSubElementMgr		SARibbonElementManager::instance()
+#define RibbonSubElementMgr SARibbonElementManager::instance()
 #endif
 #ifndef RibbonSubElementDelegate
-#define RibbonSubElementDelegate	SARibbonElementManager::instance()->delegate()
+#define RibbonSubElementDelegate SARibbonElementManager::instance()->factory()
 #endif
 #ifndef RibbonSubElementStyleOpt
-#define RibbonSubElementStyleOpt	SARibbonElementManager::instance()->delegate()->getRibbonStyleOption()
+#define RibbonSubElementStyleOpt SARibbonElementManager::instance()->factory()->getRibbonStyleOption()
 #endif
-#endif // SARIBBONELEMENTMANAGER_H
+#endif  // SARIBBONELEMENTMANAGER_H

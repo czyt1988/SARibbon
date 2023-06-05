@@ -50,10 +50,10 @@ public:
     SARibbonPannelLayout* m_layout { nullptr };
     SARibbonPannelOptionButton* m_optionActionButton { nullptr };  ///< 标题栏的y距离
     QPoint m_nextElementPosition;
-    static int s_pannelTitleHeight;  ///< pannel标题栏的全局高度,默认为21
+    static int s_pannelTitleHeight;  ///< pannel标题栏的全局高度,默认为18
 };
 
-int SARibbonPannel::PrivateData::s_pannelTitleHeight = 21;
+int SARibbonPannel::PrivateData::s_pannelTitleHeight = 15;
 
 SARibbonPannel::PrivateData::PrivateData(SARibbonPannel* p) : q_ptr(p)
 {
@@ -508,7 +508,7 @@ void SARibbonPannel::paintEvent(QPaintEvent* event)
     if (ThreeRowMode == pannelLayoutMode()) {
         const int th = titleHeight();
         QFont f      = font();
-        f.setPixelSize(th * 0.6);
+        f.setPixelSize(th * 0.8);
         p.setFont(f);
         if (d_ptr->m_optionActionButton) {
             p.drawText(1, height() - th, width() - d_ptr->m_optionActionButton->width() - 4, th, Qt::AlignCenter, windowTitle());
@@ -586,7 +586,7 @@ int SARibbonPannel::titleHeight() const
  */
 QSize SARibbonPannel::optionActionButtonSize() const
 {
-    return (isTwoRow() ? QSize(12, 12) : QSize(16, 16));
+    return (isTwoRow() ? QSize(12, 12) : QSize(pannelTitleHeight(), pannelTitleHeight()));
 }
 
 /**
@@ -692,15 +692,6 @@ void SARibbonPannel::resetLargeToolButtonStyle()
     for (SARibbonToolButton* b : qAsConst(btns)) {
         if ((nullptr == b) || (SARibbonToolButton::LargeButton != b->buttonType())) {
             continue;
-        }
-        if (ThreeRowMode == pannelLayoutMode()) {
-            if (SARibbonToolButton::Normal != b->largeButtonType()) {
-                b->setLargeButtonType(SARibbonToolButton::Normal);
-            }
-        } else {
-            if (SARibbonToolButton::Lite != b->largeButtonType()) {
-                b->setLargeButtonType(SARibbonToolButton::Lite);
-            }
         }
         b->updateRect();
         b->repaint();

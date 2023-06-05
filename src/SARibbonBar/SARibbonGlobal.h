@@ -2,23 +2,40 @@
 #define SARIBBONGLOBAL_H
 #include <qglobal.h>
 #include <memory>
+
+//! 版本记录：
+//!
+//! 2023-05-28 -> 0.5.0
+//! 调整了大按钮模式下的显示方案，去除了原来SARibbonToolButton的Lite和Normal模式，以WordWrap来表征
+//! 支持文字自定义换行
+//! 调整了RibbonPannel的标题栏的高度计算方案
+//!
+//! 0.5.1
+//! 不使用QString::simplified,而是简单的仅仅替换\n的simplified，这样中文换行不会多出空格
+//!
+//! 0.5.2
+//! SARibbonColorToolButton\SARibbonToolButton修正&操作在三项表达式未加括号问题
+//! SARibbonStyleOption添加虚析构函数
+//! 原来SARibbonElementCreateDelegate类改名为SARibbonElementFactory
+//!
+
 /**
- * @def ribbon的数字版本 MAJ.MIN.PAT
+ * @def ribbon的数字版本 {MAJ}.MIN.PAT
  */
 #ifndef SA_RIBBON_BAR_VERSION_MAJ
 #define SA_RIBBON_BAR_VERSION_MAJ 0
 #endif
 /**
- * @def ribbon的数字版本 MAJ.MIN.PAT
+ * @def ribbon的数字版本 MAJ.{MIN}.PAT
  */
 #ifndef SA_RIBBON_BAR_VERSION_MIN
-#define SA_RIBBON_BAR_VERSION_MIN 4
+#define SA_RIBBON_BAR_VERSION_MIN 5
 #endif
 /**
- * @def ribbon的数字版本 MAJ.MIN.PAT
+ * @def ribbon的数字版本 MAJ.MIN.{PAT}
  */
 #ifndef SA_RIBBON_BAR_VERSION_PAT
-#define SA_RIBBON_BAR_VERSION_PAT 1
+#define SA_RIBBON_BAR_VERSION_PAT 2
 #endif
 
 /**
