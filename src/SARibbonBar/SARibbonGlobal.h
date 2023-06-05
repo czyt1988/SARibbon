@@ -12,24 +12,30 @@
 //!
 //! 0.5.1
 //! 不使用QString::simplified,而是简单的仅仅替换\n的simplified，这样中文换行不会多出空格
+//!
+//! 0.5.2
+//! SARibbonColorToolButton\SARibbonToolButton修正&操作在三项表达式未加括号问题
+//! SARibbonStyleOption添加虚析构函数
+//! 原来SARibbonElementCreateDelegate类改名为SARibbonElementFactory
+//!
 
 /**
- * @def ribbon的数字版本 MAJ.MIN.PAT
+ * @def ribbon的数字版本 {MAJ}.MIN.PAT
  */
 #ifndef SA_RIBBON_BAR_VERSION_MAJ
 #define SA_RIBBON_BAR_VERSION_MAJ 0
 #endif
 /**
- * @def ribbon的数字版本 MAJ.MIN.PAT
+ * @def ribbon的数字版本 MAJ.{MIN}.PAT
  */
 #ifndef SA_RIBBON_BAR_VERSION_MIN
 #define SA_RIBBON_BAR_VERSION_MIN 5
 #endif
 /**
- * @def ribbon的数字版本 MAJ.MIN.PAT
+ * @def ribbon的数字版本 MAJ.MIN.{PAT}
  */
 #ifndef SA_RIBBON_BAR_VERSION_PAT
-#define SA_RIBBON_BAR_VERSION_PAT 1
+#define SA_RIBBON_BAR_VERSION_PAT 2
 #endif
 
 /**

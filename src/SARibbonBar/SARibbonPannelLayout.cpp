@@ -509,8 +509,6 @@ void SARibbonPannelLayout::updateGeomArray(const QRect& setrect)
                     //换列，x自动递增到下个坐标，列数增加，行数归零，最大列宽归零
                     x += (columMaxWidth + spacing);
                     ++column;
-                    row           = 0;
-                    columMaxWidth = 0;
                     //换列后此时等价于0 == row
                     item->rowIndex            = 0;
                     item->columnIndex         = column;

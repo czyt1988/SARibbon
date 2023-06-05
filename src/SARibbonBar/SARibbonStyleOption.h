@@ -19,6 +19,7 @@ class SA_RIBBON_EXPORT SARibbonStyleOption
 {
 public:
     SARibbonStyleOption();
+    virtual ~SARibbonStyleOption();
 
 public:
     // ribbonBar的高度

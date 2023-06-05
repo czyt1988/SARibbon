@@ -1,39 +1,27 @@
 ﻿#include "SARibbonElementManager.h"
 
-
-SARibbonElementManager::SARibbonElementManager() : m_delegate(nullptr)
+SARibbonElementManager::SARibbonElementManager()
 {
-    m_delegate = new SARibbonElementCreateDelegate();
+    mFactory.reset(new SARibbonElementFactory());
 }
-
 
 SARibbonElementManager::~SARibbonElementManager()
 {
-    if (m_delegate) {
-        delete m_delegate;
-    }
-    m_delegate = nullptr;
 }
 
-
-SARibbonElementManager *SARibbonElementManager::instance()
+SARibbonElementManager* SARibbonElementManager::instance()
 {
     static SARibbonElementManager s_instance;
 
     return (&(s_instance));
 }
 
-
-SARibbonElementCreateDelegate *SARibbonElementManager::delegate()
+SARibbonElementFactory* SARibbonElementManager::factory()
 {
-    return (m_delegate);
+    return (mFactory.get());
 }
 
-
-void SARibbonElementManager::setupDelegate(SARibbonElementCreateDelegate *delegate)
+void SARibbonElementManager::setupFactory(SARibbonElementFactory* delegate)
 {
-    if (m_delegate) {
-        delete m_delegate;
-    }
-    m_delegate = delegate;
+    mFactory.reset(delegate);
 }
