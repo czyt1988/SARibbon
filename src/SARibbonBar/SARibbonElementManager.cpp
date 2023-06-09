@@ -18,7 +18,7 @@ SARibbonElementManager* SARibbonElementManager::instance()
 
 SARibbonElementFactory* SARibbonElementManager::factory()
 {
-    return (mFactory.get());
+    return (mFactory.data());
 }
 
 void SARibbonElementManager::setupFactory(SARibbonElementFactory* delegate)
