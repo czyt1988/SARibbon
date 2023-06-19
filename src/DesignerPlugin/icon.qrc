@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/icon">
+        <file>icon/saribbonmainwindow.svg</file>
+        <file>icon/about.svg</file>
+        <file>icon/saribbonbar.svg</file>
+        <file>icon/addcategory.svg</file>
+    </qresource>
+</RCC>
