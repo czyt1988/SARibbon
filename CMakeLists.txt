@@ -7,8 +7,8 @@ set(SARIBBON_VERSION "${SARIBBON_VERSION_MAJOR}.${SARIBBON_VERSION_MINOR}.${SARI
 project(SARibbon VERSION ${SARIBBON_VERSION} LANGUAGES CXX)
 
 # option(BUILD_SHARED_LIBS "build the SARibbonBar in shared lib mode" ON)
-option(BUILD_EXAMPLES "build the examples" OFF)
-option(BUILD_DESIGNERPLUGIN "build the Designer Plugin" OFF)
+option(BUILD_EXAMPLES "build the examples" ON)
+
 
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -31,7 +31,7 @@ else()
     set(SARIBBON_PLATFORM "64")
 endif()
 
-# load Qt library, minimum version required is 5.7
+# load Qt library, minimum version required is 5.8
 # cn:Qt库加载,最低版本要求为5.7
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} 5.8 COMPONENTS Core Gui Widgets REQUIRED)

@@ -1,22 +1,29 @@
-cmake_minimum_required(VERSION 3.5)
+﻿cmake_minimum_required(VERSION 3.5)
 
 # 设置项目名称
 set(EXPAMPLE_NAME UseDesginerMainWindowExample)
 project(${EXPAMPLE_NAME})
 
-FIND_PACKAGE(Qt6 6.3.1 COMPONENTS Core Gui Widgets REQUIRED)
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} 5.8 COMPONENTS Core Gui Widgets REQUIRED)
 
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(UI_FILES mainwindow.ui)
-qt_wrap_ui(UI_HEADERS ${UI_FILES})
+#qt_wrap_ui(UI_HEADERS ${UI_FILES})
 
 add_executable(${EXPAMPLE_NAME}
-    ${UI_HEADERS} # 包含了.ui文件生成的头文件
+    ${UI_FILES} # 包含了.ui文件
     MainWindow.h
     MainWindow.cpp
     main.cpp
 )
 
-target_link_libraries(${EXPAMPLE_NAME} SARibbonBar Qt::Widgets Qt::Gui Qt::Core)
+
+target_link_libraries(${EXPAMPLE_NAME} PUBLIC
+                      Qt${QT_VERSION_MAJOR}::Core
+                      Qt${QT_VERSION_MAJOR}::Gui
+                      Qt${QT_VERSION_MAJOR}::Widgets)
+target_link_libraries(${EXPAMPLE_NAME} SARibbonBar)
 
 set_target_properties(${EXPAMPLE_NAME} PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
 
