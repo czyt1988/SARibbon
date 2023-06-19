@@ -20,9 +20,12 @@ HEADERS  += \
 RESOURCES += \
     saribbonresouce.qrc \
 
+# 下面演示了如何把SARibbon引入
+# 只需要下面2句话，只要把common.pri引入工程，就可以实现SARibbon的引入
 include($$PWD/../../../common.pri)
-DESTDIR = $${SARIBBON_BIN_DIR}
 include($${SARIBBONBAR_PRI_FILE_PATH})
+
+DESTDIR = $${SARIBBON_BIN_DIR}
 
 msvc {
     QMAKE_CFLAGS += /utf-8
