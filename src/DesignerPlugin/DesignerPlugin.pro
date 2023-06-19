@@ -26,6 +26,7 @@ DESTDIR         = $${SARIBBON_BIN_DIR}
 
 #所有参与编译，这样导入designer里才可以用
 DEFINES += SA_RIBBON_BAR_MAKE_LIB #定义此宏将构建库
+DEFINES += SA_COLOR_WIDGETS_MAKE_LIB #定义此宏将构建ColorWidgets库
 include($$PWD/../SARibbonBar/SARibbonBar.pri)
 
 HEADERS += \
