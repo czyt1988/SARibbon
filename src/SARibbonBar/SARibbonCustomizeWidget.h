@@ -35,8 +35,7 @@ public:
      */
     enum RibbonTreeShowType
     {
-        ShowAllCategory  ///< 显示所有Category，包括contextcategory
-        ,
+        ShowAllCategory,  ///< 显示所有Category，包括contextcategory
         ShowMainCategory  ///< 显示主要的category，不包含上下文
     };
 
@@ -45,15 +44,11 @@ public:
      */
     enum ItemRole
     {
-        LevelRole = Qt::UserRole + 1  ///< 代表这是层级，有0：category 1：pannel 2：item
-        ,
-        PointerRole = Qt::UserRole + 2  ///< 代表这是存放指针。根据LevelRole来进行转
-        ,
-        CanCustomizeRole = Qt::UserRole + 3  ///< 代表个item是可以自定义的.bool
-        ,
-        CustomizeRole = Qt::UserRole + 4  ///< 代表这个是自定义的item,bool,主要用于那些自己添加的标签和pannel，有此角色必有CanCustomizeRole
-        ,
-        CustomizeObjNameRole = Qt::UserRole + 5  ///< 记录了临时的自定义内容的obj名 QString
+        LevelRole            = Qt::UserRole + 1,  ///< 代表这是层级，有0：category 1：pannel 2：item
+        PointerRole          = Qt::UserRole + 2,  ///< 代表这是存放指针。根据LevelRole来进行转
+        CanCustomizeRole     = Qt::UserRole + 3,  ///< 代表个item是可以自定义的.bool
+        CustomizeRole        = Qt::UserRole + 4,  ///< 代表这个是自定义的item,bool,主要用于那些自己添加的标签和pannel，有此角色必有CanCustomizeRole
+        CustomizeObjNameRole = Qt::UserRole + 5   ///< 记录了临时的自定义内容的obj名 QString
     };
 
     //设置action管理器

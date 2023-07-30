@@ -160,7 +160,7 @@ SARibbonToolButton:focus {
 
 SARibbonToolButton::pressed {
   color: #000;
-  border: 1px solid#269bf4;
+  border: 1px solid #269bf4;
   background-color: #9ed2f9;
 }
 
