@@ -802,12 +802,20 @@ void SARibbonToolButton::paintEvent(QPaintEvent* e)
  */
 void SARibbonToolButton::paintButton(QPainter& p, const QStyleOptionToolButton& opt)
 {
-    bool autoRaise = opt.state & QStyle::State_AutoRaise;
+    // QStyle::State_Sunken 代表按钮按下去了
+    // QStyle::State_On 代表按钮按checked
+    // QStyle::State_MouseOver 代表当前鼠标位于按钮上面
+    QStyleOption tool = opt;
+    bool autoRaise    = opt.state & QStyle::State_AutoRaise;
     //绘制按钮
     if (autoRaise) {
-        style()->drawPrimitive(QStyle::PE_PanelButtonTool, &opt, &p, this);
+        //这个是为了实现按钮点击下去后(QStyle::State_Sunken),能出现选中的状态
+        if (opt.state & QStyle::State_Sunken) {
+            tool.state &= ~QStyle::State_MouseOver;
+        }
+        style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
     } else {
-        style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &opt, &p, this);
+        style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tool, &p, this);
     }
     //针对MenuButtonPopup的ribbon样式的特殊绘制
     if ((opt.subControls & QStyle::SC_ToolButton) && (opt.features & QStyleOptionToolButton::MenuButtonPopup)) {
@@ -816,47 +824,43 @@ void SARibbonToolButton::paintButton(QPainter& p, const QStyleOptionToolButton& 
                 if (LargeButton == d_ptr->mButtonType) {                 //大按钮模式
                     if (d_ptr->mMouseOnSubControl) {                     //此时鼠标在indecater那
                         //鼠标在文字区，把图标显示为正常
-                        QStyleOption tmp = opt;
-                        tmp.rect         = d_ptr->mDrawIconRect;
-                        tmp.state        = (QStyle::State_Raised);  //把图标区域显示为正常
+                        tool.rect  = d_ptr->mDrawIconRect;
+                        tool.state = (QStyle::State_Raised);  //把图标区域显示为正常
                         if (autoRaise) {
-                            style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tmp, &p, this);
+                            style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
                         } else {
-                            style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tmp, &p, this);
+                            style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tool, &p, this);
                         }
                     } else {
                         //鼠标在图标区，把文字显示为正常
-                        QStyleOption tmp = opt;
-                        tmp.state        = (QStyle::State_Raised);  //把图标区域显示为正常
+                        tool.state = (QStyle::State_Raised);  //把图标区域显示为正常
                         //文字和Indicator都显示正常
-                        tmp.rect = d_ptr->mDrawTextRect.united(d_ptr->mDrawIndicatorArrowRect);
+                        tool.rect = d_ptr->mDrawTextRect.united(d_ptr->mDrawIndicatorArrowRect);
                         if (autoRaise) {
-                            style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tmp, &p, this);
+                            style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
                         } else {
-                            style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tmp, &p, this);
+                            style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tool, &p, this);
                         }
                     }
                 } else {                              //小按钮模式
                     if (d_ptr->mMouseOnSubControl) {  //此时鼠标在indecater那
                         //鼠标在文字区，把图标和文字显示为正常
-                        QStyleOption tmp = opt;
-                        tmp.rect         = d_ptr->mDrawIconRect.united(d_ptr->mDrawTextRect);
-                        tmp.state        = (QStyle::State_Raised);  //把图标区域显示为正常
+                        tool.rect  = d_ptr->mDrawIconRect.united(d_ptr->mDrawTextRect);
+                        tool.state = (QStyle::State_Raised);  //把图标区域显示为正常
                         if (autoRaise) {
-                            style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tmp, &p, this);
+                            style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
                         } else {
-                            style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tmp, &p, this);
+                            style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tool, &p, this);
                         }
                     } else {
                         //鼠标在图标区，把文字显示为正常
-                        QStyleOption tmp = opt;
-                        tmp.state        = (QStyle::State_Raised);  //把图标区域显示为正常
+                        tool.state = (QStyle::State_Raised);  //把图标区域显示为正常
                         //文字和Indicator都显示正常
-                        tmp.rect = d_ptr->mDrawIndicatorArrowRect;
+                        tool.rect = d_ptr->mDrawIndicatorArrowRect;
                         if (autoRaise) {
-                            style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tmp, &p, this);
+                            style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
                         } else {
-                            style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tmp, &p, this);
+                            style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tool, &p, this);
                         }
                     }
                 }

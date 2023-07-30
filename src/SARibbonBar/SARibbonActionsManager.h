@@ -45,19 +45,13 @@ public:
      */
     enum ActionTag
     {
-        UnknowActionTag = 0  ///< 未知的tag
-        ,
-        CommonlyUsedActionTag = 0x01  ///< 预设tag-常用命令
-        ,
-        NotInFunctionalAreaActionTag = 0x02  ///< 预设tag-不在功能区命令
-        ,
-        AutoCategoryDistinguishBeginTag = 0x1000  ///< 自动按Category划分的标签起始，在@ref autoRegisteActions 函数会用到
-        ,
-        AutoCategoryDistinguishEndTag = 0x2000  ///< 自动按Category划分的标签结束，在@ref autoRegisteActions 函数会用到
-        ,
-        NotInRibbonCategoryTag = 0x2001  ///< 不在功能区的标签@ref autoRegisteActions 函数会遍历所有category的action以及SARibbonMainWindow下的action，如果两个
-        ,
-        UserDefineActionTag = 0x8000  ///< 自定义标签，所有用户自定义tag要大于此tag
+        UnknowActionTag              = 0,     ///< 未知的tag
+        CommonlyUsedActionTag        = 0x01,  ///< 预设tag-常用命令
+        NotInFunctionalAreaActionTag = 0x02,  ///< 预设tag-不在功能区命令
+        AutoCategoryDistinguishBeginTag = 0x1000,  ///< 自动按Category划分的标签起始，在@ref autoRegisteActions 函数会用到
+        AutoCategoryDistinguishEndTag = 0x2000,  ///< 自动按Category划分的标签结束，在@ref autoRegisteActions 函数会用到
+        NotInRibbonCategoryTag = 0x2001,  ///< 不在功能区的标签@ref autoRegisteActions 函数会遍历所有category的action以及SARibbonMainWindow下的action，如果两个
+        UserDefineActionTag    = 0x8000   ///< 自定义标签，所有用户自定义tag要大于此tag
     };
     SARibbonActionsManager(SARibbonMainWindow* p);
     ~SARibbonActionsManager();
