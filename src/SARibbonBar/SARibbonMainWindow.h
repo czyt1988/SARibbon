@@ -36,9 +36,8 @@ class SA_RIBBON_EXPORT SARibbonMainWindow : public QMainWindow
 public:
     enum RibbonTheme
     {
-        NormalTheme  ///< 普通主题
-        ,
-        Office2013  ///< office2013主题
+        NormalTheme,  ///< 普通主题
+        Office2013    ///< office2013主题
     };
     Q_ENUMS(RibbonTheme)
 public:

@@ -16,11 +16,30 @@ MIT协议，欢迎大家使用并提出意见
 
 # 编译
 
+## 直接引入工程（静态）
+
+SARibbon提供了合并好的`SARibbon.h`文件和`SARibbon.cpp`文件，只需要在工程引入这两个文件，同时把资源文件引入就可以使用，无需编译为动态库，可以参考SimpleExample的例子（位于`src/example/SimpleExample`），静态引入使用到如下4个文件：
+
+```
+SARibbon.h
+SARibbon.cpp
+SARibbon.pri
+SARibbonBar/resource.qrc
+```
+
+只需把上面四个文件拷贝到自己工程即可，资源文件的`SARibbonBar`文件夹如果改变，需要修改`SARibbon.pri`
+
+如果是用cmake，只需要`SARibbon.h,SARibbon.cpp,resource.qrc`这三个文件
+
+## 编译为库（动态）
+
  使用Qt Creator直接打开`SARibbon.pro`，并编译即可，会编译出SARibbonBar库和一个（目前只有一个例子）例子，lib和例子的目录位于`bin_qt{Qt版本}_{debug/release}_{32/64}`目录下
 
 > 在debug模式编译的库后面会加上'd'以作区别
 
 > 注意:最低的Qt版本为5.8
+
+
 
 # 使用方法
 

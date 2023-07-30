@@ -6,6 +6,7 @@
 
 QT       += core gui
 CONFIG += c++11
+TEMPLATE = lib
 
 DEFINES += SA_RIBBON_BAR_MAKE_LIB #定义此宏将构建库
 DEFINES += SA_COLOR_WIDGETS_MAKE_LIB #定义此宏将构建ColorWidgets库
@@ -14,7 +15,6 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 include($$PWD/../../common.pri)
 
 TARGET = $${SARIBBON_LIB_NAME}
-TEMPLATE = lib
 DESTDIR = $${SARIBBON_BIN_DIR}
 
 
