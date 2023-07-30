@@ -1,6 +1,6 @@
 ﻿cmake_minimum_required(VERSION 3.5)
 project(SARibbonBar LANGUAGES CXX VERSION ${SARIBBON_VERSION})
-set(LIB_NAME SARibbonBar)
+set(SARIBBONBAR_LIB_NAME SARibbonBar)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -110,7 +110,7 @@ SET(SARIBBON_RESOURCE_FILES
     resource.qrc
 )
 
-add_library(${LIB_NAME} SHARED
+add_library(${SARIBBONBAR_LIB_NAME} SHARED
     ${SARIBBON_HEADER_FILES}
     ${SARIBBON_SOURCE_FILES}
     ${SACOLOR_HEADER_FILES}
@@ -119,30 +119,30 @@ add_library(${LIB_NAME} SHARED
 )
 
 
-target_link_libraries(${LIB_NAME} PUBLIC
+target_link_libraries(${SARIBBONBAR_LIB_NAME} PUBLIC
                       Qt${QT_VERSION_MAJOR}::Core
                       Qt${QT_VERSION_MAJOR}::Gui
                       Qt${QT_VERSION_MAJOR}::Widgets)
 
-set_target_properties(${LIB_NAME} PROPERTIES
+set_target_properties(${SARIBBONBAR_LIB_NAME} PROPERTIES
     AUTOMOC ON
     AUTOUIC ON
     AUTORCC ON
     CXX_EXTENSIONS OFF
     DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX}
     VERSION ${SARIBBON_VERSION}
-    EXPORT_NAME ${LIB_NAME}
+    EXPORT_NAME ${SARIBBONBAR_LIB_NAME}
     ARCHIVE_OUTPUT_DIRECTORY "${SARIBBON_BIN_DIR}"
     LIBRARY_OUTPUT_DIRECTORY "${SARIBBON_BIN_DIR}"
     RUNTIME_OUTPUT_DIRECTORY "${SARIBBON_BIN_DIR}"
 )
 # 构建库定义的宏
-target_compile_definitions(${LIB_NAME} PRIVATE SA_RIBBON_BAR_MAKE_LIB)
+target_compile_definitions(${SARIBBONBAR_LIB_NAME} PRIVATE SA_RIBBON_BAR_MAKE_LIB)
 # 使用SAColorWidgets但不作为库使用定义的宏
-target_compile_definitions(${LIB_NAME} PRIVATE SA_COLOR_WIDGETS_NO_DLL)
+target_compile_definitions(${SARIBBONBAR_LIB_NAME} PRIVATE SA_COLOR_WIDGETS_NO_DLL)
 
 
-target_include_directories(${LIB_NAME} PUBLIC
+target_include_directories(${SARIBBONBAR_LIB_NAME} PUBLIC
     $<INSTALL_INTERFACE:include>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
 )
@@ -153,7 +153,7 @@ set(CMAKE_INSTALL_PREFIX ${SARIBBON_BIN_DIR})
 # the ${PACKAGE_VERSION} is the version defined in project()
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
-    "${LIB_NAME}ConfigVersion.cmake"
+    "${SARIBBONBAR_LIB_NAME}ConfigVersion.cmake"
     VERSION ${VERSION_SHORT}
     COMPATIBILITY SameMajorVersion
 )
@@ -167,7 +167,7 @@ install(FILES
     DESTINATION include/${SARIBBON_INSTALL_DIR}/colorWidgets
     COMPONENT headers
 )
-install(TARGETS ${LIB_NAME}
+install(TARGETS ${SARIBBONBAR_LIB_NAME}
     EXPORT SARibbonTargets
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
@@ -181,8 +181,8 @@ install(EXPORT SARibbonTargets
 
 if(WIN32)
 	create_win32_resource_version(
-		TARGET ${LIB_NAME}
-		FILENAME ${LIB_NAME}
+                TARGET ${SARIBBONBAR_LIB_NAME}
+                FILENAME ${SARIBBONBAR_LIB_NAME}
 		EXT "dll"
 		DESCRIPTION "Ribbon control library for Qt"
 	)
