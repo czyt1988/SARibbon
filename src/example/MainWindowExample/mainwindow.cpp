@@ -52,7 +52,7 @@
         __TMP_LASTTIMES = ___TMP_INT;                                                                                  \
     } while (0)
 
-MainWindow::MainWindow(QWidget* par) : SARibbonMainWindow(par), m_customizeWidget(nullptr)
+MainWindow::MainWindow(QWidget* par) : SARibbonMainWindow(par), m_customizeWidget(nullptr), m_applicationMenu(nullptr)
 {
     PRINT_COST_START();
     SAFramelessHelper* helper = framelessHelper();
@@ -67,9 +67,13 @@ MainWindow::MainWindow(QWidget* par) : SARibbonMainWindow(par), m_customizeWidge
     ribbon->setContentsMargins(5, 0, 5, 0);
     //设置applicationButton
     PRINT_COST("setCentralWidget & setWindowTitle");
-    ribbon->applicationButton()->setText(("File"));
+    ribbon->applicationButton()->setText(("   File   "));  //文字两边留有间距，好看一点
 
-    //添加主标签页 - 通过addCategoryPage工厂函数添加
+    //! 创建application菜单
+    createRibbonApplicationMenu();
+
+    //! 添加主标签页
+    //! 这里演示了通过addCategoryPage工厂函数添加
     SARibbonCategory* categoryMain = ribbon->addCategoryPage(tr("Main"));
     categoryMain->setObjectName(("categoryMain"));
     createCategoryMain(categoryMain);
@@ -125,6 +129,25 @@ MainWindow::MainWindow(QWidget* par) : SARibbonMainWindow(par), m_customizeWidge
     onStyleClicked(SARibbonBar::OfficeStyle);
     //
     setWindowIcon(QIcon(":/icon/icon/SA.svg"));
+}
+
+void MainWindow::createRibbonApplicationMenu()
+{
+    //以下和一个传统的QMenu操作是一样的
+    if (!m_applicationMenu) {
+        m_applicationMenu = new SARibbonMenu(this);
+        m_applicationMenu->addAction(createAction("test1", ":/icon/icon/action.svg"));
+        m_applicationMenu->addAction(createAction("test2", ":/icon/icon/action2.svg"));
+        m_applicationMenu->addAction(createAction("test3", ":/icon/icon/action3.svg"));
+        m_applicationMenu->addAction(createAction("test4", ":/icon/icon/action4.svg"));
+    }
+    // ribbonbar默认会创建一个SARibbonApplicationButton,当然用户也可以自定义button设置进去，例如定制一个圆形的菜单
+    QAbstractButton* btn              = ribbonBar()->applicationButton();
+    SARibbonApplicationButton* appBtn = qobject_cast< SARibbonApplicationButton* >(btn);
+    if (!appBtn) {
+        return;
+    }
+    appBtn->setMenu(m_applicationMenu);
 }
 
 void MainWindow::onShowContextCategory(bool on)
@@ -237,8 +260,9 @@ void MainWindow::onActionRemoveAppBtnTriggered(bool b)
         ribbonBar()->setApplicationButton(nullptr);
     } else {
         SARibbonApplicationButton* actionRemoveAppBtn = new SARibbonApplicationButton();
-        actionRemoveAppBtn->setText(tr("File"));
+        actionRemoveAppBtn->setText(tr("   File   "));
         this->ribbonBar()->setApplicationButton(actionRemoveAppBtn);
+        createRibbonApplicationMenu();
     }
 }
 
