@@ -18,3 +18,6 @@ HEADERS  += \
     mainwindow.h 
     
 include($$PWD/../../SARibbon.pri)
+
+RESOURCES += \
+    icon.qrc

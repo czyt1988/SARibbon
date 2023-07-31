@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/app">
+        <file>icon/action.svg</file>
+        <file>icon/customize0.svg</file>
+        <file>icon/folder-star.svg</file>
+        <file>icon/item.svg</file>
+        <file>icon/SA.svg</file>
+        <file>icon/save.svg</file>
+        <file>icon/test1.svg</file>
+    </qresource>
+</RCC>
