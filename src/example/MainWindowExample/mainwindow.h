@@ -16,6 +16,9 @@ public:
     MainWindow(QWidget* par = nullptr);
 
 private:
+    //创建ribbon-application菜单示例
+    void createRibbonApplicationMenu();
+    //创建main菜单示例
     void createCategoryMain(SARibbonCategory* page);
     void createCategoryOther(SARibbonCategory* page);
     void createCategoryDelete(SARibbonCategory* page);
@@ -62,6 +65,7 @@ private:
     SARibbonActionsManager* m_actMgr;
     int m_actionTagText;
     int m_actionTagWithIcon;
+    QMenu* m_applicationMenu;
     //
     QAction* mActionWordWrap { nullptr };
 };
