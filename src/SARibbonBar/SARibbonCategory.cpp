@@ -290,9 +290,11 @@ void SARibbonCategory::PrivateData::updateItemGeometry()
     SARibbonCategory* category = ribbonCategory();
     QSize contentSize          = categoryContentSize();
     int y                      = 0;
+    int x                      = 0;
 
     if (!mContentsMargins.isNull()) {
         y = mContentsMargins.top();
+        x = mContentsMargins.left();
     }
     // total 是总宽，不是x坐标系，x才是坐标系
     int total = totalSizeHintWidth();
@@ -331,7 +333,7 @@ void SARibbonCategory::PrivateData::updateItemGeometry()
         }
     }
     total = 0;  // total重新计算
-    int x = mXBase;
+    x += mXBase;
 
     //先按照sizeHint设置所有的尺寸
     for (SAPrivateRibbonCategoryItem& item : mItemList) {
