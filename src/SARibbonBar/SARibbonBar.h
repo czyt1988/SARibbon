@@ -108,7 +108,7 @@ public:
         OfficeStyleTwoRow  = 0x0100,  ///< 类似office 的ribbon风格 2行工具栏 三行布局模式，office就是三行布局模式，pannel能布置3行小toolbutton，默认模式
         WpsLiteStyleTwoRow = 0x0101   ///< 类似wps的紧凑风格  2行工具栏
     };
-    Q_ENUMS(RibbonStyle)
+    Q_ENUM(RibbonStyle)
 
     /**
      * @brief 定义当前ribbon 的状态
@@ -118,7 +118,7 @@ public:
         MinimumRibbonMode,  ///< 缩小模式
         NormalRibbonMode    ///< 正常模式
     };
-    Q_ENUMS(RibbonMode)
+    Q_ENUM(RibbonMode)
 
 public:
     //判断RibbonStyle是否为2行模式
@@ -306,6 +306,8 @@ protected:
 
     //根据currentRibbonStyle计算mainBar的高度
     virtual int mainBarHeight() const;
+    //更新
+    void updateCategoryTitleToTabName();
 protected slots:
     void onWindowTitleChanged(const QString& title);
     void onWindowIconChanged(const QIcon& i);
@@ -315,6 +317,7 @@ protected slots:
     virtual void onCurrentRibbonTabClicked(int index);
     virtual void onCurrentRibbonTabDoubleClicked(int index);
     void onContextsCategoryPageAdded(SARibbonCategory* category);
+    void onContextsCategoryCategoryNameChanged(SARibbonCategory* category, const QString& title);
     void onTabMoved(int from, int to);
 
 private:

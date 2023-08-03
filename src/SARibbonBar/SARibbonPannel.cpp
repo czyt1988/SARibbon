@@ -511,13 +511,13 @@ void SARibbonPannel::paintEvent(QPaintEvent* event)
         f.setPixelSize(th * 0.8);
         p.setFont(f);
         if (d_ptr->m_optionActionButton) {
-            p.drawText(1, height() - th, width() - d_ptr->m_optionActionButton->width() - 4, th, Qt::AlignCenter, windowTitle());
+            p.drawText(1, height() - th, width() - d_ptr->m_optionActionButton->width() - 4, th, Qt::AlignCenter, pannelName());
 #ifdef SA_RIBBON_DEBUG_HELP_DRAW
             QRect r = QRect(1, height() - th, width() - m_d->m_optionActionButton->width() - 4, th - 2);
             HELP_DRAW_RECT(p, r);
 #endif
         } else {
-            p.drawText(1, height() - th, width(), th, Qt::AlignCenter, windowTitle());
+            p.drawText(1, height() - th, width(), th, Qt::AlignCenter, pannelName());
 #ifdef SA_RIBBON_DEBUG_HELP_DRAW
             QRect r = QRect(1, height() - th, width(), th);
             HELP_DRAW_RECT(p, r);
@@ -536,7 +536,7 @@ QSize SARibbonPannel::sizeHint() const
     if (ThreeRowMode == pannelLayoutMode()) {
         //三行模式
         QFontMetrics fm = fontMetrics();
-        QSize titleSize = fm.size(Qt::TextShowMnemonic, windowTitle());
+        QSize titleSize = fm.size(Qt::TextShowMnemonic, pannelName());
         if (d_ptr->m_optionActionButton) {
             // optionActionButton的宽度需要预留
             titleSize.setWidth(titleSize.width() + d_ptr->m_optionActionButton->width() + 4);

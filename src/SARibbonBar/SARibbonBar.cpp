@@ -320,7 +320,7 @@ SARibbonCategory* SARibbonBar::addCategoryPage(const QString& title)
 
     // catagory->setFixedHeight(categoryHeight());
     category->setObjectName(title);
-    category->setWindowTitle(title);
+    category->setCategoryName(title);
     addCategoryPage(category);
     return (category);
 }
@@ -334,7 +334,7 @@ void SARibbonBar::addCategoryPage(SARibbonCategory* category)
     if (nullptr == category) {
         return;
     }
-    int index = d_ptr->mRibbonTabBar->addTab(category->windowTitle());
+    int index = d_ptr->mRibbonTabBar->addTab(category->categoryName());
 
     category->setRibbonPannelLayoutMode(isTwoRowStyle() ? SARibbonPannel::TwoRowMode : SARibbonPannel::ThreeRowMode);
 
@@ -374,7 +374,7 @@ SARibbonCategory* SARibbonBar::insertCategoryPage(const QString& title, int inde
     SARibbonCategory* category = RibbonSubElementDelegate->createRibbonCategory(this);
 
     category->setObjectName(title);
-    category->setWindowTitle(title);
+    category->setCategoryName(title);
     insertCategoryPage(category, index);
     return (category);
 }
@@ -385,7 +385,7 @@ void SARibbonBar::insertCategoryPage(SARibbonCategory* category, int index)
         return;
     }
     category->setRibbonPannelLayoutMode(isTwoRowStyle() ? SARibbonPannel::TwoRowMode : SARibbonPannel::ThreeRowMode);
-    int i = d_ptr->mRibbonTabBar->insertTab(index, category->windowTitle());
+    int i = d_ptr->mRibbonTabBar->insertTab(index, category->categoryName());
 
     _SARibbonTabData tabdata;
 
@@ -414,7 +414,7 @@ SARibbonCategory* SARibbonBar::categoryByName(const QString& title) const
     for (int i = 0; i < c; ++i) {
         SARibbonCategory* w = qobject_cast< SARibbonCategory* >(d_ptr->mStackedContainerWidget->widget(i));
         if (w) {
-            if (w->windowTitle() == title) {
+            if (w->categoryName() == title) {
                 return (w);
             }
         }
@@ -496,7 +496,7 @@ void SARibbonBar::showCategory(SARibbonCategory* category)
     for (auto i = d_ptr->mHidedCategory.begin(); i != d_ptr->mHidedCategory.end(); ++i) {
         if (i->category == category) {
             //说明要显示
-            int index = d_ptr->mRibbonTabBar->insertTab(i->index, i->category->windowTitle());
+            int index = d_ptr->mRibbonTabBar->insertTab(i->index, i->category->categoryName());
             i->index  = index;
             d_ptr->mRibbonTabBar->setTabData(index, QVariant::fromValue(*i));
             d_ptr->mHidedCategory.erase(i);  //移除
@@ -643,6 +643,7 @@ void SARibbonBar::addContextCategory(SARibbonContextCategory* context)
         return;
     }
     connect(context, &SARibbonContextCategory::categoryPageAdded, this, &SARibbonBar::onContextsCategoryPageAdded);
+    connect(context, &SARibbonContextCategory::categoryTitleChanged, this, &SARibbonBar::onContextsCategoryCategoryNameChanged);
     // remove并没有绑定，主要是remove后在stacked里也不会显示，remove且delete的话，stacked里也会删除
     if (currentRibbonStyle() == WpsLiteStyle) {
         resizeInWpsLiteStyle();
@@ -668,7 +669,7 @@ void SARibbonBar::showContextCategory(SARibbonContextCategory* context)
         category->setRibbonPannelLayoutMode(isTwoRowStyle() ? SARibbonPannel::TwoRowMode : SARibbonPannel::ThreeRowMode);
         //切换模式后会改变高度，上下文标签显示时要保证显示出来
         // category->setFixedHeight(categoryHeight());
-        int index = d_ptr->mRibbonTabBar->addTab(category->windowTitle());
+        int index = d_ptr->mRibbonTabBar->addTab(category->categoryName());
         contextCategoryData.tabPageIndex.append(index);
 
         _SARibbonTabData tabdata;
@@ -879,8 +880,16 @@ void SARibbonBar::onWindowIconChanged(const QIcon& i)
     }
 }
 
+/**
+ * @brief category的名字发生改变触发
+ * @param title
+ */
 void SARibbonBar::onCategoryWindowTitleChanged(const QString& title)
 {
+    //全部更新一遍
+    Q_UNUSED(title);
+    updateCategoryTitleToTabName();
+    /*
     SARibbonCategory* w = qobject_cast< SARibbonCategory* >(sender());
 
     if (nullptr == w) {
@@ -896,6 +905,7 @@ void SARibbonBar::onCategoryWindowTitleChanged(const QString& title)
             }
         }
     }
+    */
 }
 
 ///
@@ -992,6 +1002,18 @@ void SARibbonBar::onContextsCategoryPageAdded(SARibbonCategory* category)
 {
     Q_ASSERT_X(category != nullptr, "onContextsCategoryPageAdded", "add nullptr page");
     d_ptr->mStackedContainerWidget->addWidget(category);  //这里stackedWidget用append，其他地方都应该使用insert
+}
+
+/**
+ * @brief 上下文标签管理的标签的名字发生变换
+ * @param category
+ * @param title
+ */
+void SARibbonBar::onContextsCategoryCategoryNameChanged(SARibbonCategory* category, const QString& title)
+{
+    Q_UNUSED(category);
+    Q_UNUSED(title);
+    updateCategoryTitleToTabName();
 }
 
 /**
@@ -1338,6 +1360,26 @@ int SARibbonBar::mainBarHeight() const
     return RibbonSubElementStyleOpt.ribbonBarHeight(currentRibbonStyle());
 }
 
+/**
+ * @brief 更新所有的category title对应的tab名
+ *
+ * 此函数会对所有的category的名字和tab进行匹配，如果匹配不上会重新设置tab名
+ */
+void SARibbonBar::updateCategoryTitleToTabName()
+{
+    SARibbonTabBar* tab = d_ptr->mRibbonTabBar;
+    for (int i = 0; i < tab->count(); ++i) {
+        //鉴于tab不会很多，不考虑效率问题
+        QVariant var = tab->tabData(i);
+        if (var.isValid()) {
+            _SARibbonTabData p = var.value< _SARibbonTabData >();
+            if (p.category && p.category->categoryName() != tab->tabText(i)) {
+                tab->setTabText(i, p.category->categoryName());
+            }
+        }
+    }
+}
+
 void SARibbonBar::paintEvent(QPaintEvent* e)
 {
     Q_UNUSED(e);
@@ -1597,7 +1639,6 @@ void SARibbonBar::moveEvent(QMoveEvent* event)
     if (d_ptr->mStackedContainerWidget) {
         if (d_ptr->mStackedContainerWidget->isPopupMode()) {
             //弹出模式时，窗口发生了移动，同步调整StackedContainerWidget的位置
-            qDebug() << "moveEvent";
             resizeStackedContainerWidget();
         }
     }
