@@ -34,12 +34,20 @@ class SA_RIBBON_EXPORT SARibbonMainWindow : public QMainWindow
     SA_RIBBON_DECLARE_PRIVATE(SARibbonMainWindow)
     Q_PROPERTY(RibbonTheme ribbonTheme READ ribbonTheme WRITE setRibbonTheme)
 public:
+    /**
+     * @brief Ribbon主题，可以通过qss定制ribbon的主题，定制方法可参看源码中office2013.qss
+     *
+     * 注意，由于有些qss的尺寸，在C++代码中无法获取到，因此针对用户自定义的qss主题，有些尺寸是需要手动设置进去的
+     *
+     * 例如ribbon tab的margin信息，在QTabBar是无法获取到，而这个影响了SARibbonContextCategory的绘制，
+     * 因此，在设置qss后需要针对margin信息重新设置进SARibbonTabBar中
+     */
     enum RibbonTheme
     {
         NormalTheme,  ///< 普通主题
         Office2013    ///< office2013主题
     };
-    Q_ENUMS(RibbonTheme)
+    Q_ENUM(RibbonTheme)
 public:
     SARibbonMainWindow(QWidget* parent = nullptr, bool useRibbon = true);
     ~SARibbonMainWindow() Q_DECL_OVERRIDE;
@@ -69,6 +77,8 @@ public:
     void setMenuBar(QMenuBar* menuBar);
 
 protected:
+    //创建ribbonbar的工厂函数
+    SARibbonBar* createRibbonBar();
     void loadTheme(const QString& themeFile);
     virtual void resizeEvent(QResizeEvent* event) Q_DECL_OVERRIDE;
     virtual bool eventFilter(QObject* obj, QEvent* e) Q_DECL_OVERRIDE;

@@ -1,13 +1,15 @@
 ﻿#include "SARibbonMainWindow.h"
 #include <QWindowStateChangeEvent>
-#include "SAFramelessHelper.h"
-#include "SAWindowButtonGroup.h"
-#include "SARibbonBar.h"
 #include <QApplication>
 #include <QDebug>
 #include <QHash>
 #include <QFile>
+#include "SAFramelessHelper.h"
+#include "SAWindowButtonGroup.h"
+#include "SARibbonBar.h"
+#include "SARibbonTabBar.h"
 #include "SARibbonElementManager.h"
+#include "SARibbonDrawHelper.h"
 /**
  * @brief The SARibbonMainWindowPrivate class
  */
@@ -45,7 +47,7 @@ SARibbonMainWindow::SARibbonMainWindow(QWidget* parent, bool useRibbon)
     d_ptr->mUseRibbon = useRibbon;
     if (useRibbon) {
         setRibbonTheme(ribbonTheme());
-        setMenuWidget(new SARibbonBar(this));
+        setMenuWidget(createRibbonBar());
         qDebug() << RibbonSubElementStyleOpt;
 #ifdef Q_OS_UNIX
         //某些系统会对FramelessWindowHint异常
@@ -84,11 +86,9 @@ void SARibbonMainWindow::setRibbonTheme(SARibbonMainWindow::RibbonTheme theme)
     case NormalTheme:
         loadTheme(":/theme/resource/default.qss");
         break;
-
     case Office2013:
         loadTheme(":/theme/resource/office2013.qss");
         break;
-
     default:
         loadTheme(":/theme/resource/default.qss");
         break;
@@ -199,6 +199,38 @@ void SARibbonMainWindow::setMenuBar(QMenuBar* menuBar)
             d_ptr->mWindowButtonGroup->hide();
         }
     }
+}
+
+/**
+ * @brief 创建ribbonbar的工厂函数
+ * @return
+ */
+SARibbonBar* SARibbonMainWindow::createRibbonBar()
+{
+    SARibbonBar* bar = new SARibbonBar(this);
+    switch (ribbonTheme()) {
+    case NormalTheme:
+        break;
+    case Office2013: {
+        //在设置qss后需要针对margin信息重新设置进SARibbonTabBar中
+        // office2013.qss的margin信息如下设置，em是字符M所对应的宽度的长度
+        // margin-top: 0em;
+        // margin-right: 0em;
+        // margin-left: 0.2em;
+        // margin-bottom: 0em;
+
+        SARibbonTabBar* tab = bar->ribbonTabBar();
+        if (!tab) {
+            break;
+        }
+        QFontMetrics fm = tab->fontMetrics();
+        int emWidth     = SA_FONTMETRICS_WIDTH(fm, "M");
+        tab->setTabMargin(QMargins(0.2 * emWidth, 0, 0, 0));
+    } break;
+    default:
+        break;
+    }
+    return bar;
 }
 
 void SARibbonMainWindow::resizeEvent(QResizeEvent* event)

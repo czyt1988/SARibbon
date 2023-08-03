@@ -160,7 +160,7 @@ SARibbonPannel* SARibbonCategory::PrivateData::insertPannel(const QString& title
 {
     SARibbonPannel* pannel = RibbonSubElementDelegate->createRibbonPannel(ribbonCategory());
 
-    pannel->setWindowTitle(title);
+    pannel->setPannelName(title);
     pannel->setObjectName(title);
     insertPannel(index, pannel);
     return (pannel);
@@ -608,7 +608,7 @@ SARibbonPannel* SARibbonCategory::pannelByName(const QString& title) const
 {
     for (const SAPrivateRibbonCategoryItem& i : qAsConst(d_ptr->mItemList)) {
         if (i.pannelWidget) {
-            if (i.pannelWidget->windowTitle() == title) {
+            if (i.pannelWidget->pannelName() == title) {
                 return (i.pannelWidget);
             }
         }

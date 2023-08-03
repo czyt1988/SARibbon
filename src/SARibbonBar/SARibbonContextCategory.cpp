@@ -44,19 +44,36 @@ SARibbonContextCategory::~SARibbonContextCategory()
 {
 }
 
+/**
+ * @brief 添加标签
+ * @param title 标签名字
+ */
 SARibbonCategory* SARibbonContextCategory::addCategoryPage(const QString& title)
 {
-    SAPrivateRibbonCategoryData catData;
     SARibbonCategory* category = RibbonSubElementDelegate->createRibbonCategory(parentWidget());
+    category->setCategoryName(title);
+    addCategoryPage(category);
+    return (category);
+}
 
+/**
+ * @brief 添加标签
+ * @param page
+ */
+void SARibbonContextCategory::addCategoryPage(SARibbonCategory* category)
+{
+    if (isHaveCategory(category)) {
+        // cn:SARibbonContextCategory已经持有标签：%1，将跳过
+        qWarning() << tr("SARibbonContextCategory have category %1,will skip").arg(category->categoryName());
+        return;
+    }
     category->markIsContextCategory(true);
-    category->setWindowTitle(title);
+    connect(category, &SARibbonCategory::windowTitleChanged, this, &SARibbonContextCategory::onCategoryTitleChanged);
+    SAPrivateRibbonCategoryData catData;
     catData.categoryPage = category;
     d_ptr->categoryDataList.append(catData);
     category->installEventFilter(this);
     emit categoryPageAdded(category);
-
-    return (category);
 }
 
 int SARibbonContextCategory::categoryCount() const
@@ -123,10 +140,12 @@ QString SARibbonContextCategory::contextTitle() const
 /**
  * @brief 设置上下文标签的标题，标题仅在office模式下显示 @ref SARibbonBar::RibbonStyle
  * @param contextTitle
+ * @note 此函数会触发信号@sa contextTitleChanged
  */
 void SARibbonContextCategory::setContextTitle(const QString& contextTitle)
 {
     d_ptr->contextTitle = contextTitle;
+    emit contextTitleChanged(contextTitle);
 }
 
 /**
@@ -167,4 +186,27 @@ bool SARibbonContextCategory::takeCategory(SARibbonCategory* category)
         }
     }
     return (false);
+}
+
+/**
+ * @brief 判断上下文是否维护了此SARibbonCategory
+ * @param category
+ * @return
+ */
+bool SARibbonContextCategory::isHaveCategory(SARibbonCategory* category) const
+{
+    for (int i = 0; i < d_ptr->categoryDataList.size(); ++i) {
+        if (d_ptr->categoryDataList[ i ].categoryPage == category) {
+            return (true);
+        }
+    }
+    return (false);
+}
+
+void SARibbonContextCategory::onCategoryTitleChanged(const QString& title)
+{
+    SARibbonCategory* category = qobject_cast< SARibbonCategory* >(sender());
+    if (category) {
+        emit categoryTitleChanged(category, title);
+    }
 }
