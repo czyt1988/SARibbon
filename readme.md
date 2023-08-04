@@ -15,6 +15,21 @@ MIT protocol, welcome to use and make comments
 
 # Compile
 
+## Import into project (static)
+
+SARibbon provides amalgamated `SARibbon.h` and `SARibbon.cpp` files, which can be imported into the project and used without the need to compile them into a dynamic library. You can refer to the example of SimpleExample (located in `src/example/SimpleExample`), and use the following four files for static import:
+
+```
+SARibbon.h
+SARibbon.cpp
+SARibbon.pri
+SARibbonBar/resource.qrc
+```
+
+If using cmake, only the three files `SARibbon.h` `SARibbon.cpp`, and `resource.qrc` are required
+
+## Compile as Library (Dynamic)
+
 Open `SARibbon.pro` directly using Qt Creator, and compile it.  The SARibbonBar library and an example (there is only one example at present) will be compiled.  The directories of lib and examples are located in bin_ Qt{Qt version}_ {debug/release}_ {32/64}` under directory.
 
 > 'd' will be added after the library compiled in debug mode for distinction
