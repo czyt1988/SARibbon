@@ -139,7 +139,7 @@ set_target_properties(${SARIBBONBAR_LIB_NAME} PROPERTIES
 # 构建库定义的宏
 target_compile_definitions(${SARIBBONBAR_LIB_NAME} PRIVATE SA_RIBBON_BAR_MAKE_LIB)
 # 使用SAColorWidgets但不作为库使用定义的宏
-target_compile_definitions(${SARIBBONBAR_LIB_NAME} PRIVATE SA_COLOR_WIDGETS_NO_DLL)
+target_compile_definitions(${SARIBBONBAR_LIB_NAME} PRIVATE SA_COLOR_WIDGETS_MAKE_LIB)
 
 
 target_include_directories(${SARIBBONBAR_LIB_NAME} PUBLIC

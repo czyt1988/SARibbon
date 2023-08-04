@@ -12,6 +12,7 @@ build*
 tmp
 tmp-file
 .$*
+.vs
 
 # vscode 的隐藏文件
 /.vscode
