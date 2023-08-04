@@ -36,19 +36,22 @@ set_target_properties(${SARIBBON_EXPAMPLE_NAME} PROPERTIES
 
 install(TARGETS ${SARIBBON_EXPAMPLE_NAME} RUNTIME DESTINATION bin LIBRARY DESTINATION bin ARCHIVE DESTINATION lib)
 
-if(WIN32)
-    add_custom_command(TARGET ${SARIBBON_EXPAMPLE_NAME}
-        POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E
-                copy_if_different 
-                    "$<TARGET_FILE:SARibbonBar>" 
-                    "$<TARGET_FILE_DIR:${SARIBBON_EXPAMPLE_NAME}>"
-    )
-	create_win32_resource_version(
-		TARGET ${SARIBBON_EXPAMPLE_NAME}
-		FILENAME ${SARIBBON_EXPAMPLE_NAME}
-		EXT "exe"
-		DESCRIPTION "Example application for Qt Ribbon Control"
-	)
-	visual_studio_qt_helper(${SARIBBON_EXPAMPLE_NAME})
-endif()
+# 会有一个FAILED: src/example/MainWindowExample/CMakeFiles/MainWindowExample.dir/MainWindowExample.rc.res 
+# 暂时注释
+# 
+# if(WIN32)
+#     add_custom_command(TARGET ${SARIBBON_EXPAMPLE_NAME}
+#         POST_BUILD
+#         COMMAND ${CMAKE_COMMAND} -E
+#                 copy_if_different 
+#                     "$<TARGET_FILE:SARibbonBar>" 
+#                     "$<TARGET_FILE_DIR:${SARIBBON_EXPAMPLE_NAME}>"
+#     )
+# 	create_win32_resource_version(
+# 		TARGET ${SARIBBON_EXPAMPLE_NAME}
+# 		FILENAME ${SARIBBON_EXPAMPLE_NAME}
+# 		EXT "exe"
+# 		DESCRIPTION "Example application for Qt Ribbon Control"
+# 	)
+# 	visual_studio_qt_helper(${SARIBBON_EXPAMPLE_NAME})
+# endif()
