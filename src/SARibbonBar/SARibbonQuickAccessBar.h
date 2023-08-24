@@ -5,7 +5,7 @@
 #include <QMenu>
 #include <QToolButton>
 class SARibbonToolButton;
-
+class SARibbonButtonGroupWidget;
 ///
 /// \brief ribbon左上顶部的快速响应栏
 ///
@@ -20,6 +20,12 @@ public:
     void addAction(QAction* act);
     void addWidget(QWidget* w);
     void addMenu(QMenu* m, QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
+    //获取内部管理的ButtonGroupWidget
+    SARibbonButtonGroupWidget* buttonGroupWidget();
+    const SARibbonButtonGroupWidget* buttonGroupWidget() const;
+    // icon 尺寸设置
+    void setIconSize(const QSize& s);
+    QSize iconSize() const;
 };
 
 #endif  // SARIBBONQUICKACCESSBAR_H

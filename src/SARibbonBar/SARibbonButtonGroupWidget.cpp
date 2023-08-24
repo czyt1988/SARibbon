@@ -38,9 +38,10 @@ public:
 
 public:
     QList< SAPrivateRibbonButtonGroupWidgetItem > mItems;  ///< 用于记录所有管理的item
+    QSize mIconSize;
 };
 
-SARibbonButtonGroupWidget::PrivateData::PrivateData(SARibbonButtonGroupWidget* p) : q_ptr(p)
+SARibbonButtonGroupWidget::PrivateData::PrivateData(SARibbonButtonGroupWidget* p) : q_ptr(p), mIconSize(18, 18)
 {
 }
 
@@ -161,6 +162,27 @@ QSize SARibbonButtonGroupWidget::minimumSizeHint() const
 }
 
 /**
+ * @brief 设置icon尺寸
+ * @param s
+ */
+void SARibbonButtonGroupWidget::setIconSize(const QSize& s)
+{
+    d_ptr->mIconSize = s;
+    //迭代已经保存的button
+    const QObjectList& objlist = children();
+    for (QObject* obj : objlist) {
+        if (SARibbonToolButton* btn = qobject_cast< SARibbonToolButton* >(obj)) {
+            btn->setIconSize(s);
+        }
+    }
+}
+
+QSize SARibbonButtonGroupWidget::iconSize() const
+{
+    return d_ptr->mIconSize;
+}
+
+/**
  * @brief 处理action的事件
  *
  * 这里处理了ActionAdded，ActionChanged，ActionRemoved三个事件
@@ -192,6 +214,7 @@ void SARibbonButtonGroupWidget::actionEvent(QActionEvent* e)
         if (!item.widget) {
             SARibbonToolButton* button = RibbonSubElementDelegate->createRibbonToolButton(this);
             button->setAutoRaise(true);
+            button->setIconSize(d_ptr->mIconSize);
             button->setFocusPolicy(Qt::NoFocus);
             button->setButtonType(SARibbonToolButton::SmallButton);
             button->setToolButtonStyle(Qt::ToolButtonIconOnly);

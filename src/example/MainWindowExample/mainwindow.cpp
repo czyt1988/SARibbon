@@ -624,13 +624,15 @@ void MainWindow::createCategoryOther(SARibbonCategory* page)
     page->addPannel(pannel1);
     //按钮组
     SARibbonButtonGroupWidget* btnGroup1 = new SARibbonButtonGroupWidget(pannel1);
+    btnGroup1->setIconSize(QSize(24, 24));
     btnGroup1->addAction(createAction(tr("Decrease Margin"), ":/icon/icon/Decrease-Margin.svg"));
     btnGroup1->addAction(createAction(tr("Decrease Indent"), ":/icon/icon/Decrease-Indent.svg"));
     btnGroup1->addAction(createAction(tr("Wrap Image Left"), ":/icon/icon/Wrap-Image Left.svg"));
     btnGroup1->addAction(createAction(tr("Wrap Image Right"), ":/icon/icon/Wrap-Image Right.svg"));
     pannel1->addWidget(btnGroup1, SARibbonPannelItem::Medium);
     SARibbonButtonGroupWidget* btnGroup2 = new SARibbonButtonGroupWidget(pannel1);
-    QAction* titleAlgnment               = createAction(tr("Align Right"), ":/icon/icon/Align-Right.svg");
+    btnGroup2->setIconSize(QSize(24, 24));
+    QAction* titleAlgnment = createAction(tr("Align Right"), ":/icon/icon/Align-Right.svg");
     titleAlgnment->setProperty("align", (int)Qt::AlignRight | Qt::AlignVCenter);
     btnGroup2->addAction(titleAlgnment);
     titleAlgnment = createAction(tr("Align Left"), ":/icon/icon/Align-Left.svg");

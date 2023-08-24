@@ -24,7 +24,9 @@ public:
     QAction* addWidget(QWidget* w);
     QSize sizeHint() const Q_DECL_OVERRIDE;
     QSize minimumSizeHint() const Q_DECL_OVERRIDE;
-
+    //设置icon尺寸
+    void setIconSize(const QSize& s);
+    QSize iconSize() const;
 signals:
 
     /**
