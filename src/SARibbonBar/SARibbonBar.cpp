@@ -213,6 +213,18 @@ public:
             }
         }
     }
+    /**
+     * @brief 通过输入高度计算iconSize
+     * @param h
+     * @return
+     */
+    static QSize calcIconSizeByHeight(int h)
+    {
+        if (h - 6 > 20) {
+            return QSize(h - 6, h - 6);
+        }
+        return QSize(h - 4, h - 4);
+    }
 };
 
 //===================================================
@@ -1676,7 +1688,13 @@ void SARibbonBar::resizeInOfficeStyle()
                 d_ptr->mQuickAccessBar->setFixedHeight(validTitleBarHeight);
             }
             QSize quickAccessBarSize = d_ptr->mQuickAccessBar->sizeHint();
-            d_ptr->mQuickAccessBar->setGeometry(x, y, quickAccessBarSize.width(), validTitleBarHeight);
+            //上下留1px的边线
+            d_ptr->mQuickAccessBar->setGeometry(x, y + 1, quickAccessBarSize.width(), validTitleBarHeight - 2);
+            //变更iconsize
+            QSize btnIconSize = PrivateData::calcIconSizeByHeight(validTitleBarHeight - 2);
+            if (btnIconSize != d_ptr->mQuickAccessBar->iconSize()) {
+                d_ptr->mQuickAccessBar->setIconSize(btnIconSize);
+            }
         }
     }
     //第二行，开始布局applicationButton，tabbar，tabBarRightSizeButtonGroupWidget，TopRightCorner
@@ -1714,7 +1732,13 @@ void SARibbonBar::resizeInOfficeStyle()
     if (d_ptr->mRightButtonGroup && d_ptr->mRightButtonGroup->isVisible()) {
         QSize wSize = d_ptr->mRightButtonGroup->sizeHint();
         endX -= wSize.width();
-        d_ptr->mRightButtonGroup->setGeometry(endX, y, wSize.width(), tabH);
+        //上下留1px的边线
+        d_ptr->mRightButtonGroup->setGeometry(endX, y + 1, wSize.width(), tabH - 2);
+        //变更iconsize
+        QSize btnIconSize = PrivateData::calcIconSizeByHeight(tabH - 2);
+        if (btnIconSize != d_ptr->mRightButtonGroup->iconSize()) {
+            d_ptr->mRightButtonGroup->setIconSize(btnIconSize);
+        }
     }
     //最后确定tabbar宽度
     int tabBarWidth = endX - x;
@@ -1753,14 +1777,26 @@ void SARibbonBar::resizeInWpsLiteStyle()
     if (d_ptr->mRightButtonGroup && d_ptr->mRightButtonGroup->isVisible()) {
         QSize wSize = d_ptr->mRightButtonGroup->sizeHint();
         endX -= wSize.width();
-        d_ptr->mRightButtonGroup->setGeometry(endX, y, wSize.width(), validTitleBarHeight);
+        //上下留1px的边线
+        d_ptr->mRightButtonGroup->setGeometry(endX, y + 1, wSize.width(), validTitleBarHeight - 2);
+        //变更iconsize
+        QSize btnIconSize = PrivateData::calcIconSizeByHeight(validTitleBarHeight - 2);
+        if (btnIconSize != d_ptr->mRightButtonGroup->iconSize()) {
+            d_ptr->mRightButtonGroup->setIconSize(btnIconSize);
+        }
     }
     // quick access bar定位
     if (d_ptr->mQuickAccessBar) {
         if (d_ptr->mQuickAccessBar->isVisible()) {
             QSize quickAccessBarSize = d_ptr->mQuickAccessBar->sizeHint();
             endX -= quickAccessBarSize.width();
-            d_ptr->mQuickAccessBar->setGeometry(endX, y, quickAccessBarSize.width(), validTitleBarHeight);
+            //上下留1px的边线
+            d_ptr->mQuickAccessBar->setGeometry(endX, y + 1, quickAccessBarSize.width(), validTitleBarHeight - 2);
+            //变更iconsize
+            QSize btnIconSize = PrivateData::calcIconSizeByHeight(validTitleBarHeight - 2);
+            if (btnIconSize != d_ptr->mQuickAccessBar->iconSize()) {
+                d_ptr->mQuickAccessBar->setIconSize(btnIconSize);
+            }
         }
     }
     // cornerWidget - TopLeftCorner
