@@ -1,7 +1,7 @@
 ﻿#include "mainwindow.h"
 #include <QApplication>
-#include <QElapsedTimer>
 #include <QDebug>
+#include <QElapsedTimer>
 
 //重定向qdebug的打印
 void log_out_put(QtMsgType type, const QMessageLogContext& context, const QString& msg);
@@ -55,14 +55,12 @@ int main(int argc, char* argv[])
 #endif
     qInstallMessageHandler(log_out_put);
     QFont f = a.font();
-
     f.setFamily("微软雅黑");
     a.setFont(f);
     QElapsedTimer cost;
 
     cost.start();
     MainWindow w;
-
     qDebug() << "window build cost:" << cost.elapsed() << " ms";
     w.show();
 

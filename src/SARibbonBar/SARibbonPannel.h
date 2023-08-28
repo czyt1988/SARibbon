@@ -1,11 +1,11 @@
 ﻿#ifndef SARIBBONPANNEL_H
 #define SARIBBONPANNEL_H
 #include "SARibbonGlobal.h"
-#include <QWidget>
-#include <QLayout>
-#include "SARibbonToolButton.h"
-#include "SARibbonPannelLayout.h"
 #include "SARibbonPannelItem.h"
+#include "SARibbonPannelLayout.h"
+#include "SARibbonToolButton.h"
+#include <QLayout>
+#include <QWidget>
 class SARibbonMenu;
 class SARibbonGallery;
 class QGridLayout;
@@ -23,8 +23,7 @@ class SARibbonPannelOptionButton;
  * pannel的布局通过@ref SARibbonPannelLayout 来实现，如果有其他布局，可以通过继承@ref
  * SARibbonElementCreateDelegate::createRibbonPannel 函数返回带有自己布局的pannel，但你必须继承对应的虚函数
  */
-class SA_RIBBON_EXPORT SARibbonPannel : public QWidget
-{
+class SA_RIBBON_EXPORT SARibbonPannel : public QWidget {
     Q_OBJECT
     SA_RIBBON_DECLARE_PRIVATE(SARibbonPannel)
     friend class SARibbonCategory;
@@ -39,10 +38,9 @@ public:
     SARibbonPannel(const QString& name, QWidget* parent = nullptr);
     ~SARibbonPannel() Q_DECL_OVERRIDE;
     using QWidget::addAction;
-    enum PannelLayoutMode
-    {
-        ThreeRowMode,  ///< 三行布局模式，office就是三行布局模式，pannel能布置3行小toolbutton，默认模式
-        TwoRowMode  ///< 两行布局模式，wps的后续布局模式就是两行布局模式，pannel能布置2行小toolbutton
+    enum PannelLayoutMode {
+        ThreeRowMode, ///< 三行布局模式，office就是三行布局模式，pannel能布置3行小toolbutton，默认模式
+        TwoRowMode ///< 两行布局模式，wps的后续布局模式就是两行布局模式，pannel能布置2行小toolbutton
     };
 
     //把action的行属性设置进action中，action自身携带了行属性
@@ -70,14 +68,14 @@ public:
     void addAction(QAction* act, QToolButton::ToolButtonPopupMode popMode, SARibbonPannelItem::RowProportion rp = SARibbonPannelItem::Large);
 
     QAction* addAction(const QString& text,
-                       const QIcon& icon,
-                       QToolButton::ToolButtonPopupMode popMode,
-                       SARibbonPannelItem::RowProportion rp = SARibbonPannelItem::Large);
+        const QIcon& icon,
+        QToolButton::ToolButtonPopupMode popMode,
+        SARibbonPannelItem::RowProportion rp = SARibbonPannelItem::Large);
 
     //添加menu
     SARibbonToolButton* addMenu(QMenu* menu,
-                                SARibbonPannelItem::RowProportion rp,
-                                QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
+        SARibbonPannelItem::RowProportion rp,
+        QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
 
     //添加action menu
     SARibbonToolButton* addActionMenu(QAction* action, QMenu* menu, SARibbonPannelItem::RowProportion rp);
@@ -119,7 +117,7 @@ public:
     bool isHaveOptionAction() const;
 
     //获取所有的buttons
-    QList< SARibbonToolButton* > ribbonToolButtons() const;
+    QList<SARibbonToolButton*> ribbonToolButtons() const;
 
     //获取PannelLayoutMode
     PannelLayoutMode pannelLayoutMode() const;
@@ -162,7 +160,7 @@ public:
     //大图标的高度
     int largeHeight() const;
     //获取布局对应的item
-    const QList< SARibbonPannelItem* >& ribbonPannelItem() const;
+    const QList<SARibbonPannelItem*>& ribbonPannelItem() const;
     //全局的标题栏高度
     static int pannelTitleHeight();
     static void setPannelTitleHeight(int h);
@@ -179,10 +177,12 @@ protected:
     void setPannelLayoutMode(PannelLayoutMode mode);
     void resetLayout(PannelLayoutMode newmode);
     void resetLargeToolButtonStyle();
-    static QSize maxHightIconSize(const QSize& size, int h);
+
+protected:
     virtual void paintEvent(QPaintEvent* event) Q_DECL_OVERRIDE;
     virtual void resizeEvent(QResizeEvent* event) Q_DECL_OVERRIDE;
     virtual void actionEvent(QActionEvent* e) Q_DECL_OVERRIDE;
+    virtual void changeEvent(QEvent* e) Q_DECL_OVERRIDE;
 };
 
-#endif  // SARIBBONPANNEL_H
+#endif // SARIBBONPANNEL_H

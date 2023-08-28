@@ -5,6 +5,8 @@ build*
 *.dll
 *.lib
 *.zip
+*.tar
+*.tar.gz
 *.user.*
 ~*.pptx
 ~*.docx

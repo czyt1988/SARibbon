@@ -1,34 +1,34 @@
 ﻿#include "SARibbonMainWindow.h"
-#include <QWindowStateChangeEvent>
+#include "SAFramelessHelper.h"
+#include "SARibbonBar.h"
+#include "SARibbonDrawHelper.h"
+#include "SARibbonElementManager.h"
+#include "SARibbonTabBar.h"
+#include "SAWindowButtonGroup.h"
 #include <QApplication>
 #include <QDebug>
-#include <QHash>
 #include <QFile>
-#include "SAFramelessHelper.h"
-#include "SAWindowButtonGroup.h"
-#include "SARibbonBar.h"
-#include "SARibbonTabBar.h"
-#include "SARibbonElementManager.h"
-#include "SARibbonDrawHelper.h"
+#include <QHash>
+#include <QWindowStateChangeEvent>
 /**
  * @brief The SARibbonMainWindowPrivate class
  */
-class SARibbonMainWindow::PrivateData
-{
+class SARibbonMainWindow::PrivateData {
     SA_RIBBON_DECLARE_PUBLIC(SARibbonMainWindow)
 public:
     PrivateData(SARibbonMainWindow* p);
     void init();
 
 public:
-    SARibbonMainWindow::RibbonTheme mCurrentRibbonTheme { SARibbonMainWindow::Office2013 };
-    SARibbonBar* mRibbonBar { nullptr };
-    SAWindowButtonGroup* mWindowButtonGroup { nullptr };
-    SAFramelessHelper* mFramelessHelper { nullptr };
-    bool mUseRibbon { true };
+    SARibbonMainWindow::RibbonTheme mCurrentRibbonTheme{ SARibbonMainWindow::Office2013 };
+    SARibbonBar* mRibbonBar{ nullptr };
+    SAWindowButtonGroup* mWindowButtonGroup{ nullptr };
+    SAFramelessHelper* mFramelessHelper{ nullptr };
+    bool mUseRibbon{ true };
 };
 
-SARibbonMainWindow::PrivateData::PrivateData(SARibbonMainWindow* p) : q_ptr(p)
+SARibbonMainWindow::PrivateData::PrivateData(SARibbonMainWindow* p)
+    : q_ptr(p)
 {
 }
 
@@ -41,7 +41,8 @@ void SARibbonMainWindow::PrivateData::init()
 //===================================================
 
 SARibbonMainWindow::SARibbonMainWindow(QWidget* parent, bool useRibbon)
-    : QMainWindow(parent), d_ptr(new SARibbonMainWindow::PrivateData(this))
+    : QMainWindow(parent)
+    , d_ptr(new SARibbonMainWindow::PrivateData(this))
 {
     d_ptr->init();
     d_ptr->mUseRibbon = useRibbon;
@@ -132,7 +133,7 @@ Qt::WindowFlags SARibbonMainWindow::windowButtonFlags() const
 void SARibbonMainWindow::setMenuWidget(QWidget* menubar)
 {
     QMainWindow::setMenuWidget(menubar);
-    SARibbonBar* bar = qobject_cast< SARibbonBar* >(menubar);
+    SARibbonBar* bar = qobject_cast<SARibbonBar*>(menubar);
 
     if (bar) {
         d_ptr->mRibbonBar = bar;
@@ -167,8 +168,14 @@ void SARibbonMainWindow::setMenuWidget(QWidget* menubar)
 
 void SARibbonMainWindow::setMenuBar(QMenuBar* menuBar)
 {
+    QMenuBar* old = QMainWindow::menuBar();
+    if (old) {
+        //如果之前已经设置了menubar，要把之前的删除
+        old->deleteLater();
+    }
+
     QMainWindow::setMenuBar(menuBar);
-    SARibbonBar* bar = qobject_cast< SARibbonBar* >(menuBar);
+    SARibbonBar* bar = qobject_cast<SARibbonBar*>(menuBar);
 
     if (bar) {
         d_ptr->mRibbonBar = bar;
@@ -224,19 +231,20 @@ SARibbonBar* SARibbonMainWindow::createRibbonBar()
             break;
         }
         QFontMetrics fm = tab->fontMetrics();
-        int emWidth     = SA_FONTMETRICS_WIDTH(fm, "M");
+        int emWidth = SA_FONTMETRICS_WIDTH(fm, "M");
         tab->setTabMargin(QMargins(0.2 * emWidth, 0, 0, 0));
     } break;
     default:
         break;
     }
+    bar->setContentsMargins(3, 0, 3, 0);
     return bar;
 }
 
 void SARibbonMainWindow::resizeEvent(QResizeEvent* event)
 {
     if (d_ptr->mRibbonBar) {
-        if (d_ptr->mRibbonBar->size().width() != this->size().width()) {
+        if (d_ptr->mRibbonBar->size().width() != (this->size().width())) {
             d_ptr->mRibbonBar->setFixedWidth(this->size().width());
         }
         if (d_ptr->mWindowButtonGroup) {
