@@ -1,4 +1,5 @@
-﻿add_subdirectory(SARibbonBar)
+﻿add_subdirectory(SARibbonBar/Framelesswindow)
+add_subdirectory(SARibbonBar)
 if(BUILD_EXAMPLES)
     message(STATUS "build example")
     add_subdirectory(example)

@@ -122,7 +122,8 @@ add_library(${SARIBBONBAR_LIB_NAME} SHARED
 target_link_libraries(${SARIBBONBAR_LIB_NAME} PUBLIC
                       Qt${QT_VERSION_MAJOR}::Core
                       Qt${QT_VERSION_MAJOR}::Gui
-                      Qt${QT_VERSION_MAJOR}::Widgets)
+                      Qt${QT_VERSION_MAJOR}::Widgets
+		              Framelesswindow)
 
 set_target_properties(${SARIBBONBAR_LIB_NAME} PROPERTIES
     AUTOMOC ON
