@@ -38,7 +38,7 @@ set(FRAMLESSWINDOW_INSTALL_DIR Framelesswindow)
 #		COMPATIBILITY SameMajorVersion
 #)
 install(FILES
-		${SARIBBON_HEADER_FILES}
+		${_header}
 		DESTINATION include/${FRAMLESSWINDOW_INSTALL_DIR}
 		COMPONENT headers
 )
