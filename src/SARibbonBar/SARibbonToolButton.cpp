@@ -483,6 +483,9 @@ QSize SARibbonToolButton::PrivateData::calcLargeButtonSizeHint(const QStyleOptio
     int w    = 0;
     int h    = opt.fontMetrics.lineSpacing() * 4.5;  // 3*1.5
     int minW = h * 0.75;  //最小宽度，在pannel里面的按钮，最小宽度要和icon适应
+    if (mDrawIconRect.isValid()) {
+        minW = mDrawIconRect.height();
+    }
     if (SARibbonPannel* pannel = qobject_cast< SARibbonPannel* >(q_ptr->parent())) {
         //对于建立在SARibbonPannel的基础上的大按钮，把高度设置为SARibbonPannel计算的大按钮高度
         h = pannel->largeHeight();
