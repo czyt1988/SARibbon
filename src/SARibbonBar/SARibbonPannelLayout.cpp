@@ -419,7 +419,8 @@ void SARibbonPannelLayout::updateGeomArray(const QRect& setrect)
             continue;
         }
 
-        QSize hint           = item->sizeHint();
+        QSize hint = item->sizeHint();
+
         Qt::Orientations exp = item->expandingDirections();
         if (item->widget()) {
             //有窗口是水平扩展，则标记为扩展
