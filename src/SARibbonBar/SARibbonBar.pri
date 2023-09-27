@@ -1,3 +1,6 @@
+
+include($$PWD/3rdparty/framelesshelper/qmake/core.pri)
+include($$PWD/3rdparty/framelesshelper/qmake/widgets.pri)
 #-------------------------------------------------
 #
 # SARibbon的文件

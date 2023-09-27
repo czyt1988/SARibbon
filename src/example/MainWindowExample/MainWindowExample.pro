@@ -5,23 +5,23 @@
 #-------------------------------------------------
 
 QT       += core gui
-
+CONFIG += c++17
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = SARibbonMainWindowExample
 TEMPLATE = app
 
 SOURCES += main.cpp\
-    mainwindow.cpp 
+    mainwindow.cpp
 
 HEADERS  += \
-    mainwindow.h 
+    mainwindow.h
 
 RESOURCES += \
     saribbonresouce.qrc \
 
-# ������ʾ����ΰ�SARibbon����
-# ֻ��Ҫ����2�仰��ֻҪ��common.pri���빤�̣��Ϳ���ʵ��SARibbon������
+# 下面演示了如何把SARibbon引入
+# 只需要下面2句话，只要把common.pri引入工程，就可以实现SARibbon的引入
 include($$PWD/../../../common.pri)
 include($${SARIBBONBAR_PRI_FILE_PATH})
 

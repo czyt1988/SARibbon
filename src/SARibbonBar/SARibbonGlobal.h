@@ -5,6 +5,13 @@
 
 //! 版本记录：
 //!
+//! 2023-09-27 -> 0.7.0
+//! 添加了第三方的无边框方案（https://github.com/wangwenx190/framelesshelper），用以解决linux、mac等问题平台的问题
+//!
+//! 2023-09-27 -> 0.6.0
+//! 添加了Amalgamate，修正了一些显示的bug，修正cmake的异常
+//! 添加了上下文标签中category标题名字改变的信号
+//!
 //! 2023-05-28 -> 0.5.0
 //! 调整了大按钮模式下的显示方案，去除了原来SARibbonToolButton的Lite和Normal模式，以WordWrap来表征
 //! 支持文字自定义换行
@@ -29,13 +36,13 @@
  * @def ribbon的数字版本 MAJ.{MIN}.PAT
  */
 #ifndef SA_RIBBON_BAR_VERSION_MIN
-#define SA_RIBBON_BAR_VERSION_MIN 6
+#define SA_RIBBON_BAR_VERSION_MIN 7
 #endif
 /**
  * @def ribbon的数字版本 MAJ.MIN.{PAT}
  */
 #ifndef SA_RIBBON_BAR_VERSION_PAT
-#define SA_RIBBON_BAR_VERSION_PAT 1
+#define SA_RIBBON_BAR_VERSION_PAT 0
 #endif
 
 /**
@@ -76,5 +83,10 @@
     friend class classname;                                                                                            \
     classname* q_ptr { nullptr };
 #endif
+
+/**
+ * @def 定义此宏用第三方的frameless作为无边框方案
+ */
+#define SARIBBON_USE_3RDPARTY_FRAMELESSHELPER 1
 
 #endif  // SARIBBONGLOBAL_H

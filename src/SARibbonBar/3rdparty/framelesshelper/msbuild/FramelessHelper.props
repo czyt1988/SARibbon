@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <LibraryPath>$(MSBuildThisFileDirectory)..\lib;$(MSBuildThisFileDirectory)..\lib\debug;$(MSBuildThisFileDirectory)..\lib\release;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Label="QtSettings">
+    <QtHeaderSearchPath>$(MSBuildThisFileDirectory)..\include;$(MSBuildThisFileDirectory)..\include\FramelessHelper;$(MSBuildThisFileDirectory)..\include\FramelessHelper\Core;$(MSBuildThisFileDirectory)..\include\FramelessHelper\Core\private;$(MSBuildThisFileDirectory)..\include\FramelessHelper\Widgets;$(MSBuildThisFileDirectory)..\include\FramelessHelper\Widgets\private;$(MSBuildThisFileDirectory)..\include\FramelessHelper\Quick;$(MSBuildThisFileDirectory)..\include\FramelessHelper\Quick\private;$(QtHeaderSearchPath)</QtHeaderSearchPath>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies Condition="'$(Configuration)'=='Debug'">FramelessHelperCore64d.lib;FramelessHelperWidgets64d.lib;FramelessHelperQuick64d.lib;%(AdditionalDependencies);</AdditionalDependencies>
+      <AdditionalDependencies Condition="'$(Configuration)'=='Release'">FramelessHelperCore64.lib;FramelessHelperWidgets64.lib;FramelessHelperQuick64.lib;%(AdditionalDependencies);</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+</Project>
