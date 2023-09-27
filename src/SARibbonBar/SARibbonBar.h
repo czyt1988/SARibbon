@@ -12,6 +12,7 @@ class SARibbonElementFactory;
 class SARibbonTabBar;
 class SARibbonButtonGroupWidget;
 class SARibbonQuickAccessBar;
+class SARibbonStackedWidget;
 
 /**
  * @brief SARibbonBar继承于QMenuBar,在SARibbonMainWindow中直接替换了原来的QMenuBar
@@ -87,7 +88,8 @@ class SARibbonQuickAccessBar;
  * }
  * @endcode
  */
-class SA_RIBBON_EXPORT SARibbonBar : public QMenuBar {
+class SA_RIBBON_EXPORT SARibbonBar : public QMenuBar
+{
     Q_OBJECT
     SA_RIBBON_DECLARE_PRIVATE(SARibbonBar)
     Q_PROPERTY(RibbonStyle ribbonStyle READ currentRibbonStyle WRITE setRibbonStyle)
@@ -100,20 +102,22 @@ public:
     /**
      * @brief 定义ribbon的风格,第一字节代表样式，第二字节代表是否是2行
      */
-    enum RibbonStyle {
-        OfficeStyle = 0x0000, ///< 类似office 的ribbon风格
-        WpsLiteStyle = 0x0001, ///< 类似wps的紧凑风格
-        OfficeStyleTwoRow = 0x0100, ///< 类似office 的ribbon风格 2行工具栏 三行布局模式，office就是三行布局模式，pannel能布置3行小toolbutton，默认模式
-        WpsLiteStyleTwoRow = 0x0101 ///< 类似wps的紧凑风格  2行工具栏
+    enum RibbonStyle
+    {
+        OfficeStyle        = 0x0000,  ///< 类似office 的ribbon风格
+        WpsLiteStyle       = 0x0001,  ///< 类似wps的紧凑风格
+        OfficeStyleTwoRow  = 0x0100,  ///< 类似office 的ribbon风格 2行工具栏 三行布局模式，office就是三行布局模式，pannel能布置3行小toolbutton，默认模式
+        WpsLiteStyleTwoRow = 0x0101   ///< 类似wps的紧凑风格  2行工具栏
     };
     Q_ENUM(RibbonStyle)
 
     /**
      * @brief 定义当前ribbon 的状态
      */
-    enum RibbonMode {
-        MinimumRibbonMode, ///< 缩小模式
-        NormalRibbonMode ///< 正常模式
+    enum RibbonMode
+    {
+        MinimumRibbonMode,  ///< 缩小模式
+        NormalRibbonMode    ///< 正常模式
     };
     Q_ENUM(RibbonMode)
 
@@ -175,7 +179,7 @@ public:
     void moveCategory(int from, int to);
 
     //获取当前显示的所有的SARibbonCategory，包含未显示的SARibbonContextCategory的SARibbonCategory也一并返回
-    QList<SARibbonCategory*> categoryPages(bool getAll = true) const;
+    QList< SARibbonCategory* > categoryPages(bool getAll = true) const;
 
     //移除SARibbonCategory
     void removeCategory(SARibbonCategory* category);
@@ -197,7 +201,7 @@ public:
     void setContextCategoryVisible(SARibbonContextCategory* context, bool visible);
 
     //获取所有的上下文标签
-    QList<SARibbonContextCategory*> contextCategoryList() const;
+    QList< SARibbonContextCategory* > contextCategoryList() const;
 
     //移除ContextCategory
     void destroyContextCategory(SARibbonContextCategory* context);
@@ -270,6 +274,8 @@ public:
     //设置按钮允许换行
     void setEnableWordWrap(bool on);
     bool isEnableWordWrap() const;
+    //获取SARibbonStackedWidget
+    SARibbonStackedWidget* ribbonStackedWidget();
 signals:
 
     /**
@@ -339,4 +345,4 @@ protected:
     virtual void paintContextCategoryTab(QPainter& painter, const QString& title, QRect contextRect, const QColor& color);
 };
 
-#endif // SARIBBONBAR_H
+#endif  // SARIBBONBAR_H

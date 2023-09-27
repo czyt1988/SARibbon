@@ -2,16 +2,25 @@
 #define SARIBBONMAINWINDOW_H
 #include "SARibbonGlobal.h"
 #include <QMainWindow>
-class SARibbonBar;
+
+#if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
+#include "FramelessHelper/Widgets/framelessmainwindow.h"
+FRAMELESSHELPER_BEGIN_NAMESPACE
+class StandardTitleBar;
+FRAMELESSHELPER_END_NAMESPACE
+#else
 class SAFramelessHelper;
+#endif
+
+class SARibbonBar;
 
 /**
  * @brief 如果要使用SARibbonBar，必须使用此类代替QMainWindow
  *
  * 由于ribbon的风格和传统的Toolbar风格差异较大，
  * SARibbonBar使用需要把原有的QMainWindow替换为SARibbonMainWindow,
- * SARibbonMainWindow是个无边框窗体，继承自QMainWindow，其构造函数的参数useRibbon
- * 用于指定是否使用ribbon风格，默认为true
+ * SARibbonMainWindow是个无边框窗体，继承自QMainWindow（目前使用第三方的无边框方案https://github.com/wangwenx190/framelesshelper），
+ * 其构造函数的参数useRibbon用于指定是否使用ribbon风格，默认为true
  *
  * @code
  * SARibbonMainWindow(QWidget* parent = nullptr,bool useRibbon = true);
@@ -28,7 +37,11 @@ class SAFramelessHelper;
  * 通过@ref setRibbonTheme 可改变ribbon的样式，用户也可通过qss自己定义自己的样式
  *
  */
+#if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
+class SA_RIBBON_EXPORT SARibbonMainWindow : public FRAMELESSHELPER_PREPEND_NAMESPACE(FramelessMainWindow)
+#else
 class SA_RIBBON_EXPORT SARibbonMainWindow : public QMainWindow
+#endif
 {
     Q_OBJECT
     SA_RIBBON_DECLARE_PRIVATE(SARibbonMainWindow)
@@ -49,40 +62,35 @@ public:
     };
     Q_ENUM(RibbonTheme)
 public:
-    SARibbonMainWindow(QWidget* parent = nullptr, bool useRibbon = true);
+    SARibbonMainWindow(QWidget* parent = nullptr, bool useRibbon = true, const Qt::WindowFlags flags = {});
     ~SARibbonMainWindow() Q_DECL_OVERRIDE;
     //返回SARibbonBar
-    const SARibbonBar* ribbonBar() const;
-    SARibbonBar* ribbonBar();
-
+    SARibbonBar* ribbonBar() const;
+#if !SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
     //返回SAFramelessHelper
     SAFramelessHelper* framelessHelper();
-
-    void setRibbonTheme(RibbonTheme theme);
-    RibbonTheme ribbonTheme() const;
-
-    //判断当前是否使用ribbon模式
-    bool isUseRibbon() const;
-
+    //把ribbonbar的事件传递到frameless
+    bool eventFilter(QObject* obj, QEvent* e);
+#endif
     //此函数仅用于控制最小最大化和关闭按钮的显示
     void updateWindowFlag(Qt::WindowFlags flags);
-
     //获取系统按钮的状态
     Qt::WindowFlags windowButtonFlags() const;
-
-    //覆写setMenuWidget
-    void setMenuWidget(QWidget* menubar);
-
-    //覆写setMenuBar
-    void setMenuBar(QMenuBar* menuBar);
+    void setRibbonTheme(RibbonTheme theme);
+    RibbonTheme ribbonTheme() const;
+    //判断当前是否使用ribbon模式
+    bool isUseRibbon() const;
 
 protected:
     //创建ribbonbar的工厂函数
     SARibbonBar* createRibbonBar();
     void loadTheme(const QString& themeFile);
     virtual void resizeEvent(QResizeEvent* event) Q_DECL_OVERRIDE;
-    virtual bool eventFilter(QObject* obj, QEvent* e) Q_DECL_OVERRIDE;
     virtual bool event(QEvent* e) Q_DECL_OVERRIDE;
+
+private:
+    //安装ribbon
+    void installRibbonBar(SARibbonBar* bar);
 };
 
 #endif  // SARIBBONMAINWINDOW_H

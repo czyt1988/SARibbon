@@ -5,7 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui
-CONFIG += c++11
+CONFIG += c++17
 TEMPLATE = lib
 
 DEFINES += SA_RIBBON_BAR_MAKE_LIB #定义此宏将构建库
