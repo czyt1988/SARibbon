@@ -9,9 +9,9 @@ This is a lightweight Ribbon control (Officestyle UI) based on Qt (minimum Qt5, 
 
 MIT protocol, welcome to use and make comments
 
-[gitee - https://gitee.com/czyt1988/SARibbon ] ( https://gitee.com/czyt1988/SARibbon )
+[gitee:https://gitee.com/czyt1988/SARibbon ] ( https://gitee.com/czyt1988/SARibbon )
 
-[github - https://github.com/czyt1988/SARibbon ] ( https://github.com/czyt1988/SARibbon )
+[github:https://github.com/czyt1988/SARibbon ] ( https://github.com/czyt1988/SARibbon )
 
 # Compile
 
@@ -30,7 +30,7 @@ If using cmake, only the three files `SARibbon.h` `SARibbon.cpp`, and `resource.
 
 ## Compile as Library (Dynamic)
 
-Open `SARibbon.pro` directly using Qt Creator, and compile it.  The SARibbonBar library and an example (there is only one example at present) will be compiled.  The directories of lib and examples are located in bin_ Qt{Qt version}_ {debug/release}_ {32/64}` under directory.
+Open `SARibbon.pro` directly using Qt Creator, and compile it.  The SARibbonBar library and an example (there is only one example at present) will be compiled.  The directories of lib and examples are located in `bin_Qt{Qt version}_{debug/release}_{32/64}` under directory.
 
 > 'd' will be added after the library compiled in debug mode for distinction
 
@@ -83,7 +83,7 @@ Simply understand, Ribbon combines menu bars and toolbars and displays them thro
 
 - **Pannel**, this is a collection of menus, the inner panel of office will have a panel title, displayed at the bottom of the panel, followed by the toolbar buttons (Action).
 
-- **Application Button**，this is the leftmost button in the tab bar (word is the corresponding file button). This button will trigger some special pages or menus, corresponding to `SARibbonApplicationButton`, which can be hidden.
+- **Application Button**, this is the leftmost button in the tab bar (word is the corresponding file button). This button will trigger some special pages or menus, corresponding to `SARibbonApplicationButton`, which can be hidden.
 
 - **Quick Access Bar**, a simple toolbar at the top for placing common actions corresponding to `SARibbonQuickAccessBar`.
 
@@ -93,7 +93,7 @@ A simple hierarchical diagram is shown below:
 
 ![](./doc/pic/saribbonbar-level.png)
 
-### 创建Category和Pannel
+### create Category and Pannel
 
 Create ribbons in the following order:  first create categories, then create panels, and finally create corresponding toolbuttons (actions).
 
@@ -114,7 +114,7 @@ The above operation adds a button, and the effect is shown in the following figu
 
 ![](./doc/pic/add-large-action.png)
 
-Different layout styles can be combined through`addLargeAction`、`addMediumAction`、`addSmallAction`. For details, see :
+Different layout styles can be combined through`addLargeAction`,`addMediumAction`,`addSmallAction`. For details, see :
 
 [./src/example/MainWindowExample/mainwindow.cpp](./src/example/MainWindowExample/mainwindow.cpp)
 
@@ -122,7 +122,7 @@ For more specific and complex examples, see the chapter [SARibbon Layout](#SARib
 
 ### Different 'button' layouts
 
-`SARibbonPannel`provides three methods to add action：
+`SARibbonPannel`provides three methods to add action:
 
 - `addLargeAction`
 - `addMediumAction`
@@ -182,7 +182,7 @@ void MainWindow::onShowContextCategory(bool on)
 
 **Note: ** if you want to delete `contextCategory`, you need to call `SARibbonBar::destroyContextCategory` instead of delete  directly. After calling `SARibbonBar::destroyContextCategory`, you do not need to delete the pointer of ContextCategory.
 
-Different contextCategory has different style. For details，see: [SARibbon style](#SARibbon style) and [Display comparison under different styles](#Display comparison under different styles).
+Different contextCategory has different style. For details,see: [SARibbon style](#SARibbon style) and [Display comparison under different styles](#Display comparison under different styles).
 
 ### ApplicationButton
 
@@ -195,7 +195,7 @@ ribbon->applicationButton()->setText(("File"));
 
 The default applicationButton inherits from `SARibbonApplicationButton`, and `SARibbonApplicationButton` inherits from `QPushButton`, so you can perform all operations on `QPushButton`. Of course, if you want to set your own Button as an applicationButton, you can just call the `SARibbonBar::setApplicationButton` function.
 
-### QuickAccessBar和rightButtonGroup
+### QuickAccessBar and RightButtonGroup
 
 QuickAccessBar is the quick toolbar in the upper left corner and rightButtonGroup is the quick toolbar in the upper right corner. In office mode, it is divided into left and right sides. In WPS mode, the left and right sides will be combined and placed on the right.
 
@@ -203,7 +203,7 @@ QuickAccessBar is the quick toolbar in the upper left corner and rightButtonGrou
 
 ![QuickAccessBar And RightButtonGroup](./doc/screenshot/QuickAccessBarAndRightButtonGroup.png)
 
-In `SARibbon`：
+In `SARibbon`:
 
 - QuickAccessBar corresponds to the `SARibbonQuickAccessBar` class.
 - rightButtonGroup corresponds to the `SARibbonQuickAccessBar` class.
@@ -332,7 +332,7 @@ Visually, the WPS Ribbon 2line style still has a lot more space than the traditi
 
 Different styles have different layout methods.
 
-## Office Layout Mode——SARibbonBar::OfficeStyle
+## Office Layout Mode : SARibbonBar::OfficeStyle
 
 The layout of `SARibbon OfficeStyle` is shown in the following figure:
 
@@ -340,7 +340,7 @@ The layout of `SARibbon OfficeStyle` is shown in the following figure:
 
 This layout is consistent with the default layout of office.
 
-## WPS Layout Mode——SARibbonBar::WpsLiteStyle
+## WPS Layout Mode : SARibbonBar::WpsLiteStyle
 
 This mode is different from the Ribbon style of Office. By referring to the ribbon interface practice of WPS, the title bar that takes up more space in the office ribbon is used to maximize the use of the interface. In this mode, the height of one title bar can be reduced.
 
@@ -541,5 +541,5 @@ Currently, my development focus is mainly on [data workbench](https://github.com
 
 # other
 
-> Thank [FastCAE](http://www.fastcae.com/product.html) for using this control and finding many bugs and suggestions [（github）:https://github.com/DISOGitHub/FastCAE](https://github.com/DISOGitHub/FastCAE)，[gitee:https://gitee.com/DISOGitee/FastCAE](https://gitee.com/DISOGitee/FastCAE)，[Official website:http://www.fastcae.com/product.html](http://www.fastcae.com/product.html).
+> Thank [FastCAE](http://www.fastcae.com/product.html) for using this control and finding many bugs and suggestions [(github):https://github.com/DISOGitHub/FastCAE](https://github.com/DISOGitHub/FastCAE),[gitee:https://gitee.com/DISOGitee/FastCAE](https://gitee.com/DISOGitee/FastCAE),[Official website:http://www.fastcae.com/product.html](http://www.fastcae.com/product.html).
 
