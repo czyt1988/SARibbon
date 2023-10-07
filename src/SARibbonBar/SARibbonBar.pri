@@ -1,6 +1,12 @@
 
+# 这里要做如下改动：
+# 1.framelesshelper/qmake/inc/core/framelesshelper.config中的FRAMELESSHELPER_FEATURE_static_build设置为-1
+# 2.要预定义FRAMELESSHELPER_CORE_LIBRARY宏，这样才能导出符号
+# 3.要预定义FRAMELESSHELPER_WIDGETS_LIBRARY宏，这样才能导出符号
 include($$PWD/3rdparty/framelesshelper/qmake/core.pri)
 include($$PWD/3rdparty/framelesshelper/qmake/widgets.pri)
+DEFINES += FRAMELESSHELPER_CORE_LIBRARY
+DEFINES += FRAMELESSHELPER_WIDGETS_LIBRARY
 #-------------------------------------------------
 #
 # SARibbon的文件
