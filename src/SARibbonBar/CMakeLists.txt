@@ -100,8 +100,8 @@ elseif(UNIX)
         ${FRAMELESS_HEADER_DIR_CORE}/framelesshelper_linux.h
     )
     list(APPEND FRAMELESS_CORE_SOURCE_FILES
-        utils_linux.cpp
-        platformsupport_linux.cpp
+        ${FRAMELESS_SOURCE_DIR_CORE}/utils_linux.cpp
+        ${FRAMELESS_SOURCE_DIR_CORE}/platformsupport_linux.cpp
     )
 endif()
 # resource files
