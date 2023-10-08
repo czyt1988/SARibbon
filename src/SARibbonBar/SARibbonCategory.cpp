@@ -392,10 +392,15 @@ void SARibbonCategory::PrivateData::updateItemGeometry()
         mIsRightScrollBtnShow = false;
         mIsLeftScrollBtnShow  = false;
     }
+//这个貌似没有必要
+#if 0
     QWidget* cp      = category->parentWidget();
     int parentHeight = (nullptr == cp) ? contentSize.height() : cp->height();
     int parentWidth  = (nullptr == cp) ? total : cp->width();
-    mSizeHint        = QSize(parentWidth, parentHeight);
+    mSizeHint = QSize(parentWidth, parentHeight);
+#else
+    mSizeHint = QSize(total, contentSize.height());
+#endif
     doItemLayout();
 }
 
@@ -407,8 +412,8 @@ void SARibbonCategory::PrivateData::doItemLayout()
     mLeftScrollBtn->setGeometry(0, 0, 12, category->height());
     mRightScrollBtn->setGeometry(category->width() - 12, 0, 12, category->height());
     QList< QWidget* > showWidgets, hideWidgets;
-
-    for (const SAPrivateRibbonCategoryItem& item : qAsConst(mItemList)) {
+    for (int i = 0; i < mItemList.size(); ++i) {
+        SAPrivateRibbonCategoryItem& item = mItemList[ i ];
         if (item.isNull()) {
             continue;
         }
@@ -588,6 +593,38 @@ SARibbonPannel* SARibbonCategory::addPannel(const QString& title)
 }
 
 /**
+ * @brief 添加pannel
+ * @param pannel pannel的所有权SARibbonCategory来管理
+ */
+void SARibbonCategory::addPannel(SARibbonPannel* pannel)
+{
+    d_ptr->addPannel(pannel);
+#if 0
+    // TODO
+    // 如果new SARibbonPannel不马上添加进category中，而是进行action的操作，最后再page->addPannel(pannel1);
+    // 会导致初始显示不刷新的问题
+    pannel->update();
+    pannel->updateGeometry();
+    qDebug() << "category " << categoryName() << " pannel name=" << pannel->pannelName() << "size hint:" << pannel->sizeHint();
+    d_ptr->updateItemGeometry();
+
+    QApplication::postEvent(this, new QEvent(QEvent::LayoutRequest));
+#endif
+}
+
+/**
+ * @brief qt designer专用
+ * @param pannel
+ */
+void SARibbonCategory::addPannel(QWidget* pannel)
+{
+    SARibbonPannel* p = qobject_cast< SARibbonPannel* >(pannel);
+    if (p) {
+        addPannel(p);
+    }
+}
+
+/**
  * @brief 新建一个pannel，并插入到index位置
  * @param title pannel的title
  * @param index 插入的位置，如果index超出category里pannel的个数，将插入到最后
@@ -678,28 +715,6 @@ void SARibbonCategory::movePannel(int from, int to)
     }
     d_ptr->mItemList.move(from, to);
     d_ptr->updateItemGeometry();
-}
-
-/**
- * @brief 添加pannel
- * @param pannel pannel的所有权SARibbonCategory来管理
- */
-void SARibbonCategory::addPannel(SARibbonPannel* pannel)
-{
-    d_ptr->addPannel(pannel);
-}
-
-/**
- * @brief qt designer专用
- * @param pannel
- */
-void SARibbonCategory::addPannel(QWidget* pannel)
-{
-    SARibbonPannel* p = qobject_cast< SARibbonPannel* >(pannel);
-
-    if (p) {
-        addPannel(p);
-    }
 }
 
 /**
