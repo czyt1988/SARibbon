@@ -98,7 +98,7 @@ public:
                                   << QColor(14, 81, 167)   // 蓝
                                   << QColor(228, 0, 69)    // 红
                                   << QColor(67, 148, 0)    // 绿
-                ;
+            ;
     }
 
     void init()
@@ -1477,7 +1477,7 @@ void SARibbonBar::paintInNormalStyle()
             titleRegion.setRect(d_ptr->mQuickAccessBar->geometry().right() + 1,
                                 border.top(),
                                 width() - d_ptr->mIconRightBorderPosition - border.right()
-                                        - d_ptr->mWindowButtonSize.width() - d_ptr->mQuickAccessBar->geometry().right() - 1,
+                                    - d_ptr->mWindowButtonSize.width() - d_ptr->mQuickAccessBar->geometry().right() - 1,
                                 titleBarHeight());
         } else {
             int leftwidth = contextCategoryRegion.x() - d_ptr->mQuickAccessBar->geometry().right() - d_ptr->mIconRightBorderPosition;
@@ -1564,22 +1564,20 @@ void SARibbonBar::paintInWpsLiteStyle()
 
 void SARibbonBar::resizeStackedContainerWidget()
 {
-    QMargins border = contentsMargins();
+    QMargins border                   = contentsMargins();
+    const QRect& ribbonTabBarGeometry = d_ptr->mRibbonTabBar->geometry();
+    int x                             = border.left();
+    int y                             = ribbonTabBarGeometry.bottom() + 1;
+    int w                             = width() - border.left() - border.right();
+    int h                             = mainBarHeight() - ribbonTabBarGeometry.bottom() - border.bottom() - 1;
     if (d_ptr->mStackedContainerWidget->isPopupMode()) {
-        //弹出模式时，高度
-        QPoint absPosition = mapToGlobal(QPoint(border.left(), d_ptr->mRibbonTabBar->geometry().bottom() + 1));
-        d_ptr->mStackedContainerWidget->setGeometry(absPosition.x(),
-                                                    absPosition.y(),
-                                                    width() - border.left() - border.right(),
-                                                    mainBarHeight() - d_ptr->mRibbonTabBar->geometry().bottom()
-                                                            - border.bottom() - 1);
-    } else {
-        d_ptr->mStackedContainerWidget->setGeometry(border.left(),
-                                                    d_ptr->mRibbonTabBar->geometry().bottom() + 1,
-                                                    width() - border.left() - border.right(),
-                                                    mainBarHeight() - d_ptr->mRibbonTabBar->geometry().bottom()
-                                                            - border.bottom() - 1);
+        //弹出模式时，位置为全局位置
+        QPoint absPosition = mapToGlobal(QPoint(x, y));
+        x                  = absPosition.x();
+        y                  = absPosition.y();
     }
+    d_ptr->mStackedContainerWidget->setFixedSize(QSize(w, h));
+    d_ptr->mStackedContainerWidget->setGeometry(x, y, w, h);
 }
 
 /**

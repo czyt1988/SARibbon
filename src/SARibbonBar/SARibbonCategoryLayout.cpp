@@ -248,11 +248,10 @@ QSize SARibbonCategoryLayout::categoryContentSize() const
 void SARibbonCategoryLayout::updateGeometryArr()
 {
     SARibbonCategory* category = qobject_cast< SARibbonCategory* >(parentWidget());
-    qDebug() << "category " << category->categoryName() << "updateGeometryArr";
-    int categoryWidth = category->width();
-    QMargins mag      = contentsMargins();
-    int height        = category->height();
-    int y             = 0;
+    int categoryWidth          = category->width();
+    QMargins mag               = contentsMargins();
+    int height                 = category->height();
+    int y                      = 0;
 
     if (!mag.isNull()) {
         y = mag.top();
@@ -377,7 +376,6 @@ void SARibbonCategoryLayout::doLayout()
         updateGeometryArr();
     }
     SARibbonCategory* category = qobject_cast< SARibbonCategory* >(parentWidget());
-    qDebug() << "category " << category->categoryName() << "doLayout";
     //两个滚动按钮的位置永远不变
     d_ptr->mLeftScrollBtn->setGeometry(0, 0, 12, category->height());
     d_ptr->mRightScrollBtn->setGeometry(category->width() - 12, 0, 12, category->height());
