@@ -16,6 +16,10 @@ option(BUILD_EXAMPLES "build the examples" ON)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+if(MSVC)
+    # CMAKE_CXX_STANDARD对有些版本的msvc无效
+    set(CMAKE_CXX_FLAGS"${CMAKE_CXX_FLAGS} /std:c++17")
+endif()
 set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "add a postfix, usually d on windows")
 set(CMAKE_RELEASE_POSTFIX "" CACHE STRING "add a postfix, usually empty on windows")
 set(CMAKE_RELWITHDEBINFO_POSTFIX "rd" CACHE STRING "add a postfix, usually empty on windows")
