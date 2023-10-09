@@ -94,7 +94,8 @@ if(WIN32)
         ${FRAMELESS_SOURCE_DIR_CORE}/platformsupport_win.cpp
     )
 elseif(APPLE)
-    list(APPEND FRAMELESS_CORE_SOURCE_FILES utils_mac.mm)
+    list(APPEND FRAMELESS_CORE_SOURCE_FILES
+        ${FRAMELESS_SOURCE_DIR_CORE}/utils_mac.mm)
 elseif(UNIX)
     list(APPEND FRAMELESS_CORE_HEADER_FILES
         ${FRAMELESS_HEADER_DIR_CORE}/framelesshelper_linux.h
