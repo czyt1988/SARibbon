@@ -81,7 +81,9 @@
 #ifndef SA_RIBBON_DECLARE_PUBLIC
 #define SA_RIBBON_DECLARE_PUBLIC(classname)                                                                            \
     friend class classname;                                                                                            \
-    classname* q_ptr { nullptr };
+    classname* q_ptr { nullptr };                                                                                      \
+    PrivateData(const PrivateData&) = delete;                                                                          \
+    PrivateData& operator=(const PrivateData&) = delete;
 #endif
 
 /**
