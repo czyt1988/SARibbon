@@ -10,7 +10,7 @@
 class QHBoxLayout;
 class QWheelEvent;
 class SARibbonBar;
-
+class SARibbonCategoryLayout;
 /**
  * @brief 一项ribbon tab页
  * @note SARibbonCategory的windowTitle影响了其在SARibbonBar的标签显示，
@@ -95,17 +95,8 @@ public:
 
     //刷新category的尺寸布局
     void updateItemGeometry();
-protected slots:
-    void onLeftScrollButtonClicked();
-    void onRightScrollButtonClicked();
 
 protected:
-    //事件处理
-    bool event(QEvent* e) Q_DECL_OVERRIDE;
-
-    //
-    void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
-
     //设置pannel的模式
     void setRibbonPannelLayoutMode(SARibbonPannel::PannelLayoutMode m);
     bool eventFilter(QObject* watched, QEvent* event) Q_DECL_OVERRIDE;
@@ -115,6 +106,9 @@ protected:
 
     //标记这个是上下文标签
     void markIsContextCategory(bool isContextCategory = true);
+
+    //获取SARibbonCategoryLayoutlayout
+    SARibbonCategoryLayout* categoryLayout() const;
 
 private:
     void setRibbonBar(SARibbonBar* bar);
