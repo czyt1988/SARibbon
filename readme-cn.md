@@ -1,6 +1,10 @@
 ﻿[Click here for English](./readme.md)
 
-[![CMake](https://github.com/czyt1988/SARibbon/actions/workflows/cmake.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake.yml)
+||Windows|Linux|Mac|
+|:-|:-|:-|:-|
+|Qt5|[![cmake-win-qt5](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt5.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt5.yml)|[![CMake-Linux-Qt5](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt5.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt5.yml)|[![cmake-mac-qt5](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt5.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt5.yml)|
+|Qt6|[![cmake-win-qt6](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt6.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt6.yml)|[![CMake-Linux-Qt6](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt6.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt6.yml)|[![cmake-mac-qt6](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt6.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt6.yml)|
+
 
  这是基于Qt（最低要求Qt5，支持C++11的编译器）开发的一个轻量级的Ribbon控件(Office样式UI)
 
