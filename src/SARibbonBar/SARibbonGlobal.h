@@ -89,4 +89,9 @@
     PrivateData& operator=(const PrivateData&) = delete;
 #endif
 
+/**
+ * @def 定义此宏用第三方的frameless作为无边框方案
+ */
+#define SARIBBON_USE_3RDPARTY_FRAMELESSHELPER 1
+
 #endif  // SARIBBONGLOBAL_H

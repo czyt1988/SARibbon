@@ -1,4 +1,5 @@
 ﻿cmake_minimum_required(VERSION 3.5)
+SET(VERSION_SHORT 0.1)
 project(MainWindowExample VERSION ${VERSION_SHORT}) 
 set(SARIBBON_EXPAMPLE_NAME MainWindowExample)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
