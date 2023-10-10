@@ -1,5 +1,4 @@
 ﻿#include "SARibbonPannelLayout.h"
-#include "SARibbonCategory.h"
 #include "SARibbonPannelOptionButton.h"
 #include "SARibbonSeparatorWidget.h"
 #include "SARibbonGallery.h"
@@ -314,6 +313,7 @@ SARibbonPannelItem* SARibbonPannelLayout::createItem(QAction* action, SARibbonPa
     SARibbonPannel* pannel = qobject_cast< SARibbonPannel* >(parentWidget());
 
     if (!pannel) {
+        //在没有pannel这个函数会返回nullptr
         return (nullptr);
     }
     if (QWidgetAction* widgetAction = qobject_cast< QWidgetAction* >(action)) {

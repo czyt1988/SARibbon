@@ -12,6 +12,7 @@ class SARibbonElementFactory;
 class SARibbonTabBar;
 class SARibbonButtonGroupWidget;
 class SARibbonQuickAccessBar;
+class SARibbonStackedWidget;
 
 /**
  * @brief SARibbonBar继承于QMenuBar,在SARibbonMainWindow中直接替换了原来的QMenuBar
@@ -270,6 +271,8 @@ public:
     //设置按钮允许换行
     void setEnableWordWrap(bool on);
     bool isEnableWordWrap() const;
+    //获取SARibbonStackedWidget
+    SARibbonStackedWidget* ribbonStackedWidget();
 signals:
 
     /**

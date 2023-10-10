@@ -1,6 +1,7 @@
 ﻿#include "SARibbonPannelItem.h"
 
-SARibbonPannelItem::SARibbonPannelItem(QWidget* widget) : QWidgetItem(widget), action(nullptr), customWidget(false)
+SARibbonPannelItem::SARibbonPannelItem(QWidget* widget)
+    : QWidgetItem(widget), rowIndex(-1), columnIndex(-1), action(nullptr), customWidget(false), rowProportion(Large)
 {
 }
 
