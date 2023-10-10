@@ -5,6 +5,16 @@
 
 //! 版本记录：
 //!
+//! -----1.x版本的为引入第三方库frameless，需要c++17支持，qt5.14以上
+//! -----0.x版本的为没有引入第三方库frameless，仅仅对windows进行适配，c++11即可，qt5.8以上
+//!
+//! 2023-10-09 -> 0.7.0
+//! 修正了category的布局问题
+//!
+//! 2023-09-27 -> 0.6.0
+//! 添加了Amalgamate，修正了一些显示的bug，修正cmake的异常
+//! 添加了上下文标签中category标题名字改变的信号
+//!
 //! 2023-05-28 -> 0.5.0
 //! 调整了大按钮模式下的显示方案，去除了原来SARibbonToolButton的Lite和Normal模式，以WordWrap来表征
 //! 支持文字自定义换行
@@ -29,13 +39,13 @@
  * @def ribbon的数字版本 MAJ.{MIN}.PAT
  */
 #ifndef SA_RIBBON_BAR_VERSION_MIN
-#define SA_RIBBON_BAR_VERSION_MIN 6
+#define SA_RIBBON_BAR_VERSION_MIN 7
 #endif
 /**
  * @def ribbon的数字版本 MAJ.MIN.{PAT}
  */
 #ifndef SA_RIBBON_BAR_VERSION_PAT
-#define SA_RIBBON_BAR_VERSION_PAT 1
+#define SA_RIBBON_BAR_VERSION_PAT 0
 #endif
 
 /**
@@ -74,7 +84,9 @@
 #ifndef SA_RIBBON_DECLARE_PUBLIC
 #define SA_RIBBON_DECLARE_PUBLIC(classname)                                                                            \
     friend class classname;                                                                                            \
-    classname* q_ptr { nullptr };
+    classname* q_ptr { nullptr };                                                                                      \
+    PrivateData(const PrivateData&) = delete;                                                                          \
+    PrivateData& operator=(const PrivateData&) = delete;
 #endif
 
 #endif  // SARIBBONGLOBAL_H

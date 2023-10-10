@@ -85,14 +85,12 @@ SARibbonCategoryLayout::SARibbonCategoryLayout(SARibbonCategory* parent)
 
 SARibbonCategoryLayout::~SARibbonCategoryLayout()
 {
-    QLayoutItem* item = Q_NULLPTR;
-
-    while ((item = takeAt(0))) {
+    while (QLayoutItem* item = takeAt(0)) {
         delete item;
     }
 }
 
-SARibbonCategory* SARibbonCategoryLayout::ribbonCategory()
+SARibbonCategory* SARibbonCategoryLayout::ribbonCategory() const
 {
     return (qobject_cast< SARibbonCategory* >(parentWidget()));
 }
@@ -143,7 +141,7 @@ SARibbonCategoryLayoutItem* SARibbonCategoryLayout::takePannelItem(int index)
     return (nullptr);
 }
 
-SARibbonCategoryLayoutItem* SARibbonCategoryLayout::takePannel(SARibbonPannel* pannel)
+SARibbonCategoryLayoutItem* SARibbonCategoryLayout::takePannelItem(SARibbonPannel* pannel)
 {
     for (int i = 0; i < d_ptr->mItemList.size(); ++i) {
         SARibbonCategoryLayoutItem* item = d_ptr->mItemList[ i ];
@@ -152,6 +150,25 @@ SARibbonCategoryLayoutItem* SARibbonCategoryLayout::takePannel(SARibbonPannel* p
         }
     }
     return (nullptr);
+}
+
+/**
+ * @brief 移除pannel，对应的分割线也会删除
+ * @param pannel
+ * @return
+ */
+bool SARibbonCategoryLayout::takePannel(SARibbonPannel* pannel)
+{
+    SARibbonCategoryLayoutItem* i = takePannelItem(pannel);
+    if (i) {
+        SARibbonSeparatorWidget* sp = i->separatorWidget;
+        if (sp) {
+            sp->deleteLater();
+        }
+        delete i;
+        return true;
+    }
+    return false;
 }
 
 int SARibbonCategoryLayout::count() const
@@ -209,6 +226,21 @@ void SARibbonCategoryLayout::invalidate()
     d_ptr->mDirty = true;
     QLayout::invalidate();
 }
+/**
+ * @brief category的内容尺寸（把margins减去）
+ * @return
+ */
+QSize SARibbonCategoryLayout::categoryContentSize() const
+{
+    SARibbonCategory* category = ribbonCategory();
+    QSize s                    = category->size();
+    QMargins mag               = contentsMargins();
+    if (!mag.isNull()) {
+        s.rheight() -= (mag.top() + mag.bottom());
+        s.rwidth() -= (mag.right() + mag.left());
+    }
+    return (s);
+}
 
 /**
  * @brief 更新尺寸
@@ -216,11 +248,10 @@ void SARibbonCategoryLayout::invalidate()
 void SARibbonCategoryLayout::updateGeometryArr()
 {
     SARibbonCategory* category = qobject_cast< SARibbonCategory* >(parentWidget());
-
-    int categoryWidth = category->width();
-    QMargins mag      = contentsMargins();
-    int height        = category->height();
-    int y             = 0;
+    int categoryWidth          = category->width();
+    QMargins mag               = contentsMargins();
+    int height                 = category->height();
+    int y                      = 0;
 
     if (!mag.isNull()) {
         y = mag.top();
@@ -298,7 +329,7 @@ void SARibbonCategoryLayout::updateGeometryArr()
             item->mWillSetSeparatorGeometry = QRect(0, 0, 0, 0);
             continue;
         }
-        SARibbonPannel* p = qobject_cast< SARibbonPannel* >(item->widget());
+        SARibbonPannel* p = item->toPannelWidget();
         if (nullptr == p) {
             qDebug() << "unknow widget in SARibbonCategoryLayout";
             continue;
@@ -345,7 +376,6 @@ void SARibbonCategoryLayout::doLayout()
         updateGeometryArr();
     }
     SARibbonCategory* category = qobject_cast< SARibbonCategory* >(parentWidget());
-
     //两个滚动按钮的位置永远不变
     d_ptr->mLeftScrollBtn->setGeometry(0, 0, 12, category->height());
     d_ptr->mRightScrollBtn->setGeometry(category->width() - 12, 0, 12, category->height());
@@ -400,10 +430,144 @@ QList< SARibbonPannel* > SARibbonCategoryLayout::pannels() const
     QList< SARibbonPannel* > res;
 
     for (SARibbonCategoryLayoutItem* item : qAsConst(d_ptr->mItemList)) {
-        SARibbonPannel* p = qobject_cast< SARibbonPannel* >(item->widget());
+        SARibbonPannel* p = item->toPannelWidget();
         res.append(p);
     }
     return (res);
+}
+
+/**
+ * @brief 通过ObjectName查找pannel
+ * @param objname
+ * @return
+ */
+SARibbonPannel* SARibbonCategoryLayout::pannelByObjectName(const QString& objname) const
+{
+    for (SARibbonCategoryLayoutItem* item : d_ptr->mItemList) {
+        if (SARibbonPannel* pannel = item->toPannelWidget()) {
+            if (pannel->objectName() == objname) {
+                return pannel;
+            }
+        }
+    }
+    return nullptr;
+}
+
+/**
+ * @brief 通过名字查找pannel
+ * @param title
+ * @return 如果有重名，只会返回第一个符合条件的
+ */
+SARibbonPannel* SARibbonCategoryLayout::pannelByName(const QString& pannelname) const
+{
+    for (SARibbonCategoryLayoutItem* item : qAsConst(d_ptr->mItemList)) {
+        if (SARibbonPannel* pannel = item->toPannelWidget()) {
+            if (pannel->pannelName() == pannelname) {
+                return (pannel);
+            }
+        }
+    }
+    return (nullptr);
+}
+
+/**
+ * @brief 通过索引找到pannel，如果超过索引范围，会返回nullptr
+ * @param i
+ * @return
+ */
+SARibbonPannel* SARibbonCategoryLayout::pannelByIndex(int i) const
+{
+    if (i >= 0 && i < d_ptr->mItemList.size()) {
+        return d_ptr->mItemList[ i ]->toPannelWidget();
+    }
+    return nullptr;
+}
+
+/**
+ * @brief 移动pannel
+ * @param from
+ * @param to
+ */
+void SARibbonCategoryLayout::movePannel(int from, int to)
+{
+    d_ptr->mItemList.move(from, to);
+    doLayout();
+}
+
+/**
+ * @brief 返回pannel的个数
+ * @return
+ */
+int SARibbonCategoryLayout::pannelCount() const
+{
+    return d_ptr->mItemList.size();
+}
+
+/**
+ * @brief 查找pannel对应的索引
+ * @param p
+ * @return 如果找不到，返回-1
+ */
+int SARibbonCategoryLayout::pannelIndex(SARibbonPannel* p) const
+{
+    int c = pannelCount();
+
+    for (int i = 0; i < c; ++i) {
+        if (d_ptr->mItemList[ i ]->toPannelWidget() == p) {
+            return (i);
+        }
+    }
+    return (-1);
+}
+
+/**
+ * @brief 获取所有的pannel
+ * @return
+ */
+QList< SARibbonPannel* > SARibbonCategoryLayout::pannelList() const
+{
+    QList< SARibbonPannel* > res;
+
+    for (SARibbonCategoryLayoutItem* i : qAsConst(d_ptr->mItemList)) {
+        if (SARibbonPannel* p = i->toPannelWidget()) {
+            res.append(p);
+        }
+    }
+    return (res);
+}
+
+/**
+ * @brief 执行滚动
+ * @param px
+ */
+void SARibbonCategoryLayout::scroll(int px)
+{
+    QSize contentSize = categoryContentSize();
+    d_ptr->mXBase += px;
+    if (d_ptr->mXBase > 0) {
+        d_ptr->mXBase = 0;
+    } else if ((d_ptr->mXBase + d_ptr->mTotalWidth) < contentSize.width()) {
+        d_ptr->mXBase = contentSize.width() - d_ptr->mTotalWidth;
+    }
+    invalidate();
+}
+
+/**
+ * @brief 判断是否滚动过
+ * @return
+ */
+bool SARibbonCategoryLayout::isScrolled() const
+{
+    return (d_ptr->mXBase != 0);
+}
+
+/**
+ * @brief 这个宽度是实际内容的宽度，有可能大于size.width，也有可能小于
+ * @return
+ */
+int SARibbonCategoryLayout::categoryTotalWidth() const
+{
+    return d_ptr->mTotalWidth;
 }
 
 void SARibbonCategoryLayout::onLeftScrollButtonClicked()
@@ -458,4 +622,9 @@ void SARibbonCategoryLayout::setGeometry(const QRect& rect)
 SARibbonCategoryLayoutItem::SARibbonCategoryLayoutItem(SARibbonPannel* w) : QWidgetItem(w)
 {
     separatorWidget = nullptr;
+}
+
+SARibbonPannel* SARibbonCategoryLayoutItem::toPannelWidget()
+{
+    return qobject_cast< SARibbonPannel* >(widget());
 }

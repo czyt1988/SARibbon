@@ -121,6 +121,9 @@ public:
         mQuickAccessBar = RibbonSubElementDelegate->createQuickAccessBar(q_ptr);
         mQuickAccessBar->setObjectName(QStringLiteral("objSARibbonQuickAccessBar"));
         mQuickAccessBar->setIcon(q_ptr->windowIcon());
+        //
+        mRightButtonGroup = RibbonSubElementDelegate->craeteButtonGroupWidget(q_ptr);
+        mRightButtonGroup->setFrameShape(QFrame::NoFrame);
     }
 
     void setApplicationButton(QAbstractButton* btn)
@@ -1299,6 +1302,16 @@ bool SARibbonBar::isEnableWordWrap() const
     return SARibbonToolButton::isEnableWordWrap();
 }
 
+/**
+ * @brief ribbonbar内部的StackedWidget
+ * 所有的category都放置在StackedWidget中
+ * @return
+ */
+SARibbonStackedWidget* SARibbonBar::ribbonStackedWidget()
+{
+    return d_ptr->mStackedContainerWidget;
+}
+
 bool SARibbonBar::eventFilter(QObject* obj, QEvent* e)
 {
     if (obj) {
@@ -1552,22 +1565,20 @@ void SARibbonBar::paintInWpsLiteStyle()
 
 void SARibbonBar::resizeStackedContainerWidget()
 {
-    QMargins border = contentsMargins();
+    QMargins border                   = contentsMargins();
+    const QRect& ribbonTabBarGeometry = d_ptr->mRibbonTabBar->geometry();
+    int x                             = border.left();
+    int y                             = ribbonTabBarGeometry.bottom() + 1;
+    int w                             = width() - border.left() - border.right();
+    int h                             = mainBarHeight() - ribbonTabBarGeometry.bottom() - border.bottom() - 1;
     if (d_ptr->mStackedContainerWidget->isPopupMode()) {
-        //弹出模式时，高度
-        QPoint absPosition = mapToGlobal(QPoint(border.left(), d_ptr->mRibbonTabBar->geometry().bottom() + 1));
-        d_ptr->mStackedContainerWidget->setGeometry(absPosition.x(),
-            absPosition.y(),
-            width() - border.left() - border.right(),
-            mainBarHeight() - d_ptr->mRibbonTabBar->geometry().bottom()
-                - border.bottom() - 1);
-    } else {
-        d_ptr->mStackedContainerWidget->setGeometry(border.left(),
-            d_ptr->mRibbonTabBar->geometry().bottom() + 1,
-            width() - border.left() - border.right(),
-            mainBarHeight() - d_ptr->mRibbonTabBar->geometry().bottom()
-                - border.bottom() - 1);
+        //弹出模式时，位置为全局位置
+        QPoint absPosition = mapToGlobal(QPoint(x, y));
+        x                  = absPosition.x();
+        y                  = absPosition.y();
     }
+    d_ptr->mStackedContainerWidget->setFixedSize(QSize(w, h));
+    d_ptr->mStackedContainerWidget->setGeometry(x, y, w, h);
 }
 
 /**
