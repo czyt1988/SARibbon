@@ -71,7 +71,7 @@ public:
     //返回SAFramelessHelper
     SAFramelessHelper* framelessHelper();
     //把ribbonbar的事件传递到frameless
-    bool eventFilter(QObject* obj, QEvent* e);
+    virtual bool eventFilter(QObject* obj, QEvent* e) Q_DECL_OVERRIDE;
 #endif
     //此函数仅用于控制最小最大化和关闭按钮的显示
     void updateWindowFlag(Qt::WindowFlags flags);

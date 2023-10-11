@@ -20,6 +20,7 @@ FRAMELESSHELPER_USE_NAMESPACE
 using namespace Global;
 #else
 #include "SAFramelessHelper.h"
+#include "SAWindowButtonGroup.h"
 #endif
 
 /**
