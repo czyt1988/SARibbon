@@ -265,7 +265,7 @@ public:
     // tabbar 底部会绘制一条线条，此接口定义线条颜色
     void setTabBarBaseLineColor(const QColor& clr);
     QColor tabBarBaseLineColor() const;
-    //设置标题颜色
+    //设置标题颜色,如果不设置标题颜色，默认是SARibbonBar的qss的color属性
     void setWindowTitleTextColor(const QColor& clr);
     QColor windowTitleTextColor() const;
     //设置标题的对齐方式
@@ -325,6 +325,7 @@ protected slots:
 
 private:
     int tabIndex(SARibbonCategory* obj);
+    void resizeAll();
     void resizeInOfficeStyle();
     void resizeInWpsLiteStyle();
     void paintInNormalStyle();

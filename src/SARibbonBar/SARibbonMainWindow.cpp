@@ -33,7 +33,7 @@ public:
     void init();
 
 public:
-    SARibbonMainWindow::RibbonTheme mCurrentRibbonTheme { SARibbonMainWindow::Office2013 };
+    SARibbonMainWindow::RibbonTheme mCurrentRibbonTheme { SARibbonMainWindow::RibbonThemeOffice2013 };
     SARibbonBar* mRibbonBar { nullptr };
     SAWindowButtonGroup* mWindowButtonGroup { nullptr };
 #if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
@@ -137,14 +137,17 @@ Qt::WindowFlags SARibbonMainWindow::windowButtonFlags() const
 void SARibbonMainWindow::setRibbonTheme(SARibbonMainWindow::RibbonTheme theme)
 {
     switch (theme) {
-    case NormalTheme:
-        loadTheme(":/theme/resource/default.qss");
+    case RibbonThemeWindows7:
+        loadTheme(":/theme/resource/theme-win7.qss");
         break;
-    case Office2013:
-        loadTheme(":/theme/resource/office2013.qss");
+    case RibbonThemeOffice2013:
+        loadTheme(":/theme/resource/theme-office2013.qss");
+        break;
+    case RibbonThemeDark:
+        loadTheme(":/theme/resource/theme-dark.qss");
         break;
     default:
-        loadTheme(":/theme/resource/default.qss");
+        loadTheme(":/theme/resource/theme-office2013.qss");
         break;
     }
 }
@@ -167,9 +170,10 @@ SARibbonBar* SARibbonMainWindow::createRibbonBar()
 {
     SARibbonBar* bar = new SARibbonBar(this);
     switch (ribbonTheme()) {
-    case NormalTheme:
+    case RibbonThemeWindows7:
         break;
-    case Office2013: {
+    case RibbonThemeOffice2013:
+    case RibbonThemeDark: {
         //! 在设置qss后需要针对margin信息重新设置进SARibbonTabBar中
         //! office2013.qss的margin信息如下设置，em是字符M所对应的宽度的长度
         //! margin-top: 0em;

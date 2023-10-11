@@ -380,6 +380,16 @@ void MainWindow::onColorButtonColorClicked(const QColor& c, bool on)
     m_edit->append(QString("color click %1").arg(c.name()));
 }
 
+/**
+ * @brief 样式改变
+ * @param index
+ */
+void MainWindow::onRibbonThemeComboBoxCurrentIndexChanged(int index)
+{
+    SARibbonMainWindow::RibbonTheme t = static_cast< SARibbonMainWindow::RibbonTheme >(m_ribbonTheme->itemData(index).toInt());
+    setRibbonTheme(t);
+}
+
 void MainWindow::createCategoryMain(SARibbonCategory* page)
 {
     //! 1
@@ -454,6 +464,14 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
 #else
     connect(g, static_cast< void (QButtonGroup::*)(int) >(&QButtonGroup::buttonClicked), this, &MainWindow::onStyleClicked);
 #endif
+
+    m_ribbonTheme = new SARibbonComboBox();
+    m_ribbonTheme->addItem("Theme Win7", SARibbonMainWindow::RibbonThemeWindows7);
+    m_ribbonTheme->addItem("Theme Office2013", SARibbonMainWindow::RibbonThemeOffice2013);
+    m_ribbonTheme->addItem("Theme Dark", SARibbonMainWindow::RibbonThemeDark);
+    m_ribbonTheme->setCurrentIndex(m_ribbonTheme->findData(static_cast< int >(ribbonTheme())));
+    connect(m_ribbonTheme, QOverload< int >::of(&SARibbonComboBox::currentIndexChanged), this, &MainWindow::onRibbonThemeComboBoxCurrentIndexChanged);
+    pannelStyle->addSmallWidget(m_ribbonTheme);
 
     SARibbonPannel* pannelToolButtonStyle = page->addPannel(("sa ribbon toolbutton style"));
 

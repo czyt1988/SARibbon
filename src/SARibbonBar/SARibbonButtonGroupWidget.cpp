@@ -6,7 +6,7 @@
 #include <QActionEvent>
 #include <QWidgetAction>
 #include <QApplication>
-#include "SARibbonToolButton.h"
+#include "SARibbonControlButton.h"
 #include "SARibbonElementManager.h"
 #include "SARibbonSeparatorWidget.h"
 
@@ -117,7 +117,7 @@ QAction* SARibbonButtonGroupWidget::addAction(const QString& text, const QIcon& 
     QAction* a = new QAction(icon, text, this);
 
     addAction(a);
-    SARibbonToolButton* btn = qobject_cast< SARibbonToolButton* >(d_ptr->mItems.back().widget);
+    ButtonTyle* btn = qobject_cast< ButtonTyle* >(d_ptr->mItems.back().widget);
     btn->setPopupMode(popMode);
     return (a);
 }
@@ -127,7 +127,7 @@ QAction* SARibbonButtonGroupWidget::addMenu(QMenu* menu, QToolButton::ToolButton
     QAction* a = menu->menuAction();
 
     addAction(a);
-    SARibbonToolButton* btn = qobject_cast< SARibbonToolButton* >(d_ptr->mItems.back().widget);
+    ButtonTyle* btn = qobject_cast< ButtonTyle* >(d_ptr->mItems.back().widget);
     btn->setPopupMode(popMode);
     return (a);
 }
@@ -171,7 +171,7 @@ void SARibbonButtonGroupWidget::setIconSize(const QSize& s)
     //迭代已经保存的button
     const QObjectList& objlist = children();
     for (QObject* obj : objlist) {
-        if (SARibbonToolButton* btn = qobject_cast< SARibbonToolButton* >(obj)) {
+        if (ButtonTyle* btn = qobject_cast< ButtonTyle* >(obj)) {
             btn->setIconSize(s);
         }
     }
@@ -210,22 +210,22 @@ void SARibbonButtonGroupWidget::actionEvent(QActionEvent* e)
             sp->setTopBottomMargins(3, 3);
             item.widget = sp;
         }
-        //不是widget，自动生成SARibbonToolbutton
+        //不是widget，自动生成ButtonTyle
         if (!item.widget) {
-            SARibbonToolButton* button = RibbonSubElementDelegate->createRibbonToolButton(this);
+            ButtonTyle* button = RibbonSubElementDelegate->createRibbonControlButton(this);
             button->setAutoRaise(true);
             button->setIconSize(d_ptr->mIconSize);
             button->setFocusPolicy(Qt::NoFocus);
-            button->setButtonType(SARibbonToolButton::SmallButton);
             button->setToolButtonStyle(Qt::ToolButtonIconOnly);
             button->setDefaultAction(item.action);
             //根据QAction的属性设置按钮的大小
 
-            QObject::connect(button, &SARibbonToolButton::triggered, this, &SARibbonButtonGroupWidget::actionTriggered);
+            QObject::connect(button, &ButtonTyle::triggered, this, &SARibbonButtonGroupWidget::actionTriggered);
             item.widget = button;
         }
         layout()->addWidget(item.widget);
         d_ptr->mItems.append(item);
+        layout()->invalidate();
     } break;
 
     case QEvent::ActionChanged: {
@@ -253,4 +253,5 @@ void SARibbonButtonGroupWidget::actionEvent(QActionEvent* e)
     default:
         break;
     }
+    QFrame::actionEvent(e);
 }

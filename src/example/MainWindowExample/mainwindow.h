@@ -8,6 +8,7 @@ class SARibbonActionsManager;
 class SARibbonQuickAccessBar;
 class SARibbonButtonGroupWidget;
 class QTextEdit;
+class QComboBox;
 
 class MainWindow : public SARibbonMainWindow
 {
@@ -56,6 +57,7 @@ private slots:
     void onActionWordWrapTriggered(bool b);
     void onButtonGroupActionTriggered(QAction* act);
     void onColorButtonColorClicked(const QColor& c, bool on);
+    void onRibbonThemeComboBoxCurrentIndexChanged(int index);
 
 private:
     SARibbonContextCategory* m_contextCategory;
@@ -66,6 +68,7 @@ private:
     int m_actionTagText;
     int m_actionTagWithIcon;
     QMenu* m_applicationMenu;
+    QComboBox* m_ribbonTheme;
     //
     QAction* mActionWordWrap { nullptr };
 };

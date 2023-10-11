@@ -4,7 +4,7 @@
 #include <QToolButton>
 #include <QMenu>
 #include <QFrame>
-
+class SARibbonControlButton;
 /**
  * @brief 用于管理一组Action,类似于QToolBar
  */
@@ -12,6 +12,8 @@ class SA_RIBBON_EXPORT SARibbonButtonGroupWidget : public QFrame
 {
     Q_OBJECT
     SA_RIBBON_DECLARE_PRIVATE(SARibbonButtonGroupWidget)
+    using ButtonTyle = SARibbonControlButton;
+
 public:
     SARibbonButtonGroupWidget(QWidget* parent = Q_NULLPTR);
     ~SARibbonButtonGroupWidget() Q_DECL_OVERRIDE;
