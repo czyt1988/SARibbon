@@ -239,9 +239,13 @@ public:
 SARibbonBar::SARibbonBar(QWidget* parent) : QMenuBar(parent), d_ptr(new SARibbonBar::PrivateData(this))
 {
     d_ptr->init();
-#if Q_OS_MACOS || Q_OS_LINUX
     setNativeMenuBar(false);
-#endif
+    //#ifdef Q_OS_MACOS
+    //    setNativeMenuBar(false);
+    //#endif
+    //#ifdef Q_OS_LINUX
+    //    setNativeMenuBar(false);
+    //#endif
     if (parent) {
         connect(parent, &QWidget::windowTitleChanged, this, &SARibbonBar::onWindowTitleChanged);
         connect(parent, &QWidget::windowIconChanged, this, &SARibbonBar::onWindowIconChanged);
