@@ -72,9 +72,9 @@ public:
     QSize mWindowButtonSize;                        ///< 由SARibbonMainWindow告诉的windowbutton的尺寸
     QList< QColor > mContextCategoryColorList;      ///< contextCategory的色系
     int mContextCategoryColorListIndex;             ///< 记录contextCategory色系索引
-    QColor mTitleTextColor;                         ///< 标题文字颜色
-    QColor mTabBarBaseLineColor;                    ///< tabbar 底部会绘制一条线条，定义线条颜色
-    Qt::Alignment mTitleAligment;                   ///< 标题对齐方式
+    QColor mTitleTextColor;  ///< 标题文字颜色,默认无效，无效的情况下和SARibbonBar的qss:color属性一致
+    QColor mTabBarBaseLineColor;   ///< tabbar 底部会绘制一条线条，定义线条颜色
+    Qt::Alignment mTitleAligment;  ///< 标题对齐方式
     PrivateData(SARibbonBar* par)
         : q_ptr(par)
         , mApplicationButton(nullptr)
@@ -88,7 +88,6 @@ public:
         , mCurrentRibbonMode(SARibbonBar::NormalRibbonMode)
         , mWindowButtonSize(RibbonSubElementStyleOpt.titleBarHeight() * 4, RibbonSubElementStyleOpt.titleBarHeight())
         , mContextCategoryColorListIndex(-1)
-        , mTitleTextColor(Qt::black)
         , mTabBarBaseLineColor(186, 201, 219)
         , mTitleAligment(Qt::AlignCenter)
     {
@@ -1069,6 +1068,16 @@ int SARibbonBar::tabIndex(SARibbonCategory* obj)
     return (-1);
 }
 
+void SARibbonBar::resizeAll()
+{
+    if (isOfficeStyle()) {
+        resizeInOfficeStyle();
+    } else {
+        resizeInWpsLiteStyle();
+    }
+    update();
+}
+
 void SARibbonBar::updateRibbonElementGeometry()
 {
     //根据样式调整SARibbonCategory的布局形式
@@ -1218,6 +1227,8 @@ void SARibbonBar::setWindowButtonSize(const QSize& size)
  * @brief 设置标题的文字颜色
  *
  * 标题时mainwindow的windowTitle，如果要设置标题，直接调用SARibbonMainWindow::setWindowTitle 进行设置
+ *
+ * 如果不设置标题颜色，默认是SARibbonBar的qss的color属性
  * @param clr
  * @note 此函数不会刷新，刷新请自行调用repaint
  */
@@ -1228,7 +1239,7 @@ void SARibbonBar::setWindowTitleTextColor(const QColor& clr)
 
 /**
  * @brief 获取标题的文字颜色
- * @return
+ * @return 如果返回的是无效颜色，!QColor::isValid()，说明没有手动设置颜色，颜色将跟随SARibbonBar的qss的文字颜色
  */
 QColor SARibbonBar::windowTitleTextColor() const
 {
@@ -1265,6 +1276,8 @@ void SARibbonBar::updateRibbonGeometry()
     for (SARibbonCategory* c : qAsConst(categorys)) {
         c->updateItemGeometry();
     }
+    //重新调整尺寸
+    resizeAll();
 }
 
 /**
@@ -1686,6 +1699,10 @@ void SARibbonBar::changeEvent(QEvent* e)
         for (QWidget* w : listWidgets) {
             w->setFont(f);
         }
+        updateRibbonGeometry();
+    } break;
+    case QEvent::Show: {
+        updateRibbonGeometry();
     } break;
     default:
         break;
@@ -1908,7 +1925,9 @@ void SARibbonBar::paintBackground(QPainter& painter)
 void SARibbonBar::paintWindowTitle(QPainter& painter, const QString& title, const QRect& titleRegion)
 {
     painter.save();
-    painter.setPen(d_ptr->mTitleTextColor);
+    if (d_ptr->mTitleTextColor.isValid()) {
+        painter.setPen(d_ptr->mTitleTextColor);
+    }
     painter.drawText(titleRegion, d_ptr->mTitleAligment, title);
     painter.restore();
 }

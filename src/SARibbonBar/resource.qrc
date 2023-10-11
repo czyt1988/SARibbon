@@ -14,7 +14,8 @@
         <file>resource/define-color.svg</file>
     </qresource>
     <qresource prefix="/theme">
-        <file>resource/default.qss</file>
-        <file>resource/office2013.qss</file>
+        <file>resource/theme-win7.qss</file>
+        <file>resource/theme-office2013.qss</file>
+        <file>resource/theme-dark.qss</file>
     </qresource>
 </RCC>

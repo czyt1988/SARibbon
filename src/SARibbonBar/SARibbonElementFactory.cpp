@@ -74,6 +74,11 @@ SARibbonToolButton* SARibbonElementFactory::createRibbonToolButton(QWidget* pare
     return (new SARibbonToolButton(parent));
 }
 
+SARibbonControlButton* SARibbonElementFactory::createRibbonControlButton(QWidget* parent)
+{
+    return (new SARibbonControlButton(parent));
+}
+
 SARibbonStackedWidget* SARibbonElementFactory::createRibbonStackedWidget(SARibbonBar* parent)
 {
     return (new SARibbonStackedWidget(parent));

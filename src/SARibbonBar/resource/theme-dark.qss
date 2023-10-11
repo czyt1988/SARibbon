@@ -1,0 +1,358 @@
+﻿/* 
+start ribbon set
+dark style theme
+*/
+
+/*SARibbonBar*/
+SARibbonBar{
+  background-color: #2b2b2b;
+  border: solid #2b2b2b;
+  color:#b2b2b2;
+}
+
+/*SARibbonButtonGroupWidget*/
+SARibbonButtonGroupWidget{
+  background-color: transparent;
+  color: #242424;
+}
+
+/*SARibbonQuickAccessBar*/
+SARibbonQuickAccessBar{
+   background-color: transparent;
+}
+
+
+/*SARibbonCtrlContainer*/
+SARibbonCtrlContainer {
+  background-color: transparent;
+}
+
+/*SARibbonCategory*/
+SARibbonCategory:focus {
+  outline: none;
+}
+
+SARibbonCategory {
+  background-color: #b2b2b2;
+}
+
+/*SARibbonStackedWidget*/
+SARibbonStackedWidget{
+  background-color: #b2b2b2;
+  border-top-width: 0px;
+}
+SARibbonStackedWidget:focus{
+  outline: none;
+
+}
+/*SARibbonApplicationButton*/
+SARibbonApplicationButton{
+  color:#242424;
+  border-top-left-radius: 0.1em;
+  border-top-right-radius: 0.1em;
+  background-color: #b2b2b2;
+}
+
+SARibbonApplicationButton::hover{
+  background-color: #a0a0a0;
+}
+
+SARibbonApplicationButton::pressed{
+  background-color: #858585;
+}
+
+SARibbonApplicationButton:focus{
+  outline: none;
+}
+
+/*SARibbonTabBar*/
+SARibbonTabBar{
+    background-color: transparent;
+}
+
+SARibbonTabBar::tab {
+  color: #f0f1f2;
+  border: none;
+  background-color: transparent;
+  margin-top: 0em;
+  margin-right: 0em;
+  margin-left: 0.2em;
+  margin-bottom: 0em;
+  min-width: 3em;
+  max-width: 10em;
+  min-height: 1.2em;
+  max-height: 1.2em;
+  padding-left: 0.2em;
+  padding-right: 0.2em;
+  padding-top: 0.1em;
+  padding-bottom: 0.2em;
+}
+
+SARibbonTabBar::tab:selected, SARibbonTabBar::tab:hover {
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+}
+
+SARibbonTabBar::tab:selected {
+  color: #242424;
+  background-color: #b2b2b2;
+  border: 0.05em solid #737373;
+  border-bottom: none;
+}
+
+SARibbonTabBar::tab:hover:!selected {
+  border:0.05em solid  #a6a6a6;
+  border-bottom: none;
+  color: white;
+}
+
+SARibbonTabBar::tab:!selected {
+  margin-top: 0em;
+  color: #a0a0a0;
+}
+
+/*SARibbonCheckBox*/
+SARibbonCheckBox{
+    color:#242424;
+    background-color:transparent;
+}
+
+/*SARibbonToolButton*/
+
+SARibbonToolButton{
+    border:none;
+    color:#242424;
+    background-color:#b2b2b2;
+} 
+
+SARibbonToolButton:focus {
+  border: 0.05em solid #858585;
+  color: #242424;
+  background-color: #a0a0a0;
+}
+SARibbonToolButton::pressed{
+    color:#242424;
+    background-color: #858585;
+}
+SARibbonToolButton::checked{
+    color:#242424;
+    background-color: #9b9b9b;
+}
+SARibbonToolButton::hover {
+    color:#242424;
+    background-color: #a0a0a0;
+}
+
+/*SARibbonControlButton*/
+SARibbonControlButton{
+  background-color:transparent;
+  border: none;
+  color:#242424;
+}
+SARibbonControlButton::pressed{
+  background-color: #858585;
+}
+SARibbonControlButton::checked{
+  border: 0.05em solid #888888;
+  background-color: #9b9b9b;
+}
+SARibbonControlButton::hover {
+  border: 0.05em solid #888888;
+  background-color: #a0a0a0;
+ }
+
+SARibbonControlButton#SARibbonGalleryButtonUp,#SARibbonGalleryButtonDown,#SARibbonGalleryButtonMore{
+  background-color:#b2b2b2;
+  border: 0.05em solid #888888;
+  color: #242424;
+}
+SARibbonControlButton#SARibbonBarHidePannelButton {
+  border: 0.05em solid transparent;
+}
+
+
+/*SARibbonMenu*/
+SARibbonMenu {
+  color:#242424;
+  background-color: #b2b2b2;
+
+}
+SARibbonMenu::item {
+  padding: 5px;
+  background-color: transparent;
+}
+SARibbonMenu::item:selected {
+  background-color: #9b9b9b;
+}
+SARibbonMenu::item:hover {
+    color:#242424;
+    border: 1px solid #fcfcfc;
+}
+SARibbonMenu::icon{
+  margin-left: 1px;
+}
+
+/*SARibbonPannelOptionButton*/
+SARibbonPannelOptionButton {
+  border:none;
+  background-color: transparent;
+  color:#242424;
+}
+
+SARibbonPannelOptionButton::hover {
+  background-color:#a0a0a0;
+}
+
+
+SARibbonPannel {
+  background-color: transparent;
+  border: none;
+  color: #5f5e5e;
+}
+
+SARibbonPannel > SARibbonButtonGroupWidget {
+  border: 0.05em solid #888888;
+  background-color: transparent;
+}
+
+/*SARibbonGallery*/
+SARibbonGallery {
+  background-color: #cccccc;
+  color: #242424;
+  border: 0.05em solid #888888;
+}
+
+/*SARibbonGalleryGroup*/
+SARibbonGalleryGroup {
+  show-decoration-selected: 1;
+  background-color: transparent;
+  color: #242424;
+}
+SARibbonGalleryGroup::item:selected {
+  background-color: #9b9b9b;
+}
+SARibbonGalleryGroup::item:hover {
+  border: 0.05em solid #a0a0a0;
+}
+SARibbonGalleryGroup::item {
+  color: #242424;
+}
+
+/*RibbonGalleryViewport*/
+
+SARibbonGalleryViewport {
+  background-color: #ffffff;
+}
+
+/*SARibbonLineEdit*/
+SARibbonLineEdit {
+  border:0.05em solid #888888;
+  background-color: white;
+  color: #242424;
+  selection-background-color: #6a9eff;
+  selection-color: white;
+}
+
+
+/*SARibbonComboBox*/
+SARibbonComboBox {
+  border: 0.05em  solid #888888;
+  background-color: white;
+}
+
+SARibbonComboBox:hover{
+  border: 1px solid #cfcecc;
+  color : #242424;
+}
+
+SARibbonComboBox:editable {
+  color : #242424;
+  background-color: white;
+  selection-background-color: #6a9eff;
+  selection-color: white;
+}
+
+SARibbonComboBox::drop-down {
+  subcontrol-origin: padding;
+  subcontrol-position: top right;
+  width: 1em;
+  border: none;
+}
+
+SARibbonComboBox::drop-down:hover {
+  border: none;
+  background-color: #a0a0a0;
+}
+
+SARibbonComboBox::down-arrow {
+  image: url(:/image/resource/ArrowDown.png);
+}
+
+
+/*SARibbonSeparatorWidget*/
+SARibbonSeparatorWidget {
+  background-color: #a4a4a4;
+}
+
+/*SARibbonCategoryScrollButton*/
+SARibbonCategoryScrollButton {
+  border: 0.05em solid #888888;
+  color: #242424;
+  background-color: #b2b2b2;
+}
+
+SARibbonCategoryScrollButton[arrowType="3"] {
+  border-right-width: 0.05em;
+}
+
+SARibbonCategoryScrollButton[arrowType="4"] {
+  border-left-width: 0.05em;
+}
+/*SAWindowToolButton*/
+SAWindowToolButton { 
+  background-color: transparent; 
+  border:none;
+}
+
+SAWindowToolButton:focus {
+  outline: none;
+}
+
+SAWindowToolButton#SAMinimizeWindowButton {
+  image: url(:/image/resource/Titlebar_Min.png);
+}
+
+SAWindowToolButton#SAMaximizeWindowButton:checked {
+  image:url(:/image/resource/Titlebar_Normal.png);
+}
+
+SAWindowToolButton#SAMaximizeWindowButton {
+  image:url(:/image/resource/Titlebar_Max.png);
+}
+
+SAWindowToolButton#SAMinimizeWindowButton:hover,#SAMaximizeWindowButton:hover {
+  background-color: #e5e5e5;
+}
+
+SAWindowToolButton#SAMinimizeWindowButton:pressed,#SAMaximizeWindowButton:pressed {
+  background-color: #cacacb;
+}
+
+SAWindowToolButton#SACloseWindowButton {
+  image: url(:/image/resource/Titlebar_Close_Hover.png);
+}
+
+SAWindowToolButton#SACloseWindowButton:hover {
+  background-color: #e81123;
+  image: url(:/image/resource/Titlebar_Close.png);
+}
+
+SAWindowToolButton#SACloseWindowButton:pressed {
+  background-color: #f1707a;
+  image: url(:/image/resource/Titlebar_Close.png);
+}
+
+SAWindowToolButton#SARibbonBarHidePannelButton {
+  titlebar-shade-icon: url(:/image/resource/Titlebar_Shade.png);
+  titlebar-unshade-icon: url(:/image/resource/Titlebar_Unshade.png);
+}

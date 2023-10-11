@@ -1,41 +1,30 @@
 ﻿/* start ribbon set*/
 
-SARibbonMainWindow {
-  background-color: white;
-  border: 1px solid #707070;
-}
-
 /*SARibbonBar*/
 SARibbonBar {
   background-color: white;
   border: solid #707070;
-  border-width: 1px 1px 0px 1px;
+  color:#b2b2b2;
+  /* border-width: 0.02em 0.02em 0em 0.02em; */
 }
 
 /*SARibbonButtonGroupWidget*/
-
 SARibbonButtonGroupWidget {
   background-color: transparent;
 }
 
-SARibbonPannel > SARibbonButtonGroupWidget {
-  border: 0.05em solid #c2d0df;
-}
 
 /*SARibbonQuickAccessBar*/
-
 SARibbonQuickAccessBar {
   background-color: #cee8fc;
 }
 
 /*SARibbonCtrlContainer*/
-
 SARibbonCtrlContainer {
   background-color: transparent;
 }
 
 /*SARibbonCategory*/
-
 SARibbonCategory:focus {
   outline: none;
 }
@@ -45,7 +34,6 @@ SARibbonCategory {
 }
 
 /*SARibbonStackedWidget*/
-
 SARibbonStackedWidget {
   background-color: white;
   border: 1pt solid #c5d2e0;
@@ -57,11 +45,10 @@ SARibbonStackedWidget:focus {
 }
 
 /*SARibbonApplicationButton*/
-
 SARibbonApplicationButton {
   color: white;
-  border-top-left-radius: 1px;
-  border-top-right-radius: 1px;
+  border-top-left-radius: 0.1em;
+  border-top-right-radius: 0.1em;
   background-color: #2b579a;
 }
 
@@ -78,7 +65,6 @@ SARibbonApplicationButton:focus {
 }
 
 /*SARibbonTabBar*/
-
 SARibbonTabBar {
   background-color: transparent;
 }
@@ -111,12 +97,12 @@ SARibbonTabBar::tab:selected {
   color: #5779af;
   border: 0.05em solid #c5d2e0;
   background: white;
-  border-bottom-color: #FFFFFF;
+  border-bottom: none;
 }
 
 SARibbonTabBar::tab:hover:!selected {
-  border:1px solid #c5d2e0;
-  border-bottom-color: #FFFFFF;
+  border:0.05em solid #c5d2e0;
+  border-bottom: none;
   color: #5779af;
 }
 
@@ -125,9 +111,12 @@ SARibbonTabBar::tab:!selected {
 }
 
 /*SARibbonToolButton*/
-
+/* 
+SARibbonToolButton的背景颜色必须和pannel或者category的颜色一致
+不能设置为transparent，否则在ActionMenu模式下，上下区分的按钮无法显示 
+*/
 SARibbonToolButton {
-  border: 1px solid transparent;
+  border: none;
   color: #333;
   background-color: white;
 }
@@ -164,14 +153,6 @@ SARibbonControlButton {
   color: #333;
 }
 
-SARibbonControlButton#SARibbonGalleryButtonUp, #SARibbonGalleryButtonDown, #SARibbonGalleryButtonMore {
-  border: 0.05em solid #cee8fc;
-}
-
-SARibbonControlButton#SARibbonBarHidePannelButton {
-  border: 0.05em solid transparent;
-}
-
 SARibbonControlButton::pressed {
   border: 0.05em solid #269bf4;
   background-color: #9ed2f9;
@@ -186,6 +167,15 @@ SARibbonControlButton::hover {
   border: 0.05em solid #badffa;
   background-color: #cee7fc;
 }
+SARibbonControlButton#SARibbonGalleryButtonUp, #SARibbonGalleryButtonDown, #SARibbonGalleryButtonMore {
+  border: 0.05em solid #cee8fc;
+}
+
+SARibbonControlButton#SARibbonBarHidePannelButton {
+  border: 0.05em solid transparent;
+}
+
+
 
 /*SARibbonMenu*/
 
@@ -234,6 +224,10 @@ SARibbonPannel {
   color: #666666;
 }
 
+SARibbonPannel > SARibbonButtonGroupWidget {
+  border: 0.05em solid #c2d0df;
+}
+
 /*SARibbonGallery*/
 
 SARibbonGallery {
@@ -263,8 +257,8 @@ SARibbonGalleryGroup::item:hover {
 
 /*RibbonGalleryViewport*/
 
-RibbonGalleryViewport {
-  background-color: white;
+SARibbonGalleryViewport {
+  background-color: #ffffff;
 }
 
 /*SARibbonLineEdit*/
@@ -280,6 +274,7 @@ SARibbonLineEdit {
 
 SARibbonComboBox {
   border: 0.05em solid #c2d0df;
+  background-color: white;
 }
 
 SARibbonComboBox:hover {
@@ -297,10 +292,8 @@ SARibbonComboBox:editable {
 SARibbonComboBox::drop-down {
   subcontrol-origin: padding;
   subcontrol-position: top right;
-  width: 15px;
-  border-left: none;
-  border-top-right-radius: 0px;
-  border-bottom-right-radius: 0px;
+  width: 1em;
+  border: none;
 }
 
 SARibbonComboBox::drop-down:hover {
@@ -320,7 +313,7 @@ SARibbonSeparatorWidget {
 }
 
 SARibbonCategoryScrollButton {
-  border: 0px solid #c5d2e0;
+  border: 0.05em solid #c5d2e0;
   color: #333;
   background-color: white;
 }
