@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         macos_version: [11, latest]
-        qt_version: [5.14.2,5.15.9]
+        qt_version: [5.14.2,5.15.0]
         shared: [ON]
 
     steps:
