@@ -98,7 +98,7 @@ public:
                                   << QColor(14, 81, 167)   // 蓝
                                   << QColor(228, 0, 69)    // 红
                                   << QColor(67, 148, 0)    // 绿
-            ;
+                ;
     }
 
     void init()
@@ -240,6 +240,9 @@ public:
 SARibbonBar::SARibbonBar(QWidget* parent) : QMenuBar(parent), d_ptr(new SARibbonBar::PrivateData(this))
 {
     d_ptr->init();
+#if Q_OS_MACOS || Q_OS_LINUX
+    setNativeMenuBar(false);
+#endif
     if (parent) {
         connect(parent, &QWidget::windowTitleChanged, this, &SARibbonBar::onWindowTitleChanged);
         connect(parent, &QWidget::windowIconChanged, this, &SARibbonBar::onWindowIconChanged);
@@ -1477,7 +1480,7 @@ void SARibbonBar::paintInNormalStyle()
             titleRegion.setRect(d_ptr->mQuickAccessBar->geometry().right() + 1,
                                 border.top(),
                                 width() - d_ptr->mIconRightBorderPosition - border.right()
-                                    - d_ptr->mWindowButtonSize.width() - d_ptr->mQuickAccessBar->geometry().right() - 1,
+                                        - d_ptr->mWindowButtonSize.width() - d_ptr->mQuickAccessBar->geometry().right() - 1,
                                 titleBarHeight());
         } else {
             int leftwidth = contextCategoryRegion.x() - d_ptr->mQuickAccessBar->geometry().right() - d_ptr->mIconRightBorderPosition;
