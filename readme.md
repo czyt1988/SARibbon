@@ -6,8 +6,7 @@
 |Qt5 (5.14.2-5.15.0)|[![cmake-win-qt5](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt5.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt5.yml)|[![CMake-Linux-Qt5](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt5.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt5.yml)|[![cmake-mac-qt5](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt5.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt5.yml)|
 |Qt6 (6.2.0-6.5.0)|[![cmake-win-qt6](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt6.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt6.yml)|[![CMake-Linux-Qt6](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt6.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt6.yml)|[![cmake-mac-qt6](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt6.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt6.yml)|
 
-
-This is a lightweight Ribbon control (Officestyle UI) based on Qt (minimum Qt5, compiler supporting C++ 11). Screenshot of the interface:
+The minimum requirement is Qt5.14 or above, with c++17 standard support (due to the use of the frameless library, the minimum requirement for this library is c++17). Qt5.14 has improved high-dpi support, and it is recommended to update Qt below this version to Qt5.14 or above
 
 ![](./doc/screenshot/001.gif)
 
