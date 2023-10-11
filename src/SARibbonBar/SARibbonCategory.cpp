@@ -229,8 +229,6 @@ void SARibbonCategory::PrivateData::doWheelEvent(QWheelEvent* event)
 
 SARibbonCategory::SARibbonCategory(QWidget* p) : QWidget(p), d_ptr(new SARibbonCategory::PrivateData(this))
 {
-    setAutoFillBackground(true);
-    setBackgroundBrush(Qt::white);
     setLayout(new SARibbonCategoryLayout(this));
 }
 
