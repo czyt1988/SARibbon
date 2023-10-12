@@ -405,7 +405,7 @@ void FramelessQuickHelperPrivate::repaintAllChildren(const quint32 delay) const
     if (!window) {
         return;
     }
-    const auto update = [window]() -> void {
+    const auto update = [window, q]() -> void {
 #ifdef Q_OS_WINDOWS
         // Sync the internal window frame margins with the latest DPI, otherwise
         // we will get wrong window sizes after the DPI change.
@@ -414,6 +414,13 @@ void FramelessQuickHelperPrivate::repaintAllChildren(const quint32 delay) const
         // No need to repaint the window when it's hidden.
         if (!window->isVisible()) {
             return;
+        }
+        if (!((window->windowState() & (Qt::WindowMinimized | Qt::WindowMaximized | Qt::WindowFullScreen)) || q->isWindowFixedSize())) {
+            const QSize originalSize = window->size();
+            static constexpr const auto margins = QMargins{ 10, 10, 10, 10 };
+            window->resize(originalSize.shrunkBy(margins));
+            window->resize(originalSize.grownBy(margins));
+            window->resize(originalSize);
         }
         window->requestUpdate();
         const QList<QQuickItem *> items = window->findChildren<QQuickItem *>();

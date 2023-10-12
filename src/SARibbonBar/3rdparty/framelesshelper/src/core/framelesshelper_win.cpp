@@ -110,6 +110,7 @@ struct FramelessDataWin : public FramelessData
     // WM_MOUSELEAVE comes or we manually call TrackMouseEvent().
     bool mouseLeaveBlocked = false;
     Dpi dpi = {};
+    HMONITOR monitor = nullptr;
 #if (QT_VERSION < QT_VERSION_CHECK(6, 5, 1))
     QRect restoreGeometry = {};
 #endif // (QT_VERSION < QT_VERSION_CHECK(6, 5, 1))
@@ -234,6 +235,11 @@ void FramelessHelperWin::addWindow(const QObject *window)
     data->frameless = true;
     data->dpi = Dpi{ Utils::getWindowDpi(data->windowId, true), Utils::getWindowDpi(data->windowId, false) };
     DEBUG.noquote() << "The DPI of window" << hwnd2str(data->windowId) << "is" << data->dpi;
+    data->monitor = ::MonitorFromWindow(reinterpret_cast<HWND>(data->windowId), MONITOR_DEFAULTTONEAREST);
+    Q_ASSERT(data->monitor);
+    if (!data->monitor) {
+        WARNING << Utils::getSystemErrorMessage(kMonitorFromWindow);
+    }
     // Remove the bad window styles added by Qt (it's not that "bad" though).
     std::ignore = Utils::maybeFixupQtInternals(data->windowId);
 #if 0
@@ -1138,11 +1144,7 @@ bool FramelessHelperWin::nativeEventFilter(const QByteArray &eventType, void *me
 #endif // (QT_VERSION <= QT_VERSION_CHECK(6, 4, 2))
     case WM_DPICHANGED: {
         const Dpi oldDpi = data->dpi;
-        const Dpi newDpi = {UINT(LOWORD(wParam)), UINT(HIWORD(wParam))};
-        if (Q_UNLIKELY(newDpi == oldDpi)) {
-            WARNING << "Wrong WM_DPICHANGED received: same DPI.";
-            break;
-        }
+        const auto newDpi = Dpi{ UINT(LOWORD(wParam)), UINT(HIWORD(wParam)) };
         DEBUG.noquote() << "New DPI for window" << hwnd2str(hWnd)
                         << "is" << newDpi << "(was" << oldDpi << ").";
         data->dpi = newDpi;
@@ -1189,6 +1191,19 @@ bool FramelessHelperWin::nativeEventFilter(const QByteArray &eventType, void *me
         }
     } break;
 #endif // (QT_VERSION < QT_VERSION_CHECK(6, 5, 1))
+    case WM_MOVE: {
+        const HMONITOR currentMonitor = ::MonitorFromWindow(hWnd, MONITOR_DEFAULTTONEAREST);
+        Q_ASSERT(currentMonitor);
+        if (!currentMonitor) {
+            WARNING << Utils::getSystemErrorMessage(kMonitorFromWindow);
+            break;
+        }
+        if (currentMonitor == data->monitor) {
+            break;
+        }
+        data->monitor = currentMonitor;
+        data->callbacks->forceChildrenRepaint(500);
+    } break;
     case WM_SYSCOMMAND: {
         const WPARAM filteredWParam = (wParam & 0xFFF0);
         // When the window is fullscreened, don't enter screen saver or power
