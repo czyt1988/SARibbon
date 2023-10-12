@@ -60,8 +60,7 @@ FRAMELESSHELPER_BEGIN_NAMESPACE
 class FRAMELESSHELPER_CORE_API RegistryKey : public QObject
 {
     Q_OBJECT
-    FRAMELESSHELPER_CLASS_INFO
-    Q_DISABLE_COPY_MOVE(RegistryKey)
+    FRAMELESSHELPER_QT_CLASS(RegistryKey)
 
 public:
     explicit RegistryKey(const Global::RegistryRootKey root, const QString &key, QObject *parent = nullptr);

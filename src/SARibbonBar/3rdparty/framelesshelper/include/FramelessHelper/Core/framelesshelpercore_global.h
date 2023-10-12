@@ -67,11 +67,16 @@ QT_END_NAMESPACE
 #  define Q_OS_WINDOWS // Since 5.14
 #endif
 
+#ifndef Q_DISABLE_MOVE
+#  define Q_DISABLE_MOVE(Class) \
+      Class(Class &&) = delete; \
+      Class &operator=(Class &&) = delete;
+#endif
+
 #ifndef Q_DISABLE_COPY_MOVE // Since 5.13
 #  define Q_DISABLE_COPY_MOVE(Class) \
       Q_DISABLE_COPY(Class) \
-      Class(Class &&) = delete; \
-      Class &operator=(Class &&) = delete;
+      Q_DISABLE_MOVE(Class)
 #endif
 
 #if (QT_VERSION < QT_VERSION_CHECK(5, 10, 0))
@@ -251,6 +256,83 @@ QT_END_NAMESPACE
          (Minor) = (((Version) & 0xff) >> 16); \
          (Patch) = (((Version) & 0xff) >> 8); \
      }
+#endif
+
+#ifndef FRAMELESSHELPER_CLASS
+#  define FRAMELESSHELPER_CLASS(Class) \
+  private: \
+      Q_DISABLE_COPY(Class)
+#endif
+
+#ifndef FRAMELESSHELPER_CLASS_DPTR
+#  define FRAMELESSHELPER_CLASS_DPTR(Class) \
+  private: \
+      Q_DECLARE_PRIVATE(Class) \
+      const QScopedPointer<Class##Private> d_ptr;
+#endif
+
+#ifndef FRAMELESSHELPER_CLASS_QPTR
+#  define FRAMELESSHELPER_CLASS_QPTR(Class) \
+  private: \
+      Q_DECLARE_PUBLIC(Class) \
+  public: \
+      Class *q_ptr = nullptr;
+#endif
+
+#ifndef FRAMELESSHELPER_PRIVATE_CLASS_GETTER
+#  define FRAMELESSHELPER_PRIVATE_CLASS_GETTER(Class) \
+  public: \
+      Q_NODISCARD static Class##Private *get(Class *q); \
+      Q_NODISCARD static const Class##Private *get(const Class *q);
+#endif
+
+#ifndef FRAMELESSHELPER_PRIVATE_CLASS_GETTER_IMPL
+#  define FRAMELESSHELPER_PRIVATE_CLASS_GETTER_IMPL(Class) \
+  Class##Private *Class##Private::get(Class *q) { \
+      Q_ASSERT(q); \
+      return (q ? q->d_func() : nullptr); \
+  } \
+  const Class##Private *Class##Private::get(const Class *q) { \
+      Q_ASSERT(q); \
+      return (q ? q->d_func() : nullptr); \
+  }
+#endif
+
+#ifndef FRAMELESSHELPER_PUBLIC_CLASS
+#  define FRAMELESSHELPER_PUBLIC_CLASS(Class) \
+  private: \
+      FRAMELESSHELPER_CLASS(Class) \
+      FRAMELESSHELPER_CLASS_DPTR(Class)
+#endif
+
+#ifndef FRAMELESSHELPER_PRIVATE_CLASS
+#  define FRAMELESSHELPER_PRIVATE_CLASS(Class) \
+  private: \
+      FRAMELESSHELPER_CLASS(Class##Private) \
+      FRAMELESSHELPER_CLASS_QPTR(Class) \
+      FRAMELESSHELPER_PRIVATE_CLASS_GETTER(Class)
+#endif
+
+#ifndef FRAMELESSHELPER_QT_CLASS
+#  define FRAMELESSHELPER_QT_CLASS(Class) \
+  private: \
+      FRAMELESSHELPER_CLASS_INFO \
+      FRAMELESSHELPER_CLASS(Class)
+#endif
+
+#ifndef FRAMELESSHELPER_PUBLIC_QT_CLASS
+#  define FRAMELESSHELPER_PUBLIC_QT_CLASS(Class) \
+  private: \
+      FRAMELESSHELPER_QT_CLASS(Class) \
+      FRAMELESSHELPER_CLASS_DPTR(Class)
+#endif
+
+#ifndef FRAMELESSHELPER_PRIVATE_QT_CLASS
+#  define FRAMELESSHELPER_PRIVATE_QT_CLASS(Class) \
+  private: \
+      FRAMELESSHELPER_QT_CLASS(Class##Private) \
+      FRAMELESSHELPER_CLASS_QPTR(Class) \
+      FRAMELESSHELPER_PRIVATE_CLASS_GETTER(Class)
 #endif
 
 #if FRAMELESSHELPER_CONFIG(bundle_resource)

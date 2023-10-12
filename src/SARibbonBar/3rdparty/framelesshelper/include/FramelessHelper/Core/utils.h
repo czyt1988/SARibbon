@@ -37,30 +37,22 @@ QT_END_NAMESPACE
 
 FRAMELESSHELPER_BEGIN_NAMESPACE
 
-struct SystemParameters;
-
 namespace Utils
 {
 
-[[nodiscard]] FRAMELESSHELPER_CORE_API
-    Qt::CursorShape calculateCursorShape(const QWindow *window, const QPoint &pos);
-[[nodiscard]] FRAMELESSHELPER_CORE_API
-    Qt::Edges calculateWindowEdges(const QWindow *window, const QPoint &pos);
+[[nodiscard]] FRAMELESSHELPER_CORE_API Qt::CursorShape calculateCursorShape(const QWindow *window, const QPoint &pos);
+[[nodiscard]] FRAMELESSHELPER_CORE_API Qt::Edges calculateWindowEdges(const QWindow *window, const QPoint &pos);
 [[nodiscard]] FRAMELESSHELPER_CORE_API bool startSystemMove(QWindow *window, const QPoint &globalPos);
 [[nodiscard]] FRAMELESSHELPER_CORE_API bool startSystemResize(QWindow *window, const Qt::Edges edges, const QPoint &globalPos);
 [[nodiscard]] FRAMELESSHELPER_CORE_API QString getSystemButtonGlyph(const Global::SystemButtonType button);
 [[nodiscard]] FRAMELESSHELPER_CORE_API QWindow *findWindow(const WId windowId);
-FRAMELESSHELPER_CORE_API void moveWindowToDesktopCenter(
-    const SystemParameters *params, const bool considerTaskBar);
-[[nodiscard]] FRAMELESSHELPER_CORE_API Qt::WindowState windowStatesToWindowState(
-    const Qt::WindowStates states);
+[[nodiscard]] FRAMELESSHELPER_CORE_API bool moveWindowToDesktopCenter(const WId windowId, const bool considerTaskBar);
+[[nodiscard]] FRAMELESSHELPER_CORE_API Qt::WindowState windowStatesToWindowState(const Qt::WindowStates states);
 [[nodiscard]] FRAMELESSHELPER_CORE_API bool isThemeChangeEvent(const QEvent * const event);
-[[nodiscard]] FRAMELESSHELPER_CORE_API QColor calculateSystemButtonBackgroundColor(
-    const Global::SystemButtonType button, const Global::ButtonState state);
+[[nodiscard]] FRAMELESSHELPER_CORE_API QColor calculateSystemButtonBackgroundColor(const Global::SystemButtonType button, const Global::ButtonState state);
 [[nodiscard]] FRAMELESSHELPER_CORE_API bool shouldAppsUseDarkMode();
 [[nodiscard]] FRAMELESSHELPER_CORE_API bool isTitleBarColorized();
-[[nodiscard]] FRAMELESSHELPER_CORE_API bool
-    setBlurBehindWindowEnabled(const WId windowId, const Global::BlurMode mode, const QColor &color);
+[[nodiscard]] FRAMELESSHELPER_CORE_API bool setBlurBehindWindowEnabled(const WId windowId, const Global::BlurMode mode, const QColor &color);
 [[nodiscard]] FRAMELESSHELPER_CORE_API QString getWallpaperFilePath();
 [[nodiscard]] FRAMELESSHELPER_CORE_API Global::WallpaperAspectStyle getWallpaperAspectStyle();
 [[nodiscard]] FRAMELESSHELPER_CORE_API bool isBlurBehindWindowSupported();
@@ -100,31 +92,24 @@ FRAMELESSHELPER_CORE_API void moveWindowToDesktopCenter(
 [[nodiscard]] FRAMELESSHELPER_CORE_API bool isFullScreen(const WId windowId);
 [[nodiscard]] FRAMELESSHELPER_CORE_API bool isWindowNoState(const WId windowId);
 [[nodiscard]] FRAMELESSHELPER_CORE_API bool syncWmPaintWithDwm();
-[[nodiscard]] FRAMELESSHELPER_CORE_API bool showSystemMenu(
-    const WId windowId, const QPoint &pos,
-    const bool selectFirstEntry, const SystemParameters *params);
+[[nodiscard]] FRAMELESSHELPER_CORE_API bool showSystemMenu(const WId windowId, const QPoint &pos, const bool selectFirstEntry);
 [[nodiscard]] FRAMELESSHELPER_CORE_API QColor getDwmColorizationColor(bool *opaque = nullptr, bool *ok = nullptr);
 [[nodiscard]] FRAMELESSHELPER_CORE_API Global::DwmColorizationArea getDwmColorizationArea();
 [[nodiscard]] FRAMELESSHELPER_CORE_API bool isHighContrastModeEnabled();
 [[nodiscard]] FRAMELESSHELPER_CORE_API quint32 getPrimaryScreenDpi(const bool horizontal);
 [[nodiscard]] FRAMELESSHELPER_CORE_API quint32 getWindowDpi(const WId windowId, const bool horizontal);
-[[nodiscard]] FRAMELESSHELPER_CORE_API quint32 getResizeBorderThicknessForDpi
-    (const bool horizontal, const quint32 dpi);
-[[nodiscard]] FRAMELESSHELPER_CORE_API quint32 getResizeBorderThickness(const WId windowId,
-                                                                        const bool horizontal,
-                                                                        const bool scaled);
+[[nodiscard]] FRAMELESSHELPER_CORE_API quint32 getResizeBorderThicknessForDpi(const bool horizontal, const quint32 dpi);
+[[nodiscard]] FRAMELESSHELPER_CORE_API quint32 getResizeBorderThickness(const WId windowId, const bool horizontal, const bool scaled);
 [[nodiscard]] FRAMELESSHELPER_CORE_API quint32 getCaptionBarHeightForDpi(const quint32 dpi);
 [[nodiscard]] FRAMELESSHELPER_CORE_API quint32 getCaptionBarHeight(const WId windowId, const bool scaled);
 [[nodiscard]] FRAMELESSHELPER_CORE_API quint32 getTitleBarHeightForDpi(const quint32 dpi);
 [[nodiscard]] FRAMELESSHELPER_CORE_API quint32 getTitleBarHeight(const WId windowId, const bool scaled);
 [[nodiscard]] FRAMELESSHELPER_CORE_API quint32 getFrameBorderThicknessForDpi(const quint32 dpi);
-[[nodiscard]] FRAMELESSHELPER_CORE_API quint32 getFrameBorderThickness(const WId windowId,
-                                                                       const bool scaled);
+[[nodiscard]] FRAMELESSHELPER_CORE_API quint32 getFrameBorderThickness(const WId windowId, const bool scaled);
 [[nodiscard]] FRAMELESSHELPER_CORE_API bool maybeFixupQtInternals(const WId windowId);
 [[nodiscard]] FRAMELESSHELPER_CORE_API bool isWindowFrameBorderVisible();
 [[nodiscard]] FRAMELESSHELPER_CORE_API bool isFrameBorderColorized();
-[[nodiscard]] FRAMELESSHELPER_CORE_API bool installWindowProcHook(
-    const WId windowId, const SystemParameters *params);
+[[nodiscard]] FRAMELESSHELPER_CORE_API bool installWindowProcHook(const WId windowId);
 [[nodiscard]] FRAMELESSHELPER_CORE_API bool uninstallWindowProcHook(const WId windowId);
 [[nodiscard]] FRAMELESSHELPER_CORE_API bool setAeroSnappingEnabled(const WId windowId, const bool enable);
 [[nodiscard]] FRAMELESSHELPER_CORE_API bool tryToEnableHighestDpiAwarenessLevel();
@@ -132,20 +117,17 @@ FRAMELESSHELPER_CORE_API void moveWindowToDesktopCenter(
 [[nodiscard]] FRAMELESSHELPER_CORE_API bool shouldAppsUseDarkMode_windows();
 [[nodiscard]] FRAMELESSHELPER_CORE_API QColor getAccentColor_windows();
 [[nodiscard]] FRAMELESSHELPER_CORE_API bool setCornerStyleForWindow(const WId windowId, const Global::WindowCornerStyle style);
-[[nodiscard]] FRAMELESSHELPER_CORE_API bool hideOriginalTitleBarElements
-    (const WId windowId, const bool disable = true);
+[[nodiscard]] FRAMELESSHELPER_CORE_API bool hideOriginalTitleBarElements(const WId windowId, const bool disable = true);
 [[nodiscard]] FRAMELESSHELPER_CORE_API bool setQtDarkModeAwareEnabled(const bool enable);
 [[nodiscard]] FRAMELESSHELPER_CORE_API bool refreshWin32ThemeResources(const WId windowId, const bool dark);
 [[nodiscard]] FRAMELESSHELPER_CORE_API bool enableNonClientAreaDpiScalingForWindow(const WId windowId);
-[[nodiscard]] FRAMELESSHELPER_CORE_API
-    Global::DpiAwareness getDpiAwarenessForCurrentProcess(bool *highest = nullptr);
+[[nodiscard]] FRAMELESSHELPER_CORE_API Global::DpiAwareness getDpiAwarenessForCurrentProcess(bool *highest = nullptr);
 [[nodiscard]] FRAMELESSHELPER_CORE_API bool fixupChildWindowsDpiMessage(const WId windowId);
 [[nodiscard]] FRAMELESSHELPER_CORE_API bool fixupDialogsDpiScaling();
 [[nodiscard]] FRAMELESSHELPER_CORE_API bool setDarkModeAllowedForApp(const bool allow = true);
 [[nodiscard]] FRAMELESSHELPER_CORE_API bool bringWindowToFront(const WId windowId);
 [[nodiscard]] FRAMELESSHELPER_CORE_API QPoint getWindowPlacementOffset(const WId windowId);
 [[nodiscard]] FRAMELESSHELPER_CORE_API QRect getWindowRestoreGeometry(const WId windowId);
-[[nodiscard]] FRAMELESSHELPER_CORE_API bool removeMicaWindow(const WId windowId);
 [[nodiscard]] FRAMELESSHELPER_CORE_API quint64 getKeyState();
 [[nodiscard]] FRAMELESSHELPER_CORE_API bool isValidWindow(const WId windowId, const bool checkVisible, const bool checkTopLevel);
 [[nodiscard]] FRAMELESSHELPER_CORE_API bool updateFramebufferTransparency(const WId windowId);
@@ -156,8 +138,7 @@ FRAMELESSHELPER_CORE_API void printWin32Message(void *msg);
 #endif // Q_OS_WINDOWS
 
 #if (defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID))
-[[nodiscard]] FRAMELESSHELPER_CORE_API QScreen *x11_findScreenForVirtualDesktop
-    (const int virtualDesktopNumber);
+[[nodiscard]] FRAMELESSHELPER_CORE_API QScreen *x11_findScreenForVirtualDesktop(const int virtualDesktopNumber);
 [[nodiscard]] FRAMELESSHELPER_CORE_API x11_return_type x11_appRootWindow(const int screen);
 [[nodiscard]] FRAMELESSHELPER_CORE_API int x11_appScreen();
 [[nodiscard]] FRAMELESSHELPER_CORE_API x11_return_type x11_appTime();
@@ -166,11 +147,8 @@ FRAMELESSHELPER_CORE_API void printWin32Message(void *msg);
 [[nodiscard]] FRAMELESSHELPER_CORE_API QByteArray x11_nextStartupId();
 [[nodiscard]] FRAMELESSHELPER_CORE_API Display *x11_display();
 [[nodiscard]] FRAMELESSHELPER_CORE_API xcb_connection_t *x11_connection();
-[[nodiscard]] FRAMELESSHELPER_CORE_API QByteArray getWindowProperty
-    (const WId windowId, const xcb_atom_t prop, const xcb_atom_t type, const quint32 data_len);
-FRAMELESSHELPER_CORE_API void setWindowProperty
-    (const WId windowId, const xcb_atom_t prop, const xcb_atom_t type,
-     const void *data, const quint32 data_len, const uint8_t format);
+[[nodiscard]] FRAMELESSHELPER_CORE_API QByteArray getWindowProperty(const WId windowId, const xcb_atom_t prop, const xcb_atom_t type, const quint32 data_len);
+FRAMELESSHELPER_CORE_API void setWindowProperty(const WId windowId, const xcb_atom_t prop, const xcb_atom_t type, const void *data, const quint32 data_len, const uint8_t format);
 FRAMELESSHELPER_CORE_API void clearWindowProperty(const WId windowId, const xcb_atom_t prop);
 [[nodiscard]] FRAMELESSHELPER_CORE_API xcb_atom_t internAtom(const char *name);
 [[nodiscard]] FRAMELESSHELPER_CORE_API QString getWindowManagerName();
@@ -180,11 +158,9 @@ FRAMELESSHELPER_CORE_API void clearWindowProperty(const WId windowId, const xcb_
 FRAMELESSHELPER_CORE_API void openSystemMenu(const WId windowId, const QPoint &globalPos);
 [[nodiscard]] FRAMELESSHELPER_CORE_API bool shouldAppsUseDarkMode_linux();
 [[nodiscard]] FRAMELESSHELPER_CORE_API QColor getAccentColor_linux();
-FRAMELESSHELPER_CORE_API void sendMoveResizeMessage
-    (const WId windowId, const uint32_t action, const QPoint &globalPos, const Qt::MouseButton button = Qt::LeftButton);
+FRAMELESSHELPER_CORE_API void sendMoveResizeMessage(const WId windowId, const uint32_t action, const QPoint &globalPos, const Qt::MouseButton button = Qt::LeftButton);
 [[nodiscard]] FRAMELESSHELPER_CORE_API bool isCustomDecorationSupported();
-[[nodiscard]] FRAMELESSHELPER_CORE_API bool
-    setPlatformPropertiesForWindow(QWindow *window, const QVariantHash &props);
+[[nodiscard]] FRAMELESSHELPER_CORE_API bool setPlatformPropertiesForWindow(QWindow *window, const QVariantHash &props);
 #endif // Q_OS_LINUX
 
 #ifdef Q_OS_MACOS

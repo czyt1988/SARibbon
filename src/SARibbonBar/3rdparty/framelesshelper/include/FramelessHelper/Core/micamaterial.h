@@ -31,13 +31,10 @@
 FRAMELESSHELPER_BEGIN_NAMESPACE
 
 class MicaMaterialPrivate;
-
 class FRAMELESSHELPER_CORE_API MicaMaterial : public QObject
 {
     Q_OBJECT
-    FRAMELESSHELPER_CLASS_INFO
-    Q_DISABLE_COPY_MOVE(MicaMaterial)
-    Q_DECLARE_PRIVATE(MicaMaterial)
+    FRAMELESSHELPER_PUBLIC_QT_CLASS(MicaMaterial)
 
     Q_PROPERTY(QColor tintColor READ tintColor WRITE setTintColor NOTIFY tintColorChanged FINAL)
     Q_PROPERTY(qreal tintOpacity READ tintOpacity WRITE setTintOpacity NOTIFY tintOpacityChanged FINAL)
@@ -80,9 +77,6 @@ Q_SIGNALS:
     void noiseOpacityChanged();
     void fallbackEnabledChanged();
     void shouldRedraw();
-
-private:
-    QScopedPointer<MicaMaterialPrivate> d_ptr;
 };
 
 FRAMELESSHELPER_END_NAMESPACE

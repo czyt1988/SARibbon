@@ -39,22 +39,16 @@ class QuickMicaMaterial;
 #if FRAMELESSHELPER_CONFIG(border_painter)
 class QuickWindowBorder;
 #endif
-class FramelessQuickHelper;
-struct FramelessQuickHelperData;
 
+class FramelessQuickHelper;
 class FRAMELESSHELPER_QUICK_API FramelessQuickHelperPrivate : public QObject
 {
     Q_OBJECT
-    FRAMELESSHELPER_CLASS_INFO
-    Q_DECLARE_PUBLIC(FramelessQuickHelper)
-    Q_DISABLE_COPY_MOVE(FramelessQuickHelperPrivate)
+    FRAMELESSHELPER_PRIVATE_QT_CLASS(FramelessQuickHelper)
 
 public:
     explicit FramelessQuickHelperPrivate(FramelessQuickHelper *q);
     ~FramelessQuickHelperPrivate() override;
-
-    Q_NODISCARD static FramelessQuickHelperPrivate *get(FramelessQuickHelper *pub);
-    Q_NODISCARD static const FramelessQuickHelperPrivate *get(const FramelessQuickHelper *pub);
 
     void attach();
     void detach();
@@ -83,11 +77,8 @@ public:
     Q_NODISCARD bool isInTitleBarDraggableArea(const QPoint &pos) const;
     Q_NODISCARD bool shouldIgnoreMouseEvents(const QPoint &pos) const;
     void setSystemButtonState(const QuickGlobal::SystemButtonType button, const QuickGlobal::ButtonState state);
-    Q_NODISCARD const FramelessQuickHelperData *getWindowData() const;
-    Q_NODISCARD FramelessQuickHelperData *getWindowDataMutable() const;
     void rebindWindow();
 
-    FramelessQuickHelper *q_ptr = nullptr;
     QColor savedWindowBackgroundColor = {};
     bool blurBehindWindowEnabled = false;
     std::optional<bool> extendIntoTitleBar = std::nullopt;

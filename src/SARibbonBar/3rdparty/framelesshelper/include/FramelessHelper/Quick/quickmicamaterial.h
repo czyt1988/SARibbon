@@ -32,16 +32,13 @@
 FRAMELESSHELPER_BEGIN_NAMESPACE
 
 class QuickMicaMaterialPrivate;
-
 class FRAMELESSHELPER_QUICK_API QuickMicaMaterial : public QQuickPaintedItem
 {
     Q_OBJECT
-    FRAMELESSHELPER_CLASS_INFO
+    FRAMELESSHELPER_PUBLIC_QT_CLASS(QuickMicaMaterial)
 #ifdef QML_NAMED_ELEMENT
     QML_NAMED_ELEMENT(MicaMaterial)
 #endif
-    Q_DISABLE_COPY_MOVE(QuickMicaMaterial)
-    Q_DECLARE_PRIVATE(QuickMicaMaterial)
 
     Q_PROPERTY(QColor tintColor READ tintColor WRITE setTintColor NOTIFY tintColorChanged FINAL)
     Q_PROPERTY(qreal tintOpacity READ tintOpacity WRITE setTintOpacity NOTIFY tintOpacityChanged FINAL)
@@ -81,9 +78,6 @@ protected:
     void itemChange(const ItemChange change, const ItemChangeData &value) override;
     void classBegin() override;
     void componentComplete() override;
-
-private:
-    QScopedPointer<QuickMicaMaterialPrivate> d_ptr;
 };
 
 FRAMELESSHELPER_END_NAMESPACE

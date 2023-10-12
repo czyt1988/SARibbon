@@ -24,6 +24,7 @@
 
 #include "utils.h"
 #include "framelesshelpercore_global_p.h"
+#include "framelessmanager_p.h"
 #ifdef Q_OS_WINDOWS
 #  include "winverhelper_p.h"
 #endif // Q_OS_WINDOWS
@@ -210,29 +211,38 @@ QWindow *Utils::findWindow(const WId windowId)
     return nullptr;
 }
 
-void Utils::moveWindowToDesktopCenter(FramelessParamsConst params, const bool considerTaskBar)
+bool Utils::moveWindowToDesktopCenter(const WId windowId, const bool considerTaskBar)
 {
-    Q_ASSERT(params);
-    if (!params) {
-        return;
+    Q_ASSERT(windowId);
+    if (!windowId) {
+        return false;
     }
-    const QSize windowSize = params->getWindowSize();
-    if (windowSize.isEmpty() || (windowSize == kDefaultWindowSize)) {
-        return;
+    const QObject *window = FramelessManagerPrivate::getWindow(windowId);
+    if (!window) {
+        return false;
     }
-    const QScreen *screen = params->getWindowScreen();
+    const FramelessDataPtr data = FramelessManagerPrivate::getData(window);
+    if (!data || !data->callbacks) {
+        return false;
+    }
+    const QSize windowSize = data->callbacks->getWindowSize();
+    if (windowSize.isEmpty() || (windowSize <= kDefaultWindowSize)) {
+        return false;
+    }
+    const QScreen *screen = data->callbacks->getWindowScreen();
     if (!screen) {
         screen = QGuiApplication::primaryScreen();
     }
     Q_ASSERT(screen);
     if (!screen) {
-        return;
+        return false;
     }
     const QSize screenSize = (considerTaskBar ? screen->availableSize() : screen->size());
     const QPoint offset = (considerTaskBar ? screen->availableGeometry().topLeft() : QPoint(0, 0));
     const int newX = std::round(qreal(screenSize.width() - windowSize.width()) / qreal(2));
     const int newY = std::round(qreal(screenSize.height() - windowSize.height()) / qreal(2));
-    params->setWindowPosition(QPoint(newX + offset.x(), newY + offset.y()));
+    data->callbacks->setWindowPosition(QPoint(newX + offset.x(), newY + offset.y()));
+    return true;
 }
 
 Qt::WindowState Utils::windowStatesToWindowState(const Qt::WindowStates states)
@@ -314,9 +324,9 @@ bool Utils::shouldAppsUseDarkMode()
 qreal Utils::roundScaleFactor(const qreal factor)
 {
     // Qt can't handle scale factors less than 1.0 (according to the comments in qhighdpiscaling.cpp).
-    Q_ASSERT((factor > 1) || qFuzzyCompare(factor, qreal(1)));
-    if (factor < 1) {
-        return 1;
+    Q_ASSERT((factor > qreal(1)) || qFuzzyCompare(factor, qreal(1)));
+    if (factor < qreal(1)) {
+        return qreal(1);
     }
 #if (!FRAMELESSHELPER_CONFIG(private_qt) || (QT_VERSION < QT_VERSION_CHECK(6, 2, 1)))
 #  if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
@@ -575,7 +585,7 @@ quint32 Utils::defaultScreenDpi()
 QColor Utils::getAccentColor()
 {
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 6, 0))
-    return QGuiApplication::palette().color(QPalette::AccentColor);
+    return QGuiApplication::palette().color(QPalette::Accent);
 #else // (QT_VERSION < QT_VERSION_CHECK(6, 6, 0))
 #  ifdef Q_OS_WINDOWS
     return getAccentColor_windows();

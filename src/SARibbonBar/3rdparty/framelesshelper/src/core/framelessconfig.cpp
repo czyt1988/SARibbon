@@ -85,14 +85,14 @@ Q_GLOBAL_STATIC(FramelessConfigData, g_framelessConfigData)
 static inline void warnInappropriateOptions()
 {
     const FramelessConfig * const cfg = FramelessConfig::instance();
+    if (cfg->isSet(Option::UseCrossPlatformQtImplementation)) {
+        WARNING << "Option::UseCrossPlatformQtImplementation is deprecated and has no effect now. It will be removed in a future version.";
+    }
 #ifdef Q_OS_WINDOWS
     if (cfg->isSet(Option::DisableWindowsSnapLayout)) {
-        WARNING << "Option::DisableWindowsSnapLayout is deprecated and will removed in a future version. It has not effect now.";
+        WARNING << "Option::DisableWindowsSnapLayout is deprecated and has no effect now. It will be removed in a future version.";
     }
 #else
-    if (cfg->isSet(Option::UseCrossPlatformQtImplementation)) {
-        WARNING << "Option::UseCrossPlatformQtImplementation is default on non-Windows platforms.";
-    }
     if (cfg->isSet(Option::ForceHideWindowFrameBorder)) {
         WARNING << "Option::ForceHideWindowFrameBorder is only available on Windows.";
     }

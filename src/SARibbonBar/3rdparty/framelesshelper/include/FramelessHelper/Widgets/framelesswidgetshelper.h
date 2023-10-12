@@ -35,14 +35,12 @@ class MicaMaterial;
 #if FRAMELESSHELPER_CONFIG(border_painter)
 class WindowBorderPainter;
 #endif
-class FramelessWidgetsHelperPrivate;
 
+class FramelessWidgetsHelperPrivate;
 class FRAMELESSHELPER_WIDGETS_API FramelessWidgetsHelper : public QObject
 {
     Q_OBJECT
-    FRAMELESSHELPER_CLASS_INFO
-    Q_DECLARE_PRIVATE(FramelessWidgetsHelper)
-    Q_DISABLE_COPY_MOVE(FramelessWidgetsHelper)
+    FRAMELESSHELPER_PUBLIC_QT_CLASS(FramelessWidgetsHelper)
     Q_PROPERTY(QWidget* titleBarWidget READ titleBarWidget WRITE setTitleBarWidget NOTIFY titleBarWidgetChanged FINAL)
     Q_PROPERTY(bool windowFixedSize READ isWindowFixedSize WRITE setWindowFixedSize NOTIFY windowFixedSizeChanged FINAL)
     Q_PROPERTY(bool blurBehindWindowEnabled READ isBlurBehindWindowEnabled WRITE setBlurBehindWindowEnabled NOTIFY blurBehindWindowEnabledChanged FINAL)
@@ -96,9 +94,6 @@ Q_SIGNALS:
     void blurBehindWindowEnabledChanged();
     void windowChanged();
     void ready();
-
-private:
-    QScopedPointer<FramelessWidgetsHelperPrivate> d_ptr;
 };
 
 FRAMELESSHELPER_END_NAMESPACE

@@ -35,23 +35,17 @@ FRAMELESSHELPER_BEGIN_NAMESPACE
 #if FRAMELESSHELPER_CONFIG(border_painter)
 class QuickWindowBorder;
 #endif
-class FramelessQuickWindow;
 
+class FramelessQuickWindow;
 class FRAMELESSHELPER_QUICK_API FramelessQuickWindowPrivate : public QObject
 {
     Q_OBJECT
-    FRAMELESSHELPER_CLASS_INFO
-    Q_DECLARE_PUBLIC(FramelessQuickWindow)
-    Q_DISABLE_COPY_MOVE(FramelessQuickWindowPrivate)
+    FRAMELESSHELPER_PRIVATE_QT_CLASS(FramelessQuickWindow)
 
 public:
     explicit FramelessQuickWindowPrivate(FramelessQuickWindow *q);
     ~FramelessQuickWindowPrivate() override;
 
-    Q_NODISCARD static FramelessQuickWindowPrivate *get(FramelessQuickWindow *pub);
-    Q_NODISCARD static const FramelessQuickWindowPrivate *get(const FramelessQuickWindow *pub);
-
-    FramelessQuickWindow *q_ptr = nullptr;
     QQuickWindow::Visibility savedVisibility = QQuickWindow::Windowed;
 #if FRAMELESSHELPER_CONFIG(border_painter)
     QuickWindowBorder *windowBorder = nullptr;

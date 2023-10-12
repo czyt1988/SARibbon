@@ -50,11 +50,11 @@ _GetWindowCompositionAttribute(const HWND hWnd, PWINDOWCOMPOSITIONATTRIBDATA pvD
     Q_ASSERT(hWnd);
     Q_ASSERT(pvData);
     if (!hWnd || !pvData) {
-        SetLastError(ERROR_INVALID_PARAMETER);
+        ::SetLastError(ERROR_INVALID_PARAMETER);
         return FALSE;
     }
     if (!API_USER_AVAILABLE(GetWindowCompositionAttribute)) {
-        SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
+        ::SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
         return FALSE;
     }
     return API_CALL_FUNCTION4(user32, GetWindowCompositionAttribute, hWnd, pvData);
@@ -66,11 +66,11 @@ _SetWindowCompositionAttribute(const HWND hWnd, PWINDOWCOMPOSITIONATTRIBDATA pvD
     Q_ASSERT(hWnd);
     Q_ASSERT(pvData);
     if (!hWnd || !pvData) {
-        SetLastError(ERROR_INVALID_PARAMETER);
+        ::SetLastError(ERROR_INVALID_PARAMETER);
         return FALSE;
     }
     if (!API_USER_AVAILABLE(SetWindowCompositionAttribute)) {
-        SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
+        ::SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
         return FALSE;
     }
     return API_CALL_FUNCTION4(user32, SetWindowCompositionAttribute, hWnd, pvData);
@@ -111,14 +111,14 @@ _ShouldAppsUseDarkMode(VOID)
 {
     FRAMELESSHELPER_USE_NAMESPACE
     if (!WindowsVersionHelper::isWin10OrGreater()) {
-        SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
+        ::SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
         return FALSE;
     }
     static const auto pShouldAppsUseDarkMode
         = reinterpret_cast<ShouldAppsUseDarkModePtr>(
             SysApiLoader::resolve(kuxtheme, MAKEINTRESOURCEA(132)));
     if (!pShouldAppsUseDarkMode) {
-        SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
+        ::SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
         return FALSE;
     }
     return pShouldAppsUseDarkMode();
@@ -129,19 +129,19 @@ _AllowDarkModeForWindow(const HWND hWnd, const BOOL bAllow)
 {
     Q_ASSERT(hWnd);
     if (!hWnd) {
-        SetLastError(ERROR_INVALID_PARAMETER);
+        ::SetLastError(ERROR_INVALID_PARAMETER);
         return FALSE;
     }
     FRAMELESSHELPER_USE_NAMESPACE
     if (!WindowsVersionHelper::isWin10OrGreater()) {
-        SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
+        ::SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
         return FALSE;
     }
     static const auto pAllowDarkModeForWindow
         = reinterpret_cast<AllowDarkModeForWindowPtr>(
             SysApiLoader::resolve(kuxtheme, MAKEINTRESOURCEA(133)));
     if (!pAllowDarkModeForWindow) {
-        SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
+        ::SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
         return FALSE;
     }
     return pAllowDarkModeForWindow(hWnd, bAllow);
@@ -152,14 +152,14 @@ _AllowDarkModeForApp(const BOOL bAllow)
 {
     FRAMELESSHELPER_USE_NAMESPACE
     if (!WindowsVersionHelper::isWin10OrGreater()) {
-        SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
+        ::SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
         return FALSE;
     }
     static const auto pAllowDarkModeForApp
         = reinterpret_cast<AllowDarkModeForAppPtr>(
             SysApiLoader::resolve(kuxtheme, MAKEINTRESOURCEA(135)));
     if (!pAllowDarkModeForApp) {
-        SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
+        ::SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
         return FALSE;
     }
     return pAllowDarkModeForApp(bAllow);
@@ -170,14 +170,14 @@ _FlushMenuThemes(VOID)
 {
     FRAMELESSHELPER_USE_NAMESPACE
     if (!WindowsVersionHelper::isWin10OrGreater()) {
-        SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
+        ::SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
         return;
     }
     static const auto pFlushMenuThemes
         = reinterpret_cast<FlushMenuThemesPtr>(
             SysApiLoader::resolve(kuxtheme, MAKEINTRESOURCEA(136)));
     if (!pFlushMenuThemes) {
-        SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
+        ::SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
         return;
     }
     pFlushMenuThemes();
@@ -188,14 +188,14 @@ _RefreshImmersiveColorPolicyState(VOID)
 {
     FRAMELESSHELPER_USE_NAMESPACE
     if (!WindowsVersionHelper::isWin10OrGreater()) {
-        SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
+        ::SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
         return;
     }
     static const auto pRefreshImmersiveColorPolicyState
         = reinterpret_cast<RefreshImmersiveColorPolicyStatePtr>(
             SysApiLoader::resolve(kuxtheme, MAKEINTRESOURCEA(104)));
     if (!pRefreshImmersiveColorPolicyState) {
-        SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
+        ::SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
         return;
     }
     pRefreshImmersiveColorPolicyState();
@@ -206,19 +206,19 @@ _IsDarkModeAllowedForWindow(const HWND hWnd)
 {
     Q_ASSERT(hWnd);
     if (!hWnd) {
-        SetLastError(ERROR_INVALID_PARAMETER);
+        ::SetLastError(ERROR_INVALID_PARAMETER);
         return FALSE;
     }
     FRAMELESSHELPER_USE_NAMESPACE
     if (!WindowsVersionHelper::isWin10OrGreater()) {
-        SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
+        ::SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
         return FALSE;
     }
     static const auto pIsDarkModeAllowedForWindow
         = reinterpret_cast<IsDarkModeAllowedForWindowPtr>(
             SysApiLoader::resolve(kuxtheme, MAKEINTRESOURCEA(137)));
     if (!pIsDarkModeAllowedForWindow) {
-        SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
+        ::SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
         return FALSE;
     }
     return pIsDarkModeAllowedForWindow(hWnd);
@@ -229,14 +229,14 @@ _GetIsImmersiveColorUsingHighContrast(const IMMERSIVE_HC_CACHE_MODE mode)
 {
     FRAMELESSHELPER_USE_NAMESPACE
     if (!WindowsVersionHelper::isWin10OrGreater()) {
-        SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
+        ::SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
         return FALSE;
     }
     static const auto pGetIsImmersiveColorUsingHighContrast
         = reinterpret_cast<GetIsImmersiveColorUsingHighContrastPtr>(
             SysApiLoader::resolve(kuxtheme, MAKEINTRESOURCEA(106)));
     if (!pGetIsImmersiveColorUsingHighContrast) {
-        SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
+        ::SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
         return FALSE;
     }
     return pGetIsImmersiveColorUsingHighContrast(mode);
@@ -248,19 +248,19 @@ _OpenNcThemeData(const HWND hWnd, LPCWSTR pszClassList)
     Q_ASSERT(hWnd);
     Q_ASSERT(pszClassList);
     if (!hWnd || !pszClassList) {
-        SetLastError(ERROR_INVALID_PARAMETER);
+        ::SetLastError(ERROR_INVALID_PARAMETER);
         return nullptr;
     }
     FRAMELESSHELPER_USE_NAMESPACE
     if (!WindowsVersionHelper::isWin10OrGreater()) {
-        SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
+        ::SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
         return nullptr;
     }
     static const auto pOpenNcThemeData
         = reinterpret_cast<OpenNcThemeDataPtr>(
             SysApiLoader::resolve(kuxtheme, MAKEINTRESOURCEA(49)));
     if (!pOpenNcThemeData) {
-        SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
+        ::SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
         return nullptr;
     }
     return pOpenNcThemeData(hWnd, pszClassList);
@@ -271,14 +271,14 @@ _ShouldSystemUseDarkMode(VOID)
 {
     FRAMELESSHELPER_USE_NAMESPACE
     if (!WindowsVersionHelper::isWin10OrGreater()) {
-        SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
+        ::SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
         return FALSE;
     }
     static const auto pShouldSystemUseDarkMode
         = reinterpret_cast<ShouldSystemUseDarkModePtr>(
             SysApiLoader::resolve(kuxtheme, MAKEINTRESOURCEA(138)));
     if (!pShouldSystemUseDarkMode) {
-        SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
+        ::SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
         return FALSE;
     }
     return pShouldSystemUseDarkMode();
@@ -289,14 +289,14 @@ _SetPreferredAppMode(const PREFERRED_APP_MODE mode)
 {
     FRAMELESSHELPER_USE_NAMESPACE
     if (!WindowsVersionHelper::isWin10OrGreater()) {
-        SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
+        ::SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
         return PAM_MAX;
     }
     static const auto pSetPreferredAppMode
         = reinterpret_cast<SetPreferredAppModePtr>(
             SysApiLoader::resolve(kuxtheme, MAKEINTRESOURCEA(135)));
     if (!pSetPreferredAppMode) {
-        SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
+        ::SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
         return PAM_MAX;
     }
     return pSetPreferredAppMode(mode);
@@ -307,14 +307,14 @@ _IsDarkModeAllowedForApp(VOID)
 {
     FRAMELESSHELPER_USE_NAMESPACE
     if (!WindowsVersionHelper::isWin10OrGreater()) {
-        SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
+        ::SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
         return FALSE;
     }
     static const auto pIsDarkModeAllowedForApp
         = reinterpret_cast<IsDarkModeAllowedForAppPtr>(
             SysApiLoader::resolve(kuxtheme, MAKEINTRESOURCEA(139)));
     if (!pIsDarkModeAllowedForApp) {
-        SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
+        ::SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
         return FALSE;
     }
     return pIsDarkModeAllowedForApp();
@@ -325,12 +325,12 @@ _EnableChildWindowDpiMessage2(const HWND hWnd, const BOOL fEnable)
 {
     Q_ASSERT(hWnd);
     if (!hWnd) {
-        SetLastError(ERROR_INVALID_PARAMETER);
+        ::SetLastError(ERROR_INVALID_PARAMETER);
         return FALSE;
     }
     FRAMELESSHELPER_USE_NAMESPACE
     if (!WindowsVersionHelper::isWin10OrGreater()) {
-        SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
+        ::SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
         return FALSE;
     }
     using EnableChildWindowDpiMessagePtr = decltype(&::_EnableChildWindowDpiMessage);
@@ -355,7 +355,7 @@ _EnableChildWindowDpiMessage2(const HWND hWnd, const BOOL fEnable)
         return nullptr;
     }();
     if (!pEnableChildWindowDpiMessage) {
-        SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
+        ::SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
         return FALSE;
     }
     return pEnableChildWindowDpiMessage(hWnd, fEnable);
@@ -366,7 +366,7 @@ _EnablePerMonitorDialogScaling2(VOID)
 {
     FRAMELESSHELPER_USE_NAMESPACE
     if (!WindowsVersionHelper::isWin10OrGreater()) {
-        SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
+        ::SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
         return FALSE;
     }
     using EnablePerMonitorDialogScalingPtr = decltype(&::_EnablePerMonitorDialogScaling);
@@ -385,7 +385,7 @@ _EnablePerMonitorDialogScaling2(VOID)
         return nullptr;
     }();
     if (!pEnablePerMonitorDialogScaling) {
-        SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
+        ::SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
         return FALSE;
     }
     return pEnablePerMonitorDialogScaling();
@@ -396,12 +396,12 @@ _GetDpiForWindow2(const HWND hWnd)
 {
     Q_ASSERT(hWnd);
     if (!hWnd) {
-        SetLastError(ERROR_INVALID_PARAMETER);
+        ::SetLastError(ERROR_INVALID_PARAMETER);
         return 0;
     }
     FRAMELESSHELPER_USE_NAMESPACE
     if (!WindowsVersionHelper::isWin10OrGreater()) {
-        SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
+        ::SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
         return 0;
     }
     using GetDpiForWindowPtr = decltype(&::_GetDpiForWindow);
@@ -424,7 +424,7 @@ _GetDpiForWindow2(const HWND hWnd)
         return nullptr;
     }();
     if (!pGetDpiForWindow) {
-        SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
+        ::SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
         return 0;
     }
     return pGetDpiForWindow(hWnd);
@@ -436,12 +436,12 @@ _GetSystemMetricsForDpi2(const int nIndex, const UINT dpi)
     Q_ASSERT(nIndex >= 0);
     Q_ASSERT(dpi != 0);
     if ((nIndex < 0) || (dpi == 0)) {
-        SetLastError(ERROR_INVALID_PARAMETER);
+        ::SetLastError(ERROR_INVALID_PARAMETER);
         return 0;
     }
     FRAMELESSHELPER_USE_NAMESPACE
     if (!WindowsVersionHelper::isWin10OrGreater()) {
-        SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
+        ::SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
         return 0;
     }
     using GetSystemMetricsForDpiPtr = decltype(&::_GetSystemMetricsForDpi);
@@ -460,7 +460,7 @@ _GetSystemMetricsForDpi2(const int nIndex, const UINT dpi)
         return nullptr;
     }();
     if (!pGetSystemMetricsForDpi) {
-        SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
+        ::SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
         return 0;
     }
     return pGetSystemMetricsForDpi(nIndex, dpi);
@@ -473,12 +473,12 @@ _AdjustWindowRectExForDpi2(LPRECT lpRect, const DWORD dwStyle,
     Q_ASSERT(lpRect);
     Q_ASSERT(dpi != 0);
     if (!lpRect || (dpi == 0)) {
-        SetLastError(ERROR_INVALID_PARAMETER);
+        ::SetLastError(ERROR_INVALID_PARAMETER);
         return FALSE;
     }
     FRAMELESSHELPER_USE_NAMESPACE
     if (!WindowsVersionHelper::isWin10OrGreater()) {
-        SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
+        ::SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
         return FALSE;
     }
     using AdjustWindowRectExForDpiPtr = decltype(&::_AdjustWindowRectExForDpi);
@@ -496,7 +496,7 @@ _AdjustWindowRectExForDpi2(LPRECT lpRect, const DWORD dwStyle,
         return nullptr;
     }();
     if (!pAdjustWindowRectExForDpi) {
-        SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
+        ::SetLastError(ERROR_CALL_NOT_IMPLEMENTED);
         return FALSE;
     }
     return pAdjustWindowRectExForDpi(lpRect, dwStyle, bMenu, dwExStyle, dpi);

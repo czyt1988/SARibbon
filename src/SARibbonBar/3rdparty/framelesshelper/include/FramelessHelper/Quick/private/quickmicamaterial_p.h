@@ -31,27 +31,21 @@
 FRAMELESSHELPER_BEGIN_NAMESPACE
 
 class MicaMaterial;
-class QuickMicaMaterial;
 
+class QuickMicaMaterial;
 class FRAMELESSHELPER_QUICK_API QuickMicaMaterialPrivate : public QObject
 {
     Q_OBJECT
-    FRAMELESSHELPER_CLASS_INFO
-    Q_DISABLE_COPY_MOVE(QuickMicaMaterialPrivate)
-    Q_DECLARE_PUBLIC(QuickMicaMaterial)
+    FRAMELESSHELPER_PRIVATE_QT_CLASS(QuickMicaMaterial)
 
 public:
     explicit QuickMicaMaterialPrivate(QuickMicaMaterial *q);
     ~QuickMicaMaterialPrivate() override;
 
-    Q_NODISCARD static QuickMicaMaterialPrivate *get(QuickMicaMaterial *q);
-    Q_NODISCARD static const QuickMicaMaterialPrivate *get(const QuickMicaMaterial *q);
-
     Q_SLOT void rebindWindow();
 
     void initialize();
 
-    QuickMicaMaterial *q_ptr = nullptr;
     QMetaObject::Connection rootWindowXChangedConnection = {};
     QMetaObject::Connection rootWindowYChangedConnection = {};
     QMetaObject::Connection rootWindowActiveChangedConnection = {};

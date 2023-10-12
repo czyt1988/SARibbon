@@ -33,11 +33,10 @@ FRAMELESSHELPER_BEGIN_NAMESPACE
 class FRAMELESSHELPER_QUICK_API QuickImageItem : public QQuickPaintedItem
 {
     Q_OBJECT
-    FRAMELESSHELPER_CLASS_INFO
+    FRAMELESSHELPER_QT_CLASS(QuickImageItem)
 #ifdef QML_NAMED_ELEMENT
     QML_NAMED_ELEMENT(ImageItem)
 #endif
-    Q_DISABLE_COPY_MOVE(QuickImageItem)
 
     Q_PROPERTY(QVariant source READ source WRITE setSource NOTIFY sourceChanged FINAL)
 

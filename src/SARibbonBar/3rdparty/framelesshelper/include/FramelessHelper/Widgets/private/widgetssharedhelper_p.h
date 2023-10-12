@@ -39,8 +39,7 @@ class WindowBorderPainter;
 class FRAMELESSHELPER_WIDGETS_API WidgetsSharedHelper : public QObject
 {
     Q_OBJECT
-    FRAMELESSHELPER_CLASS_INFO
-    Q_DISABLE_COPY_MOVE(WidgetsSharedHelper)
+    FRAMELESSHELPER_QT_CLASS(WidgetsSharedHelper)
 #if FRAMELESSHELPER_CONFIG(mica_material)
     Q_PROPERTY(bool micaEnabled READ isMicaEnabled WRITE setMicaEnabled NOTIFY micaEnabledChanged FINAL)
 #endif

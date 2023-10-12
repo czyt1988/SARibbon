@@ -37,13 +37,10 @@
 FRAMELESSHELPER_BEGIN_NAMESPACE
 
 class StandardTitleBarPrivate;
-
 class FRAMELESSHELPER_WIDGETS_API StandardTitleBar : public QWidget
 {
     Q_OBJECT
-    FRAMELESSHELPER_CLASS_INFO
-    Q_DECLARE_PRIVATE(StandardTitleBar)
-    Q_DISABLE_COPY_MOVE(StandardTitleBar)
+    FRAMELESSHELPER_PUBLIC_QT_CLASS(StandardTitleBar)
     Q_PROPERTY(Qt::Alignment titleLabelAlignment READ titleLabelAlignment WRITE setTitleLabelAlignment NOTIFY titleLabelAlignmentChanged FINAL)
 #if (!defined(Q_OS_MACOS) && FRAMELESSHELPER_CONFIG(system_button))
     Q_PROPERTY(StandardSystemButton* minimizeButton READ minimizeButton CONSTANT FINAL)
@@ -104,9 +101,6 @@ Q_SIGNALS:
     void windowIconSizeChanged();
     void windowIconVisibleChanged();
     void titleFontChanged();
-
-private:
-    QScopedPointer<StandardTitleBarPrivate> d_ptr;
 };
 
 FRAMELESSHELPER_END_NAMESPACE

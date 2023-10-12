@@ -31,6 +31,7 @@ project(FramelessHelper
 )
 
 include(CMakeDependentOption)
+include(cmake/utils.cmake)
 
 # TODO: Use add_feature_info() for every option below? Is it worth doing?
 option(FRAMELESSHELPER_BUILD_STATIC "Build FramelessHelper as a static library." OFF)
@@ -61,16 +62,7 @@ option(FRAMELESSHELPER_NO_TRANSLATION "Don't bundle the I18N translations into t
 option(FRAMELESSHELPER_NO_MICA_MATERIAL "Disable the cross-platform homemade Mica Material." OFF)
 option(FRAMELESSHELPER_NO_BORDER_PAINTER "Disable the cross-platform window frame border painter." OFF)
 option(FRAMELESSHELPER_NO_SYSTEM_BUTTON "Disable the pre-defined StandardSystemButton control." OFF)
-
-if(FRAMELESSHELPER_NO_WINDOW AND FRAMELESSHELPER_BUILD_EXAMPLES)
-    message(WARNING "You can't build the examples when the FramelessWindow class is disabled at the same time!")
-    set(FRAMELESSHELPER_BUILD_EXAMPLES OFF)
-endif()
-
-set(FRAMELESSHELPER_64BIT_POSTFIX "")
-if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-    set(FRAMELESSHELPER_64BIT_POSTFIX "64")
-endif()
+cmake_dependent_option(FRAMELESSHELPER_NATIVE_IMPL "Use platform native implementation instead of Qt to get best experience." ON WIN32 OFF)
 
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Gui)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Gui)
@@ -78,10 +70,18 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Gui)
 find_package(QT NAMES Qt6 Qt5 QUIET COMPONENTS Widgets Quick)
 find_package(Qt${QT_VERSION_MAJOR} QUIET COMPONENTS Widgets Quick)
 
-include(cmake/utils.cmake)
+if(FRAMELESSHELPER_NATIVE_IMPL AND NOT WIN32)
+    message(WARNING "FRAMELESSHELPER_NATIVE_IMPL currently only supports the Windows platform!")
+    set(FRAMELESSHELPER_NATIVE_IMPL OFF)
+endif()
 
-if(NOT APPLE AND FRAMELESSHELPER_ENABLE_UNIVERSAL_BUILD)
-    message(WARNING "Current OS is not macOS, universal build will be disabled.")
+if(FRAMELESSHELPER_NO_WINDOW AND FRAMELESSHELPER_BUILD_EXAMPLES)
+    message(WARNING "You can't build the examples when the FramelessWindow class is disabled at the same time!")
+    set(FRAMELESSHELPER_BUILD_EXAMPLES OFF)
+endif()
+
+if(FRAMELESSHELPER_ENABLE_UNIVERSAL_BUILD AND NOT APPLE)
+    message(WARNING "Universal build is a macOS only feature, it will be disabled on current platform.")
     set(FRAMELESSHELPER_ENABLE_UNIVERSAL_BUILD OFF)
 elseif(APPLE AND ((QT_VERSION VERSION_LESS "6.2" AND QT_VERSION VERSION_GREATER_EQUAL "6.0") OR (QT_VERSION VERSION_LESS "5.15.9")))
     message(WARNING "Your Qt version ${QT_VERSION} doesn't support universal build, it will be disabled.")
@@ -94,6 +94,29 @@ endif()
 
 if(FRAMELESSHELPER_ENABLE_VCLTL AND NOT MSVC)
     message(WARNING "VC-LTL is only available for the MSVC toolchain.")
+    set(FRAMELESSHELPER_ENABLE_VCLTL OFF)
+endif()
+
+if(FRAMELESSHELPER_ENABLE_YYTHUNKS AND NOT MSVC)
+    message(WARNING "YY-Thunks is only available for the MSVC toolchain.")
+    set(FRAMELESSHELPER_ENABLE_YYTHUNKS OFF)
+endif()
+
+if(NOT TARGET Qt${QT_VERSION_MAJOR}::Core OR NOT TARGET Qt${QT_VERSION_MAJOR}::Gui)
+    message(WARNING "Can't find the QtCore and/or QtGui module. Nothing will be built.")
+    set(FRAMELESSHELPER_BUILD_WIDGETS OFF)
+    set(FRAMELESSHELPER_BUILD_QUICK OFF)
+    set(FRAMELESSHELPER_BUILD_EXAMPLES OFF)
+endif()
+
+if(FRAMELESSHELPER_BUILD_QUICK AND NOT TARGET Qt${QT_VERSION_MAJOR}::Quick)
+    message(WARNING "Can't find the QtQuick module. FramelessHelper's QtQuick implementation and the QtQuick demo won't be built.")
+    set(FRAMELESSHELPER_BUILD_QUICK OFF)
+endif()
+
+set(FRAMELESSHELPER_64BIT_POSTFIX "")
+if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+    set(FRAMELESSHELPER_64BIT_POSTFIX "64")
 endif()
 
 set(FRAMELESSHELPER_LICENSE_HEADER "/*
@@ -144,24 +167,22 @@ if(MINGW AND CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
     set(FRAMELESSHELPER_ENABLE_CFGUARD OFF)
 endif()
 
-if(MSVC)
-    if(FRAMELESSHELPER_ENABLE_VCLTL)
-        include(cmake/VC-LTL.cmake)
-        if("x${SupportLTL}" STREQUAL "xtrue")
-            # Make sure we will always overwrite the previous settings.
-            unset(CMAKE_MSVC_RUNTIME_LIBRARY)
-            unset(CMAKE_MSVC_RUNTIME_LIBRARY CACHE)
-            #unset(CMAKE_MSVC_RUNTIME_LIBRARY PARENT_SCOPE)
-            set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "" FORCE)
-        endif()
+if(FRAMELESSHELPER_ENABLE_VCLTL)
+    include(cmake/VC-LTL.cmake)
+    if("x${SupportLTL}" STREQUAL "xtrue")
+        # Make sure we will always overwrite the previous settings.
+        unset(CMAKE_MSVC_RUNTIME_LIBRARY)
+        unset(CMAKE_MSVC_RUNTIME_LIBRARY CACHE)
+        #unset(CMAKE_MSVC_RUNTIME_LIBRARY PARENT_SCOPE)
+        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STRING "" FORCE)
     endif()
-    if(FRAMELESSHELPER_ENABLE_YYTHUNKS)
-        unset(YYTHUNKS_TARGET_OS)
-        unset(YYTHUNKS_TARGET_OS CACHE)
-        #unset(YYTHUNKS_TARGET_OS PARENT_SCOPE)
-        set(YYTHUNKS_TARGET_OS "WinXP" CACHE STRING "" FORCE)
-        include(cmake/YY-Thunks.cmake)
-    endif()
+endif()
+if(FRAMELESSHELPER_ENABLE_YYTHUNKS)
+    unset(YYTHUNKS_TARGET_OS)
+    unset(YYTHUNKS_TARGET_OS CACHE)
+    #unset(YYTHUNKS_TARGET_OS PARENT_SCOPE)
+    set(YYTHUNKS_TARGET_OS "WinXP" CACHE STRING "" FORCE)
+    include(cmake/YY-Thunks.cmake)
 endif()
 
 set(__extra_flags "")
@@ -174,11 +195,6 @@ prepare_package_export(
     ${__extra_flags}
 )
 unset(__extra_flags)
-
-if(FRAMELESSHELPER_BUILD_QUICK AND NOT TARGET Qt${QT_VERSION_MAJOR}::Quick)
-    message(WARNING "Can't find the QtQuick module. FramelessHelper's QtQuick implementation and the QtQuick demo won't be built.")
-    set(FRAMELESSHELPER_BUILD_QUICK OFF)
-endif()
 
 set(FRAMELESSHELPER_VERSION_FILE "${PROJECT_BINARY_DIR}/framelesshelper.version")
 generate_project_version(
@@ -202,14 +218,11 @@ add_project_config(KEY "translation" CONDITION NOT FRAMELESSHELPER_NO_TRANSLATIO
 add_project_config(KEY "mica_material" CONDITION NOT FRAMELESSHELPER_NO_MICA_MATERIAL)
 add_project_config(KEY "border_painter" CONDITION NOT FRAMELESSHELPER_NO_BORDER_PAINTER)
 add_project_config(KEY "system_button" CONDITION NOT FRAMELESSHELPER_NO_SYSTEM_BUTTON)
+add_project_config(KEY "native_impl" CONDITION FRAMELESSHELPER_NATIVE_IMPL)
 generate_project_config(PATH "${FRAMELESSHELPER_CONFIG_FILE}")
 
-if(TARGET Qt${QT_VERSION_MAJOR}::Core AND TARGET Qt${QT_VERSION_MAJOR}::Gui)
+if(FRAMELESSHELPER_BUILD_WIDGETS OR FRAMELESSHELPER_BUILD_QUICK)
     add_subdirectory(src)
-else()
-    message(WARNING "Can't find the QtCore and QtGui module. Nothing will be built.")
-    set(FRAMELESSHELPER_BUILD_WIDGETS OFF)
-    set(FRAMELESSHELPER_BUILD_EXAMPLES OFF)
 endif()
 
 if(FRAMELESSHELPER_BUILD_EXAMPLES)

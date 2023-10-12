@@ -32,13 +32,10 @@
 FRAMELESSHELPER_BEGIN_NAMESPACE
 
 class FramelessWidgetPrivate;
-
 class FRAMELESSHELPER_WIDGETS_API FramelessWidget : public QWidget
 {
     Q_OBJECT
-    FRAMELESSHELPER_CLASS_INFO
-    Q_DECLARE_PRIVATE(FramelessWidget)
-    Q_DISABLE_COPY_MOVE(FramelessWidget)
+    FRAMELESSHELPER_PUBLIC_QT_CLASS(FramelessWidget)
     Q_PROPERTY(bool hidden READ isHidden NOTIFY hiddenChanged FINAL)
     Q_PROPERTY(bool normal READ isNormal NOTIFY normalChanged FINAL)
     Q_PROPERTY(bool zoomed READ isZoomed NOTIFY zoomedChanged FINAL)
@@ -58,9 +55,6 @@ Q_SIGNALS:
     void hiddenChanged();
     void normalChanged();
     void zoomedChanged();
-
-private:
-    QScopedPointer<FramelessWidgetPrivate> d_ptr;
 };
 
 FRAMELESSHELPER_END_NAMESPACE

@@ -27,6 +27,13 @@
 
 #if FRAMELESSHELPER_CONFIG(mica_material)
 
+#if QT_CONFIG(thread)
+#  define FRAMELESSHELPER_HAS_THREAD
+  using FramelessHelperThreadClass = QThread;
+#else
+  using FramelessHelperThreadClass = QObject;
+#endif
+
 #include "framelessmanager.h"
 #include "utils.h"
 #include "framelessconfig_p.h"
@@ -35,8 +42,10 @@
 #include <memory>
 #include <QtCore/qsysinfo.h>
 #include <QtCore/qloggingcategory.h>
-#include <QtCore/qmutex.h>
-#include <QtCore/qthread.h>
+#ifdef FRAMELESSHELPER_HAS_THREAD
+#  include <QtCore/qmutex.h>
+#  include <QtCore/qthread.h>
+#endif
 #include <QtGui/qpixmap.h>
 #include <QtGui/qimage.h>
 #include <QtGui/qimagereader.h>
@@ -62,11 +71,6 @@ FRAMELESSHELPER_BEGIN_NAMESPACE
 #  define CRITICAL QT_NO_QDEBUG_MACRO()
 #endif
 
-DECLARE_SIZE_COMPARE_OPERATORS(QSize, QSize)
-DECLARE_SIZE_COMPARE_OPERATORS(QSizeF, QSizeF)
-DECLARE_SIZE_COMPARE_OPERATORS(QSize, QSizeF)
-DECLARE_SIZE_COMPARE_OPERATORS(QSizeF, QSize)
-
 using namespace Global;
 
 [[maybe_unused]] static constexpr const QSize kMaximumPictureSize = { 1920, 1080 };
@@ -85,7 +89,9 @@ struct ImageData
 {
     QPixmap blurredWallpaper = {};
     bool graphicsResourcesReady = false;
+#ifdef FRAMELESSHELPER_HAS_THREAD
     QMutex mutex{};
+#endif
 };
 
 Q_GLOBAL_STATIC(ImageData, g_imageData)
@@ -484,21 +490,25 @@ static inline void expblur(QImage &img, qreal radius, const bool improvedQuality
     return {x, y, w, h};
 }
 
-class WallpaperThread : public QThread
+class WallpaperThread : public FramelessHelperThreadClass
 {
     Q_OBJECT
-    FRAMELESSHELPER_CLASS_INFO
-    Q_DISABLE_COPY_MOVE(WallpaperThread)
+    FRAMELESSHELPER_QT_CLASS(WallpaperThread)
 
 public:
-    explicit WallpaperThread(QObject *parent = nullptr) : QThread(parent) {}
+    explicit WallpaperThread(QObject *parent = nullptr) : FramelessHelperThreadClass(parent) {}
     ~WallpaperThread() override = default;
 
 Q_SIGNALS:
     void imageUpdated();
 
+#ifdef FRAMELESSHELPER_HAS_THREAD
 protected:
     void run() override
+#else
+public:
+    void start()
+#endif
     {
         const QString wallpaperFilePath = Utils::getWallpaperFilePath();
         if (wallpaperFilePath.isEmpty()) {
@@ -571,7 +581,9 @@ protected:
             bufferPainter.drawImage(rect.topLeft(), image);
         }
         {
+#ifdef FRAMELESSHELPER_HAS_THREAD
             const QMutexLocker locker(&g_imageData()->mutex);
+#endif
             g_imageData()->blurredWallpaper = QPixmap(wallpaperSize);
             g_imageData()->blurredWallpaper.fill(kDefaultTransparentColor);
             QPainter painter(&g_imageData()->blurredWallpaper);
@@ -592,11 +604,13 @@ protected:
 struct ThreadData
 {
     std::unique_ptr<WallpaperThread> thread = nullptr;
+#ifdef FRAMELESSHELPER_HAS_THREAD
     QMutex mutex{};
+#endif
 };
-
 Q_GLOBAL_STATIC(ThreadData, g_threadData)
 
+#ifdef FRAMELESSHELPER_HAS_THREAD
 static inline void threadCleaner()
 {
     const QMutexLocker locker(&g_threadData()->mutex);
@@ -606,6 +620,7 @@ static inline void threadCleaner()
         g_threadData()->thread->wait();
     }
 }
+#endif
 
 MicaMaterialPrivate::MicaMaterialPrivate(MicaMaterial *q) : QObject(q)
 {
@@ -639,11 +654,16 @@ const MicaMaterialPrivate *MicaMaterialPrivate::get(const MicaMaterial *q)
 
 void MicaMaterialPrivate::maybeGenerateBlurredWallpaper(const bool force)
 {
+#ifdef FRAMELESSHELPER_HAS_THREAD
     g_imageData()->mutex.lock();
+#endif
     if (!g_imageData()->blurredWallpaper.isNull() && !force) {
+#ifdef FRAMELESSHELPER_HAS_THREAD
         g_imageData()->mutex.unlock();
+#endif
         return;
     }
+#ifdef FRAMELESSHELPER_HAS_THREAD
     g_imageData()->mutex.unlock();
     const QMutexLocker locker(&g_threadData()->mutex);
     if (g_threadData()->thread->isRunning()) {
@@ -652,12 +672,15 @@ void MicaMaterialPrivate::maybeGenerateBlurredWallpaper(const bool force)
         g_threadData()->thread->wait();
     }
     g_threadData()->thread->start(QThread::LowPriority);
+#else
+    g_threadData()->thread->start();
+#endif
 }
 
 void MicaMaterialPrivate::updateMaterialBrush()
 {
 #if FRAMELESSHELPER_CONFIG(bundle_resource)
-    framelesshelpercore_initResource();
+    FramelessHelperCoreInitResource();
     static const QImage noiseTexture = QImage(FRAMELESSHELPER_STRING_LITERAL(":/org.wangwenx190.FramelessHelper/resources/images/noise.png"));
 #endif // FRAMELESSHELPER_CORE_NO_BUNDLE_RESOURCE
     QImage micaTexture = QImage(QSize(64, 64), kDefaultImageFormat);
@@ -691,10 +714,14 @@ void MicaMaterialPrivate::forceRebuildWallpaper()
 
 void MicaMaterialPrivate::initialize()
 {
+#ifdef FRAMELESSHELPER_HAS_THREAD
     g_threadData()->mutex.lock();
+#endif
     if (!g_threadData()->thread) {
         g_threadData()->thread = std::make_unique<WallpaperThread>();
+#ifdef FRAMELESSHELPER_HAS_THREAD
         qAddPostRoutine(threadCleaner);
+#endif
     }
     connect(g_threadData()->thread.get(), &WallpaperThread::imageUpdated, this, [this](){
         if (initialized) {
@@ -702,7 +729,9 @@ void MicaMaterialPrivate::initialize()
             Q_EMIT q->shouldRedraw();
         }
     });
+#ifdef FRAMELESSHELPER_HAS_THREAD
     g_threadData()->mutex.unlock();
+#endif
 
     wallpaperSize = QGuiApplication::primaryScreen()->size();
 
@@ -730,13 +759,19 @@ void MicaMaterialPrivate::initialize()
 
 void MicaMaterialPrivate::prepareGraphicsResources()
 {
+#ifdef FRAMELESSHELPER_HAS_THREAD
     g_imageData()->mutex.lock();
+#endif
     if (g_imageData()->graphicsResourcesReady) {
+#ifdef FRAMELESSHELPER_HAS_THREAD
         g_imageData()->mutex.unlock();
+#endif
         return;
     }
     g_imageData()->graphicsResourcesReady = true;
+#ifdef FRAMELESSHELPER_HAS_THREAD
     g_imageData()->mutex.unlock();
+#endif
     maybeGenerateBlurredWallpaper();
 }
 
@@ -917,25 +952,35 @@ void MicaMaterial::paint(QPainter *painter, const QRect &rect, const bool active
     painter->setRenderHint(QPainter::SmoothPixmapTransform, false);
     if (active) {
         const QRect intersectedRect = wallpaperRect.intersected(mappedRect);
+#ifdef FRAMELESSHELPER_HAS_THREAD
         g_imageData()->mutex.lock();
+#endif
         painter->drawPixmap(originPoint, g_imageData()->blurredWallpaper, intersectedRect);
+#ifdef FRAMELESSHELPER_HAS_THREAD
         g_imageData()->mutex.unlock();
+#endif
         if (intersectedRect != mappedRect) {
             static constexpr const auto xOffset = QPoint{ 1, 0 };
             if (mappedRect.y() + mappedRect.height() <= wallpaperRect.height()) {
                 const QRect outerRect = { intersectedRect.topRight() + xOffset, QSize{ mappedRect.width() - intersectedRect.width(), intersectedRect.height() } };
                 const QPoint outerRectOriginPoint = originPoint + QPoint{ intersectedRect.width(), 0 } + xOffset;
                 const QRect mappedOuterRect = d->mapToWallpaper(outerRect);
+#ifdef FRAMELESSHELPER_HAS_THREAD
                 const QMutexLocker locker(&g_imageData()->mutex);
+#endif
                 painter->drawPixmap(outerRectOriginPoint, g_imageData()->blurredWallpaper, mappedOuterRect);
             } else {
                 static constexpr const auto yOffset = QPoint{ 0, 1 };
                 const QRect outerRectBottom = { intersectedRect.bottomLeft() + yOffset, QSize{ intersectedRect.width(), mappedRect.height() - intersectedRect.height() } };
                 const QPoint outerRectBottomOriginPoint = originPoint + QPoint{ 0, intersectedRect.height() } + yOffset;
                 const QRect mappedOuterRectBottom = d->mapToWallpaper(outerRectBottom);
+#ifdef FRAMELESSHELPER_HAS_THREAD
                 g_imageData()->mutex.lock();
+#endif
                 painter->drawPixmap(outerRectBottomOriginPoint, g_imageData()->blurredWallpaper, mappedOuterRectBottom);
+#ifdef FRAMELESSHELPER_HAS_THREAD
                 g_imageData()->mutex.unlock();
+#endif
                 if (mappedRect.x() + mappedRect.width() > wallpaperRect.width()) {
                     const QRect outerRectRight = { intersectedRect.topRight() + xOffset, QSize{ mappedRect.width() - intersectedRect.width(), intersectedRect.height() } };
                     const QPoint outerRectRightOriginPoint = originPoint + QPoint{ intersectedRect.width(), 0 } + xOffset;
@@ -943,7 +988,9 @@ void MicaMaterial::paint(QPainter *painter, const QRect &rect, const bool active
                     const QRect outerRectCorner = { intersectedRect.bottomRight() + xOffset + yOffset, QSize{ outerRectRight.width(), outerRectBottom.height() } };
                     const QPoint outerRectCornerOriginPoint = originPoint + QPoint{ intersectedRect.width(), intersectedRect.height() } + xOffset + yOffset;
                     const QRect mappedOuterRectCorner = d->mapToWallpaper(outerRectCorner);
+#ifdef FRAMELESSHELPER_HAS_THREAD
                     const QMutexLocker locker(&g_imageData()->mutex);
+#endif
                     painter->drawPixmap(outerRectRightOriginPoint, g_imageData()->blurredWallpaper, mappedOuterRectRight);
                     painter->drawPixmap(outerRectCornerOriginPoint, g_imageData()->blurredWallpaper, mappedOuterRectCorner);
                 }

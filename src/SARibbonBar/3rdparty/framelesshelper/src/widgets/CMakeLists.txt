@@ -102,7 +102,7 @@ if(WIN32 AND NOT FRAMELESSHELPER_BUILD_STATIC)
             COPYRIGHT "MIT License"
             ORIGINAL_FILENAME "${SUB_MODULE_FULL_NAME}.dll"
             PRODUCT "${PROJECT_NAME}"
-            COMMENTS "Built from commit ${PROJECT_VERSION_COMMIT} on ${PROJECT_COMPILE_DATETIME} (UTC)."
+            COMMENTS "Who don't love Raiden Shogun ?"
             LIBRARY
         )
     endif()
