@@ -28,6 +28,9 @@ jobs:
           cache: 'true'
           cache-key-prefix: ${{ runner.os }}-Qt-Cache-${{ matrix.qt_version }}
           dir: ${{ github.workspace }}/Qt
+    
+    - name: Install Linux dependencies
+      run: sudo apt install -y libgl1-mesa-dev libxcb1-dev libgtk-3-dev
 
     - name: Configure CMake
       run: cmake -DCMAKE_BUILD_TYPE="${{env.BUILD_TYPE}}" -DBUILD_SHARED_LIBS=${{ matrix.shared }} -DBUILD_EXAMPLES=OFF -B "${{github.workspace}}/build"

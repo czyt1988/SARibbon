@@ -114,6 +114,23 @@ using namespace Global;
 static_assert(std::size(WindowsVersions) == (static_cast<int>(WindowsVersion::Latest) + 1));
 #endif
 
+FramelessCallbacks::FramelessCallbacks() = default;
+
+FramelessCallbacks::~FramelessCallbacks() = default;
+
+FramelessCallbacksPtr FramelessCallbacks::create()
+{
+    return std::make_shared<FramelessCallbacks>();
+}
+
+FramelessExtraData::FramelessExtraData() = default;
+
+FramelessExtraData::~FramelessExtraData() = default;
+
+FramelessData::FramelessData() = default;
+
+FramelessData::~FramelessData() = default;
+
 void FramelessHelperCoreInitialize()
 {
     static bool inited = false;
@@ -251,7 +268,7 @@ void FramelessHelperPrintLogo()
     QString message = {};
     QTextStream stream(&message, QIODevice::WriteOnly);
     stream << "FramelessHelper (" << (ver.build.is_static ? "static" : "shared")
-           << ", " << (ver.build.is_debug ? "debug" : "release")
+           << ", " << (ver.build.is_debug ? "debug" : "release") << ", "
            << ver.build.architecture << ") version " << ver.version.str
            << ", author wangwenx190 (Yuhang Zhao, 2546789017@qq.com)."
            << " Built by " << ver.compiler.name << ver.compiler.version

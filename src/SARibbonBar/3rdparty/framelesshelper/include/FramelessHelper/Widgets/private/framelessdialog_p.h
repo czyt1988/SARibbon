@@ -30,24 +30,18 @@
 
 FRAMELESSHELPER_BEGIN_NAMESPACE
 
-class FramelessDialog;
 class WidgetsSharedHelper;
 
+class FramelessDialog;
 class FRAMELESSHELPER_WIDGETS_API FramelessDialogPrivate : public QObject
 {
     Q_OBJECT
-    FRAMELESSHELPER_CLASS_INFO
-    Q_DECLARE_PUBLIC(FramelessDialog)
-    Q_DISABLE_COPY_MOVE(FramelessDialogPrivate)
+    FRAMELESSHELPER_PRIVATE_QT_CLASS(FramelessDialog)
 
 public:
     explicit FramelessDialogPrivate(FramelessDialog *q);
     ~FramelessDialogPrivate() override;
 
-    Q_NODISCARD static FramelessDialogPrivate *get(FramelessDialog *pub);
-    Q_NODISCARD static const FramelessDialogPrivate *get(const FramelessDialog *pub);
-
-    FramelessDialog *q_ptr = nullptr;
     WidgetsSharedHelper *sharedHelper = nullptr;
 };
 

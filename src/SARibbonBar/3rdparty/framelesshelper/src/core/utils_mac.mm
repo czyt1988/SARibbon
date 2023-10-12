@@ -87,7 +87,7 @@ using namespace Global;
 
 class MacOSNotificationObserver
 {
-    Q_DISABLE_COPY_MOVE(MacOSNotificationObserver)
+    FRAMELESSHELPER_CLASS(MacOSNotificationObserver)
 
 public:
     explicit MacOSNotificationObserver(NSObject *object, NSNotificationName name, const Callback &callback) {
@@ -125,7 +125,7 @@ private:
 
 class MacOSKeyValueObserver
 {
-    Q_DISABLE_COPY_MOVE(MacOSKeyValueObserver)
+    FRAMELESSHELPER_CLASS(MacOSKeyValueObserver)
 
 public:
     // Note: MacOSKeyValueObserver must not outlive the object observed!
@@ -176,7 +176,7 @@ private:
 
 class MacOSThemeObserver
 {
-    Q_DISABLE_COPY_MOVE(MacOSThemeObserver)
+    FRAMELESSHELPER_CLASS(MacOSThemeObserver)
 
 public:
     explicit MacOSThemeObserver()
@@ -223,8 +223,7 @@ private:
 class NSWindowProxy : public QObject
 {
     Q_OBJECT
-    FRAMELESSHELPER_CLASS_INFO
-    Q_DISABLE_COPY_MOVE(NSWindowProxy)
+    FRAMELESSHELPER_QT_CLASS(NSWindowProxy)
 
 public:
     explicit NSWindowProxy(QWindow *qtWindow, NSWindow *macWindow, QObject *parent = nil) : QObject(parent)

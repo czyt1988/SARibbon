@@ -30,24 +30,18 @@
 
 FRAMELESSHELPER_BEGIN_NAMESPACE
 
-class FramelessWidget;
 class WidgetsSharedHelper;
 
+class FramelessWidget;
 class FRAMELESSHELPER_WIDGETS_API FramelessWidgetPrivate : public QObject
 {
     Q_OBJECT
-    FRAMELESSHELPER_CLASS_INFO
-    Q_DECLARE_PUBLIC(FramelessWidget)
-    Q_DISABLE_COPY_MOVE(FramelessWidgetPrivate)
+    FRAMELESSHELPER_PRIVATE_QT_CLASS(FramelessWidget)
 
 public:
     explicit FramelessWidgetPrivate(FramelessWidget *q);
     ~FramelessWidgetPrivate() override;
 
-    Q_NODISCARD static FramelessWidgetPrivate *get(FramelessWidget *pub);
-    Q_NODISCARD static const FramelessWidgetPrivate *get(const FramelessWidget *pub);
-
-    FramelessWidget *q_ptr = nullptr;
     Qt::WindowState savedWindowState = Qt::WindowNoState;
     WidgetsSharedHelper *sharedHelper = nullptr;
 };

@@ -33,16 +33,13 @@
 FRAMELESSHELPER_BEGIN_NAMESPACE
 
 class FramelessQuickWindowPrivate;
-
 class FRAMELESSHELPER_QUICK_API FramelessQuickWindow : public QQuickWindowQmlImpl
 {
     Q_OBJECT
-    FRAMELESSHELPER_CLASS_INFO
+    FRAMELESSHELPER_PUBLIC_QT_CLASS(FramelessQuickWindow)
 #ifdef QML_NAMED_ELEMENT
     QML_NAMED_ELEMENT(FramelessWindow)
 #endif
-    Q_DECLARE_PRIVATE(FramelessQuickWindow)
-    Q_DISABLE_COPY_MOVE(FramelessQuickWindow)
     Q_PROPERTY(bool hidden READ isHidden NOTIFY hiddenChanged FINAL)
     Q_PROPERTY(bool normal READ isNormal NOTIFY normalChanged FINAL)
     Q_PROPERTY(bool minimized READ isMinimized NOTIFY minimizedChanged FINAL)
@@ -77,9 +74,6 @@ Q_SIGNALS:
     void maximizedChanged();
     void zoomedChanged();
     void fullScreenChanged();
-
-private:
-    QScopedPointer<FramelessQuickWindowPrivate> d_ptr;
 };
 
 FRAMELESSHELPER_END_NAMESPACE
