@@ -1,12 +1,11 @@
 ﻿[Click here for English](./readme.md)
 
-||Windows|Linux|Mac|
+||Windows(2019, latest)|Linux ubuntu(20.04, latest)|Mac(11-latest)|
 |:-|:-|:-|:-|
-|Qt5|[![cmake-win-qt5](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt5.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt5.yml)|[![CMake-Linux-Qt5](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt5.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt5.yml)|[![cmake-mac-qt5](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt5.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt5.yml)|
-|Qt6|[![cmake-win-qt6](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt6.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt6.yml)|[![CMake-Linux-Qt6](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt6.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt6.yml)|[![cmake-mac-qt6](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt6.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt6.yml)|
+|Qt5 (5.14.2-5.15.0)|[![cmake-win-qt5](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt5.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt5.yml)|[![CMake-Linux-Qt5](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt5.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt5.yml)|[![cmake-mac-qt5](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt5.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt5.yml)|
+|Qt6 (6.2.0-6.5.0)|[![cmake-win-qt6](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt6.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt6.yml)|[![CMake-Linux-Qt6](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt6.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt6.yml)|[![cmake-mac-qt6](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt6.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt6.yml)|
 
-
- 这是基于Qt（最低要求Qt5，支持C++11的编译器）开发的一个轻量级的Ribbon控件(Office样式UI)
+最低要求Qt5.14以上，c++17标准支持（由于使用了frameless库，此库最低要求c++17）,Qt5.14完善了高分辨率的支持，建议低于此版本的Qt都更新到Qt5.14以上
 
  界面截图：
 
@@ -17,6 +16,10 @@ MIT协议，欢迎大家使用并提出意见
 [gitee(码云) - https://gitee.com/czyt1988/SARibbon](https://gitee.com/czyt1988/SARibbon)
 
 [github - https://github.com/czyt1988/SARibbon](https://github.com/czyt1988/SARibbon)
+
+SARibbon提供了几种布局方式，以及可以通过qss自由定义主题
+
+![](./doc/screenshot/SARibbon-theme-style.gif)
 
 # 编译
 
