@@ -21,7 +21,7 @@ SARibbon提供了几种布局方式，以及可以通过qss自由定义主题
 
 ![](./doc/screenshot/SARibbon-theme-style.gif)
 
-# 编译
+# 构建
 
 ## 直接引入工程（静态）
 
@@ -46,7 +46,12 @@ SARibbonBar/resource.qrc
 
 > 注意:最低的Qt版本为5.8
 
+## 常见问题及错误
 
+framelessmanager.moc的缺失提升，遇到此错误，先执行qmake即可
+```txt
+..\..\..\SARibbon\src\SARibbonBar\3rdparty\framelesshelper\src\core\framelessmanager.cpp(563): fatal error C1083: 无法打开包括文件: “framelessmanager.moc”: No such file or directory
+```
 
 # 使用方法
 
