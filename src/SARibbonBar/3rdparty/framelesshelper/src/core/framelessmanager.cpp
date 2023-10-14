@@ -24,12 +24,20 @@
 
 #include "framelessmanager.h"
 #include "framelessmanager_p.h"
-#include "framelesshelper_qt.h"
-#include "framelessconfig_p.h"
 #include "framelesshelpercore_global_p.h"
+#if FRAMELESSHELPER_CONFIG(native_impl)
+#  ifdef Q_OS_WINDOWS
+#    include "framelesshelper_win.h"
+#  elif (defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID))
+#  elif defined(Q_OS_MACOS)
+#  else
+#  endif
+#else
+#  include "framelesshelper_qt.h"
+#endif
+#include "framelessconfig_p.h"
 #include "utils.h"
 #ifdef Q_OS_WINDOWS
-#  include "framelesshelper_win.h"
 #  include "winverhelper_p.h"
 #endif
 #include <QtCore/qvariant.h>
@@ -37,6 +45,7 @@
 #include <QtCore/qloggingcategory.h>
 #include <QtGui/qfontdatabase.h>
 #include <QtGui/qwindow.h>
+#include <QtGui/qevent.h>
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
 #  include <QtGui/qguiapplication.h>
 #  include <QtGui/qstylehints.h>
@@ -59,11 +68,25 @@ FRAMELESSHELPER_BEGIN_NAMESPACE
 
 using namespace Global;
 
-using FramelessManagerData = QList<WId>;
-
-Q_GLOBAL_STATIC(FramelessManagerData, g_framelessManagerData)
-
 static constexpr const int kEventDelayInterval = 1000;
+
+struct InternalData
+{
+    FramelessDataHash dataMap = {};
+    QHash<WId, QObject *> windowMap = {};
+
+    InternalData();
+    ~InternalData();
+
+private:
+    FRAMELESSHELPER_CLASS(InternalData)
+};
+
+InternalData::InternalData() = default;
+
+InternalData::~InternalData() = default;
+
+Q_GLOBAL_STATIC(InternalData, g_internalData)
 
 #if FRAMELESSHELPER_CONFIG(bundle_resource)
 [[nodiscard]] static inline QString iconFontFamilyName()
@@ -83,16 +106,60 @@ static constexpr const int kEventDelayInterval = 1000;
 }
 #endif
 
-[[nodiscard]] static inline bool usePureQtImplementation()
+class InternalEventFilter : public QObject
 {
-    static const auto result = []() -> bool {
-#ifdef Q_OS_WINDOWS
-        return FramelessConfig::instance()->isSet(Option::UseCrossPlatformQtImplementation);
-#else
-        return true;
-#endif
-    }();
-    return result;
+    Q_OBJECT
+    FRAMELESSHELPER_QT_CLASS(InternalEventFilter)
+
+public:
+    explicit InternalEventFilter(const QObject *window, QObject *parent = nullptr);
+    ~InternalEventFilter() override;
+
+protected:
+    Q_NODISCARD bool eventFilter(QObject *object, QEvent *event) override;
+
+private:
+    const QObject *m_window = nullptr;
+};
+
+InternalEventFilter::InternalEventFilter(const QObject *window, QObject *parent) : QObject(parent), m_window(window)
+{
+    Q_ASSERT(m_window);
+    Q_ASSERT(m_window->isWidgetType() || m_window->isWindowType());
+}
+
+InternalEventFilter::~InternalEventFilter() = default;
+
+bool InternalEventFilter::eventFilter(QObject *object, QEvent *event)
+{
+    Q_ASSERT(object);
+    Q_ASSERT(event);
+    Q_ASSERT(m_window);
+    if (!object || !event || !m_window || (object != m_window)) {
+        return false;
+    }
+    const FramelessDataPtr data = FramelessManagerPrivate::getData(m_window);
+    if (!data || !data->frameless || !data->callbacks) {
+        return false;
+    }
+    switch (event->type()) {
+    case QEvent::WinIdChange: {
+        const WId windowId = data->callbacks->getWindowId();
+        Q_ASSERT(windowId);
+        if (windowId) {
+            FramelessManagerPrivate::updateWindowId(m_window, windowId);
+        }
+    } break;
+    case QEvent::Close: {
+        const auto ce = static_cast<const QCloseEvent *>(event);
+        if (ce->isAccepted()) {
+            std::ignore = FramelessManager::instance()->removeWindow(m_window);
+        }
+    } break;
+    default:
+        break;
+    }
+    return false;
 }
 
 FramelessManagerPrivate::FramelessManagerPrivate(FramelessManager *q) : QObject(q)
@@ -133,7 +200,7 @@ void FramelessManagerPrivate::initializeIconFont()
         return;
     }
     inited = true;
-    framelesshelpercore_initResource();
+    FramelessHelperCoreInitResource();
     // We always register this font because it's our only fallback.
     const int id = QFontDatabase::addApplicationFont(FRAMELESSHELPER_STRING_LITERAL(":/org.wangwenx190.FramelessHelper/resources/fonts/iconfont.ttf"));
     if (id < 0) {
@@ -229,6 +296,80 @@ void FramelessManagerPrivate::doNotifyWallpaperHasChangedOrNot()
     }
 }
 
+FramelessDataPtr FramelessManagerPrivate::getData(const QObject *window)
+{
+    Q_ASSERT(window);
+    Q_ASSERT(window->isWidgetType() || window->isWindowType());
+    if (!window || !(window->isWidgetType() || window->isWindowType())) {
+        return nullptr;
+    }
+    return g_internalData()->dataMap.value(const_cast<QObject *>(window));
+}
+
+FramelessDataPtr FramelessManagerPrivate::createData(const QObject *window, const WId windowId)
+{
+    Q_ASSERT(window);
+    Q_ASSERT(window->isWidgetType() || window->isWindowType());
+    Q_ASSERT(windowId);
+    if (!window || !(window->isWidgetType() || window->isWindowType()) || !windowId) {
+        return nullptr;
+    }
+    const auto win = const_cast<QObject *>(window);
+    auto it = g_internalData()->dataMap.find(win);
+    if (it == g_internalData()->dataMap.end()) {
+        FramelessDataPtr data = FramelessData::create();
+        data->window = win;
+        data->windowId = windowId;
+        it = g_internalData()->dataMap.insert(win, data);
+        g_internalData()->windowMap.insert(windowId, win);
+    }
+    return it.value();
+}
+
+WId FramelessManagerPrivate::getWindowId(const QObject *window)
+{
+    Q_ASSERT(window);
+    Q_ASSERT(window->isWidgetType() || window->isWindowType());
+    if (!window || !(window->isWidgetType() || window->isWindowType())) {
+        return 0;
+    }
+    if (const FramelessDataPtr data = getData(window)) {
+        return data->windowId;
+    }
+    return 0;
+}
+
+QObject *FramelessManagerPrivate::getWindow(const WId windowId)
+{
+    Q_ASSERT(windowId);
+    if (!windowId) {
+        return nullptr;
+    }
+    return g_internalData()->windowMap.value(windowId);
+}
+
+void FramelessManagerPrivate::updateWindowId(const QObject *window, const WId newWindowId)
+{
+    Q_ASSERT(window);
+    Q_ASSERT(window->isWidgetType() || window->isWindowType());
+    Q_ASSERT(newWindowId);
+    if (!window || !(window->isWidgetType() || window->isWindowType()) || !newWindowId) {
+        return;
+    }
+    const auto win = const_cast<QObject *>(window);
+    const FramelessDataPtr data = g_internalData()->dataMap.value(win);
+    Q_ASSERT(data);
+    if (!data) {
+        return;
+    }
+    const WId oldWindowId = data->windowId;
+    data->windowId = newWindowId;
+    g_internalData()->windowMap.remove(oldWindowId);
+    g_internalData()->windowMap.insert(newWindowId, win);
+    data->frameless = false;
+    std::ignore = FramelessManager::instance()->addWindow(window, newWindowId);
+}
+
 bool FramelessManagerPrivate::isThemeOverrided() const
 {
     return (overrideTheme.value_or(SystemTheme::Unknown) != SystemTheme::Unknown);
@@ -264,8 +405,8 @@ void FramelessManagerPrivate::initialize()
     // We are doing some tricks in our Windows message handling code, so
     // we don't use Qt's theme notifier on Windows. But for other platforms
     // we want to use as many Qt functionalities as possible.
-#if ((QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)) && !defined(Q_OS_WINDOWS))
-    QStyleHints * const styleHints = QGuiApplication::styleHints();
+#if ((QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)) && !FRAMELESSHELPER_CONFIG(native_impl))
+    QStyleHints *styleHints = QGuiApplication::styleHints();
     Q_ASSERT(styleHints);
     if (styleHints) {
         connect(styleHints, &QStyleHints::colorSchemeChanged, this, [this](const Qt::ColorScheme colorScheme){
@@ -342,51 +483,81 @@ void FramelessManager::setOverrideTheme(const SystemTheme theme)
     Q_EMIT systemThemeChanged();
 }
 
-void FramelessManager::addWindow(FramelessParamsConst params)
+bool FramelessManager::addWindow(const QObject *window, const WId windowId)
 {
-    Q_ASSERT(params);
-    if (!params) {
-        return;
+    Q_ASSERT(window);
+    Q_ASSERT(window->isWidgetType() || window->isWindowType());
+    Q_ASSERT(windowId);
+    if (!window || !(window->isWidgetType() || window->isWindowType()) || !windowId) {
+        return false;
     }
-    const WId windowId = params->getWindowId();
-    if (g_framelessManagerData()->contains(windowId)) {
-        return;
+    FramelessDataPtr data = FramelessManagerPrivate::getData(window);
+    if (data && data->frameless) {
+        return false;
     }
-    g_framelessManagerData()->append(windowId);
-    static const bool pureQt = usePureQtImplementation();
-    if (pureQt) {
-        FramelessHelperQt::addWindow(params);
+    if (!data) {
+        data = FramelessData::create();
+        data->window = const_cast<QObject *>(window);
+        data->windowId = windowId;
+        g_internalData()->dataMap.insert(data->window, data);
+        g_internalData()->windowMap.insert(windowId, data->window);
     }
-#ifdef Q_OS_WINDOWS
-    if (!pureQt) {
-        FramelessHelperWin::addWindow(params);
-    }
-    std::ignore = Utils::installWindowProcHook(windowId, params);
+#if FRAMELESSHELPER_CONFIG(native_impl)
+#  ifdef Q_OS_WINDOWS
+    std::ignore = Utils::installWindowProcHook(windowId);
+    FramelessHelperWin::addWindow(window);
+#  elif (defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID))
+#  elif defined(Q_OS_MACOS)
+#  else
+#  endif
+#else
+    FramelessHelperQt::addWindow(window);
 #endif
-    connect(params->getWindowHandle(), &QWindow::destroyed, FramelessManager::instance(), [this, windowId](){ removeWindow(windowId); });
+    if (!data->internalEventHandler) {
+        data->internalEventHandler = new InternalEventFilter(data->window, data->window);
+        data->window->installEventFilter(data->internalEventHandler);
+    }
+    return true;
 }
 
-void FramelessManager::removeWindow(const WId windowId)
+bool FramelessManager::removeWindow(const QObject *window)
 {
-    Q_ASSERT(windowId);
-    if (!windowId) {
-        return;
+    Q_ASSERT(window);
+    if (!window) {
+        return false;
     }
-    if (!g_framelessManagerData()->contains(windowId)) {
-        return;
+    const auto it = g_internalData()->dataMap.constFind(const_cast<QObject *>(window));
+    if (it == g_internalData()->dataMap.constEnd()) {
+        return false;
     }
-    g_framelessManagerData()->removeAll(windowId);
-    static const bool pureQt = usePureQtImplementation();
-    if (pureQt) {
-        FramelessHelperQt::removeWindow(windowId);
+    const FramelessDataPtr data = it.value();
+    Q_ASSERT(data);
+    Q_ASSERT(data->window);
+    Q_ASSERT(data->windowId);
+    if (!data || !data->window || !data->windowId) {
+        return false;
     }
-#ifdef Q_OS_WINDOWS
-    if (!pureQt) {
-        FramelessHelperWin::removeWindow(windowId);
+    if (data->internalEventHandler) {
+        data->window->removeEventFilter(data->internalEventHandler);
+        delete data->internalEventHandler;
+        data->internalEventHandler = nullptr;
     }
-    std::ignore = Utils::uninstallWindowProcHook(windowId);
-    std::ignore = Utils::removeMicaWindow(windowId);
+#if FRAMELESSHELPER_CONFIG(native_impl)
+#  ifdef Q_OS_WINDOWS
+    FramelessHelperWin::removeWindow(window);
+    std::ignore = Utils::uninstallWindowProcHook(data->windowId);
+#  elif (defined(Q_OS_LINUX) && !defined(Q_OS_ANDROID))
+#  elif defined(Q_OS_MACOS)
+#  else
+#  endif
+#else
+    FramelessHelperQt::removeWindow(window);
 #endif
+    g_internalData()->dataMap.erase(it);
+    g_internalData()->windowMap.remove(data->windowId);
+    return true;
 }
 
 FRAMELESSHELPER_END_NAMESPACE
+
+#include "framelessmanager.moc"

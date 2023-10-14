@@ -31,13 +31,10 @@
 FRAMELESSHELPER_BEGIN_NAMESPACE
 
 class ChromePalettePrivate;
-
 class FRAMELESSHELPER_CORE_API ChromePalette : public QObject
 {
     Q_OBJECT
-    FRAMELESSHELPER_CLASS_INFO
-    Q_DECLARE_PRIVATE(ChromePalette)
-    Q_DISABLE_COPY_MOVE(ChromePalette)
+    FRAMELESSHELPER_PUBLIC_QT_CLASS(ChromePalette)
 
     Q_PROPERTY(QColor titleBarActiveBackgroundColor READ titleBarActiveBackgroundColor
                WRITE setTitleBarActiveBackgroundColor RESET resetTitleBarActiveBackgroundColor
@@ -120,9 +117,6 @@ Q_SIGNALS:
     void closeButtonPressColorChanged();
     void titleBarColorChanged();
     void chromeButtonColorChanged();
-
-private:
-    QScopedPointer<ChromePalettePrivate> d_ptr;
 };
 
 FRAMELESSHELPER_END_NAMESPACE

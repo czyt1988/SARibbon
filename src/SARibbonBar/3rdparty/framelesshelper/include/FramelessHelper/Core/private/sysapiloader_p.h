@@ -31,8 +31,7 @@ FRAMELESSHELPER_BEGIN_NAMESPACE
 class FRAMELESSHELPER_CORE_API SysApiLoader : public QObject
 {
     Q_OBJECT
-    FRAMELESSHELPER_CLASS_INFO
-    Q_DISABLE_COPY_MOVE(SysApiLoader)
+    FRAMELESSHELPER_QT_CLASS(SysApiLoader)
 
 public:
     Q_NODISCARD static SysApiLoader *instance();

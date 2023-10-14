@@ -28,6 +28,7 @@
 
 #include "framelesshelper_windows.h"
 #include "framelessmanager.h"
+#include "framelessmanager_p.h"
 #include "framelessconfig_p.h"
 #include "sysapiloader_p.h"
 #include "registrykey_p.h"
@@ -192,20 +193,46 @@ FRAMELESSHELPER_STRING_CONSTANT(RedrawWindow)
 FRAMELESSHELPER_STRING_CONSTANT(ScreenToClient)
 FRAMELESSHELPER_STRING_CONSTANT(DwmFlush)
 FRAMELESSHELPER_STRING_CONSTANT(GetCursorPos)
+FRAMELESSHELPER_STRING_CONSTANT(DeleteObject)
 
-struct Win32UtilsData
+struct UtilsWinExtraData : public FramelessExtraData
 {
-    SystemParameters params = {};
-};
-
-struct Win32UtilsInternal
-{
-    QHash<WId, Win32UtilsData> data = {};
     WNDPROC qtWindowProc = nullptr;
-    QList<WId> micaWindowIds = {};
-};
+    bool windowProcHooked = false;
+    bool mica = false;
 
-Q_GLOBAL_STATIC(Win32UtilsInternal, g_win32UtilsData)
+    UtilsWinExtraData();
+    ~UtilsWinExtraData() override;
+
+    [[nodiscard]] static FramelessExtraDataPtr create();
+};
+using UtilsWinExtraDataPtr = std::shared_ptr<UtilsWinExtraData>;
+
+UtilsWinExtraData::UtilsWinExtraData() = default;
+
+UtilsWinExtraData::~UtilsWinExtraData() = default;
+
+FramelessExtraDataPtr UtilsWinExtraData::create()
+{
+    return std::make_shared<UtilsWinExtraData>();
+}
+
+[[nodiscard]] static inline UtilsWinExtraDataPtr tryGetExtraData(const FramelessDataPtr &data, const bool create)
+{
+    Q_ASSERT(data);
+    if (!data) {
+        return nullptr;
+    }
+    auto it = data->extraData.find(ExtraDataType::WindowsUtilities);
+    if (it == data->extraData.end()) {
+        if (create) {
+            it = data->extraData.insert(ExtraDataType::WindowsUtilities, UtilsWinExtraData::create());
+        } else {
+            return nullptr;
+        }
+    }
+    return std::dynamic_pointer_cast<UtilsWinExtraData>(it.value());
+}
 
 struct Win32Message
 {
@@ -583,99 +610,6 @@ static constexpr const std::array<Win32Message, 333> g_win32MessageMap =
 };
 #undef DEFINE_WIN32_MESSAGE
 
-[[nodiscard]] bool operator==(const POINT &lhs, const POINT &rhs) noexcept
-{
-    return ((lhs.x == rhs.x) && (lhs.y == rhs.y));
-}
-
-[[nodiscard]] bool operator!=(const POINT &lhs, const POINT &rhs) noexcept
-{
-    return !operator==(lhs, rhs);
-}
-
-[[nodiscard]] bool operator==(const SIZE &lhs, const SIZE &rhs) noexcept
-{
-    return ((lhs.cx == rhs.cx) && (lhs.cy == rhs.cy));
-}
-
-[[nodiscard]] bool operator!=(const SIZE &lhs, const SIZE &rhs) noexcept
-{
-    return !operator==(lhs, rhs);
-}
-
-[[nodiscard]] bool operator>(const SIZE &lhs, const SIZE &rhs) noexcept
-{
-    return ((lhs.cx * lhs.cy) > (rhs.cx * rhs.cy));
-}
-
-[[nodiscard]] bool operator>=(const SIZE &lhs, const SIZE &rhs) noexcept
-{
-    return (operator>(lhs, rhs) || operator==(lhs, rhs));
-}
-
-[[nodiscard]] bool operator<(const SIZE &lhs, const SIZE &rhs) noexcept
-{
-    return (operator!=(lhs, rhs) && !operator>(lhs, rhs));
-}
-
-[[nodiscard]] bool operator<=(const SIZE &lhs, const SIZE &rhs) noexcept
-{
-    return (operator<(lhs, rhs) || operator==(lhs, rhs));
-}
-
-[[nodiscard]] bool operator==(const RECT &lhs, const RECT &rhs) noexcept
-{
-    return ((lhs.left == rhs.left) && (lhs.top == rhs.top)
-            && (lhs.right == rhs.right) && (lhs.bottom == rhs.bottom));
-}
-
-[[nodiscard]] bool operator!=(const RECT &lhs, const RECT &rhs) noexcept
-{
-    return !operator==(lhs, rhs);
-}
-
-[[nodiscard]] QPoint point2qpoint(const POINT &point)
-{
-    return QPoint{ int(point.x), int(point.y) };
-}
-
-[[nodiscard]] POINT qpoint2point(const QPoint &point)
-{
-    return POINT{ LONG(point.x()), LONG(point.y()) };
-}
-
-[[nodiscard]] QSize size2qsize(const SIZE &size)
-{
-    return QSize{ int(size.cx), int(size.cy) };
-}
-
-[[nodiscard]] SIZE qsize2size(const QSize &size)
-{
-    return SIZE{ LONG(size.width()), LONG(size.height()) };
-}
-
-[[nodiscard]] QRect rect2qrect(const RECT &rect)
-{
-    return QRect{ QPoint{ int(rect.left), int(rect.top) }, QSize{ int(RECT_WIDTH(rect)), int(RECT_HEIGHT(rect)) } };
-}
-
-[[nodiscard]] RECT qrect2rect(const QRect &qrect)
-{
-    return RECT{ LONG(qrect.left()), LONG(qrect.top()), LONG(qrect.right()), LONG(qrect.bottom()) };
-}
-
-[[nodiscard]] QString hwnd2str(const WId windowId)
-{
-    // NULL handle is allowed here.
-    return FRAMELESSHELPER_STRING_LITERAL("0x") + QString::number(windowId, 16).toUpper().rightJustified(8, u'0');
-}
-
-[[nodiscard]] QString hwnd2str(const HWND hwnd)
-{
-    // NULL handle is allowed here.
-    return hwnd2str(reinterpret_cast<WId>(hwnd));
-}
-
 [[nodiscard]] std::optional<MONITORINFOEXW> getMonitorForWindow(const HWND hwnd)
 {
     Q_ASSERT(hwnd);
@@ -734,8 +668,7 @@ static constexpr const std::array<Win32Message, 333> g_win32MessageMap =
     static const auto currentOsVer = []() -> std::optional<VersionNumber> {
         if (API_NT_AVAILABLE(RtlGetVersion)) {
             using RtlGetVersionPtr = _NTSTATUS(WINAPI *)(PRTL_OSVERSIONINFOW);
-            const auto pRtlGetVersion =
-                reinterpret_cast<RtlGetVersionPtr>(SysApiLoader::instance()->get(kntdll, kRtlGetVersion));
+            const auto pRtlGetVersion = reinterpret_cast<RtlGetVersionPtr>(SysApiLoader::instance()->get(kntdll, kRtlGetVersion));
             RTL_OSVERSIONINFOEXW osvi;
             SecureZeroMemory(&osvi, sizeof(osvi));
             osvi.dwOSVersionInfoSize = sizeof(osvi);
@@ -785,8 +718,7 @@ static constexpr const std::array<Win32Message, 333> g_win32MessageMap =
     return kErrorMessageTemplate.arg(function, QString::number(code), errorText);
 #else // !FRAMELESSHELPER_CONFIG(private_qt)
     LPWSTR buf = nullptr;
-    if (::FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-                         nullptr, code, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), reinterpret_cast<LPWSTR>(&buf), 0, nullptr) == 0) {
+    if (::FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, nullptr, code, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), reinterpret_cast<LPWSTR>(&buf), 0, nullptr) == 0) {
         return FRAMELESSHELPER_STRING_LITERAL("FormatMessageW() returned empty string.");
     }
     const QString errorText = QString::fromWCharArray(buf).trimmed();
@@ -839,16 +771,14 @@ static constexpr const std::array<Win32Message, 333> g_win32MessageMap =
     const int newWindowY = (activeMonitorRect.top + currentWindowOffsetY);
     static constexpr const UINT flags =
         (SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOOWNERZORDER);
-    if (::SetWindowPos(hwnd, nullptr, newWindowX, newWindowY,
-          currentWindowWidth, currentWindowHeight, flags) == FALSE) {
+    if (::SetWindowPos(hwnd, nullptr, newWindowX, newWindowY, currentWindowWidth, currentWindowHeight, flags) == FALSE) {
         WARNING << Utils::getSystemErrorMessage(kSetWindowPos);
         return false;
     }
     return true;
 }
 
-[[nodiscard]] static inline int getSystemMetrics2(const int index, const bool horizontal,
-                                                  const quint32 dpi)
+[[nodiscard]] static inline int getSystemMetrics2(const int index, const bool horizontal, const quint32 dpi)
 {
     Q_ASSERT(dpi != 0);
     if (dpi == 0) {
@@ -863,8 +793,7 @@ static constexpr const std::array<Win32Message, 333> g_win32MessageMap =
     return std::round(qreal(::GetSystemMetrics(index)) / currentDpr * requestedDpr);
 }
 
-[[nodiscard]] static inline int getSystemMetrics2(const WId windowId, const int index,
-                                                  const bool horizontal, const bool scaled)
+[[nodiscard]] static inline int getSystemMetrics2(const WId windowId, const int index, const bool horizontal, const bool scaled)
 {
     Q_ASSERT(windowId);
     if (!windowId) {
@@ -883,29 +812,29 @@ static constexpr const std::array<Win32Message, 333> g_win32MessageMap =
     return std::round(qreal(::GetSystemMetrics(index)) / dpr);
 }
 
-[[maybe_unused]] [[nodiscard]] static inline
+[[maybe_unused]] [[nodiscard]] static inline constexpr
     DWORD qtEdgesToWin32Orientation(const Qt::Edges edges)
 {
     if (edges == Qt::Edges{}) {
         return 0;
     } else if (edges == (Qt::LeftEdge)) {
-        return 0xF001; // SC_SIZELEFT
+        return SC_SIZELEFT;
     } else if (edges == (Qt::RightEdge)) {
-        return 0xF002; // SC_SIZERIGHT
+        return SC_SIZERIGHT;
     } else if (edges == (Qt::TopEdge)) {
-        return 0xF003; // SC_SIZETOP
+        return SC_SIZETOP;
     } else if (edges == (Qt::TopEdge | Qt::LeftEdge)) {
-        return 0xF004; // SC_SIZETOPLEFT
+        return SC_SIZETOPLEFT;
     } else if (edges == (Qt::TopEdge | Qt::RightEdge)) {
-        return 0xF005; // SC_SIZETOPRIGHT
+        return SC_SIZETOPRIGHT;
     } else if (edges == (Qt::BottomEdge)) {
-        return 0xF006; // SC_SIZEBOTTOM
+        return SC_SIZEBOTTOM;
     } else if (edges == (Qt::BottomEdge | Qt::LeftEdge)) {
-        return 0xF007; // SC_SIZEBOTTOMLEFT
+        return SC_SIZEBOTTOMLEFT;
     } else if (edges == (Qt::BottomEdge | Qt::RightEdge)) {
-        return 0xF008; // SC_SIZEBOTTOMRIGHT
+        return SC_SIZEBOTTOMRIGHT;
     } else {
-        return 0xF000; // SC_SIZE
+        return SC_SIZE;
     }
 }
 
@@ -923,7 +852,7 @@ static constexpr const std::array<Win32Message, 333> g_win32MessageMap =
     return result;
 }
 
-[[nodiscard]] static inline bool isNonClientMessage(const UINT message)
+[[nodiscard]] static inline constexpr bool isNonClientMessage(const UINT message)
 {
     if (((message >= WM_NCCREATE) && (message <= WM_NCACTIVATE))
             || ((message >= WM_NCMOUSEMOVE) && (message <= WM_NCMBUTTONDBLCLK))
@@ -936,7 +865,7 @@ static constexpr const std::array<Win32Message, 333> g_win32MessageMap =
     }
 }
 
-[[nodiscard]] static inline bool isMouseMessage(const UINT message, bool *isNonClient = nullptr)
+[[nodiscard]] static inline constexpr bool isMouseMessage(const UINT message, bool *isNonClient = nullptr)
 {
     if (((message >= WM_MOUSEFIRST) && (message <= WM_MOUSELAST))
             || ((message == WM_MOUSEHOVER) || (message == WM_MOUSELEAVE))) {
@@ -956,18 +885,12 @@ static constexpr const std::array<Win32Message, 333> g_win32MessageMap =
     }
 }
 
-[[nodiscard]] static inline bool usePureQtImplementation()
-{
-    static const bool result = FramelessConfig::instance()->isSet(Option::UseCrossPlatformQtImplementation);
-    return result;
-}
-
 [[nodiscard]] static inline LRESULT CALLBACK FramelessHelperHookWindowProc
     (const HWND hWnd, const UINT uMsg, const WPARAM wParam, const LPARAM lParam)
 {
     Q_ASSERT(hWnd);
     if (!hWnd) {
-        return 0;
+        return FALSE;
     }
 #if FRAMELESSHELPER_CONFIG(debug_output)
     if (isWin32MessageDebuggingEnabled()) {
@@ -981,11 +904,27 @@ static constexpr const std::array<Win32Message, 333> g_win32MessageMap =
         Utils::printWin32Message(&message);
     }
 #endif
+    const auto defaultWindowProcessing = [hWnd, uMsg, wParam, lParam]() -> LRESULT { return ::DefWindowProcW(hWnd, uMsg, wParam, lParam); };
     const auto windowId = reinterpret_cast<WId>(hWnd);
-    const auto it = g_win32UtilsData()->data.constFind(windowId);
-    if (it == g_win32UtilsData()->data.constEnd()) {
-        return ::DefWindowProcW(hWnd, uMsg, wParam, lParam);
+    const QObject *window = FramelessManagerPrivate::getWindow(windowId);
+    if (!window) {
+        return defaultWindowProcessing();
     }
+    const FramelessDataPtr data = FramelessManagerPrivate::getData(window);
+    if (!data || !data->frameless || !data->callbacks) {
+        return defaultWindowProcessing();
+    }
+    const UtilsWinExtraDataPtr extraData = tryGetExtraData(data, false);
+    Q_ASSERT(extraData);
+    if (!extraData) {
+        return defaultWindowProcessing();
+    }
+    const QWindow *qWindow = data->callbacks->getWindowHandle();
+    Q_ASSERT(qWindow);
+    if (!qWindow) {
+        return defaultWindowProcessing();
+    }
+#if FRAMELESSHELPER_CONFIG(native_impl)
     // https://github.com/qt/qtbase/blob/e26a87f1ecc40bc8c6aa5b889fce67410a57a702/src/plugins/platforms/windows/qwindowscontext.cpp#L1025
     // We can see from the source code that Qt will filter out some messages first and then send the unfiltered
     // messages to the event dispatcher. To activate the Snap Layout feature on Windows 11, we must process
@@ -1004,7 +943,7 @@ static constexpr const std::array<Win32Message, 333> g_win32MessageMap =
     // (and correct client area size, especially when the window is maximized/fullscreen). So we still go through
     // the normal code path of the original qWindowsWndProc() function, but only for this specific message. It should
     // be OK because Qt won't prevent us from handling WM_NCCALCSIZE.
-    if (!usePureQtImplementation() && (uMsg != WM_NCCALCSIZE)) {
+    if (uMsg != WM_NCCALCSIZE) {
         MSG message;
         SecureZeroMemory(&message, sizeof(message));
         message.hwnd = hWnd;
@@ -1034,7 +973,7 @@ static constexpr const std::array<Win32Message, 333> g_win32MessageMap =
             return LRESULT(filterResult);
         }
     }
-    const Win32UtilsData &data = it.value();
+#endif // native_impl
     const auto getNativePosFromMouse = [lParam]() -> QPoint {
         return {GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)};
     };
@@ -1073,8 +1012,8 @@ static constexpr const std::array<Win32Message, 333> g_win32MessageMap =
     switch (uMsg) {
     case WM_RBUTTONUP: {
         const QPoint nativeLocalPos = getNativePosFromMouse();
-        const QPoint qtScenePos = Utils::fromNativeLocalPosition(data.params.getWindowHandle(), nativeLocalPos);
-        if (data.params.isInsideTitleBarDraggableArea(qtScenePos)) {
+        const QPoint qtScenePos = Utils::fromNativeLocalPosition(qWindow, nativeLocalPos);
+        if (data->callbacks->isInsideTitleBarDraggableArea(qtScenePos)) {
             POINT pos = {nativeLocalPos.x(), nativeLocalPos.y()};
             if (::ClientToScreen(hWnd, &pos) == FALSE) {
                 WARNING << Utils::getSystemErrorMessage(kClientToScreen);
@@ -1084,12 +1023,12 @@ static constexpr const std::array<Win32Message, 333> g_win32MessageMap =
             nativeGlobalPos = {pos.x, pos.y};
         }
     } break;
-    case WM_NCRBUTTONUP: {
+    case WM_NCRBUTTONUP:
         if (wParam == HTCAPTION) {
             shouldShowSystemMenu = true;
             nativeGlobalPos = getNativePosFromMouse();
         }
-    } break;
+        break;
     case WM_SYSCOMMAND: {
         const WPARAM filteredWParam = (wParam & 0xFFF0);
         if ((filteredWParam == SC_KEYMENU) && (lParam == VK_SPACE)) {
@@ -1112,20 +1051,20 @@ static constexpr const std::array<Win32Message, 333> g_win32MessageMap =
         break;
     }
     if (shouldShowSystemMenu) {
-        std::ignore = Utils::showSystemMenu(windowId, nativeGlobalPos, broughtByKeyboard, &data.params);
+        std::ignore = Utils::showSystemMenu(windowId, nativeGlobalPos, broughtByKeyboard);
         // QPA's internal code will handle system menu events separately, and its
         // behavior is not what we would want to see because it doesn't know our
         // window doesn't have any window frame now, so return early here to avoid
         // entering Qt's own handling logic.
-        return 0; // Return 0 means we have handled this event.
+        return FALSE; // Return 0 means we have handled this event.
     }
-    Q_ASSERT(g_win32UtilsData()->qtWindowProc);
-    if (g_win32UtilsData()->qtWindowProc) {
+    Q_ASSERT(extraData->qtWindowProc);
+    if (extraData->qtWindowProc) {
         // Hand over to Qt's original window proc function for events we are not
         // interested in.
-        return ::CallWindowProcW(g_win32UtilsData()->qtWindowProc, hWnd, uMsg, wParam, lParam);
+        return ::CallWindowProcW(extraData->qtWindowProc, hWnd, uMsg, wParam, lParam);
     } else {
-        return ::DefWindowProcW(hWnd, uMsg, wParam, lParam);
+        return defaultWindowProcessing();
     }
 }
 
@@ -1167,16 +1106,12 @@ bool Utils::triggerFrameChange(const WId windowId)
         return false;
     }
     const auto hwnd = reinterpret_cast<HWND>(windowId);
-    static constexpr const UINT swpFlags =
-        (SWP_FRAMECHANGED | SWP_NOACTIVATE | SWP_NOSIZE
-        | SWP_NOMOVE | SWP_NOZORDER | SWP_NOOWNERZORDER);
+    static constexpr const UINT swpFlags = (SWP_FRAMECHANGED | SWP_NOACTIVATE | SWP_NOSIZE | SWP_NOMOVE | SWP_NOZORDER | SWP_NOOWNERZORDER);
     if (::SetWindowPos(hwnd, nullptr, 0, 0, 0, 0, swpFlags) == FALSE) {
         WARNING << getSystemErrorMessage(kSetWindowPos);
         return false;
     }
-    static constexpr const UINT rdwFlags =
-        (RDW_ERASE | RDW_FRAME | RDW_INVALIDATE
-        | RDW_UPDATENOW | RDW_ALLCHILDREN);
+    static constexpr const UINT rdwFlags = (RDW_ERASE | RDW_FRAME | RDW_INVALIDATE | RDW_UPDATENOW | RDW_ALLCHILDREN);
     if (::RedrawWindow(hwnd, nullptr, nullptr, rdwFlags) == FALSE) {
         WARNING << getSystemErrorMessage(kRedrawWindow);
         return false;
@@ -1193,19 +1128,31 @@ bool Utils::updateWindowFrameMargins(const WId windowId, const bool reset)
     if (!API_DWM_AVAILABLE(DwmExtendFrameIntoClientArea)) {
         return false;
     }
-    // We can't extend the window frame when DWM composition is disabled.
+    // We can't extend the window frame when DWM composition is disabled anyway.
     // No need to try further in this case.
     if (!isDwmCompositionEnabled()) {
         return false;
     }
-    const bool micaEnabled = g_win32UtilsData()->micaWindowIds.contains(windowId);
-    const auto margins = [micaEnabled, reset]() -> MARGINS {
+    const QObject *window = FramelessManagerPrivate::getWindow(windowId);
+    if (!window) {
+        return false;
+    }
+    const FramelessDataPtr data = FramelessManagerPrivate::getData(window);
+    if (!data) {
+        return false;
+    }
+    const UtilsWinExtraDataPtr extraData = tryGetExtraData(data, false);
+    Q_ASSERT(extraData);
+    if (!extraData) {
+        return false;
+    }
+    const auto margins = [&extraData, reset]() -> MARGINS {
         // To make Mica/Mica Alt work for normal Win32 windows, we have to
         // let the window frame extend to the whole window (or disable the
         // redirection surface, but this will break GDI's rendering, so we
         // can't do this, unfortunately), so we can't change the window frame
         // margins in this case, otherwise Mica/Mica Alt will be broken.
-        if (micaEnabled) {
+        if (extraData->mica) {
             return {-1, -1, -1, -1};
         }
         if (reset || isWindowFrameBorderVisible()) {
@@ -1275,9 +1222,9 @@ QString Utils::getSystemErrorMessage(const QString &function)
     if (function.isEmpty()) {
         return {};
     }
-    const DWORD code = GetLastError();
+    const DWORD code = ::GetLastError();
     if (code == ERROR_SUCCESS) {
-        return {};
+        return kSuccessMessageText;
     }
     return getSystemErrorMessageImpl(function, code);
 }
@@ -1342,12 +1289,19 @@ DwmColorizationArea Utils::getDwmColorizationArea()
     return DwmColorizationArea::None;
 }
 
-bool Utils::showSystemMenu(const WId windowId, const QPoint &pos, const bool selectFirstEntry,
-                           FramelessParamsConst params)
+bool Utils::showSystemMenu(const WId windowId, const QPoint &pos, const bool selectFirstEntry)
 {
     Q_ASSERT(windowId);
-    Q_ASSERT(params);
-    if (!windowId || !params) {
+    if (!windowId) {
+        return false;
+    }
+
+    const QObject *window = FramelessManagerPrivate::getWindow(windowId);
+    if (!window) {
+        return false;
+    }
+    const FramelessDataPtr data = FramelessManagerPrivate::getData(window);
+    if (!data || !data->frameless || !data->callbacks) {
         return false;
     }
 
@@ -1361,11 +1315,11 @@ bool Utils::showSystemMenu(const WId windowId, const QPoint &pos, const bool sel
     }
 
     // Tweak the menu items according to the current window status and user settings.
-    const bool disableRestore = params->getProperty(kSysMenuDisableRestoreVar, false).toBool();
-    const bool disableMinimize = params->getProperty(kSysMenuDisableMinimizeVar, false).toBool();
-    const bool disableMaximize = params->getProperty(kSysMenuDisableMaximizeVar, false).toBool();
+    const bool disableRestore = data->callbacks->getProperty(kSysMenuDisableRestoreVar, false).toBool();
+    const bool disableMinimize = data->callbacks->getProperty(kSysMenuDisableMinimizeVar, false).toBool();
+    const bool disableMaximize = data->callbacks->getProperty(kSysMenuDisableMaximizeVar, false).toBool();
     const bool maxOrFull = (IsMaximized(hWnd) || isFullScreen(windowId));
-    const bool fixedSize = params->isWindowFixedSize();
+    const bool fixedSize = data->callbacks->isWindowFixedSize();
     ::EnableMenuItem(hMenu, SC_RESTORE, (MF_BYCOMMAND | ((maxOrFull && !fixedSize && !disableRestore) ? MFS_ENABLED : MFS_DISABLED)));
     // The first menu item should be selected by default if the menu is brought
     // up by keyboard. I don't know how to pre-select a menu item but it seems
@@ -1399,14 +1353,13 @@ bool Utils::showSystemMenu(const WId windowId, const QPoint &pos, const bool sel
     ::SetMenuDefaultItem(hMenu, defaultItemId, FALSE);
 
     // Popup the system menu at the required position.
-    const int result = ::TrackPopupMenu(hMenu, (TPM_RETURNCMD | (QGuiApplication::isRightToLeft()
-                            ? TPM_RIGHTALIGN : TPM_LEFTALIGN)), pos.x(), pos.y(), 0, hWnd, nullptr);
+    const int result = ::TrackPopupMenu(hMenu, (TPM_RETURNCMD | (QGuiApplication::isRightToLeft() ? TPM_RIGHTALIGN : TPM_LEFTALIGN)), pos.x(), pos.y(), 0, hWnd, nullptr);
 
     // Unhighlight the first menu item after the popup menu is closed, otherwise it will keep
     // highlighting until we unhighlight it manually.
     ::HiliteMenuItem(hWnd, hMenu, SC_RESTORE, (MF_BYCOMMAND | MFS_UNHILITE));
 
-    if (result == 0) {
+    if (result == FALSE) {
         // The user canceled the menu, no need to continue.
         return true;
     }
@@ -1614,13 +1567,10 @@ quint32 Utils::getPrimaryScreenDpi(const bool horizontal)
     // Using Direct2D to get the primary monitor's DPI is only available on Windows 7
     // and onwards, but it has been marked as deprecated by Microsoft.
     if (API_D2D_AVAILABLE(D2D1CreateFactory)) {
-        using D2D1CreateFactoryPtr =
-            HRESULT(WINAPI *)(D2D1_FACTORY_TYPE, REFIID, CONST D2D1_FACTORY_OPTIONS *, void **);
-        const auto pD2D1CreateFactory =
-            reinterpret_cast<D2D1CreateFactoryPtr>(SysApiLoader::instance()->get(kd2d1, kD2D1CreateFactory));
+        using D2D1CreateFactoryPtr = HRESULT(WINAPI *)(D2D1_FACTORY_TYPE, REFIID, CONST D2D1_FACTORY_OPTIONS *, void **);
+        const auto pD2D1CreateFactory = reinterpret_cast<D2D1CreateFactoryPtr>(SysApiLoader::instance()->get(kd2d1, kD2D1CreateFactory));
         ID2D1Factory *d2dFactory = nullptr;
-        HRESULT hr = pD2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, __uuidof(ID2D1Factory),
-                                        nullptr, reinterpret_cast<void **>(&d2dFactory));
+        HRESULT hr = pD2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, __uuidof(ID2D1Factory), nullptr, reinterpret_cast<void **>(&d2dFactory));
         if (SUCCEEDED(hr)) {
             // We want to get the newest system DPI, so refresh the system metrics
             // manually to ensure that.
@@ -1740,11 +1690,9 @@ quint32 Utils::getResizeBorderThicknessForDpi(const bool horizontal, const quint
         return 0;
     }
     if (horizontal) {
-        return (getSystemMetrics2(SM_CXSIZEFRAME, true, dpi)
-                + getSystemMetrics2(SM_CXPADDEDBORDER, true, dpi));
+        return (getSystemMetrics2(SM_CXSIZEFRAME, true, dpi) + getSystemMetrics2(SM_CXPADDEDBORDER, true, dpi));
     } else {
-        return (getSystemMetrics2(SM_CYSIZEFRAME, false, dpi)
-                + getSystemMetrics2(SM_CYPADDEDBORDER, false, dpi));
+        return (getSystemMetrics2(SM_CYSIZEFRAME, false, dpi) + getSystemMetrics2(SM_CYPADDEDBORDER, false, dpi));
     }
 }
 
@@ -1755,11 +1703,9 @@ quint32 Utils::getResizeBorderThickness(const WId windowId, const bool horizonta
         return 0;
     }
     if (horizontal) {
-        return (getSystemMetrics2(windowId, SM_CXSIZEFRAME, true, scaled)
-                + getSystemMetrics2(windowId, SM_CXPADDEDBORDER, true, scaled));
+        return (getSystemMetrics2(windowId, SM_CXSIZEFRAME, true, scaled) + getSystemMetrics2(windowId, SM_CXPADDEDBORDER, true, scaled));
     } else {
-        return (getSystemMetrics2(windowId, SM_CYSIZEFRAME, false, scaled)
-                + getSystemMetrics2(windowId, SM_CYPADDEDBORDER, false, scaled));
+        return (getSystemMetrics2(windowId, SM_CYSIZEFRAME, false, scaled) + getSystemMetrics2(windowId, SM_CYPADDEDBORDER, false, scaled));
     }
 }
 
@@ -1830,13 +1776,12 @@ quint32 Utils::getFrameBorderThickness(const WId windowId, const bool scaled)
     const qreal scaleFactor = (qreal(dpi) / qreal(USER_DEFAULT_SCREEN_DPI));
     const auto hwnd = reinterpret_cast<HWND>(windowId);
     UINT value = 0;
-    const HRESULT hr = API_CALL_FUNCTION(dwmapi, DwmGetWindowAttribute, hwnd,
-        _DWMWA_VISIBLE_FRAME_BORDER_THICKNESS, &value, sizeof(value));
+    const HRESULT hr = API_CALL_FUNCTION(dwmapi, DwmGetWindowAttribute, hwnd, _DWMWA_VISIBLE_FRAME_BORDER_THICKNESS, &value, sizeof(value));
     if (SUCCEEDED(hr)) {
-        const qreal dpr = (scaled ? 1.0 : scaleFactor);
+        const qreal dpr = (scaled ? qreal(1) : scaleFactor);
         return std::round(qreal(value) / dpr);
     } else {
-        const qreal dpr = (scaled ? scaleFactor : 1.0);
+        const qreal dpr = (scaled ? scaleFactor : qreal(1));
         return std::round(qreal(kDefaultWindowFrameBorderThickness) * dpr);
     }
 }
@@ -1949,7 +1894,7 @@ bool Utils::startSystemMove(QWindow *window, const QPoint &globalPos)
         return false;
     }
     const auto hwnd = reinterpret_cast<HWND>(window->winId());
-    if (::PostMessageW(hwnd, WM_SYSCOMMAND, 0xF012 /*SC_DRAGMOVE*/, 0) == FALSE) {
+    if (::PostMessageW(hwnd, WM_SYSCOMMAND, SC_DRAGMOVE, 0) == FALSE) {
         WARNING << getSystemErrorMessage(kPostMessageW);
         return false;
     }
@@ -1986,10 +1931,8 @@ bool Utils::startSystemResize(QWindow *window, const Qt::Edges edges, const QPoi
 bool Utils::isWindowFrameBorderVisible()
 {
     static const auto result = []() -> bool {
+#if FRAMELESSHELPER_CONFIG(native_impl)
         const FramelessConfig * const config = FramelessConfig::instance();
-        if (config->isSet(Option::UseCrossPlatformQtImplementation)) {
-            return false;
-        }
         if (config->isSet(Option::ForceShowWindowFrameBorder)) {
             return true;
         }
@@ -1997,6 +1940,9 @@ bool Utils::isWindowFrameBorderVisible()
             return false;
         }
         return WindowsVersionHelper::isWin10OrGreater();
+#else
+        return false;
+#endif
     }();
     return result;
 }
@@ -2016,15 +1962,29 @@ bool Utils::isFrameBorderColorized()
     return isTitleBarColorized();
 }
 
-bool Utils::installWindowProcHook(const WId windowId, FramelessParamsConst params)
+bool Utils::installWindowProcHook(const WId windowId)
 {
     Q_ASSERT(windowId);
-    Q_ASSERT(params);
-    if (!windowId || !params) {
+    if (!windowId) {
+        return false;
+    }
+    const QObject *window = FramelessManagerPrivate::getWindow(windowId);
+    Q_ASSERT(window);
+    if (!window) {
+        return false;
+    }
+    const FramelessDataPtr data = FramelessManagerPrivate::getData(window);
+    Q_ASSERT(data);
+    if (!data || data->frameless) {
+        return false;
+    }
+    const UtilsWinExtraDataPtr extraData = tryGetExtraData(data, true);
+    Q_ASSERT(extraData);
+    if (!extraData) {
         return false;
     }
     const auto hwnd = reinterpret_cast<HWND>(windowId);
-    if (!g_win32UtilsData()->qtWindowProc) {
+    if (!extraData->qtWindowProc) {
         ::SetLastError(ERROR_SUCCESS);
         const auto qtWindowProc = reinterpret_cast<WNDPROC>(::GetWindowLongPtrW(hwnd, GWLP_WNDPROC));
         Q_ASSERT(qtWindowProc);
@@ -2032,18 +1992,15 @@ bool Utils::installWindowProcHook(const WId windowId, FramelessParamsConst param
             WARNING << getSystemErrorMessage(kGetWindowLongPtrW);
             return false;
         }
-        g_win32UtilsData()->qtWindowProc = qtWindowProc;
+        extraData->qtWindowProc = qtWindowProc;
     }
-    const auto it = g_win32UtilsData()->data.constFind(windowId);
-    if (it == g_win32UtilsData()->data.constEnd()) {
-        Win32UtilsData data = {};
-        data.params = *params;
-        g_win32UtilsData()->data.insert(windowId, data);
+    if (!extraData->windowProcHooked) {
         ::SetLastError(ERROR_SUCCESS);
         if (::SetWindowLongPtrW(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(FramelessHelperHookWindowProc)) == 0) {
             WARNING << getSystemErrorMessage(kSetWindowLongPtrW);
             return false;
         }
+        extraData->windowProcHooked = true;
     }
     return true;
 }
@@ -2054,19 +2011,30 @@ bool Utils::uninstallWindowProcHook(const WId windowId)
     if (!windowId) {
         return false;
     }
-    const auto it = g_win32UtilsData()->data.constFind(windowId);
-    if (it != g_win32UtilsData()->data.constEnd()) {
-        g_win32UtilsData()->data.erase(it);
+    const QObject *window = FramelessManagerPrivate::getWindow(windowId);
+    if (!window) {
+        return false;
     }
-    if (g_win32UtilsData()->data.isEmpty() && g_win32UtilsData()->qtWindowProc) {
-        const auto hwnd = reinterpret_cast<HWND>(windowId);
-        ::SetLastError(ERROR_SUCCESS);
-        if (::SetWindowLongPtrW(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(g_win32UtilsData()->qtWindowProc)) == 0) {
-            WARNING << getSystemErrorMessage(kSetWindowLongPtrW);
-            return false;
-        }
-        g_win32UtilsData()->qtWindowProc = nullptr;
+    const FramelessDataPtr data = FramelessManagerPrivate::getData(window);
+    if (!data || !data->frameless) {
+        return false;
     }
+    const UtilsWinExtraDataPtr extraData = tryGetExtraData(data, false);
+    if (!extraData || !extraData->windowProcHooked) {
+        return false;
+    }
+    Q_ASSERT(extraData->qtWindowProc);
+    if (!extraData->qtWindowProc) {
+        return false;
+    }
+    const auto hwnd = reinterpret_cast<HWND>(windowId);
+    ::SetLastError(ERROR_SUCCESS);
+    if (::SetWindowLongPtrW(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(extraData->qtWindowProc)) == 0) {
+        WARNING << getSystemErrorMessage(kSetWindowLongPtrW);
+        return false;
+    }
+    extraData->qtWindowProc = nullptr;
+    extraData->windowProcHooked = false;
     return true;
 }
 
@@ -2323,6 +2291,19 @@ bool Utils::setBlurBehindWindowEnabled(const WId windowId, const BlurMode mode, 
     if (!windowId) {
         return false;
     }
+    const QObject *window = FramelessManagerPrivate::getWindow(windowId);
+    if (!window) {
+        return false;
+    }
+    const FramelessDataPtr data = FramelessManagerPrivate::getData(window);
+    if (!data) {
+        return false;
+    }
+    const UtilsWinExtraDataPtr extraData = tryGetExtraData(data, false);
+    // Don't assert here, the user may be using pure Qt solution.
+    if (!extraData) {
+        return false;
+    }
     const auto hwnd = reinterpret_cast<HWND>(windowId);
     if (WindowsVersionHelper::isWin8OrGreater()) {
         if (!(API_DWM_AVAILABLE(DwmSetWindowAttribute)
@@ -2330,17 +2311,49 @@ bool Utils::setBlurBehindWindowEnabled(const WId windowId, const BlurMode mode, 
             WARNING << "Blur behind window is not available on current platform.";
             return false;
         }
-        const auto restoreWindowFrameMargins = [windowId]() -> void {
-            g_win32UtilsData()->micaWindowIds.removeAll(windowId);
+        const auto restoreWindowFrameMargins = [windowId, &extraData]() -> void {
+            extraData->mica = false;
             std::ignore = updateWindowFrameMargins(windowId, false);
         };
+        static const auto userPreferredBlurMode = []() -> std::optional<BlurMode> {
+            const QString option = qEnvironmentVariable("FRAMELESSHELPER_BLUR_MODE");
+            if (option.isEmpty()) {
+                return std::nullopt;
+            }
+            if (option.contains(FRAMELESSHELPER_STRING_LITERAL("MICAALT"), Qt::CaseInsensitive)) {
+                return BlurMode::Windows_MicaAlt;
+            }
+            if (option.contains(FRAMELESSHELPER_STRING_LITERAL("MICA"), Qt::CaseInsensitive)) {
+                return BlurMode::Windows_Mica;
+            }
+            if (option.contains(FRAMELESSHELPER_STRING_LITERAL("ACRYLIC"), Qt::CaseInsensitive)) {
+                return BlurMode::Windows_Acrylic;
+            }
+            if (option.contains(FRAMELESSHELPER_STRING_LITERAL("AERO"), Qt::CaseInsensitive)) {
+                return BlurMode::Windows_Aero;
+            }
+            return std::nullopt;
+        }();
+        static constexpr const auto kDefaultAcrylicOpacity = 0.8f;
+        static const auto acrylicOpacity = []() -> float {
+            const QString option = qEnvironmentVariable("FRAMELESSHELPER_ACRYLIC_OPACITY");
+            if (option.isEmpty()) {
+                return kDefaultAcrylicOpacity;
+            }
+            bool ok = false;
+            const float num = option.toFloat(&ok);
+            if (ok && !qIsNaN(num) && (num > float(0)) && (num < float(1))) {
+                return num;
+            }
+            return kDefaultAcrylicOpacity;
+        }();
         static const bool preferMicaAlt = (qEnvironmentVariableIntValue("FRAMELESSHELPER_PREFER_MICA_ALT") != 0);
-        const auto blurMode = [mode]() -> BlurMode {
+        const auto recommendedBlurMode = [mode]() -> BlurMode {
             if ((mode == BlurMode::Disable) || (mode == BlurMode::Windows_Aero)) {
                 return mode;
             }
             if (((mode == BlurMode::Windows_Mica) || (mode == BlurMode::Windows_MicaAlt))
-                && !WindowsVersionHelper::isWin11OrGreater()) {
+                    && !WindowsVersionHelper::isWin11OrGreater()) {
                 WARNING << "The Mica material is not supported on your system, fallback to the Acrylic blur instead...";
                 if (WindowsVersionHelper::isWin10OrGreater()) {
                     return BlurMode::Windows_Acrylic;
@@ -2366,6 +2379,7 @@ bool Utils::setBlurBehindWindowEnabled(const WId windowId, const BlurMode mode, 
             Q_UNREACHABLE_RETURN(BlurMode::Default);
             QT_WARNING_POP
         }();
+        const BlurMode blurMode = ((recommendedBlurMode == BlurMode::Disable) ? BlurMode::Disable : userPreferredBlurMode.value_or(recommendedBlurMode));
         if (blurMode == BlurMode::Disable) {
             bool result = true;
             if (WindowsVersionHelper::isWin1122H2OrGreater()) {
@@ -2387,8 +2401,8 @@ bool Utils::setBlurBehindWindowEnabled(const WId windowId, const BlurMode mode, 
             } else {
                 ACCENT_POLICY policy;
                 SecureZeroMemory(&policy, sizeof(policy));
-                policy.AccentState = ACCENT_DISABLED;
-                policy.AccentFlags = ACCENT_NONE;
+                policy.dwAccentState = ACCENT_DISABLED;
+                policy.dwAccentFlags = ACCENT_NONE;
                 WINDOWCOMPOSITIONATTRIBDATA wcad;
                 SecureZeroMemory(&wcad, sizeof(wcad));
                 wcad.Attrib = WCA_ACCENT_POLICY;
@@ -2405,7 +2419,7 @@ bool Utils::setBlurBehindWindowEnabled(const WId windowId, const BlurMode mode, 
             return result;
         } else {
             if ((blurMode == BlurMode::Windows_Mica) || (blurMode == BlurMode::Windows_MicaAlt)) {
-                g_win32UtilsData()->micaWindowIds.append(windowId);
+                extraData->mica = true;
                 // By giving a negative value, DWM will extend the window frame into the whole
                 // client area. We need this step because the Mica material can only be applied
                 // to the non-client area of a window. Without this step, you'll get a window
@@ -2453,22 +2467,22 @@ bool Utils::setBlurBehindWindowEnabled(const WId windowId, const BlurMode mode, 
                 ACCENT_POLICY policy;
                 SecureZeroMemory(&policy, sizeof(policy));
                 if (blurMode == BlurMode::Windows_Acrylic) {
-                    policy.AccentState = ACCENT_ENABLE_ACRYLICBLURBEHIND;
-                    policy.AccentFlags = ACCENT_ENABLE_LUMINOSITY;
+                    policy.dwAccentState = ACCENT_ENABLE_ACRYLICBLURBEHIND;
+                    policy.dwAccentFlags = ACCENT_ENABLE_ACRYLIC_WITH_LUMINOSITY;
                     const auto gradientColor = [&color]() -> QColor {
                         if (color.isValid()) {
                             return color;
                         }
                         QColor clr = ((FramelessManager::instance()->systemTheme() == SystemTheme::Dark) ? kDefaultSystemDarkColor : kDefaultSystemLightColor);
-                        clr.setAlphaF(0.9f);
+                        clr.setAlphaF(acrylicOpacity);
                         return clr;
                     }();
                     // This API expects the #AABBGGRR format.
                     policy.dwGradientColor = DWORD(qRgba(gradientColor.blue(),
                         gradientColor.green(), gradientColor.red(), gradientColor.alpha()));
                 } else if (blurMode == BlurMode::Windows_Aero) {
-                    policy.AccentState = ACCENT_ENABLE_BLURBEHIND;
-                    policy.AccentFlags = ACCENT_NONE;
+                    policy.dwAccentState = ACCENT_ENABLE_BLURBEHIND;
+                    policy.dwAccentFlags = ACCENT_NONE;
                 } else {
                     QT_WARNING_PUSH
                     QT_WARNING_DISABLE_MSVC(4702)
@@ -2597,7 +2611,10 @@ bool Utils::isBlurBehindWindowSupported()
         if (FramelessConfig::instance()->isSet(Option::ForceNonNativeBackgroundBlur)) {
             return false;
         }
-        return WindowsVersionHelper::isWin11OrGreater();
+        // Enabling Mica on Win11 make it very hard to hide the original three caption buttons,
+        // and enabling Acrylic on Win10 makes the window very laggy during moving and resizing.
+        //return WindowsVersionHelper::isWin10OrGreater();
+        return false;
     }();
     return result;
 }
@@ -2646,9 +2663,9 @@ bool Utils::setQtDarkModeAwareEnabled(const bool enable)
             // flag has no effect for pure Qt Quick applications.
             return {App::DarkModeWindowFrames | App::DarkModeStyle};
 #    else // (QT_VERSION < QT_VERSION_CHECK(6, 5, 0)) \
-    // Don't try to use the broken dark theme for Qt Widgets applications. \
-    // For Qt Quick applications this is also enough. There's no global dark \
-    // theme for them anyway.
+            // Don't try to use the broken dark theme for Qt Widgets applications. \
+            // For Qt Quick applications this is also enough. There's no global dark \
+            // theme for them anyway.
             return {App::DarkModeWindowFrames};
 #    endif // (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
         }());
@@ -3071,16 +3088,6 @@ QRect Utils::getWindowRestoreGeometry(const WId windowId)
     return rect2qrect(wp.rcNormalPosition).translated(getWindowPlacementOffset(windowId));
 }
 
-bool Utils::removeMicaWindow(const WId windowId)
-{
-    Q_ASSERT(windowId);
-    if (!windowId) {
-        return false;
-    }
-    g_win32UtilsData()->micaWindowIds.removeAll(windowId);
-    return true;
-}
-
 quint64 Utils::getKeyState()
 {
     quint64 result = 0;
@@ -3127,7 +3134,7 @@ bool Utils::isValidWindow(const WId windowId, const bool checkVisible, const boo
         return false;
     }
     const LONG_PTR exStyles = ::GetWindowLongPtrW(hwnd, GWL_EXSTYLE);
-    if ((exStyles != 0) && (exStyles & WS_EX_TOOLWINDOW)) {
+    if ((exStyles == 0) || (exStyles & WS_EX_TOOLWINDOW)) {
         return false;
     }
     RECT rect = { 0, 0, 0, 0 };
@@ -3169,15 +3176,14 @@ bool Utils::updateFramebufferTransparency(const WId windowId)
     bool ok = false;
     std::ignore = getDwmColorizationColor(&opaque, &ok);
     if (WindowsVersionHelper::isWin8OrGreater() || (ok && !opaque)) {
-#if 0 // Windows QPA will always do this for us.
         DWM_BLURBEHIND bb;
         SecureZeroMemory(&bb, sizeof(bb));
         bb.dwFlags = (DWM_BB_ENABLE | DWM_BB_BLURREGION);
-        bb.hRgnBlur = CreateRectRgn(0, 0, -1, -1);
+        bb.hRgnBlur = ::CreateRectRgn(0, 0, -1, -1);
         bb.fEnable = TRUE;
         const HRESULT hr = API_CALL_FUNCTION(dwmapi, DwmEnableBlurBehindWindow, hwnd, &bb);
         if (bb.hRgnBlur) {
-            if (DeleteObject(bb.hRgnBlur) == FALSE) {
+            if (::DeleteObject(bb.hRgnBlur) == FALSE) {
                 WARNING << getSystemErrorMessage(kDeleteObject);
             }
         }
@@ -3185,7 +3191,6 @@ bool Utils::updateFramebufferTransparency(const WId windowId)
             WARNING << getSystemErrorMessageImpl(kDwmEnableBlurBehindWindow, hr);
             return false;
         }
-#endif
     } else {
         // HACK: Disable framebuffer transparency on Windows 7 when the
         //       colorization color is opaque, because otherwise the window

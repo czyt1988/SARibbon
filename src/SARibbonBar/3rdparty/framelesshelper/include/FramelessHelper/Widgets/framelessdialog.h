@@ -32,20 +32,14 @@
 FRAMELESSHELPER_BEGIN_NAMESPACE
 
 class FramelessDialogPrivate;
-
 class FRAMELESSHELPER_WIDGETS_API FramelessDialog : public QDialog
 {
     Q_OBJECT
-    FRAMELESSHELPER_CLASS_INFO
-    Q_DECLARE_PRIVATE(FramelessDialog)
-    Q_DISABLE_COPY_MOVE(FramelessDialog)
+    FRAMELESSHELPER_PUBLIC_QT_CLASS(FramelessDialog)
 
 public:
     explicit FramelessDialog(QWidget *parent = nullptr);
     ~FramelessDialog() override;
-
-private:
-    QScopedPointer<FramelessDialogPrivate> d_ptr;
 };
 
 FRAMELESSHELPER_END_NAMESPACE

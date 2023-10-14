@@ -30,22 +30,18 @@
 
 FRAMELESSHELPER_BEGIN_NAMESPACE
 
-struct SystemParameters;
-class FramelessManager;
+struct FramelessData;
+using FramelessDataPtr = std::shared_ptr<FramelessData>;
 
+class FramelessManager;
 class FRAMELESSHELPER_CORE_API FramelessManagerPrivate : public QObject
 {
     Q_OBJECT
-    FRAMELESSHELPER_CLASS_INFO
-    Q_DECLARE_PUBLIC(FramelessManager)
-    Q_DISABLE_COPY_MOVE(FramelessManagerPrivate)
+    FRAMELESSHELPER_PRIVATE_QT_CLASS(FramelessManager)
 
 public:
     explicit FramelessManagerPrivate(FramelessManager *q);
     ~FramelessManagerPrivate() override;
-
-    Q_NODISCARD static FramelessManagerPrivate *get(FramelessManager *pub);
-    Q_NODISCARD static const FramelessManagerPrivate *get(const FramelessManager *pub);
 
     static void initializeIconFont();
     Q_NODISCARD static QFont getIconFont();
@@ -60,7 +56,12 @@ public:
     void doNotifySystemThemeHasChangedOrNot();
     void doNotifyWallpaperHasChangedOrNot();
 
-    FramelessManager *q_ptr = nullptr;
+    Q_NODISCARD static FramelessDataPtr getData(const QObject *window);
+    Q_NODISCARD static FramelessDataPtr createData(const QObject *window, const WId windowId);
+    Q_NODISCARD static WId getWindowId(const QObject *window);
+    Q_NODISCARD static QObject *getWindow(const WId windowId);
+    static void updateWindowId(const QObject *window, const WId newWindowId);
+
     Global::SystemTheme systemTheme = Global::SystemTheme::Unknown;
     std::optional<Global::SystemTheme> overrideTheme = std::nullopt;
     QColor accentColor = {};

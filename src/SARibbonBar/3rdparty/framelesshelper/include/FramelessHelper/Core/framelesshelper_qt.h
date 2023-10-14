@@ -26,25 +26,27 @@
 
 #include <FramelessHelper/Core/framelesshelpercore_global.h>
 
+#if !FRAMELESSHELPER_CONFIG(native_impl)
+
 FRAMELESSHELPER_BEGIN_NAMESPACE
 
-struct SystemParameters;
-
+class FramelessHelperQtPrivate;
 class FRAMELESSHELPER_CORE_API FramelessHelperQt : public QObject
 {
     Q_OBJECT
-    FRAMELESSHELPER_CLASS_INFO
-    Q_DISABLE_COPY_MOVE(FramelessHelperQt)
+    FRAMELESSHELPER_PUBLIC_QT_CLASS(FramelessHelperQt)
 
 public:
     explicit FramelessHelperQt(QObject *parent = nullptr);
     ~FramelessHelperQt() override;
 
-    static void addWindow(const SystemParameters *params);
-    static void removeWindow(const WId windowId);
+    static void addWindow(const QObject *window);
+    static void removeWindow(const QObject *window);
 
 protected:
     Q_NODISCARD bool eventFilter(QObject *object, QEvent *event) override;
 };
 
 FRAMELESSHELPER_END_NAMESPACE
+
+#endif // !native_impl

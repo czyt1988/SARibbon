@@ -132,7 +132,7 @@ extern QString gtkSettings(const gchar *);
     // https://bugreports.qt.io/browse/QTBUG-102488
     const QPoint localPos = window->mapFromGlobal(globalPos);
     const QPoint scenePos = localPos; // windowPos in Qt5.
-    const auto event = std::make_unique<QMouseEvent>(
+    const auto event = new QMouseEvent(
         QEvent::MouseButtonRelease,
         localPos,
         scenePos,
@@ -140,7 +140,7 @@ extern QString gtkSettings(const gchar *);
         Qt::LeftButton,
         QGuiApplication::mouseButtons() ^ Qt::LeftButton,
         QGuiApplication::keyboardModifiers());
-    QGuiApplication::sendEvent(window, event.get());
+    QGuiApplication::postEvent(window, event);
 }
 
 QScreen *Utils::x11_findScreenForVirtualDesktop(const int virtualDesktopNumber)

@@ -46,11 +46,10 @@ class QuickImageItem;
 class FRAMELESSHELPER_QUICK_API QuickStandardTitleBar : public QQuickRectangle
 {
     Q_OBJECT
-    FRAMELESSHELPER_CLASS_INFO
+    FRAMELESSHELPER_QT_CLASS(QuickStandardTitleBar)
 #ifdef QML_NAMED_ELEMENT
     QML_NAMED_ELEMENT(StandardTitleBar)
 #endif // QML_NAMED_ELEMENT
-    Q_DISABLE_COPY_MOVE(QuickStandardTitleBar)
     Q_PROPERTY(Qt::Alignment titleLabelAlignment READ titleLabelAlignment WRITE setTitleLabelAlignment NOTIFY titleLabelAlignmentChanged FINAL)
     Q_PROPERTY(QQuickLabel* titleLabel READ titleLabel CONSTANT FINAL)
 #if (!defined(Q_OS_MACOS) && FRAMELESSHELPER_CONFIG(system_button))

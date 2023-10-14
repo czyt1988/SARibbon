@@ -86,6 +86,46 @@
 
 #include <FramelessHelper/Core/framelesshelpercore_global.h>
 
+#ifndef SC_SIZE
+#  define SC_SIZE (0xF000)
+#endif
+
+#ifndef SC_SIZELEFT
+#  define SC_SIZELEFT (0xF001)
+#endif
+
+#ifndef SC_SIZERIGHT
+#  define SC_SIZERIGHT (0xF002)
+#endif
+
+#ifndef SC_SIZETOP
+#  define SC_SIZETOP (0xF003)
+#endif
+
+#ifndef SC_SIZETOPLEFT
+#  define SC_SIZETOPLEFT (0xF004)
+#endif
+
+#ifndef SC_SIZETOPRIGHT
+#  define SC_SIZETOPRIGHT (0xF005)
+#endif
+
+#ifndef SC_SIZEBOTTOM
+#  define SC_SIZEBOTTOM (0xF006)
+#endif
+
+#ifndef SC_SIZEBOTTOMLEFT
+#  define SC_SIZEBOTTOMLEFT (0xF007)
+#endif
+
+#ifndef SC_SIZEBOTTOMRIGHT
+#  define SC_SIZEBOTTOMRIGHT (0xF008)
+#endif
+
+#ifndef SC_DRAGMOVE
+#  define SC_DRAGMOVE (0xF012)
+#endif
+
 #ifndef WM_SIZEWAIT
 #  define WM_SIZEWAIT (0x0004)
 #endif
@@ -779,19 +819,14 @@ using ACCENT_STATE = enum ACCENT_STATE
 using ACCENT_FLAG = enum ACCENT_FLAG
 {
     ACCENT_NONE = 0,
-    ACCENT_ENABLE_LUMINOSITY = 1 << 1,
-    ACCENT_ENABLE_BORDER_LEFT = 1 << 5,
-    ACCENT_ENABLE_BORDER_TOP = 1 << 6,
-    ACCENT_ENABLE_BORDER_RIGHT = 1 << 7,
-    ACCENT_ENABLE_BORDER_BOTTOM = 1 << 8,
-    ACCENT_ENABLE_BORDER = ACCENT_ENABLE_BORDER_LEFT | ACCENT_ENABLE_BORDER_TOP | ACCENT_ENABLE_BORDER_RIGHT | ACCENT_ENABLE_BORDER_BOTTOM,
-    ACCENT_ENABLE_ALL = ACCENT_ENABLE_BORDER
+    ACCENT_ENABLE_ACRYLIC = 1,
+    ACCENT_ENABLE_ACRYLIC_WITH_LUMINOSITY = 482
 };
 
 using ACCENT_POLICY = struct ACCENT_POLICY
 {
-    ACCENT_STATE AccentState;
-    ACCENT_FLAG AccentFlags;
+    DWORD dwAccentState;
+    DWORD dwAccentFlags;
     DWORD dwGradientColor; // #AABBGGRR
     DWORD dwAnimationId;
 };
@@ -1107,7 +1142,7 @@ _AdjustWindowRectExForDpi2(
 
 EXTERN_C_END
 
-[[maybe_unused]] inline constexpr const int kAutoHideTaskBarThickness = 2; // The thickness of an auto-hide taskbar in pixels.
+[[maybe_unused]] inline constexpr const unsigned char kAutoHideTaskBarThickness = 2; // The thickness of an auto-hide taskbar in pixels.
 [[maybe_unused]] inline constexpr const wchar_t kDwmRegistryKey[] = LR"(Software\Microsoft\Windows\DWM)";
 [[maybe_unused]] inline constexpr const wchar_t kPersonalizeRegistryKey[] = LR"(Software\Microsoft\Windows\CurrentVersion\Themes\Personalize)";
 [[maybe_unused]] inline constexpr const wchar_t kThemeSettingChangeEventName[] = L"ImmersiveColorSet";
@@ -1116,3 +1151,95 @@ EXTERN_C_END
 [[maybe_unused]] inline constexpr const wchar_t kSystemLightThemeResourceName[] = L"Explorer";
 [[maybe_unused]] inline constexpr const wchar_t kDesktopRegistryKey[] = LR"(Control Panel\Desktop)";
 [[maybe_unused]] inline constexpr const wchar_t kDarkModePropertyName[] = L"UseImmersiveDarkModeColors";
+
+[[maybe_unused]] [[nodiscard]] inline constexpr bool operator==(const POINT &lhs, const POINT &rhs) noexcept
+{
+    return ((lhs.x == rhs.x) && (lhs.y == rhs.y));
+}
+
+[[maybe_unused]] [[nodiscard]] inline constexpr bool operator!=(const POINT &lhs, const POINT &rhs) noexcept
+{
+    return !operator==(lhs, rhs);
+}
+
+[[maybe_unused]] [[nodiscard]] inline constexpr bool operator==(const SIZE &lhs, const SIZE &rhs) noexcept
+{
+    return ((lhs.cx == rhs.cx) && (lhs.cy == rhs.cy));
+}
+
+[[maybe_unused]] [[nodiscard]] inline constexpr bool operator!=(const SIZE &lhs, const SIZE &rhs) noexcept
+{
+    return !operator==(lhs, rhs);
+}
+
+[[maybe_unused]] [[nodiscard]] inline constexpr bool operator>(const SIZE &lhs, const SIZE &rhs) noexcept
+{
+    return ((lhs.cx * lhs.cy) > (rhs.cx * rhs.cy));
+}
+
+[[maybe_unused]] [[nodiscard]] inline constexpr bool operator>=(const SIZE &lhs, const SIZE &rhs) noexcept
+{
+    return (operator>(lhs, rhs) || operator==(lhs, rhs));
+}
+
+[[maybe_unused]] [[nodiscard]] inline constexpr bool operator<(const SIZE &lhs, const SIZE &rhs) noexcept
+{
+    return (operator!=(lhs, rhs) && !operator>(lhs, rhs));
+}
+
+[[maybe_unused]] [[nodiscard]] inline constexpr bool operator<=(const SIZE &lhs, const SIZE &rhs) noexcept
+{
+    return (operator<(lhs, rhs) || operator==(lhs, rhs));
+}
+
+[[maybe_unused]] [[nodiscard]] inline constexpr bool operator==(const RECT &lhs, const RECT &rhs) noexcept
+{
+    return ((lhs.left == rhs.left) && (lhs.top == rhs.top) && (lhs.right == rhs.right) && (lhs.bottom == rhs.bottom));
+}
+
+[[maybe_unused]] [[nodiscard]] inline constexpr bool operator!=(const RECT &lhs, const RECT &rhs) noexcept
+{
+    return !operator==(lhs, rhs);
+}
+
+[[nodiscard]] inline constexpr QPoint point2qpoint(const POINT &point)
+{
+    return QPoint{ int(point.x), int(point.y) };
+}
+
+[[nodiscard]] inline constexpr POINT qpoint2point(const QPoint &point)
+{
+    return POINT{ LONG(point.x()), LONG(point.y()) };
+}
+
+[[nodiscard]] inline constexpr QSize size2qsize(const SIZE &size)
+{
+    return QSize{ int(size.cx), int(size.cy) };
+}
+
+[[nodiscard]] inline constexpr SIZE qsize2size(const QSize &size)
+{
+    return SIZE{ LONG(size.width()), LONG(size.height()) };
+}
+
+[[nodiscard]] inline constexpr QRect rect2qrect(const RECT &rect)
+{
+    return QRect{ QPoint{ int(rect.left), int(rect.top) }, QSize{ int(RECT_WIDTH(rect)), int(RECT_HEIGHT(rect)) } };
+}
+
+[[nodiscard]] inline constexpr RECT qrect2rect(const QRect &qrect)
+{
+    return RECT{ LONG(qrect.left()), LONG(qrect.top()), LONG(qrect.right()), LONG(qrect.bottom()) };
+}
+
+[[nodiscard]] inline /*constexpr*/ QString hwnd2str(const WId windowId)
+{
+    // NULL handle is allowed here.
+    return FRAMELESSHELPER_STRING_LITERAL("0x") + QString::number(windowId, 16).toUpper().rightJustified(8, u'0');
+}
+
+[[nodiscard]] inline /*constexpr*/ QString hwnd2str(const HWND hwnd)
+{
+    // NULL handle is allowed here.
+    return hwnd2str(reinterpret_cast<WId>(hwnd));
+}

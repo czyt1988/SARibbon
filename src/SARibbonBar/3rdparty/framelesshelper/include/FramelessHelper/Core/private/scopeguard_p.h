@@ -37,7 +37,7 @@ using ScopeGuardCallback = std::function<void()>;
 
 class [[nodiscard]] ScopeGuard
 {
-    Q_DISABLE_COPY(ScopeGuard)
+    FRAMELESSHELPER_CLASS(ScopeGuard)
 
 public:
     ScopeGuard()

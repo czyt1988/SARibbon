@@ -31,13 +31,10 @@
 FRAMELESSHELPER_BEGIN_NAMESPACE
 
 class WindowBorderPainterPrivate;
-
 class FRAMELESSHELPER_CORE_API WindowBorderPainter : public QObject
 {
     Q_OBJECT
-    FRAMELESSHELPER_CLASS_INFO
-    Q_DISABLE_COPY_MOVE(WindowBorderPainter)
-    Q_DECLARE_PRIVATE(WindowBorderPainter)
+    FRAMELESSHELPER_PUBLIC_QT_CLASS(WindowBorderPainter)
 
     Q_PROPERTY(int thickness READ thickness WRITE setThickness NOTIFY thicknessChanged FINAL)
     Q_PROPERTY(Global::WindowEdges edges READ edges WRITE setEdges NOTIFY edgesChanged FINAL)
@@ -77,9 +74,6 @@ Q_SIGNALS:
     void inactiveColorChanged();
     void nativeBorderChanged();
     void shouldRepaint();
-
-private:
-    QScopedPointer<WindowBorderPainterPrivate> d_ptr;
 };
 
 FRAMELESSHELPER_END_NAMESPACE

@@ -25,7 +25,10 @@
 #pragma once
 
 #include <FramelessHelper/Core/framelesshelpercore_global.h>
+#include <QtCore/qhash.h>
+#include <QtGui/qwindowdefs.h>
 #include <functional>
+#include <memory>
 
 QT_BEGIN_NAMESPACE
 class QScreen;
@@ -62,7 +65,7 @@ using GetWidgetHandleCallback = std::function<QObject *()>;
 using ForceChildrenRepaintCallback = std::function<void(const int)>;
 using ResetQtGrabbedControlCallback = std::function<bool()>;
 
-struct SystemParameters
+struct FRAMELESSHELPER_CORE_API FramelessCallbacks
 {
     GetWindowFlagsCallback getWindowFlags = nullptr;
     SetWindowFlagsCallback setWindowFlags = nullptr;
@@ -92,29 +95,90 @@ struct SystemParameters
     GetWidgetHandleCallback getWidgetHandle = nullptr;
     ForceChildrenRepaintCallback forceChildrenRepaint = nullptr;
     ResetQtGrabbedControlCallback resetQtGrabbedControl = nullptr;
+
+    FramelessCallbacks();
+    virtual ~FramelessCallbacks();
+
+    using PtrType = std::shared_ptr<FramelessCallbacks>;
+    [[nodiscard]] static PtrType create();
+
+private:
+    FRAMELESSHELPER_CLASS(FramelessCallbacks)
+};
+using FramelessCallbacksPtr = FramelessCallbacks::PtrType;
+
+enum class ExtraDataType : quint8
+{
+    WindowsUtilities,
+    LinuxUtilities,
+    MacOSUtilities,
+    FramelessWidgetsHelper,
+    FramelessQuickHelper
 };
 
-using FramelessParams = SystemParameters *;
-using FramelessParamsConst = const SystemParameters *;
-using FramelessParamsRef = SystemParameters &;
-using FramelessParamsConstRef = const SystemParameters &;
+#if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+inline uint qHash(const ExtraDataType key, const uint seed = 0) noexcept {
+    return ::qHash(static_cast<quint8>(key), seed);
+}
+#endif
+
+struct FRAMELESSHELPER_CORE_API FramelessExtraData
+{
+    FramelessExtraData();
+    virtual ~FramelessExtraData();
+
+    using PtrType = std::shared_ptr<FramelessExtraData>;
+
+private:
+    FRAMELESSHELPER_CLASS(FramelessExtraData)
+};
+using FramelessExtraDataPtr = FramelessExtraData::PtrType;
+using FramelessExtraDataPtrs = QList<FramelessExtraDataPtr>;
+using FramelessExtraDataHash = QHash<ExtraDataType, FramelessExtraDataPtr>;
+
+struct FRAMELESSHELPER_CORE_API FramelessData
+{
+    QObject *window = nullptr;
+    WId windowId = 0;
+    QObject *internalEventHandler = nullptr;
+    bool frameless = false;
+    FramelessCallbacksPtr callbacks = nullptr;
+    FramelessExtraDataHash extraData = {};
+
+    FramelessData();
+    virtual ~FramelessData();
+
+    using PtrType = std::shared_ptr<FramelessData>;
+    [[nodiscard]] static PtrType create();
+
+private:
+    FRAMELESSHELPER_CLASS(FramelessData)
+};
+using FramelessDataPtr = FramelessData::PtrType;
+using FramelessDataPtrs = QList<FramelessDataPtr>;
+using FramelessDataHash = QHash<QObject *, FramelessDataPtr>;
 
 FRAMELESSHELPER_END_NAMESPACE
 
 #define DECLARE_SIZE_COMPARE_OPERATORS(Type1, Type2) \
-  [[maybe_unused]] [[nodiscard]] static inline constexpr bool operator>(const Type1 &lhs, const Type2 &rhs) noexcept \
+  [[maybe_unused]] [[nodiscard]] inline constexpr bool operator>(const Type1 &lhs, const Type2 &rhs) noexcept \
   { \
       return ((lhs.width() * lhs.height()) > (rhs.width() * rhs.height())); \
   } \
-  [[maybe_unused]] [[nodiscard]] static inline constexpr bool operator>=(const Type1 &lhs, const Type2 &rhs) noexcept \
+  [[maybe_unused]] [[nodiscard]] inline constexpr bool operator>=(const Type1 &lhs, const Type2 &rhs) noexcept \
   { \
       return (operator>(lhs, rhs) || operator==(lhs, rhs)); \
   } \
-  [[maybe_unused]] [[nodiscard]] static inline constexpr bool operator<(const Type1 &lhs, const Type2 &rhs) noexcept \
+  [[maybe_unused]] [[nodiscard]] inline constexpr bool operator<(const Type1 &lhs, const Type2 &rhs) noexcept \
   { \
       return (operator!=(lhs, rhs) && !operator>(lhs, rhs)); \
   } \
-  [[maybe_unused]] [[nodiscard]] static inline constexpr bool operator<=(const Type1 &lhs, const Type2 &rhs) noexcept \
+  [[maybe_unused]] [[nodiscard]] inline constexpr bool operator<=(const Type1 &lhs, const Type2 &rhs) noexcept \
   { \
       return (operator<(lhs, rhs) || operator==(lhs, rhs)); \
   }
+
+DECLARE_SIZE_COMPARE_OPERATORS(QSize, QSize)
+DECLARE_SIZE_COMPARE_OPERATORS(QSizeF, QSizeF)
+DECLARE_SIZE_COMPARE_OPERATORS(QSize, QSizeF)
+DECLARE_SIZE_COMPARE_OPERATORS(QSizeF, QSize)

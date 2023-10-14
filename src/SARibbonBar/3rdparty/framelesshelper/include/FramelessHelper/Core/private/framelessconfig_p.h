@@ -31,8 +31,7 @@ FRAMELESSHELPER_BEGIN_NAMESPACE
 class FRAMELESSHELPER_CORE_API FramelessConfig : public QObject
 {
     Q_OBJECT
-    FRAMELESSHELPER_CLASS_INFO
-    Q_DISABLE_COPY_MOVE(FramelessConfig)
+    FRAMELESSHELPER_QT_CLASS(FramelessConfig)
 
 public:
     Q_NODISCARD static FramelessConfig *instance();

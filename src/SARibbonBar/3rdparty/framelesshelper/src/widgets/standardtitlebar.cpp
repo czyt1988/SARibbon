@@ -144,11 +144,31 @@ StandardTitleBarPrivate::FontMetrics StandardTitleBarPrivate::titleLabelSize() c
     }
     const QFont font = titleFont.value_or(defaultFont());
     const QFontMetrics fontMetrics(font);
+    const int textWidth = Utils::horizontalAdvance(fontMetrics, text);
     return {
-        /* .width */ Utils::horizontalAdvance(fontMetrics, text),
+        /* .width */ std::min(textWidth, titleLabelMaxWidth()),
         /* .height */ fontMetrics.height(),
         /* .ascent */ fontMetrics.ascent()
     };
+}
+
+int StandardTitleBarPrivate::titleLabelMaxWidth() const
+{
+#if (FRAMELESSHELPER_CONFIG(system_button) && !defined(Q_OS_MACOS))
+    const int chromeButtonAreaWidth = (closeButton->x() + closeButton->width() - minimizeButton->x());
+#else
+    static constexpr const int chromeButtonAreaWidth = 70;
+#endif
+    Q_Q(const StandardTitleBar);
+    int textMaxWidth = q->width();
+    if ((labelAlignment & Qt::AlignLeft) || (labelAlignment & Qt::AlignRight)) {
+        textMaxWidth -= (windowIconRect().width() + chromeButtonAreaWidth + (kDefaultTitleBarContentsMargin * 2));
+    } else if (labelAlignment & Qt::AlignHCenter) {
+        textMaxWidth -= ((chromeButtonAreaWidth + kDefaultTitleBarContentsMargin) * 2);
+    } else {
+        textMaxWidth = std::round(qreal(textMaxWidth) * qreal(0.8));
+    }
+    return std::max(textMaxWidth, 0);
 }
 
 bool StandardTitleBarPrivate::mouseEventHandler(QMouseEvent *event)
@@ -578,7 +598,12 @@ void StandardTitleBar::paintEvent(QPaintEvent *event)
                 const int y = std::round((qreal(height() - labelSize.height) / qreal(2)) + qreal(labelSize.ascent));
                 return {x, y};
             }();
-            painter.drawText(pos, text);
+            const int textMaxWidth = d->titleLabelMaxWidth();
+            const QString elidedText = painter.fontMetrics().elidedText(text, Qt::ElideRight, textMaxWidth, Qt::TextShowMnemonic);
+            // No need to draw the text if there's only the elide mark left (or even less).
+            if (elidedText.size() > 3) {
+                painter.drawText(pos, elidedText);
+            }
         }
     }
     if (d->windowIconVisible) {

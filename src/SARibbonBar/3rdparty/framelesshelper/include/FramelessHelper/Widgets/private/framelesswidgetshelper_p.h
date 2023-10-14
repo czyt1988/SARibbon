@@ -36,23 +36,17 @@ class MicaMaterial;
 #if FRAMELESSHELPER_CONFIG(border_painter)
 class WindowBorderPainter;
 #endif
-class FramelessWidgetsHelper;
-struct FramelessWidgetsHelperData;
 class WidgetsSharedHelper;
 
+class FramelessWidgetsHelper;
 class FRAMELESSHELPER_WIDGETS_API FramelessWidgetsHelperPrivate : public QObject
 {
     Q_OBJECT
-    FRAMELESSHELPER_CLASS_INFO
-    Q_DECLARE_PUBLIC(FramelessWidgetsHelper)
-    Q_DISABLE_COPY_MOVE(FramelessWidgetsHelperPrivate)
+    FRAMELESSHELPER_PRIVATE_QT_CLASS(FramelessWidgetsHelper)
 
 public:
     explicit FramelessWidgetsHelperPrivate(FramelessWidgetsHelper *q);
     ~FramelessWidgetsHelperPrivate() override;
-
-    Q_NODISCARD static FramelessWidgetsHelperPrivate *get(FramelessWidgetsHelper *pub);
-    Q_NODISCARD static const FramelessWidgetsHelperPrivate *get(const FramelessWidgetsHelper *pub);
 
     void attach();
     void detach();
@@ -83,10 +77,7 @@ public:
     Q_NODISCARD bool shouldIgnoreMouseEvents(const QPoint &pos) const;
     void setSystemButtonState(const Global::SystemButtonType button, const Global::ButtonState state);
     Q_NODISCARD QWidget *findTopLevelWindow() const;
-    Q_NODISCARD const FramelessWidgetsHelperData *getWindowData() const;
-    Q_NODISCARD FramelessWidgetsHelperData *getWindowDataMutable() const;
 
-    FramelessWidgetsHelper *q_ptr = nullptr;
     QColor savedWindowBackgroundColor = {};
     bool blurBehindWindowEnabled = false;
     QPointer<QWidget> window = nullptr;

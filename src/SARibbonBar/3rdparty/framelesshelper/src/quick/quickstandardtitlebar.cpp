@@ -92,25 +92,26 @@ void QuickStandardTitleBar::setTitleLabelAlignment(const Qt::Alignment value)
     m_windowTitleLabel->setVAlign(QQuickLabel::AlignVCenter);
     const QQuickItemPrivate * const titleBarPriv = QQuickItemPrivate::get(this);
     labelAnchors->setVerticalCenter(titleBarPriv->verticalCenter());
-    if (m_labelAlignment & Qt::AlignLeft) {
+    if ((m_labelAlignment & Qt::AlignLeft) || (m_labelAlignment & Qt::AlignRight) || (m_labelAlignment & Qt::AlignHCenter)) {
         if (m_windowIcon->isVisible()) {
             labelAnchors->setLeft(QQuickItemPrivate::get(m_windowIcon)->right());
         } else {
             labelAnchors->setLeft(titleBarPriv->left());
         }
         labelAnchors->setLeftMargin(kDefaultTitleBarContentsMargin);
-        m_windowTitleLabel->setHAlign(QQuickLabel::AlignLeft);
-    } else if (m_labelAlignment & Qt::AlignRight) {
 #ifdef Q_OS_MACOS
         labelAnchors->setRight(titleBarPriv->right());
 #elif FRAMELESSHELPER_CONFIG(system_button)
         labelAnchors->setRight(QQuickItemPrivate::get(m_systemButtonsRow)->left());
 #endif
         labelAnchors->setRightMargin(kDefaultTitleBarContentsMargin);
-        m_windowTitleLabel->setHAlign(QQuickLabel::AlignRight);
-    } else if (m_labelAlignment & Qt::AlignHCenter) {
-        labelAnchors->setHorizontalCenter(titleBarPriv->horizontalCenter());
-        m_windowTitleLabel->setHAlign(QQuickLabel::AlignHCenter);
+        if (m_labelAlignment & Qt::AlignLeft) {
+            m_windowTitleLabel->setHAlign(QQuickLabel::AlignLeft);
+        } else if (m_labelAlignment & Qt::AlignRight) {
+            m_windowTitleLabel->setHAlign(QQuickLabel::AlignRight);
+        } else {
+            m_windowTitleLabel->setHAlign(QQuickLabel::AlignHCenter);
+        }
     } else {
         WARNING << "The alignment for the title label is not set!";
         labelAnchors->setLeft(titleBarPriv->left());
@@ -503,6 +504,8 @@ void QuickStandardTitleBar::initialize()
     setHeight(kDefaultTitleBarHeight);
 
     m_windowTitleLabel = new QQuickLabel(this);
+    m_windowTitleLabel->setMaximumLineCount(1);
+    m_windowTitleLabel->setElideMode(QQuickText::ElideRight);
     QFont f = m_windowTitleLabel->font();
     f.setPointSize(kDefaultTitleBarFontPointSize);
     m_windowTitleLabel->setFont(f);

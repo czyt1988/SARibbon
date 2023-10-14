@@ -35,7 +35,7 @@ using namespace Global;
 
 class WinVerHelper
 {
-    Q_DISABLE_COPY_MOVE(WinVerHelper)
+    FRAMELESSHELPER_CLASS(WinVerHelper)
 
 public:
     explicit WinVerHelper();
