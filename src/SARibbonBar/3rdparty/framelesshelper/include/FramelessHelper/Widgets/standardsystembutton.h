@@ -32,13 +32,10 @@
 FRAMELESSHELPER_BEGIN_NAMESPACE
 
 class StandardSystemButtonPrivate;
-
 class FRAMELESSHELPER_WIDGETS_API StandardSystemButton : public QPushButton
 {
     Q_OBJECT
-    FRAMELESSHELPER_CLASS_INFO
-    Q_DECLARE_PRIVATE(StandardSystemButton)
-    Q_DISABLE_COPY_MOVE(StandardSystemButton)
+    FRAMELESSHELPER_PUBLIC_QT_CLASS(StandardSystemButton)
     Q_PROPERTY(Global::SystemButtonType buttonType READ buttonType WRITE setButtonType NOTIFY buttonTypeChanged FINAL)
     Q_PROPERTY(QString glyph READ glyph WRITE setGlyph NOTIFY glyphChanged FINAL)
     Q_PROPERTY(QColor hoverColor READ hoverColor WRITE setHoverColor NOTIFY hoverColorChanged FINAL)
@@ -89,9 +86,6 @@ Q_SIGNALS:
     void inactiveForegroundColorChanged();
     void activeChanged();
     void glyphSizeChanged();
-
-private:
-    QScopedPointer<StandardSystemButtonPrivate> d_ptr;
 };
 
 FRAMELESSHELPER_END_NAMESPACE

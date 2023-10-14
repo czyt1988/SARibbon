@@ -71,6 +71,10 @@
      }
 #endif
 
+#ifndef FRAMELESSHELPER_IMPORT_QUICK_PLUGIN
+#  define FRAMELESSHELPER_IMPORT_QUICK_PLUGIN Q_IMPORT_PLUGIN(org_wangwenx190_FramelessHelperPlugin)
+#endif
+
 FRAMELESSHELPER_BEGIN_NAMESPACE
 
 [[maybe_unused]] inline constexpr const char FRAMELESSHELPER_QUICK_URI[] = "org.wangwenx190.FramelessHelper";
@@ -84,8 +88,7 @@ FRAMELESSHELPER_QUICK_API void FramelessHelperQuickRegisterTypes(QQmlEngine *);
 class FRAMELESSHELPER_QUICK_API QuickGlobal : public QObject
 {
     Q_OBJECT
-    FRAMELESSHELPER_CLASS_INFO
-    Q_DISABLE_COPY_MOVE(QuickGlobal)
+    FRAMELESSHELPER_QT_CLASS(QuickGlobal)
 #ifdef QML_NAMED_ELEMENT
     QML_NAMED_ELEMENT(FramelessHelperConstants)
 #endif

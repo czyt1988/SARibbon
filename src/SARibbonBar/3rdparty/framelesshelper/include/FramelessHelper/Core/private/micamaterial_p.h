@@ -32,20 +32,14 @@
 FRAMELESSHELPER_BEGIN_NAMESPACE
 
 class MicaMaterial;
-
 class FRAMELESSHELPER_CORE_API MicaMaterialPrivate : public QObject
 {
     Q_OBJECT
-    FRAMELESSHELPER_CLASS_INFO
-    Q_DISABLE_COPY_MOVE(MicaMaterialPrivate)
-    Q_DECLARE_PUBLIC(MicaMaterial)
+    FRAMELESSHELPER_PRIVATE_QT_CLASS(MicaMaterial)
 
 public:
     explicit MicaMaterialPrivate(MicaMaterial *q);
     ~MicaMaterialPrivate() override;
-
-    Q_NODISCARD static MicaMaterialPrivate *get(MicaMaterial *q);
-    Q_NODISCARD static const MicaMaterialPrivate *get(const MicaMaterial *q);
 
     Q_NODISCARD static QColor systemFallbackColor();
 
@@ -60,7 +54,6 @@ public:
     void initialize();
     void prepareGraphicsResources();
 
-    MicaMaterial *q_ptr = nullptr;
     QColor tintColor = {};
     qreal tintOpacity = qreal(0);
     QColor fallbackColor = {};

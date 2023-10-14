@@ -30,29 +30,23 @@
 
 FRAMELESSHELPER_BEGIN_NAMESPACE
 
-class QuickWindowBorder;
 class WindowBorderPainter;
 
+class QuickWindowBorder;
 class FRAMELESSHELPER_QUICK_API QuickWindowBorderPrivate : public QObject
 {
     Q_OBJECT
-    FRAMELESSHELPER_CLASS_INFO
-    Q_DISABLE_COPY_MOVE(QuickWindowBorderPrivate)
-    Q_DECLARE_PUBLIC(QuickWindowBorder)
+    FRAMELESSHELPER_PRIVATE_QT_CLASS(QuickWindowBorder)
 
 public:
     explicit QuickWindowBorderPrivate(QuickWindowBorder *q);
     ~QuickWindowBorderPrivate() override;
-
-    Q_NODISCARD static QuickWindowBorderPrivate *get(QuickWindowBorder *q);
-    Q_NODISCARD static const QuickWindowBorderPrivate *get(const QuickWindowBorder *q);
 
     Q_SLOT void update();
 
     void initialize();
     void rebindWindow();
 
-    QuickWindowBorder *q_ptr = nullptr;
     WindowBorderPainter *borderPainter = nullptr;
     QMetaObject::Connection activeChangeConnection = {};
     QMetaObject::Connection visibilityChangeConnection = {};

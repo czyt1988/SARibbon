@@ -40,11 +40,10 @@ FRAMELESSHELPER_BEGIN_NAMESPACE
 class FRAMELESSHELPER_QUICK_API QuickStandardSystemButton : public QQuickButton
 {
     Q_OBJECT
-    FRAMELESSHELPER_CLASS_INFO
+    FRAMELESSHELPER_QT_CLASS(QuickStandardSystemButton)
 #ifdef QML_NAMED_ELEMENT
     QML_NAMED_ELEMENT(StandardSystemButton)
 #endif
-    Q_DISABLE_COPY_MOVE(QuickStandardSystemButton)
     Q_PROPERTY(QuickGlobal::SystemButtonType buttonType READ buttonType WRITE setButtonType NOTIFY buttonTypeChanged FINAL)
     Q_PROPERTY(QString glyph READ glyph WRITE setGlyph NOTIFY glyphChanged FINAL)
     Q_PROPERTY(QColor hoverColor READ hoverColor WRITE setHoverColor NOTIFY hoverColorChanged FINAL)

@@ -28,15 +28,11 @@
 
 FRAMELESSHELPER_BEGIN_NAMESPACE
 
-struct SystemParameters;
 class FramelessManagerPrivate;
-
 class FRAMELESSHELPER_CORE_API FramelessManager : public QObject
 {
     Q_OBJECT
-    FRAMELESSHELPER_CLASS_INFO
-    Q_DECLARE_PRIVATE(FramelessManager)
-    Q_DISABLE_COPY_MOVE(FramelessManager)
+    FRAMELESSHELPER_PUBLIC_QT_CLASS(FramelessManager)
     Q_PROPERTY(Global::SystemTheme systemTheme READ systemTheme WRITE setOverrideTheme NOTIFY systemThemeChanged FINAL)
     Q_PROPERTY(QColor systemAccentColor READ systemAccentColor NOTIFY systemThemeChanged FINAL)
     Q_PROPERTY(QString wallpaper READ wallpaper NOTIFY wallpaperChanged FINAL)
@@ -51,8 +47,8 @@ public:
     Q_NODISCARD Global::WallpaperAspectStyle wallpaperAspectStyle() const;
 
 public Q_SLOTS:
-    void addWindow(const SystemParameters *params);
-    void removeWindow(const WId windowId);
+    Q_NODISCARD bool addWindow(const QObject *window, const WId windowId);
+    Q_NODISCARD bool removeWindow(const QObject *window);
     void setOverrideTheme(const Global::SystemTheme theme);
 
 Q_SIGNALS:
@@ -62,9 +58,6 @@ Q_SIGNALS:
 private:
     explicit FramelessManager(QObject *parent = nullptr);
     ~FramelessManager() override;
-
-private:
-    QScopedPointer<FramelessManagerPrivate> d_ptr;
 };
 
 FRAMELESSHELPER_END_NAMESPACE

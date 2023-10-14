@@ -32,24 +32,17 @@
 FRAMELESSHELPER_BEGIN_NAMESPACE
 
 class StandardSystemButton;
-
 class FRAMELESSHELPER_WIDGETS_API StandardSystemButtonPrivate : public QObject
 {
     Q_OBJECT
-    FRAMELESSHELPER_CLASS_INFO
-    Q_DECLARE_PUBLIC(StandardSystemButton)
-    Q_DISABLE_COPY_MOVE(StandardSystemButtonPrivate)
+    FRAMELESSHELPER_PRIVATE_QT_CLASS(StandardSystemButton)
 
 public:
     explicit StandardSystemButtonPrivate(StandardSystemButton *q);
     ~StandardSystemButtonPrivate() override;
 
-    Q_NODISCARD static StandardSystemButtonPrivate *get(StandardSystemButton *pub);
-    Q_NODISCARD static const StandardSystemButtonPrivate *get(const StandardSystemButton *pub);
-
     Q_NODISCARD static QSize getRecommendedButtonSize();
 
-    StandardSystemButton *q_ptr = nullptr;
     Global::SystemButtonType buttonType = Global::SystemButtonType::Unknown;
     QString glyph = {};
     QColor hoverColor = {};

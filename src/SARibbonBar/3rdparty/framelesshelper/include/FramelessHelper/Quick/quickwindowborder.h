@@ -32,16 +32,13 @@
 FRAMELESSHELPER_BEGIN_NAMESPACE
 
 class QuickWindowBorderPrivate;
-
 class FRAMELESSHELPER_QUICK_API QuickWindowBorder : public QQuickPaintedItem
 {
     Q_OBJECT
-    FRAMELESSHELPER_CLASS_INFO
+    FRAMELESSHELPER_PUBLIC_QT_CLASS(QuickWindowBorder)
 #ifdef QML_NAMED_ELEMENT
     QML_NAMED_ELEMENT(WindowBorder)
 #endif
-    Q_DISABLE_COPY_MOVE(QuickWindowBorder)
-    Q_DECLARE_PRIVATE(QuickWindowBorder)
 
     Q_PROPERTY(qreal thickness READ thickness WRITE setThickness NOTIFY thicknessChanged FINAL)
     Q_PROPERTY(QuickGlobal::WindowEdges edges READ edges WRITE setEdges NOTIFY edgesChanged FINAL)
@@ -86,9 +83,6 @@ Q_SIGNALS:
     void activeColorChanged();
     void inactiveColorChanged();
     void nativeBorderChanged();
-
-private:
-    QScopedPointer<QuickWindowBorderPrivate> d_ptr;
 };
 
 FRAMELESSHELPER_END_NAMESPACE

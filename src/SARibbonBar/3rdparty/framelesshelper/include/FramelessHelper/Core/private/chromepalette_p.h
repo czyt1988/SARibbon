@@ -32,24 +32,17 @@
 FRAMELESSHELPER_BEGIN_NAMESPACE
 
 class ChromePalette;
-
 class FRAMELESSHELPER_CORE_API ChromePalettePrivate : public QObject
 {
     Q_OBJECT
-    FRAMELESSHELPER_CLASS_INFO
-    Q_DECLARE_PUBLIC(ChromePalette)
-    Q_DISABLE_COPY_MOVE(ChromePalettePrivate)
+    FRAMELESSHELPER_PRIVATE_QT_CLASS(ChromePalette)
 
 public:
     explicit ChromePalettePrivate(ChromePalette *q);
     ~ChromePalettePrivate() override;
 
-    Q_NODISCARD static ChromePalettePrivate *get(ChromePalette *q);
-    Q_NODISCARD static const ChromePalettePrivate *get(const ChromePalette *q);
-
     Q_SLOT void refresh();
 
-    ChromePalette *q_ptr = nullptr;
     // System-defined ones:
     QColor titleBarActiveBackgroundColor_sys = {};
     QColor titleBarInactiveBackgroundColor_sys = {};

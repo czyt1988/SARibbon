@@ -35,18 +35,18 @@ if(UNIX AND NOT APPLE)
     endif()
     find_package(X11 QUIET COMPONENTS xcb)
     if(TARGET X11::xcb)
-        message("Found system XCB. The XCB wrapper will be disabled.")
+        message(STATUS "--- Found system XCB. The XCB wrapper will be disabled.")
     else()
-        message("System XCB not found. The XCB wrapper will be used instead.")
+        message(STATUS "--- System XCB not found. The XCB wrapper will be used instead.")
     endif()
     find_package(PkgConfig QUIET)
     if(PkgConfig_FOUND)
         pkg_check_modules(GTK3 QUIET IMPORTED_TARGET gtk+-3.0)
     endif()
     if(TARGET PkgConfig::GTK3)
-        message("Found system GTK. The GTK wrapper will be disabled.")
+        message(STATUS "--- Found system GTK. The GTK wrapper will be disabled.")
     else()
-        message("System GTK not found. The GTK wrapper will be used instead.")
+        message(STATUS "--- System GTK not found. The GTK wrapper will be used instead.")
     endif()
 endif()
 
@@ -61,14 +61,12 @@ set(PUBLIC_HEADERS
     ${FRAMELESSHELPER_VERSION_FILE}
     ${FRAMELESSHELPER_CONFIG_FILE}
     ${INCLUDE_PREFIX}/framelesshelpercore_global.h
-    ${INCLUDE_PREFIX}/framelesshelper_qt.h
     ${INCLUDE_PREFIX}/framelessmanager.h
     ${INCLUDE_PREFIX}/utils.h
 )
 
 set(PUBLIC_HEADERS_ALIAS
     ${INCLUDE_PREFIX}/Global
-    ${INCLUDE_PREFIX}/FramelessHelper_Qt
     ${INCLUDE_PREFIX}/FramelessManager
     ${INCLUDE_PREFIX}/Utils
 )
@@ -84,7 +82,6 @@ set(PRIVATE_HEADERS
 
 set(SOURCES
     utils.cpp
-    framelesshelper_qt.cpp
     framelessmanager.cpp
     framelessconfig.cpp
     sysapiloader.cpp
@@ -92,14 +89,8 @@ set(SOURCES
 )
 
 if(WIN32)
-    list(APPEND PUBLIC_HEADERS
-        ${INCLUDE_PREFIX}/framelesshelper_windows.h
-        ${INCLUDE_PREFIX}/framelesshelper_win.h
-    )
-    list(APPEND PUBLIC_HEADERS_ALIAS
-        ${INCLUDE_PREFIX}/FramelessHelper_Windows
-        ${INCLUDE_PREFIX}/FramelessHelper_Win
-    )
+    list(APPEND PUBLIC_HEADERS ${INCLUDE_PREFIX}/framelesshelper_windows.h)
+    list(APPEND PUBLIC_HEADERS_ALIAS ${INCLUDE_PREFIX}/FramelessHelper_Windows)
     list(APPEND PRIVATE_HEADERS
         ${INCLUDE_PREFIX}/private/registrykey_p.h
         ${INCLUDE_PREFIX}/private/winverhelper_p.h
@@ -107,23 +98,33 @@ if(WIN32)
     list(APPEND SOURCES
         registrykey.cpp
         utils_win.cpp
-        framelesshelper_win.cpp
         winverhelper.cpp
         platformsupport_win.cpp
     )
 elseif(APPLE)
     list(APPEND SOURCES utils_mac.mm)
 elseif(UNIX)
-    list(APPEND PUBLIC_HEADERS
-        ${INCLUDE_PREFIX}/framelesshelper_linux.h
-    )
-    list(APPEND PUBLIC_HEADERS_ALIAS
-        ${INCLUDE_PREFIX}/FramelessHelper_Linux
-    )
+    list(APPEND PUBLIC_HEADERS ${INCLUDE_PREFIX}/framelesshelper_linux.h)
+    list(APPEND PUBLIC_HEADERS_ALIAS ${INCLUDE_PREFIX}/FramelessHelper_Linux)
     list(APPEND SOURCES
         utils_linux.cpp
         platformsupport_linux.cpp
     )
+endif()
+
+if(FRAMELESSHELPER_NATIVE_IMPL)
+    if(WIN32)
+        list(APPEND PUBLIC_HEADERS ${INCLUDE_PREFIX}/framelesshelper_win.h)
+        list(APPEND PUBLIC_HEADERS_ALIAS ${INCLUDE_PREFIX}/FramelessHelper_Win)
+        list(APPEND SOURCES framelesshelper_win.cpp)
+    elseif(APPLE)
+    elseif(UNIX)
+    else()
+    endif()
+else()
+    list(APPEND PUBLIC_HEADERS ${INCLUDE_PREFIX}/framelesshelper_qt.h)
+    list(APPEND PUBLIC_HEADERS_ALIAS ${INCLUDE_PREFIX}/FramelessHelper_Qt)
+    list(APPEND SOURCES framelesshelper_qt.cpp)
 endif()
 
 if(NOT FRAMELESSHELPER_NO_TITLEBAR)
@@ -158,7 +159,7 @@ if(WIN32 AND NOT FRAMELESSHELPER_BUILD_STATIC)
             COPYRIGHT "MIT License"
             ORIGINAL_FILENAME "${SUB_MODULE_FULL_NAME}.dll"
             PRODUCT "${PROJECT_NAME}"
-            COMMENTS "Built from commit ${PROJECT_VERSION_COMMIT} on ${PROJECT_COMPILE_DATETIME} (UTC)."
+            COMMENTS "Who don't love Raiden Shogun ?"
             LIBRARY
         )
     endif()
