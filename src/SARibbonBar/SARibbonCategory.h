@@ -26,6 +26,7 @@ class SA_RIBBON_EXPORT SARibbonCategory : public QWidget
     Q_PROPERTY(QString categoryName READ categoryName WRITE setCategoryName)
 public:
     SARibbonCategory(QWidget* p = nullptr);
+    SARibbonCategory(const QString& name, QWidget* p = nullptr);
     ~SARibbonCategory();
 
     // category的名字

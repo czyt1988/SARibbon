@@ -65,8 +65,8 @@ SARibbonMainWindow::SARibbonMainWindow(QWidget* parent, bool useRibbon, const Qt
 {
     d_ptr->init();
     if (useRibbon) {
-        setRibbonTheme(ribbonTheme());
         installRibbonBar(createRibbonBar());
+        setRibbonTheme(ribbonTheme());
         qDebug() << RibbonSubElementStyleOpt;
     }
 }
@@ -137,19 +137,32 @@ Qt::WindowFlags SARibbonMainWindow::windowButtonFlags() const
 
 void SARibbonMainWindow::setRibbonTheme(SARibbonMainWindow::RibbonTheme theme)
 {
-    switch (theme) {
-    case RibbonThemeWindows7:
-        loadTheme(":/theme/resource/theme-win7.qss");
-        break;
-    case RibbonThemeOffice2013:
-        loadTheme(":/theme/resource/theme-office2013.qss");
-        break;
-    case RibbonThemeDark:
-        loadTheme(":/theme/resource/theme-dark.qss");
-        break;
-    default:
-        loadTheme(":/theme/resource/theme-office2013.qss");
-        break;
+    sa_set_ribbon_theme(this, theme);
+    d_ptr->mCurrentRibbonTheme = theme;
+    if (SARibbonBar* bar = ribbonBar()) {
+        switch (ribbonTheme()) {
+        case RibbonThemeWindows7:
+            break;
+        case RibbonThemeOffice2013:
+        case RibbonThemeDark: {
+            //! 在设置qss后需要针对margin信息重新设置进SARibbonTabBar中
+            //! office2013.qss的margin信息如下设置，em是字符M所对应的宽度的长度
+            //! margin-top: 0em;
+            //! margin-right: 0em;
+            //! margin-left: 0.2em;
+            //! margin-bottom: 0em;
+
+            SARibbonTabBar* tab = bar->ribbonTabBar();
+            if (!tab) {
+                break;
+            }
+            QFontMetrics fm = tab->fontMetrics();
+            int emWidth     = SA_FONTMETRICS_WIDTH(fm, "M");
+            tab->setTabMargin(QMargins(0.2 * emWidth, 0, 0, 0));
+        } break;
+        default:
+            break;
+        }
     }
 }
 
@@ -170,29 +183,6 @@ bool SARibbonMainWindow::isUseRibbon() const
 SARibbonBar* SARibbonMainWindow::createRibbonBar()
 {
     SARibbonBar* bar = new SARibbonBar(this);
-    switch (ribbonTheme()) {
-    case RibbonThemeWindows7:
-        break;
-    case RibbonThemeOffice2013:
-    case RibbonThemeDark: {
-        //! 在设置qss后需要针对margin信息重新设置进SARibbonTabBar中
-        //! office2013.qss的margin信息如下设置，em是字符M所对应的宽度的长度
-        //! margin-top: 0em;
-        //! margin-right: 0em;
-        //! margin-left: 0.2em;
-        //! margin-bottom: 0em;
-
-        SARibbonTabBar* tab = bar->ribbonTabBar();
-        if (!tab) {
-            break;
-        }
-        QFontMetrics fm = tab->fontMetrics();
-        int emWidth     = SA_FONTMETRICS_WIDTH(fm, "M");
-        tab->setTabMargin(QMargins(0.2 * emWidth, 0, 0, 0));
-    } break;
-    default:
-        break;
-    }
     bar->setContentsMargins(3, 0, 3, 0);
     return bar;
 }
@@ -278,12 +268,25 @@ void SARibbonMainWindow::installRibbonBar(SARibbonBar* bar)
 #endif
 }
 
-void SARibbonMainWindow::loadTheme(const QString& themeFile)
+void sa_set_ribbon_theme(QWidget* w, SARibbonMainWindow::RibbonTheme theme)
 {
-    QFile file(themeFile);
-
+    QFile file;
+    switch (theme) {
+    case SARibbonMainWindow::RibbonThemeWindows7:
+        file.setFileName(":/theme/resource/theme-win7.qss");
+        break;
+    case SARibbonMainWindow::RibbonThemeOffice2013:
+        file.setFileName(":/theme/resource/theme-office2013.qss");
+        break;
+    case SARibbonMainWindow::RibbonThemeDark:
+        file.setFileName(":/theme/resource/theme-dark.qss");
+        break;
+    default:
+        file.setFileName(":/theme/resource/theme-office2013.qss");
+        break;
+    }
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         return;
     }
-    setStyleSheet(file.readAll());
+    w->setStyleSheet(file.readAll());
 }

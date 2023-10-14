@@ -130,7 +130,7 @@ MainWindow::MainWindow(QWidget* par) : SARibbonMainWindow(par), m_customizeWidge
     setMinimumWidth(500);
     //
     showMaximized();
-    onStyleClicked(SARibbonBar::OfficeStyle);
+    onStyleClicked(SARibbonBar::RibbonStyleLooseThreeRow);
     //
     setWindowIcon(QIcon(":/icon/icon/SA.svg"));
 }
@@ -173,23 +173,23 @@ void MainWindow::onStyleClicked(int id)
     ribbonBar()->setRibbonStyle(ribbonStyle);
     mActionWordWrap->setChecked(SARibbonToolButton::isEnableWordWrap());
     switch (ribbonStyle) {
-    case SARibbonBar::OfficeStyle:
+    case SARibbonBar::RibbonStyleLooseThreeRow:
         m_edit->append(
                 tr("\nchange ribbon style to office style,The standard office style text display is line wrapped, "
                    "and you can also control whether it wrap through SARibbonToolButton::setEnableWordWrap"));  // cn:标准的office样式的文字显示是换行的，你也可以通过SARibbonToolButton::setEnableWordWrap来控制它是否换行
         m_edit->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::OfficeStyle);"));
         break;
-    case SARibbonBar::OfficeStyleTwoRow:
+    case SARibbonBar::RibbonStyleLooseTwoRow:
         m_edit->append(tr("\nchange ribbon style to office style 2 row,All text in 2-line mode does not wrap, and you "
                           "can also control whether it wraps through SARibbonToolButton: setEnableWordWrap"));  // cn:所有2行模式的文字都是不换行的，你也可以通过SARibbonToolButton::setEnableWordWrap来控制它是否换行
         m_edit->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::OfficeStyleTwoRow);"));
         break;
-    case SARibbonBar::WpsLiteStyle:
+    case SARibbonBar::RibbonStyleCompactThreeRow:
         m_edit->append(tr("\nchange ribbon style to wps style,The standard wps style text display is line wrapped, "
                           "and you can also control whether it wrap through SARibbonToolButton::setEnableWordWrap"));  // cn:标准的wps样式的文字显示是换行的，你也可以通过SARibbonToolButton::setEnableWordWrap来控制它是否换行
         m_edit->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::OfficeStyleTwoRow);"));
         break;
-    case SARibbonBar::WpsLiteStyleTwoRow:
+    case SARibbonBar::RibbonStyleCompactTwoRow:
         m_edit->append(tr("\nchange ribbon style to wps style 2 row,All text in 2-line mode does not wrap, and you "
                           "can also control whether it wraps through SARibbonToolButton: setEnableWordWrap"));  // cn:所有2行模式的文字都是不换行的，你也可以通过SARibbonToolButton::setEnableWordWrap来控制它是否换行
         m_edit->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::OfficeStyleTwoRow);"));
@@ -435,28 +435,28 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     r->setObjectName(("use office style"));
     r->setChecked(true);
     pannelStyle->addSmallWidget(r);
-    g->addButton(r, SARibbonBar::OfficeStyle);
+    g->addButton(r, SARibbonBar::RibbonStyleLooseThreeRow);
 
     r = new QRadioButton();
     r->setObjectName(("use wps style"));
     r->setText(tr("use wps style"));
     r->setChecked(false);
     pannelStyle->addSmallWidget(r);
-    g->addButton(r, SARibbonBar::WpsLiteStyle);
+    g->addButton(r, SARibbonBar::RibbonStyleCompactThreeRow);
 
     r = new QRadioButton();
     r->setObjectName(("use office 2row style"));
     r->setText(tr("use office 2 row style"));
     r->setChecked(false);
     pannelStyle->addSmallWidget(r);
-    g->addButton(r, SARibbonBar::OfficeStyleTwoRow);
+    g->addButton(r, SARibbonBar::RibbonStyleLooseTwoRow);
 
     r = new QRadioButton();
     r->setObjectName(("use wps 2row style"));
     r->setText(tr("use wps 2row style"));
     r->setChecked(false);
     pannelStyle->addSmallWidget(r);
-    g->addButton(r, SARibbonBar::WpsLiteStyleTwoRow);
+    g->addButton(r, SARibbonBar::RibbonStyleCompactTwoRow);
 
 //    connect(g, QOverload<int>::of(&QButtonGroup::buttonClicked), this, &MainWindow::onStyleClicked);
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)

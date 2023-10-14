@@ -104,10 +104,15 @@ public:
      */
     enum RibbonStyle
     {
-        OfficeStyle        = 0x0000,  ///< 类似office 的ribbon风格
-        WpsLiteStyle       = 0x0001,  ///< 类似wps的紧凑风格
-        OfficeStyleTwoRow  = 0x0100,  ///< 类似office 的ribbon风格 2行工具栏 三行布局模式，office就是三行布局模式，pannel能布置3行小toolbutton，默认模式
-        WpsLiteStyleTwoRow = 0x0101   ///< 类似wps的紧凑风格  2行工具栏
+        RibbonStyleLooseThreeRow   = 0x0000,              ///< 宽松结构，3行模式
+        RibbonStyleCompactThreeRow = 0x0001,              ///< 紧凑结构，3行模式
+        RibbonStyleLooseTwoRow     = 0x0100,              ///< 宽松结构，2行模式
+        RibbonStyleCompactTwoRow   = 0x0101,              ///< 紧凑结构，2行模式
+                                                          // 以下枚举将组件淘汰
+        OfficeStyle        = RibbonStyleLooseThreeRow,    ///< 类似office 的ribbon风格
+        WpsLiteStyle       = RibbonStyleCompactThreeRow,  ///< 类似wps的紧凑风格
+        OfficeStyleTwoRow  = RibbonStyleLooseTwoRow,  ///< 类似office 的ribbon风格 2行工具栏 三行布局模式，office就是三行布局模式，pannel能布置3行小toolbutton，默认模式
+        WpsLiteStyleTwoRow = RibbonStyleCompactTwoRow  ///< 类似wps的紧凑风格  2行工具栏
     };
     Q_ENUM(RibbonStyle)
 
@@ -276,6 +281,9 @@ public:
     bool isEnableWordWrap() const;
     //获取SARibbonStackedWidget
     SARibbonStackedWidget* ribbonStackedWidget();
+    //设置是否显示标题
+    void setTitleVisible(bool on = false);
+    bool isTitleVisible() const;
 signals:
 
     /**
