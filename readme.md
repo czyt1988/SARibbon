@@ -20,7 +20,7 @@ Several layout methods are provided, and themes can be freely defined through QS
 
 ![](./doc/screenshot/SARibbon-theme-style.gif)
 
-# Compile
+# Build
 
 ## Import into project (static)
 
@@ -42,6 +42,14 @@ Open `SARibbon.pro` directly using Qt Creator, and compile it.  The SARibbonBar 
 > 'd' will be added after the library compiled in debug mode for distinction
 
 > Note:The minimum Qt version is 5.8
+
+## FQA
+
+“framelessmanager.moc”: No such file or directory:run qmake first
+
+```txt
+..\..\..\SARibbon\src\SARibbonBar\3rdparty\framelesshelper\src\core\framelessmanager.cpp(563): fatal error C1083: Unable to open include file: “framelessmanager.moc”: No such file or directory
+```
 
 # Usage
 
