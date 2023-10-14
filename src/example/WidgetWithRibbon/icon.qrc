@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/icon">
+        <file>icon/action.svg</file>
+        <file>icon/action2.svg</file>
+        <file>icon/customize0.svg</file>
+        <file>icon/folder-star.svg</file>
+        <file>icon/hidePannel.svg</file>
+        <file>icon/save.svg</file>
+        <file>icon/useqss.svg</file>
+        <file>icon/windowsflag-normal.svg</file>
+    </qresource>
+</RCC>

@@ -232,6 +232,13 @@ SARibbonCategory::SARibbonCategory(QWidget* p) : QWidget(p), d_ptr(new SARibbonC
     setLayout(new SARibbonCategoryLayout(this));
 }
 
+SARibbonCategory::SARibbonCategory(const QString& name, QWidget* p)
+    : QWidget(p), d_ptr(new SARibbonCategory::PrivateData(this))
+{
+    setLayout(new SARibbonCategoryLayout(this));
+    setCategoryName(name);
+}
+
 SARibbonCategory::~SARibbonCategory()
 {
 }

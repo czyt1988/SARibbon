@@ -75,6 +75,7 @@ public:
     QColor mTitleTextColor;  ///< 标题文字颜色,默认无效，无效的情况下和SARibbonBar的qss:color属性一致
     QColor mTabBarBaseLineColor;   ///< tabbar 底部会绘制一条线条，定义线条颜色
     Qt::Alignment mTitleAligment;  ///< 标题对齐方式
+    bool mIsTitleVisible;          ///< 标题是否显示
     PrivateData(SARibbonBar* par)
         : q_ptr(par)
         , mApplicationButton(nullptr)
@@ -83,13 +84,14 @@ public:
         , mIconRightBorderPosition(1)
         , mMinimumCategoryButton(nullptr)
         , mRightButtonGroup(nullptr)
-        , mRibbonStyle(SARibbonBar::OfficeStyle)
-        , mLastShowStyle(SARibbonBar::OfficeStyle)
+        , mRibbonStyle(SARibbonBar::RibbonStyleLooseThreeRow)
+        , mLastShowStyle(SARibbonBar::RibbonStyleLooseThreeRow)
         , mCurrentRibbonMode(SARibbonBar::NormalRibbonMode)
         , mWindowButtonSize(RibbonSubElementStyleOpt.titleBarHeight() * 4, RibbonSubElementStyleOpt.titleBarHeight())
         , mContextCategoryColorListIndex(-1)
         , mTabBarBaseLineColor(186, 201, 219)
         , mTitleAligment(Qt::AlignCenter)
+        , mIsTitleVisible(true)
     {
         mContextCategoryColorList << QColor(201, 89, 156)  // 玫红
                                   << QColor(242, 203, 29)  // 黄
@@ -97,7 +99,7 @@ public:
                                   << QColor(14, 81, 167)   // 蓝
                                   << QColor(228, 0, 69)    // 红
                                   << QColor(67, 148, 0)    // 绿
-                ;
+            ;
     }
 
     void init()
@@ -250,7 +252,7 @@ SARibbonBar::SARibbonBar(QWidget* parent) : QMenuBar(parent), d_ptr(new SARibbon
         connect(parent, &QWidget::windowTitleChanged, this, &SARibbonBar::onWindowTitleChanged);
         connect(parent, &QWidget::windowIconChanged, this, &SARibbonBar::onWindowIconChanged);
     }
-    setRibbonStyle(OfficeStyle);
+    setRibbonStyle(RibbonStyleLooseThreeRow);
 }
 
 SARibbonBar::~SARibbonBar()
@@ -665,7 +667,7 @@ void SARibbonBar::addContextCategory(SARibbonContextCategory* context)
     connect(context, &SARibbonContextCategory::categoryPageAdded, this, &SARibbonBar::onContextsCategoryPageAdded);
     connect(context, &SARibbonContextCategory::categoryTitleChanged, this, &SARibbonBar::onContextsCategoryCategoryNameChanged);
     // remove并没有绑定，主要是remove后在stacked里也不会显示，remove且delete的话，stacked里也会删除
-    if (currentRibbonStyle() == WpsLiteStyle) {
+    if (currentRibbonStyle() == RibbonStyleCompactThreeRow) {
         resizeInWpsLiteStyle();
     }
     d_ptr->mContextCategoryList.append(context);
@@ -1331,6 +1333,24 @@ SARibbonStackedWidget* SARibbonBar::ribbonStackedWidget()
     return d_ptr->mStackedContainerWidget;
 }
 
+/**
+ * @brief 设置是否显示标题
+ * @param on
+ */
+void SARibbonBar::setTitleVisible(bool on)
+{
+    d_ptr->mIsTitleVisible = on;
+}
+
+/**
+ * @brief 判断标题是否显示
+ * @return
+ */
+bool SARibbonBar::isTitleVisible() const
+{
+    return d_ptr->mIsTitleVisible;
+}
+
 bool SARibbonBar::eventFilter(QObject* obj, QEvent* e)
 {
     if (obj) {
@@ -1497,7 +1517,7 @@ void SARibbonBar::paintInNormalStyle()
             titleRegion.setRect(d_ptr->mQuickAccessBar->geometry().right() + 1,
                                 border.top(),
                                 width() - d_ptr->mIconRightBorderPosition - border.right()
-                                        - d_ptr->mWindowButtonSize.width() - d_ptr->mQuickAccessBar->geometry().right() - 1,
+                                    - d_ptr->mWindowButtonSize.width() - d_ptr->mQuickAccessBar->geometry().right() - 1,
                                 titleBarHeight());
         } else {
             int leftwidth = contextCategoryRegion.x() - d_ptr->mQuickAccessBar->geometry().right() - d_ptr->mIconRightBorderPosition;
@@ -1928,6 +1948,10 @@ void SARibbonBar::paintBackground(QPainter& painter)
 ///
 void SARibbonBar::paintWindowTitle(QPainter& painter, const QString& title, const QRect& titleRegion)
 {
+    //如果标题不显示直接跳出
+    if (!isTitleVisible()) {
+        return;
+    }
     painter.save();
     if (d_ptr->mTitleTextColor.isValid()) {
         painter.setPen(d_ptr->mTitleTextColor);

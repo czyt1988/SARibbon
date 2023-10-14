@@ -13,13 +13,13 @@ SARibbonStyleOption::~SARibbonStyleOption()
 int SARibbonStyleOption::ribbonBarHeight(SARibbonBar::RibbonStyle s) const
 {
     switch (s) {
-    case SARibbonBar::OfficeStyle:
+    case SARibbonBar::RibbonStyleLooseThreeRow:
         return m_ribbonbarHeightOfficeStyleThreeRow;
-    case SARibbonBar::OfficeStyleTwoRow:
+    case SARibbonBar::RibbonStyleLooseTwoRow:
         return m_ribbonbarHeightOfficeStyleTwoRow;
-    case SARibbonBar::WpsLiteStyle:
+    case SARibbonBar::RibbonStyleCompactThreeRow:
         return m_ribbonbarHeightWPSStyleThreeRow;
-    case SARibbonBar::WpsLiteStyleTwoRow:
+    case SARibbonBar::RibbonStyleCompactTwoRow:
         return m_ribbonbarHeightWPSStyleTwoRow;
     default:
         break;
@@ -56,13 +56,13 @@ void SARibbonStyleOption::recalc()
 int SARibbonStyleOption::calcMainbarHeight(SARibbonBar::RibbonStyle s) const
 {
     switch (s) {
-    case SARibbonBar::WpsLiteStyle:
+    case SARibbonBar::RibbonStyleCompactThreeRow:
         // 不是减去m_titleBarHeight原因是绘制wps的样式时，标题栏是存在，只是把bar画在标题栏上，相当于没有bar
         return m_ribbonbarHeightOfficeStyleThreeRow - m_tabBarHeight;
-    case SARibbonBar::WpsLiteStyleTwoRow:
+    case SARibbonBar::RibbonStyleCompactTwoRow:
         //两行模式把标题栏去掉
         return m_ribbonbarHeightOfficeStyleThreeRow * 0.9 - m_tabBarHeight - SARibbonPannel::pannelTitleHeight();
-    case SARibbonBar::OfficeStyleTwoRow:
+    case SARibbonBar::RibbonStyleLooseTwoRow:
         return m_ribbonbarHeightOfficeStyleThreeRow * 0.9 - SARibbonPannel::pannelTitleHeight();
     default:
         break;
@@ -86,9 +86,9 @@ void SARibbonStyleOption::init()
 
 void SARibbonStyleOption::updateMainbarHeight()
 {
-    m_ribbonbarHeightWPSStyleThreeRow  = calcMainbarHeight(SARibbonBar::WpsLiteStyle);
-    m_ribbonbarHeightOfficeStyleTwoRow = calcMainbarHeight(SARibbonBar::OfficeStyleTwoRow);
-    m_ribbonbarHeightWPSStyleTwoRow    = calcMainbarHeight(SARibbonBar::WpsLiteStyleTwoRow);
+    m_ribbonbarHeightWPSStyleThreeRow  = calcMainbarHeight(SARibbonBar::RibbonStyleCompactThreeRow);
+    m_ribbonbarHeightOfficeStyleTwoRow = calcMainbarHeight(SARibbonBar::RibbonStyleLooseTwoRow);
+    m_ribbonbarHeightWPSStyleTwoRow    = calcMainbarHeight(SARibbonBar::RibbonStyleCompactTwoRow);
 }
 
 /**
@@ -103,9 +103,9 @@ QDebug operator<<(QDebug debug, const SARibbonStyleOption& c)
     Q_UNUSED(saver);
     debug.nospace() << "fontMetrics.lineSpacing=" << QApplication::fontMetrics().lineSpacing()
                     << ",SARibbonStyleOption(titleBarHeight=" << c.titleBarHeight() << ",tabBarHeight=" << c.tabBarHeight()
-                    << "\n,ribbonBarHeight(OfficeStyle)=" << c.ribbonBarHeight(SARibbonBar::OfficeStyle)
-                    << "\n,ribbonBarHeight(OfficeStyleTwoRow)=" << c.ribbonBarHeight(SARibbonBar::OfficeStyleTwoRow)
-                    << "\n,ribbonBarHeight(WpsLiteStyle)=" << c.ribbonBarHeight(SARibbonBar::WpsLiteStyle)
-                    << "\n,ribbonBarHeight(WpsLiteStyleTwoRow)=" << c.ribbonBarHeight(SARibbonBar::WpsLiteStyleTwoRow);
+                    << "\n,ribbonBarHeight(OfficeStyle)=" << c.ribbonBarHeight(SARibbonBar::RibbonStyleLooseThreeRow)
+                    << "\n,ribbonBarHeight(OfficeStyleTwoRow)=" << c.ribbonBarHeight(SARibbonBar::RibbonStyleLooseTwoRow)
+                    << "\n,ribbonBarHeight(WpsLiteStyle)=" << c.ribbonBarHeight(SARibbonBar::RibbonStyleCompactThreeRow)
+                    << "\n,ribbonBarHeight(WpsLiteStyleTwoRow)=" << c.ribbonBarHeight(SARibbonBar::RibbonStyleCompactTwoRow);
     return debug;
 }
