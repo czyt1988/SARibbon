@@ -62,7 +62,7 @@ using GetPropertyCallback = std::function<QVariant(const char *, const QVariant 
 using SetCursorCallback = std::function<void(const QCursor &)>;
 using UnsetCursorCallback = std::function<void()>;
 using GetWidgetHandleCallback = std::function<QObject *()>;
-using ForceChildrenRepaintCallback = std::function<void(const int)>;
+using ForceChildrenRepaintCallback = std::function<void()>;
 using ResetQtGrabbedControlCallback = std::function<bool()>;
 
 struct FRAMELESSHELPER_CORE_API FramelessCallbacks

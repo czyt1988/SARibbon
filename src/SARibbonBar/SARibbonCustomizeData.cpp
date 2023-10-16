@@ -1,6 +1,5 @@
 ﻿#include "SARibbonCustomizeData.h"
 #include "SARibbonBar.h"
-#include "SARibbonMainWindow.h"
 #include <QDebug>
 #include <QObject>
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -47,14 +46,12 @@ bool SARibbonCustomizeData::isValid() const
 }
 
 /**
- * @brief 应用SARibbonCustomizeData到SARibbonMainWindow
+ * @brief 应用SARibbonCustomizeData到SARibbonBar
  * @param m
  * @return 如果应用失败，返回false,如果actionType==UnknowActionType直接返回false
  */
-bool SARibbonCustomizeData::apply(SARibbonMainWindow* m) const
+bool SARibbonCustomizeData::apply(SARibbonBar* bar) const
 {
-    SARibbonBar* bar = m->ribbonBar();
-
     if (nullptr == bar) {
         return (false);
     }

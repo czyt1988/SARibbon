@@ -7,7 +7,7 @@
 #include <QMap>
 #include <QString>
 #include <QSet>
-class SARibbonMainWindow;
+class SARibbonBar;
 class SARibbonCategory;
 
 /**
@@ -28,8 +28,7 @@ class SARibbonCategory;
  * @ref filter （等同@ref actions ）函数用于提取标签管理的action list，@ref allActions 函数返回SARibbonActionsManager
  * 管理的所有标签。
  *
- * 通过@ref autoRegisteActions 函数可以快速的建立action的管理，此函数会遍历@ref SARibbonMainWindow 下的所有子object，
- * 同时遍历SARibbonMainWindow下所有@ref SARibbonPannel 添加的action,并给予Category建立tag，正常使用用户仅需关注此autoRegisteActions函数即可
+ * 通过@ref autoRegisteActions 函数可以快速的建立action的管理，此函数会遍历@ref SARibbonBar下所有@ref SARibbonPannel 添加的action,并给予Category建立tag，正常使用用户仅需关注此autoRegisteActions函数即可
  *
  *
  */
@@ -50,10 +49,10 @@ public:
         NotInFunctionalAreaActionTag = 0x02,  ///< 预设tag-不在功能区命令
         AutoCategoryDistinguishBeginTag = 0x1000,  ///< 自动按Category划分的标签起始，在@ref autoRegisteActions 函数会用到
         AutoCategoryDistinguishEndTag = 0x2000,  ///< 自动按Category划分的标签结束，在@ref autoRegisteActions 函数会用到
-        NotInRibbonCategoryTag = 0x2001,  ///< 不在功能区的标签@ref autoRegisteActions 函数会遍历所有category的action以及SARibbonMainWindow下的action，如果两个
-        UserDefineActionTag    = 0x8000   ///< 自定义标签，所有用户自定义tag要大于此tag
+        NotInRibbonCategoryTag = 0x2001,  ///< 不在功能区的标签@ref autoRegisteActions 函数会遍历所有category的action
+        UserDefineActionTag = 0x8000  ///< 自定义标签，所有用户自定义tag要大于此tag
     };
-    SARibbonActionsManager(SARibbonMainWindow* p);
+    SARibbonActionsManager(SARibbonBar* bar);
     ~SARibbonActionsManager();
     //设置tag对应的名字
     void setTagName(int tag, const QString& name);
@@ -93,7 +92,7 @@ public:
     QList< QAction* > allActions() const;
 
     //自动加载action,返回tag对应的Category指针
-    QMap< int, SARibbonCategory* > autoRegisteActions(SARibbonMainWindow* w);
+    QMap< int, SARibbonCategory* > autoRegisteActions(SARibbonBar* bar);
 
     //自动加载widget下的actions函数返回的action,返回加载的数量，这些
     QSet< QAction* > autoRegisteWidgetActions(QWidget* w, int tag, bool enableEmit = false);
@@ -103,9 +102,6 @@ public:
 
     //清除
     void clear();
-
-    //获取ribbonwindow
-    SARibbonMainWindow* ribbonWindow() const;
 
 signals:
 

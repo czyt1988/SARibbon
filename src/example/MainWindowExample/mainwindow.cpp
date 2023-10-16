@@ -175,8 +175,8 @@ void MainWindow::onStyleClicked(int id)
     switch (ribbonStyle) {
     case SARibbonBar::RibbonStyleLooseThreeRow:
         m_edit->append(
-                tr("\nchange ribbon style to office style,The standard office style text display is line wrapped, "
-                   "and you can also control whether it wrap through SARibbonToolButton::setEnableWordWrap"));  // cn:标准的office样式的文字显示是换行的，你也可以通过SARibbonToolButton::setEnableWordWrap来控制它是否换行
+            tr("\nchange ribbon style to office style,The standard office style text display is line wrapped, "
+               "and you can also control whether it wrap through SARibbonToolButton::setEnableWordWrap"));  // cn:标准的office样式的文字显示是换行的，你也可以通过SARibbonToolButton::setEnableWordWrap来控制它是否换行
         m_edit->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::OfficeStyle);"));
         break;
     case SARibbonBar::RibbonStyleLooseTwoRow:
@@ -255,7 +255,7 @@ void MainWindow::onActionHelpTriggered()
                                 "\n Author:czy"
                                 "\n Email:czy.t@163.com"
                                 "\n ===============")
-                                     .arg(SARibbonBar::versionString()));
+                                 .arg(SARibbonBar::versionString()));
 }
 
 void MainWindow::onActionRemoveAppBtnTriggered(bool b)
@@ -293,7 +293,7 @@ void MainWindow::onActionLoadCustomizeXmlFileTriggered()
     //只能调用一次
     static bool has_call = false;
     if (!has_call) {
-        has_call = sa_apply_customize_from_xml_file("customize.xml", this, m_actMgr);
+        has_call = sa_apply_customize_from_xml_file("customize.xml", ribbonBar(), m_actMgr);
     }
 }
 
@@ -1137,7 +1137,7 @@ void MainWindow::addSomeOtherAction()
     m_actionTagText     = SARibbonActionsManager::UserDefineActionTag + 1;
     m_actionTagWithIcon = SARibbonActionsManager::UserDefineActionTag + 2;
 
-    m_actMgr = new SARibbonActionsManager(this);  //申明过程已经自动注册所有action
+    m_actMgr = new SARibbonActionsManager(ribbonBar());  //申明过程已经自动注册所有action
 
     //以下注册特别的action
     m_actMgr->registeAction(acttext1, SARibbonActionsManager::CommonlyUsedActionTag);

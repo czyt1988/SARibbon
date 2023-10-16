@@ -46,12 +46,55 @@ SARibbonBar/resource.qrc
 
 > 注意:最低的Qt版本为5.8
 
-## 常见问题及错误
+## Linux下构建
 
-framelessmanager.moc的缺失提升，遇到此错误，先执行qmake即可
+SARibbon在1.x后引入第三方库frameless，此库能很好的解决无边框问题，在linux下编译需要预先安装
+
+## 常见问题
+
+### 1、framelessmanager.moc的缺失提示，或者任何xxx.moc，遇到此错误，先执行qmake即可
+
 ```txt
 ..\..\..\SARibbon\src\SARibbonBar\3rdparty\framelesshelper\src\core\framelessmanager.cpp(563): fatal error C1083: 无法打开包括文件: “framelessmanager.moc”: No such file or directory
 ```
+
+### 2、高分屏显示问题
+
+针对高分屏显示，有如下两个方面准备
+
+1 - 在main函数中为QApplication设置`Qt::AA_EnableHighDpiScaling`属性
+
+这个属性使得应用程序自动检测显示器的像素密度来实现自动缩放，示例代码如下：
+
+```cpp
+int main(int argc, char* argv[])
+{
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
+    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+#endif
+    QApplication a(argc, argv);
+    ......
+}
+```
+
+2 - 在main函数中为QApplication设置缩放策略：`QApplication::setHighDpiScaleFactorRoundingPolicy`
+
+Qt5.6提供了`Qt::AA_EnableHighDpiScaling`，但不能完全解决，Qt5.14开始提供了高分屏缩放策略设置`QApplication::setHighDpiScaleFactorRoundingPolicy`，同`AA_EnableHighDpiScaling`一样需要在main函数前面设置
+
+```cpp
+int main(int argc, char* argv[])
+{
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
+    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+#endif
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+    QApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
+#endif
+    QApplication a(argc, argv);
+    ......
+}
+```
+
 
 # 使用方法
 

@@ -38,7 +38,6 @@
 #ifdef Q_OS_WINDOWS
 #  include <FramelessHelper/Core/private/winverhelper_p.h>
 #endif // Q_OS_WINDOWS
-#include <QtCore/qtimer.h>
 #include <QtCore/qeventloop.h>
 #include <QtCore/qloggingcategory.h>
 #include <QtGui/qcursor.h>
@@ -72,6 +71,8 @@ FRAMELESSHELPER_BEGIN_NAMESPACE
 #endif
 
 using namespace Global;
+
+static constexpr const auto kRepaintTimerInterval = 500;
 
 struct FramelessQuickHelperExtraData : public FramelessExtraData
 {
@@ -137,6 +138,9 @@ FramelessQuickHelperPrivate::FramelessQuickHelperPrivate(FramelessQuickHelper *q
         return;
     }
     q_ptr = q;
+    repaintTimer.setTimerType(Qt::VeryCoarseTimer);
+    repaintTimer.setInterval(kRepaintTimerInterval);
+    connect(&repaintTimer, &QTimer::timeout, this, &FramelessQuickHelperPrivate::doRepaintAllChildren);
     // Workaround a MOC limitation: we can't emit a signal from the parent class.
     connect(q_ptr, &FramelessQuickHelper::windowChanged, q_ptr, &FramelessQuickHelper::windowChanged2);
 }
@@ -212,7 +216,7 @@ void FramelessQuickHelperPrivate::attach()
         data->callbacks->setCursor = [window](const QCursor &cursor) -> void { window->setCursor(cursor); };
         data->callbacks->unsetCursor = [window]() -> void { window->unsetCursor(); };
         data->callbacks->getWidgetHandle = []() -> QObject * { return nullptr; };
-        data->callbacks->forceChildrenRepaint = [this](const int delay) -> void { repaintAllChildren(delay); };
+        data->callbacks->forceChildrenRepaint = [this]() -> void { repaintAllChildren(); };
         data->callbacks->resetQtGrabbedControl = []() -> bool { return false; };
     }
 
@@ -398,48 +402,46 @@ FramelessQuickHelper *FramelessQuickHelperPrivate::findOrCreateFramelessHelper(Q
     return instance;
 }
 
-void FramelessQuickHelperPrivate::repaintAllChildren(const quint32 delay) const
+void FramelessQuickHelperPrivate::repaintAllChildren()
+{
+    repaintTimer.start();
+}
+
+void FramelessQuickHelperPrivate::doRepaintAllChildren()
 {
     Q_Q(const FramelessQuickHelper);
-    QQuickWindow * const window = q->window();
+    QQuickWindow *window = q->window();
     if (!window) {
         return;
     }
-    const auto update = [window, q]() -> void {
 #ifdef Q_OS_WINDOWS
-        // Sync the internal window frame margins with the latest DPI, otherwise
-        // we will get wrong window sizes after the DPI change.
-        std::ignore = Utils::updateInternalWindowFrameMargins(window, true);
+    // Sync the internal window frame margins with the latest DPI, otherwise
+    // we will get wrong window sizes after the DPI change.
+    std::ignore = Utils::updateInternalWindowFrameMargins(window, true);
 #endif // Q_OS_WINDOWS
-        // No need to repaint the window when it's hidden.
-        if (!window->isVisible()) {
-            return;
-        }
-        if (!((window->windowState() & (Qt::WindowMinimized | Qt::WindowMaximized | Qt::WindowFullScreen)) || q->isWindowFixedSize())) {
-            const QSize originalSize = window->size();
-            static constexpr const auto margins = QMargins{ 10, 10, 10, 10 };
-            window->resize(originalSize.shrunkBy(margins));
-            window->resize(originalSize.grownBy(margins));
-            window->resize(originalSize);
-        }
-        window->requestUpdate();
-        const QList<QQuickItem *> items = window->findChildren<QQuickItem *>();
-        if (items.isEmpty()) {
-            return;
-        }
-        for (auto &&item : std::as_const(items)) {
-            // Only items with the "QQuickItem::ItemHasContents" flag enabled are allowed to call "update()".
-            // And don't repaint the item if it's hidden.
-            if ((item->flags() & QQuickItem::ItemHasContents) && item->isVisible()) {
-                item->update();
-            }
-        }
-    };
-    if (delay > 0) {
-        QTimer::singleShot(delay, this, update);
-    } else {
-        update();
+    // No need to repaint the window when it's hidden.
+    if (!window->isVisible()) {
+        return;
     }
+    if (!((window->windowState() & (Qt::WindowMinimized | Qt::WindowMaximized | Qt::WindowFullScreen)) || q->isWindowFixedSize())) {
+        const QSize originalSize = window->size();
+        static constexpr const auto margins = QMargins{ 10, 10, 10, 10 };
+        window->resize(originalSize.shrunkBy(margins));
+        window->resize(originalSize.grownBy(margins));
+        window->resize(originalSize);
+    }
+    window->requestUpdate();
+#if 0 // Calling QWindow::requestUpdate() should be enough.
+    const QList<QQuickItem *> items = window->findChildren<QQuickItem *>();
+    for (auto &&item : std::as_const(items)) {
+        // Only items with the "QQuickItem::ItemHasContents" flag enabled are allowed to call "update()".
+        // And don't repaint the item if it's hidden.
+        if ((item->flags() & QQuickItem::ItemHasContents) && item->isVisible()) {
+            item->update();
+        }
+    }
+#endif
+    repaintTimer.stop();
 }
 
 quint32 FramelessQuickHelperPrivate::readyWaitTime() const

@@ -39,7 +39,6 @@
 #include <FramelessHelper/Core/private/framelessconfig_p.h>
 #include <FramelessHelper/Core/private/framelesshelpercore_global_p.h>
 #include <QtCore/qhash.h>
-#include <QtCore/qtimer.h>
 #include <QtCore/qeventloop.h>
 #include <QtCore/qloggingcategory.h>
 #include <QtGui/qwindow.h>
@@ -71,6 +70,8 @@ FRAMELESSHELPER_BEGIN_NAMESPACE
 #endif
 
 using namespace Global;
+
+static constexpr const auto kRepaintTimerInterval = 500;
 
 struct FramelessWidgetsHelperExtraData : public FramelessExtraData
 {
@@ -210,6 +211,9 @@ FramelessWidgetsHelperPrivate::FramelessWidgetsHelperPrivate(FramelessWidgetsHel
         return;
     }
     q_ptr = q;
+    repaintTimer.setTimerType(Qt::VeryCoarseTimer);
+    repaintTimer.setInterval(kRepaintTimerInterval);
+    connect(&repaintTimer, &QTimer::timeout, this, &FramelessWidgetsHelperPrivate::doRepaintAllChildren);
 }
 
 FramelessWidgetsHelperPrivate::~FramelessWidgetsHelperPrivate() = default;
@@ -363,26 +367,22 @@ FramelessWidgetsHelper *FramelessWidgetsHelperPrivate::findOrCreateFramelessHelp
     return instance;
 }
 
-void FramelessWidgetsHelperPrivate::repaintAllChildren(const quint32 delay) const
+void FramelessWidgetsHelperPrivate::repaintAllChildren()
+{
+    repaintTimer.start();
+}
+
+void FramelessWidgetsHelperPrivate::doRepaintAllChildren()
 {
     if (!window) {
         return;
     }
-    const auto update = [this]() -> void {
-        forceWidgetRepaint(window);
-        const QList<QWidget *> widgets = window->findChildren<QWidget *>();
-        if (widgets.isEmpty()) {
-            return;
-        }
-        for (auto &&widget : std::as_const(widgets)) {
-            forceWidgetRepaint(widget);
-        }
-    };
-    if (delay > 0) {
-        QTimer::singleShot(delay, this, update);
-    } else {
-        update();
+    forceWidgetRepaint(window);
+    const QList<QWidget *> widgets = window->findChildren<QWidget *>();
+    for (auto &&widget : std::as_const(widgets)) {
+        forceWidgetRepaint(widget);
     }
+    repaintTimer.stop();
 }
 
 quint32 FramelessWidgetsHelperPrivate::readyWaitTime() const
@@ -460,7 +460,7 @@ void FramelessWidgetsHelperPrivate::attach()
         data->callbacks->setCursor = [this](const QCursor &cursor) -> void { window->setCursor(cursor); };
         data->callbacks->unsetCursor = [this]() -> void { window->unsetCursor(); };
         data->callbacks->getWidgetHandle = [this]() -> QObject * { return window; };
-        data->callbacks->forceChildrenRepaint = [this](const int delay) -> void { repaintAllChildren(delay); };
+        data->callbacks->forceChildrenRepaint = [this]() -> void { repaintAllChildren(); };
         data->callbacks->resetQtGrabbedControl = []() -> bool {
             if (qt_button_down) {
                 static constexpr const auto invalidPos = QPoint{ -99999, -99999 };

@@ -26,6 +26,7 @@
 
 #include <FramelessHelper/Widgets/framelesshelperwidgets_global.h>
 #include <QtCore/qvariant.h>
+#include <QtCore/qtimer.h>
 #include <QtWidgets/qsizepolicy.h>
 
 FRAMELESSHELPER_BEGIN_NAMESPACE
@@ -66,7 +67,8 @@ public:
     Q_NODISCARD static WidgetsSharedHelper *findOrCreateSharedHelper(QWidget *window);
     Q_NODISCARD static FramelessWidgetsHelper *findOrCreateFramelessHelper(QObject *object);
 
-    void repaintAllChildren(const quint32 delay = 0) const;
+    void repaintAllChildren();
+    Q_INVOKABLE void doRepaintAllChildren();
 
     Q_NODISCARD quint32 readyWaitTime() const;
     void setReadyWaitTime(const quint32 time);
@@ -84,6 +86,7 @@ public:
     bool qpaReady = false;
     QSizePolicy savedSizePolicy = {};
     quint32 qpaWaitTime = 0;
+    QTimer repaintTimer{};
 };
 
 FRAMELESSHELPER_END_NAMESPACE

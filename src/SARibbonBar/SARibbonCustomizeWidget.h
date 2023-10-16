@@ -9,6 +9,8 @@
 // SARibbonCustomizeWidget 特有
 class SARibbonCustomizeWidgetUi;
 class SARibbonMainWindow;
+class SARibbonBar;
+//
 class QStandardItemModel;
 class QStandardItem;
 class QAbstractButton;
@@ -27,7 +29,10 @@ class SA_RIBBON_EXPORT SARibbonCustomizeWidget : public QWidget
     Q_OBJECT
     SA_RIBBON_DECLARE_PRIVATE(SARibbonCustomizeWidget)
 public:
+    //保留接口
     SARibbonCustomizeWidget(SARibbonMainWindow* ribbonWindow, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+    //对于不使用SARibbonMainWindow的情况，使用此构造函数
+    SARibbonCustomizeWidget(SARibbonBar* ribbonbar, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
     ~SARibbonCustomizeWidget();
 
     /**
@@ -78,7 +83,7 @@ public:
     void fromXml(const QString& xmlpath);
 
     //应用xml配置，可以结合customize_datas_from_xml和customize_datas_apply函数
-    static bool fromXml(QXmlStreamReader* xml, SARibbonMainWindow* w, SARibbonActionsManager* mgr);
+    static bool fromXml(QXmlStreamReader* xml, SARibbonBar* bar, SARibbonActionsManager* mgr);
 
     //清除所有动作，在执行applys函数后，如果要继续调用，应该clear，否则会导致异常
     void clear();
@@ -131,6 +136,7 @@ private slots:
     void onPushButtonResetClicked();
 
 private:
+    void init(SARibbonBar* ribbonbar);
     void initConnection();
 
 private:
@@ -161,10 +167,10 @@ QList< SARibbonCustomizeData > SA_RIBBON_EXPORT sa_customize_datas_from_xml(QXml
 /**
  * @brief 应用QList<SARibbonCustomizeData>
  * @param cds
- * @param w SARibbonMainWindow指针
+ * @param w SARibbonBar指针
  * @return 成功应用的个数
  */
-int SA_RIBBON_EXPORT sa_customize_datas_apply(const QList< SARibbonCustomizeData >& cds, SARibbonMainWindow* w);
+int SA_RIBBON_EXPORT sa_customize_datas_apply(const QList< SARibbonCustomizeData >& cds, SARibbonBar* w);
 
 /**
  * @brief 直接加载xml自定义ribbon配置文件用于ribbon的自定义显示
@@ -180,6 +186,6 @@ int SA_RIBBON_EXPORT sa_customize_datas_apply(const QList< SARibbonCustomizeData
  * }
  * @endcode
  */
-bool SA_RIBBON_EXPORT sa_apply_customize_from_xml_file(const QString& filePath, SARibbonMainWindow* w, SARibbonActionsManager* mgr);
+bool SA_RIBBON_EXPORT sa_apply_customize_from_xml_file(const QString& filePath, SARibbonBar* bar, SARibbonActionsManager* mgr);
 
 #endif  // SARIBBONCUSTOMIZEWIDGET_H

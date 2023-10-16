@@ -43,12 +43,52 @@ Open `SARibbon.pro` directly using Qt Creator, and compile it.  The SARibbonBar 
 
 > Note:The minimum Qt version is 5.8
 
-## FQA
 
-“framelessmanager.moc”: No such file or directory:run qmake first
+## FAQ
+
+### "framelessmanager.moc": No such file or directory
+
+run qmake first
 
 ```txt
 ..\..\..\SARibbon\src\SARibbonBar\3rdparty\framelesshelper\src\core\framelessmanager.cpp(563): fatal error C1083: Unable to open include file: “framelessmanager.moc”: No such file or directory
+```
+
+### High-DPI screen display issues
+
+There are two ways to prepare for the issue of high-DPI screen display:
+
+1 - Set `Qt::AA_EnableHighDpiScaling` for QApplication in the main function
+
+This attribute enables the application to automatically detect the pixel density of the display to achieve automatic scaling, such as:
+
+```cpp
+int main(int argc, char* argv[])
+{
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
+    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+#endif
+    QApplication a(argc, argv);
+    ......
+}
+```
+
+2- Set the scaling policy for QApplication in the main function: `QApplication::setHighDpiScaleFactorRoundingPolicy`
+
+Qt5.6 provides `Qt::AA_EnableHighDpiScaling`, but it cannot completely solve the problem of high-DPI screens. Qt5.14 has provided a high-dpi screen scaling policy setting called `QApplication::setHighDpiScaleFactorRoundingPolicy`, also needs to be set in the main function, for example:
+
+```cpp
+int main(int argc, char* argv[])
+{
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
+    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+#endif
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+    QApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
+#endif
+    QApplication a(argc, argv);
+    ......
+}
 ```
 
 # Usage
