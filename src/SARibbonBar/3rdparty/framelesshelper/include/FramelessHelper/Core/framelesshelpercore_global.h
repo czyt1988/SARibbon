@@ -371,22 +371,25 @@ Q_NAMESPACE_EXPORT(FRAMELESSHELPER_CORE_API)
 [[maybe_unused]] inline constexpr const QSize kDefaultWindowSize = {160, 160}; // Value taken from Windows QPA.
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
-#  define kDefaultBlackColor QColorConstants::Black
 #  define kDefaultWhiteColor QColorConstants::White
+#  define kDefaultBlackColor QColorConstants::Black
 #  define kDefaultTransparentColor QColorConstants::Transparent
+#  define kDefaultLightGrayColor QColorConstants::LightGray
 #  define kDefaultDarkGrayColor QColorConstants::DarkGray
 #else // (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
-   [[maybe_unused]] inline Q_COLOR_CONSTEXPR const QColor kDefaultBlackColor = {0, 0, 0}; // #000000
    [[maybe_unused]] inline Q_COLOR_CONSTEXPR const QColor kDefaultWhiteColor = {255, 255, 255}; // #FFFFFF
+   [[maybe_unused]] inline Q_COLOR_CONSTEXPR const QColor kDefaultBlackColor = {0, 0, 0}; // #000000
    [[maybe_unused]] inline Q_COLOR_CONSTEXPR const QColor kDefaultTransparentColor = {0, 0, 0, 0};
+   [[maybe_unused]] inline Q_COLOR_CONSTEXPR const QColor kDefaultLightGrayColor = {211, 211, 211}; // #D3D3D3
    [[maybe_unused]] inline Q_COLOR_CONSTEXPR const QColor kDefaultDarkGrayColor = {169, 169, 169}; // #A9A9A9
 #endif // (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
 
 [[maybe_unused]] inline Q_COLOR_CONSTEXPR const QColor kDefaultSystemLightColor = {240, 240, 240}; // #F0F0F0
 [[maybe_unused]] inline Q_COLOR_CONSTEXPR const QColor kDefaultSystemDarkColor = {32, 32, 32}; // #202020
-[[maybe_unused]] inline Q_COLOR_CONSTEXPR const QColor kDefaultFrameBorderActiveColor = {77, 77, 77}; // #4D4D4D
-[[maybe_unused]] inline Q_COLOR_CONSTEXPR const QColor kDefaultFrameBorderInactiveColorDark = {87, 89, 89}; // #575959
-[[maybe_unused]] inline Q_COLOR_CONSTEXPR const QColor kDefaultFrameBorderInactiveColorLight = {166, 166, 166}; // #A6A6A6
+[[maybe_unused]] inline Q_COLOR_CONSTEXPR const QColor kDefaultFrameBorderActiveColorLight = {110, 110, 110}; // #6E6E6E
+[[maybe_unused]] inline Q_COLOR_CONSTEXPR const QColor kDefaultFrameBorderActiveColorDark = {51, 51, 51}; // #333333
+[[maybe_unused]] inline Q_COLOR_CONSTEXPR const QColor kDefaultFrameBorderInactiveColorLight = {167, 167, 167}; // #A7A7A7
+[[maybe_unused]] inline Q_COLOR_CONSTEXPR const QColor kDefaultFrameBorderInactiveColorDark = {61, 61, 62}; // #3D3D3E
 [[maybe_unused]] inline Q_COLOR_CONSTEXPR const QColor kDefaultSystemButtonBackgroundColor = {204, 204, 204}; // #CCCCCC
 [[maybe_unused]] inline Q_COLOR_CONSTEXPR const QColor kDefaultSystemCloseButtonBackgroundColor = {232, 17, 35}; // #E81123
 

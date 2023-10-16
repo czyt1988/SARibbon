@@ -4,7 +4,7 @@
 #include "SARibbonActionsManager.h"
 #include "SARibbonPannel.h"
 #include <QList>
-
+class SARibbonBar;
 class SARibbonMainWindow;
 
 /**
@@ -42,7 +42,7 @@ public:
     bool isValid() const;
 
     //应用SARibbonCustomizeData
-    bool apply(SARibbonMainWindow* m) const;
+    bool apply(SARibbonBar* bar) const;
 
     //获取actionmanager指针
     SARibbonActionsManager* actionManager();

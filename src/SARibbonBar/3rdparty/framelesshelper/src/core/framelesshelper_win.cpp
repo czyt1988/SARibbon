@@ -1154,7 +1154,7 @@ bool FramelessHelperWin::nativeEventFilter(const QByteArray &eventType, void *me
             data->restoreGeometry.setSize(Utils::rescaleSize(data->restoreGeometry.size(), oldDpi.x, newDpi.x));
         }
 #endif // (QT_VERSION < QT_VERSION_CHECK(6, 5, 1))
-        data->callbacks->forceChildrenRepaint(500);
+        data->callbacks->forceChildrenRepaint();
     } break;
     case WM_DWMCOMPOSITIONCHANGED:
         // Re-apply the custom window frame if recovered from the basic theme.
@@ -1202,7 +1202,7 @@ bool FramelessHelperWin::nativeEventFilter(const QByteArray &eventType, void *me
             break;
         }
         data->monitor = currentMonitor;
-        data->callbacks->forceChildrenRepaint(500);
+        data->callbacks->forceChildrenRepaint();
     } break;
     case WM_SYSCOMMAND: {
         const WPARAM filteredWParam = (wParam & 0xFFF0);

@@ -222,7 +222,7 @@ bool FramelessHelperQt::eventFilter(QObject *object, QEvent *event)
     if (type == QEvent::ScreenChangeInternal)
 #endif // (QT_VERSION >= QT_VERSION_CHECK(6, 6, 0))
     {
-        data->callbacks->forceChildrenRepaint(500);
+        data->callbacks->forceChildrenRepaint();
         return false;
     }
     const auto qWindow = qobject_cast<QWindow *>(object);

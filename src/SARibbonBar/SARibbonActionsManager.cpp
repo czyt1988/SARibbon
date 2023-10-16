@@ -2,7 +2,6 @@
 #include <QMap>
 #include <QHash>
 #include <QDebug>
-#include "SARibbonMainWindow.h"
 #include "SARibbonBar.h"
 
 class SARibbonActionsManager::PrivateData
@@ -34,10 +33,10 @@ void SARibbonActionsManager::PrivateData::clear()
     mSale = 0;
 }
 
-SARibbonActionsManager::SARibbonActionsManager(SARibbonMainWindow* p)
-    : QObject(p), d_ptr(new SARibbonActionsManager::PrivateData(this))
+SARibbonActionsManager::SARibbonActionsManager(SARibbonBar* bar)
+    : QObject(bar), d_ptr(new SARibbonActionsManager::PrivateData(this))
 {
-    autoRegisteActions(p);
+    autoRegisteActions(bar);
 }
 
 SARibbonActionsManager::~SARibbonActionsManager()
@@ -274,35 +273,36 @@ QList< QAction* > SARibbonActionsManager::allActions() const
 }
 
 /**
- * @brief 自动加载SARibbonMainWindow的action
- * 此函数会遍历@ref SARibbonMainWindow 下的所有子object，找到action注册，
+ * @brief 自动加载SARibbonBar的action
+ * 此函数会遍历@ref SARibbonBar的父窗口(一般是SARibbonMainWindow)下的所有子object，找到action注册，
  * 并会遍历所有@ref SARibbonCategory,把SARibbonCategory下的action按SARibbonCategory的title name进行分类
  *
  * 此函数会把所有category下的action生成tag并注册，返回的QMap<int, SARibbonCategory *>是记录了category对应的tag
  *
- * 此函数还会把SARibbonMainWindow下面的action，但不在任何一个category下的作为NotInRibbonCategoryTag标签注册，默认名字会赋予not
+ * 此函数还会把SARibbonBar的父窗口(一般是SARibbonMainWindow)下面的action，但不在任何一个category下的作为NotInRibbonCategoryTag标签注册，默认名字会赋予not
  * in ribbon， 可以通过@ref setTagName 改变
  *
  * @param w
  * @return
  * @note 此函数的调用最好在category设置了标题后调用，因为会以category的标题作为标签的命名
  */
-QMap< int, SARibbonCategory* > SARibbonActionsManager::autoRegisteActions(SARibbonMainWindow* w)
+QMap< int, SARibbonCategory* > SARibbonActionsManager::autoRegisteActions(SARibbonBar* bar)
 {
     QMap< int, SARibbonCategory* > res;
-    //先遍历SARibbonMainWindow下的所有子对象，把所有action找到
+    //先遍历SARibbonBar的父窗口(一般是SARibbonMainWindow)下的所有子对象，把所有action找到
+    QWidget* parWidget = bar->parentWidget();
     QSet< QAction* > mainwindowActions;
-
-    for (QObject* o : qAsConst(w->children())) {
-        if (QAction* a = qobject_cast< QAction* >(o)) {
-            //说明是action
-            if (!a->objectName().isEmpty()) {
-                mainwindowActions.insert(a);
+    if (parWidget) {
+        for (QObject* o : qAsConst(parWidget->children())) {
+            if (QAction* a = qobject_cast< QAction* >(o)) {
+                //说明是action
+                if (!a->objectName().isEmpty()) {
+                    mainwindowActions.insert(a);
+                }
             }
         }
     }
     //开始遍历每个category，加入action
-    SARibbonBar* bar = w->ribbonBar();
 
     if (nullptr == bar) {
         //非ribbon模式，直接退出
@@ -396,11 +396,6 @@ QList< QAction* > SARibbonActionsManager::search(const QString& text)
 void SARibbonActionsManager::clear()
 {
     d_ptr->clear();
-}
-
-SARibbonMainWindow* SARibbonActionsManager::ribbonWindow() const
-{
-    return (qobject_cast< SARibbonMainWindow* >(parent()));
 }
 
 /**
