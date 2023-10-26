@@ -8,5 +8,7 @@
         <file>icon/save.svg</file>
         <file>icon/useqss.svg</file>
         <file>icon/windowsflag-normal.svg</file>
+        <file>icon/redo.svg</file>
+        <file>icon/undo.svg</file>
     </qresource>
 </RCC>

@@ -87,7 +87,7 @@ public:
         , mRibbonStyle(SARibbonBar::RibbonStyleLooseThreeRow)
         , mLastShowStyle(SARibbonBar::RibbonStyleLooseThreeRow)
         , mCurrentRibbonMode(SARibbonBar::NormalRibbonMode)
-        , mWindowButtonSize(RibbonSubElementStyleOpt.titleBarHeight() * 4, RibbonSubElementStyleOpt.titleBarHeight())
+        , mWindowButtonSize(0, 0)
         , mContextCategoryColorListIndex(-1)
         , mTabBarBaseLineColor(186, 201, 219)
         , mTitleAligment(Qt::AlignCenter)

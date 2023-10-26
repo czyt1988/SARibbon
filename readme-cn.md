@@ -23,20 +23,41 @@ SARibbon提供了几种布局方式，以及可以通过qss自由定义主题
 
 # 构建
 
+> 注意:要求C++17，需要支持C++17的对应Qt版本（Qt5.9.1以上）
+
+由于最低C++版本为17，因此，在你的qmake文件中，需要添加：
+
+```shell
+CONFIG += c++17
+```
+
 ## 直接引入工程（静态）
 
-SARibbon提供了合并好的`SARibbon.h`文件和`SARibbon.cpp`文件，只需要在工程引入这两个文件，同时把资源文件引入就可以使用，无需编译为动态库，可以参考SimpleExample的例子（位于`src/example/SimpleExample`），静态引入使用到如下4个文件：
+SARibbon提供了合并好的`SARibbon.h`文件和`SARibbon.cpp`文件，只需要在工程引入这两个文件，同时把资源文件和第三方库文件引入就可以使用，无需编译为动态库，可以参考SimpleExample的例子（位于`src/example/SimpleExample`），静态引入使用到`SARibbon.h`、`SARibbon.cpp`、`SARibbon.pri`、`SARibbonBar/resource.qrc`4个文件以及`SARibbonBar/3rdparty`这个文件夹：
+
+你的工程目录将如下所示：
 
 ```
-SARibbon.h
-SARibbon.cpp
-SARibbon.pri
-SARibbonBar/resource.qrc
+|-you-project-dir
+|  |-you-project.pro
+|  |-SARibbon.h
+|  |-SARibbon.cpp
+|  |-SARibbon.pri
+|  |-SARibbonBar
+|     |-resource.qrc
+|     |-resource(直接把SARibbonBar下的resource完整复制过来)
+|        |-resource files
+|     |-3rdparty(直接把SARibbonBar下的3rdparty完整复制过来)
+|        |-framelesshelper
+|           |-src
+|           |  |-src files
+|           |-include
+|           |  |-header files
+|           |-qmake
+|           |  |-pri files
 ```
 
-只需把上面四个文件拷贝到自己工程即可，资源文件的`SARibbonBar`文件夹如果改变，需要修改`SARibbon.pri`
-
-如果是用cmake，只需要`SARibbon.h,SARibbon.cpp,resource.qrc`这三个文件
+使用qmake，只需把`SARibbon.h`、`SARibbon.cpp`、`SARibbon.pri`拷贝到自己工程目录下，同时创建`SARibbonBar`文件夹，并把`resource.qrc`文件拷贝到`SARibbonBar`文件夹下，把`resource`文件夹和`3rdparty`文件夹拷贝到`SARibbonBar`文件夹即可使用
 
 ## 编译为库（动态）
 
@@ -44,7 +65,7 @@ SARibbonBar/resource.qrc
 
 > 在debug模式编译的库后面会加上'd'以作区别
 
-> 注意:最低的Qt版本为5.8
+> 注意:最低的Qt版本为5.14并要求C++17
 
 ## Linux下构建
 

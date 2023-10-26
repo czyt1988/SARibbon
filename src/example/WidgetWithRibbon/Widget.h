@@ -25,5 +25,6 @@ private:
 
 private:
     Ui::Widget* ui;
+    SARibbonBar* mRibbonBar { nullptr };
 };
 #endif  // WIDGET_H
