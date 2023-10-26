@@ -78,7 +78,7 @@ const FramelessDialogPrivate *FramelessDialogPrivate::get(const FramelessDialog 
 }
 
 FramelessDialog::FramelessDialog(QWidget *parent)
-    : QDialog(parent), d_ptr(new FramelessDialogPrivate(this))
+    : QDialog(parent), d_ptr(std::make_unique<FramelessDialogPrivate>(this))
 {
     FramelessWidgetsHelper::get(this)->extendsContentIntoTitleBar();
     Q_D(FramelessDialog);

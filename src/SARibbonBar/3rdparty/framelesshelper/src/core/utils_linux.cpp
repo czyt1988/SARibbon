@@ -530,13 +530,13 @@ WallpaperAspectStyle Utils::getWallpaperAspectStyle()
     if (options.isEmpty()) {
         return defaultAspectStyle;
     } else {
-        if ((options == u"wallpaper"_s) || (options == u"tiled"_s)) {
+        if ((options == "wallpaper"_L1) || (options == "tiled"_L1)) {
             return WallpaperAspectStyle::Tile;
-        } else if (options == u"centered"_s) {
+        } else if (options == "centered"_L1) {
             return WallpaperAspectStyle::Center;
-        } else if (options == u"stretched"_s) {
+        } else if (options == "stretched"_L1) {
             return WallpaperAspectStyle::Stretch;
-        } else if (options == u"scaled"_s) {
+        } else if (options == "scaled"_L1) {
             return WallpaperAspectStyle::Fit;
         } else {
             return defaultAspectStyle;

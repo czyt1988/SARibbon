@@ -103,7 +103,7 @@ FramelessHelperQtPrivate::FramelessHelperQtPrivate(FramelessHelperQt *q) : q_ptr
 
 FramelessHelperQtPrivate::~FramelessHelperQtPrivate() = default;
 
-FramelessHelperQt::FramelessHelperQt(QObject *parent) : QObject(parent), d_ptr(new FramelessHelperQtPrivate(this))
+FramelessHelperQt::FramelessHelperQt(QObject *parent) : QObject(parent), d_ptr(std::make_unique<FramelessHelperQtPrivate>(this))
 {
 }
 

@@ -180,7 +180,7 @@ void QuickWindowBorderPrivate::rebindWindow()
 }
 
 QuickWindowBorder::QuickWindowBorder(QQuickItem *parent)
-    : QQuickPaintedItem(parent), d_ptr(new QuickWindowBorderPrivate(this))
+    : QQuickPaintedItem(parent), d_ptr(std::make_unique<QuickWindowBorderPrivate>(this))
 {
 }
 

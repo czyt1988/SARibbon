@@ -449,7 +449,7 @@ void StandardTitleBarPrivate::initialize()
 }
 
 StandardTitleBar::StandardTitleBar(QWidget *parent)
-    : QWidget(parent), d_ptr(new StandardTitleBarPrivate(this))
+    : QWidget(parent), d_ptr(std::make_unique<StandardTitleBarPrivate>(this))
 {
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     setFixedHeight(kDefaultTitleBarHeight);

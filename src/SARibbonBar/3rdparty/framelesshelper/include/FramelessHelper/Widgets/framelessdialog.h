@@ -26,6 +26,7 @@
 
 #include <FramelessHelper/Widgets/framelesshelperwidgets_global.h>
 #include <QtWidgets/qdialog.h>
+#include <memory>
 
 #if FRAMELESSHELPER_CONFIG(window)
 

@@ -27,6 +27,7 @@
 #include <FramelessHelper/Quick/framelesshelperquick_global.h>
 #include <QtQuick/qquickitem.h>
 #include <QtQuick/qquickwindow.h>
+#include <memory>
 
 FRAMELESSHELPER_BEGIN_NAMESPACE
 

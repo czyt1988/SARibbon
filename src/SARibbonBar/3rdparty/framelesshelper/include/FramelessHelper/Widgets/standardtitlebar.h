@@ -25,6 +25,7 @@
 #pragma once
 
 #include <FramelessHelper/Widgets/framelesshelperwidgets_global.h>
+#include <memory>
 
 #if FRAMELESSHELPER_CONFIG(titlebar)
 

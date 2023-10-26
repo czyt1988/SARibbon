@@ -79,7 +79,7 @@ const FramelessWidgetPrivate *FramelessWidgetPrivate::get(const FramelessWidget 
 }
 
 FramelessWidget::FramelessWidget(QWidget *parent)
-    : QWidget(parent, Qt::Window),  d_ptr(new FramelessWidgetPrivate(this))
+    : QWidget(parent, Qt::Window),  d_ptr(std::make_unique<FramelessWidgetPrivate>(this))
 {
     FramelessWidgetsHelper::get(this)->extendsContentIntoTitleBar();
     Q_D(FramelessWidget);

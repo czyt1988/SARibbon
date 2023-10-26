@@ -428,7 +428,7 @@ void FramelessManagerPrivate::initialize()
 }
 
 FramelessManager::FramelessManager(QObject *parent) :
-    QObject(parent), d_ptr(new FramelessManagerPrivate(this))
+    QObject(parent), d_ptr(std::make_unique<FramelessManagerPrivate>(this))
 {
 }
 

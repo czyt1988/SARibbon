@@ -135,6 +135,9 @@ FRAMELESSHELPER_STRING_CONSTANT(EnableMenuItem)
 FRAMELESSHELPER_STRING_CONSTANT(SetMenuDefaultItem)
 FRAMELESSHELPER_STRING_CONSTANT(HiliteMenuItem)
 FRAMELESSHELPER_STRING_CONSTANT(TrackPopupMenu)
+FRAMELESSHELPER_STRING_CONSTANT(DrawMenuBar)
+FRAMELESSHELPER_STRING_CONSTANT(DeleteMenu)
+FRAMELESSHELPER_STRING_CONSTANT(RemoveMenu)
 FRAMELESSHELPER_STRING_CONSTANT(ClientToScreen)
 FRAMELESSHELPER_STRING_CONSTANT(DwmEnableBlurBehindWindow)
 FRAMELESSHELPER_STRING_CONSTANT(SetWindowCompositionAttribute)
@@ -1315,49 +1318,114 @@ bool Utils::showSystemMenu(const WId windowId, const QPoint &pos, const bool sel
     }
 
     // Tweak the menu items according to the current window status and user settings.
+    const bool disableClose = data->callbacks->getProperty(kSysMenuDisableCloseVar, false).toBool();
     const bool disableRestore = data->callbacks->getProperty(kSysMenuDisableRestoreVar, false).toBool();
     const bool disableMinimize = data->callbacks->getProperty(kSysMenuDisableMinimizeVar, false).toBool();
     const bool disableMaximize = data->callbacks->getProperty(kSysMenuDisableMaximizeVar, false).toBool();
+    const bool disableSize = data->callbacks->getProperty(kSysMenuDisableSizeVar, false).toBool();
+    const bool disableMove = data->callbacks->getProperty(kSysMenuDisableMoveVar, false).toBool();
+    const bool removeClose = data->callbacks->getProperty(kSysMenuRemoveCloseVar, false).toBool();
+    const bool removeSeparator = data->callbacks->getProperty(kSysMenuRemoveSeparatorVar, false).toBool();
+    const bool removeRestore = data->callbacks->getProperty(kSysMenuRemoveRestoreVar, false).toBool();
+    const bool removeMinimize = data->callbacks->getProperty(kSysMenuRemoveMinimizeVar, false).toBool();
+    const bool removeMaximize = data->callbacks->getProperty(kSysMenuRemoveMaximizeVar, false).toBool();
+    const bool removeSize = data->callbacks->getProperty(kSysMenuRemoveSizeVar, false).toBool();
+    const bool removeMove = data->callbacks->getProperty(kSysMenuRemoveMoveVar, false).toBool();
     const bool maxOrFull = (IsMaximized(hWnd) || isFullScreen(windowId));
     const bool fixedSize = data->callbacks->isWindowFixedSize();
-    ::EnableMenuItem(hMenu, SC_RESTORE, (MF_BYCOMMAND | ((maxOrFull && !fixedSize && !disableRestore) ? MFS_ENABLED : MFS_DISABLED)));
-    // The first menu item should be selected by default if the menu is brought
-    // up by keyboard. I don't know how to pre-select a menu item but it seems
-    // highlight can do the job. However, there's an annoying issue if we do
-    // this manually: the highlighted menu item is really only highlighted,
-    // not selected, so even if the mouse cursor hovers on other menu items
-    // or the user navigates to other menu items through keyboard, the original
-    // highlight bar will not move accordingly, the OS will generate another
-    // highlight bar to indicate the current selected menu item, which will make
-    // the menu look kind of weird. Currently I don't know how to fix this issue.
-    ::HiliteMenuItem(hWnd, hMenu, SC_RESTORE, (MF_BYCOMMAND | (selectFirstEntry ? MFS_HILITE : MFS_UNHILITE)));
-    ::EnableMenuItem(hMenu, SC_MOVE, (MF_BYCOMMAND | (!maxOrFull ? MFS_ENABLED : MFS_DISABLED)));
-    ::EnableMenuItem(hMenu, SC_SIZE, (MF_BYCOMMAND | ((!maxOrFull && !fixedSize && !(disableMinimize || disableMaximize)) ? MFS_ENABLED : MFS_DISABLED)));
-    ::EnableMenuItem(hMenu, SC_MINIMIZE, (MF_BYCOMMAND | (disableMinimize ? MFS_DISABLED : MFS_ENABLED)));
-    ::EnableMenuItem(hMenu, SC_MAXIMIZE, (MF_BYCOMMAND | ((!maxOrFull && !fixedSize && !disableMaximize) ? MFS_ENABLED : MFS_DISABLED)));
-    ::EnableMenuItem(hMenu, SC_CLOSE, (MF_BYCOMMAND | MFS_ENABLED));
+    if (removeClose) {
+        if (::DeleteMenu(hMenu, SC_CLOSE, MF_BYCOMMAND) == FALSE) {
+            //WARNING << getSystemErrorMessage(kDeleteMenu);
+        }
+    } else {
+        ::EnableMenuItem(hMenu, SC_CLOSE, (MF_BYCOMMAND | (disableClose ? MFS_DISABLED : MFS_ENABLED)));
+    }
+    if (removeSeparator) {
+        // Looks like we must use 0 for the second parameter here, otherwise we can't remove the separator.
+        if (::DeleteMenu(hMenu, 0, MFT_SEPARATOR) == FALSE) {
+            //WARNING << getSystemErrorMessage(kDeleteMenu);
+        }
+    }
+    if (removeMaximize) {
+        if (::DeleteMenu(hMenu, SC_MAXIMIZE, MF_BYCOMMAND) == FALSE) {
+            //WARNING << getSystemErrorMessage(kDeleteMenu);
+        }
+    } else {
+        ::EnableMenuItem(hMenu, SC_MAXIMIZE, (MF_BYCOMMAND | ((!maxOrFull && !fixedSize && !disableMaximize) ? MFS_ENABLED : MFS_DISABLED)));
+    }
+    if (removeRestore) {
+        if (::DeleteMenu(hMenu, SC_RESTORE, MF_BYCOMMAND) == FALSE) {
+            //WARNING << getSystemErrorMessage(kDeleteMenu);
+        }
+    } else {
+        ::EnableMenuItem(hMenu, SC_RESTORE, (MF_BYCOMMAND | ((maxOrFull && !fixedSize && !disableRestore) ? MFS_ENABLED : MFS_DISABLED)));
+        // The first menu item should be selected by default if the menu is brought
+        // up by keyboard. I don't know how to pre-select a menu item but it seems
+        // highlight can do the job. However, there's an annoying issue if we do
+        // this manually: the highlighted menu item is really only highlighted,
+        // not selected, so even if the mouse cursor hovers on other menu items
+        // or the user navigates to other menu items through keyboard, the original
+        // highlight bar will not move accordingly, the OS will generate another
+        // highlight bar to indicate the current selected menu item, which will make
+        // the menu look kind of weird. Currently I don't know how to fix this issue.
+        ::HiliteMenuItem(hWnd, hMenu, SC_RESTORE, (MF_BYCOMMAND | (selectFirstEntry ? MFS_HILITE : MFS_UNHILITE)));
+    }
+    if (removeMinimize) {
+        if (::DeleteMenu(hMenu, SC_MINIMIZE, MF_BYCOMMAND) == FALSE) {
+            //WARNING << getSystemErrorMessage(kDeleteMenu);
+        }
+    } else {
+        ::EnableMenuItem(hMenu, SC_MINIMIZE, (MF_BYCOMMAND | (disableMinimize ? MFS_DISABLED : MFS_ENABLED)));
+    }
+    if (removeSize) {
+        if (::DeleteMenu(hMenu, SC_SIZE, MF_BYCOMMAND) == FALSE) {
+            //WARNING << getSystemErrorMessage(kDeleteMenu);
+        }
+    } else {
+        ::EnableMenuItem(hMenu, SC_SIZE, (MF_BYCOMMAND | ((!maxOrFull && !fixedSize && !(disableSize || disableMinimize || disableMaximize)) ? MFS_ENABLED : MFS_DISABLED)));
+    }
+    if (removeMove) {
+        if (::DeleteMenu(hMenu, SC_MOVE, MF_BYCOMMAND) == FALSE) {
+            //WARNING << getSystemErrorMessage(kDeleteMenu);
+        }
+    } else {
+        ::EnableMenuItem(hMenu, SC_MOVE, (MF_BYCOMMAND | ((disableMove || maxOrFull) ? MFS_DISABLED : MFS_ENABLED)));
+    }
 
     // The default menu item will appear in bold font. There can only be one default
     // menu item per menu at most. Set the item ID to "UINT_MAX" (or simply "-1")
     // can clear the default item for the given menu.
-    UINT defaultItemId = UINT_MAX;
+    std::optional<UINT> defaultItemId = std::nullopt;
     if (WindowsVersionHelper::isWin11OrGreater()) {
         if (maxOrFull) {
-            defaultItemId = SC_RESTORE;
+            if (!removeRestore) {
+                defaultItemId = SC_RESTORE;
+            }
         } else {
-            defaultItemId = SC_MAXIMIZE;
+            if (!removeMaximize) {
+                defaultItemId = SC_MAXIMIZE;
+            }
         }
-    } else {
+    }
+    if (!(defaultItemId.has_value() || removeClose)) {
         defaultItemId = SC_CLOSE;
     }
-    ::SetMenuDefaultItem(hMenu, defaultItemId, FALSE);
+    if (::SetMenuDefaultItem(hMenu, defaultItemId.value_or(UINT_MAX), FALSE) == FALSE) {
+        WARNING << getSystemErrorMessage(kSetMenuDefaultItem);
+    }
+
+    if (::DrawMenuBar(hWnd) == FALSE) {
+        WARNING << getSystemErrorMessage(kDrawMenuBar);
+    }
 
     // Popup the system menu at the required position.
     const int result = ::TrackPopupMenu(hMenu, (TPM_RETURNCMD | (QGuiApplication::isRightToLeft() ? TPM_RIGHTALIGN : TPM_LEFTALIGN)), pos.x(), pos.y(), 0, hWnd, nullptr);
 
-    // Unhighlight the first menu item after the popup menu is closed, otherwise it will keep
-    // highlighting until we unhighlight it manually.
-    ::HiliteMenuItem(hWnd, hMenu, SC_RESTORE, (MF_BYCOMMAND | MFS_UNHILITE));
+    if (!removeRestore) {
+        // Unhighlight the first menu item after the popup menu is closed, otherwise it will keep
+        // highlighting until we unhighlight it manually.
+        ::HiliteMenuItem(hWnd, hMenu, SC_RESTORE, (MF_BYCOMMAND | MFS_UNHILITE));
+    }
 
     if (result == FALSE) {
         // The user canceled the menu, no need to continue.

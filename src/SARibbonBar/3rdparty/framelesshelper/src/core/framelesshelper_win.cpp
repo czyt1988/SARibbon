@@ -245,11 +245,13 @@ void FramelessHelperWin::addWindow(const QObject *window)
 #if 0
     data->callbacks->setWindowFlags(data->callbacks->getWindowFlags() | Qt::FramelessWindowHint);
 #else
+#  if (QT_VERSION < QT_VERSION_CHECK(6, 5, 3))
     // Qt maintains a frame margin internally, we need to update it accordingly
     // otherwise we'll get lots of warning messages when we change the window
     // geometry, it will also affect the final window geometry because QPA will
     // always take it into account when setting window size and position.
     std::ignore = Utils::updateInternalWindowFrameMargins(qWindow, true);
+#  endif
 #endif
     // Tell DWM our preferred frame margin.
     std::ignore = Utils::updateWindowFrameMargins(data->windowId, false);
