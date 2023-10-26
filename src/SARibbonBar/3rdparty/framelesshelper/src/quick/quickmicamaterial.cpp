@@ -145,7 +145,7 @@ void QuickMicaMaterialPrivate::rebindWindow()
 }
 
 QuickMicaMaterial::QuickMicaMaterial(QQuickItem *parent)
-    : QQuickPaintedItem(parent), d_ptr(new QuickMicaMaterialPrivate(this))
+    : QQuickPaintedItem(parent), d_ptr(std::make_unique<QuickMicaMaterialPrivate>(this))
 {
 }
 

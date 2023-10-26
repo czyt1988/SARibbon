@@ -133,7 +133,7 @@ void ChromePalettePrivate::refresh()
 }
 
 ChromePalette::ChromePalette(QObject *parent) :
-    QObject(parent), d_ptr(new ChromePalettePrivate(this))
+    QObject(parent), d_ptr(std::make_unique<ChromePalettePrivate>(this))
 {
 }
 

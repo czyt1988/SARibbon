@@ -24,19 +24,23 @@
 
 @PACKAGE_INIT@
 
-set(_@PROJECT_NAME@_supported_components Core Widgets Quick)
+include(CMakeFindDependencyMacro)
 
-foreach(_comp ${@PROJECT_NAME@_FIND_COMPONENTS})
-    if(_comp IN_LIST _@PROJECT_NAME@_supported_components)
-        set(__target @PROJECT_NAME@::${_comp})
+set(_@PROJECT_NAME@_supported_components Core Widgets Quick)
+set(_@PROJECT_NAME@_available_components Core Gui)
+
+foreach(_component ${@PROJECT_NAME@_FIND_COMPONENTS})
+    if(_component IN_LIST _@PROJECT_NAME@_supported_components)
+        set(__target @PROJECT_NAME@::${_component})
         if(TARGET ${__target})
             continue()
         else()
-            set(__target_full @PROJECT_NAME@${_comp})
+            set(__target_full @PROJECT_NAME@${_component})
             set(__targets_file "${CMAKE_CURRENT_LIST_DIR}/${__target_full}Targets.cmake")
             if(EXISTS "${__targets_file}")
                 include("${__targets_file}")
                 add_library(${__target} ALIAS @PROJECT_NAME@::${__target_full})
+                list(APPEND _@PROJECT_NAME@_available_components ${_component})
             else()
                 set(@PROJECT_NAME@_FOUND FALSE)
                 set(@PROJECT_NAME@_NOT_FOUND_MESSAGE "Can't find necessary configuration file for ${__target}, please make sure this component is built successfully and installed properly.")
@@ -68,3 +72,9 @@ set_package_properties(@PROJECT_NAME@ PROPERTIES
     DESCRIPTION "@PROJECT_DESCRIPTION@"
     URL "@PROJECT_HOMEPAGE_URL@"
 )
+
+if(${@PROJECT_NAME@_FOUND})
+    list(REMOVE_DUPLICATES _@PROJECT_NAME@_available_components)
+    find_dependency(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS ${_@PROJECT_NAME@_available_components})
+    find_dependency(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS ${_@PROJECT_NAME@_available_components})
+endif()

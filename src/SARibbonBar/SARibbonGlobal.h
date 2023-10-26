@@ -13,6 +13,7 @@
  * cn:
  * 添加了SARibbonBar在QWidget窗口上使用的例子
  * 整理了SARibbon.h和SARibbon.cpp,调整了静态使用的例子
+ * frameless库更新到c4a7bc8版本（20231022）
  *
  * 2023-10-14 -> 1.0.1
  * cn:

@@ -87,6 +87,7 @@ public:
     bool qpaReady = false;
     quint32 qpaWaitTime = 0;
     QTimer repaintTimer{};
+    bool repaintedOnce = false;
 };
 
 FRAMELESSHELPER_END_NAMESPACE

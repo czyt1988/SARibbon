@@ -830,7 +830,7 @@ QRect MicaMaterialPrivate::mapToWallpaper(const QRect &rect) const
 }
 
 MicaMaterial::MicaMaterial(QObject *parent)
-    : QObject(parent), d_ptr(new MicaMaterialPrivate(this))
+    : QObject(parent), d_ptr(std::make_unique<MicaMaterialPrivate>(this))
 {
 }
 

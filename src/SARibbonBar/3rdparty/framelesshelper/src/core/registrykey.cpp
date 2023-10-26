@@ -66,7 +66,7 @@ static constexpr const std::array<ULONG_PTR, 10> g_registryKeyMap =
     0x80000060  // HKEY_PERFORMANCE_NLSTEXT
 };
 static constexpr const auto registryKeyCount = std::size(g_registryKeyMap);
-static_assert(registryKeyCount == (static_cast<int>(RegistryRootKey::PerformanceNlsText) + 1));
+static_assert(registryKeyCount == (static_cast<quint8>(RegistryRootKey::PerformanceNlsText) + 1));
 
 [[maybe_unused]] static Q_STRING_CONSTEXPR const std::array<FRAMELESSHELPER_STRING_TYPE, registryKeyCount> g_registryStrMap =
 {
@@ -91,14 +91,14 @@ RegistryKey::RegistryKey(const RegistryRootKey root, const QString &key, QObject
     m_rootKey = root;
     m_subKey = key;
 #if REGISTRYKEY_QWINREGISTRYKEY
-    m_registryKey.reset(new QWinRegistryKey(reinterpret_cast<HKEY>(g_registryKeyMap.at(static_cast<int>(m_rootKey))), m_subKey));
+    m_registryKey = std::make_unique<QWinRegistryKey>(reinterpret_cast<HKEY>(g_registryKeyMap.at(static_cast<quint8>(m_rootKey))), m_subKey);
     if (!m_registryKey->isValid()) {
         m_registryKey.reset();
     }
 #else
-    const QString rootKey = g_registryStrMap.at(static_cast<int>(m_rootKey));
+    const QString rootKey = g_registryStrMap.at(static_cast<quint8>(m_rootKey));
     const auto lastSlashPos = m_subKey.lastIndexOf(u'\\');
-    m_settings.reset(new QSettings(rootKey + u'\\' + m_subKey.left(lastSlashPos), QSettings::NativeFormat));
+    m_settings = std::make_unique<QSettings>(rootKey + u'\\' + m_subKey.left(lastSlashPos), QSettings::NativeFormat);
     if (m_settings->childGroups().contains(m_subKey.mid(lastSlashPos + 1))) {
         m_settings.reset(new QSettings(rootKey + u'\\' + m_subKey, QSettings::NativeFormat));
     } else {
@@ -122,9 +122,9 @@ QString RegistryKey::subKey() const
 bool RegistryKey::isValid() const
 {
 #if REGISTRYKEY_QWINREGISTRYKEY
-    return (!m_registryKey.isNull() && m_registryKey->isValid());
+    return (m_registryKey && m_registryKey->isValid());
 #else
-    return !m_settings.isNull();
+    return m_settings;
 #endif
 }
 

@@ -84,7 +84,7 @@ const FramelessQuickApplicationWindowPrivate *FramelessQuickApplicationWindowPri
 }
 
 FramelessQuickApplicationWindow::FramelessQuickApplicationWindow(QWindow *parent)
-    : QQuickApplicationWindow(parent), d_ptr(new FramelessQuickApplicationWindowPrivate(this))
+    : QQuickApplicationWindow(parent), d_ptr(std::make_unique<FramelessQuickApplicationWindowPrivate>(this))
 {
     QQuickItem * const rootItem = contentItem();
     FramelessQuickHelper::get(rootItem)->extendsContentIntoTitleBar();

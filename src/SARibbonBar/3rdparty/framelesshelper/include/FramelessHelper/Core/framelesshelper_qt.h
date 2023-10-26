@@ -25,6 +25,7 @@
 #pragma once
 
 #include <FramelessHelper/Core/framelesshelpercore_global.h>
+#include <memory>
 
 #if !FRAMELESSHELPER_CONFIG(native_impl)
 

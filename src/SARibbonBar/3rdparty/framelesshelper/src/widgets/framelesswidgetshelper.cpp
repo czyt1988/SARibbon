@@ -161,7 +161,7 @@ static inline void forceWidgetRepaint(QWidget *widget)
     if (!widget) {
         return;
     }
-#ifdef Q_OS_WINDOWS
+#if (defined(Q_OS_WINDOWS) && (QT_VERSION < QT_VERSION_CHECK(6, 5, 3)))
     // There's some additional things to do for top level windows on Windows.
     if (widget->isWindow()) {
         // Don't crash if the QWindow instance has not been created yet.
@@ -186,7 +186,7 @@ static inline void forceWidgetRepaint(QWidget *widget)
         // A widget will most likely repaint itself if it's size is changed.
         if (!isWidgetFixedSize(widget)) {
             const QSize originalSize = widget->size();
-            static constexpr const auto margins = QMargins{10, 10, 10, 10};
+            static constexpr const auto margins = QMargins{ 1, 1, 1, 1 };
             widget->resize(originalSize.shrunkBy(margins));
             widget->resize(originalSize.grownBy(margins));
             widget->resize(originalSize);
@@ -216,7 +216,10 @@ FramelessWidgetsHelperPrivate::FramelessWidgetsHelperPrivate(FramelessWidgetsHel
     connect(&repaintTimer, &QTimer::timeout, this, &FramelessWidgetsHelperPrivate::doRepaintAllChildren);
 }
 
-FramelessWidgetsHelperPrivate::~FramelessWidgetsHelperPrivate() = default;
+FramelessWidgetsHelperPrivate::~FramelessWidgetsHelperPrivate()
+{
+    detach();
+}
 
 FramelessWidgetsHelperPrivate *FramelessWidgetsHelperPrivate::get(FramelessWidgetsHelper *pub)
 {
@@ -374,15 +377,19 @@ void FramelessWidgetsHelperPrivate::repaintAllChildren()
 
 void FramelessWidgetsHelperPrivate::doRepaintAllChildren()
 {
-    if (!window) {
-        return;
-    }
-    forceWidgetRepaint(window);
-    const QList<QWidget *> widgets = window->findChildren<QWidget *>();
-    for (auto &&widget : std::as_const(widgets)) {
-        forceWidgetRepaint(widget);
-    }
     repaintTimer.stop();
+    if (repaintedOnce) {
+        if (!window) {
+            return;
+        }
+        forceWidgetRepaint(window);
+        const QList<QWidget *> widgets = window->findChildren<QWidget *>();
+        for (auto &&widget : std::as_const(widgets)) {
+            forceWidgetRepaint(widget);
+        }
+    } else {
+        repaintedOnce = true;
+    }
 }
 
 quint32 FramelessWidgetsHelperPrivate::readyWaitTime() const
@@ -775,7 +782,7 @@ void FramelessWidgetsHelper::setSystemButton(QWidget *widget, const SystemButton
 }
 
 FramelessWidgetsHelper::FramelessWidgetsHelper(QObject *parent)
-    : QObject(parent), d_ptr(new FramelessWidgetsHelperPrivate(this))
+    : QObject(parent), d_ptr(std::make_unique<FramelessWidgetsHelperPrivate>(this))
 {
 }
 

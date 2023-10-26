@@ -25,6 +25,7 @@
 #pragma once
 
 #include <FramelessHelper/Quick/framelesshelperquick_global.h>
+#include <memory>
 
 #if (FRAMELESSHELPER_CONFIG(private_qt) && FRAMELESSHELPER_CONFIG(window) && (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)))
 

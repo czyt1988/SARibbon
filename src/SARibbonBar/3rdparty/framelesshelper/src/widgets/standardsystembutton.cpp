@@ -86,7 +86,7 @@ QSize StandardSystemButtonPrivate::getRecommendedButtonSize()
 }
 
 StandardSystemButton::StandardSystemButton(QWidget *parent)
-    : QPushButton(parent), d_ptr(new StandardSystemButtonPrivate(this))
+    : QPushButton(parent), d_ptr(std::make_unique<StandardSystemButtonPrivate>(this))
 {
     FramelessManagerPrivate::initializeIconFont();
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);

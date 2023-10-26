@@ -26,6 +26,7 @@
 
 #include <FramelessHelper/Quick/framelesshelperquick_global.h>
 #include <QtQuick/qquickpainteditem.h>
+#include <memory>
 
 #if FRAMELESSHELPER_CONFIG(border_painter)
 

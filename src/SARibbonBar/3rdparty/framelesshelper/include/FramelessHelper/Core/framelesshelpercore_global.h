@@ -268,7 +268,7 @@ QT_END_NAMESPACE
 #  define FRAMELESSHELPER_CLASS_DPTR(Class) \
   private: \
       Q_DECLARE_PRIVATE(Class) \
-      const QScopedPointer<Class##Private> d_ptr;
+      const std::unique_ptr<Class##Private> d_ptr;
 #endif
 
 #ifndef FRAMELESSHELPER_CLASS_QPTR
@@ -395,9 +395,19 @@ Q_NAMESPACE_EXPORT(FRAMELESSHELPER_CORE_API)
 
 [[maybe_unused]] inline constexpr const char kDontOverrideCursorVar[] = "FRAMELESSHELPER_DONT_OVERRIDE_CURSOR";
 [[maybe_unused]] inline constexpr const char kDontToggleMaximizeVar[] = "FRAMELESSHELPER_DONT_TOGGLE_MAXIMIZE";
+[[maybe_unused]] inline constexpr const char kSysMenuDisableMoveVar[] = "FRAMELESSHELPER_SYSTEM_MENU_DISABLE_MOVE";
+[[maybe_unused]] inline constexpr const char kSysMenuDisableSizeVar[] = "FRAMELESSHELPER_SYSTEM_MENU_DISABLE_SIZE";
 [[maybe_unused]] inline constexpr const char kSysMenuDisableMinimizeVar[] = "FRAMELESSHELPER_SYSTEM_MENU_DISABLE_MINIMIZE";
 [[maybe_unused]] inline constexpr const char kSysMenuDisableMaximizeVar[] = "FRAMELESSHELPER_SYSTEM_MENU_DISABLE_MAXIMIZE";
 [[maybe_unused]] inline constexpr const char kSysMenuDisableRestoreVar[] = "FRAMELESSHELPER_SYSTEM_MENU_DISABLE_RESTORE";
+[[maybe_unused]] inline constexpr const char kSysMenuDisableCloseVar[] = "FRAMELESSHELPER_SYSTEM_MENU_DISABLE_CLOSE";
+[[maybe_unused]] inline constexpr const char kSysMenuRemoveMoveVar[] = "FRAMELESSHELPER_SYSTEM_MENU_REMOVE_MOVE";
+[[maybe_unused]] inline constexpr const char kSysMenuRemoveSizeVar[] = "FRAMELESSHELPER_SYSTEM_MENU_REMOVE_SIZE";
+[[maybe_unused]] inline constexpr const char kSysMenuRemoveMinimizeVar[] = "FRAMELESSHELPER_SYSTEM_MENU_REMOVE_MINIMIZE";
+[[maybe_unused]] inline constexpr const char kSysMenuRemoveMaximizeVar[] = "FRAMELESSHELPER_SYSTEM_MENU_REMOVE_MAXIMIZE";
+[[maybe_unused]] inline constexpr const char kSysMenuRemoveRestoreVar[] = "FRAMELESSHELPER_SYSTEM_MENU_REMOVE_RESTORE";
+[[maybe_unused]] inline constexpr const char kSysMenuRemoveSeparatorVar[] = "FRAMELESSHELPER_SYSTEM_MENU_REMOVE_SEPARATOR";
+[[maybe_unused]] inline constexpr const char kSysMenuRemoveCloseVar[] = "FRAMELESSHELPER_SYSTEM_MENU_REMOVE_CLOSE";
 
 enum class Option : quint8
 {
