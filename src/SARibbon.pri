@@ -7,6 +7,15 @@
 # 使用方法见例子：src\example\SimpleExample\
 #
 #-------------------------------------------------
+
+# 引入第三方库framelesshelper
+# 1.framelesshelper/qmake/inc/core/framelesshelper.config中的FRAMELESSHELPER_FEATURE_static_build设置为-1
+include($$PWD/SARibbonBar/3rdparty/framelesshelper/qmake/core.pri)
+include($$PWD/SARibbonBar/3rdparty/framelesshelper/qmake/widgets.pri)
+DEFINES += FRAMELESSHELPER_CORE_LIBRARY
+DEFINES += FRAMELESSHELPER_WIDGETS_LIBRARY
+DEFINES += FRAMELESSHELPER_FEATURE_static_build=1
+
 SOURCES += \
     $$PWD/SARibbon.cpp
     
