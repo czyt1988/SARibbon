@@ -9,6 +9,10 @@
  * @note My native language is not English, and most of the translation of documents is machine translation
  *
  * 版本记录(change log):
+ * 2023-10-26 -> 1.0.2
+ * cn:
+ * 添加了SARibbonBar在QWidget窗口上使用的例子
+ * 整理了SARibbon.h和SARibbon.cpp,调整了静态使用的例子
  *
  * 2023-10-14 -> 1.0.1
  * cn:
@@ -80,7 +84,7 @@
  * @def ribbon的数字版本 MAJ.MIN.{PAT}
  */
 #ifndef SA_RIBBON_BAR_VERSION_PAT
-#define SA_RIBBON_BAR_VERSION_PAT 1
+#define SA_RIBBON_BAR_VERSION_PAT 2
 #endif
 
 /**

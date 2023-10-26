@@ -7,6 +7,7 @@ include($$PWD/3rdparty/framelesshelper/qmake/core.pri)
 include($$PWD/3rdparty/framelesshelper/qmake/widgets.pri)
 DEFINES += FRAMELESSHELPER_CORE_LIBRARY
 DEFINES += FRAMELESSHELPER_WIDGETS_LIBRARY
+DEFINES += FRAMELESSHELPER_FEATURE_static_build=-1
 #-------------------------------------------------
 #
 # SARibbon的文件
