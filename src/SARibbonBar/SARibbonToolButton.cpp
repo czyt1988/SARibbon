@@ -811,9 +811,13 @@ void SARibbonToolButton::paintButton(QPainter& p, const QStyleOptionToolButton& 
     // QStyle::State_MouseOver 代表当前鼠标位于按钮上面
     QStyleOption tool = opt;
     bool autoRaise    = opt.state & QStyle::State_AutoRaise;
+    if (defaultAction()->objectName() == tr("Menu Button Popup checkable")) {
+        qDebug() << opt;
+    }
     //绘制按钮
     if (autoRaise) {
         //这个是为了实现按钮点击下去后(QStyle::State_Sunken),能出现选中的状态
+        //先绘制一个鼠标不在按钮上的状态
         if (opt.state & QStyle::State_Sunken) {
             tool.state &= ~QStyle::State_MouseOver;
         }
@@ -827,9 +831,10 @@ void SARibbonToolButton::paintButton(QPainter& p, const QStyleOptionToolButton& 
             if (!(opt.activeSubControls & QStyle::SC_ToolButtonMenu)) {  //按钮的菜单弹出时不做处理
                 if (LargeButton == d_ptr->mButtonType) {                 //大按钮模式
                     if (d_ptr->mMouseOnSubControl) {                     //此时鼠标在indecater那
-                        //鼠标在文字区，把图标显示为正常
-                        tool.rect  = d_ptr->mDrawIconRect;
-                        tool.state = (QStyle::State_Raised);  //把图标区域显示为正常
+                        //鼠标在文字区，把图标显示为正常（就是鼠标不放上去的状态）
+                        tool.rect = d_ptr->mDrawIconRect;
+                        tool.state |= (QStyle::State_Raised);  //把图标区域显示为正常
+                        tool.state &= ~QStyle::State_MouseOver;
                         if (autoRaise) {
                             style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
                         } else {
@@ -837,7 +842,8 @@ void SARibbonToolButton::paintButton(QPainter& p, const QStyleOptionToolButton& 
                         }
                     } else {
                         //鼠标在图标区，把文字显示为正常
-                        tool.state = (QStyle::State_Raised);  //把图标区域显示为正常
+                        tool.state |= (QStyle::State_Raised);  //把图标区域显示为正常
+                        tool.state &= ~QStyle::State_MouseOver;
                         //文字和Indicator都显示正常
                         tool.rect = d_ptr->mDrawTextRect.united(d_ptr->mDrawIndicatorArrowRect);
                         if (autoRaise) {
