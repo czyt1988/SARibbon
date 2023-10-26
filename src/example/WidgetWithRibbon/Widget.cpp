@@ -4,26 +4,27 @@
 #include "SARibbonCategory.h"
 #include "SARibbonPannel.h"
 #include "SARibbonMainWindow.h"
+#include "SARibbonQuickAccessBar.h"
 Widget::Widget(QWidget* parent) : QWidget(parent), ui(new Ui::Widget)
 {
     // 注意：ui文件中有个QVBoxLayout布局
     ui->setupUi(this);
     // 直接创建SARibbonBar
-    SARibbonBar* ribbonbar = new SARibbonBar(this);
+    mRibbonBar = new SARibbonBar(this);
     // QWidget模式下，没有必要再显示标题
-    ribbonbar->setTitleVisible(false);
+    mRibbonBar->setTitleVisible(false);
     // QWidget模式下，直接使用紧凑模式效果更好
-    ribbonbar->setRibbonStyle(SARibbonBar::RibbonStyleCompactThreeRow);
+    mRibbonBar->setRibbonStyle(SARibbonBar::RibbonStyleCompactThreeRow);
     // 取消applicationbutton
-    ribbonbar->setApplicationButton(nullptr);
+    mRibbonBar->setApplicationButton(nullptr);
     //设置主题，这里虽然没用到SARibbonMainWindow，但Ribbon的主题是SARibbonMainWindow中定义的，因此要引入SARibbonMainWindow.h
-    sa_set_ribbon_theme(ribbonbar, SARibbonMainWindow::RibbonThemeOffice2013);
+    sa_set_ribbon_theme(mRibbonBar, SARibbonMainWindow::RibbonThemeOffice2013);
 
     // QWidgets设置一个QVBoxLayout，把窗口放到QVBoxLayout的第二个布局中，第一个布局给SARibbonBar
     // 这样，SARibbonBar就会在最上面
-    ui->verticalLayout->insertWidget(0, ribbonbar);
+    ui->verticalLayout->insertWidget(0, mRibbonBar);
 
-    buildRibbon(ribbonbar);
+    buildRibbon(mRibbonBar);
 }
 
 Widget::~Widget()
@@ -46,6 +47,10 @@ void Widget::buildRibbon(SARibbonBar* bar)
     pannel2->addLargeAction(createAction("setting", ":/icon/icon/customize0.svg"));
     pannel2->addLargeAction(createAction("windowsflag", ":/icon/icon/windowsflag-normal.svg"));
     bar->addCategoryPage(page1);
+
+    SARibbonQuickAccessBar* qbar = mRibbonBar->quickAccessBar();
+    qbar->addAction(createAction("undo", ":/icon/icon/undo.svg"));
+    qbar->addAction(createAction("redo", ":/icon/icon/redo.svg"));
 }
 
 QAction* Widget::createAction(const QString& text, const QString& iconurl)

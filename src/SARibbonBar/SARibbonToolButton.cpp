@@ -811,9 +811,6 @@ void SARibbonToolButton::paintButton(QPainter& p, const QStyleOptionToolButton& 
     // QStyle::State_MouseOver 代表当前鼠标位于按钮上面
     QStyleOption tool = opt;
     bool autoRaise    = opt.state & QStyle::State_AutoRaise;
-    if (defaultAction()->objectName() == tr("Menu Button Popup checkable")) {
-        qDebug() << opt;
-    }
     //绘制按钮
     if (autoRaise) {
         //这个是为了实现按钮点击下去后(QStyle::State_Sunken),能出现选中的状态
