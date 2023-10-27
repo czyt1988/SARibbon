@@ -1,6 +1,19 @@
 ﻿
 [中文文档点击这里](./readme-cn.md)
 
+
+<img src="https://img.shields.io/badge/C++-17-blue"/>
+<img src="https://img.shields.io/badge/Qt-5.9+-green"/>
+<img src="https://img.shields.io/badge/Qt-6-green"/>
+<img src="https://img.shields.io/badge/license-MIT-yellow"/>
+
+<img src="https://img.shields.io/badge/windows-0077d6
+"/>
+<img src="https://img.shields.io/badge/ubuntu-ed6432
+"/>
+<img src="https://img.shields.io/badge/macos-000
+"/>
+
 ||Windows(2019, latest)|Linux ubuntu(20.04, latest)|Mac(11-latest)|
 |:-|:-|:-|:-|
 |Qt5 (5.14.2-5.15.0)|[![cmake-win-qt5](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt5.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt5.yml)|[![CMake-Linux-Qt5](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt5.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt5.yml)|[![cmake-mac-qt5](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt5.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt5.yml)|
@@ -10,9 +23,9 @@
 
 MIT protocol, welcome to use and make comments
 
-[gitee:https://gitee.com/czyt1988/SARibbon ] ( https://gitee.com/czyt1988/SARibbon )
+[gitee:https://gitee.com/czyt1988/SARibbon](https://gitee.com/czyt1988/SARibbon)
 
-[github:https://github.com/czyt1988/SARibbon ] ( https://github.com/czyt1988/SARibbon )
+[github:https://github.com/czyt1988/SARibbon](https://github.com/czyt1988/SARibbon)
 
 Several layout methods are provided, and themes can be freely defined through QSS
 
