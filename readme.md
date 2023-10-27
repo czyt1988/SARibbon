@@ -6,8 +6,6 @@
 |Qt5 (5.14.2-5.15.0)|[![cmake-win-qt5](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt5.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt5.yml)|[![CMake-Linux-Qt5](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt5.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt5.yml)|[![cmake-mac-qt5](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt5.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt5.yml)|
 |Qt6 (6.2.0-6.5.0)|[![cmake-win-qt6](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt6.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt6.yml)|[![CMake-Linux-Qt6](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt6.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt6.yml)|[![cmake-mac-qt6](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt6.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt6.yml)|
 
-The minimum requirement is Qt5.14 or above, with c++17 standard support (due to the use of the frameless library, the minimum requirement for this library is c++17). Qt5.14 has improved high-dpi support, and it is recommended to update Qt below this version to Qt5.14 or above
-
 ![](./doc/screenshot/001.gif)
 
 MIT protocol, welcome to use and make comments
@@ -22,18 +20,44 @@ Several layout methods are provided, and themes can be freely defined through QS
 
 # Build
 
+Note: Requires C++17 standard support (due to the use of the frameless library, this library requires C++17 as a minimum), Qt version is at least above Qt5.9, otherwise it cannot support C++17.  Recommend using Qt5.14 or above, as Qt5.14 improves support for high resolutions.
+
+Since the minimum C++ version is 17, you need to add the following in your qmake file:
+
+```shell
+CONFIG += c++17
+```
+
 ## Import into project (static)
 
-SARibbon provides amalgamated `SARibbon.h` and `SARibbon.cpp` files, which can be imported into the project and used without the need to compile them into a dynamic library. You can refer to the example of SimpleExample (located in `src/example/SimpleExample`), and use the following four files for static import:
+SARibbon provides amalgamated `SARibbon.h` and `SARibbon.cpp` files, which can be imported into the project and used without the need to compile them into a dynamic library. You can refer to the example of SimpleExample (located in `src/example/SimpleExample`).Static import uses four files: `SARibbon. h`,`SARibbon. cpp`, `SARibbon. pri`, `SARibbonBar/resource.qrc`, as well as two folders: `SARibbonBar/3rdparty` and `SARibbonBar/resource`:
 
 ```
-SARibbon.h
-SARibbon.cpp
-SARibbon.pri
-SARibbonBar/resource.qrc
+|-you-project-dir
+|  |-you-project.pro
+|  |-SARibbon.h
+|  |-SARibbon.cpp
+|  |-SARibbon.pri
+|  |-SARibbonBar
+|     |-resource.qrc
+|     |-resource(copy the complete resource floder under SARibbonBar)
+|        |-resource files
+|     |-3rdparty(copy the complete 3rdparty floder under SARibbonBar)
+|        |-framelesshelper
+|           |-src
+|           |  |-src files
+|           |-include
+|           |  |-header files
+|           |-qmake
+|           |  |-pri files
 ```
 
-If using cmake, only the three files `SARibbon.h` `SARibbon.cpp`, and `resource.qrc` are required
+Use qmake to compile, by following these steps:
+- 1.Copy `SARibbon.h`, `SARibbon.cpp`, `SARibbon.pri` to your project directory
+- 2.Create a folder named `SARibbonBar` under your project directory
+- 3.Copy the `src/SARibbonBar/resource.qrc` file in the source code to the `SARibbonBar` folder under your project directory
+- 4.Copy the `resource` folder and `3rdparty` folder under the source code `src/SARibbonBar` to the `SARibbonBar` folder under your project directory
+- 5.Import the `SARibbon.pri` file in the pro file of your own project, such as: `include($$PWD/SARibbon.pri)`
 
 ## Compile as Library (Dynamic)
 
@@ -292,10 +316,53 @@ void MainWindow::initRightButtonGroup(){
     rightBar->addAction(actionHelp);
 }
 ```
+## Using SARibbonBar in QWidget or QDialog
+
+`SARibbonBar` supports using it on `QWidget` or `QDialog`.  See the example: `src/example/WidgetWithRibbon`
+You only need to use `SARibbonBar` as a normal window.  Here is a rough description of the process of creating a `SARibbonBar` in a `QWidget`
+
+First, declare the pointer of `SARibbonBar` in the header file
+
+```cpp
+private:
+    Ui::Widget* ui;
+    SARibbonBar* mRibbonBar { nullptr };
+```
+
+Create a `SARibbonBar` in the constructor of the widget. There is a `QVBoxLayout` layout in the ui file of the widget. Place the `SARibbonBar` on the top layer. At the same time, because there is no need to display the title in the `QWidget` mode, you can call the `SARibbonBar::setTitleVisible` method to hide the title. The application button can also be cancelled by passing in a null pointer through `SARibbonBar::setApplicationButton` if it is unnecessary in the `QWidget`. Finally, because the subject of the SARibbonBar is set in the `SARibbonMainWindow` method, the subject can be set in the `QWidget` through the global function `sa_set_ribbon_theme `to set
+
+
+```cpp
+Widget::Widget(QWidget* parent) : QWidget(parent), ui(new Ui::Widget)
+{
+    //Note: There is a QVBoxLayout layout in the ui file
+    ui->setupUi(this);
+    //Create SARibbonBar directly
+    mRibbonBar = new SARibbonBar(this);
+    //In QWidget mode, it is unnecessary to display the title
+    mRibbonBar->setTitleVisible(false);
+    //In QWidget mode, it is better to use compact mode directly
+    mRibbonBar->setRibbonStyle(SARibbonBar::RibbonStyleCompactThreeRow);
+    //remove the applicationbutton
+    mRibbonBar->setApplicationButton(nullptr);
+    //Set the theme. Although SARibbonMainWindow is not used here, the theme of the ribbon is defined in SARibbonMainWindow, so SARibbonMainWindow.h should be imported
+    sa_set_ribbon_theme(mRibbonBar, SARibbonMainWindow::RibbonThemeOffice2013);
+
+    //QWidgets sets a QVBoxLayout, places the window in the second layout of QVBoxLayout, and gives the first layout to SARibbonBar
+    //In this way, SARibbonBar will be at the top
+    ui->verticalLayout->insertWidget(0, mRibbonBar);
+
+    buildRibbon(mRibbonBar);
+}
+```
+
+The screenshot is as follows:
+
+![Ribbon for QWidget](./doc/screenshot/ribbonbar-use-in-qwidget.png)
 
 # SARibbon style
 
- `SARibbon` supports switching between four ribbon styles. Here, the ribbon style of 'office' and 'WPS' is referred.
+ `SARibbon` supports switching between four ribbon styles. Here, the ribbon style of `office` and `WPS` is referred.
 Online style switching can be realized through`void SARibbonBar::setRibbonStyle(RibbonStyle v)`.
 
 ## Office Ribbon style
