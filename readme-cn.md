@@ -5,8 +5,6 @@
 |Qt5 (5.14.2-5.15.0)|[![cmake-win-qt5](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt5.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt5.yml)|[![CMake-Linux-Qt5](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt5.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt5.yml)|[![cmake-mac-qt5](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt5.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt5.yml)|
 |Qt6 (6.2.0-6.5.0)|[![cmake-win-qt6](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt6.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt6.yml)|[![CMake-Linux-Qt6](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt6.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt6.yml)|[![cmake-mac-qt6](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt6.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt6.yml)|
 
-最低要求Qt5.14以上，c++17标准支持（由于使用了frameless库，此库最低要求c++17）,Qt5.14完善了高分辨率的支持，建议低于此版本的Qt都更新到Qt5.14以上
-
  界面截图：
 
 ![](./doc/screenshot/001.gif)
@@ -23,7 +21,7 @@ SARibbon提供了几种布局方式，以及可以通过qss自由定义主题
 
 # 构建
 
-> 注意:要求C++17，需要支持C++17的对应Qt版本（Qt5.9.1以上）
+> 注意:要求c++17标准支持（由于使用了frameless库，此库最低要求c++17），Qt版本至少在Qt5.9以上，否则无法支持C++17,推荐使用Qt5.14以上版本,因为Qt5.14完善了高分辨率的支持
 
 由于最低C++版本为17，因此，在你的qmake文件中，需要添加：
 
@@ -33,7 +31,7 @@ CONFIG += c++17
 
 ## 直接引入工程（静态）
 
-SARibbon提供了合并好的`SARibbon.h`文件和`SARibbon.cpp`文件，只需要在工程引入这两个文件，同时把资源文件和第三方库文件引入就可以使用，无需编译为动态库，可以参考SimpleExample的例子（位于`src/example/SimpleExample`），静态引入使用到`SARibbon.h`、`SARibbon.cpp`、`SARibbon.pri`、`SARibbonBar/resource.qrc`4个文件以及`SARibbonBar/3rdparty`这个文件夹：
+SARibbon提供了合并好的`SARibbon.h`文件和`SARibbon.cpp`文件，只需要在工程引入这两个文件，同时把资源文件和第三方库文件引入就可以使用，无需编译为动态库，可以参考SimpleExample的例子（位于`src/example/SimpleExample`），静态引入使用到`SARibbon.h`、`SARibbon.cpp`、`SARibbon.pri`、`SARibbonBar/resource.qrc`4个文件以及`SARibbonBar/3rdparty`,`SARibbonBar/resource`这两个文件夹：
 
 你的工程目录将如下所示：
 
@@ -57,7 +55,12 @@ SARibbon提供了合并好的`SARibbon.h`文件和`SARibbon.cpp`文件，只需�
 |           |  |-pri files
 ```
 
-使用qmake，只需把`SARibbon.h`、`SARibbon.cpp`、`SARibbon.pri`拷贝到自己工程目录下，同时创建`SARibbonBar`文件夹，并把`resource.qrc`文件拷贝到`SARibbonBar`文件夹下，把`resource`文件夹和`3rdparty`文件夹拷贝到`SARibbonBar`文件夹即可使用
+使用qmake编译，可通过如下步骤：
+- 1. 把`SARibbon.h`、`SARibbon.cpp`、`SARibbon.pri`拷贝到自己工程目录下
+- 2. 在自己工程目录下创建`SARibbonBar`文件夹
+- 3. 把源码中的`src/SARibbonBar/resource.qrc`文件拷贝到自己工程目录下的`SARibbonBar`文件夹
+- 4. 把源码`src/SARibbonBar`下的`resource`文件夹和`3rdparty`文件夹拷贝到自己工程目录下的`SARibbonBar`文件夹中
+- 5. 在自己工程的pro文件中引入`SARibbon.pri`文件，如：`include($$PWD/SARibbon.pri)`
 
 ## 编译为库（动态）
 
@@ -65,7 +68,7 @@ SARibbon提供了合并好的`SARibbon.h`文件和`SARibbon.cpp`文件，只需�
 
 > 在debug模式编译的库后面会加上'd'以作区别
 
-> 注意:最低的Qt版本为5.14并要求C++17
+> 注意:最低的Qt版本为5.9(建议使用Qt5.14)并要求C++17
 
 ## Linux下构建
 
@@ -303,6 +306,49 @@ void MainWindow::initRightButtonGroup(){
     rightBar->addAction(actionHelp);
 }
 ```
+## 在QWidget或QDialog中使用SARibbonBar
+
+SARibbonBar支持在QWidget或者QDialog上使用，具体可见例子：`src/example/WidgetWithRibbon`
+
+你只需要把SARibbonBar当做一个普通窗口使用即可，下面大致介绍一下在QWidget中创建`SARibbonBar`的过程
+
+首先在头文件声明SARibbonBar的窗口指针
+
+```cpp
+private:
+    Ui::Widget* ui;
+    SARibbonBar* mRibbonBar { nullptr };
+```
+
+在Widget的构造函数中创建`SARibbonBar`,Widget的ui文件中有个`QVBoxLayout`布局，把`SARibbonBar`放置在最顶层，同时，由于QWidget模式下，没有必要再显示标题，可以调用`SARibbonBar::setTitleVisible`方法把标题隐藏。applicationbutton在QWidget如果没有必要也可以通过`SARibbonBar::setApplicationButton`传入一个空指针取消掉，最后由于SARibbonBar的主题是在`SARibbonMainWindow`方法中设置的，在QWidget中设置主题可通过全局函数`sa_set_ribbon_theme`进行设置
+
+```cpp
+Widget::Widget(QWidget* parent) : QWidget(parent), ui(new Ui::Widget)
+{
+    // 注意：ui文件中有个QVBoxLayout布局
+    ui->setupUi(this);
+    // 直接创建SARibbonBar
+    mRibbonBar = new SARibbonBar(this);
+    // QWidget模式下，没有必要再显示标题
+    mRibbonBar->setTitleVisible(false);
+    // QWidget模式下，直接使用紧凑模式效果更好
+    mRibbonBar->setRibbonStyle(SARibbonBar::RibbonStyleCompactThreeRow);
+    // 取消applicationbutton
+    mRibbonBar->setApplicationButton(nullptr);
+    //设置主题，这里虽然没用到SARibbonMainWindow，但Ribbon的主题是SARibbonMainWindow中定义的，因此要引入SARibbonMainWindow.h
+    sa_set_ribbon_theme(mRibbonBar, SARibbonMainWindow::RibbonThemeOffice2013);
+
+    // QWidgets设置一个QVBoxLayout，把窗口放到QVBoxLayout的第二个布局中，第一个布局给SARibbonBar
+    // 这样，SARibbonBar就会在最上面
+    ui->verticalLayout->insertWidget(0, mRibbonBar);
+
+    buildRibbon(mRibbonBar);
+}
+```
+
+效果如下：
+
+![Ribbon用在QWidget上](./doc/screenshot/ribbonbar-use-in-qwidget.png)
 
 # SARibbon样式
 
