@@ -3,7 +3,8 @@ SET(VERSION_SHORT 0.1)
 project(MainWindowExample VERSION ${VERSION_SHORT}) 
 set(SARIBBON_EXPAMPLE_NAME MainWindowExample)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
+# 显示定义FRAMELESSHELPER_FEATURE_static_build为-1 否则库引用会失败
+add_definitions(-DFRAMELESSHELPER_FEATURE_static_build=-1)
 # qt库加载，最低要求5.8
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} 5.8 COMPONENTS Core Gui Widgets REQUIRED)

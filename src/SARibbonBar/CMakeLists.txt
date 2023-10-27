@@ -31,6 +31,8 @@ if(UNIX AND NOT APPLE)
 endif()
 
 # frameless core 相关路径设置
+# 显示定义FRAMELESSHELPER_FEATURE_static_build为-1
+add_definitions(-DFRAMELESSHELPER_FEATURE_static_build=-1)
 
 SET(FRAMELESS_HEADER_BASE ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/framelesshelper/include)
 SET(FRAMELESS_HEADER_DIR ${FRAMELESS_HEADER_BASE}/FramelessHelper)
