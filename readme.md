@@ -1,18 +1,19 @@
 ﻿
 [中文文档点击这里](./readme-cn.md)
 
-
+<div align="center">
+<p>
 <img src="https://img.shields.io/badge/C++-17-blue"/>
 <img src="https://img.shields.io/badge/Qt-5.9+-green"/>
 <img src="https://img.shields.io/badge/Qt-6-green"/>
 <img src="https://img.shields.io/badge/license-MIT-yellow"/>
-
-<img src="https://img.shields.io/badge/windows-0077d6
-"/>
-<img src="https://img.shields.io/badge/ubuntu-ed6432
-"/>
-<img src="https://img.shields.io/badge/macos-000
-"/>
+</p>
+<p>
+<img src="https://img.shields.io/badge/windows-0077d6"/>
+<img src="https://img.shields.io/badge/ubuntu-ed6432"/>
+<img src="https://img.shields.io/badge/macos-000"/>
+</p>
+</div>
 
 ||Windows(2019, latest)|Linux ubuntu(20.04, latest)|Mac(11-latest)|
 |:-|:-|:-|:-|
