@@ -82,7 +82,7 @@ public:
 
     QColor savedWindowBackgroundColor = {};
     bool blurBehindWindowEnabled = false;
-    QPointer<QWidget> window = nullptr;
+    QPointer<QWidget> window;//QPointer<QWidget> window = nullptr; can not compile under mingw
     bool qpaReady = false;
     QSizePolicy savedSizePolicy = {};
     quint32 qpaWaitTime = 0;

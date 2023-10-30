@@ -79,10 +79,21 @@
 #  define NTDDI_VERSION NTDDI_WIN10_NI
 #endif
 
+#if _WIN32_WINNT < _WIN32_WINNT_WIN10
+#undef _WIN32_WINNT
+#define _WIN32_WINNT _WIN32_WINNT_WIN10
+#endif
+
+#if WINVER < _WIN32_WINNT_WIN10
+#undef WINVER
+#define WINVER _WIN32_WINNT_WIN10
+#endif
+
 #include <windows.h>
 #include <uxtheme.h>
 #include <shellapi.h>
 #include <dwmapi.h>
+
 
 #include <FramelessHelper/Core/framelesshelpercore_global.h>
 

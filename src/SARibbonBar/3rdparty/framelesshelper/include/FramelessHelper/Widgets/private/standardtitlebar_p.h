@@ -80,7 +80,7 @@ public:
     StandardSystemButton *maximizeButton = nullptr;
     StandardSystemButton *closeButton = nullptr;
 #endif
-    QPointer<QWidget> window = nullptr;
+    QPointer<QWidget> window;////QPointer<QWidget> window = nullptr; can not compile under mingw
     bool extended = false;
     Qt::Alignment labelAlignment = {};
     bool hideWhenClose = false;

@@ -185,6 +185,7 @@ void FramelessQuickHelperPrivate::attach()
     }
 
     if (!data->callbacks) {
+        QPointer<QWindow> w = window;
         data->callbacks = FramelessCallbacks::create();
         data->callbacks->getWindowId = [window]() -> WId { return window->winId(); };
         data->callbacks->getWindowFlags = [window]() -> Qt::WindowFlags { return window->flags(); };
@@ -198,7 +199,7 @@ void FramelessQuickHelperPrivate::attach()
         data->callbacks->setWindowFixedSize = [q](const bool value) -> void { q->setWindowFixedSize(value); };
         data->callbacks->getWindowState = [window]() -> Qt::WindowState { return window->windowState(); };
         data->callbacks->setWindowState = [window](const Qt::WindowState state) -> void { window->setWindowState(state); };
-        data->callbacks->getWindowHandle = [q]() -> QWindow * { return q->window(); };
+        data->callbacks->getWindowHandle = [w]() -> QWindow * { return w; };
         data->callbacks->windowToScreen = [window](const QPoint &pos) -> QPoint { return window->mapToGlobal(pos); };
         data->callbacks->screenToWindow = [window](const QPoint &pos) -> QPoint { return window->mapFromGlobal(pos); };
         data->callbacks->isInsideSystemButtons = [this](const QPoint &pos, SystemButtonType *button) -> bool {
