@@ -3,7 +3,7 @@
 <div align="center">
 <p>
 <img src="https://img.shields.io/badge/C++-17-blue"/>
-<img src="https://img.shields.io/badge/Qt-5.9+-green"/>
+<img src="https://img.shields.io/badge/Qt-5.14+-green"/>
 <img src="https://img.shields.io/badge/Qt-6-green"/>
 <img src="https://img.shields.io/badge/license-MIT-yellow"/>
 </p>
@@ -35,7 +35,7 @@ SARibbon提供了几种布局方式，以及可以通过qss自由定义主题
 
 # 构建
 
-> 注意:要求c++17标准支持（由于使用了frameless库，此库最低要求c++17），Qt版本至少在Qt5.9以上，否则无法支持C++17,推荐使用Qt5.14以上版本,因为Qt5.14完善了高分辨率的支持
+> 注意:要求c++17标准支持（由于使用了frameless库，此库最低要求c++17），Qt版本至少在Qt5.14及以上，否则无法编译frameless库，推荐使用Qt5.14以上版本,因为Qt5.14完善了高分辨率的支持
 
 由于最低C++版本为17，因此，在你的qmake文件中，需要添加：
 
@@ -82,7 +82,7 @@ SARibbon提供了合并好的`SARibbon.h`文件和`SARibbon.cpp`文件，只需�
 
 > 在debug模式编译的库后面会加上'd'以作区别
 
-> 注意:最低的Qt版本为5.9(建议使用Qt5.14)并要求C++17
+> 注意:最低的Qt版本为5.14，并要求C++17
 
 ## Linux下构建
 
