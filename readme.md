@@ -4,7 +4,7 @@
 <div align="center">
 <p>
 <img src="https://img.shields.io/badge/C++-17-blue"/>
-<img src="https://img.shields.io/badge/Qt-5.9+-green"/>
+<img src="https://img.shields.io/badge/Qt-5.14+-green"/>
 <img src="https://img.shields.io/badge/Qt-6-green"/>
 <img src="https://img.shields.io/badge/license-MIT-yellow"/>
 </p>
@@ -34,7 +34,7 @@ Several layout methods are provided, and themes can be freely defined through QS
 
 # Build
 
-Note: Requires C++17 standard support (due to the use of the frameless library, this library requires C++17 as a minimum), Qt version is at least above Qt5.9, otherwise it cannot support C++17.  Recommend using Qt5.14 or above, as Qt5.14 improves support for high resolutions.
+Note: Requires C++17 standard support (due to the use of the frameless library, this library requires C++17 as a minimum), Qt version is at least above Qt5.14, otherwise it unable to compile frameless library.  Recommend using Qt5.14 or above, as Qt5.14 improves support for high resolutions.
 
 Since the minimum C++ version is 17, you need to add the following in your qmake file:
 
