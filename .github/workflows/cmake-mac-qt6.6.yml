@@ -1,4 +1,4 @@
-name: CMake-Mac-Qt6
+name: CMake-Mac-Qt6.6
 
 on: [pull_request,push]
 
@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         macos_version: [11, latest]
-        qt_version: [6.2.0,6.5.0]
+        qt_version: [6.6.*]
         shared: [ON]
 
     steps:
