@@ -1,5 +1,5 @@
 ﻿
-[中文文档点击这里](./readme-cn.md)
+[中文文档点击这里,QQ群:434014314](./readme-cn.md)
 
 <div align="center">
 <p>
