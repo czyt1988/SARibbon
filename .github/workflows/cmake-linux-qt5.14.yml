@@ -1,4 +1,4 @@
-name: CMake-Linux-Qt5
+name: CMake-Linux-Qt5.14
 
 on: [pull_request,push]
 
@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         ubuntu_version: [20.04, latest]
-        qt_version: [5.14.2,5.15.0]
+        qt_version: [5.14.*]
         shared: [ON]
 
     steps:

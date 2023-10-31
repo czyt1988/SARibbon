@@ -1,4 +1,4 @@
-name: CMake-Windows-Qt6.3
+name: CMake-Mac-Qt6.1
 
 on: [pull_request,push]
 
@@ -7,14 +7,14 @@ env:
   BUILD_TYPE: Release
 
 jobs:
-  MSVC:
-    name: windows-${{ matrix.win_version }}-Qt-${{ matrix.qt_version }}-shared-${{ matrix.shared }}
-    runs-on: windows-${{ matrix.win_version }}
+  macos:
+    runs-on: macos-${{ matrix.macos_version }}
+    name: macos-${{ matrix.macos_version }}-Qt-${{ matrix.qt_version }}-shared-${{ matrix.shared }}
     strategy:
       fail-fast: false
       matrix:
-        win_version: [2019, latest]
-        qt_version: [6.3.*]
+        macos_version: [11, latest]
+        qt_version: [6.1.*]
         shared: [ON]
 
     steps:
