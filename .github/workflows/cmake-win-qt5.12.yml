@@ -1,4 +1,4 @@
-name: CMake-Windows-Qt6
+name: CMake-Windows-Qt5.12LTS
 
 on: [pull_request,push]
 
@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         win_version: [2019, latest]
-        qt_version: [6.2.0,6.5.0]
+        qt_version: [5.12.0,5.12.12]
         shared: [ON]
 
     steps:
