@@ -43,7 +43,9 @@ Several layout methods are provided, and themes can be freely defined through QS
 
 # Build
 
-Note: Requires C++17 standard support (due to the use of the frameless library, this library requires C++17 as a minimum), Qt version is at least above Qt5.14, otherwise it unable to compile frameless library.  Recommend using Qt5.14 or above, as Qt5.14 improves support for high resolutions.
+> Qmake and cmake will choose whether to load the frameless library based on the qt version, and will choose whether to use C++11 or C++17 based on different qt versions
+
+> Note: Requires C++17 standard support (due to the use of the frameless library, this library requires C++17 as a minimum), Qt version is at least above Qt5.14, otherwise it unable to compile frameless library.  Recommend using Qt5.14 or above, as Qt5.14 improves support for high resolutions.
 
 Since the minimum C++ version is 17, you need to add the following in your qmake file:
 
@@ -81,6 +83,8 @@ Use qmake to compile, by following these steps:
 - 3.Copy the `src/SARibbonBar/resource.qrc` file in the source code to the `SARibbonBar` folder under your project directory
 - 4.Copy the `resource` folder and `3rdparty` folder under the source code `src/SARibbonBar` to the `SARibbonBar` folder under your project directory
 - 5.Import the `SARibbon.pri` file in the pro file of your own project, such as: `include($$PWD/SARibbon.pri)`
+
+Static use of SARibbon can refer to the example of StaticExample (located in `src/example/StaticExample`)
 
 ## Compile as Library (Dynamic)
 

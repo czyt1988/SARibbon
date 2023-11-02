@@ -51,7 +51,9 @@ SARibbon提供了几种布局方式，以及可以通过qss自由定义主题
 
 # 构建
 
-> 注意:要求c++17标准支持（由于使用了frameless库，此库最低要求c++17），Qt版本至少在Qt5.14及以上，否则无法编译frameless库，推荐使用Qt5.14以上版本,因为Qt5.14完善了高分辨率的支持
+> qmake和cmake会根据qt版本选择是否加载frameless库，会根据不同的qt版本选择使用c++11还是C++17
+
+> 注意:如果使用frameless库，要求c++17标准支持（由于使用了frameless库，此库最低要求c++17），Qt版本至少在Qt5.14及以上，否则无法编译frameless库，推荐使用Qt5.14以上版本,因为Qt5.14完善了高分辨率的支持
 
 由于最低C++版本为17，因此，在你的qmake文件中，需要添加：
 
@@ -61,7 +63,7 @@ CONFIG += c++17
 
 ## 直接引入工程（静态）
 
-SARibbon提供了合并好的`SARibbon.h`文件和`SARibbon.cpp`文件，只需要在工程引入这两个文件，同时把资源文件和第三方库文件引入就可以使用，无需编译为动态库，可以参考SimpleExample的例子（位于`src/example/SimpleExample`），静态引入使用到`SARibbon.h`、`SARibbon.cpp`、`SARibbon.pri`、`SARibbonBar/resource.qrc`4个文件以及`SARibbonBar/3rdparty`,`SARibbonBar/resource`这两个文件夹：
+SARibbon提供了合并好的`SARibbon.h`文件和`SARibbon.cpp`文件，只需要在工程引入这两个文件，同时把资源文件和第三方库文件引入就可以使用，无需编译为动态库，可以参考StaticExample的例子（位于`src/example/StaticExample`），静态引入使用到`SARibbon.h`、`SARibbon.cpp`、`SARibbon.pri`、`SARibbonBar/resource.qrc`4个文件以及`SARibbonBar/3rdparty`,`SARibbonBar/resource`这两个文件夹：
 
 你的工程目录将如下所示：
 
