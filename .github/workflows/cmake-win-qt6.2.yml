@@ -1,4 +1,4 @@
-name: CMake-Windows-Qt6.2
+name: CMake-Windows-Qt6.2LTS
 
 on: [pull_request,push]
 

@@ -1,4 +1,4 @@
-name: CMake-Windows-Qt5.15
+name: CMake-Windows-Qt5.15LTS
 
 on: [pull_request,push]
 

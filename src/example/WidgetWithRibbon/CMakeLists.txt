@@ -8,6 +8,36 @@ add_definitions(-DFRAMELESSHELPER_FEATURE_static_build=-1)
 # qt库加载，最低要求5.9
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} 5.9 COMPONENTS Core Gui Widgets REQUIRED)
+
+# 在加载qt版本后，需要下面这段开判断是否使用framelss
+# 根据qt版本选择是否使用frameless库，目前frameless库支持qt5.14,qt5.15,qt6.4+,除了上诉版本，都使用不了
+if(${QT_VERSION_MAJOR} EQUAL 5)
+    # qt版本为5，判断是否小版本大于14
+    if(${QT_VERSION_MINOR} GREATER_EQUAL 14)
+        #5.14和5.15可以使用frameless
+        set(SARIBBON_USE_FRAMELESS_LIB ON)
+    else()
+        set(SARIBBON_USE_FRAMELESS_LIB OFF)
+    endif()
+elseif(${QT_VERSION_MAJOR} EQUAL 6)
+    # qt版本为6，判断是否小版本大于4
+    if(${QT_VERSION_MINOR} GREATER_EQUAL 4)
+        #6.4及以上可以使用frameless
+        set(SARIBBON_USE_FRAMELESS_LIB ON)
+    else()
+        set(SARIBBON_USE_FRAMELESS_LIB OFF)
+    endif()
+endif()
+if(SARIBBON_USE_FRAMELESS_LIB)
+    #使用frameless必须设置SARIBBON_USE_3RDPARTY_FRAMELESSHELPER宏为1
+    add_definitions(-DSARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1)
+else()
+    #不使用frameless必须设置SARIBBON_USE_3RDPARTY_FRAMELESSHELPER宏为0
+    add_definitions(-DSARIBBON_USE_3RDPARTY_FRAMELESSHELPER=0)
+endif()
+
+
+
 add_executable(${SARIBBON_EXPAMPLE_NAME} 
     Widget.h
     Widget.cpp

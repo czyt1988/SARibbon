@@ -9,13 +9,24 @@
  * @note My native language is not English, and most of the translation of documents is machine translation
  *
  * 版本记录(change log):
- * 2023-10-26 -> 1.0.2
+ *
+ * - 2023-11-02 -> 1.0.4
+ *
+ * cn:因为引入了framelss库，导致很多版本的qt无法编译，为了兼容不同版本的qt编译问题，进行了版本自适应，
+ * 不符合framelss的qt版本自动使用原来的framelss方案，从而实现了qt5.9到qt6的完全支持
+ * en:Because of the introduction of the framelss library, many versions of qt cannot be compiled.
+ * In order to be compatible with different versions of qt compilation, version adaptation is carried out.
+ * The qt version that does not conform to the framelss automatically uses the original framelss scheme, thus realizing full support for qt5.9 to qt6
+ *
+ * - 2023-10-26 -> 1.0.2
+ *
  * cn:
  * 添加了SARibbonBar在QWidget窗口上使用的例子
  * 整理了SARibbon.h和SARibbon.cpp,调整了静态使用的例子
  * frameless库更新到c4a7bc8版本（20231022）
  *
- * 2023-10-14 -> 1.0.1
+ * - 2023-10-14 -> 1.0.1
+ *
  * cn:
  * 引入第三方库frameless
  * 支持ubuntu和macos
@@ -28,7 +39,9 @@
  * 添加了QWidget使用SARibbonBar的例子
  * 同步把自定义ribbon的SARibbonMainWindow的依赖去除
  * 完善了文档包括高分屏问题和linux编译的方法
+ *
  * en(machine translation):
+ *
  * import third-party library:frameless
  * Supports ubuntu and macos
  * Solving the problem of multi screen movement in Windwos system
@@ -41,29 +54,33 @@
  * Synchronize the removal of dependencies on SARibbonMainWindow for custom ribbons
  * Improved documentation including high resolution issues and methods for compiling Linux
  *
- * -----1.x版本的为引入第三方库frameless，需要c++17支持，qt5.14以上
- * -----0.x版本的为没有引入第三方库frameless，仅仅对windows进行适配，c++11即可，qt5.8以上
- * 2023-10-09 -> 0.7.1
+ * - 2023-10-09 -> 0.7.1
+ *
  * 增加了深色主题
  * 调整了枚举的命名方式
  * 增加了一些重绘方式
  *
- * 2023-10-09 -> 0.7.0
+ * - 2023-10-09 -> 0.7.0
+ *
  * 修正了category的布局问题
  *
- * 2023-09-27 -> 0.6.0
+ * - 2023-09-27 -> 0.6.0
+ *
  * 添加了Amalgamate，修正了一些显示的bug，修正cmake的异常
  * 添加了上下文标签中category标题名字改变的信号
  *
- * 2023-05-28 -> 0.5.0
+ * - 2023-05-28 -> 0.5.0
+ *
  * 调整了大按钮模式下的显示方案，去除了原来SARibbonToolButton的Lite和Normal模式，以WordWrap来表征
  * 支持文字自定义换行
  * 调整了RibbonPannel的标题栏的高度计算方案
  *
- * 0.5.1
+ * - 0.5.1
+ *
  * 不使用QString::simplified,而是简单的仅仅替换\n的simplified，这样中文换行不会多出空格
  *
- * 0.5.2
+ * - 0.5.2
+ *
  * SARibbonColorToolButton\SARibbonToolButton修正&操作在三项表达式未加括号问题
  * SARibbonStyleOption添加虚析构函数
  * 原来SARibbonElementCreateDelegate类改名为SARibbonElementFactory
@@ -125,13 +142,14 @@
 #define SA_RIBBON_DECLARE_PUBLIC(classname)                                                                            \
     friend class classname;                                                                                            \
     classname* q_ptr { nullptr };                                                                                      \
-    PrivateData(const PrivateData&) = delete;                                                                          \
+    PrivateData(const PrivateData&)            = delete;                                                               \
     PrivateData& operator=(const PrivateData&) = delete;
 #endif
 
 /**
  * @def 定义此宏用第三方的frameless作为无边框方案
+ * 此宏在qmake或在cmake中定义，不需要在此显示定义
  */
-#define SARIBBON_USE_3RDPARTY_FRAMELESSHELPER 1
+// #define SARIBBON_USE_3RDPARTY_FRAMELESSHELPER 0
 
 #endif  // SARIBBONGLOBAL_H
