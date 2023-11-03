@@ -6,6 +6,12 @@
 #include "../../src/SARibbonBar/colorWidgets/SAColorGridWidget.h"
 #include "../../src/SARibbonBar/colorWidgets/SAColorPaletteGridWidget.h"
 #include "../../src/SARibbonBar/colorWidgets/SAColorToolButton.h"
+//frameless
+#include "../../src/SARibbonBar/3rdparty/FramelessWindowConverter/FramelessWindowConverter.h"
+#include "../../src/SARibbonBar/3rdparty/FramelessWindowConverter/FramelessWindowConverter_p.h"
+#include "../../src/SARibbonBar/3rdparty/FramelessWindowConverter/FramelessWindowConverterWindows.h"
+#include "../../src/SARibbonBar/3rdparty/FramelessWindowConverter/FramelessWindowConverterLinux.h"
+#include "../../src/SARibbonBar/3rdparty/FramelessWindowConverter/FramelessWindowConverterMacos.h"
 //sa ribbon
 #include "../../src/SARibbonBar/SAFramelessHelper.h"
 #include "../../src/SARibbonBar/SARibbonApplicationButton.h"
@@ -26,7 +32,6 @@
 #include "../../src/SARibbonBar/SARibbonTabBar.h"
 #include "../../src/SARibbonBar/SARibbonControlButton.h"
 #include "../../src/SARibbonBar/SARibbonMenu.h"
-
 #include "../../src/SARibbonBar/SARibbonPannelOptionButton.h"
 #include "../../src/SARibbonBar/SARibbonPannelItem.h"
 #include "../../src/SARibbonBar/SARibbonPannelLayout.h"

@@ -19,11 +19,16 @@
 #pragma warning (push)
 #pragma warning (disable: 4996) // deprecated POSIX names
 #endif
-
+//sa color button
 #include "../../src/SARibbonBar/colorWidgets/SAColorMenu.cpp"
 #include "../../src/SARibbonBar/colorWidgets/SAColorGridWidget.cpp"
 #include "../../src/SARibbonBar/colorWidgets/SAColorPaletteGridWidget.cpp"
 #include "../../src/SARibbonBar/colorWidgets/SAColorToolButton.cpp"
+//frameless
+#include "../../src/SARibbonBar/3rdparty/FramelessWindowConverter/FramelessWindowConverter.cpp"
+#include "../../src/SARibbonBar/3rdparty/FramelessWindowConverter/FramelessWindowConverter_p.cpp"
+#include "../../src/SARibbonBar/3rdparty/FramelessWindowConverter/FramelessWindowConverterWindows.cpp"
+#include "../../src/SARibbonBar/3rdparty/FramelessWindowConverter/FramelessWindowConverterLinux.cpp"
 //sa ribbon
 #include "../../src/SARibbonBar/SAFramelessHelper.cpp"
 #include "../../src/SARibbonBar/SARibbonApplicationButton.cpp"
@@ -44,7 +49,6 @@
 #include "../../src/SARibbonBar/SARibbonTabBar.cpp"
 #include "../../src/SARibbonBar/SARibbonControlButton.cpp"
 #include "../../src/SARibbonBar/SARibbonMenu.cpp"
-
 #include "../../src/SARibbonBar/SARibbonPannelOptionButton.cpp"
 #include "../../src/SARibbonBar/SARibbonPannelItem.cpp"
 #include "../../src/SARibbonBar/SARibbonPannelLayout.cpp"

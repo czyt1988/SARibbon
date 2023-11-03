@@ -223,12 +223,6 @@
     PrivateData& operator=(const PrivateData&) = delete;
 #endif
 
-/**
- * @def 定义此宏用第三方的frameless作为无边框方案
- * 此宏在qmake或在cmake中定义，不需要在此显示定义
- */
-// #define SARIBBON_USE_3RDPARTY_FRAMELESSHELPER 0
-
 #endif  // SARIBBONGLOBAL_H
 
 /*** End of inlined file: SARibbonGlobal.h ***/
@@ -525,6 +519,489 @@ signals:
 #endif  // SACOLORTOOLBUTTON_H
 
 /*** End of inlined file: SAColorToolButton.h ***/
+
+// frameless
+
+/*** Start of inlined file: FramelessWindowConverter.h ***/
+#ifndef WINDOWFRAME_H
+#define WINDOWFRAME_H
+
+#include <functional>
+
+namespace FWC
+{
+
+class FramelessWindowConverter
+{
+public:
+    FramelessWindowConverter();
+    virtual ~FramelessWindowConverter();
+
+    virtual bool filterNativeEvents(void* message, long* result) final;
+
+    void convertWindowToFrameless(
+            unsigned long long inWindowHandle,
+            std::function< void(void) > releaseMouseGrab = []() {});
+
+    void toggleWindowFrameAfterConversion();
+    bool getIsFrameless();
+
+    inline unsigned long long getWindowHandle()
+    {
+        return windowHandle;
+    }
+    inline std::function< bool(int, int) > getShouldPerformWindowDrag()
+    {
+        return shouldPerformWindowDrag;
+    }
+
+    // Decide if the window should be dragged when a mouse click was detected at current mouse Position
+    // default inShouldPerformWindowDrag means you can click anywhere in the window to move it
+    void setShouldPerformWindowDrag(std::function< bool(int, int) > inShouldPerformWindowDrag);
+
+    // Release Mouse Grab to give the window manager control over it
+    inline std::function< void(void) > getReleaseMouseGrab()
+    {
+        return releaseMouseGrab;
+    }
+    void setReleaseMouseGrab(std::function< void(void) > inReleaseMouseGrab);
+
+    // Border Width for resizing (default is 8 pixels)
+    void setBorderWidth(int inBorderWidth);
+    int getBorderWidth();
+    void setEnableResizing(bool inEnableResizing);
+    bool getEnableResizing();
+
+    // Minimum and maximum window sizes
+    int getMinimumWindowWidth();
+    int getMinimumWindowHeight();
+    int getMaximumWindowWidth();
+    int getMaximumWindowHeight();
+
+    void setMinimumWindowWidth(int inWidth);
+    void setMinimumWindowHeight(int inHeight);
+    void setMaximumWindowWidth(int inWidth);
+    void setMaximumWindowHeight(int inHeight);
+
+    void setMinMaxWindowSizes(int inMinWidth, int inMinHeight, int inMaxWidth, int inMaxHeight);
+
+    // Window control
+    void hideForTranslucency();
+    void showForTranslucency();
+    void minimizeWindow();
+    void maximizeWindow();
+    void restoreWindow();
+    void closeWindow();
+    void toggleFullscreen();
+
+    // Only works on macOS and Windows
+    void setEnableShadow(bool inEnableShadow);
+    bool getHasShadow();
+
+    // macOS settings
+    void useTrafficLightsOnMacOS(bool inUseTrafficLights);
+    bool isUsingTrafficLightsOnMacOS();
+
+    // Hide/Show or Enable/Disable individual traffic lights on macOS
+    void setHiddenGreenTrafficLightOnMacOS(bool inHidden);
+    void setHiddenRedTrafficLightOnMacOS(bool inHidden);
+    void setHiddenYellowTrafficLightOnMacOS(bool inHidden);
+    bool getHiddenGreenTrafficLightOnMacOS();
+    bool getHiddenRedTrafficLightOnMacOS();
+    bool getHiddenYellowTrafficLightOnMacOS();
+
+    void setEnabledGreenTrafficLightOnMacOS(bool inEnabled);
+    void setEnabledRedTrafficLightOnMacOS(bool inEnabled);
+    void setEnabledYellowTrafficLightOnMacOS(bool inEnabled);
+    bool getEnabledGreenTrafficLightOnMacOS();
+    bool getEnabledRedTrafficLightOnMacOS();
+    bool getEnabledYellowTrafficLightOnMacOS();
+
+    // Positions are relative to upper left window corner
+    void setHorizontalAlignmentOfTrafficLightsOnMacOS(bool inHorizontal);
+    bool getHorizontalAlignmentOfTrafficLightsOnMacOS();
+    void setUpperLeftXPositionOfTrafficLightsOnMacOS(int inXPos);
+    void setUpperLeftYPositionOfTrafficLightsOnMacOS(int inYPos);
+    int getUpperLeftXPositionOfTrafficLightsOnMacOS();
+    int getUpperLeftYPositionOfTrafficLightsOnMacOS();
+
+private:
+    class FramelessWindowConverterPrivate* d_ptr;
+    unsigned long long windowHandle;
+    std::function< bool(int, int) > shouldPerformWindowDrag = [](int, int) { return true; };
+    std::function< void(void) > releaseMouseGrab;
+    int borderWidth = 8;
+    int minimumWindowWidth;
+    int minimumWindowHeight;
+    int maximumWindowWidth;
+    int maximumWindowHeight;
+    bool bUseTrafficLights = false;
+    bool bIsFramless       = false;
+    bool bHasShadow        = false;
+    bool bEnableResizing   = true;
+
+    // macOS Settings
+    bool bHiddenGreen  = false;
+    bool bHiddenRed    = false;
+    bool bHiddenYellow = false;
+
+    bool bEnabledGreen  = true;
+    bool bEnabledRed    = true;
+    bool bEnabledYellow = true;
+
+    // Default is horizontal
+    bool bTrafficLightsAlignmentHorizontal = true;
+    int xPosOfTrafficLights = 7, yPosOfTrafficLights = 3;
+};
+
+}
+
+#endif  // WINDOWFRAME_H
+
+/*** End of inlined file: FramelessWindowConverter.h ***/
+
+/*** Start of inlined file: FramelessWindowConverter_p.h ***/
+#ifndef NATIVEWINDOWEVENTFILTER_P_H
+#define NATIVEWINDOWEVENTFILTER_P_H
+
+namespace FWC
+{
+
+class FramelessWindowConverter;
+
+// Same structure as _NET_WM_MOVERESIZ_*
+// #define _NET_WM_MOVERESIZE_SIZE_TOPLEFT      0
+// #define _NET_WM_MOVERESIZE_SIZE_TOP          1
+// #define _NET_WM_MOVERESIZE_SIZE_TOPRIGHT     2
+// #define _NET_WM_MOVERESIZE_SIZE_RIGHT        3
+// #define _NET_WM_MOVERESIZE_SIZE_BOTTOMRIGHT  4
+// #define _NET_WM_MOVERESIZE_SIZE_BOTTOM       5
+// #define _NET_WM_MOVERESIZE_SIZE_BOTTOMLEFT   6
+// #define _NET_WM_MOVERESIZE_SIZE_LEFT         7
+// #define _NET_WM_MOVERESIZE_MOVE              8   /* movement only */
+enum class FWCBorderHitTestResult
+{
+    TOP_LEFT,
+    TOP,
+    TOP_RIGHT,
+    RIGHT,
+    BOTTOM_RIGHT,
+    BOTTOM,
+    BOTTOM_LEFT,
+    LEFT,
+    CLIENT,
+    NONE
+};
+
+struct FWCRect
+{
+    int x1;
+    int y1;
+    int x2;
+    int y2;
+
+    FWCRect(int inX1, int inY1, int inX2, int inY2) : x1(inX1), y1(inY1), x2(inX2), y2(inY2)
+    {
+    }
+    inline int left()
+    {
+        return x1;
+    }
+    inline int right()
+    {
+        return x2;
+    }
+    inline int top()
+    {
+        return y1;
+    }
+    inline int bottom()
+    {
+        return y2;
+    }
+};
+
+struct FWCPoint
+{
+    int x;
+    int y;
+
+    FWCPoint(int inX, int inY) : x(inX), y(inY)
+    {
+    }
+    FWCPoint() : x(0), y(0)
+    {
+    }
+};
+
+struct FWCFloatingPoint
+{
+    double x;
+    double y;
+
+    FWCFloatingPoint(double inX, double inY) : x(inX), y(inY)
+    {
+    }
+    FWCFloatingPoint() : x(0), y(0)
+    {
+    }
+};
+
+class FramelessWindowConverterPrivate
+{
+public:
+    static FramelessWindowConverterPrivate* create(FramelessWindowConverter* q);
+    FramelessWindowConverterPrivate() = delete;
+    FramelessWindowConverterPrivate(FramelessWindowConverter* q) : q_ptr(q)
+    {
+    }
+    virtual ~FramelessWindowConverterPrivate()
+    {
+    }
+    virtual bool filterNativeEvent(void* message, long* result) = 0;
+
+    virtual void convertToFrameless()       = 0;
+    virtual void convertToWindowWithFrame() = 0;
+
+    virtual void hideForTranslucency()
+    {
+    }
+    virtual void showForTranslucency()
+    {
+    }
+    virtual void minimizeWindow()   = 0;
+    virtual void maximizeWindow()   = 0;
+    virtual void closeWindow()      = 0;
+    virtual void restoreWindow()    = 0;
+    virtual void toggleFullscreen() = 0;
+    virtual void setEnableShadow()
+    {
+    }
+
+    // MacOS
+    virtual void setHiddenGreenTrafficLightOnMacOS(bool inHidden)
+    {
+        (void)inHidden;
+    }
+    virtual void setHiddenRedTrafficLightOnMacOS(bool inHidden)
+    {
+        (void)inHidden;
+    }
+    virtual void setHiddenYellowTrafficLightOnMacOS(bool inHidden)
+    {
+        (void)inHidden;
+    }
+
+    virtual void setEnabledGreenTrafficLightOnMacOS(bool inEnabled)
+    {
+        (void)inEnabled;
+    }
+    virtual void setEnabledRedTrafficLightOnMacOS(bool inEnabled)
+    {
+        (void)inEnabled;
+    }
+    virtual void setEnabledYellowTrafficLightOnMacOS(bool inEnabled)
+    {
+        (void)inEnabled;
+    }
+
+    virtual void setHorizontalAlignmentOfTrafficLightsOnMacOS()
+    {
+    }
+    virtual void setUpperLeftXPositionOfTrafficLightsOnMacOS()
+    {
+    }
+    virtual void setUpperLeftYPositionOfTrafficLightsOnMacOS()
+    {
+    }
+
+protected:
+    FramelessWindowConverter* q_ptr;
+    virtual FWCBorderHitTestResult doBorderHitTest(FWCRect inWindowRect, FWCPoint inMousePosition, int inBorderWidth);
+    bool bFullscreen = false;
+};
+
+}
+
+#endif  // NATIVEWINDOWEVENTFILTER_P_H
+
+/*** End of inlined file: FramelessWindowConverter_p.h ***/
+
+/*** Start of inlined file: FramelessWindowConverterWindows.h ***/
+#ifndef WINDOWSNATIVEWINDOWEVENTFILTER_P_H
+#define WINDOWSNATIVEWINDOWEVENTFILTER_P_H
+
+#ifdef WIN32
+
+#include <qt_windows.h>
+
+namespace FWC
+{
+
+class FramelessWindowConverterWindows : public FramelessWindowConverterPrivate
+{
+public:
+    FramelessWindowConverterWindows(FramelessWindowConverter* q);
+    bool filterNativeEvent(void* message, long* result) override;
+    void convertToFrameless() override;
+    void convertToWindowWithFrame() override;
+    void minimizeWindow() override;
+    void maximizeWindow() override;
+    void restoreWindow() override;
+    void closeWindow() override;
+    void toggleFullscreen() override;
+    void setEnableShadow() override;
+
+private:
+    FWCRect getCurrentClientRect();
+    FWCRect getCurrentWindowRect();
+    FWCPoint getCurrentMousePos(LPARAM lParam);
+    HWND handle;
+
+    // Not using WS_CAPTION in borderless, since it messes with translucent Qt-Windows.
+    enum class Style : DWORD
+    {
+        windowed = WS_OVERLAPPEDWINDOW | WS_THICKFRAME | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX,
+        // WS_CAPTION is needed for minimize/maximize animation -> it gets added to the window "on demand",
+        // to not get rounded corners with translucent windows (no idea why windows does this)
+        // The WM_SYSMENU etc. messes with maximized windows when they get reactivated -> windows positions them outside the screen
+        aero_borderless = WS_POPUP | WS_THICKFRAME /* | WS_CAPTION*/ | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX,
+        maximized_borderless = WS_POPUP | WS_THICKFRAME
+    };
+    void setFrameless(bool enabled);
+    class FramelessWindowConverterPrivate* d_ptr;
+};
+
+}
+
+#endif
+#endif  // WINDOWSNATIVEWINDOWEVENTFILTER_P_H
+
+/*** End of inlined file: FramelessWindowConverterWindows.h ***/
+
+/*** Start of inlined file: FramelessWindowConverterLinux.h ***/
+#ifndef FRAMELESSWINDOWCONVERTERLINUX_H
+#define FRAMELESSWINDOWCONVERTERLINUX_H
+
+#ifdef __linux__
+
+struct _XDisplay;
+typedef _XDisplay Display;
+
+struct xcb_connection_t;
+typedef xcb_connection_t xcb_connection_t;
+
+typedef unsigned int xcb_window_t;
+
+namespace FWC
+{
+
+class FramelessWindowConverterLinux : public FramelessWindowConverterPrivate
+{
+public:
+    FramelessWindowConverterLinux(FramelessWindowConverter* q);
+    void convertToFrameless() override;
+    void convertToWindowWithFrame() override;
+    bool filterNativeEvent(void* message, long* result) override;
+    void minimizeWindow() override;
+    void maximizeWindow() override;
+    void restoreWindow() override;
+    void closeWindow() override;
+    void toggleFullscreen() override;
+
+private:
+    xcb_connection_t* connection;
+    xcb_window_t rootWindow;
+    Display* display;
+    xcb_window_t windowHandle;
+
+    void changeCursorShape(unsigned int shape);
+    int xiOpCode;  // XInput
+    unsigned int lastButtonPressTime;
+    bool isSystemOpRunning = false;  // resize or move
+    FWCRect getCurrentWindowFrame();
+    unsigned int getAtom(const char* name);
+};
+
+}
+
+#endif
+#endif  // FRAMELESSWINDOWCONVERTERLINUX_H
+
+/*** End of inlined file: FramelessWindowConverterLinux.h ***/
+
+/*** Start of inlined file: FramelessWindowConverterMacos.h ***/
+#ifndef FRAMELESSWINDOWCONVERTERMACOS_H
+#define FRAMELESSWINDOWCONVERTERMACOS_H
+
+#ifdef __APPLE__
+
+#ifdef __OBJC__
+@class NSWindow;
+@class NSView;
+@class NSButton;
+#else
+class NSWindow;
+class NSView;
+class NSButton;
+#endif
+
+namespace FWC
+{
+
+class FramelessWindowConverter;
+
+class FramelessWindowConverterMacos : public FramelessWindowConverterPrivate
+{
+public:
+    FramelessWindowConverterMacos(FramelessWindowConverter* q);
+    bool filterNativeEvent(void* message, long* result) override;
+    void minimizeWindow() override;
+    void maximizeWindow() override;
+    void restoreWindow() override;
+    void closeWindow() override;
+    void toggleFullscreen() override;
+    void convertToFrameless() override;
+    void convertToWindowWithFrame() override;
+
+    void hideForTranslucency() override;
+    void showForTranslucency() override;
+
+    void setHiddenGreenTrafficLightOnMacOS(bool inHidden) override;
+    void setHiddenRedTrafficLightOnMacOS(bool inHidden) override;
+    void setHiddenYellowTrafficLightOnMacOS(bool inHidden) override;
+
+    void setEnabledGreenTrafficLightOnMacOS(bool inEnabled) override;
+    void setEnabledRedTrafficLightOnMacOS(bool inEnabled) override;
+    void setEnabledYellowTrafficLightOnMacOS(bool inEnabled) override;
+
+    void setHorizontalAlignmentOfTrafficLightsOnMacOS() override;
+    void setUpperLeftXPositionOfTrafficLightsOnMacOS() override;
+    void setUpperLeftYPositionOfTrafficLightsOnMacOS() override;
+
+private:
+    NSView* nativeWidgetView;
+    NSWindow* window;
+    NSButton* fullScreenButton;
+    NSButton* closeButton;
+    NSButton* minimizeButton;
+    bool isResizing                         = false;
+    bool isMoving                           = false;
+    FWC::FWCBorderHitTestResult currentBHTR = FWC::FWCBorderHitTestResult::NONE;
+    FWCFloatingPoint startDiffCursorFrameLocs;
+    void showCursorByHitResult(FWCBorderHitTestResult inBorderHitResult);
+    void showAppropriateCursor();
+    void resizeWindow(FWCFloatingPoint mouseLocationInWindow);
+    void repositionTrafficLights();
+    void showTrafficLights();
+};
+
+}
+
+#endif
+#endif  // FRAMELESSWINDOWCONVERTERMACOS_H
+
+/*** End of inlined file: FramelessWindowConverterMacos.h ***/
 
 // sa ribbon
 
@@ -3333,15 +3810,6 @@ private:
 
 #include <QMainWindow>
 
-#if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
-#include "FramelessHelper/Widgets/framelessmainwindow.h"
-FRAMELESSHELPER_BEGIN_NAMESPACE
-class StandardTitleBar;
-FRAMELESSHELPER_END_NAMESPACE
-#else
-class SAFramelessHelper;
-#endif
-
 class SARibbonBar;
 
 /**
@@ -3367,11 +3835,7 @@ class SARibbonBar;
  * 通过@ref setRibbonTheme 可改变ribbon的样式，用户也可通过qss自己定义自己的样式
  *
  */
-#if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
-class SA_RIBBON_EXPORT SARibbonMainWindow : public FRAMELESSHELPER_PREPEND_NAMESPACE(FramelessMainWindow)
-#else
 class SA_RIBBON_EXPORT SARibbonMainWindow : public QMainWindow
-#endif
 {
     Q_OBJECT
     SA_RIBBON_DECLARE_PRIVATE(SARibbonMainWindow)
@@ -3397,12 +3861,8 @@ public:
     ~SARibbonMainWindow() Q_DECL_OVERRIDE;
     // 返回SARibbonBar
     SARibbonBar* ribbonBar() const;
-#if !SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
-    // 返回SAFramelessHelper
-    SAFramelessHelper* framelessHelper();
     // 把ribbonbar的事件传递到frameless
     virtual bool eventFilter(QObject* obj, QEvent* e) Q_DECL_OVERRIDE;
-#endif
     // 此函数仅用于控制最小最大化和关闭按钮的显示
     void updateWindowFlag(Qt::WindowFlags flags);
     // 获取系统按钮的状态
@@ -3417,6 +3877,7 @@ protected:
     SARibbonBar* createRibbonBar();
     virtual void resizeEvent(QResizeEvent* event) Q_DECL_OVERRIDE;
     virtual bool event(QEvent* e) Q_DECL_OVERRIDE;
+    virtual bool nativeEvent(const QByteArray& eventType, void* message, long* result) Q_DECL_OVERRIDE;
 
 private:
     // 安装ribbon

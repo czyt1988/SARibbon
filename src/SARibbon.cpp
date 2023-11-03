@@ -22,6 +22,7 @@
 #pragma warning(push)
 #pragma warning(disable : 4996)  // deprecated POSIX names
 #endif
+// sa color button
 
 /*** Start of inlined file: SAColorMenu.cpp ***/
 #include <QWidgetAction>
@@ -1505,6 +1506,1136 @@ void SAColorToolButton::paintColor(QStylePainter* p, const QRect& colorRect, con
 }
 
 /*** End of inlined file: SAColorToolButton.cpp ***/
+
+// frameless
+
+/*** Start of inlined file: FramelessWindowConverter.cpp ***/
+using namespace FWC;
+
+FramelessWindowConverter::FramelessWindowConverter()
+    : d_ptr(FramelessWindowConverterPrivate::create(this))
+    , windowHandle(0)
+    , minimumWindowWidth(-1)
+    , minimumWindowHeight(-1)
+    , maximumWindowWidth(-1)
+    , maximumWindowHeight(-1)
+{
+}
+
+FramelessWindowConverter::~FramelessWindowConverter()
+{
+    delete d_ptr;
+}
+
+void FramelessWindowConverter::convertWindowToFrameless(unsigned long long inWindowHandle, std::function< void(void) > inReleaseMouseGrab)
+{
+    bIsFramless  = true;
+    windowHandle = inWindowHandle;
+    setReleaseMouseGrab(inReleaseMouseGrab);
+    d_ptr->convertToFrameless();
+}
+
+void FramelessWindowConverter::toggleWindowFrameAfterConversion()
+{
+    bIsFramless = !bIsFramless;
+    if (bIsFramless)
+        d_ptr->convertToWindowWithFrame();
+    else
+        d_ptr->convertToFrameless();
+}
+
+bool FramelessWindowConverter::getIsFrameless()
+{
+    return bIsFramless;
+}
+
+void FramelessWindowConverter::setEnableResizing(bool inEnableResizing)
+{
+    bEnableResizing = inEnableResizing;
+}
+bool FramelessWindowConverter::getEnableResizing()
+{
+    return bEnableResizing;
+}
+
+bool FramelessWindowConverter::filterNativeEvents(void* message, long* result)
+{
+    if (bIsFramless)
+        return d_ptr->filterNativeEvent(message, result);
+    else
+        return false;
+}
+
+void FramelessWindowConverter::setShouldPerformWindowDrag(std::function< bool(int, int) > inShouldPerformWindowDrag)
+{
+    if (inShouldPerformWindowDrag != nullptr)
+        shouldPerformWindowDrag = inShouldPerformWindowDrag;
+    else
+        shouldPerformWindowDrag = [](int, int) { return true; };
+}
+
+void FramelessWindowConverter::setReleaseMouseGrab(std::function< void(void) > inReleaseMouseGrab)
+{
+    if (inReleaseMouseGrab != nullptr)
+        releaseMouseGrab = inReleaseMouseGrab;
+    else
+        releaseMouseGrab = []() {};
+}
+
+void FramelessWindowConverter::minimizeWindow()
+{
+    d_ptr->minimizeWindow();
+}
+
+void FramelessWindowConverter::maximizeWindow()
+{
+    d_ptr->maximizeWindow();
+}
+
+void FramelessWindowConverter::closeWindow()
+{
+    d_ptr->closeWindow();
+}
+
+void FramelessWindowConverter::restoreWindow()
+{
+    d_ptr->restoreWindow();
+}
+
+void FramelessWindowConverter::toggleFullscreen()
+{
+    d_ptr->toggleFullscreen();
+}
+
+void FramelessWindowConverter::hideForTranslucency()
+{
+    d_ptr->hideForTranslucency();
+}
+
+void FramelessWindowConverter::showForTranslucency()
+{
+    d_ptr->showForTranslucency();
+}
+
+void FramelessWindowConverter::setEnableShadow(bool inEnableShadow)
+{
+    bHasShadow = inEnableShadow;
+    d_ptr->setEnableShadow();
+}
+
+bool FramelessWindowConverter::getHasShadow()
+{
+    return bHasShadow;
+}
+
+void FramelessWindowConverter::setBorderWidth(int inBorderWidth)
+{
+    borderWidth = inBorderWidth;
+}
+int FramelessWindowConverter::getBorderWidth()
+{
+    return borderWidth;
+}
+
+int FramelessWindowConverter::getMinimumWindowWidth()
+{
+    return minimumWindowWidth;
+}
+int FramelessWindowConverter::getMinimumWindowHeight()
+{
+    return minimumWindowHeight;
+}
+int FramelessWindowConverter::getMaximumWindowWidth()
+{
+    return maximumWindowWidth;
+}
+int FramelessWindowConverter::getMaximumWindowHeight()
+{
+    return maximumWindowHeight;
+}
+
+void FramelessWindowConverter::setMinimumWindowWidth(int inWidth)
+{
+    minimumWindowWidth = inWidth;
+}
+void FramelessWindowConverter::setMinimumWindowHeight(int inHeight)
+{
+    minimumWindowHeight = inHeight;
+}
+void FramelessWindowConverter::setMaximumWindowWidth(int inWidth)
+{
+    maximumWindowWidth = inWidth;
+}
+void FramelessWindowConverter::setMaximumWindowHeight(int inHeight)
+{
+    maximumWindowHeight = inHeight;
+}
+
+void FramelessWindowConverter::setMinMaxWindowSizes(int inMinWidth, int inMinHeight, int inMaxWidth, int inMaxHeight)
+{
+    minimumWindowWidth  = inMinWidth;
+    minimumWindowHeight = inMinHeight;
+    maximumWindowWidth  = inMaxWidth;
+    maximumWindowHeight = inMaxHeight;
+}
+
+void FramelessWindowConverter::useTrafficLightsOnMacOS(bool inUseTrafficLights)
+{
+    bUseTrafficLights = inUseTrafficLights;
+}
+
+bool FramelessWindowConverter::isUsingTrafficLightsOnMacOS()
+{
+    return bUseTrafficLights;
+}
+
+void FramelessWindowConverter::setHiddenGreenTrafficLightOnMacOS(bool inHidden)
+{
+    bHiddenGreen = inHidden;
+    d_ptr->setHiddenGreenTrafficLightOnMacOS(inHidden);
+}
+void FramelessWindowConverter::setHiddenRedTrafficLightOnMacOS(bool inHidden)
+{
+    bHiddenRed = inHidden;
+    d_ptr->setHiddenRedTrafficLightOnMacOS(inHidden);
+}
+void FramelessWindowConverter::setHiddenYellowTrafficLightOnMacOS(bool inHidden)
+{
+    bHiddenYellow = inHidden;
+    d_ptr->setHiddenYellowTrafficLightOnMacOS(inHidden);
+}
+
+bool FramelessWindowConverter::getHiddenGreenTrafficLightOnMacOS()
+{
+    return bHiddenGreen;
+}
+bool FramelessWindowConverter::getHiddenRedTrafficLightOnMacOS()
+{
+    return bHiddenRed;
+}
+bool FramelessWindowConverter::getHiddenYellowTrafficLightOnMacOS()
+{
+    return bHiddenYellow;
+}
+
+void FramelessWindowConverter::setEnabledGreenTrafficLightOnMacOS(bool inEnabled)
+{
+    bEnabledGreen = inEnabled;
+    d_ptr->setEnabledGreenTrafficLightOnMacOS(inEnabled);
+}
+void FramelessWindowConverter::setEnabledRedTrafficLightOnMacOS(bool inEnabled)
+{
+    bEnabledRed = inEnabled;
+    d_ptr->setEnabledRedTrafficLightOnMacOS(inEnabled);
+}
+void FramelessWindowConverter::setEnabledYellowTrafficLightOnMacOS(bool inEnabled)
+{
+    bEnabledYellow = inEnabled;
+    d_ptr->setEnabledYellowTrafficLightOnMacOS(inEnabled);
+}
+
+bool FramelessWindowConverter::getEnabledGreenTrafficLightOnMacOS()
+{
+    return bEnabledGreen;
+}
+bool FramelessWindowConverter::getEnabledRedTrafficLightOnMacOS()
+{
+    return bEnabledRed;
+}
+bool FramelessWindowConverter::getEnabledYellowTrafficLightOnMacOS()
+{
+    return bEnabledYellow;
+}
+
+void FramelessWindowConverter::setHorizontalAlignmentOfTrafficLightsOnMacOS(bool inHorizontal)
+{
+    bTrafficLightsAlignmentHorizontal = inHorizontal;
+    d_ptr->setHorizontalAlignmentOfTrafficLightsOnMacOS();
+}
+bool FramelessWindowConverter::getHorizontalAlignmentOfTrafficLightsOnMacOS()
+{
+    return bTrafficLightsAlignmentHorizontal;
+}
+
+void FramelessWindowConverter::setUpperLeftXPositionOfTrafficLightsOnMacOS(int inXPos)
+{
+    xPosOfTrafficLights = inXPos;
+    d_ptr->setUpperLeftXPositionOfTrafficLightsOnMacOS();
+}
+void FramelessWindowConverter::setUpperLeftYPositionOfTrafficLightsOnMacOS(int inYPos)
+{
+    yPosOfTrafficLights = inYPos;
+    d_ptr->setUpperLeftYPositionOfTrafficLightsOnMacOS();
+}
+int FramelessWindowConverter::getUpperLeftXPositionOfTrafficLightsOnMacOS()
+{
+    return xPosOfTrafficLights;
+}
+int FramelessWindowConverter::getUpperLeftYPositionOfTrafficLightsOnMacOS()
+{
+    return yPosOfTrafficLights;
+}
+
+/*** End of inlined file: FramelessWindowConverter.cpp ***/
+
+/*** Start of inlined file: FramelessWindowConverter_p.cpp ***/
+#ifdef WIN32
+
+#elif __linux__
+
+#elif __APPLE__
+
+#endif
+
+using namespace FWC;
+
+FramelessWindowConverterPrivate* FramelessWindowConverterPrivate::create(FramelessWindowConverter* q)
+{
+#ifdef WIN32
+    return new FramelessWindowConverterWindows(q);
+#elif __linux__
+    return new FramelessWindowConverterLinux(q);
+#elif __APPLE__
+    return new FramelessWindowConverterMacos(q);
+#endif
+}
+
+FWCBorderHitTestResult FramelessWindowConverterPrivate::doBorderHitTest(FWCRect inWindowRect, FWCPoint inMousePosition, int borderWidth)
+{
+    FWCBorderHitTestResult bhtResult = FWCBorderHitTestResult::NONE;  // outside window
+
+    if (inMousePosition.x > inWindowRect.left() + borderWidth && inMousePosition.x < inWindowRect.right() - borderWidth
+        && inMousePosition.y < inWindowRect.bottom() - borderWidth && inMousePosition.y > inWindowRect.top() + borderWidth) {
+        return FWCBorderHitTestResult::CLIENT;
+    }
+    // left border
+    if (inMousePosition.x >= inWindowRect.left() && inMousePosition.x <= inWindowRect.left() + borderWidth) {
+        bhtResult = FWCBorderHitTestResult::LEFT;
+    }
+    // right border
+    else if (inMousePosition.x <= inWindowRect.right() && inMousePosition.x >= inWindowRect.right() - borderWidth) {
+        bhtResult = FWCBorderHitTestResult::RIGHT;
+    }
+    // bottom border
+    else if (inMousePosition.y <= inWindowRect.bottom() && inMousePosition.y >= inWindowRect.bottom() - borderWidth) {
+        bhtResult = FWCBorderHitTestResult::BOTTOM;
+    }
+    // top border
+    else if (inMousePosition.y >= inWindowRect.top() && inMousePosition.y <= inWindowRect.top() + borderWidth) {
+        bhtResult = FWCBorderHitTestResult::TOP;
+    }
+
+    // bottom left corner
+    if (bhtResult == FWCBorderHitTestResult::LEFT && inMousePosition.y <= inWindowRect.bottom()
+        && inMousePosition.y >= inWindowRect.bottom() - borderWidth) {
+        bhtResult = FWCBorderHitTestResult::BOTTOM_LEFT;
+    }
+    // bottom right corner
+    else if (bhtResult == FWCBorderHitTestResult::RIGHT && inMousePosition.y <= inWindowRect.bottom()
+             && inMousePosition.y >= inWindowRect.bottom() - borderWidth) {
+        bhtResult = FWCBorderHitTestResult::BOTTOM_RIGHT;
+    }
+    // top left corner
+    else if (bhtResult == FWCBorderHitTestResult::LEFT && inMousePosition.y >= inWindowRect.top()
+             && inMousePosition.y <= inWindowRect.top() + borderWidth) {
+        bhtResult = FWCBorderHitTestResult::TOP_LEFT;
+    }
+    // top right corner
+    else if (bhtResult == FWCBorderHitTestResult::RIGHT && inMousePosition.y >= inWindowRect.top()
+             && inMousePosition.y <= inWindowRect.top() + borderWidth) {
+        bhtResult = FWCBorderHitTestResult::TOP_RIGHT;
+    }
+
+    return bhtResult;
+}
+
+/*** End of inlined file: FramelessWindowConverter_p.cpp ***/
+
+/*** Start of inlined file: FramelessWindowConverterWindows.cpp ***/
+#ifdef WIN32
+
+#include <windowsx.h>
+#include <dwmapi.h>
+#pragma comment(lib, "dwmapi.lib")
+
+#include <qdebug.h>
+
+using namespace FWC;
+
+// Utility functions without warnings
+constexpr WORD getLOWORD(unsigned long long l)
+{
+    return static_cast< WORD >(static_cast< DWORD_PTR >(l) & 0xffff);
+}
+
+constexpr WORD getLOWORD(long long l)
+{
+    return static_cast< WORD >(static_cast< DWORD_PTR >(l) & 0xffff);
+}
+
+constexpr WORD getHIWORD(unsigned long long l)
+{
+    return static_cast< WORD >((static_cast< DWORD_PTR >(l) >> 16) & 0xffff);
+}
+
+constexpr WORD getHIWORD(long long l)
+{
+    return static_cast< WORD >((static_cast< DWORD_PTR >(l) >> 16) & 0xffff);
+}
+
+enum class CursorNames
+{
+    WEST_EAST,
+    NORTH_SOUTH,
+    NORTH_EAST_SOUTH_WEST,
+    NORTH_WEST_SOUTH_EAST,
+    ARROW
+};
+
+constexpr LPWSTR getCursorResource(CursorNames inCursorName)
+{
+    // See WinUser.h for Standard Cursor IDs (IDC_ARROW etc.)
+    switch (inCursorName) {
+    case CursorNames::WEST_EAST:
+        return reinterpret_cast< LPWSTR >(static_cast< ULONG_PTR >(static_cast< WORD >(32644)));
+    case CursorNames::NORTH_SOUTH:
+        return reinterpret_cast< LPWSTR >(static_cast< ULONG_PTR >(static_cast< WORD >(32645)));
+    case CursorNames::NORTH_EAST_SOUTH_WEST:
+        return reinterpret_cast< LPWSTR >(static_cast< ULONG_PTR >(static_cast< WORD >(32643)));
+    case CursorNames::NORTH_WEST_SOUTH_EAST:
+        return reinterpret_cast< LPWSTR >(static_cast< ULONG_PTR >(static_cast< WORD >(32642)));
+    case CursorNames::ARROW:
+        return reinterpret_cast< LPWSTR >(static_cast< ULONG_PTR >(static_cast< WORD >(32512)));
+    }
+
+    return nullptr;
+}
+// END Utility functions without warnings
+
+FramelessWindowConverterWindows::FramelessWindowConverterWindows(FramelessWindowConverter* q)
+    : FramelessWindowConverterPrivate(q)
+{
+}
+
+void FramelessWindowConverterWindows::convertToFrameless()
+{
+    handle = reinterpret_cast< HWND >(q_ptr->getWindowHandle());
+    setFrameless(true);
+}
+
+void FramelessWindowConverterWindows::convertToWindowWithFrame()
+{
+    setFrameless(false);
+}
+
+void FramelessWindowConverterWindows::minimizeWindow()
+{
+    // Disable minimize in fullscreen mode -> can not be restored (no idea why)
+    if (!bFullscreen) {
+        SetWindowLongPtr(handle, GWL_STYLE, GetWindowLongPtrW(handle, GWL_STYLE) | WS_CAPTION);
+        ShowWindow(handle, SW_MINIMIZE);
+    }
+}
+
+void FramelessWindowConverterWindows::maximizeWindow()
+{
+    ShowWindow(handle, SW_MAXIMIZE);
+}
+
+void FramelessWindowConverterWindows::restoreWindow()
+{
+    ShowWindow(handle, SW_RESTORE);
+}
+
+void FramelessWindowConverterWindows::closeWindow()
+{
+    SendMessage(handle, WM_CLOSE, 0, 0);
+}
+
+void FramelessWindowConverterWindows::toggleFullscreen()
+{
+    bFullscreen = !bFullscreen;
+    if (bFullscreen) {
+        // When the window is already maximized restore it and go fullscreen immediatly after
+        // Otherwise it will not go fullscreen
+        ShowWindow(handle, SW_RESTORE);
+        ShowWindow(handle, SW_MAXIMIZE);
+    } else {
+        ShowWindow(handle, SW_RESTORE);
+    }
+}
+
+void FramelessWindowConverterWindows::setEnableShadow()
+{
+    if (q_ptr->getHasShadow()) {
+        const MARGINS shadow = { 1, 1, 1, 1 };
+        DwmExtendFrameIntoClientArea(handle, &shadow);
+        // redraw frame
+        SetWindowPos(handle, nullptr, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE);
+        ShowWindow(handle, SW_SHOW);
+    } else {
+        const MARGINS shadow = { 0, 0, 0, 0 };
+        DwmExtendFrameIntoClientArea(handle, &shadow);
+        // redraw frame
+        SetWindowPos(handle, nullptr, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE);
+        ShowWindow(handle, SW_SHOW);
+    }
+}
+
+FWCRect FramelessWindowConverterWindows::getCurrentClientRect()
+{
+    RECT WINRect;
+    if (!GetClientRect(handle, &WINRect)) {
+        return FWCRect(-1, -1, -1, -1);
+    }
+    return FWCRect(WINRect.left, WINRect.top, WINRect.right, WINRect.bottom);
+}
+
+FWCRect FramelessWindowConverterWindows::getCurrentWindowRect()
+{
+    RECT WINRect;
+    if (!GetWindowRect(handle, &WINRect)) {
+        return FWCRect(-1, -1, -1, -1);
+    }
+    return FWCRect(WINRect.left, WINRect.top, WINRect.right, WINRect.bottom);
+}
+
+FWCPoint FramelessWindowConverterWindows::getCurrentMousePos(LPARAM lParam)
+{
+    return FWCPoint(getLOWORD(lParam), getHIWORD(lParam));
+}
+
+bool FramelessWindowConverterWindows::filterNativeEvent(void* message, long* result)
+{
+#if (QT_VERSION == QT_VERSION_CHECK(5, 11, 1))
+    MSG* msg = *reinterpret_cast< MSG** >(message);  // Nice Bug Qt...
+#else
+    MSG* msg = reinterpret_cast< MSG* >(message);
+#endif
+
+    switch (msg->message) {
+    case WM_NCCALCSIZE: {
+        if (msg->wParam == TRUE) {
+            // Frameless window -> kill title bar and border
+            *result = 0;
+            return true;
+        }
+        break;
+    }
+    case WM_WINDOWPOSCHANGING:
+        // Give maximized windows special window style to stop Windows 10 from repositioning and resizing the window
+        WINDOWPLACEMENT wpm;
+        GetWindowPlacement(handle, &wpm);
+        if (wpm.showCmd != SW_SHOWMAXIMIZED && !(GetWindowLongPtrW(handle, GWL_STYLE) & WS_SYSMENU)) {
+            SetWindowLongPtrW(handle, GWL_STYLE, static_cast< LONG >(Style::aero_borderless));
+            SetWindowPos(handle, nullptr, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE);
+            ShowWindow(handle, SW_SHOW);
+        } else if (wpm.showCmd == SW_SHOWMAXIMIZED && (GetWindowLongPtrW(handle, GWL_STYLE) & WS_SYSMENU)) {
+            SetWindowLongPtrW(handle, GWL_STYLE, static_cast< LONG >(Style::maximized_borderless));
+            SetWindowPos(handle, nullptr, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE);
+            ShowWindow(handle, SW_SHOWMAXIMIZED);
+        }
+        break;
+    case WM_NCACTIVATE: {
+        // Prevents window frame reappearing on window activation in "basic" theme,
+        // where no aero shadow is present.
+        *result = 1;
+        break;
+    }
+    case WM_ACTIVATEAPP: {
+        if (msg->wParam == TRUE) {
+            // Remove WS_CAPTION when switching from another window
+            WINDOWPLACEMENT wpm;
+
+            GetWindowPlacement(handle, &wpm);
+            if (wpm.showCmd != SW_SHOWMINIMIZED) {
+                SetWindowLongPtr(handle, GWL_STYLE, GetWindowLongPtrW(handle, GWL_STYLE) & ~WS_CAPTION);
+            }
+        }
+        break;
+    }
+    case WM_ACTIVATE: {
+        // Enable Minimize Animation by adding/removing WS_CAPTION window style
+        if (getLOWORD(msg->wParam) == WA_ACTIVE && getHIWORD(msg->wParam) == 0)  // not minimized
+        {
+            SetWindowLongPtr(handle, GWL_STYLE, GetWindowLongPtrW(handle, GWL_STYLE) & ~WS_CAPTION);
+        } else if (getLOWORD(msg->wParam) == WA_INACTIVE && getHIWORD(msg->wParam) == 0)  // not minimized
+        {
+            // This actually also gets called when switching to another window (see WM_ACTIVATEAPP for the fix)
+            SetWindowLongPtr(handle, GWL_STYLE, GetWindowLongPtrW(handle, GWL_STYLE) | WS_CAPTION);
+        }
+        break;
+    }
+    case WM_NCHITTEST: {
+        // Not using WM_NCHITTEST.
+        // QAbstractNativeEventFilter does not send this message (bug?).
+        // Instead WM_LBUTTONDBLCLK and WM_LBUTTONDOWN is used to send WM_NCLBUTTON*** events manually
+        // WM_MOUSEMOVE is used to set appropriate cursor.
+        // This is also more consistent with the implementation on other platforms (linux, mac).
+        break;
+        //                switch(doBorderHitTest(getCurrentWindowRect(), getCurrentMousePos(msg->lParam), q_ptr->getBorderWidth()))
+        //                {
+        //                case FWCBorderHitTestResult::TOP_LEFT:
+        //                    *result = HTTOPLEFT;
+        //                    return true;
+        //                case FWCBorderHitTestResult::TOP:
+        //                    *result = HTTOP;
+        //                    return true;
+        //                case FWCBorderHitTestResult::TOP_RIGHT:
+        //                    *result = HTTOPRIGHT;
+        //                    return true;
+        //                case FWCBorderHitTestResult::RIGHT:
+        //                    *result = HTRIGHT;
+        //                    return true;
+        //                case FWCBorderHitTestResult::BOTTOM_RIGHT:
+        //                    *result = HTBOTTOMRIGHT;
+        //                    return true;
+        //                case FWCBorderHitTestResult::BOTTOM:
+        //                    *result = HTBOTTOM;
+        //                    return true;
+        //                case FWCBorderHitTestResult::BOTTOM_LEFT:
+        //                    *result = HTBOTTOMLEFT;
+        //                    return true;
+        //                case FWCBorderHitTestResult::LEFT:
+        //                    *result = HTLEFT;
+        //                    return true;
+        //                case FWCBorderHitTestResult::CLIENT:
+        //                    *result = HTCAPTION;
+        //                    return true;
+        //                case FWCBorderHitTestResult::NONE:
+        //                    *result = 0;
+        //                    return false;
+        //                }
+        //                break;
+    }
+    case WM_LBUTTONDBLCLK: {
+        // Exclude Child Widgets
+        FWCPoint mousePos(getCurrentMousePos(msg->lParam));
+
+        // Only this widget is used for dragging.
+        if (!q_ptr->getShouldPerformWindowDrag()(mousePos.x, mousePos.y)) {
+            return false;
+        }
+
+        if (doBorderHitTest(getCurrentClientRect(), mousePos, q_ptr->getBorderWidth()) == FWCBorderHitTestResult::CLIENT) {
+            ReleaseCapture();
+            SendMessage(handle, WM_NCLBUTTONDBLCLK, HTCAPTION, msg->lParam);
+        }
+        break;
+    }
+    case WM_LBUTTONDOWN: {
+        FWCPoint mousePos(getCurrentMousePos(msg->lParam));
+        FWCBorderHitTestResult hitResult;
+        if (q_ptr->getEnableResizing())
+            hitResult = doBorderHitTest(getCurrentClientRect(), mousePos, q_ptr->getBorderWidth());
+        else
+            hitResult = doBorderHitTest(getCurrentClientRect(), mousePos, 0);
+
+        switch (hitResult) {
+        case FWCBorderHitTestResult::LEFT:
+            ReleaseCapture();
+            SendMessage(handle, WM_NCLBUTTONDOWN, HTLEFT, msg->lParam);
+            break;
+        case FWCBorderHitTestResult::RIGHT:
+            ReleaseCapture();
+            SendMessage(handle, WM_NCLBUTTONDOWN, HTRIGHT, msg->lParam);
+            break;
+        case FWCBorderHitTestResult::TOP:
+            ReleaseCapture();
+            SendMessage(handle, WM_NCLBUTTONDOWN, HTTOP, msg->lParam);
+            break;
+        case FWCBorderHitTestResult::BOTTOM:
+            ReleaseCapture();
+            SendMessage(handle, WM_NCLBUTTONDOWN, HTBOTTOM, msg->lParam);
+            break;
+        case FWCBorderHitTestResult::BOTTOM_LEFT:
+            ReleaseCapture();
+            SendMessage(handle, WM_NCLBUTTONDOWN, HTBOTTOMLEFT, msg->lParam);
+            break;
+        case FWCBorderHitTestResult::BOTTOM_RIGHT:
+            ReleaseCapture();
+            SendMessage(handle, WM_NCLBUTTONDOWN, HTBOTTOMRIGHT, msg->lParam);
+            break;
+        case FWCBorderHitTestResult::TOP_LEFT:
+            ReleaseCapture();
+            SendMessage(handle, WM_NCLBUTTONDOWN, HTTOPLEFT, msg->lParam);
+            break;
+        case FWCBorderHitTestResult::TOP_RIGHT:
+            ReleaseCapture();
+            SendMessage(handle, WM_NCLBUTTONDOWN, HTTOPRIGHT, msg->lParam);
+            break;
+        default:
+            // Only this widget is used for dragging.
+            if (q_ptr->getShouldPerformWindowDrag()(mousePos.x, mousePos.y)) {
+                ReleaseCapture();
+                SendMessage(handle, WM_NCLBUTTONDOWN, HTCAPTION, msg->lParam);
+            }
+            break;
+        }
+        break;
+    }
+    case WM_MOUSEMOVE: {
+        if (!q_ptr->getEnableResizing())
+            break;  // No Resizing
+
+        switch (doBorderHitTest(getCurrentClientRect(), getCurrentMousePos(msg->lParam), q_ptr->getBorderWidth())) {
+        case FWCBorderHitTestResult::LEFT:
+            SetCursor(LoadCursor(nullptr, getCursorResource(CursorNames::WEST_EAST)));
+            break;
+        case FWCBorderHitTestResult::RIGHT:
+            SetCursor(LoadCursor(nullptr, getCursorResource(CursorNames::WEST_EAST)));
+            break;
+        case FWCBorderHitTestResult::TOP:
+            SetCursor(LoadCursor(nullptr, getCursorResource(CursorNames::NORTH_SOUTH)));
+            break;
+        case FWCBorderHitTestResult::BOTTOM:
+            SetCursor(LoadCursor(nullptr, getCursorResource(CursorNames::NORTH_SOUTH)));
+            break;
+        case FWCBorderHitTestResult::BOTTOM_LEFT:
+            SetCursor(LoadCursor(nullptr, getCursorResource(CursorNames::NORTH_EAST_SOUTH_WEST)));
+            break;
+        case FWCBorderHitTestResult::BOTTOM_RIGHT:
+            SetCursor(LoadCursor(nullptr, getCursorResource(CursorNames::NORTH_WEST_SOUTH_EAST)));
+            break;
+        case FWCBorderHitTestResult::TOP_LEFT:
+            SetCursor(LoadCursor(nullptr, getCursorResource(CursorNames::NORTH_WEST_SOUTH_EAST)));
+            break;
+        case FWCBorderHitTestResult::TOP_RIGHT:
+            SetCursor(LoadCursor(nullptr, getCursorResource(CursorNames::NORTH_EAST_SOUTH_WEST)));
+            break;
+        default:
+            SetCursor(LoadCursor(nullptr, getCursorResource(CursorNames::ARROW)));
+            break;
+        }
+        break;
+    }
+    case WM_GETMINMAXINFO: {
+        MINMAXINFO* minMaxInfo = reinterpret_cast< MINMAXINFO* >(msg->lParam);
+
+        // Get Monitor Info
+        auto monitor = ::MonitorFromWindow(handle, MONITOR_DEFAULTTONEAREST);
+        MONITORINFO monitor_info {};
+        monitor_info.cbSize = sizeof(monitor_info);
+        GetMonitorInfoW(monitor, &monitor_info);
+
+        // Set position and size of maximized window
+        minMaxInfo->ptMaxPosition.x = 0;
+        minMaxInfo->ptMaxPosition.y = 0;
+
+        if (bFullscreen) {
+            minMaxInfo->ptMaxSize.x = monitor_info.rcMonitor.right - monitor_info.rcMonitor.left;
+            minMaxInfo->ptMaxSize.y = monitor_info.rcMonitor.bottom - monitor_info.rcMonitor.top;
+        } else {
+            minMaxInfo->ptMaxSize.x = monitor_info.rcWork.right - monitor_info.rcWork.left;
+            minMaxInfo->ptMaxSize.y = monitor_info.rcWork.bottom - monitor_info.rcWork.top;
+        }
+
+        // Set limits of the size of the window
+        bool bMinMaxInfo = false;
+        if (q_ptr->getMinimumWindowWidth() >= 0) {
+            minMaxInfo->ptMinTrackSize.x = q_ptr->getMinimumWindowWidth();
+            bMinMaxInfo                  = true;
+        }
+
+        if (q_ptr->getMinimumWindowHeight() >= 0) {
+            minMaxInfo->ptMinTrackSize.y = q_ptr->getMinimumWindowHeight();
+            bMinMaxInfo                  = true;
+        }
+
+        if (q_ptr->getMaximumWindowWidth() >= 0) {
+            minMaxInfo->ptMaxTrackSize.x = q_ptr->getMaximumWindowWidth();
+            bMinMaxInfo                  = true;
+        }
+
+        if (q_ptr->getMaximumWindowHeight() >= 0) {
+            minMaxInfo->ptMaxTrackSize.y = q_ptr->getMaximumWindowHeight();
+            bMinMaxInfo                  = true;
+        }
+
+        if (bMinMaxInfo) {
+            *result = 0;
+            return true;
+        } else
+            break;
+    }
+    }  // end switch
+    return false;
+}
+
+void FramelessWindowConverterWindows::setFrameless(bool enabled)
+{
+    Style new_style = (enabled) ? Style::aero_borderless : Style::windowed;
+    Style old_style = static_cast< Style >(::GetWindowLongPtrW(handle, GWL_STYLE));
+
+    if (new_style != old_style) {
+        SetWindowLongPtrW(handle, GWL_STYLE, static_cast< LONG >(new_style));
+
+        // Support for shadow
+        setEnableShadow();
+
+        // redraw frame
+        SetWindowPos(handle, nullptr, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOSIZE);
+        ShowWindow(handle, SW_SHOW);
+    }
+}
+
+#endif
+
+/*** End of inlined file: FramelessWindowConverterWindows.cpp ***/
+
+/*** Start of inlined file: FramelessWindowConverterLinux.cpp ***/
+#ifdef __linux__
+
+#include <X11/cursorfont.h>
+#include <X11/Xlib-xcb.h>
+#include <X11/extensions/XI2proto.h>
+#include <string.h>
+
+using namespace FWC;
+
+FramelessWindowConverterLinux::FramelessWindowConverterLinux(FramelessWindowConverter* q)
+    : FramelessWindowConverterPrivate(q), lastButtonPressTime(0)
+{
+}
+
+void FramelessWindowConverterLinux::convertToFrameless()
+{
+    display      = XOpenDisplay(nullptr);
+    connection   = XGetXCBConnection(display);
+    rootWindow   = xcb_setup_roots_iterator(xcb_get_setup(connection)).data->root;
+    windowHandle = static_cast< xcb_window_t >(q_ptr->getWindowHandle());
+}
+
+void FramelessWindowConverterLinux::convertToWindowWithFrame()
+{
+    // Do nothing, it just works!
+}
+
+void FramelessWindowConverterLinux::changeCursorShape(unsigned int shape)
+{
+    Cursor cursor = XCreateFontCursor(display, shape);
+    XDefineCursor(display, windowHandle, cursor);
+    XFlush(display);
+}
+
+unsigned int FramelessWindowConverterLinux::getAtom(const char* name)
+{
+    xcb_intern_atom_cookie_t cookie;
+    xcb_intern_atom_reply_t* reply;
+
+    cookie = xcb_intern_atom(connection, 0, static_cast< uint16_t >(strlen(name)), name);
+    if ((reply = xcb_intern_atom_reply(connection, cookie, nullptr))) {
+        unsigned int replyAtom = reply->atom;
+        free(reply);
+        return replyAtom;
+    } else
+        return 0;
+}
+
+void FramelessWindowConverterLinux::minimizeWindow()
+{
+    xcb_client_message_event_t event;
+    event.response_type    = XCB_CLIENT_MESSAGE;
+    event.format           = 32;
+    event.sequence         = 0;
+    event.window           = windowHandle;
+    event.type             = getAtom("WM_CHANGE_STATE");
+    event.data.data32[ 0 ] = 3;  // IconicState
+    event.data.data32[ 1 ] = 0;
+    event.data.data32[ 2 ] = 0;
+    event.data.data32[ 3 ] = 0;
+    event.data.data32[ 4 ] = 0;
+
+    xcb_send_event(connection,
+                   0,
+                   rootWindow,
+                   XCB_EVENT_MASK_STRUCTURE_NOTIFY | XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT,
+                   reinterpret_cast< char* >(&event));
+    xcb_flush(connection);
+}
+
+void FramelessWindowConverterLinux::maximizeWindow()
+{
+    xcb_client_message_event_t event;
+    event.response_type    = XCB_CLIENT_MESSAGE;
+    event.format           = 32;
+    event.sequence         = 0;
+    event.window           = windowHandle;
+    event.type             = getAtom("_NET_WM_STATE");
+    event.data.data32[ 0 ] = 1;  //_NET_WM_STATE_ADD
+    event.data.data32[ 1 ] = getAtom("_NET_WM_STATE_MAXIMIZED_HORZ");
+    event.data.data32[ 2 ] = getAtom("_NET_WM_STATE_MAXIMIZED_VERT");
+    event.data.data32[ 3 ] = 0;
+    event.data.data32[ 4 ] = 0;
+
+    xcb_send_event(connection,
+                   0,
+                   rootWindow,
+                   XCB_EVENT_MASK_STRUCTURE_NOTIFY | XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT,
+                   reinterpret_cast< char* >(&event));
+    xcb_flush(connection);
+}
+
+void FramelessWindowConverterLinux::restoreWindow()
+{
+    xcb_client_message_event_t event;
+    event.response_type    = XCB_CLIENT_MESSAGE;
+    event.format           = 32;
+    event.sequence         = 0;
+    event.window           = windowHandle;
+    event.type             = getAtom("_NET_WM_STATE");
+    event.data.data32[ 0 ] = 0;  //_NET_WM_STATE_REMOVE
+    event.data.data32[ 1 ] = getAtom("_NET_WM_STATE_MAXIMIZED_HORZ");
+    event.data.data32[ 2 ] = getAtom("_NET_WM_STATE_MAXIMIZED_VERT");
+    event.data.data32[ 3 ] = 0;
+    event.data.data32[ 4 ] = 0;
+
+    xcb_send_event(connection,
+                   0,
+                   rootWindow,
+                   XCB_EVENT_MASK_STRUCTURE_NOTIFY | XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT,
+                   reinterpret_cast< char* >(&event));
+    xcb_flush(connection);
+}
+
+void FramelessWindowConverterLinux::closeWindow()
+{
+    xcb_client_message_event_t event;
+    event.response_type    = XCB_CLIENT_MESSAGE;
+    event.format           = 32;
+    event.sequence         = 0;
+    event.window           = windowHandle;
+    event.type             = getAtom("WM_PROTOCOLS");
+    event.data.data32[ 0 ] = getAtom("WM_DELETE_WINDOW");
+    event.data.data32[ 1 ] = CurrentTime;
+    event.data.data32[ 2 ] = 0;
+    event.data.data32[ 3 ] = 0;
+    event.data.data32[ 4 ] = 0;
+
+    xcb_send_event(connection,
+                   0,
+                   rootWindow,
+                   XCB_EVENT_MASK_STRUCTURE_NOTIFY | XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT,
+                   reinterpret_cast< char* >(&event));
+    xcb_flush(connection);
+}
+
+void FramelessWindowConverterLinux::toggleFullscreen()
+{
+    bFullscreen = !bFullscreen;
+
+    xcb_client_message_event_t event;
+    event.response_type    = XCB_CLIENT_MESSAGE;
+    event.format           = 32;
+    event.sequence         = 0;
+    event.window           = windowHandle;
+    event.type             = getAtom("_NET_WM_STATE");
+    event.data.data32[ 0 ] = 2;  //_NET_WM_STATE_TOGGLE
+    event.data.data32[ 1 ] = getAtom("_NET_WM_STATE_FULLSCREEN");
+    event.data.data32[ 2 ] = 0;
+    event.data.data32[ 3 ] = 0;
+    event.data.data32[ 4 ] = 0;
+
+    xcb_send_event(connection,
+                   0,
+                   rootWindow,
+                   XCB_EVENT_MASK_STRUCTURE_NOTIFY | XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT,
+                   reinterpret_cast< char* >(&event));
+    xcb_flush(connection);
+}
+
+bool isXIEvent(xcb_generic_event_t* event, int opCode)
+{
+    xcb_ge_event_t* e = reinterpret_cast< xcb_ge_event_t* >(event);
+    return e->pad0 == opCode;
+}
+
+bool isXIType(xcb_generic_event_t* event, int opCode, uint16_t type)
+{
+    if (!isXIEvent(event, opCode))
+        return false;
+
+    xXIGenericDeviceEvent* xiEvent = reinterpret_cast< xXIGenericDeviceEvent* >(event);
+    return xiEvent->evtype == type;
+}
+
+int fixed1616ToInt(FP1616 val)
+{
+    return int(val) / 0x10000;
+}
+
+FWCRect FramelessWindowConverterLinux::getCurrentWindowFrame()
+{
+    xcb_get_geometry_cookie_t geom_cookie = xcb_get_geometry(connection, static_cast< xcb_drawable_t >(windowHandle));
+    xcb_get_geometry_reply_t* frame_geometry = xcb_get_geometry_reply(connection, geom_cookie, nullptr);
+    FWCRect rect(0, 0, frame_geometry->width, frame_geometry->height);
+    free(frame_geometry);
+    return rect;
+}
+
+bool FramelessWindowConverterLinux::filterNativeEvent(void* message, long*)
+{
+    xcb_generic_event_t* ev = static_cast< xcb_generic_event_t* >(message);
+
+    if ((ev->response_type & ~0x80) == XCB_GE_GENERIC) {
+        int xiEventBase, xiErrorBase;
+        XQueryExtension(display, "XInputExtension", &xiOpCode, &xiEventBase, &xiErrorBase);
+
+        if (isXIType(ev, xiOpCode, XI_Motion)) {
+            if (isSystemOpRunning) {
+                // Change event to button release event, fixes some bugs with Qt and _NET_WM_MOVERESIZE
+                // After _NET_WM_MOVERESIZE ends and the mouse is moved this gets called and Qt gets a button release
+                // event. This is very hacky, but it works :)
+                xXIGenericDeviceEvent* xiEvent = reinterpret_cast< xXIGenericDeviceEvent* >(ev);
+                xiEvent->evtype                = XI_ButtonRelease;
+
+                isSystemOpRunning = false;
+            }
+
+            xXIDeviceEvent* xev = reinterpret_cast< xXIDeviceEvent* >(ev);
+            const int x         = fixed1616ToInt(xev->event_x);
+            const int y         = fixed1616ToInt(xev->event_y);
+            FWCPoint mousePos(x, y);
+
+            switch (doBorderHitTest(getCurrentWindowFrame(), mousePos, q_ptr->getBorderWidth())) {
+            case FWCBorderHitTestResult::LEFT:
+                changeCursorShape(XC_left_side);
+                break;
+            case FWCBorderHitTestResult::RIGHT:
+                changeCursorShape(XC_right_side);
+                break;
+            case FWCBorderHitTestResult::TOP:
+                changeCursorShape(XC_top_side);
+                break;
+            case FWCBorderHitTestResult::BOTTOM:
+                changeCursorShape(XC_bottom_side);
+                break;
+            case FWCBorderHitTestResult::BOTTOM_LEFT:
+                changeCursorShape(XC_bottom_left_corner);
+                break;
+            case FWCBorderHitTestResult::BOTTOM_RIGHT:
+                changeCursorShape(XC_bottom_right_corner);
+                break;
+            case FWCBorderHitTestResult::TOP_LEFT:
+                changeCursorShape(XC_top_left_corner);
+                break;
+            case FWCBorderHitTestResult::TOP_RIGHT:
+                changeCursorShape(XC_top_right_corner);
+                break;
+            default:
+                changeCursorShape(XC_arrow);
+                break;
+            }
+
+            return false;
+        }
+        if (isXIType(ev, xiOpCode, XI_ButtonPress)) {
+            xXIDeviceEvent* deviceEvent = reinterpret_cast< xXIDeviceEvent* >(ev);
+
+            if (deviceEvent->detail != 1)
+                return false;
+
+            const int x = fixed1616ToInt(deviceEvent->event_x);
+            const int y = fixed1616ToInt(deviceEvent->event_y);
+            FWCPoint mousePos(x, y);
+
+            // Only this widget is used for dragging.
+            bool shouldDrag = q_ptr->getShouldPerformWindowDrag()(mousePos.x, mousePos.y);
+
+            // Double Click
+            if (lastButtonPressTime != 0 && (deviceEvent->time - lastButtonPressTime) < 400 && shouldDrag) {
+                xcb_get_property_cookie_t cookie = xcb_get_property(connection, false, windowHandle, getAtom("_NET_WM_STATE"), XCB_ATOM_ATOM, 0, 32);
+                xcb_get_property_reply_t* reply = xcb_get_property_reply(connection, cookie, nullptr);
+                xcb_atom_t* isMaximized         = reinterpret_cast< xcb_atom_t* >(xcb_get_property_value(reply));
+                free(reply);
+
+                xcb_client_message_event_t event;
+                event.response_type    = XCB_CLIENT_MESSAGE;
+                event.format           = 32;
+                event.sequence         = 0;
+                event.window           = windowHandle;
+                event.type             = getAtom("_NET_WM_STATE");
+                event.data.data32[ 1 ] = getAtom("_NET_WM_STATE_MAXIMIZED_HORZ");
+                event.data.data32[ 2 ] = getAtom("_NET_WM_STATE_MAXIMIZED_VERT");
+                event.data.data32[ 3 ] = 0;
+                event.data.data32[ 4 ] = 0;
+
+                if ((*isMaximized == getAtom("_NET_WM_STATE_MAXIMIZED_VERT"))
+                    || (*isMaximized == getAtom("_NET_WM_STATE_MAXIMIZED_HORZ"))) {
+                    event.data.data32[ 0 ] = 0;  //_NET_WM_STATE_REMOVE
+                } else {
+                    event.data.data32[ 0 ] = 1;  //_NET_WM_STATE_ADD
+                }
+
+                xcb_send_event(connection,
+                               0,
+                               rootWindow,
+                               XCB_EVENT_MASK_STRUCTURE_NOTIFY | XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT,
+                               reinterpret_cast< char* >(&event));
+                xcb_flush(connection);
+
+                return false;
+            }
+            lastButtonPressTime = deviceEvent->time;
+
+            //                        xcb_client_message_event_t event;
+            //                        event.response_type = XCB_CLIENT_MESSAGE;
+            //                        event.format = 32;
+            //                        event.sequence = 0;
+            //                        event.window = windowHandle;
+            //                        event.type = getAtom("_NET_WM_MOVERESIZE");
+            //                        event.data.data32[0] = fixed1616ToInt(deviceEvent->root_x);
+            //                        event.data.data32[1] = fixed1616ToInt(deviceEvent->root_y);
+            //                        // Either one of the different resize events or a Move event
+            //                        event.data.data32[2] = static_cast<int>(doBorderHitTest(getCurrentWindowFrame(), mousePos, q_ptr->getBorderWidth()));
+            //                        event.data.data32[3] = XCB_BUTTON_INDEX_1;
+            //                        event.data.data32[4] = 0;
+
+            //                         q_ptr->getReleaseMouseGrab()();
+            //                        xcb_send_event(connection, 0, rootWindow,
+            //                                       XCB_EVENT_MASK_STRUCTURE_NOTIFY |
+            //                                       XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT, (const char *)&event);
+            //                        XFlush(display);
+
+            // Test mouse cursor position in window and check if the window should be dragged
+            FWCBorderHitTestResult bhResult = doBorderHitTest(getCurrentWindowFrame(), mousePos, q_ptr->getBorderWidth());
+            if (bhResult == FWCBorderHitTestResult::CLIENT && shouldDrag == false)
+                return false;
+
+            // Qt gives a warning of a unhandled client message with xcb events -> use xlib event instead :)
+            XEvent xev;
+            // Set type of event
+            // Either one of the different resize events or a Move event
+            xev.xclient.data.l[ 2 ] = static_cast< int >(bhResult);
+
+            Atom netMoveResize       = getAtom("_NET_WM_MOVERESIZE");
+            xev.xclient.type         = ClientMessage;
+            xev.xclient.message_type = netMoveResize;
+            xev.xclient.display      = display;
+            xev.xclient.window       = windowHandle;
+            xev.xclient.format       = 32;
+            xev.xclient.data.l[ 0 ]  = fixed1616ToInt(deviceEvent->root_x);
+            xev.xclient.data.l[ 1 ]  = fixed1616ToInt(deviceEvent->root_y);
+
+            xev.xclient.data.l[ 3 ] = Button1;
+            xev.xclient.data.l[ 4 ] = 0;
+
+            q_ptr->getReleaseMouseGrab()();
+            XSendEvent(display, rootWindow, False, SubstructureRedirectMask | SubstructureNotifyMask, &xev);
+            XFlush(display);
+
+            isSystemOpRunning = true;
+
+            return false;
+        }
+    }
+
+    return false;
+}
+
+#endif
+
+/*** End of inlined file: FramelessWindowConverterLinux.cpp ***/
 
 // sa ribbon
 
@@ -14067,16 +15198,9 @@ SARibbonCustomizeWidget* SARibbonCustomizeDialog::customizeWidget() const
 #include <QFile>
 #include <QHash>
 #include <QWindowStateChangeEvent>
+#include <QWindow>
 
-#if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
-#include "FramelessHelper/Widgets/standardsystembutton.h"
-#include "FramelessHelper/Widgets/framelesswidgetshelper.h"
-
-FRAMELESSHELPER_USE_NAMESPACE
-using namespace Global;
-#else
-
-#endif
+// frameless
 
 /**
  * @brief The SARibbonMainWindowPrivate class
@@ -14086,39 +15210,71 @@ class SARibbonMainWindow::PrivateData
     SA_RIBBON_DECLARE_PUBLIC(SARibbonMainWindow)
 public:
     PrivateData(SARibbonMainWindow* p);
-    void init();
+    void init(SARibbonMainWindow* mainwindow);
 
 public:
     SARibbonMainWindow::RibbonTheme mCurrentRibbonTheme { SARibbonMainWindow::RibbonThemeOffice2013 };
     SARibbonBar* mRibbonBar { nullptr };
     SAWindowButtonGroup* mWindowButtonGroup { nullptr };
-#if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
-    FRAMELESSHELPER_PREPEND_NAMESPACE(StandardTitleBar) * mTitleBar = nullptr;
-#else
-    SAFramelessHelper* mFramelessHelper { nullptr };
-#endif
+    FWC::FramelessWindowConverter framelessWindowConverter;
 };
 
 SARibbonMainWindow::PrivateData::PrivateData(SARibbonMainWindow* p) : q_ptr(p)
 {
 }
 
-void SARibbonMainWindow::PrivateData::init()
+void SARibbonMainWindow::PrivateData::init(SARibbonMainWindow* mainwindow)
 {
+    // On Windows Qt::FramelessWindowHint needs to be set for translucency
+    // Disable all transparency effects on all platforms when not frameless
+    mainwindow->setWindowFlag(Qt::FramelessWindowHint, true);
+    mainwindow->setWindowFlag(Qt::NoDropShadowWindowHint, true);
+    //    mainwindow->setAttribute(Qt::WA_TranslucentBackground, true);
+    //    mainwindow->setAttribute(Qt::WA_NoSystemBackground, true);
+    // Convert window
+    framelessWindowConverter.convertWindowToFrameless(mainwindow->winId(), [ mainwindow ]() {
+        mainwindow->windowHandle()->setMouseGrabEnabled(false);
+    });
+    // 把窗口转换为无边框
+    framelessWindowConverter.setBorderWidth(1);
+    //
+    framelessWindowConverter.setShouldPerformWindowDrag([ this, mainwindow ](int x, int y) -> bool {
+        qDebug() << "setShouldPerformWindowDrag:x=" << x << ",y=" << y;
+        // 这里要判断x，y是否允许拖动窗口
+        // 如果点到WindowButtonGroup不拖动
+        if (this->mWindowButtonGroup) {
+            QRect buttonGroupGeo = this->mWindowButtonGroup->geometry();
+            if (buttonGroupGeo.contains(x, y)) {
+                return false;
+            }
+        }
+        QWidget* w = mainwindow->childAt(x, y);
+        if (nullptr == w) {
+            // 点击的就是自己
+            return false;
+        }
+        SARibbonBar* ribbonbar = qobject_cast< SARibbonBar* >(w);
+        if (!ribbonbar) {
+            // 没有点击到ribbonbar,childAt会把最底层的窗口获取，
+            // title是直接绘制到ribbonbar上的，因此获取到的child是ribbonbar就说明点击就是title，
+            // 点击到ribbonbar的其他子窗口获取到的是那个子窗口的指针
+            return false;
+        }
+        QPoint clickPointOfRibbon = ribbonbar->mapFrom(mainwindow, QPoint(x, y));
+        if (clickPointOfRibbon.y() < ribbonbar->titleBarHeight()) {
+            return true;
+        }
+        return false;
+    });
 }
 
 //===================================================
 // SARibbonMainWindow
 //===================================================
 SARibbonMainWindow::SARibbonMainWindow(QWidget* parent, bool useRibbon, const Qt::WindowFlags flags)
-#if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
-    : FramelessMainWindow(parent, flags)
-#else
-    : QMainWindow(parent, flags)
-#endif
-    , d_ptr(new SARibbonMainWindow::PrivateData(this))
+    : QMainWindow(parent, flags), d_ptr(new SARibbonMainWindow::PrivateData(this))
 {
-    d_ptr->init();
+    d_ptr->init(this);
     if (useRibbon) {
         installRibbonBar(createRibbonBar());
         setRibbonTheme(ribbonTheme());
@@ -14137,12 +15293,6 @@ SARibbonMainWindow::~SARibbonMainWindow()
 SARibbonBar* SARibbonMainWindow::ribbonBar() const
 {
     return qobject_cast< SARibbonBar* >(menuWidget());
-}
-
-#if !SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
-SAFramelessHelper* SARibbonMainWindow::framelessHelper()
-{
-    return (d_ptr->mFramelessHelper);
 }
 
 bool SARibbonMainWindow::eventFilter(QObject* obj, QEvent* e)
@@ -14165,7 +15315,7 @@ bool SARibbonMainWindow::eventFilter(QObject* obj, QEvent* e)
     }
     return (QMainWindow::eventFilter(obj, e));
 }
-#endif
+
 /**
  * @brief 此函数仅用于控制最小最大化和关闭按钮的显示
  */
@@ -14273,6 +15423,12 @@ bool SARibbonMainWindow::event(QEvent* e)
     return (QMainWindow::event(e));
 }
 
+bool SARibbonMainWindow::nativeEvent(const QByteArray& eventType, void* message, long* result)
+{
+    Q_UNUSED(eventType);
+    return d_ptr->framelessWindowConverter.filterNativeEvents(message, result);
+}
+
 void SARibbonMainWindow::installRibbonBar(SARibbonBar* bar)
 {
     QWidget* old = QMainWindow::menuWidget();
@@ -14280,11 +15436,8 @@ void SARibbonMainWindow::installRibbonBar(SARibbonBar* bar)
         // 如果之前已经设置了menubar，要把之前的删除
         old->deleteLater();
     }
-#if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
-    auto helper = FramelessWidgetsHelper::get(this);
-    QMainWindow::setMenuWidget(bar);
-    helper->setTitleBarWidget(bar);
-
+    // 安装ribbonbar
+    setMenuWidget(bar);
     // 设置window按钮
     if (nullptr == d_ptr->mWindowButtonGroup) {
         d_ptr->mWindowButtonGroup = new SAWindowButtonGroup(this);
@@ -14294,33 +15447,6 @@ void SARibbonMainWindow::installRibbonBar(SARibbonBar* bar)
     d_ptr->mWindowButtonGroup->setFixedSize(s);
     d_ptr->mWindowButtonGroup->setWindowStates(windowState());
     d_ptr->mWindowButtonGroup->show();
-    helper->setHitTestVisible(d_ptr->mWindowButtonGroup);   // IMPORTANT!
-    helper->setHitTestVisible(bar->ribbonTabBar());         // IMPORTANT!
-    helper->setHitTestVisible(bar->rightButtonGroup());     // IMPORTANT!
-    helper->setHitTestVisible(bar->applicationButton());    // IMPORTANT!
-    helper->setHitTestVisible(bar->quickAccessBar());       // IMPORTANT!
-    helper->setHitTestVisible(bar->ribbonStackedWidget());  // IMPORTANT!
-
-#else
-
-    QMainWindow::setMenuWidget(bar);
-    bar->installEventFilter(this);
-    // 设置窗体的标题栏高度
-    if (nullptr == d_ptr->mFramelessHelper) {
-        d_ptr->mFramelessHelper = new SAFramelessHelper(this);
-    }
-    d_ptr->mFramelessHelper->setTitleHeight(bar->titleBarHeight());
-    // 设置window按钮
-    if (nullptr == d_ptr->mWindowButtonGroup) {
-        d_ptr->mWindowButtonGroup = new SAWindowButtonGroup(this);
-    }
-    QSize s = d_ptr->mWindowButtonGroup->sizeHint();
-    s.setHeight(bar->titleBarHeight());
-    d_ptr->mWindowButtonGroup->setFixedSize(s);
-    d_ptr->mWindowButtonGroup->setWindowStates(windowState());
-    d_ptr->mWindowButtonGroup->show();
-
-#endif
 }
 
 void sa_set_ribbon_theme(QWidget* w, SARibbonMainWindow::RibbonTheme theme)

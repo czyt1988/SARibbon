@@ -146,10 +146,4 @@
     PrivateData& operator=(const PrivateData&) = delete;
 #endif
 
-/**
- * @def 定义此宏用第三方的frameless作为无边框方案
- * 此宏在qmake或在cmake中定义，不需要在此显示定义
- */
-// #define SARIBBON_USE_3RDPARTY_FRAMELESSHELPER 0
-
 #endif  // SARIBBONGLOBAL_H

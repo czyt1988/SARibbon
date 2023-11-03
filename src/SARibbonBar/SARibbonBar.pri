@@ -1,43 +1,7 @@
 
-# 这里要做如下改动：
-# 1.framelesshelper/qmake/inc/core/framelesshelper.config中的FRAMELESSHELPER_FEATURE_static_build设置为-1
-# 2.要预定义FRAMELESSHELPER_CORE_LIBRARY宏，这样才能导出符号
-# 3.要预定义FRAMELESSHELPER_WIDGETS_LIBRARY宏，这样才能导出符号
-
-greaterThan(QT_MAJOR_VERSION, 4){
-    # 目前 frameless支持qt5.14,qt5.15,qt6.4+,除了上诉版本，都使用不了
-    greaterThan(QT_MINOR_VERSION, 13){
-        SA_RIBBON_CONFIG += use_frameless
-    }
-}else{
-    # Qt6,qt6.4+可使用frameless
-    greaterThan(QT_MAJOR_VERSION, 5){
-        greaterThan(QT_MINOR_VERSION, 3){
-            SA_RIBBON_CONFIG += use_frameless
-        }
-    }
-}
-
-
-contains( SA_RIBBON_CONFIG, use_frameless ) {
-    message("use_frameless lib,compile with c+=17")
-    # 引入第三方库frameless后，必须要求c++17
-    !contains(CONFIG,C++17){
-        CONFIG += c++17
-    }
-    include($$PWD/3rdparty/framelesshelper/qmake/core.pri)
-    include($$PWD/3rdparty/framelesshelper/qmake/widgets.pri)
-    DEFINES += FRAMELESSHELPER_CORE_LIBRARY
-    DEFINES += FRAMELESSHELPER_WIDGETS_LIBRARY
-    DEFINES += FRAMELESSHELPER_FEATURE_static_build=-1
-    # 定义SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1是的使用framelss库
-    DEFINES += SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1
-}else{
-message("do not use_frameless lib,compile with c+=11")
-    CONFIG += c++11
-    DEFINES += SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=0
-}
-message("SA_RIBBON_CONFIG="$${SA_RIBBON_CONFIG})
+# 引入第三方库Qt-FramelessNativeWindow，https://github.com/Ochrazy/Qt-FramelessNativeWindow
+CONFIG += c++11
+include($$PWD/3rdparty/FramelessWindowConverter/FramelessWindowConverter.pri)
 #-------------------------------------------------
 #
 # SARibbon的文件
