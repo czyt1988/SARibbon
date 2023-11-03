@@ -46,11 +46,9 @@ void SARibbonMainWindow::PrivateData::init(SARibbonMainWindow* mainwindow)
     framelessWindowConverter.convertWindowToFrameless(mainwindow->winId(), [ mainwindow ]() {
         mainwindow->windowHandle()->setMouseGrabEnabled(false);
     });
-    // 把窗口转换为无边框
-    framelessWindowConverter.setBorderWidth(1);
+    //    framelessWindowConverter.setBorderWidth(1);
     //
     framelessWindowConverter.setShouldPerformWindowDrag([ this, mainwindow ](int x, int y) -> bool {
-        qDebug() << "setShouldPerformWindowDrag:x=" << x << ",y=" << y;
         // 这里要判断x，y是否允许拖动窗口
         // 如果点到WindowButtonGroup不拖动
         if (this->mWindowButtonGroup) {
@@ -77,6 +75,7 @@ void SARibbonMainWindow::PrivateData::init(SARibbonMainWindow* mainwindow)
         }
         return false;
     });
+    framelessWindowConverter.setEnableResizing(true);
 }
 
 //===================================================
@@ -223,7 +222,16 @@ bool SARibbonMainWindow::event(QEvent* e)
         switch (e->type()) {
         case QEvent::WindowStateChange: {
             if (isUseRibbon()) {
-                d_ptr->mWindowButtonGroup->setWindowStates(windowState());
+                Qt::WindowStates st = windowState();
+                qDebug() << "WindowStateChange" << st;
+                d_ptr->mWindowButtonGroup->setWindowStates(st);
+                if (st.testFlag(Qt::WindowMinimized)) {
+                    d_ptr->framelessWindowConverter.minimizeWindow();
+                } else if (st.testFlag(Qt::WindowMaximized)) {
+                    d_ptr->framelessWindowConverter.maximizeWindow();
+                } else if (st.testFlag(Qt::WindowFullScreen)) {
+                    d_ptr->framelessWindowConverter.toggleFullscreen();
+                }
             }
         } break;
 
