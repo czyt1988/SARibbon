@@ -362,7 +362,7 @@ void SARibbonPannelLayout::updateGeomArray(const QRect& setrect)
     }
 
 #if SARibbonPannelLayout_DEBUG_PRINT
-    qDebug() << "SARibbonPannelLayout::updateGeomArray(" << setrect << ")";
+    qDebug() << "SARibbonPannelLayout::updateGeomArray(" << setrect << "),pannel name = " << pannel->pannelName();
 #endif
     int height          = setrect.height();
     const QMargins& mag = pannelContentsMargins();
@@ -617,6 +617,9 @@ void SARibbonPannelLayout::updateGeomArray(const QRect& setrect)
         recalcExpandGeomArray(setrect);
     }
     this->m_sizeHint = QSize(totalWidth, height);
+#if SARibbonPannelLayout_DEBUG_PRINT
+    qDebug() << "SARibbonPannelLayout::updateGeomArray,m_sizeHint=" << m_sizeHint;
+#endif
 }
 
 void SARibbonPannelLayout::recalcExpandGeomArray(const QRect& setrect)

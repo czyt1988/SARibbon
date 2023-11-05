@@ -7,6 +7,9 @@
 #include <QApplication>
 #include <QDebug>
 
+#ifndef SARibbonCategoryLayout_DEBUG_PRINT
+#define SARibbonCategoryLayout_DEBUG_PRINT 0
+#endif
 /**
  * @brief The SARibbonCategoryLayoutPrivate class
  */
@@ -248,10 +251,14 @@ QSize SARibbonCategoryLayout::categoryContentSize() const
 void SARibbonCategoryLayout::updateGeometryArr()
 {
     SARibbonCategory* category = qobject_cast< SARibbonCategory* >(parentWidget());
-    int categoryWidth          = category->width();
-    QMargins mag               = contentsMargins();
-    int height                 = category->height();
-    int y                      = 0;
+    if (nullptr == category) {
+        return;
+    }
+
+    int categoryWidth = category->width();
+    QMargins mag      = contentsMargins();
+    int height        = category->height();
+    int y             = 0;
 
     if (!mag.isNull()) {
         y = mag.top();
@@ -264,10 +271,10 @@ void SARibbonCategoryLayout::updateGeometryArr()
     //扩展的宽度
     int expandWidth = 0;
 
-    //如果total < categoryWidth,m_d->mXBase可以设置为0
-    //判断是否超过总长度
-#ifdef SA_RIBBON_DEBUG_HELP_DRAW
-    qDebug() << "\r\n\r\n============================================="
+//如果total < categoryWidth,m_d->mXBase可以设置为0
+//判断是否超过总长度
+#if SARibbonCategoryLayout_DEBUG_PRINT
+    qDebug() << "\r\n\r\n==========================(" << category->categoryName() << ")======="
              << "\r\nSARibbonCategoryLayout::updateGeometryArr"
              << "\r\npannel name:" << category->windowTitle() << "\r\n height:" << height
              << "\r\n first total:" << total << "\r\n y:" << y << "\r\n expandWidth:" << expandWidth;
@@ -334,6 +341,7 @@ void SARibbonCategoryLayout::updateGeometryArr()
             qDebug() << "unknow widget in SARibbonCategoryLayout";
             continue;
         }
+        p->layout()->update();
         QSize pannelSize = p->sizeHint();
         QSize SeparatorSize(0, 0);
         if (item->separatorWidget) {
@@ -356,12 +364,13 @@ void SARibbonCategoryLayout::updateGeometryArr()
     QWidget* cp        = category->parentWidget();
     int parentHeight   = (nullptr == cp) ? height : cp->height();
     int parentWidth    = (nullptr == cp) ? total : cp->width();
-#ifdef SA_RIBBON_DEBUG_HELP_DRAW
-    qDebug() << "\r\n mSizeHint:[ " << parentHeight << "," << parentWidth;
-    for (int i = 0; i < m_d->mItemList.size(); ++i) {
-        qDebug() << "\r\n [ " << i << "]"
-                 << " geo:" << m_d->mItemList[ i ]->mWillSetGeometry
-                 << " sep geo:" << m_d->mItemList[ i ]->mWillSetSeparatorGeometry;
+#if SARibbonCategoryLayout_DEBUG_PRINT
+    qDebug() << "\r\n mSizeHint:[ " << parentHeight << "," << parentWidth << "]";
+    for (int i = 0; i < d_ptr->mItemList.size(); ++i) {
+        qDebug() << "\r\n [ " << i << "] (pannel name=" << d_ptr->mItemList[ i ]->toPannelWidget()->pannelName()
+                 << "),sizeHint=" << d_ptr->mItemList[ i ]->toPannelWidget()->sizeHint()
+                 << "\r\n geo:" << d_ptr->mItemList[ i ]->mWillSetGeometry
+                 << ", Separator geo:" << d_ptr->mItemList[ i ]->mWillSetSeparatorGeometry;
     }
 #endif
     d_ptr->mSizeHint = QSize(parentWidth, parentHeight);

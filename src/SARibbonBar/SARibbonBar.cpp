@@ -1277,13 +1277,17 @@ QColor SARibbonBar::tabBarBaseLineColor() const
  */
 void SARibbonBar::updateRibbonGeometry()
 {
-    updateRibbonElementGeometry();
-    QList< SARibbonCategory* > categorys = categoryPages();
-    for (SARibbonCategory* c : qAsConst(categorys)) {
-        c->updateItemGeometry();
-    }
-    //重新调整尺寸
-    resizeAll();
+    //    updateRibbonElementGeometry();
+    //    QList< SARibbonCategory* > categorys = categoryPages();
+    //    for (SARibbonCategory* c : qAsConst(categorys)) {
+    //        c->updateItemGeometry();
+    //    }
+    //    //重新调整尺寸
+    //    resizeAll();
+    //
+    //! 直接给一个resizeevent，让所有刷新
+    QResizeEvent* e = new QResizeEvent(size(), QSize());
+    QApplication::postEvent(this, e);
 }
 
 /**
