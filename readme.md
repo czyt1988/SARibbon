@@ -55,7 +55,7 @@ CONFIG += c++17
 
 ## Import into project (static)
 
-SARibbon provides amalgamated `SARibbon.h` and `SARibbon.cpp` files, which can be imported into the project and used without the need to compile them into a dynamic library. You can refer to the example of SimpleExample (located in `src/example/SimpleExample`).Static import uses four files: `SARibbon. h`,`SARibbon. cpp`, `SARibbon. pri`, `SARibbonBar/resource.qrc`, as well as two folders: `SARibbonBar/3rdparty` and `SARibbonBar/resource`:
+SARibbon provides amalgamated `SARibbon.h` and `SARibbon.cpp` files, which can be imported into the project and used without the need to compile them into a dynamic library. You can refer to the example of `StaticExample` (located in `src/example/StaticExample`).Static import uses four files: `SARibbon. h`,`SARibbon. cpp`, `SARibbon. pri`, `SARibbonBar/resource.qrc`, as well as two folders: `SARibbonBar/3rdparty` and `SARibbonBar/resource`:
 
 ```
 |-you-project-dir
@@ -86,6 +86,8 @@ Use qmake to compile, by following these steps:
 
 Static use of SARibbon can refer to the example of StaticExample (located in `src/example/StaticExample`)
 
+
+
 ## Compile as Library (Dynamic)
 
 Open `SARibbon.pro` directly using Qt Creator, and compile it.  The SARibbonBar library and an example (there is only one example at present) will be compiled.  The directories of lib and examples are located in `bin_Qt{Qt version}_{debug/release}_{32/64}` under directory.
@@ -94,6 +96,13 @@ Open `SARibbon.pro` directly using Qt Creator, and compile it.  The SARibbonBar 
 
 > Note:The minimum Qt version is 5.8
 
+## Build under Linux
+
+After the 1.x version, SARibbon uses the third-party library frameless, which can effectively solve the frameless problem of Qt window programs. Compiling under Linux requires the following three libraries: `libgl1-mesa-dev`,`libxcb1-dev`,`libgtk-3-dev`
+
+```shell
+sudo apt install -y libgl1-mesa-dev libxcb1-dev libgtk-3-dev
+```
 
 ## FAQ
 
@@ -140,6 +149,24 @@ int main(int argc, char* argv[])
     QApplication a(argc, argv);
     ......
 }
+```
+
+### Shortcut key problem
+
+Often people report that after using SARibbonBar, the shortcut keys for the unactivated tabs do not respond, and only the shortcut keys for the activated tabs respond.This issue is not a problem with SARibbonBar, but rather a problem with the setting of the shortcut context property for QAction.  The default shortcut property for QAction is `Qt::WindowShortcut`.  `Qt::WindowShortcut` means that the shortcut is active when its parent widget is a logical subwidget of the active top-level window.If it is a traditional toolbar mode, the toolbar where the action is located is always at the front, so the shortcut key always takes effect.However, if it is SARibbonBar, the action is located in a hidden pannel, and the shortcut key does not take effect.If you want the shortcut key to take effect regardless of whether the pannel is hidden, just set the action's `shortcutContext` property to `Qt::ApplicationShortcut`
+
+example:
+
+```cpp
+QAction* actionUndo = createAction("undo", ":/icon/icon/undo.svg");
+actionUndo->setShortcut(QKeySequence("Ctrl+Shift+z"));
+actionUndo->setShortcutContext(Qt::ApplicationShortcut);
+pannel->addSmallAction(actionUndo);
+
+QAction* actionRedo = createAction("redo", ":/icon/icon/redo.svg");
+actionRedo->setShortcut(QKeySequence("Ctrl+z"));
+actionRedo->setShortcutContext(Qt::ApplicationShortcut);
+pannel->addSmallAction(actionRedo);
 ```
 
 # Usage

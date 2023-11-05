@@ -390,6 +390,25 @@ void MainWindow::onRibbonThemeComboBoxCurrentIndexChanged(int index)
     setRibbonTheme(t);
 }
 
+/**
+ * @brief 隐藏action
+ * @param on
+ */
+void MainWindow::onActionHideActionTriggered(bool on)
+{
+    mActionWordWrap->setVisible(on);
+    mActionDisable->setVisible(on);
+    mActionUnlock->setVisible(on);
+    mActionSetTextTest->setVisible(on);
+    mActionShowTest->setVisible(on);
+    mActionHideAction2->setVisible(on);
+    mActionHideAction4->setVisible(on);
+    mActionHideShowTextAct2->setVisible(on);
+    mActionHideShowTextAct3->setVisible(on);
+    mActionHideShowTextAct4->setVisible(on);
+    ribbonBar()->updateRibbonGeometry();
+}
+
 void MainWindow::createCategoryMain(SARibbonCategory* page)
 {
     //! 1
@@ -934,93 +953,95 @@ void MainWindow::createContextCategoryPage1(SARibbonCategory* page)
 {
     SARibbonPannel* pannel = page->addPannel(tr("show and hide test"));
 
-    QAction* actionHidePannel = createAction("hide pannel", ":/icon/icon/hidePannel.svg");
-    actionHidePannel->setCheckable(true);
-    pannel->addLargeAction(actionHidePannel);
+    QAction* actionHideActions = createAction("hide action", ":/icon/icon/hidePannel.svg");
+    actionHideActions->setCheckable(true);
+    actionHideActions->setChecked(true);
+    pannel->addLargeAction(actionHideActions);
+    connect(actionHideActions, &QAction::triggered, this, &MainWindow::onActionHideActionTriggered);
 
-    QAction* actionDisable = createAction(tr("Disable"), ":/icon/icon/enableTest.svg");
+    mActionDisable = createAction(tr("Disable"), ":/icon/icon/enableTest.svg");
 
-    actionDisable->setDisabled(true);
-    pannel->addLargeAction(actionDisable);
-    connect(actionDisable, &QAction::triggered, this, [ actionDisable ](bool b) {
+    mActionDisable->setDisabled(true);
+    pannel->addLargeAction(mActionDisable);
+    connect(mActionDisable, &QAction::triggered, this, [ this ](bool b) {
         Q_UNUSED(b);
-        actionDisable->setDisabled(true);
+        mActionDisable->setDisabled(true);
     });
 
-    QAction* actionUnlock = createAction(tr("unlock"), ":/icon/icon/unlock.svg");
-    actionUnlock->setShortcut(QKeySequence(QLatin1String("Ctrl+E")));
-    pannel->addLargeAction(actionUnlock);
-    connect(actionUnlock, &QAction::triggered, this, [ actionDisable ](bool b) {
+    mActionUnlock = createAction(tr("unlock"), ":/icon/icon/unlock.svg");
+    mActionUnlock->setShortcut(QKeySequence(QLatin1String("Ctrl+E")));
+    pannel->addLargeAction(mActionUnlock);
+    connect(mActionUnlock, &QAction::triggered, this, [ this ](bool b) {
         Q_UNUSED(b);
-        actionDisable->setEnabled(true);
-        actionDisable->setText(("Enabled"));
+        mActionDisable->setEnabled(true);
+        mActionDisable->setText(("Enabled"));
     });
 
-    QAction* actionSetTextTest = createAction("set text", ":/icon/icon/setText.svg");
+    mActionSetTextTest = createAction("set text", ":/icon/icon/setText.svg");
 
-    actionSetTextTest->setCheckable(true);
-    actionSetTextTest->setShortcut(QKeySequence(QLatin1String("Ctrl+D")));
-    pannel->addLargeAction(actionSetTextTest);
+    mActionSetTextTest->setCheckable(true);
+    mActionSetTextTest->setShortcut(QKeySequence(QLatin1String("Ctrl+D")));
+    pannel->addLargeAction(mActionSetTextTest);
 
-    connect(actionSetTextTest, &QAction::toggled, this, [ actionSetTextTest ](bool b) {
+    connect(mActionSetTextTest, &QAction::toggled, this, [ this ](bool b) {
         if (b) {
-            actionSetTextTest->setText(QStringLiteral(u"setText测试"));
+            mActionSetTextTest->setText(QStringLiteral(u"setText测试"));
         } else {
-            actionSetTextTest->setText(QStringLiteral(u"set text"));
+            mActionSetTextTest->setText(QStringLiteral(u"set text"));
         }
     });
     //隐藏pannel
-    QAction* actionShowTest = createAction("show beside pannel", ":/icon/icon/show.svg");
+    mActionShowTest = createAction("show beside pannel", ":/icon/icon/show.svg");
 
-    actionShowTest->setCheckable(true);
-    pannel->addLargeAction(actionShowTest);
+    mActionShowTest->setCheckable(true);
+    pannel->addLargeAction(mActionShowTest);
 
-    SARibbonPannel* pannel2 = page->addPannel(tr("show/hide"));
+    mPannelVisbileExample = page->addPannel(tr("show/hide"));
 
-    pannel2->addLargeAction(actionSetTextTest);
+    mPannelVisbileExample->addLargeAction(mActionSetTextTest);
 
-    connect(actionShowTest, &QAction::toggled, this, [ actionShowTest, pannel2, this ](bool b) {
-        pannel2->setVisible(!b);
+    connect(mActionShowTest, &QAction::toggled, this, [ this ](bool b) {
+        mPannelVisbileExample->setVisible(!b);
         if (b) {
-            actionShowTest->setText(tr("hide beside pannel"));
+            mActionShowTest->setText(tr("hide beside pannel"));
         } else {
-            actionShowTest->setText(tr("show beside pannel"));
+            mActionShowTest->setText(tr("show beside pannel"));
         }
         ribbonBar()->repaint();
     });
 
     SARibbonPannel* pannel3 = page->addPannel(("show/hide action test"));
 
-    QAction* actionHideAction2 = createAction("hide action 2", ":/icon/icon/action.svg");
-    QAction* actionHideAction4 = createAction("hide action 4", ":/icon/icon/action.svg");
-    actionHideAction2->setCheckable(true);
-    actionHideAction2->setChecked(true);
-    actionHideAction4->setCheckable(true);
-    actionHideAction4->setChecked(true);
-    QAction* act2 = createAction("action2", ":/icon/icon/action2.svg");
-    QAction* act3 = createAction("action3", ":/icon/icon/action3.svg");
-    QAction* act4 = createAction("action4", ":/icon/icon/action4.svg");
-    pannel3->addLargeAction(actionHideAction2);
-    pannel3->addLargeAction(actionHideAction4);
-    pannel3->addSmallAction(act2);
-    pannel3->addSmallAction(act3);
-    pannel3->addSmallAction(act4);
-    connect(actionHideAction2, &QAction::triggered, this, [ actionHideAction2, act2 ](bool b) {
+    mActionHideAction2 = createAction("hide action 2", ":/icon/icon/action.svg");
+    mActionHideAction4 = createAction("hide action 4", ":/icon/icon/action.svg");
+    mActionHideAction2->setCheckable(true);
+    mActionHideAction2->setChecked(true);
+    mActionHideAction4->setCheckable(true);
+    mActionHideAction4->setChecked(true);
+    mActionHideShowTextAct2 = createAction("action2", ":/icon/icon/action2.svg");
+    mActionHideShowTextAct3 = createAction("action3", ":/icon/icon/action3.svg");
+    mActionHideShowTextAct4 = createAction("action4", ":/icon/icon/action4.svg");
+    pannel3->addLargeAction(mActionHideAction2);
+    pannel3->addLargeAction(mActionHideAction4);
+    pannel3->addSmallAction(mActionHideShowTextAct2);
+    pannel3->addSmallAction(mActionHideShowTextAct3);
+    pannel3->addSmallAction(mActionHideShowTextAct4);
+    connect(mActionHideAction2, &QAction::triggered, this, [ this ](bool b) {
         if (b) {
-            act2->setVisible(true);
-            actionHideAction2->setText(tr("hide action2"));
+            mActionHideShowTextAct2->setVisible(true);
+            mActionHideAction2->setText(tr("hide action2"));
         } else {
-            act2->setVisible(false);
-            actionHideAction2->setText(tr("show action2"));
+            mActionHideShowTextAct2->setVisible(false);
+            mActionHideAction2->setText(tr("show action2"));
         }
     });
-    connect(actionHideAction4, &QAction::triggered, this, [ actionHideAction4, act4 ](bool b) {
+    connect(mActionHideAction4, &QAction::triggered, this, [ this ](bool b) {
         if (b) {
-            act4->setVisible(true);
-            actionHideAction4->setText(tr("hide action4"));
+            mActionHideShowTextAct4->setVisible(true);
+            mActionHideAction4->setText(tr("hide action4"));
         } else {
-            act4->setVisible(false);
-            actionHideAction4->setText(tr("show action4"));
+            mActionHideShowTextAct4->setVisible(false);
+            mActionHideAction4->setText(tr("show action4"));
         }
     });
     //
@@ -1097,8 +1118,20 @@ void MainWindow::createQuickAccessBar(SARibbonQuickAccessBar* quickAccessBar)
 {
     quickAccessBar->addAction(createAction("save", ":/icon/icon/save.svg", "save-quickbar"));
     quickAccessBar->addSeparator();
-    quickAccessBar->addAction(createAction("undo", ":/icon/icon/undo.svg"));
-    quickAccessBar->addAction(createAction("redo", ":/icon/icon/redo.svg"));
+
+    QAction* actionUndo = createAction("undo", ":/icon/icon/undo.svg");
+    actionUndo->setShortcut(QKeySequence("Ctrl+Shift+z"));
+    actionUndo->setShortcutContext(Qt::ApplicationShortcut);
+    quickAccessBar->addAction(actionUndo);
+
+    QAction* actionRedo = createAction("redo", ":/icon/icon/redo.svg");
+    actionRedo->setShortcut(QKeySequence("Ctrl+z"));
+    actionRedo->setShortcutContext(Qt::ApplicationShortcut);
+    quickAccessBar->addAction(actionRedo);
+
+    connect(actionUndo, &QAction::triggered, this, [ this ]() { m_edit->append("undo"); });
+    connect(actionRedo, &QAction::triggered, this, [ this ]() { m_edit->append("redo"); });
+
     quickAccessBar->addSeparator();
     QMenu* m = new QMenu("Presentation File", this);
     m->setIcon(QIcon(":/icon/icon/presentationFile.svg"));

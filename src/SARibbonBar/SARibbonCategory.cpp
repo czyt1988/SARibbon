@@ -9,6 +9,7 @@
 #include <QHBoxLayout>
 #include <QList>
 #include <QMap>
+#include <QResizeEvent>
 #include "SARibbonCategoryLayout.h"
 #include "SARibbonSeparatorWidget.h"
 #include "SARibbonElementManager.h"
@@ -523,6 +524,8 @@ void SARibbonCategory::updateItemGeometry()
 {
     if (SARibbonCategoryLayout* lay = categoryLayout()) {
         lay->invalidate();
+        QResizeEvent* e = new QResizeEvent(size(), QSize());
+        QApplication::postEvent(this, e);
     }
 }
 
