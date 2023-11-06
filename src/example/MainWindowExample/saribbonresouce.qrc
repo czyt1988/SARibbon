@@ -59,6 +59,8 @@
         <file>icon/Underline.svg</file>
         <file>icon/Italic.svg</file>
         <file>icon/bold.svg</file>
+        <file>icon/visible-false.svg</file>
+        <file>icon/visible-true.svg</file>
     </qresource>
     <qresource prefix="/gallery-icon">
         <file>icon/gallery/Document-File.svg</file>

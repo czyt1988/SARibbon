@@ -31,7 +31,8 @@ private:
     void createContextCategoryPage1(SARibbonCategory* page);
     void createContextCategoryPage2(SARibbonCategory* page);
     void createQuickAccessBar(SARibbonQuickAccessBar* quickAccessBar);
-    void createRightButtonGroup(SARibbonButtonGroupWidget* rightBar);
+    void createRightButtonGroup();
+    // 创建ActionsManager，实现actions的管理以及SARibbonBar的自定义
     void createActionsManager();
     QAction* createAction(const QString& text, const QString& iconurl, const QString& objName);
     QAction* createAction(const QString& text, const QString& iconurl);
@@ -60,6 +61,8 @@ private slots:
     void onColorButtonColorClicked(const QColor& c, bool on);
     void onRibbonThemeComboBoxCurrentIndexChanged(int index);
     void onActionHideActionTriggered(bool on);
+    // 切换所有action是否可见
+    void onActionVisibleAllTriggered(bool on);
 
 private:
     // 创建其它actions，这些actions并不在SARibbonBar管理
@@ -94,6 +97,8 @@ private:
     QAction* mOtherAction5 { nullptr };
     QAction* mOtherActionIcon1 { nullptr };
     SARibbonPannel* mPannelVisbileExample { nullptr };
+    //
+    QAction* mActionVisibleAll { nullptr };  ///< 控制所有action是否可见的开关
 };
 
 #endif  // MAINWINDOW_H
