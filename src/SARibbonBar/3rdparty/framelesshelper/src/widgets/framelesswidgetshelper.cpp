@@ -161,7 +161,7 @@ static inline void forceWidgetRepaint(QWidget *widget)
     if (!widget) {
         return;
     }
-#if (defined(Q_OS_WINDOWS) && (QT_VERSION < QT_VERSION_CHECK(6, 5, 3)))
+#if (defined(Q_OS_WINDOWS) && (QT_VERSION != QT_VERSION_CHECK(6, 5, 3)) && (QT_VERSION != QT_VERSION_CHECK(6, 6, 0)))
     // There's some additional things to do for top level windows on Windows.
     if (widget->isWindow()) {
         // Don't crash if the QWindow instance has not been created yet.
