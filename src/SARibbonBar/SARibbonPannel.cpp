@@ -38,11 +38,11 @@ class SARibbonPannel::PrivateData
     SA_RIBBON_DECLARE_PUBLIC(SARibbonPannel)
 public:
     PrivateData(SARibbonPannel* p);
-    //根据m_pannelLayoutMode返回gridLayout应该增加的行数
+    // 根据m_pannelLayoutMode返回gridLayout应该增加的行数
     int rowadded();
     void createLayout();
 
-    //返回最后一个添加的action对应的button，前提是最后一个是toolbutton，否则返回nullptr
+    // 返回最后一个添加的action对应的button，前提是最后一个是toolbutton，否则返回nullptr
     SARibbonToolButton* lastAddActionButton();
 
 public:
@@ -442,10 +442,10 @@ QList< SARibbonToolButton* > SARibbonPannel::ribbonToolButtons() const
  */
 void SARibbonPannel::setPannelLayoutMode(SARibbonPannel::PannelLayoutMode mode)
 {
-    //不做相同判断，这样可以进行强制布局
-    //    if (d_ptr->m_pannelLayoutMode == mode) {
-    //        return;
-    //    }
+    // 不做相同判断，这样可以进行强制布局
+    //     if (d_ptr->m_pannelLayoutMode == mode) {
+    //         return;
+    //     }
     d_ptr->m_pannelLayoutMode = mode;
     resetLayout(mode);
     resetLargeToolButtonStyle();
@@ -477,7 +477,7 @@ void SARibbonPannel::addOptionAction(QAction* action)
     d_ptr->m_optionActionButton->setFixedSize(optionActionButtonSize());
     d_ptr->m_optionActionButton->setIconSize(optionActionButtonSize() - QSize(-2, -2));
     d_ptr->m_optionActionButton->connectAction(action);
-    updateGeometry();  //通知layout进行重新布局
+    updateGeometry();  // 通知layout进行重新布局
     repaint();
 }
 
@@ -527,7 +527,7 @@ QSize SARibbonPannel::sizeHint() const
     int maxWidth  = laySize.width() + 2;
 
     if (ThreeRowMode == pannelLayoutMode()) {
-        //三行模式
+        // 三行模式
         QFontMetrics fm = fontMetrics();
         QSize titleSize = fm.size(Qt::TextShowMnemonic, pannelName());
         if (d_ptr->m_optionActionButton) {
@@ -605,7 +605,7 @@ void SARibbonPannel::moveAction(int from, int to)
     if (SARibbonPannelLayout* lay = pannelLayout()) {
         return (lay->move(from, to));
     }
-    updateGeometry();  //通知layout进行重新布局
+    updateGeometry();  // 通知layout进行重新布局
 }
 
 /**
@@ -682,13 +682,26 @@ SARibbonPannelLayout* SARibbonPannel::pannelLayout() const
     return qobject_cast< SARibbonPannelLayout* >(layout());
 }
 
+/**
+ * @brief 更新布局
+ */
+void SARibbonPannel::updateItemGeometry()
+{
+    if (QLayout* lay = layout()) {
+        lay->invalidate();
+    }
+    updateGeometry();
+    QResizeEvent* e = new QResizeEvent(size(), QSize());
+    QApplication::postEvent(this, e);
+}
+
 void SARibbonPannel::resetLayout(PannelLayoutMode newmode)
 {
     Q_UNUSED(newmode);
     if (QLayout* ly = layout()) {
         ly->invalidate();
         layout()->setSpacing(TwoRowMode == newmode ? 4 : 2);
-        updateGeometry();  //通知layout进行重新布局
+        updateGeometry();  // 通知layout进行重新布局
     }
 }
 
@@ -715,7 +728,7 @@ void SARibbonPannel::resizeEvent(QResizeEvent* event)
         if (ThreeRowMode == pannelLayoutMode()) {
             d_ptr->m_optionActionButton->move(width() - d_ptr->m_optionActionButton->width() - 2,
                                               height() - titleHeight()
-                                                  + (titleHeight() - d_ptr->m_optionActionButton->height()) / 2);
+                                                      + (titleHeight() - d_ptr->m_optionActionButton->height()) / 2);
         } else {
             d_ptr->m_optionActionButton->move(width() - d_ptr->m_optionActionButton->width(),
                                               height() - d_ptr->m_optionActionButton->height());
@@ -757,14 +770,14 @@ void SARibbonPannel::actionEvent(QActionEvent* e)
         }
         int index = layout()->count();
         if (e->before()) {
-            //说明是插入
+            // 说明是插入
             index = lay->indexOf(action);
             if (-1 == index) {
-                index = layout()->count();  //找不到的时候就插入到最后
+                index = layout()->count();  // 找不到的时候就插入到最后
             }
         }
         lay->insertAction(index, action, getActionRowProportionProperty(action));
-        //由于pannel的尺寸发生变化，需要让category也调整
+        // 由于pannel的尺寸发生变化，需要让category也调整
         if (QWidget* parw = parentWidget()) {
             if (QLayout* pl = parw->layout()) {
                 pl->invalidate();
@@ -773,9 +786,10 @@ void SARibbonPannel::actionEvent(QActionEvent* e)
     } break;
 
     case QEvent::ActionChanged: {
-        //让布局重新绘制
+        // 让布局重新绘制
         layout()->invalidate();
-        //由于pannel的尺寸发生变化，需要让category也调整
+        updateGeometry();
+        // 由于pannel的尺寸发生变化，需要让category也调整
         if (QWidget* parw = parentWidget()) {
 #if SARibbonPannel_DEBUG_PRINT
             if (SARibbonCategory* category = qobject_cast< SARibbonCategory* >(parw)) {
@@ -811,7 +825,7 @@ void SARibbonPannel::actionEvent(QActionEvent* e)
             QLayoutItem* item = lay->takeAt(index);
             delete item;
         }
-        //由于pannel的尺寸发生变化，需要让category也调整
+        // 由于pannel的尺寸发生变化，需要让category也调整
         if (QWidget* parw = parentWidget()) {
             if (QLayout* pl = parw->layout()) {
                 pl->invalidate();

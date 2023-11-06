@@ -18,9 +18,9 @@ public:
     MainWindow(QWidget* par = nullptr);
 
 private:
-    //创建ribbon-application菜单示例
-    void createRibbonApplicationMenu();
-    //创建main菜单示例
+    // 创建ribbon-application菜单示例
+    void createRibbonApplicationButton();
+    // 创建main菜单示例
     void createCategoryMain(SARibbonCategory* page);
     void createCategoryOther(SARibbonCategory* page);
     void createCategoryDelete(SARibbonCategory* page);
@@ -32,7 +32,7 @@ private:
     void createContextCategoryPage2(SARibbonCategory* page);
     void createQuickAccessBar(SARibbonQuickAccessBar* quickAccessBar);
     void createRightButtonGroup(SARibbonButtonGroupWidget* rightBar);
-    void addSomeOtherAction();
+    void createActionsManager();
     QAction* createAction(const QString& text, const QString& iconurl, const QString& objName);
     QAction* createAction(const QString& text, const QString& iconurl);
 private slots:
@@ -62,15 +62,19 @@ private slots:
     void onActionHideActionTriggered(bool on);
 
 private:
-    SARibbonContextCategory* m_contextCategory;
-    SARibbonContextCategory* m_contextCategory2;
-    SARibbonCustomizeWidget* m_customizeWidget;
-    QTextEdit* m_edit;
-    SARibbonActionsManager* m_actMgr;
-    int m_actionTagText;
-    int m_actionTagWithIcon;
-    QMenu* m_applicationMenu;
-    QComboBox* m_ribbonTheme;
+    // 创建其它actions，这些actions并不在SARibbonBar管理
+    void createOtherActions();
+
+private:
+    SARibbonContextCategory* mContextCategory;
+    SARibbonContextCategory* mContextCategory2;
+    SARibbonCustomizeWidget* mWidgetForCustomize;
+    QTextEdit* mTextedit;
+    SARibbonActionsManager* mActionsManager;
+    int mTagForActionText;
+    int mTagForActionIcon;
+    QMenu* mMenuApplicationBtn;
+    QComboBox* mComboboxRibbonTheme;
     //
     QAction* mActionWordWrap { nullptr };
     QAction* mActionDisable { nullptr };
@@ -83,6 +87,12 @@ private:
     QAction* mActionHideShowTextAct3 { nullptr };
     QAction* mActionHideShowTextAct4 { nullptr };
     //
+    QAction* mOtherAction1 { nullptr };
+    QAction* mOtherAction2 { nullptr };
+    QAction* mOtherAction3 { nullptr };
+    QAction* mOtherAction4 { nullptr };
+    QAction* mOtherAction5 { nullptr };
+    QAction* mOtherActionIcon1 { nullptr };
     SARibbonPannel* mPannelVisbileExample { nullptr };
 };
 

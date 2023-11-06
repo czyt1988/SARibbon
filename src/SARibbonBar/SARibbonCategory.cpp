@@ -29,10 +29,10 @@ public:
     void addPannel(SARibbonPannel* pannel);
     void insertPannel(int index, SARibbonPannel* pannel);
 
-    //把pannel从Category中移除，不会销毁，此时pannel的所有权归还操作者
+    // 把pannel从Category中移除，不会销毁，此时pannel的所有权归还操作者
     bool takePannel(SARibbonPannel* pannel);
 
-    //移除Pannel，Category会直接回收SARibbonPannel内存
+    // 移除Pannel，Category会直接回收SARibbonPannel内存
     bool removePannel(SARibbonPannel* pannel);
     void setBackgroundBrush(const QBrush& brush);
     SARibbonCategory* ribbonCategory();
@@ -40,10 +40,10 @@ public:
     void setRibbonPannelLayoutMode(SARibbonPannel::PannelLayoutMode m);
     SARibbonPannel::PannelLayoutMode ribbonPannelLayoutMode() const;
 
-    //返回所有的Pannel
+    // 返回所有的Pannel
     QList< SARibbonPannel* > pannelList();
 
-    //更新item的布局,此函数会调用doItemLayout
+    // 更新item的布局,此函数会调用doItemLayout
     void updateItemGeometry();
 
     void doWheelEvent(QWheelEvent* event);
@@ -194,14 +194,14 @@ void SARibbonCategory::PrivateData::doWheelEvent(QWheelEvent* event)
         return;
     }
     QSize contentSize = lay->categoryContentSize();
-    //求总宽
+    // 求总宽
     int totalWidth = lay->categoryTotalWidth();
 
     if (totalWidth > contentSize.width()) {
-        //这个时候滚动有效
+        // 这个时候滚动有效
         int scrollpix = 40;
         // Qt6 取消了QWheelEvent::delta函数
-        //是要下面方法可兼容qt5/6
+        // 是要下面方法可兼容qt5/6
         QPoint numPixels  = event->pixelDelta();
         QPoint numDegrees = event->angleDelta() / 8;
         if (!numPixels.isNull()) {
@@ -215,9 +215,9 @@ void SARibbonCategory::PrivateData::doWheelEvent(QWheelEvent* event)
         }
         lay->scroll(scrollpix);
     } else {
-        //这时候无需处理事件，把滚动事件上发让父级也能接收
+        // 这时候无需处理事件，把滚动事件上发让父级也能接收
         event->ignore();
-        //如滚动过就还原
+        // 如滚动过就还原
         if (lay->isScrolled()) {
             lay->scroll(0);
         }
@@ -522,8 +522,13 @@ SARibbonBar* SARibbonCategory::ribbonBar() const
  */
 void SARibbonCategory::updateItemGeometry()
 {
-    if (SARibbonCategoryLayout* lay = categoryLayout()) {
+    QList< SARibbonPannel* > pannels = pannelList();
+    for (SARibbonPannel* p : qAsConst(pannels)) {
+        p->updateItemGeometry();
+    }
+    if (QLayout* lay = layout()) {
         lay->invalidate();
+        updateGeometry();
         QResizeEvent* e = new QResizeEvent(size(), QSize());
         QApplication::postEvent(this, e);
     }
@@ -539,12 +544,12 @@ bool SARibbonCategory::eventFilter(QObject* watched, QEvent* event)
     if (pannel) {
         switch (event->type()) {
         case QEvent::HideToParent: {
-            //隐藏和显示都要重新布局
+            // 隐藏和显示都要重新布局
             layout()->invalidate();
         } break;
 
         case QEvent::ShowToParent: {
-            //隐藏和显示都要重新布局
+            // 隐藏和显示都要重新布局
             layout()->invalidate();
         } break;
 
