@@ -59,8 +59,240 @@
 #  include <sdkddkver.h>
 #endif
 
+#ifndef _WIN32_WINNT_NT4
+#  define _WIN32_WINNT_NT4 0x0400
+#endif
+
+#ifndef _WIN32_WINNT_WIN2K
+#  define _WIN32_WINNT_WIN2K 0x0500
+#endif
+
+#ifndef _WIN32_WINNT_WINXP
+#  define _WIN32_WINNT_WINXP 0x0501
+#endif
+
+#ifndef _WIN32_WINNT_WS03
+#  define _WIN32_WINNT_WS03 0x0502
+#endif
+
+#ifndef _WIN32_WINNT_LONGHORN
+#  define _WIN32_WINNT_LONGHORN 0x0600
+#endif
+
+#ifndef _WIN32_WINNT_WS08
+#  define _WIN32_WINNT_WS08 _WIN32_WINNT_LONGHORN
+#endif
+
+#ifndef _WIN32_WINNT_WIN6
+#  define _WIN32_WINNT_WIN6 _WIN32_WINNT_LONGHORN
+#endif
+
+#ifndef _WIN32_WINNT_VISTA
+#  define _WIN32_WINNT_VISTA _WIN32_WINNT_LONGHORN
+#endif
+
+#ifndef _WIN32_WINNT_WIN7
+#  define _WIN32_WINNT_WIN7 0x0601
+#endif
+
+#ifndef _WIN32_WINNT_WIN8
+#  define _WIN32_WINNT_WIN8 0x0602
+#endif
+
+#ifndef _WIN32_WINNT_WINBLUE
+#  define _WIN32_WINNT_WINBLUE 0x0603
+#endif
+
 #ifndef _WIN32_WINNT_WIN10
 #  define _WIN32_WINNT_WIN10 0x0A00
+#endif
+
+#ifndef NTDDI_WIN4
+#  define NTDDI_WIN4 0x04000000
+#endif
+
+#ifndef NTDDI_WIN2K
+#  define NTDDI_WIN2K 0x05000000
+#endif
+
+#ifndef NTDDI_WIN2KSP1
+#  define NTDDI_WIN2KSP1 0x05000100
+#endif
+
+#ifndef NTDDI_WIN2KSP2
+#  define NTDDI_WIN2KSP2 0x05000200
+#endif
+
+#ifndef NTDDI_WIN2KSP3
+#  define NTDDI_WIN2KSP3 0x05000300
+#endif
+
+#ifndef NTDDI_WIN2KSP4
+#  define NTDDI_WIN2KSP4 0x05000400
+#endif
+
+#ifndef NTDDI_WINXP
+#  define NTDDI_WINXP 0x05010000
+#endif
+
+#ifndef NTDDI_WINXPSP1
+#  define NTDDI_WINXPSP1 0x05010100
+#endif
+
+#ifndef NTDDI_WINXPSP2
+#  define NTDDI_WINXPSP2 0x05010200
+#endif
+
+#ifndef NTDDI_WINXPSP3
+#  define NTDDI_WINXPSP3 0x05010300
+#endif
+
+#ifndef NTDDI_WINXPSP4
+#  define NTDDI_WINXPSP4 0x05010400
+#endif
+
+#ifndef NTDDI_WS03
+#  define NTDDI_WS03 0x05020000
+#endif
+
+#ifndef NTDDI_WS03SP1
+#  define NTDDI_WS03SP1 0x05020100
+#endif
+
+#ifndef NTDDI_WS03SP2
+#  define NTDDI_WS03SP2 0x05020200
+#endif
+
+#ifndef NTDDI_WS03SP3
+#  define NTDDI_WS03SP3 0x05020300
+#endif
+
+#ifndef NTDDI_WS03SP4
+#  define NTDDI_WS03SP4 0x05020400
+#endif
+
+#ifndef NTDDI_LONGHORN
+#  define NTDDI_LONGHORN 0x06000000
+#endif
+
+#ifndef NTDDI_WIN6
+#  define NTDDI_WIN6 NTDDI_LONGHORN
+#endif
+
+#ifndef NTDDI_VISTA
+#  define NTDDI_VISTA NTDDI_LONGHORN
+#endif
+
+#ifndef NTDDI_WIN6SP1
+#  define NTDDI_WIN6SP1 0x06000100
+#endif
+
+#ifndef NTDDI_VISTASP1
+#  define NTDDI_VISTASP1 NTDDI_WIN6SP1
+#endif
+
+#ifndef NTDDI_WS08
+#  define NTDDI_WS08 NTDDI_WIN6SP1
+#endif
+
+#ifndef NTDDI_WIN6SP2
+#  define NTDDI_WIN6SP2 0x06000200
+#endif
+
+#ifndef NTDDI_VISTASP2
+#  define NTDDI_VISTASP2 NTDDI_WIN6SP2
+#endif
+
+#ifndef NTDDI_WS08SP2
+#  define NTDDI_WS08SP2 NTDDI_WIN6SP2
+#endif
+
+#ifndef NTDDI_WIN6SP3
+#  define NTDDI_WIN6SP3 0x06000300
+#endif
+
+#ifndef NTDDI_VISTASP3
+#  define NTDDI_VISTASP3 NTDDI_WIN6SP3
+#endif
+
+#ifndef NTDDI_WS08SP3
+#  define NTDDI_WS08SP3 NTDDI_WIN6SP3
+#endif
+
+#ifndef NTDDI_WIN6SP4
+#  define NTDDI_WIN6SP4 0x06000400
+#endif
+
+#ifndef NTDDI_VISTASP4
+#  define NTDDI_VISTASP4 NTDDI_WIN6SP4
+#endif
+
+#ifndef NTDDI_WS08SP4
+#  define NTDDI_WS08SP4 NTDDI_WIN6SP4
+#endif
+
+#ifndef NTDDI_WIN7
+#  define NTDDI_WIN7 0x06010000
+#endif
+
+#ifndef NTDDI_WIN8
+#  define NTDDI_WIN8 0x06020000
+#endif
+
+#ifndef NTDDI_WINBLUE
+#  define NTDDI_WINBLUE 0x06030000
+#endif
+
+#ifndef NTDDI_WINTHRESHOLD
+#  define NTDDI_WINTHRESHOLD 0x0A000000
+#endif
+
+#ifndef NTDDI_WIN10
+#  define NTDDI_WIN10 NTDDI_WINTHRESHOLD
+#endif
+
+#ifndef NTDDI_WIN10_TH2
+#  define NTDDI_WIN10_TH2 0x0A000001
+#endif
+
+#ifndef NTDDI_WIN10_RS1
+#  define NTDDI_WIN10_RS1 0x0A000002
+#endif
+
+#ifndef NTDDI_WIN10_RS2
+#  define NTDDI_WIN10_RS2 0x0A000003
+#endif
+
+#ifndef NTDDI_WIN10_RS3
+#  define NTDDI_WIN10_RS3 0x0A000004
+#endif
+
+#ifndef NTDDI_WIN10_RS4
+#  define NTDDI_WIN10_RS4 0x0A000005
+#endif
+
+#ifndef NTDDI_WIN10_RS5
+#  define NTDDI_WIN10_RS5 0x0A000006
+#endif
+
+#ifndef NTDDI_WIN10_19H1
+#  define NTDDI_WIN10_19H1 0x0A000007
+#endif
+
+#ifndef NTDDI_WIN10_VB
+#  define NTDDI_WIN10_VB 0x0A000008
+#endif
+
+#ifndef NTDDI_WIN10_MN
+#  define NTDDI_WIN10_MN 0x0A000009
+#endif
+
+#ifndef NTDDI_WIN10_FE
+#  define NTDDI_WIN10_FE 0x0A00000A
+#endif
+
+#ifndef NTDDI_WIN10_CO
+#  define NTDDI_WIN10_CO 0x0A00000B
 #endif
 
 #ifndef NTDDI_WIN10_NI
@@ -79,21 +311,20 @@
 #  define NTDDI_VERSION NTDDI_WIN10_NI
 #endif
 
-#if _WIN32_WINNT < _WIN32_WINNT_WIN10
-#undef _WIN32_WINNT
-#define _WIN32_WINNT _WIN32_WINNT_WIN10
+#if (_WIN32_WINNT < _WIN32_WINNT_WIN10)
+#  undef _WIN32_WINNT
+#  define _WIN32_WINNT _WIN32_WINNT_WIN10
 #endif
 
-#if WINVER < _WIN32_WINNT_WIN10
-#undef WINVER
-#define WINVER _WIN32_WINNT_WIN10
+#if (WINVER < _WIN32_WINNT_WIN10)
+#  undef WINVER
+#  define WINVER _WIN32_WINNT_WIN10
 #endif
 
 #include <windows.h>
 #include <uxtheme.h>
 #include <shellapi.h>
 #include <dwmapi.h>
-
 
 #include <FramelessHelper/Core/framelesshelpercore_global.h>
 

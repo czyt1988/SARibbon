@@ -420,7 +420,7 @@ void FramelessQuickHelperPrivate::doRepaintAllChildren()
         if (!window) {
             return;
         }
-#if (defined(Q_OS_WINDOWS) && (QT_VERSION < QT_VERSION_CHECK(6, 5, 3)))
+#if (defined(Q_OS_WINDOWS) && (QT_VERSION != QT_VERSION_CHECK(6, 5, 3)) && (QT_VERSION != QT_VERSION_CHECK(6, 6, 0)))
         // Sync the internal window frame margins with the latest DPI, otherwise
         // we will get wrong window sizes after the DPI change.
         std::ignore = Utils::updateInternalWindowFrameMargins(window, true);
