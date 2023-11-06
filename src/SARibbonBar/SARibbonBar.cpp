@@ -1084,7 +1084,7 @@ void SARibbonBar::resizeAll()
     update();
 }
 
-void SARibbonBar::updateRibbonElementGeometry()
+void SARibbonBar::synchronousCategoryLayoutMode()
 {
     // 根据样式调整SARibbonCategory的布局形式
     QList< SARibbonCategory* > categorys = categoryPages();
@@ -1098,11 +1098,6 @@ void SARibbonBar::updateRibbonElementGeometry()
     if (NormalRibbonMode == currentRibbonState()) {
         setFixedHeight(mainBarHeight());
     }
-    //    //最小模式时，bar的高度在resize之后调整
-    //    else if(MinimumRibbonMode == currentRibbonState()){
-    //        //处于最小模式下时，bar的高度为tabbar的bottom
-    //        setFixedHeight(m_d->ribbonTabBar->geometry().bottom());
-    //    }
 }
 
 void SARibbonBar::activeRightButtonGroup()
@@ -1142,7 +1137,7 @@ void SARibbonBar::setRibbonStyle(SARibbonBar::RibbonStyle v)
     // 如果想在两行模式换行，在调用SARibbonBar::setRibbonStyle后，再SARibbonToolButton::setEnableWordWrap(true)
     SARibbonToolButton::setEnableWordWrap(!isTwoRowStyle(v));
 
-    updateRibbonElementGeometry();
+    synchronousCategoryLayoutMode();
     QSize oldSize = size();
     QSize newSize(oldSize.width(), mainBarHeight());
     QResizeEvent es(newSize, oldSize);
@@ -1285,11 +1280,23 @@ void SARibbonBar::updateRibbonGeometry()
     //    //重新调整尺寸
     //    resizeAll();
     //
+    //    auto fnUpdate = [](QWidget* w) {
+    //        if (w) {
+    //            if (w->layout()) {
+    //                w->layout()->invalidate();
+    //            }
+    //            w->updateGeometry();
+    //            w->adjustSize();
+    //        }
+    //    };
     updateGeometry();
+    //    fnUpdate(d_ptr->mQuickAccessBar);
+    //    fnUpdate(d_ptr->mRightButtonGroup);
     QList< SARibbonCategory* > categorys = categoryPages();
     for (SARibbonCategory* c : qAsConst(categorys)) {
         c->updateItemGeometry();
     }
+
     //! 直接给一个resizeevent，让所有刷新
     QResizeEvent* e = new QResizeEvent(size(), QSize());
     QApplication::postEvent(this, e);
@@ -1745,7 +1752,7 @@ void SARibbonBar::changeEvent(QEvent* e)
 
 void SARibbonBar::resizeInOfficeStyle()
 {
-    updateRibbonElementGeometry();
+    synchronousCategoryLayoutMode();
     QMargins border = contentsMargins();
     int x           = border.left();
     int y           = border.top();
@@ -1815,7 +1822,8 @@ void SARibbonBar::resizeInOfficeStyle()
     // tab bar 定位
 
     // tabBar 右边的附加按钮组，这里一般会附加一些类似登录等按钮组
-    if (d_ptr->mRightButtonGroup && d_ptr->mRightButtonGroup->isVisible()) {
+    // 20231106 把visible的判断去掉 && d_ptr->mRightButtonGroup->isVisible()
+    if (d_ptr->mRightButtonGroup) {
         QSize wSize = d_ptr->mRightButtonGroup->sizeHint();
         endX -= wSize.width();
         // 上下留1px的边线
@@ -1835,7 +1843,7 @@ void SARibbonBar::resizeInOfficeStyle()
 
 void SARibbonBar::resizeInWpsLiteStyle()
 {
-    updateRibbonElementGeometry();
+    synchronousCategoryLayoutMode();
     QMargins border = contentsMargins();
     int x           = border.left();
     int y           = border.top();
@@ -1860,7 +1868,8 @@ void SARibbonBar::resizeInWpsLiteStyle()
     }
 
     // tabBar 右边的附加按钮组
-    if (d_ptr->mRightButtonGroup && d_ptr->mRightButtonGroup->isVisible()) {
+    // 20231106 把visible的判断去掉 && d_ptr->mRightButtonGroup->isVisible()
+    if (d_ptr->mRightButtonGroup) {
         QSize wSize = d_ptr->mRightButtonGroup->sizeHint();
         endX -= wSize.width();
         // 上下留1px的边线
