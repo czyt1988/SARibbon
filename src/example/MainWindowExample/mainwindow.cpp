@@ -135,9 +135,17 @@ MainWindow::MainWindow(QWidget* par)
     SARibbonQuickAccessBar* quickAccessBar = ribbon->quickAccessBar();
     createQuickAccessBar(quickAccessBar);
     PRINT_COST("add quick access bar");
-    SARibbonButtonGroupWidget* rightBar = ribbon->rightButtonGroup();
-    createRightButtonGroup(rightBar);
+
+    //! cn:
+    //! 创建RightButtonGroup,RightButtonGroup类似一个在右上角的工具栏，给用户放置一些快捷图标，例如关于、帮助等图标，
+    //! RightButtonGroup在SARibbonBar创建时就会构建一个默认的SARibbonButtonGroupWidget，可以通过SARibbonBar::rightButtonGroup函数获取
+    //! en:
+    //! Create a RightButtonGroup, which is similar to a toolbar in the upper right corner,
+    //! providing users with shortcut icons such as About, Help, etc. RightButtonGroup will build a default SARibbonButtonGroupWidget when creating SARibbonBar,
+    //! which can be obtained through the SARibbonBar::rightButtonGroup function
+    createRightButtonGroup();
     PRINT_COST("add right bar");
+
     //! cn:
     //! actionManager可以管理所有的action，并给SARibbon的自定义窗口使用,
     //! actionManager必须在ribbon的action都创建完成后创建，如果在之前就创建好，后加入ribbon的action需要手动管理到actionManager里，
@@ -441,6 +449,21 @@ void MainWindow::onActionHideActionTriggered(bool on)
     mActionHideShowTextAct2->setVisible(on);
     mActionHideShowTextAct3->setVisible(on);
     mActionHideShowTextAct4->setVisible(on);
+    ribbonBar()->updateRibbonGeometry();
+}
+
+/**
+ * @brief 切换所有action是否可见
+ * @param on
+ */
+void MainWindow::onActionVisibleAllTriggered(bool on)
+{
+    QList< QAction* > acts = mActionsManager->allActions();
+    for (QAction* a : acts) {
+        if (a != mActionVisibleAll) {
+            a->setVisible(on);
+        }
+    }
     ribbonBar()->updateRibbonGeometry();
 }
 
@@ -1197,13 +1220,38 @@ void MainWindow::createQuickAccessBar(SARibbonQuickAccessBar* quickAccessBar)
     connect(actionCustomizeAndSave, &QAction::triggered, this, &MainWindow::onActionCustomizeAndSaveTriggered);
 }
 
-void MainWindow::createRightButtonGroup(SARibbonButtonGroupWidget* rightBar)
+/**
+ * @brief 创建RightButtonGroup
+ *
+ * RightButtonGroup实在ribbonbar右边的工具栏，可以放置一些快捷图标
+ * @param rightBar
+ */
+void MainWindow::createRightButtonGroup()
 {
-    QAction* actionHelp = createAction(tr("help"), ":/icon/icon/help.svg");
+    SARibbonBar* ribbon = ribbonBar();
+    if (!ribbon) {
+        return;
+    }
+    SARibbonButtonGroupWidget* rightBar = ribbon->rightButtonGroup();
+    QAction* actionHelp                 = createAction(tr("help"), ":/icon/icon/help.svg");
+    mActionVisibleAll                   = createAction(tr("Visible"), ":/icon/icon/visible-true.svg");
+    mActionVisibleAll->setCheckable(true);
+    mActionVisibleAll->setChecked(true);
     connect(actionHelp, &QAction::triggered, this, &MainWindow::onActionHelpTriggered);
+    connect(mActionVisibleAll, &QAction::triggered, this, &MainWindow::onActionVisibleAllTriggered);
     rightBar->addAction(actionHelp);
+    rightBar->addAction(mActionVisibleAll);
 }
 
+/**
+ * @brief 创建ActionsManager（Create ActionsManager）
+ *
+ * 创建ActionsManager，实现actions的管理以及SARibbonBar的自定义
+ *
+ * Create ActionsManager to manage actions and customize SARibbonBar
+ *
+ *
+ */
 void MainWindow::createActionsManager()
 {
     // 添加其他的action，这些action并不在ribbon管理范围，主要用于SARibbonCustomizeWidget自定义用
