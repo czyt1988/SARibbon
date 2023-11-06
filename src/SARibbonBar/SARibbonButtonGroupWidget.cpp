@@ -168,7 +168,7 @@ QSize SARibbonButtonGroupWidget::minimumSizeHint() const
 void SARibbonButtonGroupWidget::setIconSize(const QSize& s)
 {
     d_ptr->mIconSize = s;
-    //迭代已经保存的button
+    // 迭代已经保存的button
     const QObjectList& objlist = children();
     for (QObject* obj : objlist) {
         if (ButtonTyle* btn = qobject_cast< ButtonTyle* >(obj)) {
@@ -210,7 +210,7 @@ void SARibbonButtonGroupWidget::actionEvent(QActionEvent* e)
             sp->setTopBottomMargins(3, 3);
             item.widget = sp;
         }
-        //不是widget，自动生成ButtonTyle
+        // 不是widget，自动生成ButtonTyle
         if (!item.widget) {
             ButtonTyle* button = RibbonSubElementDelegate->createRibbonControlButton(this);
             button->setAutoRaise(true);
@@ -218,7 +218,7 @@ void SARibbonButtonGroupWidget::actionEvent(QActionEvent* e)
             button->setFocusPolicy(Qt::NoFocus);
             button->setToolButtonStyle(Qt::ToolButtonIconOnly);
             button->setDefaultAction(item.action);
-            //根据QAction的属性设置按钮的大小
+            // 根据QAction的属性设置按钮的大小
 
             QObject::connect(button, &ButtonTyle::triggered, this, &SARibbonButtonGroupWidget::actionTriggered);
             item.widget = button;
@@ -226,11 +226,13 @@ void SARibbonButtonGroupWidget::actionEvent(QActionEvent* e)
         layout()->addWidget(item.widget);
         d_ptr->mItems.append(item);
         layout()->invalidate();
+        updateGeometry();
     } break;
 
     case QEvent::ActionChanged: {
-        //让布局重新绘制
+        // 让布局重新绘制
         layout()->invalidate();
+        updateGeometry();
     } break;
 
     case QEvent::ActionRemoved: {
@@ -248,6 +250,7 @@ void SARibbonButtonGroupWidget::actionEvent(QActionEvent* e)
             i = d_ptr->mItems.erase(i);
         }
         layout()->invalidate();
+        updateGeometry();
     } break;
 
     default:
