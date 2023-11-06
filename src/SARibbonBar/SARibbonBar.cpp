@@ -99,7 +99,7 @@ public:
                                   << QColor(14, 81, 167)   // 蓝
                                   << QColor(228, 0, 69)    // 红
                                   << QColor(67, 148, 0)    // 绿
-                ;
+            ;
     }
 
     void init()
@@ -1151,8 +1151,8 @@ void SARibbonBar::setRibbonStyle(SARibbonBar::RibbonStyle v)
 }
 
 /**
- * @brief 返回当前ribbon的风格
- * @return 返回当前ribbon的风格
+   @brief 返回当前ribbon的风格
+   @return 返回当前ribbon的风格
  */
 SARibbonBar::RibbonStyle SARibbonBar::currentRibbonStyle() const
 {
@@ -1164,10 +1164,10 @@ SARibbonBar::RibbonMode SARibbonBar::currentRibbonState() const
     return (d_ptr->mCurrentRibbonMode);
 }
 
-///
-/// \brief 切换到对应标签
-/// \param index 标签索引
-///
+/**
+   @brief 切换到对应标签
+   @param index 标签索引
+ */
 void SARibbonBar::setCurrentIndex(int index)
 {
     d_ptr->mRibbonTabBar->setCurrentIndex(index);
@@ -1183,10 +1183,10 @@ int SARibbonBar::currentIndex()
     return (d_ptr->mRibbonTabBar->currentIndex());
 }
 
-///
-/// \brief 确保标签显示出来，tab并切换到对应页
-/// \param category 标签指针
-///
+/**
+ * @brief 确保标签显示出来，tab并切换到对应页
+ * @param category 标签指针
+ */
 void SARibbonBar::raiseCategory(SARibbonCategory* category)
 {
     int index = d_ptr->mStackedContainerWidget->indexOf(category);
@@ -1289,9 +1289,9 @@ void SARibbonBar::updateRibbonGeometry()
     //            w->adjustSize();
     //        }
     //    };
-    updateGeometry();
     //    fnUpdate(d_ptr->mQuickAccessBar);
     //    fnUpdate(d_ptr->mRightButtonGroup);
+    updateGeometry();
     QList< SARibbonCategory* > categorys = categoryPages();
     for (SARibbonCategory* c : qAsConst(categorys)) {
         c->updateItemGeometry();
@@ -1533,7 +1533,7 @@ void SARibbonBar::paintInNormalStyle()
             titleRegion.setRect(d_ptr->mQuickAccessBar->geometry().right() + 1,
                                 border.top(),
                                 width() - d_ptr->mIconRightBorderPosition - border.right()
-                                        - d_ptr->mWindowButtonSize.width() - d_ptr->mQuickAccessBar->geometry().right() - 1,
+                                    - d_ptr->mWindowButtonSize.width() - d_ptr->mQuickAccessBar->geometry().right() - 1,
                                 titleBarHeight());
         } else {
             int leftwidth = contextCategoryRegion.x() - d_ptr->mQuickAccessBar->geometry().right() - d_ptr->mIconRightBorderPosition;
