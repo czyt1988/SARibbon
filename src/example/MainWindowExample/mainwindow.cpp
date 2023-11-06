@@ -50,11 +50,12 @@
     do {                                                                                                               \
         int ___TMP_INT = __TMP_COST.elapsed();                                                                         \
         qDebug() << STR << " cost " << ___TMP_INT - __TMP_LASTTIMES << " ms (" << ___TMP_INT << ")";                   \
-        m_edit->append(QString("%1 cost %2 ms(%3)").arg(STR).arg(___TMP_INT - __TMP_LASTTIMES).arg(___TMP_INT));       \
+        mTextedit->append(QString("%1 cost %2 ms(%3)").arg(STR).arg(___TMP_INT - __TMP_LASTTIMES).arg(___TMP_INT));    \
         __TMP_LASTTIMES = ___TMP_INT;                                                                                  \
     } while (0)
 
-MainWindow::MainWindow(QWidget* par) : SARibbonMainWindow(par), m_customizeWidget(nullptr), m_applicationMenu(nullptr)
+MainWindow::MainWindow(QWidget* par)
+    : SARibbonMainWindow(par), mWidgetForCustomize(nullptr), mMenuApplicationBtn(nullptr)
 {
     PRINT_COST_START();
 #if !SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
@@ -62,28 +63,40 @@ MainWindow::MainWindow(QWidget* par) : SARibbonMainWindow(par), m_customizeWidge
     helper->setRubberBandOnResize(false);
 #endif
     setWindowTitle(("ribbon mainwindow test"));
-    m_edit = new QTextEdit(this);
-    setCentralWidget(m_edit);
+    mTextedit = new QTextEdit(this);
+    setCentralWidget(mTextedit);
     setStatusBar(new QStatusBar());
 
     SARibbonBar* ribbon = ribbonBar();
-    //通过setContentsMargins设置ribbon四周的间距
+
+    //! 通过setContentsMargins设置ribbon四周的间距
     ribbon->setContentsMargins(5, 0, 5, 0);
-    //设置applicationButton
-    //    PRINT_COST("setCentralWidget & setWindowTitle");
-    ribbon->applicationButton()->setText(("   File   "));  //文字两边留有间距，好看一点
 
-    //! 创建application菜单
-    createRibbonApplicationMenu();
+    //! cn:
+    //! 这里示例的是如何设置和修改applicationButton，默认情况下SARibbonBar会创建一个SARibbonApplicationButton，
+    //! SARibbonApplicationButton的父类是QToolButton,用户也可以创建自己的applicationButton，
+    //! 通过SARibbonBar::setApplicationButton函数设置自己定义的按钮，如果传入一个空指针，将取消掉applicationButton
+    //! en:
+    //! Here is an example of how to set and modify the applicationButton. By default,
+    //! SARibbonBar will create a SARibbonApplicationButton. The parent class of SARibbonApplicationButton is QToolButton.
+    //! Users can also create their own applicationButton, and set their own buttons through the SARibbonBar::setApplicationButton function.
+    //! If a null pointer is passed in, the applicationButton will be canceled
+    createRibbonApplicationButton();
 
-    //! 添加主标签页
-    //! 这里演示了通过addCategoryPage工厂函数添加
+    //! cn:
+    //! 添加主标签页,这里演示通过SARibbonBar::addCategoryPage函数添加一个标签页
+    //! en:
+    //! Add the main tab. Here we show how to add a tab through the SARibbonBar::addCategoryPage function
     SARibbonCategory* categoryMain = ribbon->addCategoryPage(tr("Main"));
+
+    //! cn: SARibbonBar的Category和Pannel，以及对应的Action都应该设置ObjectName，因为如果要自定义action，这些ObjectName是必不可少的
+    //! en: The category , pannel and actions of SARibbonBar, should be set with Object Names, as these Object Names are essential for customizing actions
     categoryMain->setObjectName(("categoryMain"));
     createCategoryMain(categoryMain);
     PRINT_COST("new main page");
 
-    //添加其他标签页 - 直接new SARibbonCategory添加
+    //! cn:这里演示了另外一种添加标签页的方式，先创建SARibbonCategory指针，并通过SARibbonBar::addCategoryPage函数把SARibbonCategory指针传递给SARibbonBar
+    //! en:Here is another way to add a tab: first create a SARibbonCategory pointer and pass it to SARibbonBar through the SARibbonBar::addCategoryPage function
     SARibbonCategory* categoryOther = new SARibbonCategory();
     categoryOther->setCategoryName(tr("Other"));
     categoryOther->setObjectName(("categoryOther"));
@@ -91,7 +104,7 @@ MainWindow::MainWindow(QWidget* par) : SARibbonMainWindow(par), m_customizeWidge
     ribbon->addCategoryPage(categoryOther);
     PRINT_COST("add other page");
 
-    //添加删除标签页
+    // 添加删除标签页
     SARibbonCategory* categoryDelete = new SARibbonCategory();
     categoryDelete->setCategoryName(("Delete"));
     categoryDelete->setObjectName(("categoryDelete"));
@@ -99,7 +112,7 @@ MainWindow::MainWindow(QWidget* par) : SARibbonMainWindow(par), m_customizeWidge
     createCategoryDelete(categoryDelete);
     PRINT_COST("add category delete page");
 
-    //添加尺寸标签页
+    // 添加尺寸标签页
     SARibbonCategory* categorySize = new SARibbonCategory();
     categorySize->setCategoryName(("Size(example long category)"));
     categorySize->setObjectName(("categorySize"));
@@ -107,7 +120,7 @@ MainWindow::MainWindow(QWidget* par) : SARibbonMainWindow(par), m_customizeWidge
     createCategorySize(categorySize);
     PRINT_COST("add category size page");
 
-    //添加颜色标签页
+    // 添加颜色标签页
     SARibbonCategory* categoryColor = new SARibbonCategory();
     categoryColor->setCategoryName(("Color"));
     categoryColor->setObjectName(("categoryColor"));
@@ -125,44 +138,64 @@ MainWindow::MainWindow(QWidget* par) : SARibbonMainWindow(par), m_customizeWidge
     SARibbonButtonGroupWidget* rightBar = ribbon->rightButtonGroup();
     createRightButtonGroup(rightBar);
     PRINT_COST("add right bar");
-    addSomeOtherAction();
+    //! cn:
+    //! actionManager可以管理所有的action，并给SARibbon的自定义窗口使用,
+    //! actionManager必须在ribbon的action都创建完成后创建，如果在之前就创建好，后加入ribbon的action需要手动管理到actionManager里，
+    //! actionManager也可以管理不在ribbonBar里的action
+    //! en:
+    //! The ActionManager can manage all actions and be used for SARibbon's custom window.
+    //! The ActionManager must be created after all the actions in the ribbon are created.
+    //! If the actions are created before, the actions added to the ribbon need to be manually managed in the ActionManager.
+    //! The ActionManager can also manage actions not in the ribbon bar
+    createActionsManager();
 
     setMinimumWidth(500);
     //
     showMaximized();
-    onStyleClicked(SARibbonBar::RibbonStyleLooseThreeRow);
+    //    onStyleClicked(SARibbonBar::RibbonStyleLooseThreeRow);
     //
     setWindowIcon(QIcon(":/icon/icon/SA.svg"));
 }
 
-void MainWindow::createRibbonApplicationMenu()
+void MainWindow::createRibbonApplicationButton()
 {
-    //以下和一个传统的QMenu操作是一样的
-    if (!m_applicationMenu) {
-        m_applicationMenu = new SARibbonMenu(this);
-        m_applicationMenu->addAction(createAction("test1", ":/icon/icon/action.svg"));
-        m_applicationMenu->addAction(createAction("test2", ":/icon/icon/action2.svg"));
-        m_applicationMenu->addAction(createAction("test3", ":/icon/icon/action3.svg"));
-        m_applicationMenu->addAction(createAction("test4", ":/icon/icon/action4.svg"));
+    SARibbonBar* ribbon = ribbonBar();
+    if (!ribbon) {
+        return;
     }
-    // ribbonbar默认会创建一个SARibbonApplicationButton,当然用户也可以自定义button设置进去，例如定制一个圆形的菜单
-    QAbstractButton* btn              = ribbonBar()->applicationButton();
+    QAbstractButton* btn = ribbon->applicationButton();
+    if (!btn) {
+        // cn: SARibbonBar默认就会创建一个SARibbonApplicationButton，因此，在正常情况下，这个位置不会进入
+        // en: SARibbonBar creates a SARibbonApplicationButton by default. Therefore, under normal circumstances, this location will not enter
+        btn = new SARibbonApplicationButton(this);
+        ribbon->setApplicationButton(btn);
+    }
+    ribbon->applicationButton()->setText((" File "));  // 文字两边留有间距，好看一点
+    // cn: SARibbonMenu和QMenu的操作是一样的
+    // en: The operations of SARibbonMenu and QMenu are the same
+    if (!mMenuApplicationBtn) {
+        mMenuApplicationBtn = new SARibbonMenu(this);
+        mMenuApplicationBtn->addAction(createAction("test1", ":/icon/icon/action.svg"));
+        mMenuApplicationBtn->addAction(createAction("test2", ":/icon/icon/action2.svg"));
+        mMenuApplicationBtn->addAction(createAction("test3", ":/icon/icon/action3.svg"));
+        mMenuApplicationBtn->addAction(createAction("test4", ":/icon/icon/action4.svg"));
+    }
     SARibbonApplicationButton* appBtn = qobject_cast< SARibbonApplicationButton* >(btn);
     if (!appBtn) {
         return;
     }
-    appBtn->setMenu(m_applicationMenu);
+    appBtn->setMenu(mMenuApplicationBtn);
 }
 
 void MainWindow::onShowContextCategory(bool on)
 {
-    if (m_contextCategory == nullptr) {
+    if (mContextCategory == nullptr) {
         createContextCategory1();
     }
     if (on) {
-        this->ribbonBar()->showContextCategory(m_contextCategory);
+        this->ribbonBar()->showContextCategory(mContextCategory);
     } else {
-        this->ribbonBar()->hideContextCategory(m_contextCategory);
+        this->ribbonBar()->hideContextCategory(mContextCategory);
     }
 }
 
@@ -174,25 +207,26 @@ void MainWindow::onStyleClicked(int id)
     mActionWordWrap->setChecked(SARibbonToolButton::isEnableWordWrap());
     switch (ribbonStyle) {
     case SARibbonBar::RibbonStyleLooseThreeRow:
-        m_edit->append(
-            tr("\nchange ribbon style to office style,The standard office style text display is line wrapped, "
-               "and you can also control whether it wrap through SARibbonToolButton::setEnableWordWrap"));  // cn:标准的office样式的文字显示是换行的，你也可以通过SARibbonToolButton::setEnableWordWrap来控制它是否换行
-        m_edit->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::OfficeStyle);"));
+        mTextedit->append(
+                tr("\nchange ribbon style to office style,The standard office style text display is line wrapped, "
+                   "and you can also control whether it wrap through SARibbonToolButton::setEnableWordWrap"));  // cn:标准的office样式的文字显示是换行的，你也可以通过SARibbonToolButton::setEnableWordWrap来控制它是否换行
+        mTextedit->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::OfficeStyle);"));
         break;
     case SARibbonBar::RibbonStyleLooseTwoRow:
-        m_edit->append(tr("\nchange ribbon style to office style 2 row,All text in 2-line mode does not wrap, and you "
-                          "can also control whether it wraps through SARibbonToolButton: setEnableWordWrap"));  // cn:所有2行模式的文字都是不换行的，你也可以通过SARibbonToolButton::setEnableWordWrap来控制它是否换行
-        m_edit->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::OfficeStyleTwoRow);"));
+        mTextedit->append(
+                tr("\nchange ribbon style to office style 2 row,All text in 2-line mode does not wrap, and you "
+                   "can also control whether it wraps through SARibbonToolButton: setEnableWordWrap"));  // cn:所有2行模式的文字都是不换行的，你也可以通过SARibbonToolButton::setEnableWordWrap来控制它是否换行
+        mTextedit->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::OfficeStyleTwoRow);"));
         break;
     case SARibbonBar::RibbonStyleCompactThreeRow:
-        m_edit->append(tr("\nchange ribbon style to wps style,The standard wps style text display is line wrapped, "
-                          "and you can also control whether it wrap through SARibbonToolButton::setEnableWordWrap"));  // cn:标准的wps样式的文字显示是换行的，你也可以通过SARibbonToolButton::setEnableWordWrap来控制它是否换行
-        m_edit->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::OfficeStyleTwoRow);"));
+        mTextedit->append(tr("\nchange ribbon style to wps style,The standard wps style text display is line wrapped, "
+                             "and you can also control whether it wrap through SARibbonToolButton::setEnableWordWrap"));  // cn:标准的wps样式的文字显示是换行的，你也可以通过SARibbonToolButton::setEnableWordWrap来控制它是否换行
+        mTextedit->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::OfficeStyleTwoRow);"));
         break;
     case SARibbonBar::RibbonStyleCompactTwoRow:
-        m_edit->append(tr("\nchange ribbon style to wps style 2 row,All text in 2-line mode does not wrap, and you "
-                          "can also control whether it wraps through SARibbonToolButton: setEnableWordWrap"));  // cn:所有2行模式的文字都是不换行的，你也可以通过SARibbonToolButton::setEnableWordWrap来控制它是否换行
-        m_edit->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::OfficeStyleTwoRow);"));
+        mTextedit->append(tr("\nchange ribbon style to wps style 2 row,All text in 2-line mode does not wrap, and you "
+                             "can also control whether it wraps through SARibbonToolButton: setEnableWordWrap"));  // cn:所有2行模式的文字都是不换行的，你也可以通过SARibbonToolButton::setEnableWordWrap来控制它是否换行
+        mTextedit->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::OfficeStyleTwoRow);"));
         break;
     default:
         break;
@@ -202,21 +236,21 @@ void MainWindow::onStyleClicked(int id)
 void MainWindow::onActionCustomizeTriggered(bool b)
 {
     Q_UNUSED(b);
-    if (nullptr == m_customizeWidget) {
-        m_customizeWidget = new SARibbonCustomizeWidget(this, this, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint | Qt::Dialog);
-        m_customizeWidget->setWindowModality(Qt::ApplicationModal);  //设置阻塞类型
-        m_customizeWidget->setAttribute(Qt::WA_ShowModal, true);     //属性设置 true:模态 false:非模态
-        m_customizeWidget->setupActionsManager(m_actMgr);
+    if (nullptr == mWidgetForCustomize) {
+        mWidgetForCustomize = new SARibbonCustomizeWidget(this, this, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint | Qt::Dialog);
+        mWidgetForCustomize->setWindowModality(Qt::ApplicationModal);  // 设置阻塞类型
+        mWidgetForCustomize->setAttribute(Qt::WA_ShowModal, true);     // 属性设置 true:模态 false:非模态
+        mWidgetForCustomize->setupActionsManager(mActionsManager);
     }
-    m_customizeWidget->show();
-    m_customizeWidget->applys();
+    mWidgetForCustomize->show();
+    mWidgetForCustomize->applys();
 }
 
 void MainWindow::onActionCustomizeAndSaveTriggered(bool b)
 {
     Q_UNUSED(b);
     SARibbonCustomizeDialog dlg(this);
-    dlg.setupActionsManager(m_actMgr);
+    dlg.setupActionsManager(mActionsManager);
     dlg.fromXml("customize.xml");
     if (SARibbonCustomizeDialog::Accepted == dlg.exec()) {
         dlg.applys();
@@ -240,8 +274,8 @@ void MainWindow::onActionCustomizeAndSaveTriggered(bool b)
                 s << str;
                 s.flush();
             }
-            m_edit->append("write xml:");
-            m_edit->append(str);
+            mTextedit->append("write xml:");
+            mTextedit->append(str);
         }
     }
 }
@@ -255,7 +289,7 @@ void MainWindow::onActionHelpTriggered()
                                 "\n Author:czy"
                                 "\n Email:czy.t@163.com"
                                 "\n ===============")
-                                 .arg(SARibbonBar::versionString()));
+                                     .arg(SARibbonBar::versionString()));
 }
 
 void MainWindow::onActionRemoveAppBtnTriggered(bool b)
@@ -266,7 +300,7 @@ void MainWindow::onActionRemoveAppBtnTriggered(bool b)
         SARibbonApplicationButton* actionRemoveAppBtn = new SARibbonApplicationButton();
         actionRemoveAppBtn->setText(tr("   File   "));
         this->ribbonBar()->setApplicationButton(actionRemoveAppBtn);
-        createRibbonApplicationMenu();
+        createRibbonApplicationButton();
     }
 }
 
@@ -284,29 +318,29 @@ void MainWindow::onActionUseQssTriggered()
         return;
     }
     QString qss(f.readAll());
-    m_edit->setText(qss);
+    mTextedit->setText(qss);
     this->ribbonBar()->setStyleSheet(qss);
 }
 
 void MainWindow::onActionLoadCustomizeXmlFileTriggered()
 {
-    //只能调用一次
+    // 只能调用一次
     static bool has_call = false;
     if (!has_call) {
-        has_call = sa_apply_customize_from_xml_file("customize.xml", ribbonBar(), m_actMgr);
+        has_call = sa_apply_customize_from_xml_file("customize.xml", ribbonBar(), mActionsManager);
     }
 }
 
 void MainWindow::onActionWindowFlagNormalButtonTriggered(bool b)
 {
     if (b) {
-        //最大最小关闭按钮都有
+        // 最大最小关闭按钮都有
         Qt::WindowFlags f = windowFlags();
         f |= (Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint);
         updateWindowFlag(f);
     } else {
-        //由于已经处于frameless状态，这个最大最小设置是无效的
-        // setWindowFlags(windowFlags()&~Qt::WindowMaximizeButtonHint&~Qt::WindowMinimizeButtonHint);
+        // 由于已经处于frameless状态，这个最大最小设置是无效的
+        //  setWindowFlags(windowFlags()&~Qt::WindowMaximizeButtonHint&~Qt::WindowMinimizeButtonHint);
         Qt::WindowFlags f = windowFlags();
         f &= ~Qt::WindowMinMaxButtonsHint & ~Qt::WindowCloseButtonHint;
         updateWindowFlag(f);
@@ -343,10 +377,10 @@ void MainWindow::onActionFontSmallerTriggered()
 void MainWindow::onActionWordWrapTriggered(bool b)
 {
     ribbonBar()->setEnableWordWrap(b);
-    m_edit->append(tr("By using the SARibbonBar::setEnableWordWrap function, "
-                      "you can set whether text breaks or not.\n"
-                      "By default, the two line mode will not wrap, the three line mode will wrap.\n"
-                      "You can force the two line mode to wrap, or the three line mode to not wrap"));
+    mTextedit->append(tr("By using the SARibbonBar::setEnableWordWrap function, "
+                         "you can set whether text breaks or not.\n"
+                         "By default, the two line mode will not wrap, the three line mode will wrap.\n"
+                         "You can force the two line mode to wrap, or the three line mode to not wrap"));
     // cn:通过SARibbonBar::setEnableWordWrap函数可以设置文字是否换行。\n
     // 默认情况下，两行模式都不会换行，三行模式下都会换行。\n
     // 可以强制设置两行模式也换行，或者三行模式不换行
@@ -377,7 +411,7 @@ void MainWindow::onButtonGroupActionTriggered(QAction* act)
 void MainWindow::onColorButtonColorClicked(const QColor& c, bool on)
 {
     Q_UNUSED(on);
-    m_edit->append(QString("color click %1").arg(c.name()));
+    mTextedit->append(QString("color click %1").arg(c.name()));
 }
 
 /**
@@ -386,7 +420,8 @@ void MainWindow::onColorButtonColorClicked(const QColor& c, bool on)
  */
 void MainWindow::onRibbonThemeComboBoxCurrentIndexChanged(int index)
 {
-    SARibbonMainWindow::RibbonTheme t = static_cast< SARibbonMainWindow::RibbonTheme >(m_ribbonTheme->itemData(index).toInt());
+    SARibbonMainWindow::RibbonTheme t = static_cast< SARibbonMainWindow::RibbonTheme >(
+            mComboboxRibbonTheme->itemData(index).toInt());
     setRibbonTheme(t);
 }
 
@@ -409,13 +444,26 @@ void MainWindow::onActionHideActionTriggered(bool on)
     ribbonBar()->updateRibbonGeometry();
 }
 
+/**
+ * @brief 创建其它actions，这些actions并不在SARibbonBar管理
+ */
+void MainWindow::createOtherActions()
+{
+    mOtherAction1     = new QAction(("text action1"), this);
+    mOtherAction2     = new QAction(("text action2"), this);
+    mOtherAction3     = new QAction(("text action3"), this);
+    mOtherAction4     = new QAction(("text action4"), this);
+    mOtherAction5     = new QAction(("text action5"), this);
+    mOtherActionIcon1 = new QAction(QIcon(":/icon/icon/layout.svg"), ("action with icon"), this);
+}
+
 void MainWindow::createCategoryMain(SARibbonCategory* page)
 {
     //! 1
     //! pannel 1 start
     //!
 
-    //使用addPannel函数来创建SARibbonPannel，效果和new SARibbonPannel再addPannel一样
+    // 使用addPannel函数来创建SARibbonPannel，效果和new SARibbonPannel再addPannel一样
     SARibbonPannel* pannelStyle = page->addPannel(("ribbon style"));
 
     QAction* actSave = createAction(tr("Save"), ":/icon/icon/save.svg");
@@ -423,7 +471,7 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     pannelStyle->addLargeAction(actSave);
     connect(actSave, &QAction::triggered, this, [ this ](bool b) {
         Q_UNUSED(b);
-        this->m_edit->append("actSaveion clicked");
+        this->mTextedit->append("actSaveion clicked");
     });
 
     QAction* actHideRibbon = createAction(tr("hide ribbon"), ":/icon/icon/hideRibbon.svg", "actHideRibbon");
@@ -438,7 +486,7 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     actShowHideButton->setCheckable(true);
     pannelStyle->addSmallAction(actShowHideButton);  // wrod wrap was not effect in small button
     connect(actShowHideButton, &QAction::triggered, this, [ this ](bool b) {
-        this->ribbonBar()->showMinimumModeButton(b);  //显示ribbon最小化按钮
+        this->ribbonBar()->showMinimumModeButton(b);  // 显示ribbon最小化按钮
     });
     actShowHideButton->trigger();
 
@@ -484,13 +532,13 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     connect(g, static_cast< void (QButtonGroup::*)(int) >(&QButtonGroup::buttonClicked), this, &MainWindow::onStyleClicked);
 #endif
 
-    m_ribbonTheme = new SARibbonComboBox();
-    m_ribbonTheme->addItem("Theme Win7", SARibbonMainWindow::RibbonThemeWindows7);
-    m_ribbonTheme->addItem("Theme Office2013", SARibbonMainWindow::RibbonThemeOffice2013);
-    m_ribbonTheme->addItem("Theme Dark", SARibbonMainWindow::RibbonThemeDark);
-    m_ribbonTheme->setCurrentIndex(m_ribbonTheme->findData(static_cast< int >(ribbonTheme())));
-    connect(m_ribbonTheme, QOverload< int >::of(&SARibbonComboBox::currentIndexChanged), this, &MainWindow::onRibbonThemeComboBoxCurrentIndexChanged);
-    pannelStyle->addSmallWidget(m_ribbonTheme);
+    mComboboxRibbonTheme = new SARibbonComboBox();
+    mComboboxRibbonTheme->addItem("Theme Win7", SARibbonMainWindow::RibbonThemeWindows7);
+    mComboboxRibbonTheme->addItem("Theme Office2013", SARibbonMainWindow::RibbonThemeOffice2013);
+    mComboboxRibbonTheme->addItem("Theme Dark", SARibbonMainWindow::RibbonThemeDark);
+    mComboboxRibbonTheme->setCurrentIndex(mComboboxRibbonTheme->findData(static_cast< int >(ribbonTheme())));
+    connect(mComboboxRibbonTheme, QOverload< int >::of(&SARibbonComboBox::currentIndexChanged), this, &MainWindow::onRibbonThemeComboBoxCurrentIndexChanged);
+    pannelStyle->addSmallWidget(mComboboxRibbonTheme);
 
     SARibbonPannel* pannelToolButtonStyle = page->addPannel(("sa ribbon toolbutton style"));
 
@@ -578,9 +626,9 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     pannel2->addLargeAction(actDeleteContext);
     connect(actDeleteContext, &QAction::triggered, this, [ this, act ](bool on) {
         Q_UNUSED(on);
-        if (this->m_contextCategory) {
-            this->ribbonBar()->destroyContextCategory(this->m_contextCategory);
-            this->m_contextCategory = nullptr;
+        if (this->mContextCategory) {
+            this->ribbonBar()->destroyContextCategory(this->mContextCategory);
+            this->mContextCategory = nullptr;
             act->setDisabled(true);
         }
     });
@@ -589,17 +637,17 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     pannel2->addLargeAction(act);
     connect(act, &QAction::triggered, this, [ this ](bool on) {
         Q_UNUSED(on);
-        this->m_edit->append(tr("Text can be manually wrapped(use \\n), and will appear as 1 line in the case of "
-                                "SARibbonBar::setEnableWordWrap (false)"));  // cn:文本中手动换行
+        this->mTextedit->append(tr("Text can be manually wrapped(use \\n), and will appear as 1 line in the case of "
+                                   "SARibbonBar::setEnableWordWrap (false)"));  // cn:文本中手动换行
     });
 
-    act = createAction(tr("Word\nWrap"), ":/icon/icon/setText.svg");
+    act = createAction(tr("Word \nWrap"), ":/icon/icon/setText.svg");
     act->setMenu(menu);
     pannel2->addLargeAction(act);
     connect(act, &QAction::triggered, this, [ this ](bool on) {
         Q_UNUSED(on);
-        this->m_edit->append(tr("Text can be manually wrapped(use \\n), and will appear as 1 line in the case of "
-                                "SARibbonBar::setEnableWordWrap (false)"));  // cn:文本中手动换行
+        this->mTextedit->append(tr("Text can be manually wrapped(use \\n), and will appear as 1 line in the case of "
+                                   "SARibbonBar::setEnableWordWrap (false)"));  // cn:文本中手动换行
     });
     //! 3
     //! pannel 3 start -> widget test
@@ -665,7 +713,7 @@ void MainWindow::createCategoryOther(SARibbonCategory* page)
     SARibbonPannel* pannel1 = new SARibbonPannel(tr("pannel one"));
     pannel1->setObjectName("CategoryOther-pannel1");
     page->addPannel(pannel1);
-    //按钮组
+    // 按钮组
     SARibbonButtonGroupWidget* btnGroup1 = new SARibbonButtonGroupWidget(pannel1);
     btnGroup1->setIconSize(QSize(24, 24));
     btnGroup1->addAction(createAction(tr("Decrease Margin"), ":/icon/icon/Decrease-Margin.svg"));
@@ -692,8 +740,8 @@ void MainWindow::createCategoryOther(SARibbonCategory* page)
     auto lambdaCreateGalleryAction = [ this ](const QString& text, const QString& iconurl) -> QAction* {
         QAction* act = this->createAction(text, iconurl);
         this->connect(act, &QAction::triggered, this, [ this, text ]() {
-            if (this->m_edit) {
-                this->m_edit->append(QString("%1 triggered").arg(text));
+            if (this->mTextedit) {
+                this->mTextedit->append(QString("%1 triggered").arg(text));
             }
         });
         return act;
@@ -780,13 +828,13 @@ void MainWindow::createCategoryOther(SARibbonCategory* page)
     QAction* a1 = createAction("Context Category 1", ":/icon/icon/ContextCategory.svg");
     a1->setCheckable(true);
     connect(a1, &QAction::triggered, this, [ this ](bool c) {
-        this->ribbonBar()->setContextCategoryVisible(m_contextCategory, c);
+        this->ribbonBar()->setContextCategoryVisible(mContextCategory, c);
     });
 
     QAction* a2 = createAction("Context Category 2", ":/icon/icon/ContextCategory.svg");
     a2->setCheckable(true);
     connect(a2, &QAction::triggered, this, [ this ](bool c) {
-        this->ribbonBar()->setContextCategoryVisible(m_contextCategory2, c);
+        this->ribbonBar()->setContextCategoryVisible(mContextCategory2, c);
     });
     pannelContextCategory->addLargeAction(a1);
     pannelContextCategory->addLargeAction(a2);
@@ -930,23 +978,23 @@ void MainWindow::createCategoryColor(SARibbonCategory* page)
  */
 void MainWindow::createContextCategory1()
 {
-    //上下文标签
+    // 上下文标签
     SARibbonBar* ribbon = ribbonBar();
-    m_contextCategory   = ribbon->addContextCategory(tr("context"), QColor(), 1);
+    mContextCategory    = ribbon->addContextCategory(tr("context"), QColor(), 1);
 
-    SARibbonCategory* contextCategoryPage1 = m_contextCategory->addCategoryPage(tr("Page1"));
+    SARibbonCategory* contextCategoryPage1 = mContextCategory->addCategoryPage(tr("Page1"));
     createContextCategoryPage1(contextCategoryPage1);
 
-    SARibbonCategory* contextCategoryPage2 = m_contextCategory->addCategoryPage(tr("Page2"));
+    SARibbonCategory* contextCategoryPage2 = mContextCategory->addCategoryPage(tr("Page2"));
     createContextCategoryPage2(contextCategoryPage2);
 }
 
 void MainWindow::createContextCategory2()
 {
     SARibbonBar* ribbon = ribbonBar();
-    m_contextCategory2  = ribbon->addContextCategory(("context2"), QColor(), 2);
-    m_contextCategory2->addCategoryPage(("context2 Page1"));
-    m_contextCategory2->addCategoryPage(("context2 Page2"));
+    mContextCategory2   = ribbon->addContextCategory(("context2"), QColor(), 2);
+    mContextCategory2->addCategoryPage(("context2 Page1"));
+    mContextCategory2->addCategoryPage(("context2 Page2"));
 }
 
 void MainWindow::createContextCategoryPage1(SARibbonCategory* page)
@@ -990,7 +1038,7 @@ void MainWindow::createContextCategoryPage1(SARibbonCategory* page)
             mActionSetTextTest->setText(QStringLiteral(u"set text"));
         }
     });
-    //隐藏pannel
+    // 隐藏pannel
     mActionShowTest = createAction("show beside pannel", ":/icon/icon/show.svg");
 
     mActionShowTest->setCheckable(true);
@@ -1129,8 +1177,8 @@ void MainWindow::createQuickAccessBar(SARibbonQuickAccessBar* quickAccessBar)
     actionRedo->setShortcutContext(Qt::ApplicationShortcut);
     quickAccessBar->addAction(actionRedo);
 
-    connect(actionUndo, &QAction::triggered, this, [ this ]() { m_edit->append("undo"); });
-    connect(actionRedo, &QAction::triggered, this, [ this ]() { m_edit->append("redo"); });
+    connect(actionUndo, &QAction::triggered, this, [ this ]() { mTextedit->append("undo"); });
+    connect(actionRedo, &QAction::triggered, this, [ this ]() { mTextedit->append("redo"); });
 
     quickAccessBar->addSeparator();
     QMenu* m = new QMenu("Presentation File", this);
@@ -1156,39 +1204,32 @@ void MainWindow::createRightButtonGroup(SARibbonButtonGroupWidget* rightBar)
     rightBar->addAction(actionHelp);
 }
 
-void MainWindow::addSomeOtherAction()
+void MainWindow::createActionsManager()
 {
-    //添加其他的action，这些action并不在ribbon管理范围，主要用于SARibbonCustomizeWidget自定义用
-    QAction* acttext1 = new QAction(("text action1"), this);
-    QAction* acttext2 = new QAction(("text action2"), this);
-    QAction* acttext3 = new QAction(("text action3"), this);
-    QAction* acttext4 = new QAction(("text action4"), this);
-    QAction* acttext5 = new QAction(("text action5"), this);
+    // 添加其他的action，这些action并不在ribbon管理范围，主要用于SARibbonCustomizeWidget自定义用
+    createOtherActions();
+    mTagForActionText = SARibbonActionsManager::UserDefineActionTag + 1;
+    mTagForActionIcon = SARibbonActionsManager::UserDefineActionTag + 2;
 
-    QAction* actIcon1 = new QAction(QIcon(":/icon/icon/layout.svg"), ("action with icon"), this);
+    mActionsManager = new SARibbonActionsManager(ribbonBar());  // 申明过程已经自动注册所有action
 
-    m_actionTagText     = SARibbonActionsManager::UserDefineActionTag + 1;
-    m_actionTagWithIcon = SARibbonActionsManager::UserDefineActionTag + 2;
+    // 以下注册特别的action
+    mActionsManager->registeAction(mOtherAction1, SARibbonActionsManager::CommonlyUsedActionTag);
+    mActionsManager->registeAction(mOtherAction3, SARibbonActionsManager::CommonlyUsedActionTag);
+    mActionsManager->registeAction(mOtherAction5, SARibbonActionsManager::CommonlyUsedActionTag);
+    mActionsManager->registeAction(mOtherActionIcon1, SARibbonActionsManager::CommonlyUsedActionTag);
 
-    m_actMgr = new SARibbonActionsManager(ribbonBar());  //申明过程已经自动注册所有action
+    mActionsManager->registeAction(mOtherAction1, mTagForActionText);
+    mActionsManager->registeAction(mOtherAction2, mTagForActionText);
+    mActionsManager->registeAction(mOtherAction3, mTagForActionText);
+    mActionsManager->registeAction(mOtherAction4, mTagForActionText);
+    mActionsManager->registeAction(mOtherAction5, mTagForActionText);
 
-    //以下注册特别的action
-    m_actMgr->registeAction(acttext1, SARibbonActionsManager::CommonlyUsedActionTag);
-    m_actMgr->registeAction(acttext3, SARibbonActionsManager::CommonlyUsedActionTag);
-    m_actMgr->registeAction(acttext5, SARibbonActionsManager::CommonlyUsedActionTag);
-    m_actMgr->registeAction(actIcon1, SARibbonActionsManager::CommonlyUsedActionTag);
+    mActionsManager->registeAction(mOtherActionIcon1, mTagForActionIcon);
 
-    m_actMgr->registeAction(acttext1, m_actionTagText);
-    m_actMgr->registeAction(acttext2, m_actionTagText);
-    m_actMgr->registeAction(acttext3, m_actionTagText);
-    m_actMgr->registeAction(acttext4, m_actionTagText);
-    m_actMgr->registeAction(acttext5, m_actionTagText);
-
-    m_actMgr->registeAction(actIcon1, m_actionTagWithIcon);
-
-    m_actMgr->setTagName(SARibbonActionsManager::CommonlyUsedActionTag, tr("in common use"));  //
-    m_actMgr->setTagName(m_actionTagText, tr("no icon action"));
-    m_actMgr->setTagName(m_actionTagWithIcon, tr("have icon action"));
+    mActionsManager->setTagName(SARibbonActionsManager::CommonlyUsedActionTag, tr("in common use"));  //
+    mActionsManager->setTagName(mTagForActionText, tr("no icon action"));
+    mActionsManager->setTagName(mTagForActionIcon, tr("have icon action"));
 }
 
 QAction* MainWindow::createAction(const QString& text, const QString& iconurl, const QString& objName)
@@ -1211,34 +1252,34 @@ QAction* MainWindow::createAction(const QString& text, const QString& iconurl)
 
 void MainWindow::onMenuButtonPopupCheckableTest(bool b)
 {
-    m_edit->append(QString("MenuButtonPopupCheckableTest : %1").arg(b));
+    mTextedit->append(QString("MenuButtonPopupCheckableTest : %1").arg(b));
 }
 
 void MainWindow::onInstantPopupCheckableTest(bool b)
 {
-    m_edit->append(QString("InstantPopupCheckableTest : %1").arg(b));
+    mTextedit->append(QString("InstantPopupCheckableTest : %1").arg(b));
 }
 
 void MainWindow::onDelayedPopupCheckableTest(bool b)
 {
-    m_edit->append(QString("DelayedPopupCheckableTest : %1").arg(b));
+    mTextedit->append(QString("DelayedPopupCheckableTest : %1").arg(b));
 }
 
 void MainWindow::onMenuButtonPopupCheckabletriggered(bool b)
 {
-    m_edit->append(QString("MenuButtonPopupCheckabletriggered : %1").arg(b));
+    mTextedit->append(QString("MenuButtonPopupCheckabletriggered : %1").arg(b));
 }
 
 void MainWindow::onInstantPopupCheckabletriggered(bool b)
 {
-    m_edit->append(QString("InstantPopupCheckabletriggered : %1").arg(b));
+    mTextedit->append(QString("InstantPopupCheckabletriggered : %1").arg(b));
 }
 
 void MainWindow::onDelayedPopupCheckabletriggered(bool b)
 {
     Q_UNUSED(b);
-    m_edit->append(tr("The SARibbonToolButton::setPopupMode(QToolButton::DelayedPopup) method "
-                      "can be used to set the menu pop-up method to delayed pop-up. "
-                      "This also demonstrates manually setting text wrapping"));
+    mTextedit->append(tr("The SARibbonToolButton::setPopupMode(QToolButton::DelayedPopup) method "
+                         "can be used to set the menu pop-up method to delayed pop-up. "
+                         "This also demonstrates manually setting text wrapping"));
     // cn:使用SARibbonToolButton::setPopupMode(QToolButton::DelayedPopup)方法可以设置菜单弹出方式为延迟弹出，这里也演示了手动设置文本的换行
 }
