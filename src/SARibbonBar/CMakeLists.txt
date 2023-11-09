@@ -143,23 +143,31 @@ if(SARIBBON_USE_FRAMELESS_LIB)
         ${FRAMELESS_SOURCE_DIR_WIDGETS}/framelesshelperwidgets_global.cpp
         ${FRAMELESS_SOURCE_DIR_WIDGETS}/framelessdialog.cpp
     )
+	# 把所有FRAMELESS相关的库合并到一起
+        SET(FRAMELESS_HEADER_FILES ${FRAMELESS_CORE_CONFIG_HEADER_FILES})
+        list(APPEND FRAMELESS_HEADER_FILES ${FRAMELESS_CORE_HEADER_FILES})
+        list(APPEND FRAMELESS_HEADER_FILES ${FRAMELESS_WIDGETS_HEADER_FILES})
+        SET(FRAMELESS_SOURCE_FILES ${FRAMELESS_CORE_SOURCE_FILES})
+        list(APPEND FRAMELESS_SOURCE_FILES ${FRAMELESS_WIDGETS_SOURCE_FILES})
+        SET(FRAMELESS_RESOURCE_FILES ${FRAMELESS_CORE_RESOURCES_FILES})
 endif()
 #################################################
 # SAColorWidgets相关
 # https://github.com/czyt1988/SAColorWidgets
 #################################################
+SET(SACOLOR_DIR ${CMAKE_CURRENT_SOURCE_DIR}/colorWidgets)
 SET(SACOLOR_HEADER_FILES
-    ./colorWidgets/SAColorWidgetsGlobal.h
-    ./colorWidgets/SAColorToolButton.h
-    ./colorWidgets/SAColorGridWidget.h
-    ./colorWidgets/SAColorPaletteGridWidget.h
-    ./colorWidgets/SAColorMenu.h
+    ${SACOLOR_DIR}/SAColorWidgetsGlobal.h
+    ${SACOLOR_DIR}/SAColorToolButton.h
+    ${SACOLOR_DIR}/SAColorGridWidget.h
+    ${SACOLOR_DIR}/SAColorPaletteGridWidget.h
+    ${SACOLOR_DIR}/SAColorMenu.h
 )
 SET(SACOLOR_SOURCE_FILES
-    ./colorWidgets/SAColorToolButton.cpp
-    ./colorWidgets/SAColorGridWidget.cpp
-    ./colorWidgets/SAColorPaletteGridWidget.cpp
-    ./colorWidgets/SAColorMenu.cpp
+    ${SACOLOR_DIR}/SAColorToolButton.cpp
+    ${SACOLOR_DIR}/SAColorGridWidget.cpp
+    ${SACOLOR_DIR}/SAColorPaletteGridWidget.cpp
+    ${SACOLOR_DIR}/SAColorMenu.cpp
 )
 
 #################################################
@@ -266,12 +274,9 @@ if(SARIBBON_USE_FRAMELESS_LIB)
         ${SARIBBON_RESOURCE_FILES}
         ${SACOLOR_HEADER_FILES}
         ${SACOLOR_SOURCE_FILES}
-        ${FRAMELESS_CORE_CONFIG_HEADER_FILES}
-        ${FRAMELESS_CORE_HEADER_FILES}
-        ${FRAMELESS_CORE_SOURCE_FILES}
-        ${FRAMELESS_CORE_RESOURCES_FILES}
-        ${FRAMELESS_WIDGETS_HEADER_FILES}
-        ${FRAMELESS_WIDGETS_SOURCE_FILES}
+        ${FRAMELESS_HEADER_FILES}
+        ${FRAMELESS_SOURCE_FILES}
+        ${FRAMELESS_RESOURCE_FILES}
     )
 else()
     add_library(${SARIBBONBAR_LIB_NAME} SHARED
@@ -384,6 +389,7 @@ endif()
 # ------------------------------- install script -------------------------------
 set(SARIBBON_INSTALL_DIR SARibbon)
 set(CMAKE_INSTALL_PREFIX ${SARIBBON_BIN_DIR})
+message(STATUS "install dir ${SARIBBON_BIN_DIR}")
 # Generate library version info which will generate xxxConfigVersion.cmake,
 # the ${PACKAGE_VERSION} is the version defined in project()
 include(CMakePackageConfigHelpers)
@@ -402,6 +408,63 @@ install(FILES
     DESTINATION include/${SARIBBON_INSTALL_DIR}/colorWidgets
     COMPONENT headers
 )
+
+# 生成单一文件
+# 单一文件是把整个SARibbon打包为一个h和一个cpp，方便集成
+set(SARIBBON_AMALGAMATE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/../SARibbon.h 
+	${CMAKE_CURRENT_SOURCE_DIR}/../SARibbon.cpp 
+	${CMAKE_CURRENT_SOURCE_DIR}/../SARibbon.pri)
+install(FILES
+    ${SARIBBON_AMALGAMATE_FILES}
+    DESTINATION amalgamate
+    COMPONENT amalgamate
+)
+install(FILES
+    ${SARIBBON_RESOURCE_FILES}
+    DESTINATION amalgamate/SARibbonBar
+    COMPONENT amalgamate
+)
+set(SARIBBON_RESOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/resource)
+set(SARIBBON_RESOURCE_RAW_FILES 
+	${SARIBBON_RESOURCE_DIR}/theme-win7.qss
+	${SARIBBON_RESOURCE_DIR}/theme-office2013.qss
+	${SARIBBON_RESOURCE_DIR}/theme-dark.qss
+	${SARIBBON_RESOURCE_DIR}/ArrowDown.png
+	${SARIBBON_RESOURCE_DIR}/ArrowMore.png
+	${SARIBBON_RESOURCE_DIR}/ArrowUp.png
+	${SARIBBON_RESOURCE_DIR}/ribbonPannelOptionButton.png
+	${SARIBBON_RESOURCE_DIR}/define-color.svg
+	${SARIBBON_RESOURCE_DIR}/Titlebar_Close.png
+	${SARIBBON_RESOURCE_DIR}/Titlebar_Close_Hover.png
+	${SARIBBON_RESOURCE_DIR}/Titlebar_Max.png
+	${SARIBBON_RESOURCE_DIR}/Titlebar_Min.png
+	${SARIBBON_RESOURCE_DIR}/Titlebar_Normal.png
+	${SARIBBON_RESOURCE_DIR}/Titlebar_Shade.png
+	${SARIBBON_RESOURCE_DIR}/Titlebar_Unshade.png
+	)
+install(FILES
+    ${SARIBBON_RESOURCE_RAW_FILES}
+    DESTINATION amalgamate/SARibbonBar/resource
+    COMPONENT amalgamate
+)
+
+# 如果开启了frameless，要把frameless的文件也拷贝过去
+if(SARIBBON_USE_FRAMELESS_LIB)
+	#复制目录src/SARibbonBar/3rdparty/framelesshelper/include/
+	install(DIRECTORY
+        ${FRAMELESS_HEADER_DIR}
+		DESTINATION include/${SARIBBON_INSTALL_DIR}/3rdparty/framelesshelper/include
+		COMPONENT headers
+	)
+	#复制目录src/SARibbonBar/3rdparty/framelesshelper/qmake/
+	SET(FRAMELESS_QMAKE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/framelesshelper/qmake)
+	install(DIRECTORY
+        ${FRAMELESS_QMAKE_DIR}
+		DESTINATION include/${SARIBBON_INSTALL_DIR}/3rdparty/framelesshelper/
+		COMPONENT headers
+	)
+endif()
+
 install(TARGETS ${SARIBBONBAR_LIB_NAME}
     EXPORT SARibbonTargets
     RUNTIME DESTINATION bin

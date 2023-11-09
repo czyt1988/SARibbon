@@ -66,6 +66,7 @@ Thumbs.db
 .*.swp
 
 # Visual Studio generated files
+CMakeSettings.json
 *.ib_pdb_index
 *.idb
 *.ilk
