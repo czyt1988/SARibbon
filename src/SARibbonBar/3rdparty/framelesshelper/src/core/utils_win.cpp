@@ -49,9 +49,9 @@
 #    include <QtGui/private/qguiapplication_p.h>
 #  endif // (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
 #  include <QtGui/qpa/qplatformwindow.h>
-#  if (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+#  if (QT_VERSION < QT_VERSION_CHECK(6, 2, 0))
 #    include <QtGui/qpa/qplatformnativeinterface.h>
-#  else // (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+#  else // (QT_VERSION >= QT_VERSION_CHECK(6, 2, 0))
 #    include <QtGui/qpa/qplatformwindow_p.h>
 #  endif // (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
 #endif
