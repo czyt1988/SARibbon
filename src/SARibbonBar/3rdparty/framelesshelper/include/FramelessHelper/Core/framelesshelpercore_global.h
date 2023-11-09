@@ -116,7 +116,7 @@ QT_END_NAMESPACE
 #endif
 
 // QLatin1StringView can't be constexpr until Qt6?
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 4, 0))
 #  define Q_STRING_CONSTEXPR constexpr
 #else
 #  define Q_STRING_CONSTEXPR
