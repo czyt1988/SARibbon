@@ -35,7 +35,7 @@ QQ交流群:434014314
 |Qt6.5|[![cmake-win-qt6.5](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt6.5.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt6.5.yml)|[![CMake-Linux-Qt6.5](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt6.5.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt6.5.yml)|[![cmake-mac-qt6.5](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt6.5.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt6.5.yml)|
 |Qt6.6|[![cmake-win-qt6.6](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt6.6.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt6.6.yml)|[![CMake-Linux-Qt6.6](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt6.6.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt6.6.yml)|[![cmake-mac-qt6.6](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt6.6.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt6.6.yml)|
 
-# SARibbon
+# SARibbon简介
 
 这是一个`Qt`下的`Ribbon`界面控件，提供了类似微软Office系列软件的操作界面，适用于大型功能性软件、工业软件、复杂软件的ui交互，`SARibbon`在设计时参考了时参考了MFC Ribbon接口的命名风格，样式上参考了微软Office系列软件以及WPS软件的ribbon风格，并把两者的优点进行了集成，形成了一个可定义多种主题风格的Ribbon控件，`SARibbon`能通过qss快速的定义出自己想要的主题风格，并对常用的一些功能性控件进行了封装，例如：[颜色选择按钮和颜色选择画板](https://github.com/czyt1988/SAColorWidgets)
 
@@ -49,7 +49,7 @@ QQ交流群:434014314
 
 ![](./doc/screenshot/SARibbonBar-minMode.gif)
 
-- 支持quickAccessBar（word快速菜单），在wps模式和office模式下会有不同的显示效果
+- 支持quickAccessBar（word快速菜单），在不同布局模式下会有不同的显示效果
 
 ![](./doc/screenshot/SARibbonBar-quickAccessBar.gif)
 
@@ -57,6 +57,28 @@ QQ交流群:434014314
 
 ![](./doc/screenshot/SARibbonBar-ribbonbutton.gif)
 
+- 支持4种不同风格的布局样式
+QuickAccessBarAndRightButtonGroup.png
+![](./doc/screenshot/SARibbonBar-style.gif)
+
+- 支持qss对ribbon进行自定义设置，可实时切换主题
+
+![](./doc/screenshot/SARibbonBar-theme-style.gif)
+
+- 支持上下文标签
+
+![](./doc/screenshot/SARibbonBar-context-category.png)
+
+- 支持Gallery控件
+
+![](./doc/screenshot/SARibbonBar-gallery.gif)
+
+- 支持超长滚动和Option Action
+
+![](./doc/screenshot/SARibbonBar-option-action.gif)
+
+- 支持4K屏和多屏幕扩展
+- 支持linux和MacOS（界面未做深度适配）
 
 MIT协议，欢迎大家使用并提出意见
 
@@ -64,25 +86,26 @@ MIT协议，欢迎大家使用并提出意见
 
 [github - https://github.com/czyt1988/SARibbon](https://github.com/czyt1988/SARibbon)
 
-SARibbon提供了几种布局方式，以及可以通过qss自由定义主题
-
-![](./doc/screenshot/SARibbon-theme-style.gif)
 
 # 构建
 
+SARibbon提供qmake和cmake两种构建方式，同时提供了一个集成的SARibbon.h和SARibbon.cpp文件方便静态的嵌入到单一工程
+
 > qmake和cmake会根据qt版本选择是否加载frameless库，会根据不同的qt版本选择使用c++11还是C++17
 
-> 注意:如果使用frameless库，要求c++17标准支持（由于使用了frameless库，此库最低要求c++17），Qt版本至少在Qt5.14及以上，否则无法编译frameless库，推荐使用Qt5.14以上版本,因为Qt5.14完善了高分辨率的支持
+> 注意:如果使用frameless库，要求c++17标准支持，在SARibbon的qmake和cmake中做了根据qt版本自动判断是否加载frameless的方法，如果qt版本在5.14以上会自动加载frameless库，并把c++版本设置为C++17
 
-由于最低C++版本为17，因此，在你的qmake文件中，需要添加：
+## Linux下构建前置准备
+
+SARibbon在1.x后引入第三方库frameless，此库能很好的解决无边框问题，在linux下编译需要安装下面三个库：`libgl1-mesa-dev`,`libxcb1-dev`,`libgtk-3-dev`
 
 ```shell
-CONFIG += c++17
+sudo apt install -y libgl1-mesa-dev libxcb1-dev libgtk-3-dev
 ```
 
 ## 直接引入工程（静态）
 
-SARibbon提供了合并好的`SARibbon.h`文件和`SARibbon.cpp`文件，只需要在工程引入这两个文件，同时把资源文件和第三方库文件引入就可以使用，无需编译为动态库，可以参考StaticExample的例子（位于`src/example/StaticExample`），静态引入使用到`SARibbon.h`、`SARibbon.cpp`、`SARibbon.pri`、`SARibbonBar/resource.qrc`4个文件以及`SARibbonBar/3rdparty`,`SARibbonBar/resource`这两个文件夹：
+SARibbon提供了合并好的`SARibbon.h`文件和`SARibbon.cpp`文件，只需要在工程引入这两个文件，同时把资源文件和第三方库文件引入就可以使用，无需编译为动态库，可以参考StaticExample的例子（例子位于`src/example/StaticExample`），静态引入使用到`SARibbon.h`、`SARibbon.cpp`、`SARibbon.pri`、`SARibbonBar/resource.qrc`4个文件以及`SARibbonBar/3rdparty`,`SARibbonBar/resource`这两个文件夹：
 
 你的工程目录将如下所示：
 
@@ -113,23 +136,33 @@ SARibbon提供了合并好的`SARibbon.h`文件和`SARibbon.cpp`文件，只需�
 - 4. 把源码`src/SARibbonBar`下的`resource`文件夹和`3rdparty`文件夹拷贝到自己工程目录下的`SARibbonBar`文件夹中
 - 5. 在自己工程的pro文件中引入`SARibbon.pri`文件，如：`include($$PWD/SARibbon.pri)`
 
-## 编译为库（动态）
+使用cmake的话参考StaticExample例子的cmake编写方式
 
- 使用Qt Creator直接打开`SARibbon.pro`，并编译即可，会编译出SARibbonBar库和一个（目前只有一个例子）例子，lib和例子的目录位于`bin_qt{Qt版本}_{debug/release}_{32/64}`目录下
+## 编译为动态库
+
+### qmake
+
+使用Qt Creator直接打开`SARibbon.pro`，编译即可，会编译出SARibbonBar库和例子，lib和例子的目录位于`bin_qt{Qt版本}_{debug/release}_{32/64}`目录下
 
 > 在debug模式编译的库后面会加上'd'以作区别
 
-> 注意:最低的Qt版本为5.14，并要求C++17
+### cmake
 
-## Linux下构建
+使用Qt Creator或者visual studio打开`src/CMakeLists.txt`编译即可
 
-SARibbon在1.x后引入第三方库frameless，此库能很好的解决无边框问题，在linux下编译需要安装下面三个库：`libgl1-mesa-dev`,`libxcb1-dev`,`libgtk-3-dev`
-
-```shell
-sudo apt install -y libgl1-mesa-dev libxcb1-dev libgtk-3-dev
+```cmake
+mkdir build
+cd build
+cmake -DCMAKE_PREFIX_PATH={YOUR_QT_SDK_DIR_PATH} -DCMAKE_INSTALL_PREFIX={WHERE_YOU_WANT_TO_INSTALL} -DCMAKE_BUILD_TYPE=Release
+cmake --build . --config Release --target all --parallel
+cmake --install . --config Release --strip 
 ```
 
-## 常见问题
+{YOUR_QT_SDK_DIR_PATH}是你的qtsdk的目录，类似`D:\Qt\5.14.2\msvc2017_64\`
+
+{WHERE_YOU_WANT_TO_INSTALL}是你的安装目录
+
+## 编译过程的常见问题
 
 ### 1、framelessmanager.moc的缺失提示，或者任何xxx.moc，遇到此错误，先执行qmake即可
 
@@ -137,72 +170,75 @@ sudo apt install -y libgl1-mesa-dev libxcb1-dev libgtk-3-dev
 ..\..\..\SARibbon\src\SARibbonBar\3rdparty\framelesshelper\src\core\framelessmanager.cpp(563): fatal error C1083: 无法打开包括文件: “framelessmanager.moc”: No such file or directory
 ```
 
-### 2、高分屏显示问题
-
-针对高分屏显示，有如下两个方面准备
-
-1 - 在main函数中为QApplication设置`Qt::AA_EnableHighDpiScaling`属性
-
-这个属性使得应用程序自动检测显示器的像素密度来实现自动缩放，示例代码如下：
-
-```cpp
-int main(int argc, char* argv[])
-{
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
-    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-#endif
-    QApplication a(argc, argv);
-    ......
-}
-```
-
-2 - 在main函数中为QApplication设置缩放策略：`QApplication::setHighDpiScaleFactorRoundingPolicy`
-
-Qt5.6提供了`Qt::AA_EnableHighDpiScaling`，但不能完全解决，Qt5.14开始提供了高分屏缩放策略设置`QApplication::setHighDpiScaleFactorRoundingPolicy`，同`AA_EnableHighDpiScaling`一样需要在main函数前面设置
-
-```cpp
-int main(int argc, char* argv[])
-{
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
-    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-#endif
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
-    QApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
-#endif
-    QApplication a(argc, argv);
-    ......
-}
-```
-
-### 3、快捷键问题
-
-经常有人反馈使用SARibbonBar后，没有被激活的tab页的快捷键没有响应，只有激活的标签页的快捷键才有反应，这个问题并非SARibbonBar的问题，而是设置快捷键时没有设置好`QAction`的`shortcutContext`的属性，`QAction`默认快捷键的属性是`Qt::WindowShortcut`,`Qt::WindowShortcut`代表当父部件是活动顶层窗口的逻辑子部件时，快捷键生效，如果是传统的toolbar模式，由于action所在的toolbar一直在最前端，因此快捷键一直生效，但如果是SARibbonBar，action所在的pannel是会隐藏的，隐藏后快捷键就不生效，如果想快捷键无论Pannel是否隐藏都生效，只需要设置快捷键的`shortcutContext`属性为`Qt::ApplicationShortcut`即可
-
-例如：
-
-```cpp
-QAction* actionUndo = createAction("undo", ":/icon/icon/undo.svg");
-actionUndo->setShortcut(QKeySequence("Ctrl+Shift+z"));
-actionUndo->setShortcutContext(Qt::ApplicationShortcut);
-quickAccessBar->addAction(actionUndo);
-
-QAction* actionRedo = createAction("redo", ":/icon/icon/redo.svg");
-actionRedo->setShortcut(QKeySequence("Ctrl+z"));
-actionRedo->setShortcutContext(Qt::ApplicationShortcut);
-quickAccessBar->addAction(actionRedo);
-```
 
 # 使用方法
 
-可以把编译好的整个目录移动到需要的工程目录下，然后在项目的pro文件中,`include SARibbonBar.pri`即可，示例如下：
+## 引入库
+
+在编译完成后，按照如下方法引入SARibbon
+
+### qmake
+
+如果使用qmake，在编译完成后，你只需把如下文件按目录结构拷贝到你的工程中
+
+先在你的工程中建立一个3rdparty文件夹，再把整个SARibbon文件夹拷贝过去，SARibbon内部已经有几个pri文件可以很方便的让你把工程引入到自己目录中，`./importSARibbonBarLib.pri`文件是用于引入SARibbon库的
+
+在自己的Qt工程pro文件中加入如下语句即可
 
 ```shell
-include($$PWD/SARibbonBar/SARibbon/SARibbonBar.pri)
+include($$PWD/3rdparty/SARibbon/importSARibbonBarLib.pri)
 ```
+
+qmake的编译过程会在SARibbon下生成bin_qtx.x_xx文件夹，库文件和dll文件都在此文件夹下，importSARibbonBarLib.pri会自动把这个文件夹下的库引用进来
+
+此时你的工程目录结构大致如下：
+
+```
+|-[you-project-dir]
+|  |-you-project.pro
+|  |-[3rdparty]
+|     |-[SARibbon](直接把SARibbon完整复制过来)
+|        |-importSARibbonBarLib.pri
+|        |-SARibbonBar.pri
+|        |-common.pri
+|        |-[bin_qtx.x.x_(release|debug)_(64|86)]
+|        |-[src]
+|        |   |-[SARibbonBar]
+```
+
+
+### cmake
+
+cmake在执行install后，会把必要的文件拷贝到安装目录下，cmake文件编写时可参考`src/example/MainWindowExample/CMakeLists.txt`
+
+
 
 ## 快速开始
 
-要使用SARibbon，需要对`QMainWindow`替换为`SARibbonMainWindow`，`SARibbonMainWindow`修改了`QMainWindow`对menubar的渲染方式
+Ribbon是把菜单栏和工具栏合并了，并通过一个tab控件进行展示，Ribbon是无法简单的使用Tab+Toolbar替代的，涉及到很多细节问题，`SARibbon`在设计时参考了MFC Ribbon接口的命名风格，标签页称之为`Category`(种类)，每个`Category`下面有多个`pannel`（面板），面板下面管理着toolbutton，`pannel`有点类似传统的`Toolbar`，其层次结构如下图所示，这些命名参考了MFC的ribbon界面类
+
+![msdn ribbon 介绍页](./doc/pic/msdn-ribbon.png)
+
+一些常见的名词解释如下
+
+- **Category 类别**，代表一个标签所呈现的内容，对应`SARibbonCategory`
+- **Context Category 上下文类别**，这个是一种特殊的类别，它正常不显示，需要基于上下文判断是否应该显示，最常用的就是word中插入图片后，会有图片修改相关的标签出现，如果没选中图片，这个标签就消失，这个就是上下文类别，对应`SARibbonContextCategory`
+- **Pannel 面板**，这个是一组菜单的集合，类似一个Toolbar，对应`SARibbonPannel`
+- **Application Button 应用按钮**，标签栏最左边的按钮（word就是对应文件按钮），这个按钮会触发一些特殊的页面或菜单，对应`SARibbonApplicationButton`,可以隐藏
+- **Quick Access Bar 快速响应栏**，位于最顶部的一个简单工具栏，用于放置一些常用的action，对应`SARibbonQuickAccessBar`
+- **Gallery 预览控件**,这是Ribbon最吸引眼球的控件，用直观的图像把功能显示出来，甚至有些会根据上下文进行实时渲染，典型的就是word开始标签下的样式选择，对应`SARibbonGallery`
+
+SARibbonBar的层次如下图所示：
+
+![](./doc/pic/saribbonbar-level.png)
+
+> 注：不同的布局方案影响着`Category`和`Quick Access Bar`的摆放方式，具体可见[SARibbonBar布局方案](#SARibbonBar布局方案)
+
+### 在MainWindow中使用Ribbon
+
+要MainWindow中使用SARibbon，需要把`QMainWindow`替换为`SARibbonMainWindow`，`SARibbonMainWindow`修改了`QMainWindow`对menubar的渲染方式
+
+> 注意，如果使用ui文件，要把原来ui文件的菜单删除，否则可能引起一些异常
 
 示例代码如下:
 
@@ -217,7 +253,7 @@ public:
 }
 ```
 
-当然`SARibbonMainWindow`也支持普通模式的渲染，其构造函数为：
+`SARibbonMainWindow`也支持普通模式的渲染，其构造函数为：
 
 ```cpp
 SARibbonMainWindow(QWidget *parent = nullptr, bool useRibbon = true);
@@ -225,33 +261,68 @@ SARibbonMainWindow(QWidget *parent = nullptr, bool useRibbon = true);
 
 第二个参数如果设置为false，将会使用普通的菜单工具栏模式，预留这个接口是为了一些项目需要能在ribbon和经典菜单工具栏切换的场景设计的，Ribbon状态和经典状态不支持热切换，如果需要切换，用户可以设置一个配置文件或者注册表，在应用重启时给第二个参数传入false即可进入到经典菜单工具栏模式
 
-但不建议做这种兼容，ribbon和经典菜单是不能直接转换的，像gallery这种控件在经典菜单是很难呈现的
+### 在QWidget或QDialog中使用SARibbonBar
 
-简单的理解，Ribbon是把菜单栏和工具栏合并了，并通过一个tab控件进行展示，`SARibbon`在设计时参考了MFC Ribbon接口的命名风格，标签页称之为`Category`(种类)，每个`Category`下面有多个`pannel`（面板），面板下面才是具体的toolbutton，其层次结构如下图所示，这些命名参考了MFC的ribbon界面类
+SARibbonBar支持在QWidget或者QDialog上使用，具体可见例子：`src/example/WidgetWithRibbon`
 
-![msdn ribbon 介绍页](./doc/pic/msdn-ribbon.png)
+你只需要把SARibbonBar当做一个普通窗口使用即可，下面大致介绍一下在QWidget中创建`SARibbonBar`的过程
 
+首先在头文件声明SARibbonBar的窗口指针
 
-- **Category 类别**，代表一个标签所呈现的内容，对应`SARibbonCategory`
-- **Context Category 上下文类别**，这个是一种特殊的类别，它正常不显示，需要基于上下文判断是否应该显示，最常用的就是word中插入图片后，会有图片修改相关的标签出现，如果没选中图片，这个标签就消失，这个就是上下文类别，对应`SARibbonContextCategory`
-- **Pannel 面板**，这个是一组菜单的集合，office里面板都会有个面板标题，显示在面板最下方，面板之后就是工具栏按钮（Action）
-- **Application Button 应用按钮**，标签栏最左边的按钮（word就是对应文件按钮），这个按钮会触发一些特殊的页面或菜单，对应`SARibbonApplicationButton`,可以隐藏
-- **Quick Access Bar 快速响应栏**，位于最顶部的一个简单工具栏，用于放置一些常用的action，对应`SARibbonQuickAccessBar`
-- **Gallery 预览控件**,这是Ribbon最吸引眼球的控件，用直观的图像把功能显示出来，甚至有些会根据上下文进行实时渲染，典型的就是word开始标签下的样式选择，对应`SARibbonGallery`
+```cpp
+private:
+    Ui::Widget* ui;
+    SARibbonBar* mRibbonBar { nullptr };
+```
 
-简单的层次示意如下图所示：
+在Widget的构造函数中创建`SARibbonBar`,Widget的ui文件中有个`QVBoxLayout`布局，把`SARibbonBar`放置在最顶层，同时，由于QWidget模式下，没有必要再显示标题，可以调用`SARibbonBar::setTitleVisible`方法把标题隐藏。applicationbutton在QWidget如果没有必要也可以通过`SARibbonBar::setApplicationButton`传入一个空指针取消掉，最后由于SARibbonBar的主题是在`SARibbonMainWindow`方法中设置的，在QWidget中设置主题可通过全局函数`sa_set_ribbon_theme`进行设置
 
-![](./doc/pic/saribbonbar-level.png)
+```cpp
+#include "SARibbonBar.h"
+#include "SARibbonCategory.h"
+#include "SARibbonPannel.h"
+#include "SARibbonMainWindow.h"
+Widget::Widget(QWidget* parent) : QWidget(parent), ui(new Ui::Widget)
+{
+    // 注意：ui文件中有个QVBoxLayout布局
+    ui->setupUi(this);
+    // 直接创建SARibbonBar
+    mRibbonBar = new SARibbonBar(this);
+    // QWidget模式下，没有必要再显示标题
+    mRibbonBar->setTitleVisible(false);
+    // QWidget模式下，直接使用紧凑模式效果更好
+    mRibbonBar->setRibbonStyle(SARibbonBar::RibbonStyleCompactThreeRow);
+    // 取消applicationbutton
+    mRibbonBar->setApplicationButton(nullptr);
+    //设置主题，这里虽然没用到SARibbonMainWindow，但Ribbon的主题是SARibbonMainWindow中定义的，因此要引入SARibbonMainWindow.h
+    sa_set_ribbon_theme(mRibbonBar, SARibbonMainWindow::RibbonThemeOffice2013);
+
+    // QWidgets设置一个QVBoxLayout，把窗口放到QVBoxLayout的第二个布局中，第一个布局给SARibbonBar
+    // 这样，SARibbonBar就会在最上面
+    ui->verticalLayout->insertWidget(0, mRibbonBar);
+
+    buildRibbon(mRibbonBar);
+}
+```
+
+效果如下：
+
+![Ribbon用在QWidget上](./doc/screenshot/ribbonbar-use-in-qwidget.png)
+
 
 ### 创建Category和Pannel
 
-创建ribbon的顺序是：先创建类别，再创建面板，最后创建对应的toolbutton（action）
+创建ribbon的顺序是：先创建类别(Category)，再创建面板(Pannel)，最后创建对应的toolbutton（action）
+
+使用`SARibbonBar::addCategoryPage`把Category添加到SARibbonBar中，使用`SARibbonCategory::addPannel`把`Pannel`添加到`Category`中,使用`SARibbonPannel::addAction`可以在Pannel上添加action
+
+下面的代码，演示了添加一个action的示例：
 
 ```cpp
 //添加主标签页 - 通过addCategoryPage工厂函数添加
 SARibbonCategory* categoryMain = ribbon->addCategoryPage(tr("Main"));
  //使用addPannel函数来创建SARibbonPannel，效果和new SARibbonPannel再addPannel一样
-SARibbonPannel* pannel1 = categoryMain->addPannel(("Panel 1"));
+SARibbonPannel* pannel1 = categoryMain->addPannel("Panel 1");
 QAction* actSave = new QAction(this);
 actSave->setText("save");
 actSave->setIcon(QIcon(":/icon/icon/save.svg"));
@@ -264,18 +335,25 @@ pannel1->addLargeAction(actSave);
 
 ![](./doc/pic/add-large-action.png)
 
-通过`addLargeAction`、`addMediumAction`、`addSmallAction`可以组合出不同的布局样式。具体可见[./src/example/MainWindowExample/mainwindow.cpp](./src/example/MainWindowExample/mainwindow.cpp)
+用户也可以直接new出SARibbonCategory，并添加到pannel中，下面的代码效果和上面的一样：
+
+```cpp
+//添加主标签页 - 通过addCategoryPage工厂函数添加
+SARibbonCategory* categoryMain = new SARibbonCategory(tr("Main"));
+ribbon->addCategoryPage(categoryMain);
+ //使用addPannel函数来创建SARibbonPannel，效果和new SARibbonPannel再addPannel一样
+SARibbonPannel* pannel1 = new SARibbonPannel("Panel 1");
+categoryMain->addPannel(pannel1);
+QAction* actSave = new QAction(this);
+...
+pannel1->addLargeAction(actSave);
+```
+
+Ribbon的图标有大有小，通过`addLargeAction`、`addMediumAction`、`addSmallAction`可以组合出不同的布局样式
+
+具体可见[./src/example/MainWindowExample/mainwindow.cpp](./src/example/MainWindowExample/mainwindow.cpp)
 
 更加具体复杂的例子可见[SARibbon的布局](#SARibbon的布局)章节
-
-### 不同的“按钮”布局
-
-`SARibbonPannel`提供了三个添加action的方法：
-- `addLargeAction`
-- `addMediumAction`
-- `addSmallAction`
-
-不同的方法添加的action最后在pannel里显示的效果不一样，具体见[pannel的布局](#pannel的布局)
 
 ### ContextCategory 上下文标签
 
@@ -378,162 +456,68 @@ void MainWindow::initRightButtonGroup(){
     rightBar->addAction(actionHelp);
 }
 ```
-## 在QWidget或QDialog中使用SARibbonBar
 
-SARibbonBar支持在QWidget或者QDialog上使用，具体可见例子：`src/example/WidgetWithRibbon`
+### SARibbonBar布局方案
 
-你只需要把SARibbonBar当做一个普通窗口使用即可，下面大致介绍一下在QWidget中创建`SARibbonBar`的过程
+ `SARibbon`支持4种ribbon布局方案，布局方案参考了`office`的ribbon风格和`WPS`的ribbon风格，布局方案的切换可
+通过`void SARibbonBar::setRibbonStyle(RibbonStyle v)`实现
 
-首先在头文件声明SARibbonBar的窗口指针
+`office`模式是最常见的ribbon模式，`tab`和标题栏占用位置较多，`WPS`设计的ribbon模式进行了改良，它为了减小ribbon的高度，把标签和标题栏设置在一起，这样减少了一个标题栏高度，有效利用了垂直空间，同时还把pannel的按钮布局由最大摆放3个变为摆放两个，进一步压缩了垂直空间
 
-```cpp
-private:
-    Ui::Widget* ui;
-    SARibbonBar* mRibbonBar { nullptr };
-```
-
-在Widget的构造函数中创建`SARibbonBar`,Widget的ui文件中有个`QVBoxLayout`布局，把`SARibbonBar`放置在最顶层，同时，由于QWidget模式下，没有必要再显示标题，可以调用`SARibbonBar::setTitleVisible`方法把标题隐藏。applicationbutton在QWidget如果没有必要也可以通过`SARibbonBar::setApplicationButton`传入一个空指针取消掉，最后由于SARibbonBar的主题是在`SARibbonMainWindow`方法中设置的，在QWidget中设置主题可通过全局函数`sa_set_ribbon_theme`进行设置
-
-```cpp
-Widget::Widget(QWidget* parent) : QWidget(parent), ui(new Ui::Widget)
-{
-    // 注意：ui文件中有个QVBoxLayout布局
-    ui->setupUi(this);
-    // 直接创建SARibbonBar
-    mRibbonBar = new SARibbonBar(this);
-    // QWidget模式下，没有必要再显示标题
-    mRibbonBar->setTitleVisible(false);
-    // QWidget模式下，直接使用紧凑模式效果更好
-    mRibbonBar->setRibbonStyle(SARibbonBar::RibbonStyleCompactThreeRow);
-    // 取消applicationbutton
-    mRibbonBar->setApplicationButton(nullptr);
-    //设置主题，这里虽然没用到SARibbonMainWindow，但Ribbon的主题是SARibbonMainWindow中定义的，因此要引入SARibbonMainWindow.h
-    sa_set_ribbon_theme(mRibbonBar, SARibbonMainWindow::RibbonThemeOffice2013);
-
-    // QWidgets设置一个QVBoxLayout，把窗口放到QVBoxLayout的第二个布局中，第一个布局给SARibbonBar
-    // 这样，SARibbonBar就会在最上面
-    ui->verticalLayout->insertWidget(0, mRibbonBar);
-
-    buildRibbon(mRibbonBar);
-}
-```
-
-效果如下：
-
-![Ribbon用在QWidget上](./doc/screenshot/ribbonbar-use-in-qwidget.png)
-
-# SARibbon样式
-
- `SARibbon`支持4种ribbon样式进行切换，这里参考了`office`的ribbon风格和`wps`的ribbon风格
-通过`void SARibbonBar::setRibbonStyle(RibbonStyle v)`可实现在线的样式切换
-
-## Office Ribbon 样式
-
-office模式是最常见的ribbon模式，tab和标题栏占用位置较多。
-
-此模式和Office的Ribbon样式一致，office的word界面截图如下
+office的word界面和WPS Word界面截图对比
 
 ![office 界面截图](./doc/pic/office-screenshot.png)
 
-SARibbon的`SARibbonBar::OfficeStyle`样式
-
-![](./doc/screenshot/office-mode.png)
-
-针对上面样式的布局，见[SARibbon的布局](#SARibbon的布局)
-
-## WPS Ribbon 样式
-
-wps设计的ribbon模式进行了改良，它为了减小ribbon的高度，把标签和标题栏设置在一起，这样减少了一个标题栏高度，有效利用了垂直空间，这是WPS对ribbon的第一次改动
-
-![Wps 改动了ribbon的布局方式，第1次改动](./doc/pic/wps-change-ribbon-1.jpg)
-
-SARibbon的`SARibbonBar::WpsLiteStyle`样式
-
-![](./doc/screenshot/wps-mode.png)
-
-针对上面样式的布局，见[SARibbon的布局](#SARibbon的布局)
+![Wps 改动了ribbon的布局方式](./doc/pic/wps-change-ribbon-1.jpg)
 
 在正常屏幕下，WPS 样式会比 Office 样式减少至少30像素左右的垂直高度，相比1920*1080的屏幕来说，相当于节约了接近3%的垂直空间
 
-## 不同样式下的显示对比：
+SARibbon中把带有标题栏的称之为宽松布局（Loose），宽松布局的各个元素如下图排列：
 
-`SARibbonBar::OfficeStyle`
-![](doc/screenshot/office-3-style.png)
-
-`SARibbonBar::OfficeStyleTwoRow`
-![](doc/screenshot/office-2-style.png)
-
-`SARibbonBar::WpsLiteStyle`
-![](doc/screenshot/wps-3-style.png)
-
-`SARibbonBar::WpsLiteStyleTwoRow`
-![](doc/screenshot/wps-2-style.png)
-
-另外，改变2行模式下字体是否换行，还能出现2种样式，通过静态函数`SARibbonToolButton::setLiteStyleEnableWordWrap`可以进行设置
-
-文字不换行的2行模式显示效果如下：
-
-`SARibbonBar::OfficeStyleTwoRow and SARibbonToolButton::setLiteStyleEnableWordWrap(false)`
-![](doc/screenshot/office-2-style-nowrap.png)
-
-`SARibbonBar::WpsLiteStyleTwoRow and SARibbonToolButton::setLiteStyleEnableWordWrap(false)`
-![](doc/screenshot/wps-2-style-nowrap.png)
-
-工具栏文字不换行，会使图标显示的更大，显示效果会更好，这个看具体需求而定，使用`SARibbonToolButton::setLiteStyleEnableWordWrap(false)`并不会改变ribbon bar的高度，但图标会变更大一点
-
-
-
-## 更小的垂直空间
-
-为了更好的利用垂直空间，WPS把原来的3行变为了2行，这样可以释放更多的垂直空间，这是WPS对ribbon的第二次布局更改，新版WPS的截图如下：
-
-![Wps 改动了ribbon的布局方式，第2次改动](./doc/pic/wps-change-ribbon-2.png)
-
-`SARibbon`也借鉴了此设计方法，并针对office的Ribbon样式和wps的Ribbon样式都实现了2行方案，效果如下：
-
-office ribbon样式的2行显示效果：
-
-![](./doc/screenshot/office-mode-2line.png)
-
-
-wps ribbon样式的2行显示效果：
-
-![](./doc/screenshot/wps-mode-2line.png)
-
-正常屏幕下不同样式的垂直高度如下表所示：
-
-|样式|垂直高度(px)|对应样式枚举名称|
-|:-|:-|:-|
-|Office Ribbon 样式|160|SARibbonBar::OfficeStyle|
-|WPS Ribbon 样式|130|SARibbonBar::WpsLiteStyle|
-|Office Ribbon 2line 样式|134|SARibbonBar::OfficeStyleTwoRow|
-|WPS Ribbon 2line 样式|104|SARibbonBar::WpsLiteStyleTwoRow|
-
-由上表可见WPS Ribbon 2line样式的垂直高度为普通Office Ribbon 样式的65%，相比1920*1080的屏幕来说，相当于节约了接近5%的垂直空间
-
-在感观上，WPS Ribbon 2line 样式的显示效果还是比传统的office布局多出很多空间
-
-# SARibbon的布局
-
-不同样式有不同的布局方法
-
-## Office布局模式——SARibbonBar::OfficeStyle
-
-`SARibbon OfficeStyle`的布局如下图所示：
-
-![OfficeStyle 布局](./doc/pic/ribbonbar-geometry-office3.png)
+![宽松布局](./doc/pic/ribbonbar-geometry-office3.png)
 
 这个布局和office的默认布局是一致的
 
-## WPS布局模式——SARibbonBar::WpsLiteStyle
+SARibbon中把带有标题栏和tab结合一起的布局方式称之为紧凑布局（Compact），紧凑布局的各个元素如下图排列：
 
-此模式和Office的Ribbon样式有区别，参考了WPS的ribbon界面做法，把office ribbon较占空间的标题栏进行利用，实现了界面的最大利用，这个模式下可以减少一个标题栏的高度
+![紧凑布局](./doc/pic/ribbonbar-geometry-wps3.png)
 
-![WpsLiteStyle 布局](./doc/pic/ribbonbar-geometry-wps3.png)
+SARibbonBar提供了`setRibbonStyle`函数，可以定义当前的布局方案，枚举`SARibbonBar::RibbonStyle`定义了四种布局方案：
 
+- `SARibbonBar::RibbonStyleLooseThreeRow`宽松结构，3行模式(v0.x版本为`SARibbonBar::OfficeStyle`)
 
+![SARibbonBar::RibbonStyleLooseThreeRow](doc/screenshot/office-3-style.png)
 
-## pannel的布局
+- `SARibbonBar::RibbonStyleLooseTwoRow`宽松结构，2行模式(v0.x版本为`SARibbonBar::OfficeStyleTwoRow`)
+
+![SARibbonBar::RibbonStyleLooseTwoRow](doc/screenshot/office-2-style.png)
+
+- `SARibbonBar::RibbonStyleCompactThreeRow`紧凑结构，3行模式(v0.x版本为`SARibbonBar::WpsLiteStyle`)
+
+![SARibbonBar::RibbonStyleCompactThreeRow](doc/screenshot/wps-3-style.png)
+
+- `SARibbonBar::RibbonStyleCompactTwoRow`紧凑结构，2行模式(v0.x版本为`SARibbonBar::WpsLiteStyleTwoRow`)
+
+![SARibbonBar::RibbonStyleCompactTwoRow](doc/screenshot/wps-2-style.png)
+
+### SARibbonBar文字换行，及图标大小
+
+通过`SARibbonBar::setEnableWordWrap`函数可以控制SARibbonBar的文字是否换行，`SARibbonBar`的高度是固定的，文字是否换行会影响图标显示的大小，因此，如果你想图标看起来更大，可以设置文字不换行
+
+文字不换行的2行模式显示效果如下：
+
+`SARibbonBar::RibbonStyleCompactTwoRow`紧凑结构，2行模式把文字设置为不换行后(`SARibbonBar::setEnableWordWrap(false)`)的效果如下
+
+![](doc/screenshot/wps-2-style-nowrap.png)
+
+工具栏文字不换行，会使图标显示的更大，显示效果会更好，这个看具体需求而定
+
+### 不同的“按钮”布局方式
+
+`SARibbonPannel`提供了三个添加action的方法：
+- `addLargeAction`
+- `addMediumAction`
+- `addSmallAction`
 
 在标准的pannel中，一个action（按钮）有3种布局，以office word为例，pannel的三种布局其实是所占行数:
 
@@ -561,13 +545,7 @@ enum RowProportion {
 
 SARibbonPannel里管理的每个action都会带有一个占位的属性（`SARibbonPannelItem::RowProportion`），这个占位属性决定了这个action在pannel里的布局。
 
-
-上面讲到了pannel的布局，pannel布局一个很关键的点就是`行`的概念，`行`的不同定义，会影响整个显示效果。在高版本的wps中，为了进一步缩减ribbon bar的高度，把ribbon的3行按钮改为了2个，这样使得ribbon bar进一步缩减，对应action不多的category显得会更饱满，相当于只有medium，没有small模式，`SARibbon`支持这几种ribbon样式，引入了行数的概念，在`SARibbonBar::RibbonStyle`的枚举中带`TwoRow`结尾的都是指代2行模式，具体介绍见[SARibbon样式:更小的垂直空间](#更小的垂直空间)
-
-
-下面针对不同行数进行详细介绍。
-
-### 3行模式
+#### 3行模式
 
 三行模式是传统的pannel布局方式，如下图所示：
 
@@ -581,7 +559,7 @@ SARibbonPannel里管理的每个action都会带有一个占位的属性（`SARib
 
 3行模式下的pannel会显示pannel的标题在`Pannel Title`区域，另外还有一个`OptionAction`的区域，这个是给这个action添加特殊触发使用的，如果没有设置`OptionAction`，这个区域是隐藏。
 
-### 2行模式
+#### 2行模式
 
 两行模式是传统的WPS的改进布局法（具体是否是WPS首先这样做的不清楚，我是按照WPS的布局进行参考的），如下图所示：
 
@@ -597,17 +575,13 @@ SARibbonPannel里管理的每个action都会带有一个占位的属性（`SARib
 
 > 注意：两行模式的category的title是不显示的
 
-# SARibbon的自定义功能
+### SARibbon的自定义功能
 
 ribbon的自定义是ribbon的一个特色，参考了office和wps的自定义界面，用户可以为自己的ribbon定义非常多的内容，甚至可以定义出一个完全和原来不一样的界面。
 
 以下是office的自定义界面
 
 ![office的自定义界面](./doc/screenshot/customize/customization-office-ui.png)
-
-以下是wps的自定义界面
-
-![wps的自定义界面](./doc/screenshot/customize/customization-wps-ui.png)
 
 SARibbon参考office和wps的界面，封装了方便使用的`SARibbonCustomize**`类，包括如下5个类：
 
@@ -626,7 +600,7 @@ SARibbon参考office和wps的界面，封装了方便使用的`SARibbonCustomize
 ![SARibbon的自定义界面](./doc/screenshot/customize/customization-saribbon-ui.png)
 
 
-# 如何给界面添加自定义功能
+#### 给界面添加自定义功能
 
 这里演示如何添加自定义功能
 
@@ -636,6 +610,7 @@ SARibbon参考office和wps的界面，封装了方便使用的`SARibbonCustomize
 //MainWindow.h 中定义成员变量
 SARibbonActionsManager* m_ribbonActionMgr;///< 用于管理所有action
 ```
+
 在MainWindow的初始化过程中，还需要创建大量的`QAction`，`QAction`的父对象指定为MainWindow，另外还会生成ribbon布局，例如添加category，添加pannel等操作，在上述操作完成后添加如下步骤，自动让`SARibbonActionsManager`管理所有的`QAction`
 
 ```cpp
@@ -672,15 +647,11 @@ sa_apply_customize_from_xml_file("customization.xml", this, m_ribbonActionMgr);
 
 这样软件每次启动都会按照配置文件加载。
 
-SARibbon实现自定义只需上述几步即可实现。
 
 # 更多截图
 
 
 ![](./doc/screenshot/SARibbonBar-screenshot-minMode.gif)
-
-
-
 
 
 - 支持qss对ribbon进行设置
@@ -714,23 +685,64 @@ SARibbon项目是SA项目的子项
 
 这个ribbon主要通过QTabbar和QStackWidget实现，按照微软MFCRibbbon的接口命名方式来写，主要通过qss来控制，默认qss在资源文件中，理论上能满足各种样式，可以实现样式的切换(换肤)
 
+# 常见问题
 
-# 计划及进度
+## 1、高分屏显示问题
 
-目前我的开发精力主要在[data-workbench](https://github.com/czyt1988/data-workbench)中，我会在开发过程遇到的问题对SARibbon进行修正，也会针对Issues进行修正
+针对高分屏显示，有如下两个方面准备
 
-## 计划
+1 - 在main函数中为QApplication设置`Qt::AA_EnableHighDpiScaling`属性
 
-- 正在实现designer plugin
-- 完善Gallery控件（`SARibbonGallery`）
+这个属性使得应用程序自动检测显示器的像素密度来实现自动缩放，示例代码如下：
 
-## 已知bug
+```cpp
+int main(int argc, char* argv[])
+{
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
+    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+#endif
+    QApplication a(argc, argv);
+    ......
+}
+```
 
-- 在ubuntu下会有文字换行显示不全问题
-- 某些Ubuntu系统无法显示
+2 - 在main函数中为QApplication设置缩放策略：`QApplication::setHighDpiScaleFactorRoundingPolicy`
+
+Qt5.6提供了`Qt::AA_EnableHighDpiScaling`，但不能完全解决，Qt5.14开始提供了高分屏缩放策略设置`QApplication::setHighDpiScaleFactorRoundingPolicy`，同`AA_EnableHighDpiScaling`一样需要在main函数前面设置
+
+```cpp
+int main(int argc, char* argv[])
+{
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
+    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+#endif
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+    QApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
+#endif
+    QApplication a(argc, argv);
+    ......
+}
+```
+
+## 2、快捷键问题
+
+经常有人反馈使用SARibbonBar后，没有被激活的tab页的快捷键没有响应，只有激活的标签页的快捷键才有反应，这个问题并非SARibbonBar的问题，而是设置快捷键时没有设置好`QAction`的`shortcutContext`的属性，`QAction`默认快捷键的属性是`Qt::WindowShortcut`,`Qt::WindowShortcut`代表当父部件是活动顶层窗口的逻辑子部件时，快捷键生效，如果是传统的toolbar模式，由于action所在的toolbar一直在最前端，因此快捷键一直生效，但如果是SARibbonBar，action所在的pannel是会隐藏的，隐藏后快捷键就不生效，如果想快捷键无论Pannel是否隐藏都生效，只需要设置快捷键的`shortcutContext`属性为`Qt::ApplicationShortcut`即可
+
+例如：
+
+```cpp
+QAction* actionUndo = createAction("undo", ":/icon/icon/undo.svg");
+actionUndo->setShortcut(QKeySequence("Ctrl+Shift+z"));
+actionUndo->setShortcutContext(Qt::ApplicationShortcut);
+quickAccessBar->addAction(actionUndo);
+
+QAction* actionRedo = createAction("redo", ":/icon/icon/redo.svg");
+actionRedo->setShortcut(QKeySequence("Ctrl+z"));
+actionRedo->setShortcutContext(Qt::ApplicationShortcut);
+quickAccessBar->addAction(actionRedo);
+```
 
 # 其他
 
-[关于SARibbonToolButton的布局方案说明](./doc/)
 
 > 感谢[FastCAE](http://www.fastcae.com/product.html)项目使用了本控件，并找到了许多bug和建议，FastCAE国产CAE软件集成开发平台，免费开源，是面向求解器开发者提供CAE软件界面与通用功能模块快速研发集成框架，[其开源仓库（github）:https://github.com/DISOGitHub/FastCAE](https://github.com/DISOGitHub/FastCAE)，[gitee:https://gitee.com/DISOGitee/FastCAE](https://gitee.com/DISOGitee/FastCAE)，[官网见:http://www.fastcae.com/product.html](http://www.fastcae.com/product.html)
