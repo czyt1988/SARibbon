@@ -35,9 +35,28 @@ QQ交流群:434014314
 |Qt6.5|[![cmake-win-qt6.5](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt6.5.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt6.5.yml)|[![CMake-Linux-Qt6.5](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt6.5.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt6.5.yml)|[![cmake-mac-qt6.5](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt6.5.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt6.5.yml)|
 |Qt6.6|[![cmake-win-qt6.6](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt6.6.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt6.6.yml)|[![CMake-Linux-Qt6.6](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt6.6.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt6.6.yml)|[![cmake-mac-qt6.6](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt6.6.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt6.6.yml)|
 
- 界面截图：
+# SARibbon
 
-![](./doc/screenshot/001.gif)
+这是一个`Qt`下的`Ribbon`界面控件，提供了类似微软Office系列软件的操作界面，适用于大型功能性软件、工业软件、复杂软件的ui交互，`SARibbon`在设计时参考了时参考了MFC Ribbon接口的命名风格，样式上参考了微软Office系列软件以及WPS软件的ribbon风格，并把两者的优点进行了集成，形成了一个可定义多种主题风格的Ribbon控件，`SARibbon`能通过qss快速的定义出自己想要的主题风格，并对常用的一些功能性控件进行了封装，例如：[颜色选择按钮和颜色选择画板](https://github.com/czyt1988/SAColorWidgets)
+
+## 功能特点
+
+- 针对Ribbon的布局和显示
+
+![](./doc/screenshot/SARibbonBar-overview.gif)
+
+- 支持最小化模式，ribbon只显示标签（默认双击标签会进行切换）
+
+![](./doc/screenshot/SARibbonBar-minMode.gif)
+
+- 支持quickAccessBar（word快速菜单），在wps模式和office模式下会有不同的显示效果
+
+![](./doc/screenshot/SARibbonBar-quickAccessBar.gif)
+
+- 支持4种不同的ribbon button，普通按钮，延迟弹出菜单按钮，菜单按钮，action菜单按钮（action菜单按钮是此ribbon控件最主要解决的问题之一）
+
+![](./doc/screenshot/SARibbonBar-ribbonbutton.gif)
+
 
 MIT协议，欢迎大家使用并提出意见
 
@@ -657,19 +676,12 @@ SARibbon实现自定义只需上述几步即可实现。
 
 # 更多截图
 
-![](./doc/screenshot/SARibbonBar-screenshot-01.gif)
-
-- 支持最小化模式，ribbon只显示标签（默认双击标签会进行切换）
 
 ![](./doc/screenshot/SARibbonBar-screenshot-minMode.gif)
 
-- 支持quickAccessBar（word快速菜单），在wps模式和office模式下会有不同的显示效果
 
-![](./doc/screenshot/SARibbonBar-screenshot-quickAccessBar.gif)
 
-- 支持4种不同的ribbon button，普通按钮，延迟弹出菜单按钮，菜单按钮，action菜单按钮（action菜单按钮是此ribbon控件最主要解决的问题之一）
 
-![](./doc/screenshot/SARibbonBar-screenshot-ribbonbutton.gif)
 
 - 支持qss对ribbon进行设置
 
