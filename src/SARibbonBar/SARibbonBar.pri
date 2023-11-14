@@ -4,23 +4,19 @@
 # 2.要预定义FRAMELESSHELPER_CORE_LIBRARY宏，这样才能导出符号
 # 3.要预定义FRAMELESSHELPER_WIDGETS_LIBRARY宏，这样才能导出符号
 
-greaterThan(QT_MAJOR_VERSION, 4){
-    # 目前 frameless支持qt5.14,qt5.15,qt6.4+,除了上诉版本，都使用不了
+equals(QT_MAJOR_VERSION, 5){
     greaterThan(QT_MINOR_VERSION, 13){
         SA_RIBBON_CONFIG += use_frameless
     }
 }else{
-    # Qt6,qt6.4+可使用frameless
-    greaterThan(QT_MAJOR_VERSION, 5){
-        greaterThan(QT_MINOR_VERSION, 3){
-            SA_RIBBON_CONFIG += use_frameless
-        }
+# qt6.0不支持
+    greaterThan(QT_MINOR_VERSION, 0){
+        SA_RIBBON_CONFIG += use_frameless
     }
 }
 
-
 contains( SA_RIBBON_CONFIG, use_frameless ) {
-    message("use_frameless lib,compile with c+=17")
+    message("use frameless lib,compile with c+=17")
     # 引入第三方库frameless后，必须要求c++17
     !contains(CONFIG,C++17){
         CONFIG += c++17
