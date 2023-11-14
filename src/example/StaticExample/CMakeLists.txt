@@ -25,7 +25,7 @@ find_package(QT NAMES Qt6 Qt5 COMPONENTS Widgets REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets REQUIRED)
 
 # 在加载qt版本后，需要下面这段开判断是否使用framelss
-# 根据qt版本选择是否使用frameless库，目前frameless库支持qt5.14,qt5.15,qt6.4+,除了上诉版本，都使用不了
+# 根据qt版本选择是否使用frameless库，目前frameless库支持qt5.14,qt5.15,qt6.1+,除了上诉版本，都使用不了
 if(${QT_VERSION_MAJOR} EQUAL 5)
     # qt版本为5，判断是否小版本大于14
     if(${QT_VERSION_MINOR} GREATER_EQUAL 14)
@@ -35,14 +35,15 @@ if(${QT_VERSION_MAJOR} EQUAL 5)
         set(SARIBBON_USE_FRAMELESS_LIB OFF)
     endif()
 elseif(${QT_VERSION_MAJOR} EQUAL 6)
-    # qt版本为6，判断是否小版本大于4
-    if(${QT_VERSION_MINOR} GREATER_EQUAL 4)
-        #6.4及以上可以使用frameless
+    # qt版本为6，判断是否小版本大于6.1
+    if(${QT_VERSION_MINOR} GREATER_EQUAL 1)
         set(SARIBBON_USE_FRAMELESS_LIB ON)
     else()
+        #6.0及bug多多无法使用frameless
         set(SARIBBON_USE_FRAMELESS_LIB OFF)
     endif()
 endif()
+
 # 注意后面所有SARIBBON_USE_FRAMELESS_LIB的判断，都是和framelss有关
 # 如果是使用frameless库，需要c++17，否则c++11足以
 if(SARIBBON_USE_FRAMELESS_LIB)

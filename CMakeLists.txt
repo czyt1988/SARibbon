@@ -31,11 +31,11 @@ if(${QT_VERSION_MAJOR} EQUAL 5)
         set(SARIBBON_USE_FRAMELESS_LIB OFF)
     endif()
 elseif(${QT_VERSION_MAJOR} EQUAL 6)
-    # qt版本为6，判断是否小版本大于4
-    if(${QT_VERSION_MINOR} GREATER_EQUAL 0)
-        #6.0及以上可以使用frameless
+    # qt版本为6，判断是否小版本大于6.1
+    if(${QT_VERSION_MINOR} GREATER_EQUAL 1)
         set(SARIBBON_USE_FRAMELESS_LIB ON)
     else()
+        #6.0及bug多多无法使用frameless
         set(SARIBBON_USE_FRAMELESS_LIB OFF)
     endif()
 endif()
