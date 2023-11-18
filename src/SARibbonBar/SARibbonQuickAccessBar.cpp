@@ -15,6 +15,7 @@ public:
 public:
     SARibbonButtonGroupWidget* groupWidget { nullptr };
 };
+
 SARibbonQuickAccessBar::PrivateData::PrivateData(SARibbonQuickAccessBar* p) : q_ptr(p)
 {
 }
