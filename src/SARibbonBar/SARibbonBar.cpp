@@ -115,7 +115,7 @@ public:
         q_ptr->connect(mRibbonTabBar, &QTabBar::tabMoved, q_ptr, &SARibbonBar::onTabMoved);
         //
         mStackedContainerWidget = RibbonSubElementDelegate->createRibbonStackedWidget(q_ptr);
-        mRibbonTabBar->setObjectName(QStringLiteral("objSAStackedContainerWidget"));
+        mStackedContainerWidget->setObjectName(QStringLiteral("objSAStackedContainerWidget"));
         mStackedContainerWidget->connect(mStackedContainerWidget, &SARibbonStackedWidget::hidWindow, q_ptr, &SARibbonBar::onStackWidgetHided);
         mStackedContainerWidget->installEventFilter(q_ptr);
         setNormalMode();
