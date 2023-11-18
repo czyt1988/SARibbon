@@ -15,78 +15,78 @@ class SARibbonQuickAccessBar;
 class SARibbonStackedWidget;
 
 /**
- * @brief SARibbonBar继承于QMenuBar,在SARibbonMainWindow中直接替换了原来的QMenuBar
- *
- * 通过setRibbonStyle函数设置ribbon的风格:
- *
- * @code
- * void setRibbonStyle(RibbonStyle v);
- * @endcode
- *
- * SARibbonBar参考office和wps，提供了四种风格的Ribbon模式,@ref SARibbonBar::RibbonStyle
- *
- * 如果想ribbon占用的空间足够小，WpsLiteStyleTwoRow模式能比OfficeStyle节省35%的高度空间
- *
- * 如何生成ribbon?先看看一个传统的Menu/ToolBar是如何生成的：
- *
- * @code
- * void MainWindow::MainWindow()
- * {
- *    QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
- *    QToolBar *fileToolBar = addToolBar(tr("File"));
- *    //生成action
- *    QAction *newAct = new QAction(newIcon, tr("&New"), this);
- *    fileMenu->addAction(newAct);
- *    fileToolBar->addAction(newAct);
- *
- *    QAction *openAct = new QAction(openIcon, tr("&Open..."), this);
- *    fileMenu->addAction(openAct);
- *    fileToolBar->addAction(openAct);
- * }
- * @endcode
- *
- * 传统的Menu/ToolBar主要通过QMenu的addMenu添加菜单,通过QMainWindow::addToolBar生成QToolBar,
- * 再把QAction设置进QMenu和QToolBar中
- *
- * SARibbonBar和传统方法相似，不过相对于传统的Menu/ToolBar QMenu和QToolBar是平级的，
- * Ribbon是有明显的层级关系，SARibbonBar下面是 @ref SARibbonCategory，
- * SARibbonCategory下面是@ref SARibbonPannel ，SARibbonPannel下面是@ref SARibbonToolButton ，
- * SARibbonToolButton管理着QAction
- *
- * 因此，生成一个ribbon只需以下几个函数：
- * @code
- * SARibbonCategory * SARibbonBar::addCategoryPage(const QString& title);
- * SARibbonPannel * SARibbonCategory::addPannel(const QString& title);
- * SARibbonToolButton * SARibbonPannel::addLargeAction(QAction *action);
- * SARibbonToolButton * SARibbonPannel::addSmallAction(QAction *action);
- * @endcode
- *
- * 因此生成步骤如下：
- *
- * @code
- * //成员变量
- * SARibbonCategory* categoryMain;
- * SARibbonPannel* FilePannel;
- *
- * //建立ui
- * void setupRibbonUi()
- * {
- *     ......
- *     //ribbonwindow为SARibbonMainWindow
- *     SARibbonBar* ribbon = ribbonwindow->ribbonBar();
- *     ribbon->setRibbonStyle(SARibbonBar::WpsLiteStyle);
- *     //添加一个Main标签
- *     categoryMain = ribbon->addCategoryPage(QStringLiteral("Main"));
- *     //Main标签下添加一个File Pannel
- *     FilePannel = categoryMain->addPannel(QStringLiteral("FilePannel"));
- *     //开始为File Pannel添加action
- *     FilePannel->addLargeAction(actionNew);
- *     FilePannel->addLargeAction(actionOpen);
- *     FilePannel->addLargeAction(actionSave);
- *     FilePannel->addSmallAction(actionImportMesh);
- *     FilePannel->addSmallAction(actionImportGeometry);
- * }
- * @endcode
+  @brief SARibbonBar继承于QMenuBar,在SARibbonMainWindow中直接替换了原来的QMenuBar
+
+  通过setRibbonStyle函数设置ribbon的风格:
+
+  @code
+  void setRibbonStyle(RibbonStyle v);
+  @endcode
+
+  SARibbonBar参考office和wps，提供了四种风格的Ribbon模式,@ref SARibbonBar::RibbonStyle
+
+  如果想ribbon占用的空间足够小，WpsLiteStyleTwoRow模式能比OfficeStyle节省35%的高度空间
+
+  如何生成ribbon?先看看一个传统的Menu/ToolBar是如何生成的：
+
+  @code
+  void MainWindow::MainWindow()
+  {
+     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
+     QToolBar *fileToolBar = addToolBar(tr("File"));
+     //生成action
+     QAction *newAct = new QAction(newIcon, tr("&New"), this);
+     fileMenu->addAction(newAct);
+     fileToolBar->addAction(newAct);
+
+     QAction *openAct = new QAction(openIcon, tr("&Open..."), this);
+     fileMenu->addAction(openAct);
+     fileToolBar->addAction(openAct);
+  }
+  @endcode
+
+  传统的Menu/ToolBar主要通过QMenu的addMenu添加菜单,通过QMainWindow::addToolBar生成QToolBar,
+  再把QAction设置进QMenu和QToolBar中
+
+  SARibbonBar和传统方法相似，不过相对于传统的Menu/ToolBar QMenu和QToolBar是平级的，
+  Ribbon是有明显的层级关系，SARibbonBar下面是 @ref SARibbonCategory，
+  SARibbonCategory下面是@ref SARibbonPannel ，SARibbonPannel下面是@ref SARibbonToolButton ，
+  SARibbonToolButton管理着QAction
+
+  因此，生成一个ribbon只需以下几个函数：
+  @code
+  SARibbonCategory * SARibbonBar::addCategoryPage(const QString& title);
+  SARibbonPannel * SARibbonCategory::addPannel(const QString& title);
+  SARibbonToolButton * SARibbonPannel::addLargeAction(QAction *action);
+  SARibbonToolButton * SARibbonPannel::addSmallAction(QAction *action);
+  @endcode
+
+  因此生成步骤如下：
+
+  @code
+  //成员变量
+  SARibbonCategory* categoryMain;
+  SARibbonPannel* FilePannel;
+
+  //建立ui
+  void setupRibbonUi()
+  {
+      ......
+      //ribbonwindow为SARibbonMainWindow
+      SARibbonBar* ribbon = ribbonwindow->ribbonBar();
+      ribbon->setRibbonStyle(SARibbonBar::WpsLiteStyle);
+      //添加一个Main标签
+      categoryMain = ribbon->addCategoryPage(QStringLiteral("Main"));
+      //Main标签下添加一个File Pannel
+      FilePannel = categoryMain->addPannel(QStringLiteral("FilePannel"));
+      //开始为File Pannel添加action
+      FilePannel->addLargeAction(actionNew);
+      FilePannel->addLargeAction(actionOpen);
+      FilePannel->addLargeAction(actionSave);
+      FilePannel->addSmallAction(actionImportMesh);
+      FilePannel->addSmallAction(actionImportGeometry);
+  }
+  @endcode
  */
 class SA_RIBBON_EXPORT SARibbonBar : public QMenuBar
 {
@@ -104,14 +104,14 @@ public:
      */
     enum RibbonStyle
     {
-        RibbonStyleLooseThreeRow   = 0x0000,         ///< 宽松结构，3行模式
-        RibbonStyleCompactThreeRow = 0x0001,         ///< 紧凑结构，3行模式
-        RibbonStyleLooseTwoRow     = 0x0100,         ///< 宽松结构，2行模式
-        RibbonStyleCompactTwoRow   = 0x0101,         ///< 紧凑结构，2行模式
-                                                     // 以下枚举将组件淘汰
-        OfficeStyle  = RibbonStyleLooseThreeRow,     ///< 类似office 的ribbon风格
-        WpsLiteStyle = RibbonStyleCompactThreeRow,   ///< 类似wps的紧凑风格
-        OfficeStyleTwoRow = RibbonStyleLooseTwoRow,  ///< 类似office 的ribbon风格 2行工具栏 三行布局模式，office就是三行布局模式，pannel能布置3行小toolbutton，默认模式
+        RibbonStyleLooseThreeRow   = 0x0000,              ///< 宽松结构，3行模式
+        RibbonStyleCompactThreeRow = 0x0001,              ///< 紧凑结构，3行模式
+        RibbonStyleLooseTwoRow     = 0x0100,              ///< 宽松结构，2行模式
+        RibbonStyleCompactTwoRow   = 0x0101,              ///< 紧凑结构，2行模式
+                                                          // 以下枚举将组件淘汰
+        OfficeStyle        = RibbonStyleLooseThreeRow,    ///< 类似office 的ribbon风格
+        WpsLiteStyle       = RibbonStyleCompactThreeRow,  ///< 类似wps的紧凑风格
+        OfficeStyleTwoRow  = RibbonStyleLooseTwoRow,  ///< 类似office 的ribbon风格 2行工具栏 三行布局模式，office就是三行布局模式，pannel能布置3行小toolbutton，默认模式
         WpsLiteStyleTwoRow = RibbonStyleCompactTwoRow  ///< 类似wps的紧凑风格  2行工具栏
     };
     Q_ENUM(RibbonStyle)
@@ -136,6 +136,7 @@ public:
     // 获取版本信息
     static QString versionString();
 
+public:
     // 构造函数
     SARibbonBar(QWidget* parent = nullptr);
     ~SARibbonBar() Q_DECL_OVERRIDE;
@@ -265,7 +266,7 @@ public:
     // 告诉saribbonbar，window button的尺寸
     void setWindowButtonSize(const QSize& size);
 
-    // 更新ribbon的布局数据，此函数适用于一些关键性尺寸变化，换起ribbon下面元素的布局
+    // 更新ribbon的布局数据，此函数适用于一些关键性尺寸变化，换起ribbon下面元素的布局,在发现刷新问题时，可以调用此函数
     void updateRibbonGeometry();
     // tabbar 底部会绘制一条线条，此接口定义线条颜色
     void setTabBarBaseLineColor(const QColor& clr);
@@ -276,36 +277,44 @@ public:
     // 设置标题的对齐方式
     void setWindowTitleAligment(Qt::Alignment al);
     Qt::Alignment windowTitleAligment() const;
-    // 设置按钮允许换行
+    // 设置按钮允许换行，注意图标大小是由文字决定的，两行文字会让图标变小，如果想图标变大，文字不换行是最好的
     void setEnableWordWrap(bool on);
     bool isEnableWordWrap() const;
-    // 获取SARibbonStackedWidget
+    // 获取SARibbonStackedWidget，谨慎使用此函数
     SARibbonStackedWidget* ribbonStackedWidget();
     // 设置是否显示标题
     void setTitleVisible(bool on = false);
     bool isTitleVisible() const;
+    //允许用户自定义AccessBar图标尺寸，默认为false
+    void setEnableUserDefineAccessBarIconSize(bool on = true);
+    bool isEnableUserDefineAccessBarIconSize() const;
+    //允许用户自定义RightBar图标尺寸，默认为false
+    void setEnableUserDefineRightBarIconSize(bool on = true);
+    bool isEnableUserDefineRightBarIconSize() const;
 signals:
 
     /**
-     * @brief 应用按钮点击响应 - 左上角的按钮，通过关联此信号触发应用按钮点击的效果
+     @brief 应用按钮点击响应 - 左上角的按钮，通过关联此信号触发应用按钮点击的效果
+
+     例如想点击按钮后弹出一个全屏的窗口（如office这些）
      */
     void applicationButtonClicked();
 
     /**
-     * @brief 标签页变化触发的信号
-     * @param index
+     @brief 标签页变化触发的信号
+     @param index
      */
     void currentRibbonTabChanged(int index);
 
     /**
-     * @brief ribbon的状态发生了变化后触发此信号
-     * @param nowState 变更之后的ribbon状态
+     @brief ribbon的状态发生了变化后触发此信号
+     @param nowState 变更之后的ribbon状态
      */
     void ribbonModeChanged(SARibbonBar::RibbonMode nowState);
 
     /**
-     * @brief ribbon的状态发生了变化后触发此信号
-     * @param nowStyle 变更之后的ribbon样式
+     @brief ribbon的状态发生了变化后触发此信号
+     @param nowStyle 变更之后的ribbon样式
      */
     void ribbonStyleChanged(SARibbonBar::RibbonStyle nowStyle);
 

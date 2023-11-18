@@ -73,9 +73,12 @@ public:
     QList< QColor > mContextCategoryColorList;      ///< contextCategory的色系
     int mContextCategoryColorListIndex;             ///< 记录contextCategory色系索引
     QColor mTitleTextColor;  ///< 标题文字颜色,默认无效，无效的情况下和SARibbonBar的qss:color属性一致
-    QColor mTabBarBaseLineColor;   ///< tabbar 底部会绘制一条线条，定义线条颜色
-    Qt::Alignment mTitleAligment;  ///< 标题对齐方式
-    bool mIsTitleVisible;          ///< 标题是否显示
+    QColor mTabBarBaseLineColor;              ///< tabbar 底部会绘制一条线条，定义线条颜色
+    Qt::Alignment mTitleAligment;             ///< 标题对齐方式
+    bool mIsTitleVisible;                     ///< 标题是否显示
+    bool mEnableUserDefineAccessBarIconSize;  ///< 允许用户自定义AccessBar的IconSize
+    bool mEnableUserDefineRightBarIconSize;   ///< 允许用户自定义RightBar的IconSize
+public:
     PrivateData(SARibbonBar* par)
         : q_ptr(par)
         , mApplicationButton(nullptr)
@@ -92,6 +95,7 @@ public:
         , mTabBarBaseLineColor(186, 201, 219)
         , mTitleAligment(Qt::AlignCenter)
         , mIsTitleVisible(true)
+        , mEnableUserDefineAccessBarIconSize(false)
     {
         mContextCategoryColorList << QColor(201, 89, 156)  // 玫红
                                   << QColor(242, 203, 29)  // 黄
@@ -1367,6 +1371,52 @@ bool SARibbonBar::isTitleVisible() const
     return d_ptr->mIsTitleVisible;
 }
 
+/**
+   @brief 设置允许用户自定义AccessBar的icon size
+
+    若设置为true此时用户调用AccessBar的setIconSize是可接受的，否则iconsize大小将由SARibbonBar计算
+
+    默认为false
+
+   @param
+ */
+void SARibbonBar::setEnableUserDefineAccessBarIconSize(bool on)
+{
+    d_ptr->mEnableUserDefineAccessBarIconSize = on;
+}
+
+/**
+   @brief 是否允许用户自定义AccessBar的icon size
+   @return
+ */
+bool SARibbonBar::isEnableUserDefineAccessBarIconSize() const
+{
+    return d_ptr->mEnableUserDefineAccessBarIconSize;
+}
+
+/**
+   @brief 是否允许用户自定义RightBar的icon size
+
+    若设置为true此时用户调用RightBar的setIconSize是可接受的，否则iconsize大小将由SARibbonBar计算
+
+    默认为false
+
+   @param on
+ */
+void SARibbonBar::setEnableUserDefineRightBarIconSize(bool on)
+{
+    d_ptr->mEnableUserDefineRightBarIconSize = on;
+}
+
+/**
+   @brief 是否允许用户自定义RightBar的icon size
+   @return
+ */
+bool SARibbonBar::isEnableUserDefineRightBarIconSize() const
+{
+    return d_ptr->mEnableUserDefineRightBarIconSize;
+}
+
 bool SARibbonBar::eventFilter(QObject* obj, QEvent* e)
 {
     if (obj) {
@@ -1783,10 +1833,12 @@ void SARibbonBar::resizeInOfficeStyle()
             QSize quickAccessBarSize = d_ptr->mQuickAccessBar->sizeHint();
             // 上下留1px的边线
             d_ptr->mQuickAccessBar->setGeometry(x, y + 1, quickAccessBarSize.width(), validTitleBarHeight - 2);
-            // 变更iconsize
-            QSize btnIconSize = PrivateData::calcIconSizeByHeight(validTitleBarHeight - 2);
-            if (btnIconSize != d_ptr->mQuickAccessBar->iconSize()) {
-                d_ptr->mQuickAccessBar->setIconSize(btnIconSize);
+            if (!(d_ptr->mEnableUserDefineAccessBarIconSize)) {  //允许用户自定义AccessBar的IconSize就不进入此条件重置大小
+                // 变更iconsize
+                QSize btnIconSize = PrivateData::calcIconSizeByHeight(validTitleBarHeight - 2);
+                if (btnIconSize != d_ptr->mQuickAccessBar->iconSize()) {
+                    d_ptr->mQuickAccessBar->setIconSize(btnIconSize);
+                }
             }
         }
     }
@@ -1829,9 +1881,11 @@ void SARibbonBar::resizeInOfficeStyle()
         // 上下留1px的边线
         d_ptr->mRightButtonGroup->setGeometry(endX, y + 1, wSize.width(), tabH - 2);
         // 变更iconsize
-        QSize btnIconSize = PrivateData::calcIconSizeByHeight(tabH - 2);
-        if (btnIconSize != d_ptr->mRightButtonGroup->iconSize()) {
-            d_ptr->mRightButtonGroup->setIconSize(btnIconSize);
+        if (!(d_ptr->mEnableUserDefineRightBarIconSize)) {
+            QSize btnIconSize = PrivateData::calcIconSizeByHeight(tabH - 2);
+            if (btnIconSize != d_ptr->mRightButtonGroup->iconSize()) {
+                d_ptr->mRightButtonGroup->setIconSize(btnIconSize);
+            }
         }
     }
     // 最后确定tabbar宽度
@@ -1875,9 +1929,11 @@ void SARibbonBar::resizeInWpsLiteStyle()
         // 上下留1px的边线
         d_ptr->mRightButtonGroup->setGeometry(endX, y + 1, wSize.width(), validTitleBarHeight - 2);
         // 变更iconsize
-        QSize btnIconSize = PrivateData::calcIconSizeByHeight(validTitleBarHeight - 2);
-        if (btnIconSize != d_ptr->mRightButtonGroup->iconSize()) {
-            d_ptr->mRightButtonGroup->setIconSize(btnIconSize);
+        if (!(d_ptr->mEnableUserDefineRightBarIconSize)) {
+            QSize btnIconSize = PrivateData::calcIconSizeByHeight(validTitleBarHeight - 2);
+            if (btnIconSize != d_ptr->mRightButtonGroup->iconSize()) {
+                d_ptr->mRightButtonGroup->setIconSize(btnIconSize);
+            }
         }
     }
     // quick access bar定位
@@ -1888,9 +1944,11 @@ void SARibbonBar::resizeInWpsLiteStyle()
             // 上下留1px的边线
             d_ptr->mQuickAccessBar->setGeometry(endX, y + 1, quickAccessBarSize.width(), validTitleBarHeight - 2);
             // 变更iconsize
-            QSize btnIconSize = PrivateData::calcIconSizeByHeight(validTitleBarHeight - 2);
-            if (btnIconSize != d_ptr->mQuickAccessBar->iconSize()) {
-                d_ptr->mQuickAccessBar->setIconSize(btnIconSize);
+            if (!(d_ptr->mEnableUserDefineAccessBarIconSize)) {  //允许用户自定义AccessBar的IconSize就不进入此条件重置大小
+                QSize btnIconSize = PrivateData::calcIconSizeByHeight(validTitleBarHeight - 2);
+                if (btnIconSize != d_ptr->mQuickAccessBar->iconSize()) {
+                    d_ptr->mQuickAccessBar->setIconSize(btnIconSize);
+                }
             }
         }
     }
