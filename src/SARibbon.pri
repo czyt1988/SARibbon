@@ -11,17 +11,14 @@
 
 
 # 这里判断qt的版本看看是否适合使用frameless，如果适合使用SA_RIBBON_CONFIG将加入use_frameless
-greaterThan(QT_MAJOR_VERSION, 4){
-    # 目前 frameless支持qt5.14,qt5.15,qt6.4+,除了上诉版本，都使用不了
+equals(QT_MAJOR_VERSION, 5){
     greaterThan(QT_MINOR_VERSION, 13){
         SA_RIBBON_CONFIG += use_frameless
     }
 }else{
-    # Qt6,qt6.4+可使用frameless
-    greaterThan(QT_MAJOR_VERSION, 5){
-        greaterThan(QT_MINOR_VERSION, 3){
-            SA_RIBBON_CONFIG += use_frameless
-        }
+# qt6.0不支持
+    greaterThan(QT_MINOR_VERSION, 0){
+        SA_RIBBON_CONFIG += use_frameless
     }
 }
 
