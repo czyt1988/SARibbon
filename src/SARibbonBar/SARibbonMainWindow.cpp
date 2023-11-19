@@ -140,10 +140,12 @@ void SARibbonMainWindow::setRibbonTheme(SARibbonMainWindow::RibbonTheme theme)
     sa_set_ribbon_theme(this, theme);
     d_ptr->mCurrentRibbonTheme = theme;
     if (SARibbonBar* bar = ribbonBar()) {
+        //尺寸修正
         switch (ribbonTheme()) {
         case RibbonThemeWindows7:
             break;
         case RibbonThemeOffice2013:
+        case RibbonThemeOffice2016Blue:
         case RibbonThemeDark: {
             //! 在设置qss后需要针对margin信息重新设置进SARibbonTabBar中
             //! office2013.qss的margin信息如下设置，em是字符M所对应的宽度的长度
@@ -160,6 +162,20 @@ void SARibbonMainWindow::setRibbonTheme(SARibbonMainWindow::RibbonTheme theme)
             int emWidth     = SA_FONTMETRICS_WIDTH(fm, "M");
             tab->setTabMargin(QMargins(0.2 * emWidth, 0, 0, 0));
         } break;
+        default:
+            break;
+        }
+        //上下文标签颜色设置
+        switch (ribbonTheme()) {
+        case RibbonThemeWindows7:
+        case RibbonThemeOffice2013:
+        case RibbonThemeDark:
+            bar->setContextCategoryColorList(QList< QColor >());  //< 设置空颜色列表会重置为默认色系
+            break;
+        case RibbonThemeOffice2016Blue:
+            bar->setContextCategoryColorList(QList< QColor >() << QColor(18, 64, 120));  //< 设置空颜色列表会重置为默认色系
+            break;
+
         default:
             break;
         }
@@ -277,6 +293,9 @@ void sa_set_ribbon_theme(QWidget* w, SARibbonMainWindow::RibbonTheme theme)
         break;
     case SARibbonMainWindow::RibbonThemeOffice2013:
         file.setFileName(":/theme/resource/theme-office2013.qss");
+        break;
+    case SARibbonMainWindow::RibbonThemeOffice2016Blue:
+        file.setFileName(":/theme/resource/theme-office2016-blue.qss");
         break;
     case SARibbonMainWindow::RibbonThemeDark:
         file.setFileName(":/theme/resource/theme-dark.qss");

@@ -97,13 +97,7 @@ public:
         , mIsTitleVisible(true)
         , mEnableUserDefineAccessBarIconSize(false)
     {
-        mContextCategoryColorList << QColor(201, 89, 156)  // 玫红
-                                  << QColor(242, 203, 29)  // 黄
-                                  << QColor(255, 157, 0)   // 橙
-                                  << QColor(14, 81, 167)   // 蓝
-                                  << QColor(228, 0, 69)    // 红
-                                  << QColor(67, 148, 0)    // 绿
-            ;
+        mContextCategoryColorList = SARibbonBar::getDefaultContextCategoryColorList();
     }
 
     void init()
@@ -227,8 +221,8 @@ public:
      */
     static QSize calcIconSizeByHeight(int h)
     {
-        if (h - 6 > 20) {
-            return QSize(h - 6, h - 6);
+        if (h - 8 >= 20) {
+            return QSize(h - 8, h - 8);
         }
         return QSize(h - 4, h - 4);
     }
@@ -289,6 +283,23 @@ bool SARibbonBar::isOfficeStyle(SARibbonBar::RibbonStyle s)
 QString SARibbonBar::versionString()
 {
     return QString("%1.%2.%3").arg(SA_RIBBON_BAR_VERSION_MAJ).arg(SA_RIBBON_BAR_VERSION_MIN).arg(SA_RIBBON_BAR_VERSION_PAT);
+}
+
+/**
+   @brief 获取默认的上下文标签颜色列表
+   @return
+ */
+QList< QColor > SARibbonBar::getDefaultContextCategoryColorList()
+{
+    QList< QColor > res;
+    res << QColor(201, 89, 156)  // 玫红
+        << QColor(242, 203, 29)  // 黄
+        << QColor(255, 157, 0)   // 橙
+        << QColor(14, 81, 167)   // 蓝
+        << QColor(228, 0, 69)    // 红
+        << QColor(67, 148, 0)    // 绿
+        ;
+    return res;
 }
 
 /**
@@ -1415,6 +1426,34 @@ void SARibbonBar::setEnableUserDefineRightBarIconSize(bool on)
 bool SARibbonBar::isEnableUserDefineRightBarIconSize() const
 {
     return d_ptr->mEnableUserDefineRightBarIconSize;
+}
+
+/**
+   @brief 设置上下文标签的颜色列表
+
+    上下文标签显示的时候，会从颜色列表中取颜色进行标签的渲染
+   @param cls
+ */
+void SARibbonBar::setContextCategoryColorList(const QList< QColor >& cls)
+{
+    d_ptr->mContextCategoryColorList = cls;
+    if (d_ptr->mContextCategoryColorList.isEmpty()) {
+        d_ptr->mContextCategoryColorList = getDefaultContextCategoryColorList();
+    }
+    d_ptr->mContextCategoryColorListIndex = 0;
+    //这时需要对已经显示的contextCategoryData的颜色进行重新设置
+    for (SARibbonContextCategory* c : d_ptr->mContextCategoryList) {
+        c->setContextColor(d_ptr->getContextCategoryColor());
+    }
+}
+
+/**
+   @brief 获取上下文标签的颜色列表
+   @return
+ */
+QList< QColor > SARibbonBar::getContextCategoryColorList() const
+{
+    return d_ptr->mContextCategoryColorList;
 }
 
 bool SARibbonBar::eventFilter(QObject* obj, QEvent* e)

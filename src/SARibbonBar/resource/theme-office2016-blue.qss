@@ -1,0 +1,443 @@
+﻿/*
+这是模仿office2016的主题模板
+通过替换占位符实现主题的设置
+{Ribbon.BKColor} : ribbon的背景颜色，决定标题栏等位置的颜色
+
+{Category.BKColor} : Category的背景颜色，SARibbonStackedWidget的背景颜色应该和SARibbonCategory的背景颜色一致
+{Category.BorderColor}:Category的边框颜色，默认{Category.BKColor}一致
+
+{CategoryScrollButton.BorderColor}:Category的移动按钮的边框颜色，建议等于{ToolButton.BorderColor:hover}
+{CategoryScrollButton.BKColor}:Category的移动按钮的背景颜色，建议等于{ToolButton.BKColor}
+{CategoryScrollButton.BKColor:hover}:Category的移动按钮hover下的背景颜色，建议等于{ToolButton.BKColor:hover}
+
+{ApplicationButton.BKColor}:建议和{Ribbon.BKColor}一致
+{ApplicationButton.BKColor:hover}:{ApplicationButton.BKColor}hover状态的颜色
+{ApplicationButton.BKColor:pressed}:{ApplicationButton.BKColor}pressed状态的颜色
+
+{Tab.Color} : Tab的文字颜色，建议和{Ribbon.BKColor}颜色的反色，区分度要高
+{Tab.Color:selected}: 选中Tab的文字颜色，建议和{Ribbon.BKColor}一致
+{Tab.BorderColor:selected}:选中Tab的边框颜色，建议和{Tab.Color:selected}一致
+{Tab.BKColor:selected}:选中Tab的背景颜色，建议和{Category.BKColor}一致
+{Tab.BorderColor:hover:!selected}:tab没被选中，但出于hover状态下的边框颜色，建议和{Tab.Color}一致
+{Tab.Color:hover:!selected}:tab没被选中，但出于hover状态下的文字颜色，建议和{Tab.Color}一致
+
+{ToolButton.BKColor}:按钮的背景颜色，应该和{Category.BKColor}一致
+{ToolButton.Color}:按钮的文字色
+{ToolButton.Color:pressed}:按钮按下状态的文字色
+{ToolButton.BorderColor:pressed}:按钮按下状态的边框颜色
+{ToolButton.BKColor:pressed}:按钮按下状态的背景颜色
+{ToolButton.Color:checked}:按钮选中状态的文字色
+{ToolButton.BorderColor:checked}:按钮选中状态的边框颜色
+{ToolButton.BKColor:checked}:按钮选中状态的背景颜色
+{ToolButton.Color:hover}:按钮hover状态的文字色
+{ToolButton.BorderColor:hover}:按钮hover状态的边框颜色
+{ToolButton.BKColor:hover}:按钮hover状态的背景颜色
+
+{PannelButtonGroup.BorderColor}:Pannel下的buttongroup的边框颜色，建议和{ToolButton.BorderColor:hover}一致
+
+{ControlButton.BKColor}:工具栏按钮的背景颜色，建议为透明
+{ControlButton.BorderColor}:工具栏按钮的边框颜色，建议为透明
+{ControlButton.BorderColor:pressed}:工具栏按钮按下后的边框颜色
+{ControlButton.BKColor:pressed}:工具栏按钮按下后的背景颜色
+{ControlButton.BorderColor:checked}:工具栏按钮checked状态的背景颜色
+{ControlButton.BKColor:checked}:工具栏按钮checked状态的背景颜色
+{ControlButton.BorderColor:hover}:工具栏按钮hover状态的背景颜色
+{ControlButton.BKColor:hover}:工具栏按钮hover状态的背景颜色
+
+{GalleryButton.BKColor}:GalleryButton按钮的背景颜色，建议为透明
+{GalleryButton.BorderColor}:GalleryButton按钮的边框颜色，建议为透明
+{GalleryButton.BorderColor:hover}:GalleryButton按钮hover状态的背景颜色
+{GalleryButton.BKColor:hover}:GalleryButton按钮hover状态的背景颜色
+{Gallery.BorderColor}:Gallery的边框颜色，建议为{ToolButton.BKColor:hover}
+{Gallery.BKColor}:Gallery的背景颜色，建议为transparent
+{Gallery.Color}:Gallery的文字颜色，建议为{ToolButton.Color}
+{GalleryGroup.BKColor}:GalleryGroup的背景颜色，建议为transparent
+{GalleryGroup.BorderColor}:GalleryGroup的BorderColor，建议为{Gallery.BorderColor}
+{GalleryGroup.BKColor:selected}:GalleryGroup选中的条目的背景颜色建议为{ToolButton.BKColor:selected}
+{GalleryGroup.Color:selected}:GalleryGroup选中的条目的文字颜色建议为{ToolButton.Color}
+
+{Menu.Color}:菜单文字颜色，建议为{ToolButton.Color}
+{Menu.BKColor}:菜单背景颜色，建议为{ToolButton.Color}
+{Menu.BorderColor}:菜单边框颜色，建议为{Menu.BKColor}
+{Menu.BKColor:selected}菜单选中条目的背景颜色，建议为{ToolButton.BKColor:checked}
+{Menu.BKColor:hover}菜单hover条目的背景颜色，建议为 {ToolButton.BKColor:hover}
+
+{OptionButton.BKColor}:pannel下的OptionButton的背景颜色，建议为transparent
+{OptionButton.Color}:pannel下的OptionButton的文字颜色，建议为{ToolButton.Color}
+{OptionButton.BKColor:hover}:pannel下的OptionButton在hover状态下的背景颜色，建议为{ToolButton.BKColor:hover}
+*/
+
+
+
+/*SARibbonBar*/
+SARibbonBar {
+  background-color: #225497;/* {Ribbon.BKColor} */
+  border: solid #707070;
+  color:#b2b2b2;
+  /* border-width: 0.02em 0.02em 0em 0.02em; */
+}
+
+/*SARibbonButtonGroupWidget*/
+SARibbonButtonGroupWidget {
+  background-color: transparent;
+}
+
+
+/*SARibbonQuickAccessBar*/
+SARibbonQuickAccessBar {
+  background-color: transparent;
+}
+
+/*SARibbonCtrlContainer*/
+SARibbonCtrlContainer {
+  background-color: transparent;
+}
+
+/*SARibbonCategory*/
+SARibbonCategory:focus {
+  outline: none;
+}
+
+SARibbonCategory {
+  background-color: #f1f1f1;/* {Category.BKColor} */
+}
+
+
+/*SARibbonCategoryScrollButton*/
+
+SARibbonCategoryScrollButton {
+  border: 0.05em solid #c5c5c5;/*{CategoryScrollButton.BorderColor}*/
+  background-color: #f1f1f1;/*{CategoryScrollButton.BKColor}*/
+}
+
+SARibbonCategoryScrollButton[arrowType="3"] {
+  border-right-width: 0.05em;
+}
+
+SARibbonCategoryScrollButton[arrowType="4"] {
+  border-left-width: 0.05em;
+}
+
+SARibbonCategoryScrollButton::hover {
+  background-color: #c5c5c5;/*{CategoryScrollButton.BKColor:hover}*/
+}
+
+/*SARibbonPannel*/
+
+SARibbonPannel > SARibbonButtonGroupWidget {
+  border: 0.05em solid #c6c6c6;/* {PannelButtonGroup.BorderColor} */
+}
+
+/*SARibbonStackedWidget*/
+SARibbonStackedWidget {
+  background-color: #f1f1f1;/* {Category.BKColor} */
+  border: 1pt solid #f1f1f1;/* {Category.BorderColor} */
+  border-top-width: 0px;
+}
+
+SARibbonStackedWidget:focus {
+  outline: none;
+}
+
+/*SARibbonApplicationButton*/
+SARibbonApplicationButton {
+  color: white;
+  background-color: #225497;/* {ApplicationButton.BKColor} */
+}
+
+SARibbonApplicationButton::hover {
+  background-color: #436bb2;/* {ApplicationButton.BKColor:hover} */
+}
+
+SARibbonApplicationButton::pressed {
+  background-color: #3369b9;/* {ApplicationButton.BKColor:hover} */
+}
+
+SARibbonApplicationButton:focus {
+  outline: none;
+}
+
+/*SARibbonTabBar*/
+SARibbonTabBar {
+  background-color: transparent;
+}
+
+
+SARibbonTabBar::tab {
+  color: #d2e4ff;/* {Tab.Color} */
+  border: none;
+  background: transparent;
+  margin-top: 0em;
+  margin-right: 0em;
+  margin-left: 0.2em;
+  margin-bottom: 0em;
+  min-width: 3em;
+  max-width: 10em;
+  min-height: 1.2em;
+  max-height: 1.2em;
+  padding-left: 0.2em;
+  padding-right: 0.2em;
+  padding-top: 0.1em;
+  padding-bottom: 0.2em;
+}
+
+SARibbonTabBar::tab:selected, SARibbonTabBar::tab:hover {
+  border-top-left-radius: 0px;
+  border-top-right-radius: 0px;
+}
+
+SARibbonTabBar::tab:selected {
+  color: #225497;/* {Tab.Color:selected} */
+  border: 0.05em solid #225497;/* {Tab.BorderColor:selected} */
+  background: #f1f1f1;/* {Tab.BKColor:selected} */
+  border-bottom: none;
+}
+
+SARibbonTabBar::tab:hover:!selected {
+  border:0.05em solid #d2e4ff;/* {Tab.BorderColor:hover:!selected} */
+  border-bottom: none;
+  color: #d2e4ff;/* {Tab.Color:hover:!selected} */
+}
+
+SARibbonTabBar::tab:!selected {
+  margin-top: 0px;
+}
+
+/*SARibbonToolButton*/
+/* 
+SARibbonToolButton的背景颜色必须和pannel或者category的颜色一致
+不能设置为transparent，否则在ActionMenu模式下，上下区分的按钮无法显示 
+*/
+SARibbonToolButton {
+  border: none;
+  color: #333;/* {ToolButton.Color} */
+  background-color: #f1f1f1;/* {ToolButton.BKColor} */
+}
+
+SARibbonToolButton::pressed {
+  color: #000;/* {ToolButton.Color:pressed} */
+  border: 0.05em solid #c5c3c6;/* {ToolButton.BorderColor:pressed} */
+  background-color: #c5c3c6;/* {ToolButton.BKColor:pressed} */
+}
+
+SARibbonToolButton::checked {
+  color: #333;/* {ToolButton.Color:checked} */
+  border: 0.05em solid #c6c6c6;/* {ToolButton.BorderColor:checked} */
+  background-color: #c6c6c6;/* {ToolButton.BKColor:checked} */
+}
+
+SARibbonToolButton::hover {
+  color: #000;/* {ToolButton.Color:hover} */
+  border: 0.05em solid #c5c5c5;/* {ToolButton.BorderColor:hover} */
+  background-color: #c5c5c5;/* {ToolButton.BKColor:hover} */
+}
+
+/*SARibbonControlButton*/
+
+SARibbonControlButton {
+  background-color: transparent;/*{ControlButton.BKColor}*/
+  border: 0.05em solid transparent;/*{ControlButton.BorderColor}*/
+  color: #333;
+}
+
+SARibbonControlButton::pressed {
+  border: 0.05em solid #a3bacc;/*{ControlButton.BorderColor:pressed}*/
+  background-color: #a3bacc;/*{ControlButton.BKColor:pressed}*/
+}
+
+SARibbonControlButton::checked {
+  border: 0.05em solid #12427b;/*{ControlButton.BorderColor:checked}*/
+  background-color: #12427b;/*{ControlButton.BKColor:checked}*/
+}
+
+SARibbonControlButton::hover {
+  border: 0.05em solid #badffa;/*{ControlButton.BorderColor:hover}*/
+  background-color: #cee7fc;/*{ControlButton.BKColor:hover}*/
+}
+
+SARibbonControlButton#SARibbonGalleryButtonUp, #SARibbonGalleryButtonDown, #SARibbonGalleryButtonMore {
+  border: 0.05em solid #f1f1f1;/*{GalleryButton.BorderColor}*/
+  background-color: #f1f1f1;/*{GalleryButton.BKColor}*/
+}
+SARibbonControlButton#SARibbonGalleryButtonUp::hover, #SARibbonGalleryButtonDown::hover, #SARibbonGalleryButtonMore::hover {
+  border: 0.05em solid #c5c5c5;/*{GalleryButton.BorderColor:hover}*/
+  background-color: #c5c5c5;/*{GalleryButton.BKColor:hover}*/
+}
+
+SARibbonControlButton#SARibbonBarHidePannelButton {
+  border: 0.05em solid transparent;
+}
+
+
+/*SARibbonGallery*/
+
+SARibbonGallery {
+  border: 0.05em solid #c5c5c5;/*{Gallery.BorderColor}*/
+  background-color: transparent;/*{Gallery.BKColor}*/
+  color: #333;/*{Gallery.Color}*/
+}
+
+/*SARibbonGalleryGroup*/
+
+SARibbonGalleryGroup {
+  show-decoration-selected: 1;
+  background-color: transparent;/*{GalleryGroup.BKColor}*/
+  color: #333;
+  border: 0.05em solid #c5c5c5;/*{GalleryGroup.BorderColor}*/
+}
+
+SARibbonGalleryGroup::item:selected {
+  background-color: #c5c5c5;/*{GalleryGroup.BKColor:selected}*/
+  color: black;/*{GalleryGroup.Color:selected}*/
+}
+
+SARibbonGalleryGroup::item:hover {
+  border: 0.1em solid #c5c5c5;
+  background-color: #c5c5c5;
+}
+
+/*RibbonGalleryViewport*/
+
+SARibbonGalleryViewport {
+  background-color: #ffffff;
+}
+
+/*SARibbonMenu*/
+
+SARibbonMenu {
+  color: #333;/*{Menu.Color}*/
+  background-color: #f1f1f1;/*{Menu.BKColor}*/
+  border: 0.05em solid #FCFCFC;/*{Menu.BorderColor}*/
+}
+
+SARibbonMenu::item {
+  padding: 5px 5px 5px 5px;
+  background-color: transparent;
+}
+
+SARibbonMenu::item:selected {
+  background-color: #c6c6c6;/*{Menu.BKColor:selected}*/
+}
+
+SARibbonMenu::item:hover {
+  color: #000;
+  background-color: #c5c5c5;/*{Menu.BKColor:hover}*/
+  border: 0.05em solid #c5c5c5;/*{Menu.BorderColor:hover}*/
+}
+
+SARibbonMenu::icon {
+  margin-left: 0.05em;
+}
+
+/*SARibbonPannelOptionButton*/
+
+SARibbonPannelOptionButton {
+  background-color: transparent;/*{OptionButton.BKColor}*/
+  color: #333;/*{OptionButton.Color}*/
+}
+
+SARibbonPannelOptionButton::hover {
+  background-color: #c5c5c5;/*{OptionButton.BKColor:hover}*/
+  border: 0px;
+}
+
+/*SARibbonLineEdit*/
+
+SARibbonLineEdit {
+  border: 0.05em solid #C0C2C4;
+  background: #FFF;
+  selection-background-color: #9BBBF7;
+  selection-color: #000;
+}
+
+/*SARibbonComboBox*/
+
+SARibbonComboBox {
+  border: 0.05em solid #c2d0df;
+  background-color: white;
+}
+
+SARibbonComboBox:hover {
+  border: 0.05em solid #269bf4;
+  color: #000;
+}
+
+SARibbonComboBox:editable {
+  color: #000;
+  background: white;
+  selection-background-color: #9BBBF7;
+  selection-color: #000;
+}
+
+SARibbonComboBox::drop-down {
+  subcontrol-origin: padding;
+  subcontrol-position: top right;
+  width: 1em;
+  border: none;
+}
+
+SARibbonComboBox::drop-down:hover {
+  border: 0.05em solid #FDEEB3;
+  background-color: #9ed2f9;
+}
+
+SARibbonComboBox::down-arrow {
+  image: url(:/image/resource/ArrowDown.png);
+}
+
+/*SARibbonSeparatorWidget*/
+
+SARibbonSeparatorWidget {
+  /*background-color: transparent;*/
+  background-color: white;
+}
+
+/*SAWindowToolButton*/
+
+SAWindowToolButton { 
+  background-color: transparent; 
+  border:none;
+}
+
+SAWindowToolButton:focus {
+  outline: none;
+}
+
+SAWindowToolButton#SAMinimizeWindowButton {
+  image: url(:/image/resource/Titlebar_Min.png);
+}
+
+SAWindowToolButton#SAMaximizeWindowButton:checked {
+  image:url(:/image/resource/Titlebar_Normal.png);
+}
+
+SAWindowToolButton#SAMaximizeWindowButton {
+  image:url(:/image/resource/Titlebar_Max.png);
+}
+
+SAWindowToolButton#SAMinimizeWindowButton:hover,#SAMaximizeWindowButton:hover {
+  background-color: #e5e5e5;
+}
+
+SAWindowToolButton#SAMinimizeWindowButton:pressed,#SAMaximizeWindowButton:pressed {
+  background-color: #cacacb;
+}
+
+SAWindowToolButton#SACloseWindowButton {
+  image: url(:/image/resource/Titlebar_Close.png);
+}
+
+SAWindowToolButton#SACloseWindowButton:hover {
+  background-color: #e81123;
+  image: url(:/image/resource/Titlebar_Close_Hover.png);
+}
+
+SAWindowToolButton#SACloseWindowButton:pressed {
+  background-color: #f1707a;
+  image: url(:/image/resource/Titlebar_Close_Hover.png);
+}
+
+SAWindowToolButton#SARibbonBarHidePannelButton {
+  titlebar-shade-icon: url(:/image/resource/Titlebar_Shade.png);
+  titlebar-unshade-icon: url(:/image/resource/Titlebar_Unshade.png);
+}

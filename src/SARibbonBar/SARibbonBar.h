@@ -136,6 +136,9 @@ public:
     // 获取版本信息
     static QString versionString();
 
+    //获取默认的上下文标签颜色列表
+    static QList< QColor > getDefaultContextCategoryColorList();
+
 public:
     // 构造函数
     SARibbonBar(QWidget* parent = nullptr);
@@ -291,6 +294,9 @@ public:
     //允许用户自定义RightBar图标尺寸，默认为false
     void setEnableUserDefineRightBarIconSize(bool on = true);
     bool isEnableUserDefineRightBarIconSize() const;
+    //上下文标签的颜色列表，上下文标签显示的时候，会从颜色列表中取颜色进行标签的渲染
+    void setContextCategoryColorList(const QList< QColor >& cls);
+    QList< QColor > getContextCategoryColorList() const;
 signals:
 
     /**

@@ -1,4 +1,7 @@
-﻿/* start ribbon set*/
+﻿/*
+这是模仿office2013的白色风格主题
+start ribbon set
+*/
 
 /*SARibbonBar*/
 SARibbonBar {
