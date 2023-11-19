@@ -70,6 +70,9 @@ public:
     bool isScrolled() const;
     // category的总宽度
     int categoryTotalWidth() const;
+    //设置Category的对齐方式
+    void setCategoryAlignment(SARibbonAlignment al);
+    SARibbonAlignment getCategoryAlignment() const;
 private slots:
     void onLeftScrollButtonClicked();
     void onRightScrollButtonClicked();

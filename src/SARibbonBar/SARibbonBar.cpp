@@ -78,6 +78,7 @@ public:
     bool mIsTitleVisible;                     ///< 标题是否显示
     bool mEnableUserDefineAccessBarIconSize;  ///< 允许用户自定义AccessBar的IconSize
     bool mEnableUserDefineRightBarIconSize;   ///< 允许用户自定义RightBar的IconSize
+    SARibbonAlignment mRibbonAlignment;       ///< 对齐方式
 public:
     PrivateData(SARibbonBar* par)
         : q_ptr(par)
@@ -96,6 +97,7 @@ public:
         , mTitleAligment(Qt::AlignCenter)
         , mIsTitleVisible(true)
         , mEnableUserDefineAccessBarIconSize(false)
+        , mRibbonAlignment(SARibbonAlignment::AlignLeft)
     {
         mContextCategoryColorList = SARibbonBar::getDefaultContextCategoryColorList();
     }
@@ -355,7 +357,6 @@ SARibbonCategory* SARibbonBar::addCategoryPage(const QString& title)
 {
     SARibbonCategory* category = RibbonSubElementDelegate->createRibbonCategory(this);
 
-    // catagory->setFixedHeight(categoryHeight());
     category->setObjectName(title);
     category->setCategoryName(title);
     addCategoryPage(category);
@@ -705,7 +706,6 @@ void SARibbonBar::showContextCategory(SARibbonContextCategory* context)
         // 此句如果模式重复设置不会进行多余操作
         category->setRibbonPannelLayoutMode(isTwoRowStyle() ? SARibbonPannel::TwoRowMode : SARibbonPannel::ThreeRowMode);
         // 切换模式后会改变高度，上下文标签显示时要保证显示出来
-        //  category->setFixedHeight(categoryHeight());
         int index = d_ptr->mRibbonTabBar->addTab(category->categoryName());
         contextCategoryData.tabPageIndex.append(index);
 
@@ -1099,12 +1099,13 @@ void SARibbonBar::resizeAll()
     update();
 }
 
-void SARibbonBar::synchronousCategoryLayoutMode()
+void SARibbonBar::synchronousCategoryLayoutMode(bool autoUpdate)
 {
     // 根据样式调整SARibbonCategory的布局形式
     QList< SARibbonCategory* > categorys = categoryPages();
 
     for (SARibbonCategory* c : qAsConst(categorys)) {
+        c->setCategoryAlignment(getRibbonAlignment());
         c->setRibbonPannelLayoutMode(SARibbonBar::isTwoRowStyle(currentRibbonStyle()) ? SARibbonPannel::TwoRowMode
                                                                                       : SARibbonPannel::ThreeRowMode);
     }
@@ -1112,6 +1113,11 @@ void SARibbonBar::synchronousCategoryLayoutMode()
     // 根据样式调整bar的高度
     if (NormalRibbonMode == currentRibbonState()) {
         setFixedHeight(mainBarHeight());
+    }
+    //! 直接给一个resizeevent，让所有刷新
+    if (autoUpdate) {
+        QResizeEvent* e = new QResizeEvent(size(), QSize());
+        QApplication::postEvent(this, e);
     }
 }
 
@@ -1152,7 +1158,8 @@ void SARibbonBar::setRibbonStyle(SARibbonBar::RibbonStyle v)
     // 如果想在两行模式换行，在调用SARibbonBar::setRibbonStyle后，再SARibbonToolButton::setEnableWordWrap(true)
     SARibbonToolButton::setEnableWordWrap(!isTwoRowStyle(v));
 
-    synchronousCategoryLayoutMode();
+    synchronousCategoryLayoutMode(false);  //这里不急着刷新，下面会继续刷新
+
     QSize oldSize = size();
     QSize newSize(oldSize.width(), mainBarHeight());
     QResizeEvent es(newSize, oldSize);
@@ -1456,6 +1463,25 @@ QList< QColor > SARibbonBar::getContextCategoryColorList() const
     return d_ptr->mContextCategoryColorList;
 }
 
+/**
+   @brief 设置ribbon的对齐方式
+   @param al
+ */
+void SARibbonBar::setRibbonAlignment(SARibbonAlignment al)
+{
+    d_ptr->mRibbonAlignment = al;
+    synchronousCategoryLayoutMode();
+}
+
+/**
+   @brief ribbon的对齐方式
+   @return
+ */
+SARibbonAlignment SARibbonBar::getRibbonAlignment() const
+{
+    return d_ptr->mRibbonAlignment;
+}
+
 bool SARibbonBar::eventFilter(QObject* obj, QEvent* e)
 {
     if (obj) {
@@ -1509,13 +1535,7 @@ int SARibbonBar::calcMinTabBarWidth() const
     // mainwindow的空间，接受鼠标事件，从而实现拖动等操作，否则tabbar占用整个顶栏，鼠标无法点击到mainwindow
     // 计算tab所占用的宽度
     const QMargins& mg = d_ptr->mRibbonTabBar->tabMargin();
-    int mintabBarWidth = 0;
-
-    for (int i = 0; i < d_ptr->mRibbonTabBar->count(); ++i) {
-        mintabBarWidth += d_ptr->mRibbonTabBar->tabRect(i).width();
-    }
-    mintabBarWidth += (mg.left() + mg.right());
-    return (mintabBarWidth);
+    return d_ptr->mRibbonTabBar->sizeHint().width() + (mg.left() + mg.right());
 }
 
 /**
@@ -1928,9 +1948,22 @@ void SARibbonBar::resizeInOfficeStyle()
         }
     }
     // 最后确定tabbar宽度
-    int tabBarWidth = endX - x;
-    d_ptr->mRibbonTabBar->setGeometry(x, y, tabBarWidth, tabH);
-
+    int tabBarAllowedWidth = endX - x;
+    if (getRibbonAlignment() == SARibbonAlignment::AlignLeft) {
+        d_ptr->mRibbonTabBar->setGeometry(x, y, tabBarAllowedWidth, tabH);
+    } else {
+        //居中对齐的情况下，Tab要居中显示
+        //得到tab的推荐尺寸
+        int mintabBarWidth = calcMinTabBarWidth();
+        if (mintabBarWidth >= tabBarAllowedWidth) {
+            //这时tabbar没有居中对齐的必要性，空间位置不够了
+            d_ptr->mRibbonTabBar->setGeometry(x, y, tabBarAllowedWidth, tabH);
+        } else {
+            //说明tabbar的宽度有居中的可能性
+            int xoffset = (tabBarAllowedWidth - mintabBarWidth) / 2;
+            d_ptr->mRibbonTabBar->setGeometry(x + xoffset, y, mintabBarWidth, tabH);
+        }
+    }
     resizeStackedContainerWidget();
 }
 
@@ -2022,7 +2055,7 @@ void SARibbonBar::resizeInWpsLiteStyle()
         }
     }
     // tab bar 定位 wps模式下applicationButton的右边就是tab bar
-    int tabBarWidth = endX - x;
+    int tabBarAllowedWidth = endX - x;
     // 20200831
     // tabBarWidth的宽度原来为endX - x;，现需要根据实际进行调整
     // 为了把tabbar没有tab的部分不占用，这里的宽度需要根据tab的size来进行设置，让tabbar的长度刚刚好，这样能让出
@@ -2030,11 +2063,22 @@ void SARibbonBar::resizeInWpsLiteStyle()
     // 计算tab所占用的宽度
     int mintabBarWidth = calcMinTabBarWidth();
 
-    if (mintabBarWidth < tabBarWidth) {
-        tabBarWidth = mintabBarWidth;
+    if (getRibbonAlignment() == SARibbonAlignment::AlignLeft) {
+        if (mintabBarWidth < tabBarAllowedWidth) {
+            tabBarAllowedWidth = mintabBarWidth;
+        }
+        d_ptr->mRibbonTabBar->setGeometry(x, y, tabBarAllowedWidth, tabH);
+    } else {
+        //居中对齐
+        if (mintabBarWidth >= tabBarAllowedWidth) {
+            //这时tabbar没有居中对齐的必要性，空间位置不够了
+            d_ptr->mRibbonTabBar->setGeometry(x, y, tabBarAllowedWidth, tabH);
+        } else {
+            //说明tabbar的宽度有居中的可能性
+            int xoffset = (tabBarAllowedWidth - mintabBarWidth) / 2;
+            d_ptr->mRibbonTabBar->setGeometry(x + xoffset, y, mintabBarWidth, tabH);
+        }
     }
-    d_ptr->mRibbonTabBar->setGeometry(x, y, tabBarWidth, tabH);
-
     // 调整整个stackedContainer
     resizeStackedContainerWidget();
 }

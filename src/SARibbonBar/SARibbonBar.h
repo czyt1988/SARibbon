@@ -297,6 +297,9 @@ public:
     //上下文标签的颜色列表，上下文标签显示的时候，会从颜色列表中取颜色进行标签的渲染
     void setContextCategoryColorList(const QList< QColor >& cls);
     QList< QColor > getContextCategoryColorList() const;
+    //设置ribbon的对齐方式
+    void setRibbonAlignment(SARibbonAlignment al);
+    SARibbonAlignment getRibbonAlignment() const;
 signals:
 
     /**
@@ -357,7 +360,7 @@ private:
 
     // 刷新所有ContextCategoryManagerData，这个在单独一个Category删除时调用
     void updateContextCategoryManagerData();
-    void synchronousCategoryLayoutMode();
+    void synchronousCategoryLayoutMode(bool autoUpdate = true);
 
 protected:
     virtual void paintEvent(QPaintEvent* e) Q_DECL_OVERRIDE;
