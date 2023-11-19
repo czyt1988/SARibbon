@@ -63,6 +63,8 @@ private slots:
     void onActionHideActionTriggered(bool on);
     // 切换所有action是否可见
     void onActionVisibleAllTriggered(bool on);
+    //居中对齐checkbox的槽
+    void onCheckBoxAlignmentCenterClicked(bool checked);
 
 private:
     // 创建其它actions，这些actions并不在SARibbonBar管理

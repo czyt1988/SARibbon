@@ -10,6 +10,11 @@
 
   版本记录(change log):
 
+  - 2023-11-19 -> 1.0.6
+  添加Office2016主题
+  Category可以居中对齐
+  QuickAccessBar的图标调小一像素，且用户可设置
+
   - 2023-11-10 -> 1.0.5
   自动根据Qt版本来适配是否加载frameless库
 
@@ -105,7 +110,7 @@
  * @def ribbon的数字版本 MAJ.MIN.{PAT}
  */
 #ifndef SA_RIBBON_BAR_VERSION_PAT
-#define SA_RIBBON_BAR_VERSION_PAT 5
+#define SA_RIBBON_BAR_VERSION_PAT 6
 #endif
 
 /**
@@ -148,6 +153,15 @@
     PrivateData(const PrivateData&) = delete;                                                                          \
     PrivateData& operator=(const PrivateData&) = delete;
 #endif
+
+/**
+   @brief 定义Ribbon的对其方式，目前支持左对齐和居中对其
+ */
+enum class SARibbonAlignment
+{
+    AlignLeft,   ///< 左对齐，tab栏左对齐，同时category也是左对齐
+    AlignCenter  ///< 居中对其，tab栏居中对齐，同时category也是居中对齐
+};
 
 /**
  * @def 定义此宏用第三方的frameless作为无边框方案

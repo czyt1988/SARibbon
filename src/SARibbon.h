@@ -81,86 +81,94 @@
 #include <memory>
 
 /**
- * @file  SARibbonGlobal.h
- *
- * @note My native language is not English, and most of the translation of documents is machine translation
- *
- * 版本记录(change log):
- *
- * - 2023-11-02 -> 1.0.4
- *
- * cn:因为引入了framelss库，导致很多版本的qt无法编译，为了兼容不同版本的qt编译问题，进行了版本自适应，
- * 不符合framelss的qt版本自动使用原来的framelss方案，从而实现了qt5.9到qt6的完全支持
- * en:Because of the introduction of the framelss library, many versions of qt cannot be compiled.
- * In order to be compatible with different versions of qt compilation, version adaptation is carried out.
- * The qt version that does not conform to the framelss automatically uses the original framelss scheme, thus realizing full support for qt5.9 to qt6
- *
- * - 2023-10-26 -> 1.0.2
- *
- * cn:
- * 添加了SARibbonBar在QWidget窗口上使用的例子
- * 整理了SARibbon.h和SARibbon.cpp,调整了静态使用的例子
- * frameless库更新到c4a7bc8版本（20231022）
- *
- * - 2023-10-14 -> 1.0.1
- *
- * cn:
- * 引入第三方库frameless
- * 支持ubuntu和macos
- * 解决windwos系统的多屏幕移动问题
- * 依赖frameless，实现windows系统的一些界面操作，如边缘触发半屏
- * 添加深色主题
- * 优化了一些界面刷新逻辑
- * 最低C++版本要求为c++17
- * 一些接口的调整和一些枚举名称的调整
- * 添加了QWidget使用SARibbonBar的例子
- * 同步把自定义ribbon的SARibbonMainWindow的依赖去除
- * 完善了文档包括高分屏问题和linux编译的方法
- *
- * en(machine translation):
- *
- * import third-party library:frameless
- * Supports ubuntu and macos
- * Solving the problem of multi screen movement in Windwos system
- * Relying on frameless library to implement some interface operations in Windows systems, such as edge triggered half screen
- * Add a dark theme
- * Optimized some interface refresh logic
- * The minimum C++version requirement is c++17
- * Some interface adjustments and some enumeration name adjustments
- * Added an example of using SARibbonBar for QWidgets
- * Synchronize the removal of dependencies on SARibbonMainWindow for custom ribbons
- * Improved documentation including high resolution issues and methods for compiling Linux
- *
- * - 2023-10-09 -> 0.7.1
- *
- * 增加了深色主题
- * 调整了枚举的命名方式
- * 增加了一些重绘方式
- *
- * - 2023-10-09 -> 0.7.0
- *
- * 修正了category的布局问题
- *
- * - 2023-09-27 -> 0.6.0
- *
- * 添加了Amalgamate，修正了一些显示的bug，修正cmake的异常
- * 添加了上下文标签中category标题名字改变的信号
- *
- * - 2023-05-28 -> 0.5.0
- *
- * 调整了大按钮模式下的显示方案，去除了原来SARibbonToolButton的Lite和Normal模式，以WordWrap来表征
- * 支持文字自定义换行
- * 调整了RibbonPannel的标题栏的高度计算方案
- *
- * - 0.5.1
- *
- * 不使用QString::simplified,而是简单的仅仅替换\n的simplified，这样中文换行不会多出空格
- *
- * - 0.5.2
- *
- * SARibbonColorToolButton\SARibbonToolButton修正&操作在三项表达式未加括号问题
- * SARibbonStyleOption添加虚析构函数
- * 原来SARibbonElementCreateDelegate类改名为SARibbonElementFactory
+  @file  SARibbonGlobal.h
+
+  @note My native language is not English, and most of the translation of documents is machine translation
+
+  版本记录(change log):
+
+  - 2023-11-19 -> 1.0.6
+  添加Office2016主题
+  Category可以居中对齐
+  QuickAccessBar的图标调小一像素，且用户可设置
+
+  - 2023-11-10 -> 1.0.5
+  自动根据Qt版本来适配是否加载frameless库
+
+  - 2023-11-02 -> 1.0.4
+
+  cn:因为引入了framelss库，导致很多版本的qt无法编译，为了兼容不同版本的qt编译问题，进行了版本自适应，
+  不符合framelss的qt版本自动使用原来的framelss方案，从而实现了qt5.9到qt6的完全支持
+  en:Because of the introduction of the framelss library, many versions of qt cannot be compiled.
+  In order to be compatible with different versions of qt compilation, version adaptation is carried out.
+  The qt version that does not conform to the framelss automatically uses the original framelss scheme, thus realizing full support for qt5.9 to qt6
+
+  - 2023-10-26 -> 1.0.2
+
+  cn:
+  添加了SARibbonBar在QWidget窗口上使用的例子
+  整理了SARibbon.h和SARibbon.cpp,调整了静态使用的例子
+  frameless库更新到c4a7bc8版本（20231022）
+
+  - 2023-10-14 -> 1.0.1
+
+  cn:
+  引入第三方库frameless
+  支持ubuntu和macos
+  解决windwos系统的多屏幕移动问题
+  依赖frameless，实现windows系统的一些界面操作，如边缘触发半屏
+  添加深色主题
+  优化了一些界面刷新逻辑
+  最低C++版本要求为c++17
+  一些接口的调整和一些枚举名称的调整
+  添加了QWidget使用SARibbonBar的例子
+  同步把自定义ribbon的SARibbonMainWindow的依赖去除
+  完善了文档包括高分屏问题和linux编译的方法
+
+  en(machine translation):
+
+  import third-party library:frameless
+  Supports ubuntu and macos
+  Solving the problem of multi screen movement in Windwos system
+  Relying on frameless library to implement some interface operations in Windows systems, such as edge triggered half screen
+  Add a dark theme
+  Optimized some interface refresh logic
+  The minimum C++version requirement is c++17
+  Some interface adjustments and some enumeration name adjustments
+  Added an example of using SARibbonBar for QWidgets
+  Synchronize the removal of dependencies on SARibbonMainWindow for custom ribbons
+  Improved documentation including high resolution issues and methods for compiling Linux
+
+  - 2023-10-09 -> 0.7.1
+
+  增加了深色主题
+  调整了枚举的命名方式
+  增加了一些重绘方式
+
+  - 2023-10-09 -> 0.7.0
+
+  修正了category的布局问题
+
+  - 2023-09-27 -> 0.6.0
+
+  添加了Amalgamate，修正了一些显示的bug，修正cmake的异常
+  添加了上下文标签中category标题名字改变的信号
+
+  - 2023-05-28 -> 0.5.0
+
+  调整了大按钮模式下的显示方案，去除了原来SARibbonToolButton的Lite和Normal模式，以WordWrap来表征
+  支持文字自定义换行
+  调整了RibbonPannel的标题栏的高度计算方案
+
+  - 0.5.1
+
+  不使用QString::simplified,而是简单的仅仅替换\n的simplified，这样中文换行不会多出空格
+
+  - 0.5.2
+
+  SARibbonColorToolButton\SARibbonToolButton修正&操作在三项表达式未加括号问题
+  SARibbonStyleOption添加虚析构函数
+  原来SARibbonElementCreateDelegate类改名为SARibbonElementFactory
  */
 
 /**
@@ -179,7 +187,7 @@
  * @def ribbon的数字版本 MAJ.MIN.{PAT}
  */
 #ifndef SA_RIBBON_BAR_VERSION_PAT
-#define SA_RIBBON_BAR_VERSION_PAT 2
+#define SA_RIBBON_BAR_VERSION_PAT 6
 #endif
 
 /**
@@ -219,9 +227,18 @@
 #define SA_RIBBON_DECLARE_PUBLIC(classname)                                                                            \
 	friend class classname;                                                                                            \
 	classname* q_ptr { nullptr };                                                                                      \
-    PrivateData(const PrivateData&) = delete;                                                                          \
+	PrivateData(const PrivateData&) = delete;                                                                          \
 	PrivateData& operator=(const PrivateData&) = delete;
 #endif
+
+/**
+   @brief 定义Ribbon的对其方式，目前支持左对齐和居中对其
+ */
+enum class SARibbonAlignment
+{
+	AlignLeft,   ///< 左对齐，tab栏左对齐，同时category也是左对齐
+	AlignCenter  ///< 居中对其，tab栏居中对齐，同时category也是居中对齐
+};
 
 /**
  * @def 定义此宏用第三方的frameless作为无边框方案
@@ -1314,7 +1331,7 @@ public:
 	//获取内部管理的ButtonGroupWidget
 	SARibbonButtonGroupWidget* buttonGroupWidget();
 	const SARibbonButtonGroupWidget* buttonGroupWidget() const;
-	// icon 尺寸设置
+	// icon 尺寸设置 - 注意，如果要自定义iconsize，需要设置
 	void setIconSize(const QSize& s);
 	QSize iconSize() const;
 };
@@ -1337,7 +1354,7 @@ class SA_RIBBON_EXPORT SARibbonTabBar : public QTabBar
 {
 	Q_OBJECT
 public:
-    SARibbonTabBar(QWidget* parent = Q_NULLPTR);
+	SARibbonTabBar(QWidget* parent = Q_NULLPTR);
 	const QMargins& tabMargin() const;
 	void setTabMargin(const QMargins& tabMargin);
 
@@ -1886,6 +1903,10 @@ protected:
 	//获取SARibbonCategoryLayoutlayout
 	SARibbonCategoryLayout* categoryLayout() const;
 
+	//设置Category的对齐方式
+	void setCategoryAlignment(SARibbonAlignment al);
+	SARibbonAlignment getCategoryAlignment() const;
+
 private:
 	void setRibbonBar(SARibbonBar* bar);
 };
@@ -1978,6 +1999,9 @@ public:
 	bool isScrolled() const;
 	// category的总宽度
 	int categoryTotalWidth() const;
+	//设置Category的对齐方式
+	void setCategoryAlignment(SARibbonAlignment al);
+	SARibbonAlignment getCategoryAlignment() const;
 private slots:
 	void onLeftScrollButtonClicked();
 	void onRightScrollButtonClicked();
@@ -2423,78 +2447,78 @@ class SARibbonQuickAccessBar;
 class SARibbonStackedWidget;
 
 /**
- * @brief SARibbonBar继承于QMenuBar,在SARibbonMainWindow中直接替换了原来的QMenuBar
- *
- * 通过setRibbonStyle函数设置ribbon的风格:
- *
- * @code
- * void setRibbonStyle(RibbonStyle v);
- * @endcode
- *
- * SARibbonBar参考office和wps，提供了四种风格的Ribbon模式,@ref SARibbonBar::RibbonStyle
- *
- * 如果想ribbon占用的空间足够小，WpsLiteStyleTwoRow模式能比OfficeStyle节省35%的高度空间
- *
- * 如何生成ribbon?先看看一个传统的Menu/ToolBar是如何生成的：
- *
- * @code
- * void MainWindow::MainWindow()
- * {
- *    QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
- *    QToolBar *fileToolBar = addToolBar(tr("File"));
- *    //生成action
- *    QAction *newAct = new QAction(newIcon, tr("&New"), this);
- *    fileMenu->addAction(newAct);
- *    fileToolBar->addAction(newAct);
- *
- *    QAction *openAct = new QAction(openIcon, tr("&Open..."), this);
- *    fileMenu->addAction(openAct);
- *    fileToolBar->addAction(openAct);
- * }
- * @endcode
- *
- * 传统的Menu/ToolBar主要通过QMenu的addMenu添加菜单,通过QMainWindow::addToolBar生成QToolBar,
- * 再把QAction设置进QMenu和QToolBar中
- *
- * SARibbonBar和传统方法相似，不过相对于传统的Menu/ToolBar QMenu和QToolBar是平级的，
- * Ribbon是有明显的层级关系，SARibbonBar下面是 @ref SARibbonCategory，
- * SARibbonCategory下面是@ref SARibbonPannel ，SARibbonPannel下面是@ref SARibbonToolButton ，
- * SARibbonToolButton管理着QAction
- *
- * 因此，生成一个ribbon只需以下几个函数：
- * @code
- * SARibbonCategory * SARibbonBar::addCategoryPage(const QString& title);
- * SARibbonPannel * SARibbonCategory::addPannel(const QString& title);
- * SARibbonToolButton * SARibbonPannel::addLargeAction(QAction *action);
- * SARibbonToolButton * SARibbonPannel::addSmallAction(QAction *action);
- * @endcode
- *
- * 因此生成步骤如下：
- *
- * @code
- * //成员变量
- * SARibbonCategory* categoryMain;
- * SARibbonPannel* FilePannel;
- *
- * //建立ui
- * void setupRibbonUi()
- * {
- *     ......
- *     //ribbonwindow为SARibbonMainWindow
- *     SARibbonBar* ribbon = ribbonwindow->ribbonBar();
- *     ribbon->setRibbonStyle(SARibbonBar::WpsLiteStyle);
- *     //添加一个Main标签
- *     categoryMain = ribbon->addCategoryPage(QStringLiteral("Main"));
- *     //Main标签下添加一个File Pannel
- *     FilePannel = categoryMain->addPannel(QStringLiteral("FilePannel"));
- *     //开始为File Pannel添加action
- *     FilePannel->addLargeAction(actionNew);
- *     FilePannel->addLargeAction(actionOpen);
- *     FilePannel->addLargeAction(actionSave);
- *     FilePannel->addSmallAction(actionImportMesh);
- *     FilePannel->addSmallAction(actionImportGeometry);
- * }
- * @endcode
+  @brief SARibbonBar继承于QMenuBar,在SARibbonMainWindow中直接替换了原来的QMenuBar
+
+  通过setRibbonStyle函数设置ribbon的风格:
+
+  @code
+  void setRibbonStyle(RibbonStyle v);
+  @endcode
+
+  SARibbonBar参考office和wps，提供了四种风格的Ribbon模式,@ref SARibbonBar::RibbonStyle
+
+  如果想ribbon占用的空间足够小，WpsLiteStyleTwoRow模式能比OfficeStyle节省35%的高度空间
+
+  如何生成ribbon?先看看一个传统的Menu/ToolBar是如何生成的：
+
+  @code
+  void MainWindow::MainWindow()
+  {
+     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
+     QToolBar *fileToolBar = addToolBar(tr("File"));
+     //生成action
+     QAction *newAct = new QAction(newIcon, tr("&New"), this);
+     fileMenu->addAction(newAct);
+     fileToolBar->addAction(newAct);
+
+     QAction *openAct = new QAction(openIcon, tr("&Open..."), this);
+     fileMenu->addAction(openAct);
+     fileToolBar->addAction(openAct);
+  }
+  @endcode
+
+  传统的Menu/ToolBar主要通过QMenu的addMenu添加菜单,通过QMainWindow::addToolBar生成QToolBar,
+  再把QAction设置进QMenu和QToolBar中
+
+  SARibbonBar和传统方法相似，不过相对于传统的Menu/ToolBar QMenu和QToolBar是平级的，
+  Ribbon是有明显的层级关系，SARibbonBar下面是 @ref SARibbonCategory，
+  SARibbonCategory下面是@ref SARibbonPannel ，SARibbonPannel下面是@ref SARibbonToolButton ，
+  SARibbonToolButton管理着QAction
+
+  因此，生成一个ribbon只需以下几个函数：
+  @code
+  SARibbonCategory * SARibbonBar::addCategoryPage(const QString& title);
+  SARibbonPannel * SARibbonCategory::addPannel(const QString& title);
+  SARibbonToolButton * SARibbonPannel::addLargeAction(QAction *action);
+  SARibbonToolButton * SARibbonPannel::addSmallAction(QAction *action);
+  @endcode
+
+  因此生成步骤如下：
+
+  @code
+  //成员变量
+  SARibbonCategory* categoryMain;
+  SARibbonPannel* FilePannel;
+
+  //建立ui
+  void setupRibbonUi()
+  {
+      ......
+      //ribbonwindow为SARibbonMainWindow
+      SARibbonBar* ribbon = ribbonwindow->ribbonBar();
+      ribbon->setRibbonStyle(SARibbonBar::WpsLiteStyle);
+      //添加一个Main标签
+      categoryMain = ribbon->addCategoryPage(QStringLiteral("Main"));
+      //Main标签下添加一个File Pannel
+      FilePannel = categoryMain->addPannel(QStringLiteral("FilePannel"));
+      //开始为File Pannel添加action
+      FilePannel->addLargeAction(actionNew);
+      FilePannel->addLargeAction(actionOpen);
+      FilePannel->addLargeAction(actionSave);
+      FilePannel->addSmallAction(actionImportMesh);
+      FilePannel->addSmallAction(actionImportGeometry);
+  }
+  @endcode
  */
 class SA_RIBBON_EXPORT SARibbonBar : public QMenuBar
 {
@@ -2512,14 +2536,14 @@ public:
 	 */
 	enum RibbonStyle
 	{
-        RibbonStyleLooseThreeRow   = 0x0000,              ///< 宽松结构，3行模式
-        RibbonStyleCompactThreeRow = 0x0001,              ///< 紧凑结构，3行模式
-        RibbonStyleLooseTwoRow     = 0x0100,              ///< 宽松结构，2行模式
-        RibbonStyleCompactTwoRow   = 0x0101,              ///< 紧凑结构，2行模式
+		RibbonStyleLooseThreeRow   = 0x0000,              ///< 宽松结构，3行模式
+		RibbonStyleCompactThreeRow = 0x0001,              ///< 紧凑结构，3行模式
+		RibbonStyleLooseTwoRow     = 0x0100,              ///< 宽松结构，2行模式
+		RibbonStyleCompactTwoRow   = 0x0101,              ///< 紧凑结构，2行模式
                                                           // 以下枚举将组件淘汰
-        OfficeStyle        = RibbonStyleLooseThreeRow,    ///< 类似office 的ribbon风格
-        WpsLiteStyle       = RibbonStyleCompactThreeRow,  ///< 类似wps的紧凑风格
-        OfficeStyleTwoRow  = RibbonStyleLooseTwoRow,  ///< 类似office 的ribbon风格 2行工具栏 三行布局模式，office就是三行布局模式，pannel能布置3行小toolbutton，默认模式
+		OfficeStyle        = RibbonStyleLooseThreeRow,    ///< 类似office 的ribbon风格
+		WpsLiteStyle       = RibbonStyleCompactThreeRow,  ///< 类似wps的紧凑风格
+		OfficeStyleTwoRow  = RibbonStyleLooseTwoRow,  ///< 类似office 的ribbon风格 2行工具栏 三行布局模式，office就是三行布局模式，pannel能布置3行小toolbutton，默认模式
 		WpsLiteStyleTwoRow = RibbonStyleCompactTwoRow  ///< 类似wps的紧凑风格  2行工具栏
 	};
 	Q_ENUM(RibbonStyle)
@@ -2544,6 +2568,10 @@ public:
 	// 获取版本信息
 	static QString versionString();
 
+	//获取默认的上下文标签颜色列表
+	static QList< QColor > getDefaultContextCategoryColorList();
+
+public:
 	// 构造函数
 	SARibbonBar(QWidget* parent = nullptr);
 	~SARibbonBar() Q_DECL_OVERRIDE;
@@ -2673,7 +2701,7 @@ public:
 	// 告诉saribbonbar，window button的尺寸
 	void setWindowButtonSize(const QSize& size);
 
-	// 更新ribbon的布局数据，此函数适用于一些关键性尺寸变化，换起ribbon下面元素的布局
+	// 更新ribbon的布局数据，此函数适用于一些关键性尺寸变化，换起ribbon下面元素的布局,在发现刷新问题时，可以调用此函数
 	void updateRibbonGeometry();
 	// tabbar 底部会绘制一条线条，此接口定义线条颜色
 	void setTabBarBaseLineColor(const QColor& clr);
@@ -2684,36 +2712,50 @@ public:
 	// 设置标题的对齐方式
 	void setWindowTitleAligment(Qt::Alignment al);
 	Qt::Alignment windowTitleAligment() const;
-	// 设置按钮允许换行
+	// 设置按钮允许换行，注意图标大小是由文字决定的，两行文字会让图标变小，如果想图标变大，文字不换行是最好的
 	void setEnableWordWrap(bool on);
 	bool isEnableWordWrap() const;
-	// 获取SARibbonStackedWidget
+	// 获取SARibbonStackedWidget，谨慎使用此函数
 	SARibbonStackedWidget* ribbonStackedWidget();
 	// 设置是否显示标题
 	void setTitleVisible(bool on = false);
 	bool isTitleVisible() const;
+	//允许用户自定义AccessBar图标尺寸，默认为false
+	void setEnableUserDefineAccessBarIconSize(bool on = true);
+	bool isEnableUserDefineAccessBarIconSize() const;
+	//允许用户自定义RightBar图标尺寸，默认为false
+	void setEnableUserDefineRightBarIconSize(bool on = true);
+	bool isEnableUserDefineRightBarIconSize() const;
+	//上下文标签的颜色列表，上下文标签显示的时候，会从颜色列表中取颜色进行标签的渲染
+	void setContextCategoryColorList(const QList< QColor >& cls);
+	QList< QColor > getContextCategoryColorList() const;
+	//设置ribbon的对齐方式
+	void setRibbonAlignment(SARibbonAlignment al);
+	SARibbonAlignment getRibbonAlignment() const;
 signals:
 
 	/**
-	 * @brief 应用按钮点击响应 - 左上角的按钮，通过关联此信号触发应用按钮点击的效果
+	 @brief 应用按钮点击响应 - 左上角的按钮，通过关联此信号触发应用按钮点击的效果
+
+	 例如想点击按钮后弹出一个全屏的窗口（如office这些）
 	 */
 	void applicationButtonClicked();
 
 	/**
-	 * @brief 标签页变化触发的信号
-	 * @param index
+	 @brief 标签页变化触发的信号
+	 @param index
 	 */
 	void currentRibbonTabChanged(int index);
 
 	/**
-	 * @brief ribbon的状态发生了变化后触发此信号
-	 * @param nowState 变更之后的ribbon状态
+	 @brief ribbon的状态发生了变化后触发此信号
+	 @param nowState 变更之后的ribbon状态
 	 */
 	void ribbonModeChanged(SARibbonBar::RibbonMode nowState);
 
 	/**
-	 * @brief ribbon的状态发生了变化后触发此信号
-	 * @param nowStyle 变更之后的ribbon样式
+	 @brief ribbon的状态发生了变化后触发此信号
+	 @param nowStyle 变更之后的ribbon样式
 	 */
 	void ribbonStyleChanged(SARibbonBar::RibbonStyle nowStyle);
 
@@ -2750,7 +2792,7 @@ private:
 
 	// 刷新所有ContextCategoryManagerData，这个在单独一个Category删除时调用
 	void updateContextCategoryManagerData();
-	void synchronousCategoryLayoutMode();
+	void synchronousCategoryLayoutMode(bool autoUpdate = true);
 
 protected:
 	virtual void paintEvent(QPaintEvent* e) Q_DECL_OVERRIDE;
@@ -3389,9 +3431,10 @@ public:
 	 */
 	enum RibbonTheme
 	{
-		RibbonThemeOffice2013,  ///< office2013主题
-		RibbonThemeWindows7,    ///< win7主题
-		RibbonThemeDark         ///< 暗色主题
+		RibbonThemeOffice2013,      ///< office2013主题
+		RibbonThemeOffice2016Blue,  ///< office2016-蓝色主题
+		RibbonThemeWindows7,        ///< win7主题
+		RibbonThemeDark             ///< 暗色主题
 	};
 	Q_ENUM(RibbonTheme)
 public:

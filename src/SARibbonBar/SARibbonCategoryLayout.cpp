@@ -31,6 +31,7 @@ public:
     int mXBase { 0 };
     QSize mSizeHint { 50, 50 };
     QList< SARibbonCategoryLayoutItem* > mItemList;
+    SARibbonAlignment mCategoryAlignment { SARibbonAlignment::AlignLeft };  ///< 对齐方式
 };
 
 //=============================================================
@@ -295,14 +296,15 @@ void SARibbonCategoryLayout::updateGeometryArr()
             d_ptr->mIsLeftScrollBtnShow  = true;
         }
     } else {
-        //记录可以扩展的数量
-        int canExpandingCount = 0;
         //说明total 小于 categoryWidth
+        //记录可以扩展的数量
+        int canExpandingCount        = 0;
         d_ptr->mIsRightScrollBtnShow = false;
         d_ptr->mIsLeftScrollBtnShow  = false;
         //这个是避免一开始totalWidth > categorySize.width()，通过滚动按钮调整了m_d->mBaseX
         //随之调整了窗体尺寸，调整后totalWidth < categorySize.width()导致category在原来位置
         //无法显示，必须这里把mBaseX设置为0
+
         d_ptr->mXBase = 0;
         //
 
@@ -321,9 +323,12 @@ void SARibbonCategoryLayout::updateGeometryArr()
             expandWidth = 0;
         }
     }
-    total = 0;  // total重新计算
     int x = d_ptr->mXBase;
-
+    if ((getCategoryAlignment() == SARibbonAlignment::AlignCenter) && (total < categoryWidth) && (0 == expandWidth)) {
+        //如果是居中对齐，同时没有伸缩的pannel，同时总宽度没有超过category的宽度
+        x = (categoryWidth - total) / 2;
+    }
+    total = 0;  // total重新计算
     //先按照sizeHint设置所有的尺寸
     for (SARibbonCategoryLayoutItem* item : qAsConst(d_ptr->mItemList)) {
         if (item->isEmpty()) {
@@ -577,6 +582,26 @@ bool SARibbonCategoryLayout::isScrolled() const
 int SARibbonCategoryLayout::categoryTotalWidth() const
 {
     return d_ptr->mTotalWidth;
+}
+
+/**
+   @brief 设置Category的对齐方式
+
+   居中对齐会让pannel以居中进行对齐
+   @param al
+ */
+void SARibbonCategoryLayout::setCategoryAlignment(SARibbonAlignment al)
+{
+    d_ptr->mCategoryAlignment = al;
+}
+
+/**
+   @brief Category的对齐方式
+   @return
+ */
+SARibbonAlignment SARibbonCategoryLayout::getCategoryAlignment() const
+{
+    return d_ptr->mCategoryAlignment;
 }
 
 void SARibbonCategoryLayout::onLeftScrollButtonClicked()

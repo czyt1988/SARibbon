@@ -5291,6 +5291,7 @@ public:
 public:
 	SARibbonButtonGroupWidget* groupWidget { nullptr };
 };
+
 SARibbonQuickAccessBar::PrivateData::PrivateData(SARibbonQuickAccessBar* p) : q_ptr(p)
 {
 }
@@ -7624,6 +7625,31 @@ void SARibbonCategory::updateItemGeometry()
 	}
 }
 
+/**
+   @brief 设置Category的对齐方式
+   @param al
+ */
+void SARibbonCategory::setCategoryAlignment(SARibbonAlignment al)
+{
+	SARibbonCategoryLayout* lay = qobject_cast< SARibbonCategoryLayout* >(layout());
+	if (lay) {
+		lay->setCategoryAlignment(al);
+	}
+}
+
+/**
+   @brief Category的对齐方式
+   @return
+ */
+SARibbonAlignment SARibbonCategory::getCategoryAlignment() const
+{
+	SARibbonCategoryLayout* lay = qobject_cast< SARibbonCategoryLayout* >(layout());
+	if (lay) {
+		return lay->getCategoryAlignment();
+	}
+	return SARibbonAlignment::AlignLeft;
+}
+
 bool SARibbonCategory::eventFilter(QObject* watched, QEvent* event)
 {
 	if (nullptr == watched) {
@@ -7726,6 +7752,7 @@ public:
 	int mXBase { 0 };
 	QSize mSizeHint { 50, 50 };
 	QList< SARibbonCategoryLayoutItem* > mItemList;
+	SARibbonAlignment mCategoryAlignment { SARibbonAlignment::AlignLeft };  ///< 对齐方式
 };
 
 //=============================================================
@@ -7990,14 +8017,15 @@ void SARibbonCategoryLayout::updateGeometryArr()
 			d_ptr->mIsLeftScrollBtnShow  = true;
 		}
 	} else {
-		//记录可以扩展的数量
-		int canExpandingCount = 0;
 		//说明total 小于 categoryWidth
+		//记录可以扩展的数量
+		int canExpandingCount        = 0;
 		d_ptr->mIsRightScrollBtnShow = false;
 		d_ptr->mIsLeftScrollBtnShow  = false;
 		//这个是避免一开始totalWidth > categorySize.width()，通过滚动按钮调整了m_d->mBaseX
 		//随之调整了窗体尺寸，调整后totalWidth < categorySize.width()导致category在原来位置
 		//无法显示，必须这里把mBaseX设置为0
+
 		d_ptr->mXBase = 0;
 		//
 
@@ -8016,9 +8044,12 @@ void SARibbonCategoryLayout::updateGeometryArr()
 			expandWidth = 0;
 		}
 	}
-	total = 0;  // total重新计算
 	int x = d_ptr->mXBase;
-
+	if ((getCategoryAlignment() == SARibbonAlignment::AlignCenter) && (total < categoryWidth) && (0 == expandWidth)) {
+		//如果是居中对齐，同时没有伸缩的pannel，同时总宽度没有超过category的宽度
+		x = (categoryWidth - total) / 2;
+	}
+	total = 0;  // total重新计算
 	//先按照sizeHint设置所有的尺寸
 	for (SARibbonCategoryLayoutItem* item : qAsConst(d_ptr->mItemList)) {
 		if (item->isEmpty()) {
@@ -8272,6 +8303,26 @@ bool SARibbonCategoryLayout::isScrolled() const
 int SARibbonCategoryLayout::categoryTotalWidth() const
 {
 	return d_ptr->mTotalWidth;
+}
+
+/**
+   @brief 设置Category的对齐方式
+
+   居中对齐会让pannel以居中进行对齐
+   @param al
+ */
+void SARibbonCategoryLayout::setCategoryAlignment(SARibbonAlignment al)
+{
+	d_ptr->mCategoryAlignment = al;
+}
+
+/**
+   @brief Category的对齐方式
+   @return
+ */
+SARibbonAlignment SARibbonCategoryLayout::getCategoryAlignment() const
+{
+	return d_ptr->mCategoryAlignment;
 }
 
 void SARibbonCategoryLayout::onLeftScrollButtonClicked()
@@ -9687,9 +9738,13 @@ public:
 	QList< QColor > mContextCategoryColorList;      ///< contextCategory的色系
 	int mContextCategoryColorListIndex;             ///< 记录contextCategory色系索引
 	QColor mTitleTextColor;  ///< 标题文字颜色,默认无效，无效的情况下和SARibbonBar的qss:color属性一致
-	QColor mTabBarBaseLineColor;   ///< tabbar 底部会绘制一条线条，定义线条颜色
-	Qt::Alignment mTitleAligment;  ///< 标题对齐方式
-	bool mIsTitleVisible;          ///< 标题是否显示
+	QColor mTabBarBaseLineColor;              ///< tabbar 底部会绘制一条线条，定义线条颜色
+	Qt::Alignment mTitleAligment;             ///< 标题对齐方式
+	bool mIsTitleVisible;                     ///< 标题是否显示
+	bool mEnableUserDefineAccessBarIconSize;  ///< 允许用户自定义AccessBar的IconSize
+	bool mEnableUserDefineRightBarIconSize;   ///< 允许用户自定义RightBar的IconSize
+	SARibbonAlignment mRibbonAlignment;       ///< 对齐方式
+public:
 	PrivateData(SARibbonBar* par)
         : q_ptr(par)
         , mApplicationButton(nullptr)
@@ -9706,14 +9761,10 @@ public:
         , mTabBarBaseLineColor(186, 201, 219)
         , mTitleAligment(Qt::AlignCenter)
         , mIsTitleVisible(true)
+        , mEnableUserDefineAccessBarIconSize(false)
+        , mRibbonAlignment(SARibbonAlignment::AlignLeft)
 	{
-		mContextCategoryColorList << QColor(201, 89, 156)  // 玫红
-                                  << QColor(242, 203, 29)  // 黄
-                                  << QColor(255, 157, 0)   // 橙
-                                  << QColor(14, 81, 167)   // 蓝
-                                  << QColor(228, 0, 69)    // 红
-                                  << QColor(67, 148, 0)    // 绿
-            ;
+		mContextCategoryColorList = SARibbonBar::getDefaultContextCategoryColorList();
 	}
 
 	void init()
@@ -9729,7 +9780,7 @@ public:
 		q_ptr->connect(mRibbonTabBar, &QTabBar::tabMoved, q_ptr, &SARibbonBar::onTabMoved);
 		//
 		mStackedContainerWidget = RibbonSubElementDelegate->createRibbonStackedWidget(q_ptr);
-		mRibbonTabBar->setObjectName(QStringLiteral("objSAStackedContainerWidget"));
+		mStackedContainerWidget->setObjectName(QStringLiteral("objSAStackedContainerWidget"));
 		mStackedContainerWidget->connect(mStackedContainerWidget, &SARibbonStackedWidget::hidWindow, q_ptr, &SARibbonBar::onStackWidgetHided);
 		mStackedContainerWidget->installEventFilter(q_ptr);
 		setNormalMode();
@@ -9837,8 +9888,8 @@ public:
 	 */
 	static QSize calcIconSizeByHeight(int h)
 	{
-		if (h - 6 > 20) {
-			return QSize(h - 6, h - 6);
+		if (h - 8 >= 20) {
+			return QSize(h - 8, h - 8);
 		}
 		return QSize(h - 4, h - 4);
 	}
@@ -9902,6 +9953,23 @@ QString SARibbonBar::versionString()
 }
 
 /**
+   @brief 获取默认的上下文标签颜色列表
+   @return
+ */
+QList< QColor > SARibbonBar::getDefaultContextCategoryColorList()
+{
+	QList< QColor > res;
+	res << QColor(201, 89, 156)  // 玫红
+        << QColor(242, 203, 29)  // 黄
+        << QColor(255, 157, 0)   // 橙
+        << QColor(14, 81, 167)   // 蓝
+        << QColor(228, 0, 69)    // 红
+        << QColor(67, 148, 0)    // 绿
+        ;
+	return res;
+}
+
+/**
  * @brief 返回applicationButton
  * @return 默认的applicationButton是@ref SARibbonApplicationButton 生成，通过@ref setApplicationButton 可设置为其他button
  */
@@ -9954,7 +10022,6 @@ SARibbonCategory* SARibbonBar::addCategoryPage(const QString& title)
 {
 	SARibbonCategory* category = RibbonSubElementDelegate->createRibbonCategory(this);
 
-	// catagory->setFixedHeight(categoryHeight());
 	category->setObjectName(title);
 	category->setCategoryName(title);
 	addCategoryPage(category);
@@ -10304,7 +10371,6 @@ void SARibbonBar::showContextCategory(SARibbonContextCategory* context)
 		// 此句如果模式重复设置不会进行多余操作
 		category->setRibbonPannelLayoutMode(isTwoRowStyle() ? SARibbonPannel::TwoRowMode : SARibbonPannel::ThreeRowMode);
 		// 切换模式后会改变高度，上下文标签显示时要保证显示出来
-		//  category->setFixedHeight(categoryHeight());
 		int index = d_ptr->mRibbonTabBar->addTab(category->categoryName());
 		contextCategoryData.tabPageIndex.append(index);
 
@@ -10698,12 +10764,13 @@ void SARibbonBar::resizeAll()
 	update();
 }
 
-void SARibbonBar::synchronousCategoryLayoutMode()
+void SARibbonBar::synchronousCategoryLayoutMode(bool autoUpdate)
 {
 	// 根据样式调整SARibbonCategory的布局形式
 	QList< SARibbonCategory* > categorys = categoryPages();
 
 	for (SARibbonCategory* c : qAsConst(categorys)) {
+		c->setCategoryAlignment(getRibbonAlignment());
 		c->setRibbonPannelLayoutMode(SARibbonBar::isTwoRowStyle(currentRibbonStyle()) ? SARibbonPannel::TwoRowMode
                                                                                       : SARibbonPannel::ThreeRowMode);
 	}
@@ -10711,6 +10778,11 @@ void SARibbonBar::synchronousCategoryLayoutMode()
 	// 根据样式调整bar的高度
 	if (NormalRibbonMode == currentRibbonState()) {
 		setFixedHeight(mainBarHeight());
+	}
+	//! 直接给一个resizeevent，让所有刷新
+	if (autoUpdate) {
+		QResizeEvent* e = new QResizeEvent(size(), QSize());
+		QApplication::postEvent(this, e);
 	}
 }
 
@@ -10751,7 +10823,8 @@ void SARibbonBar::setRibbonStyle(SARibbonBar::RibbonStyle v)
 	// 如果想在两行模式换行，在调用SARibbonBar::setRibbonStyle后，再SARibbonToolButton::setEnableWordWrap(true)
 	SARibbonToolButton::setEnableWordWrap(!isTwoRowStyle(v));
 
-	synchronousCategoryLayoutMode();
+	synchronousCategoryLayoutMode(false);  //这里不急着刷新，下面会继续刷新
+
 	QSize oldSize = size();
 	QSize newSize(oldSize.width(), mainBarHeight());
 	QResizeEvent es(newSize, oldSize);
@@ -10981,6 +11054,99 @@ bool SARibbonBar::isTitleVisible() const
 	return d_ptr->mIsTitleVisible;
 }
 
+/**
+   @brief 设置允许用户自定义AccessBar的icon size
+
+    若设置为true此时用户调用AccessBar的setIconSize是可接受的，否则iconsize大小将由SARibbonBar计算
+
+    默认为false
+
+   @param
+ */
+void SARibbonBar::setEnableUserDefineAccessBarIconSize(bool on)
+{
+	d_ptr->mEnableUserDefineAccessBarIconSize = on;
+}
+
+/**
+   @brief 是否允许用户自定义AccessBar的icon size
+   @return
+ */
+bool SARibbonBar::isEnableUserDefineAccessBarIconSize() const
+{
+	return d_ptr->mEnableUserDefineAccessBarIconSize;
+}
+
+/**
+   @brief 是否允许用户自定义RightBar的icon size
+
+    若设置为true此时用户调用RightBar的setIconSize是可接受的，否则iconsize大小将由SARibbonBar计算
+
+    默认为false
+
+   @param on
+ */
+void SARibbonBar::setEnableUserDefineRightBarIconSize(bool on)
+{
+	d_ptr->mEnableUserDefineRightBarIconSize = on;
+}
+
+/**
+   @brief 是否允许用户自定义RightBar的icon size
+   @return
+ */
+bool SARibbonBar::isEnableUserDefineRightBarIconSize() const
+{
+	return d_ptr->mEnableUserDefineRightBarIconSize;
+}
+
+/**
+   @brief 设置上下文标签的颜色列表
+
+    上下文标签显示的时候，会从颜色列表中取颜色进行标签的渲染
+   @param cls
+ */
+void SARibbonBar::setContextCategoryColorList(const QList< QColor >& cls)
+{
+	d_ptr->mContextCategoryColorList = cls;
+	if (d_ptr->mContextCategoryColorList.isEmpty()) {
+		d_ptr->mContextCategoryColorList = getDefaultContextCategoryColorList();
+	}
+	d_ptr->mContextCategoryColorListIndex = 0;
+	//这时需要对已经显示的contextCategoryData的颜色进行重新设置
+	for (SARibbonContextCategory* c : d_ptr->mContextCategoryList) {
+		c->setContextColor(d_ptr->getContextCategoryColor());
+	}
+}
+
+/**
+   @brief 获取上下文标签的颜色列表
+   @return
+ */
+QList< QColor > SARibbonBar::getContextCategoryColorList() const
+{
+	return d_ptr->mContextCategoryColorList;
+}
+
+/**
+   @brief 设置ribbon的对齐方式
+   @param al
+ */
+void SARibbonBar::setRibbonAlignment(SARibbonAlignment al)
+{
+	d_ptr->mRibbonAlignment = al;
+	synchronousCategoryLayoutMode();
+}
+
+/**
+   @brief ribbon的对齐方式
+   @return
+ */
+SARibbonAlignment SARibbonBar::getRibbonAlignment() const
+{
+	return d_ptr->mRibbonAlignment;
+}
+
 bool SARibbonBar::eventFilter(QObject* obj, QEvent* e)
 {
 	if (obj) {
@@ -11034,13 +11200,7 @@ int SARibbonBar::calcMinTabBarWidth() const
 	// mainwindow的空间，接受鼠标事件，从而实现拖动等操作，否则tabbar占用整个顶栏，鼠标无法点击到mainwindow
 	// 计算tab所占用的宽度
 	const QMargins& mg = d_ptr->mRibbonTabBar->tabMargin();
-	int mintabBarWidth = 0;
-
-	for (int i = 0; i < d_ptr->mRibbonTabBar->count(); ++i) {
-		mintabBarWidth += d_ptr->mRibbonTabBar->tabRect(i).width();
-	}
-	mintabBarWidth += (mg.left() + mg.right());
-	return (mintabBarWidth);
+	return d_ptr->mRibbonTabBar->sizeHint().width() + (mg.left() + mg.right());
 }
 
 /**
@@ -11397,10 +11557,12 @@ void SARibbonBar::resizeInOfficeStyle()
 			QSize quickAccessBarSize = d_ptr->mQuickAccessBar->sizeHint();
 			// 上下留1px的边线
 			d_ptr->mQuickAccessBar->setGeometry(x, y + 1, quickAccessBarSize.width(), validTitleBarHeight - 2);
-			// 变更iconsize
-			QSize btnIconSize = PrivateData::calcIconSizeByHeight(validTitleBarHeight - 2);
-			if (btnIconSize != d_ptr->mQuickAccessBar->iconSize()) {
-				d_ptr->mQuickAccessBar->setIconSize(btnIconSize);
+			if (!(d_ptr->mEnableUserDefineAccessBarIconSize)) {  //允许用户自定义AccessBar的IconSize就不进入此条件重置大小
+				// 变更iconsize
+				QSize btnIconSize = PrivateData::calcIconSizeByHeight(validTitleBarHeight - 2);
+				if (btnIconSize != d_ptr->mQuickAccessBar->iconSize()) {
+					d_ptr->mQuickAccessBar->setIconSize(btnIconSize);
+				}
 			}
 		}
 	}
@@ -11443,15 +11605,30 @@ void SARibbonBar::resizeInOfficeStyle()
 		// 上下留1px的边线
 		d_ptr->mRightButtonGroup->setGeometry(endX, y + 1, wSize.width(), tabH - 2);
 		// 变更iconsize
-		QSize btnIconSize = PrivateData::calcIconSizeByHeight(tabH - 2);
-		if (btnIconSize != d_ptr->mRightButtonGroup->iconSize()) {
-			d_ptr->mRightButtonGroup->setIconSize(btnIconSize);
+		if (!(d_ptr->mEnableUserDefineRightBarIconSize)) {
+			QSize btnIconSize = PrivateData::calcIconSizeByHeight(tabH - 2);
+			if (btnIconSize != d_ptr->mRightButtonGroup->iconSize()) {
+				d_ptr->mRightButtonGroup->setIconSize(btnIconSize);
+			}
 		}
 	}
 	// 最后确定tabbar宽度
-	int tabBarWidth = endX - x;
-	d_ptr->mRibbonTabBar->setGeometry(x, y, tabBarWidth, tabH);
-
+	int tabBarAllowedWidth = endX - x;
+	if (getRibbonAlignment() == SARibbonAlignment::AlignLeft) {
+		d_ptr->mRibbonTabBar->setGeometry(x, y, tabBarAllowedWidth, tabH);
+	} else {
+		//居中对齐的情况下，Tab要居中显示
+		//得到tab的推荐尺寸
+		int mintabBarWidth = calcMinTabBarWidth();
+		if (mintabBarWidth >= tabBarAllowedWidth) {
+			//这时tabbar没有居中对齐的必要性，空间位置不够了
+			d_ptr->mRibbonTabBar->setGeometry(x, y, tabBarAllowedWidth, tabH);
+		} else {
+			//说明tabbar的宽度有居中的可能性
+			int xoffset = (tabBarAllowedWidth - mintabBarWidth) / 2;
+			d_ptr->mRibbonTabBar->setGeometry(x + xoffset, y, mintabBarWidth, tabH);
+		}
+	}
 	resizeStackedContainerWidget();
 }
 
@@ -11489,9 +11666,11 @@ void SARibbonBar::resizeInWpsLiteStyle()
 		// 上下留1px的边线
 		d_ptr->mRightButtonGroup->setGeometry(endX, y + 1, wSize.width(), validTitleBarHeight - 2);
 		// 变更iconsize
-		QSize btnIconSize = PrivateData::calcIconSizeByHeight(validTitleBarHeight - 2);
-		if (btnIconSize != d_ptr->mRightButtonGroup->iconSize()) {
-			d_ptr->mRightButtonGroup->setIconSize(btnIconSize);
+		if (!(d_ptr->mEnableUserDefineRightBarIconSize)) {
+			QSize btnIconSize = PrivateData::calcIconSizeByHeight(validTitleBarHeight - 2);
+			if (btnIconSize != d_ptr->mRightButtonGroup->iconSize()) {
+				d_ptr->mRightButtonGroup->setIconSize(btnIconSize);
+			}
 		}
 	}
 	// quick access bar定位
@@ -11502,9 +11681,11 @@ void SARibbonBar::resizeInWpsLiteStyle()
 			// 上下留1px的边线
 			d_ptr->mQuickAccessBar->setGeometry(endX, y + 1, quickAccessBarSize.width(), validTitleBarHeight - 2);
 			// 变更iconsize
-			QSize btnIconSize = PrivateData::calcIconSizeByHeight(validTitleBarHeight - 2);
-			if (btnIconSize != d_ptr->mQuickAccessBar->iconSize()) {
-				d_ptr->mQuickAccessBar->setIconSize(btnIconSize);
+			if (!(d_ptr->mEnableUserDefineAccessBarIconSize)) {  //允许用户自定义AccessBar的IconSize就不进入此条件重置大小
+				QSize btnIconSize = PrivateData::calcIconSizeByHeight(validTitleBarHeight - 2);
+				if (btnIconSize != d_ptr->mQuickAccessBar->iconSize()) {
+					d_ptr->mQuickAccessBar->setIconSize(btnIconSize);
+				}
 			}
 		}
 	}
@@ -11539,7 +11720,7 @@ void SARibbonBar::resizeInWpsLiteStyle()
 		}
 	}
 	// tab bar 定位 wps模式下applicationButton的右边就是tab bar
-	int tabBarWidth = endX - x;
+	int tabBarAllowedWidth = endX - x;
 	// 20200831
 	// tabBarWidth的宽度原来为endX - x;，现需要根据实际进行调整
 	// 为了把tabbar没有tab的部分不占用，这里的宽度需要根据tab的size来进行设置，让tabbar的长度刚刚好，这样能让出
@@ -11547,11 +11728,22 @@ void SARibbonBar::resizeInWpsLiteStyle()
 	// 计算tab所占用的宽度
 	int mintabBarWidth = calcMinTabBarWidth();
 
-	if (mintabBarWidth < tabBarWidth) {
-		tabBarWidth = mintabBarWidth;
+	if (getRibbonAlignment() == SARibbonAlignment::AlignLeft) {
+		if (mintabBarWidth < tabBarAllowedWidth) {
+			tabBarAllowedWidth = mintabBarWidth;
+		}
+		d_ptr->mRibbonTabBar->setGeometry(x, y, tabBarAllowedWidth, tabH);
+	} else {
+		//居中对齐
+		if (mintabBarWidth >= tabBarAllowedWidth) {
+			//这时tabbar没有居中对齐的必要性，空间位置不够了
+			d_ptr->mRibbonTabBar->setGeometry(x, y, tabBarAllowedWidth, tabH);
+		} else {
+			//说明tabbar的宽度有居中的可能性
+			int xoffset = (tabBarAllowedWidth - mintabBarWidth) / 2;
+			d_ptr->mRibbonTabBar->setGeometry(x + xoffset, y, mintabBarWidth, tabH);
+		}
 	}
-	d_ptr->mRibbonTabBar->setGeometry(x, y, tabBarWidth, tabH);
-
 	// 调整整个stackedContainer
 	resizeStackedContainerWidget();
 }
@@ -14280,10 +14472,12 @@ void SARibbonMainWindow::setRibbonTheme(SARibbonMainWindow::RibbonTheme theme)
 	sa_set_ribbon_theme(this, theme);
 	d_ptr->mCurrentRibbonTheme = theme;
 	if (SARibbonBar* bar = ribbonBar()) {
+		//尺寸修正
 		switch (ribbonTheme()) {
 		case RibbonThemeWindows7:
 			break;
 		case RibbonThemeOffice2013:
+		case RibbonThemeOffice2016Blue:
 		case RibbonThemeDark: {
 			//! 在设置qss后需要针对margin信息重新设置进SARibbonTabBar中
 			//! office2013.qss的margin信息如下设置，em是字符M所对应的宽度的长度
@@ -14300,6 +14494,20 @@ void SARibbonMainWindow::setRibbonTheme(SARibbonMainWindow::RibbonTheme theme)
 			int emWidth     = SA_FONTMETRICS_WIDTH(fm, "M");
 			tab->setTabMargin(QMargins(0.2 * emWidth, 0, 0, 0));
 		} break;
+		default:
+			break;
+		}
+		//上下文标签颜色设置
+		switch (ribbonTheme()) {
+		case RibbonThemeWindows7:
+		case RibbonThemeOffice2013:
+		case RibbonThemeDark:
+			bar->setContextCategoryColorList(QList< QColor >());  //< 设置空颜色列表会重置为默认色系
+			break;
+		case RibbonThemeOffice2016Blue:
+			bar->setContextCategoryColorList(QList< QColor >() << QColor(18, 64, 120));  //< 设置空颜色列表会重置为默认色系
+			break;
+
 		default:
 			break;
 		}
@@ -14417,6 +14625,9 @@ void sa_set_ribbon_theme(QWidget* w, SARibbonMainWindow::RibbonTheme theme)
 		break;
 	case SARibbonMainWindow::RibbonThemeOffice2013:
 		file.setFileName(":/theme/resource/theme-office2013.qss");
+		break;
+	case SARibbonMainWindow::RibbonThemeOffice2016Blue:
+		file.setFileName(":/theme/resource/theme-office2016-blue.qss");
 		break;
 	case SARibbonMainWindow::RibbonThemeDark:
 		file.setFileName(":/theme/resource/theme-dark.qss");

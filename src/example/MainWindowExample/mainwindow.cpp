@@ -468,6 +468,19 @@ void MainWindow::onActionVisibleAllTriggered(bool on)
 }
 
 /**
+   @brief 居中对齐checkbox的槽
+   @param checked
+ */
+void MainWindow::onCheckBoxAlignmentCenterClicked(bool checked)
+{
+    if (checked) {
+        ribbonBar()->setRibbonAlignment(SARibbonAlignment::AlignCenter);
+    } else {
+        ribbonBar()->setRibbonAlignment(SARibbonAlignment::AlignLeft);
+    }
+}
+
+/**
  * @brief 创建其它actions，这些actions并不在SARibbonBar管理
  */
 void MainWindow::createOtherActions()
@@ -563,6 +576,13 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     mComboboxRibbonTheme->setCurrentIndex(mComboboxRibbonTheme->findData(static_cast< int >(ribbonTheme())));
     connect(mComboboxRibbonTheme, QOverload< int >::of(&SARibbonComboBox::currentIndexChanged), this, &MainWindow::onRibbonThemeComboBoxCurrentIndexChanged);
     pannelStyle->addSmallWidget(mComboboxRibbonTheme);
+
+    SARibbonCheckBox* checkBox = new SARibbonCheckBox(this);
+
+    checkBox->setText(tr("Alignment Center"));
+    checkBox->setObjectName("checkBoxAlignmentCenter");
+    connect(checkBox, &SARibbonCheckBox::clicked, this, &MainWindow::onCheckBoxAlignmentCenterClicked);
+    pannelStyle->addSmallWidget(checkBox);
 
     SARibbonPannel* pannelToolButtonStyle = page->addPannel(("sa ribbon toolbutton style"));
 
@@ -710,17 +730,13 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
         qDebug() << w->metaObject()->className();
         w = w->parentWidget();
     }
-    SARibbonCheckBox* checkBox = new SARibbonCheckBox(this);
 
-    checkBox->setText(tr("checkBox"));
-    pannelWidgetTest->addSmallWidget(checkBox);
     pannelWidgetTest->addSeparator();
 
     QCalendarWidget* calendarWidget = new QCalendarWidget(this);
     calendarWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     calendarWidget->setObjectName(("calendarWidget"));
     pannelWidgetTest->addLargeWidget(calendarWidget);
-    pannelWidgetTest->setExpanding();
     optAct = new QAction(this);
     connect(optAct, &QAction::triggered, this, [ this ](bool on) {
         Q_UNUSED(on);

@@ -534,6 +534,31 @@ void SARibbonCategory::updateItemGeometry()
     }
 }
 
+/**
+   @brief 设置Category的对齐方式
+   @param al
+ */
+void SARibbonCategory::setCategoryAlignment(SARibbonAlignment al)
+{
+    SARibbonCategoryLayout* lay = qobject_cast< SARibbonCategoryLayout* >(layout());
+    if (lay) {
+        lay->setCategoryAlignment(al);
+    }
+}
+
+/**
+   @brief Category的对齐方式
+   @return
+ */
+SARibbonAlignment SARibbonCategory::getCategoryAlignment() const
+{
+    SARibbonCategoryLayout* lay = qobject_cast< SARibbonCategoryLayout* >(layout());
+    if (lay) {
+        return lay->getCategoryAlignment();
+    }
+    return SARibbonAlignment::AlignLeft;
+}
+
 bool SARibbonCategory::eventFilter(QObject* watched, QEvent* event)
 {
     if (nullptr == watched) {

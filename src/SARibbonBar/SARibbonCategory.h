@@ -111,6 +111,10 @@ protected:
     //获取SARibbonCategoryLayoutlayout
     SARibbonCategoryLayout* categoryLayout() const;
 
+    //设置Category的对齐方式
+    void setCategoryAlignment(SARibbonAlignment al);
+    SARibbonAlignment getCategoryAlignment() const;
+
 private:
     void setRibbonBar(SARibbonBar* bar);
 };
