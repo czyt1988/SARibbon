@@ -57,9 +57,10 @@ public:
      */
     enum RibbonTheme
     {
-        RibbonThemeOffice2013,  ///< office2013主题
-        RibbonThemeWindows7,    ///< win7主题
-        RibbonThemeDark         ///< 暗色主题
+        RibbonThemeOffice2013,      ///< office2013主题
+        RibbonThemeOffice2016Blue,  ///< office2016-蓝色主题
+        RibbonThemeWindows7,        ///< win7主题
+        RibbonThemeDark             ///< 暗色主题
     };
     Q_ENUM(RibbonTheme)
 public:

@@ -17,5 +17,6 @@
         <file>resource/theme-win7.qss</file>
         <file>resource/theme-office2013.qss</file>
         <file>resource/theme-dark.qss</file>
+        <file>resource/theme-office2016-blue.qss</file>
     </qresource>
 </RCC>
