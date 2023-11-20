@@ -10,6 +10,7 @@ class SARibbonButtonGroupWidget;
 class SARibbonPannel;
 class QTextEdit;
 class QComboBox;
+class QCloseEvent;
 
 class MainWindow : public SARibbonMainWindow
 {
@@ -69,6 +70,9 @@ private slots:
 private:
     // 创建其它actions，这些actions并不在SARibbonBar管理
     void createOtherActions();
+
+protected:
+    void closeEvent(QCloseEvent* e) override;
 
 private:
     SARibbonContextCategory* mContextCategory;

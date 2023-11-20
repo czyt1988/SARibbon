@@ -493,6 +493,15 @@ void MainWindow::createOtherActions()
     mOtherActionIcon1 = new QAction(QIcon(":/icon/icon/layout.svg"), ("action with icon"), this);
 }
 
+#include <QMessageBox>
+void MainWindow::closeEvent(QCloseEvent* e)
+{
+    auto res = QMessageBox::question(this, tr("question"), tr("Confirm whether to exit"));
+    if (res == QMessageBox::Yes) {
+        SARibbonMainWindow::closeEvent(e);
+    }
+}
+
 void MainWindow::createCategoryMain(SARibbonCategory* page)
 {
     //! 1
