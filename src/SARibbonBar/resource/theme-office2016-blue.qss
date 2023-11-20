@@ -20,6 +20,7 @@
 {Tab.BKColor:selected}:选中Tab的背景颜色，建议和{Category.BKColor}一致
 {Tab.BorderColor:hover:!selected}:tab没被选中，但出于hover状态下的边框颜色，建议和{Tab.Color}一致
 {Tab.Color:hover:!selected}:tab没被选中，但出于hover状态下的文字颜色，建议和{Tab.Color}一致
+{Tab.BKColor:hover:!selected}:tab没被选中，但出于hover状态下的背景颜色
 
 {ToolButton.BKColor}:按钮的背景颜色，应该和{Category.BKColor}一致
 {ToolButton.Color}:按钮的文字色
@@ -142,15 +143,16 @@ SARibbonStackedWidget:focus {
 /*SARibbonApplicationButton*/
 SARibbonApplicationButton {
   color: white;
+  border:none;
   background-color: #225497;/* {ApplicationButton.BKColor} */
 }
 
 SARibbonApplicationButton::hover {
-  background-color: #436bb2;/* {ApplicationButton.BKColor:hover} */
+  background-color: #3e6db5;/* {ApplicationButton.BKColor:hover} */
 }
 
 SARibbonApplicationButton::pressed {
-  background-color: #3369b9;/* {ApplicationButton.BKColor:hover} */
+  background-color: #225497;/* {ApplicationButton.BKColor:hover} */
 }
 
 SARibbonApplicationButton:focus {
@@ -194,9 +196,9 @@ SARibbonTabBar::tab:selected {
 }
 
 SARibbonTabBar::tab:hover:!selected {
-  border:0.05em solid #d2e4ff;/* {Tab.BorderColor:hover:!selected} */
-  border-bottom: none;
+  border:none;/* {Tab.BorderColor:hover:!selected} */
   color: #d2e4ff;/* {Tab.Color:hover:!selected} */
+  background: #3e6db6;/* {Tab.BKColor:hover:!selected} */
 }
 
 SARibbonTabBar::tab:!selected {
@@ -241,8 +243,8 @@ SARibbonControlButton {
 }
 
 SARibbonControlButton::pressed {
-  border: 0.05em solid #a3bacc;/*{ControlButton.BorderColor:pressed}*/
-  background-color: #a3bacc;/*{ControlButton.BKColor:pressed}*/
+  border: 0.05em solid #124078;/*{ControlButton.BorderColor:pressed}*/
+  background-color: #124078;/*{ControlButton.BKColor:pressed}*/
 }
 
 SARibbonControlButton::checked {
@@ -251,8 +253,8 @@ SARibbonControlButton::checked {
 }
 
 SARibbonControlButton::hover {
-  border: 0.05em solid #badffa;/*{ControlButton.BorderColor:hover}*/
-  background-color: #cee7fc;/*{ControlButton.BKColor:hover}*/
+  border: 0.05em solid #3e6db6;/*{ControlButton.BorderColor:hover}*/
+  background-color: #3e6db6;/*{ControlButton.BKColor:hover}*/
 }
 
 SARibbonControlButton#SARibbonGalleryButtonUp, #SARibbonGalleryButtonDown, #SARibbonGalleryButtonMore {
