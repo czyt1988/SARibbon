@@ -9762,6 +9762,7 @@ public:
         , mTitleAligment(Qt::AlignCenter)
         , mIsTitleVisible(true)
         , mEnableUserDefineAccessBarIconSize(false)
+        , mEnableUserDefineRightBarIconSize(false)
         , mRibbonAlignment(SARibbonAlignment::AlignLeft)
 	{
 		mContextCategoryColorList = SARibbonBar::getDefaultContextCategoryColorList();
@@ -11526,7 +11527,7 @@ void SARibbonBar::changeEvent(QEvent* e)
 
 void SARibbonBar::resizeInOfficeStyle()
 {
-	synchronousCategoryLayoutMode();
+	synchronousCategoryLayoutMode(false);
 	QMargins border = contentsMargins();
 	int x           = border.left();
 	int y           = border.top();
@@ -11634,7 +11635,7 @@ void SARibbonBar::resizeInOfficeStyle()
 
 void SARibbonBar::resizeInWpsLiteStyle()
 {
-	synchronousCategoryLayoutMode();
+	synchronousCategoryLayoutMode(false);
 	QMargins border = contentsMargins();
 	int x           = border.left();
 	int y           = border.top();

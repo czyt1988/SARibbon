@@ -41,6 +41,7 @@
 #include <QTextEdit>
 #include <QTextStream>
 #include <QXmlStreamWriter>
+#include <QMessageBox>
 #define PRINT_COST_START()                                                                                             \
     QElapsedTimer __TMP_COST;                                                                                          \
     __TMP_COST.start();                                                                                                \
@@ -491,6 +492,16 @@ void MainWindow::createOtherActions()
     mOtherAction4     = new QAction(("text action4"), this);
     mOtherAction5     = new QAction(("text action5"), this);
     mOtherActionIcon1 = new QAction(QIcon(":/icon/icon/layout.svg"), ("action with icon"), this);
+}
+
+void MainWindow::closeEvent(QCloseEvent* e)
+{
+    auto res = QMessageBox::question(this, tr("question"), tr("Confirm whether to exit"));
+    if (res == QMessageBox::Yes) {
+        e->accept();
+    } else {
+        e->ignore();
+    }
 }
 
 void MainWindow::createCategoryMain(SARibbonCategory* page)
