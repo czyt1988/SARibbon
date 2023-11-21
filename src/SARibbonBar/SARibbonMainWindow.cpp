@@ -92,8 +92,8 @@ SAFramelessHelper* SARibbonMainWindow::framelessHelper()
 
 bool SARibbonMainWindow::eventFilter(QObject* obj, QEvent* e)
 {
-    //这个过滤是为了把ribbonBar上的动作传递到mainwindow，再传递到frameless，
-    //由于ribbonbar会遮挡刁frameless的区域，导致frameless无法捕获这些消息
+    // 这个过滤是为了把ribbonBar上的动作传递到mainwindow，再传递到frameless，
+    // 由于ribbonbar会遮挡刁frameless的区域，导致frameless无法捕获这些消息
     if (obj == ribbonBar()) {
         switch (e->type()) {
         case QEvent::MouseButtonPress:
@@ -140,7 +140,7 @@ void SARibbonMainWindow::setRibbonTheme(SARibbonMainWindow::RibbonTheme theme)
     sa_set_ribbon_theme(this, theme);
     d_ptr->mCurrentRibbonTheme = theme;
     if (SARibbonBar* bar = ribbonBar()) {
-        //尺寸修正
+        // 尺寸修正
         switch (ribbonTheme()) {
         case RibbonThemeWindows7:
             break;
@@ -165,7 +165,7 @@ void SARibbonMainWindow::setRibbonTheme(SARibbonMainWindow::RibbonTheme theme)
         default:
             break;
         }
-        //上下文标签颜色设置
+        // 上下文标签颜色设置
         switch (ribbonTheme()) {
         case RibbonThemeWindows7:
         case RibbonThemeOffice2013:
@@ -175,7 +175,9 @@ void SARibbonMainWindow::setRibbonTheme(SARibbonMainWindow::RibbonTheme theme)
         case RibbonThemeOffice2016Blue:
             bar->setContextCategoryColorList(QList< QColor >() << QColor(18, 64, 120));  //< 设置空颜色列表会重置为默认色系
             break;
-
+        case RibbonThemeOffice2021Blue:
+            bar->setContextCategoryColorList(QList< QColor >() << QColor(0, 0, 0, 0));  //< 设置空颜色列表会重置为默认色系
+            break;
         default:
             break;
         }
@@ -238,7 +240,7 @@ void SARibbonMainWindow::installRibbonBar(SARibbonBar* bar)
 {
     QWidget* old = QMainWindow::menuWidget();
     if (old) {
-        //如果之前已经设置了menubar，要把之前的删除
+        // 如果之前已经设置了menubar，要把之前的删除
         old->deleteLater();
     }
 #if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
@@ -246,7 +248,7 @@ void SARibbonMainWindow::installRibbonBar(SARibbonBar* bar)
     QMainWindow::setMenuWidget(bar);
     helper->setTitleBarWidget(bar);
 
-    //设置window按钮
+    // 设置window按钮
     if (nullptr == d_ptr->mWindowButtonGroup) {
         d_ptr->mWindowButtonGroup = new SAWindowButtonGroup(this);
     }
@@ -266,12 +268,12 @@ void SARibbonMainWindow::installRibbonBar(SARibbonBar* bar)
 
     QMainWindow::setMenuWidget(bar);
     bar->installEventFilter(this);
-    //设置窗体的标题栏高度
+    // 设置窗体的标题栏高度
     if (nullptr == d_ptr->mFramelessHelper) {
         d_ptr->mFramelessHelper = new SAFramelessHelper(this);
     }
     d_ptr->mFramelessHelper->setTitleHeight(bar->titleBarHeight());
-    //设置window按钮
+    // 设置window按钮
     if (nullptr == d_ptr->mWindowButtonGroup) {
         d_ptr->mWindowButtonGroup = new SAWindowButtonGroup(this);
     }
@@ -296,6 +298,9 @@ void sa_set_ribbon_theme(QWidget* w, SARibbonMainWindow::RibbonTheme theme)
         break;
     case SARibbonMainWindow::RibbonThemeOffice2016Blue:
         file.setFileName(":/theme/resource/theme-office2016-blue.qss");
+        break;
+    case SARibbonMainWindow::RibbonThemeOffice2021Blue:
+        file.setFileName(":/theme/resource/theme-office2021-blue.qss");
         break;
     case SARibbonMainWindow::RibbonThemeDark:
         file.setFileName(":/theme/resource/theme-dark.qss");
