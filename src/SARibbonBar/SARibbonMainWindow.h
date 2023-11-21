@@ -59,6 +59,7 @@ public:
     {
         RibbonThemeOffice2013,      ///< office2013主题
         RibbonThemeOffice2016Blue,  ///< office2016-蓝色主题
+        RibbonThemeOffice2021Blue,  ///< office2021-蓝色主题
         RibbonThemeWindows7,        ///< win7主题
         RibbonThemeDark             ///< 暗色主题
     };
@@ -66,31 +67,31 @@ public:
 public:
     SARibbonMainWindow(QWidget* parent = nullptr, bool useRibbon = true, const Qt::WindowFlags flags = {});
     ~SARibbonMainWindow() Q_DECL_OVERRIDE;
-    //返回SARibbonBar
+    // 返回SARibbonBar
     SARibbonBar* ribbonBar() const;
 #if !SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
-    //返回SAFramelessHelper
+    // 返回SAFramelessHelper
     SAFramelessHelper* framelessHelper();
-    //把ribbonbar的事件传递到frameless
+    // 把ribbonbar的事件传递到frameless
     virtual bool eventFilter(QObject* obj, QEvent* e) Q_DECL_OVERRIDE;
 #endif
-    //此函数仅用于控制最小最大化和关闭按钮的显示
+    // 此函数仅用于控制最小最大化和关闭按钮的显示
     void updateWindowFlag(Qt::WindowFlags flags);
-    //获取系统按钮的状态
+    // 获取系统按钮的状态
     Qt::WindowFlags windowButtonFlags() const;
     void setRibbonTheme(RibbonTheme theme);
     RibbonTheme ribbonTheme() const;
-    //判断当前是否使用ribbon模式
+    // 判断当前是否使用ribbon模式
     bool isUseRibbon() const;
 
 protected:
-    //创建ribbonbar的工厂函数
+    // 创建ribbonbar的工厂函数
     SARibbonBar* createRibbonBar();
     virtual void resizeEvent(QResizeEvent* event) Q_DECL_OVERRIDE;
     virtual bool event(QEvent* e) Q_DECL_OVERRIDE;
 
 private:
-    //安装ribbon
+    // 安装ribbon
     void installRibbonBar(SARibbonBar* bar);
 };
 
