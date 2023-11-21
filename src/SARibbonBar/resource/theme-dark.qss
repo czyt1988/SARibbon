@@ -53,16 +53,20 @@ SARibbonApplicationButton{
   background-color: #b2b2b2;
 }
 
-SARibbonApplicationButton::hover{
+SARibbonApplicationButton:hover{
   background-color: #a0a0a0;
 }
 
-SARibbonApplicationButton::pressed{
+SARibbonApplicationButton:pressed{
   background-color: #858585;
 }
 
 SARibbonApplicationButton:focus{
   outline: none;
+}
+
+SARibbonApplicationButton::menu-indicator {
+  subcontrol-position: right;
 }
 
 /*SARibbonTabBar*/
@@ -130,15 +134,15 @@ SARibbonToolButton:focus {
   color: #242424;
   background-color: #a0a0a0;
 }
-SARibbonToolButton::pressed{
+SARibbonToolButton:pressed{
     color:#242424;
     background-color: #858585;
 }
-SARibbonToolButton::checked{
+SARibbonToolButton:checked{
     color:#242424;
     background-color: #9b9b9b;
 }
-SARibbonToolButton::hover {
+SARibbonToolButton:hover {
     color:#242424;
     background-color: #a0a0a0;
 }
@@ -149,14 +153,14 @@ SARibbonControlButton{
   border: none;
   color:#242424;
 }
-SARibbonControlButton::pressed{
+SARibbonControlButton:pressed{
   background-color: #858585;
 }
-SARibbonControlButton::checked{
+SARibbonControlButton:checked{
   border: 0.05em solid #888888;
   background-color: #9b9b9b;
 }
-SARibbonControlButton::hover {
+SARibbonControlButton:hover {
   border: 0.05em solid #888888;
   background-color: #a0a0a0;
  }
@@ -199,7 +203,7 @@ SARibbonPannelOptionButton {
   color:#242424;
 }
 
-SARibbonPannelOptionButton::hover {
+SARibbonPannelOptionButton:hover {
   background-color:#a0a0a0;
 }
 
