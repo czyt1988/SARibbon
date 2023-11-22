@@ -39,7 +39,6 @@ class QuickWindowBorder;
 class FramelessQuickWindow;
 class FRAMELESSHELPER_QUICK_API FramelessQuickWindowPrivate : public QObject
 {
-    Q_OBJECT
     FRAMELESSHELPER_PRIVATE_QT_CLASS(FramelessQuickWindow)
 
 public:

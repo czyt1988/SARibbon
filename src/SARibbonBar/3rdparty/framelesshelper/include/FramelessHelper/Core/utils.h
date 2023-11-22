@@ -81,6 +81,7 @@ namespace Utils
 [[nodiscard]] FRAMELESSHELPER_CORE_API quint32 defaultScreenDpi();
 [[nodiscard]] FRAMELESSHELPER_CORE_API bool isWindowAccelerated(const QWindow *window);
 [[nodiscard]] FRAMELESSHELPER_CORE_API bool isWindowTransparent(const QWindow *window);
+[[nodiscard]] FRAMELESSHELPER_CORE_API QColor calculateForegroundColor(const QColor &backgroundColor);
 
 #ifdef Q_OS_WINDOWS
 [[nodiscard]] FRAMELESSHELPER_CORE_API bool isWindowsVersionOrGreater(const Global::WindowsVersion version);

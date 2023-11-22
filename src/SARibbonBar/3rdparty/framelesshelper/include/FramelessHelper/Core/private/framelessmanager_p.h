@@ -36,7 +36,6 @@ using FramelessDataPtr = std::shared_ptr<FramelessData>;
 class FramelessManager;
 class FRAMELESSHELPER_CORE_API FramelessManagerPrivate : public QObject
 {
-    Q_OBJECT
     FRAMELESSHELPER_PRIVATE_QT_CLASS(FramelessManager)
 
 public:
@@ -72,6 +71,21 @@ public:
     Global::WallpaperAspectStyle wallpaperAspectStyle = Global::WallpaperAspectStyle::Fill;
     QTimer themeTimer{};
     QTimer wallpaperTimer{};
+};
+
+class InternalEventFilter : public QObject
+{
+    FRAMELESSHELPER_QT_CLASS(InternalEventFilter)
+
+public:
+    explicit InternalEventFilter(const QObject *window, QObject *parent = nullptr);
+    ~InternalEventFilter() override;
+
+protected:
+    Q_NODISCARD bool eventFilter(QObject *object, QEvent *event) override;
+
+private:
+    const QObject *m_window = nullptr;
 };
 
 FRAMELESSHELPER_END_NAMESPACE

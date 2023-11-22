@@ -35,7 +35,6 @@ FRAMELESSHELPER_BEGIN_NAMESPACE
 
 class FRAMELESSHELPER_QUICK_API FramelessQuickUtils : public QObject, public QQmlParserStatus
 {
-    Q_OBJECT
     FRAMELESSHELPER_QT_CLASS(FramelessQuickUtils)
     Q_INTERFACES(QQmlParserStatus)
 #ifdef QML_NAMED_ELEMENT
@@ -56,6 +55,7 @@ class FRAMELESSHELPER_QUICK_API FramelessQuickUtils : public QObject, public QQm
     Q_PROPERTY(QSizeF defaultSystemButtonIconSize READ defaultSystemButtonIconSize CONSTANT FINAL)
     Q_PROPERTY(QColor defaultSystemButtonBackgroundColor READ defaultSystemButtonBackgroundColor CONSTANT FINAL)
     Q_PROPERTY(QColor defaultSystemCloseButtonBackgroundColor READ defaultSystemCloseButtonBackgroundColor CONSTANT FINAL)
+    Q_PROPERTY(bool blurBehindWindowSupported READ blurBehindWindowSupported CONSTANT FINAL)
 
 public:
     explicit FramelessQuickUtils(QObject *parent = nullptr);
@@ -74,6 +74,7 @@ public:
     Q_NODISCARD QSizeF defaultSystemButtonIconSize() const;
     Q_NODISCARD QColor defaultSystemButtonBackgroundColor() const;
     Q_NODISCARD QColor defaultSystemCloseButtonBackgroundColor() const;
+    Q_NODISCARD bool blurBehindWindowSupported() const;
 
     Q_NODISCARD Q_SLOT QColor getSystemButtonBackgroundColor(
         const QuickGlobal::SystemButtonType button, const QuickGlobal::ButtonState state);

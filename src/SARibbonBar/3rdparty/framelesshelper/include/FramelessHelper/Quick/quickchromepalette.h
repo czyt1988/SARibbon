@@ -34,7 +34,6 @@ FRAMELESSHELPER_BEGIN_NAMESPACE
 
 class FRAMELESSHELPER_QUICK_API QuickChromePalette : public ChromePalette, public QQmlParserStatus
 {
-    Q_OBJECT
     FRAMELESSHELPER_QT_CLASS(QuickChromePalette)
     Q_INTERFACES(QQmlParserStatus)
 #ifdef QML_ANONYMOUS

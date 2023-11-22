@@ -9,6 +9,19 @@ find_package(Qt${QT_VERSION_MAJOR} 5.8 COMPONENTS Core Gui Widgets REQUIRED)
 
 # 在加载qt版本后，需要下面这段开判断是否使用framelss
 # 根据qt版本选择是否使用frameless库，目前frameless库支持qt5.14,qt5.15,qt6.4+,除了上诉版本，都使用不了
+function(setup_custom_moc_macros)
+    cmake_parse_arguments(arg "" "" "TARGETS" ${ARGN})
+    if(arg_UNPARSED_ARGUMENTS)
+        message(AUTHOR_WARNING "setup_custom_moc_macros: Unrecognized arguments: ${arg_UNPARSED_ARGUMENTS}")
+    endif()
+    foreach(__target ${arg_TARGETS})
+        if(NOT TARGET ${__target})
+            message(AUTHOR_WARNING "${__target} is not a valid CMake target!")
+            continue()
+        endif()
+        set_property(TARGET ${__target} APPEND PROPERTY AUTOMOC_MACRO_NAMES "FRAMELESSHELPER_QT_CLASS;FRAMELESSHELPER_PUBLIC_QT_CLASS;FRAMELESSHELPER_PRIVATE_QT_CLASS")
+    endforeach()
+endfunction()
 if(${QT_VERSION_MAJOR} EQUAL 5)
     # qt版本为5，判断是否小版本大于14
     if(${QT_VERSION_MINOR} GREATER_EQUAL 14)
@@ -31,6 +44,8 @@ if(SARIBBON_USE_FRAMELESS_LIB)
     add_definitions(-DSARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1)
     # 显示定义FRAMELESSHELPER_FEATURE_static_build为-1 否则库引用会失败
     add_definitions(-DFRAMELESSHELPER_FEATURE_static_build=-1)
+
+    setup_custom_moc_macros(TARGETS ${SARIBBON_EXPAMPLE_NAME})
 else()
     #不使用frameless必须设置SARIBBON_USE_3RDPARTY_FRAMELESSHELPER宏为0
     add_definitions(-DSARIBBON_USE_3RDPARTY_FRAMELESSHELPER=0)

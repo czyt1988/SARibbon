@@ -7,6 +7,20 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 #################################################
 # frameless库https://github.com/wangwenx190/framelesshelper
 #################################################
+function(setup_custom_moc_macros)
+    cmake_parse_arguments(arg "" "" "TARGETS" ${ARGN})
+    if(arg_UNPARSED_ARGUMENTS)
+        message(AUTHOR_WARNING "setup_custom_moc_macros: Unrecognized arguments: ${arg_UNPARSED_ARGUMENTS}")
+    endif()
+    foreach(__target ${arg_TARGETS})
+        if(NOT TARGET ${__target})
+            message(AUTHOR_WARNING "${__target} is not a valid CMake target!")
+            continue()
+        endif()
+        set_property(TARGET ${__target} APPEND PROPERTY AUTOMOC_MACRO_NAMES "FRAMELESSHELPER_QT_CLASS;FRAMELESSHELPER_PUBLIC_QT_CLASS;FRAMELESSHELPER_PRIVATE_QT_CLASS")
+    endforeach()
+endfunction()
+
 if(SARIBBON_USE_FRAMELESS_LIB)
     if(UNIX AND NOT APPLE)
         # Qt X11Extras is only available in Qt5.
@@ -143,13 +157,13 @@ if(SARIBBON_USE_FRAMELESS_LIB)
         ${FRAMELESS_SOURCE_DIR_WIDGETS}/framelesshelperwidgets_global.cpp
         ${FRAMELESS_SOURCE_DIR_WIDGETS}/framelessdialog.cpp
     )
-	# 把所有FRAMELESS相关的库合并到一起
-        SET(FRAMELESS_HEADER_FILES ${FRAMELESS_CORE_CONFIG_HEADER_FILES})
-        list(APPEND FRAMELESS_HEADER_FILES ${FRAMELESS_CORE_HEADER_FILES})
-        list(APPEND FRAMELESS_HEADER_FILES ${FRAMELESS_WIDGETS_HEADER_FILES})
-        SET(FRAMELESS_SOURCE_FILES ${FRAMELESS_CORE_SOURCE_FILES})
-        list(APPEND FRAMELESS_SOURCE_FILES ${FRAMELESS_WIDGETS_SOURCE_FILES})
-        SET(FRAMELESS_RESOURCE_FILES ${FRAMELESS_CORE_RESOURCES_FILES})
+    # 把所有FRAMELESS相关的库合并到一起
+    SET(FRAMELESS_HEADER_FILES ${FRAMELESS_CORE_CONFIG_HEADER_FILES})
+    list(APPEND FRAMELESS_HEADER_FILES ${FRAMELESS_CORE_HEADER_FILES})
+    list(APPEND FRAMELESS_HEADER_FILES ${FRAMELESS_WIDGETS_HEADER_FILES})
+    SET(FRAMELESS_SOURCE_FILES ${FRAMELESS_CORE_SOURCE_FILES})
+    list(APPEND FRAMELESS_SOURCE_FILES ${FRAMELESS_WIDGETS_SOURCE_FILES})
+    SET(FRAMELESS_RESOURCE_FILES ${FRAMELESS_CORE_RESOURCES_FILES})
 endif()
 #################################################
 # SAColorWidgets相关
@@ -278,6 +292,7 @@ if(SARIBBON_USE_FRAMELESS_LIB)
         ${FRAMELESS_SOURCE_FILES}
         ${FRAMELESS_RESOURCE_FILES}
     )
+    setup_custom_moc_macros(TARGETS ${SARIBBONBAR_LIB_NAME})
 else()
     add_library(${SARIBBONBAR_LIB_NAME} SHARED
         ${SARIBBON_HEADER_FILES}

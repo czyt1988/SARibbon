@@ -240,6 +240,9 @@ void QuickStandardSystemButton::updateColor()
         if (!hover && !active && m_inactiveForegroundColor.isValid()) {
             return m_inactiveForegroundColor;
         }
+        if ((m_buttonType == QuickGlobal::SystemButtonType::Close) && hover) {
+            return kDefaultWhiteColor;
+        }
         if (m_activeForegroundColor.isValid()) {
             return m_activeForegroundColor;
         }

@@ -93,16 +93,7 @@ void ChromePalettePrivate::refresh()
     titleBarInactiveBackgroundColor_sys = (dark ? kDefaultSystemDarkColor : kDefaultWhiteColor);
     titleBarActiveForegroundColor_sys = [this, dark, colorized]() -> QColor {
         if (dark || colorized) {
-            // Calculate the most appropriate foreground color, based on the
-            // current background color.
-            const qreal grayF = (
-                (qreal(0.299) * titleBarActiveBackgroundColor_sys.redF()) +
-                (qreal(0.587) * titleBarActiveBackgroundColor_sys.greenF()) +
-                (qreal(0.114) * titleBarActiveBackgroundColor_sys.blueF()));
-            static constexpr const auto kFlag = qreal(0.5);
-            if ((grayF < kFlag) || qFuzzyCompare(grayF, kFlag)) {
-                return kDefaultWhiteColor;
-            }
+            return Utils::calculateForegroundColor(titleBarActiveBackgroundColor_sys);
         }
         return kDefaultBlackColor;
     }();
