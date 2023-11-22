@@ -44,7 +44,6 @@ class QuickWindowBorder;
 class FramelessQuickHelper;
 class FRAMELESSHELPER_QUICK_API FramelessQuickHelperPrivate : public QObject
 {
-    Q_OBJECT
     FRAMELESSHELPER_PRIVATE_QT_CLASS(FramelessQuickHelper)
 
 public:
@@ -87,7 +86,6 @@ public:
     bool qpaReady = false;
     quint32 qpaWaitTime = 0;
     QTimer repaintTimer{};
-    bool repaintedOnce = false;
 };
 
 FRAMELESSHELPER_END_NAMESPACE

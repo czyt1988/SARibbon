@@ -36,7 +36,6 @@ FRAMELESSHELPER_BEGIN_NAMESPACE
 class FramelessQuickApplicationWindowPrivate;
 class FRAMELESSHELPER_QUICK_API FramelessQuickApplicationWindow : public QQuickApplicationWindow
 {
-    Q_OBJECT
     FRAMELESSHELPER_PUBLIC_QT_CLASS(FramelessQuickApplicationWindow)
 #ifdef QML_NAMED_ELEMENT
     QML_NAMED_ELEMENT(FramelessApplicationWindow)

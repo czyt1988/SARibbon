@@ -222,7 +222,6 @@ private:
 
 class NSWindowProxy : public QObject
 {
-    Q_OBJECT
     FRAMELESSHELPER_QT_CLASS(NSWindowProxy)
 
 public:
@@ -254,7 +253,6 @@ public:
     }
 
 public Q_SLOTS:
-
     void replaceImplementations()
     {
         Method method = class_getInstanceMethod(windowClass, @selector(setStyleMask:));
@@ -516,7 +514,6 @@ private:
 };
 
 using MacUtilsData = QHash<WId, NSWindowProxy *>;
-
 Q_GLOBAL_STATIC(MacUtilsData, g_macUtilsData);
 
 [[nodiscard]] static inline NSWindow *mac_getNSWindow(const WId windowId)

@@ -26,15 +26,29 @@
 
 #include <FramelessHelper/Core/framelesshelpercore_global.h>
 #include <QtGui/qbrush.h>
+#ifdef FRAMELESSHELPER_HAS_THREAD
+#  undef FRAMELESSHELPER_HAS_THREAD
+#endif
+#if QT_CONFIG(thread)
+#  define FRAMELESSHELPER_HAS_THREAD 1
+#  include <QtCore/qthread.h>
+#else // !QT_CONFIG(thread)
+#  define FRAMELESSHELPER_HAS_THREAD 0
+#endif // QT_CONFIG(thread)
 
 #if FRAMELESSHELPER_CONFIG(mica_material)
 
 FRAMELESSHELPER_BEGIN_NAMESPACE
 
+#if FRAMELESSHELPER_HAS_THREAD
+using FramelessHelperThreadClass = QThread;
+#else
+using FramelessHelperThreadClass = QObject;
+#endif
+
 class MicaMaterial;
 class FRAMELESSHELPER_CORE_API MicaMaterialPrivate : public QObject
 {
-    Q_OBJECT
     FRAMELESSHELPER_PRIVATE_QT_CLASS(MicaMaterial)
 
 public:
@@ -62,6 +76,26 @@ public:
     QBrush micaBrush = {};
     bool initialized = false;
     QSize wallpaperSize = {};
+};
+
+class WallpaperThread : public FramelessHelperThreadClass
+{
+    FRAMELESSHELPER_QT_CLASS(WallpaperThread)
+
+public:
+    explicit WallpaperThread(QObject *parent = nullptr);
+    ~WallpaperThread() override;
+
+Q_SIGNALS:
+    void imageUpdated();
+
+#if FRAMELESSHELPER_HAS_THREAD
+protected:
+    void run() override;
+#else
+public:
+    void start();
+#endif
 };
 
 FRAMELESSHELPER_END_NAMESPACE

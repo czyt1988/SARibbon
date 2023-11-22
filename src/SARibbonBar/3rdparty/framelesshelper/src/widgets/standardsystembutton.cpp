@@ -305,12 +305,13 @@ void StandardSystemButton::paintEvent(QPaintEvent *event)
     painter.save();
     painter.setRenderHints(QPainter::Antialiasing | QPainter::TextAntialiasing
                            | QPainter::SmoothPixmapTransform);
-    const auto backgroundColor = [this, d]() -> QColor {
+    const bool isHovering = underMouse();
+    const auto backgroundColor = [isHovering, d, this]() -> QColor {
         // The pressed state has higher priority than the hovered state.
         if (isDown() && d->pressColor.isValid()) {
             return d->pressColor;
         }
-        if (underMouse() && d->hoverColor.isValid()) {
+        if (isHovering && d->hoverColor.isValid()) {
             return d->hoverColor;
         }
         if (d->normalColor.isValid()) {
@@ -323,9 +324,12 @@ void StandardSystemButton::paintEvent(QPaintEvent *event)
         painter.fillRect(buttonRect, backgroundColor);
     }
     if (!d->glyph.isEmpty()) {
-        painter.setPen([this, d]() -> QColor {
-            if (!underMouse() && !d->active && d->inactiveForegroundColor.isValid()) {
+        painter.setPen([isHovering, d]() -> QColor {
+            if (!isHovering && !d->active && d->inactiveForegroundColor.isValid()) {
                 return d->inactiveForegroundColor;
+            }
+            if ((d->buttonType == SystemButtonType::Close) && isHovering) {
+                return kDefaultWhiteColor;
             }
             if (d->activeForegroundColor.isValid()) {
                 return d->activeForegroundColor;

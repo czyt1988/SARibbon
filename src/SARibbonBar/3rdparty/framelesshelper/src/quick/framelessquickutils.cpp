@@ -131,6 +131,11 @@ QColor FramelessQuickUtils::defaultSystemCloseButtonBackgroundColor() const
     return kDefaultSystemCloseButtonBackgroundColor;
 }
 
+bool FramelessQuickUtils::blurBehindWindowSupported() const
+{
+    return Utils::isBlurBehindWindowSupported();
+}
+
 QColor FramelessQuickUtils::getSystemButtonBackgroundColor(const QuickGlobal::SystemButtonType button,
                                                            const QuickGlobal::ButtonState state)
 {

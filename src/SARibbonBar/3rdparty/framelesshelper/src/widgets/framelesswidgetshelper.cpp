@@ -71,7 +71,7 @@ FRAMELESSHELPER_BEGIN_NAMESPACE
 
 using namespace Global;
 
-static constexpr const auto kRepaintTimerInterval = 500;
+static constexpr const auto kRepaintTimerInterval = 300;
 
 struct FramelessWidgetsHelperExtraData : public FramelessExtraData
 {
@@ -378,17 +378,13 @@ void FramelessWidgetsHelperPrivate::repaintAllChildren()
 void FramelessWidgetsHelperPrivate::doRepaintAllChildren()
 {
     repaintTimer.stop();
-    if (repaintedOnce) {
-        if (!window) {
-            return;
-        }
-        forceWidgetRepaint(window);
-        const QList<QWidget *> widgets = window->findChildren<QWidget *>();
-        for (auto &&widget : std::as_const(widgets)) {
-            forceWidgetRepaint(widget);
-        }
-    } else {
-        repaintedOnce = true;
+    if (!window) {
+        return;
+    }
+    forceWidgetRepaint(window);
+    const QList<QWidget *> widgets = window->findChildren<QWidget *>();
+    for (auto &&widget : std::as_const(widgets)) {
+        forceWidgetRepaint(widget);
     }
 }
 
@@ -655,6 +651,9 @@ bool FramelessWidgetsHelperPrivate::shouldIgnoreMouseEvents(const QPoint &pos) c
         return false;
     }
     const auto withinFrameBorder = [this, &pos]() -> bool {
+        if (isWidgetFixedSize(window)) {
+            return false;
+        }
         if (pos.y() < kDefaultResizeBorderThickness) {
             return true;
         }

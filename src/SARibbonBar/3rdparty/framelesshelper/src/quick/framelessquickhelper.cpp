@@ -72,7 +72,7 @@ FRAMELESSHELPER_BEGIN_NAMESPACE
 
 using namespace Global;
 
-static constexpr const auto kRepaintTimerInterval = 500;
+static constexpr const auto kRepaintTimerInterval = 300;
 
 struct FramelessQuickHelperExtraData : public FramelessExtraData
 {
@@ -414,42 +414,38 @@ void FramelessQuickHelperPrivate::repaintAllChildren()
 void FramelessQuickHelperPrivate::doRepaintAllChildren()
 {
     repaintTimer.stop();
-    if (repaintedOnce) {
-        Q_Q(const FramelessQuickHelper);
-        QQuickWindow *window = q->window();
-        if (!window) {
-            return;
-        }
-#if (defined(Q_OS_WINDOWS) && (QT_VERSION != QT_VERSION_CHECK(6, 5, 3)) && (QT_VERSION != QT_VERSION_CHECK(6, 6, 0)))
-        // Sync the internal window frame margins with the latest DPI, otherwise
-        // we will get wrong window sizes after the DPI change.
-        std::ignore = Utils::updateInternalWindowFrameMargins(window, true);
-#endif // Q_OS_WINDOWS
-        // No need to repaint the window when it's hidden.
-        if (!window->isVisible()) {
-            return;
-        }
-        if (!((window->windowState() & (Qt::WindowMinimized | Qt::WindowMaximized | Qt::WindowFullScreen)) || q->isWindowFixedSize())) {
-            const QSize originalSize = window->size();
-            static constexpr const auto margins = QMargins{ 1, 1, 1, 1 };
-            window->resize(originalSize.shrunkBy(margins));
-            window->resize(originalSize.grownBy(margins));
-            window->resize(originalSize);
-        }
-        window->requestUpdate();
-#if 0 // Calling QWindow::requestUpdate() should be enough.
-        const QList<QQuickItem *> items = window->findChildren<QQuickItem *>();
-        for (auto &&item : std::as_const(items)) {
-            // Only items with the "QQuickItem::ItemHasContents" flag enabled are allowed to call "update()".
-            // And don't repaint the item if it's hidden.
-            if ((item->flags() & QQuickItem::ItemHasContents) && item->isVisible()) {
-                item->update();
-            }
-        }
-#endif
-    } else {
-        repaintedOnce = true;
+    Q_Q(const FramelessQuickHelper);
+    QQuickWindow *window = q->window();
+    if (!window) {
+        return;
     }
+#if (defined(Q_OS_WINDOWS) && (QT_VERSION != QT_VERSION_CHECK(6, 5, 3)) && (QT_VERSION != QT_VERSION_CHECK(6, 6, 0)))
+    // Sync the internal window frame margins with the latest DPI, otherwise
+    // we will get wrong window sizes after the DPI change.
+    std::ignore = Utils::updateInternalWindowFrameMargins(window, true);
+#endif // Q_OS_WINDOWS
+    // No need to repaint the window when it's hidden.
+    if (!window->isVisible()) {
+        return;
+    }
+    if (!((window->windowState() & (Qt::WindowMinimized | Qt::WindowMaximized | Qt::WindowFullScreen)) || q->isWindowFixedSize())) {
+        const QSize originalSize = window->size();
+        static constexpr const auto margins = QMargins{ 1, 1, 1, 1 };
+        window->resize(originalSize.shrunkBy(margins));
+        window->resize(originalSize.grownBy(margins));
+        window->resize(originalSize);
+    }
+    window->requestUpdate();
+#if 0 // Calling QWindow::requestUpdate() should be enough.
+    const QList<QQuickItem *> items = window->findChildren<QQuickItem *>();
+    for (auto &&item : std::as_const(items)) {
+        // Only items with the "QQuickItem::ItemHasContents" flag enabled are allowed to call "update()".
+        // And don't repaint the item if it's hidden.
+        if ((item->flags() & QQuickItem::ItemHasContents) && item->isVisible()) {
+            item->update();
+        }
+    }
+#endif
 }
 
 quint32 FramelessQuickHelperPrivate::readyWaitTime() const
@@ -594,7 +590,10 @@ bool FramelessQuickHelperPrivate::shouldIgnoreMouseEvents(const QPoint &pos) con
     if (!window) {
         return false;
     }
-    const auto withinFrameBorder = [&pos, window]() -> bool {
+    const auto withinFrameBorder = [q, &pos, window]() -> bool {
+        if (q->isWindowFixedSize()) {
+            return false;
+        }
         if (pos.y() < kDefaultResizeBorderThickness) {
             return true;
         }

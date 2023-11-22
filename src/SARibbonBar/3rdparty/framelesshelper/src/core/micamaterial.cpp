@@ -27,13 +27,6 @@
 
 #if FRAMELESSHELPER_CONFIG(mica_material)
 
-#if QT_CONFIG(thread)
-#  define FRAMELESSHELPER_HAS_THREAD
-  using FramelessHelperThreadClass = QThread;
-#else
-  using FramelessHelperThreadClass = QObject;
-#endif
-
 #include "framelessmanager.h"
 #include "utils.h"
 #include "framelessconfig_p.h"
@@ -42,9 +35,8 @@
 #include <memory>
 #include <QtCore/qsysinfo.h>
 #include <QtCore/qloggingcategory.h>
-#ifdef FRAMELESSHELPER_HAS_THREAD
+#if FRAMELESSHELPER_HAS_THREAD
 #  include <QtCore/qmutex.h>
-#  include <QtCore/qthread.h>
 #endif
 #include <QtGui/qpixmap.h>
 #include <QtGui/qimage.h>
@@ -89,7 +81,7 @@ struct ImageData
 {
     QPixmap blurredWallpaper = {};
     bool graphicsResourcesReady = false;
-#ifdef FRAMELESSHELPER_HAS_THREAD
+#if FRAMELESSHELPER_HAS_THREAD
     QMutex mutex{};
 #endif
 };
@@ -490,127 +482,118 @@ static inline void expblur(QImage &img, qreal radius, const bool improvedQuality
     return {x, y, w, h};
 }
 
-class WallpaperThread : public FramelessHelperThreadClass
+WallpaperThread::WallpaperThread(QObject *parent) : FramelessHelperThreadClass(parent)
 {
-    Q_OBJECT
-    FRAMELESSHELPER_QT_CLASS(WallpaperThread)
+}
 
-public:
-    explicit WallpaperThread(QObject *parent = nullptr) : FramelessHelperThreadClass(parent) {}
-    ~WallpaperThread() override = default;
+WallpaperThread::~WallpaperThread() = default;
 
-Q_SIGNALS:
-    void imageUpdated();
-
-#ifdef FRAMELESSHELPER_HAS_THREAD
-protected:
-    void run() override
+#if FRAMELESSHELPER_HAS_THREAD
+void WallpaperThread::run()
 #else
-public:
-    void start()
+void WallpaperThread::start()
 #endif
-    {
-        const QString wallpaperFilePath = Utils::getWallpaperFilePath();
-        if (wallpaperFilePath.isEmpty()) {
-            WARNING << "Failed to retrieve the wallpaper file path.";
-            return;
-        }
-        // QImageReader allows us read the image size before we actually loading it, this behavior
-        // can help us avoid consume too much memory if the image resolution is very large, eg, 4K.
-        QImageReader reader(wallpaperFilePath);
-        if (!reader.canRead()) {
-            WARNING << "Qt can't read the wallpaper file:" << reader.errorString();
-            return;
-        }
-        const QSize actualSize = reader.size();
-        if (actualSize.isEmpty()) {
-            WARNING << "The wallpaper picture size is invalid.";
-            return;
-        }
-        const QSize correctedSize = (actualSize > kMaximumPictureSize ? kMaximumPictureSize : actualSize);
-        if (correctedSize != actualSize) {
-            DEBUG << "The wallpaper picture size is greater than 1920x1080, it will be shrinked to reduce memory consumption.";
-            reader.setScaledSize(correctedSize);
-        }
-        QImage image(correctedSize, kDefaultImageFormat);
-        if (!reader.read(&image)) {
-            WARNING << "Failed to read the wallpaper image:" << reader.errorString();
-            return;
-        }
-        if (image.isNull()) {
-            WARNING << "The obtained image data is null.";
-            return;
-        }
-        WallpaperAspectStyle aspectStyle = Utils::getWallpaperAspectStyle();
-        const QSize wallpaperSize = QGuiApplication::primaryScreen()->size();
-        QImage buffer(wallpaperSize, kDefaultImageFormat);
-#ifdef Q_OS_WINDOWS
-        if (aspectStyle == WallpaperAspectStyle::Center) {
-            buffer.fill(kDefaultBlackColor);
-        }
-#endif
-        if ((aspectStyle == WallpaperAspectStyle::Stretch)
-            || (aspectStyle == WallpaperAspectStyle::Fit)
-            || (aspectStyle == WallpaperAspectStyle::Fill)) {
-            Qt::AspectRatioMode mode = Qt::KeepAspectRatioByExpanding;
-            if (aspectStyle == WallpaperAspectStyle::Stretch) {
-                mode = Qt::IgnoreAspectRatio;
-            } else if (aspectStyle == WallpaperAspectStyle::Fit) {
-                mode = Qt::KeepAspectRatio;
-            }
-            QSize newSize = image.size();
-            newSize.scale(wallpaperSize, mode);
-            image = image.scaled(newSize);
-        }
-        static constexpr const QPoint desktopOriginPoint = {0, 0};
-        const QRect desktopRect = {desktopOriginPoint, wallpaperSize};
-        if (aspectStyle == WallpaperAspectStyle::Tile) {
-            QPainter bufferPainter(&buffer);
-            // Same as above, we prefer speed than quality here.
-            bufferPainter.setRenderHint(QPainter::Antialiasing, false);
-            bufferPainter.setRenderHint(QPainter::TextAntialiasing, false);
-            bufferPainter.setRenderHint(QPainter::SmoothPixmapTransform, false);
-            bufferPainter.fillRect(desktopRect, QBrush(image));
-        } else {
-            QPainter bufferPainter(&buffer);
-            // Same here.
-            bufferPainter.setRenderHint(QPainter::Antialiasing, false);
-            bufferPainter.setRenderHint(QPainter::TextAntialiasing, false);
-            bufferPainter.setRenderHint(QPainter::SmoothPixmapTransform, false);
-            const QRect rect = alignedRect(Qt::LeftToRight, Qt::AlignCenter, image.size(), desktopRect);
-            bufferPainter.drawImage(rect.topLeft(), image);
-        }
-        {
-#ifdef FRAMELESSHELPER_HAS_THREAD
-            const QMutexLocker locker(&g_imageData()->mutex);
-#endif
-            g_imageData()->blurredWallpaper = QPixmap(wallpaperSize);
-            g_imageData()->blurredWallpaper.fill(kDefaultTransparentColor);
-            QPainter painter(&g_imageData()->blurredWallpaper);
-            // Same here.
-            painter.setRenderHint(QPainter::Antialiasing, false);
-            painter.setRenderHint(QPainter::TextAntialiasing, false);
-            painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
-#if FRAMELESSHELPER_CONFIG(private_qt)
-            qt_blurImage(&painter, buffer, kDefaultBlurRadius, false, false);
-#else // !FRAMELESSHELPER_CONFIG(private_qt)
-            painter.drawImage(desktopOriginPoint, buffer);
-#endif // FRAMELESSHELPER_CONFIG(private_qt)
-        }
-        Q_EMIT imageUpdated();
+{
+    const QString wallpaperFilePath = Utils::getWallpaperFilePath();
+    if (wallpaperFilePath.isEmpty()) {
+        WARNING << "Failed to retrieve the wallpaper file path.";
+        return;
     }
-};
+    // QImageReader allows us read the image size before we actually loading it, this behavior
+    // can help us avoid consume too much memory if the image resolution is very large, eg, 4K.
+    QImageReader reader(wallpaperFilePath);
+    if (!reader.canRead()) {
+        WARNING << "Qt can't read the wallpaper file:" << reader.errorString();
+        return;
+    }
+    const QSize actualSize = reader.size();
+    if (actualSize.isEmpty()) {
+        WARNING << "The wallpaper picture size is invalid.";
+        return;
+    }
+    const QSize correctedSize = (actualSize > kMaximumPictureSize ? kMaximumPictureSize : actualSize);
+    if (correctedSize != actualSize) {
+        DEBUG << "The wallpaper picture size is greater than 1920x1080, it will be shrinked to reduce memory consumption.";
+        reader.setScaledSize(correctedSize);
+    }
+    QImage image(correctedSize, kDefaultImageFormat);
+    if (!reader.read(&image)) {
+        WARNING << "Failed to read the wallpaper image:" << reader.errorString();
+        return;
+    }
+    if (image.isNull()) {
+        WARNING << "The obtained image data is null.";
+        return;
+    }
+    WallpaperAspectStyle aspectStyle = Utils::getWallpaperAspectStyle();
+    const QSize wallpaperSize = QGuiApplication::primaryScreen()->size();
+    QImage buffer(wallpaperSize, kDefaultImageFormat);
+#ifdef Q_OS_WINDOWS
+    if (aspectStyle == WallpaperAspectStyle::Center) {
+        buffer.fill(kDefaultBlackColor);
+    }
+#endif
+    if ((aspectStyle == WallpaperAspectStyle::Stretch)
+        || (aspectStyle == WallpaperAspectStyle::Fit)
+        || (aspectStyle == WallpaperAspectStyle::Fill)) {
+        Qt::AspectRatioMode mode = Qt::KeepAspectRatioByExpanding;
+        if (aspectStyle == WallpaperAspectStyle::Stretch) {
+            mode = Qt::IgnoreAspectRatio;
+        } else if (aspectStyle == WallpaperAspectStyle::Fit) {
+            mode = Qt::KeepAspectRatio;
+        }
+        QSize newSize = image.size();
+        newSize.scale(wallpaperSize, mode);
+        image = image.scaled(newSize);
+    }
+    static constexpr const QPoint desktopOriginPoint = {0, 0};
+    const QRect desktopRect = {desktopOriginPoint, wallpaperSize};
+    if (aspectStyle == WallpaperAspectStyle::Tile) {
+        QPainter bufferPainter(&buffer);
+        // Same as above, we prefer speed than quality here.
+        bufferPainter.setRenderHint(QPainter::Antialiasing, false);
+        bufferPainter.setRenderHint(QPainter::TextAntialiasing, false);
+        bufferPainter.setRenderHint(QPainter::SmoothPixmapTransform, false);
+        bufferPainter.fillRect(desktopRect, QBrush(image));
+    } else {
+        QPainter bufferPainter(&buffer);
+        // Same here.
+        bufferPainter.setRenderHint(QPainter::Antialiasing, false);
+        bufferPainter.setRenderHint(QPainter::TextAntialiasing, false);
+        bufferPainter.setRenderHint(QPainter::SmoothPixmapTransform, false);
+        const QRect rect = alignedRect(Qt::LeftToRight, Qt::AlignCenter, image.size(), desktopRect);
+        bufferPainter.drawImage(rect.topLeft(), image);
+    }
+    {
+#if FRAMELESSHELPER_HAS_THREAD
+        const QMutexLocker locker(&g_imageData()->mutex);
+#endif
+        g_imageData()->blurredWallpaper = QPixmap(wallpaperSize);
+        g_imageData()->blurredWallpaper.fill(kDefaultTransparentColor);
+        QPainter painter(&g_imageData()->blurredWallpaper);
+        // Same here.
+        painter.setRenderHint(QPainter::Antialiasing, false);
+        painter.setRenderHint(QPainter::TextAntialiasing, false);
+        painter.setRenderHint(QPainter::SmoothPixmapTransform, false);
+#if FRAMELESSHELPER_CONFIG(private_qt)
+        qt_blurImage(&painter, buffer, kDefaultBlurRadius, false, false);
+#else // !FRAMELESSHELPER_CONFIG(private_qt)
+        painter.drawImage(desktopOriginPoint, buffer);
+#endif // FRAMELESSHELPER_CONFIG(private_qt)
+    }
+    Q_EMIT imageUpdated();
+}
 
 struct ThreadData
 {
     std::unique_ptr<WallpaperThread> thread = nullptr;
-#ifdef FRAMELESSHELPER_HAS_THREAD
+#if FRAMELESSHELPER_HAS_THREAD
     QMutex mutex{};
 #endif
 };
 Q_GLOBAL_STATIC(ThreadData, g_threadData)
 
-#ifdef FRAMELESSHELPER_HAS_THREAD
+#if FRAMELESSHELPER_HAS_THREAD
 static inline void threadCleaner()
 {
     const QMutexLocker locker(&g_threadData()->mutex);
@@ -654,16 +637,16 @@ const MicaMaterialPrivate *MicaMaterialPrivate::get(const MicaMaterial *q)
 
 void MicaMaterialPrivate::maybeGenerateBlurredWallpaper(const bool force)
 {
-#ifdef FRAMELESSHELPER_HAS_THREAD
+#if FRAMELESSHELPER_HAS_THREAD
     g_imageData()->mutex.lock();
 #endif
     if (!g_imageData()->blurredWallpaper.isNull() && !force) {
-#ifdef FRAMELESSHELPER_HAS_THREAD
+#if FRAMELESSHELPER_HAS_THREAD
         g_imageData()->mutex.unlock();
 #endif
         return;
     }
-#ifdef FRAMELESSHELPER_HAS_THREAD
+#if FRAMELESSHELPER_HAS_THREAD
     g_imageData()->mutex.unlock();
     const QMutexLocker locker(&g_threadData()->mutex);
     if (g_threadData()->thread->isRunning()) {
@@ -714,12 +697,12 @@ void MicaMaterialPrivate::forceRebuildWallpaper()
 
 void MicaMaterialPrivate::initialize()
 {
-#ifdef FRAMELESSHELPER_HAS_THREAD
+#if FRAMELESSHELPER_HAS_THREAD
     g_threadData()->mutex.lock();
 #endif
     if (!g_threadData()->thread) {
         g_threadData()->thread = std::make_unique<WallpaperThread>();
-#ifdef FRAMELESSHELPER_HAS_THREAD
+#if FRAMELESSHELPER_HAS_THREAD
         qAddPostRoutine(threadCleaner);
 #endif
     }
@@ -729,7 +712,7 @@ void MicaMaterialPrivate::initialize()
             Q_EMIT q->shouldRedraw();
         }
     });
-#ifdef FRAMELESSHELPER_HAS_THREAD
+#if FRAMELESSHELPER_HAS_THREAD
     g_threadData()->mutex.unlock();
 #endif
 
@@ -759,17 +742,17 @@ void MicaMaterialPrivate::initialize()
 
 void MicaMaterialPrivate::prepareGraphicsResources()
 {
-#ifdef FRAMELESSHELPER_HAS_THREAD
+#if FRAMELESSHELPER_HAS_THREAD
     g_imageData()->mutex.lock();
 #endif
     if (g_imageData()->graphicsResourcesReady) {
-#ifdef FRAMELESSHELPER_HAS_THREAD
+#if FRAMELESSHELPER_HAS_THREAD
         g_imageData()->mutex.unlock();
 #endif
         return;
     }
     g_imageData()->graphicsResourcesReady = true;
-#ifdef FRAMELESSHELPER_HAS_THREAD
+#if FRAMELESSHELPER_HAS_THREAD
     g_imageData()->mutex.unlock();
 #endif
     maybeGenerateBlurredWallpaper();
@@ -952,11 +935,11 @@ void MicaMaterial::paint(QPainter *painter, const QRect &rect, const bool active
     painter->setRenderHint(QPainter::SmoothPixmapTransform, false);
     if (active) {
         const QRect intersectedRect = wallpaperRect.intersected(mappedRect);
-#ifdef FRAMELESSHELPER_HAS_THREAD
+#if FRAMELESSHELPER_HAS_THREAD
         g_imageData()->mutex.lock();
 #endif
         painter->drawPixmap(originPoint, g_imageData()->blurredWallpaper, intersectedRect);
-#ifdef FRAMELESSHELPER_HAS_THREAD
+#if FRAMELESSHELPER_HAS_THREAD
         g_imageData()->mutex.unlock();
 #endif
         if (intersectedRect != mappedRect) {
@@ -965,7 +948,7 @@ void MicaMaterial::paint(QPainter *painter, const QRect &rect, const bool active
                 const QRect outerRect = { intersectedRect.topRight() + xOffset, QSize{ mappedRect.width() - intersectedRect.width(), intersectedRect.height() } };
                 const QPoint outerRectOriginPoint = originPoint + QPoint{ intersectedRect.width(), 0 } + xOffset;
                 const QRect mappedOuterRect = d->mapToWallpaper(outerRect);
-#ifdef FRAMELESSHELPER_HAS_THREAD
+#if FRAMELESSHELPER_HAS_THREAD
                 const QMutexLocker locker(&g_imageData()->mutex);
 #endif
                 painter->drawPixmap(outerRectOriginPoint, g_imageData()->blurredWallpaper, mappedOuterRect);
@@ -974,11 +957,11 @@ void MicaMaterial::paint(QPainter *painter, const QRect &rect, const bool active
                 const QRect outerRectBottom = { intersectedRect.bottomLeft() + yOffset, QSize{ intersectedRect.width(), mappedRect.height() - intersectedRect.height() } };
                 const QPoint outerRectBottomOriginPoint = originPoint + QPoint{ 0, intersectedRect.height() } + yOffset;
                 const QRect mappedOuterRectBottom = d->mapToWallpaper(outerRectBottom);
-#ifdef FRAMELESSHELPER_HAS_THREAD
+#if FRAMELESSHELPER_HAS_THREAD
                 g_imageData()->mutex.lock();
 #endif
                 painter->drawPixmap(outerRectBottomOriginPoint, g_imageData()->blurredWallpaper, mappedOuterRectBottom);
-#ifdef FRAMELESSHELPER_HAS_THREAD
+#if FRAMELESSHELPER_HAS_THREAD
                 g_imageData()->mutex.unlock();
 #endif
                 if (mappedRect.x() + mappedRect.width() > wallpaperRect.width()) {
@@ -988,7 +971,7 @@ void MicaMaterial::paint(QPainter *painter, const QRect &rect, const bool active
                     const QRect outerRectCorner = { intersectedRect.bottomRight() + xOffset + yOffset, QSize{ outerRectRight.width(), outerRectBottom.height() } };
                     const QPoint outerRectCornerOriginPoint = originPoint + QPoint{ intersectedRect.width(), intersectedRect.height() } + xOffset + yOffset;
                     const QRect mappedOuterRectCorner = d->mapToWallpaper(outerRectCorner);
-#ifdef FRAMELESSHELPER_HAS_THREAD
+#if FRAMELESSHELPER_HAS_THREAD
                     const QMutexLocker locker(&g_imageData()->mutex);
 #endif
                     painter->drawPixmap(outerRectRightOriginPoint, g_imageData()->blurredWallpaper, mappedOuterRectRight);
@@ -1012,7 +995,5 @@ void MicaMaterial::paint(QPainter *painter, const QRect &rect, const bool active
 }
 
 FRAMELESSHELPER_END_NAMESPACE
-
-#include "micamaterial.moc"
 
 #endif

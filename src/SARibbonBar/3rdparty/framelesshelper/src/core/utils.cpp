@@ -25,6 +25,7 @@
 #include "utils.h"
 #include "framelesshelpercore_global_p.h"
 #include "framelessmanager_p.h"
+#include "framelessmanager.h"
 #ifdef Q_OS_WINDOWS
 #  include "winverhelper_p.h"
 #endif // Q_OS_WINDOWS
@@ -278,25 +279,28 @@ QColor Utils::calculateSystemButtonBackgroundColor(const SystemButtonType button
     if (state == ButtonState::Normal) {
         return kDefaultTransparentColor;
     }
+    const bool isDark = (FramelessManager::instance()->systemTheme() == SystemTheme::Dark);
     const bool isClose = (button == SystemButtonType::Close);
     const bool isTitleColor = isTitleBarColorized();
     const bool isHovered = (state == ButtonState::Hovered);
-    const auto result = [isClose, isTitleColor]() -> QColor {
+    auto result = [isDark, isClose, isTitleColor]() -> QColor {
         if (isClose) {
             return kDefaultSystemCloseButtonBackgroundColor;
         }
         if (isTitleColor) {
-            return getAccentColor();
+            return calculateForegroundColor(getAccentColor());
         }
-        return kDefaultSystemButtonBackgroundColor;
+        return (isDark ? kDefaultWhiteColor : kDefaultBlackColor);
     }();
     if (isClose) {
         return (isHovered ? result.lighter(110) : result.lighter(140));
     }
-    if (!isTitleColor) {
-        return (isHovered ? result.lighter(110) : result);
+    if (isHovered) {
+        result.setAlpha(12);
+    } else {
+        result.setAlpha(6);
     }
-    return (isHovered ? result.lighter(150) : result.lighter(120));
+    return result;
 }
 
 bool Utils::shouldAppsUseDarkMode()
@@ -637,6 +641,28 @@ bool Utils::isWindowTransparent(const QWindow *window)
     // the following check will not be useful. But since this is
     // what the QPA code does, we just mirror it here.
     return window->format().hasAlpha();
+}
+
+QColor Utils::calculateForegroundColor(const QColor &backgroundColor)
+{
+    Q_ASSERT(backgroundColor.isValid());
+    if (!backgroundColor.isValid()) {
+        return kDefaultBlackColor;
+    }
+    static constexpr const auto kFlag = qreal(0.5);
+    if (backgroundColor.alphaF() < kFlag) {
+        return kDefaultBlackColor;
+    }
+    // Calculate the most appropriate foreground color, based on the
+    // current background color.
+    const qreal grayF = (
+        (qreal(0.299) * backgroundColor.redF()) +
+        (qreal(0.587) * backgroundColor.greenF()) +
+        (qreal(0.114) * backgroundColor.blueF()));
+    if ((grayF < kFlag) || qFuzzyCompare(grayF, kFlag)) {
+        return kDefaultWhiteColor;
+    }
+    return kDefaultBlackColor;
 }
 
 FRAMELESSHELPER_END_NAMESPACE

@@ -35,7 +35,6 @@ FRAMELESSHELPER_BEGIN_NAMESPACE
 class QuickMicaMaterialPrivate;
 class FRAMELESSHELPER_QUICK_API QuickMicaMaterial : public QQuickPaintedItem
 {
-    Q_OBJECT
     FRAMELESSHELPER_PUBLIC_QT_CLASS(QuickMicaMaterial)
 #ifdef QML_NAMED_ELEMENT
     QML_NAMED_ELEMENT(MicaMaterial)

@@ -843,23 +843,53 @@ bool FramelessHelperWin::nativeEventFilter(const QByteArray &eventType, void *me
         const auto clientHeight = RECT_HEIGHT(clientRect);
 
         const QPoint qtScenePos = Utils::fromNativeLocalPosition(qWindow, QPoint(nativeLocalPos.x, nativeLocalPos.y));
+
+        const bool isFixedSize = data->callbacks->isWindowFixedSize();
+        const bool isTitleBar = data->callbacks->isInsideTitleBarDraggableArea(qtScenePos);
+        const bool dontOverrideCursor = data->callbacks->getProperty(kDontOverrideCursorVar, false).toBool();
+        const bool dontToggleMaximize = data->callbacks->getProperty(kDontToggleMaximizeVar, false).toBool();
+
+        if (dontToggleMaximize) {
+            static bool warnedOnce = false;
+            if (!warnedOnce) {
+                warnedOnce = true;
+                DEBUG << "To disable window maximization, you should remove the "
+                         "WS_MAXIMIZEBOX style from the window instead. FramelessHelper "
+                         "won't do that for you, so you'll have to do it manually yourself.";
+            }
+        }
+
         SystemButtonType sysButtonType = SystemButtonType::Unknown;
-        if (data->callbacks->isInsideSystemButtons(qtScenePos, &sysButtonType)) {
+        if (!isFixedSize && data->callbacks->isInsideSystemButtons(qtScenePos, &sysButtonType)) {
+            // Firstly, we set the hit test result to a default value to be able to detect whether we
+            // have changed it or not afterwards.
+            *result = HTNOWHERE;
             // Even if the mouse is inside the chrome button area now, we should still allow the user
             // to be able to resize the window with the top or right window border, this is also the
-            // normal behavior of a native Win32 window.
-            static constexpr const int kBorderSize = 2;
-            const bool isTop = (nativeLocalPos.y <= kBorderSize);
-            const bool isRight = (nativeLocalPos.x >= (clientWidth - kBorderSize));
-            if (isTop || isRight) {
-                if (isTop && isRight) {
-                    *result = HTTOPRIGHT;
-                } else if (isTop) {
-                    *result = HTTOP;
-                } else {
-                    *result = HTRIGHT;
+            // normal behavior of a native Win32 window (but only when the window is not maximized/
+            // fullscreened/minimized, of course).
+            if (Utils::isWindowNoState(windowId)) {
+                static constexpr const int kBorderSize = 2;
+                const bool isTop = (nativeLocalPos.y <= kBorderSize);
+                const bool isRight = (nativeLocalPos.x >= (clientWidth - kBorderSize));
+                if (isTop || isRight) {
+                    if (dontOverrideCursor) {
+                        // The user doesn't want the window to be resized, so we tell Windows we are
+                        // in the client area so that the controls beneath the mouse cursor can still
+                        // be hovered or clicked.
+                        *result = (isTitleBar ? HTCAPTION : HTCLIENT);
+                    } else {
+                        if (isTop && isRight) {
+                            *result = HTTOPRIGHT;
+                        } else if (isTop) {
+                            *result = HTTOP;
+                        } else {
+                            *result = HTRIGHT;
+                        }
+                    }
                 }
-            } else {
+            }
+            if (*result == HTNOWHERE) {
                 // OK, we are now really inside one of the chrome buttons, tell Windows the exact role of our button.
                 // The Snap Layout feature introduced in Windows 11 won't work without this.
                 switch (sysButtonType) {
@@ -880,9 +910,13 @@ bool FramelessHelperWin::nativeEventFilter(const QByteArray &eventType, void *me
                     *result = HTCLOSE;
                     break;
                 case SystemButtonType::Unknown:
-                    *result = HTCLIENT; // Normally we'd never enter this branch.
                     break;
                 }
+            }
+            if (*result == HTNOWHERE) {
+                // OK, it seems we are not inside the window resize area, nor inside the chrome buttons,
+                // tell Windows we are in the client area to let Qt handle this event.
+                *result = HTCLIENT;
             }
             return true;
         }
@@ -893,26 +927,16 @@ bool FramelessHelperWin::nativeEventFilter(const QByteArray &eventType, void *me
         const bool full = Utils::isFullScreen(windowId);
         const int frameSizeY = Utils::getResizeBorderThickness(windowId, false, true);
         const bool isTop = (nativeLocalPos.y < frameSizeY);
-        const bool isTitleBar = data->callbacks->isInsideTitleBarDraggableArea(qtScenePos);
-        const bool isFixedSize = data->callbacks->isWindowFixedSize();
-        const bool dontOverrideCursor = data->callbacks->getProperty(kDontOverrideCursorVar, false).toBool();
-        const bool dontToggleMaximize = data->callbacks->getProperty(kDontToggleMaximizeVar, false).toBool();
-
-        if (dontToggleMaximize) {
-            static bool once = false;
-            if (!once) {
-                once = true;
-                DEBUG << "To disable window maximization, you should remove the "
-                         "WS_MAXIMIZEBOX style from the window instead. FramelessHelper "
-                         "won't do that for you, so you'll have to do it manually yourself.";
-            }
-        }
 
         if (frameBorderVisible) {
             // This will handle the left, right and bottom parts of the frame
             // because we didn't change them.
             const LRESULT originalHitTestResult = ::DefWindowProcW(hWnd, WM_NCHITTEST, 0, lParam);
             if (originalHitTestResult != HTCLIENT) {
+                // Even if the window is not resizable, we still can't return HTCLIENT here because
+                // when we enters this code path, it means the mouse cursor is outside of the window,
+                // that is, the three transparent window resize area. Returning HTCLIENT will confuse
+                // Windows and we can't put our controls there anyway.
                 *result = ((isFixedSize || dontOverrideCursor) ? HTBORDER : originalHitTestResult);
                 return true;
             }
@@ -933,7 +957,7 @@ bool FramelessHelperWin::nativeEventFilter(const QByteArray &eventType, void *me
                 // Return HTCLIENT instead of HTBORDER here, because the mouse is
                 // inside our homemade title bar now, return HTCLIENT to let our
                 // title bar can still capture mouse events.
-                *result = ((isFixedSize || dontOverrideCursor) ? HTCLIENT : HTTOP);
+                *result = ((isFixedSize || dontOverrideCursor) ? (isTitleBar ? HTCAPTION : HTCLIENT) : HTTOP);
                 return true;
             }
             if (isTitleBar) {
@@ -962,7 +986,7 @@ bool FramelessHelperWin::nativeEventFilter(const QByteArray &eventType, void *me
                     // Return HTCLIENT instead of HTBORDER here, because the mouse is
                     // inside the window now, return HTCLIENT to let the controls
                     // inside our window can still capture mouse events.
-                    *result = HTCLIENT;
+                    *result = (isTitleBar ? HTCAPTION : HTCLIENT);
                     return true;
                 }
                 if (isTop) {

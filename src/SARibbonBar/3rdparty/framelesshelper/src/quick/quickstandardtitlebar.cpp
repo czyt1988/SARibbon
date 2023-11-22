@@ -245,7 +245,7 @@ void QuickStandardTitleBar::setWindowIcon(const QVariant &value)
 
 void QuickStandardTitleBar::updateMaximizeButton()
 {
-#if (!defined(Q_OS_MACOS) && FRAMELESSHELPER_CONFIG(system_button))
+#if (FRAMELESSHELPER_CONFIG(system_button) && defined(Q_OS_LINUX))
     const QQuickWindow * const w = window();
     if (!w) {
         return;
@@ -361,7 +361,7 @@ void QuickStandardTitleBar::clickCloseButton()
 
 void QuickStandardTitleBar::retranslateUi()
 {
-#if (!defined(Q_OS_MACOS) && FRAMELESSHELPER_CONFIG(system_button))
+#if (FRAMELESSHELPER_CONFIG(system_button) && defined(Q_OS_LINUX))
     qobject_cast<QQuickToolTipAttached *>(qmlAttachedPropertiesObject<QQuickToolTip>(m_minimizeButton))->setText(tr("Minimize"));
     qobject_cast<QQuickToolTipAttached *>(qmlAttachedPropertiesObject<QQuickToolTip>(m_maximizeButton))->setText([this]() -> QString {
         if (const QQuickWindow * const w = window()) {

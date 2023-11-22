@@ -35,7 +35,6 @@ class WidgetsSharedHelper;
 class FramelessDialog;
 class FRAMELESSHELPER_WIDGETS_API FramelessDialogPrivate : public QObject
 {
-    Q_OBJECT
     FRAMELESSHELPER_PRIVATE_QT_CLASS(FramelessDialog)
 
 public:

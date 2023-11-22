@@ -44,7 +44,6 @@ class ChromePalette;
 class StandardTitleBar;
 class FRAMELESSHELPER_WIDGETS_API StandardTitleBarPrivate : public QObject
 {
-    Q_OBJECT
     FRAMELESSHELPER_PRIVATE_QT_CLASS(StandardTitleBar)
 
 public:

@@ -45,7 +45,6 @@
 #include <QtCore/qloggingcategory.h>
 #include <QtGui/qfontdatabase.h>
 #include <QtGui/qwindow.h>
-#include <QtGui/qevent.h>
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 5, 0))
 #  include <QtGui/qguiapplication.h>
 #  include <QtGui/qstylehints.h>
@@ -106,22 +105,6 @@ Q_GLOBAL_STATIC(InternalData, g_internalData)
 }
 #endif
 
-class InternalEventFilter : public QObject
-{
-    Q_OBJECT
-    FRAMELESSHELPER_QT_CLASS(InternalEventFilter)
-
-public:
-    explicit InternalEventFilter(const QObject *window, QObject *parent = nullptr);
-    ~InternalEventFilter() override;
-
-protected:
-    Q_NODISCARD bool eventFilter(QObject *object, QEvent *event) override;
-
-private:
-    const QObject *m_window = nullptr;
-};
-
 InternalEventFilter::InternalEventFilter(const QObject *window, QObject *parent) : QObject(parent), m_window(window)
 {
     Q_ASSERT(m_window);
@@ -142,22 +125,12 @@ bool InternalEventFilter::eventFilter(QObject *object, QEvent *event)
     if (!data || !data->frameless || !data->callbacks) {
         return false;
     }
-    switch (event->type()) {
-    case QEvent::WinIdChange: {
+    if (event->type() == QEvent::WinIdChange) {
         const WId windowId = data->callbacks->getWindowId();
         Q_ASSERT(windowId);
         if (windowId) {
             FramelessManagerPrivate::updateWindowId(m_window, windowId);
         }
-    } break;
-    case QEvent::Close: {
-        const auto ce = static_cast<const QCloseEvent *>(event);
-        if (ce->isAccepted()) {
-            std::ignore = FramelessManager::instance()->removeWindow(m_window);
-        }
-    } break;
-    default:
-        break;
     }
     return false;
 }
@@ -559,5 +532,3 @@ bool FramelessManager::removeWindow(const QObject *window)
 }
 
 FRAMELESSHELPER_END_NAMESPACE
-
-#include "framelessmanager.moc"

@@ -45,7 +45,6 @@ class QuickImageItem;
 
 class FRAMELESSHELPER_QUICK_API QuickStandardTitleBar : public QQuickRectangle
 {
-    Q_OBJECT
     FRAMELESSHELPER_QT_CLASS(QuickStandardTitleBar)
 #ifdef QML_NAMED_ELEMENT
     QML_NAMED_ELEMENT(StandardTitleBar)

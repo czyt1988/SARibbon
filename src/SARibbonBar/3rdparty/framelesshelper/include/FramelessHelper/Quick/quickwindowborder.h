@@ -35,7 +35,6 @@ FRAMELESSHELPER_BEGIN_NAMESPACE
 class QuickWindowBorderPrivate;
 class FRAMELESSHELPER_QUICK_API QuickWindowBorder : public QQuickPaintedItem
 {
-    Q_OBJECT
     FRAMELESSHELPER_PUBLIC_QT_CLASS(QuickWindowBorder)
 #ifdef QML_NAMED_ELEMENT
     QML_NAMED_ELEMENT(WindowBorder)

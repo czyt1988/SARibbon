@@ -35,7 +35,6 @@ class MicaMaterial;
 class QuickMicaMaterial;
 class FRAMELESSHELPER_QUICK_API QuickMicaMaterialPrivate : public QObject
 {
-    Q_OBJECT
     FRAMELESSHELPER_PRIVATE_QT_CLASS(QuickMicaMaterial)
 
 public:
