@@ -79,6 +79,19 @@ set(SARIBBON_SIMPLE
 #################################################
 # frameless库https://github.com/wangwenx190/framelesshelper
 #################################################
+function(setup_custom_moc_macros)
+    cmake_parse_arguments(arg "" "" "TARGETS" ${ARGN})
+    if(arg_UNPARSED_ARGUMENTS)
+        message(AUTHOR_WARNING "setup_custom_moc_macros: Unrecognized arguments: ${arg_UNPARSED_ARGUMENTS}")
+    endif()
+    foreach(__target ${arg_TARGETS})
+        if(NOT TARGET ${__target})
+            message(AUTHOR_WARNING "${__target} is not a valid CMake target!")
+            continue()
+        endif()
+        set_property(TARGET ${__target} APPEND PROPERTY AUTOMOC_MACRO_NAMES "FRAMELESSHELPER_QT_CLASS;FRAMELESSHELPER_PUBLIC_QT_CLASS;FRAMELESSHELPER_PRIVATE_QT_CLASS")
+    endforeach()
+endfunction()
 if(SARIBBON_USE_FRAMELESS_LIB)
     # 显示定义FRAMELESSHELPER_FEATURE_static_build为-1 否则库引用会失败
     add_definitions(-DFRAMELESSHELPER_FEATURE_static_build=1)
@@ -265,8 +278,9 @@ endif()
 
 target_link_libraries(StaticExample PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 
-# frameless 依赖了qt-private相关的库
+# frameless 依赖了qt-private相关的库, 同时要扩展一下moc
 if(SARIBBON_USE_FRAMELESS_LIB)
+    setup_custom_moc_macros(TARGETS StaticExample)
     target_link_libraries(StaticExample PRIVATE
             Qt${QT_VERSION_MAJOR}::CorePrivate
             Qt${QT_VERSION_MAJOR}::GuiPrivate
