@@ -37,7 +37,7 @@ QQ交流群:434014314
 
 # SARibbon简介
 
-这是一个`Qt`下的`Ribbon`界面控件，提供了类似微软Office系列软件的操作界面，适用于大型功能性软件、工业软件、复杂软件的ui交互，`SARibbon`在设计时参考了时参考了MFC Ribbon接口的命名风格，样式上参考了微软Office系列软件以及WPS软件的ribbon风格，并把两者的优点进行了集成，形成了一个可定义多种主题风格的Ribbon控件，`SARibbon`能通过qss快速的定义出自己想要的主题风格，并对常用的一些功能性控件进行了封装，例如：[颜色选择按钮和颜色选择画板](https://github.com/czyt1988/SAColorWidgets)
+这是一个`Qt`下的`Ribbon`界面控件，提供了类似微软Office系列软件的操作界面。`SARibbon`适用于大型软件、工业软件、复杂软件的ui。`SARibbon`在设计时参考了MFC Ribbon接口的命名风格，`SARibbon`的界面样式参考了微软Office系列软件以及WPS软件的Ribbon界面，并结合了两者的优点。`SARibbon`是一个可定义多种主题风格的Ribbon控件，它能通过qss快速的定义出自己想要的主题风格。为了方便大型软件的开发，`SARibbon`对常用的一些功能性控件进行了封装，例如：[颜色选择按钮和颜色选择画板](https://github.com/czyt1988/SAColorWidgets)
 
 ## 功能特点
 
@@ -45,7 +45,7 @@ QQ交流群:434014314
 
 ![Ribbon的布局和显示](./doc/screenshot/SARibbonBar-overview.gif)
 
-- 支持最小化模式，ribbon只显示标签（默认双击标签会进行切换）
+- 支持最小化模式，ribbon只显示标签（默认双击标签会进行切换）,支持上下文标签tab
 
 ![SARibbon最小化模式](./doc/screenshot/SARibbonBar-minMode.gif)
 
@@ -61,7 +61,7 @@ QQ交流群:434014314
 
 ![SARibbon-4种不同风格的布局样式](./doc/screenshot/SARibbonBar-style.gif)
 
-- 支持qss对ribbon进行自定义设置，可实时切换主题
+- 支持qss对ribbon进行自定义设置，可实时切换主题,内置了5种不同风格的主题
 
 win7主题：
 ![SARibbon-theme-win7](./doc/screenshot/SARibbon-theme-win7.png)
@@ -74,11 +74,7 @@ office2021主题：
 dark主题：
 ![SARibbon-theme-dark](./doc/screenshot/SARibbon-theme-dark.png)
 
-- 支持上下文标签
-
-![](./doc/screenshot/SARibbonBar-context-category.png)
-
-- 支持Gallery控件
+- 提供Gallery控件
 
 ![](./doc/screenshot/SARibbonBar-gallery.gif)
 
@@ -86,7 +82,7 @@ dark主题：
 
 ![](./doc/screenshot/SARibbonBar-option-action.gif)
 
-- 支持居中模式
+- 提供居中对齐模式
 
 ![](./doc/screenshot/SARibbon-aligment-center.png)
 
@@ -107,11 +103,11 @@ SARibbon提供qmake和cmake两种构建方式，同时提供了一个集成的SA
 
 > qmake和cmake会根据qt版本选择是否加载frameless库，会根据不同的qt版本选择使用c++11还是C++17
 
-> 注意:如果使用frameless库，要求c++17标准支持，在SARibbon的qmake和cmake中做了根据qt版本自动判断是否加载frameless的方法，如果qt版本在5.14以上会自动加载frameless库，并把c++版本设置为C++17
+> 注意:如果使用frameless库，要求c++标准最低为17，在SARibbon会根据qt版本自动判断是否加载frameless库，如果qt版本在5.14以上会自动加载frameless库，并把c++标准设置为C++17
 
 ## Linux下构建前置准备
 
-SARibbon在1.x后引入第三方库frameless，此库能很好的解决无边框问题，在linux下编译需要安装下面三个库：`libgl1-mesa-dev`,`libxcb1-dev`,`libgtk-3-dev`
+SARibbon在1.x后使用了第三方库frameless，此库能很好的解决无边框问题，在linux下编译需要安装下面三个库：`libgl1-mesa-dev`,`libxcb1-dev`,`libgtk-3-dev`
 
 ```shell
 sudo apt install -y libgl1-mesa-dev libxcb1-dev libgtk-3-dev
@@ -119,7 +115,7 @@ sudo apt install -y libgl1-mesa-dev libxcb1-dev libgtk-3-dev
 
 ## 直接引入工程（静态）
 
-SARibbon提供了合并好的`SARibbon.h`文件和`SARibbon.cpp`文件，只需要在工程引入这两个文件，同时把资源文件和第三方库文件引入就可以使用，无需编译为动态库，可以参考StaticExample的例子（例子位于`src/example/StaticExample`），静态引入使用到`SARibbon.h`、`SARibbon.cpp`、`SARibbon.pri`、`SARibbonBar/resource.qrc`4个文件以及`SARibbonBar/3rdparty`,`SARibbonBar/resource`这两个文件夹：
+SARibbon提供了合并好的`SARibbon.h`文件和`SARibbon.cpp`文件，只需要在自己的工程中引入这两个文件，同时把资源文件和第三方库文件引入就可以使用，无需编译为动态库或者静态库，可以参考StaticExample例子（位于`src/example/StaticExample`），静态嵌入将使用到`SARibbon.h`、`SARibbon.cpp`、`SARibbon.pri`、`SARibbonBar/resource.qrc`这4个文件，以及`SARibbonBar/3rdparty`,`SARibbonBar/resource`这两个文件夹：
 
 你的工程目录将如下所示：
 
@@ -143,7 +139,8 @@ SARibbon提供了合并好的`SARibbon.h`文件和`SARibbon.cpp`文件，只需�
 |           |  |-pri files
 ```
 
-使用qmake编译，可通过如下步骤：
+使用qmake编译，有如下步骤：
+
 - 1. 把`SARibbon.h`、`SARibbon.cpp`、`SARibbon.pri`拷贝到自己工程目录下
 - 2. 在自己工程目录下创建`SARibbonBar`文件夹
 - 3. 把源码中的`src/SARibbonBar/resource.qrc`文件拷贝到自己工程目录下的`SARibbonBar`文件夹
@@ -352,10 +349,8 @@ pannel1->addLargeAction(actSave);
 用户也可以直接new出SARibbonCategory，并添加到pannel中，下面的代码效果和上面的一样：
 
 ```cpp
-//添加主标签页 - 通过addCategoryPage工厂函数添加
 SARibbonCategory* categoryMain = new SARibbonCategory(tr("Main"));
 ribbon->addCategoryPage(categoryMain);
- //使用addPannel函数来创建SARibbonPannel，效果和new SARibbonPannel再addPannel一样
 SARibbonPannel* pannel1 = new SARibbonPannel("Panel 1");
 categoryMain->addPannel(pannel1);
 QAction* actSave = new QAction(this);
@@ -366,8 +361,6 @@ pannel1->addLargeAction(actSave);
 Ribbon的图标有大有小，通过`addLargeAction`、`addMediumAction`、`addSmallAction`可以组合出不同的布局样式
 
 具体可见[./src/example/MainWindowExample/mainwindow.cpp](./src/example/MainWindowExample/mainwindow.cpp)
-
-更加具体复杂的例子可见[SARibbon的布局](#SARibbon的布局)章节
 
 ### ContextCategory 上下文标签
 
@@ -547,8 +540,8 @@ SARibbonBar提供了`setRibbonStyle`函数，可以定义当前的布局方案�
 
 ```cpp
 /**
-    * @brief 定义了行的占比，ribbon中有large，media和small三种占比
-    */
+  * @brief 定义了行的占比，ribbon中有large，media和small三种占比
+  */
 enum RowProportion {
     None            ///< 为定义占比，这时候将会依据expandingDirections来判断，如果能有Qt::Vertical，就等同于Large，否则就是Small
     , Large         ///< 大占比，一个widget的高度会充满整个pannel
@@ -664,40 +657,18 @@ sa_apply_customize_from_xml_file("customization.xml", this, m_ribbonActionMgr);
 
 # 更多截图
 
-
-![](./doc/screenshot/SARibbonBar-screenshot-minMode.gif)
-
-
-- 支持qss对ribbon进行设置
-
-![](./doc/screenshot/SARibbonBar-screenshot-useqss.gif)
-
-- 这是使用此控件的本人另外一个开源软件的截图
+- 这是使用SARibbon构建的软件截图
 
 ![](./doc/screenshot/data-workbench-screenshot1-cn.gif)
 ![](./doc/screenshot/data-workbench-screenshot01-en.png)
-[github - https://github.com/czyt1988/data-workbench](https://github.com/czyt1988/data-workbench)
-
-[gitee - https://gitee.com/czyt1988/data-workbench](https://gitee.com/czyt1988/data-workbench)
-
-# 题外
-
-这个Ribbon主要靠`QSS`实现而不是重写样式(`QStyle`)，主要是重写样式工作量巨大，一些`QSS`无法实现的，重写了界面，如RibbonToolButton，
-
-目前基本的布局和ToolButton功能以及完成，简单的RibbonGallery控件也有初步实现，后续还需对Gallery进行完善
-
-更多界面截图可看：
 
 [github - https://github.com/czyt1988/data-workbench](https://github.com/czyt1988/data-workbench)
 
 [gitee - https://gitee.com/czyt1988/data-workbench](https://gitee.com/czyt1988/data-workbench)
-
-SARibbon项目是SA项目的子项
 
 具体Ribbon的生成代码可见：
-[https://github.com/czyt1988/data-workbench/blob/master/src/APP/DAAppRibbonArea.cpp](https://github.com/czyt1988/data-workbench/blob/master/src/APP/DAAppRibbonArea.cpp)
 
-这个ribbon主要通过QTabbar和QStackWidget实现，按照微软MFCRibbbon的接口命名方式来写，主要通过qss来控制，默认qss在资源文件中，理论上能满足各种样式，可以实现样式的切换(换肤)
+[https://github.com/czyt1988/data-workbench/blob/master/src/APP/DAAppRibbonArea.cpp](https://github.com/czyt1988/data-workbench/blob/master/src/APP/DAAppRibbonArea.cpp)
 
 # 常见问题
 
