@@ -511,13 +511,11 @@ SARibbonBar提供了`setRibbonStyle`函数，可以定义当前的布局方案�
 
 通过`SARibbonBar::setEnableWordWrap`函数可以控制SARibbonBar的文字是否换行，`SARibbonBar`的高度是固定的，文字是否换行会影响图标显示的大小，因此，如果你想图标看起来更大，可以设置文字不换行
 
-文字不换行的2行模式显示效果如下：
-
-`SARibbonBar::RibbonStyleCompactTwoRow`紧凑结构，2行模式把文字设置为不换行后(`SARibbonBar::setEnableWordWrap(false)`)的效果如下
+在`SARibbonBar::RibbonStyleCompactTwoRow`的布局模式下，文字不换行的显示效果如下：
 
 ![](doc/screenshot/wps-2-style-nowrap.png)
 
-工具栏文字不换行，会使图标显示的更大，显示效果会更好，这个看具体需求而定
+SARibbonBar文字设置为不换行后，会使图标的显示空间变得更大
 
 ### 不同的“按钮”布局方式
 
@@ -528,13 +526,11 @@ SARibbonBar提供了`setRibbonStyle`函数，可以定义当前的布局方案�
 
 在标准的pannel中，一个action（按钮）有3种布局，以office word为例，pannel的三种布局其实是所占行数:
 
-- 第一种，占满整个pannel，只有一行，称之为`large`
-- 第二种，一个pannel下放置两行，称之为`medium`
-- 第三种，一个pannel放置3行内容，称之为`samll`
+- 第一种，占满整个pannel，称之为`large`
+- 第二种，一个pannel下可以放置2个按钮，称之为`medium`
+- 第三种，一个pannel放置3个按钮，称之为`samll`
 
 ![word pannel 布局示例](./doc/pic/pannelLayout3row-example.png)
-
-因此，pannel的布局其实归根结底就是行数，可以理解为`QGridLayout`来对pannel进行布局的，把grid分割为6行，`large`模式下占全部6行，`medium`模式下占据3行，`small`模式下占据2行（实际并不是用GridLayout布置的）。
 
 枚举`SARibbonPannelItem::RowProportion`是为了表征每个窗体在pannel所占行数的情况，在pannel布局中会常用到，这个枚举定义如下：
 
