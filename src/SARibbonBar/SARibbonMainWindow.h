@@ -13,7 +13,7 @@ class SAFramelessHelper;
 #endif
 
 class SARibbonBar;
-
+class SAWindowButtonGroup;
 /**
  * @brief 如果要使用SARibbonBar，必须使用此类代替QMainWindow
  *
@@ -83,6 +83,8 @@ public:
     RibbonTheme ribbonTheme() const;
     // 判断当前是否使用ribbon模式
     bool isUseRibbon() const;
+    //获取左上角按钮组（最大化，最小化，关闭）
+    SAWindowButtonGroup* windowButtonGroup() const;
 
 protected:
     // 创建ribbonbar的工厂函数

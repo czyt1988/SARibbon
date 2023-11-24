@@ -32,6 +32,7 @@ FRAMELESSHELPER_BEGIN_NAMESPACE
 class FramelessManagerPrivate;
 class FRAMELESSHELPER_CORE_API FramelessManager : public QObject
 {
+    Q_OBJECT
     FRAMELESSHELPER_PUBLIC_QT_CLASS(FramelessManager)
     Q_PROPERTY(Global::SystemTheme systemTheme READ systemTheme WRITE setOverrideTheme NOTIFY systemThemeChanged FINAL)
     Q_PROPERTY(QColor systemAccentColor READ systemAccentColor NOTIFY systemThemeChanged FINAL)

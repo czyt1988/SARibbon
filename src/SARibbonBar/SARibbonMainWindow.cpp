@@ -195,6 +195,15 @@ bool SARibbonMainWindow::isUseRibbon() const
 }
 
 /**
+   @brief 获取左上角按钮组（最大化，最小化，关闭）
+   @return
+ */
+SAWindowButtonGroup* SARibbonMainWindow::windowButtonGroup() const
+{
+    return d_ptr->mWindowButtonGroup;
+}
+
+/**
  * @brief 创建ribbonbar的工厂函数
  * @return
  */
@@ -263,7 +272,6 @@ void SARibbonMainWindow::installRibbonBar(SARibbonBar* bar)
     helper->setHitTestVisible(bar->applicationButton());    // IMPORTANT!
     helper->setHitTestVisible(bar->quickAccessBar());       // IMPORTANT!
     helper->setHitTestVisible(bar->ribbonStackedWidget());  // IMPORTANT!
-
 #else
 
     QMainWindow::setMenuWidget(bar);

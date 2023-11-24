@@ -770,7 +770,7 @@ void SARibbonToolButton::resizeEvent(QResizeEvent* e)
  */
 QSize SARibbonToolButton::sizeHint() const
 {
-    //    if (!d_ptr->mSizeHint.isValid() || d_ptr->mSizeHint.width() <= 22) {  // 22是给与sizehint的最小值，如果小于这个值，重新计算一下
+    //    if (!d_ptr->mSizeHint.isValid()) {  // 22是给与sizehint的最小值，如果小于这个值，重新计算一下
     //        QStyleOptionToolButton opt;
     //        initStyleOption(&opt);
     //        d_ptr->updateSizeHint(opt);
@@ -921,9 +921,23 @@ void SARibbonToolButton::paintText(QPainter& p, const QStyleOptionToolButton& op
             text = opt.text;
         }
     }
-
-    style()->drawItemText(&p, textDrawRect, alignment, opt.palette, opt.state & QStyle::State_Enabled, text, QPalette::ButtonText);
-
+    //! 以下内容参考QCommonStyle.cpp
+    //! void QCommonStyle::drawComplexControl(ComplexControl cc, const QStyleOptionComplex *opt,QPainter *p, const QWidget *widget) const
+    //! case CC_ToolButton:
+    QStyle::State bflags = opt.state & ~QStyle::State_Sunken;
+    if (bflags & QStyle::State_AutoRaise) {
+        if (!(bflags & QStyle::State_MouseOver) || !(bflags & QStyle::State_Enabled)) {
+            bflags &= ~QStyle::State_Raised;
+        }
+    }
+    if (opt.state & QStyle::State_Sunken) {
+        if (opt.activeSubControls & QStyle::SC_ToolButton) {
+            bflags |= QStyle::State_Sunken;
+        }
+    }
+    QStyleOptionToolButton label = opt;
+    label.state                  = bflags;
+    style()->drawItemText(&p, textDrawRect, alignment, label.palette, label.state & QStyle::State_Enabled, text, QPalette::ButtonText);
     SARIBBONTOOLBUTTON_DEBUG_DRAW_RECT(p, textDrawRect);
 }
 

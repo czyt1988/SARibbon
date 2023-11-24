@@ -541,7 +541,7 @@ In the standard pannel, an action (button) has three layouts mode. Taking office
 
 ![word pannel example](./doc/pic/pannelLayout3row-example.png)
 
-SARibbonPannelItem::RowProportion is used to represent the number of rows each form occupies in the pannel. It is commonly used in the pannel layout. This enumeration is defined as follows:
+`SARibbonPannelItem::RowProportion` is used to represent the number of rows each form occupies in the pannel. It is commonly used in the pannel layout. This enumeration is defined as follows:
 
 ```cpp
 /**
@@ -555,114 +555,106 @@ enum RowProportion {
 };
 ```
 
-SARibbonPannel里管理的每个action都会带有一个占位的属性（`SARibbonPannelItem::RowProportion`），这个占位属性决定了这个action在pannel里的布局。
+Each action managed in `SARibbonPannel` will have a private property (`SARibbonPannelItem::RowProportion`). This property determines the layout of this action in the pannel.
 
-#### 3行模式
+### `SARibbonPannel` layout mode
 
-三行模式是传统的pannel布局方式，如下图所示：
+#### 3-line mode
 
-![3行模式ribbon布局示例](./doc/pic/pannelLayout3row.png)
+The three line mode is the traditional pannel layout, as shown in the following figure:
 
-3行模式下有三种占位(`SARibbonPannelItem::RowProportion`)，分别为large、medium和small
+![3-line mode](./doc/pic/pannelLayout3row.png)
 
-- large大占比，一个widget的高度会充满整个pannel
-- medium中占比，pannel里一列放置2个窗体，前提是这一列2个都是medium，否则会显示异常（暂时还未做medium条件降级到small的处理，后续会实现）
-- small小占比，pannel里一列放置3个窗体
+In the 3-line mode, there are three kinds of placeholders, which are large, medium and small
 
-3行模式下的pannel会显示pannel的标题在`Pannel Title`区域，另外还有一个`OptionAction`的区域，这个是给这个action添加特殊触发使用的，如果没有设置`OptionAction`，这个区域是隐藏。
+The pannel in the 3-line mode will display the title of the pannel in the Pannel Title area, and there is another OptionAction area. This area is used to add a special trigger to this action. If OptionAction is not set, this area is hidden.
 
-#### 2行模式
+#### 2-line mode
 
-两行模式是传统的WPS的改进布局法（具体是否是WPS首先这样做的不清楚，我是按照WPS的布局进行参考的），如下图所示：
+The two-line mode is the WPS improved layout method , as shown in the following figure:
 
-![2行模式ribbon布局示例](./doc/pic/pannelLayout2row.png)
+![2-line mode](./doc/pic/pannelLayout2row.png)
 
-2行模式下medium和small占位(`SARibbonPannelItem::RowProportion`)是一样的，不做区分。
+In the 2-line mode, the medium and small placeholders (SARibbonPannelItem::RowProportion) are the same, and no distinction is made.
 
-另外两行模式下pannel是不显示标题的。
+In 2-line mode, pannel does not display the title.
 
-2行模式是按照WPS的2020进行参考编写的，WPS2020的截图如下：
+### SARibbon Customization
 
-![WPS pannel 2行ribbon布局示例](./doc/pic/pannelLayout2row-example.png)
+Ribbon customization is a feature of ribbon. With reference to the custom interface of office and WPS, users can define a lot of content for their own ribbon, or even define an interface completely different from the original one.
 
-> 注意：两行模式的category的title是不显示的
+The following is the custom interface of office.
 
-### SARibbon的自定义功能
+![office Ribbon Customization](./doc/screenshot/customize/customization-office-ui.png)
 
-ribbon的自定义是ribbon的一个特色，参考了office和wps的自定义界面，用户可以为自己的ribbon定义非常多的内容，甚至可以定义出一个完全和原来不一样的界面。
+SARibbon refers to the interface of office and WPS, and encapsulates the easy-to-use `SARibbonCustomize**` class, including the following five classes:
 
-以下是office的自定义界面
+> - `SARibbonCustomizeDialog`
+> - `SARibbonCustomizeWidget`
+> - `SARibbonCustomizeData`
+> - `SARibbonActionsManager`
+> - `SARibbonActionsManagerModel`
 
-![office的自定义界面](./doc/screenshot/customize/customization-office-ui.png)
+Actual users can only use `SARibbonActionsManager` and `SARibbonCustomizeDialog`/`SARibbonCustomizeWidget`, and other users will not use them normally.
 
-SARibbon参考office和wps的界面，封装了方便使用的`SARibbonCustomize**`类，包括如下5个类：
+`SARibbonActionsManager` is used to manage `QAction`, add the `QAction` that is wanted to customize to `SARibbonActionsManager` for management, and classify `QAction` so that they can be displayed in `SARibbonCustomizeDialog`/`SARibbonCustomizeWidget`.
 
-> - SARibbonCustomizeDialog
-> - SARibbonCustomizeWidget
-> - SARibbonCustomizeData
-> - SARibbonActionsManager
-> - SARibbonActionsManagerModel
+`SARibbonCustomizeDialog`/`SARibbonCustomizeWidget` is a specific display window. The `SARibbonCustomizeDialog` encapsulates the `SARibbonCustomizeWidget` as a dialog box. If you want to integrate it into the configuration dialog box like office, you can use the `SARibbonCustomizeWidget`. The effect of the `SARibbonCustomizeDialog` is shown in the following figure:
 
-实际用户使用仅会面对`SARibbonActionsManager`和`SARibbonCustomizeDialog`/`SARibbonCustomizeWidget`，其余类用户正常不会使用。
-
-`SARibbonActionsManager`是用来管理`QAction`，把想要自定义的`QAction`添加到`SARibbonActionsManager`中管理，并可以对`QAction`进行分类，以便在`SARibbonCustomizeDialog`/`SARibbonCustomizeWidget`中显示
-
-`SARibbonCustomizeDialog`/`SARibbonCustomizeWidget`是具体的显示窗口，`SARibbonCustomizeDialog`把`SARibbonCustomizeWidget`封装为对话框，如果要实现office那样集成到配置对话框中可以使用`SARibbonCustomizeWidget`，`SARibbonCustomizeDialog`的效果如下图所示：
-
-![SARibbon的自定义界面](./doc/screenshot/customize/customization-saribbon-ui.png)
+![SARibbon Customize Dialog](./doc/screenshot/customize/customization-saribbon-ui.png)
 
 
-#### 给界面添加自定义功能
+#### Add custom functions to an interface
 
-这里演示如何添加自定义功能
+Here's how to add custom features.
 
-首先定义`SARibbonActionsManager`作为MainWindow的成员变量
+First, define `SARibbonActionsManager` as the member variable of `MainWindow`.
 
 ```cpp
-//MainWindow.h 中定义成员变量
-SARibbonActionsManager* m_ribbonActionMgr;///< 用于管理所有action
+//Define member variables in the MainWindow.h. 
+SARibbonActionsManager* m_ribbonActionMgr;///< Manage all actions
 ```
 
-在MainWindow的初始化过程中，还需要创建大量的`QAction`，`QAction`的父对象指定为MainWindow，另外还会生成ribbon布局，例如添加category，添加pannel等操作，在上述操作完成后添加如下步骤，自动让`SARibbonActionsManager`管理所有的`QAction`
+During the initialization of `MainWindow`, a large number of `QAction` need to be created. The parent object of `QAction` is designated as `MainWindow`. In addition, ribbon layout will be generated, such as adding category, adding panel and other operations. After the above operations are completed, add the following steps to automatically let `SARibbonActionsManager` manage all `QAction`.
 
 ```cpp
-//MainWindow的初始化，生成QAction
-//生成ribbon布局
+//Initialization of MainWindow and generation of QAction.
+//Generate ribbon layout.
 m_ribbonActionMgr = new SARibbonActionsManager(mainWinowPtr);
 m_ribbonActionMgr->autoRegisteActions(mainWinowPtr);
 ```
 
-`SARibbonActionsManager`的关键函数`autoRegisteActions`可以遍历 `SARibbonMainWindow`下的所有子object，找到action并注册，并会遍历所有`SARibbonCategory`,把`SARibbonCategory`下的action按`SARibbonCategory`的title name进行分类，此函数还会把`SARibbonMainWindow`下面的action，但不在任何一个category下的作为NotInRibbonCategoryTag标签注册，默认名字会赋予not in ribbon
+The key function `autoRegisteActions` of `SARibbonActionsManager` can traverse all subobjects under `SARibbonMainWindow`, find and register action, and traverse all `SARibbonCategory`. The actions under `SARibbonCategory` are classified according to the title name of `SARibbonCategory`. This function also registers the actions under `SARibbonMainWindow`, but not under any category, as 'NotInRibbonCategoryTag' tags, The default name is 'not in ribbon'.
 
-在需要调用`SARibbonCustomizeDialog`的地方如下操作：
+To call SARibbonCustomizeDialog as follows:
 
 ```cpp
 QString cfgpath = "customization.xml";
 SARibbonCustomizeDialog dlg(this, this);
 
 dlg.setupActionsManager(m_ribbonActionMgr);
-dlg.fromXml(cfgpath);//调用这一步是为了把已经存在的自定义步骤加载进来，在保存时能基于原有的自定义步骤上追加
+dlg.fromXml(cfgpath);//This step is called to load the existing custom steps, which can be added based on the original custom steps when saving.
 if (QDialog::Accepted == dlg.exec()) {
-    dlg.applys();//应用自定义步骤
-    dlg.toXml(cfgpath);//把自定义步骤保存到文件中
+    dlg.applys();//Apply custom steps
+    dlg.toXml(cfgpath);//Save custom steps to a file
 }
 ```
 
-在MainWindow生成前还需要把自定义的内容加载，因此在构造函数最后应该加入如下语句：
+Before the MainWindow is generated, the customized content needs to be loaded. Therefore, the following statement should be added to the constructor:
 
 ```cpp
-//MainWindow的构造函数最后
+//Constructor of MainWindow
 sa_apply_customize_from_xml_file("customization.xml", this, m_ribbonActionMgr);
 ```
 
-`sa_apply_customize_from_xml_file`是`SARibbonCustomizeWidget.h`中提供的函数，直接把配置文件中的自定义内容应用到MainWindow中。
+`sa_apply_customize_from_xml_file` is the function provided in `SARibbonCustomizeWidget.h`. The customized contents in the configuration file are directly applyed in the MainWindow.
 
-这样软件每次启动都会按照配置文件加载。
+In this way, the software will be loaded according to the configuration file every time it is started.
 
 
-# 更多截图
+# More screenshots
 
-- 这是使用SARibbon构建的软件截图
+- Here is a screenshot of the software built with SARibbon
 
 ![](./doc/screenshot/data-workbench-screenshot1-cn.gif)
 ![](./doc/screenshot/data-workbench-screenshot01-en.png)
@@ -671,19 +663,19 @@ sa_apply_customize_from_xml_file("customization.xml", this, m_ribbonActionMgr);
 
 [gitee - https://gitee.com/czyt1988/data-workbench](https://gitee.com/czyt1988/data-workbench)
 
-具体Ribbon的生成代码可见：
+The specific ribbon generation code can be seen:
 
 [https://github.com/czyt1988/data-workbench/blob/master/src/APP/DAAppRibbonArea.cpp](https://github.com/czyt1988/data-workbench/blob/master/src/APP/DAAppRibbonArea.cpp)
 
-# 常见问题
+# FAQ
 
-## 1、高分屏显示问题
+## High-DPI screen display issues
 
-针对高分屏显示，有如下两个方面准备
+There are two ways to prepare for the issue of high-DPI screen display:
 
-1 - 在main函数中为QApplication设置`Qt::AA_EnableHighDpiScaling`属性
+- 1 Set `Qt::AA_EnableHighDpiScaling` for `QApplication` in the main function
 
-这个属性使得应用程序自动检测显示器的像素密度来实现自动缩放，示例代码如下：
+This attribute enables the application to automatically detect the pixel density of the display to achieve automatic scaling, such as:
 
 ```cpp
 int main(int argc, char* argv[])
@@ -696,9 +688,9 @@ int main(int argc, char* argv[])
 }
 ```
 
-2 - 在main函数中为QApplication设置缩放策略：`QApplication::setHighDpiScaleFactorRoundingPolicy`
+- 2 Set the scaling policy for `QApplication` in the main function: `QApplication::setHighDpiScaleFactorRoundingPolicy`
 
-Qt5.6提供了`Qt::AA_EnableHighDpiScaling`，但不能完全解决，Qt5.14开始提供了高分屏缩放策略设置`QApplication::setHighDpiScaleFactorRoundingPolicy`，同`AA_EnableHighDpiScaling`一样需要在main函数前面设置
+Qt5.6 provides `Qt::AA_EnableHighDpiScaling`, but it cannot completely solve the problem of high-DPI screens. Qt5.14 has provided a high-dpi screen scaling policy setting called `QApplication::setHighDpiScaleFactorRoundingPolicy`, also needs to be set in the main function, for example:
 
 ```cpp
 int main(int argc, char* argv[])
@@ -714,11 +706,11 @@ int main(int argc, char* argv[])
 }
 ```
 
-## 2、快捷键问题
+## Shortcut key problem
 
-经常有人反馈使用SARibbonBar后，没有被激活的tab页的快捷键没有响应，只有激活的标签页的快捷键才有反应，这个问题并非SARibbonBar的问题，而是设置快捷键时没有设置好`QAction`的`shortcutContext`的属性，`QAction`默认快捷键的属性是`Qt::WindowShortcut`,`Qt::WindowShortcut`代表当父部件是活动顶层窗口的逻辑子部件时，快捷键生效，如果是传统的toolbar模式，由于action所在的toolbar一直在最前端，因此快捷键一直生效，但如果是SARibbonBar，action所在的pannel是会隐藏的，隐藏后快捷键就不生效，如果想快捷键无论Pannel是否隐藏都生效，只需要设置快捷键的`shortcutContext`属性为`Qt::ApplicationShortcut`即可
+Often people report that after using SARibbonBar, the shortcut keys for the unactivated tabs do not respond, and only the shortcut keys for the activated tabs respond.This issue is not a problem with `SARibbonBar`, but rather a problem with the setting of the shortcut context property for QAction. The default shortcut property for `QAction` is `Qt::WindowShortcut`. `Qt::WindowShortcut` means that the shortcut is active when its parent widget is a logical subwidget of the active top-level window.If it is a traditional toolbar mode, the toolbar where the action is located is always at the front, so the shortcut key always takes effect.However, if it is `SARibbonBar`, the action is located in a hidden pannel, and the shortcut key does not take effect.If you want the shortcut key to take effect regardless of whether the pannel is hidden, just set the action's shortcutContext property to `Qt::ApplicationShortcut`
 
-例如：
+example:
 
 ```cpp
 QAction* actionUndo = createAction("undo", ":/icon/icon/undo.svg");
@@ -732,7 +724,7 @@ actionRedo->setShortcutContext(Qt::ApplicationShortcut);
 quickAccessBar->addAction(actionRedo);
 ```
 
-# 其他
+# other
+Thank FastCAE for using this control and finding many bugs and suggestions
 
-
-> 感谢[FastCAE](http://www.fastcae.com/product.html)项目使用了本控件，并找到了许多bug和建议，FastCAE国产CAE软件集成开发平台，免费开源，是面向求解器开发者提供CAE软件界面与通用功能模块快速研发集成框架，[其开源仓库（github）:https://github.com/DISOGitHub/FastCAE](https://github.com/DISOGitHub/FastCAE)，[gitee:https://gitee.com/DISOGitee/FastCAE](https://gitee.com/DISOGitee/FastCAE)，[官网见:http://www.fastcae.com/product.html](http://www.fastcae.com/product.html)
+> Thank[FastCAE](http://www.fastcae.com/product.html)for using this control and finding many bugs and suggestions
