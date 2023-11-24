@@ -284,7 +284,6 @@ private:
     SARibbonBar* mRibbonBar { nullptr };
 ```
 
-在Widget的构造函数中创建`SARibbonBar`,Widget的ui文件中有个`QVBoxLayout`布局，把`SARibbonBar`放置在最顶层，同时，由于QWidget模式下，没有必要再显示标题，可以调用`SARibbonBar::setTitleVisible`方法把标题隐藏。applicationbutton在QWidget如果没有必要也可以通过`SARibbonBar::setApplicationButton`传入一个空指针取消掉，最后由于SARibbonBar的主题是在`SARibbonMainWindow`方法中设置的，在QWidget中设置主题可通过全局函数`sa_set_ribbon_theme`进行设置
 Create a `SARibbonBar` in the Widget's constructor, there is a `QVBoxLayout` layout in the widget's ui file, place the `SARibbonBar` at the very top, and at the same time, since the QWidget mode, there is no need to display the title, you can call the `SARibbonBar::setTitleVisible` method to hide the title. applicationbutton can also be canceled in QWidget via `SARibbonBar::setApplicationButton` if it is not necessary, and finally since the theme of SARibbonBar is set in the `SARibbonMainWindow` method, the theme can be set in QWidget via the global function `sa_set_ribbon_ theme`
 
 
@@ -319,7 +318,7 @@ Widget::Widget(QWidget* parent) : QWidget(parent), ui(new Ui::Widget)
 
 Here's what it looks like:
 
-![Ribbon用在QWidget上](./doc/screenshot/ribbonbar-use-in-qwidget.png)
+![Ribbon on QWidget](./doc/screenshot/ribbonbar-use-in-qwidget.png)
 
 
 ### Create Category and Pannel
@@ -514,46 +513,45 @@ SARibbonBar provides a `setRibbonStyle` function that defines the current layout
 
 ![SARibbonBar::RibbonStyleCompactTwoRow](doc/screenshot/wps-2-style.png)
 
-### SARibbonBar文字换行，及图标大小
+### Text wrapping, and icon size
 
-通过`SARibbonBar::setEnableWordWrap`函数可以控制SARibbonBar的文字是否换行，`SARibbonBar`的高度是固定的，文字是否换行会影响图标显示的大小，因此，如果你想图标看起来更大，可以设置文字不换行
+The `SARibbonBar::setEnableWordWrap` function allows you to control whether the text of the SARibbonBar wraps or not, the height of the `SARibbonBar` is fixed, and whether the text wraps or not will affect the size of the icon display, so if you want the icon to look bigger, you can set the text to not wrap
 
-文字不换行的2行模式显示效果如下：
+In `SARibbonBar::RibbonStyleCompactTwoRow` layout style, the text without wrapping is displayed as follows:
 
 `SARibbonBar::RibbonStyleCompactTwoRow`紧凑结构，2行模式把文字设置为不换行后(`SARibbonBar::setEnableWordWrap(false)`)的效果如下
 
-![](doc/screenshot/wps-2-style-nowrap.png)
+![nowrap](doc/screenshot/wps-2-style-nowrap.png)
 
-工具栏文字不换行，会使图标显示的更大，显示效果会更好，这个看具体需求而定
+When the SARibbonBar text is set to non-wrapping, the display space of the icon becomes larger
 
-### 不同的“按钮”布局方式
+### Tool Button layouts of SARibbonBar
 
-`SARibbonPannel`提供了三个添加action的方法：
+`SARibbonPannel` provides three methods to add action:
+
 - `addLargeAction`
 - `addMediumAction`
 - `addSmallAction`
 
-在标准的pannel中，一个action（按钮）有3种布局，以office word为例，pannel的三种布局其实是所占行数:
+In the standard pannel, an action (button) has three layouts mode. Taking office word as an example, the three layouts of pannel are actually the number of lines occupied:
 
-- 第一种，占满整个pannel，只有一行，称之为`large`
-- 第二种，一个pannel下放置两行，称之为`medium`
-- 第三种，一个pannel放置3行内容，称之为`samll`
+- The first, which occupies the entire pannel, is called 'Large'
+- Second, 2 buttons can be placed under one pannel, which is called 'medium'
+- The third type, a pannel with 3 buttons, is called 'samll'
 
-![word pannel 布局示例](./doc/pic/pannelLayout3row-example.png)
+![word pannel example](./doc/pic/pannelLayout3row-example.png)
 
-因此，pannel的布局其实归根结底就是行数，可以理解为`QGridLayout`来对pannel进行布局的，把grid分割为6行，`large`模式下占全部6行，`medium`模式下占据3行，`small`模式下占据2行（实际并不是用GridLayout布置的）。
-
-枚举`SARibbonPannelItem::RowProportion`是为了表征每个窗体在pannel所占行数的情况，在pannel布局中会常用到，这个枚举定义如下：
+SARibbonPannelItem::RowProportion is used to represent the number of rows each form occupies in the pannel. It is commonly used in the pannel layout. This enumeration is defined as follows:
 
 ```cpp
 /**
-  * @brief 定义了行的占比，ribbon中有large，media和small三种占比
-  */
+ * @brief defines the proportion of rows. The ribbon has  three proportions: large, media and small.
+ */
 enum RowProportion {
-    None            ///< 为定义占比，这时候将会依据expandingDirections来判断，如果能有Qt::Vertical，就等同于Large，否则就是Small
-    , Large         ///< 大占比，一个widget的高度会充满整个pannel
-    , Medium        ///< 中占比，在@ref SARibbonPannel::pannelLayoutMode 为 @ref SARibbonPannel::ThreeRowMode 时才会起作用，且要同一列里两个都是Medium时，会在三行中占据两行
-    , Small         ///< 小占比，占SARibbonPannel的一行，Medium在不满足条件时也会变为Small，但不会变为Large
+    None            ///< to define the proportion, it will be judged according to expandingDirections. If Qt::Vertical is available, it is equal to Large, otherwise it is Small
+    , Large         ///< Large proportion, the height of a widget will fill the whole pannel.
+    , Medium        ///< Medium proportion will only work when @ref SARibbonPannel::pannelLayoutMode is @ref SARibbonPannel::ThreeRowMode, and will occupy two of the three rows if both of them in the same column are Medium.
+    , Small         ///< Small proportion, in the line of SARibbonPannel, Medium will become Small if it does not meet the conditions, but will not become Large.
 };
 ```
 
