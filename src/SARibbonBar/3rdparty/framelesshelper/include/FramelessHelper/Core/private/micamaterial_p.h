@@ -49,6 +49,7 @@ using FramelessHelperThreadClass = QObject;
 class MicaMaterial;
 class FRAMELESSHELPER_CORE_API MicaMaterialPrivate : public QObject
 {
+    Q_OBJECT
     FRAMELESSHELPER_PRIVATE_QT_CLASS(MicaMaterial)
 
 public:
@@ -80,6 +81,7 @@ public:
 
 class WallpaperThread : public FramelessHelperThreadClass
 {
+    Q_OBJECT
     FRAMELESSHELPER_QT_CLASS(WallpaperThread)
 
 public:

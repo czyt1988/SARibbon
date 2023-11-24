@@ -34,6 +34,7 @@ FRAMELESSHELPER_BEGIN_NAMESPACE
 class FramelessHelperQtPrivate;
 class FRAMELESSHELPER_CORE_API FramelessHelperQt : public QObject
 {
+    Q_OBJECT
     FRAMELESSHELPER_PUBLIC_QT_CLASS(FramelessHelperQt)
 
 public:

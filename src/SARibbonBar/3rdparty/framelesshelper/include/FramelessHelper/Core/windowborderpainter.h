@@ -34,6 +34,7 @@ FRAMELESSHELPER_BEGIN_NAMESPACE
 class WindowBorderPainterPrivate;
 class FRAMELESSHELPER_CORE_API WindowBorderPainter : public QObject
 {
+    Q_OBJECT
     FRAMELESSHELPER_PUBLIC_QT_CLASS(WindowBorderPainter)
 
     Q_PROPERTY(int thickness READ thickness WRITE setThickness NOTIFY thicknessChanged FINAL)

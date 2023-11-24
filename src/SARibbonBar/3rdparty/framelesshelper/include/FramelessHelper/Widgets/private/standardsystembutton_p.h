@@ -34,6 +34,7 @@ FRAMELESSHELPER_BEGIN_NAMESPACE
 class StandardSystemButton;
 class FRAMELESSHELPER_WIDGETS_API StandardSystemButtonPrivate : public QObject
 {
+    Q_OBJECT
     FRAMELESSHELPER_PRIVATE_QT_CLASS(StandardSystemButton)
 
 public:

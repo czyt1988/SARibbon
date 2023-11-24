@@ -546,7 +546,9 @@ enum RowProportion {
 };
 ```
 
-SARibbonPannel里管理的每个action都会带有一个占位的属性（`SARibbonPannelItem::RowProportion`），这个占位属性决定了这个action在pannel里的布局。
+`SARibbonPannel`里管理的每个action都会带有一个私有的属性（`SARibbonPannelItem::RowProportion`），这个属性决定了这个action在pannel里的布局
+
+### SARibbonPannel的布局模式
 
 #### 3行模式
 
@@ -556,27 +558,17 @@ SARibbonPannel里管理的每个action都会带有一个占位的属性（`SARib
 
 3行模式下有三种占位(`SARibbonPannelItem::RowProportion`)，分别为large、medium和small
 
-- large大占比，一个widget的高度会充满整个pannel
-- medium中占比，pannel里一列放置2个窗体，前提是这一列2个都是medium，否则会显示异常（暂时还未做medium条件降级到small的处理，后续会实现）
-- small小占比，pannel里一列放置3个窗体
-
 3行模式下的pannel会显示pannel的标题在`Pannel Title`区域，另外还有一个`OptionAction`的区域，这个是给这个action添加特殊触发使用的，如果没有设置`OptionAction`，这个区域是隐藏。
 
 #### 2行模式
 
-两行模式是传统的WPS的改进布局法（具体是否是WPS首先这样做的不清楚，我是按照WPS的布局进行参考的），如下图所示：
+2行模式是WPS的改进布局法（具体是否是WPS首先这样做的不清楚，我是按照WPS的布局进行参考的），如下图所示：
 
 ![2行模式ribbon布局示例](./doc/pic/pannelLayout2row.png)
 
 2行模式下medium和small占位(`SARibbonPannelItem::RowProportion`)是一样的，不做区分。
 
-另外两行模式下pannel是不显示标题的。
-
-2行模式是按照WPS的2020进行参考编写的，WPS2020的截图如下：
-
-![WPS pannel 2行ribbon布局示例](./doc/pic/pannelLayout2row-example.png)
-
-> 注意：两行模式的category的title是不显示的
+2行模式下pannel是不显示标题的
 
 ### SARibbon的自定义功能
 

@@ -107,22 +107,6 @@ public:
     {
         q_ptr->setFixedSize(sizeHint());
         resize(q_ptr->size());
-        //        int span = 0;
-
-        //        if (buttonClose) {
-        //            buttonClose->move(q_d->width()-buttonClose->width()
-        //                , q_d->y());
-        //            span = buttonClose->width();
-        //        }
-        //        if (buttonMaximize) {
-        //            buttonMaximize->move(q_d->width()-buttonMaximize->width()-span
-        //                , q_d->y());
-        //            span += buttonMaximize->width();
-        //        }
-        //        if (buttonMinimize) {
-        //            buttonMinimize->move(q_d->width()-buttonMinimize->width()-span
-        //                , q_d->y());
-        //        }
     }
 
     void resize(QSize size)

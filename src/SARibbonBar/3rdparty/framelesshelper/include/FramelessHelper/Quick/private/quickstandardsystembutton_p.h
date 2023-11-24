@@ -39,6 +39,7 @@ FRAMELESSHELPER_BEGIN_NAMESPACE
 
 class FRAMELESSHELPER_QUICK_API QuickStandardSystemButton : public QQuickButton
 {
+    Q_OBJECT
     FRAMELESSHELPER_QT_CLASS(QuickStandardSystemButton)
 #ifdef QML_NAMED_ELEMENT
     QML_NAMED_ELEMENT(StandardSystemButton)

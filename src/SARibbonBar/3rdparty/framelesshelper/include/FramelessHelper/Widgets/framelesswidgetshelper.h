@@ -40,6 +40,7 @@ class WindowBorderPainter;
 class FramelessWidgetsHelperPrivate;
 class FRAMELESSHELPER_WIDGETS_API FramelessWidgetsHelper : public QObject
 {
+    Q_OBJECT
     FRAMELESSHELPER_PUBLIC_QT_CLASS(FramelessWidgetsHelper)
     Q_PROPERTY(QWidget* titleBarWidget READ titleBarWidget WRITE setTitleBarWidget NOTIFY titleBarWidgetChanged FINAL)
     Q_PROPERTY(bool windowFixedSize READ isWindowFixedSize WRITE setWindowFixedSize NOTIFY windowFixedSizeChanged FINAL)

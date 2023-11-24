@@ -35,6 +35,7 @@ class WidgetsSharedHelper;
 class FramelessMainWindow;
 class FRAMELESSHELPER_WIDGETS_API FramelessMainWindowPrivate : public QObject
 {
+    Q_OBJECT
     FRAMELESSHELPER_PRIVATE_QT_CLASS(FramelessMainWindow)
 
 public:

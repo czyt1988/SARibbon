@@ -35,6 +35,7 @@ FRAMELESSHELPER_BEGIN_NAMESPACE
 class FramelessDialogPrivate;
 class FRAMELESSHELPER_WIDGETS_API FramelessDialog : public QDialog
 {
+    Q_OBJECT
     FRAMELESSHELPER_PUBLIC_QT_CLASS(FramelessDialog)
 
 public:

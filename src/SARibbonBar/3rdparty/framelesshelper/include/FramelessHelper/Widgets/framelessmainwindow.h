@@ -35,6 +35,7 @@ FRAMELESSHELPER_BEGIN_NAMESPACE
 class FramelessMainWindowPrivate;
 class FRAMELESSHELPER_WIDGETS_API FramelessMainWindow : public QMainWindow
 {
+    Q_OBJECT
     FRAMELESSHELPER_PUBLIC_QT_CLASS(FramelessMainWindow)
     Q_PROPERTY(bool hidden READ isHidden NOTIFY hiddenChanged FINAL)
     Q_PROPERTY(bool normal READ isNormal NOTIFY normalChanged FINAL)

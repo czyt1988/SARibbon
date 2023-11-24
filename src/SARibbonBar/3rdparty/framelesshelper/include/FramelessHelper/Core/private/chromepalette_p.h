@@ -34,6 +34,7 @@ FRAMELESSHELPER_BEGIN_NAMESPACE
 class ChromePalette;
 class FRAMELESSHELPER_CORE_API ChromePalettePrivate : public QObject
 {
+    Q_OBJECT
     FRAMELESSHELPER_PRIVATE_QT_CLASS(ChromePalette)
 
 public:
