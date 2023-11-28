@@ -302,7 +302,7 @@ else()
         ${SACOLOR_SOURCE_FILES}
     )
 endif()
-
+add_library(SARibbon ALIAS ${SARIBBONBAR_LIB_NAME})
 #################################################
 # Qt相关的依赖
 #################################################
@@ -385,7 +385,7 @@ endif()
 
 if(SARIBBON_USE_FRAMELESS_LIB)
     target_include_directories(${SARIBBONBAR_LIB_NAME} PUBLIC
-        $<INSTALL_INTERFACE:include>
+        $<INSTALL_INTERFACE:"include">
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
         $<BUILD_INTERFACE:${FRAMELESS_HEADER_BASE}>
         $<BUILD_INTERFACE:${FRAMELESS_HEADER_DIR}>
@@ -397,30 +397,27 @@ if(SARIBBON_USE_FRAMELESS_LIB)
     )
 else()
     target_include_directories(${SARIBBONBAR_LIB_NAME} PUBLIC
-        $<INSTALL_INTERFACE:include>
+        $<INSTALL_INTERFACE:"include">
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     )
 endif()
+
 # ------------------------------- install script -------------------------------
+
 set(SARIBBON_INSTALL_DIR SARibbon)
 set(CMAKE_INSTALL_PREFIX ${SARIBBON_BIN_DIR})
 message(STATUS "install dir ${SARIBBON_BIN_DIR}")
-# Generate library version info which will generate xxxConfigVersion.cmake,
-# the ${PACKAGE_VERSION} is the version defined in project()
-include(CMakePackageConfigHelpers)
-write_basic_package_version_file(
-    "${SARIBBONBAR_LIB_NAME}ConfigVersion.cmake"
-    VERSION ${VERSION_SHORT}
-    COMPATIBILITY SameMajorVersion
-)
+
+# 头文件
 install(FILES
     ${SARIBBON_HEADER_FILES}
-    DESTINATION include/${SARIBBON_INSTALL_DIR}
+    DESTINATION include
     COMPONENT headers
 )
+# SAColorWidget的头文件
 install(FILES
     ${SACOLOR_HEADER_FILES}
-    DESTINATION include/${SARIBBON_INSTALL_DIR}/colorWidgets
+    DESTINATION include/colorWidgets
     COMPONENT headers
 )
 
@@ -432,35 +429,16 @@ set(SARIBBON_AMALGAMATE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/../SARibbon.h
 install(FILES
     ${SARIBBON_AMALGAMATE_FILES}
     DESTINATION amalgamate
-    COMPONENT amalgamate
 )
+# 复制resource目录到install/amalgamate目录
+install(DIRECTORY
+    ${CMAKE_CURRENT_SOURCE_DIR}/resource
+    DESTINATION amalgamate/SARibbonBar
+)
+# resource.qrc
 install(FILES
     ${SARIBBON_RESOURCE_FILES}
     DESTINATION amalgamate/SARibbonBar
-    COMPONENT amalgamate
-)
-set(SARIBBON_RESOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/resource)
-set(SARIBBON_RESOURCE_RAW_FILES 
-	${SARIBBON_RESOURCE_DIR}/theme-win7.qss
-	${SARIBBON_RESOURCE_DIR}/theme-office2013.qss
-	${SARIBBON_RESOURCE_DIR}/theme-dark.qss
-	${SARIBBON_RESOURCE_DIR}/ArrowDown.png
-	${SARIBBON_RESOURCE_DIR}/ArrowMore.png
-	${SARIBBON_RESOURCE_DIR}/ArrowUp.png
-	${SARIBBON_RESOURCE_DIR}/ribbonPannelOptionButton.png
-	${SARIBBON_RESOURCE_DIR}/define-color.svg
-	${SARIBBON_RESOURCE_DIR}/Titlebar_Close.png
-	${SARIBBON_RESOURCE_DIR}/Titlebar_Close_Hover.png
-	${SARIBBON_RESOURCE_DIR}/Titlebar_Max.png
-	${SARIBBON_RESOURCE_DIR}/Titlebar_Min.png
-	${SARIBBON_RESOURCE_DIR}/Titlebar_Normal.png
-	${SARIBBON_RESOURCE_DIR}/Titlebar_Shade.png
-	${SARIBBON_RESOURCE_DIR}/Titlebar_Unshade.png
-	)
-install(FILES
-    ${SARIBBON_RESOURCE_RAW_FILES}
-    DESTINATION amalgamate/SARibbonBar/resource
-    COMPONENT amalgamate
 )
 
 # 如果开启了frameless，要把frameless的文件也拷贝过去
@@ -468,29 +446,51 @@ if(SARIBBON_USE_FRAMELESS_LIB)
 	#复制目录src/SARibbonBar/3rdparty/framelesshelper/include/
 	install(DIRECTORY
         ${FRAMELESS_HEADER_DIR}
-		DESTINATION include/${SARIBBON_INSTALL_DIR}/3rdparty/framelesshelper/include
+		DESTINATION include/3rdparty/framelesshelper/include
 		COMPONENT headers
 	)
 	#复制目录src/SARibbonBar/3rdparty/framelesshelper/qmake/
 	SET(FRAMELESS_QMAKE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/framelesshelper/qmake)
 	install(DIRECTORY
         ${FRAMELESS_QMAKE_DIR}
-		DESTINATION include/${SARIBBON_INSTALL_DIR}/3rdparty/framelesshelper/
+		DESTINATION include/3rdparty/framelesshelper/
 		COMPONENT headers
 	)
 endif()
 
+include(CMakePackageConfigHelpers)
+set(SARIBBONBAR_LIB_INCLUDE_INSTALL_DIR "../../include")
+write_basic_package_version_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/SARibbonConfigVersion.cmake
+    VERSION ${SARIBBON_VERSION}
+    COMPATIBILITY SameMajorVersion
+)
+configure_package_config_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/SARibbonBarConfig.cmake.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/SARibbonConfig.cmake"
+  INSTALL_DESTINATION "lib/cmake"
+  PATH_VARS SARIBBONBAR_LIB_INCLUDE_INSTALL_DIR
+)
+message("CMAKE_CURRENT_BINARY_DIR=${CMAKE_CURRENT_BINARY_DIR}")
 install(TARGETS ${SARIBBONBAR_LIB_NAME}
-    EXPORT SARibbonTargets
+    EXPORT SARibbonBarTargets
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
-    INCLUDES DESTINATION include/${SARIBBON_INSTALL_DIR}
+    INCLUDES DESTINATION include
 )
-install(EXPORT SARibbonTargets
+install(EXPORT SARibbonBarTargets
     FILE SARibbonTargets.cmake
-    DESTINATION lib/cmake/${SARIBBON_INSTALL_DIR}
+    DESTINATION lib/cmake
 )
+
+install(FILES
+    "${CMAKE_CURRENT_BINARY_DIR}/SARibbonConfig.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/SARibbonConfigVersion.cmake"
+    DESTINATION lib/cmake
+)
+
+# 资源文件生成
 
 if(WIN32)
 	create_win32_resource_version(

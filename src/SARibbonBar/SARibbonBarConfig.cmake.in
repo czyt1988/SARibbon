@@ -1,0 +1,15 @@
+# This module defines
+# @PROJECT_NAME@_FOUND, if false, do not try to link to @PROJECT_NAME@
+# @PROJECT_NAME@_INCLUDE_DIR, where to find the headers
+# @PROJECT_NAME@_LIBRARIES, where to find the libs
+@PACKAGE_INIT@
+
+set (PackageName @SARIBBONBAR_LIB_NAME@)
+set (@SARIBBONBAR_LIB_NAME@_VERSION @SARIBBON_VERSION@)
+
+include ( ${CMAKE_CURRENT_LIST_DIR}/SARibbonTargets.cmake )
+set_and_check ( ${PackageName}_INCLUDE_DIR @SARIBBONBAR_LIB_INCLUDE_INSTALL_DIR@ )
+set ( ${PackageName}_LIBRARIES)
+list ( APPEND ${PackageName}_LIBRARIES ${PackageName})
+
+check_required_components(${PackageName})
