@@ -7,8 +7,8 @@ configure_file (project-config-version.cmake.in
 
 install (FILES
   "${PROJECT_BINARY_DIR}/${PROJECT_NAME_LOWER}-config.cmake"
-  DESTINATION "cmake")
+  DESTINATION "lib/cmake")
 
 install (FILES
   "${PROJECT_BINARY_DIR}/${PROJECT_NAME_LOWER}-config-version.cmake"
-  DESTINATION "cmake")
+  DESTINATION "lib/cmake")

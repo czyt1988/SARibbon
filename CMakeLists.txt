@@ -17,7 +17,12 @@ option(BUILD_EXAMPLES "build the examples" ON)
 # cn:Qt库加载,最低版本要求为5.8
 set(SARIBBON_MIN_QT_VERSION 5.8)
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} ${SARIBBON_MIN_QT_VERSION} COMPONENTS Core Gui Widgets REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} ${DA_MIN_QT_VERSION} COMPONENTS
+    Core
+    Gui
+    Widgets
+    REQUIRED
+)
 message(STATUS "current Qt version is Qt${QT_VERSION_MAJOR}.${QT_VERSION_MINOR}.${QT_VERSION_PATCH}")
 
 
@@ -98,7 +103,10 @@ else()
     set(SARIBBON_PLATFORM "64")
 endif()
 
-
+# windows系统下，直接安装到当前文件夹下
+if(WIN32)
+	set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_SOURCE_DIR}/bin_qt${QT_VERSION}/SARibbon")
+endif()
 
 include(cmake/WinResource.cmake)
 
@@ -121,24 +129,26 @@ set(SARIBBON_DOC_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/readme-cn.md
     ${CMAKE_CURRENT_SOURCE_DIR}/LICENSE
     )
+# 复制doc目录到install目录
 install(DIRECTORY
     ${CMAKE_CURRENT_SOURCE_DIR}/doc
-    DESTINATION ${CMAKE_INSTALL_PREFIX}
+    DESTINATION .
     COMPONENT document
 )
+#  把文档复制过去
 install(FILES
     ${SARIBBON_DOC_FILES}
-    DESTINATION ${CMAKE_INSTALL_PREFIX}
+    DESTINATION .
     COMPONENT document
 )
 
-# pri文件
+# 把针对cmake安装的两个pri文件复制到根目录下
 set(SARIBBON_QMAKE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/cmake/common.pri
     ${CMAKE_CURRENT_SOURCE_DIR}/cmake/SARibbonBar.pri
     )
 install(FILES
     ${SARIBBON_QMAKE_FILES}
-    DESTINATION ${CMAKE_INSTALL_PREFIX}
+    DESTINATION .
     COMPONENT qmake
 )
