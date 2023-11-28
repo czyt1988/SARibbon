@@ -404,7 +404,6 @@ endif()
 
 # ------------------------------- install script -------------------------------
 
-set(SARIBBON_INSTALL_DIR SARibbon)
 set(CMAKE_INSTALL_PREFIX ${SARIBBON_BIN_DIR})
 message(STATUS "install dir ${SARIBBON_BIN_DIR}")
 
@@ -459,6 +458,8 @@ if(SARIBBON_USE_FRAMELESS_LIB)
 endif()
 
 include(CMakePackageConfigHelpers)
+# SARibbonBarConfig.cmake.in中，会让此变量和“${CMAKE_CURRENT_LIST_DIR}/”进行拼接，也就是${CMAKE_CURRENT_LIST_DIR}/@SARIBBONBAR_LIB_INCLUDE_INSTALL_DIR@
+# 最终变为${CMAKE_CURRENT_LIST_DIR}/../../include
 set(SARIBBONBAR_LIB_INCLUDE_INSTALL_DIR "../../include")
 write_basic_package_version_file(
     ${CMAKE_CURRENT_BINARY_DIR}/SARibbonConfigVersion.cmake
