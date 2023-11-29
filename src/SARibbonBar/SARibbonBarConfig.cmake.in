@@ -4,11 +4,11 @@
 # @PROJECT_NAME@_LIBRARIES, where to find the libs
 @PACKAGE_INIT@
 
-set (PackageName @SARIBBONBAR_LIB_NAME@)
-set (@SARIBBONBAR_LIB_NAME@_VERSION @SARIBBON_VERSION@)
+set (PackageName @SARIBBON_LIB_NAME@)
+set (@SARIBBON_LIB_NAME@_VERSION @SARIBBON_VERSION@)
 
-include ( ${CMAKE_CURRENT_LIST_DIR}/SARibbonTargets.cmake )
-set_and_check ( ${PackageName}_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/@SARIBBONBAR_LIB_INCLUDE_INSTALL_DIR@ )
+include ( ${CMAKE_CURRENT_LIST_DIR}/${PackageName}Targets.cmake )
+set_and_check ( ${PackageName}_INCLUDE_DIR ${PACKAGE_PREFIX_DIR}/@SARIBBON_LIB_INCLUDE_INSTALL_DIR@ )
 set ( ${PackageName}_LIBRARIES)
 list ( APPEND ${PackageName}_LIBRARIES ${PackageName})
 

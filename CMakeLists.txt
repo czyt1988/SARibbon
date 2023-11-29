@@ -103,10 +103,7 @@ else()
     set(SARIBBON_PLATFORM "64")
 endif()
 
-# windows系统下，直接安装到当前文件夹下
-if(WIN32)
-	set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_SOURCE_DIR}/bin_qt${QT_VERSION}/SARibbon")
-endif()
+
 
 include(cmake/WinResource.cmake)
 
@@ -115,6 +112,10 @@ include(cmake/WinResource.cmake)
 set(SARIBBON_BIN_NAME bin_qt${QT_VERSION_MAJOR}.${QT_VERSION_MINOR}.${QT_VERSION_PATCH}_${SARIBBON_BUILD_TYPE}_${SARIBBON_PLATFORM})
 set(SARIBBON_BIN_DIR ${CMAKE_CURRENT_SOURCE_DIR}/${SARIBBON_BIN_NAME})
 
+# windows系统下，默认直接安装到当前文件夹下
+if(WIN32)
+	set(CMAKE_INSTALL_PREFIX "${SARIBBON_BIN_DIR}/SARibbon")
+endif()
 
 add_subdirectory(src)
 add_subdirectory(cmake)
