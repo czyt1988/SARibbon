@@ -363,28 +363,28 @@ set_target_properties(${SARIBBON_LIB_NAME} PROPERTIES
     VERSION ${SARIBBON_VERSION}
     EXPORT_NAME ${SARIBBON_LIB_NAME}
 )
-# 构建库定义的宏
+# 构建库定义的宏,此宏必须为PRIVATE
 target_compile_definitions(${SARIBBON_LIB_NAME} PRIVATE SA_RIBBON_BAR_MAKE_LIB)
-# 使用SAColorWidgets但不作为库使用定义的宏
+# 使用SAColorWidgets但不作为库使用定义的宏,此宏必须为PRIVATE
 target_compile_definitions(${SARIBBON_LIB_NAME} PRIVATE SA_COLOR_WIDGETS_MAKE_LIB)
 if(SARIBBON_USE_FRAMELESS_LIB)
-    # 显示定义FRAMELESSHELPER_FEATURE_static_build为-1
-    target_compile_definitions(${SARIBBON_LIB_NAME} PRIVATE FRAMELESSHELPER_FEATURE_static_build=-1)
-    # 使用frameless,但也要导出符号，因此要定义导出宏
+    # 显示定义FRAMELESSHELPER_FEATURE_static_build为-1,此宏必须为PUBLIC
+    target_compile_definitions(${SARIBBON_LIB_NAME} PUBLIC FRAMELESSHELPER_FEATURE_static_build=-1)
+    # 使用frameless,但也要导出符号，因此要定义导出宏,下面两个宏必须为PRIVATE
     target_compile_definitions(${SARIBBON_LIB_NAME} PRIVATE FRAMELESSHELPER_CORE_LIBRARY)
     target_compile_definitions(${SARIBBON_LIB_NAME} PRIVATE FRAMELESSHELPER_WIDGETS_LIBRARY)
-    #使用frameless必须设置SARIBBON_USE_3RDPARTY_FRAMELESSHELPER宏为1
+    #使用frameless必须设置SARIBBON_USE_3RDPARTY_FRAMELESSHELPER宏为1,此宏必须为PUBLIC
     target_compile_definitions(${SARIBBON_LIB_NAME} PUBLIC SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1)
 else()
-    #不使用frameless必须设置SARIBBON_USE_3RDPARTY_FRAMELESSHELPER宏为0
+    #不使用frameless必须设置SARIBBON_USE_3RDPARTY_FRAMELESSHELPER宏为0,此宏必须为PUBLIC
     target_compile_definitions(${SARIBBON_LIB_NAME} PUBLIC SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=0)
 endif()
 
 # INSTALL_INTERFACE的路径替换，不要出现引号
 if(SARIBBON_USE_FRAMELESS_LIB)
     target_include_directories(${SARIBBON_LIB_NAME} PUBLIC
-        $<INSTALL_INTERFACE:include>
-		$<INSTALL_INTERFACE:include/3rdparty/framelesshelper/include>
+        $<INSTALL_INTERFACE:include/${SARIBBON_LIB_NAME}>
+		$<INSTALL_INTERFACE:include/${SARIBBON_LIB_NAME}/3rdparty/framelesshelper/include>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
         $<BUILD_INTERFACE:${FRAMELESS_HEADER_BASE}>
         $<BUILD_INTERFACE:${FRAMELESS_HEADER_DIR}>
@@ -396,7 +396,7 @@ if(SARIBBON_USE_FRAMELESS_LIB)
     )
 else()
     target_include_directories(${SARIBBON_LIB_NAME} PUBLIC
-        $<INSTALL_INTERFACE:include>
+        $<INSTALL_INTERFACE:include/${SARIBBON_LIB_NAME}>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     )
 endif()
@@ -407,13 +407,13 @@ message(STATUS "install dir ${SARIBBON_BIN_DIR}")
 # 头文件
 install(FILES
     ${SARIBBON_HEADER_FILES}
-    DESTINATION include
+    DESTINATION include/${SARIBBON_LIB_NAME}
     COMPONENT headers
 )
 # SAColorWidget的头文件
 install(FILES
     ${SACOLOR_HEADER_FILES}
-    DESTINATION include/colorWidgets
+    DESTINATION include/${SARIBBON_LIB_NAME}/colorWidgets
     COMPONENT headers
 )
 
@@ -426,32 +426,36 @@ set(SARIBBON_AMALGAMATE_FILES
 )
 install(FILES
     ${SARIBBON_AMALGAMATE_FILES}
-    DESTINATION amalgamate
+    DESTINATION ${SARIBBON_LIB_NAME}_amalgamate
 )
 # 复制resource目录到install/amalgamate目录
 install(DIRECTORY
     ${CMAKE_CURRENT_SOURCE_DIR}/resource
-    DESTINATION amalgamate/SARibbonBar
+    DESTINATION ${SARIBBON_LIB_NAME}_amalgamate/SARibbonBar
 )
 # resource.qrc
 install(FILES
     ${SARIBBON_RESOURCE_FILES}
-    DESTINATION amalgamate/SARibbonBar
+    DESTINATION ${SARIBBON_LIB_NAME}_amalgamate/SARibbonBar
 )
-
+# 复制3rdparty目录到install/amalgamate目录
+install(DIRECTORY
+    ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
+    DESTINATION ${SARIBBON_LIB_NAME}_amalgamate/SARibbonBar
+)
 # 如果开启了frameless，要把frameless的文件也拷贝过去
 if(SARIBBON_USE_FRAMELESS_LIB)
 	#复制目录src/SARibbonBar/3rdparty/framelesshelper/include/
 	install(DIRECTORY
         ${FRAMELESS_HEADER_DIR}
-		DESTINATION include/3rdparty/framelesshelper/include
+		DESTINATION include/${SARIBBON_LIB_NAME}/3rdparty/framelesshelper/include
 		COMPONENT headers
 	)
 	#复制目录src/SARibbonBar/3rdparty/framelesshelper/qmake/
 	SET(FRAMELESS_QMAKE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/framelesshelper/qmake)
 	install(DIRECTORY
         ${FRAMELESS_QMAKE_DIR}
-		DESTINATION include/3rdparty/framelesshelper/
+		DESTINATION include/${SARIBBON_LIB_NAME}/3rdparty/framelesshelper/
 		COMPONENT headers
 	)
 endif()
@@ -461,7 +465,7 @@ include(CMakePackageConfigHelpers)
 # PACKAGE_PREFIX_DIR等于${CMAKE_CURRENT_LIST_DIR}/../..
 # 最终变为${CMAKE_CURRENT_LIST_DIR}/../../include
 # 注意此处是替换，不要出现引号
-set(SARIBBON_LIB_INCLUDE_INSTALL_DIR include)
+set(SARIBBON_LIB_INCLUDE_INSTALL_DIR include/${SARIBBON_LIB_NAME})
 write_basic_package_version_file(
     ${CMAKE_CURRENT_BINARY_DIR}/${SARIBBON_LIB_NAME}ConfigVersion.cmake
     VERSION ${SARIBBON_VERSION}
@@ -479,7 +483,7 @@ install(TARGETS ${SARIBBON_LIB_NAME}
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
-    INCLUDES DESTINATION include
+    INCLUDES DESTINATION include/${SARIBBON_LIB_NAME}
 )
 install(EXPORT ${SARIBBON_LIB_NAME}Targets
     FILE ${SARIBBON_LIB_NAME}Targets.cmake
