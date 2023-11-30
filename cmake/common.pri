@@ -15,7 +15,7 @@ defineReplace(saRibbonLibNameMake) {
     }
     return ($${LibName})
 }
-
-SARIBBON_BIN_DIR = $$PWD/lib
+SARIBBON_LIB_DIR = $$PWD/..
+SARIBBON_BIN_DIR = $$PWD/../bin
 SARIBBONBAR_PRI_FILE_PATH = $$PWD/SARibbonBar.pri # 源代码路径
 SARIBBON_LIB_NAME=$$saRibbonLibNameMake(SARibbonBar)

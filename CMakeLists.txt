@@ -11,13 +11,13 @@ set(SARIBBON_VERSION "${SARIBBON_VERSION_MAJOR}.${SARIBBON_VERSION_MINOR}.${SARI
 project(SARibbon VERSION ${SARIBBON_VERSION} LANGUAGES CXX)
 
 # option(BUILD_SHARED_LIBS "build the SARibbonBar in shared lib mode" ON)
-option(BUILD_EXAMPLES "build the examples" ON)
+option(SARIBBON_BUILD_EXAMPLES "build the examples" ON)
 
 # load Qt library, minimum version required is 5.8
 # cn:Qt库加载,最低版本要求为5.8
 set(SARIBBON_MIN_QT_VERSION 5.8)
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} ${DA_MIN_QT_VERSION} COMPONENTS
+find_package(Qt${QT_VERSION_MAJOR} ${SARIBBON_MIN_QT_VERSION} COMPONENTS
     Core
     Gui
     Widgets
@@ -73,34 +73,26 @@ set(CMAKE_MINSIZEREL_POSTFIX "s" CACHE STRING "add a postfix, usually empty on w
 
 if(CMAKE_BUILD_TYPE MATCHES "Release")
     set(CMAKE_BUILD_POSTFIX "${CMAKE_RELEASE_POSTFIX}")
-	set(SARIBBON_BUILD_TYPE release)
 elseif (CMAKE_BUILD_TYPE MATCHES "MinSizeRel")
     set(CMAKE_BUILD_POSTFIX "${CMAKE_MINSIZEREL_POSTFIX}")
-	set(SARIBBON_BUILD_TYPE unknow)
-	set(SARIBBON_BUILD_TYPE release)
 elseif(CMAKE_BUILD_TYPE MATCHES "RelWithDebInfo")
     set(CMAKE_BUILD_POSTFIX "${CMAKE_RELWITHDEBINFO_POSTFIX}")
-	set(SARIBBON_BUILD_TYPE release)
 elseif(CMAKE_BUILD_TYPE MATCHES "Debug")
     set(CMAKE_BUILD_POSTFIX "${CMAKE_DEBUG_POSTFIX}")
-	set(SARIBBON_BUILD_TYPE debug)#SARIBBON_BUILD_TYPE用于生成bin目录的后缀名称
 else()
     set(CMAKE_BUILD_POSTFIX "")
-	set(SARIBBON_BUILD_TYPE unknow)
 endif()
 
 if(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4819")
 endif()
 
-# include(CPack)
-
 message(STATUS "SARibbon ${SARIBBON_VERSION}")
 # 平台判断
 if("${CMAKE_SIZEOF_VOID_P}" STREQUAL "4")
-    set(SARIBBON_PLATFORM "86")
+    set(SARIBBON_PLATFORM "x86")
 else()
-    set(SARIBBON_PLATFORM "64")
+    set(SARIBBON_PLATFORM "x64")
 endif()
 
 
@@ -109,7 +101,7 @@ include(cmake/WinResource.cmake)
 
 # The bin file directory is one level above the current directory
 # cn:bin文件目录在当前目录的上上一级
-set(SARIBBON_BIN_NAME bin_qt${QT_VERSION_MAJOR}.${QT_VERSION_MINOR}.${QT_VERSION_PATCH}_${SARIBBON_BUILD_TYPE}_${SARIBBON_PLATFORM})
+set(SARIBBON_BIN_NAME bin_qt${QT_VERSION}_${CMAKE_BUILD_TYPE}_${SARIBBON_PLATFORM})
 set(SARIBBON_BIN_DIR ${CMAKE_CURRENT_SOURCE_DIR}/${SARIBBON_BIN_NAME})
 
 # windows系统下，默认直接安装到当前文件夹下
@@ -133,13 +125,13 @@ set(SARIBBON_DOC_FILES
 # 复制doc目录到install目录
 install(DIRECTORY
     ${CMAKE_CURRENT_SOURCE_DIR}/doc
-    DESTINATION .
+    DESTINATION doc/SARibbon
     COMPONENT document
 )
 #  把文档复制过去
 install(FILES
     ${SARIBBON_DOC_FILES}
-    DESTINATION .
+    DESTINATION doc/SARibbon
     COMPONENT document
 )
 
@@ -150,6 +142,6 @@ set(SARIBBON_QMAKE_FILES
     )
 install(FILES
     ${SARIBBON_QMAKE_FILES}
-    DESTINATION .
+    DESTINATION lib/qmake
     COMPONENT qmake
 )
