@@ -384,7 +384,8 @@ endif()
 if(SARIBBON_USE_FRAMELESS_LIB)
     target_include_directories(${SARIBBON_LIB_NAME} PUBLIC
         $<INSTALL_INTERFACE:include/${SARIBBON_LIB_NAME}>
-		$<INSTALL_INTERFACE:include/${SARIBBON_LIB_NAME}/3rdparty/framelesshelper/include>
+        $<INSTALL_INTERFACE:include/${SARIBBON_LIB_NAME}/3rdparty/framelesshelper/include>
+        $<INSTALL_INTERFACE:include/${SARIBBON_LIB_NAME}/3rdparty/framelesshelper/qmake/inc/core>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
         $<BUILD_INTERFACE:${FRAMELESS_HEADER_BASE}>
         $<BUILD_INTERFACE:${FRAMELESS_HEADER_DIR}>
