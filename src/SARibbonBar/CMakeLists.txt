@@ -474,7 +474,7 @@ write_basic_package_version_file(
 configure_package_config_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/SARibbonBarConfig.cmake.in"
   "${CMAKE_CURRENT_BINARY_DIR}/${SARIBBON_LIB_NAME}Config.cmake"
-  INSTALL_DESTINATION "lib/cmake"
+  INSTALL_DESTINATION lib/cmake/${SARIBBON_LIB_NAME}
   PATH_VARS SARIBBON_LIB_INCLUDE_INSTALL_DIR
 )
 message("CMAKE_CURRENT_BINARY_DIR=${CMAKE_CURRENT_BINARY_DIR}")
@@ -487,13 +487,13 @@ install(TARGETS ${SARIBBON_LIB_NAME}
 )
 install(EXPORT ${SARIBBON_LIB_NAME}Targets
     FILE ${SARIBBON_LIB_NAME}Targets.cmake
-    DESTINATION lib/cmake
+    DESTINATION lib/cmake/${SARIBBON_LIB_NAME}
 )
 
 install(FILES
     "${CMAKE_CURRENT_BINARY_DIR}/${SARIBBON_LIB_NAME}Config.cmake"
     "${CMAKE_CURRENT_BINARY_DIR}/${SARIBBON_LIB_NAME}ConfigVersion.cmake"
-    DESTINATION lib/cmake
+    DESTINATION lib/cmake/${SARIBBON_LIB_NAME}
 )
 
 # 资源文件生成

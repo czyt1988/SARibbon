@@ -142,6 +142,6 @@ set(SARIBBON_QMAKE_FILES
     )
 install(FILES
     ${SARIBBON_QMAKE_FILES}
-    DESTINATION lib/qmake
+    DESTINATION lib/qmake/SARibbonBar
     COMPONENT qmake
 )
