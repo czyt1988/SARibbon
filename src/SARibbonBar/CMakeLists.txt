@@ -403,7 +403,7 @@ else()
 endif()
 
 # ------------------------------- install script -------------------------------
-message(STATUS "install dir ${SARIBBON_BIN_DIR}")
+message(STATUS "install dir ${CMAKE_INSTALL_PREFIX}")
 
 # 头文件
 install(FILES
@@ -448,16 +448,16 @@ install(DIRECTORY
 if(SARIBBON_USE_FRAMELESS_LIB)
 	#复制目录src/SARibbonBar/3rdparty/framelesshelper/include/
 	install(DIRECTORY
-        ${FRAMELESS_HEADER_DIR}
-		DESTINATION include/${SARIBBON_LIB_NAME}/3rdparty/framelesshelper/include
-		COMPONENT headers
+            ${FRAMELESS_HEADER_DIR}
+            DESTINATION include/${SARIBBON_LIB_NAME}/3rdparty/framelesshelper/include
+            COMPONENT headers
 	)
 	#复制目录src/SARibbonBar/3rdparty/framelesshelper/qmake/
 	SET(FRAMELESS_QMAKE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/framelesshelper/qmake)
 	install(DIRECTORY
-        ${FRAMELESS_QMAKE_DIR}
-		DESTINATION include/${SARIBBON_LIB_NAME}/3rdparty/framelesshelper/
-		COMPONENT headers
+            ${FRAMELESS_QMAKE_DIR}
+            DESTINATION include/${SARIBBON_LIB_NAME}/3rdparty/framelesshelper/
+            COMPONENT headers
 	)
 endif()
 
@@ -473,10 +473,10 @@ write_basic_package_version_file(
     COMPATIBILITY SameMajorVersion
 )
 configure_package_config_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/SARibbonBarConfig.cmake.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/${SARIBBON_LIB_NAME}Config.cmake"
-  INSTALL_DESTINATION lib/cmake/${SARIBBON_LIB_NAME}
-  PATH_VARS SARIBBON_LIB_INCLUDE_INSTALL_DIR
+    "${CMAKE_CURRENT_SOURCE_DIR}/SARibbonBarConfig.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/${SARIBBON_LIB_NAME}Config.cmake"
+    INSTALL_DESTINATION lib/cmake/${SARIBBON_LIB_NAME}
+    PATH_VARS SARIBBON_LIB_INCLUDE_INSTALL_DIR
 )
 message("CMAKE_CURRENT_BINARY_DIR=${CMAKE_CURRENT_BINARY_DIR}")
 install(TARGETS ${SARIBBON_LIB_NAME}
