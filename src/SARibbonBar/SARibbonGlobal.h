@@ -9,6 +9,10 @@
   @note My native language is not English, and most of the translation of documents is machine translation
 
   版本记录(change log):
+  - 2023-12-06 -> 1.0.7
+  修订了CMake，让安装和引入更标准
+  添加了中文的构建和引入文档
+  一些细节的调整
 
   - 2023-11-19 -> 1.0.6
   添加Office2016主题
@@ -110,7 +114,7 @@
  * @def ribbon的数字版本 MAJ.MIN.{PAT}
  */
 #ifndef SA_RIBBON_BAR_VERSION_PAT
-#define SA_RIBBON_BAR_VERSION_PAT 6
+#define SA_RIBBON_BAR_VERSION_PAT 7
 #endif
 
 /**
