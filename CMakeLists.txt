@@ -106,7 +106,7 @@ set(SARIBBON_BIN_DIR ${CMAKE_CURRENT_SOURCE_DIR}/${SARIBBON_BIN_NAME})
 
 # windows系统下，默认直接安装到当前文件夹下
 if(WIN32)
-	set(CMAKE_INSTALL_PREFIX "${SARIBBON_BIN_DIR}/SARibbon")
+    set(CMAKE_INSTALL_PREFIX "${SARIBBON_BIN_DIR}")
 endif()
 
 add_subdirectory(src)
