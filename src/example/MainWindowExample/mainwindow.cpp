@@ -179,7 +179,7 @@ void MainWindow::createRibbonApplicationButton()
         btn = new SARibbonApplicationButton(this);
         ribbon->setApplicationButton(btn);
     }
-    ribbon->applicationButton()->setText((" File "));  // 文字两边留有间距，好看一点
+    ribbon->applicationButton()->setText(("   File   "));  // 文字两边留有间距，好看一点
     // cn: SARibbonMenu和QMenu的操作是一样的
     // en: The operations of SARibbonMenu and QMenu are the same
     if (!mMenuApplicationBtn) {
@@ -217,14 +217,14 @@ void MainWindow::onStyleClicked(int id)
     switch (ribbonStyle) {
     case SARibbonBar::RibbonStyleLooseThreeRow:
         mTextedit->append(
-                tr("\nchange ribbon style to office style,The standard office style text display is line wrapped, "
-                   "and you can also control whether it wrap through SARibbonToolButton::setEnableWordWrap"));  // cn:标准的office样式的文字显示是换行的，你也可以通过SARibbonToolButton::setEnableWordWrap来控制它是否换行
+            tr("\nchange ribbon style to office style,The standard office style text display is line wrapped, "
+               "and you can also control whether it wrap through SARibbonToolButton::setEnableWordWrap"));  // cn:标准的office样式的文字显示是换行的，你也可以通过SARibbonToolButton::setEnableWordWrap来控制它是否换行
         mTextedit->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::OfficeStyle);"));
         break;
     case SARibbonBar::RibbonStyleLooseTwoRow:
         mTextedit->append(
-                tr("\nchange ribbon style to office style 2 row,All text in 2-line mode does not wrap, and you "
-                   "can also control whether it wraps through SARibbonToolButton: setEnableWordWrap"));  // cn:所有2行模式的文字都是不换行的，你也可以通过SARibbonToolButton::setEnableWordWrap来控制它是否换行
+            tr("\nchange ribbon style to office style 2 row,All text in 2-line mode does not wrap, and you "
+               "can also control whether it wraps through SARibbonToolButton: setEnableWordWrap"));  // cn:所有2行模式的文字都是不换行的，你也可以通过SARibbonToolButton::setEnableWordWrap来控制它是否换行
         mTextedit->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::OfficeStyleTwoRow);"));
         break;
     case SARibbonBar::RibbonStyleCompactThreeRow:
@@ -298,7 +298,7 @@ void MainWindow::onActionHelpTriggered()
                                 "\n Author:czy"
                                 "\n Email:czy.t@163.com"
                                 "\n ===============")
-                                     .arg(SARibbonBar::versionString()));
+                                 .arg(SARibbonBar::versionString()));
 }
 
 void MainWindow::onActionRemoveAppBtnTriggered(bool b)
@@ -430,7 +430,7 @@ void MainWindow::onColorButtonColorClicked(const QColor& c, bool on)
 void MainWindow::onRibbonThemeComboBoxCurrentIndexChanged(int index)
 {
     SARibbonMainWindow::RibbonTheme t = static_cast< SARibbonMainWindow::RibbonTheme >(
-            mComboboxRibbonTheme->itemData(index).toInt());
+        mComboboxRibbonTheme->itemData(index).toInt());
     setRibbonTheme(t);
 }
 

@@ -5,7 +5,6 @@
 #include <QStylePainter>
 #include <QDebug>
 #include <QLabel>
-#include "SARibbonDrawHelper.h"
 
 /**
  * @brief The SARibbonCtrlContainerPrivate class
@@ -117,8 +116,14 @@ bool SARibbonCtrlContainer::hasContainerWidget() const
  */
 void SARibbonCtrlContainer::setIcon(const QIcon& i)
 {
-    d_ptr->icon = i;
-    d_ptr->labelPixmap->setPixmap(i.pixmap(d_ptr->iconSize));
+    d_ptr->icon    = i;
+    QPixmap pixmap = i.pixmap(d_ptr->iconSize);
+    d_ptr->labelPixmap->setPixmap(pixmap);
+}
+
+void SARibbonCtrlContainer::setIcon(const QPixmap& pixmap)
+{
+    d_ptr->labelPixmap->setPixmap(pixmap);
 }
 
 /**

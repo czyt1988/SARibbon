@@ -367,7 +367,7 @@ protected:
     virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
     virtual void moveEvent(QMoveEvent* e) Q_DECL_OVERRIDE;
     virtual void changeEvent(QEvent* e) Q_DECL_OVERRIDE;
-    virtual void paintBackground(QPainter& painter);
+    virtual void paintTabbarBaseLine(QPainter& painter);
     virtual void paintWindowTitle(QPainter& painter, const QString& title, const QRect& titleRegion);
     virtual void paintContextCategoryTab(QPainter& painter, const QString& title, QRect contextRect, const QColor& color);
 };
