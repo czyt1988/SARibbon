@@ -728,7 +728,7 @@ void SARibbonPannel::resizeEvent(QResizeEvent* event)
         if (ThreeRowMode == pannelLayoutMode()) {
             d_ptr->m_optionActionButton->move(width() - d_ptr->m_optionActionButton->width() - 2,
                                               height() - titleHeight()
-                                                      + (titleHeight() - d_ptr->m_optionActionButton->height()) / 2);
+                                                  + (titleHeight() - d_ptr->m_optionActionButton->height()) / 2);
         } else {
             d_ptr->m_optionActionButton->move(width() - d_ptr->m_optionActionButton->width(),
                                               height() - d_ptr->m_optionActionButton->height());

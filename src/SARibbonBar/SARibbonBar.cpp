@@ -242,6 +242,7 @@ public:
 SARibbonBar::SARibbonBar(QWidget* parent) : QMenuBar(parent), d_ptr(new SARibbonBar::PrivateData(this))
 {
     d_ptr->init();
+    ensurePolished();
     setNativeMenuBar(false);
     // #ifdef Q_OS_MACOS
     //     setNativeMenuBar(false);
@@ -1395,6 +1396,13 @@ bool SARibbonBar::isTitleVisible() const
 void SARibbonBar::setEnableUserDefineAccessBarIconSize(bool on)
 {
     d_ptr->mEnableUserDefineAccessBarIconSize = on;
+    if (!(d_ptr->mEnableUserDefineAccessBarIconSize)) {  //允许用户自定义AccessBar的IconSize就不进入此条件重置大小
+        // 变更iconsize
+        QSize btnIconSize = PrivateData::calcIconSizeByHeight(titleBarHeight());
+        if (btnIconSize != d_ptr->mQuickAccessBar->iconSize()) {
+            d_ptr->mQuickAccessBar->setIconSize(btnIconSize);
+        }
+    }
 }
 
 /**
@@ -1418,6 +1426,13 @@ bool SARibbonBar::isEnableUserDefineAccessBarIconSize() const
 void SARibbonBar::setEnableUserDefineRightBarIconSize(bool on)
 {
     d_ptr->mEnableUserDefineRightBarIconSize = on;
+    // 变更iconsize
+    if (!(d_ptr->mEnableUserDefineRightBarIconSize)) {
+        QSize btnIconSize = PrivateData::calcIconSizeByHeight(titleBarHeight());
+        if (btnIconSize != d_ptr->mRightButtonGroup->iconSize()) {
+            d_ptr->mRightButtonGroup->setIconSize(btnIconSize);
+        }
+    }
 }
 
 /**
@@ -1561,6 +1576,7 @@ void SARibbonBar::updateCategoryTitleToTabName()
             }
         }
     }
+    repaint();
 }
 
 void SARibbonBar::paintEvent(QPaintEvent* e)
@@ -1584,11 +1600,11 @@ void SARibbonBar::paintInNormalStyle()
     QPainter p(this);
 
     //!
-    paintBackground(p);
+    paintTabbarBaseLine(p);
     //! 显示上下文标签
     p.save();
     QList< _SAContextCategoryManagerData > contextCategoryDataList = d_ptr->mCurrentShowingContextCategory;
-    bool isCurrentSelectContextCategoryPage                        = false;
+    // bool isCurrentSelectContextCategoryPage                        = false;
 
     QPoint contextCategoryRegion(width(), -1);
     QMargins border = contentsMargins();
@@ -1615,16 +1631,16 @@ void SARibbonBar::paintInNormalStyle()
                 contextCategoryRegion.setY(contextTitleRect.right());
             }
         }
-        isCurrentSelectContextCategoryPage = indexs.contains(d_ptr->mRibbonTabBar->currentIndex());
-        if (isCurrentSelectContextCategoryPage) {
-            QPen pen;
-            pen.setColor(clr);
-            pen.setWidth(1);
-            p.setPen(pen);
-            p.setBrush(Qt::NoBrush);
-            p.drawRect(d_ptr->mStackedContainerWidget->geometry());
-            isCurrentSelectContextCategoryPage = false;
-        }
+        // isCurrentSelectContextCategoryPage = indexs.contains(d_ptr->mRibbonTabBar->currentIndex());
+        // if (isCurrentSelectContextCategoryPage) {
+        //     QPen pen;
+        //     pen.setColor(clr);
+        //     pen.setWidth(1);
+        //     p.setPen(pen);
+        //     p.setBrush(Qt::NoBrush);
+        //     p.drawRect(d_ptr->mStackedContainerWidget->geometry());
+        //     isCurrentSelectContextCategoryPage = false;
+        // }
     }
     p.restore();
     //! 显示标题等
@@ -1667,7 +1683,7 @@ void SARibbonBar::paintInWpsLiteStyle()
 {
     QPainter p(this);
     //!
-    paintBackground(p);
+    paintTabbarBaseLine(p);
     //! 显示上下文标签
     p.save();
     QList< _SAContextCategoryManagerData > contextCategoryDataList = d_ptr->mCurrentShowingContextCategory;
@@ -1885,14 +1901,7 @@ void SARibbonBar::resizeInOfficeStyle()
             }
             QSize quickAccessBarSize = d_ptr->mQuickAccessBar->sizeHint();
             // 上下留1px的边线
-            d_ptr->mQuickAccessBar->setGeometry(x, y + 1, quickAccessBarSize.width(), validTitleBarHeight - 2);
-            if (!(d_ptr->mEnableUserDefineAccessBarIconSize)) {  //允许用户自定义AccessBar的IconSize就不进入此条件重置大小
-                // 变更iconsize
-                QSize btnIconSize = PrivateData::calcIconSizeByHeight(validTitleBarHeight - 2);
-                if (btnIconSize != d_ptr->mQuickAccessBar->iconSize()) {
-                    d_ptr->mQuickAccessBar->setIconSize(btnIconSize);
-                }
-            }
+            d_ptr->mQuickAccessBar->setGeometry(x, y + 1, quickAccessBarSize.width(), validTitleBarHeight);
         }
     }
     // 第二行，开始布局applicationButton，tabbar，tabBarRightSizeButtonGroupWidget，TopRightCorner
@@ -1933,13 +1942,6 @@ void SARibbonBar::resizeInOfficeStyle()
         endX -= wSize.width();
         // 上下留1px的边线
         d_ptr->mRightButtonGroup->setGeometry(endX, y + 1, wSize.width(), tabH - 2);
-        // 变更iconsize
-        if (!(d_ptr->mEnableUserDefineRightBarIconSize)) {
-            QSize btnIconSize = PrivateData::calcIconSizeByHeight(tabH - 2);
-            if (btnIconSize != d_ptr->mRightButtonGroup->iconSize()) {
-                d_ptr->mRightButtonGroup->setIconSize(btnIconSize);
-            }
-        }
     }
     // 最后确定tabbar宽度
     int tabBarAllowedWidth = endX - x;
@@ -1994,13 +1996,6 @@ void SARibbonBar::resizeInWpsLiteStyle()
         endX -= wSize.width();
         // 上下留1px的边线
         d_ptr->mRightButtonGroup->setGeometry(endX, y + 1, wSize.width(), validTitleBarHeight - 2);
-        // 变更iconsize
-        if (!(d_ptr->mEnableUserDefineRightBarIconSize)) {
-            QSize btnIconSize = PrivateData::calcIconSizeByHeight(validTitleBarHeight - 2);
-            if (btnIconSize != d_ptr->mRightButtonGroup->iconSize()) {
-                d_ptr->mRightButtonGroup->setIconSize(btnIconSize);
-            }
-        }
     }
     // quick access bar定位
     if (d_ptr->mQuickAccessBar) {
@@ -2009,13 +2004,6 @@ void SARibbonBar::resizeInWpsLiteStyle()
             endX -= quickAccessBarSize.width();
             // 上下留1px的边线
             d_ptr->mQuickAccessBar->setGeometry(endX, y + 1, quickAccessBarSize.width(), validTitleBarHeight - 2);
-            // 变更iconsize
-            if (!(d_ptr->mEnableUserDefineAccessBarIconSize)) {  //允许用户自定义AccessBar的IconSize就不进入此条件重置大小
-                QSize btnIconSize = PrivateData::calcIconSizeByHeight(validTitleBarHeight - 2);
-                if (btnIconSize != d_ptr->mQuickAccessBar->iconSize()) {
-                    d_ptr->mQuickAccessBar->setIconSize(btnIconSize);
-                }
-            }
         }
     }
     // cornerWidget - TopLeftCorner
@@ -2077,7 +2065,7 @@ void SARibbonBar::resizeInWpsLiteStyle()
     resizeStackedContainerWidget();
 }
 
-void SARibbonBar::paintBackground(QPainter& painter)
+void SARibbonBar::paintTabbarBaseLine(QPainter& painter)
 {
     painter.save();
     // 在tabbar下绘制一条线
