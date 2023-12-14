@@ -5,7 +5,8 @@
 #include <QStylePainter>
 #include <QDebug>
 #include <QLabel>
-
+#include <QApplication>
+#include <QScreen>
 /**
  * @brief The SARibbonCtrlContainerPrivate class
  */
@@ -117,7 +118,8 @@ bool SARibbonCtrlContainer::hasContainerWidget() const
 void SARibbonCtrlContainer::setIcon(const QIcon& i)
 {
     d_ptr->icon    = i;
-    QPixmap pixmap = i.pixmap(d_ptr->iconSize);
+    QPixmap pixmap = i.pixmap(d_ptr->iconSize * devicePixelRatioF());
+    pixmap.setDevicePixelRatio(devicePixelRatioF());
     d_ptr->labelPixmap->setPixmap(pixmap);
 }
 
