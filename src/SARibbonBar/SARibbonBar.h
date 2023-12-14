@@ -104,14 +104,14 @@ public:
      */
     enum RibbonStyle
     {
-        RibbonStyleLooseThreeRow   = 0x0000,              ///< 宽松结构，3行模式
-        RibbonStyleCompactThreeRow = 0x0001,              ///< 紧凑结构，3行模式
-        RibbonStyleLooseTwoRow     = 0x0100,              ///< 宽松结构，2行模式
-        RibbonStyleCompactTwoRow   = 0x0101,              ///< 紧凑结构，2行模式
-                                                          // 以下枚举将组件淘汰
-        OfficeStyle        = RibbonStyleLooseThreeRow,    ///< 类似office 的ribbon风格
-        WpsLiteStyle       = RibbonStyleCompactThreeRow,  ///< 类似wps的紧凑风格
-        OfficeStyleTwoRow  = RibbonStyleLooseTwoRow,  ///< 类似office 的ribbon风格 2行工具栏 三行布局模式，office就是三行布局模式，pannel能布置3行小toolbutton，默认模式
+        RibbonStyleLooseThreeRow   = 0x0000,         ///< 宽松结构，3行模式
+        RibbonStyleCompactThreeRow = 0x0001,         ///< 紧凑结构，3行模式
+        RibbonStyleLooseTwoRow     = 0x0100,         ///< 宽松结构，2行模式
+        RibbonStyleCompactTwoRow   = 0x0101,         ///< 紧凑结构，2行模式
+                                                     // 以下枚举将组件淘汰
+        OfficeStyle  = RibbonStyleLooseThreeRow,     ///< 类似office 的ribbon风格
+        WpsLiteStyle = RibbonStyleCompactThreeRow,   ///< 类似wps的紧凑风格
+        OfficeStyleTwoRow = RibbonStyleLooseTwoRow,  ///< 类似office 的ribbon风格 2行工具栏 三行布局模式，office就是三行布局模式，pannel能布置3行小toolbutton，默认模式
         WpsLiteStyleTwoRow = RibbonStyleCompactTwoRow  ///< 类似wps的紧凑风格  2行工具栏
     };
     Q_ENUM(RibbonStyle)
@@ -136,7 +136,7 @@ public:
     // 获取版本信息
     static QString versionString();
 
-    //获取默认的上下文标签颜色列表
+    // 获取默认的上下文标签颜色列表
     static QList< QColor > getDefaultContextCategoryColorList();
 
 public:
@@ -229,16 +229,21 @@ public:
 
     // ribbon tab的高度
     int tabBarHeight() const;
-
+    void setTabBarHeight(int h);
     // 标题栏的高度
     int titleBarHeight() const;
-
+    void setTitleBarHeight(int h);
+    // 获取mainBar的高度
+    int mainBarHeight() const;
+    void setMainBarHeight(int m);
+    // 最小模式下的MainBar高度
+    int minimumModeMainBarHeight() const;
     // 激活tabbar右边的按钮群
-    void activeRightButtonGroup();
-
+    SARibbonButtonGroupWidget* activeRightButtonGroup();
     // 右侧按钮群
     SARibbonButtonGroupWidget* rightButtonGroup();
-
+    // 激活QuickAccessBar
+    SARibbonQuickAccessBar* activeQuickAccessBar();
     // 快速响应栏
     SARibbonQuickAccessBar* quickAccessBar();
 
@@ -288,16 +293,16 @@ public:
     // 设置是否显示标题
     void setTitleVisible(bool on = false);
     bool isTitleVisible() const;
-    //允许用户自定义AccessBar图标尺寸，默认为false
+    // 允许用户自定义AccessBar图标尺寸，默认为false
     void setEnableUserDefineAccessBarIconSize(bool on = true);
     bool isEnableUserDefineAccessBarIconSize() const;
-    //允许用户自定义RightBar图标尺寸，默认为false
+    // 允许用户自定义RightBar图标尺寸，默认为false
     void setEnableUserDefineRightBarIconSize(bool on = true);
     bool isEnableUserDefineRightBarIconSize() const;
-    //上下文标签的颜色列表，上下文标签显示的时候，会从颜色列表中取颜色进行标签的渲染
+    // 上下文标签的颜色列表，上下文标签显示的时候，会从颜色列表中取颜色进行标签的渲染
     void setContextCategoryColorList(const QList< QColor >& cls);
     QList< QColor > getContextCategoryColorList() const;
-    //设置ribbon的对齐方式
+    // 设置ribbon的对齐方式
     void setRibbonAlignment(SARibbonAlignment al);
     SARibbonAlignment getRibbonAlignment() const;
 signals:
@@ -327,14 +332,18 @@ signals:
      */
     void ribbonStyleChanged(SARibbonBar::RibbonStyle nowStyle);
 
+    /**
+       @brief 标题栏高度发生了变化的信号
+       @param oldHeight
+       @param newHeight
+     */
+    void titleBarHeightChanged(int oldHeight, int newHeight);
+
 protected:
     bool eventFilter(QObject* obj, QEvent* e) override;
 
     // 根据情况重置tabbar的宽度，主要针对wps模式
     int calcMinTabBarWidth() const;
-
-    // 根据currentRibbonStyle计算mainBar的高度
-    virtual int mainBarHeight() const;
     // 更新
     void updateCategoryTitleToTabName();
 protected slots:
