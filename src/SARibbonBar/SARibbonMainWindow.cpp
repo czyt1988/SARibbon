@@ -67,7 +67,6 @@ SARibbonMainWindow::SARibbonMainWindow(QWidget* parent, bool useRibbon, const Qt
     if (useRibbon) {
         installRibbonBar(createRibbonBar());
         setRibbonTheme(ribbonTheme());
-        qDebug() << RibbonSubElementStyleOpt;
     }
 }
 

@@ -25,25 +25,25 @@ public:
     // ribbonBar的高度
     virtual int ribbonBarHeight(SARibbonBar::RibbonStyle s) const;
 
-    //标题栏的高度，对于wps模式，此参数没有用
+    // 标题栏的高度，对于wps模式，此参数没有用
     virtual int titleBarHeight() const;
 
-    //标签栏高度
+    // 标签栏高度
     virtual int tabBarHeight() const;
 
-    //在改变了参数后对需要计算的变量从新计算
+    // 在改变了参数后对需要计算的变量从新计算
     virtual void recalc();
 
 protected:
-    //通过已有参数计算pannel的高度
-    //    int calcPannelHeight(SARibbonPannel::PannelLayoutMode lm) const;
-    //计算ribbon的高度
+    // 通过已有参数计算pannel的高度
+    //     int calcPannelHeight(SARibbonPannel::PannelLayoutMode lm) const;
+    // 计算ribbon的高度
     int calcMainbarHeight(SARibbonBar::RibbonStyle s) const;
 
 private:
-    //初始化
+    // 初始化
     void init();
-    //计算pannel的高度
+    // 计算pannel的高度
     void updateMainbarHeight();
 
 private:

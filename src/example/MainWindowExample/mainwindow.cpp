@@ -157,12 +157,8 @@ MainWindow::MainWindow(QWidget* par)
     //! If the actions are created before, the actions added to the ribbon need to be manually managed in the ActionManager.
     //! The ActionManager can also manage actions not in the ribbon bar
     createActionsManager();
-
     setMinimumWidth(500);
-    //
     showMaximized();
-    //    onStyleClicked(SARibbonBar::RibbonStyleLooseThreeRow);
-    //
     setWindowIcon(QIcon(":/icon/icon/SA.svg"));
 }
 
