@@ -1,6 +1,7 @@
 ﻿#include "SARibbonStyleOption.h"
 #include <QApplication>
 #include <QDebug>
+#include <QScreen>
 SARibbonStyleOption::SARibbonStyleOption()
 {
     init();
@@ -73,7 +74,10 @@ int SARibbonStyleOption::calcMainbarHeight(SARibbonBar::RibbonStyle s) const
 void SARibbonStyleOption::init()
 {
     QFontMetrics fm = QApplication::fontMetrics();
+    qreal dr = QApplication::primaryScreen()->devicePixelRatio();
+
     int lineSpacing = fm.lineSpacing();
+    lineSpacing *= dr;
 
     m_titleBarHeight                     = lineSpacing * 1.8;
     m_tabBarHeight                       = lineSpacing * 1.5;
@@ -102,6 +106,7 @@ QDebug operator<<(QDebug debug, const SARibbonStyleOption& c)
     QDebugStateSaver saver(debug);
     Q_UNUSED(saver);
     debug.nospace() << "fontMetrics.lineSpacing=" << QApplication::fontMetrics().lineSpacing()
+                       << "fontMetrics.height=" << QApplication::fontMetrics().height()
                     << ",SARibbonStyleOption(titleBarHeight=" << c.titleBarHeight() << ",tabBarHeight=" << c.tabBarHeight()
                     << "\n,ribbonBarHeight(OfficeStyle)=" << c.ribbonBarHeight(SARibbonBar::RibbonStyleLooseThreeRow)
                     << "\n,ribbonBarHeight(OfficeStyleTwoRow)=" << c.ribbonBarHeight(SARibbonBar::RibbonStyleLooseTwoRow)
