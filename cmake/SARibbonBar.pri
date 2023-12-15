@@ -1,7 +1,10 @@
-include($$PWD/common.pri)
+# lib/qmake/this-file
+# include/SARibbonBar/
 
-INCLUDEPATH += $$PWD/include/SARibbon
-DEPENDPATH += $$PWD/include/SARibbon
+include($$PWD/common.pri)
+SARIBBON_INCLUDE_DIR = $$PWD/../../include/SARibbonBar
+INCLUDEPATH += $${SARIBBON_INCLUDE_DIR}
+DEPENDPATH += $${SARIBBON_INCLUDE_DIR}
 
 
 greaterThan(QT_MAJOR_VERSION, 4){
@@ -23,10 +26,10 @@ contains( SA_RIBBON_CONFIG, use_frameless ) {
         CONFIG += c++17
     }
     # framelessHelper的引用路径
-    INCLUDEPATH += $$PWD/include/SARibbon/3rdparty/framelesshelper/include
-    DEPENDPATH += $$PWD/include/SARibbon/3rdparty/framelesshelper/include
-    INCLUDEPATH += $$PWD/include/SARibbon/3rdparty/framelesshelper/qmake/inc/core
-    DEPENDPATH += $$PWD/include/SARibbon/3rdparty/framelesshelper/qmake/inc/core
+    INCLUDEPATH += $${SARIBBON_INCLUDE_DIR}/3rdparty/framelesshelper/include
+    DEPENDPATH += $${SARIBBON_INCLUDE_DIR}/3rdparty/framelesshelper/include
+    INCLUDEPATH += $${SARIBBON_INCLUDE_DIR}/3rdparty/framelesshelper/qmake/inc/core
+    DEPENDPATH += $${SARIBBON_INCLUDE_DIR}/3rdparty/framelesshelper/qmake/inc/core
     # 定义FRAMELESSHELPER_FEATURE_static_build为-1让frameless也作为库的一部分
     DEFINES += FRAMELESSHELPER_FEATURE_static_build=-1
     # 定义SARIBBON_USE_3RDPARTY_FRAMELESSHELPER为1
@@ -34,5 +37,5 @@ contains( SA_RIBBON_CONFIG, use_frameless ) {
 }else{
     DEFINES += SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=0
 }
-LIBS += -L$${SARIBBON_BIN_DIR} -l$${SARIBBON_LIB_NAME}
+LIBS += -L$${SARIBBON_LIB_DIR} -l$${SARIBBON_LIB_NAME}
 

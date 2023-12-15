@@ -63,15 +63,15 @@ public:
     QList< SARibbonContextCategory* > mContextCategoryList;  ///< 存放所有的上下文标签
     QList< _SARibbonTabData > mHidedCategory;
     int mIconRightBorderPosition;  ///< 标题栏x值得最小值，在有图标和快捷启动按钮，此值都需要变化
-    SARibbonControlButton* mMinimumCategoryButton;  ///< 隐藏面板按钮
-    SARibbonButtonGroupWidget* mRightButtonGroup;   ///< 在tab bar右边的按钮群
-    SARibbonQuickAccessBar* mQuickAccessBar;        ///< 快速响应栏
-    SARibbonBar::RibbonStyle mRibbonStyle;          ///< ribbon的风格
-    SARibbonBar::RibbonStyle mLastShowStyle;        ///< ribbon的风格
-    SARibbonBar::RibbonMode mCurrentRibbonMode;     ///< 记录当前模式
-    QSize mWindowButtonSize;                        ///< 由SARibbonMainWindow告诉的windowbutton的尺寸
-    QList< QColor > mContextCategoryColorList;      ///< contextCategory的色系
-    int mContextCategoryColorListIndex;             ///< 记录contextCategory色系索引
+    QAction* mMinimumCategoryButtonAction;         ///< 隐藏面板按钮action
+    SARibbonButtonGroupWidget* mRightButtonGroup;  ///< 在tab bar右边的按钮群
+    SARibbonQuickAccessBar* mQuickAccessBar;       ///< 快速响应栏
+    SARibbonBar::RibbonStyle mRibbonStyle;         ///< ribbon的风格
+    SARibbonBar::RibbonStyle mLastShowStyle;       ///< ribbon的风格
+    SARibbonBar::RibbonMode mCurrentRibbonMode;    ///< 记录当前模式
+    QSize mWindowButtonSize;                       ///< 由SARibbonMainWindow告诉的windowbutton的尺寸
+    QList< QColor > mContextCategoryColorList;     ///< contextCategory的色系
+    int mContextCategoryColorListIndex;            ///< 记录contextCategory色系索引
     QColor mTitleTextColor;  ///< 标题文字颜色,默认无效，无效的情况下和SARibbonBar的qss:color属性一致
     QColor mTabBarBaseLineColor;              ///< tabbar 底部会绘制一条线条，定义线条颜色
     Qt::Alignment mTitleAligment;             ///< 标题对齐方式
@@ -88,7 +88,7 @@ public:
         , mRibbonTabBar(nullptr)
         , mStackedContainerWidget(nullptr)
         , mIconRightBorderPosition(1)
-        , mMinimumCategoryButton(nullptr)
+        , mMinimumCategoryButtonAction(nullptr)
         , mRightButtonGroup(nullptr)
         , mRibbonStyle(SARibbonBar::RibbonStyleLooseThreeRow)
         , mLastShowStyle(SARibbonBar::RibbonStyleLooseThreeRow)
@@ -353,6 +353,7 @@ QSize SARibbonBar::PrivateData::calcIconSizeByHeight(int h)
 SARibbonBar::SARibbonBar(QWidget* parent) : QMenuBar(parent), d_ptr(new SARibbonBar::PrivateData(this))
 {
     d_ptr->init();
+    ensurePolished();
     setNativeMenuBar(false);
     // #ifdef Q_OS_MACOS
     //     setNativeMenuBar(false);
@@ -968,28 +969,21 @@ void SARibbonBar::showMinimumModeButton(bool isShow)
 {
     if (isShow) {
         activeRightButtonGroup();
-        if (nullptr == d_ptr->mMinimumCategoryButton) {
-            d_ptr->mMinimumCategoryButton = RibbonSubElementDelegate->createHidePannelButton(this);
-            d_ptr->mMinimumCategoryButton->ensurePolished();  // 载入样式图标
-            QAction* action = new QAction(d_ptr->mMinimumCategoryButton);
-            action->setIcon(style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton,
-                                                  0,
-                                                  d_ptr->mMinimumCategoryButton));
-            connect(action, &QAction::triggered, this, [ = ]() {
-                this->setMinimumMode(!isMinimumMode());
-                action->setIcon(style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton,
-                                                      0,
-                                                      d_ptr->mMinimumCategoryButton));
-            });
-            d_ptr->mMinimumCategoryButton->setDefaultAction(action);
-            d_ptr->mRightButtonGroup->addWidget(d_ptr->mMinimumCategoryButton);
-            update();
-        }
+
+        d_ptr->mMinimumCategoryButtonAction = new QAction(this);
+        d_ptr->mMinimumCategoryButtonAction->setIcon(
+                style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton, nullptr));
+        connect(d_ptr->mMinimumCategoryButtonAction, &QAction::triggered, this, [ this ]() {
+            this->setMinimumMode(!isMinimumMode());
+            this->d_ptr->mMinimumCategoryButtonAction->setIcon(
+                    style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton, nullptr));
+        });
+        d_ptr->mRightButtonGroup->addAction(d_ptr->mMinimumCategoryButtonAction);
+
     } else {
-        if (nullptr != d_ptr->mMinimumCategoryButton) {
-            d_ptr->mMinimumCategoryButton->hide();
-            d_ptr->mMinimumCategoryButton->deleteLater();
-            d_ptr->mMinimumCategoryButton = nullptr;
+        if (nullptr != d_ptr->mMinimumCategoryButtonAction) {
+            d_ptr->mMinimumCategoryButtonAction->deleteLater();
+            d_ptr->mMinimumCategoryButtonAction = nullptr;
         }
     }
     QResizeEvent resizeEvent(size(), size());
@@ -1003,7 +997,7 @@ void SARibbonBar::showMinimumModeButton(bool isShow)
 ///
 bool SARibbonBar::haveShowMinimumModeButton() const
 {
-    return (nullptr != d_ptr->mMinimumCategoryButton);
+    return (nullptr != d_ptr->mMinimumCategoryButtonAction);
 }
 
 /**
@@ -1552,6 +1546,13 @@ bool SARibbonBar::isTitleVisible() const
 void SARibbonBar::setEnableUserDefineAccessBarIconSize(bool on)
 {
     d_ptr->mEnableUserDefineAccessBarIconSize = on;
+    if (!(d_ptr->mEnableUserDefineAccessBarIconSize)) {  // 允许用户自定义AccessBar的IconSize就不进入此条件重置大小
+        // 变更iconsize
+        QSize btnIconSize = PrivateData::calcIconSizeByHeight(titleBarHeight());
+        if (btnIconSize != d_ptr->mQuickAccessBar->iconSize()) {
+            d_ptr->mQuickAccessBar->setIconSize(btnIconSize);
+        }
+    }
 }
 
 /**
@@ -1575,6 +1576,13 @@ bool SARibbonBar::isEnableUserDefineAccessBarIconSize() const
 void SARibbonBar::setEnableUserDefineRightBarIconSize(bool on)
 {
     d_ptr->mEnableUserDefineRightBarIconSize = on;
+    // 变更iconsize
+    if (!(d_ptr->mEnableUserDefineRightBarIconSize)) {
+        QSize btnIconSize = PrivateData::calcIconSizeByHeight(titleBarHeight());
+        if (btnIconSize != d_ptr->mRightButtonGroup->iconSize()) {
+            d_ptr->mRightButtonGroup->setIconSize(btnIconSize);
+        }
+    }
 }
 
 /**
@@ -1736,6 +1744,7 @@ void SARibbonBar::updateCategoryTitleToTabName()
             }
         }
     }
+    repaint();
 }
 
 void SARibbonBar::paintEvent(QPaintEvent* e)
@@ -1759,11 +1768,11 @@ void SARibbonBar::paintInNormalStyle()
     QPainter p(this);
 
     //!
-    paintBackground(p);
+    paintTabbarBaseLine(p);
     //! 显示上下文标签
     p.save();
     QList< _SAContextCategoryManagerData > contextCategoryDataList = d_ptr->mCurrentShowingContextCategory;
-    bool isCurrentSelectContextCategoryPage                        = false;
+    // bool isCurrentSelectContextCategoryPage                        = false;
 
     QPoint contextCategoryRegion(width(), -1);
     QMargins border = contentsMargins();
@@ -1790,16 +1799,16 @@ void SARibbonBar::paintInNormalStyle()
                 contextCategoryRegion.setY(contextTitleRect.right());
             }
         }
-        isCurrentSelectContextCategoryPage = indexs.contains(d_ptr->mRibbonTabBar->currentIndex());
-        if (isCurrentSelectContextCategoryPage) {
-            QPen pen;
-            pen.setColor(clr);
-            pen.setWidth(1);
-            p.setPen(pen);
-            p.setBrush(Qt::NoBrush);
-            p.drawRect(d_ptr->mStackedContainerWidget->geometry());
-            isCurrentSelectContextCategoryPage = false;
-        }
+        // isCurrentSelectContextCategoryPage = indexs.contains(d_ptr->mRibbonTabBar->currentIndex());
+        // if (isCurrentSelectContextCategoryPage) {
+        //     QPen pen;
+        //     pen.setColor(clr);
+        //     pen.setWidth(1);
+        //     p.setPen(pen);
+        //     p.setBrush(Qt::NoBrush);
+        //     p.drawRect(d_ptr->mStackedContainerWidget->geometry());
+        //     isCurrentSelectContextCategoryPage = false;
+        // }
     }
     p.restore();
     //! 显示标题等
@@ -1842,7 +1851,7 @@ void SARibbonBar::paintInWpsLiteStyle()
 {
     QPainter p(this);
     //!
-    paintBackground(p);
+    paintTabbarBaseLine(p);
     //! 显示上下文标签
     p.save();
     QList< _SAContextCategoryManagerData > contextCategoryDataList = d_ptr->mCurrentShowingContextCategory;
@@ -2060,14 +2069,7 @@ void SARibbonBar::resizeInOfficeStyle()
             }
             QSize quickAccessBarSize = d_ptr->mQuickAccessBar->sizeHint();
             // 上下留1px的边线
-            d_ptr->mQuickAccessBar->setGeometry(x, y + 1, quickAccessBarSize.width(), validTitleBarHeight - 2);
-            if (!(d_ptr->mEnableUserDefineAccessBarIconSize)) {  // 允许用户自定义AccessBar的IconSize就不进入此条件重置大小
-                // 变更iconsize
-                QSize btnIconSize = PrivateData::calcIconSizeByHeight(validTitleBarHeight - 2);
-                if (btnIconSize != d_ptr->mQuickAccessBar->iconSize()) {
-                    d_ptr->mQuickAccessBar->setIconSize(btnIconSize);
-                }
-            }
+            d_ptr->mQuickAccessBar->setGeometry(x, y + 1, quickAccessBarSize.width(), validTitleBarHeight);
         }
     }
     // 第二行，开始布局applicationButton，tabbar，tabBarRightSizeButtonGroupWidget，TopRightCorner
@@ -2108,13 +2110,6 @@ void SARibbonBar::resizeInOfficeStyle()
         endX -= wSize.width();
         // 上下留1px的边线
         d_ptr->mRightButtonGroup->setGeometry(endX, y + 1, wSize.width(), tabH - 2);
-        // 变更iconsize
-        if (!(d_ptr->mEnableUserDefineRightBarIconSize)) {
-            QSize btnIconSize = PrivateData::calcIconSizeByHeight(tabH - 2);
-            if (btnIconSize != d_ptr->mRightButtonGroup->iconSize()) {
-                d_ptr->mRightButtonGroup->setIconSize(btnIconSize);
-            }
-        }
     }
     // 最后确定tabbar宽度
     int tabBarAllowedWidth = endX - x;
@@ -2169,13 +2164,6 @@ void SARibbonBar::resizeInWpsLiteStyle()
         endX -= wSize.width();
         // 上下留1px的边线
         d_ptr->mRightButtonGroup->setGeometry(endX, y + 1, wSize.width(), validTitleBarHeight - 2);
-        // 变更iconsize
-        if (!(d_ptr->mEnableUserDefineRightBarIconSize)) {
-            QSize btnIconSize = PrivateData::calcIconSizeByHeight(validTitleBarHeight - 2);
-            if (btnIconSize != d_ptr->mRightButtonGroup->iconSize()) {
-                d_ptr->mRightButtonGroup->setIconSize(btnIconSize);
-            }
-        }
     }
     // quick access bar定位
     if (d_ptr->mQuickAccessBar) {
@@ -2184,13 +2172,6 @@ void SARibbonBar::resizeInWpsLiteStyle()
             endX -= quickAccessBarSize.width();
             // 上下留1px的边线
             d_ptr->mQuickAccessBar->setGeometry(endX, y + 1, quickAccessBarSize.width(), validTitleBarHeight - 2);
-            // 变更iconsize
-            if (!(d_ptr->mEnableUserDefineAccessBarIconSize)) {  // 允许用户自定义AccessBar的IconSize就不进入此条件重置大小
-                QSize btnIconSize = PrivateData::calcIconSizeByHeight(validTitleBarHeight - 2);
-                if (btnIconSize != d_ptr->mQuickAccessBar->iconSize()) {
-                    d_ptr->mQuickAccessBar->setIconSize(btnIconSize);
-                }
-            }
         }
     }
     // cornerWidget - TopLeftCorner
@@ -2252,7 +2233,7 @@ void SARibbonBar::resizeInWpsLiteStyle()
     resizeStackedContainerWidget();
 }
 
-void SARibbonBar::paintBackground(QPainter& painter)
+void SARibbonBar::paintTabbarBaseLine(QPainter& painter)
 {
     painter.save();
     // 在tabbar下绘制一条线

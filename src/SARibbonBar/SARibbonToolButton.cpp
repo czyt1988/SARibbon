@@ -484,7 +484,7 @@ QSize SARibbonToolButton::PrivateData::calcLargeButtonSizeHint(const QStyleOptio
     int h    = opt.fontMetrics.lineSpacing() * 4.5;  // 3*1.5
     int minW = h * 0.75;  // 最小宽度，在pannel里面的按钮，最小宽度要和icon适应
     if (mDrawIconRect.isValid()) {
-        minW = mDrawIconRect.height();
+        minW = mDrawIconRect.width();
     }
     if (SARibbonPannel* pannel = qobject_cast< SARibbonPannel* >(q_ptr->parent())) {
         // 对于建立在SARibbonPannel的基础上的大按钮，把高度设置为SARibbonPannel计算的大按钮高度
@@ -539,7 +539,6 @@ int SARibbonToolButton::PrivateData::estimateLargeButtonTextWidth(int buttonHeig
                                                                   float widthHeightRatio,
                                                                   int maxTrycount)
 {
-
     QSize textSize;
     int space        = SA_FONTMETRICS_WIDTH(fm, (QLatin1Char(' '))) * 2;
     int hintMaxWidth = buttonHeight * widthHeightRatio;  ///< 建议的宽度
@@ -1064,7 +1063,6 @@ void SARibbonToolButton::updateRect()
 {
     QStyleOptionToolButton opt;
     initStyleOption(&opt);
-    //    d_ptr->updateSizeHint(opt);
     d_ptr->updateDrawRect(opt);
 }
 

@@ -159,19 +159,9 @@ SARibbon提供了合并好的`SARibbon.h`文件和`SARibbon.cpp`文件，只需�
 
 ### cmake
 
-使用Qt Creator或者visual studio打开`src/CMakeLists.txt`编译即可
+使用Qt Creator或者visual studio打开`根目录下的CMakeLists.txt`编译即可
 
-```cmake
-mkdir build
-cd build
-cmake -DCMAKE_PREFIX_PATH={YOUR_QT_SDK_DIR_PATH} -DCMAKE_INSTALL_PREFIX={WHERE_YOU_WANT_TO_INSTALL} -DCMAKE_BUILD_TYPE=Release
-cmake --build . --config Release --target all --parallel
-cmake --install . --config Release --strip 
-```
-
-{YOUR_QT_SDK_DIR_PATH}是你的qtsdk的目录，类似`D:\Qt\5.14.2\msvc2017_64\`
-
-{WHERE_YOU_WANT_TO_INSTALL}是你的安装目录
+具体教程见[使用cmake构建及使用SARibbon的教程](./doc/build-cmake.md)
 
 ## 编译过程的常见问题
 
@@ -180,7 +170,6 @@ cmake --install . --config Release --strip
 ```txt
 ..\..\..\SARibbon\src\SARibbonBar\3rdparty\framelesshelper\src\core\framelessmanager.cpp(563): fatal error C1083: 无法打开包括文件: “framelessmanager.moc”: No such file or directory
 ```
-
 
 # 使用方法
 
@@ -222,7 +211,27 @@ qmake的编译过程会在SARibbon下生成bin_qtx.x_xx文件夹，库文件和d
 
 cmake在执行install后，会把必要的文件拷贝到安装目录下，cmake文件编写时可参考`src/example/MainWindowExample/CMakeLists.txt`
 
+具体教程见[使用cmake构建及使用SARibbon的教程](./doc/build-cmake.md)
 
+### visual studio添加
+
+如果你的qt版本大于等于5.14，会使用第三方库frameless，此时使用vs的界面操作添加SARibbon需要注意以下几点：
+
+1、include路径有三个
+```
+src/SARibbonBar
+src/SARibbonBar/3rdparty/framelesshelper/include
+src/SARibbonBar/3rdparty/framelesshelper/qmake/inc/core
+```
+
+2、预定义宏有两个：
+
+```
+FRAMELESSHELPER_FEATURE_static_build=-1
+SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1
+```
+
+否则会报LNK2001的错误
 
 ## 快速开始
 
