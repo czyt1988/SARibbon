@@ -4,6 +4,8 @@
 #include <QStyle>
 #include <QDebug>
 #include <QScopedPointer>
+#include "SARibbonMainWindow.h"
+#include "SARibbonBar.h"
 #include "SARibbonElementManager.h"
 // 为了避免使用此框架的app设置了全局的qpushbutton 的 qss样式影响此按钮，定义了一个类
 
@@ -39,7 +41,7 @@ public:
             buttonMinimize->setObjectName(QStringLiteral("SAMinimizeWindowButton"));
             buttonMinimize->setFixedSize(30, par->height() - 2);
             buttonMinimize->setFocusPolicy(Qt::NoFocus);  // 避免铺抓到
-            buttonMinimize->setIconSize(buttonMinimize->size() * mIconscale);
+            //            buttonMinimize->setIconSize(buttonMinimize->size() * mIconscale);
             buttonMinimize->show();
             par->connect(buttonMinimize, &QAbstractButton::clicked, par, &SAWindowButtonGroup::minimizeWindow);
         } else {
@@ -65,7 +67,7 @@ public:
             buttonMaximize->setFixedSize(30, par->height() - 2);
             buttonMaximize->setCheckable(true);
             buttonMaximize->setFocusPolicy(Qt::NoFocus);  // 避免铺抓到
-            buttonMaximize->setIconSize(buttonMaximize->size() * mIconscale);
+            //            buttonMaximize->setIconSize(buttonMaximize->size() * mIconscale);
             buttonMaximize->show();
             par->connect(buttonMaximize, &QAbstractButton::clicked, par, &SAWindowButtonGroup::maximizeWindow);
         } else {
@@ -92,7 +94,7 @@ public:
             buttonClose->setFocusPolicy(Qt::NoFocus);  // 避免铺抓到
             // buttonClose->setFlat(true);
             par->connect(buttonClose, &QAbstractButton::clicked, par, &SAWindowButtonGroup::closeWindow);
-            buttonClose->setIconSize(buttonClose->size() * mIconscale);
+            //            buttonClose->setIconSize(buttonClose->size() * mIconscale);
             buttonClose->show();
         } else {
             if (buttonClose) {
@@ -176,7 +178,9 @@ SAWindowToolButton::SAWindowToolButton(QWidget* p) : QPushButton(p)
 {
     setFlat(true);
 }
-
+//===================================================
+// SAWindowButtonGroup
+//===================================================
 SAWindowButtonGroup::SAWindowButtonGroup(QWidget* parent)
     : QWidget(parent), d_ptr(new SAWindowButtonGroup::PrivateData(this))
 {
@@ -344,7 +348,15 @@ bool SAWindowButtonGroup::eventFilter(QObject* watched, QEvent* e)
 void SAWindowButtonGroup::parentResize()
 {
     QWidget* par = parentWidget();
-
+    if (SARibbonMainWindow* rb = qobject_cast< SARibbonMainWindow* >(par)) {
+        if (SARibbonBar* bar = rb->ribbonBar()) {
+            // 先看看titlebar多高
+            if (height() != bar->titleBarHeight()) {
+                setFixedHeight(bar->titleBarHeight());
+            }
+            d_ptr->resize(QSize(width(), height()));
+        }
+    }
     if (par) {
         QSize parSize = par->size();
         move(parSize.width() - width() - 1, 0);
