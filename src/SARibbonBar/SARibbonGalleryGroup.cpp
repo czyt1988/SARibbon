@@ -4,7 +4,6 @@
 #include <QActionGroup>
 #include <QItemSelectionModel>
 #include "SARibbonElementManager.h"
-#include "SARibbonStyleOption.h"
 /**
  * @brief The SARibbonGalleryGroupPrivate class
  */
@@ -262,7 +261,7 @@ void SARibbonGalleryGroup::recalcGridSize(int galleryHeight)
         }
     }
     setGridSize(QSize(w, h));
-    //在通过GalleryGroupStyle确定icon的尺寸
+    // 在通过GalleryGroupStyle确定icon的尺寸
     const int shiftpix = 4;  // 这个是移动像素，qt在鼠标移动到图标上时会移动一下，给用户明确的动态，导致如果布局很满会超出显示范围，因此要在此基础上缩放一点
     switch (getGalleryGroupStyle()) {
     case IconWithText: {

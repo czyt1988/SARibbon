@@ -16,7 +16,7 @@
 #include "SARibbonPannelOptionButton.h"
 #include "SARibbonPannelLayout.h"
 
-SARibbonElementFactory::SARibbonElementFactory() : mStyleOption(new SARibbonStyleOption())
+SARibbonElementFactory::SARibbonElementFactory()
 {
 }
 
@@ -92,20 +92,6 @@ SARibbonButtonGroupWidget* SARibbonElementFactory::craeteButtonGroupWidget(QWidg
 SARibbonQuickAccessBar* SARibbonElementFactory::createQuickAccessBar(QWidget* parent)
 {
     return (new SARibbonQuickAccessBar(parent));
-}
-
-SARibbonStyleOption& SARibbonElementFactory::getRibbonStyleOption()
-{
-    return (*mStyleOption);
-}
-
-/**
- * @brief 设置style配置
- * @param opt
- */
-void SARibbonElementFactory::setRibbonStyleOption(SARibbonStyleOption* opt)
-{
-    mStyleOption.reset(opt);
 }
 
 /**

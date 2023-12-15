@@ -154,7 +154,7 @@ public:
     QSize sizeHint() const
     {
         int width  = 0;
-        int height = RibbonSubElementStyleOpt.titleBarHeight();
+        int height = 30;
 
         if (buttonClose) {
             width += 40;
