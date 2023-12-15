@@ -239,7 +239,6 @@ void SARibbonBar::PrivateData::init()
     mQuickAccessBar->setIcon(q_ptr->windowIcon());
     //
     mRightButtonGroup = RibbonSubElementDelegate->craeteButtonGroupWidget(q_ptr);
-    mRightButtonGroup->setFrameShape(QFrame::NoFrame);
     //
     setNormalMode();
 }
@@ -1265,7 +1264,6 @@ SARibbonButtonGroupWidget* SARibbonBar::activeRightButtonGroup()
 {
     if (nullptr == d_ptr->mRightButtonGroup) {
         d_ptr->mRightButtonGroup = RibbonSubElementDelegate->craeteButtonGroupWidget(this);
-        d_ptr->mRightButtonGroup->setFrameShape(QFrame::NoFrame);
     }
     d_ptr->mRightButtonGroup->show();
     return d_ptr->mRightButtonGroup;

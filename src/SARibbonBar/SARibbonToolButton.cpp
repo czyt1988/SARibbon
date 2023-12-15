@@ -622,13 +622,9 @@ QPixmap SARibbonToolButton::PrivateData::createIconPixmap(const QStyleOptionTool
     } else {
         mode = QIcon::Normal;
     }
-    //添加高分屏支持
-    qreal pr = QApplication::primaryScreen()->devicePixelRatio();
+    // 添加高分屏支持
     QSize pxiampSize = iconsize - QSize(2, 2);
-    pxiampSize *= pr;
-    QPixmap px = opt.icon.pixmap(pxiampSize, mode, state);
-    px.setDevicePixelRatio(pr);
-    return px;
+    return opt.icon.pixmap(pxiampSize, mode, state);
 }
 
 int SARibbonToolButton::PrivateData::getTextAlignment() const

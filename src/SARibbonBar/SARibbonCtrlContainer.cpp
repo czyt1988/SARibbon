@@ -40,7 +40,7 @@ public:
     void setContainerWidget(QWidget* w)
     {
         if (containerWidget) {
-            //原来有widget
+            // 原来有widget
             QWidget* oldwidget = containerWidget;
             takeContainerWidget(oldwidget);
             oldwidget->deleteLater();
@@ -118,8 +118,7 @@ bool SARibbonCtrlContainer::hasContainerWidget() const
 void SARibbonCtrlContainer::setIcon(const QIcon& i)
 {
     d_ptr->icon    = i;
-    QPixmap pixmap = i.pixmap(d_ptr->iconSize * devicePixelRatioF());
-    pixmap.setDevicePixelRatio(devicePixelRatioF());
+    QPixmap pixmap = i.pixmap(d_ptr->iconSize);
     d_ptr->labelPixmap->setPixmap(pixmap);
 }
 
