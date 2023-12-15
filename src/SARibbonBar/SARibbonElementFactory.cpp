@@ -84,17 +84,6 @@ SARibbonStackedWidget* SARibbonElementFactory::createRibbonStackedWidget(SARibbo
     return (new SARibbonStackedWidget(parent));
 }
 
-SARibbonControlButton* SARibbonElementFactory::createHidePannelButton(SARibbonBar* parent)
-{
-    SARibbonControlButton* btn = new SARibbonControlButton(parent);
-
-    btn->setAutoRaise(false);
-    btn->setObjectName(QStringLiteral("SARibbonBarHidePannelButton"));
-    btn->setToolButtonStyle(Qt::ToolButtonIconOnly);
-    btn->setFixedSize(parent->tabBarHeight() - 4, parent->tabBarHeight() - 4);
-    return (btn);
-}
-
 SARibbonButtonGroupWidget* SARibbonElementFactory::craeteButtonGroupWidget(QWidget* parent)
 {
     return (new SARibbonButtonGroupWidget(parent));

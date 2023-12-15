@@ -1,6 +1,6 @@
 ﻿cmake_minimum_required(VERSION 3.5)
 project(SARibbonBar LANGUAGES CXX VERSION ${SARIBBON_VERSION})
-set(SARIBBONBAR_LIB_NAME SARibbonBar)
+set(SARIBBON_LIB_NAME SARibbonBar)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -282,7 +282,7 @@ SET(SARIBBON_RESOURCE_FILES
 
 ################################################################
 if(SARIBBON_USE_FRAMELESS_LIB)
-    add_library(${SARIBBONBAR_LIB_NAME} SHARED
+    add_library(${SARIBBON_LIB_NAME} SHARED
         ${SARIBBON_HEADER_FILES}
         ${SARIBBON_SOURCE_FILES}
         ${SARIBBON_RESOURCE_FILES}
@@ -292,9 +292,9 @@ if(SARIBBON_USE_FRAMELESS_LIB)
         ${FRAMELESS_SOURCE_FILES}
         ${FRAMELESS_RESOURCE_FILES}
     )
-    setup_custom_moc_macros(TARGETS ${SARIBBONBAR_LIB_NAME})
+    setup_custom_moc_macros(TARGETS ${SARIBBON_LIB_NAME})
 else()
-    add_library(${SARIBBONBAR_LIB_NAME} SHARED
+    add_library(${SARIBBON_LIB_NAME} SHARED
         ${SARIBBON_HEADER_FILES}
         ${SARIBBON_SOURCE_FILES}
         ${SARIBBON_RESOURCE_FILES}
@@ -302,11 +302,11 @@ else()
         ${SACOLOR_SOURCE_FILES}
     )
 endif()
-add_library(SARibbon ALIAS ${SARIBBONBAR_LIB_NAME})
+add_library(SARibbon ALIAS ${SARIBBON_LIB_NAME})
 #################################################
 # Qt相关的依赖
 #################################################
-target_link_libraries(${SARIBBONBAR_LIB_NAME} PUBLIC
+target_link_libraries(${SARIBBON_LIB_NAME} PUBLIC
                       Qt${QT_VERSION_MAJOR}::Core
                       Qt${QT_VERSION_MAJOR}::Gui
                       Qt${QT_VERSION_MAJOR}::Widgets)
@@ -319,34 +319,34 @@ target_link_libraries(${SARIBBONBAR_LIB_NAME} PUBLIC
 # But it was again brought back as a private feature of QtGui in 6.2
 if(SARIBBON_USE_FRAMELESS_LIB)
     if(TARGET Qt5::X11Extras)
-        target_link_libraries(${SARIBBONBAR_LIB_NAME} PRIVATE
+        target_link_libraries(${SARIBBON_LIB_NAME} PRIVATE
             Qt5::X11Extras
         )
     endif()
 
     # frameless 依赖了qt-private相关的库
-    target_link_libraries(${SARIBBONBAR_LIB_NAME} PRIVATE
+    target_link_libraries(${SARIBBON_LIB_NAME} PRIVATE
             Qt${QT_VERSION_MAJOR}::CorePrivate
             Qt${QT_VERSION_MAJOR}::GuiPrivate
         )
 
     if(APPLE)
-      target_link_libraries(${SARIBBONBAR_LIB_NAME} PRIVATE
+      target_link_libraries(${SARIBBON_LIB_NAME} PRIVATE
           "-framework Foundation"
           "-framework Cocoa"
           "-framework AppKit"
       )
     elseif(UNIX)
       if(TARGET X11::xcb)
-          target_link_libraries(${SARIBBONBAR_LIB_NAME} PRIVATE
+          target_link_libraries(${SARIBBON_LIB_NAME} PRIVATE
               X11::xcb
           )
       endif()
       if(TARGET PkgConfig::GTK3)
-          target_link_libraries(${SARIBBONBAR_LIB_NAME} PRIVATE
+          target_link_libraries(${SARIBBON_LIB_NAME} PRIVATE
               PkgConfig::GTK3
           )
-          target_compile_definitions(${SARIBBONBAR_LIB_NAME} PRIVATE
+          target_compile_definitions(${SARIBBON_LIB_NAME} PRIVATE
               GDK_VERSION_MIN_REQUIRED=GDK_VERSION_3_6
           )
       endif()
@@ -354,38 +354,41 @@ if(SARIBBON_USE_FRAMELESS_LIB)
 endif()
 #################################################
 
-set_target_properties(${SARIBBONBAR_LIB_NAME} PROPERTIES
+set_target_properties(${SARIBBON_LIB_NAME} PROPERTIES
     AUTOMOC ON
     AUTOUIC ON
     AUTORCC ON
     CXX_EXTENSIONS OFF
     DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX}
     VERSION ${SARIBBON_VERSION}
-    EXPORT_NAME ${SARIBBONBAR_LIB_NAME}
-    ARCHIVE_OUTPUT_DIRECTORY "${SARIBBON_BIN_DIR}"
-    LIBRARY_OUTPUT_DIRECTORY "${SARIBBON_BIN_DIR}"
-    RUNTIME_OUTPUT_DIRECTORY "${SARIBBON_BIN_DIR}"
+    EXPORT_NAME ${SARIBBON_LIB_NAME}
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
 )
-# 构建库定义的宏
-target_compile_definitions(${SARIBBONBAR_LIB_NAME} PRIVATE SA_RIBBON_BAR_MAKE_LIB)
-# 使用SAColorWidgets但不作为库使用定义的宏
-target_compile_definitions(${SARIBBONBAR_LIB_NAME} PRIVATE SA_COLOR_WIDGETS_MAKE_LIB)
+# 构建库定义的宏,此宏必须为PRIVATE
+target_compile_definitions(${SARIBBON_LIB_NAME} PRIVATE SA_RIBBON_BAR_MAKE_LIB)
+# 使用SAColorWidgets但不作为库使用定义的宏,此宏必须为PRIVATE
+target_compile_definitions(${SARIBBON_LIB_NAME} PRIVATE SA_COLOR_WIDGETS_MAKE_LIB)
 if(SARIBBON_USE_FRAMELESS_LIB)
-    # 显示定义FRAMELESSHELPER_FEATURE_static_build为-1
-    target_compile_definitions(${SARIBBONBAR_LIB_NAME} PRIVATE FRAMELESSHELPER_FEATURE_static_build=-1)
-    # 使用frameless,但也要导出符号，因此要定义导出宏
-    target_compile_definitions(${SARIBBONBAR_LIB_NAME} PRIVATE FRAMELESSHELPER_CORE_LIBRARY)
-    target_compile_definitions(${SARIBBONBAR_LIB_NAME} PRIVATE FRAMELESSHELPER_WIDGETS_LIBRARY)
-    #使用frameless必须设置SARIBBON_USE_3RDPARTY_FRAMELESSHELPER宏为1
-    target_compile_definitions(${SARIBBONBAR_LIB_NAME} PUBLIC SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1)
+    # 显示定义FRAMELESSHELPER_FEATURE_static_build为-1,此宏必须为PUBLIC
+    target_compile_definitions(${SARIBBON_LIB_NAME} PUBLIC FRAMELESSHELPER_FEATURE_static_build=-1)
+    # 使用frameless,但也要导出符号，因此要定义导出宏,下面两个宏必须为PRIVATE
+    target_compile_definitions(${SARIBBON_LIB_NAME} PRIVATE FRAMELESSHELPER_CORE_LIBRARY)
+    target_compile_definitions(${SARIBBON_LIB_NAME} PRIVATE FRAMELESSHELPER_WIDGETS_LIBRARY)
+    #使用frameless必须设置SARIBBON_USE_3RDPARTY_FRAMELESSHELPER宏为1,此宏必须为PUBLIC
+    target_compile_definitions(${SARIBBON_LIB_NAME} PUBLIC SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1)
 else()
-    #不使用frameless必须设置SARIBBON_USE_3RDPARTY_FRAMELESSHELPER宏为0
-    target_compile_definitions(${SARIBBONBAR_LIB_NAME} PUBLIC SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=0)
+    #不使用frameless必须设置SARIBBON_USE_3RDPARTY_FRAMELESSHELPER宏为0,此宏必须为PUBLIC
+    target_compile_definitions(${SARIBBON_LIB_NAME} PUBLIC SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=0)
 endif()
 
+# INSTALL_INTERFACE的路径替换，不要出现引号
 if(SARIBBON_USE_FRAMELESS_LIB)
-    target_include_directories(${SARIBBONBAR_LIB_NAME} PUBLIC
-        $<INSTALL_INTERFACE:"include">
+    target_include_directories(${SARIBBON_LIB_NAME} PUBLIC
+        $<INSTALL_INTERFACE:include/${SARIBBON_LIB_NAME}>
+        $<INSTALL_INTERFACE:include/${SARIBBON_LIB_NAME}/3rdparty/framelesshelper/include>
+        $<INSTALL_INTERFACE:include/${SARIBBON_LIB_NAME}/3rdparty/framelesshelper/qmake/inc/core>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
         $<BUILD_INTERFACE:${FRAMELESS_HEADER_BASE}>
         $<BUILD_INTERFACE:${FRAMELESS_HEADER_DIR}>
@@ -396,106 +399,113 @@ if(SARIBBON_USE_FRAMELESS_LIB)
         $<BUILD_INTERFACE:${FRAMELESS_HEADER_DIR_WIDGETS_PRIVATE}>
     )
 else()
-    target_include_directories(${SARIBBONBAR_LIB_NAME} PUBLIC
-        $<INSTALL_INTERFACE:"include">
+    target_include_directories(${SARIBBON_LIB_NAME} PUBLIC
+        $<INSTALL_INTERFACE:include/${SARIBBON_LIB_NAME}>
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
     )
 endif()
 
 # ------------------------------- install script -------------------------------
-
-set(SARIBBON_INSTALL_DIR SARibbon)
-set(CMAKE_INSTALL_PREFIX ${SARIBBON_BIN_DIR})
-message(STATUS "install dir ${SARIBBON_BIN_DIR}")
+message(STATUS "install dir ${CMAKE_INSTALL_PREFIX}")
 
 # 头文件
 install(FILES
     ${SARIBBON_HEADER_FILES}
-    DESTINATION include
+    DESTINATION include/${SARIBBON_LIB_NAME}
     COMPONENT headers
 )
 # SAColorWidget的头文件
 install(FILES
     ${SACOLOR_HEADER_FILES}
-    DESTINATION include/colorWidgets
+    DESTINATION include/${SARIBBON_LIB_NAME}/colorWidgets
     COMPONENT headers
 )
 
 # 生成单一文件
 # 单一文件是把整个SARibbon打包为一个h和一个cpp，方便集成
-set(SARIBBON_AMALGAMATE_FILES ${CMAKE_CURRENT_SOURCE_DIR}/../SARibbon.h 
-	${CMAKE_CURRENT_SOURCE_DIR}/../SARibbon.cpp 
-	${CMAKE_CURRENT_SOURCE_DIR}/../SARibbon.pri)
+set(SARIBBON_AMALGAMATE_FILES 
+    ${CMAKE_CURRENT_SOURCE_DIR}/../SARibbon.h 
+    ${CMAKE_CURRENT_SOURCE_DIR}/../SARibbon.cpp 
+    ${CMAKE_CURRENT_SOURCE_DIR}/../SARibbon.pri
+)
 install(FILES
     ${SARIBBON_AMALGAMATE_FILES}
-    DESTINATION amalgamate
+    DESTINATION ${SARIBBON_LIB_NAME}_amalgamate
 )
 # 复制resource目录到install/amalgamate目录
 install(DIRECTORY
     ${CMAKE_CURRENT_SOURCE_DIR}/resource
-    DESTINATION amalgamate/SARibbonBar
+    DESTINATION ${SARIBBON_LIB_NAME}_amalgamate/SARibbonBar
 )
 # resource.qrc
 install(FILES
     ${SARIBBON_RESOURCE_FILES}
-    DESTINATION amalgamate/SARibbonBar
+    DESTINATION ${SARIBBON_LIB_NAME}_amalgamate/SARibbonBar
 )
-
+# 复制3rdparty目录到install/amalgamate目录
+install(DIRECTORY
+    ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
+    DESTINATION ${SARIBBON_LIB_NAME}_amalgamate/SARibbonBar
+)
 # 如果开启了frameless，要把frameless的文件也拷贝过去
 if(SARIBBON_USE_FRAMELESS_LIB)
 	#复制目录src/SARibbonBar/3rdparty/framelesshelper/include/
 	install(DIRECTORY
-        ${FRAMELESS_HEADER_DIR}
-		DESTINATION include/3rdparty/framelesshelper/include
-		COMPONENT headers
+            ${FRAMELESS_HEADER_DIR}
+            DESTINATION include/${SARIBBON_LIB_NAME}/3rdparty/framelesshelper/include
+            COMPONENT headers
 	)
 	#复制目录src/SARibbonBar/3rdparty/framelesshelper/qmake/
 	SET(FRAMELESS_QMAKE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/framelesshelper/qmake)
 	install(DIRECTORY
-        ${FRAMELESS_QMAKE_DIR}
-		DESTINATION include/3rdparty/framelesshelper/
-		COMPONENT headers
+            ${FRAMELESS_QMAKE_DIR}
+            DESTINATION include/${SARIBBON_LIB_NAME}/3rdparty/framelesshelper/
+            COMPONENT headers
 	)
 endif()
 
 include(CMakePackageConfigHelpers)
-set(SARIBBONBAR_LIB_INCLUDE_INSTALL_DIR "../../include")
+# SARibbonBarConfig.cmake.in中，会让此变量和“${PACKAGE_PREFIX_DIR}/”进行拼接，也就是${PACKAGE_PREFIX_DIR}/@SARIBBON_LIB_INCLUDE_INSTALL_DIR@
+# PACKAGE_PREFIX_DIR等于${CMAKE_CURRENT_LIST_DIR}/../..
+# 最终变为${CMAKE_CURRENT_LIST_DIR}/../../include
+# 注意此处是替换，不要出现引号
+set(SARIBBON_LIB_INCLUDE_INSTALL_DIR include/${SARIBBON_LIB_NAME})
 write_basic_package_version_file(
-    ${CMAKE_CURRENT_BINARY_DIR}/SARibbonConfigVersion.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/${SARIBBON_LIB_NAME}ConfigVersion.cmake
     VERSION ${SARIBBON_VERSION}
     COMPATIBILITY SameMajorVersion
 )
 configure_package_config_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/SARibbonBarConfig.cmake.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/SARibbonConfig.cmake"
-  INSTALL_DESTINATION "lib/cmake"
-  PATH_VARS SARIBBONBAR_LIB_INCLUDE_INSTALL_DIR
+    "${CMAKE_CURRENT_SOURCE_DIR}/SARibbonBarConfig.cmake.in"
+    "${CMAKE_CURRENT_BINARY_DIR}/${SARIBBON_LIB_NAME}Config.cmake"
+    INSTALL_DESTINATION lib/cmake/${SARIBBON_LIB_NAME}
+    PATH_VARS SARIBBON_LIB_INCLUDE_INSTALL_DIR
 )
 message("CMAKE_CURRENT_BINARY_DIR=${CMAKE_CURRENT_BINARY_DIR}")
-install(TARGETS ${SARIBBONBAR_LIB_NAME}
-    EXPORT SARibbonBarTargets
+install(TARGETS ${SARIBBON_LIB_NAME}
+    EXPORT ${SARIBBON_LIB_NAME}Targets
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib
-    INCLUDES DESTINATION include
+    INCLUDES DESTINATION include/${SARIBBON_LIB_NAME}
 )
-install(EXPORT SARibbonBarTargets
-    FILE SARibbonTargets.cmake
-    DESTINATION lib/cmake
+install(EXPORT ${SARIBBON_LIB_NAME}Targets
+    FILE ${SARIBBON_LIB_NAME}Targets.cmake
+    DESTINATION lib/cmake/${SARIBBON_LIB_NAME}
 )
 
 install(FILES
-    "${CMAKE_CURRENT_BINARY_DIR}/SARibbonConfig.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/SARibbonConfigVersion.cmake"
-    DESTINATION lib/cmake
+    "${CMAKE_CURRENT_BINARY_DIR}/${SARIBBON_LIB_NAME}Config.cmake"
+    "${CMAKE_CURRENT_BINARY_DIR}/${SARIBBON_LIB_NAME}ConfigVersion.cmake"
+    DESTINATION lib/cmake/${SARIBBON_LIB_NAME}
 )
 
 # 资源文件生成
 
 if(WIN32)
 	create_win32_resource_version(
-                TARGET ${SARIBBONBAR_LIB_NAME}
-                FILENAME ${SARIBBONBAR_LIB_NAME}
+                TARGET ${SARIBBON_LIB_NAME}
+                FILENAME ${SARIBBON_LIB_NAME}
 		EXT "dll"
 		DESCRIPTION "Ribbon control library for Qt"
 	)

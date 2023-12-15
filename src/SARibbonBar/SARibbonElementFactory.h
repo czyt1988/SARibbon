@@ -48,9 +48,6 @@ public:
     virtual SARibbonToolButton* createRibbonToolButton(QWidget* parent);
     virtual SARibbonControlButton* createRibbonControlButton(QWidget* parent);
     virtual SARibbonStackedWidget* createRibbonStackedWidget(SARibbonBar* parent);
-
-    //创建隐藏ribbon的按钮代理函数
-    virtual SARibbonControlButton* createHidePannelButton(SARibbonBar* parent);
     virtual SARibbonButtonGroupWidget* craeteButtonGroupWidget(QWidget* parent);
     virtual SARibbonQuickAccessBar* createQuickAccessBar(QWidget* parent);
 

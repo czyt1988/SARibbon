@@ -26,6 +26,7 @@ public:
     bool hasContainerWidget() const;
     //图标
     void setIcon(const QIcon& i);
+    void setIcon(const QPixmap& pixmap);
     QIcon getIcon() const;
     //图标
     void setText(const QString& t);
