@@ -306,50 +306,57 @@ SARibbonCategoryScrollButton[arrowType="4"] {
 }
 
 /*SAWindowToolButton*/
-SAWindowToolButton { 
-  background-color: transparent; 
+
+SAWindowToolButton {
+  background-color: transparent;
   border:none;
 }
 
 SAWindowToolButton:focus {
   outline: none;
 }
-
-#SAMinimizeWindowButton {
-  image: url(:/image/resource/Titlebar_Min.png);
+/*Min*/
+SAWindowToolButton#SAMinimizeWindowButton {
+  qproperty-iconSize: 16px 16px;
+  qproperty-icon: url(:/image/resource/Titlebar_Min.svg) center;
 }
-
-#SAMaximizeWindowButton:checked {
-  image:url(:/image/resource/Titlebar_Normal.png);
-}
-
-#SAMaximizeWindowButton {
-  image:url(:/image/resource/Titlebar_Max.png);
-}
-
-#SAMinimizeWindowButton:hover,#SAMaximizeWindowButton:hover {
+SAWindowToolButton#SAMinimizeWindowButton:hover,#SAMaximizeWindowButton:hover {
   background-color: #e5e5e5;
+  qproperty-iconSize: 16px 16px;
+  qproperty-icon: url(:/image/resource/Titlebar_Min_Hover.svg) center;
 }
-
-#SAMinimizeWindowButton:pressed,#SAMaximizeWindowButton:pressed {
+SAWindowToolButton#SAMinimizeWindowButton:pressed,#SAMaximizeWindowButton:pressed {
   background-color: #cacacb;
 }
-
-#SACloseWindowButton {
-  image: url(:/image/resource/Titlebar_Close.png);
+/*Max*/
+SAWindowToolButton#SAMaximizeWindowButton {
+    qproperty-iconSize: 16px 16px;
+    qproperty-icon: url(:/image/resource/Titlebar_Max.svg) center;
+}
+SAWindowToolButton#SAMaximizeWindowButton:checked {
+    qproperty-icon: url(:/image/resource/Titlebar_Normal.svg) center;
+}
+SAWindowToolButton#SAMaximizeWindowButton:hover {
+    background-color: #e5e5e5;
+    qproperty-icon: url(:/image/resource/Titlebar_Max_Hover.svg) center;
 }
 
-#SACloseWindowButton:hover {
+
+/*Close*/
+SAWindowToolButton#SACloseWindowButton {
+    qproperty-iconSize: 16px 16px;
+    qproperty-icon: url(:/image/resource/Titlebar_Close.svg) center;
+}
+SAWindowToolButton#SACloseWindowButton:hover {
   background-color: #e81123;
-  image: url(:/image/resource/Titlebar_Close_Hover.png);
+  qproperty-icon: url(:/image/resource/Titlebar_Close_Hover.svg) center;
+}
+SAWindowToolButton#SACloseWindowButton:pressed {
+    background-color: #f1707a;
+    qproperty-icon: url(:/image/resource/Titlebar_Close_Hover.svg) center;
 }
 
-#SACloseWindowButton:pressed {
-  background-color: #f1707a;
-  image: url(:/image/resource/Titlebar_Close_Hover.png);
-}
-
-#SARibbonBarHidePannelButton {
+SAWindowToolButton#SARibbonBarHidePannelButton {
   titlebar-shade-icon: url(:/image/resource/Titlebar_Shade.png);
   titlebar-unshade-icon: url(:/image/resource/Titlebar_Unshade.png);
 }

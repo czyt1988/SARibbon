@@ -4,14 +4,17 @@
         <file>resource/ArrowDown.png</file>
         <file>resource/ArrowMore.png</file>
         <file>resource/ArrowUp.png</file>
-        <file>resource/Titlebar_Close.png</file>
-        <file>resource/Titlebar_Close_Hover.png</file>
-        <file>resource/Titlebar_Max.png</file>
-        <file>resource/Titlebar_Min.png</file>
-        <file>resource/Titlebar_Normal.png</file>
         <file>resource/Titlebar_Shade.png</file>
         <file>resource/Titlebar_Unshade.png</file>
         <file>resource/define-color.svg</file>
+        <file>resource/Titlebar_Close.svg</file>
+        <file>resource/Titlebar_Close_Hover.svg</file>
+        <file>resource/Titlebar_Max.svg</file>
+        <file>resource/Titlebar_Max_Hover.svg</file>
+        <file>resource/Titlebar_Min.svg</file>
+        <file>resource/Titlebar_Min_Hover.svg</file>
+        <file>resource/Titlebar_Normal.svg</file>
+        <file>resource/Titlebar_Normal_Hover.svg</file>
     </qresource>
     <qresource prefix="/theme">
         <file>resource/theme-win7.qss</file>

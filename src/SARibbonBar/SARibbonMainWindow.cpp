@@ -66,6 +66,8 @@ SARibbonMainWindow::SARibbonMainWindow(QWidget* parent, bool useRibbon, const Qt
     if (useRibbon) {
         installRibbonBar(createRibbonBar());
         setRibbonTheme(ribbonTheme());
+    } else {
+        setupNormalWindow();
     }
 }
 
@@ -107,6 +109,11 @@ bool SARibbonMainWindow::eventFilter(QObject* obj, QEvent* e)
         }
     }
     return (QMainWindow::eventFilter(obj, e));
+}
+#else
+FRAMELESSHELPER_PREPEND_NAMESPACE(FramelessWidgetsHelper*) SARibbonMainWindow::framelessHelper()
+{
+    return FramelessWidgetsHelper::get(this);
 }
 #endif
 /**
@@ -259,9 +266,6 @@ void SARibbonMainWindow::installRibbonBar(SARibbonBar* bar)
     if (nullptr == d_ptr->mWindowButtonGroup) {
         d_ptr->mWindowButtonGroup = new SAWindowButtonGroup(this);
     }
-    QSize s = d_ptr->mWindowButtonGroup->sizeHint();
-    s.setHeight(bar->titleBarHeight());
-    d_ptr->mWindowButtonGroup->setFixedSize(s);
     d_ptr->mWindowButtonGroup->setWindowStates(windowState());
     d_ptr->mWindowButtonGroup->show();
     helper->setHitTestVisible(d_ptr->mWindowButtonGroup);   // IMPORTANT!
@@ -292,6 +296,22 @@ void SARibbonMainWindow::installRibbonBar(SARibbonBar* bar)
 #endif
 }
 
+/**
+   @brief 构建为普通窗口
+ */
+void SARibbonMainWindow::setupNormalWindow()
+{
+#if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
+    auto helper = FramelessWidgetsHelper::get(this);
+    // 设置window按钮
+    if (nullptr == d_ptr->mWindowButtonGroup) {
+        d_ptr->mWindowButtonGroup = new SAWindowButtonGroup(this);
+    }
+    d_ptr->mWindowButtonGroup->setWindowStates(windowState());
+    d_ptr->mWindowButtonGroup->show();
+#endif
+}
+
 void sa_set_ribbon_theme(QWidget* w, SARibbonMainWindow::RibbonTheme theme)
 {
     QFile file;
@@ -318,5 +338,7 @@ void sa_set_ribbon_theme(QWidget* w, SARibbonMainWindow::RibbonTheme theme)
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         return;
     }
-    w->setStyleSheet(file.readAll());
+    // 有反馈用qstring接住文件内容，再设置进去才能生效（qt5.7版本）
+    QString qss = file.readAll();
+    w->setStyleSheet(qss);
 }
