@@ -169,4 +169,13 @@ enum class SARibbonAlignment
  */
 // #define SARIBBON_USE_3RDPARTY_FRAMELESSHELPER 0
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
+#ifndef SA_FONTMETRICS_WIDTH
+#define SA_FONTMETRICS_WIDTH(fm, str) fm.horizontalAdvance(str)
+#endif
+#else
+#ifndef SA_FONTMETRICS_WIDTH
+#define SA_FONTMETRICS_WIDTH(fm, str) fm.width(str)
+#endif
+#endif
 #endif  // SARIBBONGLOBAL_H

@@ -1,6 +1,5 @@
 ﻿#include "SARibbonMainWindow.h"
 #include "SARibbonBar.h"
-#include "SARibbonDrawHelper.h"
 #include "SARibbonElementManager.h"
 #include "SARibbonTabBar.h"
 #include <QApplication>

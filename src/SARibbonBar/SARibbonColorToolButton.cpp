@@ -42,15 +42,22 @@ QPixmap SARibbonColorToolButton::PrivateData::createIconPixmap(const QStyleOptio
         mode = QIcon::Normal;
     }
     QSize realIconSize = iconsize - QSize(0, c_ribbonbutton_color_height + 1);
+    realIconSize *= q_ptr->devicePixelRatioF();
     QPixmap pixmap     = opt.icon.pixmap(q_ptr->window()->windowHandle(), realIconSize, mode, state);
+    pixmap.setDevicePixelRatio(q_ptr->devicePixelRatioF());
     QPixmap res(pixmap.size() + QSize(4, c_ribbonbutton_color_height + 4));  //宽度上，颜色块多出2px
+    res.setDevicePixelRatio(q_ptr->devicePixelRatioF());
     res.fill(Qt::transparent);
     QPainter painter(&res);
     int xpixmap   = (res.width() - pixmap.width()) / 2;
     int ypixmap   = (res.height() - c_ribbonbutton_color_height - 2 - pixmap.height()) / 2;  //这里要减去2而不是1，这样奇数偶数都不会影响
-    QRect rpixmap = QRect(xpixmap, ypixmap, pixmap.width(), pixmap.height());
+    xpixmap /= q_ptr->devicePixelRatioF();
+    ypixmap /= q_ptr->devicePixelRatioF();
+    int w = pixmap.width()/q_ptr->devicePixelRatioF();
+    int h = pixmap.height()/q_ptr->devicePixelRatioF();
+    QRect rpixmap = QRect(xpixmap, ypixmap, w, h);
     painter.drawPixmap(rpixmap, pixmap);
-    QRect colorRect = rpixmap.adjusted(0, pixmap.height() + 1, 0, c_ribbonbutton_color_height + 1);
+    QRect colorRect = rpixmap.adjusted(0, h + 1, 0, c_ribbonbutton_color_height + 1);
     if (mColor.isValid()) {
         painter.fillRect(colorRect, mColor);
     } else {
