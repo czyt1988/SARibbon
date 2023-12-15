@@ -115,6 +115,7 @@ QAction* SARibbonButtonGroupWidget::addAction(QAction* a)
 QAction* SARibbonButtonGroupWidget::addAction(const QString& text, const QIcon& icon, QToolButton::ToolButtonPopupMode popMode)
 {
     QAction* a = new QAction(icon, text, this);
+
     addAction(a);
     ButtonTyle* btn = qobject_cast< ButtonTyle* >(d_ptr->mItems.back().widget);
     btn->setPopupMode(popMode);
