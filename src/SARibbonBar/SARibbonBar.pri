@@ -68,7 +68,6 @@ SOURCES += \
     $$PWD/SARibbonGalleryItem.cpp \
     $$PWD/SARibbonComboBox.cpp \
     $$PWD/SARibbonElementManager.cpp \
-    $$PWD/SARibbonDrawHelper.cpp \
     $$PWD/SARibbonLineEdit.cpp \
     $$PWD/SARibbonCheckBox.cpp \
     $$PWD/SARibbonButtonGroupWidget.cpp \
@@ -108,7 +107,6 @@ HEADERS  += \
     $$PWD/SARibbonGalleryItem.h \
     $$PWD/SARibbonComboBox.h \
     $$PWD/SARibbonElementManager.h \
-    $$PWD/SARibbonDrawHelper.h \
     $$PWD/SARibbonLineEdit.h \
     $$PWD/SARibbonCheckBox.h \
     $$PWD/SARibbonButtonGroupWidget.h \

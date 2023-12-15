@@ -1,5 +1,4 @@
 ﻿#include "SARibbonToolButton.h"
-#include "SARibbonDrawHelper.h"
 #include "SARibbonElementManager.h"
 #include <QAction>
 #include <QApplication>
@@ -11,6 +10,8 @@
 #include <QStyleOptionToolButton>
 #include <QStylePainter>
 #include <QTextOption>
+#include <QApplication>
+#include <QScreen>
 /**
  * @def 定义文字换行时2行文本的矩形高度系数，此系数决定文字区域的高度
  *
@@ -621,7 +622,13 @@ QPixmap SARibbonToolButton::PrivateData::createIconPixmap(const QStyleOptionTool
     } else {
         mode = QIcon::Normal;
     }
-    return (opt.icon.pixmap(iconsize - QSize(2, 2), mode, state));
+    //添加高分屏支持
+    qreal pr = QApplication::primaryScreen()->devicePixelRatio();
+    QSize pxiampSize = iconsize - QSize(2, 2);
+    pxiampSize *= pr;
+    QPixmap px = opt.icon.pixmap(pxiampSize, mode, state);
+    px.setDevicePixelRatio(pr);
+    return px;
 }
 
 int SARibbonToolButton::PrivateData::getTextAlignment() const

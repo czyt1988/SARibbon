@@ -219,7 +219,6 @@ SET(SARIBBON_HEADER_FILES
     SARibbonComboBox.h
     SARibbonElementFactory.h
     SARibbonElementManager.h
-    SARibbonDrawHelper.h
     SARibbonLineEdit.h
     SARibbonCheckBox.h
     SARibbonButtonGroupWidget.h
@@ -261,7 +260,6 @@ SET(SARIBBON_SOURCE_FILES
     SARibbonComboBox.cpp
     SARibbonElementFactory.cpp
     SARibbonElementManager.cpp
-    SARibbonDrawHelper.cpp
     SARibbonLineEdit.cpp
     SARibbonCheckBox.cpp
     SARibbonButtonGroupWidget.cpp
