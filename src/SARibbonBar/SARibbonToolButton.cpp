@@ -269,7 +269,7 @@ void SARibbonToolButton::PrivateData::calcSmallButtonDrawRects(const QStyleOptio
     case Qt::ToolButtonIconOnly: {
         if (hasIndicator(opt)) {
             // 在仅有图标的小模式显示时，预留一个下拉箭头位置
-            iconRect = opt.rect.adjusted(spacing, spacing, -indicatorLen - spacing, -spacing);
+            iconRect           = opt.rect.adjusted(spacing, spacing, -indicatorLen - spacing, -spacing);
             indicatorArrowRect = QRect(opt.rect.right() - indicatorLen - spacing, iconRect.y(), indicatorLen, iconRect.height());
         } else {
             iconRect           = opt.rect.adjusted(spacing, spacing, -spacing, -spacing);
@@ -281,7 +281,7 @@ void SARibbonToolButton::PrivateData::calcSmallButtonDrawRects(const QStyleOptio
     case Qt::ToolButtonTextOnly: {
         if (hasIndicator(opt)) {
             // 在仅有图标的小模式显示时，预留一个下拉箭头位置
-            textRect = opt.rect.adjusted(spacing, spacing, -indicatorLen - spacing, -spacing);
+            textRect           = opt.rect.adjusted(spacing, spacing, -indicatorLen - spacing, -spacing);
             indicatorArrowRect = QRect(opt.rect.right() - indicatorLen - spacing, spacing, indicatorLen, textRect.height());
         } else {
             textRect           = opt.rect.adjusted(spacing, spacing, -spacing, -spacing);
@@ -484,26 +484,28 @@ QSize SARibbonToolButton::PrivateData::calcLargeButtonSizeHint(const QStyleOptio
     int w    = 0;
     int h    = opt.fontMetrics.lineSpacing() * 4.5;  // 3*1.5
     int minW = h * 0.75;  // 最小宽度，在pannel里面的按钮，最小宽度要和icon适应
-    if (mDrawIconRect.isValid()) {
-        minW = mDrawIconRect.width();
-    }
+
     if (SARibbonPannel* pannel = qobject_cast< SARibbonPannel* >(q_ptr->parent())) {
         // 对于建立在SARibbonPannel的基础上的大按钮，把高度设置为SARibbonPannel计算的大按钮高度
         h = pannel->largeHeight();
     }
+    int textHeight = calcTextDrawRectHeight(opt);
+    if (mDrawIconRect.isValid()) {
+        minW = qMax(mDrawIconRect.width(), h - textHeight);
+    }
     // 估算字体的宽度作为宽度
-    w = estimateLargeButtonTextWidth(h, calcTextDrawRectHeight(opt), opt.text, opt.fontMetrics);
+    w = estimateLargeButtonTextWidth(h, textHeight, opt.text, opt.fontMetrics);
     w += (2 * mSpacing);
     // 判断是否需要加上indicator
     if (isEnableWordWrap() && isTextNeedWrap()) {
         w += mIndicatorLen;
     }
 
-    if (w < minW) {
-        w = minW;
-    }
+    // if (w < minW) {
+    //     w = minW;
+    // }
     //! Qt6.4 取消了QApplication::globalStrut
-    return QSize(w, h).expandedTo(QSize(2, 2));
+    return QSize(w, h).expandedTo(QSize(minW, textHeight));
 }
 
 /**
