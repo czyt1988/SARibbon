@@ -225,14 +225,12 @@ void SARibbonButtonGroupWidget::actionEvent(QActionEvent* e)
         }
         layout()->addWidget(item.widget);
         d_ptr->mItems.append(item);
-        layout()->invalidate();
         updateGeometry();
     } break;
 
     case QEvent::ActionChanged: {
         // 让布局重新绘制
         layout()->invalidate();
-        updateGeometry();
     } break;
 
     case QEvent::ActionRemoved: {
@@ -250,7 +248,6 @@ void SARibbonButtonGroupWidget::actionEvent(QActionEvent* e)
             i = d_ptr->mItems.erase(i);
         }
         layout()->invalidate();
-        updateGeometry();
     } break;
 
     default:

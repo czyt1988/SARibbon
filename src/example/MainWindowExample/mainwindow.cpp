@@ -11,7 +11,6 @@
 #include "SARibbonComboBox.h"
 #include "SARibbonCustomizeDialog.h"
 #include "SARibbonCustomizeWidget.h"
-#include "SARibbonElementManager.h"
 #include "SARibbonGallery.h"
 #include "SARibbonLineEdit.h"
 #include "SARibbonMenu.h"

@@ -44,6 +44,8 @@ public:
     //更新尺寸
     void updateRect();
 
+    virtual QSize sizeHint() const Q_DECL_OVERRIDE;
+
 public:
     //在lite模式下是否允许文字换行
     static void setEnableWordWrap(bool on);
@@ -58,7 +60,6 @@ protected:
     virtual void focusOutEvent(QFocusEvent* e) Q_DECL_OVERRIDE;
     virtual void leaveEvent(QEvent* e) Q_DECL_OVERRIDE;
     virtual bool hitButton(const QPoint& pos) const Q_DECL_OVERRIDE;
-    virtual QSize sizeHint() const Q_DECL_OVERRIDE;
     virtual bool event(QEvent* e) Q_DECL_OVERRIDE;
     //事件改变 - 主要为了捕获字体的改变
     virtual void changeEvent(QEvent* e) Q_DECL_OVERRIDE;

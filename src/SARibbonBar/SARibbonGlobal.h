@@ -178,4 +178,14 @@ enum class SARibbonAlignment
 #define SA_FONTMETRICS_WIDTH(fm, str) fm.width(str)
 #endif
 #endif
+
+#ifndef SA_DEBUG_PRINT_SIZE_HINT
+/**
+  @def 定义此宏，将打印和尺寸刷新相关的信息
+
+    仅用于调试
+ */
+#define SA_DEBUG_PRINT_SIZE_HINT 0
+#endif
+
 #endif  // SARIBBONGLOBAL_H

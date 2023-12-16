@@ -11,7 +11,8 @@ class SARibbonGallery;
 class QGridLayout;
 class SARibbonPannelOptionButton;
 class SARibbonPannelLayout;
-
+class SARibbonCategory;
+class SARibbonBar;
 /**
  * @brief pannel页窗口，pannel是ribbon的面板用于承放控件
  *
@@ -31,6 +32,7 @@ class SA_RIBBON_EXPORT SARibbonPannel : public QWidget
     friend class SARibbonCategory;
     friend class SARibbonCategoryPrivate;
     friend class SARibbonCustomizeWidgetPrivate;
+    friend class SARibbonPannelLayout;
     Q_PROPERTY(bool isCanCustomize READ isCanCustomize WRITE setCanCustomize)
     Q_PROPERTY(bool isExpanding READ isExpanding WRITE setExpanding)
     Q_PROPERTY(QString pannelName READ pannelName WRITE setPannelName)
@@ -171,6 +173,10 @@ public:
     SARibbonPannelLayout* pannelLayout() const;
     // 更新布局
     void updateItemGeometry();
+    //获取category指针，如果没有parent，或者不在category管理，返回nullptr
+    SARibbonCategory* category() const;
+    //获取ribbonBar指针，如果没有返回nullptr
+    SARibbonBar* ribbonBar() const;
 signals:
 
     /**
@@ -186,8 +192,9 @@ protected:
     void resetLargeToolButtonStyle();
 
 protected:
-    virtual void paintEvent(QPaintEvent* event) Q_DECL_OVERRIDE;
-    virtual void resizeEvent(QResizeEvent* event) Q_DECL_OVERRIDE;
+    virtual bool event(QEvent* e) Q_DECL_OVERRIDE;
+    virtual void paintEvent(QPaintEvent* e) Q_DECL_OVERRIDE;
+    virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
     virtual void actionEvent(QActionEvent* e) Q_DECL_OVERRIDE;
     virtual void changeEvent(QEvent* e) Q_DECL_OVERRIDE;
 };
