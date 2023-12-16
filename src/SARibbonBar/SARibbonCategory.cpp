@@ -5,13 +5,11 @@
 #include <QLinearGradient>
 #include <QDebug>
 #include <QApplication>
-#include "SARibbonToolButton.h"
 #include <QHBoxLayout>
 #include <QList>
 #include <QMap>
 #include <QResizeEvent>
 #include "SARibbonCategoryLayout.h"
-#include "SARibbonSeparatorWidget.h"
 #include "SARibbonElementManager.h"
 
 ///
@@ -52,7 +50,6 @@ public:
     bool mIsContextCategory { false };  ///< 标记是否是上下文标签
     bool mIsCanCustomize { true };      ///< 标记是否可以自定义
     SARibbonPannel::PannelLayoutMode mDefaultPannelLayoutMode { SARibbonPannel::ThreeRowMode };
-    SARibbonBar* mBar { nullptr };
 };
 SARibbonCategory::PrivateData::PrivateData(SARibbonCategory* p) : q_ptr(p)
 {
@@ -96,7 +93,6 @@ void SARibbonCategory::PrivateData::insertPannel(int index, SARibbonPannel* pann
         pannel->setParent(q_ptr);
     }
     pannel->setPannelLayoutMode(ribbonPannelLayoutMode());
-    pannel->installEventFilter(q_ptr);
     index = qMax(0, index);
     index = qMin(lay->pannelCount(), index);
     lay->addPannel(pannel);
@@ -160,10 +156,10 @@ const SARibbonCategory* SARibbonCategory::PrivateData::ribbonCategory() const
  */
 void SARibbonCategory::PrivateData::setRibbonPannelLayoutMode(SARibbonPannel::PannelLayoutMode m)
 {
-    // 不做相同判断，这样可以通过此函数强制重新布局
-    //    if (mDefaultPannelLayoutMode == m) {
-    //        return;
-    //    }
+    if (mDefaultPannelLayoutMode == m) {
+        return;
+    }
+
     mDefaultPannelLayoutMode    = m;
     QList< SARibbonPannel* > ps = pannelList();
 
@@ -180,9 +176,11 @@ SARibbonPannel::PannelLayoutMode SARibbonCategory::PrivateData::ribbonPannelLayo
 
 void SARibbonCategory::PrivateData::updateItemGeometry()
 {
+#if SA_DEBUG_PRINT_SIZE_HINT
+    qDebug() << "SARibbonCategory::PrivateData::updateItemGeometry,categoryName=" << q_ptr->categoryName();
+#endif
     if (SARibbonCategoryLayout* lay = qobject_cast< SARibbonCategoryLayout* >(q_ptr->layout())) {
         lay->invalidate();
-        lay->doLayout();
     }
     return;
 }
@@ -272,6 +270,11 @@ void SARibbonCategory::setCategoryName(const QString& title)
 void SARibbonCategory::setRibbonPannelLayoutMode(SARibbonPannel::PannelLayoutMode m)
 {
     d_ptr->setRibbonPannelLayoutMode(m);
+}
+
+bool SARibbonCategory::event(QEvent* e)
+{
+    return QWidget::event(e);
 }
 
 SARibbonPannel::PannelLayoutMode SARibbonCategory::ribbonPannelLayoutMode() const
@@ -514,7 +517,12 @@ void SARibbonCategory::setCanCustomize(bool b)
  */
 SARibbonBar* SARibbonCategory::ribbonBar() const
 {
-    return (d_ptr->mBar);
+    if (QWidget* par = parentWidget()) {
+        if (SARibbonBar* ribbon = qobject_cast< SARibbonBar* >(par->parentWidget())) {
+            return ribbon;
+        }
+    }
+    return nullptr;
 }
 
 /**
@@ -522,16 +530,10 @@ SARibbonBar* SARibbonCategory::ribbonBar() const
  */
 void SARibbonCategory::updateItemGeometry()
 {
-    QList< SARibbonPannel* > pannels = pannelList();
-    for (SARibbonPannel* p : qAsConst(pannels)) {
-        p->updateItemGeometry();
-    }
-    if (QLayout* lay = layout()) {
-        lay->invalidate();
-        updateGeometry();
-        QResizeEvent* e = new QResizeEvent(size(), QSize());
-        QApplication::postEvent(this, e);
-    }
+#if SA_DEBUG_PRINT_SIZE_HINT
+    qDebug() << "SARibbonCategory name=" << categoryName() << " updateItemGeometry";
+#endif
+    d_ptr->updateItemGeometry();
 }
 
 /**
@@ -559,32 +561,6 @@ SARibbonAlignment SARibbonCategory::getCategoryAlignment() const
     return SARibbonAlignment::AlignLeft;
 }
 
-bool SARibbonCategory::eventFilter(QObject* watched, QEvent* event)
-{
-    if (nullptr == watched) {
-        return (false);
-    }
-    SARibbonPannel* pannel = qobject_cast< SARibbonPannel* >(watched);
-
-    if (pannel) {
-        switch (event->type()) {
-        case QEvent::HideToParent: {
-            // 隐藏和显示都要重新布局
-            layout()->invalidate();
-        } break;
-
-        case QEvent::ShowToParent: {
-            // 隐藏和显示都要重新布局
-            layout()->invalidate();
-        } break;
-
-        default:
-            break;
-        }
-    }
-    return (false);
-}
-
 /**
  * @brief 在超出边界情况下，滚轮可滚动pannel
  * @param event
@@ -592,6 +568,35 @@ bool SARibbonCategory::eventFilter(QObject* watched, QEvent* event)
 void SARibbonCategory::wheelEvent(QWheelEvent* event)
 {
     d_ptr->doWheelEvent(event);
+}
+
+void SARibbonCategory::changeEvent(QEvent* event)
+{
+    switch (event->type()) {
+    case QEvent::StyleChange: {
+        if (layout()) {
+#if SA_DEBUG_PRINT_SIZE_HINT
+            qDebug() << "SARibbonCategory changeEvent(StyleChange),categoryName=" << categoryName();
+#endif
+            layout()->invalidate();
+        }
+    } break;
+    case QEvent::FontChange: {
+#if SA_DEBUG_PRINT_SIZE_HINT
+        qDebug() << "SARibbonCategory changeEvent(FontChange),categoryName=" << categoryName();
+#endif
+        QList< SARibbonPannel* > pannels = pannelList();
+        for (SARibbonPannel* p : qAsConst(pannels)) {
+            p->setFont(font());
+        }
+        if (layout()) {
+            layout()->invalidate();
+        }
+    } break;
+    default:
+        break;
+    };
+    return QWidget::changeEvent(event);
 }
 
 /**
@@ -610,15 +615,6 @@ void SARibbonCategory::markIsContextCategory(bool isContextCategory)
 SARibbonCategoryLayout* SARibbonCategory::categoryLayout() const
 {
     return qobject_cast< SARibbonCategoryLayout* >(layout());
-}
-
-/**
- * @brief 设置ribbonbar，此函数仅提供给ribbonbar调用
- * @param bar ribbonbar指针
- */
-void SARibbonCategory::setRibbonBar(SARibbonBar* bar)
-{
-    d_ptr->mBar = bar;
 }
 
 //===================================================

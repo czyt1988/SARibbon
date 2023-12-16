@@ -1,12 +1,9 @@
 ﻿#include "SARibbonPannelLayout.h"
 #include "SARibbonPannelOptionButton.h"
 #include "SARibbonSeparatorWidget.h"
-#include "SARibbonGallery.h"
 #include "SARibbonElementManager.h"
-#include "SARibbonMenu.h"
 #include <QWidgetAction>
 #include <QQueue>
-#include <set>
 #include "SARibbonPannel.h"
 #include "SARibbonPannelItem.h"
 #define SARibbonPannelLayout_DEBUG_PRINT 0
@@ -36,6 +33,7 @@ SARibbonPannelLayout::SARibbonPannelLayout(QWidget* p)
 
 SARibbonPannelLayout::~SARibbonPannelLayout()
 {
+    //参考QToolBarLayout
     while (!m_items.isEmpty()) {
         SARibbonPannelItem* item = m_items.takeFirst();
         if (QWidgetAction* widgetAction = qobject_cast< QWidgetAction* >(item->action)) {
@@ -123,6 +121,7 @@ int SARibbonPannelLayout::count() const
 
 bool SARibbonPannelLayout::isEmpty() const
 {
+
     return (m_items.isEmpty());
 }
 
@@ -215,6 +214,8 @@ void SARibbonPannelLayout::move(int from, int to)
  */
 bool SARibbonPannelLayout::isDirty() const
 {
+    SARibbonPannelLayout* that = const_cast< SARibbonPannelLayout* >(this);
+    that->updateGeomArray(QRect());
     return (m_dirty);
 }
 
@@ -289,6 +290,11 @@ void SARibbonPannelLayout::layoutActions()
     for (QWidget* w : qAsConst(hideWidgets)) {
         w->hide();
     }
+#if SA_DEBUG_PRINT_SIZE_HINT
+    if (SARibbonPannel* pannel = qobject_cast< SARibbonPannel* >(parentWidget())) {
+        qDebug() << "SARibbonPannelLayout layoutActions,pannel name = " << pannel->pannelName();
+    }
+#endif
 }
 
 /**
@@ -408,17 +414,18 @@ void SARibbonPannelLayout::updateGeomArray(const QRect& setrect)
         SARibbonPannelItem* item = m_items.at(i);
         if (item->isEmpty()) {
             // 如果是hide就直接跳过
-#if SARibbonPannelLayout_DEBUG_PRINT
-            qDebug() << item->widget()->metaObject()->className() << "is hide"
-                     << " row:" << row << " col:" << column;
-#endif
             item->rowIndex    = -1;
             item->columnIndex = -1;
             continue;
         }
 
         QSize hint = item->sizeHint();
-
+#if SA_DEBUG_PRINT_SIZE_HINT
+        if (SARibbonToolButton* tb = qobject_cast< SARibbonToolButton* >(item->widget())) {
+            qDebug() << "SARibbonPannelItem sizeHint=" << hint << " SARibbonToolButton::sizeHint=" << tb->sizeHint()
+                     << " ,name=" << tb->text();
+        }
+#endif
         Qt::Orientations exp = item->expandingDirections();
         if (item->widget()) {
             // 有窗口是水平扩展，则标记为扩展
@@ -443,8 +450,6 @@ void SARibbonPannelLayout::updateGeomArray(const QRect& setrect)
             if (row != 0) {
                 x += (columMaxWidth + spacing);
                 ++column;
-                row           = 0;
-                columMaxWidth = 0;
             }
             //
             item->rowIndex            = 0;
@@ -615,8 +620,15 @@ void SARibbonPannelLayout::updateGeomArray(const QRect& setrect)
         recalcExpandGeomArray(setrect);
     }
     this->m_sizeHint = QSize(totalWidth, height);
-#if SARibbonPannelLayout_DEBUG_PRINT
-    qDebug() << "SARibbonPannelLayout::updateGeomArray,m_sizeHint=" << m_sizeHint;
+#if SA_DEBUG_PRINT_SIZE_HINT
+    qDebug() << "SARibbonPannelLayout updateGeomArray,pannel name = " << pannel->pannelName()
+             << "\n  size hint =" << this->m_sizeHint  //
+             << "\n   spacing=" << spacing             //
+             << "\n   mag=" << mag                     //
+             << "\n   largeHeight=" << largeHeight     //
+             << "\n   smallHeight=" << smallHeight     //
+        ;
+    ;
 #endif
 }
 

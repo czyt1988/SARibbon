@@ -412,7 +412,7 @@ QList< QColor > SARibbonBar::getDefaultContextCategoryColorList()
         << QColor(14, 81, 167)   // 蓝
         << QColor(228, 0, 69)    // 红
         << QColor(67, 148, 0)    // 绿
-            ;
+        ;
     return res;
 }
 
@@ -492,7 +492,6 @@ void SARibbonBar::addCategoryPage(SARibbonCategory* category)
 
     tabdata.category = category;
     tabdata.index    = index;
-    category->setRibbonBar(this);
     d_ptr->mRibbonTabBar->setTabData(index, QVariant::fromValue(tabdata));
 
     d_ptr->mStackedContainerWidget->insertWidget(index, category);
@@ -971,11 +970,11 @@ void SARibbonBar::showMinimumModeButton(bool isShow)
 
         d_ptr->mMinimumCategoryButtonAction = new QAction(this);
         d_ptr->mMinimumCategoryButtonAction->setIcon(
-                style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton, nullptr));
+            style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton, nullptr));
         connect(d_ptr->mMinimumCategoryButtonAction, &QAction::triggered, this, [ this ]() {
             this->setMinimumMode(!isMinimumMode());
             this->d_ptr->mMinimumCategoryButtonAction->setIcon(
-                    style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton, nullptr));
+                style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton, nullptr));
         });
         d_ptr->mRightButtonGroup->addAction(d_ptr->mMinimumCategoryButtonAction);
 
@@ -1818,7 +1817,7 @@ void SARibbonBar::paintInNormalStyle()
             titleRegion.setRect(d_ptr->mQuickAccessBar->geometry().right() + 1,
                                 border.top(),
                                 width() - d_ptr->mIconRightBorderPosition - border.right()
-                                        - d_ptr->mWindowButtonSize.width() - d_ptr->mQuickAccessBar->geometry().right() - 1,
+                                    - d_ptr->mWindowButtonSize.width() - d_ptr->mQuickAccessBar->geometry().right() - 1,
                                 titleBarHeight());
         } else {
             int leftwidth = contextCategoryRegion.x() - d_ptr->mQuickAccessBar->geometry().right() - d_ptr->mIconRightBorderPosition;
@@ -2033,6 +2032,19 @@ void SARibbonBar::changeEvent(QEvent* e)
         break;
     }
     QMenuBar::changeEvent(e);
+}
+
+bool SARibbonBar::event(QEvent* e)
+{
+    switch (e->type()) {
+    case QEvent::Show:
+        //第一次显示刷新
+        updateRibbonGeometry();
+        break;
+    default:
+        break;
+    }
+    return QMenuBar::event(e);
 }
 
 void SARibbonBar::resizeInOfficeStyle()

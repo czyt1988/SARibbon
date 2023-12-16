@@ -100,10 +100,11 @@ public:
 protected:
     //设置pannel的模式
     void setRibbonPannelLayoutMode(SARibbonPannel::PannelLayoutMode m);
-    bool eventFilter(QObject* watched, QEvent* event) Q_DECL_OVERRIDE;
-
+    virtual bool event(QEvent* e) Q_DECL_OVERRIDE;
     //处理滚轮事件
     void wheelEvent(QWheelEvent* event) Q_DECL_OVERRIDE;
+    //
+    void changeEvent(QEvent* event) Q_DECL_OVERRIDE;
 
     //标记这个是上下文标签
     void markIsContextCategory(bool isContextCategory = true);
@@ -114,9 +115,6 @@ protected:
     //设置Category的对齐方式
     void setCategoryAlignment(SARibbonAlignment al);
     SARibbonAlignment getCategoryAlignment() const;
-
-private:
-    void setRibbonBar(SARibbonBar* bar);
 };
 
 /**

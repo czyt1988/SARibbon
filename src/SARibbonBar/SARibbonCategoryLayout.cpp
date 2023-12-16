@@ -255,7 +255,6 @@ void SARibbonCategoryLayout::updateGeometryArr()
     if (nullptr == category) {
         return;
     }
-
     int categoryWidth = category->width();
     QMargins mag      = contentsMargins();
     int height        = category->height();
@@ -379,6 +378,10 @@ void SARibbonCategoryLayout::updateGeometryArr()
     }
 #endif
     d_ptr->mSizeHint = QSize(parentWidth, parentHeight);
+#if SA_DEBUG_PRINT_SIZE_HINT
+    qDebug() << "SARibbonCategory name=" << category->categoryName()
+             << " SARibbonCategoryLayout updateGeometryArr,SizeHint=" << d_ptr->mSizeHint;
+#endif
 }
 
 /**
@@ -433,6 +436,9 @@ void SARibbonCategoryLayout::doLayout()
     for (QWidget* w : qAsConst(hideWidgets)) {
         w->hide();
     }
+#if SA_DEBUG_PRINT_SIZE_HINT
+    qDebug() << "SARibbonCategory name=" << category->categoryName() << " SARibbonCategoryLayout doLayout";
+#endif
 }
 
 /**
