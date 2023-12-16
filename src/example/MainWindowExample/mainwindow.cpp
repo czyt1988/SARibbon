@@ -1071,6 +1071,9 @@ void MainWindow::createContextCategoryPage1(SARibbonCategory* page)
         mActionDisable->setEnabled(true);
         mActionDisable->setText(("Enabled"));
     });
+    auto act = createAction(tr("1"), ":/icon/icon/unlock.svg");
+    act->setToolTip(tr("very short string"));
+    pannel->addLargeAction(act);
 
     mActionSetTextTest = createAction("set text", ":/icon/icon/setText.svg");
 
