@@ -130,7 +130,6 @@ SARibbonPannel > SARibbonButtonGroupWidget {
 
 /*SARibbonStackedWidget*/
 SARibbonStackedWidget {
-  background-color: #ffffff;/* {Category.BKColor} */
   border: 1pt solid #ffffff;/* {Category.BorderColor} */
   border-top-width: 0px;
 }

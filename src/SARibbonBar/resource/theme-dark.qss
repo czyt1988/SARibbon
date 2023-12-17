@@ -28,17 +28,17 @@ SARibbonCtrlContainer {
 }
 
 /*SARibbonCategory*/
+SARibbonCategory {
+  background-color: #b2b2b2;
+}
 SARibbonCategory:focus {
   outline: none;
 }
 
-SARibbonCategory {
-  background-color: #b2b2b2;
-}
+
 
 /*SARibbonStackedWidget*/
 SARibbonStackedWidget{
-  background-color: #b2b2b2;
   border-top-width: 0px;
 }
 SARibbonStackedWidget:focus{

@@ -36,7 +36,6 @@ SARibbonCategory{
 
 /*SARibbonStackedWidget*/
 SARibbonStackedWidget{
-  background-color: white;
   border-top-width: 0px;
 }
 SARibbonStackedWidget:focus{
