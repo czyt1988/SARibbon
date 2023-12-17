@@ -228,12 +228,14 @@ void SARibbonCategory::PrivateData::doWheelEvent(QWheelEvent* event)
 
 SARibbonCategory::SARibbonCategory(QWidget* p) : QWidget(p), d_ptr(new SARibbonCategory::PrivateData(this))
 {
+    setAttribute(Qt::WA_StyledBackground);
     setLayout(new SARibbonCategoryLayout(this));
 }
 
 SARibbonCategory::SARibbonCategory(const QString& name, QWidget* p)
     : QWidget(p), d_ptr(new SARibbonCategory::PrivateData(this))
 {
+    setAttribute(Qt::WA_StyledBackground);
     setLayout(new SARibbonCategoryLayout(this));
     setCategoryName(name);
 }

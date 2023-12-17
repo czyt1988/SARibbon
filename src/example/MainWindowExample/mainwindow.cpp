@@ -41,6 +41,7 @@
 #include <QTextStream>
 #include <QXmlStreamWriter>
 #include <QMessageBox>
+#include <QShortcut>
 #define PRINT_COST_START()                                                                                             \
     QElapsedTimer __TMP_COST;                                                                                          \
     __TMP_COST.start();                                                                                                \
@@ -509,12 +510,17 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     SARibbonPannel* pannelStyle = page->addPannel(("ribbon style"));
 
     QAction* actSave = createAction(tr("Save"), ":/icon/icon/save.svg");
-    actSave->setShortcut(QKeySequence(QLatin1String("Ctrl+S")));
-    pannelStyle->addLargeAction(actSave);
+    //这样设置快捷键
+    QShortcut* shortCut = new QShortcut(QKeySequence(QLatin1String("Ctrl+S")), this);
+    connect(shortCut, &QShortcut::activated, this, [ actSave ]() { actSave->trigger(); });
+    //这样设置是无效的
+    // actSave->setShortcut(QKeySequence(QLatin1String("Ctrl+S")));
+
     connect(actSave, &QAction::triggered, this, [ this ](bool b) {
         Q_UNUSED(b);
         this->mTextedit->append("actSaveion clicked");
     });
+    pannelStyle->addLargeAction(actSave);
 
     QAction* actHideRibbon = createAction(tr("hide ribbon"), ":/icon/icon/hideRibbon.svg", "actHideRibbon");
     actHideRibbon->setCheckable(true);
@@ -1065,6 +1071,7 @@ void MainWindow::createContextCategoryPage1(SARibbonCategory* page)
 
     mActionUnlock = createAction(tr("unlock"), ":/icon/icon/unlock.svg");
     mActionUnlock->setShortcut(QKeySequence(QLatin1String("Ctrl+E")));
+    mActionUnlock->setShortcutContext(Qt::ApplicationShortcut);
     pannel->addLargeAction(mActionUnlock);
     connect(mActionUnlock, &QAction::triggered, this, [ this ](bool b) {
         Q_UNUSED(b);
@@ -1079,6 +1086,7 @@ void MainWindow::createContextCategoryPage1(SARibbonCategory* page)
 
     mActionSetTextTest->setCheckable(true);
     mActionSetTextTest->setShortcut(QKeySequence(QLatin1String("Ctrl+D")));
+    mActionSetTextTest->setShortcutContext(Qt::ApplicationShortcut);
     pannel->addLargeAction(mActionSetTextTest);
 
     connect(mActionSetTextTest, &QAction::toggled, this, [ this ](bool b) {
@@ -1095,7 +1103,7 @@ void MainWindow::createContextCategoryPage1(SARibbonCategory* page)
     pannel->addLargeAction(mActionShowTest);
 
     mPannelVisbileExample = page->addPannel(tr("show/hide"));
-
+    //重复添加
     mPannelVisbileExample->addLargeAction(mActionSetTextTest);
 
     connect(mActionShowTest, &QAction::toggled, this, [ this ](bool b) {
