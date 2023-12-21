@@ -50,10 +50,8 @@ public:
     SARibbonPannel::PannelLayoutMode m_pannelLayoutMode { SARibbonPannel::ThreeRowMode };  ///< pannel的布局模式，默认为3行模式ThreeRowMode
     SARibbonPannelOptionButton* m_optionActionButton { nullptr };  ///< 标题栏的y距离
     QPoint m_nextElementPosition;
-    static int s_pannelTitleHeight;  ///< pannel标题栏的全局高度,默认为18
+    int m_pannelTitleHeight { 15 };  ///< pannel标题栏的高度,默认为18
 };
-
-int SARibbonPannel::PrivateData::s_pannelTitleHeight = 15;
 
 SARibbonPannel::PrivateData::PrivateData(SARibbonPannel* p) : q_ptr(p)
 {
@@ -464,7 +462,7 @@ SARibbonPannel::PannelLayoutMode SARibbonPannel::pannelLayoutMode() const
  * @note 要去除OptionAction直接传入nullptr即可
  * @note SARibbonPannel不对QAction的destroy进行关联，如果外部对action进行delete，需要先传入nullptr给addOptionAction
  */
-void SARibbonPannel::addOptionAction(QAction* action)
+void SARibbonPannel::setOptionAction(QAction* action)
 {
     if (nullptr == action) {
         if (d_ptr->m_optionActionButton) {
@@ -567,12 +565,22 @@ bool SARibbonPannel::isExpanding() const
 }
 
 /**
- * @brief 标题栏高度，仅在三行模式下生效
+   @brief 设置标题栏的高度
+   @param h
+ */
+void SARibbonPannel::setTitleHeight(int h)
+{
+    d_ptr->m_pannelTitleHeight = h;
+    layout()->invalidate();
+}
+
+/**
+ * @brief 标题栏高度
  * @return
  */
 int SARibbonPannel::titleHeight() const
 {
-    return (isTwoRow() ? 0 : pannelTitleHeight());
+    return d_ptr->m_pannelTitleHeight;
 }
 
 /**
@@ -581,7 +589,7 @@ int SARibbonPannel::titleHeight() const
  */
 QSize SARibbonPannel::optionActionButtonSize() const
 {
-    return (isTwoRow() ? QSize(12, 12) : QSize(pannelTitleHeight(), pannelTitleHeight()));
+    return (0 == titleHeight() ? QSize(12, 12) : QSize(pannelTitleHeight(), pannelTitleHeight()));
 }
 
 /**
@@ -661,7 +669,7 @@ int SARibbonPannel::largeHeight() const
  */
 int SARibbonPannel::pannelTitleHeight()
 {
-    return SARibbonPannel::PrivateData::s_pannelTitleHeight;
+    return SARibbonPannel::PrivateData::m_pannelTitleHeight;
 }
 
 /**
@@ -670,7 +678,7 @@ int SARibbonPannel::pannelTitleHeight()
  */
 void SARibbonPannel::setPannelTitleHeight(int h)
 {
-    SARibbonPannel::PrivateData::s_pannelTitleHeight = h;
+    SARibbonPannel::PrivateData::m_pannelTitleHeight = h;
 }
 
 /**

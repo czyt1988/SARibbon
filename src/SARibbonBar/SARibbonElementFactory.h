@@ -53,4 +53,4 @@ public:
     virtual SARibbonPannelOptionButton* createRibbonPannelOptionButton(SARibbonPannel* pannel);
 };
 
-#endif  // SARIBBONELEMENTCREATEDELEGATE_H
+#endif  // SARIBBONELEMENTFACTORY_H

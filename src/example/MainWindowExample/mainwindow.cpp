@@ -668,7 +668,7 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
         Q_UNUSED(on);
         QMessageBox::information(this, tr("Option Action Triggered"), tr("Option Action Triggered"));
     });
-    pannelToolButtonStyle->addOptionAction(optAct);
+    pannelToolButtonStyle->setOptionAction(optAct);
     //! 2
     //! pannel 2 start
     //!
@@ -755,7 +755,7 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
         Q_UNUSED(on);
         QMessageBox::information(this, tr("Option Action Triggered"), tr("Option Action Triggered"));
     });
-    pannelWidgetTest->addOptionAction(optAct);
+    pannelWidgetTest->setOptionAction(optAct);
 
     pannelWidgetTest->setVisible(true);
 }
@@ -827,7 +827,7 @@ void MainWindow::createCategoryOther(SARibbonCategory* page)
     QAction* optAct = new QAction(this);
 
     optAct->setObjectName(("debug"));
-    pannel1->addOptionAction(optAct);
+    pannel1->setOptionAction(optAct);
 
     SARibbonPannel* pannel2 = new SARibbonPannel(tr("pannel two"));
     pannel2->setObjectName("CategoryOther-pannel2");
