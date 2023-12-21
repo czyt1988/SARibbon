@@ -115,8 +115,8 @@ public:
     // 从pannel中把action对应的button提取出来，如果action没有对应的button，就返回nullptr
     SARibbonToolButton* actionToRibbonToolButton(QAction* action);
 
-    // 添加操作action，如果要去除，传入nullptr指针即可，SARibbonPannel不会对QAction的所有权进行管理
-    void addOptionAction(QAction* action);
+    // 设置操作action，如果要去除，传入nullptr指针即可，SARibbonPannel不会对QAction的所有权进行管理
+    void setOptionAction(QAction* action);
 
     // 判断是否存在OptionAction
     bool isHaveOptionAction() const;
@@ -142,7 +142,8 @@ public:
     // 是否是扩展模式
     bool isExpanding() const;
 
-    // 标题栏高度，仅在3行模式下生效
+    // 标题栏高度
+    void setTitleHeight(int h);
     int titleHeight() const;
 
     // optionActionButton的尺寸

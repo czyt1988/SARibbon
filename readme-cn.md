@@ -731,21 +731,20 @@ int main(int argc, char* argv[])
 
 ## 2、快捷键问题
 
-经常有人反馈使用SARibbonBar后，没有被激活的tab页的快捷键没有响应，只有激活的标签页的快捷键才有反应，这个问题并非SARibbonBar的问题，而是设置快捷键时没有设置好`QAction`的`shortcutContext`的属性，`QAction`默认快捷键的属性是`Qt::WindowShortcut`,`Qt::WindowShortcut`代表当父部件是活动顶层窗口的逻辑子部件时，快捷键生效，如果是传统的toolbar模式，由于action所在的toolbar一直在最前端，因此快捷键一直生效，但如果是SARibbonBar，action所在的pannel是会隐藏的，隐藏后快捷键就不生效，如果想快捷键无论Pannel是否隐藏都生效，只需要设置快捷键的`shortcutContext`属性为`Qt::ApplicationShortcut`即可
+经常有人反馈使用SARibbonBar后，没有被激活的tab页的快捷键没有响应，只有激活的标签页的快捷键才有反应，如果是传统的toolbar模式，由于action所在的toolbar一直在最前端，因此快捷键一直生效，但如果是SARibbonBar，action所在的pannel是会隐藏的，隐藏后快捷键就不生效，如果想快捷键无论Pannel是否隐藏都生效，设置快捷键的`shortcutContext`属性为`Qt::ApplicationShortcut`也无效，这时，可以在创建Category的地方手动创建快捷键
 
 例如：
 
 ```cpp
-QAction* actionUndo = createAction("undo", ":/icon/icon/undo.svg");
-actionUndo->setShortcut(QKeySequence("Ctrl+Shift+z"));
-actionUndo->setShortcutContext(Qt::ApplicationShortcut);
-quickAccessBar->addAction(actionUndo);
-
-QAction* actionRedo = createAction("redo", ":/icon/icon/redo.svg");
-actionRedo->setShortcut(QKeySequence("Ctrl+z"));
-actionRedo->setShortcutContext(Qt::ApplicationShortcut);
-quickAccessBar->addAction(actionRedo);
+    ribbon构建
+    ...
+    QShortcut* shortCut = new QShortcut(QKeySequence(QLatin1String("Ctrl+S")), this);
+    connect(shortCut, &QShortcut::activated, this, [ actSave ]() {
+        actSave->trigger();
+    });
 ```
+
+这个快捷键的创建位置在Mainwidnow，这样快捷键就随着mainwindow周期
 
 # 其他
 
