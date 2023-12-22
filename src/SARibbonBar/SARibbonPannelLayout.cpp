@@ -33,7 +33,7 @@ SARibbonPannelLayout::SARibbonPannelLayout(QWidget* p)
 
 SARibbonPannelLayout::~SARibbonPannelLayout()
 {
-    //参考QToolBarLayout
+    // 参考QToolBarLayout
     while (!m_items.isEmpty()) {
         SARibbonPannelItem* item = m_items.takeFirst();
         if (QWidgetAction* widgetAction = qobject_cast< QWidgetAction* >(item->action)) {
@@ -329,6 +329,9 @@ SARibbonPannelItem* SARibbonPannelLayout::createItem(QAction* action, SARibbonPa
     } else if (action->isSeparator()) {
         SARibbonSeparatorWidget* sep = RibbonSubElementDelegate->createRibbonSeparatorWidget(pannel);
         widget                       = sep;
+        auto t                       = action->property(SA_ActionPropertyName_SeparatorTop).toInt();
+        auto b                       = action->property(SA_ActionPropertyName_SeparatorBottom).toInt();
+        sep->setTopBottomMargins(t, b);
     }
     // 不是widget，自动生成SARibbonToolbutton
     if (!widget) {
@@ -339,6 +342,16 @@ SARibbonPannelItem* SARibbonPannelLayout::createItem(QAction* action, SARibbonPa
         button->setFocusPolicy(Qt::NoFocus);
         button->setButtonType(buttonType);
         button->setDefaultAction(action);
+        // 属性检查
+        auto var = action->property(SA_ActionPropertyName_ToolButtonPopupMode);
+        if (var.isValid()) {
+            bool isok = false;
+            int iv    = var.toInt(&isok);
+            if (isok) {
+                QToolButton::ToolButtonPopupMode pm = static_cast< QToolButton::ToolButtonPopupMode >(iv);
+                button->setPopupMode(pm);
+            }
+        }
         // 根据QAction的属性设置按钮的大小
 
         QObject::connect(button, &SARibbonToolButton::triggered, pannel, &SARibbonPannel::actionTriggered);
@@ -627,7 +640,7 @@ void SARibbonPannelLayout::updateGeomArray(const QRect& setrect)
              << "\n   mag=" << mag                     //
              << "\n   largeHeight=" << largeHeight     //
              << "\n   smallHeight=" << smallHeight     //
-        ;
+            ;
     ;
 #endif
 }
