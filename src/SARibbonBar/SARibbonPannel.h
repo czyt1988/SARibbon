@@ -58,16 +58,16 @@ public:
     void setActionRowProportion(QAction* action, SARibbonPannelItem::RowProportion rp);
 
     // 把action加入到pannel
-    SARibbonToolButton* addAction(QAction* action, SARibbonPannelItem::RowProportion rp);
+    void addAction(QAction* action, SARibbonPannelItem::RowProportion rp);
 
     // 把action加入到pannel，并以大图标显示
-    SARibbonToolButton* addLargeAction(QAction* action);
+    void addLargeAction(QAction* action);
 
     // 把action加入到pannel，在三行模式下会以中图标显示
-    SARibbonToolButton* addMediumAction(QAction* action);
+    void addMediumAction(QAction* action);
 
     // 把action加入到pannel，并以小图标显示
-    SARibbonToolButton* addSmallAction(QAction* action);
+    void addSmallAction(QAction* action);
 
     // 生成并添加一个action
     void addAction(QAction* act, QToolButton::ToolButtonPopupMode popMode, SARibbonPannelItem::RowProportion rp = SARibbonPannelItem::Large);
@@ -107,7 +107,7 @@ public:
     QAction* addLargeWidget(QWidget* w);
 
     // 添加一个Gallery
-    SARibbonGallery* addGallery();
+    SARibbonGallery* addGallery(bool expanding = true);
 
     // 添加分割线
     QAction* addSeparator(int top = 6, int bottom = 6);
@@ -173,9 +173,9 @@ public:
     SARibbonPannelLayout* pannelLayout() const;
     // 更新布局
     void updateItemGeometry();
-    //获取category指针，如果没有parent，或者不在category管理，返回nullptr
+    // 获取category指针，如果没有parent，或者不在category管理，返回nullptr
     SARibbonCategory* category() const;
-    //获取ribbonBar指针，如果没有返回nullptr
+    // 获取ribbonBar指针，如果没有返回nullptr
     SARibbonBar* ribbonBar() const;
 signals:
 

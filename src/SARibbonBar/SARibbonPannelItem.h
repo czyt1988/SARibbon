@@ -37,7 +37,22 @@ public:
     bool customWidget;  ///< 对于没有窗口的action，实际也会有一个SARibbonToolButton，在销毁时要delete掉
     SARibbonPannelItem::RowProportion rowProportion;  ///< 行的占比，ribbon中有large，media和small三种占比,见@ref RowProportion
 };
-#ifndef SARibbonPannelItemRowProportionPropertyName
-#define SARibbonPannelItemRowProportionPropertyName "SARibbonPannelItem_RowProportion"
+#ifndef SA_ActionPropertyName_RowProportion
+#define SA_ActionPropertyName_RowProportion "_sa_RowProportion"
+#endif
+#ifndef SA_ActionPropertyName_SeparatorTop
+#define SA_ActionPropertyName_SeparatorTop "_sa_SeparatorTop"
+#endif
+#ifndef SA_ActionPropertyName_SeparatorBottom
+#define SA_ActionPropertyName_SeparatorBottom "_sa_SeparatorBottom"
+#endif
+#ifndef SA_ActionPropertyName_ToolButtonPopupMode
+#define SA_ActionPropertyName_ToolButtonPopupMode "_sa_ToolButtonPopupMode"
+#endif
+#ifndef SA_ActionPropertyName_IsActionMenu
+#define SA_ActionPropertyName_IsActionMenu "_sa_IsActionMenu"
+#endif
+#ifndef SA_ActionPropertyName_MenuPointer
+#define SA_ActionPropertyName_MenuPointer "_sa_MenuPointer"
 #endif
 #endif  // SARIBBONPANNELITEM_H
