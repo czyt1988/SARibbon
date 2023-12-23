@@ -345,7 +345,7 @@ void SARibbonCategoryLayout::updateGeometryArr()
             qDebug() << "unknow widget in SARibbonCategoryLayout";
             continue;
         }
-        p->layout()->update();
+        // p->layout()->update();
         QSize pannelSize = p->sizeHint();
         QSize SeparatorSize(0, 0);
         if (item->separatorWidget) {
@@ -650,9 +650,16 @@ void SARibbonCategoryLayout::onRightScrollButtonClicked()
 
 void SARibbonCategoryLayout::setGeometry(const QRect& rect)
 {
+    QRect old = geometry();
+    if (old == rect) {
+        return;
+    }
+#if SA_DEBUG_PRINT_SIZE_HINT
+    qDebug() << "SARibbonCategoryLayout " << ribbonCategory()->categoryName() << " setGeometry=" << rect;
+#endif
+    QLayout::setGeometry(rect);
     d_ptr->mDirty = false;
     updateGeometryArr();
-    QLayout::setGeometry(rect);
     doLayout();
 }
 //=============================================================

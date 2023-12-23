@@ -60,6 +60,15 @@ int SARibbonPannelLayout::indexOf(QAction* action) const
     return (-1);
 }
 
+/**
+ * @brief 获取ribbonpannel
+ * @return
+ */
+SARibbonPannel* SARibbonPannelLayout::ribbonPannel() const
+{
+    return qobject_cast< SARibbonPannel* >(parentWidget());
+}
+
 void SARibbonPannelLayout::addItem(QLayoutItem* item)
 {
     Q_UNUSED(item);
@@ -342,16 +351,9 @@ SARibbonPannelItem* SARibbonPannelLayout::createItem(QAction* action, SARibbonPa
         button->setFocusPolicy(Qt::NoFocus);
         button->setButtonType(buttonType);
         button->setDefaultAction(action);
-        // 属性检查
-        auto var = action->property(SA_ActionPropertyName_ToolButtonPopupMode);
-        if (var.isValid()) {
-            bool isok = false;
-            int iv    = var.toInt(&isok);
-            if (isok) {
-                QToolButton::ToolButtonPopupMode pm = static_cast< QToolButton::ToolButtonPopupMode >(iv);
-                button->setPopupMode(pm);
-            }
-        }
+        // 属性设置
+        QToolButton::ToolButtonPopupMode popMode = SARibbonPannel::getActionToolButtonPopupModeProperty(action);
+        button->setPopupMode(popMode);
         // 根据QAction的属性设置按钮的大小
 
         QObject::connect(button, &SARibbonToolButton::triggered, pannel, &SARibbonPannel::actionTriggered);
@@ -640,7 +642,7 @@ void SARibbonPannelLayout::updateGeomArray(const QRect& setrect)
              << "\n   mag=" << mag                     //
              << "\n   largeHeight=" << largeHeight     //
              << "\n   smallHeight=" << smallHeight     //
-            ;
+        ;
     ;
 #endif
 }
@@ -775,8 +777,15 @@ void SARibbonPannelLayout::columnWidthInfo(int colindex, int& width, int& maximu
 
 void SARibbonPannelLayout::setGeometry(const QRect& rect)
 {
+    QRect old = geometry();
+    if (old == rect) {
+        return;
+    }
+#if SA_DEBUG_PRINT_SIZE_HINT
+    qDebug() << "SARibbonPannelLayout " << ribbonPannel()->pannelName() << " setGeometry=" << rect;
+#endif
+    QLayout::setGeometry(rect);
     m_dirty = false;
     updateGeomArray(rect);
-    QLayout::setGeometry(rect);
     layoutActions();
 }
