@@ -24,6 +24,9 @@ public:
     ~SARibbonPannelLayout();
     virtual int indexOf(QAction* action) const;
 
+    //获取ribbonpannel
+    SARibbonPannel* ribbonPannel() const;
+
     // SARibbonPannelLayout additem 无效
     void addItem(QLayoutItem* item) Q_DECL_OVERRIDE;
 

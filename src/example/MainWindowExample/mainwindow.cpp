@@ -599,7 +599,6 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
 
     SARibbonPannel* pannelToolButtonStyle = page->addPannel(("sa ribbon toolbutton style"));
 
-    SARibbonToolButton* btn;
     SARibbonMenu* menu = new SARibbonMenu(this);
     QAction* a         = nullptr;
     {
@@ -613,48 +612,41 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     QAction* act = createAction(tr("test 1"), ":/icon/icon/test1.svg");
     act->setMenu(menu);
     act->setToolTip(tr("use QToolButton::MenuButtonPopup mode"));
-    btn = pannelToolButtonStyle->addSmallAction(act);
-    btn->setPopupMode(QToolButton::MenuButtonPopup);
+    pannelToolButtonStyle->addSmallAction(act, QToolButton::MenuButtonPopup);
 
     act = createAction(tr("test 2"), ":/icon/icon/test2.svg");
     act->setMenu(menu);
     act->setToolTip(tr("use QToolButton::InstantPopup mode"));
-    btn = pannelToolButtonStyle->addSmallAction(act);
-    btn->setPopupMode(QToolButton::InstantPopup);
+    pannelToolButtonStyle->addSmallAction(act, QToolButton::InstantPopup);
 
     pannelToolButtonStyle->addSeparator();
 
     act = createAction(tr("Delayed\nPopup"), ":/icon/icon/folder-cog.svg");
     act->setMenu(menu);
-    btn = pannelToolButtonStyle->addLargeAction(act);
-    btn->setPopupMode(QToolButton::DelayedPopup);
+    pannelToolButtonStyle->addLargeAction(act, QToolButton::DelayedPopup);
 
     connect(act, &QAction::triggered, this, &MainWindow::onDelayedPopupCheckabletriggered);
 
     act = createAction(tr("Menu Button Popup"), ":/icon/icon/folder-star.svg");
     act->setMenu(menu);
-    btn = pannelToolButtonStyle->addLargeAction(act);
-    btn->setPopupMode(QToolButton::MenuButtonPopup);
+    pannelToolButtonStyle->addLargeAction(act, QToolButton::MenuButtonPopup);
     connect(act, &QAction::triggered, this, &MainWindow::onMenuButtonPopupCheckabletriggered);
 
     act = createAction(tr("Instant Popup"), ":/icon/icon/folder-stats.svg");
     act->setMenu(menu);
-    btn = pannelToolButtonStyle->addLargeAction(act);
-    btn->setPopupMode(QToolButton::InstantPopup);
+    pannelToolButtonStyle->addLargeAction(act, QToolButton::InstantPopup);
     connect(act, &QAction::triggered, this, &MainWindow::onInstantPopupCheckabletriggered);
 
     act = createAction(tr("Delayed Popup checkable"), ":/icon/icon/folder-table.svg");
     act->setCheckable(true);
     act->setMenu(menu);
-    btn = pannelToolButtonStyle->addLargeAction(act);
-    btn->setPopupMode(QToolButton::DelayedPopup);
+    pannelToolButtonStyle->addLargeAction(act, QToolButton::DelayedPopup);
     connect(act, &QAction::triggered, this, &MainWindow::onDelayedPopupCheckableTest);
 
     act = createAction(tr("Menu Button Popup checkable"), ":/icon/icon/folder-checkmark.svg");
     act->setCheckable(true);
     act->setMenu(menu);
-    btn = pannelToolButtonStyle->addLargeAction(act);
-    btn->setPopupMode(QToolButton::MenuButtonPopup);
+    pannelToolButtonStyle->addLargeAction(act, QToolButton::MenuButtonPopup);
     connect(act, &QAction::triggered, this, &MainWindow::onMenuButtonPopupCheckableTest);
 
     act = createAction(tr("disable action"), ":/icon/icon/disable.svg");

@@ -48,29 +48,23 @@ public:
         TwoRowMode  ///< 两行布局模式，wps的后续布局模式就是两行布局模式，pannel能布置2行小toolbutton
     };
 
-    // 把action的行属性设置进action中，action自身携带了行属性
-    static void setActionRowProportionProperty(QAction* action, SARibbonPannelItem::RowProportion rp);
-
-    // 获取action的行属性
-    static SARibbonPannelItem::RowProportion getActionRowProportionProperty(QAction* action);
-
-    // 设置action的行行为，行属性决定了ribbon pannel的显示方式
-    void setActionRowProportion(QAction* action, SARibbonPannelItem::RowProportion rp);
-
     // 把action加入到pannel
     void addAction(QAction* action, SARibbonPannelItem::RowProportion rp);
-
+    // 生成并添加一个action
+    void addAction(QAction* act, QToolButton::ToolButtonPopupMode popMode, SARibbonPannelItem::RowProportion rp = SARibbonPannelItem::Large);
     // 把action加入到pannel，并以大图标显示
     void addLargeAction(QAction* action);
-
     // 把action加入到pannel，在三行模式下会以中图标显示
     void addMediumAction(QAction* action);
-
     // 把action加入到pannel，并以小图标显示
     void addSmallAction(QAction* action);
 
-    // 生成并添加一个action
-    void addAction(QAction* act, QToolButton::ToolButtonPopupMode popMode, SARibbonPannelItem::RowProportion rp = SARibbonPannelItem::Large);
+    // 把action加入到pannel，并以小图标显示
+    void addSmallAction(QAction* action, QToolButton::ToolButtonPopupMode popMode);
+    // 把action加入到pannel，并以大图标显示
+    void addLargeAction(QAction* action, QToolButton::ToolButtonPopupMode popMode);
+    // 把action加入到pannel，在三行模式下会以中图标显示
+    void addMediumAction(QAction* action, QToolButton::ToolButtonPopupMode popMode);
 
     QAction* addAction(const QString& text,
                        const QIcon& icon,
@@ -78,21 +72,13 @@ public:
                        SARibbonPannelItem::RowProportion rp = SARibbonPannelItem::Large);
 
     // 添加menu
-    SARibbonToolButton* addMenu(QMenu* menu,
-                                SARibbonPannelItem::RowProportion rp,
-                                QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
-
-    // 添加action menu
-    SARibbonToolButton* addActionMenu(QAction* action, QMenu* menu, SARibbonPannelItem::RowProportion rp);
-
-    // action menu,action menu是一个特殊的menu,即可点击触发action，也可弹出菜单
-    SARibbonToolButton* addLargeActionMenu(QAction* action, QMenu* menu);
+    void addMenu(QMenu* menu, SARibbonPannelItem::RowProportion rp, QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
 
     // 添加普通大菜单
-    SARibbonToolButton* addLargeMenu(QMenu* menu, QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
+    void addLargeMenu(QMenu* menu, QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
 
     // 添加普通小按钮菜单
-    SARibbonToolButton* addSmallMenu(QMenu* menu, QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
+    void addSmallMenu(QMenu* menu, QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
 
     // 添加窗口
     QAction* addWidget(QWidget* w, SARibbonPannelItem::RowProportion rp);
@@ -184,6 +170,16 @@ signals:
      * @param action
      */
     void actionTriggered(QAction* action);
+
+public:
+    // 把action的行属性设置进action中，action自身携带了行属性
+    static void setActionRowProportionProperty(QAction* action, SARibbonPannelItem::RowProportion rp);
+    // 获取action的行属性
+    static SARibbonPannelItem::RowProportion getActionRowProportionProperty(QAction* action);
+    // 把action的行属性设置进action中，action自身携带了行属性
+    static void setActionToolButtonPopupModeProperty(QAction* action, QToolButton::ToolButtonPopupMode popMode);
+    // 获取action的行属性
+    static QToolButton::ToolButtonPopupMode getActionToolButtonPopupModeProperty(QAction* action);
 
 protected:
     // 设置PannelLayoutMode，此函数设置为protect避免误调用

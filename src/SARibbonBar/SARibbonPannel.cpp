@@ -4,7 +4,6 @@
 #include "SARibbonGallery.h"
 #include "SARibbonPannelLayout.h"
 #include "SARibbonPannelOptionButton.h"
-#include "SARibbonSeparatorWidget.h"
 #include "SARibbonToolButton.h"
 #include <QAction>
 #include <QApplication>
@@ -117,9 +116,7 @@ SARibbonPannel::~SARibbonPannel()
  */
 void SARibbonPannel::setActionRowProportionProperty(QAction* action, SARibbonPannelItem::RowProportion rp)
 {
-    if (action == nullptr) {
-        return;
-    }
+    Q_CHECK_PTR(action);
     action->setProperty(SA_ActionPropertyName_RowProportion, static_cast< int >(rp));
 }
 
@@ -140,31 +137,59 @@ SARibbonPannelItem::RowProportion SARibbonPannel::getActionRowProportionProperty
 }
 
 /**
- * @brief 设置action的行行为，行属性决定了ribbon pannel的显示方式
- * @param action 需要设置的action，此action必须已经被pannel添加过
- * @param rp 行为
+ * @brief 设置action的ToolButtonPopupMode属性
+ * @param action
+ * @param popMode
  */
-void SARibbonPannel::setActionRowProportion(QAction* action, SARibbonPannelItem::RowProportion rp)
+void SARibbonPannel::setActionToolButtonPopupModeProperty(QAction* action, QToolButton::ToolButtonPopupMode popMode)
 {
-    if (action == nullptr) {
-        return;
-    }
-    setActionRowProportionProperty(action, rp);
+    Q_CHECK_PTR(action);
+    action->setProperty(SA_ActionPropertyName_ToolButtonPopupMode, static_cast< int >(popMode));
 }
 
 /**
-   @brief 添加action
+ * @brief 获取action的ToolButtonPopupMode属性
+ * @param action
+ * @return
+ */
+QToolButton::ToolButtonPopupMode SARibbonPannel::getActionToolButtonPopupModeProperty(QAction* action)
+{
+    bool isok = false;
+    int r     = action->property(SA_ActionPropertyName_ToolButtonPopupMode).toInt(&isok);
 
-   action实际对应了一个toolbutton，如果想找到对应的toolbutton，使用@ref actionToRibbonToolButton
-   @param action action
-   @param rp 指定action的行占比
-   @sa actionToRibbonToolButton
+    if (isok) {
+        return (static_cast< QToolButton::ToolButtonPopupMode >(r));
+    }
+    return (QToolButton::InstantPopup);
+}
+
+/**
+ * @brief 添加action
+ *
+ * action实际对应了一个toolbutton，如果想找到对应的toolbutton，使用@ref actionToRibbonToolButton
+ * @param action
+ * @param rp 指定action的行占比
+ * @param popMode 菜单弹出样式
  */
 void SARibbonPannel::addAction(QAction* action, SARibbonPannelItem::RowProportion rp)
 {
     Q_CHECK_PTR(action);
     setActionRowProportionProperty(action, rp);
     addAction(action);
+}
+
+/**
+ * @brief 添加一个action
+ * @param act
+ * @param popMode 按钮的样式
+ * @param rp action在pannel中的占位情况，默认是大图标
+ */
+void SARibbonPannel::addAction(QAction* act, QToolButton::ToolButtonPopupMode popMode, SARibbonPannelItem::RowProportion rp)
+{
+    Q_CHECK_PTR(act);
+    setActionRowProportionProperty(act, rp);
+    setActionToolButtonPopupModeProperty(act, popMode);
+    addAction(act);
 }
 
 /**
@@ -202,18 +227,19 @@ void SARibbonPannel::addSmallAction(QAction* action)
     addAction(action, SARibbonPannelItem::Small);
 }
 
-/**
- * @brief 添加一个action
- * @param act
- * @param popMode 按钮的样式
- * @param rp action在pannel中的占位情况，默认是大图标
- */
-void SARibbonPannel::addAction(QAction* act, QToolButton::ToolButtonPopupMode popMode, SARibbonPannelItem::RowProportion rp)
+void SARibbonPannel::addSmallAction(QAction* action, QToolButton::ToolButtonPopupMode popMode)
 {
-    Q_CHECK_PTR(act);
-    setActionRowProportionProperty(act, rp);
-    act->setProperty(SA_ActionPropertyName_ToolButtonPopupMode, static_cast< int >(popMode));
-    addAction(act);
+    addAction(action, popMode, SARibbonPannelItem::Small);
+}
+
+void SARibbonPannel::addLargeAction(QAction* action, QToolButton::ToolButtonPopupMode popMode)
+{
+    addAction(action, popMode, SARibbonPannelItem::Large);
+}
+
+void SARibbonPannel::addMediumAction(QAction* action, QToolButton::ToolButtonPopupMode popMode)
+{
+    addAction(action, popMode, SARibbonPannelItem::Medium);
 }
 
 /**
@@ -244,60 +270,21 @@ QAction* SARibbonPannel::addAction(const QString& text, const QIcon& icon, QTool
  * @param popMode,菜单弹出模式，默认InstantPopup模式
  * @return
  */
-SARibbonToolButton* SARibbonPannel::addMenu(QMenu* menu, SARibbonPannelItem::RowProportion rp, QToolButton::ToolButtonPopupMode popMode)
+void SARibbonPannel::addMenu(QMenu* menu, SARibbonPannelItem::RowProportion rp, QToolButton::ToolButtonPopupMode popMode)
 {
     Q_CHECK_PTR(menu);
     QAction* action = menu->menuAction();
-
-    addAction(action, rp);
-    if (SARibbonToolButton* btn = d_ptr->lastAddActionButton()) {
-        btn->setPopupMode(popMode);
-        return (btn);
-    }
-    return nullptr;
+    addAction(action, popMode, rp);
 }
 
-/**
- * @brief 添加一个ActionMenu
- * @param action
- * @param menu
- * @param rp
- * @return
- */
-SARibbonToolButton* SARibbonPannel::addActionMenu(QAction* action, QMenu* menu, SARibbonPannelItem::RowProportion rp)
+void SARibbonPannel::addLargeMenu(QMenu* menu, QToolButton::ToolButtonPopupMode popMode)
 {
-    Q_CHECK_PTR(action);
-    Q_CHECK_PTR(menu);
-    action->setProperty(SA_ActionPropertyName_IsActionMenu, true);
-    action->setProperty(SA_ActionPropertyName_MenuPointer, QVariant::fromValue(void*(menu)));
-    SARibbonToolButton* btn = addAction(action, rp);
-    if (nullptr == btn) {
-        return nullptr;
-    }
-    btn->setMenu(menu);
-    btn->setPopupMode(QToolButton::MenuButtonPopup);
-    return (btn);
+    addMenu(menu, SARibbonPannelItem::Large, popMode);
 }
 
-/**
- * @brief 添加action menu,action menu是一个特殊的menu,即可点击触发action，也可弹出菜单
- * @param action 点击触发的action，在pannel中，图标以此action的图标为准
- * @param menu 需要弹出的menu
- * @return 返回
- */
-SARibbonToolButton* SARibbonPannel::addLargeActionMenu(QAction* action, QMenu* menu)
+void SARibbonPannel::addSmallMenu(QMenu* menu, QToolButton::ToolButtonPopupMode popMode)
 {
-    return (addActionMenu(action, menu, SARibbonPannelItem::Large));
-}
-
-SARibbonToolButton* SARibbonPannel::addLargeMenu(QMenu* menu, QToolButton::ToolButtonPopupMode popMode)
-{
-    return (addMenu(menu, SARibbonPannelItem::Large, popMode));
-}
-
-SARibbonToolButton* SARibbonPannel::addSmallMenu(QMenu* menu, QToolButton::ToolButtonPopupMode popMode)
-{
-    return (addMenu(menu, SARibbonPannelItem::Small, popMode));
+    addMenu(menu, SARibbonPannelItem::Small, popMode);
 }
 
 /**
@@ -389,6 +376,7 @@ QAction* SARibbonPannel::addSeparator(int top, int bottom)
  */
 SARibbonToolButton* SARibbonPannel::actionToRibbonToolButton(QAction* action)
 {
+#if 0
     SARibbonPannelLayout* lay = qobject_cast< SARibbonPannelLayout* >(layout());
 
     if (lay) {
@@ -401,6 +389,18 @@ SARibbonToolButton* SARibbonPannel::actionToRibbonToolButton(QAction* action)
         return (btn);
     }
     return (nullptr);
+#else
+    for (auto obj : qAsConst(children())) {
+        if (obj->isWidgetType()) {
+            if (SARibbonToolButton* btn = qobject_cast< SARibbonToolButton* >(obj)) {
+                if (btn->defaultAction() == action) {
+                    return btn;
+                }
+            }
+        }
+    }
+    return (nullptr);
+#endif
 }
 
 /**
@@ -724,7 +724,6 @@ void SARibbonPannel::resetLargeToolButtonStyle()
             continue;
         }
         b->updateRect();
-        b->repaint();
     }
 }
 
@@ -750,7 +749,7 @@ void SARibbonPannel::resizeEvent(QResizeEvent* e)
         if (ThreeRowMode == pannelLayoutMode()) {
             d_ptr->m_optionActionButton->move(width() - d_ptr->m_optionActionButton->width() - 2,
                                               height() - titleHeight()
-                                                      + (titleHeight() - d_ptr->m_optionActionButton->height()) / 2);
+                                                  + (titleHeight() - d_ptr->m_optionActionButton->height()) / 2);
         } else {
             d_ptr->m_optionActionButton->move(width() - d_ptr->m_optionActionButton->width(),
                                               height() - d_ptr->m_optionActionButton->height());
@@ -793,7 +792,7 @@ void SARibbonPannel::actionEvent(QActionEvent* e)
         int index = layout()->count();
         if (e->before()) {
             // 说明是插入
-            index = lay->indexOf(action);
+            index = lay->indexOf(e->before());
             if (-1 == index) {
                 index = layout()->count();  // 找不到的时候就插入到最后
             }

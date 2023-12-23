@@ -3,7 +3,6 @@
 #include "SARibbonGlobal.h"
 #include <QWidgetItem>
 #include <QAction>
-#include <functional>
 class SARibbonToolButton;
 /**
  * @brief 是对pannel所有子窗口的抽象，参考qt的toolbar
@@ -40,14 +39,14 @@ public:
 #ifndef SA_ActionPropertyName_RowProportion
 #define SA_ActionPropertyName_RowProportion "_sa_RowProportion"
 #endif
+#ifndef SA_ActionPropertyName_ToolButtonPopupMode
+#define SA_ActionPropertyName_ToolButtonPopupMode "_sa_ToolButtonPopupMode"
+#endif
 #ifndef SA_ActionPropertyName_SeparatorTop
 #define SA_ActionPropertyName_SeparatorTop "_sa_SeparatorTop"
 #endif
 #ifndef SA_ActionPropertyName_SeparatorBottom
 #define SA_ActionPropertyName_SeparatorBottom "_sa_SeparatorBottom"
-#endif
-#ifndef SA_ActionPropertyName_ToolButtonPopupMode
-#define SA_ActionPropertyName_ToolButtonPopupMode "_sa_ToolButtonPopupMode"
 #endif
 #ifndef SA_ActionPropertyName_IsActionMenu
 #define SA_ActionPropertyName_IsActionMenu "_sa_IsActionMenu"
