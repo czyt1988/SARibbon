@@ -141,7 +141,7 @@
 #define SA_RIBBON_DECLARE_PUBLIC(classname)                                                                            \
     friend class classname;                                                                                            \
     classname* q_ptr { nullptr };                                                                                      \
-    PrivateData(const PrivateData&)            = delete;                                                               \
+    PrivateData(const PrivateData&) = delete;                                                                          \
     PrivateData& operator=(const PrivateData&) = delete;
 #endif
 
@@ -187,5 +187,12 @@ enum class SARibbonAlignment
  */
 #define SA_DEBUG_PRINT_SIZE_HINT 1
 #endif
+#ifndef SA_DEBUG_PRINT_EVENT
+/**
+  @def 定义此宏，将打印事件
 
+    仅用于调试
+ */
+#define SA_DEBUG_PRINT_EVENT 0
+#endif
 #endif  // SARIBBONGLOBAL_H

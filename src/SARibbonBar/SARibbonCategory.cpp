@@ -276,6 +276,11 @@ void SARibbonCategory::setRibbonPannelLayoutMode(SARibbonPannel::PannelLayoutMod
 
 bool SARibbonCategory::event(QEvent* e)
 {
+#if SA_DEBUG_PRINT_EVENT
+    if (e->type() != QEvent::Paint) {
+        qDebug() << "SARibbonCategory event(" << e->type() << "),name=" << categoryName();
+    }
+#endif
     return QWidget::event(e);
 }
 
@@ -468,10 +473,10 @@ QList< SARibbonPannel* > SARibbonCategory::pannelList() const
 
 QSize SARibbonCategory::sizeHint() const
 {
-    if (QLayout* lay = layout()) {
+    if (SARibbonCategoryLayout* lay = categoryLayout()) {
         return lay->sizeHint();
     }
-    return QSize(500, 200);
+    return QSize(1000, 100);
 }
 
 /**
