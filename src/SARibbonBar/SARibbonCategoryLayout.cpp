@@ -1,7 +1,6 @@
 ﻿#include "SARibbonCategoryLayout.h"
 #include <QLayoutItem>
 #include "SARibbonPannel.h"
-#include "SARibbonToolButton.h"
 #include "SARibbonElementManager.h"
 #include "SARibbonSeparatorWidget.h"
 #include <QApplication>
@@ -29,7 +28,8 @@ public:
     SARibbonCategoryScrollButton* mRightScrollBtn { nullptr };  ///< 在区域无法显示时显示的按钮
     int mTotalWidth { 0 };
     int mXBase { 0 };
-    QSize mSizeHint { 50, 50 };
+    QSize mSizeHint;
+    QSize mMinSizeHint;
     QList< SARibbonCategoryLayoutItem* > mItemList;
     SARibbonAlignment mCategoryAlignment { SARibbonAlignment::AlignLeft };  ///< 对齐方式
 };
@@ -50,16 +50,27 @@ int SARibbonCategoryLayout::PrivateData::totalSizeHintWidth() const
 {
     int total    = 0;
     QMargins mag = q_ptr->contentsMargins();
-
+#if SA_DEBUG_PRINT_SIZE_HINT
+    int debug_i__ = 0;
+    QString debug_totalSizeHintWidth__;
+#endif
     if (!mag.isNull()) {
         total += (mag.left() + mag.right());
     }
     //先计算总长
     for (SARibbonCategoryLayoutItem* item : qAsConst(mItemList)) {
         if (item->isEmpty()) {
-            //如果是hide就直接跳过
+//如果是hide就直接跳过
+#if SA_DEBUG_PRINT_SIZE_HINT
+            ++debug_i__;
+            debug_totalSizeHintWidth__ += QString("   [%1](%2)is empty skip\n")
+                                              .arg(debug_i__)
+                                              .arg(item->toPannelWidget()->pannelName());
+#endif
             continue;
         }
+        //这里要使用widget()->sizeHint()，因为pannel的标题会影总体布局，此处需要修改
+        // TODO
         QSize pannelSize = item->widget()->sizeHint();
         QSize SeparatorSize(0, 0);
         if (item->separatorWidget) {
@@ -67,7 +78,21 @@ int SARibbonCategoryLayout::PrivateData::totalSizeHintWidth() const
         }
         total += pannelSize.width();
         total += SeparatorSize.width();
+#if SA_DEBUG_PRINT_SIZE_HINT
+        ++debug_i__;
+        debug_totalSizeHintWidth__ += QString("|-[%1]pannelSize=(%2,%3),SeparatorSize=(%4,%5),name=(%6) \n")
+                                          .arg(debug_i__)
+                                          .arg(pannelSize.width())
+                                          .arg(pannelSize.height())
+                                          .arg(SeparatorSize.width())
+                                          .arg(SeparatorSize.height())
+                                          .arg(item->toPannelWidget()->pannelName());
+#endif
     }
+#if SA_DEBUG_PRINT_SIZE_HINT
+    qDebug() << "SARibbonCategoryLayout.totalSizeHintWidth=" << total;
+    qDebug().noquote() << debug_totalSizeHintWidth__;
+#endif
     return (total);
 }
 
@@ -89,7 +114,7 @@ SARibbonCategoryLayout::SARibbonCategoryLayout(SARibbonCategory* parent)
 
 SARibbonCategoryLayout::~SARibbonCategoryLayout()
 {
-    while (QLayoutItem* item = takeAt(0)) {
+    while (auto item = takePannelItem(0)) {
         delete item;
     }
 }
@@ -126,13 +151,14 @@ QLayoutItem* SARibbonCategoryLayout::itemAt(int index) const
  */
 QLayoutItem* SARibbonCategoryLayout::takeAt(int index)
 {
-    return (takePannelItem(index));
+    QLayoutItem* r = takePannelItem(index);
+    invalidate();
+    return r;
 }
 
 SARibbonCategoryLayoutItem* SARibbonCategoryLayout::takePannelItem(int index)
 {
     if ((index >= 0) && (index < d_ptr->mItemList.size())) {
-        invalidate();
         SARibbonCategoryLayoutItem* item = d_ptr->mItemList.takeAt(index);
         if (item->widget()) {
             item->widget()->hide();
@@ -170,6 +196,7 @@ bool SARibbonCategoryLayout::takePannel(SARibbonPannel* pannel)
             sp->deleteLater();
         }
         delete i;
+        invalidate();
         return true;
     }
     return false;
@@ -208,12 +235,20 @@ void SARibbonCategoryLayout::insertPannel(int index, SARibbonPannel* pannel)
 
 QSize SARibbonCategoryLayout::sizeHint() const
 {
+    if (d_ptr->mSizeHint.isNull()) {
+        SARibbonCategoryLayout* that = const_cast< SARibbonCategoryLayout* >(this);
+        that->updateGeometryArr();
+    }
     return (d_ptr->mSizeHint);
 }
 
 QSize SARibbonCategoryLayout::minimumSize() const
 {
-    return (d_ptr->mSizeHint);
+    if (d_ptr->mMinSizeHint.isNull()) {
+        SARibbonCategoryLayout* that = const_cast< SARibbonCategoryLayout* >(this);
+        that->updateGeometryArr();
+    }
+    return (d_ptr->mMinSizeHint);
 }
 
 /**
@@ -251,7 +286,7 @@ QSize SARibbonCategoryLayout::categoryContentSize() const
  */
 void SARibbonCategoryLayout::updateGeometryArr()
 {
-    SARibbonCategory* category = qobject_cast< SARibbonCategory* >(parentWidget());
+    SARibbonCategory* category = ribbonCategory();
     if (nullptr == category) {
         return;
     }
@@ -273,11 +308,14 @@ void SARibbonCategoryLayout::updateGeometryArr()
 
 //如果total < categoryWidth,m_d->mXBase可以设置为0
 //判断是否超过总长度
-#if SARibbonCategoryLayout_DEBUG_PRINT
-    qDebug() << "\r\n\r\n==========================(" << category->categoryName() << ")======="
-             << "\r\nSARibbonCategoryLayout::updateGeometryArr"
-             << "\r\npannel name:" << category->windowTitle() << "\r\n height:" << height
-             << "\r\n first total:" << total << "\r\n y:" << y << "\r\n expandWidth:" << expandWidth;
+#if SA_DEBUG_PRINT_SIZE_HINT
+    qDebug() << "SARibbonCategoryLayout::updateGeometryArr"
+             << "\n|-category name=" << category->categoryName()  //
+             << "\n|-category height=" << height                  //
+             << "\n|-totalSizeHintWidth=" << total                //
+             << "\n|-y=" << y                                     //
+             << "\n|-expandWidth:" << expandWidth                 //
+             << "\n|-mag=" << mag;
 #endif
     if (total > categoryWidth) {
         //超过总长度，需要显示滚动按钮
@@ -364,23 +402,12 @@ void SARibbonCategoryLayout::updateGeometryArr()
         x += w;
         total += w;
     }
-    d_ptr->mTotalWidth = total;
-    QWidget* cp        = category->parentWidget();
-    int parentHeight   = (nullptr == cp) ? height : cp->height();
-    int parentWidth    = (nullptr == cp) ? total : cp->width();
-#if SARibbonCategoryLayout_DEBUG_PRINT
-    qDebug() << "\r\n mSizeHint:[ " << parentHeight << "," << parentWidth << "]";
-    for (int i = 0; i < d_ptr->mItemList.size(); ++i) {
-        qDebug() << "\r\n [ " << i << "] (pannel name=" << d_ptr->mItemList[ i ]->toPannelWidget()->pannelName()
-                 << "),sizeHint=" << d_ptr->mItemList[ i ]->toPannelWidget()->sizeHint()
-                 << "\r\n geo:" << d_ptr->mItemList[ i ]->mWillSetGeometry
-                 << ", Separator geo:" << d_ptr->mItemList[ i ]->mWillSetSeparatorGeometry;
-    }
-#endif
-    d_ptr->mSizeHint = QSize(parentWidth, parentHeight);
+    d_ptr->mTotalWidth  = total;
+    d_ptr->mSizeHint    = QSize(d_ptr->mTotalWidth, height);
+    d_ptr->mMinSizeHint = QSize(categoryWidth, height);
 #if SA_DEBUG_PRINT_SIZE_HINT
-    qDebug() << "SARibbonCategory name=" << category->categoryName()
-             << " SARibbonCategoryLayout updateGeometryArr,SizeHint=" << d_ptr->mSizeHint;
+    qDebug() << "SARibbonCategoryLayout updateGeometryArr,SizeHint=" << d_ptr->mSizeHint
+             << ",Category name=" << category->categoryName();
 #endif
 }
 
@@ -392,18 +419,25 @@ void SARibbonCategoryLayout::doLayout()
     if (d_ptr->mDirty) {
         updateGeometryArr();
     }
-    SARibbonCategory* category = qobject_cast< SARibbonCategory* >(parentWidget());
+    SARibbonCategory* category = ribbonCategory();
     //两个滚动按钮的位置永远不变
     d_ptr->mLeftScrollBtn->setGeometry(0, 0, 12, category->height());
     d_ptr->mRightScrollBtn->setGeometry(category->width() - 12, 0, 12, category->height());
     QList< QWidget* > showWidgets, hideWidgets;
-
+#ifdef SA_DEBUG_PRINT_SIZE_HINT
+    int debug_i__(0);
+    qDebug() << "SARibbonCategoryLayout::doLayout(),name=" << category->categoryName();
+#endif
     for (SARibbonCategoryLayoutItem* item : qAsConst(d_ptr->mItemList)) {
         if (item->isEmpty()) {
             hideWidgets << item->widget();
             if (item->separatorWidget) {
                 hideWidgets << item->separatorWidget;
             }
+#ifdef SA_DEBUG_PRINT_SIZE_HINT
+            qDebug() << "|-[" << debug_i__ << "]pannelName(" << item->toPannelWidget()->pannelName() << ",will hide";
+            ++debug_i__;
+#endif
         } else {
             item->widget()->setFixedSize(item->mWillSetGeometry.size());
             item->widget()->move(item->mWillSetGeometry.topLeft());
@@ -413,10 +447,11 @@ void SARibbonCategoryLayout::doLayout()
                 item->separatorWidget->setGeometry(item->mWillSetSeparatorGeometry);
                 showWidgets << item->separatorWidget;
             }
-#ifdef SA_RIBBON_DEBUG_HELP_DRAW
-            qDebug() << "SARibbonCategoryLayout::doLayout() =";
-            qDebug() << "\r\n     pannel:" << item->widget()->windowTitle() << "\r\n     pannel geo:" << item->mWillSetGeometry
-                     << "\r\n     sep geo:" << item->mWillSetSeparatorGeometry;
+#ifdef SA_DEBUG_PRINT_SIZE_HINT
+            qDebug() << "|-[" << debug_i__ << "]pannelName(" << item->toPannelWidget()->pannelName()
+                     << "),willSetGeometry:" << item->mWillSetGeometry
+                     << ",WillSetSeparatorGeometry:" << item->mWillSetSeparatorGeometry;
+            ++debug_i__;
 #endif
         }
     }
@@ -431,14 +466,15 @@ void SARibbonCategoryLayout::doLayout()
     }
     // 不在上面那里进行show和hide因为这会触发SARibbonPannelLayout的重绘，导致循环绘制，非常影响效率
     for (QWidget* w : qAsConst(showWidgets)) {
-        w->show();
+        if (!w->isVisible()) {
+            w->show();
+        }
     }
     for (QWidget* w : qAsConst(hideWidgets)) {
-        w->hide();
+        if (w->isVisible()) {
+            w->hide();
+        }
     }
-#if SA_DEBUG_PRINT_SIZE_HINT
-    qDebug() << "SARibbonCategory name=" << category->categoryName() << " SARibbonCategoryLayout doLayout";
-#endif
 }
 
 /**
@@ -655,7 +691,7 @@ void SARibbonCategoryLayout::setGeometry(const QRect& rect)
         return;
     }
 #if SA_DEBUG_PRINT_SIZE_HINT
-    qDebug() << "SARibbonCategoryLayout " << ribbonCategory()->categoryName() << " setGeometry=" << rect;
+    qDebug() << "===========SARibbonCategoryLayout.setGeometry(" << rect << "(" << ribbonCategory()->categoryName() << ")=======";
 #endif
     QLayout::setGeometry(rect);
     d_ptr->mDirty = false;

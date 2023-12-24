@@ -507,20 +507,24 @@ void SARibbonPannel::paintEvent(QPaintEvent* e)
 
 QSize SARibbonPannel::sizeHint() const
 {
-    QSize laySize = layout()->sizeHint();
-    int maxWidth  = laySize.width() + 2;
-
-    if (ThreeRowMode == pannelLayoutMode()) {
-        // 三行模式
-        QFontMetrics fm = fontMetrics();
-        QSize titleSize = fm.size(Qt::TextShowMnemonic, pannelName());
-        if (d_ptr->m_optionActionButton) {
-            // optionActionButton的宽度需要预留
-            titleSize.setWidth(titleSize.width() + d_ptr->m_optionActionButton->width() + 4);
+    int shWidth  = 500;
+    int shHeight = 80;
+    if (QLayout* lay = layout()) {
+        QSize laySize = layout()->sizeHint();
+        shWidth       = laySize.width();
+        shHeight      = laySize.height();
+        if (ThreeRowMode == pannelLayoutMode()) {
+            // 三行模式
+            QFontMetrics fm = fontMetrics();
+            QSize titleSize = fm.size(Qt::TextShowMnemonic, pannelName());
+            if (d_ptr->m_optionActionButton) {
+                // optionActionButton的宽度需要预留
+                titleSize.setWidth(titleSize.width() + d_ptr->m_optionActionButton->width() + 4);
+            }
+            shWidth = qMax(shWidth, titleSize.width());
         }
-        maxWidth = qMax(maxWidth, titleSize.width());
     }
-    return (QSize(maxWidth, laySize.height()));
+    return QSize(shWidth, shHeight);
 }
 
 QSize SARibbonPannel::minimumSizeHint() const
@@ -729,6 +733,11 @@ void SARibbonPannel::resetLargeToolButtonStyle()
 
 bool SARibbonPannel::event(QEvent* e)
 {
+#if SA_DEBUG_PRINT_EVENT
+    if (e->type() != QEvent::Paint) {
+        qDebug() << "SARibbonPannel event(" << e->type() << "),name=" << pannelName();
+    }
+#endif
     // if (SARibbonPannelLayout* lay = pannelLayout()) {
     //     if (lay->isDirty() && e->type() == QEvent::LayoutRequest) {
     //         if (QWidget* parw = parentWidget()) {
@@ -809,6 +818,7 @@ void SARibbonPannel::actionEvent(QActionEvent* e)
     case QEvent::ActionChanged: {
         // 让布局重新绘制
         layout()->invalidate();
+
         // updateGeometry();
         // 由于pannel的尺寸发生变化，需要让category也调整
         if (QWidget* parw = parentWidget()) {
@@ -826,7 +836,6 @@ void SARibbonPannel::actionEvent(QActionEvent* e)
             // //!
             // //! 调用parw->updateGeometry();也没有效果，目前看使用resizeevent是最有效果的
             // //!
-            // // parw->updateGeometry();
             // QResizeEvent* ersize = new QResizeEvent(parw->size(), QSize());
             // QApplication::postEvent(parw, ersize);
         }
