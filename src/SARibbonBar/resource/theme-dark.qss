@@ -28,17 +28,17 @@ SARibbonCtrlContainer {
 }
 
 /*SARibbonCategory*/
+SARibbonCategory {
+  background-color: #b2b2b2;
+}
 SARibbonCategory:focus {
   outline: none;
 }
 
-SARibbonCategory {
-  background-color: #b2b2b2;
-}
+
 
 /*SARibbonStackedWidget*/
 SARibbonStackedWidget{
-  background-color: #b2b2b2;
   border-top-width: 0px;
 }
 SARibbonStackedWidget:focus{
@@ -313,47 +313,54 @@ SARibbonCategoryScrollButton[arrowType="4"] {
   border-left-width: 0.05em;
 }
 /*SAWindowToolButton*/
-SAWindowToolButton { 
-  background-color: transparent; 
+
+SAWindowToolButton {
+  background-color: transparent;
   border:none;
 }
 
 SAWindowToolButton:focus {
   outline: none;
 }
-
+/*Min*/
 SAWindowToolButton#SAMinimizeWindowButton {
-  image: url(:/image/resource/Titlebar_Min.png);
+  qproperty-iconSize: 16px 16px;
+  qproperty-icon: url(:/image/resource/Titlebar_Min.svg) center;
 }
-
-SAWindowToolButton#SAMaximizeWindowButton:checked {
-  image:url(:/image/resource/Titlebar_Normal.png);
-}
-
-SAWindowToolButton#SAMaximizeWindowButton {
-  image:url(:/image/resource/Titlebar_Max.png);
-}
-
 SAWindowToolButton#SAMinimizeWindowButton:hover,#SAMaximizeWindowButton:hover {
   background-color: #e5e5e5;
+  qproperty-iconSize: 16px 16px;
+  qproperty-icon: url(:/image/resource/Titlebar_Min_Hover.svg) center;
 }
-
 SAWindowToolButton#SAMinimizeWindowButton:pressed,#SAMaximizeWindowButton:pressed {
   background-color: #cacacb;
 }
-
-SAWindowToolButton#SACloseWindowButton {
-  image: url(:/image/resource/Titlebar_Close_Hover.png);
+/*Max*/
+SAWindowToolButton#SAMaximizeWindowButton {
+    qproperty-iconSize: 16px 16px;
+    qproperty-icon: url(:/image/resource/Titlebar_Max.svg) center;
+}
+SAWindowToolButton#SAMaximizeWindowButton:checked {
+    qproperty-icon: url(:/image/resource/Titlebar_Normal.svg) center;
+}
+SAWindowToolButton#SAMaximizeWindowButton:hover {
+    background-color: #e5e5e5;
+    qproperty-icon: url(:/image/resource/Titlebar_Max_Hover.svg) center;
 }
 
+
+/*Close*/
+SAWindowToolButton#SACloseWindowButton {
+    qproperty-iconSize: 16px 16px;
+    qproperty-icon: url(:/image/resource/Titlebar_Close.svg) center;
+}
 SAWindowToolButton#SACloseWindowButton:hover {
   background-color: #e81123;
-  image: url(:/image/resource/Titlebar_Close.png);
+  qproperty-icon: url(:/image/resource/Titlebar_Close_Hover.svg) center;
 }
-
 SAWindowToolButton#SACloseWindowButton:pressed {
-  background-color: #f1707a;
-  image: url(:/image/resource/Titlebar_Close.png);
+    background-color: #f1707a;
+    qproperty-icon: url(:/image/resource/Titlebar_Close_Hover.svg) center;
 }
 
 SAWindowToolButton#SARibbonBarHidePannelButton {

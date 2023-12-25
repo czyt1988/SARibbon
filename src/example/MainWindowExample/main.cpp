@@ -3,7 +3,7 @@
 #include <QDebug>
 #include <QElapsedTimer>
 
-//重定向qdebug的打印
+// 重定向qdebug的打印
 void log_out_put(QtMsgType type, const QMessageLogContext& context, const QString& msg);
 
 /**
@@ -18,53 +18,24 @@ void log_out_put(QtMsgType type, const QMessageLogContext& context, const QStrin
 
     switch (type) {
     case QtDebugMsg:
-        fprintf(stdout,
-                "[Debug] %s \n-------------->(%s:%u, %s)\n",
-                localMsg.constData(),
-                context.file,
-                context.line,
-                context.function);
+        fprintf(stdout, "%s |[Debug] (%s[%u],%s)\n", localMsg.constData(), context.function, context.line, context.file);
         break;
 
-        //    case QtInfoMsg:
-        //        fprintf(stdout, "[Info] %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line,
-        //        context.function); break;
-
     case QtWarningMsg:
-        fprintf(stdout,
-                "[Warning] %s \n-------------->(%s:%u, %s)\n",
-                localMsg.constData(),
-                context.file,
-                context.line,
-                context.function);
+        fprintf(stdout, "%s |[Warning] (%s[%u],%s)\n", localMsg.constData(), context.function, context.line, context.file);
         break;
 
     case QtCriticalMsg:
-        fprintf(stdout,
-                "[Critical] %s \n-------------->(%s:%u, %s)\n",
-                localMsg.constData(),
-                context.file,
-                context.line,
-                context.function);
+        fprintf(stdout, "%s |[Critical] (%s[%u],%s)\n", localMsg.constData(), context.function, context.line, context.file);
         break;
 
     case QtFatalMsg:
-        fprintf(stdout,
-                "Fatal: %s \n-------------->(%s:%u, %s)\n",
-                localMsg.constData(),
-                context.file,
-                context.line,
-                context.function);
+        fprintf(stdout, "%s |[Fatal] (%s[%u],%s)\n", localMsg.constData(), context.function, context.line, context.file);
         abort();
         break;
 
     default:
-        fprintf(stdout,
-                "[Debug] %s \n-------------->(%s:%u, %s)\n",
-                localMsg.constData(),
-                context.file,
-                context.line,
-                context.function);
+        fprintf(stdout, "%s |[Debug](%s[%u],%s)\n", localMsg.constData(), context.function, context.line, context.file);
         break;
     }
 #ifndef QT_NO_DEBUG_OUTPUT
@@ -74,9 +45,10 @@ void log_out_put(QtMsgType type, const QMessageLogContext& context, const QStrin
 
 int main(int argc, char* argv[])
 {
-    //以下是针对高分屏的设置，有高分屏需求都需要按照下面进行设置
+    // 以下是针对高分屏的设置，有高分屏需求都需要按照下面进行设置
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
     QApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);

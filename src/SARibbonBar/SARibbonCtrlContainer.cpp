@@ -5,8 +5,8 @@
 #include <QStylePainter>
 #include <QDebug>
 #include <QLabel>
-#include "SARibbonDrawHelper.h"
-
+#include <QApplication>
+#include <QScreen>
 /**
  * @brief The SARibbonCtrlContainerPrivate class
  */
@@ -40,7 +40,7 @@ public:
     void setContainerWidget(QWidget* w)
     {
         if (containerWidget) {
-            //原来有widget
+            // 原来有widget
             QWidget* oldwidget = containerWidget;
             takeContainerWidget(oldwidget);
             oldwidget->deleteLater();
@@ -117,8 +117,14 @@ bool SARibbonCtrlContainer::hasContainerWidget() const
  */
 void SARibbonCtrlContainer::setIcon(const QIcon& i)
 {
-    d_ptr->icon = i;
-    d_ptr->labelPixmap->setPixmap(i.pixmap(d_ptr->iconSize));
+    d_ptr->icon    = i;
+    QPixmap pixmap = i.pixmap(d_ptr->iconSize);
+    d_ptr->labelPixmap->setPixmap(pixmap);
+}
+
+void SARibbonCtrlContainer::setIcon(const QPixmap& pixmap)
+{
+    d_ptr->labelPixmap->setPixmap(pixmap);
 }
 
 /**

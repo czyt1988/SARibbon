@@ -2,10 +2,8 @@
 #include "SARibbonCategory.h"
 #include "SARibbonElementManager.h"
 #include "SARibbonGallery.h"
-#include "SARibbonMenu.h"
 #include "SARibbonPannelLayout.h"
 #include "SARibbonPannelOptionButton.h"
-#include "SARibbonSeparatorWidget.h"
 #include "SARibbonToolButton.h"
 #include <QAction>
 #include <QApplication>
@@ -118,10 +116,8 @@ SARibbonPannel::~SARibbonPannel()
  */
 void SARibbonPannel::setActionRowProportionProperty(QAction* action, SARibbonPannelItem::RowProportion rp)
 {
-    if (action == nullptr) {
-        return;
-    }
-    action->setProperty(SARibbonPannelItemRowProportionPropertyName, int(rp));
+    Q_CHECK_PTR(action);
+    action->setProperty(SA_ActionPropertyName_RowProportion, static_cast< int >(rp));
 }
 
 /**
@@ -132,7 +128,7 @@ void SARibbonPannel::setActionRowProportionProperty(QAction* action, SARibbonPan
 SARibbonPannelItem::RowProportion SARibbonPannel::getActionRowProportionProperty(QAction* action)
 {
     bool isok = false;
-    int r     = action->property(SARibbonPannelItemRowProportionPropertyName).toInt(&isok);
+    int r     = action->property(SA_ActionPropertyName_RowProportion).toInt(&isok);
 
     if (isok) {
         return (static_cast< SARibbonPannelItem::RowProportion >(r));
@@ -141,73 +137,45 @@ SARibbonPannelItem::RowProportion SARibbonPannel::getActionRowProportionProperty
 }
 
 /**
- * @brief 设置action的行行为，行属性决定了ribbon pannel的显示方式
- * @param action 需要设置的action，此action必须已经被pannel添加过
- * @param rp 行为
+ * @brief 设置action的ToolButtonPopupMode属性
+ * @param action
+ * @param popMode
  */
-void SARibbonPannel::setActionRowProportion(QAction* action, SARibbonPannelItem::RowProportion rp)
+void SARibbonPannel::setActionToolButtonPopupModeProperty(QAction* action, QToolButton::ToolButtonPopupMode popMode)
 {
-    if (action == nullptr) {
-        return;
+    Q_CHECK_PTR(action);
+    action->setProperty(SA_ActionPropertyName_ToolButtonPopupMode, static_cast< int >(popMode));
+}
+
+/**
+ * @brief 获取action的ToolButtonPopupMode属性
+ * @param action
+ * @return
+ */
+QToolButton::ToolButtonPopupMode SARibbonPannel::getActionToolButtonPopupModeProperty(QAction* action)
+{
+    bool isok = false;
+    int r     = action->property(SA_ActionPropertyName_ToolButtonPopupMode).toInt(&isok);
+
+    if (isok) {
+        return (static_cast< QToolButton::ToolButtonPopupMode >(r));
     }
-    setActionRowProportionProperty(action, rp);
-    if (SARibbonPannelLayout* lay = pannelLayout()) {
-        SARibbonPannelItem* it = lay->pannelItem(action);
-        if (it) {
-            it->rowProportion = rp;
-            lay->invalidate();
-        }
-    }
+    return (QToolButton::InstantPopup);
 }
 
 /**
  * @brief 添加action
- * @param action action
+ *
+ * action实际对应了一个toolbutton，如果想找到对应的toolbutton，使用@ref actionToRibbonToolButton
+ * @param action
  * @param rp 指定action的行占比
- * @return 返回对应的SARibbonToolButton，如果是窗口，返回的toolbutton为nullptr
+ * @param popMode 菜单弹出样式
  */
-SARibbonToolButton* SARibbonPannel::addAction(QAction* action, SARibbonPannelItem::RowProportion rp)
+void SARibbonPannel::addAction(QAction* action, SARibbonPannelItem::RowProportion rp)
 {
-    if (action == nullptr) {
-        return nullptr;
-    }
+    Q_CHECK_PTR(action);
     setActionRowProportionProperty(action, rp);
     addAction(action);
-
-    return (d_ptr->lastAddActionButton());
-}
-
-/**
- * @brief 添加大图标
- *
- * @param action
- * @sa 如果想获取actiom对应的SARibbonToolButton,可以使用@ref actionToRibbonToolButton 函数
- */
-SARibbonToolButton* SARibbonPannel::addLargeAction(QAction* action)
-{
-    return (addAction(action, SARibbonPannelItem::Large));
-}
-
-/**
- * @brief 在三栏模式下，强制加为2栏action
- * @note 在两行模式下，Medium和Small等价
- * 主要应用在ThreeRowMode下
- * @param action
- * @sa 如果想获取actiom对应的SARibbonToolButton,可以使用@ref actionToRibbonToolButton 函数
- */
-SARibbonToolButton* SARibbonPannel::addMediumAction(QAction* action)
-{
-    return (addAction(action, SARibbonPannelItem::Medium));
-}
-
-/**
- * @brief 添加小图标
- * @param action
- * @sa 如果想获取actiom对应的SARibbonToolButton,可以使用@ref actionToRibbonToolButton 函数
- */
-SARibbonToolButton* SARibbonPannel::addSmallAction(QAction* action)
-{
-    return (addAction(action, SARibbonPannelItem::Small));
 }
 
 /**
@@ -218,16 +186,60 @@ SARibbonToolButton* SARibbonPannel::addSmallAction(QAction* action)
  */
 void SARibbonPannel::addAction(QAction* act, QToolButton::ToolButtonPopupMode popMode, SARibbonPannelItem::RowProportion rp)
 {
-    if (act == nullptr) {
-        return;
-    }
+    Q_CHECK_PTR(act);
     setActionRowProportionProperty(act, rp);
+    setActionToolButtonPopupModeProperty(act, popMode);
     addAction(act);
-    SARibbonToolButton* btn = d_ptr->lastAddActionButton();
+}
 
-    if (btn) {
-        btn->setPopupMode(popMode);
-    }
+/**
+   @brief 添加大图标
+
+   action实际对应了一个toolbutton，如果想找到对应的toolbutton，使用@ref actionToRibbonToolButton
+   @param action
+ */
+void SARibbonPannel::addLargeAction(QAction* action)
+{
+    addAction(action, SARibbonPannelItem::Large);
+}
+
+/**
+   @brief 在三栏模式下，强制加为2栏action
+   @note 在两行模式下，Medium和Small等价
+   主要应用在ThreeRowMode下
+
+   action实际对应了一个toolbutton，如果想找到对应的toolbutton，使用@ref actionToRibbonToolButton
+   @param action
+ */
+void SARibbonPannel::addMediumAction(QAction* action)
+{
+    addAction(action, SARibbonPannelItem::Medium);
+}
+
+/**
+   @brief 添加小图标
+
+   action实际对应了一个toolbutton，如果想找到对应的toolbutton，使用@ref actionToRibbonToolButton
+   @param action
+ */
+void SARibbonPannel::addSmallAction(QAction* action)
+{
+    addAction(action, SARibbonPannelItem::Small);
+}
+
+void SARibbonPannel::addSmallAction(QAction* action, QToolButton::ToolButtonPopupMode popMode)
+{
+    addAction(action, popMode, SARibbonPannelItem::Small);
+}
+
+void SARibbonPannel::addLargeAction(QAction* action, QToolButton::ToolButtonPopupMode popMode)
+{
+    addAction(action, popMode, SARibbonPannelItem::Large);
+}
+
+void SARibbonPannel::addMediumAction(QAction* action, QToolButton::ToolButtonPopupMode popMode)
+{
+    addAction(action, popMode, SARibbonPannelItem::Medium);
 }
 
 /**
@@ -258,57 +270,21 @@ QAction* SARibbonPannel::addAction(const QString& text, const QIcon& icon, QTool
  * @param popMode,菜单弹出模式，默认InstantPopup模式
  * @return
  */
-SARibbonToolButton* SARibbonPannel::addMenu(QMenu* menu, SARibbonPannelItem::RowProportion rp, QToolButton::ToolButtonPopupMode popMode)
+void SARibbonPannel::addMenu(QMenu* menu, SARibbonPannelItem::RowProportion rp, QToolButton::ToolButtonPopupMode popMode)
 {
-    if (menu == nullptr) {
-        return nullptr;
-    }
+    Q_CHECK_PTR(menu);
     QAction* action = menu->menuAction();
-
-    addAction(action, rp);
-    SARibbonToolButton* btn = d_ptr->lastAddActionButton();
-
-    btn->setPopupMode(popMode);
-    return (btn);
+    addAction(action, popMode, rp);
 }
 
-/**
- * @brief 添加一个ActionMenu
- * @param action
- * @param menu
- * @param rp
- * @return
- */
-SARibbonToolButton* SARibbonPannel::addActionMenu(QAction* action, QMenu* menu, SARibbonPannelItem::RowProportion rp)
+void SARibbonPannel::addLargeMenu(QMenu* menu, QToolButton::ToolButtonPopupMode popMode)
 {
-    SARibbonToolButton* btn = addAction(action, rp);
-    if (nullptr == btn) {
-        return nullptr;
-    }
-    btn->setMenu(menu);
-    btn->setPopupMode(QToolButton::MenuButtonPopup);
-    return (btn);
+    addMenu(menu, SARibbonPannelItem::Large, popMode);
 }
 
-/**
- * @brief 添加action menu,action menu是一个特殊的menu,即可点击触发action，也可弹出菜单
- * @param action 点击触发的action，在pannel中，图标以此action的图标为准
- * @param menu 需要弹出的menu
- * @return 返回
- */
-SARibbonToolButton* SARibbonPannel::addLargeActionMenu(QAction* action, QMenu* menu)
+void SARibbonPannel::addSmallMenu(QMenu* menu, QToolButton::ToolButtonPopupMode popMode)
 {
-    return (addActionMenu(action, menu, SARibbonPannelItem::Large));
-}
-
-SARibbonToolButton* SARibbonPannel::addLargeMenu(QMenu* menu, QToolButton::ToolButtonPopupMode popMode)
-{
-    return (addMenu(menu, SARibbonPannelItem::Large, popMode));
-}
-
-SARibbonToolButton* SARibbonPannel::addSmallMenu(QMenu* menu, QToolButton::ToolButtonPopupMode popMode)
-{
-    return (addMenu(menu, SARibbonPannelItem::Small, popMode));
+    addMenu(menu, SARibbonPannelItem::Small, popMode);
 }
 
 /**
@@ -365,13 +341,14 @@ QAction* SARibbonPannel::addLargeWidget(QWidget* w)
  * @return
  * @note SARibbonPannel将拥有SARibbonGallery的管理权
  */
-SARibbonGallery* SARibbonPannel::addGallery()
+SARibbonGallery* SARibbonPannel::addGallery(bool expanding)
 {
     SARibbonGallery* gallery = RibbonSubElementDelegate->createRibbonGallery(this);
 
     addWidget(gallery, SARibbonPannelItem::Large);
-
-    setExpanding();
+    if (expanding) {
+        setExpanding(expanding);
+    }
     return (gallery);
 }
 
@@ -386,14 +363,9 @@ QAction* SARibbonPannel::addSeparator(int top, int bottom)
 
     action->setSeparator(true);
     setActionRowProportionProperty(action, SARibbonPannelItem::Large);
+    action->setProperty(SA_ActionPropertyName_SeparatorTop, top);
+    action->setProperty(SA_ActionPropertyName_SeparatorBottom, bottom);
     addAction(action);
-    if (SARibbonPannelLayout* lay = pannelLayout()) {
-        QWidget* w                   = lay->lastWidget();
-        SARibbonSeparatorWidget* sep = qobject_cast< SARibbonSeparatorWidget* >(w);
-        if (sep) {
-            sep->setTopBottomMargins(top, bottom);
-        }
-    }
     return (action);
 }
 
@@ -404,6 +376,7 @@ QAction* SARibbonPannel::addSeparator(int top, int bottom)
  */
 SARibbonToolButton* SARibbonPannel::actionToRibbonToolButton(QAction* action)
 {
+#if 0
     SARibbonPannelLayout* lay = qobject_cast< SARibbonPannelLayout* >(layout());
 
     if (lay) {
@@ -416,6 +389,18 @@ SARibbonToolButton* SARibbonPannel::actionToRibbonToolButton(QAction* action)
         return (btn);
     }
     return (nullptr);
+#else
+    for (auto obj : qAsConst(children())) {
+        if (obj->isWidgetType()) {
+            if (SARibbonToolButton* btn = qobject_cast< SARibbonToolButton* >(obj)) {
+                if (btn->defaultAction() == action) {
+                    return btn;
+                }
+            }
+        }
+    }
+    return (nullptr);
+#endif
 }
 
 /**
@@ -442,13 +427,12 @@ QList< SARibbonToolButton* > SARibbonPannel::ribbonToolButtons() const
  */
 void SARibbonPannel::setPannelLayoutMode(SARibbonPannel::PannelLayoutMode mode)
 {
-    // 不做相同判断，这样可以进行强制布局
-    //     if (d_ptr->m_pannelLayoutMode == mode) {
-    //         return;
-    //     }
+    if (d_ptr->m_pannelLayoutMode == mode) {
+        return;
+    }
     d_ptr->m_pannelLayoutMode = mode;
-    resetLayout(mode);
     resetLargeToolButtonStyle();
+    resetLayout(mode);
 }
 
 SARibbonPannel::PannelLayoutMode SARibbonPannel::pannelLayoutMode() const
@@ -490,7 +474,7 @@ bool SARibbonPannel::isHaveOptionAction() const
     return (d_ptr->m_optionActionButton != nullptr);
 }
 
-void SARibbonPannel::paintEvent(QPaintEvent* event)
+void SARibbonPannel::paintEvent(QPaintEvent* e)
 {
     QPainter p(this);
 
@@ -518,25 +502,29 @@ void SARibbonPannel::paintEvent(QPaintEvent* event)
         }
     }
 
-    QWidget::paintEvent(event);
+    QWidget::paintEvent(e);
 }
 
 QSize SARibbonPannel::sizeHint() const
 {
-    QSize laySize = layout()->sizeHint();
-    int maxWidth  = laySize.width() + 2;
-
-    if (ThreeRowMode == pannelLayoutMode()) {
-        // 三行模式
-        QFontMetrics fm = fontMetrics();
-        QSize titleSize = fm.size(Qt::TextShowMnemonic, pannelName());
-        if (d_ptr->m_optionActionButton) {
-            // optionActionButton的宽度需要预留
-            titleSize.setWidth(titleSize.width() + d_ptr->m_optionActionButton->width() + 4);
+    int shWidth  = 500;
+    int shHeight = 80;
+    if (QLayout* lay = layout()) {
+        QSize laySize = layout()->sizeHint();
+        shWidth       = laySize.width();
+        shHeight      = laySize.height();
+        if (ThreeRowMode == pannelLayoutMode()) {
+            // 三行模式
+            QFontMetrics fm = fontMetrics();
+            QSize titleSize = fm.size(Qt::TextShowMnemonic, pannelName());
+            if (d_ptr->m_optionActionButton) {
+                // optionActionButton的宽度需要预留
+                titleSize.setWidth(titleSize.width() + d_ptr->m_optionActionButton->width() + 4);
+            }
+            shWidth = qMax(shWidth, titleSize.width());
         }
-        maxWidth = qMax(maxWidth, titleSize.width());
     }
-    return (QSize(maxWidth, laySize.height()));
+    return QSize(shWidth, shHeight);
 }
 
 QSize SARibbonPannel::minimumSizeHint() const
@@ -590,7 +578,7 @@ QSize SARibbonPannel::optionActionButtonSize() const
 int SARibbonPannel::actionIndex(QAction* act) const
 {
     if (SARibbonPannelLayout* lay = pannelLayout()) {
-        return (lay->indexOf(act));
+        return (lay->indexByAction(act));
     }
     return (-1);
 }
@@ -664,8 +652,6 @@ int SARibbonPannel::pannelTitleHeight()
 
 /**
  * @brief 设置pannel的全局高度，此函数是个全局的影响
- * @note SARibbonStyleOption会用到此函数，调用设置函数后需要手动重新计算SARibbonStyleOption的内容,@sa SARibbonStyleOption::recalc
- * @sa SARibbonStyleOption
  * @param h
  */
 void SARibbonPannel::setPannelTitleHeight(int h)
@@ -687,21 +673,46 @@ SARibbonPannelLayout* SARibbonPannel::pannelLayout() const
  */
 void SARibbonPannel::updateItemGeometry()
 {
+#if SA_DEBUG_PRINT_SIZE_HINT
+    qDebug() << "SARibbonPannel updateItemGeometry,pannelName=" << pannelName();
+#endif
     if (QLayout* lay = layout()) {
         lay->invalidate();
     }
-    updateGeometry();
-    QResizeEvent* e = new QResizeEvent(size(), QSize());
-    QApplication::postEvent(this, e);
+}
+
+/**
+   @brief 获取category指针，如果没有parent，或者不在category管理，返回nullptr
+   @return
+ */
+SARibbonCategory* SARibbonPannel::category() const
+{
+    return qobject_cast< SARibbonCategory* >(parent());
+}
+
+/**
+   @brief 获取ribbonBar指针，如果没有返回nullptr
+   @return
+ */
+SARibbonBar* SARibbonPannel::ribbonBar() const
+{
+    if (SARibbonCategory* c = category()) {
+        return c->ribbonBar();
+    }
+    return nullptr;
 }
 
 void SARibbonPannel::resetLayout(PannelLayoutMode newmode)
 {
     Q_UNUSED(newmode);
-    if (QLayout* ly = layout()) {
-        ly->invalidate();
-        layout()->setSpacing(TwoRowMode == newmode ? 4 : 2);
-        updateGeometry();  // 通知layout进行重新布局
+#if SARibbonPannel_DEBUG_PRINT && SA_DEBUG_PRINT_SIZE_HINT
+    qDebug() << "SARibbonPannel resetLayout,pannelName=" << pannelName();
+#endif
+    if (ribbonBar()) {
+        if (QLayout* ly = layout()) {
+            layout()->setSpacing(TwoRowMode == newmode ? 4 : 2);
+            ly->invalidate();
+        }
     }
 }
 
@@ -717,11 +728,30 @@ void SARibbonPannel::resetLargeToolButtonStyle()
             continue;
         }
         b->updateRect();
-        b->repaint();
     }
 }
 
-void SARibbonPannel::resizeEvent(QResizeEvent* event)
+bool SARibbonPannel::event(QEvent* e)
+{
+#if SA_DEBUG_PRINT_EVENT
+    if (e->type() != QEvent::Paint) {
+        qDebug() << "SARibbonPannel event(" << e->type() << "),name=" << pannelName();
+    }
+#endif
+    // if (SARibbonPannelLayout* lay = pannelLayout()) {
+    //     if (lay->isDirty() && e->type() == QEvent::LayoutRequest) {
+    //         if (QWidget* parw = parentWidget()) {
+    //             if (QLayout* pl = parw->layout()) {
+    //                 pl->invalidate();
+    //             }
+    //         }
+    //         lay->m_dirty = false;
+    //     }
+    // }
+    return QWidget::event(e);
+}
+
+void SARibbonPannel::resizeEvent(QResizeEvent* e)
 {
     //! 1.移动操作按钮到角落
     if (d_ptr->m_optionActionButton) {
@@ -736,7 +766,7 @@ void SARibbonPannel::resizeEvent(QResizeEvent* event)
     }
     //! 2.resize后，重新设置分割线的高度
     //! 由于分割线在布局中，只要分割线足够高就可以，不需要重新设置
-    return (QWidget::resizeEvent(event));
+    return (QWidget::resizeEvent(e));
 }
 
 /**
@@ -771,32 +801,27 @@ void SARibbonPannel::actionEvent(QActionEvent* e)
         int index = layout()->count();
         if (e->before()) {
             // 说明是插入
-            index = lay->indexOf(action);
+            index = lay->indexByAction(e->before());
             if (-1 == index) {
                 index = layout()->count();  // 找不到的时候就插入到最后
             }
         }
         lay->insertAction(index, action, getActionRowProportionProperty(action));
         // 由于pannel的尺寸发生变化，需要让category也调整
-        if (QWidget* parw = parentWidget()) {
-            if (QLayout* pl = parw->layout()) {
-                pl->invalidate();
-            }
-        }
+        // if (QWidget* parw = parentWidget()) {
+        //     if (QLayout* pl = parw->layout()) {
+        //         pl->invalidate();
+        //     }
+        // }
     } break;
 
     case QEvent::ActionChanged: {
         // 让布局重新绘制
         layout()->invalidate();
-        updateGeometry();
+
+        // updateGeometry();
         // 由于pannel的尺寸发生变化，需要让category也调整
         if (QWidget* parw = parentWidget()) {
-#if SARibbonPannel_DEBUG_PRINT
-            if (SARibbonCategory* category = qobject_cast< SARibbonCategory* >(parw)) {
-                qDebug() << "pannel (" << pannelName() << ") action(" << action->text() << ") Changed,at category"
-                         << category->categoryName();
-            }
-#endif
             if (QLayout* pl = parw->layout()) {
                 pl->invalidate();
             }
@@ -805,32 +830,31 @@ void SARibbonPannel::actionEvent(QActionEvent* e)
             //! 重打印信息上看，pannel的尺寸有进行更新，category的尺寸也进行了更新，但更新的次数和调用invalidate的次数不一样，需要手动触发ResizeEvent
             //! 尝试过调用QEvent::LayoutRequest没有效果：
             //! @code
-            //! QEvent* e = new QEvent(QEvent::LayoutRequest);
-            //! QApplication::postEvent(parw, e);
+            //! QEvent* el = new QEvent(QEvent::LayoutRequest);
+            //! QApplication::postEvent(parw, el);
             //! @endcode
             //!
             //! 调用parw->updateGeometry();也没有效果，目前看使用resizeevent是最有效果的
             //!
-            parw->updateGeometry();
-            QResizeEvent* e = new QResizeEvent(parw->size(), QSize());
-            QApplication::postEvent(parw, e);
+            QResizeEvent* ersize = new QResizeEvent(parw->size(), QSize());
+            QApplication::postEvent(parw, ersize);
         }
     } break;
 
     case QEvent::ActionRemoved: {
         SARibbonPannelLayout* lay = pannelLayout();
         action->disconnect(this);
-        int index = lay->indexOf(action);
+        int index = lay->indexByAction(action);
         if (index != -1) {
             QLayoutItem* item = lay->takeAt(index);
             delete item;
         }
         // 由于pannel的尺寸发生变化，需要让category也调整
-        if (QWidget* parw = parentWidget()) {
-            if (QLayout* pl = parw->layout()) {
-                pl->invalidate();
-            }
-        }
+        // if (QWidget* parw = parentWidget()) {
+        //     if (QLayout* pl = parw->layout()) {
+        //         pl->invalidate();
+        //     }
+        // }
     } break;
 
     default:
@@ -856,8 +880,8 @@ void SARibbonPannel::changeEvent(QEvent* e)
         if (QLayout* lay = layout()) {
             lay->invalidate();
         }
-        QWidget::changeEvent(e);
     }
+    QWidget::changeEvent(e);
 }
 
 /**

@@ -7,6 +7,7 @@
 #include "FramelessHelper/Widgets/framelessmainwindow.h"
 FRAMELESSHELPER_BEGIN_NAMESPACE
 class StandardTitleBar;
+class FramelessWidgetsHelper;
 FRAMELESSHELPER_END_NAMESPACE
 #else
 class SAFramelessHelper;
@@ -74,6 +75,8 @@ public:
     SAFramelessHelper* framelessHelper();
     // 把ribbonbar的事件传递到frameless
     virtual bool eventFilter(QObject* obj, QEvent* e) Q_DECL_OVERRIDE;
+#else
+    FRAMELESSHELPER_PREPEND_NAMESPACE(FramelessWidgetsHelper*) framelessHelper();
 #endif
     // 此函数仅用于控制最小最大化和关闭按钮的显示
     void updateWindowFlag(Qt::WindowFlags flags);
@@ -83,7 +86,7 @@ public:
     RibbonTheme ribbonTheme() const;
     // 判断当前是否使用ribbon模式
     bool isUseRibbon() const;
-    //获取左上角按钮组（最大化，最小化，关闭）
+    // 获取左上角按钮组（最大化，最小化，关闭）
     SAWindowButtonGroup* windowButtonGroup() const;
 
 protected:
@@ -95,6 +98,8 @@ protected:
 private:
     // 安装ribbon
     void installRibbonBar(SARibbonBar* bar);
+    // 构建为普通窗口
+    void setupNormalWindow();
 };
 
 /**

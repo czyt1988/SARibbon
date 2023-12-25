@@ -21,16 +21,16 @@ public:
     void updateWindowFlag();
     void updateWindowFlag(Qt::WindowFlags flags);
 
-    //设置按钮的宽度比例,最终按钮宽度将按照此比例进行设置
+    // 设置按钮的宽度比例,最终按钮宽度将按照此比例进行设置
     void setButtonWidthStretch(int close = 4, int max = 3, int min = 3);
 
-    //设置按钮的缩放比例
+    // 设置按钮的缩放比例
     void setIconScale(qreal iconscale = 0.5);
 
-    //设置Qt::WindowStates
+    // 设置Qt::WindowStates
     void setWindowStates(Qt::WindowStates s);
 
-    //仅获取按钮的状态
+    // 仅获取按钮的状态
     Qt::WindowFlags windowButtonFlags() const;
 
     virtual QSize sizeHint() const Q_DECL_OVERRIDE;

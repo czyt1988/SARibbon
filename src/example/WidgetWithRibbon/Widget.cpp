@@ -38,7 +38,10 @@ void Widget::buildRibbon(SARibbonBar* bar)
     page1->setCategoryName("page1");
     SARibbonPannel* pannel1 = new SARibbonPannel("pannel1", page1);
     page1->addPannel(pannel1);
-    pannel1->addLargeAction(createAction("save", ":/icon/icon/save.svg"));
+    QAction* act = createAction("  save  ", ":/icon/icon/save.svg");
+    act->setIconText("  save  ");
+    pannel1->addLargeAction(act);
+
     pannel1->addLargeAction(createAction("open", ":/icon/icon/folder-star.svg"));
     pannel1->addSmallAction(createAction("action1", ":/icon/icon/action.svg"));
     pannel1->addSmallAction(createAction("action2", ":/icon/icon/action2.svg"));

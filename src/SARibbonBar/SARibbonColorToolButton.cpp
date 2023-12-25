@@ -28,10 +28,10 @@ SARibbonColorToolButton::PrivateData::PrivateData(SARibbonColorToolButton* p) : 
 
 QPixmap SARibbonColorToolButton::PrivateData::createIconPixmap(const QStyleOptionToolButton& opt, const QSize& iconsize) const
 {
-    if (opt.icon.isNull()) {  //没有有图标
+    if (opt.icon.isNull()) {  // 没有有图标
         return QPixmap();
     }
-    //有icon，在icon下方加入颜色
+    // 有icon，在icon下方加入颜色
     QIcon::State state = (opt.state & QStyle::State_On) ? QIcon::On : QIcon::Off;
     QIcon::Mode mode;
     if (!(opt.state & QStyle::State_Enabled)) {
@@ -43,14 +43,16 @@ QPixmap SARibbonColorToolButton::PrivateData::createIconPixmap(const QStyleOptio
     }
     QSize realIconSize = iconsize - QSize(0, c_ribbonbutton_color_height + 1);
     QPixmap pixmap     = opt.icon.pixmap(q_ptr->window()->windowHandle(), realIconSize, mode, state);
-    QPixmap res(pixmap.size() + QSize(4, c_ribbonbutton_color_height + 4));  //宽度上，颜色块多出2px
+    QPixmap res(pixmap.size() + QSize(4, c_ribbonbutton_color_height + 4));  // 宽度上，颜色块多出2px
     res.fill(Qt::transparent);
     QPainter painter(&res);
-    int xpixmap   = (res.width() - pixmap.width()) / 2;
-    int ypixmap   = (res.height() - c_ribbonbutton_color_height - 2 - pixmap.height()) / 2;  //这里要减去2而不是1，这样奇数偶数都不会影响
-    QRect rpixmap = QRect(xpixmap, ypixmap, pixmap.width(), pixmap.height());
+    int xpixmap = (res.width() - pixmap.width()) / 2;
+    int ypixmap = (res.height() - c_ribbonbutton_color_height - 2 - pixmap.height()) / 2;  // 这里要减去2而不是1，这样奇数偶数都不会影响
+    int w         = pixmap.width();
+    int h         = pixmap.height();
+    QRect rpixmap = QRect(xpixmap, ypixmap, w, h);
     painter.drawPixmap(rpixmap, pixmap);
-    QRect colorRect = rpixmap.adjusted(0, pixmap.height() + 1, 0, c_ribbonbutton_color_height + 1);
+    QRect colorRect = rpixmap.adjusted(0, h + 1, 0, c_ribbonbutton_color_height + 1);
     if (mColor.isValid()) {
         painter.fillRect(colorRect, mColor);
     } else {
@@ -197,7 +199,7 @@ void SARibbonColorToolButton::onButtonClicked(bool checked)
 void SARibbonColorToolButton::paintIcon(QPainter& p, const QStyleOptionToolButton& opt, const QRect& iconDrawRect)
 {
     if (ColorUnderIcon == colorStyle()) {
-        //有icon
+        // 有icon
         QPixmap pm = d_ptr->createIconPixmap(opt, iconDrawRect.size());
         style()->drawItemPixmap(&p, iconDrawRect, Qt::AlignCenter, pm);
     } else {
