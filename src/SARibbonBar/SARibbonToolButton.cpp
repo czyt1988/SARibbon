@@ -1,5 +1,4 @@
 ﻿#include "SARibbonToolButton.h"
-#include "SARibbonElementManager.h"
 #include <QAction>
 #include <QApplication>
 #include <QCursor>
@@ -12,6 +11,8 @@
 #include <QTextOption>
 #include <QApplication>
 #include <QScreen>
+#include "SARibbonPannel.h"
+
 /**
  * @def 定义文字换行时2行文本的矩形高度系数，此系数决定文字区域的高度
  *
@@ -269,7 +270,7 @@ void SARibbonToolButton::PrivateData::calcSmallButtonDrawRects(const QStyleOptio
     case Qt::ToolButtonIconOnly: {
         if (hasIndicator(opt)) {
             // 在仅有图标的小模式显示时，预留一个下拉箭头位置
-            iconRect = opt.rect.adjusted(spacing, spacing, -indicatorLen - spacing, -spacing);
+            iconRect           = opt.rect.adjusted(spacing, spacing, -indicatorLen - spacing, -spacing);
             indicatorArrowRect = QRect(opt.rect.right() - indicatorLen - spacing, iconRect.y(), indicatorLen, iconRect.height());
         } else {
             iconRect           = opt.rect.adjusted(spacing, spacing, -spacing, -spacing);
@@ -281,7 +282,7 @@ void SARibbonToolButton::PrivateData::calcSmallButtonDrawRects(const QStyleOptio
     case Qt::ToolButtonTextOnly: {
         if (hasIndicator(opt)) {
             // 在仅有图标的小模式显示时，预留一个下拉箭头位置
-            textRect = opt.rect.adjusted(spacing, spacing, -indicatorLen - spacing, -spacing);
+            textRect           = opt.rect.adjusted(spacing, spacing, -indicatorLen - spacing, -spacing);
             indicatorArrowRect = QRect(opt.rect.right() - indicatorLen - spacing, spacing, indicatorLen, textRect.height());
         } else {
             textRect           = opt.rect.adjusted(spacing, spacing, -spacing, -spacing);
@@ -505,7 +506,7 @@ QSize SARibbonToolButton::PrivateData::calcLargeButtonSizeHint(const QStyleOptio
              << "\n| | | |-mDrawIconRect=" << mDrawIconRect                          //
              << "\n| | | |-minW=" << minW                                            //
              << "\n| | | |-w=" << w                                                  //
-            ;
+        ;
 #endif
     //! Qt6.4 取消了QApplication::globalStrut
     return QSize(w, h).expandedTo(QSize(minW, textHeight));
