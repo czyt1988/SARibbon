@@ -170,9 +170,16 @@ void SARibbonCategory::PrivateData::updateItemGeometry()
 #if SA_DEBUG_PRINT_SIZE_HINT
     qDebug() << "SARibbonCategory::PrivateData::updateItemGeometry,categoryName=" << q_ptr->categoryName();
 #endif
-    if (SARibbonCategoryLayout* lay = qobject_cast< SARibbonCategoryLayout* >(q_ptr->layout())) {
-        lay->invalidate();
+    SARibbonCategoryLayout* lay = qobject_cast< SARibbonCategoryLayout* >(q_ptr->layout());
+    if (!lay) {
+        return;
     }
+    const QList< SARibbonPannel* > pannels = lay->pannelList();
+    for (auto pannel : pannels) {
+        pannel->updateItemGeometry();
+    }
+    lay->invalidate();
+
     return;
 }
 

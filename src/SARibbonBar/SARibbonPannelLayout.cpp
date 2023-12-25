@@ -228,9 +228,12 @@ void SARibbonPannelLayout::move(int from, int to)
  */
 bool SARibbonPannelLayout::isDirty() const
 {
-    SARibbonPannelLayout* that = const_cast< SARibbonPannelLayout* >(this);
-    that->updateGeomArray(QRect());
     return (m_dirty);
+}
+
+void SARibbonPannelLayout::updateGeomArray()
+{
+    updateGeomArray(geometry());
 }
 
 /**
@@ -428,10 +431,10 @@ void SARibbonPannelLayout::updateGeomArray(const QRect& setrect)
         if (SARibbonToolButton* tb = qobject_cast< SARibbonToolButton* >(item->widget())) {
             auto ss__ = tb->sizeHint();
             debug_print__log__ += QString("| | |-[%1]SARibbonToolButton.sizeHint=(%2,%3),ButtonText=%4\n")
-                                          .arg(i)
-                                          .arg(ss__.width())
-                                          .arg(ss__.height())
-                                          .arg(tb->text());
+                                      .arg(i)
+                                      .arg(ss__.width())
+                                      .arg(ss__.height())
+                                      .arg(tb->text());
         }
 #endif
         Qt::Orientations exp = item->expandingDirections();
@@ -633,7 +636,7 @@ void SARibbonPannelLayout::updateGeomArray(const QRect& setrect)
              << "\n| | |-mag=" << mag                      //
              << "\n| | |-largeHeight=" << largeHeight      //
              << "\n| | |-smallHeight=" << smallHeight      //
-            ;
+        ;
     qDebug().noquote() << debug_print__log__;
 #endif
 }
@@ -724,7 +727,7 @@ void SARibbonPannelLayout::recalcExpandGeomArray(const QRect& setrect)
     qDebug() << "| |-SARibbonPannelLayout recalcExpandGeomArray(" << setrect
              << ") pannelName=" << ribbonPannel()->pannelName()  //
              << ",expandwidth=" << expandwidth                   //
-            ;
+        ;
 #endif
 }
 

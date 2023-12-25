@@ -676,8 +676,11 @@ void SARibbonPannel::updateItemGeometry()
 #if SA_DEBUG_PRINT_SIZE_HINT
     qDebug() << "SARibbonPannel updateItemGeometry,pannelName=" << pannelName();
 #endif
-    if (QLayout* lay = layout()) {
+    //此函数需要添加，否则SARibbonBar::setEnableWordWrap无法刷新按钮
+    resetLargeToolButtonStyle();
+    if (SARibbonPannelLayout* lay = pannelLayout()) {
         lay->invalidate();
+        lay->updateGeomArray();
     }
 }
 
@@ -758,7 +761,7 @@ void SARibbonPannel::resizeEvent(QResizeEvent* e)
         if (ThreeRowMode == pannelLayoutMode()) {
             d_ptr->m_optionActionButton->move(width() - d_ptr->m_optionActionButton->width() - 2,
                                               height() - titleHeight()
-                                                      + (titleHeight() - d_ptr->m_optionActionButton->height()) / 2);
+                                                  + (titleHeight() - d_ptr->m_optionActionButton->height()) / 2);
         } else {
             d_ptr->m_optionActionButton->move(width() - d_ptr->m_optionActionButton->width(),
                                               height() - d_ptr->m_optionActionButton->height());
