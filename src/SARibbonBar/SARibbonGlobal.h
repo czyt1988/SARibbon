@@ -9,6 +9,10 @@
   @note My native language is not English, and most of the translation of documents is machine translation
 
   版本记录(change log):
+  - 2023-12-25 -> 1.0.8
+  修正了尺寸刷新的问题，在首次显示不会出现控件跳动的状态
+  调整了创建RibbonButton的方式
+  调整了SARibbonPannel一些接口，使得创建更加规范
 
   - 2023-11-19 -> 1.0.6
   添加Office2016主题
@@ -110,7 +114,7 @@
  * @def ribbon的数字版本 MAJ.MIN.{PAT}
  */
 #ifndef SA_RIBBON_BAR_VERSION_PAT
-#define SA_RIBBON_BAR_VERSION_PAT 7
+#define SA_RIBBON_BAR_VERSION_PAT 8
 #endif
 
 #ifndef SA_RIBBON_BAR_NO_EXPORT
@@ -141,7 +145,7 @@
 #define SA_RIBBON_DECLARE_PUBLIC(classname)                                                                            \
     friend class classname;                                                                                            \
     classname* q_ptr { nullptr };                                                                                      \
-    PrivateData(const PrivateData&) = delete;                                                                          \
+    PrivateData(const PrivateData&)            = delete;                                                               \
     PrivateData& operator=(const PrivateData&) = delete;
 #endif
 
@@ -185,7 +189,7 @@ enum class SARibbonAlignment
 
     仅用于调试
  */
-#define SA_DEBUG_PRINT_SIZE_HINT 1
+#define SA_DEBUG_PRINT_SIZE_HINT 0
 #endif
 #ifndef SA_DEBUG_PRINT_EVENT
 /**

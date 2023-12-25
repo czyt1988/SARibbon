@@ -48,10 +48,4 @@ public:
 #ifndef SA_ActionPropertyName_SeparatorBottom
 #define SA_ActionPropertyName_SeparatorBottom "_sa_SeparatorBottom"
 #endif
-#ifndef SA_ActionPropertyName_IsActionMenu
-#define SA_ActionPropertyName_IsActionMenu "_sa_IsActionMenu"
-#endif
-#ifndef SA_ActionPropertyName_MenuPointer
-#define SA_ActionPropertyName_MenuPointer "_sa_MenuPointer"
-#endif
 #endif  // SARIBBONPANNELITEM_H

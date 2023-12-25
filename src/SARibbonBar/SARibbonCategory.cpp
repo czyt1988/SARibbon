@@ -32,7 +32,6 @@ public:
 
     // 移除Pannel，Category会直接回收SARibbonPannel内存
     bool removePannel(SARibbonPannel* pannel);
-    void setBackgroundBrush(const QBrush& brush);
     SARibbonCategory* ribbonCategory();
     const SARibbonCategory* ribbonCategory() const;
     void setRibbonPannelLayoutMode(SARibbonPannel::PannelLayoutMode m);
@@ -95,7 +94,7 @@ void SARibbonCategory::PrivateData::insertPannel(int index, SARibbonPannel* pann
     pannel->setPannelLayoutMode(ribbonPannelLayoutMode());
     index = qMax(0, index);
     index = qMin(lay->pannelCount(), index);
-    lay->addPannel(pannel);
+    lay->insertPannel(index, pannel);
     pannel->setVisible(true);
 }
 
@@ -116,14 +115,6 @@ bool SARibbonCategory::PrivateData::removePannel(SARibbonPannel* pannel)
         return (true);
     }
     return (false);
-}
-
-void SARibbonCategory::PrivateData::setBackgroundBrush(const QBrush& brush)
-{
-    QPalette p = ribbonCategory()->palette();
-
-    p.setBrush(QPalette::Window, brush);
-    ribbonCategory()->setPalette(p);
 }
 
 QList< SARibbonPannel* > SARibbonCategory::PrivateData::pannelList()
@@ -453,15 +444,6 @@ bool SARibbonCategory::removePannel(int index)
     return (removePannel(p));
 }
 
-///
-/// \brief SARibbonCategory::setBackgroundBrush
-/// \param brush
-///
-void SARibbonCategory::setBackgroundBrush(const QBrush& brush)
-{
-    d_ptr->setBackgroundBrush(brush);
-}
-
 /**
  * @brief 返回Category下的所有pannel
  * @return
@@ -524,9 +506,15 @@ void SARibbonCategory::setCanCustomize(bool b)
  */
 SARibbonBar* SARibbonCategory::ribbonBar() const
 {
+    // 第一个par是stackwidget
     if (QWidget* par = parentWidget()) {
-        if (SARibbonBar* ribbon = qobject_cast< SARibbonBar* >(par->parentWidget())) {
-            return ribbon;
+        // 理论此时是ribbonbar
+        par = par->parentWidget();
+        while (par) {
+            if (SARibbonBar* ribbon = qobject_cast< SARibbonBar* >(par)) {
+                return ribbon;
+            }
+            par = par->parentWidget();
         }
     }
     return nullptr;
