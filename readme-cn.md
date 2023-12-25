@@ -171,6 +171,27 @@ SARibbon提供了合并好的`SARibbon.h`文件和`SARibbon.cpp`文件，只需�
 ..\..\..\SARibbon\src\SARibbonBar\3rdparty\framelesshelper\src\core\framelessmanager.cpp(563): fatal error C1083: 无法打开包括文件: “framelessmanager.moc”: No such file or directory
 ```
 
+### visual studio引入lib
+
+有些工程直接使用vs引入lib，而不是通过cmake和qmake来管理，这里介绍一下如何通过visual studio的界面引用库
+
+在引入lib后，还需要做如下事情：
+
+1. 首先要在vs中添加include目录
+
+```
+{yourPath}\include\SARibbon
+{yourPath}\include\SARibbon\3rdparty\framelesshelper\include
+{yourPath}\include\SARibbon\3rdparty\framelesshelper\qmake\inc\core
+```
+
+2. 前处理添加预定义宏
+
+```
+SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1
+FRAMELESSHELPER_FEATURE_static_build=-1
+```
+
 # 使用方法
 
 ## 引入库
@@ -682,6 +703,7 @@ int main(int argc, char* argv[])
 {
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
     QApplication a(argc, argv);
     ......
@@ -697,6 +719,7 @@ int main(int argc, char* argv[])
 {
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
     QApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);

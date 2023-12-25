@@ -50,7 +50,6 @@ SOURCES += \
     $$PWD/SARibbonCustomizeWidget.cpp \
     $$PWD/SARibbonElementFactory.cpp \
     $$PWD/SARibbonMainWindow.cpp \
-    $$PWD/SARibbonStyleOption.cpp \
     $$PWD/SAWindowButtonGroup.cpp \
     $$PWD/SARibbonApplicationButton.cpp \
     $$PWD/SARibbonTabBar.cpp \
@@ -68,7 +67,6 @@ SOURCES += \
     $$PWD/SARibbonGalleryItem.cpp \
     $$PWD/SARibbonComboBox.cpp \
     $$PWD/SARibbonElementManager.cpp \
-    $$PWD/SARibbonDrawHelper.cpp \
     $$PWD/SARibbonLineEdit.cpp \
     $$PWD/SARibbonCheckBox.cpp \
     $$PWD/SARibbonButtonGroupWidget.cpp \
@@ -89,7 +87,6 @@ HEADERS  += \
     $$PWD/SARibbonCustomizeWidget.h \
     $$PWD/SARibbonElementFactory.h \
     $$PWD/SARibbonMainWindow.h \
-    $$PWD/SARibbonStyleOption.h \
     $$PWD/SAWindowButtonGroup.h \
     $$PWD/SARibbonApplicationButton.h \
     $$PWD/SARibbonTabBar.h \
@@ -108,7 +105,6 @@ HEADERS  += \
     $$PWD/SARibbonGalleryItem.h \
     $$PWD/SARibbonComboBox.h \
     $$PWD/SARibbonElementManager.h \
-    $$PWD/SARibbonDrawHelper.h \
     $$PWD/SARibbonLineEdit.h \
     $$PWD/SARibbonCheckBox.h \
     $$PWD/SARibbonButtonGroupWidget.h \

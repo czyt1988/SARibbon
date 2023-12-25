@@ -7,7 +7,6 @@
 #include <QScopedPointer>
 #include "SARibbonBar.h"
 #include "SARibbonPannel.h"
-#include "SARibbonStyleOption.h"
 class QWidget;
 class SARibbonBar;
 class SARibbonTabBar;
@@ -50,16 +49,8 @@ public:
     virtual SARibbonStackedWidget* createRibbonStackedWidget(SARibbonBar* parent);
     virtual SARibbonButtonGroupWidget* craeteButtonGroupWidget(QWidget* parent);
     virtual SARibbonQuickAccessBar* createQuickAccessBar(QWidget* parent);
-
-    // SARibbonStyleOption可以进行继承，此函数无需设置为虚函数
-    SARibbonStyleOption& getRibbonStyleOption();
-    void setRibbonStyleOption(SARibbonStyleOption* opt);
-
-    //创建SARibbonPannelOptionButton
+    // 创建SARibbonPannelOptionButton
     virtual SARibbonPannelOptionButton* createRibbonPannelOptionButton(SARibbonPannel* pannel);
-
-private:
-    QScopedPointer< SARibbonStyleOption > mStyleOption;
 };
 
 #endif  // SARIBBONELEMENTCREATEDELEGATE_H

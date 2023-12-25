@@ -32,91 +32,86 @@ public:
     // category的名字
     QString categoryName() const;
 
-    //设置category名字，等同setWindowTitle
+    // 设置category名字，等同setWindowTitle
     void setCategoryName(const QString& title);
 
-    //布局模式
+    // 布局模式
     SARibbonPannel::PannelLayoutMode ribbonPannelLayoutMode() const;
 
-    //添加pannel
+    // 添加pannel
     SARibbonPannel* addPannel(const QString& title);
 
-    //添加pannel
+    // 添加pannel
     void addPannel(SARibbonPannel* pannel);
 
     // qt designer专用
     Q_INVOKABLE void addPannel(QWidget* pannel);
 
-    //插入pannel
+    // 插入pannel
     SARibbonPannel* insertPannel(const QString& title, int index);
 
-    //通过名字查找pannel
+    // 通过名字查找pannel
     SARibbonPannel* pannelByName(const QString& title) const;
 
-    //通过ObjectName查找pannel
+    // 通过ObjectName查找pannel
     SARibbonPannel* pannelByObjectName(const QString& objname) const;
 
-    //通过索引找到pannel，如果超过索引范围，会返回nullptr
+    // 通过索引找到pannel，如果超过索引范围，会返回nullptr
     SARibbonPannel* pannelByIndex(int index) const;
 
-    //查找pannel的index
+    // 查找pannel的index
     int pannelIndex(SARibbonPannel* p) const;
 
-    //移动一个Pannel从from index到to index
+    // 移动一个Pannel从from index到to index
     void movePannel(int from, int to);
 
-    //把pannel从Category中移除，不会销毁，此时pannel的所有权归还操作者
+    // 把pannel从Category中移除，不会销毁，此时pannel的所有权归还操作者
     bool takePannel(SARibbonPannel* pannel);
 
-    //移除Pannel，Category会直接回收SARibbonPannel内存
+    // 移除Pannel，Category会直接回收SARibbonPannel内存
     bool removePannel(SARibbonPannel* pannel);
     bool removePannel(int index);
 
-    //设置背景
-    void setBackgroundBrush(const QBrush& brush);
-
-    //返回所有的Pannel
+    // 返回所有的Pannel
     QList< SARibbonPannel* > pannelList() const;
 
     //
     QSize sizeHint() const Q_DECL_OVERRIDE;
 
-    //如果是ContextCategory，此函数返回true
+    // 如果是ContextCategory，此函数返回true
     bool isContextCategory() const;
 
     // pannel的个数
     int pannelCount() const;
 
-    //判断是否可以自定义
+    // 判断是否可以自定义
     bool isCanCustomize() const;
     void setCanCustomize(bool b);
 
-    //获取对应的ribbonbar，如果没有加入ribbonbar的管理，此值为null
+    // 获取对应的ribbonbar，如果没有加入ribbonbar的管理，此值为null
     SARibbonBar* ribbonBar() const;
 
-    //刷新category的尺寸布局
+    // 刷新category的尺寸布局
     void updateItemGeometry();
 
 protected:
-    //设置pannel的模式
+    // 设置pannel的模式
     void setRibbonPannelLayoutMode(SARibbonPannel::PannelLayoutMode m);
-    bool eventFilter(QObject* watched, QEvent* event) Q_DECL_OVERRIDE;
-
-    //处理滚轮事件
+    virtual bool event(QEvent* e) Q_DECL_OVERRIDE;
+    // 处理滚轮事件
     void wheelEvent(QWheelEvent* event) Q_DECL_OVERRIDE;
+    //
+    void changeEvent(QEvent* event) Q_DECL_OVERRIDE;
 
-    //标记这个是上下文标签
+    // 标记这个是上下文标签
     void markIsContextCategory(bool isContextCategory = true);
 
-    //获取SARibbonCategoryLayoutlayout
+    // 获取SARibbonCategoryLayoutlayout
     SARibbonCategoryLayout* categoryLayout() const;
 
-    //设置Category的对齐方式
+    // 设置Category的对齐方式
     void setCategoryAlignment(SARibbonAlignment al);
     SARibbonAlignment getCategoryAlignment() const;
-
-private:
-    void setRibbonBar(SARibbonBar* bar);
 };
 
 /**
