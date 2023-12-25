@@ -269,7 +269,7 @@ void SARibbonToolButton::PrivateData::calcSmallButtonDrawRects(const QStyleOptio
     case Qt::ToolButtonIconOnly: {
         if (hasIndicator(opt)) {
             // 在仅有图标的小模式显示时，预留一个下拉箭头位置
-            iconRect           = opt.rect.adjusted(spacing, spacing, -indicatorLen - spacing, -spacing);
+            iconRect = opt.rect.adjusted(spacing, spacing, -indicatorLen - spacing, -spacing);
             indicatorArrowRect = QRect(opt.rect.right() - indicatorLen - spacing, iconRect.y(), indicatorLen, iconRect.height());
         } else {
             iconRect           = opt.rect.adjusted(spacing, spacing, -spacing, -spacing);
@@ -281,7 +281,7 @@ void SARibbonToolButton::PrivateData::calcSmallButtonDrawRects(const QStyleOptio
     case Qt::ToolButtonTextOnly: {
         if (hasIndicator(opt)) {
             // 在仅有图标的小模式显示时，预留一个下拉箭头位置
-            textRect           = opt.rect.adjusted(spacing, spacing, -indicatorLen - spacing, -spacing);
+            textRect = opt.rect.adjusted(spacing, spacing, -indicatorLen - spacing, -spacing);
             indicatorArrowRect = QRect(opt.rect.right() - indicatorLen - spacing, spacing, indicatorLen, textRect.height());
         } else {
             textRect           = opt.rect.adjusted(spacing, spacing, -spacing, -spacing);
@@ -490,9 +490,6 @@ QSize SARibbonToolButton::PrivateData::calcLargeButtonSizeHint(const QStyleOptio
         h = pannel->largeHeight();
     }
     int textHeight = calcTextDrawRectHeight(opt);
-    if (mDrawIconRect.isValid()) {
-        minW = qMax(mDrawIconRect.width(), h - textHeight);
-    }
     // 估算字体的宽度作为宽度
     w = estimateLargeButtonTextWidth(h, textHeight, opt.text, opt.fontMetrics);
     w += (2 * mSpacing);
@@ -501,9 +498,15 @@ QSize SARibbonToolButton::PrivateData::calcLargeButtonSizeHint(const QStyleOptio
         w += mIndicatorLen;
     }
 
-    // if (w < minW) {
-    //     w = minW;
-    // }
+#if SA_RIBBON_TOOLBUTTON_DEBUG_PRINT && SA_DEBUG_PRINT_SIZE_HINT
+    qDebug() << "| | |-SARibbonToolButton::PrivateData::calcLargeButtonSizeHint,text=" << opt.text
+             << "\n| | | |-lineSpacing*4.5=" << opt.fontMetrics.lineSpacing() * 4.5  //
+             << "\n| | | |-textHeight=" << textHeight                                //
+             << "\n| | | |-mDrawIconRect=" << mDrawIconRect                          //
+             << "\n| | | |-minW=" << minW                                            //
+             << "\n| | | |-w=" << w                                                  //
+            ;
+#endif
     //! Qt6.4 取消了QApplication::globalStrut
     return QSize(w, h).expandedTo(QSize(minW, textHeight));
 }
@@ -759,9 +762,6 @@ bool SARibbonToolButton::hitButton(const QPoint& pos) const
  */
 void SARibbonToolButton::resizeEvent(QResizeEvent* e)
 {
-#if SA_RIBBON_TOOLBUTTON_DEBUG_PRINT
-    qDebug() << "SARibbonToolButton::resizeEvent, text=" << text() << " obj=" << objectName() << " size=" << e->size();
-#endif
     // 在resizeevent计算绘图所需的尺寸，避免在绘图过程中实时绘制提高效率
     QToolButton::resizeEvent(e);
     updateRect();
@@ -779,6 +779,9 @@ QSize SARibbonToolButton::sizeHint() const
     //        initStyleOption(&opt);
     //        d_ptr->updateSizeHint(opt);
     //    }
+#if SA_RIBBON_TOOLBUTTON_DEBUG_PRINT && SA_DEBUG_PRINT_SIZE_HINT
+    qDebug() << "| | |-SARibbonToolButton::sizeHint";
+#endif
     QStyleOptionToolButton opt;
     initStyleOption(&opt);
     d_ptr->updateSizeHint(opt);
