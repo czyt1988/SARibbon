@@ -42,6 +42,7 @@
 #include <QXmlStreamWriter>
 #include <QMessageBox>
 #include <QShortcut>
+#include <QLineEdit>
 #define PRINT_COST_START()                                                                                             \
     QElapsedTimer __TMP_COST;                                                                                          \
     __TMP_COST.start();                                                                                                \
@@ -1245,6 +1246,15 @@ void MainWindow::createQuickAccessBar(SARibbonQuickAccessBar* quickAccessBar)
     QAction* actionCustomizeAndSave = createAction("customize and save", ":/icon/icon/customize.svg");
     quickAccessBar->addAction(actionCustomizeAndSave);
     connect(actionCustomizeAndSave, &QAction::triggered, this, &MainWindow::onActionCustomizeAndSaveTriggered);
+
+    //
+    mSearchEditor = new QLineEdit(this);
+    mSearchEditor->setFixedWidth(100);
+    mSearchEditor->setPlaceholderText("Search");
+    quickAccessBar->addWidget(mSearchEditor);
+    connect(mSearchEditor, &QLineEdit::editingFinished, this, [ this ]() {
+        this->mTextedit->append(this->mSearchEditor->text());
+    });
 }
 
 /**
