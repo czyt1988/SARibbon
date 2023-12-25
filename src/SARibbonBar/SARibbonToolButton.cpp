@@ -846,14 +846,17 @@ void SARibbonToolButton::paintButton(QPainter& p, const QStyleOptionToolButton& 
                         }
                     } else {
                         // 鼠标在图标区，把文字显示为正常
-                        tool.state |= (QStyle::State_Raised);  // 把图标区域显示为正常
-                        tool.state &= ~QStyle::State_MouseOver;
-                        // 文字和Indicator都显示正常
-                        tool.rect = d_ptr->mDrawTextRect.united(d_ptr->mDrawIndicatorArrowRect);
-                        if (autoRaise) {
-                            style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
-                        } else {
-                            style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tool, &p, this);
+                        if (!tool.state.testFlag(QStyle::State_Sunken)) {
+                            // State_Sunken说明此按钮正在按下，这时候，文本区域不需要绘制，只有在非按下状态才需要绘制
+                            tool.state |= (QStyle::State_Raised);  // 把图标区域显示为正常
+                            tool.state &= ~QStyle::State_MouseOver;
+                            // 文字和Indicator都显示正常
+                            tool.rect = d_ptr->mDrawTextRect.united(d_ptr->mDrawIndicatorArrowRect);
+                            if (autoRaise) {
+                                style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
+                            } else {
+                                style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tool, &p, this);
+                            }
                         }
                     }
                 } else {                              // 小按钮模式
