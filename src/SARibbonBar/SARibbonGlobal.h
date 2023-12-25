@@ -9,10 +9,15 @@
   @note My native language is not English, and most of the translation of documents is machine translation
 
   版本记录(change log):
-  - 2023-12-25 -> 1.0.8
+
+  - 2023-12-25 -> 1.1.0
   修正了尺寸刷新的问题，在首次显示不会出现控件跳动的状态
+  修正了一些问题
   调整了创建RibbonButton的方式
   调整了SARibbonPannel一些接口，使得创建更加规范
+  调整了ToolButton的渲染方式
+
+  ------------------------
 
   - 2023-11-19 -> 1.0.6
   添加Office2016主题
@@ -108,13 +113,13 @@
  * @def ribbon的数字版本 MAJ.{MIN}.PAT
  */
 #ifndef SA_RIBBON_BAR_VERSION_MIN
-#define SA_RIBBON_BAR_VERSION_MIN 0
+#define SA_RIBBON_BAR_VERSION_MIN 1
 #endif
 /**
  * @def ribbon的数字版本 MAJ.MIN.{PAT}
  */
 #ifndef SA_RIBBON_BAR_VERSION_PAT
-#define SA_RIBBON_BAR_VERSION_PAT 8
+#define SA_RIBBON_BAR_VERSION_PAT 0
 #endif
 
 #ifndef SA_RIBBON_BAR_NO_EXPORT
