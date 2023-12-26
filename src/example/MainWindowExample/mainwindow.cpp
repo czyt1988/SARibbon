@@ -89,7 +89,7 @@ MainWindow::MainWindow(QWidget* par)
     //! 添加主标签页,这里演示通过SARibbonBar::addCategoryPage函数添加一个标签页
     //! en:
     //! Add the main tab. Here we show how to add a tab through the SARibbonBar::addCategoryPage function
-    SARibbonCategory* categoryMain = ribbon->addCategoryPage(tr("Main"));
+    SARibbonCategory* categoryMain = ribbon->addCategoryPage(tr("&Main"));
 
     //! cn: SARibbonBar的Category和Pannel，以及对应的Action都应该设置ObjectName，因为如果要自定义action，这些ObjectName是必不可少的
     //! en: The category , pannel and actions of SARibbonBar, should be set with Object Names, as these Object Names are essential for customizing actions
@@ -176,7 +176,7 @@ void MainWindow::createRibbonApplicationButton()
         btn = new SARibbonApplicationButton(this);
         ribbon->setApplicationButton(btn);
     }
-    ribbon->applicationButton()->setText(("   File   "));  // 文字两边留有间距，好看一点
+    ribbon->applicationButton()->setText(("  &File  "));  // 文字两边留有间距，好看一点
     // cn: SARibbonMenu和QMenu的操作是一样的
     // en: The operations of SARibbonMenu and QMenu are the same
     if (!mMenuApplicationBtn) {
@@ -214,14 +214,14 @@ void MainWindow::onStyleClicked(int id)
     switch (ribbonStyle) {
     case SARibbonBar::RibbonStyleLooseThreeRow:
         mTextedit->append(
-            tr("\nchange ribbon style to office style,The standard office style text display is line wrapped, "
-               "and you can also control whether it wrap through SARibbonToolButton::setEnableWordWrap"));  // cn:标准的office样式的文字显示是换行的，你也可以通过SARibbonToolButton::setEnableWordWrap来控制它是否换行
+                tr("\nchange ribbon style to office style,The standard office style text display is line wrapped, "
+                   "and you can also control whether it wrap through SARibbonToolButton::setEnableWordWrap"));  // cn:标准的office样式的文字显示是换行的，你也可以通过SARibbonToolButton::setEnableWordWrap来控制它是否换行
         mTextedit->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::OfficeStyle);"));
         break;
     case SARibbonBar::RibbonStyleLooseTwoRow:
         mTextedit->append(
-            tr("\nchange ribbon style to office style 2 row,All text in 2-line mode does not wrap, and you "
-               "can also control whether it wraps through SARibbonToolButton: setEnableWordWrap"));  // cn:所有2行模式的文字都是不换行的，你也可以通过SARibbonToolButton::setEnableWordWrap来控制它是否换行
+                tr("\nchange ribbon style to office style 2 row,All text in 2-line mode does not wrap, and you "
+                   "can also control whether it wraps through SARibbonToolButton: setEnableWordWrap"));  // cn:所有2行模式的文字都是不换行的，你也可以通过SARibbonToolButton::setEnableWordWrap来控制它是否换行
         mTextedit->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::OfficeStyleTwoRow);"));
         break;
     case SARibbonBar::RibbonStyleCompactThreeRow:
@@ -295,7 +295,7 @@ void MainWindow::onActionHelpTriggered()
                                 "\n Author:czy"
                                 "\n Email:czy.t@163.com"
                                 "\n ===============")
-                                 .arg(SARibbonBar::versionString()));
+                                     .arg(SARibbonBar::versionString()));
 }
 
 void MainWindow::onActionRemoveAppBtnTriggered(bool b)
@@ -304,7 +304,7 @@ void MainWindow::onActionRemoveAppBtnTriggered(bool b)
         ribbonBar()->setApplicationButton(nullptr);
     } else {
         SARibbonApplicationButton* actionRemoveAppBtn = new SARibbonApplicationButton();
-        actionRemoveAppBtn->setText(tr("   File   "));
+        actionRemoveAppBtn->setText(tr("  &File  "));
         this->ribbonBar()->setApplicationButton(actionRemoveAppBtn);
         createRibbonApplicationButton();
     }
@@ -427,7 +427,7 @@ void MainWindow::onColorButtonColorClicked(const QColor& c, bool on)
 void MainWindow::onRibbonThemeComboBoxCurrentIndexChanged(int index)
 {
     SARibbonMainWindow::RibbonTheme t = static_cast< SARibbonMainWindow::RibbonTheme >(
-        mComboboxRibbonTheme->itemData(index).toInt());
+            mComboboxRibbonTheme->itemData(index).toInt());
     setRibbonTheme(t);
 }
 
@@ -511,11 +511,11 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     SARibbonPannel* pannelStyle = page->addPannel(("ribbon style"));
 
     QAction* actSave = createAction(tr("Save"), ":/icon/icon/save.svg");
-    //这样设置快捷键
+    // 这样设置快捷键
     QShortcut* shortCut = new QShortcut(QKeySequence(QLatin1String("Ctrl+S")), this);
     connect(shortCut, &QShortcut::activated, this, [ actSave ]() { actSave->trigger(); });
-    //这样设置是无效的
-    // actSave->setShortcut(QKeySequence(QLatin1String("Ctrl+S")));
+    // 这样设置是无效的
+    //  actSave->setShortcut(QKeySequence(QLatin1String("Ctrl+S")));
 
     connect(actSave, &QAction::triggered, this, [ this ](bool b) {
         Q_UNUSED(b);
@@ -1096,7 +1096,7 @@ void MainWindow::createContextCategoryPage1(SARibbonCategory* page)
     pannel->addLargeAction(mActionShowTest);
 
     mPannelVisbileExample = page->addPannel(tr("show/hide"));
-    //重复添加
+    // 重复添加
     mPannelVisbileExample->addLargeAction(mActionSetTextTest);
 
     connect(mActionShowTest, &QAction::toggled, this, [ this ](bool b) {

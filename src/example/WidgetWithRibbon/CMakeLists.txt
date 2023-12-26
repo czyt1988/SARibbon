@@ -57,6 +57,7 @@ add_executable(${SARIBBON_EXPAMPLE_NAME}
     Widget.cpp
     main.cpp
     icon.qrc
+    Widget.ui
 )
 
 target_include_directories(${SARIBBON_EXPAMPLE_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../../SARibbonBar")
