@@ -140,6 +140,15 @@ Qt::WindowFlags SARibbonMainWindow::windowButtonFlags() const
     return (windowFlags());
 }
 
+/**
+ * @brief SARibbonMainWindow::setRibbonTheme
+ *
+ * 注意主题在构造函数设置主题会不完全生效，使用QTimer投放到队列最后执行即可
+ * @code
+ * QTimer::singleShot(0, this, [ this ]() { this->setRibbonTheme(SARibbonMainWindow::RibbonThemeDark); });
+ * @endcode
+ * @param theme
+ */
 void SARibbonMainWindow::setRibbonTheme(SARibbonMainWindow::RibbonTheme theme)
 {
     sa_set_ribbon_theme(this, theme);

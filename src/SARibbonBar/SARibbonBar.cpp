@@ -410,7 +410,7 @@ QList< QColor > SARibbonBar::getDefaultContextCategoryColorList()
         << QColor(14, 81, 167)   // 蓝
         << QColor(228, 0, 69)    // 红
         << QColor(67, 148, 0)    // 绿
-        ;
+            ;
     return res;
 }
 
@@ -967,11 +967,11 @@ void SARibbonBar::showMinimumModeButton(bool isShow)
 
         d_ptr->mMinimumCategoryButtonAction = new QAction(this);
         d_ptr->mMinimumCategoryButtonAction->setIcon(
-            style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton, nullptr));
+                style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton, nullptr));
         connect(d_ptr->mMinimumCategoryButtonAction, &QAction::triggered, this, [ this ]() {
             this->setMinimumMode(!isMinimumMode());
             this->d_ptr->mMinimumCategoryButtonAction->setIcon(
-                style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton, nullptr));
+                    style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton, nullptr));
         });
         d_ptr->mRightButtonGroup->addAction(d_ptr->mMinimumCategoryButtonAction);
 
@@ -1821,7 +1821,7 @@ void SARibbonBar::paintInNormalStyle()
             titleRegion.setRect(d_ptr->mQuickAccessBar->geometry().right() + 1,
                                 border.top(),
                                 width() - d_ptr->mIconRightBorderPosition - border.right()
-                                    - d_ptr->mWindowButtonSize.width() - d_ptr->mQuickAccessBar->geometry().right() - 1,
+                                        - d_ptr->mWindowButtonSize.width() - d_ptr->mQuickAccessBar->geometry().right() - 1,
                                 titleBarHeight());
         } else {
             int leftwidth = contextCategoryRegion.x() - d_ptr->mQuickAccessBar->geometry().right() - d_ptr->mIconRightBorderPosition;
@@ -2054,7 +2054,7 @@ void SARibbonBar::resizeInOfficeStyle()
 
     x += d_ptr->mIconRightBorderPosition + 5;
     if (QWidget* connerL = cornerWidget(Qt::TopLeftCorner)) {
-        if (connerL->isVisible()) {
+        if (connerL->isVisibleTo(this)) {
             QSize connerSize = connerL->sizeHint();
             if (connerSize.height() < validTitleBarHeight) {
                 int detal = (validTitleBarHeight - connerSize.height()) / 2;
@@ -2067,7 +2067,7 @@ void SARibbonBar::resizeInOfficeStyle()
     }
     // quick access bar定位
     if (d_ptr->mQuickAccessBar) {
-        if (d_ptr->mQuickAccessBar->isVisible()) {
+        if (d_ptr->mQuickAccessBar->isVisibleTo(this)) {
             if (d_ptr->mQuickAccessBar->height() != validTitleBarHeight) {
                 d_ptr->mQuickAccessBar->setFixedHeight(validTitleBarHeight);
             }
@@ -2081,8 +2081,8 @@ void SARibbonBar::resizeInOfficeStyle()
     y += validTitleBarHeight;
     // applicationButton 定位
     if (d_ptr->mApplicationButton) {
-        if (d_ptr->mApplicationButton->isVisible()) {
-            d_ptr->mApplicationButton->setGeometry(x, y, d_ptr->mApplicationButton->size().width(), tabH);
+        if (d_ptr->mApplicationButton->isVisibleTo(this)) {
+            d_ptr->mApplicationButton->setGeometry(x, y, d_ptr->mApplicationButton->sizeHint().width(), tabH);
             x = d_ptr->mApplicationButton->geometry().right();
         }
     }
@@ -2093,7 +2093,7 @@ void SARibbonBar::resizeInOfficeStyle()
     int endX = width() - border.right();
 
     if (QWidget* connerW = cornerWidget(Qt::TopRightCorner)) {
-        if (connerW->isVisible()) {
+        if (connerW->isVisibleTo(this)) {
             QSize connerSize = connerW->sizeHint();
             endX -= connerSize.width();
             if (connerSize.height() < tabH) {
@@ -2149,7 +2149,7 @@ void SARibbonBar::resizeInWpsLiteStyle()
     int endX = width() - border.right() - d_ptr->mWindowButtonSize.width();
 
     if (QWidget* connerW = cornerWidget(Qt::TopRightCorner)) {
-        if (connerW->isVisible()) {
+        if (connerW->isVisibleTo(this)) {
             QSize connerSize = connerW->sizeHint();
             endX -= connerSize.width();
             if (connerSize.height() < validTitleBarHeight) {
@@ -2171,7 +2171,7 @@ void SARibbonBar::resizeInWpsLiteStyle()
     }
     // quick access bar定位
     if (d_ptr->mQuickAccessBar) {
-        if (d_ptr->mQuickAccessBar->isVisible()) {
+        if (d_ptr->mQuickAccessBar->isVisibleTo(this)) {
             QSize quickAccessBarSize = d_ptr->mQuickAccessBar->sizeHint();
             endX -= quickAccessBarSize.width();
             // 上下留1px的边线
@@ -2180,7 +2180,7 @@ void SARibbonBar::resizeInWpsLiteStyle()
     }
     // cornerWidget - TopLeftCorner
     if (QWidget* connerL = cornerWidget(Qt::TopLeftCorner)) {
-        if (connerL->isVisible()) {
+        if (connerL->isVisibleTo(this)) {
             QSize connerSize = connerL->sizeHint();
             endX -= connerSize.width();
             if (connerSize.height() < validTitleBarHeight) {
@@ -2203,8 +2203,8 @@ void SARibbonBar::resizeInWpsLiteStyle()
 
     // applicationButton 定位，与TabBar同高
     if (d_ptr->mApplicationButton) {
-        if (d_ptr->mApplicationButton->isVisible()) {
-            d_ptr->mApplicationButton->setGeometry(x, y, d_ptr->mApplicationButton->size().width(), tabH);
+        if (d_ptr->mApplicationButton->isVisibleTo(this)) {
+            d_ptr->mApplicationButton->setGeometry(x, y, d_ptr->mApplicationButton->sizeHint().width(), tabH);
             x = d_ptr->mApplicationButton->geometry().right() + 2;
         }
     }
