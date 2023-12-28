@@ -433,43 +433,41 @@ SAWindowToolButton:focus {
 }
 /*Min*/
 SAWindowToolButton#SAMinimizeWindowButton {
-  qproperty-iconSize: 16px 16px;
-  qproperty-icon: url(:/image/resource/Titlebar_Min.svg) center;
+  background-position:center;
+  background-repeat: no-repeat;
+  background-image: url(:/image/resource/Titlebar_Min.svg);
 }
-SAWindowToolButton#SAMinimizeWindowButton:hover,#SAMaximizeWindowButton:hover {
-  background-color: #e5e5e5;
-  qproperty-iconSize: 16px 16px;
-  qproperty-icon: url(:/image/resource/Titlebar_Min_Hover.svg) center;
+SAWindowToolButton#SAMinimizeWindowButton:hover{
+  background-color: #f5f6f6;
 }
-SAWindowToolButton#SAMinimizeWindowButton:pressed,#SAMaximizeWindowButton:pressed {
+SAWindowToolButton#SAMinimizeWindowButton:pressed{
   background-color: #cacacb;
 }
 /*Max*/
 SAWindowToolButton#SAMaximizeWindowButton {
-    qproperty-iconSize: 16px 16px;
-    qproperty-icon: url(:/image/resource/Titlebar_Max.svg) center;
-}
-SAWindowToolButton#SAMaximizeWindowButton:checked {
-    qproperty-icon: url(:/image/resource/Titlebar_Normal.svg) center;
+    background-position:center;
+    background-repeat: no-repeat;
+    background-image: url(:/image/resource/Titlebar_Max.svg);
 }
 SAWindowToolButton#SAMaximizeWindowButton:hover {
-    background-color: #e5e5e5;
-    qproperty-icon: url(:/image/resource/Titlebar_Max_Hover.svg) center;
+    background-color: #f5f6f6;
+}
+SAWindowToolButton#SAMaximizeWindowButton:checked {
+    background-image: url(:/image/resource/Titlebar_Normal.svg) center;
 }
 
 
 /*Close*/
 SAWindowToolButton#SACloseWindowButton {
-    qproperty-iconSize: 16px 16px;
-    qproperty-icon: url(:/image/resource/Titlebar_Close.svg) center;
+    background-position:center;
+    background-repeat: no-repeat;
+    background-image: url(:/image/resource/Titlebar_Close.svg);
 }
 SAWindowToolButton#SACloseWindowButton:hover {
   background-color: #e81123;
-  qproperty-icon: url(:/image/resource/Titlebar_Close_Hover.svg) center;
 }
 SAWindowToolButton#SACloseWindowButton:pressed {
     background-color: #f1707a;
-    qproperty-icon: url(:/image/resource/Titlebar_Close_Hover.svg) center;
 }
 
 SAWindowToolButton#SARibbonBarHidePannelButton {
