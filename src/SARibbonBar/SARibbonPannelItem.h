@@ -42,6 +42,9 @@ public:
 #ifndef SA_ActionPropertyName_ToolButtonPopupMode
 #define SA_ActionPropertyName_ToolButtonPopupMode "_sa_ToolButtonPopupMode"
 #endif
+#ifndef SA_ActionPropertyName_ToolButtonStyle
+#define SA_ActionPropertyName_ToolButtonStyle "_sa_ToolButtonStyle"
+#endif
 #ifndef SA_ActionPropertyName_SeparatorTop
 #define SA_ActionPropertyName_SeparatorTop "_sa_SeparatorTop"
 #endif

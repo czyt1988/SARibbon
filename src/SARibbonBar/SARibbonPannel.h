@@ -176,10 +176,14 @@ public:
     static void setActionRowProportionProperty(QAction* action, SARibbonPannelItem::RowProportion rp);
     // 获取action的行属性
     static SARibbonPannelItem::RowProportion getActionRowProportionProperty(QAction* action);
-    // 把action的行属性设置进action中，action自身携带了行属性
+    // 把action的PopupMode属性设置进action中，action自身携带了PopupMode属性
     static void setActionToolButtonPopupModeProperty(QAction* action, QToolButton::ToolButtonPopupMode popMode);
-    // 获取action的行属性
+    // 获取action的PopupMode属性
     static QToolButton::ToolButtonPopupMode getActionToolButtonPopupModeProperty(QAction* action);
+    // 把action的ToolButtonStyle属性设置进action中，action自身携带了ToolButtonStyle属性
+    static void setActionToolButtonStyleProperty(QAction* action, Qt::ToolButtonStyle buttonStyle);
+    // 获取action的ToolButtonStyle属性
+    static Qt::ToolButtonStyle getActionToolButtonStyleProperty(QAction* action);
 
 protected:
     // 设置PannelLayoutMode，此函数设置为protect避免误调用

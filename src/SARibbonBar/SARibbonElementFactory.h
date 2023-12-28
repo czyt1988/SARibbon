@@ -19,6 +19,7 @@ class SARibbonGallery;
 class SARibbonGalleryGroup;
 class SARibbonToolButton;
 class SARibbonControlButton;
+class SARibbonControlToolButton;
 class SARibbonButtonGroupWidget;
 class SARibbonStackedWidget;
 class SARibbonQuickAccessBar;
@@ -46,6 +47,7 @@ public:
     virtual SARibbonGalleryGroup* createRibbonGalleryGroup(QWidget* parent);
     virtual SARibbonToolButton* createRibbonToolButton(QWidget* parent);
     virtual SARibbonControlButton* createRibbonControlButton(QWidget* parent);
+    virtual SARibbonControlToolButton* createRibbonControlToolButton(QWidget* parent);
     virtual SARibbonStackedWidget* createRibbonStackedWidget(SARibbonBar* parent);
     virtual SARibbonButtonGroupWidget* craeteButtonGroupWidget(QWidget* parent);
     virtual SARibbonQuickAccessBar* createQuickAccessBar(QWidget* parent);

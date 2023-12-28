@@ -9,10 +9,12 @@
 #include "SARibbonControlButton.h"
 #include "SARibbonElementManager.h"
 #include "SARibbonSeparatorWidget.h"
+#include "SARibbonPannel.h"
 
 //===================================================
 // SAPrivateRibbonButtonGroupWidgetItem
 //===================================================
+
 class SAPrivateRibbonButtonGroupWidgetItem
 {
 public:
@@ -48,9 +50,12 @@ SARibbonButtonGroupWidget::PrivateData::PrivateData(SARibbonButtonGroupWidget* p
 void SARibbonButtonGroupWidget::PrivateData::init()
 {
     QHBoxLayout* layout = new QHBoxLayout(q_ptr);
+    //上下保留一点间隙
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
     q_ptr->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+    //默认尺寸24
+    mIconSize = QSize(24, 24);
 }
 
 //===================================================
@@ -98,8 +103,10 @@ SARibbonButtonGroupWidget::~SARibbonButtonGroupWidget()
     }
 }
 
-QAction* SARibbonButtonGroupWidget::addAction(QAction* a)
+QAction* SARibbonButtonGroupWidget::addAction(QAction* a, Qt::ToolButtonStyle buttonStyle, QToolButton::ToolButtonPopupMode popMode)
 {
+    SARibbonPannel::setActionToolButtonStyleProperty(a, buttonStyle);
+    SARibbonPannel::setActionToolButtonPopupModeProperty(a, popMode);
     QWidget::addAction(a);
     return (a);
 }
@@ -112,23 +119,17 @@ QAction* SARibbonButtonGroupWidget::addAction(QAction* a)
  * @param popMode
  * @return
  */
-QAction* SARibbonButtonGroupWidget::addAction(const QString& text, const QIcon& icon, QToolButton::ToolButtonPopupMode popMode)
+QAction* SARibbonButtonGroupWidget::addAction(const QString& text, const QIcon& icon, Qt::ToolButtonStyle buttonStyle, QToolButton::ToolButtonPopupMode popMode)
 {
     QAction* a = new QAction(icon, text, this);
-
-    addAction(a);
-    ButtonTyle* btn = qobject_cast< ButtonTyle* >(d_ptr->mItems.back().widget);
-    btn->setPopupMode(popMode);
+    addAction(a, buttonStyle, popMode);
     return (a);
 }
 
-QAction* SARibbonButtonGroupWidget::addMenu(QMenu* menu, QToolButton::ToolButtonPopupMode popMode)
+QAction* SARibbonButtonGroupWidget::addMenu(QMenu* menu, Qt::ToolButtonStyle buttonStyle, QToolButton::ToolButtonPopupMode popMode)
 {
-    QAction* a = menu->menuAction();
-
-    addAction(a);
-    ButtonTyle* btn = qobject_cast< ButtonTyle* >(d_ptr->mItems.back().widget);
-    btn->setPopupMode(popMode);
+	QAction* a = menu->menuAction();
+	addAction(a, buttonStyle, popMode);
     return (a);
 }
 
@@ -151,6 +152,20 @@ QAction* SARibbonButtonGroupWidget::addWidget(QWidget* w)
     return (a);
 }
 
+SARibbonControlToolButton *SARibbonButtonGroupWidget::actionToRibbonControlToolButton(QAction *action)
+{
+	for (auto obj : qAsConst(children())) {
+		if (obj->isWidgetType()) {
+			if (SARibbonControlToolButton* btn = qobject_cast< SARibbonControlToolButton* >(obj)) {
+				if (btn->defaultAction() == action) {
+					return btn;
+				}
+			}
+		}
+	}
+	return (nullptr);
+}
+
 QSize SARibbonButtonGroupWidget::sizeHint() const
 {
     return (layout()->sizeHint());
@@ -171,8 +186,9 @@ void SARibbonButtonGroupWidget::setIconSize(const QSize& s)
     // 迭代已经保存的button
     const QObjectList& objlist = children();
     for (QObject* obj : objlist) {
-        if (ButtonTyle* btn = qobject_cast< ButtonTyle* >(obj)) {
+        if (SARibbonControlToolButton* btn = qobject_cast< SARibbonControlToolButton* >(obj)) {
             btn->setIconSize(s);
+            btn->setFixedHeight(s.height());
         }
     }
 }
@@ -203,6 +219,8 @@ void SARibbonButtonGroupWidget::actionEvent(QActionEvent* e)
             if (item.widget != nullptr) {
                 item.widget->setAttribute(Qt::WA_LayoutUsesWidgetRect);
                 item.widget->show();
+                //widget高度保持一致
+                item.widget->setFixedHeight(d_ptr->mIconSize.height());
                 item.customWidget = true;
             }
         } else if (item.action->isSeparator()) {
@@ -212,16 +230,24 @@ void SARibbonButtonGroupWidget::actionEvent(QActionEvent* e)
         }
         // 不是widget，自动生成ButtonTyle
         if (!item.widget) {
-            ButtonTyle* button = RibbonSubElementDelegate->createRibbonControlButton(this);
+            //只使用small
+            SARibbonToolButton::RibbonButtonType buttonType = SARibbonToolButton::SmallButton;
+            SARibbonControlToolButton* button = RibbonSubElementDelegate->createRibbonControlToolButton(this);
             button->setAutoRaise(true);
             button->setIconSize(d_ptr->mIconSize);
+            button->setFixedHeight(d_ptr->mIconSize.height());
             button->setFocusPolicy(Qt::NoFocus);
-            button->setToolButtonStyle(Qt::ToolButtonIconOnly);
+            button->setButtonType(buttonType);
             button->setDefaultAction(item.action);
+            // 属性设置
+            QToolButton::ToolButtonPopupMode popMode = SARibbonPannel::getActionToolButtonPopupModeProperty(item.action);
+            button->setPopupMode(popMode);
+            Qt::ToolButtonStyle buttonStyle = SARibbonPannel::getActionToolButtonStyleProperty(item.action);
+            button->setToolButtonStyle(buttonStyle);
             // 根据QAction的属性设置按钮的大小
 
-            QObject::connect(button, &ButtonTyle::triggered, this, &SARibbonButtonGroupWidget::actionTriggered);
-            item.widget = button;
+			QObject::connect(button, &SARibbonToolButton::triggered, this, &SARibbonButtonGroupWidget::actionTriggered);
+			item.widget = button;
         }
         layout()->addWidget(item.widget);
         d_ptr->mItems.append(item);
