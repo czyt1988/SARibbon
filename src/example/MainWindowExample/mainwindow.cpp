@@ -257,6 +257,19 @@ void MainWindow::onActionCustomizeAndSaveTriggered(bool b)
     Q_UNUSED(b);
     SARibbonCustomizeDialog dlg(this);
     dlg.setupActionsManager(mActionsManager);
+    //如果启动时未应用上次修改，先应用再读取,保持本地数据和ui一致
+    if(!mHasApplyCustomizeXmlFile)
+    {
+        auto res = QMessageBox::question(this, tr("question"), tr("Apply the last modification?\nIf not, local data will be reset"));
+        if (res == QMessageBox::Yes) {
+            onActionLoadCustomizeXmlFileTriggered();
+            return;
+        } else {
+            QFile::remove("customize.xml");
+            dlg.clear();
+        }
+    }
+
     dlg.fromXml("customize.xml");
     if (SARibbonCustomizeDialog::Accepted == dlg.exec()) {
         dlg.applys();
@@ -331,9 +344,8 @@ void MainWindow::onActionUseQssTriggered()
 void MainWindow::onActionLoadCustomizeXmlFileTriggered()
 {
     // 只能调用一次
-    static bool has_call = false;
-    if (!has_call) {
-        has_call = sa_apply_customize_from_xml_file("customize.xml", ribbonBar(), mActionsManager);
+    if (!mHasApplyCustomizeXmlFile) {
+        mHasApplyCustomizeXmlFile = sa_apply_customize_from_xml_file("customize.xml", ribbonBar(), mActionsManager);
     }
 }
 
