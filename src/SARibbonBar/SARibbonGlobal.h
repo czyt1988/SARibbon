@@ -9,7 +9,9 @@
   @note My native language is not English, and most of the translation of documents is machine translation
 
   版本记录(change log):
-
+  - 2023-12-25 -> 1.1.1
+  修正了SARibbonBar的布局过程对窗体隐藏的判断方式，使得在窗口没显示时也能正确布局
+  
   - 2023-12-25 -> 1.1.0
   修正了尺寸刷新的问题，在首次显示不会出现控件跳动的状态
   修正了一些问题
@@ -119,7 +121,7 @@
  * @def ribbon的数字版本 MAJ.MIN.{PAT}
  */
 #ifndef SA_RIBBON_BAR_VERSION_PAT
-#define SA_RIBBON_BAR_VERSION_PAT 0
+#define SA_RIBBON_BAR_VERSION_PAT 1
 #endif
 
 #ifndef SA_RIBBON_BAR_NO_EXPORT
@@ -177,6 +179,8 @@ enum class SARibbonAlignment
  * 此宏在qmake或在cmake中定义，不需要在此显示定义
  */
 // #define SARIBBON_USE_3RDPARTY_FRAMELESSHELPER 0
+
+
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
 #ifndef SA_FONTMETRICS_WIDTH
