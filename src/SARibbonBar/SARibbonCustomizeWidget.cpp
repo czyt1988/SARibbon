@@ -143,6 +143,11 @@ bool sa_apply_customize_from_xml_file(const QString& filePath, SARibbonBar* bar,
     if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
         return (false);
     }
+    if(f.size() == 0)
+    {
+        //文件空算应用成功
+        return true;
+    }
     f.seek(0);
     QXmlStreamReader xml(&f);
 
