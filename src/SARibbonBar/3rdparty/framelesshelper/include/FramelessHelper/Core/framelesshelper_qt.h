@@ -1,4 +1,4 @@
-/*
+﻿/*
  * MIT License
  *
  * Copyright (C) 2021-2023 by wangwenx190 (Yuhang Zhao)
