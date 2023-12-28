@@ -26,7 +26,7 @@ find_package(Qt${QT_VERSION_MAJOR} ${SARIBBON_MIN_QT_VERSION} COMPONENTS
 )
 message(STATUS "current Qt version is Qt${QT_VERSION_MAJOR}.${QT_VERSION_MINOR}.${QT_VERSION_PATCH}")
 
-
+set(SARIBBON_USE_FRAMELESS_LIB OFF)
 # 根据qt版本选择是否使用frameless库，目前frameless库支持qt5.14,qt5.15,qt6.4+,除了上诉版本，都使用不了
 if(${QT_VERSION_MAJOR} EQUAL 5)
     # qt版本为5，判断是否小版本大于14
