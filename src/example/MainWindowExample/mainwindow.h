@@ -49,6 +49,7 @@ private slots:
     void onStyleClicked(int id);
     void onActionCustomizeTriggered(bool b);
     void onActionCustomizeAndSaveTriggered(bool b);
+    void onActionCustomizeAndSaveWithApplyTriggered(bool b);
     void onActionHelpTriggered();
     void onActionRemoveAppBtnTriggered(bool b);
     void onActionUseQssTriggered();

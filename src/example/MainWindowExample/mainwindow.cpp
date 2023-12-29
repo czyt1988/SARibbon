@@ -43,6 +43,7 @@
 #include <QMessageBox>
 #include <QShortcut>
 #include <QLineEdit>
+#include <QDialogButtonBox>
 #define PRINT_COST_START()                                                                                             \
     QElapsedTimer __TMP_COST;                                                                                          \
     __TMP_COST.start();                                                                                                \
@@ -267,12 +268,24 @@ void MainWindow::onActionCustomizeAndSaveTriggered(bool b)
         } else {
             QFile::remove("customize.xml");
             dlg.clear();
+
+            mHasApplyCustomizeXmlFile = true;
         }
     }
 
     dlg.fromXml("customize.xml");
     if (SARibbonCustomizeDialog::Accepted == dlg.exec()) {
-        dlg.applys();
+        //先apply
+        if(dlg.isCached())
+            dlg.applys();
+
+		//无更改直接退出
+		if(!dlg.isApplied())
+		{
+			mTextedit->append("no change to save");
+			return;
+		}
+
         QByteArray str;
         QXmlStreamWriter xml(&str);
         xml.setAutoFormatting(true);
@@ -297,6 +310,98 @@ void MainWindow::onActionCustomizeAndSaveTriggered(bool b)
             mTextedit->append(str);
         }
     }
+}
+
+void MainWindow::onActionCustomizeAndSaveWithApplyTriggered(bool b)
+{
+	//如果启动时未应用上次修改，先应用再读取,保持本地数据和ui一致
+	if(!mHasApplyCustomizeXmlFile)
+	{
+		auto res = QMessageBox::question(this, tr("question"), tr("Apply the last modification?\nIf not, local data will be reset"));
+		if (res == QMessageBox::Yes) {
+			onActionLoadCustomizeXmlFileTriggered();
+			return;
+		} else {
+			QFile::remove("customize.xml");
+			mHasApplyCustomizeXmlFile = true;
+		}
+	}
+
+	QDialog dlg;
+	QVBoxLayout *main = new QVBoxLayout;
+	dlg.setLayout(main);
+	SARibbonCustomizeWidget* widgetForCustomize = new SARibbonCustomizeWidget(this, &dlg);
+	widgetForCustomize->setupActionsManager(mActionsManager);
+
+	main->addWidget(widgetForCustomize, 1);
+
+	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Save
+													   | QDialogButtonBox::Cancel
+													   | QDialogButtonBox::Apply);
+
+	main->addWidget(buttonBox);
+
+	connect(buttonBox, &QDialogButtonBox::accepted, &dlg, &QDialog::accept);
+	connect(buttonBox, &QDialogButtonBox::rejected, &dlg, &QDialog::reject);
+	connect(buttonBox, &QDialogButtonBox::clicked, &dlg, [=](QAbstractButton *button){
+
+		auto role = buttonBox->buttonRole(button);
+		if(role == QDialogButtonBox::ApplyRole)//apply
+		{
+			if(widgetForCustomize->isCached())
+			{
+				widgetForCustomize->applys();
+				mTextedit->append("change applied");
+			}
+			else
+			{
+				mTextedit->append("no change to apply");
+			}
+		}
+	});
+
+	widgetForCustomize->fromXml("customize.xml");
+	if (QDialog::Accepted == dlg.exec()){
+		//先apply
+		if(widgetForCustomize->isCached())
+			widgetForCustomize->applys();
+
+		//无更改直接退出
+		if(!widgetForCustomize->isApplied())
+		{
+			mTextedit->append("no change to save");
+			return;
+		}
+
+		QByteArray str;
+		QXmlStreamWriter xml(&str);
+		xml.setAutoFormatting(true);
+		xml.setAutoFormattingIndent(2);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)  // QXmlStreamWriter always encodes XML in UTF-8.
+		xml.setCodec("utf-8");
+#endif
+		xml.writeStartDocument();
+		bool isok = widgetForCustomize->toXml(&xml);
+		xml.writeEndDocument();
+		if (isok) {
+			QFile f("customize.xml");
+			if (f.open(QIODevice::ReadWrite | QIODevice::Text | QIODevice::Truncate)) {
+				QTextStream s(&f);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)  // QTextStream always encodes XML in UTF-8.
+				s.setCodec("utf-8");
+#endif
+				s << str;
+				s.flush();
+			}
+			mTextedit->append("write xml:");
+			mTextedit->append(str);
+		}
+	}
+	else {
+		//清除所有动作
+		widgetForCustomize->clear();
+		mTextedit->append("all changes clear, the applied changes will take no effect afer restart");
+	}
 }
 
 void MainWindow::onActionHelpTriggered()
@@ -345,6 +450,18 @@ void MainWindow::onActionLoadCustomizeXmlFileTriggered()
 {
     // 只能调用一次
     if (!mHasApplyCustomizeXmlFile) {
+        if(!QFile::exists("customize.xml"))
+        {
+            mHasApplyCustomizeXmlFile = true;
+            return;
+        }
+        QFile f("customize.xml");
+        qDebug() << "size of customize.xml : " << f.size();
+        if(f.size() <= 0)
+        {
+            mHasApplyCustomizeXmlFile = true;
+            return;
+        }
         mHasApplyCustomizeXmlFile = sa_apply_customize_from_xml_file("customize.xml", ribbonBar(), mActionsManager);
     }
 }
@@ -1268,6 +1385,10 @@ void MainWindow::createQuickAccessBar(SARibbonQuickAccessBar* quickAccessBar)
     QAction* actionCustomizeAndSave = createAction("customize and save", ":/icon/icon/customize.svg");
     quickAccessBar->addAction(actionCustomizeAndSave);
     connect(actionCustomizeAndSave, &QAction::triggered, this, &MainWindow::onActionCustomizeAndSaveTriggered);
+
+	QAction* actionCustomizeAndSaveWithApply = createAction("customize and save with apply", ":/icon/icon/customize.svg");
+	quickAccessBar->addAction(actionCustomizeAndSaveWithApply);
+	connect(actionCustomizeAndSaveWithApply, &QAction::triggered, this, &MainWindow::onActionCustomizeAndSaveWithApplyTriggered);
 
     //
     mSearchEditor = new SARibbonLineEdit(this);
