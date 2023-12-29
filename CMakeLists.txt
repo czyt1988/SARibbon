@@ -6,12 +6,13 @@ cmake_minimum_required(VERSION 3.5)
 
 set(SARIBBON_VERSION_MAJOR 1)
 set(SARIBBON_VERSION_MINOR 1)
-set(SARIBBON_VERSION_PATCH 1)
+set(SARIBBON_VERSION_PATCH 2)
 set(SARIBBON_VERSION "${SARIBBON_VERSION_MAJOR}.${SARIBBON_VERSION_MINOR}.${SARIBBON_VERSION_PATCH}")
 project(SARibbon VERSION ${SARIBBON_VERSION} LANGUAGES CXX)
 
 # option(BUILD_SHARED_LIBS "build the SARibbonBar in shared lib mode" ON)
 option(SARIBBON_BUILD_EXAMPLES "build the examples" ON)
+# frameless能提供windows的窗口特效，如边缘吸附，且对高分屏多屏幕的支持更好
 option(SARIBBON_USE_FRAMELESS_LIB "use frameless lib" OFF)
 
 # load Qt library, minimum version required is 5.8
