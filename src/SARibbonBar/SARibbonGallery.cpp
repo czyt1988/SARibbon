@@ -5,7 +5,6 @@
 #define ICON_ARROW_UP QIcon(":/image/resource/ArrowUp.png")
 #define ICON_ARROW_DOWN QIcon(":/image/resource/ArrowDown.png")
 #define ICON_ARROW_MORE QIcon(":/image/resource/ArrowMore.png")
-#include "SARibbonMenu.h"
 #include <QResizeEvent>
 #include <QDebug>
 #include <QVBoxLayout>

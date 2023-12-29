@@ -79,7 +79,7 @@ SARibbonControlButton* SARibbonElementFactory::createRibbonControlButton(QWidget
     return (new SARibbonControlButton(parent));
 }
 
-SARibbonControlToolButton *SARibbonElementFactory::createRibbonControlToolButton(QWidget *parent)
+SARibbonControlToolButton* SARibbonElementFactory::createRibbonControlToolButton(QWidget* parent)
 {
     return (new SARibbonControlToolButton(parent));
 }
@@ -103,7 +103,7 @@ SARibbonQuickAccessBar* SARibbonElementFactory::createQuickAccessBar(QWidget* pa
  * @brief 创建SARibbonPannelOptionButton
  * @param pannel 附属的pannel
  * @return
- * @sa @ref SARibbonPannelOptionButton
+ * @sa SARibbonPannelOptionButton
  */
 SARibbonPannelOptionButton* SARibbonElementFactory::createRibbonPannelOptionButton(SARibbonPannel* pannel)
 {

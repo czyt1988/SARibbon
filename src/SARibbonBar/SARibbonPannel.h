@@ -6,6 +6,7 @@
 #include "SARibbonToolButton.h"
 #include <QLayout>
 #include <QWidget>
+#include <QLabel>
 class SARibbonMenu;
 class SARibbonGallery;
 class QGridLayout;
@@ -13,6 +14,17 @@ class SARibbonPannelOptionButton;
 class SARibbonPannelLayout;
 class SARibbonCategory;
 class SARibbonBar;
+
+/**
+ * @brief SARibbonPannel的标题label，此类用于qss
+ */
+class SA_RIBBON_EXPORT SARibbonPannelLabel : public QLabel
+{
+    Q_OBJECT
+public:
+    SARibbonPannelLabel(QWidget* parent = nullptr);
+};
+
 /**
  * @brief pannel页窗口，pannel是ribbon的面板用于承放控件
  *
@@ -37,21 +49,24 @@ class SA_RIBBON_EXPORT SARibbonPannel : public QWidget
     Q_PROPERTY(bool isExpanding READ isExpanding WRITE setExpanding)
     Q_PROPERTY(QString pannelName READ pannelName WRITE setPannelName)
 public:
-public:
-    SARibbonPannel(QWidget* parent = nullptr);
-    SARibbonPannel(const QString& name, QWidget* parent = nullptr);
-    ~SARibbonPannel() Q_DECL_OVERRIDE;
-    using QWidget::addAction;
     enum PannelLayoutMode
     {
         ThreeRowMode,  ///< 三行布局模式，office就是三行布局模式，pannel能布置3行小toolbutton，默认模式
         TwoRowMode  ///< 两行布局模式，wps的后续布局模式就是两行布局模式，pannel能布置2行小toolbutton
     };
+    Q_ENUM(PannelLayoutMode)
+public:
+    SARibbonPannel(QWidget* parent = nullptr);
+    SARibbonPannel(const QString& name, QWidget* parent = nullptr);
+    ~SARibbonPannel() Q_DECL_OVERRIDE;
+    using QWidget::addAction;
 
     // 把action加入到pannel
     void addAction(QAction* action, SARibbonPannelItem::RowProportion rp);
     // 生成并添加一个action
-    void addAction(QAction* act, QToolButton::ToolButtonPopupMode popMode, SARibbonPannelItem::RowProportion rp = SARibbonPannelItem::Large);
+    void addAction(QAction* act,
+                   QToolButton::ToolButtonPopupMode popMode,
+                   SARibbonPannelItem::RowProportion rp = SARibbonPannelItem::Large);
     // 把action加入到pannel，并以大图标显示
     void addLargeAction(QAction* action);
     // 把action加入到pannel，在三行模式下会以中图标显示
@@ -72,7 +87,9 @@ public:
                        SARibbonPannelItem::RowProportion rp = SARibbonPannelItem::Large);
 
     // 添加menu
-    void addMenu(QMenu* menu, SARibbonPannelItem::RowProportion rp, QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
+    void addMenu(QMenu* menu,
+                 SARibbonPannelItem::RowProportion rp,
+                 QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
 
     // 添加普通大菜单
     void addLargeMenu(QMenu* menu, QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
@@ -102,6 +119,7 @@ public:
     SARibbonToolButton* actionToRibbonToolButton(QAction* action);
 
     // 设置操作action，如果要去除，传入nullptr指针即可，SARibbonPannel不会对QAction的所有权进行管理
+    // OptionAction也会触发actionTriggered信号
     void setOptionAction(QAction* action);
 
     // 判断是否存在OptionAction
@@ -132,8 +150,8 @@ public:
     void setTitleHeight(int h);
     int titleHeight() const;
 
-    // optionActionButton的尺寸
-    virtual QSize optionActionButtonSize() const;
+    // 判断是否显示标题，只有标题的高度被设置，才会显示标题
+    bool isShowTitle() const;
 
     // action对应的布局index，此操作一般用于移动moveAction，其他意义不大
     int actionIndex(QAction* act) const;
@@ -150,12 +168,9 @@ public:
     void setPannelName(const QString& title);
 
     // 大图标的高度
-    int largeHeight() const;
-    // 获取布局对应的item
+    int largeButtonHeight() const;
+    // 获取布局对应的item,此函数目前仅仅在自定义过程中用到
     const QList< SARibbonPannelItem* >& ribbonPannelItem() const;
-    // 全局的标题栏高度
-    static int pannelTitleHeight();
-    static void setPannelTitleHeight(int h);
     // 获取pannel layout
     SARibbonPannelLayout* pannelLayout() const;
     // 更新布局
@@ -164,6 +179,8 @@ public:
     SARibbonCategory* category() const;
     // 获取ribbonBar指针，如果没有返回nullptr
     SARibbonBar* ribbonBar() const;
+    // pannel高度推荐
+    static int pannelHeightHint(const QFontMetrics& fm, PannelLayoutMode layMode, int pannelTitleHeight);
 signals:
 
     /**
@@ -194,8 +211,6 @@ protected:
 
 protected:
     virtual bool event(QEvent* e) Q_DECL_OVERRIDE;
-    virtual void paintEvent(QPaintEvent* e) Q_DECL_OVERRIDE;
-    virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
     virtual void actionEvent(QActionEvent* e) Q_DECL_OVERRIDE;
     virtual void changeEvent(QEvent* e) Q_DECL_OVERRIDE;
 };

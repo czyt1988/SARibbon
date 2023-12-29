@@ -488,7 +488,7 @@ QSize SARibbonToolButton::PrivateData::calcLargeButtonSizeHint(const QStyleOptio
 
     if (SARibbonPannel* pannel = qobject_cast< SARibbonPannel* >(q_ptr->parent())) {
         // 对于建立在SARibbonPannel的基础上的大按钮，把高度设置为SARibbonPannel计算的大按钮高度
-        h = pannel->largeHeight();
+        h = pannel->largeButtonHeight();
     }
     int textHeight = calcTextDrawRectHeight(opt);
     // 估算字体的宽度作为宽度
