@@ -1232,12 +1232,22 @@ void MainWindow::createQuickAccessBar(SARibbonQuickAccessBar* quickAccessBar)
     connect(actionRedo, &QAction::triggered, this, [ this ]() { mTextedit->append("redo"); });
 
     quickAccessBar->addSeparator();
-    QMenu* m = new QMenu("Presentation File", this);
-    m->setIcon(QIcon(":/icon/icon/presentationFile.svg"));
+
+    QMenu* m1 = new QMenu("Presentation File 1", this);
+    m1->setIcon(QIcon(":/icon/icon/presentationFile.svg"));
     for (int i = 0; i < 10; ++i) {
-        m->addAction(createAction(QString("file%1").arg(i + 1), ":/icon/icon/file.svg"));
+        m1->addAction(createAction(QString("file%1").arg(i + 1), ":/icon/icon/file.svg"));
     }
-    quickAccessBar->addMenu(m);
+    quickAccessBar->addMenu(m1, Qt::ToolButtonIconOnly, QToolButton::InstantPopup);
+
+	QMenu* m2 = new QMenu("Presentation File 2", this);
+	m2->setIcon(QIcon(":/icon/icon/presentationFile.svg"));
+	for (int i = 0; i < 10; ++i) {
+		m2->addAction(createAction(QString("file%1").arg(i + 1), ":/icon/icon/file.svg"));
+	}
+	QAction* actiontestmenu = new QAction("Presentation File 2");
+	actiontestmenu->setMenu(m2);
+	quickAccessBar->addAction(actiontestmenu, Qt::ToolButtonIconOnly, QToolButton::MenuButtonPopup);
 
     QAction* customize = createAction("customize", ":/icon/icon/customize0.svg", "customize2");
     quickAccessBar->addAction(customize);
@@ -1248,7 +1258,7 @@ void MainWindow::createQuickAccessBar(SARibbonQuickAccessBar* quickAccessBar)
     connect(actionCustomizeAndSave, &QAction::triggered, this, &MainWindow::onActionCustomizeAndSaveTriggered);
 
     //
-    mSearchEditor = new QLineEdit(this);
+    mSearchEditor = new SARibbonLineEdit(this);
     mSearchEditor->setFixedWidth(100);
     mSearchEditor->setPlaceholderText("Search");
     quickAccessBar->addWidget(mSearchEditor);

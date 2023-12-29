@@ -164,6 +164,33 @@ QToolButton::ToolButtonPopupMode SARibbonPannel::getActionToolButtonPopupModePro
 }
 
 /**
+ * @brief 设置action的ToolButtonStyle属性
+ * @param action
+ * @param buttonStyle
+ */
+void SARibbonPannel::setActionToolButtonStyleProperty(QAction *action, Qt::ToolButtonStyle buttonStyle)
+{
+	Q_CHECK_PTR(action);
+	action->setProperty(SA_ActionPropertyName_ToolButtonStyle, static_cast< int >(buttonStyle));
+}
+
+/**
+ * @brief 获取action的ToolButtonStyle属性
+ * @param action
+ * @return
+ */
+Qt::ToolButtonStyle SARibbonPannel::getActionToolButtonStyleProperty(QAction *action)
+{
+	bool isok = false;
+	int r     = action->property(SA_ActionPropertyName_ToolButtonStyle).toInt(&isok);
+
+	if (isok) {
+		return (static_cast< Qt::ToolButtonStyle >(r));
+	}
+	return (Qt::ToolButtonIconOnly);
+}
+
+/**
  * @brief 添加action
  *
  * action实际对应了一个toolbutton，如果想找到对应的toolbutton，使用@ref actionToRibbonToolButton
