@@ -28,7 +28,7 @@ if(${QT_VERSION_MAJOR} EQUAL 5)
     # qt版本为5，判断是否小版本大于14
     if(${QT_VERSION_MINOR} GREATER_EQUAL 14)
         #5.14和5.15可以使用frameless
-        set(SARIBBON_USE_FRAMELESS_LIB ON)
+        #set(SARIBBON_USE_FRAMELESS_LIB ON)
     else()
         set(SARIBBON_USE_FRAMELESS_LIB OFF)
     endif()
@@ -36,7 +36,7 @@ elseif(${QT_VERSION_MAJOR} EQUAL 6)
     # qt版本为6，判断是否小版本大于4
     if(${QT_VERSION_MINOR} GREATER_EQUAL 4)
         #6.4及以上可以使用frameless
-        set(SARIBBON_USE_FRAMELESS_LIB ON)
+        #set(SARIBBON_USE_FRAMELESS_LIB ON)
     else()
         set(SARIBBON_USE_FRAMELESS_LIB OFF)
     endif()
@@ -57,6 +57,7 @@ add_executable(${SARIBBON_EXPAMPLE_NAME}
     Widget.cpp
     main.cpp
     icon.qrc
+    Widget.ui
 )
 
 target_include_directories(${SARIBBON_EXPAMPLE_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../../SARibbonBar")

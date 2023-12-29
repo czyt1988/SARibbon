@@ -32,7 +32,6 @@ public:
 
     // 移除Pannel，Category会直接回收SARibbonPannel内存
     bool removePannel(SARibbonPannel* pannel);
-    void setBackgroundBrush(const QBrush& brush);
     SARibbonCategory* ribbonCategory();
     const SARibbonCategory* ribbonCategory() const;
     void setRibbonPannelLayoutMode(SARibbonPannel::PannelLayoutMode m);
@@ -95,7 +94,7 @@ void SARibbonCategory::PrivateData::insertPannel(int index, SARibbonPannel* pann
     pannel->setPannelLayoutMode(ribbonPannelLayoutMode());
     index = qMax(0, index);
     index = qMin(lay->pannelCount(), index);
-    lay->addPannel(pannel);
+    lay->insertPannel(index, pannel);
     pannel->setVisible(true);
 }
 
@@ -116,14 +115,6 @@ bool SARibbonCategory::PrivateData::removePannel(SARibbonPannel* pannel)
         return (true);
     }
     return (false);
-}
-
-void SARibbonCategory::PrivateData::setBackgroundBrush(const QBrush& brush)
-{
-    QPalette p = ribbonCategory()->palette();
-
-    p.setBrush(QPalette::Window, brush);
-    ribbonCategory()->setPalette(p);
 }
 
 QList< SARibbonPannel* > SARibbonCategory::PrivateData::pannelList()
@@ -179,9 +170,16 @@ void SARibbonCategory::PrivateData::updateItemGeometry()
 #if SA_DEBUG_PRINT_SIZE_HINT
     qDebug() << "SARibbonCategory::PrivateData::updateItemGeometry,categoryName=" << q_ptr->categoryName();
 #endif
-    if (SARibbonCategoryLayout* lay = qobject_cast< SARibbonCategoryLayout* >(q_ptr->layout())) {
-        lay->invalidate();
+    SARibbonCategoryLayout* lay = qobject_cast< SARibbonCategoryLayout* >(q_ptr->layout());
+    if (!lay) {
+        return;
     }
+    const QList< SARibbonPannel* > pannels = lay->pannelList();
+    for (auto pannel : pannels) {
+        pannel->updateItemGeometry();
+    }
+    lay->invalidate();
+
     return;
 }
 
@@ -276,6 +274,11 @@ void SARibbonCategory::setRibbonPannelLayoutMode(SARibbonPannel::PannelLayoutMod
 
 bool SARibbonCategory::event(QEvent* e)
 {
+#if SA_DEBUG_PRINT_EVENT
+    if (e->type() != QEvent::Paint) {
+        qDebug() << "SARibbonCategory event(" << e->type() << "),name=" << categoryName();
+    }
+#endif
     return QWidget::event(e);
 }
 
@@ -448,15 +451,6 @@ bool SARibbonCategory::removePannel(int index)
     return (removePannel(p));
 }
 
-///
-/// \brief SARibbonCategory::setBackgroundBrush
-/// \param brush
-///
-void SARibbonCategory::setBackgroundBrush(const QBrush& brush)
-{
-    d_ptr->setBackgroundBrush(brush);
-}
-
 /**
  * @brief 返回Category下的所有pannel
  * @return
@@ -468,10 +462,10 @@ QList< SARibbonPannel* > SARibbonCategory::pannelList() const
 
 QSize SARibbonCategory::sizeHint() const
 {
-    if (QLayout* lay = layout()) {
+    if (SARibbonCategoryLayout* lay = categoryLayout()) {
         return lay->sizeHint();
     }
-    return QSize(500, 200);
+    return QSize(1000, 100);
 }
 
 /**
@@ -519,9 +513,15 @@ void SARibbonCategory::setCanCustomize(bool b)
  */
 SARibbonBar* SARibbonCategory::ribbonBar() const
 {
+    // 第一个par是stackwidget
     if (QWidget* par = parentWidget()) {
-        if (SARibbonBar* ribbon = qobject_cast< SARibbonBar* >(par->parentWidget())) {
-            return ribbon;
+        // 理论此时是ribbonbar
+        par = par->parentWidget();
+        while (par) {
+            if (SARibbonBar* ribbon = qobject_cast< SARibbonBar* >(par)) {
+                return ribbon;
+            }
+            par = par->parentWidget();
         }
     }
     return nullptr;

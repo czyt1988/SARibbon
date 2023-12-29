@@ -82,6 +82,9 @@ public:
     void updateWindowFlag(Qt::WindowFlags flags);
     // 获取系统按钮的状态
     Qt::WindowFlags windowButtonFlags() const;
+
+    // 注意主题在构造函数设置主题会不完全生效，使用QTimer投放到队列最后执行即可
+    // QTimer::singleShot(0, this, [ this ]() { this->setRibbonTheme(SARibbonMainWindow::RibbonThemeDark); });
     void setRibbonTheme(RibbonTheme theme);
     RibbonTheme ribbonTheme() const;
     // 判断当前是否使用ribbon模式
