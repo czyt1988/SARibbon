@@ -147,6 +147,29 @@ SARibbonToolButton:hover {
     background-color: #a0a0a0;
 }
 
+/*SARibbonControlToolButton*/
+
+SARibbonControlToolButton {
+  background-color: transparent;/*{ControlToolButton.BKColor}*/
+  color: #a0a0a0;
+  border: 0.05em solid transparent;
+}
+
+SARibbonControlToolButton:pressed {
+  background-color: #858585;/*{ControlToolButton.BKColor:pressed}*/
+}
+
+SARibbonControlToolButton:checked {
+  border: 0.05em solid #888888;/*{ControlToolButton.BorderColor:checked}*/
+  background-color: #9b9b9b;/*{ControlToolButton.BKColor:checked}*/
+}
+
+SARibbonControlToolButton:hover {
+  color: white;
+  border: 0.05em solid #888888;/*{ControlToolButton.BorderColor:hover}*/
+  background-color: #a0a0a0;/*{ControlToolButton.BKColor:hover}*/
+}
+
 /*SARibbonControlButton*/
 SARibbonControlButton{
   background-color:transparent;
@@ -169,9 +192,6 @@ SARibbonControlButton#SARibbonGalleryButtonUp,#SARibbonGalleryButtonDown,#SARibb
   background-color:#b2b2b2;
   border: 0.05em solid #888888;
   color: #242424;
-}
-SARibbonControlButton#SARibbonBarHidePannelButton {
-  border: 0.05em solid transparent;
 }
 
 
@@ -361,9 +381,4 @@ SAWindowToolButton#SACloseWindowButton:hover {
 }
 SAWindowToolButton#SACloseWindowButton:pressed {
     background-color: #f1707a;
-}
-
-SAWindowToolButton#SARibbonBarHidePannelButton {
-  titlebar-shade-icon: url(:/image/resource/Titlebar_Shade.png);
-  titlebar-unshade-icon: url(:/image/resource/Titlebar_Unshade.png);
 }
