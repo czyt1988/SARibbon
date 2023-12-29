@@ -5,13 +5,15 @@
 cmake_minimum_required(VERSION 3.5)
 
 set(SARIBBON_VERSION_MAJOR 1)
-set(SARIBBON_VERSION_MINOR 0)
-set(SARIBBON_VERSION_PATCH 6)
+set(SARIBBON_VERSION_MINOR 1)
+set(SARIBBON_VERSION_PATCH 2)
 set(SARIBBON_VERSION "${SARIBBON_VERSION_MAJOR}.${SARIBBON_VERSION_MINOR}.${SARIBBON_VERSION_PATCH}")
 project(SARibbon VERSION ${SARIBBON_VERSION} LANGUAGES CXX)
 
 # option(BUILD_SHARED_LIBS "build the SARibbonBar in shared lib mode" ON)
 option(SARIBBON_BUILD_EXAMPLES "build the examples" ON)
+# frameless能提供windows的窗口特效，如边缘吸附，且对高分屏多屏幕的支持更好
+option(SARIBBON_USE_FRAMELESS_LIB "use frameless lib" OFF)
 
 # load Qt library, minimum version required is 5.8
 # cn:Qt库加载,最低版本要求为5.8
@@ -25,20 +27,19 @@ find_package(Qt${QT_VERSION_MAJOR} ${SARIBBON_MIN_QT_VERSION} COMPONENTS
 )
 message(STATUS "current Qt version is Qt${QT_VERSION_MAJOR}.${QT_VERSION_MINOR}.${QT_VERSION_PATCH}")
 
-
 # 根据qt版本选择是否使用frameless库，目前frameless库支持qt5.14,qt5.15,qt6.4+,除了上诉版本，都使用不了
 if(${QT_VERSION_MAJOR} EQUAL 5)
     # qt版本为5，判断是否小版本大于14
     if(${QT_VERSION_MINOR} GREATER_EQUAL 14)
         #5.14和5.15可以使用frameless
-        set(SARIBBON_USE_FRAMELESS_LIB ON)
+        #set(SARIBBON_USE_FRAMELESS_LIB ON)
     else()
         set(SARIBBON_USE_FRAMELESS_LIB OFF)
     endif()
 elseif(${QT_VERSION_MAJOR} EQUAL 6)
     # qt版本为6，判断是否小版本大于6.1
     if(${QT_VERSION_MINOR} GREATER_EQUAL 1)
-        set(SARIBBON_USE_FRAMELESS_LIB ON)
+        #set(SARIBBON_USE_FRAMELESS_LIB ON)
     else()
         #6.0及bug多多无法使用frameless
         set(SARIBBON_USE_FRAMELESS_LIB OFF)

@@ -1,5 +1,4 @@
 ﻿#include "SARibbonToolButton.h"
-#include "SARibbonElementManager.h"
 #include <QAction>
 #include <QApplication>
 #include <QCursor>
@@ -12,6 +11,8 @@
 #include <QTextOption>
 #include <QApplication>
 #include <QScreen>
+#include "SARibbonPannel.h"
+
 /**
  * @def 定义文字换行时2行文本的矩形高度系数，此系数决定文字区域的高度
  *
@@ -490,9 +491,6 @@ QSize SARibbonToolButton::PrivateData::calcLargeButtonSizeHint(const QStyleOptio
         h = pannel->largeHeight();
     }
     int textHeight = calcTextDrawRectHeight(opt);
-    if (mDrawIconRect.isValid()) {
-        minW = qMax(mDrawIconRect.width(), h - textHeight);
-    }
     // 估算字体的宽度作为宽度
     w = estimateLargeButtonTextWidth(h, textHeight, opt.text, opt.fontMetrics);
     w += (2 * mSpacing);
@@ -501,9 +499,15 @@ QSize SARibbonToolButton::PrivateData::calcLargeButtonSizeHint(const QStyleOptio
         w += mIndicatorLen;
     }
 
-    // if (w < minW) {
-    //     w = minW;
-    // }
+#if SA_RIBBON_TOOLBUTTON_DEBUG_PRINT && SA_DEBUG_PRINT_SIZE_HINT
+    qDebug() << "| | |-SARibbonToolButton::PrivateData::calcLargeButtonSizeHint,text=" << opt.text
+             << "\n| | | |-lineSpacing*4.5=" << opt.fontMetrics.lineSpacing() * 4.5  //
+             << "\n| | | |-textHeight=" << textHeight                                //
+             << "\n| | | |-mDrawIconRect=" << mDrawIconRect                          //
+             << "\n| | | |-minW=" << minW                                            //
+             << "\n| | | |-w=" << w                                                  //
+        ;
+#endif
     //! Qt6.4 取消了QApplication::globalStrut
     return QSize(w, h).expandedTo(QSize(minW, textHeight));
 }
@@ -759,9 +763,6 @@ bool SARibbonToolButton::hitButton(const QPoint& pos) const
  */
 void SARibbonToolButton::resizeEvent(QResizeEvent* e)
 {
-#if SA_RIBBON_TOOLBUTTON_DEBUG_PRINT
-    qDebug() << "SARibbonToolButton::resizeEvent, text=" << text() << " obj=" << objectName() << " size=" << e->size();
-#endif
     // 在resizeevent计算绘图所需的尺寸，避免在绘图过程中实时绘制提高效率
     QToolButton::resizeEvent(e);
     updateRect();
@@ -779,6 +780,9 @@ QSize SARibbonToolButton::sizeHint() const
     //        initStyleOption(&opt);
     //        d_ptr->updateSizeHint(opt);
     //    }
+#if SA_RIBBON_TOOLBUTTON_DEBUG_PRINT && SA_DEBUG_PRINT_SIZE_HINT
+    qDebug() << "| | |-SARibbonToolButton::sizeHint";
+#endif
     QStyleOptionToolButton opt;
     initStyleOption(&opt);
     d_ptr->updateSizeHint(opt);
@@ -843,14 +847,17 @@ void SARibbonToolButton::paintButton(QPainter& p, const QStyleOptionToolButton& 
                         }
                     } else {
                         // 鼠标在图标区，把文字显示为正常
-                        tool.state |= (QStyle::State_Raised);  // 把图标区域显示为正常
-                        tool.state &= ~QStyle::State_MouseOver;
-                        // 文字和Indicator都显示正常
-                        tool.rect = d_ptr->mDrawTextRect.united(d_ptr->mDrawIndicatorArrowRect);
-                        if (autoRaise) {
-                            style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
-                        } else {
-                            style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tool, &p, this);
+                        if (!tool.state.testFlag(QStyle::State_Sunken)) {
+                            // State_Sunken说明此按钮正在按下，这时候，文本区域不需要绘制，只有在非按下状态才需要绘制
+                            tool.state |= (QStyle::State_Raised);  // 把图标区域显示为正常
+                            tool.state &= ~QStyle::State_MouseOver;
+                            // 文字和Indicator都显示正常
+                            tool.rect = d_ptr->mDrawTextRect.united(d_ptr->mDrawIndicatorArrowRect);
+                            if (autoRaise) {
+                                style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
+                            } else {
+                                style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tool, &p, this);
+                            }
                         }
                     }
                 } else {                              // 小按钮模式

@@ -1,5 +1,6 @@
 ﻿#include "SARibbonStackedWidget.h"
 #include <QEventLoop>
+#include <QResizeEvent>
 #include <QMouseEvent>
 #include <QDebug>
 #include <QApplication>
@@ -12,7 +13,6 @@ class SARibbonStackedWidget::PrivateData
     SA_RIBBON_DECLARE_PUBLIC(SARibbonStackedWidget)
 public:
     QEventLoop* eventLoop { nullptr };
-    bool isAutoResize { true };
 
 public:
     PrivateData(SARibbonStackedWidget* p) : q_ptr(p)
@@ -82,22 +82,6 @@ void SARibbonStackedWidget::exec()
 }
 
 /**
- * @brief 设置stacked管理的窗口会随着stacked的大小变化而变化大小
- *
- * 默认为true
- * @param autoresize
- */
-void SARibbonStackedWidget::setAutoResize(bool autoresize)
-{
-    d_ptr->isAutoResize = autoresize;
-}
-
-bool SARibbonStackedWidget::isAutoResize() const
-{
-    return (d_ptr->isAutoResize);
-}
-
-/**
  * @brief 类似tabbar的moveTab函数，交换两个窗口的index
  * @param from
  * @param to
@@ -122,4 +106,16 @@ void SARibbonStackedWidget::hideEvent(QHideEvent* e)
     emit hidWindow();
 
     QStackedWidget::hideEvent(e);
+}
+
+void SARibbonStackedWidget::resizeEvent(QResizeEvent* e)
+{
+    QStackedWidget::resizeEvent(e);
+    for (int i = 0; i < count(); ++i) {
+        if (i == currentIndex()) {
+            continue;
+        }
+        QEvent* layE = new QEvent(QEvent::LayoutRequest);
+        QApplication::postEvent(widget(i), layE);
+    }
 }

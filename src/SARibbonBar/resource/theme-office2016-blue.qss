@@ -237,6 +237,30 @@ SARibbonToolButton:hover {
   background-color: #c5c5c5;/* {ToolButton.BKColor:hover} */
 }
 
+/*SARibbonControlToolButton*/
+
+SARibbonControlToolButton {
+  background-color: transparent;/*{ControlToolButton.BKColor}*/
+  color: #d2e4ff;
+  border: 0.05em solid transparent;
+}
+
+SARibbonControlToolButton:pressed {
+  border: 0.05em solid #124078;/*{ControlToolButton.BorderColor:pressed}*/
+  background-color: #12427b;/*{ControlToolButton.BKColor:pressed}*/
+}
+
+SARibbonControlToolButton:checked {
+  border: 0.05em solid #12427b;/*{ControlToolButton.BorderColor:checked}*/
+  background-color: #12427b;/*{ControlToolButton.BKColor:checked}*/
+}
+
+SARibbonControlToolButton:hover {
+  border: 0.05em solid #3e6db6;/*{ControlToolButton.BorderColor:hover}*/
+  color: white;/* {ControlToolButton.Color:hover} */
+  background-color: #3e6db6;/*{ControlToolButton.BKColor:hover}*/
+}
+
 /*SARibbonControlButton*/
 
 SARibbonControlButton {
@@ -269,9 +293,6 @@ SARibbonControlButton#SARibbonGalleryButtonUp:hover, #SARibbonGalleryButtonDown:
   background-color: #c5c5c5;/*{GalleryButton.BKColor:hover}*/
 }
 
-SARibbonControlButton#SARibbonBarHidePannelButton {
-  border: 0.05em solid transparent;
-}
 
 
 /*SARibbonGallery*/
@@ -407,48 +428,43 @@ SAWindowToolButton {
 SAWindowToolButton:focus {
   outline: none;
 }
+/* 深色模式的系统按钮设置 */
 /*Min*/
 SAWindowToolButton#SAMinimizeWindowButton {
-  qproperty-iconSize: 16px 16px;
-  qproperty-icon: url(:/image/resource/Titlebar_Min.svg) center;
+  background-position:center;
+  background-repeat: no-repeat;
+  background-image: url(:/image/resource/Titlebar_Min_Hover.svg);
 }
-SAWindowToolButton#SAMinimizeWindowButton:hover,#SAMaximizeWindowButton:hover {
-  background-color: #e5e5e5;
-  qproperty-iconSize: 16px 16px;
-  qproperty-icon: url(:/image/resource/Titlebar_Min_Hover.svg) center;
+SAWindowToolButton#SAMinimizeWindowButton:hover{
+  background-color: #b8b8b8;
 }
-SAWindowToolButton#SAMinimizeWindowButton:pressed,#SAMaximizeWindowButton:pressed {
+SAWindowToolButton#SAMinimizeWindowButton:pressed{
   background-color: #cacacb;
 }
 /*Max*/
 SAWindowToolButton#SAMaximizeWindowButton {
-    qproperty-iconSize: 16px 16px;
-    qproperty-icon: url(:/image/resource/Titlebar_Max.svg) center;
-}
-SAWindowToolButton#SAMaximizeWindowButton:checked {
-    qproperty-icon: url(:/image/resource/Titlebar_Normal.svg) center;
+    background-position:center;
+    background-repeat: no-repeat;
+    background-image: url(:/image/resource/Titlebar_Max_Hover.svg);
 }
 SAWindowToolButton#SAMaximizeWindowButton:hover {
-    background-color: #e5e5e5;
-    qproperty-icon: url(:/image/resource/Titlebar_Max_Hover.svg) center;
+    background-color: #b8b8b8;
+}
+SAWindowToolButton#SAMaximizeWindowButton:checked {
+    background-image: url(:/image/resource/Titlebar_Normal_Hover.svg) center;
 }
 
 
 /*Close*/
 SAWindowToolButton#SACloseWindowButton {
-    qproperty-iconSize: 16px 16px;
-    qproperty-icon: url(:/image/resource/Titlebar_Close.svg) center;
+    background-position:center;
+    background-repeat: no-repeat;
+    background-image: url(:/image/resource/Titlebar_Close_Hover.svg);
 }
 SAWindowToolButton#SACloseWindowButton:hover {
   background-color: #e81123;
-  qproperty-icon: url(:/image/resource/Titlebar_Close_Hover.svg) center;
 }
 SAWindowToolButton#SACloseWindowButton:pressed {
     background-color: #f1707a;
-    qproperty-icon: url(:/image/resource/Titlebar_Close_Hover.svg) center;
 }
 
-SAWindowToolButton#SARibbonBarHidePannelButton {
-  titlebar-shade-icon: url(:/image/resource/Titlebar_Shade.png);
-  titlebar-unshade-icon: url(:/image/resource/Titlebar_Unshade.png);
-}

@@ -22,7 +22,10 @@ class SA_RIBBON_EXPORT SARibbonPannelLayout : public QLayout
 public:
     SARibbonPannelLayout(QWidget* p = 0);
     ~SARibbonPannelLayout();
-    virtual int indexOf(QAction* action) const;
+    int indexByAction(QAction* action) const;
+
+    // 获取ribbonpannel
+    SARibbonPannel* ribbonPannel() const;
 
     // SARibbonPannelLayout additem 无效
     void addItem(QLayoutItem* item) Q_DECL_OVERRIDE;
@@ -43,45 +46,48 @@ public:
     QSize minimumSize() const Q_DECL_OVERRIDE;
     QSize sizeHint() const Q_DECL_OVERRIDE;
 
-    //通过action获取SARibbonPannelItem
+    // 通过action获取SARibbonPannelItem
     SARibbonPannelItem* pannelItem(QAction* action) const;
 
-    //获取最后一个添加的item
+    // 获取最后一个添加的item
     SARibbonPannelItem* lastItem() const;
 
-    //获取最后生成的窗口
+    // 获取最后生成的窗口
     QWidget* lastWidget() const;
 
-    //移动两个item
+    // 移动两个item
     void move(int from, int to);
 
-    //判断是否需要重新布局
+    // 判断是否需要重新布局
     bool isDirty() const;
 
-    //计算大图标的高度
+    //
+    void updateGeomArray();
+
+    // 计算大图标的高度
     static int calcLargeHeight(const QRect& setrect, const SARibbonPannel* pannel);
 
 public:
-    //全局的contentsMargins
+    // 全局的contentsMargins
     static const QMargins& pannelContentsMargins();
     static void setPannelContentsMargins(const QMargins& m);
 
 protected:
-    //布局action
+    // 布局action
     void layoutActions();
 
-    //把action转换为item，对于纯Action，此函数会创建SARibbonToolButton,
-    // rp用于告诉Layout生成什么样的窗口，详细见SARibbonPannelItem::RowProportion
+    // 把action转换为item，对于纯Action，此函数会创建SARibbonToolButton,
+    //  rp用于告诉Layout生成什么样的窗口，详细见SARibbonPannelItem::RowProportion
     SARibbonPannelItem* createItem(QAction* action, SARibbonPannelItem::RowProportion rp = SARibbonPannelItem::None);
     void updateGeomArray(const QRect& setrect);
 
-    //重新计算扩展条码，此函数必须在updateGeomArray函数之后调用
+    // 重新计算扩展条码，此函数必须在updateGeomArray函数之后调用
     void recalcExpandGeomArray(const QRect& setrect);
 
 private:
-    //返回所有列的区域
-    // QMap<int,QRect> columnsGeometry() const;
-    //根据列数，计算窗口的宽度，以及最大宽度
+    // 返回所有列的区域
+    //  QMap<int,QRect> columnsGeometry() const;
+    // 根据列数，计算窗口的宽度，以及最大宽度
     void columnWidthInfo(int colindex, int& width, int& maximum) const;
 
 private:
