@@ -176,9 +176,6 @@ SARibbonControlButton#SARibbonGalleryButtonUp, #SARibbonGalleryButtonDown, #SARi
   border: 1px solid #cee8fc;
 }
 
-SARibbonControlButton#SARibbonBarHidePannelButton {
-  border: 1px solid transparent;
-}
 
 
 
@@ -384,9 +381,4 @@ SAWindowToolButton#SACloseWindowButton:hover {
 }
 SAWindowToolButton#SACloseWindowButton:pressed {
     background-color: #f1707a;
-}
-
-SAWindowToolButton#SARibbonBarHidePannelButton {
-  titlebar-shade-icon: url(:/image/resource/Titlebar_Shade.png);
-  titlebar-unshade-icon: url(:/image/resource/Titlebar_Unshade.png);
 }
