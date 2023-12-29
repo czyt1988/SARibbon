@@ -136,17 +136,19 @@ int sa_customize_datas_apply(const QList< SARibbonCustomizeData >& cds, SARibbon
     return (c);
 }
 
+int sa_customize_datas_reverse(const QList<SARibbonCustomizeData> &cds, SARibbonBar *bar)
+{
+	int c = 0;
+	//todo 支持反向操作
+	return (c);
+}
+
 bool sa_apply_customize_from_xml_file(const QString& filePath, SARibbonBar* bar, SARibbonActionsManager* mgr)
 {
     QFile f(filePath);
 
     if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
         return (false);
-    }
-    if(f.size() == 0)
-    {
-        //文件空算应用成功
-        return true;
     }
     f.seek(0);
     QXmlStreamReader xml(&f);
@@ -389,8 +391,9 @@ public:
     PrivateData(SARibbonCustomizeWidget* p);
     void updateModel();
 
-    QList< SARibbonCustomizeData > mCustomizeDatas;     ///< 记录所有的自定义动作
-    QList< SARibbonCustomizeData > mOldCustomizeDatas;  ///< 记录旧的自定义动作
+    QList< SARibbonCustomizeData > mCustomizeDatasCache;     ///< 缓存记录所有的自定义动作
+    QList< SARibbonCustomizeData > mCustomizeDatasApplied;   ///< 应用后的所有的自定义动作
+    QList< SARibbonCustomizeData > mOldCustomizeDatas;       ///< 记录旧的自定义动作,本地文件缓存
     //创建一个随机id，形如：pre_QDateTime::currentMSecsSinceEpoch_suf
     static QString makeRandomObjName(const QString& pre);
 
@@ -716,9 +719,22 @@ void SARibbonCustomizeWidget::setupActionsManager(SARibbonActionsManager* mgr)
     }
 }
 
-bool SARibbonCustomizeWidget::isChanged() const
+/**
+ * @brief //判断用户是否有要存储的内容，对应save动作
+ * @return
+ */
+bool SARibbonCustomizeWidget::isApplied() const
 {
-    return (d_ptr->mCustomizeDatas.size() > 0);
+    return (d_ptr->mCustomizeDatasApplied.size() > 0);
+}
+
+/**
+ * @brief 判断用户是否有改动内容，对应apply动作
+ * @return
+ */
+bool SARibbonCustomizeWidget::isCached() const
+{
+    return (d_ptr->mCustomizeDatasCache.size() > 0);
 }
 
 /**
@@ -757,8 +773,8 @@ void SARibbonCustomizeWidget::updateModel()
  */
 void SARibbonCustomizeWidget::updateModel(RibbonTreeShowType type)
 {
-    d_ptr->mShowType = type;
-    d_ptr->updateModel();
+	d_ptr->mShowType = type;
+	d_ptr->updateModel();
 }
 
 /**
@@ -768,8 +784,17 @@ void SARibbonCustomizeWidget::updateModel(RibbonTreeShowType type)
  */
 bool SARibbonCustomizeWidget::applys()
 {
-    simplify();
-    return (sa_customize_datas_apply(d_ptr->mCustomizeDatas, d_ptr->mRibbonBar) > 0);
+	simplify();
+	if (sa_customize_datas_apply(d_ptr->mCustomizeDatasCache, d_ptr->mRibbonBar) > 0)
+	{
+		//将临时操作存入已应用操作，并清空临时操作
+		makeActionsApplied();
+		clearCache();
+		return true;
+	}
+	else{
+		return false;
+	}
 }
 
 /**
@@ -814,7 +839,11 @@ bool SARibbonCustomizeWidget::toXml(QXmlStreamWriter* xml) const
 {
     QList< SARibbonCustomizeData > res;
 
-    res = d_ptr->mOldCustomizeDatas + d_ptr->mCustomizeDatas;
+	if(isApplied())
+		res << d_ptr->mCustomizeDatasApplied;
+	if(isCached())
+		res << d_ptr->mCustomizeDatasCache;
+
     res = SARibbonCustomizeData::simplify(res);
     return (sa_customize_datas_to_xml(xml, res));
 }
@@ -914,13 +943,38 @@ bool SARibbonCustomizeWidget::fromXml(QXmlStreamReader* xml, SARibbonBar* bar, S
 }
 
 /**
- * @brief 清除所有动作
+ * @brief 清除已应用的动作
+ */
+void SARibbonCustomizeWidget::makeActionsApplied()
+{
+    d_ptr->mCustomizeDatasApplied << d_ptr->mCustomizeDatasCache;
+}
+
+/**
+ * @brief 清除applied的动作，cancel操作后需要清空已应用的动作
+ */
+void SARibbonCustomizeWidget::clearApplied()
+{
+    d_ptr->mCustomizeDatasApplied.clear();
+}
+
+/**
+ * @brief 清除缓存动作
  *
  * 在执行applys函数后，如果要继续调用，应该clear，否则会导致异常
  */
+void SARibbonCustomizeWidget::clearCache()
+{
+    d_ptr->mCustomizeDatasCache.clear();
+}
+
+/**
+ * @brief 清除所有动作，不包含本地读取的数据
+ */
 void SARibbonCustomizeWidget::clear()
 {
-    d_ptr->mCustomizeDatas.clear();
+	clearApplied();
+	clearCache();
 }
 
 /**
@@ -928,7 +982,7 @@ void SARibbonCustomizeWidget::clear()
  */
 void SARibbonCustomizeWidget::simplify()
 {
-    d_ptr->mCustomizeDatas = SARibbonCustomizeData::simplify(d_ptr->mCustomizeDatas);
+    d_ptr->mCustomizeDatasCache = SARibbonCustomizeData::simplify(d_ptr->mCustomizeDatasCache);
 }
 
 /**
@@ -1020,7 +1074,7 @@ void SARibbonCustomizeWidget::setSelectItem(QStandardItem* item, bool ensureVisi
     }
     if (m) {
         m->clearSelection();
-        m->select(item->index(), QItemSelectionModel::Select);
+        m->setCurrentIndex(item->index(), QItemSelectionModel::SelectCurrent);
     }
     if (ensureVisible) {
         ui->treeViewResult->scrollTo(item->index());
@@ -1103,7 +1157,7 @@ void SARibbonCustomizeWidget::onPushButtonNewCategoryClicked()
                                                                                   SARibbonCustomizeWidget::PrivateData::makeRandomObjName(
                                                                                       "category"));
 
-    d_ptr->mCustomizeDatas.append(d);
+    d_ptr->mCustomizeDatasCache.append(d);
     ni->setData(true, SARibbonCustomizeWidget::CanCustomizeRole);  //有CustomizeRole，必有CanCustomizeRole
     ni->setData(true, SARibbonCustomizeWidget::CustomizeRole);
     ni->setData(d.categoryObjNameValue, SARibbonCustomizeWidget::CustomizeObjNameRole);
@@ -1149,7 +1203,7 @@ void SARibbonCustomizeWidget::onPushButtonNewPannelClicked()
                                                                                 SARibbonCustomizeWidget::PrivateData::makeRandomObjName(
                                                                                     "pannel"));
 
-    d_ptr->mCustomizeDatas.append(d);
+    d_ptr->mCustomizeDatasCache.append(d);
     ni->setData(true, SARibbonCustomizeWidget::CanCustomizeRole);  //有CustomizeRole，必有CanCustomizeRole
     ni->setData(true, SARibbonCustomizeWidget::CustomizeRole);
     ni->setData(d.pannelObjNameValue, SARibbonCustomizeWidget::CustomizeObjNameRole);
@@ -1177,12 +1231,12 @@ void SARibbonCustomizeWidget::onPushButtonRenameClicked()
         //改Category名
         QString cateObjName     = d_ptr->itemObjectName(item);
         SARibbonCustomizeData d = SARibbonCustomizeData::makeRenameCategoryCustomizeData(text, cateObjName);
-        d_ptr->mCustomizeDatas.append(d);
+        d_ptr->mCustomizeDatasCache.append(d);
     } else if (1 == level) {
         QString cateObjName     = d_ptr->itemObjectName(item->parent());
         QString pannelObjName   = d_ptr->itemObjectName(item);
         SARibbonCustomizeData d = SARibbonCustomizeData::makeRenamePannelCustomizeData(text, cateObjName, pannelObjName);
-        d_ptr->mCustomizeDatas.append(d);
+        d_ptr->mCustomizeDatasCache.append(d);
     } else {
         // action 不允许改名
         return;
@@ -1217,7 +1271,7 @@ void SARibbonCustomizeWidget::onPushButtonAddClicked()
                                                                                 categoryObjName,
                                                                                 pannelObjName);
 
-    d_ptr->mCustomizeDatas.append(d);
+    d_ptr->mCustomizeDatasCache.append(d);
 
     QStandardItem* actItem = new QStandardItem(act->icon(), act->text());
 
@@ -1244,13 +1298,13 @@ void SARibbonCustomizeWidget::onPushButtonDeleteClicked()
     if (0 == level) {
         //删除category
         SARibbonCustomizeData d = SARibbonCustomizeData::makeRemoveCategoryCustomizeData(d_ptr->itemObjectName(item));
-        d_ptr->mCustomizeDatas.append(d);
+        d_ptr->mCustomizeDatasCache.append(d);
     } else if (1 == level) {
         //删除pannel
         QString catObjName      = d_ptr->itemObjectName(item->parent());
         QString pannelObjName   = d_ptr->itemObjectName(item);
         SARibbonCustomizeData d = SARibbonCustomizeData::makeRemovePannelCustomizeData(catObjName, pannelObjName);
-        d_ptr->mCustomizeDatas.append(d);
+        d_ptr->mCustomizeDatasCache.append(d);
     } else if (2 == level) {
         //删除Action
         QString catObjName    = d_ptr->itemObjectName(item->parent()->parent());
@@ -1265,7 +1319,7 @@ void SARibbonCustomizeWidget::onPushButtonDeleteClicked()
                                                                                        pannelObjName,
                                                                                        key,
                                                                                        d_ptr->mActionMgr);
-        d_ptr->mCustomizeDatas.append(d);
+        d_ptr->mCustomizeDatasCache.append(d);
     }
     //执行删除操作
     removeItem(item);
@@ -1311,7 +1365,7 @@ void SARibbonCustomizeWidget::onToolButtonUpClicked()
     if (0 == level) {
         //移动category
         SARibbonCustomizeData d = SARibbonCustomizeData::makeChangeCategoryOrderCustomizeData(d_ptr->itemObjectName(item), -1);
-        d_ptr->mCustomizeDatas.append(d);
+        d_ptr->mCustomizeDatasCache.append(d);
         int r = item->row();
         item  = d_ptr->mRibbonModel->takeItem(r);
         d_ptr->mRibbonModel->removeRow(r);
@@ -1321,7 +1375,7 @@ void SARibbonCustomizeWidget::onToolButtonUpClicked()
         SARibbonCustomizeData d = SARibbonCustomizeData::makeChangePannelOrderCustomizeData(d_ptr->itemObjectName(paritem),
                                                                                             d_ptr->itemObjectName(item),
                                                                                             -1);
-        d_ptr->mCustomizeDatas.append(d);
+        d_ptr->mCustomizeDatasCache.append(d);
         int r = item->row();
         item  = paritem->takeChild(r);
         paritem->removeRow(r);
@@ -1339,12 +1393,16 @@ void SARibbonCustomizeWidget::onToolButtonUpClicked()
                                                                                             key,
                                                                                             d_ptr->mActionMgr,
                                                                                             -1);
-        d_ptr->mCustomizeDatas.append(d);
+        d_ptr->mCustomizeDatasCache.append(d);
         int r = item->row();
         item  = pannelItem->takeChild(r);
         pannelItem->removeRow(r);
         pannelItem->insertRow(r - 1, item);
     }
+
+	//保持焦点，方便连续操作
+	setSelectItem(item);
+	onTreeViewResultClicked(item->index());
 }
 
 void SARibbonCustomizeWidget::onToolButtonDownClicked()
@@ -1369,7 +1427,7 @@ void SARibbonCustomizeWidget::onToolButtonDownClicked()
     if (0 == level) {
         //移动category
         SARibbonCustomizeData d = SARibbonCustomizeData::makeChangeCategoryOrderCustomizeData(d_ptr->itemObjectName(item), 1);
-        d_ptr->mCustomizeDatas.append(d);
+        d_ptr->mCustomizeDatasCache.append(d);
         int r = item->row();
         item  = d_ptr->mRibbonModel->takeItem(item->row());
         d_ptr->mRibbonModel->removeRow(r);
@@ -1379,7 +1437,7 @@ void SARibbonCustomizeWidget::onToolButtonDownClicked()
         SARibbonCustomizeData d = SARibbonCustomizeData::makeChangePannelOrderCustomizeData(d_ptr->itemObjectName(paritem),
                                                                                             d_ptr->itemObjectName(item),
                                                                                             1);
-        d_ptr->mCustomizeDatas.append(d);
+        d_ptr->mCustomizeDatasCache.append(d);
         int r = item->row();
         item  = paritem->takeChild(r);
         paritem->removeRow(r);
@@ -1397,12 +1455,16 @@ void SARibbonCustomizeWidget::onToolButtonDownClicked()
                                                                                             key,
                                                                                             d_ptr->mActionMgr,
                                                                                             -1);
-        d_ptr->mCustomizeDatas.append(d);
+        d_ptr->mCustomizeDatasCache.append(d);
         int r = item->row();
         item  = pannelItem->takeChild(r);
         pannelItem->removeRow(r);
         pannelItem->insertRow(r + 1, item);
     }
+
+	//保持焦点，方便连续操作
+	setSelectItem(item);
+	onTreeViewResultClicked(item->index());
 }
 
 void SARibbonCustomizeWidget::onItemChanged(QStandardItem* item)
@@ -1416,7 +1478,7 @@ void SARibbonCustomizeWidget::onItemChanged(QStandardItem* item)
         if (item->isCheckable()) {
             QString objname = d_ptr->itemObjectName(item);
             SARibbonCustomizeData d = SARibbonCustomizeData::makeVisibleCategoryCustomizeData(objname, item->checkState() == Qt::Checked);
-            d_ptr->mCustomizeDatas.append(d);
+            d_ptr->mCustomizeDatasCache.append(d);
         }
     }
 }
