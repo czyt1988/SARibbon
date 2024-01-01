@@ -1,7 +1,8 @@
 ﻿#ifndef SARIBBONGLOBAL_H
 #define SARIBBONGLOBAL_H
-#include <qglobal.h>
 #include <memory>
+#include <QtGlobal>
+#include <QObject>
 
 /**
   @file  SARibbonGlobal.h
@@ -9,6 +10,12 @@
   @note My native language is not English, and most of the translation of documents is machine translation
 
   版本记录(change log):
+  - 2024-01-01 -> 2.0.0
+  SARibbonPannel的文字使用SARibbonPannelLabel(QLabel)显示，可以通过qss进行自定义
+  SARibbonBar的样式RibbonStyle改为QFlags
+  SARibbonBar添加了相关的迭代函数
+  尺寸的计算重新进行了调整
+
   - 2023-12-29 -> 1.1.2
   合并了lixinchang的修改(https://gitee.com/lixinchang)
   添加了SARibbonControlToolButton，ControlBar不再使用QToolButton，避免和QToolButton的qss冲突
@@ -115,19 +122,19 @@
  * @def ribbon的数字版本 {MAJ}.MIN.PAT
  */
 #ifndef SA_RIBBON_BAR_VERSION_MAJ
-#define SA_RIBBON_BAR_VERSION_MAJ 1
+#define SA_RIBBON_BAR_VERSION_MAJ 2
 #endif
 /**
  * @def ribbon的数字版本 MAJ.{MIN}.PAT
  */
 #ifndef SA_RIBBON_BAR_VERSION_MIN
-#define SA_RIBBON_BAR_VERSION_MIN 1
+#define SA_RIBBON_BAR_VERSION_MIN 0
 #endif
 /**
  * @def ribbon的数字版本 MAJ.MIN.{PAT}
  */
 #ifndef SA_RIBBON_BAR_VERSION_PAT
-#define SA_RIBBON_BAR_VERSION_PAT 2
+#define SA_RIBBON_BAR_VERSION_PAT 0
 #endif
 
 #ifndef SA_RIBBON_BAR_NO_EXPORT

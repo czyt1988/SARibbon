@@ -165,7 +165,7 @@ SARibbonControlToolButton:checked {
 }
 
 SARibbonControlToolButton:hover {
-  color: white;
+  color: black;
   border: 0.05em solid #888888;/*{ControlToolButton.BorderColor:hover}*/
   background-color: #a0a0a0;/*{ControlToolButton.BKColor:hover}*/
 }

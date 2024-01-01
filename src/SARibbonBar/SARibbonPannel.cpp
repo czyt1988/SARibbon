@@ -556,7 +556,7 @@ QSize SARibbonPannel::sizeHint() const
         QSize laySize = layout()->sizeHint();
         shWidth       = laySize.width();
     }
-    if (isShowTitle()) {
+    if (isEnableShowTitle()) {
         if (d_ptr->m_label) {
             QSize titleSize = d_ptr->m_label->fontMetrics().size(Qt::TextShowMnemonic, pannelName());
             if (shWidth < (titleSize.width() + 4)) {
@@ -599,7 +599,6 @@ bool SARibbonPannel::isExpanding() const
 void SARibbonPannel::setTitleHeight(int h)
 {
     if (SARibbonPannelLayout* lay = pannelLayout()) {
-
         lay->setPannelTitleHeight(h);
     }
 }
@@ -620,12 +619,23 @@ int SARibbonPannel::titleHeight() const
  * @brief 判断是否显示标题，只有标题的高度被设置，才会显示标题
  * @return
  */
-bool SARibbonPannel::isShowTitle() const
+bool SARibbonPannel::isEnableShowTitle() const
 {
     if (SARibbonPannelLayout* lay = pannelLayout()) {
-        return lay->isHavePannelTitle();
+        return lay->isEnableShowPannelTitle();
     }
     return false;
+}
+
+/**
+ * @brief 是否显示标题，显示标题后，标题的高度需要设置，默认高度为15
+ * @param on
+ */
+void SARibbonPannel::setEnableShowTitle(bool on)
+{
+    if (SARibbonPannelLayout* lay = pannelLayout()) {
+        return lay->setEnableShowPannelTitle(on);
+    }
 }
 
 /**

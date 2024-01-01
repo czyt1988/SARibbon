@@ -34,8 +34,6 @@ public:
     bool removePannel(SARibbonPannel* pannel);
     SARibbonCategory* ribbonCategory();
     const SARibbonCategory* ribbonCategory() const;
-    void setRibbonPannelLayoutMode(SARibbonPannel::PannelLayoutMode m);
-    SARibbonPannel::PannelLayoutMode ribbonPannelLayoutMode() const;
 
     // 返回所有的Pannel
     QList< SARibbonPannel* > pannelList();
@@ -46,8 +44,10 @@ public:
     void doWheelEvent(QWheelEvent* event);
 
 public:
-    bool mIsContextCategory { false };  ///< 标记是否是上下文标签
-    bool mIsCanCustomize { true };      ///< 标记是否可以自定义
+    bool mEnableShowPannelTitle { true };  ///< 是否运行pannel的标题栏显示
+    int mPannelTitleHeight { 15 };         ///< pannel的标题栏默认高度
+    bool mIsContextCategory { false };     ///< 标记是否是上下文标签
+    bool mIsCanCustomize { true };         ///< 标记是否可以自定义
     SARibbonPannel::PannelLayoutMode mDefaultPannelLayoutMode { SARibbonPannel::ThreeRowMode };
 };
 SARibbonCategory::PrivateData::PrivateData(SARibbonCategory* p) : q_ptr(p)
@@ -57,7 +57,8 @@ SARibbonCategory::PrivateData::PrivateData(SARibbonCategory* p) : q_ptr(p)
 SARibbonPannel* SARibbonCategory::PrivateData::addPannel(const QString& title)
 {
     if (SARibbonCategoryLayout* lay = q_ptr->categoryLayout()) {
-        return (insertPannel(title, lay->pannelCount()));
+        SARibbonPannel* p = insertPannel(title, lay->pannelCount());
+        return p;
     }
     return nullptr;
 }
@@ -75,10 +76,17 @@ SARibbonPannel* SARibbonCategory::PrivateData::insertPannel(const QString& title
 void SARibbonCategory::PrivateData::addPannel(SARibbonPannel* pannel)
 {
     if (SARibbonCategoryLayout* lay = q_ptr->categoryLayout()) {
-        return (insertPannel(lay->pannelCount(), pannel));
+        insertPannel(lay->pannelCount(), pannel);
     }
 }
 
+/**
+ * @brief 插入pannel到layout
+ *
+ * 所有的添加操作最终会调用此函数
+ * @param index
+ * @param pannel
+ */
 void SARibbonCategory::PrivateData::insertPannel(int index, SARibbonPannel* pannel)
 {
     if (nullptr == pannel) {
@@ -91,7 +99,10 @@ void SARibbonCategory::PrivateData::insertPannel(int index, SARibbonPannel* pann
     if (pannel->parentWidget() != q_ptr) {
         pannel->setParent(q_ptr);
     }
-    pannel->setPannelLayoutMode(ribbonPannelLayoutMode());
+    // 同步一些状态
+    pannel->setEnableShowTitle(mEnableShowPannelTitle);
+    pannel->setTitleHeight(mPannelTitleHeight);
+    pannel->setPannelLayoutMode(mDefaultPannelLayoutMode);
     index = qMax(0, index);
     index = qMin(lay->pannelCount(), index);
     lay->insertPannel(index, pannel);
@@ -133,36 +144,6 @@ SARibbonCategory* SARibbonCategory::PrivateData::ribbonCategory()
 const SARibbonCategory* SARibbonCategory::PrivateData::ribbonCategory() const
 {
     return (q_ptr);
-}
-
-/**
- * @brief 设置pannel的模式
- *
- * 在@ref SARibbonBar调用@ref SARibbonBar::setRibbonStyle 函数时，会对所有的SARibbonCategory调用此函数
- * 把新的SARibbonPannel::PannelLayoutMode设置进去
- *
- * 此函数为SARibbonCategory::setRibbonPannelLayoutMode的代理，
- * 在SARibbonCategory类中，此函数为protected，主要在SARibbonBar::setRibbonStyle时才会触发
- * @param m
- */
-void SARibbonCategory::PrivateData::setRibbonPannelLayoutMode(SARibbonPannel::PannelLayoutMode m)
-{
-    if (mDefaultPannelLayoutMode == m) {
-        return;
-    }
-
-    mDefaultPannelLayoutMode    = m;
-    QList< SARibbonPannel* > ps = pannelList();
-
-    for (SARibbonPannel* p : qAsConst(ps)) {
-        p->setPannelLayoutMode(m);
-    }
-    updateItemGeometry();
-}
-
-SARibbonPannel::PannelLayoutMode SARibbonCategory::PrivateData::ribbonPannelLayoutMode() const
-{
-    return (mDefaultPannelLayoutMode);
 }
 
 void SARibbonCategory::PrivateData::updateItemGeometry()
@@ -260,18 +241,6 @@ void SARibbonCategory::setCategoryName(const QString& title)
     setWindowTitle(title);
 }
 
-/**
- * @brief 设置pannel的模式
- *
- * 在@ref SARibbonBar 调用@ref SARibbonBar::setRibbonStyle 函数时，会对所有的SARibbonCategory调用此函数
- * 把新的SARibbonPannel::PannelLayoutMode设置进去
- * @param m
- */
-void SARibbonCategory::setRibbonPannelLayoutMode(SARibbonPannel::PannelLayoutMode m)
-{
-    d_ptr->setRibbonPannelLayoutMode(m);
-}
-
 bool SARibbonCategory::event(QEvent* e)
 {
 #if SA_DEBUG_PRINT_EVENT
@@ -282,9 +251,30 @@ bool SARibbonCategory::event(QEvent* e)
     return QWidget::event(e);
 }
 
+/**
+ * @brief pannel的模式
+ * @return
+ */
 SARibbonPannel::PannelLayoutMode SARibbonCategory::ribbonPannelLayoutMode() const
 {
-    return (d_ptr->ribbonPannelLayoutMode());
+    return (d_ptr->mDefaultPannelLayoutMode);
+}
+
+/**
+ * @brief 设置pannel的模式
+ *
+ * 在@ref SARibbonBar 调用@ref SARibbonBar::setRibbonStyle 函数时，会对所有的SARibbonCategory调用此函数
+ * 把新的SARibbonPannel::PannelLayoutMode设置进去
+ * @param m
+ */
+void SARibbonCategory::setRibbonPannelLayoutMode(SARibbonPannel::PannelLayoutMode m)
+{
+    d_ptr->mDefaultPannelLayoutMode = m;
+    iterate([ m ](SARibbonPannel* p) -> bool {
+        p->setPannelLayoutMode(m);
+        return true;
+    });
+    updateItemGeometry();
 }
 
 /**
@@ -508,6 +498,49 @@ void SARibbonCategory::setCanCustomize(bool b)
 }
 
 /**
+ * @brief pannel标题栏的高度
+ * @return
+ */
+int SARibbonCategory::pannelTitleHeight() const
+{
+    return d_ptr->mPannelTitleHeight;
+}
+/**
+ * @brief 设置pannel的高度
+ * @param h
+ */
+void SARibbonCategory::setPannelTitleHeight(int h)
+{
+    d_ptr->mPannelTitleHeight = h;
+    iterate([ h ](SARibbonPannel* p) -> bool {
+        p->setTitleHeight(h);
+        return true;
+    });
+}
+
+/**
+ * @brief 是否pannel显示标题栏
+ * @return
+ */
+bool SARibbonCategory::isEnableShowPannelTitle() const
+{
+    return d_ptr->mEnableShowPannelTitle;
+}
+
+/**
+ * @brief 设置显示pannel标题
+ * @param on
+ */
+void SARibbonCategory::setEnableShowPannelTitle(bool on)
+{
+    d_ptr->mEnableShowPannelTitle = on;
+    iterate([ on ](SARibbonPannel* p) -> bool {
+        p->setEnableShowTitle(on);
+        return true;
+    });
+}
+
+/**
  * @brief 获取对应的ribbonbar
  * @return 如果没有加入ribbonbar的管理，此值为null
  */
@@ -536,6 +569,22 @@ void SARibbonCategory::updateItemGeometry()
     qDebug() << "SARibbonCategory name=" << categoryName() << " updateItemGeometry";
 #endif
     d_ptr->updateItemGeometry();
+}
+
+/**
+ * @brief 此函数会遍历Category下的所有pannel,执行函数指针
+ * @param fp 函数指针返回false则停止迭代
+ * @return 返回false代表没有迭代完所有的category，中途接收到回调函数的false返回而中断迭代
+ */
+bool SARibbonCategory::iterate(FpPannelIterate fp)
+{
+    const QList< SARibbonPannel* > ps = pannelList();
+    for (SARibbonPannel* p : ps) {
+        if (!fp(p)) {
+            return false;
+        }
+    }
+    return true;
 }
 
 /**
@@ -587,10 +636,11 @@ void SARibbonCategory::changeEvent(QEvent* event)
 #if SA_DEBUG_PRINT_SIZE_HINT
         qDebug() << "SARibbonCategory changeEvent(FontChange),categoryName=" << categoryName();
 #endif
-        QList< SARibbonPannel* > pannels = pannelList();
-        for (SARibbonPannel* p : qAsConst(pannels)) {
-            p->setFont(font());
-        }
+        QFont f = font();
+        iterate([ f ](SARibbonPannel* p) -> bool {
+            p->setFont(f);
+            return true;
+        });
         if (layout()) {
             layout()->invalidate();
         }

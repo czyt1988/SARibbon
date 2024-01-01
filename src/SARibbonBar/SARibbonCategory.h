@@ -25,6 +25,9 @@ class SA_RIBBON_EXPORT SARibbonCategory : public QWidget
     Q_PROPERTY(bool isCanCustomize READ isCanCustomize WRITE setCanCustomize)
     Q_PROPERTY(QString categoryName READ categoryName WRITE setCategoryName)
 public:
+    using FpPannelIterate = std::function< bool(SARibbonPannel*) >;
+
+public:
     SARibbonCategory(QWidget* p = nullptr);
     SARibbonCategory(const QString& name, QWidget* p = nullptr);
     ~SARibbonCategory();
@@ -35,8 +38,9 @@ public:
     // 设置category名字，等同setWindowTitle
     void setCategoryName(const QString& title);
 
-    // 布局模式
+    // 设置pannel的模式
     SARibbonPannel::PannelLayoutMode ribbonPannelLayoutMode() const;
+    void setRibbonPannelLayoutMode(SARibbonPannel::PannelLayoutMode m);
 
     // 添加pannel
     SARibbonPannel* addPannel(const QString& title);
@@ -88,15 +92,28 @@ public:
     bool isCanCustomize() const;
     void setCanCustomize(bool b);
 
+    // 设置pannel的标题栏高度
+    int pannelTitleHeight() const;
+    void setPannelTitleHeight(int h);
+
+    // 设置pannel是否显示标题栏
+    bool isEnableShowPannelTitle() const;
+    void setEnableShowPannelTitle(bool on);
+
+    // 设置Category的对齐方式
+    void setCategoryAlignment(SARibbonAlignment al);
+    SARibbonAlignment getCategoryAlignment() const;
+
     // 获取对应的ribbonbar，如果没有加入ribbonbar的管理，此值为null
     SARibbonBar* ribbonBar() const;
 
     // 刷新category的尺寸布局
     void updateItemGeometry();
 
+    // 此函数会遍历Category下的所有pannel,执行函数指针，函数指针返回false则停止迭代
+    bool iterate(FpPannelIterate fp);
+
 protected:
-    // 设置pannel的模式
-    void setRibbonPannelLayoutMode(SARibbonPannel::PannelLayoutMode m);
     virtual bool event(QEvent* e) Q_DECL_OVERRIDE;
     // 处理滚轮事件
     void wheelEvent(QWheelEvent* event) Q_DECL_OVERRIDE;
@@ -108,10 +125,6 @@ protected:
 
     // 获取SARibbonCategoryLayoutlayout
     SARibbonCategoryLayout* categoryLayout() const;
-
-    // 设置Category的对齐方式
-    void setCategoryAlignment(SARibbonAlignment al);
-    SARibbonAlignment getCategoryAlignment() const;
 };
 
 /**

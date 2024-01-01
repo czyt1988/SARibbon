@@ -208,31 +208,45 @@ void MainWindow::onShowContextCategory(bool on)
 void MainWindow::onStyleClicked(int id)
 {
 
-    SARibbonBar::RibbonStyle ribbonStyle = static_cast< SARibbonBar::RibbonStyle >(id);
+    SARibbonBar::RibbonStyles ribbonStyle = static_cast< SARibbonBar::RibbonStyles >(id);
     ribbonBar()->setRibbonStyle(ribbonStyle);
     mActionWordWrap->setChecked(SARibbonToolButton::isEnableWordWrap());
     switch (ribbonStyle) {
     case SARibbonBar::RibbonStyleLooseThreeRow:
+        // cn:"LooseThreeRow"样式的文字显示是换行的，同时也会显示标题栏，你也可以通过SARibbonBar::setEnableWordWrap来控制按钮是否换行显示，
+        // 可以通过SARibbonBar::setEnableShowPannelTitle控制标题栏是否显示
         mTextedit->append(
-                tr("\nchange ribbon style to office style,The standard office style text display is line wrapped, "
-                   "and you can also control whether it wrap through SARibbonToolButton::setEnableWordWrap"));  // cn:标准的office样式的文字显示是换行的，你也可以通过SARibbonToolButton::setEnableWordWrap来控制它是否换行
-        mTextedit->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::OfficeStyle);"));
+            tr("\nThe text display of the \"LooseThreeRow\" style is word wrap and also displays the title bar. "
+               "You can also control whether the button is line breaking through SARibbonBar::setEnableWordWrap,"
+               "and whether the title bar is displayed through SARibbonBar::setEnableShowPannelTitle"));
+        mTextedit->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::RibbonStyleLooseThreeRow);"));
         break;
     case SARibbonBar::RibbonStyleLooseTwoRow:
+        // cn:"LooseThreeRow"样式的文字显示是不换行的，同时也会显示标题栏，你也可以通过SARibbonBar::setEnableWordWrap来控制按钮是否换行显示，
+        // 可以通过SARibbonBar::setEnableShowPannelTitle控制标题栏是否显示
         mTextedit->append(
-                tr("\nchange ribbon style to office style 2 row,All text in 2-line mode does not wrap, and you "
-                   "can also control whether it wraps through SARibbonToolButton: setEnableWordWrap"));  // cn:所有2行模式的文字都是不换行的，你也可以通过SARibbonToolButton::setEnableWordWrap来控制它是否换行
-        mTextedit->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::OfficeStyleTwoRow);"));
+            tr("\nThe text display of the \"LooseTwoRow\" style is not word wrap and also displays the title bar. "
+               "You can also control whether the button is line breaking through SARibbonBar::setEnableWordWrap,"
+               "and whether the title bar is displayed through SARibbonBar::setEnableShowPannelTitle"));
+        mTextedit->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::RibbonStyleLooseTwoRow);"));
         break;
     case SARibbonBar::RibbonStyleCompactThreeRow:
-        mTextedit->append(tr("\nchange ribbon style to wps style,The standard wps style text display is line wrapped, "
-                             "and you can also control whether it wrap through SARibbonToolButton::setEnableWordWrap"));  // cn:标准的wps样式的文字显示是换行的，你也可以通过SARibbonToolButton::setEnableWordWrap来控制它是否换行
-        mTextedit->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::OfficeStyleTwoRow);"));
+        // cn:"CompactThreeRow"样式的文字显示是换行的，不会显示标题栏，你也可以通过SARibbonBar::setEnableWordWrap来控制按钮是否换行显示，
+        // 可以通过SARibbonBar::setEnableShowPannelTitle控制标题栏是否显示
+        mTextedit->append(
+            tr("\nThe text display of the \"LooseThreeRow\" style is word wrap and not displays the title bar. "
+               "You can also control whether the button is line breaking through SARibbonBar::setEnableWordWrap,"
+               "and whether the title bar is displayed through SARibbonBar::setEnableShowPannelTitle"));
+        mTextedit->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::RibbonStyleCompactThreeRow);"));
         break;
     case SARibbonBar::RibbonStyleCompactTwoRow:
-        mTextedit->append(tr("\nchange ribbon style to wps style 2 row,All text in 2-line mode does not wrap, and you "
-                             "can also control whether it wraps through SARibbonToolButton: setEnableWordWrap"));  // cn:所有2行模式的文字都是不换行的，你也可以通过SARibbonToolButton::setEnableWordWrap来控制它是否换行
-        mTextedit->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::OfficeStyleTwoRow);"));
+        // cn:"CompactTwoRow"样式的文字显示是不换行的，不会显示标题栏，你也可以通过SARibbonBar::setEnableWordWrap来控制按钮是否换行显示，
+        // 可以通过SARibbonBar::setEnableShowPannelTitle控制标题栏是否显示
+        mTextedit->append(
+            tr("\nThe text display of the \"CompactTwoRow\" style is not word wrap and not displays the title bar. "
+               "You can also control whether the button is line breaking through SARibbonBar::setEnableWordWrap,"
+               "and whether the title bar is displayed through SARibbonBar::setEnableShowPannelTitle"));
+        mTextedit->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::RibbonStyleCompactTwoRow);"));
         break;
     default:
         break;
@@ -243,7 +257,10 @@ void MainWindow::onActionCustomizeTriggered(bool b)
 {
     Q_UNUSED(b);
     if (nullptr == mWidgetForCustomize) {
-        mWidgetForCustomize = new SARibbonCustomizeWidget(this, this, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint | Qt::Dialog);
+        mWidgetForCustomize = new SARibbonCustomizeWidget(this,
+                                                          this,
+                                                          Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint
+                                                              | Qt::Dialog);
         mWidgetForCustomize->setWindowModality(Qt::ApplicationModal);  // 设置阻塞类型
         mWidgetForCustomize->setAttribute(Qt::WA_ShowModal, true);     // 属性设置 true:模态 false:非模态
         mWidgetForCustomize->setupActionsManager(mActionsManager);
@@ -295,7 +312,7 @@ void MainWindow::onActionHelpTriggered()
                                 "\n Author:czy"
                                 "\n Email:czy.t@163.com"
                                 "\n ===============")
-                                     .arg(SARibbonBar::versionString()));
+                                 .arg(SARibbonBar::versionString()));
 }
 
 void MainWindow::onActionRemoveAppBtnTriggered(bool b)
@@ -427,7 +444,7 @@ void MainWindow::onColorButtonColorClicked(const QColor& c, bool on)
 void MainWindow::onRibbonThemeComboBoxCurrentIndexChanged(int index)
 {
     SARibbonMainWindow::RibbonTheme t = static_cast< SARibbonMainWindow::RibbonTheme >(
-            mComboboxRibbonTheme->itemData(index).toInt());
+        mComboboxRibbonTheme->itemData(index).toInt());
     setRibbonTheme(t);
 }
 
@@ -588,7 +605,10 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     mComboboxRibbonTheme->addItem("Theme Office2021 Blue", SARibbonMainWindow::RibbonThemeOffice2021Blue);
     mComboboxRibbonTheme->addItem("Theme Dark", SARibbonMainWindow::RibbonThemeDark);
     mComboboxRibbonTheme->setCurrentIndex(mComboboxRibbonTheme->findData(static_cast< int >(ribbonTheme())));
-    connect(mComboboxRibbonTheme, QOverload< int >::of(&SARibbonComboBox::currentIndexChanged), this, &MainWindow::onRibbonThemeComboBoxCurrentIndexChanged);
+    connect(mComboboxRibbonTheme,
+            QOverload< int >::of(&SARibbonComboBox::currentIndexChanged),
+            this,
+            &MainWindow::onRibbonThemeComboBoxCurrentIndexChanged);
     pannelStyle->addSmallWidget(mComboboxRibbonTheme);
 
     SARibbonCheckBox* checkBox = new SARibbonCheckBox(this);
@@ -802,13 +822,15 @@ void MainWindow::createCategoryOther(SARibbonCategory* page)
     galleryActions.append(lambdaCreateGalleryAction("File Error", ":/gallery-icon/icon/gallery/File-Error.svg"));
     galleryActions.append(lambdaCreateGalleryAction("File Read Only", ":/gallery-icon/icon/gallery/File-Readonly.svg"));
     galleryActions.append(lambdaCreateGalleryAction("File Settings", ":/gallery-icon/icon/gallery/File-Settings.svg"));
-    galleryActions.append(lambdaCreateGalleryAction("Presentation File", ":/gallery-icon/icon/gallery/Presentation-File.svg"));
+    galleryActions.append(
+        lambdaCreateGalleryAction("Presentation File", ":/gallery-icon/icon/gallery/Presentation-File.svg"));
     SARibbonGalleryGroup* group1 = gallery->addCategoryActions(tr("Files"), galleryActions);
     group1->setGalleryGroupStyle(SARibbonGalleryGroup::IconWithWordWrapText);
     group1->setGridMinimumWidth(80);
     galleryActions.clear();
     galleryActions.append(lambdaCreateGalleryAction("Photoshop", ":/gallery-icon/icon/gallery/Photoshop.svg"));
-    galleryActions.append(lambdaCreateGalleryAction("Internet-Explorer", ":/gallery-icon/icon/gallery/Internet-Explorer.svg"));
+    galleryActions.append(
+        lambdaCreateGalleryAction("Internet-Explorer", ":/gallery-icon/icon/gallery/Internet-Explorer.svg"));
     galleryActions.append(lambdaCreateGalleryAction("Illustrator", ":/gallery-icon/icon/gallery/Illustrator.svg"));
     galleryActions.append(lambdaCreateGalleryAction("Google-Maps", ":/gallery-icon/icon/gallery/Google-Maps.svg"));
     galleryActions.append(lambdaCreateGalleryAction("Adobe", ":/gallery-icon/icon/gallery/Adobe.svg"));
@@ -830,7 +852,9 @@ void MainWindow::createCategoryOther(SARibbonCategory* page)
     connect(actionRemoveAppBtn, &QAction::toggled, this, &MainWindow::onActionRemoveAppBtnTriggered);
     pannel2->addLargeAction(actionRemoveAppBtn);
 
-    QAction* actionLongText = createAction(tr("show very long text in a button,balabalabala etc"), ":/icon/icon/long-text.svg", "long-text");
+    QAction* actionLongText = createAction(tr("show very long text in a button,balabalabala etc"),
+                                           ":/icon/icon/long-text.svg",
+                                           "long-text");
     pannel2->addLargeAction(actionLongText);
 
     SARibbonPannel* pannelStyle = new SARibbonPannel(tr("style"));
@@ -855,7 +879,9 @@ void MainWindow::createCategoryOther(SARibbonCategory* page)
     pannelUtf8->setObjectName("CategoryOther-pannelUtf8");
     page->addPannel(pannelUtf8);
 
-    QAction* actionChangeText = createAction(QStringLiteral(u"改变显示为英文"), ":/icon/icon/chinese-char.svg", "actionChangeText");
+    QAction* actionChangeText = createAction(QStringLiteral(u"改变显示为英文"),
+                                             ":/icon/icon/chinese-char.svg",
+                                             "actionChangeText");
     actionChangeText->setCheckable(true);
     actionChangeText->setChecked(false);
     pannelUtf8->addLargeAction(actionChangeText);
@@ -1174,43 +1200,69 @@ void MainWindow::createContextCategoryPage2(SARibbonCategory* page)
     });
     SARibbonPannel* pannelLayout = page->addPannel(("特殊布局"));
 
-    pannelLayout->addAction(createAction("Large", ":/icon/icon/layout.svg", "@Large1"), QToolButton::InstantPopup, SARibbonPannelItem::Large);
-    pannelLayout->addAction(createAction("Small", ":/icon/icon/layout.svg", "@Small1"), QToolButton::InstantPopup, SARibbonPannelItem::Small);
-    pannelLayout->addAction(createAction("Small", ":/icon/icon/layout.svg", "@Small2"), QToolButton::InstantPopup, SARibbonPannelItem::Small);
+    pannelLayout->addAction(createAction("Large", ":/icon/icon/layout.svg", "@Large1"),
+                            QToolButton::InstantPopup,
+                            SARibbonPannelItem::Large);
+    pannelLayout->addAction(createAction("Small", ":/icon/icon/layout.svg", "@Small1"),
+                            QToolButton::InstantPopup,
+                            SARibbonPannelItem::Small);
+    pannelLayout->addAction(createAction("Small", ":/icon/icon/layout.svg", "@Small2"),
+                            QToolButton::InstantPopup,
+                            SARibbonPannelItem::Small);
     pannelLayout->addSeparator();
-    pannelLayout->addAction(createAction("Small", ":/icon/icon/layout.svg", "@Small3"), QToolButton::InstantPopup, SARibbonPannelItem::Small);
-    pannelLayout->addAction(createAction("Small", ":/icon/icon/layout.svg", "@Small4"), QToolButton::InstantPopup, SARibbonPannelItem::Small);
-    pannelLayout->addAction(createAction("Small", ":/icon/icon/layout.svg", "@Small5"), QToolButton::InstantPopup, SARibbonPannelItem::Small);
-    pannelLayout->addAction(createAction("Small", ":/icon/icon/layout.svg", "@Small6"), QToolButton::InstantPopup, SARibbonPannelItem::Small);
+    pannelLayout->addAction(createAction("Small", ":/icon/icon/layout.svg", "@Small3"),
+                            QToolButton::InstantPopup,
+                            SARibbonPannelItem::Small);
+    pannelLayout->addAction(createAction("Small", ":/icon/icon/layout.svg", "@Small4"),
+                            QToolButton::InstantPopup,
+                            SARibbonPannelItem::Small);
+    pannelLayout->addAction(createAction("Small", ":/icon/icon/layout.svg", "@Small5"),
+                            QToolButton::InstantPopup,
+                            SARibbonPannelItem::Small);
+    pannelLayout->addAction(createAction("Small", ":/icon/icon/layout.svg", "@Small6"),
+                            QToolButton::InstantPopup,
+                            SARibbonPannelItem::Small);
     pannelLayout->addSeparator();
-    pannelLayout->addAction(createAction("Large", ":/icon/icon/layout.svg", "@Large2"), QToolButton::InstantPopup, SARibbonPannelItem::Large);
+    pannelLayout->addAction(createAction("Large", ":/icon/icon/layout.svg", "@Large2"),
+                            QToolButton::InstantPopup,
+                            SARibbonPannelItem::Large);
     pannelLayout->addAction(createAction("Medium", ":/icon/icon/layout.svg", "@Medium1"),
                             QToolButton::InstantPopup,
                             SARibbonPannelItem::Medium);
     pannelLayout->addAction(createAction("Medium", ":/icon/icon/layout.svg", "@Medium2"),
                             QToolButton::InstantPopup,
                             SARibbonPannelItem::Medium);
-    pannelLayout->addAction(createAction("Small", ":/icon/icon/layout.svg", "@Small7"), QToolButton::InstantPopup, SARibbonPannelItem::Small);
+    pannelLayout->addAction(createAction("Small", ":/icon/icon/layout.svg", "@Small7"),
+                            QToolButton::InstantPopup,
+                            SARibbonPannelItem::Small);
     pannelLayout->addAction(createAction("Medium", ":/icon/icon/layout.svg", "@Medium3"),
                             QToolButton::InstantPopup,
                             SARibbonPannelItem::Medium);
-    pannelLayout->addAction(createAction("Large", ":/icon/icon/layout.svg", "@Large3"), QToolButton::InstantPopup, SARibbonPannelItem::Large);
+    pannelLayout->addAction(createAction("Large", ":/icon/icon/layout.svg", "@Large3"),
+                            QToolButton::InstantPopup,
+                            SARibbonPannelItem::Large);
     pannelLayout->addAction(createAction("Medium", ":/icon/icon/layout.svg", "@Medium4"),
                             QToolButton::InstantPopup,
                             SARibbonPannelItem::Medium);
     pannelLayout->addAction(createAction("Medium", ":/icon/icon/layout.svg", "@Medium5"),
                             QToolButton::InstantPopup,
                             SARibbonPannelItem::Medium);
-    pannelLayout->addAction(createAction("Large", ":/icon/icon/layout.svg", "@Large4"), QToolButton::InstantPopup, SARibbonPannelItem::Large);
+    pannelLayout->addAction(createAction("Large", ":/icon/icon/layout.svg", "@Large4"),
+                            QToolButton::InstantPopup,
+                            SARibbonPannelItem::Large);
     pannelLayout->addSeparator();
     pannelLayout->addAction(createAction("Medium", ":/icon/icon/layout.svg", "@Medium6"),
                             QToolButton::InstantPopup,
                             SARibbonPannelItem::Medium);
-    pannelLayout->addAction(createAction("Large", ":/icon/icon/layout.svg", "@Large5"), QToolButton::InstantPopup, SARibbonPannelItem::Large);
+    pannelLayout->addAction(createAction("Large", ":/icon/icon/layout.svg", "@Large5"),
+                            QToolButton::InstantPopup,
+                            SARibbonPannelItem::Large);
     pannelLayout->addAction(createAction("Medium", ":/icon/icon/layout.svg", "@Medium7"),
                             QToolButton::InstantPopup,
                             SARibbonPannelItem::Medium);
-    pannelLayout->addAction(createAction("Small", ":/icon/icon/layout.svg", "@Small8"), QToolButton::InstantPopup, SARibbonPannelItem::Small);
+    pannelLayout->addAction(createAction("Small", ":/icon/icon/layout.svg", "@Small8"),
+                            QToolButton::InstantPopup,
+                            SARibbonPannelItem::Small);
 }
 
 void MainWindow::createQuickAccessBar(SARibbonQuickAccessBar* quickAccessBar)
