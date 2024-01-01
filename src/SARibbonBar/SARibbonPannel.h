@@ -150,8 +150,9 @@ public:
     void setTitleHeight(int h);
     int titleHeight() const;
 
-    // 判断是否显示标题，只有标题的高度被设置，才会显示标题
-    bool isShowTitle() const;
+    // 是否显示标题，显示标题后，标题的高度需要设置，默认高度为15
+    bool isEnableShowTitle() const;
+    void setEnableShowTitle(bool on);
 
     // action对应的布局index，此操作一般用于移动moveAction，其他意义不大
     int actionIndex(QAction* act) const;

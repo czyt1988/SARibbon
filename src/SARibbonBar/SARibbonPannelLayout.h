@@ -61,7 +61,8 @@ public:
     int pannelTitleHeight() const;
     void setPannelTitleHeight(int newTitleHeight);
     // 判断是否存在标题
-    bool isHavePannelTitle() const;
+    bool isEnableShowPannelTitle() const;
+    void setEnableShowPannelTitle(bool on);
     // 返回大按钮的高度
     int largeButtonHeight() const;
     // 标题区域和按钮的间隔
@@ -91,13 +92,14 @@ private:
 
 private:
     QList< SARibbonPannelItem* > m_items;
-    int m_columnCount { 0 };      ///< 记录有多少列
-    bool m_expandFlag { false };  ///< 标记是否是会扩展的
-    QSize m_sizeHint;             ///< sizeHint返回的尺寸
-    bool m_dirty { true };        ///< 用于标记是否需要刷新元素，参考QToolBarLayout源码
-    int m_largeHeight { 0 };      ///< 记录大图标的高度
-    int m_titleHeight { 15 };     ///< 标题区域高度
-    int m_titleSpace { 2 };       ///< 标题区域和按钮的间隔
+    int m_columnCount { 0 };          ///< 记录有多少列
+    bool m_expandFlag { false };      ///< 标记是否是会扩展的
+    QSize m_sizeHint;                 ///< sizeHint返回的尺寸
+    bool m_dirty { true };            ///< 用于标记是否需要刷新元素，参考QToolBarLayout源码
+    int m_largeHeight { 0 };          ///< 记录大图标的高度
+    int m_titleHeight { 15 };         ///< 标题区域高度
+    int m_titleSpace { 2 };           ///< 标题区域和按钮的间隔
+    bool m_enableShowTitle { true };  ///< 是否运行显示pannel标题
     SARibbonPannelLabel* m_titleLabel { nullptr };  ///< titlelabel指针
     QRect m_titleLabelGeometry;                     ///< titlelabel的位置
     QToolButton* m_optionActionBtn { nullptr };     ///< optionAction对应的button

@@ -297,7 +297,7 @@ void SARibbonPannelLayout::doLayout()
         updateGeomArray();
     }
     QList< QWidget* > showWidgets, hideWidgets;
-
+    SARibbonPannel* pannel = ribbonPannel();
     for (SARibbonPannelItem* item : qAsConst(m_items)) {
         if (item->isEmpty()) {
             hideWidgets << item->widget();
@@ -317,9 +317,16 @@ void SARibbonPannelLayout::doLayout()
             w->hide();
     }
     // 布局label
-    if (isHavePannelTitle()) {
-        if (m_titleLabel) {
+    if (m_titleLabel) {
+        if (isEnableShowPannelTitle()) {
             m_titleLabel->setGeometry(m_titleLabelGeometry);
+            if (!m_titleLabel->isVisibleTo(pannel)) {
+                m_titleLabel->show();
+            }
+        } else {
+            if (m_titleLabel->isVisibleTo(pannel)) {
+                m_titleLabel->hide();
+            }
         }
     }
     // 布局m_optionActionBtn
@@ -411,6 +418,10 @@ void SARibbonPannelLayout::updateGeomArray(const QRect& setrect)
     const int yBegin    = mag.top();
     int titleH          = (m_titleHeight >= 0) ? m_titleHeight : 0;  // 防止负数影响
     int titleSpace      = (m_titleHeight >= 0) ? m_titleSpace : 0;  // 对于没有标题的情况，spacing就不生效
+    if (!isEnableShowPannelTitle()) {
+        titleH     = 0;
+        titleSpace = 0;
+    }
     // 获取pannel的布局模式 3行或者2行
     //  rowcount 是ribbon的行，有2行和3行两种
     const short rowCount = (pannel->pannelLayoutMode() == SARibbonPannel::ThreeRowMode) ? 3 : 2;
@@ -655,13 +666,13 @@ void SARibbonPannelLayout::updateGeomArray(const QRect& setrect)
         recalcExpandGeomArray(setrect);
     }
     // 布局label
-    if (isHavePannelTitle()) {
+    if (isEnableShowPannelTitle()) {
         m_titleLabelGeometry.setRect(mag.left(), yTitleBegin, setrect.width(), titleH);
     }
     // 布局optionActionButton
     if (isHaveOptionAction()) {
         QSize optBtnSize = optionActionButtonSize();
-        if (isHavePannelTitle()) {
+        if (isEnableShowPannelTitle()) {
             // 有标题
             m_optionActionBtnGeometry.setRect(m_titleLabelGeometry.right() - m_titleLabelGeometry.height(),
                                               m_titleLabelGeometry.y(),
@@ -811,7 +822,7 @@ SARibbonPannelLabel* SARibbonPannelLayout::pannelTitleLabel() const
  */
 QSize SARibbonPannelLayout::optionActionButtonSize() const
 {
-    return (isHavePannelTitle() ? QSize(12, 12) : QSize(m_titleHeight, m_titleHeight));
+    return (isEnableShowPannelTitle() ? QSize(12, 12) : QSize(m_titleHeight, m_titleHeight));
 }
 
 void SARibbonPannelLayout::setPannelTitleLabel(SARibbonPannelLabel* newTitleLabel)
@@ -844,7 +855,7 @@ void SARibbonPannelLayout::setPannelTitleSpace(int newTitleSpace)
         return;
     }
     m_titleSpace = newTitleSpace;
-    updateGeomArray();
+    invalidate();
 }
 
 /**
@@ -866,16 +877,29 @@ void SARibbonPannelLayout::setPannelTitleHeight(int newTitleHeight)
         return;
     }
     m_titleHeight = newTitleHeight;
-    updateGeomArray();
+    invalidate();
 }
 
 /**
  * @brief 判断是否存在标题
  * @return
  */
-bool SARibbonPannelLayout::isHavePannelTitle() const
+bool SARibbonPannelLayout::isEnableShowPannelTitle() const
 {
-    return (m_titleHeight > 2);
+    return m_enableShowTitle;
+}
+
+/**
+ * @brief 设置显示标题
+ * @param on
+ */
+void SARibbonPannelLayout::setEnableShowPannelTitle(bool on)
+{
+    if (m_enableShowTitle == on) {
+        return;
+    }
+    m_enableShowTitle = on;
+    invalidate();
 }
 
 /**
