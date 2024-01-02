@@ -17,12 +17,12 @@ Widget::Widget(QWidget* parent) : QWidget(parent), ui(new Ui::Widget)
     mRibbonBar->setRibbonStyle(SARibbonBar::RibbonStyleCompactThreeRow);
     // 取消applicationbutton
     mRibbonBar->setApplicationButton(nullptr);
-    //设置主题，这里虽然没用到SARibbonMainWindow，但Ribbon的主题是SARibbonMainWindow中定义的，因此要引入SARibbonMainWindow.h
+    // 设置主题，这里虽然没用到SARibbonMainWindow，但Ribbon的主题是SARibbonMainWindow中定义的，因此要引入SARibbonMainWindow.h
     sa_set_ribbon_theme(mRibbonBar, SARibbonMainWindow::RibbonThemeOffice2013);
 
-    // QWidgets设置一个QVBoxLayout，把窗口放到QVBoxLayout的第二个布局中，第一个布局给SARibbonBar
-    // 这样，SARibbonBar就会在最上面
-    ui->verticalLayout->insertWidget(0, mRibbonBar);
+    // QLayout有专门的setMenuBar接口，针对menubar的布局，不需要插入到verticalLayout的0位置也可以实现
+    // ui->verticalLayout->insertWidget(0, mRibbonBar);
+    ui->verticalLayout->setMenuBar(mRibbonBar);
 
     buildRibbon(mRibbonBar);
 }
