@@ -84,7 +84,13 @@ SARibbonBar* SARibbonMainWindow::ribbonBar() const
     return qobject_cast< SARibbonBar* >(menuWidget());
 }
 
-#if !SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
+#if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
+FRAMELESSHELPER_PREPEND_NAMESPACE(FramelessWidgetsHelper*) SARibbonMainWindow::framelessHelper()
+{
+    return FramelessWidgetsHelper::get(this);
+}
+#else
+
 SAFramelessHelper* SARibbonMainWindow::framelessHelper()
 {
     return (d_ptr->mFramelessHelper);
@@ -109,11 +115,6 @@ bool SARibbonMainWindow::eventFilter(QObject* obj, QEvent* e)
         }
     }
     return (QMainWindow::eventFilter(obj, e));
-}
-#else
-FRAMELESSHELPER_PREPEND_NAMESPACE(FramelessWidgetsHelper*) SARibbonMainWindow::framelessHelper()
-{
-    return FramelessWidgetsHelper::get(this);
 }
 #endif
 /**
@@ -317,7 +318,9 @@ void SARibbonMainWindow::setupNormalWindow()
         d_ptr->mWindowButtonGroup = new SAWindowButtonGroup(this);
     }
     d_ptr->mWindowButtonGroup->setWindowStates(windowState());
+    d_ptr->mWindowButtonGroup->resize(60, 30);
     d_ptr->mWindowButtonGroup->show();
+    d_ptr->mWindowButtonGroup->raise();
 #endif
 }
 
@@ -348,6 +351,6 @@ void sa_set_ribbon_theme(QWidget* w, SARibbonMainWindow::RibbonTheme theme)
         return;
     }
     // 有反馈用qstring接住文件内容，再设置进去才能生效（qt5.7版本）
-    QString qss = file.readAll();
+    QString qss = QString::fromUtf8(file.readAll());
     w->setStyleSheet(qss);
 }
