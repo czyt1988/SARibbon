@@ -7,16 +7,12 @@
 #include <QFile>
 #include <QHash>
 #include <QWindowStateChangeEvent>
-
 #include "SAWindowButtonGroup.h"
 #if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
-#include "FramelessHelper/Widgets/standardsystembutton.h"
-#include "FramelessHelper/Widgets/framelesswidgetshelper.h"
+#include <QWKWidgets/widgetwindowagent.h>
 #include "SARibbonButtonGroupWidget.h"
 #include "SARibbonQuickAccessBar.h"
 #include "SARibbonStackedWidget.h"
-FRAMELESSHELPER_USE_NAMESPACE
-using namespace Global;
 #else
 #include "SAFramelessHelper.h"
 #include "SAWindowButtonGroup.h"
@@ -30,14 +26,13 @@ class SARibbonMainWindow::PrivateData
     SA_RIBBON_DECLARE_PUBLIC(SARibbonMainWindow)
 public:
     PrivateData(SARibbonMainWindow* p);
-    void init();
 
 public:
     SARibbonMainWindow::RibbonTheme mCurrentRibbonTheme { SARibbonMainWindow::RibbonThemeOffice2013 };
     SARibbonBar* mRibbonBar { nullptr };
     SAWindowButtonGroup* mWindowButtonGroup { nullptr };
 #if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
-    FRAMELESSHELPER_PREPEND_NAMESPACE(StandardTitleBar) * mTitleBar = nullptr;
+    QWK::WidgetWindowAgent* mFramelessHelper { nullptr };
 #else
     SAFramelessHelper* mFramelessHelper { nullptr };
 #endif
@@ -45,26 +40,21 @@ public:
 
 SARibbonMainWindow::PrivateData::PrivateData(SARibbonMainWindow* p) : q_ptr(p)
 {
-}
-
-void SARibbonMainWindow::PrivateData::init()
-{
+#if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
+    mFramelessHelper = new QWK::WidgetWindowAgent(p);
+    mFramelessHelper->setup(p);
+#else
+#endif
 }
 
 //===================================================
 // SARibbonMainWindow
 //===================================================
 SARibbonMainWindow::SARibbonMainWindow(QWidget* parent, bool useRibbon, const Qt::WindowFlags flags)
-#if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
-    : FramelessMainWindow(parent, flags)
-#else
-    : QMainWindow(parent, flags)
-#endif
-    , d_ptr(new SARibbonMainWindow::PrivateData(this))
+    : QMainWindow(parent, flags), d_ptr(new SARibbonMainWindow::PrivateData(this))
 {
-    d_ptr->init();
     if (useRibbon) {
-        installRibbonBar(createRibbonBar());
+        setRibbonBar(createRibbonBar());
         setRibbonTheme(ribbonTheme());
     } else {
         setupNormalWindow();
@@ -84,10 +74,57 @@ SARibbonBar* SARibbonMainWindow::ribbonBar() const
     return qobject_cast< SARibbonBar* >(menuWidget());
 }
 
-#if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
-FRAMELESSHELPER_PREPEND_NAMESPACE(FramelessWidgetsHelper*) SARibbonMainWindow::framelessHelper()
+void SARibbonMainWindow::setRibbonBar(SARibbonBar* bar)
 {
-    return FramelessWidgetsHelper::get(this);
+    QWidget* old = QMainWindow::menuWidget();
+    if (old) {
+        // 如果之前已经设置了menubar，要把之前的删除
+        old->deleteLater();
+    }
+#if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
+    auto helper = d_ptr->mFramelessHelper;
+    QMainWindow::setMenuWidget(bar);
+    helper->setTitleBar(bar);
+
+    // 设置window按钮
+    if (nullptr == d_ptr->mWindowButtonGroup) {
+        d_ptr->mWindowButtonGroup = new SAWindowButtonGroup(this);
+    }
+    d_ptr->mWindowButtonGroup->setWindowStates(windowState());
+    d_ptr->mWindowButtonGroup->show();
+    helper->setHitTestVisible(bar->ribbonTabBar());         // IMPORTANT!
+    helper->setHitTestVisible(bar->rightButtonGroup());     // IMPORTANT!
+    helper->setHitTestVisible(bar->applicationButton());    // IMPORTANT!
+    helper->setHitTestVisible(bar->quickAccessBar());       // IMPORTANT!
+    helper->setHitTestVisible(bar->ribbonStackedWidget());  // IMPORTANT!
+    helper->setHitTestVisible(d_ptr->mWindowButtonGroup);   // IMPORTANT!
+#else
+
+    QMainWindow::setMenuWidget(bar);
+    bar->installEventFilter(this);
+    // 设置窗体的标题栏高度
+    if (nullptr == d_ptr->mFramelessHelper) {
+        d_ptr->mFramelessHelper = new SAFramelessHelper(this);
+    }
+    d_ptr->mFramelessHelper->setTitleHeight(bar->titleBarHeight());
+    // 设置window按钮
+    if (nullptr == d_ptr->mWindowButtonGroup) {
+        d_ptr->mWindowButtonGroup = new SAWindowButtonGroup(this);
+    }
+    QSize s = d_ptr->mWindowButtonGroup->sizeHint();
+    s.setHeight(bar->titleBarHeight());
+    d_ptr->mWindowButtonGroup->setFixedSize(s);
+    d_ptr->mWindowButtonGroup->setWindowStates(windowState());
+    d_ptr->mWindowButtonGroup->show();
+
+#endif
+}
+
+#if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
+void SARibbonMainWindow::setFramelessHitTestVisible(const QWidget* w, bool visible)
+{
+    auto helper = d_ptr->mFramelessHelper;
+    helper->setHitTestVisible(w, visible);
 }
 #else
 
@@ -260,60 +297,14 @@ bool SARibbonMainWindow::event(QEvent* e)
     return (QMainWindow::event(e));
 }
 
-void SARibbonMainWindow::installRibbonBar(SARibbonBar* bar)
-{
-    QWidget* old = QMainWindow::menuWidget();
-    if (old) {
-        // 如果之前已经设置了menubar，要把之前的删除
-        old->deleteLater();
-    }
-#if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
-    auto helper = FramelessWidgetsHelper::get(this);
-    QMainWindow::setMenuWidget(bar);
-    helper->setTitleBarWidget(bar);
-
-    // 设置window按钮
-    if (nullptr == d_ptr->mWindowButtonGroup) {
-        d_ptr->mWindowButtonGroup = new SAWindowButtonGroup(this);
-    }
-    d_ptr->mWindowButtonGroup->setWindowStates(windowState());
-    d_ptr->mWindowButtonGroup->show();
-    helper->setHitTestVisible(d_ptr->mWindowButtonGroup);   // IMPORTANT!
-    helper->setHitTestVisible(bar->ribbonTabBar());         // IMPORTANT!
-    helper->setHitTestVisible(bar->rightButtonGroup());     // IMPORTANT!
-    helper->setHitTestVisible(bar->applicationButton());    // IMPORTANT!
-    helper->setHitTestVisible(bar->quickAccessBar());       // IMPORTANT!
-    helper->setHitTestVisible(bar->ribbonStackedWidget());  // IMPORTANT!
-#else
-
-    QMainWindow::setMenuWidget(bar);
-    bar->installEventFilter(this);
-    // 设置窗体的标题栏高度
-    if (nullptr == d_ptr->mFramelessHelper) {
-        d_ptr->mFramelessHelper = new SAFramelessHelper(this);
-    }
-    d_ptr->mFramelessHelper->setTitleHeight(bar->titleBarHeight());
-    // 设置window按钮
-    if (nullptr == d_ptr->mWindowButtonGroup) {
-        d_ptr->mWindowButtonGroup = new SAWindowButtonGroup(this);
-    }
-    QSize s = d_ptr->mWindowButtonGroup->sizeHint();
-    s.setHeight(bar->titleBarHeight());
-    d_ptr->mWindowButtonGroup->setFixedSize(s);
-    d_ptr->mWindowButtonGroup->setWindowStates(windowState());
-    d_ptr->mWindowButtonGroup->show();
-
-#endif
-}
-
 /**
    @brief 构建为普通窗口
  */
 void SARibbonMainWindow::setupNormalWindow()
 {
 #if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
-    auto helper = FramelessWidgetsHelper::get(this);
-    // 设置window按钮
+    // auto helper = FramelessWidgetsHelper::get(this);
+    //  设置window按钮
     if (nullptr == d_ptr->mWindowButtonGroup) {
         d_ptr->mWindowButtonGroup = new SAWindowButtonGroup(this);
     }

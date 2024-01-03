@@ -4,16 +4,17 @@
 
 cmake_minimum_required(VERSION 3.5)
 
-set(SARIBBON_VERSION_MAJOR 1)
-set(SARIBBON_VERSION_MINOR 1)
-set(SARIBBON_VERSION_PATCH 2)
+set(SARIBBON_VERSION_MAJOR 2)
+set(SARIBBON_VERSION_MINOR 0)
+set(SARIBBON_VERSION_PATCH 0)
 set(SARIBBON_VERSION "${SARIBBON_VERSION_MAJOR}.${SARIBBON_VERSION_MINOR}.${SARIBBON_VERSION_PATCH}")
+message(STATUS "SARibbon v${SARIBBON_VERSION}")
 project(SARibbon VERSION ${SARIBBON_VERSION} LANGUAGES CXX)
 
 # option(BUILD_SHARED_LIBS "build the SARibbonBar in shared lib mode" ON)
 option(SARIBBON_BUILD_EXAMPLES "build the examples" ON)
-# frameless能提供windows的窗口特效，如边缘吸附，且对高分屏多屏幕的支持更好
-option(SARIBBON_USE_FRAMELESS_LIB "use frameless lib" OFF)
+# frameless能提供windows的窗口特效，如边缘吸附，且对高分屏多屏幕的支持更好,默认开启
+option(SARIBBON_USE_FRAMELESS_LIB "use frameless lib" ON)
 
 # load Qt library, minimum version required is 5.8
 # cn:Qt库加载,最低版本要求为5.8
@@ -88,18 +89,13 @@ if(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4819")
 endif()
 
-message(STATUS "SARibbon ${SARIBBON_VERSION}")
+
 # 平台判断
 if("${CMAKE_SIZEOF_VOID_P}" STREQUAL "4")
     set(SARIBBON_PLATFORM "x86")
 else()
     set(SARIBBON_PLATFORM "x64")
 endif()
-
-
-
-include(cmake/WinResource.cmake)
-
 # The bin file directory is one level above the current directory
 # cn:bin文件目录在当前目录的上上一级
 set(SARIBBON_BIN_NAME bin_qt${QT_VERSION}_${CMAKE_BUILD_TYPE}_${SARIBBON_PLATFORM})
@@ -110,8 +106,19 @@ if(WIN32)
     set(CMAKE_INSTALL_PREFIX "${SARIBBON_BIN_DIR}")
 endif()
 
+##################################
+# subdirectory
+##################################
+
+if(SARIBBON_USE_FRAMELESS_LIB)
+    if(NOT DEFINED QWindowKit_DIR)
+        message(WARNING "option SARIBBON_USE_FRAMELESS_LIB=ON,but QWindowKit_DIR not defined,will set QWindowKit_DIR=${SARIBBON_BIN_DIR}/cmake/QWindowKit")
+        set(QWindowKit_DIR ${SARIBBON_BIN_DIR}/lib/cmake/QWindowKit)
+    endif()
+endif()
+
+include(cmake/WinResource.cmake)
 add_subdirectory(src)
-add_subdirectory(cmake)
 
 ##################################
 # install

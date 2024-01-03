@@ -1,0 +1,3 @@
+[submodule "src/SARibbonBar/3rdparty/qwindowkit"]
+	path = src/SARibbonBar/3rdparty/qwindowkit
+	url = https://github.com/stdware/qwindowkit
