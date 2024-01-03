@@ -3,13 +3,7 @@
 #include "SARibbonGlobal.h"
 #include <QMainWindow>
 
-#if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
-#include "FramelessHelper/Widgets/framelessmainwindow.h"
-FRAMELESSHELPER_BEGIN_NAMESPACE
-class StandardTitleBar;
-class FramelessWidgetsHelper;
-FRAMELESSHELPER_END_NAMESPACE
-#else
+#if !SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
 class SAFramelessHelper;
 #endif
 
@@ -38,11 +32,7 @@ class SAWindowButtonGroup;
  * 通过@ref setRibbonTheme 可改变ribbon的样式，用户也可通过qss自己定义自己的样式
  *
  */
-#if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
-class SA_RIBBON_EXPORT SARibbonMainWindow : public FRAMELESSHELPER_PREPEND_NAMESPACE(FramelessMainWindow)
-#else
 class SA_RIBBON_EXPORT SARibbonMainWindow : public QMainWindow
-#endif
 {
     Q_OBJECT
     SA_RIBBON_DECLARE_PRIVATE(SARibbonMainWindow)
@@ -70,13 +60,15 @@ public:
     ~SARibbonMainWindow() Q_DECL_OVERRIDE;
     // 返回SARibbonBar
     SARibbonBar* ribbonBar() const;
+    // 安装ribbon
+    void setRibbonBar(SARibbonBar* bar);
 #if !SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
     // 返回SAFramelessHelper
     SAFramelessHelper* framelessHelper();
     // 把ribbonbar的事件传递到frameless
     virtual bool eventFilter(QObject* obj, QEvent* e) Q_DECL_OVERRIDE;
 #else
-    FRAMELESSHELPER_PREPEND_NAMESPACE(FramelessWidgetsHelper*) framelessHelper();
+    void setFramelessHitTestVisible(const QWidget* w, bool visible = true);
 #endif
     // 此函数仅用于控制最小最大化和关闭按钮的显示
     void updateWindowFlag(Qt::WindowFlags flags);
@@ -99,8 +91,6 @@ protected:
     virtual bool event(QEvent* e) Q_DECL_OVERRIDE;
 
 private:
-    // 安装ribbon
-    void installRibbonBar(SARibbonBar* bar);
     // 构建为普通窗口
     void setupNormalWindow();
 };
