@@ -28,6 +28,7 @@ class SARibbonMainWindow::PrivateData
     SA_RIBBON_DECLARE_PUBLIC(SARibbonMainWindow)
 public:
     PrivateData(SARibbonMainWindow* p);
+    void installFrameless(SARibbonMainWindow* p);
 
 public:
     SARibbonMainWindow::RibbonTheme mCurrentRibbonTheme { SARibbonMainWindow::RibbonThemeOffice2013 };
@@ -42,10 +43,15 @@ public:
 
 SARibbonMainWindow::PrivateData::PrivateData(SARibbonMainWindow* p) : q_ptr(p)
 {
+}
+
+void SARibbonMainWindow::PrivateData::installFrameless(SARibbonMainWindow* p)
+{
 #if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
     mFramelessHelper = new QWK::WidgetWindowAgent(p);
     mFramelessHelper->setup(p);
 #else
+    d_ptr->mFramelessHelper = new SAFramelessHelper(p);
 #endif
 }
 
@@ -57,6 +63,7 @@ SARibbonMainWindow::SARibbonMainWindow(QWidget* parent, bool useRibbon, const Qt
 {
     connect(qApp, &QApplication::primaryScreenChanged, this, &SARibbonMainWindow::onPrimaryScreenChanged);
     if (useRibbon) {
+        d_ptr->installFrameless(this);
         setRibbonBar(createRibbonBar());
         setRibbonTheme(ribbonTheme());
     } else {
@@ -98,6 +105,7 @@ void SARibbonMainWindow::setRibbonBar(SARibbonBar* bar)
         d_ptr->mWindowButtonGroup = new SAWindowButtonGroup(this);
     }
     d_ptr->mWindowButtonGroup->setWindowStates(windowState());
+    d_ptr->mWindowButtonGroup->raise();
     d_ptr->mWindowButtonGroup->show();
     helper->setHitTestVisible(bar->ribbonTabBar());         // IMPORTANT!
     helper->setHitTestVisible(bar->rightButtonGroup());     // IMPORTANT!
@@ -110,9 +118,6 @@ void SARibbonMainWindow::setRibbonBar(SARibbonBar* bar)
     QMainWindow::setMenuWidget(bar);
     bar->installEventFilter(this);
     // 设置窗体的标题栏高度
-    if (nullptr == d_ptr->mFramelessHelper) {
-        d_ptr->mFramelessHelper = new SAFramelessHelper(this);
-    }
     d_ptr->mFramelessHelper->setTitleHeight(bar->titleBarHeight());
     // 设置window按钮
     if (nullptr == d_ptr->mWindowButtonGroup) {
@@ -122,6 +127,7 @@ void SARibbonMainWindow::setRibbonBar(SARibbonBar* bar)
     s.setHeight(bar->titleBarHeight());
     d_ptr->mWindowButtonGroup->setFixedSize(s);
     d_ptr->mWindowButtonGroup->setWindowStates(windowState());
+    d_ptr->mWindowButtonGroup->raise();
     d_ptr->mWindowButtonGroup->show();
 
 #endif

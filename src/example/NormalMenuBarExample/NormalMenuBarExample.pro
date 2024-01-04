@@ -21,7 +21,7 @@ HEADERS  += \ \
 
 
 include($$PWD/../../../common.pri)
-DESTDIR = $${SARIBBON_BIN_DIR}
+DESTDIR = $${SARIBBON_BIN_DIR}/bin
 include($${SARIBBONBAR_PRI_FILE_PATH})
 
 msvc {
