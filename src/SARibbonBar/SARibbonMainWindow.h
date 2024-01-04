@@ -15,6 +15,7 @@ class SAFramelessHelper;
 
 class SARibbonBar;
 class SAWindowButtonGroup;
+class QScreen;
 /**
  * @brief 如果要使用SARibbonBar，必须使用此类代替QMainWindow
  *
@@ -70,6 +71,8 @@ public:
     ~SARibbonMainWindow() Q_DECL_OVERRIDE;
     // 返回SARibbonBar
     SARibbonBar* ribbonBar() const;
+    // 设置ribbonbar
+    void setRibbonBar(SARibbonBar* bar);
 #if !SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
     // 返回SAFramelessHelper
     SAFramelessHelper* framelessHelper();
@@ -97,10 +100,10 @@ protected:
     SARibbonBar* createRibbonBar();
     virtual void resizeEvent(QResizeEvent* event) Q_DECL_OVERRIDE;
     virtual bool event(QEvent* e) Q_DECL_OVERRIDE;
+private slots:
+    void onPrimaryScreenChanged(QScreen* screen);
 
 private:
-    // 安装ribbon
-    void installRibbonBar(SARibbonBar* bar);
     // 构建为普通窗口
     void setupNormalWindow();
 };
