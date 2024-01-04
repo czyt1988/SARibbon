@@ -16,7 +16,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 include($$PWD/../../common.pri)
 
 TARGET = $${SARIBBON_LIB_NAME}
-DESTDIR = $${SARIBBON_BIN_DIR}
+DESTDIR = $${SARIBBON_BIN_DIR}/bin
 
 ######################################
 #SA_RIBBON_CONFIG 用于定义一些编译选项：
@@ -25,5 +25,7 @@ DESTDIR = $${SARIBBON_BIN_DIR}
 #     frameless第三方库必须C++17且只有几个版本的qt可用，目前支持（qt5.14,qt5.15,qt6.4以上）
 #     除了上诉版本SA_RIBBON_CONFIG中不会加入use_frameless
 #     frameless库能实现Ubuntu下和mac下的显示，同时多屏幕的支持也较好
+# 使用frameless库，需要定义QWindowKit的安装目录，默认在SARIBBON_BIN_DIR
+# SA_RIBBON_QWindowKit_Install_DIR = $$SARIBBON_BIN_DIR
 ######################################
 include($$PWD/SARibbonBar.pri)
