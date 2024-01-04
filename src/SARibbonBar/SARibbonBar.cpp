@@ -80,10 +80,10 @@ public:
     bool mEnableUserDefineRightBarIconSize { false };       ///< 允许用户自定义RightBar的IconSize
     SARibbonAlignment mRibbonAlignment { SARibbonAlignment::AlignLeft };  ///< 对齐方式
     int mTitleBarHeight { 30 };                                           ///< 标题栏高度
-    int mTabBarHeight { -1 };  ///< tabbar高度，默认为-1，-1的时候就是无效高度，这时高度由字体决定，用户调用setTabBarHeight后，设置的高度为正，则使用用户设定的高度，而不使用自动计算的高度
-    bool mEnableShowPannelTitle { true };  ///< 是否运行pannel的标题栏显示
-    int mPannelTitleHeight { 15 };         ///< pannel的标题栏默认高度
-
+    int mTabBarHeight { 28 };                                             ///< tabbar高度
+    bool mEnableShowPannelTitle { true };                                 ///< 是否运行pannel的标题栏显示
+    int mPannelTitleHeight { 15 };                                        ///< pannel的标题栏默认高度
+    int mCategoryHeight { 60 };                                           ///< Category的高度
 public:
     PrivateData(SARibbonBar* par) : q_ptr(par)
     {
@@ -97,9 +97,17 @@ public:
     // 根据字体信息计算category的高度
     static int calcCategoryHeight(const QFontMetrics& fm, SARibbonBar::RibbonStyles rStyle, int pannelTitleHeight);
     // 计算tabbar高度
-    static int calcMainBarHeight(int tabHegith, int titleHeight, int categoryHeight, RibbonStyles rStyle, SARibbonBar::RibbonMode rMode);
+    static int calcMainBarHeight(int tabHegith,
+                                 int titleHeight,
+                                 int categoryHeight,
+                                 RibbonStyles rStyle,
+                                 SARibbonBar::RibbonMode rMode);
     // 获取当前最小模式下的高度
     int getCurrentMinimumModeMainBarHeight() const;
+
+    // 获取当前正常模式下的高度
+    int getCurrentNormalModeMainBarHeight() const;
+
     // 重置尺寸
     void resetSize();
 
@@ -107,7 +115,7 @@ public:
 
     bool isContainContextCategoryInList(SARibbonContextCategory* contextCategory);
 
-    void setHideMode();
+    void setMinimumMode();
 
     void setNormalMode();
 
@@ -137,7 +145,10 @@ void SARibbonBar::PrivateData::init()
     //
     mStackedContainerWidget = RibbonSubElementDelegate->createRibbonStackedWidget(q_ptr);
     mStackedContainerWidget->setObjectName(QStringLiteral("objSARibbonStackedContainerWidget"));
-    mStackedContainerWidget->connect(mStackedContainerWidget, &SARibbonStackedWidget::hidWindow, q_ptr, &SARibbonBar::onStackWidgetHided);
+    mStackedContainerWidget->connect(mStackedContainerWidget,
+                                     &SARibbonStackedWidget::hidWindow,
+                                     q_ptr,
+                                     &SARibbonBar::onStackWidgetHided);
     // 捕获事件，在popmode时必须用到
     mStackedContainerWidget->installEventFilter(q_ptr);
     //
@@ -214,6 +225,7 @@ int SARibbonBar::PrivateData::calcMainBarHeight(int tabHegith,
                                                 SARibbonBar::RibbonMode rMode)
 {
     if (rMode == MinimumRibbonMode) {
+        // 最小模式，没有categoryHeight
         if (SARibbonBar::isLooseStyle(rStyle)) {
             return titleHeight + tabHegith;
         } else {
@@ -231,12 +243,12 @@ int SARibbonBar::PrivateData::calcMainBarHeight(int tabHegith,
 
 int SARibbonBar::PrivateData::getCurrentMinimumModeMainBarHeight() const
 {
-    if (SARibbonBar::isLooseStyle(mRibbonStyle)) {
-        return mTitleBarHeight + mRibbonTabBar->height();
-    } else {
-        return mTitleBarHeight;
-    }
-    return mTitleBarHeight + mRibbonTabBar->height();
+    return calcMainBarHeight(mTabBarHeight, mTitleBarHeight, mCategoryHeight, mRibbonStyle, SARibbonBar::MinimumRibbonMode);
+}
+
+int SARibbonBar::PrivateData::getCurrentNormalModeMainBarHeight() const
+{
+    return calcMainBarHeight(mTabBarHeight, mTitleBarHeight, mCategoryHeight, mRibbonStyle, SARibbonBar::NormalRibbonMode);
 }
 
 /**
@@ -245,13 +257,12 @@ int SARibbonBar::PrivateData::getCurrentMinimumModeMainBarHeight() const
 void SARibbonBar::PrivateData::resetSize()
 {
     auto fm         = q_ptr->fontMetrics();
-    int titleHeight = calcTitleBarHeight(fm);
+    mTitleBarHeight = calcTitleBarHeight(fm);
     // mTabBarHeight有大于0的值说明用户设置了，就使用用户设置的值
-    int tabHeight      = (mTabBarHeight <= 0) ? calcTabBarHeight(fm) : mTabBarHeight;
-    int categoryHeight = calcCategoryHeight(fm, mRibbonStyle, mPannelTitleHeight);
-    int mainBarHeight = calcMainBarHeight(tabHeight, mTitleBarHeight, categoryHeight, mRibbonStyle, mCurrentRibbonMode);
-    mTitleBarHeight   = titleHeight;
-    mRibbonTabBar->setFixedHeight(tabHeight);
+    mTabBarHeight   = calcTabBarHeight(fm);
+    mCategoryHeight = calcCategoryHeight(fm, mRibbonStyle, mPannelTitleHeight);
+    int mainBarHeight = calcMainBarHeight(mTabBarHeight, mTitleBarHeight, mCategoryHeight, mRibbonStyle, mCurrentRibbonMode);
+    mRibbonTabBar->setFixedHeight(mTabBarHeight);
     // 处于最小模式下时，bar的高度为tabbar的bottom,这个调整必须在resize event之后
     q_ptr->setFixedHeight(mainBarHeight);
 }
@@ -281,7 +292,7 @@ bool SARibbonBar::PrivateData::isContainContextCategoryInList(SARibbonContextCat
     return (false);
 }
 
-void SARibbonBar::PrivateData::setHideMode()
+void SARibbonBar::PrivateData::setMinimumMode()
 {
     mCurrentRibbonMode = SARibbonBar::MinimumRibbonMode;
     this->mStackedContainerWidget->setPopupMode();
@@ -446,7 +457,7 @@ QList< QColor > SARibbonBar::getDefaultContextCategoryColorList()
         << QColor(14, 81, 167)   // 蓝
         << QColor(228, 0, 69)    // 红
         << QColor(67, 148, 0)    // 绿
-            ;
+        ;
     return res;
 }
 
@@ -970,7 +981,7 @@ void SARibbonBar::setMinimumMode(bool isMinimum)
     qDebug() << "SARibbonBar::setHideMode " << isMinimum;
 #endif
     if (isMinimum) {
-        d_ptr->setHideMode();
+        d_ptr->setMinimumMode();
     } else {
         d_ptr->setNormalMode();
     }
@@ -999,11 +1010,13 @@ void SARibbonBar::showMinimumModeButton(bool isShow)
 
         d_ptr->mMinimumCategoryButtonAction = new QAction(this);
         d_ptr->mMinimumCategoryButtonAction->setIcon(
-                style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton, nullptr));
+            style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton,
+                                  nullptr));
         connect(d_ptr->mMinimumCategoryButtonAction, &QAction::triggered, this, [ this ]() {
             this->setMinimumMode(!isMinimumMode());
             this->d_ptr->mMinimumCategoryButtonAction->setIcon(
-                    style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton, nullptr));
+                style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton,
+                                      nullptr));
         });
         d_ptr->mRightButtonGroup->addAction(d_ptr->mMinimumCategoryButtonAction);
 
@@ -1358,27 +1371,22 @@ void SARibbonBar::setRibbonStyle(SARibbonBar::RibbonStyles v)
              << "\n  isTwoRowStyle=" << isTwoRowStyle()      //
              << "\n  isLooseStyle=" << isLooseStyle()        //
              << "\n  isCompactStyle=" << isCompactStyle()    //
-            ;
+        ;
 #endif
     // 执行判断
     setEnableWordWrap(isThreeRowStyle());
     d_ptr->mQuickAccessBar->setEnableShowIcon(isLooseStyle());
     setEnableShowPannelTitle(isThreeRowStyle());
 
-    d_ptr->resetSize();
-    if (MinimumRibbonMode == currentRibbonState()) {
-        // 处于最小模式下时，bar的高度为tabbar的bottom,这个调整必须在resize event之后
-        setFixedHeight(minimumModeMainBarHeight());
-    } else {
-        setFixedHeight(mainBarHeight());
-    }
+    // 此函数会调用setFixedHeight
     synchronousCategoryData(false);  // 这里不急着刷新，下面会继续刷新
+    d_ptr->resetSize();
 
-    QSize oldSize = size();
-    QSize newSize(oldSize.width(), mainBarHeight());
-    QResizeEvent es(newSize, oldSize);
+    // QSize oldSize = size();
+    // QSize newSize(oldSize.width(), mainBarHeight());
+    // QResizeEvent es(newSize, oldSize);
 
-    QApplication::sendEvent(this, &es);
+    // QApplication::sendEvent(this, &es);
 
     emit ribbonStyleChanged(d_ptr->mRibbonStyle);
 }
@@ -1833,14 +1841,14 @@ int SARibbonBar::calcMinTabBarWidth() const
 }
 
 /**
- * @brief mainBarHeight的计算高度
+ * @brief 正常模式下的高度
  *
  * 有可能SARibbonBar::height和mainBarHeight不相等，这种情况发生在RibbonState::MinimumRibbonMode状态下
  * @return 高度
  */
-int SARibbonBar::mainBarHeight() const
+int SARibbonBar::normalModeMainBarHeight() const
 {
-    return height();
+    return d_ptr->getCurrentNormalModeMainBarHeight();
 }
 
 /**
@@ -1946,10 +1954,11 @@ void SARibbonBar::paintInLooseStyle()
             titleRegion.setRect(d_ptr->mQuickAccessBar->geometry().right() + 1,
                                 border.top(),
                                 width() - d_ptr->mIconRightBorderPosition - border.right()
-                                        - d_ptr->mWindowButtonSize.width() - d_ptr->mQuickAccessBar->geometry().right() - 1,
+                                    - d_ptr->mWindowButtonSize.width() - d_ptr->mQuickAccessBar->geometry().right() - 1,
                                 titleBarHeight());
         } else {
-            int leftwidth = contextCategoryRegion.x() - d_ptr->mQuickAccessBar->geometry().right() - d_ptr->mIconRightBorderPosition;
+            int leftwidth = contextCategoryRegion.x() - d_ptr->mQuickAccessBar->geometry().right()
+                            - d_ptr->mIconRightBorderPosition;
             int rightwidth = width() - contextCategoryRegion.y() - d_ptr->mWindowButtonSize.width();
             //            if (width() - contextCategoryRegion.y() > contextCategoryRegion.x()-x) {
             if (rightwidth > leftwidth) {
@@ -2028,7 +2037,7 @@ void SARibbonBar::resizeStackedContainerWidget()
     int x = border.left();
     int y = ribbonTabBarGeometry.bottom() + 1;
     int w = width() - border.left() - border.right();
-    int h = mainBarHeight() - ribbonTabBarGeometry.bottom() - border.bottom() - 1;
+    int h = d_ptr->mCategoryHeight;
     if (d_ptr->mStackedContainerWidget->isPopupMode()) {
         // 弹出模式时，位置为全局位置
         QPoint absPosition = mapToGlobal(QPoint(x, y));

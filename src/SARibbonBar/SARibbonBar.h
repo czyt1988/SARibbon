@@ -245,8 +245,8 @@ public:
     int titleBarHeight() const;
     void setTitleBarHeight(int h);
 
-    // 获取mainBar的高度
-    int mainBarHeight() const;
+    // 获取正常模式下的mainBar的高度
+    int normalModeMainBarHeight() const;
 
     // 最小模式下的MainBar高度
     int minimumModeMainBarHeight() const;
