@@ -3,15 +3,16 @@
 # 1.framelesshelper/qmake/inc/core/framelesshelper.config中的FRAMELESSHELPER_FEATURE_static_build设置为-1
 # 2.要预定义FRAMELESSHELPER_CORE_LIBRARY宏，这样才能导出符号
 # 3.要预定义FRAMELESSHELPER_WIDGETS_LIBRARY宏，这样才能导出符号
-
-equals(QT_MAJOR_VERSION, 5){
-    greaterThan(QT_MINOR_VERSION, 13){
-        SA_RIBBON_CONFIG += use_frameless
-    }
-}else{
-# qt6.0不支持
-    greaterThan(QT_MINOR_VERSION, 0){
-        SA_RIBBON_CONFIG += use_frameless
+!contains( SA_RIBBON_CONFIG, use_frameless ) {
+    equals(QT_MAJOR_VERSION, 5){
+        greaterThan(QT_MINOR_VERSION, 13){
+            SA_RIBBON_CONFIG += use_frameless
+        }
+    }else{
+    # qt6.0不支持
+        greaterThan(QT_MINOR_VERSION, 0){
+            SA_RIBBON_CONFIG += use_frameless
+        }
     }
 }
 
@@ -21,15 +22,17 @@ contains( SA_RIBBON_CONFIG, use_frameless ) {
     !contains(CONFIG,C++17){
         CONFIG += c++17
     }
-    include($$PWD/3rdparty/framelesshelper/qmake/core.pri)
-    include($$PWD/3rdparty/framelesshelper/qmake/widgets.pri)
-    DEFINES += FRAMELESSHELPER_CORE_LIBRARY
-    DEFINES += FRAMELESSHELPER_WIDGETS_LIBRARY
-    DEFINES += FRAMELESSHELPER_FEATURE_static_build=-1
+    !exists($$SA_RIBBON_QWindowKit_Install_DIR){
+        message("SA_RIBBON_QWindowKit_Install_DIR not define,set to $$SARIBBON_BIN_DIR")
+        SA_RIBBON_QWindowKit_Install_DIR = $$SARIBBON_BIN_DIR
+    }
+    SA_RIBBON_QWindowKit_QMake_DIR = $$SA_RIBBON_QWindowKit_Install_DIR/share/QWindowKit/qmake
+    include($$SA_RIBBON_QWindowKit_QMake_DIR/QWKCore.pri)
+    include($$SA_RIBBON_QWindowKit_QMake_DIR/QWKWidgets.pri)
     # 定义SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1是的使用framelss库
     DEFINES += SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1
 }else{
-message("do not use_frameless lib,compile with c+=11")
+    message("do not use_frameless lib,compile with c+=11")
     CONFIG += c++11
     DEFINES += SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=0
 }

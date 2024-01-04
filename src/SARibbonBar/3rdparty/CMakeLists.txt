@@ -8,6 +8,16 @@ project(SARibbon-3rdparty-build
         DESCRIPTION "SARibbon : 3rdparty build"
 )
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+if(MSVC)
+    # CMAKE_CXX_STANDARD对有些版本的msvc无效
+    set(CMAKE_CXX_FLAGS"${CMAKE_CXX_FLAGS} /std:c++17")
+endif()
+# 编译错误error C2039: “max”: 不是“std”的成员
+# 避免和min/max宏冲突
+add_definitions(-DNOMINMAX)
+
 ########################################################
 # 安装路径设置
 ########################################################

@@ -1,14 +1,14 @@
 CONFIG(debug, debug|release){
     contains(QT_ARCH, i386) {
-        SARIBBON_BIN_DIR = $$PWD/bin_qt$$[QT_VERSION]_debug
+        SARIBBON_BIN_DIR = $$PWD/bin_qt$$[QT_VERSION]_Debug_x86
     }else {
-        SARIBBON_BIN_DIR = $$PWD/bin_qt$$[QT_VERSION]_debug_64
+        SARIBBON_BIN_DIR = $$PWD/bin_qt$$[QT_VERSION]_Debug_x64
     }
 }else{
     contains(QT_ARCH, i386) {
-        SARIBBON_BIN_DIR = $$PWD/bin_qt$$[QT_VERSION]_release
+        SARIBBON_BIN_DIR = $$PWD/bin_qt$$[QT_VERSION]_Release_x86
     }else {
-        SARIBBON_BIN_DIR = $$PWD/bin_qt$$[QT_VERSION]_release_64
+        SARIBBON_BIN_DIR = $$PWD/bin_qt$$[QT_VERSION]_Release_x64
     }
 }
 
