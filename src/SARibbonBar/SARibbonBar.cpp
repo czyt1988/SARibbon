@@ -79,11 +79,15 @@ public:
     bool mEnableUserDefineAccessBarIconSize { false };      ///< 允许用户自定义AccessBar的IconSize
     bool mEnableUserDefineRightBarIconSize { false };       ///< 允许用户自定义RightBar的IconSize
     SARibbonAlignment mRibbonAlignment { SARibbonAlignment::AlignLeft };  ///< 对齐方式
+    bool mEnableShowPannelTitle { true };                                 ///< 是否运行pannel的标题栏显示
     int mTitleBarHeight { 30 };                                           ///< 标题栏高度
     int mTabBarHeight { 28 };                                             ///< tabbar高度
-    bool mEnableShowPannelTitle { true };                                 ///< 是否运行pannel的标题栏显示
     int mPannelTitleHeight { 15 };                                        ///< pannel的标题栏默认高度
     int mCategoryHeight { 60 };                                           ///< Category的高度
+    std::unique_ptr< int > mUserDefTitleBarHeight;  ///< 用户定义的标题栏高度，正常不使用用户设定的高度，而是使用自动计算的高度
+    std::unique_ptr< int > mUserDefTabBarHeight;  ///< 用户定义的tabbar高度，正常不使用用户设定的高度，而是使用自动计算的高度
+    std::unique_ptr< int > mUserDefCategoryHeight;  ///< 用户定义的Category的高度，正常不使用用户设定的高度，而是使用自动计算的高度
+
 public:
     PrivateData(SARibbonBar* par) : q_ptr(par)
     {
@@ -1076,11 +1080,15 @@ int SARibbonBar::tabBarHeight() const
  * @note 此函数不会自动刷新，如果需要刷新调用此函数后需要调用@ref updateRibbonGeometry
  * @param h
  */
-void SARibbonBar::setTabBarHeight(int h)
+void SARibbonBar::setTabBarHeight(int h, bool resizeByNow)
 {
-    d_ptr->mTabBarHeight = h;
-    if (h > 0) {
-        d_ptr->mRibbonTabBar->setFixedHeight(h);
+    if (nullptr == d_ptr->mUserDefTabBarHeight) {
+        d_ptr->mUserDefTabBarHeight = std::make_unique< int >(h);
+    } else {
+        *(d_ptr->mUserDefTabBarHeight) = h;
+    }
+    if (resizeByNow) {
+        updateRibbonGeometry();
     }
 }
 
@@ -1100,15 +1108,47 @@ int SARibbonBar::titleBarHeight() const
    @note 此操作会发射@ref titleBarHeightChanged 信号
    @param h
  */
-void SARibbonBar::setTitleBarHeight(int h)
+void SARibbonBar::setTitleBarHeight(int h, bool resizeByNow)
 {
-    if (d_ptr->mTitleBarHeight == h) {
-        return;
+    int oldHeight = d_ptr->mTitleBarHeight;
+    if (nullptr == d_ptr->mUserDefTitleBarHeight) {
+        d_ptr->mUserDefTitleBarHeight = std::make_unique< int >(h);
+    } else {
+        *(d_ptr->mUserDefTitleBarHeight) = h;
+        //
+        oldHeight = *(d_ptr->mUserDefTitleBarHeight);
     }
-    int oldHeight          = d_ptr->mTitleBarHeight;
-    d_ptr->mTitleBarHeight = h;
-    updateRibbonGeometry();
+
+    if (resizeByNow) {
+        updateRibbonGeometry();
+    }
     emit titleBarHeightChanged(oldHeight, h);
+}
+
+/**
+ * @brief category的高度
+ * @return
+ */
+int SARibbonBar::categoryHeight() const
+{
+    return d_ptr->mStackedContainerWidget->height();
+}
+
+/**
+ * @brief 设置category的高度
+ * @param h
+ * @param resizeByNow
+ */
+void SARibbonBar::setCategoryHeight(int h, bool resizeByNow)
+{
+    if (nullptr == d_ptr->mUserDefCategoryHeight) {
+        d_ptr->mUserDefCategoryHeight = std::make_unique< int >(h);
+    } else {
+        *(d_ptr->mUserDefCategoryHeight) = h;
+    }
+    if (resizeByNow) {
+        updateRibbonGeometry();
+    }
 }
 
 void SARibbonBar::onWindowTitleChanged(const QString& title)

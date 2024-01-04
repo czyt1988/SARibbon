@@ -239,11 +239,15 @@ public:
 
     // ribbon tab的高度
     int tabBarHeight() const;
-    void setTabBarHeight(int h);
+    void setTabBarHeight(int h, bool resizeByNow = true);
 
     // 标题栏的高度
     int titleBarHeight() const;
-    void setTitleBarHeight(int h);
+    void setTitleBarHeight(int h, bool resizeByNow = true);
+
+    // category的高度
+    int categoryHeight() const;
+    void setCategoryHeight(int h, bool resizeByNow = true);
 
     // 获取正常模式下的mainBar的高度
     int normalModeMainBarHeight() const;
