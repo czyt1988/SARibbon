@@ -7,6 +7,8 @@
 #include <QFile>
 #include <QHash>
 #include <QWindowStateChangeEvent>
+#include <QScreen>
+
 #include "SAWindowButtonGroup.h"
 #if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
 #include <QWKWidgets/widgetwindowagent.h>
@@ -53,6 +55,7 @@ SARibbonMainWindow::PrivateData::PrivateData(SARibbonMainWindow* p) : q_ptr(p)
 SARibbonMainWindow::SARibbonMainWindow(QWidget* parent, bool useRibbon, const Qt::WindowFlags flags)
     : QMainWindow(parent, flags), d_ptr(new SARibbonMainWindow::PrivateData(this))
 {
+    connect(qApp, &QApplication::primaryScreenChanged, this, &SARibbonMainWindow::onPrimaryScreenChanged);
     if (useRibbon) {
         setRibbonBar(createRibbonBar());
         setRibbonTheme(ribbonTheme());
@@ -74,6 +77,10 @@ SARibbonBar* SARibbonMainWindow::ribbonBar() const
     return qobject_cast< SARibbonBar* >(menuWidget());
 }
 
+/**
+ * @brief 设置ribbonbar
+ * @param bar
+ */
 void SARibbonMainWindow::setRibbonBar(SARibbonBar* bar)
 {
     QWidget* old = QMainWindow::menuWidget();
@@ -295,6 +302,20 @@ bool SARibbonMainWindow::event(QEvent* e)
         }
     }
     return (QMainWindow::event(e));
+}
+
+/**
+ * @brief 主屏幕切换触发的信号
+ * @param screen
+ */
+void SARibbonMainWindow::onPrimaryScreenChanged(QScreen* screen)
+{
+    Q_UNUSED(screen);
+    // 主屏幕切换后，从新计算所有尺寸
+    if (SARibbonBar* bar = ribbonBar()) {
+        qDebug() << "Primary Screen Changed";
+        bar->updateRibbonGeometry();
+    }
 }
 
 /**
