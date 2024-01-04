@@ -26,7 +26,7 @@ RESOURCES += \
 include($$PWD/../../../common.pri)
 include($${SARIBBONBAR_PRI_FILE_PATH})
 
-DESTDIR = $${SARIBBON_BIN_DIR}
+DESTDIR = $${SARIBBON_BIN_DIR}/bin
 
 msvc {
     QMAKE_CFLAGS += /utf-8
