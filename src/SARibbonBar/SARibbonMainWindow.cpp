@@ -51,7 +51,7 @@ void SARibbonMainWindow::PrivateData::installFrameless(SARibbonMainWindow* p)
     mFramelessHelper = new QWK::WidgetWindowAgent(p);
     mFramelessHelper->setup(p);
 #else
-    d_ptr->mFramelessHelper = new SAFramelessHelper(p);
+    mFramelessHelper = new SAFramelessHelper(p);
 #endif
 }
 
