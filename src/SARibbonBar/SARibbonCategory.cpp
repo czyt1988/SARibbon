@@ -159,8 +159,7 @@ void SARibbonCategory::PrivateData::updateItemGeometry()
     for (auto pannel : pannels) {
         pannel->updateItemGeometry();
     }
-    lay->invalidate();
-
+    lay->updateGeometryArr();
     return;
 }
 

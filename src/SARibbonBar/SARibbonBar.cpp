@@ -64,11 +64,11 @@ public:
     QList< SARibbonContextCategory* > mContextCategoryList;  ///< 存放所有的上下文标签
     QList< _SARibbonTabData > mHidedCategory;
     int mIconRightBorderPosition { 1 };  ///< 标题栏x值得最小值，在有图标和快捷启动按钮，此值都需要变化
-    QAction* mMinimumCategoryButtonAction { nullptr };                                ///< 隐藏面板按钮action
-    SARibbonButtonGroupWidget* mRightButtonGroup { nullptr };                         ///< 在tab bar右边的按钮群
-    SARibbonQuickAccessBar* mQuickAccessBar { nullptr };                              ///< 快速响应栏
+    QAction* mMinimumCategoryButtonAction { nullptr };                                 ///< 隐藏面板按钮action
+    SARibbonButtonGroupWidget* mRightButtonGroup { nullptr };                          ///< 在tab bar右边的按钮群
+    SARibbonQuickAccessBar* mQuickAccessBar { nullptr };                               ///< 快速响应栏
     SARibbonBar::RibbonStyles mRibbonStyle { SARibbonBar::RibbonStyleLooseThreeRow };  ///< ribbon的风格
-    SARibbonBar::RibbonMode mCurrentRibbonMode { SARibbonBar::NormalRibbonMode };     ///< 记录当前模式
+    SARibbonBar::RibbonMode mCurrentRibbonMode { SARibbonBar::NormalRibbonMode };      ///< 记录当前模式
     QSize mWindowButtonSize;                    ///< 由SARibbonMainWindow告诉的windowbutton的尺寸
     QList< QColor > mContextCategoryColorList;  ///< contextCategory的色系
     int mContextCategoryColorListIndex { -1 };  ///< 记录contextCategory色系索引
@@ -97,11 +97,7 @@ public:
     // 根据字体信息计算category的高度
     static int calcCategoryHeight(const QFontMetrics& fm, SARibbonBar::RibbonStyles rStyle, int pannelTitleHeight);
     // 计算tabbar高度
-    static int calcMainBarHeight(int tabHegith,
-                                 int titleHeight,
-                                 int categoryHeight,
-                                 RibbonStyles rStyle,
-                                 SARibbonBar::RibbonMode rMode);
+    static int calcMainBarHeight(int tabHegith, int titleHeight, int categoryHeight, RibbonStyles rStyle, SARibbonBar::RibbonMode rMode);
     // 获取当前最小模式下的高度
     int getCurrentMinimumModeMainBarHeight() const;
     // 重置尺寸
@@ -141,10 +137,7 @@ void SARibbonBar::PrivateData::init()
     //
     mStackedContainerWidget = RibbonSubElementDelegate->createRibbonStackedWidget(q_ptr);
     mStackedContainerWidget->setObjectName(QStringLiteral("objSARibbonStackedContainerWidget"));
-    mStackedContainerWidget->connect(mStackedContainerWidget,
-                                     &SARibbonStackedWidget::hidWindow,
-                                     q_ptr,
-                                     &SARibbonBar::onStackWidgetHided);
+    mStackedContainerWidget->connect(mStackedContainerWidget, &SARibbonStackedWidget::hidWindow, q_ptr, &SARibbonBar::onStackWidgetHided);
     // 捕获事件，在popmode时必须用到
     mStackedContainerWidget->installEventFilter(q_ptr);
     //
@@ -453,7 +446,7 @@ QList< QColor > SARibbonBar::getDefaultContextCategoryColorList()
         << QColor(14, 81, 167)   // 蓝
         << QColor(228, 0, 69)    // 红
         << QColor(67, 148, 0)    // 绿
-        ;
+            ;
     return res;
 }
 
@@ -1006,13 +999,11 @@ void SARibbonBar::showMinimumModeButton(bool isShow)
 
         d_ptr->mMinimumCategoryButtonAction = new QAction(this);
         d_ptr->mMinimumCategoryButtonAction->setIcon(
-            style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton,
-                                  nullptr));
+                style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton, nullptr));
         connect(d_ptr->mMinimumCategoryButtonAction, &QAction::triggered, this, [ this ]() {
             this->setMinimumMode(!isMinimumMode());
             this->d_ptr->mMinimumCategoryButtonAction->setIcon(
-                style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton,
-                                      nullptr));
+                    style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton, nullptr));
         });
         d_ptr->mRightButtonGroup->addAction(d_ptr->mMinimumCategoryButtonAction);
 
@@ -1367,7 +1358,7 @@ void SARibbonBar::setRibbonStyle(SARibbonBar::RibbonStyles v)
              << "\n  isTwoRowStyle=" << isTwoRowStyle()      //
              << "\n  isLooseStyle=" << isLooseStyle()        //
              << "\n  isCompactStyle=" << isCompactStyle()    //
-        ;
+            ;
 #endif
     // 执行判断
     setEnableWordWrap(isThreeRowStyle());
@@ -1528,12 +1519,10 @@ QColor SARibbonBar::tabBarBaseLineColor() const
 void SARibbonBar::updateRibbonGeometry()
 {
     d_ptr->resetSize();
-
-    QList< SARibbonCategory* > categorys = categoryPages();
-    for (SARibbonCategory* c : qAsConst(categorys)) {
+    iterate([](SARibbonCategory* c) -> bool {
         c->updateItemGeometry();
-    }
-
+        return true;
+    });
     //! 直接给一个resizeevent，让所有刷新
     QResizeEvent* e = new QResizeEvent(size(), QSize());
     QApplication::postEvent(this, e);
@@ -1957,11 +1946,10 @@ void SARibbonBar::paintInLooseStyle()
             titleRegion.setRect(d_ptr->mQuickAccessBar->geometry().right() + 1,
                                 border.top(),
                                 width() - d_ptr->mIconRightBorderPosition - border.right()
-                                    - d_ptr->mWindowButtonSize.width() - d_ptr->mQuickAccessBar->geometry().right() - 1,
+                                        - d_ptr->mWindowButtonSize.width() - d_ptr->mQuickAccessBar->geometry().right() - 1,
                                 titleBarHeight());
         } else {
-            int leftwidth = contextCategoryRegion.x() - d_ptr->mQuickAccessBar->geometry().right()
-                            - d_ptr->mIconRightBorderPosition;
+            int leftwidth = contextCategoryRegion.x() - d_ptr->mQuickAccessBar->geometry().right() - d_ptr->mIconRightBorderPosition;
             int rightwidth = width() - contextCategoryRegion.y() - d_ptr->mWindowButtonSize.width();
             //            if (width() - contextCategoryRegion.y() > contextCategoryRegion.x()-x) {
             if (rightwidth > leftwidth) {

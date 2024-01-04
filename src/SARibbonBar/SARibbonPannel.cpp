@@ -223,8 +223,8 @@ QToolButton::ToolButtonPopupMode SARibbonPannel::getActionToolButtonPopupModePro
  */
 void SARibbonPannel::setActionToolButtonStyleProperty(QAction* action, Qt::ToolButtonStyle buttonStyle)
 {
-	Q_CHECK_PTR(action);
-	action->setProperty(SA_ActionPropertyName_ToolButtonStyle, static_cast< int >(buttonStyle));
+    Q_CHECK_PTR(action);
+    action->setProperty(SA_ActionPropertyName_ToolButtonStyle, static_cast< int >(buttonStyle));
 }
 
 /**
@@ -234,13 +234,13 @@ void SARibbonPannel::setActionToolButtonStyleProperty(QAction* action, Qt::ToolB
  */
 Qt::ToolButtonStyle SARibbonPannel::getActionToolButtonStyleProperty(QAction* action)
 {
-	bool isok = false;
-	int r     = action->property(SA_ActionPropertyName_ToolButtonStyle).toInt(&isok);
+    bool isok = false;
+    int r     = action->property(SA_ActionPropertyName_ToolButtonStyle).toInt(&isok);
 
-	if (isok) {
-		return (static_cast< Qt::ToolButtonStyle >(r));
-	}
-	return (Qt::ToolButtonIconOnly);
+    if (isok) {
+        return (static_cast< Qt::ToolButtonStyle >(r));
+    }
+    return (Qt::ToolButtonIconOnly);
 }
 
 /**
@@ -336,10 +336,7 @@ void SARibbonPannel::addMediumAction(QAction* action, QToolButton::ToolButtonPop
  * @param rp action在pannel中的占位情况，默认是大图标
  * @return 返回添加的action
  */
-QAction* SARibbonPannel::addAction(const QString& text,
-                                   const QIcon& icon,
-                                   QToolButton::ToolButtonPopupMode popMode,
-                                   SARibbonPannelItem::RowProportion rp)
+QAction* SARibbonPannel::addAction(const QString& text, const QIcon& icon, QToolButton::ToolButtonPopupMode popMode, SARibbonPannelItem::RowProportion rp)
 {
     QAction* action = new QAction(icon, text, this);
     addAction(action, popMode, rp);
@@ -730,7 +727,6 @@ void SARibbonPannel::updateItemGeometry()
     // 此函数需要添加，否则SARibbonBar::setEnableWordWrap无法刷新按钮
     resetLargeToolButtonStyle();
     if (SARibbonPannelLayout* lay = pannelLayout()) {
-        lay->invalidate();
         lay->updateGeomArray();
     }
 }
