@@ -115,7 +115,7 @@ void SAColorMenu::bindToColorToolButton(SAColorToolButton* btn)
  * @brief ThemeColorsPalette对应的action
  * @return
  */
-QWidgetAction* SAColorMenu::getThemeColorsPaletteAction() const
+QWidgetAction* SAColorMenu::themeColorsPaletteAction() const
 {
     return d_ptr->mThemeColorPaletteAction;
 }
@@ -133,7 +133,7 @@ QWidgetAction* SAColorMenu::getCustomColorsWidgetAction() const
  * @brief 自定义颜色action
  * @return
  */
-QAction* SAColorMenu::getCustomColorAction() const
+QAction* SAColorMenu::customColorAction() const
 {
     return d_ptr->mCustomColorAction;
 }
@@ -142,7 +142,7 @@ QAction* SAColorMenu::getCustomColorAction() const
  * @brief 获取ThemeColorsPalette
  * @return
  */
-SAColorPaletteGridWidget* SAColorMenu::getColorPaletteGridWidget() const
+SAColorPaletteGridWidget* SAColorMenu::colorPaletteGridWidget() const
 {
     return d_ptr->mThemeColorsWidget;
 }
@@ -151,7 +151,7 @@ SAColorPaletteGridWidget* SAColorMenu::getColorPaletteGridWidget() const
  * @brief 获取自定义颜色grid
  * @return
  */
-SAColorGridWidget* SAColorMenu::getCustomColorsWidget() const
+SAColorGridWidget* SAColorMenu::customColorsWidget() const
 {
     return d_ptr->mCustomColorsWidget;
 }
@@ -191,7 +191,7 @@ void SAColorMenu::enableNoneColorAction(bool on)
  * @note 注意，enableNoneColorAction(true),之后才不是nullptr
  * @return 如果没有建立NoneColorAction，会返回nullptr
  */
-QAction* SAColorMenu::getNoneColorAction() const
+QAction* SAColorMenu::noneColorAction() const
 {
     return d_ptr->mNoneColorAction;
 }
@@ -219,7 +219,7 @@ void SAColorMenu::init(const QList< QColor >& themeCls)
     d_ptr->mCustomColorAction = new QAction(tr("Custom Color"), this);  // cn:自定义颜色
     addAction(d_ptr->mCustomColorAction);
 
-    QSize clrSize              = d_ptr->mThemeColorsWidget->getColorIconSize();
+    QSize clrSize              = d_ptr->mThemeColorsWidget->colorIconSize();
     d_ptr->mCustomColorsWidget = new SAColorGridWidget(this);
     d_ptr->mCustomColorsWidget->setRowMinimumHeight(0, clrSize.height());
     d_ptr->mCustomColorsWidget->setHorizontalSpacerToRight();

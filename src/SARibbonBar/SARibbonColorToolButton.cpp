@@ -113,7 +113,7 @@ SARibbonColorToolButton::~SARibbonColorToolButton()
  * @brief 获取按钮维护的颜色
  * @return
  */
-QColor SARibbonColorToolButton::getColor() const
+QColor SARibbonColorToolButton::color() const
 {
     return d_ptr->mColor;
 }
@@ -155,7 +155,7 @@ SAColorMenu* SARibbonColorToolButton::setupStandardColorMenu()
     setPopupMode(QToolButton::MenuButtonPopup);
     SAColorMenu* m = new SAColorMenu(this);
     m->enableNoneColorAction(true);
-    QAction* customColor = m->getCustomColorAction();
+    QAction* customColor = m->customColorAction();
     if (customColor) {
         customColor->setIcon(QIcon(":/image/resource/define-color.svg"));
     }

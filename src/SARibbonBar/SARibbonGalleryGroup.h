@@ -81,39 +81,39 @@ public:
     SARibbonGalleryGroup(QWidget* w = 0);
 
     virtual ~SARibbonGalleryGroup();
-    //重新计算grid尺寸
+    // 重新计算grid尺寸
     void setRecalcGridSizeBlock(bool on = true);
     bool isRecalcGridSizeBlock() const;
     void recalcGridSize();
     void recalcGridSize(int galleryHeight);
-    //设置显示的样式
+    // 设置显示的样式
     void setGalleryGroupStyle(GalleryGroupStyle style);
-    GalleryGroupStyle getGalleryGroupStyle() const;
-    //添加一个item
+    GalleryGroupStyle galleryGroupStyle() const;
+    // 添加一个item
     void addItem(const QString& text, const QIcon& icon);
     void addItem(SARibbonGalleryItem* item);
-    //以一个aciton作为item添加
+    // 以一个aciton作为item添加
     void addActionItem(QAction* act);
     void addActionItemList(const QList< QAction* >& acts);
 
-    //构建一个model，这个model的父类是SARibbonGalleryGroup，如果要共享model，需要手动处理model的父类
+    // 构建一个model，这个model的父类是SARibbonGalleryGroup，如果要共享model，需要手动处理model的父类
     void setupGroupModel();
     SARibbonGalleryGroupModel* groupModel();
     // 标题
     void setGroupTitle(const QString& title);
-    QString getGroupTitle() const;
+    QString groupTitle() const;
     void selectByIndex(int i);
-    //设置显示的行数
+    // 设置显示的行数
     void setDisplayRow(DisplayRow r);
-    DisplayRow getDisplayRow() const;
-    //设置grid最小的宽度，默认为0（不限制），可以限定grid的宽度
+    DisplayRow displayRow() const;
+    // 设置grid最小的宽度，默认为0（不限制），可以限定grid的宽度
     void setGridMinimumWidth(int w);
-    int getGridMinimumWidth() const;
-    //设置grid最大的宽度，默认为0（不限制），可以限定grid的宽度
+    int gridMinimumWidth() const;
+    // 设置grid最大的宽度，默认为0（不限制），可以限定grid的宽度
     void setGridMaximumWidth(int w);
-    int getGridMaximumWidth() const;
-    //获取SARibbonGalleryGroup管理的actiongroup
-    QActionGroup* getActionGroup() const;
+    int gridMaximumWidth() const;
+    // 获取SARibbonGalleryGroup管理的actiongroup
+    QActionGroup* actionGroup() const;
 private slots:
     void onItemClicked(const QModelIndex& index);
     void onItemEntered(const QModelIndex& index);

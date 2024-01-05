@@ -60,7 +60,7 @@
 #endif
 
 /**
-   @brief 定义Ribbon的对其方式，目前支持左对齐和居中对其
+ * @brief 定义Ribbon的对其方式，目前支持左对齐和居中对其
  */
 enum class SARibbonAlignment
 {

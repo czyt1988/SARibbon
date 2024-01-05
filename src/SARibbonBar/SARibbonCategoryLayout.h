@@ -35,44 +35,44 @@ public:
     QSize minimumSize() const Q_DECL_OVERRIDE;
     Qt::Orientations expandingDirections() const Q_DECL_OVERRIDE;
     void invalidate() Q_DECL_OVERRIDE;
-    //追加一个pannel
+    // 追加一个pannel
     void addPannel(SARibbonPannel* pannel);
-    //插入一个pannel
+    // 插入一个pannel
     void insertPannel(int index, SARibbonPannel* pannel);
     //
     QSize categoryContentSize() const;
-    //更新尺寸
+    // 更新尺寸
     void updateGeometryArr();
 
-    //执行位置调整
+    // 执行位置调整
     void doLayout();
 
-    //返回所有pannels
+    // 返回所有pannels
     QList< SARibbonPannel* > pannels() const;
 
-    //通过obj name获取pannel
+    // 通过obj name获取pannel
     SARibbonPannel* pannelByObjectName(const QString& objname) const;
-    //通过pannel name获取pannel
+    // 通过pannel name获取pannel
     SARibbonPannel* pannelByName(const QString& pannelname) const;
-    //通过索引找到pannel，如果超过索引范围，会返回nullptr
+    // 通过索引找到pannel，如果超过索引范围，会返回nullptr
     SARibbonPannel* pannelByIndex(int i) const;
-    //移动pannel
+    // 移动pannel
     void movePannel(int from, int to);
     // pannel的数量
     int pannelCount() const;
     // pannel的索引
     int pannelIndex(SARibbonPannel* p) const;
-    //获取所有的pannel
+    // 获取所有的pannel
     QList< SARibbonPannel* > pannelList() const;
-    //执行滚轮事件
+    // 执行滚轮事件
     void scroll(int px);
-    //判断是否有滚动过
+    // 判断是否有滚动过
     bool isScrolled() const;
     // category的总宽度
     int categoryTotalWidth() const;
-    //设置Category的对齐方式
+    // 设置Category的对齐方式
     void setCategoryAlignment(SARibbonAlignment al);
-    SARibbonAlignment getCategoryAlignment() const;
+    SARibbonAlignment categoryAlignment() const;
 private slots:
     void onLeftScrollButtonClicked();
     void onRightScrollButtonClicked();
@@ -86,7 +86,7 @@ class SA_RIBBON_EXPORT SARibbonCategoryLayoutItem : public QWidgetItem
 public:
     SARibbonCategoryLayoutItem(SARibbonPannel* w);
     SARibbonSeparatorWidget* separatorWidget;
-    //把内部的widget转换为pannel
+    // 把内部的widget转换为pannel
     SARibbonPannel* toPannelWidget();
     QRect mWillSetGeometry;           ///< pannel将要设置的Geometry
     QRect mWillSetSeparatorGeometry;  ///< pannel将要设置的Separator的Geometry

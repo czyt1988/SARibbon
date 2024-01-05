@@ -82,12 +82,12 @@ SARibbonCtrlContainer::~SARibbonCtrlContainer()
 {
 }
 
-QWidget* SARibbonCtrlContainer::getContainerWidget()
+QWidget* SARibbonCtrlContainer::containerWidget()
 {
     return (d_ptr->containerWidget);
 }
 
-const QWidget* SARibbonCtrlContainer::getContainerWidget() const
+const QWidget* SARibbonCtrlContainer::containerWidget() const
 {
     return (d_ptr->containerWidget);
 }
@@ -131,7 +131,7 @@ void SARibbonCtrlContainer::setIcon(const QPixmap& pixmap)
  * @brief 获取图标
  * @return
  */
-QIcon SARibbonCtrlContainer::getIcon() const
+QIcon SARibbonCtrlContainer::icon() const
 {
     return d_ptr->icon;
 }
@@ -149,7 +149,7 @@ void SARibbonCtrlContainer::setText(const QString& t)
  * @brief 获取文字
  * @return
  */
-QString SARibbonCtrlContainer::getText() const
+QString SARibbonCtrlContainer::text() const
 {
     return d_ptr->labelText->text();
 }
@@ -157,4 +157,13 @@ QString SARibbonCtrlContainer::getText() const
 void SARibbonCtrlContainer::setContainerWidget(QWidget* w)
 {
     d_ptr->setContainerWidget(w);
+}
+
+/**
+ * @brief 获取显示icon的窗口
+ * @return
+ */
+QWidget* SARibbonCtrlContainer::iconWidget() const
+{
+    return d_ptr->labelPixmap;
 }

@@ -256,7 +256,7 @@ QList< QColor > SAColorGridWidget::getColorList() const
  * @brief 获取间隔
  * @return
  */
-int SAColorGridWidget::getSpacing() const
+int SAColorGridWidget::spacing() const
 {
     return d_ptr->mGridLayout->spacing();
 }
@@ -274,7 +274,7 @@ void SAColorGridWidget::setSpacing(int v)
  * @brief 获取颜色的数量
  * @return
  */
-int SAColorGridWidget::getColorCount() const
+int SAColorGridWidget::colorCount() const
 {
     return d_ptr->mColors.size();
 }
@@ -295,7 +295,7 @@ void SAColorGridWidget::setColorIconSize(const QSize& s)
  * @brief 获取图标 size
  * @return
  */
-QSize SAColorGridWidget::getColorIconSize() const
+QSize SAColorGridWidget::colorIconSize() const
 {
     return d_ptr->mIconSize;
 }
@@ -325,7 +325,7 @@ bool SAColorGridWidget::isColorCheckable() const
  * @brief 获取当前选中的颜色
  * @return
  */
-QColor SAColorGridWidget::getCurrentCheckedColor() const
+QColor SAColorGridWidget::currentCheckedColor() const
 {
     QAbstractButton* btn = d_ptr->mButtonGroup->checkedButton();
     if (nullptr == btn) {
@@ -335,7 +335,7 @@ QColor SAColorGridWidget::getCurrentCheckedColor() const
     if (nullptr == t) {
         return QColor();
     }
-    return t->getColor();
+    return t->color();
 }
 
 /**
@@ -343,7 +343,7 @@ QColor SAColorGridWidget::getCurrentCheckedColor() const
  * @param index
  * @return 如果没有返回nullptr
  */
-SAColorToolButton* SAColorGridWidget::getColorButton(int index) const
+SAColorToolButton* SAColorGridWidget::colorButton(int index) const
 {
     return d_ptr->getColorToolButtonAt(index);
 }
@@ -360,7 +360,7 @@ void SAColorGridWidget::setVerticalSpacing(int v)
  * @brief 等同GridLayout的VerticalSpacing属性
  * @return
  */
-int SAColorGridWidget::getVerticalSpacing() const
+int SAColorGridWidget::verticalSpacing() const
 {
     return d_ptr->mGridLayout->verticalSpacing();
 }
@@ -376,7 +376,7 @@ void SAColorGridWidget::setHorizontalSpacing(int v)
  * @brief 等同GridLayout的HorizontalSpacing属性
  * @return
  */
-int SAColorGridWidget::getHorizontalSpacing() const
+int SAColorGridWidget::horizontalSpacing() const
 {
     return d_ptr->mGridLayout->horizontalSpacing();
 }
@@ -427,7 +427,7 @@ void SAColorGridWidget::onButtonClicked(QAbstractButton* btn)
 {
     SAColorToolButton* t = qobject_cast< SAColorToolButton* >(btn);
     if (t) {
-        emit colorClicked(t->getColor());
+        emit colorClicked(t->color());
     }
 }
 
@@ -435,7 +435,7 @@ void SAColorGridWidget::onButtonPressed(QAbstractButton* btn)
 {
     SAColorToolButton* t = qobject_cast< SAColorToolButton* >(btn);
     if (t) {
-        emit colorPressed(t->getColor());
+        emit colorPressed(t->color());
     }
 }
 
@@ -443,7 +443,7 @@ void SAColorGridWidget::onButtonToggled(QAbstractButton* btn, bool on)
 {
     SAColorToolButton* t = qobject_cast< SAColorToolButton* >(btn);
     if (t) {
-        emit colorToggled(t->getColor(), on);
+        emit colorToggled(t->color(), on);
     }
 }
 
@@ -468,7 +468,7 @@ void SAColorGridWidget::onButtonReleased(QAbstractButton* btn)
 {
     SAColorToolButton* t = qobject_cast< SAColorToolButton* >(btn);
     if (t) {
-        emit colorReleased(t->getColor());
+        emit colorReleased(t->color());
     }
 }
 

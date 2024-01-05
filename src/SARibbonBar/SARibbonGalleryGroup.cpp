@@ -41,7 +41,7 @@ void SARibbonGalleryGroupItemDelegate::paint(QPainter* painter, const QStyleOpti
     if (nullptr == m_group) {
         return;
     }
-    switch (m_group->getGalleryGroupStyle()) {
+    switch (m_group->galleryGroupStyle()) {
     case SARibbonGalleryGroup::IconWithText:
         paintIconWithText(painter, option, index);
         break;
@@ -239,7 +239,7 @@ void SARibbonGalleryGroup::recalcGridSize(int galleryHeight)
         return;
     }
     // 首先通过DisplayRow计算GridSize
-    int dr = static_cast< int >(getDisplayRow());
+    int dr = static_cast< int >(displayRow());
     if (dr < 1) {
         dr = 1;
     } else if (dr > 3) {
@@ -250,20 +250,20 @@ void SARibbonGalleryGroup::recalcGridSize(int galleryHeight)
         h = galleryHeight;
     }
     int w = h;
-    if (getGridMinimumWidth() > 0) {
-        if (w < getGridMinimumWidth()) {
-            w = getGridMinimumWidth();
+    if (gridMinimumWidth() > 0) {
+        if (w < gridMinimumWidth()) {
+            w = gridMinimumWidth();
         }
     }
-    if (getGridMaximumWidth() > 0) {
-        if (w > getGridMaximumWidth()) {
-            w = getGridMaximumWidth();
+    if (gridMaximumWidth() > 0) {
+        if (w > gridMaximumWidth()) {
+            w = gridMaximumWidth();
         }
     }
     setGridSize(QSize(w, h));
     // 在通过GalleryGroupStyle确定icon的尺寸
     const int shiftpix = 4;  // 这个是移动像素，qt在鼠标移动到图标上时会移动一下，给用户明确的动态，导致如果布局很满会超出显示范围，因此要在此基础上缩放一点
-    switch (getGalleryGroupStyle()) {
+    switch (galleryGroupStyle()) {
     case IconWithText: {
         int textHeight = fontMetrics().lineSpacing();
         int iconHeight = h - textHeight - 2 * spacing() - shiftpix;
@@ -312,7 +312,7 @@ void SARibbonGalleryGroup::setGalleryGroupStyle(SARibbonGalleryGroup::GalleryGro
     recalcGridSize();
 }
 
-SARibbonGalleryGroup::GalleryGroupStyle SARibbonGalleryGroup::getGalleryGroupStyle() const
+SARibbonGalleryGroup::GalleryGroupStyle SARibbonGalleryGroup::galleryGroupStyle() const
 {
     return d_ptr->mPreStyle;
 }
@@ -381,7 +381,7 @@ void SARibbonGalleryGroup::setGroupTitle(const QString& title)
     emit groupTitleChanged(d_ptr->mGroupTitle);
 }
 
-QString SARibbonGalleryGroup::getGroupTitle() const
+QString SARibbonGalleryGroup::groupTitle() const
 {
     return (d_ptr->mGroupTitle);
 }
@@ -415,7 +415,7 @@ void SARibbonGalleryGroup::setDisplayRow(DisplayRow r)
  * @brief Gallery显示的行数
  * @return
  */
-SARibbonGalleryGroup::DisplayRow SARibbonGalleryGroup::getDisplayRow() const
+SARibbonGalleryGroup::DisplayRow SARibbonGalleryGroup::displayRow() const
 {
     return d_ptr->mDisplayRow;
 }
@@ -433,7 +433,7 @@ void SARibbonGalleryGroup::setGridMinimumWidth(int w)
  * @brief grid最小的宽度，默认为0（不限制）
  * @return
  */
-int SARibbonGalleryGroup::getGridMinimumWidth() const
+int SARibbonGalleryGroup::gridMinimumWidth() const
 {
     return d_ptr->mGridMinimumWidth;
 }
@@ -451,7 +451,7 @@ void SARibbonGalleryGroup::setGridMaximumWidth(int w)
  * @brief grid最大的的宽度，默认为0（不限制）
  * @param w
  */
-int SARibbonGalleryGroup::getGridMaximumWidth() const
+int SARibbonGalleryGroup::gridMaximumWidth() const
 {
     return d_ptr->mGridMaximumWidth;
 }
@@ -460,7 +460,7 @@ int SARibbonGalleryGroup::getGridMaximumWidth() const
  * @brief 获取SARibbonGalleryGroup管理的actiongroup
  * @return
  */
-QActionGroup* SARibbonGalleryGroup::getActionGroup() const
+QActionGroup* SARibbonGalleryGroup::actionGroup() const
 {
     return d_ptr->mActionGroup;
 }

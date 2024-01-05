@@ -17,10 +17,14 @@ public:
     SARibbonQuickAccessBar(QWidget* parent = 0);
     ~SARibbonQuickAccessBar();
     void addSeparator();
-    void addAction(QAction* act, Qt::ToolButtonStyle buttonStyle = Qt::ToolButtonIconOnly, QToolButton::ToolButtonPopupMode popMode = QToolButton::DelayedPopup);
+    void addAction(QAction* act,
+                   Qt::ToolButtonStyle buttonStyle          = Qt::ToolButtonIconOnly,
+                   QToolButton::ToolButtonPopupMode popMode = QToolButton::DelayedPopup);
     void addWidget(QWidget* w);
-    void addMenu(QMenu* m, Qt::ToolButtonStyle buttonStyle = Qt::ToolButtonIconOnly, QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
-    //获取内部管理的ButtonGroupWidget
+    void addMenu(QMenu* m,
+                 Qt::ToolButtonStyle buttonStyle          = Qt::ToolButtonIconOnly,
+                 QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
+    // 获取内部管理的ButtonGroupWidget
     SARibbonButtonGroupWidget* buttonGroupWidget();
     const SARibbonButtonGroupWidget* buttonGroupWidget() const;
     // icon 尺寸设置 - 注意，如果要自定义iconsize，需要设置

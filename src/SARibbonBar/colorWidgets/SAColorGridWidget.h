@@ -20,47 +20,47 @@ class SA_COLOR_WIDGETS_API SAColorGridWidget : public QWidget
 {
     Q_OBJECT
     SA_COLOR_WIDGETS_DECLARE_PRIVATE(SAColorGridWidget)
-    Q_PROPERTY(int spacing READ getSpacing WRITE setSpacing)
+    Q_PROPERTY(int spacing READ spacing WRITE setSpacing)
 public:
     using FunColorBtn = std::function< void(SAColorToolButton*) >;
 
 public:
     SAColorGridWidget(QWidget* par = nullptr);
     ~SAColorGridWidget();
-    //设置列数，行数量会根据列数量来匹配,如果设置-1或者0，说明不限定列数量，这样会只有一行
+    // 设置列数，行数量会根据列数量来匹配,如果设置-1或者0，说明不限定列数量，这样会只有一行
     void setColumnCount(int c);
-    int getColumnCount() const;
-    //设置当前的颜色列表
+    int columnCount() const;
+    // 设置当前的颜色列表
     void setColorList(const QList< QColor >& cls);
     QList< QColor > getColorList() const;
-    //间隔
-    int getSpacing() const;
+    // 间隔
+    int spacing() const;
     void setSpacing(int v);
-    //获取颜色的数量
-    int getColorCount() const;
-    //图标的尺寸
+    // 获取颜色的数量
+    int colorCount() const;
+    // 图标的尺寸
     void setColorIconSize(const QSize& s);
-    QSize getColorIconSize() const;
-    //设置颜色是否是checkable
+    QSize colorIconSize() const;
+    // 设置颜色是否是checkable
     void setColorCheckable(bool on = true);
     bool isColorCheckable() const;
-    //获取当前选中的颜色
-    QColor getCurrentCheckedColor() const;
-    //获取index对于的colorbutton
-    SAColorToolButton* getColorButton(int index) const;
-    //垂直间距
+    // 获取当前选中的颜色
+    QColor currentCheckedColor() const;
+    // 获取index对于的colorbutton
+    SAColorToolButton* colorButton(int index) const;
+    // 垂直间距
     void setVerticalSpacing(int v);
-    int getVerticalSpacing() const;
-    //水平间距
+    int verticalSpacing() const;
+    // 水平间距
     void setHorizontalSpacing(int v);
-    int getHorizontalSpacing() const;
-    //清除当前选中状态，这时没有颜色是选中的
+    int horizontalSpacing() const;
+    // 清除当前选中状态，这时没有颜色是选中的
     void clearCheckedState();
-    //对所有的colorbtn就行遍历处理，可以通过此函数进行tooltip设置等操作
+    // 对所有的colorbtn就行遍历处理，可以通过此函数进行tooltip设置等操作
     void iterationColorBtns(FunColorBtn fn);
-    //设置行最小高度
+    // 设置行最小高度
     void setRowMinimumHeight(int row, int minSize);
-    //让颜色块左对齐
+    // 让颜色块左对齐
     void setHorizontalSpacerToRight(bool on = true);
 private slots:
     void onButtonClicked(QAbstractButton* btn);
