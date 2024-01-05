@@ -292,7 +292,7 @@ SAColorToolButton::~SAColorToolButton()
  * @brief 获取颜色
  * @return
  */
-QColor SAColorToolButton::getColor() const
+QColor SAColorToolButton::color() const
 {
     return d_ptr->mColor;
 }
@@ -307,7 +307,7 @@ void SAColorToolButton::setMargins(const QMargins& mg)
     repaint();
 }
 
-QMargins SAColorToolButton::getMargins() const
+QMargins SAColorToolButton::margins() const
 {
     return d_ptr->mMargins;
 }
@@ -445,7 +445,7 @@ QSize SAColorToolButton::sizeHint() const
 
 void SAColorToolButton::onButtonClicked(bool checked)
 {
-    emit colorClicked(getColor(), checked);
+    emit colorClicked(color(), checked);
 }
 
 /**

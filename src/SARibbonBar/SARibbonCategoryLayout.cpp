@@ -361,7 +361,7 @@ void SARibbonCategoryLayout::updateGeometryArr()
         }
     }
     int x = d_ptr->mXBase;
-    if ((getCategoryAlignment() == SARibbonAlignment::AlignCenter) && (total < categoryWidth) && (0 == expandWidth)) {
+    if ((categoryAlignment() == SARibbonAlignment::AlignCenter) && (total < categoryWidth) && (0 == expandWidth)) {
         // 如果是居中对齐，同时没有伸缩的pannel，同时总宽度没有超过category的宽度
         x = (categoryWidth - total) / 2;
     }
@@ -641,7 +641,7 @@ void SARibbonCategoryLayout::setCategoryAlignment(SARibbonAlignment al)
    @brief Category的对齐方式
    @return
  */
-SARibbonAlignment SARibbonCategoryLayout::getCategoryAlignment() const
+SARibbonAlignment SARibbonCategoryLayout::categoryAlignment() const
 {
     return d_ptr->mCategoryAlignment;
 }

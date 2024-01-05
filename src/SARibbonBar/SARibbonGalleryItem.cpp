@@ -157,7 +157,7 @@ void SARibbonGalleryItem::setTextAlignment(Qt::Alignment a)
     setData(Qt::TextAlignmentRole, (int)a);
 }
 
-Qt::Alignment SARibbonGalleryItem::getTextAlignment() const
+Qt::Alignment SARibbonGalleryItem::textAlignment() const
 {
     return qvariant_cast< Qt::Alignment >(data(Qt::TextAlignmentRole));
 }

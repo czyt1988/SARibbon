@@ -139,7 +139,7 @@ public:
     static QString versionString();
 
     // 获取默认的上下文标签颜色列表
-    static QList< QColor > getDefaultContextCategoryColorList();
+    static QList< QColor > defaultContextCategoryColorList();
 
 public:
     // 构造函数
@@ -196,9 +196,7 @@ public:
     void removeCategory(SARibbonCategory* category);
 
     // 添加一个上下文标签
-    SARibbonContextCategory* addContextCategory(const QString& title,
-                                                const QColor& color = QColor(),
-                                                const QVariant& id  = QVariant());
+    SARibbonContextCategory* addContextCategory(const QString& title, const QColor& color = QColor(), const QVariant& id = QVariant());
     void addContextCategory(SARibbonContextCategory* context);
 
     // 显示一个上下文标签
@@ -335,7 +333,7 @@ public:
 
     // 上下文标签的颜色列表，上下文标签显示的时候，会从颜色列表中取颜色进行标签的渲染
     void setContextCategoryColorList(const QList< QColor >& cls);
-    QList< QColor > getContextCategoryColorList() const;
+    QList< QColor > contextCategoryColorList() const;
 
     // 设置ribbon的对齐方式
     void setRibbonAlignment(SARibbonAlignment al);

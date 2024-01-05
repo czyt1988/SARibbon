@@ -91,7 +91,7 @@ public:
 public:
     PrivateData(SARibbonBar* par) : q_ptr(par)
     {
-        mContextCategoryColorList = SARibbonBar::getDefaultContextCategoryColorList();
+        mContextCategoryColorList = SARibbonBar::defaultContextCategoryColorList();
     }
     void init();
     // 计算tabbar高度
@@ -101,11 +101,7 @@ public:
     // 根据字体信息计算category的高度
     static int calcCategoryHeight(const QFontMetrics& fm, SARibbonBar::RibbonStyles rStyle, int pannelTitleHeight);
     // 计算tabbar高度
-    static int calcMainBarHeight(int tabHegith,
-                                 int titleHeight,
-                                 int categoryHeight,
-                                 RibbonStyles rStyle,
-                                 SARibbonBar::RibbonMode rMode);
+    static int calcMainBarHeight(int tabHegith, int titleHeight, int categoryHeight, RibbonStyles rStyle, SARibbonBar::RibbonMode rMode);
     // 获取当前最小模式下的高度
     int getCurrentMinimumModeMainBarHeight() const;
 
@@ -149,10 +145,7 @@ void SARibbonBar::PrivateData::init()
     //
     mStackedContainerWidget = RibbonSubElementDelegate->createRibbonStackedWidget(q_ptr);
     mStackedContainerWidget->setObjectName(QStringLiteral("objSARibbonStackedContainerWidget"));
-    mStackedContainerWidget->connect(mStackedContainerWidget,
-                                     &SARibbonStackedWidget::hidWindow,
-                                     q_ptr,
-                                     &SARibbonBar::onStackWidgetHided);
+    mStackedContainerWidget->connect(mStackedContainerWidget, &SARibbonStackedWidget::hidWindow, q_ptr, &SARibbonBar::onStackWidgetHided);
     // 捕获事件，在popmode时必须用到
     mStackedContainerWidget->installEventFilter(q_ptr);
     //
@@ -452,7 +445,7 @@ QString SARibbonBar::versionString()
    @brief 获取默认的上下文标签颜色列表
    @return
  */
-QList< QColor > SARibbonBar::getDefaultContextCategoryColorList()
+QList< QColor > SARibbonBar::defaultContextCategoryColorList()
 {
     QList< QColor > res;
     res << QColor(201, 89, 156)  // 玫红
@@ -461,7 +454,7 @@ QList< QColor > SARibbonBar::getDefaultContextCategoryColorList()
         << QColor(14, 81, 167)   // 蓝
         << QColor(228, 0, 69)    // 红
         << QColor(67, 148, 0)    // 绿
-        ;
+            ;
     return res;
 }
 
@@ -1014,13 +1007,11 @@ void SARibbonBar::showMinimumModeButton(bool isShow)
 
         d_ptr->mMinimumCategoryButtonAction = new QAction(this);
         d_ptr->mMinimumCategoryButtonAction->setIcon(
-            style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton,
-                                  nullptr));
+                style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton, nullptr));
         connect(d_ptr->mMinimumCategoryButtonAction, &QAction::triggered, this, [ this ]() {
             this->setMinimumMode(!isMinimumMode());
             this->d_ptr->mMinimumCategoryButtonAction->setIcon(
-                style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton,
-                                      nullptr));
+                    style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton, nullptr));
         });
         d_ptr->mRightButtonGroup->addAction(d_ptr->mMinimumCategoryButtonAction);
 
@@ -1411,7 +1402,7 @@ void SARibbonBar::setRibbonStyle(SARibbonBar::RibbonStyles v)
              << "\n  isTwoRowStyle=" << isTwoRowStyle()      //
              << "\n  isLooseStyle=" << isLooseStyle()        //
              << "\n  isCompactStyle=" << isCompactStyle()    //
-        ;
+            ;
 #endif
     // 执行判断
     setEnableWordWrap(isThreeRowStyle());
@@ -1755,7 +1746,7 @@ void SARibbonBar::setContextCategoryColorList(const QList< QColor >& cls)
 {
     d_ptr->mContextCategoryColorList = cls;
     if (d_ptr->mContextCategoryColorList.isEmpty()) {
-        d_ptr->mContextCategoryColorList = getDefaultContextCategoryColorList();
+        d_ptr->mContextCategoryColorList = defaultContextCategoryColorList();
     }
     d_ptr->mContextCategoryColorListIndex = 0;
     // 这时需要对已经显示的contextCategoryData的颜色进行重新设置
@@ -1768,7 +1759,7 @@ void SARibbonBar::setContextCategoryColorList(const QList< QColor >& cls)
    @brief 获取上下文标签的颜色列表
    @return
  */
-QList< QColor > SARibbonBar::getContextCategoryColorList() const
+QList< QColor > SARibbonBar::contextCategoryColorList() const
 {
     return d_ptr->mContextCategoryColorList;
 }
@@ -1994,11 +1985,10 @@ void SARibbonBar::paintInLooseStyle()
             titleRegion.setRect(d_ptr->mQuickAccessBar->geometry().right() + 1,
                                 border.top(),
                                 width() - d_ptr->mIconRightBorderPosition - border.right()
-                                    - d_ptr->mWindowButtonSize.width() - d_ptr->mQuickAccessBar->geometry().right() - 1,
+                                        - d_ptr->mWindowButtonSize.width() - d_ptr->mQuickAccessBar->geometry().right() - 1,
                                 titleBarHeight());
         } else {
-            int leftwidth = contextCategoryRegion.x() - d_ptr->mQuickAccessBar->geometry().right()
-                            - d_ptr->mIconRightBorderPosition;
+            int leftwidth = contextCategoryRegion.x() - d_ptr->mQuickAccessBar->geometry().right() - d_ptr->mIconRightBorderPosition;
             int rightwidth = width() - contextCategoryRegion.y() - d_ptr->mWindowButtonSize.width();
             //            if (width() - contextCategoryRegion.y() > contextCategoryRegion.x()-x) {
             if (rightwidth > leftwidth) {

@@ -103,7 +103,7 @@ void SAColorPaletteGridWidget::setColorList(const QList< QColor >& cls)
  * @brief 获取颜色系列
  * @return
  */
-QList< QColor > SAColorPaletteGridWidget::getColorList() const
+QList< QColor > SAColorPaletteGridWidget::colorList() const
 {
     return d_ptr->mMainColorList->getColorList();
 }
@@ -124,7 +124,7 @@ void SAColorPaletteGridWidget::setFactor(const QList< int >& factor)
  * @brief 获取色卡
  * @return
  */
-QList< int > SAColorPaletteGridWidget::getFactor() const
+QList< int > SAColorPaletteGridWidget::factor() const
 {
     return d_ptr->mFactor;
 }
@@ -139,9 +139,9 @@ void SAColorPaletteGridWidget::setColorIconSize(const QSize& s)
     d_ptr->mPaletteColorGrid->setColorIconSize(s);
 }
 
-QSize SAColorPaletteGridWidget::getColorIconSize() const
+QSize SAColorPaletteGridWidget::colorIconSize() const
 {
-    return d_ptr->mMainColorList->getColorIconSize();
+    return d_ptr->mMainColorList->colorIconSize();
 }
 
 /**

@@ -15,16 +15,16 @@ public:
     SAColorPaletteGridWidget(QWidget* par = nullptr);
     SAColorPaletteGridWidget(const QList< QColor >& cls, QWidget* par = nullptr);
     ~SAColorPaletteGridWidget();
-    //设置窗口维护的colorList
+    // 设置窗口维护的colorList
     void setColorList(const QList< QColor >& cls);
-    QList< QColor > getColorList() const;
-    //设置颜色深浅比例factor，默认为{ 180, 160, 140, 75, 50 }
+    QList< QColor > colorList() const;
+    // 设置颜色深浅比例factor，默认为{ 180, 160, 140, 75, 50 }
     void setFactor(const QList< int >& factor);
-    QList< int > getFactor() const;
-    //设置iconsize
+    QList< int > factor() const;
+    // 设置iconsize
     void setColorIconSize(const QSize& s);
-    QSize getColorIconSize() const;
-    //设置颜色是否是checkable
+    QSize colorIconSize() const;
+    // 设置颜色是否是checkable
     void setColorCheckable(bool on = true);
     bool isColorCheckable() const;
 private slots:

@@ -24,15 +24,15 @@ public:
     SARibbonColorToolButton(QWidget* parent = Q_NULLPTR);
     SARibbonColorToolButton(QAction* defaultAction, QWidget* parent = Q_NULLPTR);
     ~SARibbonColorToolButton();
-    //获取颜色
-    QColor getColor() const;
-    //设置颜色显示方案
+    // 获取颜色
+    QColor color() const;
+    // 设置颜色显示方案
     void setColorStyle(ColorStyle s);
     ColorStyle colorStyle() const;
-    //建立标准的颜色菜单
+    // 建立标准的颜色菜单
     SAColorMenu* setupStandardColorMenu();
 public slots:
-    //设置颜色,会发射colorChanged信号
+    // 设置颜色,会发射colorChanged信号
     void setColor(const QColor& c);
 private slots:
     void onButtonClicked(bool checked = false);

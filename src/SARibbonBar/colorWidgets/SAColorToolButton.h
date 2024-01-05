@@ -43,19 +43,19 @@ class SA_COLOR_WIDGETS_API SAColorToolButton : public QToolButton
 public:
     explicit SAColorToolButton(QWidget* parent = nullptr);
     ~SAColorToolButton();
-    //获取颜色
-    QColor getColor() const;
-    //设置Margins
+    // 获取颜色
+    QColor color() const;
+    // 设置Margins
     void setMargins(const QMargins& mg);
-    QMargins getMargins() const;
-    //绘制无颜色
+    QMargins margins() const;
+    // 绘制无颜色
     static void paintNoneColor(QPainter* p, const QRect& colorRect);
 public slots:
-    //设置颜色,会发射colorChanged信号
+    // 设置颜色,会发射colorChanged信号
     void setColor(const QColor& c);
 
 protected:
-    //获取关键的三个rect位置
+    // 获取关键的三个rect位置
     virtual void calcRect(const QStyleOptionToolButton& opt, QRect& iconRect, QRect& textRect, QRect& colorRect);
     virtual void paintButton(QStylePainter* p, const QStyleOptionToolButton& opt);
     virtual void paintIcon(QStylePainter* p, const QRect& iconRect, const QStyleOptionToolButton& opt);

@@ -100,11 +100,11 @@ public:
             layout->addWidget(viewportGroup, 1);
         }
         viewportGroup->setRecalcGridSizeBlock(true);
-        viewportGroup->setGalleryGroupStyle(v->getGalleryGroupStyle());
-        viewportGroup->setDisplayRow(v->getDisplayRow());
+        viewportGroup->setGalleryGroupStyle(v->galleryGroupStyle());
+        viewportGroup->setDisplayRow(v->displayRow());
         viewportGroup->setSpacing(v->spacing());
-        viewportGroup->setGridMaximumWidth(v->getGridMaximumWidth());
-        viewportGroup->setGridMinimumWidth(v->getGridMinimumWidth());
+        viewportGroup->setGridMaximumWidth(v->gridMaximumWidth());
+        viewportGroup->setGridMinimumWidth(v->gridMinimumWidth());
         viewportGroup->setRecalcGridSizeBlock(false);
         viewportGroup->recalcGridSize(viewportGroup->height());
         viewportGroup->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -167,7 +167,7 @@ void SARibbonGalleryViewport::addWidget(QWidget* w, const QString& title)
  * @param g
  * @return 如果没有管理group，将返回nullptr
  */
-QLabel* SARibbonGalleryViewport::getWidgetTitleLabel(QWidget* w)
+QLabel* SARibbonGalleryViewport::titleLabel(QWidget* w)
 {
     return _widgetToTitleLable.value(w, nullptr);
 }
@@ -178,7 +178,7 @@ QLabel* SARibbonGalleryViewport::getWidgetTitleLabel(QWidget* w)
  */
 void SARibbonGalleryViewport::removeWidget(QWidget* w)
 {
-    QLabel* label = getWidgetTitleLabel(w);
+    QLabel* label = titleLabel(w);
     if (label) {
         m_layout->removeWidget(label);
     }
@@ -190,9 +190,9 @@ void SARibbonGalleryViewport::removeWidget(QWidget* w)
  * @param g
  * @param title
  */
-void SARibbonGalleryViewport::widgetTitleChanged(QWidget* w, const QString& title)
+void SARibbonGalleryViewport::onTitleChanged(QWidget* w, const QString& title)
 {
-    QLabel* l = getWidgetTitleLabel(w);
+    QLabel* l = titleLabel(w);
     if (l) {
         l->setText(title);
     }
@@ -238,10 +238,10 @@ void SARibbonGallery::addGalleryGroup(SARibbonGalleryGroup* group)
 {
     group->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     SARibbonGalleryViewport* viewport = ensureGetPopupViewPort();
-    viewport->addWidget(group, group->getGroupTitle());
+    viewport->addWidget(group, group->groupTitle());
     connect(group, &QAbstractItemView::clicked, this, &SARibbonGallery::onItemClicked);
     connect(group, &SARibbonGalleryGroup::groupTitleChanged, this, [ group, viewport ](const QString& t) {
-        viewport->widgetTitleChanged(group, t);
+        viewport->onTitleChanged(group, t);
     });
     connect(group, &SARibbonGalleryGroup::triggered, this, &SARibbonGallery::triggered);
     connect(group, &SARibbonGalleryGroup::hovered, this, &SARibbonGallery::hovered);

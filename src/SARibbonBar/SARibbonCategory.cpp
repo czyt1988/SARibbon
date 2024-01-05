@@ -602,11 +602,11 @@ void SARibbonCategory::setCategoryAlignment(SARibbonAlignment al)
    @brief Category的对齐方式
    @return
  */
-SARibbonAlignment SARibbonCategory::getCategoryAlignment() const
+SARibbonAlignment SARibbonCategory::categoryAlignment() const
 {
     SARibbonCategoryLayout* lay = qobject_cast< SARibbonCategoryLayout* >(layout());
     if (lay) {
-        return lay->getCategoryAlignment();
+        return lay->categoryAlignment();
     }
     return SARibbonAlignment::AlignLeft;
 }
