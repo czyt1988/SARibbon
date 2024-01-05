@@ -104,12 +104,14 @@ public:
     static int calcMainBarHeight(int tabHegith, int titleHeight, int categoryHeight, RibbonStyles rStyle, SARibbonBar::RibbonMode rMode);
     // 获取当前最小模式下的高度
     int getCurrentMinimumModeMainBarHeight() const;
-
     // 获取当前正常模式下的高度
     int getCurrentNormalModeMainBarHeight() const;
-
     // 重置尺寸
     void resetSize();
+    // 获取关键参数
+    void getPivotalSize(int& tabHegith, int& titleHeight, int& categoryHeight) const;
+    // 更新推荐的尺寸值
+    void updateHintSize();
 
     void setApplicationButton(QAbstractButton* btn);
 
@@ -240,12 +242,16 @@ int SARibbonBar::PrivateData::calcMainBarHeight(int tabHegith,
 
 int SARibbonBar::PrivateData::getCurrentMinimumModeMainBarHeight() const
 {
-    return calcMainBarHeight(mTabBarHeight, mTitleBarHeight, mCategoryHeight, mRibbonStyle, SARibbonBar::MinimumRibbonMode);
+    int tabBarHeight, titleBarHeight, categoryHeight;
+    getPivotalSize(tabBarHeight, titleBarHeight, categoryHeight);
+    return calcMainBarHeight(tabBarHeight, titleBarHeight, categoryHeight, mRibbonStyle, SARibbonBar::MinimumRibbonMode);
 }
 
 int SARibbonBar::PrivateData::getCurrentNormalModeMainBarHeight() const
 {
-    return calcMainBarHeight(mTabBarHeight, mTitleBarHeight, mCategoryHeight, mRibbonStyle, SARibbonBar::NormalRibbonMode);
+    int tabBarHeight, titleBarHeight, categoryHeight;
+    getPivotalSize(tabBarHeight, titleBarHeight, categoryHeight);
+    return calcMainBarHeight(tabBarHeight, titleBarHeight, categoryHeight, mRibbonStyle, SARibbonBar::NormalRibbonMode);
 }
 
 /**
@@ -253,15 +259,52 @@ int SARibbonBar::PrivateData::getCurrentNormalModeMainBarHeight() const
  */
 void SARibbonBar::PrivateData::resetSize()
 {
+    updateHintSize();
+    int tabBarHeight, titleBarHeight, categoryHeight;
+    getPivotalSize(tabBarHeight, titleBarHeight, categoryHeight);
+    int mainBarHeight = calcMainBarHeight(tabBarHeight, titleBarHeight, categoryHeight, mRibbonStyle, mCurrentRibbonMode);
+    mRibbonTabBar->setFixedHeight(tabBarHeight);
+    // 处于最小模式下时，bar的高度为tabbar的bottom,这个调整必须在resize event之后
+    q_ptr->setFixedHeight(mainBarHeight);
+}
+
+/**
+ * @brief 获取tabHegith，titleHeight，categoryHeight三个关键尺寸
+ * @param tabHegith 返回
+ * @param titleHeight 返回
+ * @param categoryHeight 返回
+ */
+void SARibbonBar::PrivateData::getPivotalSize(int& tabHegith, int& titleHeight, int& categoryHeight) const
+{
+    if (mUserDefTabBarHeight) {
+        tabHegith = *mUserDefTabBarHeight;
+    } else {
+        tabHegith = mTabBarHeight;
+    }
+
+    if (mUserDefTitleBarHeight) {
+        titleHeight = *mUserDefTitleBarHeight;
+    } else {
+        titleHeight = mTitleBarHeight;
+    }
+
+    if (mUserDefCategoryHeight) {
+        categoryHeight = *mUserDefCategoryHeight;
+    } else {
+        categoryHeight = mCategoryHeight;
+    }
+}
+
+/**
+ * @brief 更新推荐的尺寸值
+ */
+void SARibbonBar::PrivateData::updateHintSize()
+{
     auto fm         = q_ptr->fontMetrics();
     mTitleBarHeight = calcTitleBarHeight(fm);
     // mTabBarHeight有大于0的值说明用户设置了，就使用用户设置的值
     mTabBarHeight   = calcTabBarHeight(fm);
     mCategoryHeight = calcCategoryHeight(fm, mRibbonStyle, mPannelTitleHeight);
-    int mainBarHeight = calcMainBarHeight(mTabBarHeight, mTitleBarHeight, mCategoryHeight, mRibbonStyle, mCurrentRibbonMode);
-    mRibbonTabBar->setFixedHeight(mTabBarHeight);
-    // 处于最小模式下时，bar的高度为tabbar的bottom,这个调整必须在resize event之后
-    q_ptr->setFixedHeight(mainBarHeight);
 }
 
 void SARibbonBar::PrivateData::setApplicationButton(QAbstractButton* btn)
@@ -1412,12 +1455,6 @@ void SARibbonBar::setRibbonStyle(SARibbonBar::RibbonStyles v)
     // 此函数会调用setFixedHeight
     synchronousCategoryData(false);  // 这里不急着刷新，下面会继续刷新
     d_ptr->resetSize();
-
-    // QSize oldSize = size();
-    // QSize newSize(oldSize.width(), mainBarHeight());
-    // QResizeEvent es(newSize, oldSize);
-
-    // QApplication::sendEvent(this, &es);
 
     emit ribbonStyleChanged(d_ptr->mRibbonStyle);
 }
