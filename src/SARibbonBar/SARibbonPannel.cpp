@@ -146,13 +146,13 @@ void SARibbonPannel::PrivateData::setPannelName(const QString& title)
 // SARibbonPannel
 //==================================================
 
-SARibbonPannel::SARibbonPannel(QWidget* parent) : QWidget(parent), d_ptr(new SARibbonPannel::PrivateData(this))
+SARibbonPannel::SARibbonPannel(QWidget* parent) : QFrame(parent), d_ptr(new SARibbonPannel::PrivateData(this))
 {
     setPannelLayoutMode(ThreeRowMode);
 }
 
 SARibbonPannel::SARibbonPannel(const QString& name, QWidget* parent)
-    : QWidget(parent), d_ptr(new SARibbonPannel::PrivateData(this))
+    : QFrame(parent), d_ptr(new SARibbonPannel::PrivateData(this))
 {
     setPannelLayoutMode(ThreeRowMode);
     setPannelName(name);
@@ -336,7 +336,10 @@ void SARibbonPannel::addMediumAction(QAction* action, QToolButton::ToolButtonPop
  * @param rp action在pannel中的占位情况，默认是大图标
  * @return 返回添加的action
  */
-QAction* SARibbonPannel::addAction(const QString& text, const QIcon& icon, QToolButton::ToolButtonPopupMode popMode, SARibbonPannelItem::RowProportion rp)
+QAction* SARibbonPannel::addAction(const QString& text,
+                                   const QIcon& icon,
+                                   QToolButton::ToolButtonPopupMode popMode,
+                                   SARibbonPannelItem::RowProportion rp)
 {
     QAction* action = new QAction(icon, text, this);
     addAction(action, popMode, rp);
@@ -511,7 +514,7 @@ void SARibbonPannel::setPannelLayoutMode(SARibbonPannel::PannelLayoutMode mode)
         return;
     }
     d_ptr->m_pannelLayoutMode = mode;
-    resetLayout(mode);
+    updateItemGeometry();
 }
 
 SARibbonPannel::PannelLayoutMode SARibbonPannel::pannelLayoutMode() const
@@ -546,20 +549,12 @@ bool SARibbonPannel::isHaveOptionAction() const
 
 QSize SARibbonPannel::sizeHint() const
 {
-    QFontMetrics fm = fontMetrics();
-    int shWidth     = 500;
-    int shHeight    = pannelHeightHint(fm, pannelLayoutMode(), titleHeight());
+    int shWidth  = 500;
+    int shHeight = 100;
     if (QLayout* lay = layout()) {
         QSize laySize = layout()->sizeHint();
         shWidth       = laySize.width();
-    }
-    if (isEnableShowTitle()) {
-        if (d_ptr->m_label) {
-            QSize titleSize = d_ptr->m_label->fontMetrics().size(Qt::TextShowMnemonic, pannelName());
-            if (shWidth < (titleSize.width() + 4)) {
-                shWidth = (titleSize.width() + 4);
-            }
-        }
+        shHeight      = laySize.height();
     }
     return QSize(shWidth, shHeight);
 }
@@ -725,7 +720,7 @@ void SARibbonPannel::updateItemGeometry()
     qDebug() << "SARibbonPannel updateItemGeometry,pannelName=" << pannelName();
 #endif
     // 此函数需要添加，否则SARibbonBar::setEnableWordWrap无法刷新按钮
-    resetLargeToolButtonStyle();
+    resetToolButtonSize();
     if (SARibbonPannelLayout* lay = pannelLayout()) {
         lay->updateGeomArray();
     }
@@ -778,29 +773,15 @@ int SARibbonPannel::pannelHeightHint(const QFontMetrics& fm, PannelLayoutMode la
     return (textH * 4.5 + pannelTitleHeight);
 }
 
-void SARibbonPannel::resetLayout(PannelLayoutMode newmode)
-{
-#if SARibbonPannel_DEBUG_PRINT && SA_DEBUG_PRINT_SIZE_HINT
-    qDebug() << "SARibbonPannel resetLayout,pannelName=" << pannelName();
-#endif
-    if (ribbonBar()) {
-        // if (SARibbonPannelLayout* ly = pannelLayout()) {
-        //     layout()->setSpacing(TwoRowMode == newmode ? 4 : 2);
-        //     ly->invalidate();
-        // }
-        updateItemGeometry();
-    }
-}
-
 /**
- * @brief 重置大按钮的尺寸，在布局改变后（尤其高度变更），大按钮的尺寸需要手动变更
+ * @brief 重置按钮的尺寸，在布局改变后（尤其高度变更），按钮的尺寸需要手动变更
  */
-void SARibbonPannel::resetLargeToolButtonStyle()
+void SARibbonPannel::resetToolButtonSize()
 {
     QList< SARibbonToolButton* > btns = ribbonToolButtons();
 
     for (SARibbonToolButton* b : qAsConst(btns)) {
-        if ((nullptr == b) || (SARibbonToolButton::LargeButton != b->buttonType())) {
+        if ((nullptr == b)) {
             continue;
         }
         b->updateRect();

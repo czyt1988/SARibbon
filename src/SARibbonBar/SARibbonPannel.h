@@ -37,7 +37,7 @@ public:
  * pannel的布局通过@ref SARibbonPannelLayout 来实现，如果有其他布局，可以通过继承@ref
  * SARibbonElementCreateDelegate::createRibbonPannel 函数返回带有自己布局的pannel，但你必须继承对应的虚函数
  */
-class SA_RIBBON_EXPORT SARibbonPannel : public QWidget
+class SA_RIBBON_EXPORT SARibbonPannel : public QFrame
 {
     Q_OBJECT
     SA_RIBBON_DECLARE_PRIVATE(SARibbonPannel)
@@ -130,15 +130,15 @@ public:
 
     // 获取PannelLayoutMode
     PannelLayoutMode pannelLayoutMode() const;
+    void setPannelLayoutMode(PannelLayoutMode mode);
+    // 更新按钮的尺寸，这个函数在pannel的布局状态变换后需要调用刷新
+    void resetToolButtonSize();
 
     // 判断是否为2行模式
     bool isTwoRow() const
     {
         return (TwoRowMode == pannelLayoutMode());
     }
-
-    virtual QSize sizeHint() const Q_DECL_OVERRIDE;
-    virtual QSize minimumSizeHint() const Q_DECL_OVERRIDE;
 
     // 把pannel设置为扩展模式，此时会撑大水平区域
     void setExpanding(bool isExpanding = true);
@@ -180,8 +180,9 @@ public:
     SARibbonCategory* category() const;
     // 获取ribbonBar指针，如果没有返回nullptr
     SARibbonBar* ribbonBar() const;
-    // pannel高度推荐
-    static int pannelHeightHint(const QFontMetrics& fm, PannelLayoutMode layMode, int pannelTitleHeight);
+    //
+    virtual QSize sizeHint() const Q_DECL_OVERRIDE;
+    virtual QSize minimumSizeHint() const Q_DECL_OVERRIDE;
 signals:
 
     /**
@@ -191,6 +192,8 @@ signals:
     void actionTriggered(QAction* action);
 
 public:
+    // pannel高度推荐
+    static int pannelHeightHint(const QFontMetrics& fm, PannelLayoutMode layMode, int pannelTitleHeight);
     // 把action的行属性设置进action中，action自身携带了行属性
     static void setActionRowProportionProperty(QAction* action, SARibbonPannelItem::RowProportion rp);
     // 获取action的行属性
@@ -203,12 +206,6 @@ public:
     static void setActionToolButtonStyleProperty(QAction* action, Qt::ToolButtonStyle buttonStyle);
     // 获取action的ToolButtonStyle属性
     static Qt::ToolButtonStyle getActionToolButtonStyleProperty(QAction* action);
-
-protected:
-    // 设置PannelLayoutMode，此函数设置为protect避免误调用
-    void setPannelLayoutMode(PannelLayoutMode mode);
-    void resetLayout(PannelLayoutMode newmode);
-    void resetLargeToolButtonStyle();
 
 protected:
     virtual bool event(QEvent* e) Q_DECL_OVERRIDE;

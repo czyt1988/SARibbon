@@ -62,6 +62,8 @@ AlwaysBreakTemplateDeclarations: true
 # clang-format does not handle that.
 AllowShortFunctionsOnASingleLine: false
 AllowShortIfStatementsOnASingleLine: false
+AllowShortLambdasOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
 #
 BinPackParameters: false
 BinPackArguments: false
@@ -97,3 +99,5 @@ SpacesInSquareBrackets: true
 SpacesInAngles: true
 
 KeepEmptyLinesAtTheStartOfBlocks: true
+
+AllowShortCaseLabelsOnASingleLine: true

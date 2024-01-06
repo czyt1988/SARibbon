@@ -204,16 +204,14 @@ void SARibbonCategory::PrivateData::doWheelEvent(QWheelEvent* event)
 // SARibbonCategory
 //----------------------------------------------------
 
-SARibbonCategory::SARibbonCategory(QWidget* p) : QWidget(p), d_ptr(new SARibbonCategory::PrivateData(this))
+SARibbonCategory::SARibbonCategory(QWidget* p) : QFrame(p), d_ptr(new SARibbonCategory::PrivateData(this))
 {
-    setAttribute(Qt::WA_StyledBackground);
     setLayout(new SARibbonCategoryLayout(this));
 }
 
 SARibbonCategory::SARibbonCategory(const QString& name, QWidget* p)
-    : QWidget(p), d_ptr(new SARibbonCategory::PrivateData(this))
+    : QFrame(p), d_ptr(new SARibbonCategory::PrivateData(this))
 {
-    setAttribute(Qt::WA_StyledBackground);
     setLayout(new SARibbonCategoryLayout(this));
     setCategoryName(name);
 }
@@ -254,7 +252,7 @@ bool SARibbonCategory::event(QEvent* e)
  * @brief pannel的模式
  * @return
  */
-SARibbonPannel::PannelLayoutMode SARibbonCategory::ribbonPannelLayoutMode() const
+SARibbonPannel::PannelLayoutMode SARibbonCategory::pannelLayoutMode() const
 {
     return (d_ptr->mDefaultPannelLayoutMode);
 }
@@ -266,7 +264,7 @@ SARibbonPannel::PannelLayoutMode SARibbonCategory::ribbonPannelLayoutMode() cons
  * 把新的SARibbonPannel::PannelLayoutMode设置进去
  * @param m
  */
-void SARibbonCategory::setRibbonPannelLayoutMode(SARibbonPannel::PannelLayoutMode m)
+void SARibbonCategory::setPannelLayoutMode(SARibbonPannel::PannelLayoutMode m)
 {
     d_ptr->mDefaultPannelLayoutMode = m;
     iterate([ m ](SARibbonPannel* p) -> bool {

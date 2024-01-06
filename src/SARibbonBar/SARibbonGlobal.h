@@ -93,6 +93,15 @@ enum class SARibbonAlignment
 #endif
 #endif
 
+#ifndef SA_DEBUG_PRINT_SARIBBONBAR
+/**
+  @def 定义此宏，qDebug将支持SARibbonBar的属性打印
+
+    仅用于调试
+ */
+#define SA_DEBUG_PRINT_SARIBBONBAR 1
+#endif
+
 #ifndef SA_DEBUG_PRINT_SIZE_HINT
 /**
   @def 定义此宏，将打印和尺寸刷新相关的信息

@@ -10,12 +10,6 @@ SARibbonBar{
   color:#b2b2b2;
 }
 
-/*SARibbonButtonGroupWidget*/
-SARibbonButtonGroupWidget{
-  background-color: transparent;
-  color: #242424;
-}
-
 /*SARibbonQuickAccessBar*/
 SARibbonQuickAccessBar{
    background-color: transparent;
@@ -35,6 +29,34 @@ SARibbonCategory:focus {
   outline: none;
 }
 
+/*SARibbonPannel*/
+
+SARibbonPannel {
+  background-color: transparent;
+  border: none;
+}
+
+/*SARibbonPannelOptionButton*/
+SARibbonPannelOptionButton {
+  border:none;
+  background-color: transparent;
+  color:#242424;
+}
+
+SARibbonPannelOptionButton:hover {
+  background-color:#a0a0a0;
+}
+
+/*SARibbonButtonGroupWidget*/
+SARibbonButtonGroupWidget{
+  background-color: transparent;
+  color: #242424;
+}
+
+SARibbonPannel > SARibbonButtonGroupWidget {
+  border: 1px solid #888888;
+  background-color: transparent;
+}
 
 
 /*SARibbonStackedWidget*/
@@ -48,8 +70,8 @@ SARibbonStackedWidget:focus{
 /*SARibbonApplicationButton*/
 SARibbonApplicationButton{
   color:#242424;
-  border-top-left-radius: 0.1em;
-  border-top-right-radius: 0.1em;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
   background-color: #b2b2b2;
 }
 
@@ -77,41 +99,30 @@ SARibbonTabBar{
 SARibbonTabBar::tab {
   color: #f0f1f2;
   border: none;
-  background-color: transparent;
-  margin-top: 0em;
-  margin-right: 0em;
-  margin-left: 0.2em;
-  margin-bottom: 0em;
-  min-width: 3em;
-  max-width: 10em;
-  min-height: 1.2em;
-  max-height: 1.2em;
-  padding-left: 0.2em;
-  padding-right: 0.2em;
-  padding-top: 0.1em;
-  padding-bottom: 0.2em;
-}
-
-SARibbonTabBar::tab:selected, SARibbonTabBar::tab:hover {
-  border-top-left-radius: 0px;
-  border-top-right-radius: 0px;
+  background: transparent;
+  margin-top: 0px;
+  margin-right: 0px;
+  margin-left: 5px;
+  margin-bottom: 0px;
+  min-width: 50px;
+  min-height: 25px;
+  padding-left: 5px;
+  padding-right: 5px;
 }
 
 SARibbonTabBar::tab:selected {
   color: #242424;
   background-color: #b2b2b2;
-  border: 0.05em solid #737373;
-  border-bottom: none;
+  border: 1px solid #737373;
 }
 
 SARibbonTabBar::tab:hover:!selected {
-  border:0.05em solid  #a6a6a6;
-  border-bottom: none;
+  border:1px solid #a6a6a6;
   color: white;
 }
 
 SARibbonTabBar::tab:!selected {
-  margin-top: 0em;
+  margin-top: 0px;
   color: #a0a0a0;
 }
 
@@ -130,7 +141,7 @@ SARibbonToolButton{
 } 
 
 SARibbonToolButton:focus {
-  border: 0.05em solid #858585;
+  border: 1px solid #858585;
   color: #242424;
   background-color: #a0a0a0;
 }
@@ -152,7 +163,7 @@ SARibbonToolButton:hover {
 SARibbonControlToolButton {
   background-color: transparent;/*{ControlToolButton.BKColor}*/
   color: #a0a0a0;
-  border: 0.05em solid transparent;
+  border: 1px solid transparent;
 }
 
 SARibbonControlToolButton:pressed {
@@ -160,13 +171,13 @@ SARibbonControlToolButton:pressed {
 }
 
 SARibbonControlToolButton:checked {
-  border: 0.05em solid #888888;/*{ControlToolButton.BorderColor:checked}*/
+  border: 1px solid #888888;/*{ControlToolButton.BorderColor:checked}*/
   background-color: #9b9b9b;/*{ControlToolButton.BKColor:checked}*/
 }
 
 SARibbonControlToolButton:hover {
   color: black;
-  border: 0.05em solid #888888;/*{ControlToolButton.BorderColor:hover}*/
+  border: 1px solid #888888;/*{ControlToolButton.BorderColor:hover}*/
   background-color: #a0a0a0;/*{ControlToolButton.BKColor:hover}*/
 }
 
@@ -180,17 +191,17 @@ SARibbonControlButton:pressed{
   background-color: #858585;
 }
 SARibbonControlButton:checked{
-  border: 0.05em solid #888888;
+  border: 1px solid #888888;
   background-color: #9b9b9b;
 }
 SARibbonControlButton:hover {
-  border: 0.05em solid #888888;
+  border: 1px solid #888888;
   background-color: #a0a0a0;
  }
 
 SARibbonControlButton#SARibbonGalleryButtonUp,#SARibbonGalleryButtonDown,#SARibbonGalleryButtonMore{
   background-color:#b2b2b2;
-  border: 0.05em solid #888888;
+  border: 1px solid #888888;
   color: #242424;
 }
 
@@ -216,34 +227,11 @@ SARibbonMenu::icon{
   margin-left: 1px;
 }
 
-/*SARibbonPannelOptionButton*/
-SARibbonPannelOptionButton {
-  border:none;
-  background-color: transparent;
-  color:#242424;
-}
-
-SARibbonPannelOptionButton:hover {
-  background-color:#a0a0a0;
-}
-
-
-SARibbonPannel {
-  background-color: transparent;
-  border: none;
-  color: #5f5e5e;
-}
-
-SARibbonPannel > SARibbonButtonGroupWidget {
-  border: 0.05em solid #888888;
-  background-color: transparent;
-}
-
 /*SARibbonGallery*/
 SARibbonGallery {
   background-color: #cccccc;
   color: #242424;
-  border: 0.05em solid #888888;
+  border: 1px solid #888888;
 }
 
 /*SARibbonGalleryGroup*/
@@ -256,7 +244,7 @@ SARibbonGalleryGroup::item:selected {
   background-color: #9b9b9b;
 }
 SARibbonGalleryGroup::item:hover {
-  border: 0.05em solid #a0a0a0;
+  border: 1px solid #a0a0a0;
 }
 SARibbonGalleryGroup::item {
   color: #242424;
@@ -270,7 +258,7 @@ SARibbonGalleryViewport {
 
 /*SARibbonLineEdit*/
 SARibbonLineEdit {
-  border:0.05em solid #888888;
+  border:1px solid #888888;
   background-color: white;
   color: #242424;
   selection-background-color: #6a9eff;
@@ -280,7 +268,7 @@ SARibbonLineEdit {
 
 /*SARibbonComboBox*/
 SARibbonComboBox {
-  border: 0.05em  solid #888888;
+  border: 1px  solid #888888;
   background-color: white;
 }
 
@@ -320,17 +308,17 @@ SARibbonSeparatorWidget {
 
 /*SARibbonCategoryScrollButton*/
 SARibbonCategoryScrollButton {
-  border: 0.05em solid #888888;
+  border: 1px solid #888888;
   color: #242424;
   background-color: #b2b2b2;
 }
 
 SARibbonCategoryScrollButton[arrowType="3"] {
-  border-right-width: 0.05em;
+  border-right-width: 1px;
 }
 
 SARibbonCategoryScrollButton[arrowType="4"] {
-  border-left-width: 0.05em;
+  border-left-width: 1px;
 }
 /*SAWindowToolButton*/
 
