@@ -59,6 +59,7 @@
 MainWindow::MainWindow(QWidget* par)
     : SARibbonMainWindow(par), mWidgetForCustomize(nullptr), mMenuApplicationBtn(nullptr)
 {
+
     PRINT_COST_START();
 #if !SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
     SAFramelessHelper* helper = framelessHelper();
@@ -70,7 +71,6 @@ MainWindow::MainWindow(QWidget* par)
     setStatusBar(new QStatusBar());
 
     SARibbonBar* ribbon = ribbonBar();
-
     //! 通过setContentsMargins设置ribbon四周的间距
     ribbon->setContentsMargins(5, 0, 5, 0);
 
@@ -161,6 +161,9 @@ MainWindow::MainWindow(QWidget* par)
     setMinimumWidth(500);
     showMaximized();
     setWindowIcon(QIcon(":/icon/icon/SA.svg"));
+#if SA_DEBUG_PRINT_SARIBBONBAR
+    qDebug() << *ribbon;
+#endif
 }
 
 void MainWindow::createRibbonApplicationButton()

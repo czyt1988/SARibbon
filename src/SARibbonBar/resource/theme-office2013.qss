@@ -10,11 +10,6 @@ SARibbonBar {
   color:#b2b2b2;
 }
 
-/*SARibbonButtonGroupWidget*/
-SARibbonButtonGroupWidget {
-  background-color: transparent;
-}
-
 
 /*SARibbonQuickAccessBar*/
 SARibbonQuickAccessBar {
@@ -24,14 +19,6 @@ SARibbonQuickAccessBar {
 /*SARibbonCtrlContainer*/
 SARibbonCtrlContainer {
   background-color: transparent;
-}
-
-/*SARibbonCategory*/
-SARibbonCategory {
-  background-color: #fcfdfe;
-}
-SARibbonCategory:focus {
-  outline: none;
 }
 
 
@@ -44,6 +31,51 @@ SARibbonStackedWidget {
 SARibbonStackedWidget:focus {
   outline: none;
 }
+
+/*SARibbonCategory*/
+SARibbonCategory {
+  background-color: #fcfdfe;
+}
+SARibbonCategory:focus {
+  outline: none;
+}
+
+
+/*SARibbonPannel*/
+
+SARibbonPannel {
+  background-color: #fcfdfe;
+  border: none;
+  color: #666666;
+}
+
+SARibbonPannel > SARibbonButtonGroupWidget {
+  border: 1px solid #c2d0df;
+}
+/*SARibbonButtonGroupWidget*/
+SARibbonButtonGroupWidget {
+  background-color: transparent;
+}
+
+/*SARibbonPannelLabel Pannel下标题栏*/
+
+SARibbonPannelLabel {
+    background-color: transparent;
+    color: #666666;
+}
+
+/*SARibbonPannelOptionButton*/
+
+SARibbonPannelOptionButton {
+  background-color: transparent;
+  color: #333;
+}
+
+SARibbonPannelOptionButton:hover {
+  background-color: #cee7fc;
+  border: 0px;
+}
+
 
 /*SARibbonApplicationButton*/
 SARibbonApplicationButton {
@@ -84,30 +116,19 @@ SARibbonTabBar::tab {
   margin-left: 5px;
   margin-bottom: 0px;
   min-width: 50px;
-  max-width: 200px;
-  min-height: 20px;
-  max-height: 20px;
+  min-height: 25px;
   padding-left: 5px;
   padding-right: 5px;
-  padding-top: 2px;
-  padding-bottom: 5px;
-}
-
-SARibbonTabBar::tab:selected, SARibbonTabBar::tab:hover {
-  border-top-left-radius: 0px;
-  border-top-right-radius: 0px;
 }
 
 SARibbonTabBar::tab:selected {
   color: #5779af;
   border: 1px solid #c5d2e0;
   background: white;
-  border-bottom: none;
 }
 
 SARibbonTabBar::tab:hover:!selected {
   border:1px solid #c5d2e0;
-  border-bottom: none;
   color: #5779af;
 }
 
@@ -206,29 +227,7 @@ SARibbonMenu::icon {
   margin-left: 1px;
 }
 
-/*SARibbonPannelOptionButton*/
 
-SARibbonPannelOptionButton {
-  background-color: transparent;
-  color: #333;
-}
-
-SARibbonPannelOptionButton:hover {
-  background-color: #cee7fc;
-  border: 0px;
-}
-
-/*SARibbonPannel*/
-
-SARibbonPannel {
-  background-color: white;
-  border: 0px;
-  color: #666666;
-}
-
-SARibbonPannel > SARibbonButtonGroupWidget {
-  border: 1px solid #c2d0df;
-}
 
 /*SARibbonGallery*/
 
@@ -294,7 +293,7 @@ SARibbonComboBox:editable {
 SARibbonComboBox::drop-down {
   subcontrol-origin: padding;
   subcontrol-position: top right;
-  width: 15px;
+  width: 1em;
   border: none;
 }
 

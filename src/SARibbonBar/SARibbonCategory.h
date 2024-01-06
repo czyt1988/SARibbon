@@ -1,7 +1,7 @@
 ﻿#ifndef SARIBBONCATEGORY_H
 #define SARIBBONCATEGORY_H
 #include "SARibbonGlobal.h"
-#include <QWidget>
+#include <QFrame>
 #include "SARibbonPannel.h"
 #include <QScopedPointer>
 #include <QPushButton>
@@ -16,7 +16,7 @@ class SARibbonCategoryLayout;
  * @note SARibbonCategory的windowTitle影响了其在SARibbonBar的标签显示，
  * 如果要改标签名字，直接调用SARibbonCategory的setWindowTitle函数
  */
-class SA_RIBBON_EXPORT SARibbonCategory : public QWidget
+class SA_RIBBON_EXPORT SARibbonCategory : public QFrame
 {
     Q_OBJECT
     SA_RIBBON_DECLARE_PRIVATE(SARibbonCategory)
@@ -39,8 +39,8 @@ public:
     void setCategoryName(const QString& title);
 
     // 设置pannel的模式
-    SARibbonPannel::PannelLayoutMode ribbonPannelLayoutMode() const;
-    void setRibbonPannelLayoutMode(SARibbonPannel::PannelLayoutMode m);
+    SARibbonPannel::PannelLayoutMode pannelLayoutMode() const;
+    void setPannelLayoutMode(SARibbonPannel::PannelLayoutMode m);
 
     // 添加pannel
     SARibbonPannel* addPannel(const QString& title);

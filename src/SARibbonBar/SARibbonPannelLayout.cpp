@@ -653,12 +653,6 @@ void SARibbonPannelLayout::updateGeomArray(const QRect& setrect)
             totalWidth = x + columMaxWidth + mag.right();
         }
     }
-    // 在有optionButton情况下，的2行模式，需要调整totalWidth
-    if (pannel->isTwoRow()) {
-        if (isHaveOptionAction()) {
-            totalWidth += optionActionButtonSize().width();
-        }
-    }
 
     // 在设置完所有窗口后，再设置扩展属性的窗口
     if (totalWidth < setrect.width() && (setrect.width() - totalWidth) > 10) {
@@ -666,10 +660,20 @@ void SARibbonPannelLayout::updateGeomArray(const QRect& setrect)
         recalcExpandGeomArray(setrect);
     }
     // 布局label
+    bool isTitleWidthThanPannel = false;
     if (isEnableShowPannelTitle()) {
-        m_titleLabelGeometry.setRect(mag.left(), yTitleBegin, setrect.width(), titleH);
+        m_titleLabelGeometry.setRect(mag.left(), yTitleBegin, setrect.width() - mag.left() - mag.right(), titleH);
+        // 这里要确认标题宽度是否大于totalWidth，如果大于，则要把标题的宽度作为totalwidth
+        QFontMetrics fm = m_titleLabel->fontMetrics();
+        int textWidth   = SA_FONTMETRICS_WIDTH(fm, pannel->pannelName());
+        textWidth += 4;
+        if (totalWidth < textWidth) {
+            totalWidth             = textWidth;
+            isTitleWidthThanPannel = true;  // 说明标题的长度大于按钮布局的长度
+        }
     }
     // 布局optionActionButton
+
     if (isHaveOptionAction()) {
         QSize optBtnSize = optionActionButtonSize();
         if (isEnableShowPannelTitle()) {
@@ -678,6 +682,13 @@ void SARibbonPannelLayout::updateGeomArray(const QRect& setrect)
                                               m_titleLabelGeometry.y(),
                                               m_titleLabelGeometry.height(),
                                               m_titleLabelGeometry.height());
+
+            // 特殊情况，如果pannel的标题长度大于totalWidth，那么说明totalWidth比较短
+            // 这时候，optionActionBtn的宽度要加上到标题宽度上
+            if (isTitleWidthThanPannel) {
+                // 由于文字是居中对齐，因此要扩展2个按钮的宽度
+                totalWidth += (2 * titleH);
+            }
         } else {
             // 无标题
             m_optionActionBtnGeometry.setRect(setrect.right() - optBtnSize.width() - mag.right(),
@@ -687,7 +698,9 @@ void SARibbonPannelLayout::updateGeomArray(const QRect& setrect)
             totalWidth += optBtnSize.width();
         }
     }
-    this->m_sizeHint = QSize(totalWidth, height);
+    // 刷新sizeHint
+    int heightHint   = SARibbonPannel::pannelHeightHint(pannel->fontMetrics(), pannel->pannelLayoutMode(), titleH);
+    this->m_sizeHint = QSize(totalWidth, heightHint);
 #if SARibbonPannelLayout_DEBUG_PRINT && SA_DEBUG_PRINT_SIZE_HINT
     qDebug() << "| |-SARibbonPannelLayout updateGeomArray(" << setrect << "),pannel name = " << pannel->pannelName()
              << "\n| | |-size hint =" << this->m_sizeHint  //
