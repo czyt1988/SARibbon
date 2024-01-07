@@ -440,14 +440,12 @@ SARibbonGallery* SARibbonPannel::addGallery(bool expanding)
  * @param top 上边距 @default 6
  * @param bottom 下边距 @default 6
  */
-QAction* SARibbonPannel::addSeparator(int top, int bottom)
+QAction* SARibbonPannel::addSeparator()
 {
     QAction* action = new QAction(this);
 
     action->setSeparator(true);
     setActionRowProportionProperty(action, SARibbonPannelItem::Large);
-    action->setProperty(SA_ActionPropertyName_SeparatorTop, top);
-    action->setProperty(SA_ActionPropertyName_SeparatorBottom, bottom);
     addAction(action);
     return (action);
 }
@@ -759,18 +757,18 @@ int SARibbonPannel::pannelHeightHint(const QFontMetrics& fm, PannelLayoutMode la
     int textH = fm.lineSpacing();  // 这里用linespace，因为在换行的情况下，行距是不可忽略的，ribbon的大按钮默认是2行
     switch (layMode) {
     case SARibbonPannel::ThreeRowMode: {
-        // 5.5=（3*1.5+1） （三行）,1是给panneltitle预留的
-        return textH * 4.5 + pannelTitleHeight;
+        // 5.5=（3*1.6+1） （三行）,1是给panneltitle预留的
+        return textH * 4.8 + pannelTitleHeight;
     } break;
     case SARibbonPannel::TwoRowMode: {
-        // 3=2*1.5
-        return textH * 3 + pannelTitleHeight;
+        // 3=2*1.6
+        return textH * 3.2 + pannelTitleHeight;
     } break;
     default: {
         qWarning() << "unknow SARibbonPannel::PannelLayoutMode:" << layMode;
     }
     }
-    return (textH * 4.5 + pannelTitleHeight);
+    return (textH * 4.8 + pannelTitleHeight);
 }
 
 /**

@@ -41,7 +41,6 @@ public:
     virtual SARibbonCategory* createRibbonCategory(QWidget* parent);
     virtual SARibbonContextCategory* createRibbonContextCategory(QWidget* parent);
     virtual SARibbonPannel* createRibbonPannel(QWidget* parent);
-    virtual SARibbonSeparatorWidget* createRibbonSeparatorWidget(int value, QWidget* parent);
     virtual SARibbonSeparatorWidget* createRibbonSeparatorWidget(QWidget* parent);
     virtual SARibbonGallery* createRibbonGallery(QWidget* parent);
     virtual SARibbonGalleryGroup* createRibbonGalleryGroup(QWidget* parent);

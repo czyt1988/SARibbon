@@ -49,11 +49,6 @@ SARibbonPannel* SARibbonElementFactory::createRibbonPannel(QWidget* parent)
     return (new SARibbonPannel(parent));
 }
 
-SARibbonSeparatorWidget* SARibbonElementFactory::createRibbonSeparatorWidget(int value, QWidget* parent)
-{
-    return (new SARibbonSeparatorWidget(value, parent));
-}
-
 SARibbonSeparatorWidget* SARibbonElementFactory::createRibbonSeparatorWidget(QWidget* parent)
 {
     return (new SARibbonSeparatorWidget(parent));

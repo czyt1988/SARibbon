@@ -22,5 +22,6 @@
         <file>resource/theme-dark.qss</file>
         <file>resource/theme-office2016-blue.qss</file>
         <file>resource/theme-office2021-blue.qss</file>
+        <file>resource/theme-dark2.qss</file>
     </qresource>
 </RCC>

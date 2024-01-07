@@ -171,7 +171,7 @@ void SARibbonBar::PrivateData::init()
  */
 int SARibbonBar::PrivateData::calcTabBarHeight(const QFontMetrics& fm)
 {
-    int r = fm.height() * 1.5;
+    int r = fm.height() * 1.6;
     if (r < 20) {
         r = 20;
     }
@@ -194,6 +194,7 @@ int SARibbonBar::PrivateData::calcTitleBarHeight(const QFontMetrics& fm)
 
 /**
  * @brief 估算category的高度
+ * @note 经过对照，1.6行高和office的高度比较接近
  * @param fm
  * @param s
  * @return
@@ -202,13 +203,13 @@ int SARibbonBar::PrivateData::calcCategoryHeight(const QFontMetrics& fm, SARibbo
 {
     int textH = fm.lineSpacing();  // 这里用linespace，因为在换行的情况下，行距是不可忽略的，ribbon的大按钮默认是2行
     if (SARibbonPannel::ThreeRowMode == lm) {
-        // 5.5=（3*1.5+1） （三行）,1是给panneltitle预留的
-        return textH * 4.5 + pannelTitleHeight;
+        // 5.5=（3*1.6+1） （三行）,1是给panneltitle预留的
+        return textH * 4.8 + pannelTitleHeight;
     } else {
-        // 3=2*1.5
-        return textH * 3 + pannelTitleHeight;
+        // 3=2*1.6
+        return textH * 3.2 + pannelTitleHeight;
     }
-    return (textH * 4.5 + pannelTitleHeight);
+    return (textH * 4.8 + pannelTitleHeight);
 }
 
 /**
@@ -2478,8 +2479,15 @@ void SARibbonBar::resizeInCompactStyle()
     resizeStackedContainerWidget();
 }
 
+/**
+ * @brief 绘制tabbar下的基准线，这个方法仅仅在office2013模式下需要
+ * @param painter
+ */
 void SARibbonBar::paintTabbarBaseLine(QPainter& painter)
 {
+    if (!d_ptr->mTabBarBaseLineColor.isValid()) {
+        return;
+    }
     painter.save();
     // 在tabbar下绘制一条线
     const int lineY = d_ptr->mRibbonTabBar->geometry().bottom();

@@ -88,6 +88,16 @@ SARibbonCtrlContainer {
   background-color: transparent;
 }
 
+
+/*
+SARibbonSeparatorWidget
+注意，SARibbonSeparatorWidget的背景颜色是使用color
+如果想给不同的部件下的分割线设置不同风格，可以使用如SARibbonCategory > SARibbonSeparatorWidget的方式，参考theme-dark2.qss
+*/
+SARibbonSeparatorWidget {
+  color: #bec0c2;
+}
+
 /*SARibbonCategory*/
 
 SARibbonCategory {
@@ -95,6 +105,16 @@ SARibbonCategory {
 }
 SARibbonCategory:focus {
   outline: none;
+}
+
+/*
+SARibbonCategory下的SARibbonSeparatorWidget
+注意，SARibbonSeparatorWidget的背景颜色是使用color
+*/
+SARibbonCategory > SARibbonSeparatorWidget {
+  color: #bec0c2;
+  margin-top:3px;
+  margin-bottom:3px;
 }
 
 /*SARibbonPannel*/

@@ -31,7 +31,7 @@ public:
     void installFrameless(SARibbonMainWindow* p);
 
 public:
-    SARibbonMainWindow::RibbonTheme mCurrentRibbonTheme { SARibbonMainWindow::RibbonThemeOffice2013 };
+    SARibbonMainWindow::RibbonTheme mCurrentRibbonTheme { SARibbonMainWindow::RibbonThemeOffice2021Blue };
     SARibbonBar* mRibbonBar { nullptr };
     SAWindowButtonGroup* mWindowButtonGroup { nullptr };
 #if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
@@ -205,33 +205,44 @@ void SARibbonMainWindow::setRibbonTheme(SARibbonMainWindow::RibbonTheme theme)
     sa_set_ribbon_theme(this, theme);
     d_ptr->mCurrentRibbonTheme = theme;
     if (SARibbonBar* bar = ribbonBar()) {
+        auto theme = ribbonTheme();
         // 尺寸修正
-        switch (ribbonTheme()) {
+        switch (theme) {
         case RibbonThemeWindows7:
-            break;
         case RibbonThemeOffice2013:
         case RibbonThemeOffice2016Blue:
-        case RibbonThemeDark: {
+        case RibbonThemeDark:
+        case RibbonThemeDark2: {
             //! 在设置qss后需要针对margin信息重新设置进SARibbonTabBar中
-            //! office2013.qss的margin信息如下设置，em是字符M所对应的宽度的长度
-            //! margin-top: 0em;
-            //! margin-right: 0em;
-            //! margin-left: 0.2em;
-            //! margin-bottom: 0em;
-
+            //! office2013.qss的margin信息如下设置
+            //! margin-top: 0px;
+            //! margin-right: 0px;
+            //! margin-left: 5px;
+            //! margin-bottom: 0px;
             SARibbonTabBar* tab = bar->ribbonTabBar();
             if (!tab) {
                 break;
             }
-            QFontMetrics fm = tab->fontMetrics();
-            int emWidth     = SA_FONTMETRICS_WIDTH(fm, "M");
-            tab->setTabMargin(QMargins(0.2 * emWidth, 0, 0, 0));
+            tab->setTabMargin(QMargins(5, 0, 0, 0));
         } break;
+        case RibbonThemeOffice2021Blue: {
+            SARibbonTabBar* tab = bar->ribbonTabBar();
+            if (!tab) {
+                break;
+            }
+            //! 在设置qss后需要针对margin信息重新设置进SARibbonTabBar中
+            //! office2021.qss的margin信息如下设置
+            //! margin-top: 0px;
+            //! margin-right: 5px;
+            //! margin-left: 5px;
+            //! margin-bottom: 0px;
+            tab->setTabMargin(QMargins(5, 0, 5, 0));
+        }
         default:
             break;
         }
-        // 上下文标签颜色设置
-        switch (ribbonTheme()) {
+        // 上下文标签颜色设置,以及基线颜色设置
+        switch (theme) {
         case RibbonThemeWindows7:
         case RibbonThemeOffice2013:
         case RibbonThemeDark:
@@ -245,6 +256,12 @@ void SARibbonMainWindow::setRibbonTheme(SARibbonMainWindow::RibbonTheme theme)
             break;
         default:
             break;
+        }
+        // 基线颜色设置
+        if (RibbonThemeOffice2013 == theme) {
+            bar->setTabBarBaseLineColor(QColor(186, 201, 219));
+        } else {
+            bar->setTabBarBaseLineColor(QColor());
         }
     }
 }
@@ -360,6 +377,9 @@ void sa_set_ribbon_theme(QWidget* w, SARibbonMainWindow::RibbonTheme theme)
         break;
     case SARibbonMainWindow::RibbonThemeDark:
         file.setFileName(":/theme/resource/theme-dark.qss");
+        break;
+    case SARibbonMainWindow::RibbonThemeDark2:
+        file.setFileName(":/theme/resource/theme-dark2.qss");
         break;
     default:
         file.setFileName(":/theme/resource/theme-office2013.qss");
