@@ -113,7 +113,7 @@ public:
     SARibbonGallery* addGallery(bool expanding = true);
 
     // 添加分割线
-    QAction* addSeparator(int top = 6, int bottom = 6);
+    QAction* addSeparator();
 
     // 从pannel中把action对应的button提取出来，如果action没有对应的button，就返回nullptr
     SARibbonToolButton* actionToRibbonToolButton(QAction* action);
