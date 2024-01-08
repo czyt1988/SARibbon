@@ -226,7 +226,7 @@ void SARibbonCategoryLayout::insertPannel(int index, SARibbonPannel* pannel)
     SARibbonCategoryLayoutItem* item = new SARibbonCategoryLayoutItem(pannel);
 
     // 分割线
-    item->separatorWidget = RibbonSubElementDelegate->createRibbonSeparatorWidget(parentWidget());
+    item->separatorWidget = RibbonSubElementFactory->createRibbonSeparatorWidget(parentWidget());
     // 插入list中
     d_ptr->mItemList.insert(index, item);
     // 标记需要重新计算尺寸

@@ -4,6 +4,8 @@
 #include "SARibbonQuickAccessBar.h"
 #include "SARibbonStackedWidget.h"
 #include "SARibbonTabBar.h"
+#include "SAWindowButtonGroup.h"
+#include <QPointer>
 #include <QAction>
 #include <QApplication>
 #include <QDebug>
@@ -57,16 +59,17 @@ class SARibbonBar::PrivateData
 {
     SA_RIBBON_DECLARE_PUBLIC(SARibbonBar)
 public:
-    QAbstractButton* mApplicationButton { nullptr };
-    SARibbonTabBar* mRibbonTabBar { nullptr };
-    SARibbonStackedWidget* mStackedContainerWidget { nullptr };
+    QPointer< QAbstractButton > mApplicationButton;
+    QPointer< SARibbonTabBar > mRibbonTabBar;
+    QPointer< SARibbonStackedWidget > mStackedContainerWidget;
+    QPointer< SARibbonButtonGroupWidget > mRightButtonGroup;  ///< 在tab bar右边的按钮群
+    QPointer< SARibbonQuickAccessBar > mQuickAccessBar;       ///< 快速响应栏
+    QPointer< SAWindowButtonGroup > mWindowButtonGroup;       ///< 最大、最小、关闭按钮组
+    QAction* mMinimumCategoryButtonAction { nullptr };        ///< 隐藏面板按钮action
     QList< _SAContextCategoryManagerData > mCurrentShowingContextCategory;
     QList< SARibbonContextCategory* > mContextCategoryList;  ///< 存放所有的上下文标签
     QList< _SARibbonTabData > mHidedCategory;
     int mIconRightBorderPosition { 1 };  ///< 标题栏x值得最小值，在有图标和快捷启动按钮，此值都需要变化
-    QAction* mMinimumCategoryButtonAction { nullptr };                                 ///< 隐藏面板按钮action
-    SARibbonButtonGroupWidget* mRightButtonGroup { nullptr };                          ///< 在tab bar右边的按钮群
-    SARibbonQuickAccessBar* mQuickAccessBar { nullptr };                               ///< 快速响应栏
     SARibbonBar::RibbonStyles mRibbonStyle { SARibbonBar::RibbonStyleLooseThreeRow };  ///< ribbon的风格
     SARibbonBar::RibbonMode mCurrentRibbonMode { SARibbonBar::NormalRibbonMode };      ///< 记录当前模式
     QSize mWindowButtonSize;                    ///< 由SARibbonMainWindow告诉的windowbutton的尺寸
@@ -96,11 +99,11 @@ public:
     }
     void init();
     // 计算tabbar高度
-    static int calcTabBarHeight(const QFontMetrics& fm);
+    int calcTabBarHeight();
     // 根据字体信息计算标题栏高度
-    static int calcTitleBarHeight(const QFontMetrics& fm);
+    int calcTitleBarHeight();
     // 根据字体信息计算category的高度
-    static int calcCategoryHeight(const QFontMetrics& fm, SARibbonPannel::PannelLayoutMode lm, int pannelTitleHeight);
+    int calcCategoryHeight();
     // 计算tabbar高度
     static int calcMainBarHeight(int tabHegith, int titleHeight, int categoryHeight, bool tabOnTitle, SARibbonBar::RibbonMode rMode);
     // 获取当前最小模式下的高度
@@ -136,9 +139,9 @@ public:
 
 void SARibbonBar::PrivateData::init()
 {
-    mApplicationButton = RibbonSubElementDelegate->createRibbonApplicationButton(q_ptr);
+    mApplicationButton = RibbonSubElementFactory->createRibbonApplicationButton(q_ptr);
     q_ptr->connect(mApplicationButton, &QAbstractButton::clicked, q_ptr, &SARibbonBar::applicationButtonClicked);
-    mRibbonTabBar = RibbonSubElementDelegate->createRibbonTabBar(q_ptr);
+    mRibbonTabBar = RibbonSubElementFactory->createRibbonTabBar(q_ptr);
     mRibbonTabBar->setObjectName(QStringLiteral("objSARibbonTabBar"));
     mRibbonTabBar->setDrawBase(false);
     q_ptr->connect(mRibbonTabBar, &QTabBar::currentChanged, q_ptr, &SARibbonBar::onCurrentRibbonTabChanged);
@@ -146,7 +149,7 @@ void SARibbonBar::PrivateData::init()
     q_ptr->connect(mRibbonTabBar, &QTabBar::tabBarDoubleClicked, q_ptr, &SARibbonBar::onCurrentRibbonTabDoubleClicked);
     q_ptr->connect(mRibbonTabBar, &QTabBar::tabMoved, q_ptr, &SARibbonBar::onTabMoved);
     //
-    mStackedContainerWidget = RibbonSubElementDelegate->createRibbonStackedWidget(q_ptr);
+    mStackedContainerWidget = RibbonSubElementFactory->createRibbonStackedWidget(q_ptr);
     mStackedContainerWidget->setObjectName(QStringLiteral("objSARibbonStackedContainerWidget"));
     mStackedContainerWidget->connect(mStackedContainerWidget,
                                      &SARibbonStackedWidget::hidWindow,
@@ -155,11 +158,11 @@ void SARibbonBar::PrivateData::init()
     // 捕获事件，在popmode时必须用到
     mStackedContainerWidget->installEventFilter(q_ptr);
     //
-    mQuickAccessBar = RibbonSubElementDelegate->createQuickAccessBar(q_ptr);
+    mQuickAccessBar = RibbonSubElementFactory->createQuickAccessBar(q_ptr);
     mQuickAccessBar->setObjectName(QStringLiteral("objSARibbonQuickAccessBar"));
     mQuickAccessBar->setIcon(q_ptr->windowIcon());
     //
-    mRightButtonGroup = RibbonSubElementDelegate->craeteButtonGroupWidget(q_ptr);
+    mRightButtonGroup = RibbonSubElementFactory->craeteButtonGroupWidget(q_ptr);
     //
     setNormalMode();
 }
@@ -169,9 +172,11 @@ void SARibbonBar::PrivateData::init()
  * @param fm
  * @return
  */
-int SARibbonBar::PrivateData::calcTabBarHeight(const QFontMetrics& fm)
+int SARibbonBar::PrivateData::calcTabBarHeight()
 {
-    int r = fm.height() * 1.6;
+    int defaultHeight  = q_ptr->style()->pixelMetric(QStyle::PM_TabBarBaseHeight);
+    int defaultHeight2 = q_ptr->fontMetrics().height() * 1.6;
+    int r              = qMax(defaultHeight, defaultHeight2);
     if (r < 20) {
         r = 20;
     }
@@ -183,9 +188,11 @@ int SARibbonBar::PrivateData::calcTabBarHeight(const QFontMetrics& fm)
  * @param fm
  * @return
  */
-int SARibbonBar::PrivateData::calcTitleBarHeight(const QFontMetrics& fm)
+int SARibbonBar::PrivateData::calcTitleBarHeight()
 {
-    int r = fm.height() * 1.8;
+    int defaultHeight  = q_ptr->style()->pixelMetric(QStyle::PM_TitleBarHeight);
+    int defaultHeight2 = q_ptr->fontMetrics().height() * 1.8;
+    int r              = qMax(defaultHeight, defaultHeight2);
     if (r < 25) {
         r = 25;
     }
@@ -199,17 +206,17 @@ int SARibbonBar::PrivateData::calcTitleBarHeight(const QFontMetrics& fm)
  * @param s
  * @return
  */
-int SARibbonBar::PrivateData::calcCategoryHeight(const QFontMetrics& fm, SARibbonPannel::PannelLayoutMode lm, int pannelTitleHeight)
+int SARibbonBar::PrivateData::calcCategoryHeight()
 {
-    int textH = fm.lineSpacing();  // 这里用linespace，因为在换行的情况下，行距是不可忽略的，ribbon的大按钮默认是2行
-    if (SARibbonPannel::ThreeRowMode == lm) {
+    int textH = q_ptr->fontMetrics().lineSpacing();  // 这里用linespace，因为在换行的情况下，行距是不可忽略的，ribbon的大按钮默认是2行
+    if (SARibbonPannel::ThreeRowMode == mDefaulePannelLayoutMode) {
         // 5.5=（3*1.6+1） （三行）,1是给panneltitle预留的
-        return textH * 4.8 + pannelTitleHeight;
+        return textH * 4.8 + mPannelTitleHeight;
     } else {
         // 3=2*1.6
-        return textH * 3.2 + pannelTitleHeight;
+        return textH * 3.2 + mPannelTitleHeight;
     }
-    return (textH * 4.8 + pannelTitleHeight);
+    return (textH * 4.8 + mPannelTitleHeight);
 }
 
 /**
@@ -306,16 +313,16 @@ void SARibbonBar::PrivateData::getPivotalSize(int& tabHegith, int& titleHeight, 
 void SARibbonBar::PrivateData::updateHintSize()
 {
     auto fm         = q_ptr->fontMetrics();
-    mTitleBarHeight = calcTitleBarHeight(fm);
+    mTitleBarHeight = calcTitleBarHeight();
     // mTabBarHeight有大于0的值说明用户设置了，就使用用户设置的值
-    mTabBarHeight   = calcTabBarHeight(fm);
-    mCategoryHeight = calcCategoryHeight(fm, mDefaulePannelLayoutMode, mPannelTitleHeight);
+    mTabBarHeight   = calcTabBarHeight();
+    mCategoryHeight = calcCategoryHeight();
 }
 
 void SARibbonBar::PrivateData::setApplicationButton(QAbstractButton* btn)
 {
     if (mApplicationButton) {
-        delete mApplicationButton;
+        mApplicationButton->deleteLater();
     }
     if (btn) {
         if (btn->parent() != q_ptr) {
@@ -557,7 +564,7 @@ SARibbonTabBar* SARibbonBar::ribbonTabBar()
  */
 SARibbonCategory* SARibbonBar::addCategoryPage(const QString& title)
 {
-    SARibbonCategory* category = RibbonSubElementDelegate->createRibbonCategory(this);
+    SARibbonCategory* category = RibbonSubElementFactory->createRibbonCategory(this);
 
     category->setObjectName(title);
     category->setCategoryName(title);
@@ -599,7 +606,7 @@ void SARibbonBar::addCategoryPage(QWidget* category)
  */
 SARibbonCategory* SARibbonBar::insertCategoryPage(const QString& title, int index)
 {
-    SARibbonCategory* category = RibbonSubElementDelegate->createRibbonCategory(this);
+    SARibbonCategory* category = RibbonSubElementFactory->createRibbonCategory(this);
 
     category->setObjectName(title);
     category->setCategoryName(title);
@@ -851,7 +858,7 @@ void SARibbonBar::removeCategory(SARibbonCategory* category)
  */
 SARibbonContextCategory* SARibbonBar::addContextCategory(const QString& title, const QColor& color, const QVariant& id)
 {
-    SARibbonContextCategory* context = RibbonSubElementDelegate->createRibbonContextCategory(this);
+    SARibbonContextCategory* context = RibbonSubElementFactory->createRibbonContextCategory(this);
 
     context->setObjectName(title);
     context->setContextTitle(title);
@@ -1387,7 +1394,7 @@ void SARibbonBar::synchronousCategoryData(bool autoUpdate)
 SARibbonButtonGroupWidget* SARibbonBar::activeRightButtonGroup()
 {
     if (nullptr == d_ptr->mRightButtonGroup) {
-        d_ptr->mRightButtonGroup = RibbonSubElementDelegate->craeteButtonGroupWidget(this);
+        d_ptr->mRightButtonGroup = RibbonSubElementFactory->craeteButtonGroupWidget(this);
     }
     d_ptr->mRightButtonGroup->show();
     return d_ptr->mRightButtonGroup;
@@ -1409,7 +1416,7 @@ SARibbonButtonGroupWidget* SARibbonBar::rightButtonGroup()
 SARibbonQuickAccessBar* SARibbonBar::activeQuickAccessBar()
 {
     if (nullptr == d_ptr->mQuickAccessBar) {
-        d_ptr->mQuickAccessBar = RibbonSubElementDelegate->createQuickAccessBar(this);
+        d_ptr->mQuickAccessBar = RibbonSubElementFactory->createQuickAccessBar(this);
         d_ptr->mQuickAccessBar->setObjectName(QStringLiteral("objSARibbonQuickAccessBar"));
         d_ptr->mQuickAccessBar->setIcon(windowIcon());
     }
@@ -1892,6 +1899,54 @@ bool SARibbonBar::iterate(FpPannelIterate fp)
     return true;
 }
 
+/**
+ * @brief 设置边角widget可见性，对于mdi窗口，会出现TopLeftCorner和TopRightCorner两个corner widget
+ * @param on
+ * @param c
+ */
+void SARibbonBar::setCornerWidgetVisible(bool on, Qt::Corner c)
+{
+    if (QWidget* w = cornerWidget(c)) {
+        w->setVisible(on);
+    }
+}
+
+/**
+ * @brief 显示windows的关闭、最大、最小化按钮
+ * @param on
+ */
+void SARibbonBar::showWindowButtonGroup(bool on)
+{
+    if (!on) {
+        if (d_ptr->mWindowButtonGroup) {
+            d_ptr->mWindowButtonGroup->hide();
+            d_ptr->mWindowButtonGroup->deleteLater();
+            d_ptr->mWindowButtonGroup = nullptr;
+        }
+    } else {
+        if (d_ptr->mWindowButtonGroup.isNull()) {
+            d_ptr->mWindowButtonGroup = RibbonSubElementFactory->createWindowButtonGroup(this);
+        }
+        d_ptr->mWindowButtonGroup->raise();
+        d_ptr->mWindowButtonGroup->show();
+    }
+}
+
+/**
+ * @brief 获取系统的关闭、最大、最小化按钮组
+ * @return
+ */
+SAWindowButtonGroup* SARibbonBar::windowButtonGroup() const
+{
+    return d_ptr->mWindowButtonGroup;
+}
+
+/**
+ * @brief SARibbonBar::eventFilter
+ * @param obj
+ * @param e
+ * @return
+ */
 bool SARibbonBar::eventFilter(QObject* obj, QEvent* e)
 {
     if (obj) {

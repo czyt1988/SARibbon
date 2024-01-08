@@ -426,7 +426,7 @@ QAction* SARibbonPannel::addLargeWidget(QWidget* w)
  */
 SARibbonGallery* SARibbonPannel::addGallery(bool expanding)
 {
-    SARibbonGallery* gallery = RibbonSubElementDelegate->createRibbonGallery(this);
+    SARibbonGallery* gallery = RibbonSubElementFactory->createRibbonGallery(this);
 
     addWidget(gallery, SARibbonPannelItem::Large);
     if (expanding) {

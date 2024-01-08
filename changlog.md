@@ -3,6 +3,7 @@
 ## 2024-01-01 -> 2.0.0
 
 - SARibbonPannel的文字使用SARibbonPannelLabel(QLabel)显示，可以通过qss进行自定义
+- SARibbonCategory和
 - SARibbonBar的样式RibbonStyle改为QFlags
 - SARibbonBar添加了相关的迭代函数
 - 尺寸的计算重新进行了调整
