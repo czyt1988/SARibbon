@@ -107,7 +107,7 @@ void SARibbonPannelLayout::setOptionAction(QAction* action)
     if (action) {
         // 创建option action
         if (nullptr == m_optionActionBtn) {
-            m_optionActionBtn = RibbonSubElementDelegate->createRibbonPannelOptionButton(p);
+            m_optionActionBtn = RibbonSubElementFactory->createRibbonPannelOptionButton(p);
             QObject::connect(m_optionActionBtn, &SARibbonToolButton::triggered, p, &SARibbonPannel::actionTriggered);
             // 确保m_optionActionBtn在label之上
             if (m_titleLabel) {
@@ -366,7 +366,7 @@ SARibbonPannelItem* SARibbonPannelLayout::createItem(QAction* action, SARibbonPa
             customWidget = true;  // 标记为true，在移除的时候是不会对这个窗口进行删除，false默认会进行删除如SARibbonSeparatorWidget和SARibbonToolButton
         }
     } else if (action->isSeparator()) {
-        SARibbonSeparatorWidget* sep = RibbonSubElementDelegate->createRibbonSeparatorWidget(pannel);
+        SARibbonSeparatorWidget* sep = RibbonSubElementFactory->createRibbonSeparatorWidget(pannel);
         widget                       = sep;
     }
     // 不是widget，自动生成SARibbonToolbutton
@@ -375,7 +375,7 @@ SARibbonPannelItem* SARibbonPannelLayout::createItem(QAction* action, SARibbonPa
                                                                ? SARibbonToolButton::LargeButton
                                                                : SARibbonToolButton::SmallButton);
 
-        SARibbonToolButton* button = RibbonSubElementDelegate->createRibbonToolButton(pannel);
+        SARibbonToolButton* button = RibbonSubElementFactory->createRibbonToolButton(pannel);
         button->setFocusPolicy(Qt::NoFocus);
         button->setButtonType(buttonType);
         button->setDefaultAction(action);

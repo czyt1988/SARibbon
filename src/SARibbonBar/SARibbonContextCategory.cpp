@@ -50,7 +50,7 @@ SARibbonContextCategory::~SARibbonContextCategory()
  */
 SARibbonCategory* SARibbonContextCategory::addCategoryPage(const QString& title)
 {
-    SARibbonCategory* category = RibbonSubElementDelegate->createRibbonCategory(parentWidget());
+    SARibbonCategory* category = RibbonSubElementFactory->createRibbonCategory(parentWidget());
     category->setCategoryName(title);
     addCategoryPage(category);
     return (category);

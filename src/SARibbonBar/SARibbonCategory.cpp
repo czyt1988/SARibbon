@@ -65,7 +65,7 @@ SARibbonPannel* SARibbonCategory::PrivateData::addPannel(const QString& title)
 
 SARibbonPannel* SARibbonCategory::PrivateData::insertPannel(const QString& title, int index)
 {
-    SARibbonPannel* pannel = RibbonSubElementDelegate->createRibbonPannel(ribbonCategory());
+    SARibbonPannel* pannel = RibbonSubElementFactory->createRibbonPannel(ribbonCategory());
 
     pannel->setPannelName(title);
     pannel->setObjectName(title);

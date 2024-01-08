@@ -229,14 +229,14 @@ void SARibbonButtonGroupWidget::actionEvent(QActionEvent* e)
                 item.customWidget = true;
             }
         } else if (item.action->isSeparator()) {
-            SARibbonSeparatorWidget* sp = RibbonSubElementDelegate->createRibbonSeparatorWidget(this);
+            SARibbonSeparatorWidget* sp = RibbonSubElementFactory->createRibbonSeparatorWidget(this);
             item.widget                 = sp;
         }
         // 不是widget，自动生成ButtonTyle
         if (!item.widget) {
             // 只使用small
             SARibbonToolButton::RibbonButtonType buttonType = SARibbonToolButton::SmallButton;
-            SARibbonControlToolButton* button = RibbonSubElementDelegate->createRibbonControlToolButton(this);
+            SARibbonControlToolButton* button = RibbonSubElementFactory->createRibbonControlToolButton(this);
             button->setAutoRaise(true);
             button->setIconSize(d_ptr->mIconSize);
             button->setFixedHeight(d_ptr->mIconSize.height());

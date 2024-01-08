@@ -45,10 +45,8 @@ private:
 #ifndef RibbonSubElementMgr
 #define RibbonSubElementMgr SARibbonElementManager::instance()
 #endif
-#ifndef RibbonSubElementDelegate
-#define RibbonSubElementDelegate SARibbonElementManager::instance()->factory()
+#ifndef RibbonSubElementFactory
+#define RibbonSubElementFactory SARibbonElementManager::instance()->factory()
 #endif
-#ifndef RibbonSubElementStyleOpt
-#define RibbonSubElementStyleOpt SARibbonElementManager::instance()->factory()->getRibbonStyleOption()
-#endif
+
 #endif  // SARIBBONELEMENTMANAGER_H

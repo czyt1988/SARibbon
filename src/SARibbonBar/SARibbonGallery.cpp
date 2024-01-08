@@ -59,7 +59,7 @@ public:
         q_ptr->connect(buttonUp, &QAbstractButton::clicked, q_ptr, &SARibbonGallery::pageUp);
         q_ptr->connect(buttonDown, &QAbstractButton::clicked, q_ptr, &SARibbonGallery::pageDown);
         q_ptr->connect(buttonMore, &QAbstractButton::clicked, q_ptr, &SARibbonGallery::showMoreDetail);
-        //信号转发
+        // 信号转发
         q_ptr->connect(q_ptr, &SARibbonGallery::triggered, q_ptr, &SARibbonGallery::onTriggered);
         popupWidget   = nullptr;
         viewportGroup = nullptr;
@@ -96,7 +96,7 @@ public:
     void setViewPort(SARibbonGalleryGroup* v)
     {
         if (nullptr == viewportGroup) {
-            viewportGroup = RibbonSubElementDelegate->createRibbonGalleryGroup(q_ptr);
+            viewportGroup = RibbonSubElementFactory->createRibbonGalleryGroup(q_ptr);
             layout->addWidget(viewportGroup, 1);
         }
         viewportGroup->setRecalcGridSizeBlock(true);
@@ -114,7 +114,7 @@ public:
     }
 };
 
-//静态变量初始化
+// 静态变量初始化
 
 /**
  * @brief SARibbonGalleryPrivate::sGalleryButtonMaximumWidth
@@ -225,7 +225,7 @@ QSize SARibbonGallery::sizeHint() const
  */
 SARibbonGalleryGroup* SARibbonGallery::addGalleryGroup()
 {
-    SARibbonGalleryGroup* group = RibbonSubElementDelegate->createRibbonGalleryGroup(this);
+    SARibbonGalleryGroup* group = RibbonSubElementFactory->createRibbonGalleryGroup(this);
     addGalleryGroup(group);
     return (group);
 }
@@ -256,7 +256,7 @@ void SARibbonGallery::addGalleryGroup(SARibbonGalleryGroup* group)
  */
 SARibbonGalleryGroup* SARibbonGallery::addCategoryActions(const QString& title, QList< QAction* > actions)
 {
-    SARibbonGalleryGroup* group = RibbonSubElementDelegate->createRibbonGalleryGroup(this);
+    SARibbonGalleryGroup* group = RibbonSubElementFactory->createRibbonGalleryGroup(this);
     if (!title.isEmpty()) {
         group->setGroupTitle(title);
     }
@@ -353,7 +353,7 @@ void SARibbonGallery::onItemClicked(const QModelIndex& index)
 void SARibbonGallery::onTriggered(QAction* action)
 {
     Q_UNUSED(action);
-    //点击后关闭弹出窗口
+    // 点击后关闭弹出窗口
     if (d_ptr->popupWidget) {
         if (d_ptr->popupWidget->isVisible()) {
             d_ptr->popupWidget->hide();
@@ -372,7 +372,7 @@ SARibbonGalleryViewport* SARibbonGallery::ensureGetPopupViewPort()
 void SARibbonGallery::resizeEvent(QResizeEvent* event)
 {
     QFrame::resizeEvent(event);
-    //对SARibbonGalleryViewport所有SARibbonGalleryGroup重置尺寸
+    // 对SARibbonGalleryViewport所有SARibbonGalleryGroup重置尺寸
     int h = layout()->contentsRect().height();
     if (d_ptr->viewportGroup) {
         h = d_ptr->viewportGroup->height();
