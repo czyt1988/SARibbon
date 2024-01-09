@@ -530,6 +530,29 @@ QList< QColor > SARibbonBar::defaultContextCategoryColorList()
 }
 
 /**
+ * @brief 提供高分屏的支持静态函数
+ *
+ * @note 此函数需要在main函数，QApplication生成之前调用
+ * @code
+ * int main(int argc, char* argv[]){
+ *    SARibbonBar::initHighDpi();
+ *    QApplication a(argc, argv);
+ *    ...
+ * }
+ * @endcode
+ */
+void SARibbonBar::initHighDpi()
+{
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)) && (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
+#endif
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+    QApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
+#endif
+}
+
+/**
  * @brief 返回applicationButton
  * @return 默认的applicationButton是@ref SARibbonApplicationButton 生成，通过@ref setApplicationButton 可设置为其他button
  */

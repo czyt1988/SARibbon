@@ -2,7 +2,7 @@
 #include <QApplication>
 #include <QDebug>
 #include <QElapsedTimer>
-
+#include "SARibbonBar.h"
 // 重定向qdebug的打印
 void log_out_put(QtMsgType type, const QMessageLogContext& context, const QString& msg);
 
@@ -46,13 +46,8 @@ void log_out_put(QtMsgType type, const QMessageLogContext& context, const QStrin
 int main(int argc, char* argv[])
 {
     // 以下是针对高分屏的设置，有高分屏需求都需要按照下面进行设置
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 6, 0))
-    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-    QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
-#endif
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
-    QApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
-#endif
+    SARibbonBar::initHighDpi();
+
     QApplication a(argc, argv);
     qInstallMessageHandler(log_out_put);
     QFont f = a.font();
