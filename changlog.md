@@ -16,7 +16,14 @@
   4.属性pannelLayoutMode，可控制pannel的布局方式
   5.属性tabOnTitle，可控制tab放置在title栏上
   6.titleBarHeight，tabBarHeight，categoryHeight这三个高度支持用户自定义，默认会根据字体大小计算
-  6.setTabBarBaseLineColor控制tabbar下基线颜色，某些主题需要设置颜色（窗口标题栏和category区域颜色一样的情况下如office 2013主题）可通过此函数设置，传入QColor()取消颜色
+  7.setTabBarBaseLineColor控制tabbar下基线颜色，某些主题需要设置颜色（窗口标题栏和category区域颜色一样的情况下如office 2013主题）可通过此函数设置，传入QColor()取消颜色
+- 添加了SARibbonBar::initHighDpi()静态函数，方便开启高分屏设置
+- 【注意】frameless库更换为qwindowkit(https://github.com/stdware/qwindowkit)，qwindowkit源码不作为项目一部分，使用git submodule管理，因此，项目clone下来后，需要执行`git submodule update --init --recursive`
+- 【注意】如果开启SARIBBON_USE_FRAMELESS_LIB（默认开启），需要先构建`qwindowkit`，目前`qwindowkit`不提供qmake，只提供cmake，编译完`qwindowkit`后，SARibbon支持qmake和cmake
+- SAMainWindow支持非ribbon模式
+
+【警告】编译过程会在当前目录下生成bin_qtx.x.x_Debug/Release_x64/86这样的文件夹，请确保有写入权限，否则会执行qmake或cmake过程报错
+
 
 
 由于接口函数有明显调整，因此版本变更为2.0

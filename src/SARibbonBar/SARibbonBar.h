@@ -148,6 +148,9 @@ public:
     // 获取默认的上下文标签颜色列表
     static QList< QColor > defaultContextCategoryColorList();
 
+    //
+    static void initHighDpi();
+
 public:
     // 构造函数
     SARibbonBar(QWidget* parent = nullptr);
