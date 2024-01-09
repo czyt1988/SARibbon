@@ -147,7 +147,7 @@ private:
     // 处理鼠标进入
     bool handleHoverMoveEvent(QHoverEvent* event);
 
-    //处理鼠标双击事件
+    // 处理鼠标双击事件
     bool handleDoubleClickedMouseEvent(QMouseEvent* event);
 
 private:
@@ -355,7 +355,7 @@ bool SAPrivateFramelessWidgetData::handleMousePressEvent(QMouseEvent* event)
 
         if (m_pressedMousePos.m_bOnEdges) {
             if (m_pWidget->isMaximized()) {
-                //窗口在最大化状态时，点击边界不做任何处理
+                // 窗口在最大化状态时，点击边界不做任何处理
                 return (false);
             }
             if (d->m_bRubberBandOnResize) {
@@ -365,7 +365,7 @@ bool SAPrivateFramelessWidgetData::handleMousePressEvent(QMouseEvent* event)
             }
         } else if (d->m_bRubberBandOnMove && m_bLeftButtonTitlePressed) {
             if (m_pWidget->isMaximized()) {
-                //窗口在最大化状态时，点击标题栏不做任何处理
+                // 窗口在最大化状态时，点击标题栏不做任何处理
                 return (false);
             }
             m_pRubberBand->setGeometry(frameRect);
@@ -396,21 +396,21 @@ bool SAPrivateFramelessWidgetData::handleMouseMoveEvent(QMouseEvent* event)
     if (m_bLeftButtonPressed) {
         if (d->m_bWidgetResizable && m_pressedMousePos.m_bOnEdges) {
             if (m_pWidget->isMaximized()) {
-                //窗口在最大化状态时，点击边界不做任何处理
+                // 窗口在最大化状态时，点击边界不做任何处理
                 return (false);
             }
             resizeWidget(event->globalPos());
             return (true);
         } else if (d->m_bWidgetMovable && m_bLeftButtonTitlePressed) {
             if (m_pWidget->isMaximized()) {
-                //先求出窗口到鼠标的相对位置
+                // 先求出窗口到鼠标的相对位置
                 QRect normalGeometry = m_pWidget->normalGeometry();
                 m_pWidget->showNormal();
                 QPoint p = event->globalPos();
                 p.ry() -= 10;
                 p.rx() -= (normalGeometry.width() / 2);
                 m_pWidget->move(p);
-                //这时要重置m_ptDragPos
+                // 这时要重置m_ptDragPos
                 m_ptDragPos = QPoint(normalGeometry.width() / 2, 10);
                 return (true);
             }
@@ -448,8 +448,8 @@ bool SAPrivateFramelessWidgetData::handleDoubleClickedMouseEvent(QMouseEvent* ev
         if (m_pWidget) {
             SARibbonMainWindow* mainwindow = qobject_cast< SARibbonMainWindow* >(m_pWidget);
             if (mainwindow) {
-                if (mainwindow->windowButtonFlags() & Qt::WindowMaximizeButtonHint) {
-                    //在最大化按钮显示时才进行shownormal处理
+                if (mainwindow->windowFlags() & Qt::WindowMaximizeButtonHint) {
+                    // 在最大化按钮显示时才进行shownormal处理
                     bool titlePressed = event->pos().y() < m_moveMousePos.m_nTitleHeight;
                     if (titlePressed) {
                         if (m_pWidget->isMaximized()) {
@@ -479,11 +479,11 @@ SAFramelessHelper::SAFramelessHelper(QObject* parent) : QObject(parent), d_ptr(n
         QWidget* w = qobject_cast< QWidget* >(parent);
         if (w) {
             w->setWindowFlags(w->windowFlags() | Qt::FramelessWindowHint);
-            setWidgetMovable(true);       //设置窗体可移动
-            setWidgetResizable(true);     //设置窗体可缩放
-            setRubberBandOnMove(false);   //设置橡皮筋效果-可移动
-            setRubberBandOnResize(true);  //设置橡皮筋效果-可缩放
-            activateOn(w);                //激活当前窗体
+            setWidgetMovable(true);       // 设置窗体可移动
+            setWidgetResizable(true);     // 设置窗体可缩放
+            setRubberBandOnMove(false);   // 设置橡皮筋效果-可移动
+            setRubberBandOnResize(true);  // 设置橡皮筋效果-可缩放
+            activateOn(w);                // 激活当前窗体
         }
     }
 }

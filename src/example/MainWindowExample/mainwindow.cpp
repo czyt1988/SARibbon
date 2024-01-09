@@ -359,18 +359,10 @@ void MainWindow::onActionLoadCustomizeXmlFileTriggered()
 
 void MainWindow::onActionWindowFlagNormalButtonTriggered(bool b)
 {
-    if (b) {
-        // 最大最小关闭按钮都有
-        Qt::WindowFlags f = windowFlags();
-        f |= (Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint);
-        updateWindowFlag(f);
-    } else {
-        // 由于已经处于frameless状态，这个最大最小设置是无效的
-        //  setWindowFlags(windowFlags()&~Qt::WindowMaximizeButtonHint&~Qt::WindowMinimizeButtonHint);
-        Qt::WindowFlags f = windowFlags();
-        f &= ~Qt::WindowMinMaxButtonsHint & ~Qt::WindowCloseButtonHint;
-        updateWindowFlag(f);
-    }
+    Qt::WindowFlags f = windowFlags();
+    f.setFlag(Qt::WindowCloseButtonHint, b);
+    f.setFlag(Qt::WindowMinMaxButtonsHint, b);
+    setWindowFlags(f);
 }
 
 void MainWindow::onFontComWidgetCurrentFontChanged(const QFont& f)

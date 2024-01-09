@@ -23,8 +23,8 @@ public:
     int mMaxStretch { 3 };
     int mMinStretch { 3 };
     int mTitleBarHeight { 28 };
-    Qt::WindowFlags mFlags;
-    PrivateData(SAWindowButtonGroup* p) : q_ptr(p), mFlags(Qt::WindowFlags())
+    Qt::WindowFlags mFlags { Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint };
+    PrivateData(SAWindowButtonGroup* p) : q_ptr(p)
     {
     }
 
@@ -155,7 +155,10 @@ public:
 
     QSize sizeHint() const
     {
-        int height   = mTitleBarHeight;
+        int height = mTitleBarHeight;
+        if (height < 20) {
+            height = 20;
+        }
         int btnWidth = mTitleBarHeight * 1.5;
         int width(0);
         if (buttonClose) {
@@ -260,7 +263,7 @@ void SAWindowButtonGroup::setButtonWidthStretch(int close, int max, int min)
  * 标题栏高度会影响sizeHint
  * @param h
  */
-void SAWindowButtonGroup::setTitleBarHeight(int h)
+void SAWindowButtonGroup::setWindowTitleHeight(int h)
 {
     d_ptr->mTitleBarHeight = h;
 }
@@ -269,7 +272,7 @@ void SAWindowButtonGroup::setTitleBarHeight(int h)
  * @brief 标题栏高度
  * @return
  */
-int SAWindowButtonGroup::titleBarHeight() const
+int SAWindowButtonGroup::windowTitleHeight() const
 {
     return d_ptr->mTitleBarHeight;
 }
@@ -306,12 +309,28 @@ Qt::WindowFlags SAWindowButtonGroup::windowButtonFlags() const
     if (d_ptr->mFlags & Qt::WindowMinimizeButtonHint) {
         f |= Qt::WindowMinimizeButtonHint;
     }
+
     return (f);
 }
 
 QSize SAWindowButtonGroup::sizeHint() const
 {
     return (d_ptr->sizeHint());
+}
+
+QAbstractButton* SAWindowButtonGroup::minimizeButton() const
+{
+    return d_ptr->buttonMinimize;
+}
+
+QAbstractButton* SAWindowButtonGroup::maximizeButton() const
+{
+    return d_ptr->buttonMaximize;
+}
+
+QAbstractButton* SAWindowButtonGroup::closeButton() const
+{
+    return d_ptr->buttonClose;
 }
 
 void SAWindowButtonGroup::resizeEvent(QResizeEvent* e)

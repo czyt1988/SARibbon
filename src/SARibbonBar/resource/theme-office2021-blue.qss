@@ -236,32 +236,25 @@ SARibbonTabBar::tab {
   margin-left: 5px;
   margin-bottom: 0px;
   min-width: 50px;
-  max-width: 250px;
   min-height: 25px;
-  max-height: 25px;
   padding-left: 0px;
   padding-right: 0px;
-  padding-top: -5px;
-  padding-bottom: -5px;
+  padding-top: -4px;
+  padding-bottom: -4px;
 
-}
-
-SARibbonTabBar::tab:selected, SARibbonTabBar::tab:hover {
-  border-top-left-radius: 0px;
-  border-top-right-radius: 0px;
 }
 
 SARibbonTabBar::tab:selected {
   color: #2760a7;/* {Tab.Color:selected} */
   /*顶部要给一个透明的border高度，否则文字会向上偏移*/
-  border-top:5px solid transparent;
-  border-bottom: 5px solid #2760a7;
+  border-top:4px solid transparent;
+  border-bottom: 4px solid #2760a7;
 }
 
 SARibbonTabBar::tab:hover:!selected {
   /*顶部要给一个透明的border高度，否则文字会向上偏移*/
-  border-top:5px solid transparent;
-  border-bottom: 5px solid #d0ced1;
+  border-top:4px solid transparent;
+  border-bottom: 4px solid #d0ced1;
   color: #242424;/* {Tab.Color:hover:!selected} */
 }
 

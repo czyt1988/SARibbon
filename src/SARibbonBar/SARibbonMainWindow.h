@@ -37,6 +37,7 @@ class SA_RIBBON_EXPORT SARibbonMainWindow : public QMainWindow
 {
     Q_OBJECT
     SA_RIBBON_DECLARE_PRIVATE(SARibbonMainWindow)
+    friend class SARibbonBar;
     Q_PROPERTY(RibbonTheme ribbonTheme READ ribbonTheme WRITE setRibbonTheme)
 public:
     /**
@@ -70,12 +71,11 @@ public:
     // 把ribbonbar的事件传递到frameless
     virtual bool eventFilter(QObject* obj, QEvent* e) Q_DECL_OVERRIDE;
 #else
+    // 如果ribbon中有自定义的窗口在标题栏等非点击区域加入后，想能点击，需要调用此接口告知可点击
     void setFramelessHitTestVisible(const QWidget* w, bool visible = true);
 #endif
     // 此函数仅用于控制最小最大化和关闭按钮的显示
     void updateWindowFlag(Qt::WindowFlags flags);
-    // 获取系统按钮的状态
-    Qt::WindowFlags windowButtonFlags() const;
 
     // 注意主题在构造函数设置主题会不完全生效，使用QTimer投放到队列最后执行即可
     // QTimer::singleShot(0, this, [ this ]() { this->setRibbonTheme(SARibbonMainWindow::RibbonThemeDark); });
@@ -83,14 +83,12 @@ public:
     RibbonTheme ribbonTheme() const;
     // 判断当前是否使用ribbon模式
     bool isUseRibbon() const;
-    // 获取左上角按钮组（最大化，最小化，关闭）
-    SAWindowButtonGroup* windowButtonGroup() const;
 
 protected:
     // 创建ribbonbar的工厂函数
     SARibbonBar* createRibbonBar();
     virtual void resizeEvent(QResizeEvent* event) Q_DECL_OVERRIDE;
-    virtual bool event(QEvent* e) Q_DECL_OVERRIDE;
+    virtual void changeEvent(QEvent* e) Q_DECL_OVERRIDE;
 private slots:
     void onPrimaryScreenChanged(QScreen* screen);
 
