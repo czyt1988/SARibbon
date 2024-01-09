@@ -18,26 +18,22 @@ public:
     void setupMinimizeButton(bool on);
     void setupMaximizeButton(bool on);
     void setupCloseButton(bool on);
+    // 以最顶层的widget的WindowFlag作为WindowFlag
     void updateWindowFlag();
     void updateWindowFlag(Qt::WindowFlags flags);
-
     // 设置按钮的宽度比例,最终按钮宽度将按照此比例进行设置
     void setButtonWidthStretch(int close = 4, int max = 3, int min = 3);
-
-    // 设置按钮的缩放比例
-    void setIconScale(qreal iconscale = 0.5);
-
+    // 标题栏高度
+    void setTitleBarHeight(int h);
+    int titleBarHeight() const;
     // 设置Qt::WindowStates
     void setWindowStates(Qt::WindowStates s);
-
     // 仅获取按钮的状态
     Qt::WindowFlags windowButtonFlags() const;
 
     virtual QSize sizeHint() const Q_DECL_OVERRIDE;
 
 protected:
-    virtual bool eventFilter(QObject* watched, QEvent* e) Q_DECL_OVERRIDE;
-    virtual void parentResize();
     virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
 
 protected slots:
