@@ -1,12 +1,23 @@
 ﻿# 版本记录(change log):
       
-## 2024-01-01 -> 2.0.0
+## 2024-01-09 -> 2.0.0
 
+- SARibbonCategory和SARibbonPannel可以通过qss定制
 - SARibbonPannel的文字使用SARibbonPannelLabel(QLabel)显示，可以通过qss进行自定义
-- SARibbonCategory和
+- SARibbonSeparatorWidget分割线也支持qss定制
 - SARibbonBar的样式RibbonStyle改为QFlags
-- SARibbonBar添加了相关的迭代函数
+- SARibbonBar添加了相关的迭代函数，可快速遍历所有的category和pannel
 - 尺寸的计算重新进行了调整
+- 默认的qss进行了重新调整，适用更多的屏幕尺寸
+- SARibbonBar添加了如下接口：
+  1.SARibbonBar::setCornerWidgetVisible 可以设置cornerwidget的显示隐藏与否
+  2.属性enableShowPannelTitle，控制是否显示pannel的标题
+  3.属性pannelTitleHeight，控制pannel标题栏高度
+  4.属性pannelLayoutMode，可控制pannel的布局方式
+  5.属性tabOnTitle，可控制tab放置在title栏上
+  6.titleBarHeight，tabBarHeight，categoryHeight这三个高度支持用户自定义，默认会根据字体大小计算
+  6.setTabBarBaseLineColor控制tabbar下基线颜色，某些主题需要设置颜色（窗口标题栏和category区域颜色一样的情况下如office 2013主题）可通过此函数设置，传入QColor()取消颜色
+
 
 由于接口函数有明显调整，因此版本变更为2.0
 
