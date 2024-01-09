@@ -24,14 +24,18 @@ public:
     // 设置按钮的宽度比例,最终按钮宽度将按照此比例进行设置
     void setButtonWidthStretch(int close = 4, int max = 3, int min = 3);
     // 标题栏高度
-    void setTitleBarHeight(int h);
-    int titleBarHeight() const;
+    void setWindowTitleHeight(int h);
+    int windowTitleHeight() const;
     // 设置Qt::WindowStates
     void setWindowStates(Qt::WindowStates s);
     // 仅获取按钮的状态
     Qt::WindowFlags windowButtonFlags() const;
 
     virtual QSize sizeHint() const Q_DECL_OVERRIDE;
+
+    QAbstractButton* minimizeButton() const;
+    QAbstractButton* maximizeButton() const;
+    QAbstractButton* closeButton() const;
 
 protected:
     virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;

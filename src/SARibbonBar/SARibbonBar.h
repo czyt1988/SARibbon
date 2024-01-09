@@ -93,6 +93,7 @@ class SA_RIBBON_EXPORT SARibbonBar : public QMenuBar
 {
     Q_OBJECT
     SA_RIBBON_DECLARE_PRIVATE(SARibbonBar)
+    friend class SARibbonMainWindow;
     Q_PROPERTY(RibbonStyles ribbonStyle READ currentRibbonStyle WRITE setRibbonStyle)
     Q_PROPERTY(bool minimumMode READ isMinimumMode WRITE setMinimumMode)
     Q_PROPERTY(bool minimumModeButton READ haveShowMinimumModeButton WRITE showMinimumModeButton)
@@ -103,6 +104,7 @@ class SA_RIBBON_EXPORT SARibbonBar : public QMenuBar
     Q_PROPERTY(bool enableShowPannelTitle READ isEnableShowPannelTitle WRITE setEnableShowPannelTitle)
     Q_PROPERTY(bool tabOnTitle READ isTabOnTitle WRITE setTabOnTitle)
     Q_PROPERTY(SARibbonPannel::PannelLayoutMode pannelLayoutMode READ pannelLayoutMode WRITE setPannelLayoutMode)
+
 public:
     enum RibbonStyleFlag
     {
@@ -293,9 +295,6 @@ public:
     bool isLooseStyle() const;
     bool isCompactStyle() const;
 
-    // 告诉saribbonbar，window button的尺寸
-    void setWindowButtonSize(const QSize& size);
-
     // 更新ribbon的布局数据，此函数适用于一些关键性尺寸变化，换起ribbon下面元素的布局,在发现刷新问题时，可以调用此函数
     void updateRibbonGeometry();
 
@@ -361,10 +360,6 @@ public:
 
     // 设置边角widget可见性，对于mdi窗口，会出现TopLeftCorner和TopRightCorner两个corner widget
     void setCornerWidgetVisible(bool on, Qt::Corner c = Qt::TopLeftCorner);
-
-    // 系统按钮
-    void showWindowButtonGroup(bool on = true);
-    SAWindowButtonGroup* windowButtonGroup() const;
 signals:
 
     /**
@@ -401,11 +396,12 @@ signals:
 
 protected:
     bool eventFilter(QObject* obj, QEvent* e) override;
-
     // 根据情况重置tabbar的宽度，主要针对wps模式
     int calcMinTabBarWidth() const;
     // 更新
     void updateCategoryTitleToTabName();
+    // 告知WindowButtonGroup的尺寸
+    void setWindowButtonGroupSize(const QSize& s);
 protected slots:
     void onWindowTitleChanged(const QString& title);
     void onWindowIconChanged(const QIcon& i);

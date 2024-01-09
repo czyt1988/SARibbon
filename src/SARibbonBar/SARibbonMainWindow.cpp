@@ -32,7 +32,6 @@ public:
 
 public:
     SARibbonMainWindow::RibbonTheme mCurrentRibbonTheme { SARibbonMainWindow::RibbonThemeOffice2021Blue };
-    SARibbonBar* mRibbonBar { nullptr };
     SAWindowButtonGroup* mWindowButtonGroup { nullptr };
 #if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
     QWK::WidgetWindowAgent* mFramelessHelper { nullptr };
@@ -95,45 +94,49 @@ void SARibbonMainWindow::setRibbonBar(SARibbonBar* bar)
         // 如果之前已经设置了menubar，要把之前的删除
         old->deleteLater();
     }
-#if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
-    auto helper = d_ptr->mFramelessHelper;
     QMainWindow::setMenuWidget(bar);
-    helper->setTitleBar(bar);
-
+    const int th = bar->titleBarHeight();
     // 设置window按钮
     if (nullptr == d_ptr->mWindowButtonGroup) {
-        d_ptr->mWindowButtonGroup = new SAWindowButtonGroup(this);
+        d_ptr->mWindowButtonGroup = RibbonSubElementFactory->createWindowButtonGroup(this);
     }
-    d_ptr->mWindowButtonGroup->setWindowStates(windowState());
-    d_ptr->mWindowButtonGroup->raise();
-    d_ptr->mWindowButtonGroup->show();
+    SAWindowButtonGroup* wg = d_ptr->mWindowButtonGroup;
+    wg->setWindowStates(windowState());
+    wg->setWindowTitleHeight(th);
+    wg->show();
+#if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
+    auto helper = d_ptr->mFramelessHelper;
+    helper->setTitleBar(bar);
+    // 以下这些窗口，需要允许点击
+    helper->setHitTestVisible(wg);                          // IMPORTANT!
     helper->setHitTestVisible(bar->ribbonTabBar());         // IMPORTANT!
     helper->setHitTestVisible(bar->rightButtonGroup());     // IMPORTANT!
     helper->setHitTestVisible(bar->applicationButton());    // IMPORTANT!
     helper->setHitTestVisible(bar->quickAccessBar());       // IMPORTANT!
     helper->setHitTestVisible(bar->ribbonStackedWidget());  // IMPORTANT!
-    helper->setHitTestVisible(d_ptr->mWindowButtonGroup);   // IMPORTANT!
+    if (wg->closeButton()) {
+        helper->setSystemButton(QWK::WindowAgentBase::Close, wg->closeButton());
+    }
+    if (wg->minimizeButton()) {
+        helper->setSystemButton(QWK::WindowAgentBase::Minimize, wg->minimizeButton());
+    }
+    if (wg->maximizeButton()) {
+        helper->setSystemButton(QWK::WindowAgentBase::Maximize, wg->maximizeButton());
+    }
 #else
-
-    QMainWindow::setMenuWidget(bar);
     bar->installEventFilter(this);
     // 设置窗体的标题栏高度
-    d_ptr->mFramelessHelper->setTitleHeight(bar->titleBarHeight());
-    // 设置window按钮
-    if (nullptr == d_ptr->mWindowButtonGroup) {
-        d_ptr->mWindowButtonGroup = new SAWindowButtonGroup(this);
-    }
-    QSize s = d_ptr->mWindowButtonGroup->sizeHint();
-    s.setHeight(bar->titleBarHeight());
-    d_ptr->mWindowButtonGroup->setFixedSize(s);
-    d_ptr->mWindowButtonGroup->setWindowStates(windowState());
-    d_ptr->mWindowButtonGroup->raise();
-    d_ptr->mWindowButtonGroup->show();
-
+    d_ptr->mFramelessHelper->setTitleHeight(th);
 #endif
 }
 
 #if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
+
+/**
+ * @brief 如果ribbon中有自定义的窗口在标题栏等非点击区域加入后，想能点击，需要调用此接口告知可点击
+ * @param w
+ * @param visible
+ */
 void SARibbonMainWindow::setFramelessHitTestVisible(const QWidget* w, bool visible)
 {
     auto helper = d_ptr->mFramelessHelper;
@@ -172,23 +175,9 @@ bool SARibbonMainWindow::eventFilter(QObject* obj, QEvent* e)
  */
 void SARibbonMainWindow::updateWindowFlag(Qt::WindowFlags flags)
 {
-    if (isUseRibbon()) {
-        d_ptr->mWindowButtonGroup->updateWindowFlag(flags);
+    if (SAWindowButtonGroup* g = d_ptr->mWindowButtonGroup) {
+        g->updateWindowFlag(flags);
     }
-    repaint();
-}
-
-/**
- * @brief 此函数返回的flags仅包括 Qt::WindowCloseButtonHint，Qt::WindowMaximizeButtonHint，Qt::WindowMinimizeButtonHint
- * 三个
- * @return
- */
-Qt::WindowFlags SARibbonMainWindow::windowButtonFlags() const
-{
-    if (isUseRibbon()) {
-        return (d_ptr->mWindowButtonGroup->windowButtonFlags());
-    }
-    return (windowFlags());
 }
 
 /**
@@ -277,15 +266,6 @@ bool SARibbonMainWindow::isUseRibbon() const
 }
 
 /**
-   @brief 获取左上角按钮组（最大化，最小化，关闭）
-   @return
- */
-SAWindowButtonGroup* SARibbonMainWindow::windowButtonGroup() const
-{
-    return d_ptr->mWindowButtonGroup;
-}
-
-/**
  * @brief 创建ribbonbar的工厂函数
  * @return
  */
@@ -298,25 +278,37 @@ SARibbonBar* SARibbonMainWindow::createRibbonBar()
 
 void SARibbonMainWindow::resizeEvent(QResizeEvent* event)
 {
-    SARibbonBar* bar = ribbonBar();
+    SARibbonBar* bar        = ribbonBar();
+    SAWindowButtonGroup* wg = d_ptr->mWindowButtonGroup;
+
+    if (wg) {
+        if (bar) {
+            const int th = bar->titleBarHeight();
+            if (th != wg->height()) {
+                wg->setWindowTitleHeight(th);
+            }
+        }
+        QSize wgSizeHint = wg->sizeHint();
+        wg->setGeometry(width() - wgSizeHint.width(), 0, wgSizeHint.width(), wgSizeHint.height());
+    }
     if (bar) {
+        if (wg) {
+            bar->setWindowButtonGroupSize(wg->size());
+        }
         if (bar->size().width() != (this->size().width())) {
             bar->setFixedWidth(this->size().width());
-        }
-        if (d_ptr->mWindowButtonGroup) {
-            bar->setWindowButtonSize(d_ptr->mWindowButtonGroup->size());
         }
     }
     QMainWindow::resizeEvent(event);
 }
 
-bool SARibbonMainWindow::event(QEvent* e)
+void SARibbonMainWindow::changeEvent(QEvent* e)
 {
     if (e) {
         switch (e->type()) {
         case QEvent::WindowStateChange: {
-            if (isUseRibbon()) {
-                d_ptr->mWindowButtonGroup->setWindowStates(windowState());
+            if (SAWindowButtonGroup* wg = d_ptr->mWindowButtonGroup) {
+                wg->setWindowStates(windowState());
             }
         } break;
 
@@ -324,7 +316,7 @@ bool SARibbonMainWindow::event(QEvent* e)
             break;
         }
     }
-    return (QMainWindow::event(e));
+    QMainWindow::changeEvent(e);
 }
 
 /**

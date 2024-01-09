@@ -129,7 +129,7 @@ SARibbonTabBar{
 
 SARibbonTabBar::tab {
     color:#444444;
-    border:none;
+    border:1px solid transparent;/*加上边框，否则选中后加入边框后会有1px的偏移*/
     background: transparent;
     margin-top: 0px;
     margin-right: 0px;
@@ -158,9 +158,6 @@ SARibbonTabBar::tab:hover:!selected{
     color: #000000;
 }
 
-SARibbonTabBar::tab:!selected {
-    margin-top: 0px;
-}
 
 /*SARibbonCheckBox*/
 SARibbonCheckBox{

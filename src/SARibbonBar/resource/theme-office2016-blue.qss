@@ -215,43 +215,30 @@ SARibbonTabBar {
 
 SARibbonTabBar::tab {
   color: #d2e4ff;/* {Tab.Color} */
-  border: none;
+  border:none;
   background: transparent;
   margin-top: 0px;
   margin-right: 0px;
   margin-left: 5px;
   margin-bottom: 0px;
   min-width: 50px;
-  max-width: 200px;
-  min-height: 20px;
-  max-height: 20px;
+  min-height: 25px;
   padding-left: 5px;
   padding-right: 5px;
-  padding-top: 2px;
-  padding-bottom: 5px;
-}
-
-SARibbonTabBar::tab:selected, SARibbonTabBar::tab:hover {
-  border-top-left-radius: 0px;
-  border-top-right-radius: 0px;
 }
 
 SARibbonTabBar::tab:selected {
   color: #225497;/* {Tab.Color:selected} */
-  border: 1px solid #225497;/* {Tab.BorderColor:selected} */
   background: #f1f1f1;/* {Tab.BKColor:selected} */
-  border-bottom: none;
+  border:none;
 }
 
 SARibbonTabBar::tab:hover:!selected {
-  border:1px solid #3e6db6;/* {Tab.BorderColor:hover:!selected} */
-  color: #d2e4ff;/* {Tab.Color:hover:!selected} */
-  background: #3e6db6;/* {Tab.BKColor:hover:!selected} */
+  border:none;/* {Tab.BorderColor:hover:!selected} */
+  color:#d2e4ff;/* {Tab.Color:hover:!selected} */
+  background:#3e6db6;/* {Tab.BKColor:hover:!selected} */
 }
 
-SARibbonTabBar::tab:!selected {
-  margin-top: 0px;
-}
 
 /*SARibbonToolButton*/
 /* 
