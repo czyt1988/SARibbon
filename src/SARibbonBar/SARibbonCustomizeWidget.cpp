@@ -63,7 +63,6 @@ QList< SARibbonCustomizeData > sa_customize_datas_from_xml(QXmlStreamReader* xml
 {
     //先找到"sa-ribbon-customize"
     while (!xml->atEnd()) {
-        qDebug() << "name:" << xml->name() << " qualifiedName:" << xml->qualifiedName();
 
         if (xml->isStartElement() && (xml->name().toString() == "sa-ribbon-customize")) {
             break;
@@ -466,25 +465,30 @@ void SARibbonCustomizeWidget::PrivateData::updateModel()
                     continue;
                 }
                 QStandardItem* ii = new QStandardItem();
-                if (i->customWidget) {
-                    //如果是自定义窗口
-                    if (i->widget()->windowTitle().isEmpty() && i->widget()->windowIcon().isNull()) {
-                        delete ii;
-                        continue;  //如果窗口啥也没有，就跳过
-                    }
-                    ii->setText(i->widget()->windowTitle());
-                    ii->setIcon(i->widget()->windowIcon());
-                    if (SARibbonCustomizeData::isCanCustomize(i->widget())) {
-                        ii->setData(true, SARibbonCustomizeWidget::CanCustomizeRole);  //标记这个是可以自定义的
-                    }
-                } else {
-                    //不是自定义，说明是action
-                    ii->setText(i->action->text());
-                    ii->setIcon(i->action->icon());
-                    if (SARibbonCustomizeData::isCanCustomize(i->action)) {
-                        ii->setData(true, SARibbonCustomizeWidget::CanCustomizeRole);  //标记这个是可以自定义的
-                    }
-                }
+//                if (i->customWidget) {
+//                    //如果是自定义窗口
+//                    if (i->widget()->windowTitle().isEmpty() && i->widget()->windowIcon().isNull()) {
+//                        delete ii;
+//                        continue;  //如果窗口啥也没有，就跳过
+//                    }
+//                    ii->setText(i->widget()->windowTitle());
+//                    ii->setIcon(i->widget()->windowIcon());
+//                    if (SARibbonCustomizeData::isCanCustomize(i->widget())) {
+//                        ii->setData(true, SARibbonCustomizeWidget::CanCustomizeRole);  //标记这个是可以自定义的
+//                    }
+//                } else {
+//                    //不是自定义，说明是action
+//                    ii->setText(i->action->text());
+//                    ii->setIcon(i->action->icon());
+//                    if (SARibbonCustomizeData::isCanCustomize(i->action)) {
+//                        ii->setData(true, SARibbonCustomizeWidget::CanCustomizeRole);  //标记这个是可以自定义的
+//                    }
+//                }
+				ii->setText(i->action->text());
+				ii->setIcon(i->action->icon());
+				if (SARibbonCustomizeData::isCanCustomize(i->action)) {
+					ii->setData(true, SARibbonCustomizeWidget::CanCustomizeRole);  //标记这个是可以自定义的
+				}
                 ii->setData(2, SARibbonCustomizeWidget::LevelRole);
                 ii->setData(QVariant::fromValue< qintptr >(qintptr(i)), SARibbonCustomizeWidget::PointerRole);
                 pi->appendRow(ii);
@@ -715,6 +719,8 @@ void SARibbonCustomizeWidget::setupActionsManager(SARibbonActionsManager* mgr)
 
     ui->comboBoxActionIndex->clear();
     for (int tag : qAsConst(tags)) {
+        if(mgr->tagName(tag).isEmpty())
+            continue;
         ui->comboBoxActionIndex->addItem(mgr->tagName(tag), tag);
     }
 }
@@ -837,7 +843,7 @@ bool SARibbonCustomizeWidget::applys()
  */
 bool SARibbonCustomizeWidget::toXml(QXmlStreamWriter* xml) const
 {
-    QList< SARibbonCustomizeData > res;
+	QList< SARibbonCustomizeData > res = d_ptr->mOldCustomizeDatas;
 
 	if(isApplied())
 		res << d_ptr->mCustomizeDatasApplied;

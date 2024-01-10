@@ -34,9 +34,16 @@ public:
 
     QSize sizeHint() const Q_DECL_OVERRIDE;
     QSize minimumSizeHint() const Q_DECL_OVERRIDE;
-    //设置icon尺寸
-    void setIconSize(const QSize& s);
-    QSize iconSize() const;
+    void resizeEvent(QResizeEvent *event) Q_DECL_OVERRIDE;
+
+    //设置内部控件高度
+    void setItemHeight(int h);
+    int itemHeight() const;
+
+	//上下margin
+	void setItemMargin(int m);
+	int itemMargin() const;
+
 signals:
 
     /**
