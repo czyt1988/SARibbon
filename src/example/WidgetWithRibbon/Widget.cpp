@@ -1,5 +1,8 @@
+
 #include "Widget.h"
+
 #include "ui_Widget.h"
+
 #include "SARibbonBar.h"
 #include "SARibbonCategory.h"
 #include "SARibbonPannel.h"

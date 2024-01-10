@@ -678,6 +678,7 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     QRadioButton* r = new QRadioButton();
     r->setText(tr("use office style"));
     r->setObjectName(("use office style"));
+    r->setWindowTitle(r->text());
     r->setChecked(true);
     pannelStyle->addSmallWidget(r);
     g->addButton(r, SARibbonBar::RibbonStyleLooseThreeRow);
@@ -685,6 +686,7 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     r = new QRadioButton();
     r->setObjectName(("use wps style"));
     r->setText(tr("use wps style"));
+    r->setWindowTitle(r->text());
     r->setChecked(false);
     pannelStyle->addSmallWidget(r);
     g->addButton(r, SARibbonBar::RibbonStyleCompactThreeRow);
@@ -692,6 +694,7 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     r = new QRadioButton();
     r->setObjectName(("use office 2row style"));
     r->setText(tr("use office 2 row style"));
+    r->setWindowTitle(r->text());
     r->setChecked(false);
     pannelStyle->addSmallWidget(r);
     g->addButton(r, SARibbonBar::RibbonStyleLooseTwoRow);
@@ -699,6 +702,7 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     r = new QRadioButton();
     r->setObjectName(("use wps 2row style"));
     r->setText(tr("use wps 2row style"));
+    r->setWindowTitle(r->text());
     r->setChecked(false);
     pannelStyle->addSmallWidget(r);
     g->addButton(r, SARibbonBar::RibbonStyleCompactTwoRow);
@@ -711,6 +715,8 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
 #endif
 
     mComboboxRibbonTheme = new SARibbonComboBox();
+    mComboboxRibbonTheme->setWindowTitle(tr("RibbonTheme"));
+    mComboboxRibbonTheme->setObjectName("RibbonTheme");
     mComboboxRibbonTheme->addItem("Theme Win7", SARibbonMainWindow::RibbonThemeWindows7);
     mComboboxRibbonTheme->addItem("Theme Office2013", SARibbonMainWindow::RibbonThemeOffice2013);
     mComboboxRibbonTheme->addItem("Theme Office2016 Blue", SARibbonMainWindow::RibbonThemeOffice2016Blue);
@@ -724,6 +730,7 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
 
     checkBox->setText(tr("Alignment Center"));
     checkBox->setObjectName("checkBoxAlignmentCenter");
+    checkBox->setWindowTitle(checkBox->text());
     connect(checkBox, &SARibbonCheckBox::clicked, this, &MainWindow::onCheckBoxAlignmentCenterClicked);
     pannelStyle->addSmallWidget(checkBox);
 
@@ -835,10 +842,10 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     SARibbonPannel* pannelWidgetTest = page->addPannel(tr("widget test"));
     pannelWidgetTest->setObjectName(QStringLiteral(u"pannelWidgetTest"));
 
-    SARibbonComboBox* com = new SARibbonComboBox(this);
-
+	SARibbonComboBox* com = new SARibbonComboBox(this);
+	com->setObjectName("SARibbonComboBox test");
     com->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    com->setWindowTitle(tr("ComboBox"));
+    com->setWindowTitle(tr("SARibbonComboBox test"));
     for (int i = 0; i < 40; ++i) {
         com->addItem(QString("SARibbonComboBox test%1").arg(i + 1));
     }
@@ -846,6 +853,7 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     pannelWidgetTest->addSmallWidget(com);
 
     com = new SARibbonComboBox(this);
+    com->setObjectName("ComboBox Editable");
     com->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     com->setWindowTitle("ComboBox Editable");
     for (int i = 0; i < 40; ++i) {
@@ -855,6 +863,7 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
 
     SARibbonLineEdit* lineEdit = new SARibbonLineEdit(this);
 
+    lineEdit->setObjectName("Line Edit");
     lineEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     lineEdit->setWindowTitle("Line Edit");
     lineEdit->setText("SARibbonLineEdit");
@@ -871,6 +880,7 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     QCalendarWidget* calendarWidget = new QCalendarWidget(this);
     calendarWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     calendarWidget->setObjectName(("calendarWidget"));
+    calendarWidget->setWindowTitle("calendarWidget");
     pannelWidgetTest->addLargeWidget(calendarWidget);
     optAct = new QAction(this);
     connect(optAct, &QAction::triggered, this, [ this ](bool on) {
@@ -890,14 +900,18 @@ void MainWindow::createCategoryOther(SARibbonCategory* page)
     page->addPannel(pannel1);
     // 按钮组
     SARibbonButtonGroupWidget* btnGroup1 = new SARibbonButtonGroupWidget(pannel1);
-    btnGroup1->setIconSize(QSize(24, 24));
+    btnGroup1->setObjectName("SARibbonButtonGroupWidget1");
+    btnGroup1->setWindowTitle("SARibbonButtonGroupWidget1");
+
     btnGroup1->addAction(createAction(tr("Decrease Margin"), ":/icon/icon/Decrease-Margin.svg"));
     btnGroup1->addAction(createAction(tr("Decrease Indent"), ":/icon/icon/Decrease-Indent.svg"));
     btnGroup1->addAction(createAction(tr("Wrap Image Left"), ":/icon/icon/Wrap-Image Left.svg"));
     btnGroup1->addAction(createAction(tr("Wrap Image Right"), ":/icon/icon/Wrap-Image Right.svg"));
     pannel1->addWidget(btnGroup1, SARibbonPannelItem::Medium);
     SARibbonButtonGroupWidget* btnGroup2 = new SARibbonButtonGroupWidget(pannel1);
-    btnGroup2->setIconSize(QSize(24, 24));
+    btnGroup2->setObjectName("SARibbonButtonGroupWidget2");
+    btnGroup2->setWindowTitle("SARibbonButtonGroupWidget2");
+
     QAction* titleAlgnment = createAction(tr("Align Right"), ":/icon/icon/Align-Right.svg");
     titleAlgnment->setProperty("align", (int)Qt::AlignRight | Qt::AlignVCenter);
     btnGroup2->addAction(titleAlgnment);
