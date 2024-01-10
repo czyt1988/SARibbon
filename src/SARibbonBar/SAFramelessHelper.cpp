@@ -349,9 +349,9 @@ bool SAPrivateFramelessWidgetData::handleMousePressEvent(QMouseEvent* event)
         m_bLeftButtonTitlePressed = event->pos().y() < m_moveMousePos.m_nTitleHeight;
 
         QRect frameRect = m_pWidget->frameGeometry();
-        m_pressedMousePos.recalculate(event->globalPos(), frameRect);
+        m_pressedMousePos.recalculate(event->globalPosition().toPoint(), frameRect);
 
-        m_ptDragPos = event->globalPos() - frameRect.topLeft();
+        m_ptDragPos = event->globalPosition().toPoint() - frameRect.topLeft();
 
         if (m_pressedMousePos.m_bOnEdges) {
             if (m_pWidget->isMaximized()) {
@@ -399,14 +399,14 @@ bool SAPrivateFramelessWidgetData::handleMouseMoveEvent(QMouseEvent* event)
                 //窗口在最大化状态时，点击边界不做任何处理
                 return (false);
             }
-            resizeWidget(event->globalPos());
+            resizeWidget(event->globalPosition().toPoint());
             return (true);
         } else if (d->m_bWidgetMovable && m_bLeftButtonTitlePressed) {
             if (m_pWidget->isMaximized()) {
                 //先求出窗口到鼠标的相对位置
                 QRect normalGeometry = m_pWidget->normalGeometry();
                 m_pWidget->showNormal();
-                QPoint p = event->globalPos();
+                QPoint p = event->globalPosition().toPoint();
                 p.ry() -= 10;
                 p.rx() -= (normalGeometry.width() / 2);
                 m_pWidget->move(p);
@@ -414,12 +414,12 @@ bool SAPrivateFramelessWidgetData::handleMouseMoveEvent(QMouseEvent* event)
                 m_ptDragPos = QPoint(normalGeometry.width() / 2, 10);
                 return (true);
             }
-            moveWidget(event->globalPos());
+            moveWidget(event->globalPosition().toPoint());
             return (true);
         }
         return (false);
     } else if (d->m_bWidgetResizable) {
-        updateCursorShape(event->globalPos());
+        updateCursorShape(event->globalPosition().toPoint());
     }
     return (false);
 }
@@ -437,7 +437,7 @@ bool SAPrivateFramelessWidgetData::handleLeaveEvent(QEvent* event)
 bool SAPrivateFramelessWidgetData::handleHoverMoveEvent(QHoverEvent* event)
 {
     if (d->m_bWidgetResizable) {
-        updateCursorShape(m_pWidget->mapToGlobal(event->pos()));
+        updateCursorShape(m_pWidget->mapToGlobal(event->position().toPoint()));
     }
     return (false);
 }
