@@ -28,4 +28,7 @@ DESTDIR = $${SARIBBON_BIN_DIR}/bin
 # 使用frameless库，需要定义QWindowKit的安装目录，默认在SARIBBON_BIN_DIR
 # SA_RIBBON_QWindowKit_Install_DIR = $$SARIBBON_BIN_DIR
 ######################################
+# SA_RIBBON_CONFIG += use_frameless
+
+
 include($$PWD/SARibbonBar.pri)
