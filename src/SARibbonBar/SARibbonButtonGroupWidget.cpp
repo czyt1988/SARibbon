@@ -40,22 +40,21 @@ public:
 
 public:
     QList< SAPrivateRibbonButtonGroupWidgetItem > mItems;  ///< 用于记录所有管理的item
-    QSize mIconSize;
+    int mFixheight;     ///内部控件的统一高度
+    int mItemMargin;    ///间距
 };
 
-SARibbonButtonGroupWidget::PrivateData::PrivateData(SARibbonButtonGroupWidget* p) : q_ptr(p), mIconSize(18, 18)
+SARibbonButtonGroupWidget::PrivateData::PrivateData(SARibbonButtonGroupWidget* p)
+    : q_ptr(p), mFixheight(20), mItemMargin(0)
 {
 }
 
 void SARibbonButtonGroupWidget::PrivateData::init()
 {
     QHBoxLayout* layout = new QHBoxLayout(q_ptr);
-    //上下保留一点间隙
-    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setContentsMargins(0, mItemMargin, 0, mItemMargin);
     layout->setSpacing(0);
     q_ptr->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-    //默认尺寸24
-    mIconSize = QSize(24, 24);
 }
 
 //===================================================
@@ -176,26 +175,40 @@ QSize SARibbonButtonGroupWidget::minimumSizeHint() const
     return (layout()->minimumSize());
 }
 
-/**
- * @brief 设置icon尺寸
- * @param s
- */
-void SARibbonButtonGroupWidget::setIconSize(const QSize& s)
+void SARibbonButtonGroupWidget::resizeEvent(QResizeEvent *event)
 {
-    d_ptr->mIconSize = s;
-    // 迭代已经保存的button
-    const QObjectList& objlist = children();
-    for (QObject* obj : objlist) {
-        if (SARibbonControlToolButton* btn = qobject_cast< SARibbonControlToolButton* >(obj)) {
-            btn->setIconSize(s);
-            btn->setFixedHeight(s.height());
-        }
-    }
+//	int newH = geometry().size().height();
+//	setItemHeight(newH - 2 * d_ptr->mItemMargin);
+	QFrame::resizeEvent(event);
 }
 
-QSize SARibbonButtonGroupWidget::iconSize() const
+void SARibbonButtonGroupWidget::setItemHeight(int h)
 {
-    return d_ptr->mIconSize;
+	d_ptr->mFixheight = h;
+	// 迭代已经保存的button
+	const QObjectList& objlist = children();
+	for (QObject* obj : objlist) {
+		if (SARibbonControlToolButton* btn = qobject_cast< SARibbonControlToolButton* >(obj)) {
+			btn->setFixedHeight(h);
+			btn->setMinimumWidth(h);
+		}
+	}
+}
+
+int SARibbonButtonGroupWidget::itemHeight() const
+{
+	return d_ptr->mFixheight;
+}
+
+void SARibbonButtonGroupWidget::setItemMargin(int m)
+{
+	d_ptr->mItemMargin = m;
+	layout()->setContentsMargins(0, m, 0, m);
+}
+
+int SARibbonButtonGroupWidget::itemMargin() const
+{
+    return d_ptr->mItemMargin;
 }
 
 /**
@@ -220,7 +233,7 @@ void SARibbonButtonGroupWidget::actionEvent(QActionEvent* e)
                 item.widget->setAttribute(Qt::WA_LayoutUsesWidgetRect);
                 item.widget->show();
                 //widget高度保持一致
-                item.widget->setFixedHeight(d_ptr->mIconSize.height());
+                item.widget->setFixedHeight(d_ptr->mFixheight);
                 item.customWidget = true;
             }
         } else if (item.action->isSeparator()) {
@@ -234,8 +247,8 @@ void SARibbonButtonGroupWidget::actionEvent(QActionEvent* e)
             SARibbonToolButton::RibbonButtonType buttonType = SARibbonToolButton::SmallButton;
             SARibbonControlToolButton* button = RibbonSubElementDelegate->createRibbonControlToolButton(this);
             button->setAutoRaise(true);
-            button->setIconSize(d_ptr->mIconSize);
-            button->setFixedHeight(d_ptr->mIconSize.height());
+            button->setFixedHeight(d_ptr->mFixheight);
+            button->setMinimumWidth(d_ptr->mFixheight);
             button->setFocusPolicy(Qt::NoFocus);
             button->setButtonType(buttonType);
             button->setDefaultAction(item.action);

@@ -3,17 +3,6 @@ INCLUDEPATH += $$PWD/src/SARibbonBar
 DEPENDPATH += $$PWD/src/SARibbonBar
 
 
-equals(QT_MAJOR_VERSION, 5){
-    greaterThan(QT_MINOR_VERSION, 13){
-        SA_RIBBON_CONFIG += use_frameless
-    }
-}else{
-# qt6.0不支持
-    greaterThan(QT_MINOR_VERSION, 0){
-        SA_RIBBON_CONFIG += use_frameless
-    }
-}
-
 contains( SA_RIBBON_CONFIG, use_frameless ) {
     !contains(CONFIG,C++17){
         CONFIG += c++17

@@ -59,8 +59,11 @@ public:
     //设置action管理器
     void setupActionsManager(SARibbonActionsManager* mgr);
 
-    //判断用户是否有改动内容
-    bool isChanged() const;
+    //判断用户是否有要存储的内容，对应save动作
+    bool isApplied() const;
+
+	//判断用户是否有改动内容，对应apply动作
+	bool isCached() const;
 
     //获取model
     const QStandardItemModel* model() const;
@@ -85,8 +88,15 @@ public:
     //应用xml配置，可以结合customize_datas_from_xml和customize_datas_apply函数
     static bool fromXml(QXmlStreamReader* xml, SARibbonBar* bar, SARibbonActionsManager* mgr);
 
-    //清除所有动作，在执行applys函数后，如果要继续调用，应该clear，否则会导致异常
-    void clear();
+	//缓存应用的动作,这些动作不会被clear清除，用于本地存储
+	void makeActionsApplied();
+
+	//清除applied的动作，cancel操作后需要清空已应用的动作
+	void clearApplied();
+	//清除缓存动作，在执行applys函数后，如果要继续调用，应该clear，否则会导致异常
+	void clearCache();
+	//清除所有动作，不包含本地读取的数据
+	void clear();
 
 protected:
     //把QList<SARibbonCustomizeData>进行裁剪,把一些动作合并
@@ -171,6 +181,14 @@ QList< SARibbonCustomizeData > SA_RIBBON_EXPORT sa_customize_datas_from_xml(QXml
  * @return 成功应用的个数
  */
 int SA_RIBBON_EXPORT sa_customize_datas_apply(const QList< SARibbonCustomizeData >& cds, SARibbonBar* w);
+
+/**
+ * @brief 反向取消应用
+ * @param cds
+ * @param w SARibbonBar指针
+ * @return 成功应用的个数
+ */
+int SA_RIBBON_EXPORT sa_customize_datas_reverse(const QList< SARibbonCustomizeData >& cds, SARibbonBar* w);
 
 /**
  * @brief 直接加载xml自定义ribbon配置文件用于ribbon的自定义显示

@@ -1663,8 +1663,8 @@ void SARibbonBar::setEnableUserDefineAccessBarIconSize(bool on)
     if (!(d_ptr->mEnableUserDefineAccessBarIconSize)) {  // 允许用户自定义AccessBar的IconSize就不进入此条件重置大小
         // 变更iconsize
         QSize btnIconSize = PrivateData::calcIconSizeByHeight(titleBarHeight());
-        if (btnIconSize != d_ptr->mQuickAccessBar->iconSize()) {
-            d_ptr->mQuickAccessBar->setIconSize(btnIconSize);
+        if (btnIconSize.height() != d_ptr->mQuickAccessBar->itemHeight()) {
+            d_ptr->mQuickAccessBar->setItemHeight(btnIconSize.height());
         }
     }
 }
@@ -1693,8 +1693,8 @@ void SARibbonBar::setEnableUserDefineRightBarIconSize(bool on)
     // 变更iconsize
     if (!(d_ptr->mEnableUserDefineRightBarIconSize)) {
         QSize btnIconSize = PrivateData::calcIconSizeByHeight(titleBarHeight());
-        if (btnIconSize != d_ptr->mRightButtonGroup->iconSize()) {
-            d_ptr->mRightButtonGroup->setIconSize(btnIconSize);
+        if (btnIconSize.height() != d_ptr->mRightButtonGroup->itemHeight()) {
+            d_ptr->mRightButtonGroup->setItemHeight(btnIconSize.height());
         }
     }
 }

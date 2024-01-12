@@ -25,6 +25,12 @@ public:
     //设置action管理器
     void setupActionsManager(SARibbonActionsManager *mgr);
 
+	//判断用户是否有要存储的内容，对应save动作
+	bool isApplied() const;
+
+	//判断用户是否有改动内容，对应apply动作
+	bool isCached() const;
+
     //应用所有的设定
     bool applys();
 

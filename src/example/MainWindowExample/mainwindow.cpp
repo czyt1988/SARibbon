@@ -43,6 +43,7 @@
 #include <QMessageBox>
 #include <QShortcut>
 #include <QLineEdit>
+#include <QDialogButtonBox>
 #define PRINT_COST_START()                                                                                             \
     QElapsedTimer __TMP_COST;                                                                                          \
     __TMP_COST.start();                                                                                                \
@@ -274,9 +275,34 @@ void MainWindow::onActionCustomizeAndSaveTriggered(bool b)
     Q_UNUSED(b);
     SARibbonCustomizeDialog dlg(this);
     dlg.setupActionsManager(mActionsManager);
+    //如果启动时未应用上次修改，先应用再读取,保持本地数据和ui一致
+    if(!mHasApplyCustomizeXmlFile)
+    {
+        auto res = QMessageBox::question(this, tr("question"), tr("Apply the last modification?\nIf not, local data will be reset"));
+        if (res == QMessageBox::Yes) {
+            onActionLoadCustomizeXmlFileTriggered();
+            return;
+        } else {
+            QFile::remove("customize.xml");
+            dlg.clear();
+
+            mHasApplyCustomizeXmlFile = true;
+        }
+    }
+
     dlg.fromXml("customize.xml");
     if (SARibbonCustomizeDialog::Accepted == dlg.exec()) {
-        dlg.applys();
+        //先apply
+        if(dlg.isCached())
+            dlg.applys();
+
+		//无更改直接退出
+		if(!dlg.isApplied())
+		{
+			mTextedit->append("no change to save");
+			return;
+		}
+
         QByteArray str;
         QXmlStreamWriter xml(&str);
         xml.setAutoFormatting(true);
@@ -301,6 +327,98 @@ void MainWindow::onActionCustomizeAndSaveTriggered(bool b)
             mTextedit->append(str);
         }
     }
+}
+
+void MainWindow::onActionCustomizeAndSaveWithApplyTriggered(bool b)
+{
+	//如果启动时未应用上次修改，先应用再读取,保持本地数据和ui一致
+	if(!mHasApplyCustomizeXmlFile)
+	{
+		auto res = QMessageBox::question(this, tr("question"), tr("Apply the last modification?\nIf not, local data will be reset"));
+		if (res == QMessageBox::Yes) {
+			onActionLoadCustomizeXmlFileTriggered();
+			return;
+		} else {
+			QFile::remove("customize.xml");
+			mHasApplyCustomizeXmlFile = true;
+		}
+	}
+
+	QDialog dlg;
+	QVBoxLayout *main = new QVBoxLayout;
+	dlg.setLayout(main);
+	SARibbonCustomizeWidget* widgetForCustomize = new SARibbonCustomizeWidget(this, &dlg);
+	widgetForCustomize->setupActionsManager(mActionsManager);
+
+	main->addWidget(widgetForCustomize, 1);
+
+	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Save
+													   | QDialogButtonBox::Cancel
+													   | QDialogButtonBox::Apply);
+
+	main->addWidget(buttonBox);
+
+	connect(buttonBox, &QDialogButtonBox::accepted, &dlg, &QDialog::accept);
+	connect(buttonBox, &QDialogButtonBox::rejected, &dlg, &QDialog::reject);
+	connect(buttonBox, &QDialogButtonBox::clicked, &dlg, [=](QAbstractButton *button){
+
+		auto role = buttonBox->buttonRole(button);
+		if(role == QDialogButtonBox::ApplyRole)//apply
+		{
+			if(widgetForCustomize->isCached())
+			{
+				widgetForCustomize->applys();
+				mTextedit->append("change applied");
+			}
+			else
+			{
+				mTextedit->append("no change to apply");
+			}
+		}
+	});
+
+	widgetForCustomize->fromXml("customize.xml");
+	if (QDialog::Accepted == dlg.exec()){
+		//先apply
+		if(widgetForCustomize->isCached())
+			widgetForCustomize->applys();
+
+		//无更改直接退出
+		if(!widgetForCustomize->isApplied())
+		{
+			mTextedit->append("no change to save");
+			return;
+		}
+
+		QByteArray str;
+		QXmlStreamWriter xml(&str);
+		xml.setAutoFormatting(true);
+		xml.setAutoFormattingIndent(2);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)  // QXmlStreamWriter always encodes XML in UTF-8.
+		xml.setCodec("utf-8");
+#endif
+		xml.writeStartDocument();
+		bool isok = widgetForCustomize->toXml(&xml);
+		xml.writeEndDocument();
+		if (isok) {
+			QFile f("customize.xml");
+			if (f.open(QIODevice::ReadWrite | QIODevice::Text | QIODevice::Truncate)) {
+				QTextStream s(&f);
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)  // QTextStream always encodes XML in UTF-8.
+				s.setCodec("utf-8");
+#endif
+				s << str;
+				s.flush();
+			}
+			mTextedit->append("write xml:");
+			mTextedit->append(str);
+		}
+	}
+	else {
+		//清除所有动作
+		widgetForCustomize->clear();
+		mTextedit->append("all changes clear, the applied changes will take no effect afer restart");
+	}
 }
 
 void MainWindow::onActionHelpTriggered()
@@ -348,9 +466,20 @@ void MainWindow::onActionUseQssTriggered()
 void MainWindow::onActionLoadCustomizeXmlFileTriggered()
 {
     // 只能调用一次
-    static bool has_call = false;
-    if (!has_call) {
-        has_call = sa_apply_customize_from_xml_file("customize.xml", ribbonBar(), mActionsManager);
+    if (!mHasApplyCustomizeXmlFile) {
+        if(!QFile::exists("customize.xml"))
+        {
+            mHasApplyCustomizeXmlFile = true;
+            return;
+        }
+        QFile f("customize.xml");
+        qDebug() << "size of customize.xml : " << f.size();
+        if(f.size() <= 0)
+        {
+            mHasApplyCustomizeXmlFile = true;
+            return;
+        }
+        mHasApplyCustomizeXmlFile = sa_apply_customize_from_xml_file("customize.xml", ribbonBar(), mActionsManager);
     }
 }
 
@@ -566,6 +695,7 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     QRadioButton* r = new QRadioButton();
     r->setText(tr("use office style"));
     r->setObjectName(("use office style"));
+    r->setWindowTitle(r->text());
     r->setChecked(true);
     pannelStyle->addSmallWidget(r);
     g->addButton(r, SARibbonBar::RibbonStyleLooseThreeRow);
@@ -573,6 +703,7 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     r = new QRadioButton();
     r->setObjectName(("use wps style"));
     r->setText(tr("use wps style"));
+    r->setWindowTitle(r->text());
     r->setChecked(false);
     pannelStyle->addSmallWidget(r);
     g->addButton(r, SARibbonBar::RibbonStyleCompactThreeRow);
@@ -580,6 +711,7 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     r = new QRadioButton();
     r->setObjectName(("use office 2row style"));
     r->setText(tr("use office 2 row style"));
+    r->setWindowTitle(r->text());
     r->setChecked(false);
     pannelStyle->addSmallWidget(r);
     g->addButton(r, SARibbonBar::RibbonStyleLooseTwoRow);
@@ -587,6 +719,7 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     r = new QRadioButton();
     r->setObjectName(("use wps 2row style"));
     r->setText(tr("use wps 2row style"));
+    r->setWindowTitle(r->text());
     r->setChecked(false);
     pannelStyle->addSmallWidget(r);
     g->addButton(r, SARibbonBar::RibbonStyleCompactTwoRow);
@@ -599,6 +732,8 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
 #endif
 
     mComboboxRibbonTheme = new SARibbonComboBox();
+    mComboboxRibbonTheme->setWindowTitle(tr("RibbonTheme"));
+    mComboboxRibbonTheme->setObjectName("RibbonTheme");
     mComboboxRibbonTheme->addItem("Theme Win7", SARibbonMainWindow::RibbonThemeWindows7);
     mComboboxRibbonTheme->addItem("Theme Office2013", SARibbonMainWindow::RibbonThemeOffice2013);
     mComboboxRibbonTheme->addItem("Theme Office2016 Blue", SARibbonMainWindow::RibbonThemeOffice2016Blue);
@@ -615,6 +750,7 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
 
     checkBox->setText(tr("Alignment Center"));
     checkBox->setObjectName("checkBoxAlignmentCenter");
+    checkBox->setWindowTitle(checkBox->text());
     connect(checkBox, &SARibbonCheckBox::clicked, this, &MainWindow::onCheckBoxAlignmentCenterClicked);
     pannelStyle->addSmallWidget(checkBox);
 
@@ -726,10 +862,10 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     SARibbonPannel* pannelWidgetTest = page->addPannel(tr("widget test"));
     pannelWidgetTest->setObjectName(QStringLiteral(u"pannelWidgetTest"));
 
-    SARibbonComboBox* com = new SARibbonComboBox(this);
-
+	SARibbonComboBox* com = new SARibbonComboBox(this);
+	com->setObjectName("SARibbonComboBox test");
     com->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    com->setWindowTitle(tr("ComboBox"));
+    com->setWindowTitle(tr("SARibbonComboBox test"));
     for (int i = 0; i < 40; ++i) {
         com->addItem(QString("SARibbonComboBox test%1").arg(i + 1));
     }
@@ -737,6 +873,7 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     pannelWidgetTest->addSmallWidget(com);
 
     com = new SARibbonComboBox(this);
+    com->setObjectName("ComboBox Editable");
     com->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     com->setWindowTitle("ComboBox Editable");
     for (int i = 0; i < 40; ++i) {
@@ -746,6 +883,7 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
 
     SARibbonLineEdit* lineEdit = new SARibbonLineEdit(this);
 
+    lineEdit->setObjectName("Line Edit");
     lineEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     lineEdit->setWindowTitle("Line Edit");
     lineEdit->setText("SARibbonLineEdit");
@@ -762,6 +900,7 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     QCalendarWidget* calendarWidget = new QCalendarWidget(this);
     calendarWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     calendarWidget->setObjectName(("calendarWidget"));
+    calendarWidget->setWindowTitle("calendarWidget");
     pannelWidgetTest->addLargeWidget(calendarWidget);
     optAct = new QAction(this);
     connect(optAct, &QAction::triggered, this, [ this ](bool on) {
@@ -781,14 +920,18 @@ void MainWindow::createCategoryOther(SARibbonCategory* page)
     page->addPannel(pannel1);
     // 按钮组
     SARibbonButtonGroupWidget* btnGroup1 = new SARibbonButtonGroupWidget(pannel1);
-    btnGroup1->setIconSize(QSize(24, 24));
+    btnGroup1->setObjectName("SARibbonButtonGroupWidget1");
+    btnGroup1->setWindowTitle("SARibbonButtonGroupWidget1");
+
     btnGroup1->addAction(createAction(tr("Decrease Margin"), ":/icon/icon/Decrease-Margin.svg"));
     btnGroup1->addAction(createAction(tr("Decrease Indent"), ":/icon/icon/Decrease-Indent.svg"));
     btnGroup1->addAction(createAction(tr("Wrap Image Left"), ":/icon/icon/Wrap-Image Left.svg"));
     btnGroup1->addAction(createAction(tr("Wrap Image Right"), ":/icon/icon/Wrap-Image Right.svg"));
     pannel1->addWidget(btnGroup1, SARibbonPannelItem::Medium);
     SARibbonButtonGroupWidget* btnGroup2 = new SARibbonButtonGroupWidget(pannel1);
-    btnGroup2->setIconSize(QSize(24, 24));
+    btnGroup2->setObjectName("SARibbonButtonGroupWidget2");
+    btnGroup2->setWindowTitle("SARibbonButtonGroupWidget2");
+
     QAction* titleAlgnment = createAction(tr("Align Right"), ":/icon/icon/Align-Right.svg");
     titleAlgnment->setProperty("align", (int)Qt::AlignRight | Qt::AlignVCenter);
     btnGroup2->addAction(titleAlgnment);
@@ -1308,6 +1451,10 @@ void MainWindow::createQuickAccessBar(SARibbonQuickAccessBar* quickAccessBar)
     QAction* actionCustomizeAndSave = createAction("customize and save", ":/icon/icon/customize.svg");
     quickAccessBar->addAction(actionCustomizeAndSave);
     connect(actionCustomizeAndSave, &QAction::triggered, this, &MainWindow::onActionCustomizeAndSaveTriggered);
+
+	QAction* actionCustomizeAndSaveWithApply = createAction("customize and save with apply", ":/icon/icon/customize.svg");
+	quickAccessBar->addAction(actionCustomizeAndSaveWithApply);
+	connect(actionCustomizeAndSaveWithApply, &QAction::triggered, this, &MainWindow::onActionCustomizeAndSaveWithApplyTriggered);
 
     //
     mSearchEditor = new SARibbonLineEdit(this);

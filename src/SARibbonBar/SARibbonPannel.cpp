@@ -357,6 +357,9 @@ void SARibbonPannel::addMenu(QMenu* menu, SARibbonPannelItem::RowProportion rp, 
 {
     Q_CHECK_PTR(menu);
     QAction* action = menu->menuAction();
+    action->setIcon(menu->icon());
+    action->setText(menu->title());
+    action->setObjectName("action." + menu->objectName());
     addAction(action, popMode, rp);
 }
 
@@ -383,6 +386,9 @@ QAction* SARibbonPannel::addWidget(QWidget* w, SARibbonPannelItem::RowProportion
     QWidgetAction* action = new QWidgetAction(this);
 
     action->setDefaultWidget(w);
+    action->setIcon(w->windowIcon());
+    action->setText(w->windowTitle());
+    action->setObjectName("action." + w->objectName());
     w->setAttribute(Qt::WA_Hover);
     setActionRowProportionProperty(action, rp);
     addAction(action);
