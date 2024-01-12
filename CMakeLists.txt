@@ -58,7 +58,7 @@ if(SARIBBON_USE_FRAMELESS_LIB)
     endif()
     message(STATUS "The current QT version can use the frameless library and enable C++17")
 else()
-    set(CMAKE_CXX_STANDARD 11)
+    set(CMAKE_CXX_STANDARD 14)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
     if(MSVC)
         # CMAKE_CXX_STANDARD对有些版本的msvc无效

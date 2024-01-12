@@ -12,19 +12,6 @@ DEPENDPATH += $$PWD/src/SARibbonBar
 # 使用库必须明确编译时是否依赖QWindowKit，否则会存在链接错误
 ######################################
 
-!contains( SA_RIBBON_CONFIG, use_frameless ) {
-    equals(QT_MAJOR_VERSION, 5){
-        greaterThan(QT_MINOR_VERSION, 13){
-            SA_RIBBON_CONFIG += use_frameless
-        }
-    }else{
-    # qt6.0不支持
-        greaterThan(QT_MINOR_VERSION, 0){
-            SA_RIBBON_CONFIG += use_frameless
-        }
-    }
-}
-
 contains( SA_RIBBON_CONFIG, use_frameless ) {
     !contains(CONFIG,C++17){
         CONFIG += c++17
@@ -32,6 +19,9 @@ contains( SA_RIBBON_CONFIG, use_frameless ) {
     # 定义SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1是的使用framelss库
     DEFINES += SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1
 }else{
+    !contains(CONFIG,C++14){
+        CONFIG += c++14
+    }
     DEFINES += SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=0
 }
 LIBS += -L$${SARIBBON_BIN_DIR}/bin -l$${SARIBBON_LIB_NAME}

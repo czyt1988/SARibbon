@@ -91,10 +91,6 @@ protected:
     virtual void changeEvent(QEvent* e) Q_DECL_OVERRIDE;
 private slots:
     void onPrimaryScreenChanged(QScreen* screen);
-
-private:
-    // 构建为普通窗口
-    void setupNormalWindow();
 };
 
 /**

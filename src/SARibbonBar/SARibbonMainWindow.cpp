@@ -65,8 +65,6 @@ SARibbonMainWindow::SARibbonMainWindow(QWidget* parent, bool useRibbon, const Qt
         d_ptr->installFrameless(this);
         setRibbonBar(createRibbonBar());
         setRibbonTheme(ribbonTheme());
-    } else {
-        setupNormalWindow();
     }
 }
 
@@ -127,6 +125,7 @@ void SARibbonMainWindow::setRibbonBar(SARibbonBar* bar)
     bar->installEventFilter(this);
     // 设置窗体的标题栏高度
     d_ptr->mFramelessHelper->setTitleHeight(th);
+    d_ptr->mFramelessHelper->setRubberBandOnResize(false);
 #endif
 }
 
@@ -153,6 +152,8 @@ bool SARibbonMainWindow::eventFilter(QObject* obj, QEvent* e)
 {
     // 这个过滤是为了把ribbonBar上的动作传递到mainwindow，再传递到frameless，
     // 由于ribbonbar会遮挡掉frameless的区域，导致frameless无法捕获这些消息
+    // 因此必须ribbonBar()->installEventFilter(this);
+    // 20240101发现installEventFilter后，SARibbonMainWindow没有执行这个回调
     if (obj == ribbonBar()) {
         switch (e->type()) {
         case QEvent::MouseButtonPress:
@@ -333,23 +334,6 @@ void SARibbonMainWindow::onPrimaryScreenChanged(QScreen* screen)
     }
 }
 
-/**
-   @brief 构建为普通窗口
- */
-void SARibbonMainWindow::setupNormalWindow()
-{
-#if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
-    // auto helper = FramelessWidgetsHelper::get(this);
-    //  设置window按钮
-    if (nullptr == d_ptr->mWindowButtonGroup) {
-        d_ptr->mWindowButtonGroup = new SAWindowButtonGroup(this);
-    }
-    d_ptr->mWindowButtonGroup->setWindowStates(windowState());
-    d_ptr->mWindowButtonGroup->resize(60, 30);
-    d_ptr->mWindowButtonGroup->show();
-    d_ptr->mWindowButtonGroup->raise();
-#endif
-}
 
 void sa_set_ribbon_theme(QWidget* w, SARibbonMainWindow::RibbonTheme theme)
 {
