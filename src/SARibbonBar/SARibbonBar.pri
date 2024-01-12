@@ -4,17 +4,6 @@
 # 2.要预定义FRAMELESSHELPER_CORE_LIBRARY宏，这样才能导出符号
 # 3.要预定义FRAMELESSHELPER_WIDGETS_LIBRARY宏，这样才能导出符号
 
-equals(QT_MAJOR_VERSION, 5){
-    greaterThan(QT_MINOR_VERSION, 13){
-        SA_RIBBON_CONFIG += use_frameless
-    }
-}else{
-# qt6.0不支持
-    greaterThan(QT_MINOR_VERSION, 0){
-        SA_RIBBON_CONFIG += use_frameless
-    }
-}
-
 contains( SA_RIBBON_CONFIG, use_frameless ) {
     message("use frameless lib,compile with c+=17")
     # 引入第三方库frameless后，必须要求c++17
@@ -30,7 +19,9 @@ contains( SA_RIBBON_CONFIG, use_frameless ) {
     DEFINES += SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1
 }else{
 message("do not use_frameless lib,compile with c+=11")
-    CONFIG += c++11
+    !contains(CONFIG,C++14){
+        CONFIG += c++14
+    }
     DEFINES += SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=0
 }
 message("SA_RIBBON_CONFIG="$${SA_RIBBON_CONFIG})
