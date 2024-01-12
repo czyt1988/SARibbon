@@ -6,6 +6,7 @@
 FRAMELESSHELPER_USE_NAMESPACE
 using namespace Global;
 #endif
+
 MainWindow::MainWindow(QWidget* parent) : SARibbonMainWindow(parent, false)
 {
     if (!isUseRibbon()) {

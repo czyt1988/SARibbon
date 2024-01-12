@@ -93,6 +93,32 @@ enum class SARibbonAlignment
 #endif
 #endif
 
+
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+#ifndef SA_MOUSEEVENT_GLOBALPOS_POINT
+#define SA_MOUSEEVENT_GLOBALPOS_POINT(MouseEventPtr) MouseEventPtr->globalPosition().toPoint()
+#endif
+#else
+#ifndef SA_MOUSEEVENT_GLOBALPOS_POINT
+#define SA_MOUSEEVENT_GLOBALPOS_POINT(MouseEventPtr) MouseEventPtr->globalPos()
+#endif
+#endif
+
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+#ifndef SA_HOVEREVENT_POS_POINT
+#define SA_HOVEREVENT_POS_POINT(HoverEventPtr) HoverEventPtr->position().toPoint()
+#endif
+#else
+#ifndef SA_HOVEREVENT_POS_POINT
+#define SA_HOVEREVENT_POS_POINT(HoverEventPtr) HoverEventPtr->pos()
+#endif
+#endif
+
+
+
+
+
+
 #ifndef SA_DEBUG_PRINT_SIZE_HINT
 /**
   @def 定义此宏，将打印和尺寸刷新相关的信息

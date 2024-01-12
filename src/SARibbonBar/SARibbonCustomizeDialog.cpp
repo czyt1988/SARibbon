@@ -77,6 +77,24 @@ void SARibbonCustomizeDialog::setupActionsManager(SARibbonActionsManager *mgr)
     ui->customWidget->setupActionsManager(mgr);
 }
 
+/**
+ * @brief //判断用户是否有要存储的内容，对应save动作
+ * @return
+ */
+bool SARibbonCustomizeDialog::isApplied() const
+{
+    return ui->customWidget->isApplied();
+}
+
+/**
+ * @brief 判断用户是否有改动内容，对应apply动作
+ * @return
+ */
+bool SARibbonCustomizeDialog::isCached() const
+{
+    return ui->customWidget->isCached();
+}
+
 
 void SARibbonCustomizeDialog::initConnection()
 {
@@ -93,7 +111,7 @@ void SARibbonCustomizeDialog::initConnection()
  */
 bool SARibbonCustomizeDialog::applys()
 {
-    return (ui->customWidget->applys());
+    return ui->customWidget->applys();
 }
 
 
