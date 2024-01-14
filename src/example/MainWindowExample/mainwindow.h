@@ -49,6 +49,7 @@ private slots:
     void onStyleClicked(int id);
     void onActionCustomizeTriggered(bool b);
     void onActionCustomizeAndSaveTriggered(bool b);
+    void onActionCustomizeAndSaveWithApplyTriggered(bool b);
     void onActionHelpTriggered();
     void onActionRemoveAppBtnTriggered(bool b);
     void onActionUseQssTriggered();
@@ -107,6 +108,7 @@ private:
     SARibbonPannel* mPannelVisbileExample { nullptr };
     //
     QAction* mActionVisibleAll { nullptr };  ///< 控制所有action是否可见的开关
+    bool mHasApplyCustomizeXmlFile {false}; ///程序启动后是否应用上次修改
 };
 
 #endif  // MAINWINDOW_H

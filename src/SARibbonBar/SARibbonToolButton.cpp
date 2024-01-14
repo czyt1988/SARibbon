@@ -1,4 +1,6 @@
 ﻿#include "SARibbonToolButton.h"
+#include "SARibbonPannel.h"
+
 #include <QAction>
 #include <QApplication>
 #include <QCursor>
@@ -11,7 +13,7 @@
 #include <QTextOption>
 #include <QApplication>
 #include <QScreen>
-#include "SARibbonPannel.h"
+#include <QProxyStyle>
 
 /**
  * @def 定义文字换行时2行文本的矩形高度系数，此系数决定文字区域的高度
@@ -84,6 +86,88 @@ QDebug operator<<(QDebug debug, const QStyleOptionToolButton& opt)
     return (debug);
 }
 }
+
+//===================================================
+// SARibbonToolButtonProxyStyle
+//===================================================
+
+class SARibbonToolButtonProxyStyle : public QProxyStyle
+{
+public:
+	void drawPrimitive(PrimitiveElement pe, const QStyleOption *opt, QPainter *p, const QWidget *widget = nullptr) const override
+	{
+		if(pe == PE_IndicatorArrowUp || pe == PE_IndicatorArrowDown || pe == PE_IndicatorArrowRight || pe == PE_IndicatorArrowLeft)
+		{
+			if (opt->rect.width() <= 1 || opt->rect.height() <= 1)
+				return;
+
+			QRect r = opt->rect;
+			int size = qMin(r.height(), r.width());
+			QPixmap pixmap;
+			qreal pixelRatio = p->device()->devicePixelRatio();
+			int border = qRound(pixelRatio*(size/4));
+			int sqsize = qRound(pixelRatio*(2*(size/2)));
+			QImage image(sqsize, sqsize, QImage::Format_ARGB32_Premultiplied);
+			image.fill(Qt::transparent);
+			QPainter imagePainter(&image);
+
+			QPolygon a;
+			switch (pe) {
+			case PE_IndicatorArrowUp:
+				a.setPoints(3, border, sqsize/2,  sqsize/2, border,  sqsize - border, sqsize/2);
+				break;
+			case PE_IndicatorArrowDown:
+				a.setPoints(3, border, sqsize/2,  sqsize/2, sqsize - border,  sqsize - border, sqsize/2);
+				break;
+			case PE_IndicatorArrowRight:
+				a.setPoints(3, sqsize - border, sqsize/2,  sqsize/2, border,  sqsize/2, sqsize - border);
+				break;
+			case PE_IndicatorArrowLeft:
+				a.setPoints(3, border, sqsize/2,  sqsize/2, border,  sqsize/2, sqsize - border);
+				break;
+			default:
+				break;
+			}
+
+			int bsx = 0;
+			int bsy = 0;
+
+			if (opt->state & State_Sunken) {
+				bsx = proxy()->pixelMetric(PM_ButtonShiftHorizontal, opt, widget);
+				bsy = proxy()->pixelMetric(PM_ButtonShiftVertical, opt, widget);
+			}
+
+			QRect bounds = a.boundingRect();
+			int sx = sqsize / 2 - bounds.center().x() - 1;
+			int sy = sqsize / 2 - bounds.center().y() - 1;
+			imagePainter.translate(sx + bsx, sy + bsy);
+			imagePainter.setPen(QPen(opt->palette.buttonText().color(), 1.4));
+			imagePainter.setBrush(Qt::NoBrush);
+
+			if (!(opt->state & State_Enabled)) {
+				imagePainter.translate(1, 1);
+				imagePainter.setPen(QPen(opt->palette.light().color(), 1.4));
+				imagePainter.drawPolyline(a);
+				imagePainter.translate(-1, -1);
+				imagePainter.setPen(QPen(opt->palette.mid().color(), 1.4));
+			}
+
+			imagePainter.drawPolyline(a);
+			imagePainter.end();
+			pixmap = QPixmap::fromImage(image);
+			pixmap.setDevicePixelRatio(pixelRatio);
+
+			int xOffset = r.x() + (r.width() - size)/2;
+			int yOffset = r.y() + (r.height() - size)/2;
+			p->drawPixmap(xOffset, yOffset, pixmap);
+		}
+		else
+		{
+			QProxyStyle::drawPrimitive(pe, opt, p, widget);
+		}
+	}
+};
+
 //===================================================
 // SARibbonToolButton::PrivateData
 //===================================================
@@ -167,6 +251,9 @@ bool SARibbonToolButton::PrivateData::s_enableWordWrap = false;
 
 SARibbonToolButton::PrivateData::PrivateData(SARibbonToolButton* p) : q_ptr(p)
 {
+	auto proxy = new SARibbonToolButtonProxyStyle();
+	proxy->setParent(p);   // take ownership to avoid memleak
+	p->setStyle(proxy);
 }
 
 /**
