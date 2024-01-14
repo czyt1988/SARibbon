@@ -77,11 +77,6 @@ enum class SARibbonAlignment
 #define SA_RIBBON_BAR_PROP_CAN_CUSTOMIZE "_sa_isCanCustomize"
 #endif
 
-/**
- * @def 定义此宏用第三方的frameless作为无边框方案
- * 此宏在qmake或在cmake中定义，不需要在此显示定义
- */
-// #define SARIBBON_USE_3RDPARTY_FRAMELESSHELPER 0
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
 #ifndef SA_FONTMETRICS_WIDTH
@@ -93,30 +88,56 @@ enum class SARibbonAlignment
 #endif
 #endif
 
-#ifndef SA_DEBUG_PRINT_SARIBBONBAR
-/**
-  @def 定义此宏，qDebug将支持SARibbonBar的属性打印
 
-    仅用于调试
- */
-#define SA_DEBUG_PRINT_SARIBBONBAR 1
+
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+#ifndef SA_MOUSEEVENT_GLOBALPOS_POINT
+#define SA_MOUSEEVENT_GLOBALPOS_POINT(MouseEventPtr) MouseEventPtr->globalPosition().toPoint()
+#endif
+#else
+#ifndef SA_MOUSEEVENT_GLOBALPOS_POINT
+#define SA_MOUSEEVENT_GLOBALPOS_POINT(MouseEventPtr) MouseEventPtr->globalPos()
+#endif
 #endif
 
-#ifndef SA_DEBUG_PRINT_SIZE_HINT
+#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
+#ifndef SA_HOVEREVENT_POS_POINT
+#define SA_HOVEREVENT_POS_POINT(HoverEventPtr) HoverEventPtr->position().toPoint()
+#endif
+#else
+#ifndef SA_HOVEREVENT_POS_POINT
+#define SA_HOVEREVENT_POS_POINT(HoverEventPtr) HoverEventPtr->pos()
+#endif
+#endif
+
+
+
 /**
   @def 定义此宏，将打印和尺寸刷新相关的信息
 
     仅用于调试
  */
+#ifndef SA_DEBUG_PRINT_SIZE_HINT
 #define SA_DEBUG_PRINT_SIZE_HINT 0
 #endif
 
-#ifndef SA_DEBUG_PRINT_EVENT
 /**
   @def 定义此宏，将打印事件
 
     仅用于调试
  */
+#ifndef SA_DEBUG_PRINT_EVENT
 #define SA_DEBUG_PRINT_EVENT 0
 #endif
+
+/**
+  @def 定义此宏，qDebug将支持SARibbonBar的属性打印
+
+    仅用于调试
+ */
+#ifndef SA_DEBUG_PRINT_SARIBBONBAR
+#define SA_DEBUG_PRINT_SARIBBONBAR 1
+#endif
+
+
 #endif  // SARIBBONGLOBAL_H
