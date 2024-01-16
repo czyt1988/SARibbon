@@ -40,8 +40,8 @@ public:
 
 public:
     QList< SAPrivateRibbonButtonGroupWidgetItem > mItems;  ///< 用于记录所有管理的item
-    int mFixheight;     ///内部控件的统一高度
-    int mItemMargin;    ///间距
+    int mFixheight;                                        /// 内部控件的统一高度
+    int mItemMargin;                                       /// 间距
 };
 
 SARibbonButtonGroupWidget::PrivateData::PrivateData(SARibbonButtonGroupWidget* p)
@@ -103,9 +103,7 @@ SARibbonButtonGroupWidget::~SARibbonButtonGroupWidget()
     }
 }
 
-QAction* SARibbonButtonGroupWidget::addAction(QAction* a,
-                                              Qt::ToolButtonStyle buttonStyle,
-                                              QToolButton::ToolButtonPopupMode popMode)
+QAction* SARibbonButtonGroupWidget::addAction(QAction* a, Qt::ToolButtonStyle buttonStyle, QToolButton::ToolButtonPopupMode popMode)
 {
     SARibbonPannel::setActionToolButtonStyleProperty(a, buttonStyle);
     SARibbonPannel::setActionToolButtonPopupModeProperty(a, popMode);
@@ -121,10 +119,7 @@ QAction* SARibbonButtonGroupWidget::addAction(QAction* a,
  * @param popMode
  * @return
  */
-QAction* SARibbonButtonGroupWidget::addAction(const QString& text,
-                                              const QIcon& icon,
-                                              Qt::ToolButtonStyle buttonStyle,
-                                              QToolButton::ToolButtonPopupMode popMode)
+QAction* SARibbonButtonGroupWidget::addAction(const QString& text, const QIcon& icon, Qt::ToolButtonStyle buttonStyle, QToolButton::ToolButtonPopupMode popMode)
 {
     QAction* a = new QAction(icon, text, this);
     addAction(a, buttonStyle, popMode);
@@ -133,8 +128,8 @@ QAction* SARibbonButtonGroupWidget::addAction(const QString& text,
 
 QAction* SARibbonButtonGroupWidget::addMenu(QMenu* menu, Qt::ToolButtonStyle buttonStyle, QToolButton::ToolButtonPopupMode popMode)
 {
-	QAction* a = menu->menuAction();
-	addAction(a, buttonStyle, popMode);
+    QAction* a = menu->menuAction();
+    addAction(a, buttonStyle, popMode);
     return (a);
 }
 
@@ -157,18 +152,18 @@ QAction* SARibbonButtonGroupWidget::addWidget(QWidget* w)
     return (a);
 }
 
-SARibbonControlToolButton* SARibbonButtonGroupWidget::actionToRibbonControlToolButton(QAction* action)
+SARibbonControlButton* SARibbonButtonGroupWidget::actionToRibbonControlToolButton(QAction* action)
 {
-	for (auto obj : qAsConst(children())) {
-		if (obj->isWidgetType()) {
-			if (SARibbonControlToolButton* btn = qobject_cast< SARibbonControlToolButton* >(obj)) {
-				if (btn->defaultAction() == action) {
-					return btn;
-				}
-			}
-		}
-	}
-	return (nullptr);
+    for (auto obj : qAsConst(children())) {
+        if (obj->isWidgetType()) {
+            if (SARibbonControlButton* btn = qobject_cast< SARibbonControlButton* >(obj)) {
+                if (btn->defaultAction() == action) {
+                    return btn;
+                }
+            }
+        }
+    }
+    return (nullptr);
 }
 
 QSize SARibbonButtonGroupWidget::sizeHint() const
@@ -181,29 +176,28 @@ QSize SARibbonButtonGroupWidget::minimumSizeHint() const
     return (layout()->minimumSize());
 }
 
-
 void SARibbonButtonGroupWidget::setItemHeight(int h)
 {
-	d_ptr->mFixheight = h;
-	// 迭代已经保存的button
-	const QObjectList& objlist = children();
-	for (QObject* obj : objlist) {
-		if (SARibbonControlToolButton* btn = qobject_cast< SARibbonControlToolButton* >(obj)) {
-			btn->setFixedHeight(h);
-			btn->setMinimumWidth(h);
-		}
-	}
+    d_ptr->mFixheight = h;
+    // 迭代已经保存的button
+    const QObjectList& objlist = children();
+    for (QObject* obj : objlist) {
+        if (SARibbonControlButton* btn = qobject_cast< SARibbonControlButton* >(obj)) {
+            btn->setFixedHeight(h);
+            btn->setMinimumWidth(h);
+        }
+    }
 }
 
 int SARibbonButtonGroupWidget::itemHeight() const
 {
-	return d_ptr->mFixheight;
+    return d_ptr->mFixheight;
 }
 
 void SARibbonButtonGroupWidget::setItemMargin(int m)
 {
-	d_ptr->mItemMargin = m;
-	layout()->setContentsMargins(0, m, 0, m);
+    d_ptr->mItemMargin = m;
+    layout()->setContentsMargins(0, m, 0, m);
 }
 
 int SARibbonButtonGroupWidget::itemMargin() const
@@ -232,7 +226,7 @@ void SARibbonButtonGroupWidget::actionEvent(QActionEvent* e)
             if (item.widget != nullptr) {
                 item.widget->setAttribute(Qt::WA_LayoutUsesWidgetRect);
                 item.widget->show();
-                //widget高度保持一致
+                // widget高度保持一致
                 item.widget->setFixedHeight(d_ptr->mFixheight);
                 item.customWidget = true;
             }
@@ -242,14 +236,11 @@ void SARibbonButtonGroupWidget::actionEvent(QActionEvent* e)
         }
         // 不是widget，自动生成ButtonTyle
         if (!item.widget) {
-            // 只使用small
-            SARibbonToolButton::RibbonButtonType buttonType = SARibbonToolButton::SmallButton;
-            SARibbonControlToolButton* button = RibbonSubElementFactory->createRibbonControlToolButton(this);
+            SARibbonControlButton* button = RibbonSubElementFactory->createRibbonControlButton(this);
             button->setAutoRaise(true);
             button->setFixedHeight(d_ptr->mFixheight);
             button->setMinimumWidth(d_ptr->mFixheight);
             button->setFocusPolicy(Qt::NoFocus);
-            button->setButtonType(buttonType);
             button->setDefaultAction(item.action);
             // 属性设置
             QToolButton::ToolButtonPopupMode popMode = SARibbonPannel::getActionToolButtonPopupModeProperty(item.action);
@@ -258,8 +249,8 @@ void SARibbonButtonGroupWidget::actionEvent(QActionEvent* e)
             button->setToolButtonStyle(buttonStyle);
             // 根据QAction的属性设置按钮的大小
 
-			QObject::connect(button, &SARibbonToolButton::triggered, this, &SARibbonButtonGroupWidget::actionTriggered);
-			item.widget = button;
+            QObject::connect(button, &SARibbonToolButton::triggered, this, &SARibbonButtonGroupWidget::actionTriggered);
+            item.widget = button;
         }
         layout()->addWidget(item.widget);
         d_ptr->mItems.append(item);

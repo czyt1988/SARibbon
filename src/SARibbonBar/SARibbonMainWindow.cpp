@@ -279,6 +279,7 @@ SARibbonBar* SARibbonMainWindow::createRibbonBar()
 
 void SARibbonMainWindow::resizeEvent(QResizeEvent* event)
 {
+    QMainWindow::resizeEvent(event);
     SARibbonBar* bar        = ribbonBar();
     SAWindowButtonGroup* wg = d_ptr->mWindowButtonGroup;
 
@@ -290,7 +291,7 @@ void SARibbonMainWindow::resizeEvent(QResizeEvent* event)
             }
         }
         QSize wgSizeHint = wg->sizeHint();
-        wg->setGeometry(width() - wgSizeHint.width(), 0, wgSizeHint.width(), wgSizeHint.height());
+        wg->setGeometry(frameGeometry().width() - wgSizeHint.width(), 0, wgSizeHint.width(), wgSizeHint.height());
     }
     if (bar) {
         if (wg) {
@@ -300,7 +301,6 @@ void SARibbonMainWindow::resizeEvent(QResizeEvent* event)
             bar->setFixedWidth(this->size().width());
         }
     }
-    QMainWindow::resizeEvent(event);
 }
 
 void SARibbonMainWindow::changeEvent(QEvent* e)
@@ -333,7 +333,6 @@ void SARibbonMainWindow::onPrimaryScreenChanged(QScreen* screen)
         bar->updateRibbonGeometry();
     }
 }
-
 
 void sa_set_ribbon_theme(QWidget* w, SARibbonMainWindow::RibbonTheme theme)
 {
