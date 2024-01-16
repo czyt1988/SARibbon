@@ -2,11 +2,22 @@
 #define SARIBBONGALLERY_H
 #include "SARibbonGlobal.h"
 #include <QFrame>
+#include <QToolButton>
 #include "SARibbonGalleryGroup.h"
 #include <QSizeGrip>
 class QLabel;
 class QVBoxLayout;
 class SARibbonGalleryViewport;
+
+/**
+ * @brief 针对SARibbonGallery控件的按钮
+ */
+class SA_RIBBON_EXPORT SARibbonGalleryButton : public QToolButton
+{
+    Q_OBJECT
+public:
+    SARibbonGalleryButton(QWidget* parent = 0);
+};
 
 /**
  * @brief Gallery控件

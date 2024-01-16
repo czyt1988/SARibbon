@@ -21,9 +21,9 @@ class SARibbonGallery::PrivateData
     SA_RIBBON_DECLARE_PUBLIC(SARibbonGallery)
 public:
     static int sGalleryButtonMaximumWidth;
-    SARibbonControlButton* buttonUp { nullptr };
-    SARibbonControlButton* buttonDown { nullptr };
-    SARibbonControlButton* buttonMore { nullptr };
+    SARibbonGalleryButton* buttonUp { nullptr };
+    SARibbonGalleryButton* buttonDown { nullptr };
+    SARibbonGalleryButton* buttonMore { nullptr };
 #if 0
     SARibbonMenu *popupWidget;
 #else
@@ -38,9 +38,9 @@ public:
 
     void init()
     {
-        buttonUp   = new SARibbonControlButton(q_ptr);
-        buttonDown = new SARibbonControlButton(q_ptr);
-        buttonMore = new SARibbonControlButton(q_ptr);
+        buttonUp   = new SARibbonGalleryButton(q_ptr);
+        buttonDown = new SARibbonGalleryButton(q_ptr);
+        buttonMore = new SARibbonGalleryButton(q_ptr);
         buttonUp->setToolButtonStyle(Qt::ToolButtonIconOnly);
         buttonDown->setToolButtonStyle(Qt::ToolButtonIconOnly);
         buttonMore->setToolButtonStyle(Qt::ToolButtonIconOnly);
@@ -120,6 +120,14 @@ public:
  * @brief SARibbonGalleryPrivate::sGalleryButtonMaximumWidth
  */
 int SARibbonGallery::PrivateData::sGalleryButtonMaximumWidth = 15;
+
+//===================================================
+// SARibbonGalleryButton
+//===================================================
+
+SARibbonGalleryButton::SARibbonGalleryButton(QWidget* parent) : QToolButton(parent)
+{
+}
 
 //===================================================
 // SARibbonGalleryViewport
