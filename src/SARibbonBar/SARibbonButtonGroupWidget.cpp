@@ -39,6 +39,7 @@ public:
     void init();
 
 public:
+    QSize mIconSize { 24, 24 };
     QList< SAPrivateRibbonButtonGroupWidgetItem > mItems;  ///< 用于记录所有管理的item
     int mFixheight;                                        /// 内部控件的统一高度
     int mItemMargin;                                       /// 间距
@@ -103,6 +104,28 @@ SARibbonButtonGroupWidget::~SARibbonButtonGroupWidget()
     }
 }
 
+/**
+ * @brief 设置图标尺寸
+ * @param iconSize
+ */
+void SARibbonButtonGroupWidget::setIconSize(const QSize& ic)
+{
+    d_ptr->mIconSize = ic;
+    iterate([ ic ](SARibbonControlButton* btn) -> bool {
+        btn->setIconSize(ic);
+        return true;
+    });
+}
+
+/**
+ * @brief 图标尺寸
+ * @return
+ */
+QSize SARibbonButtonGroupWidget::iconSize() const
+{
+    return d_ptr->mIconSize;
+}
+
 QAction* SARibbonButtonGroupWidget::addAction(QAction* a, Qt::ToolButtonStyle buttonStyle, QToolButton::ToolButtonPopupMode popMode)
 {
     SARibbonPannel::setActionToolButtonStyleProperty(a, buttonStyle);
@@ -154,16 +177,15 @@ QAction* SARibbonButtonGroupWidget::addWidget(QWidget* w)
 
 SARibbonControlButton* SARibbonButtonGroupWidget::actionToRibbonControlToolButton(QAction* action)
 {
-    for (auto obj : qAsConst(children())) {
-        if (obj->isWidgetType()) {
-            if (SARibbonControlButton* btn = qobject_cast< SARibbonControlButton* >(obj)) {
-                if (btn->defaultAction() == action) {
-                    return btn;
-                }
-            }
+    SARibbonControlButton* res = nullptr;
+    iterate([ &res, action ](SARibbonControlButton* btn) -> bool {
+        if (btn->defaultAction() == action) {
+            res = btn;
+            return false;  // 返回false退出迭代
         }
-    }
-    return (nullptr);
+        return true;
+    });
+    return (res);
 }
 
 QSize SARibbonButtonGroupWidget::sizeHint() const
@@ -206,6 +228,31 @@ int SARibbonButtonGroupWidget::itemMargin() const
 }
 
 /**
+ * @brief 此函数会遍历SARibbonButtonGroupWidget下的所有SARibbonControlButton，执行函数指针(bool(SARibbonControlButton*))，函数指针返回false则停止迭代
+ * @param fp
+ * @return 中途迭代退出返回false
+ */
+bool SARibbonButtonGroupWidget::iterate(SARibbonButtonGroupWidget::FpButtonIterate fp)
+{
+    QLayout* lay = layout();
+    int c        = lay->count();
+    for (int i = 0; i < c; ++i) {
+        auto item = lay->itemAt(i);
+        if (!item) {
+            continue;
+        }
+        SARibbonControlButton* btn = qobject_cast< SARibbonControlButton* >(item->widget());
+        if (!btn) {
+            continue;
+        }
+        if (!fp(btn)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+/**
  * @brief 处理action的事件
  *
  * 这里处理了ActionAdded，ActionChanged，ActionRemoved三个事件
@@ -226,8 +273,6 @@ void SARibbonButtonGroupWidget::actionEvent(QActionEvent* e)
             if (item.widget != nullptr) {
                 item.widget->setAttribute(Qt::WA_LayoutUsesWidgetRect);
                 item.widget->show();
-                // widget高度保持一致
-                item.widget->setFixedHeight(d_ptr->mFixheight);
                 item.customWidget = true;
             }
         } else if (item.action->isSeparator()) {
