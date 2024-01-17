@@ -12,11 +12,16 @@ class SA_RIBBON_EXPORT SARibbonButtonGroupWidget : public QFrame
 {
     Q_OBJECT
     SA_RIBBON_DECLARE_PRIVATE(SARibbonButtonGroupWidget)
+public:
+    using FpButtonIterate = std::function< bool(SARibbonControlButton*) >;
 
 public:
     SARibbonButtonGroupWidget(QWidget* parent = Q_NULLPTR);
     ~SARibbonButtonGroupWidget() Q_DECL_OVERRIDE;
 
+    // 图标尺寸
+    void setIconSize(const QSize& ic);
+    QSize iconSize() const;
     // 生成并添加一个action
     QAction* addAction(QAction* a,
                        Qt::ToolButtonStyle buttonStyle          = Qt::ToolButtonIconOnly,
@@ -44,6 +49,8 @@ public:
     void setItemMargin(int m);
     int itemMargin() const;
 
+public:
+    bool iterate(FpButtonIterate fp);
 signals:
 
     /**
