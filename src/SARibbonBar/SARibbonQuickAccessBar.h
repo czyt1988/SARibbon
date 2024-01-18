@@ -27,9 +27,9 @@ public:
     // 获取内部管理的ButtonGroupWidget
     SARibbonButtonGroupWidget* buttonGroupWidget();
     const SARibbonButtonGroupWidget* buttonGroupWidget() const;
-    // 设置内部控件高度 - 注意，如果要自定义高度，需要设置
-    void setItemHeight(int h);
-    int itemHeight() const;
+    // 设置图标尺寸
+    void setIconSize(const QSize& s);
+    QSize iconSize() const;
 };
 
 #endif  // SARIBBONQUICKACCESSBAR_H

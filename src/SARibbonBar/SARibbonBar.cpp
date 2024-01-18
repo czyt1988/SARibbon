@@ -78,8 +78,6 @@ public:
     QColor mTabBarBaseLineColor { QColor(186, 201, 219) };  ///< tabbar 底部会绘制一条线条，定义线条颜色
     Qt::Alignment mTitleAligment { Qt::AlignCenter };       ///< 标题对齐方式
     bool mIsTitleVisible { true };                          ///< 标题是否显示
-    bool mEnableUserDefineAccessBarIconSize { false };      ///< 允许用户自定义AccessBar的IconSize
-    bool mEnableUserDefineRightBarIconSize { false };       ///< 允许用户自定义RightBar的IconSize
     SARibbonAlignment mRibbonAlignment { SARibbonAlignment::AlignLeft };                         ///< 对齐方式
     SARibbonPannel::PannelLayoutMode mDefaulePannelLayoutMode { SARibbonPannel::ThreeRowMode };  ///< 默认的PannelLayoutMode
     bool mEnableShowPannelTitle { true };  ///< 是否运行pannel的标题栏显示
@@ -154,10 +152,7 @@ void SARibbonBar::PrivateData::init()
     //
     mStackedContainerWidget = RibbonSubElementFactory->createRibbonStackedWidget(q_ptr);
     mStackedContainerWidget->setObjectName(QStringLiteral("objSARibbonStackedContainerWidget"));
-    mStackedContainerWidget->connect(mStackedContainerWidget,
-                                     &SARibbonStackedWidget::hidWindow,
-                                     q_ptr,
-                                     &SARibbonBar::onStackWidgetHided);
+    mStackedContainerWidget->connect(mStackedContainerWidget, &SARibbonStackedWidget::hidWindow, q_ptr, &SARibbonBar::onStackWidgetHided);
     // 捕获事件，在popmode时必须用到
     mStackedContainerWidget->installEventFilter(q_ptr);
     //
@@ -236,11 +231,7 @@ int SARibbonBar::PrivateData::calcCategoryHeight()
  * @param categoryHeight
  * @return
  */
-int SARibbonBar::PrivateData::calcMainBarHeight(int tabHegith,
-                                                int titleHeight,
-                                                int categoryHeight,
-                                                bool tabOnTitle,
-                                                SARibbonBar::RibbonMode rMode)
+int SARibbonBar::PrivateData::calcMainBarHeight(int tabHegith, int titleHeight, int categoryHeight, bool tabOnTitle, SARibbonBar::RibbonMode rMode)
 {
     if (rMode == MinimumRibbonMode) {
         // 最小模式，没有categoryHeight
@@ -525,7 +516,7 @@ QList< QColor > SARibbonBar::defaultContextCategoryColorList()
         << QColor(14, 81, 167)   // 蓝
         << QColor(228, 0, 69)    // 红
         << QColor(67, 148, 0)    // 绿
-        ;
+            ;
     return res;
 }
 
@@ -1090,13 +1081,11 @@ void SARibbonBar::showMinimumModeButton(bool isShow)
 
         d_ptr->mMinimumCategoryButtonAction = new QAction(this);
         d_ptr->mMinimumCategoryButtonAction->setIcon(
-            style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton,
-                                  nullptr));
+                style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton, nullptr));
         connect(d_ptr->mMinimumCategoryButtonAction, &QAction::triggered, this, [ this ]() {
             this->setMinimumMode(!isMinimumMode());
             this->d_ptr->mMinimumCategoryButtonAction->setIcon(
-                style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton,
-                                      nullptr));
+                    style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton, nullptr));
         });
         d_ptr->mRightButtonGroup->addAction(d_ptr->mMinimumCategoryButtonAction);
 
@@ -1486,7 +1475,7 @@ void SARibbonBar::setRibbonStyle(SARibbonBar::RibbonStyles v)
              << "\n  isTwoRowStyle=" << isTwoRowStyle()      //
              << "\n  isLooseStyle=" << isLooseStyle()        //
              << "\n  isCompactStyle=" << isCompactStyle()    //
-        ;
+            ;
 #endif
     // 执行判断
     setEnableWordWrap(isThreeRowStyle(v));
@@ -1790,66 +1779,6 @@ bool SARibbonBar::isTitleVisible() const
 }
 
 /**
-   @brief 设置允许用户自定义AccessBar的icon size
-
-    若设置为true此时用户调用AccessBar的setIconSize是可接受的，否则iconsize大小将由SARibbonBar计算
-
-    默认为false
-
-   @param
- */
-void SARibbonBar::setEnableUserDefineAccessBarIconSize(bool on)
-{
-    d_ptr->mEnableUserDefineAccessBarIconSize = on;
-    if (!(d_ptr->mEnableUserDefineAccessBarIconSize)) {  // 允许用户自定义AccessBar的IconSize就不进入此条件重置大小
-        // 变更iconsize
-        QSize btnIconSize = PrivateData::calcIconSizeByHeight(titleBarHeight());
-        if (btnIconSize.height() != d_ptr->mQuickAccessBar->itemHeight()) {
-            d_ptr->mQuickAccessBar->setItemHeight(btnIconSize.height());
-        }
-    }
-}
-
-/**
-   @brief 是否允许用户自定义AccessBar的icon size
-   @return
- */
-bool SARibbonBar::isEnableUserDefineAccessBarIconSize() const
-{
-    return d_ptr->mEnableUserDefineAccessBarIconSize;
-}
-
-/**
-   @brief 是否允许用户自定义RightBar的icon size
-
-    若设置为true此时用户调用RightBar的setIconSize是可接受的，否则iconsize大小将由SARibbonBar计算
-
-    默认为false
-
-   @param on
- */
-void SARibbonBar::setEnableUserDefineRightBarIconSize(bool on)
-{
-    d_ptr->mEnableUserDefineRightBarIconSize = on;
-    // 变更iconsize
-    if (!(d_ptr->mEnableUserDefineRightBarIconSize)) {
-        QSize btnIconSize = PrivateData::calcIconSizeByHeight(titleBarHeight());
-        if (btnIconSize.height() != d_ptr->mRightButtonGroup->itemHeight()) {
-            d_ptr->mRightButtonGroup->setItemHeight(btnIconSize.height());
-        }
-    }
-}
-
-/**
-   @brief 是否允许用户自定义RightBar的icon size
-   @return
- */
-bool SARibbonBar::isEnableUserDefineRightBarIconSize() const
-{
-    return d_ptr->mEnableUserDefineRightBarIconSize;
-}
-
-/**
    @brief 设置上下文标签的颜色列表
 
     上下文标签显示的时候，会从颜色列表中取颜色进行标签的渲染
@@ -2127,11 +2056,10 @@ void SARibbonBar::paintInLooseStyle()
             titleRegion.setRect(d_ptr->mQuickAccessBar->geometry().right() + 1,
                                 border.top(),
                                 width() - d_ptr->mIconRightBorderPosition - border.right()
-                                    - d_ptr->mWindowButtonSize.width() - d_ptr->mQuickAccessBar->geometry().right() - 1,
+                                        - d_ptr->mWindowButtonSize.width() - d_ptr->mQuickAccessBar->geometry().right() - 1,
                                 titleBarHeight());
         } else {
-            int leftwidth = contextCategoryRegion.x() - d_ptr->mQuickAccessBar->geometry().right()
-                            - d_ptr->mIconRightBorderPosition;
+            int leftwidth = contextCategoryRegion.x() - d_ptr->mQuickAccessBar->geometry().right() - d_ptr->mIconRightBorderPosition;
             int rightwidth = width() - contextCategoryRegion.y() - d_ptr->mWindowButtonSize.width();
             //            if (width() - contextCategoryRegion.y() > contextCategoryRegion.x()-x) {
             if (rightwidth > leftwidth) {
@@ -2609,7 +2537,7 @@ QDebug operator<<(QDebug debug, const SARibbonBar& ribbon)
                     << "\n -mEnableShowPannelTitle=" << ribbon.d_ptr->mEnableShowPannelTitle      //
                     << "\n -mWindowButtonSize=" << ribbon.d_ptr->mWindowButtonSize                //
                     << "\n -mIconRightBorderPosition=" << ribbon.d_ptr->mIconRightBorderPosition  //
-        ;
+            ;
 
     return debug;
 }
