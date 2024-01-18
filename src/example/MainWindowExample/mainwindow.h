@@ -32,7 +32,7 @@ private:
     void createContextCategory2();
     void createContextCategoryPage1(SARibbonCategory* page);
     void createContextCategoryPage2(SARibbonCategory* page);
-    void createQuickAccessBar(SARibbonQuickAccessBar* quickAccessBar);
+    void createQuickAccessBar();
     void createRightButtonGroup();
     // 创建ActionsManager，实现actions的管理以及SARibbonBar的自定义
     void createActionsManager();
@@ -66,7 +66,7 @@ private slots:
     void onActionHideActionTriggered(bool on);
     // 切换所有action是否可见
     void onActionVisibleAllTriggered(bool on);
-    //居中对齐checkbox的槽
+    // 居中对齐checkbox的槽
     void onCheckBoxAlignmentCenterClicked(bool checked);
 
 private:
@@ -107,8 +107,8 @@ private:
     QAction* mOtherActionIcon1 { nullptr };
     SARibbonPannel* mPannelVisbileExample { nullptr };
     //
-    QAction* mActionVisibleAll { nullptr };  ///< 控制所有action是否可见的开关
-    bool mHasApplyCustomizeXmlFile {false}; ///程序启动后是否应用上次修改
+    QAction* mActionVisibleAll { nullptr };    ///< 控制所有action是否可见的开关
+    bool mHasApplyCustomizeXmlFile { false };  /// 程序启动后是否应用上次修改
 };
 
 #endif  // MAINWINDOW_H
