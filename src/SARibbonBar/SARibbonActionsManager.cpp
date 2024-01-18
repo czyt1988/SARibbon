@@ -73,10 +73,10 @@ void SARibbonActionsManager::removeTag(int tag)
 {
     QList< QAction* > oldacts = actions(tag);
 
-    //开始移除
+    // 开始移除
     d_ptr->mTagToActions.remove(tag);
     d_ptr->mTagToName.remove(tag);
-    //开始查找需要移出总表的action
+    // 开始查找需要移出总表的action
     QList< QAction* > needRemoveAct;
     QList< QAction* > total;
 
@@ -88,7 +88,7 @@ void SARibbonActionsManager::removeTag(int tag)
             needRemoveAct.append(a);
         }
     }
-    //从总表移除action
+    // 从总表移除action
     for (QAction* a : qAsConst(needRemoveAct)) {
         auto i = d_ptr->mActionToKey.find(a);
         if (i != d_ptr->mActionToKey.end()) {
@@ -120,19 +120,20 @@ bool SARibbonActionsManager::registeAction(QAction* act, int tag, const QString&
         k = QString("id_%1_%2").arg(d_ptr->mSale++).arg(act->objectName());
     }
     if (d_ptr->mKeyToAction.contains(k)) {
-        qWarning() << "key: " << k << " have been exist,you can set key in an unique value when use SARibbonActionsManager::registeAction";
+        qWarning() << "key: "
+                   << k << " have been exist,you can set key in an unique value when use SARibbonActionsManager::registeAction";
         return (false);
     }
     d_ptr->mKeyToAction[ k ]   = act;
     d_ptr->mActionToKey[ act ] = k;
-    //记录tag 对 action
-    bool isneedemit = !(d_ptr->mTagToActions.contains(tag));  //记录是否需要发射信号
+    // 记录tag 对 action
+    bool isneedemit = !(d_ptr->mTagToActions.contains(tag));  // 记录是否需要发射信号
 
     d_ptr->mTagToActions[ tag ].append(act);
-    //绑定槽
+    // 绑定槽
     connect(act, &QObject::destroyed, this, &SARibbonActionsManager::onActionDestroyed);
     if (isneedemit && enableEmit) {
-        //说明新增tag
+        // 说明新增tag
         emit actionTagChanged(tag, false);
     }
     return (true);
@@ -151,7 +152,7 @@ void SARibbonActionsManager::unregisteAction(QAction* act, bool enableEmit)
     if (nullptr == act) {
         return;
     }
-    //绑定槽
+    // 绑定槽
     disconnect(act, &QObject::destroyed, this, &SARibbonActionsManager::onActionDestroyed);
     removeAction(act, enableEmit);
 }
@@ -165,11 +166,11 @@ void SARibbonActionsManager::unregisteAction(QAction* act, bool enableEmit)
  */
 void SARibbonActionsManager::removeAction(QAction* act, bool enableEmit)
 {
-    QList< int > deletedTags;                     //记录删除的tag，用于触发actionTagChanged
+    QList< int > deletedTags;                     // 记录删除的tag，用于触发actionTagChanged
     QMap< int, QList< QAction* > > tagToActions;  ///< tag : QList<QAction*>
 
     for (auto i = d_ptr->mTagToActions.begin(); i != d_ptr->mTagToActions.end(); ++i) {
-        //把不是act的内容转移到tagToActions和tagToActionKeys中，之后再和m_d里的替换
+        // 把不是act的内容转移到tagToActions和tagToActionKeys中，之后再和m_d里的替换
         auto tmpi = tagToActions.insert(i.key(), QList< QAction* >());
         int count = 0;
         for (int j = 0; j < i.value().size(); ++j) {
@@ -179,20 +180,20 @@ void SARibbonActionsManager::removeAction(QAction* act, bool enableEmit)
             }
         }
         if (0 == count) {
-            //说明这个tag没有内容
+            // 说明这个tag没有内容
             tagToActions.erase(tmpi);
             deletedTags.append(i.key());
         }
     }
-    //删除mKeyToAction
+    // 删除mKeyToAction
     QString key = d_ptr->mActionToKey.value(act);
 
     d_ptr->mActionToKey.remove(act);
     d_ptr->mKeyToAction.remove(key);
 
-    //置换
+    // 置换
     d_ptr->mTagToActions.swap(tagToActions);
-    //发射信号
+    // 发射信号
     if (enableEmit) {
         for (int tagdelete : qAsConst(deletedTags)) {
             emit actionTagChanged(tagdelete, true);
@@ -289,23 +290,23 @@ QList< QAction* > SARibbonActionsManager::allActions() const
 QMap< int, SARibbonCategory* > SARibbonActionsManager::autoRegisteActions(SARibbonBar* bar)
 {
     QMap< int, SARibbonCategory* > res;
-    //先遍历SARibbonBar的父窗口(一般是SARibbonMainWindow)下的所有子对象，把所有action找到
+    // 先遍历SARibbonBar的父窗口(一般是SARibbonMainWindow)下的所有子对象，把所有action找到
     QWidget* parWidget = bar->parentWidget();
     QSet< QAction* > mainwindowActions;
     if (parWidget) {
         for (QObject* o : qAsConst(parWidget->children())) {
             if (QAction* a = qobject_cast< QAction* >(o)) {
-                //说明是action
+                // 说明是action
                 if (!a->objectName().isEmpty()) {
                     mainwindowActions.insert(a);
                 }
             }
         }
     }
-    //开始遍历每个category，加入action
+    // 开始遍历每个category，加入action
 
     if (nullptr == bar) {
-        //非ribbon模式，直接退出
+        // 非ribbon模式，直接退出
         return (res);
     }
     QSet< QAction* > categoryActions;
@@ -321,7 +322,7 @@ QMap< int, SARibbonCategory* > SARibbonActionsManager::autoRegisteActions(SARibb
         res[ tag ] = c;
         ++tag;
     }
-    //找到不在功能区的actions
+    // 找到不在功能区的actions
     QSet< QAction* > notincategory = mainwindowActions - categoryActions;
 
     for (QAction* a : qAsConst(notincategory)) {
@@ -333,7 +334,7 @@ QMap< int, SARibbonCategory* > SARibbonActionsManager::autoRegisteActions(SARibb
         setTagName(NotInRibbonCategoryTag, tr("not in ribbon"));
     }
     for (auto i = res.begin(); i != res.end(); ++i) {
-        connect(i.value(), &SARibbonCategory::windowTitleChanged, this, &SARibbonActionsManager::onCategoryTitleChanged);
+        connect(i.value(), &SARibbonCategory::categoryNameChanged, this, &SARibbonActionsManager::onCategoryTitleChanged);
     }
     d_ptr->mTagToCategory = res;
     return (res);
@@ -353,8 +354,8 @@ QSet< QAction* > SARibbonActionsManager::autoRegisteWidgetActions(QWidget* w, in
 
     for (QAction* a : qAsConst(was)) {
         if (res.contains(a) || a->objectName().isEmpty()) {
-            //重复内容不重复加入
-            //没有object name不加入
+            // 重复内容不重复加入
+            // 没有object name不加入
             continue;
         }
         if (registeAction(a, tag, a->objectName(), enableEmit)) {
@@ -511,10 +512,10 @@ SARibbonActionsManagerModel::~SARibbonActionsManagerModel()
 
 int SARibbonActionsManagerModel::rowCount(const QModelIndex& parent) const
 {
-    if (parent.isValid()) {  //非顶层
+    if (parent.isValid()) {  // 非顶层
         return (0);
     }
-    //顶层
+    // 顶层
     return (d_ptr->count());
 }
 

@@ -133,10 +133,11 @@ MainWindow::MainWindow(QWidget* par)
 
     createContextCategory1();
     PRINT_COST("add context1 category page");
+
     createContextCategory2();
     PRINT_COST("add context2 category page");
-    SARibbonQuickAccessBar* quickAccessBar = ribbon->quickAccessBar();
-    createQuickAccessBar(quickAccessBar);
+
+    createQuickAccessBar();
     PRINT_COST("add quick access bar");
 
     //! cn:
@@ -159,6 +160,7 @@ MainWindow::MainWindow(QWidget* par)
     //! If the actions are created before, the actions added to the ribbon need to be manually managed in the ActionManager.
     //! The ActionManager can also manage actions not in the ribbon bar
     createActionsManager();
+
     setMinimumWidth(500);
     showMaximized();
     setWindowIcon(QIcon(":/icon/icon/SA.svg"));
@@ -278,10 +280,11 @@ void MainWindow::onActionCustomizeAndSaveTriggered(bool b)
     Q_UNUSED(b);
     SARibbonCustomizeDialog dlg(this);
     dlg.setupActionsManager(mActionsManager);
-    //如果启动时未应用上次修改，先应用再读取,保持本地数据和ui一致
-    if(!mHasApplyCustomizeXmlFile)
-    {
-        auto res = QMessageBox::question(this, tr("question"), tr("Apply the last modification?\nIf not, local data will be reset"));
+    // 如果启动时未应用上次修改，先应用再读取,保持本地数据和ui一致
+    if (!mHasApplyCustomizeXmlFile) {
+        auto res = QMessageBox::question(this,
+                                         tr("question"),
+                                         tr("Apply the last modification?\nIf not, local data will be reset"));
         if (res == QMessageBox::Yes) {
             onActionLoadCustomizeXmlFileTriggered();
             return;
@@ -295,13 +298,12 @@ void MainWindow::onActionCustomizeAndSaveTriggered(bool b)
 
     dlg.fromXml("customize.xml");
     if (SARibbonCustomizeDialog::Accepted == dlg.exec()) {
-        //先apply
-        if(dlg.isCached())
+        // 先apply
+        if (dlg.isCached())
             dlg.applys();
 
-		//无更改直接退出
-		if(!dlg.isApplied())
-		{
+        // 无更改直接退出
+        if (!dlg.isApplied()) {
 			mTextedit->append("no change to save");
 			return;
 		}
@@ -334,10 +336,11 @@ void MainWindow::onActionCustomizeAndSaveTriggered(bool b)
 
 void MainWindow::onActionCustomizeAndSaveWithApplyTriggered(bool b)
 {
-	//如果启动时未应用上次修改，先应用再读取,保持本地数据和ui一致
-	if(!mHasApplyCustomizeXmlFile)
-	{
-		auto res = QMessageBox::question(this, tr("question"), tr("Apply the last modification?\nIf not, local data will be reset"));
+    // 如果启动时未应用上次修改，先应用再读取,保持本地数据和ui一致
+    if (!mHasApplyCustomizeXmlFile) {
+        auto res = QMessageBox::question(this,
+                                         tr("question"),
+                                         tr("Apply the last modification?\nIf not, local data will be reset"));
 		if (res == QMessageBox::Yes) {
 			onActionLoadCustomizeXmlFileTriggered();
 			return;
@@ -348,47 +351,41 @@ void MainWindow::onActionCustomizeAndSaveWithApplyTriggered(bool b)
 	}
 
 	QDialog dlg;
-	QVBoxLayout *main = new QVBoxLayout;
+    QVBoxLayout* main = new QVBoxLayout;
 	dlg.setLayout(main);
 	SARibbonCustomizeWidget* widgetForCustomize = new SARibbonCustomizeWidget(this, &dlg);
 	widgetForCustomize->setupActionsManager(mActionsManager);
 
 	main->addWidget(widgetForCustomize, 1);
 
-	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Save
-													   | QDialogButtonBox::Cancel
-													   | QDialogButtonBox::Apply);
+    QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel
+                                                       | QDialogButtonBox::Apply);
 
 	main->addWidget(buttonBox);
 
 	connect(buttonBox, &QDialogButtonBox::accepted, &dlg, &QDialog::accept);
 	connect(buttonBox, &QDialogButtonBox::rejected, &dlg, &QDialog::reject);
-	connect(buttonBox, &QDialogButtonBox::clicked, &dlg, [=](QAbstractButton *button){
-
+    connect(buttonBox, &QDialogButtonBox::clicked, &dlg, [ = ](QAbstractButton* button) {
 		auto role = buttonBox->buttonRole(button);
-		if(role == QDialogButtonBox::ApplyRole)//apply
+        if (role == QDialogButtonBox::ApplyRole)  // apply
 		{
-			if(widgetForCustomize->isCached())
-			{
+            if (widgetForCustomize->isCached()) {
 				widgetForCustomize->applys();
 				mTextedit->append("change applied");
-			}
-			else
-			{
+            } else {
 				mTextedit->append("no change to apply");
 			}
 		}
 	});
 
 	widgetForCustomize->fromXml("customize.xml");
-	if (QDialog::Accepted == dlg.exec()){
-		//先apply
-		if(widgetForCustomize->isCached())
+    if (QDialog::Accepted == dlg.exec()) {
+        // 先apply
+        if (widgetForCustomize->isCached())
 			widgetForCustomize->applys();
 
-		//无更改直接退出
-		if(!widgetForCustomize->isApplied())
-		{
+        // 无更改直接退出
+        if (!widgetForCustomize->isApplied()) {
 			mTextedit->append("no change to save");
 			return;
 		}
@@ -416,9 +413,8 @@ void MainWindow::onActionCustomizeAndSaveWithApplyTriggered(bool b)
 			mTextedit->append("write xml:");
 			mTextedit->append(str);
 		}
-	}
-	else {
-		//清除所有动作
+    } else {
+        // 清除所有动作
 		widgetForCustomize->clear();
 		mTextedit->append("all changes clear, the applied changes will take no effect afer restart");
 	}
@@ -470,15 +466,13 @@ void MainWindow::onActionLoadCustomizeXmlFileTriggered()
 {
     // 只能调用一次
     if (!mHasApplyCustomizeXmlFile) {
-        if(!QFile::exists("customize.xml"))
-        {
+        if (!QFile::exists("customize.xml")) {
             mHasApplyCustomizeXmlFile = true;
             return;
         }
         QFile f("customize.xml");
         qDebug() << "size of customize.xml : " << f.size();
-        if(f.size() <= 0)
-        {
+        if (f.size() <= 0) {
             mHasApplyCustomizeXmlFile = true;
             return;
         }
@@ -1127,6 +1121,21 @@ void MainWindow::createCategorySize(SARibbonCategory* page)
     QAction* actLargeFontText = createAction(tr("Larger Font Text"), ":/icon/icon/file.svg", "actLargeFontText");
     pannel->addLargeAction(actLargeFontText);
     page->addPannel(pannel);
+
+    // pannel 3
+    pannel          = new SARibbonPannel(tr("Grid"));
+    QWidget* w      = new QWidget();
+    QGridLayout* g  = new QGridLayout(w);
+    QLabel* lab1    = new QLabel("value1:");
+    QLineEdit* edi1 = new QLineEdit(w);
+    QLabel* lab2    = new QLabel("value2:");
+    QLineEdit* edi2 = new QLineEdit(w);
+    g->addWidget(lab1, 0, 0);
+    g->addWidget(edi1, 0, 1);
+    g->addWidget(lab2, 1, 0);
+    g->addWidget(edi2, 1, 1);
+    pannel->addLargeWidget(w);
+    page->addPannel(pannel);
 }
 
 void MainWindow::createCategoryColor(SARibbonCategory* page)
@@ -1404,8 +1413,10 @@ void MainWindow::createContextCategoryPage2(SARibbonCategory* page)
                             SARibbonPannelItem::Small);
 }
 
-void MainWindow::createQuickAccessBar(SARibbonQuickAccessBar* quickAccessBar)
+void MainWindow::createQuickAccessBar()
 {
+    SARibbonQuickAccessBar* quickAccessBar = ribbonBar()->quickAccessBar();
+
     quickAccessBar->addAction(createAction("save", ":/icon/icon/save.svg", "save-quickbar"));
     quickAccessBar->addSeparator();
 
