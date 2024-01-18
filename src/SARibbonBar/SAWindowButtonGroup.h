@@ -1,13 +1,13 @@
 ﻿#ifndef SAWINDOWBUTTONGROUP_H
 #define SAWINDOWBUTTONGROUP_H
 #include "SARibbonGlobal.h"
-#include <QWidget>
+#include <QFrame>
 #include <QPushButton>
 
 ///
 /// \brief 窗口的最大最小化按钮
 ///
-class SA_RIBBON_EXPORT SAWindowButtonGroup : public QWidget
+class SA_RIBBON_EXPORT SAWindowButtonGroup : public QFrame
 {
     Q_OBJECT
     SA_RIBBON_DECLARE_PRIVATE(SAWindowButtonGroup)

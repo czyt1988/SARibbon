@@ -291,6 +291,9 @@ void SARibbonMainWindow::resizeEvent(QResizeEvent* event)
             }
         }
         QSize wgSizeHint = wg->sizeHint();
+        // 需要先resize，有可能不能设置到对应的size，以设置后的size为准
+        wg->resize(wgSizeHint);
+        wgSizeHint = wg->size();
         wg->setGeometry(frameGeometry().width() - wgSizeHint.width(), 0, wgSizeHint.width(), wgSizeHint.height());
     }
     if (bar) {

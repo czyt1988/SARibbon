@@ -108,10 +108,10 @@ public:
     void updateSize()
     {
         q_ptr->setFixedSize(sizeHint());
-        resize(q_ptr->size());
+        resizeElement(q_ptr->size());
     }
 
-    void resize(QSize size)
+    void resizeElement(QSize size)
     {
         qreal tw = 0;
 
@@ -145,7 +145,7 @@ public:
             x += w;
         }
         if (buttonClose) {
-            int w = (mCloseStretch / tw) * size.width();
+            int w = size.width() - x;
             // buttonClose->setGeometry(x, 0, w, size.height());
             // 受到qss样式影响会导致最小宽度、高度设置不了，因此要设置fixsize再move
             buttonClose->setFixedSize(w, size.height());
@@ -185,7 +185,7 @@ SAWindowToolButton::SAWindowToolButton(QWidget* p) : QPushButton(p)
 // SAWindowButtonGroup
 //===================================================
 SAWindowButtonGroup::SAWindowButtonGroup(QWidget* parent)
-    : QWidget(parent), d_ptr(new SAWindowButtonGroup::PrivateData(this))
+    : QFrame(parent), d_ptr(new SAWindowButtonGroup::PrivateData(this))
 {
     updateWindowFlag();
 }
@@ -196,7 +196,7 @@ SAWindowButtonGroup::SAWindowButtonGroup(QWidget* parent)
  * @param flags
  */
 SAWindowButtonGroup::SAWindowButtonGroup(QWidget* parent, Qt::WindowFlags flags)
-    : QWidget(parent), d_ptr(new SAWindowButtonGroup::PrivateData(this))
+    : QFrame(parent), d_ptr(new SAWindowButtonGroup::PrivateData(this))
 {
     d_ptr->mFlags = flags;
     updateWindowFlag();
@@ -335,7 +335,8 @@ QAbstractButton* SAWindowButtonGroup::closeButton() const
 
 void SAWindowButtonGroup::resizeEvent(QResizeEvent* e)
 {
-    d_ptr->resize(e->size());
+    Q_UNUSED(e);
+    d_ptr->resizeElement(size());
 }
 
 void SAWindowButtonGroup::closeWindow()
