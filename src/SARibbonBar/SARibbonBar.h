@@ -206,9 +206,7 @@ public:
     void removeCategory(SARibbonCategory* category);
 
     // 添加一个上下文标签
-    SARibbonContextCategory* addContextCategory(const QString& title,
-                                                const QColor& color = QColor(),
-                                                const QVariant& id  = QVariant());
+    SARibbonContextCategory* addContextCategory(const QString& title, const QColor& color = QColor(), const QVariant& id = QVariant());
     void addContextCategory(SARibbonContextCategory* context);
 
     // 显示一个上下文标签
@@ -339,14 +337,6 @@ public:
     // 设置是否显示标题
     void setTitleVisible(bool on = false);
     bool isTitleVisible() const;
-
-    // 允许用户自定义AccessBar图标尺寸，默认为false
-    void setEnableUserDefineAccessBarIconSize(bool on = true);
-    bool isEnableUserDefineAccessBarIconSize() const;
-
-    // 允许用户自定义RightBar图标尺寸，默认为false
-    void setEnableUserDefineRightBarIconSize(bool on = true);
-    bool isEnableUserDefineRightBarIconSize() const;
 
     // 上下文标签的颜色列表，上下文标签显示的时候，会从颜色列表中取颜色进行标签的渲染
     void setContextCategoryColorList(const QList< QColor >& cls);
