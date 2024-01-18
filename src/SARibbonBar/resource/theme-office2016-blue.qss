@@ -215,7 +215,7 @@ SARibbonTabBar {
 
 SARibbonTabBar::tab {
   color: #d2e4ff;/* {Tab.Color} */
-  border:none;
+  border:1px solid transparent;
   background: transparent;
   margin-top: 0px;
   margin-right: 0px;
@@ -230,11 +230,11 @@ SARibbonTabBar::tab {
 SARibbonTabBar::tab:selected {
   color: #225497;/* {Tab.Color:selected} */
   background: #f1f1f1;/* {Tab.BKColor:selected} */
-  border:none;
+  border:1px solid #f1f1f1;
 }
 
 SARibbonTabBar::tab:hover:!selected {
-  border:none;/* {Tab.BorderColor:hover:!selected} */
+  border:1px solid #3e6db6;/* {Tab.BorderColor:hover:!selected} */
   color:#d2e4ff;/* {Tab.Color:hover:!selected} */
   background:#3e6db6;/* {Tab.BKColor:hover:!selected} */
 }
