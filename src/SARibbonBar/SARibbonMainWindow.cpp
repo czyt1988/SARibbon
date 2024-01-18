@@ -277,9 +277,9 @@ SARibbonBar* SARibbonMainWindow::createRibbonBar()
     return bar;
 }
 
-void SARibbonMainWindow::resizeEvent(QResizeEvent* event)
+void SARibbonMainWindow::resizeEvent(QResizeEvent* e)
 {
-    QMainWindow::resizeEvent(event);
+    QMainWindow::resizeEvent(e);
     SARibbonBar* bar        = ribbonBar();
     SAWindowButtonGroup* wg = d_ptr->mWindowButtonGroup;
 

@@ -68,7 +68,7 @@ void SARibbonContextCategory::addCategoryPage(SARibbonCategory* category)
         return;
     }
     category->markIsContextCategory(true);
-    connect(category, &SARibbonCategory::windowTitleChanged, this, &SARibbonContextCategory::onCategoryTitleChanged);
+    connect(category, &SARibbonCategory::categoryNameChanged, this, &SARibbonContextCategory::onCategoryTitleChanged);
     SAPrivateRibbonCategoryData catData;
     catData.categoryPage = category;
     d_ptr->categoryDataList.append(catData);
