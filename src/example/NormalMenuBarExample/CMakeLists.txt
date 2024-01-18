@@ -1,7 +1,7 @@
 ﻿cmake_minimum_required(VERSION 3.5)
 SET(VERSION_SHORT 0.1)
-project(NormalMenuBarExample VERSION ${VERSION_SHORT}) 
 set(SARIBBON_EXPAMPLE_NAME NormalMenuBarExample)
+project(${SARIBBON_EXPAMPLE_NAME} VERSION ${VERSION_SHORT})
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # 显示定义FRAMELESSHELPER_FEATURE_static_build为-1 否则库引用会失败
 add_definitions(-DFRAMELESSHELPER_FEATURE_static_build=-1)

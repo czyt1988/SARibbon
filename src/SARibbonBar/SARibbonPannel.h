@@ -191,6 +191,12 @@ signals:
      */
     void actionTriggered(QAction* action);
 
+    /**
+     * @brief pannel的标题发生了改变
+     * @param n
+     */
+    void pannelNameChanged(const QString& n);
+
 public:
     // pannel高度推荐
     static int pannelHeightHint(const QFontMetrics& fm, PannelLayoutMode layMode, int pannelTitleHeight);

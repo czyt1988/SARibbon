@@ -690,10 +690,15 @@ QString SARibbonPannel::pannelName() const
 /**
  * @brief pannel的名称
  * @param title 标题
+ * @note 此函数会触发@sa pannelNameChanged 信号
  */
 void SARibbonPannel::setPannelName(const QString& title)
 {
-    d_ptr->setPannelName(title);
+    QString oldName = pannelName();
+    if (oldName != title) {
+        d_ptr->setPannelName(title);
+        emit pannelNameChanged(title);
+    }
 }
 
 /**
