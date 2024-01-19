@@ -2,11 +2,18 @@
 #define SAWINDOWBUTTONGROUP_H
 #include "SARibbonGlobal.h"
 #include <QFrame>
-#include <QPushButton>
+#include <QToolButton>
 
-///
-/// \brief 窗口的最大最小化按钮
-///
+/**
+ * \brief 窗口的最大最小化按钮
+ * @note 内部有个SARibbonButtonGroupWidget，其ObjectName = SAWindowButtonGroupToolBar
+ * 如果需要qss，可以进行特化处理:
+ *
+ * @code
+ * SARibbonButtonGroupWidget#SAWindowButtonGroupToolBar
+ * @endcode
+ *
+ */
 class SA_RIBBON_EXPORT SAWindowButtonGroup : public QFrame
 {
     Q_OBJECT
@@ -26,16 +33,36 @@ public:
     // 标题栏高度
     void setWindowTitleHeight(int h);
     int windowTitleHeight() const;
+    // 设置标准系统按钮的宽度
+    void setWindowButtonWidth(int w);
+    int windowButtonWidth() const;
     // 设置Qt::WindowStates
     void setWindowStates(Qt::WindowStates s);
     // 仅获取按钮的状态
     Qt::WindowFlags windowButtonFlags() const;
-
-    virtual QSize sizeHint() const Q_DECL_OVERRIDE;
-
+    // 三个标准系统窗口按钮
     QAbstractButton* minimizeButton() const;
     QAbstractButton* maximizeButton() const;
     QAbstractButton* closeButton() const;
+
+    // 图标尺寸
+    void setIconSize(const QSize& ic);
+    QSize iconSize() const;
+    // 生成并添加一个action
+    QAction* addAction(QAction* a,
+                       Qt::ToolButtonStyle buttonStyle          = Qt::ToolButtonIconOnly,
+                       QToolButton::ToolButtonPopupMode popMode = QToolButton::DelayedPopup);
+    QAction* addAction(const QString& text,
+                       const QIcon& icon,
+                       Qt::ToolButtonStyle buttonStyle          = Qt::ToolButtonIconOnly,
+                       QToolButton::ToolButtonPopupMode popMode = QToolButton::DelayedPopup);
+    QAction* addMenu(QMenu* menu,
+                     Qt::ToolButtonStyle buttonStyle          = Qt::ToolButtonIconOnly,
+                     QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
+    QAction* addSeparator();
+    QAction* addWidget(QWidget* w);
+
+    virtual QSize sizeHint() const Q_DECL_OVERRIDE;
 
 protected:
     virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
@@ -49,10 +76,11 @@ protected slots:
 /**
  * @brief The SAWindowToolButton class
  */
-class SAWindowToolButton : public QPushButton
+class SAWindowToolButton : public QToolButton
 {
     Q_OBJECT
 public:
     SAWindowToolButton(QWidget* p = nullptr);
 };
+
 #endif  // SAWINDOWBUTTONGROUP_H
