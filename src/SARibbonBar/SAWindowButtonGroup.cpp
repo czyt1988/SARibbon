@@ -7,6 +7,8 @@
 #include "SARibbonMainWindow.h"
 #include "SARibbonBar.h"
 #include "SARibbonElementManager.h"
+#include "SARibbonButtonGroupWidget.h"
+
 // 为了避免使用此框架的app设置了全局的qpushbutton 的 qss样式影响此按钮，定义了一个类
 
 /**
@@ -22,10 +24,16 @@ public:
     int mCloseStretch { 4 };
     int mMaxStretch { 3 };
     int mMinStretch { 3 };
+    int mWindowButtonWidth { 35 };
     int mTitleBarHeight { 28 };
     Qt::WindowFlags mFlags { Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint };
+    SARibbonButtonGroupWidget* mButtonGroup;
+
+public:
     PrivateData(SAWindowButtonGroup* p) : q_ptr(p)
     {
+        mButtonGroup = new SARibbonButtonGroupWidget(p);
+        mButtonGroup->setObjectName("SAWindowButtonGroupToolBar");
     }
 
     void setupMinimizeButton(bool on)
@@ -39,9 +47,7 @@ public:
             }
             buttonMinimize = new SAWindowToolButton(par);
             buttonMinimize->setObjectName(QStringLiteral("SAMinimizeWindowButton"));
-            buttonMinimize->setFixedSize(30, par->height() - 2);
             buttonMinimize->setFocusPolicy(Qt::NoFocus);  // 避免铺抓到
-            //            buttonMinimize->setIconSize(buttonMinimize->size() * mIconscale);
             buttonMinimize->show();
             par->connect(buttonMinimize, &QAbstractButton::clicked, par, &SAWindowButtonGroup::minimizeWindow);
         } else {
@@ -64,7 +70,6 @@ public:
             }
             buttonMaximize = new SAWindowToolButton(par);
             buttonMaximize->setObjectName(QStringLiteral("SAMaximizeWindowButton"));
-            buttonMaximize->setFixedSize(30, par->height() - 2);
             buttonMaximize->setCheckable(true);
             buttonMaximize->setFocusPolicy(Qt::NoFocus);  // 避免铺抓到
             //            buttonMaximize->setIconSize(buttonMaximize->size() * mIconscale);
@@ -90,7 +95,6 @@ public:
             }
             buttonClose = new SAWindowToolButton(par);
             buttonClose->setObjectName(QStringLiteral("SACloseWindowButton"));
-            buttonClose->setFixedSize(40, par->height() - 2);
             buttonClose->setFocusPolicy(Qt::NoFocus);  // 避免铺抓到
             // buttonClose->setFlat(true);
             par->connect(buttonClose, &QAbstractButton::clicked, par, &SAWindowButtonGroup::closeWindow);
@@ -107,50 +111,48 @@ public:
 
     void updateSize()
     {
-        q_ptr->setFixedSize(sizeHint());
         resizeElement(q_ptr->size());
     }
 
     void resizeElement(QSize size)
     {
-        qreal tw = 0;
-
+        int x = size.width();
         if (buttonClose) {
-            tw += mCloseStretch;
+            int w = closeButtonWidthHint();
+            x -= w;
+            buttonClose->setGeometry(x, 0, w, size.height());
         }
         if (buttonMaximize) {
-            tw += mMaxStretch;
+            int w = maxButtonWidthHint();
+            x -= w;
+            buttonMaximize->setGeometry(x, 0, w, size.height());
         }
         if (buttonMinimize) {
-            tw += mMinStretch;
+            int w = minButtonWidthHint();
+            x -= w;
+            buttonMinimize->setGeometry(x, 0, w, size.height());
         }
-        // 调整按钮
+        if (mButtonGroup) {
+            mButtonGroup->setGeometry(0, 0, x, size.height());
+        }
+    }
 
-        int x = 0;
+    int closeButtonWidthHint() const
+    {
+        qreal t = mCloseStretch + mMaxStretch + mMinStretch;
+        return (mCloseStretch * (3 * mWindowButtonWidth)) / t;
+    }
 
-        if (buttonMinimize) {
-            int w = (mMinStretch / tw) * size.width();
-            // buttonMinimize->setGeometry(x, 0, w, size.height());
-            // 受到qss样式影响会导致最小宽度、高度设置不了，因此要设置fixsize再move
-            buttonMinimize->setFixedSize(w, size.height());
-            buttonMinimize->move(x, 0);
-            x += w;
-        }
-        if (buttonMaximize) {
-            int w = (mMaxStretch / tw) * size.width();
-            // buttonMaximize->setGeometry(x, 0, w, size.height());
-            // 受到qss样式影响会导致最小宽度、高度设置不了，因此要设置fixsize再move
-            buttonMaximize->setFixedSize(w, size.height());
-            buttonMaximize->move(x, 0);
-            x += w;
-        }
-        if (buttonClose) {
-            int w = size.width() - x;
-            // buttonClose->setGeometry(x, 0, w, size.height());
-            // 受到qss样式影响会导致最小宽度、高度设置不了，因此要设置fixsize再move
-            buttonClose->setFixedSize(w, size.height());
-            buttonClose->move(x, 0);
-        }
+    int maxButtonWidthHint() const
+    {
+        qreal t = mCloseStretch + mMaxStretch + mMinStretch;
+        return (mMaxStretch * (3 * mWindowButtonWidth)) / t;
+    }
+
+    int minButtonWidthHint() const
+    {
+        qreal t = mCloseStretch + mMaxStretch + mMinStretch;
+        return (mMinStretch * (3 * mWindowButtonWidth)) / t;
     }
 
     QSize sizeHint() const
@@ -159,27 +161,30 @@ public:
         if (height < 20) {
             height = 20;
         }
-        int btnWidth = mTitleBarHeight * 1.5;
-        int width(0);
+        QSize res(0, 0);
+        if (mButtonGroup) {
+            res = mButtonGroup->sizeHint();
+        }
+        res.setHeight(height);
         if (buttonClose) {
-            width += btnWidth;
+            res.setWidth(res.width() + closeButtonWidthHint());
         }
         if (buttonMaximize) {
-            width += btnWidth;
+            res.setWidth(res.width() + maxButtonWidthHint());
         }
         if (buttonMinimize) {
-            width += btnWidth;
+            res.setWidth(res.width() + minButtonWidthHint());
         }
-        return (QSize(width, height));
+        return res;
     }
 };
 
 //===================================================
 // SAWindowToolButton
 //===================================================
-SAWindowToolButton::SAWindowToolButton(QWidget* p) : QPushButton(p)
+SAWindowToolButton::SAWindowToolButton(QWidget* p) : QToolButton(p)
 {
-    setFlat(true);
+    setAutoRaise(true);
 }
 //===================================================
 // SAWindowButtonGroup
@@ -278,6 +283,24 @@ int SAWindowButtonGroup::windowTitleHeight() const
 }
 
 /**
+ * @brief 系统按钮的宽度
+ * @param w
+ */
+void SAWindowButtonGroup::setWindowButtonWidth(int w)
+{
+    d_ptr->mWindowButtonWidth = w;
+}
+
+/**
+ * @brief 系统按钮的宽度
+ * @param w
+ */
+int SAWindowButtonGroup::windowButtonWidth() const
+{
+    return d_ptr->mWindowButtonWidth;
+}
+
+/**
  * @brief 设置窗口状态（最大最小化按钮状态）
  * @param s
  */
@@ -331,6 +354,41 @@ QAbstractButton* SAWindowButtonGroup::maximizeButton() const
 QAbstractButton* SAWindowButtonGroup::closeButton() const
 {
     return d_ptr->buttonClose;
+}
+
+void SAWindowButtonGroup::setIconSize(const QSize& ic)
+{
+    d_ptr->mButtonGroup->setIconSize(ic);
+}
+
+QSize SAWindowButtonGroup::iconSize() const
+{
+    return d_ptr->mButtonGroup->iconSize();
+}
+
+QAction* SAWindowButtonGroup::addAction(QAction* a, Qt::ToolButtonStyle buttonStyle, QToolButton::ToolButtonPopupMode popMode)
+{
+    return d_ptr->mButtonGroup->addAction(a, buttonStyle, popMode);
+}
+
+QAction* SAWindowButtonGroup::addAction(const QString& text, const QIcon& icon, Qt::ToolButtonStyle buttonStyle, QToolButton::ToolButtonPopupMode popMode)
+{
+    return d_ptr->mButtonGroup->addAction(text, icon, buttonStyle, popMode);
+}
+
+QAction* SAWindowButtonGroup::addMenu(QMenu* menu, Qt::ToolButtonStyle buttonStyle, QToolButton::ToolButtonPopupMode popMode)
+{
+    return d_ptr->mButtonGroup->addMenu(menu, buttonStyle, popMode);
+}
+
+QAction* SAWindowButtonGroup::addSeparator()
+{
+    return d_ptr->mButtonGroup->addSeparator();
+}
+
+QAction* SAWindowButtonGroup::addWidget(QWidget* w)
+{
+    return d_ptr->mButtonGroup->addWidget(w);
 }
 
 void SAWindowButtonGroup::resizeEvent(QResizeEvent* e)

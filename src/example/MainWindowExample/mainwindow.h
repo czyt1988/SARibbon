@@ -34,6 +34,7 @@ private:
     void createContextCategoryPage2(SARibbonCategory* page);
     void createQuickAccessBar();
     void createRightButtonGroup();
+    void createWindowButtonGroupBar();
     // 创建ActionsManager，实现actions的管理以及SARibbonBar的自定义
     void createActionsManager();
     QAction* createAction(const QString& text, const QString& iconurl, const QString& objName);

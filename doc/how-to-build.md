@@ -1,3 +1,67 @@
+此文会详细介绍如何构建和引入SARibbon
+
+# 准备工作
+
+SARibbon使用了[QWindowkit](https://github.com/stdware/qwindowkit)作为无边框方案，同时也支持简单的无边框方案，如果你需要操作系统原生的窗口支持，如windows7以后的贴边处理，windows11的最大化按钮悬停的效果，建议开启[QWindowkit](https://github.com/stdware/qwindowkit)库，[QWindowkit](https://github.com/stdware/qwindowkit)库还能较好解决多屏幕移动问题
+
+如果你要依赖[QWindowkit](https://github.com/stdware/qwindowkit)库，需要先编译[QWindowkit](https://github.com/stdware/qwindowkit)库，[QWindowkit](https://github.com/stdware/qwindowkit)库作为SARibbon项目的submodules，如果在`git clone`时没有附带`--recursive`参数，需要执行`submodule update`命令:
+
+```shell
+git submodule update --init --recursive
+```
+
+# 编译QWindowkit库(如果不开启跳过此步)
+
+`QWindowkit`库只提供了cmake的编译方式，必须使用cmake
+
+为了简单，在`src/SARibbonBar/3rdparty`下提供了一个`CMakeLists.txt`文件，已经对此库的必要配置进行了设置，直接调用`src/SARibbonBar/3rdparty/CMakeLists.txt`文件编译即可
+
+使用Qt Creator和使用visual studio构建和安装基本一样
+
+## 使用Qt Creator构建和安装
+
+使用qt creator编译`QWindowkit`库，直接用qt creator打开`src/SARibbonBar/3rdparty/CMakeLists.txt`文件
+
+![](./pic/build-cmake-qwk-qtc-01.png)
+
+点击运行（Ctrl+R）
+
+![](./pic/build-cmake-qwk-qtc-02.png)
+
+切换到项目模式（Ctrl+5）
+
+build步骤选择install
+
+![](./pic/build-cmake-qwk-qtc-03.png)
+
+再点击运行（Ctrl+R）
+
+这时你会在SARibbon根目录下看到形如`bin_qt5.14.2_Debug_x64`这样的安装目录，这里自动把`QWindowkit`库安装在此目录下
+
+![](./pic/build-cmake-qwk-qtc-04.png)
+
+此时完成`QWindowkit`库的编译和安装
+
+## 使用visual studio构建和安装
+
+使用visual studio编译`QWindowkit`库，用visual studio打开->CMake，选择`src/SARibbonBar/3rdparty/CMakeLists.txt`文件
+
+![](./pic/build-cmake-vs-01.png)
+
+选中CMake菜单->全部生成
+
+![](./pic/build-cmake-vs-03.png)
+
+选中CMake菜单->安装
+
+![](./pic/build-cmake-vs-04.png)
+
+这时你会在SARibbon根目录下看到形如`bin_qt5.14.2_Debug_x64`这样的安装目录，这里自动把`QWindowkit`库安装在此目录下
+
+![](./pic/build-cmake-qwk-qtc-04.png)
+
+此时完成`QWindowkit`库的编译和安装
+
 # Cmake构建及使用SARibbon教程
 
 最近发现有许多使用visual studio（以下简称vs）咨询可以构建但无法引入的问题，为此，这里专门写此文针对此问题进行说明
