@@ -12,7 +12,7 @@
 // 为了避免使用此框架的app设置了全局的qpushbutton 的 qss样式影响此按钮，定义了一个类
 
 /**
- * @brief The SAWindowButtonGroupPrivate class
+ * @brief The SARibbonSystemButtonBar class
  */
 class SARibbonSystemButtonBar::PrivateData
 {
@@ -33,7 +33,7 @@ public:
     PrivateData(SARibbonSystemButtonBar* p) : q_ptr(p)
     {
         mButtonGroup = new SARibbonButtonGroupWidget(p);
-        mButtonGroup->setObjectName("SAWindowButtonGroupToolBar");
+        mButtonGroup->setObjectName("SASystemButtonGroup");
     }
 
     void setupMinimizeButton(bool on)
