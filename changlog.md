@@ -2,25 +2,26 @@
       
 ## 2024-01-09 -> 2.0.0
 
-- SARibbonCategory和SARibbonPannel可以通过qss定制
-- SARibbonPannel的文字使用SARibbonPannelLabel(QLabel)显示，可以通过qss进行自定义
-- SARibbonSeparatorWidget分割线也支持qss定制
-- SARibbonBar的样式RibbonStyle改为QFlags
-- SARibbonBar添加了相关的迭代函数，可快速遍历所有的category和pannel
+- `SARibbonCategory`和`SARibbonPannel`可以通过qss定制
+- `SARibbonPannel`的文字使用`SARibbonPannelLabel(QLabel)`显示，可以通过qss进行自定义
+- `SARibbonSeparatorWidget`分割线也支持qss定制
+- `SARibbonBar`的样式`RibbonStyle`改为`QFlags`
+- `SARibbonBar`添加了相关的迭代函数，可快速遍历所有的category和pannel
 - 尺寸的计算重新进行了调整
 - 默认的qss进行了重新调整，适用更多的屏幕尺寸
-- SARibbonBar添加了如下接口：
-  1.SARibbonBar::setCornerWidgetVisible 可以设置cornerwidget的显示隐藏与否
-  2.属性enableShowPannelTitle，控制是否显示pannel的标题
-  3.属性pannelTitleHeight，控制pannel标题栏高度
-  4.属性pannelLayoutMode，可控制pannel的布局方式
-  5.属性tabOnTitle，可控制tab放置在title栏上
-  6.titleBarHeight，tabBarHeight，categoryHeight这三个高度支持用户自定义，默认会根据字体大小计算
-  7.setTabBarBaseLineColor控制tabbar下基线颜色，某些主题需要设置颜色（窗口标题栏和category区域颜色一样的情况下如office 2013主题）可通过此函数设置，传入QColor()取消颜色
-- 添加了SARibbonBar::initHighDpi()静态函数，方便开启高分屏设置
-- 【注意】frameless库更换为qwindowkit(https://github.com/stdware/qwindowkit)，qwindowkit源码不作为项目一部分，使用git submodule管理，因此，项目clone下来后，需要执行`git submodule update --init --recursive`
-- 【注意】如果开启SARIBBON_USE_FRAMELESS_LIB（默认开启），需要先构建`qwindowkit`，目前`qwindowkit`不提供qmake，只提供cmake，编译完`qwindowkit`后，SARibbon支持qmake和cmake
-- SAMainWindow支持非ribbon模式
+- `SARibbonBar`添加了如下接口：
+  1.`SARibbonBar::setCornerWidgetVisible` 可以设置`cornerwidget`的显示隐藏与否
+  2.属性`enableShowPannelTitle`，控制是否显示pannel的标题
+  3.属性`pannelTitleHeight`，控制pannel标题栏高度
+  4.属性`pannelLayoutMode`，可控制pannel的布局方式
+  5.属性`tabOnTitle`，可控制tab放置在title栏上
+  6.`titleBarHeight`，`tabBarHeight`，`categoryHeight`这三个高度支持用户自定义，默认会根据字体大小计算
+  7.`setTabBarBaseLineColor`控制tabbar下基线颜色，某些主题需要设置颜色（窗口标题栏和category区域颜色一样的情况下如office 2013主题）可通过此函数设置，传入`QColor()`取消颜色
+- 添加了`SARibbonBar::initHighDpi()`静态函数，方便开启高分屏设置
+- 【注意】frameless库更换为qwindowkit(https://github.com/stdware/qwindowkit)，qwindowkit源码不作为项目一部分，使用`git submodule`管理，因此，项目clone下来后，需要执行`git submodule update --init --recursive`
+- 【注意】如果开启`SARIBBON_USE_FRAMELESS_LIB`（默认开启），需要先构建`qwindowkit`，目前`qwindowkit`不提供qmake，只提供cmake，编译完`qwindowkit`后，SARibbon支持qmake和cmake
+- `SARibbonMainWindow`支持非ribbon模式
+- 原`SAWindowButtonGroup`改名为`SARibbonSystemButtonGroupBar`，同时支持添加action
 
 【警告】编译过程会在当前目录下生成bin_qtx.x.x_Debug/Release_x64/86这样的文件夹，请确保有写入权限，否则会执行qmake或cmake过程报错
 
