@@ -64,7 +64,7 @@ SARibbonMainWindow::SARibbonMainWindow(QWidget* parent, bool useRibbon, const Qt
 {
     d_ptr->init();
     if (useRibbon) {
-        installRibbonBar(createRibbonBar());
+        setRibbonBar(createRibbonBar());
         setRibbonTheme(ribbonTheme());
     } else {
         setupNormalWindow();
@@ -231,16 +231,29 @@ SARibbonBar* SARibbonMainWindow::createRibbonBar()
 
 void SARibbonMainWindow::resizeEvent(QResizeEvent* event)
 {
-    SARibbonBar* bar = ribbonBar();
+    QMainWindow::resizeEvent(event);
+
+    SARibbonBar* bar        = ribbonBar();
+    SAWindowButtonGroup* wg = d_ptr->mWindowButtonGroup;
+
+    if (wg) {
+        if (bar) {
+            const int th = bar->titleBarHeight();
+            if (th != wg->height()) {
+                wg->setWindowTitleHeight(th);
+            }
+        }
+        QSize wgSizeHint = wg->sizeHint();
+        wg->setGeometry(frameGeometry().width() - wgSizeHint.width(), 0, wgSizeHint.width(), wgSizeHint.height());
+    }
     if (bar) {
+        if (wg) {
+            bar->setWindowButtonSize(wg->size());
+        }
         if (bar->size().width() != (this->size().width())) {
             bar->setFixedWidth(this->size().width());
         }
-        if (d_ptr->mWindowButtonGroup) {
-            bar->setWindowButtonSize(d_ptr->mWindowButtonGroup->size());
-        }
     }
-    QMainWindow::resizeEvent(event);
 }
 
 bool SARibbonMainWindow::event(QEvent* e)
@@ -260,7 +273,7 @@ bool SARibbonMainWindow::event(QEvent* e)
     return (QMainWindow::event(e));
 }
 
-void SARibbonMainWindow::installRibbonBar(SARibbonBar* bar)
+void SARibbonMainWindow::setRibbonBar(SARibbonBar* bar)
 {
     QWidget* old = QMainWindow::menuWidget();
     if (old) {
@@ -274,7 +287,8 @@ void SARibbonMainWindow::installRibbonBar(SARibbonBar* bar)
 
     // 设置window按钮
     if (nullptr == d_ptr->mWindowButtonGroup) {
-        d_ptr->mWindowButtonGroup = new SAWindowButtonGroup(this);
+        d_ptr->mWindowButtonGroup = RibbonSubElementDelegate->createWindowButtonGroup(this);
+        d_ptr->mWindowButtonGroup->updateWindowFlag();
     }
     d_ptr->mWindowButtonGroup->setWindowStates(windowState());
     d_ptr->mWindowButtonGroup->show();
@@ -284,6 +298,7 @@ void SARibbonMainWindow::installRibbonBar(SARibbonBar* bar)
     helper->setHitTestVisible(bar->applicationButton());    // IMPORTANT!
     helper->setHitTestVisible(bar->quickAccessBar());       // IMPORTANT!
     helper->setHitTestVisible(bar->ribbonStackedWidget());  // IMPORTANT!
+
 #else
 
     QMainWindow::setMenuWidget(bar);
@@ -295,7 +310,8 @@ void SARibbonMainWindow::installRibbonBar(SARibbonBar* bar)
     d_ptr->mFramelessHelper->setTitleHeight(bar->titleBarHeight());
     // 设置window按钮
     if (nullptr == d_ptr->mWindowButtonGroup) {
-        d_ptr->mWindowButtonGroup = new SAWindowButtonGroup(this);
+        d_ptr->mWindowButtonGroup = RibbonSubElementDelegate->createWindowButtonGroup(this);
+        d_ptr->mWindowButtonGroup->updateWindowFlag();
     }
     QSize s = d_ptr->mWindowButtonGroup->sizeHint();
     s.setHeight(bar->titleBarHeight());

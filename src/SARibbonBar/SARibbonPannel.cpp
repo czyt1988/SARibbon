@@ -146,13 +146,13 @@ void SARibbonPannel::PrivateData::setPannelName(const QString& title)
 // SARibbonPannel
 //==================================================
 
-SARibbonPannel::SARibbonPannel(QWidget* parent) : QWidget(parent), d_ptr(new SARibbonPannel::PrivateData(this))
+SARibbonPannel::SARibbonPannel(QWidget* parent) : QFrame(parent), d_ptr(new SARibbonPannel::PrivateData(this))
 {
     setPannelLayoutMode(ThreeRowMode);
 }
 
 SARibbonPannel::SARibbonPannel(const QString& name, QWidget* parent)
-    : QWidget(parent), d_ptr(new SARibbonPannel::PrivateData(this))
+    : QFrame(parent), d_ptr(new SARibbonPannel::PrivateData(this))
 {
     setPannelLayoutMode(ThreeRowMode);
     setPannelName(name);
@@ -446,14 +446,12 @@ SARibbonGallery* SARibbonPannel::addGallery(bool expanding)
  * @param top 上边距 @default 6
  * @param bottom 下边距 @default 6
  */
-QAction* SARibbonPannel::addSeparator(int top, int bottom)
+QAction* SARibbonPannel::addSeparator()
 {
     QAction* action = new QAction(this);
 
     action->setSeparator(true);
     setActionRowProportionProperty(action, SARibbonPannelItem::Large);
-    action->setProperty(SA_ActionPropertyName_SeparatorTop, top);
-    action->setProperty(SA_ActionPropertyName_SeparatorBottom, bottom);
     addAction(action);
     return (action);
 }

@@ -12,13 +12,13 @@
  * @def ribbon的数字版本 {MAJ}.MIN.PAT
  */
 #ifndef SA_RIBBON_BAR_VERSION_MAJ
-#define SA_RIBBON_BAR_VERSION_MAJ 2
+#define SA_RIBBON_BAR_VERSION_MAJ 1
 #endif
 /**
  * @def ribbon的数字版本 MAJ.{MIN}.PAT
  */
 #ifndef SA_RIBBON_BAR_VERSION_MIN
-#define SA_RIBBON_BAR_VERSION_MIN 0
+#define SA_RIBBON_BAR_VERSION_MIN 2
 #endif
 /**
  * @def ribbon的数字版本 MAJ.MIN.{PAT}
@@ -93,7 +93,6 @@ enum class SARibbonAlignment
 #endif
 #endif
 
-
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
 #ifndef SA_MOUSEEVENT_GLOBALPOS_POINT
 #define SA_MOUSEEVENT_GLOBALPOS_POINT(MouseEventPtr) MouseEventPtr->globalPosition().toPoint()
@@ -113,11 +112,6 @@ enum class SARibbonAlignment
 #define SA_HOVEREVENT_POS_POINT(HoverEventPtr) HoverEventPtr->pos()
 #endif
 #endif
-
-
-
-
-
 
 #ifndef SA_DEBUG_PRINT_SIZE_HINT
 /**

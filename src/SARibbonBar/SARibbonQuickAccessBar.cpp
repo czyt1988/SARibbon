@@ -74,19 +74,19 @@ const SARibbonButtonGroupWidget* SARibbonQuickAccessBar::buttonGroupWidget() con
 }
 
 /**
- * @brief 控件高度设置
- * @param h
+ * @brief 图标尺寸
+ * @param s
  */
-void SARibbonQuickAccessBar::setItemHeight(int h)
+void SARibbonQuickAccessBar::setIconSize(const QSize& s)
 {
-    d_ptr->groupWidget->setItemHeight(h);
+    d_ptr->groupWidget->setIconSize(s);
 }
 
 /**
- * @brief 控件高度
+ * @brief SARibbonQuickAccessBar::iconSize
  * @return
  */
-int SARibbonQuickAccessBar::itemHeight() const
+QSize SARibbonQuickAccessBar::iconSize() const
 {
-    return d_ptr->groupWidget->itemHeight();
+    return d_ptr->groupWidget->iconSize();
 }

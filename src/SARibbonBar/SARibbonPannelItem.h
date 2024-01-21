@@ -45,10 +45,4 @@ public:
 #ifndef SA_ActionPropertyName_ToolButtonStyle
 #define SA_ActionPropertyName_ToolButtonStyle "_sa_ToolButtonStyle"
 #endif
-#ifndef SA_ActionPropertyName_SeparatorTop
-#define SA_ActionPropertyName_SeparatorTop "_sa_SeparatorTop"
-#endif
-#ifndef SA_ActionPropertyName_SeparatorBottom
-#define SA_ActionPropertyName_SeparatorBottom "_sa_SeparatorBottom"
-#endif
 #endif  // SARIBBONPANNELITEM_H

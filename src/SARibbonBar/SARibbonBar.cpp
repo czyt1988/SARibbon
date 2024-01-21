@@ -64,11 +64,11 @@ public:
     QList< SARibbonContextCategory* > mContextCategoryList;  ///< 存放所有的上下文标签
     QList< _SARibbonTabData > mHidedCategory;
     int mIconRightBorderPosition { 1 };  ///< 标题栏x值得最小值，在有图标和快捷启动按钮，此值都需要变化
-    QAction* mMinimumCategoryButtonAction { nullptr };                                ///< 隐藏面板按钮action
-    SARibbonButtonGroupWidget* mRightButtonGroup { nullptr };                         ///< 在tab bar右边的按钮群
-    SARibbonQuickAccessBar* mQuickAccessBar { nullptr };                              ///< 快速响应栏
+    QAction* mMinimumCategoryButtonAction { nullptr };                                 ///< 隐藏面板按钮action
+    SARibbonButtonGroupWidget* mRightButtonGroup { nullptr };                          ///< 在tab bar右边的按钮群
+    SARibbonQuickAccessBar* mQuickAccessBar { nullptr };                               ///< 快速响应栏
     SARibbonBar::RibbonStyles mRibbonStyle { SARibbonBar::RibbonStyleLooseThreeRow };  ///< ribbon的风格
-    SARibbonBar::RibbonMode mCurrentRibbonMode { SARibbonBar::NormalRibbonMode };     ///< 记录当前模式
+    SARibbonBar::RibbonMode mCurrentRibbonMode { SARibbonBar::NormalRibbonMode };      ///< 记录当前模式
     QSize mWindowButtonSize;                    ///< 由SARibbonMainWindow告诉的windowbutton的尺寸
     QList< QColor > mContextCategoryColorList;  ///< contextCategory的色系
     int mContextCategoryColorListIndex { -1 };  ///< 记录contextCategory色系索引
@@ -76,8 +76,6 @@ public:
     QColor mTabBarBaseLineColor { QColor(186, 201, 219) };  ///< tabbar 底部会绘制一条线条，定义线条颜色
     Qt::Alignment mTitleAligment { Qt::AlignCenter };       ///< 标题对齐方式
     bool mIsTitleVisible { true };                          ///< 标题是否显示
-    bool mEnableUserDefineAccessBarIconSize { false };      ///< 允许用户自定义AccessBar的IconSize
-    bool mEnableUserDefineRightBarIconSize { false };       ///< 允许用户自定义RightBar的IconSize
     SARibbonAlignment mRibbonAlignment { SARibbonAlignment::AlignLeft };  ///< 对齐方式
     int mTitleBarHeight { 30 };                                           ///< 标题栏高度
     int mTabBarHeight { -1 };  ///< tabbar高度，默认为-1，-1的时候就是无效高度，这时高度由字体决定，用户调用setTabBarHeight后，设置的高度为正，则使用用户设定的高度，而不使用自动计算的高度
@@ -1646,66 +1644,6 @@ void SARibbonBar::setTitleVisible(bool on)
 bool SARibbonBar::isTitleVisible() const
 {
     return d_ptr->mIsTitleVisible;
-}
-
-/**
-   @brief 设置允许用户自定义AccessBar的icon size
-
-    若设置为true此时用户调用AccessBar的setIconSize是可接受的，否则iconsize大小将由SARibbonBar计算
-
-    默认为false
-
-   @param
- */
-void SARibbonBar::setEnableUserDefineAccessBarIconSize(bool on)
-{
-    d_ptr->mEnableUserDefineAccessBarIconSize = on;
-    if (!(d_ptr->mEnableUserDefineAccessBarIconSize)) {  // 允许用户自定义AccessBar的IconSize就不进入此条件重置大小
-        // 变更iconsize
-        QSize btnIconSize = PrivateData::calcIconSizeByHeight(titleBarHeight());
-        if (btnIconSize.height() != d_ptr->mQuickAccessBar->itemHeight()) {
-            d_ptr->mQuickAccessBar->setItemHeight(btnIconSize.height());
-        }
-    }
-}
-
-/**
-   @brief 是否允许用户自定义AccessBar的icon size
-   @return
- */
-bool SARibbonBar::isEnableUserDefineAccessBarIconSize() const
-{
-    return d_ptr->mEnableUserDefineAccessBarIconSize;
-}
-
-/**
-   @brief 是否允许用户自定义RightBar的icon size
-
-    若设置为true此时用户调用RightBar的setIconSize是可接受的，否则iconsize大小将由SARibbonBar计算
-
-    默认为false
-
-   @param on
- */
-void SARibbonBar::setEnableUserDefineRightBarIconSize(bool on)
-{
-    d_ptr->mEnableUserDefineRightBarIconSize = on;
-    // 变更iconsize
-    if (!(d_ptr->mEnableUserDefineRightBarIconSize)) {
-        QSize btnIconSize = PrivateData::calcIconSizeByHeight(titleBarHeight());
-        if (btnIconSize.height() != d_ptr->mRightButtonGroup->itemHeight()) {
-            d_ptr->mRightButtonGroup->setItemHeight(btnIconSize.height());
-        }
-    }
-}
-
-/**
-   @brief 是否允许用户自定义RightBar的icon size
-   @return
- */
-bool SARibbonBar::isEnableUserDefineRightBarIconSize() const
-{
-    return d_ptr->mEnableUserDefineRightBarIconSize;
 }
 
 /**

@@ -16,6 +16,8 @@ tmp-file
 .$*
 .vs
 
+.qtc_clangd
+
 # vscode 的隐藏文件
 .vscode
 
