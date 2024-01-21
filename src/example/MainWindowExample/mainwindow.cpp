@@ -19,6 +19,7 @@
 #include "SARibbonToolButton.h"
 #include "colorWidgets/SAColorGridWidget.h"
 #include "colorWidgets/SAColorPaletteGridWidget.h"
+#include "SAWindowButtonGroup.h"
 #include <QAbstractButton>
 #include <QAction>
 #include <QApplication>
@@ -149,6 +150,10 @@ MainWindow::MainWindow(QWidget* par)
     //! which can be obtained through the SARibbonBar::rightButtonGroup function
     createRightButtonGroup();
     PRINT_COST("add right bar");
+
+    //! cn:
+    //! 这里演示了如何在系统窗口最小化最大化关闭按钮旁边添加其他按钮
+    createWindowButtonGroupBar();
 
     //! cn:
     //! actionManager可以管理所有的action，并给SARibbon的自定义窗口使用,
@@ -356,12 +361,12 @@ void MainWindow::onActionCustomizeAndSaveWithApplyTriggered(bool b)
 	SARibbonCustomizeWidget* widgetForCustomize = new SARibbonCustomizeWidget(this, &dlg);
 	widgetForCustomize->setupActionsManager(mActionsManager);
 
-	main->addWidget(widgetForCustomize, 1);
+    main->addWidget(widgetForCustomize, 1);
 
     QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel
                                                        | QDialogButtonBox::Apply);
 
-	main->addWidget(buttonBox);
+    main->addWidget(buttonBox);
 
 	connect(buttonBox, &QDialogButtonBox::accepted, &dlg, &QDialog::accept);
 	connect(buttonBox, &QDialogButtonBox::rejected, &dlg, &QDialog::reject);
@@ -395,17 +400,17 @@ void MainWindow::onActionCustomizeAndSaveWithApplyTriggered(bool b)
 		xml.setAutoFormatting(true);
 		xml.setAutoFormattingIndent(2);
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)  // QXmlStreamWriter always encodes XML in UTF-8.
-		xml.setCodec("utf-8");
+        xml.setCodec("utf-8");
 #endif
-		xml.writeStartDocument();
-		bool isok = widgetForCustomize->toXml(&xml);
-		xml.writeEndDocument();
-		if (isok) {
-			QFile f("customize.xml");
-			if (f.open(QIODevice::ReadWrite | QIODevice::Text | QIODevice::Truncate)) {
-				QTextStream s(&f);
+        xml.writeStartDocument();
+        bool isok = widgetForCustomize->toXml(&xml);
+        xml.writeEndDocument();
+        if (isok) {
+            QFile f("customize.xml");
+            if (f.open(QIODevice::ReadWrite | QIODevice::Text | QIODevice::Truncate)) {
+                QTextStream s(&f);
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)  // QTextStream always encodes XML in UTF-8.
-				s.setCodec("utf-8");
+                s.setCodec("utf-8");
 #endif
 				s << str;
 				s.flush();
@@ -852,8 +857,8 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     SARibbonPannel* pannelWidgetTest = page->addPannel(tr("widget test"));
     pannelWidgetTest->setObjectName(QStringLiteral(u"pannelWidgetTest"));
 
-	SARibbonComboBox* com = new SARibbonComboBox(this);
-	com->setObjectName("SARibbonComboBox test");
+    SARibbonComboBox* com = new SARibbonComboBox(this);
+    com->setObjectName("SARibbonComboBox test");
     com->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
     com->setWindowTitle(tr("SARibbonComboBox test"));
     for (int i = 0; i < 40; ++i) {
@@ -1442,14 +1447,14 @@ void MainWindow::createQuickAccessBar()
     }
     quickAccessBar->addMenu(m1, Qt::ToolButtonIconOnly, QToolButton::InstantPopup);
 
-	QMenu* m2 = new QMenu("Presentation File 2", this);
-	m2->setIcon(QIcon(":/icon/icon/presentationFile.svg"));
-	for (int i = 0; i < 10; ++i) {
-		m2->addAction(createAction(QString("file%1").arg(i + 1), ":/icon/icon/file.svg"));
-	}
-	QAction* actiontestmenu = new QAction("Presentation File 2");
-	actiontestmenu->setMenu(m2);
-	quickAccessBar->addAction(actiontestmenu, Qt::ToolButtonIconOnly, QToolButton::MenuButtonPopup);
+    QMenu* m2 = new QMenu("Presentation File 2", this);
+    m2->setIcon(QIcon(":/icon/icon/presentationFile.svg"));
+    for (int i = 0; i < 10; ++i) {
+        m2->addAction(createAction(QString("file%1").arg(i + 1), ":/icon/icon/file.svg"));
+    }
+    QAction* actiontestmenu = new QAction("Presentation File 2");
+    actiontestmenu->setMenu(m2);
+    quickAccessBar->addAction(actiontestmenu, Qt::ToolButtonIconOnly, QToolButton::MenuButtonPopup);
 
     QAction* customize = createAction("customize", ":/icon/icon/customize0.svg", "customize2");
     quickAccessBar->addAction(customize);
@@ -1459,9 +1464,9 @@ void MainWindow::createQuickAccessBar()
     quickAccessBar->addAction(actionCustomizeAndSave);
     connect(actionCustomizeAndSave, &QAction::triggered, this, &MainWindow::onActionCustomizeAndSaveTriggered);
 
-	QAction* actionCustomizeAndSaveWithApply = createAction("customize and save with apply", ":/icon/icon/customize.svg");
-	quickAccessBar->addAction(actionCustomizeAndSaveWithApply);
-	connect(actionCustomizeAndSaveWithApply, &QAction::triggered, this, &MainWindow::onActionCustomizeAndSaveWithApplyTriggered);
+    QAction* actionCustomizeAndSaveWithApply = createAction("customize and save with apply", ":/icon/icon/customize.svg");
+    quickAccessBar->addAction(actionCustomizeAndSaveWithApply);
+    connect(actionCustomizeAndSaveWithApply, &QAction::triggered, this, &MainWindow::onActionCustomizeAndSaveWithApplyTriggered);
 
     //
     mSearchEditor = new SARibbonLineEdit(this);
@@ -1494,6 +1499,19 @@ void MainWindow::createRightButtonGroup()
     connect(mActionVisibleAll, &QAction::triggered, this, &MainWindow::onActionVisibleAllTriggered);
     rightBar->addAction(actionHelp);
     rightBar->addAction(mActionVisibleAll);
+}
+
+/**
+ * @brief 创建右上角系统最大、最小化按钮栏的图标工具
+ */
+void MainWindow::createWindowButtonGroupBar()
+{
+    SAWindowButtonGroup* wbar = windowButtonBar();
+    if (!wbar) {
+        return;
+    }
+    QAction* a = wbar->addAction(tr("Login"), QIcon(), Qt::ToolButtonTextOnly);
+    connect(a, &QAction::triggered, this, [ this ]() { this->mTextedit->append("Login triggered"); });
 }
 
 /**

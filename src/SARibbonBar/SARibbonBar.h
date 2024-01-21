@@ -13,7 +13,6 @@ class SARibbonTabBar;
 class SARibbonButtonGroupWidget;
 class SARibbonQuickAccessBar;
 class SARibbonStackedWidget;
-class SAWindowButtonGroup;
 
 /**
   @brief SARibbonBar继承于QMenuBar,在SARibbonMainWindow中直接替换了原来的QMenuBar

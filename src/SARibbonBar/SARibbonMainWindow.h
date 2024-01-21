@@ -68,8 +68,6 @@ public:
 #if !SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
     // 返回SAFramelessHelper
     SAFramelessHelper* framelessHelper();
-    // 把ribbonbar的事件传递到frameless
-    virtual bool eventFilter(QObject* obj, QEvent* e) Q_DECL_OVERRIDE;
 #else
     // 如果ribbon中有自定义的窗口在标题栏等非点击区域加入后，想能点击，需要调用此接口告知可点击
     void setFramelessHitTestVisible(const QWidget* w, bool visible = true);
@@ -83,6 +81,10 @@ public:
     RibbonTheme ribbonTheme() const;
     // 判断当前是否使用ribbon模式
     bool isUseRibbon() const;
+    // 把ribbonbar的事件传递到frameless
+    virtual bool eventFilter(QObject* obj, QEvent* e) Q_DECL_OVERRIDE;
+    // 获取最大化，最小化，关闭按钮所在的bar。可以通过此函数在最大最小化按钮旁边设置内容
+    SAWindowButtonGroup* windowButtonBar() const;
 
 protected:
     // 创建ribbonbar的工厂函数

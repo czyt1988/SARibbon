@@ -148,8 +148,12 @@ SAFramelessHelper* SARibbonMainWindow::framelessHelper()
     return (d_ptr->mFramelessHelper);
 }
 
+#endif
+
 bool SARibbonMainWindow::eventFilter(QObject* obj, QEvent* e)
 {
+#if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
+#else
     // 这个过滤是为了把ribbonBar上的动作传递到mainwindow，再传递到frameless，
     // 由于ribbonbar会遮挡掉frameless的区域，导致frameless无法捕获这些消息
     // 因此必须ribbonBar()->installEventFilter(this);
@@ -168,9 +172,19 @@ bool SARibbonMainWindow::eventFilter(QObject* obj, QEvent* e)
             break;
         }
     }
+#endif
     return (QMainWindow::eventFilter(obj, e));
 }
-#endif
+
+/**
+ * @brief 获取系统按钮组，可以在此基础上添加其他按钮
+ * @return
+ */
+SAWindowButtonGroup* SARibbonMainWindow::windowButtonBar() const
+{
+    return d_ptr->mWindowButtonGroup;
+}
+
 /**
  * @brief 此函数仅用于控制最小最大化和关闭按钮的显示
  */
@@ -291,9 +305,6 @@ void SARibbonMainWindow::resizeEvent(QResizeEvent* e)
             }
         }
         QSize wgSizeHint = wg->sizeHint();
-        // 需要先resize，有可能不能设置到对应的size，以设置后的size为准
-        wg->resize(wgSizeHint);
-        wgSizeHint = wg->size();
         wg->setGeometry(frameGeometry().width() - wgSizeHint.width(), 0, wgSizeHint.width(), wgSizeHint.height());
     }
     if (bar) {
