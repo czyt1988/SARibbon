@@ -1,7 +1,7 @@
 ﻿#ifndef SARIBBONCATEGORY_H
 #define SARIBBONCATEGORY_H
 #include "SARibbonGlobal.h"
-#include <QWidget>
+#include <QFrame>
 #include "SARibbonPannel.h"
 #include <QScopedPointer>
 #include <QPushButton>
@@ -16,7 +16,7 @@ class SARibbonCategoryLayout;
  * @note SARibbonCategory的windowTitle影响了其在SARibbonBar的标签显示，
  * 如果要改标签名字，直接调用SARibbonCategory的setWindowTitle函数
  */
-class SA_RIBBON_EXPORT SARibbonCategory : public QWidget
+class SA_RIBBON_EXPORT SARibbonCategory : public QFrame
 {
     Q_OBJECT
     SA_RIBBON_DECLARE_PRIVATE(SARibbonCategory)
@@ -112,6 +112,12 @@ public:
 
     // 此函数会遍历Category下的所有pannel,执行函数指针，函数指针返回false则停止迭代
     bool iterate(FpPannelIterate fp);
+signals:
+    /**
+     * @brief category标题发生了改变信号
+     * @param n
+     */
+    void categoryNameChanged(const QString& n);
 
 protected:
     virtual bool event(QEvent* e) Q_DECL_OVERRIDE;

@@ -1,13 +1,20 @@
 ﻿#ifndef SAWINDOWBUTTONGROUP_H
 #define SAWINDOWBUTTONGROUP_H
 #include "SARibbonGlobal.h"
-#include <QWidget>
-#include <QPushButton>
+#include <QFrame>
+#include <QToolButton>
 
-///
-/// \brief 窗口的最大最小化按钮
-///
-class SA_RIBBON_EXPORT SAWindowButtonGroup : public QWidget
+/**
+ * \brief 窗口的最大最小化按钮
+ * @note 内部有个SARibbonButtonGroupWidget，其ObjectName = SAWindowButtonGroupToolBar
+ * 如果需要qss，可以进行特化处理:
+ *
+ * @code
+ * SARibbonButtonGroupWidget#SAWindowButtonGroupToolBar
+ * @endcode
+ *
+ */
+class SA_RIBBON_EXPORT SAWindowButtonGroup : public QFrame
 {
     Q_OBJECT
     SA_RIBBON_DECLARE_PRIVATE(SAWindowButtonGroup)
@@ -18,26 +25,46 @@ public:
     void setupMinimizeButton(bool on);
     void setupMaximizeButton(bool on);
     void setupCloseButton(bool on);
+    // 以最顶层的widget的WindowFlag作为WindowFlag
     void updateWindowFlag();
     void updateWindowFlag(Qt::WindowFlags flags);
-
     // 设置按钮的宽度比例,最终按钮宽度将按照此比例进行设置
     void setButtonWidthStretch(int close = 4, int max = 3, int min = 3);
-
-    // 设置按钮的缩放比例
-    void setIconScale(qreal iconscale = 0.5);
-
+    // 标题栏高度
+    void setWindowTitleHeight(int h);
+    int windowTitleHeight() const;
+    // 设置标准系统按钮的宽度
+    void setWindowButtonWidth(int w);
+    int windowButtonWidth() const;
     // 设置Qt::WindowStates
     void setWindowStates(Qt::WindowStates s);
-
     // 仅获取按钮的状态
     Qt::WindowFlags windowButtonFlags() const;
+    // 三个标准系统窗口按钮
+    QAbstractButton* minimizeButton() const;
+    QAbstractButton* maximizeButton() const;
+    QAbstractButton* closeButton() const;
+
+    // 图标尺寸
+    void setIconSize(const QSize& ic);
+    QSize iconSize() const;
+    // 生成并添加一个action
+    QAction* addAction(QAction* a,
+                       Qt::ToolButtonStyle buttonStyle          = Qt::ToolButtonIconOnly,
+                       QToolButton::ToolButtonPopupMode popMode = QToolButton::DelayedPopup);
+    QAction* addAction(const QString& text,
+                       const QIcon& icon,
+                       Qt::ToolButtonStyle buttonStyle          = Qt::ToolButtonIconOnly,
+                       QToolButton::ToolButtonPopupMode popMode = QToolButton::DelayedPopup);
+    QAction* addMenu(QMenu* menu,
+                     Qt::ToolButtonStyle buttonStyle          = Qt::ToolButtonIconOnly,
+                     QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
+    QAction* addSeparator();
+    QAction* addWidget(QWidget* w);
 
     virtual QSize sizeHint() const Q_DECL_OVERRIDE;
 
 protected:
-    virtual bool eventFilter(QObject* watched, QEvent* e) Q_DECL_OVERRIDE;
-    virtual void parentResize();
     virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
 
 protected slots:
@@ -49,10 +76,11 @@ protected slots:
 /**
  * @brief The SAWindowToolButton class
  */
-class SAWindowToolButton : public QPushButton
+class SAWindowToolButton : public QToolButton
 {
     Q_OBJECT
 public:
     SAWindowToolButton(QWidget* p = nullptr);
 };
+
 #endif  // SAWINDOWBUTTONGROUP_H

@@ -37,7 +37,7 @@ public:
  * pannel的布局通过@ref SARibbonPannelLayout 来实现，如果有其他布局，可以通过继承@ref
  * SARibbonElementCreateDelegate::createRibbonPannel 函数返回带有自己布局的pannel，但你必须继承对应的虚函数
  */
-class SA_RIBBON_EXPORT SARibbonPannel : public QWidget
+class SA_RIBBON_EXPORT SARibbonPannel : public QFrame
 {
     Q_OBJECT
     SA_RIBBON_DECLARE_PRIVATE(SARibbonPannel)
@@ -113,7 +113,7 @@ public:
     SARibbonGallery* addGallery(bool expanding = true);
 
     // 添加分割线
-    QAction* addSeparator(int top = 6, int bottom = 6);
+    QAction* addSeparator();
 
     // 从pannel中把action对应的button提取出来，如果action没有对应的button，就返回nullptr
     SARibbonToolButton* actionToRibbonToolButton(QAction* action);

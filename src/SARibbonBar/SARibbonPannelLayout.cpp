@@ -368,9 +368,6 @@ SARibbonPannelItem* SARibbonPannelLayout::createItem(QAction* action, SARibbonPa
     } else if (action->isSeparator()) {
         SARibbonSeparatorWidget* sep = RibbonSubElementDelegate->createRibbonSeparatorWidget(pannel);
         widget                       = sep;
-        auto t                       = action->property(SA_ActionPropertyName_SeparatorTop).toInt();
-        auto b                       = action->property(SA_ActionPropertyName_SeparatorBottom).toInt();
-        sep->setTopBottomMargins(t, b);
     }
     // 不是widget，自动生成SARibbonToolbutton
     if (!widget) {

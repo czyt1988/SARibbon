@@ -91,6 +91,8 @@ public:
     bool isUseRibbon() const;
     // 获取左上角按钮组（最大化，最小化，关闭）
     SAWindowButtonGroup* windowButtonGroup() const;
+    // 安装ribbon
+    void setRibbonBar(SARibbonBar* bar);
 
 protected:
     // 创建ribbonbar的工厂函数
@@ -99,8 +101,6 @@ protected:
     virtual bool event(QEvent* e) Q_DECL_OVERRIDE;
 
 private:
-    // 安装ribbon
-    void installRibbonBar(SARibbonBar* bar);
     // 构建为普通窗口
     void setupNormalWindow();
 };

@@ -42,6 +42,8 @@ public:
     void updateItemGeometry();
 
     void doWheelEvent(QWheelEvent* event);
+    // 初始化
+    void init(SARibbonCategory* c);
 
 public:
     bool mEnableShowPannelTitle { true };  ///< 是否运行pannel的标题栏显示
@@ -159,8 +161,7 @@ void SARibbonCategory::PrivateData::updateItemGeometry()
     for (auto pannel : pannels) {
         pannel->updateItemGeometry();
     }
-    lay->invalidate();
-
+    lay->updateGeometryArr();
     return;
 }
 
@@ -201,22 +202,26 @@ void SARibbonCategory::PrivateData::doWheelEvent(QWheelEvent* event)
     }
 }
 
+void SARibbonCategory::PrivateData::init(SARibbonCategory* c)
+{
+    c->setLayout(new SARibbonCategoryLayout(c));
+    c->connect(c, &SARibbonCategory::windowTitleChanged, c, &SARibbonCategory::categoryNameChanged);
+}
+
 //----------------------------------------------------
 // SARibbonCategory
 //----------------------------------------------------
 
-SARibbonCategory::SARibbonCategory(QWidget* p) : QWidget(p), d_ptr(new SARibbonCategory::PrivateData(this))
+SARibbonCategory::SARibbonCategory(QWidget* p) : QFrame(p), d_ptr(new SARibbonCategory::PrivateData(this))
 {
-    setAttribute(Qt::WA_StyledBackground);
-    setLayout(new SARibbonCategoryLayout(this));
+    d_ptr->init(this);
 }
 
 SARibbonCategory::SARibbonCategory(const QString& name, QWidget* p)
-    : QWidget(p), d_ptr(new SARibbonCategory::PrivateData(this))
+    : QFrame(p), d_ptr(new SARibbonCategory::PrivateData(this))
 {
-    setAttribute(Qt::WA_StyledBackground);
-    setLayout(new SARibbonCategoryLayout(this));
     setCategoryName(name);
+    d_ptr->init(this);
 }
 
 SARibbonCategory::~SARibbonCategory()

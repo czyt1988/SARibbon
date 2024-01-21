@@ -15,6 +15,7 @@
 #include "SARibbonQuickAccessBar.h"
 #include "SARibbonPannelOptionButton.h"
 #include "SARibbonPannelLayout.h"
+#include "SAWindowButtonGroup.h"
 
 SARibbonElementFactory::SARibbonElementFactory()
 {
@@ -47,11 +48,6 @@ SARibbonContextCategory* SARibbonElementFactory::createRibbonContextCategory(QWi
 SARibbonPannel* SARibbonElementFactory::createRibbonPannel(QWidget* parent)
 {
     return (new SARibbonPannel(parent));
-}
-
-SARibbonSeparatorWidget* SARibbonElementFactory::createRibbonSeparatorWidget(int value, QWidget* parent)
-{
-    return (new SARibbonSeparatorWidget(value, parent));
 }
 
 SARibbonSeparatorWidget* SARibbonElementFactory::createRibbonSeparatorWidget(QWidget* parent)
@@ -97,6 +93,11 @@ SARibbonButtonGroupWidget* SARibbonElementFactory::craeteButtonGroupWidget(QWidg
 SARibbonQuickAccessBar* SARibbonElementFactory::createQuickAccessBar(QWidget* parent)
 {
     return (new SARibbonQuickAccessBar(parent));
+}
+
+SAWindowButtonGroup* SARibbonElementFactory::createWindowButtonGroup(QWidget* parent)
+{
+    return (new SAWindowButtonGroup(parent));
 }
 
 /**
