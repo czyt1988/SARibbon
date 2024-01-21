@@ -9,7 +9,7 @@
 #include <QWindowStateChangeEvent>
 #include <QScreen>
 
-#include "SAWindowButtonGroup.h"
+#include "SARibbonSystemButtonBar.h"
 #if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
 #include <QWKWidgets/widgetwindowagent.h>
 #include "SARibbonButtonGroupWidget.h"
@@ -32,7 +32,7 @@ public:
 
 public:
     SARibbonMainWindow::RibbonTheme mCurrentRibbonTheme { SARibbonMainWindow::RibbonThemeOffice2021Blue };
-    SAWindowButtonGroup* mWindowButtonGroup { nullptr };
+    SARibbonSystemButtonBar* mWindowButtonGroup { nullptr };
 #if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
     QWK::WidgetWindowAgent* mFramelessHelper { nullptr };
 #else
@@ -98,7 +98,7 @@ void SARibbonMainWindow::setRibbonBar(SARibbonBar* bar)
     if (nullptr == d_ptr->mWindowButtonGroup) {
         d_ptr->mWindowButtonGroup = RibbonSubElementFactory->createWindowButtonGroup(this);
     }
-    SAWindowButtonGroup* wg = d_ptr->mWindowButtonGroup;
+    SARibbonSystemButtonBar* wg = d_ptr->mWindowButtonGroup;
     wg->setWindowStates(windowState());
     wg->setWindowTitleHeight(th);
     wg->show();
@@ -180,7 +180,7 @@ bool SARibbonMainWindow::eventFilter(QObject* obj, QEvent* e)
  * @brief 获取系统按钮组，可以在此基础上添加其他按钮
  * @return
  */
-SAWindowButtonGroup* SARibbonMainWindow::windowButtonBar() const
+SARibbonSystemButtonBar* SARibbonMainWindow::windowButtonBar() const
 {
     return d_ptr->mWindowButtonGroup;
 }
@@ -190,7 +190,7 @@ SAWindowButtonGroup* SARibbonMainWindow::windowButtonBar() const
  */
 void SARibbonMainWindow::updateWindowFlag(Qt::WindowFlags flags)
 {
-    if (SAWindowButtonGroup* g = d_ptr->mWindowButtonGroup) {
+    if (SARibbonSystemButtonBar* g = d_ptr->mWindowButtonGroup) {
         g->updateWindowFlag(flags);
     }
 }
@@ -295,7 +295,7 @@ void SARibbonMainWindow::resizeEvent(QResizeEvent* e)
 {
     QMainWindow::resizeEvent(e);
     SARibbonBar* bar        = ribbonBar();
-    SAWindowButtonGroup* wg = d_ptr->mWindowButtonGroup;
+    SARibbonSystemButtonBar* wg = d_ptr->mWindowButtonGroup;
 
     if (wg) {
         if (bar) {
@@ -322,7 +322,7 @@ void SARibbonMainWindow::changeEvent(QEvent* e)
     if (e) {
         switch (e->type()) {
         case QEvent::WindowStateChange: {
-            if (SAWindowButtonGroup* wg = d_ptr->mWindowButtonGroup) {
+            if (SARibbonSystemButtonBar* wg = d_ptr->mWindowButtonGroup) {
                 wg->setWindowStates(windowState());
             }
         } break;

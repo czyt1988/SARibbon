@@ -8,7 +8,7 @@ class SAFramelessHelper;
 #endif
 
 class SARibbonBar;
-class SAWindowButtonGroup;
+class SARibbonSystemButtonBar;
 class QScreen;
 /**
  * @brief 如果要使用SARibbonBar，必须使用此类代替QMainWindow
@@ -84,7 +84,7 @@ public:
     // 把ribbonbar的事件传递到frameless
     virtual bool eventFilter(QObject* obj, QEvent* e) Q_DECL_OVERRIDE;
     // 获取最大化，最小化，关闭按钮所在的bar。可以通过此函数在最大最小化按钮旁边设置内容
-    SAWindowButtonGroup* windowButtonBar() const;
+    SARibbonSystemButtonBar* windowButtonBar() const;
 
 protected:
     // 创建ribbonbar的工厂函数

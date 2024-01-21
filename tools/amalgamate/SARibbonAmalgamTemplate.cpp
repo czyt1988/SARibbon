@@ -27,7 +27,7 @@
 //sa ribbon
 #include "../../src/SARibbonBar/SAFramelessHelper.cpp"
 #include "../../src/SARibbonBar/SARibbonApplicationButton.cpp"
-#include "../../src/SARibbonBar/SAWindowButtonGroup.cpp"
+#include "../../src/SARibbonBar/SARibbonSystemButtonBar.cpp"
 #include "../../src/SARibbonBar/SARibbonToolButton.cpp"
 #include "../../src/SARibbonBar/SARibbonColorToolButton.cpp"
 #include "../../src/SARibbonBar/SARibbonLineWidgetContainer.cpp"

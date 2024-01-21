@@ -19,7 +19,7 @@
 #include "SARibbonToolButton.h"
 #include "colorWidgets/SAColorGridWidget.h"
 #include "colorWidgets/SAColorPaletteGridWidget.h"
-#include "SAWindowButtonGroup.h"
+#include "SARibbonSystemButtonBar.h"
 #include <QAbstractButton>
 #include <QAction>
 #include <QApplication>
@@ -1506,7 +1506,7 @@ void MainWindow::createRightButtonGroup()
  */
 void MainWindow::createWindowButtonGroupBar()
 {
-    SAWindowButtonGroup* wbar = windowButtonBar();
+    SARibbonSystemButtonBar* wbar = windowButtonBar();
     if (!wbar) {
         return;
     }
