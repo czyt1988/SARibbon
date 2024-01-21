@@ -1,4 +1,4 @@
-﻿#include "SAWindowButtonGroup.h"
+﻿#include "SARibbonSystemButtonBar.h"
 #include <QToolButton>
 #include <QResizeEvent>
 #include <QStyle>
@@ -14,13 +14,13 @@
 /**
  * @brief The SAWindowButtonGroupPrivate class
  */
-class SAWindowButtonGroup::PrivateData
+class SARibbonSystemButtonBar::PrivateData
 {
-    SA_RIBBON_DECLARE_PUBLIC(SAWindowButtonGroup)
+    SA_RIBBON_DECLARE_PUBLIC(SARibbonSystemButtonBar)
 public:
-    SAWindowToolButton* buttonClose { nullptr };
-    SAWindowToolButton* buttonMinimize { nullptr };
-    SAWindowToolButton* buttonMaximize { nullptr };
+    SARibbonSystemToolButton* buttonClose { nullptr };
+    SARibbonSystemToolButton* buttonMinimize { nullptr };
+    SARibbonSystemToolButton* buttonMaximize { nullptr };
     int mCloseStretch { 4 };
     int mMaxStretch { 3 };
     int mMinStretch { 3 };
@@ -30,7 +30,7 @@ public:
     SARibbonButtonGroupWidget* mButtonGroup;
 
 public:
-    PrivateData(SAWindowButtonGroup* p) : q_ptr(p)
+    PrivateData(SARibbonSystemButtonBar* p) : q_ptr(p)
     {
         mButtonGroup = new SARibbonButtonGroupWidget(p);
         mButtonGroup->setObjectName("SAWindowButtonGroupToolBar");
@@ -38,18 +38,18 @@ public:
 
     void setupMinimizeButton(bool on)
     {
-        SAWindowButtonGroup* par = q_ptr;
+        SARibbonSystemButtonBar* par = q_ptr;
 
         if (on) {
             if (buttonMinimize) {
                 buttonMinimize->deleteLater();
                 buttonMinimize = nullptr;
             }
-            buttonMinimize = new SAWindowToolButton(par);
+            buttonMinimize = new SARibbonSystemToolButton(par);
             buttonMinimize->setObjectName(QStringLiteral("SAMinimizeWindowButton"));
             buttonMinimize->setFocusPolicy(Qt::NoFocus);  // 避免铺抓到
             buttonMinimize->show();
-            par->connect(buttonMinimize, &QAbstractButton::clicked, par, &SAWindowButtonGroup::minimizeWindow);
+            par->connect(buttonMinimize, &QAbstractButton::clicked, par, &SARibbonSystemButtonBar::minimizeWindow);
         } else {
             if (buttonMinimize) {
                 delete buttonMinimize;
@@ -61,20 +61,20 @@ public:
 
     void setupMaximizeButton(bool on)
     {
-        SAWindowButtonGroup* par = q_ptr;
+        SARibbonSystemButtonBar* par = q_ptr;
 
         if (on) {
             if (buttonMaximize) {
                 buttonMaximize->deleteLater();
                 buttonMaximize = nullptr;
             }
-            buttonMaximize = new SAWindowToolButton(par);
+            buttonMaximize = new SARibbonSystemToolButton(par);
             buttonMaximize->setObjectName(QStringLiteral("SAMaximizeWindowButton"));
             buttonMaximize->setCheckable(true);
             buttonMaximize->setFocusPolicy(Qt::NoFocus);  // 避免铺抓到
             //            buttonMaximize->setIconSize(buttonMaximize->size() * mIconscale);
             buttonMaximize->show();
-            par->connect(buttonMaximize, &QAbstractButton::clicked, par, &SAWindowButtonGroup::maximizeWindow);
+            par->connect(buttonMaximize, &QAbstractButton::clicked, par, &SARibbonSystemButtonBar::maximizeWindow);
         } else {
             if (buttonMaximize) {
                 delete buttonMaximize;
@@ -86,18 +86,18 @@ public:
 
     void setupCloseButton(bool on)
     {
-        SAWindowButtonGroup* par = q_ptr;
+        SARibbonSystemButtonBar* par = q_ptr;
 
         if (on) {
             if (buttonClose) {
                 buttonClose->deleteLater();
                 buttonClose = nullptr;
             }
-            buttonClose = new SAWindowToolButton(par);
+            buttonClose = new SARibbonSystemToolButton(par);
             buttonClose->setObjectName(QStringLiteral("SACloseWindowButton"));
             buttonClose->setFocusPolicy(Qt::NoFocus);  // 避免铺抓到
             // buttonClose->setFlat(true);
-            par->connect(buttonClose, &QAbstractButton::clicked, par, &SAWindowButtonGroup::closeWindow);
+            par->connect(buttonClose, &QAbstractButton::clicked, par, &SARibbonSystemButtonBar::closeWindow);
             //            buttonClose->setIconSize(buttonClose->size() * mIconscale);
             buttonClose->show();
         } else {
@@ -180,17 +180,17 @@ public:
 };
 
 //===================================================
-// SAWindowToolButton
+// SARibbonSystemToolButton
 //===================================================
-SAWindowToolButton::SAWindowToolButton(QWidget* p) : QToolButton(p)
+SARibbonSystemToolButton::SARibbonSystemToolButton(QWidget* p) : QToolButton(p)
 {
     setAutoRaise(true);
 }
 //===================================================
-// SAWindowButtonGroup
+// SARibbonSystemButtonBar
 //===================================================
-SAWindowButtonGroup::SAWindowButtonGroup(QWidget* parent)
-    : QFrame(parent), d_ptr(new SAWindowButtonGroup::PrivateData(this))
+SARibbonSystemButtonBar::SARibbonSystemButtonBar(QWidget* parent)
+    : QFrame(parent), d_ptr(new SARibbonSystemButtonBar::PrivateData(this))
 {
     updateWindowFlag();
 }
@@ -200,33 +200,33 @@ SAWindowButtonGroup::SAWindowButtonGroup(QWidget* parent)
  * @param parent
  * @param flags
  */
-SAWindowButtonGroup::SAWindowButtonGroup(QWidget* parent, Qt::WindowFlags flags)
-    : QFrame(parent), d_ptr(new SAWindowButtonGroup::PrivateData(this))
+SARibbonSystemButtonBar::SARibbonSystemButtonBar(QWidget* parent, Qt::WindowFlags flags)
+    : QFrame(parent), d_ptr(new SARibbonSystemButtonBar::PrivateData(this))
 {
     d_ptr->mFlags = flags;
     updateWindowFlag();
 }
 
-SAWindowButtonGroup::~SAWindowButtonGroup()
+SARibbonSystemButtonBar::~SARibbonSystemButtonBar()
 {
 }
 
-void SAWindowButtonGroup::setupMinimizeButton(bool on)
+void SARibbonSystemButtonBar::setupMinimizeButton(bool on)
 {
     d_ptr->setupMinimizeButton(on);
 }
 
-void SAWindowButtonGroup::setupMaximizeButton(bool on)
+void SARibbonSystemButtonBar::setupMaximizeButton(bool on)
 {
     d_ptr->setupMaximizeButton(on);
 }
 
-void SAWindowButtonGroup::setupCloseButton(bool on)
+void SARibbonSystemButtonBar::setupCloseButton(bool on)
 {
     d_ptr->setupCloseButton(on);
 }
 
-void SAWindowButtonGroup::updateWindowFlag()
+void SARibbonSystemButtonBar::updateWindowFlag()
 {
     QWidget* topedWidget = this;
     // 找到最顶层窗口
@@ -241,7 +241,7 @@ void SAWindowButtonGroup::updateWindowFlag()
  * @brief 此函数仅用于控制最小最大化和关闭按钮的显示
  * @param flags
  */
-void SAWindowButtonGroup::updateWindowFlag(Qt::WindowFlags flags)
+void SARibbonSystemButtonBar::updateWindowFlag(Qt::WindowFlags flags)
 {
     d_ptr->mFlags = flags;
     setupMinimizeButton(flags & Qt::WindowMinimizeButtonHint);
@@ -255,7 +255,7 @@ void SAWindowButtonGroup::updateWindowFlag(Qt::WindowFlags flags)
  * @param max 最大化按钮比例
  * @param min 最小化按钮比例
  */
-void SAWindowButtonGroup::setButtonWidthStretch(int close, int max, int min)
+void SARibbonSystemButtonBar::setButtonWidthStretch(int close, int max, int min)
 {
     d_ptr->mMaxStretch   = max;
     d_ptr->mMinStretch   = min;
@@ -268,7 +268,7 @@ void SAWindowButtonGroup::setButtonWidthStretch(int close, int max, int min)
  * 标题栏高度会影响sizeHint
  * @param h
  */
-void SAWindowButtonGroup::setWindowTitleHeight(int h)
+void SARibbonSystemButtonBar::setWindowTitleHeight(int h)
 {
     d_ptr->mTitleBarHeight = h;
 }
@@ -277,7 +277,7 @@ void SAWindowButtonGroup::setWindowTitleHeight(int h)
  * @brief 标题栏高度
  * @return
  */
-int SAWindowButtonGroup::windowTitleHeight() const
+int SARibbonSystemButtonBar::windowTitleHeight() const
 {
     return d_ptr->mTitleBarHeight;
 }
@@ -286,7 +286,7 @@ int SAWindowButtonGroup::windowTitleHeight() const
  * @brief 系统按钮的宽度
  * @param w
  */
-void SAWindowButtonGroup::setWindowButtonWidth(int w)
+void SARibbonSystemButtonBar::setWindowButtonWidth(int w)
 {
     d_ptr->mWindowButtonWidth = w;
 }
@@ -295,7 +295,7 @@ void SAWindowButtonGroup::setWindowButtonWidth(int w)
  * @brief 系统按钮的宽度
  * @param w
  */
-int SAWindowButtonGroup::windowButtonWidth() const
+int SARibbonSystemButtonBar::windowButtonWidth() const
 {
     return d_ptr->mWindowButtonWidth;
 }
@@ -304,7 +304,7 @@ int SAWindowButtonGroup::windowButtonWidth() const
  * @brief 设置窗口状态（最大最小化按钮状态）
  * @param s
  */
-void SAWindowButtonGroup::setWindowStates(Qt::WindowStates s)
+void SARibbonSystemButtonBar::setWindowStates(Qt::WindowStates s)
 {
     if (d_ptr->buttonMaximize) {
         bool on = s.testFlag(Qt::WindowMaximized);
@@ -319,7 +319,7 @@ void SAWindowButtonGroup::setWindowStates(Qt::WindowStates s)
  *
  * @return
  */
-Qt::WindowFlags SAWindowButtonGroup::windowButtonFlags() const
+Qt::WindowFlags SARibbonSystemButtonBar::windowButtonFlags() const
 {
     Qt::WindowFlags f = Qt::Widget;  // widget是000
 
@@ -336,82 +336,82 @@ Qt::WindowFlags SAWindowButtonGroup::windowButtonFlags() const
     return (f);
 }
 
-QSize SAWindowButtonGroup::sizeHint() const
+QSize SARibbonSystemButtonBar::sizeHint() const
 {
     return (d_ptr->sizeHint());
 }
 
-QAbstractButton* SAWindowButtonGroup::minimizeButton() const
+QAbstractButton* SARibbonSystemButtonBar::minimizeButton() const
 {
     return d_ptr->buttonMinimize;
 }
 
-QAbstractButton* SAWindowButtonGroup::maximizeButton() const
+QAbstractButton* SARibbonSystemButtonBar::maximizeButton() const
 {
     return d_ptr->buttonMaximize;
 }
 
-QAbstractButton* SAWindowButtonGroup::closeButton() const
+QAbstractButton* SARibbonSystemButtonBar::closeButton() const
 {
     return d_ptr->buttonClose;
 }
 
-void SAWindowButtonGroup::setIconSize(const QSize& ic)
+void SARibbonSystemButtonBar::setIconSize(const QSize& ic)
 {
     d_ptr->mButtonGroup->setIconSize(ic);
 }
 
-QSize SAWindowButtonGroup::iconSize() const
+QSize SARibbonSystemButtonBar::iconSize() const
 {
     return d_ptr->mButtonGroup->iconSize();
 }
 
-QAction* SAWindowButtonGroup::addAction(QAction* a, Qt::ToolButtonStyle buttonStyle, QToolButton::ToolButtonPopupMode popMode)
+QAction* SARibbonSystemButtonBar::addAction(QAction* a, Qt::ToolButtonStyle buttonStyle, QToolButton::ToolButtonPopupMode popMode)
 {
     return d_ptr->mButtonGroup->addAction(a, buttonStyle, popMode);
 }
 
-QAction* SAWindowButtonGroup::addAction(const QString& text, const QIcon& icon, Qt::ToolButtonStyle buttonStyle, QToolButton::ToolButtonPopupMode popMode)
+QAction* SARibbonSystemButtonBar::addAction(const QString& text, const QIcon& icon, Qt::ToolButtonStyle buttonStyle, QToolButton::ToolButtonPopupMode popMode)
 {
     return d_ptr->mButtonGroup->addAction(text, icon, buttonStyle, popMode);
 }
 
-QAction* SAWindowButtonGroup::addMenu(QMenu* menu, Qt::ToolButtonStyle buttonStyle, QToolButton::ToolButtonPopupMode popMode)
+QAction* SARibbonSystemButtonBar::addMenu(QMenu* menu, Qt::ToolButtonStyle buttonStyle, QToolButton::ToolButtonPopupMode popMode)
 {
     return d_ptr->mButtonGroup->addMenu(menu, buttonStyle, popMode);
 }
 
-QAction* SAWindowButtonGroup::addSeparator()
+QAction* SARibbonSystemButtonBar::addSeparator()
 {
     return d_ptr->mButtonGroup->addSeparator();
 }
 
-QAction* SAWindowButtonGroup::addWidget(QWidget* w)
+QAction* SARibbonSystemButtonBar::addWidget(QWidget* w)
 {
     return d_ptr->mButtonGroup->addWidget(w);
 }
 
-void SAWindowButtonGroup::resizeEvent(QResizeEvent* e)
+void SARibbonSystemButtonBar::resizeEvent(QResizeEvent* e)
 {
     Q_UNUSED(e);
     d_ptr->resizeElement(size());
 }
 
-void SAWindowButtonGroup::closeWindow()
+void SARibbonSystemButtonBar::closeWindow()
 {
     if (parentWidget()) {
         parentWidget()->close();
     }
 }
 
-void SAWindowButtonGroup::minimizeWindow()
+void SARibbonSystemButtonBar::minimizeWindow()
 {
     if (parentWidget()) {
         parentWidget()->showMinimized();
     }
 }
 
-void SAWindowButtonGroup::maximizeWindow()
+void SARibbonSystemButtonBar::maximizeWindow()
 {
     QWidget* par = parentWidget();
 

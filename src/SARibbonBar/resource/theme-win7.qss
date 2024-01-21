@@ -347,52 +347,52 @@ SARibbonCategoryScrollButton[arrowType="4"] {
   border-left-width: 1px;
 }
 
-/*SAWindowToolButton*/
+/*SARibbonSystemToolButton*/
 
-SAWindowToolButton {
+SARibbonSystemToolButton {
   background-color: transparent;
   border:none;
 }
 
-SAWindowToolButton:focus {
+SARibbonSystemToolButton:focus {
   outline: none;
 }
 /*Min*/
-SAWindowToolButton#SAMinimizeWindowButton {
+SARibbonSystemToolButton#SAMinimizeWindowButton {
   background-position:center;
   background-repeat: no-repeat;
   background-image: url(:/image/resource/Titlebar_Min.svg);
 }
-SAWindowToolButton#SAMinimizeWindowButton:hover{
+SARibbonSystemToolButton#SAMinimizeWindowButton:hover{
   background-color: #f5f6f6;
 }
-SAWindowToolButton#SAMinimizeWindowButton:pressed{
+SARibbonSystemToolButton#SAMinimizeWindowButton:pressed{
   background-color: #cacacb;
 }
 /*Max*/
-SAWindowToolButton#SAMaximizeWindowButton {
+SARibbonSystemToolButton#SAMaximizeWindowButton {
     background-position:center;
     background-repeat: no-repeat;
     background-image: url(:/image/resource/Titlebar_Max.svg);
 }
-SAWindowToolButton#SAMaximizeWindowButton:hover {
+SARibbonSystemToolButton#SAMaximizeWindowButton:hover {
     background-color: #f5f6f6;
 }
-SAWindowToolButton#SAMaximizeWindowButton:checked {
+SARibbonSystemToolButton#SAMaximizeWindowButton:checked {
     background-image: url(:/image/resource/Titlebar_Normal.svg) center;
 }
 
 
 /*Close*/
-SAWindowToolButton#SACloseWindowButton {
+SARibbonSystemToolButton#SACloseWindowButton {
     background-position:center;
     background-repeat: no-repeat;
     background-image: url(:/image/resource/Titlebar_Close.svg);
 }
-SAWindowToolButton#SACloseWindowButton:hover {
+SARibbonSystemToolButton#SACloseWindowButton:hover {
   background-color: #e81123;
 }
-SAWindowToolButton#SACloseWindowButton:pressed {
+SARibbonSystemToolButton#SACloseWindowButton:pressed {
     background-color: #f1707a;
 }
 

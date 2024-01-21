@@ -24,7 +24,7 @@ class SARibbonButtonGroupWidget;
 class SARibbonStackedWidget;
 class SARibbonQuickAccessBar;
 class SARibbonPannelOptionButton;
-class SAWindowButtonGroup;
+class SARibbonSystemButtonBar;
 
 ///
 /// \brief SARibbon的子元素创建的工厂，SARibbon内部创建子元素都通过SARibbonElementFactory来创建
@@ -51,7 +51,7 @@ public:
     virtual SARibbonStackedWidget* createRibbonStackedWidget(SARibbonBar* parent);
     virtual SARibbonButtonGroupWidget* craeteButtonGroupWidget(QWidget* parent);
     virtual SARibbonQuickAccessBar* createQuickAccessBar(QWidget* parent);
-    virtual SAWindowButtonGroup* createWindowButtonGroup(QWidget* parent);
+    virtual SARibbonSystemButtonBar* createWindowButtonGroup(QWidget* parent);
     virtual SARibbonPannelOptionButton* createRibbonPannelOptionButton(SARibbonPannel* pannel);
 };
 

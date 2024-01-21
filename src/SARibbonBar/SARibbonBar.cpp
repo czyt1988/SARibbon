@@ -4,7 +4,7 @@
 #include "SARibbonQuickAccessBar.h"
 #include "SARibbonStackedWidget.h"
 #include "SARibbonTabBar.h"
-#include "SAWindowButtonGroup.h"
+#include "SARibbonSystemButtonBar.h"
 #include <QPointer>
 #include <QAction>
 #include <QApplication>

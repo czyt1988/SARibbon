@@ -9,7 +9,7 @@
 //sa ribbon
 #include "../../src/SARibbonBar/SAFramelessHelper.h"
 #include "../../src/SARibbonBar/SARibbonApplicationButton.h"
-#include "../../src/SARibbonBar/SAWindowButtonGroup.h"
+#include "../../src/SARibbonBar/SARibbonSystemButtonBar.h"
 #include "../../src/SARibbonBar/SARibbonToolButton.h"
 #include "../../src/SARibbonBar/SARibbonColorToolButton.h"
 #include "../../src/SARibbonBar/SARibbonLineWidgetContainer.h"

@@ -38,7 +38,7 @@ SET(SARIBBON_HEADER_FILES
     SARibbonCustomizeDialog.h
     SARibbonCustomizeWidget.h
     SARibbonMainWindow.h
-    SAWindowButtonGroup.h
+    SARibbonSystemButtonBar.h
     SARibbonApplicationButton.h
     SARibbonTabBar.h
     SARibbonCategory.h
@@ -79,7 +79,7 @@ SET(SARIBBON_SOURCE_FILES
     SARibbonCustomizeDialog.cpp
     SARibbonCustomizeWidget.cpp
     SARibbonMainWindow.cpp
-    SAWindowButtonGroup.cpp
+    SARibbonSystemButtonBar.cpp
     SARibbonApplicationButton.cpp
     SARibbonTabBar.cpp
     SARibbonCategory.cpp
@@ -106,7 +106,6 @@ SET(SARIBBON_SOURCE_FILES
     SARibbonPannelLayout.cpp
     SARibbonPannelItem.cpp
     SARibbonLineWidgetContainer.cpp
-    SARibbonColorToolButton.cpp
 )
 
 # resource files

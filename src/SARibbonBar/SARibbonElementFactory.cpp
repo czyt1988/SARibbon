@@ -15,7 +15,7 @@
 #include "SARibbonQuickAccessBar.h"
 #include "SARibbonPannelOptionButton.h"
 #include "SARibbonPannelLayout.h"
-#include "SAWindowButtonGroup.h"
+#include "SARibbonSystemButtonBar.h"
 
 SARibbonElementFactory::SARibbonElementFactory()
 {
@@ -95,9 +95,9 @@ SARibbonQuickAccessBar* SARibbonElementFactory::createQuickAccessBar(QWidget* pa
     return (new SARibbonQuickAccessBar(parent));
 }
 
-SAWindowButtonGroup* SARibbonElementFactory::createWindowButtonGroup(QWidget* parent)
+SARibbonSystemButtonBar* SARibbonElementFactory::createWindowButtonGroup(QWidget* parent)
 {
-    return (new SAWindowButtonGroup(parent));
+    return (new SARibbonSystemButtonBar(parent));
 }
 
 /**
