@@ -17,7 +17,6 @@
 #include "SARibbonStackedWidget.h"
 #else
 #include "SAFramelessHelper.h"
-#include "SAWindowButtonGroup.h"
 #endif
 
 /**

@@ -6,11 +6,11 @@
 
 /**
  * \brief 窗口的最大最小化按钮
- * @note 内部有个SARibbonButtonGroupWidget，其ObjectName = SAWindowButtonGroupToolBar
+ * @note 内部有个SARibbonButtonGroupWidget，其ObjectName = SASystemButtonGroup
  * 如果需要qss，可以进行特化处理:
  *
  * @code
- * SARibbonButtonGroupWidget#SAWindowButtonGroupToolBar
+ * SARibbonButtonGroupWidget#SASystemButtonGroup
  * @endcode
  *
  */

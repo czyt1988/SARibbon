@@ -1908,11 +1908,6 @@ bool SARibbonBar::eventFilter(QObject* obj, QEvent* e)
                 }
             }
         }
-        //        if (SAWindowButtonGroup *g = qobject_cast<SAWindowButtonGroup *>(obj)) {
-        //            if (e->type() == QEvent::Resize) {
-        //                m_d->windowButtonSize = g->size();
-        //            }
-        //        }
     }
     return (QMenuBar::eventFilter(obj, e));
 }

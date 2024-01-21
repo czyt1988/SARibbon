@@ -2189,7 +2189,7 @@ SARibbonApplicationButton::SARibbonApplicationButton(const QIcon& icon, const QS
 // 为了避免使用此框架的app设置了全局的qpushbutton 的 qss样式影响此按钮，定义了一个类
 
 /**
- * @brief The SAWindowButtonGroupPrivate class
+ * @brief The SARibbonSystemButtonBar class
  */
 class SARibbonSystemButtonBar::PrivateData
 {
@@ -2210,7 +2210,7 @@ public:
 	PrivateData(SARibbonSystemButtonBar* p) : q_ptr(p)
 	{
 		mButtonGroup = new SARibbonButtonGroupWidget(p);
-		mButtonGroup->setObjectName("SAWindowButtonGroupToolBar");
+		mButtonGroup->setObjectName("SASystemButtonGroup");
 	}
 
 	void setupMinimizeButton(bool on)
@@ -12019,11 +12019,6 @@ bool SARibbonBar::eventFilter(QObject* obj, QEvent* e)
 				}
 			}
 		}
-		//        if (SAWindowButtonGroup *g = qobject_cast<SAWindowButtonGroup *>(obj)) {
-		//            if (e->type() == QEvent::Resize) {
-		//                m_d->windowButtonSize = g->size();
-		//            }
-		//        }
 	}
 	return (QMenuBar::eventFilter(obj, e));
 }
@@ -15195,7 +15190,6 @@ SARibbonCustomizeWidget* SARibbonCustomizeDialog::customizeWidget() const
 
 #else
 
-#include "SAWindowButtonGroup.h"
 #endif
 
 /**
