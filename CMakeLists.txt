@@ -28,25 +28,24 @@ find_package(Qt${QT_VERSION_MAJOR} ${SARIBBON_MIN_QT_VERSION} COMPONENTS
 )
 message(STATUS "current Qt version is Qt${QT_VERSION_MAJOR}.${QT_VERSION_MINOR}.${QT_VERSION_PATCH}")
 
-# 根据qt版本选择是否使用frameless库，目前frameless库支持qt5.14,qt5.15,qt6.4+,除了上诉版本，都使用不了
-if(${QT_VERSION_MAJOR} EQUAL 5)
-    # qt版本为5，判断是否小版本大于14
-    if(${QT_VERSION_MINOR} GREATER_EQUAL 14)
-        #5.14和5.15可以使用frameless
-        #set(SARIBBON_USE_FRAMELESS_LIB ON)
-    else()
-        set(SARIBBON_USE_FRAMELESS_LIB OFF)
-    endif()
-elseif(${QT_VERSION_MAJOR} EQUAL 6)
-    # qt版本为6，判断是否小版本大于6.1
-    if(${QT_VERSION_MINOR} GREATER_EQUAL 1)
-        #set(SARIBBON_USE_FRAMELESS_LIB ON)
-    else()
-        #6.0及bug多多无法使用frameless
-        set(SARIBBON_USE_FRAMELESS_LIB OFF)
+# 根据qt版本确认能否使用frameless库，目前frameless库支持qt5.14,qt5.15,qt6.1+,除了上诉版本，都使用不了
+if(SARIBBON_USE_FRAMELESS_LIB)
+    if(${QT_VERSION_MAJOR} EQUAL 5)
+        # qt版本为5，判断是否小版本小于14，小于14无法使用
+        if(${QT_VERSION_MINOR} LESS 14)
+            #5.14和5.15可以使用frameless
+            set(SARIBBON_USE_FRAMELESS_LIB OFF)
+            message(WARNING "QT_VERSION = Qt${QT_VERSION} QT version minor is ${QT_VERSION_MINOR},less 14,will set SARIBBON_USE_FRAMELESS_LIB OFF")
+        endif()
+    elseif(${QT_VERSION_MAJOR} EQUAL 6)
+        # qt版本为6，判断是否小版本大于6.1
+        if(${QT_VERSION_MINOR} LESS_EQUAL 1)
+            #6.0及bug多多无法使用frameless
+            set(SARIBBON_USE_FRAMELESS_LIB OFF)
+            message(WARNING "QT_VERSION = Qt${QT_VERSION} QT version minor is ${QT_VERSION_MINOR},less 1,will set SARIBBON_USE_FRAMELESS_LIB OFF")
+        endif()
     endif()
 endif()
-
 
 # 如果是使用frameless库，需要c++17，否则c++11足以
 if(SARIBBON_USE_FRAMELESS_LIB)
@@ -112,8 +111,29 @@ endif()
 
 if(SARIBBON_USE_FRAMELESS_LIB)
     if(NOT DEFINED QWindowKit_DIR)
-        message(WARNING "option SARIBBON_USE_FRAMELESS_LIB=ON,but QWindowKit_DIR not defined,will set QWindowKit_DIR=${SARIBBON_BIN_DIR}/cmake/QWindowKit")
-        set(QWindowKit_DIR ${SARIBBON_BIN_DIR}/lib/cmake/QWindowKit)
+        # 没有定义QWindowKit_DIR，先尝试能否find_package
+        find_package(QWindowKit QUIET)
+        if(NOT QWindowKit_FOUND)
+            message(WARNING "option SARIBBON_USE_FRAMELESS_LIB=ON,but QWindowKit_DIR not defined,will set QWindowKit_DIR=${SARIBBON_BIN_DIR}/cmake/QWindowKit")
+            set(__qwk_dir ${SARIBBON_BIN_DIR}/lib/cmake/QWindowKit)
+            if(EXISTS ${__qwk_dir})
+                set(QWindowKit_DIR ${__qwk_dir})
+            else()
+                message(WARNING "SARIBBON_USE_FRAMELESS_LIB=ON,but not defined QWindowKit_DIR path")
+            endif()
+            # 再次尝试加载QWindowKit
+            find_package(QWindowKit QUIET)
+            if(NOT QWindowKit_FOUND)
+                set(SARIBBON_USE_FRAMELESS_LIB OFF)
+                message(WARNING "can not find package QWindowKit at ${__qwk_dir},set SARIBBON_USE_FRAMELESS_LIB=OFF")
+            endif()
+        endif()
+    else()
+        find_package(QWindowKit QUIET)
+        if(NOT QWindowKit_FOUND)
+            set(SARIBBON_USE_FRAMELESS_LIB OFF)
+            message(WARNING "can not find package QWindowKit at ${__qwk_dir},set SARIBBON_USE_FRAMELESS_LIB=OFF")
+        endif()
     endif()
 endif()
 
