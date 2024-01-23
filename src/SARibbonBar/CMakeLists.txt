@@ -106,6 +106,7 @@ SET(SARIBBON_SOURCE_FILES
     SARibbonPannelLayout.cpp
     SARibbonPannelItem.cpp
     SARibbonLineWidgetContainer.cpp
+    SARibbonColorToolButton.cpp
 )
 
 # resource files

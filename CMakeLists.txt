@@ -29,6 +29,7 @@ find_package(Qt${QT_VERSION_MAJOR} ${SARIBBON_MIN_QT_VERSION} COMPONENTS
 message(STATUS "current Qt version is Qt${QT_VERSION_MAJOR}.${QT_VERSION_MINOR}.${QT_VERSION_PATCH}")
 
 # 根据qt版本确认能否使用frameless库，目前frameless库支持qt5.14,qt5.15,qt6.1+,除了上诉版本，都使用不了
+# 上述版本的qt如果设置SARIBBON_USE_FRAMELESS_LIB=ON也会改为OFF
 if(SARIBBON_USE_FRAMELESS_LIB)
     if(${QT_VERSION_MAJOR} EQUAL 5)
         # qt版本为5，判断是否小版本小于14，小于14无法使用
@@ -47,7 +48,7 @@ if(SARIBBON_USE_FRAMELESS_LIB)
     endif()
 endif()
 
-# 如果是使用frameless库，需要c++17，否则c++11足以
+# 如果是使用frameless库，需要c++17，否则c++14
 if(SARIBBON_USE_FRAMELESS_LIB)
     set(CMAKE_CXX_STANDARD 17)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -61,7 +62,7 @@ else()
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
     if(MSVC)
         # CMAKE_CXX_STANDARD对有些版本的msvc无效
-        set(CMAKE_CXX_FLAGS"${CMAKE_CXX_FLAGS} /std:c++11")
+        set(CMAKE_CXX_FLAGS"${CMAKE_CXX_FLAGS} /std:c++14")
     endif()
     message(STATUS "The current qt version cannot use the frameless library, enable C++11")
 endif()
@@ -95,9 +96,11 @@ if("${CMAKE_SIZEOF_VOID_P}" STREQUAL "4")
 else()
     set(SARIBBON_PLATFORM "x64")
 endif()
+
 # The bin file directory is one level above the current directory
 # cn:bin文件目录在当前目录的上上一级
-set(SARIBBON_BIN_NAME bin_qt${QT_VERSION}_${CMAKE_BUILD_TYPE}_${SARIBBON_PLATFORM})
+# 安装目录默认名字为bin_qt5.14.2_msvc_x64
+set(SARIBBON_BIN_NAME bin_qt${QT_VERSION}_${CMAKE_CXX_COMPILER_ID}_${SARIBBON_PLATFORM})
 set(SARIBBON_BIN_DIR ${CMAKE_CURRENT_SOURCE_DIR}/${SARIBBON_BIN_NAME})
 
 # windows系统下，默认直接安装到当前文件夹下
