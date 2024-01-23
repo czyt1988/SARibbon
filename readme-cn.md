@@ -37,7 +37,14 @@ QQ交流群:434014314
 
 # SARibbon简介
 
-这是一个`Qt`下的`Ribbon`界面控件，提供了类似微软Office系列软件的操作界面。`SARibbon`适用于大型软件、工业软件、复杂软件的ui。`SARibbon`在设计时参考了MFC Ribbon接口的命名风格，`SARibbon`的界面样式参考了微软Office系列软件以及WPS软件的Ribbon界面，并结合了两者的优点。`SARibbon`是一个可定义多种主题风格的Ribbon控件，它能通过qss快速的定义出自己想要的主题风格。为了方便大型软件的开发，`SARibbon`对常用的一些功能性控件进行了封装，例如：[颜色选择按钮和颜色选择画板](https://github.com/czyt1988/SAColorWidgets)
+这是一个`Qt`下的`Ribbon`界面控件，提供了类似微软Office系列软件的操作界面。
+
+- `SARibbon`适用于大型软件、工业软件、复杂软件的ui
+- `SARibbon`在设计时参考了MFC Ribbon接口的命名风格
+- `SARibbon`的界面样式参考了微软Office系列软件以及WPS软件的Ribbon界面，并结合了两者的优点
+- `SARibbon`是一个可定义多种主题风格的Ribbon控件，它能通过qss快速的定义出自己想要的主题风格
+
+为了方便大型软件的开发，`SARibbon`对常用的一些功能性控件进行了封装，例如：[颜色选择按钮和颜色选择画板](https://github.com/czyt1988/SAColorWidgets)
 
 ## 功能特点
 
@@ -101,17 +108,19 @@ MIT协议，欢迎大家使用并提出意见
 
 SARibbon提供qmake和cmake两种构建方式，同时提供了一个集成的SARibbon.h和SARibbon.cpp文件方便静态的嵌入到单一工程
 
-> qmake和cmake会根据qt版本选择是否加载frameless库，会根据不同的qt版本选择使用c++11还是C++17
+> qmake和cmake会根据qt版本选择是否加载frameless库，会根据不同的qt版本选择使用c++14还是C++17
 
-> 注意:如果使用frameless库，要求c++标准最低为17，在SARibbon会根据qt版本自动判断是否加载frameless库，如果qt版本在5.14以上会自动加载frameless库，并把c++标准设置为C++17
+> SARibbon支持第三方无边框库[QWindowkit](https://github.com/stdware/qwindowkit)，同时也支持简单的无边框方案，如果你需要操作系统原生的窗口支持，如windows7以后的贴边处理，windows11的最大化按钮悬停的效果，建议开启[QWindowkit](https://github.com/stdware/qwindowkit)库，[QWindowkit](https://github.com/stdware/qwindowkit)库还能较好解决多屏幕移动问题
 
-## Linux下构建前置准备
-
-SARibbon在1.x后使用了第三方库frameless，此库能很好的解决无边框问题，在linux下编译需要安装下面三个库：`libgl1-mesa-dev`,`libxcb1-dev`,`libgtk-3-dev`
+如果你要依赖[QWindowkit](https://github.com/stdware/qwindowkit)库，需要先编译[QWindowkit](https://github.com/stdware/qwindowkit)库，[QWindowkit](https://github.com/stdware/qwindowkit)库作为SARibbon项目的submodules，如果在`git clone`时没有附带`--recursive`参数，需要执行`submodule update`命令:
 
 ```shell
-sudo apt install -y libgl1-mesa-dev libxcb1-dev libgtk-3-dev
+git submodule update --init --recursive
 ```
+
+## 编译为动态库
+
+具体构建过程，见文档：[SARibbon构建](./doc/how-to-build-cn.md)
 
 ## 直接引入工程（静态）
 
@@ -149,48 +158,6 @@ SARibbon提供了合并好的`SARibbon.h`文件和`SARibbon.cpp`文件，只需�
 
 使用cmake的话参考StaticExample例子的cmake编写方式
 
-## 编译为动态库
-
-### qmake
-
-使用Qt Creator直接打开`SARibbon.pro`，编译即可，会编译出SARibbonBar库和例子，lib和例子的目录位于`bin_qt{Qt版本}_{debug/release}_{32/64}`目录下
-
-> 在debug模式编译的库后面会加上'd'以作区别
-
-### cmake
-
-使用Qt Creator或者visual studio打开`根目录下的CMakeLists.txt`编译即可
-
-具体教程见[使用cmake构建及使用SARibbon的教程](./doc/build-cmake.md)
-
-## 编译过程的常见问题
-
-### 1、framelessmanager.moc的缺失提示，或者任何xxx.moc，遇到此错误，先执行qmake即可
-
-```txt
-..\..\..\SARibbon\src\SARibbonBar\3rdparty\framelesshelper\src\core\framelessmanager.cpp(563): fatal error C1083: 无法打开包括文件: “framelessmanager.moc”: No such file or directory
-```
-
-### visual studio引入lib
-
-有些工程直接使用vs引入lib，而不是通过cmake和qmake来管理，这里介绍一下如何通过visual studio的界面引用库
-
-在引入lib后，还需要做如下事情：
-
-1. 首先要在vs中添加include目录
-
-```
-{yourPath}\include\SARibbon
-{yourPath}\include\SARibbon\3rdparty\framelesshelper\include
-{yourPath}\include\SARibbon\3rdparty\framelesshelper\qmake\inc\core
-```
-
-2. 前处理添加预定义宏
-
-```
-SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1
-FRAMELESSHELPER_FEATURE_static_build=-1
-```
 
 # 使用方法
 
@@ -232,7 +199,7 @@ qmake的编译过程会在SARibbon下生成bin_qtx.x_xx文件夹，库文件和d
 
 cmake在执行install后，会把必要的文件拷贝到安装目录下，cmake文件编写时可参考`src/example/MainWindowExample/CMakeLists.txt`
 
-具体教程见[使用cmake构建及使用SARibbon的教程](./doc/build-cmake.md)
+具体见文档：[SARibbon构建](./doc/how-to-build-cn.md)
 
 ### visual studio添加
 
@@ -241,18 +208,15 @@ cmake在执行install后，会把必要的文件拷贝到安装目录下，cmake
 1、include路径有三个
 ```
 src/SARibbonBar
-src/SARibbonBar/3rdparty/framelesshelper/include
-src/SARibbonBar/3rdparty/framelesshelper/qmake/inc/core
 ```
 
-2、预定义宏有两个：
+2、预定义宏有一个：
+
+注意，预定义宏一定要和编译时配置一致，否则会导致拖动异常
 
 ```
-FRAMELESSHELPER_FEATURE_static_build=-1
 SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1
 ```
-
-否则会报LNK2001的错误
 
 ## 快速开始
 

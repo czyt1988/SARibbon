@@ -18,11 +18,7 @@ git submodule update --init --recursive
 
 使用Qt Creator和使用visual studio构建和安装基本一样
 
-# 使用CMake构建和安装SARibbon库
-
-> 推荐使用cmake对SARibbon库进行构建和安装
-
-## 使用Qt Creator（CMake）进行SARibbon库的构建和安装
+## 使用Qt Creator构建和安装
 
 使用qt creator编译`QWindowkit`库，直接用qt creator打开`src/SARibbonBar/3rdparty/CMakeLists.txt`文件
 
@@ -46,7 +42,7 @@ build步骤选择install
 
 此时完成`QWindowkit`库的编译和安装
 
-## 使用visual studio（CMake）进行SARibbon库的构建和安装
+## 使用visual studio构建和安装
 
 使用visual studio编译`QWindowkit`库，用visual studio打开->CMake，选择`src/SARibbonBar/3rdparty/CMakeLists.txt`文件
 
@@ -94,7 +90,7 @@ build步骤选择install
 
 ![](./pic/build-cmake-vs-04.png)
 
-这时候你会看到源码的根目录下多出一个文件夹,文件夹命名方式为`bin_qt{version}_[MSVC/GNU]_x[64/86]`（前提是你没有改变CMAKE_INSTALL_PREFIX）
+这时候你会看到源码的根目录下多出一个文件夹,文件夹命名方式为`bin_qt{version}_[Debug/Release]_x[64/86]`（前提是你没有改变CMAKE_INSTALL_PREFIX）
 
 ![](./pic/build-cmake-install-dir.png)
 
@@ -112,30 +108,20 @@ build步骤选择install
 
 ![](./pic/build-cmake-qtc-03.png)
 
-再次点击运行按钮，这时候你会看到源码的根目录下多出一个文件夹,文件夹命名方式为`bin_qt{version}_[MSVC/GNU]_x[64/86]`（前提是你没有改变CMAKE_INSTALL_PREFIX）
+再次点击运行按钮，这时候你会看到源码的根目录下多出一个文件夹,文件夹命名方式为`bin_qt{version}_[Debug/Release]_x[64/86]`（前提是你没有改变CMAKE_INSTALL_PREFIX）
 
 ![](./pic/build-cmake-install-dir.png)
 
 使用SARibbon的所有内容都在这个文件夹下
 
-# 使用QMake构建和安装
-
-> SARibbon提供qmake的构建和安装，但更推荐使用cmake对SARibbon库进行构建和安装
-
-使用qmake进行构建和安装只需使用qt creator打开SARibbon库下的`SARibbon.pro`文件，再点击运行（Ctrl+R）即可
-
-如果在打开`SARibbon.pro`文件出现一些错误提示，可能是你的Qt Creator对某个文件夹没有创建权限，需要使用管理员权限运行
-
-# 引入SARibbon库
-
-## 使用CMake引入SARibbonBar
+# 基于cmake引入SARibbonBar
 
 引用SARibbonBar和编译器无关，主要针对自己cmake文件的编写
 
 1、指定SARibbonBar的安装目录，把安装目录下的`lib/cmake/SARibbonBar`位置设置给`SARibbonBar_DIR`变量
 
 ```cmake
-set(SARibbonBar_DIR "C:\src\Qt\SARibbon\bin_qt5.14.2_MSVC_x64\lib\cmake\SARibbonBar")
+set(SARibbonBar_DIR "C:\src\Qt\SARibbon\bin_qt5.14.2_Debug_x64\lib\cmake\SARibbonBar")
 ```
 
 2、使用find_package找到SARibbonBar的Config文件，这个函数实际上是调用`lib/cmake/SARibbonBar/SARibbonBarConfig.cmake`文件，这里会把需要include的路径、预定义的宏，和需要添加的库给指定好，此时`SARibbonBar_INCLUDE_DIR`就是SARibbonBar的include文件路径
