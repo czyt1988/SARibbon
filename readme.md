@@ -96,59 +96,19 @@ MIT protocol，welcome for everyone to use and give comments
 
 `SARibbon` provides both qmake and cmake build methods, and provides an amalgamate `SARibbon.h` and `SARibbon.cpp` file for static embedding into a single project
 
-> Qmake and Cmake will choose whether to load frameless libraries according to the Qt version, and will choose whether to use C++11 or C++17 depending on the Qt version
+> `SARibbon` supports third-party library [QWindowKit](https://github.com/stdware/qwindowkit) At the same time, it also supports simple frameless solutions. If you need native window support for the operating system, such as edge trimming after Windows 7 and maximizing the hovering effect of buttons in Windows 11, it is recommended to enable [QWindowKit](https://github.com/stdware/qwindowkit) Library, [QWindowKit](https://github.com/stdware/qwindowkit) Library can better solve the problem of multi screen movement
 
-> Note: If you use the frameless library, the minimum C++ standard required is 17, and SARibbon will automatically determine whether to load the frameless library according to the qt version when building, and if the qt version is greater than 5.14, the frameless library will be loaded, and the C++ standard will be set to C++17
-
-## Prepare for the Linux build
-
-SARibbon uses a third-party library frameless after 1.x, this library can solve the frameless problem very well, and the following three libraries need to be installed for compilation under linux:`libgl1-mesa-dev`,`libxcb1-dev`,`libgtk-3-dev`
+If you want to rely on [QWindowKit](https://github.com/stdware/qwindowkit) Library, needs to be compiled first [QWindowKit](https://github.com/stdware/qwindowkit) Library, [QWindowKit](https://github.com/stdware/qwindowkit) As the submodules of the SARibbon project, if the '-- recursive' parameter is not included in the 'git clone', the 'submodules update' command needs to be executed:
 
 ```shell
-sudo apt install -y libgl1-mesa-dev libxcb1-dev libgtk-3-dev
+git submodule update --init --recursive
 ```
-
-## Embedding SARibbon directly into the project
-
-SARibbon provides amalgamate `SARibbon.h` file and `SARibbon.cpp` file, you only need to import these two files in your own project, and at the same time import resource files and third-party library files to use, no need to compile into dynamic libraries or static libraries, you can refer to the StaticExample example (located in `src/example/StaticExample`), static embedding will be used to` SARibbon.h`, `SARibbon.cpp`, `SARibbon.pri`, `SARibbonBar/resource.qrc`, and `SARibbonBar/3rdparty`, `SARibbonBar/resource` two folders:
-
-Your project directory will look like this:
-
-```
-|-you-project-dir
-|  |-you-project.pro
-|  |-SARibbon.h
-|  |-SARibbon.cpp
-|  |-SARibbon.pri
-|  |-SARibbonBar
-|     |-resource.qrc
-|     |-resource(Directly copy the resource under SARibbonBar in its entirety)
-|        |-resource files
-|     |-3rdparty(Directly copy the 3rdparty under SARibbonBar in its entirety)
-|        |-framelesshelper
-|           |-src
-|           |  |-src files
-|           |-include
-|           |  |-header files
-|           |-qmake
-|           |  |-pri files
-```
-
-To compile with qmake, you can follow the steps below:
-
-- 1. Copy `SARibbon.h`, `SARibbon.cpp`, `SARibbon.pri` to your project directory
-- 2. Create a `SARibbonBar` folder in your project directory
-- 3. Copy the `src/SARibbonBar/resource.qrc` file in the source code to the `SARibbonBar` folder in your project directory
-- 4. Copy the `resource` folder and `3rdparty` folder under `src/SARibbonBar` to the `SARibbonBar` folder in your project directory
-- 5. Import the `SARibbon.pri` file into the pro file of your project, e.g. `include($$PWD/SARibbon.pri)`
-
-If you use cmake, refer to the cmake writing method of the StaticExample example(located in `src/example/StaticExample`)
 
 ## Compile to dynamic libraries
 
 ### qmake
 
-Use Qt Creator to open `SARibbon.pro` directly, compile it, and the SARibbonBar library and examples will be compiled, and the lib and example directories are located in the `bin_qt{Qt version}_{debug/release}_{32/64}` directory
+Use Qt Creator to open `SARibbon.pro` directly, compile it, and the SARibbonBar library and examples will be compiled, and the lib and example directories are located in the `bin_qt{Qt version}_{MSVC/GNU}_x{32/64}` directory
 
 > Libraries compiled in debug mode are distinguished by a 'd' after the end
 
@@ -168,14 +128,35 @@ cmake --install . --config Release --strip
 
 {WHERE_YOU_WANT_TO_INSTALL} is your installation directory
 
-## FAQ about the compilation
 
-### 1. The missing file of framelessmanager.moc, or any xxx.moc, if you encounter this error, you can execute qmake first
 
-```txt
-..\..\..\SARibbon\src\SARibbonBar\3rdparty\framelesshelper\src\core\framelessmanager.cpp(563): fatal error C1083: Unable to open include file: “framelessmanager.moc”: No such file or directory
+## Embedding SARibbon directly into the project
+
+SARibbon provides amalgamate `SARibbon.h` file and `SARibbon.cpp` file, you only need to import these two files in your own project, and at the same time import resource files and third-party library files to use, no need to compile into dynamic libraries or static libraries, you can refer to the StaticExample example (located in `src/example/StaticExample`), static embedding will be used to` SARibbon.h`, `SARibbon.cpp`, `SARibbon.pri`, `SARibbonBar/resource.qrc`, and `SARibbonBar/3rdparty`, `SARibbonBar/resource` two folders:
+
+Your project directory will look like this:
+
+```
+|-you-project-dir
+|  |-you-project.pro
+|  |-SARibbon.h
+|  |-SARibbon.cpp
+|  |-SARibbon.pri
+|  |-SARibbonBar
+|     |-resource.qrc
+|     |-resource(Directly copy the resource under SARibbonBar in its entirety)
+|        |-resource files
 ```
 
+To compile with qmake, you can follow the steps below:
+
+- 1. Copy `SARibbon.h`, `SARibbon.cpp`, `SARibbon.pri` to your project directory
+- 2. Create a `SARibbonBar` folder in your project directory
+- 3. Copy the `src/SARibbonBar/resource.qrc` file in the source code to the `SARibbonBar` folder in your project directory
+- 4. Copy the `resource` folder under `src/SARibbonBar` to the `SARibbonBar` folder in your project directory
+- 5. Import the `SARibbon.pri` file into the pro file of your project, e.g. `include($$PWD/SARibbon.pri)`
+
+If you use cmake, refer to the cmake writing method of the StaticExample example(located in `src/example/StaticExample`)
 
 # How to use:
 
@@ -207,7 +188,7 @@ At this point, your project directory looks like this:
 |        |-importSARibbonBarLib.pri
 |        |-SARibbonBar.pri
 |        |-common.pri
-|        |-[bin_qtx.x.x_(release|debug)_(64|86)]
+|        |-[bin_qtx.x.x_{MSVC/GNU}_x{32/64}]
 |        |-[src]
 |        |   |-[SARibbonBar]
 ```
@@ -710,23 +691,19 @@ int main(int argc, char* argv[])
 
 ## Shortcut key problem
 
-Often people report that after using SARibbonBar, the shortcut keys for the unactivated tabs do not respond, and only the shortcut keys for the activated tabs respond.This issue is not a problem with `SARibbonBar`, but rather a problem with the setting of the shortcut context property for QAction. The default shortcut property for `QAction` is `Qt::WindowShortcut`. `Qt::WindowShortcut` means that the shortcut is active when its parent widget is a logical subwidget of the active top-level window.If it is a traditional toolbar mode, the toolbar where the action is located is always at the front, so the shortcut key always takes effect.However, if it is `SARibbonBar`, the action is located in a hidden pannel, and the shortcut key does not take effect.If you want the shortcut key to take effect regardless of whether the pannel is hidden, just set the action's shortcutContext property to `Qt::ApplicationShortcut`
+People often give feedback that after using SARibbonBar, the shortcut keys of inactive tab pages do not respond, and only the shortcut keys of activated tab pages respond. If it is in traditional toolbar mode, the shortcut key will remain in effect because the toolbar where the action is located is always at the forefront. However, if it is SARibbonBar, the shortcut key in the action panel will be hidden, and it will not take effect after hiding, If you want the shortcut key to take effect regardless of whether Pannel is hidden or not, setting the shortcut key's' shortcutContext 'property to `Qt::ApplicationShortcut` is also invalid. In this case, you can manually create the shortcut key in the place where you created the Category
 
 example:
 
 ```cpp
-QAction* actionUndo = createAction("undo", ":/icon/icon/undo.svg");
-actionUndo->setShortcut(QKeySequence("Ctrl+Shift+z"));
-actionUndo->setShortcutContext(Qt::ApplicationShortcut);
-quickAccessBar->addAction(actionUndo);
-
-QAction* actionRedo = createAction("redo", ":/icon/icon/redo.svg");
-actionRedo->setShortcut(QKeySequence("Ctrl+z"));
-actionRedo->setShortcutContext(Qt::ApplicationShortcut);
-quickAccessBar->addAction(actionRedo);
+    ribbon build
+    ...
+    QShortcut* shortCut = new QShortcut(QKeySequence(QLatin1String("Ctrl+S")), this);
+    connect(shortCut, &QShortcut::activated, this, [ actSave ]() {
+        actSave->trigger();
+    });
 ```
 
-# other
-Thank FastCAE for using this control and finding many bugs and suggestions
+# Gallery
 
 > Thank[FastCAE](http://www.fastcae.com/product.html)for using this control and finding many bugs and suggestions

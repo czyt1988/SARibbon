@@ -23,9 +23,7 @@
 - `SARibbonMainWindow`支持非ribbon模式
 - 原`SAWindowButtonGroup`改名为`SARibbonSystemButtonGroupBar`，同时支持添加action
 
-【警告】编译过程会在当前目录下生成bin_qtx.x.x_Debug/Release_x64/86这样的文件夹，请确保有写入权限，否则会执行qmake或cmake过程报错
-
-
+【警告】编译过程会在当前目录下生成bin_qtx.x.x_[MSVC/GNU]_x[64/86]这样的文件夹，请确保有写入权限，否则执行qmake过程会报错
 
 由于接口函数有明显调整，因此版本变更为2.0
 
