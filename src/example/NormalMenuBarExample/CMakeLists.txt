@@ -14,7 +14,7 @@ set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_LIST_DIR})
 add_executable(${SARIBBON_EXPAMPLE_NAME} 
     MainWindow.h
     MainWindow.cpp
-    mainwindow.ui
+    MainWindow.ui
     main.cpp
 )
 
