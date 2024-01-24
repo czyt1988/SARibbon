@@ -108,8 +108,6 @@ MIT协议，欢迎大家使用并提出意见
 
 SARibbon提供qmake和cmake两种构建方式，同时提供了一个集成的SARibbon.h和SARibbon.cpp文件方便静态的嵌入到单一工程
 
-> qmake和cmake会根据qt版本选择是否加载frameless库，会根据不同的qt版本选择使用c++14还是C++17
-
 > SARibbon支持第三方无边框库[QWindowkit](https://github.com/stdware/qwindowkit)，同时也支持简单的无边框方案，如果你需要操作系统原生的窗口支持，如windows7以后的贴边处理，windows11的最大化按钮悬停的效果，建议开启[QWindowkit](https://github.com/stdware/qwindowkit)库，[QWindowkit](https://github.com/stdware/qwindowkit)库还能较好解决多屏幕移动问题
 
 如果你要依赖[QWindowkit](https://github.com/stdware/qwindowkit)库，需要先编译[QWindowkit](https://github.com/stdware/qwindowkit)库，[QWindowkit](https://github.com/stdware/qwindowkit)库作为SARibbon项目的submodules，如果在`git clone`时没有附带`--recursive`参数，需要执行`submodule update`命令:
@@ -118,13 +116,15 @@ SARibbon提供qmake和cmake两种构建方式，同时提供了一个集成的SA
 git submodule update --init --recursive
 ```
 
+> 用户指定使用[QWindowkit](https://github.com/stdware/qwindowkit)后，要求C++标准最低为C++17否则最低要求为c++14
+
 ## 编译为动态库
 
 具体构建过程，见文档：[SARibbon构建](./doc/how-to-build-cn.md)
 
 ## 直接引入工程（静态）
 
-SARibbon提供了合并好的`SARibbon.h`文件和`SARibbon.cpp`文件，只需要在自己的工程中引入这两个文件，同时把资源文件和第三方库文件引入就可以使用，无需编译为动态库或者静态库，可以参考StaticExample例子（位于`src/example/StaticExample`），静态嵌入将使用到`SARibbon.h`、`SARibbon.cpp`、`SARibbon.pri`、`SARibbonBar/resource.qrc`这4个文件，以及`SARibbonBar/3rdparty`,`SARibbonBar/resource`这两个文件夹：
+SARibbon提供了合并好的`SARibbon.h`文件和`SARibbon.cpp`文件，只需要在自己的工程中引入这两个文件，同时把资源文件和第三方库文件引入就可以使用，无需编译为动态库或者静态库，可以参考StaticExample例子（位于`src/example/StaticExample`），静态嵌入将使用到`SARibbon.h`、`SARibbon.cpp`、`SARibbon.pri`、`SARibbonBar/resource.qrc`这4个文件，以及`SARibbonBar/resource`这个文件夹：
 
 你的工程目录将如下所示：
 
@@ -138,14 +138,6 @@ SARibbon提供了合并好的`SARibbon.h`文件和`SARibbon.cpp`文件，只需�
 |     |-resource.qrc
 |     |-resource(直接把SARibbonBar下的resource完整复制过来)
 |        |-resource files
-|     |-3rdparty(直接把SARibbonBar下的3rdparty完整复制过来)
-|        |-framelesshelper
-|           |-src
-|           |  |-src files
-|           |-include
-|           |  |-header files
-|           |-qmake
-|           |  |-pri files
 ```
 
 使用qmake编译，有如下步骤：
@@ -156,7 +148,7 @@ SARibbon提供了合并好的`SARibbon.h`文件和`SARibbon.cpp`文件，只需�
 - 4. 把源码`src/SARibbonBar`下的`resource`文件夹和`3rdparty`文件夹拷贝到自己工程目录下的`SARibbonBar`文件夹中
 - 5. 在自己工程的pro文件中引入`SARibbon.pri`文件，如：`include($$PWD/SARibbon.pri)`
 
-使用cmake的话参考StaticExample例子的cmake编写方式
+使用cmake的话参考StaticExample（位于`src/example/StaticExample`）例子的cmake编写方式
 
 
 # 使用方法
@@ -177,7 +169,7 @@ SARibbon提供了合并好的`SARibbon.h`文件和`SARibbon.cpp`文件，只需�
 include($$PWD/3rdparty/SARibbon/importSARibbonBarLib.pri)
 ```
 
-qmake的编译过程会在SARibbon下生成bin_qtx.x_xx文件夹，库文件和dll文件都在此文件夹下，importSARibbonBarLib.pri会自动把这个文件夹下的库引用进来
+qmake的编译过程会在SARibbon下生成`bin_qt{Qt version}_{MSVC/GNU}_x{32/64}`文件夹，库文件和dll文件都在此文件夹下，importSARibbonBarLib.pri会自动把这个文件夹下的库引用进来
 
 此时你的工程目录结构大致如下：
 
@@ -189,34 +181,16 @@ qmake的编译过程会在SARibbon下生成bin_qtx.x_xx文件夹，库文件和d
 |        |-importSARibbonBarLib.pri
 |        |-SARibbonBar.pri
 |        |-common.pri
-|        |-[bin_qtx.x.x_(release|debug)_(64|86)]
+|        |-[bin_qtx.x.x_{MSVC/GNU}_x{32/64}]
 |        |-[src]
 |        |   |-[SARibbonBar]
 ```
-
 
 ### cmake
 
 cmake在执行install后，会把必要的文件拷贝到安装目录下，cmake文件编写时可参考`src/example/MainWindowExample/CMakeLists.txt`
 
 具体见文档：[SARibbon构建](./doc/how-to-build-cn.md)
-
-### visual studio添加
-
-如果你的qt版本大于等于5.14，会使用第三方库frameless，此时使用vs的界面操作添加SARibbon需要注意以下几点：
-
-1、include路径有三个
-```
-src/SARibbonBar
-```
-
-2、预定义宏有一个：
-
-注意，预定义宏一定要和编译时配置一致，否则会导致拖动异常
-
-```
-SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1
-```
 
 ## 快速开始
 
@@ -711,6 +685,5 @@ int main(int argc, char* argv[])
 这个快捷键的创建位置在Mainwidnow，这样快捷键就随着mainwindow周期
 
 # 其他
-
 
 > 感谢[FastCAE](http://www.fastcae.com/product.html)项目使用了本控件，并找到了许多bug和建议，FastCAE国产CAE软件集成开发平台，免费开源，是面向求解器开发者提供CAE软件界面与通用功能模块快速研发集成框架，[其开源仓库（github）:https://github.com/DISOGitHub/FastCAE](https://github.com/DISOGitHub/FastCAE)，[gitee:https://gitee.com/DISOGitee/FastCAE](https://gitee.com/DISOGitee/FastCAE)，[官网见:http://www.fastcae.com/product.html](http://www.fastcae.com/product.html)

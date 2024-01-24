@@ -18,7 +18,7 @@ git submodule update --init --recursive
 
 使用Qt Creator和使用visual studio构建和安装基本一样
 
-## 使用Qt Creator构建和安装
+## 使用Qt Creator构建和安装QWindowkit库
 
 使用qt creator编译`QWindowkit`库，直接用qt creator打开`src/SARibbonBar/3rdparty/CMakeLists.txt`文件
 
@@ -42,7 +42,7 @@ build步骤选择install
 
 此时完成`QWindowkit`库的编译和安装
 
-## 使用visual studio构建和安装
+## 使用visual studio构建和安装QWindowkit库
 
 使用visual studio编译`QWindowkit`库，用visual studio打开->CMake，选择`src/SARibbonBar/3rdparty/CMakeLists.txt`文件
 
@@ -62,17 +62,13 @@ build步骤选择install
 
 此时完成`QWindowkit`库的编译和安装
 
-# Cmake构建及使用SARibbon教程
+# 构建SARibbonBar库
 
-最近发现有许多使用visual studio（以下简称vs）咨询可以构建但无法引入的问题，为此，这里专门写此文针对此问题进行说明
+SARibbonBar库提供cmake和qmake两种方式构建，推荐使用cmake
 
-分两种方式，第一种使用cmake，个人推荐使用cmake对工程进行构建，毕竟能用到Ribbon的界面都算大型工程了
+## 基于CMake构建SARibbonBar库
 
-另外一种是直接通过visual studio建立的工程引入SARibbon
-
-# 基于cmake的构建和使用
-
-## vs下基于cmake的构建
+### vs下基于cmake的构建
 
 点击文件->打开->Cmake 选中CMakeLists.txt
 
@@ -94,7 +90,7 @@ build步骤选择install
 
 ![](./pic/build-cmake-install-dir.png)
 
-## qtcreator下基于cmake的构建
+### qtcreator下基于cmake的构建
 
 点击文件->打开文件或项目选中CMakeLists.txt，加载完成后形成如下的构建树
 
@@ -114,26 +110,69 @@ build步骤选择install
 
 使用SARibbon的所有内容都在这个文件夹下
 
-# 基于cmake引入SARibbonBar
+## 基于QMake构建SARibbonBar
 
-引用SARibbonBar和编译器无关，主要针对自己cmake文件的编写
+qmake构建SARibbonBar只需使用Qt Creator打开SARibbon.pro文件即可
 
-1、指定SARibbonBar的安装目录，把安装目录下的`lib/cmake/SARibbonBar`位置设置给`SARibbonBar_DIR`变量
+> 注意，如果使用Qt Creator打开SARibbon.pro文件过程报错，那么你的账户没有足够的写权限，因为qmake过程会在当前目录下执行mkdir等命令，没有足够权限，会报qmake错误
+
+# 使用SARibbonBar库
+
+## 基于cmake引入SARibbonBar库
+
+首先要通过cmake编译并执行安装，在自己的工程按照如下步骤执行：
+
+1. 指定SARibbonBar的安装目录，把安装目录下的`lib/cmake/SARibbonBar`位置设置给`SARibbonBar_DIR`变量
 
 ```cmake
-set(SARibbonBar_DIR "C:\src\Qt\SARibbon\bin_qt5.14.2_Debug_x64\lib\cmake\SARibbonBar")
+set(SARibbonBar_DIR "C:\src\Qt\SARibbon\bin_qt5.14.2_MSVC_x64\lib\cmake\SARibbonBar")
 ```
 
-2、使用find_package找到SARibbonBar的Config文件，这个函数实际上是调用`lib/cmake/SARibbonBar/SARibbonBarConfig.cmake`文件，这里会把需要include的路径、预定义的宏，和需要添加的库给指定好，此时`SARibbonBar_INCLUDE_DIR`就是SARibbonBar的include文件路径
+2. 使用find_package找到SARibbonBar的Config文件，这个函数实际上是调用`lib/cmake/SARibbonBar/SARibbonBarConfig.cmake`文件，这里会把需要include的路径、预定义的宏，和需要添加的库给指定好，此时`SARibbonBar_INCLUDE_DIR`就是SARibbonBar的include文件路径
 
 ```cmake
 find_package(SARibbonBar)
 ```
 
-3、最后调用`target_link_libraries`添加SARibbonBar库到自己的工程中,这里${myapp_target_name}是自己工程的target名字
+3. 最后调用`target_link_libraries`添加SARibbonBar库到自己的工程中,这里${myapp_target_name}是自己工程的target名字
 
 ```cmake
 target_link_libraries(${myapp_target_name} PUBLIC
     SARibbonBar
 )
 ```
+
+## 基于qmake引入SARibbonBar库
+
+qmake的编译过程会在SARibbon下生成`bin_qt{Qt version}_{MSVC/GNU}_x{32/64}`文件夹，库文件和dll文件都在此文件夹下，importSARibbonBarLib.pri会自动把这个文件夹下的库引用进来
+
+步骤如下：
+
+1. 先在你的工程中建立一个3rdparty文件夹，再把整个SARibbon文件夹拷贝过去
+
+> SARibbon内部已经有几个pri文件可以很方便的让你把工程引入到自己目录中，`./importSARibbonBarLib.pri`文件就是用于引入SARibbon库的
+
+2. 在自己的Qt工程pro文件中加入如下语句即可
+
+```shell
+include($$PWD/3rdparty/SARibbon/importSARibbonBarLib.pri)
+```
+
+此时你的工程目录结构大致如下：
+
+```
+|-[you-project-dir]
+|  |-you-project.pro
+|  |-[3rdparty]
+|     |-[SARibbon](直接把SARibbon完整复制过来)
+|        |-importSARibbonBarLib.pri
+|        |-SARibbonBar.pri
+|        |-common.pri
+|        |-[bin_qtx.x.x_{MSVC/GNU}_x{32/64}]
+|        |-[src]
+|        |   |-[SARibbonBar]
+```
+
+`importSARibbonBarLib.pri`、`SARibbonBar.pri`、`common.pri`这三个文件是引入工程的关键文件
+
+> Qt6.0版本后已经放弃qmake，建议使用cmake来管理工程

@@ -63,10 +63,6 @@ MainWindow::MainWindow(QWidget* par)
 {
 
     PRINT_COST_START();
-#if !SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
-    SAFramelessHelper* helper = framelessHelper();
-    helper->setRubberBandOnResize(false);
-#endif
     setWindowTitle(("ribbon mainwindow test"));
     mTextedit = new QTextEdit(this);
     setCentralWidget(mTextedit);
