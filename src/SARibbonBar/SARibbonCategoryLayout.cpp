@@ -440,9 +440,9 @@ void SARibbonCategoryLayout::doLayout()
             ++debug_i__;
 #endif
         } else {
-            item->widget()->setFixedSize(item->mWillSetGeometry.size());
-            item->widget()->move(item->mWillSetGeometry.topLeft());
-            //            item->setGeometry(item->mWillSetGeometry);
+            // item->widget()->setFixedSize(item->mWillSetGeometry.size());
+            // item->widget()->move(item->mWillSetGeometry.topLeft());
+            item->setGeometry(item->mWillSetGeometry);
             showWidgets << item->widget();
             if (item->separatorWidget) {
                 item->separatorWidget->setGeometry(item->mWillSetSeparatorGeometry);
