@@ -25,13 +25,15 @@ MainWindow::MainWindow(QWidget* parent) : SARibbonMainWindow(parent)
     combo->addItem("RibbonThemeOffice2016Blue", static_cast< int >(SARibbonMainWindow::RibbonThemeOffice2016Blue));
     combo->addItem("RibbonThemeOffice2021Blue", static_cast< int >(SARibbonMainWindow::RibbonThemeOffice2021Blue));
     combo->addItem("RibbonThemeDark", static_cast< int >(SARibbonMainWindow::RibbonThemeDark));
+    combo->addItem("RibbonThemeDark2", static_cast< int >(SARibbonMainWindow::RibbonThemeDark2));
+    combo->setCurrentIndex(3);
     connect(combo, QOverload< int >::of(&QComboBox::currentIndexChanged), [ this, combo ](int index) {
         SARibbonMainWindow::RibbonTheme th = static_cast< SARibbonMainWindow::RibbonTheme >(combo->itemData(index).toInt());
         this->setRibbonTheme(th);
     });
     resize(800, 600);
     // 在构造函数设置主题会不完全生效
-    QTimer::singleShot(0, this, [ this ]() { this->setRibbonTheme(SARibbonMainWindow::RibbonThemeDark); });
+    // QTimer::singleShot(0, this, [ this ]() { this->setRibbonTheme(SARibbonMainWindow::RibbonThemeOffice2016Blue); });
 
     // more example see MainWindowExample
 }

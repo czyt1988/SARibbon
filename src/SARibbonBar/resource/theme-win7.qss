@@ -119,7 +119,8 @@ SARibbonApplicationButton:focus{
 }
 
 SARibbonApplicationButton::menu-indicator {
-  subcontrol-position: right;
+  /*subcontrol-position: right;*/
+  width:0px;
 }
 
 /*SARibbonTabBar*/
