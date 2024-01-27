@@ -103,7 +103,8 @@ SARibbonApplicationButton:focus{
 }
 
 SARibbonApplicationButton::menu-indicator {
-  subcontrol-position: right;
+  /*subcontrol-position: right;*/
+  width:0px;
 }
 
 /*SARibbonTabBar*/
@@ -138,6 +139,8 @@ SARibbonTabBar::tab:hover:!selected {
 
 SARibbonTabBar::tab:!selected {
   color: #a0a0a0;
+  border:1px solid transparent;
+  background: transparent;
 }
 
 /*SARibbonCheckBox*/

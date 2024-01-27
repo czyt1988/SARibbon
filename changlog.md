@@ -1,5 +1,10 @@
 ﻿# 版本记录(change log):
-      
+    
+## 2024-01-27 -> 2.0.1
+- 调整qss，让SARibbonApplicationButton的下拉箭头不显示
+- 文档添加gallery
+- 修正了一个布局可能异常的点
+
 ## 2024-01-09 -> 2.0.0
 
 - `SARibbonCategory`和`SARibbonPannel`可以通过qss定制

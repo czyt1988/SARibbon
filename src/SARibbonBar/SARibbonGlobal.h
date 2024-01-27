@@ -24,7 +24,7 @@
  * @def ribbon的数字版本 MAJ.MIN.{PAT}
  */
 #ifndef SA_RIBBON_BAR_VERSION_PAT
-#define SA_RIBBON_BAR_VERSION_PAT 0
+#define SA_RIBBON_BAR_VERSION_PAT 1
 #endif
 
 #ifndef SA_RIBBON_BAR_NO_EXPORT
@@ -77,7 +77,6 @@ enum class SARibbonAlignment
 #define SA_RIBBON_BAR_PROP_CAN_CUSTOMIZE "_sa_isCanCustomize"
 #endif
 
-
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
 #ifndef SA_FONTMETRICS_WIDTH
 #define SA_FONTMETRICS_WIDTH(fm, str) fm.horizontalAdvance(str)
@@ -87,8 +86,6 @@ enum class SARibbonAlignment
 #define SA_FONTMETRICS_WIDTH(fm, str) fm.width(str)
 #endif
 #endif
-
-
 
 #if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
 #ifndef SA_MOUSEEVENT_GLOBALPOS_POINT
@@ -109,8 +106,6 @@ enum class SARibbonAlignment
 #define SA_HOVEREVENT_POS_POINT(HoverEventPtr) HoverEventPtr->pos()
 #endif
 #endif
-
-
 
 /**
   @def 定义此宏，将打印和尺寸刷新相关的信息
@@ -138,6 +133,5 @@ enum class SARibbonAlignment
 #ifndef SA_DEBUG_PRINT_SARIBBONBAR
 #define SA_DEBUG_PRINT_SARIBBONBAR 1
 #endif
-
 
 #endif  // SARIBBONGLOBAL_H
