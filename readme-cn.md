@@ -684,6 +684,14 @@ int main(int argc, char* argv[])
 
 这个快捷键的创建位置在Mainwidnow，这样快捷键就随着mainwindow周期
 
-# 其他
+# 界面展示
 
-> 感谢[FastCAE](http://www.fastcae.com/product.html)项目使用了本控件，并找到了许多bug和建议，FastCAE国产CAE软件集成开发平台，免费开源，是面向求解器开发者提供CAE软件界面与通用功能模块快速研发集成框架，[其开源仓库（github）:https://github.com/DISOGitHub/FastCAE](https://github.com/DISOGitHub/FastCAE)，[gitee:https://gitee.com/DISOGitee/FastCAE](https://gitee.com/DISOGitee/FastCAE)，[官网见:http://www.fastcae.com/product.html](http://www.fastcae.com/product.html)
+> [FastCAE](http://www.fastcae.com/product.html) CAE软件集成开发平台。
+主页:[www.fastcae.com](www.fastcae.com)
+
+![FastCAE](./doc/gallery/fastcae.png)
+
+> [shonDy](https://shoncloud.com) 粒子法流体仿真软件。
+主页:[https://shoncloud.com](https://shoncloud.com)
+
+![shonDy](./doc/gallery/shonDy.png)

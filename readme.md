@@ -706,4 +706,12 @@ example:
 
 # Gallery
 
-> Thank[FastCAE](http://www.fastcae.com/product.html)for using this control and finding many bugs and suggestions
+> [FastCAE](http://www.fastcae.com/product.html) CAE software integrated development platform. 
+homepage:[www.fastcae.com](www.fastcae.com)
+
+![FastCAE](./doc/gallery/fastcae.png)
+
+> [shonDy](https://shoncloud.com) MPS(Moving particle simulation method) Fluid simulation software.
+homepage:[https://shoncloud.com](https://shoncloud.com)
+
+![shonDy](./doc/gallery/shonDy.png)
