@@ -205,7 +205,9 @@ public:
     void removeCategory(SARibbonCategory* category);
 
     // 添加一个上下文标签
-    SARibbonContextCategory* addContextCategory(const QString& title, const QColor& color = QColor(), const QVariant& id = QVariant());
+    SARibbonContextCategory* addContextCategory(const QString& title,
+                                                const QColor& color = QColor(),
+                                                const QVariant& id  = QVariant());
     void addContextCategory(SARibbonContextCategory* context);
 
     // 显示一个上下文标签
@@ -341,6 +343,10 @@ public:
     void setContextCategoryColorList(const QList< QColor >& cls);
     QList< QColor > contextCategoryColorList() const;
 
+    // 设置context category 标题的文字颜色
+    void setContextCategoryTitleTextColor(const QColor& clr);
+    QColor contextCategoryTitleTextColor() const;
+
     // 设置ribbon的对齐方式
     void setRibbonAlignment(SARibbonAlignment al);
     SARibbonAlignment ribbonAlignment() const;
@@ -427,7 +433,7 @@ protected:
     virtual bool event(QEvent* e) Q_DECL_OVERRIDE;
     virtual void paintTabbarBaseLine(QPainter& painter);
     virtual void paintWindowTitle(QPainter& painter, const QString& title, const QRect& titleRegion);
-    virtual void paintContextCategoryTab(QPainter& painter, const QString& title, QRect contextRect, const QColor& color);
+    virtual void paintContextCategoryTab(QPainter& painter, const QString& title, const QRect& contextRect, const QColor& color);
 #if SA_DEBUG_PRINT_SARIBBONBAR
     SA_RIBBON_EXPORT friend QDebug operator<<(QDebug debug, const SARibbonBar& ribbon);
 #endif

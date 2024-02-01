@@ -1,10 +1,4 @@
 ﻿#include "SARibbonBar.h"
-#include "SARibbonButtonGroupWidget.h"
-#include "SARibbonElementManager.h"
-#include "SARibbonQuickAccessBar.h"
-#include "SARibbonStackedWidget.h"
-#include "SARibbonTabBar.h"
-#include "SARibbonSystemButtonBar.h"
 #include <QPointer>
 #include <QAction>
 #include <QApplication>
@@ -17,6 +11,11 @@
 #include <QStyleOptionMenuItem>
 #include <QTimer>
 #include <QVariant>
+#include "SARibbonButtonGroupWidget.h"
+#include "SARibbonElementManager.h"
+#include "SARibbonQuickAccessBar.h"
+#include "SARibbonStackedWidget.h"
+#include "SARibbonTabBar.h"
 #include "SARibbonApplicationButton.h"
 
 #define HELP_DRAW_RECT(p, rect)                                                                                        \
@@ -76,6 +75,7 @@ public:
     int mContextCategoryColorListIndex { -1 };  ///< 记录contextCategory色系索引
     QColor mTitleTextColor;  ///< 标题文字颜色,默认无效，无效的情况下和SARibbonBar的qss:color属性一致
     QColor mTabBarBaseLineColor { QColor(186, 201, 219) };  ///< tabbar 底部会绘制一条线条，定义线条颜色
+    QColor mContextCategoryTitleTextColor { Qt::black };    ///< 记录Context category的标题字体颜色
     Qt::Alignment mTitleAligment { Qt::AlignCenter };       ///< 标题对齐方式
     bool mIsTitleVisible { true };                          ///< 标题是否显示
     SARibbonAlignment mRibbonAlignment { SARibbonAlignment::AlignLeft };                         ///< 对齐方式
@@ -152,7 +152,10 @@ void SARibbonBar::PrivateData::init()
     //
     mStackedContainerWidget = RibbonSubElementFactory->createRibbonStackedWidget(q_ptr);
     mStackedContainerWidget->setObjectName(QStringLiteral("objSARibbonStackedContainerWidget"));
-    mStackedContainerWidget->connect(mStackedContainerWidget, &SARibbonStackedWidget::hidWindow, q_ptr, &SARibbonBar::onStackWidgetHided);
+    mStackedContainerWidget->connect(mStackedContainerWidget,
+                                     &SARibbonStackedWidget::hidWindow,
+                                     q_ptr,
+                                     &SARibbonBar::onStackWidgetHided);
     // 捕获事件，在popmode时必须用到
     mStackedContainerWidget->installEventFilter(q_ptr);
     //
@@ -231,7 +234,11 @@ int SARibbonBar::PrivateData::calcCategoryHeight()
  * @param categoryHeight
  * @return
  */
-int SARibbonBar::PrivateData::calcMainBarHeight(int tabHegith, int titleHeight, int categoryHeight, bool tabOnTitle, SARibbonBar::RibbonMode rMode)
+int SARibbonBar::PrivateData::calcMainBarHeight(int tabHegith,
+                                                int titleHeight,
+                                                int categoryHeight,
+                                                bool tabOnTitle,
+                                                SARibbonBar::RibbonMode rMode)
 {
     if (rMode == MinimumRibbonMode) {
         // 最小模式，没有categoryHeight
@@ -510,13 +517,14 @@ QString SARibbonBar::versionString()
 QList< QColor > SARibbonBar::defaultContextCategoryColorList()
 {
     QList< QColor > res;
-    res << QColor(201, 89, 156)  // 玫红
-        << QColor(242, 203, 29)  // 黄
-        << QColor(255, 157, 0)   // 橙
-        << QColor(14, 81, 167)   // 蓝
-        << QColor(228, 0, 69)    // 红
-        << QColor(67, 148, 0)    // 绿
-            ;
+    res                           //
+        << QColor(206, 232, 252)  // 蓝
+        << QColor(253, 238, 179)  // 黄
+        << QColor(212, 255, 174)  // 绿
+        << QColor(255, 196, 214)  // 红
+        << QColor(255, 216, 153)  // 橙
+        << QColor(255, 224, 243)  // 玫红
+        ;
     return res;
 }
 
@@ -1081,11 +1089,13 @@ void SARibbonBar::showMinimumModeButton(bool isShow)
 
         d_ptr->mMinimumCategoryButtonAction = new QAction(this);
         d_ptr->mMinimumCategoryButtonAction->setIcon(
-                style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton, nullptr));
+            style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton,
+                                  nullptr));
         connect(d_ptr->mMinimumCategoryButtonAction, &QAction::triggered, this, [ this ]() {
             this->setMinimumMode(!isMinimumMode());
             this->d_ptr->mMinimumCategoryButtonAction->setIcon(
-                    style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton, nullptr));
+                style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton,
+                                      nullptr));
         });
         d_ptr->mRightButtonGroup->addAction(d_ptr->mMinimumCategoryButtonAction);
 
@@ -1475,7 +1485,7 @@ void SARibbonBar::setRibbonStyle(SARibbonBar::RibbonStyles v)
              << "\n  isTwoRowStyle=" << isTwoRowStyle()      //
              << "\n  isLooseStyle=" << isLooseStyle()        //
              << "\n  isCompactStyle=" << isCompactStyle()    //
-            ;
+        ;
 #endif
     // 执行判断
     setEnableWordWrap(isThreeRowStyle(v));
@@ -1807,6 +1817,24 @@ QList< QColor > SARibbonBar::contextCategoryColorList() const
 }
 
 /**
+ * @brief 设置contextCategory 标题的颜色
+ * @param clr
+ */
+void SARibbonBar::setContextCategoryTitleTextColor(const QColor& clr)
+{
+    d_ptr->mContextCategoryTitleTextColor = clr;
+}
+
+/**
+ * @brief contextCategory 标题的颜色
+ * @return
+ */
+QColor SARibbonBar::contextCategoryTitleTextColor() const
+{
+    return d_ptr->mContextCategoryTitleTextColor;
+}
+
+/**
    @brief 设置ribbon的对齐方式
    @param al
  */
@@ -2051,10 +2079,11 @@ void SARibbonBar::paintInLooseStyle()
             titleRegion.setRect(d_ptr->mQuickAccessBar->geometry().right() + 1,
                                 border.top(),
                                 width() - d_ptr->mIconRightBorderPosition - border.right()
-                                        - d_ptr->mWindowButtonSize.width() - d_ptr->mQuickAccessBar->geometry().right() - 1,
+                                    - d_ptr->mWindowButtonSize.width() - d_ptr->mQuickAccessBar->geometry().right() - 1,
                                 titleBarHeight());
         } else {
-            int leftwidth = contextCategoryRegion.x() - d_ptr->mQuickAccessBar->geometry().right() - d_ptr->mIconRightBorderPosition;
+            int leftwidth = contextCategoryRegion.x() - d_ptr->mQuickAccessBar->geometry().right()
+                            - d_ptr->mIconRightBorderPosition;
             int rightwidth = width() - contextCategoryRegion.y() - d_ptr->mWindowButtonSize.width();
             //            if (width() - contextCategoryRegion.y() > contextCategoryRegion.x()-x) {
             if (rightwidth > leftwidth) {
@@ -2177,7 +2206,7 @@ void SARibbonBar::updateContextCategoryManagerData()
  * @param contextRect 上下文标签的绘制区域
  * @param color 上下文标签赋予的颜色
  */
-void SARibbonBar::paintContextCategoryTab(QPainter& painter, const QString& title, QRect contextRect, const QColor& color)
+void SARibbonBar::paintContextCategoryTab(QPainter& painter, const QString& title, const QRect& contextRect, const QColor& color)
 {
     // 绘制上下文标签
     // 首先有5像素的实体粗线位于顶部
@@ -2185,21 +2214,21 @@ void SARibbonBar::paintContextCategoryTab(QPainter& painter, const QString& titl
     painter.save();
     painter.setPen(Qt::NoPen);
     painter.setBrush(color);
-    painter.drawRect(QRect(contextRect.x(), border.top(), contextRect.width(), 5));
-
-    // 剩下把颜色变亮90%
-    QColor gColor = color.lighter(190);
-
-    // 减去之前的5像素
-    contextRect -= QMargins(0, 5, 0, 0);
-    painter.fillRect(contextRect, gColor);
+    painter.drawRect(contextRect);
+    const int contextLineWidth = 5;
+    // 绘制很线
+    QColor gColor = color.darker();
+    painter.fillRect(QRect(contextRect.x(), contextRect.y(), contextRect.width(), contextLineWidth), gColor);
 
     // 只有在office模式下才需要绘制标题
     if (isLooseStyle()) {
         if (!title.isEmpty()) {
-            contextRect.setBottom(d_ptr->mRibbonTabBar->geometry().top());
-            painter.setPen(color);
-            painter.drawText(contextRect, Qt::AlignCenter, title);
+            QRect textRect = QRect(contextRect.x(),
+                                   contextRect.y() + contextLineWidth,
+                                   contextRect.width(),
+                                   contextRect.height() - contextLineWidth - d_ptr->mRibbonTabBar->height());
+            painter.setPen(contextCategoryTitleTextColor());
+            painter.drawText(textRect, Qt::AlignCenter, title);
         }
     }
     painter.restore();
@@ -2532,7 +2561,7 @@ QDebug operator<<(QDebug debug, const SARibbonBar& ribbon)
                     << "\n -mEnableShowPannelTitle=" << ribbon.d_ptr->mEnableShowPannelTitle      //
                     << "\n -mWindowButtonSize=" << ribbon.d_ptr->mWindowButtonSize                //
                     << "\n -mIconRightBorderPosition=" << ribbon.d_ptr->mIconRightBorderPosition  //
-            ;
+        ;
 
     return debug;
 }
