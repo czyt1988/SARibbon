@@ -255,7 +255,7 @@ void SARibbonMainWindow::setRibbonTheme(SARibbonMainWindow::RibbonTheme theme)
             bar->setContextCategoryColorList(QList< QColor >() << QColor(18, 64, 120));  //< 设置空颜色列表会重置为默认色系
             break;
         case RibbonThemeOffice2021Blue:
-            bar->setContextCategoryColorList(QList< QColor >() << QColor(0, 0, 0, 0));  //< 设置空颜色列表会重置为默认色系
+            bar->setContextCategoryColorList(QList< QColor >() << QColor(209, 207, 209));  //< 设置空颜色列表会重置为默认色系
             break;
         default:
             break;
@@ -293,7 +293,7 @@ SARibbonBar* SARibbonMainWindow::createRibbonBar()
 void SARibbonMainWindow::resizeEvent(QResizeEvent* e)
 {
     QMainWindow::resizeEvent(e);
-    SARibbonBar* bar        = ribbonBar();
+    SARibbonBar* bar            = ribbonBar();
     SARibbonSystemButtonBar* wg = d_ptr->mWindowButtonGroup;
 
     if (wg) {
