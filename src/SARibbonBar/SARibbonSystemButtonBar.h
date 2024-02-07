@@ -1,11 +1,11 @@
-#ifndef SARIBBONSYSTEMBUTTONBAR_H
+﻿#ifndef SARIBBONSYSTEMBUTTONBAR_H
 #define SARIBBONSYSTEMBUTTONBAR_H
 #include "SARibbonGlobal.h"
 #include <QFrame>
 #include <QToolButton>
 
 /**
- * \brief 窗口的最大最小化按钮
+ * @brief 窗口的最大最小化按钮
  * @note 内部有个SARibbonButtonGroupWidget，其ObjectName = SASystemButtonGroup
  * 如果需要qss，可以进行特化处理:
  *

@@ -371,7 +371,10 @@ QAction* SARibbonSystemButtonBar::addAction(QAction* a, Qt::ToolButtonStyle butt
     return d_ptr->mButtonGroup->addAction(a, buttonStyle, popMode);
 }
 
-QAction* SARibbonSystemButtonBar::addAction(const QString& text, const QIcon& icon, Qt::ToolButtonStyle buttonStyle, QToolButton::ToolButtonPopupMode popMode)
+QAction* SARibbonSystemButtonBar::addAction(const QString& text,
+                                            const QIcon& icon,
+                                            Qt::ToolButtonStyle buttonStyle,
+                                            QToolButton::ToolButtonPopupMode popMode)
 {
     return d_ptr->mButtonGroup->addAction(text, icon, buttonStyle, popMode);
 }
