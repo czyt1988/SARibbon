@@ -1,6 +1,10 @@
 ﻿# 版本记录(change log):
-    
-## 2024-01-27 -> 2.0.1
+
+## 2024-02-07 -> 2.0.2 
+- 修正SARibbonSystemButtonBar的编码问题，可能会导致vs下无法编译成功
+- SARibbonContextCategory的标签颜色调整
+
+## 2024-01-27 -> 2.0.1【失效，请使用v2.0.2及以上版本】
 - 调整qss，让SARibbonApplicationButton的下拉箭头不显示
 - 文档添加gallery
 - 修正了一个布局可能异常的点
