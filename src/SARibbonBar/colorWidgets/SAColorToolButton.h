@@ -6,6 +6,7 @@ class QPaintEvent;
 class QResizeEvent;
 class QPainter;
 class QStylePainter;
+class SAColorMenu;
 /**
  * @brief 这是一个只显示颜色的toolbutton
  *
@@ -41,7 +42,20 @@ class SA_COLOR_WIDGETS_API SAColorToolButton : public QToolButton
     Q_OBJECT
     SA_COLOR_WIDGETS_DECLARE_PRIVATE(SAColorToolButton)
 public:
+    /**
+     * @brief 颜色按钮的内置样式
+     * @param parent
+     * @return
+     */
+    enum ColorToolButtonStyle
+    {
+        WithColorMenu,  ///< 默认会构建一个SAColorMenu
+        NoColorMenu     ///< 没有ColorMenu
+    };
+
+public:
     explicit SAColorToolButton(QWidget* parent = nullptr);
+    explicit SAColorToolButton(ColorToolButtonStyle style, QWidget* parent = nullptr);
     ~SAColorToolButton();
     // 获取颜色
     QColor color() const;
@@ -50,6 +64,13 @@ public:
     QMargins margins() const;
     // 绘制无颜色
     static void paintNoneColor(QPainter* p, const QRect& colorRect);
+    // 设置颜色按钮的样式
+    void setColorToolButtonStyle(ColorToolButtonStyle s);
+    ColorToolButtonStyle colorToolButtonStyle() const;
+    // 获取colorMenu，注意，这个函数很有可能会返回nullptr，如果ColorToolButtonStyle设置为NoColorMenu或者自己设置了菜单，此函数返回nullptr
+    SAColorMenu* colorMenu() const;
+    // 建立标准的颜色菜单
+    SAColorMenu* createColorMenu();
 public slots:
     // 设置颜色,会发射colorChanged信号
     void setColor(const QColor& c);
