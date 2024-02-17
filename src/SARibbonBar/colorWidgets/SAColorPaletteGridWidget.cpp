@@ -6,7 +6,6 @@
 #include <QColorDialog>
 // SA
 #include "SAColorGridWidget.h"
-#include "SAColorToolButton.h"
 class SAColorPaletteGridWidget::PrivateData
 {
     SA_COLOR_WIDGETS_DECLARE_PUBLIC(SAColorPaletteGridWidget)

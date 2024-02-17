@@ -9,7 +9,7 @@ class SAColorGridWidget::PrivateData
     SA_COLOR_WIDGETS_DECLARE_PUBLIC(SAColorGridWidget)
 public:
     PrivateData(SAColorGridWidget* p);
-    //获取ColorToolButton
+    // 获取ColorToolButton
     SAColorToolButton* getColorToolButtonAt(int index);
     SAColorToolButton* getColorToolButtonAt(int r, int c);
     SAColorToolButton* getCheckedButton() const;
@@ -27,7 +27,7 @@ public:
     QButtonGroup* mButtonGroup { nullptr };
     QSize mIconSize { 16, 16 };
     int mColumnCount { 8 };  ///< 列数，行数量会根据列数量来匹配,如果设置-1或者0，说明不限定列数量，这样会只有一行
-    bool mColorCheckable;    ///<设置颜色是否是checkable
+    bool mColorCheckable;    ///< 设置颜色是否是checkable
     bool mHorizontalSpacerToRight { false };  ///< 最右边是否有弹簧
 };
 
@@ -89,11 +89,11 @@ void SAColorGridWidget::PrivateData::updateGridColor(bool isRemoveSpacer)
             }
         }
     }
-    //清除多余单元格
+    // 清除多余单元格
     int nowGridRow = mGridLayout->rowCount();
     int nowGridCol = mGridLayout->columnCount();
     if (nowGridRow > row) {
-        //多余的清除
+        // 多余的清除
         for (int r = row; r < nowGridRow; ++r) {
             for (int c = 0; c < nowGridCol; ++c) {
                 removeAt(r, c);
@@ -101,7 +101,7 @@ void SAColorGridWidget::PrivateData::updateGridColor(bool isRemoveSpacer)
         }
     }
     if (nowGridCol > col) {
-        //多余的列清除
+        // 多余的列清除
         for (int r = 0; r < row; ++r) {
             for (int c = col; c < nowGridCol; ++c) {
                 if (isRemoveSpacer) {
@@ -179,7 +179,7 @@ void SAColorGridWidget::PrivateData::setColorAt(const QColor& clr, int r, int c)
             tl->setColor(clr);
         }
     } else {
-        SAColorToolButton* tl = new SAColorToolButton(q_ptr);
+        SAColorToolButton* tl = new SAColorToolButton(SAColorToolButton::NoColorMenu, q_ptr);
         tl->setToolButtonStyle(Qt::ToolButtonIconOnly);
         tl->setIconSize(mIconSize);
         tl->setMargins(QMargins(4, 4, 4, 4));
@@ -208,10 +208,22 @@ bool SAColorGridWidget::PrivateData::isSpacer(int r, int c) const
 
 SAColorGridWidget::SAColorGridWidget(QWidget* par) : QWidget(par), d_ptr(new SAColorGridWidget::PrivateData(this))
 {
-    connect(d_ptr->mButtonGroup, QOverload< QAbstractButton* >::of(&QButtonGroup::buttonClicked), this, &SAColorGridWidget::onButtonClicked);
-    connect(d_ptr->mButtonGroup, QOverload< QAbstractButton* >::of(&QButtonGroup::buttonPressed), this, &SAColorGridWidget::onButtonPressed);
-    connect(d_ptr->mButtonGroup, QOverload< QAbstractButton* >::of(&QButtonGroup::buttonReleased), this, &SAColorGridWidget::onButtonReleased);
-    connect(d_ptr->mButtonGroup, QOverload< QAbstractButton*, bool >::of(&QButtonGroup::buttonToggled), this, &SAColorGridWidget::onButtonToggled);
+    connect(d_ptr->mButtonGroup,
+            QOverload< QAbstractButton* >::of(&QButtonGroup::buttonClicked),
+            this,
+            &SAColorGridWidget::onButtonClicked);
+    connect(d_ptr->mButtonGroup,
+            QOverload< QAbstractButton* >::of(&QButtonGroup::buttonPressed),
+            this,
+            &SAColorGridWidget::onButtonPressed);
+    connect(d_ptr->mButtonGroup,
+            QOverload< QAbstractButton* >::of(&QButtonGroup::buttonReleased),
+            this,
+            &SAColorGridWidget::onButtonReleased);
+    connect(d_ptr->mButtonGroup,
+            QOverload< QAbstractButton*, bool >::of(&QButtonGroup::buttonToggled),
+            this,
+            &SAColorGridWidget::onButtonToggled);
 }
 
 SAColorGridWidget::~SAColorGridWidget()
