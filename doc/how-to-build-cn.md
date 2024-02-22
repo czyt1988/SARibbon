@@ -4,7 +4,11 @@
 
 SARibbon使用了[QWindowkit](https://github.com/stdware/qwindowkit)作为无边框方案，同时也支持简单的无边框方案，如果你需要操作系统原生的窗口支持，如windows7以后的贴边处理，windows11的最大化按钮悬停的效果，建议开启[QWindowkit](https://github.com/stdware/qwindowkit)库，[QWindowkit](https://github.com/stdware/qwindowkit)库还能较好解决多屏幕移动问题
 
-如果你要依赖[QWindowkit](https://github.com/stdware/qwindowkit)库，需要先编译[QWindowkit](https://github.com/stdware/qwindowkit)库，[QWindowkit](https://github.com/stdware/qwindowkit)库作为SARibbon项目的submodules，如果在`git clone`时没有附带`--recursive`参数，需要执行`submodule update`命令:
+开启QWindowkit将能实现如下效果：
+
+![](./pic/set-qwindowkit-on-snap.gif)
+
+如果你要开启[QWindowkit](https://github.com/stdware/qwindowkit)，需要先编译[QWindowkit](https://github.com/stdware/qwindowkit)库，[QWindowkit](https://github.com/stdware/qwindowkit)库作为SARibbon项目的submodules，如果在`git clone`时没有附带`--recursive`参数，需要执行`submodule update`命令:
 
 ```shell
 git submodule update --init --recursive
@@ -36,7 +40,7 @@ build步骤选择install
 
 再点击运行（Ctrl+R）
 
-这时你会在SARibbon根目录下看到形如`bin_qt5.14.2_Debug_x64`这样的安装目录，这里自动把`QWindowkit`库安装在此目录下
+这时你会在SARibbon根目录下看到形如`bin_qt5.14.2_MSVC_x64`这样的安装目录，这里自动把`QWindowkit`库安装在此目录下
 
 ![](./pic/build-cmake-qwk-qtc-04.png)
 
@@ -56,7 +60,7 @@ build步骤选择install
 
 ![](./pic/build-cmake-vs-04.png)
 
-这时你会在SARibbon根目录下看到形如`bin_qt5.14.2_Debug_x64`这样的安装目录，这里自动把`QWindowkit`库安装在此目录下
+这时你会在SARibbon根目录下看到形如`bin_qt5.14.2_MSVC_x64`这样的安装目录，这里自动把`QWindowkit`库安装在此目录下
 
 ![](./pic/build-cmake-qwk-qtc-04.png)
 
@@ -69,6 +73,13 @@ SARibbonBar库提供cmake和qmake两种方式构建，推荐使用cmake
 ## 基于CMake构建SARibbonBar库
 
 ### vs下基于cmake的构建
+
+如果要开启`QWindowKit`，在CMakeLists.txt中把`SARIBBON_USE_FRAMELESS_LIB`的option值手动改为ON
+
+```
+# frameless能提供windows的窗口特效，如边缘吸附，且对高分屏多屏幕的支持更好,默认开启
+option(SARIBBON_USE_FRAMELESS_LIB "Using the QWindowKit library as a frameless solution" ON)
+```
 
 点击文件->打开->Cmake 选中CMakeLists.txt
 
@@ -86,7 +97,7 @@ SARibbonBar库提供cmake和qmake两种方式构建，推荐使用cmake
 
 ![](./pic/build-cmake-vs-04.png)
 
-这时候你会看到源码的根目录下多出一个文件夹,文件夹命名方式为`bin_qt{version}_[Debug/Release]_x[64/86]`（前提是你没有改变CMAKE_INSTALL_PREFIX）
+这时候你会看到源码的根目录下多出一个文件夹,文件夹命名方式为`bin_qt{version}_[MSVC/GNU]_x[64/86]`（前提是你没有改变CMAKE_INSTALL_PREFIX）
 
 ![](./pic/build-cmake-install-dir.png)
 
@@ -96,6 +107,10 @@ SARibbonBar库提供cmake和qmake两种方式构建，推荐使用cmake
 
 ![](./pic/build-cmake-qtc-01.png)
 
+Qt Creator可以在界面修改`SARIBBON_USE_FRAMELESS_LIB`值，也可以手动修改，在Qt Creator中，点击左侧边，切换到项目模式（Ctrl+5）,如下图，在Current Configuration中设置`SARIBBON_USE_FRAMELESS_LIB`为ON即可开启`QWindowKit`，前提是要先编译`QWindowKit`
+
+![](./pic/build-cmake-qtc-01-enable-qwk.png)
+
 点击运行按钮
 
 ![](./pic/build-cmake-qtc-02.png)
@@ -104,7 +119,7 @@ SARibbonBar库提供cmake和qmake两种方式构建，推荐使用cmake
 
 ![](./pic/build-cmake-qtc-03.png)
 
-再次点击运行按钮，这时候你会看到源码的根目录下多出一个文件夹,文件夹命名方式为`bin_qt{version}_[Debug/Release]_x[64/86]`（前提是你没有改变CMAKE_INSTALL_PREFIX）
+再次点击运行按钮，这时候你会看到源码的根目录下多出一个文件夹,文件夹命名方式为`bin_qt{version}_[MSVC/GNU]_x[64/86]`（前提是你没有改变CMAKE_INSTALL_PREFIX）
 
 ![](./pic/build-cmake-install-dir.png)
 
@@ -114,7 +129,7 @@ SARibbonBar库提供cmake和qmake两种方式构建，推荐使用cmake
 
 qmake构建SARibbonBar只需使用Qt Creator打开SARibbon.pro文件即可
 
-> 注意，如果使用Qt Creator打开SARibbon.pro文件过程报错，那么你的账户没有足够的写权限，因为qmake过程会在当前目录下执行mkdir等命令，没有足够权限，会报qmake错误
+> 注意，如果使用Qt Creator打开SARibbon.pro文件过程报错，那么你的账户可能是没有足够的写权限，不同版本的Qt Creator在不同操作系统由不一样的表现，建议使用cmake
 
 # 使用SARibbonBar库
 

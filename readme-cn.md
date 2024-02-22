@@ -110,6 +110,10 @@ SARibbon提供qmake和cmake两种构建方式，同时提供了一个集成的SA
 
 > SARibbon支持第三方无边框库[QWindowkit](https://github.com/stdware/qwindowkit)，同时也支持简单的无边框方案，如果你需要操作系统原生的窗口支持，如windows7以后的贴边处理，windows11的最大化按钮悬停的效果，建议开启[QWindowkit](https://github.com/stdware/qwindowkit)库，[QWindowkit](https://github.com/stdware/qwindowkit)库还能较好解决多屏幕移动问题
 
+开启`QWindowkit`后的效果如下：
+
+![](./doc/pic/set-qwindowkit-on-snap.gif)
+
 如果你要依赖[QWindowkit](https://github.com/stdware/qwindowkit)库，需要先编译[QWindowkit](https://github.com/stdware/qwindowkit)库，[QWindowkit](https://github.com/stdware/qwindowkit)库作为SARibbon项目的submodules，如果在`git clone`时没有附带`--recursive`参数，需要执行`submodule update`命令:
 
 ```shell

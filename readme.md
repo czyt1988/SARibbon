@@ -98,6 +98,8 @@ MIT protocol，welcome for everyone to use and give comments
 
 > `SARibbon` supports third-party library [QWindowKit](https://github.com/stdware/qwindowkit) At the same time, it also supports simple frameless solutions. If you need native window support for the operating system, such as edge trimming after Windows 7 and maximizing the hovering effect of buttons in Windows 11, it is recommended to enable [QWindowKit](https://github.com/stdware/qwindowkit) Library, [QWindowKit](https://github.com/stdware/qwindowkit) Library can better solve the problem of multi screen movement
 
+![](./doc/pic/set-qwindowkit-on-snap.gif)
+
 If you want to rely on [QWindowKit](https://github.com/stdware/qwindowkit) Library, needs to be compiled first [QWindowKit](https://github.com/stdware/qwindowkit) Library, [QWindowKit](https://github.com/stdware/qwindowkit) As the submodules of the SARibbon project, if the '-- recursive' parameter is not included in the 'git clone', the 'submodules update' command needs to be executed:
 
 ```shell
