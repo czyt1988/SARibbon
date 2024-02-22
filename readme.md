@@ -108,29 +108,7 @@ git submodule update --init --recursive
 
 ## Compile to dynamic libraries
 
-### qmake
-
-Use Qt Creator to open `SARibbon.pro` directly, compile it, and the SARibbonBar library and examples will be compiled, and the lib and example directories are located in the `bin_qt{Qt version}_{MSVC/GNU}_x{32/64}` directory
-
-> Libraries compiled in debug mode are distinguished by a 'd' after the end
-
-### cmake
-
-Use Qt Creator or visual studio to open `src/CMakeLists.txt` compilation
-
-```cmake
-mkdir build
-cd build
-cmake -DCMAKE_PREFIX_PATH={YOUR_QT_SDK_DIR_PATH} -DCMAKE_INSTALL_PREFIX={WHERE_YOU_WANT_TO_INSTALL} -DCMAKE_BUILD_TYPE=Release
-cmake --build . --config Release --target all --parallel
-cmake --install . --config Release --strip 
-```
-
-{YOUR_QT_SDK_DIR_PATH} is the directory of your qtsdk, something like `D:Qt5.14.2msvc2017_64`
-
-{WHERE_YOU_WANT_TO_INSTALL} is your installation directory
-
-
+For the detailed build process, refer to the document: [Building SARibbon](./doc/how-to-build.md)
 
 ## Embedding SARibbon directly into the project
 
