@@ -39,7 +39,7 @@ else()
 endif()
 # The bin file directory is one level above the current directory
 # cn:bin文件目录在当前目录的上上一级
-set(SARIBBON_BIN_NAME bin_qt${QT_VERSION}_${CMAKE_BUILD_TYPE}_${SARIBBON_PLATFORM})
+set(SARIBBON_BIN_NAME bin_qt${QT_VERSION}_${CMAKE_CXX_COMPILER_ID}_${SARIBBON_PLATFORM})
 set(SARIBBON_BIN_DIR ${CMAKE_CURRENT_LIST_DIR}/../../../${SARIBBON_BIN_NAME})
 # windows系统下，默认直接安装到当前文件夹下
 if(WIN32)

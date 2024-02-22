@@ -1,153 +1,192 @@
-此文会详细介绍如何构建和引入SARibbon
+This document will detail how to build and introduce SARibbon.
 
-# 准备工作
+# Preparation
 
-SARibbon使用了[QWindowkit](https://github.com/stdware/qwindowkit)作为无边框方案，同时也支持简单的无边框方案，如果你需要操作系统原生的窗口支持，如windows7以后的贴边处理，windows11的最大化按钮悬停的效果，建议开启[QWindowkit](https://github.com/stdware/qwindowkit)库，[QWindowkit](https://github.com/stdware/qwindowkit)库还能较好解决多屏幕移动问题
+SARibbon uses [QWindowkit](https://github.com/stdware/qwindowkit) as a borderless solution, while also supporting a simpler approach. If you require native window support from the operating system, such as edge sticking in Windows 7 or later, and hover effects on the maximize button in Windows 11, it is recommended to enable the [QWindowkit](https://github.com/stdware/qwindowkit) library. The [QWindowkit](https://github.com/stdware/qwindowkit) library can also better handle multi-screen movement issues.
 
-如果你要依赖[QWindowkit](https://github.com/stdware/qwindowkit)库，需要先编译[QWindowkit](https://github.com/stdware/qwindowkit)库，[QWindowkit](https://github.com/stdware/qwindowkit)库作为SARibbon项目的submodules，如果在`git clone`时没有附带`--recursive`参数，需要执行`submodule update`命令:
+Enabling QWindowkit will achieve the following effects:
+
+![](./pic/set-qwindowkit-on-snap.gif)
+
+If you want to enable [QWindowkit](https://github.com/stdware/qwindowkit), you need to first compile the [QWindowkit](https://github.com/stdware/qwindowkit) library. As the [QWindowkit](https://github.com/stdware/qwindowkit) library is a submodule of the SARibbon project, if you did not include the `--recursive` parameter during `git clone`, you need to execute the `submodule update` command:
 
 ```shell
 git submodule update --init --recursive
 ```
 
-# 编译QWindowkit库(如果不开启跳过此步)
+# Compile QWindowkit Library (Skip this step if not enabled)
 
-`QWindowkit`库只提供了cmake的编译方式，必须使用cmake
+`QWindowkit` library provides only cmake compilation method, and cmake must be used.
 
-为了简单，在`src/SARibbonBar/3rdparty`下提供了一个`CMakeLists.txt`文件，已经对此库的必要配置进行了设置，直接调用`src/SARibbonBar/3rdparty/CMakeLists.txt`文件编译即可
+For simplicity, a `CMakeLists.txt` file is provided under `src/SARibbonBar/3rdparty`, which has already set up the necessary configurations for this library. Simply call the `src/SARibbonBar/3rdparty/CMakeLists.txt` file to compile.
 
-使用Qt Creator和使用visual studio构建和安装基本一样
+Building with Qt Creator is similar to using Visual Studio.
 
-# 使用CMake构建和安装SARibbon库
+## Build and Install QWindowkit Library with Qt Creator
 
-> 推荐使用cmake对SARibbon库进行构建和安装
-
-## 使用Qt Creator（CMake）进行SARibbon库的构建和安装
-
-使用qt creator编译`QWindowkit`库，直接用qt creator打开`src/SARibbonBar/3rdparty/CMakeLists.txt`文件
+Compile the `QWindowkit` library using Qt Creator by directly opening the `src/SARibbonBar/3rdparty/CMakeLists.txt` file.
 
 ![](./pic/build-cmake-qwk-qtc-01.png)
 
-点击运行（Ctrl+R）
+Click run (Ctrl+R).
 
 ![](./pic/build-cmake-qwk-qtc-02.png)
 
-切换到项目模式（Ctrl+5）
+Switch to the Projects mode (Ctrl+5).
 
-build步骤选择install
+Select the 'install' option for the build step.
 
 ![](./pic/build-cmake-qwk-qtc-03.png)
 
-再点击运行（Ctrl+R）
+Click run again (Ctrl+R).
 
-这时你会在SARibbon根目录下看到形如`bin_qt5.14.2_Debug_x64`这样的安装目录，这里自动把`QWindowkit`库安装在此目录下
+You will now see an installation directory like `bin_qt5.14.2_MSVC_x64` in the SARibbon root directory. The `QWindowkit` library is automatically installed in this directory.
 
 ![](./pic/build-cmake-qwk-qtc-04.png)
 
-此时完成`QWindowkit`库的编译和安装
+This completes the compilation and installation of the `QWindowkit` library.
 
-## 使用visual studio（CMake）进行SARibbon库的构建和安装
+## Build and Install QWindowkit Library with Visual Studio
 
-使用visual studio编译`QWindowkit`库，用visual studio打开->CMake，选择`src/SARibbonBar/3rdparty/CMakeLists.txt`文件
+Compile the `QWindowkit` library using Visual Studio by opening CMake and selecting the `src/SARibbonBar/3rdparty/CMakeLists.txt` file.
 
 ![](./pic/build-cmake-vs-01.png)
 
-选中CMake菜单->全部生成
+Select CMake menu->Generate All.
 
 ![](./pic/build-cmake-vs-03.png)
 
-选中CMake菜单->安装
+Select CMake menu->Install.
 
 ![](./pic/build-cmake-vs-04.png)
 
-这时你会在SARibbon根目录下看到形如`bin_qt5.14.2_Debug_x64`这样的安装目录，这里自动把`QWindowkit`库安装在此目录下
+You will now see an installation directory like `bin_qt5.14.2_MSVC_x64` in the SARibbon root directory. The `QWindowkit` library is automatically installed in this directory.
 
 ![](./pic/build-cmake-qwk-qtc-04.png)
 
-此时完成`QWindowkit`库的编译和安装
+This completes the compilation and installation of the `QWindowkit` library.
 
-# Cmake构建及使用SARibbon教程
+# Build SARibbonBar Library
 
-最近发现有许多使用visual studio（以下简称vs）咨询可以构建但无法引入的问题，为此，这里专门写此文针对此问题进行说明
+SARibbonBar library provides two ways to build: cmake and qmake. It is recommended to use cmake.
 
-分两种方式，第一种使用cmake，个人推荐使用cmake对工程进行构建，毕竟能用到Ribbon的界面都算大型工程了
+## Build SARibbonBar Library with CMake
 
-另外一种是直接通过visual studio建立的工程引入SARibbon
+### Building with CMake in Visual Studio
 
-# 基于cmake的构建和使用
+To enable `QWindowKit`, manually set the value of the `SARIBBON_USE_FRAMELESS_LIB` option to ON in the CMakeLists.txt file:
 
-## vs下基于cmake的构建
+```
+option(SARIBBON_USE_FRAMELESS_LIB "Using the QWindowKit library as a frameless solution" ON)
+```
 
-点击文件->打开->Cmake 选中CMakeLists.txt
+Open file->Open->CMake and select CMakeLists.txt.
 
 ![](./pic/build-cmake-vs-01.png)
 
-将会形成如下的构建树
+The build tree will look like this:
 
 ![](./pic/build-cmake-vs-02.png)
 
-直接点击CMake菜单->全部生成
+Click CMake menu->Generate All.
 
 ![](./pic/build-cmake-vs-03.png)
 
-全部生成完成后，CMake菜单->安装->SARibbon
+After generation, click CMake menu->Install->SARibbon.
 
 ![](./pic/build-cmake-vs-04.png)
 
-这时候你会看到源码的根目录下多出一个文件夹,文件夹命名方式为`bin_qt{version}_[MSVC/GNU]_x[64/86]`（前提是你没有改变CMAKE_INSTALL_PREFIX）
+You will see a new folder in the root directory named `bin_qt{version}_{MSVC/GNU}_x{64/86}` (assuming you did not change CMAKE_INSTALL_PREFIX).
 
 ![](./pic/build-cmake-install-dir.png)
 
-## qtcreator下基于cmake的构建
+### Building with CMake in Qt Creator
 
-点击文件->打开文件或项目选中CMakeLists.txt，加载完成后形成如下的构建树
+Click File->Open File or Project and select CMakeLists.txt. Once loaded, the project tree will appear as follows:
 
 ![](./pic/build-cmake-qtc-01.png)
 
-点击运行按钮
+In Qt Creator, you can modify the value of `SARIBBON_USE_FRAMELESS_LIB` in the interface or manually. Switch to the Projects mode (Ctrl+5), navigate to Current Configuration, and set `SARIBBON_USE_FRAMELESS_LIB` to ON to enable `QWindowKit`, assuming you have compiled `QWindowKit` first.
+
+![](./pic/build-cmake-qtc-01-enable-qwk.png)
+
+Click the run button.
 
 ![](./pic/build-cmake-qtc-02.png)
 
-运行结束，会弹出例子窗口，点击左侧边栏的项目标签，Build的步骤，选中install
+After completion, a sample window will pop up. Click the Build steps in the sidebar, and select install.
 
 ![](./pic/build-cmake-qtc-03.png)
 
-再次点击运行按钮，这时候你会看到源码的根目录下多出一个文件夹,文件夹命名方式为`bin_qt{version}_[MSVC/GNU]_x[64/86]`（前提是你没有改变CMAKE_INSTALL_PREFIX）
+Click run again, and you will see a new folder in the root directory named `bin_qt{version}_{MSVC/GNU}_x{64/86}` (assuming you did not change CMAKE_INSTALL_PREFIX).
 
 ![](./pic/build-cmake-install-dir.png)
 
-使用SARibbon的所有内容都在这个文件夹下
+All contents related to using SARibbon are located in this folder.
 
-# 使用QMake构建和安装
+## Build SARibbonBar Library with QMake
 
-> SARibbon提供qmake的构建和安装，但更推荐使用cmake对SARibbon库进行构建和安装
+Building SARibbonBar with qmake only requires opening the SARibbon.pro file in Qt Creator.
 
-使用qmake进行构建和安装只需使用qt creator打开SARibbon库下的`SARibbon.pro`文件，再点击运行（Ctrl+R）即可
+Note: If there are errors during the process of opening the SARibbon.pro file in Qt Creator, your account may lack sufficient write permissions. Different versions of Qt Creator exhibit different behaviors on different operating systems. It is recommended to use cmake.
 
-如果在打开`SARibbon.pro`文件出现一些错误提示，可能是你的Qt Creator对某个文件夹没有创建权限，需要使用管理员权限运行
+# Using SARibbonBar Library
 
-# 引入SARibbon库
+## Introducing SARibbonBar with CMake
 
-## 使用CMake引入SARibbonBar
+First, compile and install SARibbonBar using cmake in your project:
 
-引用SARibbonBar和编译器无关，主要针对自己cmake文件的编写
-
-1、指定SARibbonBar的安装目录，把安装目录下的`lib/cmake/SARibbonBar`位置设置给`SARibbonBar_DIR`变量
+1. Specify the SARibbonBar installation directory and set the `SARibbonBar_DIR` variable to point to the `lib/cmake/SARibbonBar` location in the installation directory.
 
 ```cmake
 set(SARibbonBar_DIR "C:\src\Qt\SARibbon\bin_qt5.14.2_MSVC_x64\lib\cmake\SARibbonBar")
 ```
 
-2、使用find_package找到SARibbonBar的Config文件，这个函数实际上是调用`lib/cmake/SARibbonBar/SARibbonBarConfig.cmake`文件，这里会把需要include的路径、预定义的宏，和需要添加的库给指定好，此时`SARibbonBar_INCLUDE_DIR`就是SARibbonBar的include文件路径
+2. Use `find_package` to locate the SARibbonBar Config file. This function actually calls the `lib/cmake/SARibbonBar/SARibbonBarConfig.cmake` file, which sets up the necessary include paths, predefined macros, and libraries to add. At this point, `SARibbonBar_INCLUDE_DIR` is the path to the SARibbonBar include files.
 
 ```cmake
 find_package(SARibbonBar)
 ```
 
-3、最后调用`target_link_libraries`添加SARibbonBar库到自己的工程中,这里${myapp_target_name}是自己工程的target名字
+3. Finally, use `target_link_libraries` to add the SARibbonBar library to your project. Here, `${myapp_target_name}` is the target name of your project.
 
 ```cmake
 target_link_libraries(${myapp_target_name} PUBLIC
     SARibbonBar
 )
 ```
+
+## Introducing SARibbonBar with QMake
+
+During the qmake compilation process, a `bin_qt{Qt version}_{MSVC/GNU}_x{32/64}` folder will be generated under SARibbon, containing library and dll files. The `importSARibbonBarLib.pri` file will automatically reference the libraries in this folder.
+
+Follow these steps:
+
+1. Create a `3rdparty` folder in your project and copy the entire SARibbon folder into it.
+
+> Inside SARibbon, there are several `.pri` files that can easily integrate the project into your directory. The `importSARibbonBarLib.pri` file is used to import the SARibbon library.
+
+2. Add the following statement to your project's Qt project pro file:
+
+```shell
+include($$PWD/3rdparty/SARibbon/importSARibbonBarLib.pri)
+```
+
+Your project directory structure should look roughly like this:
+
+```
+|-[you-project-dir]
+|  |-you-project.pro
+|  |-[3rdparty]
+|     |-[SARibbon](Copy SARibbon entirely here)
+|        |-importSARibbonBarLib.pri
+|        |-SARibbonBar.pri
+|        |-common.pri
+|        |-[bin_qtx.x.x_{MSVC/GNU}_x{32/64}]
+|        |-[src]
+|        |   |-[SARibbonBar]
+```
+
+These three files (`importSARibbonBarLib.pri`, `SARibbonBar.pri`, `common.pri`) are crucial for integrating the project.
+
+> Note: Starting from Qt 6.0, qmake has been abandoned. It is recommended to use cmake to manage projects.
