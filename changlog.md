@@ -1,5 +1,10 @@
 ﻿# 版本记录(change log):
 
+## 2024-02-07 -> 2.0.3
+- 调整SAColorToolButton的实现，使之更简单
+- 修正qwk库引入的cmake
+- 调整文档
+
 ## 2024-02-07 -> 2.0.2 
 - 修正SARibbonSystemButtonBar的编码问题，可能会导致vs下无法编译成功
 - SARibbonContextCategory的标签颜色调整
