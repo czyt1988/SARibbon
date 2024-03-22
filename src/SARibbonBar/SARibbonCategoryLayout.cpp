@@ -440,9 +440,12 @@ void SARibbonCategoryLayout::doLayout()
             ++debug_i__;
 #endif
         } else {
-            // item->widget()->setFixedSize(item->mWillSetGeometry.size());
-            // item->widget()->move(item->mWillSetGeometry.topLeft());
-            item->setGeometry(item->mWillSetGeometry);
+            //! 这里不能用item->setGeometry(item->mWillSetGeometry);这样会得到一个很奇怪的显示效果
+            //! 就是窗口的最左边不会移出去，而是把最右边压缩，
+            item->widget()->setGeometry(item->mWillSetGeometry);
+            //            item->widget()->setFixedSize(item->mWillSetGeometry.size());
+            //            item->widget()->move(item->mWillSetGeometry.topLeft());
+            //            item->setGeometry(item->mWillSetGeometry);
             showWidgets << item->widget();
             if (item->separatorWidget) {
                 item->separatorWidget->setGeometry(item->mWillSetSeparatorGeometry);

@@ -302,7 +302,11 @@ void SARibbonPannelLayout::doLayout()
         if (item->isEmpty()) {
             hideWidgets << item->widget();
         } else {
-            item->setGeometry(item->itemWillSetGeometry);
+            // 在category发现item->setGeometry有点奇怪的现象，这里统一使用item->widget->setgeo
+            // item->setGeometry(item->itemWillSetGeometry);
+            if (item->widget()) {
+                item->widget()->setGeometry(item->itemWillSetGeometry);
+            }
             showWidgets << item->widget();
         }
     }
