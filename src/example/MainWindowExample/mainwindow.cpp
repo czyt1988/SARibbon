@@ -557,7 +557,7 @@ void MainWindow::onColorButtonColorClicked(const QColor& c, bool on)
  */
 void MainWindow::onRibbonThemeComboBoxCurrentIndexChanged(int index)
 {
-    SARibbonMainWindow::RibbonTheme t = static_cast< SARibbonMainWindow::RibbonTheme >(
+	SARibbonTheme t = static_cast< SARibbonTheme >(
             mComboboxRibbonTheme->itemData(index).toInt());
     setRibbonTheme(t);
 }
@@ -719,12 +719,12 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     mComboboxRibbonTheme = new SARibbonComboBox();
     mComboboxRibbonTheme->setWindowTitle(tr("RibbonTheme"));
     mComboboxRibbonTheme->setObjectName("RibbonTheme");
-    mComboboxRibbonTheme->addItem("Theme Win7", SARibbonMainWindow::RibbonThemeWindows7);
-    mComboboxRibbonTheme->addItem("Theme Office2013", SARibbonMainWindow::RibbonThemeOffice2013);
-    mComboboxRibbonTheme->addItem("Theme Office2016 Blue", SARibbonMainWindow::RibbonThemeOffice2016Blue);
-    mComboboxRibbonTheme->addItem("Theme Office2021 Blue", SARibbonMainWindow::RibbonThemeOffice2021Blue);
-    mComboboxRibbonTheme->addItem("Theme Dark", SARibbonMainWindow::RibbonThemeDark);
-    mComboboxRibbonTheme->addItem("Theme Dark2", SARibbonMainWindow::RibbonThemeDark2);
+	mComboboxRibbonTheme->addItem("Theme Win7", static_cast<int>(SARibbonTheme::RibbonThemeWindows7));
+	mComboboxRibbonTheme->addItem("Theme Office2013", static_cast<int>(SARibbonTheme::RibbonThemeOffice2013));
+	mComboboxRibbonTheme->addItem("Theme Office2016 Blue", static_cast<int>(SARibbonTheme::RibbonThemeOffice2016Blue));
+	mComboboxRibbonTheme->addItem("Theme Office2021 Blue", static_cast<int>(SARibbonTheme::RibbonThemeOffice2021Blue));
+	mComboboxRibbonTheme->addItem("Theme Dark", static_cast<int>(SARibbonTheme::RibbonThemeDark));
+	mComboboxRibbonTheme->addItem("Theme Dark2", static_cast<int>(SARibbonTheme::RibbonThemeDark2));
     mComboboxRibbonTheme->setCurrentIndex(mComboboxRibbonTheme->findData(static_cast< int >(ribbonTheme())));
     connect(mComboboxRibbonTheme, QOverload< int >::of(&SARibbonComboBox::currentIndexChanged), this, &MainWindow::onRibbonThemeComboBoxCurrentIndexChanged);
     pannelStyle->addSmallWidget(mComboboxRibbonTheme);

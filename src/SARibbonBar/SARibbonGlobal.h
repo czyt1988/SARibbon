@@ -44,19 +44,19 @@
  */
 #ifndef SA_RIBBON_DECLARE_PRIVATE
 #define SA_RIBBON_DECLARE_PRIVATE(classname)                                                                           \
-    class PrivateData;                                                                                                 \
-    friend class classname::PrivateData;                                                                               \
-    std::unique_ptr< PrivateData > d_ptr;
+	class PrivateData;                                                                                                 \
+	friend class classname::PrivateData;                                                                               \
+	std::unique_ptr< PrivateData > d_ptr;
 #endif
 /**
  * @def   模仿Q_DECLARE_PUBLIC
  */
 #ifndef SA_RIBBON_DECLARE_PUBLIC
 #define SA_RIBBON_DECLARE_PUBLIC(classname)                                                                            \
-    friend class classname;                                                                                            \
-    classname* q_ptr { nullptr };                                                                                      \
-    PrivateData(const PrivateData&)            = delete;                                                               \
-    PrivateData& operator=(const PrivateData&) = delete;
+	friend class classname;                                                                                            \
+	classname* q_ptr { nullptr };                                                                                      \
+	PrivateData(const PrivateData&)            = delete;                                                               \
+	PrivateData& operator=(const PrivateData&) = delete;
 #endif
 
 /**
@@ -64,8 +64,26 @@
  */
 enum class SARibbonAlignment
 {
-    AlignLeft,   ///< 左对齐，tab栏左对齐，同时category也是左对齐
-    AlignCenter  ///< 居中对其，tab栏居中对齐，同时category也是居中对齐
+	AlignLeft,   ///< 左对齐，tab栏左对齐，同时category也是左对齐
+	AlignCenter  ///< 居中对其，tab栏居中对齐，同时category也是居中对齐
+};
+
+/**
+ * @brief ribbon主题
+ * 
+ * 注意，由于有些qss的尺寸，在C++代码中无法获取到，因此针对用户自定义的qss主题，有些尺寸是需要手动设置进去的
+ *
+ * 例如ribbon tab的margin信息，在QTabBar是无法获取到，而这个影响了SARibbonContextCategory的绘制，
+ * 因此，在设置qss后需要针对margin信息重新设置进SARibbonTabBar中
+ */
+enum class SARibbonTheme
+{
+	RibbonThemeOffice2013,      ///< office2013主题
+	RibbonThemeOffice2016Blue,  ///< office2016-蓝色主题
+	RibbonThemeOffice2021Blue,  ///< office2021-蓝色主题
+	RibbonThemeWindows7,        ///< win7主题
+	RibbonThemeDark,            ///< 暗色主题
+	RibbonThemeDark2
 };
 
 /**

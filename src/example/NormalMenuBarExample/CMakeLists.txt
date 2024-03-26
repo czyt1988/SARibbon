@@ -10,7 +10,7 @@ find_package(Qt${QT_VERSION_MAJOR} 5.9 COMPONENTS Core Gui Widgets REQUIRED)
 
 # linux下会报
 set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_LIST_DIR})
-add_executable(${SARIBBON_EXPAMPLE_NAME} 
+add_executable(${SARIBBON_EXPAMPLE_NAME} WIN32
     MainWindow.h
     MainWindow.cpp
     MainWindow.ui
