@@ -38,6 +38,7 @@ SET(SARIBBON_HEADER_FILES
     SARibbonCustomizeDialog.h
     SARibbonCustomizeWidget.h
     SARibbonMainWindow.h
+    SARibbonWidget.h
     SARibbonSystemButtonBar.h
     SARibbonApplicationButton.h
     SARibbonTabBar.h
@@ -79,6 +80,7 @@ SET(SARIBBON_SOURCE_FILES
     SARibbonCustomizeDialog.cpp
     SARibbonCustomizeWidget.cpp
     SARibbonMainWindow.cpp
+    SARibbonWidget.cpp
     SARibbonSystemButtonBar.cpp
     SARibbonApplicationButton.cpp
     SARibbonTabBar.cpp
