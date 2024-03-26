@@ -30,7 +30,7 @@ public:
     void installFrameless(SARibbonMainWindow* p);
 
 public:
-    SARibbonMainWindow::RibbonTheme mCurrentRibbonTheme { SARibbonMainWindow::RibbonThemeOffice2021Blue };
+	SARibbonTheme mCurrentRibbonTheme { SARibbonTheme::RibbonThemeOffice2021Blue };
     SARibbonSystemButtonBar* mWindowButtonGroup { nullptr };
 #if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
     QWK::WidgetWindowAgent* mFramelessHelper { nullptr };
@@ -203,7 +203,7 @@ void SARibbonMainWindow::updateWindowFlag(Qt::WindowFlags flags)
  * @endcode
  * @param theme
  */
-void SARibbonMainWindow::setRibbonTheme(SARibbonMainWindow::RibbonTheme theme)
+void SARibbonMainWindow::setRibbonTheme(SARibbonTheme theme)
 {
     sa_set_ribbon_theme(this, theme);
     d_ptr->mCurrentRibbonTheme = theme;
@@ -211,11 +211,11 @@ void SARibbonMainWindow::setRibbonTheme(SARibbonMainWindow::RibbonTheme theme)
         auto theme = ribbonTheme();
         // 尺寸修正
         switch (theme) {
-        case RibbonThemeWindows7:
-        case RibbonThemeOffice2013:
-        case RibbonThemeOffice2016Blue:
-        case RibbonThemeDark:
-        case RibbonThemeDark2: {
+        case SARibbonTheme::RibbonThemeWindows7:
+        case SARibbonTheme::RibbonThemeOffice2013:
+        case SARibbonTheme::RibbonThemeOffice2016Blue:
+        case SARibbonTheme::RibbonThemeDark:
+        case SARibbonTheme::RibbonThemeDark2: {
             //! 在设置qss后需要针对margin信息重新设置进SARibbonTabBar中
             //! office2013.qss的margin信息如下设置
             //! margin-top: 0px;
@@ -228,7 +228,7 @@ void SARibbonMainWindow::setRibbonTheme(SARibbonMainWindow::RibbonTheme theme)
             }
             tab->setTabMargin(QMargins(5, 0, 0, 0));
         } break;
-        case RibbonThemeOffice2021Blue: {
+		case SARibbonTheme::RibbonThemeOffice2021Blue: {
             SARibbonTabBar* tab = bar->ribbonTabBar();
             if (!tab) {
                 break;
@@ -246,22 +246,22 @@ void SARibbonMainWindow::setRibbonTheme(SARibbonMainWindow::RibbonTheme theme)
         }
         // 上下文标签颜色设置,以及基线颜色设置
         switch (theme) {
-        case RibbonThemeWindows7:
-        case RibbonThemeOffice2013:
-        case RibbonThemeDark:
+        case SARibbonTheme::RibbonThemeWindows7:
+        case SARibbonTheme::RibbonThemeOffice2013:
+        case SARibbonTheme::RibbonThemeDark:
             bar->setContextCategoryColorList(QList< QColor >());  //< 设置空颜色列表会重置为默认色系
             break;
-        case RibbonThemeOffice2016Blue:
+		case SARibbonTheme::RibbonThemeOffice2016Blue:
             bar->setContextCategoryColorList(QList< QColor >() << QColor(18, 64, 120));  //< 设置空颜色列表会重置为默认色系
             break;
-        case RibbonThemeOffice2021Blue:
+		case SARibbonTheme::RibbonThemeOffice2021Blue:
             bar->setContextCategoryColorList(QList< QColor >() << QColor(209, 207, 209));  //< 设置空颜色列表会重置为默认色系
             break;
         default:
             break;
         }
         // 基线颜色设置
-        if (RibbonThemeOffice2013 == theme) {
+		if (SARibbonTheme::RibbonThemeOffice2013 == theme) {
             bar->setTabBarBaseLineColor(QColor(186, 201, 219));
         } else {
             bar->setTabBarBaseLineColor(QColor());
@@ -269,7 +269,7 @@ void SARibbonMainWindow::setRibbonTheme(SARibbonMainWindow::RibbonTheme theme)
     }
 }
 
-SARibbonMainWindow::RibbonTheme SARibbonMainWindow::ribbonTheme() const
+SARibbonTheme SARibbonMainWindow::ribbonTheme() const
 {
     return (d_ptr->mCurrentRibbonTheme);
 }
@@ -347,26 +347,26 @@ void SARibbonMainWindow::onPrimaryScreenChanged(QScreen* screen)
     }
 }
 
-void sa_set_ribbon_theme(QWidget* w, SARibbonMainWindow::RibbonTheme theme)
+void sa_set_ribbon_theme(QWidget* w, SARibbonTheme theme)
 {
     QFile file;
     switch (theme) {
-    case SARibbonMainWindow::RibbonThemeWindows7:
+	case SARibbonTheme::RibbonThemeWindows7:
         file.setFileName(":/theme/resource/theme-win7.qss");
         break;
-    case SARibbonMainWindow::RibbonThemeOffice2013:
+	case SARibbonTheme::RibbonThemeOffice2013:
         file.setFileName(":/theme/resource/theme-office2013.qss");
         break;
-    case SARibbonMainWindow::RibbonThemeOffice2016Blue:
+	case SARibbonTheme::RibbonThemeOffice2016Blue:
         file.setFileName(":/theme/resource/theme-office2016-blue.qss");
         break;
-    case SARibbonMainWindow::RibbonThemeOffice2021Blue:
+	case SARibbonTheme::RibbonThemeOffice2021Blue:
         file.setFileName(":/theme/resource/theme-office2021-blue.qss");
         break;
-    case SARibbonMainWindow::RibbonThemeDark:
+	case SARibbonTheme::RibbonThemeDark:
         file.setFileName(":/theme/resource/theme-dark.qss");
         break;
-    case SARibbonMainWindow::RibbonThemeDark2:
+	case SARibbonTheme::RibbonThemeDark2:
         file.setFileName(":/theme/resource/theme-dark2.qss");
         break;
     default:

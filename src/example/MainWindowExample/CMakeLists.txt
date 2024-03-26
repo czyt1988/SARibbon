@@ -7,7 +7,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} 5.8 COMPONENTS Core Gui Widgets REQUIRED)
 
-add_executable(${SARIBBON_EXPAMPLE_NAME} 
+add_executable(${SARIBBON_EXPAMPLE_NAME} WIN32
     mainwindow.h
     mainwindow.cpp
     main.cpp
