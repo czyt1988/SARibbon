@@ -53,6 +53,21 @@ void Widget::buildRibbon(SARibbonBar* bar)
     pannel2->addLargeAction(createAction("setting", ":/icon/icon/customize0.svg"));
     pannel2->addLargeAction(createAction("windowsflag", ":/icon/icon/windowsflag-normal.svg"));
     bar->addCategoryPage(page1);
+    //加入主题
+	mComboTheme = new QComboBox();
+	mComboTheme->addItem("Theme Win7", SARibbonMainWindow::RibbonThemeWindows7);
+	mComboTheme->addItem("Theme Office2013", SARibbonMainWindow::RibbonThemeOffice2013);
+	mComboTheme->addItem("Theme Office2016 Blue", SARibbonMainWindow::RibbonThemeOffice2016Blue);
+	mComboTheme->addItem("Theme Office2021 Blue", SARibbonMainWindow::RibbonThemeOffice2021Blue);
+	mComboTheme->addItem("Theme Dark", SARibbonMainWindow::RibbonThemeDark);
+	mComboTheme->addItem("Theme Dark2", SARibbonMainWindow::RibbonThemeDark2);
+	mComboTheme->setCurrentIndex(mComboTheme->findData(static_cast< int >(SARibbonMainWindow::RibbonThemeOffice2013)));
+	connect(mComboTheme,
+	        QOverload< int >::of(&QComboBox::currentIndexChanged),
+	        this,
+	        &Widget::onRibbonThemeComboBoxCurrentIndexChanged);
+	pannel2->addSeparator();
+	pannel2->addSmallWidget(mComboTheme);
 
     SARibbonQuickAccessBar* qbar = mRibbonBar->quickAccessBar();
     qbar->addAction(createAction("undo", ":/icon/icon/undo.svg"));
@@ -66,4 +81,11 @@ QAction* Widget::createAction(const QString& text, const QString& iconurl)
     act->setIcon(QIcon(iconurl));
     act->setObjectName(text);
     return act;
+}
+
+void Widget::onRibbonThemeComboBoxCurrentIndexChanged(int index)
+{
+	SARibbonMainWindow::RibbonTheme t = static_cast< SARibbonMainWindow::RibbonTheme >(mComboTheme->itemData(index).toInt());
+	sa_set_ribbon_theme(mRibbonBar, t);
+	mRibbonBar->updateRibbonGeometry();
 }

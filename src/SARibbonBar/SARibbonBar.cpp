@@ -1621,9 +1621,11 @@ void SARibbonBar::updateRibbonGeometry()
         c->updateItemGeometry();
         return true;
     });
+    //！主题变更后，tabbar的长度需要进行刷新
+
     //! 直接给一个resizeevent，让所有刷新
-    // QResizeEvent* e = new QResizeEvent(size(), QSize());
-    // QApplication::postEvent(this, e);
+     QResizeEvent* e = new QResizeEvent(size(), QSize());
+     QApplication::postEvent(this, e);
 }
 
 /**
