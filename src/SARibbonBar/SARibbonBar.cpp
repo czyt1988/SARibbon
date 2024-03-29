@@ -670,6 +670,8 @@ void SARibbonBar::insertCategoryPage(SARibbonCategory* category, int index)
     // 更新index信息
     d_ptr->updateTabData();
     QApplication::postEvent(this, new QResizeEvent(size(), size()));
+
+    connect(category, &SARibbonCategory::actionTriggered, this, &SARibbonBar::actionTriggered);
 }
 
 /**
