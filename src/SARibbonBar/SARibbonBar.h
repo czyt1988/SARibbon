@@ -6,8 +6,8 @@
 #include <QMenuBar>
 #include <QScopedPointer>
 #include <QVariant>
-#include <QAction>
 
+class QAction;
 class QAbstractButton;
 class SARibbonElementFactory;
 class SARibbonTabBar;
