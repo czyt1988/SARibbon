@@ -22,9 +22,9 @@ public:
     SARibbonSystemToolButton* buttonMinimize { nullptr };
     SARibbonSystemToolButton* buttonMaximize { nullptr };
     int mCloseStretch { 4 };
-    int mMaxStretch { 3 };
-    int mMinStretch { 3 };
-    int mWindowButtonWidth { 35 };
+    int mMaxStretch { 4 };
+    int mMinStretch { 4 }; //FIXED:
+    int mWindowButtonWidth { 45 }; //FIXED:
     int mTitleBarHeight { 28 };
     Qt::WindowFlags mFlags { Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint };
     SARibbonButtonGroupWidget* mButtonGroup;

@@ -163,7 +163,8 @@ MainWindow::MainWindow(QWidget* par)
     createActionsManager();
 
     setMinimumWidth(500);
-    showMaximized();
+    // showMaximized();
+    resize(1024, 768);
     setWindowIcon(QIcon(":/icon/icon/SA.svg"));
 #if SA_DEBUG_PRINT_SARIBBONBAR
     qDebug() << *ribbon;
@@ -1506,6 +1507,7 @@ void MainWindow::createWindowButtonGroupBar()
     if (!wbar) {
         return;
     }
+    wbar->setButtonWidthStretch(4, 4, 4);
     QAction* a = wbar->addAction(tr("Login"), QIcon(), Qt::ToolButtonTextOnly);
     connect(a, &QAction::triggered, this, [ this ]() { this->mTextedit->append("Login triggered"); });
 }

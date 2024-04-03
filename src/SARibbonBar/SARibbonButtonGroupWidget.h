@@ -5,6 +5,21 @@
 #include <QMenu>
 #include <QFrame>
 class SARibbonControlButton;
+
+class SARibbonButtonGroupWidgetItem //FIXED: 旧版代码中在 .cpp 文件中, 新版代码已经去除
+{
+public:
+    QAction* action;
+    QWidget* widget;
+    bool customWidget;
+    bool operator==(QAction* action);
+    bool operator==(const SARibbonButtonGroupWidgetItem& w);
+
+    SARibbonButtonGroupWidgetItem();
+    SARibbonButtonGroupWidgetItem(QAction* a, QWidget* w, bool cw);
+};
+
+
 /**
  * @brief 用于管理一组Action,类似于QToolBar
  */
@@ -40,7 +55,10 @@ public:
 
     QSize sizeHint() const Q_DECL_OVERRIDE;
     QSize minimumSizeHint() const Q_DECL_OVERRIDE;
-
+    
+    QList< SARibbonButtonGroupWidgetItem > getItems(); //FIXED:
+    void setItems(QList< SARibbonButtonGroupWidgetItem > newItems); //FIXED:
+    
 public:
     bool iterate(FpButtonIterate fp);
 signals:

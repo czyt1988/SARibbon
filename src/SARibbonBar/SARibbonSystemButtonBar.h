@@ -29,7 +29,7 @@ public:
     void updateWindowFlag();
     void updateWindowFlag(Qt::WindowFlags flags);
     // 设置按钮的宽度比例,最终按钮宽度将按照此比例进行设置
-    void setButtonWidthStretch(int close = 4, int max = 3, int min = 3);
+    void setButtonWidthStretch(int close = 4, int max = 4, int min = 4);//FIXED:
     // 标题栏高度
     void setWindowTitleHeight(int h);
     int windowTitleHeight() const;

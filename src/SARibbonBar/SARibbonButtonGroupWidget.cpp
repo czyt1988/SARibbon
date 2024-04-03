@@ -11,6 +11,31 @@
 #include "SARibbonSeparatorWidget.h"
 #include "SARibbonPannel.h"
 
+
+////////////////////////////////////////////// //FIXED:
+
+bool SARibbonButtonGroupWidgetItem::operator==(QAction* action)
+{
+    return (this->action == action);
+}
+
+bool SARibbonButtonGroupWidgetItem::operator==(const SARibbonButtonGroupWidgetItem& w)
+{
+    return (this->action == w.action);
+}
+
+SARibbonButtonGroupWidgetItem::SARibbonButtonGroupWidgetItem() : action(nullptr), widget(nullptr), customWidget(false)
+{
+}
+
+SARibbonButtonGroupWidgetItem::SARibbonButtonGroupWidgetItem(QAction* a, QWidget* w, bool cw)
+    : action(a), widget(w), customWidget(cw)
+{
+}
+
+//////////////////////////////////////////////
+
+
 //===================================================
 // SARibbonButtonGroupWidget::PrivateData
 //===================================================
@@ -24,6 +49,7 @@ public:
 
 public:
     QSize mIconSize { 20, 20 };
+    QList< SARibbonButtonGroupWidgetItem > mItems;  // FIXED: 新版已删除
 };
 
 SARibbonButtonGroupWidget::PrivateData::PrivateData(SARibbonButtonGroupWidget* p) : q_ptr(p)
@@ -60,6 +86,10 @@ void SARibbonButtonGroupWidget::PrivateData::removeAction(QAction* a)
     }
 }
 
+
+//////////////////////////////////////////////
+
+
 //===================================================
 // SARibbonButtonGroupWidget
 //===================================================
@@ -72,6 +102,13 @@ SARibbonButtonGroupWidget::SARibbonButtonGroupWidget(QWidget* parent)
 
 SARibbonButtonGroupWidget::~SARibbonButtonGroupWidget()
 {
+    for (SARibbonButtonGroupWidgetItem& item : d_ptr->mItems) { //FIXED:
+        if (QWidgetAction* widgetAction = qobject_cast< QWidgetAction* >(item.action)) {
+            if (item.customWidget) {
+                widgetAction->releaseWidget(item.widget);
+            }
+        }
+    } //FIXED: 新版已去除
 }
 
 /**
@@ -239,6 +276,7 @@ void SARibbonButtonGroupWidget::actionEvent(QActionEvent* e)
             w = button;
         }
         layout()->addWidget(w);
+        d_ptr->mItems.append(SARibbonButtonGroupWidgetItem(a, w, false)); // FIXED:
         updateGeometry();
     } break;
 
@@ -251,10 +289,25 @@ void SARibbonButtonGroupWidget::actionEvent(QActionEvent* e)
     case QEvent::ActionRemoved: {
         d_ptr->removeAction(e->action());
         updateGeometry();
+        
+        for(auto it = d_ptr->mItems.begin(); it != d_ptr->mItems.end();){
+            it = d_ptr->mItems.erase(it);
+        } //FIXED:
     } break;
 
     default:
         break;
     }
     QFrame::actionEvent(e);
+}
+
+//FIXED:
+QList<SARibbonButtonGroupWidgetItem> SARibbonButtonGroupWidget::getItems()
+{
+    return d_ptr->mItems;
+}
+//FIXED:
+void SARibbonButtonGroupWidget::setItems(QList<SARibbonButtonGroupWidgetItem> newItems)
+{
+    d_ptr->mItems = newItems;
 }

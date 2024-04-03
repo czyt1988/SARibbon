@@ -1,5 +1,7 @@
 ﻿bin_*
 build*
+BUILD
+INSTALL
 *.user
 *.autosave
 *.dll
@@ -93,4 +95,3 @@ CMakeSettings.json
 # --------
 *.dll
 *.exe
-

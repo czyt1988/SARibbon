@@ -25,8 +25,13 @@ public:
                  Qt::ToolButtonStyle buttonStyle          = Qt::ToolButtonIconOnly,
                  QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
     // 获取内部管理的ButtonGroupWidget
-    SARibbonButtonGroupWidget* buttonGroupWidget();
+    SARibbonButtonGroupWidget* buttonGroupWidget(); //FIXED: getRibbonButtonGroupWidget
     const SARibbonButtonGroupWidget* buttonGroupWidget() const;
+    
+    SARibbonButtonGroupWidget* getRibbonButtonGroupWidget(){
+        return buttonGroupWidget();
+    }
+    
     // 设置图标尺寸
     void setIconSize(const QSize& s);
     QSize iconSize() const;

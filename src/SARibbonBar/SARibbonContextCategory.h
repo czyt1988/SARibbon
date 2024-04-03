@@ -16,7 +16,7 @@ public:
     ~SARibbonContextCategory();
     //上下文目录添加下属目录
     SARibbonCategory* addCategoryPage(const QString& title);
-    void addCategoryPage(SARibbonCategory* category);
+    SARibbonCategory* addCategoryPage(SARibbonCategory* category); //FIXED:
     //获取上下文标签下管理的标签个数
     int categoryCount() const;
 

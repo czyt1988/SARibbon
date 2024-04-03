@@ -12,9 +12,9 @@ message(STATUS "SARibbon v${SARIBBON_VERSION}")
 project(SARibbon VERSION ${SARIBBON_VERSION} LANGUAGES CXX)
 
 # option(BUILD_SHARED_LIBS "build the SARibbonBar in shared lib mode" ON)
-option(SARIBBON_BUILD_EXAMPLES "build the examples" ON)
+set(SARIBBON_BUILD_EXAMPLES 1) #FIXED:
 # frameless能提供windows的窗口特效，如边缘吸附，且对高分屏多屏幕的支持更好,默认开启
-option(SARIBBON_USE_FRAMELESS_LIB "Using the QWindowKit library as a frameless solution" OFF)
+set(SARIBBON_USE_FRAMELESS_LIB 0) #BUG: Qt 6.5 下有bug, 例如标题栏无法正常加载, 或拖动标题栏无反应等
 
 # load Qt library, minimum version required is 5.8
 # cn:Qt库加载,最低版本要求为5.8
@@ -39,33 +39,35 @@ if(SARIBBON_USE_FRAMELESS_LIB)
             message(WARNING "QT_VERSION = Qt${QT_VERSION} QT version minor is ${QT_VERSION_MINOR},less 14,will set SARIBBON_USE_FRAMELESS_LIB OFF")
         endif()
     elseif(${QT_VERSION_MAJOR} EQUAL 6)
-        # qt版本为6，判断是否小版本大于6.1
-        if(${QT_VERSION_MINOR} LESS_EQUAL 1)
-            #6.0及bug多多无法使用frameless
-            set(SARIBBON_USE_FRAMELESS_LIB OFF)
-            message(WARNING "QT_VERSION = Qt${QT_VERSION} QT version minor is ${QT_VERSION_MINOR},less 1,will set SARIBBON_USE_FRAMELESS_LIB OFF")
-        endif()
+        # qt版本为6，判断是否小版本大于6.1 #FIXED:
+        # if(${QT_VERSION_MINOR} LESS_EQUAL 1)
+        #     #6.0及bug多多无法使用frameless
+        #     set(SARIBBON_USE_FRAMELESS_LIB OFF)
+        #     message(WARNING "QT_VERSION = Qt${QT_VERSION} QT version minor is ${QT_VERSION_MINOR},less 1,will set SARIBBON_USE_FRAMELESS_LIB OFF")
+        # endif()
     endif()
 endif()
-
+ 
 # 如果是使用frameless库，需要c++17，否则c++14
-if(SARIBBON_USE_FRAMELESS_LIB)
-    set(CMAKE_CXX_STANDARD 17)
-    set(CMAKE_CXX_STANDARD_REQUIRED ON)
-    if(MSVC)
-        # CMAKE_CXX_STANDARD对有些版本的msvc无效
-        set(CMAKE_CXX_FLAGS"${CMAKE_CXX_FLAGS} /std:c++17")
-    endif()
-    message(STATUS "The current QT version can use the frameless library and enable C++17")
-else()
-    set(CMAKE_CXX_STANDARD 14)
-    set(CMAKE_CXX_STANDARD_REQUIRED ON)
-    if(MSVC)
-        # CMAKE_CXX_STANDARD对有些版本的msvc无效
-        set(CMAKE_CXX_FLAGS"${CMAKE_CXX_FLAGS} /std:c++14")
-    endif()
-    message(STATUS "The current qt version cannot use the frameless library, enable C++11")
-endif()
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+# if(SARIBBON_USE_FRAMELESS_LIB) #FIXED:
+#     set(CMAKE_CXX_STANDARD 17)
+#     set(CMAKE_CXX_STANDARD_REQUIRED ON)
+#     if(MSVC)
+#         # CMAKE_CXX_STANDARD对有些版本的msvc无效
+#         set(CMAKE_CXX_FLAGS"${CMAKE_CXX_FLAGS} /std:c++17")
+#     endif()
+#     message(STATUS "The current QT version can use the frameless library and enable C++17")
+# else()
+#     set(CMAKE_CXX_STANDARD 14)
+#     set(CMAKE_CXX_STANDARD_REQUIRED ON)
+#     if(MSVC)
+#         # CMAKE_CXX_STANDARD对有些版本的msvc无效
+#         set(CMAKE_CXX_FLAGS"${CMAKE_CXX_FLAGS} /std:c++14")
+#     endif()
+#     message(STATUS "The current qt version cannot use the frameless library, enable C++11")
+# endif()
 
 set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "add a postfix, usually d on windows")
 set(CMAKE_RELEASE_POSTFIX "" CACHE STRING "add a postfix, usually empty on windows")
@@ -111,7 +113,6 @@ endif()
 ##################################
 # subdirectory
 ##################################
-
 if(SARIBBON_USE_FRAMELESS_LIB)
     if(NOT QWindowKit_DIR)
         message(STATUS "option SARIBBON_USE_FRAMELESS_LIB=ON,but QWindowKit_DIR not defined,will set QWindowKit_DIR=${SARIBBON_BIN_DIR}/lib/cmake/QWindowKit")
@@ -150,26 +151,26 @@ set(SARIBBON_DOC_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/readme-cn.md
     ${CMAKE_CURRENT_SOURCE_DIR}/LICENSE
     )
-# 复制doc目录到install目录
-install(DIRECTORY
-    ${CMAKE_CURRENT_SOURCE_DIR}/doc
-    DESTINATION doc/SARibbon
-    COMPONENT document
-)
-#  把文档复制过去
-install(FILES
-    ${SARIBBON_DOC_FILES}
-    DESTINATION doc/SARibbon
-    COMPONENT document
-)
+# 复制doc目录到install目录 #FIXED:
+# install(DIRECTORY
+#     ${CMAKE_CURRENT_SOURCE_DIR}/doc
+#     DESTINATION doc/SARibbon
+#     COMPONENT document
+# )
+# #  把文档复制过去
+# install(FILES
+#     ${SARIBBON_DOC_FILES}
+#     DESTINATION doc/SARibbon
+#     COMPONENT document
+# )
 
-# 把针对cmake安装的两个pri文件复制到根目录下
-set(SARIBBON_QMAKE_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/common.pri
-    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/SARibbonBar.pri
-    )
-install(FILES
-    ${SARIBBON_QMAKE_FILES}
-    DESTINATION lib/qmake/SARibbonBar
-    COMPONENT qmake
-)
+# 把针对cmake安装的两个pri文件复制到根目录下 #FIXED:
+# set(SARIBBON_QMAKE_FILES
+#     ${CMAKE_CURRENT_SOURCE_DIR}/cmake/common.pri
+#     ${CMAKE_CURRENT_SOURCE_DIR}/cmake/SARibbonBar.pri
+#     )
+# install(FILES
+#     ${SARIBBON_QMAKE_FILES}
+#     DESTINATION lib/qmake/SARibbonBar
+#     COMPONENT qmake
+# )

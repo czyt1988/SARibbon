@@ -60,12 +60,12 @@ SARibbonCategory* SARibbonContextCategory::addCategoryPage(const QString& title)
  * @brief 添加标签
  * @param page
  */
-void SARibbonContextCategory::addCategoryPage(SARibbonCategory* category)
+SARibbonCategory* SARibbonContextCategory::addCategoryPage(SARibbonCategory* category) //FIXED:
 {
     if (isHaveCategory(category)) {
         // cn:SARibbonContextCategory已经持有标签：%1，将跳过
         qWarning() << tr("SARibbonContextCategory have category %1,will skip").arg(category->categoryName());
-        return;
+        return category; //FIXED:
     }
     category->markIsContextCategory(true);
     connect(category, &SARibbonCategory::categoryNameChanged, this, &SARibbonContextCategory::onCategoryTitleChanged);
@@ -74,6 +74,8 @@ void SARibbonContextCategory::addCategoryPage(SARibbonCategory* category)
     d_ptr->categoryDataList.append(catData);
     category->installEventFilter(this);
     emit categoryPageAdded(category);
+    
+    return category; //FIXED:
 }
 
 int SARibbonContextCategory::categoryCount() const

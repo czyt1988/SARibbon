@@ -756,6 +756,11 @@ SARibbonBar* SARibbonPannel::ribbonBar() const
     return nullptr;
 }
 
+SARibbonToolButton* SARibbonPannel::lastAddActionButton() //FIXED:
+{
+    return d_ptr->lastAddActionButton();
+}
+
 /**
  * @brief pannel高度推荐
  * @param fm

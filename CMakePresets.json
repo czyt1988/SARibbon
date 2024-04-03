@@ -1,0 +1,78 @@
+{
+  "version": 5,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 23
+  },
+  "configurePresets": [
+    {
+      "name": "Ninja-MS-D",
+      "displayName": "Ninja-MS-D",
+      "description": "Ninja MSVC Windows x64 Debug",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/BUILD/${presetName}",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_C_COMPILER": "cl",
+        "CMAKE_CXX_COMPILER": "cl",
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/INSTALL/",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "True",
+        "QT_VERSION_MAJOR": "6",
+        "QWindowKit_DIR": "D:/gitRepo/Qt_related/qwindowkit/INSTALL/lib/cmake/QWindowKit"
+      },
+      "architecture": {
+        "value": "x64",
+        "strategy": "external"
+      },
+      "toolset": {
+        "value": "host=x64,version=14.3",
+        "strategy": "external"
+      }
+    },
+    {
+      "name": "Ninja-MS-R",
+      "displayName": "Ninja-MS-R",
+      "description": "Ninja MSVC Windows x64 Release",
+      "inherits": "Ninja-MS-D",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release"
+      }
+    },
+    {
+      "hidden": true,
+      "name": "Qt",
+      "cacheVariables": {
+        "CMAKE_PREFIX_PATH": "$env{QTDIR}"
+      },
+      "environment": {
+        "PATH": "$penv{PATH};$env{QTDIR}/bin"
+      },
+      "vendor": {
+        "qt-project.org/Qt": {
+          "checksum": "Sp19WUpde73JS7nK33HZMqVZTyI="
+        }
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "Ninja-MS-D",
+      "displayName": "Ninja-MS-D",
+      "description": "Ninja MSVC Windows x64 Debug",
+      "configurePreset": "Ninja-MS-D",
+      "configuration": "Debug"
+    },
+    {
+      "name": "Ninja-MS-R",
+      "displayName": "Ninja-MS-R",
+      "description": "Ninja MSVC Windows x64 Release",
+      "configurePreset": "Ninja-MS-R",
+      "configuration": "Release"
+    }
+  ],
+  "vendor": {
+    "qt-project.org/Presets": {
+      "checksum": "z3jKnShQRsTTlKHqpYP+50hH5bo="
+    }
+  }
+}

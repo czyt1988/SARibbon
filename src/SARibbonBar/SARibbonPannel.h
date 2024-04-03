@@ -183,6 +183,9 @@ public:
     //
     virtual QSize sizeHint() const Q_DECL_OVERRIDE;
     virtual QSize minimumSizeHint() const Q_DECL_OVERRIDE;
+    
+    SARibbonToolButton* lastAddActionButton(); //FIXED:
+    
 signals:
 
     /**
