@@ -62,8 +62,6 @@ AlwaysBreakTemplateDeclarations: true
 # clang-format does not handle that.
 AllowShortFunctionsOnASingleLine: false
 AllowShortIfStatementsOnASingleLine: false
-AllowShortLambdasOnASingleLine: false
-AllowShortLoopsOnASingleLine: false
 #
 BinPackParameters: false
 BinPackArguments: false
@@ -74,7 +72,6 @@ AlwaysBreakAfterReturnType: None
 PenaltyReturnTypeOnItsOwnLine: 5000
 PenaltyBreakAssignment: 5000
 PenaltyBreakBeforeFirstCallParameter: 5000
-PenaltyExcessCharacter: 1
 
 # The coding style specifies some include order categories, but also tells to
 # separate categories with an empty line. It does not specify the order within
@@ -99,5 +96,3 @@ SpacesInSquareBrackets: true
 SpacesInAngles: true
 
 KeepEmptyLinesAtTheStartOfBlocks: true
-
-AllowShortCaseLabelsOnASingleLine: true
