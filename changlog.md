@@ -2,6 +2,8 @@
 
 ## 2024-04-16
 - 添加actionTriggered信号
+- 修正了滚动action显示效果
+
 
 ## 2024-02-07 -> 2.0.3
 - 调整SAColorToolButton的实现，使之更简单
