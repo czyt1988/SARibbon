@@ -72,6 +72,10 @@ MainWindow::MainWindow(QWidget* par)
     //! 通过setContentsMargins设置ribbon四周的间距
     ribbon->setContentsMargins(5, 0, 5, 0);
 
+    connect(ribbon, &SARibbonBar::actionTriggered, this, [ this ](QAction* action) {
+        mTextedit->append(QString("action object name=%1 triggered").arg(action->objectName()));
+    });
+
     //! cn:
     //! 这里示例的是如何设置和修改applicationButton，默认情况下SARibbonBar会创建一个SARibbonApplicationButton，
     //! SARibbonApplicationButton的父类是QToolButton,用户也可以创建自己的applicationButton，
@@ -635,11 +639,6 @@ void MainWindow::closeEvent(QCloseEvent* e)
     } else {
         e->ignore();
     }
-}
-
-void MainWindow::onClickButtonControls(QAction *action)
-{
-     mTextedit->append(QString("on ClickButton Controls %1").arg(action->data().toString()));
 }
 
 void MainWindow::createCategoryMain(SARibbonCategory* page)

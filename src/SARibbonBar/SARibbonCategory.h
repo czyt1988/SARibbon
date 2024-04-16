@@ -6,8 +6,8 @@
 #include <QScopedPointer>
 #include <QPushButton>
 #include <QWheelEvent>
-#include <QAction>
 
+class QAction;
 class QHBoxLayout;
 class QWheelEvent;
 class SARibbonBar;
