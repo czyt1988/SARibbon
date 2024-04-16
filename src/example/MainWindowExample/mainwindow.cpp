@@ -637,6 +637,11 @@ void MainWindow::closeEvent(QCloseEvent* e)
     }
 }
 
+void MainWindow::onClickButtonControls(QAction *action)
+{
+     mTextedit->append(QString("on ClickButton Controls %1").arg(action->data().toString()));
+}
+
 void MainWindow::createCategoryMain(SARibbonCategory* page)
 {
     //! 1
@@ -758,6 +763,8 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     }
 
     QAction* act = createAction(tr("test 1"), ":/icon/icon/test1.svg");
+    QVariant temp("Test");
+    act->setData(temp);
     act->setMenu(menu);
     act->setToolTip(tr("use QToolButton::MenuButtonPopup mode"));
     pannelToolButtonStyle->addSmallAction(act, QToolButton::MenuButtonPopup);

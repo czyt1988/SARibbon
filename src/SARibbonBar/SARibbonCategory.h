@@ -6,6 +6,7 @@
 #include <QScopedPointer>
 #include <QPushButton>
 #include <QWheelEvent>
+#include <QAction>
 
 class QHBoxLayout;
 class QWheelEvent;
@@ -118,6 +119,12 @@ signals:
      * @param n
      */
     void categoryNameChanged(const QString& n);
+
+    /**
+     * @brief 参考QToolBar::actionTriggered的信号
+     * @param action
+     */
+    void actionTriggered(QAction* action);
 
 protected:
     virtual bool event(QEvent* e) Q_DECL_OVERRIDE;

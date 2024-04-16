@@ -7,6 +7,7 @@
 #include <QScopedPointer>
 #include <QVariant>
 
+class QAction;
 class QAbstractButton;
 class SARibbonElementFactory;
 class SARibbonTabBar;
@@ -391,6 +392,12 @@ signals:
        @param newHeight
      */
     void titleBarHeightChanged(int oldHeight, int newHeight);
+
+    /**
+     * @brief 参考QToolBar::actionTriggered的信号
+     * @param action
+     */
+    void actionTriggered(QAction* action);
 
 protected:
     bool eventFilter(QObject* obj, QEvent* e) override;
