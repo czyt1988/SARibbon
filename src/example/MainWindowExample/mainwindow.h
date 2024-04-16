@@ -76,7 +76,6 @@ private:
 
 protected:
     void closeEvent(QCloseEvent* e) override;
-    void onClickButtonControls(QAction *action);
 
 private:
     SARibbonContextCategory* mContextCategory;

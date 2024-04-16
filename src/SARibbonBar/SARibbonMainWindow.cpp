@@ -64,7 +64,6 @@ SARibbonMainWindow::SARibbonMainWindow(QWidget* parent, bool useRibbon, const Qt
         d_ptr->installFrameless(this);
         setRibbonBar(createRibbonBar());
         setRibbonTheme(ribbonTheme());
-        connect(ribbonBar(), &SARibbonBar::actionTriggered,this , &SARibbonMainWindow::actionTriggered);
     }
 }
 

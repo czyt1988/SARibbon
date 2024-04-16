@@ -2,12 +2,11 @@
 #define SARIBBONMAINWINDOW_H
 #include "SARibbonGlobal.h"
 #include <QMainWindow>
-#include <QAction>
 
 #if !SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
 class SAFramelessHelper;
 #endif
-
+class QAction;
 class SARibbonBar;
 class SARibbonSystemButtonBar;
 class QScreen;
@@ -86,17 +85,12 @@ public:
     virtual bool eventFilter(QObject* obj, QEvent* e) Q_DECL_OVERRIDE;
     // 获取最大化，最小化，关闭按钮所在的bar。可以通过此函数在最大最小化按钮旁边设置内容
     SARibbonSystemButtonBar* windowButtonBar() const;
-public slots:
-    void actionTriggered(QAction* action){
-           return onClickButtonControls(action);
-    };
 
 protected:
     // 创建ribbonbar的工厂函数
     SARibbonBar* createRibbonBar();
     virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
     virtual void changeEvent(QEvent* e) Q_DECL_OVERRIDE;
-    virtual void onClickButtonControls(QAction *action){}
 private slots:
     void onPrimaryScreenChanged(QScreen* screen);
 };
