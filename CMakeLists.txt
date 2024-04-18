@@ -14,7 +14,7 @@ project(SARibbon VERSION ${SARIBBON_VERSION} LANGUAGES CXX)
 # option(BUILD_SHARED_LIBS "build the SARibbonBar in shared lib mode" ON)
 set(SARIBBON_BUILD_EXAMPLES 1) #FIXED:
 # frameless能提供windows的窗口特效，如边缘吸附，且对高分屏多屏幕的支持更好,默认开启
-set(SARIBBON_USE_FRAMELESS_LIB 0) #BUG: Qt 6.5 下有bug, 例如标题栏无法正常加载, 或拖动标题栏无反应等
+set(SARIBBON_USE_FRAMELESS_LIB 1) #BUG: Qt 6.5 下有bug, 例如标题栏无法正常加载, 或拖动标题栏无反应等
 
 # load Qt library, minimum version required is 5.8
 # cn:Qt库加载,最低版本要求为5.8
