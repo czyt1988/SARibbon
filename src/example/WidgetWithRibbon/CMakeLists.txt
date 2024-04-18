@@ -9,7 +9,7 @@ add_definitions(-DFRAMELESSHELPER_FEATURE_static_build=-1)
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} 5.9 COMPONENTS Core Gui Widgets REQUIRED)
 
-add_executable(${SARIBBON_EXPAMPLE_NAME} 
+add_executable(${SARIBBON_EXPAMPLE_NAME} WIN32
     Widget.h
     Widget.cpp
     main.cpp

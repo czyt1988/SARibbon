@@ -109,6 +109,9 @@ void SARibbonCategory::PrivateData::insertPannel(int index, SARibbonPannel* pann
     index = qMin(lay->pannelCount(), index);
     lay->insertPannel(index, pannel);
     pannel->setVisible(true);
+
+    QObject::connect(pannel, &SARibbonPannel::actionTriggered
+        , ribbonCategory(), &SARibbonCategory::actionTriggered);
 }
 
 bool SARibbonCategory::PrivateData::takePannel(SARibbonPannel* pannel)

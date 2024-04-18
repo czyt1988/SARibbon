@@ -6,7 +6,7 @@
 #if !SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
 class SAFramelessHelper;
 #endif
-
+class QAction;
 class SARibbonBar;
 class SARibbonSystemButtonBar;
 class QScreen;
@@ -38,26 +38,8 @@ class SA_RIBBON_EXPORT SARibbonMainWindow : public QMainWindow
     Q_OBJECT
     SA_RIBBON_DECLARE_PRIVATE(SARibbonMainWindow)
     friend class SARibbonBar;
-    Q_PROPERTY(RibbonTheme ribbonTheme READ ribbonTheme WRITE setRibbonTheme)
-public:
-    /**
-     * @brief Ribbon主题，可以通过qss定制ribbon的主题，定制方法可参看源码中office2013.qss
-     *
-     * 注意，由于有些qss的尺寸，在C++代码中无法获取到，因此针对用户自定义的qss主题，有些尺寸是需要手动设置进去的
-     *
-     * 例如ribbon tab的margin信息，在QTabBar是无法获取到，而这个影响了SARibbonContextCategory的绘制，
-     * 因此，在设置qss后需要针对margin信息重新设置进SARibbonTabBar中
-     */
-    enum RibbonTheme
-    {
-        RibbonThemeOffice2013,      ///< office2013主题
-        RibbonThemeOffice2016Blue,  ///< office2016-蓝色主题
-        RibbonThemeOffice2021Blue,  ///< office2021-蓝色主题
-        RibbonThemeWindows7,        ///< win7主题
-        RibbonThemeDark,            ///< 暗色主题
-        RibbonThemeDark2
-    };
-    Q_ENUM(RibbonTheme)
+    Q_PROPERTY(SARibbonTheme ribbonTheme READ ribbonTheme WRITE setRibbonTheme)
+
 public:
     SARibbonMainWindow(QWidget* parent = nullptr, bool useRibbon = true, const Qt::WindowFlags flags = {});
     ~SARibbonMainWindow() Q_DECL_OVERRIDE;
@@ -77,8 +59,8 @@ public:
 
     // 注意主题在构造函数设置主题会不完全生效，使用QTimer投放到队列最后执行即可
     // QTimer::singleShot(0, this, [ this ]() { this->setRibbonTheme(SARibbonMainWindow::RibbonThemeDark); });
-    void setRibbonTheme(RibbonTheme theme);
-    RibbonTheme ribbonTheme() const;
+	void setRibbonTheme(SARibbonTheme theme);
+	SARibbonTheme ribbonTheme() const;
     // 判断当前是否使用ribbon模式
     bool isUseRibbon() const;
     // 把ribbonbar的事件传递到frameless
@@ -107,6 +89,6 @@ private slots:
  * @param w
  * @param theme
  */
-void SA_RIBBON_EXPORT sa_set_ribbon_theme(QWidget* w, SARibbonMainWindow::RibbonTheme theme);
+void SA_RIBBON_EXPORT sa_set_ribbon_theme(QWidget* w, SARibbonTheme theme);
 
 #endif  // SARIBBONMAINWINDOW_H

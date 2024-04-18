@@ -52,13 +52,16 @@ build步骤选择install
 
 ![](./pic/build-cmake-vs-01.png)
 
-选中CMake菜单->全部生成
+选中CMake菜单->全部生成（有些版本没有CMake菜单，可以在CMakeLists.txt点右键）
 
 ![](./pic/build-cmake-vs-03.png)
 
-选中CMake菜单->安装
+选中CMake菜单->安装（有些版本没有CMake菜单，可以在CMakeLists.txt点右键）
 
 ![](./pic/build-cmake-vs-04.png)
+
+> 不同的vs操作有点不一样，没有CMake菜单的，可以在CMakeLists.txt点右键
+![](./pic/build-cmake-vs-04-other.png)
 
 这时你会在SARibbon根目录下看到形如`bin_qt5.14.2_MSVC_x64`这样的安装目录，这里自动把`QWindowkit`库安装在此目录下
 
@@ -135,9 +138,9 @@ qmake构建SARibbonBar只需使用Qt Creator打开SARibbon.pro文件即可
 
 ## 基于cmake引入SARibbonBar库
 
-首先要通过cmake编译并执行安装，在自己的工程按照如下步骤执行：
+首先要通过cmake编译并执行安装，在自己的工程CMakeLists.txt按照如下步骤执行：
 
-1. 指定SARibbonBar的安装目录，把安装目录下的`lib/cmake/SARibbonBar`位置设置给`SARibbonBar_DIR`变量
+1. 指定SARibbonBar的安装目录，把安装目录下的`lib/cmake/SARibbonBar`位置设置给`SARibbonBar_DIR`变量(CMake在执行`find_package(xx)`时，会先查看是否有`xx_DIR`变量，如果有，会先查询`xx_DIR`下是否有对应的`xxConfig.cmake`文件)
 
 ```cmake
 set(SARibbonBar_DIR "C:\src\Qt\SARibbon\bin_qt5.14.2_MSVC_x64\lib\cmake\SARibbonBar")
@@ -158,6 +161,8 @@ target_link_libraries(${myapp_target_name} PUBLIC
 ```
 
 ## 基于qmake引入SARibbonBar库
+
+> Qt6开始，不再推荐使用qmake，SARibbon未来的版本有可能会取消qmake的支持
 
 qmake的编译过程会在SARibbon下生成`bin_qt{Qt version}_{MSVC/GNU}_x{32/64}`文件夹，库文件和dll文件都在此文件夹下，importSARibbonBarLib.pri会自动把这个文件夹下的库引用进来
 

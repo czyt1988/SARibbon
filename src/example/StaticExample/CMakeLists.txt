@@ -89,7 +89,7 @@ else()
             ${PROJECT_SOURCES}
         )
     else()
-        add_executable(StaticExample
+        add_executable(StaticExample WIN32
             ${PROJECT_SOURCES}
         )
     endif()
