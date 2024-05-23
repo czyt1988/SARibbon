@@ -10,11 +10,16 @@ find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} 5.9 COMPONENTS Core Gui Widgets REQUIRED)
 
 add_executable(${SARIBBON_EXPAMPLE_NAME} WIN32
-    Widget.h
-    Widget.cpp
+    RibbonWidget.h
+    RibbonWidget.cpp
+    MainWidget.h
+    MainWidget.cpp
+    MainWidget.ui
+    InnerWidget.h
+    InnerWidget.cpp
+    InnerWidget.ui
     main.cpp
     icon.qrc
-    Widget.ui
 )
 
 target_include_directories(${SARIBBON_EXPAMPLE_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../../SARibbonBar")
