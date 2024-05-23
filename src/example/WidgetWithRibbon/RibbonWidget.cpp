@@ -1,41 +1,31 @@
-
-#include "Widget.h"
-
-#include "ui_Widget.h"
-
+#include "RibbonWidget.h"
+#include "InnerWidget.h"
 #include "SARibbonBar.h"
 #include "SARibbonCategory.h"
 #include "SARibbonPannel.h"
 #include "SARibbonMainWindow.h"
 #include "SARibbonQuickAccessBar.h"
-Widget::Widget(QWidget* parent) : QWidget(parent), ui(new Ui::Widget)
+RibbonWidget::RibbonWidget(QWidget* parent) : SARibbonWidget(parent)
 {
-    // 注意：ui文件中有个QVBoxLayout布局
-    ui->setupUi(this);
     // 直接创建SARibbonBar
-    mRibbonBar = new SARibbonBar(this);
+    SARibbonBar* ribbonbar = ribbonBar();
     // QWidget模式下，没有必要再显示标题
-    mRibbonBar->setTitleVisible(false);
+    ribbonbar->setTitleVisible(false);
     // QWidget模式下，直接使用紧凑模式效果更好
-    mRibbonBar->setRibbonStyle(SARibbonBar::RibbonStyleCompactThreeRow);
+    ribbonbar->setRibbonStyle(SARibbonBar::RibbonStyleCompactThreeRow);
     // 取消applicationbutton
-    mRibbonBar->setApplicationButton(nullptr);
-    // 设置主题，这里虽然没用到SARibbonMainWindow，但Ribbon的主题是SARibbonMainWindow中定义的，因此要引入SARibbonMainWindow.h
-    sa_set_ribbon_theme(mRibbonBar, SARibbonTheme::RibbonThemeOffice2013);
+    ribbonbar->setApplicationButton(nullptr);
 
-    // QLayout有专门的setMenuBar接口，针对menubar的布局，不需要插入到verticalLayout的0位置也可以实现
-    // ui->verticalLayout->insertWidget(0, mRibbonBar);
-    ui->verticalLayout->setMenuBar(mRibbonBar);
-
-    buildRibbon(mRibbonBar);
+    buildRibbon(ribbonbar);
+    //
+    setWidget(new InnerWidget());
 }
 
-Widget::~Widget()
+RibbonWidget::~RibbonWidget()
 {
-    delete ui;
 }
 
-void Widget::buildRibbon(SARibbonBar* bar)
+void RibbonWidget::buildRibbon(SARibbonBar* bar)
 {
     SARibbonCategory* page1 = new SARibbonCategory();
     page1->setCategoryName("page1");
@@ -44,7 +34,6 @@ void Widget::buildRibbon(SARibbonBar* bar)
     QAction* act = createAction("  save  ", ":/icon/icon/save.svg");
     act->setIconText("  save  ");
     pannel1->addLargeAction(act);
-
     pannel1->addLargeAction(createAction("open", ":/icon/icon/folder-star.svg"));
     pannel1->addSmallAction(createAction("action1", ":/icon/icon/action.svg"));
     pannel1->addSmallAction(createAction("action2", ":/icon/icon/action2.svg"));
@@ -53,39 +42,44 @@ void Widget::buildRibbon(SARibbonBar* bar)
     pannel2->addLargeAction(createAction("setting", ":/icon/icon/customize0.svg"));
     pannel2->addLargeAction(createAction("windowsflag", ":/icon/icon/windowsflag-normal.svg"));
     bar->addCategoryPage(page1);
-    //加入主题
+    // 加入主题
 	mComboTheme = new QComboBox();
-	mComboTheme->addItem("Theme Win7", static_cast<int>(SARibbonTheme::RibbonThemeWindows7));
-	mComboTheme->addItem("Theme Office2013", static_cast<int>(SARibbonTheme::RibbonThemeOffice2013));
-	mComboTheme->addItem("Theme Office2016 Blue", static_cast<int>(SARibbonTheme::RibbonThemeOffice2016Blue));
-	mComboTheme->addItem("Theme Office2021 Blue", static_cast<int>(SARibbonTheme::RibbonThemeOffice2021Blue));
-	mComboTheme->addItem("Theme Dark", static_cast<int>(SARibbonTheme::RibbonThemeDark));
-	mComboTheme->addItem("Theme Dark2", static_cast<int>(SARibbonTheme::RibbonThemeDark2));
+    mComboTheme->addItem("Theme Win7", static_cast< int >(SARibbonTheme::RibbonThemeWindows7));
+    mComboTheme->addItem("Theme Office2013", static_cast< int >(SARibbonTheme::RibbonThemeOffice2013));
+    mComboTheme->addItem("Theme Office2016 Blue", static_cast< int >(SARibbonTheme::RibbonThemeOffice2016Blue));
+    mComboTheme->addItem("Theme Office2021 Blue", static_cast< int >(SARibbonTheme::RibbonThemeOffice2021Blue));
+    mComboTheme->addItem("Theme Dark", static_cast< int >(SARibbonTheme::RibbonThemeDark));
+    mComboTheme->addItem("Theme Dark2", static_cast< int >(SARibbonTheme::RibbonThemeDark2));
 	mComboTheme->setCurrentIndex(mComboTheme->findData(static_cast< int >(SARibbonTheme::RibbonThemeOffice2013)));
 	connect(mComboTheme,
 	        QOverload< int >::of(&QComboBox::currentIndexChanged),
 	        this,
-	        &Widget::onRibbonThemeComboBoxCurrentIndexChanged);
+            &RibbonWidget::onRibbonThemeComboBoxCurrentIndexChanged);
 	pannel2->addSeparator();
 	pannel2->addSmallWidget(mComboTheme);
 
-    SARibbonQuickAccessBar* qbar = mRibbonBar->quickAccessBar();
+    SARibbonQuickAccessBar* qbar = bar->quickAccessBar();
     qbar->addAction(createAction("undo", ":/icon/icon/undo.svg"));
     qbar->addAction(createAction("redo", ":/icon/icon/redo.svg"));
 }
 
-QAction* Widget::createAction(const QString& text, const QString& iconurl)
+QAction* RibbonWidget::createAction(const QString& text, const QString& iconurl)
 {
     QAction* act = new QAction(this);
     act->setText(text);
     act->setIcon(QIcon(iconurl));
     act->setObjectName(text);
+    connect(act, &QAction::triggered, this, [ this, act ]() {
+        InnerWidget* w = qobject_cast< InnerWidget* >(widget());
+        if (w) {
+            w->appendText(QString("action(%1) triggered").arg(act->text()));
+        }
+    });
     return act;
 }
 
-void Widget::onRibbonThemeComboBoxCurrentIndexChanged(int index)
+void RibbonWidget::onRibbonThemeComboBoxCurrentIndexChanged(int index)
 {
 	SARibbonTheme t = static_cast< SARibbonTheme >(mComboTheme->itemData(index).toInt());
-	sa_set_ribbon_theme(mRibbonBar, t);
-	mRibbonBar->updateRibbonGeometry();
+    setRibbonTheme(t);
 }

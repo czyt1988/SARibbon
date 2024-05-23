@@ -202,7 +202,7 @@ QWidget* SARibbonWidget::takeWidget()
 	}
 	auto item = lay->itemAt(0);
 	if (nullptr == item) {
-		return;
+        return nullptr;
 	}
 	lay->removeItem(item);
 	auto w = item->widget();
