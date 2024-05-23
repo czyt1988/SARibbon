@@ -1,9 +1,12 @@
 ﻿# 版本记录(change log):
 
-## 2024-04-16
+
+## 2024-05-23 -> 2.1.0
 - 添加actionTriggered信号
 - 修正了滚动action显示效果
-
+- 把SARibbonTheme从SARibbonMainWindow中转移到SARibbonGloabls.h中并作为枚举类(enum class)
+- 添加SARibbonWidget，同时调整example/widget示例
+- 调整了布局移动的实现方式，不会出现压缩式移动
 
 ## 2024-02-07 -> 2.0.3
 - 调整SAColorToolButton的实现，使之更简单

@@ -43,4 +43,4 @@
 #include "../../src/SARibbonBar/SARibbonCustomizeWidget.h"
 #include "../../src/SARibbonBar/SARibbonCustomizeDialog.h"
 #include "../../src/SARibbonBar/SARibbonMainWindow.h"
-
+#include "../../src/SARibbonBar/SARibbonWidget.h"
