@@ -68,7 +68,8 @@ SOURCES += \
     $$PWD/SARibbonCtrlContainer.cpp \
     $$PWD/SARibbonPannelLayout.cpp \
     $$PWD/SARibbonPannelItem.cpp \
-    $$PWD/SARibbonLineWidgetContainer.cpp
+    $$PWD/SARibbonLineWidgetContainer.cpp \
+    $$PWD/SARibbonWidget.cpp
 
 HEADERS  += \
     $$PWD/SAFramelessHelper.h \
@@ -106,7 +107,8 @@ HEADERS  += \
     $$PWD/SARibbonCtrlContainer.h \
     $$PWD/SARibbonPannelLayout.h \
     $$PWD/SARibbonPannelItem.h \
-    $$PWD/SARibbonLineWidgetContainer.h
+    $$PWD/SARibbonLineWidgetContainer.h \
+    $$PWD/SARibbonWidget.h
 
 RESOURCES += \
     $$PWD/resource.qrc

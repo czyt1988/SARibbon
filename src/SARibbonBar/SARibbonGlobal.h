@@ -18,13 +18,13 @@ class QWidget;
  * @def ribbon的数字版本 MAJ.{MIN}.PAT
  */
 #ifndef SA_RIBBON_BAR_VERSION_MIN
-#define SA_RIBBON_BAR_VERSION_MIN 0
+#define SA_RIBBON_BAR_VERSION_MIN 1
 #endif
 /**
  * @def ribbon的数字版本 MAJ.MIN.{PAT}
  */
 #ifndef SA_RIBBON_BAR_VERSION_PAT
-#define SA_RIBBON_BAR_VERSION_PAT 4
+#define SA_RIBBON_BAR_VERSION_PAT 0
 #endif
 
 #ifndef SA_RIBBON_BAR_NO_EXPORT
@@ -70,7 +70,7 @@ enum class SARibbonAlignment
 
 /**
  * @brief ribbon主题
- * 
+ *
  * 注意，由于有些qss的尺寸，在C++代码中无法获取到，因此针对用户自定义的qss主题，有些尺寸是需要手动设置进去的
  *
  * 例如ribbon tab的margin信息，在QTabBar是无法获取到，而这个影响了SARibbonContextCategory的绘制，
@@ -85,9 +85,6 @@ enum class SARibbonTheme
 	RibbonThemeDark,            ///< 暗色主题
 	RibbonThemeDark2
 };
-
-
-
 
 /**
  * @def 属性，用于标记是否可以进行自定义，用于动态设置到@ref SARibbonCategory 和@ref SARibbonPannel
@@ -155,7 +152,6 @@ enum class SARibbonTheme
 #define SA_DEBUG_PRINT_SARIBBONBAR 1
 #endif
 
-
 /**
  * @brief 全局的设置ribbon theme函数
  *
@@ -169,6 +165,5 @@ enum class SARibbonTheme
  * @param theme
  */
 void SA_RIBBON_EXPORT sa_set_ribbon_theme(QWidget* w, SARibbonTheme theme);
-
 
 #endif  // SARIBBONGLOBAL_H

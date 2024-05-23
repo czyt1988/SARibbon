@@ -61,7 +61,7 @@
 #include "../../src/SARibbonBar/SARibbonCustomizeWidget.cpp"
 #include "../../src/SARibbonBar/SARibbonCustomizeDialog.cpp"
 #include "../../src/SARibbonBar/SARibbonMainWindow.cpp"
-
+#include "../../src/SARibbonBar/SARibbonWidget.cpp"
 #ifdef _MSC_VER
 #pragma warning (pop)
 #pragma pop_macro ("_CRT_SECURE_NO_WARNINGS")
