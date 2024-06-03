@@ -52,7 +52,7 @@ public:
             par->connect(buttonMinimize, &QAbstractButton::clicked, par, &SARibbonSystemButtonBar::minimizeWindow);
         } else {
             if (buttonMinimize) {
-                delete buttonMinimize;
+                buttonMinimize->deleteLater();
                 buttonMinimize = nullptr;
             }
         }
@@ -77,7 +77,8 @@ public:
             par->connect(buttonMaximize, &QAbstractButton::clicked, par, &SARibbonSystemButtonBar::maximizeWindow);
         } else {
             if (buttonMaximize) {
-                delete buttonMaximize;
+                buttonMaximize->deleteLater();
+                ;
                 buttonMaximize = nullptr;
             }
         }
@@ -102,7 +103,8 @@ public:
             buttonClose->show();
         } else {
             if (buttonClose) {
-                delete buttonClose;
+                buttonClose->deleteLater();
+                ;
                 buttonClose = nullptr;
             }
         }
