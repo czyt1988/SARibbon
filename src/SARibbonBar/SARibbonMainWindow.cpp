@@ -111,6 +111,7 @@ void SARibbonMainWindow::setRibbonBar(SARibbonBar* bar)
     helper->setHitTestVisible(bar->applicationButton());    // IMPORTANT!
     helper->setHitTestVisible(bar->quickAccessBar());       // IMPORTANT!
     helper->setHitTestVisible(bar->ribbonStackedWidget());  // IMPORTANT!
+#if SARIBBON_ENABLE_SNAP_LAYOUT
     if (wg->closeButton()) {
         helper->setSystemButton(QWK::WindowAgentBase::Close, wg->closeButton());
     }
@@ -120,6 +121,7 @@ void SARibbonMainWindow::setRibbonBar(SARibbonBar* bar)
     if (wg->maximizeButton()) {
         helper->setSystemButton(QWK::WindowAgentBase::Maximize, wg->maximizeButton());
     }
+#endif
 #else
     bar->installEventFilter(this);
     // 设置窗体的标题栏高度

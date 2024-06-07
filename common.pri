@@ -44,5 +44,10 @@ SARIBBON_LIB_NAME=$$saRibbonLibNameMake(SARibbonBar)
 #     frameless库能实现Ubuntu下和mac下的显示，同时多屏幕的支持也较好
 # 使用frameless库，需要定义QWindowKit的安装目录，默认在SARIBBON_BIN_DIR
 # SA_RIBBON_QWindowKit_Install_DIR = $$SARIBBON_BIN_DIR
+# 
+# SA_RIBBON_CONFIG+=enable_snap_layout
+#      此选项将允许开启windows11的snap layout效果，目前在qt6.5下是正常显示位置，其它已知qt版本的snap layout位置会有偏移
+#      此选项必须在 SA_RIBBON_CONFIG+=use_frameless 下才有效
 ######################################
 # SA_RIBBON_CONFIG += use_frameless
+# SA_RIBBON_CONFIG += enable_snap_layout

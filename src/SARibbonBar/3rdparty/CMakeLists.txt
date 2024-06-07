@@ -49,10 +49,10 @@ endif()
 # 第三方库参数设置
 ########################################################
 # 
-set(QWINDOWKIT_BUILD_WIDGETS ON)
-set(QWINDOWKIT_BUILD_EXAMPLES OFF)
-set(QWINDOWKIT_BUILD_QUICK OFF)
-set(QWINDOWKIT_INSTALL ON)
+set(QWINDOWKIT_BUILD_WIDGETS ON CACHE BOOL "force set QWINDOWKIT_BUILD_WIDGETS ON" FORCE)
+set(QWINDOWKIT_BUILD_EXAMPLES OFF CACHE BOOL "force set QWINDOWKIT_BUILD_EXAMPLES OFF" FORCE)
+set(QWINDOWKIT_BUILD_QUICK OFF CACHE BOOL "force set QWINDOWKIT_BUILD_QUICK OFF" FORCE)
+set(QWINDOWKIT_INSTALL ON CACHE BOOL "force set QWINDOWKIT_INSTALL ON" FORCE)
 ########################################################
 # 安装第三方库
 ########################################################
