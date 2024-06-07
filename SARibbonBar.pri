@@ -5,7 +5,7 @@ DEPENDPATH += $$PWD/src/SARibbonBar
 
 ######################################
 #SA_RIBBON_CONFIG 用于定义一些编译选项：
-# SA_RIBBON_CONFIG+=use_frameless 此选项在common.pri种定义，注意必须保证编译和使用统一，否则会发生不可预估的异常
+# SA_RIBBON_CONFIG+=use_frameless 此选项在common.pri中定义，注意必须保证编译和使用统一，否则会发生不可预估的异常
 ######################################
 
 contains( SA_RIBBON_CONFIG, use_frameless ) {
