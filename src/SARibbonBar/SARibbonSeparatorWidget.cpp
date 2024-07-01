@@ -1,4 +1,6 @@
 #include "SARibbonSeparatorWidget.h"
+#include <QApplication>
+#include <QScreen>
 #include <QStylePainter>
 #include <QPainter>
 #include <QDebug>
@@ -7,13 +9,14 @@ SARibbonSeparatorWidget::SARibbonSeparatorWidget(QWidget* parent) : QFrame(paren
 {
     setFrameShape(QFrame::VLine);
     setFrameShadow(QFrame::Plain);
-    setLineWidth(1);
-    setMidLineWidth(1);
-}
 
-QSize SARibbonSeparatorWidget::sizeHint() const
-{
-    QSize sh = QFrame::sizeHint();
-    sh.setWidth(1);
-    return sh;
+    if(QScreen* screen     = QApplication::primaryScreen()){
+        qreal dpr           = screen->physicalDotsPerInch() / screen->logicalDotsPerInch();
+        int scaledLineWidth = qRound(1.0 * dpr);  // 假设基础 lineWidth 是 1
+        setLineWidth(scaledLineWidth);
+        //    qDebug() << "SARibbonSeparatorWidget:" << scaledLineWidth;
+    }else{
+        setLineWidth(1);
+    }
+
 }

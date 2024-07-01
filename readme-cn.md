@@ -687,15 +687,3 @@ int main(int argc, char* argv[])
 ```
 
 这个快捷键的创建位置在Mainwidnow，这样快捷键就随着mainwindow周期
-
-# 界面展示
-
-> [FastCAE](http://www.fastcae.com/product.html) CAE软件集成开发平台。
-主页:[www.fastcae.com](www.fastcae.com)
-
-![FastCAE](./doc/gallery/fastcae.png)
-
-> [shonDy](https://shoncloud.com) 粒子法流体仿真软件。
-主页:[https://shoncloud.com](https://shoncloud.com)
-
-![shonDy](./doc/gallery/shonDy.png)
