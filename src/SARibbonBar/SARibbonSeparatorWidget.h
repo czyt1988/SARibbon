@@ -12,7 +12,6 @@ class SA_RIBBON_EXPORT SARibbonSeparatorWidget : public QFrame
     Q_OBJECT
 public:
     SARibbonSeparatorWidget(QWidget* parent = nullptr);
-    virtual QSize sizeHint() const override;
 };
 
 #endif  // SARIBBONSEPARATORWIDGET_H
