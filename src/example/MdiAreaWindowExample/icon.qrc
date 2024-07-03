@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/mdiWindowApp">
+        <file>icon/add.svg</file>
+    </qresource>
+</RCC>

@@ -1,53 +1,34 @@
-﻿#include "mainwindow.h"
-#if !SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
-#include "SAFramelessHelper.h"
-#endif
-#include "SARibbonApplicationButton.h"
-#include "SARibbonBar.h"
-#include "SARibbonButtonGroupWidget.h"
-#include "SARibbonCategory.h"
-#include "SARibbonCheckBox.h"
-#include "SARibbonColorToolButton.h"
-#include "SARibbonComboBox.h"
-#include "SARibbonCustomizeDialog.h"
-#include "SARibbonCustomizeWidget.h"
-#include "SARibbonGallery.h"
-#include "SARibbonLineEdit.h"
-#include "SARibbonMenu.h"
-#include "SARibbonPannel.h"
-#include "SARibbonQuickAccessBar.h"
-#include "SARibbonToolButton.h"
-#include "colorWidgets/SAColorGridWidget.h"
-#include "colorWidgets/SAColorPaletteGridWidget.h"
-#include "SARibbonSystemButtonBar.h"
-#include <QAbstractButton>
-#include <QAction>
-#include <QApplication>
-#include <QButtonGroup>
-#include <QCalendarWidget>
-#include <QDebug>
-#include <QElapsedTimer>
-#include <QFile>
-#include <QFileDialog>
-#include <QFontComboBox>
-#include <QLabel>
-#include <QLineEdit>
-#include <QMenu>
-#include <QMessageBox>
-#include <QPushButton>
-#include <QRadioButton>
-#include <QSpinBox>
-#include <QStatusBar>
+#include "MainWindow.h"
+#include "ui_MainWindow.h"
 #include <QTextEdit>
-#include <QTextStream>
-#include <QXmlStreamWriter>
-#include <QMessageBox>
-#include <QShortcut>
-#include <QLineEdit>
-#include <QDialogButtonBox>
-
-MainWindow::MainWindow(QWidget* par)
-    : SARibbonMainWindow(par), mWidgetForCustomize(nullptr), mMenuApplicationBtn(nullptr)
+#include <QMdiSubWindow>
+#include "SARibbonBar.h"
+#include "SARibbonCategory.h"
+#include "SARibbonPannel.h"
+MainWindow::MainWindow(QWidget* parent) : SARibbonMainWindow(parent), ui(new Ui::MainWindow)
 {
-    showMaximized();
+    // 注意，你必须在ui文件中删除菜单栏，否则会拿到空的ribbon指针
+    ui->setupUi(this);
+    SARibbonBar* ribbon        = ribbonBar();
+    SARibbonCategory* mainPage = new SARibbonCategory("Main");
+    ribbon->addCategoryPage(mainPage);
+    buildMainPage(mainPage);
+}
+
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
+
+void MainWindow::buildMainPage(SARibbonCategory* mainPage)
+{
+    SARibbonPannel* mainPannel = new SARibbonPannel("operate");
+    mainPannel->addAction(ui->actionadd_window);
+    mainPage->addPannel(mainPannel);
+}
+
+void MainWindow::on_actionadd_window_triggered()
+{
+    QMdiSubWindow* sub = ui->mdiArea->addSubWindow(new QTextEdit());
+    sub->show();
 }

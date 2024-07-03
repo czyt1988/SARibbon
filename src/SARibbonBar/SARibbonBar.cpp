@@ -321,7 +321,6 @@ int SARibbonBar::PrivateData::categoryHeight() const
  */
 void SARibbonBar::PrivateData::updateHintSize()
 {
-    auto fm         = q_ptr->fontMetrics();
     mTitleBarHeight = calcTitleBarHeight();
     // mTabBarHeight有大于0的值说明用户设置了，就使用用户设置的值
     mTabBarHeight   = calcTabBarHeight();
@@ -358,20 +357,20 @@ bool SARibbonBar::PrivateData::isContainContextCategoryInList(SARibbonContextCat
 void SARibbonBar::PrivateData::setMinimumMode()
 {
     mCurrentRibbonMode = SARibbonBar::MinimumRibbonMode;
-    this->mStackedContainerWidget->setPopupMode();
-    this->mStackedContainerWidget->setFocusPolicy(Qt::NoFocus);
-    this->mStackedContainerWidget->clearFocus();
-    this->mRibbonTabBar->setFocus();
-    this->mStackedContainerWidget->hide();
+    mStackedContainerWidget->setPopupMode();
+    mStackedContainerWidget->setFocusPolicy(Qt::NoFocus);
+    mStackedContainerWidget->clearFocus();
+    mRibbonTabBar->setFocus();
+    mStackedContainerWidget->hide();
     resetSize();
 }
 
 void SARibbonBar::PrivateData::setNormalMode()
 {
     mCurrentRibbonMode = SARibbonBar::NormalRibbonMode;
-    this->mStackedContainerWidget->setNormalMode();
-    this->mStackedContainerWidget->setFocus();
-    this->mStackedContainerWidget->show();
+    mStackedContainerWidget->setNormalMode();
+    mStackedContainerWidget->setFocus();
+    mStackedContainerWidget->show();
     resetSize();
 }
 
@@ -544,6 +543,7 @@ void SARibbonBar::initHighDpi()
     QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+    // 在有些时候，无法显示分割线，是由于PassThrough导致的
     QApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
 #endif
 }

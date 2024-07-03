@@ -1,23 +1,29 @@
-﻿#ifndef MAINWINDOW_H
+#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
-#include "SARibbonMainWindow.h"
-class SARibbonCategory;
-class SARibbonContextCategory;
-class SARibbonCustomizeWidget;
-class SARibbonActionsManager;
-class SARibbonQuickAccessBar;
-class SARibbonButtonGroupWidget;
-class SARibbonPannel;
-class QTextEdit;
-class QComboBox;
-class QCloseEvent;
-class QLineEdit;
 
+#include <QMainWindow>
+#include "SARibbonMainWindow.h"
+namespace Ui
+{
+class MainWindow;
+}
+class SARibbonCategory;
 class MainWindow : public SARibbonMainWindow
 {
     Q_OBJECT
+
 public:
-    MainWindow(QWidget* par = nullptr);
+    explicit MainWindow(QWidget* parent = nullptr);
+    ~MainWindow();
+
+private slots:
+    void on_actionadd_window_triggered();
+
+private:
+    void buildMainPage(SARibbonCategory* mainPage);
+
+private:
+    Ui::MainWindow* ui;
 };
 
 #endif  // MAINWINDOW_H

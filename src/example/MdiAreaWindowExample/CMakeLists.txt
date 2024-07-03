@@ -1,17 +1,18 @@
 ﻿cmake_minimum_required(VERSION 3.5)
 SET(VERSION_SHORT 0.1)
-project(MainWindowExample VERSION ${VERSION_SHORT}) 
-set(SARIBBON_EXPAMPLE_NAME MainWindowExample)
+project(MdiAreaWindowExample VERSION ${VERSION_SHORT}) 
+set(SARIBBON_EXPAMPLE_NAME MdiAreaWindowExample)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # qt库加载，最低要求5.8
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} 5.8 COMPONENTS Core Gui Widgets REQUIRED)
 
 add_executable(${SARIBBON_EXPAMPLE_NAME} WIN32
-    mainwindow.h
-    mainwindow.cpp
+    MainWindow.h
+    MainWindow.cpp
+    MainWindow.ui
     main.cpp
-    saribbonresouce.qrc
+    icon.qrc
 )
 
 target_include_directories(${SARIBBON_EXPAMPLE_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../../SARibbonBar")
