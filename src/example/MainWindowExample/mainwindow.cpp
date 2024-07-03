@@ -621,6 +621,26 @@ void MainWindow::onCheckBoxAlignmentCenterClicked(bool checked)
     }
 }
 
+void MainWindow::onSpinBoxRibbonTitleHeightChanged(int h)
+{
+    ribbonBar()->setTitleBarHeight(h);
+}
+
+void MainWindow::onSpinBoxRibbonTabHeightChanged(int h)
+{
+    ribbonBar()->setTabBarHeight(h);
+}
+
+void MainWindow::onSpinBoxRibbonCategoryHeightChanged(int h)
+{
+    ribbonBar()->setCategoryHeight(h);
+}
+
+void MainWindow::onSpinBoxRibbonPannelTtitleHeightChanged(int h)
+{
+    ribbonBar()->setPannelTitleHeight(h);
+}
+
 /**
  * @brief 创建其它actions，这些actions并不在SARibbonBar管理
  */
@@ -1133,17 +1153,44 @@ void MainWindow::createCategorySize(SARibbonCategory* page)
     page->addPannel(pannel);
 
     // pannel 3
-    pannel          = new SARibbonPannel(tr("Grid"));
-    QWidget* w      = new QWidget();
-    QGridLayout* g  = new QGridLayout(w);
-    QLabel* lab1    = new QLabel("value1:");
-    QLineEdit* edi1 = new QLineEdit(w);
-    QLabel* lab2    = new QLabel("value2:");
-    QLineEdit* edi2 = new QLineEdit(w);
-    g->addWidget(lab1, 0, 0);
-    g->addWidget(edi1, 0, 1);
-    g->addWidget(lab2, 1, 0);
-    g->addWidget(edi2, 1, 1);
+    // 这里演示了一个窗口带有gridlayoout
+    pannel         = new SARibbonPannel(tr("Grid"));
+    QWidget* w     = new QWidget();
+    QGridLayout* g = new QGridLayout(w);
+
+    QLabel* lab0                       = new QLabel("Ribbon Title Height:");
+    QSpinBox* spinboxRibbonTitleHeight = new QSpinBox(w);
+    spinboxRibbonTitleHeight->setRange(10, 99);
+
+    QLabel* lab1                     = new QLabel("Ribbon Tab Height:");
+    QSpinBox* spinboxRibbonTabHeight = new QSpinBox(w);
+    spinboxRibbonTabHeight->setRange(10, 99);
+
+    QLabel* lab2                          = new QLabel("Ribbon Category Height:");
+    QSpinBox* spinboxRibbonCategoryHeight = new QSpinBox(w);
+    spinboxRibbonCategoryHeight->setRange(30, 300);
+
+    QLabel* lab3                              = new QLabel("Ribbon Pannel Title:");
+    QSpinBox* spinboxRibbonPannelTtitleHeight = new QSpinBox(w);
+    spinboxRibbonPannelTtitleHeight->setRange(5, 99);
+
+    g->addWidget(lab0, 0, 0);
+    g->addWidget(spinboxRibbonTitleHeight, 0, 1);
+    g->addWidget(lab1, 1, 0);
+    g->addWidget(spinboxRibbonTabHeight, 1, 1);
+    g->addWidget(lab2, 0, 2);
+    g->addWidget(spinboxRibbonCategoryHeight, 0, 3);
+    g->addWidget(lab3, 1, 2);
+    g->addWidget(spinboxRibbonPannelTtitleHeight, 1, 3);
+    spinboxRibbonTitleHeight->setValue(ribbonBar()->titleBarHeight());
+    spinboxRibbonTabHeight->setValue(ribbonBar()->tabBarHeight());
+    spinboxRibbonCategoryHeight->setValue(ribbonBar()->categoryHeight());
+    spinboxRibbonPannelTtitleHeight->setValue(ribbonBar()->pannelTitleHeight());
+    connect(spinboxRibbonTitleHeight, &QSpinBox::valueChanged, this, &MainWindow::onSpinBoxRibbonTitleHeightChanged);
+    connect(spinboxRibbonTabHeight, &QSpinBox::valueChanged, this, &MainWindow::onSpinBoxRibbonTabHeightChanged);
+    connect(spinboxRibbonCategoryHeight, &QSpinBox::valueChanged, this, &MainWindow::onSpinBoxRibbonCategoryHeightChanged);
+    connect(spinboxRibbonPannelTtitleHeight, &QSpinBox::valueChanged, this, &MainWindow::onSpinBoxRibbonPannelTtitleHeightChanged);
+
     pannel->addLargeWidget(w);
     page->addPannel(pannel);
 }
