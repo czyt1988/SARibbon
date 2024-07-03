@@ -1220,6 +1220,7 @@ void SARibbonBar::setCategoryHeight(int h, bool resizeByNow)
     } else {
         *(d_ptr->mUserDefCategoryHeight) = h;
     }
+    resizeStackedContainerWidget();
     if (resizeByNow) {
         updateRibbonGeometry();
     }
@@ -2162,7 +2163,7 @@ void SARibbonBar::resizeStackedContainerWidget()
     int x = border.left();
     int y = ribbonTabBarGeometry.bottom() + 1;
     int w = width() - border.left() - border.right();
-    int h = d_ptr->mCategoryHeight;
+    int h = d_ptr->categoryHeight();
     if (d_ptr->mStackedContainerWidget->isPopupMode()) {
         // 弹出模式时，位置为全局位置
         QPoint absPosition = mapToGlobal(QPoint(x, y));

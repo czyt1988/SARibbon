@@ -69,6 +69,11 @@ private slots:
     void onActionVisibleAllTriggered(bool on);
     // 居中对齐checkbox的槽
     void onCheckBoxAlignmentCenterClicked(bool checked);
+    //
+    void onSpinBoxRibbonTitleHeightChanged(int h);
+    void onSpinBoxRibbonTabHeightChanged(int h);
+    void onSpinBoxRibbonCategoryHeightChanged(int h);
+    void onSpinBoxRibbonPannelTtitleHeightChanged(int h);
 
 private:
     // 创建其它actions，这些actions并不在SARibbonBar管理
