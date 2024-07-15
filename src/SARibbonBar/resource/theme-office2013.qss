@@ -136,7 +136,7 @@ SARibbonTabBar::tab {
   margin-left: 5px;
   margin-bottom: 0px;
   min-width: 50px;
-  min-height: 25px;
+  min-height: 28px;/*此参数不设置，会导致底部内容露出来*/
 }
 
 SARibbonTabBar::tab:selected {
