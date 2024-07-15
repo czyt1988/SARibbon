@@ -18,7 +18,7 @@ class QWidget;
  * @def ribbon的数字版本 MAJ.{MIN}.PAT
  */
 #ifndef SA_RIBBON_BAR_VERSION_MIN
-#define SA_RIBBON_BAR_VERSION_MIN 1
+#define SA_RIBBON_BAR_VERSION_MIN 2
 #endif
 /**
  * @def ribbon的数字版本 MAJ.MIN.{PAT}

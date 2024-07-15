@@ -1,5 +1,11 @@
 ﻿# 版本记录(change log):
 
+## 2024-07-15 -> 2.2.0
+- 增加了mdi窗口的示例
+- 增加了SARibbonTabBar的tab尺寸计算方式，可以让tab高度按照tabbar高度自动调整
+- 示例增加了尺寸设置的配置，可以任意调整titlebar，tabbar，pannel title height的高度
+- 修正调整category高度后，pannel高度不跟着改变的问题
+- 添加snap layout的开关，在依赖qwk下，可以设置是否开启snap layout
 
 ## 2024-05-23 -> 2.1.0
 - 添加actionTriggered信号
