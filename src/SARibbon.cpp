@@ -1,4 +1,4 @@
-// 定义此宏，将SA_RIBBON_EXPORT定义为空
+﻿// 定义此宏，将SA_RIBBON_EXPORT定义为空
 #ifndef SA_RIBBON_BAR_NO_EXPORT
 #define SA_RIBBON_BAR_NO_EXPORT
 #endif
@@ -2299,7 +2299,7 @@ public:
 			par->connect(buttonMinimize, &QAbstractButton::clicked, par, &SARibbonSystemButtonBar::minimizeWindow);
 		} else {
 			if (buttonMinimize) {
-				delete buttonMinimize;
+				buttonMinimize->deleteLater();
 				buttonMinimize = nullptr;
 			}
 		}
@@ -2324,7 +2324,8 @@ public:
 			par->connect(buttonMaximize, &QAbstractButton::clicked, par, &SARibbonSystemButtonBar::maximizeWindow);
 		} else {
 			if (buttonMaximize) {
-				delete buttonMaximize;
+				buttonMaximize->deleteLater();
+				;
 				buttonMaximize = nullptr;
 			}
 		}
@@ -2349,7 +2350,8 @@ public:
 			buttonClose->show();
 		} else {
 			if (buttonClose) {
-				delete buttonClose;
+				buttonClose->deleteLater();
+				;
 				buttonClose = nullptr;
 			}
 		}
@@ -2744,8 +2746,7 @@ namespace SA
 
 QDebug operator<<(QDebug debug, const QStyleOptionToolButton& opt)
 {
-	debug << "=============="
-          << "\nQStyleOption(" << (QStyleOption)opt << ")"
+    debug << "==============" << "\nQStyleOption(" << (QStyleOption)opt << ")"
           << "\n  QStyleOptionComplex:"
              "\n     subControls("
           << opt.subControls
@@ -5219,6 +5220,8 @@ void SARibbonStackedWidget::resizeEvent(QResizeEvent* e)
 /*** End of inlined file: SARibbonStackedWidget.cpp ***/
 
 /*** Start of inlined file: SARibbonSeparatorWidget.cpp ***/
+#include <QApplication>
+#include <QScreen>
 #include <QStylePainter>
 #include <QPainter>
 #include <QDebug>
@@ -5227,15 +5230,15 @@ SARibbonSeparatorWidget::SARibbonSeparatorWidget(QWidget* parent) : QFrame(paren
 {
 	setFrameShape(QFrame::VLine);
 	setFrameShadow(QFrame::Plain);
-	setLineWidth(1);
-	setMidLineWidth(1);
-}
 
-QSize SARibbonSeparatorWidget::sizeHint() const
-{
-	QSize sh = QFrame::sizeHint();
-	sh.setWidth(1);
-	return sh;
+    if (QScreen* screen = QApplication::primaryScreen()) {
+		qreal dpr           = screen->physicalDotsPerInch() / screen->logicalDotsPerInch();
+		int scaledLineWidth = qRound(1.0 * dpr);  // 假设基础 lineWidth 是 1
+		setLineWidth(scaledLineWidth);
+		//    qDebug() << "SARibbonSeparatorWidget:" << scaledLineWidth;
+    } else {
+		setLineWidth(1);
+	}
 }
 
 /*** End of inlined file: SARibbonSeparatorWidget.cpp ***/
@@ -5506,6 +5509,9 @@ QSize SARibbonQuickAccessBar::iconSize() const
 /*** End of inlined file: SARibbonQuickAccessBar.cpp ***/
 
 /*** Start of inlined file: SARibbonTabBar.cpp ***/
+#include <QStyleOptionTab>
+#include <QFontMetrics>
+
 SARibbonTabBar::SARibbonTabBar(QWidget* parent) : QTabBar(parent), m_tabMargin(6, 0, 0, 0)
 {
 	setExpanding(false);
@@ -5519,6 +5525,35 @@ const QMargins& SARibbonTabBar::tabMargin() const
 void SARibbonTabBar::setTabMargin(const QMargins& tabMargin)
 {
 	m_tabMargin = tabMargin;
+}
+
+QSize SARibbonTabBar::tabSizeHint(int index) const
+{
+	QStyleOptionTab opt;
+	initStyleOption(&opt, index);
+	int hframe            = style()->pixelMetric(QStyle::PM_TabBarTabHSpace, &opt, this);
+	const QFontMetrics fm = fontMetrics();
+
+	int widgetWidth = 0;
+	int padding     = 0;
+	if (!opt.leftButtonSize.isEmpty()) {
+		padding += 4;
+		widgetWidth += opt.leftButtonSize.width();
+	}
+	if (!opt.rightButtonSize.isEmpty()) {
+		padding += 4;
+		widgetWidth += opt.rightButtonSize.width();
+	}
+	if (!opt.icon.isNull()) {
+		padding += 4;
+	}
+	const int textWidth = fm.size(Qt::TextShowMnemonic, opt.text).width();
+	QSize csz;
+
+	csz = QSize(textWidth + opt.iconSize.width() + hframe + widgetWidth + padding, height());
+
+	QSize retSize = style()->sizeFromContents(QStyle::CT_TabBarTab, &opt, csz, this);
+	return retSize;
 }
 
 /*** End of inlined file: SARibbonTabBar.cpp ***/
@@ -8480,12 +8515,11 @@ void SARibbonCategoryLayout::updateGeometryArr()
 // 如果total < categoryWidth,m_d->mXBase可以设置为0
 // 判断是否超过总长度
 #if SARibbonCategoryLayout_DEBUG_PRINT && SA_DEBUG_PRINT_SIZE_HINT
-	qDebug() << "SARibbonCategoryLayout::updateGeometryArr"
-             << "\n|-category name=" << category->categoryName()  //
-             << "\n|-category height=" << height                  //
-             << "\n|-totalSizeHintWidth=" << total                //
-             << "\n|-y=" << y                                     //
-             << "\n|-expandWidth:" << expandWidth                 //
+    qDebug() << "SARibbonCategoryLayout::updateGeometryArr" << "\n|-category name=" << category->categoryName()  //
+             << "\n|-category height=" << height                                                                 //
+             << "\n|-totalSizeHintWidth=" << total                                                               //
+             << "\n|-y=" << y                                                                                    //
+             << "\n|-expandWidth:" << expandWidth                                                                //
              << "\n|-mag=" << mag;
 #endif
 	if (total > categoryWidth) {
@@ -10277,6 +10311,7 @@ public:
 		mContextCategoryColorList = SARibbonBar::defaultContextCategoryColorList();
 	}
 	void init();
+	int systemTabBarHeight() const;
 	// 计算tabbar高度
 	int calcTabBarHeight();
 	// 根据字体信息计算标题栏高度
@@ -10347,6 +10382,13 @@ void SARibbonBar::PrivateData::init()
 	setNormalMode();
 }
 
+int SARibbonBar::PrivateData::systemTabBarHeight() const
+{
+	return q_ptr->style()->pixelMetric(QStyle::PM_TabBarBaseHeight)
+           + q_ptr->style()->pixelMetric(QStyle::PM_TabBarTabHSpace)
+           + q_ptr->style()->pixelMetric(QStyle::PM_TabBarTabOverlap);
+}
+
 /**
  * @brief 估算tabbar的高度
  * @param fm
@@ -10354,7 +10396,7 @@ void SARibbonBar::PrivateData::init()
  */
 int SARibbonBar::PrivateData::calcTabBarHeight()
 {
-	int defaultHeight = q_ptr->style()->pixelMetric(QStyle::PM_TabBarBaseHeight);
+	int defaultHeight = systemTabBarHeight();
 	int fontHeight = q_ptr->fontMetrics().lineSpacing();  // 不要用height，像宋体这种字体，height=12，lineSpacing=14，有些就无法显示
 	int defaultHeight2 = fontHeight * 1.6;
 	if (defaultHeight2 < fontHeight + 10) {
@@ -10454,9 +10496,6 @@ void SARibbonBar::PrivateData::resetSize()
 	updateHintSize();
 	const int th      = tabBarHeigth();
 	int mainBarHeight = calcMainBarHeight(th, titleBarHeight(), categoryHeight(), mIsTabOnTitle, mCurrentRibbonMode);
-	if (mRibbonTabBar) {
-		mRibbonTabBar->setFixedHeight(th);
-	}
 	// 处于最小模式下时，bar的高度为tabbar的bottom,这个调整必须在resize event之后
 	q_ptr->setFixedHeight(mainBarHeight);
 }
@@ -10503,7 +10542,6 @@ int SARibbonBar::PrivateData::categoryHeight() const
  */
 void SARibbonBar::PrivateData::updateHintSize()
 {
-	auto fm         = q_ptr->fontMetrics();
 	mTitleBarHeight = calcTitleBarHeight();
 	// mTabBarHeight有大于0的值说明用户设置了，就使用用户设置的值
 	mTabBarHeight   = calcTabBarHeight();
@@ -10540,20 +10578,20 @@ bool SARibbonBar::PrivateData::isContainContextCategoryInList(SARibbonContextCat
 void SARibbonBar::PrivateData::setMinimumMode()
 {
 	mCurrentRibbonMode = SARibbonBar::MinimumRibbonMode;
-	this->mStackedContainerWidget->setPopupMode();
-	this->mStackedContainerWidget->setFocusPolicy(Qt::NoFocus);
-	this->mStackedContainerWidget->clearFocus();
-	this->mRibbonTabBar->setFocus();
-	this->mStackedContainerWidget->hide();
+	mStackedContainerWidget->setPopupMode();
+	mStackedContainerWidget->setFocusPolicy(Qt::NoFocus);
+	mStackedContainerWidget->clearFocus();
+	mRibbonTabBar->setFocus();
+	mStackedContainerWidget->hide();
 	resetSize();
 }
 
 void SARibbonBar::PrivateData::setNormalMode()
 {
 	mCurrentRibbonMode = SARibbonBar::NormalRibbonMode;
-	this->mStackedContainerWidget->setNormalMode();
-	this->mStackedContainerWidget->setFocus();
-	this->mStackedContainerWidget->show();
+	mStackedContainerWidget->setNormalMode();
+	mStackedContainerWidget->setFocus();
+	mStackedContainerWidget->show();
 	resetSize();
 }
 
@@ -10726,6 +10764,7 @@ void SARibbonBar::initHighDpi()
 	QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
 #endif
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 14, 0))
+	// 在有些时候，无法显示分割线，是由于PassThrough导致的
 	QApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);
 #endif
 }
@@ -11324,7 +11363,8 @@ SARibbonBar::RibbonMode SARibbonBar::currentRibbonState() const
  */
 int SARibbonBar::tabBarHeight() const
 {
-	return d_ptr->mRibbonTabBar->height();
+	return d_ptr->tabBarHeigth();
+	// return d_ptr->mRibbonTabBar->height();
 }
 
 /**
@@ -11402,6 +11442,7 @@ void SARibbonBar::setCategoryHeight(int h, bool resizeByNow)
 	} else {
 		*(d_ptr->mUserDefCategoryHeight) = h;
 	}
+	resizeStackedContainerWidget();
 	if (resizeByNow) {
 		updateRibbonGeometry();
 	}
@@ -12344,7 +12385,7 @@ void SARibbonBar::resizeStackedContainerWidget()
 	int x = border.left();
 	int y = ribbonTabBarGeometry.bottom() + 1;
 	int w = width() - border.left() - border.right();
-	int h = d_ptr->mCategoryHeight;
+	int h = d_ptr->categoryHeight();
 	if (d_ptr->mStackedContainerWidget->isPopupMode()) {
 		// 弹出模式时，位置为全局位置
 		QPoint absPosition = mapToGlobal(QPoint(x, y));
@@ -12493,7 +12534,7 @@ void SARibbonBar::resizeInLooseStyle()
 	// cornerWidget - TopLeftCorner
 	const int validTitleBarHeight = d_ptr->titleBarHeight();
 	const int tabH                = d_ptr->tabBarHeigth();
-
+	// tabbar的标签不会因为tabbar的高度而铺满，tabbar的标签是固定高度的，tabbar拉高只会把底部露出来，因此，systab是理论合理的高度
 	// 布局corner widget
 	x += d_ptr->mIconRightBorderPosition + 5;
 	if (QWidget* connerL = cornerWidget(Qt::TopLeftCorner)) {
@@ -12521,10 +12562,11 @@ void SARibbonBar::resizeInLooseStyle()
 	}
 	// 第二行，开始布局applicationButton，tabbar，tabBarRightSizeButtonGroupWidget，TopRightCorner
 	x = border.left();
-	y += validTitleBarHeight;
+	y += validTitleBarHeight;  // 此时，y值在titlebar下面
 	// applicationButton 定位
 	if (d_ptr->mApplicationButton) {
 		if (d_ptr->mApplicationButton->isVisibleTo(this)) {
+			// 保证
 			d_ptr->mApplicationButton->setGeometry(x, y, d_ptr->mApplicationButton->sizeHint().width(), tabH);
 			x = d_ptr->mApplicationButton->geometry().right();
 		}
@@ -12636,12 +12678,13 @@ void SARibbonBar::resizeInCompactStyle()
 	}
 
 	// tab 的y值需要重新计算
+	// 紧凑模式下，tabbarHeight不生效
 	int tabH = tabBarHeight();
-
 	if (tabH > validTitleBarHeight) {
 		// 这种直接把tabH设置为validTitleBarHeight
 		tabH = validTitleBarHeight;
 	}
+
 	y = y + validTitleBarHeight - tabH;  // 如果tabH较小，则下以，让tab底部和title的底部对齐
 
 	// applicationButton 定位，与TabBar同高
@@ -15383,6 +15426,7 @@ void SARibbonMainWindow::setRibbonBar(SARibbonBar* bar)
 	helper->setHitTestVisible(bar->applicationButton());    // IMPORTANT!
 	helper->setHitTestVisible(bar->quickAccessBar());       // IMPORTANT!
 	helper->setHitTestVisible(bar->ribbonStackedWidget());  // IMPORTANT!
+#if SARIBBON_ENABLE_SNAP_LAYOUT
 	if (wg->closeButton()) {
 		helper->setSystemButton(QWK::WindowAgentBase::Close, wg->closeButton());
 	}
@@ -15392,6 +15436,7 @@ void SARibbonMainWindow::setRibbonBar(SARibbonBar* bar)
 	if (wg->maximizeButton()) {
 		helper->setSystemButton(QWK::WindowAgentBase::Maximize, wg->maximizeButton());
 	}
+#endif
 #else
 	bar->installEventFilter(this);
 	// 设置窗体的标题栏高度
