@@ -2318,7 +2318,6 @@ void SARibbonBar::resizeInLooseStyle()
 	// cornerWidget - TopLeftCorner
 	const int validTitleBarHeight = d_ptr->titleBarHeight();
 	const int tabH                = d_ptr->tabBarHeigth();
-	const int sysTabH             = d_ptr->systemTabBarHeight();
 	// tabbar的标签不会因为tabbar的高度而铺满，tabbar的标签是固定高度的，tabbar拉高只会把底部露出来，因此，systab是理论合理的高度
 	// 布局corner widget
 	x += d_ptr->mIconRightBorderPosition + 5;
@@ -2348,15 +2347,11 @@ void SARibbonBar::resizeInLooseStyle()
 	// 第二行，开始布局applicationButton，tabbar，tabBarRightSizeButtonGroupWidget，TopRightCorner
 	x = border.left();
 	y += validTitleBarHeight;  // 此时，y值在titlebar下面
-	// 按照sysTabH设置真实的y偏移
-	if (sysTabH < tabH) {
-		y += (tabH - sysTabH);
-	}
 	// applicationButton 定位
 	if (d_ptr->mApplicationButton) {
 		if (d_ptr->mApplicationButton->isVisibleTo(this)) {
 			// 保证
-			d_ptr->mApplicationButton->setGeometry(x, y, d_ptr->mApplicationButton->sizeHint().width(), sysTabH);
+			d_ptr->mApplicationButton->setGeometry(x, y, d_ptr->mApplicationButton->sizeHint().width(), tabH);
 			x = d_ptr->mApplicationButton->geometry().right();
 		}
 	}
@@ -2370,11 +2365,11 @@ void SARibbonBar::resizeInLooseStyle()
 		if (connerW->isVisibleTo(this)) {
 			QSize connerSize = connerW->sizeHint();
 			endX -= connerSize.width();
-			if (connerSize.height() < sysTabH) {
-				int detal = (sysTabH - connerSize.height()) / 2;
+			if (connerSize.height() < tabH) {
+				int detal = (tabH - connerSize.height()) / 2;
 				connerW->setGeometry(endX, y + detal, connerSize.width(), connerSize.height());
 			} else {
-				connerW->setGeometry(endX, y, connerSize.width(), sysTabH);
+				connerW->setGeometry(endX, y, connerSize.width(), tabH);
 			}
 		}
 	}
@@ -2387,23 +2382,23 @@ void SARibbonBar::resizeInLooseStyle()
 		QSize wSize = d_ptr->mRightButtonGroup->sizeHint();
 		endX -= wSize.width();
 		// 上下留1px的边线
-		d_ptr->mRightButtonGroup->setGeometry(endX, y + 1, wSize.width(), sysTabH - 2);
+		d_ptr->mRightButtonGroup->setGeometry(endX, y + 1, wSize.width(), tabH - 2);
 	}
 	// 最后确定tabbar宽度
 	int tabBarAllowedWidth = endX - x;
 	if (ribbonAlignment() == SARibbonAlignment::AlignLeft) {
-		d_ptr->mRibbonTabBar->setGeometry(x, y, tabBarAllowedWidth, sysTabH);
+		d_ptr->mRibbonTabBar->setGeometry(x, y, tabBarAllowedWidth, tabH);
 	} else {
 		// 居中对齐的情况下，Tab要居中显示
 		// 得到tab的推荐尺寸
 		int mintabBarWidth = calcMinTabBarWidth();
 		if (mintabBarWidth >= tabBarAllowedWidth) {
 			// 这时tabbar没有居中对齐的必要性，空间位置不够了
-			d_ptr->mRibbonTabBar->setGeometry(x, y, tabBarAllowedWidth, sysTabH);
+			d_ptr->mRibbonTabBar->setGeometry(x, y, tabBarAllowedWidth, tabH);
 		} else {
 			// 说明tabbar的宽度有居中的可能性
 			int xoffset = (tabBarAllowedWidth - mintabBarWidth) / 2;
-			d_ptr->mRibbonTabBar->setGeometry(x + xoffset, y, mintabBarWidth, sysTabH);
+			d_ptr->mRibbonTabBar->setGeometry(x + xoffset, y, mintabBarWidth, tabH);
 		}
 	}
 	resizeStackedContainerWidget();
@@ -2468,7 +2463,7 @@ void SARibbonBar::resizeInCompactStyle()
 
 	// tab 的y值需要重新计算
 	// 紧凑模式下，tabbarHeight不生效
-	int tabH = d_ptr->systemTabBarHeight();
+	int tabH = tabBarHeight();
 	if (tabH > validTitleBarHeight) {
 		// 这种直接把tabH设置为validTitleBarHeight
 		tabH = validTitleBarHeight;
