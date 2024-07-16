@@ -757,6 +757,29 @@ SARibbonBar* SARibbonPannel::ribbonBar() const
 }
 
 /**
+ * @brief 设置按钮之间的间隔
+ * @param n
+ */
+void SARibbonPannel::setSpacing(int n)
+{
+    if (auto lay = layout()) {
+        lay->setSpacing(n);
+    }
+}
+
+/**
+ * @brief 按钮之间的间隔
+ * @return
+ */
+int SARibbonPannel::spacing() const
+{
+    if (auto lay = layout()) {
+        return lay->spacing();
+    }
+    return 0;
+}
+
+/**
  * @brief pannel高度推荐
  * @param fm
  * @param layMode

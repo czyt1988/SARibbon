@@ -17,8 +17,18 @@ void SARibbonTabBar::setTabMargin(const QMargins& tabMargin)
 	m_tabMargin = tabMargin;
 }
 
+/**
+ * @brief tab的尺寸预估
+ *
+ * 有别于系统默认的tabbar，SARibbonTabBar的tab高度和tabbar高度一致，且不考虑纵向分布情况
+ * @param index
+ * @return
+ */
 QSize SARibbonTabBar::tabSizeHint(int index) const
 {
+    if (index < 0) {
+        return QSize();
+    }
 	QStyleOptionTab opt;
 	initStyleOption(&opt, index);
 	int hframe            = style()->pixelMetric(QStyle::PM_TabBarTabHSpace, &opt, this);
@@ -38,10 +48,6 @@ QSize SARibbonTabBar::tabSizeHint(int index) const
 		padding += 4;
 	}
 	const int textWidth = fm.size(Qt::TextShowMnemonic, opt.text).width();
-	QSize csz;
-
-	csz = QSize(textWidth + opt.iconSize.width() + hframe + widgetWidth + padding, height());
-
-	QSize retSize = style()->sizeFromContents(QStyle::CT_TabBarTab, &opt, csz, this);
-	return retSize;
+    QSize csz           = QSize(textWidth + opt.iconSize.width() + hframe + widgetWidth + padding, height());
+    return style()->sizeFromContents(QStyle::CT_TabBarTab, &opt, csz, this);
 }

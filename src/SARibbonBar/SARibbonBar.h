@@ -333,6 +333,10 @@ public:
     bool isEnableShowPannelTitle() const;
     void setEnableShowPannelTitle(bool on);
 
+    // 设置pannel的spacing
+    void setPannelSpacing(int n);
+    int pannelSpacing() const;
+
     // 获取SARibbonStackedWidget，谨慎使用此函数
     SARibbonStackedWidget* ribbonStackedWidget();
 

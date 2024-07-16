@@ -50,6 +50,7 @@ public:
     int mPannelTitleHeight { 15 };         ///< pannel的标题栏默认高度
     bool mIsContextCategory { false };     ///< 标记是否是上下文标签
     bool mIsCanCustomize { true };         ///< 标记是否可以自定义
+    int mPannelSpacing { 0 };              ///< pannel的spacing
     SARibbonPannel::PannelLayoutMode mDefaultPannelLayoutMode { SARibbonPannel::ThreeRowMode };
 };
 SARibbonCategory::PrivateData::PrivateData(SARibbonCategory* p) : q_ptr(p)
@@ -101,17 +102,17 @@ void SARibbonCategory::PrivateData::insertPannel(int index, SARibbonPannel* pann
     if (pannel->parentWidget() != q_ptr) {
         pannel->setParent(q_ptr);
     }
-    // 同步一些状态
+    // 同步状态
     pannel->setEnableShowTitle(mEnableShowPannelTitle);
     pannel->setTitleHeight(mPannelTitleHeight);
     pannel->setPannelLayoutMode(mDefaultPannelLayoutMode);
+    pannel->setSpacing(mPannelSpacing);
     index = qMax(0, index);
     index = qMin(lay->pannelCount(), index);
     lay->insertPannel(index, pannel);
     pannel->setVisible(true);
 
-    QObject::connect(pannel, &SARibbonPannel::actionTriggered
-        , ribbonCategory(), &SARibbonCategory::actionTriggered);
+    QObject::connect(pannel, &SARibbonPannel::actionTriggered, ribbonCategory(), &SARibbonCategory::actionTriggered);
 }
 
 bool SARibbonCategory::PrivateData::takePannel(SARibbonPannel* pannel)
@@ -618,6 +619,30 @@ SARibbonAlignment SARibbonCategory::categoryAlignment() const
         return lay->categoryAlignment();
     }
     return SARibbonAlignment::AlignLeft;
+}
+
+/**
+ * @brief 设置pannel的spacing
+ * @param n
+ */
+void SARibbonCategory::setPannelSpacing(int n)
+{
+    d_ptr->mPannelSpacing = n;
+    iterate([ n ](SARibbonPannel* pannel) -> bool {
+        if (pannel) {
+            pannel->setSpacing(n);
+        }
+        return true;
+    });
+}
+
+/**
+ * @brief pannel的spacing
+ * @return
+ */
+int SARibbonCategory::pannelSpacing() const
+{
+    return d_ptr->mPannelSpacing;
 }
 
 /**
