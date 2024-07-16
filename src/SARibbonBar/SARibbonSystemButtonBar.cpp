@@ -4,6 +4,7 @@
 #include <QStyle>
 #include <QDebug>
 #include <QScopedPointer>
+#include <QWindowStateChangeEvent>
 #include "SARibbonMainWindow.h"
 #include "SARibbonBar.h"
 #include "SARibbonElementManager.h"
@@ -341,6 +342,42 @@ Qt::WindowFlags SARibbonSystemButtonBar::windowButtonFlags() const
 QSize SARibbonSystemButtonBar::sizeHint() const
 {
     return (d_ptr->sizeHint());
+}
+
+bool SARibbonSystemButtonBar::eventFilter(QObject* obj, QEvent* event)
+{
+    if (obj == parent()) {
+        // SARibbonMainWindow的事件
+        if (event->type() == QEvent::Resize) {
+            SARibbonMainWindow* mainWindow = qobject_cast< SARibbonMainWindow* >(obj);
+            if (!mainWindow) {
+                // 所有事件都不消费
+                return QFrame::eventFilter(obj, event);
+            }
+            SARibbonBar* ribbonBar = mainWindow->ribbonBar();
+            if (!ribbonBar) {
+                // 所有事件都不消费
+                return QFrame::eventFilter(obj, event);
+            }
+            const int th = ribbonBar->titleBarHeight();
+            if (th != height()) {
+                setWindowTitleHeight(th);
+            }
+            QRect fr         = mainWindow->frameGeometry();
+            QSize wgSizeHint = sizeHint();
+            setGeometry(fr.width() - wgSizeHint.width(), 0, wgSizeHint.width(), wgSizeHint.height());
+            // 把设置好的尺寸给ribbonbar
+            ribbonBar->setWindowButtonGroupSize(size());
+        } else if (event->type() == QEvent::WindowStateChange) {
+            SARibbonMainWindow* mainWindow = qobject_cast< SARibbonMainWindow* >(obj);
+            if (!mainWindow) {
+                // 所有事件都不消费
+                return QFrame::eventFilter(obj, event);
+            }
+            setWindowStates(mainWindow->windowState());
+        }
+    }
+    return QFrame::eventFilter(obj, event);
 }
 
 QAbstractButton* SARibbonSystemButtonBar::minimizeButton() const

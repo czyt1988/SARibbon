@@ -46,7 +46,7 @@ public:
     // 返回SARibbonBar
     SARibbonBar* ribbonBar() const;
     // 设置ribbonbar
-    void setRibbonBar(SARibbonBar* bar);
+    void setRibbonBar(SARibbonBar* ribbon);
 #if !SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
     // 返回SAFramelessHelper
     SAFramelessHelper* framelessHelper();
@@ -71,12 +71,16 @@ public:
 protected:
     // 创建ribbonbar的工厂函数
     SARibbonBar* createRibbonBar();
-    virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
-    virtual void changeEvent(QEvent* e) Q_DECL_OVERRIDE;
 private slots:
     void onPrimaryScreenChanged(QScreen* screen);
 };
 
-
+class SARibbonMainWindowEventFilter : public QObject
+{
+    Q_OBJECT
+public:
+    SARibbonMainWindowEventFilter(QObject* par);
+    virtual bool eventFilter(QObject* obj, QEvent* e) Q_DECL_OVERRIDE;
+};
 
 #endif  // SARIBBONMAINWINDOW_H
