@@ -216,7 +216,7 @@ SARibbonControlButton:hover {
   background-color: #a0a0a0;
  }
 
-SARibbonControlButton#SARibbonGalleryButtonUp,#SARibbonGalleryButtonDown,#SARibbonGalleryButtonMore{
+SARibbonGalleryButton{
   background-color:#b2b2b2;
   border: 1px solid #888888;
   color: #242424;
