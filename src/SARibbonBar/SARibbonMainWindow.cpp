@@ -37,6 +37,7 @@ public:
 #else
     SAFramelessHelper* mFramelessHelper { nullptr };
 #endif
+    SARibbonMainWindowEventFilter* mEventFilter { nullptr };
 };
 
 SARibbonMainWindow::PrivateData::PrivateData(SARibbonMainWindow* p) : q_ptr(p)
@@ -84,23 +85,23 @@ SARibbonBar* SARibbonMainWindow::ribbonBar() const
  * @brief 设置ribbonbar
  * @param bar
  */
-void SARibbonMainWindow::setRibbonBar(SARibbonBar* bar)
+void SARibbonMainWindow::setRibbonBar(SARibbonBar* ribbon)
 {
     QWidget* old = QMainWindow::menuWidget();
     if (old) {
         // 如果之前已经设置了menubar，要把之前的删除
         old->deleteLater();
     }
-    QMainWindow::setMenuWidget(bar);
-    const int th = bar->titleBarHeight();
+    QMainWindow::setMenuWidget(ribbon);
+    const int th = ribbon->titleBarHeight();
     // 设置window按钮
     if (nullptr == d_ptr->mWindowButtonGroup) {
         d_ptr->mWindowButtonGroup = RibbonSubElementFactory->createWindowButtonGroup(this);
     }
-    SARibbonSystemButtonBar* wg = d_ptr->mWindowButtonGroup;
-    wg->setWindowStates(windowState());
-    wg->setWindowTitleHeight(th);
-    wg->show();
+    SARibbonSystemButtonBar* sysBar = d_ptr->mWindowButtonGroup;
+    sysBar->setWindowStates(windowState());
+    sysBar->setWindowTitleHeight(th);
+    sysBar->show();
 #if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
     auto helper = d_ptr->mFramelessHelper;
     helper->setTitleBar(bar);
@@ -123,11 +124,19 @@ void SARibbonMainWindow::setRibbonBar(SARibbonBar* bar)
     }
 #endif
 #else
-    bar->installEventFilter(this);
+    // 捕获ribbonbar的事件
+    ribbon->installEventFilter(this);
+    // SARibbonSystemButtonBar的eventfilter捕获mainwindow的事件
+    // 通过eventerfilter来处理mainwindow的事件，避免用户错误的继承resizeEvent导致systembar的位置异常
+    installEventFilter(sysBar);
     // 设置窗体的标题栏高度
     d_ptr->mFramelessHelper->setTitleHeight(th);
     d_ptr->mFramelessHelper->setRubberBandOnResize(false);
 #endif
+    if (!d_ptr->mEventFilter) {
+        d_ptr->mEventFilter = new SARibbonMainWindowEventFilter(this);
+        installEventFilter(d_ptr->mEventFilter);
+    }
 }
 
 #if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
@@ -292,49 +301,6 @@ SARibbonBar* SARibbonMainWindow::createRibbonBar()
     return bar;
 }
 
-void SARibbonMainWindow::resizeEvent(QResizeEvent* e)
-{
-    QMainWindow::resizeEvent(e);
-    SARibbonBar* bar            = ribbonBar();
-    SARibbonSystemButtonBar* wg = d_ptr->mWindowButtonGroup;
-
-    if (wg) {
-        if (bar) {
-            const int th = bar->titleBarHeight();
-            if (th != wg->height()) {
-                wg->setWindowTitleHeight(th);
-            }
-        }
-        QSize wgSizeHint = wg->sizeHint();
-        wg->setGeometry(frameGeometry().width() - wgSizeHint.width(), 0, wgSizeHint.width(), wgSizeHint.height());
-    }
-    if (bar) {
-        if (wg) {
-            bar->setWindowButtonGroupSize(wg->size());
-        }
-        if (bar->size().width() != (this->size().width())) {
-            bar->setFixedWidth(this->size().width());
-        }
-    }
-}
-
-void SARibbonMainWindow::changeEvent(QEvent* e)
-{
-    if (e) {
-        switch (e->type()) {
-        case QEvent::WindowStateChange: {
-            if (SARibbonSystemButtonBar* wg = d_ptr->mWindowButtonGroup) {
-                wg->setWindowStates(windowState());
-            }
-        } break;
-
-        default:
-            break;
-        }
-    }
-    QMainWindow::changeEvent(e);
-}
-
 /**
  * @brief 主屏幕切换触发的信号
  * @param screen
@@ -381,4 +347,25 @@ void sa_set_ribbon_theme(QWidget* w, SARibbonTheme theme)
     // 有反馈用qstring接住文件内容，再设置进去才能生效（qt5.7版本）
     QString qss = QString::fromUtf8(file.readAll());
     w->setStyleSheet(qss);
+}
+
+//----------------------------------------------------
+// SARibbonMainWindowEventFilter
+//----------------------------------------------------
+SARibbonMainWindowEventFilter::SARibbonMainWindowEventFilter(QObject* par) : QObject(par)
+{
+}
+
+bool SARibbonMainWindowEventFilter::eventFilter(QObject* obj, QEvent* e)
+{
+    if (e) {
+        if (e->type() == QEvent::Resize) {
+            if (SARibbonMainWindow* m = qobject_cast< SARibbonMainWindow* >(obj)) {
+                if (SARibbonBar* ribbon = m->ribbonBar()) {
+                    ribbon->setFixedWidth(m->size().width());
+                }
+            }
+        }
+    }
+    return QObject::eventFilter(obj, e);
 }

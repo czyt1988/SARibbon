@@ -63,6 +63,8 @@ public:
     QAction* addWidget(QWidget* w);
 
     virtual QSize sizeHint() const Q_DECL_OVERRIDE;
+    // 捕获mainwindow的事件
+    bool eventFilter(QObject* obj, QEvent* event) override;
 
 protected:
     virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;

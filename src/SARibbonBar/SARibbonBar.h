@@ -94,6 +94,7 @@ class SA_RIBBON_EXPORT SARibbonBar : public QMenuBar
     Q_OBJECT
     SA_RIBBON_DECLARE_PRIVATE(SARibbonBar)
     friend class SARibbonMainWindow;
+    friend class SARibbonSystemButtonBar;
     Q_PROPERTY(RibbonStyles ribbonStyle READ currentRibbonStyle WRITE setRibbonStyle)
     Q_PROPERTY(bool minimumMode READ isMinimumMode WRITE setMinimumMode)
     Q_PROPERTY(bool minimumModeButton READ haveShowMinimumModeButton WRITE showMinimumModeButton)
