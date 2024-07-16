@@ -317,11 +317,11 @@ SARibbonControlButton:hover {
   background-color: #3e6db6;/*{ControlButton.BKColor:hover}*/
 }
 
-SARibbonControlButton#SARibbonGalleryButtonUp, #SARibbonGalleryButtonDown, #SARibbonGalleryButtonMore {
+SARibbonGalleryButton {
   border: 1px solid #f1f1f1;/*{GalleryButton.BorderColor}*/
   background-color: #f1f1f1;/*{GalleryButton.BKColor}*/
 }
-SARibbonControlButton#SARibbonGalleryButtonUp:hover, #SARibbonGalleryButtonDown:hover, #SARibbonGalleryButtonMore:hover {
+SARibbonGalleryButton:hover {
   border: 1px solid #c5c5c5;/*{GalleryButton.BorderColor:hover}*/
   background-color: #c5c5c5;/*{GalleryButton.BKColor:hover}*/
 }
