@@ -74,6 +74,7 @@ private slots:
     void onSpinBoxRibbonTabHeightChanged(int h);
     void onSpinBoxRibbonCategoryHeightChanged(int h);
     void onSpinBoxRibbonPannelTtitleHeightChanged(int h);
+    void onSpinBoxRibbonPannelSpacingChanged(int h);
 
 private:
     // 创建其它actions，这些actions并不在SARibbonBar管理

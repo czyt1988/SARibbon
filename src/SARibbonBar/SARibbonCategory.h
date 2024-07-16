@@ -105,6 +105,9 @@ public:
     void setCategoryAlignment(SARibbonAlignment al);
     SARibbonAlignment categoryAlignment() const;
 
+    // 设置pannel的spacing
+    void setPannelSpacing(int n);
+    int pannelSpacing() const;
     // 获取对应的ribbonbar，如果没有加入ribbonbar的管理，此值为null
     SARibbonBar* ribbonBar() const;
 

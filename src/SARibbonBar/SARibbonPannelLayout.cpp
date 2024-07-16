@@ -412,13 +412,14 @@ void SARibbonPannelLayout::updateGeomArray(const QRect& setrect)
         return;
     }
 
-    const int height    = setrect.height();
-    const QMargins& mag = contentsMargins();
-    const int spacing   = this->spacing();
-    int x               = mag.left();
-    const int yBegin    = mag.top();
-    int titleH          = (m_titleHeight >= 0) ? m_titleHeight : 0;  // 防止负数影响
-    int titleSpace      = (m_titleHeight >= 0) ? m_titleSpace : 0;  // 对于没有标题的情况，spacing就不生效
+    const int height     = setrect.height();
+    const QMargins& mag  = contentsMargins();
+    const int spacing    = this->spacing();
+    const int spacingRow = 1;  // 高度间距，也就是行间距，不同行之间的距离
+    int x                = mag.left();
+    const int yBegin     = mag.top();
+    int titleH           = (m_titleHeight >= 0) ? m_titleHeight : 0;  // 防止负数影响
+    int titleSpace = (m_titleHeight >= 0) ? m_titleSpace : 0;  // 对于没有标题的情况，spacing就不生效
     if (!isEnableShowPannelTitle()) {
         titleH     = 0;
         titleSpace = 0;
@@ -431,15 +432,15 @@ void SARibbonPannelLayout::updateGeomArray(const QRect& setrect)
     const int yTitleBegin = height - mag.bottom() - titleH;
     m_largeHeight         = largeHeight;
     // 计算smallHeight的高度
-    const int smallHeight = (largeHeight - (rowCount - 1) * spacing) / rowCount;
+    const int smallHeight = (largeHeight - (rowCount - 1) * spacingRow) / rowCount;
     // Medium行的y位置
     const int yMediumRow0 = (2 == rowCount) ? yBegin : (yBegin + ((largeHeight - 2 * smallHeight) / 3));
-    const int yMediumRow1 = (2 == rowCount) ? (yBegin + smallHeight + spacing)
+    const int yMediumRow1 = (2 == rowCount) ? (yBegin + smallHeight + spacingRow)
                                             : (yBegin + ((largeHeight - 2 * smallHeight) / 3) * 2 + smallHeight);
     // Small行的y位置
     const int ySmallRow0 = yBegin;
-    const int ySmallRow1 = yBegin + smallHeight + spacing;
-    const int ySmallRow2 = yBegin + 2 * (smallHeight + spacing);
+    const int ySmallRow1 = yBegin + smallHeight + spacingRow;
+    const int ySmallRow2 = yBegin + 2 * (smallHeight + spacingRow);
     // row用于记录下个item应该属于第几行，item->rowIndex用于记录当前处于第几行，
     // item->rowIndex主要用于SARibbonPannelItem::Medium
     short row  = 0;

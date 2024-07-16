@@ -180,6 +180,9 @@ public:
     SARibbonCategory* category() const;
     // 获取ribbonBar指针，如果没有返回nullptr
     SARibbonBar* ribbonBar() const;
+    // 设置按钮之间的间隔
+    void setSpacing(int n);
+    int spacing() const;
     //
     virtual QSize sizeHint() const Q_DECL_OVERRIDE;
     virtual QSize minimumSizeHint() const Q_DECL_OVERRIDE;
