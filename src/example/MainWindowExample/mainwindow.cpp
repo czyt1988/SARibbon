@@ -492,7 +492,7 @@ void MainWindow::onActionLoadCustomizeXmlFileTriggered()
 void MainWindow::onActionWindowFlagNormalButtonTriggered(bool b)
 {
 	Qt::WindowFlags f = windowFlags();
-	f.setFlag(Qt::WindowCloseButtonHint, b);
+    f.setFlag(Qt::WindowCloseButtonHint, b);
 	f.setFlag(Qt::WindowMinMaxButtonsHint, b);
 	setWindowFlags(f);
 }

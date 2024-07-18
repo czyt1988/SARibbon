@@ -221,7 +221,8 @@ SARibbonBar的层次如下图所示：
 
 要MainWindow中使用SARibbon，需要把`QMainWindow`替换为`SARibbonMainWindow`，`SARibbonMainWindow`修改了`QMainWindow`对menubar的渲染方式
 
-> 注意，如果使用ui文件，要把原来ui文件的菜单删除，否则可能引起一些异常
+> 注意，如果使用ui文件，要把原来ui文件的菜单删除，否则可能引起一些异常，如下图所示：
+> ![](./doc/pic/remove-menu-bar-at-uifile.png)
 
 示例代码如下:
 
@@ -236,7 +237,7 @@ public:
 }
 ```
 
-`SARibbonMainWindow`也支持普通模式的渲染，其构造函数为：
+`SARibbonMainWindow`也支持普通模式的渲染，SARibbonMainWindow的构造函数第二个参数用于设定是否用ribbon模式：
 
 ```cpp
 SARibbonMainWindow(QWidget *parent = nullptr, bool useRibbon = true);
@@ -248,43 +249,37 @@ SARibbonMainWindow(QWidget *parent = nullptr, bool useRibbon = true);
 
 SARibbonBar支持在QWidget或者QDialog上使用，具体可见例子：`src/example/WidgetWithRibbon`
 
-你只需要把SARibbonBar当做一个普通窗口使用即可，下面大致介绍一下在QWidget中创建`SARibbonBar`的过程
-
-首先在头文件声明SARibbonBar的窗口指针
+项目提供了`SARibbonWidget`类，widget窗口继承`SARibbonWidget`即可实现ribbon效果的窗口
 
 ```cpp
-private:
-    Ui::Widget* ui;
-    SARibbonBar* mRibbonBar { nullptr };
+#include "SARibbonWidget.h"
+
+class RibbonWidget : public SARibbonWidget
+{
+	Q_OBJECT
+public:
+    RibbonWidget(QWidget* parent = nullptr);
+};
 ```
 
-在Widget的构造函数中创建`SARibbonBar`,Widget的ui文件中有个`QVBoxLayout`布局，把`SARibbonBar`放置在最顶层，同时，由于QWidget模式下，没有必要再显示标题，可以调用`SARibbonBar::setTitleVisible`方法把标题隐藏。applicationbutton在QWidget如果没有必要也可以通过`SARibbonBar::setApplicationButton`传入一个空指针取消掉，最后由于SARibbonBar的主题是在`SARibbonMainWindow`方法中设置的，在QWidget中设置主题可通过全局函数`sa_set_ribbon_theme`进行设置
+`SARibbonWidget`类提供了`setWidget`方法，可以嵌入任意的widget
 
 ```cpp
-#include "SARibbonBar.h"
-#include "SARibbonCategory.h"
-#include "SARibbonPannel.h"
-#include "SARibbonMainWindow.h"
-Widget::Widget(QWidget* parent) : QWidget(parent), ui(new Ui::Widget)
+RibbonWidget::RibbonWidget(QWidget* parent) : SARibbonWidget(parent)
 {
-    // 注意：ui文件中有个QVBoxLayout布局
-    ui->setupUi(this);
     // 直接创建SARibbonBar
-    mRibbonBar = new SARibbonBar(this);
+    SARibbonBar* ribbonbar = ribbonBar();
     // QWidget模式下，没有必要再显示标题
-    mRibbonBar->setTitleVisible(false);
+    ribbonbar->setTitleVisible(false);
     // QWidget模式下，直接使用紧凑模式效果更好
-    mRibbonBar->setRibbonStyle(SARibbonBar::RibbonStyleCompactThreeRow);
+    ribbonbar->setRibbonStyle(SARibbonBar::RibbonStyleCompactThreeRow);
     // 取消applicationbutton
-    mRibbonBar->setApplicationButton(nullptr);
-    //设置主题，这里虽然没用到SARibbonMainWindow，但Ribbon的主题是SARibbonMainWindow中定义的，因此要引入SARibbonMainWindow.h
-    sa_set_ribbon_theme(mRibbonBar, SARibbonMainWindow::RibbonThemeOffice2013);
+    ribbonbar->setApplicationButton(nullptr);
 
-    // QWidgets设置一个QVBoxLayout，把窗口放到QVBoxLayout的第二个布局中，第一个布局给SARibbonBar
-    // 这样，SARibbonBar就会在最上面
-    ui->verticalLayout->insertWidget(0, mRibbonBar);
-
-    buildRibbon(mRibbonBar);
+    //
+    //buildRibbon(ribbonbar);
+    //
+    setWidget(new InnerWidget());
 }
 ```
 
@@ -629,6 +624,10 @@ sa_apply_customize_from_xml_file("customization.xml", this, m_ribbonActionMgr);
 具体Ribbon的生成代码可见：
 
 [https://github.com/czyt1988/data-workbench/blob/master/src/APP/DAAppRibbonArea.cpp](https://github.com/czyt1988/data-workbench/blob/master/src/APP/DAAppRibbonArea.cpp)
+
+# 文档生成
+
+你可以通过doxygen生成qch和html类型的文档，`doc/Doxyfile-qch-cn`文件用于生成`.qch`格式的qt帮助文档,你可以把它集成到qt creator当中，`doc/Doxyfile-wiki-cn`文件用于生成html格式的文档，方便你在浏览器中查阅
 
 # 常见问题
 
