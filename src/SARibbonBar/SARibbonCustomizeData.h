@@ -32,80 +32,83 @@ public:
     };
     SARibbonCustomizeData();
     SARibbonCustomizeData(ActionType type, SARibbonActionsManager* mgr = nullptr);
-    //获取CustomizeData的action type
+    // 获取CustomizeData的action type
     ActionType actionType() const;
 
-    //设置CustomizeData的action type
+    // 设置CustomizeData的action type
     void setActionType(ActionType a);
 
-    //判断是否是一个正常的CustomizeData
+    // 判断是否是一个正常的CustomizeData
     bool isValid() const;
 
-    //应用SARibbonCustomizeData
+    // 应用SARibbonCustomizeData
     bool apply(SARibbonBar* bar) const;
 
-    //获取actionmanager指针
+    // 获取actionmanager指针
     SARibbonActionsManager* actionManager();
 
-    //设置ActionsManager
+    // 设置ActionsManager
     void setActionsManager(SARibbonActionsManager* mgr);
 
-    //对应AddCategoryActionType
+    // 对应AddCategoryActionType
     static SARibbonCustomizeData makeAddCategoryCustomizeData(const QString& title, int index, const QString& objName);
 
-    //对应AddPannelActionType
-    static SARibbonCustomizeData makeAddPannelCustomizeData(const QString& title, int index, const QString& categoryobjName, const QString& objName);
+    // 对应AddPannelActionType
+    static SARibbonCustomizeData makeAddPannelCustomizeData(const QString& title,
+                                                            int index,
+                                                            const QString& categoryobjName,
+                                                            const QString& objName);
 
-    //对应AddActionActionType
+    // 对应AddActionActionType
     static SARibbonCustomizeData makeAddActionCustomizeData(const QString& key,
                                                             SARibbonActionsManager* mgr,
                                                             SARibbonPannelItem::RowProportion rp,
                                                             const QString& categoryObjName,
                                                             const QString& pannelObjName);
 
-    //对应RenameCategoryActionType
+    // 对应RenameCategoryActionType
     static SARibbonCustomizeData makeRenameCategoryCustomizeData(const QString& newname, const QString& categoryobjName);
 
-    //对应RenamePannelActionType
+    // 对应RenamePannelActionType
     static SARibbonCustomizeData makeRenamePannelCustomizeData(const QString& newname,
                                                                const QString& categoryobjName,
                                                                const QString& pannelObjName);
 
-    //对应RemoveCategoryActionType
+    // 对应RemoveCategoryActionType
     static SARibbonCustomizeData makeRemoveCategoryCustomizeData(const QString& categoryobjName);
 
-    //对应ChangeCategoryOrderActionType
+    // 对应ChangeCategoryOrderActionType
     static SARibbonCustomizeData makeChangeCategoryOrderCustomizeData(const QString& categoryobjName, int moveindex);
 
-    //对应ChangePannelOrderActionType
+    // 对应ChangePannelOrderActionType
     static SARibbonCustomizeData makeChangePannelOrderCustomizeData(const QString& categoryobjName,
                                                                     const QString& pannelObjName,
                                                                     int moveindex);
 
-    //对应ChangeActionOrderActionType
+    // 对应ChangeActionOrderActionType
     static SARibbonCustomizeData makeChangeActionOrderCustomizeData(const QString& categoryobjName,
                                                                     const QString& pannelObjName,
                                                                     const QString& key,
                                                                     SARibbonActionsManager* mgr,
                                                                     int moveindex);
 
-    //对应RemovePannelActionType
+    // 对应RemovePannelActionType
     static SARibbonCustomizeData makeRemovePannelCustomizeData(const QString& categoryobjName, const QString& pannelObjName);
 
-    //对应RemoveActionActionType
+    // 对应RemoveActionActionType
     static SARibbonCustomizeData makeRemoveActionCustomizeData(const QString& categoryobjName,
                                                                const QString& pannelObjName,
                                                                const QString& key,
                                                                SARibbonActionsManager* mgr);
 
-    //对应VisibleCategoryActionType
+    // 对应VisibleCategoryActionType
     static SARibbonCustomizeData makeVisibleCategoryCustomizeData(const QString& categoryobjName, bool isShow);
 
-    //判断是否可以自定义,如果某个action不想被编辑，可以通过此函数设置
+    // 判断是否可以自定义,如果某个action不想被编辑，可以通过此函数设置
     static bool isCanCustomize(QObject* obj);
     static void setCanCustomize(QObject* obj, bool canbe = true);
 
-    //对QList<SARibbonCustomizeData>进行简化
+    // 对QList<SARibbonCustomizeData>进行简化
     static QList< SARibbonCustomizeData > simplify(const QList< SARibbonCustomizeData >& csd);
 
 public:
@@ -139,8 +142,8 @@ public:
 
     SARibbonPannelItem::RowProportion actionRowProportionValue;  ///< 行的占比，ribbon中有large，media和small三种占比,见@ref RowProportion
 private:
-    ActionType m_type;  ///< 标记这个data是category还是pannel亦或是action
-    SARibbonActionsManager* m_actionsManagerPointer;
+    ActionType mType;  ///< 标记这个data是category还是pannel亦或是action
+    SARibbonActionsManager* mActionsManagerPointer;
 };
 Q_DECLARE_METATYPE(SARibbonCustomizeData)
 

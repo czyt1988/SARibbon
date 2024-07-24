@@ -14,38 +14,38 @@ class SARibbonCtrlContainer::PrivateData
 {
     SA_RIBBON_DECLARE_PUBLIC(SARibbonCtrlContainer)
 public:
-    QWidget* containerWidget { nullptr };
-    QHBoxLayout* horizontalLayout { nullptr };
-    QLabel* labelPixmap { nullptr };
-    QLabel* labelText { nullptr };
-    QSize iconSize { 24, 24 };
-    QIcon icon;
+    QWidget* mContainerWidget { nullptr };
+    QHBoxLayout* mHorizontalLayout { nullptr };
+    QLabel* mLabelPixmap { nullptr };
+    QLabel* mLabelText { nullptr };
+    QSize mIconSize { 24, 24 };
+    QIcon mIcon;
     PrivateData(SARibbonCtrlContainer* p) : q_ptr(p)
     {
-        horizontalLayout = new QHBoxLayout(p);
-        horizontalLayout->setSpacing(0);
-        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
-        horizontalLayout->setContentsMargins(0, 0, 0, 0);
+        mHorizontalLayout = new QHBoxLayout(p);
+        mHorizontalLayout->setSpacing(0);
+        mHorizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
+        mHorizontalLayout->setContentsMargins(0, 0, 0, 0);
 
-        labelPixmap = new QLabel(p);
-        labelPixmap->setObjectName(QString::fromUtf8("labelPixmap"));
-        labelPixmap->setAlignment(Qt::AlignCenter);
-        horizontalLayout->addWidget(labelPixmap);
+        mLabelPixmap = new QLabel(p);
+        mLabelPixmap->setObjectName(QString::fromUtf8("labelPixmap"));
+        mLabelPixmap->setAlignment(Qt::AlignCenter);
+        mHorizontalLayout->addWidget(mLabelPixmap);
 
-        labelText = new QLabel(p);
-        labelText->setObjectName(QString::fromUtf8("labelText"));
-        horizontalLayout->addWidget(labelText);
+        mLabelText = new QLabel(p);
+        mLabelText->setObjectName(QString::fromUtf8("labelText"));
+        mHorizontalLayout->addWidget(mLabelText);
     }
 
     void setContainerWidget(QWidget* w)
     {
-        if (containerWidget) {
+        if (mContainerWidget) {
             // 原来有widget
-            QWidget* oldwidget = containerWidget;
+            QWidget* oldwidget = mContainerWidget;
             takeContainerWidget(oldwidget);
             oldwidget->deleteLater();
         }
-        containerWidget = w;
+        mContainerWidget = w;
         if (!w) {
             return;
         }
@@ -53,7 +53,7 @@ public:
             w->setParent(q_ptr);
         }
         // ContainerWidget永远在最右边
-        horizontalLayout->insertWidget(horizontalLayout->count(), w);
+        mHorizontalLayout->insertWidget(mHorizontalLayout->count(), w);
         QSizePolicy sizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -62,9 +62,9 @@ public:
 
     void takeContainerWidget(QWidget* w)
     {
-        int i = horizontalLayout->indexOf(w);
+        int i = mHorizontalLayout->indexOf(w);
         if (i >= 0) {
-            QLayoutItem* item = horizontalLayout->takeAt(i);
+            QLayoutItem* item = mHorizontalLayout->takeAt(i);
             delete item;
         }
     }
@@ -84,22 +84,22 @@ SARibbonCtrlContainer::~SARibbonCtrlContainer()
 
 QWidget* SARibbonCtrlContainer::containerWidget()
 {
-    return (d_ptr->containerWidget);
+    return (d_ptr->mContainerWidget);
 }
 
 const QWidget* SARibbonCtrlContainer::containerWidget() const
 {
-    return (d_ptr->containerWidget);
+    return (d_ptr->mContainerWidget);
 }
 
 void SARibbonCtrlContainer::setEnableShowIcon(bool b)
 {
-    d_ptr->labelPixmap->setVisible(b);
+    d_ptr->mLabelPixmap->setVisible(b);
 }
 
 void SARibbonCtrlContainer::setEnableShowTitle(bool b)
 {
-    d_ptr->labelText->setVisible(b);
+    d_ptr->mLabelText->setVisible(b);
 }
 
 /**
@@ -108,7 +108,7 @@ void SARibbonCtrlContainer::setEnableShowTitle(bool b)
  */
 bool SARibbonCtrlContainer::hasContainerWidget() const
 {
-    return (d_ptr->containerWidget != nullptr);
+    return (d_ptr->mContainerWidget != nullptr);
 }
 
 /**
@@ -117,14 +117,14 @@ bool SARibbonCtrlContainer::hasContainerWidget() const
  */
 void SARibbonCtrlContainer::setIcon(const QIcon& i)
 {
-    d_ptr->icon    = i;
-    QPixmap pixmap = i.pixmap(d_ptr->iconSize);
-    d_ptr->labelPixmap->setPixmap(pixmap);
+    d_ptr->mIcon   = i;
+    QPixmap pixmap = i.pixmap(d_ptr->mIconSize);
+    d_ptr->mLabelPixmap->setPixmap(pixmap);
 }
 
 void SARibbonCtrlContainer::setIcon(const QPixmap& pixmap)
 {
-    d_ptr->labelPixmap->setPixmap(pixmap);
+    d_ptr->mLabelPixmap->setPixmap(pixmap);
 }
 
 /**
@@ -133,7 +133,7 @@ void SARibbonCtrlContainer::setIcon(const QPixmap& pixmap)
  */
 QIcon SARibbonCtrlContainer::icon() const
 {
-    return d_ptr->icon;
+    return d_ptr->mIcon;
 }
 
 /**
@@ -142,7 +142,7 @@ QIcon SARibbonCtrlContainer::icon() const
  */
 void SARibbonCtrlContainer::setText(const QString& t)
 {
-    d_ptr->labelText->setText(t);
+    d_ptr->mLabelText->setText(t);
 }
 
 /**
@@ -151,7 +151,7 @@ void SARibbonCtrlContainer::setText(const QString& t)
  */
 QString SARibbonCtrlContainer::text() const
 {
-    return d_ptr->labelText->text();
+    return d_ptr->mLabelText->text();
 }
 
 void SARibbonCtrlContainer::setContainerWidget(QWidget* w)
@@ -165,5 +165,5 @@ void SARibbonCtrlContainer::setContainerWidget(QWidget* w)
  */
 QWidget* SARibbonCtrlContainer::iconWidget() const
 {
-    return d_ptr->labelPixmap;
+    return d_ptr->mLabelPixmap;
 }

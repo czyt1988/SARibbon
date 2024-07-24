@@ -23,10 +23,10 @@ public:
     PrivateData(SARibbonContextCategory* p);
 
 public:
-    QList< SAPrivateRibbonCategoryData > categoryDataList;
-    QVariant contextID;
-    QColor contextColor;
-    QString contextTitle;
+    QList< SAPrivateRibbonCategoryData > mCategoryDataList;
+    QVariant mContextID;
+    QColor mContextColor;
+    QString mContextTitle;
 };
 SARibbonContextCategory::PrivateData::PrivateData(SARibbonContextCategory* p) : q_ptr(p)
 {
@@ -71,34 +71,34 @@ void SARibbonContextCategory::addCategoryPage(SARibbonCategory* category)
     connect(category, &SARibbonCategory::categoryNameChanged, this, &SARibbonContextCategory::onCategoryTitleChanged);
     SAPrivateRibbonCategoryData catData;
     catData.categoryPage = category;
-    d_ptr->categoryDataList.append(catData);
+    d_ptr->mCategoryDataList.append(catData);
     category->installEventFilter(this);
     emit categoryPageAdded(category);
 }
 
 int SARibbonContextCategory::categoryCount() const
 {
-    return (d_ptr->categoryDataList.count());
+    return (d_ptr->mCategoryDataList.count());
 }
 
 void SARibbonContextCategory::setId(const QVariant& id)
 {
-    d_ptr->contextID = id;
+    d_ptr->mContextID = id;
 }
 
 QVariant SARibbonContextCategory::id() const
 {
-    return (d_ptr->contextID);
+    return (d_ptr->mContextID);
 }
 
 void SARibbonContextCategory::setContextColor(const QColor color)
 {
-    d_ptr->contextColor = color;
+    d_ptr->mContextColor = color;
 }
 
 QColor SARibbonContextCategory::contextColor() const
 {
-    return (d_ptr->contextColor);
+    return (d_ptr->mContextColor);
 }
 
 QWidget* SARibbonContextCategory::parentWidget() const
@@ -134,7 +134,7 @@ bool SARibbonContextCategory::eventFilter(QObject* watched, QEvent* e)
  */
 QString SARibbonContextCategory::contextTitle() const
 {
-    return (d_ptr->contextTitle);
+    return (d_ptr->mContextTitle);
 }
 
 /**
@@ -144,7 +144,7 @@ QString SARibbonContextCategory::contextTitle() const
  */
 void SARibbonContextCategory::setContextTitle(const QString& contextTitle)
 {
-    d_ptr->contextTitle = contextTitle;
+    d_ptr->mContextTitle = contextTitle;
     emit contextTitleChanged(contextTitle);
 }
 
@@ -155,7 +155,7 @@ void SARibbonContextCategory::setContextTitle(const QString& contextTitle)
  */
 SARibbonCategory* SARibbonContextCategory::categoryPage(int index)
 {
-    return (d_ptr->categoryDataList[ index ].categoryPage);
+    return (d_ptr->mCategoryDataList[ index ].categoryPage);
 }
 
 /**
@@ -166,7 +166,7 @@ QList< SARibbonCategory* > SARibbonContextCategory::categoryList() const
 {
     QList< SARibbonCategory* > res;
 
-    for (const SAPrivateRibbonCategoryData& c : qAsConst(d_ptr->categoryDataList)) {
+    for (const SAPrivateRibbonCategoryData& c : qAsConst(d_ptr->mCategoryDataList)) {
         res.append(c.categoryPage);
     }
     return (res);
@@ -179,9 +179,9 @@ QList< SARibbonCategory* > SARibbonContextCategory::categoryList() const
  */
 bool SARibbonContextCategory::takeCategory(SARibbonCategory* category)
 {
-    for (int i = 0; i < d_ptr->categoryDataList.size(); ++i) {
-        if (d_ptr->categoryDataList[ i ].categoryPage == category) {
-            d_ptr->categoryDataList.takeAt(i);
+    for (int i = 0; i < d_ptr->mCategoryDataList.size(); ++i) {
+        if (d_ptr->mCategoryDataList[ i ].categoryPage == category) {
+            d_ptr->mCategoryDataList.takeAt(i);
             return (true);
         }
     }
@@ -195,8 +195,8 @@ bool SARibbonContextCategory::takeCategory(SARibbonCategory* category)
  */
 bool SARibbonContextCategory::isHaveCategory(SARibbonCategory* category) const
 {
-    for (int i = 0; i < d_ptr->categoryDataList.size(); ++i) {
-        if (d_ptr->categoryDataList[ i ].categoryPage == category) {
+    for (int i = 0; i < d_ptr->mCategoryDataList.size(); ++i) {
+        if (d_ptr->mCategoryDataList[ i ].categoryPage == category) {
             return (true);
         }
     }

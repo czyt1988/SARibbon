@@ -12,6 +12,8 @@ class SARibbonGalleryGroup;
 ///
 class SA_RIBBON_EXPORT SARibbonGalleryItem
 {
+    friend class SARibbonGalleryGroupModel;
+
 public:
     SARibbonGalleryItem();
     SARibbonGalleryItem(const QString& text, const QIcon& icon);
@@ -54,10 +56,9 @@ public:
     Qt::Alignment textAlignment() const;
 
 private:
-    friend class SARibbonGalleryGroupModel;
-    QMap< int, QVariant > m_datas;
-    Qt::ItemFlags m_flags;
-    QAction* m_action;
+    QMap< int, QVariant > mDatas;
+    Qt::ItemFlags mFlags;
+    QAction* mAction;
 };
 
 #endif  // SARIBBONGALLERYITEM_H
