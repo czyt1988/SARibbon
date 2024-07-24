@@ -13,7 +13,7 @@ public:
     PrivateData(SARibbonQuickAccessBar* p);
 
 public:
-    SARibbonButtonGroupWidget* groupWidget { nullptr };
+    SARibbonButtonGroupWidget* mGroupWidget { nullptr };
 };
 
 SARibbonQuickAccessBar::PrivateData::PrivateData(SARibbonQuickAccessBar* p) : q_ptr(p)
@@ -26,9 +26,9 @@ SARibbonQuickAccessBar::PrivateData::PrivateData(SARibbonQuickAccessBar* p) : q_
 SARibbonQuickAccessBar::SARibbonQuickAccessBar(QWidget* parent)
     : SARibbonCtrlContainer(parent), d_ptr(new SARibbonQuickAccessBar::PrivateData(this))
 {
-    d_ptr->groupWidget = new SARibbonButtonGroupWidget(this);
-    d_ptr->groupWidget->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding));
-    setContainerWidget(d_ptr->groupWidget);
+    d_ptr->mGroupWidget = new SARibbonButtonGroupWidget(this);
+    d_ptr->mGroupWidget->setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding));
+    setContainerWidget(d_ptr->mGroupWidget);
 }
 
 SARibbonQuickAccessBar::~SARibbonQuickAccessBar()
@@ -37,22 +37,22 @@ SARibbonQuickAccessBar::~SARibbonQuickAccessBar()
 
 void SARibbonQuickAccessBar::addSeparator()
 {
-    d_ptr->groupWidget->addSeparator();
+    d_ptr->mGroupWidget->addSeparator();
 }
 
 void SARibbonQuickAccessBar::addAction(QAction* act, Qt::ToolButtonStyle buttonStyle, QToolButton::ToolButtonPopupMode popMode)
 {
-    d_ptr->groupWidget->addAction(act, buttonStyle, popMode);
+    d_ptr->mGroupWidget->addAction(act, buttonStyle, popMode);
 }
 
 void SARibbonQuickAccessBar::addWidget(QWidget* w)
 {
-    d_ptr->groupWidget->addWidget(w);
+    d_ptr->mGroupWidget->addWidget(w);
 }
 
 void SARibbonQuickAccessBar::addMenu(QMenu* m, Qt::ToolButtonStyle buttonStyle, QToolButton::ToolButtonPopupMode popMode)
 {
-    d_ptr->groupWidget->addMenu(m, buttonStyle, popMode);
+    d_ptr->mGroupWidget->addMenu(m, buttonStyle, popMode);
 }
 
 /**
@@ -61,7 +61,7 @@ void SARibbonQuickAccessBar::addMenu(QMenu* m, Qt::ToolButtonStyle buttonStyle, 
  */
 SARibbonButtonGroupWidget* SARibbonQuickAccessBar::buttonGroupWidget()
 {
-    return d_ptr->groupWidget;
+    return d_ptr->mGroupWidget;
 }
 
 /**
@@ -70,7 +70,7 @@ SARibbonButtonGroupWidget* SARibbonQuickAccessBar::buttonGroupWidget()
  */
 const SARibbonButtonGroupWidget* SARibbonQuickAccessBar::buttonGroupWidget() const
 {
-    return d_ptr->groupWidget;
+    return d_ptr->mGroupWidget;
 }
 
 /**
@@ -79,7 +79,7 @@ const SARibbonButtonGroupWidget* SARibbonQuickAccessBar::buttonGroupWidget() con
  */
 void SARibbonQuickAccessBar::setIconSize(const QSize& s)
 {
-    d_ptr->groupWidget->setIconSize(s);
+    d_ptr->mGroupWidget->setIconSize(s);
 }
 
 /**
@@ -88,5 +88,5 @@ void SARibbonQuickAccessBar::setIconSize(const QSize& s)
  */
 QSize SARibbonQuickAccessBar::iconSize() const
 {
-    return d_ptr->groupWidget->iconSize();
+    return d_ptr->mGroupWidget->iconSize();
 }

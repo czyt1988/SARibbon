@@ -32,16 +32,16 @@ public:
 //===================================================
 
 SARibbonGalleryGroupItemDelegate::SARibbonGalleryGroupItemDelegate(SARibbonGalleryGroup* group, QObject* parent)
-    : QStyledItemDelegate(parent), m_group(group)
+    : QStyledItemDelegate(parent), mGroup(group)
 {
 }
 
 void SARibbonGalleryGroupItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
-    if (nullptr == m_group) {
+    if (nullptr == mGroup) {
         return;
     }
-    switch (m_group->galleryGroupStyle()) {
+    switch (mGroup->galleryGroupStyle()) {
     case SARibbonGalleryGroup::IconWithText:
         paintIconWithText(painter, option, index);
         break;
@@ -59,12 +59,12 @@ void SARibbonGalleryGroupItemDelegate::paint(QPainter* painter, const QStyleOpti
 
 void SARibbonGalleryGroupItemDelegate::paintIconOnly(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
-    QStyle* style = m_group->style();
-    int sp        = m_group->spacing();
+    QStyle* style = mGroup->style();
+    int sp        = mGroup->spacing();
     sp += 3;
     painter->save();
     painter->setClipRect(option.rect);
-    style->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter, m_group);
+    style->drawPrimitive(QStyle::PE_PanelItemViewItem, &option, painter, mGroup);
     // draw the icon
     QRect iconRect = option.rect;
 
@@ -91,7 +91,7 @@ QSize SARibbonGalleryGroupItemDelegate::sizeHint(const QStyleOptionViewItem& opt
 {
     Q_UNUSED(index);
     Q_UNUSED(option);
-    return m_group->gridSize();
+    return mGroup->gridSize();
 }
 
 //===================================================
@@ -109,75 +109,75 @@ SARibbonGalleryGroupModel::~SARibbonGalleryGroupModel()
 
 int SARibbonGalleryGroupModel::rowCount(const QModelIndex& parent) const
 {
-    return (parent.isValid() ? 0 : m_items.size());
+    return (parent.isValid() ? 0 : mItems.size());
 }
 
 Qt::ItemFlags SARibbonGalleryGroupModel::flags(const QModelIndex& index) const
 {
-    if (!index.isValid() || (index.row() >= m_items.size())) {
+    if (!index.isValid() || (index.row() >= mItems.size())) {
         return (Qt::NoItemFlags);
     }
-    return (m_items.at(index.row())->flags());
+    return (mItems.at(index.row())->flags());
 }
 
 QVariant SARibbonGalleryGroupModel::data(const QModelIndex& index, int role) const
 {
-    if (!index.isValid() || (index.row() >= m_items.count())) {
+    if (!index.isValid() || (index.row() >= mItems.count())) {
         return (QVariant());
     }
-    return (m_items.at(index.row())->data(role));
+    return (mItems.at(index.row())->data(role));
 }
 
 QModelIndex SARibbonGalleryGroupModel::index(int row, int column, const QModelIndex& parent) const
 {
     if (hasIndex(row, column, parent)) {
-        return (createIndex(row, column, m_items.at(row)));
+        return (createIndex(row, column, mItems.at(row)));
     }
     return (QModelIndex());
 }
 
 bool SARibbonGalleryGroupModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {
-    if (!index.isValid() || (index.row() >= m_items.count())) {
+    if (!index.isValid() || (index.row() >= mItems.count())) {
         return (false);
     }
 
-    m_items.at(index.row())->setData(role, value);
+    mItems.at(index.row())->setData(role, value);
     return (true);
 }
 
 void SARibbonGalleryGroupModel::clear()
 {
     beginResetModel();
-    for (int i = 0; i < m_items.count(); ++i) {
-        if (m_items.at(i)) {
-            delete m_items.at(i);
+    for (int i = 0; i < mItems.count(); ++i) {
+        if (mItems.at(i)) {
+            delete mItems.at(i);
         }
     }
-    m_items.clear();
+    mItems.clear();
     endResetModel();
 }
 
 SARibbonGalleryItem* SARibbonGalleryGroupModel::at(int row) const
 {
-    return (m_items.value(row));
+    return (mItems.value(row));
 }
 
 void SARibbonGalleryGroupModel::insert(int row, SARibbonGalleryItem* item)
 {
     beginInsertRows(QModelIndex(), row, row);
-    m_items.insert(row, item);
+    mItems.insert(row, item);
     endInsertRows();
 }
 
 SARibbonGalleryItem* SARibbonGalleryGroupModel::take(int row)
 {
-    if ((row < 0) || (row >= m_items.count())) {
+    if ((row < 0) || (row >= mItems.count())) {
         return (0);
     }
 
     beginRemoveRows(QModelIndex(), row, row);
-    SARibbonGalleryItem* item = m_items.takeAt(row);
+    SARibbonGalleryItem* item = mItems.takeAt(row);
 
     endRemoveRows();
     return (item);
@@ -185,8 +185,8 @@ SARibbonGalleryItem* SARibbonGalleryGroupModel::take(int row)
 
 void SARibbonGalleryGroupModel::append(SARibbonGalleryItem* item)
 {
-    beginInsertRows(QModelIndex(), m_items.count(), m_items.count() + 1);
-    m_items.append(item);
+    beginInsertRows(QModelIndex(), mItems.count(), mItems.count() + 1);
+    mItems.append(item);
     endInsertRows();
 }
 
