@@ -1,19 +1,19 @@
 ﻿#include "SARibbonGalleryItem.h"
 #include "SARibbonGalleryGroup.h"
 
-SARibbonGalleryItem::SARibbonGalleryItem() : m_flags(Qt::ItemIsEnabled | Qt::ItemIsSelectable), m_action(nullptr)
+SARibbonGalleryItem::SARibbonGalleryItem() : mFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable), mAction(nullptr)
 {
 }
 
 SARibbonGalleryItem::SARibbonGalleryItem(const QString& text, const QIcon& icon)
-    : m_flags(Qt::ItemIsEnabled | Qt::ItemIsSelectable), m_action(nullptr)
+    : mFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable), mAction(nullptr)
 {
     setText(text);
     setIcon(icon);
     setTextAlignment(Qt::AlignTop | Qt::AlignHCenter);
 }
 
-SARibbonGalleryItem::SARibbonGalleryItem(QAction* act) : m_flags(Qt::ItemIsEnabled | Qt::ItemIsSelectable)
+SARibbonGalleryItem::SARibbonGalleryItem(QAction* act) : mFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable)
 {
     setTextAlignment(Qt::AlignTop | Qt::AlignHCenter);
     setAction(act);
@@ -25,26 +25,26 @@ SARibbonGalleryItem::~SARibbonGalleryItem()
 
 void SARibbonGalleryItem::setData(int role, const QVariant& data)
 {
-    m_datas[ role ] = data;
+    mDatas[ role ] = data;
 }
 
 QVariant SARibbonGalleryItem::data(int role) const
 {
-    if (m_action) {
+    if (mAction) {
         switch (role) {
         case Qt::DisplayRole:
-            return (m_action->text());
+            return (mAction->text());
 
         case Qt::ToolTipRole:
-            return (m_action->toolTip());
+            return (mAction->toolTip());
 
         case Qt::DecorationRole:
-            return (m_action->icon());
+            return (mAction->icon());
         default:
             break;
         }
     }
-    return (m_datas.value(role));
+    return (mDatas.value(role));
 }
 
 void SARibbonGalleryItem::setText(const QString& text)
@@ -54,8 +54,8 @@ void SARibbonGalleryItem::setText(const QString& text)
 
 QString SARibbonGalleryItem::text() const
 {
-    if (m_action) {
-        return (m_action->text());
+    if (mAction) {
+        return (mAction->text());
     }
     return (data(Qt::DisplayRole).toString());
 }
@@ -67,8 +67,8 @@ void SARibbonGalleryItem::setToolTip(const QString& text)
 
 QString SARibbonGalleryItem::toolTip() const
 {
-    if (m_action) {
-        return (m_action->toolTip());
+    if (mAction) {
+        return (mAction->toolTip());
     }
     return (data(Qt::ToolTipRole).toString());
 }
@@ -80,76 +80,76 @@ void SARibbonGalleryItem::setIcon(const QIcon& ico)
 
 QIcon SARibbonGalleryItem::icon() const
 {
-    if (m_action) {
-        return (m_action->icon());
+    if (mAction) {
+        return (mAction->icon());
     }
     return (qvariant_cast< QIcon >(data(Qt::DecorationRole)));
 }
 
 bool SARibbonGalleryItem::isSelectable() const
 {
-    return (m_flags & Qt::ItemIsSelectable);
+    return (mFlags & Qt::ItemIsSelectable);
 }
 
 void SARibbonGalleryItem::setSelectable(bool isSelectable)
 {
     if (isSelectable) {
-        m_flags |= Qt::ItemIsSelectable;
+        mFlags |= Qt::ItemIsSelectable;
     } else {
-        m_flags = (m_flags & (~Qt::ItemIsSelectable));
+        mFlags = (mFlags & (~Qt::ItemIsSelectable));
     }
 }
 
 bool SARibbonGalleryItem::isEnable() const
 {
-    if (m_action) {
-        return (m_action->isEnabled());
+    if (mAction) {
+        return (mAction->isEnabled());
     }
-    return (m_flags & Qt::ItemIsEnabled);
+    return (mFlags & Qt::ItemIsEnabled);
 }
 
 void SARibbonGalleryItem::setEnable(bool isEnable)
 {
-    if (m_action) {
-        m_action->setEnabled(isEnable);
+    if (mAction) {
+        mAction->setEnabled(isEnable);
     }
 
     if (isEnable) {
-        m_flags |= Qt::ItemIsEnabled;
+        mFlags |= Qt::ItemIsEnabled;
     } else {
-        m_flags = (m_flags & (~Qt::ItemIsEnabled));
+        mFlags = (mFlags & (~Qt::ItemIsEnabled));
     }
 }
 
 void SARibbonGalleryItem::setFlags(Qt::ItemFlags flag)
 {
-    m_flags = flag;
-    if (m_action) {
-        m_action->setEnabled(flag & Qt::ItemIsEnabled);
+    mFlags = flag;
+    if (mAction) {
+        mAction->setEnabled(flag & Qt::ItemIsEnabled);
     }
 }
 
 Qt::ItemFlags SARibbonGalleryItem::flags() const
 {
-    return (m_flags);
+    return (mFlags);
 }
 
 void SARibbonGalleryItem::setAction(QAction* act)
 {
-    m_action = act;
-    if (nullptr == m_action) {
+    mAction = act;
+    if (nullptr == mAction) {
         return;
     }
     if (act->isEnabled()) {
-        m_flags |= Qt::ItemIsEnabled;
+        mFlags |= Qt::ItemIsEnabled;
     } else {
-        m_flags = (m_flags & (~Qt::ItemIsEnabled));
+        mFlags = (mFlags & (~Qt::ItemIsEnabled));
     }
 }
 
 QAction* SARibbonGalleryItem::action()
 {
-    return (m_action);
+    return (mAction);
 }
 
 void SARibbonGalleryItem::setTextAlignment(Qt::Alignment a)
