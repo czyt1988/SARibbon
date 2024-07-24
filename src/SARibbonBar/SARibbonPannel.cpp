@@ -568,6 +568,44 @@ QSize SARibbonPannel::minimumSizeHint() const
     return (layout()->minimumSize());
 }
 
+void SARibbonPannel::setToolButtonIconSize(const QSize& s)
+{
+    if (SARibbonPannelLayout* lay = pannelLayout()) {
+        lay->setToolButtonIconSize(s);
+    }
+    // 对已经管理的QToolButton设置为iconsize
+    iterate([ s ](SARibbonToolButton* t) -> bool {
+        t->setIconSize(s);
+        return true;
+    });
+}
+
+QSize SARibbonPannel::toolButtonIconSize() const
+{
+    if (SARibbonPannelLayout* lay = pannelLayout()) {
+        return lay->toolButtonIconSize();
+    }
+    return QSize();
+}
+
+/**
+ * @brief 遍历SARibbonPannel下的所有RibbonToolButton，执行函数指针(bool(SARibbonRibbonToolButton*))，函数指针返回false则停止迭代
+ * @param fp
+ * @return 返回false说明迭代中途退出，返回true则表示迭代完全
+ */
+bool SARibbonPannel::iterate(SARibbonPannel::FpRibbonToolButtonIterate fp)
+{
+    const QObjectList& ols = children();
+    for (QObject* obj : ols) {
+        if (SARibbonToolButton* t = qobject_cast< SARibbonToolButton* >(obj)) {
+            if (!fp(t)) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 /**
  * @brief 把pannel设置为扩展模式，此时会撑大水平区域
  * @param isExpanding

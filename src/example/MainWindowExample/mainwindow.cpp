@@ -646,6 +646,11 @@ void MainWindow::onSpinBoxRibbonPannelSpacingChanged(int h)
     ribbonBar()->setPannelSpacing(h);
 }
 
+void MainWindow::onSpinBoxRibbonPannelToolBtnIconSizeChanged(int h)
+{
+    ribbonBar()->setPannelToolButtonIconSize(QSize(h, h));
+}
+
 /**
  * @brief 创建其它actions，这些actions并不在SARibbonBar管理
  */
@@ -1158,7 +1163,7 @@ void MainWindow::createCategorySize(SARibbonCategory* page)
 	page->addPannel(pannel);
 
 	// pannel 3
-	// 这里演示了一个窗口带有gridlayoout
+    // 这里演示了一个窗口,带有gridlayoout
 	pannel         = new SARibbonPannel(tr("Grid"));
 	QWidget* w     = new QWidget();
 	QGridLayout* g = new QGridLayout(w);
@@ -1183,6 +1188,10 @@ void MainWindow::createCategorySize(SARibbonCategory* page)
     QSpinBox* spinboxRibbonPannelSpacing = new QSpinBox(w);
     spinboxRibbonPannelSpacing->setRange(0, 25);
 
+    QLabel* lab5                                 = new QLabel("Pannel ToolButton Icon Size:");
+    QSpinBox* spinboxRibbonPannelToolBtnIconSize = new QSpinBox(w);
+    spinboxRibbonPannelToolBtnIconSize->setRange(1, 99);
+
 	g->addWidget(lab0, 0, 0);
 	g->addWidget(spinboxRibbonTitleHeight, 0, 1);
 	g->addWidget(lab1, 1, 0);
@@ -1193,17 +1202,24 @@ void MainWindow::createCategorySize(SARibbonCategory* page)
 	g->addWidget(spinboxRibbonPannelTtitleHeight, 1, 3);
     g->addWidget(lab4, 0, 4);
     g->addWidget(spinboxRibbonPannelSpacing, 0, 5);
+    g->addWidget(lab5, 1, 4);
+    g->addWidget(spinboxRibbonPannelToolBtnIconSize, 1, 5);
 	spinboxRibbonTitleHeight->setValue(ribbonBar()->titleBarHeight());
 	spinboxRibbonTabHeight->setValue(ribbonBar()->tabBarHeight());
 	spinboxRibbonCategoryHeight->setValue(ribbonBar()->categoryHeight());
 	spinboxRibbonPannelTtitleHeight->setValue(ribbonBar()->pannelTitleHeight());
     spinboxRibbonPannelSpacing->setValue(ribbonBar()->pannelSpacing());
+    spinboxRibbonPannelToolBtnIconSize->setValue(ribbonBar()->pannelToolButtonIconSize().width());
 #if QT_VERSION_MAJOR >= 6
 	connect(spinboxRibbonTitleHeight, &QSpinBox::valueChanged, this, &MainWindow::onSpinBoxRibbonTitleHeightChanged);
 	connect(spinboxRibbonTabHeight, &QSpinBox::valueChanged, this, &MainWindow::onSpinBoxRibbonTabHeightChanged);
 	connect(spinboxRibbonCategoryHeight, &QSpinBox::valueChanged, this, &MainWindow::onSpinBoxRibbonCategoryHeightChanged);
 	connect(spinboxRibbonPannelTtitleHeight, &QSpinBox::valueChanged, this, &MainWindow::onSpinBoxRibbonPannelTtitleHeightChanged);
     connect(spinboxRibbonPannelSpacing, &QSpinBox::valueChanged, this, &MainWindow::onSpinBoxRibbonPannelSpacingChanged);
+    connect(spinboxRibbonPannelToolBtnIconSize,
+            &QSpinBox::valueChanged,
+            this,
+            &MainWindow::onSpinBoxRibbonPannelToolBtnIconSizeChanged);
 #else
 	connect(spinboxRibbonTitleHeight,
             QOverload< int >::of(&QSpinBox::valueChanged),
@@ -1225,6 +1241,10 @@ void MainWindow::createCategorySize(SARibbonCategory* page)
             QOverload< int >::of(&QSpinBox::valueChanged),
             this,
             &MainWindow::onSpinBoxRibbonPannelSpacingChanged);
+    connect(spinboxRibbonPannelToolBtnIconSize,
+            QOverload< int >::of(&QSpinBox::valueChanged),
+            this,
+            &MainWindow::onSpinBoxRibbonPannelToolBtnIconSizeChanged);
 #endif
 	pannel->addLargeWidget(w);
 	page->addPannel(pannel);

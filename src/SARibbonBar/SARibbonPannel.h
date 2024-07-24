@@ -56,6 +56,9 @@ public:
     };
     Q_ENUM(PannelLayoutMode)
 public:
+    using FpRibbonToolButtonIterate = std::function< bool(SARibbonToolButton*) >;
+
+public:
     SARibbonPannel(QWidget* parent = nullptr);
     SARibbonPannel(const QString& name, QWidget* parent = nullptr);
     ~SARibbonPannel() Q_DECL_OVERRIDE;
@@ -186,6 +189,11 @@ public:
     //
     virtual QSize sizeHint() const Q_DECL_OVERRIDE;
     virtual QSize minimumSizeHint() const Q_DECL_OVERRIDE;
+    // 设置按钮的icon尺寸，large action不受此尺寸影响
+    void setToolButtonIconSize(const QSize& s);
+    QSize toolButtonIconSize() const;
+    // 此函数会遍历SARibbonPannel下的所有RibbonToolButton，执行函数指针(bool(SARibbonRibbonToolButton*))，函数指针返回false则停止迭代
+    bool iterate(FpRibbonToolButtonIterate fp);
 signals:
 
     /**

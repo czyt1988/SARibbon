@@ -108,6 +108,11 @@ public:
     // 设置pannel的spacing
     void setPannelSpacing(int n);
     int pannelSpacing() const;
+
+    // 设置pannel按钮的icon尺寸，large action不受此尺寸影响
+    void setPannelToolButtonIconSize(const QSize& s);
+    QSize pannelToolButtonIconSize() const;
+
     // 获取对应的ribbonbar，如果没有加入ribbonbar的管理，此值为null
     SARibbonBar* ribbonBar() const;
 

@@ -46,11 +46,12 @@ public:
     void init(SARibbonCategory* c);
 
 public:
-    bool mEnableShowPannelTitle { true };  ///< 是否运行pannel的标题栏显示
-    int mPannelTitleHeight { 15 };         ///< pannel的标题栏默认高度
-    bool mIsContextCategory { false };     ///< 标记是否是上下文标签
-    bool mIsCanCustomize { true };         ///< 标记是否可以自定义
-    int mPannelSpacing { 0 };              ///< pannel的spacing
+    bool mEnableShowPannelTitle { true };    ///< 是否运行pannel的标题栏显示
+    int mPannelTitleHeight { 15 };           ///< pannel的标题栏默认高度
+    bool mIsContextCategory { false };       ///< 标记是否是上下文标签
+    bool mIsCanCustomize { true };           ///< 标记是否可以自定义
+    int mPannelSpacing { 0 };                ///< pannel的spacing
+    QSize mPannelToolButtonSize { 22, 22 };  ///< 记录pannel的默认图标大小
     SARibbonPannel::PannelLayoutMode mDefaultPannelLayoutMode { SARibbonPannel::ThreeRowMode };
 };
 SARibbonCategory::PrivateData::PrivateData(SARibbonCategory* p) : q_ptr(p)
@@ -107,6 +108,7 @@ void SARibbonCategory::PrivateData::insertPannel(int index, SARibbonPannel* pann
     pannel->setTitleHeight(mPannelTitleHeight);
     pannel->setPannelLayoutMode(mDefaultPannelLayoutMode);
     pannel->setSpacing(mPannelSpacing);
+    pannel->setToolButtonIconSize(mPannelToolButtonSize);
     index = qMax(0, index);
     index = qMin(lay->pannelCount(), index);
     lay->insertPannel(index, pannel);
@@ -643,6 +645,30 @@ void SARibbonCategory::setPannelSpacing(int n)
 int SARibbonCategory::pannelSpacing() const
 {
     return d_ptr->mPannelSpacing;
+}
+
+/**
+ * @brief 设置pannel按钮的icon尺寸，large action不受此尺寸影响
+ * @param s
+ */
+void SARibbonCategory::setPannelToolButtonIconSize(const QSize& s)
+{
+    d_ptr->mPannelToolButtonSize = s;
+    iterate([ s ](SARibbonPannel* pannel) -> bool {
+        if (pannel) {
+            pannel->setToolButtonIconSize(s);
+        }
+        return true;
+    });
+}
+
+/**
+ * @brief pannel按钮的icon尺寸，large action不受此尺寸影响
+ * @return
+ */
+QSize SARibbonCategory::pannelToolButtonIconSize() const
+{
+    return d_ptr->mPannelToolButtonSize;
 }
 
 /**
