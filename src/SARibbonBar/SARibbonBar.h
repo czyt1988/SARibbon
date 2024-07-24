@@ -338,6 +338,10 @@ public:
     void setPannelSpacing(int n);
     int pannelSpacing() const;
 
+    // 设置pannel按钮的icon尺寸，large action不受此尺寸影响
+    void setPannelToolButtonIconSize(const QSize& s);
+    QSize pannelToolButtonIconSize() const;
+
     // 获取SARibbonStackedWidget，谨慎使用此函数
     SARibbonStackedWidget* ribbonStackedWidget();
 

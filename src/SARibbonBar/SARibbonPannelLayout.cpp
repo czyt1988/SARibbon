@@ -383,6 +383,7 @@ SARibbonPannelItem* SARibbonPannelLayout::createItem(QAction* action, SARibbonPa
         button->setFocusPolicy(Qt::NoFocus);
         button->setButtonType(buttonType);
         button->setDefaultAction(action);
+        button->setIconSize(mDefaultToolButtonIconSize);
         // 属性设置
         QToolButton::ToolButtonPopupMode popMode = SARibbonPannel::getActionToolButtonPopupModeProperty(action);
         button->setPopupMode(popMode);
@@ -829,6 +830,16 @@ void SARibbonPannelLayout::columnWidthInfo(int colindex, int& width, int& maximu
 SARibbonPannelLabel* SARibbonPannelLayout::pannelTitleLabel() const
 {
     return m_titleLabel;
+}
+
+void SARibbonPannelLayout::setToolButtonIconSize(const QSize& s)
+{
+    mDefaultToolButtonIconSize = s;
+}
+
+QSize SARibbonPannelLayout::toolButtonIconSize() const
+{
+    return mDefaultToolButtonIconSize;
 }
 
 /**

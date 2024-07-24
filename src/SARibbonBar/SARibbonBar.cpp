@@ -80,13 +80,14 @@ public:
 	bool mIsTitleVisible { true };                          ///< 标题是否显示
 	SARibbonAlignment mRibbonAlignment { SARibbonAlignment::AlignLeft };                         ///< 对齐方式
 	SARibbonPannel::PannelLayoutMode mDefaulePannelLayoutMode { SARibbonPannel::ThreeRowMode };  ///< 默认的PannelLayoutMode
-	bool mEnableShowPannelTitle { true };  ///< 是否运行pannel的标题栏显示
-	bool mIsTabOnTitle { false };          ///< 是否tab在标题栏上
-	int mTitleBarHeight { 30 };            ///< 标题栏高度
-	int mTabBarHeight { 28 };              ///< tabbar高度
-	int mPannelTitleHeight { 15 };         ///< pannel的标题栏默认高度
-	int mCategoryHeight { 60 };            ///< Category的高度
-    int mPannelSpacing { 0 };              ///< pannel的spacing
+    bool mEnableShowPannelTitle { true };    ///< 是否运行pannel的标题栏显示
+    bool mIsTabOnTitle { false };            ///< 是否tab在标题栏上
+    int mTitleBarHeight { 30 };              ///< 标题栏高度
+    int mTabBarHeight { 28 };                ///< tabbar高度
+    int mPannelTitleHeight { 15 };           ///< pannel的标题栏默认高度
+    int mCategoryHeight { 60 };              ///< Category的高度
+    int mPannelSpacing { 0 };                ///< pannel的spacing
+    QSize mPannelToolButtonSize { 22, 22 };  ///< 记录pannel的默认图标大小
 	std::unique_ptr< int > mUserDefTitleBarHeight;  ///< 用户定义的标题栏高度，正常不使用用户设定的高度，而是使用自动计算的高度
 	std::unique_ptr< int > mUserDefTabBarHeight;  ///< 用户定义的tabbar高度，正常不使用用户设定的高度，而是使用自动计算的高度
 	std::unique_ptr< int > mUserDefCategoryHeight;  ///< 用户定义的Category的高度，正常不使用用户设定的高度，而是使用自动计算的高度
@@ -667,6 +668,7 @@ void SARibbonBar::insertCategoryPage(SARibbonCategory* category, int index)
 	}
 	category->setPannelLayoutMode(d_ptr->mDefaulePannelLayoutMode);
     category->setPannelSpacing(d_ptr->mPannelSpacing);
+    category->setPannelToolButtonIconSize(d_ptr->mPannelToolButtonSize);
     int i = d_ptr->mRibbonTabBar->insertTab(index, category->categoryName());
 
     _SARibbonTabData tabdata;
@@ -1797,6 +1799,31 @@ void SARibbonBar::setPannelSpacing(int n)
 int SARibbonBar::pannelSpacing() const
 {
     return d_ptr->mPannelSpacing;
+}
+
+/**
+ * @brief 设置pannel按钮的icon尺寸，large action不受此尺寸影响
+ * @param s
+ */
+void SARibbonBar::setPannelToolButtonIconSize(const QSize& s)
+{
+    d_ptr->mPannelToolButtonSize = s;
+    // 同步当前被SARibbonBar管理的SARibbonCategory的PannelSpacing
+    iterate([ s ](SARibbonCategory* category) -> bool {
+        if (category) {
+            category->setPannelToolButtonIconSize(s);
+        }
+        return true;
+    });
+}
+
+/**
+ * @brief pannel按钮的icon尺寸，large action不受此尺寸影响
+ * @return
+ */
+QSize SARibbonBar::pannelToolButtonIconSize() const
+{
+    return d_ptr->mPannelToolButtonSize;
 }
 
 /**
