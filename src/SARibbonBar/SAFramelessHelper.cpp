@@ -42,22 +42,22 @@ public:
     void recalculate(const QPoint& globalMousePos, const QRect& frameRect);
 
 public:
-    bool m_bOnEdges { true };
-    bool m_bOnLeftEdge { true };
-    bool m_bOnRightEdge { true };
-    bool m_bOnTopEdge { true };
-    bool m_bOnBottomEdge { true };
-    bool m_bOnTopLeftEdge { true };
-    bool m_bOnBottomLeftEdge { true };
-    bool m_bOnTopRightEdge { true };
-    bool m_bOnBottomRightEdge { true };
+    bool mIsOnEdges { true };
+    bool mIsOnLeftEdge { true };
+    bool mIsOnRightEdge { true };
+    bool mIsOnTopEdge { true };
+    bool mIsOnBottomEdge { true };
+    bool mIsOnTopLeftEdge { true };
+    bool mIsOnBottomLeftEdge { true };
+    bool mIsOnTopRightEdge { true };
+    bool mIsOnBottomRightEdge { true };
 
-    static int m_nBorderWidth;
-    static int m_nTitleHeight;
+    static int s_borderWidth;
+    static int s_titleHeight;
 };
 
-int SAPrivateFramelessCursorPosCalculator::m_nBorderWidth = 5;
-int SAPrivateFramelessCursorPosCalculator::m_nTitleHeight = 30;
+int SAPrivateFramelessCursorPosCalculator::s_borderWidth = 5;
+int SAPrivateFramelessCursorPosCalculator::s_titleHeight = 30;
 
 /***** CursorPosCalculator *****/
 SAPrivateFramelessCursorPosCalculator::SAPrivateFramelessCursorPosCalculator()
@@ -67,15 +67,15 @@ SAPrivateFramelessCursorPosCalculator::SAPrivateFramelessCursorPosCalculator()
 
 void SAPrivateFramelessCursorPosCalculator::reset()
 {
-    m_bOnEdges           = false;
-    m_bOnLeftEdge        = false;
-    m_bOnRightEdge       = false;
-    m_bOnTopEdge         = false;
-    m_bOnBottomEdge      = false;
-    m_bOnTopLeftEdge     = false;
-    m_bOnBottomLeftEdge  = false;
-    m_bOnTopRightEdge    = false;
-    m_bOnBottomRightEdge = false;
+    mIsOnEdges           = false;
+    mIsOnLeftEdge        = false;
+    mIsOnRightEdge       = false;
+    mIsOnTopEdge         = false;
+    mIsOnBottomEdge      = false;
+    mIsOnTopLeftEdge     = false;
+    mIsOnBottomLeftEdge  = false;
+    mIsOnTopRightEdge    = false;
+    mIsOnBottomRightEdge = false;
 }
 
 void SAPrivateFramelessCursorPosCalculator::recalculate(const QPoint& gMousePos, const QRect& frameRect)
@@ -89,20 +89,20 @@ void SAPrivateFramelessCursorPosCalculator::recalculate(const QPoint& gMousePos,
     int frameWidth  = frameRect.width();
     int frameHeight = frameRect.height();
 
-    m_bOnLeftEdge = (globalMouseX >= frameX && globalMouseX <= frameX + m_nBorderWidth);
+    mIsOnLeftEdge = (globalMouseX >= frameX && globalMouseX <= frameX + s_borderWidth);
 
-    m_bOnRightEdge = (globalMouseX >= frameX + frameWidth - m_nBorderWidth && globalMouseX <= frameX + frameWidth);
+    mIsOnRightEdge = (globalMouseX >= frameX + frameWidth - s_borderWidth && globalMouseX <= frameX + frameWidth);
 
-    m_bOnTopEdge = (globalMouseY >= frameY && globalMouseY <= frameY + m_nBorderWidth);
+    mIsOnTopEdge = (globalMouseY >= frameY && globalMouseY <= frameY + s_borderWidth);
 
-    m_bOnBottomEdge = (globalMouseY >= frameY + frameHeight - m_nBorderWidth && globalMouseY <= frameY + frameHeight);
+    mIsOnBottomEdge = (globalMouseY >= frameY + frameHeight - s_borderWidth && globalMouseY <= frameY + frameHeight);
 
-    m_bOnTopLeftEdge     = m_bOnTopEdge && m_bOnLeftEdge;
-    m_bOnBottomLeftEdge  = m_bOnBottomEdge && m_bOnLeftEdge;
-    m_bOnTopRightEdge    = m_bOnTopEdge && m_bOnRightEdge;
-    m_bOnBottomRightEdge = m_bOnBottomEdge && m_bOnRightEdge;
+    mIsOnTopLeftEdge     = mIsOnTopEdge && mIsOnLeftEdge;
+    mIsOnBottomLeftEdge  = mIsOnBottomEdge && mIsOnLeftEdge;
+    mIsOnTopRightEdge    = mIsOnTopEdge && mIsOnRightEdge;
+    mIsOnBottomRightEdge = mIsOnBottomEdge && mIsOnRightEdge;
 
-    m_bOnEdges = m_bOnLeftEdge || m_bOnRightEdge || m_bOnTopEdge || m_bOnBottomEdge;
+    mIsOnEdges = mIsOnLeftEdge || mIsOnRightEdge || mIsOnTopEdge || mIsOnBottomEdge;
 }
 
 /*****
@@ -245,16 +245,16 @@ void SAPrivateFramelessWidgetData::updateCursorShape(const QPoint& gMousePos)
 
     m_moveMousePos.recalculate(gMousePos, m_pWidget->frameGeometry());
 
-    if (m_moveMousePos.m_bOnTopLeftEdge || m_moveMousePos.m_bOnBottomRightEdge) {
+    if (m_moveMousePos.mIsOnTopLeftEdge || m_moveMousePos.mIsOnBottomRightEdge) {
         m_pWidget->setCursor(Qt::SizeFDiagCursor);
         m_bCursorShapeChanged = true;
-    } else if (m_moveMousePos.m_bOnTopRightEdge || m_moveMousePos.m_bOnBottomLeftEdge) {
+    } else if (m_moveMousePos.mIsOnTopRightEdge || m_moveMousePos.mIsOnBottomLeftEdge) {
         m_pWidget->setCursor(Qt::SizeBDiagCursor);
         m_bCursorShapeChanged = true;
-    } else if (m_moveMousePos.m_bOnLeftEdge || m_moveMousePos.m_bOnRightEdge) {
+    } else if (m_moveMousePos.mIsOnLeftEdge || m_moveMousePos.mIsOnRightEdge) {
         m_pWidget->setCursor(Qt::SizeHorCursor);
         m_bCursorShapeChanged = true;
-    } else if (m_moveMousePos.m_bOnTopEdge || m_moveMousePos.m_bOnBottomEdge) {
+    } else if (m_moveMousePos.mIsOnTopEdge || m_moveMousePos.mIsOnBottomEdge) {
         m_pWidget->setCursor(Qt::SizeVerCursor);
         m_bCursorShapeChanged = true;
     } else {
@@ -285,25 +285,25 @@ void SAPrivateFramelessWidgetData::resizeWidget(const QPoint& gMousePos)
     int minWidth  = m_pWidget->minimumWidth();
     int minHeight = m_pWidget->minimumHeight();
 
-    if (m_pressedMousePos.m_bOnTopLeftEdge) {
+    if (m_pressedMousePos.mIsOnTopLeftEdge) {
         left = gMousePos.x();
         top  = gMousePos.y();
-    } else if (m_pressedMousePos.m_bOnBottomLeftEdge) {
+    } else if (m_pressedMousePos.mIsOnBottomLeftEdge) {
         left   = gMousePos.x();
         bottom = gMousePos.y();
-    } else if (m_pressedMousePos.m_bOnTopRightEdge) {
+    } else if (m_pressedMousePos.mIsOnTopRightEdge) {
         right = gMousePos.x();
         top   = gMousePos.y();
-    } else if (m_pressedMousePos.m_bOnBottomRightEdge) {
+    } else if (m_pressedMousePos.mIsOnBottomRightEdge) {
         right  = gMousePos.x();
         bottom = gMousePos.y();
-    } else if (m_pressedMousePos.m_bOnLeftEdge) {
+    } else if (m_pressedMousePos.mIsOnLeftEdge) {
         left = gMousePos.x();
-    } else if (m_pressedMousePos.m_bOnRightEdge) {
+    } else if (m_pressedMousePos.mIsOnRightEdge) {
         right = gMousePos.x();
-    } else if (m_pressedMousePos.m_bOnTopEdge) {
+    } else if (m_pressedMousePos.mIsOnTopEdge) {
         top = gMousePos.y();
-    } else if (m_pressedMousePos.m_bOnBottomEdge) {
+    } else if (m_pressedMousePos.mIsOnBottomEdge) {
         bottom = gMousePos.y();
     }
 
@@ -346,15 +346,15 @@ bool SAPrivateFramelessWidgetData::handleMousePressEvent(QMouseEvent* event)
 {
     if (event->button() == Qt::LeftButton) {
         m_bLeftButtonPressed      = true;
-        m_bLeftButtonTitlePressed = event->pos().y() < m_moveMousePos.m_nTitleHeight;
+        m_bLeftButtonTitlePressed = event->pos().y() < m_moveMousePos.s_titleHeight;
 
         QRect frameRect = m_pWidget->frameGeometry();
-        auto gp = SA_MOUSEEVENT_GLOBALPOS_POINT(event);
+        auto gp         = SA_MOUSEEVENT_GLOBALPOS_POINT(event);
         m_pressedMousePos.recalculate(gp, frameRect);
 
         m_ptDragPos = gp - frameRect.topLeft();
 
-        if (m_pressedMousePos.m_bOnEdges) {
+        if (m_pressedMousePos.mIsOnEdges) {
             if (m_pWidget->isMaximized()) {
                 // 窗口在最大化状态时，点击边界不做任何处理
                 return (false);
@@ -396,7 +396,7 @@ bool SAPrivateFramelessWidgetData::handleMouseMoveEvent(QMouseEvent* event)
 {
     QPoint p = SA_MOUSEEVENT_GLOBALPOS_POINT(event);
     if (m_bLeftButtonPressed) {
-        if (d->m_bWidgetResizable && m_pressedMousePos.m_bOnEdges) {
+        if (d->m_bWidgetResizable && m_pressedMousePos.mIsOnEdges) {
             if (m_pWidget->isMaximized()) {
                 // 窗口在最大化状态时，点击边界不做任何处理
                 return (false);
@@ -451,7 +451,7 @@ bool SAPrivateFramelessWidgetData::handleDoubleClickedMouseEvent(QMouseEvent* ev
             if (mainwindow) {
                 if (mainwindow->windowFlags() & Qt::WindowMaximizeButtonHint) {
                     // 在最大化按钮显示时才进行shownormal处理
-                    bool titlePressed = event->pos().y() < m_moveMousePos.m_nTitleHeight;
+                    bool titlePressed = event->pos().y() < m_moveMousePos.s_titleHeight;
                     if (titlePressed) {
                         if (m_pWidget->isMaximized()) {
                             m_pWidget->showNormal();
@@ -574,14 +574,14 @@ void SAFramelessHelper::setRubberBandOnResize(bool resizable)
 void SAFramelessHelper::setBorderWidth(int width)
 {
     if (width > 0) {
-        SAPrivateFramelessCursorPosCalculator::m_nBorderWidth = width;
+        SAPrivateFramelessCursorPosCalculator::s_borderWidth = width;
     }
 }
 
 void SAFramelessHelper::setTitleHeight(int height)
 {
     if (height > 0) {
-        SAPrivateFramelessCursorPosCalculator::m_nTitleHeight = height;
+        SAPrivateFramelessCursorPosCalculator::s_titleHeight = height;
     }
 }
 
@@ -607,10 +607,10 @@ bool SAFramelessHelper::rubberBandOnResisze()
 
 uint SAFramelessHelper::borderWidth()
 {
-    return (SAPrivateFramelessCursorPosCalculator::m_nBorderWidth);
+    return (SAPrivateFramelessCursorPosCalculator::s_borderWidth);
 }
 
 uint SAFramelessHelper::titleHeight()
 {
-    return (SAPrivateFramelessCursorPosCalculator::m_nTitleHeight);
+    return (SAPrivateFramelessCursorPosCalculator::s_titleHeight);
 }

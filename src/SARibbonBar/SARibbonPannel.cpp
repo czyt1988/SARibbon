@@ -1000,5 +1000,5 @@ void SARibbonPannel::changeEvent(QEvent* e)
  */
 const QList< SARibbonPannelItem* >& SARibbonPannel::ribbonPannelItem() const
 {
-    return (pannelLayout()->m_items);
+    return (pannelLayout()->mItems);
 }

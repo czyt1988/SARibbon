@@ -21,7 +21,7 @@ public:
     virtual void paintIconWithTextWordWrap(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
 
 private:
-    SARibbonGalleryGroup* m_group;
+    SARibbonGalleryGroup* mGroup;
 };
 
 ///
@@ -45,7 +45,7 @@ public:
     void append(SARibbonGalleryItem* item);
 
 private:
-    QList< SARibbonGalleryItem* > m_items;
+    QList< SARibbonGalleryItem* > mItems;
 };
 
 /**
