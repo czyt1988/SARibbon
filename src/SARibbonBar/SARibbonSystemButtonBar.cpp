@@ -363,7 +363,7 @@ bool SARibbonSystemButtonBar::eventFilter(QObject* obj, QEvent* event)
             if (th != height()) {
                 setWindowTitleHeight(th);
             }
-            QRect fr         = mainWindow->frameGeometry();
+            QRect fr         = mainWindow->geometry();
             QSize wgSizeHint = sizeHint();
             setGeometry(fr.width() - wgSizeHint.width(), 0, wgSizeHint.width(), wgSizeHint.height());
             // 把设置好的尺寸给ribbonbar
