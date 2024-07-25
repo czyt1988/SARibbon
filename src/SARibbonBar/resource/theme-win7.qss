@@ -137,7 +137,6 @@ SARibbonTabBar::tab {
     margin-left: 5px;
     margin-bottom: 0px;
     min-width: 50px;
-    min-height: 28px;
     padding-left: 5px;
     padding-right: 5px;
 }
@@ -328,11 +327,6 @@ SARibbonComboBox::down-arrow {
 }
 
 
-/*SARibbonSeparatorWidget*/
-SARibbonSeparatorWidget{
-    /*background-color: transparent;*/
-    background-color: #D3D3D3;
-}
 
 SARibbonCategoryScrollButton {
   border: 1px solid #c5d2e0;
