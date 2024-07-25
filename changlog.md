@@ -1,5 +1,12 @@
 ﻿# 版本记录(change log):
 
+## 2024-07-25 -> 2.2.1
+- 增加setPannelSpacing接口，可调节pannel按钮的间距
+- SARibbonToolButton的icon尺寸可设置，在小按钮模式下，用户可指定icon尺寸
+- 把SARibbonMainWindow的事件处理通过eventfilter实现，避免用户在重写事件时误操作
+- 修正SARibbonGalleryButton的样式错误
+- 修正SystemBar在qwk下会位置有偏离的问题
+
 ## 2024-07-15 -> 2.2.0
 - 增加了mdi窗口的示例
 - 增加了SARibbonTabBar的tab尺寸计算方式，可以让tab高度按照tabbar高度自动调整
