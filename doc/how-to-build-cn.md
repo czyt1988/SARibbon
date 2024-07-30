@@ -71,17 +71,18 @@ build步骤选择install
 
 # 构建SARibbonBar库
 
-SARibbonBar库提供cmake和qmake两种方式构建，推荐使用cmake
+`SARibbonBar`库提供`cmake`和`qmake`两种方式构建，推荐使用`cmake`
 
-## 基于CMake构建SARibbonBar库
+> qt6之后不再维护`qmake`，逐渐转移到`cmake`中，`SARibbon`的未来版本不排除移除`qmake`
 
-### vs下基于cmake的构建
+## 基于`CMake`构建`SARibbonBar`库
 
-如果要开启`QWindowKit`，在CMakeLists.txt中把`SARIBBON_USE_FRAMELESS_LIB`的option值手动改为ON
+### vs下基于`cmake`的构建
+
+如果要开启`QWindowKit`，在`CMakeLists.txt`中把`SARIBBON_USE_FRAMELESS_LIB`的option值手动改为ON
 
 ```
-# frameless能提供windows的窗口特效，如边缘吸附，且对高分屏多屏幕的支持更好,默认开启
-option(SARIBBON_USE_FRAMELESS_LIB "Using the QWindowKit library as a frameless solution" ON)
+# `QWindowkit`能提供windows的窗口特效，如边缘吸附，且对高分屏多屏幕的支持更好
 ```
 
 点击文件->打开->Cmake 选中CMakeLists.txt
@@ -130,9 +131,9 @@ Qt Creator可以在界面修改`SARIBBON_USE_FRAMELESS_LIB`值，也可以手动
 
 ## 基于QMake构建SARibbonBar
 
-qmake构建SARibbonBar只需使用Qt Creator打开SARibbon.pro文件即可
+qmake构建SARibbonBar只需使用Qt Creator打开`SARibbon.pro`文件即可
 
-> 注意，如果使用Qt Creator打开SARibbon.pro文件过程报错，那么你的账户可能是没有足够的写权限，不同版本的Qt Creator在不同操作系统由不一样的表现，建议使用cmake
+> 注意，如果使用Qt Creator打开`SARibbon.pro`文件过程报错，那么你的账户可能是没有足够的写权限，不同版本的Qt Creator在不同操作系统由不一样的表现，建议使用cmake
 
 # 使用SARibbonBar库
 
@@ -162,17 +163,39 @@ target_link_libraries(${myapp_target_name} PUBLIC
 
 ## 基于qmake引入SARibbonBar库
 
-> Qt6开始，不再推荐使用qmake，SARibbon未来的版本有可能会取消qmake的支持
+> Qt6开始，不再推荐使用`qmake`，SARibbon未来的版本有可能会取消qmake的支持
 
-qmake的编译过程会在SARibbon下生成`bin_qt{Qt version}_{MSVC/GNU}_x{32/64}`文件夹，库文件和dll文件都在此文件夹下，importSARibbonBarLib.pri会自动把这个文件夹下的库引用进来
+qmake的编译过程会在SARibbon下生成`bin_qt{Qt version}_{MSVC/GNU}_x{32/64}`文件夹，库文件和dll文件都在此文件夹下，importSARibbonBarLib.pri会自动把这个文件夹下的库引用进来，在引入之前需要先进行配置，配置内容位于`common.pri`中
 
 步骤如下：
 
-1. 先在你的工程中建立一个3rdparty文件夹，再把整个SARibbon文件夹拷贝过去
+1. 先在你的工程中建立一个`3rdparty`文件夹，再把整个`SARibbon`文件夹拷贝过去
 
 > SARibbon内部已经有几个pri文件可以很方便的让你把工程引入到自己目录中，`./importSARibbonBarLib.pri`文件就是用于引入SARibbon库的
 
-2. 在自己的Qt工程pro文件中加入如下语句即可
+importSARibbonBarLib.pri文件按照本库目录结构引入了依赖和头文件，如果你自己需要调整目录结构，可参考此文件进行修改
+
+2. 配置common.pri文件
+
+按照你实际的库的编译情况，配置SARibbon/common.pri文件，目前可选配置如下：
+
+```shell
+# SA_RIBBON_CONFIG+=use_frameless
+#     此选项将使用frameless第三方库，这个选项在SARibbonBar.pri中会自动判断，如果，达到frameless的使用要求将会自动定义
+#     frameless第三方库必须C++17且只有几个版本的qt可用，目前支持（qt5.14,qt5.15,qt6.4以上）
+#     除了上诉版本SA_RIBBON_CONFIG中不会加入use_frameless
+#     frameless库能实现Ubuntu下和mac下的显示，同时多屏幕的支持也较好
+# 使用frameless库，需要定义QWindowKit的安装目录，默认在SARIBBON_BIN_DIR
+# SA_RIBBON_QWindowKit_Install_DIR = $$SARIBBON_BIN_DIR
+# 
+# SA_RIBBON_CONFIG+=enable_snap_layout
+#      此选项将允许开启windows11的snap layout效果，目前在qt6.5下是正常显示位置，其它已知qt版本的snap layout位置会有偏移
+#      此选项必须在 SA_RIBBON_CONFIG+=use_frameless 下才有效
+```
+
+你根据实际情况打开配置项（把注释去掉）
+
+3. 在自己的Qt工程pro文件中加入如下语句即可
 
 ```shell
 include($$PWD/3rdparty/SARibbon/importSARibbonBarLib.pri)
@@ -185,9 +208,9 @@ include($$PWD/3rdparty/SARibbon/importSARibbonBarLib.pri)
 |  |-you-project.pro
 |  |-[3rdparty]
 |     |-[SARibbon](直接把SARibbon完整复制过来)
-|        |-importSARibbonBarLib.pri
-|        |-SARibbonBar.pri
-|        |-common.pri
+|        |-importSARibbonBarLib.pri（这个是方面你的qmake工程导入的文件，实际是引入了SARibbonBar.pri）
+|        |-SARibbonBar.pri（用于引入库和依赖）
+|        |-common.pri（这里是你的配置内容）
 |        |-[bin_qtx.x.x_{MSVC/GNU}_x{32/64}]
 |        |-[src]
 |        |   |-[SARibbonBar]
@@ -195,7 +218,7 @@ include($$PWD/3rdparty/SARibbon/importSARibbonBarLib.pri)
 
 `importSARibbonBarLib.pri`、`SARibbonBar.pri`、`common.pri`这三个文件是引入工程的关键文件
 
-> Qt6.0版本后已经放弃qmake，建议使用cmake来管理工程
+> 再次声明：Qt6.0版本后已经放弃qmake，建议使用cmake来管理工程
 
 # 公开的预定义宏
 

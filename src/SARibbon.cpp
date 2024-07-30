@@ -15645,23 +15645,23 @@ void SARibbonMainWindow::setRibbonBar(SARibbonBar* ribbon)
 	sysBar->show();
 #if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
 	auto helper = d_ptr->mFramelessHelper;
-	helper->setTitleBar(bar);
+	helper->setTitleBar(ribbon);
 	// 以下这些窗口，需要允许点击
-	helper->setHitTestVisible(wg);                          // IMPORTANT!
-	helper->setHitTestVisible(bar->ribbonTabBar());         // IMPORTANT!
-	helper->setHitTestVisible(bar->rightButtonGroup());     // IMPORTANT!
-	helper->setHitTestVisible(bar->applicationButton());    // IMPORTANT!
-	helper->setHitTestVisible(bar->quickAccessBar());       // IMPORTANT!
-	helper->setHitTestVisible(bar->ribbonStackedWidget());  // IMPORTANT!
+	helper->setHitTestVisible(sysBar);                         // IMPORTANT!
+	helper->setHitTestVisible(ribbon->ribbonTabBar());         // IMPORTANT!
+	helper->setHitTestVisible(ribbon->rightButtonGroup());     // IMPORTANT!
+	helper->setHitTestVisible(ribbon->applicationButton());    // IMPORTANT!
+	helper->setHitTestVisible(ribbon->quickAccessBar());       // IMPORTANT!
+	helper->setHitTestVisible(ribbon->ribbonStackedWidget());  // IMPORTANT!
 #if SARIBBON_ENABLE_SNAP_LAYOUT
-	if (wg->closeButton()) {
-		helper->setSystemButton(QWK::WindowAgentBase::Close, wg->closeButton());
+	if (sysBar->closeButton()) {
+		helper->setSystemButton(QWK::WindowAgentBase::Close, sysBar->closeButton());
 	}
-	if (wg->minimizeButton()) {
-		helper->setSystemButton(QWK::WindowAgentBase::Minimize, wg->minimizeButton());
+	if (sysBar->minimizeButton()) {
+		helper->setSystemButton(QWK::WindowAgentBase::Minimize, sysBar->minimizeButton());
 	}
-	if (wg->maximizeButton()) {
-		helper->setSystemButton(QWK::WindowAgentBase::Maximize, wg->maximizeButton());
+	if (sysBar->maximizeButton()) {
+		helper->setSystemButton(QWK::WindowAgentBase::Maximize, sysBar->maximizeButton());
 	}
 #endif
 #else
