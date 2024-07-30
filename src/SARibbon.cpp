@@ -15667,13 +15667,13 @@ void SARibbonMainWindow::setRibbonBar(SARibbonBar* ribbon)
 #else
 	// 捕获ribbonbar的事件
 	ribbon->installEventFilter(this);
-	// SARibbonSystemButtonBar的eventfilter捕获mainwindow的事件
-	// 通过eventerfilter来处理mainwindow的事件，避免用户错误的继承resizeEvent导致systembar的位置异常
-	installEventFilter(sysBar);
 	// 设置窗体的标题栏高度
 	d_ptr->mFramelessHelper->setTitleHeight(th);
 	d_ptr->mFramelessHelper->setRubberBandOnResize(false);
 #endif
+	// SARibbonSystemButtonBar的eventfilter捕获mainwindow的事件
+	// 通过eventerfilter来处理mainwindow的事件，避免用户错误的继承resizeEvent导致systembar的位置异常
+	installEventFilter(sysBar);
 	if (!d_ptr->mEventFilter) {
 		d_ptr->mEventFilter = new SARibbonMainWindowEventFilter(this);
 		installEventFilter(d_ptr->mEventFilter);
