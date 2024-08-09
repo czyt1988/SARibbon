@@ -104,6 +104,7 @@ void SARibbonMainWindow::setRibbonBar(SARibbonBar* ribbon)
     SARibbonSystemButtonBar* sysBar = d_ptr->mWindowButtonGroup;
     sysBar->setWindowStates(windowState());
     sysBar->setWindowTitleHeight(th);
+    sysBar->raise();//确保sysbar在最顶层，避免第二次设置ribbonbar的时候，被ribbonbar覆盖了sysbar
     sysBar->show();
 #if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
     auto helper = d_ptr->mFramelessHelper;
@@ -298,7 +299,7 @@ bool SARibbonMainWindow::isUseRibbon() const
  */
 SARibbonBar* SARibbonMainWindow::createRibbonBar()
 {
-    SARibbonBar* bar = new SARibbonBar(this);
+    SARibbonBar* bar = RibbonSubElementFactory->createRibbonBar(this);
     bar->setContentsMargins(3, 0, 3, 0);
     return bar;
 }

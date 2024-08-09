@@ -35,23 +35,26 @@ class QScreen;
  * @ref SARibbonMainWindow 提供了几种常用的ribbon样式
  * 通过@ref setRibbonTheme 可改变ribbon的样式，用户也可通过qss自己定义自己的样式
  * 
- * 如果你自己继承了SARibbonBar，你可以通过重写@ref createRibbonBar 来实现SARibbonMainWindow安装新的ribbonbar
+ * 如果你自己继承了SARibbonBar，你可以通过@ref setRibbonBar 设置自己的ribbonbar进去
  * 
- * @code
- * class MyMainWindow : public SARibbonMainWindow
- * {
- * public:
- * ...
- * protected:
- *  virtual SARibbonBar* createRibbonBar() override;
- * };
- * 
- * SARibbonBar* MyMainWindow::createRibbonBar(){
- *   return new MyRibbonBar(this);
- * }
- * @endcode
- * 
+ * 另外有个一个更加高效的方法，来实现自定义的Ribbon，就是继承一个@ref SARibbonElementFactory
  *
+ * @code
+ * class MyRibbonFactory:public SARibbonElementFactory{
+ * ...
+ * virtual SARibbonBar* createRibbonBar(QWidget* parent){
+ *     return new MyRibbonBar(parent);
+ * }
+ * };
+ * @endcode
+ *
+ * SARibbonMainWindow生成之前(一般在main函数），设置元件工厂：
+ *
+ * @code
+ * SARibbonElementManager::instance()->setupFactory(new MyRibbonFactory());
+ * @endcode
+ *
+ * 此时，Ribbon的元素会通过MyRibbonFactory的接口来生成
  */
 class SA_RIBBON_EXPORT SARibbonMainWindow : public QMainWindow
 {
@@ -90,7 +93,7 @@ public:
 
 protected:
     // 创建ribbonbar的工厂函数
-    virtual SARibbonBar* createRibbonBar();
+    SARibbonBar* createRibbonBar();
 private slots:
     void onPrimaryScreenChanged(QScreen* screen);
 };

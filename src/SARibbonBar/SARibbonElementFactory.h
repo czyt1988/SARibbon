@@ -37,6 +37,7 @@ class SA_RIBBON_EXPORT SARibbonElementFactory
 public:
     SARibbonElementFactory();
     virtual ~SARibbonElementFactory();
+    virtual SARibbonBar* createRibbonBar(QWidget* parent);
     virtual SARibbonTabBar* createRibbonTabBar(QWidget* parent);
     virtual SARibbonApplicationButton* createRibbonApplicationButton(QWidget* parent);
     virtual SARibbonCategory* createRibbonCategory(QWidget* parent);
