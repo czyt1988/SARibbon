@@ -21,7 +21,7 @@ SARibbonElementFactory* SARibbonElementManager::factory()
     return (mFactory.data());
 }
 
-void SARibbonElementManager::setupFactory(SARibbonElementFactory* delegate)
+void SARibbonElementManager::setupFactory(SARibbonElementFactory* fac)
 {
-    mFactory.reset(delegate);
+    mFactory.reset(fac);
 }

@@ -2,6 +2,7 @@
 #include <QApplication>
 #include <QFontMetrics>
 #include "SARibbonApplicationButton.h"
+#include "SARibbonBar.h"
 #include "SARibbonTabBar.h"
 #include "SARibbonCategory.h"
 #include "SARibbonContextCategory.h"
@@ -23,6 +24,11 @@ SARibbonElementFactory::SARibbonElementFactory()
 
 SARibbonElementFactory::~SARibbonElementFactory()
 {
+}
+
+SARibbonBar* SARibbonElementFactory::createRibbonBar(QWidget* parent)
+{
+    return (new SARibbonBar(parent));
 }
 
 SARibbonTabBar* SARibbonElementFactory::createRibbonTabBar(QWidget* parent)
