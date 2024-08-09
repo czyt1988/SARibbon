@@ -23,14 +23,34 @@ class QScreen;
  * @endcode
  *
  * 如果想换回非ribbon风格，只需要把useRibbon设置为false即可,
- * 成员函数isUseRibbon用于判断当前是否为ribbon模式，这个函数在兼容传统Toolbar风格和ribbon风格时非常有用。
+ * 成员函数isUseRibbon用于判断当前是否为ribbon模式，这个函数在兼容传统Toolbar风格和ribbon风格时非常有用
+ * 
+ * 但这个不支持动态切换，因此，实际工程中，你若要进行切换，需要写配置文件，程序在构造时传入模式，
+ * 并且，你的程序要做好判断，因为非Ribbon模式下，所有Ribbon相关的接口都会返回空指针
  *
  * @code
  * bool isUseRibbon() const;
  * @endcode
  *
- * @ref SARibbonMainWindow 提供了几种常用的ribbon样式，样式可见@ref RibbonTheme
+ * @ref SARibbonMainWindow 提供了几种常用的ribbon样式
  * 通过@ref setRibbonTheme 可改变ribbon的样式，用户也可通过qss自己定义自己的样式
+ * 
+ * 如果你自己继承了SARibbonBar，你可以通过重写@ref createRibbonBar 来实现SARibbonMainWindow安装新的ribbonbar
+ * 
+ * @code
+ * class MyMainWindow : public SARibbonMainWindow
+ * {
+ * public:
+ * ...
+ * protected:
+ *  virtual SARibbonBar* createRibbonBar() override;
+ * };
+ * 
+ * SARibbonBar* MyMainWindow::createRibbonBar(){
+ *   return new MyRibbonBar(this);
+ * }
+ * @endcode
+ * 
  *
  */
 class SA_RIBBON_EXPORT SARibbonMainWindow : public QMainWindow
@@ -70,7 +90,7 @@ public:
 
 protected:
     // 创建ribbonbar的工厂函数
-    SARibbonBar* createRibbonBar();
+    virtual SARibbonBar* createRibbonBar();
 private slots:
     void onPrimaryScreenChanged(QScreen* screen);
 };

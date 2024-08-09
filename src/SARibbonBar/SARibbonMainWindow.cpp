@@ -97,6 +97,9 @@ void SARibbonMainWindow::setRibbonBar(SARibbonBar* ribbon)
     // 设置window按钮
     if (nullptr == d_ptr->mWindowButtonGroup) {
         d_ptr->mWindowButtonGroup = RibbonSubElementFactory->createWindowButtonGroup(this);
+        // SARibbonSystemButtonBar的eventfilter捕获mainwindow的事件
+        // 通过eventerfilter来处理mainwindow的事件，避免用户错误的继承resizeEvent导致systembar的位置异常
+        installEventFilter(d_ptr->mWindowButtonGroup);
     }
     SARibbonSystemButtonBar* sysBar = d_ptr->mWindowButtonGroup;
     sysBar->setWindowStates(windowState());
@@ -130,9 +133,6 @@ void SARibbonMainWindow::setRibbonBar(SARibbonBar* ribbon)
     d_ptr->mFramelessHelper->setTitleHeight(th);
     d_ptr->mFramelessHelper->setRubberBandOnResize(false);
 #endif
-    // SARibbonSystemButtonBar的eventfilter捕获mainwindow的事件
-    // 通过eventerfilter来处理mainwindow的事件，避免用户错误的继承resizeEvent导致systembar的位置异常
-    installEventFilter(sysBar);
     if (!d_ptr->mEventFilter) {
         d_ptr->mEventFilter = new SARibbonMainWindowEventFilter(this);
         installEventFilter(d_ptr->mEventFilter);
@@ -292,6 +292,8 @@ bool SARibbonMainWindow::isUseRibbon() const
 
 /**
  * @brief 创建ribbonbar的工厂函数
+ * 
+ * 用户如果重写了SARibbonBar，可以通过重新此虚函数返回自己的Ribbon实例
  * @return
  */
 SARibbonBar* SARibbonMainWindow::createRibbonBar()
