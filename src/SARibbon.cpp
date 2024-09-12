@@ -1,4 +1,4 @@
-// 定义此宏，将SA_RIBBON_EXPORT定义为空
+﻿// 定义此宏，将SA_RIBBON_EXPORT定义为空
 #ifndef SA_RIBBON_BAR_NO_EXPORT
 #define SA_RIBBON_BAR_NO_EXPORT
 #endif
@@ -13032,6 +13032,11 @@ SARibbonElementFactory::~SARibbonElementFactory()
 {
 }
 
+SARibbonBar* SARibbonElementFactory::createRibbonBar(QWidget* parent)
+{
+	return (new SARibbonBar(parent));
+}
+
 SARibbonTabBar* SARibbonElementFactory::createRibbonTabBar(QWidget* parent)
 {
 	return (new SARibbonTabBar(parent));
@@ -13142,9 +13147,9 @@ SARibbonElementFactory* SARibbonElementManager::factory()
 	return (mFactory.data());
 }
 
-void SARibbonElementManager::setupFactory(SARibbonElementFactory* delegate)
+void SARibbonElementManager::setupFactory(SARibbonElementFactory* fac)
 {
-	mFactory.reset(delegate);
+	mFactory.reset(fac);
 }
 
 /*** End of inlined file: SARibbonElementManager.cpp ***/
@@ -15638,10 +15643,14 @@ void SARibbonMainWindow::setRibbonBar(SARibbonBar* ribbon)
 	// 设置window按钮
 	if (nullptr == d_ptr->mWindowButtonGroup) {
 		d_ptr->mWindowButtonGroup = RibbonSubElementFactory->createWindowButtonGroup(this);
+		// SARibbonSystemButtonBar的eventfilter捕获mainwindow的事件
+		// 通过eventerfilter来处理mainwindow的事件，避免用户错误的继承resizeEvent导致systembar的位置异常
+		installEventFilter(d_ptr->mWindowButtonGroup);
 	}
 	SARibbonSystemButtonBar* sysBar = d_ptr->mWindowButtonGroup;
 	sysBar->setWindowStates(windowState());
 	sysBar->setWindowTitleHeight(th);
+	sysBar->raise();  // 确保sysbar在最顶层，避免第二次设置ribbonbar的时候，被ribbonbar覆盖了sysbar
 	sysBar->show();
 #if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
 	auto helper = d_ptr->mFramelessHelper;
@@ -15671,12 +15680,13 @@ void SARibbonMainWindow::setRibbonBar(SARibbonBar* ribbon)
 	d_ptr->mFramelessHelper->setTitleHeight(th);
 	d_ptr->mFramelessHelper->setRubberBandOnResize(false);
 #endif
-	// SARibbonSystemButtonBar的eventfilter捕获mainwindow的事件
-	// 通过eventerfilter来处理mainwindow的事件，避免用户错误的继承resizeEvent导致systembar的位置异常
-	installEventFilter(sysBar);
 	if (!d_ptr->mEventFilter) {
 		d_ptr->mEventFilter = new SARibbonMainWindowEventFilter(this);
 		installEventFilter(d_ptr->mEventFilter);
+	}
+	// 最后要提升，否则新加入的会被覆盖
+	if (d_ptr->mWindowButtonGroup) {
+		d_ptr->mWindowButtonGroup->raise();
 	}
 }
 
@@ -15833,11 +15843,13 @@ bool SARibbonMainWindow::isUseRibbon() const
 
 /**
  * @brief 创建ribbonbar的工厂函数
+ *
+ * 用户如果重写了SARibbonBar，可以通过重新此虚函数返回自己的Ribbon实例
  * @return
  */
 SARibbonBar* SARibbonMainWindow::createRibbonBar()
 {
-	SARibbonBar* bar = new SARibbonBar(this);
+	SARibbonBar* bar = RibbonSubElementFactory->createRibbonBar(this);
 	bar->setContentsMargins(3, 0, 3, 0);
 	return bar;
 }
