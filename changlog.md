@@ -1,5 +1,10 @@
 ﻿# 版本记录(change log):
 
+## 2024-09-12 -> 2.2.4
+- 修正自定义过程调用setRibbonBar后，会导致最大最小化按钮被遮挡的问题
+- 调整Mdi例子中cmake的文件大小写，避免在linux系统下大小写敏感
+- 修正qwk开启后，eventfilter没有捕获的问题
+
 ## 2024-07-25 -> 2.2.1
 - 增加setPannelSpacing接口，可调节pannel按钮的间距
 - SARibbonToolButton的icon尺寸可设置，在小按钮模式下，用户可指定icon尺寸
