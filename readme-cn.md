@@ -154,6 +154,15 @@ SARibbon提供了合并好的`SARibbon.h`文件和`SARibbon.cpp`文件，只需�
 
 使用cmake的话参考StaticExample（位于`src/example/StaticExample`）例子的cmake编写方式
 
+在静态引入方案中，如果你需要使用`QWindowkit`,你的工程首先要添加好`QWindowkit`库，并且在引入SARibbon.h之前，增加下面这个宏：
+
+```cpp
+#ifndef SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
+#define SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
+#endif
+```
+> 此宏要在最早#include “SARibbon.h”之前添加，如果你无法确保哪里是你最早引入SARibbon.h的地方，那么你可以把这个宏直接加到`SARibbon.h`文件最上端
+
 
 # 使用方法
 
@@ -686,3 +695,9 @@ int main(int argc, char* argv[])
 ```
 
 这个快捷键的创建位置在Mainwidnow，这样快捷键就随着mainwindow周期
+
+# 给我一个鼓励
+
+如果项目对你有用，请你给我一个鼓励：
+
+![](./doc/pic/赞赏码.png)
