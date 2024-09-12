@@ -6,13 +6,15 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 # qt库加载，最低要求5.8
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} 5.8 COMPONENTS Core Gui Widgets REQUIRED)
-
+file(GLOB HEADER_FILES "${CMAKE_CURRENT_LIST_DIR}/*.h")
+file(GLOB SOURCE_FILES "${CMAKE_CURRENT_LIST_DIR}/*.cpp")
+file(GLOB UI_FILES "${CMAKE_CURRENT_LIST_DIR}/*.ui")
+file(GLOB RESOURCE_FILES "${CMAKE_CURRENT_LIST_DIR}/*.qrc")
 add_executable(${SARIBBON_EXPAMPLE_NAME} WIN32
-    mdimainWindow.h
-    mdimainWindow.cpp
-    MainWindow.ui
-    main.cpp
-    icon.qrc
+    ${HEADER_FILES}
+    ${SOURCE_FILES}
+    ${UI_FILES}
+    ${RESOURCE_FILES}
 )
 
 target_include_directories(${SARIBBON_EXPAMPLE_NAME} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../../SARibbonBar")
