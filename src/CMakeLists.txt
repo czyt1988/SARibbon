@@ -1,8 +1,4 @@
 ﻿add_subdirectory(SARibbonBar)
-if(SARIBBON_BUILD_EXAMPLES)
-    message(STATUS "build example")
-    add_subdirectory(example)
-endif()
 #if(BUILD_DESIGNERPLUGIN)
 #    add_subdirectory(DesignerPlugin)
 #endif()
