@@ -3,29 +3,8 @@
 #include <memory>
 #include <QtGlobal>
 #include <QObject>
+#include "SARibbonBarVersionInfo.h"
 class QWidget;
-/**
-  @file  SARibbonGlobal.h
- */
-
-/**
- * @def ribbon的数字版本 {MAJ}.MIN.PAT
- */
-#ifndef SA_RIBBON_BAR_VERSION_MAJ
-#define SA_RIBBON_BAR_VERSION_MAJ 2
-#endif
-/**
- * @def ribbon的数字版本 MAJ.{MIN}.PAT
- */
-#ifndef SA_RIBBON_BAR_VERSION_MIN
-#define SA_RIBBON_BAR_VERSION_MIN 2
-#endif
-/**
- * @def ribbon的数字版本 MAJ.MIN.{PAT}
- */
-#ifndef SA_RIBBON_BAR_VERSION_PAT
-#define SA_RIBBON_BAR_VERSION_PAT 4
-#endif
 
 #ifndef SA_RIBBON_BAR_NO_EXPORT
 #if defined(SA_RIBBON_BAR_MAKE_LIB)  // 定义此宏将构建library
@@ -34,7 +13,6 @@ class QWidget;
 #define SA_RIBBON_EXPORT Q_DECL_IMPORT
 #endif
 #endif
-
 #ifndef SA_RIBBON_EXPORT
 #define SA_RIBBON_EXPORT
 #endif
@@ -62,8 +40,7 @@ class QWidget;
 /**
  * @brief 定义Ribbon的对其方式，目前支持左对齐和居中对其
  */
-enum class SARibbonAlignment
-{
+SA_RIBBON_EXPORT enum class SARibbonAlignment {
 	AlignLeft,   ///< 左对齐，tab栏左对齐，同时category也是左对齐
 	AlignCenter  ///< 居中对其，tab栏居中对齐，同时category也是居中对齐
 };
@@ -76,8 +53,7 @@ enum class SARibbonAlignment
  * 例如ribbon tab的margin信息，在QTabBar是无法获取到，而这个影响了SARibbonContextCategory的绘制，
  * 因此，在设置qss后需要针对margin信息重新设置进SARibbonTabBar中
  */
-enum class SARibbonTheme
-{
+SA_RIBBON_EXPORT enum class SARibbonTheme {
 	RibbonThemeOffice2013,      ///< office2013主题
 	RibbonThemeOffice2016Blue,  ///< office2016-蓝色主题
 	RibbonThemeOffice2021Blue,  ///< office2021-蓝色主题
@@ -149,7 +125,7 @@ enum class SARibbonTheme
     仅用于调试
  */
 #ifndef SA_DEBUG_PRINT_SARIBBONBAR
-#define SA_DEBUG_PRINT_SARIBBONBAR 1
+#define SA_DEBUG_PRINT_SARIBBONBAR 0
 #endif
 
 /**

@@ -34,7 +34,7 @@ git submodule update --init --recursive
 
 切换到项目模式（Ctrl+5）
 
-build步骤选择install
+build步骤选择install（有些版本qt creator无法all和install一起选中，那么就先选all，编译完成后选install再执行安装）
 
 ![](./pic/build-cmake-qwk-qtc-03.png)
 
@@ -61,6 +61,7 @@ build步骤选择install
 ![](./pic/build-cmake-vs-04.png)
 
 > 不同的vs操作有点不一样，没有CMake菜单的，可以在CMakeLists.txt点右键
+
 ![](./pic/build-cmake-vs-04-other.png)
 
 这时你会在SARibbon根目录下看到形如`bin_qt5.14.2_MSVC_x64`这样的安装目录，这里自动把`QWindowkit`库安装在此目录下
@@ -81,10 +82,6 @@ build步骤选择install
 
 如果要开启`QWindowKit`，在`CMakeLists.txt`中把`SARIBBON_USE_FRAMELESS_LIB`的option值手动改为ON
 
-```
-# `QWindowkit`能提供windows的窗口特效，如边缘吸附，且对高分屏多屏幕的支持更好
-```
-
 点击文件->打开->Cmake 选中CMakeLists.txt
 
 ![](./pic/build-cmake-vs-01.png)
@@ -93,15 +90,15 @@ build步骤选择install
 
 ![](./pic/build-cmake-vs-02.png)
 
-直接点击CMake菜单->全部生成
+直接点击CMake菜单->全部生成（有些版本没有CMake菜单，可以在CMakeLists.txt点右键）
 
 ![](./pic/build-cmake-vs-03.png)
 
-全部生成完成后，CMake菜单->安装->SARibbon
+全部生成完成后，CMake菜单->安装->SARibbon（有些版本没有CMake菜单，可以在CMakeLists.txt点右键）
 
 ![](./pic/build-cmake-vs-04.png)
 
-这时候你会看到源码的根目录下多出一个文件夹,文件夹命名方式为`bin_qt{version}_[MSVC/GNU]_x[64/86]`（前提是你没有改变CMAKE_INSTALL_PREFIX）
+这时候你会看到源码的根目录下多出一个文件夹,文件夹命名方式为`bin_qt{version}_[MSVC/GNU]_x[64/86]`（你可以使用默认安装位置，把`SARIBBON_INSTALL_IN_CURRENT_DIR`变量设置为OFF即可:`SARIBBON_INSTALL_IN_CURRENT_DIR=OFF`）
 
 ![](./pic/build-cmake-install-dir.png)
 

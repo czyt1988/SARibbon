@@ -59,17 +59,6 @@ set(SARIBBON_SIMPLE
     ${SARIBBON_DIR}/SARibbonBar/resource.qrc
 )
 
-
-if(SARIBBON_USE_FRAMELESS_LIB)
-    #使用frameless必须设置SARIBBON_USE_3RDPARTY_FRAMELESSHELPER宏为1
-    add_definitions(-DSARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1)
-else()
-    #不使用frameless必须设置SARIBBON_USE_3RDPARTY_FRAMELESSHELPER宏为0
-    add_definitions(-DSARIBBON_USE_3RDPARTY_FRAMELESSHELPER=0)
-endif()
-
-
-
 set(PROJECT_SOURCES
         main.cpp
         MainWindow.cpp
@@ -103,4 +92,16 @@ target_include_directories(StaticExample PUBLIC
 )
 
 
-
+if(SARIBBON_USE_FRAMELESS_LIB)
+    find_package(QWindowKit QUIET)
+    if(QWindowKit_FOUND)
+        target_link_libraries(StaticExample PRIVATE QWindowKit::Widgets)
+        target_compile_definitions(StaticExample PRIVATE SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1)
+    else()
+        message(WARNING "can not find package QWindowKit,You need to specify the cmake installation path of QWindowKit to the QWindowKit_DIR variable")
+        target_compile_definitions(StaticExample PRIVATE SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=0)
+    endif()
+else()
+    #不使用frameless必须设置SARIBBON_USE_3RDPARTY_FRAMELESSHELPER宏为0
+    target_compile_definitions(StaticExample PRIVATE SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=0)
+endif()

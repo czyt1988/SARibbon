@@ -199,9 +199,27 @@ qmake的编译过程会在SARibbon下生成`bin_qt{Qt version}_{MSVC/GNU}_x{32/6
 |        |   |-[SARibbonBar]
 ```
 
-### cmake
+### cmake（推荐）
 
-cmake在执行install后，会把必要的文件拷贝到安装目录下，cmake文件编写时可参考`src/example/MainWindowExample/CMakeLists.txt`
+建议在执行install后使用此库
+
+cmake引入方法：
+
+```cmake
+find_package(SARibbonBar REQUIRED)
+...
+target_link_libraries({your_target_name} PUBLIC SARibbonBar::SARibbonBar)
+```
+
+如果find_package找不到`SARibbonBar`，你需要把`SARibbon`安装位置需要高速给你的cmake工程
+
+```
+set(SARibbonBar_DIR "[你的SARibbonBar安装根目录]/lib/cmake")
+```
+
+如果你编译时，`SARIBBON_INSTALL_IN_CURRENT_DIR`选项设置为`ON`(默认)，那会在SARibbon工程根目录下下生成`bin_qt{Qt version}_{MSVC/GNU}_x{32/64}`文件夹作为安装目录，这是为了和qmake统一，也是为了方便一个操作系统进行多个不同版本qt和编译器进行区分安装，否则，windows系统会默认安装在`C:\Program Files\SARibbonBar`文件夹下
+
+通过cmake引入SARibbon可参考`src/example/MainWindowExample/CMakeLists.txt`
 
 具体见文档：[SARibbon构建](./doc/how-to-build-cn.md)
 
