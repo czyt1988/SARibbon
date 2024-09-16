@@ -74,15 +74,11 @@
 
 /*** End of inlined file: SAColorWidgetsGlobal.h ***/
 
-/*** Start of inlined file: SARibbonGlobal.h ***/
-#ifndef SARIBBONGLOBAL_H
-#define SARIBBONGLOBAL_H
-#include <memory>
-#include <QtGlobal>
-#include <QObject>
-class QWidget;
+/*** Start of inlined file: SARibbonBarVersionInfo.h ***/
+#ifndef SARIBBONVERSIONINFO_H
+#define SARIBBONVERSIONINFO_H
 /**
-  @file  SARibbonGlobal.h
+ * @file 此文档由cmake根据SARibbonBarVersionInfo.h.in自动生成，任何在此文件上的改动都将覆写
  */
 
 /**
@@ -104,6 +100,26 @@ class QWidget;
 #define SA_RIBBON_BAR_VERSION_PAT 4
 #endif
 
+/**
+ * @def 版本号（字符串）
+ */
+#ifndef SARIBBON_VERSION
+#define SARIBBON_VERSION "2.2.4"
+#endif
+
+#endif  // SARIBBONVERSIONINFO_H
+
+/*** End of inlined file: SARibbonBarVersionInfo.h ***/
+
+/*** Start of inlined file: SARibbonGlobal.h ***/
+#ifndef SARIBBONGLOBAL_H
+#define SARIBBONGLOBAL_H
+#include <memory>
+#include <QtGlobal>
+#include <QObject>
+
+class QWidget;
+
 #ifndef SA_RIBBON_BAR_NO_EXPORT
 #if defined(SA_RIBBON_BAR_MAKE_LIB)  // 定义此宏将构建library
 #define SA_RIBBON_EXPORT Q_DECL_EXPORT
@@ -111,7 +127,6 @@ class QWidget;
 #define SA_RIBBON_EXPORT Q_DECL_IMPORT
 #endif
 #endif
-
 #ifndef SA_RIBBON_EXPORT
 #define SA_RIBBON_EXPORT
 #endif
@@ -139,8 +154,7 @@ class QWidget;
 /**
  * @brief 定义Ribbon的对其方式，目前支持左对齐和居中对其
  */
-enum class SARibbonAlignment
-{
+SA_RIBBON_EXPORT enum class SARibbonAlignment {
 	AlignLeft,   ///< 左对齐，tab栏左对齐，同时category也是左对齐
 	AlignCenter  ///< 居中对其，tab栏居中对齐，同时category也是居中对齐
 };
@@ -153,8 +167,7 @@ enum class SARibbonAlignment
  * 例如ribbon tab的margin信息，在QTabBar是无法获取到，而这个影响了SARibbonContextCategory的绘制，
  * 因此，在设置qss后需要针对margin信息重新设置进SARibbonTabBar中
  */
-enum class SARibbonTheme
-{
+SA_RIBBON_EXPORT enum class SARibbonTheme {
 	RibbonThemeOffice2013,      ///< office2013主题
 	RibbonThemeOffice2016Blue,  ///< office2016-蓝色主题
 	RibbonThemeOffice2021Blue,  ///< office2021-蓝色主题
@@ -226,7 +239,7 @@ enum class SARibbonTheme
     仅用于调试
  */
 #ifndef SA_DEBUG_PRINT_SARIBBONBAR
-#define SA_DEBUG_PRINT_SARIBBONBAR 1
+#define SA_DEBUG_PRINT_SARIBBONBAR 0
 #endif
 
 /**
@@ -3668,7 +3681,7 @@ private slots:
 	void onPrimaryScreenChanged(QScreen* screen);
 };
 
-class SARibbonMainWindowEventFilter : public QObject
+class SA_RIBBON_EXPORT SARibbonMainWindowEventFilter : public QObject
 {
 	Q_OBJECT
 public:

@@ -1,5 +1,6 @@
 ﻿//Global
 #include "../../src/SARibbonBar/colorWidgets/SAColorWidgetsGlobal.h"
+#include "../../src/SARibbonBar/SARibbonBarVersionInfo.h"
 #include "../../src/SARibbonBar/SARibbonGlobal.h"
 //color widget
 #include "../../src/SARibbonBar/colorWidgets/SAColorMenu.h"

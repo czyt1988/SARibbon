@@ -174,9 +174,29 @@ At this point, your project directory looks like this:
 ```
 
 
-### cmake
+### cmake (recommended)
 
-After cmake executes install, it will copy the necessary files to the installation directory, which can be used as a reference when writing cmake files`src/example/MainWindowExample/CMakeLists.txt`
+It is recommended to use this library after execution of `install`.
+
+Method for introducing cmake:
+
+```cmake
+find_package(SARibbonBar REQUIRED)
+...
+target_link_libraries({your_target_name} PUBLIC SARibbonBar::SARibbonBar)
+```
+
+If `find_package` cannot find `SARibbonBar`, you need to inform your cmake project of the installation location of `SARibbon`.
+
+```
+set(SARibbonBar_DIR "[your SARibbonBar installation root directory]/lib/cmake")
+```
+
+If during compilation, the `SARIBBON_INSTALL_IN_CURRENT_DIR` option is set to `ON` (default), a `bin_qt{Qt version}_{MSVC/GNU}_x{32/64}` folder will be generated under the root directory of the SARibbon project as the installation directory. This is to align with qmake and facilitate the installation of multiple different versions of Qt and compilers on a single operating system. Otherwise, on Windows, it will be installed in the `C:\Program Files\SARibbonBar` folder by default.
+
+For reference on introducing SARibbon via cmake, see `src/example/MainWindowExample/CMakeLists.txt`.
+
+For details, refer to the documentation: [SARibbon Building](./doc/how-to-build-cn.md)
 
 ## Get started quickly
 
