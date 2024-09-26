@@ -1,4 +1,4 @@
-﻿#include "SARibbonMainWindow.h"
+#include "SARibbonMainWindow.h"
 #include "SARibbonBar.h"
 #include "SARibbonElementManager.h"
 #include "SARibbonTabBar.h"
@@ -151,7 +151,7 @@ void SARibbonMainWindow::setRibbonBar(SARibbonBar* ribbon)
  * @param w
  * @param visible
  */
-void SARibbonMainWindow::setFramelessHitTestVisible(const QWidget* w, bool visible)
+void SARibbonMainWindow::setFramelessHitTestVisible(QWidget* w, bool visible)
 {
 	auto helper = d_ptr->mFramelessHelper;
 	helper->setHitTestVisible(w, visible);

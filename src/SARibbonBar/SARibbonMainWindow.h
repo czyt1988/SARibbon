@@ -1,4 +1,4 @@
-﻿#ifndef SARIBBONMAINWINDOW_H
+#ifndef SARIBBONMAINWINDOW_H
 #define SARIBBONMAINWINDOW_H
 #include "SARibbonGlobal.h"
 #include <QMainWindow>
@@ -75,7 +75,7 @@ public:
 	SAFramelessHelper* framelessHelper();
 #else
 	// 如果ribbon中有自定义的窗口在标题栏等非点击区域加入后，想能点击，需要调用此接口告知可点击
-	void setFramelessHitTestVisible(const QWidget* w, bool visible = true);
+	void setFramelessHitTestVisible(QWidget* w, bool visible = true);
 #endif
 	// 此函数仅用于控制最小最大化和关闭按钮的显示
 	void updateWindowFlag(Qt::WindowFlags flags);
