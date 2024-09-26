@@ -1,4 +1,4 @@
-﻿#ifndef SARIBBONGLOBAL_H
+#ifndef SARIBBONGLOBAL_H
 #define SARIBBONGLOBAL_H
 #include <memory>
 #include <QtGlobal>
@@ -40,7 +40,8 @@ class QWidget;
 /**
  * @brief 定义Ribbon的对其方式，目前支持左对齐和居中对其
  */
-SA_RIBBON_EXPORT enum class SARibbonAlignment {
+enum class SARibbonAlignment
+{
 	AlignLeft,   ///< 左对齐，tab栏左对齐，同时category也是左对齐
 	AlignCenter  ///< 居中对其，tab栏居中对齐，同时category也是居中对齐
 };
@@ -53,7 +54,8 @@ SA_RIBBON_EXPORT enum class SARibbonAlignment {
  * 例如ribbon tab的margin信息，在QTabBar是无法获取到，而这个影响了SARibbonContextCategory的绘制，
  * 因此，在设置qss后需要针对margin信息重新设置进SARibbonTabBar中
  */
-SA_RIBBON_EXPORT enum class SARibbonTheme {
+enum class SARibbonTheme
+{
 	RibbonThemeOffice2013,      ///< office2013主题
 	RibbonThemeOffice2016Blue,  ///< office2016-蓝色主题
 	RibbonThemeOffice2021Blue,  ///< office2021-蓝色主题
