@@ -27,13 +27,13 @@ public:
     // 设置颜色是否是checkable
     void setColorCheckable(bool on = true);
     bool isColorCheckable() const;
-private slots:
+private Q_SLOTS:
     void onMainColorClicked(const QColor& c);
     void onPaletteColorClicked(const QColor& c);
 
 private:
     void init();
-signals:
+Q_SIGNALS:
     /**
      * @brief 对于check模式，check的颜色触发的信号
      * @param c

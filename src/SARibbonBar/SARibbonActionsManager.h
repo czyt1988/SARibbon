@@ -103,14 +103,14 @@ public:
     //清除
     void clear();
 
-signals:
+Q_SIGNALS:
 
     /**
      * @brief 标签变化触发的信号，变化包括新增和删除
      */
     void actionTagChanged(int tag, bool isdelete);
 
-private slots:
+private Q_SLOTS:
     void onActionDestroyed(QObject* o);
     void onCategoryTitleChanged(const QString& title);
 
@@ -140,7 +140,7 @@ public:
     QAction* indexToAction(QModelIndex index) const;
     void search(const QString& text);
 
-private slots:
+private Q_SLOTS:
     void onActionTagChanged(int tag, bool isdelete);
 };
 
