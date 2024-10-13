@@ -15,7 +15,7 @@ class InnerWidget : public QWidget
 public:
     explicit InnerWidget(QWidget* parent = nullptr);
     ~InnerWidget();
-public slots:
+public Q_SLOTS:
     void appendText(const QString& t);
 
 private:
