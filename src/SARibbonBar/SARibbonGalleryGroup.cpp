@@ -378,7 +378,7 @@ SARibbonGalleryGroupModel* SARibbonGalleryGroup::groupModel()
 void SARibbonGalleryGroup::setGroupTitle(const QString& title)
 {
     d_ptr->mGroupTitle = title;
-    emit groupTitleChanged(d_ptr->mGroupTitle);
+    Q_EMIT groupTitleChanged(d_ptr->mGroupTitle);
 }
 
 QString SARibbonGalleryGroup::groupTitle() const

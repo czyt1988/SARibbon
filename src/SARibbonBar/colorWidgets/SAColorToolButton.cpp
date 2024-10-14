@@ -419,7 +419,7 @@ void SAColorToolButton::setColor(const QColor& c)
     if (d_ptr->mColor != c) {
         d_ptr->mColor = c;
         repaint();
-        emit colorChanged(c);
+        Q_EMIT colorChanged(c);
     }
 }
 
@@ -522,7 +522,7 @@ QSize SAColorToolButton::sizeHint() const
 
 void SAColorToolButton::onButtonClicked(bool checked)
 {
-    emit colorClicked(color(), checked);
+    Q_EMIT colorClicked(color(), checked);
 }
 
 /**

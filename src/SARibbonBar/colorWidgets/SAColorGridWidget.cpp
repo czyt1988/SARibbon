@@ -439,7 +439,7 @@ void SAColorGridWidget::onButtonClicked(QAbstractButton* btn)
 {
     SAColorToolButton* t = qobject_cast< SAColorToolButton* >(btn);
     if (t) {
-        emit colorClicked(t->color());
+        Q_EMIT colorClicked(t->color());
     }
 }
 
@@ -447,7 +447,7 @@ void SAColorGridWidget::onButtonPressed(QAbstractButton* btn)
 {
     SAColorToolButton* t = qobject_cast< SAColorToolButton* >(btn);
     if (t) {
-        emit colorPressed(t->color());
+        Q_EMIT colorPressed(t->color());
     }
 }
 
@@ -455,7 +455,7 @@ void SAColorGridWidget::onButtonToggled(QAbstractButton* btn, bool on)
 {
     SAColorToolButton* t = qobject_cast< SAColorToolButton* >(btn);
     if (t) {
-        emit colorToggled(t->color(), on);
+        Q_EMIT colorToggled(t->color(), on);
     }
 }
 
@@ -480,7 +480,7 @@ void SAColorGridWidget::onButtonReleased(QAbstractButton* btn)
 {
     SAColorToolButton* t = qobject_cast< SAColorToolButton* >(btn);
     if (t) {
-        emit colorReleased(t->color());
+        Q_EMIT colorReleased(t->color());
     }
 }
 

@@ -134,7 +134,7 @@ bool SARibbonActionsManager::registeAction(QAction* act, int tag, const QString&
     connect(act, &QObject::destroyed, this, &SARibbonActionsManager::onActionDestroyed);
     if (isneedemit && enableEmit) {
         // 说明新增tag
-        emit actionTagChanged(tag, false);
+        Q_EMIT actionTagChanged(tag, false);
     }
     return (true);
 }
@@ -196,7 +196,7 @@ void SARibbonActionsManager::removeAction(QAction* act, bool enableEmit)
     // 发射信号
     if (enableEmit) {
         for (int tagdelete : qAsConst(deletedTags)) {
-            emit actionTagChanged(tagdelete, true);
+            Q_EMIT actionTagChanged(tagdelete, true);
         }
     }
 }
