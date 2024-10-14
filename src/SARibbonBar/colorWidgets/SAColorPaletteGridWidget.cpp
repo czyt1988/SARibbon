@@ -161,11 +161,11 @@ bool SAColorPaletteGridWidget::isColorCheckable() const
 void SAColorPaletteGridWidget::onMainColorClicked(const QColor& c)
 {
     d_ptr->mPaletteColorGrid->clearCheckedState();
-    emit colorClicked(c);
+    Q_EMIT colorClicked(c);
 }
 
 void SAColorPaletteGridWidget::onPaletteColorClicked(const QColor& c)
 {
     d_ptr->mMainColorList->clearCheckedState();
-    emit colorClicked(c);
+    Q_EMIT colorClicked(c);
 }

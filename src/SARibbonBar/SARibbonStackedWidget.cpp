@@ -103,7 +103,7 @@ void SARibbonStackedWidget::hideEvent(QHideEvent* e)
         }
     }
     setFocus();
-    emit hidWindow();
+    Q_EMIT hidWindow();
 
     QStackedWidget::hideEvent(e);
 }

@@ -735,7 +735,7 @@ void SARibbonPannel::setPannelName(const QString& title)
     QString oldName = pannelName();
     if (oldName != title) {
         d_ptr->setPannelName(title);
-        emit pannelNameChanged(title);
+        Q_EMIT pannelNameChanged(title);
     }
 }
 
