@@ -181,13 +181,13 @@ void SARibbonColorToolButton::setColor(const QColor& c)
             setIcon(d_ptr->createColorIcon(c, QSize(32, 32)));
         }
         repaint();
-        emit colorChanged(c);
+        Q_EMIT colorChanged(c);
     }
 }
 
 void SARibbonColorToolButton::onButtonClicked(bool checked)
 {
-    emit colorClicked(d_ptr->mColor, checked);
+    Q_EMIT colorClicked(d_ptr->mColor, checked);
 }
 
 /**

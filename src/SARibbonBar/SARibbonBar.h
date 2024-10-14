@@ -368,7 +368,7 @@ public:
 
     // 设置边角widget可见性，对于mdi窗口，会出现TopLeftCorner和TopRightCorner两个corner widget
     void setCornerWidgetVisible(bool on, Qt::Corner c = Qt::TopLeftCorner);
-signals:
+Q_SIGNALS:
 
     /**
      @brief 应用按钮点击响应 - 左上角的按钮，通过关联此信号触发应用按钮点击的效果
@@ -416,7 +416,7 @@ protected:
     void updateCategoryTitleToTabName();
     // 告知WindowButtonGroup的尺寸
     void setWindowButtonGroupSize(const QSize& s);
-protected slots:
+protected Q_SLOTS:
     void onWindowTitleChanged(const QString& title);
     void onWindowIconChanged(const QIcon& i);
     void onCategoryWindowTitleChanged(const QString& title);

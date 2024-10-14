@@ -69,7 +69,7 @@ public:
 protected:
     virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
 
-protected slots:
+protected Q_SLOTS:
     Q_SLOT void closeWindow();
     Q_SLOT void minimizeWindow();
     Q_SLOT void maximizeWindow();
