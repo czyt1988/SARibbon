@@ -38,7 +38,7 @@ public:
 	QWidget* widget() const;
     //
     QWidget* takeWidget();
-private slots:
+private Q_SLOTS:
 	void onPrimaryScreenChanged(QScreen* screen);
 };
 

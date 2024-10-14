@@ -43,7 +43,7 @@ public:
 
     //判断上下文是否维护了此SARibbonCategory
     bool isHaveCategory(SARibbonCategory* category) const;
-signals:
+Q_SIGNALS:
     /**
      * @brief 标签加入上下文
      * @param category
@@ -68,7 +68,7 @@ signals:
      * @param title 新名字
      */
     void categoryTitleChanged(SARibbonCategory* category, const QString& title);
-private slots:
+private Q_SLOTS:
     void onCategoryTitleChanged(const QString& title);
 
 protected:

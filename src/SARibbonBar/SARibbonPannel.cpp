@@ -1002,3 +1002,12 @@ const QList< SARibbonPannelItem* >& SARibbonPannel::ribbonPannelItem() const
 {
     return (pannelLayout()->mItems);
 }
+
+/**
+ * @brief 获取最近添加的按钮
+ * @return 刚才添加的按钮的指针
+ */
+SARibbonToolButton* SARibbonPannel::lastAddActionButton()
+{
+    return d_ptr->lastAddActionButton();
+}

@@ -62,13 +62,13 @@ public:
     void setRowMinimumHeight(int row, int minSize);
     // 让颜色块左对齐
     void setHorizontalSpacerToRight(bool on = true);
-private slots:
+private Q_SLOTS:
     void onButtonClicked(QAbstractButton* btn);
     void onButtonPressed(QAbstractButton* btn);
     void onButtonReleased(QAbstractButton* btn);
     void onButtonToggled(QAbstractButton* btn, bool on);
 
-signals:
+Q_SIGNALS:
     /**
      * @brief 对于check模式，check的颜色触发的信号
      * @param c
