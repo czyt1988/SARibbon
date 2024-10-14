@@ -2,7 +2,6 @@
 # include/SARibbonBar/
 
 include($$PWD/common.pri)
-SARIBBON_INCLUDE_DIR = $$PWD/../../include/SARibbonBar
 INCLUDEPATH += $${SARIBBON_INCLUDE_DIR}
 DEPENDPATH += $${SARIBBON_INCLUDE_DIR}
 
@@ -25,11 +24,6 @@ contains( SA_RIBBON_CONFIG, use_frameless ) {
     !contains(CONFIG,C++17){
         CONFIG += c++17
     }
-    # framelessHelper的引用路径
-    INCLUDEPATH += $${SARIBBON_INCLUDE_DIR}/3rdparty/framelesshelper/include
-    DEPENDPATH += $${SARIBBON_INCLUDE_DIR}/3rdparty/framelesshelper/include
-    INCLUDEPATH += $${SARIBBON_INCLUDE_DIR}/3rdparty/framelesshelper/qmake/inc/core
-    DEPENDPATH += $${SARIBBON_INCLUDE_DIR}/3rdparty/framelesshelper/qmake/inc/core
     # 定义FRAMELESSHELPER_FEATURE_static_build为-1让frameless也作为库的一部分
     DEFINES += FRAMELESSHELPER_FEATURE_static_build=-1
     # 定义SARIBBON_USE_3RDPARTY_FRAMELESSHELPER为1
