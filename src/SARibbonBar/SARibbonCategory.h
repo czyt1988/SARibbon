@@ -121,7 +121,7 @@ public:
 
     // 此函数会遍历Category下的所有pannel,执行函数指针，函数指针返回false则停止迭代
     bool iterate(FpPannelIterate fp);
-signals:
+Q_SIGNALS:
     /**
      * @brief category标题发生了改变信号
      * @param n
