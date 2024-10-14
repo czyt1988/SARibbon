@@ -71,7 +71,7 @@ public:
     SAColorMenu* colorMenu() const;
     // 建立标准的颜色菜单
     SAColorMenu* createColorMenu();
-public slots:
+public Q_SLOTS:
     // 设置颜色,会发射colorChanged信号
     void setColor(const QColor& c);
 
@@ -87,9 +87,9 @@ protected:
     virtual void paintEvent(QPaintEvent* e) Q_DECL_OVERRIDE;
     virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
     virtual QSize sizeHint() const Q_DECL_OVERRIDE;
-private slots:
+private Q_SLOTS:
     void onButtonClicked(bool checked = false);
-signals:
+Q_SIGNALS:
     /**
      * @brief 颜色被点击的响应
      * @param color

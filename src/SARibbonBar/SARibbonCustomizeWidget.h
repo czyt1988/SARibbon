@@ -129,7 +129,7 @@ protected:
     //删除一个item
     void removeItem(QStandardItem* item);
 
-private slots:
+private Q_SLOTS:
     void onComboBoxActionIndexCurrentIndexChanged(int index);
     void onRadioButtonGroupButtonClicked(QAbstractButton* b);
     void onPushButtonNewCategoryClicked();

@@ -16,7 +16,7 @@ public:
 private:
 	void buildRibbon(SARibbonBar* bar);
 	QAction* createAction(const QString& text, const QString& iconurl);
-private slots:
+private Q_SLOTS:
 	void onRibbonThemeComboBoxCurrentIndexChanged(int index);
 
 private:

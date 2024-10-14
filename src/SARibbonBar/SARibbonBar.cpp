@@ -1080,7 +1080,7 @@ void SARibbonBar::setMinimumMode(bool isMinimum)
 	QResizeEvent resizeEvent(size(), size());
 	QApplication::sendEvent(this, &resizeEvent);
 	// 发射信号
-	emit ribbonModeChanged(isMinimum ? MinimumRibbonMode : NormalRibbonMode);
+	Q_EMIT ribbonModeChanged(isMinimum ? MinimumRibbonMode : NormalRibbonMode);
 }
 
 ///
@@ -1211,7 +1211,7 @@ void SARibbonBar::setTitleBarHeight(int h, bool resizeByNow)
 	if (resizeByNow) {
 		updateRibbonGeometry();
 	}
-	emit titleBarHeightChanged(oldHeight, h);
+	Q_EMIT titleBarHeightChanged(oldHeight, h);
 }
 
 /**
@@ -1291,7 +1291,7 @@ void SARibbonBar::onCurrentRibbonTabChanged(int index)
 	if (d_ptr->mStackedContainerWidget->currentWidget() != category) {
 		d_ptr->mStackedContainerWidget->setCurrentWidget(category);
 	}
-	emit currentRibbonTabChanged(index);
+	Q_EMIT currentRibbonTabChanged(index);
 	if (isMinimumMode()) {
 		d_ptr->mRibbonTabBar->clearFocus();
 		if (!d_ptr->mStackedContainerWidget->isVisible()) {
@@ -1512,7 +1512,7 @@ void SARibbonBar::setRibbonStyle(SARibbonBar::RibbonStyles v)
 	synchronousCategoryData(false);  // 这里不急着刷新，下面会继续刷新
 	d_ptr->resetSize();
 
-	emit ribbonStyleChanged(d_ptr->mRibbonStyle);
+	Q_EMIT ribbonStyleChanged(d_ptr->mRibbonStyle);
 }
 
 /**
