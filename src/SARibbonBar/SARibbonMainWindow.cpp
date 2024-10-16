@@ -154,7 +154,7 @@ void SARibbonMainWindow::setRibbonBar(SARibbonBar* ribbon)
 void SARibbonMainWindow::setFramelessHitTestVisible(QWidget* w, bool visible)
 {
 	auto helper = d_ptr->mFramelessHelper;
-	helper->setHitTestVisible(w, visible);
+	helper->setHitTestVisible(const_cast<QWidget*>(w), visible);
 }
 #else
 

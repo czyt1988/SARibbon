@@ -39,7 +39,7 @@ private:
 	void createActionsManager();
 	QAction* createAction(const QString& text, const QString& iconurl, const QString& objName);
 	QAction* createAction(const QString& text, const QString& iconurl);
-private slots:
+private Q_SLOTS:
 	void onMenuButtonPopupCheckableTest(bool b);
 	void onInstantPopupCheckableTest(bool b);
 	void onDelayedPopupCheckableTest(bool b);
@@ -56,7 +56,6 @@ private slots:
 	void onActionUseQssTriggered();
 	void onActionLoadCustomizeXmlFileTriggered();
 	void onActionWindowFlagNormalButtonTriggered(bool b);
-
 	void onFontComWidgetCurrentFontChanged(const QFont& f);
 	void onActionFontLargerTriggered();
 	void onActionFontSmallerTriggered();

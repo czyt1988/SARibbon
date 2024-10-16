@@ -70,6 +70,31 @@ build步骤选择install（有些版本qt creator无法all和install一起选中
 
 此时完成`QWindowkit`库的编译和安装
 
+## 使用命令行构建(适用Qt5及vs2019以下)
+
+由于`QWindowkit`库要求的cmake版本较高，vs2019及以下版本内置的cmake版本基本都无法满足，因此需要通过命令行对`QWindowkit`库进行构建，这里介绍在windows下如何通过cmd命令行构建`QWindowkit`库
+
+首先你要安装一个高版本的cmake工具,假设安装在了`C:\Program Files (x86)\cmake3.27.9\bin\cmake.exe`,同时你要确认你的qt版本路径和编译器，这里以Qt5.14.2 MSVC 2017版本举例
+
+找到你qt的安装路径下Qt5Config.cmake所在的文件夹，例如：`C:\Qt\Qt5.14.2\5.14.2\msvc2017_64\lib\cmake\Qt5`
+
+打开命令行，cd到`src/SARibbonBar/3rdparty`目录，首先执行下面语句：
+
+```
+"C:\Program Files (x86)\cmake3.27.9\bin\cmake.exe" -B build -S . -G "Visual Studio 15 2017" -A x64 -DQt5_DIR="C:\Qt\Qt5.14.2\5.14.2\msvc2017_64\lib\cmake\Qt5"
+```
+
+一般你的cmake.exe无法不在环境变量中，你在cmd命令中可以指定完整cmake路径，执行完后会看到如下输出：
+
+![](./pic/cmd-build-qwk.png)
+
+接着你再执行下面两个命令即可
+
+```
+"C:\Program Files (x86)\cmake3.27.9\bin\cmake.exe" --build build --target install --config Debug
+"C:\Program Files (x86)\cmake3.27.9\bin\cmake.exe" --build build --target install --config Release
+```
+
 # 构建SARibbonBar库
 
 `SARibbonBar`库提供`cmake`和`qmake`两种方式构建，推荐使用`cmake`

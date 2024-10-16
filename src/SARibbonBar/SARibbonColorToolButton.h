@@ -31,12 +31,12 @@ public:
     ColorStyle colorStyle() const;
     // 建立标准的颜色菜单
     SAColorMenu* setupStandardColorMenu();
-public slots:
+public Q_SLOTS:
     // 设置颜色,会发射colorChanged信号
     void setColor(const QColor& c);
-private slots:
+private Q_SLOTS:
     void onButtonClicked(bool checked = false);
-signals:
+Q_SIGNALS:
     /**
      * @brief 颜色被点击的响应
      * @param color

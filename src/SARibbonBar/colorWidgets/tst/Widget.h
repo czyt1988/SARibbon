@@ -20,7 +20,7 @@ public:
     QColor makeRandColor() const;
     //
     void setColor(const QColor& clr);
-private slots:
+private Q_SLOTS:
     void onGridColorWidgetClicked(const QColor& c);
 
 private:

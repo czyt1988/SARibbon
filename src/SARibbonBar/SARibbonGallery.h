@@ -64,7 +64,7 @@ public:
 public:
     // 设置最右边三个控制按钮的最大宽度（默认15）
     static void setGalleryButtonMaximumWidth(int w);
-signals:
+Q_SIGNALS:
     /**
      * @brief 转发管理的SARibbonGalleryGroup::triggered
      * 所有加入SARibbonGallery的action都会被一个QActionGroup管理,可以通过@sa getActionGroup 获取到对应的actiongroup
@@ -78,14 +78,14 @@ signals:
      */
     void hovered(QAction* action);
 
-public slots:
+public Q_SLOTS:
     // 上翻页
     virtual void pageUp();
     // 下翻页
     virtual void pageDown();
     // 显示更多触发，默认弹出内部管理的SARibbonGalleryViewport，用户可重载此函数实现自定义的弹出
     virtual void showMoreDetail();
-protected slots:
+protected Q_SLOTS:
     void onItemClicked(const QModelIndex& index);
     virtual void onTriggered(QAction* action);
 
@@ -113,7 +113,7 @@ public:
     QLabel* titleLabel(QWidget* w);
     // 移除窗口
     void removeWidget(QWidget* w);
-public slots:
+public Q_SLOTS:
     void onTitleChanged(QWidget* w, const QString& title);
 
 private:

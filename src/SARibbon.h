@@ -298,16 +298,16 @@ public:
 	void enableNoneColorAction(bool on = true);
 	// 获取None Color Action,注意，enableNoneColorAction(true),之后才不是nullptr
 	QAction* noneColorAction() const;
-public slots:
+public Q_SLOTS:
 	// 这是一个辅助槽函数，为了让用户自定义的其他action也能关联menu，可以调用此槽函数，实现selectedColor信号以及menu的隐藏
 	void emitSelectedColor(const QColor& c);
-signals:
+Q_SIGNALS:
 	/**
 	 * @brief 选择了颜色触发的信号
 	 * @param c
 	 */
 	void selectedColor(const QColor& c);
-private slots:
+private Q_SLOTS:
 	void onCustomColorActionTriggered(bool on);
 	void onNoneColorActionTriggered(bool on);
 
@@ -384,13 +384,13 @@ public:
 	void setRowMinimumHeight(int row, int minSize);
 	// 让颜色块左对齐
 	void setHorizontalSpacerToRight(bool on = true);
-private slots:
+private Q_SLOTS:
 	void onButtonClicked(QAbstractButton* btn);
 	void onButtonPressed(QAbstractButton* btn);
 	void onButtonReleased(QAbstractButton* btn);
 	void onButtonToggled(QAbstractButton* btn, bool on);
 
-signals:
+Q_SIGNALS:
 	/**
 	 * @brief 对于check模式，check的颜色触发的信号
 	 * @param c
@@ -446,13 +446,13 @@ public:
 	// 设置颜色是否是checkable
 	void setColorCheckable(bool on = true);
 	bool isColorCheckable() const;
-private slots:
+private Q_SLOTS:
 	void onMainColorClicked(const QColor& c);
 	void onPaletteColorClicked(const QColor& c);
 
 private:
 	void init();
-signals:
+Q_SIGNALS:
 	/**
 	 * @brief 对于check模式，check的颜色触发的信号
 	 * @param c
@@ -539,7 +539,7 @@ public:
 	SAColorMenu* colorMenu() const;
 	// 建立标准的颜色菜单
 	SAColorMenu* createColorMenu();
-public slots:
+public Q_SLOTS:
 	// 设置颜色,会发射colorChanged信号
 	void setColor(const QColor& c);
 
@@ -555,9 +555,9 @@ protected:
 	virtual void paintEvent(QPaintEvent* e) Q_DECL_OVERRIDE;
 	virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
 	virtual QSize sizeHint() const Q_DECL_OVERRIDE;
-private slots:
+private Q_SLOTS:
 	void onButtonClicked(bool checked = false);
-signals:
+Q_SIGNALS:
 	/**
 	 * @brief 颜色被点击的响应
 	 * @param color
@@ -727,7 +727,7 @@ public:
 protected:
 	virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
 
-protected slots:
+protected Q_SLOTS:
 	Q_SLOT void closeWindow();
 	Q_SLOT void minimizeWindow();
 	Q_SLOT void maximizeWindow();
@@ -876,12 +876,12 @@ public:
 	ColorStyle colorStyle() const;
 	// 建立标准的颜色菜单
 	SAColorMenu* setupStandardColorMenu();
-public slots:
+public Q_SLOTS:
 	// 设置颜色,会发射colorChanged信号
 	void setColor(const QColor& c);
-private slots:
+private Q_SLOTS:
 	void onButtonClicked(bool checked = false);
-signals:
+Q_SIGNALS:
 	/**
 	 * @brief 颜色被点击的响应
 	 * @param color
@@ -1055,14 +1055,14 @@ public:
 	// 清除
 	void clear();
 
-signals:
+Q_SIGNALS:
 
 	/**
 	 * @brief 标签变化触发的信号，变化包括新增和删除
 	 */
 	void actionTagChanged(int tag, bool isdelete);
 
-private slots:
+private Q_SLOTS:
 	void onActionDestroyed(QObject* o);
 	void onCategoryTitleChanged(const QString& title);
 
@@ -1092,7 +1092,7 @@ public:
 	QAction* indexToAction(QModelIndex index) const;
 	void search(const QString& text);
 
-private slots:
+private Q_SLOTS:
 	void onActionTagChanged(int tag, bool isdelete);
 };
 
@@ -1208,7 +1208,7 @@ public:
 
 public:
 	bool iterate(FpButtonIterate fp);
-signals:
+Q_SIGNALS:
 
 	/**
 	 * @brief 参考QToolBar::actionTriggered的信号
@@ -1259,7 +1259,7 @@ protected:
 	//    void mouseReleaseEvent(QMouseEvent *e);
 	void hideEvent(QHideEvent* e) Q_DECL_OVERRIDE;
 	virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
-signals:
+Q_SIGNALS:
 	/**
 	 * @brief hidWindow
 	 */
@@ -1853,7 +1853,7 @@ public:
 	QSize toolButtonIconSize() const;
 	// 此函数会遍历SARibbonPannel下的所有RibbonToolButton，执行函数指针(bool(SARibbonRibbonToolButton*))，函数指针返回false则停止迭代
 	bool iterate(FpRibbonToolButtonIterate fp);
-signals:
+Q_SIGNALS:
 
 	/**
 	 * @brief 等同于QToolBar::actionTriggered
@@ -2017,7 +2017,7 @@ public:
 
 	// 此函数会遍历Category下的所有pannel,执行函数指针，函数指针返回false则停止迭代
 	bool iterate(FpPannelIterate fp);
-signals:
+Q_SIGNALS:
 	/**
 	 * @brief category标题发生了改变信号
 	 * @param n
@@ -2135,7 +2135,7 @@ public:
 	// 设置Category的对齐方式
 	void setCategoryAlignment(SARibbonAlignment al);
 	SARibbonAlignment categoryAlignment() const;
-private slots:
+private Q_SLOTS:
 	void onLeftScrollButtonClicked();
 	void onRightScrollButtonClicked();
 };
@@ -2202,7 +2202,7 @@ public:
 
 	// 判断上下文是否维护了此SARibbonCategory
 	bool isHaveCategory(SARibbonCategory* category) const;
-signals:
+Q_SIGNALS:
 	/**
 	 * @brief 标签加入上下文
 	 * @param category
@@ -2227,7 +2227,7 @@ signals:
 	 * @param title 新名字
 	 */
 	void categoryTitleChanged(SARibbonCategory* category, const QString& title);
-private slots:
+private Q_SLOTS:
 	void onCategoryTitleChanged(const QString& title);
 
 protected:
@@ -2424,10 +2424,10 @@ public:
 	int gridMaximumWidth() const;
 	// 获取SARibbonGalleryGroup管理的actiongroup
 	QActionGroup* actionGroup() const;
-private slots:
+private Q_SLOTS:
 	void onItemClicked(const QModelIndex& index);
 	void onItemEntered(const QModelIndex& index);
-signals:
+Q_SIGNALS:
 	void groupTitleChanged(const QString& title);
 	/**
 	 * @brief 等同QActionGroup的triggered
@@ -2515,7 +2515,7 @@ public:
 public:
 	// 设置最右边三个控制按钮的最大宽度（默认15）
 	static void setGalleryButtonMaximumWidth(int w);
-signals:
+Q_SIGNALS:
 	/**
 	 * @brief 转发管理的SARibbonGalleryGroup::triggered
 	 * 所有加入SARibbonGallery的action都会被一个QActionGroup管理,可以通过@sa getActionGroup 获取到对应的actiongroup
@@ -2529,14 +2529,14 @@ signals:
 	 */
 	void hovered(QAction* action);
 
-public slots:
+public Q_SLOTS:
 	// 上翻页
 	virtual void pageUp();
 	// 下翻页
 	virtual void pageDown();
 	// 显示更多触发，默认弹出内部管理的SARibbonGalleryViewport，用户可重载此函数实现自定义的弹出
 	virtual void showMoreDetail();
-protected slots:
+protected Q_SLOTS:
 	void onItemClicked(const QModelIndex& index);
 	virtual void onTriggered(QAction* action);
 
@@ -2564,7 +2564,7 @@ public:
 	QLabel* titleLabel(QWidget* w);
 	// 移除窗口
 	void removeWidget(QWidget* w);
-public slots:
+public Q_SLOTS:
 	void onTitleChanged(QWidget* w, const QString& title);
 
 private:
@@ -2945,7 +2945,7 @@ public:
 
 	// 设置边角widget可见性，对于mdi窗口，会出现TopLeftCorner和TopRightCorner两个corner widget
 	void setCornerWidgetVisible(bool on, Qt::Corner c = Qt::TopLeftCorner);
-signals:
+Q_SIGNALS:
 
 	/**
 	 @brief 应用按钮点击响应 - 左上角的按钮，通过关联此信号触发应用按钮点击的效果
@@ -2993,7 +2993,7 @@ protected:
 	void updateCategoryTitleToTabName();
 	// 告知WindowButtonGroup的尺寸
 	void setWindowButtonGroupSize(const QSize& s);
-protected slots:
+protected Q_SLOTS:
 	void onWindowTitleChanged(const QString& title);
 	void onWindowIconChanged(const QIcon& i);
 	void onCategoryWindowTitleChanged(const QString& title);
@@ -3438,7 +3438,7 @@ protected:
 	// 删除一个item
 	void removeItem(QStandardItem* item);
 
-private slots:
+private Q_SLOTS:
 	void onComboBoxActionIndexCurrentIndexChanged(int index);
 	void onRadioButtonGroupButtonClicked(QAbstractButton* b);
 	void onPushButtonNewCategoryClicked();
@@ -3677,7 +3677,7 @@ public:
 protected:
 	// 创建ribbonbar的工厂函数
 	SARibbonBar* createRibbonBar();
-private slots:
+private Q_SLOTS:
 	void onPrimaryScreenChanged(QScreen* screen);
 };
 
@@ -3734,7 +3734,7 @@ public:
 	QWidget* widget() const;
 	//
 	QWidget* takeWidget();
-private slots:
+private Q_SLOTS:
 	void onPrimaryScreenChanged(QScreen* screen);
 };
 

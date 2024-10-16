@@ -33,16 +33,16 @@ public:
     void enableNoneColorAction(bool on = true);
     // 获取None Color Action,注意，enableNoneColorAction(true),之后才不是nullptr
     QAction* noneColorAction() const;
-public slots:
+public Q_SLOTS:
     // 这是一个辅助槽函数，为了让用户自定义的其他action也能关联menu，可以调用此槽函数，实现selectedColor信号以及menu的隐藏
     void emitSelectedColor(const QColor& c);
-signals:
+Q_SIGNALS:
     /**
      * @brief 选择了颜色触发的信号
      * @param c
      */
     void selectedColor(const QColor& c);
-private slots:
+private Q_SLOTS:
     void onCustomColorActionTriggered(bool on);
     void onNoneColorActionTriggered(bool on);
 

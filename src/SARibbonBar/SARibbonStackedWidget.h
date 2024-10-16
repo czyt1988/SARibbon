@@ -32,7 +32,7 @@ protected:
     //    void mouseReleaseEvent(QMouseEvent *e);
     void hideEvent(QHideEvent* e) Q_DECL_OVERRIDE;
     virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
-signals:
+Q_SIGNALS:
     /**
      * @brief hidWindow
      */
