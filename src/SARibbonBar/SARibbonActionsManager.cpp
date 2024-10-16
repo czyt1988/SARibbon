@@ -2,21 +2,22 @@
 #include <QMap>
 #include <QHash>
 #include <QDebug>
+#include <QWidgetAction>
 #include "SARibbonBar.h"
 
 class SARibbonActionsManager::PrivateData
 {
-    SA_RIBBON_DECLARE_PUBLIC(SARibbonActionsManager)
+	SA_RIBBON_DECLARE_PUBLIC(SARibbonActionsManager)
 public:
-    PrivateData(SARibbonActionsManager* p);
-    void clear();
+	PrivateData(SARibbonActionsManager* p);
+	void clear();
 
-    QMap< int, QList< QAction* > > mTagToActions;   ///< tag : QList<QAction*>
-    QMap< int, QString > mTagToName;                ///< tag对应的名字
-    QHash< QString, QAction* > mKeyToAction;        ///< key对应action
-    QMap< QAction*, QString > mActionToKey;         ///< action对应key
-    QMap< int, SARibbonCategory* > mTagToCategory;  ///< 仅仅在autoRegisteActions函数会有用
-    int mSale;  ///< 盐用于生成固定的id，在用户不主动设置key时，id基于msale生成，只要SARibbonActionsManager的调用registeAction顺序不变，生成的id都不变，因为它是基于自增实现的
+	QMap< int, QList< QAction* > > mTagToActions;   ///< tag : QList<QAction*>
+	QMap< int, QString > mTagToName;                ///< tag对应的名字
+	QHash< QString, QAction* > mKeyToAction;        ///< key对应action
+	QMap< QAction*, QString > mActionToKey;         ///< action对应key
+	QMap< int, SARibbonCategory* > mTagToCategory;  ///< 仅仅在autoRegisteActions函数会有用
+	int mSale;  ///< 盐用于生成固定的id，在用户不主动设置key时，id基于msale生成，只要SARibbonActionsManager的调用registeAction顺序不变，生成的id都不变，因为它是基于自增实现的
 };
 
 SARibbonActionsManager::PrivateData::PrivateData(SARibbonActionsManager* p) : q_ptr(p), mSale(0)
@@ -25,12 +26,12 @@ SARibbonActionsManager::PrivateData::PrivateData(SARibbonActionsManager* p) : q_
 
 void SARibbonActionsManager::PrivateData::clear()
 {
-    mTagToActions.clear();
-    mTagToName.clear();
-    mKeyToAction.clear();
-    mActionToKey.clear();
-    mTagToCategory.clear();
-    mSale = 0;
+	mTagToActions.clear();
+	mTagToName.clear();
+	mKeyToAction.clear();
+	mActionToKey.clear();
+	mTagToCategory.clear();
+	mSale = 0;
 }
 
 SARibbonActionsManager::SARibbonActionsManager(SARibbonBar* bar)
@@ -71,31 +72,31 @@ QString SARibbonActionsManager::tagName(int tag) const
  */
 void SARibbonActionsManager::removeTag(int tag)
 {
-    QList< QAction* > oldacts = actions(tag);
+	QList< QAction* > oldacts = actions(tag);
 
-    // 开始移除
-    d_ptr->mTagToActions.remove(tag);
-    d_ptr->mTagToName.remove(tag);
-    // 开始查找需要移出总表的action
-    QList< QAction* > needRemoveAct;
-    QList< QAction* > total;
+	// 开始移除
+	d_ptr->mTagToActions.remove(tag);
+	d_ptr->mTagToName.remove(tag);
+	// 开始查找需要移出总表的action
+	QList< QAction* > needRemoveAct;
+	QList< QAction* > total;
 
-    for (auto i = d_ptr->mTagToActions.begin(); i != d_ptr->mTagToActions.end(); ++i) {
-        total += i.value();
-    }
-    for (QAction* a : qAsConst(oldacts)) {
-        if (!total.contains(a)) {
-            needRemoveAct.append(a);
-        }
-    }
-    // 从总表移除action
-    for (QAction* a : qAsConst(needRemoveAct)) {
-        auto i = d_ptr->mActionToKey.find(a);
-        if (i != d_ptr->mActionToKey.end()) {
-            d_ptr->mKeyToAction.remove(i.value());
-            d_ptr->mActionToKey.erase(i);
-        }
-    }
+	for (auto i = d_ptr->mTagToActions.begin(); i != d_ptr->mTagToActions.end(); ++i) {
+		total += i.value();
+	}
+	for (QAction* a : qAsConst(oldacts)) {
+		if (!total.contains(a)) {
+			needRemoveAct.append(a);
+		}
+	}
+	// 从总表移除action
+	for (QAction* a : qAsConst(needRemoveAct)) {
+		auto i = d_ptr->mActionToKey.find(a);
+		if (i != d_ptr->mActionToKey.end()) {
+			d_ptr->mKeyToAction.remove(i.value());
+			d_ptr->mActionToKey.erase(i);
+		}
+	}
 }
 
 /**
@@ -106,37 +107,38 @@ void SARibbonActionsManager::removeTag(int tag)
  * registeAction的tag是直接记录进去的，如果要多个标签并存，在registe之前先或好tag
  * @param key key是action对应的key，一个key只对应一个action，是查找action的关键
  * ,默认情况为一个QString(),这时key是QAction的objectName
+ * @param enableEmit 控制是否发射@ref actionTagChanged 信号
  * @note 同一个action多次注册不同的tag可以通过tag索引到action，但通过action只能索引到最后一个注册的tag
  * @note tag的新增会触发actionTagChanged信号
  */
 bool SARibbonActionsManager::registeAction(QAction* act, int tag, const QString& key, bool enableEmit)
 {
-    if (nullptr == act) {
-        return (false);
-    }
-    QString k = key;
+	if (nullptr == act) {
+		return (false);
+	}
+	QString k = key;
 
-    if (k.isEmpty()) {
-        k = QString("id_%1_%2").arg(d_ptr->mSale++).arg(act->objectName());
-    }
-    if (d_ptr->mKeyToAction.contains(k)) {
-        qWarning() << "key: "
-                   << k << " have been exist,you can set key in an unique value when use SARibbonActionsManager::registeAction";
-        return (false);
-    }
-    d_ptr->mKeyToAction[ k ]   = act;
-    d_ptr->mActionToKey[ act ] = k;
-    // 记录tag 对 action
-    bool isneedemit = !(d_ptr->mTagToActions.contains(tag));  // 记录是否需要发射信号
+	if (k.isEmpty()) {
+		k = QString("id_%1_%2").arg(d_ptr->mSale++).arg(act->objectName());
+	}
+	if (d_ptr->mKeyToAction.contains(k)) {
+		qWarning() << "key: "
+				   << k << " have been exist,you can set key in an unique value when use SARibbonActionsManager::registeAction";
+		return (false);
+	}
+	d_ptr->mKeyToAction[ k ]   = act;
+	d_ptr->mActionToKey[ act ] = k;
+	// 记录tag 对 action
+	bool isneedemit = !(d_ptr->mTagToActions.contains(tag));  // 记录是否需要发射信号
 
-    d_ptr->mTagToActions[ tag ].append(act);
-    // 绑定槽
-    connect(act, &QObject::destroyed, this, &SARibbonActionsManager::onActionDestroyed);
-    if (isneedemit && enableEmit) {
-        // 说明新增tag
-        emit actionTagChanged(tag, false);
-    }
-    return (true);
+	d_ptr->mTagToActions[ tag ].append(act);
+	// 绑定槽
+	connect(act, &QObject::destroyed, this, &SARibbonActionsManager::onActionDestroyed);
+	if (isneedemit && enableEmit) {
+		// 说明新增tag
+		emit actionTagChanged(tag, false);
+	}
+	return (true);
 }
 
 /**
@@ -149,12 +151,12 @@ bool SARibbonActionsManager::registeAction(QAction* act, int tag, const QString&
  */
 void SARibbonActionsManager::unregisteAction(QAction* act, bool enableEmit)
 {
-    if (nullptr == act) {
-        return;
-    }
-    // 绑定槽
-    disconnect(act, &QObject::destroyed, this, &SARibbonActionsManager::onActionDestroyed);
-    removeAction(act, enableEmit);
+	if (nullptr == act) {
+		return;
+	}
+	// 绑定槽
+	disconnect(act, &QObject::destroyed, this, &SARibbonActionsManager::onActionDestroyed);
+	removeAction(act, enableEmit);
 }
 
 /**
@@ -166,39 +168,39 @@ void SARibbonActionsManager::unregisteAction(QAction* act, bool enableEmit)
  */
 void SARibbonActionsManager::removeAction(QAction* act, bool enableEmit)
 {
-    QList< int > deletedTags;                     // 记录删除的tag，用于触发actionTagChanged
-    QMap< int, QList< QAction* > > tagToActions;  ///< tag : QList<QAction*>
+	QList< int > deletedTags;                     // 记录删除的tag，用于触发actionTagChanged
+	QMap< int, QList< QAction* > > tagToActions;  ///< tag : QList<QAction*>
 
-    for (auto i = d_ptr->mTagToActions.begin(); i != d_ptr->mTagToActions.end(); ++i) {
-        // 把不是act的内容转移到tagToActions和tagToActionKeys中，之后再和m_d里的替换
-        auto tmpi = tagToActions.insert(i.key(), QList< QAction* >());
-        int count = 0;
-        for (int j = 0; j < i.value().size(); ++j) {
-            if (i.value()[ j ] != act) {
-                tmpi.value().append(act);
-                ++count;
-            }
-        }
-        if (0 == count) {
-            // 说明这个tag没有内容
-            tagToActions.erase(tmpi);
-            deletedTags.append(i.key());
-        }
-    }
-    // 删除mKeyToAction
-    QString key = d_ptr->mActionToKey.value(act);
+	for (auto i = d_ptr->mTagToActions.begin(); i != d_ptr->mTagToActions.end(); ++i) {
+		// 把不是act的内容转移到tagToActions和tagToActionKeys中，之后再和m_d里的替换
+		auto tmpi = tagToActions.insert(i.key(), QList< QAction* >());
+		int count = 0;
+		for (int j = 0; j < i.value().size(); ++j) {
+			if (i.value()[ j ] != act) {
+				tmpi.value().append(act);
+				++count;
+			}
+		}
+		if (0 == count) {
+			// 说明这个tag没有内容
+			tagToActions.erase(tmpi);
+			deletedTags.append(i.key());
+		}
+	}
+	// 删除mKeyToAction
+	QString key = d_ptr->mActionToKey.value(act);
 
-    d_ptr->mActionToKey.remove(act);
-    d_ptr->mKeyToAction.remove(key);
+	d_ptr->mActionToKey.remove(act);
+	d_ptr->mKeyToAction.remove(key);
 
-    // 置换
-    d_ptr->mTagToActions.swap(tagToActions);
-    // 发射信号
-    if (enableEmit) {
-        for (int tagdelete : qAsConst(deletedTags)) {
-            emit actionTagChanged(tagdelete, true);
-        }
-    }
+	// 置换
+	d_ptr->mTagToActions.swap(tagToActions);
+	// 发射信号
+	if (enableEmit) {
+		for (int tagdelete : qAsConst(deletedTags)) {
+			emit actionTagChanged(tagdelete, true);
+		}
+	}
 }
 
 /**
@@ -289,55 +291,55 @@ QList< QAction* > SARibbonActionsManager::allActions() const
  */
 QMap< int, SARibbonCategory* > SARibbonActionsManager::autoRegisteActions(SARibbonBar* bar)
 {
-    QMap< int, SARibbonCategory* > res;
-    // 先遍历SARibbonBar的父窗口(一般是SARibbonMainWindow)下的所有子对象，把所有action找到
-    QWidget* parWidget = bar->parentWidget();
-    QSet< QAction* > mainwindowActions;
-    if (parWidget) {
-        for (QObject* o : qAsConst(parWidget->children())) {
-            if (QAction* a = qobject_cast< QAction* >(o)) {
-                // 说明是action
-                if (!a->objectName().isEmpty()) {
-                    mainwindowActions.insert(a);
-                }
-            }
-        }
-    }
-    // 开始遍历每个category，加入action
+	QMap< int, SARibbonCategory* > res;
+	// 先遍历SARibbonBar的父窗口(一般是SARibbonMainWindow)下的所有子对象，把所有action找到
+	QWidget* parWidget = bar->parentWidget();
+	QSet< QAction* > mainwindowActions;
+	if (parWidget) {
+		for (QObject* o : qAsConst(parWidget->children())) {
+			if (QAction* a = qobject_cast< QAction* >(o)) {
+				// 说明是action
+				if (!a->objectName().isEmpty()) {
+					mainwindowActions.insert(a);
+				}
+			}
+		}
+	}
+	// 开始遍历每个category，加入action
 
-    if (nullptr == bar) {
-        // 非ribbon模式，直接退出
-        return (res);
-    }
-    QSet< QAction* > categoryActions;
-    QList< SARibbonCategory* > categorys = bar->categoryPages();
-    int tag                              = AutoCategoryDistinguishBeginTag;
+	if (nullptr == bar) {
+		// 非ribbon模式，直接退出
+		return (res);
+	}
+	QSet< QAction* > categoryActions;
+	QList< SARibbonCategory* > categorys = bar->categoryPages();
+	int tag                              = AutoCategoryDistinguishBeginTag;
 
-    for (SARibbonCategory* c : qAsConst(categorys)) {
-        QList< SARibbonPannel* > pannels = c->pannelList();
-        for (SARibbonPannel* p : qAsConst(pannels)) {
-            categoryActions += autoRegisteWidgetActions(p, tag, false);
-        }
-        setTagName(tag, c->categoryName());
-        res[ tag ] = c;
-        ++tag;
-    }
-    // 找到不在功能区的actions
-    QSet< QAction* > notincategory = mainwindowActions - categoryActions;
+	for (SARibbonCategory* c : qAsConst(categorys)) {
+		QList< SARibbonPannel* > pannels = c->pannelList();
+		for (SARibbonPannel* p : qAsConst(pannels)) {
+			categoryActions += autoRegisteWidgetActions(p, tag, false);
+		}
+		setTagName(tag, c->categoryName());
+		res[ tag ] = c;
+		++tag;
+	}
+	// 找到不在功能区的actions
+	QSet< QAction* > notincategory = mainwindowActions - categoryActions;
 
-    for (QAction* a : qAsConst(notincategory)) {
-        if (!a->objectName().isEmpty()) {
-            registeAction(a, NotInRibbonCategoryTag, a->objectName(), false);
-        }
-    }
-    if (notincategory.size() > 0) {
-        setTagName(NotInRibbonCategoryTag, tr("not in ribbon"));
-    }
-    for (auto i = res.begin(); i != res.end(); ++i) {
-        connect(i.value(), &SARibbonCategory::categoryNameChanged, this, &SARibbonActionsManager::onCategoryTitleChanged);
-    }
-    d_ptr->mTagToCategory = res;
-    return (res);
+	for (QAction* a : qAsConst(notincategory)) {
+		if (!a->objectName().isEmpty()) {
+			registeAction(a, NotInRibbonCategoryTag, a->objectName(), false);
+		}
+	}
+	if (notincategory.size() > 0) {
+		setTagName(NotInRibbonCategoryTag, tr("not in ribbon"));
+	}
+	for (auto i = res.begin(); i != res.end(); ++i) {
+		connect(i.value(), &SARibbonCategory::categoryNameChanged, this, &SARibbonActionsManager::onCategoryTitleChanged);
+	}
+	d_ptr->mTagToCategory = res;
+	return (res);
 }
 
 /**
@@ -349,20 +351,20 @@ QMap< int, SARibbonCategory* > SARibbonActionsManager::autoRegisteActions(SARibb
  */
 QSet< QAction* > SARibbonActionsManager::autoRegisteWidgetActions(QWidget* w, int tag, bool enableEmit)
 {
-    QSet< QAction* > res;
-    QList< QAction* > was = w->actions();
+	QSet< QAction* > res;
+	QList< QAction* > was = w->actions();
 
-    for (QAction* a : qAsConst(was)) {
-        if (res.contains(a) || a->objectName().isEmpty()) {
-            // 重复内容不重复加入
-            // 没有object name不加入
-            continue;
-        }
-        if (registeAction(a, tag, a->objectName(), enableEmit)) {
-            res.insert(a);
-        }
-    }
-    return (res);
+	for (QAction* a : qAsConst(was)) {
+		if (res.contains(a) || a->objectName().isEmpty()) {
+			// 重复内容不重复加入
+			// 没有object name不加入
+			continue;
+		}
+		if (registeAction(a, tag, a->objectName(), enableEmit)) {
+			res.insert(a);
+		}
+	}
+	return (res);
 }
 
 /**
@@ -372,26 +374,26 @@ QSet< QAction* > SARibbonActionsManager::autoRegisteWidgetActions(QWidget* w, in
  */
 QList< QAction* > SARibbonActionsManager::search(const QString& text)
 {
-    QList< QAction* > res;
+	QList< QAction* > res;
 
-    if (text.isEmpty()) {
-        return (res);
-    }
-    QStringList kws = text.split(" ");
+	if (text.isEmpty()) {
+		return (res);
+	}
+	QStringList kws = text.split(" ");
 
-    if (kws.isEmpty()) {
-        kws.append(text);
-    }
-    QList< QAction* > acts = d_ptr->mActionToKey.keys();
+	if (kws.isEmpty()) {
+		kws.append(text);
+	}
+	QList< QAction* > acts = d_ptr->mActionToKey.keys();
 
-    for (const QString& k : qAsConst(kws)) {
-        for (auto i = d_ptr->mActionToKey.begin(); i != d_ptr->mActionToKey.end(); ++i) {
-            if (i.key()->text().contains(k, Qt::CaseInsensitive)) {
-                res.append(i.key());
-            }
-        }
-    }
-    return (res);
+	for (const QString& k : qAsConst(kws)) {
+		for (auto i = d_ptr->mActionToKey.begin(); i != d_ptr->mActionToKey.end(); ++i) {
+			if (i.key()->text().contains(k, Qt::CaseInsensitive)) {
+				res.append(i.key());
+			}
+		}
+	}
+	return (res);
 }
 
 void SARibbonActionsManager::clear()
@@ -406,9 +408,9 @@ void SARibbonActionsManager::clear()
  */
 void SARibbonActionsManager::onActionDestroyed(QObject* o)
 {
-    QAction* act = static_cast< QAction* >(o);
+	QAction* act = static_cast< QAction* >(o);
 
-    removeAction(act, false);
+	removeAction(act, false);
 }
 
 /**
@@ -417,17 +419,17 @@ void SARibbonActionsManager::onActionDestroyed(QObject* o)
  */
 void SARibbonActionsManager::onCategoryTitleChanged(const QString& title)
 {
-    SARibbonCategory* c = qobject_cast< SARibbonCategory* >(sender());
+	SARibbonCategory* c = qobject_cast< SARibbonCategory* >(sender());
 
-    if (nullptr == c) {
-        return;
-    }
-    int tag = d_ptr->mTagToCategory.key(c, -1);
+	if (nullptr == c) {
+		return;
+	}
+	int tag = d_ptr->mTagToCategory.key(c, -1);
 
-    if (tag == -1) {
-        return;
-    }
-    setTagName(tag, title);
+	if (tag == -1) {
+		return;
+	}
+	setTagName(tag, title);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -436,19 +438,19 @@ void SARibbonActionsManager::onCategoryTitleChanged(const QString& title)
 
 class SARibbonActionsManagerModel::PrivateData
 {
-    SA_RIBBON_DECLARE_PUBLIC(SARibbonActionsManagerModel)
+	SA_RIBBON_DECLARE_PUBLIC(SARibbonActionsManagerModel)
 public:
-    PrivateData(SARibbonActionsManagerModel* p);
-    void updateRef();
-    int count() const;
-    QAction* at(int index);
-    bool isNull() const;
+	PrivateData(SARibbonActionsManagerModel* p);
+	void updateRef();
+	int count() const;
+	QAction* at(int index);
+	bool isNull() const;
 
 public:
-    SARibbonActionsManager* mMgr { nullptr };
-    int mTag { SARibbonActionsManager::CommonlyUsedActionTag };
-    QString mSeatchText;
-    QList< QAction* > mActions;
+	SARibbonActionsManager* mMgr { nullptr };
+	int mTag { SARibbonActionsManager::CommonlyUsedActionTag };
+	QString mSeatchText;
+	QList< QAction* > mActions;
 };
 
 SARibbonActionsManagerModel::PrivateData::PrivateData(SARibbonActionsManagerModel* p) : q_ptr(p)
@@ -457,38 +459,38 @@ SARibbonActionsManagerModel::PrivateData::PrivateData(SARibbonActionsManagerMode
 
 void SARibbonActionsManagerModel::PrivateData::updateRef()
 {
-    if (isNull()) {
-        return;
-    }
-    if (!mSeatchText.isEmpty()) {
-        mActions = mMgr->search(mSeatchText);
-    } else {
-        mActions = mMgr->actions(mTag);
-    }
+	if (isNull()) {
+		return;
+	}
+	if (!mSeatchText.isEmpty()) {
+		mActions = mMgr->search(mSeatchText);
+	} else {
+		mActions = mMgr->actions(mTag);
+	}
 }
 
 int SARibbonActionsManagerModel::PrivateData::count() const
 {
-    if (isNull()) {
-        return (0);
-    }
-    return (mActions.size());
+	if (isNull()) {
+		return (0);
+	}
+	return (mActions.size());
 }
 
 QAction* SARibbonActionsManagerModel::PrivateData::at(int index)
 {
-    if (isNull()) {
-        return (nullptr);
-    }
-    if (index >= count()) {
-        return (nullptr);
-    }
-    return (mActions.at(index));
+	if (isNull()) {
+		return (nullptr);
+	}
+	if (index >= count()) {
+		return (nullptr);
+	}
+	return (mActions.at(index));
 }
 
 bool SARibbonActionsManagerModel::PrivateData::isNull() const
 {
-    return (mMgr == nullptr);
+	return (mMgr == nullptr);
 }
 
 //===================================================
@@ -512,95 +514,106 @@ SARibbonActionsManagerModel::~SARibbonActionsManagerModel()
 
 int SARibbonActionsManagerModel::rowCount(const QModelIndex& parent) const
 {
-    if (parent.isValid()) {  // 非顶层
-        return (0);
-    }
-    // 顶层
-    return (d_ptr->count());
+	if (parent.isValid()) {  // 非顶层
+		return (0);
+	}
+	// 顶层
+	return (d_ptr->count());
 }
 
 QVariant SARibbonActionsManagerModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    Q_UNUSED(section);
-    if (role != Qt::DisplayRole) {
-        return (QVariant());
-    }
-    if (Qt::Horizontal == orientation) {
-        return (tr("action name"));
-    }
-    return (QVariant());
+	Q_UNUSED(section);
+	if (role != Qt::DisplayRole) {
+		return (QVariant());
+	}
+	if (Qt::Horizontal == orientation) {
+		return (tr("action name"));
+	}
+	return (QVariant());
 }
 
 Qt::ItemFlags SARibbonActionsManagerModel::flags(const QModelIndex& index) const
 {
-    if (!index.isValid()) {
-        return (Qt::NoItemFlags);
-    }
-    return (Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+	if (!index.isValid()) {
+		return (Qt::NoItemFlags);
+	}
+	return (Qt::ItemIsSelectable | Qt::ItemIsEnabled);
 }
 
 QVariant SARibbonActionsManagerModel::data(const QModelIndex& index, int role) const
 {
-    QAction* act = indexToAction(index);
+	QAction* act = indexToAction(index);
 
-    if (nullptr == act) {
-        return (QVariant());
-    }
+	if (nullptr == act) {
+		return (QVariant());
+	}
 
-    switch (role) {
-    case Qt::DisplayRole:
-        return (act->text());
+	switch (role) {
+	case Qt::DisplayRole: {
+		QString str = act->text();
+		if (!str.isEmpty()) {
+			return str;
+		}
+		// 如果文本为空，一般是没有设置文本，或者是窗口，如果是窗口，那么用windowtitle作为文本
+		if (QWidgetAction* wa = qobject_cast< QWidgetAction* >(act)) {
+			if (QWidget* w = wa->defaultWidget()) {
+				str = w->windowTitle();
+			}
+		}
+		return str;
+	}
+	case Qt::DecorationRole:
+		return (act->icon());
 
-    case Qt::DecorationRole:
-        return (act->icon());
-
-    default:
-        break;
-    }
-    return (QVariant());
+	default:
+		break;
+	}
+	return (QVariant());
 }
 
 void SARibbonActionsManagerModel::setFilter(int tag)
 {
-    d_ptr->mTag = tag;
-    update();
+	d_ptr->mTag = tag;
+	update();
 }
 
 void SARibbonActionsManagerModel::update()
 {
-    beginResetModel();
-    d_ptr->updateRef();
-    endResetModel();
+	beginResetModel();
+	d_ptr->updateRef();
+	endResetModel();
 }
 
 void SARibbonActionsManagerModel::setupActionsManager(SARibbonActionsManager* m)
 {
-    d_ptr->mMgr     = m;
-    d_ptr->mTag     = SARibbonActionsManager::CommonlyUsedActionTag;
-    d_ptr->mActions = m->filter(d_ptr->mTag);
-    connect(m, &SARibbonActionsManager::actionTagChanged, this, &SARibbonActionsManagerModel::onActionTagChanged);
-    update();
+	d_ptr->mMgr     = m;
+	d_ptr->mTag     = SARibbonActionsManager::CommonlyUsedActionTag;
+	d_ptr->mActions = m->filter(d_ptr->mTag);
+	connect(m, &SARibbonActionsManager::actionTagChanged, this, &SARibbonActionsManagerModel::onActionTagChanged);
+	update();
 }
 
 void SARibbonActionsManagerModel::uninstallActionsManager()
 {
-    if (!d_ptr->isNull()) {
-        disconnect(d_ptr->mMgr, &SARibbonActionsManager::actionTagChanged, this, &SARibbonActionsManagerModel::onActionTagChanged);
-        d_ptr->mMgr = nullptr;
-        d_ptr->mTag = SARibbonActionsManager::CommonlyUsedActionTag;
-    }
-    update();
+	if (!d_ptr->isNull()) {
+		disconnect(
+			d_ptr->mMgr, &SARibbonActionsManager::actionTagChanged, this, &SARibbonActionsManagerModel::onActionTagChanged);
+		d_ptr->mMgr = nullptr;
+		d_ptr->mTag = SARibbonActionsManager::CommonlyUsedActionTag;
+	}
+	update();
 }
 
 QAction* SARibbonActionsManagerModel::indexToAction(QModelIndex index) const
 {
-    if (!index.isValid()) {
-        return (nullptr);
-    }
-    if (index.row() >= d_ptr->count()) {
-        return (nullptr);
-    }
-    return (d_ptr->at(index.row()));
+	if (!index.isValid()) {
+		return (nullptr);
+	}
+	if (index.row() >= d_ptr->count()) {
+		return (nullptr);
+	}
+	return (d_ptr->at(index.row()));
 }
 
 /**
@@ -609,18 +622,18 @@ QAction* SARibbonActionsManagerModel::indexToAction(QModelIndex index) const
  */
 void SARibbonActionsManagerModel::search(const QString& text)
 {
-    d_ptr->mSeatchText = text;
-    update();
+	d_ptr->mSeatchText = text;
+	update();
 }
 
 void SARibbonActionsManagerModel::onActionTagChanged(int tag, bool isdelete)
 {
-    if (isdelete && (tag == d_ptr->mTag)) {
-        d_ptr->mTag = SARibbonActionsManager::UnknowActionTag;
-        update();
-    } else {
-        if (tag == d_ptr->mTag) {
-            update();
-        }
-    }
+	if (isdelete && (tag == d_ptr->mTag)) {
+		d_ptr->mTag = SARibbonActionsManager::UnknowActionTag;
+		update();
+	} else {
+		if (tag == d_ptr->mTag) {
+			update();
+		}
+	}
 }
