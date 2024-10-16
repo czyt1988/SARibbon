@@ -130,13 +130,12 @@ bool SARibbonActionsManager::registeAction(QAction* act, int tag, const QString&
 	d_ptr->mActionToKey[ act ] = k;
 	// 记录tag 对 action
 	bool isneedemit = !(d_ptr->mTagToActions.contains(tag));  // 记录是否需要发射信号
-
 	d_ptr->mTagToActions[ tag ].append(act);
 	// 绑定槽
 	connect(act, &QObject::destroyed, this, &SARibbonActionsManager::onActionDestroyed);
 	if (isneedemit && enableEmit) {
 		// 说明新增tag
-		emit actionTagChanged(tag, false);
+		Q_EMIT actionTagChanged(tag, false);
 	}
 	return (true);
 }
@@ -198,7 +197,7 @@ void SARibbonActionsManager::removeAction(QAction* act, bool enableEmit)
 	// 发射信号
 	if (enableEmit) {
 		for (int tagdelete : qAsConst(deletedTags)) {
-			emit actionTagChanged(tagdelete, true);
+			Q_EMIT actionTagChanged(tagdelete, true);
 		}
 	}
 }

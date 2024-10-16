@@ -43,7 +43,7 @@ public:
 
 public:
     bool iterate(FpButtonIterate fp);
-signals:
+Q_SIGNALS:
 
     /**
      * @brief 参考QToolBar::actionTriggered的信号

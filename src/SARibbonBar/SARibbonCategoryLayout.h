@@ -73,7 +73,7 @@ public:
     // 设置Category的对齐方式
     void setCategoryAlignment(SARibbonAlignment al);
     SARibbonAlignment categoryAlignment() const;
-private slots:
+private Q_SLOTS:
     void onLeftScrollButtonClicked();
     void onRightScrollButtonClicked();
 };

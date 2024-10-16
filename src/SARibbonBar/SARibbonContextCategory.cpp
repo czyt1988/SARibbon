@@ -73,7 +73,7 @@ void SARibbonContextCategory::addCategoryPage(SARibbonCategory* category)
     catData.categoryPage = category;
     d_ptr->mCategoryDataList.append(catData);
     category->installEventFilter(this);
-    emit categoryPageAdded(category);
+    Q_EMIT categoryPageAdded(category);
 }
 
 int SARibbonContextCategory::categoryCount() const
@@ -145,7 +145,7 @@ QString SARibbonContextCategory::contextTitle() const
 void SARibbonContextCategory::setContextTitle(const QString& contextTitle)
 {
     d_ptr->mContextTitle = contextTitle;
-    emit contextTitleChanged(contextTitle);
+    Q_EMIT contextTitleChanged(contextTitle);
 }
 
 /**
@@ -207,6 +207,6 @@ void SARibbonContextCategory::onCategoryTitleChanged(const QString& title)
 {
     SARibbonCategory* category = qobject_cast< SARibbonCategory* >(sender());
     if (category) {
-        emit categoryTitleChanged(category, title);
+        Q_EMIT categoryTitleChanged(category, title);
     }
 }

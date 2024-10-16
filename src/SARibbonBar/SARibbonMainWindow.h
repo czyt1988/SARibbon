@@ -92,10 +92,10 @@ public:
 	SARibbonSystemButtonBar* windowButtonBar() const;
 
 protected:
-	// 创建ribbonbar的工厂函数
-	SARibbonBar* createRibbonBar();
-private slots:
-	void onPrimaryScreenChanged(QScreen* screen);
+    // 创建ribbonbar的工厂函数
+    SARibbonBar* createRibbonBar();
+private Q_SLOTS:
+    void onPrimaryScreenChanged(QScreen* screen);
 };
 
 class SA_RIBBON_EXPORT SARibbonMainWindowEventFilter : public QObject

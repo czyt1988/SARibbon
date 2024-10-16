@@ -194,7 +194,11 @@ public:
     QSize toolButtonIconSize() const;
     // 此函数会遍历SARibbonPannel下的所有RibbonToolButton，执行函数指针(bool(SARibbonRibbonToolButton*))，函数指针返回false则停止迭代
     bool iterate(FpRibbonToolButtonIterate fp);
-signals:
+    
+    // 获取最近添加的按钮
+    SARibbonToolButton* lastAddActionButton();
+    
+Q_SIGNALS:
 
     /**
      * @brief 等同于QToolBar::actionTriggered
