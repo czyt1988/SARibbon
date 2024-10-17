@@ -1,9 +1,11 @@
 TEMPLATE = subdirs
 SUBDIRS += \
            src/SARibbonBar \
-           src/example/NormalMenuBarExample\
-           src/example/WidgetWithRibbon \
-           src/example/MainWindowExample
+           example/NormalMenuBarExample\
+           example/WidgetWithRibbon \
+           example/MdiAreaWindowExample \
+           example/StaticExample \
+           example/MainWindowExample
 
 
 CONFIG += ordered

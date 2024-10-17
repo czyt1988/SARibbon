@@ -1,6 +1,6 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2022-09-21T14:04:12
+# Project created by QtCreator 2017-09-21T14:04:12
 #
 #-------------------------------------------------
 
@@ -9,26 +9,29 @@ QT       += core gui
 CONFIG += c++17
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = NormalMenuBarExample
+TARGET = MdiAreaWindowExample
 TEMPLATE = app
 
-SOURCES += main.cpp \
-    MainWindow.cpp
+SOURCES += main.cpp\
+    mdimainwindow.cpp
 
-HEADERS  += \ \
-    MainWindow.h
+HEADERS  += \
+    mdimainwindow.h
 
-
-
+FORMS += \
+    MainWindow.ui 
+    
+RESOURCES += \
+    icon.qrc
+# 下面演示了如何把SARibbon引入
+# 只需要下面2句话，只要把common.pri引入工程，就可以实现SARibbon的引入
 include($$PWD/../../common.pri)
-DESTDIR = $${SARIBBON_BIN_DIR}/bin
 include($${SARIBBONBAR_PRI_FILE_PATH})
+
+DESTDIR = $${SARIBBON_BIN_DIR}/bin
 
 msvc {
     QMAKE_CFLAGS += /utf-8
     QMAKE_CXXFLAGS += /utf-8
 }
-
-FORMS += \
-    MainWindow.ui
 

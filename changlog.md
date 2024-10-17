@@ -1,5 +1,10 @@
 ﻿# 版本记录(change log):
 
+## 2024-10-17 -> 2.2.5
+- 原有的qt关键宏替换为Q_SIGNAL\Q_SLOT\Q_EMIT，以适应no_keywords设置
+- 调整目录结构，单独把example提取出来
+- 完善mdi窗口的例子，可以结合qwk实现mdi窗口的最大最小化按钮的显示
+
 ## 2024-09-12 -> 2.2.4
 - 修正自定义过程调用setRibbonBar后，会导致最大最小化按钮被遮挡的问题
 - 调整Mdi例子中cmake的文件大小写，避免在linux系统下大小写敏感

@@ -17,7 +17,7 @@ SOURCES += main.cpp\
 HEADERS  += \
     mainwindow.h 
     
-include($$PWD/../../SARibbon.pri)
+include($$PWD/../../src/SARibbon.pri)
 
 RESOURCES += \
     icon.qrc

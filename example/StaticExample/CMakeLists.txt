@@ -52,7 +52,7 @@ endif()
 #################################################
 # 这里展示如何简单的使用SARibbon在CMake文件里
 # Here is an example of how to simply use SARibbon in a CMake file
-SET(SARIBBON_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../..)
+SET(SARIBBON_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../src)
 set(SARIBBON_SIMPLE
     ${SARIBBON_DIR}/SARibbon.h
     ${SARIBBON_DIR}/SARibbon.cpp

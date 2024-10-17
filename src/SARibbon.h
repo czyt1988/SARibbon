@@ -97,14 +97,14 @@
  * @def ribbon的数字版本 MAJ.MIN.{PAT}
  */
 #ifndef SA_RIBBON_BAR_VERSION_PAT
-#define SA_RIBBON_BAR_VERSION_PAT 4
+#define SA_RIBBON_BAR_VERSION_PAT 5
 #endif
 
 /**
  * @def 版本号（字符串）
  */
 #ifndef SARIBBON_VERSION
-#define SARIBBON_VERSION "2.2.4"
+#define SARIBBON_VERSION "2.2.5"
 #endif
 
 #endif  // SARIBBONVERSIONINFO_H
@@ -154,7 +154,8 @@ class QWidget;
 /**
  * @brief 定义Ribbon的对其方式，目前支持左对齐和居中对其
  */
-SA_RIBBON_EXPORT enum class SARibbonAlignment {
+enum class SARibbonAlignment
+{
 	AlignLeft,   ///< 左对齐，tab栏左对齐，同时category也是左对齐
 	AlignCenter  ///< 居中对其，tab栏居中对齐，同时category也是居中对齐
 };
@@ -167,7 +168,8 @@ SA_RIBBON_EXPORT enum class SARibbonAlignment {
  * 例如ribbon tab的margin信息，在QTabBar是无法获取到，而这个影响了SARibbonContextCategory的绘制，
  * 因此，在设置qss后需要针对margin信息重新设置进SARibbonTabBar中
  */
-SA_RIBBON_EXPORT enum class SARibbonTheme {
+enum class SARibbonTheme
+{
 	RibbonThemeOffice2013,      ///< office2013主题
 	RibbonThemeOffice2016Blue,  ///< office2016-蓝色主题
 	RibbonThemeOffice2021Blue,  ///< office2021-蓝色主题
@@ -1853,6 +1855,10 @@ public:
 	QSize toolButtonIconSize() const;
 	// 此函数会遍历SARibbonPannel下的所有RibbonToolButton，执行函数指针(bool(SARibbonRibbonToolButton*))，函数指针返回false则停止迭代
 	bool iterate(FpRibbonToolButtonIterate fp);
+
+	// 获取最近添加的按钮
+	SARibbonToolButton* lastAddActionButton();
+
 Q_SIGNALS:
 
 	/**
@@ -2328,7 +2334,8 @@ public:
 	virtual QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const Q_DECL_OVERRIDE;
 	virtual void paintIconOnly(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
 	virtual void paintIconWithText(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
-	virtual void paintIconWithTextWordWrap(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
+	virtual void
+	paintIconWithTextWordWrap(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
 
 private:
 	SARibbonGalleryGroup* mGroup;
@@ -2784,9 +2791,8 @@ public:
 	void removeCategory(SARibbonCategory* category);
 
 	// 添加一个上下文标签
-	SARibbonContextCategory* addContextCategory(const QString& title,
-												const QColor& color = QColor(),
-												const QVariant& id  = QVariant());
+	SARibbonContextCategory*
+	addContextCategory(const QString& title, const QColor& color = QColor(), const QVariant& id = QVariant());
 	void addContextCategory(SARibbonContextCategory* context);
 
 	// 显示一个上下文标签
@@ -3026,7 +3032,8 @@ protected:
 	virtual bool event(QEvent* e) Q_DECL_OVERRIDE;
 	virtual void paintTabbarBaseLine(QPainter& painter);
 	virtual void paintWindowTitle(QPainter& painter, const QString& title, const QRect& titleRegion);
-	virtual void paintContextCategoryTab(QPainter& painter, const QString& title, const QRect& contextRect, const QColor& color);
+	virtual void
+	paintContextCategoryTab(QPainter& painter, const QString& title, const QRect& contextRect, const QColor& color);
 #if SA_DEBUG_PRINT_SARIBBONBAR
 	SA_RIBBON_EXPORT friend QDebug operator<<(QDebug debug, const SARibbonBar& ribbon);
 #endif
@@ -3208,10 +3215,8 @@ public:
 	static SARibbonCustomizeData makeAddCategoryCustomizeData(const QString& title, int index, const QString& objName);
 
 	// 对应AddPannelActionType
-	static SARibbonCustomizeData makeAddPannelCustomizeData(const QString& title,
-															int index,
-															const QString& categoryobjName,
-															const QString& objName);
+	static SARibbonCustomizeData
+	makeAddPannelCustomizeData(const QString& title, int index, const QString& categoryobjName, const QString& objName);
 
 	// 对应AddActionActionType
 	static SARibbonCustomizeData makeAddActionCustomizeData(const QString& key,
@@ -3224,9 +3229,8 @@ public:
 	static SARibbonCustomizeData makeRenameCategoryCustomizeData(const QString& newname, const QString& categoryobjName);
 
 	// 对应RenamePannelActionType
-	static SARibbonCustomizeData makeRenamePannelCustomizeData(const QString& newname,
-															   const QString& categoryobjName,
-															   const QString& pannelObjName);
+	static SARibbonCustomizeData
+	makeRenamePannelCustomizeData(const QString& newname, const QString& categoryobjName, const QString& pannelObjName);
 
 	// 对应RemoveCategoryActionType
 	static SARibbonCustomizeData makeRemoveCategoryCustomizeData(const QString& categoryobjName);
@@ -3235,9 +3239,8 @@ public:
 	static SARibbonCustomizeData makeChangeCategoryOrderCustomizeData(const QString& categoryobjName, int moveindex);
 
 	// 对应ChangePannelOrderActionType
-	static SARibbonCustomizeData makeChangePannelOrderCustomizeData(const QString& categoryobjName,
-																	const QString& pannelObjName,
-																	int moveindex);
+	static SARibbonCustomizeData
+	makeChangePannelOrderCustomizeData(const QString& categoryobjName, const QString& pannelObjName, int moveindex);
 
 	// 对应ChangeActionOrderActionType
 	static SARibbonCustomizeData makeChangeActionOrderCustomizeData(const QString& categoryobjName,
@@ -3658,7 +3661,7 @@ public:
 	SAFramelessHelper* framelessHelper();
 #else
 	// 如果ribbon中有自定义的窗口在标题栏等非点击区域加入后，想能点击，需要调用此接口告知可点击
-	void setFramelessHitTestVisible(const QWidget* w, bool visible = true);
+	void setFramelessHitTestVisible(QWidget* w, bool visible = true);
 #endif
 	// 此函数仅用于控制最小最大化和关闭按钮的显示
 	void updateWindowFlag(Qt::WindowFlags flags);
