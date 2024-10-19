@@ -145,8 +145,8 @@ message(STATUS "link ${SARIBBON_LIB_NAME} PUBLIC Qt${QT_VERSION_MAJOR}::Core Qt$
 # But it was again brought back as a private feature of QtGui in 6.2
 if(_SARIBBON_USE_FRAMELESS_LIB)
     find_package(QWindowKit REQUIRED)
-    target_link_libraries(${SARIBBON_LIB_NAME} PUBLIC QWindowKit::Widgets)
-    message(STATUS "link ${SARIBBON_LIB_NAME} PUBLIC QWindowKit::Widgets")
+    target_link_libraries(${SARIBBON_LIB_NAME} PRIVATE QWindowKit::Widgets)
+    message(STATUS "link ${SARIBBON_LIB_NAME} PRIVATE QWindowKit::Widgets")
 endif()
 #################################################
 include(GNUInstallDirs)
