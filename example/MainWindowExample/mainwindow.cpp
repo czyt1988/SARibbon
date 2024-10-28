@@ -92,7 +92,6 @@ MainWindow::MainWindow(QWidget* par)
 	//! en:
 	//! Add the main tab. Here we show how to add a tab through the SARibbonBar::addCategoryPage function
 	SARibbonCategory* categoryMain = ribbon->addCategoryPage(tr("&Main"));
-
 	//! cn: SARibbonBar的Category和Pannel，以及对应的Action都应该设置ObjectName，因为如果要自定义action，这些ObjectName是必不可少的
 	//! en: The category , pannel and actions of SARibbonBar, should be set with Object Names, as these Object Names are essential for customizing actions
 	categoryMain->setObjectName(("categoryMain"));
