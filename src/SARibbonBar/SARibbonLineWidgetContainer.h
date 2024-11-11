@@ -17,8 +17,8 @@
 class SA_RIBBON_EXPORT SARibbonLineWidgetContainer : public QWidget
 {
 public:
-    SARibbonLineWidgetContainer(QWidget* par = nullptr);
-
+    explicit SARibbonLineWidgetContainer(QWidget* par = nullptr);
+    ~SARibbonLineWidgetContainer();
     //设置widget,不允许设置一个nullptr
     void setWidget(QWidget* innerWidget);
 

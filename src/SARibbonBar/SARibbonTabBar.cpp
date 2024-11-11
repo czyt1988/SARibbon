@@ -7,6 +7,10 @@ SARibbonTabBar::SARibbonTabBar(QWidget* parent) : QTabBar(parent), m_tabMargin(6
 	setExpanding(false);
 }
 
+SARibbonTabBar::~SARibbonTabBar()
+{
+}
+
 const QMargins& SARibbonTabBar::tabMargin() const
 {
 	return (m_tabMargin);

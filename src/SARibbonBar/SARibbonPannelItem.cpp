@@ -5,6 +5,10 @@ SARibbonPannelItem::SARibbonPannelItem(QWidget* widget)
 {
 }
 
+SARibbonPannelItem::~SARibbonPannelItem()
+{
+}
+
 bool SARibbonPannelItem::isEmpty() const
 {
     return (action == nullptr || !action->isVisible());

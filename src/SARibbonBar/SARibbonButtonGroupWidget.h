@@ -16,8 +16,8 @@ public:
     using FpButtonIterate = std::function< bool(SARibbonControlButton*) >;
 
 public:
-    SARibbonButtonGroupWidget(QWidget* parent = Q_NULLPTR);
-    ~SARibbonButtonGroupWidget() Q_DECL_OVERRIDE;
+    explicit SARibbonButtonGroupWidget(QWidget* parent = nullptr);
+    ~SARibbonButtonGroupWidget();
 
     // 图标尺寸
     void setIconSize(const QSize& ic);
@@ -38,8 +38,8 @@ public:
     // 从ButtonGroupWidget中把action对应的button提取出来，如果action没有对应的button，就返回nullptr
     SARibbonControlButton* actionToRibbonControlToolButton(QAction* action);
 
-    QSize sizeHint() const Q_DECL_OVERRIDE;
-    QSize minimumSizeHint() const Q_DECL_OVERRIDE;
+    QSize sizeHint() const override;
+    QSize minimumSizeHint() const override;
 
 public:
     bool iterate(FpButtonIterate fp);
@@ -52,7 +52,7 @@ Q_SIGNALS:
     void actionTriggered(QAction* action);
 
 protected:
-    virtual void actionEvent(QActionEvent* e) Q_DECL_OVERRIDE;
+    virtual void actionEvent(QActionEvent* e) override;
 };
 
 #endif  // SARIBBONBUTTONGROUPWIDGET_H

@@ -15,9 +15,9 @@ class SA_RIBBON_EXPORT SARibbonGalleryItem
     friend class SARibbonGalleryGroupModel;
 
 public:
-    SARibbonGalleryItem();
-    SARibbonGalleryItem(const QString& text, const QIcon& icon);
-    SARibbonGalleryItem(QAction* act);
+    explicit SARibbonGalleryItem();
+    explicit SARibbonGalleryItem(const QString& text, const QIcon& icon);
+    explicit SARibbonGalleryItem(QAction* act);
     virtual ~SARibbonGalleryItem();
     // 设置角色
     void setData(int role, const QVariant& data);

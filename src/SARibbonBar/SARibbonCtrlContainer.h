@@ -17,7 +17,7 @@ class SA_RIBBON_EXPORT SARibbonCtrlContainer : public QWidget
     Q_OBJECT
     SA_RIBBON_DECLARE_PRIVATE(SARibbonCtrlContainer)
 public:
-    SARibbonCtrlContainer(QWidget* parent = Q_NULLPTR);
+    explicit SARibbonCtrlContainer(QWidget* parent = nullptr);
     ~SARibbonCtrlContainer();
 
     void setEnableShowIcon(bool b);

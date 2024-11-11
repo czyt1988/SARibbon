@@ -59,8 +59,8 @@ public:
     using FpRibbonToolButtonIterate = std::function< bool(SARibbonToolButton*) >;
 
 public:
-    SARibbonPannel(QWidget* parent = nullptr);
-    SARibbonPannel(const QString& name, QWidget* parent = nullptr);
+    explicit SARibbonPannel(QWidget* parent = nullptr);
+    explicit SARibbonPannel(const QString& name, QWidget* parent = nullptr);
     ~SARibbonPannel() Q_DECL_OVERRIDE;
     using QWidget::addAction;
 
