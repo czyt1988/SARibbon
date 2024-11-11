@@ -13,7 +13,8 @@ class SA_RIBBON_EXPORT SARibbonControlButton : public QToolButton
 {
     Q_OBJECT
 public:
-    SARibbonControlButton(QWidget* parent = 0);
+    explicit SARibbonControlButton(QWidget* parent = nullptr);
+    ~SARibbonControlButton();
 };
 
 /**
@@ -25,7 +26,8 @@ class SA_RIBBON_EXPORT SARibbonControlToolButton : public QToolButton
 {
     Q_OBJECT
 public:
-    SARibbonControlToolButton(QWidget* parent = 0);
+    explicit SARibbonControlToolButton(QWidget* parent = nullptr);
+    ~SARibbonControlToolButton();
 };
 
 #endif  // SARIBBONPANNELTOOLBUTTON_H

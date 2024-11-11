@@ -12,6 +12,10 @@ SARibbonMenu::SARibbonMenu(const QString& title, QWidget *parent) : QMenu(title,
     setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 }
 
+SARibbonMenu::~SARibbonMenu()
+{
+}
+
 
 QAction *SARibbonMenu::addRibbonMenu(SARibbonMenu *menu)
 {

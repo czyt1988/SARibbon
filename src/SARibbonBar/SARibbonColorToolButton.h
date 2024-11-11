@@ -21,8 +21,8 @@ public:
     };
 
 public:
-    SARibbonColorToolButton(QWidget* parent = Q_NULLPTR);
-    SARibbonColorToolButton(QAction* defaultAction, QWidget* parent = Q_NULLPTR);
+    explicit SARibbonColorToolButton(QWidget* parent = nullptr);
+    explicit SARibbonColorToolButton(QAction* defaultAction, QWidget* parent = nullptr);
     ~SARibbonColorToolButton();
     // 获取颜色
     QColor color() const;

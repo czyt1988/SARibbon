@@ -16,7 +16,8 @@ class SA_RIBBON_EXPORT SARibbonGalleryButton : public QToolButton
 {
     Q_OBJECT
 public:
-    SARibbonGalleryButton(QWidget* parent = 0);
+    explicit SARibbonGalleryButton(QWidget* parent = nullptr);
+    ~SARibbonGalleryButton();
 };
 
 /**
@@ -45,9 +46,9 @@ class SA_RIBBON_EXPORT SARibbonGallery : public QFrame
     Q_OBJECT
     SA_RIBBON_DECLARE_PRIVATE(SARibbonGallery)
 public:
-    SARibbonGallery(QWidget* parent = 0);
+    explicit SARibbonGallery(QWidget* parent = nullptr);
     virtual ~SARibbonGallery();
-    virtual QSize sizeHint() const Q_DECL_OVERRIDE;
+    virtual QSize sizeHint() const override;
     // 添加一个GalleryGroup
     SARibbonGalleryGroup* addGalleryGroup();
     // 添加一个GalleryGroup
@@ -93,8 +94,8 @@ private:
     SARibbonGalleryViewport* ensureGetPopupViewPort();
 
 protected:
-    void resizeEvent(QResizeEvent* event) Q_DECL_OVERRIDE;
-    void paintEvent(QPaintEvent* event) Q_DECL_OVERRIDE;
+    void resizeEvent(QResizeEvent* event) override;
+    void paintEvent(QPaintEvent* event) override;
 };
 
 ///

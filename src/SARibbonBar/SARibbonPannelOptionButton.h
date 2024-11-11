@@ -17,7 +17,8 @@ class SA_RIBBON_EXPORT SARibbonPannelOptionButton : public QToolButton
 {
     Q_OBJECT
 public:
-    SARibbonPannelOptionButton(QWidget* parent = Q_NULLPTR);
+    explicit SARibbonPannelOptionButton(QWidget* parent = nullptr);
+    ~SARibbonPannelOptionButton();
 };
 
 #endif  // SAROBBONPANNELOPTIONBUTTON_H

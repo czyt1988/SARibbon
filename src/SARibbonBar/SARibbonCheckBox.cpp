@@ -11,3 +11,7 @@ SARibbonCheckBox::SARibbonCheckBox(const QString &text, QWidget *parent)
 {
 
 }
+
+SARibbonCheckBox::~SARibbonCheckBox()
+{
+}

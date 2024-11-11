@@ -10,8 +10,9 @@ class SA_RIBBON_EXPORT SARibbonCheckBox : public QCheckBox
 {
     Q_OBJECT
 public:
-	SARibbonCheckBox(QWidget *parent = Q_NULLPTR);
-	SARibbonCheckBox(const QString &text, QWidget *parent = Q_NULLPTR);
+	explicit SARibbonCheckBox(QWidget *parent = nullptr);
+	explicit SARibbonCheckBox(const QString &text, QWidget *parent = nullptr);
+    ~SARibbonCheckBox();
 };
 
 #endif // SARIBBONCHECKBOX_H

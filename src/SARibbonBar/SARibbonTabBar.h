@@ -11,7 +11,8 @@ class SA_RIBBON_EXPORT SARibbonTabBar : public QTabBar
 {
 	Q_OBJECT
 public:
-	SARibbonTabBar(QWidget* parent = Q_NULLPTR);
+	explicit SARibbonTabBar(QWidget* parent = nullptr);
+    ~SARibbonTabBar();
 	const QMargins& tabMargin() const;
 	void setTabMargin(const QMargins& tabMargin);
 

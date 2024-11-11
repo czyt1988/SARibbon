@@ -13,7 +13,7 @@ class SA_RIBBON_EXPORT SARibbonStackedWidget : public QStackedWidget
     Q_OBJECT
     SA_RIBBON_DECLARE_PRIVATE(SARibbonStackedWidget)
 public:
-    SARibbonStackedWidget(QWidget* parent);
+    explicit SARibbonStackedWidget(QWidget* parent);
     ~SARibbonStackedWidget();
     void setPopupMode();
     bool isPopupMode() const;
@@ -21,11 +21,12 @@ public:
     bool isNormalMode() const;
     void exec();
 
-    // 设置stacked管理的窗口会随着stacked的大小变化而变化大小
-    // 就算不激活也调整大小
-    void setAutoResize(bool autoresize);
-    bool isAutoResize() const;
-    // 移动窗口
+    /**
+     * @brief 类似tabbar的moveTab函数，交换两个窗口的index
+     * @param from
+     * @param to
+     * @note 此操作会触发widgetRemoved(int index)信号
+     */
     void moveWidget(int from, int to);
 
 protected:

@@ -713,6 +713,10 @@ SARibbonCategoryLayoutItem::SARibbonCategoryLayoutItem(SARibbonPannel* w) : QWid
     separatorWidget = nullptr;
 }
 
+SARibbonCategoryLayoutItem::~SARibbonCategoryLayoutItem()
+{
+}
+
 SARibbonPannel* SARibbonCategoryLayoutItem::toPannelWidget()
 {
     return qobject_cast< SARibbonPannel* >(widget());

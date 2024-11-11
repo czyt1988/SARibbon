@@ -19,8 +19,8 @@ class SA_RIBBON_EXPORT SARibbonSystemButtonBar : public QFrame
     Q_OBJECT
     SA_RIBBON_DECLARE_PRIVATE(SARibbonSystemButtonBar)
 public:
-    SARibbonSystemButtonBar(QWidget* parent);
-    SARibbonSystemButtonBar(QWidget* parent, Qt::WindowFlags flags);
+    explicit SARibbonSystemButtonBar(QWidget* parent);
+    explicit SARibbonSystemButtonBar(QWidget* parent, Qt::WindowFlags flags);
     ~SARibbonSystemButtonBar();
     void setupMinimizeButton(bool on);
     void setupMaximizeButton(bool on);
