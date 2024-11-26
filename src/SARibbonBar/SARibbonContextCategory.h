@@ -12,7 +12,7 @@ class SA_RIBBON_EXPORT SARibbonContextCategory : public QObject
     Q_OBJECT
     SA_RIBBON_DECLARE_PRIVATE(SARibbonContextCategory)
 public:
-    SARibbonContextCategory(QWidget* parent = 0);
+    explicit SARibbonContextCategory(QWidget* parent = nullptr);
     ~SARibbonContextCategory();
     //上下文目录添加下属目录
     SARibbonCategory* addCategoryPage(const QString& title);

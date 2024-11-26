@@ -129,6 +129,9 @@ SARibbonGalleryButton::SARibbonGalleryButton(QWidget* parent) : QToolButton(pare
 {
 }
 
+SARibbonGalleryButton::~SARibbonGalleryButton()
+{
+}
 //===================================================
 // SARibbonGalleryViewport
 //===================================================
@@ -414,3 +417,5 @@ void SARibbonGallery::paintEvent(QPaintEvent* event)
 {
     QFrame::paintEvent(event);
 }
+
+

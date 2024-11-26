@@ -52,7 +52,7 @@ public:
         NotInRibbonCategoryTag = 0x2001,  ///< 不在功能区的标签@ref autoRegisteActions 函数会遍历所有category的action
         UserDefineActionTag = 0x8000  ///< 自定义标签，所有用户自定义tag要大于此tag
     };
-    SARibbonActionsManager(SARibbonBar* bar);
+    explicit SARibbonActionsManager(SARibbonBar* bar);
     ~SARibbonActionsManager();
     //设置tag对应的名字
     void setTagName(int tag, const QString& name);

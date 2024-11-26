@@ -735,3 +735,7 @@ SARibbonCategoryScrollButton::SARibbonCategoryScrollButton(Qt::ArrowType arr, QW
 {
     setArrowType(arr);
 }
+
+SARibbonCategoryScrollButton::~SARibbonCategoryScrollButton()
+{
+}

@@ -14,7 +14,7 @@ class SA_RIBBON_EXPORT SARibbonQuickAccessBar : public SARibbonCtrlContainer
     Q_OBJECT
     SA_RIBBON_DECLARE_PRIVATE(SARibbonQuickAccessBar)
 public:
-    SARibbonQuickAccessBar(QWidget* parent = 0);
+    explicit SARibbonQuickAccessBar(QWidget* parent = nullptr);
     ~SARibbonQuickAccessBar();
     void addSeparator();
     void addAction(QAction* act,

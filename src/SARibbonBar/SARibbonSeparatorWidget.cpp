@@ -20,3 +20,7 @@ SARibbonSeparatorWidget::SARibbonSeparatorWidget(QWidget* parent) : QFrame(paren
     }
 
 }
+
+SARibbonSeparatorWidget::~SARibbonSeparatorWidget()
+{
+}

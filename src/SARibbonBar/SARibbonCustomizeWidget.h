@@ -30,9 +30,9 @@ class SA_RIBBON_EXPORT SARibbonCustomizeWidget : public QWidget
     SA_RIBBON_DECLARE_PRIVATE(SARibbonCustomizeWidget)
 public:
     //保留接口
-    SARibbonCustomizeWidget(SARibbonMainWindow* ribbonWindow, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+    explicit SARibbonCustomizeWidget(SARibbonMainWindow* ribbonWindow, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
     //对于不使用SARibbonMainWindow的情况，使用此构造函数
-    SARibbonCustomizeWidget(SARibbonBar* ribbonbar, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+    explicit SARibbonCustomizeWidget(SARibbonBar* ribbonbar, QWidget* parent = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
     ~SARibbonCustomizeWidget();
 
     /**

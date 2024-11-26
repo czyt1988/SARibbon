@@ -36,6 +36,10 @@ SARibbonGalleryGroupItemDelegate::SARibbonGalleryGroupItemDelegate(SARibbonGalle
 {
 }
 
+SARibbonGalleryGroupItemDelegate::~SARibbonGalleryGroupItemDelegate()
+{
+}
+
 void SARibbonGalleryGroupItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
     if (nullptr == mGroup) {

@@ -21,7 +21,7 @@ class SA_RIBBON_EXPORT SARibbonPannelLayout : public QLayout
     friend class SARibbonPannel;
 
 public:
-    SARibbonPannelLayout(QWidget* p = 0);
+    explicit SARibbonPannelLayout(QWidget* p = nullptr);
     ~SARibbonPannelLayout();
     // SARibbonPannelLayout additem 无效
     void addItem(QLayoutItem* item) Q_DECL_OVERRIDE;

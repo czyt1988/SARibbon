@@ -363,6 +363,10 @@ SARibbonMainWindowEventFilter::SARibbonMainWindowEventFilter(QObject* par) : QOb
 {
 }
 
+SARibbonMainWindowEventFilter::~SARibbonMainWindowEventFilter()
+{
+}
+
 bool SARibbonMainWindowEventFilter::eventFilter(QObject* obj, QEvent* e)
 {
 	if (e) {

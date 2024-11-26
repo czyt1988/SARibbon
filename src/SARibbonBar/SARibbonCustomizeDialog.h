@@ -21,7 +21,8 @@ class SA_RIBBON_EXPORT SARibbonCustomizeDialog : public QDialog
 {
     Q_OBJECT
 public:
-    SARibbonCustomizeDialog(SARibbonMainWindow *ribbonWindow, QWidget *p = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+    explicit SARibbonCustomizeDialog(SARibbonMainWindow *ribbonWindow, QWidget *p = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
+    ~SARibbonCustomizeDialog();
     //设置action管理器
     void setupActionsManager(SARibbonActionsManager *mgr);
 

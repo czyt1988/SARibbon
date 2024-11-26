@@ -29,8 +29,8 @@ public:
     using FpPannelIterate = std::function< bool(SARibbonPannel*) >;
 
 public:
-    SARibbonCategory(QWidget* p = nullptr);
-    SARibbonCategory(const QString& name, QWidget* p = nullptr);
+    explicit SARibbonCategory(QWidget* p = nullptr);
+    explicit SARibbonCategory(const QString& name, QWidget* p = nullptr);
     ~SARibbonCategory();
 
     // category的名字
@@ -135,11 +135,11 @@ Q_SIGNALS:
     void actionTriggered(QAction* action);
 
 protected:
-    virtual bool event(QEvent* e) Q_DECL_OVERRIDE;
+    virtual bool event(QEvent* e) override;
     // 处理滚轮事件
-    void wheelEvent(QWheelEvent* event) Q_DECL_OVERRIDE;
+    void wheelEvent(QWheelEvent* event) override;
     //
-    void changeEvent(QEvent* event) Q_DECL_OVERRIDE;
+    void changeEvent(QEvent* event) override;
 
     // 标记这个是上下文标签
     void markIsContextCategory(bool isContextCategory = true);
@@ -157,7 +157,8 @@ class SA_RIBBON_EXPORT SARibbonCategoryScrollButton : public QToolButton
 {
     Q_OBJECT
 public:
-    SARibbonCategoryScrollButton(Qt::ArrowType arr, QWidget* p = nullptr);
+    explicit SARibbonCategoryScrollButton(Qt::ArrowType arr, QWidget* p = nullptr);
+    ~SARibbonCategoryScrollButton();
 };
 
 #endif  // SARIBBONCATEGORY_H

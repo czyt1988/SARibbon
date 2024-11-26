@@ -15,6 +15,10 @@ SARibbonLineWidgetContainer::SARibbonLineWidgetContainer(QWidget *par) : QWidget
     setLayout(lay);
 }
 
+SARibbonLineWidgetContainer::~SARibbonLineWidgetContainer()
+{
+}
+
 
 void SARibbonLineWidgetContainer::setWidget(QWidget *innerWidget)
 {
