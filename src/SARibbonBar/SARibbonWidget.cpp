@@ -1,6 +1,5 @@
 ﻿#include "SARibbonWidget.h"
 #include "SARibbonBar.h"
-#include "SARibbonElementManager.h"
 #include "SARibbonTabBar.h"
 #include <QApplication>
 #include <QDebug>
@@ -202,7 +201,7 @@ QWidget* SARibbonWidget::takeWidget()
 	}
 	auto item = lay->itemAt(0);
 	if (nullptr == item) {
-        return nullptr;
+		return nullptr;
 	}
 	lay->removeItem(item);
 	auto w = item->widget();
