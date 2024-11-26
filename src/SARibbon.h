@@ -153,6 +153,8 @@ class QWidget;
 
 /**
  * @brief 定义Ribbon的对其方式，目前支持左对齐和居中对其
+ *
+ * @note 如果你编译器提示：成员声明的限定名称非法，那么留意一下文件换行是否为LF，如果是把文件换行改为CRLF
  */
 enum class SARibbonAlignment
 {
@@ -406,6 +408,7 @@ Q_SIGNALS:
 public:
 	virtual QSize sizeHint() const Q_DECL_OVERRIDE;
 };
+
 namespace SA
 {
 /**
