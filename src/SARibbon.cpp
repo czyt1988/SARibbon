@@ -2248,6 +2248,10 @@ SARibbonApplicationButton::SARibbonApplicationButton(const QIcon& icon, const QS
 	setText(text);
 }
 
+SARibbonApplicationButton::~SARibbonApplicationButton()
+{
+}
+
 /*** End of inlined file: SARibbonApplicationButton.cpp ***/
 
 /*** Start of inlined file: SARibbonSystemButtonBar.cpp ***/
@@ -4170,6 +4174,10 @@ SARibbonLineWidgetContainer::SARibbonLineWidgetContainer(QWidget* par) : QWidget
 	setLayout(lay);
 }
 
+SARibbonLineWidgetContainer::~SARibbonLineWidgetContainer()
+{
+}
+
 void SARibbonLineWidgetContainer::setWidget(QWidget* innerWidget)
 {
     QHBoxLayout* lay = static_cast< QHBoxLayout* >(layout());
@@ -4855,6 +4863,10 @@ SARibbonLineEdit::SARibbonLineEdit(const QString& text, QWidget* parent) : QLine
 {
 }
 
+SARibbonLineEdit::~SARibbonLineEdit()
+{
+}
+
 /*** End of inlined file: SARibbonLineEdit.cpp ***/
 
 /*** Start of inlined file: SARibbonCheckBox.cpp ***/
@@ -4868,10 +4880,18 @@ SARibbonCheckBox::SARibbonCheckBox(const QString& text, QWidget* parent) : QChec
 {
 }
 
+SARibbonCheckBox::~SARibbonCheckBox()
+{
+}
+
 /*** End of inlined file: SARibbonCheckBox.cpp ***/
 
 /*** Start of inlined file: SARibbonComboBox.cpp ***/
 SARibbonComboBox::SARibbonComboBox(QWidget* parent) : QComboBox(parent)
+{
+}
+
+SARibbonComboBox::~SARibbonComboBox()
 {
 }
 
@@ -5224,12 +5244,6 @@ void SARibbonStackedWidget::exec()
 	d_ptr->eventLoop = nullptr;
 }
 
-/**
- * @brief 类似tabbar的moveTab函数，交换两个窗口的index
- * @param from
- * @param to
- * @note 此操作会触发widgetRemoved(int index)信号
- */
 void SARibbonStackedWidget::moveWidget(int from, int to)
 {
 	QWidget* w = widget(from);
@@ -5285,6 +5299,10 @@ SARibbonSeparatorWidget::SARibbonSeparatorWidget(QWidget* parent) : QFrame(paren
     } else {
 		setLineWidth(1);
 	}
+}
+
+SARibbonSeparatorWidget::~SARibbonSeparatorWidget()
+{
 }
 
 /*** End of inlined file: SARibbonSeparatorWidget.cpp ***/
@@ -5563,6 +5581,10 @@ SARibbonTabBar::SARibbonTabBar(QWidget* parent) : QTabBar(parent), m_tabMargin(6
 	setExpanding(false);
 }
 
+SARibbonTabBar::~SARibbonTabBar()
+{
+}
+
 const QMargins& SARibbonTabBar::tabMargin() const
 {
 	return (m_tabMargin);
@@ -5615,7 +5637,14 @@ SARibbonControlButton::SARibbonControlButton(QWidget* parent) : QToolButton(pare
 {
 }
 
+SARibbonControlButton::~SARibbonControlButton()
+{
+}
 SARibbonControlToolButton::SARibbonControlToolButton(QWidget* parent) : QToolButton(parent)
+{
+}
+
+SARibbonControlToolButton::~SARibbonControlToolButton()
 {
 }
 
@@ -5632,6 +5661,10 @@ SARibbonMenu::SARibbonMenu(QWidget* parent) : QMenu(parent)
 SARibbonMenu::SARibbonMenu(const QString& title, QWidget* parent) : QMenu(title, parent)
 {
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+}
+
+SARibbonMenu::~SARibbonMenu()
+{
 }
 
 QAction* SARibbonMenu::addRibbonMenu(SARibbonMenu* menu)
@@ -5674,7 +5707,12 @@ SARibbonPannelOptionButton::SARibbonPannelOptionButton(QWidget* parent) : QToolB
 	setCheckable(false);
 	setToolButtonStyle(Qt::ToolButtonIconOnly);
 	setIconSize(QSize(10, 10));
-	setIcon(QIcon(":/image/resource/ribbonPannelOptionButton.png"));
+	static QIcon s_default_icon = QIcon(":/image/resource/ribbonPannelOptionButton.png");
+	setIcon(s_default_icon);
+}
+
+SARibbonPannelOptionButton::~SARibbonPannelOptionButton()
+{
 }
 
 /*** End of inlined file: SARibbonPannelOptionButton.cpp ***/
@@ -5682,6 +5720,10 @@ SARibbonPannelOptionButton::SARibbonPannelOptionButton(QWidget* parent) : QToolB
 /*** Start of inlined file: SARibbonPannelItem.cpp ***/
 SARibbonPannelItem::SARibbonPannelItem(QWidget* widget)
     : QWidgetItem(widget), rowIndex(-1), columnIndex(-1), action(nullptr), customWidget(false), rowProportion(Large)
+{
+}
+
+SARibbonPannelItem::~SARibbonPannelItem()
 {
 }
 
@@ -8388,6 +8430,10 @@ SARibbonCategoryScrollButton::SARibbonCategoryScrollButton(Qt::ArrowType arr, QW
 	setArrowType(arr);
 }
 
+SARibbonCategoryScrollButton::~SARibbonCategoryScrollButton()
+{
+}
+
 /*** End of inlined file: SARibbonCategory.cpp ***/
 
 /*** Start of inlined file: SARibbonCategoryLayout.cpp ***/
@@ -8687,7 +8733,8 @@ void SARibbonCategoryLayout::updateGeometryArr()
 	if (!mag.isNull()) {
 		y = mag.top();
 		height -= (mag.top() + mag.bottom());
-		categoryWidth -= (mag.right() + mag.left());
+		// categoryWidth不能把mag减去，减去后会导致categoryWidth不是实际的categoryWidth
+		// categoryWidth -= (mag.right() + mag.left());
 	}
 	// total 是总宽，不是x坐标系，x才是坐标系
 	int total = d_ptr->totalSizeHintWidth();
@@ -9098,6 +9145,10 @@ void SARibbonCategoryLayout::setGeometry(const QRect& rect)
 SARibbonCategoryLayoutItem::SARibbonCategoryLayoutItem(SARibbonPannel* w) : QWidgetItem(w)
 {
 	separatorWidget = nullptr;
+}
+
+SARibbonCategoryLayoutItem::~SARibbonCategoryLayoutItem()
+{
 }
 
 SARibbonPannel* SARibbonCategoryLayoutItem::toPannelWidget()
@@ -9521,6 +9572,10 @@ public:
 
 SARibbonGalleryGroupItemDelegate::SARibbonGalleryGroupItemDelegate(SARibbonGalleryGroup* group, QObject* parent)
     : QStyledItemDelegate(parent), mGroup(group)
+{
+}
+
+SARibbonGalleryGroupItemDelegate::~SARibbonGalleryGroupItemDelegate()
 {
 }
 
@@ -10116,6 +10171,9 @@ SARibbonGalleryButton::SARibbonGalleryButton(QWidget* parent) : QToolButton(pare
 {
 }
 
+SARibbonGalleryButton::~SARibbonGalleryButton()
+{
+}
 //===================================================
 // SARibbonGalleryViewport
 //===================================================
@@ -15443,6 +15501,9 @@ SARibbonCustomizeDialog::SARibbonCustomizeDialog(SARibbonMainWindow* ribbonWindo
  * 等同@ref SARibbonCustomizeWidget::setupActionsManager
  * @param mgr
  */
+SARibbonCustomizeDialog::~SARibbonCustomizeDialog()
+{
+}
 void SARibbonCustomizeDialog::setupActionsManager(SARibbonActionsManager* mgr)
 {
 	ui->customWidget->setupActionsManager(mgr);
@@ -15904,6 +15965,10 @@ void sa_set_ribbon_theme(QWidget* w, SARibbonTheme theme)
 // SARibbonMainWindowEventFilter
 //----------------------------------------------------
 SARibbonMainWindowEventFilter::SARibbonMainWindowEventFilter(QObject* par) : QObject(par)
+{
+}
+
+SARibbonMainWindowEventFilter::~SARibbonMainWindowEventFilter()
 {
 }
 
