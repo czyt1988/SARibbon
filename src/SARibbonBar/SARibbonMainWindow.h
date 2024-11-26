@@ -64,8 +64,8 @@ class SA_RIBBON_EXPORT SARibbonMainWindow : public QMainWindow
 	Q_PROPERTY(SARibbonTheme ribbonTheme READ ribbonTheme WRITE setRibbonTheme)
 
 public:
-	SARibbonMainWindow(QWidget* parent = nullptr, bool useRibbon = true, const Qt::WindowFlags flags = {});
-	~SARibbonMainWindow() Q_DECL_OVERRIDE;
+	explicit SARibbonMainWindow(QWidget* parent = nullptr, bool useRibbon = true, const Qt::WindowFlags flags = {});
+	~SARibbonMainWindow() override;
 	// 返回SARibbonBar
 	SARibbonBar* ribbonBar() const;
 	// 设置ribbonbar
@@ -98,12 +98,17 @@ private Q_SLOTS:
     void onPrimaryScreenChanged(QScreen* screen);
 };
 
+
+/**
+ * @brief 针对SARibbonMainWindow的事件处理器，主要处理systembar的位置调整
+ */
 class SA_RIBBON_EXPORT SARibbonMainWindowEventFilter : public QObject
 {
 	Q_OBJECT
 public:
-	SARibbonMainWindowEventFilter(QObject* par);
-	virtual bool eventFilter(QObject* obj, QEvent* e) Q_DECL_OVERRIDE;
+	explicit SARibbonMainWindowEventFilter(QObject* par);
+    ~SARibbonMainWindowEventFilter();
+	virtual bool eventFilter(QObject* obj, QEvent* e) override;
 };
 
 #endif  // SARIBBONMAINWINDOW_H

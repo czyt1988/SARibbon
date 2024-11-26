@@ -298,7 +298,8 @@ void SARibbonCategoryLayout::updateGeometryArr()
     if (!mag.isNull()) {
         y = mag.top();
         height -= (mag.top() + mag.bottom());
-        categoryWidth -= (mag.right() + mag.left());
+        // categoryWidth不能把mag减去，减去后会导致categoryWidth不是实际的categoryWidth
+        // categoryWidth -= (mag.right() + mag.left());
     }
     // total 是总宽，不是x坐标系，x才是坐标系
     int total = d_ptr->totalSizeHintWidth();
@@ -710,6 +711,10 @@ void SARibbonCategoryLayout::setGeometry(const QRect& rect)
 SARibbonCategoryLayoutItem::SARibbonCategoryLayoutItem(SARibbonPannel* w) : QWidgetItem(w)
 {
     separatorWidget = nullptr;
+}
+
+SARibbonCategoryLayoutItem::~SARibbonCategoryLayoutItem()
+{
 }
 
 SARibbonPannel* SARibbonCategoryLayoutItem::toPannelWidget()

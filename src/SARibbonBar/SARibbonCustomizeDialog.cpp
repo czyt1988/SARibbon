@@ -72,7 +72,10 @@ SARibbonCustomizeDialog::SARibbonCustomizeDialog(SARibbonMainWindow *ribbonWindo
  * 等同@ref SARibbonCustomizeWidget::setupActionsManager
  * @param mgr
  */
-void SARibbonCustomizeDialog::setupActionsManager(SARibbonActionsManager *mgr)
+     SARibbonCustomizeDialog::~SARibbonCustomizeDialog()
+ {
+ }
+ void SARibbonCustomizeDialog::setupActionsManager(SARibbonActionsManager *mgr)
 {
     ui->customWidget->setupActionsManager(mgr);
 }

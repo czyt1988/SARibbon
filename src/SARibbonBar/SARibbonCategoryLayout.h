@@ -18,23 +18,23 @@ class SA_RIBBON_EXPORT SARibbonCategoryLayout : public QLayout
     Q_OBJECT
     SA_RIBBON_DECLARE_PRIVATE(SARibbonCategoryLayout)
 public:
-    SARibbonCategoryLayout(SARibbonCategory* parent);
+    explicit SARibbonCategoryLayout(SARibbonCategory* parent);
     ~SARibbonCategoryLayout();
 
     SARibbonCategory* ribbonCategory() const;
 
-    virtual void addItem(QLayoutItem* item) Q_DECL_OVERRIDE;
-    virtual QLayoutItem* itemAt(int index) const Q_DECL_OVERRIDE;
-    virtual QLayoutItem* takeAt(int index) Q_DECL_OVERRIDE;
+    virtual void addItem(QLayoutItem* item) override;
+    virtual QLayoutItem* itemAt(int index) const override;
+    virtual QLayoutItem* takeAt(int index) override;
     SARibbonCategoryLayoutItem* takePannelItem(int index);
     SARibbonCategoryLayoutItem* takePannelItem(SARibbonPannel* pannel);
     bool takePannel(SARibbonPannel* pannel);
-    virtual int count() const Q_DECL_OVERRIDE;
-    void setGeometry(const QRect& rect) Q_DECL_OVERRIDE;
-    QSize sizeHint() const Q_DECL_OVERRIDE;
-    QSize minimumSize() const Q_DECL_OVERRIDE;
-    Qt::Orientations expandingDirections() const Q_DECL_OVERRIDE;
-    void invalidate() Q_DECL_OVERRIDE;
+    virtual int count() const override;
+    void setGeometry(const QRect& rect) override;
+    QSize sizeHint() const override;
+    QSize minimumSize() const override;
+    Qt::Orientations expandingDirections() const override;
+    void invalidate() override;
     // 追加一个pannel
     void addPannel(SARibbonPannel* pannel);
     // 插入一个pannel
@@ -84,7 +84,8 @@ private Q_SLOTS:
 class SA_RIBBON_EXPORT SARibbonCategoryLayoutItem : public QWidgetItem
 {
 public:
-    SARibbonCategoryLayoutItem(SARibbonPannel* w);
+    explicit SARibbonCategoryLayoutItem(SARibbonPannel* w);
+    ~SARibbonCategoryLayoutItem();
     SARibbonSeparatorWidget* separatorWidget;
     // 把内部的widget转换为pannel
     SARibbonPannel* toPannelWidget();

@@ -81,12 +81,6 @@ void SARibbonStackedWidget::exec()
     d_ptr->eventLoop = nullptr;
 }
 
-/**
- * @brief 类似tabbar的moveTab函数，交换两个窗口的index
- * @param from
- * @param to
- * @note 此操作会触发widgetRemoved(int index)信号
- */
 void SARibbonStackedWidget::moveWidget(int from, int to)
 {
     QWidget* w = widget(from);

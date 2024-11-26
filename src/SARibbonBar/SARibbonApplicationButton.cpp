@@ -27,3 +27,7 @@ SARibbonApplicationButton::SARibbonApplicationButton(const QIcon& icon, const QS
     setIcon(icon);
     setText(text);
 }
+
+SARibbonApplicationButton::~SARibbonApplicationButton()
+{
+}

@@ -154,8 +154,8 @@ public:
 
 public:
     // 构造函数
-    SARibbonBar(QWidget* parent = nullptr);
-    ~SARibbonBar() Q_DECL_OVERRIDE;
+    explicit SARibbonBar(QWidget* parent = nullptr);
+    ~SARibbonBar();
     // 获取applicationButton
     QAbstractButton* applicationButton();
 
@@ -442,11 +442,11 @@ private:
     void synchronousCategoryData(bool autoUpdate = true);
 
 protected:
-    virtual void paintEvent(QPaintEvent* e) Q_DECL_OVERRIDE;
-    virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
-    virtual void moveEvent(QMoveEvent* e) Q_DECL_OVERRIDE;
-    virtual void changeEvent(QEvent* e) Q_DECL_OVERRIDE;
-    virtual bool event(QEvent* e) Q_DECL_OVERRIDE;
+    virtual void paintEvent(QPaintEvent* e) override;
+    virtual void resizeEvent(QResizeEvent* e) override;
+    virtual void moveEvent(QMoveEvent* e) override;
+    virtual void changeEvent(QEvent* e) override;
+    virtual bool event(QEvent* e) override;
     virtual void paintTabbarBaseLine(QPainter& painter);
     virtual void paintWindowTitle(QPainter& painter, const QString& title, const QRect& titleRegion);
     virtual void paintContextCategoryTab(QPainter& painter, const QString& title, const QRect& contextRect, const QColor& color);

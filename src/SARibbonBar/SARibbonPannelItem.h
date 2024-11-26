@@ -26,7 +26,9 @@ public:
         Medium,  ///< 中占比，在@ref SARibbonPannel::pannelLayoutMode 为 @ref SARibbonPannel::ThreeRowMode 时才会起作用，且要同一列里两个都是Medium时，会在三行中占据两行
         Small  ///< 小占比，占SARibbonPannel的一行，Medium在不满足条件时也会变为Small，但不会变为Large
     };
-    SARibbonPannelItem(QWidget* widget);
+    explicit SARibbonPannelItem(QWidget* widget);
+    ~SARibbonPannelItem();
+
     bool isEmpty() const Q_DECL_OVERRIDE;
 
     short rowIndex;             ///< 记录当前item属于第几行，hide模式下为-1

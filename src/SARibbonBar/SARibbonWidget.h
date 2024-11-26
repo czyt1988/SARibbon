@@ -20,8 +20,8 @@ class SA_RIBBON_EXPORT SARibbonWidget : public QWidget
 	Q_PROPERTY(SARibbonTheme ribbonTheme READ ribbonTheme WRITE setRibbonTheme)
 
 public:
-	SARibbonWidget(QWidget* parent = nullptr);
-	~SARibbonWidget() Q_DECL_OVERRIDE;
+	explicit SARibbonWidget(QWidget* parent = nullptr);
+	~SARibbonWidget();
 	// 返回SARibbonBar
 	SARibbonBar* ribbonBar() const;
 	// 设置ribbonbar

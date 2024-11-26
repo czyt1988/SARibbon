@@ -11,3 +11,7 @@ SARibbonLineEdit::SARibbonLineEdit(const QString &text, QWidget *parent)
 {
 
 }
+
+SARibbonLineEdit::~SARibbonLineEdit()
+{
+}

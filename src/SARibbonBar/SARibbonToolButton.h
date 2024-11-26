@@ -26,8 +26,8 @@ public:
     Q_ENUM(RibbonButtonType)
 
 public:
-    SARibbonToolButton(QWidget* parent = Q_NULLPTR);
-    SARibbonToolButton(QAction* defaultAction, QWidget* parent = Q_NULLPTR);
+    explicit SARibbonToolButton(QWidget* parent = nullptr);
+    explicit SARibbonToolButton(QAction* defaultAction, QWidget* parent = nullptr);
     ~SARibbonToolButton();
     //标记按钮的样式，按钮的样式有不同的渲染方式
     RibbonButtonType buttonType() const;
