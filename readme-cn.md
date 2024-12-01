@@ -3,7 +3,7 @@
 <div align="center">
 <p>
 <img src="https://img.shields.io/badge/C++-17-blue"/>
-<img src="https://img.shields.io/badge/Qt-5.14+-green"/>
+<img src="https://img.shields.io/badge/ -5.14+-green"/>
 <img src="https://img.shields.io/badge/Qt-6-green"/>
 <img src="https://img.shields.io/badge/license-MIT-yellow"/>
 </p>
@@ -361,7 +361,7 @@ public:
 ```cpp
 RibbonWidget::RibbonWidget(QWidget* parent) : SARibbonWidget(parent)
 {
-    // 直接创建SARibbonBar
+    // 获取SARibbonBar
     SARibbonBar* ribbonbar = ribbonBar();
     // QWidget模式下，没有必要再显示标题
     ribbonbar->setTitleVisible(false);
@@ -370,9 +370,6 @@ RibbonWidget::RibbonWidget(QWidget* parent) : SARibbonWidget(parent)
     // 取消applicationbutton
     ribbonbar->setApplicationButton(nullptr);
 
-    //
-    //buildRibbon(ribbonbar);
-    //
     setWidget(new InnerWidget());
 }
 ```
@@ -482,7 +479,7 @@ SARibbonBar* ribbon = ribbonBar();
 ribbon->applicationButton()->setText(("File"));
 ```
 
-默认的applicationButton继承自`SARibbonApplicationButton`,而`SARibbonApplicationButton`继承自`QPushButton`，因此你可以对其进行`QPushButton`所有的操作，当然如果想设置自己的Button作为applicationButton也是可以的，只需要调用`SARibbonBar::setApplicationButton`函数即可
+默认的applicationButton继承自`SARibbonApplicationButton`,而`SARibbonApplicationButton`继承自`QPushButton`，因此你可以对其进行`QPushButton`所有的操作，如果想设置自己的Button作为applicationButton也是可以的，只需要调用`SARibbonBar::setApplicationButton`函数即可
 
 ### QuickAccessBar和rightButtonGroup
 
@@ -710,6 +707,7 @@ sa_apply_customize_from_xml_file("customization.xml", this, m_ribbonActionMgr);
 
 ![](./doc/screenshot/data-workbench-screenshot1-cn.gif)
 ![](./doc/screenshot/data-workbench-screenshot01-en.png)
+![](./doc/screenshot/data-workbench-screenshot01-cn.png)
 
 [github - https://github.com/czyt1988/data-workbench](https://github.com/czyt1988/data-workbench)
 
@@ -780,6 +778,17 @@ int main(int argc, char* argv[])
 ```
 
 这个快捷键的创建位置在Mainwidnow，这样快捷键就随着mainwindow周期
+
+
+## 3、主题设置不生效
+
+某些版本的qt，在构造函数设置主题会不完全生效，可以使用QTimer投放到队列最后执行，如：
+
+```cpp
+QTimer::singleShot(0, this, [ this ]() { 
+    this->setRibbonTheme(SARibbonMainWindow::RibbonThemeDark); 
+    });
+```
 
 # 给我一个鼓励
 

@@ -1,4 +1,4 @@
-#include "SARibbonMainWindow.h"
+﻿#include "SARibbonMainWindow.h"
 #include "SARibbonBar.h"
 #include "SARibbonElementManager.h"
 #include "SARibbonTabBar.h"
@@ -213,10 +213,11 @@ void SARibbonMainWindow::updateWindowFlag(Qt::WindowFlags flags)
 /**
  * @brief SARibbonMainWindow::setRibbonTheme
  *
- * 注意主题在构造函数设置主题会不完全生效，使用QTimer投放到队列最后执行即可
+ * 注意某些版本的qt，在构造函数设置主题会不完全生效，可以使用QTimer投放到队列最后执行，如：
  * @code
  * QTimer::singleShot(0, this, [ this ]() { this->setRibbonTheme(SARibbonMainWindow::RibbonThemeDark); });
  * @endcode
+ *
  * @param theme
  */
 void SARibbonMainWindow::setRibbonTheme(SARibbonTheme theme)
