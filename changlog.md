@@ -1,16 +1,30 @@
 ﻿# 版本记录(change log):
 
+## 2024-12-23 -> 2.2.7 [hotfix]
+
+- 修正合并文件会存在宏重复定义问题
+
+## 2024-12-23 -> 2.2.6 
+
+- 修正了category在滚动时，右边的滚动按钮不会随着滚动到最右边消失的问题
+- 统一所有文件的换行为CRLF
+- 调整cmake，qwk的依赖为private
+- example的cmake添加静态编译的例子
+
 ## 2024-10-17 -> 2.2.5
+
 - 原有的qt关键宏替换为Q_SIGNAL\Q_SLOT\Q_EMIT，以适应no_keywords设置
 - 调整目录结构，单独把example提取出来
 - 完善mdi窗口的例子，可以结合qwk实现mdi窗口的最大最小化按钮的显示
 
 ## 2024-09-12 -> 2.2.4
+
 - 修正自定义过程调用setRibbonBar后，会导致最大最小化按钮被遮挡的问题
 - 调整Mdi例子中cmake的文件大小写，避免在linux系统下大小写敏感
 - 修正qwk开启后，eventfilter没有捕获的问题
 
 ## 2024-07-25 -> 2.2.1
+
 - 增加setPannelSpacing接口，可调节pannel按钮的间距
 - SARibbonToolButton的icon尺寸可设置，在小按钮模式下，用户可指定icon尺寸
 - 把SARibbonMainWindow的事件处理通过eventfilter实现，避免用户在重写事件时误操作
@@ -18,6 +32,7 @@
 - 修正SystemBar在qwk下会位置有偏离的问题
 
 ## 2024-07-15 -> 2.2.0
+
 - 增加了mdi窗口的示例
 - 增加了SARibbonTabBar的tab尺寸计算方式，可以让tab高度按照tabbar高度自动调整
 - 示例增加了尺寸设置的配置，可以任意调整titlebar，tabbar，pannel title height的高度
@@ -25,6 +40,7 @@
 - 添加snap layout的开关，在依赖qwk下，可以设置是否开启snap layout
 
 ## 2024-05-23 -> 2.1.0
+
 - 添加actionTriggered信号
 - 修正了滚动action显示效果
 - 把SARibbonTheme从SARibbonMainWindow中转移到SARibbonGloabls.h中并作为枚举类(enum class)
@@ -32,15 +48,18 @@
 - 调整了布局移动的实现方式，不会出现压缩式移动
 
 ## 2024-02-07 -> 2.0.3
+
 - 调整SAColorToolButton的实现，使之更简单
 - 修正qwk库引入的cmake
 - 调整文档
 
 ## 2024-02-07 -> 2.0.2 
+
 - 修正SARibbonSystemButtonBar的编码问题，可能会导致vs下无法编译成功
 - SARibbonContextCategory的标签颜色调整
 
 ## 2024-01-27 -> 2.0.1【失效，请使用v2.0.2及以上版本】
+
 - 调整qss，让SARibbonApplicationButton的下拉箭头不显示
 - 文档添加gallery
 - 修正了一个布局可能异常的点
