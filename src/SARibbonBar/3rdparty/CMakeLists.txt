@@ -18,6 +18,9 @@ endif()
 # 避免和min/max宏冲突
 add_definitions(-DNOMINMAX)
 
+# 在当前目录安装，此操作会让库安装在当前目录下，新建类似bin_qt5.14.2_msvc_x64这样的文件夹，否则就安装到默认位置，windows的默认位置一般位于C:\Program Files
+option(QWK_INSTALL_IN_CURRENT_DIR "Whether to install in the current directory" ON)
+
 ########################################################
 # 安装路径设置
 ########################################################
@@ -43,7 +46,9 @@ set(SARIBBON_BIN_NAME bin_qt${QT_VERSION}_${CMAKE_CXX_COMPILER_ID}_${SARIBBON_PL
 set(SARIBBON_BIN_DIR ${CMAKE_CURRENT_LIST_DIR}/../../../${SARIBBON_BIN_NAME})
 # windows系统下，默认直接安装到当前文件夹下
 if(WIN32)
-    set(CMAKE_INSTALL_PREFIX "${SARIBBON_BIN_DIR}")
+	if(QWK_INSTALL_IN_CURRENT_DIR)
+		set(CMAKE_INSTALL_PREFIX "${SARIBBON_BIN_DIR}")
+	endif()
 endif()
 ########################################################
 # 第三方库参数设置
