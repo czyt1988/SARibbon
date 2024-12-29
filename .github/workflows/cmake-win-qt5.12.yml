@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        win_version: [2019, latest]
+        win_version: [latest]
         qt_version: [5.12.*]
         shared: [ON]
 
