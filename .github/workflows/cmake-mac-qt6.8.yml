@@ -1,4 +1,4 @@
-name: CMake-Mac-Qt5.12LTS
+name: CMake-Mac-Qt6.8LTS
 
 on: [pull_request,push]
 
@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         macos_version: [latest]
-        qt_version: [5.12.*]
+        qt_version: [6.8.*]
         shared: [ON]
 
     steps:
