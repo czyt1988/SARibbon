@@ -28,6 +28,8 @@ jobs:
             cache: 'true'
             cache-key-prefix: ${{ runner.os }}-Qt-Cache-${{ matrix.qt_version }}
             dir: ${{ github.workspace }}/Qt
+            host: 'windows'
+            arch: 'win64_msvc2019_64'
 
       - name: Configure CMake
         run: cmake -DCMAKE_BUILD_TYPE="${{env.BUILD_TYPE}}" -DBUILD_SHARED_LIBS=${{ matrix.shared }} -DBUILD_EXAMPLES=OFF -B "${{github.workspace}}/build"

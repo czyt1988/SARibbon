@@ -18,6 +18,9 @@ jobs:
         shared: [ON]
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
       - name: Install Qt
         uses: jurplel/install-qt-action@v4
         with:
