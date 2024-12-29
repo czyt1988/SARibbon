@@ -1,4 +1,4 @@
-name: CMake-Linux-Qt6.2LTS
+name: CMake-Linux-Qt6.8LTS
 
 on: [pull_request,push]
 
@@ -14,7 +14,7 @@ jobs:
       fail-fast: false
       matrix:
         ubuntu_version: [latest]
-        qt_version: [6.2.*]
+        qt_version: [6.8.*]
         shared: [ON]
 
     steps:
