@@ -2,132 +2,141 @@
 
 # 准备工作
 
-SARibbon使用了[QWindowkit](https://github.com/stdware/qwindowkit)作为无边框方案，同时也支持简单的无边框方案，如果你需要操作系统原生的窗口支持，如windows7以后的贴边处理，windows11的Snap Layout效果，建议开启[QWindowkit](https://github.com/stdware/qwindowkit)库，[QWindowkit](https://github.com/stdware/qwindowkit)库还能较好解决多屏幕移动问题
+SARibbon采用[QWindowkit](https://github.com/stdware/qwindowkit)作为无边框窗口方案，同时也支持简单的无边框设置。如果你需要操作系统原生的窗口特性，如Windows 7及以后版本的贴边处理，或Windows 11的Snap Layout效果，建议启用[QWindowkit](https://github.com/stdware/qwindowkit)库。该库还能有效解决多屏幕移动问题。
 
-开启QWindowkit将能实现如下效果：
+启用QWindowkit后，你将能实现如下效果：
 
 ![](./pic/set-qwindowkit-on-snap.gif)
 
-如果你要开启[QWindowkit](https://github.com/stdware/qwindowkit)，需要先编译[QWindowkit](https://github.com/stdware/qwindowkit)库，[QWindowkit](https://github.com/stdware/qwindowkit)库作为SARibbon项目的submodules，如果在`git clone`时没有附带`--recursive`参数，需要执行`submodule update`命令:
+若要启用[QWindowkit](https://github.com/stdware/qwindowkit)，需先编译该库。作为SARibbon项目的子模块，如果你在`git clone`时没有使用`--recursive`参数，需执行`submodule update`命令：
 
 ```shell
 git submodule update --init --recursive
 ```
 
+# 关于安装位置
+
+通过CMake构建完成后，使用`install`命令可以安装所有依赖。引用库时，只需通过`find_package`命令，即可将所有依赖和预定义宏等配置一并引入，这是目前最推荐的做法。
+
+然而，在程序开发过程中，可能会遇到不同编译器（如MSVC、MinGW）和不同Qt版本的编译问题。如果使用默认的安装位置（Windows下为C:\Program Files），则只能安装一个版本的库。为了区分不同编译器和Qt版本，SARibbon默认使用本地安装。本地安装会根据编译器和Qt版本生成一个安装文件夹，文件夹命名格式为`bin_qt{version}_[MSVC/GNU]_x[64/86]`。通过`SARIBBON_INSTALL_IN_CURRENT_DIR`选项可以配置是否根据编译器和Qt版本安装到本地，该选项默认为`ON`，即会根据编译器和Qt版本生成一个本地文件夹进行安装。
+
 # 编译QWindowkit库(如果不开启跳过此步)
 
-`QWindowkit`库只提供了cmake的编译方式，必须使用cmake
+`QWindowkit`库仅提供CMake的编译方式，必须使用CMake进行编译。
 
-为了简单，在`src/SARibbonBar/3rdparty`下提供了一个`CMakeLists.txt`文件，已经对此库的必要配置进行了设置，直接调用`src/SARibbonBar/3rdparty/CMakeLists.txt`文件编译即可
+为简化操作，在`src/SARibbonBar/3rdparty`下提供了一个`CMakeLists.txt`文件，已对该库的必要配置进行了设置。你可以直接调用该文件进行编译。
 
-使用Qt Creator和使用visual studio构建和安装基本一样
+使用Qt Creator和Visual Studio进行构建和安装的方式基本相同。
 
 ## 使用Qt Creator构建和安装QWindowkit库
 
-使用qt creator编译`QWindowkit`库，直接用qt creator打开`src/SARibbonBar/3rdparty/CMakeLists.txt`文件
+1. 使用Qt Creator打开`src/SARibbonBar/3rdparty/CMakeLists.txt`文件。
 
 ![](./pic/build-cmake-qwk-qtc-01.png)
 
-点击运行（Ctrl+R）
+2. 点击运行（Ctrl+R）。
 
 ![](./pic/build-cmake-qwk-qtc-02.png)
 
-切换到项目模式（Ctrl+5）
+3. 切换到项目模式（Ctrl+5）。
 
-build步骤选择install（有些版本qt creator无法all和install一起选中，那么就先选all，编译完成后选install再执行安装）
+4. 在Build步骤中选择`install`（有些版本的Qt Creator无法同时选中`all`和`install`，此时可先选`all`，编译完成后再选`install`进行安装）。
 
 ![](./pic/build-cmake-qwk-qtc-03.png)
 
-再点击运行（Ctrl+R）
+5. 再次点击运行（Ctrl+R）。
 
-这时你会在SARibbon根目录下看到形如`bin_qt5.14.2_MSVC_x64`这样的安装目录，这里自动把`QWindowkit`库安装在此目录下
+此时，你会在SARibbon根目录下看到形如`bin_qt5.14.2_MSVC_x64`的安装目录，`QWindowkit`库已自动安装在此目录下。
 
 ![](./pic/build-cmake-qwk-qtc-04.png)
 
-此时完成`QWindowkit`库的编译和安装
+至此，`QWindowkit`库的编译和安装已完成。
 
 ## 使用visual studio构建和安装QWindowkit库
 
-使用visual studio编译`QWindowkit`库，用visual studio打开->CMake，选择`src/SARibbonBar/3rdparty/CMakeLists.txt`文件
+1. 使用Visual Studio打开CMake项目，选择`src/SARibbonBar/3rdparty/CMakeLists.txt`文件。
 
 ![](./pic/build-cmake-vs-01.png)
 
-选中CMake菜单->全部生成（有些版本没有CMake菜单，可以在CMakeLists.txt点右键）
+2. 在CMake菜单中选择“全部生成”（有些版本没有CMake菜单，可在`CMakeLists.txt`上点击右键）。
 
 ![](./pic/build-cmake-vs-03.png)
 
-选中CMake菜单->安装（有些版本没有CMake菜单，可以在CMakeLists.txt点右键）
+3. 在CMake菜单中选择“安装”（有些版本没有CMake菜单，可在`CMakeLists.txt`上点击右键）。
 
 ![](./pic/build-cmake-vs-04.png)
 
-> 不同的vs操作有点不一样，没有CMake菜单的，可以在CMakeLists.txt点右键
+> 注意：不同版本的Visual Studio操作可能略有不同，没有CMake菜单的，可以在`CMakeLists.txt`上点击右键。
 
 ![](./pic/build-cmake-vs-04-other.png)
 
-这时你会在SARibbon根目录下看到形如`bin_qt5.14.2_MSVC_x64`这样的安装目录，这里自动把`QWindowkit`库安装在此目录下
+此时，你会在SARibbon根目录下看到形如`bin_qt5.14.2_MSVC_x64`的安装目录，`QWindowkit`库已自动安装在此目录下。
 
 ![](./pic/build-cmake-qwk-qtc-04.png)
 
-此时完成`QWindowkit`库的编译和安装
+至此，`QWindowkit`库的编译和安装已完成。
 
 ## 使用命令行构建(适用Qt5及vs2019以下)
 
-由于`QWindowkit`库要求的cmake版本较高，vs2019及以下版本内置的cmake版本基本都无法满足，因此需要通过命令行对`QWindowkit`库进行构建，这里介绍在windows下如何通过cmd命令行构建`QWindowkit`库
+由于`QWindowkit`库要求的CMake版本较高，VS2019及以下版本内置的CMake版本可能无法满足需求。因此，需要通过命令行对`QWindowkit`库进行构建。以下是在Windows下通过CMD命令行构建`QWindowkit`库的步骤：
 
-首先你要安装一个高版本的cmake工具,假设安装在了`C:\Program Files (x86)\cmake3.27.9\bin\cmake.exe`,同时你要确认你的qt版本路径和编译器，这里以Qt5.14.2 MSVC 2017版本举例
+1. 安装一个高版本的CMake工具，并确认其路径（例如：`C:\Program Files (x86)\cmake3.27.9\bin\cmake.exe`）。
 
-找到你qt的安装路径下Qt5Config.cmake所在的文件夹，例如：`C:\Qt\Qt5.14.2\5.14.2\msvc2017_64\lib\cmake\Qt5`
+2. 确认你的Qt版本路径和编译器。以Qt5.14.2 MSVC 2017版本为例。
 
-打开命令行，cd到`src/SARibbonBar/3rdparty`目录，首先执行下面语句：
+3. 找到Qt安装路径下`Qt5Config.cmake`所在的文件夹（例如：`C:\Qt\Qt5.14.2\5.14.2\msvc2017_64\lib\cmake\Qt5`）。
 
-```
-"C:\Program Files (x86)\cmake3.27.9\bin\cmake.exe" -B build -S . -G "Visual Studio 15 2017" -A x64 -DQt5_DIR="C:\Qt\Qt5.14.2\5.14.2\msvc2017_64\lib\cmake\Qt5"
-```
+4. 打开命令行，切换到`src/SARibbonBar/3rdparty`目录，执行以下命令：
 
-一般你的cmake.exe无法不在环境变量中，你在cmd命令中可以指定完整cmake路径，执行完后会看到如下输出：
+   ```shell
+   "C:\Program Files (x86)\cmake3.27.9\bin\cmake.exe" -B build -S . -G "Visual Studio 15 2017" -A x64 -DQt5_DIR="C:\Qt\Qt5.14.2\5.14.2\msvc2017_64\lib\cmake\Qt5"
+   ```
 
-![](./pic/cmd-build-qwk.png)
+   如果`cmake.exe`不在环境变量中，需指定完整路径。如果在环境变量中，则只需输入`cmake`即可。
 
-接着你再执行下面两个命令即可
+5. 执行完成后，会看到相应的输出。
 
-```
+   ![](./pic/cmd-build-qwk.png)
+
+6. 接着执行以下两个命令：
+
+```shell
 "C:\Program Files (x86)\cmake3.27.9\bin\cmake.exe" --build build --target install --config Debug
 "C:\Program Files (x86)\cmake3.27.9\bin\cmake.exe" --build build --target install --config Release
 ```
 
 # 构建SARibbonBar库
 
-`SARibbonBar`库提供`cmake`和`qmake`两种方式构建，推荐使用`cmake`
+`SARibbonBar`库提供CMake和QMake两种方式构建，推荐使用CMake。
 
-> qt6之后不再维护`qmake`，逐渐转移到`cmake`中，`SARibbon`的未来版本不排除移除`qmake`
+> 注意：Qt6之后不再维护QMake，逐渐转向CMake。SARibbon的未来版本可能会移除QMake支持。
 
 ## 基于`CMake`构建`SARibbonBar`库
 
 ### vs下基于`cmake`的构建
 
-如果要开启`QWindowKit`，在`CMakeLists.txt`中把`SARIBBON_USE_FRAMELESS_LIB`的option值手动改为ON
+1. 如果要启用`QWindowKit`，在`CMakeLists.txt`中将`SARIBBON_USE_FRAMELESS_LIB`的option值手动改为ON。
+2. 打开CMake项目，选中`CMakeLists.txt`。
 
-点击文件->打开->Cmake 选中CMakeLists.txt
+   ![](./pic/build-cmake-vs-01.png)
 
-![](./pic/build-cmake-vs-01.png)
+3. 将会形成如下的构建树。
 
-将会形成如下的构建树
+   ![](./pic/build-cmake-vs-02.png)
 
-![](./pic/build-cmake-vs-02.png)
+4. 直接在CMake菜单中选择“全部生成”（有些版本没有CMake菜单，可在`CMakeLists.txt`上点击右键）。
 
-直接点击CMake菜单->全部生成（有些版本没有CMake菜单，可以在CMakeLists.txt点右键）
+   ![](./pic/build-cmake-vs-03.png)
 
-![](./pic/build-cmake-vs-03.png)
+5. 全部生成完成后，在CMake菜单中选择“安装”->“SARibbon”（有些版本没有CMake菜单，可在`CMakeLists.txt`上点击右键）。
 
-全部生成完成后，CMake菜单->安装->SARibbon（有些版本没有CMake菜单，可以在CMakeLists.txt点右键）
+   ![](./pic/build-cmake-vs-04.png)
 
-![](./pic/build-cmake-vs-04.png)
+此时，你会在源码根目录下看到一个新文件夹，文件夹命名格式为`bin_qt{version}_[MSVC/GNU]_x[64/86]`（你可以使用默认安装位置，将`SARIBBON_INSTALL_IN_CURRENT_DIR`变量设置为OFF即可：`SARIBBON_INSTALL_IN_CURRENT_DIR=OFF`）。
 
-这时候你会看到源码的根目录下多出一个文件夹,文件夹命名方式为`bin_qt{version}_[MSVC/GNU]_x[64/86]`（你可以使用默认安装位置，把`SARIBBON_INSTALL_IN_CURRENT_DIR`变量设置为OFF即可:`SARIBBON_INSTALL_IN_CURRENT_DIR=OFF`）
+   ![](./pic/build-cmake-install-dir.png)
 
-![](./pic/build-cmake-install-dir.png)
-
-### qtcreator下基于cmake的构建
+### Qt Creator下基于CMake的构建
 
 点击文件->打开文件或项目选中CMakeLists.txt，加载完成后形成如下的构建树
 
@@ -249,4 +258,3 @@ SARibbon在编译过程中有些预定义宏，这些宏在基于visual studio�
 `SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1/0`,此宏用来定义是否引入了`QWindowkit`库
 
 `SARIBBON_ENABLE_SNAP_LAYOUT=1/0`,此宏在SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1时才有用，用于定义是否开始windows11的snap layout效果
-
