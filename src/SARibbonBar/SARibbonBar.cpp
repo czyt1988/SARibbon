@@ -1552,10 +1552,12 @@ int SARibbonBar::currentIndex()
  */
 void SARibbonBar::raiseCategory(SARibbonCategory* category)
 {
-	int index = d_ptr->mStackedContainerWidget->indexOf(category);
-
-	if (index >= 0) {
-		setCurrentIndex(index);
+	for (int i = 0; i < d_ptr->mRibbonTabBar->count(); ++i) {
+		_SARibbonTabData p = d_ptr->mRibbonTabBar->tabData(i).value< _SARibbonTabData >();
+		if (p.category == category) {
+			d_ptr->mRibbonTabBar->setCurrentIndex(i);
+			return;
+		}
 	}
 }
 
