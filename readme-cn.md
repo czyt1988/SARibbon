@@ -757,6 +757,8 @@ int main(int argc, char* argv[])
 }
 ```
 
+如果你使用OpenGL窗口发生了一些奇怪的问题，你可以把上面这些语句去掉看看，最新版Qt已经不需要进行上述的处理了
+
 ## 2、快捷键问题
 
 经常有人反馈使用SARibbonBar后，没有被激活的tab页的快捷键没有响应，只有激活的标签页的快捷键才有反应，如果是传统的toolbar模式，由于action所在的toolbar一直在最前端，因此快捷键一直生效，但如果是SARibbonBar，action所在的pannel是会隐藏的，隐藏后快捷键就不生效，如果想快捷键无论Pannel是否隐藏都生效，设置快捷键的`shortcutContext`属性为`Qt::ApplicationShortcut`也无效，这时，可以在创建Category的地方手动创建快捷键
@@ -783,6 +785,23 @@ int main(int argc, char* argv[])
 QTimer::singleShot(0, this, [ this ]() { 
     this->setRibbonTheme(SARibbonMainWindow::RibbonThemeDark); 
     });
+```
+
+## 4、遇到宏重定义
+
+出现这个错误是在使用SARibbon.h/cpp时，这是因为早期版本的一些写在cpp里的调试宏没有做`#ifdef`处理，多个cpp合并后就会出现问题，用共享库不会出现此问题，如果遇到此问题，更新到v2.2.8以上版本即可
+
+## 5、最大最小化图标不在右上角而在左上角
+
+如果你遇到这个问题，确认编译的库文件和头文件是否匹配，通常这个问题发生在局部更新上，也就是仅仅替换了dll，而没有替换h文件导致的，有些工程在拉取了最新的SARibbon版本后，更新完直接替换lib和dll文件，头文件没有替换就会发生此问题，修复此问题的方法是确保所有文件的版本一致性，你可以把原来涉及的文件都删除掉，如果你用cmake安装的话，将涉及如下文件/文件夹：
+
+```
+bin/SARibbonBar.dll
+include/SARibbonBar[文件夹]
+lib/SARibbonBar.lib
+lib/qmake/SARibbonBar[文件夹]
+lib/cmake/SARibbonBar[文件夹]
+SARibbonBar_amalgamate
 ```
 
 # 给我一个鼓励
