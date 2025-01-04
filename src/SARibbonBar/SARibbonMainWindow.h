@@ -90,6 +90,8 @@ public:
 	virtual bool eventFilter(QObject* obj, QEvent* e) Q_DECL_OVERRIDE;
 	// 获取最大化，最小化，关闭按钮所在的bar。可以通过此函数在最大最小化按钮旁边设置内容
 	SARibbonSystemButtonBar* windowButtonBar() const;
+    // 确保系统最大最小化按钮的事件过滤器安装成功，如果你清除了过滤器，需要调用此函数把最大最小化按钮的过滤器安装上去
+    void ensureSystemButtonBarEventFilter();
 
 protected:
     // 创建ribbonbar的工厂函数
@@ -97,7 +99,6 @@ protected:
 private Q_SLOTS:
     void onPrimaryScreenChanged(QScreen* screen);
 };
-
 
 /**
  * @brief 针对SARibbonMainWindow的事件处理器，主要处理systembar的位置调整

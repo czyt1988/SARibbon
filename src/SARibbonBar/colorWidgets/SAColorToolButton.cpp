@@ -8,7 +8,6 @@
 #include <QDebug>
 #include "SAColorMenu.h"
 
-#define SAColorToolButton_DEBUG_PRINT 0
 class SAColorToolButton::PrivateData
 {
     SA_COLOR_WIDGETS_DECLARE_PUBLIC(SAColorToolButton)

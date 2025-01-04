@@ -346,20 +346,21 @@ QSize SARibbonSystemButtonBar::sizeHint() const
 
 bool SARibbonSystemButtonBar::eventFilter(QObject* obj, QEvent* event)
 {
-    if (obj == parent()) {
+    if (obj && event) {
+        SARibbonMainWindow* mainWindow = qobject_cast< SARibbonMainWindow* >(obj);
+        if (!mainWindow) {
+            // 所有事件都不消费
+            return QFrame::eventFilter(obj, event);
+        }
         // SARibbonMainWindow的事件
-        if (event->type() == QEvent::Resize) {
-            SARibbonMainWindow* mainWindow = qobject_cast< SARibbonMainWindow* >(obj);
-            if (!mainWindow) {
-                // 所有事件都不消费
-                return QFrame::eventFilter(obj, event);
-            }
+        switch (event->type()) {
+        case QEvent::Resize: {
+            int th = 25;
+
             SARibbonBar* ribbonBar = mainWindow->ribbonBar();
-            if (!ribbonBar) {
-                // 所有事件都不消费
-                return QFrame::eventFilter(obj, event);
+            if (ribbonBar) {
+                th = ribbonBar->titleBarHeight();
             }
-            const int th = ribbonBar->titleBarHeight();
             if (th != height()) {
                 setWindowTitleHeight(th);
             }
@@ -367,14 +368,15 @@ bool SARibbonSystemButtonBar::eventFilter(QObject* obj, QEvent* event)
             QSize wgSizeHint = sizeHint();
             setGeometry(fr.width() - wgSizeHint.width(), 0, wgSizeHint.width(), wgSizeHint.height());
             // 把设置好的尺寸给ribbonbar
-            ribbonBar->setWindowButtonGroupSize(size());
-        } else if (event->type() == QEvent::WindowStateChange) {
-            SARibbonMainWindow* mainWindow = qobject_cast< SARibbonMainWindow* >(obj);
-            if (!mainWindow) {
-                // 所有事件都不消费
-                return QFrame::eventFilter(obj, event);
+            if (ribbonBar) {
+                ribbonBar->setWindowButtonGroupSize(size());
             }
+        } break;
+        case QEvent::WindowStateChange: {
             setWindowStates(mainWindow->windowState());
+        } break;
+        default:
+            break;
         }
     }
     return QFrame::eventFilter(obj, event);
