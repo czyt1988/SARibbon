@@ -154,7 +154,7 @@ void SARibbonMainWindow::setRibbonBar(SARibbonBar* ribbon)
 void SARibbonMainWindow::setFramelessHitTestVisible(QWidget* w, bool visible)
 {
 	auto helper = d_ptr->mFramelessHelper;
-	helper->setHitTestVisible(const_cast<QWidget*>(w), visible);
+    helper->setHitTestVisible(const_cast< QWidget* >(w), visible);
 }
 #else
 
@@ -180,9 +180,9 @@ bool SARibbonMainWindow::eventFilter(QObject* obj, QEvent* e)
 		case QEvent::MouseMove:
 		case QEvent::Leave:
 		case QEvent::HoverMove:
-		case QEvent::MouseButtonDblClick:
+        case QEvent::MouseButtonDblClick: {
 			QApplication::sendEvent(this, e);
-
+        } break;
 		default:
 			break;
 		}
@@ -198,6 +198,15 @@ bool SARibbonMainWindow::eventFilter(QObject* obj, QEvent* e)
 SARibbonSystemButtonBar* SARibbonMainWindow::windowButtonBar() const
 {
     return d_ptr->mWindowButtonGroup;
+}
+
+/**
+ * @brief 确保系统最大最小化按钮的事件过滤器安装成功
+ *
+ * 如果你清除了过滤器，需要调用此函数把最大最小化按钮的过滤器安装上去
+ */
+void SARibbonMainWindow::ensureSystemButtonBarEventFilter()
+{
 }
 
 /**
@@ -370,10 +379,10 @@ SARibbonMainWindowEventFilter::~SARibbonMainWindowEventFilter()
 
 bool SARibbonMainWindowEventFilter::eventFilter(QObject* obj, QEvent* e)
 {
-	if (e) {
+    if (e && obj) {
 		if (e->type() == QEvent::Resize) {
 			if (SARibbonMainWindow* m = qobject_cast< SARibbonMainWindow* >(obj)) {
-				if (SARibbonBar* ribbon = m->ribbonBar()) {
+                if (SARibbonBar* ribbon = m->ribbonBar()) {
 					ribbon->setFixedWidth(m->size().width());
 				}
 			}

@@ -13,6 +13,15 @@
  * SARibbonButtonGroupWidget#SASystemButtonGroup
  * @endcode
  *
+ * SARibbonSystemButtonBar的eventfilter捕获mainwindow的事件,通过eventerfilter来处理mainwindow的事件，避免用户错误的继承resizeEvent导致systembar的位置异常
+ *
+ * 因此，主窗口需要安装事件过滤器
+ *
+ * @code
+ * MainWindow::MainWindow(){
+ *    installEventFilter(mWindowButtonGroup);
+ * }
+ * @endcode
  */
 class SA_RIBBON_EXPORT SARibbonSystemButtonBar : public QFrame
 {
