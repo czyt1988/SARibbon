@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.5)
 
 set(SARIBBON_VERSION_MAJOR 2)
 set(SARIBBON_VERSION_MINOR 2)
-set(SARIBBON_VERSION_PATCH 5)
+set(SARIBBON_VERSION_PATCH 8)
 set(SARIBBON_VERSION "${SARIBBON_VERSION_MAJOR}.${SARIBBON_VERSION_MINOR}.${SARIBBON_VERSION_PATCH}")
 message(STATUS "SARibbon v${SARIBBON_VERSION}")
 project(SARibbon VERSION ${SARIBBON_VERSION} LANGUAGES CXX)
@@ -18,7 +18,11 @@ option(SARIBBON_USE_FRAMELESS_LIB "Using the QWindowKit library as a frameless s
 # frameless能提供windows的窗口特效，如边缘吸附，且对高分屏多屏幕的支持更好,默认开启
 option(SARIBBON_ENABLE_SNAPLAYOUT "Whether to enable the Snap Layout effect in Windows 11, this option only takes effect when SARIBBON_USE_FRAMELESS_LIB=ON" OFF)
 # 在当前目录安装，此操作会让库安装在当前目录下，新建类似bin_qt5.14.2_msvc_x64这样的文件夹，否则就安装到默认位置，windows的默认位置一般位于C:\Program Files
-option(SARIBBON_INSTALL_IN_CURRENT_DIR "Whether to install in the current directory" ON)
+if(WIN32)
+    option(SARIBBON_INSTALL_IN_CURRENT_DIR "Whether to install in the current directory" ON)
+else()
+    option(SARIBBON_INSTALL_IN_CURRENT_DIR "Whether to install in the current directory" OFF)
+endif()
 
 # load Qt library, minimum version required is 5.8
 # cn:Qt库加载,最低版本要求为5.8
@@ -110,10 +114,8 @@ set(SARIBBON_LOCAL_INSTALL_BIN_DIR ${CMAKE_CURRENT_LIST_DIR}/${SARIBBON_LOCAL_IN
 
 # windows系统下，默认直接安装到当前文件夹下
 if(SARIBBON_INSTALL_IN_CURRENT_DIR)
-    if(WIN32)
-        set(CMAKE_INSTALL_PREFIX "${SARIBBON_LOCAL_INSTALL_BIN_DIR}")
-        message(STATUS "SARIBBON_INSTALL_IN_CURRENT_DIR=ON,will install in:${CMAKE_INSTALL_PREFIX}")
-    endif()
+    set(CMAKE_INSTALL_PREFIX "${SARIBBON_LOCAL_INSTALL_BIN_DIR}")
+    message(STATUS "SARIBBON_INSTALL_IN_CURRENT_DIR=ON,will install in:${CMAKE_INSTALL_PREFIX}")
 endif()
 ##################################
 # subdirectory

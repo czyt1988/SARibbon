@@ -83,7 +83,9 @@ else()
         )
     endif()
 endif()
-
+if(WIN32)
+    set_target_properties(StaticExample PROPERTIES WIN32_EXECUTABLE TRUE)
+endif()
 target_link_libraries(StaticExample PRIVATE Qt${QT_VERSION_MAJOR}::Widgets)
 target_include_directories(StaticExample PUBLIC
     $<INSTALL_INTERFACE:include>

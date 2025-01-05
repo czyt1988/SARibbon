@@ -9,13 +9,17 @@ file(GLOB HEADER_FILES "${CMAKE_CURRENT_LIST_DIR}/*.h")
 file(GLOB SOURCE_FILES "${CMAKE_CURRENT_LIST_DIR}/*.cpp")
 file(GLOB UI_FILES "${CMAKE_CURRENT_LIST_DIR}/*.ui")
 file(GLOB RESOURCE_FILES "${CMAKE_CURRENT_LIST_DIR}/*.qrc")
-add_executable(MdiAreaWindowExample WIN32
+add_executable(MdiAreaWindowExample
     ${HEADER_FILES}
     ${SOURCE_FILES}
     ${UI_FILES}
     ${RESOURCE_FILES}
 )
-
+if(WIN32)
+    set_target_properties(MdiAreaWindowExample PROPERTIES
+        WIN32_EXECUTABLE TRUE
+    )
+endif()
 if(NOT TARGET SARibbonBar)
     # 说明这个例子是单独加载
     message(STATUS "NOT TARGET SARibbonBar find_package(SARibbonBar REQUIRED)")

@@ -201,13 +201,13 @@ endif()
 # 头文件
 install(FILES
     ${SARIBBON_HEADER_FILES}
-    DESTINATION include/${SARIBBON_LIB_NAME}
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${SARIBBON_LIB_NAME}
     COMPONENT headers
 )
 # SAColorWidget的头文件
 install(FILES
     ${SACOLOR_HEADER_FILES}
-    DESTINATION include/${SARIBBON_LIB_NAME}/colorWidgets
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${SARIBBON_LIB_NAME}/colorWidgets
     COMPONENT headers
 )
 
@@ -232,11 +232,7 @@ install(FILES
     ${SARIBBON_RESOURCE_FILES}
     DESTINATION ${SARIBBON_LIB_NAME}_amalgamate/SARibbonBar
 )
-# 复制3rdparty目录到install/amalgamate目录
-install(DIRECTORY
-    ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty
-    DESTINATION ${SARIBBON_LIB_NAME}_amalgamate/SARibbonBar
-)
+
 
 
 include(CMakePackageConfigHelpers)
@@ -245,7 +241,7 @@ include(CMakePackageConfigHelpers)
 # PACKAGE_PREFIX_DIR等于${CMAKE_CURRENT_LIST_DIR}/../..
 # 最终变为${CMAKE_CURRENT_LIST_DIR}/../../include
 # 注意此处是替换，不要出现引号
-set(SARIBBON_LIB_INCLUDE_INSTALL_DIR include/${SARIBBON_LIB_NAME})
+set(SARIBBON_LIB_INCLUDE_INSTALL_DIR ${CMAKE_INSTALL_INCLUDEDIR}/${SARIBBON_LIB_NAME})
 write_basic_package_version_file(
     ${CMAKE_CURRENT_BINARY_DIR}/${SARIBBON_LIB_NAME}ConfigVersion.cmake
     VERSION ${SARIBBON_VERSION}
