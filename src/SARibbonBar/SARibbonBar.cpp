@@ -185,8 +185,8 @@ int SARibbonBar::PrivateData::systemTabBarHeight() const
  */
 int SARibbonBar::PrivateData::calcTabBarHeight()
 {
-	int defaultHeight  = systemTabBarHeight();
-	int fontHeight     = q_ptr->fontMetrics().lineSpacing();  // 不要用height，像宋体这种字体，height=12，lineSpacing=14，有些就无法显示
+    int defaultHeight = systemTabBarHeight();
+    int fontHeight = q_ptr->fontMetrics().lineSpacing();  // 不要用height，像宋体这种字体，height=12，lineSpacing=14，有些就无法显示
 	int defaultHeight2 = fontHeight * 1.6;
 	if (defaultHeight2 < fontHeight + 10) {
 		defaultHeight2 = fontHeight + 10;  // 主要为了满足office2021主题，tab下有个4px的横杠
@@ -1732,7 +1732,33 @@ void SARibbonBar::setEnableWordWrap(bool on)
  */
 bool SARibbonBar::isEnableWordWrap() const
 {
-	return SARibbonToolButton::isEnableWordWrap();
+    return SARibbonToolButton::isEnableWordWrap();
+}
+
+/**
+ * @brief 文本宽度估算时的宽度比高度系数
+ * @param fac 系数，默认为1.4，此系数越大，按钮允许的宽度越宽
+ *
+ * 超过此系数的宽度时，开始尝试换行，例如按钮高度为h，如果单行文本的宽度大于h*系数，则按钮将不进行横向拉伸，类似于maxwidth效果
+ *
+ * 此系数和maxwidth取最小值
+ */
+void SARibbonBar::setButtonTextEllipsisAspectFactor(qreal fac)
+{
+    SARibbonToolButton::setTextEllipsisAspectFactor(fac);
+    updateRibbonGeometry();
+}
+
+/**
+ * @brief 文本宽度估算时的宽度比高度系数
+ *
+ * 超过此系数的宽度时，开始尝试换行，例如按钮高度为h，如果单行文本的宽度大于h*系数，则按钮将不进行横向拉伸，类似于maxwidth效果
+ *
+ * 此系数和maxwidth取最小值
+ */
+qreal SARibbonBar::buttonTextEllipsisAspectFactor() const
+{
+    return SARibbonToolButton::textEllipsisAspectFactor();
 }
 
 /**

@@ -326,6 +326,10 @@ public:
     void setEnableWordWrap(bool on);
     bool isEnableWordWrap() const;
 
+    // 文本宽度估算时的宽度比高度系数,超过此系数的宽度时，开始尝试换行或者省略号显示
+    void setButtonTextEllipsisAspectFactor(qreal fac = 1.4);
+    qreal buttonTextEllipsisAspectFactor() const;
+
     // 设置pannel的标题栏高度
     int pannelTitleHeight() const;
     void setPannelTitleHeight(int h);
