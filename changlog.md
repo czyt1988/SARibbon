@@ -4,6 +4,8 @@
 
 - 修正合并文件会存在宏重复定义问题-2.2.7遗漏了一个调试宏
 - SARibbonSeparatorWidget的宽度增加了最小1像素的判断
+- SARibbonToolButton添加了textEllipsisAspectFactor相关接口，用户可以通过设置文字省略显示的长宽比，来调整按钮的最宽宽度
+- 优化了一些cmake的内容
 
 ## 2024-12-23 -> 2.2.7 [hotfix]
 
