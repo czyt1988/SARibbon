@@ -16,41 +16,18 @@
 #include <QProxyStyle>
 
 /**
- * @def 定义文字换行时2行文本的矩形高度系数，此系数决定文字区域的高度
- *
- * fontMetrics.lineSpacing*系数 = 文本区域高度
- */
-#define SARIBBONTOOLBUTTON_WORDWRAP_TEXT_FACTOR 2.05
-
-/**
- * @def 定义文字不换行时单行文本的矩形高度系数，此系数决定文字区域的高度
- *
- * fontMetrics.lineSpacing*系数 = 文本区域高度
- */
-#define SARIBBONTOOLBUTTON_NOWORDWRAP_TEXT_FACTOR 1.2
-
-/**
- * @def 定义小按钮的矩形高度系数，此系数决定文字区域的高度
- *
- * fontMetrics.lineSpacing*系数 = 文本区域高度
- */
-#define SARIBBONTOOLBUTTON_SMALLBUTTON_TEXT_FACTOR 1.4
-
-/**
- * @def 文本宽度估算时的宽度比高度系数
- *
- * 超过此系数的宽度时，开始尝试换行，例如按钮高度为h，如果单行文本的宽度大于h*系数，则触发换行估算
- */
-#define SARIBBONTOOLBUTTON_WORDWRAP_WIDTH_PER_HEIGHT_RATIO 1.4
-
-/**
  * @def 开启此宏会打印一些常见信息
  */
+#ifndef SA_RIBBON_TOOLBUTTON_DEBUG_PRINT
 #define SA_RIBBON_TOOLBUTTON_DEBUG_PRINT 0
+#endif
 
+#ifndef SARIBBONTOOLBUTTON_DEBUG_DRAW
 #define SARIBBONTOOLBUTTON_DEBUG_DRAW 0
+#endif
 
 #if SARIBBONTOOLBUTTON_DEBUG_DRAW
+#ifndef SARIBBONTOOLBUTTON_DEBUG_DRAW_RECT
 #define SARIBBONTOOLBUTTON_DEBUG_DRAW_RECT(p, rect)                                                                    \
     do {                                                                                                               \
         p.save();                                                                                                      \
@@ -59,9 +36,11 @@
         p.drawRect(rect);                                                                                              \
         p.restore();                                                                                                   \
     } while (0)
-
+#endif
 #else
+#ifndef SARIBBONTOOLBUTTON_DEBUG_DRAW_RECT
 #define SARIBBONTOOLBUTTON_DEBUG_DRAW_RECT(p, rect)
+#endif
 #endif
 namespace SA
 {
@@ -217,8 +196,7 @@ public:
                                      int textDrawRectHeight,
                                      const QString& text,
                                      const QFontMetrics& fm,
-                                     float widthHeightRatio = SARIBBONTOOLBUTTON_WORDWRAP_WIDTH_PER_HEIGHT_RATIO,
-                                     int maxTrycount        = 3);
+                                     int maxTrycount = 3);
     QPixmap createIconPixmap(const QStyleOptionToolButton& opt, const QSize& iconsize) const;
     // 获取文字的对其方式
     int getTextAlignment() const;
@@ -240,11 +218,56 @@ public:
     QSize mSizeHint;                 ///< 保存计算好的sizehint
     bool mIsTextNeedWrap { false };  ///< 标记文字是否需要换行显示
 public:
-    static bool s_enableWordWrap;  ///< 在lite模式下是否允许文字换行，如果允许，则图标相对比较小，默认不允许
+    /**
+     * @brief 在lite模式下是否允许文字换行
+     *
+     * 如果允许，则图标相对比较小，默认不允许
+     */
+    static bool s_enableWordWrap;
+
+    /**
+     * @brief 这个系数决定了文字换行时2行文本的矩形高度
+     *
+     * 此值应该大于2
+     *
+     * 文本区域高度 = fontMetrics.lineSpacing*系数
+     */
+    static qreal s_twoLineHeightFactor;
+
+    /**
+     * @brief 这个系数决定了单行文本的行高度
+     *
+     * 此值应该大于1
+     *
+     * 文本区域高度 = fontMetrics.lineSpacing*系数
+     */
+    static qreal s_oneLineHeightFactor;
+
+    /**
+     * @brief 这个系数决定了小按钮文本的行高度
+     *
+     * 此值应该大于1
+     *
+     * 文本区域高度 = fontMetrics.lineSpacing*系数
+     */
+    static qreal s_smallButtonHeightFactor;
+
+    /**
+     * @brief 文本宽度估算时的宽度比高度系数
+     *
+     * 超过此系数的宽度时，开始尝试换行，例如按钮高度为h，如果单行文本的宽度大于h*系数，则按钮将不进行横向拉伸，类似于maxwidth效果
+     *
+     * 此系数和maxwidth取最小值
+     */
+    static qreal s_textEllipsisAspectFactor;
 };
 
 // 静态参数初始化
-bool SARibbonToolButton::PrivateData::s_enableWordWrap = false;
+bool SARibbonToolButton::PrivateData::s_enableWordWrap            = false;
+qreal SARibbonToolButton::PrivateData::s_twoLineHeightFactor      = 2.05;
+qreal SARibbonToolButton::PrivateData::s_oneLineHeightFactor      = 1.2;
+qreal SARibbonToolButton::PrivateData::s_smallButtonHeightFactor  = 1.4;
+qreal SARibbonToolButton::PrivateData::s_textEllipsisAspectFactor = 1.4;
 
 SARibbonToolButton::PrivateData::PrivateData(SARibbonToolButton* p) : q_ptr(p)
 {
@@ -623,13 +646,13 @@ int SARibbonToolButton::PrivateData::calcTextDrawRectHeight(const QStyleOptionTo
 {
     if (SARibbonToolButton::LargeButton == mButtonType) {
         if (isEnableWordWrap()) {
-            return opt.fontMetrics.lineSpacing() * SARIBBONTOOLBUTTON_WORDWRAP_TEXT_FACTOR + opt.fontMetrics.leading();
+            return opt.fontMetrics.lineSpacing() * s_twoLineHeightFactor + opt.fontMetrics.leading();
         } else {
-            return opt.fontMetrics.lineSpacing() * SARIBBONTOOLBUTTON_NOWORDWRAP_TEXT_FACTOR;
+            return opt.fontMetrics.lineSpacing() * s_oneLineHeightFactor;
         }
     }
     // 小按钮
-    return opt.fontMetrics.lineSpacing() * SARIBBONTOOLBUTTON_SMALLBUTTON_TEXT_FACTOR;
+    return opt.fontMetrics.lineSpacing() * s_smallButtonHeightFactor;
 }
 
 /**
@@ -645,12 +668,12 @@ int SARibbonToolButton::PrivateData::estimateLargeButtonTextWidth(int buttonHeig
                                                                   int textDrawRectHeight,
                                                                   const QString& text,
                                                                   const QFontMetrics& fm,
-                                                                  float widthHeightRatio,
                                                                   int maxTrycount)
 {
     QSize textSize;
-    int space        = SA_FONTMETRICS_WIDTH(fm, (QLatin1Char(' '))) * 2;
-    int hintMaxWidth = buttonHeight * widthHeightRatio;  ///< 建议的宽度
+    int space = SA_FONTMETRICS_WIDTH(fm, (QLatin1Char(' '))) * 2;
+    int hintMaxWidth = qMin(static_cast< int >(buttonHeight * SARibbonToolButton::PrivateData::s_textEllipsisAspectFactor),
+                            q_ptr->maximumWidth());  ///< 建议的宽度
     if (isEnableWordWrap()) {
         textSize = fm.size(Qt::TextShowMnemonic, text);
         textSize.setWidth(textSize.width() + space);
@@ -708,10 +731,6 @@ int SARibbonToolButton::PrivateData::estimateLargeButtonTextWidth(int buttonHeig
     if (textSize.width() < hintMaxWidth) {
         // 范围合理，直接返回
         return textSize.width();
-    }
-    if (textSize.width() > q_ptr->maximumWidth()) {
-        // 超出了极限，就返回极限
-        return q_ptr->maximumWidth();
     }
     return hintMaxWidth;
 }
@@ -830,7 +849,7 @@ void SARibbonToolButton::mousePressEvent(QMouseEvent* e)
     d_ptr->mMenuButtonPressed = false;
     //! 注意这里要用QAbstractButton的mousePressEvent，而不是QToolButton的mousePressEvent
     //! QToolButton的mousePressEvent主要是为了弹出菜单，这里弹出菜单的方式是不一样的，因此不能执行QToolButton的mousePressEvent
-    QAbstractButton::mousePressEvent(e);
+    QToolButton::mousePressEvent(e);
 }
 
 void SARibbonToolButton::mouseReleaseEvent(QMouseEvent* e)
@@ -1196,6 +1215,35 @@ void SARibbonToolButton::setEnableWordWrap(bool on)
 bool SARibbonToolButton::isEnableWordWrap()
 {
     return SARibbonToolButton::PrivateData::s_enableWordWrap;
+}
+
+/**
+ * @brief 文本宽度估算时的宽度比高度系数
+ * @param fac 系数，默认为1.4，此系数越大，按钮允许的宽度越宽
+ *
+ * 超过此系数的宽度时，开始尝试换行，例如按钮高度为h，如果单行文本的宽度大于h*系数，则按钮将不进行横向拉伸，类似于maxwidth效果
+ *
+ * 此系数和maxwidth取最小值
+ */
+void SARibbonToolButton::setTextEllipsisAspectFactor(qreal fac)
+{
+    if (fac < 0 && qFuzzyIsNull(fac)) {
+        qWarning() << tr("The TextEllipsisAspectFactor parameter cannot be set to 0 or a negative number");  // cn:textEllipsisAspectFactor不能设置为0或者负数
+        fac = 1.0;
+    }
+    SARibbonToolButton::PrivateData::s_textEllipsisAspectFactor = fac;
+}
+
+/**
+ * @brief 文本宽度估算时的宽度比高度系数
+ *
+ * 超过此系数的宽度时，开始尝试换行，例如按钮高度为h，如果单行文本的宽度大于h*系数，则按钮将不进行横向拉伸，类似于maxwidth效果
+ *
+ * 此系数和maxwidth取最小值
+ */
+qreal SARibbonToolButton::textEllipsisAspectFactor()
+{
+    return SARibbonToolButton::PrivateData::s_textEllipsisAspectFactor;
 }
 
 bool SARibbonToolButton::event(QEvent* e)

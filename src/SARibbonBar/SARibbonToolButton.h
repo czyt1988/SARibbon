@@ -29,27 +29,30 @@ public:
     explicit SARibbonToolButton(QWidget* parent = nullptr);
     explicit SARibbonToolButton(QAction* defaultAction, QWidget* parent = nullptr);
     ~SARibbonToolButton();
-    //标记按钮的样式，按钮的样式有不同的渲染方式
+    // 标记按钮的样式，按钮的样式有不同的渲染方式
     RibbonButtonType buttonType() const;
     void setButtonType(const RibbonButtonType& buttonType);
-    //是否是小按钮
+    // 是否是小按钮
     bool isSmallRibbonButton() const;
-    //是否是大按钮
+    // 是否是大按钮
     bool isLargeRibbonButton() const;
-    //最小尺寸提示
+    // 最小尺寸提示
     virtual QSize minimumSizeHint() const Q_DECL_OVERRIDE;
 
-    //获取间距
+    // 获取间距
     int spacing() const;
-    //更新尺寸
+    // 更新尺寸
     void updateRect();
 
     virtual QSize sizeHint() const Q_DECL_OVERRIDE;
 
 public:
-    //在lite模式下是否允许文字换行
+    // 在lite模式下是否允许文字换行
     static void setEnableWordWrap(bool on);
     static bool isEnableWordWrap();
+    // 文本宽度估算时的宽度比高度系数,超过此系数的宽度时，开始尝试换行或者省略号显示
+    static void setTextEllipsisAspectFactor(qreal fac = 1.4);
+    static qreal textEllipsisAspectFactor();
 
 protected:
     virtual void paintEvent(QPaintEvent* e) Q_DECL_OVERRIDE;
@@ -61,18 +64,18 @@ protected:
     virtual void leaveEvent(QEvent* e) Q_DECL_OVERRIDE;
     virtual bool hitButton(const QPoint& pos) const Q_DECL_OVERRIDE;
     virtual bool event(QEvent* e) Q_DECL_OVERRIDE;
-    //事件改变 - 主要为了捕获字体的改变
+    // 事件改变 - 主要为了捕获字体的改变
     virtual void changeEvent(QEvent* e) Q_DECL_OVERRIDE;
     virtual void actionEvent(QActionEvent* e) Q_DECL_OVERRIDE;
 
 protected:
-    //绘制按钮
+    // 绘制按钮
     virtual void paintButton(QPainter& p, const QStyleOptionToolButton& opt);
-    //绘制图标
+    // 绘制图标
     virtual void paintIcon(QPainter& p, const QStyleOptionToolButton& opt, const QRect& iconDrawRect);
-    //绘制文本
+    // 绘制文本
     virtual void paintText(QPainter& p, const QStyleOptionToolButton& opt, const QRect& textDrawRect);
-    //绘制Indicator
+    // 绘制Indicator
     virtual void paintIndicator(QPainter& p, const QStyleOptionToolButton& opt, const QRect& indicatorDrawRect);
 
 private:
