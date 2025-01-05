@@ -7,13 +7,17 @@ set(CMAKE_AUTORCC ON)
 # qt库加载，最低要求5.8
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} 5.8 COMPONENTS Core Gui Widgets REQUIRED)
-add_executable(MainWindowExample WIN32
+add_executable(MainWindowExample
     mainwindow.h
     mainwindow.cpp
     main.cpp
     saribbonresouce.qrc
 )
-
+if(WIN32)
+    set_target_properties(MainWindowExample PROPERTIES
+        WIN32_EXECUTABLE TRUE
+    )
+endif()
 if(NOT TARGET SARibbonBar)
     # 说明这个例子是单独加载
     message(STATUS "NOT TARGET SARibbonBar find_package(SARibbonBar REQUIRED)")

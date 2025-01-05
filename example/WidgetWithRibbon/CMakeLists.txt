@@ -8,7 +8,7 @@ add_definitions(-DFRAMELESSHELPER_FEATURE_static_build=-1)
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} 5.9 COMPONENTS Core Gui Widgets REQUIRED)
 
-add_executable(WidgetWithRibbon WIN32
+add_executable(WidgetWithRibbon
     RibbonWidget.h
     RibbonWidget.cpp
     MainWidget.h
@@ -20,7 +20,9 @@ add_executable(WidgetWithRibbon WIN32
     main.cpp
     icon.qrc
 )
-
+if(WIN32)
+    set_target_properties(WidgetWithRibbon PROPERTIES WIN32_EXECUTABLE TRUE)
+endif()
 
 if(NOT TARGET SARibbonBar)
     # 说明这个例子是单独加载

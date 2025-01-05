@@ -9,13 +9,15 @@ find_package(Qt${QT_VERSION_MAJOR} 5.9 COMPONENTS Core Gui Widgets REQUIRED)
 
 # linux下会报
 set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_LIST_DIR})
-add_executable(NormalMenuBarExample WIN32
+add_executable(NormalMenuBarExample
     MainWindow.h
     MainWindow.cpp
     MainWindow.ui
     main.cpp
 )
-
+if(WIN32)
+    set_target_properties(NormalMenuBarExample PROPERTIES WIN32_EXECUTABLE TRUE)
+endif()
 if(NOT TARGET SARibbonBar)
     # 说明这个例子是单独加载
     message(STATUS "NOT TARGET SARibbonBar find_package(SARibbonBar REQUIRED)")
