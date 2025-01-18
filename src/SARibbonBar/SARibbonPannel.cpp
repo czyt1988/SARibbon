@@ -122,11 +122,13 @@ SARibbonToolButton* SARibbonPannel::PrivateData::lastAddActionButton()
 void SARibbonPannel::PrivateData::resetTitleLabelFont()
 {
 	if (SARibbonPannelLayout* lay = pannelLayout()) {
-		int h   = lay->pannelTitleHeight();
-		QFont f = q_ptr->font();
-		f.setPixelSize(h * 0.8);
-		if (m_label) {
-			m_label->setFont(f);
+		int h = lay->pannelTitleHeight();
+		if (h > 1) {
+			QFont f = q_ptr->font();
+			f.setPixelSize(h * 0.8);
+			if (m_label) {
+				m_label->setFont(f);
+			}
 		}
 	}
 }
@@ -631,14 +633,19 @@ bool SARibbonPannel::isExpanding() const
 }
 
 /**
-   @brief 设置标题栏的高度
-   @param h
+ * @brief 设置标题栏的高度
+ *
+ * 为了避免用户误操作，这个函数为protect，如果你要设置pannel的标题栏高度，你应该调用@ref SARibbonBar::setPannelTitleHeight
+ * @sa SARibbonBar::setPannelTitleHeight
+ *
+ * @param h 高度
  */
 void SARibbonPannel::setTitleHeight(int h)
 {
 	if (SARibbonPannelLayout* lay = pannelLayout()) {
 		lay->setPannelTitleHeight(h);
 	}
+	d_ptr->resetTitleLabelFont();
 }
 
 /**
@@ -667,6 +674,10 @@ bool SARibbonPannel::isEnableShowTitle() const
 
 /**
  * @brief 是否显示标题，显示标题后，标题的高度需要设置，默认高度为15
+ *
+ * 为了避免用户误操作，这个函数为protected，如果你要设置pannel题栏是否显示，你应该调用@ref SARibbonBar::setEnableShowPannelTitle
+ *
+ * @sa SARibbonBar::setEnableShowPannelTitle
  * @param on
  */
 void SARibbonPannel::setEnableShowTitle(bool on)
@@ -800,6 +811,10 @@ SARibbonBar* SARibbonPannel::ribbonBar() const
 
 /**
  * @brief 设置按钮之间的间隔
+ *
+ * 为了避免用户误操作，这个函数为protected，如果你要设置pannel按钮之间的间隔，你应该调用@ref SARibbonBar::setPannelSpacing
+ * @sa SARibbonBar::setPannelSpacing
+ *
  * @param n
  */
 void SARibbonPannel::setSpacing(int n)
@@ -860,26 +875,6 @@ void SARibbonPannel::resetToolButtonSize()
 		}
 		b->updateRect();
 	}
-}
-
-bool SARibbonPannel::event(QEvent* e)
-{
-#if SA_DEBUG_PRINT_EVENT
-	if (e->type() != QEvent::Paint) {
-		qDebug() << "SARibbonPannel event(" << e->type() << "),name=" << pannelName();
-	}
-#endif
-	// if (SARibbonPannelLayout* lay = pannelLayout()) {
-	//     if (lay->isDirty() && e->type() == QEvent::LayoutRequest) {
-	//         if (QWidget* parw = parentWidget()) {
-	//             if (QLayout* pl = parw->layout()) {
-	//                 pl->invalidate();
-	//             }
-	//         }
-	//         lay->m_dirty = false;
-	//     }
-	// }
-	return QWidget::event(e);
 }
 
 /**
@@ -1014,4 +1009,13 @@ const QList< SARibbonPannelItem* >& SARibbonPannel::ribbonPannelItem() const
 SARibbonToolButton* SARibbonPannel::lastAddActionButton()
 {
 	return d_ptr->lastAddActionButton();
+}
+
+/**
+ * @brief 获取title对应的label控件
+ * @return
+ */
+SARibbonPannelLabel* SARibbonPannel::titleLabel() const
+{
+    return d_ptr->m_label;
 }
