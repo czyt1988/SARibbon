@@ -1,6 +1,7 @@
 ﻿#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 #include "SARibbonMainWindow.h"
+#include <QTimer>
 class SARibbonCategory;
 class SARibbonContextCategory;
 class SARibbonCustomizeWidget;
@@ -75,6 +76,8 @@ private Q_SLOTS:
 	void onSpinBoxRibbonPannelTtitleHeightChanged(int h);
 	void onSpinBoxRibbonPannelSpacingChanged(int h);
 	void onSpinBoxRibbonPannelToolBtnIconSizeChanged(int h);
+	// 此函数用来演示标题栏颜色改变
+	void onTitleBackgroundBrushChangedTimeout();
 
 private:
 	// 创建其它actions，这些actions并不在SARibbonBar管理
@@ -115,7 +118,8 @@ private:
 	SARibbonPannel* mPannelVisbileExample { nullptr };
 	//
 	QAction* mActionVisibleAll { nullptr };    ///< 控制所有action是否可见的开关
-	bool mHasApplyCustomizeXmlFile { false };  /// 程序启动后是否应用上次修改
+	bool mHasApplyCustomizeXmlFile { false };  ///< 程序启动后是否应用上次修改
+	QTimer mChangeTitleBkColorTimer;           ///< 用于周期改变标题颜色的一个定时器
 };
 
 #endif  // MAINWINDOW_H

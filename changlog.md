@@ -1,10 +1,19 @@
 ﻿# 版本记录(change log):
 
+## 2025-02-05 -> 2.2.9
+
+- `SARibbonBar`增加`setWindowTitleBackgroundBrush`/`windowTitleBackgroundBrush`函数，允许用户设置标题栏的背景色
+
+![](./doc/screenshot/SARibbonBar-setWindowTitleBackgroundBrush.png)
+
+- 修正了`SARibbonBar`针对标题的渲染方式，能根据父窗口的`isWindowModified`状态，针对`[*]`占位符进行渲染
+- 例子中增加了标题栏背景颜色周期改变的示例
+
 ## 2025-01-04 -> 2.2.8 [hotfix]
 
 - 修正合并文件会存在宏重复定义问题-2.2.7遗漏了一个调试宏
-- SARibbonSeparatorWidget的宽度增加了最小1像素的判断
-- SARibbonToolButton添加了textEllipsisAspectFactor相关接口，用户可以通过设置文字省略显示的长宽比，来调整按钮的最宽宽度
+- `SARibbonSeparatorWidget`的宽度增加了最小1像素的判断
+- `SARibbonToolButton`添加了`textEllipsisAspectFactor`相关函数，用户可以通过设置文字省略显示的长宽比，来调整按钮的最宽宽度
 - 优化了一些cmake的内容
 
 ## 2024-12-23 -> 2.2.7 [hotfix]
@@ -20,54 +29,54 @@
 
 ## 2024-10-17 -> 2.2.5
 
-- 原有的qt关键宏替换为Q_SIGNAL\Q_SLOT\Q_EMIT，以适应no_keywords设置
+- 原有的qt关键宏替换为`Q_SIGNAL` / `Q_SLOT` / `Q_EMIT`，以适应no_keywords设置
 - 调整目录结构，单独把example提取出来
 - 完善mdi窗口的例子，可以结合qwk实现mdi窗口的最大最小化按钮的显示
 
 ## 2024-09-12 -> 2.2.4
 
-- 修正自定义过程调用setRibbonBar后，会导致最大最小化按钮被遮挡的问题
+- 修正自定义`SARibbonMainWindow`调用`setRibbonBar`后，会导致最大最小化按钮被遮挡的问题
 - 调整Mdi例子中cmake的文件大小写，避免在linux系统下大小写敏感
-- 修正qwk开启后，eventfilter没有捕获的问题
+- 修正qwk开启后，`SARibbonMainWindow::eventfilter`没有捕获的问题
 
 ## 2024-07-25 -> 2.2.1
 
-- 增加setPannelSpacing接口，可调节pannel按钮的间距
-- SARibbonToolButton的icon尺寸可设置，在小按钮模式下，用户可指定icon尺寸
-- 把SARibbonMainWindow的事件处理通过eventfilter实现，避免用户在重写事件时误操作
-- 修正SARibbonGalleryButton的样式错误
+- 增加`setPannelSpacing`接口，可调节pannel按钮的间距
+- `SARibbonToolButton`的icon尺寸可设置，在小按钮模式下，用户可指定icon尺寸
+- 把`SARibbonMainWindow`的事件处理通过`eventfilter`实现，避免用户在重写事件时误操作
+- 修正`SARibbonGalleryButton`的样式错误
 - 修正SystemBar在qwk下会位置有偏离的问题
 
 ## 2024-07-15 -> 2.2.0
 
 - 增加了mdi窗口的示例
-- 增加了SARibbonTabBar的tab尺寸计算方式，可以让tab高度按照tabbar高度自动调整
+- 增加了`SARibbonTabBar`的tab尺寸计算方式，可以让tab高度按照tabbar高度自动调整
 - 示例增加了尺寸设置的配置，可以任意调整titlebar，tabbar，pannel title height的高度
 - 修正调整category高度后，pannel高度不跟着改变的问题
 - 添加snap layout的开关，在依赖qwk下，可以设置是否开启snap layout
 
 ## 2024-05-23 -> 2.1.0
 
-- 添加actionTriggered信号
+- 添加`actionTriggered`信号
 - 修正了滚动action显示效果
-- 把SARibbonTheme从SARibbonMainWindow中转移到SARibbonGloabls.h中并作为枚举类(enum class)
-- 添加SARibbonWidget，同时调整example/widget示例
+- 把`SARibbonTheme`从SARibbonMainWindow中转移到`SARibbonGloabls.h`中并作为枚举类(enum class)
+- 添加`SARibbonWidget`，同时调整example/widget示例
 - 调整了布局移动的实现方式，不会出现压缩式移动
 
 ## 2024-02-07 -> 2.0.3
 
-- 调整SAColorToolButton的实现，使之更简单
+- 调整`SAColorToolButton`的实现，使之更简单
 - 修正qwk库引入的cmake
 - 调整文档
 
 ## 2024-02-07 -> 2.0.2 
 
-- 修正SARibbonSystemButtonBar的编码问题，可能会导致vs下无法编译成功
-- SARibbonContextCategory的标签颜色调整
+- 修正`SARibbonSystemButtonBar`的编码问题，可能会导致vs下无法编译成功
+- `SARibbonContextCategory`的标签颜色调整
 
 ## 2024-01-27 -> 2.0.1【失效，请使用v2.0.2及以上版本】
 
-- 调整qss，让SARibbonApplicationButton的下拉箭头不显示
+- 调整qss，让`SARibbonApplicationButton`的下拉箭头不显示
 - 文档添加gallery
 - 修正了一个布局可能异常的点
 
@@ -101,20 +110,20 @@
 ## 2023-12-29 -> 1.1.2
 
 - 合并了lixinchang的修改(https://gitee.com/lixinchang)
-- 添加了SARibbonControlToolButton，ControlBar不再使用QToolButton，避免和QToolButton的qss冲突
+- 添加了`SARibbonControlToolButton`，ControlBar不再使用QToolButton，避免和QToolButton的qss冲突
 - ControlBar支持按钮菜单样式的指定
 - 调整了默认样式的内容
 
 ## 2023-12-25 -> 1.1.1
 
-- 修正了SARibbonBar的布局过程对窗体隐藏的判断方式，使得在窗口没显示时也能正确布局
+- 修正了`SARibbonBar`的布局过程对窗体隐藏的判断方式，使得在窗口没显示时也能正确布局
 
 ## 2023-12-25 -> 1.1.0
 
 - 修正了尺寸刷新的问题，在首次显示不会出现控件跳动的状态
 - 修正了一些问题
 - 调整了创建RibbonButton的方式
-- 调整了SARibbonPannel一些接口，使得创建更加规范
+- 调整了`SARibbonPannel`一些接口，使得创建更加规范
 - 调整了ToolButton的渲染方式
 
   ------------------------
@@ -189,16 +198,16 @@ en(machine translation):
 
 ## 2023-05-28 -> 0.5.0
 
-- 调整了大按钮模式下的显示方案，去除了原来SARibbonToolButton的Lite和Normal模式，以WordWrap来表征
+- 调整了大按钮模式下的显示方案，去除了原来`SARibbonToolButton`的Lite和Normal模式，以WordWrap来表征
 - 支持文字自定义换行
 - 调整了RibbonPannel的标题栏的高度计算方案
 
 ## 0.5.1
 
-- 不使用QString::simplified,而是简单的仅仅替换\n的simplified，这样中文换行不会多出空格
+- 不使用`QString::simplified`,而是简单的仅仅替换\n的simplified，这样中文换行不会多出空格
 
 ## 0.5.2
 
-- SARibbonColorToolButton\SARibbonToolButton修正&操作在三项表达式未加括号问题
-- SARibbonStyleOption添加虚析构函数
-- 原来SARibbonElementCreateDelegate类改名为SARibbonElementFactory
+- `SARibbonColorToolButton` / `SARibbonToolButton`修正&操作在三项表达式未加括号问题
+- `SARibbonStyleOption`添加虚析构函数
+- 原来`SARibbonElementCreateDelegate`类改名为`SARibbonElementFactory`

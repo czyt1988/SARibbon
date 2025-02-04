@@ -63,7 +63,8 @@ MainWindow::MainWindow(QWidget* par)
 {
 
 	PRINT_COST_START();
-	setWindowTitle(("ribbon mainwindow test"));
+	setWindowTitle(("ribbon mainwindow test[*]"));
+	setWindowModified(true);
 	mTextedit = new QTextEdit(this);
 	setCentralWidget(mTextedit);
 	setStatusBar(new QStatusBar());
@@ -171,7 +172,11 @@ MainWindow::MainWindow(QWidget* par)
 	connect(ribbon, &SARibbonBar::currentRibbonTabChanged, this, [ this ](int v) {
 		mTextedit->append(QString("SARibbonBar::currentRibbonTabChanged(%1)").arg(v));
 	});
+	//! 这个定时器10秒触发一次，用于改变标题颜色
+	connect(&mChangeTitleBkColorTimer, &QTimer::timeout, this, &MainWindow::onTitleBackgroundBrushChangedTimeout);
+	mChangeTitleBkColorTimer.start(10000);
 
+	//! 全屏显示
 	showMaximized();
 }
 
@@ -670,6 +675,23 @@ void MainWindow::onSpinBoxRibbonPannelToolBtnIconSizeChanged(int h)
 }
 
 /**
+ * @brief 此函数用来演示标题栏颜色改变
+ */
+void MainWindow::onTitleBackgroundBrushChangedTimeout()
+{
+	static bool s_setNoBrush = true;
+	s_setNoBrush             = (!s_setNoBrush);
+	if (s_setNoBrush) {
+		ribbonBar()->setWindowTitleTextColor(Qt::black);
+		ribbonBar()->setWindowTitleBackgroundBrush(Qt::NoBrush);
+	} else {
+		ribbonBar()->setWindowTitleTextColor(Qt::white);
+		ribbonBar()->setWindowTitleBackgroundBrush(Qt::red);
+	}
+	ribbonBar()->repaint();
+}
+
+/**
  * @brief 创建其它actions，这些actions并不在SARibbonBar管理
  */
 void MainWindow::createOtherActions()
@@ -702,16 +724,19 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
 	SARibbonPannel* pannelStyle = page->addPannel(("ribbon style"));
 
 	QAction* actSave = createAction(tr("Save"), ":/icon/icon/save.svg");
-	// 这样设置快捷键
-	QShortcut* shortCut = new QShortcut(QKeySequence(QLatin1String("Ctrl+S")), this);
-	connect(shortCut, &QShortcut::activated, this, [ actSave ]() { actSave->trigger(); });
-	// 这样设置是无效的
-	//  actSave->setShortcut(QKeySequence(QLatin1String("Ctrl+S")));
-
 	connect(actSave, &QAction::triggered, this, [ this ](bool b) {
 		Q_UNUSED(b);
 		this->mTextedit->append("actSaveion clicked");
+		this->setWindowModified(false);
+		// 更新状态后，需要手动调用ribbonbar刷新重绘标题，目前ribbonbar不会自动检测WindowModified状态
+		this->ribbonBar()->repaint();
 	});
+	// 这样设置快捷键
+	QShortcut* shortCut = new QShortcut(QKeySequence(QLatin1String("Ctrl+S")), this);
+	connect(shortCut, &QShortcut::activated, this, [ actSave ]() { actSave->trigger(); });
+	// 这样设置如果切换到其它标签，快捷键是不生效的
+	//  actSave->setShortcut(QKeySequence(QLatin1String("Ctrl+S")));
+
 	pannelStyle->addLargeAction(actSave);
 
 	QAction* actHideRibbon = createAction(tr("hide ribbon"), ":/icon/icon/hideRibbon.svg", "actHideRibbon");
