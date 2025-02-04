@@ -81,6 +81,7 @@ public:
 	QColor mContextCategoryTitleTextColor { Qt::black };    ///< 记录Context category的标题字体颜色
 	Qt::Alignment mTitleAligment { Qt::AlignCenter };       ///< 标题对齐方式
 	bool mIsTitleVisible { true };                          ///< 标题是否显示
+	QBrush mTitleBackgroundBrush { Qt::NoBrush };           ///< 标题的背景颜色
 	SARibbonAlignment mRibbonAlignment { SARibbonAlignment::AlignLeft };                         ///< 对齐方式
 	SARibbonPannel::PannelLayoutMode mDefaulePannelLayoutMode { SARibbonPannel::ThreeRowMode };  ///< 默认的PannelLayoutMode
 	bool mEnableShowPannelTitle { true };    ///< 是否运行pannel的标题栏显示
@@ -108,7 +109,8 @@ public:
 	// 根据字体信息计算category的高度
 	int calcCategoryHeight();
 	// 计算tabbar高度
-	static int calcMainBarHeight(int tabHegith, int titleHeight, int categoryHeight, bool tabOnTitle, SARibbonBar::RibbonMode rMode);
+	static int
+	calcMainBarHeight(int tabHegith, int titleHeight, int categoryHeight, bool tabOnTitle, SARibbonBar::RibbonMode rMode);
 	// 获取当前最小模式下的高度
 	int getCurrentMinimumModeMainBarHeight() const;
 	// 获取当前正常模式下的高度
@@ -185,8 +187,8 @@ int SARibbonBar::PrivateData::systemTabBarHeight() const
  */
 int SARibbonBar::PrivateData::calcTabBarHeight()
 {
-    int defaultHeight = systemTabBarHeight();
-    int fontHeight = q_ptr->fontMetrics().lineSpacing();  // 不要用height，像宋体这种字体，height=12，lineSpacing=14，有些就无法显示
+	int defaultHeight = systemTabBarHeight();
+	int fontHeight = q_ptr->fontMetrics().lineSpacing();  // 不要用height，像宋体这种字体，height=12，lineSpacing=14，有些就无法显示
 	int defaultHeight2 = fontHeight * 1.6;
 	if (defaultHeight2 < fontHeight + 10) {
 		defaultHeight2 = fontHeight + 10;  // 主要为了满足office2021主题，tab下有个4px的横杠
@@ -269,7 +271,8 @@ int SARibbonBar::PrivateData::calcMainBarHeight(int tabHegith,
 
 int SARibbonBar::PrivateData::getCurrentMinimumModeMainBarHeight() const
 {
-	return calcMainBarHeight(tabBarHeigth(), titleBarHeight(), categoryHeight(), mIsTabOnTitle, SARibbonBar::MinimumRibbonMode);
+	return calcMainBarHeight(
+		tabBarHeigth(), titleBarHeight(), categoryHeight(), mIsTabOnTitle, SARibbonBar::MinimumRibbonMode);
 }
 
 int SARibbonBar::PrivateData::getCurrentNormalModeMainBarHeight() const
@@ -1104,14 +1107,12 @@ void SARibbonBar::showMinimumModeButton(bool isShow)
 		activeRightButtonGroup();
 
 		d_ptr->mMinimumCategoryButtonAction = new QAction(this);
-		d_ptr->mMinimumCategoryButtonAction->setIcon(
-		    style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton,
-		                          nullptr));
+		d_ptr->mMinimumCategoryButtonAction->setIcon(style()->standardIcon(
+			isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton, nullptr));
 		connect(d_ptr->mMinimumCategoryButtonAction, &QAction::triggered, this, [ this ]() {
 			this->setMinimumMode(!isMinimumMode());
-			this->d_ptr->mMinimumCategoryButtonAction->setIcon(
-			    style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton,
-			                          nullptr));
+			this->d_ptr->mMinimumCategoryButtonAction->setIcon(style()->standardIcon(
+				isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton, nullptr));
 		});
 		d_ptr->mRightButtonGroup->addAction(d_ptr->mMinimumCategoryButtonAction);
 
@@ -1443,6 +1444,29 @@ void SARibbonBar::synchronousCategoryData(bool autoUpdate)
 }
 
 /**
+ * @brief 把窗口标题文字转换为显示的文字，这里主要针对[*]占位符进行替换
+ * @param title
+ * @return 如果存在[*]占位符，则根据父窗口的isWindowModified状态进行文字的替换，isWindowModified为true，[*]替换为*，isWindowModified为false，[*]替换为空
+ */
+QString SARibbonBar::toDisplayTitleText(const QString& title) const
+{
+	if (!title.contains("[*]")) {
+		return title;
+	}
+	QWidget* w = parentWidget();
+	if (!w) {
+		return title;
+	}
+	QString res = title;
+	if (w->isWindowModified()) {
+		res.replace("[*]", "*");
+	} else {
+		res.replace("[*]", "");
+	}
+	return res;
+}
+
+/**
    @brief 激活tabbar右边的按钮群
    @return 返回右边的按钮群指针
  */
@@ -1747,8 +1771,8 @@ bool SARibbonBar::isEnableWordWrap() const
  */
 void SARibbonBar::setButtonTextEllipsisAspectFactor(qreal fac)
 {
-    SARibbonToolButton::setTextEllipsisAspectFactor(fac);
-    updateRibbonGeometry();
+	SARibbonToolButton::setTextEllipsisAspectFactor(fac);
+	updateRibbonGeometry();
 }
 
 /**
@@ -1883,6 +1907,29 @@ void SARibbonBar::setTitleVisible(bool on)
 bool SARibbonBar::isTitleVisible() const
 {
 	return d_ptr->mIsTitleVisible;
+}
+
+/**
+ * @brief 设置标题栏的背景颜色
+ *
+ * 如果不需要颜色，设置Qt::NoBrush
+ * @param bk 背景颜色
+ */
+void SARibbonBar::setWindowTitleBackgroundBrush(const QBrush& bk)
+{
+    d_ptr->mTitleBackgroundBrush = bk;
+}
+
+/**
+ * @brief 标题栏的背景颜色
+ *
+ * 颜色为Qt::NoBrush时，代表没有背景颜色
+ * @default Qt::NoBrush
+ * @return
+ */
+QBrush SARibbonBar::windowTitleBackgroundBrush() const
+{
+    return d_ptr->mTitleBackgroundBrush;
 }
 
 /**
@@ -2200,7 +2247,7 @@ void SARibbonBar::paintInLooseStyle()
 		p.drawRect(titleRegion);
 		p.restore();
 #endif
-		paintWindowTitle(p, parWindow->windowTitle(), titleRegion);
+		paintWindowTitle(p, toDisplayTitleText(parWindow->windowTitle()), titleRegion);
 	}
 }
 
@@ -2246,7 +2293,7 @@ void SARibbonBar::paintInCompactStyle()
 			p.drawRect(titleRegion);
 			p.restore();
 #endif
-			paintWindowTitle(p, parWindow->windowTitle(), titleRegion);
+			paintWindowTitle(p, toDisplayTitleText(parWindow->windowTitle()), titleRegion);
 		}
 	}
 }
@@ -2633,9 +2680,19 @@ void SARibbonBar::paintWindowTitle(QPainter& painter, const QString& title, cons
 		return;
 	}
 	painter.save();
+	// 先绘制背景
+	if (d_ptr->mTitleBackgroundBrush != Qt::NoBrush) {
+		painter.setPen(Qt::NoPen);
+		painter.setBrush(d_ptr->mTitleBackgroundBrush);
+		painter.drawRect(titleRegion);
+	}
+	// 再绘制文本
 	if (d_ptr->mTitleTextColor.isValid()) {
 		painter.setPen(d_ptr->mTitleTextColor);
+	} else {
+		painter.setPen(Qt::black);
 	}
+
 	painter.drawText(titleRegion, d_ptr->mTitleAligment, title);
 	painter.restore();
 }
