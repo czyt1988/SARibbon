@@ -64,7 +64,11 @@ class SA_RIBBON_EXPORT SARibbonMainWindow : public QMainWindow
 	Q_PROPERTY(SARibbonTheme ribbonTheme READ ribbonTheme WRITE setRibbonTheme)
 
 public:
-	explicit SARibbonMainWindow(QWidget* parent = nullptr, bool useRibbon = true, const Qt::WindowFlags flags = {});
+    explicit SARibbonMainWindow(
+        QWidget* parent                = nullptr,
+        SARibbonMainWindowStyles style = { static_cast< int >(SARibbonMainWindowStyleFlag::UseRibbonMenuBar)
+                                           | static_cast< int >(SARibbonMainWindowStyleFlag::UseNativeFrame) },
+        const Qt::WindowFlags flags    = Qt::WindowFlags());
 	~SARibbonMainWindow() override;
 	// 返回SARibbonBar
 	SARibbonBar* ribbonBar() const;
@@ -90,8 +94,8 @@ public:
 	virtual bool eventFilter(QObject* obj, QEvent* e) Q_DECL_OVERRIDE;
 	// 获取最大化，最小化，关闭按钮所在的bar。可以通过此函数在最大最小化按钮旁边设置内容
 	SARibbonSystemButtonBar* windowButtonBar() const;
-    // 确保系统最大最小化按钮的事件过滤器安装成功，如果你清除了过滤器，需要调用此函数把最大最小化按钮的过滤器安装上去
-    void ensureSystemButtonBarEventFilter();
+    // 获取当前mainwidow的样式
+    SARibbonMainWindowStyles ribbonMainwindowStyle() const;
 
 protected:
     // 创建ribbonbar的工厂函数
