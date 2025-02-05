@@ -73,7 +73,7 @@ public:
 	int mIconRightBorderPosition { 1 };  ///< 标题栏x值得最小值，在有图标和快捷启动按钮，此值都需要变化
 	SARibbonBar::RibbonStyles mRibbonStyle { SARibbonBar::RibbonStyleLooseThreeRow };  ///< ribbon的风格
 	SARibbonBar::RibbonMode mCurrentRibbonMode { SARibbonBar::NormalRibbonMode };      ///< 记录当前模式
-	QSize mWindowButtonSize;                    ///< 由SARibbonMainWindow告诉的windowbutton的尺寸
+    QSize mSystemButtonSize;  ///< 由SARibbonMainWindow告诉窗口的关闭最大化等按钮的尺寸
 	QList< QColor > mContextCategoryColorList;  ///< contextCategory的色系
 	int mContextCategoryColorListIndex { -1 };  ///< 记录contextCategory色系索引
 	QColor mTitleTextColor;  ///< 标题文字颜色,默认无效，无效的情况下和SARibbonBar的qss:color属性一致
@@ -95,6 +95,7 @@ public:
 	std::unique_ptr< int > mUserDefTitleBarHeight;  ///< 用户定义的标题栏高度，正常不使用用户设定的高度，而是使用自动计算的高度
 	std::unique_ptr< int > mUserDefTabBarHeight;  ///< 用户定义的tabbar高度，正常不使用用户设定的高度，而是使用自动计算的高度
 	std::unique_ptr< int > mUserDefCategoryHeight;  ///< 用户定义的Category的高度，正常不使用用户设定的高度，而是使用自动计算的高度
+    SARibbonMainWindowStyles mMainWindowStyle;  ///< 记录MainWindow的样式
 public:
 	PrivateData(SARibbonBar* par) : q_ptr(par)
 	{
@@ -109,8 +110,7 @@ public:
 	// 根据字体信息计算category的高度
 	int calcCategoryHeight();
 	// 计算tabbar高度
-	static int
-	calcMainBarHeight(int tabHegith, int titleHeight, int categoryHeight, bool tabOnTitle, SARibbonBar::RibbonMode rMode);
+    static int calcMainBarHeight(int tabHegith, int titleHeight, int categoryHeight, bool tabOnTitle, SARibbonBar::RibbonMode rMode);
 	// 获取当前最小模式下的高度
 	int getCurrentMinimumModeMainBarHeight() const;
 	// 获取当前正常模式下的高度
@@ -137,7 +137,8 @@ public:
 	QColor getContextCategoryColor();
 
 	void updateTabData();
-
+    // 是否使用ribbon边框，如果不是，将影响布局方式
+    bool isUseRibbonFrame() const;
 	/**
 	 * @brief 通过输入高度计算iconSize
 	 * @param h
@@ -271,8 +272,7 @@ int SARibbonBar::PrivateData::calcMainBarHeight(int tabHegith,
 
 int SARibbonBar::PrivateData::getCurrentMinimumModeMainBarHeight() const
 {
-	return calcMainBarHeight(
-		tabBarHeigth(), titleBarHeight(), categoryHeight(), mIsTabOnTitle, SARibbonBar::MinimumRibbonMode);
+    return calcMainBarHeight(tabBarHeigth(), titleBarHeight(), categoryHeight(), mIsTabOnTitle, SARibbonBar::MinimumRibbonMode);
 }
 
 int SARibbonBar::PrivateData::getCurrentNormalModeMainBarHeight() const
@@ -429,7 +429,12 @@ void SARibbonBar::PrivateData::updateTabData()
 				}
 			}
 		}
-	}
+    }
+}
+
+bool SARibbonBar::PrivateData::isUseRibbonFrame() const
+{
+    return mMainWindowStyle.testFlag(SARibbonMainWindowStyleFlag::UseRibbonFrame);
 }
 
 QSize SARibbonBar::PrivateData::calcIconSizeByHeight(int h)
@@ -1107,12 +1112,14 @@ void SARibbonBar::showMinimumModeButton(bool isShow)
 		activeRightButtonGroup();
 
 		d_ptr->mMinimumCategoryButtonAction = new QAction(this);
-		d_ptr->mMinimumCategoryButtonAction->setIcon(style()->standardIcon(
-			isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton, nullptr));
+        d_ptr->mMinimumCategoryButtonAction->setIcon(
+            style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton,
+                                  nullptr));
 		connect(d_ptr->mMinimumCategoryButtonAction, &QAction::triggered, this, [ this ]() {
 			this->setMinimumMode(!isMinimumMode());
-			this->d_ptr->mMinimumCategoryButtonAction->setIcon(style()->standardIcon(
-				isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton, nullptr));
+            this->d_ptr->mMinimumCategoryButtonAction->setIcon(
+                style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton,
+                                      nullptr));
 		});
 		d_ptr->mRightButtonGroup->addAction(d_ptr->mMinimumCategoryButtonAction);
 
@@ -2143,9 +2150,18 @@ void SARibbonBar::updateCategoryTitleToTabName()
  * @brief 告知WindowButtonGroup的尺寸
  * @param s
  */
-void SARibbonBar::setWindowButtonGroupSize(const QSize& s)
+void SARibbonBar::setSystemButtonGroupSize(const QSize& s)
 {
-	d_ptr->mWindowButtonSize = s;
+    d_ptr->mSystemButtonSize = s;
+}
+
+/**
+ * @brief SARibbonBar::setMainWindowStyles
+ * @param s
+ */
+void SARibbonBar::setMainWindowStyles(SARibbonMainWindowStyles s)
+{
+    d_ptr->mMainWindowStyle = s;
 }
 
 void SARibbonBar::paintEvent(QPaintEvent* e)
@@ -2215,40 +2231,36 @@ void SARibbonBar::paintInLooseStyle()
 	}
 	p.restore();
 	//! 显示标题等
-	QWidget* parWindow = parentWidget();
+    if (d_ptr->isUseRibbonFrame()) {
+        QWidget* parWindow = parentWidget();
 
-	if (parWindow) {
-		QRect titleRegion;
-		if (contextCategoryRegion.y() < 0) {
-			titleRegion.setRect(d_ptr->mQuickAccessBar->geometry().right() + 1,
-			                    border.top(),
-			                    width() - d_ptr->mIconRightBorderPosition - border.right()
-			                        - d_ptr->mWindowButtonSize.width() - d_ptr->mQuickAccessBar->geometry().right() - 1,
-			                    titleBarHeight());
-		} else {
-			int leftwidth = contextCategoryRegion.x() - d_ptr->mQuickAccessBar->geometry().right()
-			                - d_ptr->mIconRightBorderPosition;
-			int rightwidth = width() - contextCategoryRegion.y() - d_ptr->mWindowButtonSize.width();
-			//            if (width() - contextCategoryRegion.y() > contextCategoryRegion.x()-x) {
-			if (rightwidth > leftwidth) {
-				// 说明右边的区域大一点，标题显示在右，显示在右边需要减去windowbutton宽度
-				titleRegion.setRect(contextCategoryRegion.y(), border.top(), rightwidth, titleBarHeight());
-			} else {
-				// 说明左边的大一点
-				titleRegion.setRect(d_ptr->mIconRightBorderPosition + d_ptr->mQuickAccessBar->geometry().right(),
+        if (parWindow) {
+            QRect titleRegion;
+            if (contextCategoryRegion.y() < 0) {
+                titleRegion.setRect(d_ptr->mQuickAccessBar->geometry().right() + 1,
 				                    border.top(),
-				                    leftwidth,
+                                    width() - d_ptr->mIconRightBorderPosition - border.right()
+                                        - d_ptr->mSystemButtonSize.width() - d_ptr->mQuickAccessBar->geometry().right() - 1,
 				                    titleBarHeight());
-			}
-		}
-#ifdef SA_RIBBON_DEBUG_HELP_DRAW
-		p.save();
-		p.setBrush(QColor(255, 0, 0, 120));
-		p.drawRect(titleRegion);
-		p.restore();
-#endif
-		paintWindowTitle(p, toDisplayTitleText(parWindow->windowTitle()), titleRegion);
-	}
+            } else {
+                int leftwidth = contextCategoryRegion.x() - d_ptr->mQuickAccessBar->geometry().right()
+                                - d_ptr->mIconRightBorderPosition;
+                int rightwidth = width() - contextCategoryRegion.y() - d_ptr->mSystemButtonSize.width();
+                //            if (width() - contextCategoryRegion.y() > contextCategoryRegion.x()-x) {
+                if (rightwidth > leftwidth) {
+                    // 说明右边的区域大一点，标题显示在右，显示在右边需要减去windowbutton宽度
+                    titleRegion.setRect(contextCategoryRegion.y(), border.top(), rightwidth, titleBarHeight());
+                } else {
+                    // 说明左边的大一点
+                    titleRegion.setRect(d_ptr->mIconRightBorderPosition + d_ptr->mQuickAccessBar->geometry().right(),
+                                        border.top(),
+                                        leftwidth,
+                                        titleBarHeight());
+                }
+            }
+            paintWindowTitle(p, toDisplayTitleText(parWindow->windowTitle()), titleRegion);
+        }
+    }
 }
 
 void SARibbonBar::paintInCompactStyle()
@@ -2279,23 +2291,18 @@ void SARibbonBar::paintInCompactStyle()
 	}
 	p.restore();
 	//! 显示标题等
+    if (d_ptr->isUseRibbonFrame()) {
+        QWidget* parWindow = parentWidget();
 
-	QWidget* parWindow = parentWidget();
-
-	if (parWindow) {
-		int start = d_ptr->mRibbonTabBar->x() + d_ptr->mRibbonTabBar->width();
-		int width = d_ptr->mQuickAccessBar->x() - start;
-		if (width > 20) {
-			QRect titleRegion(start, border.top(), width, titleBarHeight());
-#ifdef SA_RIBBON_DEBUG_HELP_DRAW
-			p.save();
-			p.setBrush(QColor(255, 0, 0, 120));
-			p.drawRect(titleRegion);
-			p.restore();
-#endif
-			paintWindowTitle(p, toDisplayTitleText(parWindow->windowTitle()), titleRegion);
+        if (parWindow) {
+            int start = d_ptr->mRibbonTabBar->x() + d_ptr->mRibbonTabBar->width();
+            int width = d_ptr->mQuickAccessBar->x() - start;
+            if (width > 20) {
+                QRect titleRegion(start, border.top(), width, titleBarHeight());
+                paintWindowTitle(p, toDisplayTitleText(parWindow->windowTitle()), titleRegion);
+            }
 		}
-	}
+    }
 }
 
 void SARibbonBar::resizeStackedContainerWidget()
@@ -2444,6 +2451,9 @@ bool SARibbonBar::event(QEvent* e)
 	return QMenuBar::event(e);
 }
 
+/**
+ * @brief 宽松结构的各个子对象定位
+ */
 void SARibbonBar::resizeInLooseStyle()
 {
 	synchronousCategoryData(false);
@@ -2552,7 +2562,10 @@ void SARibbonBar::resizeInCompactStyle()
 
 	// 先布局右边内容
 	//  cornerWidget - TopRightCorner
-	int endX = width() - border.right() - d_ptr->mWindowButtonSize.width();
+    int endX = width() - border.right();
+    if (d_ptr->isUseRibbonFrame()) {
+        endX -= d_ptr->mSystemButtonSize.width();
+    }
 
 	if (QWidget* connerW = cornerWidget(Qt::TopRightCorner)) {
 		if (connerW->isVisibleTo(this)) {

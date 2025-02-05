@@ -149,7 +149,7 @@ public:
 	// 获取默认的上下文标签颜色列表
 	static QList< QColor > defaultContextCategoryColorList();
 
-	//
+    // 初始化高分辨率适配
 	static void initHighDpi();
 
 public:
@@ -207,8 +207,9 @@ public:
 	void removeCategory(SARibbonCategory* category);
 
 	// 添加一个上下文标签
-	SARibbonContextCategory*
-	addContextCategory(const QString& title, const QColor& color = QColor(), const QVariant& id = QVariant());
+    SARibbonContextCategory* addContextCategory(const QString& title,
+                                                const QColor& color = QColor(),
+                                                const QVariant& id  = QVariant());
 	void addContextCategory(SARibbonContextCategory* context);
 
 	// 显示一个上下文标签
@@ -422,7 +423,9 @@ protected:
 	// 更新
 	void updateCategoryTitleToTabName();
 	// 告知WindowButtonGroup的尺寸
-	void setWindowButtonGroupSize(const QSize& s);
+    void setSystemButtonGroupSize(const QSize& s);
+    // 设置当前的MainWindow的样式，这个函数是SARibbonMainWindow调用，告知ribbonbar当前MainWindow的样式
+    void setMainWindowStyles(SARibbonMainWindowStyles s);
 protected Q_SLOTS:
 	void onWindowTitleChanged(const QString& title);
 	void onWindowIconChanged(const QIcon& i);
@@ -451,6 +454,7 @@ private:
 	QString toDisplayTitleText(const QString& title) const;
 
 protected:
+    void setRibbonMainwindowStyle();
 	virtual void paintEvent(QPaintEvent* e) override;
 	virtual void resizeEvent(QResizeEvent* e) override;
 	virtual void moveEvent(QMoveEvent* e) override;
@@ -458,8 +462,7 @@ protected:
 	virtual bool event(QEvent* e) override;
 	virtual void paintTabbarBaseLine(QPainter& painter);
 	virtual void paintWindowTitle(QPainter& painter, const QString& title, const QRect& titleRegion);
-	virtual void
-	paintContextCategoryTab(QPainter& painter, const QString& title, const QRect& contextRect, const QColor& color);
+    virtual void paintContextCategoryTab(QPainter& painter, const QString& title, const QRect& contextRect, const QColor& color);
 #if SA_DEBUG_PRINT_SARIBBONBAR
 	SA_RIBBON_EXPORT friend QDebug operator<<(QDebug debug, const SARibbonBar& ribbon);
 #endif
