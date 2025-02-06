@@ -67,7 +67,7 @@ public:
     explicit SARibbonMainWindow(
         QWidget* parent                = nullptr,
         SARibbonMainWindowStyles style = { static_cast< int >(SARibbonMainWindowStyleFlag::UseRibbonMenuBar)
-                                           | static_cast< int >(SARibbonMainWindowStyleFlag::UseNativeFrame) },
+                                           | static_cast< int >(SARibbonMainWindowStyleFlag::UseRibbonFrame) },
         const Qt::WindowFlags flags    = Qt::WindowFlags());
 	~SARibbonMainWindow() override;
 	// 返回SARibbonBar

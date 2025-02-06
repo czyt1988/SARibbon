@@ -424,6 +424,8 @@ protected:
 	void updateCategoryTitleToTabName();
 	// 告知WindowButtonGroup的尺寸
     void setSystemButtonGroupSize(const QSize& s);
+    // 更新标题位置rect
+    void updateTitleRect();
     // 设置当前的MainWindow的样式，这个函数是SARibbonMainWindow调用，告知ribbonbar当前MainWindow的样式
     void setMainWindowStyles(SARibbonMainWindowStyles s);
 protected Q_SLOTS:
