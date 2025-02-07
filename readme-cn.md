@@ -17,9 +17,8 @@
 QQ交流群:434014314
 
 <div align="center">
-<img src="./doc/SARibbon-qq%E4%BA%A4%E6%B5%81%E7%BE%A4.jpg"/>
+<img src="./doc/SARibbon-qq%E4%BA%A4%E6%B5%81%E7%BE%A4.jpg" style="width:300px;"/>
 </div>
-
 
 ||Windows(latest)|Linux ubuntu(latest)|Mac(latest)|
 |:-|:-|:-|:-|
@@ -91,13 +90,11 @@ dark主题：
 - 支持4K屏和多屏幕扩展
 - 支持linux和MacOS（界面未做深度适配）
 
-
 MIT协议，欢迎大家使用并提出意见
 
 [gitee(码云) - https://gitee.com/czyt1988/SARibbon](https://gitee.com/czyt1988/SARibbon)
 
 [github - https://github.com/czyt1988/SARibbon](https://github.com/czyt1988/SARibbon)
-
 
 # 构建
 
@@ -230,14 +227,15 @@ qmake的编译过程会在SARibbon下生成`bin_qt{Qt version}_{MSVC/GNU}_x{32/6
 - common.pri
  qmake配置文件，里面定义配置信息，在编译库的时候可以通过此文件改动配置，引入的时候要和编译的时候配置一致
 
- - importSARibbonBarLib.pri
+- importSARibbonBarLib.pri
   用于引入库，实际就是include(SARibbonBar.pri)
 
- - SARibbonBar.pri
+- SARibbonBar.pri
   用于引入库的具体实现
 
 - src/SARibbon.pri
   针对SARibbon.h和SARibbon.cpp的pri文件，如果你用静态集成模式，使用此pri文件
+
 ---
 
 你自己可以把所有头文件复制到一个文件夹，并引入SARibbon库，具体操作和引入其它库方式一致，但这里需要注意的是，你如果自己引入，需要指定一下以下几个宏：
@@ -345,7 +343,7 @@ SARibbonBar支持在QWidget或者QDialog上使用，具体可见例子：`exampl
 
 class RibbonWidget : public SARibbonWidget
 {
-	Q_OBJECT
+ Q_OBJECT
 public:
     RibbonWidget(QWidget* parent = nullptr);
 };
@@ -372,7 +370,6 @@ RibbonWidget::RibbonWidget(QWidget* parent) : SARibbonWidget(parent)
 效果如下：
 
 ![Ribbon用在QWidget上](./doc/screenshot/ribbonbar-use-in-qwidget.png)
-
 
 ### 创建Category和Pannel
 
@@ -434,6 +431,7 @@ SARibbonContextCategory* m_contextCategory;
 ```
 
 cpp文件:
+
 ```cpp
 SARibbonBar* ribbon = ribbonBar();
 //创建一个contextCategory，颜色随机
@@ -573,6 +571,7 @@ SARibbonBar文字设置为不换行后，会使图标的显示空间变得更大
 ### 不同的“按钮”布局方式
 
 `SARibbonPannel`提供了三个添加action的方法：
+
 - `addLargeAction`
 - `addMediumAction`
 - `addSmallAction`
@@ -647,7 +646,6 @@ SARibbon参考office和wps的界面，封装了方便使用的`SARibbonCustomize
 
 ![SARibbon的自定义界面](./doc/screenshot/customize/customization-saribbon-ui.png)
 
-
 #### 给界面添加自定义功能
 
 这里演示如何添加自定义功能
@@ -694,7 +692,6 @@ sa_apply_customize_from_xml_file("customization.xml", this, m_ribbonActionMgr);
 `sa_apply_customize_from_xml_file`是`SARibbonCustomizeWidget.h`中提供的函数，直接把配置文件中的自定义内容应用到MainWindow中。
 
 这样软件每次启动都会按照配置文件加载。
-
 
 # 更多截图
 
@@ -761,21 +758,25 @@ int main(int argc, char* argv[])
 
 ## 2、快捷键问题
 
-经常有人反馈使用SARibbonBar后，没有被激活的tab页的快捷键没有响应，只有激活的标签页的快捷键才有反应，如果是传统的toolbar模式，由于action所在的toolbar一直在最前端，因此快捷键一直生效，但如果是SARibbonBar，action所在的pannel是会隐藏的，隐藏后快捷键就不生效，如果想快捷键无论Pannel是否隐藏都生效，设置快捷键的`shortcutContext`属性为`Qt::ApplicationShortcut`也无效，这时，可以在创建Category的地方手动创建快捷键
+经常有人反馈使用SARibbonBar后，没有被激活的tab页的快捷键没有响应，只有激活的标签页的快捷键才有反应，如果是传统的toolbar模式，由于action所在的toolbar一直在最前端，因此快捷键一直生效，但如果是SARibbonBar，action所在的pannel是会隐藏的，隐藏后快捷键就不生效，如果想快捷键无论Pannel是否隐藏都生效，设置快捷键的`shortcutContext`属性为`Qt::ApplicationShortcut`也无效，这时，可以通过Qt的`QWidget::addAction`函数把带快捷键的action添加到MainWindow中
 
 例如：
 
 ```cpp
-    ribbon构建
+void MainWindow::initRibbon(){
+    SARibbonCategory* categoryMain = ribbon->addCategoryPage(tr("Main"));
+    SARibbonPannel* pannel = categoryMain->addPannel(tr("io"));
+    //这里省略action的创建过程
+    QAction* actSave = new QAction(this);
     ...
-    QShortcut* shortCut = new QShortcut(QKeySequence(QLatin1String("Ctrl+S")), this);
-    connect(shortCut, &QShortcut::activated, this, [ actSave ]() {
-        actSave->trigger();
-    });
+    //给action设置快捷键
+    actSave->setShortcut(QKeySequence(QLatin1String("Ctrl+S")));
+    //把action添加到pannel中
+    pannel->addLargeAction(actSave);
+    //把action添加到MainWindow中，这样切换到其他标签页，也可以响应快捷键
+    addAction(actSave);
+}
 ```
-
-这个快捷键的创建位置在Mainwidnow，这样快捷键就随着mainwindow周期
-
 
 ## 3、主题设置不生效
 
@@ -795,7 +796,7 @@ QTimer::singleShot(0, this, [ this ]() {
 
 如果你遇到这个问题，确认编译的库文件和头文件是否匹配，通常这个问题发生在局部更新上，也就是仅仅替换了dll，而没有替换h文件导致的，有些工程在拉取了最新的SARibbon版本后，更新完直接替换lib和dll文件，头文件没有替换就会发生此问题，修复此问题的方法是确保所有文件的版本一致性，你可以把原来涉及的文件都删除掉，如果你用cmake安装的话，将涉及如下文件/文件夹：
 
-```
+```txt
 bin/SARibbonBar.dll
 include/SARibbonBar[文件夹]
 lib/SARibbonBar.lib
@@ -804,8 +805,13 @@ lib/cmake/SARibbonBar[文件夹]
 SARibbonBar_amalgamate
 ```
 
+## 6、图标没有显示
+
+如果你遇到图标不显示，例如最大最小化按钮没有图标但有按钮，那么说明你的运行环境没有找到Qt的svg插件，你的程序目录下应该要有`imageformats/qsvg.dll`插件，你可以运行windeployqt拉取你程序的依赖，或者确保你的环境变量PATH配置中能找到`plugins/imageformats`文件夹
+
 # 给我一个鼓励
 
 如果项目对你有用，请你给我一个鼓励：
-
-![](./doc/pic/赞赏码.png)
+<div style="text-align:center">
+    <img src="./doc/pic/赞赏码.png" alt="赞赏码" style="width:400px;" />
+</div>

@@ -1,0 +1,27 @@
+<RCC>
+    <qresource prefix="/icon">
+        <file>icon/save.svg</file>
+        <file>icon/hideRibbon.svg</file>
+        <file>icon/showHideButton.svg</file>
+        <file>icon/item.svg</file>
+        <file>icon/test1.svg</file>
+        <file>icon/test2.svg</file>
+        <file>icon/folder-cog.svg</file>
+        <file>icon/folder-star.svg</file>
+        <file>icon/folder-stats.svg</file>
+        <file>icon/folder-table.svg</file>
+        <file>icon/folder-checkmark.svg</file>
+        <file>icon/showContext.svg</file>
+        <file>icon/deleteContext.svg</file>
+        <file>icon/disable.svg</file>
+        <file>icon/SA.svg</file>
+        <file>icon/help.svg</file>
+        <file>icon/setText.svg</file>
+        <file>icon/action.svg</file>
+        <file>icon/action4.svg</file>
+        <file>icon/action3.svg</file>
+        <file>icon/action2.svg</file>
+        <file>icon/wordwrap.svg</file>
+        <file>icon/visible-true.svg</file>
+    </qresource>
+</RCC>
