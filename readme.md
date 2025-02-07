@@ -1,4 +1,4 @@
-﻿[中文文档点击这里,QQ群:434014314](./readme-cn.md)
+[中文文档点击这里,QQ群:434014314](./readme-cn.md)
 
 <div align="center">
 <p>
@@ -24,90 +24,106 @@
 |Qt6.5 LTS|[![cmake-win-qt6.5](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt6.5.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt6.5.yml)|[![CMake-Linux-Qt6.5](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt6.5.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt6.5.yml)|[![cmake-mac-qt6.5](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt6.5.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt6.5.yml)|
 |Qt6.8 LTS|[![cmake-win-qt6.8](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt6.8.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt6.8.yml)|[![CMake-Linux-Qt6.8](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt6.8.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt6.8.yml)|[![cmake-mac-qt6.8](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt6.8.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt6.8.yml)|
 
-# Introduction to SARibbon
+# SARibbon Introduction
 
-This is a `Ribbon control` under `Qt` framework, which provides an interface similar to that of Microsoft Office software. `SARibbon` is suitable for large software, industrial software, and complex software UI. `SARibbon` is designed with reference to the naming style of the MFC Ribbon interface, and the interface style of `SARibbon` refers to the Ribbon interface of Microsoft Office series software and WPS software, and combines the advantages of both. `SARibbon` is a ribbon widget that can define a variety of theme styles, and it can quickly define your desired theme style through qss.In order to facilitate the development of large software, `SARibbon` encapsulates some commonly used functional controls,such as [Color Widgets](https://github.com/czyt1988/SAColorWidgets)
+This is a `Qt`-based `Ribbon` interface widget that provides an operation interface similar to Microsoft Office software.
 
+- `SARibbon` is suitable for the UI of large-scale software, industrial software, and complex software.
+- `SARibbon` references the naming style of the MFC Ribbon interface in its design.
+- `SARibbon` draws on the Ribbon interfaces of Microsoft Office and WPS software, combining the strengths of both.
+- `SARibbon` is a Ribbon widget that can define multiple theme styles and quickly define desired themes through qss.
+
+For the convenience of developing large-scale software, `SARibbon` encapsulates some commonly used functional widgets, such as [color selection buttons and color selection palettes](https://github.com/czyt1988/SAColorWidgets).
 
 ## Features
 
-- Layout and display for Ribbon
+- Ribbon layout and display
 
-![Layout and display for Ribbon](./doc/screenshot/SARibbonBar-overview.gif)
+![Ribbon Layout and Display](./doc/screenshot/SARibbonBar-overview.gif)
 
-- Support minimization mode, ribbon only shows tabs (default double-click on the tab will switch)
+- Support for minimized mode, where the Ribbon only displays tabs (double-clicking a tab will toggle by default), and support for context tab.
 
-![SARibbon minimization mode](./doc/screenshot/SARibbonBar-minMode.gif)
+![SARibbon Minimized Mode](./doc/screenshot/SARibbonBar-minMode.gif)
 
-- Supports quickAccessBar (word quick menu), which will have different display effects in different layout modes
+- Support for quickAccessBar (similar to Word's quick menu), which has different display effects under different layout modes.
 
 ![SARibbon-quickAccessBar](./doc/screenshot/SARibbonBar-quickAccessBar.gif)
 
-- Support 4 different ribbon buttons: normal buttons, delay pop-up menu buttons, menu buttons, action menu buttons
+- Support for 4 types of Ribbon buttons: regular buttons, delayed pop-up menu buttons, menu buttons, and action menu buttons (the action menu button is one of the main issues this Ribbon widget addresses).
 
-![ribbon button](./doc/screenshot/SARibbonBar-ribbonbutton.gif)
+![SARibbon-4 Types of Ribbon Buttons](./doc/screenshot/SARibbonBar-ribbonbutton.gif)
 
-- There are 4 different styles of ribbon layouts available
+- Support for 4 different styles of layout.
 
-![4 different ribbon layout](./doc/screenshot/SARibbonBar-style.gif)
+![SARibbon-4 Different Styles of Layout](./doc/screenshot/SARibbonBar-style.gif)
 
-- Support QSS to customize the ribbon, you can switch themes in real time, and there are 5 different styles of themes built-in
+- Support for customizing the Ribbon using qss, with real-time theme switching and 5 built-in different styles.
 
-win7 theme:
+Win7 theme:
 ![SARibbon-theme-win7](./doc/screenshot/SARibbon-theme-win7.png)
-office2013 theme:
+
+Office2013 theme:
 ![SARibbon-theme-office2013](./doc/screenshot/SARibbon-theme-office2013.png)
-office2016 theme:
+
+Office2016 theme:
 ![SARibbon-theme-office2016](./doc/screenshot/SARibbon-theme-office2016.png)
-office2021 theme:
+
+Office2021 theme:
 ![SARibbon-theme-office2021](./doc/screenshot/SARibbon-theme-office2021.png)
-dark theme:
+
+Dark theme:
 ![SARibbon-theme-dark](./doc/screenshot/SARibbon-theme-dark.png)
 
-- Provides a Gallery control
+- Provide Gallery widget.
 
 ![](./doc/screenshot/SARibbonBar-gallery.gif)
 
-- Supports long scrolling and Option Action
+- Support for long scrolling and Option Action.
 
 ![](./doc/screenshot/SARibbonBar-option-action.gif)
 
-- Provides a centered alignment mode
+- Provide center alignment mode.
 
 ![](./doc/screenshot/SARibbon-aligment-center.png)
 
-- Support 4K screen and multi-screen
-- Support linux and MacOS
+- Support for 4K screens and multi-screen extension.
+- Support for Linux and MacOS (the interface is not deeply customized).
 
+Under the MIT license, everyone is welcome to use it and provide feedback.
 
-MIT protocol，welcome for everyone to use and give comments
-
-[gitee - https://gitee.com/czyt1988/SARibbon](https://gitee.com/czyt1988/SARibbon)
+[gitee (Code Cloud) - https://gitee.com/czyt1988/SARibbon](https://gitee.com/czyt1988/SARibbon)
 
 [github - https://github.com/czyt1988/SARibbon](https://github.com/czyt1988/SARibbon)
 
-
 # Build
 
-`SARibbon` provides both qmake and cmake build methods, and provides an amalgamate `SARibbon.h` and `SARibbon.cpp` file for static embedding into a single project
+It is recommended to use cmake for building. After building with cmake, you can install it (install). With cmake, your project can either use cmake to include SARibbonBar or use qmake to include SARibbonBar.
 
-> `SARibbon` supports third-party library [QWindowKit](https://github.com/stdware/qwindowkit) At the same time, it also supports simple frameless solutions. If you need native window support for the operating system, such as edge trimming after Windows 7 and maximizing the hovering effect of buttons in Windows 11, it is recommended to enable [QWindowKit](https://github.com/stdware/qwindowkit) Library, [QWindowKit](https://github.com/stdware/qwindowkit) Library can better solve the problem of multi screen movement
+SARibbon provides two build methods: qmake and cmake. It also offers an integrated SARibbon.h and SARibbon.cpp file for easy static embedding in a single project.
+
+> SARibbon supports the third-party frameless library [QWindowkit](https://github.com/stdware/qwindowkit). It also supports a simple frameless solution. If you need native window support from the operating system, such as edge docking for Windows 7 and later, or the hover effect of the maximize button in Windows 11, it is recommended to enable the [QWindowkit](https://github.com/stdware/qwindowkit) library. The [QWindowkit](https://github.com/stdware/qwindowkit) library can also effectively solve multi-screen movement issues.
+
+The effect after enabling `QWindowkit` is as follows:
 
 ![](./doc/pic/set-qwindowkit-on-snap.gif)
 
-If you want to rely on [QWindowKit](https://github.com/stdware/qwindowkit) Library, needs to be compiled first [QWindowKit](https://github.com/stdware/qwindowkit) Library, [QWindowKit](https://github.com/stdware/qwindowkit) As the submodules of the SARibbon project, if the '-- recursive' parameter is not included in the 'git clone', the 'submodules update' command needs to be executed:
+If you depend on the [QWindowkit](https://github.com/stdware/qwindowkit) library, you need to compile the [QWindowkit](https://github.com/stdware/qwindowkit) library first. The [QWindowkit](https://github.com/stdware/qwindowkit) library is a submodule of the SARibbon project. If you did not use the `--recursive` parameter when performing `git clone`, you need to execute the `submodule update` command:
 
 ```shell
 git submodule update --init --recursive
 ```
 
-## Compile to dynamic libraries
+> If the user specifies the use of [QWindowkit](https://github.com/stdware/qwindowkit), the minimum C++ standard required is C++17; otherwise, the minimum requirement is C++14.
 
-For the detailed build process, refer to the document: [Building SARibbon](./doc/how-to-build.md)
+## Building as a Dynamic Library
 
-## Embedding SARibbon directly into the project
+For the specific build process, refer to the documentation: [SARibbon Build](./doc/how-to-build-cn.md)
 
-SARibbon provides amalgamate `SARibbon.h` file and `SARibbon.cpp` file, you only need to import these two files in your own project, and at the same time import resource files and third-party library files to use, no need to compile into dynamic libraries or static libraries, you can refer to the StaticExample example (located in `src/example/StaticExample`), static embedding will be used to` SARibbon.h`, `SARibbon.cpp`, `SARibbon.pri`, `SARibbonBar/resource.qrc`, and `SARibbonBar/3rdparty`, `SARibbonBar/resource` two folders:
+## Directly Including in the Project (Static)
+
+You can include SARibbon in your project without building it as a library. After building and installing with cmake, static file inclusion is also provided.
+
+SARibbon provides the merged `SARibbon.h` and `SARibbon.cpp` files. You only need to include these two files in your project, along with the resource files and third-party library files, to use it without compiling it into a dynamic or static library. You can refer to the StaticExample (located in `example/StaticExample`) for how to include it statically. This will involve the following 4 files and the `SARibbonBar/resource` folder:
 
 Your project directory will look like this:
 
@@ -119,47 +135,85 @@ Your project directory will look like this:
 |  |-SARibbon.pri
 |  |-SARibbonBar
 |     |-resource.qrc
-|     |-resource(Directly copy the resource under SARibbonBar in its entirety)
+|     |-resource(copy the entire resource folder from SARibbonBar)
 |        |-resource files
 ```
 
-To compile with qmake, you can follow the steps below:
+### Using qmake
 
-- 1. Copy `SARibbon.h`, `SARibbon.cpp`, `SARibbon.pri` to your project directory
-- 2. Create a `SARibbonBar` folder in your project directory
-- 3. Copy the `src/SARibbonBar/resource.qrc` file in the source code to the `SARibbonBar` folder in your project directory
-- 4. Copy the `resource` folder under `src/SARibbonBar` to the `SARibbonBar` folder in your project directory
-- 5. Import the `SARibbon.pri` file into the pro file of your project, e.g. `include($$PWD/SARibbon.pri)`
+To compile with qmake, follow these steps:
 
-If you use cmake, refer to the cmake writing method of the StaticExample example(located in `src/example/StaticExample`)
+- 1. Copy `SARibbon.h`, `SARibbon.cpp`, and `SARibbon.pri` to your project directory.
+- 2. Create a `SARibbonBar` folder in your project directory.
+- 3. Copy the `resource.qrc` file from `src/SARibbonBar` in the source code to the `SARibbonBar` folder in your project directory.
+- 4. Copy the `resource` and `3rdparty` folders from `src/SARibbonBar` in the source code to the `SARibbonBar` folder in your project directory.
+- 5. Include the `SARibbon.pri` file in your project's pro file, like this: `include($$PWD/SARibbon.pri)`.
 
-# How to use:
+qmake can use the `SARibbon.pri` file to enable or disable the third-party frameless library.
 
-## Import the library
+### Using cmake
 
-After the compilation is complete, import SARibbon as follows:
+If you are using cmake, refer to the cmake script in the StaticExample (located in `example/StaticExample`) and include the aforementioned files in your project.
 
-### qmake
+```cmake
+SET(SARIBBON_DIR {Directory containing SARibbon.h and SARibbon.cpp})
+set(SARIBBON_STATIC_FILE
+    ${SARIBBON_DIR}/SARibbon.h
+    ${SARIBBON_DIR}/SARibbon.cpp
+    ${SARIBBON_DIR}/SARibbonBar/resource.qrc
+)
+add_executable({your_target} 
+            {your project's cpp and header files}
+            ${SARIBBON_STATIC_FILE}
+)
+```
 
-If you use qmake, you can simply copy the following files into your project in a directory structure after the compilation is complete
+In the static inclusion scenario with cmake, if you need to use `QWindowkit`, your project must first include the `QWindowkit` library and add the following predefinition macro:
 
-Create a 3rdparty folder in your project first, and then copy the entire SARibbon folder, there are already several pri files inside SARibbon that can easily allow you to import the project into your own directory, and the `./importSARibbonBarLib.pri` file is used to import the SARibbon library
+```cmake
+find_package(QWindowKit)
+target_link_libraries({your_target} PRIVATE QWindowKit::Widgets)
+target_compile_definitions({your_target} PRIVATE SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1)
+```
 
-After completing the appeal process, you can add the following statement to your Qt project pro file
+Otherwise, you need to set it to 0:
+
+```cmake
+target_compile_definitions({your_target} PRIVATE SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=0)
+```
+
+# Usage
+
+## Including the Library
+
+After compiling, follow the methods below to include SARibbon.
+
+### qmake (Not Recommended)
+
+Even if your project uses qmake, it is still recommended to build with cmake and use the install command to create a standard library installation. The SARibbon built with cmake can also be included through qmake.
+
+#### Including Through qmake Build
+
+If your SARibbon is built with qmake, a `bin_qt{Qt version}_{MSVC/GNU}_x{32/64}` folder will be generated in the SARibbon directory. To include it simply, copy the following files to your project directory according to the
+ directory structure.
+
+First, create a 3rdparty folder in your project directory, then copy the entire SARibbon folder there. SARibbon already has several pri files that can conveniently include the project in your directory. The `./importSARibbonBarLib.pri` file is used to include the SARibbon library.
+
+Include the following line in your Qt project's pro file:
 
 ```shell
 include($$PWD/3rdparty/SARibbon/importSARibbonBarLib.pri)
 ```
 
-The compilation process of qmake will generate bin_qtx.x_xx folder under SARibbon, and the library files and dll files are in this folder, and `importSARibbonBarLib.pri` will automatically reference the libraries in this folder
+The qmake build process will generate a `bin_qt{Qt version}_{MSVC/GNU}_x{32/64}` folder in SARibbon, where the library and dll files are located. The importSARibbonBarLib.pri file will automatically reference the library in this folder.
 
-At this point, your project directory looks like this:
+Your project directory structure will look like this:
 
 ```
 |-[you-project-dir]
 |  |-you-project.pro
 |  |-[3rdparty]
-|     |-[SARibbon](Copy SARibbon in its entirety)
+|     |-[SARibbon](copy the entire SARibbon folder here)
 |        |-importSARibbonBarLib.pri
 |        |-SARibbonBar.pri
 |        |-common.pri
@@ -168,12 +222,48 @@ At this point, your project directory looks like this:
 |        |   |-[SARibbonBar]
 ```
 
+Explanation of the pri files:
 
-### cmake (recommended)
+- common.pri
+  A qmake configuration file that defines configuration information. When compiling the library, you can modify the configuration through this file. When including it, the configuration must match the one used during compilation.
 
-It is recommended to use this library after execution of `install`.
+- importSARibbonBarLib.pri
+  Used to include the library, which is essentially an include(SARibbonBar.pri).
 
-Method for introducing cmake:
+- SARibbonBar.pri
+  Used to include the specific implementation of the library.
+
+- src/SARibbon.pri
+  The pri file for SARibbon.h and SARibbon.cpp. If you are using static integration, use this pri file.
+
+---
+
+You can copy all the header files to one folder and include the SARibbon library, similar to including other libraries. However, if you include it yourself, you need to define the following macros:
+
+- SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
+
+  This macro specifies whether you are using the third-party frameless library `QWindowkit`. If `QWindowkit` was used during compilation, you need to define SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1; otherwise, set it to 0. In your pro file, you can write:
+
+```shell
+# Compiled with QWindowkit
+DEFINES += SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1
+# Compiled without QWindowkit
+DEFINES += SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=0
+```
+
+#### Including Through cmake Build
+
+Even if your project is managed with qmake, it is recommended to build SARibbon with cmake and install it. After building and installing with cmake, a qmake inclusion scheme is also provided in the `lib/qmake/SARibbonBar` directory of the installation location. You only need to add the following line to your pro file to include it:
+
+```shell
+include({SARibbon installation directory}/lib/qmake/SARibbonBar/SARibbonBar.pri)
+```
+
+### cmake (Recommended)
+
+It is recommended to use this library after performing the install step.
+
+To include it using cmake:
 
 ```cmake
 find_package(SARibbonBar REQUIRED)
@@ -181,51 +271,47 @@ find_package(SARibbonBar REQUIRED)
 target_link_libraries({your_target_name} PUBLIC SARibbonBar::SARibbonBar)
 ```
 
-If `find_package` cannot find `SARibbonBar`, you need to inform your cmake project of the installation location of `SARibbon`.
+If `find_package` cannot find `SARibbonBar`, you need to inform the cmake project of the SARibbon installation location:
 
 ```
-set(SARibbonBar_DIR "[your SARibbonBar installation root directory]/lib/cmake")
+set(SARibbonBar_DIR "[Your SARibbon installation root directory]/lib/cmake")
 ```
 
-If during compilation, the `SARIBBON_INSTALL_IN_CURRENT_DIR` option is set to `ON` (default), a `bin_qt{Qt version}_{MSVC/GNU}_x{32/64}` folder will be generated under the root directory of the SARibbon project as the installation directory. This is to align with qmake and facilitate the installation of multiple different versions of Qt and compilers on a single operating system. Otherwise, on Windows, it will be installed in the `C:\Program Files\SARibbonBar` folder by default.
+If the `SARIBBON_INSTALL_IN_CURRENT_DIR` option is set to `ON` during compilation (default), a `bin_qt{Qt version}_{MSVC/GNU}_x{32/64}` folder will be generated in the SARibbon project root directory as the installation directory. This is to unify with qmake and also to facilitate the separate installation of multiple different versions of Qt and compilers on one operating system. Otherwise, on Windows, it will be installed by default in the `C:\Program Files\SARibbonBar` folder.
 
-For reference on introducing SARibbon via cmake, see `src/example/MainWindowExample/CMakeLists.txt`.
+For an example of including SARibbon using cmake, refer to `example/MainWindowExample/CMakeLists.txt`.
 
-For details, refer to the documentation: [SARibbon Building](./doc/how-to-build-cn.md)
+For more details, see the documentation: [SARibbon Build](./doc/how-to-build-cn.md)
 
-## Get started quickly
+## Quick Start
 
-Ribbon is a combination of the menu bar and the toolbar, and displayed through a tab control, Ribbon can not be simply replaced by Tab+Toolbar, involving a lot of details, `SARibbon` refers to the naming style of the MFC Ribbon interface in the design, the tab page is called `Category`, and there are multiple `pannel` under each `Category`, below which manages the toolbutton, `pannel` is a bit like the traditional `Toolbar`, with a hierarchy as shown in the image below, and these names are referencing the MFC ribbon interface class
+The Ribbon combines the menu bar and toolbar, displaying them through a tab widget. The Ribbon cannot be simply replaced by a Tab+Toolbar, as it involves many detailed issues. When designing `SARibbon`, the naming style of the MFC Ribbon interface was referenced. The tab page is called `Category` (kind), and each `Category` has multiple `pannel` (panels) under it, which manage toolbuttons. The `pannel` is somewhat similar to a traditional `Toolbar`. The hierarchy is shown in the figure below, and these names reference the Ribbon interface classes in MFC.
 
-![msdn ribbon](./doc/pic/msdn-ribbon.png)
+![msdn ribbon introduction page](./doc/pic/msdn-ribbon.png)
 
-Some common nouns are explained below
+Some common terminology explanations are as follows:
 
-- **Category**, representing what a label presents, corresponding to `SARibbonCategory`.
+- **Category**: Represents the content displayed by a tab, corresponding to `SARibbonCategory`.
+- **Context Category**: This is a special kind of category that is not displayed normally and is shown based on context. The most common example is in Word, where a picture editing-related tab appears when an image is selected, and disappears when the image is deselected. This is a context category, corresponding to `SARibbonContextCategory`.
+- **Pannel**: A collection of menus, similar to a Toolbar, corresponding to `SARibbonPannel`.
+- **Application Button**: The button at the top-left corner of the tab bar (in Word, it corresponds to the File button). This button triggers special pages or menus, corresponding to `SARibbonApplicationButton`, which can be hidden.
+- **Quick Access Bar**: A simple toolbar at the very top for placing frequently used actions, corresponding to `SARibbonQuickAccessBar`.
+- **Gallery**: This is the most eye-catching widget of the Ribbon, displaying functions with intuitive images. Some even render in real-time based on context. A typical example is the style selection in the Home tab of Word, corresponding to `SARibbonGallery`.
 
-- **Context Category**, this is a special category. It is not displayed normally. You need to judge whether it should be displayed based on the context. The most common way is that after inserting a picture in word, a label related to picture modification will appear. If no picture is selected, the label will disappear. This is the context category, corresponding to `SARibbonContextCategory`.
-
-- **Pannel**, This is a collection of menus, like a Toolbar, corresponding to `SARibbonPannel`
-
-- **Application Button**, this is the leftmost button in the tab bar (word is the corresponding file button). This button will trigger some special pages or menus, corresponding to `SARibbonApplicationButton`, which can be hidden.
-
-- **Quick Access Bar**, a simple toolbar at the top for placing common actions corresponding to `SARibbonQuickAccessBar`.
-
-- **Gallery Control**, this is the most eye-catching control of ribbon. It displays the functions with intuitive images, and even some renders are done in real time according to the context. Typical example is the style selection in the office word. corresponding to `SARibbonGallery`.
-
-The layout of SARibbonBar is shown in the figure below
+The hierarchy of SARibbonBar is shown in the figure below:
 
 ![](./doc/pic/saribbonbar-level.png)
 
-> Note: Different layout schemes affect the placement of the `Category` and `Quick Access Bar`
+> Note: Different layout schemes affect the placement of `Category` and `Quick Access Bar`. For more details, see [SARibbonBar Layout Schemes](#SARibbonBar Layout Schemes).
 
-### Use Ribbon in the MainWindow
+### Using Ribbon in MainWindow
 
-To use SARibbon in MainWindow, you need to replace `QMainWindow` with `SARibbonMainWindow`, which modifies the way `QMainWindow` renders menubar
+To use SARibbon in MainWindow, you need to replace `QMainWindow` with `SARibbonMainWindow`. `SARibbonMainWindow` modifies the rendering of the menubar in `QMainWindow`.
 
-> Note that if you use a UI file, you should delete the menu of the UI file, otherwise it may cause some exceptions
+> Note: If you are using a ui file, delete the original menu in the ui file to avoid potential exceptions, as shown in the figure below:
+> ![](./doc/pic/remove-menu-bar-at-uifile.png)
 
-The sample code is as follows:
+Example code is as follows:
 
 ```cpp
 #include "SARibbonMainWindow.h"
@@ -238,78 +324,67 @@ public:
 }
 ```
 
-`SARibbonMainWindow` also supports normal mode rendering with the following constructor:
+`SARibbonMainWindow` also supports rendering in normal mode. The second parameter of the SARibbonMainWindow constructor is used to set whether to use Ribbon mode:
 
 ```cpp
 SARibbonMainWindow(QWidget *parent = nullptr, bool useRibbon = true);
 ```
 
-If the second parameter is set to false, it will use the normal menu toolbar mode, this interface is reserved for some projects that need to be able to switch between ribbon and classic menu toolbar scenes, ribbon state and classic state do not support hot switching, if you need to switch, you can set a configuration file or registry, pass false to the second parameter when the application is restarted to enter the classic menu toolbar mode
+If the second parameter is set to false, it will use the normal menu toolbar mode. This interface is reserved for projects that need to switch between Ribbon and classic menu toolbar modes. Ribbon state and classic state do not support hot switching. If switching is needed, users can set a configuration file or registry entry and pass false to the second parameter upon application restart to enter the classic menu toolbar mode.
 
-### Use SARibbonBar in QWidget or QDialog
+### Using SARibbonBar in QWidget or QDialog
 
-`SARibbonBar` can be used on `QWidget` or `QDialog`, see the example：`src/example/WidgetWithRibbon`
+SARibbonBar supports use in QWidget or QDialog. For more details, see the example: `example/WidgetWithRibbon`.
 
-All you need to do is use `SARibbonBar` as a normal widget
-
-First, declare the pointer of `SARibbonBar` in the header file
+The project provides the `SARibbonWidget` class. Inheriting `SARibbonWidget` in a widget window will achieve a Ribbon-effect window.
 
 ```cpp
-private:
-    Ui::Widget* ui;
-    SARibbonBar* mRibbonBar { nullptr };
+#include "SARibbonWidget.h"
+
+class RibbonWidget : public SARibbonWidget
+{
+ Q_OBJECT
+public:
+    RibbonWidget(QWidget* parent = nullptr);
+};
 ```
 
-Create a `SARibbonBar` in the Widget's constructor, there is a `QVBoxLayout` layout in the widget's ui file, place the `SARibbonBar` at the very top, and at the same time, since the QWidget mode, there is no need to display the title, you can call the `SARibbonBar::setTitleVisible` method to hide the title. applicationbutton can also be canceled in QWidget via `SARibbonBar::setApplicationButton` if it is not necessary, and finally since the theme of SARibbonBar is set in the `SARibbonMainWindow` method, the theme can be set in QWidget via the global function `sa_set_ribbon_ theme`
-
+The `SARibbonWidget` class provides the `setWidget` method, which can embed any widget.
 
 ```cpp
-#include "SARibbonBar.h"
-#include "SARibbonCategory.h"
-#include "SARibbonPannel.h"
-#include "SARibbonMainWindow.h"
-Widget::Widget(QWidget* parent) : QWidget(parent), ui(new Ui::Widget)
+RibbonWidget::RibbonWidget(QWidget* parent) : SARibbonWidget(parent)
 {
-    // Note: There is a QVBoxLayout layout in the ui file
-    ui->setupUi(this);
-    // Create SARibbonBar
-    mRibbonBar = new SARibbonBar(this);
-    // there is no need to display the title anymore on QWidget
-    mRibbonBar->setTitleVisible(false);
-    // it is better to use compact mode directly on QWidget
-    mRibbonBar->setRibbonStyle(SARibbonBar::RibbonStyleCompactThreeRow);
-    // cancel applicationbutton
-    mRibbonBar->setApplicationButton(nullptr);
-    // Set the theme, although SARibbonMainWindow is not used here, 
-    // but the theme of the Ribbon is defined in SARibbonMainWindow, so SARibbonMainWindow.h should be introduced
-    sa_set_ribbon_theme(mRibbonBar, SARibbonMainWindow::RibbonThemeOffice2013);
+    // Get SARibbonBar
+    SARibbonBar* ribbonbar = ribbonBar();
+    // In QWidget mode, there is no need to display the title
+    ribbonbar->setTitleVisible(false);
+    // In QWidget mode, using compact mode is better
+    ribbonbar->setRibbonStyle(SARibbonBar::RibbonStyleCompactThreeRow);
+    // Cancel applicationbutton
+    ribbonbar->setApplicationButton(nullptr);
 
-    // QWidgets sets a QVBoxLayout and puts the window in the second layout of the QVBoxLayout, 
-    // and the first layout is given to SARibbonBar, so that SARibbonBar will be on top
-    ui->verticalLayout->insertWidget(0, mRibbonBar);
-
-    buildRibbon(mRibbonBar);
+    setWidget(new InnerWidget());
 }
 ```
 
-Here's what it looks like:
+The effect is as follows:
 
-![Ribbon on QWidget](./doc/screenshot/ribbonbar-use-in-qwidget.png)
+![Ribbon Used in QWidget](./doc/screenshot/ribbonbar-use-in-qwidget.png)
 
+### Creating Categories and Pannels
 
-### Create Category and Pannel
+The order of creating a Ribbon is as follows: first create the category (
+Category), then create the panel (Pannel), and finally create the corresponding toolbutton (action).
 
-The order of creating a ribbon is to create a Category, then a Pannel, and finally a toolbutton (action)
-
-Use `SARibbonBar::addCategoryPage` to add a Category to SARibbonBar, `SARibbonCategory::addPannel` to add a Category, and `SARibbonPannel::addAction` to add an action to Pannel
+Use `SARibbonBar::addCategoryPage` to add the Category to SARibbonBar, use `SARibbonCategory::addPannel` to add the Pannel to the Category, and use `SARibbonPannel::addAction` to add actions to the Pannel.
 
 The following code demonstrates an example of adding an action:
 
 ```cpp
-//Add main tab - The main tab is added through the addcategorypage factory function.
+// Add the main tab page - through the addCategoryPage factory function
 SARibbonCategory* categoryMain = ribbon->addCategoryPage(tr("Main"));
- //Using the addpannel function to create saribponpannel. The effect is the same as that of new saribponpannel, and then call SARibbonCategory:: addpannel.
-SARibbonPannel* pannel1 = categoryMain->addPannel(("Panel 1"));
+ // Use the addPannel function to create a SARibbonPannel, which has the same effect as creating a new SARibbonPannel and then adding it
+SARibbonPannel* pannel1 = categoryMain->addPannel("Panel 1");
 QAction* actSave = new QAction(this);
 actSave->setText("save");
 actSave->setIcon(QIcon(":/icon/icon/save.svg"));
@@ -318,11 +393,11 @@ actSave->setShortcut(QKeySequence(QLatin1String("Ctrl+S")));
 pannel1->addLargeAction(actSave);
 ```
 
-The above operation adds a button, and the effect is shown in the following figure:
+The above operation adds a button, and the effect is shown in the figure below:
 
 ![](./doc/pic/add-large-action.png)
 
-You can also directly new out of `SARibbonCategory` and add it to pannel, and the following code will look the same as the one above:
+Users can also directly create a SARibbonCategory and add it to the pannel. The following code has the same effect as the one above:
 
 ```cpp
 SARibbonCategory* categoryMain = new SARibbonCategory(tr("Main"));
@@ -334,48 +409,41 @@ QAction* actSave = new QAction(this);
 pannel1->addLargeAction(actSave);
 ```
 
-Different layout styles can be combined through`addLargeAction`,`addMediumAction`,`addSmallAction`. For details, see :
+Ribbon icons come in different sizes. Using `addLargeAction`, `addMediumAction`, and `addSmallAction` can create different layout styles.
 
-[./src/example/MainWindowExample/mainwindow.cpp](./src/example/MainWindowExample/mainwindow.cpp)
+For more details, see [./example/MainWindowExample/mainwindow.cpp](./example/MainWindowExample/mainwindow.cpp).
 
-### Context Category
+### ContextCategory (Contextual Tabs)
 
-The so-called Context Category refers to the label / label group that appears only under special circumstances. For example, when office word selects a picture, the Context Category of picture editing will appear, as shown in the following figure:
+Contextual tabs are special tabs or tab groups that only appear under certain conditions. For example, in Microsoft Office Word, when an image is selected, an image editing contextual tab appears. If no image is selected, the tab disappears. This is a contextual tab, corresponding to `SARibbonContextCategory`.
 
-![Context Category](doc/pic/word-contextcategory.png)
+Contextual tabs are usually created during program initialization and hidden by default, waiting to be displayed when needed. Creating a contextual tab is as follows:
 
-The class corresponding to the Context Category in SARibbon is `SARibbonContextCategory`
+Since contextual tabs need to be invoked when needed, it is a good practice to save them as member variables. Of course, you can also search for them by iterating through the list (using `SARibbonBar::contextCategoryList` to enumerate all `SARibbonContextCategory` instances).
 
-The Context Category is usually created when the program is initialized. It is usually hidden and displayed when it needs to be displayed. The Context Category is created as follows:
-
-Since the Context Category needs to be invoked when used, it is a good choice to save it with a member variable. Of course, you can also traverse the search (`SARibbonBar::contextCategoryList`can enumerate all `SARibbonContextCategory`).
-
-header file:
+Header file:
 
 ```cpp
 SARibbonContextCategory* m_contextCategory;
 ```
 
-cpp file:
+Cpp file:
+
 ```cpp
 SARibbonBar* ribbon = ribbonBar();
-//Create a contextCategory with random colors
+// Create a contextCategory with a random color
 m_contextCategory   = ribbon->addContextCategory(tr("context"), QColor());
 SARibbonCategory* contextCategoryPage1 = m_contextCategory->addCategoryPage(tr("Page1"));
-//Operate on contextCategoryPage1
+// Perform operations on contextCategoryPage1
 ......
 SARibbonCategory* contextCategoryPage2 = m_contextCategory->addCategoryPage(tr("Page2"));
-//Operate on contextCategoryPage2
+// Perform operations on contextCategoryPage2
 ......
 ```
 
-The `SARibbonCategory` created by `SARibbonContextCategory` is managed by `SARibbonContextCategory`. Only when `SARibbonContextCategory` is displayed, the managed `SARibbonCategory` is displayed
+`SARibbonCategory` instances created by `SARibbonContextCategory` are managed by `SARibbonContextCategory`. Only when `SARibbonContextCategory` is "displayed" will its managed `SARibbonCategory` instances be shown. **Note:** `SARibbonContextCategory` is not a window.
 
-Note: **`SARibbonContextCategory`** is not a widget.
-
-To display a contex use
-
-`SARibbonBar::showContextCategory`/`SARibbonBar::hideContextCategory`:
+To display a contextual tab, simply call `SARibbonBar::showContextCategory` or `SARibbonBar::hideContextCategory`:
 
 ```cpp
 void MainWindow::onShowContextCategory(bool on)
@@ -388,35 +456,31 @@ void MainWindow::onShowContextCategory(bool on)
 }
 ```
 
-**Note: ** if you want to delete `contextCategory`, you need to call `SARibbonBar::destroyContextCategory` instead of delete  directly. After calling `SARibbonBar::destroyContextCategory`, you do not need to delete the pointer of ContextCategory.
+**Note:** If you need to delete a `contextCategory`, call `SARibbonBar::destroyContextCategory` instead of directly deleting it. After calling `SARibbonBar::destroyContextCategory`, there is no need to delete the pointer to `ContextCategory`.
 
-Different contextCategory has different style. For details,see: [SARibbon style](#SARibbon style) and [Display comparison under different styles](#Display comparison under different styles).
+Different styles of `contextCategory` have different appearances. For more details, see [SARibbon Styles](#SARibbon Styles) and [Comparison of Appearance Under Different Styles](#Comparison of Appearance Under Different Styles).
 
 ### ApplicationButton
 
-There is a special and obvious button called `ApplicationButton` in the upper left corner of the ribbon interface. This button is generally used to call up menus. SARibbonBar creates `ApplicationButton` by default during construction. Its text can be set in the following ways:
+There is a special and prominent button at the top-left corner of the Ribbon interface, known as the `applicationButton`. This button is generally used to invoke a menu. By default, `SARibbonBar` creates an `applicationButton` during construction, and you can set its text as follows:
 
 ```cpp
 SARibbonBar* ribbon = ribbonBar();
 ribbon->applicationButton()->setText(("File"));
 ```
 
-The default applicationButton inherits from `SARibbonApplicationButton`, and `SARibbonApplicationButton` inherits from `QPushButton`, so you can perform all operations on `QPushButton`. Of course, if you want to set your own Button as an applicationButton, you can just call the `SARibbonBar::setApplicationButton` function.
+The default `applicationButton` inherits from `SARibbonApplicationButton`, which in turn inherits from `QPushButton`. Therefore, you can perform all operations available for `QPushButton` on it. If you wish to set your own button as the `applicationButton`, you can do so by calling the `SARibbonBar::setApplicationButton` function.
 
-### QuickAccessBar and RightButtonGroup
+### QuickAccessBar and rightButtonGroup
 
-QuickAccessBar is the quick toolbar in the upper left corner and rightButtonGroup is the quick toolbar in the upper right corner. In office mode, it is divided into left and right sides. In WPS mode, the left and right sides will be combined and placed on the right.
-
-
-
-![QuickAccessBar And RightButtonGroup](./doc/screenshot/QuickAccessBarAndRightButtonGroup.png)
+The QuickAccessBar is a simple toolbar located at the top-left corner, while the rightButtonGroup is a toolbar at the top-right corner. In Office mode, these toolbars are separated into left and right sides, whereas in WPS mode, they are combined and placed on the right side.
 
 In `SARibbon`:
 
 - QuickAccessBar corresponds to the `SARibbonQuickAccessBar` class.
-- rightButtonGroup corresponds to the `SARibbonQuickAccessBar` class.
+- rightButtonGroup corresponds to the `SARibbonButtonGroupWidget` class.
 
-During initialization, `SARibbonBar` will create QuickAccessBar and RightButtonGroup by default. Its pointers can be obtained through `SARibbonBar::quickAccessBar` and `SARibbonBar::rightButtonGroup`. Examples are as follows:
+`SARibbonBar` initializes by default with QuickAccessBar and RightButtonGroup. You can obtain pointers to these components and perform operations on them using `SARibbonBar::quickAccessBar` and `SARibbonBar::rightButtonGroup`, respectively. Here is an example:
 
 ```cpp
 QAction* MainWindow::createAction(const QString& text, const QString& iconurl, const QString& objName)
@@ -446,212 +510,214 @@ void MainWindow::initRightButtonGroup(){
 }
 ```
 
-### SARibbonBar layout style
+### SARibbonBar Layout Schemes
 
- `SARibbon` supports switching between four ribbon styles. Here, the ribbon style of `office` and `WPS` is referred.
-Online style switching can be realized through`void SARibbonBar::setRibbonStyle(RibbonStyle v)`.
+`SARibbon` supports 4 Ribbon layout schemes, referencing the Ribbon styles of `Office` and `WPS`. The layout scheme can be switched using the `void SARibbonBar::setRibbonStyle(RibbonStyle v)` function.
 
-The `office` mode is the most common ribbon mode, the `tab` and title bar occupy more space, the ribbon mode designed by `WPS` has been improved, it reduces the height of the ribbon, the label and the title bar are set together, so as to reduce the height of a title bar, effectively use the vertical space, and at the same time, the button layout of the pannel is changed from a maximum of 3 to 2, further compressing the vertical space
+The `Office` mode is the most common Ribbon mode, where the `tab` and title bar occupy more space. The `WPS` Ribbon mode has been improved to reduce the height of the Ribbon. It combines the tab and title bar to save one title bar height, effectively utilizing vertical space. Additionally, it changes the button layout in the pannel from a maximum of 3 buttons to 2 buttons per row, further compressing the vertical space.
 
-Screenshot comparison between the word interface of office and the word interface of WPS
+Comparison of screenshots of the Office Word interface and the WPS Word interface:
 
-![office](./doc/pic/office-screenshot.png)
+![Office Interface Screenshot](./doc/pic/office-screenshot.png)
 
-![Wps](./doc/pic/wps-change-ribbon-1.jpg)
+![WPS Changed Ribbon Layout](./doc/pic/wps-change-ribbon-1.jpg)
 
-Under the normal screen, the WPS style will reduce the vertical height by at least 30 pixels compared with the Office style, which is equivalent to saving nearly 3% of the vertical space compared with the 1920*1080 screen.
+Under normal screen conditions, the WPS style reduces the vertical height by at least 30 pixels compared to the Office style, which is equivalent to saving nearly 3% of the vertical space on a 1920*1080 screen.
 
-In SARibbon, the one with the title bar is called Loose, and the elements of the loose layout are arranged as shown below：
+In `SARibbon`, the layout with a title bar is referred to as a loose layout (Loose), and the arrangement of its various elements is shown in the figure below:
 
-![Loose](./doc/pic/ribbonbar-geometry-office3.png)
+![Loose Layout](./doc/pic/ribbonbar-geometry-office3.png)
 
-This layout is consistent with the default layout of Office
+This layout is consistent with the default layout in Office.
 
-In SARibbon, the layout with a title bar and tab is called a compact layout, and the elements of the compact layout are arranged as follows:
+The layout in `SARibbon` that combines the title bar and tab is called a compact layout (Compact), and the arrangement of its various elements is shown in the figure below:
 
-![compact](./doc/pic/ribbonbar-geometry-wps3.png)
+![Compact Layout](./doc/pic/ribbonbar-geometry-wps3.png)
 
-SARibbonBar provides a `setRibbonStyle` function that defines the current layout style, and enumerating `SARibbonBar::RibbonStyle` defines four layout schemes:
+The `SARibbonBar` provides the `setRibbonStyle` function to define the current layout scheme. The `SARibbonBar::RibbonStyle` enumeration defines four layout schemes:
 
-- `SARibbonBar::RibbonStyleLooseThreeRow`Loose With Three Row(The v0.x version is `SARibbonBar::OfficeStyle`)
+- `
+SARibbonBar::RibbonStyleLooseThreeRow`: Loose structure, 3-row mode (v0.x version was `SARibbonBar::OfficeStyle`)
 
 ![SARibbonBar::RibbonStyleLooseThreeRow](doc/screenshot/office-3-style.png)
 
-- `SARibbonBar::RibbonStyleLooseTwoRow`Loose With Two Row(The v0.x version is `SARibbonBar::OfficeStyleTwoRow`)
+- `SARibbonBar::RibbonStyleLooseTwoRow`: Loose structure, 2-row mode (v0.x version was `SARibbonBar::OfficeStyleTwoRow`)
 
 ![SARibbonBar::RibbonStyleLooseTwoRow](doc/screenshot/office-2-style.png)
 
-- `SARibbonBar::RibbonStyleCompactThreeRow`Compact With Three Row(The v0.x version is `SARibbonBar::WpsLiteStyle`)
+- `SARibbonBar::RibbonStyleCompactThreeRow`: Compact structure, 3-row mode (v0.x version was `SARibbonBar::WpsLiteStyle`)
 
 ![SARibbonBar::RibbonStyleCompactThreeRow](doc/screenshot/wps-3-style.png)
 
-- `SARibbonBar::RibbonStyleCompactTwoRow`Compact With Two Row(The v0.x version is `SARibbonBar::WpsLiteStyleTwoRow`)
+- `SARibbonBar::RibbonStyleCompactTwoRow`: Compact structure, 2-row mode (v0.x version was `SARibbonBar::WpsLiteStyleTwoRow`)
 
 ![SARibbonBar::RibbonStyleCompactTwoRow](doc/screenshot/wps-2-style.png)
 
-### Text wrapping, and icon size
+### SARibbonBar Text Wrapping and Icon Size
 
-The `SARibbonBar::setEnableWordWrap` function allows you to control whether the text of the SARibbonBar wraps or not, the height of the `SARibbonBar` is fixed, and whether the text wraps or not will affect the size of the icon display, so if you want the icon to look bigger, you can set the text to not wrap
+The `SARibbonBar::setEnableWordWrap` function controls whether the text in SARibbonBar wraps. The height of `SARibbonBar` is fixed, and text wrapping affects the size of the icons. Therefore, if you want the icons to appear larger, you can set text wrapping to off.
 
-In `SARibbonBar::RibbonStyleCompactTwoRow` layout style, the text without wrapping is displayed as follows:
+In the `SARibbonBar::RibbonStyleCompactTwoRow` layout mode, the display effect with text wrapping off is as follows:
 
-`SARibbonBar::RibbonStyleCompactTwoRow`紧凑结构，2行模式把文字设置为不换行后(`SARibbonBar::setEnableWordWrap(false)`)的效果如下
+![](doc/screenshot/wps-2-style-nowrap.png)
 
-![nowrap](doc/screenshot/wps-2-style-nowrap.png)
+Setting text wrapping off in SARibbonBar increases the display space for icons.
 
-When the SARibbonBar text is set to non-wrapping, the display space of the icon becomes larger
+### Different Button Layout Styles
 
-### Tool Button layouts of SARibbonBar
-
-`SARibbonPannel` provides three methods to add action:
+`SARibbonPannel` provides three methods to add actions:
 
 - `addLargeAction`
 - `addMediumAction`
 - `addSmallAction`
 
-In the standard pannel, an action (button) has three layouts mode. Taking office word as an example, the three layouts of pannel are actually the number of lines occupied:
+In a standard pannel, a button (action) has three layouts. Taking Microsoft Office Word as an example, the three layouts of a pannel are actually the number of rows occupied:
 
-- The first, which occupies the entire pannel, is called 'Large'
-- Second, 2 buttons can be placed under one pannel, which is called 'medium'
-- The third type, a pannel with 3 buttons, is called 'samll'
+- The first type occupies the entire pannel and is called `large`.
+- The second type allows two buttons in one pannel and is called `medium`.
+- The third type places three buttons in one pannel and is called `small`.
 
-![word pannel example](./doc/pic/pannelLayout3row-example.png)
+![Word Pannel Layout Example](./doc/pic/pannelLayout3row-example.png)
 
-`SARibbonPannelItem::RowProportion` is used to represent the number of rows each form occupies in the pannel. It is commonly used in the pannel layout. This enumeration is defined as follows:
+The `SARibbonPannelItem::RowProportion` enumeration represents the number of rows occupied by each widget in the pannel and is commonly used in pannel layouts. This enumeration is defined as follows:
 
 ```cpp
 /**
- * @brief defines the proportion of rows. The ribbon has  three proportions: large, media and small.
- */
+  * @brief Defines the row proportion, with large, medium, and small proportions in the Ribbon
+  */
 enum RowProportion {
-    None            ///< to define the proportion, it will be judged according to expandingDirections. If Qt::Vertical is available, it is equal to Large, otherwise it is Small
-    , Large         ///< Large proportion, the height of a widget will fill the whole pannel.
-    , Medium        ///< Medium proportion will only work when @ref SARibbonPannel::pannelLayoutMode is @ref SARibbonPannel::ThreeRowMode, and will occupy two of the three rows if both of them in the same column are Medium.
-    , Small         ///< Small proportion, in the line of SARibbonPannel, Medium will become Small if it does not meet the conditions, but will not become Large.
+    None            ///< Undefined proportion; this will be determined based on expandingDirections. If Qt::Vertical is possible, it is equivalent to Large; otherwise, it is Small.
+    , Large         ///< Large proportion, where a widget's height will fill the entire pannel
+    , Medium        ///< Medium proportion, which only takes effect in @ref SARibbonPannel::pannelLayoutMode when it is @ref SARibbonPannel::ThreeRowMode. Both items in the same column must be Medium to occupy two rows out of three.
+    , Small         ///< Small proportion, occupying one row of SARibbonPannel. Medium will also become Small if conditions are not met, but it will not become Large.
 };
 ```
 
-Each action managed in `SARibbonPannel` will have a private property (`SARibbonPannelItem::RowProportion`). This property determines the layout of this action in the pannel.
+Each action managed by `SARibbonPannel` has a private attribute (`SARibbonPannelItem::RowProportion`), which determines the layout of the action within the pannel.
 
-### `SARibbonPannel` layout mode
+### SARibbonPannel Layout Modes
 
-#### 3-line mode
+#### Three-Row Mode
 
-The three line mode is the traditional pannel layout, as shown in the following figure:
+The three-row mode is the traditional pannel layout, as shown in the figure below:
 
-![3-line mode](./doc/pic/pannelLayout3row.png)
+![Three-Row Mode Ribbon Layout Example](./doc/pic/pannelLayout3row.png)
 
-In the 3-line mode, there are three kinds of placeholders, which are large, medium and small
+In the three-row mode, there are three types of proportions (`SARibbonPannelItem::RowProportion`): large, medium, and small.
 
-The pannel in the 3-line mode will display the title of the pannel in the Pannel Title area, and there is another OptionAction area. This area is used to add a special trigger to this action. If OptionAction is not set, this area is hidden.
+The pannel in the three-row mode displays the pannel title in the `Pannel Title` area. There is also an `OptionAction` area, which is used for special triggering of the action. If no `OptionAction` is set, this area is hidden.
 
-#### 2-line mode
+#### Two-Row Mode
 
-The two-line mode is the WPS improved layout method , as shown in the following figure:
+The two-row mode is an improved layout method referenced from WPS (it is unclear whether WPS was the first to use this layout, but it was designed based on WPS's layout), as shown in the figure below:
 
-![2-line mode](./doc/pic/pannelLayout2row.png)
+![Two-Row Mode Ribbon Layout Example](./doc/pic/pannelLayout2row.png)
 
-In the 2-line mode, the medium and small placeholders (SARibbonPannelItem::RowProportion) are the same, and no distinction is made.
+In the two-row mode, the proportions of medium and small (`SARibbonPannelItem::RowProportion`) are the same and are not distinguished.
 
-In 2-line mode, pannel does not display the title.
+The pannel in the two-row mode does not display the title.
 
-### SARibbon Customization
+### Customization Features of SARibbon
 
-Ribbon customization is a feature of ribbon. With reference to the custom interface of office and WPS, users can define a lot of content for their own ribbon, or even define an interface completely different from the original one.
+Customization is a key feature of Ribbon. Referencing the customization interfaces of Office and WPS, users can define a wide range of content for their Ribbon, even creating a completely different interface from the original.
 
-The following is the custom interface of office.
+Below is the customization interface of Office:
 
-![office Ribbon Customization](./doc/screenshot/customize/customization-office-ui.png)
+![Office Customization Interface](./doc/screenshot/customize/customization-office-ui.png)
 
-SARibbon refers to the interface of office and WPS, and encapsulates the easy-to-use `SARibbonCustomize**` class, including the following five classes:
+`SARibbon` encapsulates a set of convenient-to-use `SARibbonCustomize**` classes, including the following 5 classes:
 
-> - `SARibbonCustomizeDialog`
-> - `SARibbonCustomizeWidget`
-> - `SARibbonCustomizeData`
-> - `SARibbonActionsManager`
-> - `SARibbonActionsManagerModel`
+> - SARibbonCustomizeDialog
+> - SARibbonCustomizeWidget
+> - SARibbonCustomizeData
+> - SARibbonActionsManager
+> - SARibbonActionsManagerModel
 
-Actual users can only use `SARibbonActionsManager` and `SARibbonCustomizeDialog`/`SARibbonCustomizeWidget`, and other users will not use them normally.
+In practice, users will only deal with `SARibbonActionsManager` and `SARibbonCustomizeDialog`/`SARibbonCustomizeWidget`. The other classes are typically not used by users.
 
-`SARibbonActionsManager` is used to manage `QAction`, add the `QAction` that is wanted to customize to `SARibbonActionsManager` for management, and classify `QAction` so that they can be displayed in `SARibbonCustomizeDialog`/`SARibbonCustomizeWidget`.
+`SARibbonActionsManager` is used to manage `QAction`. Add the `QAction` you want to customize to `SARibbonActionsManager` for management, and you can categorize `QAction` to display in `SARibbonCustomizeDialog`/`SARibbonCustomizeWidget`.
 
-`SARibbonCustomizeDialog`/`SARibbonCustomizeWidget` is a specific display window. The `SARibbonCustomizeDialog` encapsulates the `SARibbonCustomizeWidget` as a dialog box. If you want to integrate it into the configuration dialog box like office, you can use the `SARibbonCustomizeWidget`. The effect of the `SARibbonCustomizeDialog` is shown in the following figure:
+`SARibbonCustomizeDialog`/`SARibbonCustomizeWidget` are the actual display windows. `SARibbonCustomizeDialog` packages `SARibbonCustomizeWidget` into a dialog box. If you want to integrate it into a configuration dialog box like Office, you can use `SARibbonCustomizeWidget`. The effect of `SARibbonCustomizeDialog` is shown in the figure below:
 
-![SARibbon Customize Dialog](./doc/screenshot/customize/customization-saribbon-ui.png)
+![SARibbon Customization Interface](./doc/screenshot/customize/customization-saribbon-ui.png)
 
+#### Adding Customization Features to the Interface
 
-#### Add custom functions to an interface
+Here is an example of how to add customization features.
 
-Here's how to add custom features.
-
-First, define `SARibbonActionsManager` as the member variable of `MainWindow`.
+First, define `SARibbonActionsManager` as a member variable of MainWindow:
 
 ```cpp
-//Define member variables in the MainWindow.h. 
-SARibbonActionsManager* m_ribbonActionMgr;///< Manage all actions
+// In MainWindow.h, define the member variable
+SARibbonActionsManager* m_ribbonActionMgr; ///< Used to manage all actions
 ```
 
-During the initialization of `MainWindow`, a large number of `QAction` need to be created. The parent object of `QAction` is designated as `MainWindow`. In addition, ribbon layout will be generated, such as adding category, adding panel and other operations. After the above operations are completed, add the following steps to automatically let `SARibbonActionsManager` manage all `QAction`.
+During the initialization of MainWindow, a large number of `QAction` instances need to be created, with MainWindow as the parent object. Additionally, the Ribbon layout will be generated, such as adding categories and panels. After these operations are completed, add the following steps to automatically have `SARibbonActionsManager` manage all `QAction` instances:
 
 ```cpp
-//Initialization of MainWindow and generation of QAction.
-//Generate ribbon layout.
+// Initialization of MainWindow, generating QAction
+// Generating Ribbon layout
 m_ribbonActionMgr = new SARibbonActionsManager(mainWinowPtr);
 m_ribbonActionMgr->autoRegisteActions(mainWinowPtr);
 ```
 
-The key function `autoRegisteActions` of `SARibbonActionsManager` can traverse all subobjects under `SARibbonMainWindow`, find and register action, and traverse all `SARibbonCategory`. The actions under `SARibbonCategory` are classified according to the title name of `SARibbonCategory`. This function also registers the actions under `SARibbonMainWindow`, but not under any category, as 'NotInRibbonCategoryTag' tags, The default name is 'not in ribbon'.
+The key function `autoRegisteActions` of `SARibbonActionsManager` can iterate through all child objects of `SARibbonMainWindow`, find actions, and register them. It will also iterate through all `SARibbonCategory` instances, categorizing the actions under `SARibbonCategory` by the title name of `SARibbonCategory`. This function will register actions under `SARibbonMainWindow` but not in any category as the `NotInRibbonCategoryTag` label. By default, the name will be assigned as `not in ribbon`.
 
-To call SARibbonCustomizeDialog as follows:
+Where you need to invoke `SARibbonCustomizeDialog`, perform the following operations:
 
 ```cpp
 QString cfgpath = "customization.xml";
 SARibbonCustomizeDialog dlg(this, this);
 
 dlg.setupActionsManager(m_ribbonActionMgr);
-dlg.fromXml(cfgpath);//This step is called to load the existing custom steps, which can be added based on the original custom steps when saving.
+dlg.fromXml(cfgpath); // This step is called to load existing customization steps, so that when saving, it can be based on the existing customization steps
 if (QDialog::Accepted == dlg.exec()) {
-    dlg.applys();//Apply custom steps
-    dlg.toXml(cfgpath);//Save custom steps to a file
+    dlg.applys(); // Apply customization steps
+    dlg.toXml(cfgpath); // Save customization steps to a file
 }
 ```
 
-Before the MainWindow is generated, the customized content needs to be loaded. Therefore, the following statement should be added to the constructor:
+Before constructing MainWindow, the customized content needs to be loaded. Therefore, add the following line at the end of the constructor:
 
 ```cpp
-//Constructor of MainWindow
+// At the end of the MainWindow constructor
 sa_apply_customize_from_xml_file("customization.xml", this, m_ribbonActionMgr);
 ```
 
-`sa_apply_customize_from_xml_file` is the function provided in `SARibbonCustomizeWidget.h`. The customized contents in the configuration file are directly applyed in the MainWindow.
+`sa_apply_customize_from_xml_file` is a function provided in `SARibbonCustomizeWidget.h`, which directly applies the customized content from the configuration file to MainWindow.
 
-In this way, the software will be loaded according to the configuration file every time it is started.
+In this way, the software will load according to the configuration file each time it starts.
 
+# More Screenshots
 
-# More screenshots
-
-- Here is a screenshot of the software built with SARibbon
+- This is a screenshot of software built using SARibbon:
 
 ![](./doc/screenshot/data-workbench-screenshot1-cn.gif)
-![](./doc/screenshot/data-workbench-screenshot01-en.png)
+![](./doc/screenshot/data-workbench-screenshot01-en
+.png)
+![](./doc/screenshot/data-workbench-screenshot01-cn.png)
 
 [github - https://github.com/czyt1988/data-workbench](https://github.com/czyt1988/data-workbench)
 
 [gitee - https://gitee.com/czyt1988/data-workbench](https://gitee.com/czyt1988/data-workbench)
 
-The specific ribbon generation code can be seen:
+For the specific Ribbon generation code, see:
 
 [https://github.com/czyt1988/data-workbench/blob/master/src/APP/DAAppRibbonArea.cpp](https://github.com/czyt1988/data-workbench/blob/master/src/APP/DAAppRibbonArea.cpp)
 
-# FAQ
+# Documentation Generation
 
-## High-DPI screen display issues
+You can generate qch and html documentation using doxygen. The `doc/Doxyfile-qch-cn` file is used to generate `.qch` format Qt help documentation, which can be integrated into Qt Creator. The `doc/Doxyfile-wiki-cn` file is used to generate html documentation for easy viewing in a web browser.
 
-There are two ways to prepare for the issue of high-DPI screen display:
+# FAQs
 
-- 1 Set `Qt::AA_EnableHighDpiScaling` for `QApplication` in the main function
+## 1. High-DPI Display Issues
 
-This attribute enables the application to automatically detect the pixel density of the display to achieve automatic scaling, such as:
+For high-DPI display, the following two aspects are prepared:
+
+1 - Set the `Qt::AA_EnableHighDpiScaling` attribute for QApplication in the main function.
+
+This attribute enables the application to automatically detect the pixel density of the display to achieve automatic scaling. The example code is as follows:
 
 ```cpp
 int main(int argc, char* argv[])
@@ -665,9 +731,9 @@ int main(int argc, char* argv[])
 }
 ```
 
-- 2 Set the scaling policy for `QApplication` in the main function: `QApplication::setHighDpiScaleFactorRoundingPolicy`
+2 - Set the scaling policy for QApplication in the main function: `QApplication::setHighDpiScaleFactorRoundingPolicy`
 
-Qt5.6 provides `Qt::AA_EnableHighDpiScaling`, but it cannot completely solve the problem of high-DPI screens. Qt5.14 has provided a high-dpi screen scaling policy setting called `QApplication::setHighDpiScaleFactorRoundingPolicy`, also needs to be set in the main function, for example:
+Qt 5.6 introduced `Qt::AA_EnableHighDpiScaling`, but it does not completely solve the issue. Starting from Qt 5.14, the high-DPI scaling policy setting `QApplication::setHighDpiScaleFactorRoundingPolicy` is provided. Like `AA_EnableHighDpiScaling`, it needs to be set before the main function.
 
 ```cpp
 int main(int argc, char* argv[])
@@ -684,18 +750,59 @@ int main(int argc, char* argv[])
 }
 ```
 
-## Shortcut key problem
+If you encounter strange issues with an OpenGL window, you can remove the above statements to see if it resolves the problem. The latest version of Qt no longer requires the above handling.
 
-People often give feedback that after using SARibbonBar, the shortcut keys of inactive tab pages do not respond, and only the shortcut keys of activated tab pages respond. If it is in traditional toolbar mode, the shortcut key will remain in effect because the toolbar where the action is located is always at the forefront. However, if it is SARibbonBar, the shortcut key in the action panel will be hidden, and it will not take effect after hiding, If you want the shortcut key to take effect regardless of whether Pannel is hidden or not, setting the shortcut key's' shortcutContext 'property to `Qt::ApplicationShortcut` is also invalid. In this case, you can manually create the shortcut key in the place where you created the Category
+## 2. Shortcut Key Issues
 
-example:
+Many users have reported that after using SARibbonBar, the shortcut keys of inactive tab pages do not respond, while only the shortcut keys of the active tab page are effective. In traditional toolbar mode, since the toolbar containing the action is always at the forefront, the shortcut keys are always effective. However, in SARibbonBar, the pannel containing the action can be hidden, and once hidden, the shortcut keys will not work. If you want the shortcut keys to be effective regardless of whether the Pannel is hidden, setting the `shortcutContext` attribute of the shortcut key to `Qt::ApplicationShortcut` is also无效. At this time, you can use the Qt `QWidget::addAction` function to add the action with the shortcut key to the MainWindow.
+
+For example:
 
 ```cpp
-    ribbon build
+void MainWindow::initRibbon(){
+    SARibbonCategory* categoryMain = ribbon->addCategoryPage(tr("Main"));
+    SARibbonPannel* pannel = categoryMain->addPannel(tr("io"));
+    // Omitted action creation process
+    QAction* actSave = new QAction(this);
     ...
-    QShortcut* shortCut = new QShortcut(QKeySequence(QLatin1String("Ctrl+S")), this);
-    connect(shortCut, &QShortcut::activated, this, [ actSave ]() {
-        actSave->trigger();
+    // Set shortcut for the action
+    actSave->setShortcut(QKeySequence(QLatin1String("Ctrl+S")));
+    // Add the action to the pannel
+    pannel->addLargeAction(actSave);
+    // Add the action to the MainWindow so that it can respond to shortcut keys even when switching to other tab pages
+    addAction(actSave);
+}
+```
+
+## 3. Theme Settings Not Taking Effect
+
+In some versions of Qt, setting the theme in the constructor may not take full effect. You can use `QTimer` to schedule it to the end of the queue for execution, like this:
+
+```cpp
+QTimer::singleShot(0, this, [ this ]() { 
+    this->setRibbonTheme(SARibbonMainWindow::RibbonThemeDark); 
     });
 ```
 
+## 4. Macro Redefinition Issues
+
+This error occurs when using SARibbon.h/cpp. This is because some debug macros written in cpp in early versions did not have `#ifdef` processing. When multiple cpp files are merged, problems will arise. This issue does not occur when using shared libraries. If you encounter this problem, update to version v2.2.8 or above.
+
+## 5. Maximize/Minimize Icons in the Wrong Corner
+
+If you encounter this issue, ensure that the library files and header files match. This problem usually occurs during partial updates, such as replacing only the dll without replacing the h file. Some projects, after pulling the latest version of SARibbon, directly replace the lib and dll files without updating the header files, which can cause this issue. To fix this problem, ensure the consistency of all file versions. If you installed using cmake, the following files/folders will be involved:
+
+```txt
+bin/SARibbonBar.dll
+include/SARibbonBar[folder]
+lib/SARibbonBar.lib
+lib/qmake/SARibbonBar[folder]
+lib/cmake/SARibbonBar[folder]
+SARibbonBar_amalgamate
+```
+
+## 6. Icons Not Displaying
+
+If you encounter issues with icons not displaying, such as maximize/minimize buttons showing the button but not the icon, it indicates that your runtime environment cannot find the Qt svg plugin. Your program directory should contain the `imageformats/qsvg.dll` plugin. You can run `windeployqt` to fetch the dependencies for your program, or ensure that the `plugins/imageformats` folder is accessible in your PATH environment variable configuration.
+
+This article was translated by kimi, a large language model from China.
