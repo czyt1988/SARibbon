@@ -2029,7 +2029,7 @@ SARibbonAlignment SARibbonBar::ribbonAlignment() const
  * @param fp 函数指针返回false则停止迭代
  * @return 返回false代表没有迭代完所有的category，中途接收到回调函数的false返回而中断迭代
  */
-bool SARibbonBar::iterate(FpCategoryIterate fp)
+bool SARibbonBar::iterate(FpCategoryIterate fp) const
 {
 	const QList< SARibbonCategory* > cs = categoryPages(true);
 	for (SARibbonCategory* c : cs) {
@@ -2045,7 +2045,7 @@ bool SARibbonBar::iterate(FpCategoryIterate fp)
  * @param fp 函数指针返回false则停止迭代
  * @return 返回false代表没有迭代完所有的category，中途接收到回调函数的false返回而中断迭代
  */
-bool SARibbonBar::iterate(FpPannelIterate fp)
+bool SARibbonBar::iterate(FpPannelIterate fp) const
 {
 	const QList< SARibbonCategory* > cs = categoryPages(true);
 	for (SARibbonCategory* c : cs) {
@@ -2065,7 +2065,22 @@ void SARibbonBar::setCornerWidgetVisible(bool on, Qt::Corner c)
 {
 	if (QWidget* w = cornerWidget(c)) {
 		w->setVisible(on);
-	}
+    }
+}
+
+/**
+ * @brief 此函数会遍历所有pannel，并获取它下面的action
+ * @return
+ */
+QList< QAction* > SARibbonBar::allActions() const
+{
+    QList< QAction* > res;
+    auto fp = [ &res ](SARibbonPannel* pannel) -> bool {
+        res += pannel->actions();
+        return true;
+    };
+    iterate(fp);
+    return res;
 }
 
 /**
