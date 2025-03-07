@@ -20,6 +20,7 @@
 #include "colorWidgets/SAColorGridWidget.h"
 #include "colorWidgets/SAColorPaletteGridWidget.h"
 #include "SARibbonSystemButtonBar.h"
+#include "SARibbonApplicationWidget.h"
 #include <QAbstractButton>
 #include <QAction>
 #include <QApplication>

@@ -69,6 +69,7 @@ SET(SARIBBON_HEADER_FILES
     SARibbonPannelItem.h
     SARibbonLineWidgetContainer.h
     SARibbonColorToolButton.h
+    SARibbonApplicationWidget.h
 )
 
 # source files
@@ -110,6 +111,7 @@ SET(SARIBBON_SOURCE_FILES
     SARibbonPannelItem.cpp
     SARibbonLineWidgetContainer.cpp
     SARibbonColorToolButton.cpp
+    SARibbonApplicationWidget.cpp
 )
 
 # resource files

@@ -20,6 +20,7 @@
 #include "colorWidgets/SAColorGridWidget.h"
 #include "colorWidgets/SAColorPaletteGridWidget.h"
 #include "SARibbonSystemButtonBar.h"
+#include "SARibbonApplicationWidget.h"
 #include <QAbstractButton>
 #include <QAction>
 #include <QApplication>
@@ -145,21 +146,32 @@ void MainWindow::createRibbonApplicationButton()
 		btn = new SARibbonApplicationButton(this);
 		ribbon->setApplicationButton(btn);
 	}
-	ribbon->applicationButton()->setText(("  &File  "));  // 文字两边留有间距，好看一点
-	//! cn: SARibbonMenu和QMenu的操作是一样的
-	//! en: The operations of SARibbonMenu and QMenu are the same
-	if (!mMenuApplicationBtn) {
-		mMenuApplicationBtn = new SARibbonMenu(this);
-        mMenuApplicationBtn->addAction(createAction("appbtn-test1", ":/icon/icon/action.svg"));
-        mMenuApplicationBtn->addAction(createAction("appbtn-test2", ":/icon/icon/action2.svg"));
-        mMenuApplicationBtn->addAction(createAction("appbtn-test3", ":/icon/icon/action3.svg"));
-        mMenuApplicationBtn->addAction(createAction("appbtn-test4", ":/icon/icon/action4.svg"));
+
+    btn->setText(("  &File  "));  // 文字两边留有间距，好看一点
+    if (0) {
+        SARibbonApplicationButton* appBtn = qobject_cast< SARibbonApplicationButton* >(btn);
+        if (!appBtn) {
+            return;
+        }
+        //! cn: SARibbonMenu和QMenu的操作是一样的
+        //! en: The operations of SARibbonMenu and QMenu are the same
+        if (!mMenuApplicationBtn) {
+            mMenuApplicationBtn = new SARibbonMenu(this);
+            mMenuApplicationBtn->addAction(createAction("appbtn-test1", ":/icon/icon/action.svg"));
+            mMenuApplicationBtn->addAction(createAction("appbtn-test2", ":/icon/icon/action2.svg"));
+            mMenuApplicationBtn->addAction(createAction("appbtn-test3", ":/icon/icon/action3.svg"));
+            mMenuApplicationBtn->addAction(createAction("appbtn-test4", ":/icon/icon/action4.svg"));
+        }
+
+        appBtn->setMenu(mMenuApplicationBtn);
+    } else {
+        mAppWidget = new SARibbonApplicationWidget(this);
+        mAppWidget->hide();
+        connect(btn, &QAbstractButton::clicked, this, [ this ](bool c) {
+            Q_UNUSED(c);
+            this->mAppWidget->show();
+        });
 	}
-	SARibbonApplicationButton* appBtn = qobject_cast< SARibbonApplicationButton* >(btn);
-	if (!appBtn) {
-		return;
-	}
-	appBtn->setMenu(mMenuApplicationBtn);
 }
 
 /**
