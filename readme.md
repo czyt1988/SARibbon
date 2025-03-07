@@ -805,4 +805,4 @@ SARibbonBar_amalgamate
 
 If you encounter issues with icons not displaying, such as maximize/minimize buttons showing the button but not the icon, it indicates that your runtime environment cannot find the Qt svg plugin. Your program directory should contain the `imageformats/qsvg.dll` plugin. You can run `windeployqt` to fetch the dependencies for your program, or ensure that the `plugins/imageformats` folder is accessible in your PATH environment variable configuration.
 
-This article was translated by kimi, a large language model from China.
+> This article was translated by [kimi](kimi.moonshot.cn), a large language model from China. [kimi](kimi.moonshot.cn) is known for its strong capabilities in natural language understanding and generation, making it highly effective for tasks like translation and content creation.

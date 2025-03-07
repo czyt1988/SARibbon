@@ -10,6 +10,7 @@
 #include <QScreen>
 
 #include "SARibbonSystemButtonBar.h"
+#include "SARibbonWidget.h"
 #if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
 #include <QWKWidgets/widgetwindowagent.h>
 #include "SARibbonButtonGroupWidget.h"
@@ -372,40 +373,6 @@ void SARibbonMainWindow::onPrimaryScreenChanged(QScreen* screen)
 		qDebug() << "Primary Screen Changed";
 		bar->updateRibbonGeometry();
 	}
-}
-
-void sa_set_ribbon_theme(QWidget* w, SARibbonTheme theme)
-{
-	QFile file;
-	switch (theme) {
-	case SARibbonTheme::RibbonThemeWindows7:
-		file.setFileName(":/theme/resource/theme-win7.qss");
-		break;
-	case SARibbonTheme::RibbonThemeOffice2013:
-		file.setFileName(":/theme/resource/theme-office2013.qss");
-		break;
-	case SARibbonTheme::RibbonThemeOffice2016Blue:
-		file.setFileName(":/theme/resource/theme-office2016-blue.qss");
-		break;
-	case SARibbonTheme::RibbonThemeOffice2021Blue:
-		file.setFileName(":/theme/resource/theme-office2021-blue.qss");
-		break;
-	case SARibbonTheme::RibbonThemeDark:
-		file.setFileName(":/theme/resource/theme-dark.qss");
-		break;
-	case SARibbonTheme::RibbonThemeDark2:
-		file.setFileName(":/theme/resource/theme-dark2.qss");
-		break;
-	default:
-		file.setFileName(":/theme/resource/theme-office2013.qss");
-		break;
-	}
-	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-		return;
-	}
-	// 有反馈用qstring接住文件内容，再设置进去才能生效（qt5.7版本）
-	QString qss = QString::fromUtf8(file.readAll());
-	w->setStyleSheet(qss);
 }
 
 //----------------------------------------------------

@@ -9,6 +9,7 @@ class SARibbonActionsManager;
 class SARibbonQuickAccessBar;
 class SARibbonButtonGroupWidget;
 class SARibbonPannel;
+class SARibbonApplicationWidget;
 class QTextEdit;
 class QComboBox;
 class QCloseEvent;
@@ -61,6 +62,7 @@ private:
 	QMenu* mMenuApplicationBtn;
 	QComboBox* mComboboxRibbonTheme;
 	QLineEdit* mSearchEditor { nullptr };
+    SARibbonApplicationWidget* mAppWidget { nullptr };
 	//
 	QAction* mActionWordWrap { nullptr };
 	QAction* mActionDisable { nullptr };
