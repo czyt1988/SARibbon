@@ -155,6 +155,17 @@ MainWindow::MainWindow(QWidget* par)
 	//! 这里演示了如何在系统窗口最小化最大化关闭按钮旁边添加其他按钮
 	createWindowButtonGroupBar();
 
+    //! cn:
+    //! actionManager可以管理所有的action，并给SARibbon的自定义窗口使用,
+    //! actionManager必须在ribbon的action都创建完成后创建，如果在之前就创建好，后加入ribbon的action需要手动管理到actionManager里，
+    //! actionManager也可以管理不在ribbonBar里的action
+    //! en:
+    //! The ActionManager can manage all actions and be used for SARibbon's custom window.
+    //! The ActionManager must be created after all the actions in the ribbon are created.
+    //! If the actions are created before, the actions added to the ribbon need to be manually managed in the ActionManager.
+    //! The ActionManager can also manage actions not in the ribbon bar
+    createActionsManager();
+
 	setMinimumWidth(500);
 	setWindowIcon(QIcon(":/icon/icon/SA.svg"));
 
@@ -1665,6 +1676,43 @@ void MainWindow::createWindowButtonGroupBar()
 	}
 	QAction* a = wbar->addAction(tr("Login"), QIcon(), Qt::ToolButtonTextOnly);
 	connect(a, &QAction::triggered, this, [ this ]() { this->mTextedit->append("Login triggered"); });
+}
+
+/**
+ * @brief 创建ActionsManager（Create ActionsManager）
+ *
+ * 创建ActionsManager，实现actions的管理以及SARibbonBar的自定义
+ *
+ * Create ActionsManager to manage actions and customize SARibbonBar
+ *
+ *
+ */
+void MainWindow::createActionsManager()
+{
+    // 添加其他的action，这些action并不在ribbon管理范围，主要用于SARibbonCustomizeWidget自定义用
+    createOtherActions();
+    mTagForActionText = SARibbonActionsManager::UserDefineActionTag + 1;
+    mTagForActionIcon = SARibbonActionsManager::UserDefineActionTag + 2;
+
+    mActionsManager = new SARibbonActionsManager(ribbonBar());  // 申明过程已经自动注册所有action
+
+    // 以下注册特别的action
+    mActionsManager->registeAction(mOtherAction1, SARibbonActionsManager::CommonlyUsedActionTag);
+    mActionsManager->registeAction(mOtherAction3, SARibbonActionsManager::CommonlyUsedActionTag);
+    mActionsManager->registeAction(mOtherAction5, SARibbonActionsManager::CommonlyUsedActionTag);
+    mActionsManager->registeAction(mOtherActionIcon1, SARibbonActionsManager::CommonlyUsedActionTag);
+
+    mActionsManager->registeAction(mOtherAction1, mTagForActionText);
+    mActionsManager->registeAction(mOtherAction2, mTagForActionText);
+    mActionsManager->registeAction(mOtherAction3, mTagForActionText);
+    mActionsManager->registeAction(mOtherAction4, mTagForActionText);
+    mActionsManager->registeAction(mOtherAction5, mTagForActionText);
+
+    mActionsManager->registeAction(mOtherActionIcon1, mTagForActionIcon);
+
+    mActionsManager->setTagName(SARibbonActionsManager::CommonlyUsedActionTag, tr("in common use"));  //
+    mActionsManager->setTagName(mTagForActionText, tr("no icon action"));
+    mActionsManager->setTagName(mTagForActionIcon, tr("have icon action"));
 }
 
 QAction* MainWindow::createAction(const QString& text, const QString& iconurl, const QString& objName)
