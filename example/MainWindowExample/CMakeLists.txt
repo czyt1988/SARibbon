@@ -10,6 +10,9 @@ find_package(Qt${QT_VERSION_MAJOR} 5.8 COMPONENTS Core Gui Widgets REQUIRED)
 add_executable(MainWindowExample
     mainwindow.h
     mainwindow.cpp
+    ApplicationWidget.h
+    ApplicationWidget.cpp
+    ApplicationWidget.ui
     main.cpp
     saribbonresouce.qrc
 )

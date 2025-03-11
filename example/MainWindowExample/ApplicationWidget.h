@@ -2,21 +2,23 @@
 #define APPLICATIONWIDGET_H
 
 #include <QWidget>
-
-namespace Ui {
+#include "SARibbonApplicationWidget.h"
+class SARibbonMainWindow;
+namespace Ui
+{
 class ApplicationWidget;
 }
 
-class ApplicationWidget : public QWidget
+class ApplicationWidget : public SARibbonApplicationWidget
 {
     Q_OBJECT
 
 public:
-    explicit ApplicationWidget(QWidget *parent = nullptr);
+    explicit ApplicationWidget(SARibbonMainWindow* parent = nullptr);
     ~ApplicationWidget();
 
 private:
-    Ui::ApplicationWidget *ui;
+    Ui::ApplicationWidget* ui;
 };
 
-#endif // APPLICATIONWIDGET_H
+#endif  // APPLICATIONWIDGET_H
