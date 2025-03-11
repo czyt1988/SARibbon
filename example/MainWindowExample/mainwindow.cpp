@@ -21,6 +21,7 @@
 #include "colorWidgets/SAColorPaletteGridWidget.h"
 #include "SARibbonSystemButtonBar.h"
 #include "SARibbonApplicationWidget.h"
+#include "ApplicationWidget.h"
 #include <QAbstractButton>
 #include <QAction>
 #include <QApplication>
@@ -210,7 +211,7 @@ void MainWindow::createRibbonApplicationButton()
 	}
 	appBtn->setMenu(mMenuApplicationBtn);
 #else
-    mAppWidget = new SARibbonApplicationWidget(this);
+    mAppWidget = new ApplicationWidget(this);
     mAppWidget->hide();
     connect(btn, &QAbstractButton::clicked, this, [ this ](bool c) {
         Q_UNUSED(c);
