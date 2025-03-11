@@ -143,18 +143,4 @@ Q_DECLARE_FLAGS(SARibbonMainWindowStyles, SARibbonMainWindowStyleFlag)
 #define SA_DEBUG_PRINT_SARIBBONBAR 0
 #endif
 
-/**
- * @brief 全局的设置ribbon theme函数
- *
- * 之所以提供此函数，是因为在某些情况下，SARibbonBar不用在SARibbonMainWindow情况下的时候，也需要设置主题，
- * 但主题设置是在SARibbonMainWindow下的为了能在非SARibbonMainWindow下也能设置主题，这里提供@sa sa_set_ribbon_theme函数，
- * 可以这样使用：
- * @code
- * @endcode
- *
- * @param w
- * @param theme
- */
-void SA_RIBBON_EXPORT sa_set_ribbon_theme(QWidget* w, SARibbonTheme theme);
-
 #endif  // SARIBBONGLOBAL_H

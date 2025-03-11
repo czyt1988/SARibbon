@@ -9,6 +9,7 @@ class SARibbonActionsManager;
 class SARibbonQuickAccessBar;
 class SARibbonButtonGroupWidget;
 class SARibbonPannel;
+class SARibbonApplicationWidget;
 class QTextEdit;
 class QComboBox;
 class QCloseEvent;
@@ -54,13 +55,14 @@ protected:
 	void closeEvent(QCloseEvent* e) override;
 
 private:
-	SARibbonContextCategory* mContextCategory;
-	QTextEdit* mTextedit;
+    SARibbonContextCategory* mContextCategory { nullptr };
+    QTextEdit* mTextedit { nullptr };
 	int mTagForActionText;
 	int mTagForActionIcon;
-	QMenu* mMenuApplicationBtn;
-	QComboBox* mComboboxRibbonTheme;
+    QMenu* mMenuApplicationBtn { nullptr };
+    QComboBox* mComboboxRibbonTheme { nullptr };
 	QLineEdit* mSearchEditor { nullptr };
+    SARibbonApplicationWidget* mAppWidget { nullptr };
 	//
 	QAction* mActionWordWrap { nullptr };
 	QAction* mActionDisable { nullptr };
