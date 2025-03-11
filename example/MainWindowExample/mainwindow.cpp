@@ -59,8 +59,7 @@
 		__TMP_LASTTIMES = ___TMP_INT;                                                                                  \
 	} while (0)
 
-MainWindow::MainWindow(QWidget* par)
-    : SARibbonMainWindow(par), mWidgetForCustomize(nullptr), mMenuApplicationBtn(nullptr)
+MainWindow::MainWindow(QWidget* par) : SARibbonMainWindow(par)
 {
 
 	PRINT_COST_START();
@@ -156,6 +155,17 @@ MainWindow::MainWindow(QWidget* par)
 	//! 这里演示了如何在系统窗口最小化最大化关闭按钮旁边添加其他按钮
 	createWindowButtonGroupBar();
 
+    //! cn:
+    //! actionManager可以管理所有的action，并给SARibbon的自定义窗口使用,
+    //! actionManager必须在ribbon的action都创建完成后创建，如果在之前就创建好，后加入ribbon的action需要手动管理到actionManager里，
+    //! actionManager也可以管理不在ribbonBar里的action
+    //! en:
+    //! The ActionManager can manage all actions and be used for SARibbon's custom window.
+    //! The ActionManager must be created after all the actions in the ribbon are created.
+    //! If the actions are created before, the actions added to the ribbon need to be manually managed in the ActionManager.
+    //! The ActionManager can also manage actions not in the ribbon bar
+    createActionsManager();
+
 	setMinimumWidth(500);
 	setWindowIcon(QIcon(":/icon/icon/SA.svg"));
 
@@ -183,7 +193,8 @@ void MainWindow::createRibbonApplicationButton()
 		btn = new SARibbonApplicationButton(this);
 		ribbon->setApplicationButton(btn);
 	}
-	ribbon->applicationButton()->setText(("  &File  "));  // 文字两边留有间距，好看一点
+    btn->setText(("  &File  "));  // 文字两边留有间距，好看一点
+#ifdef USE_APPLICATION_NORMAL_MENU
 	//! cn: SARibbonMenu和QMenu的操作是一样的
 	//! en: The operations of SARibbonMenu and QMenu are the same
 	if (!mMenuApplicationBtn) {
@@ -198,6 +209,14 @@ void MainWindow::createRibbonApplicationButton()
 		return;
 	}
 	appBtn->setMenu(mMenuApplicationBtn);
+#else
+    mAppWidget = new SARibbonApplicationWidget(this);
+    mAppWidget->hide();
+    connect(btn, &QAbstractButton::clicked, this, [ this ](bool c) {
+        Q_UNUSED(c);
+        this->mAppWidget->show();
+    });
+#endif
 }
 
 /**
@@ -613,8 +632,8 @@ void MainWindow::onActionHideActionTriggered(bool on)
  */
 void MainWindow::onActionVisibleAllTriggered(bool on)
 {
-	QList< QAction* > acts = mActionsManager->allActions();
-	for (QAction* a : acts) {
+    const QList< QAction* > acts = mActionsManager->allActions();
+    for (QAction* a : acts) {
 		if (a != mActionVisibleAll) {
 			a->setVisible(on);
 		}
@@ -1686,6 +1705,33 @@ QAction* MainWindow::createAction(const QString& text, const QString& iconurl)
 	return act;
 }
 
+void MainWindow::createActionsManager()
+{
+    // 添加其他的action，这些action并不在ribbon管理范围，主要用于SARibbonCustomizeWidget自定义用
+    createOtherActions();
+    mTagForActionText = SARibbonActionsManager::UserDefineActionTag + 1;
+    mTagForActionIcon = SARibbonActionsManager::UserDefineActionTag + 2;
+
+    mActionsManager = new SARibbonActionsManager(ribbonBar());  // 申明过程已经自动注册所有action
+
+    // 以下注册特别的action
+    mActionsManager->registeAction(mOtherAction1, SARibbonActionsManager::CommonlyUsedActionTag);
+    mActionsManager->registeAction(mOtherAction3, SARibbonActionsManager::CommonlyUsedActionTag);
+    mActionsManager->registeAction(mOtherAction5, SARibbonActionsManager::CommonlyUsedActionTag);
+    mActionsManager->registeAction(mOtherActionIcon1, SARibbonActionsManager::CommonlyUsedActionTag);
+
+    mActionsManager->registeAction(mOtherAction1, mTagForActionText);
+    mActionsManager->registeAction(mOtherAction2, mTagForActionText);
+    mActionsManager->registeAction(mOtherAction3, mTagForActionText);
+    mActionsManager->registeAction(mOtherAction4, mTagForActionText);
+    mActionsManager->registeAction(mOtherAction5, mTagForActionText);
+
+    mActionsManager->registeAction(mOtherActionIcon1, mTagForActionIcon);
+
+    mActionsManager->setTagName(SARibbonActionsManager::CommonlyUsedActionTag, tr("in common use"));  //
+    mActionsManager->setTagName(mTagForActionText, tr("no icon action"));
+    mActionsManager->setTagName(mTagForActionIcon, tr("have icon action"));
+}
 void MainWindow::onMenuButtonPopupCheckableTest(bool b)
 {
 	mTextedit->append(QString("MenuButtonPopupCheckableTest : %1").arg(b));

@@ -593,7 +593,7 @@ void SARibbonBar::initHighDpi()
  */
 QAbstractButton* SARibbonBar::applicationButton()
 {
-	return (d_ptr->mApplicationButton);
+    return (d_ptr->mApplicationButton.data());
 }
 
 /**
