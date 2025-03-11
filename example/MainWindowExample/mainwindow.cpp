@@ -20,6 +20,7 @@
 #include "colorWidgets/SAColorGridWidget.h"
 #include "colorWidgets/SAColorPaletteGridWidget.h"
 #include "SARibbonSystemButtonBar.h"
+#include "SARibbonApplicationWidget.h"
 #include <QAbstractButton>
 #include <QAction>
 #include <QApplication>
@@ -58,8 +59,7 @@
 		__TMP_LASTTIMES = ___TMP_INT;                                                                                  \
 	} while (0)
 
-MainWindow::MainWindow(QWidget* par)
-    : SARibbonMainWindow(par), mWidgetForCustomize(nullptr), mMenuApplicationBtn(nullptr)
+MainWindow::MainWindow(QWidget* par) : SARibbonMainWindow(par)
 {
 
 	PRINT_COST_START();
@@ -193,7 +193,8 @@ void MainWindow::createRibbonApplicationButton()
 		btn = new SARibbonApplicationButton(this);
 		ribbon->setApplicationButton(btn);
 	}
-	ribbon->applicationButton()->setText(("  &File  "));  // 文字两边留有间距，好看一点
+    btn->setText(("  &File  "));  // 文字两边留有间距，好看一点
+#ifdef USE_APPLICATION_NORMAL_MENU
 	//! cn: SARibbonMenu和QMenu的操作是一样的
 	//! en: The operations of SARibbonMenu and QMenu are the same
 	if (!mMenuApplicationBtn) {
@@ -208,6 +209,14 @@ void MainWindow::createRibbonApplicationButton()
 		return;
 	}
 	appBtn->setMenu(mMenuApplicationBtn);
+#else
+    mAppWidget = new SARibbonApplicationWidget(this);
+    mAppWidget->hide();
+    connect(btn, &QAbstractButton::clicked, this, [ this ](bool c) {
+        Q_UNUSED(c);
+        this->mAppWidget->show();
+    });
+#endif
 }
 
 /**
@@ -623,8 +632,8 @@ void MainWindow::onActionHideActionTriggered(bool on)
  */
 void MainWindow::onActionVisibleAllTriggered(bool on)
 {
-	QList< QAction* > acts = mActionsManager->allActions();
-	for (QAction* a : acts) {
+    const QList< QAction* > acts = mActionsManager->allActions();
+    for (QAction* a : acts) {
 		if (a != mActionVisibleAll) {
 			a->setVisible(on);
 		}
@@ -1733,6 +1742,33 @@ QAction* MainWindow::createAction(const QString& text, const QString& iconurl)
 	return act;
 }
 
+void MainWindow::createActionsManager()
+{
+    // 添加其他的action，这些action并不在ribbon管理范围，主要用于SARibbonCustomizeWidget自定义用
+    createOtherActions();
+    mTagForActionText = SARibbonActionsManager::UserDefineActionTag + 1;
+    mTagForActionIcon = SARibbonActionsManager::UserDefineActionTag + 2;
+
+    mActionsManager = new SARibbonActionsManager(ribbonBar());  // 申明过程已经自动注册所有action
+
+    // 以下注册特别的action
+    mActionsManager->registeAction(mOtherAction1, SARibbonActionsManager::CommonlyUsedActionTag);
+    mActionsManager->registeAction(mOtherAction3, SARibbonActionsManager::CommonlyUsedActionTag);
+    mActionsManager->registeAction(mOtherAction5, SARibbonActionsManager::CommonlyUsedActionTag);
+    mActionsManager->registeAction(mOtherActionIcon1, SARibbonActionsManager::CommonlyUsedActionTag);
+
+    mActionsManager->registeAction(mOtherAction1, mTagForActionText);
+    mActionsManager->registeAction(mOtherAction2, mTagForActionText);
+    mActionsManager->registeAction(mOtherAction3, mTagForActionText);
+    mActionsManager->registeAction(mOtherAction4, mTagForActionText);
+    mActionsManager->registeAction(mOtherAction5, mTagForActionText);
+
+    mActionsManager->registeAction(mOtherActionIcon1, mTagForActionIcon);
+
+    mActionsManager->setTagName(SARibbonActionsManager::CommonlyUsedActionTag, tr("in common use"));  //
+    mActionsManager->setTagName(mTagForActionText, tr("no icon action"));
+    mActionsManager->setTagName(mTagForActionIcon, tr("have icon action"));
+}
 void MainWindow::onMenuButtonPopupCheckableTest(bool b)
 {
 	mTextedit->append(QString("MenuButtonPopupCheckableTest : %1").arg(b));
