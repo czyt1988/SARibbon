@@ -1742,33 +1742,6 @@ QAction* MainWindow::createAction(const QString& text, const QString& iconurl)
 	return act;
 }
 
-void MainWindow::createActionsManager()
-{
-    // 添加其他的action，这些action并不在ribbon管理范围，主要用于SARibbonCustomizeWidget自定义用
-    createOtherActions();
-    mTagForActionText = SARibbonActionsManager::UserDefineActionTag + 1;
-    mTagForActionIcon = SARibbonActionsManager::UserDefineActionTag + 2;
-
-    mActionsManager = new SARibbonActionsManager(ribbonBar());  // 申明过程已经自动注册所有action
-
-    // 以下注册特别的action
-    mActionsManager->registeAction(mOtherAction1, SARibbonActionsManager::CommonlyUsedActionTag);
-    mActionsManager->registeAction(mOtherAction3, SARibbonActionsManager::CommonlyUsedActionTag);
-    mActionsManager->registeAction(mOtherAction5, SARibbonActionsManager::CommonlyUsedActionTag);
-    mActionsManager->registeAction(mOtherActionIcon1, SARibbonActionsManager::CommonlyUsedActionTag);
-
-    mActionsManager->registeAction(mOtherAction1, mTagForActionText);
-    mActionsManager->registeAction(mOtherAction2, mTagForActionText);
-    mActionsManager->registeAction(mOtherAction3, mTagForActionText);
-    mActionsManager->registeAction(mOtherAction4, mTagForActionText);
-    mActionsManager->registeAction(mOtherAction5, mTagForActionText);
-
-    mActionsManager->registeAction(mOtherActionIcon1, mTagForActionIcon);
-
-    mActionsManager->setTagName(SARibbonActionsManager::CommonlyUsedActionTag, tr("in common use"));  //
-    mActionsManager->setTagName(mTagForActionText, tr("no icon action"));
-    mActionsManager->setTagName(mTagForActionIcon, tr("have icon action"));
-}
 void MainWindow::onMenuButtonPopupCheckableTest(bool b)
 {
 	mTextedit->append(QString("MenuButtonPopupCheckableTest : %1").arg(b));
