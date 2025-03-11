@@ -67,7 +67,12 @@
 {OptionButton.BKColor:hover}:pannel下的OptionButton在hover状态下的背景颜色，建议为{ToolButton.BKColor:hover}
 */
 
-
+/*SARibbonApplicationWidget*/
+SARibbonApplicationWidget{
+    background-color: #e5e3e5;/* {Ribbon.BKColor} */
+    border: solid #e5e3e5;
+    color:#242424;
+}
 
 /*SARibbonBar*/
 SARibbonBar {
@@ -75,8 +80,6 @@ SARibbonBar {
   border: solid #e5e3e5;
   color:#242424;
 }
-
-
 
 
 /*SARibbonQuickAccessBar*/

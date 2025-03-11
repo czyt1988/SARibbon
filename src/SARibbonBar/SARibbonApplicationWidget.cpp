@@ -3,12 +3,19 @@
 #include <QEvent>
 #include <QKeyEvent>
 #include <QResizeEvent>
+#include <QDebug>
+#include <QPainter>
 #include "SARibbonMainWindow.h"
 
-SARibbonApplicationWidget::SARibbonApplicationWidget(SARibbonMainWindow* parent) : QWidget(parent)
+SARibbonApplicationWidget::SARibbonApplicationWidget(SARibbonMainWindow* parent) : QFrame(parent)
 {
+    setWindowFlags(windowFlags() | Qt::FramelessWindowHint);  // 去除边框
     parent->installEventFilter(this);
-    move(0, 0);
+    if (parent) {
+        setGeometry(0, 0, parent->width(), parent->height());
+    } else {
+        setGeometry(0, 0, 300, 300);
+    }
 }
 
 void SARibbonApplicationWidget::resizeToParent(const QSize& parentSize)
@@ -29,7 +36,17 @@ bool SARibbonApplicationWidget::eventFilter(QObject* obj, QEvent* ev)
             break;
         }
     }
-    return QWidget::eventFilter(obj, ev);
+    return QFrame::eventFilter(obj, ev);
+}
+
+void SARibbonApplicationWidget::showEvent(QShowEvent* event)
+{
+    QWidget* par = parentWidget();
+    if (par) {
+        resizeToParent(par->size());
+    }
+    setFocus();  // 显示窗口时请求焦点
+    QFrame::showEvent(event);
 }
 
 /**
@@ -41,8 +58,9 @@ void SARibbonApplicationWidget::keyPressEvent(QKeyEvent* ev)
     if (ev) {
         if (ev->key() == Qt::Key_Escape) {
             hide();
+            qDebug() << "Key_Escape";
             ev->accept();
         }
     }
-    return QWidget::keyPressEvent(ev);
+    return QFrame::keyPressEvent(ev);
 }

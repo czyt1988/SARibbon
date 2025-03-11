@@ -59,8 +59,7 @@
 		__TMP_LASTTIMES = ___TMP_INT;                                                                                  \
 	} while (0)
 
-MainWindow::MainWindow(QWidget* par, SARibbonMainWindowStyles style)
-    : SARibbonMainWindow(par, style), mMenuApplicationBtn(nullptr)
+MainWindow::MainWindow(QWidget* par, SARibbonMainWindowStyles style) : SARibbonMainWindow(par, style)
 {
     setWindowTitle(("ribbon use native frame test[*]"));
 	setWindowModified(true);

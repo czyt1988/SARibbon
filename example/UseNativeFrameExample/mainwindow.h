@@ -55,12 +55,12 @@ protected:
 	void closeEvent(QCloseEvent* e) override;
 
 private:
-	SARibbonContextCategory* mContextCategory;
-	QTextEdit* mTextedit;
+    SARibbonContextCategory* mContextCategory { nullptr };
+    QTextEdit* mTextedit { nullptr };
 	int mTagForActionText;
 	int mTagForActionIcon;
-	QMenu* mMenuApplicationBtn;
-	QComboBox* mComboboxRibbonTheme;
+    QMenu* mMenuApplicationBtn { nullptr };
+    QComboBox* mComboboxRibbonTheme { nullptr };
 	QLineEdit* mSearchEditor { nullptr };
     SARibbonApplicationWidget* mAppWidget { nullptr };
 	//
