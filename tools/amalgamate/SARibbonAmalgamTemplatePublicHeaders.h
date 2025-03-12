@@ -45,3 +45,4 @@
 #include "../../src/SARibbonBar/SARibbonCustomizeDialog.h"
 #include "../../src/SARibbonBar/SARibbonMainWindow.h"
 #include "../../src/SARibbonBar/SARibbonWidget.h"
+#include "../../src/SARibbonBar/SARibbonApplicationWidget.h"
