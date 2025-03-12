@@ -13572,8 +13572,9 @@ void SARibbonBar::onCurrentRibbonTabChanged(int index)
 		if (!d_ptr->mStackedContainerWidget->isVisible()) {
 			if (d_ptr->mStackedContainerWidget->isPopupMode()) {
 				// 在stackedContainerWidget弹出前，先给tabbar一个QHoverEvent,让tabbar知道鼠标已经移开
-                const auto globalPos = d_ptr->mRibbonTabBar->mapToGlobal(QCursor::pos());
-                QHoverEvent ehl(QEvent::HoverLeave, globalPos, globalPos);
+				QHoverEvent ehl(QEvent::HoverLeave,
+				                d_ptr->mRibbonTabBar->mapToGlobal(QCursor::pos()),
+				                d_ptr->mRibbonTabBar->mapToGlobal(QCursor::pos()));
 				QApplication::sendEvent(d_ptr->mRibbonTabBar, &ehl);
 				resizeStackedContainerWidget();
 				d_ptr->mStackedContainerWidget->setFocus();
@@ -13602,8 +13603,9 @@ void SARibbonBar::onCurrentRibbonTabClicked(int index)
 		if (!this->d_ptr->mStackedContainerWidget->isVisible()) {
 			if (this->d_ptr->mStackedContainerWidget->isPopupMode()) {
 				// 在stackedContainerWidget弹出前，先给tabbar一个QHoverEvent,让tabbar知道鼠标已经移开
-                const auto globalPos = d_ptr->mRibbonTabBar->mapToGlobal(QCursor::pos());
-                QHoverEvent ehl(QEvent::HoverLeave, globalPos, globalPos);
+				QHoverEvent ehl(QEvent::HoverLeave,
+				                d_ptr->mRibbonTabBar->mapToGlobal(QCursor::pos()),
+				                d_ptr->mRibbonTabBar->mapToGlobal(QCursor::pos()));
 				QApplication::sendEvent(d_ptr->mRibbonTabBar, &ehl);
 				// 弹出前都调整一下位置，避免移动后位置异常
 				resizeStackedContainerWidget();
@@ -14348,14 +14350,12 @@ bool SARibbonBar::eventFilter(QObject* obj, QEvent* e)
 				if (d_ptr->mStackedContainerWidget->isPopupMode()) {
 					QMouseEvent* mouseEvent = static_cast< QMouseEvent* >(e);
 					if (!d_ptr->mStackedContainerWidget->rect().contains(mouseEvent->pos())) {
-                        const auto globalPos   = SA_MOUSEEVENT_GLOBALPOS_POINT(mouseEvent);
-                        QWidget* clickedWidget = QApplication::widgetAt(globalPos);
+						QWidget* clickedWidget = QApplication::widgetAt(mouseEvent->globalPos());
 						if (clickedWidget == d_ptr->mRibbonTabBar) {
-
-                            const QPoint targetPoint = clickedWidget->mapFromGlobal(globalPos);
+							const QPoint targetPoint = clickedWidget->mapFromGlobal(mouseEvent->globalPos());
 							QMouseEvent* evPress     = new QMouseEvent(mouseEvent->type(),
                                                                    targetPoint,
-                                                                   globalPos,
+                                                                   mouseEvent->globalPos(),
                                                                    mouseEvent->button(),
                                                                    mouseEvent->buttons(),
                                                                    mouseEvent->modifiers());
@@ -14639,7 +14639,7 @@ void SARibbonBar::paintContextCategoryTab(QPainter& painter, const QString& titl
 {
 	// 绘制上下文标签
 	// 首先有5像素的实体粗线位于顶部
-
+	QMargins border = contentsMargins();
 	painter.save();
 	painter.setPen(Qt::NoPen);
 	painter.setBrush(color);
@@ -16009,8 +16009,6 @@ int sa_customize_datas_apply(const QList< SARibbonCustomizeData >& cds, SARibbon
 
 int sa_customize_datas_reverse(const QList< SARibbonCustomizeData >& cds, SARibbonBar* bar)
 {
-    Q_UNUSED(cds);
-    Q_UNUSED(bar);
 	int c = 0;
 	// todo 支持反向操作
 	return (c);
