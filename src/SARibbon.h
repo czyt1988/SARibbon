@@ -257,20 +257,6 @@ Q_DECLARE_FLAGS(SARibbonMainWindowStyles, SARibbonMainWindowStyleFlag)
 #define SA_DEBUG_PRINT_SARIBBONBAR 0
 #endif
 
-/**
- * @brief 全局的设置ribbon theme函数
- *
- * 之所以提供此函数，是因为在某些情况下，SARibbonBar不用在SARibbonMainWindow情况下的时候，也需要设置主题，
- * 但主题设置是在SARibbonMainWindow下的为了能在非SARibbonMainWindow下也能设置主题，这里提供@sa sa_set_ribbon_theme函数，
- * 可以这样使用：
- * @code
- * @endcode
- *
- * @param w
- * @param theme
- */
-void SA_RIBBON_EXPORT sa_set_ribbon_theme(QWidget* w, SARibbonTheme theme);
-
 #endif  // SARIBBONGLOBAL_H
 
 /*** End of inlined file: SARibbonGlobal.h ***/
@@ -3834,10 +3820,54 @@ public:
 private Q_SLOTS:
 	void onPrimaryScreenChanged(QScreen* screen);
 };
-
+/**
+ * @brief 全局的设置ribbon theme函数
+ *
+ * 之所以提供此函数，是因为在某些情况下，SARibbonBar不用在SARibbonMainWindow情况下的时候，也需要设置主题，
+ * 但主题设置是在SARibbonMainWindow下的为了能在非SARibbonMainWindow下也能设置主题，这里提供@sa sa_set_ribbon_theme函数，
+ * 可以这样使用：
+ * @code
+ * @endcode
+ *
+ * @param w
+ * @param theme
+ */
+void SA_RIBBON_EXPORT sa_set_ribbon_theme(QWidget* w, SARibbonTheme theme);
 #endif  // SARIBBONWIDGET_H
 
 /*** End of inlined file: SARibbonWidget.h ***/
+
+/*** Start of inlined file: SARibbonApplicationWidget.h ***/
+#ifndef SARIBBONAPPLICATIONWIDGET_H
+#define SARIBBONAPPLICATIONWIDGET_H
+
+#include <QFrame>
+class QShowEvent;
+class QKeyEvent;
+class SARibbonMainWindow;
+/**
+ * @brief 这个窗口是用于applicationButton点击后弹出类似office系列软件的文件窗口，此窗口会把整个MainWindow覆盖，
+ * 同时会接管边框的一些消息
+ */
+class SA_RIBBON_EXPORT SARibbonApplicationWidget : public QFrame
+{
+	Q_OBJECT
+public:
+	SARibbonApplicationWidget(SARibbonMainWindow* parent);
+
+protected:
+	virtual void resizeToParent(const QSize& parentSize);
+
+protected:
+	void resizeToParent();
+	bool eventFilter(QObject* obj, QEvent* ev) override;
+	void showEvent(QShowEvent* event) override;
+	void keyPressEvent(QKeyEvent* ev) override;
+};
+
+#endif  // SARIBBONAPPLICATIONWIDGET_H
+
+/*** End of inlined file: SARibbonApplicationWidget.h ***/
 
 /*** End of inlined file: SARibbonAmalgamTemplatePublicHeaders.h ***/
 
