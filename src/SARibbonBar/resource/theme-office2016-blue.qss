@@ -429,7 +429,7 @@ SARibbonComboBox::drop-down:hover {
 }
 
 SARibbonComboBox::down-arrow {
-  image: url(:/image/resource/ArrowDown.png);
+  image: url(:/SARibbon/image/resource/ArrowDown.png);
 }
 
 /*SARibbonSeparatorWidget*/
@@ -454,7 +454,7 @@ SARibbonSystemToolButton:focus {
 SARibbonSystemToolButton#SAMinimizeWindowButton {
   background-position:center;
   background-repeat: no-repeat;
-  background-image: url(:/image/resource/Titlebar_Min_Hover.svg);
+  background-image: url(:/SARibbon/image/resource/Titlebar_Min_Hover.svg);
 }
 SARibbonSystemToolButton#SAMinimizeWindowButton:hover{
   background-color: #b8b8b8;
@@ -466,13 +466,13 @@ SARibbonSystemToolButton#SAMinimizeWindowButton:pressed{
 SARibbonSystemToolButton#SAMaximizeWindowButton {
     background-position:center;
     background-repeat: no-repeat;
-    background-image: url(:/image/resource/Titlebar_Max_Hover.svg);
+    background-image: url(:/SARibbon/image/resource/Titlebar_Max_Hover.svg);
 }
 SARibbonSystemToolButton#SAMaximizeWindowButton:hover {
     background-color: #b8b8b8;
 }
 SARibbonSystemToolButton#SAMaximizeWindowButton:checked {
-    background-image: url(:/image/resource/Titlebar_Normal_Hover.svg) center;
+    background-image: url(:/SARibbon/image/resource/Titlebar_Normal_Hover.svg) center;
 }
 
 
@@ -480,7 +480,7 @@ SARibbonSystemToolButton#SAMaximizeWindowButton:checked {
 SARibbonSystemToolButton#SACloseWindowButton {
     background-position:center;
     background-repeat: no-repeat;
-    background-image: url(:/image/resource/Titlebar_Close_Hover.svg);
+    background-image: url(:/SARibbon/image/resource/Titlebar_Close_Hover.svg);
 }
 SARibbonSystemToolButton#SACloseWindowButton:hover {
   background-color: #e81123;

@@ -2,9 +2,9 @@
 #include "SARibbonControlButton.h"
 #include <QIcon>
 #include <QApplication>
-#define ICON_ARROW_UP QIcon(":/image/resource/ArrowUp.png")
-#define ICON_ARROW_DOWN QIcon(":/image/resource/ArrowDown.png")
-#define ICON_ARROW_MORE QIcon(":/image/resource/ArrowMore.png")
+#define ICON_ARROW_UP QIcon(":/SARibbon/image/resource/ArrowUp.png")
+#define ICON_ARROW_DOWN QIcon(":/SARibbon/image/resource/ArrowDown.png")
+#define ICON_ARROW_MORE QIcon(":/SARibbon/image/resource/ArrowMore.png")
 #include <QResizeEvent>
 #include <QDebug>
 #include <QVBoxLayout>
@@ -417,5 +417,3 @@ void SARibbonGallery::paintEvent(QPaintEvent* event)
 {
     QFrame::paintEvent(event);
 }
-
-

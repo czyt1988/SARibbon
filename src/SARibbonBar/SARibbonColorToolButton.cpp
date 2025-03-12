@@ -47,7 +47,8 @@ QPixmap SARibbonColorToolButton::PrivateData::createIconPixmap(const QStyleOptio
     res.fill(Qt::transparent);
     QPainter painter(&res);
     int xpixmap = (res.width() - pixmap.width()) / 2;
-    int ypixmap = (res.height() - c_ribbonbutton_color_height - 2 - pixmap.height()) / 2;  // 这里要减去2而不是1，这样奇数偶数都不会影响
+    int ypixmap = (res.height() - c_ribbonbutton_color_height - 2 - pixmap.height())
+                  / 2;  // 这里要减去2而不是1，这样奇数偶数都不会影响
     int w         = pixmap.width();
     int h         = pixmap.height();
     QRect rpixmap = QRect(xpixmap, ypixmap, w, h);
@@ -157,7 +158,7 @@ SAColorMenu* SARibbonColorToolButton::setupStandardColorMenu()
     m->enableNoneColorAction(true);
     QAction* customColor = m->customColorAction();
     if (customColor) {
-        customColor->setIcon(QIcon(":/image/resource/define-color.svg"));
+        customColor->setIcon(QIcon(":/SARibbon/image/resource/define-color.svg"));
     }
     connect(m, &SAColorMenu::selectedColor, this, &SARibbonColorToolButton::setColor);
     setMenu(m);

@@ -117,9 +117,10 @@ SET(SARIBBON_SOURCE_FILES
 # resource files
 # cn:资源文件
 SET(SARIBBON_RESOURCE_FILES
-    resource.qrc
+    SARibbonResource.qrc
 )
 
+message(STATUS "SARibbon resource file:${SARIBBON_RESOURCE_FILES}")
 ################################################################
 
 add_library(${SARIBBON_LIB_NAME} SHARED
@@ -133,6 +134,8 @@ add_library(${SARIBBON_LIB_NAME}::${SARIBBON_LIB_NAME} ALIAS ${SARIBBON_LIB_NAME
 #################################################
 # Qt相关的依赖
 #################################################
+
+
 target_link_libraries(${SARIBBON_LIB_NAME} PUBLIC
                       Qt${QT_VERSION_MAJOR}::Core
                       Qt${QT_VERSION_MAJOR}::Gui
@@ -220,19 +223,10 @@ set(SARIBBON_AMALGAMATE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/../SARibbon.cpp 
     ${CMAKE_CURRENT_SOURCE_DIR}/../SARibbon.pri
 )
+
 install(FILES
     ${SARIBBON_AMALGAMATE_FILES}
     DESTINATION ${SARIBBON_LIB_NAME}_amalgamate
-)
-# 复制resource目录到install/amalgamate目录
-install(DIRECTORY
-    ${CMAKE_CURRENT_SOURCE_DIR}/resource
-    DESTINATION ${SARIBBON_LIB_NAME}_amalgamate/SARibbonBar
-)
-# resource.qrc
-install(FILES
-    ${SARIBBON_RESOURCE_FILES}
-    DESTINATION ${SARIBBON_LIB_NAME}_amalgamate/SARibbonBar
 )
 
 
