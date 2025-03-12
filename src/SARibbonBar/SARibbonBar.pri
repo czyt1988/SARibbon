@@ -72,7 +72,8 @@ SOURCES += \
     $$PWD/SARibbonPannelLayout.cpp \
     $$PWD/SARibbonPannelItem.cpp \
     $$PWD/SARibbonLineWidgetContainer.cpp \
-    $$PWD/SARibbonWidget.cpp
+    $$PWD/SARibbonWidget.cpp \
+    $$PWD/SARibbonApplicationWidget.cpp
 
 HEADERS  += \
     $$PWD/SAFramelessHelper.h \
@@ -111,10 +112,11 @@ HEADERS  += \
     $$PWD/SARibbonPannelLayout.h \
     $$PWD/SARibbonPannelItem.h \
     $$PWD/SARibbonLineWidgetContainer.h \
-    $$PWD/SARibbonWidget.h
+    $$PWD/SARibbonWidget.h \
+    $$PWD/SARibbonApplicationWidget.h
 
 RESOURCES += \
-    $$PWD/resource.qrc
+    $$PWD/SARibbonResource.qrc
 
 # 加入SAColorWidgets组件
 include($$PWD/colorWidgets/SAColorWidgets.pri)

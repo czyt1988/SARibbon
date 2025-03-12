@@ -20,7 +20,9 @@
 #pragma warning (disable: 4996) // deprecated POSIX names
 #endif
 
-#include "../qrc_resource.cpp"
+// clang-format off
+#include "../qrc_SARibbonResource.cpp"
+// clang-format on
 
 #include "../../src/SARibbonBar/colorWidgets/SAColorMenu.cpp"
 #include "../../src/SARibbonBar/colorWidgets/SAColorGridWidget.cpp"

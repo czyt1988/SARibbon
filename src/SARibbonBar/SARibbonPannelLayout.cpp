@@ -122,7 +122,7 @@ void SARibbonPannelLayout::setOptionAction(QAction* action)
 		}
 		mOptionActionBtn->setDefaultAction(action);
 		if (action->icon().isNull()) {
-			mOptionActionBtn->setIcon(QIcon(":/image/resource/ribbonPannelOptionButton.png"));
+            mOptionActionBtn->setIcon(QIcon(":/SARibbon/image/resource/ribbonPannelOptionButton.png"));
 		}
 		// 标记需要重新计算尺寸
 		invalidate();

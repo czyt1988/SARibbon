@@ -44,8 +44,6 @@ SOURCES += \
 HEADERS  += \
     $$PWD/SARibbon.h
     
-RESOURCES += \
-    $$PWD/SARibbonBar/resource.qrc
     
 INCLUDEPATH += $$PWD
 DEPENDPATH += $$PWD

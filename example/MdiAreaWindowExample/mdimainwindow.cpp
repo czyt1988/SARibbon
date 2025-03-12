@@ -57,6 +57,8 @@ void MainWindow::onMdiAreaSubWindowActivated(QMdiSubWindow* window)
 			m_mdiCornerWidget = cw;
 		}
 	}
+#else
+    Q_UNUSED(window);
 #endif
 }
 
@@ -67,6 +69,7 @@ void MainWindow::onMdiAreaSubWindowActivated(QMdiSubWindow* window)
  */
 void MainWindow::onSubWindowStateChanged(Qt::WindowStates oldState, Qt::WindowStates newState)
 {
+    Q_UNUSED(oldState);
 #if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
 	if (newState.testFlag(Qt::WindowMaximized)) {
 		SARibbonBar* ribbon = ribbonBar();
@@ -77,5 +80,7 @@ void MainWindow::onSubWindowStateChanged(Qt::WindowStates oldState, Qt::WindowSt
 			m_mdiCornerWidget = cw;
 		}
 	}
+#else
+    Q_UNUSED(newState);
 #endif
 }
