@@ -95,193 +95,95 @@ Under the MIT license, everyone is welcome to use it and provide feedback.
 
 [github - https://github.com/czyt1988/SARibbon](https://github.com/czyt1988/SARibbon)
 
-# Build
+# Building
 
-It is recommended to use cmake for building. After building with cmake, you can install it (install). With cmake, your project can either use cmake to include SARibbonBar or use qmake to include SARibbonBar.
+It is recommended to use cmake for building. After completing the cmake build and installation, your project can integrate SARibbonBar using either cmake or qmake.
 
-SARibbon provides two build methods: qmake and cmake. It also offers an integrated SARibbon.h and SARibbon.cpp file for easy static embedding in a single project.
+SARibbon offers both qmake and cmake build options. Additionally, it provides integrated SARibbon.h and SARibbon.cpp files for quick static embedding in projects.
 
-> SARibbon supports the third-party frameless library [QWindowkit](https://github.com/stdware/qwindowkit). It also supports a simple frameless solution. If you need native window support from the operating system, such as edge docking for Windows 7 and later, or the hover effect of the maximize button in Windows 11, it is recommended to enable the [QWindowkit](https://github.com/stdware/qwindowkit) library. The [QWindowkit](https://github.com/stdware/qwindowkit) library can also effectively solve multi-screen movement issues.
+> SARibbon supports the third-party frameless library [QWindowkit](https://github.com/stdware/qwindowkit). It also supports a simple frameless solution. If you need native window support from the operating system, such as edge snapping in Windows 7 and later, or the maximize button hover effect in Windows 11, it is recommended to enable the [QWindowkit](https://github.com/stdware/qwindowkit) library. The [QWindowkit](https://github.com/stdware/qwindowkit) library can also better solve multi-screen movement issues.
 
 The effect after enabling `QWindowkit` is as follows:
 
 ![](./doc/pic/set-qwindowkit-on-snap.gif)
 
-If you depend on the [QWindowkit](https://github.com/stdware/qwindowkit) library, you need to compile the [QWindowkit](https://github.com/stdware/qwindowkit) library first. The [QWindowkit](https://github.com/stdware/qwindowkit) library is a submodule of the SARibbon project. If you did not use the `--recursive` parameter when performing `git clone`, you need to execute the `submodule update` command:
+If you want to depend on the [QWindowkit](https://github.com/stdware/qwindowkit) library, you need to compile the [QWindowkit](https://github.com/stdware/qwindowkit) library first. As a submodule of the SARibbon project, if the `--recursive` parameter was not included during `git clone`, you need to run the `submodule update` command:
 
 ```shell
 git submodule update --init --recursive
 ```
 
-> If the user specifies the use of [QWindowkit](https://github.com/stdware/qwindowkit), the minimum C++ standard required is C++17; otherwise, the minimum requirement is C++14.
+> After the user specifies the use of [QWindowkit](https://github.com/stdware/qwindowkit), the minimum C++ standard required is C++17, otherwise the minimum requirement is C++14.
 
 ## Building as a Dynamic Library
 
-For the specific build process, refer to the documentation: [SARibbon Build](./doc/how-to-build-cn.md)
+For the specific build process, refer to the document: [SARibbon Build](./doc/how-to-build.md)
 
-## Directly Including in the Project (Static)
+## Static Project Integration
 
-You can include SARibbon in your project without building it as a library. After building and installing with cmake, static file inclusion is also provided.
-
-SARibbon provides the merged `SARibbon.h` and `SARibbon.cpp` files. You only need to include these two files in your project, along with the resource files and third-party library files, to use it without compiling it into a dynamic or static library. You can refer to the StaticExample (located in `example/StaticExample`) for how to include it statically. This will involve the following 4 files and the `SARibbonBar/resource` folder:
-
-Your project directory will look like this:
-
-```
-|-you-project-dir
-|  |-you-project.pro
-|  |-SARibbon.h
-|  |-SARibbon.cpp
-|  |-SARibbon.pri
-|  |-SARibbonBar
-|     |-resource.qrc
-|     |-resource(copy the entire resource folder from SARibbonBar)
-|        |-resource files
-```
+You can integrate SARibbon without building it into a dynamic library by directly including the provided `SARibbon.h` and `SARibbon.cpp` files in your project. These files include all necessary resources. Refer to the StaticExample (located in `example/StaticExample`) for guidance.
 
 ### Using qmake
 
-To compile with qmake, follow these steps:
+To use qmake, follow these steps:
 
-- 1. Copy `SARibbon.h`, `SARibbon.cpp`, and `SARibbon.pri` to your project directory.
-- 2. Create a `SARibbonBar` folder in your project directory.
-- 3. Copy the `resource.qrc` file from `src/SARibbonBar` in the source code to the `SARibbonBar` folder in your project directory.
-- 4. Copy the `resource` and `3rdparty` folders from `src/SARibbonBar` in the source code to the `SARibbonBar` folder in your project directory.
-- 5. Include the `SARibbon.pri` file in your project's pro file, like this: `include($$PWD/SARibbon.pri)`.
+1. Copy `SARibbon.h`, `SARibbon.cpp`, and `SARibbon.pri` (from the `./src` directory) to your project directory.
+2. Include the `SARibbon.pri` file in your project's pro file, like: `include($$PWD/SARibbon.pri)`.
 
-qmake can use the `SARibbon.pri` file to enable or disable the third-party frameless library.
+qmake can use the `SARibbon.pri` file to configure whether to enable the third-party frameless library.
 
 ### Using cmake
 
-If you are using cmake, refer to the cmake script in the StaticExample (located in `example/StaticExample`) and include the aforementioned files in your project.
+When using cmake, refer to the cmake writing style in the StaticExample (located in `example/StaticExample`). Simply include `SARibbon.h` and `SARibbon.cpp` in your project.
 
 ```cmake
-SET(SARIBBON_DIR {Directory containing SARibbon.h and SARibbon.cpp})
-set(SARIBBON_STATIC_FILE
-    ${SARIBBON_DIR}/SARibbon.h
-    ${SARIBBON_DIR}/SARibbon.cpp
-    ${SARIBBON_DIR}/SARibbonBar/resource.qrc
+set(SARIBBON_FILES
+    SARibbon.h
+    SARibbon.cpp
 )
-add_executable({your_target} 
+add_executable({your-target} 
             {your project's cpp and header files}
-            ${SARIBBON_STATIC_FILE}
+            ${SARIBBON_FILES}
 )
 ```
 
-In the static inclusion scenario with cmake, if you need to use `QWindowkit`, your project must first include the `QWindowkit` library and add the following predefinition macro:
+If your project needs to use `QWindowkit`, you must integrate the `QWindowkit` library and add the pre-defined macro:
 
 ```cmake
 find_package(QWindowKit)
-target_link_libraries({your_target} PRIVATE QWindowKit::Widgets)
-target_compile_definitions({your_target} PRIVATE SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1)
+target_link_libraries({your-target} PRIVATE QWindowKit::Widgets)
+target_compile_definitions({your-target} PRIVATE SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1)
 ```
 
 Otherwise, you need to set it to 0:
 
 ```cmake
-target_compile_definitions({your_target} PRIVATE SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=0)
+target_compile_definitions({your-target} PRIVATE SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=0)
 ```
 
 # Usage
 
-## Including the Library
+## Importing the Library
 
-After compiling, follow the methods below to include SARibbon.
+After compilation, integrate SARibbon into your project as follows:
 
-### qmake (Not Recommended)
+### qmake
 
-Even if your project uses qmake, it is still recommended to build with cmake and use the install command to create a standard library installation. The SARibbon built with cmake can also be included through qmake.
+1. Copy `SARibbon.h`, `SARibbon.cpp`, and `SARibbon.pri` (from the `./src` directory) to your project directory.
+2. Include `SARibbon.pri` in your project's .pro file: `include($$PWD/SARibbon.pri)`.
 
-#### Including Through qmake Build
+Refer to the comments in `SARibbon.pri` for configuration details.
 
-If your SARibbon is built with qmake, a `bin_qt{Qt version}_{MSVC/GNU}_x{32/64}` folder will be generated in the SARibbon directory. To include it simply, copy the following files to your project directory according to the
- directory structure.
+### cmake
 
-First, create a 3rdparty folder in your project directory, then copy the entire SARibbon folder there. SARibbon already has several pri files that can conveniently include the project in your directory. The `./importSARibbonBarLib.pri` file is used to include the SARibbon library.
-
-Include the following line in your Qt project's pro file:
-
-```shell
-include($$PWD/3rdparty/SARibbon/importSARibbonBarLib.pri)
-```
-
-The qmake build process will generate a `bin_qt{Qt version}_{MSVC/GNU}_x{32/64}` folder in SARibbon, where the library and dll files are located. The importSARibbonBarLib.pri file will automatically reference the library in this folder.
-
-Your project directory structure will look like this:
-
-```
-|-[you-project-dir]
-|  |-you-project.pro
-|  |-[3rdparty]
-|     |-[SARibbon](copy the entire SARibbon folder here)
-|        |-importSARibbonBarLib.pri
-|        |-SARibbonBar.pri
-|        |-common.pri
-|        |-[bin_qtx.x.x_{MSVC/GNU}_x{32/64}]
-|        |-[src]
-|        |   |-[SARibbonBar]
-```
-
-Explanation of the pri files:
-
-- common.pri
-  A qmake configuration file that defines configuration information. When compiling the library, you can modify the configuration through this file. When including it, the configuration must match the one used during compilation.
-
-- importSARibbonBarLib.pri
-  Used to include the library, which is essentially an include(SARibbonBar.pri).
-
-- SARibbonBar.pri
-  Used to include the specific implementation of the library.
-
-- src/SARibbon.pri
-  The pri file for SARibbon.h and SARibbon.cpp. If you are using static integration, use this pri file.
-
----
-
-You can copy all the header files to one folder and include the SARibbon library, similar to including other libraries. However, if you include it yourself, you need to define the following macros:
-
-- SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
-
-  This macro specifies whether you are using the third-party frameless library `QWindowkit`. If `QWindowkit` was used during compilation, you need to define SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1; otherwise, set it to 0. In your pro file, you can write:
-
-```shell
-# Compiled with QWindowkit
-DEFINES += SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1
-# Compiled without QWindowkit
-DEFINES += SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=0
-```
-
-#### Including Through cmake Build
-
-Even if your project is managed with qmake, it is recommended to build SARibbon with cmake and install it. After building and installing with cmake, a qmake inclusion scheme is also provided in the `lib/qmake/SARibbonBar` directory of the installation location. You only need to add the following line to your pro file to include it:
-
-```shell
-include({SARibbon installation directory}/lib/qmake/SARibbonBar/SARibbonBar.pri)
-```
-
-### cmake (Recommended)
-
-It is recommended to use this library after performing the install step.
-
-To include it using cmake:
+If you've built SARibbon dynamically, use it after installation via:
 
 ```cmake
+set(SARibbonBar_DIR "[Your SARibbonBar install root]/lib/cmake")
 find_package(SARibbonBar REQUIRED)
-...
 target_link_libraries({your_target_name} PUBLIC SARibbonBar::SARibbonBar)
 ```
 
-If `find_package` cannot find `SARibbonBar`, you need to inform the cmake project of the SARibbon installation location:
-
-```
-set(SARibbonBar_DIR "[Your SARibbon installation root directory]/lib/cmake")
-```
-
-If the `SARIBBON_INSTALL_IN_CURRENT_DIR` option is set to `ON` during compilation (default), a `bin_qt{Qt version}_{MSVC/GNU}_x{32/64}` folder will be generated in the SARibbon project root directory as the installation directory. This is to unify with qmake and also to facilitate the separate installation of multiple different versions of Qt and compilers on one operating system. Otherwise, on Windows, it will be installed by default in the `C:\Program Files\SARibbonBar` folder.
-
-For an example of including SARibbon using cmake, refer to `example/MainWindowExample/CMakeLists.txt`.
-
-For more details, see the documentation: [SARibbon Build](./doc/how-to-build-cn.md)
 
 ## Quick Start
 

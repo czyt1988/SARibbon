@@ -100,7 +100,7 @@ MIT协议，欢迎大家使用并提出意见
 
 这里建议使用cmake进行构建，cmake构建完成后并进行安装（install），使用cmake构建，你的工程既可以用cmake引入SARibbonBar，也可以使用qmake引入SARibbonBar
 
-SARibbon提供qmake和cmake两种构建方式，同时提供了一个集成的SARibbon.h和SARibbon.cpp文件方便静态的嵌入到单一工程
+SARibbon提供qmake和cmake两种构建方式，同时提供了一个集成的SARibbon.h和SARibbon.cpp文件可以快速静态的嵌入到工程中
 
 > SARibbon支持第三方无边框库[QWindowkit](https://github.com/stdware/qwindowkit)，同时也支持简单的无边框方案，如果你需要操作系统原生的窗口支持，如windows7以后的贴边处理，windows11的最大化按钮悬停的效果，建议开启[QWindowkit](https://github.com/stdware/qwindowkit)库，[QWindowkit](https://github.com/stdware/qwindowkit)库还能较好解决多屏幕移动问题
 
@@ -120,56 +120,38 @@ git submodule update --init --recursive
 
 具体构建过程，见文档：[SARibbon构建](./doc/how-to-build-cn.md)
 
-## 直接引入工程（静态）
+## 静态引入工程
 
-你可以不对SARibbon库进行构建，直接引入，通过cmake构建安装后，也提供静态文件引入的内容
+你可以不对SARibbon库进行构建，直接引入
 
-SARibbon提供了合并好的`SARibbon.h`文件和`SARibbon.cpp`文件，只需要在自己的工程中引入这两个文件，同时把资源文件和第三方库文件引入就可以使用，无需编译为动态库或者静态库，可以参考StaticExample例子（位于`example/StaticExample`），静态嵌入将使用到`SARibbon.h`、`SARibbon.cpp`、`SARibbon.pri`、`SARibbonBar/resource.qrc`这4个文件，以及`SARibbonBar/resource`这个文件夹：
-
-你的工程目录将如下所示：
-
-```
-|-you-project-dir
-|  |-you-project.pro
-|  |-SARibbon.h
-|  |-SARibbon.cpp
-|  |-SARibbon.pri
-|  |-SARibbonBar
-|     |-resource.qrc
-|     |-resource(直接把SARibbonBar下的resource完整复制过来)
-|        |-resource files
-```
+SARibbon提供了合并好的`SARibbon.h`文件和`SARibbon.cpp`文件，资源文件也都合并进`SARibbon.cpp`中，只需要在自己的工程中引入这两个文件即可，无需编译为动态库，可以参考StaticExample例子（位于`example/StaticExample`）
 
 ### 使用qmake
 
 使用qmake编译，有如下步骤：
 
-- 1. 把`SARibbon.h`、`SARibbon.cpp`、`SARibbon.pri`拷贝到自己工程目录下
-- 2. 在自己工程目录下创建`SARibbonBar`文件夹
-- 3. 把源码中的`src/SARibbonBar/resource.qrc`文件拷贝到自己工程目录下的`SARibbonBar`文件夹
-- 4. 把源码`src/SARibbonBar`下的`resource`文件夹和`3rdparty`文件夹拷贝到自己工程目录下的`SARibbonBar`文件夹中
-- 5. 在自己工程的pro文件中引入`SARibbon.pri`文件，如：`include($$PWD/SARibbon.pri)`
+- 1. 把`SARibbon.h`、`SARibbon.cpp`、`SARibbon.pri`（位于`./src`目录下）拷贝到自己工程目录下
+- 2. 在自己工程的pro文件中引入`SARibbon.pri`文件，如：`include($$PWD/SARibbon.pri)`
 
 qmake可以通过`SARibbon.pri`文件设置是否开启第三方无边框库
 
 ### 使用cmake
 
-使用cmake的话参考StaticExample（位于`example/StaticExample`）例子的cmake编写方式编写，主要把上诉的几个文件引入工程即可
+使用cmake的话参考StaticExample（位于`example/StaticExample`）例子的cmake编写方式编写，把`SARibbon.h`、`SARibbon.cpp`引入工程即可
 
 ```cmake
-SET(SARIBBON_DIR {SARibbon.h和SARibbon.cpp所在目录})
-set(SARIBBON_STATIC_FILE
-    ${SARIBBON_DIR}/SARibbon.h
-    ${SARIBBON_DIR}/SARibbon.cpp
-    ${SARIBBON_DIR}/SARibbonBar/resource.qrc
+
+set(SARIBBON_FILES
+    SARibbon.h
+    SARibbon.cpp
 )
 add_executable({you-target} 
             {你项目的cpp和头文件}
-            ${SARIBBON_STATIC_FILE}
+            ${SARIBBON_FILES}
 )
 ```
 
-基于cmake在静态引入方案中，如果你需要使用`QWindowkit`,你的工程首先要添加好`QWindowkit`库，并且增加预定义宏：
+如果你需要使用`QWindowkit`,你的工程要引入`QWindowkit`库，并且增加预定义宏：
 
 ```cmake
 find_package(QWindowKit)
@@ -189,81 +171,26 @@ target_compile_definitions({you-target} PRIVATE SARIBBON_USE_3RDPARTY_FRAMELESSH
 
 在编译完成后，按照如下方法引入SARibbon
 
-### qmake（不推荐）
+### qmake
 
-就算你的工程使用的是qmake，但构建过程还是建议使用cmake，并通过install命令，形成标准的库安装，通过cmake安装的SARibbon，也可以通过qmake引入
+- 1. 把`SARibbon.h`、`SARibbon.cpp`、`SARibbon.pri`（位于`./src`目录下）拷贝到自己工程目录下
+- 2. 在自己工程的pro文件中引入`SARibbon.pri`文件，如：`include($$PWD/SARibbon.pri)`
 
-#### 通过qmake构建的引入
+ `SARibbon.pri`文件可进行设置，具体可参见文件中的注释
 
-如果你的SARibbon是通过qmake构建，那么会在SARibbon目录下生成`bin_qt{Qt version}_{MSVC/GNU}_x{32/64}`文件夹，简单的引入，你只需把如下文件按目录结构拷贝到你的工程中
+### cmake
 
-先在你的工程中建立一个3rdparty文件夹，再把整个SARibbon文件夹拷贝过去，SARibbon内部已经有几个pri文件可以很方便的让你把工程引入到自己目录中，`./importSARibbonBarLib.pri`文件是用于引入SARibbon库的
-
-在自己的Qt工程pro文件中加入如下语句即可
-
-```shell
-include($$PWD/3rdparty/SARibbon/importSARibbonBarLib.pri)
-```
-
-qmake的编译过程会在SARibbon下生成`bin_qt{Qt version}_{MSVC/GNU}_x{32/64}`文件夹，库文件和dll文件都在此文件夹下，importSARibbonBarLib.pri会自动把这个文件夹下的库引用进来
-
-此时你的工程目录结构大致如下：
-
-```
-|-[you-project-dir]
-|  |-you-project.pro
-|  |-[3rdparty]
-|     |-[SARibbon](直接把SARibbon完整复制过来)
-|        |-importSARibbonBarLib.pri
-|        |-SARibbonBar.pri
-|        |-common.pri
-|        |-[bin_qtx.x.x_{MSVC/GNU}_x{32/64}]
-|        |-[src]
-|        |   |-[SARibbonBar]
-```
-
-几个pri文件的说明：
-
-- common.pri
- qmake配置文件，里面定义配置信息，在编译库的时候可以通过此文件改动配置，引入的时候要和编译的时候配置一致
-
-- importSARibbonBarLib.pri
-  用于引入库，实际就是include(SARibbonBar.pri)
-
-- SARibbonBar.pri
-  用于引入库的具体实现
-
-- src/SARibbon.pri
-  针对SARibbon.h和SARibbon.cpp的pri文件，如果你用静态集成模式，使用此pri文件
-
----
-
-你自己可以把所有头文件复制到一个文件夹，并引入SARibbon库，具体操作和引入其它库方式一致，但这里需要注意的是，你如果自己引入，需要指定一下以下几个宏：
-
-- SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
-
- 这个宏指定你是否使用第三方无边框库`QWindowkit`,如果编译时，使用了`QWindowkit`，那么，需要定义SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1，否则为0，在你的pro文件中，你可以这样写：
-
-```shell
-# 编译使用了QWindowkit
-DEFINES += SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1
-# 编译没有使用QWindowkit
-DEFINES += SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1
-```
-
-#### 通过cmake构建的引入
-
-就算你的项目使用qmake管理，也建议SARibbon的构建使用cmake构建并进行安装，因为cmake构建并进行安装后，也提供了qmake的引入方案，位于安装位置的`lib/qmake/SARibbonBar`目录下，你仅仅需要在你pro文件中加入如下语句即可引入：
-
-```shell
-include({SARibbon安装目录}/lib/qmake/SARibbonBar/SARibbonBar.pri)
-```
-
-### cmake（推荐）
-
-建议在执行install后使用此库
+如果你是动态构建，在执行install后使用此库
 
 cmake引入方法：
+
+设置你的`SARibbonBar`安装目录，如：
+
+```
+set(SARibbonBar_DIR "[你的SARibbonBar安装根目录]/lib/cmake")
+```
+
+通过find_package引入
 
 ```cmake
 find_package(SARibbonBar REQUIRED)
@@ -271,17 +198,6 @@ find_package(SARibbonBar REQUIRED)
 target_link_libraries({your_target_name} PUBLIC SARibbonBar::SARibbonBar)
 ```
 
-如果find_package找不到`SARibbonBar`，你需要把`SARibbon`安装位置告诉cmake工程
-
-```
-set(SARibbonBar_DIR "[你的SARibbonBar安装根目录]/lib/cmake")
-```
-
-如果你编译时，`SARIBBON_INSTALL_IN_CURRENT_DIR`选项设置为`ON`(默认)，那会在SARibbon工程根目录下下生成`bin_qt{Qt version}_{MSVC/GNU}_x{32/64}`文件夹作为安装目录，这是为了和qmake统一，也是为了方便一个操作系统进行多个不同版本qt和编译器进行区分安装，否则，windows系统会默认安装在`C:\Program Files\SARibbonBar`文件夹下
-
-通过cmake引入SARibbon可参考`example/MainWindowExample/CMakeLists.txt`
-
-具体见文档：[SARibbon构建](./doc/how-to-build-cn.md)
 
 ## 快速开始
 
