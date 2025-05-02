@@ -81,7 +81,7 @@ SARibbonButtonGroupWidget::~SARibbonButtonGroupWidget()
 void SARibbonButtonGroupWidget::setIconSize(const QSize& ic)
 {
     d_ptr->mIconSize = ic;
-    iterate([ ic ](SARibbonControlButton* btn) -> bool {
+    iterateButton([ ic ](SARibbonControlButton* btn) -> bool {
         btn->setIconSize(ic);
         return true;
     });
@@ -148,7 +148,7 @@ QAction* SARibbonButtonGroupWidget::addWidget(QWidget* w)
 SARibbonControlButton* SARibbonButtonGroupWidget::actionToRibbonControlToolButton(QAction* action)
 {
     SARibbonControlButton* res = nullptr;
-    iterate([ &res, action ](SARibbonControlButton* btn) -> bool {
+    iterateButton([ &res, action ](SARibbonControlButton* btn) -> bool {
         if (btn->defaultAction() == action) {
             res = btn;
             return false;  // 返回false退出迭代
@@ -173,7 +173,7 @@ QSize SARibbonButtonGroupWidget::minimumSizeHint() const
  * @param fp
  * @return 中途迭代退出返回false
  */
-bool SARibbonButtonGroupWidget::iterate(SARibbonButtonGroupWidget::FpButtonIterate fp)
+bool SARibbonButtonGroupWidget::iterateButton(SARibbonButtonGroupWidget::FpButtonIterate fp)
 {
     QLayout* lay = layout();
     int c        = lay->count();

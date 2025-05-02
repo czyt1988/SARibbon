@@ -42,7 +42,7 @@ public:
     QSize minimumSizeHint() const override;
 
 public:
-    bool iterate(FpButtonIterate fp);
+    bool iterateButton(FpButtonIterate fp);
 Q_SIGNALS:
 
     /**

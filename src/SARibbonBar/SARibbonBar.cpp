@@ -1428,7 +1428,7 @@ void SARibbonBar::resizeAll()
  */
 void SARibbonBar::synchronousCategoryData(bool autoUpdate)
 {
-	iterate([ this ](SARibbonCategory* c) -> bool {
+	iterateCategory([ this ](SARibbonCategory* c) -> bool {
 		c->setEnableShowPannelTitle(this->isEnableShowPannelTitle());
 		c->setPannelTitleHeight(this->pannelTitleHeight());
 		c->setCategoryAlignment(this->ribbonAlignment());
@@ -1670,7 +1670,7 @@ QColor SARibbonBar::tabBarBaseLineColor() const
 void SARibbonBar::updateRibbonGeometry()
 {
 	d_ptr->resetSize();
-	iterate([](SARibbonCategory* c) -> bool {
+	iterateCategory([](SARibbonCategory* c) -> bool {
 		c->updateItemGeometry();
 		return true;
 	});
@@ -1697,7 +1697,7 @@ SARibbonPannel::PannelLayoutMode SARibbonBar::pannelLayoutMode() const
 void SARibbonBar::setPannelLayoutMode(SARibbonPannel::PannelLayoutMode m)
 {
 	d_ptr->mDefaulePannelLayoutMode = m;
-	iterate([ m ](SARibbonCategory* c) -> bool {
+	iterateCategory([ m ](SARibbonCategory* c) -> bool {
 		c->setPannelLayoutMode(m);
 		return true;
 	});
@@ -1803,7 +1803,7 @@ int SARibbonBar::pannelTitleHeight() const
 void SARibbonBar::setPannelTitleHeight(int h)
 {
 	d_ptr->mPannelTitleHeight = h;
-	iterate([ h ](SARibbonCategory* c) -> bool {
+	iterateCategory([ h ](SARibbonCategory* c) -> bool {
 		c->setPannelTitleHeight(h);
 		return true;
 	});
@@ -1825,7 +1825,7 @@ bool SARibbonBar::isEnableShowPannelTitle() const
 void SARibbonBar::setEnableShowPannelTitle(bool on)
 {
 	d_ptr->mEnableShowPannelTitle = on;
-	iterate([ on ](SARibbonCategory* c) -> bool {
+	iterateCategory([ on ](SARibbonCategory* c) -> bool {
 		c->setEnableShowPannelTitle(on);
 		return true;
 	});
@@ -1839,7 +1839,7 @@ void SARibbonBar::setPannelSpacing(int n)
 {
 	d_ptr->mPannelSpacing = n;
 	// 同步当前被SARibbonBar管理的SARibbonCategory的PannelSpacing
-	iterate([ n ](SARibbonCategory* category) -> bool {
+	iterateCategory([ n ](SARibbonCategory* category) -> bool {
 		if (category) {
 			category->setPannelSpacing(n);
 		}
@@ -1864,7 +1864,7 @@ void SARibbonBar::setPannelToolButtonIconSize(const QSize& s)
 {
 	d_ptr->mPannelToolButtonSize = s;
 	// 同步当前被SARibbonBar管理的SARibbonCategory的PannelSpacing
-	iterate([ s ](SARibbonCategory* category) -> bool {
+	iterateCategory([ s ](SARibbonCategory* category) -> bool {
 		if (category) {
 			category->setPannelToolButtonIconSize(s);
 		}
@@ -2002,7 +2002,7 @@ SARibbonAlignment SARibbonBar::ribbonAlignment() const
  * @param fp 函数指针返回false则停止迭代
  * @return 返回false代表没有迭代完所有的category，中途接收到回调函数的false返回而中断迭代
  */
-bool SARibbonBar::iterate(FpCategoryIterate fp)
+bool SARibbonBar::iterateCategory(FpCategoryIterate fp)
 {
 	const QList< SARibbonCategory* > cs = categoryPages(true);
 	for (SARibbonCategory* c : cs) {
@@ -2018,11 +2018,11 @@ bool SARibbonBar::iterate(FpCategoryIterate fp)
  * @param fp 函数指针返回false则停止迭代
  * @return 返回false代表没有迭代完所有的category，中途接收到回调函数的false返回而中断迭代
  */
-bool SARibbonBar::iterate(FpPannelIterate fp)
+bool SARibbonBar::iteratePannel(FpPannelIterate fp)
 {
 	const QList< SARibbonCategory* > cs = categoryPages(true);
 	for (SARibbonCategory* c : cs) {
-		if (!c->iterate(fp)) {
+		if (!c->iteratePannel(fp)) {
 			return false;
 		}
 	}
@@ -2372,7 +2372,8 @@ void SARibbonBar::paintContextCategoryTab(QPainter& painter, const QString& titl
 			                       contextRect.width(),
 			                       contextRect.height() - contextLineWidth - d_ptr->mRibbonTabBar->height());
 			painter.setPen(contextCategoryTitleTextColor());
-			painter.drawText(textRect, Qt::AlignCenter, title);
+			QFontMetrics fontMetrics(painter.font());
+			painter.drawText(textRect, Qt::AlignCenter, fontMetrics.elidedText(title, Qt::ElideRight, textRect.width()));
 		}
 	}
 	painter.restore();

@@ -281,7 +281,7 @@ SARibbonPannel::PannelLayoutMode SARibbonCategory::pannelLayoutMode() const
 void SARibbonCategory::setPannelLayoutMode(SARibbonPannel::PannelLayoutMode m)
 {
     d_ptr->mDefaultPannelLayoutMode = m;
-    iterate([ m ](SARibbonPannel* p) -> bool {
+    iteratePannel([ m ](SARibbonPannel* p) -> bool {
         p->setPannelLayoutMode(m);
         return true;
     });
@@ -523,7 +523,7 @@ int SARibbonCategory::pannelTitleHeight() const
 void SARibbonCategory::setPannelTitleHeight(int h)
 {
     d_ptr->mPannelTitleHeight = h;
-    iterate([ h ](SARibbonPannel* p) -> bool {
+    iteratePannel([ h ](SARibbonPannel* p) -> bool {
         p->setTitleHeight(h);
         return true;
     });
@@ -545,7 +545,7 @@ bool SARibbonCategory::isEnableShowPannelTitle() const
 void SARibbonCategory::setEnableShowPannelTitle(bool on)
 {
     d_ptr->mEnableShowPannelTitle = on;
-    iterate([ on ](SARibbonPannel* p) -> bool {
+    iteratePannel([ on ](SARibbonPannel* p) -> bool {
         p->setEnableShowTitle(on);
         return true;
     });
@@ -587,7 +587,7 @@ void SARibbonCategory::updateItemGeometry()
  * @param fp 函数指针返回false则停止迭代
  * @return 返回false代表没有迭代完所有的category，中途接收到回调函数的false返回而中断迭代
  */
-bool SARibbonCategory::iterate(FpPannelIterate fp)
+bool SARibbonCategory::iteratePannel(FpPannelIterate fp)
 {
     const QList< SARibbonPannel* > ps = pannelList();
     for (SARibbonPannel* p : ps) {
@@ -630,7 +630,7 @@ SARibbonAlignment SARibbonCategory::categoryAlignment() const
 void SARibbonCategory::setPannelSpacing(int n)
 {
     d_ptr->mPannelSpacing = n;
-    iterate([ n ](SARibbonPannel* pannel) -> bool {
+    iteratePannel([ n ](SARibbonPannel* pannel) -> bool {
         if (pannel) {
             pannel->setSpacing(n);
         }
@@ -654,7 +654,7 @@ int SARibbonCategory::pannelSpacing() const
 void SARibbonCategory::setPannelToolButtonIconSize(const QSize& s)
 {
     d_ptr->mPannelToolButtonSize = s;
-    iterate([ s ](SARibbonPannel* pannel) -> bool {
+    iteratePannel([ s ](SARibbonPannel* pannel) -> bool {
         if (pannel) {
             pannel->setToolButtonIconSize(s);
         }
@@ -696,7 +696,7 @@ void SARibbonCategory::changeEvent(QEvent* event)
         qDebug() << "SARibbonCategory changeEvent(FontChange),categoryName=" << categoryName();
 #endif
         QFont f = font();
-        iterate([ f ](SARibbonPannel* p) -> bool {
+        iteratePannel([ f ](SARibbonPannel* p) -> bool {
             p->setFont(f);
             return true;
         });

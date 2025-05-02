@@ -580,7 +580,7 @@ void SARibbonPannel::setToolButtonIconSize(const QSize& s)
 		lay->setToolButtonIconSize(s);
 	}
 	// 对已经管理的QToolButton设置为iconsize
-	iterate([ s ](SARibbonToolButton* t) -> bool {
+	iterateButton([ s ](SARibbonToolButton* t) -> bool {
 		t->setIconSize(s);
 		return true;
 	});
@@ -599,7 +599,7 @@ QSize SARibbonPannel::toolButtonIconSize() const
  * @param fp
  * @return 返回false说明迭代中途退出，返回true则表示迭代完全
  */
-bool SARibbonPannel::iterate(SARibbonPannel::FpRibbonToolButtonIterate fp)
+bool SARibbonPannel::iterateButton(SARibbonPannel::FpRibbonToolButtonIterate fp)
 {
 	const QObjectList& ols = children();
 	for (QObject* obj : ols) {
