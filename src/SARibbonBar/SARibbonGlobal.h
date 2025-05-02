@@ -67,6 +67,17 @@ enum class SARibbonTheme
 };
 
 /**
+ * @brief RibbonMainWindow的样式
+ */
+enum class SARibbonMainWindowStyleFlag : int
+{
+    UseRibbonFrame   = 1,  ///< 代表使用ribbon边框，ribbon边框会更紧凑
+    UseNativeFrame   = 2,  ///< 代表使用操作系统的边框
+    UseRibbonMenuBar = 4,
+    UseNativeMenuBar = 8
+};
+Q_DECLARE_FLAGS(SARibbonMainWindowStyles, SARibbonMainWindowStyleFlag)
+/**
  * @def 属性，用于标记是否可以进行自定义，用于动态设置到@ref SARibbonCategory 和@ref SARibbonPannel
  * 值为bool，在为true时，可以通过@ref SARibbonCustomizeWidget 改变这个SARibbonCategory和SARibbonPannel的布局，
  * 默认不会有此属性，仅在有此属性且为true时才会在SARibbonCustomizeWidget中能显示为可设置
@@ -131,19 +142,5 @@ enum class SARibbonTheme
 #ifndef SA_DEBUG_PRINT_SARIBBONBAR
 #define SA_DEBUG_PRINT_SARIBBONBAR 0
 #endif
-
-/**
- * @brief 全局的设置ribbon theme函数
- *
- * 之所以提供此函数，是因为在某些情况下，SARibbonBar不用在SARibbonMainWindow情况下的时候，也需要设置主题，
- * 但主题设置是在SARibbonMainWindow下的为了能在非SARibbonMainWindow下也能设置主题，这里提供@sa sa_set_ribbon_theme函数，
- * 可以这样使用：
- * @code
- * @endcode
- *
- * @param w
- * @param theme
- */
-void SA_RIBBON_EXPORT sa_set_ribbon_theme(QWidget* w, SARibbonTheme theme);
 
 #endif  // SARIBBONGLOBAL_H

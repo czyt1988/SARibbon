@@ -56,7 +56,6 @@ SET(SARIBBON_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../src)
 set(SARIBBON_SIMPLE
     ${SARIBBON_DIR}/SARibbon.h
     ${SARIBBON_DIR}/SARibbon.cpp
-    ${SARIBBON_DIR}/SARibbonBar/resource.qrc
 )
 
 set(PROJECT_SOURCES

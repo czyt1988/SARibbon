@@ -369,7 +369,7 @@ bool SARibbonSystemButtonBar::eventFilter(QObject* obj, QEvent* event)
             setGeometry(fr.width() - wgSizeHint.width(), 0, wgSizeHint.width(), wgSizeHint.height());
             // 把设置好的尺寸给ribbonbar
             if (ribbonBar) {
-                ribbonBar->setWindowButtonGroupSize(size());
+                ribbonBar->setSystemButtonGroupSize(size());
             }
         } break;
         case QEvent::WindowStateChange: {

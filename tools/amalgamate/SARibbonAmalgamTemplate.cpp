@@ -20,6 +20,10 @@
 #pragma warning (disable: 4996) // deprecated POSIX names
 #endif
 
+// clang-format off
+#include "../qrc_SARibbonResource.cpp"
+// clang-format on
+
 #include "../../src/SARibbonBar/colorWidgets/SAColorMenu.cpp"
 #include "../../src/SARibbonBar/colorWidgets/SAColorGridWidget.cpp"
 #include "../../src/SARibbonBar/colorWidgets/SAColorPaletteGridWidget.cpp"
@@ -62,6 +66,7 @@
 #include "../../src/SARibbonBar/SARibbonCustomizeDialog.cpp"
 #include "../../src/SARibbonBar/SARibbonMainWindow.cpp"
 #include "../../src/SARibbonBar/SARibbonWidget.cpp"
+#include "../../src/SARibbonBar/SARibbonApplicationWidget.cpp"
 #ifdef _MSC_VER
 #pragma warning (pop)
 #pragma pop_macro ("_CRT_SECURE_NO_WARNINGS")

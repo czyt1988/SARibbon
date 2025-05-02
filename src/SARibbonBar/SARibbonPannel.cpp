@@ -599,7 +599,7 @@ QSize SARibbonPannel::toolButtonIconSize() const
  * @param fp
  * @return 返回false说明迭代中途退出，返回true则表示迭代完全
  */
-bool SARibbonPannel::iterateButton(SARibbonPannel::FpRibbonToolButtonIterate fp)
+bool SARibbonPannel::iterateButton(SARibbonPannel::FpRibbonToolButtonIterate fp) const
 {
 	const QObjectList& ols = children();
 	for (QObject* obj : ols) {

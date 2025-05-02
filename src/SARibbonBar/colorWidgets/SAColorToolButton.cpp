@@ -401,7 +401,7 @@ SAColorMenu* SAColorToolButton::createColorMenu()
     m->enableNoneColorAction(true);
     QAction* customColor = m->customColorAction();
     if (customColor) {
-        customColor->setIcon(QIcon(":/image/resource/define-color.svg"));
+        customColor->setIcon(QIcon(":/SARibbon/image/resource/define-color.svg"));
     }
     connect(m, &SAColorMenu::selectedColor, this, &SAColorToolButton::setColor);
     setMenu(m);

@@ -67,7 +67,12 @@
 {OptionButton.BKColor:hover}:pannel下的OptionButton在hover状态下的背景颜色，建议为{ToolButton.BKColor:hover}
 */
 
-
+/*SARibbonApplicationWidget*/
+SARibbonApplicationWidget{
+    background-color: #e5e3e5;/* {Ribbon.BKColor} */
+    border: solid #e5e3e5;
+    color:#242424;
+}
 
 /*SARibbonBar*/
 SARibbonBar {
@@ -75,8 +80,6 @@ SARibbonBar {
   border: solid #e5e3e5;
   color:#242424;
 }
-
-
 
 
 /*SARibbonQuickAccessBar*/
@@ -460,7 +463,7 @@ SARibbonComboBox::drop-down:hover {
 }
 
 SARibbonComboBox::down-arrow {
-  image: url(:/image/resource/ArrowDown.png);
+  image: url(:/SARibbon/image/resource/ArrowDown.png);
 }
 
 /*SARibbonSeparatorWidget*/
@@ -484,7 +487,7 @@ SARibbonSystemToolButton:focus {
 SARibbonSystemToolButton#SAMinimizeWindowButton {
   background-position:center;
   background-repeat: no-repeat;
-  background-image: url(:/image/resource/Titlebar_Min.svg);
+  background-image: url(:/SARibbon/image/resource/Titlebar_Min.svg);
 }
 
 SARibbonSystemToolButton#SAMinimizeWindowButton:hover{
@@ -498,13 +501,13 @@ SARibbonSystemToolButton#SAMinimizeWindowButton:pressed{
 SARibbonSystemToolButton#SAMaximizeWindowButton {
     background-position:center;
     background-repeat: no-repeat;
-    background-image: url(:/image/resource/Titlebar_Max.svg);
+    background-image: url(:/SARibbon/image/resource/Titlebar_Max.svg);
 }
 SARibbonSystemToolButton#SAMaximizeWindowButton:hover {
     background-color: #f5f6f6;
 }
 SARibbonSystemToolButton#SAMaximizeWindowButton:checked {
-    background-image: url(:/image/resource/Titlebar_Normal.svg) center;
+    background-image: url(:/SARibbon/image/resource/Titlebar_Normal.svg) center;
 }
 
 
@@ -512,7 +515,7 @@ SARibbonSystemToolButton#SAMaximizeWindowButton:checked {
 SARibbonSystemToolButton#SACloseWindowButton {
     background-position:center;
     background-repeat: no-repeat;
-    background-image: url(:/image/resource/Titlebar_Close.svg);
+    background-image: url(:/SARibbon/image/resource/Titlebar_Close.svg);
 }
 SARibbonSystemToolButton#SACloseWindowButton:hover {
   background-color: #e81123;

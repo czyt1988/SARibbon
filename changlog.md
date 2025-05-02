@@ -1,5 +1,15 @@
 ﻿# 版本记录(change log):
 
+## 2025-03-12 -> 2.3.0
+
+- 静态引入版本仅仅只需`SARibbon.h`和`SARibbon.cpp`两个文件，其他文件不需要
+- 增加`SARibbonApplicationWidget`,可以方便快速实现类似office的文件窗口的效果，具体见MainWindow例子
+- `SARibbonMainWindow`的构造函数第二个参数设置为枚举类
+- 支持使用原生边框，不使用无边框的方案，具体见`example/UseNativeFrameExample`例子,效果如下：
+
+![](./doc/screenshot/use-native-frame.png)
+
+
 ## 2025-02-05 -> 2.2.9
 
 - `SARibbonBar`增加`setWindowTitleBackgroundBrush`/`windowTitleBackgroundBrush`函数，允许用户设置标题栏的背景色
