@@ -21,7 +21,12 @@
 #endif
 
 // clang-format off
-#include "../qrc_SARibbonResource.cpp"
+#include "../qrc_SARibbonResource_Datas.cpp"
+#if QT_VERSION >= QT_VERSION_CHECK(5,14,0)
+#include "../qrc_SARibbonResource_version3.cpp"
+#else
+#include "../qrc_SARibbonResource_version2.cpp"
+#endif
 // clang-format on
 
 #include "../../src/SARibbonBar/colorWidgets/SAColorMenu.cpp"

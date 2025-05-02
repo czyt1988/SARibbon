@@ -1,9 +1,6 @@
 /****************************************************************************
-** Resource object code
-**
+** 这是资源文件moc后的二进制内容，这部分内容如果资源文件未修改，不需要进行修改，主要由qt_resource_data，qt_resource_name，qt_resource_struct三个数据结构组成
 ** Created by: The Resource Compiler for Qt version 5.14.2
-**
-** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
 static const unsigned char qt_resource_data[] = {
@@ -1650,62 +1647,3 @@ static const unsigned char qt_resource_struct[] = {
 0x0,0x0,0x1,0x96,0x8e,0xc6,0x77,0x8a,
 
 };
-
-#ifdef QT_NAMESPACE
-#  define QT_RCC_PREPEND_NAMESPACE(name) ::QT_NAMESPACE::name
-#  define QT_RCC_MANGLE_NAMESPACE0(x) x
-#  define QT_RCC_MANGLE_NAMESPACE1(a, b) a##_##b
-#  define QT_RCC_MANGLE_NAMESPACE2(a, b) QT_RCC_MANGLE_NAMESPACE1(a,b)
-#  define QT_RCC_MANGLE_NAMESPACE(name) QT_RCC_MANGLE_NAMESPACE2( \
-        QT_RCC_MANGLE_NAMESPACE0(name), QT_RCC_MANGLE_NAMESPACE0(QT_NAMESPACE))
-#else
-#   define QT_RCC_PREPEND_NAMESPACE(name) name
-#   define QT_RCC_MANGLE_NAMESPACE(name) name
-#endif
-
-#ifdef QT_NAMESPACE
-namespace QT_NAMESPACE {
-#endif
-
-bool qRegisterResourceData(int, const unsigned char *, const unsigned char *, const unsigned char *);
-bool qUnregisterResourceData(int, const unsigned char *, const unsigned char *, const unsigned char *);
-
-#if defined(__ELF__) || defined(__APPLE__)
-static inline unsigned char qResourceFeatureZlib()
-{
-    extern const unsigned char qt_resourceFeatureZlib;
-    return qt_resourceFeatureZlib;
-}
-#else
-unsigned char qResourceFeatureZlib();
-#endif
-
-#ifdef QT_NAMESPACE
-}
-#endif
-
-int QT_RCC_MANGLE_NAMESPACE(qInitResources_SARibbonResource)();
-int QT_RCC_MANGLE_NAMESPACE(qInitResources_SARibbonResource)()
-{
-    int version = 3;
-    QT_RCC_PREPEND_NAMESPACE(qRegisterResourceData)
-        (version, qt_resource_struct, qt_resource_name, qt_resource_data);
-    return 1;
-}
-
-int QT_RCC_MANGLE_NAMESPACE(qCleanupResources_SARibbonResource)();
-int QT_RCC_MANGLE_NAMESPACE(qCleanupResources_SARibbonResource)()
-{
-    int version = 3;
-    version += QT_RCC_PREPEND_NAMESPACE(qResourceFeatureZlib());
-    QT_RCC_PREPEND_NAMESPACE(qUnregisterResourceData)
-       (version, qt_resource_struct, qt_resource_name, qt_resource_data);
-    return 1;
-}
-
-namespace {
-   struct initializer {
-       initializer() { QT_RCC_MANGLE_NAMESPACE(qInitResources_SARibbonResource)(); }
-       ~initializer() { QT_RCC_MANGLE_NAMESPACE(qCleanupResources_SARibbonResource)(); }
-   } dummy;
-}
