@@ -9,6 +9,7 @@ class SARibbonActionsManager;
 class SARibbonQuickAccessBar;
 class SARibbonButtonGroupWidget;
 class SARibbonPannel;
+class SARibbonApplicationWidget;
 class QTextEdit;
 class QComboBox;
 class QCloseEvent;
@@ -87,16 +88,15 @@ protected:
 	void closeEvent(QCloseEvent* e) override;
 
 private:
-	SARibbonContextCategory* mContextCategory;
-	SARibbonContextCategory* mContextCategory2;
-	SARibbonCustomizeWidget* mWidgetForCustomize;
-	QTextEdit* mTextedit;
-	SARibbonActionsManager* mActionsManager;
-	int mTagForActionText;
-	int mTagForActionIcon;
-	QMenu* mMenuApplicationBtn;
-	QComboBox* mComboboxRibbonTheme;
+    SARibbonContextCategory* mContextCategory { nullptr };
+    SARibbonContextCategory* mContextCategory2 { nullptr };
+    SARibbonCustomizeWidget* mWidgetForCustomize { nullptr };
+    QTextEdit* mTextedit { nullptr };
+    SARibbonActionsManager* mActionsManager { nullptr };
+    QMenu* mMenuApplicationBtn { nullptr };
+    QComboBox* mComboboxRibbonTheme { nullptr };
 	QLineEdit* mSearchEditor { nullptr };
+    SARibbonApplicationWidget* mAppWidget { nullptr };
 	//
 	QAction* mActionWordWrap { nullptr };
 	QAction* mActionDisable { nullptr };
@@ -119,7 +119,9 @@ private:
 	//
 	QAction* mActionVisibleAll { nullptr };    ///< 控制所有action是否可见的开关
 	bool mHasApplyCustomizeXmlFile { false };  ///< 程序启动后是否应用上次修改
-	QTimer mChangeTitleBkColorTimer;           ///< 用于周期改变标题颜色的一个定时器
+    int mTagForActionText;
+    int mTagForActionIcon;
+    QTimer mChangeTitleBkColorTimer;  ///< 用于周期改变标题颜色的一个定时器
 };
 
 #endif  // MAINWINDOW_H

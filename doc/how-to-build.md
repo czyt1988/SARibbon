@@ -1,4 +1,4 @@
-This document will detail how to build and introduce SARibbon.
+This document details SARibbon's dynamic build process. If you're unfamiliar with building, consider static integration. Just add SARibbon.h and SARibbon.cpp to your project.
 
 # Preparation
 

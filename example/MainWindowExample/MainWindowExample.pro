@@ -12,11 +12,16 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = SARibbonMainWindowExample
 TEMPLATE = app
 
-SOURCES += main.cpp\
-    mainwindow.cpp
+SOURCES += main.cpp      \
+    mainwindow.cpp       \
+    ApplicationWidget.cpp\
 
-HEADERS  += \
-    mainwindow.h
+HEADERS  +=              \
+    mainwindow.h         \
+    ApplicationWidget.h  \
+
+FORMS += \
+    ApplicationWidget.ui \
 
 RESOURCES += \
     saribbonresouce.qrc \

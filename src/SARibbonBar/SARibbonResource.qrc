@@ -1,5 +1,5 @@
 <RCC>
-    <qresource prefix="/image">
+    <qresource prefix="/SARibbon/image">
         <file>resource/ribbonPannelOptionButton.png</file>
         <file>resource/ArrowDown.png</file>
         <file>resource/ArrowMore.png</file>

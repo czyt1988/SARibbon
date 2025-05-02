@@ -7,7 +7,7 @@ SARibbonPannelOptionButton::SARibbonPannelOptionButton(QWidget* parent) : QToolB
     setCheckable(false);
     setToolButtonStyle(Qt::ToolButtonIconOnly);
     setIconSize(QSize(10, 10));
-    static QIcon s_default_icon = QIcon(":/image/resource/ribbonPannelOptionButton.png");
+    static QIcon s_default_icon = QIcon(":/SARibbon/image/resource/ribbonPannelOptionButton.png");
     setIcon(s_default_icon);
 }
 

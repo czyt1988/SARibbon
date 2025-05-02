@@ -149,7 +149,7 @@ public:
 	// 获取默认的上下文标签颜色列表
 	static QList< QColor > defaultContextCategoryColorList();
 
-	//
+	// 初始化高分辨率适配
 	static void initHighDpi();
 
 public:
@@ -369,12 +369,16 @@ public:
 	SARibbonAlignment ribbonAlignment() const;
 
 	// 此函数会遍历SARibbonBar下的所有Category，执行函数指针(bool(SARibbonCategory*))，函数指针返回false则停止迭代
-	bool iterateCategory(FpCategoryIterate fp);
+
+	bool iterateCategory(FpCategoryIterate fp) const;
 	// 此函数会遍历SARibbonBar下的所有Category,并迭代所有的pannel，执行函数指针(bool(SARibbonPannel*))，函数指针返回false则停止迭代
-	bool iteratePannel(FpPannelIterate fp);
+	bool iteratePannel(FpPannelIterate fp) const;
 
 	// 设置边角widget可见性，对于mdi窗口，会出现TopLeftCorner和TopRightCorner两个corner widget
 	void setCornerWidgetVisible(bool on, Qt::Corner c = Qt::TopLeftCorner);
+
+	// 获取所有pannel下的action
+	QList< QAction* > allActions() const;
 Q_SIGNALS:
 
 	/**
@@ -422,7 +426,11 @@ protected:
 	// 更新
 	void updateCategoryTitleToTabName();
 	// 告知WindowButtonGroup的尺寸
-	void setWindowButtonGroupSize(const QSize& s);
+	void setSystemButtonGroupSize(const QSize& s);
+	// 更新标题位置rect
+	void updateTitleRect();
+	// 设置当前的MainWindow的样式，这个函数是SARibbonMainWindow调用，告知ribbonbar当前MainWindow的样式
+	void setMainWindowStyles(SARibbonMainWindowStyles s);
 protected Q_SLOTS:
 	void onWindowTitleChanged(const QString& title);
 	void onWindowIconChanged(const QIcon& i);
@@ -451,6 +459,7 @@ private:
 	QString toDisplayTitleText(const QString& title) const;
 
 protected:
+	void setRibbonMainwindowStyle();
 	virtual void paintEvent(QPaintEvent* e) override;
 	virtual void resizeEvent(QResizeEvent* e) override;
 	virtual void moveEvent(QMoveEvent* e) override;
