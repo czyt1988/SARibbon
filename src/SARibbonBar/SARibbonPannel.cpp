@@ -392,6 +392,14 @@ QAction* SARibbonPannel::addWidget(QWidget* w, SARibbonPannelItem::RowProportion
 	QWidgetAction* action = new QWidgetAction(this);
 
 	action->setDefaultWidget(w);
+
+	action->setEnabled(w->isEnabled());
+	// 建立 Action -> Widget 的单向同步
+	connect(action, &QWidgetAction::changed, this, [ w, action ]() {
+		if (w) {
+			w->setEnabled(action->isEnabled());
+		}
+	});
 	action->setIcon(w->windowIcon());
 	action->setText(w->windowTitle());
 	action->setObjectName("action." + w->objectName());
@@ -946,6 +954,14 @@ void SARibbonPannel::actionEvent(QActionEvent* e)
 			//!
 			QResizeEvent* ersize = new QResizeEvent(parw->size(), QSize());
 			QApplication::postEvent(parw, ersize);
+		}
+		
+		// 只处理 QWidgetAction 的情况
+		if (QWidgetAction* widgetAction = qobject_cast< QWidgetAction* >(e->action())) {
+			// 安全获取关联控件
+			if (QWidget* w = widgetAction->defaultWidget()) {
+				w->setEnabled(widgetAction->isEnabled());
+			}
 		}
 	} break;
 
