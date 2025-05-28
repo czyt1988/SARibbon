@@ -83,7 +83,7 @@ public:
 	QBrush mTitleBackgroundBrush { Qt::NoBrush };           ///< 标题的背景颜色
 	SARibbonAlignment mRibbonAlignment { SARibbonAlignment::AlignLeft };                         ///< 对齐方式
 	SARibbonPannel::PannelLayoutMode mDefaulePannelLayoutMode { SARibbonPannel::ThreeRowMode };  ///< 默认的PannelLayoutMode
-	bool mEnableShowPannelTitle { true };    ///< 是否运行pannel的标题栏显示
+	bool mEnableShowPannelTitle { true };    ///< 是否允许pannel的标题栏显示
 	bool mIsTabOnTitle { false };            ///< 是否tab在标题栏上
 	int mTitleBarHeight { 30 };              ///< 标题栏高度
 	int mTabBarHeight { 28 };                ///< tabbar高度
@@ -95,11 +95,14 @@ public:
 	std::unique_ptr< int > mUserDefTitleBarHeight;  ///< 用户定义的标题栏高度，正常不使用用户设定的高度，而是使用自动计算的高度
 	std::unique_ptr< int > mUserDefTabBarHeight;  ///< 用户定义的tabbar高度，正常不使用用户设定的高度，而是使用自动计算的高度
 	std::unique_ptr< int > mUserDefCategoryHeight;  ///< 用户定义的Category的高度，正常不使用用户设定的高度，而是使用自动计算的高度
-	SARibbonMainWindowStyles mMainWindowStyle;  ///< 记录MainWindow的样式
+	SARibbonMainWindowStyles mMainWindowStyle;                   ///< 记录MainWindow的样式
+	FpContextCategoryHighlight mFpContextHighlight { nullptr };  ///< 上下文标签高亮
+	bool mEnableTabDoubleClickToMinimumMode { true };  ///< 是否允许tab双击激活ribbon的最小化模式
 public:
 	PrivateData(SARibbonBar* par) : q_ptr(par)
 	{
 		mContextCategoryColorList = SARibbonBar::defaultContextCategoryColorList();
+		mFpContextHighlight       = [](const QColor& c) -> QColor { return SA::makeColorVibrant(c); };
 	}
 	void init();
 	int systemTabBarHeight() const;
@@ -1173,6 +1176,24 @@ QAction* SARibbonBar::minimumModeAction() const
 }
 
 /**
+ * @brief 是否允许tab双击后进入ribbon的最小模式
+ * @return
+ */
+bool SARibbonBar::isEnableTabDoubleClickToMinimumMode() const
+{
+    return d_ptr->mEnableTabDoubleClickToMinimumMode;
+}
+
+/**
+ * @brief 设置是否允许tab双击后，ribbon进入最小化模式，此属性默认开启
+ * @param on
+ */
+void SARibbonBar::setTabDoubleClickToMinimumMode(bool on) const
+{
+    d_ptr->mEnableTabDoubleClickToMinimumMode = on;
+}
+
+/**
  * @brief 当前ribbon的状态（正常|最小化）
  * @return
  */
@@ -1381,7 +1402,9 @@ void SARibbonBar::onCurrentRibbonTabClicked(int index)
 void SARibbonBar::onCurrentRibbonTabDoubleClicked(int index)
 {
 	Q_UNUSED(index);
-	setMinimumMode(!isMinimumMode());
+	if (isEnableTabDoubleClickToMinimumMode()) {
+		setMinimumMode(!isMinimumMode());
+	}
 }
 
 void SARibbonBar::onContextsCategoryPageAdded(SARibbonCategory* category)
@@ -2006,6 +2029,15 @@ QColor SARibbonBar::contextCategoryTitleTextColor() const
 }
 
 /**
+ * @brief 设置一个函数指针，函数指针输入上下文标签设定的颜色，输出一个高亮颜色，高亮颜色用于绘制上下文标签的高亮部位，例如最顶部的横线
+ * @param fp
+ */
+void SARibbonBar::setContextCategoryColorHighLight(FpContextCategoryHighlight fp)
+{
+    d_ptr->mFpContextHighlight = fp;
+}
+
+/**
    @brief 设置ribbon的对齐方式
    @param al
  */
@@ -2395,15 +2427,17 @@ void SARibbonBar::paintContextCategoryTab(QPainter& painter, const QString& titl
 {
 	// 绘制上下文标签
 	// 首先有5像素的实体粗线位于顶部
-	QMargins border = contentsMargins();
 	painter.save();
 	painter.setPen(Qt::NoPen);
 	painter.setBrush(color);
 	painter.drawRect(contextRect);
 	const int contextLineWidth = 5;
 	// 绘制很线
-	QColor gColor = color.darker();
-	painter.fillRect(QRect(contextRect.x(), contextRect.y(), contextRect.width(), contextLineWidth), gColor);
+	QColor highlightColor = color;
+	if (d_ptr->mFpContextHighlight) {
+		highlightColor = d_ptr->mFpContextHighlight(color);
+	}
+	painter.fillRect(QRect(contextRect.x(), contextRect.y(), contextRect.width(), contextLineWidth), highlightColor);
 
 	// 只有在office模式下才需要绘制标题
 	if (isLooseStyle()) {
@@ -2786,3 +2820,19 @@ QDebug operator<<(QDebug debug, const SARibbonBar& ribbon)
 	return debug;
 }
 #endif
+
+namespace SA
+{
+QColor makeColorVibrant(const QColor& c, int saturationDelta, int valueDelta)
+{
+	int h, s, v, a;
+	c.getHsv(&h, &s, &v, &a);  // 分解HSV分量
+
+	// 增加饱和度（上限255）
+	s = qMin(s + saturationDelta, 255);
+	// 增加明度（上限255）
+	v = qMin(v + valueDelta, 255);
+
+	return QColor::fromHsv(h, s, v, a);  // 重新生成颜色
+}
+}
