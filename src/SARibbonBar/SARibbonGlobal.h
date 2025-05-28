@@ -71,10 +71,10 @@ enum class SARibbonTheme
  */
 enum class SARibbonMainWindowStyleFlag : int
 {
-    UseRibbonFrame   = 1,  ///< 代表使用ribbon边框，ribbon边框会更紧凑
-    UseNativeFrame   = 2,  ///< 代表使用操作系统的边框
-    UseRibbonMenuBar = 4,
-    UseNativeMenuBar = 8
+	UseRibbonFrame   = 1,  ///< 代表使用ribbon边框，ribbon边框会更紧凑
+	UseNativeFrame   = 2,  ///< 代表使用操作系统的边框
+	UseRibbonMenuBar = 4,
+	UseNativeMenuBar = 8
 };
 Q_DECLARE_FLAGS(SARibbonMainWindowStyles, SARibbonMainWindowStyleFlag)
 /**

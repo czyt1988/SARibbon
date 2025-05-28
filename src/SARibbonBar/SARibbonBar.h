@@ -132,9 +132,13 @@ public:
 		NormalRibbonMode    ///< 正常模式
 	};
 	Q_ENUM(RibbonMode)
-
+public:
 	using FpCategoryIterate = std::function< bool(SARibbonCategory*) >;
 	using FpPannelIterate   = SARibbonCategory::FpPannelIterate;
+	/**
+	 * @brief 这是针对上下文标签的高亮颜色绘制，用户可以设置一个函数指针，来针对上下文标签的高亮颜色进行调整
+	 */
+	using FpContextCategoryHighlight = std::function< QColor(const QColor&) >;
 
 public:
 	// 判断RibbonStyle是否为2行模式
@@ -243,6 +247,10 @@ public:
 
 	// 隐藏ribbon对应的action
 	QAction* minimumModeAction() const;
+
+	// tab双击后最小化ribbon
+	bool isEnableTabDoubleClickToMinimumMode() const;
+	void setTabDoubleClickToMinimumMode(bool on = true) const;
 
 	// 当前的模式
 	RibbonMode currentRibbonState() const;
@@ -364,6 +372,9 @@ public:
 	void setContextCategoryTitleTextColor(const QColor& clr);
 	QColor contextCategoryTitleTextColor() const;
 
+	// 设置上下文标签颜色的高亮方法
+	void setContextCategoryColorHighLight(FpContextCategoryHighlight fp);
+
 	// 设置ribbon的对齐方式
 	void setRibbonAlignment(SARibbonAlignment al);
 	SARibbonAlignment ribbonAlignment() const;
@@ -475,4 +486,15 @@ protected:
 };
 Q_DECLARE_OPERATORS_FOR_FLAGS(SARibbonBar::RibbonStyles)
 
+namespace SA
+{
+/**
+ * @brief makeColorVibrant 让颜色鲜艳
+ * @param c 原来的颜色
+ * @param saturationDelta 增加饱和度（上限255）
+ * @param valueDelta 增加明度（上限255）
+ * @return
+ */
+QColor SA_RIBBON_EXPORT makeColorVibrant(const QColor& c, int saturationDelta = 150, int valueDelta = 30);
+}
 #endif  // SARIBBONBAR_H

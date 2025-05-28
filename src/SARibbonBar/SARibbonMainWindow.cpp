@@ -29,12 +29,15 @@ class SARibbonMainWindow::PrivateData
 public:
 	PrivateData(SARibbonMainWindow* p);
 	void installFrameless(SARibbonMainWindow* p);
-    bool isUseRibbonBar() const;
-    bool isUseRibbonFrame() const;
-    void checkMainWindowFlag();
+	bool isUseRibbonBar() const;
+	bool isUseRibbonFrame() const;
+	void checkMainWindowFlag();
+	static void updateTabBarMargins(SARibbonTabBar* tab, SARibbonTheme theme);
+	static void updateContextColors(SARibbonBar* bar, SARibbonTheme theme);
+	static void updateTabBarBaseLineColor(SARibbonBar* bar, SARibbonTheme theme);
 
 public:
-    SARibbonMainWindowStyles mRibbonMainWindowStyle;
+	SARibbonMainWindowStyles mRibbonMainWindowStyle;
 	SARibbonTheme mCurrentRibbonTheme { SARibbonTheme::RibbonThemeOffice2021Blue };
 	SARibbonSystemButtonBar* mWindowButtonGroup { nullptr };
 #if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
@@ -61,7 +64,7 @@ void SARibbonMainWindow::PrivateData::installFrameless(SARibbonMainWindow* p)
 
 bool SARibbonMainWindow::PrivateData::isUseRibbonBar() const
 {
-    return mRibbonMainWindowStyle.testFlag(SARibbonMainWindowStyleFlag::UseRibbonMenuBar);
+	return mRibbonMainWindowStyle.testFlag(SARibbonMainWindowStyleFlag::UseRibbonMenuBar);
 }
 
 bool SARibbonMainWindow::PrivateData::isUseRibbonFrame() const
@@ -74,17 +77,71 @@ bool SARibbonMainWindow::PrivateData::isUseRibbonFrame() const
  */
 void SARibbonMainWindow::PrivateData::checkMainWindowFlag()
 {
-    // 如果都没有设置边框样式，默认设置为ribbon边框
-    if (!mRibbonMainWindowStyle.testFlag(SARibbonMainWindowStyleFlag::UseRibbonFrame)
-        && !mRibbonMainWindowStyle.testFlag(SARibbonMainWindowStyleFlag::UseNativeFrame)) {
-        mRibbonMainWindowStyle.setFlag(SARibbonMainWindowStyleFlag::UseRibbonFrame, true);
-    }
+	// 如果都没有设置边框样式，默认设置为ribbon边框
+	if (!mRibbonMainWindowStyle.testFlag(SARibbonMainWindowStyleFlag::UseRibbonFrame)
+		&& !mRibbonMainWindowStyle.testFlag(SARibbonMainWindowStyleFlag::UseNativeFrame)) {
+		mRibbonMainWindowStyle.setFlag(SARibbonMainWindowStyleFlag::UseRibbonFrame, true);
+	}
 
-    // 如果都没有设置MenuBar，默认设置为ribbonbar
-    if (!mRibbonMainWindowStyle.testFlag(SARibbonMainWindowStyleFlag::UseRibbonMenuBar)
-        && !mRibbonMainWindowStyle.testFlag(SARibbonMainWindowStyleFlag::UseNativeMenuBar)) {
-        mRibbonMainWindowStyle.setFlag(SARibbonMainWindowStyleFlag::UseRibbonMenuBar, true);
-    }
+	// 如果都没有设置MenuBar，默认设置为ribbonbar
+	if (!mRibbonMainWindowStyle.testFlag(SARibbonMainWindowStyleFlag::UseRibbonMenuBar)
+		&& !mRibbonMainWindowStyle.testFlag(SARibbonMainWindowStyleFlag::UseNativeMenuBar)) {
+		mRibbonMainWindowStyle.setFlag(SARibbonMainWindowStyleFlag::UseRibbonMenuBar, true);
+	}
+}
+
+void SARibbonMainWindow::PrivateData::updateTabBarMargins(SARibbonTabBar* tab, SARibbonTheme theme)
+{
+	static const std::map< SARibbonTheme, QMargins > themeMargins = {
+		{ SARibbonTheme::RibbonThemeWindows7, { 5, 0, 0, 0 } },
+		{ SARibbonTheme::RibbonThemeOffice2013, { 5, 0, 0, 0 } },
+		{ SARibbonTheme::RibbonThemeOffice2016Blue, { 5, 0, 0, 0 } },
+		{ SARibbonTheme::RibbonThemeDark, { 5, 0, 0, 0 } },
+		{ SARibbonTheme::RibbonThemeDark2, { 5, 0, 0, 0 } },
+		{ SARibbonTheme::RibbonThemeOffice2021Blue, { 5, 0, 5, 0 } }
+	};
+	auto it = themeMargins.find(theme);
+	if (it != themeMargins.end()) {
+		tab->setTabMargin(it->second);
+	}
+}
+
+void SARibbonMainWindow::PrivateData::updateContextColors(SARibbonBar* bar, SARibbonTheme theme)
+{
+	static const SARibbonBar::FpContextCategoryHighlight cs_darkerHighlight = [](const QColor& c) -> QColor {
+		return c.darker();
+	};
+	static const SARibbonBar::FpContextCategoryHighlight cs_vibrantHighlight = [](const QColor& c) -> QColor {
+		return SA::makeColorVibrant(c);
+	};
+
+	switch (theme) {
+	case SARibbonTheme::RibbonThemeWindows7:
+	case SARibbonTheme::RibbonThemeOffice2013:
+	case SARibbonTheme::RibbonThemeDark:
+		bar->setContextCategoryColorList({});  // 重置为默认色系
+		bar->setContextCategoryColorHighLight(cs_vibrantHighlight);
+		break;
+	case SARibbonTheme::RibbonThemeOffice2016Blue:
+		bar->setContextCategoryColorList({ QColor(18, 64, 120) });
+		bar->setContextCategoryColorHighLight(cs_darkerHighlight);
+		break;
+	case SARibbonTheme::RibbonThemeOffice2021Blue:
+		bar->setContextCategoryColorList({ QColor(209, 207, 209) });
+		bar->setContextCategoryColorHighLight([](const QColor& c) -> QColor { return QColor(39, 96, 167); });
+		break;
+	default:
+		break;
+	}
+}
+
+void SARibbonMainWindow::PrivateData::updateTabBarBaseLineColor(SARibbonBar* bar, SARibbonTheme theme)
+{
+	if (theme == SARibbonTheme::RibbonThemeOffice2013) {
+		bar->setTabBarBaseLineColor(QColor(186, 201, 219));
+	} else {
+		bar->setTabBarBaseLineColor(QColor());
+	}
 }
 
 //===================================================
@@ -93,16 +150,16 @@ void SARibbonMainWindow::PrivateData::checkMainWindowFlag()
 SARibbonMainWindow::SARibbonMainWindow(QWidget* parent, SARibbonMainWindowStyles style, const Qt::WindowFlags flags)
     : QMainWindow(parent, flags), d_ptr(new SARibbonMainWindow::PrivateData(this))
 {
-    d_ptr->mRibbonMainWindowStyle = style;
-    d_ptr->checkMainWindowFlag();
-    if (d_ptr->isUseRibbonBar()) {
-        if (d_ptr->isUseRibbonFrame()) {
-            d_ptr->installFrameless(this);
-        }
+	d_ptr->mRibbonMainWindowStyle = style;
+	d_ptr->checkMainWindowFlag();
+	if (d_ptr->isUseRibbonBar()) {
+		if (d_ptr->isUseRibbonFrame()) {
+			d_ptr->installFrameless(this);
+		}
 		setRibbonBar(createRibbonBar());
 		setRibbonTheme(ribbonTheme());
 	}
-    connect(qApp, &QApplication::primaryScreenChanged, this, &SARibbonMainWindow::onPrimaryScreenChanged);
+	connect(qApp, &QApplication::primaryScreenChanged, this, &SARibbonMainWindow::onPrimaryScreenChanged);
 }
 
 SARibbonMainWindow::~SARibbonMainWindow()
@@ -130,55 +187,55 @@ void SARibbonMainWindow::setRibbonBar(SARibbonBar* ribbon)
 		old->deleteLater();
 	}
 	QMainWindow::setMenuWidget(ribbon);
-    ribbon->setMainWindowStyles(d_ptr->mRibbonMainWindowStyle);
+	ribbon->setMainWindowStyles(d_ptr->mRibbonMainWindowStyle);
 	const int th = ribbon->titleBarHeight();
 
-    if (d_ptr->isUseRibbonFrame()) {
-        // 设置window按钮
-        if (nullptr == d_ptr->mWindowButtonGroup) {
-            d_ptr->mWindowButtonGroup = RibbonSubElementFactory->createWindowButtonGroup(this);
-            // SARibbonSystemButtonBar的eventfilter捕获mainwindow的事件
-            // 通过eventerfilter来处理mainwindow的事件，避免用户错误的继承resizeEvent导致systembar的位置异常
-            installEventFilter(d_ptr->mWindowButtonGroup);
-        }
-        SARibbonSystemButtonBar* sysBar = d_ptr->mWindowButtonGroup;
-        sysBar->setWindowStates(windowState());
-        sysBar->setWindowTitleHeight(th);
-        sysBar->raise();  // 确保sysbar在最顶层，避免第二次设置ribbonbar的时候，被ribbonbar覆盖了sysbar
-        sysBar->show();
+	if (d_ptr->isUseRibbonFrame()) {
+		// 设置window按钮
+		if (nullptr == d_ptr->mWindowButtonGroup) {
+			d_ptr->mWindowButtonGroup = RibbonSubElementFactory->createWindowButtonGroup(this);
+			// SARibbonSystemButtonBar的eventfilter捕获mainwindow的事件
+			// 通过eventerfilter来处理mainwindow的事件，避免用户错误的继承resizeEvent导致systembar的位置异常
+			installEventFilter(d_ptr->mWindowButtonGroup);
+		}
+		SARibbonSystemButtonBar* sysBar = d_ptr->mWindowButtonGroup;
+		sysBar->setWindowStates(windowState());
+		sysBar->setWindowTitleHeight(th);
+		sysBar->raise();  // 确保sysbar在最顶层，避免第二次设置ribbonbar的时候，被ribbonbar覆盖了sysbar
+		sysBar->show();
 #if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
-        auto helper = d_ptr->mFramelessHelper;
-        helper->setTitleBar(ribbon);
-        // 以下这些窗口，需要允许点击
-        helper->setHitTestVisible(sysBar);                         // IMPORTANT!
-        helper->setHitTestVisible(ribbon->ribbonTabBar());         // IMPORTANT!
-        helper->setHitTestVisible(ribbon->rightButtonGroup());     // IMPORTANT!
-        helper->setHitTestVisible(ribbon->applicationButton());    // IMPORTANT!
-        helper->setHitTestVisible(ribbon->quickAccessBar());       // IMPORTANT!
-        helper->setHitTestVisible(ribbon->ribbonStackedWidget());  // IMPORTANT!
+		auto helper = d_ptr->mFramelessHelper;
+		helper->setTitleBar(ribbon);
+		// 以下这些窗口，需要允许点击
+		helper->setHitTestVisible(sysBar);                         // IMPORTANT!
+		helper->setHitTestVisible(ribbon->ribbonTabBar());         // IMPORTANT!
+		helper->setHitTestVisible(ribbon->rightButtonGroup());     // IMPORTANT!
+		helper->setHitTestVisible(ribbon->applicationButton());    // IMPORTANT!
+		helper->setHitTestVisible(ribbon->quickAccessBar());       // IMPORTANT!
+		helper->setHitTestVisible(ribbon->ribbonStackedWidget());  // IMPORTANT!
 #if SARIBBON_ENABLE_SNAP_LAYOUT
-        if (sysBar->closeButton()) {
-            helper->setSystemButton(QWK::WindowAgentBase::Close, sysBar->closeButton());
-        }
-        if (sysBar->minimizeButton()) {
-            helper->setSystemButton(QWK::WindowAgentBase::Minimize, sysBar->minimizeButton());
-        }
-        if (sysBar->maximizeButton()) {
-            helper->setSystemButton(QWK::WindowAgentBase::Maximize, sysBar->maximizeButton());
-        }
+		if (sysBar->closeButton()) {
+			helper->setSystemButton(QWK::WindowAgentBase::Close, sysBar->closeButton());
+		}
+		if (sysBar->minimizeButton()) {
+			helper->setSystemButton(QWK::WindowAgentBase::Minimize, sysBar->minimizeButton());
+		}
+		if (sysBar->maximizeButton()) {
+			helper->setSystemButton(QWK::WindowAgentBase::Maximize, sysBar->maximizeButton());
+		}
 #endif
 #else
-        // 捕获ribbonbar的事件
-        ribbon->installEventFilter(this);
-        // 设置窗体的标题栏高度
-        d_ptr->mFramelessHelper->setTitleHeight(th);
-        d_ptr->mFramelessHelper->setRubberBandOnResize(false);
+		// 捕获ribbonbar的事件
+		ribbon->installEventFilter(this);
+		// 设置窗体的标题栏高度
+		d_ptr->mFramelessHelper->setTitleHeight(th);
+		d_ptr->mFramelessHelper->setRubberBandOnResize(false);
 #endif
-        // 最后要提升，否则新加入的会被覆盖
-        if (d_ptr->mWindowButtonGroup) {
-            d_ptr->mWindowButtonGroup->raise();
-        }
-    }
+		// 最后要提升，否则新加入的会被覆盖
+		if (d_ptr->mWindowButtonGroup) {
+			d_ptr->mWindowButtonGroup->raise();
+		}
+	}
 	if (!d_ptr->mEventFilter) {
 		d_ptr->mEventFilter = new SARibbonMainWindowEventFilter(this);
 		installEventFilter(d_ptr->mEventFilter);
@@ -195,7 +252,7 @@ void SARibbonMainWindow::setRibbonBar(SARibbonBar* ribbon)
 void SARibbonMainWindow::setFramelessHitTestVisible(QWidget* w, bool visible)
 {
 	auto helper = d_ptr->mFramelessHelper;
-    helper->setHitTestVisible(const_cast< QWidget* >(w), visible);
+	helper->setHitTestVisible(const_cast< QWidget* >(w), visible);
 }
 #else
 
@@ -221,9 +278,9 @@ bool SARibbonMainWindow::eventFilter(QObject* obj, QEvent* e)
 		case QEvent::MouseMove:
 		case QEvent::Leave:
 		case QEvent::HoverMove:
-        case QEvent::MouseButtonDblClick: {
+		case QEvent::MouseButtonDblClick: {
 			QApplication::sendEvent(this, e);
-        } break;
+		} break;
 		default:
 			break;
 		}
@@ -255,10 +312,10 @@ SARibbonMainWindowStyles SARibbonMainWindow::ribbonMainwindowStyle() const
  */
 void SARibbonMainWindow::updateWindowFlag(Qt::WindowFlags flags)
 {
-    if (d_ptr->isUseRibbonFrame()) {
-        if (SARibbonSystemButtonBar* g = d_ptr->mWindowButtonGroup) {
-            g->updateWindowFlag(flags);
-        }
+	if (d_ptr->isUseRibbonFrame()) {
+		if (SARibbonSystemButtonBar* g = d_ptr->mWindowButtonGroup) {
+			g->updateWindowFlag(flags);
+		}
 	}
 }
 
@@ -277,64 +334,14 @@ void SARibbonMainWindow::setRibbonTheme(SARibbonTheme theme)
 	sa_set_ribbon_theme(this, theme);
 	d_ptr->mCurrentRibbonTheme = theme;
 	if (SARibbonBar* bar = ribbonBar()) {
-		auto theme = ribbonTheme();
-		// 尺寸修正
-		switch (theme) {
-		case SARibbonTheme::RibbonThemeWindows7:
-		case SARibbonTheme::RibbonThemeOffice2013:
-		case SARibbonTheme::RibbonThemeOffice2016Blue:
-		case SARibbonTheme::RibbonThemeDark:
-		case SARibbonTheme::RibbonThemeDark2: {
-			//! 在设置qss后需要针对margin信息重新设置进SARibbonTabBar中
-			//! office2013.qss的margin信息如下设置
-			//! margin-top: 0px;
-			//! margin-right: 0px;
-			//! margin-left: 5px;
-			//! margin-bottom: 0px;
-			SARibbonTabBar* tab = bar->ribbonTabBar();
-			if (!tab) {
-				break;
-			}
-			tab->setTabMargin(QMargins(5, 0, 0, 0));
-		} break;
-		case SARibbonTheme::RibbonThemeOffice2021Blue: {
-			SARibbonTabBar* tab = bar->ribbonTabBar();
-			if (!tab) {
-				break;
-			}
-			//! 在设置qss后需要针对margin信息重新设置进SARibbonTabBar中
-			//! office2021.qss的margin信息如下设置
-			//! margin-top: 0px;
-			//! margin-right: 5px;
-			//! margin-left: 5px;
-			//! margin-bottom: 0px;
-			tab->setTabMargin(QMargins(5, 0, 5, 0));
+		// 1. tab bar的间距
+		if (SARibbonTabBar* tab = bar->ribbonTabBar()) {
+			SARibbonMainWindow::PrivateData::updateTabBarMargins(tab, theme);
 		}
-		default:
-			break;
-		}
-		// 上下文标签颜色设置,以及基线颜色设置
-		switch (theme) {
-		case SARibbonTheme::RibbonThemeWindows7:
-		case SARibbonTheme::RibbonThemeOffice2013:
-		case SARibbonTheme::RibbonThemeDark:
-			bar->setContextCategoryColorList(QList< QColor >());  //< 设置空颜色列表会重置为默认色系
-			break;
-		case SARibbonTheme::RibbonThemeOffice2016Blue:
-			bar->setContextCategoryColorList(QList< QColor >() << QColor(18, 64, 120));  //< 设置空颜色列表会重置为默认色系
-			break;
-		case SARibbonTheme::RibbonThemeOffice2021Blue:
-			bar->setContextCategoryColorList(QList< QColor >() << QColor(209, 207, 209));  //< 设置空颜色列表会重置为默认色系
-			break;
-		default:
-			break;
-		}
-		// 基线颜色设置
-		if (SARibbonTheme::RibbonThemeOffice2013 == theme) {
-			bar->setTabBarBaseLineColor(QColor(186, 201, 219));
-		} else {
-			bar->setTabBarBaseLineColor(QColor());
-		}
+		// 2. 上下文颜色设置
+		SARibbonMainWindow::PrivateData::updateContextColors(bar, theme);
+		// 3. tabbar的基线颜色
+		SARibbonMainWindow::PrivateData::updateTabBarBaseLineColor(bar, theme);
 	}
 }
 
@@ -388,10 +395,10 @@ SARibbonMainWindowEventFilter::~SARibbonMainWindowEventFilter()
 
 bool SARibbonMainWindowEventFilter::eventFilter(QObject* obj, QEvent* e)
 {
-    if (e && obj) {
+	if (e && obj) {
 		if (e->type() == QEvent::Resize) {
 			if (SARibbonMainWindow* m = qobject_cast< SARibbonMainWindow* >(obj)) {
-                if (SARibbonBar* ribbon = m->ribbonBar()) {
+				if (SARibbonBar* ribbon = m->ribbonBar()) {
 					ribbon->setFixedWidth(m->size().width());
 				}
 			}
