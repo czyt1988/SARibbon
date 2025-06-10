@@ -12378,7 +12378,7 @@ public:
 	QBrush mTitleBackgroundBrush { Qt::NoBrush };           ///< 标题的背景颜色
 	SARibbonAlignment mRibbonAlignment { SARibbonAlignment::AlignLeft };                         ///< 对齐方式
 	SARibbonPannel::PannelLayoutMode mDefaulePannelLayoutMode { SARibbonPannel::ThreeRowMode };  ///< 默认的PannelLayoutMode
-	bool mEnableShowPannelTitle { true };    ///< 是否运行pannel的标题栏显示
+	bool mEnableShowPannelTitle { true };    ///< 是否允许pannel的标题栏显示
 	bool mIsTabOnTitle { false };            ///< 是否tab在标题栏上
 	int mTitleBarHeight { 30 };              ///< 标题栏高度
 	int mTabBarHeight { 28 };                ///< tabbar高度
@@ -12390,11 +12390,14 @@ public:
 	std::unique_ptr< int > mUserDefTitleBarHeight;  ///< 用户定义的标题栏高度，正常不使用用户设定的高度，而是使用自动计算的高度
 	std::unique_ptr< int > mUserDefTabBarHeight;  ///< 用户定义的tabbar高度，正常不使用用户设定的高度，而是使用自动计算的高度
 	std::unique_ptr< int > mUserDefCategoryHeight;  ///< 用户定义的Category的高度，正常不使用用户设定的高度，而是使用自动计算的高度
-	SARibbonMainWindowStyles mMainWindowStyle;  ///< 记录MainWindow的样式
+	SARibbonMainWindowStyles mMainWindowStyle;                   ///< 记录MainWindow的样式
+	FpContextCategoryHighlight mFpContextHighlight { nullptr };  ///< 上下文标签高亮
+	bool mEnableTabDoubleClickToMinimumMode { true };  ///< 是否允许tab双击激活ribbon的最小化模式
 public:
 	PrivateData(SARibbonBar* par) : q_ptr(par)
 	{
 		mContextCategoryColorList = SARibbonBar::defaultContextCategoryColorList();
+		mFpContextHighlight       = [](const QColor& c) -> QColor { return SA::makeColorVibrant(c); };
 	}
 	void init();
 	int systemTabBarHeight() const;
@@ -13468,6 +13471,24 @@ QAction* SARibbonBar::minimumModeAction() const
 }
 
 /**
+ * @brief 是否允许tab双击后进入ribbon的最小模式
+ * @return
+ */
+bool SARibbonBar::isEnableTabDoubleClickToMinimumMode() const
+{
+	return d_ptr->mEnableTabDoubleClickToMinimumMode;
+}
+
+/**
+ * @brief 设置是否允许tab双击后，ribbon进入最小化模式，此属性默认开启
+ * @param on
+ */
+void SARibbonBar::setTabDoubleClickToMinimumMode(bool on) const
+{
+	d_ptr->mEnableTabDoubleClickToMinimumMode = on;
+}
+
+/**
  * @brief 当前ribbon的状态（正常|最小化）
  * @return
  */
@@ -13676,7 +13697,9 @@ void SARibbonBar::onCurrentRibbonTabClicked(int index)
 void SARibbonBar::onCurrentRibbonTabDoubleClicked(int index)
 {
 	Q_UNUSED(index);
-	setMinimumMode(!isMinimumMode());
+	if (isEnableTabDoubleClickToMinimumMode()) {
+		setMinimumMode(!isMinimumMode());
+	}
 }
 
 void SARibbonBar::onContextsCategoryPageAdded(SARibbonCategory* category)
@@ -14301,6 +14324,15 @@ QColor SARibbonBar::contextCategoryTitleTextColor() const
 }
 
 /**
+ * @brief 设置一个函数指针，函数指针输入上下文标签设定的颜色，输出一个高亮颜色，高亮颜色用于绘制上下文标签的高亮部位，例如最顶部的横线
+ * @param fp
+ */
+void SARibbonBar::setContextCategoryColorHighLight(FpContextCategoryHighlight fp)
+{
+	d_ptr->mFpContextHighlight = fp;
+}
+
+/**
    @brief 设置ribbon的对齐方式
    @param al
  */
@@ -14690,15 +14722,17 @@ void SARibbonBar::paintContextCategoryTab(QPainter& painter, const QString& titl
 {
 	// 绘制上下文标签
 	// 首先有5像素的实体粗线位于顶部
-	QMargins border = contentsMargins();
 	painter.save();
 	painter.setPen(Qt::NoPen);
 	painter.setBrush(color);
 	painter.drawRect(contextRect);
 	const int contextLineWidth = 5;
 	// 绘制很线
-	QColor gColor = color.darker();
-	painter.fillRect(QRect(contextRect.x(), contextRect.y(), contextRect.width(), contextLineWidth), gColor);
+	QColor highlightColor = color;
+	if (d_ptr->mFpContextHighlight) {
+		highlightColor = d_ptr->mFpContextHighlight(color);
+	}
+	painter.fillRect(QRect(contextRect.x(), contextRect.y(), contextRect.width(), contextLineWidth), highlightColor);
 
 	// 只有在office模式下才需要绘制标题
 	if (isLooseStyle()) {
@@ -15081,6 +15115,22 @@ QDebug operator<<(QDebug debug, const SARibbonBar& ribbon)
 	return debug;
 }
 #endif
+
+namespace SA
+{
+QColor makeColorVibrant(const QColor& c, int saturationDelta, int valueDelta)
+{
+	int h, s, v, a;
+	c.getHsv(&h, &s, &v, &a);  // 分解HSV分量
+
+	// 增加饱和度（上限255）
+	s = qMin(s + saturationDelta, 255);
+	// 增加明度（上限255）
+	v = qMin(v + valueDelta, 255);
+
+	return QColor::fromHsv(h, s, v, a);  // 重新生成颜色
+}
+}
 
 /*** End of inlined file: SARibbonBar.cpp ***/
 
@@ -17625,6 +17675,9 @@ public:
 	bool isUseRibbonBar() const;
 	bool isUseRibbonFrame() const;
 	void checkMainWindowFlag();
+	static void updateTabBarMargins(SARibbonTabBar* tab, SARibbonTheme theme);
+	static void updateContextColors(SARibbonBar* bar, SARibbonTheme theme);
+	static void updateTabBarBaseLineColor(SARibbonBar* bar, SARibbonTheme theme);
 
 public:
 	SARibbonMainWindowStyles mRibbonMainWindowStyle;
@@ -17677,6 +17730,60 @@ void SARibbonMainWindow::PrivateData::checkMainWindowFlag()
 	if (!mRibbonMainWindowStyle.testFlag(SARibbonMainWindowStyleFlag::UseRibbonMenuBar)
         && !mRibbonMainWindowStyle.testFlag(SARibbonMainWindowStyleFlag::UseNativeMenuBar)) {
 		mRibbonMainWindowStyle.setFlag(SARibbonMainWindowStyleFlag::UseRibbonMenuBar, true);
+	}
+}
+
+void SARibbonMainWindow::PrivateData::updateTabBarMargins(SARibbonTabBar* tab, SARibbonTheme theme)
+{
+	static const std::map< SARibbonTheme, QMargins > themeMargins = {
+		{ SARibbonTheme::RibbonThemeWindows7, { 5, 0, 0, 0 } },
+		{ SARibbonTheme::RibbonThemeOffice2013, { 5, 0, 0, 0 } },
+		{ SARibbonTheme::RibbonThemeOffice2016Blue, { 5, 0, 0, 0 } },
+		{ SARibbonTheme::RibbonThemeDark, { 5, 0, 0, 0 } },
+		{ SARibbonTheme::RibbonThemeDark2, { 5, 0, 0, 0 } },
+		{ SARibbonTheme::RibbonThemeOffice2021Blue, { 5, 0, 5, 0 } }
+	};
+	auto it = themeMargins.find(theme);
+	if (it != themeMargins.end()) {
+		tab->setTabMargin(it->second);
+	}
+}
+
+void SARibbonMainWindow::PrivateData::updateContextColors(SARibbonBar* bar, SARibbonTheme theme)
+{
+	static const SARibbonBar::FpContextCategoryHighlight cs_darkerHighlight = [](const QColor& c) -> QColor {
+		return c.darker();
+	};
+	static const SARibbonBar::FpContextCategoryHighlight cs_vibrantHighlight = [](const QColor& c) -> QColor {
+		return SA::makeColorVibrant(c);
+	};
+
+	switch (theme) {
+	case SARibbonTheme::RibbonThemeWindows7:
+	case SARibbonTheme::RibbonThemeOffice2013:
+	case SARibbonTheme::RibbonThemeDark:
+		bar->setContextCategoryColorList({});  // 重置为默认色系
+		bar->setContextCategoryColorHighLight(cs_vibrantHighlight);
+		break;
+	case SARibbonTheme::RibbonThemeOffice2016Blue:
+		bar->setContextCategoryColorList({ QColor(18, 64, 120) });
+		bar->setContextCategoryColorHighLight(cs_darkerHighlight);
+		break;
+	case SARibbonTheme::RibbonThemeOffice2021Blue:
+		bar->setContextCategoryColorList({ QColor(209, 207, 209) });
+		bar->setContextCategoryColorHighLight([](const QColor& c) -> QColor { return QColor(39, 96, 167); });
+		break;
+	default:
+		break;
+	}
+}
+
+void SARibbonMainWindow::PrivateData::updateTabBarBaseLineColor(SARibbonBar* bar, SARibbonTheme theme)
+{
+	if (theme == SARibbonTheme::RibbonThemeOffice2013) {
+		bar->setTabBarBaseLineColor(QColor(186, 201, 219));
+	} else {
+		bar->setTabBarBaseLineColor(QColor());
 	}
 }
 
@@ -17870,64 +17977,14 @@ void SARibbonMainWindow::setRibbonTheme(SARibbonTheme theme)
 	sa_set_ribbon_theme(this, theme);
 	d_ptr->mCurrentRibbonTheme = theme;
 	if (SARibbonBar* bar = ribbonBar()) {
-		auto theme = ribbonTheme();
-		// 尺寸修正
-		switch (theme) {
-		case SARibbonTheme::RibbonThemeWindows7:
-		case SARibbonTheme::RibbonThemeOffice2013:
-		case SARibbonTheme::RibbonThemeOffice2016Blue:
-		case SARibbonTheme::RibbonThemeDark:
-		case SARibbonTheme::RibbonThemeDark2: {
-			//! 在设置qss后需要针对margin信息重新设置进SARibbonTabBar中
-			//! office2013.qss的margin信息如下设置
-			//! margin-top: 0px;
-			//! margin-right: 0px;
-			//! margin-left: 5px;
-			//! margin-bottom: 0px;
-			SARibbonTabBar* tab = bar->ribbonTabBar();
-			if (!tab) {
-				break;
-			}
-			tab->setTabMargin(QMargins(5, 0, 0, 0));
-		} break;
-		case SARibbonTheme::RibbonThemeOffice2021Blue: {
-			SARibbonTabBar* tab = bar->ribbonTabBar();
-			if (!tab) {
-				break;
-			}
-			//! 在设置qss后需要针对margin信息重新设置进SARibbonTabBar中
-			//! office2021.qss的margin信息如下设置
-			//! margin-top: 0px;
-			//! margin-right: 5px;
-			//! margin-left: 5px;
-			//! margin-bottom: 0px;
-			tab->setTabMargin(QMargins(5, 0, 5, 0));
+		// 1. tab bar的间距
+		if (SARibbonTabBar* tab = bar->ribbonTabBar()) {
+			SARibbonMainWindow::PrivateData::updateTabBarMargins(tab, theme);
 		}
-		default:
-			break;
-		}
-		// 上下文标签颜色设置,以及基线颜色设置
-		switch (theme) {
-		case SARibbonTheme::RibbonThemeWindows7:
-		case SARibbonTheme::RibbonThemeOffice2013:
-		case SARibbonTheme::RibbonThemeDark:
-			bar->setContextCategoryColorList(QList< QColor >());  //< 设置空颜色列表会重置为默认色系
-			break;
-		case SARibbonTheme::RibbonThemeOffice2016Blue:
-			bar->setContextCategoryColorList(QList< QColor >() << QColor(18, 64, 120));  //< 设置空颜色列表会重置为默认色系
-			break;
-		case SARibbonTheme::RibbonThemeOffice2021Blue:
-			bar->setContextCategoryColorList(QList< QColor >() << QColor(209, 207, 209));  //< 设置空颜色列表会重置为默认色系
-			break;
-		default:
-			break;
-		}
-		// 基线颜色设置
-		if (SARibbonTheme::RibbonThemeOffice2013 == theme) {
-			bar->setTabBarBaseLineColor(QColor(186, 201, 219));
-		} else {
-			bar->setTabBarBaseLineColor(QColor());
-		}
+		// 2. 上下文颜色设置
+		SARibbonMainWindow::PrivateData::updateContextColors(bar, theme);
+		// 3. tabbar的基线颜色
+		SARibbonMainWindow::PrivateData::updateTabBarBaseLineColor(bar, theme);
 	}
 }
 
