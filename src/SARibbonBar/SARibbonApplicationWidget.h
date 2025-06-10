@@ -19,7 +19,6 @@ protected:
     virtual void resizeToParent(const QSize& parentSize);
 
 protected:
-    void resizeToParent();
     bool eventFilter(QObject* obj, QEvent* ev) override;
     void showEvent(QShowEvent* event) override;
     void keyPressEvent(QKeyEvent* ev) override;
