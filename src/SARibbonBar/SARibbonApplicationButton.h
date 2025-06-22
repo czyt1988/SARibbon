@@ -6,7 +6,7 @@
 /**
  * @brief The SARibbonApplicationButton class
  *
- * 默认的plicationButton,可以通过样式指定不一样的ApplicationButton
+ * 默认的ApplicationButton,可以通过样式指定不一样的ApplicationButton
  */
 class SA_RIBBON_EXPORT SARibbonApplicationButton : public QToolButton
 {
