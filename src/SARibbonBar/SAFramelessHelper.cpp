@@ -5,6 +5,7 @@
 #include <QHoverEvent>
 #include <QApplication>
 #include <QDebug>
+#include <QScreen>
 #include "SARibbonMainWindow.h"
 class SAPrivateFramelessWidgetData;
 
@@ -89,13 +90,16 @@ void SAPrivateFramelessCursorPosCalculator::recalculate(const QPoint& gMousePos,
     int frameWidth  = frameRect.width();
     int frameHeight = frameRect.height();
 
-    mIsOnLeftEdge = (globalMouseX >= frameX && globalMouseX <= frameX + s_borderWidth);
+    // 使用设备独立像素计算边界
+    // mIsOnLeftEdge = (globalMouseX >= frameX && globalMouseX <= frameX + s_borderWidth);
+    // mIsOnRightEdge = (globalMouseX >= frameX + frameWidth - s_borderWidth && globalMouseX <= frameX + frameWidth);
+    const int border = qRound(qApp->devicePixelRatio() * s_borderWidth);
+    mIsOnLeftEdge    = (globalMouseX >= frameX && globalMouseX <= frameX + border);
+    mIsOnRightEdge   = (globalMouseX >= frameX + frameWidth - border && globalMouseX <= frameX + frameWidth);
 
-    mIsOnRightEdge = (globalMouseX >= frameX + frameWidth - s_borderWidth && globalMouseX <= frameX + frameWidth);
+    mIsOnTopEdge = (globalMouseY >= frameY && globalMouseY <= frameY + border);
 
-    mIsOnTopEdge = (globalMouseY >= frameY && globalMouseY <= frameY + s_borderWidth);
-
-    mIsOnBottomEdge = (globalMouseY >= frameY + frameHeight - s_borderWidth && globalMouseY <= frameY + frameHeight);
+    mIsOnBottomEdge = (globalMouseY >= frameY + frameHeight - border && globalMouseY <= frameY + frameHeight);
 
     mIsOnTopLeftEdge     = mIsOnTopEdge && mIsOnLeftEdge;
     mIsOnBottomLeftEdge  = mIsOnBottomEdge && mIsOnLeftEdge;
@@ -122,7 +126,6 @@ public:
     // 更新橡皮筋状态
     void updateRubberBandStatus();
 
-private:
     // 更新鼠标样式
     void updateCursorShape(const QPoint& gMousePos);
 
@@ -149,6 +152,27 @@ private:
 
     // 处理鼠标双击事件
     bool handleDoubleClickedMouseEvent(QMouseEvent* event);
+
+    QScreen* currentScreen() const
+    {
+        return m_pWidget->screen();
+    }
+
+    QRect screenAvailableGeometry() const
+    {
+        if (QScreen* screen = currentScreen()) {
+            return screen->availableGeometry();
+        }
+        return QApplication::primaryScreen()->availableGeometry();
+    }
+
+    QRect screenGeometry() const
+    {
+        if (QScreen* screen = currentScreen()) {
+            return screen->geometry();
+        }
+        return QApplication::primaryScreen()->geometry();
+    }
 
 private:
     SAFramelessHelper::PrivateData* d;
@@ -325,6 +349,21 @@ void SAPrivateFramelessWidgetData::resizeWidget(const QPoint& gMousePos)
             }
         }
 
+        // 添加屏幕边界约束
+        QRect screenGeom = screenAvailableGeometry();
+        if (newRect.left() < screenGeom.left()) {
+            newRect.setLeft(screenGeom.left());
+        }
+        if (newRect.top() < screenGeom.top()) {
+            newRect.setTop(screenGeom.top());
+        }
+        if (newRect.right() > screenGeom.right()) {
+            newRect.setRight(screenGeom.right());
+        }
+        if (newRect.bottom() > screenGeom.bottom()) {
+            newRect.setBottom(screenGeom.bottom());
+        }
+
         if (d->m_bRubberBandOnResize) {
             m_pRubberBand->setGeometry(newRect);
         } else {
@@ -401,22 +440,64 @@ bool SAPrivateFramelessWidgetData::handleMouseMoveEvent(QMouseEvent* event)
                 // 窗口在最大化状态时，点击边界不做任何处理
                 return (false);
             }
+            // 限制在屏幕边界内调整
+            QRect screenGeom = screenGeometry();
+            p.setX(qBound(screenGeom.left() + 1, p.x(), screenGeom.right() - 1));
+            p.setY(qBound(screenGeom.top() + 1, p.y(), screenGeom.bottom() - 1));
+
             resizeWidget(p);
             return (true);
         } else if (d->m_bWidgetMovable && m_bLeftButtonTitlePressed) {
             if (m_pWidget->isMaximized()) {
-                // 先求出窗口到鼠标的相对位置
+                // 动态计算恢复位置
                 QRect normalGeometry = m_pWidget->normalGeometry();
+                if (normalGeometry.isEmpty()) {
+                    normalGeometry = screenAvailableGeometry().adjusted(100, 100, -100, -100);
+                }
+
+                // 计算鼠标在标题栏的相对位置
+                double relativeX = static_cast< double >(event->pos().x()) / m_pWidget->width();
+                int newX         = p.x() - relativeX * normalGeometry.width();
+
+                // 确保窗口不会移出屏幕
+                QRect screenGeom = screenAvailableGeometry();
+                newX             = qBound(screenGeom.left(), newX, screenGeom.right() - normalGeometry.width());
+
+                int newY = p.y() - event->pos().y() / 2;  // 保留部分标题栏可见
+
                 m_pWidget->showNormal();
-                p.ry() -= 10;
-                p.rx() -= (normalGeometry.width() / 2);
-                m_pWidget->move(p);
-                // 这时要重置m_ptDragPos
-                m_ptDragPos = QPoint(normalGeometry.width() / 2, 10);
-                return (true);
+                m_pWidget->move(newX, newY);
+
+                // 更新拖动位置
+                m_ptDragPos = QPoint(normalGeometry.width() * relativeX, event->pos().y());
+                return true;
             }
-            moveWidget(p);
-            return (true);
+            // 多屏幕边界检查
+            QRect screenGeom = screenGeometry();
+            QPoint newPos    = p - m_ptDragPos;
+            QRect widgetGeom = m_pWidget->frameGeometry();
+            widgetGeom.moveTopLeft(newPos);
+
+            // 确保窗口不会移出当前屏幕
+            if (widgetGeom.left() < screenGeom.left()) {
+                newPos.setX(screenGeom.left());
+            }
+            if (widgetGeom.top() < screenGeom.top()) {
+                newPos.setY(screenGeom.top());
+            }
+            if (widgetGeom.right() > screenGeom.right()) {
+                newPos.setX(screenGeom.right() - widgetGeom.width());
+            }
+            if (widgetGeom.bottom() > screenGeom.bottom()) {
+                newPos.setY(screenGeom.bottom() - widgetGeom.height());
+            }
+
+            if (d->m_bRubberBandOnMove) {
+                m_pRubberBand->move(newPos);
+            } else {
+                m_pWidget->move(newPos);
+            }
+            return true;
         }
         return (false);
     } else if (d->m_bWidgetResizable) {
@@ -453,8 +534,12 @@ bool SAPrivateFramelessWidgetData::handleDoubleClickedMouseEvent(QMouseEvent* ev
                     // 在最大化按钮显示时才进行shownormal处理
                     bool titlePressed = event->pos().y() < m_moveMousePos.s_titleHeight;
                     if (titlePressed) {
+                        // 多屏幕支持：获取当前屏幕的可用区域
+                        QRect screenGeom = screenAvailableGeometry();
                         if (m_pWidget->isMaximized()) {
                             m_pWidget->showNormal();
+                            // 居中显示
+                            m_pWidget->move(screenGeom.center() - m_pWidget->rect().center());
                         } else {
                             m_pWidget->showMaximized();
                         }
@@ -512,9 +597,13 @@ bool SAFramelessHelper::eventFilter(QObject* obj, QEvent* event)
         if (data) {
             return (data->handleWidgetEvent(event));
         }
+    } break;
+    case QEvent::ScreenChangeInternal:
+        // 处理屏幕切换事件：
+        if (SAPrivateFramelessWidgetData* data = d_ptr->m_widgetDataHash.value(static_cast< QWidget* >(obj))) {
+            data->updateCursorShape(QCursor::pos());
+        }
         break;
-    }
-
     default:
         break;
     }
@@ -574,14 +663,14 @@ void SAFramelessHelper::setRubberBandOnResize(bool resizable)
 void SAFramelessHelper::setBorderWidth(int width)
 {
     if (width > 0) {
-        SAPrivateFramelessCursorPosCalculator::s_borderWidth = width;
+        SAPrivateFramelessCursorPosCalculator::s_borderWidth = qRound(width * qApp->devicePixelRatio());
     }
 }
 
 void SAFramelessHelper::setTitleHeight(int height)
 {
     if (height > 0) {
-        SAPrivateFramelessCursorPosCalculator::s_titleHeight = height;
+        SAPrivateFramelessCursorPosCalculator::s_titleHeight = qRound(height * qApp->devicePixelRatio());
     }
 }
 
