@@ -220,6 +220,8 @@ SARibbonBar的层次如下图所示：
 
 > 注：不同的布局方案影响着`Category`和`Quick Access Bar`的摆放方式，具体可见[SARibbonBar布局方案](#SARibbonBar布局方案)
 
+**你可以通过`example/MainWindowExample`例子来学习SARibbon的使用，你也可以点击这个例子的窗口，体验SARibbon的一些功能**
+
 ### 在MainWindow中使用Ribbon
 
 要MainWindow中使用SARibbon，需要把`QMainWindow`替换为`SARibbonMainWindow`，`SARibbonMainWindow`修改了`QMainWindow`对menubar的渲染方式
@@ -327,6 +329,8 @@ pannel1->addLargeAction(actSave);
 Ribbon的图标有大有小，通过`addLargeAction`、`addMediumAction`、`addSmallAction`可以组合出不同的布局样式
 
 具体可见[./example/MainWindowExample/mainwindow.cpp](./example/MainWindowExample/mainwindow.cpp)
+
+
 
 ### ContextCategory 上下文标签
 
@@ -724,6 +728,10 @@ SARibbonBar_amalgamate
 ## 6、图标没有显示
 
 如果你遇到图标不显示，例如最大最小化按钮没有图标但有按钮，那么说明你的运行环境没有找到Qt的svg插件，你的程序目录下应该要有`imageformats/qsvg.dll`插件，你可以运行windeployqt拉取你程序的依赖，或者确保你的环境变量PATH配置中能找到`plugins/imageformats`文件夹
+
+## 7、提示Could not create pixmap from :\SARibbon\image\resource\xxx.svg
+
+此问题同问题6，你的程序目录下应该要有`imageformats/qsvg.dll`插件
 
 # 给我一个鼓励
 
