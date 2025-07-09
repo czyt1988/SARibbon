@@ -321,7 +321,7 @@ public:
 	void setTabBarBaseLineColor(const QColor& clr);
 	QColor tabBarBaseLineColor() const;
 
-	// 设置标题颜色,如果不设置标题颜色，默认是SARibbonBar的qss的color属性
+	// 设置标题颜色
 	void setWindowTitleTextColor(const QColor& clr);
 	QColor windowTitleTextColor() const;
 
