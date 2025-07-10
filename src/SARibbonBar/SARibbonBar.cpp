@@ -113,8 +113,7 @@ public:
 	// 根据字体信息计算category的高度
 	int calcCategoryHeight();
 	// 计算tabbar高度
-	static int
-	calcMainBarHeight(int tabHegith, int titleHeight, int categoryHeight, bool tabOnTitle, SARibbonBar::RibbonMode rMode);
+    static int calcMainBarHeight(int tabHegith, int titleHeight, int categoryHeight, bool tabOnTitle, SARibbonBar::RibbonMode rMode);
 	// 获取当前最小模式下的高度
 	int getCurrentMinimumModeMainBarHeight() const;
 	// 获取当前正常模式下的高度
@@ -278,8 +277,7 @@ int SARibbonBar::PrivateData::calcMainBarHeight(int tabHegith,
 
 int SARibbonBar::PrivateData::getCurrentMinimumModeMainBarHeight() const
 {
-	return calcMainBarHeight(
-		tabBarHeigth(), titleBarHeight(), categoryHeight(), mIsTabOnTitle, SARibbonBar::MinimumRibbonMode);
+    return calcMainBarHeight(tabBarHeigth(), titleBarHeight(), categoryHeight(), mIsTabOnTitle, SARibbonBar::MinimumRibbonMode);
 }
 
 int SARibbonBar::PrivateData::getCurrentNormalModeMainBarHeight() const
@@ -374,6 +372,9 @@ bool SARibbonBar::PrivateData::isContainContextCategoryInList(SARibbonContextCat
 	return (false);
 }
 
+/**
+ * @brief 设置最小模式
+ */
 void SARibbonBar::PrivateData::setMinimumMode()
 {
 	mCurrentRibbonMode = SARibbonBar::MinimumRibbonMode;
@@ -385,6 +386,9 @@ void SARibbonBar::PrivateData::setMinimumMode()
 	resetSize();
 }
 
+/**
+ * @brief 设置正常模式
+ */
 void SARibbonBar::PrivateData::setNormalMode()
 {
 	mCurrentRibbonMode = SARibbonBar::NormalRibbonMode;
@@ -394,6 +398,10 @@ void SARibbonBar::PrivateData::setNormalMode()
 	resetSize();
 }
 
+/**
+ * @brief 获取ContextCategory的color
+ * @return
+ */
 QColor SARibbonBar::PrivateData::getContextCategoryColor()
 {
 	if (mContextCategoryColorList.isEmpty()) {
@@ -407,6 +415,9 @@ QColor SARibbonBar::PrivateData::getContextCategoryColor()
 	return (mContextCategoryColorList.at(mContextCategoryColorListIndex));
 }
 
+/**
+ * @brief 更新tab数据
+ */
 void SARibbonBar::PrivateData::updateTabData()
 {
 	int tabcount = mRibbonTabBar->count();
@@ -439,6 +450,9 @@ void SARibbonBar::PrivateData::updateTabData()
 	}
 }
 
+/**
+ * @brief 获取当前tabbar的样式
+ */
 bool SARibbonBar::PrivateData::isUseRibbonFrame() const
 {
 	return mMainWindowStyle.testFlag(SARibbonMainWindowStyleFlag::UseRibbonFrame);
@@ -1137,12 +1151,14 @@ void SARibbonBar::showMinimumModeButton(bool isShow)
 		activeRightButtonGroup();
 
 		d_ptr->mMinimumCategoryButtonAction = new QAction(this);
-		d_ptr->mMinimumCategoryButtonAction->setIcon(style()->standardIcon(
-			isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton, nullptr));
+        d_ptr->mMinimumCategoryButtonAction->setIcon(
+            style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton,
+                                  nullptr));
 		connect(d_ptr->mMinimumCategoryButtonAction, &QAction::triggered, this, [ this ]() {
 			this->setMinimumMode(!isMinimumMode());
-			this->d_ptr->mMinimumCategoryButtonAction->setIcon(style()->standardIcon(
-				isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton, nullptr));
+            this->d_ptr->mMinimumCategoryButtonAction->setIcon(
+                style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton,
+                                      nullptr));
 		});
 		d_ptr->mRightButtonGroup->addAction(d_ptr->mMinimumCategoryButtonAction);
 
@@ -2276,12 +2292,12 @@ void SARibbonBar::updateTitleRect()
 			int rightwidth = x2 - contextRegionRight;  // 计算出上下文标签右边标题栏的宽度
 			if (rightwidth > leftwidth) {
 				// 说明右边的区域大一点，标题显示在右，显示在右边需要减去windowbutton宽度
-				d_ptr->mTitleRect =
-					QRect(QPoint(contextRegionRight, border.top()), QPoint(x2, validTitleBarHeight + border.top()));
+                d_ptr->mTitleRect = QRect(QPoint(contextRegionRight, border.top()),
+                                          QPoint(x2, validTitleBarHeight + border.top()));
 			} else {
 				// 说明左边的大一点
-				d_ptr->mTitleRect =
-					QRect(QPoint(x1, border.top()), QPoint(contextRegionLeft, validTitleBarHeight + border.top()));
+                d_ptr->mTitleRect = QRect(QPoint(x1, border.top()),
+                                          QPoint(contextRegionLeft, validTitleBarHeight + border.top()));
 			}
 		}
 	}
@@ -2326,9 +2342,9 @@ void SARibbonBar::paintInLooseStyle()
 		if (!contextData.tabPageIndex.isEmpty()) {
 			// 绘制
 			paintContextCategoryTab(p,
-									contextData.contextCategory->contextTitle(),
-									contextTitleRect,
-									contextData.contextCategory->contextColor());
+                                    contextData.contextCategory->contextTitle(),
+                                    contextTitleRect,
+                                    contextData.contextCategory->contextColor());
 		}
 	}
 
@@ -2356,9 +2372,9 @@ void SARibbonBar::paintInCompactStyle()
 		if (!contextData.tabPageIndex.isEmpty()) {
 			// 绘制
 			paintContextCategoryTab(p,
-									contextData.contextCategory->contextTitle(),
-									contextTitleRect,
-									contextData.contextCategory->contextColor());
+                                    contextData.contextCategory->contextTitle(),
+                                    contextTitleRect,
+                                    contextData.contextCategory->contextColor());
 		}
 	}
 
@@ -2567,7 +2583,7 @@ void SARibbonBar::resizeInLooseStyle()
 	// 第二行，开始布局applicationButton，tabbar，tabBarRightSizeButtonGroupWidget，TopRightCorner
 	x = border.left();
 	y += validTitleBarHeight;  // 此时，y值在titlebar下面
-							   // applicationButton 定位
+                               // applicationButton 定位
 	if (applicationButton) {
 		if (applicationButton->isVisibleTo(this)) {
 			// 保证
