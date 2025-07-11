@@ -37,6 +37,7 @@ void SARibbonButtonGroupWidget::PrivateData::init()
 	// 上下保留一点间隙
 	layout->setContentsMargins(0, 0, 0, 0);
 	layout->setSpacing(1);
+	layout->setAlignment(Qt::AlignLeft);  // 左对齐防止居中留白
 	q_ptr->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 }
 
@@ -65,13 +66,15 @@ void SARibbonButtonGroupWidget::PrivateData::removeAction(QAction* a)
 			// 特殊处理 QWidgetAction
 			if (QWidgetAction* widgetAction = qobject_cast< QWidgetAction* >(a)) {
 				widgetAction->releaseWidget(widget);
-			} else {
-				widget->hide();
-				widget->deleteLater();
 			}
+			widget->hide();
+			widget->deleteLater();
 		}
 		lay->removeItem(item);
 	}
+	// 在删除后强制布局重新计算
+	lay->invalidate();  // 标记布局需要更新
+	lay->activate();    // 立即激活新布局
 }
 
 SARibbonControlButton* SARibbonButtonGroupWidget::PrivateData::createButtonForAction(QAction* a)
@@ -197,7 +200,7 @@ QSize SARibbonButtonGroupWidget::sizeHint() const
 
 QSize SARibbonButtonGroupWidget::minimumSizeHint() const
 {
-    return QSize(18, QFrame::minimumSizeHint().height());
+    return layout()->minimumSize();
 }
 
 /**
@@ -247,6 +250,7 @@ void SARibbonButtonGroupWidget::actionEvent(QActionEvent* e)
 			w = widgetAction->requestWidget(this);
 			if (w != nullptr) {
 				w->setAttribute(Qt::WA_LayoutUsesWidgetRect);
+				w->setVisible(act->isVisible());
 				w->show();
 			}
 		} else if (act->isSeparator()) {
@@ -255,10 +259,34 @@ void SARibbonButtonGroupWidget::actionEvent(QActionEvent* e)
 		} else {  // 不是widget，自动生成ButtonTyle
 			w = d_ptr->createButtonForAction(act);
 		}
-		layout()->addWidget(w);
+		if (w) {
+			w->setVisible(act->isVisible());  // 新增：设置初始可见性
+			layout()->addWidget(w);
+		}
 		updateGeometry();
 	} break;
 	case QEvent::ActionChanged: {
+		// 处理可见性
+		QLayout* lay = layout();
+		for (int i = 0; i < lay->count(); ++i) {
+			QLayoutItem* item = lay->itemAt(i);
+			if (!item || !item->widget()) {
+				continue;
+			}
+			if (SARibbonControlButton* btn = qobject_cast< SARibbonControlButton* >(item->widget())) {
+				if (btn->defaultAction() == act) {
+					if (btn->isVisible() != act->isVisible()) {
+						btn->setVisible(act->isVisible());
+					}
+				}
+			} else if (QWidgetAction* wa = qobject_cast< QWidgetAction* >(act)) {
+				if (wa->defaultWidget() == item->widget()) {
+					if (item->widget()->isVisible() != act->isVisible()) {
+						item->widget()->setVisible(act->isVisible());
+					}
+				}
+			}
+		}
 		// 让布局重新绘制
 		layout()->invalidate();
 		updateGeometry();
