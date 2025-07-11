@@ -7,10 +7,3 @@ SARibbonControlButton::SARibbonControlButton(QWidget* parent) : QToolButton(pare
 SARibbonControlButton::~SARibbonControlButton()
 {
 }
-SARibbonControlToolButton::SARibbonControlToolButton(QWidget* parent) : QToolButton(parent)
-{
-}
-
-SARibbonControlToolButton::~SARibbonControlToolButton()
-{
-}
