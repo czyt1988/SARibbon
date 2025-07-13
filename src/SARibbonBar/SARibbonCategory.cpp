@@ -115,6 +115,7 @@ void SARibbonCategory::PrivateData::insertPannel(int index, SARibbonPannel* pann
 	pannel->setVisible(true);
 
 	QObject::connect(pannel, &SARibbonPannel::actionTriggered, ribbonCategory(), &SARibbonCategory::actionTriggered);
+	q_ptr->updateGeometry();  // 通知父布局这个控件的尺寸提示(sizeHint())可能已改变
 }
 
 bool SARibbonCategory::PrivateData::takePannel(SARibbonPannel* pannel)
@@ -123,7 +124,9 @@ bool SARibbonCategory::PrivateData::takePannel(SARibbonPannel* pannel)
 	if (nullptr == lay) {
 		return false;
 	}
-	return lay->takePannel(pannel);
+	bool res = lay->takePannel(pannel);
+	q_ptr->updateGeometry();  // 通知父布局这个控件的尺寸提示(sizeHint())可能已改变
+	return res;
 }
 
 bool SARibbonCategory::PrivateData::removePannel(SARibbonPannel* pannel)

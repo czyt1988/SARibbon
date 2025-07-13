@@ -35,6 +35,7 @@ SET(SARIBBON_HEADER_FILES
     SARibbonGlobal.h
     SAFramelessHelper.h
     SARibbonActionsManager.h
+    SARibbonBarLayout.h
     SARibbonBar.h
     SARibbonCustomizeData.h
     SARibbonCustomizeDialog.h
@@ -77,6 +78,7 @@ SET(SARIBBON_HEADER_FILES
 SET(SARIBBON_SOURCE_FILES
     SAFramelessHelper.cpp
     SARibbonActionsManager.cpp
+    SARibbonBarLayout.cpp
     SARibbonBar.cpp
     SARibbonCustomizeData.cpp
     SARibbonCustomizeDialog.cpp
