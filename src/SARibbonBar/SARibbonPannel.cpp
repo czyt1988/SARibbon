@@ -708,9 +708,9 @@ int SARibbonPannel::actionIndex(QAction* act) const
 void SARibbonPannel::moveAction(int from, int to)
 {
 	if (SARibbonPannelLayout* lay = pannelLayout()) {
-		return (lay->move(from, to));
+		lay->move(from, to);
+		lay->activate();
 	}
-	updateGeometry();  // 通知layout进行重新布局
 }
 
 /**
@@ -906,46 +906,26 @@ void SARibbonPannel::actionEvent(QActionEvent* e)
 				widgetAction->setParent(this);
 			}
 		}
-		int index = layout()->count();
+		int index = lay->count();
 		if (e->before()) {
 			// 说明是插入
 			index = lay->indexByAction(e->before());
 			if (-1 == index) {
-				index = layout()->count();  // 找不到的时候就插入到最后
+				index = lay->count();  // 找不到的时候就插入到最后
 			}
 		}
 		lay->insertAction(index, action, getActionRowProportionProperty(action));
-		// 由于pannel的尺寸发生变化，需要让category也调整
-		// if (QWidget* parw = parentWidget()) {
-		//     if (QLayout* pl = parw->layout()) {
-		//         pl->invalidate();
-		//     }
-		// }
+		// 通知父布局这个控件的尺寸提示(sizeHint())可能已改变
+		updateGeometry();
 	} break;
 
 	case QEvent::ActionChanged: {
 		// 让布局重新绘制
-		layout()->invalidate();
-
-		// updateGeometry();
-		// 由于pannel的尺寸发生变化，需要让category也调整
+		// 通知父布局这个控件的尺寸提示(sizeHint())可能已改变
+		updateGeometry();
+		//  由于pannel的尺寸发生变化，需要让category也调整
 		if (QWidget* parw = parentWidget()) {
-			if (QLayout* pl = parw->layout()) {
-				pl->invalidate();
-			}
-			//! 强制发送一个resizeevent，让Category能重绘，如果没有这个函数，发现Category的layout虽然设置了invalidate（标记缓存失效）
-			//! 但并没有按顺序在pannel尺寸更新后更新Category的尺寸，导致有些pannel的尺寸识别出现异常
-			//! 重打印信息上看，pannel的尺寸有进行更新，category的尺寸也进行了更新，但更新的次数和调用invalidate的次数不一样，需要手动触发ResizeEvent
-			//! 尝试过调用QEvent::LayoutRequest没有效果：
-			//! @code
-			//! QEvent* el = new QEvent(QEvent::LayoutRequest);
-			//! QApplication::postEvent(parw, el);
-			//! @endcode
-			//!
-			//! 调用parw->updateGeometry();也没有效果，目前看使用resizeevent是最有效果的
-			//!
-			QResizeEvent* ersize = new QResizeEvent(parw->size(), QSize());
-			QApplication::postEvent(parw, ersize);
+			parw->adjustSize();
 		}
 	} break;
 
@@ -957,12 +937,7 @@ void SARibbonPannel::actionEvent(QActionEvent* e)
 			QLayoutItem* item = lay->takeAt(index);
 			delete item;
 		}
-		// 由于pannel的尺寸发生变化，需要让category也调整
-		// if (QWidget* parw = parentWidget()) {
-		//     if (QLayout* pl = parw->layout()) {
-		//         pl->invalidate();
-		//     }
-		// }
+		updateGeometry();
 	} break;
 
 	default:

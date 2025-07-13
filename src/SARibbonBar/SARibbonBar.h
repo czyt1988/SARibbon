@@ -233,6 +233,9 @@ public:
 	// 移除ContextCategory
 	void destroyContextCategory(SARibbonContextCategory* context);
 
+	// 获取当前可见的上下文标签的tab索引
+	QList< int > currentVisibleContextCategoryTabIndexs() const;
+
 	// 设置为隐藏模式
 	void setMinimumMode(bool isHide);
 
@@ -390,6 +393,8 @@ public:
 
 	// 获取所有pannel下的action
 	QList< QAction* > allActions() const;
+	// 当前是否使用的无边框
+	bool isUseRibbonFrame() const;
 Q_SIGNALS:
 
 	/**
@@ -439,7 +444,7 @@ protected:
 	// 告知WindowButtonGroup的尺寸
 	void setSystemButtonGroupSize(const QSize& s);
 	// 更新标题位置rect
-	void updateTitleRect();
+	// void updateTitleRect();
 	// 设置当前的MainWindow的样式，这个函数是SARibbonMainWindow调用，告知ribbonbar当前MainWindow的样式
 	void setMainWindowStyles(SARibbonMainWindowStyles s);
 protected Q_SLOTS:
@@ -456,26 +461,22 @@ protected Q_SLOTS:
 
 private:
 	int tabIndex(SARibbonCategory* obj);
-	void resizeAll();
-	void resizeInLooseStyle();
-	void resizeInCompactStyle();
 	void paintInLooseStyle();
 	void paintInCompactStyle();
-	void resizeStackedContainerWidget();
 
 	// 刷新所有ContextCategoryManagerData，这个在单独一个Category删除时调用
 	void updateContextCategoryManagerData();
 	void synchronousCategoryData(bool autoUpdate = true);
 	// 把窗口标题文字转换为显示的文字，这里主要针对[*]占位符进行替换
 	QString toDisplayTitleText(const QString& title) const;
+	// 获取标题显示的区域
+	QRect getWindowTitleRect() const;
 
 protected:
 	void setRibbonMainwindowStyle();
 	virtual void paintEvent(QPaintEvent* e) override;
-	virtual void resizeEvent(QResizeEvent* e) override;
 	virtual void moveEvent(QMoveEvent* e) override;
 	virtual void changeEvent(QEvent* e) override;
-	virtual bool event(QEvent* e) override;
 	virtual void paintTabbarBaseLine(QPainter& painter);
 	virtual void paintWindowTitle(QPainter& painter, const QString& title, const QRect& titleRegion);
 	virtual void
@@ -496,5 +497,43 @@ namespace SA
  * @return
  */
 QColor SA_RIBBON_EXPORT makeColorVibrant(const QColor& c, int saturationDelta = 150, int valueDelta = 30);
+
+/**
+ * @brief 按照指定的新高度，保持宽高比缩放 QSize。
+ *
+ * 此函数根据原始尺寸的宽高比，计算出在指定新高度下的对应宽度，
+ * 并返回一个新的 QSize 对象。
+ *
+ * @param originalSize 原始尺寸。
+ * @param newHeight    缩放后的新高度。
+ * @return             按比例缩放后的 QSize。
+ *
+ * @par 示例：
+ * @code
+ * QSize original(800, 600);
+ * QSize scaled = scaleSizeByHeight(original, 300);
+ * // scaled 将是 (400, 300)
+ * @endcode
+ */
+QSize scaleSizeByHeight(const QSize& originalSize, int newHeight);
+
+/**
+ * @brief 按照指定的新宽度，保持宽高比缩放 QSize。
+ *
+ * 此函数根据原始尺寸的宽高比，计算出在指定新宽度下的对应高度，
+ * 并返回一个新的 QSize 对象。
+ *
+ * @param originalSize 原始尺寸。
+ * @param newWidth     缩放后的新宽度。
+ * @return             按比例缩放后的 QSize。
+ *
+ * @par 示例：
+ * @code
+ * QSize original(800, 600);
+ * QSize scaled = scaleSizeByWidth(original, 400);
+ * // scaled 将是 (400, 300)
+ * @endcode
+ */
+QSize scaleSizeByWidth(const QSize& originalSize, int newWidth);
 }
 #endif  // SARIBBONBAR_H
