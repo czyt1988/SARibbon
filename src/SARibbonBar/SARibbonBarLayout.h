@@ -42,14 +42,14 @@ public:
 	// 计算最小TabBar宽度
 	int calcMinTabBarWidth() const;
 
-	// 更新标题区域
-	void updateTitleRect();
-
 	// 重置尺寸，这个是在ribbon模式发生改变的时候调用，例如setMinimumMode或者setNormalMode,此函数会触发重新布局
 	void resetSize();
 
+    // 更新标题区域
+    void layoutTitleRect();
+
 	// 调整StackedContainerWidget的位置
-	void resizeStackedContainerWidget();
+    void layoutStackedContainerWidget();
 
 	// 设置系统按钮大小
 	void setSystemButtonSize(const QSize& size);

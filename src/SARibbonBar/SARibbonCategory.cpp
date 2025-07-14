@@ -3,7 +3,6 @@
 #include <QResizeEvent>
 #include <QPainter>
 #include <QLinearGradient>
-#include <QDebug>
 #include <QApplication>
 #include <QHBoxLayout>
 #include <QList>
@@ -12,6 +11,12 @@
 #include "SARibbonCategoryLayout.h"
 #include "SARibbonElementManager.h"
 
+#ifndef SARIBBONCATEGORY_DEBUG_PRINT
+#define SARIBBONCATEGORY_DEBUG_PRINT 0
+#endif
+#if SARIBBONCATEGORY_DEBUG_PRINT
+#include <QDebug>
+#endif
 ///
 /// \brief ribbon页的代理类
 /// 如果需要修改重绘SARibbonCategory，可以通过设置SARibbonCategory::setProxy
@@ -159,7 +164,7 @@ const SARibbonCategory* SARibbonCategory::PrivateData::ribbonCategory() const
 
 void SARibbonCategory::PrivateData::updateItemGeometry()
 {
-#if SA_DEBUG_PRINT_SIZE_HINT
+#if SARIBBONCATEGORY_DEBUG_PRINT
 	qDebug() << "SARibbonCategory::PrivateData::updateItemGeometry,categoryName=" << q_ptr->categoryName();
 #endif
 	SARibbonCategoryLayout* lay = qobject_cast< SARibbonCategoryLayout* >(q_ptr->layout());
@@ -257,7 +262,7 @@ void SARibbonCategory::setCategoryName(const QString& title)
 
 bool SARibbonCategory::event(QEvent* e)
 {
-#if SA_DEBUG_PRINT_EVENT
+#if SARIBBONCATEGORY_DEBUG_PRINT
 	if (e->type() != QEvent::Paint) {
 		qDebug() << "SARibbonCategory event(" << e->type() << "),name=" << categoryName();
 	}
@@ -579,7 +584,7 @@ SARibbonBar* SARibbonCategory::ribbonBar() const
  */
 void SARibbonCategory::updateItemGeometry()
 {
-#if SA_DEBUG_PRINT_SIZE_HINT
+#if SARIBBONCATEGORY_DEBUG_PRINT
 	qDebug() << "SARibbonCategory name=" << categoryName() << " updateItemGeometry";
 #endif
 	d_ptr->updateItemGeometry();
@@ -688,14 +693,14 @@ void SARibbonCategory::changeEvent(QEvent* event)
 	switch (event->type()) {
 	case QEvent::StyleChange: {
 		if (layout()) {
-#if SA_DEBUG_PRINT_SIZE_HINT
+#if SARIBBONCATEGORY_DEBUG_PRINT
 			qDebug() << "SARibbonCategory changeEvent(StyleChange),categoryName=" << categoryName();
 #endif
 			layout()->invalidate();
 		}
 	} break;
 	case QEvent::FontChange: {
-#if SA_DEBUG_PRINT_SIZE_HINT
+#if SARIBBONCATEGORY_DEBUG_PRINT
 		qDebug() << "SARibbonCategory changeEvent(FontChange),categoryName=" << categoryName();
 #endif
 		QFont f = font();

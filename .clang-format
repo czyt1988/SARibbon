@@ -69,9 +69,10 @@ AllowAllParametersOfDeclarationOnNextLine: false
 AlwaysBreakAfterReturnType: None
 
 #
-PenaltyReturnTypeOnItsOwnLine: 5000
-PenaltyBreakAssignment: 5000
-PenaltyBreakBeforeFirstCallParameter: 5000
+PenaltyReturnTypeOnItsOwnLine: 60
+PenaltyBreakAssignment: 20
+PenaltyBreakBeforeFirstCallParameter: 19
+PenaltyBreakString: 1000
 
 # The coding style specifies some include order categories, but also tells to
 # separate categories with an empty line. It does not specify the order within

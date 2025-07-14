@@ -778,7 +778,7 @@ SARibbonPannelLayout* SARibbonPannel::pannelLayout() const
  */
 void SARibbonPannel::updateItemGeometry()
 {
-#if SA_DEBUG_PRINT_SIZE_HINT
+#if SARIBBONPANNEL_DEBUG_PRINT
 	qDebug() << "SARibbonPannel updateItemGeometry,pannelName=" << pannelName();
 #endif
 	// 此函数需要添加，否则SARibbonBar::setEnableWordWrap无法刷新按钮
