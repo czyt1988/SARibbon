@@ -64,6 +64,7 @@
 #include "../../src/SARibbonBar/SARibbonGalleryGroup.cpp"
 #include "../../src/SARibbonBar/SARibbonGallery.cpp"
 #include "../../src/SARibbonBar/SARibbonBar.cpp"
+#include "../../src/SARibbonBar/SARibbonBarLayout.cpp"
 #include "../../src/SARibbonBar/SARibbonElementFactory.cpp"
 #include "../../src/SARibbonBar/SARibbonElementManager.cpp"
 #include "../../src/SARibbonBar/SARibbonCustomizeData.cpp"

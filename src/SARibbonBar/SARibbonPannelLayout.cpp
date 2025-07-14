@@ -205,7 +205,7 @@ QSize SARibbonPannelLayout::minimumSize() const
 
 QSize SARibbonPannelLayout::sizeHint() const
 {
-#if SARIBBONPANNELLAYOUT_DEBUG_PRINT && SA_DEBUG_PRINT_SIZE_HINT
+#if SARIBBONPANNELLAYOUT_DEBUG_PRINT
 	if (SARibbonPannel* pannel = ribbonPannel()) {
 		qDebug() << "| |-SARibbonPannelLayout sizeHint,sizeHint = " << m_sizeHint;
 	}
@@ -294,7 +294,7 @@ void SARibbonPannelLayout::updateGeomArray()
  */
 void SARibbonPannelLayout::doLayout()
 {
-#if SARIBBONPANNELLAYOUT_DEBUG_PRINT && SA_DEBUG_PRINT_SIZE_HINT
+#if SARIBBONPANNELLAYOUT_DEBUG_PRINT
 	if (SARibbonPannel* pannel = ribbonPannel()) {
 		qDebug() << "| |-SARibbonPannelLayout layoutActions,pannel name = " << pannel->pannelName();
 	}
@@ -459,7 +459,7 @@ void SARibbonPannelLayout::updateGeomArray(const QRect& setrect)
 
 	int itemCount = mItems.count();
 
-#if SARIBBONPANNELLAYOUT_DEBUG_PRINT && SA_DEBUG_PRINT_SIZE_HINT
+#if SARIBBONPANNELLAYOUT_DEBUG_PRINT
 	QString debug_print__log__;
 #endif
 	// 本列第一、二行占比
@@ -475,7 +475,7 @@ void SARibbonPannelLayout::updateGeomArray(const QRect& setrect)
 		}
 
 		QSize hint = item->sizeHint();
-#if SARIBBONPANNELLAYOUT_DEBUG_PRINT && SA_DEBUG_PRINT_SIZE_HINT
+#if SARIBBONPANNELLAYOUT_DEBUG_PRINT
 		if (SARibbonToolButton* tb = qobject_cast< SARibbonToolButton* >(item->widget())) {
 			auto ss__ = tb->sizeHint();
 			debug_print__log__ += QString("| | |-[%1]SARibbonToolButton.sizeHint=(%2,%3),ButtonText=%4\n")
@@ -710,7 +710,7 @@ void SARibbonPannelLayout::updateGeomArray(const QRect& setrect)
 	// 刷新sizeHint
 	int heightHint  = SARibbonPannel::pannelHeightHint(pannel->fontMetrics(), pannel->pannelLayoutMode(), titleH);
 	this->mSizeHint = QSize(totalWidth, heightHint);
-#if SARIBBONPANNELLAYOUT_DEBUG_PRINT && SA_DEBUG_PRINT_SIZE_HINT
+#if SARIBBONPANNELLAYOUT_DEBUG_PRINT
 	qDebug() << "| |-SARibbonPannelLayout updateGeomArray(" << setrect << "),pannel name = " << pannel->pannelName()
 	         << "\n| | |-size hint =" << this->m_sizeHint  //
 	         << "\n| | |-totalWidth=" << totalWidth        //
@@ -807,7 +807,7 @@ void SARibbonPannelLayout::recalcExpandGeomArray(const QRect& setrect)
 			}
 		}
 	}
-#if SARIBBONPANNELLAYOUT_DEBUG_PRINT && SA_DEBUG_PRINT_SIZE_HINT
+#if SARIBBONPANNELLAYOUT_DEBUG_PRINT
 	qDebug() << "| |-SARibbonPannelLayout recalcExpandGeomArray(" << setrect
 	         << ") pannelName=" << ribbonPannel()->pannelName()  //
 	         << ",expandwidth=" << expandwidth                   //
@@ -949,7 +949,7 @@ void SARibbonPannelLayout::setGeometry(const QRect& rect)
 	if (old == rect) {
 		return;
 	}
-#if SARIBBONPANNELLAYOUT_DEBUG_PRINT && SA_DEBUG_PRINT_SIZE_HINT
+#if SARIBBONPANNELLAYOUT_DEBUG_PRINT
 	qDebug() << "| |----->SARibbonPannelLayout.setGeometry(" << rect << "(" << ribbonPannel()->pannelName() << ")=======";
 #endif
 	QLayout::setGeometry(rect);

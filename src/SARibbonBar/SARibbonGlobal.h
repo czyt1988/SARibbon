@@ -116,31 +116,4 @@ Q_DECLARE_FLAGS(SARibbonMainWindowStyles, SARibbonMainWindowStyleFlag)
 #endif
 #endif
 
-/**
-  @def 定义此宏，将打印和尺寸刷新相关的信息
-
-    仅用于调试
- */
-#ifndef SA_DEBUG_PRINT_SIZE_HINT
-#define SA_DEBUG_PRINT_SIZE_HINT 0
-#endif
-
-/**
-  @def 定义此宏，将打印事件
-
-    仅用于调试
- */
-#ifndef SA_DEBUG_PRINT_EVENT
-#define SA_DEBUG_PRINT_EVENT 0
-#endif
-
-/**
-  @def 定义此宏，qDebug将支持SARibbonBar的属性打印
-
-    仅用于调试
- */
-#ifndef SA_DEBUG_PRINT_SARIBBONBAR
-#define SA_DEBUG_PRINT_SARIBBONBAR 0
-#endif
-
 #endif  // SARIBBONGLOBAL_H

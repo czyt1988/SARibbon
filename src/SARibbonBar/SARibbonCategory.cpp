@@ -3,7 +3,6 @@
 #include <QResizeEvent>
 #include <QPainter>
 #include <QLinearGradient>
-#include <QDebug>
 #include <QApplication>
 #include <QHBoxLayout>
 #include <QList>
@@ -12,6 +11,12 @@
 #include "SARibbonCategoryLayout.h"
 #include "SARibbonElementManager.h"
 
+#ifndef SARIBBONCATEGORY_DEBUG_PRINT
+#define SARIBBONCATEGORY_DEBUG_PRINT 0
+#endif
+#if SARIBBONCATEGORY_DEBUG_PRINT
+#include <QDebug>
+#endif
 ///
 /// \brief ribbon页的代理类
 /// 如果需要修改重绘SARibbonCategory，可以通过设置SARibbonCategory::setProxy
@@ -51,8 +56,10 @@ public:
 	bool mIsContextCategory { false };       ///< 标记是否是上下文标签
 	bool mIsCanCustomize { true };           ///< 标记是否可以自定义
 	int mPannelSpacing { 0 };                ///< pannel的spacing
+	bool m_isUseAnimating { true };          ///< 默认使用动画滚动
 	QSize mPannelToolButtonSize { 22, 22 };  ///< 记录pannel的默认图标大小
 	SARibbonPannel::PannelLayoutMode mDefaultPannelLayoutMode { SARibbonPannel::ThreeRowMode };
+	int m_wheelScrollStep { 400 };  // 默认滚轮滚动步长
 };
 SARibbonCategory::PrivateData::PrivateData(SARibbonCategory* p) : q_ptr(p)
 {
@@ -115,6 +122,7 @@ void SARibbonCategory::PrivateData::insertPannel(int index, SARibbonPannel* pann
 	pannel->setVisible(true);
 
 	QObject::connect(pannel, &SARibbonPannel::actionTriggered, ribbonCategory(), &SARibbonCategory::actionTriggered);
+	q_ptr->updateGeometry();  // 通知父布局这个控件的尺寸提示(sizeHint())可能已改变
 }
 
 bool SARibbonCategory::PrivateData::takePannel(SARibbonPannel* pannel)
@@ -123,7 +131,9 @@ bool SARibbonCategory::PrivateData::takePannel(SARibbonPannel* pannel)
 	if (nullptr == lay) {
 		return false;
 	}
-	return lay->takePannel(pannel);
+	bool res = lay->takePannel(pannel);
+	q_ptr->updateGeometry();  // 通知父布局这个控件的尺寸提示(sizeHint())可能已改变
+	return res;
 }
 
 bool SARibbonCategory::PrivateData::removePannel(SARibbonPannel* pannel)
@@ -156,7 +166,7 @@ const SARibbonCategory* SARibbonCategory::PrivateData::ribbonCategory() const
 
 void SARibbonCategory::PrivateData::updateItemGeometry()
 {
-#if SA_DEBUG_PRINT_SIZE_HINT
+#if SARIBBONCATEGORY_DEBUG_PRINT
 	qDebug() << "SARibbonCategory::PrivateData::updateItemGeometry,categoryName=" << q_ptr->categoryName();
 #endif
 	SARibbonCategoryLayout* lay = qobject_cast< SARibbonCategoryLayout* >(q_ptr->layout());
@@ -177,33 +187,52 @@ void SARibbonCategory::PrivateData::doWheelEvent(QWheelEvent* event)
 	if (nullptr == lay) {
 		return;
 	}
+
+	// 如果动画正在进行，忽略新的事件
+	if (m_isUseAnimating && lay->isAnimatingScroll()) {
+		event->ignore();
+		return;
+	}
+
 	QSize contentSize = lay->categoryContentSize();
-	// 求总宽
-	int totalWidth = lay->categoryTotalWidth();
+	int totalWidth    = lay->categoryTotalWidth();
 
 	if (totalWidth > contentSize.width()) {
-		// 这个时候滚动有效
-		int scrollpix = 40;
-		// Qt6 取消了QWheelEvent::delta函数
-		// 是要下面方法可兼容qt5/6
+		int scrollStep = m_wheelScrollStep;
+
+		// 根据滚轮方向确定滚动方向
 		QPoint numPixels  = event->pixelDelta();
 		QPoint numDegrees = event->angleDelta() / 8;
+
 		if (!numPixels.isNull()) {
-			if (numDegrees.y() < 0) {
-				scrollpix = -scrollpix;
-			}
+			scrollStep = (numPixels.y() < 0) ? -scrollStep : scrollStep;
 		} else if (!numDegrees.isNull()) {
-			if (numDegrees.y() < 0) {
-				scrollpix = -scrollpix;
-			}
+			scrollStep = (numDegrees.y() < 0) ? -scrollStep : scrollStep;
 		}
-		lay->scroll(scrollpix);
+
+		// 动态调整步长 - 滚动越快步长越大
+		const int absDelta = qMax(qAbs(numPixels.y()), qAbs(numDegrees.y()));
+		if (absDelta > 60) {
+			scrollStep *= 2;
+		} else if (absDelta < 20) {
+			scrollStep /= 2;
+		}
+
+		// 根据设置选择滚动方式
+		if (m_isUseAnimating) {
+			lay->scrollByAnimate(scrollStep);
+		} else {
+			lay->scroll(scrollStep);
+		}
 	} else {
-		// 这时候无需处理事件，把滚动事件上发让父级也能接收
 		event->ignore();
-		// 如滚动过就还原
 		if (lay->isScrolled()) {
-			lay->scroll(0);
+			// 根据设置选择复位方式
+			if (m_isUseAnimating) {
+				lay->scrollToByAnimate(0);
+			} else {
+				lay->scroll(0);
+			}
 		}
 	}
 }
@@ -223,6 +252,11 @@ SARibbonCategory::SARibbonCategory(QWidget* p) : QFrame(p), d_ptr(new SARibbonCa
     d_ptr->init(this);
 }
 
+/**
+ * @brief 带名称的构造函数
+ * @param name Category名称
+ * @param p 父级控件指针
+ */
 SARibbonCategory::SARibbonCategory(const QString& name, QWidget* p)
     : QFrame(p), d_ptr(new SARibbonCategory::PrivateData(this))
 {
@@ -235,8 +269,8 @@ SARibbonCategory::~SARibbonCategory()
 }
 
 /**
- * @brief category的名字,等同windowTitle函数
- * @return
+ * @brief 获取Category名称
+ * @return 当前Category的名称（即windowTitle）
  */
 QString SARibbonCategory::categoryName() const
 {
@@ -244,8 +278,8 @@ QString SARibbonCategory::categoryName() const
 }
 
 /**
- * @brief 设置category名字，等同setWindowTitle
- * @param title
+ * @brief 设置Category名称
+ * @param title 新名称（等价于setWindowTitle）
  */
 void SARibbonCategory::setCategoryName(const QString& title)
 {
@@ -254,7 +288,7 @@ void SARibbonCategory::setCategoryName(const QString& title)
 
 bool SARibbonCategory::event(QEvent* e)
 {
-#if SA_DEBUG_PRINT_EVENT
+#if SARIBBONCATEGORY_DEBUG_PRINT
 	if (e->type() != QEvent::Paint) {
 		qDebug() << "SARibbonCategory event(" << e->type() << "),name=" << categoryName();
 	}
@@ -263,8 +297,8 @@ bool SARibbonCategory::event(QEvent* e)
 }
 
 /**
- * @brief pannel的模式
- * @return
+ * @brief 获取面板布局模式
+ * @return 当前所有面板的布局模式
  */
 SARibbonPannel::PannelLayoutMode SARibbonCategory::pannelLayoutMode() const
 {
@@ -272,7 +306,7 @@ SARibbonPannel::PannelLayoutMode SARibbonCategory::pannelLayoutMode() const
 }
 
 /**
- * @brief 设置pannel的模式
+ * @brief 设置面板布局模式
  *
  * 在@ref SARibbonBar 调用@ref SARibbonBar::setRibbonStyle 函数时，会对所有的SARibbonCategory调用此函数
  * 把新的SARibbonPannel::PannelLayoutMode设置进去
@@ -289,10 +323,10 @@ void SARibbonCategory::setPannelLayoutMode(SARibbonPannel::PannelLayoutMode m)
 }
 
 /**
- * @brief 添加pannel
+ * @brief 添加面板(pannel)
  *
- * @note pannel的所有权由SARibbonCategory来管理，请不要在外部对其进行销毁
- * @param title pannel的标题，在office/wps的三行模式下会显示在pannel的下方
+ * @note 面板(pannel)的所有权由SARibbonCategory来管理，请不要在外部对其进行销毁
+ * @param title 面板(pannel)的标题，在office/wps的三行模式下会显示在面板(pannel)的下方
  * @return 返回生成的@ref SARibbonPannel 指针
  * @see 对SARibbonPannel的其他操作，参考 @ref SARibbonCategory::takePannel
  */
@@ -576,10 +610,69 @@ SARibbonBar* SARibbonCategory::ribbonBar() const
  */
 void SARibbonCategory::updateItemGeometry()
 {
-#if SA_DEBUG_PRINT_SIZE_HINT
+#if SARIBBONCATEGORY_DEBUG_PRINT
 	qDebug() << "SARibbonCategory name=" << categoryName() << " updateItemGeometry";
 #endif
 	d_ptr->updateItemGeometry();
+}
+
+/**
+ * @brief 设置滚动时是否使用动画
+ * @param useAnimating
+ */
+void SARibbonCategory::setUseAnimatingScroll(bool useAnimating)
+{
+    d_ptr->m_isUseAnimating = useAnimating;
+}
+
+/**
+ * @brief 滚动时是否使用动画
+ * @return
+ */
+bool SARibbonCategory::isUseAnimatingScroll() const
+{
+    return d_ptr->m_isUseAnimating;
+}
+
+/**
+ * @brief 设置滚轮滚动步长（px）
+ * @param step
+ */
+void SARibbonCategory::setWheelScrollStep(int step)
+{
+    d_ptr->m_wheelScrollStep = qMax(10, step);  // 最小10像素
+}
+
+/**
+ * @brief 滚轮的滚动步长
+ * @return
+ */
+int SARibbonCategory::wheelScrollStep() const
+{
+    return d_ptr->m_wheelScrollStep;
+}
+
+/**
+ * @brief 设置动画持续时间
+ * @param duration
+ */
+void SARibbonCategory::setAnimationDuration(int duration)
+{
+	if (SARibbonCategoryLayout* lay = categoryLayout()) {
+		lay->setAnimationDuration(duration);
+	}
+}
+
+/**
+ * @brief 动画持续时间
+ * @return
+ */
+int SARibbonCategory::animationDuration() const
+{
+	if (SARibbonCategoryLayout* lay = categoryLayout()) {
+		return lay->animationDuration();
+	}
+	return -1;
 }
 
 /**
@@ -672,7 +765,9 @@ QSize SARibbonCategory::pannelToolButtonIconSize() const
 }
 
 /**
- * @brief 在超出边界情况下，滚轮可滚动pannel
+ * @brief 滚动事件
+ *
+ * 在内容超出category的宽度情况下，滚轮可滚动pannel
  * @param event
  */
 void SARibbonCategory::wheelEvent(QWheelEvent* event)
@@ -685,14 +780,14 @@ void SARibbonCategory::changeEvent(QEvent* event)
 	switch (event->type()) {
 	case QEvent::StyleChange: {
 		if (layout()) {
-#if SA_DEBUG_PRINT_SIZE_HINT
+#if SARIBBONCATEGORY_DEBUG_PRINT
 			qDebug() << "SARibbonCategory changeEvent(StyleChange),categoryName=" << categoryName();
 #endif
 			layout()->invalidate();
 		}
 	} break;
 	case QEvent::FontChange: {
-#if SA_DEBUG_PRINT_SIZE_HINT
+#if SARIBBONCATEGORY_DEBUG_PRINT
 		qDebug() << "SARibbonCategory changeEvent(FontChange),categoryName=" << categoryName();
 #endif
 		QFont f = font();

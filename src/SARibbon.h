@@ -91,7 +91,7 @@
  * @def ribbon的数字版本 MAJ.{MIN}.PAT
  */
 #ifndef SA_RIBBON_BAR_VERSION_MIN
-#define SA_RIBBON_BAR_VERSION_MIN 3
+#define SA_RIBBON_BAR_VERSION_MIN 4
 #endif
 /**
  * @def ribbon的数字版本 MAJ.MIN.{PAT}
@@ -104,7 +104,7 @@
  * @def 版本号（字符串）
  */
 #ifndef SARIBBON_VERSION
-#define SARIBBON_VERSION "2.3.0"
+#define SARIBBON_VERSION "2.4.0"
 #endif
 
 #endif  // SARIBBONVERSIONINFO_H
@@ -228,33 +228,6 @@ Q_DECLARE_FLAGS(SARibbonMainWindowStyles, SARibbonMainWindowStyleFlag)
 #ifndef SA_HOVEREVENT_POS_POINT
 #define SA_HOVEREVENT_POS_POINT(HoverEventPtr) HoverEventPtr->pos()
 #endif
-#endif
-
-/**
-  @def 定义此宏，将打印和尺寸刷新相关的信息
-
-    仅用于调试
- */
-#ifndef SA_DEBUG_PRINT_SIZE_HINT
-#define SA_DEBUG_PRINT_SIZE_HINT 0
-#endif
-
-/**
-  @def 定义此宏，将打印事件
-
-    仅用于调试
- */
-#ifndef SA_DEBUG_PRINT_EVENT
-#define SA_DEBUG_PRINT_EVENT 0
-#endif
-
-/**
-  @def 定义此宏，qDebug将支持SARibbonBar的属性打印
-
-    仅用于调试
- */
-#ifndef SA_DEBUG_PRINT_SARIBBONBAR
-#define SA_DEBUG_PRINT_SARIBBONBAR 0
 #endif
 
 #endif  // SARIBBONGLOBAL_H
@@ -585,6 +558,21 @@ Q_SIGNALS:
 
 class QWidget;
 
+/**
+ * @class SAFramelessHelper
+ * @brief 该类用于帮助实现无边框窗体的移动和缩放功能。
+ *
+ * SAFramelessHelper 提供了一系列方法来激活、移除无边框窗体，设置窗体的移动、缩放属性，
+ * 以及橡皮筋效果等。通过事件过滤机制，它能够处理鼠标事件，从而实现窗体的移动和缩放操作。
+ *
+ * @example
+ * @code
+ * SAFramelessHelper* helper = new SAFramelessHelper(this);
+ * helper->activateOn(myWidget);
+ * helper->setWidgetMovable(true);
+ * helper->setWidgetResizable(true);
+ * @endcode
+ */
 class SA_RIBBON_EXPORT SAFramelessHelper : public QObject
 {
 	Q_OBJECT
@@ -623,6 +611,8 @@ public:
 	bool rubberBandOnResisze();
 	uint borderWidth();
 	uint titleHeight();
+	// 获取当前屏幕的 DPI 缩放因子
+	static qreal getScreenDpiScale(const QWidget* widget);
 
 protected:
 	// 事件过滤，进行移动、缩放等
@@ -1250,7 +1240,18 @@ class QHideEvent;
 class QResizeEvent;
 
 /**
- * @brief 有qdialog功能的stackwidget，用于在最小化时stack能像dialog那样弹出来
+ * @class SARibbonStackedWidget
+ * @brief 具有弹出式菜单功能的堆叠窗口部件
+ *
+ * 此类扩展了 QStackedWidget，添加了两种工作模式：
+ * 1. 正常模式：作为常规的堆叠部件，嵌入在父窗口布局中
+ * 2. 弹出模式：作为独立的弹出窗口，可用于实现类似菜单的显示效果
+ *
+ * 在弹出模式下，窗口将显示为无边框面板，并支持模态事件循环（exec()方法），
+ * 这使得它可以像菜单或对话框一样使用。
+ *
+ * @note 切换模式时会自动处理窗口状态和事件循环
+ * @sa QStackedWidget
  */
 class SA_RIBBON_EXPORT SARibbonStackedWidget : public QStackedWidget
 {
@@ -1259,18 +1260,22 @@ class SA_RIBBON_EXPORT SARibbonStackedWidget : public QStackedWidget
 public:
 	explicit SARibbonStackedWidget(QWidget* parent);
 	~SARibbonStackedWidget();
+	// 设置弹出模式
 	void setPopupMode();
+
+	// 检查当前是否处于弹出模式
 	bool isPopupMode() const;
+
+	// 设置正常模式 和普通的stackwidget一样
 	void setNormalMode();
+
+	// 检查当前是否处于正常模式
 	bool isNormalMode() const;
+
+	// 在弹出模式下以模态方式运行事件循环
 	void exec();
 
-	/**
-	 * @brief 类似tabbar的moveTab函数，交换两个窗口的index
-	 * @param from
-	 * @param to
-	 * @note 此操作会触发widgetRemoved(int index)信号
-	 */
+	// 类似tabbar的moveTab函数，交换两个窗口的index
 	void moveWidget(int from, int to);
 
 protected:
@@ -1279,7 +1284,7 @@ protected:
 	virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
 Q_SIGNALS:
 	/**
-	 * @brief hidWindow
+	 * @brief 隐藏窗口信号
 	 */
 	void hidWindow();
 };
@@ -1440,19 +1445,6 @@ class SA_RIBBON_EXPORT SARibbonControlButton : public QToolButton
 public:
 	explicit SARibbonControlButton(QWidget* parent = nullptr);
 	~SARibbonControlButton();
-};
-
-/**
- * @brief 用于SARibbonButtonGroupWidget的control button
- *
- * 为了防止SARibbonToolButton qss的影响，单独继承一个类
- */
-class SA_RIBBON_EXPORT SARibbonControlToolButton : public QToolButton
-{
-	Q_OBJECT
-public:
-	explicit SARibbonControlToolButton(QWidget* parent = nullptr);
-	~SARibbonControlToolButton();
 };
 
 #endif  // SARIBBONPANNELTOOLBUTTON_H
@@ -1954,10 +1946,12 @@ class QHBoxLayout;
 class QWheelEvent;
 class SARibbonBar;
 class SARibbonCategoryLayout;
+
 /**
- * @brief 一项ribbon tab页
- * @note SARibbonCategory的windowTitle影响了其在SARibbonBar的标签显示，
- * 如果要改标签名字，直接调用SARibbonCategory的setWindowTitle函数
+ * @brief Ribbon控件中的分类选项卡页面（Category）
+ *
+ * 每个Category代表Ribbon中的一个标签页，包含多个面板(Pannel)
+ *
  */
 class SA_RIBBON_EXPORT SARibbonCategory : public QFrame
 {
@@ -2061,6 +2055,18 @@ public:
 	// 刷新category的尺寸布局
 	void updateItemGeometry();
 
+	// 设置是否使用动画滚动
+	void setUseAnimatingScroll(bool useAnimating);
+	bool isUseAnimatingScroll() const;
+
+	// 设置滚轮滚动步长（像素）
+	void setWheelScrollStep(int step);
+	int wheelScrollStep() const;
+
+	// 设置动画持续时间（毫秒）
+	void setAnimationDuration(int duration);
+	int animationDuration() const;
+
 	// 此函数会遍历Category下的所有pannel,执行函数指针，函数指针返回false则停止迭代
 	bool iteratePannel(FpPannelIterate fp) const;
 Q_SIGNALS:
@@ -2127,6 +2133,8 @@ class SA_RIBBON_EXPORT SARibbonCategoryLayout : public QLayout
 	Q_OBJECT
 	SA_RIBBON_DECLARE_PRIVATE(SARibbonCategoryLayout)
 public:
+	Q_PROPERTY(int scrollPosition READ scrollPosition WRITE setScrollPosition)
+public:
 	explicit SARibbonCategoryLayout(SARibbonCategory* parent);
 	~SARibbonCategoryLayout();
 
@@ -2175,6 +2183,16 @@ public:
 	QList< SARibbonPannel* > pannelList() const;
 	// 执行滚轮事件
 	void scroll(int px);
+	void scrollTo(int targetX);
+	// 带动画的滚动
+	void scrollByAnimate(int px);
+	void scrollToByAnimate(int targetX);
+	// 滚动后的位置
+	int scrollPosition() const;
+	// 设置滚动位置
+	void setScrollPosition(int pos);
+	// 是否在滚动动画中
+	bool isAnimatingScroll() const;
 	// 判断是否有滚动过
 	bool isScrolled() const;
 	// category的总宽度
@@ -2182,9 +2200,15 @@ public:
 	// 设置Category的对齐方式
 	void setCategoryAlignment(SARibbonAlignment al);
 	SARibbonAlignment categoryAlignment() const;
+	// 设置动画持续时间
+	void setAnimationDuration(int duration);
+	int animationDuration() const;
 private Q_SLOTS:
 	void onLeftScrollButtonClicked();
 	void onRightScrollButtonClicked();
+
+private:
+	void setupAnimateScroll();
 };
 
 /**
@@ -2861,6 +2885,9 @@ public:
 	// 移除ContextCategory
 	void destroyContextCategory(SARibbonContextCategory* context);
 
+	// 获取当前可见的上下文标签的tab索引
+	QList< int > currentVisibleContextCategoryTabIndexs() const;
+
 	// 设置为隐藏模式
 	void setMinimumMode(bool isHide);
 
@@ -2949,7 +2976,7 @@ public:
 	void setTabBarBaseLineColor(const QColor& clr);
 	QColor tabBarBaseLineColor() const;
 
-	// 设置标题颜色,如果不设置标题颜色，默认是SARibbonBar的qss的color属性
+	// 设置标题颜色
 	void setWindowTitleTextColor(const QColor& clr);
 	QColor windowTitleTextColor() const;
 
@@ -3018,6 +3045,8 @@ public:
 
 	// 获取所有pannel下的action
 	QList< QAction* > allActions() const;
+	// 当前是否使用的无边框
+	bool isUseRibbonFrame() const;
 Q_SIGNALS:
 
 	/**
@@ -3066,8 +3095,6 @@ protected:
 	void updateCategoryTitleToTabName();
 	// 告知WindowButtonGroup的尺寸
 	void setSystemButtonGroupSize(const QSize& s);
-	// 更新标题位置rect
-	void updateTitleRect();
 	// 设置当前的MainWindow的样式，这个函数是SARibbonMainWindow调用，告知ribbonbar当前MainWindow的样式
 	void setMainWindowStyles(SARibbonMainWindowStyles s);
 protected Q_SLOTS:
@@ -3084,26 +3111,23 @@ protected Q_SLOTS:
 
 private:
 	int tabIndex(SARibbonCategory* obj);
-	void resizeAll();
-	void resizeInLooseStyle();
-	void resizeInCompactStyle();
 	void paintInLooseStyle();
 	void paintInCompactStyle();
-	void resizeStackedContainerWidget();
 
 	// 刷新所有ContextCategoryManagerData，这个在单独一个Category删除时调用
 	void updateContextCategoryManagerData();
 	void synchronousCategoryData(bool autoUpdate = true);
 	// 把窗口标题文字转换为显示的文字，这里主要针对[*]占位符进行替换
 	QString toDisplayTitleText(const QString& title) const;
+	// 获取标题显示的区域
+	QRect getWindowTitleRect() const;
 
 protected:
 	void setRibbonMainwindowStyle();
 	virtual void paintEvent(QPaintEvent* e) override;
-	virtual void resizeEvent(QResizeEvent* e) override;
 	virtual void moveEvent(QMoveEvent* e) override;
 	virtual void changeEvent(QEvent* e) override;
-	virtual bool event(QEvent* e) override;
+
 	virtual void paintTabbarBaseLine(QPainter& painter);
 	virtual void paintWindowTitle(QPainter& painter, const QString& title, const QRect& titleRegion);
 	virtual void
@@ -3124,10 +3148,149 @@ namespace SA
  * @return
  */
 QColor SA_RIBBON_EXPORT makeColorVibrant(const QColor& c, int saturationDelta = 150, int valueDelta = 30);
+
+/**
+ * @brief 按照指定的新高度，保持宽高比缩放 QSize。
+ *
+ * 此函数根据原始尺寸的宽高比，计算出在指定新高度下的对应宽度，
+ * 并返回一个新的 QSize 对象。
+ *
+ * @param originalSize 原始尺寸。
+ * @param newHeight    缩放后的新高度。
+ * @return             按比例缩放后的 QSize。
+ *
+ * @par 示例：
+ * @code
+ * QSize original(800, 600);
+ * QSize scaled = scaleSizeByHeight(original, 300);
+ * // scaled 将是 (400, 300)
+ * @endcode
+ */
+QSize scaleSizeByHeight(const QSize& originalSize, int newHeight);
+
+/**
+ * @brief 按照指定的新宽度，保持宽高比缩放 QSize。
+ *
+ * 此函数根据原始尺寸的宽高比，计算出在指定新宽度下的对应高度，
+ * 并返回一个新的 QSize 对象。
+ *
+ * @param originalSize 原始尺寸。
+ * @param newWidth     缩放后的新宽度。
+ * @return             按比例缩放后的 QSize。
+ *
+ * @par 示例：
+ * @code
+ * QSize original(800, 600);
+ * QSize scaled = scaleSizeByWidth(original, 400);
+ * // scaled 将是 (400, 300)
+ * @endcode
+ */
+QSize scaleSizeByWidth(const QSize& originalSize, int newWidth);
 }
 #endif  // SARIBBONBAR_H
 
 /*** End of inlined file: SARibbonBar.h ***/
+
+/*** Start of inlined file: SARibbonBarLayout.h ***/
+#ifndef SARIBBONBARLAYOUT_H
+#define SARIBBONBARLAYOUT_H
+
+#include <QLayout>
+#include <QPointer>
+
+class SARibbonTabBar;
+class SARibbonStackedWidget;
+class SARibbonQuickAccessBar;
+class SARibbonButtonGroupWidget;
+class SARibbonContextCategory;
+
+class SA_RIBBON_EXPORT SARibbonBarLayout : public QLayout
+{
+	Q_OBJECT
+	SA_RIBBON_DECLARE_PRIVATE(SARibbonBarLayout)
+public:
+	explicit SARibbonBarLayout(SARibbonBar* parent);
+	virtual ~SARibbonBarLayout();
+
+	// QLayout 必须实现的接口
+	void addItem(QLayoutItem* item) override;
+	QLayoutItem* itemAt(int index) const override;
+	QLayoutItem* takeAt(int index) override;
+	int count() const override;
+	QSize sizeHint() const override;
+	QSize minimumSize() const override;
+	void setGeometry(const QRect& rect) override;
+
+	// 执行布局
+	virtual void doLayout();
+
+	// 样式相关
+	bool isLooseStyle() const;
+	bool isCompactStyle() const;
+
+	// 标题区域
+	const QRect& titleRect() const;
+
+	// 计算最小TabBar宽度
+	int calcMinTabBarWidth() const;
+
+	// 重置尺寸，这个是在ribbon模式发生改变的时候调用，例如setMinimumMode或者setNormalMode,此函数会触发重新布局
+	void resetSize();
+
+	// 更新标题区域
+	void layoutTitleRect();
+
+	// 调整StackedContainerWidget的位置
+	void layoutStackedContainerWidget();
+
+	// 设置系统按钮大小
+	void setSystemButtonSize(const QSize& size);
+
+	// 设置tab在title上面，这样可以省略title区域
+	void setTabOnTitle(bool on);
+	bool isTabOnTitle() const;
+
+	// 最小模式下的MainBar高度
+	int minimumModeMainBarHeight() const;
+
+	// 获取正常模式下的mainBar的高度
+	int normalModeMainBarHeight() const;
+
+	// ribbon tab的高度
+	int tabBarHeight() const;
+	void setTabBarHeight(int h);
+
+	// 标题栏的高度
+	int titleBarHeight() const;
+	void setTitleBarHeight(int h);
+
+	// category的高度
+	int categoryHeight() const;
+	void setCategoryHeight(int h);
+
+	// 设置pannel的标题栏高度
+	int pannelTitleHeight() const;
+	void setPannelTitleHeight(int h);
+
+	// 获取元素
+	SARibbonBar* ribbonBar() const;
+	SARibbonTabBar* ribbonTabBar() const;
+	SARibbonStackedWidget* stackedContainerWidget() const;
+	SARibbonQuickAccessBar* quickAccessBar() const;
+	SARibbonButtonGroupWidget* rightButtonGroup() const;
+	QAbstractButton* applicationButton() const;
+
+protected:
+	void resizeInLooseStyle();
+	void resizeInCompactStyle();
+
+private:
+	void init();
+};
+
+#endif  // SARIBBONBARLAYOUT_H
+
+/*** End of inlined file: SARibbonBarLayout.h ***/
 
 /*** Start of inlined file: SARibbonElementFactory.h ***/
 #ifndef SARIBBONELEMENTFACTORY_H
@@ -3150,7 +3313,6 @@ class SARibbonGallery;
 class SARibbonGalleryGroup;
 class SARibbonToolButton;
 class SARibbonControlButton;
-class SARibbonControlToolButton;
 class SARibbonButtonGroupWidget;
 class SARibbonStackedWidget;
 class SARibbonQuickAccessBar;
@@ -3179,7 +3341,6 @@ public:
 	virtual SARibbonGalleryGroup* createRibbonGalleryGroup(QWidget* parent);
 	virtual SARibbonToolButton* createRibbonToolButton(QWidget* parent);
 	virtual SARibbonControlButton* createRibbonControlButton(QWidget* parent);
-	virtual SARibbonControlToolButton* createRibbonControlToolButton(QWidget* parent);
 	virtual SARibbonStackedWidget* createRibbonStackedWidget(SARibbonBar* parent);
 	virtual SARibbonButtonGroupWidget* craeteButtonGroupWidget(QWidget* parent);
 	virtual SARibbonQuickAccessBar* createQuickAccessBar(QWidget* parent);
@@ -3879,7 +4040,6 @@ protected:
 	virtual void resizeToParent(const QSize& parentSize);
 
 protected:
-	void resizeToParent();
 	bool eventFilter(QObject* obj, QEvent* ev) override;
 	void showEvent(QShowEvent* event) override;
 	void keyPressEvent(QKeyEvent* ev) override;
