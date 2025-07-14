@@ -5,8 +5,9 @@
 cmake_minimum_required(VERSION 3.5)
 
 set(SARIBBON_VERSION_MAJOR 2)
-set(SARIBBON_VERSION_MINOR 3)
-set(SARIBBON_VERSION_PATCH 2)
+set(SARIBBON_VERSION_MINOR 4)
+set(SARIBBON_VERSION_PATCH 0)
+
 set(SARIBBON_VERSION "${SARIBBON_VERSION_MAJOR}.${SARIBBON_VERSION_MINOR}.${SARIBBON_VERSION_PATCH}")
 message(STATUS "SARibbon v${SARIBBON_VERSION}")
 project(SARibbon VERSION ${SARIBBON_VERSION} LANGUAGES CXX)
@@ -63,7 +64,7 @@ if(_SARIBBON_USE_FRAMELESS_LIB)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
     if(MSVC)
         # CMAKE_CXX_STANDARD对有些版本的msvc无效
-        set(CMAKE_CXX_FLAGS"${CMAKE_CXX_FLAGS} /std:c++17")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
     endif()
     message(STATUS "The current QT version can use the frameless library and enable C++17")
 else()
@@ -71,7 +72,7 @@ else()
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
     if(MSVC)
         # CMAKE_CXX_STANDARD对有些版本的msvc无效
-        set(CMAKE_CXX_FLAGS"${CMAKE_CXX_FLAGS} /std:c++14")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++14")
     endif()
     message(STATUS "The current qt version cannot use the frameless library, enable C++14")
 endif()
@@ -117,34 +118,54 @@ if(SARIBBON_INSTALL_IN_CURRENT_DIR)
     set(CMAKE_INSTALL_PREFIX "${SARIBBON_LOCAL_INSTALL_BIN_DIR}")
     message(STATUS "SARIBBON_INSTALL_IN_CURRENT_DIR=ON,will install in:${CMAKE_INSTALL_PREFIX}")
 endif()
-##################################
-# subdirectory
-##################################
 
+
+# QWindowKit的依赖
+# QWindowKit的查找顺序：
+# 1. 用户通过-DQWindowKit_DIR指定的路径
+# 2. 项目本地安装目录 (bin_qtX.X.X_compiler_platform/lib/cmake/QWindowKit)
+# 3. 系统默认安装路径
+# 对于开发者，可以在配置时指定路径：
+# cmake -DQWindowKit_DIR={path-to-qwindowkit/lib/cmake/QWindowKit}
 if(_SARIBBON_USE_FRAMELESS_LIB)
-    if(NOT QWindowKit_DIR)
-        message(STATUS "option SARIBBON_USE_FRAMELESS_LIB=ON,but QWindowKit_DIR not defined,will set QWindowKit_DIR=${SARIBBON_LOCAL_INSTALL_BIN_DIR}/lib/cmake/QWindowKit")
-        set(__qwk_dir ${SARIBBON_LOCAL_INSTALL_BIN_DIR}/lib/cmake/QWindowKit)
-        if(EXISTS ${__qwk_dir})
-            set(QWindowKit_DIR ${__qwk_dir})
-        else()
-            message(WARNING "SARIBBON_USE_FRAMELESS_LIB=ON,but not defined QWindowKit_DIR path")
-        endif()
-        # 再次尝试加载QWindowKit
+    # 明确记录尝试查找的路径
+    set(_qwk_search_paths)
+
+    # 如果用户已指定QWindowKit_DIR，优先使用
+    if(QWindowKit_DIR)
+        list(APPEND _qwk_search_paths ${QWindowKit_DIR})
+        message(STATUS "Using user-specified QWindowKit_DIR: ${QWindowKit_DIR}")
+    endif()
+
+    # 添加项目本地安装目录作为备选路径
+    set(_local_qwk_dir ${SARIBBON_LOCAL_INSTALL_BIN_DIR}/lib/cmake/QWindowKit)
+    if(EXISTS "${_local_qwk_dir}")
+        list(APPEND _qwk_search_paths ${_local_qwk_dir})
+        message(STATUS "Adding local install path for QWindowKit: ${_local_qwk_dir}")
+    endif()
+
+    # 尝试查找QWindowKit包
+    find_package(QWindowKit QUIET
+        PATHS ${_qwk_search_paths}
+        NO_DEFAULT_PATH  # 禁止在系统默认路径查找
+    )
+
+    # 如果未找到，尝试系统路径作为最后手段
+    if(NOT QWindowKit_FOUND)
+        message(STATUS "QWindowKit not found in specified paths, trying system default...")
         find_package(QWindowKit QUIET)
-        if(NOT QWindowKit_FOUND)
-            set(_SARIBBON_USE_FRAMELESS_LIB OFF)
-            message(WARNING "can not find package QWindowKit at ${__qwk_dir},set SARIBBON_USE_FRAMELESS_LIB=OFF")
-        endif()
+    endif()
+
+    # 最终确认是否找到
+    if(QWindowKit_FOUND)
+        message(STATUS "QWindowKit found at: ${QWindowKit_DIR}")
     else()
-        message(STATUS "QWindowKit_DIR=${QWindowKit_DIR}")
-        find_package(QWindowKit QUIET)
-        if(NOT QWindowKit_FOUND)
-            set(_SARIBBON_USE_FRAMELESS_LIB OFF)
-            message(WARNING "can not find package QWindowKit at ${__qwk_dir},set SARIBBON_USE_FRAMELESS_LIB=OFF")
-        endif()
+        set(_SARIBBON_USE_FRAMELESS_LIB OFF)
+        message(WARNING "QWindowKit not found - disabling frameless support. Searched paths:\n  ${_qwk_search_paths}")
     endif()
 endif()
+
+
 
 include(cmake/WinResource.cmake)
 

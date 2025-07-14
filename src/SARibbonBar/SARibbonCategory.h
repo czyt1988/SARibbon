@@ -12,10 +12,12 @@ class QHBoxLayout;
 class QWheelEvent;
 class SARibbonBar;
 class SARibbonCategoryLayout;
+
 /**
- * @brief 一项ribbon tab页
- * @note SARibbonCategory的windowTitle影响了其在SARibbonBar的标签显示，
- * 如果要改标签名字，直接调用SARibbonCategory的setWindowTitle函数
+ * @brief Ribbon控件中的分类选项卡页面（Category）
+ *
+ * 每个Category代表Ribbon中的一个标签页，包含多个面板(Pannel)
+ *
  */
 class SA_RIBBON_EXPORT SARibbonCategory : public QFrame
 {
@@ -118,6 +120,18 @@ public:
 
 	// 刷新category的尺寸布局
 	void updateItemGeometry();
+
+	// 设置是否使用动画滚动
+	void setUseAnimatingScroll(bool useAnimating);
+	bool isUseAnimatingScroll() const;
+
+	// 设置滚轮滚动步长（像素）
+	void setWheelScrollStep(int step);
+	int wheelScrollStep() const;
+
+	// 设置动画持续时间（毫秒）
+	void setAnimationDuration(int duration);
+	int animationDuration() const;
 
 	// 此函数会遍历Category下的所有pannel,执行函数指针，函数指针返回false则停止迭代
 	bool iteratePannel(FpPannelIterate fp) const;

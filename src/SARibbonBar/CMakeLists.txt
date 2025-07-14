@@ -35,6 +35,7 @@ SET(SARIBBON_HEADER_FILES
     SARibbonGlobal.h
     SAFramelessHelper.h
     SARibbonActionsManager.h
+    SARibbonBarLayout.h
     SARibbonBar.h
     SARibbonCustomizeData.h
     SARibbonCustomizeDialog.h
@@ -77,6 +78,7 @@ SET(SARIBBON_HEADER_FILES
 SET(SARIBBON_SOURCE_FILES
     SAFramelessHelper.cpp
     SARibbonActionsManager.cpp
+    SARibbonBarLayout.cpp
     SARibbonBar.cpp
     SARibbonCustomizeData.cpp
     SARibbonCustomizeDialog.cpp
@@ -224,11 +226,9 @@ set(SARIBBON_AMALGAMATE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/../SARibbon.pri
 )
 
-install(FILES
-    ${SARIBBON_AMALGAMATE_FILES}
-    DESTINATION ${SARIBBON_LIB_NAME}_amalgamate
+install(FILES ${SARIBBON_AMALGAMATE_FILES}
+     DESTINATION share/${SARIBBON_LIB_NAME}_amalgamate
 )
-
 
 
 include(CMakePackageConfigHelpers)
@@ -273,8 +273,8 @@ install(FILES
 
 if(WIN32)
 	create_win32_resource_version(
-                TARGET ${SARIBBON_LIB_NAME}
-                FILENAME ${SARIBBON_LIB_NAME}
+        TARGET ${SARIBBON_LIB_NAME}
+        FILENAME ${SARIBBON_LIB_NAME}
 		EXT "dll"
 		DESCRIPTION "Ribbon control library for Qt"
 	)

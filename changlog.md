@@ -1,5 +1,12 @@
 ﻿# 版本记录(change log):
 
+## 2025-07-14 -> 2.4.0
+
+- 调整了SARibbonBar的布局方式，添加了SARibbonBarLayout类
+- 调整了原来的代码格式化clang-format
+- category的滚动增加动画效果，不那么生硬，添加了动画设置相关接口
+- 修正了已知的一些bug
+
 ## 2025-03-12 -> 2.3.0
 
 - 静态引入版本仅仅只需`SARibbon.h`和`SARibbon.cpp`两个文件，其他文件不需要
