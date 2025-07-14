@@ -18,7 +18,10 @@
 #include "SARibbonTabBar.h"
 #include "SARibbonApplicationButton.h"
 #include "SARibbonBarLayout.h"
-#ifdef SA_RIBBON_DEBUG_HELP_DRAW
+#ifndef SARIBBONBAR_DEBUG_PRINT
+#define SARIBBONBAR_DEBUG_PRINT 0
+#endif
+#if SARIBBONBAR_DEBUG_PRINT
 #ifndef SARIBBONBAR_HELP_DRAW_RECT
 #define SARIBBONBAR_HELP_DRAW_RECT(p, rect)                                                                            \
 	do {                                                                                                               \
@@ -282,7 +285,11 @@ QRect SARibbonBar::PrivateData::calcContextCategoryTitleRect(const _SAContextCat
 void SARibbonBar::PrivateData::relayout()
 {
 	if (auto lay = q_ptr->layout()) {
+        lay->invalidate();
 		lay->activate();
+#if SARIBBONBAR_DEBUG_PRINT
+        qDebug() << "SARibbonBar relayout";
+#endif
 	}
 }
 
@@ -809,6 +816,9 @@ void SARibbonBar::showContextCategory(SARibbonContextCategory* context)
 	// 由于上下文都是在最后追加，不需要调用updateTabData();
 
 	d_ptr->relayout();
+
+    // 重新布局完后需要重绘
+    update();
 }
 
 /**
@@ -834,6 +844,8 @@ void SARibbonBar::hideContextCategory(SARibbonContextCategory* context)
 	if (needResize) {
 		d_ptr->updateTabData();
 		d_ptr->relayout();
+        // 重新布局完后需要重绘
+        update();
 	}
 }
 
@@ -935,7 +947,7 @@ QList< int > SARibbonBar::currentVisibleContextCategoryTabIndexs() const
  */
 void SARibbonBar::setMinimumMode(bool isMinimum)
 {
-#ifdef SA_RIBBON_DEBUG_HELP_DRAW
+#if SARIBBONBAR_DEBUG_PRINT
 	qDebug() << "SARibbonBar::setHideMode " << isMinimum;
 #endif
 	if (isMinimum) {
@@ -943,8 +955,10 @@ void SARibbonBar::setMinimumMode(bool isMinimum)
 	} else {
 		d_ptr->setNormalMode();
 	}
-	QResizeEvent resizeEvent(size(), size());
-	QApplication::sendEvent(this, &resizeEvent);
+    if (SARibbonBarLayout* lay = qobject_cast< SARibbonBarLayout* >(layout())) {
+        // 强制更新尺寸
+        lay->resetSize();
+    }
 	// 发射信号
 	Q_EMIT ribbonModeChanged(isMinimum ? MinimumRibbonMode : NormalRibbonMode);
 }
@@ -967,21 +981,19 @@ void SARibbonBar::showMinimumModeButton(bool isShow)
 		activeRightButtonGroup();
 
 		d_ptr->mMinimumCategoryButtonAction = new QAction(this);
-		d_ptr->mMinimumCategoryButtonAction->setIcon(style()->standardIcon(
-			isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton, nullptr));
+        d_ptr->mMinimumCategoryButtonAction->setIcon(
+            style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton,
+                                  nullptr));
 		connect(d_ptr->mMinimumCategoryButtonAction, &QAction::triggered, this, [ this ]() {
 			this->setMinimumMode(!isMinimumMode());
-			this->d_ptr->mMinimumCategoryButtonAction->setIcon(style()->standardIcon(
-				isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton, nullptr));
+            this->d_ptr->mMinimumCategoryButtonAction->setIcon(
+                style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton,
+                                      nullptr));
 		});
 		d_ptr->mRightButtonGroup->addAction(d_ptr->mMinimumCategoryButtonAction);
 	}
 
 	d_ptr->mMinimumCategoryButtonAction->setVisible(isShow);
-
-	QResizeEvent resizeEvent(size(), size());
-
-	QApplication::sendEvent(this, &resizeEvent);
 }
 
 /**
@@ -1187,7 +1199,7 @@ void SARibbonBar::onCurrentRibbonTabChanged(int index)
 				                d_ptr->mRibbonTabBar->mapToGlobal(QCursor::pos()));
 				QApplication::sendEvent(d_ptr->mRibbonTabBar, &ehl);
 				if (SARibbonBarLayout* lay = qobject_cast< SARibbonBarLayout* >(layout())) {
-					lay->resizeStackedContainerWidget();
+                    lay->layoutStackedContainerWidget();
 				}
 				d_ptr->mStackedContainerWidget->setFocus();
 				// exec之前先发射信息号，否则会被exec阻塞
@@ -1221,7 +1233,7 @@ void SARibbonBar::onCurrentRibbonTabClicked(int index)
 				QApplication::sendEvent(d_ptr->mRibbonTabBar, &ehl);
 				// 弹出前都调整一下位置，避免移动后位置异常
 				if (SARibbonBarLayout* lay = qobject_cast< SARibbonBarLayout* >(layout())) {
-					lay->resizeStackedContainerWidget();
+                    lay->layoutStackedContainerWidget();
 				}
 				this->d_ptr->mStackedContainerWidget->setFocus();
 				this->d_ptr->mStackedContainerWidget->exec();
@@ -1310,7 +1322,6 @@ void SARibbonBar::synchronousCategoryData(bool autoUpdate)
 		c->setPannelTitleHeight(this->pannelTitleHeight());
 		c->setCategoryAlignment(this->ribbonAlignment());
 		c->setPannelLayoutMode(this->pannelLayoutMode());
-		c->adjustSize();
 		return true;
 	});
 	if (autoUpdate) {
@@ -1407,7 +1418,7 @@ void SARibbonBar::setRibbonStyle(SARibbonBar::RibbonStyles v)
 {
 	// 先幅值给变量
 	d_ptr->mRibbonStyle = v;
-#if SA_DEBUG_PRINT_SIZE_HINT
+#if SARIBBONBAR_DEBUG_PRINT
 	qDebug() << "setRibbonStyle(" << v << ")"                //
 	         << "\n  isThreeRowStyle=" << isThreeRowStyle()  //
 	         << "\n  isTwoRowStyle=" << isTwoRowStyle()      //
@@ -2169,11 +2180,20 @@ void SARibbonBar::paintEvent(QPaintEvent* e)
 	} else {
 		paintInCompactStyle();
 	}
-#ifdef SA_RIBBON_DEBUG_HELP_DRAW
+#if SARIBBONBAR_DEBUG_PRINT
 	QPainter p(this);
-	SARIBBONBAR_HELP_DRAW_RECT(p, m_d->quickAccessBar->geometry());
-	SARIBBONBAR_HELP_DRAW_RECT(p, m_d->ribbonTabBar->geometry());
-	SARIBBONBAR_HELP_DRAW_RECT(p, m_d->stackedContainerWidget->geometry());
+    if (d_ptr->mQuickAccessBar) {
+        SARIBBONBAR_HELP_DRAW_RECT(p, d_ptr->mQuickAccessBar->geometry());
+    }
+    if (d_ptr->mRibbonTabBar) {
+        SARIBBONBAR_HELP_DRAW_RECT(p, d_ptr->mRibbonTabBar->geometry());
+    }
+    if (d_ptr->mStackedContainerWidget) {
+        SARIBBONBAR_HELP_DRAW_RECT(p, d_ptr->mStackedContainerWidget->geometry());
+    }
+    if (d_ptr->mRightButtonGroup) {
+        SARIBBONBAR_HELP_DRAW_RECT(p, d_ptr->mRightButtonGroup->geometry());
+    }
 #endif
 }
 
@@ -2191,9 +2211,9 @@ void SARibbonBar::paintInLooseStyle()
 		if (!contextData.tabPageIndex.isEmpty()) {
 			// 绘制
 			paintContextCategoryTab(p,
-									contextData.contextCategory->contextTitle(),
-									contextTitleRect,
-									contextData.contextCategory->contextColor());
+                                    contextData.contextCategory->contextTitle(),
+                                    contextTitleRect,
+                                    contextData.contextCategory->contextColor());
 		}
 	}
 
@@ -2221,9 +2241,9 @@ void SARibbonBar::paintInCompactStyle()
 		if (!contextData.tabPageIndex.isEmpty()) {
 			// 绘制
 			paintContextCategoryTab(p,
-									contextData.contextCategory->contextTitle(),
-									contextTitleRect,
-									contextData.contextCategory->contextColor());
+                                    contextData.contextCategory->contextTitle(),
+                                    contextTitleRect,
+                                    contextData.contextCategory->contextColor());
 		}
 	}
 
@@ -2319,17 +2339,6 @@ void SARibbonBar::paintContextCategoryTab(QPainter& painter, const QString& titl
 	painter.restore();
 }
 
-// void SARibbonBar::resizeEvent(QResizeEvent* e)
-// {
-// 	Q_UNUSED(e);
-// 	if (isLooseStyle()) {
-// 		resizeInLooseStyle();
-// 	} else {
-// 		resizeInCompactStyle();
-// 	}
-// 	update();
-// }
-
 /**
  * @brief 重写moveevent是为了在移动时调整isPopupMode状态下的stackedContainerWidget位置
  * @param event
@@ -2340,7 +2349,7 @@ void SARibbonBar::moveEvent(QMoveEvent* e)
 		if (d_ptr->mStackedContainerWidget->isPopupMode()) {
 			// 弹出模式时，窗口发生了移动，同步调整StackedContainerWidget的位置
 			if (SARibbonBarLayout* lay = qobject_cast< SARibbonBarLayout* >(layout())) {
-				lay->resizeStackedContainerWidget();
+                lay->layoutStackedContainerWidget();
 			}
 		}
 	}
@@ -2429,32 +2438,6 @@ void SARibbonBar::paintWindowTitle(QPainter& painter, const QString& title, cons
 	painter.drawText(titleRegion, d_ptr->mTitleAligment, title);
 	painter.restore();
 }
-
-#if SA_DEBUG_PRINT_SARIBBONBAR
-QDebug operator<<(QDebug debug, const SARibbonBar& ribbon)
-{
-	QDebugStateSaver saver(debug);
-	QFontMetrics fm = ribbon.fontMetrics();
-	debug.nospace() << "SARibbonBar(" << ribbon.versionString() << ")"                            //
-	                << "\nribbon font metrics info:"                                              //
-	                << "\n - lineSpacing:" << fm.lineSpacing()                                    //
-	                << "\n - height:" << fm.height()                                              //
-	                << "\n - em:" << fm.boundingRect("M").width()                                 //
-	                << "\n - ex:" << fm.boundingRect("X").height()                                //
-	                << "\nribbon info:"                                                           //
-	                << "\n -mTitleBarHeight=" << ribbon.d_ptr->mTitleBarHeight                    //
-	                << "\n -mTabBarHeight=" << ribbon.d_ptr->mTabBarHeight                        //
-	                << "\n -mPannelTitleHeight=" << ribbon.d_ptr->mPannelTitleHeight              //
-	                << "\n -mCategoryHeight=" << ribbon.d_ptr->mCategoryHeight                    //
-	                << "\n -mIsTabOnTitle=" << ribbon.d_ptr->mIsTabOnTitle                        //
-	                << "\n -mEnableShowPannelTitle=" << ribbon.d_ptr->mEnableShowPannelTitle      //
-	                << "\n -mWindowButtonSize=" << ribbon.d_ptr->mWindowButtonSize                //
-	                << "\n -mIconRightBorderPosition=" << ribbon.d_ptr->mIconRightBorderPosition  //
-	    ;
-
-	return debug;
-}
-#endif
 
 namespace SA
 {

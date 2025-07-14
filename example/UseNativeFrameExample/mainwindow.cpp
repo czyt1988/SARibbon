@@ -146,7 +146,7 @@ void MainWindow::createRibbonApplicationButton()
 		ribbon->setApplicationButton(btn);
 	}
 
-    btn->setText(("  &File  "));  // 文字两边留有间距，好看一点
+    btn->setText(("&File"));
     if (0) {
         SARibbonApplicationButton* appBtn = qobject_cast< SARibbonApplicationButton* >(btn);
         if (!appBtn) {

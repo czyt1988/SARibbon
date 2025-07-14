@@ -6,7 +6,18 @@ class QHideEvent;
 class QResizeEvent;
 
 /**
- * @brief 有qdialog功能的stackwidget，用于在最小化时stack能像dialog那样弹出来
+ * @class SARibbonStackedWidget
+ * @brief 具有弹出式菜单功能的堆叠窗口部件
+ *
+ * 此类扩展了 QStackedWidget，添加了两种工作模式：
+ * 1. 正常模式：作为常规的堆叠部件，嵌入在父窗口布局中
+ * 2. 弹出模式：作为独立的弹出窗口，可用于实现类似菜单的显示效果
+ *
+ * 在弹出模式下，窗口将显示为无边框面板，并支持模态事件循环（exec()方法），
+ * 这使得它可以像菜单或对话框一样使用。
+ *
+ * @note 切换模式时会自动处理窗口状态和事件循环
+ * @sa QStackedWidget
  */
 class SA_RIBBON_EXPORT SARibbonStackedWidget : public QStackedWidget
 {
@@ -15,18 +26,22 @@ class SA_RIBBON_EXPORT SARibbonStackedWidget : public QStackedWidget
 public:
     explicit SARibbonStackedWidget(QWidget* parent);
     ~SARibbonStackedWidget();
+    // 设置弹出模式
     void setPopupMode();
+
+    // 检查当前是否处于弹出模式
     bool isPopupMode() const;
+
+    // 设置正常模式 和普通的stackwidget一样
     void setNormalMode();
+
+    // 检查当前是否处于正常模式
     bool isNormalMode() const;
+
+    // 在弹出模式下以模态方式运行事件循环
     void exec();
 
-    /**
-     * @brief 类似tabbar的moveTab函数，交换两个窗口的index
-     * @param from
-     * @param to
-     * @note 此操作会触发widgetRemoved(int index)信号
-     */
+    // 类似tabbar的moveTab函数，交换两个窗口的index
     void moveWidget(int from, int to);
 
 protected:
@@ -35,7 +50,7 @@ protected:
     virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
 Q_SIGNALS:
     /**
-     * @brief hidWindow
+     * @brief 隐藏窗口信号
      */
     void hidWindow();
 };
