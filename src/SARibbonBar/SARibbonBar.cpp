@@ -98,7 +98,9 @@ public:
 		mFpContextHighlight       = [](const QColor& c) -> QColor { return SA::makeColorVibrant(c); };
 	}
 	void init();
-
+	// 创建一个默认的ApplicationButton
+	void createDefaultApplicationButton();
+	// 设置一个ApplicationButton
 	void setApplicationButton(QAbstractButton* btn);
 
 	bool isContainContextCategoryInList(SARibbonContextCategory* contextCategory);
@@ -121,8 +123,7 @@ public:
 
 void SARibbonBar::PrivateData::init()
 {
-	mApplicationButton = RibbonSubElementFactory->createRibbonApplicationButton(q_ptr);
-	q_ptr->connect(mApplicationButton.data(), &QAbstractButton::clicked, q_ptr, &SARibbonBar::applicationButtonClicked);
+	createDefaultApplicationButton();
 	mRibbonTabBar = RibbonSubElementFactory->createRibbonTabBar(q_ptr);
 	mRibbonTabBar->setObjectName(QStringLiteral("objSARibbonTabBar"));
 	mRibbonTabBar->setDrawBase(false);
@@ -146,6 +147,11 @@ void SARibbonBar::PrivateData::init()
 	setNormalMode();
 }
 
+void SARibbonBar::PrivateData::createDefaultApplicationButton()
+{
+	setApplicationButton(RibbonSubElementFactory->createRibbonApplicationButton(q_ptr));
+}
+
 void SARibbonBar::PrivateData::setApplicationButton(QAbstractButton* btn)
 {
 	if (mApplicationButton) {
@@ -156,7 +162,10 @@ void SARibbonBar::PrivateData::setApplicationButton(QAbstractButton* btn)
 		if (btn->parent() != q_ptr) {
 			btn->setParent(q_ptr);
 		}
-		btn->move(0, q_ptr->titleBarHeight());
+		if (btn->objectName().isEmpty()) {
+			btn->setObjectName(QStringLiteral("SARibbonApplicationButton"));
+		}
+		btn->setVisible(true);
 		btn->show();
 		q_ptr->connect(btn, &QAbstractButton::clicked, q_ptr, &SARibbonBar::applicationButtonClicked);
 	}
@@ -432,13 +441,6 @@ QAbstractButton* SARibbonBar::applicationButton()
 void SARibbonBar::setApplicationButton(QAbstractButton* btn)
 {
 	d_ptr->setApplicationButton(btn);
-	if (btn) {
-		if (btn->objectName().isEmpty()) {
-			btn->setObjectName(QStringLiteral("SARibbonApplicationButton"));
-		}
-		btn->setVisible(true);
-		// btn->setGeometry(applicationButtonGeometry());
-	}
 	d_ptr->relayout();
 }
 
@@ -2454,14 +2456,26 @@ QColor makeColorVibrant(const QColor& c, int saturationDelta, int valueDelta)
 
 QSize scaleSizeByHeight(const QSize& originalSize, int newHeight)
 {
-	float aspectRatio = (float)originalSize.width() / (float)originalSize.height();
+	// 检查原始尺寸高度、宽度是否有效，以及目标高度是否有效
+	if (originalSize.height() <= 0 || originalSize.width() < 0 || newHeight <= 0) {
+		return QSize(0, 0);  // 无效输入返回零尺寸
+	}
+
+	// 计算宽高比并缩放
+	float aspectRatio = static_cast< float >(originalSize.width()) / static_cast< float >(originalSize.height());
 	int newWidth      = static_cast< int >(newHeight * aspectRatio);
 	return QSize(newWidth, newHeight);
 }
 
 QSize scaleSizeByWidth(const QSize& originalSize, int newWidth)
 {
-	float aspectRatio = (float)originalSize.height() / (float)originalSize.width();
+	// 检查原始尺寸宽度、高度是否有效，以及目标宽度是否有效
+	if (originalSize.width() <= 0 || originalSize.height() < 0 || newWidth <= 0) {
+		return QSize(0, 0);  // 无效输入返回零尺寸
+	}
+
+	// 计算高宽比并缩放
+	float aspectRatio = static_cast< float >(originalSize.height()) / static_cast< float >(originalSize.width());
 	int newHeight     = static_cast< int >(newWidth * aspectRatio);
 	return QSize(newWidth, newHeight);
 }

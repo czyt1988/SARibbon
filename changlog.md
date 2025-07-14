@@ -4,6 +4,8 @@
 
 - 调整了SARibbonBar的布局方式，添加了SARibbonBarLayout类
 - 调整了原来的代码格式化clang-format
+- category的滚动增加动画效果，不那么生硬，添加了动画设置相关接口
+- 修正了已知的一些bug
 
 ## 2025-03-12 -> 2.3.0
 

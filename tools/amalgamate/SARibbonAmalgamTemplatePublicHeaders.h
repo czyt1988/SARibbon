@@ -38,6 +38,7 @@
 #include "../../src/SARibbonBar/SARibbonGalleryGroup.h"
 #include "../../src/SARibbonBar/SARibbonGallery.h"
 #include "../../src/SARibbonBar/SARibbonBar.h"
+#include "../../src/SARibbonBar/SARibbonBarLayout.h"
 #include "../../src/SARibbonBar/SARibbonElementFactory.h"
 #include "../../src/SARibbonBar/SARibbonElementManager.h"
 #include "../../src/SARibbonBar/SARibbonCustomizeData.h"

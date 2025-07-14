@@ -226,11 +226,9 @@ set(SARIBBON_AMALGAMATE_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/../SARibbon.pri
 )
 
-install(FILES
-    ${SARIBBON_AMALGAMATE_FILES}
-    DESTINATION ${SARIBBON_LIB_NAME}_amalgamate
+install(FILES ${SARIBBON_AMALGAMATE_FILES}
+     DESTINATION share/${SARIBBON_LIB_NAME}_amalgamate
 )
-
 
 
 include(CMakePackageConfigHelpers)
@@ -275,8 +273,8 @@ install(FILES
 
 if(WIN32)
 	create_win32_resource_version(
-                TARGET ${SARIBBON_LIB_NAME}
-                FILENAME ${SARIBBON_LIB_NAME}
+        TARGET ${SARIBBON_LIB_NAME}
+        FILENAME ${SARIBBON_LIB_NAME}
 		EXT "dll"
 		DESCRIPTION "Ribbon control library for Qt"
 	)
