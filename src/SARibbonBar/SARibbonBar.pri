@@ -39,6 +39,7 @@ message("SA_RIBBON_CONFIG="$${SA_RIBBON_CONFIG})
 SOURCES += \
     $$PWD/SAFramelessHelper.cpp \
     $$PWD/SARibbonActionsManager.cpp \
+    $$PWD/SARibbonBarLayout.cpp \
     $$PWD/SARibbonBar.cpp \
     $$PWD/SARibbonColorToolButton.cpp \
     $$PWD/SARibbonCustomizeData.cpp \
@@ -78,6 +79,7 @@ SOURCES += \
 HEADERS  += \
     $$PWD/SAFramelessHelper.h \
     $$PWD/SARibbonActionsManager.h \
+    $$PWD/SARibbonBarLayout.h \
     $$PWD/SARibbonBar.h \
     $$PWD/SARibbonColorToolButton.h \
     $$PWD/SARibbonCustomizeData.h \

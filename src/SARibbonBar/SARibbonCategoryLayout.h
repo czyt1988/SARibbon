@@ -18,6 +18,8 @@ class SA_RIBBON_EXPORT SARibbonCategoryLayout : public QLayout
     Q_OBJECT
     SA_RIBBON_DECLARE_PRIVATE(SARibbonCategoryLayout)
 public:
+    Q_PROPERTY(int scrollPosition READ scrollPosition WRITE setScrollPosition)
+public:
     explicit SARibbonCategoryLayout(SARibbonCategory* parent);
     ~SARibbonCategoryLayout();
 
@@ -66,6 +68,15 @@ public:
     QList< SARibbonPannel* > pannelList() const;
     // 执行滚轮事件
     void scroll(int px);
+    // 带动画的滚动
+    void scrollByAnimate(int px);
+    void scrollToByAnimate(int targetX);
+    // 滚动后的位置
+    int scrollPosition() const;
+    // 设置滚动位置
+    void setScrollPosition(int pos);
+    // 是否在滚动动画中
+    bool isAnimatingScroll() const;
     // 判断是否有滚动过
     bool isScrolled() const;
     // category的总宽度
@@ -73,9 +84,13 @@ public:
     // 设置Category的对齐方式
     void setCategoryAlignment(SARibbonAlignment al);
     SARibbonAlignment categoryAlignment() const;
+    // 设置动画滚动
 private Q_SLOTS:
     void onLeftScrollButtonClicked();
     void onRightScrollButtonClicked();
+
+private:
+    void setupAnimateScroll();
 };
 
 /**
