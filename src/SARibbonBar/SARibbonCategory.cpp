@@ -56,6 +56,7 @@ public:
 	bool mIsContextCategory { false };       ///< 标记是否是上下文标签
 	bool mIsCanCustomize { true };           ///< 标记是否可以自定义
 	int mPannelSpacing { 0 };                ///< pannel的spacing
+    bool m_isUseAnimating { true };          ///< 默认使用动画滚动
 	QSize mPannelToolButtonSize { 22, 22 };  ///< 记录pannel的默认图标大小
 	SARibbonPannel::PannelLayoutMode mDefaultPannelLayoutMode { SARibbonPannel::ThreeRowMode };
 };
@@ -185,35 +186,89 @@ void SARibbonCategory::PrivateData::doWheelEvent(QWheelEvent* event)
 	if (nullptr == lay) {
 		return;
 	}
-	QSize contentSize = lay->categoryContentSize();
-	// 求总宽
-	int totalWidth = lay->categoryTotalWidth();
+
+    // 如果动画正在进行，忽略新的事件
+    if (m_isUseAnimating && lay->isAnimatingScroll()) {
+        event->ignore();
+        return;
+    }
+
+    QSize contentSize = lay->categoryContentSize();
+    int totalWidth    = lay->categoryTotalWidth();
 
 	if (totalWidth > contentSize.width()) {
-		// 这个时候滚动有效
-		int scrollpix = 40;
-		// Qt6 取消了QWheelEvent::delta函数
-		// 是要下面方法可兼容qt5/6
+        int scrollStep = 40;
+
+        // 根据滚轮方向确定滚动方向
 		QPoint numPixels  = event->pixelDelta();
 		QPoint numDegrees = event->angleDelta() / 8;
+
 		if (!numPixels.isNull()) {
-			if (numDegrees.y() < 0) {
-				scrollpix = -scrollpix;
-			}
+            scrollStep = (numPixels.y() < 0) ? -scrollStep : scrollStep;
 		} else if (!numDegrees.isNull()) {
-			if (numDegrees.y() < 0) {
-				scrollpix = -scrollpix;
-			}
+            scrollStep = (numDegrees.y() < 0) ? -scrollStep : scrollStep;
+        }
+
+        // 动态调整步长 - 滚动越快步长越大
+        const int absDelta = qMax(qAbs(numPixels.y()), qAbs(numDegrees.y()));
+        if (absDelta > 60) {
+            scrollStep *= 2;
+        } else if (absDelta < 20) {
+            scrollStep /= 2;
 		}
-		lay->scroll(scrollpix);
+
+        // 根据设置选择滚动方式
+        if (m_isUseAnimating) {
+            lay->scrollByAnimate(scrollStep);
+        } else {
+            lay->scroll(scrollStep);
+        }
 	} else {
-		// 这时候无需处理事件，把滚动事件上发让父级也能接收
 		event->ignore();
-		// 如滚动过就还原
 		if (lay->isScrolled()) {
-			lay->scroll(0);
+            // 根据设置选择复位方式
+            if (m_isUseAnimating) {
+                lay->scrollToByAnimate(0);
+            } else {
+                lay->scroll(0);
+            }
 		}
 	}
+    /**
+SARibbonCategoryLayout* lay = q_ptr->categoryLayout();
+if (nullptr == lay) {
+    return;
+}
+QSize contentSize = lay->categoryContentSize();
+// 求总宽
+int totalWidth = lay->categoryTotalWidth();
+
+if (totalWidth > contentSize.width()) {
+    // 这个时候滚动有效
+    int scrollpix = 40;
+    // Qt6 取消了QWheelEvent::delta函数
+    // 是要下面方法可兼容qt5/6
+    QPoint numPixels  = event->pixelDelta();
+    QPoint numDegrees = event->angleDelta() / 8;
+    if (!numPixels.isNull()) {
+        if (numDegrees.y() < 0) {
+            scrollpix = -scrollpix;
+        }
+    } else if (!numDegrees.isNull()) {
+        if (numDegrees.y() < 0) {
+            scrollpix = -scrollpix;
+        }
+    }
+    lay->scroll(scrollpix);
+} else {
+    // 这时候无需处理事件，把滚动事件上发让父级也能接收
+    event->ignore();
+    // 如滚动过就还原
+    if (lay->isScrolled()) {
+        lay->scroll(0);
+    }
+}
+**/
 }
 
 void SARibbonCategory::PrivateData::init(SARibbonCategory* c)
@@ -587,7 +642,25 @@ void SARibbonCategory::updateItemGeometry()
 #if SARIBBONCATEGORY_DEBUG_PRINT
 	qDebug() << "SARibbonCategory name=" << categoryName() << " updateItemGeometry";
 #endif
-	d_ptr->updateItemGeometry();
+    d_ptr->updateItemGeometry();
+}
+
+/**
+ * @brief 设置滚动时是否使用动画
+ * @param useAnimating
+ */
+void SARibbonCategory::setUseAnimatingScroll(bool useAnimating)
+{
+    d_ptr->m_isUseAnimating = useAnimating;
+}
+
+/**
+ * @brief 滚动时是否使用动画
+ * @return
+ */
+bool SARibbonCategory::isUseAnimatingScroll() const
+{
+    return d_ptr->m_isUseAnimating;
 }
 
 /**

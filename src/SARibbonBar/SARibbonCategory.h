@@ -119,6 +119,10 @@ public:
 	// 刷新category的尺寸布局
 	void updateItemGeometry();
 
+    // 设置是否使用动画滚动
+    void setUseAnimatingScroll(bool useAnimating);
+    bool isUseAnimatingScroll() const;
+
 	// 此函数会遍历Category下的所有pannel,执行函数指针，函数指针返回false则停止迭代
 	bool iteratePannel(FpPannelIterate fp) const;
 Q_SIGNALS:
