@@ -3,8 +3,9 @@
 #include <QResizeEvent>
 #include <QMouseEvent>
 #include <QApplication>
+#include <QPropertyAnimation>
 #ifndef SARIBBONSTACKEDWIDGET_DEBUG_PRINT
-#define SARIBBONSTACKEDWIDGET_DEBUG_PRINT 0
+#define SARIBBONSTACKEDWIDGET_DEBUG_PRINT 1
 #endif
 #if SARIBBONSTACKEDWIDGET_DEBUG_PRINT
 #include <QDebug>
@@ -17,27 +18,85 @@ class SARibbonStackedWidget::PrivateData
 	SA_RIBBON_DECLARE_PUBLIC(SARibbonStackedWidget)
 public:
 	QEventLoop* eventLoop { nullptr };
-
+    bool useAnimation { true };                 ///< 是否使用动画
+    QPropertyAnimation* animation { nullptr };  ///< 动画对象
+    QRect normalGeometry;                       ///< 正常状态下的几何位置
+    bool isAnimating { false };  ///< 标记动画是否正在进行，这个必须要有，它比animation->state()更早标记动画是否启动
+    int animationWidgetHeight { 0 };  ///< 动画时的窗口高度
+    bool isShowAnimation { false };   ///< 标记是显示动画还是隐藏动画
 public:
 	PrivateData(SARibbonStackedWidget* p) : q_ptr(p)
 	{
 	}
 
-	void init()
-	{
-		// Parent->setFocusPolicy(Qt::StrongFocus);
-	}
+    bool isAnimationRunning() const
+    {
+        return (isAnimating || animation->state() == QAbstractAnimation::Running);
+    }
 };
 
 SARibbonStackedWidget::SARibbonStackedWidget(QWidget* parent)
     : QStackedWidget(parent), d_ptr(new SARibbonStackedWidget::PrivateData(this))
 {
-	d_ptr->init();
 	setNormalMode();
+    setupAnimation();
 }
 
 SARibbonStackedWidget::~SARibbonStackedWidget()
 {
+}
+
+void SARibbonStackedWidget::setupAnimation()
+{
+    d_ptr->animation = new QPropertyAnimation(this, "animationWidgetHeight", this);
+    d_ptr->animation->setEasingCurve(QEasingCurve::OutQuad);
+    d_ptr->animation->setDuration(1000);
+    connect(d_ptr->animation, &QPropertyAnimation::finished, this, &SARibbonStackedWidget::onAnimationFinished);
+}
+
+int SARibbonStackedWidget::animationWidgetHeight() const
+{
+    return d_ptr->animationWidgetHeight;
+}
+void SARibbonStackedWidget::setAnimationWidgetHeight(int h)
+{
+    if (d_ptr->animationWidgetHeight == h) {
+        return;
+    }
+
+    d_ptr->animationWidgetHeight = h;
+
+    if (d_ptr->isAnimationRunning() && isPopupMode()) {
+        // 更新窗口大小和位置
+        setFixedSize(d_ptr->normalGeometry.width(), h);
+#if SARIBBONSTACKEDWIDGET_DEBUG_PRINT
+        qDebug() << "setAnimationWidgetHeight setFixedSize=" << d_ptr->normalGeometry.width() << "," << h;
+#endif
+    }
+}
+
+/**
+ * @brief 设置窗口normalGeometry，由于此窗口会有动画，防止动画过程中设置尺寸又被动画覆盖，因此此窗口的尺寸设置使用setNormalSize
+ *
+ * 此函数在没有动画的时候，等同于
+ * @code
+ * setFixedSize(normalGeometry.width(),normalGeometry.height());
+ * move(normalGeometry.x(),normalGeometry.y());
+ * @endcode
+ * @param normalGeometry
+ */
+void SARibbonStackedWidget::setNormalGeometry(const QRect& normalGeometry)
+{
+    d_ptr->normalGeometry = normalGeometry;
+    if (!d_ptr->isAnimationRunning()) {
+        setFixedSize(d_ptr->normalGeometry.width(), d_ptr->normalGeometry.height());
+        move(d_ptr->normalGeometry.x(), d_ptr->normalGeometry.y());
+    }
+}
+
+QRect SARibbonStackedWidget::normalGeometry() const
+{
+    return d_ptr->normalGeometry;
 }
 
 /**
@@ -94,6 +153,12 @@ void SARibbonStackedWidget::setNormalMode()
 		d_ptr->eventLoop->exit();
 		d_ptr->eventLoop = nullptr;
 	}
+    // 停止动画并恢复最终位置
+    if (d_ptr->isAnimationRunning()) {
+        d_ptr->animation->stop();
+        setFixedHeight(d_ptr->normalGeometry.height());
+    }
+
 	bool wasVisible = isVisible();
 	hide();
 	setMouseTracking(false);
@@ -151,47 +216,157 @@ void SARibbonStackedWidget::moveWidget(int from, int to)
 	insertWidget(to, w);
 }
 
+/**
+ * @brief 设置是否启用弹出动画
+ * @param on
+ */
+void SARibbonStackedWidget::setUseAnimation(bool on)
+{
+    d_ptr->useAnimation = on;
+}
+
+/**
+ * @brief 获取动画启用状态
+ * @return
+ */
+bool SARibbonStackedWidget::isUseAnimation() const
+{
+    return d_ptr->useAnimation;
+}
+/**
+ * @brief 设置动画持续时间（毫秒）
+ * @param duration
+ */
+void SARibbonStackedWidget::setAnimationDuration(int duration)
+{
+    d_ptr->animation->setDuration(duration);
+}
+
+/**
+ * @brief 获取动画持续时间
+ * @return
+ */
+int SARibbonStackedWidget::animationDuration() const
+{
+    return d_ptr->animation->duration();
+}
+
+/**
+ * @brief 动画完成槽函数
+ */
+void SARibbonStackedWidget::onAnimationFinished()
+{
+    d_ptr->isAnimating = false;
+    if (isPopupMode()) {
+        if (d_ptr->isShowAnimation) {
+            // 完成显示后，把其它窗口的尺寸移动到位置
+            if (height() != d_ptr->normalGeometry.height()) {
+                // 恢复窗口到正常位置
+                setFixedHeight(d_ptr->normalGeometry.height());
+            } else {
+                updateInnerWidgetGeometry();
+            }
+        }
+    }
+}
+
+void SARibbonStackedWidget::showEvent(QShowEvent* e)
+{
+    if (isPopupMode() && d_ptr->useAnimation && !d_ptr->isAnimationRunning()) {
+        // 这个必须放在最前面，否则setFixedHeight(0);就会把子窗口的尺寸改变
+        d_ptr->isAnimating = true;
+        // 标记为显示动画
+        d_ptr->isShowAnimation = true;
+
+        // 设置动画参数
+        d_ptr->animation->setStartValue(0);
+        d_ptr->animation->setEndValue(d_ptr->normalGeometry.height());
+
+        // 启动动画
+        d_ptr->animation->start();
+        // 设置起始位置
+        setFixedHeight(0);
+#if SARIBBONSTACKEDWIDGET_DEBUG_PRINT
+        qDebug() << "Starting show animation. Current state:" << d_ptr->animation->state()
+                 << "Start value:" << d_ptr->animation->startValue().toInt()
+                 << "End value:" << d_ptr->animation->endValue().toInt();
+#endif
+
+        // 确保动画已启动
+        QCoreApplication::processEvents();
+    } else {
+        QStackedWidget::showEvent(e);
+    }
+}
 void SARibbonStackedWidget::hideEvent(QHideEvent* e)
 {
-	if (isPopupMode()) {
-		if (d_ptr->eventLoop) {
-			d_ptr->eventLoop->exit();
-		}
-		Q_EMIT hidWindow();
-	}
+    if (!isPopupMode()) {
+        // 非弹出模式，正常的隐藏
+        QStackedWidget::hideEvent(e);
+        return;
+    }
 
-	QStackedWidget::hideEvent(e);
+    if (d_ptr->eventLoop) {
+        d_ptr->eventLoop->exit();
+        d_ptr->eventLoop = nullptr;
+    }
+    Q_EMIT hidWindow();
+    QStackedWidget::hideEvent(e);
+}
+
+void SARibbonStackedWidget::updateInnerWidgetGeometry()
+{
+    // 确保所有子部件都填满整个区域
+    const QSize newSize = size();
+    for (int i = 0; i < count(); ++i) {
+        QWidget* innerWidget = widget(i);
+        if (!innerWidget)
+            continue;
+
+        if (i == currentIndex()) {
+            // 确保当前部件也填满整个区域
+            if (innerWidget->size() != newSize) {
+                innerWidget->move(0, 0);
+                innerWidget->setFixedSize(newSize);
+            }
+            continue;
+        }
+
+        // 设置非活动部件的位置和大小
+        innerWidget->move(0, 0);
+        innerWidget->setFixedSize(newSize);
+        // innerWidget->setGeometry(0, 0, newSize.width(), newSize.height());
+        // 通知部件布局可能需要更新
+#if SARIBBONSTACKEDWIDGET_DEBUG_PRINT
+        qDebug() << "SARibbonStackedWidget::resizeEvent [not Animation]innerWidget move to:" << innerWidget->geometry()
+                 << ", isShowAnimation:" << d_ptr->isShowAnimation;
+#endif
+        QApplication::postEvent(innerWidget, new QEvent(QEvent::LayoutRequest));
+    }
 }
 
 void SARibbonStackedWidget::resizeEvent(QResizeEvent* e)
 {
-	// 先调用基类处理当前显示的部件
-	QStackedWidget::resizeEvent(e);
+    if (d_ptr->isAnimationRunning() && d_ptr->useAnimation) {
+        // 正在动画过程中，移动当前窗口的位置
+        QWidget* innerWidget = currentWidget();
+        if (!innerWidget) {
+            return;
+        }
+        int x = innerWidget->x();
 
-	// 确保所有子部件都填满整个区域
-	const QSize newSize = e->size();
-	for (int i = 0; i < count(); ++i) {
-		QWidget* innerWidget = widget(i);
-		if (!innerWidget)
-			continue;
+        innerWidget->move(x, e->size().height() - d_ptr->normalGeometry.height());
 
-		if (i == currentIndex()) {
-			// 确保当前部件也填满整个区域
-			if (innerWidget->size() != newSize) {
-				innerWidget->setGeometry(0, 0, newSize.width(), newSize.height());
-			}
-			continue;
-		}
-
-		// 设置非活动部件的位置和大小
-		innerWidget->move(0, 0);
-		innerWidget->setFixedSize(newSize);
-		// innerWidget->setGeometry(0, 0, newSize.width(), newSize.height());
 #if SARIBBONSTACKEDWIDGET_DEBUG_PRINT
-		qDebug() << "SARibbonStackedWidget resizeEvent,set innerWidget to size:" << newSize << ",and widget geo is "
-				 << innerWidget->geometry();
+        qDebug() << "SARibbonStackedWidget::resizeEvent innerWidget move to:" << innerWidget->geometry()
+                 << ", isShowAnimation:" << d_ptr->isShowAnimation;
 #endif
-		// 通知部件布局可能需要更新
-		QApplication::postEvent(innerWidget, new QEvent(QEvent::LayoutRequest));
-	}
+
+    } else {
+        // 没有动画，尺寸的改变记录下来
+        d_ptr->normalGeometry = geometry();
+        updateInnerWidgetGeometry();
+    }
+    // 调用基类处理
+    QStackedWidget::resizeEvent(e);
 }

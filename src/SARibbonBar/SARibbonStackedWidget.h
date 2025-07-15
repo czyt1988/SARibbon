@@ -24,18 +24,16 @@ class SA_RIBBON_EXPORT SARibbonStackedWidget : public QStackedWidget
     Q_OBJECT
     SA_RIBBON_DECLARE_PRIVATE(SARibbonStackedWidget)
 public:
+    Q_PROPERTY(int animationWidgetHeight READ animationWidgetHeight WRITE setAnimationWidgetHeight)  // 添加自定义属性
+public:
     explicit SARibbonStackedWidget(QWidget* parent);
     ~SARibbonStackedWidget();
-    // 设置弹出模式
+    // 弹出模式
     void setPopupMode();
-
-    // 检查当前是否处于弹出模式
     bool isPopupMode() const;
 
-    // 设置正常模式 和普通的stackwidget一样
+    // 正常模式 和普通的stackwidget一样
     void setNormalMode();
-
-    // 检查当前是否处于正常模式
     bool isNormalMode() const;
 
     // 在弹出模式下以模态方式运行事件循环
@@ -44,15 +42,38 @@ public:
     // 类似tabbar的moveTab函数，交换两个窗口的index
     void moveWidget(int from, int to);
 
-protected:
-    //    void mouseReleaseEvent(QMouseEvent *e);
-    void hideEvent(QHideEvent* e) Q_DECL_OVERRIDE;
-    virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
+    // 是否启用弹出动画
+    void setUseAnimation(bool on);
+    bool isUseAnimation() const;
+
+    // 动画持续时间（毫秒）
+    void setAnimationDuration(int duration);
+    int animationDuration() const;
+
+    // 窗口高度
+    int animationWidgetHeight() const;
+    void setAnimationWidgetHeight(int h);
+
+    // 设置窗口normalGeometry，由于此窗口会有动画，防止动画过程中设置尺寸又被动画覆盖，因此此窗口的尺寸设置使用setNormalSize
+    void setNormalGeometry(const QRect& normalGeometry);
+    QRect normalGeometry() const;
 Q_SIGNALS:
     /**
      * @brief 隐藏窗口信号
      */
     void hidWindow();
+
+protected:
+    void showEvent(QShowEvent* e) override;
+    void hideEvent(QHideEvent* e) override;
+    virtual void resizeEvent(QResizeEvent* e) override;
+    // 同步内部窗口的尺寸
+    void updateInnerWidgetGeometry();
+private Q_SLOTS:
+    // 动画完成槽函数
+    void onAnimationFinished();
+    // 建立动画
+    void setupAnimation();
 };
 
 #endif  // SARIBBONSTACKEDWIDGET_H
