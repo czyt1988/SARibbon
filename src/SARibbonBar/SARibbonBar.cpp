@@ -11,6 +11,7 @@
 #include <QStyleOptionMenuItem>
 #include <QTimer>
 #include <QVariant>
+#include <QDateTime>
 #include "SARibbonButtonGroupWidget.h"
 #include "SARibbonElementManager.h"
 #include "SARibbonQuickAccessBar.h"
@@ -73,6 +74,7 @@ public:
 	QList< _SAContextCategoryManagerData > mCurrentShowingContextCategory;
 	QList< SARibbonContextCategory* > mContextCategoryList;  ///< 存放所有的上下文标签
 	QList< _SARibbonTabData > mHidedCategory;
+	qint64 mTabBarLastClickTime { 0 };  ///< 记录tabbar点击的上次点击时间戳，tabbar无法区分双击单击，双击必定触发单击，因此需要此把快速单击去掉
 	SARibbonBar::RibbonStyles mRibbonStyle { SARibbonBar::RibbonStyleLooseThreeRow };  ///< ribbon的风格
 	SARibbonBar::RibbonMode mCurrentRibbonMode { SARibbonBar::NormalRibbonMode };      ///< 记录当前模式
 	QList< QColor > mContextCategoryColorList;                                         ///< contextCategory的色系
@@ -195,6 +197,7 @@ void SARibbonBar::PrivateData::setMinimumMode()
 	mStackedContainerWidget->hide();
 	if (SARibbonBarLayout* lay = qobject_cast< SARibbonBarLayout* >(q_ptr->layout())) {
 		lay->resetSize();
+		lay->layoutStackedContainerWidget();
 	}
 }
 
@@ -209,6 +212,7 @@ void SARibbonBar::PrivateData::setNormalMode()
 	mStackedContainerWidget->show();
 	if (SARibbonBarLayout* lay = qobject_cast< SARibbonBarLayout* >(q_ptr->layout())) {
 		lay->resetSize();
+		lay->layoutStackedContainerWidget();
 	}
 }
 
@@ -957,10 +961,6 @@ void SARibbonBar::setMinimumMode(bool isMinimum)
 	} else {
 		d_ptr->setNormalMode();
 	}
-	if (SARibbonBarLayout* lay = qobject_cast< SARibbonBarLayout* >(layout())) {
-		// 强制更新尺寸
-		lay->resetSize();
-	}
 	// 发射信号
 	Q_EMIT ribbonModeChanged(isMinimum ? MinimumRibbonMode : NormalRibbonMode);
 }
@@ -1219,13 +1219,19 @@ void SARibbonBar::onCurrentRibbonTabChanged(int index)
  */
 void SARibbonBar::onCurrentRibbonTabClicked(int index)
 {
+	const qint64 now = QDateTime::currentMSecsSinceEpoch();
+	if (d_ptr->mTabBarLastClickTime > 0 && ((now - d_ptr->mTabBarLastClickTime) < QApplication::doubleClickInterval())) {
+		return;
+	}
+	d_ptr->mTabBarLastClickTime = now;
 	if (index != d_ptr->mRibbonTabBar->currentIndex()) {
 		// 点击的标签不一致通过changed槽去处理
 		return;
 	}
-	if (this->isMinimumMode()) {
-		if (!this->d_ptr->mStackedContainerWidget->isVisible()) {
-			if (this->d_ptr->mStackedContainerWidget->isPopupMode()) {
+	if (isMinimumMode()) {
+		if (!d_ptr->mStackedContainerWidget->isVisible()) {
+			if (d_ptr->mStackedContainerWidget->isPopupMode()) {
+				qDebug() << "QHoverEvent";
 				// 在stackedContainerWidget弹出前，先给tabbar一个QHoverEvent,让tabbar知道鼠标已经移开
 				QHoverEvent ehl(QEvent::HoverLeave,
 				                d_ptr->mRibbonTabBar->mapToGlobal(QCursor::pos()),
@@ -1235,8 +1241,7 @@ void SARibbonBar::onCurrentRibbonTabClicked(int index)
 				if (SARibbonBarLayout* lay = qobject_cast< SARibbonBarLayout* >(layout())) {
 					lay->layoutStackedContainerWidget();
 				}
-				this->d_ptr->mStackedContainerWidget->setFocus();
-				this->d_ptr->mStackedContainerWidget->exec();
+				d_ptr->mStackedContainerWidget->exec();
 			}
 		}
 	}
@@ -1250,7 +1255,9 @@ void SARibbonBar::onCurrentRibbonTabClicked(int index)
  */
 void SARibbonBar::onCurrentRibbonTabDoubleClicked(int index)
 {
+	qDebug() << "onCurrentRibbonTabDoubleClicked";
 	Q_UNUSED(index);
+	d_ptr->mTabBarLastClickTime = QDateTime::currentMSecsSinceEpoch();  // 更新时间
 	if (isEnableTabDoubleClickToMinimumMode()) {
 		setMinimumMode(!isMinimumMode());
 	}
