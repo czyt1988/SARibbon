@@ -5,7 +5,7 @@
 #include <QApplication>
 #include <QPropertyAnimation>
 #ifndef SARIBBONSTACKEDWIDGET_DEBUG_PRINT
-#define SARIBBONSTACKEDWIDGET_DEBUG_PRINT 1
+#define SARIBBONSTACKEDWIDGET_DEBUG_PRINT 0
 #endif
 #if SARIBBONSTACKEDWIDGET_DEBUG_PRINT
 #include <QDebug>
@@ -18,7 +18,7 @@ class SARibbonStackedWidget::PrivateData
 	SA_RIBBON_DECLARE_PUBLIC(SARibbonStackedWidget)
 public:
 	QEventLoop* eventLoop { nullptr };
-	bool useAnimation { true };                 ///< 是否使用动画
+	bool useAnimation { false };                ///< 是否使用动画
 	QPropertyAnimation* animation { nullptr };  ///< 动画对象
 	QRect normalGeometry;                       ///< 正常状态下的几何位置
 	bool isAnimating { false };  ///< 标记动画是否正在进行，这个必须要有，它比animation->state()更早标记动画是否启动
@@ -49,7 +49,7 @@ void SARibbonStackedWidget::setupAnimation()
 {
 	d_ptr->animation = new QPropertyAnimation(this, "animationWidgetHeight", this);
 	d_ptr->animation->setEasingCurve(QEasingCurve::OutQuad);
-	d_ptr->animation->setDuration(1000);
+	d_ptr->animation->setDuration(300);
 	connect(d_ptr->animation, &QPropertyAnimation::finished, this, &SARibbonStackedWidget::onAnimationFinished);
 }
 
