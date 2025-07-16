@@ -173,7 +173,9 @@ MainWindow::MainWindow(QWidget* par) : SARibbonMainWindow(par)
 	connect(ribbon, &SARibbonBar::currentRibbonTabChanged, this, [ this ](int v) {
 		mTextedit->append(QString("SARibbonBar::currentRibbonTabChanged(%1)").arg(v));
 	});
-
+	mChangeTitleBkColorTimer.setInterval(5000);
+	mChangeTitleBkColorTimer.start();
+	connect(&mChangeTitleBkColorTimer, &QTimer::timeout, this, &MainWindow::onChangedTitleTimeout);
 	//! 全屏显示
 	showMaximized();
 }
@@ -697,6 +699,25 @@ void MainWindow::onTitleBackgroundBrushChangedTimeout()
 		ribbonBar()->setWindowTitleBackgroundBrush(Qt::red);
 	}
 	ribbonBar()->repaint();
+}
+
+void MainWindow::onChangedTitleTimeout()
+{
+	static int s_a = 0;
+	auto ribbon    = ribbonBar();
+	if (!ribbon) {
+		return;
+	}
+	++s_a;
+	if (s_a % 2 == 0) {
+		ribbon->setWindowTitleBackgroundBrush(QColor(222, 79, 79));
+		ribbon->setWindowTitleTextColor(Qt::white);
+		ribbon->update();
+	} else {
+		ribbon->setWindowTitleBackgroundBrush(Qt::NoBrush);
+		ribbon->setWindowTitleTextColor(Qt::blue);
+		ribbon->update();
+	}
 }
 
 /**
