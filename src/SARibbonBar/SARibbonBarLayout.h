@@ -45,11 +45,14 @@ public:
 	// 重置尺寸，这个是在ribbon模式发生改变的时候调用，例如setMinimumMode或者setNormalMode,此函数会触发重新布局
 	void resetSize();
 
-    // 更新标题区域
-    void layoutTitleRect();
+	// 更新标题区域
+	void layoutTitleRect();
 
 	// 调整StackedContainerWidget的位置
-    void layoutStackedContainerWidget();
+	void layoutStackedContainerWidget();
+
+	// 让category重新布局，这个函数在调整category的对其方式的时候调用，由于对其方式改变StackedContainerWidget的尺寸没有改变，但category要重新布局
+	void layoutCategory();
 
 	// 设置系统按钮大小
 	void setSystemButtonSize(const QSize& size);

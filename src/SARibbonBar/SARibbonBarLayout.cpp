@@ -12,7 +12,7 @@
 #include "SARibbonElementManager.h"
 
 #ifndef SARIBBONBARLAYOUT_ENABLE_DEBUG_PRINT
-#define SARIBBONBARLAYOUT_ENABLE_DEBUG_PRINT 0
+#define SARIBBONBARLAYOUT_ENABLE_DEBUG_PRINT 1
 #endif
 #if SARIBBONBARLAYOUT_ENABLE_DEBUG_PRINT
 #include <QDebug>
@@ -643,6 +643,17 @@ void SARibbonBarLayout::layoutStackedContainerWidget()
 	qDebug() << "resizeStackedContainerWidget,stackedWidget Geometry:" << stackedWidget->geometry()
 			 << "request set w=" << w << ",h=" << h;
 #endif
+}
+/**
+ * @brief 让category重新布局
+ *
+ *这个函数在调整category的对其方式的时候调用，由于对其方式改变StackedContainerWidget的尺寸没有改变，但category要重新布局,因此需要发射一个
+ */
+void SARibbonBarLayout::layoutCategory()
+{
+	if (SARibbonStackedWidget* stackedWidget = stackedContainerWidget()) {
+		stackedWidget->layoutRequestInnerWidgets();
+	}
 }
 
 void SARibbonBarLayout::resizeInLooseStyle()

@@ -4,6 +4,7 @@
 #include <QMouseEvent>
 #include <QApplication>
 #include <QPropertyAnimation>
+#include <QLayout>
 #ifndef SARIBBONSTACKEDWIDGET_DEBUG_PRINT
 #define SARIBBONSTACKEDWIDGET_DEBUG_PRINT 0
 #endif
@@ -96,6 +97,33 @@ void SARibbonStackedWidget::setNormalGeometry(const QRect& normalGeometry)
 QRect SARibbonStackedWidget::normalGeometry() const
 {
     return d_ptr->normalGeometry;
+}
+
+/**
+ * @brief 对内部窗口发送布局请求
+ *
+ * 这个方法会让子窗口布局失效同时重新计算布局
+ */
+void SARibbonStackedWidget::layoutRequestInnerWidgets()
+{
+	// 确保所有子部件都填满整个区域
+	for (int i = 0; i < count(); ++i) {
+		QWidget* innerWidget = widget(i);
+		if (!innerWidget) {
+			continue;
+		}
+		// 方法1 update（不生效）
+		//  innerWidget->update();
+
+		// 方法2 postEvent（不生效）
+		//  QApplication::postEvent(innerWidget, new QEvent(QEvent::LayoutRequest));
+
+		// 方法3 invalidate+activate（生效）
+		if (auto lay = innerWidget->layout()) {
+			lay->invalidate();
+			lay->activate();
+		}
+	}
 }
 
 /**
