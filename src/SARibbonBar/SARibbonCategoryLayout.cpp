@@ -36,8 +36,8 @@ public:
 	QList< SARibbonCategoryLayoutItem* > mItemList;
 	SARibbonAlignment mCategoryAlignment { SARibbonAlignment::AlignLeft };  ///< 对齐方式
 	// 动画相关
-	QPropertyAnimation* m_scrollAnimation { nullptr };
-	int m_targetScrollPosition { 0 };
+	QPropertyAnimation* mScrollAnimation { nullptr };
+	int mTargetScrollPosition { 0 };
 };
 
 //=============================================================
@@ -650,17 +650,17 @@ void SARibbonCategoryLayout::scrollByAnimate(int px)
  */
 void SARibbonCategoryLayout::scrollToByAnimate(int targetX)
 {
-	QPropertyAnimation* animation = d_ptr->m_scrollAnimation;
+	QPropertyAnimation* animation = d_ptr->mScrollAnimation;
 	if (!animation) {
 		scrollTo(targetX);
 	}
-	if (isAnimatingScroll() && targetX == d_ptr->m_targetScrollPosition) {
+	if (isAnimatingScroll() && targetX == d_ptr->mTargetScrollPosition) {
 		return;  // 已经是目标位置
 	}
 	// 计算边界
 	const int availableWidth      = categoryContentSize().width();
 	const int minBase             = qMin(availableWidth - d_ptr->mTotalWidth, 0);
-	d_ptr->m_targetScrollPosition = qBound(minBase, targetX, 0);
+	d_ptr->mTargetScrollPosition = qBound(minBase, targetX, 0);
 
 	// 如果动画正在进行，停止当前动画
 	if (animation->state() == QPropertyAnimation::Running) {
@@ -669,7 +669,7 @@ void SARibbonCategoryLayout::scrollToByAnimate(int targetX)
 
 	// 设置动画参数
 	animation->setStartValue(d_ptr->mXBase);
-	animation->setEndValue(d_ptr->m_targetScrollPosition);
+	animation->setEndValue(d_ptr->mTargetScrollPosition);
 	animation->start();
 }
 
@@ -711,7 +711,7 @@ void SARibbonCategoryLayout::setScrollPosition(int pos)
  */
 bool SARibbonCategoryLayout::isAnimatingScroll() const
 {
-    return d_ptr->m_scrollAnimation->state() == QPropertyAnimation::Running;
+    return d_ptr->mScrollAnimation->state() == QPropertyAnimation::Running;
 }
 
 /**
@@ -760,8 +760,8 @@ SARibbonAlignment SARibbonCategoryLayout::categoryAlignment() const
  */
 void SARibbonCategoryLayout::setAnimationDuration(int duration)
 {
-	if (d_ptr->m_scrollAnimation) {
-		d_ptr->m_scrollAnimation->setDuration(qMax(50, duration));  // 最小50ms
+	if (d_ptr->mScrollAnimation) {
+		d_ptr->mScrollAnimation->setDuration(qMax(50, duration));  // 最小50ms
 	}
 }
 
@@ -771,20 +771,20 @@ void SARibbonCategoryLayout::setAnimationDuration(int duration)
  */
 int SARibbonCategoryLayout::animationDuration() const
 {
-	if (d_ptr->m_scrollAnimation) {
-		return d_ptr->m_scrollAnimation->duration();
+	if (d_ptr->mScrollAnimation) {
+		return d_ptr->mScrollAnimation->duration();
 	}
 	return -1;
 }
 
 void SARibbonCategoryLayout::setupAnimateScroll()
 {
-	if (!d_ptr->m_scrollAnimation) {
+	if (!d_ptr->mScrollAnimation) {
 		// 初始化滚动动画
-		d_ptr->m_scrollAnimation = new QPropertyAnimation(this, "scrollPosition", this);
-		d_ptr->m_scrollAnimation->setDuration(300);                       // 动画时长300ms
-		d_ptr->m_scrollAnimation->setEasingCurve(QEasingCurve::OutQuad);  // 缓动曲线
-		d_ptr->m_targetScrollPosition = d_ptr->mXBase;
+		d_ptr->mScrollAnimation = new QPropertyAnimation(this, "scrollPosition", this);
+		d_ptr->mScrollAnimation->setDuration(300);                       // 动画时长300ms
+		d_ptr->mScrollAnimation->setEasingCurve(QEasingCurve::OutQuad);  // 缓动曲线
+		d_ptr->mTargetScrollPosition = d_ptr->mXBase;
 	}
 }
 

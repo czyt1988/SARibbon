@@ -1333,6 +1333,10 @@ void SARibbonBar::synchronousCategoryData(bool autoUpdate)
 	});
 	if (autoUpdate) {
 		d_ptr->relayout();
+		if (SARibbonBarLayout* lay = qobject_cast< SARibbonBarLayout* >(layout())) {
+			// 对category发送布局请求
+			lay->layoutCategory();
+		}
 	}
 }
 
