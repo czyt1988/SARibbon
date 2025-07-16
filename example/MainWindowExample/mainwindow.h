@@ -79,6 +79,8 @@ private Q_SLOTS:
 	void onSpinBoxRibbonPannelToolBtnIconSizeChanged(int h);
 	// 此函数用来演示标题栏颜色改变
 	void onTitleBackgroundBrushChangedTimeout();
+	// 改变颜色
+	void onChangedTitleTimeout();
 
 private:
 	// 创建其它actions，这些actions并不在SARibbonBar管理
@@ -88,15 +90,15 @@ protected:
 	void closeEvent(QCloseEvent* e) override;
 
 private:
-    SARibbonContextCategory* mContextCategory { nullptr };
-    SARibbonContextCategory* mContextCategory2 { nullptr };
-    SARibbonCustomizeWidget* mWidgetForCustomize { nullptr };
-    QTextEdit* mTextedit { nullptr };
-    SARibbonActionsManager* mActionsManager { nullptr };
-    QMenu* mMenuApplicationBtn { nullptr };
-    QComboBox* mComboboxRibbonTheme { nullptr };
+	SARibbonContextCategory* mContextCategory { nullptr };
+	SARibbonContextCategory* mContextCategory2 { nullptr };
+	SARibbonCustomizeWidget* mWidgetForCustomize { nullptr };
+	QTextEdit* mTextedit { nullptr };
+	SARibbonActionsManager* mActionsManager { nullptr };
+	QMenu* mMenuApplicationBtn { nullptr };
+	QComboBox* mComboboxRibbonTheme { nullptr };
 	QLineEdit* mSearchEditor { nullptr };
-    SARibbonApplicationWidget* mAppWidget { nullptr };
+	SARibbonApplicationWidget* mAppWidget { nullptr };
 	//
 	QAction* mActionWordWrap { nullptr };
 	QAction* mActionDisable { nullptr };
@@ -119,9 +121,9 @@ private:
 	//
 	QAction* mActionVisibleAll { nullptr };    ///< 控制所有action是否可见的开关
 	bool mHasApplyCustomizeXmlFile { false };  ///< 程序启动后是否应用上次修改
-    int mTagForActionText;
-    int mTagForActionIcon;
-    QTimer mChangeTitleBkColorTimer;  ///< 用于周期改变标题颜色的一个定时器
+	int mTagForActionText;
+	int mTagForActionIcon;
+	QTimer mChangeTitleBkColorTimer;  ///< 用于周期改变标题颜色的一个定时器
 };
 
 #endif  // MAINWINDOW_H
