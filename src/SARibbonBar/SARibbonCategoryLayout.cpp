@@ -446,7 +446,9 @@ void SARibbonCategoryLayout::doLayout()
 	int debug_i__(0);
 	qDebug() << "SARibbonCategoryLayout::doLayout(),name=" << category->categoryName();
 #endif
-	for (SARibbonCategoryLayoutItem* item : qAsConst(d_ptr->mItemList)) {
+	const int itemsize = d_ptr->mItemList.size();
+	for (int i = 0; i < itemsize; ++i) {
+		SARibbonCategoryLayoutItem* item = d_ptr->mItemList[ i ];
 		if (item->isEmpty()) {
 			hideWidgets << item->widget();
 			if (item->separatorWidget) {
@@ -466,7 +468,12 @@ void SARibbonCategoryLayout::doLayout()
 			showWidgets << item->widget();
 			if (item->separatorWidget) {
 				item->separatorWidget->setGeometry(item->mWillSetSeparatorGeometry);
-				showWidgets << item->separatorWidget;
+				if (i == itemsize - 1) {
+					// 最后一个pannel的分割线隐藏
+					hideWidgets << item->separatorWidget;
+				} else {
+					showWidgets << item->separatorWidget;
+				}
 			}
 #if SARibbonCategoryLayout_DEBUG_PRINT
 			qDebug() << "  |-[" << debug_i__ << "]pannelName(" << item->toPannelWidget()->pannelName()
@@ -496,6 +503,7 @@ void SARibbonCategoryLayout::doLayout()
 			w->hide();
 		}
 	}
+	// 最后一个分割线隐藏
 }
 
 /**
@@ -658,8 +666,8 @@ void SARibbonCategoryLayout::scrollToByAnimate(int targetX)
 		return;  // 已经是目标位置
 	}
 	// 计算边界
-	const int availableWidth      = categoryContentSize().width();
-	const int minBase             = qMin(availableWidth - d_ptr->mTotalWidth, 0);
+	const int availableWidth     = categoryContentSize().width();
+	const int minBase            = qMin(availableWidth - d_ptr->mTotalWidth, 0);
 	d_ptr->mTargetScrollPosition = qBound(minBase, targetX, 0);
 
 	// 如果动画正在进行，停止当前动画
