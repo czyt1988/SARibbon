@@ -44,16 +44,13 @@ QQ交流群:434014314
 
 - 针对Ribbon的布局和显示
 
-![Ribbon的布局和显示](./doc/screenshot/SARibbonBar-overview.gif)
+![Ribbon的布局和显示](./doc/screenshot/SARibbonBar-overview.png)
 
 - 支持最小化模式，ribbon只显示标签（默认双击标签会进行切换）,支持上下文标签tab
 
 ![SARibbon最小化模式](./doc/screenshot/SARibbonBar-minMode.gif)
 
-- 支持quickAccessBar（word快速菜单），在不同布局模式下会有不同的显示效果
-
-![SARibbon-quickAccessBar](./doc/screenshot/SARibbonBar-quickAccessBar.gif)
-
+- 支持quickAccessBar（word快速菜单）和rightButtonGroup，在不同布局模式下会有不同的显示效果
 - 支持4种不同的ribbon button，普通按钮，延迟弹出菜单按钮，菜单按钮，action菜单按钮（action菜单按钮是此ribbon控件最主要解决的问题之一）
 
 ![SARibbon-4种不同的ribbon button](./doc/screenshot/SARibbonBar-ribbonbutton.gif)
@@ -62,7 +59,7 @@ QQ交流群:434014314
 
 ![SARibbon-4种不同风格的布局样式](./doc/screenshot/SARibbonBar-style.gif)
 
-- 支持qss对ribbon进行自定义设置，可实时切换主题,内置了5种不同风格的主题
+- 支持qss对ribbon进行自定义设置，可实时切换主题,内置了6种不同风格的主题
 
 win7主题：
 ![SARibbon-theme-win7](./doc/screenshot/SARibbon-theme-win7.png)
@@ -74,10 +71,12 @@ office2021主题：
 ![SARibbon-theme-office2021](./doc/screenshot/SARibbon-theme-office2021.png)
 dark主题：
 ![SARibbon-theme-dark](./doc/screenshot/SARibbon-theme-dark.png)
+dark2主题：
+![SARibbon-theme-dark](./doc/screenshot/SARibbon-theme-dark2.png)
 
 - 提供Gallery控件
 
-![](./doc/screenshot/SARibbonBar-gallery.gif)
+![](./doc/screenshot/SARibbonBar-gallery.png)
 
 - 支持超长滚动和Option Action
 
@@ -330,8 +329,6 @@ Ribbon的图标有大有小，通过`addLargeAction`、`addMediumAction`、`addS
 
 具体可见[./example/MainWindowExample/mainwindow.cpp](./example/MainWindowExample/mainwindow.cpp)
 
-
-
 ### ContextCategory 上下文标签
 
 所谓上下文标签是指在特殊情况下才出现的标签/标签组，例如office word在选中图片时会出现图片编辑的上下文标签，如下图所示：
@@ -364,9 +361,9 @@ SARibbonCategory* contextCategoryPage2 = m_contextCategory->addCategoryPage(tr("
 ......
 ```
 
-由`SARibbonContextCategory`创建的`SARibbonCategory`归`SARibbonContextCategory`管理，只有`SARibbonContextCategory`“显示了”,其管理的`SARibbonCategory`才显示，**注意：** `SARibbonContextCategory`并不是一个窗口，所以，它的“显示”打了引号
+由`SARibbonContextCategory`创建的`SARibbonCategory`归`SARibbonContextCategory`管理，`SARibbonContextCategory`可以管理一组标签,**注意：** `SARibbonContextCategory`并不是一个窗口，仅仅是一组标签页的管理
 
-要显示一个上下文只需要调用`SARibbonBar::showContextCategory`/`SARibbonBar::hideContextCategory`即可:
+显示一个上下文调用`SARibbonBar::showContextCategory`/`SARibbonBar::hideContextCategory`:
 
 ```cpp
 void MainWindow::onShowContextCategory(bool on)
@@ -382,6 +379,8 @@ void MainWindow::onShowContextCategory(bool on)
 **注意：** 如果要删除`contextCategory`需要调用`SARibbonBar::destroyContextCategory`，而不是直接delete，调用`SARibbonBar::destroyContextCategory`之后无需再对ContextCategory的指针delete
 
 不同样式的contextCategory有不一样的风格，具体可见：[SARibbon样式](#SARibbon样式)以及[不同样式下的显示对比](#不同样式下的显示对比)
+
+上下文标签的显示会有特殊的颜色进行标记，上下文标签的颜色可以由`SARibbonBar::setContextCategoryColorList`进行设置
 
 ### ApplicationButton
 
