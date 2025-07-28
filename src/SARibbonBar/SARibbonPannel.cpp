@@ -935,7 +935,7 @@ void SARibbonPannel::actionEvent(QActionEvent* e)
 		if (QWidget* parw = parentWidget()) {
 			parw->adjustSize();
 		}
-		
+
 		// 只处理 QWidgetAction 的情况
 		if (QWidgetAction* widgetAction = qobject_cast< QWidgetAction* >(e->action())) {
 			// 安全获取关联控件
@@ -971,8 +971,8 @@ void SARibbonPannel::changeEvent(QEvent* e)
 		return;
 	}
 	if (e->type() == QEvent::FontChange) {
-		QFont f                       = font();
-		QList< QWidget* > listWidgets = findChildren< QWidget* >();
+		QFont f                             = font();
+		const QList< QWidget* > listWidgets = findChildren< QWidget* >();
 		for (QWidget* w : listWidgets) {
 			w->setFont(f);
 		}

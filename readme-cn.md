@@ -479,13 +479,15 @@ SARibbonBar提供了`setRibbonStyle`函数，可以定义当前的布局方案�
 
 ### SARibbonBar文字换行，及图标大小
 
-通过`SARibbonBar::setEnableWordWrap`函数可以控制SARibbonBar的文字是否换行，`SARibbonBar`的高度是固定的，文字是否换行会影响图标显示的大小，因此，如果你想图标看起来更大，可以设置文字不换行
+`SARibbonBar`的按钮图标大小是基于`SARibbonBar`的高度和文字高度决定的，`SARibbonBar`在布局的时候，首先保证文字能显示完全，剩下的区域来绘制图标，通过`SARibbonBar::setEnableWordWrap`函数可以控制SARibbonBar的文字是否换行，因此，如果你想图标看起来更大，可以设置文字不换行
 
 在`SARibbonBar::RibbonStyleCompactTwoRow`的布局模式下，文字不换行的显示效果如下：
 
 ![](doc/screenshot/wps-2-style-nowrap.png)
 
 SARibbonBar文字设置为不换行后，会使图标的显示空间变得更大
+
+另外一种方法调整图标大小是把`SARibbonBar`的高度调大，`SARibbonBar`提供了`SARibbonBar::setCategoryHeight`，可用于调整`SARibbonBar`的高度，RibbonBar的标题栏高度，TabBar高度，PannelTitle高度都可以调整，通过这些尺寸，你可以搭配出你需要的界面，具体的调整示例，可参考`example/MainWindowExample`的Size标签
 
 ### 不同的“按钮”布局方式
 
@@ -503,7 +505,7 @@ SARibbonBar文字设置为不换行后，会使图标的显示空间变得更大
 
 ![word pannel 布局示例](./doc/pic/pannelLayout3row-example.png)
 
-枚举`SARibbonPannelItem::RowProportion`是为了表征每个窗体在pannel所占行数的情况，在pannel布局中会常用到，这个枚举定义如下：
+枚举`SARibbonPannelItem::RowProportion`表示了pannel中窗体所占行数的情况，在pannel布局中会常用到，这个枚举定义如下：
 
 ```cpp
 /**
@@ -517,7 +519,17 @@ enum RowProportion {
 };
 ```
 
-`SARibbonPannel`里管理的每个action都会带有一个私有的属性（`SARibbonPannelItem::RowProportion`），这个属性决定了这个action在pannel里的布局
+`SARibbonPannel`添加action的时候，通常需要指定action对应的按钮占比情况，例如：
+
+```cpp
+SARibbonPannel* pannel = new SARibbonPannel("Pannel");
+QAction* action = new QAction(this);
+//action的初始化
+pannel->addAction(action,SARibbonPannelItem::Small);
+// 等效于：pannel->addSmallAction(action);
+```
+
+`SARibbonPannel`里管理的每个action都会带有一个私有的属性记录了这个action在pannel里的布局占比，可以通过静态函数`SARibbonPannelItem::RowProportion SARibbonPannel::getActionRowProportionProperty(QAction* action);`获取这个占比
 
 ### SARibbonPannel的布局模式
 
