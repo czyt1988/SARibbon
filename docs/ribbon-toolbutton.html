@@ -1,0 +1,169 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.10.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>SARibbon: ribbon-toolbutton</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="SA-logo.png"/></td>
+  <td id="projectalign">
+   <div id="projectname">SARibbon<span id="projectnumber">&#160;2.4.2</span>
+   </div>
+   <div id="projectbrief">SARibbon wiki</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.10.0 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','搜索');
+  $(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function(){initNavTree('ribbon-toolbutton.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div><div class="header">
+  <div class="headertitle"><div class="title">ribbon-toolbutton</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="textblock"><p>Ribbon界面无法用普通的tab+toolbutton组合来实现主要就是因为ribbon界面对工具按钮有特殊的渲染方式，和经典菜单按钮是有很大不同的，在没有菜单的情况下没有什么区别，但有菜单的情况下，会有明显不同</p>
+<p>差别主要通过下面这个动图可以提现，尤其是在MenuPopup模式下，按钮会被拆分为两部分，普通的工具栏是左右拆分，而ribbon的工具按钮是上下拆分</p>
+<div class="image">
+<img src="ribbon-toolbutton.gif" alt=""/>
+<div class="caption">
+ribbon工具按钮</div></div>
+    <h1><a class="anchor" id="ribbon工具栏按钮绘制方案"></a>
+ribbon工具栏按钮绘制方案</h1>
+<p><code>SARibbon</code>的工具栏按钮为<code><a class="el" href="class_s_a_ribbon_tool_button.html" title="Ribbon界面适用的toolButton">SARibbonToolButton</a></code>，它继承<code>QToolButton</code>，重写了其绘图方法</p>
+<p>工具栏按钮分3个矩形区域，一个是icon绘制区域，一个是文本显示区域，一个是indicator绘制区域</p>
+<p>三个区域会有两种布局方案，根据文本是否换行来进行布局</p>
+<h2><a class="anchor" id="文字换行显示的布局方案"></a>
+文字换行显示的布局方案</h2>
+<p>换行模式下，文本区域会占据两行行高，office的word就是这种布局方案</p>
+<div class="image">
+<img src="office-word-wrodwrap.png" alt=""/>
+</div>
+    <p>可以看到，第一个pannel文本没有换行，会有一行的留白，第二个pannel文本都换行，充满了文本区域,且能看到菜单的箭头在第二行最右边</p>
+<p>对于没有换行的文本，但有菜单的情况下，indicator在第二行文本处</p>
+<div class="image">
+<img src="office-word-wrodwrap2.png" alt=""/>
+</div>
+    <p>下图为<code><a class="el" href="class_s_a_ribbon_tool_button.html" title="Ribbon界面适用的toolButton">SARibbonToolButton</a></code>文本换行的布局方案</p>
+<div class="image">
+<img src="ribbon-toolbutton-largebutton.png" alt=""/>
+</div>
+    <p>indicator是有菜单时的下箭头提示，在文本确切要换行时，下箭头在第二行文本的最右边，若在换行模式，但文本没有换行，第二行的位置就用来显示indicator</p>
+<blockquote class="doxtable">
+<p>&zwj;注意，如果文本太长，<code><a class="el" href="class_s_a_ribbon_tool_button.html" title="Ribbon界面适用的toolButton">SARibbonToolButton</a></code>会尝试换行，由于英文的文本每个单词不是定长，因此会在原有文本单行显示的长度基础上先尝试1/2的长度能否换行完全显示，如果显示不了，就把长度递增为1/2+1/3，并继续尝试，如果3次都无法容纳下，就显示为原来的长度 </p>
+</blockquote>
+<blockquote class="doxtable">
+<p>&zwj;注意，换行模式下，用户可以手动给文本换行，就是加入<code>\n</code>换行，加入<code>\n</code>的文本，<code><a class="el" href="class_s_a_ribbon_tool_button.html" title="Ribbon界面适用的toolButton">SARibbonToolButton</a></code>就不用进行换行估算 </p>
+</blockquote>
+<blockquote class="doxtable">
+<p>&zwj;注意，带有<code>\n</code>的文本在不换行模式下也可正常显示，此时<code>\n</code>会被忽略掉 </p>
+</blockquote>
+<h2><a class="anchor" id="文字不换行显示的布局方案"></a>
+文字不换行显示的布局方案</h2>
+<p>对于不换行的方案，最经典的就是wps的布局方案，wps-word所有文字都是一行，不存在换行的情况，indicator布置在最右边</p>
+<div class="image">
+<img src="wps-word-nowrodwrap.png" alt=""/>
+</div>
+    <p>wps的方案尤其适合显示中文文本，但英文会有可能放不下，或者英文太长，单行很难显示全，因此如果要显示英文，建议使用换行方案，要显示中文，建议使用不换行方案</p>
+<p><code><a class="el" href="class_s_a_ribbon_tool_button.html" title="Ribbon界面适用的toolButton">SARibbonToolButton</a></code>不换行的布局方案如下</p>
+<div class="image">
+<img src="ribbon-toolbutton-largebutton-nowordwrap.png" alt=""/>
+</div>
+    <h1><a class="anchor" id="如何布置一个更美观的ribbon界面"></a>
+如何布置一个更美观的Ribbon界面</h1>
+<p>如果文字都比较短，又没有菜单情况下，使用换行模式显示会有一行文本的留白，如果很多的话会不太美观</p>
+<div class="image">
+<img src="office-excel-oneline-spacing.png" alt=""/>
+</div>
+    <p>此时又如下几种方案：</p>
+<ul>
+<li>大小搭配，如2个大按钮搭配3个小按钮</li>
+<li>使用<br  />
+强制换行,尤其是4个文字的情况下可以两个两个 </li>
+</ul>
+</div></div><!-- contents -->
+</div><!-- PageDoc -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">制作者 <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.10.0 </li>
+  </ul>
+</div>
+</body>
+</html>

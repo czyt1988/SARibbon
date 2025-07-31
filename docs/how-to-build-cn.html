@@ -1,0 +1,342 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.10.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>SARibbon: how-to-build-cn</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="SA-logo.png"/></td>
+  <td id="projectalign">
+   <div id="projectname">SARibbon<span id="projectnumber">&#160;2.4.2</span>
+   </div>
+   <div id="projectbrief">SARibbon wiki</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.10.0 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','搜索');
+  $(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function(){initNavTree('how-to-build-cn.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div><div class="header">
+  <div class="headertitle"><div class="title">how-to-build-cn</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="textblock"><p>此文会详细介绍如何动态构建SARibbon，如果你不熟悉构建，建议你用静态引入的方法，你只需把SARibbon.h和SARibbon.cpp引入你的工程即可使用</p>
+<h1><a class="anchor" id="准备工作"></a>
+准备工作</h1>
+<p>SARibbon采用<a href="https://github.com/stdware/qwindowkit">QWindowkit</a>作为无边框窗口方案，同时也支持简单的无边框设置。如果你需要操作系统原生的窗口特性，如Windows 7及以后版本的贴边处理，或Windows 11的Snap Layout效果，建议启用<a href="https://github.com/stdware/qwindowkit">QWindowkit</a>库。该库还能有效解决多屏幕移动问题。</p>
+<p>启用QWindowkit后，你将能实现如下效果：</p>
+<p><img src="./pic/set-qwindowkit-on-snap.gif" alt="" class="inline"/></p>
+<p>若要启用<a href="https://github.com/stdware/qwindowkit">QWindowkit</a>，需先编译该库。作为SARibbon项目的子模块，如果你在<code>git clone</code>时没有使用<code>--recursive</code>参数，需执行<code>submodule update</code>命令：</p>
+<div class="fragment"><div class="line">git submodule update --init --recursive</div>
+</div><!-- fragment --><h1><a class="anchor" id="关于安装位置"></a>
+关于安装位置</h1>
+<p>通过CMake构建完成后，使用<code>install</code>命令可以安装所有依赖。引用库时，只需通过<code>find_package</code>命令，即可将所有依赖和预定义宏等配置一并引入，这是目前最推荐的做法。</p>
+<p>然而，在程序开发过程中，可能会遇到不同编译器（如MSVC、MinGW）和不同Qt版本的编译问题。如果使用默认的安装位置（Windows下为C:\Program Files），则只能安装一个版本的库。为了区分不同编译器和Qt版本，SARibbon默认使用本地安装。本地安装会根据编译器和Qt版本生成一个安装文件夹，文件夹命名格式为<code>bin_qt{version}_[MSVC/GNU]_x[64/86]</code>。通过<code>SARIBBON_INSTALL_IN_CURRENT_DIR</code>选项可以配置是否根据编译器和Qt版本安装到本地，该选项默认为<code>ON</code>，即会根据编译器和Qt版本生成一个本地文件夹进行安装。</p>
+<h1><a class="anchor" id="编译qwindowkit库如果不开启跳过此步"></a>
+编译QWindowkit库(如果不开启跳过此步)</h1>
+<p><code>QWindowkit</code>库仅提供CMake的编译方式，必须使用CMake进行编译。</p>
+<p>为简化操作，在<code>src/SARibbonBar/3rdparty</code>下提供了一个<code>CMakeLists.txt</code>文件，已对该库的必要配置进行了设置。你可以直接调用该文件进行编译。</p>
+<p>使用Qt Creator和Visual Studio进行构建和安装的方式基本相同。</p>
+<h2><a class="anchor" id="使用qt-creator构建和安装qwindowkit库"></a>
+使用Qt Creator构建和安装QWindowkit库</h2>
+<ol type="1">
+<li>使用Qt Creator打开<code>src/SARibbonBar/3rdparty/CMakeLists.txt</code>文件。</li>
+</ol>
+<div class="image">
+<img src="build-cmake-qwk-qtc-01.png" alt=""/>
+</div>
+    <ol type="1">
+<li>点击运行（Ctrl+R）。</li>
+</ol>
+<div class="image">
+<img src="build-cmake-qwk-qtc-02.png" alt=""/>
+</div>
+    <ol type="1">
+<li>切换到项目模式（Ctrl+5）。</li>
+<li>在Build步骤中选择<code>install</code>（有些版本的Qt Creator无法同时选中<code>all</code>和<code>install</code>，此时可先选<code>all</code>，编译完成后再选<code>install</code>进行安装）。</li>
+</ol>
+<div class="image">
+<img src="build-cmake-qwk-qtc-03.png" alt=""/>
+</div>
+    <ol type="1">
+<li>再次点击运行（Ctrl+R）。</li>
+</ol>
+<p>此时，你会在SARibbon根目录下看到形如<code>bin_qt5.14.2_MSVC_x64</code>的安装目录，<code>QWindowkit</code>库已自动安装在此目录下。</p>
+<div class="image">
+<img src="build-cmake-qwk-qtc-04.png" alt=""/>
+</div>
+    <p>至此，<code>QWindowkit</code>库的编译和安装已完成。</p>
+<h2><a class="anchor" id="使用visual-studio构建和安装qwindowkit库"></a>
+使用visual studio构建和安装QWindowkit库</h2>
+<ol type="1">
+<li>使用Visual Studio打开CMake项目，选择<code>src/SARibbonBar/3rdparty/CMakeLists.txt</code>文件。</li>
+</ol>
+<div class="image">
+<img src="build-cmake-vs-01.png" alt=""/>
+</div>
+    <ol type="1">
+<li>在CMake菜单中选择“全部生成”（有些版本没有CMake菜单，可在<code>CMakeLists.txt</code>上点击右键）。</li>
+</ol>
+<div class="image">
+<img src="build-cmake-vs-03.png" alt=""/>
+</div>
+    <ol type="1">
+<li>在CMake菜单中选择“安装”（有些版本没有CMake菜单，可在<code>CMakeLists.txt</code>上点击右键）。</li>
+</ol>
+<div class="image">
+<img src="build-cmake-vs-04.png" alt=""/>
+</div>
+    <blockquote class="doxtable">
+<p>&zwj;注意：不同版本的Visual Studio操作可能略有不同，没有CMake菜单的，可以在<code>CMakeLists.txt</code>上点击右键。 </p>
+</blockquote>
+<p><img src="./pic/build-cmake-vs-04-other.png" alt="" class="inline"/></p>
+<p>此时，你会在SARibbon根目录下看到形如<code>bin_qt5.14.2_MSVC_x64</code>的安装目录，<code>QWindowkit</code>库已自动安装在此目录下。</p>
+<div class="image">
+<img src="build-cmake-qwk-qtc-04.png" alt=""/>
+</div>
+    <p>至此，<code>QWindowkit</code>库的编译和安装已完成。</p>
+<h2><a class="anchor" id="使用命令行构建适用qt5及vs2019以下"></a>
+使用命令行构建(适用Qt5及vs2019以下)</h2>
+<p>由于<code>QWindowkit</code>库要求的CMake版本较高，VS2019及以下版本内置的CMake版本可能无法满足需求。因此，需要通过命令行对<code>QWindowkit</code>库进行构建。以下是在Windows下通过CMD命令行构建<code>QWindowkit</code>库的步骤：</p>
+<ol type="1">
+<li>安装一个高版本的CMake工具，并确认其路径（例如：<code>C:\Program Files (x86)\cmake3.27.9\bin\cmake.exe</code>）。</li>
+<li>确认你的Qt版本路径和编译器。以Qt5.14.2 MSVC 2017版本为例。</li>
+<li>找到Qt安装路径下<code>Qt5Config.cmake</code>所在的文件夹（例如：<code>C:\Qt\Qt5.14.2\5.14.2\msvc2017_64\lib\cmake\Qt5</code>）。</li>
+<li><p class="startli">打开命令行，切换到<code>src/SARibbonBar/3rdparty</code>目录，执行以下命令：</p>
+<div class="fragment"><div class="line">&quot;C:\Program Files (x86)\cmake3.27.9\bin\cmake.exe&quot; -B build -S . -G &quot;Visual Studio 15 2017&quot; -A x64 -DQt5_DIR=&quot;C:\Qt\Qt5.14.2\5.14.2\msvc2017_64\lib\cmake\Qt5&quot;</div>
+</div><!-- fragment --><p class="startli">如果<code>cmake.exe</code>不在环境变量中，需指定完整路径。如果在环境变量中，则只需输入<code>cmake</code>即可。</p>
+</li>
+<li><p class="startli">执行完成后，会看到相应的输出。</p>
+<p class="startli"><img src="./pic/cmd-build-qwk.png" alt="" class="inline"/></p>
+</li>
+<li>接着执行以下两个命令：</li>
+</ol>
+<div class="fragment"><div class="line">&quot;C:\Program Files (x86)\cmake3.27.9\bin\cmake.exe&quot; --build build --target install --config Debug</div>
+<div class="line">&quot;C:\Program Files (x86)\cmake3.27.9\bin\cmake.exe&quot; --build build --target install --config Release</div>
+</div><!-- fragment --><h1><a class="anchor" id="构建saribbonbar库"></a>
+构建SARibbonBar库</h1>
+<p><code><a class="el" href="class_s_a_ribbon_bar.html" title="SARibbonBar继承于QMenuBar,在SARibbonMainWindow中直接替换了原来的QMenuBar">SARibbonBar</a></code>库提供CMake和QMake两种方式构建，推荐使用CMake。</p>
+<blockquote class="doxtable">
+<p>&zwj;注意：Qt6之后不再维护QMake，逐渐转向CMake。SARibbon的未来版本可能会移除QMake支持。 </p>
+</blockquote>
+<h2><a class="anchor" id="基于cmake构建saribbonbar库"></a>
+基于<code>CMake</code>构建<code>SARibbonBar</code>库</h2>
+<h3><a class="anchor" id="vs下基于cmake的构建"></a>
+vs下基于<code>cmake</code>的构建</h3>
+<ol type="1">
+<li>如果要启用<code>QWindowKit</code>，在<code>CMakeLists.txt</code>中将<code>SARIBBON_USE_FRAMELESS_LIB</code>的option值手动改为ON。</li>
+<li>打开CMake项目，选中<code>CMakeLists.txt</code>。</li>
+</ol>
+<div class="image">
+<img src="build-cmake-vs-01.png" alt=""/>
+</div>
+    <ol type="1">
+<li>将会形成如下的构建树。</li>
+</ol>
+<div class="image">
+<img src="build-cmake-vs-02.png" alt=""/>
+</div>
+    <ol type="1">
+<li>直接在CMake菜单中选择“全部生成”（有些版本没有CMake菜单，可在<code>CMakeLists.txt</code>上点击右键）。</li>
+</ol>
+<div class="image">
+<img src="build-cmake-vs-03.png" alt=""/>
+</div>
+    <ol type="1">
+<li>全部生成完成后，在CMake菜单中选择“安装”-&gt;“SARibbon”（有些版本没有CMake菜单，可在<code>CMakeLists.txt</code>上点击右键）。</li>
+</ol>
+<div class="image">
+<img src="build-cmake-vs-04.png" alt=""/>
+</div>
+    <p>此时，你会在源码根目录下看到一个新文件夹，文件夹命名格式为<code>bin_qt{version}_[MSVC/GNU]_x[64/86]</code>（你可以使用默认安装位置，将<code>SARIBBON_INSTALL_IN_CURRENT_DIR</code>变量设置为OFF即可：<code>SARIBBON_INSTALL_IN_CURRENT_DIR=OFF</code>）。</p>
+<div class="image">
+<img src="build-cmake-install-dir.png" alt=""/>
+</div>
+    <h3><a class="anchor" id="qt-creator下基于cmake的构建"></a>
+Qt Creator下基于CMake的构建</h3>
+<p>点击文件-&gt;打开文件或项目选中CMakeLists.txt，加载完成后形成如下的构建树</p>
+<div class="image">
+<img src="build-cmake-qtc-01.png" alt=""/>
+</div>
+    <p>Qt Creator可以在界面修改<code>SARIBBON_USE_FRAMELESS_LIB</code>值，也可以手动修改，在Qt Creator中，点击左侧边，切换到项目模式（Ctrl+5）,如下图，在Current Configuration中设置<code>SARIBBON_USE_FRAMELESS_LIB</code>为ON即可开启<code>QWindowKit</code>，前提是要先编译<code>QWindowKit</code></p>
+<p><img src="./pic/build-cmake-qtc-01-enable-qwk.png" alt="" class="inline"/></p>
+<p>点击运行按钮</p>
+<div class="image">
+<img src="build-cmake-qtc-02.png" alt=""/>
+</div>
+    <p>运行结束，会弹出例子窗口，点击左侧边栏的项目标签，Build的步骤，选中install</p>
+<div class="image">
+<img src="build-cmake-qtc-03.png" alt=""/>
+</div>
+    <p>再次点击运行按钮，这时候你会看到源码的根目录下多出一个文件夹,文件夹命名方式为<code>bin_qt{version}_[MSVC/GNU]_x[64/86]</code>（前提是你没有改变CMAKE_INSTALL_PREFIX）</p>
+<div class="image">
+<img src="build-cmake-install-dir.png" alt=""/>
+</div>
+    <p>使用SARibbon的所有内容都在这个文件夹下</p>
+<h2><a class="anchor" id="基于qmake构建saribbonbar"></a>
+基于QMake构建SARibbonBar</h2>
+<p>qmake构建SARibbonBar只需使用Qt Creator打开<code>SARibbon.pro</code>文件即可</p>
+<blockquote class="doxtable">
+<p>&zwj;注意，如果使用Qt Creator打开<code>SARibbon.pro</code>文件过程报错，那么你的账户可能是没有足够的写权限，不同版本的Qt Creator在不同操作系统由不一样的表现，建议使用cmake </p>
+</blockquote>
+<h1><a class="anchor" id="使用saribbonbar库"></a>
+使用SARibbonBar库</h1>
+<h2><a class="anchor" id="基于cmake引入saribbonbar库"></a>
+基于cmake引入SARibbonBar库</h2>
+<p>首先要通过cmake编译并执行安装，在自己的工程CMakeLists.txt按照如下步骤执行：</p>
+<ol type="1">
+<li>指定SARibbonBar的安装目录，把安装目录下的<code>lib/cmake/SARibbonBar</code>位置设置给<code>SARibbonBar_DIR</code>变量(CMake在执行<code>find_package(xx)</code>时，会先查看是否有<code>xx_DIR</code>变量，如果有，会先查询<code>xx_DIR</code>下是否有对应的<code>xxConfig.cmake</code>文件)</li>
+</ol>
+<div class="fragment"><div class="line">set(SARibbonBar_DIR &quot;C:\src\Qt\SARibbon\bin_qt5.14.2_MSVC_x64\lib\cmake\SARibbonBar&quot;)</div>
+</div><!-- fragment --><ol type="1">
+<li>使用find_package找到SARibbonBar的Config文件，这个函数实际上是调用<code>lib/cmake/SARibbonBar/SARibbonBarConfig.cmake</code>文件，这里会把需要include的路径、预定义的宏，和需要添加的库给指定好，此时<code>SARibbonBar_INCLUDE_DIR</code>就是SARibbonBar的include文件路径</li>
+</ol>
+<div class="fragment"><div class="line">find_package(SARibbonBar)</div>
+</div><!-- fragment --><ol type="1">
+<li>最后调用<code>target_link_libraries</code>添加SARibbonBar库到自己的工程中,这里${myapp_target_name}是自己工程的target名字</li>
+</ol>
+<div class="fragment"><div class="line">target_link_libraries(${myapp_target_name} PUBLIC</div>
+<div class="line">    SARibbonBar</div>
+<div class="line">)</div>
+</div><!-- fragment --><h2><a class="anchor" id="基于qmake引入saribbonbar库"></a>
+基于qmake引入SARibbonBar库</h2>
+<blockquote class="doxtable">
+<p>&zwj;Qt6开始，不再推荐使用<code>qmake</code>，SARibbon未来的版本有可能会取消qmake的支持 </p>
+</blockquote>
+<p>qmake的编译过程会在SARibbon下生成<code>bin_qt{Qt version}_{MSVC/GNU}_x{32/64}</code>文件夹，库文件和dll文件都在此文件夹下，importSARibbonBarLib.pri会自动把这个文件夹下的库引用进来，在引入之前需要先进行配置，配置内容位于<code>common.pri</code>中</p>
+<p>步骤如下：</p>
+<ol type="1">
+<li>先在你的工程中建立一个<code>3rdparty</code>文件夹，再把整个<code>SARibbon</code>文件夹拷贝过去</li>
+</ol>
+<blockquote class="doxtable">
+<p>&zwj;SARibbon内部已经有几个pri文件可以很方便的让你把工程引入到自己目录中，<code>./importSARibbonBarLib.pri</code>文件就是用于引入SARibbon库的 </p>
+</blockquote>
+<p>importSARibbonBarLib.pri文件按照本库目录结构引入了依赖和头文件，如果你自己需要调整目录结构，可参考此文件进行修改</p>
+<ol type="1">
+<li>配置common.pri文件</li>
+</ol>
+<p>按照你实际的库的编译情况，配置SARibbon/common.pri文件，目前可选配置如下：</p>
+<div class="fragment"><div class="line"># SA_RIBBON_CONFIG+=use_frameless</div>
+<div class="line">#     此选项将使用frameless第三方库，这个选项在SARibbonBar.pri中会自动判断，如果，达到frameless的使用要求将会自动定义</div>
+<div class="line">#     frameless第三方库必须C++17且只有几个版本的qt可用，目前支持（qt5.14,qt5.15,qt6.4以上）</div>
+<div class="line">#     除了上诉版本SA_RIBBON_CONFIG中不会加入use_frameless</div>
+<div class="line">#     frameless库能实现Ubuntu下和mac下的显示，同时多屏幕的支持也较好</div>
+<div class="line"># 使用frameless库，需要定义QWindowKit的安装目录，默认在SARIBBON_BIN_DIR</div>
+<div class="line"># SA_RIBBON_QWindowKit_Install_DIR = $$SARIBBON_BIN_DIR</div>
+<div class="line"># </div>
+<div class="line"># SA_RIBBON_CONFIG+=enable_snap_layout</div>
+<div class="line">#      此选项将允许开启windows11的snap layout效果，目前在qt6.5下是正常显示位置，其它已知qt版本的snap layout位置会有偏移</div>
+<div class="line">#      此选项必须在 SA_RIBBON_CONFIG+=use_frameless 下才有效</div>
+</div><!-- fragment --><p>你根据实际情况打开配置项（把注释去掉）</p>
+<ol type="1">
+<li>在自己的Qt工程pro文件中加入如下语句即可</li>
+</ol>
+<div class="fragment"><div class="line">include($$PWD/3rdparty/SARibbon/importSARibbonBarLib.pri)</div>
+</div><!-- fragment --><p>此时你的工程目录结构大致如下：</p>
+<div class="fragment"><div class="line">|-[you-project-dir]</div>
+<div class="line">|  |-you-project.pro</div>
+<div class="line">|  |-[3rdparty]</div>
+<div class="line">|     |-[SARibbon](直接把SARibbon完整复制过来)</div>
+<div class="line">|        |-importSARibbonBarLib.pri（这个是方面你的qmake工程导入的文件，实际是引入了SARibbonBar.pri）</div>
+<div class="line">|        |-SARibbonBar.pri（用于引入库和依赖）</div>
+<div class="line">|        |-common.pri（这里是你的配置内容）</div>
+<div class="line">|        |-[bin_qtx.x.x_{MSVC/GNU}_x{32/64}]</div>
+<div class="line">|        |-[src]</div>
+<div class="line">|        |   |-[SARibbonBar]</div>
+</div><!-- fragment --><p><code>importSARibbonBarLib.pri</code>、<code>SARibbonBar.pri</code>、<code>common.pri</code>这三个文件是引入工程的关键文件</p>
+<blockquote class="doxtable">
+<p>&zwj;再次声明：Qt6.0版本后已经放弃qmake，建议使用cmake来管理工程 </p>
+</blockquote>
+<h1><a class="anchor" id="公开的预定义宏"></a>
+公开的预定义宏</h1>
+<p>SARibbon在编译过程中有些预定义宏，这些宏在基于visual studio的库引入是必须的</p>
+<p><code>SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1/0</code>,此宏用来定义是否引入了<code>QWindowkit</code>库</p>
+<p><code>SARIBBON_ENABLE_SNAP_LAYOUT=1/0</code>,此宏在SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1时才有用，用于定义是否开始windows11的snap layout效果 </p>
+</div></div><!-- contents -->
+</div><!-- PageDoc -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">制作者 <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.10.0 </li>
+  </ul>
+</div>
+</body>
+</html>

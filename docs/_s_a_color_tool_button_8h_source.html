@@ -1,0 +1,185 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.10.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>SARibbon: C:/src/Qt/SARibbon/src/SARibbonBar/colorWidgets/SAColorToolButton.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="SA-logo.png"/></td>
+  <td id="projectalign">
+   <div id="projectname">SARibbon<span id="projectnumber">&#160;2.4.2</span>
+   </div>
+   <div id="projectbrief">SARibbon wiki</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.10.0 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','搜索');
+  $(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() { codefold.init(0); });
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function(){initNavTree('_s_a_color_tool_button_8h_source.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">SAColorToolButton.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#ifndef SACOLORTOOLBUTTON_H</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#define SACOLORTOOLBUTTON_H</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &lt;QToolButton&gt;</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &quot;SAColorWidgetsGlobal.h&quot;</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="keyword">class </span>QPaintEvent;</div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="keyword">class </span>QResizeEvent;</div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="keyword">class </span>QPainter;</div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="keyword">class </span>QStylePainter;</div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="keyword">class </span><a class="code hl_class" href="class_s_a_color_menu.html">SAColorMenu</a>;</div>
+<div class="foldopen" id="foldopen00040" data-start="{" data-end="};">
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno"><a class="line" href="class_s_a_color_tool_button.html">   40</a></span><span class="keyword">class </span>SA_COLOR_WIDGETS_API <a class="code hl_class" href="class_s_a_color_tool_button.html">SAColorToolButton</a> : <span class="keyword">public</span> QToolButton</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>{</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>    Q_OBJECT</div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>    SA_COLOR_WIDGETS_DECLARE_PRIVATE(<a class="code hl_class" href="class_s_a_color_tool_button.html">SAColorToolButton</a>)</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span><span class="keyword">public</span>:</div>
+<div class="foldopen" id="foldopen00050" data-start="{" data-end="};">
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno"><a class="line" href="class_s_a_color_tool_button.html#a9e1b41f328cac2030a198fc4509fa344">   50</a></span>    <span class="keyword">enum</span> <a class="code hl_enumeration" href="class_s_a_color_tool_button.html#a9e1b41f328cac2030a198fc4509fa344">ColorToolButtonStyle</a></div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>    {</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno"><a class="line" href="class_s_a_color_tool_button.html#a9e1b41f328cac2030a198fc4509fa344a9e5a66a1fa852c94de022dc3ffab525a">   52</a></span>        <a class="code hl_enumvalue" href="class_s_a_color_tool_button.html#a9e1b41f328cac2030a198fc4509fa344a9e5a66a1fa852c94de022dc3ffab525a">WithColorMenu</a>,  </div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>        NoColorMenu     </div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno"><a class="line" href="class_s_a_color_tool_button.html#a9e1b41f328cac2030a198fc4509fa344ab08aec8a63a90bbf26096f84e4abf3fe">   54</a></span>    };</div>
+</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span> </div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>    <span class="keyword">explicit</span> <a class="code hl_class" href="class_s_a_color_tool_button.html">SAColorToolButton</a>(QWidget* parent = <span class="keyword">nullptr</span>);</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>    <span class="keyword">explicit</span> <a class="code hl_class" href="class_s_a_color_tool_button.html">SAColorToolButton</a>(ColorToolButtonStyle style, QWidget* parent = <span class="keyword">nullptr</span>);</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    <a class="code hl_class" href="class_s_a_color_tool_button.html">~SAColorToolButton</a>();</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    <span class="comment">// 获取颜色</span></div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    QColor color() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span>    <span class="comment">// 设置Margins</span></div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    <span class="keywordtype">void</span> setMargins(<span class="keyword">const</span> QMargins&amp; mg);</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    QMargins margins() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>    <span class="comment">// 绘制无颜色</span></div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    <span class="keyword">static</span> <span class="keywordtype">void</span> paintNoneColor(QPainter* p, <span class="keyword">const</span> QRect&amp; colorRect);</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    <span class="comment">// 设置颜色按钮的样式</span></div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>    <span class="keywordtype">void</span> setColorToolButtonStyle(ColorToolButtonStyle s);</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>    ColorToolButtonStyle colorToolButtonStyle() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>    <span class="comment">// 获取colorMenu，注意，这个函数很有可能会返回nullptr，如果ColorToolButtonStyle设置为NoColorMenu或者自己设置了菜单，此函数返回nullptr</span></div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>    <a class="code hl_class" href="class_s_a_color_menu.html">SAColorMenu</a>* colorMenu() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>    <span class="comment">// 建立标准的颜色菜单</span></div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>    <a class="code hl_class" href="class_s_a_color_menu.html">SAColorMenu</a>* createColorMenu();</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span><span class="keyword">public</span> Q_SLOTS:</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>    <span class="comment">// 设置颜色,会发射colorChanged信号</span></div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    <span class="keywordtype">void</span> setColor(<span class="keyword">const</span> QColor&amp; c);</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span> </div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span><span class="keyword">protected</span>:</div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>    <span class="comment">// 获取关键的三个rect位置</span></div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> calcRect(<span class="keyword">const</span> QStyleOptionToolButton&amp; opt, QRect&amp; iconRect, QRect&amp; textRect, QRect&amp; colorRect);</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> paintButton(QStylePainter* p, <span class="keyword">const</span> QStyleOptionToolButton&amp; opt);</div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> paintIcon(QStylePainter* p, <span class="keyword">const</span> QRect&amp; iconRect, <span class="keyword">const</span> QStyleOptionToolButton&amp; opt);</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> paintText(QStylePainter* p, <span class="keyword">const</span> QRect&amp; textRect, <span class="keyword">const</span> QStyleOptionToolButton&amp; opt);</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> paintColor(QStylePainter* p, <span class="keyword">const</span> QRect&amp; colorRect, <span class="keyword">const</span> QColor&amp; color, <span class="keyword">const</span> QStyleOptionToolButton&amp; opt);</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span> </div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span><span class="keyword">protected</span>:</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> paintEvent(QPaintEvent* e) Q_DECL_OVERRIDE;</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>    <span class="keyword">virtual</span> QSize sizeHint() const Q_DECL_OVERRIDE;</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>private Q_SLOTS:</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>    <span class="keywordtype">void</span> onButtonClicked(<span class="keywordtype">bool</span> checked = false);</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>Q_SIGNALS:</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno"><a class="line" href="class_s_a_color_tool_button.html#a95ffb60a5732b1bc58a7080c951fcf19">   97</a></span>    <span class="keywordtype">void</span> colorClicked(const QColor&amp; color, <span class="keywordtype">bool</span> checked = false);</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno"><a class="line" href="class_s_a_color_tool_button.html#abcc38455a0be7f57aa389e6f5e388cf2">  102</a></span>    <span class="keywordtype">void</span> colorChanged(const QColor&amp; color);</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>};</div>
+</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span> </div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span><span class="preprocessor">#endif  </span><span class="comment">// SACOLORTOOLBUTTON_H</span></div>
+<div class="ttc" id="aclass_s_a_color_menu_html"><div class="ttname"><a href="class_s_a_color_menu.html">SAColorMenu</a></div><div class="ttdoc">标准颜色菜单</div><div class="ttdef"><b>Definition</b> SAColorMenu.h:13</div></div>
+<div class="ttc" id="aclass_s_a_color_tool_button_html"><div class="ttname"><a href="class_s_a_color_tool_button.html">SAColorToolButton</a></div><div class="ttdoc">这是一个只显示颜色的toolbutton</div><div class="ttdef"><b>Definition</b> SAColorToolButton.h:41</div></div>
+<div class="ttc" id="aclass_s_a_color_tool_button_html_a9e1b41f328cac2030a198fc4509fa344"><div class="ttname"><a href="class_s_a_color_tool_button.html#a9e1b41f328cac2030a198fc4509fa344">SAColorToolButton::ColorToolButtonStyle</a></div><div class="ttdeci">ColorToolButtonStyle</div><div class="ttdoc">颜色按钮的内置样式</div><div class="ttdef"><b>Definition</b> SAColorToolButton.h:51</div></div>
+<div class="ttc" id="aclass_s_a_color_tool_button_html_a9e1b41f328cac2030a198fc4509fa344a9e5a66a1fa852c94de022dc3ffab525a"><div class="ttname"><a href="class_s_a_color_tool_button.html#a9e1b41f328cac2030a198fc4509fa344a9e5a66a1fa852c94de022dc3ffab525a">SAColorToolButton::WithColorMenu</a></div><div class="ttdeci">@ WithColorMenu</div><div class="ttdoc">默认会构建一个SAColorMenu</div><div class="ttdef"><b>Definition</b> SAColorToolButton.h:52</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_e2d4cc23cf2ba44ad8b50ed52b6a09e1.html">SARibbonBar</a></li><li class="navelem"><a class="el" href="dir_6bc044a7f24d6801d04128e194890f9f.html">colorWidgets</a></li><li class="navelem"><b>SAColorToolButton.h</b></li>
+    <li class="footer">制作者 <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.10.0 </li>
+  </ul>
+</div>
+</body>
+</html>

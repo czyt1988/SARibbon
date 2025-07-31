@@ -1,0 +1,27 @@
+var class_s_a_ribbon_tool_button_1_1_private_data =
+[
+    [ "adjustIconSize", "class_s_a_ribbon_tool_button_1_1_private_data.html#a176eb265edf8b5c2fdfb48219e052ae6", null ],
+    [ "calcDrawRects", "class_s_a_ribbon_tool_button_1_1_private_data.html#afd2575180df92c2222aa1d69b4772654", null ],
+    [ "calcLargeButtonDrawRects", "class_s_a_ribbon_tool_button_1_1_private_data.html#acb95c0fd2f97a05bc033c7fc16a27b1e", null ],
+    [ "calcLargeButtonSizeHint", "class_s_a_ribbon_tool_button_1_1_private_data.html#af6c08de93437c4fc868d8a4829819c2a", null ],
+    [ "calcSizeHint", "class_s_a_ribbon_tool_button_1_1_private_data.html#ac2ceb8ec65b84e145b8c4e7e1d54bdd9", null ],
+    [ "calcSmallButtonDrawRects", "class_s_a_ribbon_tool_button_1_1_private_data.html#a85476b6718f349246e9e9480bd41c138", null ],
+    [ "calcSmallButtonSizeHint", "class_s_a_ribbon_tool_button_1_1_private_data.html#a6527ebe37c58466ca38e492ff2d517b3", null ],
+    [ "calcTextDrawRectHeight", "class_s_a_ribbon_tool_button_1_1_private_data.html#abf39c798bd2f62a16fb1f71d16015820", null ],
+    [ "estimateLargeButtonTextWidth", "class_s_a_ribbon_tool_button_1_1_private_data.html#ac7ce60606bef54826c1ef0efe38d2bda", null ],
+    [ "hasIndicator", "class_s_a_ribbon_tool_button_1_1_private_data.html#a3e136b6f3704af9d8ed4391437dc9170", null ],
+    [ "isTextNeedWrap", "class_s_a_ribbon_tool_button_1_1_private_data.html#a00ead57d1fbebadda3b742c6246e350a", null ],
+    [ "updateDrawRect", "class_s_a_ribbon_tool_button_1_1_private_data.html#acb38e7a1c0c09b6e8cc7c3330317433a", null ],
+    [ "updateSizeHint", "class_s_a_ribbon_tool_button_1_1_private_data.html#ac1f7c2d493bfcffceaa07ce1de3156f0", null ],
+    [ "updateStatusByMousePosition", "class_s_a_ribbon_tool_button_1_1_private_data.html#a8e9815c1bd1e36a8a2cabecc45067ce4", null ],
+    [ "mDrawIconRect", "class_s_a_ribbon_tool_button_1_1_private_data.html#a6fe87fe0357eae24df7c9f0521367df2", null ],
+    [ "mDrawIndicatorArrowRect", "class_s_a_ribbon_tool_button_1_1_private_data.html#a8967354bac3503e82d8e6e56218f9897", null ],
+    [ "mDrawTextRect", "class_s_a_ribbon_tool_button_1_1_private_data.html#a32d4d131ae69751924a2759964b8e6f4", null ],
+    [ "mIndicatorLen", "class_s_a_ribbon_tool_button_1_1_private_data.html#a11bcb3dc1c7b942449fb12a7a5336b16", null ],
+    [ "mIsTextNeedWrap", "class_s_a_ribbon_tool_button_1_1_private_data.html#aaaaa3fd329220d95acd669867c8623c9", null ],
+    [ "mMenuButtonPressed", "class_s_a_ribbon_tool_button_1_1_private_data.html#a96888f6575307ae436e5ad058d13110a", null ],
+    [ "mMouseOnSubControl", "class_s_a_ribbon_tool_button_1_1_private_data.html#ab7e0e7e0b1e39d34563ed42397baca11", null ],
+    [ "mSizeHint", "class_s_a_ribbon_tool_button_1_1_private_data.html#a897e1547814d816b3a736260fe2feb5d", null ],
+    [ "mSpacing", "class_s_a_ribbon_tool_button_1_1_private_data.html#ade024f1d942d6e70242d71e4a438e647", null ],
+    [ "mWordWrap", "class_s_a_ribbon_tool_button_1_1_private_data.html#a22096ade7278d15434d1d917c0465542", null ]
+];

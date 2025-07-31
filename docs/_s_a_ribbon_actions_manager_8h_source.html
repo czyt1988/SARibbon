@@ -1,0 +1,243 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.10.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>SARibbon: C:/src/Qt/SARibbon/src/SARibbonBar/SARibbonActionsManager.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="SA-logo.png"/></td>
+  <td id="projectalign">
+   <div id="projectname">SARibbon<span id="projectnumber">&#160;2.4.2</span>
+   </div>
+   <div id="projectbrief">SARibbon wiki</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.10.0 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','搜索');
+  $(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() { codefold.init(0); });
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function(){initNavTree('_s_a_ribbon_actions_manager_8h_source.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">SARibbonActionsManager.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#ifndef SARIBBONACTIONSMANAGER_H</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#define SARIBBONACTIONSMANAGER_H</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;SARibbonGlobal.h&quot;</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &lt;QObject&gt;</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &lt;QAbstractListModel&gt;</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &lt;QAction&gt;</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &lt;QMap&gt;</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#include &lt;QString&gt;</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="preprocessor">#include &lt;QSet&gt;</span></div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="keyword">class </span><a class="code hl_class" href="class_s_a_ribbon_bar.html">SARibbonBar</a>;</div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="keyword">class </span><a class="code hl_class" href="class_s_a_ribbon_category.html">SARibbonCategory</a>;</div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span> </div>
+<div class="foldopen" id="foldopen00035" data-start="{" data-end="};">
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno"><a class="line" href="class_s_a_ribbon_actions_manager.html">   35</a></span><span class="keyword">class </span>SA_RIBBON_EXPORT <a class="code hl_class" href="class_s_a_ribbon_actions_manager.html">SARibbonActionsManager</a> : <span class="keyword">public</span> QObject</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>{</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>    Q_OBJECT</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>    SA_RIBBON_DECLARE_PRIVATE(<a class="code hl_class" href="class_s_a_ribbon_actions_manager.html">SARibbonActionsManager</a>)</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code hl_class" href="class_s_a_ribbon_actions_manager_model.html">SARibbonActionsManagerModel</a>;</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span> </div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span><span class="keyword">public</span>:</div>
+<div class="foldopen" id="foldopen00045" data-start="{" data-end="};">
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno"><a class="line" href="class_s_a_ribbon_actions_manager.html#a9bd27e17aa38f0dd38f0956fc638124e">   45</a></span>    <span class="keyword">enum</span> <a class="code hl_enumeration" href="class_s_a_ribbon_actions_manager.html#a9bd27e17aa38f0dd38f0956fc638124e">ActionTag</a></div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>    {</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno"><a class="line" href="class_s_a_ribbon_actions_manager.html#a9bd27e17aa38f0dd38f0956fc638124eaeb50c467a7a1d1ec71f4a97a1a3cf0a0">   47</a></span>        UnknowActionTag              = 0,     </div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno"><a class="line" href="class_s_a_ribbon_actions_manager.html#a9bd27e17aa38f0dd38f0956fc638124ea33993bc38ad018d6dc563afb88a12c49">   48</a></span>        CommonlyUsedActionTag        = 0x01,  </div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno"><a class="line" href="class_s_a_ribbon_actions_manager.html#a9bd27e17aa38f0dd38f0956fc638124ea7b8887805de52ecd3abb7a750d6feae7">   49</a></span>        NotInFunctionalAreaActionTag = 0x02,  </div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno"><a class="line" href="class_s_a_ribbon_actions_manager.html#a9bd27e17aa38f0dd38f0956fc638124eab3f2cffbe173329111faab31cddfc723">   50</a></span>        AutoCategoryDistinguishBeginTag = 0x1000,  </div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno"><a class="line" href="class_s_a_ribbon_actions_manager.html#a9bd27e17aa38f0dd38f0956fc638124ea8bd27e816ca0998cf89b6f6da784dec9">   51</a></span>        AutoCategoryDistinguishEndTag = 0x2000,  </div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno"><a class="line" href="class_s_a_ribbon_actions_manager.html#a9bd27e17aa38f0dd38f0956fc638124eacbed8f74010ed3af9399df6255e7f637">   52</a></span>        NotInRibbonCategoryTag = 0x2001,  </div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>        UserDefineActionTag = 0x8000  </div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno"><a class="line" href="class_s_a_ribbon_actions_manager.html#a9bd27e17aa38f0dd38f0956fc638124ea4ebda54b195c49a09ae7b8b8c1d827b6">   54</a></span>    };</div>
+</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>    <span class="keyword">explicit</span> <a class="code hl_class" href="class_s_a_ribbon_actions_manager.html">SARibbonActionsManager</a>(<a class="code hl_class" href="class_s_a_ribbon_bar.html">SARibbonBar</a>* bar);</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>    <a class="code hl_class" href="class_s_a_ribbon_actions_manager.html">~SARibbonActionsManager</a>();</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>    <span class="comment">//设置tag对应的名字</span></div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>    <span class="keywordtype">void</span> setTagName(<span class="keywordtype">int</span> tag, <span class="keyword">const</span> QString&amp; name);</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span> </div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>    <span class="comment">//获取tag对应的名字</span></div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>    QString tagName(<span class="keywordtype">int</span> tag) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span> </div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>    <span class="comment">//移除tag，注意，这个函数非常耗时</span></div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>    <span class="keywordtype">void</span> removeTag(<span class="keywordtype">int</span> tag);</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span> </div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>    <span class="comment">//注册action</span></div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span>    <span class="keywordtype">bool</span> registeAction(QAction* act, <span class="keywordtype">int</span> tag, <span class="keyword">const</span> QString&amp; key = QString(), <span class="keywordtype">bool</span> enableEmit = <span class="keyword">true</span>);</div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span> </div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>    <span class="comment">//取消action的注册</span></div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>    <span class="keywordtype">void</span> unregisteAction(QAction* act, <span class="keywordtype">bool</span> enableEmit = <span class="keyword">true</span>);</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span> </div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>    <span class="comment">//过滤得到actions对应的引用，实际是一个迭代器</span></div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>    QList&lt; QAction* &gt;&amp; filter(<span class="keywordtype">int</span> tag);</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span> </div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>    <span class="comment">//通过tag筛选出系列action</span></div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>    QList&lt; QAction* &gt;&amp; actions(<span class="keywordtype">int</span> tag);</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>    <span class="keyword">const</span> QList&lt; QAction* &gt; actions(<span class="keywordtype">int</span> tag) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span> </div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>    <span class="comment">//获取所有的标签</span></div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>    QList&lt; int &gt; actionTags() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span> </div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>    <span class="comment">//通过key获取action</span></div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>    QAction* action(<span class="keyword">const</span> QString&amp; key) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span> </div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>    <span class="comment">//通过action找到key</span></div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>    QString key(QAction* act) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span> </div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>    <span class="comment">//返回所有管理的action数</span></div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>    <span class="keywordtype">int</span> count() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span> </div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>    <span class="comment">//返回所有管理的actions</span></div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>    QList&lt; QAction* &gt; allActions() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span> </div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>    <span class="comment">//自动加载action,返回tag对应的Category指针</span></div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>    QMap&lt; int, SARibbonCategory* &gt; autoRegisteActions(<a class="code hl_class" href="class_s_a_ribbon_bar.html">SARibbonBar</a>* bar);</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span> </div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    <span class="comment">//自动加载widget下的actions函数返回的action,返回加载的数量，这些</span></div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    QSet&lt; QAction* &gt; autoRegisteWidgetActions(QWidget* w, <span class="keywordtype">int</span> tag, <span class="keywordtype">bool</span> enableEmit = <span class="keyword">false</span>);</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span> </div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>    <span class="comment">//根据标题查找action</span></div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>    QList&lt; QAction* &gt; search(<span class="keyword">const</span> QString&amp; text);</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span> </div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>    <span class="comment">//清除</span></div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>    <span class="keywordtype">void</span> clear();</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span> </div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>Q_SIGNALS:</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span> </div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno"><a class="line" href="class_s_a_ribbon_actions_manager.html#a3ae366db281c06bc12a3db24a08e5206">  111</a></span>    <span class="keywordtype">void</span> <a class="code hl_signal" href="class_s_a_ribbon_actions_manager.html#a3ae366db281c06bc12a3db24a08e5206">actionTagChanged</a>(<span class="keywordtype">int</span> tag, <span class="keywordtype">bool</span> isdelete);</div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span> </div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span><span class="keyword">private</span> Q_SLOTS:</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>    <span class="keywordtype">void</span> onActionDestroyed(QObject* o);</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>    <span class="keywordtype">void</span> onCategoryTitleChanged(<span class="keyword">const</span> QString&amp; title);</div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span> </div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>    <span class="keywordtype">void</span> removeAction(QAction* act, <span class="keywordtype">bool</span> enableEmit = <span class="keyword">true</span>);</div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>};</div>
+</div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span> </div>
+<div class="foldopen" id="foldopen00124" data-start="{" data-end="};">
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno"><a class="line" href="class_s_a_ribbon_actions_manager_model.html">  124</a></span><span class="keyword">class </span>SA_RIBBON_EXPORT <a class="code hl_class" href="class_s_a_ribbon_actions_manager_model.html">SARibbonActionsManagerModel</a> : <span class="keyword">public</span> QAbstractListModel</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>{</div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>    Q_OBJECT</div>
+<div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>    SA_RIBBON_DECLARE_PRIVATE(<a class="code hl_class" href="class_s_a_ribbon_actions_manager_model.html">SARibbonActionsManagerModel</a>)</div>
+<div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>    <span class="keyword">explicit</span> <a class="code hl_class" href="class_s_a_ribbon_actions_manager_model.html">SARibbonActionsManagerModel</a>(QObject* p = <span class="keyword">nullptr</span>);</div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>    <span class="keyword">explicit</span> <a class="code hl_class" href="class_s_a_ribbon_actions_manager_model.html">SARibbonActionsManagerModel</a>(<a class="code hl_class" href="class_s_a_ribbon_actions_manager.html">SARibbonActionsManager</a>* m, QObject* p = <span class="keyword">nullptr</span>);</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>    <a class="code hl_class" href="class_s_a_ribbon_actions_manager_model.html">~SARibbonActionsManagerModel</a>();</div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>    <span class="keyword">virtual</span> <span class="keywordtype">int</span> rowCount(<span class="keyword">const</span> QModelIndex&amp; parent) <span class="keyword">const override</span>;</div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>    <span class="keyword">virtual</span> QVariant headerData(<span class="keywordtype">int</span> section, Qt::Orientation orientation, <span class="keywordtype">int</span> role = Qt::DisplayRole) <span class="keyword">const override</span>;</div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>    <span class="keyword">virtual</span> Qt::ItemFlags flags(<span class="keyword">const</span> QModelIndex&amp; index) <span class="keyword">const override</span>;</div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>    <span class="keyword">virtual</span> QVariant data(<span class="keyword">const</span> QModelIndex&amp; index, <span class="keywordtype">int</span> role) <span class="keyword">const override</span>;</div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>    <span class="keywordtype">void</span> setFilter(<span class="keywordtype">int</span> tag);</div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>    <span class="keywordtype">void</span> update();</div>
+<div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>    <span class="keywordtype">void</span> setupActionsManager(<a class="code hl_class" href="class_s_a_ribbon_actions_manager.html">SARibbonActionsManager</a>* m);</div>
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>    <span class="keywordtype">void</span> uninstallActionsManager();</div>
+<div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>    QAction* indexToAction(QModelIndex index) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>    <span class="keywordtype">void</span> search(<span class="keyword">const</span> QString&amp; text);</div>
+<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span> </div>
+<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span><span class="keyword">private</span> Q_SLOTS:</div>
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span>    <span class="keywordtype">void</span> onActionTagChanged(<span class="keywordtype">int</span> tag, <span class="keywordtype">bool</span> isdelete);</div>
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>};</div>
+</div>
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span> </div>
+<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span><span class="preprocessor">#endif  </span><span class="comment">// SARIBBONACTIONSMANAGER_H</span></div>
+<div class="ttc" id="aclass_s_a_ribbon_actions_manager_html"><div class="ttname"><a href="class_s_a_ribbon_actions_manager.html">SARibbonActionsManager</a></div><div class="ttdoc">用于管理SARibbon的所有Action</div><div class="ttdef"><b>Definition</b> SARibbonActionsManager.h:36</div></div>
+<div class="ttc" id="aclass_s_a_ribbon_actions_manager_html_a3ae366db281c06bc12a3db24a08e5206"><div class="ttname"><a href="class_s_a_ribbon_actions_manager.html#a3ae366db281c06bc12a3db24a08e5206">SARibbonActionsManager::actionTagChanged</a></div><div class="ttdeci">void actionTagChanged(int tag, bool isdelete)</div><div class="ttdoc">标签变化触发的信号，变化包括新增和删除</div></div>
+<div class="ttc" id="aclass_s_a_ribbon_actions_manager_html_a9bd27e17aa38f0dd38f0956fc638124e"><div class="ttname"><a href="class_s_a_ribbon_actions_manager.html#a9bd27e17aa38f0dd38f0956fc638124e">SARibbonActionsManager::ActionTag</a></div><div class="ttdeci">ActionTag</div><div class="ttdoc">定义action的标签</div><div class="ttdef"><b>Definition</b> SARibbonActionsManager.h:46</div></div>
+<div class="ttc" id="aclass_s_a_ribbon_actions_manager_model_html"><div class="ttname"><a href="class_s_a_ribbon_actions_manager_model.html">SARibbonActionsManagerModel</a></div><div class="ttdoc">SARibbonActionsManager 对应的model</div><div class="ttdef"><b>Definition</b> SARibbonActionsManager.h:125</div></div>
+<div class="ttc" id="aclass_s_a_ribbon_bar_html"><div class="ttname"><a href="class_s_a_ribbon_bar.html">SARibbonBar</a></div><div class="ttdoc">SARibbonBar继承于QMenuBar,在SARibbonMainWindow中直接替换了原来的QMenuBar</div><div class="ttdef"><b>Definition</b> SARibbonBar.h:93</div></div>
+<div class="ttc" id="aclass_s_a_ribbon_category_html"><div class="ttname"><a href="class_s_a_ribbon_category.html">SARibbonCategory</a></div><div class="ttdoc">Ribbon控件中的分类选项卡页面（Category）</div><div class="ttdef"><b>Definition</b> SARibbonCategory.h:23</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_e2d4cc23cf2ba44ad8b50ed52b6a09e1.html">SARibbonBar</a></li><li class="navelem"><b>SARibbonActionsManager.h</b></li>
+    <li class="footer">制作者 <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.10.0 </li>
+  </ul>
+</div>
+</body>
+</html>

@@ -1,0 +1,682 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.10.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>SARibbon: SARibbonActionsManager类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="SA-logo.png"/></td>
+  <td id="projectalign">
+   <div id="projectname">SARibbon<span id="projectnumber">&#160;2.4.2</span>
+   </div>
+   <div id="projectbrief">SARibbon wiki</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.10.0 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','搜索');
+  $(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function(){initNavTree('class_s_a_ribbon_actions_manager.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#nested-classes">类</a> &#124;
+<a href="#pub-types">Public 类型</a> &#124;
+<a href="#signals">信号</a> &#124;
+<a href="#pub-methods">Public 成员函数</a> &#124;
+<a href="#friends">友元</a> &#124;
+<a href="class_s_a_ribbon_actions_manager-members.html">所有成员列表</a>  </div>
+  <div class="headertitle"><div class="title">SARibbonActionsManager类 参考</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>用于管理SARibbon的所有Action  
+ <a href="#details">更多...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_s_a_ribbon_actions_manager_8h_source.html">SARibbonActionsManager.h</a>&gt;</code></p>
+<div class="dynheader">
+类 SARibbonActionsManager 继承关系图:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="class_s_a_ribbon_actions_manager.png" alt=""/>
+ </div></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
+类</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_a_ribbon_actions_manager_1_1_private_data.html">PrivateData</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-types" name="pub-types"></a>
+Public 类型</h2></td></tr>
+<tr class="memitem:a9bd27e17aa38f0dd38f0956fc638124e" id="r_a9bd27e17aa38f0dd38f0956fc638124e"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9bd27e17aa38f0dd38f0956fc638124e">ActionTag</a> { <br />
+&#160;&#160;<a class="el" href="#a9bd27e17aa38f0dd38f0956fc638124eaeb50c467a7a1d1ec71f4a97a1a3cf0a0">UnknowActionTag</a> = 0
+, <a class="el" href="#a9bd27e17aa38f0dd38f0956fc638124ea33993bc38ad018d6dc563afb88a12c49">CommonlyUsedActionTag</a> = 0x01
+, <a class="el" href="#a9bd27e17aa38f0dd38f0956fc638124ea7b8887805de52ecd3abb7a750d6feae7">NotInFunctionalAreaActionTag</a> = 0x02
+, <a class="el" href="#a9bd27e17aa38f0dd38f0956fc638124eab3f2cffbe173329111faab31cddfc723">AutoCategoryDistinguishBeginTag</a> = 0x1000
+, <br />
+&#160;&#160;<a class="el" href="#a9bd27e17aa38f0dd38f0956fc638124ea8bd27e816ca0998cf89b6f6da784dec9">AutoCategoryDistinguishEndTag</a> = 0x2000
+, <a class="el" href="#a9bd27e17aa38f0dd38f0956fc638124eacbed8f74010ed3af9399df6255e7f637">NotInRibbonCategoryTag</a> = 0x2001
+, <a class="el" href="#a9bd27e17aa38f0dd38f0956fc638124ea4ebda54b195c49a09ae7b8b8c1d827b6">UserDefineActionTag</a> = 0x8000
+<br />
+ }</td></tr>
+<tr class="memdesc:a9bd27e17aa38f0dd38f0956fc638124e"><td class="mdescLeft">&#160;</td><td class="mdescRight">定义action的标签  <a href="#a9bd27e17aa38f0dd38f0956fc638124e">更多...</a><br /></td></tr>
+<tr class="separator:a9bd27e17aa38f0dd38f0956fc638124e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="signals" name="signals"></a>
+信号</h2></td></tr>
+<tr class="memitem:a3ae366db281c06bc12a3db24a08e5206" id="r_a3ae366db281c06bc12a3db24a08e5206"><td class="memItemLeft" align="right" valign="top"><a id="a3ae366db281c06bc12a3db24a08e5206" name="a3ae366db281c06bc12a3db24a08e5206"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>actionTagChanged</b> (int tag, bool isdelete)</td></tr>
+<tr class="memdesc:a3ae366db281c06bc12a3db24a08e5206"><td class="mdescLeft">&#160;</td><td class="mdescRight">标签变化触发的信号，变化包括新增和删除 <br /></td></tr>
+<tr class="separator:a3ae366db281c06bc12a3db24a08e5206"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:a20b8f55d8e333992c547c5c2a54c2b60" id="r_a20b8f55d8e333992c547c5c2a54c2b60"><td class="memItemLeft" align="right" valign="top"><a id="a20b8f55d8e333992c547c5c2a54c2b60" name="a20b8f55d8e333992c547c5c2a54c2b60"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>SARibbonActionsManager</b> (<a class="el" href="class_s_a_ribbon_bar.html">SARibbonBar</a> *bar)</td></tr>
+<tr class="separator:a20b8f55d8e333992c547c5c2a54c2b60"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afca0c7507e50007c3a56760f7b287f93" id="r_afca0c7507e50007c3a56760f7b287f93"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afca0c7507e50007c3a56760f7b287f93">setTagName</a> (int tag, const QString &amp;name)</td></tr>
+<tr class="memdesc:afca0c7507e50007c3a56760f7b287f93"><td class="mdescLeft">&#160;</td><td class="mdescRight">设置tag对应的名字，通过这个可以得到tag和文本的映射  <br /></td></tr>
+<tr class="separator:afca0c7507e50007c3a56760f7b287f93"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8007cfb1381ca2d0d114c8c0d20ce72b" id="r_a8007cfb1381ca2d0d114c8c0d20ce72b"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a8007cfb1381ca2d0d114c8c0d20ce72b">tagName</a> (int tag) const</td></tr>
+<tr class="memdesc:a8007cfb1381ca2d0d114c8c0d20ce72b"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取tag对应的中文名字  <br /></td></tr>
+<tr class="separator:a8007cfb1381ca2d0d114c8c0d20ce72b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adadeaad3a278aa88f5453015af8d16f2" id="r_adadeaad3a278aa88f5453015af8d16f2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adadeaad3a278aa88f5453015af8d16f2">removeTag</a> (int tag)</td></tr>
+<tr class="memdesc:adadeaad3a278aa88f5453015af8d16f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">移除tag  <br /></td></tr>
+<tr class="separator:adadeaad3a278aa88f5453015af8d16f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1ca8187d1ab6dfba8587659da3e354a2" id="r_a1ca8187d1ab6dfba8587659da3e354a2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a1ca8187d1ab6dfba8587659da3e354a2">registeAction</a> (QAction *act, int tag, const QString &amp;<a class="el" href="#a89eb2e3be49b493426cfbb4887ced79e">key</a>=QString(), bool enableEmit=true)</td></tr>
+<tr class="memdesc:a1ca8187d1ab6dfba8587659da3e354a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">把action注册到管理器中，实现action的管理  <br /></td></tr>
+<tr class="separator:a1ca8187d1ab6dfba8587659da3e354a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afc4a9852da5b2c01888283091e151944" id="r_afc4a9852da5b2c01888283091e151944"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#afc4a9852da5b2c01888283091e151944">unregisteAction</a> (QAction *act, bool enableEmit=true)</td></tr>
+<tr class="memdesc:afc4a9852da5b2c01888283091e151944"><td class="mdescLeft">&#160;</td><td class="mdescRight">取消action的注册  <br /></td></tr>
+<tr class="separator:afc4a9852da5b2c01888283091e151944"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a69c97896f810475366d6b29e7985c866" id="r_a69c97896f810475366d6b29e7985c866"><td class="memItemLeft" align="right" valign="top">QList&lt; QAction * &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a69c97896f810475366d6b29e7985c866">filter</a> (int tag)</td></tr>
+<tr class="memdesc:a69c97896f810475366d6b29e7985c866"><td class="mdescLeft">&#160;</td><td class="mdescRight">等同actions  <br /></td></tr>
+<tr class="separator:a69c97896f810475366d6b29e7985c866"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adc1b6ae09a26a19518f0c4d3696b1eeb" id="r_adc1b6ae09a26a19518f0c4d3696b1eeb"><td class="memItemLeft" align="right" valign="top">QList&lt; QAction * &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adc1b6ae09a26a19518f0c4d3696b1eeb">actions</a> (int tag)</td></tr>
+<tr class="memdesc:adc1b6ae09a26a19518f0c4d3696b1eeb"><td class="mdescLeft">&#160;</td><td class="mdescRight">根据tag得到actions  <br /></td></tr>
+<tr class="separator:adc1b6ae09a26a19518f0c4d3696b1eeb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a38b72f663800f838bfdca4160cc6c76a" id="r_a38b72f663800f838bfdca4160cc6c76a"><td class="memItemLeft" align="right" valign="top"><a id="a38b72f663800f838bfdca4160cc6c76a" name="a38b72f663800f838bfdca4160cc6c76a"></a>
+const QList&lt; QAction * &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>actions</b> (int tag) const</td></tr>
+<tr class="separator:a38b72f663800f838bfdca4160cc6c76a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a68755323d56404f8fd86878e17d18b61" id="r_a68755323d56404f8fd86878e17d18b61"><td class="memItemLeft" align="right" valign="top">QList&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a68755323d56404f8fd86878e17d18b61">actionTags</a> () const</td></tr>
+<tr class="memdesc:a68755323d56404f8fd86878e17d18b61"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取所有的标签  <br /></td></tr>
+<tr class="separator:a68755323d56404f8fd86878e17d18b61"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4ea6c50811852e92c2b30907d21f8a1b" id="r_a4ea6c50811852e92c2b30907d21f8a1b"><td class="memItemLeft" align="right" valign="top">QAction *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4ea6c50811852e92c2b30907d21f8a1b">action</a> (const QString &amp;<a class="el" href="#a89eb2e3be49b493426cfbb4887ced79e">key</a>) const</td></tr>
+<tr class="memdesc:a4ea6c50811852e92c2b30907d21f8a1b"><td class="mdescLeft">&#160;</td><td class="mdescRight">通过key获取action  <br /></td></tr>
+<tr class="separator:a4ea6c50811852e92c2b30907d21f8a1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a89eb2e3be49b493426cfbb4887ced79e" id="r_a89eb2e3be49b493426cfbb4887ced79e"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a89eb2e3be49b493426cfbb4887ced79e">key</a> (QAction *act) const</td></tr>
+<tr class="memdesc:a89eb2e3be49b493426cfbb4887ced79e"><td class="mdescLeft">&#160;</td><td class="mdescRight">通过action找到key  <br /></td></tr>
+<tr class="separator:a89eb2e3be49b493426cfbb4887ced79e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9f806a1f8378eddc11364a4bcb47d7e0" id="r_a9f806a1f8378eddc11364a4bcb47d7e0"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a9f806a1f8378eddc11364a4bcb47d7e0">count</a> () const</td></tr>
+<tr class="memdesc:a9f806a1f8378eddc11364a4bcb47d7e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">返回所有管理的action数  <br /></td></tr>
+<tr class="separator:a9f806a1f8378eddc11364a4bcb47d7e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab0a180b4c9ef29c75c7d9d3b4a2f6456" id="r_ab0a180b4c9ef29c75c7d9d3b4a2f6456"><td class="memItemLeft" align="right" valign="top">QList&lt; QAction * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ab0a180b4c9ef29c75c7d9d3b4a2f6456">allActions</a> () const</td></tr>
+<tr class="memdesc:ab0a180b4c9ef29c75c7d9d3b4a2f6456"><td class="mdescLeft">&#160;</td><td class="mdescRight">返回所有管理的actions  <br /></td></tr>
+<tr class="separator:ab0a180b4c9ef29c75c7d9d3b4a2f6456"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aba8620873f2b8ad10c750e1358f12d7c" id="r_aba8620873f2b8ad10c750e1358f12d7c"><td class="memItemLeft" align="right" valign="top">QMap&lt; int, <a class="el" href="class_s_a_ribbon_category.html">SARibbonCategory</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aba8620873f2b8ad10c750e1358f12d7c">autoRegisteActions</a> (<a class="el" href="class_s_a_ribbon_bar.html">SARibbonBar</a> *bar)</td></tr>
+<tr class="memdesc:aba8620873f2b8ad10c750e1358f12d7c"><td class="mdescLeft">&#160;</td><td class="mdescRight">自动加载SARibbonBar的action 此函数会遍历SARibbonBar的父窗口(一般是SARibbonMainWindow)下的所有子object，找到action注册， 并会遍历所有<a class="el" href="class_s_a_ribbon_category.html">SARibbonCategory</a>,把SARibbonCategory下的action按SARibbonCategory的title name进行分类  <br /></td></tr>
+<tr class="separator:aba8620873f2b8ad10c750e1358f12d7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adcb9f03e6ead3fb9c0acc3d92e97a748" id="r_adcb9f03e6ead3fb9c0acc3d92e97a748"><td class="memItemLeft" align="right" valign="top">QSet&lt; QAction * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#adcb9f03e6ead3fb9c0acc3d92e97a748">autoRegisteWidgetActions</a> (QWidget *w, int tag, bool enableEmit=false)</td></tr>
+<tr class="memdesc:adcb9f03e6ead3fb9c0acc3d92e97a748"><td class="mdescLeft">&#160;</td><td class="mdescRight">自动加载action  <br /></td></tr>
+<tr class="separator:adcb9f03e6ead3fb9c0acc3d92e97a748"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a12b5934e6dfaefd016880fb7b959f87e" id="r_a12b5934e6dfaefd016880fb7b959f87e"><td class="memItemLeft" align="right" valign="top">QList&lt; QAction * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a12b5934e6dfaefd016880fb7b959f87e">search</a> (const QString &amp;text)</td></tr>
+<tr class="memdesc:a12b5934e6dfaefd016880fb7b959f87e"><td class="mdescLeft">&#160;</td><td class="mdescRight">根据标题查找action  <br /></td></tr>
+<tr class="separator:a12b5934e6dfaefd016880fb7b959f87e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aba5f7d3ce448794d0523dd650e191ade" id="r_aba5f7d3ce448794d0523dd650e191ade"><td class="memItemLeft" align="right" valign="top"><a id="aba5f7d3ce448794d0523dd650e191ade" name="aba5f7d3ce448794d0523dd650e191ade"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>clear</b> ()</td></tr>
+<tr class="separator:aba5f7d3ce448794d0523dd650e191ade"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="friends" name="friends"></a>
+友元</h2></td></tr>
+<tr class="memitem:aae4719b6ea8b25d1fc36a86c5829ed9f" id="r_aae4719b6ea8b25d1fc36a86c5829ed9f"><td class="memItemLeft" align="right" valign="top"><a id="aae4719b6ea8b25d1fc36a86c5829ed9f" name="aae4719b6ea8b25d1fc36a86c5829ed9f"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>SARibbonActionsManagerModel</b></td></tr>
+<tr class="separator:aae4719b6ea8b25d1fc36a86c5829ed9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
+<div class="textblock"><p>用于管理SARibbon的所有Action </p>
+<p>SARibbonActionsManager维护着两个表，一个是tag（标签）对应的Action list， 一个是所有接受SARibbonActionsManager管理的action list。</p>
+<p>SARibbonActionsManager的标签对应一组actions，每个标签对应的action可以重复出现， 但SARibbonActionsManager维护的action list里只有一份action，不会重复出现。</p>
+<p>tag用于对action list分组，每个tag的实体名字通过<a class="el" href="#afca0c7507e50007c3a56760f7b287f93">setTagName</a> 进行设置，在语言变化时需要及时调用 setTagName设置新的标签对应的文本。</p>
+<p>SARibbonActionsManager默认预设了6个常用标签见<a class="el" href="#a9bd27e17aa38f0dd38f0956fc638124e">SARibbonActionsManager::ActionTag</a> ，用户自定义标签需要在 SARibbonActionsManager::UserDefineActionTag值的基础上进行累加。</p>
+<p><a class="el" href="#a69c97896f810475366d6b29e7985c866">filter</a> （等同<a class="el" href="#adc1b6ae09a26a19518f0c4d3696b1eeb">actions</a> ）函数用于提取标签管理的action list，<a class="el" href="#ab0a180b4c9ef29c75c7d9d3b4a2f6456">allActions</a> 函数返回SARibbonActionsManager 管理的所有标签。</p>
+<p>通过<a class="el" href="#aba8620873f2b8ad10c750e1358f12d7c">autoRegisteActions</a> 函数可以快速的建立action的管理，此函数会遍历@ref <a class="el" href="class_s_a_ribbon_pannel.html" title="pannel页窗口，pannel是ribbon的面板用于承放控件">SARibbonPannel</a> 添加的action,并给予Category建立tag，正常使用用户仅需关注此autoRegisteActions函数即可 </p>
+</div><h2 class="groupheader">成员枚举类型说明</h2>
+<a id="a9bd27e17aa38f0dd38f0956fc638124e" name="a9bd27e17aa38f0dd38f0956fc638124e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9bd27e17aa38f0dd38f0956fc638124e">&#9670;&#160;</a></span>ActionTag</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="#a9bd27e17aa38f0dd38f0956fc638124e">SARibbonActionsManager::ActionTag</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>定义action的标签 </p>
+<table class="fieldtable">
+<tr><th colspan="2">枚举值</th></tr><tr><td class="fieldname"><a id="a9bd27e17aa38f0dd38f0956fc638124eaeb50c467a7a1d1ec71f4a97a1a3cf0a0" name="a9bd27e17aa38f0dd38f0956fc638124eaeb50c467a7a1d1ec71f4a97a1a3cf0a0"></a>UnknowActionTag&#160;</td><td class="fielddoc"><p>未知的tag </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a9bd27e17aa38f0dd38f0956fc638124ea33993bc38ad018d6dc563afb88a12c49" name="a9bd27e17aa38f0dd38f0956fc638124ea33993bc38ad018d6dc563afb88a12c49"></a>CommonlyUsedActionTag&#160;</td><td class="fielddoc"><p>预设tag-常用命令 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a9bd27e17aa38f0dd38f0956fc638124ea7b8887805de52ecd3abb7a750d6feae7" name="a9bd27e17aa38f0dd38f0956fc638124ea7b8887805de52ecd3abb7a750d6feae7"></a>NotInFunctionalAreaActionTag&#160;</td><td class="fielddoc"><p>预设tag-不在功能区命令 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a9bd27e17aa38f0dd38f0956fc638124eab3f2cffbe173329111faab31cddfc723" name="a9bd27e17aa38f0dd38f0956fc638124eab3f2cffbe173329111faab31cddfc723"></a>AutoCategoryDistinguishBeginTag&#160;</td><td class="fielddoc"><p>自动按Category划分的标签起始，在<a class="el" href="#aba8620873f2b8ad10c750e1358f12d7c">autoRegisteActions</a> 函数会用到 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a9bd27e17aa38f0dd38f0956fc638124ea8bd27e816ca0998cf89b6f6da784dec9" name="a9bd27e17aa38f0dd38f0956fc638124ea8bd27e816ca0998cf89b6f6da784dec9"></a>AutoCategoryDistinguishEndTag&#160;</td><td class="fielddoc"><p>自动按Category划分的标签结束，在<a class="el" href="#aba8620873f2b8ad10c750e1358f12d7c">autoRegisteActions</a> 函数会用到 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a9bd27e17aa38f0dd38f0956fc638124eacbed8f74010ed3af9399df6255e7f637" name="a9bd27e17aa38f0dd38f0956fc638124eacbed8f74010ed3af9399df6255e7f637"></a>NotInRibbonCategoryTag&#160;</td><td class="fielddoc"><p>不在功能区的标签<a class="el" href="#aba8620873f2b8ad10c750e1358f12d7c">autoRegisteActions</a> 函数会遍历所有category的action </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a9bd27e17aa38f0dd38f0956fc638124ea4ebda54b195c49a09ae7b8b8c1d827b6" name="a9bd27e17aa38f0dd38f0956fc638124ea4ebda54b195c49a09ae7b8b8c1d827b6"></a>UserDefineActionTag&#160;</td><td class="fielddoc"><p>自定义标签，所有用户自定义tag要大于此tag </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<h2 class="groupheader">成员函数说明</h2>
+<a id="a4ea6c50811852e92c2b30907d21f8a1b" name="a4ea6c50811852e92c2b30907d21f8a1b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4ea6c50811852e92c2b30907d21f8a1b">&#9670;&#160;</a></span>action()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QAction * SARibbonActionsManager::action </td>
+          <td>(</td>
+          <td class="paramtype">const QString &amp;</td>          <td class="paramname"><span class="paramname"><em>key</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>通过key获取action </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">key</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>如果没有key，返回nullptr </dd></dl>
+
+</div>
+</div>
+<a id="adc1b6ae09a26a19518f0c4d3696b1eeb" name="adc1b6ae09a26a19518f0c4d3696b1eeb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adc1b6ae09a26a19518f0c4d3696b1eeb">&#9670;&#160;</a></span>actions()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QList&lt; QAction * &gt; &amp; SARibbonActionsManager::actions </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>tag</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>根据tag得到actions </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tag</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd></dd></dl>
+
+</div>
+</div>
+<a id="a68755323d56404f8fd86878e17d18b61" name="a68755323d56404f8fd86878e17d18b61"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a68755323d56404f8fd86878e17d18b61">&#9670;&#160;</a></span>actionTags()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QList&lt; int &gt; SARibbonActionsManager::actionTags </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>获取所有的标签 </p>
+<dl class="section return"><dt>返回</dt><dd></dd></dl>
+
+</div>
+</div>
+<a id="ab0a180b4c9ef29c75c7d9d3b4a2f6456" name="ab0a180b4c9ef29c75c7d9d3b4a2f6456"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab0a180b4c9ef29c75c7d9d3b4a2f6456">&#9670;&#160;</a></span>allActions()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QList&lt; QAction * &gt; SARibbonActionsManager::allActions </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>返回所有管理的actions </p>
+<dl class="section return"><dt>返回</dt><dd></dd></dl>
+
+</div>
+</div>
+<a id="aba8620873f2b8ad10c750e1358f12d7c" name="aba8620873f2b8ad10c750e1358f12d7c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aba8620873f2b8ad10c750e1358f12d7c">&#9670;&#160;</a></span>autoRegisteActions()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QMap&lt; int, <a class="el" href="class_s_a_ribbon_category.html">SARibbonCategory</a> * &gt; SARibbonActionsManager::autoRegisteActions </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="class_s_a_ribbon_bar.html">SARibbonBar</a> *</td>          <td class="paramname"><span class="paramname"><em>bar</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>自动加载SARibbonBar的action 此函数会遍历SARibbonBar的父窗口(一般是SARibbonMainWindow)下的所有子object，找到action注册， 并会遍历所有<a class="el" href="class_s_a_ribbon_category.html">SARibbonCategory</a>,把SARibbonCategory下的action按SARibbonCategory的title name进行分类 </p>
+<p>此函数会把所有category下的action生成tag并注册，返回的QMap&lt;int, SARibbonCategory *&gt;是记录了category对应的tag</p>
+<p>此函数还会把SARibbonBar的父窗口(一般是SARibbonMainWindow)下面的action，但不在任何一个category下的作为NotInRibbonCategoryTag标签注册，默认名字会赋予not in ribbon， 可以通过<a class="el" href="#afca0c7507e50007c3a56760f7b287f93">setTagName</a> 改变</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">w</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd></dd></dl>
+<dl class="section note"><dt>注解</dt><dd>此函数的调用最好在category设置了标题后调用，因为会以category的标题作为标签的命名 </dd></dl>
+
+</div>
+</div>
+<a id="adcb9f03e6ead3fb9c0acc3d92e97a748" name="adcb9f03e6ead3fb9c0acc3d92e97a748"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adcb9f03e6ead3fb9c0acc3d92e97a748">&#9670;&#160;</a></span>autoRegisteWidgetActions()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QSet&lt; QAction * &gt; SARibbonActionsManager::autoRegisteWidgetActions </td>
+          <td>(</td>
+          <td class="paramtype">QWidget *</td>          <td class="paramname"><span class="paramname"><em>w</em>, </span></td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>tag</em>, </span></td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>enableEmit</em><span class="paramdefsep"> = </span><span class="paramdefval">false</span></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>自动加载action </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">w</td><td></td></tr>
+    <tr><td class="paramname">tag</td><td></td></tr>
+    <tr><td class="paramname">enableEmit</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>返回成功加入SARibbonActionsManager管理的action </dd></dl>
+
+</div>
+</div>
+<a id="a9f806a1f8378eddc11364a4bcb47d7e0" name="a9f806a1f8378eddc11364a4bcb47d7e0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9f806a1f8378eddc11364a4bcb47d7e0">&#9670;&#160;</a></span>count()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int SARibbonActionsManager::count </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>返回所有管理的action数 </p>
+<dl class="section return"><dt>返回</dt><dd></dd></dl>
+
+</div>
+</div>
+<a id="a69c97896f810475366d6b29e7985c866" name="a69c97896f810475366d6b29e7985c866"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a69c97896f810475366d6b29e7985c866">&#9670;&#160;</a></span>filter()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QList&lt; QAction * &gt; &amp; SARibbonActionsManager::filter </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>tag</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>等同actions </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tag</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd></dd></dl>
+
+</div>
+</div>
+<a id="a89eb2e3be49b493426cfbb4887ced79e" name="a89eb2e3be49b493426cfbb4887ced79e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a89eb2e3be49b493426cfbb4887ced79e">&#9670;&#160;</a></span>key()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QString SARibbonActionsManager::key </td>
+          <td>(</td>
+          <td class="paramtype">QAction *</td>          <td class="paramname"><span class="paramname"><em>act</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>通过action找到key </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">act</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>如果找不到，返回QString() </dd></dl>
+
+</div>
+</div>
+<a id="a1ca8187d1ab6dfba8587659da3e354a2" name="a1ca8187d1ab6dfba8587659da3e354a2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1ca8187d1ab6dfba8587659da3e354a2">&#9670;&#160;</a></span>registeAction()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool SARibbonActionsManager::registeAction </td>
+          <td>(</td>
+          <td class="paramtype">QAction *</td>          <td class="paramname"><span class="paramname"><em>act</em>, </span></td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>tag</em>, </span></td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const QString &amp;</td>          <td class="paramname"><span class="paramname"><em>key</em><span class="paramdefsep"> = </span><span class="paramdefval">QString()</span>, </span></td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>enableEmit</em><span class="paramdefsep"> = </span><span class="paramdefval">true</span></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>把action注册到管理器中，实现action的管理 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">act</td><td></td></tr>
+    <tr><td class="paramname">tag</td><td>tag是可以按照位进行叠加，见 <a class="el" href="#a9bd27e17aa38f0dd38f0956fc638124e">ActionTag</a> 如果 要定义自己的标签，建议定义大于<a class="el" href="#a9bd27e17aa38f0dd38f0956fc638124ea4ebda54b195c49a09ae7b8b8c1d827b6">ActionTag::UserDefineActionTag</a> 的值， registeAction的tag是直接记录进去的，如果要多个标签并存，在registe之前先或好tag </td></tr>
+    <tr><td class="paramname">key</td><td>key是action对应的key，一个key只对应一个action，是查找action的关键 ,默认情况为一个QString(),这时key是QAction的objectName </td></tr>
+    <tr><td class="paramname">enableEmit</td><td>控制是否发射<a class="el" href="#a3ae366db281c06bc12a3db24a08e5206">actionTagChanged</a> 信号 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>注解</dt><dd>同一个action多次注册不同的tag可以通过tag索引到action，但通过action只能索引到最后一个注册的tag </dd>
+<dd>
+tag的新增会触发actionTagChanged信号 </dd></dl>
+
+</div>
+</div>
+<a id="adadeaad3a278aa88f5453015af8d16f2" name="adadeaad3a278aa88f5453015af8d16f2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adadeaad3a278aa88f5453015af8d16f2">&#9670;&#160;</a></span>removeTag()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SARibbonActionsManager::removeTag </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>tag</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>移除tag </p>
+<dl class="section note"><dt>注解</dt><dd>注意，这个函数非常耗时 </dd></dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tag</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a12b5934e6dfaefd016880fb7b959f87e" name="a12b5934e6dfaefd016880fb7b959f87e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a12b5934e6dfaefd016880fb7b959f87e">&#9670;&#160;</a></span>search()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QList&lt; QAction * &gt; SARibbonActionsManager::search </td>
+          <td>(</td>
+          <td class="paramtype">const QString &amp;</td>          <td class="paramname"><span class="paramname"><em>text</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>根据标题查找action </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">text</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd></dd></dl>
+
+</div>
+</div>
+<a id="afca0c7507e50007c3a56760f7b287f93" name="afca0c7507e50007c3a56760f7b287f93"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afca0c7507e50007c3a56760f7b287f93">&#9670;&#160;</a></span>setTagName()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SARibbonActionsManager::setTagName </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>tag</em>, </span></td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const QString &amp;</td>          <td class="paramname"><span class="paramname"><em>name</em></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>设置tag对应的名字，通过这个可以得到tag和文本的映射 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tag</td><td></td></tr>
+    <tr><td class="paramname">name</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>注解</dt><dd>在支持多语言的环境下，在语言切换时需要重新设置，以更新名字 </dd></dl>
+
+</div>
+</div>
+<a id="a8007cfb1381ca2d0d114c8c0d20ce72b" name="a8007cfb1381ca2d0d114c8c0d20ce72b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8007cfb1381ca2d0d114c8c0d20ce72b">&#9670;&#160;</a></span>tagName()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QString SARibbonActionsManager::tagName </td>
+          <td>(</td>
+          <td class="paramtype">int</td>          <td class="paramname"><span class="paramname"><em>tag</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>获取tag对应的中文名字 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">tag</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd></dd></dl>
+
+</div>
+</div>
+<a id="afc4a9852da5b2c01888283091e151944" name="afc4a9852da5b2c01888283091e151944"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afc4a9852da5b2c01888283091e151944">&#9670;&#160;</a></span>unregisteAction()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SARibbonActionsManager::unregisteAction </td>
+          <td>(</td>
+          <td class="paramtype">QAction *</td>          <td class="paramname"><span class="paramname"><em>act</em>, </span></td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>enableEmit</em><span class="paramdefsep"> = </span><span class="paramdefval">true</span></span>&#160;)</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>取消action的注册 </p>
+<p>如果tag对应的最后一个action被撤销，tag也将一块删除 </p><dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">act</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>注解</dt><dd>tag的删除会触发actionTagChanged信号 </dd>
+<dd>
+如果action关联了多个tag，这些tag里的action都会被删除，对应的key也同理 </dd></dl>
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>C:/src/Qt/SARibbon/src/SARibbonBar/<a class="el" href="_s_a_ribbon_actions_manager_8h_source.html">SARibbonActionsManager.h</a></li>
+<li>C:/src/Qt/SARibbon/src/SARibbonBar/<b>SARibbonActionsManager.cpp</b></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="class_s_a_ribbon_actions_manager.html">SARibbonActionsManager</a></li>
+    <li class="footer">制作者 <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.10.0 </li>
+  </ul>
+</div>
+</body>
+</html>

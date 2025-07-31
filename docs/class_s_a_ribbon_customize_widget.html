@@ -1,0 +1,967 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.10.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>SARibbon: SARibbonCustomizeWidget类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="SA-logo.png"/></td>
+  <td id="projectalign">
+   <div id="projectname">SARibbon<span id="projectnumber">&#160;2.4.2</span>
+   </div>
+   <div id="projectbrief">SARibbon wiki</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.10.0 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','搜索');
+  $(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function(){initNavTree('class_s_a_ribbon_customize_widget.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#nested-classes">类</a> &#124;
+<a href="#pub-types">Public 类型</a> &#124;
+<a href="#pub-methods">Public 成员函数</a> &#124;
+<a href="#pub-static-methods">静态 Public 成员函数</a> &#124;
+<a href="#pro-methods">Protected 成员函数</a> &#124;
+<a href="class_s_a_ribbon_customize_widget-members.html">所有成员列表</a>  </div>
+  <div class="headertitle"><div class="title">SARibbonCustomizeWidget类 参考</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>自定义界面窗口  
+ <a href="#details">更多...</a></p>
+
+<p><code>#include &lt;<a class="el" href="_s_a_ribbon_customize_widget_8h_source.html">SARibbonCustomizeWidget.h</a>&gt;</code></p>
+<div class="dynheader">
+类 SARibbonCustomizeWidget 继承关系图:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="class_s_a_ribbon_customize_widget.png" alt=""/>
+ </div></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
+类</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_s_a_ribbon_customize_widget_1_1_private_data.html">PrivateData</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">管理SARibbonCustomizeWidget的业务逻辑  <a href="class_s_a_ribbon_customize_widget_1_1_private_data.html#details">更多...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-types" name="pub-types"></a>
+Public 类型</h2></td></tr>
+<tr class="memitem:a91bbce0a00a6d1c38ad9afc01ad59aaa" id="r_a91bbce0a00a6d1c38ad9afc01ad59aaa"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a91bbce0a00a6d1c38ad9afc01ad59aaa">RibbonTreeShowType</a> { <a class="el" href="#a91bbce0a00a6d1c38ad9afc01ad59aaaa53cfbcb075a3d4edfb4397432d731980">ShowAllCategory</a>
+, <a class="el" href="#a91bbce0a00a6d1c38ad9afc01ad59aaaaafd970f208b188fa2d6b9f56bfcda451">ShowMainCategory</a>
+ }</td></tr>
+<tr class="memdesc:a91bbce0a00a6d1c38ad9afc01ad59aaa"><td class="mdescLeft">&#160;</td><td class="mdescRight">定义ribbon树的显示类型  <a href="#a91bbce0a00a6d1c38ad9afc01ad59aaa">更多...</a><br /></td></tr>
+<tr class="separator:a91bbce0a00a6d1c38ad9afc01ad59aaa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a783ed6ab00b31cf182c5bb0f1507860d" id="r_a783ed6ab00b31cf182c5bb0f1507860d"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a783ed6ab00b31cf182c5bb0f1507860d">ItemRole</a> { <br />
+&#160;&#160;<a class="el" href="#a783ed6ab00b31cf182c5bb0f1507860da481d44bf12f84ed2f3c6765ab969cef8">LevelRole</a> = Qt::UserRole + 1
+, <a class="el" href="#a783ed6ab00b31cf182c5bb0f1507860da7fcc0f32847cb3960765354812ca18cd">PointerRole</a> = Qt::UserRole + 2
+, <a class="el" href="#a783ed6ab00b31cf182c5bb0f1507860da3818c5f4aa9cd072003a5e61fa4e0b9f">CanCustomizeRole</a> = Qt::UserRole + 3
+, <a class="el" href="#a783ed6ab00b31cf182c5bb0f1507860da9a208cf672e33d0b4c41d4fbac871507">CustomizeRole</a> = Qt::UserRole + 4
+, <br />
+&#160;&#160;<a class="el" href="#a783ed6ab00b31cf182c5bb0f1507860da62ae9c36d1041ad29788f4bdd4d63e13">CustomizeObjNameRole</a> = Qt::UserRole + 5
+<br />
+ }</td></tr>
+<tr class="memdesc:a783ed6ab00b31cf182c5bb0f1507860d"><td class="mdescLeft">&#160;</td><td class="mdescRight">QStandardItem对应的role  <a href="#a783ed6ab00b31cf182c5bb0f1507860d">更多...</a><br /></td></tr>
+<tr class="separator:a783ed6ab00b31cf182c5bb0f1507860d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:ad98fb81494238da447ce72930c39a31f" id="r_ad98fb81494238da447ce72930c39a31f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ad98fb81494238da447ce72930c39a31f">SARibbonCustomizeWidget</a> (<a class="el" href="class_s_a_ribbon_main_window.html">SARibbonMainWindow</a> *ribbonWindow, QWidget *parent=nullptr, Qt::WindowFlags f=Qt::WindowFlags())</td></tr>
+<tr class="memdesc:ad98fb81494238da447ce72930c39a31f"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="#ad98fb81494238da447ce72930c39a31f" title="SARibbonCustomizeWidget::SARibbonCustomizeWidget">SARibbonCustomizeWidget::SARibbonCustomizeWidget</a>  <br /></td></tr>
+<tr class="separator:ad98fb81494238da447ce72930c39a31f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a083566b35a21c408871de847ad4b2443" id="r_a083566b35a21c408871de847ad4b2443"><td class="memItemLeft" align="right" valign="top"><a id="a083566b35a21c408871de847ad4b2443" name="a083566b35a21c408871de847ad4b2443"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>SARibbonCustomizeWidget</b> (<a class="el" href="class_s_a_ribbon_bar.html">SARibbonBar</a> *ribbonbar, QWidget *parent=nullptr, Qt::WindowFlags f=Qt::WindowFlags())</td></tr>
+<tr class="separator:a083566b35a21c408871de847ad4b2443"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae42114e858a6e0a78c4c61b63cd3c0f7" id="r_ae42114e858a6e0a78c4c61b63cd3c0f7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae42114e858a6e0a78c4c61b63cd3c0f7">setupActionsManager</a> (<a class="el" href="class_s_a_ribbon_actions_manager.html">SARibbonActionsManager</a> *mgr)</td></tr>
+<tr class="memdesc:ae42114e858a6e0a78c4c61b63cd3c0f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">设置action管理器  <br /></td></tr>
+<tr class="separator:ae42114e858a6e0a78c4c61b63cd3c0f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7421db272e2b381a4024553a0efe3a84" id="r_a7421db272e2b381a4024553a0efe3a84"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a7421db272e2b381a4024553a0efe3a84">isApplied</a> () const</td></tr>
+<tr class="memdesc:a7421db272e2b381a4024553a0efe3a84"><td class="mdescLeft">&#160;</td><td class="mdescRight">//判断用户是否有要存储的内容，对应save动作  <br /></td></tr>
+<tr class="separator:a7421db272e2b381a4024553a0efe3a84"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac6ad1a92310d7cb64296066b5aef877d" id="r_ac6ad1a92310d7cb64296066b5aef877d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ac6ad1a92310d7cb64296066b5aef877d">isCached</a> () const</td></tr>
+<tr class="memdesc:ac6ad1a92310d7cb64296066b5aef877d"><td class="mdescLeft">&#160;</td><td class="mdescRight">判断用户是否有改动内容，对应apply动作  <br /></td></tr>
+<tr class="separator:ac6ad1a92310d7cb64296066b5aef877d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acaa608a917675e1a5d9d789012ad30af" id="r_acaa608a917675e1a5d9d789012ad30af"><td class="memItemLeft" align="right" valign="top">const QStandardItemModel *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#acaa608a917675e1a5d9d789012ad30af">model</a> () const</td></tr>
+<tr class="memdesc:acaa608a917675e1a5d9d789012ad30af"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取model  <br /></td></tr>
+<tr class="separator:acaa608a917675e1a5d9d789012ad30af"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5494493ef55cb3089edbe7bc28ed8fbc" id="r_a5494493ef55cb3089edbe7bc28ed8fbc"><td class="memItemLeft" align="right" valign="top"><a id="a5494493ef55cb3089edbe7bc28ed8fbc" name="a5494493ef55cb3089edbe7bc28ed8fbc"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>updateModel</b> ()</td></tr>
+<tr class="memdesc:a5494493ef55cb3089edbe7bc28ed8fbc"><td class="mdescLeft">&#160;</td><td class="mdescRight">根据当前的radiobutton选项来更新model <br /></td></tr>
+<tr class="separator:a5494493ef55cb3089edbe7bc28ed8fbc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a301e32e6ea1509bfdd3d499ad0450cc9" id="r_a301e32e6ea1509bfdd3d499ad0450cc9"><td class="memItemLeft" align="right" valign="top"><a id="a301e32e6ea1509bfdd3d499ad0450cc9" name="a301e32e6ea1509bfdd3d499ad0450cc9"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>updateModel</b> (<a class="el" href="#a91bbce0a00a6d1c38ad9afc01ad59aaa">RibbonTreeShowType</a> type)</td></tr>
+<tr class="memdesc:a301e32e6ea1509bfdd3d499ad0450cc9"><td class="mdescLeft">&#160;</td><td class="mdescRight">更新model <br /></td></tr>
+<tr class="separator:a301e32e6ea1509bfdd3d499ad0450cc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a658348441bdccaae1e4f03201e7850e3" id="r_a658348441bdccaae1e4f03201e7850e3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a658348441bdccaae1e4f03201e7850e3">applys</a> ()</td></tr>
+<tr class="memdesc:a658348441bdccaae1e4f03201e7850e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">应用所有设定  <br /></td></tr>
+<tr class="separator:a658348441bdccaae1e4f03201e7850e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aed8fd2fb702693b49b83df0df83b146e" id="r_aed8fd2fb702693b49b83df0df83b146e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#aed8fd2fb702693b49b83df0df83b146e">toXml</a> (QXmlStreamWriter *xml) const</td></tr>
+<tr class="memdesc:aed8fd2fb702693b49b83df0df83b146e"><td class="mdescLeft">&#160;</td><td class="mdescRight">转换为xml  <br /></td></tr>
+<tr class="separator:aed8fd2fb702693b49b83df0df83b146e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0a42c00f56b97751be90016eba7a99ff" id="r_a0a42c00f56b97751be90016eba7a99ff"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a0a42c00f56b97751be90016eba7a99ff">toXml</a> (const QString &amp;xmlpath) const</td></tr>
+<tr class="memdesc:a0a42c00f56b97751be90016eba7a99ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">把配置写入文件中  <br /></td></tr>
+<tr class="separator:a0a42c00f56b97751be90016eba7a99ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a88c9d66e4e65efc3cec6479746845aac" id="r_a88c9d66e4e65efc3cec6479746845aac"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a88c9d66e4e65efc3cec6479746845aac">fromXml</a> (QXmlStreamReader *xml)</td></tr>
+<tr class="memdesc:a88c9d66e4e65efc3cec6479746845aac"><td class="mdescLeft">&#160;</td><td class="mdescRight">从xml中加载QList&lt;SARibbonCustomizeData&gt;  <br /></td></tr>
+<tr class="separator:a88c9d66e4e65efc3cec6479746845aac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2c16e5613c5a3026b610893459176c2a" id="r_a2c16e5613c5a3026b610893459176c2a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a2c16e5613c5a3026b610893459176c2a">fromXml</a> (const QString &amp;xmlpath)</td></tr>
+<tr class="memdesc:a2c16e5613c5a3026b610893459176c2a"><td class="mdescLeft">&#160;</td><td class="mdescRight">从xml中加载QList&lt;SARibbonCustomizeData&gt;  <br /></td></tr>
+<tr class="separator:a2c16e5613c5a3026b610893459176c2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a83745286ac2779ba9feb4f6d840b79e4" id="r_a83745286ac2779ba9feb4f6d840b79e4"><td class="memItemLeft" align="right" valign="top"><a id="a83745286ac2779ba9feb4f6d840b79e4" name="a83745286ac2779ba9feb4f6d840b79e4"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>makeActionsApplied</b> ()</td></tr>
+<tr class="memdesc:a83745286ac2779ba9feb4f6d840b79e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">清除已应用的动作 <br /></td></tr>
+<tr class="separator:a83745286ac2779ba9feb4f6d840b79e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab044eb7a012929202b2a58418df92b18" id="r_ab044eb7a012929202b2a58418df92b18"><td class="memItemLeft" align="right" valign="top"><a id="ab044eb7a012929202b2a58418df92b18" name="ab044eb7a012929202b2a58418df92b18"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>clearApplied</b> ()</td></tr>
+<tr class="memdesc:ab044eb7a012929202b2a58418df92b18"><td class="mdescLeft">&#160;</td><td class="mdescRight">清除applied的动作，cancel操作后需要清空已应用的动作 <br /></td></tr>
+<tr class="separator:ab044eb7a012929202b2a58418df92b18"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a777678ee6accdc901adf882e58ceae7e" id="r_a777678ee6accdc901adf882e58ceae7e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a777678ee6accdc901adf882e58ceae7e">clearCache</a> ()</td></tr>
+<tr class="memdesc:a777678ee6accdc901adf882e58ceae7e"><td class="mdescLeft">&#160;</td><td class="mdescRight">清除缓存动作  <br /></td></tr>
+<tr class="separator:a777678ee6accdc901adf882e58ceae7e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aabf06b333a667e8eef4804fb3b716d10" id="r_aabf06b333a667e8eef4804fb3b716d10"><td class="memItemLeft" align="right" valign="top"><a id="aabf06b333a667e8eef4804fb3b716d10" name="aabf06b333a667e8eef4804fb3b716d10"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>clear</b> ()</td></tr>
+<tr class="memdesc:aabf06b333a667e8eef4804fb3b716d10"><td class="mdescLeft">&#160;</td><td class="mdescRight">清除所有动作，不包含本地读取的数据 <br /></td></tr>
+<tr class="separator:aabf06b333a667e8eef4804fb3b716d10"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
+静态 Public 成员函数</h2></td></tr>
+<tr class="memitem:ae144611bfe76b61b0c1dfc686c791628" id="r_ae144611bfe76b61b0c1dfc686c791628"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#ae144611bfe76b61b0c1dfc686c791628">fromXml</a> (QXmlStreamReader *xml, <a class="el" href="class_s_a_ribbon_bar.html">SARibbonBar</a> *bar, <a class="el" href="class_s_a_ribbon_actions_manager.html">SARibbonActionsManager</a> *mgr)</td></tr>
+<tr class="memdesc:ae144611bfe76b61b0c1dfc686c791628"><td class="mdescLeft">&#160;</td><td class="mdescRight">应用xml配置  <br /></td></tr>
+<tr class="separator:ae144611bfe76b61b0c1dfc686c791628"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-methods" name="pro-methods"></a>
+Protected 成员函数</h2></td></tr>
+<tr class="memitem:a39f6573a80535be90ca78592c91a9752" id="r_a39f6573a80535be90ca78592c91a9752"><td class="memItemLeft" align="right" valign="top"><a id="a39f6573a80535be90ca78592c91a9752" name="a39f6573a80535be90ca78592c91a9752"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>simplify</b> ()</td></tr>
+<tr class="memdesc:a39f6573a80535be90ca78592c91a9752"><td class="mdescLeft">&#160;</td><td class="mdescRight">精简 <br /></td></tr>
+<tr class="separator:a39f6573a80535be90ca78592c91a9752"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a89136eb00274aaa7ed65982994fc6e9d" id="r_a89136eb00274aaa7ed65982994fc6e9d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_s_a_ribbon_pannel_item.html#af4282b5e09c0b7ad37f1cc555a763926">SARibbonPannelItem::RowProportion</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a89136eb00274aaa7ed65982994fc6e9d">selectedRowProportion</a> () const</td></tr>
+<tr class="memdesc:a89136eb00274aaa7ed65982994fc6e9d"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取当前界面选中的行属性  <br /></td></tr>
+<tr class="separator:a89136eb00274aaa7ed65982994fc6e9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af12f2013916a25b169a70486b6fd2689" id="r_af12f2013916a25b169a70486b6fd2689"><td class="memItemLeft" align="right" valign="top">QAction *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af12f2013916a25b169a70486b6fd2689">selectedAction</a> () const</td></tr>
+<tr class="memdesc:af12f2013916a25b169a70486b6fd2689"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取listview中选中的action  <br /></td></tr>
+<tr class="separator:af12f2013916a25b169a70486b6fd2689"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a352dd8cf2280343febbacf5766a326bb" id="r_a352dd8cf2280343febbacf5766a326bb"><td class="memItemLeft" align="right" valign="top">QAction *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a352dd8cf2280343febbacf5766a326bb">itemToAction</a> (QStandardItem *item) const</td></tr>
+<tr class="memdesc:a352dd8cf2280343febbacf5766a326bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">把item转换为action  <br /></td></tr>
+<tr class="separator:a352dd8cf2280343febbacf5766a326bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4d1f37004139e23f636a3a87983bef4e" id="r_a4d1f37004139e23f636a3a87983bef4e"><td class="memItemLeft" align="right" valign="top">QStandardItem *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a4d1f37004139e23f636a3a87983bef4e">selectedItem</a> () const</td></tr>
+<tr class="memdesc:a4d1f37004139e23f636a3a87983bef4e"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取ribbon tree选中的item  <br /></td></tr>
+<tr class="separator:a4d1f37004139e23f636a3a87983bef4e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af8f8f3829dbf4cbaa721ead314c1e720" id="r_af8f8f3829dbf4cbaa721ead314c1e720"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#af8f8f3829dbf4cbaa721ead314c1e720">selectedRibbonLevel</a> () const</td></tr>
+<tr class="memdesc:af8f8f3829dbf4cbaa721ead314c1e720"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取选中的ribbon tree 的level  <br /></td></tr>
+<tr class="separator:af8f8f3829dbf4cbaa721ead314c1e720"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5e6b6d1d8440dfc0d7b977ae1bf01a20" id="r_a5e6b6d1d8440dfc0d7b977ae1bf01a20"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a5e6b6d1d8440dfc0d7b977ae1bf01a20">itemLevel</a> (QStandardItem *item) const</td></tr>
+<tr class="memdesc:a5e6b6d1d8440dfc0d7b977ae1bf01a20"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取StandardItem 的level  <br /></td></tr>
+<tr class="separator:a5e6b6d1d8440dfc0d7b977ae1bf01a20"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a93a65d63c7494ee88abbc9d2188ddce5" id="r_a93a65d63c7494ee88abbc9d2188ddce5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a93a65d63c7494ee88abbc9d2188ddce5">setSelectItem</a> (QStandardItem *item, bool ensureVisible=true)</td></tr>
+<tr class="memdesc:a93a65d63c7494ee88abbc9d2188ddce5"><td class="mdescLeft">&#160;</td><td class="mdescRight">设置某个item被选中  <br /></td></tr>
+<tr class="separator:a93a65d63c7494ee88abbc9d2188ddce5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a61b02ff8501788669cb72dec63daffb2" id="r_a61b02ff8501788669cb72dec63daffb2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a61b02ff8501788669cb72dec63daffb2">isItemCanCustomize</a> (QStandardItem *item) const</td></tr>
+<tr class="memdesc:a61b02ff8501788669cb72dec63daffb2"><td class="mdescLeft">&#160;</td><td class="mdescRight">判断itemn能否改动，可以改动返回true  <br /></td></tr>
+<tr class="separator:a61b02ff8501788669cb72dec63daffb2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9abb1be315654c88c0007b0d1fc4a6a7" id="r_a9abb1be315654c88c0007b0d1fc4a6a7"><td class="memItemLeft" align="right" valign="top"><a id="a9abb1be315654c88c0007b0d1fc4a6a7" name="a9abb1be315654c88c0007b0d1fc4a6a7"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>isSelectedItemCanCustomize</b> () const</td></tr>
+<tr class="separator:a9abb1be315654c88c0007b0d1fc4a6a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6c94677db32536f24c0c42728e68d00e" id="r_a6c94677db32536f24c0c42728e68d00e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="#a6c94677db32536f24c0c42728e68d00e">isCustomizeItem</a> (QStandardItem *item) const</td></tr>
+<tr class="memdesc:a6c94677db32536f24c0c42728e68d00e"><td class="mdescLeft">&#160;</td><td class="mdescRight">判断itemn能否改动，可以改动返回true  <br /></td></tr>
+<tr class="separator:a6c94677db32536f24c0c42728e68d00e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a30c77974a8fc8b2f6e9feeafc17aebfe" id="r_a30c77974a8fc8b2f6e9feeafc17aebfe"><td class="memItemLeft" align="right" valign="top"><a id="a30c77974a8fc8b2f6e9feeafc17aebfe" name="a30c77974a8fc8b2f6e9feeafc17aebfe"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>isSelectedItemIsCustomize</b> () const</td></tr>
+<tr class="separator:a30c77974a8fc8b2f6e9feeafc17aebfe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4d5062df01eb7fa09020f8e9bf2f9305" id="r_a4d5062df01eb7fa09020f8e9bf2f9305"><td class="memItemLeft" align="right" valign="top"><a id="a4d5062df01eb7fa09020f8e9bf2f9305" name="a4d5062df01eb7fa09020f8e9bf2f9305"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>removeItem</b> (QStandardItem *item)</td></tr>
+<tr class="separator:a4d5062df01eb7fa09020f8e9bf2f9305"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
+<div class="textblock"><p>自定义界面窗口 </p>
+<dl class="section note"><dt>注解</dt><dd>SARibbon的自定义是基于步骤的，如果在窗口生成前调用了sa_apply_customize_from_xml_file 类似函数 那么在对话框生成前为了保证同步需要调用<a class="el" href="#a88c9d66e4e65efc3cec6479746845aac">SARibbonCustomizeWidget::fromXml</a> 同步配置文件，这样再次修改后的配置文件就一致 </dd></dl>
+</div><h2 class="groupheader">成员枚举类型说明</h2>
+<a id="a783ed6ab00b31cf182c5bb0f1507860d" name="a783ed6ab00b31cf182c5bb0f1507860d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a783ed6ab00b31cf182c5bb0f1507860d">&#9670;&#160;</a></span>ItemRole</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="#a783ed6ab00b31cf182c5bb0f1507860d">SARibbonCustomizeWidget::ItemRole</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>QStandardItem对应的role </p>
+<table class="fieldtable">
+<tr><th colspan="2">枚举值</th></tr><tr><td class="fieldname"><a id="a783ed6ab00b31cf182c5bb0f1507860da481d44bf12f84ed2f3c6765ab969cef8" name="a783ed6ab00b31cf182c5bb0f1507860da481d44bf12f84ed2f3c6765ab969cef8"></a>LevelRole&#160;</td><td class="fielddoc"><p>代表这是层级，有0：category 1：pannel 2：item </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a783ed6ab00b31cf182c5bb0f1507860da7fcc0f32847cb3960765354812ca18cd" name="a783ed6ab00b31cf182c5bb0f1507860da7fcc0f32847cb3960765354812ca18cd"></a>PointerRole&#160;</td><td class="fielddoc"><p>代表这是存放指针。根据LevelRole来进行转 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a783ed6ab00b31cf182c5bb0f1507860da3818c5f4aa9cd072003a5e61fa4e0b9f" name="a783ed6ab00b31cf182c5bb0f1507860da3818c5f4aa9cd072003a5e61fa4e0b9f"></a>CanCustomizeRole&#160;</td><td class="fielddoc"><p>代表个item是可以自定义的.bool </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a783ed6ab00b31cf182c5bb0f1507860da9a208cf672e33d0b4c41d4fbac871507" name="a783ed6ab00b31cf182c5bb0f1507860da9a208cf672e33d0b4c41d4fbac871507"></a>CustomizeRole&#160;</td><td class="fielddoc"><p>代表这个是自定义的item,bool,主要用于那些自己添加的标签和pannel，有此角色必有CanCustomizeRole </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a783ed6ab00b31cf182c5bb0f1507860da62ae9c36d1041ad29788f4bdd4d63e13" name="a783ed6ab00b31cf182c5bb0f1507860da62ae9c36d1041ad29788f4bdd4d63e13"></a>CustomizeObjNameRole&#160;</td><td class="fielddoc"><p>记录了临时的自定义内容的obj名 QString </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<a id="a91bbce0a00a6d1c38ad9afc01ad59aaa" name="a91bbce0a00a6d1c38ad9afc01ad59aaa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a91bbce0a00a6d1c38ad9afc01ad59aaa">&#9670;&#160;</a></span>RibbonTreeShowType</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="#a91bbce0a00a6d1c38ad9afc01ad59aaa">SARibbonCustomizeWidget::RibbonTreeShowType</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>定义ribbon树的显示类型 </p>
+<table class="fieldtable">
+<tr><th colspan="2">枚举值</th></tr><tr><td class="fieldname"><a id="a91bbce0a00a6d1c38ad9afc01ad59aaaa53cfbcb075a3d4edfb4397432d731980" name="a91bbce0a00a6d1c38ad9afc01ad59aaaa53cfbcb075a3d4edfb4397432d731980"></a>ShowAllCategory&#160;</td><td class="fielddoc"><p>显示所有Category，包括contextcategory </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a91bbce0a00a6d1c38ad9afc01ad59aaaaafd970f208b188fa2d6b9f56bfcda451" name="a91bbce0a00a6d1c38ad9afc01ad59aaaaafd970f208b188fa2d6b9f56bfcda451"></a>ShowMainCategory&#160;</td><td class="fielddoc"><p>显示主要的category，不包含上下文 </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<h2 class="groupheader">构造及析构函数说明</h2>
+<a id="ad98fb81494238da447ce72930c39a31f" name="ad98fb81494238da447ce72930c39a31f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad98fb81494238da447ce72930c39a31f">&#9670;&#160;</a></span>SARibbonCustomizeWidget()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">SARibbonCustomizeWidget::SARibbonCustomizeWidget </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="class_s_a_ribbon_main_window.html">SARibbonMainWindow</a> *</td>          <td class="paramname"><span class="paramname"><em>ribbonWindow</em>, </span></td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QWidget *</td>          <td class="paramname"><span class="paramname"><em>parent</em><span class="paramdefsep"> = </span><span class="paramdefval">nullptr</span>, </span></td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Qt::WindowFlags</td>          <td class="paramname"><span class="paramname"><em>f</em><span class="paramdefsep"> = </span><span class="paramdefval">Qt::WindowFlags()</span></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p><a class="el" href="#ad98fb81494238da447ce72930c39a31f" title="SARibbonCustomizeWidget::SARibbonCustomizeWidget">SARibbonCustomizeWidget::SARibbonCustomizeWidget</a> </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">ribbonWindow</td><td>传入需要管理的SARibbonMainWindow指针 </td></tr>
+    <tr><td class="paramname">parent</td><td>用于界面生成的parent，可以和SARibbonMainWindow一样 </td></tr>
+    <tr><td class="paramname">f</td><td>同QWidget::QWidget的第二个参数 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<h2 class="groupheader">成员函数说明</h2>
+<a id="a658348441bdccaae1e4f03201e7850e3" name="a658348441bdccaae1e4f03201e7850e3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a658348441bdccaae1e4f03201e7850e3">&#9670;&#160;</a></span>applys()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool SARibbonCustomizeWidget::applys </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>应用所有设定 </p>
+<dl class="section return"><dt>返回</dt><dd>应用成功返回true </dd></dl>
+<dl class="section note"><dt>注解</dt><dd>所有设定有一个应用成功都会返回true </dd></dl>
+
+</div>
+</div>
+<a id="a777678ee6accdc901adf882e58ceae7e" name="a777678ee6accdc901adf882e58ceae7e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a777678ee6accdc901adf882e58ceae7e">&#9670;&#160;</a></span>clearCache()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SARibbonCustomizeWidget::clearCache </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>清除缓存动作 </p>
+<p>在执行applys函数后，如果要继续调用，应该clear，否则会导致异常 </p>
+
+</div>
+</div>
+<a id="a2c16e5613c5a3026b610893459176c2a" name="a2c16e5613c5a3026b610893459176c2a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2c16e5613c5a3026b610893459176c2a">&#9670;&#160;</a></span>fromXml() <span class="overload">[1/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SARibbonCustomizeWidget::fromXml </td>
+          <td>(</td>
+          <td class="paramtype">const QString &amp;</td>          <td class="paramname"><span class="paramname"><em>xmlpath</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>从xml中加载QList&lt;SARibbonCustomizeData&gt; </p>
+<p>对于基于配置文件的设置，对话框显示前建议调用此函数，保证叠加设置的正确记录 </p><dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">xmlpath</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>注解</dt><dd>此函数要在<a class="el" href="#ae42114e858a6e0a78c4c61b63cd3c0f7">setupActionsManager</a> 函数之后调用 </dd>
+<dd>
+如果程序启动后加载了自定义配置，再调用此窗口时需要调用此函数，把原来的配置加载进来， 在生成新动作时会把旧动作保存，但在调用applys时不会调用此加载的动作 </dd></dl>
+
+</div>
+</div>
+<a id="a88c9d66e4e65efc3cec6479746845aac" name="a88c9d66e4e65efc3cec6479746845aac"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a88c9d66e4e65efc3cec6479746845aac">&#9670;&#160;</a></span>fromXml() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SARibbonCustomizeWidget::fromXml </td>
+          <td>(</td>
+          <td class="paramtype">QXmlStreamReader *</td>          <td class="paramname"><span class="paramname"><em>xml</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>从xml中加载QList&lt;SARibbonCustomizeData&gt; </p>
+<p>对于基于配置文件的设置，对话框显示前建议调用此函数，保证叠加设置的正确记录 </p><dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">xml</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd></dd></dl>
+<dl class="section note"><dt>注解</dt><dd>此函数要在<a class="el" href="#ae42114e858a6e0a78c4c61b63cd3c0f7">setupActionsManager</a> 函数之后调用 </dd></dl>
+
+</div>
+</div>
+<a id="ae144611bfe76b61b0c1dfc686c791628" name="ae144611bfe76b61b0c1dfc686c791628"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae144611bfe76b61b0c1dfc686c791628">&#9670;&#160;</a></span>fromXml() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool SARibbonCustomizeWidget::fromXml </td>
+          <td>(</td>
+          <td class="paramtype">QXmlStreamReader *</td>          <td class="paramname"><span class="paramname"><em>xml</em>, </span></td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="class_s_a_ribbon_bar.html">SARibbonBar</a> *</td>          <td class="paramname"><span class="paramname"><em>bar</em>, </span></td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="class_s_a_ribbon_actions_manager.html">SARibbonActionsManager</a> *</td>          <td class="paramname"><span class="paramname"><em>mgr</em></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>应用xml配置 </p>
+<dl class="section note"><dt>注解</dt><dd>重复加载一个配置文件会发生异常，为了避免此类事件发生，一般通过一个变量保证只加载一次，如： <div class="fragment"><div class="line"><span class="comment">//只能调用一次</span></div>
+<div class="line"><span class="keyword">static</span> <span class="keywordtype">bool</span> has_call = <span class="keyword">false</span>;</div>
+<div class="line"><span class="keywordflow">if</span> (!has_call) {</div>
+<div class="line">    QFile f(<span class="stringliteral">&quot;customize.xml&quot;</span>);</div>
+<div class="line">    <span class="keywordflow">if</span> (!f.open(QIODevice::ReadWrite|QIODevice::Text)) {</div>
+<div class="line">        <span class="keywordflow">return</span>;</div>
+<div class="line">    }</div>
+<div class="line">    f.seek(0);</div>
+<div class="line">    QXmlStreamReader xml(&amp;f);</div>
+<div class="line">    has_call = <a class="code hl_function" href="#a88c9d66e4e65efc3cec6479746845aac">SARibbonCustomizeWidget::fromXml</a>(&amp;xml, <span class="keyword">this</span>, m_actMgr);</div>
+<div class="line">}</div>
+<div class="ttc" id="aclass_s_a_ribbon_customize_widget_html_a88c9d66e4e65efc3cec6479746845aac"><div class="ttname"><a href="#a88c9d66e4e65efc3cec6479746845aac">SARibbonCustomizeWidget::fromXml</a></div><div class="ttdeci">void fromXml(QXmlStreamReader *xml)</div><div class="ttdoc">从xml中加载QList&lt;SARibbonCustomizeData&gt;</div><div class="ttdef"><b>Definition</b> SARibbonCustomizeWidget.cpp:892</div></div>
+</div><!-- fragment --> </dd></dl>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">xml</td><td></td></tr>
+    <tr><td class="paramname">bar</td><td><a class="el" href="class_s_a_ribbon_bar.html" title="SARibbonBar继承于QMenuBar,在SARibbonMainWindow中直接替换了原来的QMenuBar">SARibbonBar</a> </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>所有设定有一个应用成功都会返回true </dd></dl>
+<dl class="section see"><dt>参见</dt><dd>sa_customize_datas_from_xml sa_customize_datas_apply sa_apply_customize_from_xml_file </dd></dl>
+
+</div>
+</div>
+<a id="a7421db272e2b381a4024553a0efe3a84" name="a7421db272e2b381a4024553a0efe3a84"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7421db272e2b381a4024553a0efe3a84">&#9670;&#160;</a></span>isApplied()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool SARibbonCustomizeWidget::isApplied </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>//判断用户是否有要存储的内容，对应save动作 </p>
+<dl class="section return"><dt>返回</dt><dd></dd></dl>
+
+</div>
+</div>
+<a id="ac6ad1a92310d7cb64296066b5aef877d" name="ac6ad1a92310d7cb64296066b5aef877d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac6ad1a92310d7cb64296066b5aef877d">&#9670;&#160;</a></span>isCached()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool SARibbonCustomizeWidget::isCached </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>判断用户是否有改动内容，对应apply动作 </p>
+<dl class="section return"><dt>返回</dt><dd></dd></dl>
+
+</div>
+</div>
+<a id="a6c94677db32536f24c0c42728e68d00e" name="a6c94677db32536f24c0c42728e68d00e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6c94677db32536f24c0c42728e68d00e">&#9670;&#160;</a></span>isCustomizeItem()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool SARibbonCustomizeWidget::isCustomizeItem </td>
+          <td>(</td>
+          <td class="paramtype">QStandardItem *</td>          <td class="paramname"><span class="paramname"><em>item</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>判断itemn能否改动，可以改动返回true </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">item</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd></dd></dl>
+
+</div>
+</div>
+<a id="a61b02ff8501788669cb72dec63daffb2" name="a61b02ff8501788669cb72dec63daffb2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a61b02ff8501788669cb72dec63daffb2">&#9670;&#160;</a></span>isItemCanCustomize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool SARibbonCustomizeWidget::isItemCanCustomize </td>
+          <td>(</td>
+          <td class="paramtype">QStandardItem *</td>          <td class="paramname"><span class="paramname"><em>item</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>判断itemn能否改动，可以改动返回true </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">item</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd></dd></dl>
+
+</div>
+</div>
+<a id="a5e6b6d1d8440dfc0d7b977ae1bf01a20" name="a5e6b6d1d8440dfc0d7b977ae1bf01a20"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5e6b6d1d8440dfc0d7b977ae1bf01a20">&#9670;&#160;</a></span>itemLevel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int SARibbonCustomizeWidget::itemLevel </td>
+          <td>(</td>
+          <td class="paramtype">QStandardItem *</td>          <td class="paramname"><span class="paramname"><em>item</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>获取StandardItem 的level </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">item</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd></dd></dl>
+
+</div>
+</div>
+<a id="a352dd8cf2280343febbacf5766a326bb" name="a352dd8cf2280343febbacf5766a326bb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a352dd8cf2280343febbacf5766a326bb">&#9670;&#160;</a></span>itemToAction()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QAction * SARibbonCustomizeWidget::itemToAction </td>
+          <td>(</td>
+          <td class="paramtype">QStandardItem *</td>          <td class="paramname"><span class="paramname"><em>item</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>把item转换为action </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">item</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>如果没有action可转换，返回nullptr </dd></dl>
+
+</div>
+</div>
+<a id="acaa608a917675e1a5d9d789012ad30af" name="acaa608a917675e1a5d9d789012ad30af"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acaa608a917675e1a5d9d789012ad30af">&#9670;&#160;</a></span>model()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const QStandardItemModel * SARibbonCustomizeWidget::model </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>获取model </p>
+<dl class="section return"><dt>返回</dt><dd></dd></dl>
+
+</div>
+</div>
+<a id="af12f2013916a25b169a70486b6fd2689" name="af12f2013916a25b169a70486b6fd2689"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af12f2013916a25b169a70486b6fd2689">&#9670;&#160;</a></span>selectedAction()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QAction * SARibbonCustomizeWidget::selectedAction </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>获取listview中选中的action </p>
+<dl class="section return"><dt>返回</dt><dd>如果没有选中action，返回nullptr </dd></dl>
+<dl class="section note"><dt>注解</dt><dd>如果要获取treeview选中的action，使用<a class="el" href="#a352dd8cf2280343febbacf5766a326bb">itemToAction</a> 函数 </dd></dl>
+
+</div>
+</div>
+<a id="a4d1f37004139e23f636a3a87983bef4e" name="a4d1f37004139e23f636a3a87983bef4e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4d1f37004139e23f636a3a87983bef4e">&#9670;&#160;</a></span>selectedItem()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QStandardItem * SARibbonCustomizeWidget::selectedItem </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>获取ribbon tree选中的item </p>
+<dl class="section return"><dt>返回</dt><dd></dd></dl>
+
+</div>
+</div>
+<a id="af8f8f3829dbf4cbaa721ead314c1e720" name="af8f8f3829dbf4cbaa721ead314c1e720"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af8f8f3829dbf4cbaa721ead314c1e720">&#9670;&#160;</a></span>selectedRibbonLevel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int SARibbonCustomizeWidget::selectedRibbonLevel </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>获取选中的ribbon tree 的level </p>
+<dl class="section return"><dt>返回</dt><dd>-1为选中异常，0代表选中了category 1代表选中了pannel 2代表选中了action </dd></dl>
+
+</div>
+</div>
+<a id="a89136eb00274aaa7ed65982994fc6e9d" name="a89136eb00274aaa7ed65982994fc6e9d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a89136eb00274aaa7ed65982994fc6e9d">&#9670;&#160;</a></span>selectedRowProportion()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_s_a_ribbon_pannel_item.html#af4282b5e09c0b7ad37f1cc555a763926">SARibbonPannelItem::RowProportion</a> SARibbonCustomizeWidget::selectedRowProportion </td>
+          <td>(</td>
+          <td class="paramname"><span class="paramname"></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>获取当前界面选中的行属性 </p>
+<dl class="section return"><dt>返回</dt><dd></dd></dl>
+
+</div>
+</div>
+<a id="a93a65d63c7494ee88abbc9d2188ddce5" name="a93a65d63c7494ee88abbc9d2188ddce5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a93a65d63c7494ee88abbc9d2188ddce5">&#9670;&#160;</a></span>setSelectItem()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SARibbonCustomizeWidget::setSelectItem </td>
+          <td>(</td>
+          <td class="paramtype">QStandardItem *</td>          <td class="paramname"><span class="paramname"><em>item</em>, </span></td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool</td>          <td class="paramname"><span class="paramname"><em>ensureVisible</em><span class="paramdefsep"> = </span><span class="paramdefval">true</span></span>&#160;)</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>设置某个item被选中 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">item</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ae42114e858a6e0a78c4c61b63cd3c0f7" name="ae42114e858a6e0a78c4c61b63cd3c0f7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae42114e858a6e0a78c4c61b63cd3c0f7">&#9670;&#160;</a></span>setupActionsManager()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SARibbonCustomizeWidget::setupActionsManager </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="class_s_a_ribbon_actions_manager.html">SARibbonActionsManager</a> *</td>          <td class="paramname"><span class="paramname"><em>mgr</em></span></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>设置action管理器 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">mgr</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a0a42c00f56b97751be90016eba7a99ff" name="a0a42c00f56b97751be90016eba7a99ff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0a42c00f56b97751be90016eba7a99ff">&#9670;&#160;</a></span>toXml() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool SARibbonCustomizeWidget::toXml </td>
+          <td>(</td>
+          <td class="paramtype">const QString &amp;</td>          <td class="paramname"><span class="paramname"><em>xmlpath</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>把配置写入文件中 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">xmlpath</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd></dd></dl>
+
+</div>
+</div>
+<a id="aed8fd2fb702693b49b83df0df83b146e" name="aed8fd2fb702693b49b83df0df83b146e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aed8fd2fb702693b49b83df0df83b146e">&#9670;&#160;</a></span>toXml() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool SARibbonCustomizeWidget::toXml </td>
+          <td>(</td>
+          <td class="paramtype">QXmlStreamWriter *</td>          <td class="paramname"><span class="paramname"><em>xml</em></span></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>转换为xml </p>
+<p>此函数仅会写element，不会写document相关内容，因此如果需要写document， 需要在此函数前调用QXmlStreamWriter::writeStartDocument(),在此函数后调用QXmlStreamWriter::writeEndDocument()</p>
+<dl class="section note"><dt>注解</dt><dd>注意，在传入QXmlStreamWriter之前，需要设置编码为utf-8:xml-&gt;setCodec("utf-8"); </dd>
+<dd>
+由于QXmlStreamWriter在QString作为io时，是不支持编码的，而此又无法保证自定义过程不出现中文字符， 因此，QXmlStreamWriter不应该通过QString进行构造，如果需要用到string，也需要通过QByteArray构造，如： <div class="fragment"><div class="line"><a class="code hl_class" href="class_s_a_ribbon_customize_dialog.html">SARibbonCustomizeDialog</a> dlg(<span class="keyword">this</span>);<span class="comment">//this为SARibbonMainWindow的窗口</span></div>
+<div class="line">dlg.setupActionsManager(m_actMgr);</div>
+<div class="line"><span class="keywordflow">if</span> (SARibbonCustomizeDialog::Accepted == dlg.exec()) {</div>
+<div class="line">   dlg.applys();</div>
+<div class="line">   QByteArray str;</div>
+<div class="line">   QXmlStreamWriter xml(&amp;str);<span class="comment">//QXmlStreamWriter不建议通过QString构造，遇到中文会异常</span></div>
+<div class="line">   xml.setAutoFormatting(<span class="keyword">true</span>);</div>
+<div class="line">   xml.setAutoFormattingIndent(2);</div>
+<div class="line">   xml.setCodec(<span class="stringliteral">&quot;utf-8&quot;</span>);<span class="comment">//在writeStartDocument之前指定编码</span></div>
+<div class="line">   xml.writeStartDocument();</div>
+<div class="line">   <span class="keywordtype">bool</span> isok = dlg.toXml(&amp;xml);</div>
+<div class="line">   xml.writeEndDocument();</div>
+<div class="line">   <span class="keywordflow">if</span> (isok) {</div>
+<div class="line">       QFile f(<span class="stringliteral">&quot;customize.xml&quot;</span>);</div>
+<div class="line">       <span class="keywordflow">if</span> (f.open(QIODevice::ReadWrite|QIODevice::Text|QIODevice::Truncate)) {</div>
+<div class="line">           QTextStream s(&amp;f);</div>
+<div class="line">           s.setCodec(<span class="stringliteral">&quot;utf-8&quot;</span>);<span class="comment">//指定编码输出</span></div>
+<div class="line">           s &lt;&lt; str;</div>
+<div class="line">           s.flush();</div>
+<div class="line">       }</div>
+<div class="line">       m_edit-&gt;append(<span class="stringliteral">&quot;write xml:&quot;</span>);<span class="comment">//m_edit的定义为：QTextEdit *m_edit;</span></div>
+<div class="line">       m_edit-&gt;append(str);</div>
+<div class="line">   }</div>
+<div class="line">}</div>
+<div class="ttc" id="aclass_s_a_ribbon_customize_dialog_html"><div class="ttname"><a href="class_s_a_ribbon_customize_dialog.html">SARibbonCustomizeDialog</a></div><div class="ttdoc">SARibbonCustomizeWidget的对话框封装</div><div class="ttdef"><b>Definition</b> SARibbonCustomizeDialog.h:21</div></div>
+</div><!-- fragment --> </dd></dl>
+<dl class="section return"><dt>返回</dt><dd>如果出现异常，返回false,如果没有自定义数据也会返回false </dd></dl>
+<dl class="section see"><dt>参见</dt><dd>sa_customize_datas_to_xml </dd></dl>
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>C:/src/Qt/SARibbon/src/SARibbonBar/<a class="el" href="_s_a_ribbon_customize_widget_8h_source.html">SARibbonCustomizeWidget.h</a></li>
+<li>C:/src/Qt/SARibbon/src/SARibbonBar/<b>SARibbonCustomizeWidget.cpp</b></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="class_s_a_ribbon_customize_widget.html">SARibbonCustomizeWidget</a></li>
+    <li class="footer">制作者 <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.10.0 </li>
+  </ul>
+</div>
+</body>
+</html>

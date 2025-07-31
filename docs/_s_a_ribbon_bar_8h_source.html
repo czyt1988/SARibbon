@@ -1,0 +1,536 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.10.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>SARibbon: C:/src/Qt/SARibbon/src/SARibbonBar/SARibbonBar.h 源文件</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="SA-logo.png"/></td>
+  <td id="projectalign">
+   <div id="projectname">SARibbon<span id="projectnumber">&#160;2.4.2</span>
+   </div>
+   <div id="projectbrief">SARibbon wiki</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.10.0 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','搜索');
+  $(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() { codefold.init(0); });
+/* @license-end */
+</script>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function(){initNavTree('_s_a_ribbon_bar_8h_source.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="headertitle"><div class="title">SARibbonBar.h</div></div>
+</div><!--header-->
+<div class="contents">
+<div class="fragment"><div class="line"><a id="l00001" name="l00001"></a><span class="lineno">    1</span><span class="preprocessor">#ifndef SARIBBONBAR_H</span></div>
+<div class="line"><a id="l00002" name="l00002"></a><span class="lineno">    2</span><span class="preprocessor">#define SARIBBONBAR_H</span></div>
+<div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span><span class="preprocessor">#include &quot;SARibbonCategory.h&quot;</span></div>
+<div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &quot;SARibbonContextCategory.h&quot;</span></div>
+<div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &quot;SARibbonGlobal.h&quot;</span></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &lt;QMenuBar&gt;</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span><span class="preprocessor">#include &lt;QScopedPointer&gt;</span></div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="preprocessor">#include &lt;QVariant&gt;</span></div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span> </div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span><span class="keyword">class </span>QAction;</div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span><span class="keyword">class </span>QAbstractButton;</div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span><span class="keyword">class </span><a class="code hl_class" href="class_s_a_ribbon_element_factory.html">SARibbonElementFactory</a>;</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span><span class="keyword">class </span><a class="code hl_class" href="class_s_a_ribbon_tab_bar.html">SARibbonTabBar</a>;</div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span><span class="keyword">class </span><a class="code hl_class" href="class_s_a_ribbon_button_group_widget.html">SARibbonButtonGroupWidget</a>;</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span><span class="keyword">class </span><a class="code hl_class" href="class_s_a_ribbon_quick_access_bar.html">SARibbonQuickAccessBar</a>;</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span><span class="keyword">class </span><a class="code hl_class" href="class_s_a_ribbon_stacked_widget.html">SARibbonStackedWidget</a>;</div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span> </div>
+<div class="foldopen" id="foldopen00092" data-start="{" data-end="};">
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno"><a class="line" href="class_s_a_ribbon_bar.html">   92</a></span><span class="keyword">class </span>SA_RIBBON_EXPORT <a class="code hl_class" href="class_s_a_ribbon_bar.html">SARibbonBar</a> : <span class="keyword">public</span> QMenuBar</div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>{</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>    Q_OBJECT</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>    SA_RIBBON_DECLARE_PRIVATE(<a class="code hl_class" href="class_s_a_ribbon_bar.html">SARibbonBar</a>)</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code hl_class" href="class_s_a_ribbon_main_window.html">SARibbonMainWindow</a>;</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>    <span class="keyword">friend</span> <span class="keyword">class </span><a class="code hl_class" href="class_s_a_ribbon_system_button_bar.html">SARibbonSystemButtonBar</a>;</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>    Q_PROPERTY(RibbonStyles ribbonStyle READ currentRibbonStyle WRITE setRibbonStyle)</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>    Q_PROPERTY(<span class="keywordtype">bool</span> minimumMode READ isMinimumMode WRITE setMinimumMode)</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>    Q_PROPERTY(<span class="keywordtype">bool</span> minimumModeButton READ haveShowMinimumModeButton WRITE showMinimumModeButton)</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>    Q_PROPERTY(QColor windowTitleTextColor READ windowTitleTextColor WRITE setWindowTitleTextColor)</div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>    Q_PROPERTY(QColor tabBarBaseLineColor READ tabBarBaseLineColor WRITE setTabBarBaseLineColor)</div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>    Q_PROPERTY(Qt::Alignment windowTitleAligment READ windowTitleAligment WRITE setWindowTitleAligment)</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>    Q_PROPERTY(<span class="keywordtype">bool</span> enableWordWrap READ isEnableWordWrap WRITE setEnableWordWrap)</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>    Q_PROPERTY(<span class="keywordtype">bool</span> enableShowPannelTitle READ isEnableShowPannelTitle WRITE setEnableShowPannelTitle)</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>    Q_PROPERTY(<span class="keywordtype">bool</span> tabOnTitle READ isTabOnTitle WRITE setTabOnTitle)</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>    Q_PROPERTY(<a class="code hl_enumeration" href="class_s_a_ribbon_pannel.html#a9da35ca039ab4045209d5614e4566219">SARibbonPannel::PannelLayoutMode</a> pannelLayoutMode READ pannelLayoutMode WRITE setPannelLayoutMode)</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span> </div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span><span class="keyword">public</span>:</div>
+<div class="foldopen" id="foldopen00110" data-start="{" data-end="};">
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno"><a class="line" href="class_s_a_ribbon_bar.html#ac2a1554ddb5825d7866968152239b1df">  110</a></span>    <span class="keyword">enum</span> <a class="code hl_enumeration" href="class_s_a_ribbon_bar.html#ac2a1554ddb5825d7866968152239b1df">RibbonStyleFlag</a></div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>    {</div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>        RibbonStyleLoose    = 0x0001,  <span class="comment">// bit:0000 0001</span></div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>        RibbonStyleCompact  = 0x0002,  <span class="comment">// bit:0000 0010</span></div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>        RibbonStyleThreeRow = 0x0010,  <span class="comment">// bit:0001 0000</span></div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>        RibbonStyleTwoRow   = 0x0020,  <span class="comment">// bit:0010 0000</span></div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span> </div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno"><a class="line" href="class_s_a_ribbon_bar.html#ac2a1554ddb5825d7866968152239b1dfa314db797c9294386824e61264b26f39d">  117</a></span>        RibbonStyleLooseThreeRow   = RibbonStyleLoose | RibbonStyleThreeRow,    </div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno"><a class="line" href="class_s_a_ribbon_bar.html#ac2a1554ddb5825d7866968152239b1dfa5633a67b57cac6b7291b99bc5328349b">  118</a></span>        RibbonStyleCompactThreeRow = RibbonStyleCompact | RibbonStyleThreeRow,  </div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno"><a class="line" href="class_s_a_ribbon_bar.html#ac2a1554ddb5825d7866968152239b1dfa6feb099a7256d645887d48e9e23fb27f">  119</a></span>        RibbonStyleLooseTwoRow     = RibbonStyleLoose | RibbonStyleTwoRow,      </div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>        RibbonStyleCompactTwoRow   = RibbonStyleCompact | RibbonStyleTwoRow     </div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno"><a class="line" href="class_s_a_ribbon_bar.html#ac2a1554ddb5825d7866968152239b1dfa13c620a5ed961e5255acc3c96e93fe6f">  121</a></span>    };</div>
+</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>    Q_ENUM(RibbonStyleFlag)</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>    Q_DECLARE_FLAGS(RibbonStyles, RibbonStyleFlag)</div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>    Q_FLAG(RibbonStyles)</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span> </div>
+<div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>    </div>
+<div class="foldopen" id="foldopen00129" data-start="{" data-end="};">
+<div class="line"><a id="l00129" name="l00129"></a><span class="lineno"><a class="line" href="class_s_a_ribbon_bar.html#a00f6355e3175ff1eb2d06b607c600488">  129</a></span>    enum <a class="code hl_enumeration" href="class_s_a_ribbon_bar.html#a00f6355e3175ff1eb2d06b607c600488">RibbonMode</a></div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>    {</div>
+<div class="line"><a id="l00131" name="l00131"></a><span class="lineno"><a class="line" href="class_s_a_ribbon_bar.html#a00f6355e3175ff1eb2d06b607c600488a67aa36c2caad880c5d1e5eb986c12ccf">  131</a></span>        <a class="code hl_enumvalue" href="class_s_a_ribbon_bar.html#a00f6355e3175ff1eb2d06b607c600488a67aa36c2caad880c5d1e5eb986c12ccf">MinimumRibbonMode</a>,  </div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>        NormalRibbonMode    </div>
+<div class="line"><a id="l00133" name="l00133"></a><span class="lineno"><a class="line" href="class_s_a_ribbon_bar.html#a00f6355e3175ff1eb2d06b607c600488a0656b0e8249a7fee766d66fd65ea1d16">  133</a></span>    };</div>
+</div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>    Q_ENUM(RibbonMode)</div>
+<div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>    <span class="keyword">using </span>FpCategoryIterate = std::function&lt; bool(<a class="code hl_class" href="class_s_a_ribbon_category.html">SARibbonCategory</a>*) &gt;;</div>
+<div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>    <span class="keyword">using </span>FpPannelIterate   = SARibbonCategory::FpPannelIterate;</div>
+<div class="line"><a id="l00141" name="l00141"></a><span class="lineno"><a class="line" href="class_s_a_ribbon_bar.html#a5a2b3d64effa794ce6c76ccd9dce448a">  141</a></span>    <span class="keyword">using </span><a class="code hl_typedef" href="class_s_a_ribbon_bar.html#a5a2b3d64effa794ce6c76ccd9dce448a">FpContextCategoryHighlight</a> = std::function&lt; QColor(<span class="keyword">const</span> QColor&amp;) &gt;;</div>
+<div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span> </div>
+<div class="line"><a id="l00143" name="l00143"></a><span class="lineno">  143</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00144" name="l00144"></a><span class="lineno">  144</span>    <span class="comment">// 判断RibbonStyle是否为2行模式</span></div>
+<div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>    <span class="keyword">static</span> <span class="keywordtype">bool</span> isTwoRowStyle(RibbonStyles s);</div>
+<div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>    <span class="keyword">static</span> <span class="keywordtype">bool</span> isThreeRowStyle(RibbonStyles s);</div>
+<div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span>    <span class="comment">// 判断是否是office样式</span></div>
+<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>    <span class="keyword">static</span> <span class="keywordtype">bool</span> isLooseStyle(RibbonStyles s);</div>
+<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>    <span class="keyword">static</span> <span class="keywordtype">bool</span> isCompactStyle(RibbonStyles s);</div>
+<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>    <span class="comment">// 获取版本信息</span></div>
+<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>    <span class="keyword">static</span> QString versionString();</div>
+<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span> </div>
+<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span>    <span class="comment">// 获取默认的上下文标签颜色列表</span></div>
+<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span>    <span class="keyword">static</span> QList&lt; QColor &gt; defaultContextCategoryColorList();</div>
+<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span> </div>
+<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>    <span class="comment">// 初始化高分辨率适配</span></div>
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>    <span class="keyword">static</span> <span class="keywordtype">void</span> initHighDpi();</div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span> </div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>    <span class="comment">// 构造函数</span></div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>    <span class="keyword">explicit</span> <a class="code hl_class" href="class_s_a_ribbon_bar.html">SARibbonBar</a>(QWidget* parent = <span class="keyword">nullptr</span>);</div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>    <a class="code hl_class" href="class_s_a_ribbon_bar.html">~SARibbonBar</a>();</div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>    <span class="comment">// 获取applicationButton</span></div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>    QAbstractButton* applicationButton();</div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span> </div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>    <span class="comment">// 设置applicationButton</span></div>
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>    <span class="keywordtype">void</span> setApplicationButton(QAbstractButton* btn);</div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span> </div>
+<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>    <span class="comment">// 获取tabbar</span></div>
+<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>    <a class="code hl_class" href="class_s_a_ribbon_tab_bar.html">SARibbonTabBar</a>* ribbonTabBar();</div>
+<div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span> </div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>    <span class="comment">// 添加一个标签</span></div>
+<div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>    <a class="code hl_class" href="class_s_a_ribbon_category.html">SARibbonCategory</a>* addCategoryPage(<span class="keyword">const</span> QString&amp; title);</div>
+<div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>    <span class="keywordtype">void</span> addCategoryPage(<a class="code hl_class" href="class_s_a_ribbon_category.html">SARibbonCategory</a>* category);</div>
+<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span> </div>
+<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span>    <span class="comment">// 为了支持Qt designer,添加的一个重载函数</span></div>
+<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>    Q_INVOKABLE <span class="keywordtype">void</span> addCategoryPage(QWidget* category);</div>
+<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span> </div>
+<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span>    <span class="comment">// 添加一个category，category的位置在index，如果当前category数量少于index，将插入到最后</span></div>
+<div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>    <a class="code hl_class" href="class_s_a_ribbon_category.html">SARibbonCategory</a>* insertCategoryPage(<span class="keyword">const</span> QString&amp; title, <span class="keywordtype">int</span> index);</div>
+<div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>    <span class="keywordtype">void</span> insertCategoryPage(<a class="code hl_class" href="class_s_a_ribbon_category.html">SARibbonCategory</a>* category, <span class="keywordtype">int</span> index);</div>
+<div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span> </div>
+<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span>    <span class="comment">// 通过名字查找Category</span></div>
+<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>    <a class="code hl_class" href="class_s_a_ribbon_category.html">SARibbonCategory</a>* categoryByName(<span class="keyword">const</span> QString&amp; title) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span> </div>
+<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span>    <span class="comment">// 通过ObjectName查找Category</span></div>
+<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>    <a class="code hl_class" href="class_s_a_ribbon_category.html">SARibbonCategory</a>* categoryByObjectName(<span class="keyword">const</span> QString&amp; objname) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span> </div>
+<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span>    <span class="comment">// 通过索引找到category，如果超过索引范围，会返回nullptr</span></div>
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span>    <a class="code hl_class" href="class_s_a_ribbon_category.html">SARibbonCategory</a>* categoryByIndex(<span class="keywordtype">int</span> index) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span> </div>
+<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>    <span class="comment">// 隐藏category,并不会删除或者取走，只是隐藏</span></div>
+<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>    <span class="keywordtype">void</span> hideCategory(<a class="code hl_class" href="class_s_a_ribbon_category.html">SARibbonCategory</a>* category);</div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span> </div>
+<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>    <span class="comment">// 显示被隐藏的category</span></div>
+<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>    <span class="keywordtype">void</span> showCategory(<a class="code hl_class" href="class_s_a_ribbon_category.html">SARibbonCategory</a>* category);</div>
+<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span> </div>
+<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span>    <span class="comment">// 判断这个category是否在显示状态，也就是tabbar有这个category</span></div>
+<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>    <span class="keywordtype">bool</span> isCategoryVisible(<span class="keyword">const</span> <a class="code hl_class" href="class_s_a_ribbon_category.html">SARibbonCategory</a>* c) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span> </div>
+<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>    <span class="comment">// 获取category的索引</span></div>
+<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span>    <span class="keywordtype">int</span> categoryIndex(<span class="keyword">const</span> <a class="code hl_class" href="class_s_a_ribbon_category.html">SARibbonCategory</a>* c) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span> </div>
+<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span>    <span class="comment">// 移动一个Category从from index到to index</span></div>
+<div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span>    <span class="keywordtype">void</span> moveCategory(<span class="keywordtype">int</span> from, <span class="keywordtype">int</span> to);</div>
+<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span> </div>
+<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span>    <span class="comment">// 获取当前显示的所有的SARibbonCategory，包含未显示的SARibbonContextCategory的SARibbonCategory也一并返回</span></div>
+<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>    QList&lt; SARibbonCategory* &gt; categoryPages(<span class="keywordtype">bool</span> getAll = <span class="keyword">true</span>) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span> </div>
+<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span>    <span class="comment">// 移除SARibbonCategory</span></div>
+<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span>    <span class="keywordtype">void</span> removeCategory(<a class="code hl_class" href="class_s_a_ribbon_category.html">SARibbonCategory</a>* category);</div>
+<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span> </div>
+<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span>    <span class="comment">// 添加一个上下文标签</span></div>
+<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span>    <a class="code hl_class" href="class_s_a_ribbon_context_category.html">SARibbonContextCategory</a>*</div>
+<div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span>    addContextCategory(<span class="keyword">const</span> QString&amp; title, <span class="keyword">const</span> QColor&amp; color = QColor(), <span class="keyword">const</span> QVariant&amp; <span class="keywordtype">id</span> = QVariant());</div>
+<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span>    <span class="keywordtype">void</span> addContextCategory(<a class="code hl_class" href="class_s_a_ribbon_context_category.html">SARibbonContextCategory</a>* context);</div>
+<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span> </div>
+<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span>    <span class="comment">// 显示一个上下文标签</span></div>
+<div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span>    <span class="keywordtype">void</span> showContextCategory(<a class="code hl_class" href="class_s_a_ribbon_context_category.html">SARibbonContextCategory</a>* context);</div>
+<div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span> </div>
+<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span>    <span class="comment">// 隐藏一个上下文标签</span></div>
+<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span>    <span class="keywordtype">void</span> hideContextCategory(<a class="code hl_class" href="class_s_a_ribbon_context_category.html">SARibbonContextCategory</a>* context);</div>
+<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span> </div>
+<div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span>    <span class="comment">// 判断上下文是否是在显示状态</span></div>
+<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span>    <span class="keywordtype">bool</span> isContextCategoryVisible(<a class="code hl_class" href="class_s_a_ribbon_context_category.html">SARibbonContextCategory</a>* context);</div>
+<div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span> </div>
+<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span>    <span class="comment">// 设置上下文标签的显示或隐藏</span></div>
+<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span>    <span class="keywordtype">void</span> setContextCategoryVisible(<a class="code hl_class" href="class_s_a_ribbon_context_category.html">SARibbonContextCategory</a>* context, <span class="keywordtype">bool</span> visible);</div>
+<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span> </div>
+<div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span>    <span class="comment">// 获取所有的上下文标签</span></div>
+<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span>    QList&lt; SARibbonContextCategory* &gt; contextCategoryList() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span> </div>
+<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span>    <span class="comment">// 移除ContextCategory</span></div>
+<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span>    <span class="keywordtype">void</span> destroyContextCategory(<a class="code hl_class" href="class_s_a_ribbon_context_category.html">SARibbonContextCategory</a>* context);</div>
+<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span> </div>
+<div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span>    <span class="comment">// 获取当前可见的上下文标签的tab索引</span></div>
+<div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span>    QList&lt; int &gt; currentVisibleContextCategoryTabIndexs() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span> </div>
+<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span>    <span class="comment">// 设置为隐藏模式</span></div>
+<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span>    <span class="keywordtype">void</span> setMinimumMode(<span class="keywordtype">bool</span> isHide);</div>
+<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span> </div>
+<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span>    <span class="comment">// 当前Ribbon是否是隐藏模式</span></div>
+<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span>    <span class="keywordtype">bool</span> isMinimumMode() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span> </div>
+<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span>    <span class="comment">// 设置显示隐藏ribbon按钮</span></div>
+<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span>    <span class="keywordtype">void</span> showMinimumModeButton(<span class="keywordtype">bool</span> isShow = <span class="keyword">true</span>);</div>
+<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span> </div>
+<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span>    <span class="comment">// 是否显示隐藏ribbon按钮</span></div>
+<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span>    <span class="keywordtype">bool</span> haveShowMinimumModeButton() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span> </div>
+<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span>    <span class="comment">// 隐藏ribbon对应的action</span></div>
+<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span>    QAction* minimumModeAction() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span> </div>
+<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span>    <span class="comment">// tab双击后最小化ribbon</span></div>
+<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span>    <span class="keywordtype">bool</span> isEnableTabDoubleClickToMinimumMode() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span>    <span class="keywordtype">void</span> setTabDoubleClickToMinimumMode(<span class="keywordtype">bool</span> on = <span class="keyword">true</span>) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span> </div>
+<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span>    <span class="comment">// 当前的模式</span></div>
+<div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span>    <a class="code hl_enumeration" href="class_s_a_ribbon_bar.html#a00f6355e3175ff1eb2d06b607c600488">RibbonMode</a> currentRibbonState() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00260" name="l00260"></a><span class="lineno">  260</span> </div>
+<div class="line"><a id="l00261" name="l00261"></a><span class="lineno">  261</span>    <span class="comment">// ribbon tab的高度</span></div>
+<div class="line"><a id="l00262" name="l00262"></a><span class="lineno">  262</span>    <span class="keywordtype">int</span> tabBarHeight() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00263" name="l00263"></a><span class="lineno">  263</span>    <span class="keywordtype">void</span> setTabBarHeight(<span class="keywordtype">int</span> h, <span class="keywordtype">bool</span> resizeByNow = <span class="keyword">true</span>);</div>
+<div class="line"><a id="l00264" name="l00264"></a><span class="lineno">  264</span> </div>
+<div class="line"><a id="l00265" name="l00265"></a><span class="lineno">  265</span>    <span class="comment">// 标题栏的高度</span></div>
+<div class="line"><a id="l00266" name="l00266"></a><span class="lineno">  266</span>    <span class="keywordtype">int</span> titleBarHeight() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00267" name="l00267"></a><span class="lineno">  267</span>    <span class="keywordtype">void</span> setTitleBarHeight(<span class="keywordtype">int</span> h, <span class="keywordtype">bool</span> resizeByNow = <span class="keyword">true</span>);</div>
+<div class="line"><a id="l00268" name="l00268"></a><span class="lineno">  268</span> </div>
+<div class="line"><a id="l00269" name="l00269"></a><span class="lineno">  269</span>    <span class="comment">// category的高度</span></div>
+<div class="line"><a id="l00270" name="l00270"></a><span class="lineno">  270</span>    <span class="keywordtype">int</span> categoryHeight() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00271" name="l00271"></a><span class="lineno">  271</span>    <span class="keywordtype">void</span> setCategoryHeight(<span class="keywordtype">int</span> h, <span class="keywordtype">bool</span> resizeByNow = <span class="keyword">true</span>);</div>
+<div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span> </div>
+<div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span>    <span class="comment">// 获取正常模式下的mainBar的高度</span></div>
+<div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>    <span class="keywordtype">int</span> normalModeMainBarHeight() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span> </div>
+<div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span>    <span class="comment">// 最小模式下的MainBar高度</span></div>
+<div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span>    <span class="keywordtype">int</span> minimumModeMainBarHeight() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span> </div>
+<div class="line"><a id="l00279" name="l00279"></a><span class="lineno">  279</span>    <span class="comment">// 激活tabbar右边的按钮群</span></div>
+<div class="line"><a id="l00280" name="l00280"></a><span class="lineno">  280</span>    <a class="code hl_class" href="class_s_a_ribbon_button_group_widget.html">SARibbonButtonGroupWidget</a>* activeRightButtonGroup();</div>
+<div class="line"><a id="l00281" name="l00281"></a><span class="lineno">  281</span> </div>
+<div class="line"><a id="l00282" name="l00282"></a><span class="lineno">  282</span>    <span class="comment">// 右侧按钮群</span></div>
+<div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span>    <a class="code hl_class" href="class_s_a_ribbon_button_group_widget.html">SARibbonButtonGroupWidget</a>* rightButtonGroup();</div>
+<div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span> </div>
+<div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span>    <span class="comment">// 激活QuickAccessBar</span></div>
+<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span>    <a class="code hl_class" href="class_s_a_ribbon_quick_access_bar.html">SARibbonQuickAccessBar</a>* activeQuickAccessBar();</div>
+<div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span> </div>
+<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span>    <span class="comment">// 快速响应栏</span></div>
+<div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span>    <a class="code hl_class" href="class_s_a_ribbon_quick_access_bar.html">SARibbonQuickAccessBar</a>* quickAccessBar();</div>
+<div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span> </div>
+<div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span>    <span class="comment">// 设置ribbon的风格</span></div>
+<div class="line"><a id="l00292" name="l00292"></a><span class="lineno">  292</span>    <span class="keywordtype">void</span> setRibbonStyle(RibbonStyles v);</div>
+<div class="line"><a id="l00293" name="l00293"></a><span class="lineno">  293</span>    RibbonStyles currentRibbonStyle() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00294" name="l00294"></a><span class="lineno">  294</span> </div>
+<div class="line"><a id="l00295" name="l00295"></a><span class="lineno">  295</span>    <span class="comment">// 设置当前ribbon的index</span></div>
+<div class="line"><a id="l00296" name="l00296"></a><span class="lineno">  296</span>    <span class="keywordtype">void</span> setCurrentIndex(<span class="keywordtype">int</span> index);</div>
+<div class="line"><a id="l00297" name="l00297"></a><span class="lineno">  297</span> </div>
+<div class="line"><a id="l00298" name="l00298"></a><span class="lineno">  298</span>    <span class="comment">// 返回当前的tab索引</span></div>
+<div class="line"><a id="l00299" name="l00299"></a><span class="lineno">  299</span>    <span class="keywordtype">int</span> currentIndex();</div>
+<div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span> </div>
+<div class="line"><a id="l00301" name="l00301"></a><span class="lineno">  301</span>    <span class="comment">// 确保标签显示出来</span></div>
+<div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span>    <span class="keywordtype">void</span> raiseCategory(<a class="code hl_class" href="class_s_a_ribbon_category.html">SARibbonCategory</a>* category);</div>
+<div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span> </div>
+<div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span>    <span class="comment">// 判断当前的行数</span></div>
+<div class="line"><a id="l00305" name="l00305"></a><span class="lineno">  305</span>    <span class="keywordtype">bool</span> isTwoRowStyle() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00306" name="l00306"></a><span class="lineno">  306</span>    <span class="keywordtype">bool</span> isThreeRowStyle() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00307" name="l00307"></a><span class="lineno">  307</span> </div>
+<div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span>    <span class="comment">// 判断当前的样式</span></div>
+<div class="line"><a id="l00309" name="l00309"></a><span class="lineno">  309</span>    <span class="keywordtype">bool</span> isLooseStyle() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00310" name="l00310"></a><span class="lineno">  310</span>    <span class="keywordtype">bool</span> isCompactStyle() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00311" name="l00311"></a><span class="lineno">  311</span> </div>
+<div class="line"><a id="l00312" name="l00312"></a><span class="lineno">  312</span>    <span class="comment">// 更新ribbon的布局数据，此函数适用于一些关键性尺寸变化，换起ribbon下面元素的布局,在发现刷新问题时，可以调用此函数</span></div>
+<div class="line"><a id="l00313" name="l00313"></a><span class="lineno">  313</span>    <span class="keywordtype">void</span> updateRibbonGeometry();</div>
+<div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span> </div>
+<div class="line"><a id="l00315" name="l00315"></a><span class="lineno">  315</span>    <span class="comment">// 设置pannel的模式</span></div>
+<div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span>    <a class="code hl_enumeration" href="class_s_a_ribbon_pannel.html#a9da35ca039ab4045209d5614e4566219">SARibbonPannel::PannelLayoutMode</a> pannelLayoutMode() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00317" name="l00317"></a><span class="lineno">  317</span>    <span class="keywordtype">void</span> setPannelLayoutMode(<a class="code hl_enumeration" href="class_s_a_ribbon_pannel.html#a9da35ca039ab4045209d5614e4566219">SARibbonPannel::PannelLayoutMode</a> m);</div>
+<div class="line"><a id="l00318" name="l00318"></a><span class="lineno">  318</span> </div>
+<div class="line"><a id="l00319" name="l00319"></a><span class="lineno">  319</span>    <span class="comment">// 设置tab在title上面，这样可以省略title区域</span></div>
+<div class="line"><a id="l00320" name="l00320"></a><span class="lineno">  320</span>    <span class="keywordtype">void</span> setTabOnTitle(<span class="keywordtype">bool</span> on);</div>
+<div class="line"><a id="l00321" name="l00321"></a><span class="lineno">  321</span>    <span class="keywordtype">bool</span> isTabOnTitle() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00322" name="l00322"></a><span class="lineno">  322</span> </div>
+<div class="line"><a id="l00323" name="l00323"></a><span class="lineno">  323</span>    <span class="comment">// tabbar 底部会绘制一条线条，此接口定义线条颜色</span></div>
+<div class="line"><a id="l00324" name="l00324"></a><span class="lineno">  324</span>    <span class="keywordtype">void</span> setTabBarBaseLineColor(<span class="keyword">const</span> QColor&amp; clr);</div>
+<div class="line"><a id="l00325" name="l00325"></a><span class="lineno">  325</span>    QColor tabBarBaseLineColor() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00326" name="l00326"></a><span class="lineno">  326</span> </div>
+<div class="line"><a id="l00327" name="l00327"></a><span class="lineno">  327</span>    <span class="comment">// 设置标题颜色</span></div>
+<div class="line"><a id="l00328" name="l00328"></a><span class="lineno">  328</span>    <span class="keywordtype">void</span> setWindowTitleTextColor(<span class="keyword">const</span> QColor&amp; clr);</div>
+<div class="line"><a id="l00329" name="l00329"></a><span class="lineno">  329</span>    QColor windowTitleTextColor() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00330" name="l00330"></a><span class="lineno">  330</span> </div>
+<div class="line"><a id="l00331" name="l00331"></a><span class="lineno">  331</span>    <span class="comment">// 设置是否显示标题</span></div>
+<div class="line"><a id="l00332" name="l00332"></a><span class="lineno">  332</span>    <span class="keywordtype">void</span> setTitleVisible(<span class="keywordtype">bool</span> on = <span class="keyword">false</span>);</div>
+<div class="line"><a id="l00333" name="l00333"></a><span class="lineno">  333</span>    <span class="keywordtype">bool</span> isTitleVisible() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00334" name="l00334"></a><span class="lineno">  334</span> </div>
+<div class="line"><a id="l00335" name="l00335"></a><span class="lineno">  335</span>    <span class="comment">// 设置标题的背景颜色</span></div>
+<div class="line"><a id="l00336" name="l00336"></a><span class="lineno">  336</span>    <span class="keywordtype">void</span> setWindowTitleBackgroundBrush(<span class="keyword">const</span> QBrush&amp; bk);</div>
+<div class="line"><a id="l00337" name="l00337"></a><span class="lineno">  337</span>    QBrush windowTitleBackgroundBrush() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00338" name="l00338"></a><span class="lineno">  338</span> </div>
+<div class="line"><a id="l00339" name="l00339"></a><span class="lineno">  339</span>    <span class="comment">// 设置标题的对齐方式</span></div>
+<div class="line"><a id="l00340" name="l00340"></a><span class="lineno">  340</span>    <span class="keywordtype">void</span> setWindowTitleAligment(Qt::Alignment al);</div>
+<div class="line"><a id="l00341" name="l00341"></a><span class="lineno">  341</span>    Qt::Alignment windowTitleAligment() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00342" name="l00342"></a><span class="lineno">  342</span> </div>
+<div class="line"><a id="l00343" name="l00343"></a><span class="lineno">  343</span>    <span class="comment">// 设置按钮允许换行，注意图标大小是由文字决定的，两行文字会让图标变小，如果想图标变大，文字不换行是最好的</span></div>
+<div class="line"><a id="l00344" name="l00344"></a><span class="lineno">  344</span>    <span class="keywordtype">void</span> setEnableWordWrap(<span class="keywordtype">bool</span> on);</div>
+<div class="line"><a id="l00345" name="l00345"></a><span class="lineno">  345</span>    <span class="keywordtype">bool</span> isEnableWordWrap() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00346" name="l00346"></a><span class="lineno">  346</span> </div>
+<div class="line"><a id="l00347" name="l00347"></a><span class="lineno">  347</span>    <span class="comment">// 文本宽度估算时的宽度比高度系数,超过此系数的宽度时，开始尝试换行或者省略号显示</span></div>
+<div class="line"><a id="l00348" name="l00348"></a><span class="lineno">  348</span>    <span class="keywordtype">void</span> setButtonTextEllipsisAspectFactor(qreal fac = 1.4);</div>
+<div class="line"><a id="l00349" name="l00349"></a><span class="lineno">  349</span>    qreal buttonTextEllipsisAspectFactor() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00350" name="l00350"></a><span class="lineno">  350</span> </div>
+<div class="line"><a id="l00351" name="l00351"></a><span class="lineno">  351</span>    <span class="comment">// 设置pannel的标题栏高度</span></div>
+<div class="line"><a id="l00352" name="l00352"></a><span class="lineno">  352</span>    <span class="keywordtype">int</span> pannelTitleHeight() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00353" name="l00353"></a><span class="lineno">  353</span>    <span class="keywordtype">void</span> setPannelTitleHeight(<span class="keywordtype">int</span> h);</div>
+<div class="line"><a id="l00354" name="l00354"></a><span class="lineno">  354</span> </div>
+<div class="line"><a id="l00355" name="l00355"></a><span class="lineno">  355</span>    <span class="comment">// 设置pannel是否显示标题栏</span></div>
+<div class="line"><a id="l00356" name="l00356"></a><span class="lineno">  356</span>    <span class="keywordtype">bool</span> isEnableShowPannelTitle() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00357" name="l00357"></a><span class="lineno">  357</span>    <span class="keywordtype">void</span> setEnableShowPannelTitle(<span class="keywordtype">bool</span> on);</div>
+<div class="line"><a id="l00358" name="l00358"></a><span class="lineno">  358</span> </div>
+<div class="line"><a id="l00359" name="l00359"></a><span class="lineno">  359</span>    <span class="comment">// 设置pannel的spacing</span></div>
+<div class="line"><a id="l00360" name="l00360"></a><span class="lineno">  360</span>    <span class="keywordtype">void</span> setPannelSpacing(<span class="keywordtype">int</span> n);</div>
+<div class="line"><a id="l00361" name="l00361"></a><span class="lineno">  361</span>    <span class="keywordtype">int</span> pannelSpacing() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00362" name="l00362"></a><span class="lineno">  362</span> </div>
+<div class="line"><a id="l00363" name="l00363"></a><span class="lineno">  363</span>    <span class="comment">// 设置pannel按钮的icon尺寸，large action不受此尺寸影响</span></div>
+<div class="line"><a id="l00364" name="l00364"></a><span class="lineno">  364</span>    <span class="keywordtype">void</span> setPannelToolButtonIconSize(<span class="keyword">const</span> QSize&amp; s);</div>
+<div class="line"><a id="l00365" name="l00365"></a><span class="lineno">  365</span>    QSize pannelToolButtonIconSize() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00366" name="l00366"></a><span class="lineno">  366</span> </div>
+<div class="line"><a id="l00367" name="l00367"></a><span class="lineno">  367</span>    <span class="comment">// 获取SARibbonStackedWidget，谨慎使用此函数</span></div>
+<div class="line"><a id="l00368" name="l00368"></a><span class="lineno">  368</span>    <a class="code hl_class" href="class_s_a_ribbon_stacked_widget.html">SARibbonStackedWidget</a>* ribbonStackedWidget();</div>
+<div class="line"><a id="l00369" name="l00369"></a><span class="lineno">  369</span> </div>
+<div class="line"><a id="l00370" name="l00370"></a><span class="lineno">  370</span>    <span class="comment">// 上下文标签的颜色列表，上下文标签显示的时候，会从颜色列表中取颜色进行标签的渲染</span></div>
+<div class="line"><a id="l00371" name="l00371"></a><span class="lineno">  371</span>    <span class="keywordtype">void</span> setContextCategoryColorList(<span class="keyword">const</span> QList&lt; QColor &gt;&amp; cls);</div>
+<div class="line"><a id="l00372" name="l00372"></a><span class="lineno">  372</span>    QList&lt; QColor &gt; contextCategoryColorList() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00373" name="l00373"></a><span class="lineno">  373</span> </div>
+<div class="line"><a id="l00374" name="l00374"></a><span class="lineno">  374</span>    <span class="comment">// 设置context category 标题的文字颜色</span></div>
+<div class="line"><a id="l00375" name="l00375"></a><span class="lineno">  375</span>    <span class="keywordtype">void</span> setContextCategoryTitleTextColor(<span class="keyword">const</span> QColor&amp; clr);</div>
+<div class="line"><a id="l00376" name="l00376"></a><span class="lineno">  376</span>    QColor contextCategoryTitleTextColor() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00377" name="l00377"></a><span class="lineno">  377</span> </div>
+<div class="line"><a id="l00378" name="l00378"></a><span class="lineno">  378</span>    <span class="comment">// 设置上下文标签颜色的高亮方法</span></div>
+<div class="line"><a id="l00379" name="l00379"></a><span class="lineno">  379</span>    <span class="keywordtype">void</span> setContextCategoryColorHighLight(<a class="code hl_typedef" href="class_s_a_ribbon_bar.html#a5a2b3d64effa794ce6c76ccd9dce448a">FpContextCategoryHighlight</a> fp);</div>
+<div class="line"><a id="l00380" name="l00380"></a><span class="lineno">  380</span> </div>
+<div class="line"><a id="l00381" name="l00381"></a><span class="lineno">  381</span>    <span class="comment">// 设置ribbon的对齐方式</span></div>
+<div class="line"><a id="l00382" name="l00382"></a><span class="lineno">  382</span>    <span class="keywordtype">void</span> setRibbonAlignment(SARibbonAlignment al);</div>
+<div class="line"><a id="l00383" name="l00383"></a><span class="lineno">  383</span>    SARibbonAlignment ribbonAlignment() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00384" name="l00384"></a><span class="lineno">  384</span> </div>
+<div class="line"><a id="l00385" name="l00385"></a><span class="lineno">  385</span>    <span class="comment">// 此函数会遍历SARibbonBar下的所有Category，执行函数指针(bool(SARibbonCategory*))，函数指针返回false则停止迭代</span></div>
+<div class="line"><a id="l00386" name="l00386"></a><span class="lineno">  386</span> </div>
+<div class="line"><a id="l00387" name="l00387"></a><span class="lineno">  387</span>    <span class="keywordtype">bool</span> iterateCategory(FpCategoryIterate fp) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00388" name="l00388"></a><span class="lineno">  388</span>    <span class="comment">// 此函数会遍历SARibbonBar下的所有Category,并迭代所有的pannel，执行函数指针(bool(SARibbonPannel*))，函数指针返回false则停止迭代</span></div>
+<div class="line"><a id="l00389" name="l00389"></a><span class="lineno">  389</span>    <span class="keywordtype">bool</span> iteratePannel(FpPannelIterate fp) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00390" name="l00390"></a><span class="lineno">  390</span> </div>
+<div class="line"><a id="l00391" name="l00391"></a><span class="lineno">  391</span>    <span class="comment">// 设置边角widget可见性，对于mdi窗口，会出现TopLeftCorner和TopRightCorner两个corner widget</span></div>
+<div class="line"><a id="l00392" name="l00392"></a><span class="lineno">  392</span>    <span class="keywordtype">void</span> setCornerWidgetVisible(<span class="keywordtype">bool</span> on, Qt::Corner c = Qt::TopLeftCorner);</div>
+<div class="line"><a id="l00393" name="l00393"></a><span class="lineno">  393</span> </div>
+<div class="line"><a id="l00394" name="l00394"></a><span class="lineno">  394</span>    <span class="comment">// 获取所有pannel下的action</span></div>
+<div class="line"><a id="l00395" name="l00395"></a><span class="lineno">  395</span>    QList&lt; QAction* &gt; allActions() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00396" name="l00396"></a><span class="lineno">  396</span>    <span class="comment">// 当前是否使用的无边框</span></div>
+<div class="line"><a id="l00397" name="l00397"></a><span class="lineno">  397</span>    <span class="keywordtype">bool</span> isUseRibbonFrame() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00398" name="l00398"></a><span class="lineno">  398</span>Q_SIGNALS:</div>
+<div class="line"><a id="l00399" name="l00399"></a><span class="lineno">  399</span> </div>
+<div class="line"><a id="l00405" name="l00405"></a><span class="lineno"><a class="line" href="class_s_a_ribbon_bar.html#aeffbee6347a079f3afb1d2727b45a057">  405</a></span>    <span class="keywordtype">void</span> <a class="code hl_signal" href="class_s_a_ribbon_bar.html#aeffbee6347a079f3afb1d2727b45a057">applicationButtonClicked</a>();</div>
+<div class="line"><a id="l00406" name="l00406"></a><span class="lineno">  406</span> </div>
+<div class="line"><a id="l00411" name="l00411"></a><span class="lineno"><a class="line" href="class_s_a_ribbon_bar.html#a6a09234c0ea31ac766b2be2413ea81b5">  411</a></span>    <span class="keywordtype">void</span> <a class="code hl_signal" href="class_s_a_ribbon_bar.html#a6a09234c0ea31ac766b2be2413ea81b5">currentRibbonTabChanged</a>(<span class="keywordtype">int</span> index);</div>
+<div class="line"><a id="l00412" name="l00412"></a><span class="lineno">  412</span> </div>
+<div class="line"><a id="l00417" name="l00417"></a><span class="lineno"><a class="line" href="class_s_a_ribbon_bar.html#a52aa893b23e58177a5837d100c82d8b2">  417</a></span>    <span class="keywordtype">void</span> <a class="code hl_signal" href="class_s_a_ribbon_bar.html#a52aa893b23e58177a5837d100c82d8b2">ribbonModeChanged</a>(<a class="code hl_enumeration" href="class_s_a_ribbon_bar.html#a00f6355e3175ff1eb2d06b607c600488">SARibbonBar::RibbonMode</a> nowState);</div>
+<div class="line"><a id="l00418" name="l00418"></a><span class="lineno">  418</span> </div>
+<div class="line"><a id="l00423" name="l00423"></a><span class="lineno"><a class="line" href="class_s_a_ribbon_bar.html#a466b9bf5d89406b0170a62763d585e22">  423</a></span>    <span class="keywordtype">void</span> <a class="code hl_signal" href="class_s_a_ribbon_bar.html#a466b9bf5d89406b0170a62763d585e22">ribbonStyleChanged</a>(SARibbonBar::RibbonStyles nowStyle);</div>
+<div class="line"><a id="l00424" name="l00424"></a><span class="lineno">  424</span> </div>
+<div class="line"><a id="l00430" name="l00430"></a><span class="lineno"><a class="line" href="class_s_a_ribbon_bar.html#a6297323791a6a667aaaf22429ad05021">  430</a></span>    <span class="keywordtype">void</span> <a class="code hl_signal" href="class_s_a_ribbon_bar.html#a6297323791a6a667aaaf22429ad05021">titleBarHeightChanged</a>(<span class="keywordtype">int</span> oldHeight, <span class="keywordtype">int</span> newHeight);</div>
+<div class="line"><a id="l00431" name="l00431"></a><span class="lineno">  431</span> </div>
+<div class="line"><a id="l00436" name="l00436"></a><span class="lineno"><a class="line" href="class_s_a_ribbon_bar.html#a93c68abf4c6a56255db664f9e0075754">  436</a></span>    <span class="keywordtype">void</span> <a class="code hl_signal" href="class_s_a_ribbon_bar.html#a93c68abf4c6a56255db664f9e0075754">actionTriggered</a>(QAction* action);</div>
+<div class="line"><a id="l00437" name="l00437"></a><span class="lineno">  437</span> </div>
+<div class="line"><a id="l00438" name="l00438"></a><span class="lineno">  438</span><span class="keyword">protected</span>:</div>
+<div class="line"><a id="l00439" name="l00439"></a><span class="lineno">  439</span>    <span class="keywordtype">bool</span> eventFilter(QObject* obj, QEvent* e) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00440" name="l00440"></a><span class="lineno">  440</span>    <span class="comment">// 根据情况重置tabbar的宽度，主要针对wps模式</span></div>
+<div class="line"><a id="l00441" name="l00441"></a><span class="lineno">  441</span>    <span class="keywordtype">int</span> calcMinTabBarWidth() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00442" name="l00442"></a><span class="lineno">  442</span>    <span class="comment">// 更新</span></div>
+<div class="line"><a id="l00443" name="l00443"></a><span class="lineno">  443</span>    <span class="keywordtype">void</span> updateCategoryTitleToTabName();</div>
+<div class="line"><a id="l00444" name="l00444"></a><span class="lineno">  444</span>    <span class="comment">// 告知WindowButtonGroup的尺寸</span></div>
+<div class="line"><a id="l00445" name="l00445"></a><span class="lineno">  445</span>    <span class="keywordtype">void</span> setSystemButtonGroupSize(<span class="keyword">const</span> QSize&amp; s);</div>
+<div class="line"><a id="l00446" name="l00446"></a><span class="lineno">  446</span>    <span class="comment">// 设置当前的MainWindow的样式，这个函数是SARibbonMainWindow调用，告知ribbonbar当前MainWindow的样式</span></div>
+<div class="line"><a id="l00447" name="l00447"></a><span class="lineno">  447</span>    <span class="keywordtype">void</span> setMainWindowStyles(SARibbonMainWindowStyles s);</div>
+<div class="line"><a id="l00448" name="l00448"></a><span class="lineno">  448</span><span class="keyword">protected</span> Q_SLOTS:</div>
+<div class="line"><a id="l00449" name="l00449"></a><span class="lineno">  449</span>    <span class="keywordtype">void</span> onWindowTitleChanged(<span class="keyword">const</span> QString&amp; title);</div>
+<div class="line"><a id="l00450" name="l00450"></a><span class="lineno">  450</span>    <span class="keywordtype">void</span> onWindowIconChanged(<span class="keyword">const</span> QIcon&amp; i);</div>
+<div class="line"><a id="l00451" name="l00451"></a><span class="lineno">  451</span>    <span class="keywordtype">void</span> onCategoryWindowTitleChanged(<span class="keyword">const</span> QString&amp; title);</div>
+<div class="line"><a id="l00452" name="l00452"></a><span class="lineno">  452</span>    <span class="keywordtype">void</span> onStackWidgetHided();</div>
+<div class="line"><a id="l00453" name="l00453"></a><span class="lineno">  453</span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> onCurrentRibbonTabChanged(<span class="keywordtype">int</span> index);</div>
+<div class="line"><a id="l00454" name="l00454"></a><span class="lineno">  454</span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> onCurrentRibbonTabClicked(<span class="keywordtype">int</span> index);</div>
+<div class="line"><a id="l00455" name="l00455"></a><span class="lineno">  455</span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> onCurrentRibbonTabDoubleClicked(<span class="keywordtype">int</span> index);</div>
+<div class="line"><a id="l00456" name="l00456"></a><span class="lineno">  456</span>    <span class="keywordtype">void</span> onContextsCategoryPageAdded(<a class="code hl_class" href="class_s_a_ribbon_category.html">SARibbonCategory</a>* category);</div>
+<div class="line"><a id="l00457" name="l00457"></a><span class="lineno">  457</span>    <span class="keywordtype">void</span> onContextsCategoryCategoryNameChanged(<a class="code hl_class" href="class_s_a_ribbon_category.html">SARibbonCategory</a>* category, <span class="keyword">const</span> QString&amp; title);</div>
+<div class="line"><a id="l00458" name="l00458"></a><span class="lineno">  458</span>    <span class="keywordtype">void</span> onTabMoved(<span class="keywordtype">int</span> from, <span class="keywordtype">int</span> to);</div>
+<div class="line"><a id="l00459" name="l00459"></a><span class="lineno">  459</span> </div>
+<div class="line"><a id="l00460" name="l00460"></a><span class="lineno">  460</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00461" name="l00461"></a><span class="lineno">  461</span>    <span class="keywordtype">int</span> tabIndex(<a class="code hl_class" href="class_s_a_ribbon_category.html">SARibbonCategory</a>* obj);</div>
+<div class="line"><a id="l00462" name="l00462"></a><span class="lineno">  462</span>    <span class="keywordtype">void</span> paintInLooseStyle();</div>
+<div class="line"><a id="l00463" name="l00463"></a><span class="lineno">  463</span>    <span class="keywordtype">void</span> paintInCompactStyle();</div>
+<div class="line"><a id="l00464" name="l00464"></a><span class="lineno">  464</span> </div>
+<div class="line"><a id="l00465" name="l00465"></a><span class="lineno">  465</span>    <span class="comment">// 刷新所有ContextCategoryManagerData，这个在单独一个Category删除时调用</span></div>
+<div class="line"><a id="l00466" name="l00466"></a><span class="lineno">  466</span>    <span class="keywordtype">void</span> updateContextCategoryManagerData();</div>
+<div class="line"><a id="l00467" name="l00467"></a><span class="lineno">  467</span>    <span class="keywordtype">void</span> synchronousCategoryData(<span class="keywordtype">bool</span> autoUpdate = <span class="keyword">true</span>);</div>
+<div class="line"><a id="l00468" name="l00468"></a><span class="lineno">  468</span>    <span class="comment">// 把窗口标题文字转换为显示的文字，这里主要针对[*]占位符进行替换</span></div>
+<div class="line"><a id="l00469" name="l00469"></a><span class="lineno">  469</span>    QString toDisplayTitleText(<span class="keyword">const</span> QString&amp; title) <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00470" name="l00470"></a><span class="lineno">  470</span>    <span class="comment">// 获取标题显示的区域</span></div>
+<div class="line"><a id="l00471" name="l00471"></a><span class="lineno">  471</span>    QRect getWindowTitleRect() <span class="keyword">const</span>;</div>
+<div class="line"><a id="l00472" name="l00472"></a><span class="lineno">  472</span> </div>
+<div class="line"><a id="l00473" name="l00473"></a><span class="lineno">  473</span><span class="keyword">protected</span>:</div>
+<div class="line"><a id="l00474" name="l00474"></a><span class="lineno">  474</span>    <span class="keywordtype">void</span> setRibbonMainwindowStyle();</div>
+<div class="line"><a id="l00475" name="l00475"></a><span class="lineno">  475</span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> paintEvent(QPaintEvent* e) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00476" name="l00476"></a><span class="lineno">  476</span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> moveEvent(QMoveEvent* e) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00477" name="l00477"></a><span class="lineno">  477</span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> changeEvent(QEvent* e) <span class="keyword">override</span>;</div>
+<div class="line"><a id="l00478" name="l00478"></a><span class="lineno">  478</span> </div>
+<div class="line"><a id="l00479" name="l00479"></a><span class="lineno">  479</span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> paintTabbarBaseLine(QPainter&amp; painter);</div>
+<div class="line"><a id="l00480" name="l00480"></a><span class="lineno">  480</span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span> paintWindowTitle(QPainter&amp; painter, <span class="keyword">const</span> QString&amp; title, <span class="keyword">const</span> QRect&amp; titleRegion);</div>
+<div class="line"><a id="l00481" name="l00481"></a><span class="lineno">  481</span>    <span class="keyword">virtual</span> <span class="keywordtype">void</span></div>
+<div class="line"><a id="l00482" name="l00482"></a><span class="lineno">  482</span>    paintContextCategoryTab(QPainter&amp; painter, <span class="keyword">const</span> QString&amp; title, <span class="keyword">const</span> QRect&amp; contextRect, <span class="keyword">const</span> QColor&amp; color);</div>
+<div class="line"><a id="l00483" name="l00483"></a><span class="lineno">  483</span><span class="preprocessor">#if SA_DEBUG_PRINT_SARIBBONBAR</span></div>
+<div class="line"><a id="l00484" name="l00484"></a><span class="lineno">  484</span>    SA_RIBBON_EXPORT <span class="keyword">friend</span> QDebug operator&lt;&lt;(QDebug debug, <span class="keyword">const</span> <a class="code hl_class" href="class_s_a_ribbon_bar.html">SARibbonBar</a>&amp; ribbon);</div>
+<div class="line"><a id="l00485" name="l00485"></a><span class="lineno">  485</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00486" name="l00486"></a><span class="lineno">  486</span>};</div>
+</div>
+<div class="line"><a id="l00487" name="l00487"></a><span class="lineno">  487</span>Q_DECLARE_OPERATORS_FOR_FLAGS(SARibbonBar::RibbonStyles)</div>
+<div class="line"><a id="l00488" name="l00488"></a><span class="lineno">  488</span> </div>
+<div class="line"><a id="l00489" name="l00489"></a><span class="lineno">  489</span><span class="keyword">namespace </span>SA</div>
+<div class="line"><a id="l00490" name="l00490"></a><span class="lineno">  490</span>{</div>
+<div class="line"><a id="l00498" name="l00498"></a><span class="lineno">  498</span>QColor SA_RIBBON_EXPORT makeColorVibrant(<span class="keyword">const</span> QColor&amp; c, <span class="keywordtype">int</span> saturationDelta = 150, <span class="keywordtype">int</span> valueDelta = 30);</div>
+<div class="line"><a id="l00499" name="l00499"></a><span class="lineno">  499</span> </div>
+<div class="line"><a id="l00517" name="l00517"></a><span class="lineno">  517</span>QSize scaleSizeByHeight(<span class="keyword">const</span> QSize&amp; originalSize, <span class="keywordtype">int</span> newHeight);</div>
+<div class="line"><a id="l00518" name="l00518"></a><span class="lineno">  518</span> </div>
+<div class="line"><a id="l00537" name="l00537"></a><span class="lineno">  537</span>QSize scaleSizeByHeight(<span class="keyword">const</span> QSize&amp; originalSize, <span class="keywordtype">int</span> newHeight, qreal factor);</div>
+<div class="line"><a id="l00538" name="l00538"></a><span class="lineno">  538</span> </div>
+<div class="line"><a id="l00556" name="l00556"></a><span class="lineno">  556</span>QSize scaleSizeByWidth(<span class="keyword">const</span> QSize&amp; originalSize, <span class="keywordtype">int</span> newWidth);</div>
+<div class="line"><a id="l00557" name="l00557"></a><span class="lineno">  557</span>}</div>
+<div class="line"><a id="l00558" name="l00558"></a><span class="lineno">  558</span><span class="preprocessor">#endif  </span><span class="comment">// SARIBBONBAR_H</span></div>
+<div class="ttc" id="aclass_s_a_ribbon_bar_html"><div class="ttname"><a href="class_s_a_ribbon_bar.html">SARibbonBar</a></div><div class="ttdoc">SARibbonBar继承于QMenuBar,在SARibbonMainWindow中直接替换了原来的QMenuBar</div><div class="ttdef"><b>Definition</b> SARibbonBar.h:93</div></div>
+<div class="ttc" id="aclass_s_a_ribbon_bar_html_a00f6355e3175ff1eb2d06b607c600488"><div class="ttname"><a href="class_s_a_ribbon_bar.html#a00f6355e3175ff1eb2d06b607c600488">SARibbonBar::RibbonMode</a></div><div class="ttdeci">RibbonMode</div><div class="ttdoc">定义当前ribbon 的状态</div><div class="ttdef"><b>Definition</b> SARibbonBar.h:130</div></div>
+<div class="ttc" id="aclass_s_a_ribbon_bar_html_a00f6355e3175ff1eb2d06b607c600488a67aa36c2caad880c5d1e5eb986c12ccf"><div class="ttname"><a href="class_s_a_ribbon_bar.html#a00f6355e3175ff1eb2d06b607c600488a67aa36c2caad880c5d1e5eb986c12ccf">SARibbonBar::MinimumRibbonMode</a></div><div class="ttdeci">@ MinimumRibbonMode</div><div class="ttdoc">缩小模式</div><div class="ttdef"><b>Definition</b> SARibbonBar.h:131</div></div>
+<div class="ttc" id="aclass_s_a_ribbon_bar_html_a466b9bf5d89406b0170a62763d585e22"><div class="ttname"><a href="class_s_a_ribbon_bar.html#a466b9bf5d89406b0170a62763d585e22">SARibbonBar::ribbonStyleChanged</a></div><div class="ttdeci">void ribbonStyleChanged(SARibbonBar::RibbonStyles nowStyle)</div><div class="ttdoc">ribbon的状态发生了变化后触发此信号</div></div>
+<div class="ttc" id="aclass_s_a_ribbon_bar_html_a52aa893b23e58177a5837d100c82d8b2"><div class="ttname"><a href="class_s_a_ribbon_bar.html#a52aa893b23e58177a5837d100c82d8b2">SARibbonBar::ribbonModeChanged</a></div><div class="ttdeci">void ribbonModeChanged(SARibbonBar::RibbonMode nowState)</div><div class="ttdoc">ribbon的状态发生了变化后触发此信号</div></div>
+<div class="ttc" id="aclass_s_a_ribbon_bar_html_a5a2b3d64effa794ce6c76ccd9dce448a"><div class="ttname"><a href="class_s_a_ribbon_bar.html#a5a2b3d64effa794ce6c76ccd9dce448a">SARibbonBar::FpContextCategoryHighlight</a></div><div class="ttdeci">std::function&lt; QColor(const QColor &amp;) &gt; FpContextCategoryHighlight</div><div class="ttdoc">这是针对上下文标签的高亮颜色绘制，用户可以设置一个函数指针，来针对上下文标签的高亮颜色进行调整</div><div class="ttdef"><b>Definition</b> SARibbonBar.h:141</div></div>
+<div class="ttc" id="aclass_s_a_ribbon_bar_html_a6297323791a6a667aaaf22429ad05021"><div class="ttname"><a href="class_s_a_ribbon_bar.html#a6297323791a6a667aaaf22429ad05021">SARibbonBar::titleBarHeightChanged</a></div><div class="ttdeci">void titleBarHeightChanged(int oldHeight, int newHeight)</div><div class="ttdoc">标题栏高度发生了变化的信号</div></div>
+<div class="ttc" id="aclass_s_a_ribbon_bar_html_a6a09234c0ea31ac766b2be2413ea81b5"><div class="ttname"><a href="class_s_a_ribbon_bar.html#a6a09234c0ea31ac766b2be2413ea81b5">SARibbonBar::currentRibbonTabChanged</a></div><div class="ttdeci">void currentRibbonTabChanged(int index)</div><div class="ttdoc">标签页变化触发的信号</div></div>
+<div class="ttc" id="aclass_s_a_ribbon_bar_html_a93c68abf4c6a56255db664f9e0075754"><div class="ttname"><a href="class_s_a_ribbon_bar.html#a93c68abf4c6a56255db664f9e0075754">SARibbonBar::actionTriggered</a></div><div class="ttdeci">void actionTriggered(QAction *action)</div><div class="ttdoc">参考QToolBar::actionTriggered的信号</div></div>
+<div class="ttc" id="aclass_s_a_ribbon_bar_html_ac2a1554ddb5825d7866968152239b1df"><div class="ttname"><a href="class_s_a_ribbon_bar.html#ac2a1554ddb5825d7866968152239b1df">SARibbonBar::RibbonStyleFlag</a></div><div class="ttdeci">RibbonStyleFlag</div><div class="ttdef"><b>Definition</b> SARibbonBar.h:111</div></div>
+<div class="ttc" id="aclass_s_a_ribbon_bar_html_aeffbee6347a079f3afb1d2727b45a057"><div class="ttname"><a href="class_s_a_ribbon_bar.html#aeffbee6347a079f3afb1d2727b45a057">SARibbonBar::applicationButtonClicked</a></div><div class="ttdeci">void applicationButtonClicked()</div><div class="ttdoc">应用按钮点击响应 - 左上角的按钮，通过关联此信号触发应用按钮点击的效果</div></div>
+<div class="ttc" id="aclass_s_a_ribbon_button_group_widget_html"><div class="ttname"><a href="class_s_a_ribbon_button_group_widget.html">SARibbonButtonGroupWidget</a></div><div class="ttdoc">用于管理一组Action,类似于QToolBar</div><div class="ttdef"><b>Definition</b> SARibbonButtonGroupWidget.h:13</div></div>
+<div class="ttc" id="aclass_s_a_ribbon_category_html"><div class="ttname"><a href="class_s_a_ribbon_category.html">SARibbonCategory</a></div><div class="ttdoc">Ribbon控件中的分类选项卡页面（Category）</div><div class="ttdef"><b>Definition</b> SARibbonCategory.h:23</div></div>
+<div class="ttc" id="aclass_s_a_ribbon_context_category_html"><div class="ttname"><a href="class_s_a_ribbon_context_category.html">SARibbonContextCategory</a></div><div class="ttdoc">管理上下文标签的类</div><div class="ttdef"><b>Definition</b> SARibbonContextCategory.h:11</div></div>
+<div class="ttc" id="aclass_s_a_ribbon_element_factory_html"><div class="ttname"><a href="class_s_a_ribbon_element_factory.html">SARibbonElementFactory</a></div><div class="ttdoc">SARibbon的子元素创建的工厂，SARibbon内部创建子元素都通过SARibbonElementFactory来创建</div><div class="ttdef"><b>Definition</b> SARibbonElementFactory.h:35</div></div>
+<div class="ttc" id="aclass_s_a_ribbon_main_window_html"><div class="ttname"><a href="class_s_a_ribbon_main_window.html">SARibbonMainWindow</a></div><div class="ttdoc">如果要使用SARibbonBar，必须使用此类代替QMainWindow</div><div class="ttdef"><b>Definition</b> SARibbonMainWindow.h:60</div></div>
+<div class="ttc" id="aclass_s_a_ribbon_pannel_html_a9da35ca039ab4045209d5614e4566219"><div class="ttname"><a href="class_s_a_ribbon_pannel.html#a9da35ca039ab4045209d5614e4566219">SARibbonPannel::PannelLayoutMode</a></div><div class="ttdeci">PannelLayoutMode</div><div class="ttdef"><b>Definition</b> SARibbonPannel.h:64</div></div>
+<div class="ttc" id="aclass_s_a_ribbon_quick_access_bar_html"><div class="ttname"><a href="class_s_a_ribbon_quick_access_bar.html">SARibbonQuickAccessBar</a></div><div class="ttdoc">ribbon左上顶部的快速响应栏</div><div class="ttdef"><b>Definition</b> SARibbonQuickAccessBar.h:13</div></div>
+<div class="ttc" id="aclass_s_a_ribbon_stacked_widget_html"><div class="ttname"><a href="class_s_a_ribbon_stacked_widget.html">SARibbonStackedWidget</a></div><div class="ttdoc">具有弹出式菜单功能的堆叠窗口部件</div><div class="ttdef"><b>Definition</b> SARibbonStackedWidget.h:23</div></div>
+<div class="ttc" id="aclass_s_a_ribbon_system_button_bar_html"><div class="ttname"><a href="class_s_a_ribbon_system_button_bar.html">SARibbonSystemButtonBar</a></div><div class="ttdoc">窗口的最大最小化按钮</div><div class="ttdef"><b>Definition</b> SARibbonSystemButtonBar.h:27</div></div>
+<div class="ttc" id="aclass_s_a_ribbon_tab_bar_html"><div class="ttname"><a href="class_s_a_ribbon_tab_bar.html">SARibbonTabBar</a></div><div class="ttdoc">The SARibbonTabBar class</div><div class="ttdef"><b>Definition</b> SARibbonTabBar.h:11</div></div>
+</div><!-- fragment --></div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="dir_e2d4cc23cf2ba44ad8b50ed52b6a09e1.html">SARibbonBar</a></li><li class="navelem"><b>SARibbonBar.h</b></li>
+    <li class="footer">制作者 <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.10.0 </li>
+  </ul>
+</div>
+</body>
+</html>
