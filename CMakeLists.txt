@@ -6,7 +6,7 @@ cmake_minimum_required(VERSION 3.5)
 
 set(SARIBBON_VERSION_MAJOR 2)
 set(SARIBBON_VERSION_MINOR 4)
-set(SARIBBON_VERSION_PATCH 1)
+set(SARIBBON_VERSION_PATCH 2)
 
 set(SARIBBON_VERSION "${SARIBBON_VERSION_MAJOR}.${SARIBBON_VERSION_MINOR}.${SARIBBON_VERSION_PATCH}")
 message(STATUS "SARibbon v${SARIBBON_VERSION}")
@@ -79,8 +79,8 @@ endif()
 
 set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "add a postfix, usually d on windows")
 set(CMAKE_RELEASE_POSTFIX "" CACHE STRING "add a postfix, usually empty on windows")
-set(CMAKE_RELWITHDEBINFO_POSTFIX "rd" CACHE STRING "add a postfix, usually empty on windows")
-set(CMAKE_MINSIZEREL_POSTFIX "s" CACHE STRING "add a postfix, usually empty on windows")
+set(CMAKE_RELWITHDEBINFO_POSTFIX "" CACHE STRING "add a postfix, usually empty on windows")
+set(CMAKE_MINSIZEREL_POSTFIX "" CACHE STRING "add a postfix, usually empty on windows")
 # Set the build postfix extension according to what configuration is being built.
 
 if(CMAKE_BUILD_TYPE MATCHES "Release")

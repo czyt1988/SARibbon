@@ -1,5 +1,10 @@
 ﻿# 版本记录(change log):
 
+## 2025-07-31 -> 2.4.2
+
+- 调整了`SARibbonApplicationButton`的布局比例，让其更协调
+- 调整了文档
+
 ## 2025-07-14 -> 2.4.1
 
 - 调整了SARibbonBar的布局方式，添加了SARibbonBarLayout类

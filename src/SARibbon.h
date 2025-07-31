@@ -97,14 +97,14 @@
  * @def ribbon的数字版本 MAJ.MIN.{PAT}
  */
 #ifndef SA_RIBBON_BAR_VERSION_PAT
-#define SA_RIBBON_BAR_VERSION_PAT 1
+#define SA_RIBBON_BAR_VERSION_PAT 2
 #endif
 
 /**
  * @def 版本号（字符串）
  */
 #ifndef SARIBBON_VERSION
-#define SARIBBON_VERSION "2.4.1"
+#define SARIBBON_VERSION "2.4.2"
 #endif
 
 #endif  // SARIBBONVERSIONINFO_H
@@ -3191,6 +3191,26 @@ QColor SA_RIBBON_EXPORT makeColorVibrant(const QColor& c, int saturationDelta = 
  * @endcode
  */
 QSize scaleSizeByHeight(const QSize& originalSize, int newHeight);
+
+/**
+ * @brief 按照指定的新高度，宽高比为1:factor缩放 QSize。
+ *
+ * 此函数根据原始尺寸的宽高比，计算出在指定新高度下的对应宽度，
+ * 并返回一个新的 QSize 对象。
+ *
+ * @param originalSize 原始尺寸。
+ * @param newHeight    缩放后的新高度。
+ * @param factor    宽高比 1:factor factor=1时，此函数和scaleSizeByHeight的两参数版本一样，如果factor=0.5，则宽高比为1:0.5，也就是高度扩充2倍，宽度扩充1倍
+ * @return             按比例缩放后的 QSize。
+ *
+ * @par 示例：
+ * @code
+ * QSize original(800, 600);
+ * QSize scaled = scaleSizeByHeight(original, 300, 2);
+ * // scaled 将是 (600, 300)
+ * @endcode
+ */
+QSize scaleSizeByHeight(const QSize& originalSize, int newHeight, qreal factor);
 
 /**
  * @brief 按照指定的新宽度，保持宽高比缩放 QSize。
