@@ -1,0 +1,724 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.10.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>SARibbon: SARibbon</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<script type="text/javascript" src="clipboard.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<script type="text/javascript" src="cookie.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="SA-logo.png"/></td>
+  <td id="projectalign">
+   <div id="projectname">SARibbon<span id="projectnumber">&#160;2.4.2</span>
+   </div>
+   <div id="projectbrief">SARibbon wiki</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.10.0 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','搜索');
+  $(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function(){initNavTree('index.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div><div class="header">
+  <div class="headertitle"><div class="title">SARibbon </div></div>
+</div><!--header-->
+<div class="contents">
+<div class="textblock"><p><a class="anchor" id="md__c_1_2src_2_qt_2_s_a_ribbon_2readme-cn"></a> Click here for English</p>
+<div align="center"> </div><div align="center"> <img src="https://img.shields.io/badge/C++-17-blue" alt="" class="inline"/> <img src="https://img.shields.io/badge/ -5.14+-green" alt="" class="inline"/> <img src="https://img.shields.io/badge/Qt-6-green" alt="" class="inline"/> <img src="https://img.shields.io/badge/license-MIT-yellow" alt="" class="inline"/> </div><div align="center"> </div><div align="center"> <img src="https://img.shields.io/badge/windows-0077d6" alt="" class="inline"/> <img src="https://img.shields.io/badge/ubuntu-ed6432" alt="" class="inline"/> <img src="https://img.shields.io/badge/macos-000" alt="" class="inline"/> </div><div align="center"> </div><p>QQ交流群:434014314</p>
+<div align="center"> <img src="./doc/SARibbon-qq%E4%BA%A4%E6%B5%81%E7%BE%A4.jpg" alt="" style="width:300px;" class="inline"/> </div><table class="markdownTable">
+<tr class="markdownTableHead">
+<th class="markdownTableHeadLeft"></th><th class="markdownTableHeadLeft">Windows(latest)   </th><th class="markdownTableHeadLeft">Linux ubuntu(latest)   </th><th class="markdownTableHeadLeft">Mac(latest)    </th></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft">Qt5.12 LTS   </td><td class="markdownTableBodyLeft"><a href="https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt5.12.yml"><img src="https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt5.12.yml/badge.svg" alt="cmake-win-qt5.12" style="pointer-events: none;" class="inline"/></a>   </td><td class="markdownTableBodyLeft"><a href="https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt5.12.yml"><img src="https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt5.12.yml/badge.svg" alt="CMake-Linux-Qt5.12" style="pointer-events: none;" class="inline"/></a>   </td><td class="markdownTableBodyLeft"><a href="https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt5.12.yml"><img src="https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt5.12.yml/badge.svg" alt="cmake-mac-qt5.12" style="pointer-events: none;" class="inline"/></a>    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft">Qt5.14   </td><td class="markdownTableBodyLeft"><a href="https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt5.14.yml"><img src="https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt5.14.yml/badge.svg" alt="cmake-win-qt5.14" style="pointer-events: none;" class="inline"/></a>   </td><td class="markdownTableBodyLeft"><a href="https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt5.14.yml"><img src="https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt5.14.yml/badge.svg" alt="CMake-Linux-Qt5.14" style="pointer-events: none;" class="inline"/></a>   </td><td class="markdownTableBodyLeft"><a href="https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt5.14.yml"><img src="https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt5.14.yml/badge.svg" alt="cmake-mac-qt5.14" style="pointer-events: none;" class="inline"/></a>    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft">Qt5.15 LTS   </td><td class="markdownTableBodyLeft"><a href="https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt5.15.yml"><img src="https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt5.15.yml/badge.svg" alt="cmake-win-qt5.15" style="pointer-events: none;" class="inline"/></a>   </td><td class="markdownTableBodyLeft"><a href="https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt5.15.yml"><img src="https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt5.15.yml/badge.svg" alt="CMake-Linux-Qt5.15" style="pointer-events: none;" class="inline"/></a>   </td><td class="markdownTableBodyLeft"><a href="https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt5.15.yml"><img src="https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt5.15.yml/badge.svg" alt="cmake-mac-qt5.15" style="pointer-events: none;" class="inline"/></a>    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft">Qt6.2 LTS   </td><td class="markdownTableBodyLeft"><a href="https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt6.2.yml"><img src="https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt6.2.yml/badge.svg" alt="cmake-win-qt6.2" style="pointer-events: none;" class="inline"/></a>   </td><td class="markdownTableBodyLeft"><a href="https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt6.2.yml"><img src="https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt6.2.yml/badge.svg" alt="CMake-Linux-Qt6.2" style="pointer-events: none;" class="inline"/></a>   </td><td class="markdownTableBodyLeft"><a href="https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt6.2.yml"><img src="https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt6.2.yml/badge.svg" alt="cmake-mac-qt6.2" style="pointer-events: none;" class="inline"/></a>    </td></tr>
+<tr class="markdownTableRowOdd">
+<td class="markdownTableBodyLeft">Qt6.5 LTS   </td><td class="markdownTableBodyLeft"><a href="https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt6.5.yml"><img src="https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt6.5.yml/badge.svg" alt="cmake-win-qt6.5" style="pointer-events: none;" class="inline"/></a>   </td><td class="markdownTableBodyLeft"><a href="https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt6.5.yml"><img src="https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt6.5.yml/badge.svg" alt="CMake-Linux-Qt6.5" style="pointer-events: none;" class="inline"/></a>   </td><td class="markdownTableBodyLeft"><a href="https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt6.5.yml"><img src="https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt6.5.yml/badge.svg" alt="cmake-mac-qt6.5" style="pointer-events: none;" class="inline"/></a>    </td></tr>
+<tr class="markdownTableRowEven">
+<td class="markdownTableBodyLeft">Qt6.8 LTS   </td><td class="markdownTableBodyLeft"><a href="https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt6.8.yml"><img src="https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt6.8.yml/badge.svg" alt="cmake-win-qt6.8" style="pointer-events: none;" class="inline"/></a>   </td><td class="markdownTableBodyLeft"><a href="https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt6.8.yml"><img src="https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt6.8.yml/badge.svg" alt="CMake-Linux-Qt6.8" style="pointer-events: none;" class="inline"/></a>   </td><td class="markdownTableBodyLeft"><a href="https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt6.8.yml"><img src="https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt6.8.yml/badge.svg" alt="cmake-mac-qt6.8" style="pointer-events: none;" class="inline"/></a>   </td></tr>
+</table>
+<h1><a class="anchor" id="saribbon简介"></a>
+SARibbon简介</h1>
+<p>这是一个<code>Qt</code>下的<code>Ribbon</code>界面控件，提供了类似微软Office系列软件的操作界面。</p>
+<ul>
+<li><code>SARibbon</code>适用于大型软件、工业软件、复杂软件的ui</li>
+<li><code>SARibbon</code>在设计时参考了MFC Ribbon接口的命名风格</li>
+<li><code>SARibbon</code>的界面样式参考了微软Office系列软件以及WPS软件的Ribbon界面，并结合了两者的优点</li>
+<li><code>SARibbon</code>是一个可定义多种主题风格的Ribbon控件，它能通过qss快速的定义出自己想要的主题风格</li>
+</ul>
+<p>为了方便大型软件的开发，<code>SARibbon</code>对常用的一些功能性控件进行了封装，例如：<a href="https://github.com/czyt1988/SAColorWidgets">颜色选择按钮和颜色选择画板</a></p>
+<h2><a class="anchor" id="功能特点"></a>
+功能特点</h2>
+<ul>
+<li>针对Ribbon的布局和显示</li>
+</ul>
+<p><img src="./doc/screenshot/SARibbonBar-overview.png" alt="Ribbon的布局和显示" class="inline"/></p>
+<ul>
+<li>支持最小化模式，ribbon只显示标签（默认双击标签会进行切换）,支持上下文标签tab</li>
+</ul>
+<div class="image">
+<img src="SARibbonBar-minMode.gif" alt=""/>
+<div class="caption">
+SARibbon最小化模式</div></div>
+    <ul>
+<li>支持quickAccessBar（word快速菜单）和rightButtonGroup，在不同布局模式下会有不同的显示效果</li>
+<li>支持4种不同的ribbon button，普通按钮，延迟弹出菜单按钮，菜单按钮，action菜单按钮（action菜单按钮是此ribbon控件最主要解决的问题之一）</li>
+</ul>
+<div class="image">
+<img src="SARibbonBar-ribbonbutton.gif" alt=""/>
+<div class="caption">
+SARibbon-4种不同的ribbon button</div></div>
+    <ul>
+<li>支持4种不同风格的布局样式</li>
+</ul>
+<div class="image">
+<img src="SARibbonBar-style.gif" alt=""/>
+<div class="caption">
+SARibbon-4种不同风格的布局样式</div></div>
+    <ul>
+<li>支持qss对ribbon进行自定义设置，可实时切换主题,内置了6种不同风格的主题</li>
+</ul>
+<p>win7主题： <img src="SARibbon-theme-win7.png" alt="" class="inline" title="SARibbon-theme-win7"/>     office2013主题： <img src="SARibbon-theme-office2013.png" alt="" class="inline" title="SARibbon-theme-office2013"/>     office2016主题： <img src="SARibbon-theme-office2016.png" alt="" class="inline" title="SARibbon-theme-office2016"/>     office2021主题： <img src="SARibbon-theme-office2021.png" alt="" class="inline" title="SARibbon-theme-office2021"/>     dark主题： <img src="SARibbon-theme-dark.png" alt="" class="inline" title="SARibbon-theme-dark"/>     dark2主题： <img src="./doc/screenshot/SARibbon-theme-dark2.png" alt="SARibbon-theme-dark" class="inline"/></p>
+<ul>
+<li>提供Gallery控件</li>
+</ul>
+<p><img src="./doc/screenshot/SARibbonBar-gallery.png" alt="" class="inline"/></p>
+<ul>
+<li>支持超长滚动和Option Action</li>
+</ul>
+<div class="image">
+<img src="SARibbonBar-option-action.gif" alt=""/>
+</div>
+    <ul>
+<li>提供居中对齐模式</li>
+</ul>
+<div class="image">
+<img src="SARibbon-aligment-center.png" alt=""/>
+</div>
+    <ul>
+<li>支持4K屏和多屏幕扩展</li>
+<li>支持linux和MacOS（界面未做深度适配）</li>
+</ul>
+<p>MIT协议，欢迎大家使用并提出意见</p>
+<p><a href="https://gitee.com/czyt1988/SARibbon">gitee(码云) - https://gitee.com/czyt1988/SARibbon</a></p>
+<p><a href="https://github.com/czyt1988/SARibbon">github - https://github.com/czyt1988/SARibbon</a></p>
+<h1><a class="anchor" id="构建"></a>
+构建</h1>
+<p>这里建议使用cmake进行构建，cmake构建完成后并进行安装（install），使用cmake构建，你的工程既可以用cmake引入SARibbonBar，也可以使用qmake引入SARibbonBar</p>
+<p>SARibbon提供qmake和cmake两种构建方式，同时提供了一个集成的SARibbon.h和SARibbon.cpp文件可以快速静态的嵌入到工程中</p>
+<blockquote class="doxtable">
+<p>&zwj;SARibbon支持第三方无边框库<a href="https://github.com/stdware/qwindowkit">QWindowkit</a>，同时也支持简单的无边框方案，如果你需要操作系统原生的窗口支持，如windows7以后的贴边处理，windows11的最大化按钮悬停的效果，建议开启<a href="https://github.com/stdware/qwindowkit">QWindowkit</a>库，<a href="https://github.com/stdware/qwindowkit">QWindowkit</a>库还能较好解决多屏幕移动问题 </p>
+</blockquote>
+<p>开启<code>QWindowkit</code>后的效果如下：</p>
+<p><img src="./doc/pic/set-qwindowkit-on-snap.gif" alt="" class="inline"/></p>
+<p>如果你要依赖<a href="https://github.com/stdware/qwindowkit">QWindowkit</a>库，需要先编译<a href="https://github.com/stdware/qwindowkit">QWindowkit</a>库，<a href="https://github.com/stdware/qwindowkit">QWindowkit</a>库作为SARibbon项目的submodules，如果在<code>git clone</code>时没有附带<code>--recursive</code>参数，需要执行<code>submodule update</code>命令:</p>
+<div class="fragment"><div class="line">git submodule update --init --recursive</div>
+</div><!-- fragment --><blockquote class="doxtable">
+<p>&zwj;用户指定使用<a href="https://github.com/stdware/qwindowkit">QWindowkit</a>后，要求C++标准最低为C++17否则最低要求为c++14 </p>
+</blockquote>
+<h2><a class="anchor" id="编译为动态库"></a>
+编译为动态库</h2>
+<p>具体构建过程，见文档：SARibbon构建</p>
+<h2><a class="anchor" id="静态引入工程"></a>
+静态引入工程</h2>
+<p>你可以不对SARibbon库进行构建，直接引入</p>
+<p>SARibbon提供了合并好的<code>SARibbon.h</code>文件和<code>SARibbon.cpp</code>文件，资源文件也都合并进<code>SARibbon.cpp</code>中，只需要在自己的工程中引入这两个文件即可，无需编译为动态库，可以参考StaticExample例子（位于<code>example/StaticExample</code>）</p>
+<h3><a class="anchor" id="使用qmake"></a>
+使用qmake</h3>
+<p>使用qmake编译，有如下步骤：</p>
+<ul>
+<li>1. 把<code>SARibbon.h</code>、<code>SARibbon.cpp</code>、<code>SARibbon.pri</code>（位于<code>./src</code>目录下）拷贝到自己工程目录下</li>
+<li>2. 在自己工程的pro文件中引入<code>SARibbon.pri</code>文件，如：<code>include($$PWD/SARibbon.pri)</code></li>
+</ul>
+<p>qmake可以通过<code>SARibbon.pri</code>文件设置是否开启第三方无边框库</p>
+<h3><a class="anchor" id="使用cmake"></a>
+使用cmake</h3>
+<p>使用cmake的话参考StaticExample（位于<code>example/StaticExample</code>）例子的cmake编写方式编写，把<code>SARibbon.h</code>、<code>SARibbon.cpp</code>引入工程即可</p>
+<div class="fragment"><div class="line">set(SARIBBON_FILES</div>
+<div class="line">    SARibbon.h</div>
+<div class="line">    SARibbon.cpp</div>
+<div class="line">)</div>
+<div class="line">add_executable({you-target} </div>
+<div class="line">            {你项目的cpp和头文件}</div>
+<div class="line">            ${SARIBBON_FILES}</div>
+<div class="line">)</div>
+</div><!-- fragment --><p>如果你需要使用<code>QWindowkit</code>,你的工程要引入<code>QWindowkit</code>库，并且增加预定义宏：</p>
+<div class="fragment"><div class="line">find_package(QWindowKit)</div>
+<div class="line">target_link_libraries({you-target} PRIVATE QWindowKit::Widgets)</div>
+<div class="line">target_compile_definitions({you-target} PRIVATE SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1)</div>
+</div><!-- fragment --><p>否则你需要把它设置为0</p>
+<div class="fragment"><div class="line">target_compile_definitions({you-target} PRIVATE SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=0)</div>
+</div><!-- fragment --><h1><a class="anchor" id="使用方法"></a>
+使用方法</h1>
+<h2><a class="anchor" id="引入库"></a>
+引入库</h2>
+<p>在编译完成后，按照如下方法引入SARibbon</p>
+<h3><a class="anchor" id="qmake"></a>
+qmake</h3>
+<ul>
+<li>1. 把<code>SARibbon.h</code>、<code>SARibbon.cpp</code>、<code>SARibbon.pri</code>（位于<code>./src</code>目录下）拷贝到自己工程目录下</li>
+<li><p class="startli">2. 在自己工程的pro文件中引入<code>SARibbon.pri</code>文件，如：<code>include($$PWD/SARibbon.pri)</code></p>
+<p class="startli"><code>SARibbon.pri</code>文件可进行设置，具体可参见文件中的注释</p>
+</li>
+</ul>
+<h3><a class="anchor" id="cmake"></a>
+cmake</h3>
+<p>如果你是动态构建，在执行install后使用此库</p>
+<p>cmake引入方法：</p>
+<p>设置你的<code><a class="el" href="class_s_a_ribbon_bar.html" title="SARibbonBar继承于QMenuBar,在SARibbonMainWindow中直接替换了原来的QMenuBar">SARibbonBar</a></code>安装目录，如：</p>
+<div class="fragment"><div class="line">set(SARibbonBar_DIR &quot;[你的SARibbonBar安装根目录]/lib/cmake&quot;)</div>
+</div><!-- fragment --><p>通过find_package引入</p>
+<div class="fragment"><div class="line">find_package(SARibbonBar REQUIRED)</div>
+<div class="line">...</div>
+<div class="line">target_link_libraries({your_target_name} PUBLIC SARibbonBar::SARibbonBar)</div>
+</div><!-- fragment --><h2><a class="anchor" id="快速开始"></a>
+快速开始</h2>
+<p>Ribbon是把菜单栏和工具栏合并了，并通过一个tab控件进行展示，Ribbon是无法简单的使用Tab+Toolbar替代的，涉及到很多细节问题，<code>SARibbon</code>在设计时参考了MFC Ribbon接口的命名风格，标签页称之为<code>Category</code>(种类)，每个<code>Category</code>下面有多个<code>pannel</code>（面板），面板下面管理着toolbutton，<code>pannel</code>有点类似传统的<code>Toolbar</code>，其层次结构如下图所示，这些命名参考了MFC的ribbon界面类</p>
+<div class="image">
+<img src="msdn-ribbon.png" alt=""/>
+<div class="caption">
+msdn ribbon 介绍页</div></div>
+    <p>一些常见的名词解释如下</p>
+<ul>
+<li><b>Category 类别**，代表一个标签所呈现的内容，对应<code><a class="el" href="class_s_a_ribbon_category.html" title="Ribbon控件中的分类选项卡页面（Category）">SARibbonCategory</a></code></b></li>
+<li><b>**Context Category 上下文类别**，这个是一种特殊的类别，它正常不显示，需要基于上下文判断是否应该显示，最常用的就是word中插入图片后，会有图片修改相关的标签出现，如果没选中图片，这个标签就消失，这个就是上下文类别，对应<code><a class="el" href="class_s_a_ribbon_context_category.html" title="管理上下文标签的类">SARibbonContextCategory</a></code></b></li>
+<li><b>**Pannel 面板**，这个是一组菜单的集合，类似一个Toolbar，对应<code><a class="el" href="class_s_a_ribbon_pannel.html" title="pannel页窗口，pannel是ribbon的面板用于承放控件">SARibbonPannel</a></code></b></li>
+<li><b>**Application Button 应用按钮**，标签栏最左边的按钮（word就是对应文件按钮），这个按钮会触发一些特殊的页面或菜单，对应<code><a class="el" href="class_s_a_ribbon_application_button.html" title="The SARibbonApplicationButton class">SARibbonApplicationButton</a></code>,可以隐藏</b></li>
+<li><b>**Quick Access Bar 快速响应栏**，位于最顶部的一个简单工具栏，用于放置一些常用的action，对应<code><a class="el" href="class_s_a_ribbon_quick_access_bar.html" title="ribbon左上顶部的快速响应栏">SARibbonQuickAccessBar</a></code></b></li>
+<li><b>**Gallery 预览控件</b>,这是Ribbon最吸引眼球的控件，用直观的图像把功能显示出来，甚至有些会根据上下文进行实时渲染，典型的就是word开始标签下的样式选择，对应<code><a class="el" href="class_s_a_ribbon_gallery.html" title="Gallery控件">SARibbonGallery</a></code></li>
+</ul>
+<p>SARibbonBar的层次如下图所示：</p>
+<div class="image">
+<img src="saribbonbar-level.png" alt=""/>
+</div>
+    <blockquote class="doxtable">
+<p>&zwj;注：不同的布局方案影响着<code>Category</code>和<code>Quick Access Bar</code>的摆放方式，具体可见SARibbonBar布局方案 </p>
+</blockquote>
+<p><b>你可以通过<code>example/MainWindowExample</code>例子来学习SARibbon的使用，你也可以点击这个例子的窗口，体验SARibbon的一些功能</b></p>
+<h3><a class="anchor" id="在mainwindow中使用ribbon"></a>
+在MainWindow中使用Ribbon</h3>
+<p>要MainWindow中使用SARibbon，需要把<code>QMainWindow</code>替换为<code><a class="el" href="class_s_a_ribbon_main_window.html" title="如果要使用SARibbonBar，必须使用此类代替QMainWindow">SARibbonMainWindow</a></code>，<code><a class="el" href="class_s_a_ribbon_main_window.html" title="如果要使用SARibbonBar，必须使用此类代替QMainWindow">SARibbonMainWindow</a></code>修改了<code>QMainWindow</code>对menubar的渲染方式</p>
+<blockquote class="doxtable">
+<p>&zwj;注意，如果使用ui文件，要把原来ui文件的菜单删除，否则可能引起一些异常，如下图所示： <img src="./doc/pic/remove-menu-bar-at-uifile.png" alt="" class="inline"/> </p>
+</blockquote>
+<p>示例代码如下:</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;SARibbonMainWindow.h&quot;</span></div>
+<div class="line"><span class="keyword">class </span>MainWindow : <span class="keyword">public</span> <a class="code hl_class" href="class_s_a_ribbon_main_window.html">SARibbonMainWindow</a></div>
+<div class="line">{</div>
+<div class="line">    Q_OBJECT</div>
+<div class="line"><span class="keyword">public</span>:</div>
+<div class="line">    MainWindow(QWidget* par = <span class="keyword">nullptr</span>);</div>
+<div class="line">    ...</div>
+<div class="line">}</div>
+<div class="ttc" id="aclass_s_a_ribbon_main_window_html"><div class="ttname"><a href="class_s_a_ribbon_main_window.html">SARibbonMainWindow</a></div><div class="ttdoc">如果要使用SARibbonBar，必须使用此类代替QMainWindow</div><div class="ttdef"><b>Definition</b> SARibbonMainWindow.h:60</div></div>
+</div><!-- fragment --><p><code><a class="el" href="class_s_a_ribbon_main_window.html" title="如果要使用SARibbonBar，必须使用此类代替QMainWindow">SARibbonMainWindow</a></code>也支持普通模式的渲染，SARibbonMainWindow的构造函数第二个参数用于设定是否用ribbon模式：</p>
+<div class="fragment"><div class="line"><a class="code hl_class" href="class_s_a_ribbon_main_window.html">SARibbonMainWindow</a>(QWidget *parent = <span class="keyword">nullptr</span>, <span class="keywordtype">bool</span> useRibbon = <span class="keyword">true</span>);</div>
+</div><!-- fragment --><p>第二个参数如果设置为false，将会使用普通的菜单工具栏模式，预留这个接口是为了一些项目需要能在ribbon和经典菜单工具栏切换的场景设计的，Ribbon状态和经典状态不支持热切换，如果需要切换，用户可以设置一个配置文件或者注册表，在应用重启时给第二个参数传入false即可进入到经典菜单工具栏模式</p>
+<h3><a class="anchor" id="在qwidget或qdialog中使用saribbonbar"></a>
+在QWidget或QDialog中使用SARibbonBar</h3>
+<p>SARibbonBar支持在QWidget或者QDialog上使用，具体可见例子：<code>example/WidgetWithRibbon</code></p>
+<p>项目提供了<code><a class="el" href="class_s_a_ribbon_widget.html" title="带SARibbonBar的Widget">SARibbonWidget</a></code>类，widget窗口继承<code><a class="el" href="class_s_a_ribbon_widget.html" title="带SARibbonBar的Widget">SARibbonWidget</a></code>即可实现ribbon效果的窗口</p>
+<div class="fragment"><div class="line"><span class="preprocessor">#include &quot;SARibbonWidget.h&quot;</span></div>
+<div class="line"> </div>
+<div class="line"><span class="keyword">class </span>RibbonWidget : <span class="keyword">public</span> <a class="code hl_class" href="class_s_a_ribbon_widget.html">SARibbonWidget</a></div>
+<div class="line">{</div>
+<div class="line"> Q_OBJECT</div>
+<div class="line"><span class="keyword">public</span>:</div>
+<div class="line">    RibbonWidget(QWidget* parent = <span class="keyword">nullptr</span>);</div>
+<div class="line">};</div>
+<div class="ttc" id="aclass_s_a_ribbon_widget_html"><div class="ttname"><a href="class_s_a_ribbon_widget.html">SARibbonWidget</a></div><div class="ttdoc">带SARibbonBar的Widget</div><div class="ttdef"><b>Definition</b> SARibbonWidget.h:16</div></div>
+</div><!-- fragment --><p><code><a class="el" href="class_s_a_ribbon_widget.html" title="带SARibbonBar的Widget">SARibbonWidget</a></code>类提供了<code>setWidget</code>方法，可以嵌入任意的widget</p>
+<div class="fragment"><div class="line">RibbonWidget::RibbonWidget(QWidget* parent) : <a class="code hl_class" href="class_s_a_ribbon_widget.html">SARibbonWidget</a>(parent)</div>
+<div class="line">{</div>
+<div class="line">    <span class="comment">// 获取SARibbonBar</span></div>
+<div class="line">    <a class="code hl_class" href="class_s_a_ribbon_bar.html">SARibbonBar</a>* ribbonbar = ribbonBar();</div>
+<div class="line">    <span class="comment">// QWidget模式下，没有必要再显示标题</span></div>
+<div class="line">    ribbonbar-&gt;<a class="code hl_function" href="class_s_a_ribbon_bar.html#a7a1347a9cf512452789df90e0dc636f5">setTitleVisible</a>(<span class="keyword">false</span>);</div>
+<div class="line">    <span class="comment">// QWidget模式下，直接使用紧凑模式效果更好</span></div>
+<div class="line">    ribbonbar-&gt;<a class="code hl_function" href="class_s_a_ribbon_bar.html#a7ee2ffcde55433d35705980030b0a38d">setRibbonStyle</a>(<a class="code hl_enumvalue" href="class_s_a_ribbon_bar.html#ac2a1554ddb5825d7866968152239b1dfa5633a67b57cac6b7291b99bc5328349b">SARibbonBar::RibbonStyleCompactThreeRow</a>);</div>
+<div class="line">    <span class="comment">// 取消applicationbutton</span></div>
+<div class="line">    ribbonbar-&gt;<a class="code hl_function" href="class_s_a_ribbon_bar.html#a10627559db4101fccaa3ed3ce10cc042">setApplicationButton</a>(<span class="keyword">nullptr</span>);</div>
+<div class="line"> </div>
+<div class="line">    setWidget(<span class="keyword">new</span> InnerWidget());</div>
+<div class="line">}</div>
+<div class="ttc" id="aclass_s_a_ribbon_bar_html"><div class="ttname"><a href="class_s_a_ribbon_bar.html">SARibbonBar</a></div><div class="ttdoc">SARibbonBar继承于QMenuBar,在SARibbonMainWindow中直接替换了原来的QMenuBar</div><div class="ttdef"><b>Definition</b> SARibbonBar.h:93</div></div>
+<div class="ttc" id="aclass_s_a_ribbon_bar_html_a10627559db4101fccaa3ed3ce10cc042"><div class="ttname"><a href="class_s_a_ribbon_bar.html#a10627559db4101fccaa3ed3ce10cc042">SARibbonBar::setApplicationButton</a></div><div class="ttdeci">void setApplicationButton(QAbstractButton *btn)</div><div class="ttdoc">设置applicationButton,如果想隐藏，可以传入nullptr</div><div class="ttdef"><b>Definition</b> SARibbonBar.cpp:445</div></div>
+<div class="ttc" id="aclass_s_a_ribbon_bar_html_a7a1347a9cf512452789df90e0dc636f5"><div class="ttname"><a href="class_s_a_ribbon_bar.html#a7a1347a9cf512452789df90e0dc636f5">SARibbonBar::setTitleVisible</a></div><div class="ttdeci">void setTitleVisible(bool on=false)</div><div class="ttdoc">设置是否显示标题</div><div class="ttdef"><b>Definition</b> SARibbonBar.cpp:1823</div></div>
+<div class="ttc" id="aclass_s_a_ribbon_bar_html_a7ee2ffcde55433d35705980030b0a38d"><div class="ttname"><a href="class_s_a_ribbon_bar.html#a7ee2ffcde55433d35705980030b0a38d">SARibbonBar::setRibbonStyle</a></div><div class="ttdeci">void setRibbonStyle(RibbonStyles v)</div><div class="ttdoc">设置ribbonbar的风格，此函数会重新设置所有元素，包括button的布局方式， 尤其是从三行变到两行的过程，重设的内容较多</div><div class="ttdef"><b>Definition</b> SARibbonBar.cpp:1434</div></div>
+<div class="ttc" id="aclass_s_a_ribbon_bar_html_ac2a1554ddb5825d7866968152239b1dfa5633a67b57cac6b7291b99bc5328349b"><div class="ttname"><a href="class_s_a_ribbon_bar.html#ac2a1554ddb5825d7866968152239b1dfa5633a67b57cac6b7291b99bc5328349b">SARibbonBar::RibbonStyleCompactThreeRow</a></div><div class="ttdeci">@ RibbonStyleCompactThreeRow</div><div class="ttdoc">紧凑结构，3行模式</div><div class="ttdef"><b>Definition</b> SARibbonBar.h:118</div></div>
+</div><!-- fragment --><p>效果如下：</p>
+<div class="image">
+<img src="ribbonbar-use-in-qwidget.png" alt=""/>
+<div class="caption">
+Ribbon用在QWidget上</div></div>
+    <h3><a class="anchor" id="创建category和pannel"></a>
+创建Category和Pannel</h3>
+<p>创建ribbon的顺序是：先创建类别(Category)，再创建面板(Pannel)，最后创建对应的toolbutton（action）</p>
+<p>使用<code><a class="el" href="class_s_a_ribbon_bar.html#a9adeaabbb6e8dc5d593dab4a90c83e63" title="添加一个标签 如果需要删除，直接delete即可，SARibbonBar会对其进行处理">SARibbonBar::addCategoryPage</a></code>把Category添加到SARibbonBar中，使用<code><a class="el" href="class_s_a_ribbon_category.html#a93a9ccb6d742ce1c5974f8aada372651" title="添加面板(pannel)">SARibbonCategory::addPannel</a></code>把<code>Pannel</code>添加到<code>Category</code>中,使用<code><a class="el" href="class_s_a_ribbon_pannel.html#ac9843072b680fbb1d70efcef3aa23dc4" title="添加action">SARibbonPannel::addAction</a></code>可以在Pannel上添加action</p>
+<p>下面的代码，演示了添加一个action的示例：</p>
+<div class="fragment"><div class="line"><span class="comment">//添加主标签页 - 通过addCategoryPage工厂函数添加</span></div>
+<div class="line"><a class="code hl_class" href="class_s_a_ribbon_category.html">SARibbonCategory</a>* categoryMain = ribbon-&gt;addCategoryPage(tr(<span class="stringliteral">&quot;Main&quot;</span>));</div>
+<div class="line"> <span class="comment">//使用addPannel函数来创建SARibbonPannel，效果和new SARibbonPannel再addPannel一样</span></div>
+<div class="line"><a class="code hl_class" href="class_s_a_ribbon_pannel.html">SARibbonPannel</a>* pannel1 = categoryMain-&gt;<a class="code hl_function" href="class_s_a_ribbon_category.html#a93a9ccb6d742ce1c5974f8aada372651">addPannel</a>(<span class="stringliteral">&quot;Panel 1&quot;</span>);</div>
+<div class="line">QAction* actSave = <span class="keyword">new</span> QAction(<span class="keyword">this</span>);</div>
+<div class="line">actSave-&gt;setText(<span class="stringliteral">&quot;save&quot;</span>);</div>
+<div class="line">actSave-&gt;setIcon(QIcon(<span class="stringliteral">&quot;:/icon/icon/save.svg&quot;</span>));</div>
+<div class="line">actSave-&gt;setObjectName(<span class="stringliteral">&quot;actSave&quot;</span>);</div>
+<div class="line">actSave-&gt;setShortcut(QKeySequence(QLatin1String(<span class="stringliteral">&quot;Ctrl+S&quot;</span>)));</div>
+<div class="line">pannel1-&gt;<a class="code hl_function" href="class_s_a_ribbon_pannel.html#aea8d760554e388afd905ea7c56c44430">addLargeAction</a>(actSave);</div>
+<div class="ttc" id="aclass_s_a_ribbon_category_html"><div class="ttname"><a href="class_s_a_ribbon_category.html">SARibbonCategory</a></div><div class="ttdoc">Ribbon控件中的分类选项卡页面（Category）</div><div class="ttdef"><b>Definition</b> SARibbonCategory.h:23</div></div>
+<div class="ttc" id="aclass_s_a_ribbon_category_html_a93a9ccb6d742ce1c5974f8aada372651"><div class="ttname"><a href="class_s_a_ribbon_category.html#a93a9ccb6d742ce1c5974f8aada372651">SARibbonCategory::addPannel</a></div><div class="ttdeci">SARibbonPannel * addPannel(const QString &amp;title)</div><div class="ttdoc">添加面板(pannel)</div><div class="ttdef"><b>Definition</b> SARibbonCategory.cpp:333</div></div>
+<div class="ttc" id="aclass_s_a_ribbon_pannel_html"><div class="ttname"><a href="class_s_a_ribbon_pannel.html">SARibbonPannel</a></div><div class="ttdoc">pannel页窗口，pannel是ribbon的面板用于承放控件</div><div class="ttdef"><b>Definition</b> SARibbonPannel.h:51</div></div>
+<div class="ttc" id="aclass_s_a_ribbon_pannel_html_aea8d760554e388afd905ea7c56c44430"><div class="ttname"><a href="class_s_a_ribbon_pannel.html#aea8d760554e388afd905ea7c56c44430">SARibbonPannel::addLargeAction</a></div><div class="ttdeci">void addLargeAction(QAction *action)</div><div class="ttdoc">添加大图标</div><div class="ttdef"><b>Definition</b> SARibbonPannel.cpp:287</div></div>
+</div><!-- fragment --><p>上面的操作添加了一个按钮，效果如下图所示：</p>
+<div class="image">
+<img src="add-large-action.png" alt=""/>
+</div>
+    <p>用户也可以直接new出SARibbonCategory，并添加到pannel中，下面的代码效果和上面的一样：</p>
+<div class="fragment"><div class="line"><a class="code hl_class" href="class_s_a_ribbon_category.html">SARibbonCategory</a>* categoryMain = <span class="keyword">new</span> <a class="code hl_class" href="class_s_a_ribbon_category.html">SARibbonCategory</a>(tr(<span class="stringliteral">&quot;Main&quot;</span>));</div>
+<div class="line">ribbon-&gt;addCategoryPage(categoryMain);</div>
+<div class="line"><a class="code hl_class" href="class_s_a_ribbon_pannel.html">SARibbonPannel</a>* pannel1 = <span class="keyword">new</span> <a class="code hl_class" href="class_s_a_ribbon_pannel.html">SARibbonPannel</a>(<span class="stringliteral">&quot;Panel 1&quot;</span>);</div>
+<div class="line">categoryMain-&gt;<a class="code hl_function" href="class_s_a_ribbon_category.html#a93a9ccb6d742ce1c5974f8aada372651">addPannel</a>(pannel1);</div>
+<div class="line">QAction* actSave = <span class="keyword">new</span> QAction(<span class="keyword">this</span>);</div>
+<div class="line">...</div>
+<div class="line">pannel1-&gt;addLargeAction(actSave);</div>
+</div><!-- fragment --><p>Ribbon的图标有大有小，通过<code>addLargeAction</code>、<code>addMediumAction</code>、<code>addSmallAction</code>可以组合出不同的布局样式</p>
+<p>具体可见<a href="./example/MainWindowExample/mainwindow.cpp">./example/MainWindowExample/mainwindow.cpp</a></p>
+<h3><a class="anchor" id="contextcategory-上下文标签"></a>
+ContextCategory 上下文标签</h3>
+<p>所谓上下文标签是指在特殊情况下才出现的标签/标签组，例如office word在选中图片时会出现图片编辑的上下文标签，如下图所示：</p>
+<div class="image">
+<img src="word-contextcategory.png" alt=""/>
+<div class="caption">
+上下文标签</div></div>
+    <p>SARibbon中上下文标签对应的类为<code><a class="el" href="class_s_a_ribbon_context_category.html" title="管理上下文标签的类">SARibbonContextCategory</a></code></p>
+<p>上下文标签一般在程序初始化的时候就创建好，平时隐藏，等待需要显示的时候再显示，创建上下文标签如下：</p>
+<p>由于上下文标签需要使用时唤起，因此，用一个成员变量保存起来是一个比较好的选择，当然也可以遍历查找（<code><a class="el" href="class_s_a_ribbon_bar.html#aaad8d2db83c8438af6ccd3b52f003f21" title="获取所有的上下文标签">SARibbonBar::contextCategoryList</a></code>可以例举所有的<code><a class="el" href="class_s_a_ribbon_context_category.html" title="管理上下文标签的类">SARibbonContextCategory</a></code>）</p>
+<p>头文件：</p>
+<div class="fragment"><div class="line"><a class="code hl_class" href="class_s_a_ribbon_context_category.html">SARibbonContextCategory</a>* m_contextCategory;</div>
+<div class="ttc" id="aclass_s_a_ribbon_context_category_html"><div class="ttname"><a href="class_s_a_ribbon_context_category.html">SARibbonContextCategory</a></div><div class="ttdoc">管理上下文标签的类</div><div class="ttdef"><b>Definition</b> SARibbonContextCategory.h:11</div></div>
+</div><!-- fragment --><p>cpp文件:</p>
+<div class="fragment"><div class="line"><a class="code hl_class" href="class_s_a_ribbon_bar.html">SARibbonBar</a>* ribbon = ribbonBar();</div>
+<div class="line"><span class="comment">//创建一个contextCategory，颜色随机</span></div>
+<div class="line">m_contextCategory   = ribbon-&gt;<a class="code hl_function" href="class_s_a_ribbon_bar.html#a15762caa4a372214196b133eb0b0b0e1">addContextCategory</a>(tr(<span class="stringliteral">&quot;context&quot;</span>), QColor());</div>
+<div class="line"><a class="code hl_class" href="class_s_a_ribbon_category.html">SARibbonCategory</a>* contextCategoryPage1 = m_contextCategory-&gt;<a class="code hl_function" href="class_s_a_ribbon_context_category.html#ad4a26f2232831d9770ca698e86509bcc">addCategoryPage</a>(tr(<span class="stringliteral">&quot;Page1&quot;</span>));</div>
+<div class="line"><span class="comment">//对contextCategoryPage1进行操作</span></div>
+<div class="line">......</div>
+<div class="line"><a class="code hl_class" href="class_s_a_ribbon_category.html">SARibbonCategory</a>* contextCategoryPage2 = m_contextCategory-&gt;<a class="code hl_function" href="class_s_a_ribbon_context_category.html#ad4a26f2232831d9770ca698e86509bcc">addCategoryPage</a>(tr(<span class="stringliteral">&quot;Page2&quot;</span>));</div>
+<div class="line"><span class="comment">//对contextCategoryPage2进行操作</span></div>
+<div class="line">......</div>
+<div class="ttc" id="aclass_s_a_ribbon_bar_html_a15762caa4a372214196b133eb0b0b0e1"><div class="ttname"><a href="class_s_a_ribbon_bar.html#a15762caa4a372214196b133eb0b0b0e1">SARibbonBar::addContextCategory</a></div><div class="ttdeci">SARibbonContextCategory * addContextCategory(const QString &amp;title, const QColor &amp;color=QColor(), const QVariant &amp;id=QVariant())</div><div class="ttdoc">添加上下文标签</div><div class="ttdef"><b>Definition</b> SARibbonBar.cpp:769</div></div>
+<div class="ttc" id="aclass_s_a_ribbon_context_category_html_ad4a26f2232831d9770ca698e86509bcc"><div class="ttname"><a href="class_s_a_ribbon_context_category.html#ad4a26f2232831d9770ca698e86509bcc">SARibbonContextCategory::addCategoryPage</a></div><div class="ttdeci">SARibbonCategory * addCategoryPage(const QString &amp;title)</div><div class="ttdoc">添加标签</div><div class="ttdef"><b>Definition</b> SARibbonContextCategory.cpp:51</div></div>
+</div><!-- fragment --><p>由<code><a class="el" href="class_s_a_ribbon_context_category.html" title="管理上下文标签的类">SARibbonContextCategory</a></code>创建的<code><a class="el" href="class_s_a_ribbon_category.html" title="Ribbon控件中的分类选项卡页面（Category）">SARibbonCategory</a></code>归<code><a class="el" href="class_s_a_ribbon_context_category.html" title="管理上下文标签的类">SARibbonContextCategory</a></code>管理，<code><a class="el" href="class_s_a_ribbon_context_category.html" title="管理上下文标签的类">SARibbonContextCategory</a></code>可以管理一组标签,<b>注意：</b> <code><a class="el" href="class_s_a_ribbon_context_category.html" title="管理上下文标签的类">SARibbonContextCategory</a></code>并不是一个窗口，仅仅是一组标签页的管理</p>
+<p>显示一个上下文调用<code><a class="el" href="class_s_a_ribbon_bar.html#a6d740994d5ca270b0ffa5f3930a3bcc0" title="显示上下文标签">SARibbonBar::showContextCategory</a></code>/<code><a class="el" href="class_s_a_ribbon_bar.html#a5944c3522c196641e756ebd1124d6f56" title="隐藏上下文标签">SARibbonBar::hideContextCategory</a></code>:</p>
+<div class="fragment"><div class="line"><span class="keywordtype">void</span> MainWindow::onShowContextCategory(<span class="keywordtype">bool</span> on)</div>
+<div class="line">{</div>
+<div class="line">    <span class="keywordflow">if</span> (on) {</div>
+<div class="line">        this-&gt;ribbonBar()-&gt;showContextCategory(m_contextCategory);</div>
+<div class="line">    } <span class="keywordflow">else</span> {</div>
+<div class="line">        this-&gt;ribbonBar()-&gt;hideContextCategory(m_contextCategory);</div>
+<div class="line">    }</div>
+<div class="line">}</div>
+</div><!-- fragment --><p><b>注意：</b> 如果要删除<code>contextCategory</code>需要调用<code><a class="el" href="class_s_a_ribbon_bar.html#affbf927bcf86e13c1c012793d8b06995" title="销毁上下文标签，上下文标签的SARibbonCategory也会随之销毁">SARibbonBar::destroyContextCategory</a></code>，而不是直接delete，调用<code><a class="el" href="class_s_a_ribbon_bar.html#affbf927bcf86e13c1c012793d8b06995" title="销毁上下文标签，上下文标签的SARibbonCategory也会随之销毁">SARibbonBar::destroyContextCategory</a></code>之后无需再对ContextCategory的指针delete</p>
+<p>不同样式的contextCategory有不一样的风格，具体可见：SARibbon样式以及不同样式下的显示对比</p>
+<p>上下文标签的显示会有特殊的颜色进行标记，上下文标签的颜色可以由<code><a class="el" href="class_s_a_ribbon_bar.html#aa503b9cbf19f6673192c943539a5509f" title="设置上下文标签的颜色列表">SARibbonBar::setContextCategoryColorList</a></code>进行设置</p>
+<h3><a class="anchor" id="applicationbutton"></a>
+ApplicationButton</h3>
+<p>ribbon界面左上角有个特殊且明显的按钮，称之为<code>applicationButton</code>，这个按钮一般用于调出菜单，SARibbonBar在构造时默认就创建了<code>applicationButton</code>，可以通过如下方式设置其文字：</p>
+<div class="fragment"><div class="line"><a class="code hl_class" href="class_s_a_ribbon_bar.html">SARibbonBar</a>* ribbon = ribbonBar();</div>
+<div class="line">ribbon-&gt;<a class="code hl_function" href="class_s_a_ribbon_bar.html#ab329b967ebdc7cb1780fd899b5e07d57">applicationButton</a>()-&gt;setText((<span class="stringliteral">&quot;File&quot;</span>));</div>
+<div class="ttc" id="aclass_s_a_ribbon_bar_html_ab329b967ebdc7cb1780fd899b5e07d57"><div class="ttname"><a href="class_s_a_ribbon_bar.html#ab329b967ebdc7cb1780fd899b5e07d57">SARibbonBar::applicationButton</a></div><div class="ttdeci">QAbstractButton * applicationButton()</div><div class="ttdoc">返回applicationButton</div><div class="ttdef"><b>Definition</b> SARibbonBar.cpp:431</div></div>
+</div><!-- fragment --><p>默认的applicationButton继承自<code><a class="el" href="class_s_a_ribbon_application_button.html" title="The SARibbonApplicationButton class">SARibbonApplicationButton</a></code>,而<code><a class="el" href="class_s_a_ribbon_application_button.html" title="The SARibbonApplicationButton class">SARibbonApplicationButton</a></code>继承自<code>QPushButton</code>，因此你可以对其进行<code>QPushButton</code>所有的操作，如果想设置自己的Button作为applicationButton也是可以的，只需要调用<code><a class="el" href="class_s_a_ribbon_bar.html#a10627559db4101fccaa3ed3ce10cc042" title="设置applicationButton,如果想隐藏，可以传入nullptr">SARibbonBar::setApplicationButton</a></code>函数即可</p>
+<h3><a class="anchor" id="quickaccessbar和rightbuttongroup"></a>
+QuickAccessBar和rightButtonGroup</h3>
+<p>QuickAccessBar是左上角的快速工具栏，rightButtonGroup是右上角的快速工具栏，在office模式下分左右两边，在wps模式下，左右将合起来，统一放到右边</p>
+<div class="image">
+<img src="QuickAccessBarAndRightButtonGroup.png" alt=""/>
+<div class="caption">
+QuickAccessBar And RightButtonGroup</div></div>
+    <p>SARibbon中：</p>
+<ul>
+<li>QuickAccessBar对应<code><a class="el" href="class_s_a_ribbon_quick_access_bar.html" title="ribbon左上顶部的快速响应栏">SARibbonQuickAccessBar</a></code>类</li>
+<li>rightButtonGroup对应<code><a class="el" href="class_s_a_ribbon_button_group_widget.html" title="用于管理一组Action,类似于QToolBar">SARibbonButtonGroupWidget</a></code>类</li>
+</ul>
+<p>SARibbonBar在初始化时会默认创建QuickAccessBar和RightButtonGroup，通过<code>SARibbonBar::quickAccessBar</code>和<code><a class="el" href="class_s_a_ribbon_bar.html#ac0260b06ce426ed7b006f9f572901688" title="返回右边的按钮群指针">SARibbonBar::rightButtonGroup</a></code>即可获取其指针进行操作，示例如下：</p>
+<div class="fragment"><div class="line">QAction* MainWindow::createAction(<span class="keyword">const</span> QString&amp; text, <span class="keyword">const</span> QString&amp; iconurl, <span class="keyword">const</span> QString&amp; objName)</div>
+<div class="line">{</div>
+<div class="line">    QAction* act = <span class="keyword">new</span> QAction(<span class="keyword">this</span>);</div>
+<div class="line">    act-&gt;setText(text);</div>
+<div class="line">    act-&gt;setIcon(QIcon(iconurl));</div>
+<div class="line">    act-&gt;setObjectName(objName);</div>
+<div class="line">    <span class="keywordflow">return</span> act;</div>
+<div class="line">}</div>
+<div class="line"> </div>
+<div class="line"><span class="keywordtype">void</span> MainWindow::initQuickAccessBar(){</div>
+<div class="line">    <a class="code hl_class" href="class_s_a_ribbon_bar.html">SARibbonBar</a>* ribbon = ribbonBar();</div>
+<div class="line">    <a class="code hl_class" href="class_s_a_ribbon_quick_access_bar.html">SARibbonQuickAccessBar</a>* quickAccessBar = ribbon-&gt;quickAccessBar();</div>
+<div class="line">    quickAccessBar-&gt;addAction(createAction(<span class="stringliteral">&quot;save&quot;</span>, <span class="stringliteral">&quot;:/icon/icon/save.svg&quot;</span>, <span class="stringliteral">&quot;save-quickbar&quot;</span>));</div>
+<div class="line">    quickAccessBar-&gt;addSeparator();</div>
+<div class="line">    quickAccessBar-&gt;addAction(createAction(<span class="stringliteral">&quot;undo&quot;</span>, <span class="stringliteral">&quot;:/icon/icon/undo.svg&quot;</span>),<span class="stringliteral">&quot;undo&quot;</span>);</div>
+<div class="line">    quickAccessBar-&gt;addAction(createAction(<span class="stringliteral">&quot;redo&quot;</span>, <span class="stringliteral">&quot;:/icon/icon/redo.svg&quot;</span>),<span class="stringliteral">&quot;redo&quot;</span>);</div>
+<div class="line">    quickAccessBar-&gt;addSeparator();</div>
+<div class="line">}</div>
+<div class="line"><span class="keywordtype">void</span> MainWindow::initRightButtonGroup(){</div>
+<div class="line">    <a class="code hl_class" href="class_s_a_ribbon_bar.html">SARibbonBar</a>* ribbon = ribbonBar();</div>
+<div class="line">    <a class="code hl_class" href="class_s_a_ribbon_button_group_widget.html">SARibbonButtonGroupWidget</a>* rightBar = ribbon-&gt;<a class="code hl_function" href="class_s_a_ribbon_bar.html#ac0260b06ce426ed7b006f9f572901688">rightButtonGroup</a>();</div>
+<div class="line">    QAction* actionHelp = createAction(<span class="stringliteral">&quot;help&quot;</span>, <span class="stringliteral">&quot;:/icon/icon/help.svg&quot;</span>,<span class="stringliteral">&quot;help&quot;</span>);</div>
+<div class="line">    connect(actionHelp, &amp;QAction::triggered, <span class="keyword">this</span>, &amp;MainWindow::onActionHelpTriggered);</div>
+<div class="line">    rightBar-&gt;addAction(actionHelp);</div>
+<div class="line">}</div>
+<div class="ttc" id="aclass_s_a_ribbon_bar_html_ac0260b06ce426ed7b006f9f572901688"><div class="ttname"><a href="class_s_a_ribbon_bar.html#ac0260b06ce426ed7b006f9f572901688">SARibbonBar::rightButtonGroup</a></div><div class="ttdeci">SARibbonButtonGroupWidget * rightButtonGroup()</div><div class="ttdoc">返回右边的按钮群指针</div><div class="ttdef"><b>Definition</b> SARibbonBar.cpp:1401</div></div>
+<div class="ttc" id="aclass_s_a_ribbon_button_group_widget_html"><div class="ttname"><a href="class_s_a_ribbon_button_group_widget.html">SARibbonButtonGroupWidget</a></div><div class="ttdoc">用于管理一组Action,类似于QToolBar</div><div class="ttdef"><b>Definition</b> SARibbonButtonGroupWidget.h:13</div></div>
+<div class="ttc" id="aclass_s_a_ribbon_quick_access_bar_html"><div class="ttname"><a href="class_s_a_ribbon_quick_access_bar.html">SARibbonQuickAccessBar</a></div><div class="ttdoc">ribbon左上顶部的快速响应栏</div><div class="ttdef"><b>Definition</b> SARibbonQuickAccessBar.h:13</div></div>
+</div><!-- fragment --><h3><a class="anchor" id="saribbonbar布局方案"></a>
+SARibbonBar布局方案</h3>
+<p><code>SARibbon</code>支持4种ribbon布局方案，布局方案参考了<code>office</code>的ribbon风格和<code>WPS</code>的ribbon风格，布局方案的切换可 通过<code>void SARibbonBar::setRibbonStyle(RibbonStyle v)</code>实现</p>
+<p><code>office</code>模式是最常见的ribbon模式，<code>tab</code>和标题栏占用位置较多，<code>WPS</code>设计的ribbon模式进行了改良，它为了减小ribbon的高度，把标签和标题栏设置在一起，这样减少了一个标题栏高度，有效利用了垂直空间，同时还把pannel的按钮布局由最大摆放3个变为摆放两个，进一步压缩了垂直空间</p>
+<p>office的word界面和WPS Word界面截图对比</p>
+<div class="image">
+<img src="office-screenshot.png" alt=""/>
+<div class="caption">
+office 界面截图</div></div>
+    <div class="image">
+<img src="wps-change-ribbon-1.jpg" alt=""/>
+<div class="caption">
+Wps 改动了ribbon的布局方式</div></div>
+    <p>在正常屏幕下，WPS 样式会比 Office 样式减少至少30像素左右的垂直高度，相比1920*1080的屏幕来说，相当于节约了接近3的垂直空间</p>
+<p>SARibbon中把带有标题栏的称之为宽松布局（Loose），宽松布局的各个元素如下图排列：</p>
+<div class="image">
+<img src="ribbonbar-geometry-office3.png" alt=""/>
+<div class="caption">
+宽松布局</div></div>
+    <p>这个布局和office的默认布局是一致的</p>
+<p>SARibbon中把带有标题栏和tab结合一起的布局方式称之为紧凑布局（Compact），紧凑布局的各个元素如下图排列：</p>
+<div class="image">
+<img src="ribbonbar-geometry-wps3.png" alt=""/>
+<div class="caption">
+紧凑布局</div></div>
+    <p>SARibbonBar提供了<code>setRibbonStyle</code>函数，可以定义当前的布局方案，枚举<code>SARibbonBar::RibbonStyle</code>定义了四种布局方案：</p>
+<ul>
+<li><code><a class="el" href="class_s_a_ribbon_bar.html#ac2a1554ddb5825d7866968152239b1dfa314db797c9294386824e61264b26f39d" title="宽松结构，3行模式">SARibbonBar::RibbonStyleLooseThreeRow</a></code>宽松结构，3行模式(v0.x版本为<code>SARibbonBar::OfficeStyle</code>)</li>
+</ul>
+<div class="image">
+<img src="office-3-style.png" alt=""/>
+<div class="caption">
+SARibbonBar::RibbonStyleLooseThreeRow</div></div>
+    <ul>
+<li><code><a class="el" href="class_s_a_ribbon_bar.html#ac2a1554ddb5825d7866968152239b1dfa6feb099a7256d645887d48e9e23fb27f" title="宽松结构，2行模式">SARibbonBar::RibbonStyleLooseTwoRow</a></code>宽松结构，2行模式(v0.x版本为<code>SARibbonBar::OfficeStyleTwoRow</code>)</li>
+</ul>
+<div class="image">
+<img src="office-2-style.png" alt=""/>
+<div class="caption">
+SARibbonBar::RibbonStyleLooseTwoRow</div></div>
+    <ul>
+<li><code><a class="el" href="class_s_a_ribbon_bar.html#ac2a1554ddb5825d7866968152239b1dfa5633a67b57cac6b7291b99bc5328349b" title="紧凑结构，3行模式">SARibbonBar::RibbonStyleCompactThreeRow</a></code>紧凑结构，3行模式(v0.x版本为<code>SARibbonBar::WpsLiteStyle</code>)</li>
+</ul>
+<div class="image">
+<img src="wps-3-style.png" alt=""/>
+<div class="caption">
+SARibbonBar::RibbonStyleCompactThreeRow</div></div>
+    <ul>
+<li><code><a class="el" href="class_s_a_ribbon_bar.html#ac2a1554ddb5825d7866968152239b1dfa13c620a5ed961e5255acc3c96e93fe6f" title="紧凑结构，2行模式">SARibbonBar::RibbonStyleCompactTwoRow</a></code>紧凑结构，2行模式(v0.x版本为<code>SARibbonBar::WpsLiteStyleTwoRow</code>)</li>
+</ul>
+<div class="image">
+<img src="wps-2-style.png" alt=""/>
+<div class="caption">
+SARibbonBar::RibbonStyleCompactTwoRow</div></div>
+    <h3><a class="anchor" id="saribbonbar文字换行及图标大小"></a>
+SARibbonBar文字换行，及图标大小</h3>
+<p><code><a class="el" href="class_s_a_ribbon_bar.html" title="SARibbonBar继承于QMenuBar,在SARibbonMainWindow中直接替换了原来的QMenuBar">SARibbonBar</a></code>的按钮图标大小是基于<code><a class="el" href="class_s_a_ribbon_bar.html" title="SARibbonBar继承于QMenuBar,在SARibbonMainWindow中直接替换了原来的QMenuBar">SARibbonBar</a></code>的高度和文字高度决定的，<code><a class="el" href="class_s_a_ribbon_bar.html" title="SARibbonBar继承于QMenuBar,在SARibbonMainWindow中直接替换了原来的QMenuBar">SARibbonBar</a></code>在布局的时候，首先保证文字能显示完全，剩下的区域来绘制图标，通过<code><a class="el" href="class_s_a_ribbon_bar.html#a9e8173f470ba8b88ba0b20cf1bf65d54" title="设置ribbonbar的按钮文字允许换行">SARibbonBar::setEnableWordWrap</a></code>函数可以控制SARibbonBar的文字是否换行，因此，如果你想图标看起来更大，可以设置文字不换行</p>
+<p>在<code><a class="el" href="class_s_a_ribbon_bar.html#ac2a1554ddb5825d7866968152239b1dfa13c620a5ed961e5255acc3c96e93fe6f" title="紧凑结构，2行模式">SARibbonBar::RibbonStyleCompactTwoRow</a></code>的布局模式下，文字不换行的显示效果如下：</p>
+<div class="image">
+<img src="wps-2-style-nowrap.png" alt=""/>
+</div>
+    <p>SARibbonBar文字设置为不换行后，会使图标的显示空间变得更大</p>
+<p>另外一种方法调整图标大小是把<code><a class="el" href="class_s_a_ribbon_bar.html" title="SARibbonBar继承于QMenuBar,在SARibbonMainWindow中直接替换了原来的QMenuBar">SARibbonBar</a></code>的高度调大，<code><a class="el" href="class_s_a_ribbon_bar.html" title="SARibbonBar继承于QMenuBar,在SARibbonMainWindow中直接替换了原来的QMenuBar">SARibbonBar</a></code>提供了<code><a class="el" href="class_s_a_ribbon_bar.html#acba7a11ea512c8b00ece9c996273016c" title="设置category的高度">SARibbonBar::setCategoryHeight</a></code>，可用于调整<code><a class="el" href="class_s_a_ribbon_bar.html" title="SARibbonBar继承于QMenuBar,在SARibbonMainWindow中直接替换了原来的QMenuBar">SARibbonBar</a></code>的高度，RibbonBar的标题栏高度，TabBar高度，PannelTitle高度都可以调整，通过这些尺寸，你可以搭配出你需要的界面，具体的调整示例，可参考<code>example/MainWindowExample</code>的Size标签</p>
+<h3><a class="anchor" id="不同的按钮布局方式"></a>
+不同的“按钮”布局方式</h3>
+<p><code><a class="el" href="class_s_a_ribbon_pannel.html" title="pannel页窗口，pannel是ribbon的面板用于承放控件">SARibbonPannel</a></code>提供了三个添加action的方法：</p>
+<ul>
+<li><code>addLargeAction</code></li>
+<li><code>addMediumAction</code></li>
+<li><code>addSmallAction</code></li>
+</ul>
+<p>在标准的pannel中，一个action（按钮）有3种布局，以office word为例，pannel的三种布局其实是所占行数:</p>
+<ul>
+<li>第一种，占满整个pannel，称之为<code>large</code></li>
+<li>第二种，一个pannel下可以放置2个按钮，称之为<code>medium</code></li>
+<li>第三种，一个pannel放置3个按钮，称之为<code>samll</code></li>
+</ul>
+<div class="image">
+<img src="pannelLayout3row-example.png" alt=""/>
+<div class="caption">
+word pannel 布局示例</div></div>
+    <p>枚举<code><a class="el" href="class_s_a_ribbon_pannel_item.html#af4282b5e09c0b7ad37f1cc555a763926" title="定义了行的占比，ribbon中有large，media和small三种占比">SARibbonPannelItem::RowProportion</a></code>表示了pannel中窗体所占行数的情况，在pannel布局中会常用到，这个枚举定义如下：</p>
+<div class="fragment"><div class="line"> </div>
+<div class="line"><span class="keyword">enum</span> RowProportion {</div>
+<div class="line">    None            </div>
+<div class="line">    , Large         </div>
+<div class="line">    , Medium        </div>
+<div class="line">    , Small         </div>
+<div class="line">};</div>
+</div><!-- fragment --><p><code><a class="el" href="class_s_a_ribbon_pannel.html" title="pannel页窗口，pannel是ribbon的面板用于承放控件">SARibbonPannel</a></code>添加action的时候，通常需要指定action对应的按钮占比情况，例如：</p>
+<div class="fragment"><div class="line"><a class="code hl_class" href="class_s_a_ribbon_pannel.html">SARibbonPannel</a>* pannel = <span class="keyword">new</span> <a class="code hl_class" href="class_s_a_ribbon_pannel.html">SARibbonPannel</a>(<span class="stringliteral">&quot;Pannel&quot;</span>);</div>
+<div class="line">QAction* action = <span class="keyword">new</span> QAction(<span class="keyword">this</span>);</div>
+<div class="line"><span class="comment">//action的初始化</span></div>
+<div class="line">pannel-&gt;<a class="code hl_function" href="class_s_a_ribbon_pannel.html#ac9843072b680fbb1d70efcef3aa23dc4">addAction</a>(action,<a class="code hl_enumvalue" href="class_s_a_ribbon_pannel_item.html#af4282b5e09c0b7ad37f1cc555a763926a840ba607e1a1a8dec487eb575f78c450">SARibbonPannelItem::Small</a>);</div>
+<div class="line"><span class="comment">// 等效于：pannel-&gt;addSmallAction(action);</span></div>
+<div class="ttc" id="aclass_s_a_ribbon_pannel_html_ac9843072b680fbb1d70efcef3aa23dc4"><div class="ttname"><a href="class_s_a_ribbon_pannel.html#ac9843072b680fbb1d70efcef3aa23dc4">SARibbonPannel::addAction</a></div><div class="ttdeci">void addAction(QAction *action, SARibbonPannelItem::RowProportion rp)</div><div class="ttdoc">添加action</div><div class="ttdef"><b>Definition</b> SARibbonPannel.cpp:260</div></div>
+<div class="ttc" id="aclass_s_a_ribbon_pannel_item_html_af4282b5e09c0b7ad37f1cc555a763926a840ba607e1a1a8dec487eb575f78c450"><div class="ttname"><a href="class_s_a_ribbon_pannel_item.html#af4282b5e09c0b7ad37f1cc555a763926a840ba607e1a1a8dec487eb575f78c450">SARibbonPannelItem::Small</a></div><div class="ttdeci">@ Small</div><div class="ttdoc">小占比，占SARibbonPannel的一行，Medium在不满足条件时也会变为Small，但不会变为Large</div><div class="ttdef"><b>Definition</b> SARibbonPannelItem.h:27</div></div>
+</div><!-- fragment --><p><code><a class="el" href="class_s_a_ribbon_pannel.html" title="pannel页窗口，pannel是ribbon的面板用于承放控件">SARibbonPannel</a></code>里管理的每个action都会带有一个私有的属性记录了这个action在pannel里的布局占比，可以通过静态函数<code><a class="el" href="class_s_a_ribbon_pannel_item.html#af4282b5e09c0b7ad37f1cc555a763926" title="定义了行的占比，ribbon中有large，media和small三种占比">SARibbonPannelItem::RowProportion</a> <a class="el" href="class_s_a_ribbon_pannel.html#af2f710ccebfd1f77699efd63a8ec2d3a" title="获取action的行属性">SARibbonPannel::getActionRowProportionProperty(QAction* action)</a>;</code>获取这个占比</p>
+<h3><a class="anchor" id="saribbonpannel的布局模式"></a>
+SARibbonPannel的布局模式</h3>
+<h4><a class="anchor" id="autotoc_md3行模式"></a>
+3行模式</h4>
+<p>三行模式是传统的pannel布局方式，如下图所示：</p>
+<div class="image">
+<img src="pannelLayout3row.png" alt=""/>
+<div class="caption">
+3行模式ribbon布局示例</div></div>
+    <p>3行模式下有三种占位(<code><a class="el" href="class_s_a_ribbon_pannel_item.html#af4282b5e09c0b7ad37f1cc555a763926" title="定义了行的占比，ribbon中有large，media和small三种占比">SARibbonPannelItem::RowProportion</a></code>)，分别为large、medium和small</p>
+<p>3行模式下的pannel会显示pannel的标题在<code>Pannel Title</code>区域，另外还有一个<code>OptionAction</code>的区域，这个是给这个action添加特殊触发使用的，如果没有设置<code>OptionAction</code>，这个区域是隐藏。</p>
+<h4><a class="anchor" id="autotoc_md2行模式"></a>
+2行模式</h4>
+<p>2行模式是WPS的改进布局法（具体是否是WPS首先这样做的不清楚，我是按照WPS的布局进行参考的），如下图所示：</p>
+<div class="image">
+<img src="pannelLayout2row.png" alt=""/>
+<div class="caption">
+2行模式ribbon布局示例</div></div>
+    <p>2行模式下medium和small占位(<code><a class="el" href="class_s_a_ribbon_pannel_item.html#af4282b5e09c0b7ad37f1cc555a763926" title="定义了行的占比，ribbon中有large，media和small三种占比">SARibbonPannelItem::RowProportion</a></code>)是一样的，不做区分。</p>
+<p>2行模式下pannel是不显示标题的</p>
+<h3><a class="anchor" id="saribbon的自定义功能"></a>
+SARibbon的自定义功能</h3>
+<p>ribbon的自定义是ribbon的一个特色，参考了office和wps的自定义界面，用户可以为自己的ribbon定义非常多的内容，甚至可以定义出一个完全和原来不一样的界面。</p>
+<p>以下是office的自定义界面</p>
+<div class="image">
+<img src="customization-office-ui.png" alt=""/>
+<div class="caption">
+office的自定义界面</div></div>
+    <p>SARibbon参考office和wps的界面，封装了方便使用的<code>SARibbonCustomize**</code>类，包括如下5个类：</p>
+<blockquote class="doxtable">
+<p>&zwj;- <a class="el" href="class_s_a_ribbon_customize_dialog.html" title="SARibbonCustomizeWidget的对话框封装">SARibbonCustomizeDialog</a></p><ul>
+<li><a class="el" href="class_s_a_ribbon_customize_widget.html" title="自定义界面窗口">SARibbonCustomizeWidget</a></li>
+<li><a class="el" href="class_s_a_ribbon_customize_data.html" title="记录所有自定义操作的数据类">SARibbonCustomizeData</a></li>
+<li><a class="el" href="class_s_a_ribbon_actions_manager.html" title="用于管理SARibbon的所有Action">SARibbonActionsManager</a></li>
+<li><a class="el" href="class_s_a_ribbon_actions_manager_model.html" title="SARibbonActionsManager 对应的model">SARibbonActionsManagerModel</a> </li>
+</ul>
+</blockquote>
+<p>实际用户使用仅会面对<code><a class="el" href="class_s_a_ribbon_actions_manager.html" title="用于管理SARibbon的所有Action">SARibbonActionsManager</a></code>和<code><a class="el" href="class_s_a_ribbon_customize_dialog.html" title="SARibbonCustomizeWidget的对话框封装">SARibbonCustomizeDialog</a></code>/<code><a class="el" href="class_s_a_ribbon_customize_widget.html" title="自定义界面窗口">SARibbonCustomizeWidget</a></code>，其余类用户正常不会使用。</p>
+<p><code><a class="el" href="class_s_a_ribbon_actions_manager.html" title="用于管理SARibbon的所有Action">SARibbonActionsManager</a></code>是用来管理<code>QAction</code>，把想要自定义的<code>QAction</code>添加到<code><a class="el" href="class_s_a_ribbon_actions_manager.html" title="用于管理SARibbon的所有Action">SARibbonActionsManager</a></code>中管理，并可以对<code>QAction</code>进行分类，以便在<code><a class="el" href="class_s_a_ribbon_customize_dialog.html" title="SARibbonCustomizeWidget的对话框封装">SARibbonCustomizeDialog</a></code>/<code><a class="el" href="class_s_a_ribbon_customize_widget.html" title="自定义界面窗口">SARibbonCustomizeWidget</a></code>中显示</p>
+<p><code><a class="el" href="class_s_a_ribbon_customize_dialog.html" title="SARibbonCustomizeWidget的对话框封装">SARibbonCustomizeDialog</a></code>/<code><a class="el" href="class_s_a_ribbon_customize_widget.html" title="自定义界面窗口">SARibbonCustomizeWidget</a></code>是具体的显示窗口，<code><a class="el" href="class_s_a_ribbon_customize_dialog.html" title="SARibbonCustomizeWidget的对话框封装">SARibbonCustomizeDialog</a></code>把<code><a class="el" href="class_s_a_ribbon_customize_widget.html" title="自定义界面窗口">SARibbonCustomizeWidget</a></code>封装为对话框，如果要实现office那样集成到配置对话框中可以使用<code><a class="el" href="class_s_a_ribbon_customize_widget.html" title="自定义界面窗口">SARibbonCustomizeWidget</a></code>，<code><a class="el" href="class_s_a_ribbon_customize_dialog.html" title="SARibbonCustomizeWidget的对话框封装">SARibbonCustomizeDialog</a></code>的效果如下图所示：</p>
+<div class="image">
+<img src="customization-saribbon-ui.png" alt=""/>
+<div class="caption">
+SARibbon的自定义界面</div></div>
+    <h4><a class="anchor" id="给界面添加自定义功能"></a>
+给界面添加自定义功能</h4>
+<p>这里演示如何添加自定义功能</p>
+<p>首先定义<code><a class="el" href="class_s_a_ribbon_actions_manager.html" title="用于管理SARibbon的所有Action">SARibbonActionsManager</a></code>作为MainWindow的成员变量</p>
+<div class="fragment"><div class="line"><span class="comment">//MainWindow.h 中定义成员变量</span></div>
+<div class="line"><a class="code hl_class" href="class_s_a_ribbon_actions_manager.html">SARibbonActionsManager</a>* m_ribbonActionMgr;</div>
+<div class="ttc" id="aclass_s_a_ribbon_actions_manager_html"><div class="ttname"><a href="class_s_a_ribbon_actions_manager.html">SARibbonActionsManager</a></div><div class="ttdoc">用于管理SARibbon的所有Action</div><div class="ttdef"><b>Definition</b> SARibbonActionsManager.h:36</div></div>
+</div><!-- fragment --><p>在MainWindow的初始化过程中，还需要创建大量的<code>QAction</code>，<code>QAction</code>的父对象指定为MainWindow，另外还会生成ribbon布局，例如添加category，添加pannel等操作，在上述操作完成后添加如下步骤，自动让<code><a class="el" href="class_s_a_ribbon_actions_manager.html" title="用于管理SARibbon的所有Action">SARibbonActionsManager</a></code>管理所有的<code>QAction</code></p>
+<div class="fragment"><div class="line"><span class="comment">//MainWindow的初始化，生成QAction</span></div>
+<div class="line"><span class="comment">//生成ribbon布局</span></div>
+<div class="line">m_ribbonActionMgr = <span class="keyword">new</span> <a class="code hl_class" href="class_s_a_ribbon_actions_manager.html">SARibbonActionsManager</a>(mainWinowPtr);</div>
+<div class="line">m_ribbonActionMgr-&gt;<a class="code hl_function" href="class_s_a_ribbon_actions_manager.html#aba8620873f2b8ad10c750e1358f12d7c">autoRegisteActions</a>(mainWinowPtr);</div>
+<div class="ttc" id="aclass_s_a_ribbon_actions_manager_html_aba8620873f2b8ad10c750e1358f12d7c"><div class="ttname"><a href="class_s_a_ribbon_actions_manager.html#aba8620873f2b8ad10c750e1358f12d7c">SARibbonActionsManager::autoRegisteActions</a></div><div class="ttdeci">QMap&lt; int, SARibbonCategory * &gt; autoRegisteActions(SARibbonBar *bar)</div><div class="ttdoc">自动加载SARibbonBar的action 此函数会遍历SARibbonBar的父窗口(一般是SARibbonMainWindow)下的所有子object，找到action注册， 并会遍历所有SARi...</div><div class="ttdef"><b>Definition</b> SARibbonActionsManager.cpp:291</div></div>
+</div><!-- fragment --><p><code><a class="el" href="class_s_a_ribbon_actions_manager.html" title="用于管理SARibbon的所有Action">SARibbonActionsManager</a></code>的关键函数<code>autoRegisteActions</code>可以遍历 <code><a class="el" href="class_s_a_ribbon_main_window.html" title="如果要使用SARibbonBar，必须使用此类代替QMainWindow">SARibbonMainWindow</a></code>下的所有子object，找到action并注册，并会遍历所有<code><a class="el" href="class_s_a_ribbon_category.html" title="Ribbon控件中的分类选项卡页面（Category）">SARibbonCategory</a></code>,把<code><a class="el" href="class_s_a_ribbon_category.html" title="Ribbon控件中的分类选项卡页面（Category）">SARibbonCategory</a></code>下的action按<code><a class="el" href="class_s_a_ribbon_category.html" title="Ribbon控件中的分类选项卡页面（Category）">SARibbonCategory</a></code>的title name进行分类，此函数还会把<code><a class="el" href="class_s_a_ribbon_main_window.html" title="如果要使用SARibbonBar，必须使用此类代替QMainWindow">SARibbonMainWindow</a></code>下面的action，但不在任何一个category下的作为NotInRibbonCategoryTag标签注册，默认名字会赋予not in ribbon</p>
+<p>在需要调用<code><a class="el" href="class_s_a_ribbon_customize_dialog.html" title="SARibbonCustomizeWidget的对话框封装">SARibbonCustomizeDialog</a></code>的地方如下操作：</p>
+<div class="fragment"><div class="line">QString cfgpath = <span class="stringliteral">&quot;customization.xml&quot;</span>;</div>
+<div class="line"><a class="code hl_class" href="class_s_a_ribbon_customize_dialog.html">SARibbonCustomizeDialog</a> dlg(<span class="keyword">this</span>, <span class="keyword">this</span>);</div>
+<div class="line"> </div>
+<div class="line">dlg.setupActionsManager(m_ribbonActionMgr);</div>
+<div class="line">dlg.fromXml(cfgpath);<span class="comment">//调用这一步是为了把已经存在的自定义步骤加载进来，在保存时能基于原有的自定义步骤上追加</span></div>
+<div class="line"><span class="keywordflow">if</span> (QDialog::Accepted == dlg.exec()) {</div>
+<div class="line">    dlg.applys();<span class="comment">//应用自定义步骤</span></div>
+<div class="line">    dlg.toXml(cfgpath);<span class="comment">//把自定义步骤保存到文件中</span></div>
+<div class="line">}</div>
+<div class="ttc" id="aclass_s_a_ribbon_customize_dialog_html"><div class="ttname"><a href="class_s_a_ribbon_customize_dialog.html">SARibbonCustomizeDialog</a></div><div class="ttdoc">SARibbonCustomizeWidget的对话框封装</div><div class="ttdef"><b>Definition</b> SARibbonCustomizeDialog.h:21</div></div>
+</div><!-- fragment --><p>在MainWindow生成前还需要把自定义的内容加载，因此在构造函数最后应该加入如下语句：</p>
+<div class="fragment"><div class="line"><span class="comment">//MainWindow的构造函数最后</span></div>
+<div class="line">sa_apply_customize_from_xml_file(<span class="stringliteral">&quot;customization.xml&quot;</span>, <span class="keyword">this</span>, m_ribbonActionMgr);</div>
+</div><!-- fragment --><p><code>sa_apply_customize_from_xml_file</code>是<code><a class="el" href="_s_a_ribbon_customize_widget_8h_source.html">SARibbonCustomizeWidget.h</a></code>中提供的函数，直接把配置文件中的自定义内容应用到MainWindow中。</p>
+<p>这样软件每次启动都会按照配置文件加载。</p>
+<h1><a class="anchor" id="更多截图"></a>
+更多截图</h1>
+<ul>
+<li>这是使用SARibbon构建的软件截图</li>
+</ul>
+<p><img src="data-workbench-screenshot1-cn.gif" alt="" class="inline"/>    </p>
+<p><img src="data-workbench-screenshot01-en.png" alt="" class="inline"/>    </p>
+<p><img src="./doc/screenshot/data-workbench-screenshot01-cn.png" alt="" class="inline"/></p>
+<p><a href="https://github.com/czyt1988/data-workbench">github - https://github.com/czyt1988/data-workbench</a></p>
+<p><a href="https://gitee.com/czyt1988/data-workbench">gitee - https://gitee.com/czyt1988/data-workbench</a></p>
+<p>具体Ribbon的生成代码可见：</p>
+<p><a href="https://github.com/czyt1988/data-workbench/blob/master/src/APP/DAAppRibbonArea.cpp">https://github.com/czyt1988/data-workbench/blob/master/src/APP/DAAppRibbonArea.cpp</a></p>
+<h1><a class="anchor" id="文档生成"></a>
+文档生成</h1>
+<p>你可以通过doxygen生成qch和html类型的文档，<code>doc/Doxyfile-qch-cn</code>文件用于生成&lt;tt&gt;.qch格式的qt帮助文档,你可以把它集成到qt creator当中，<code>doc/Doxyfile-wiki-cn</code>文件用于生成html格式的文档，方便你在浏览器中查阅</p>
+<h1><a class="anchor" id="常见问题"></a>
+常见问题</h1>
+<h2><a class="anchor" id="autotoc_md1高分屏显示问题"></a>
+1、高分屏显示问题</h2>
+<p>针对高分屏显示，有如下两个方面准备</p>
+<p>1 - 在main函数中为QApplication设置<code>Qt::AA_EnableHighDpiScaling</code>属性</p>
+<p>这个属性使得应用程序自动检测显示器的像素密度来实现自动缩放，示例代码如下：</p>
+<div class="fragment"><div class="line"><span class="keywordtype">int</span> main(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>* argv[])</div>
+<div class="line">{</div>
+<div class="line"><span class="preprocessor">#if (QT_VERSION &gt;= QT_VERSION_CHECK(5, 6, 0))</span></div>
+<div class="line">    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);</div>
+<div class="line">    QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);</div>
+<div class="line"><span class="preprocessor">#endif</span></div>
+<div class="line">    QApplication a(argc, argv);</div>
+<div class="line">    ......</div>
+<div class="line">}</div>
+</div><!-- fragment --><p>2 - 在main函数中为QApplication设置缩放策略：<code>QApplication::setHighDpiScaleFactorRoundingPolicy</code></p>
+<p>Qt5.6提供了<code>Qt::AA_EnableHighDpiScaling</code>，但不能完全解决，Qt5.14开始提供了高分屏缩放策略设置<code>QApplication::setHighDpiScaleFactorRoundingPolicy</code>，同<code>AA_EnableHighDpiScaling</code>一样需要在main函数前面设置</p>
+<div class="fragment"><div class="line"><span class="keywordtype">int</span> main(<span class="keywordtype">int</span> argc, <span class="keywordtype">char</span>* argv[])</div>
+<div class="line">{</div>
+<div class="line"><span class="preprocessor">#if (QT_VERSION &gt;= QT_VERSION_CHECK(5, 6, 0))</span></div>
+<div class="line">    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);</div>
+<div class="line">    QApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);</div>
+<div class="line"><span class="preprocessor">#endif</span></div>
+<div class="line"><span class="preprocessor">#if (QT_VERSION &gt;= QT_VERSION_CHECK(5, 14, 0))</span></div>
+<div class="line">    QApplication::setHighDpiScaleFactorRoundingPolicy(Qt::HighDpiScaleFactorRoundingPolicy::PassThrough);</div>
+<div class="line"><span class="preprocessor">#endif</span></div>
+<div class="line">    QApplication a(argc, argv);</div>
+<div class="line">    ......</div>
+<div class="line">}</div>
+</div><!-- fragment --><p>如果你使用OpenGL窗口发生了一些奇怪的问题，你可以把上面这些语句去掉看看，最新版Qt已经不需要进行上述的处理了</p>
+<h2><a class="anchor" id="autotoc_md2快捷键问题"></a>
+2、快捷键问题</h2>
+<p>经常有人反馈使用SARibbonBar后，没有被激活的tab页的快捷键没有响应，只有激活的标签页的快捷键才有反应，如果是传统的toolbar模式，由于action所在的toolbar一直在最前端，因此快捷键一直生效，但如果是SARibbonBar，action所在的pannel是会隐藏的，隐藏后快捷键就不生效，如果想快捷键无论Pannel是否隐藏都生效，设置快捷键的<code>shortcutContext</code>属性为<code>Qt::ApplicationShortcut</code>也无效，这时，可以通过Qt的<code>QWidget::addAction</code>函数把带快捷键的action添加到MainWindow中</p>
+<p>例如：</p>
+<div class="fragment"><div class="line"><span class="keywordtype">void</span> MainWindow::initRibbon(){</div>
+<div class="line">    <a class="code hl_class" href="class_s_a_ribbon_category.html">SARibbonCategory</a>* categoryMain = ribbon-&gt;<a class="code hl_function" href="class_s_a_ribbon_bar.html#a9adeaabbb6e8dc5d593dab4a90c83e63">addCategoryPage</a>(tr(<span class="stringliteral">&quot;Main&quot;</span>));</div>
+<div class="line">    <a class="code hl_class" href="class_s_a_ribbon_pannel.html">SARibbonPannel</a>* pannel = categoryMain-&gt;<a class="code hl_function" href="class_s_a_ribbon_category.html#a93a9ccb6d742ce1c5974f8aada372651">addPannel</a>(tr(<span class="stringliteral">&quot;io&quot;</span>));</div>
+<div class="line">    <span class="comment">//这里省略action的创建过程</span></div>
+<div class="line">    QAction* actSave = <span class="keyword">new</span> QAction(<span class="keyword">this</span>);</div>
+<div class="line">    ...</div>
+<div class="line">    <span class="comment">//给action设置快捷键</span></div>
+<div class="line">    actSave-&gt;setShortcut(QKeySequence(QLatin1String(<span class="stringliteral">&quot;Ctrl+S&quot;</span>)));</div>
+<div class="line">    <span class="comment">//把action添加到pannel中</span></div>
+<div class="line">    pannel-&gt;<a class="code hl_function" href="class_s_a_ribbon_pannel.html#aea8d760554e388afd905ea7c56c44430">addLargeAction</a>(actSave);</div>
+<div class="line">    <span class="comment">//把action添加到MainWindow中，这样切换到其他标签页，也可以响应快捷键</span></div>
+<div class="line">    addAction(actSave);</div>
+<div class="line">}</div>
+<div class="ttc" id="aclass_s_a_ribbon_bar_html_a9adeaabbb6e8dc5d593dab4a90c83e63"><div class="ttname"><a href="class_s_a_ribbon_bar.html#a9adeaabbb6e8dc5d593dab4a90c83e63">SARibbonBar::addCategoryPage</a></div><div class="ttdeci">SARibbonCategory * addCategoryPage(const QString &amp;title)</div><div class="ttdoc">添加一个标签 如果需要删除，直接delete即可，SARibbonBar会对其进行处理</div><div class="ttdef"><b>Definition</b> SARibbonBar.cpp:468</div></div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md3主题设置不生效"></a>
+3、主题设置不生效</h2>
+<p>某些版本的qt，在构造函数设置主题会不完全生效，可以使用QTimer投放到队列最后执行，如：</p>
+<div class="fragment"><div class="line">QTimer::singleShot(0, <span class="keyword">this</span>, [ <span class="keyword">this</span> ]() { </div>
+<div class="line">    this-&gt;setRibbonTheme(SARibbonMainWindow::RibbonThemeDark); </div>
+<div class="line">    });</div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md4遇到宏重定义"></a>
+4、遇到宏重定义</h2>
+<p>出现这个错误是在使用SARibbon.h/cpp时，这是因为早期版本的一些写在cpp里的调试宏没有做<code>#ifdef</code>处理，多个cpp合并后就会出现问题，用共享库不会出现此问题，如果遇到此问题，更新到v2.2.8以上版本即可</p>
+<h2><a class="anchor" id="autotoc_md5最大最小化图标不在右上角而在左上角"></a>
+5、最大最小化图标不在右上角而在左上角</h2>
+<p>如果你遇到这个问题，确认编译的库文件和头文件是否匹配，通常这个问题发生在局部更新上，也就是仅仅替换了dll，而没有替换h文件导致的，有些工程在拉取了最新的SARibbon版本后，更新完直接替换lib和dll文件，头文件没有替换就会发生此问题，修复此问题的方法是确保所有文件的版本一致性，你可以把原来涉及的文件都删除掉，如果你用cmake安装的话，将涉及如下文件/文件夹：</p>
+<div class="fragment"><div class="line">bin/<a class="code hl_class" href="class_s_a_ribbon_bar.html">SARibbonBar</a>.dll</div>
+<div class="line">include/<a class="code hl_class" href="class_s_a_ribbon_bar.html">SARibbonBar</a>[文件夹]</div>
+<div class="line">lib/<a class="code hl_class" href="class_s_a_ribbon_bar.html">SARibbonBar</a>.lib</div>
+<div class="line">lib/qmake/<a class="code hl_class" href="class_s_a_ribbon_bar.html">SARibbonBar</a>[文件夹]</div>
+<div class="line">lib/cmake/<a class="code hl_class" href="class_s_a_ribbon_bar.html">SARibbonBar</a>[文件夹]</div>
+<div class="line">SARibbonBar_amalgamate</div>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md6图标没有显示"></a>
+6、图标没有显示</h2>
+<p>如果你遇到图标不显示，例如最大最小化按钮没有图标但有按钮，那么说明你的运行环境没有找到Qt的svg插件，你的程序目录下应该要有<code>imageformats/qsvg.dll</code>插件，你可以运行windeployqt拉取你程序的依赖，或者确保你的环境变量PATH配置中能找到<code>plugins/imageformats</code>文件夹</p>
+<h2><a class="anchor" id="autotoc_md7提示could-not-create-pixmap-from-saribbonimageresourcexxxsvg"></a>
+7、提示Could not create pixmap from :\SARibbon\xxx.svg</h2>
+<p>此问题同问题6，你的程序目录下应该要有<code>imageformats/qsvg.dll</code>插件</p>
+<h1><a class="anchor" id="给我一个鼓励"></a>
+给我一个鼓励</h1>
+<p>如果项目对你有用，请你给我一个鼓励： </p><div style="text-align:center"> <img src="./doc/pic/赞赏码.png" alt="赞赏码" style="width:400px;" class="inline"/> </div> </div></div><!-- PageDoc -->
+<a href="doxygen_crawl.html"/>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="footer">制作者 <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.10.0 </li>
+  </ul>
+</div>
+</body>
+</html>
