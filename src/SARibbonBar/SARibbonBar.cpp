@@ -2478,6 +2478,26 @@ QSize scaleSizeByHeight(const QSize& originalSize, int newHeight)
 	return QSize(newWidth, newHeight);
 }
 
+QSize scaleSizeByHeight(const QSize& originalSize, int newHeight, qreal factor)
+{
+	// 1. 参数合法性检查
+	if (originalSize.height() <= 0 || originalSize.width() < 0 || newHeight <= 0 || qFuzzyIsNull(factor)) {
+		return QSize(0, 0);
+	}
+
+	// 2. 计算原始宽高比
+	const qreal originalAspect = static_cast< qreal >(originalSize.width()) / static_cast< qreal >(originalSize.height());
+
+	// 3. 把用户提供的 1:factor 转换成真正的目标宽高比
+	//    目标宽高比 = originalAspect / factor
+	const qreal targetAspect = originalAspect / factor;
+
+	// 4. 根据新高度反推宽度
+	const int newWidth = qRound(newHeight * targetAspect);
+
+	return QSize(newWidth, newHeight);
+}
+
 QSize scaleSizeByWidth(const QSize& originalSize, int newWidth)
 {
 	// 检查原始尺寸宽度、高度是否有效，以及目标宽度是否有效

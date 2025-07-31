@@ -12,7 +12,7 @@
 #include "SARibbonElementManager.h"
 
 #ifndef SARIBBONBARLAYOUT_ENABLE_DEBUG_PRINT
-#define SARIBBONBARLAYOUT_ENABLE_DEBUG_PRINT 1
+#define SARIBBONBARLAYOUT_ENABLE_DEBUG_PRINT 0
 #endif
 #if SARIBBONBARLAYOUT_ENABLE_DEBUG_PRINT
 #include <QDebug>
@@ -700,7 +700,13 @@ void SARibbonBarLayout::resizeInLooseStyle()
 	if (auto appBtn = applicationButton()) {
 		if (appBtn->isVisibleTo(ribbon)) {
 			QSize appBtnSize = appBtn->sizeHint();
-			appBtnSize       = SA::scaleSizeByHeight(appBtnSize, tabBarControlHeight);
+			// appBtnSize的sizehint是根据文字宽度来推荐，如果按高度来扩展，会显得有点大，直接设置高度，又显得有点小
+			// 因此宽高不按1:1比例扩展，按1:1.5比例扩展，也就是高度扩展3倍，宽度扩展3/1.5倍
+			// 目前看这个比例相对比较协调
+			appBtnSize = SA::scaleSizeByHeight(appBtnSize, tabBarControlHeight, 1.5);
+#if SARIBBONBARLAYOUT_ENABLE_DEBUG_PRINT
+			qDebug() << "scaleSizeByHeight tabBarControlHeight" << tabBarControlHeight << ",appBtnSize=" << appBtnSize;
+#endif
 			appBtn->setGeometry(x, y + 1, appBtnSize.width(), appBtnSize.height());
 			x = appBtn->geometry().right();
 			// 累加到最小宽度中
@@ -810,7 +816,7 @@ void SARibbonBarLayout::resizeInCompactStyle()
 	if (auto appBtn = applicationButton()) {
 		if (appBtn->isVisibleTo(ribbon)) {
 			QSize appBtnSize = appBtn->sizeHint();
-			appBtnSize       = SA::scaleSizeByHeight(appBtnSize, titleBarControlHeight);
+			appBtnSize       = SA::scaleSizeByHeight(appBtnSize, titleBarControlHeight, 1.5);
 			appBtn->setGeometry(x, y + 1, appBtnSize.width(), appBtnSize.height());
 			x += appBtn->geometry().right();
 			// 累加到最小宽度中

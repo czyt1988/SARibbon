@@ -9863,8 +9863,8 @@ void SARibbonPannel::changeEvent(QEvent* e)
 		return;
 	}
 	if (e->type() == QEvent::FontChange) {
-		QFont f                       = font();
-		QList< QWidget* > listWidgets = findChildren< QWidget* >();
+		QFont f                             = font();
+		const QList< QWidget* > listWidgets = findChildren< QWidget* >();
 		for (QWidget* w : listWidgets) {
 			w->setFont(f);
 		}
@@ -15367,6 +15367,26 @@ QSize scaleSizeByHeight(const QSize& originalSize, int newHeight)
 	return QSize(newWidth, newHeight);
 }
 
+QSize scaleSizeByHeight(const QSize& originalSize, int newHeight, qreal factor)
+{
+	// 1. 参数合法性检查
+	if (originalSize.height() <= 0 || originalSize.width() < 0 || newHeight <= 0 || qFuzzyIsNull(factor)) {
+		return QSize(0, 0);
+	}
+
+	// 2. 计算原始宽高比
+	const qreal originalAspect = static_cast< qreal >(originalSize.width()) / static_cast< qreal >(originalSize.height());
+
+	// 3. 把用户提供的 1:factor 转换成真正的目标宽高比
+	//    目标宽高比 = originalAspect / factor
+	const qreal targetAspect = originalAspect / factor;
+
+	// 4. 根据新高度反推宽度
+	const int newWidth = qRound(newHeight * targetAspect);
+
+	return QSize(newWidth, newHeight);
+}
+
 QSize scaleSizeByWidth(const QSize& originalSize, int newWidth)
 {
 	// 检查原始尺寸宽度、高度是否有效，以及目标宽度是否有效
@@ -15390,7 +15410,7 @@ QSize scaleSizeByWidth(const QSize& originalSize, int newWidth)
 #include <QScreen>
 
 #ifndef SARIBBONBARLAYOUT_ENABLE_DEBUG_PRINT
-#define SARIBBONBARLAYOUT_ENABLE_DEBUG_PRINT 1
+#define SARIBBONBARLAYOUT_ENABLE_DEBUG_PRINT 0
 #endif
 #if SARIBBONBARLAYOUT_ENABLE_DEBUG_PRINT
 #include <QDebug>
@@ -16078,7 +16098,13 @@ void SARibbonBarLayout::resizeInLooseStyle()
 	if (auto appBtn = applicationButton()) {
 		if (appBtn->isVisibleTo(ribbon)) {
 			QSize appBtnSize = appBtn->sizeHint();
-			appBtnSize       = SA::scaleSizeByHeight(appBtnSize, tabBarControlHeight);
+			// appBtnSize的sizehint是根据文字宽度来推荐，如果按高度来扩展，会显得有点大，直接设置高度，又显得有点小
+			// 因此宽高不按1:1比例扩展，按1:1.5比例扩展，也就是高度扩展3倍，宽度扩展3/1.5倍
+			// 目前看这个比例相对比较协调
+			appBtnSize = SA::scaleSizeByHeight(appBtnSize, tabBarControlHeight, 1.5);
+#if SARIBBONBARLAYOUT_ENABLE_DEBUG_PRINT
+			qDebug() << "scaleSizeByHeight tabBarControlHeight" << tabBarControlHeight << ",appBtnSize=" << appBtnSize;
+#endif
 			appBtn->setGeometry(x, y + 1, appBtnSize.width(), appBtnSize.height());
 			x = appBtn->geometry().right();
 			// 累加到最小宽度中
@@ -16188,7 +16214,7 @@ void SARibbonBarLayout::resizeInCompactStyle()
 	if (auto appBtn = applicationButton()) {
 		if (appBtn->isVisibleTo(ribbon)) {
 			QSize appBtnSize = appBtn->sizeHint();
-			appBtnSize       = SA::scaleSizeByHeight(appBtnSize, titleBarControlHeight);
+			appBtnSize       = SA::scaleSizeByHeight(appBtnSize, titleBarControlHeight, 1.5);
 			appBtn->setGeometry(x, y + 1, appBtnSize.width(), appBtnSize.height());
 			x += appBtn->geometry().right();
 			// 累加到最小宽度中
