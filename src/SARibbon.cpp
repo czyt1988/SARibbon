@@ -3966,10 +3966,10 @@ void SAFramelessHelper::removeFrom(QWidget* topLevelWidget)
 
 void SAFramelessHelper::setRubberBandOnMove(bool movable)
 {
-	d_ptr->m_bRubberBandOnMove                  = movable;
-	QList< SAPrivateFramelessWidgetData* > list = d_ptr->m_widgetDataHash.values();
+	d_ptr->m_bRubberBandOnMove                        = movable;
+	const QList< SAPrivateFramelessWidgetData* > list = d_ptr->m_widgetDataHash.values();
 
-	foreach (SAPrivateFramelessWidgetData* data, list) {
+	for (SAPrivateFramelessWidgetData* data : list) {
 		data->updateRubberBandStatus();
 	}
 }
@@ -3986,10 +3986,10 @@ void SAFramelessHelper::setWidgetResizable(bool resizable)
 
 void SAFramelessHelper::setRubberBandOnResize(bool resizable)
 {
-	d_ptr->m_bRubberBandOnResize                = resizable;
-	QList< SAPrivateFramelessWidgetData* > list = d_ptr->m_widgetDataHash.values();
+	d_ptr->m_bRubberBandOnResize                      = resizable;
+	const QList< SAPrivateFramelessWidgetData* > list = d_ptr->m_widgetDataHash.values();
 
-	foreach (SAPrivateFramelessWidgetData* data, list) {
+	for (SAPrivateFramelessWidgetData* data : list) {
 		data->updateRubberBandStatus();
 	}
 }
@@ -13679,6 +13679,12 @@ void SARibbonBar::addContextCategory(SARibbonContextCategory* context)
 	connect(context, &SARibbonContextCategory::categoryPageAdded, this, &SARibbonBar::onContextsCategoryPageAdded);
 	connect(context, &SARibbonContextCategory::categoryTitleChanged, this, &SARibbonBar::onContextsCategoryCategoryNameChanged);
 	// remove并没有绑定，主要是remove后在stacked里也不会显示，remove且delete的话，stacked里也会删除
+	// 如果当前SARibbonContextCategory有category，先插入stackwidget中
+	for (int i = 0; i < context->categoryCount(); ++i) {
+		if (SARibbonCategory* category = context->categoryPage(i)) {
+			d_ptr->mStackedContainerWidget->addWidget(category);
+		}
+	}
 	d_ptr->mContextCategoryList.append(context);
 }
 
@@ -13712,7 +13718,7 @@ void SARibbonBar::showContextCategory(SARibbonContextCategory* context)
 
 	d_ptr->relayout();
 
-	// 重新布局完后需要重绘
+	// 重新布局完后需要重绘,因为上下文标签涉及窗口的绘制
 	update();
 }
 

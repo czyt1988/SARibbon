@@ -594,10 +594,10 @@ void SAFramelessHelper::removeFrom(QWidget* topLevelWidget)
 
 void SAFramelessHelper::setRubberBandOnMove(bool movable)
 {
-	d_ptr->m_bRubberBandOnMove                  = movable;
-	QList< SAPrivateFramelessWidgetData* > list = d_ptr->m_widgetDataHash.values();
+	d_ptr->m_bRubberBandOnMove                        = movable;
+	const QList< SAPrivateFramelessWidgetData* > list = d_ptr->m_widgetDataHash.values();
 
-	foreach (SAPrivateFramelessWidgetData* data, list) {
+	for (SAPrivateFramelessWidgetData* data : list) {
 		data->updateRubberBandStatus();
 	}
 }
@@ -614,10 +614,10 @@ void SAFramelessHelper::setWidgetResizable(bool resizable)
 
 void SAFramelessHelper::setRubberBandOnResize(bool resizable)
 {
-	d_ptr->m_bRubberBandOnResize                = resizable;
-	QList< SAPrivateFramelessWidgetData* > list = d_ptr->m_widgetDataHash.values();
+	d_ptr->m_bRubberBandOnResize                      = resizable;
+	const QList< SAPrivateFramelessWidgetData* > list = d_ptr->m_widgetDataHash.values();
 
-	foreach (SAPrivateFramelessWidgetData* data, list) {
+	for (SAPrivateFramelessWidgetData* data : list) {
 		data->updateRubberBandStatus();
 	}
 }

@@ -14,10 +14,10 @@
 </p>
 </div>
 
-QQ交流群:434014314
+QQ交流群:755294806、434014314(已满)
 
 <div align="center">
-<img src="./doc/SARibbon-qq%E4%BA%A4%E6%B5%81%E7%BE%A4.jpg" style="width:300px;"/>
+<img src="./doc/SARibbon-qq交流群2.jpg" style="width:300px;"/>
 </div>
 
 ||Windows(latest)|Linux ubuntu(latest)|Mac(latest)|
