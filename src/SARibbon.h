@@ -798,7 +798,7 @@ public:
 	virtual QSize sizeHint() const Q_DECL_OVERRIDE;
 
 public:
-	// 在lite模式下是否允许文字换行
+	// 是否允许文字换行
 	static void setEnableWordWrap(bool on);
 	static bool isEnableWordWrap();
 	// 文本宽度估算时的宽度比高度系数,超过此系数的宽度时，开始尝试换行或者省略号显示

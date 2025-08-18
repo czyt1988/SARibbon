@@ -752,8 +752,9 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
 	// 使用addPannel函数来创建SARibbonPannel，效果和new SARibbonPannel再addPannel一样
 	SARibbonPannel* pannelStyle = page->addPannel(tr("ribbon style"));
 
-	QAction* actSave = createAction(tr("Save"), ":/icon/icon/save.svg");
-	connect(actSave, &QAction::triggered, this, [ this ](bool b) {
+	//! actionSave - 保存action
+	QAction* actionSave = createAction(tr("Save"), ":/icon/icon/save.svg");
+	connect(actionSave, &QAction::triggered, this, [ this ](bool b) {
 		Q_UNUSED(b);
 		this->mTextedit->append("actSaveion clicked");
 		this->setWindowModified(false);
@@ -761,26 +762,31 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
 		this->ribbonBar()->repaint();
 	});
 	// 快捷键设置示范，如果你想你的快捷键能在整个MainWindow生命周期都显示，你应该把这个action也添加到MainWindow中
-	actSave->setShortcut(QKeySequence(QLatin1String("Ctrl+S")));
-	addAction(actSave);
-	pannelStyle->addLargeAction(actSave);
+	actionSave->setShortcut(QKeySequence(QLatin1String("Ctrl+S")));
+	// 这里调用addAction，是为了把actionSave添加到主窗口，这样，只要主窗口在最前面，就能响应快捷键，否则，只有main tab显示才会显示快捷键
+	addAction(actionSave);
+	pannelStyle->addLargeAction(actionSave);
 
-	QAction* actHideRibbon = createAction(tr("hide ribbon"), ":/icon/icon/hideRibbon.svg", "actHideRibbon");
-	actHideRibbon->setCheckable(true);
-	pannelStyle->addSmallAction(actHideRibbon);
-	connect(actHideRibbon, &QAction::triggered, this, [ this ](bool b) { this->ribbonBar()->setMinimumMode(b); });
-	connect(ribbonBar(), &SARibbonBar::ribbonModeChanged, this, [ actHideRibbon ](SARibbonBar::RibbonMode nowNode) {
-		actHideRibbon->setChecked(nowNode == SARibbonBar::MinimumRibbonMode);
+	//! hide ribbon action
+	QAction* actionHideRibbon = createAction(tr("hide ribbon"), ":/icon/icon/hideRibbon.svg", "actHideRibbon");
+	actionHideRibbon->setCheckable(true);
+	pannelStyle->addSmallAction(actionHideRibbon);
+	connect(actionHideRibbon, &QAction::triggered, this, [ this ](bool b) { this->ribbonBar()->setMinimumMode(b); });
+	connect(ribbonBar(), &SARibbonBar::ribbonModeChanged, this, [ actionHideRibbon ](SARibbonBar::RibbonMode nowNode) {
+		// ribbon最小化状态变化时调整action的check状态
+		actionHideRibbon->setChecked(nowNode == SARibbonBar::MinimumRibbonMode);
 	});
 
-	QAction* actShowHideButton =
+	//! show hide button
+	// 注意，这里你可以看到文字设置时加了换行，在ribbon中，如果在多行文本模式下，会让文字主动换行，如果设置为单行文本，这个换行会忽略
+	QAction* actionShowHideButton =
 		createAction(tr("show \nhide button"), ":/icon/icon/showHideButton.svg", "show hide button");
-	actShowHideButton->setCheckable(true);
-	pannelStyle->addSmallAction(actShowHideButton);  // wrod wrap was not effect in small button
-	connect(actShowHideButton, &QAction::triggered, this, [ this ](bool b) {
+	actionShowHideButton->setCheckable(true);
+	pannelStyle->addSmallAction(actionShowHideButton);  // wrod wrap was not effect in small button
+	connect(actionShowHideButton, &QAction::triggered, this, [ this ](bool b) {
 		this->ribbonBar()->showMinimumModeButton(b);  // 显示ribbon最小化按钮
 	});
-	actShowHideButton->trigger();
+	actionShowHideButton->trigger();
 
 	mActionWordWrap = createAction(tr("word wrap"), ":/icon/icon/wordwrap.svg");
 	mActionWordWrap->setCheckable(ribbonBar()->isEnableWordWrap());
@@ -955,6 +961,20 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
 		this->mTextedit->append(tr("Text can be manually wrapped(use \\n), and will appear as 1 line in the case of "
 								   "SARibbonBar::setEnableWordWrap (false)"));  // cn:文本中手动换行
 	});
+
+	act = createAction(QString(), ":/icon/icon/setText.svg", "ToolButtonIconOnly");
+	pannel2->addLargeAction(act);
+	// 通过此函数获取addAction后生成的ToolButton
+	if (SARibbonToolButton* toolbutton = pannel2->lastAddActionButton()) {
+		toolbutton->setToolButtonStyle(Qt::ToolButtonIconOnly);
+	}
+
+	act = createAction(tr("Text Only"), ":/icon/icon/setText.svg", "ToolButtonTextOnly");
+	pannel2->addLargeAction(act);
+	// 通过此函数获取addAction后生成的ToolButton
+	if (SARibbonToolButton* toolbutton = pannel2->lastAddActionButton()) {
+		toolbutton->setToolButtonStyle(Qt::ToolButtonTextOnly);
+	}
 	//! 3
 	//! pannel 3 start -> widget test
 	//!
