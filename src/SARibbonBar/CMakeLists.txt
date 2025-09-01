@@ -125,7 +125,7 @@ SET(SARIBBON_RESOURCE_FILES
 message(STATUS "SARibbon resource file:${SARIBBON_RESOURCE_FILES}")
 ################################################################
 
-add_library(${SARIBBON_LIB_NAME} SHARED
+add_library(${SARIBBON_LIB_NAME}
     ${SARIBBON_HEADER_FILES}
     ${SARIBBON_SOURCE_FILES}
     ${SARIBBON_RESOURCE_FILES}
@@ -170,8 +170,14 @@ set_target_properties(${SARIBBON_LIB_NAME} PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}"
 )
 # 构建库定义的宏,此宏必须为PRIVATE
-target_compile_definitions(${SARIBBON_LIB_NAME} PRIVATE SA_RIBBON_BAR_MAKE_LIB)
-message(STATUS "macros predefined:#define SA_RIBBON_BAR_MAKE_LIB")
+if (BUILD_SHARED_LIBS)
+    target_compile_definitions(${SARIBBON_LIB_NAME} PRIVATE SA_RIBBON_BAR_MAKE_LIB)
+    message(STATUS "macros predefined:#define SA_RIBBON_BAR_MAKE_LIB")
+else()
+    target_compile_definitions(${SARIBBON_LIB_NAME} PRIVATE SA_RIBBON_BAR_NO_EXPORT)
+    message(STATUS "macros predefined:#define SA_RIBBON_BAR_NO_EXPORT")
+endif()
+
 # 使用SAColorWidgets但不作为库使用定义的宏,此宏必须为PRIVATE
 target_compile_definitions(${SARIBBON_LIB_NAME} PRIVATE SA_COLOR_WIDGETS_MAKE_LIB)
 message(STATUS "macros predefined:#define SA_COLOR_WIDGETS_MAKE_LIB")
