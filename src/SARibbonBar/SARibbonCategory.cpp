@@ -51,15 +51,16 @@ public:
 	void init(SARibbonCategory* c);
 
 public:
-	bool mEnableShowPannelTitle { true };    ///< 是否运行pannel的标题栏显示
-	int mPannelTitleHeight { 15 };           ///< pannel的标题栏默认高度
-	bool mIsContextCategory { false };       ///< 标记是否是上下文标签
-	bool mIsCanCustomize { true };           ///< 标记是否可以自定义
-	int mPannelSpacing { 0 };                ///< pannel的spacing
-	bool m_isUseAnimating { true };          ///< 默认使用动画滚动
-	QSize mPannelToolButtonSize { 22, 22 };  ///< 记录pannel的默认图标大小
-	SARibbonPannel::PannelLayoutMode mDefaultPannelLayoutMode { SARibbonPannel::ThreeRowMode };
-	int m_wheelScrollStep { 400 };  // 默认滚轮滚动步长
+    bool enableShowPannelTitle { true };    ///< 是否运行pannel的标题栏显示
+    int pannelTitleHeight { 15 };           ///< pannel的标题栏默认高度
+    bool isContextCategory { false };       ///< 标记是否是上下文标签
+    bool isCanCustomize { true };           ///< 标记是否可以自定义
+    int pannelSpacing { 0 };                ///< pannel的spacing
+    bool isUseAnimating { true };           ///< 默认使用动画滚动
+    bool enableWordWrap { true };           ///< 是否文字换行
+    QSize pannelToolButtonSize { 22, 22 };  ///< 记录pannel的默认图标大小
+    int wheelScrollStep { 400 };            // 默认滚轮滚动步长
+    SARibbonPannel::PannelLayoutMode defaultPannelLayoutMode { SARibbonPannel::ThreeRowMode };
 };
 SARibbonCategory::PrivateData::PrivateData(SARibbonCategory* p) : q_ptr(p)
 {
@@ -111,11 +112,13 @@ void SARibbonCategory::PrivateData::insertPannel(int index, SARibbonPannel* pann
 		pannel->setParent(q_ptr);
 	}
 	// 同步状态
-	pannel->setEnableShowTitle(mEnableShowPannelTitle);
-	pannel->setTitleHeight(mPannelTitleHeight);
-	pannel->setPannelLayoutMode(mDefaultPannelLayoutMode);
-	pannel->setSpacing(mPannelSpacing);
-	pannel->setToolButtonIconSize(mPannelToolButtonSize);
+    pannel->setEnableShowTitle(this->enableShowPannelTitle);
+    pannel->setTitleHeight(this->pannelTitleHeight);
+    pannel->setPannelLayoutMode(this->defaultPannelLayoutMode);
+    pannel->setSpacing(this->pannelSpacing);
+    pannel->setToolButtonIconSize(this->pannelToolButtonSize);
+    pannel->setEnableWordWrap(this->enableWordWrap);
+
 	index = qMax(0, index);
 	index = qMin(lay->pannelCount(), index);
 	lay->insertPannel(index, pannel);
@@ -189,7 +192,7 @@ void SARibbonCategory::PrivateData::doWheelEvent(QWheelEvent* event)
 	}
 
 	// 如果动画正在进行，忽略新的事件
-	if (m_isUseAnimating && lay->isAnimatingScroll()) {
+    if (isUseAnimating && lay->isAnimatingScroll()) {
 		event->ignore();
 		return;
 	}
@@ -198,7 +201,7 @@ void SARibbonCategory::PrivateData::doWheelEvent(QWheelEvent* event)
 	int totalWidth    = lay->categoryTotalWidth();
 
 	if (totalWidth > contentSize.width()) {
-		int scrollStep = m_wheelScrollStep;
+        int scrollStep = wheelScrollStep;
 
 		// 根据滚轮方向确定滚动方向
 		QPoint numPixels  = event->pixelDelta();
@@ -219,7 +222,7 @@ void SARibbonCategory::PrivateData::doWheelEvent(QWheelEvent* event)
 		}
 
 		// 根据设置选择滚动方式
-		if (m_isUseAnimating) {
+        if (isUseAnimating) {
 			lay->scrollByAnimate(scrollStep);
 		} else {
 			lay->scroll(scrollStep);
@@ -228,7 +231,7 @@ void SARibbonCategory::PrivateData::doWheelEvent(QWheelEvent* event)
 		event->ignore();
 		if (lay->isScrolled()) {
 			// 根据设置选择复位方式
-			if (m_isUseAnimating) {
+            if (isUseAnimating) {
 				lay->scrollToByAnimate(0);
 			} else {
 				lay->scroll(0);
@@ -302,7 +305,7 @@ bool SARibbonCategory::event(QEvent* e)
  */
 SARibbonPannel::PannelLayoutMode SARibbonCategory::pannelLayoutMode() const
 {
-    return (d_ptr->mDefaultPannelLayoutMode);
+    return (d_ptr->defaultPannelLayoutMode);
 }
 
 /**
@@ -314,7 +317,7 @@ SARibbonPannel::PannelLayoutMode SARibbonCategory::pannelLayoutMode() const
  */
 void SARibbonCategory::setPannelLayoutMode(SARibbonPannel::PannelLayoutMode m)
 {
-	d_ptr->mDefaultPannelLayoutMode = m;
+    d_ptr->defaultPannelLayoutMode = m;
 	iteratePannel([ m ](SARibbonPannel* p) -> bool {
 		p->setPannelLayoutMode(m);
 		return true;
@@ -509,7 +512,7 @@ QSize SARibbonCategory::sizeHint() const
  */
 bool SARibbonCategory::isContextCategory() const
 {
-    return (d_ptr->mIsContextCategory);
+    return (d_ptr->isContextCategory);
 }
 
 /**
@@ -530,7 +533,7 @@ int SARibbonCategory::pannelCount() const
  */
 bool SARibbonCategory::isCanCustomize() const
 {
-    return (d_ptr->mIsCanCustomize);
+    return (d_ptr->isCanCustomize);
 }
 
 /**
@@ -539,7 +542,7 @@ bool SARibbonCategory::isCanCustomize() const
  */
 void SARibbonCategory::setCanCustomize(bool b)
 {
-    d_ptr->mIsCanCustomize = b;
+    d_ptr->isCanCustomize = b;
 }
 
 /**
@@ -548,7 +551,7 @@ void SARibbonCategory::setCanCustomize(bool b)
  */
 int SARibbonCategory::pannelTitleHeight() const
 {
-    return d_ptr->mPannelTitleHeight;
+    return d_ptr->pannelTitleHeight;
 }
 /**
  * @brief 设置pannel的高度
@@ -556,7 +559,7 @@ int SARibbonCategory::pannelTitleHeight() const
  */
 void SARibbonCategory::setPannelTitleHeight(int h)
 {
-	d_ptr->mPannelTitleHeight = h;
+    d_ptr->pannelTitleHeight = h;
 	iteratePannel([ h ](SARibbonPannel* p) -> bool {
 		p->setTitleHeight(h);
 		return true;
@@ -569,7 +572,7 @@ void SARibbonCategory::setPannelTitleHeight(int h)
  */
 bool SARibbonCategory::isEnableShowPannelTitle() const
 {
-    return d_ptr->mEnableShowPannelTitle;
+    return d_ptr->enableShowPannelTitle;
 }
 
 /**
@@ -578,7 +581,7 @@ bool SARibbonCategory::isEnableShowPannelTitle() const
  */
 void SARibbonCategory::setEnableShowPannelTitle(bool on)
 {
-	d_ptr->mEnableShowPannelTitle = on;
+    d_ptr->enableShowPannelTitle = on;
 	iteratePannel([ on ](SARibbonPannel* p) -> bool {
 		p->setEnableShowTitle(on);
 		return true;
@@ -622,7 +625,7 @@ void SARibbonCategory::updateItemGeometry()
  */
 void SARibbonCategory::setUseAnimatingScroll(bool useAnimating)
 {
-    d_ptr->m_isUseAnimating = useAnimating;
+    d_ptr->isUseAnimating = useAnimating;
 }
 
 /**
@@ -631,7 +634,7 @@ void SARibbonCategory::setUseAnimatingScroll(bool useAnimating)
  */
 bool SARibbonCategory::isUseAnimatingScroll() const
 {
-    return d_ptr->m_isUseAnimating;
+    return d_ptr->isUseAnimating;
 }
 
 /**
@@ -640,7 +643,7 @@ bool SARibbonCategory::isUseAnimatingScroll() const
  */
 void SARibbonCategory::setWheelScrollStep(int step)
 {
-    d_ptr->m_wheelScrollStep = qMax(10, step);  // 最小10像素
+    d_ptr->wheelScrollStep = qMax(10, step);  // 最小10像素
 }
 
 /**
@@ -649,7 +652,7 @@ void SARibbonCategory::setWheelScrollStep(int step)
  */
 int SARibbonCategory::wheelScrollStep() const
 {
-    return d_ptr->m_wheelScrollStep;
+    return d_ptr->wheelScrollStep;
 }
 
 /**
@@ -672,7 +675,31 @@ int SARibbonCategory::animationDuration() const
 	if (SARibbonCategoryLayout* lay = categoryLayout()) {
 		return lay->animationDuration();
 	}
-	return -1;
+    return -1;
+}
+
+/**
+ * @brief 设置pannel的按钮文字允许换行
+ * @param on
+ */
+void SARibbonCategory::setEnableWordWrap(bool on)
+{
+    d_ptr->enableWordWrap = on;
+    iteratePannel([ on ](SARibbonPannel* pannel) -> bool {
+        if (pannel) {
+            pannel->setEnableWordWrap(on);
+        }
+        return true;
+    });
+}
+
+/**
+ * @brief 判断pannel的文字是否允许换行
+ * @return
+ */
+bool SARibbonCategory::isEnableWordWrap() const
+{
+    return d_ptr->enableWordWrap;
 }
 
 /**
@@ -722,7 +749,7 @@ SARibbonAlignment SARibbonCategory::categoryAlignment() const
  */
 void SARibbonCategory::setPannelSpacing(int n)
 {
-	d_ptr->mPannelSpacing = n;
+    d_ptr->pannelSpacing = n;
 	iteratePannel([ n ](SARibbonPannel* pannel) -> bool {
 		if (pannel) {
 			pannel->setSpacing(n);
@@ -737,7 +764,7 @@ void SARibbonCategory::setPannelSpacing(int n)
  */
 int SARibbonCategory::pannelSpacing() const
 {
-    return d_ptr->mPannelSpacing;
+    return d_ptr->pannelSpacing;
 }
 
 /**
@@ -746,7 +773,7 @@ int SARibbonCategory::pannelSpacing() const
  */
 void SARibbonCategory::setPannelToolButtonIconSize(const QSize& s)
 {
-	d_ptr->mPannelToolButtonSize = s;
+    d_ptr->pannelToolButtonSize = s;
 	iteratePannel([ s ](SARibbonPannel* pannel) -> bool {
 		if (pannel) {
 			pannel->setToolButtonIconSize(s);
@@ -761,7 +788,7 @@ void SARibbonCategory::setPannelToolButtonIconSize(const QSize& s)
  */
 QSize SARibbonCategory::pannelToolButtonIconSize() const
 {
-    return d_ptr->mPannelToolButtonSize;
+    return d_ptr->pannelToolButtonSize;
 }
 
 /**
@@ -811,7 +838,7 @@ void SARibbonCategory::changeEvent(QEvent* event)
  */
 void SARibbonCategory::markIsContextCategory(bool isContextCategory)
 {
-    d_ptr->mIsContextCategory = isContextCategory;
+    d_ptr->isContextCategory = isContextCategory;
 }
 
 /**

@@ -361,7 +361,7 @@ public:
 	void setPannelSpacing(int n);
 	int pannelSpacing() const;
 
-	// 设置pannel按钮的icon尺寸，large action不受此尺寸影响
+    // 设置pannel按钮(pannel右下角的功能按钮)的icon尺寸
 	void setPannelToolButtonIconSize(const QSize& s);
 	QSize pannelToolButtonIconSize() const;
 

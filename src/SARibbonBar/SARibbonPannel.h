@@ -210,6 +210,10 @@ public:
 
 	// 获取pannel标题的label控件
 	SARibbonPannelLabel* titleLabel() const;
+
+    // 设置按钮允许换行，注意图标大小是由文字决定的，两行文字会让图标变小，如果想图标变大，文字不换行是最好的
+    void setEnableWordWrap(bool on);
+    bool isEnableWordWrap() const;
 Q_SIGNALS:
 
 	/**

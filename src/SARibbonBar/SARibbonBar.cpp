@@ -93,6 +93,7 @@ public:
 	SARibbonMainWindowStyles mMainWindowStyle;                   ///< 记录MainWindow的样式
 	FpContextCategoryHighlight mFpContextHighlight { nullptr };  ///< 上下文标签高亮
 	bool mEnableTabDoubleClickToMinimumMode { true };  ///< 是否允许tab双击激活ribbon的最小化模式
+    bool mEnableWordWrap { true };                     ///< 是否允许文字换行
 public:
 	PrivateData(SARibbonBar* par) : q_ptr(par)
 	{
@@ -471,6 +472,7 @@ SARibbonCategory* SARibbonBar::addCategoryPage(const QString& title)
 
 	category->setObjectName(title);
 	category->setCategoryName(title);
+
 	addCategoryPage(category);
 	return (category);
 }
@@ -527,9 +529,11 @@ void SARibbonBar::insertCategoryPage(SARibbonCategory* category, int index)
 	if (nullptr == category) {
 		return;
 	}
-	category->setPannelLayoutMode(d_ptr->mDefaulePannelLayoutMode);
-	category->setPannelSpacing(d_ptr->mPannelSpacing);
-	category->setPannelToolButtonIconSize(d_ptr->mPannelToolButtonSize);
+    category->setPannelLayoutMode(pannelLayoutMode());
+    category->setPannelSpacing(pannelSpacing());
+    category->setPannelToolButtonIconSize(pannelToolButtonIconSize());
+    category->setEnableWordWrap(isEnableWordWrap());
+
 	int i = d_ptr->mRibbonTabBar->insertTab(index, category->categoryName());
 
 	_SARibbonTabData tabdata;
@@ -989,12 +993,14 @@ void SARibbonBar::showMinimumModeButton(bool isShow)
 		activeRightButtonGroup();
 
 		d_ptr->mMinimumCategoryButtonAction = new QAction(this);
-		d_ptr->mMinimumCategoryButtonAction->setIcon(style()->standardIcon(
-			isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton, nullptr));
+        d_ptr->mMinimumCategoryButtonAction->setIcon(
+            style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton,
+                                  nullptr));
 		connect(d_ptr->mMinimumCategoryButtonAction, &QAction::triggered, this, [ this ]() {
 			this->setMinimumMode(!isMinimumMode());
-			this->d_ptr->mMinimumCategoryButtonAction->setIcon(style()->standardIcon(
-				isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton, nullptr));
+            this->d_ptr->mMinimumCategoryButtonAction->setIcon(
+                style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton,
+                                      nullptr));
 		});
 		d_ptr->mRightButtonGroup->addAction(d_ptr->mMinimumCategoryButtonAction);
 	}
@@ -1668,7 +1674,13 @@ Qt::Alignment SARibbonBar::windowTitleAligment() const
  */
 void SARibbonBar::setEnableWordWrap(bool on)
 {
-	SARibbonToolButton::setEnableWordWrap(on);
+    d_ptr->mEnableWordWrap = on;
+    iterateCategory([ on ](SARibbonCategory* category) -> bool {
+        if (category) {
+            category->setEnableWordWrap(on);
+        }
+        return true;
+    });
 	updateRibbonGeometry();
 }
 
@@ -1678,7 +1690,7 @@ void SARibbonBar::setEnableWordWrap(bool on)
  */
 bool SARibbonBar::isEnableWordWrap() const
 {
-    return SARibbonToolButton::isEnableWordWrap();
+    return d_ptr->mEnableWordWrap;
 }
 
 /**
@@ -1799,6 +1811,8 @@ void SARibbonBar::setPannelToolButtonIconSize(const QSize& s)
 
 /**
  * @brief pannel按钮的icon尺寸，large action不受此尺寸影响
+ *
+ * @note pannel按钮是指pannel右下角的功能按钮
  * @return
  */
 QSize SARibbonBar::pannelToolButtonIconSize() const
@@ -2228,9 +2242,9 @@ void SARibbonBar::paintInLooseStyle()
 		if (!contextData.tabPageIndex.isEmpty()) {
 			// 绘制
 			paintContextCategoryTab(p,
-									contextData.contextCategory->contextTitle(),
-									contextTitleRect,
-									contextData.contextCategory->contextColor());
+                                    contextData.contextCategory->contextTitle(),
+                                    contextTitleRect,
+                                    contextData.contextCategory->contextColor());
 		}
 	}
 
@@ -2258,9 +2272,9 @@ void SARibbonBar::paintInCompactStyle()
 		if (!contextData.tabPageIndex.isEmpty()) {
 			// 绘制
 			paintContextCategoryTab(p,
-									contextData.contextCategory->contextTitle(),
-									contextTitleRect,
-									contextData.contextCategory->contextColor());
+                                    contextData.contextCategory->contextTitle(),
+                                    contextTitleRect,
+                                    contextData.contextCategory->contextColor());
 		}
 	}
 

@@ -1010,3 +1010,27 @@ SARibbonPannelLabel* SARibbonPannel::titleLabel() const
 {
     return d_ptr->m_label;
 }
+
+/**
+ * @brief 设置pannel的按钮文字允许换行
+ * @param on
+ */
+void SARibbonPannel::setEnableWordWrap(bool on)
+{
+    if (SARibbonPannelLayout* lay = qobject_cast< SARibbonPannelLayout* >(layout())) {
+        // 此函数会自动设置所有按钮的换行状态
+        lay->setEnableWordWrap(on);
+    }
+}
+
+/**
+ * @brief 判断pannel的文字是否允许换行
+ * @return
+ */
+bool SARibbonPannel::isEnableWordWrap() const
+{
+    if (SARibbonPannelLayout* lay = qobject_cast< SARibbonPannelLayout* >(layout())) {
+        return lay->isEnableWordWrap();
+    }
+    return false;
+}

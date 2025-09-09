@@ -48,18 +48,18 @@ namespace SA
 QDebug operator<<(QDebug debug, const QStyleOptionToolButton& opt)
 {
 	debug << "==============" << "\nQStyleOption(" << (QStyleOption)opt << ")"
-		  << "\n  QStyleOptionComplex:"
-			 "\n     subControls("
-		  << opt.subControls
-		  << " ) "
-			 "\n     activeSubControls("
-		  << opt.activeSubControls
-		  << "\n  QStyleOptionToolButton"
-			 "\n     features("
-		  << opt.features
-		  << ")"
-			 "\n     toolButtonStyle("
-		  << opt.toolButtonStyle << ")";
+          << "\n  QStyleOptionComplex:"
+             "\n     subControls("
+          << opt.subControls
+          << " ) "
+             "\n     activeSubControls("
+          << opt.activeSubControls
+          << "\n  QStyleOptionToolButton"
+             "\n     features("
+          << opt.features
+          << ")"
+             "\n     toolButtonStyle("
+          << opt.toolButtonStyle << ")";
 
 	return (debug);
 }
@@ -75,7 +75,7 @@ public:
 	void drawPrimitive(PrimitiveElement pe, const QStyleOption* opt, QPainter* p, const QWidget* widget = nullptr) const override
 	{
 		if (pe == PE_IndicatorArrowUp || pe == PE_IndicatorArrowDown || pe == PE_IndicatorArrowRight
-			|| pe == PE_IndicatorArrowLeft) {
+            || pe == PE_IndicatorArrowLeft) {
 			if (opt->rect.width() <= 1 || opt->rect.height() <= 1)
 				return;
 
@@ -161,25 +161,25 @@ public:
 	void updateSizeHint(const QStyleOptionToolButton& opt);
 	// 计算涉及到的rect尺寸
 	void calcDrawRects(const QStyleOptionToolButton& opt,
-					   QRect& iconRect,
-					   QRect& textRect,
-					   QRect& indicatorArrowRect,
-					   int spacing,
-					   int indicatorLen) const;
+                       QRect& iconRect,
+                       QRect& textRect,
+                       QRect& indicatorArrowRect,
+                       int spacing,
+                       int indicatorLen) const;
 	// 计算小按钮模式下的尺寸
 	void calcSmallButtonDrawRects(const QStyleOptionToolButton& opt,
-								  QRect& iconRect,
-								  QRect& textRect,
-								  QRect& indicatorArrowRect,
-								  int spacing,
-								  int indicatorLen) const;
+                                  QRect& iconRect,
+                                  QRect& textRect,
+                                  QRect& indicatorArrowRect,
+                                  int spacing,
+                                  int indicatorLen) const;
 	// 计算大按钮模式下的尺寸
 	void calcLargeButtonDrawRects(const QStyleOptionToolButton& opt,
-								  QRect& iconRect,
-								  QRect& textRect,
-								  QRect& indicatorArrowRect,
-								  int spacing,
-								  int indicatorLen) const;
+                                  QRect& iconRect,
+                                  QRect& textRect,
+                                  QRect& indicatorArrowRect,
+                                  int spacing,
+                                  int indicatorLen) const;
 
 	// 根据按钮的尺寸调节iconsize(注意这里的buttonRect是已经减去mSpacing的情况)
 	QSize adjustIconSize(const QRect& buttonRect, const QSize& originIconSize) const;
@@ -194,10 +194,10 @@ public:
 	int calcTextDrawRectHeight(const QStyleOptionToolButton& opt) const;
 	// 估算一个最优的文本宽度
 	int estimateLargeButtonTextWidth(int buttonHeight,
-									 int textDrawRectHeight,
-									 const QString& text,
-									 const QFontMetrics& fm,
-									 int maxTrycount = 3);
+                                     int textDrawRectHeight,
+                                     const QString& text,
+                                     const QFontMetrics& fm,
+                                     int maxTrycount = 3);
 	QPixmap createIconPixmap(const QStyleOptionToolButton& opt, const QSize& iconsize) const;
 	// 获取文字的对其方式
 	int getTextAlignment() const;
@@ -209,7 +209,7 @@ public:
 public:
 	bool mMouseOnSubControl { false };  ///< 这个用于标记MenuButtonPopup模式下，鼠标在文本区域
 	bool mMenuButtonPressed { false };  ///< 由于Indicator改变，因此hitButton不能用QToolButton的hitButton
-	bool mWordWrap { false };           ///< 标记是否文字换行 @default false
+    bool mWordWrap { true };            ///< 标记是否文字换行 @default false
 	SARibbonToolButton::RibbonButtonType mButtonType { SARibbonToolButton::LargeButton };
 	int mSpacing { 1 };              ///< 按钮和边框的距离
 	int mIndicatorLen { 8 };         ///< Indicator的长度
@@ -380,9 +380,11 @@ void SARibbonToolButton::PrivateData::calcSmallButtonDrawRects(const QStyleOptio
 	case Qt::ToolButtonIconOnly: {
 		if (hasIndicator(opt)) {
 			// 在仅有图标的小模式显示时，预留一个下拉箭头位置
-			iconRect = opt.rect.adjusted(spacing, spacing, -indicatorLen - spacing, -spacing);
-			indicatorArrowRect =
-				QRect(opt.rect.right() - indicatorLen - spacing, iconRect.y(), indicatorLen, iconRect.height());
+            iconRect           = opt.rect.adjusted(spacing, spacing, -indicatorLen - spacing, -spacing);
+            indicatorArrowRect = QRect(opt.rect.right() - indicatorLen - spacing,
+                                       iconRect.y(),
+                                       indicatorLen,
+                                       iconRect.height());
 		} else {
 			iconRect           = opt.rect.adjusted(spacing, spacing, -spacing, -spacing);
 			indicatorArrowRect = QRect();
@@ -413,8 +415,7 @@ void SARibbonToolButton::PrivateData::calcSmallButtonDrawRects(const QStyleOptio
 			iconRect = QRect();
 		} else {
 			QSize iconSize = adjustIconSize(buttonRect, opt.iconSize);
-			iconRect =
-				QRect(buttonRect.x(), buttonRect.y(), iconSize.width(), qMax(iconSize.height(), buttonRect.height()));
+            iconRect = QRect(buttonRect.x(), buttonRect.y(), iconSize.width(), qMax(iconSize.height(), buttonRect.height()));
 		}
 		// 后设置TextRect
 		if (opt.text.isEmpty()) {
@@ -422,7 +423,7 @@ void SARibbonToolButton::PrivateData::calcSmallButtonDrawRects(const QStyleOptio
 		} else {
 			// 分有菜单和没菜单两种情况
 			int adjx = iconRect.isValid() ? (iconRect.width() + spacing)
-										  : 0;  // 在buttonRect上变换，因此如果没有图标是不用偏移spacing
+                                          : 0;  // 在buttonRect上变换，因此如果没有图标是不用偏移spacing
 			if (hasInd) {
 				textRect = buttonRect.adjusted(adjx, 0, -indicatorLen, 0);
 			} else {
@@ -432,11 +433,15 @@ void SARibbonToolButton::PrivateData::calcSmallButtonDrawRects(const QStyleOptio
 		// 最后设置Indicator
 		if (hasInd) {
 			if (textRect.isValid()) {
-				indicatorArrowRect =
-					QRect(buttonRect.right() - indicatorLen + 1, textRect.y(), indicatorLen, textRect.height());
+                indicatorArrowRect = QRect(buttonRect.right() - indicatorLen + 1,
+                                           textRect.y(),
+                                           indicatorLen,
+                                           textRect.height());
 			} else if (iconRect.isValid()) {
-				indicatorArrowRect =
-					QRect(buttonRect.right() - indicatorLen + 1, iconRect.y(), indicatorLen, iconRect.height());
+                indicatorArrowRect = QRect(buttonRect.right() - indicatorLen + 1,
+                                           iconRect.y(),
+                                           indicatorLen,
+                                           iconRect.height());
 			} else {
 				indicatorArrowRect = buttonRect;
 			}
@@ -486,20 +491,20 @@ void SARibbonToolButton::PrivateData::calcLargeButtonDrawRects(const QStyleOptio
 			int indicatorHeight = static_cast< int >(indicatorLen * 1.2);
 			// 周边留下spacing距离
 			indicatorArrowRect = QRect(opt.rect.left() + spacing,
-									   opt.rect.bottom() - indicatorHeight - spacing,
-									   opt.rect.width() - 2 * spacing,
-									   indicatorHeight);
+                                       opt.rect.bottom() - indicatorHeight - spacing,
+                                       opt.rect.width() - 2 * spacing,
+                                       indicatorHeight);
 			// iconRect布满整个按钮
 			iconRect = QRect(opt.rect.left() + spacing,
-							 opt.rect.top() + spacing,
-							 opt.rect.width() - 2 * spacing,
-							 opt.rect.height() - 2 * spacing - indicatorHeight);
+                             opt.rect.top() + spacing,
+                             opt.rect.width() - 2 * spacing,
+                             opt.rect.height() - 2 * spacing - indicatorHeight);
 		} else {
 			// iconRect布满整个按钮
 			iconRect = QRect(opt.rect.left() + spacing,
-							 opt.rect.top() + spacing,
-							 opt.rect.width() - 2 * spacing,
-							 opt.rect.height() - 2 * spacing);
+                             opt.rect.top() + spacing,
+                             opt.rect.width() - 2 * spacing,
+                             opt.rect.height() - 2 * spacing);
 		}
 	} else if (Qt::ToolButtonTextOnly == opt.toolButtonStyle) {
 		// 仅有文字，处理方式和仅有图标一样
@@ -508,42 +513,44 @@ void SARibbonToolButton::PrivateData::calcLargeButtonDrawRects(const QStyleOptio
 			int indicatorHeight = static_cast< int >(indicatorLen * 1.2);
 			// 周边留下spacing距离
 			indicatorArrowRect = QRect(opt.rect.left() + spacing,
-									   opt.rect.bottom() - indicatorHeight - spacing,
-									   opt.rect.width() - 2 * spacing,
-									   indicatorHeight);
+                                       opt.rect.bottom() - indicatorHeight - spacing,
+                                       opt.rect.width() - 2 * spacing,
+                                       indicatorHeight);
 			// textRect布满整个按钮
 			textRect = QRect(opt.rect.left() + spacing,
-							 opt.rect.top() + spacing,
-							 opt.rect.width() - 2 * spacing,
-							 opt.rect.height() - 2 * spacing - indicatorHeight);
+                             opt.rect.top() + spacing,
+                             opt.rect.width() - 2 * spacing,
+                             opt.rect.height() - 2 * spacing - indicatorHeight);
 		} else {
 			// textRect布满整个按钮
 			textRect = QRect(opt.rect.left() + spacing,
-							 opt.rect.top() + spacing,
-							 opt.rect.width() - 2 * spacing,
-							 opt.rect.height() - 2 * spacing);
+                             opt.rect.top() + spacing,
+                             opt.rect.width() - 2 * spacing,
+                             opt.rect.height() - 2 * spacing);
 		}
 	} else {
 		// 先布置textRect
-		if (isEnableWordWrap()) {
+        if (q_ptr->isEnableWordWrap()) {
 			// 在换行模式下
 			if (isTextNeedWrap()) {
 				// 如果文字的确换行，indicator放在最右边
 				textRect = QRect(opt.rect.left() + spacing,
-								 opt.rect.bottom() - spacing - textHeight,
-								 opt.rect.width() - 2 * spacing - indicatorLen,  // 注意，这里会减去indicatorLen的宽度
-								 textHeight);
+                                 opt.rect.bottom() - spacing - textHeight,
+                                 opt.rect.width() - 2 * spacing - indicatorLen,  // 注意，这里会减去indicatorLen的宽度
+                                 textHeight);
 				if (hIndicator) {
 					// indicator在文字的右边
-					indicatorArrowRect =
-						QRect(textRect.right(), textRect.y() + textRect.height() / 2, indicatorLen, textHeight / 2);
+                    indicatorArrowRect = QRect(textRect.right(),
+                                               textRect.y() + textRect.height() / 2,
+                                               indicatorLen,
+                                               textHeight / 2);
 				}
 			} else {
 				// 如果文字不需要换行，由于文字下面会有一行的空白，因此indicator布局在文字下面
 				textRect = QRect(opt.rect.left() + spacing,
-								 opt.rect.bottom() - spacing - textHeight,
-								 opt.rect.width() - 2 * spacing,
-								 textHeight);
+                                 opt.rect.bottom() - spacing - textHeight,
+                                 opt.rect.width() - 2 * spacing,
+                                 textHeight);
 				if (hIndicator) {
 					int dy = textRect.height() / 2;
 					dy += (dy - indicatorLen) / 2;
@@ -696,18 +703,18 @@ QSize SARibbonToolButton::PrivateData::calcLargeButtonSizeHint(const QStyleOptio
 	w = estimateLargeButtonTextWidth(h, textHeight, opt.text, opt.fontMetrics);
 	w += (2 * mSpacing);
 	// 判断是否需要加上indicator
-	if (isEnableWordWrap() && isTextNeedWrap()) {
+    if (q_ptr->isEnableWordWrap() && isTextNeedWrap()) {
 		w += mIndicatorLen;
 	}
 
 #if SA_RIBBON_TOOLBUTTON_DEBUG_PRINT
 	qDebug() << "| | |-SARibbonToolButton::PrivateData::calcLargeButtonSizeHint,text=" << opt.text
-			 << "\n| | | |-lineSpacing*4.5=" << opt.fontMetrics.lineSpacing() * 4.5  //
-			 << "\n| | | |-textHeight=" << textHeight                                //
-			 << "\n| | | |-mDrawIconRect=" << mDrawIconRect                          //
-			 << "\n| | | |-minW=" << minW                                            //
-			 << "\n| | | |-w=" << w                                                  //
-		;
+             << "\n| | | |-lineSpacing*4.5=" << opt.fontMetrics.lineSpacing() * 4.5  //
+             << "\n| | | |-textHeight=" << textHeight                                //
+             << "\n| | | |-mDrawIconRect=" << mDrawIconRect                          //
+             << "\n| | | |-minW=" << minW                                            //
+             << "\n| | | |-w=" << w                                                  //
+        ;
 #endif
 	//! Qt6.4 取消了QApplication::globalStrut
 	return QSize(w, h).expandedTo(QSize(minW, textHeight));
@@ -721,7 +728,7 @@ QSize SARibbonToolButton::PrivateData::calcLargeButtonSizeHint(const QStyleOptio
 int SARibbonToolButton::PrivateData::calcTextDrawRectHeight(const QStyleOptionToolButton& opt) const
 {
 	if (SARibbonToolButton::LargeButton == mButtonType) {
-		if (isEnableWordWrap()) {
+        if (q_ptr->isEnableWordWrap()) {
 			return opt.fontMetrics.lineSpacing() * s_twoLineHeightFactor + opt.fontMetrics.leading();
 		} else {
 			return opt.fontMetrics.lineSpacing() * s_oneLineHeightFactor;
@@ -749,8 +756,8 @@ int SARibbonToolButton::PrivateData::estimateLargeButtonTextWidth(int buttonHeig
 	QSize textSize;
 	int space = SA_FONTMETRICS_WIDTH(fm, (QLatin1Char(' '))) * 2;
 	int hintMaxWidth = qMin(static_cast< int >(buttonHeight * SARibbonToolButton::PrivateData::s_textEllipsisAspectFactor),
-							q_ptr->maximumWidth());  ///< 建议的宽度
-	if (isEnableWordWrap()) {
+                            q_ptr->maximumWidth());  ///< 建议的宽度
+    if (q_ptr->isEnableWordWrap()) {
 		textSize = fm.size(Qt::TextShowMnemonic, text);
 		textSize.setWidth(textSize.width() + space);
 
@@ -790,7 +797,7 @@ int SARibbonToolButton::PrivateData::estimateLargeButtonTextWidth(int buttonHeig
 #if SARIBBONTOOLBUTTON_DEBUG_DRAW
 			if (trycount > 1) {
 				qDebug() << "estimateLargeButtonTextWidth,origin textSize=" << textSize << ",trycount=" << trycount
-						 << ",textRect=" << textRect;
+                         << ",textRect=" << textRect;
 			}
 #endif
 		} while (trycount < 3);
@@ -836,7 +843,7 @@ int SARibbonToolButton::PrivateData::getTextAlignment() const
 
 	if (SARibbonToolButton::LargeButton == mButtonType) {
 		return Qt::TextShowMnemonic
-			   | (isEnableWordWrap() ? (Qt::TextWordWrap | Qt::AlignTop | Qt::AlignHCenter) : Qt::AlignCenter);
+               | (q_ptr->isEnableWordWrap() ? (Qt::TextWordWrap | Qt::AlignTop | Qt::AlignHCenter) : Qt::AlignCenter);
 	}
 
 	return Qt::TextShowMnemonic | Qt::AlignCenter;
@@ -1122,8 +1129,7 @@ void SARibbonToolButton::paintText(QPainter& p, const QStyleOptionToolButton& op
 		text = opt.fontMetrics.elidedText(PrivateData::simplified(opt.text), Qt::ElideRight, textDrawRect.width(), alignment);
 	} else {
 		if (!isEnableWordWrap()) {
-			text = opt.fontMetrics.elidedText(
-				PrivateData::simplified(opt.text), Qt::ElideRight, textDrawRect.width(), alignment);
+            text = opt.fontMetrics.elidedText(PrivateData::simplified(opt.text), Qt::ElideRight, textDrawRect.width(), alignment);
 		} else {
 			text = opt.text;
 		}
@@ -1144,8 +1150,7 @@ void SARibbonToolButton::paintText(QPainter& p, const QStyleOptionToolButton& op
 	}
 	QStyleOptionToolButton label = opt;
 	label.state                  = bflags;
-	style()->drawItemText(
-		&p, textDrawRect, alignment, label.palette, label.state & QStyle::State_Enabled, text, QPalette::ButtonText);
+    style()->drawItemText(&p, textDrawRect, alignment, label.palette, label.state & QStyle::State_Enabled, text, QPalette::ButtonText);
 	SARIBBONTOOLBUTTON_DEBUG_DRAW_RECT(p, textDrawRect);
 }
 
@@ -1276,21 +1281,21 @@ void SARibbonToolButton::updateRect()
 }
 
 /**
- * @brief 设置在lite模式下是否允许文字换行，如果允许，则图标相对比较小，默认不允许
+ * @brief 设置在是否允许文字换行，如果允许，则图标相对比较小，默认不允许
  * @param on
  */
 void SARibbonToolButton::setEnableWordWrap(bool on)
 {
-    SARibbonToolButton::PrivateData::s_enableWordWrap = on;
+    d_ptr->mWordWrap = on;
 }
 
 /**
- * @brief 在lite模式下是否允许文字换行
+ * @brief 否允许文字换行
  * @return
  */
 bool SARibbonToolButton::isEnableWordWrap()
 {
-    return SARibbonToolButton::PrivateData::s_enableWordWrap;
+    return d_ptr->mWordWrap;
 }
 
 /**

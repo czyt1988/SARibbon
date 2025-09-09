@@ -48,8 +48,8 @@ public:
 
 public:
 	// 是否允许文字换行
-	static void setEnableWordWrap(bool on);
-	static bool isEnableWordWrap();
+    void setEnableWordWrap(bool on);
+    bool isEnableWordWrap();
 	// 文本宽度估算时的宽度比高度系数,超过此系数的宽度时，开始尝试换行或者省略号显示
 	static void setTextEllipsisAspectFactor(qreal fac = 1.4);
 	static qreal textEllipsisAspectFactor();
@@ -80,10 +80,10 @@ protected:
 
 private:
 	static void drawArrow(const QStyle* style,
-						  const QStyleOptionToolButton* toolbutton,
-						  const QRect& rect,
-						  QPainter* painter,
-						  const QWidget* widget = 0);
+                          const QStyleOptionToolButton* toolbutton,
+                          const QRect& rect,
+                          QPainter* painter,
+                          const QWidget* widget = 0);
 
 protected:
 };

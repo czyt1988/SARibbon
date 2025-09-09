@@ -74,6 +74,11 @@ public:
     void setToolButtonIconSize(const QSize& s);
     QSize toolButtonIconSize() const;
 
+    // 是否允许文字换行
+    bool isEnableWordWrap() const;
+    // 设置文字允许换行
+    void setEnableWordWrap(bool on);
+
 protected:
     // 获取optionAction 按钮尺寸
     QSize optionActionButtonSize() const;
@@ -108,6 +113,7 @@ private:
     QRect mTitleLabelGeometry;                     ///< titlelabel的位置
     QToolButton* mOptionActionBtn { nullptr };     ///< optionAction对应的button
     QRect mOptionActionBtnGeometry;                ///< optionAction的位置
+    bool mEnableWordWrap { true };                 ///< 是否允许文字换行
 };
 
 #endif  // SARIBBONPANNELLAYOUT_H

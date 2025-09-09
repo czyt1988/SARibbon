@@ -390,6 +390,7 @@ SARibbonPannelItem* SARibbonPannelLayout::createItem(QAction* action, SARibbonPa
 		button->setButtonType(buttonType);
 		button->setDefaultAction(action);
 		button->setIconSize(mDefaultToolButtonIconSize);
+        button->setEnableWordWrap(isEnableWordWrap());
 		// 属性设置
 		QToolButton::ToolButtonPopupMode popMode = SARibbonPannel::getActionToolButtonPopupModeProperty(action);
 		button->setPopupMode(popMode);
@@ -845,7 +846,7 @@ void SARibbonPannelLayout::setToolButtonIconSize(const QSize& s)
 
 QSize SARibbonPannelLayout::toolButtonIconSize() const
 {
-	return mDefaultToolButtonIconSize;
+    return mDefaultToolButtonIconSize;
 }
 
 /**
@@ -869,12 +870,39 @@ void SARibbonPannelLayout::setPannelTitleLabel(SARibbonPannelLabel* newTitleLabe
 }
 
 /**
+ * @brief 是否允许文字换行
+ * @return
+ */
+bool SARibbonPannelLayout::isEnableWordWrap() const
+{
+    return mEnableWordWrap;
+}
+
+/**
+ * @brief 设置文字允许换行
+ * @param enableWordWrap
+ */
+void SARibbonPannelLayout::setEnableWordWrap(bool on)
+{
+    mEnableWordWrap = on;
+    // 遍历所有SARibbonToolButton
+    for (SARibbonPannelItem* item : qAsConst(mItems)) {
+        if (!item) {
+            continue;
+        }
+        if (SARibbonToolButton* toolbtn = qobject_cast< SARibbonToolButton* >(item->widget())) {
+            toolbtn->setEnableWordWrap(on);
+        }
+    }
+}
+
+/**
  * @brief 标题区域和按钮的间隔
  * @return
  */
 int SARibbonPannelLayout::pannelTitleSpace() const
 {
-	return mTitleSpace;
+    return mTitleSpace;
 }
 
 /**
