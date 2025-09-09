@@ -79,8 +79,8 @@ public:
 	void addAction(QAction* action, SARibbonPannelItem::RowProportion rp);
 	// 生成并添加一个action
 	void addAction(QAction* act,
-				   QToolButton::ToolButtonPopupMode popMode,
-				   SARibbonPannelItem::RowProportion rp = SARibbonPannelItem::Large);
+                   QToolButton::ToolButtonPopupMode popMode,
+                   SARibbonPannelItem::RowProportion rp = SARibbonPannelItem::Large);
 	// 把action加入到pannel，并以大图标显示
 	void addLargeAction(QAction* action);
 	// 把action加入到pannel，在三行模式下会以中图标显示
@@ -96,14 +96,14 @@ public:
 	void addMediumAction(QAction* action, QToolButton::ToolButtonPopupMode popMode);
 
 	QAction* addAction(const QString& text,
-					   const QIcon& icon,
-					   QToolButton::ToolButtonPopupMode popMode,
-					   SARibbonPannelItem::RowProportion rp = SARibbonPannelItem::Large);
+                       const QIcon& icon,
+                       QToolButton::ToolButtonPopupMode popMode,
+                       SARibbonPannelItem::RowProportion rp = SARibbonPannelItem::Large);
 
 	// 添加menu
 	void addMenu(QMenu* menu,
-				 SARibbonPannelItem::RowProportion rp,
-				 QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
+                 SARibbonPannelItem::RowProportion rp,
+                 QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
 
 	// 添加普通大菜单
 	void addLargeMenu(QMenu* menu, QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
@@ -201,6 +201,7 @@ public:
 	// 设置按钮的icon尺寸，large action不受此尺寸影响
 	void setToolButtonIconSize(const QSize& s);
 	QSize toolButtonIconSize() const;
+
 	// 此函数会遍历SARibbonPannel下的所有RibbonToolButton，执行函数指针(bool(SARibbonRibbonToolButton*))，函数指针返回false则停止迭代
 	bool iterateButton(FpRibbonToolButtonIterate fp) const;
 

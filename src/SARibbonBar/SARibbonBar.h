@@ -211,8 +211,9 @@ public:
 	void removeCategory(SARibbonCategory* category);
 
 	// 添加一个上下文标签
-	SARibbonContextCategory*
-	addContextCategory(const QString& title, const QColor& color = QColor(), const QVariant& id = QVariant());
+    SARibbonContextCategory* addContextCategory(const QString& title,
+                                                const QColor& color = QColor(),
+                                                const QVariant& id  = QVariant());
 	void addContextCategory(SARibbonContextCategory* context);
 
 	// 显示一个上下文标签
@@ -383,7 +384,6 @@ public:
 	SARibbonAlignment ribbonAlignment() const;
 
 	// 此函数会遍历SARibbonBar下的所有Category，执行函数指针(bool(SARibbonCategory*))，函数指针返回false则停止迭代
-
 	bool iterateCategory(FpCategoryIterate fp) const;
 	// 此函数会遍历SARibbonBar下的所有Category,并迭代所有的pannel，执行函数指针(bool(SARibbonPannel*))，函数指针返回false则停止迭代
 	bool iteratePannel(FpPannelIterate fp) const;
@@ -478,8 +478,7 @@ protected:
 
 	virtual void paintTabbarBaseLine(QPainter& painter);
 	virtual void paintWindowTitle(QPainter& painter, const QString& title, const QRect& titleRegion);
-	virtual void
-	paintContextCategoryTab(QPainter& painter, const QString& title, const QRect& contextRect, const QColor& color);
+    virtual void paintContextCategoryTab(QPainter& painter, const QString& title, const QRect& contextRect, const QColor& color);
 #if SA_DEBUG_PRINT_SARIBBONBAR
 	SA_RIBBON_EXPORT friend QDebug operator<<(QDebug debug, const SARibbonBar& ribbon);
 #endif
