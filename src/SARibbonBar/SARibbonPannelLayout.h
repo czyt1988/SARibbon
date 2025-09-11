@@ -76,8 +76,8 @@ public:
 
     // 是否允许文字换行
     bool isEnableWordWrap() const;
-    // 设置文字允许换行
-    void setEnableWordWrap(bool on);
+    // 按钮的最大宽高比，这个系数决定按钮的最大宽度
+    qreal buttonMaximumAspectRatio() const;
 
 protected:
     // 获取optionAction 按钮尺寸
@@ -90,7 +90,10 @@ protected:
     void updateGeomArray(const QRect& setrect);
     // 重新计算扩展条码，此函数必须在updateGeomArray函数之后调用
     void recalcExpandGeomArray(const QRect& setrect);
-    // 返回optionActionButton的尺寸
+    // 设置文字允许换行
+    void setEnableWordWrap(bool on);
+    // 按钮的最大宽高比，这个系数决定按钮的最大宽度
+    void setButtonMaximumAspectRatio(qreal fac = 1.4);
 
 private:
     // 根据列数，计算窗口的宽度，以及最大宽度
@@ -114,6 +117,7 @@ private:
     QToolButton* mOptionActionBtn { nullptr };     ///< optionAction对应的button
     QRect mOptionActionBtnGeometry;                ///< optionAction的位置
     bool mEnableWordWrap { true };                 ///< 是否允许文字换行
+    qreal mButtonMaximumAspectRatio { 1.4 };       ///< 按钮的宽高比
 };
 
 #endif  // SARIBBONPANNELLAYOUT_H

@@ -210,10 +210,10 @@ public:
 
 	// 获取pannel标题的label控件
 	SARibbonPannelLabel* titleLabel() const;
-
-    // 设置按钮允许换行，注意图标大小是由文字决定的，两行文字会让图标变小，如果想图标变大，文字不换行是最好的
-    void setEnableWordWrap(bool on);
+    // 是否允许换行
     bool isEnableWordWrap() const;
+    // 按钮的最大宽高比，这个系数决定按钮的最大宽度
+    qreal buttonMaximumAspectRatio() const;
 Q_SIGNALS:
 
 	/**
@@ -253,6 +253,11 @@ protected:
 	void setSpacing(int n);
 	// 是否显示标题，显示标题后，标题的高度需要设置，默认高度为15
 	void setEnableShowTitle(bool on);
+
+    // 设置按钮允许换行，注意图标大小是由文字决定的，两行文字会让图标变小，如果想图标变大，文字不换行是最好的
+    void setEnableWordWrap(bool on);
+    // 按钮的最大宽高比，这个系数决定按钮的最大宽度
+    void setButtonMaximumAspectRatio(qreal fac = 1.4);
 };
 
 #endif  // SARIBBONPANNEL_H

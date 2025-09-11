@@ -77,6 +77,7 @@ private Q_SLOTS:
 	void onSpinBoxRibbonPannelTtitleHeightChanged(int h);
 	void onSpinBoxRibbonPannelSpacingChanged(int h);
 	void onSpinBoxRibbonPannelToolBtnIconSizeChanged(int h);
+    void onDoubleSpinBoxToolbuttonMaximumAspectRatio(double h);
 	// 此函数用来演示标题栏颜色改变
 	void onTitleBackgroundBrushChangedTimeout();
 	// 改变颜色

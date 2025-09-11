@@ -688,6 +688,10 @@ void MainWindow::onSpinBoxRibbonPannelToolBtnIconSizeChanged(int h)
     ribbonBar()->setPannelToolButtonIconSize(QSize(h, h));
 }
 
+void MainWindow::onDoubleSpinBoxToolbuttonMaximumAspectRatio(double h)
+{
+}
+
 /**
  * @brief 此函数用来演示标题栏颜色改变
  */

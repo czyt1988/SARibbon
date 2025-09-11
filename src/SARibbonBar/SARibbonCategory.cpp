@@ -51,15 +51,16 @@ public:
 	void init(SARibbonCategory* c);
 
 public:
-    bool enableShowPannelTitle { true };    ///< 是否运行pannel的标题栏显示
-    int pannelTitleHeight { 15 };           ///< pannel的标题栏默认高度
-    bool isContextCategory { false };       ///< 标记是否是上下文标签
-    bool isCanCustomize { true };           ///< 标记是否可以自定义
-    int pannelSpacing { 0 };                ///< pannel的spacing
-    bool isUseAnimating { true };           ///< 默认使用动画滚动
-    bool enableWordWrap { true };           ///< 是否文字换行
-    QSize pannelToolButtonSize { 22, 22 };  ///< 记录pannel的默认图标大小
-    int wheelScrollStep { 400 };            // 默认滚轮滚动步长
+    bool enableShowPannelTitle { true };     ///< 是否运行pannel的标题栏显示
+    int pannelTitleHeight { 15 };            ///< pannel的标题栏默认高度
+    bool isContextCategory { false };        ///< 标记是否是上下文标签
+    bool isCanCustomize { true };            ///< 标记是否可以自定义
+    int pannelSpacing { 0 };                 ///< pannel的spacing
+    bool isUseAnimating { true };            ///< 默认使用动画滚动
+    bool enableWordWrap { true };            ///< 是否文字换行
+    QSize pannelToolButtonSize { 22, 22 };   ///< 记录pannel的默认图标大小
+    int wheelScrollStep { 400 };             ///< 默认滚轮滚动步长
+    qreal buttonMaximumAspectRatio { 1.4 };  ///< 按钮最大宽高比，这个系数决定按钮的最大宽度
     SARibbonPannel::PannelLayoutMode defaultPannelLayoutMode { SARibbonPannel::ThreeRowMode };
 };
 SARibbonCategory::PrivateData::PrivateData(SARibbonCategory* p) : q_ptr(p)
@@ -700,6 +701,38 @@ void SARibbonCategory::setEnableWordWrap(bool on)
 bool SARibbonCategory::isEnableWordWrap() const
 {
     return d_ptr->enableWordWrap;
+}
+
+/**
+ * @brief 设置按钮最大宽高比，这个系数决定按钮的最大宽度
+ *
+ * 按钮的最大宽度为按钮高度*此系数，例如按钮高度为h，那么按钮最大宽度maxw=h*buttonMaximumAspectRatio
+ * 如果在此宽度下文字还无法完全显示，那么按钮将不会继续横向扩展，将使用...替代未完全显示的文字
+ *
+ * @see buttonMaximumAspectRatio
+ *
+ * @note 用户不应该调用@ref SARibbonCategory::setButtonMaximumAspectRatio 来设置，
+ * 而是调用@ref SARibbonBar::setButtonMaximumAspectRatio 设置宽高比
+ */
+void SARibbonCategory::setButtonMaximumAspectRatio(qreal fac)
+{
+    d_ptr->buttonMaximumAspectRatio = fac;
+    iteratePannel([ fac ](SARibbonPannel* pannel) -> bool {
+        if (pannel) {
+            pannel->setButtonMaximumAspectRatio(fac);
+        }
+        return true;
+    });
+}
+
+/**
+ * @brief 按钮最大宽高比，这个系数决定按钮的最大宽度
+ * @return 按钮最大宽高比
+ * @see setButtonMaximumAspectRatio
+ */
+qreal SARibbonCategory::buttonMaximumAspectRatio() const
+{
+    return d_ptr->buttonMaximumAspectRatio;
 }
 
 /**

@@ -1034,3 +1034,35 @@ bool SARibbonPannel::isEnableWordWrap() const
     }
     return false;
 }
+
+/**
+ * @brief 设置按钮最大宽高比，这个系数决定按钮的最大宽度
+ *
+ * 按钮的最大宽度为按钮高度*此系数，例如按钮高度为h，那么按钮最大宽度maxw=h*buttonMaximumAspectRatio
+ * 如果在此宽度下文字还无法完全显示，那么按钮将不会继续横向扩展，将使用...替代未完全显示的文字
+ *
+ * @see buttonMaximumAspectRatio
+ *
+ * @note 用户不应该调用@ref SARibbonPannel::setButtonMaximumAspectRatio 来设置，
+ * 而是调用@ref SARibbonBar::setButtonMaximumAspectRatio 设置宽高比
+ */
+void SARibbonPannel::setButtonMaximumAspectRatio(qreal fac)
+{
+    if (SARibbonPannelLayout* lay = qobject_cast< SARibbonPannelLayout* >(layout())) {
+        // 此函数会自动设置所有按钮的换行状态
+        lay->setButtonMaximumAspectRatio(fac);
+    }
+}
+
+/**
+ * @brief 按钮最大宽高比，这个系数决定按钮的最大宽度
+ * @return 按钮最大宽高比
+ * @see setButtonMaximumAspectRatio
+ */
+qreal SARibbonPannel::buttonMaximumAspectRatio() const
+{
+    if (SARibbonPannelLayout* lay = qobject_cast< SARibbonPannelLayout* >(layout())) {
+        return lay->buttonMaximumAspectRatio();
+    }
+    return 1.4;
+}

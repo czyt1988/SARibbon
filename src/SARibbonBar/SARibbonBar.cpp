@@ -94,6 +94,7 @@ public:
 	FpContextCategoryHighlight mFpContextHighlight { nullptr };  ///< 上下文标签高亮
 	bool mEnableTabDoubleClickToMinimumMode { true };  ///< 是否允许tab双击激活ribbon的最小化模式
     bool mEnableWordWrap { true };                     ///< 是否允许文字换行
+    qreal buttonMaximumAspectRatio { 1.4 };            ///< 按钮的最大宽高比
 public:
 	PrivateData(SARibbonBar* par) : q_ptr(par)
 	{
@@ -1694,29 +1695,33 @@ bool SARibbonBar::isEnableWordWrap() const
 }
 
 /**
- * @brief 文本宽度估算时的宽度比高度系数
- * @param fac 系数，默认为1.4，此系数越大，按钮允许的宽度越宽
+ * @brief 设置按钮最大宽高比，这个系数决定按钮的最大宽度
  *
- * 超过此系数的宽度时，开始尝试换行，例如按钮高度为h，如果单行文本的宽度大于h*系数，则按钮将不进行横向拉伸，类似于maxwidth效果
+ * 按钮的最大宽度为按钮高度*此系数，例如按钮高度为h，那么按钮最大宽度maxw=h*buttonMaximumAspectRatio
+ * 如果在此宽度下文字还无法完全显示，那么按钮将不会继续横向扩展，将使用...替代未完全显示的文字
  *
- * 此系数和maxwidth取最小值
+ * @see buttonMaximumAspectRatio
  */
-void SARibbonBar::setButtonTextEllipsisAspectFactor(qreal fac)
+void SARibbonBar::setButtonMaximumAspectRatio(qreal fac)
 {
-	SARibbonToolButton::setTextEllipsisAspectFactor(fac);
-	updateRibbonGeometry();
+    d_ptr->buttonMaximumAspectRatio = fac;
+    iterateCategory([ fac ](SARibbonCategory* category) -> bool {
+        if (category) {
+            category->setButtonMaximumAspectRatio(fac);
+        }
+        return true;
+    });
+    updateRibbonGeometry();
 }
 
 /**
- * @brief 文本宽度估算时的宽度比高度系数
- *
- * 超过此系数的宽度时，开始尝试换行，例如按钮高度为h，如果单行文本的宽度大于h*系数，则按钮将不进行横向拉伸，类似于maxwidth效果
- *
- * 此系数和maxwidth取最小值
+ * @brief 按钮最大宽高比，这个系数决定按钮的最大宽度
+ * @return 按钮最大宽高比
+ * @see setButtonMaximumAspectRatio
  */
-qreal SARibbonBar::buttonTextEllipsisAspectFactor() const
+qreal SARibbonBar::buttonMaximumAspectRatio() const
 {
-    return SARibbonToolButton::textEllipsisAspectFactor();
+    return d_ptr->buttonMaximumAspectRatio;
 }
 
 /**

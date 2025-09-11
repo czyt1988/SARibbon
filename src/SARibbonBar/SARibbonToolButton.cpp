@@ -211,64 +211,15 @@ public:
 	bool mMenuButtonPressed { false };  ///< 由于Indicator改变，因此hitButton不能用QToolButton的hitButton
     bool mWordWrap { true };            ///< 标记是否文字换行 @default false
 	SARibbonToolButton::RibbonButtonType mButtonType { SARibbonToolButton::LargeButton };
-	int mSpacing { 1 };              ///< 按钮和边框的距离
-	int mIndicatorLen { 8 };         ///< Indicator的长度
-	QRect mDrawIconRect;             ///< 记录icon的绘制位置
-	QRect mDrawTextRect;             ///< 记录text的绘制位置
-	QRect mDrawIndicatorArrowRect;   ///< 记录IndicatorArrow的绘制位置
-	QSize mSizeHint;                 ///< 保存计算好的sizehint
-	bool mIsTextNeedWrap { false };  ///< 标记文字是否需要换行显示
-public:
-	/**
-	 * @brief 在lite模式下是否允许文字换行
-	 *
-	 * 如果允许，则图标相对比较小，默认不允许
-	 */
-	static bool s_enableWordWrap;
-
-	/**
-	 * @brief 这个系数决定了文字换行时2行文本的矩形高度
-	 *
-	 * 此值应该大于2
-	 *
-	 * 文本区域高度 = fontMetrics.lineSpacing*系数
-	 */
-	static qreal s_twoLineHeightFactor;
-
-	/**
-	 * @brief 这个系数决定了单行文本的行高度
-	 *
-	 * 此值应该大于1
-	 *
-	 * 文本区域高度 = fontMetrics.lineSpacing*系数
-	 */
-	static qreal s_oneLineHeightFactor;
-
-	/**
-	 * @brief 这个系数决定了小按钮文本的行高度
-	 *
-	 * 此值应该大于1
-	 *
-	 * 文本区域高度 = fontMetrics.lineSpacing*系数
-	 */
-	static qreal s_smallButtonHeightFactor;
-
-	/**
-	 * @brief 文本宽度估算时的宽度比高度系数
-	 *
-	 * 超过此系数的宽度时，开始尝试换行，例如按钮高度为h，如果单行文本的宽度大于h*系数，则按钮将不进行横向拉伸，类似于maxwidth效果
-	 *
-	 * 此系数和maxwidth取最小值
-	 */
-	static qreal s_textEllipsisAspectFactor;
+    int mSpacing { 1 };                             ///< 按钮和边框的距离
+    int mIndicatorLen { 8 };                        ///< Indicator的长度
+    QRect mDrawIconRect;                            ///< 记录icon的绘制位置
+    QRect mDrawTextRect;                            ///< 记录text的绘制位置
+    QRect mDrawIndicatorArrowRect;                  ///< 记录IndicatorArrow的绘制位置
+    QSize mSizeHint;                                ///< 保存计算好的sizehint
+    bool mIsTextNeedWrap { false };                 ///< 标记文字是否需要换行显示
+    SARibbonToolButton::LayoutFactor layoutFactor;  ///< 布局系数
 };
-
-// 静态参数初始化
-bool SARibbonToolButton::PrivateData::s_enableWordWrap            = false;
-qreal SARibbonToolButton::PrivateData::s_twoLineHeightFactor      = 2.05;
-qreal SARibbonToolButton::PrivateData::s_oneLineHeightFactor      = 1.2;
-qreal SARibbonToolButton::PrivateData::s_smallButtonHeightFactor  = 1.4;
-qreal SARibbonToolButton::PrivateData::s_textEllipsisAspectFactor = 1.4;
 
 SARibbonToolButton::PrivateData::PrivateData(SARibbonToolButton* p) : q_ptr(p)
 {
@@ -729,13 +680,13 @@ int SARibbonToolButton::PrivateData::calcTextDrawRectHeight(const QStyleOptionTo
 {
 	if (SARibbonToolButton::LargeButton == mButtonType) {
         if (q_ptr->isEnableWordWrap()) {
-			return opt.fontMetrics.lineSpacing() * s_twoLineHeightFactor + opt.fontMetrics.leading();
+            return opt.fontMetrics.lineSpacing() * layoutFactor.twoLineHeightFactor + opt.fontMetrics.leading();
 		} else {
-			return opt.fontMetrics.lineSpacing() * s_oneLineHeightFactor;
+            return opt.fontMetrics.lineSpacing() * layoutFactor.oneLineHeightFactor;
 		}
 	}
 	// 小按钮
-	return opt.fontMetrics.lineSpacing() * s_smallButtonHeightFactor;
+    return opt.rect.height() - 2;
 }
 
 /**
@@ -754,8 +705,8 @@ int SARibbonToolButton::PrivateData::estimateLargeButtonTextWidth(int buttonHeig
                                                                   int maxTrycount)
 {
 	QSize textSize;
-	int space = SA_FONTMETRICS_WIDTH(fm, (QLatin1Char(' '))) * 2;
-	int hintMaxWidth = qMin(static_cast< int >(buttonHeight * SARibbonToolButton::PrivateData::s_textEllipsisAspectFactor),
+    int space        = SA_FONTMETRICS_WIDTH(fm, (QLatin1Char(' '))) * 2;
+    int hintMaxWidth = qMin(static_cast< int >(buttonHeight * layoutFactor.buttonMaximumAspectRatio),
                             q_ptr->maximumWidth());  ///< 建议的宽度
     if (q_ptr->isEnableWordWrap()) {
 		textSize = fm.size(Qt::TextShowMnemonic, text);
@@ -988,7 +939,37 @@ QSize SARibbonToolButton::sizeHint() const
 	QStyleOptionToolButton opt;
 	initStyleOption(&opt);
 	d_ptr->updateSizeHint(opt);
-	return d_ptr->mSizeHint;
+    return d_ptr->mSizeHint;
+}
+
+/**
+ * @brief 设置按钮的布局系数
+ *
+ * 布局系数决定了：
+ * - 文字换行时2行文本的矩形高度
+ * - 单行文本的行高度
+ * - 按钮宽高比
+ *
+ * @param fac 布局系数
+ * @see SARibbonToolButton::LayoutFactor SARibbonToolButton::setButtonMaximumAspectRatio
+ */
+void SARibbonToolButton::setLayoutFactor(const SARibbonToolButton::LayoutFactor& fac)
+{
+    d_ptr->layoutFactor = fac;
+}
+
+/**
+ * @brief SARibbonToolButton::layoutFactor
+ * @return
+ */
+const SARibbonToolButton::LayoutFactor& SARibbonToolButton::layoutFactor() const
+{
+    return d_ptr->layoutFactor;
+}
+
+SARibbonToolButton::LayoutFactor& SARibbonToolButton::layoutFactor()
+{
+    return d_ptr->layoutFactor;
 }
 
 void SARibbonToolButton::paintEvent(QPaintEvent* e)
@@ -1299,32 +1280,26 @@ bool SARibbonToolButton::isEnableWordWrap()
 }
 
 /**
- * @brief 文本宽度估算时的宽度比高度系数
- * @param fac 系数，默认为1.4，此系数越大，按钮允许的宽度越宽
+ * @brief 设置按钮最大宽高比，这个系数决定按钮的最大宽度
  *
- * 超过此系数的宽度时，开始尝试换行，例如按钮高度为h，如果单行文本的宽度大于h*系数，则按钮将不进行横向拉伸，类似于maxwidth效果
+ * 按钮的最大宽度为按钮高度*此系数，例如按钮高度为h，那么按钮最大宽度maxw=h*buttonMaximumAspectRatio
+ * 如果在此宽度下文字还无法完全显示，那么按钮将不会继续横向扩展，将使用...替代未完全显示的文字
  *
- * 此系数和maxwidth取最小值
+ * @see buttonMaximumAspectRatio , layoutFactor
  */
-void SARibbonToolButton::setTextEllipsisAspectFactor(qreal fac)
+void SARibbonToolButton::setButtonMaximumAspectRatio(qreal v)
 {
-	if (fac < 0 && qFuzzyIsNull(fac)) {
-		qWarning() << tr("The TextEllipsisAspectFactor parameter cannot be set to 0 or a negative number");  // cn:textEllipsisAspectFactor不能设置为0或者负数
-		fac = 1.0;
-	}
-	SARibbonToolButton::PrivateData::s_textEllipsisAspectFactor = fac;
+    d_ptr->layoutFactor.buttonMaximumAspectRatio = v;
 }
 
 /**
- * @brief 文本宽度估算时的宽度比高度系数
- *
- * 超过此系数的宽度时，开始尝试换行，例如按钮高度为h，如果单行文本的宽度大于h*系数，则按钮将不进行横向拉伸，类似于maxwidth效果
- *
- * 此系数和maxwidth取最小值
+ * @brief 按钮最大宽高比，这个系数决定按钮的最大宽度
+ * @return 按钮最大宽高比
+ * @see setButtonMaximumAspectRatio setLayoutFactor
  */
-qreal SARibbonToolButton::textEllipsisAspectFactor()
+qreal SARibbonToolButton::buttonMaximumAspectRatio() const
 {
-    return SARibbonToolButton::PrivateData::s_textEllipsisAspectFactor;
+    return layoutFactor().buttonMaximumAspectRatio;
 }
 
 bool SARibbonToolButton::event(QEvent* e)

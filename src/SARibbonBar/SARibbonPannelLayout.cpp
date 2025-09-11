@@ -391,6 +391,7 @@ SARibbonPannelItem* SARibbonPannelLayout::createItem(QAction* action, SARibbonPa
 		button->setDefaultAction(action);
 		button->setIconSize(mDefaultToolButtonIconSize);
         button->setEnableWordWrap(isEnableWordWrap());
+        button->setButtonMaximumAspectRatio(mButtonMaximumAspectRatio);
 		// 属性设置
 		QToolButton::ToolButtonPopupMode popMode = SARibbonPannel::getActionToolButtonPopupModeProperty(action);
 		button->setPopupMode(popMode);
@@ -894,6 +895,41 @@ void SARibbonPannelLayout::setEnableWordWrap(bool on)
             toolbtn->setEnableWordWrap(on);
         }
     }
+}
+
+/**
+ * @brief 设置按钮最大宽高比，这个系数决定按钮的最大宽度
+ *
+ * 按钮的最大宽度为按钮高度*此系数，例如按钮高度为h，那么按钮最大宽度maxw=h*buttonMaximumAspectRatio
+ * 如果在此宽度下文字还无法完全显示，那么按钮将不会继续横向扩展，将使用...替代未完全显示的文字
+ *
+ * @see buttonMaximumAspectRatio
+ *
+ * @note 用户不应该调用@ref SARibbonPannelLayout::setButtonMaximumAspectRatio 来设置，
+ * 而是调用@ref SARibbonBar::setButtonMaximumAspectRatio 设置宽高比
+ */
+void SARibbonPannelLayout::setButtonMaximumAspectRatio(qreal fac)
+{
+    mButtonMaximumAspectRatio = fac;
+    // 遍历所有SARibbonToolButton
+    for (SARibbonPannelItem* item : qAsConst(mItems)) {
+        if (!item) {
+            continue;
+        }
+        if (SARibbonToolButton* toolbtn = qobject_cast< SARibbonToolButton* >(item->widget())) {
+            toolbtn->setButtonMaximumAspectRatio(fac);
+        }
+    }
+}
+
+/**
+ * @brief 按钮最大宽高比，这个系数决定按钮的最大宽度
+ * @return 按钮最大宽高比
+ * @see setButtonMaximumAspectRatio
+ */
+qreal SARibbonPannelLayout::buttonMaximumAspectRatio() const
+{
+    return mButtonMaximumAspectRatio;
 }
 
 /**

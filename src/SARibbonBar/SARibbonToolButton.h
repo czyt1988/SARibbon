@@ -25,6 +25,38 @@ public:
 	};
 	Q_ENUM(RibbonButtonType)
 
+    /**
+     * @brief 布局系数
+     */
+    struct LayoutFactor
+    {
+        /**
+         * @brief  大按钮模式下，两行文本高度系数，这个系数决定了文字换行时2行文本的矩形高度
+         *
+         * 两行文本区域高度 = fontMetrics.lineSpacing*系数
+         * @note 此值应该大于2
+         * @default 2.05
+         */
+        qreal twoLineHeightFactor { 2.05 };
+
+        /**
+         * @brief 大按钮模式下，单行文本高度系数，这个系数决定了单行文本的行高度
+         *
+         * 单行文本区域高度 = fontMetrics.lineSpacing*系数
+         * @note 此值应该大于1
+         * @default 1.2
+         */
+        qreal oneLineHeightFactor { 1.2 };
+
+        /**
+         * @brief 按钮最大宽高比，这个系数决定按钮的最大宽度
+         *
+         * 按钮的最大宽度为按钮高度*此系数，例如按钮高度为h，那么按钮最大宽度maxw=h*buttonMaximumAspectRatio
+         * 如果在此宽度下文字还无法完全显示，那么按钮将不会继续横向扩展，将使用...替代未完全显示的文字
+         */
+        qreal buttonMaximumAspectRatio { 1.4 };
+    };
+
 public:
 	explicit SARibbonToolButton(QWidget* parent = nullptr);
 	explicit SARibbonToolButton(QAction* defaultAction, QWidget* parent = nullptr);
@@ -46,13 +78,18 @@ public:
 
 	virtual QSize sizeHint() const Q_DECL_OVERRIDE;
 
+    // 布局系数
+    void setLayoutFactor(const LayoutFactor& fac);
+    const LayoutFactor& layoutFactor() const;
+    LayoutFactor& layoutFactor();
+
 public:
 	// 是否允许文字换行
     void setEnableWordWrap(bool on);
     bool isEnableWordWrap();
-	// 文本宽度估算时的宽度比高度系数,超过此系数的宽度时，开始尝试换行或者省略号显示
-	static void setTextEllipsisAspectFactor(qreal fac = 1.4);
-	static qreal textEllipsisAspectFactor();
+    // 按钮的最大宽高比，这个系数决定按钮的最大宽度
+    void setButtonMaximumAspectRatio(qreal v = 1.4);
+    qreal buttonMaximumAspectRatio() const;
 
 protected:
 	virtual void paintEvent(QPaintEvent* e) Q_DECL_OVERRIDE;
