@@ -1658,6 +1658,7 @@ bool SARibbonBar::isTabOnTitle() const
 void SARibbonBar::setWindowTitleAligment(Qt::Alignment al)
 {
 	d_ptr->mTitleAligment = al;
+    update();
 }
 
 /**
@@ -1682,7 +1683,7 @@ void SARibbonBar::setEnableWordWrap(bool on)
         }
         return true;
     });
-	updateRibbonGeometry();
+    updateGeometry();
 }
 
 /**
@@ -1711,7 +1712,6 @@ void SARibbonBar::setButtonMaximumAspectRatio(qreal fac)
         }
         return true;
     });
-    updateRibbonGeometry();
 }
 
 /**

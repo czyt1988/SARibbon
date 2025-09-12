@@ -177,7 +177,7 @@ MainWindow::MainWindow(QWidget* par) : SARibbonMainWindow(par)
 	mChangeTitleBkColorTimer.start();
 	connect(&mChangeTitleBkColorTimer, &QTimer::timeout, this, &MainWindow::onChangedTitleTimeout);
 	//! 全屏显示
-	showMaximized();
+    // showMaximized();
 }
 
 /**
@@ -586,7 +586,6 @@ void MainWindow::onButtonGroupActionTriggered(QAction* act)
 			return;
 		}
 		ribbonBar()->setWindowTitleAligment(al);
-		ribbonBar()->updateRibbonGeometry();
 	}
 }
 
@@ -688,8 +687,9 @@ void MainWindow::onSpinBoxRibbonPannelToolBtnIconSizeChanged(int h)
     ribbonBar()->setPannelToolButtonIconSize(QSize(h, h));
 }
 
-void MainWindow::onDoubleSpinBoxToolbuttonMaximumAspectRatio(double h)
+void MainWindow::onDoubleSpinBoxToolbuttonMaximumAspectRatioChanged(double h)
 {
+    ribbonBar()->setButtonMaximumAspectRatio(h);
 }
 
 /**
@@ -1306,6 +1306,11 @@ void MainWindow::createCategorySize(SARibbonCategory* page)
 	QSpinBox* spinboxRibbonPannelToolBtnIconSize = new QSpinBox(w);
 	spinboxRibbonPannelToolBtnIconSize->setRange(1, 99);
 
+    QLabel* lab6                                              = new QLabel("Toolbutton Max Aspect Ratio:");
+    QDoubleSpinBox* doublespinboxToolbuttonMaximumAspectRatio = new QDoubleSpinBox(w);
+    doublespinboxToolbuttonMaximumAspectRatio->setRange(0.5, 99);
+    doublespinboxToolbuttonMaximumAspectRatio->setSingleStep(0.2);
+
 	g->addWidget(lab0, 0, 0);
 	g->addWidget(spinboxRibbonTitleHeight, 0, 1);
 	g->addWidget(lab1, 1, 0);
@@ -1318,12 +1323,15 @@ void MainWindow::createCategorySize(SARibbonCategory* page)
 	g->addWidget(spinboxRibbonPannelSpacing, 0, 5);
 	g->addWidget(lab5, 1, 4);
 	g->addWidget(spinboxRibbonPannelToolBtnIconSize, 1, 5);
+    g->addWidget(lab6, 0, 6);
+    g->addWidget(doublespinboxToolbuttonMaximumAspectRatio, 0, 7);
 	spinboxRibbonTitleHeight->setValue(ribbonBar()->titleBarHeight());
 	spinboxRibbonTabHeight->setValue(ribbonBar()->tabBarHeight());
 	spinboxRibbonCategoryHeight->setValue(ribbonBar()->categoryHeight());
 	spinboxRibbonPannelTtitleHeight->setValue(ribbonBar()->pannelTitleHeight());
 	spinboxRibbonPannelSpacing->setValue(ribbonBar()->pannelSpacing());
 	spinboxRibbonPannelToolBtnIconSize->setValue(ribbonBar()->pannelToolButtonIconSize().width());
+    doublespinboxToolbuttonMaximumAspectRatio->setValue(ribbonBar()->buttonMaximumAspectRatio());
 #if QT_VERSION_MAJOR >= 6
 	connect(spinboxRibbonTitleHeight, &QSpinBox::valueChanged, this, &MainWindow::onSpinBoxRibbonTitleHeightChanged);
 	connect(spinboxRibbonTabHeight, &QSpinBox::valueChanged, this, &MainWindow::onSpinBoxRibbonTabHeightChanged);
@@ -1334,6 +1342,10 @@ void MainWindow::createCategorySize(SARibbonCategory* page)
             &QSpinBox::valueChanged,
             this,
             &MainWindow::onSpinBoxRibbonPannelToolBtnIconSizeChanged);
+    connect(doublespinboxToolbuttonMaximumAspectRatio,
+            &QDoubleSpinBox::valueChanged,
+            this,
+            &MainWindow::onDoubleSpinBoxToolbuttonMaximumAspectRatioChanged);
 #else
 	connect(spinboxRibbonTitleHeight,
             QOverload< int >::of(&QSpinBox::valueChanged),
@@ -1359,6 +1371,10 @@ void MainWindow::createCategorySize(SARibbonCategory* page)
             QOverload< int >::of(&QSpinBox::valueChanged),
             this,
             &MainWindow::onSpinBoxRibbonPannelToolBtnIconSizeChanged);
+    connect(doublespinboxToolbuttonMaximumAspectRatio,
+            QOverload< double >::of(&QDoubleSpinBox::valueChanged),
+            this,
+            &MainWindow::onDoubleSpinBoxToolbuttonMaximumAspectRatioChanged);
 #endif
 	pannel->addLargeWidget(w);
 	page->addPannel(pannel);

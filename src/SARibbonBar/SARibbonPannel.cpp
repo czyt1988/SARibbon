@@ -790,7 +790,7 @@ void SARibbonPannel::updateItemGeometry()
 	qDebug() << "SARibbonPannel updateItemGeometry,pannelName=" << pannelName();
 #endif
 	// 此函数需要添加，否则SARibbonBar::setEnableWordWrap无法刷新按钮
-	resetToolButtonSize();
+    // resetToolButtonSize();
 	if (SARibbonPannelLayout* lay = pannelLayout()) {
 		lay->updateGeomArray();
 	}
@@ -1020,6 +1020,7 @@ void SARibbonPannel::setEnableWordWrap(bool on)
     if (SARibbonPannelLayout* lay = qobject_cast< SARibbonPannelLayout* >(layout())) {
         // 此函数会自动设置所有按钮的换行状态
         lay->setEnableWordWrap(on);
+        updateGeometry();
     }
 }
 

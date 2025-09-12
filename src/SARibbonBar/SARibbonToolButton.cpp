@@ -928,11 +928,6 @@ void SARibbonToolButton::resizeEvent(QResizeEvent* e)
  */
 QSize SARibbonToolButton::sizeHint() const
 {
-	//    if (!d_ptr->mSizeHint.isValid()) {  // 22是给与sizehint的最小值，如果小于这个值，重新计算一下
-	//        QStyleOptionToolButton opt;
-	//        initStyleOption(&opt);
-	//        d_ptr->updateSizeHint(opt);
-	//    }
 #if SA_RIBBON_TOOLBUTTON_DEBUG_PRINT
 	qDebug() << "| | |-SARibbonToolButton::sizeHint";
 #endif
@@ -956,6 +951,8 @@ QSize SARibbonToolButton::sizeHint() const
 void SARibbonToolButton::setLayoutFactor(const SARibbonToolButton::LayoutFactor& fac)
 {
     d_ptr->layoutFactor = fac;
+    // 通知父布局需要重新布局
+    updateGeometry();
 }
 
 /**
@@ -1220,6 +1217,7 @@ void SARibbonToolButton::setButtonType(const RibbonButtonType& buttonType)
 	}
 
 	updateRect();
+    updateGeometry();
 }
 
 /**
@@ -1268,6 +1266,8 @@ void SARibbonToolButton::updateRect()
 void SARibbonToolButton::setEnableWordWrap(bool on)
 {
     d_ptr->mWordWrap = on;
+    // 通知父布局需要重新布局
+    updateGeometry();
 }
 
 /**
@@ -1290,6 +1290,8 @@ bool SARibbonToolButton::isEnableWordWrap()
 void SARibbonToolButton::setButtonMaximumAspectRatio(qreal v)
 {
     d_ptr->layoutFactor.buttonMaximumAspectRatio = v;
+    // 通知父布局需要重新布局
+    updateGeometry();
 }
 
 /**

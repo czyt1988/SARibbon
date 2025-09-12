@@ -692,6 +692,7 @@ void SARibbonCategory::setEnableWordWrap(bool on)
         }
         return true;
     });
+    updateGeometry();
 }
 
 /**
