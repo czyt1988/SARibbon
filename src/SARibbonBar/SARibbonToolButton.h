@@ -20,7 +20,14 @@ public:
 	 */
 	enum RibbonButtonType
 	{
+        /**
+         * @brief  大按钮类型，此类型对应SARibbonBar的大按钮
+         */
 		LargeButton,
+
+        /**
+         * @brief  小按钮类型，此类型对应SARibbonBar的小按钮，等同于普通工具条的按钮
+         */
 		SmallButton
 	};
 	Q_ENUM(RibbonButtonType)
@@ -61,35 +68,40 @@ public:
 	explicit SARibbonToolButton(QWidget* parent = nullptr);
 	explicit SARibbonToolButton(QAction* defaultAction, QWidget* parent = nullptr);
 	~SARibbonToolButton();
+
 	// 标记按钮的样式，按钮的样式有不同的渲染方式
 	RibbonButtonType buttonType() const;
 	void setButtonType(const RibbonButtonType& buttonType);
+
 	// 是否是小按钮
 	bool isSmallRibbonButton() const;
 	// 是否是大按钮
 	bool isLargeRibbonButton() const;
-	// 最小尺寸提示
-	virtual QSize minimumSizeHint() const Q_DECL_OVERRIDE;
 
 	// 获取间距
 	int spacing() const;
+    void setSpacing(int v);
+
 	// 更新尺寸
 	void updateRect();
-
-	virtual QSize sizeHint() const Q_DECL_OVERRIDE;
 
     // 布局系数
     void setLayoutFactor(const LayoutFactor& fac);
     const LayoutFactor& layoutFactor() const;
     LayoutFactor& layoutFactor();
 
-public:
 	// 是否允许文字换行
     void setEnableWordWrap(bool on);
     bool isEnableWordWrap();
+
     // 按钮的最大宽高比，这个系数决定按钮的最大宽度
     void setButtonMaximumAspectRatio(qreal v = 1.4);
     qreal buttonMaximumAspectRatio() const;
+
+public:
+    virtual QSize sizeHint() const Q_DECL_OVERRIDE;
+    // 最小尺寸提示
+    virtual QSize minimumSizeHint() const Q_DECL_OVERRIDE;
 
 protected:
 	virtual void paintEvent(QPaintEvent* e) Q_DECL_OVERRIDE;
@@ -104,8 +116,6 @@ protected:
 	// 事件改变 - 主要为了捕获字体的改变
 	virtual void changeEvent(QEvent* e) Q_DECL_OVERRIDE;
 	virtual void actionEvent(QActionEvent* e) Q_DECL_OVERRIDE;
-
-protected:
 	// 绘制按钮
 	virtual void paintButton(QPainter& p, const QStyleOptionToolButton& opt);
 	// 绘制图标
@@ -121,8 +131,6 @@ private:
                           const QRect& rect,
                           QPainter* painter,
                           const QWidget* widget = 0);
-
-protected:
 };
 
 namespace SA

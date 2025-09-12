@@ -1252,6 +1252,16 @@ int SARibbonToolButton::spacing() const
     return d_ptr->mSpacing;
 }
 
+/**
+ * @brief 设置间隔，间隔是文字和图标以及图标和边界的间距
+ * @param v
+ */
+void SARibbonToolButton::setSpacing(int v)
+{
+    d_ptr->mSpacing = v;
+    updateGeometry();
+}
+
 void SARibbonToolButton::updateRect()
 {
 	QStyleOptionToolButton opt;
