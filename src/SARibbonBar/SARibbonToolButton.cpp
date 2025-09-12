@@ -818,8 +818,9 @@ QString SARibbonToolButton::PrivateData::simplified(const QString& str)
 {
 	QString res = str;
 	res.remove('\n');
-	return res;
+    return res;
 }
+
 //===================================================
 // SARibbonToolButton
 //===================================================
@@ -931,6 +932,9 @@ QSize SARibbonToolButton::sizeHint() const
 #if SA_RIBBON_TOOLBUTTON_DEBUG_PRINT
 	qDebug() << "| | |-SARibbonToolButton::sizeHint";
 #endif
+    if (d_ptr->mSizeHint.isValid()) {
+        return d_ptr->mSizeHint;
+    }
 	QStyleOptionToolButton opt;
 	initStyleOption(&opt);
 	d_ptr->updateSizeHint(opt);
@@ -951,8 +955,8 @@ QSize SARibbonToolButton::sizeHint() const
 void SARibbonToolButton::setLayoutFactor(const SARibbonToolButton::LayoutFactor& fac)
 {
     d_ptr->layoutFactor = fac;
-    // 通知父布局需要重新布局
-    updateGeometry();
+    // 重新布局
+    invalidateSizeHint();
 }
 
 /**
@@ -1146,7 +1150,16 @@ void SARibbonToolButton::paintIndicator(QPainter& p, const QStyleOptionToolButto
 	QStyleOption tool = opt;
 	tool.rect         = indicatorDrawRect;
 	style()->drawPrimitive(QStyle::PE_IndicatorArrowDown, &tool, &p, this);
-	SARIBBONTOOLBUTTON_DEBUG_DRAW_RECT(p, indicatorDrawRect);
+    SARIBBONTOOLBUTTON_DEBUG_DRAW_RECT(p, indicatorDrawRect);
+}
+
+/**
+ * @brief 标记当前的sizehint缓存失效
+ */
+void SARibbonToolButton::invalidateSizeHint()
+{
+    d_ptr->mSizeHint = QSize();
+    updateGeometry();
 }
 
 void SARibbonToolButton::drawArrow(const QStyle* style,
@@ -1186,7 +1199,7 @@ void SARibbonToolButton::drawArrow(const QStyle* style,
 void SARibbonToolButton::actionEvent(QActionEvent* e)
 {
 	QToolButton::actionEvent(e);
-	updateRect();
+    invalidateSizeHint();
 }
 
 /**
@@ -1215,9 +1228,7 @@ void SARibbonToolButton::setButtonType(const RibbonButtonType& buttonType)
 	} else {
 		setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
 	}
-
-	updateRect();
-    updateGeometry();
+    invalidateSizeHint();
 }
 
 /**
@@ -1259,14 +1270,21 @@ int SARibbonToolButton::spacing() const
 void SARibbonToolButton::setSpacing(int v)
 {
     d_ptr->mSpacing = v;
-    updateGeometry();
+    invalidateSizeHint();
 }
 
+/**
+ * @brief 更新布局信息，同时会把当前的sizehint设置为无效
+ *
+ * 此函数内部会调用updateGeometry函数
+ */
 void SARibbonToolButton::updateRect()
 {
 	QStyleOptionToolButton opt;
 	initStyleOption(&opt);
 	d_ptr->updateDrawRect(opt);
+    // 这里不调用invalidateSizeHint();因为nvalidateSizeHint();会调用updateGeometry函数，导致父窗口再次布局
+    d_ptr->mSizeHint = QSize();
 }
 
 /**
@@ -1277,7 +1295,7 @@ void SARibbonToolButton::setEnableWordWrap(bool on)
 {
     d_ptr->mWordWrap = on;
     // 通知父布局需要重新布局
-    updateGeometry();
+    invalidateSizeHint();
 }
 
 /**
@@ -1300,8 +1318,8 @@ bool SARibbonToolButton::isEnableWordWrap()
 void SARibbonToolButton::setButtonMaximumAspectRatio(qreal v)
 {
     d_ptr->layoutFactor.buttonMaximumAspectRatio = v;
-    // 通知父布局需要重新布局
-    updateGeometry();
+    // 重新布局
+    invalidateSizeHint();
 }
 
 /**
@@ -1324,7 +1342,7 @@ bool SARibbonToolButton::event(QEvent* e)
 	case QEvent::ActionRemoved:
 	case QEvent::ActionAdded: {
 		d_ptr->mMouseOnSubControl = false;
-		updateRect();
+        invalidateSizeHint();
 	} break;
 	default:
 		break;
@@ -1336,10 +1354,19 @@ bool SARibbonToolButton::event(QEvent* e)
 void SARibbonToolButton::changeEvent(QEvent* e)
 {
 	if (e) {
-		if (e->type() == QEvent::FontChange) {
-			// 说明字体改变，需要重新计算和字体相关的信息
-			updateRect();
-		}
+        switch (e->type()) {
+        case QEvent::FontChange:
+        case QEvent::StyleChange:
+        case QEvent::LanguageChange: {
+            // 说明字体改变，需要重新计算和字体相关的信息
+            invalidateSizeHint();
+        } break;
+        case QEvent::ScreenChangeInternal: {
+            invalidateSizeHint();
+        }
+        default:
+            break;
+        }
 	}
 	QToolButton::changeEvent(e);
 }

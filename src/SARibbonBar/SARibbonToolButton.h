@@ -125,6 +125,10 @@ protected:
 	// 绘制Indicator
 	virtual void paintIndicator(QPainter& p, const QStyleOptionToolButton& opt, const QRect& indicatorDrawRect);
 
+protected:
+    // 标记当前的sizehint缓存为无效
+    void invalidateSizeHint();
+
 private:
 	static void drawArrow(const QStyle* style,
                           const QStyleOptionToolButton* toolbutton,

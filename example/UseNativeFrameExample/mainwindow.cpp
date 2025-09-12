@@ -284,6 +284,7 @@ void MainWindow::onActionVisibleAllTriggered(bool on)
 		}
 	}
 	ribbonBar()->updateRibbonGeometry();
+    ribbonBar()->update();
 }
 
 /**
