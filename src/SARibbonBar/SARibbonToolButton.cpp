@@ -76,8 +76,9 @@ public:
 	{
 		if (pe == PE_IndicatorArrowUp || pe == PE_IndicatorArrowDown || pe == PE_IndicatorArrowRight
             || pe == PE_IndicatorArrowLeft) {
-			if (opt->rect.width() <= 1 || opt->rect.height() <= 1)
+            if (opt->rect.width() <= 1 || opt->rect.height() <= 1) {
 				return;
+            }
 
 			QRect r  = opt->rect;
 			int size = qMin(r.height(), r.width());
@@ -204,25 +205,27 @@ public:
 	// 确认文字是否确切要换行显示
 	bool isTextNeedWrap() const;
 	// 仅仅对\n进行剔除，和QString::simplified不一样
-	static QString simplified(const QString& str);
+    static QString simplifiedForRibbonButton(const QString& str);
 
 public:
 	bool mMouseOnSubControl { false };  ///< 这个用于标记MenuButtonPopup模式下，鼠标在文本区域
 	bool mMenuButtonPressed { false };  ///< 由于Indicator改变，因此hitButton不能用QToolButton的hitButton
     bool mWordWrap { true };            ///< 标记是否文字换行 @default false
 	SARibbonToolButton::RibbonButtonType mButtonType { SARibbonToolButton::LargeButton };
-    int mSpacing { 1 };                             ///< 按钮和边框的距离
-    int mIndicatorLen { 8 };                        ///< Indicator的长度
-    QRect mDrawIconRect;                            ///< 记录icon的绘制位置
-    QRect mDrawTextRect;                            ///< 记录text的绘制位置
-    QRect mDrawIndicatorArrowRect;                  ///< 记录IndicatorArrow的绘制位置
-    QSize mSizeHint;                                ///< 保存计算好的sizehint
-    bool mIsTextNeedWrap { false };                 ///< 标记文字是否需要换行显示
-    SARibbonToolButton::LayoutFactor layoutFactor;  ///< 布局系数
+    int mSpacing { 1 };                                      ///< 按钮和边框的距离
+    int mIndicatorLen { 8 };                                 ///< Indicator的长度
+    QRect mDrawIconRect;                                     ///< 记录icon的绘制位置
+    QRect mDrawTextRect;                                     ///< 记录text的绘制位置
+    QRect mDrawIndicatorArrowRect;                           ///< 记录IndicatorArrow的绘制位置
+    QSize mSizeHint;                                         ///< 保存计算好的sizehint
+    bool mIsTextNeedWrap { false };                          ///< 标记文字是否需要换行显示
+    SARibbonToolButton::LayoutFactor layoutFactor;           ///< 布局系数
+    std::unique_ptr< SARibbonToolButtonProxyStyle > mStyle;  ///< 按钮样式，主要为了绘制箭头
 };
 
 SARibbonToolButton::PrivateData::PrivateData(SARibbonToolButton* p) : q_ptr(p)
 {
+    mStyle = std::make_unique< SARibbonToolButtonProxyStyle >();
 }
 
 /**
@@ -603,7 +606,7 @@ QSize SARibbonToolButton::PrivateData::calcSmallButtonSizeHint(const QStyleOptio
 		h = opt.iconSize.height() + 2 * mSpacing;
 	} break;
 	case Qt::ToolButtonTextOnly: {
-		QSize textSize = opt.fontMetrics.size(Qt::TextShowMnemonic, simplified(opt.text));
+        QSize textSize = opt.fontMetrics.size(Qt::TextShowMnemonic, simplifiedForRibbonButton(opt.text));
 		textSize.setWidth(textSize.width() + SA_FONTMETRICS_WIDTH(opt.fontMetrics, (QLatin1Char(' '))) * 2);
 		textSize.setHeight(calcTextDrawRectHeight(opt));
 		w = textSize.width() + 2 * mSpacing;
@@ -615,7 +618,7 @@ QSize SARibbonToolButton::PrivateData::calcSmallButtonSizeHint(const QStyleOptio
 		h = opt.iconSize.height() + 2 * mSpacing;
 		// 再加入文本的长度
 		if (!opt.text.isEmpty()) {
-			QSize textSize = opt.fontMetrics.size(Qt::TextShowMnemonic, simplified(opt.text));
+            QSize textSize = opt.fontMetrics.size(Qt::TextShowMnemonic, simplifiedForRibbonButton(opt.text));
 			textSize.setWidth(textSize.width() + SA_FONTMETRICS_WIDTH(opt.fontMetrics, (QLatin1Char(' '))) * 2);
 			textSize.setHeight(calcTextDrawRectHeight(opt));
 			w += mSpacing;
@@ -759,8 +762,8 @@ int SARibbonToolButton::PrivateData::estimateLargeButtonTextWidth(int buttonHeig
 	//! 说明是不换行
 
 	mIsTextNeedWrap = false;  // 文字不需要换行显示，标记起来
-	// 文字不换行情况下，做simplified处理
-	textSize = fm.size(Qt::TextShowMnemonic, simplified(text));
+                              // 文字不换行情况下，做simplified处理
+    textSize = fm.size(Qt::TextShowMnemonic, simplifiedForRibbonButton(text));
 	textSize.setWidth(textSize.width() + space);
 	if (textSize.width() < hintMaxWidth) {
 		// 范围合理，直接返回
@@ -814,7 +817,7 @@ bool SARibbonToolButton::PrivateData::isTextNeedWrap() const
  * @param str
  * @return
  */
-QString SARibbonToolButton::PrivateData::simplified(const QString& str)
+QString SARibbonToolButton::PrivateData::simplifiedForRibbonButton(const QString& str)
 {
 	QString res = str;
 	res.remove('\n');
@@ -828,7 +831,12 @@ QString SARibbonToolButton::PrivateData::simplified(const QString& str)
 SARibbonToolButton::SARibbonToolButton(QWidget* parent)
     : QToolButton(parent), d_ptr(new SARibbonToolButton::PrivateData(this))
 {
-	setStyle(new SARibbonToolButtonProxyStyle());  // 直接设置新样式
+    // 静态设置也是可以，虽然节省内存，但不清楚未来qt是否会针对绘制有潜在的多线程处理的可能性，因此这里还是使用成员变量
+    // static SARibbonToolButtonProxyStyle* ss_style = new SARibbonToolButtonProxyStyle();
+    // setStyle(ss_style);
+
+    // setStyle方法不会接管样式的所有权，因此要手动删除，这里使用智能指针
+    setStyle(d_ptr->mStyle.get());
 	setAutoRaise(true);
 	setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
 	setButtonType(SmallButton);
@@ -1108,10 +1116,16 @@ void SARibbonToolButton::paintText(QPainter& p, const QStyleOptionToolButton& op
 	}
 	QString text;
 	if (isSmallRibbonButton()) {
-		text = opt.fontMetrics.elidedText(PrivateData::simplified(opt.text), Qt::ElideRight, textDrawRect.width(), alignment);
+        text = opt.fontMetrics.elidedText(PrivateData::simplifiedForRibbonButton(opt.text),
+                                          Qt::ElideRight,
+                                          textDrawRect.width(),
+                                          alignment);
 	} else {
 		if (!isEnableWordWrap()) {
-            text = opt.fontMetrics.elidedText(PrivateData::simplified(opt.text), Qt::ElideRight, textDrawRect.width(), alignment);
+            text = opt.fontMetrics.elidedText(PrivateData::simplifiedForRibbonButton(opt.text),
+                                              Qt::ElideRight,
+                                              textDrawRect.width(),
+                                              alignment);
 		} else {
 			text = opt.text;
 		}
@@ -1276,7 +1290,9 @@ void SARibbonToolButton::setSpacing(int v)
 /**
  * @brief 更新布局信息，同时会把当前的sizehint设置为无效
  *
- * 此函数内部会调用updateGeometry函数
+ * @note 此函数会清除 sizehint 缓存，但不会调用 updateGeometry()。
+ *       如果需要触发布局更新，应在调用此函数后手动调用 updateGeometry()。
+ *       在 resizeEvent 中调用此函数时，通常不需要额外调用 updateGeometry()。
  */
 void SARibbonToolButton::updateRect()
 {
