@@ -4,62 +4,86 @@
 #include <QToolButton>
 #include <QDebug>
 /**
- * @brief Ribbon界面适用的toolButton
+ * @brief Ribbon interface adapted tool button / Ribbon界面适用的toolButton
  *
- * 相对于普通toolbutton，主要多了两个类型设置，@ref setButtonType 和 @ref setLargeButtonType
+ * This button is designed specifically for the Ribbon interface, supporting two display modes: large buttons and small
+ * buttons. It also supports automatic text wrapping for large buttons to optimize space usage.
  *
- * @note @sa setIconSize 函数不在起作用，iconsize是根据当前尺寸动态调整的
+ * 该按钮专为Ribbon界面设计，支持大按钮和小按钮两种显示模式。
+ * 图标尺寸会根据按钮尺寸动态调整，无法通过 `setIconSize` 手动设置。
+ * 大按钮模式下还支持文字自动换行，以优化空间利用。
+ *
+ * @note The icon size is dynamically adjusted according to the button size and cannot be set manually via
+ * `setIconSize` / `setIconSize` 函数不在起作用，iconsize是根据当前尺寸动态调整的
  */
 class SA_RIBBON_EXPORT SARibbonToolButton : public QToolButton
 {
 	Q_OBJECT
 	SA_RIBBON_DECLARE_PRIVATE(SARibbonToolButton)
 public:
-	/**
-	 * @brief 按钮样式
-	 */
+    /**
+     * @brief Button type enumeration / 按钮样式枚举
+     */
 	enum RibbonButtonType
 	{
         /**
-         * @brief  大按钮类型，此类型对应SARibbonBar的大按钮
+         * @brief Large button type, corresponding to the large button in SARibbonBar / 大按钮类型，此类型对应SARibbonBar的大按钮
          */
 		LargeButton,
 
         /**
-         * @brief  小按钮类型，此类型对应SARibbonBar的小按钮，等同于普通工具条的按钮
+         * @brief Small button type, corresponding to the small button in SARibbonBar, equivalent to a normal toolbar
+         * button / 小按钮类型，此类型对应SARibbonBar的小按钮，等同于普通工具条的按钮
          */
 		SmallButton
 	};
 	Q_ENUM(RibbonButtonType)
 
     /**
-     * @brief 布局系数
+     * @brief Layout factor structure for fine-tuning button appearance / 用于微调按钮外观的布局系数结构体
      */
     struct LayoutFactor
     {
         /**
-         * @brief  大按钮模式下，两行文本高度系数，这个系数决定了文字换行时2行文本的矩形高度
+         * @brief Coefficient for the height of two-line text in large button mode / 大按钮模式下，两行文本高度系数
          *
+         * This coefficient determines the height of the rectangle for two-line text when word wrapping is enabled.
+         * Two-line text area height = fontMetrics.lineSpacing * coefficient.
+         *
+         * 这个系数决定了文字换行时2行文本的矩形高度。
          * 两行文本区域高度 = fontMetrics.lineSpacing*系数
-         * @note 此值应该大于2
+         *
+         * @note This value should be greater than 2. / 此值应该大于2
          * @default 2.05
          */
         qreal twoLineHeightFactor { 2.05 };
 
         /**
-         * @brief 大按钮模式下，单行文本高度系数，这个系数决定了单行文本的行高度
+         * @brief Coefficient for the height of single-line text in large button mode / 大按钮模式下，单行文本高度系数
          *
+         * This coefficient determines the line height for single-line text.
+         * Single-line text area height = fontMetrics.lineSpacing * coefficient.
+         *
+         * 这个系数决定了单行文本的行高度。
          * 单行文本区域高度 = fontMetrics.lineSpacing*系数
-         * @note 此值应该大于1
+         *
+         * @note This value should be greater than 1. / 此值应该大于1
          * @default 1.2
          */
         qreal oneLineHeightFactor { 1.2 };
 
         /**
-         * @brief 按钮最大宽高比，这个系数决定按钮的最大宽度
+         * @brief Maximum aspect ratio (width/height) for the button / 按钮最大宽高比
+         *
+         * The maximum width of the button is determined by its height multiplied by this coefficient.
+         * For example, if the button height is `h`, then the maximum width is `maxw = h * buttonMaximumAspectRatio`.
+         * If the text cannot be fully displayed within this width, the button will not expand further horizontally,
+         * and ellipsis (...) will be used to indicate truncated text.
          *
          * 按钮的最大宽度为按钮高度*此系数，例如按钮高度为h，那么按钮最大宽度maxw=h*buttonMaximumAspectRatio
          * 如果在此宽度下文字还无法完全显示，那么按钮将不会继续横向扩展，将使用...替代未完全显示的文字
+         *
+         * @default 1.4
          */
         qreal buttonMaximumAspectRatio { 1.4 };
     };

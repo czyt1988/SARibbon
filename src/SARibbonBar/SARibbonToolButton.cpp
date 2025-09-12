@@ -950,15 +950,21 @@ QSize SARibbonToolButton::sizeHint() const
 }
 
 /**
- * @brief 设置按钮的布局系数
+ * @brief Sets the layout factor for fine-tuning the button's appearance / 设置布局系数以微调按钮外观
  *
- * 布局系数决定了：
- * - 文字换行时2行文本的矩形高度
- * - 单行文本的行高度
- * - 按钮宽高比
+ * This function allows you to customize the button's text height and maximum aspect ratio.
+ * After calling this function, the button's geometry will be invalidated to trigger a relayout.
  *
- * @param fac 布局系数
- * @see SARibbonToolButton::LayoutFactor SARibbonToolButton::setButtonMaximumAspectRatio
+ * 此函数允许您自定义按钮的文本高度和最大宽高比。
+ * 调用此函数后，按钮的几何尺寸将被标记为无效，以触发重新布局。
+ *
+ * Example:
+ * @code
+ * SARibbonToolButton::LayoutFactor lf;
+ * lf.twoLineHeightFactor = 2.2; // Make two-line text taller/让两行文字更高
+ * lf.buttonMaximumAspectRatio = 1.6; // Allow a wider button/允许按钮更宽
+ * myRibbonButton->setLayoutFactor(lf);
+ * @endcode
  */
 void SARibbonToolButton::setLayoutFactor(const SARibbonToolButton::LayoutFactor& fac)
 {
