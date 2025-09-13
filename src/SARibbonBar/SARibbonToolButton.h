@@ -93,38 +93,45 @@ public:
 	explicit SARibbonToolButton(QAction* defaultAction, QWidget* parent = nullptr);
 	~SARibbonToolButton();
 
-	// 标记按钮的样式，按钮的样式有不同的渲染方式
+    // Gets the current button type (LargeButton or SmallButton) / 获取当前按钮的类型（大按钮或小按钮）
 	RibbonButtonType buttonType() const;
+    // Sets the button type to LargeButton or SmallButton / 设置按钮类型为大按钮或小按钮
 	void setButtonType(const RibbonButtonType& buttonType);
 
-	// 是否是小按钮
+    // Checks if the button is a small ribbon button / 判断按钮是否为小Ribbon按钮
 	bool isSmallRibbonButton() const;
-	// 是否是大按钮
+    //  Checks if the button is a large ribbon button / 判断按钮是否为大Ribbon按钮
 	bool isLargeRibbonButton() const;
 
-	// 获取间距
+    // Gets the current spacing value / 获取当前的间距值
 	int spacing() const;
+    // Sets the spacing between elements and the border / 设置元素与边框之间的间距
     void setSpacing(int v);
 
-	// 更新尺寸
+    // Forces an update of the internal layout rectangles / 强制更新内部布局矩形
 	void updateRect();
 
-    // 布局系数
+    // Sets the layout factor for fine-tuning the button's appearance / 设置布局系数以微调按钮外观
     void setLayoutFactor(const LayoutFactor& fac);
+    // layout factor for fine-tuning the button's appearance / 布局系数以微调按钮外观
     const LayoutFactor& layoutFactor() const;
     LayoutFactor& layoutFactor();
 
-	// 是否允许文字换行
+    // Enables or disables automatic text wrapping for large buttons / 为大按钮启用或禁用自动文字换行
     void setEnableWordWrap(bool on);
+    // Checks if automatic text wrapping is enabled / 检查是否启用了自动文字换行
     bool isEnableWordWrap();
 
-    // 按钮的最大宽高比，这个系数决定按钮的最大宽度
+    // Sets the button's maximum aspect ratio (width/height) / 设置按钮的最大宽高比
     void setButtonMaximumAspectRatio(qreal v = 1.4);
+    // Gets the button's maximum aspect ratio (width/height) / 获取按钮的最大宽高比
     qreal buttonMaximumAspectRatio() const;
+
+    // Invalidates the cached size hint / 使缓存的size hint失效
+    void invalidateSizeHint();
 
 public:
     virtual QSize sizeHint() const Q_DECL_OVERRIDE;
-    // 最小尺寸提示
     virtual QSize minimumSizeHint() const Q_DECL_OVERRIDE;
 
 protected:
@@ -137,21 +144,17 @@ protected:
 	virtual void leaveEvent(QEvent* e) Q_DECL_OVERRIDE;
 	virtual bool hitButton(const QPoint& pos) const Q_DECL_OVERRIDE;
 	virtual bool event(QEvent* e) Q_DECL_OVERRIDE;
-	// 事件改变 - 主要为了捕获字体的改变
 	virtual void changeEvent(QEvent* e) Q_DECL_OVERRIDE;
 	virtual void actionEvent(QActionEvent* e) Q_DECL_OVERRIDE;
-	// 绘制按钮
-	virtual void paintButton(QPainter& p, const QStyleOptionToolButton& opt);
-	// 绘制图标
-	virtual void paintIcon(QPainter& p, const QStyleOptionToolButton& opt, const QRect& iconDrawRect);
-	// 绘制文本
-	virtual void paintText(QPainter& p, const QStyleOptionToolButton& opt, const QRect& textDrawRect);
-	// 绘制Indicator
-	virtual void paintIndicator(QPainter& p, const QStyleOptionToolButton& opt, const QRect& indicatorDrawRect);
 
-protected:
-    // 标记当前的sizehint缓存为无效
-    void invalidateSizeHint();
+    // Paints the button's background and frame / 绘制按钮的背景和边框
+	virtual void paintButton(QPainter& p, const QStyleOptionToolButton& opt);
+    // Paints the button's icon / 绘制按钮的图标
+	virtual void paintIcon(QPainter& p, const QStyleOptionToolButton& opt, const QRect& iconDrawRect);
+    // Paints the button's text / 绘制按钮的文字
+	virtual void paintText(QPainter& p, const QStyleOptionToolButton& opt, const QRect& textDrawRect);
+    // Paints the button's indicator (e.g., dropdown arrow) / 绘制按钮的指示器（例如下拉箭头）
+	virtual void paintIndicator(QPainter& p, const QStyleOptionToolButton& opt, const QRect& indicatorDrawRect);
 
 private:
 	static void drawArrow(const QStyle* style,

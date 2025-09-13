@@ -177,7 +177,7 @@ MainWindow::MainWindow(QWidget* par) : SARibbonMainWindow(par)
 	mChangeTitleBkColorTimer.start();
 	connect(&mChangeTitleBkColorTimer, &QTimer::timeout, this, &MainWindow::onChangedTitleTimeout);
 	//! 全屏显示
-    // showMaximized();
+    showMaximized();
 }
 
 /**

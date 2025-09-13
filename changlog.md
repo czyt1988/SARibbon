@@ -10,6 +10,7 @@
 - doxygen文档添加例外，不导出内部类
 - 调整`SARibbonToolButton`原来的静态方法，把静态变量调整为成员变量，避免跨库状态不一致
 - 增加了`SARibbonBar::setButtonMaximumAspectRatio`方法，可以设置按钮的最大宽高比，从而调整按钮的文字显示效果
+- 完善了类的注释
 
 ## 2025-07-31 -> 2.4.2
 

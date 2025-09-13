@@ -858,98 +858,6 @@ SARibbonToolButton::~SARibbonToolButton()
 }
 
 /**
- * @brief 鼠标移动事件
- *
- * 由于Ribbon的Indicator和正常的Toolbutton不一样，因此无法用QStyleOptionToolButton的activeSubControls的状态
- *
- * 因此需要重新捕获鼠标的位置来更新按钮当前的一些状态
- * @param e
- */
-void SARibbonToolButton::mouseMoveEvent(QMouseEvent* e)
-{
-	d_ptr->updateStatusByMousePosition(e->pos());
-	QToolButton::mouseMoveEvent(e);
-}
-
-/**
- * @brief SARibbonToolButton::mousePressEvent
- * @param e
- */
-void SARibbonToolButton::mousePressEvent(QMouseEvent* e)
-{
-	if ((e->button() == Qt::LeftButton) && (popupMode() == MenuButtonPopup)) {
-		d_ptr->updateStatusByMousePosition(e->pos());
-		if (d_ptr->mMouseOnSubControl) {
-			d_ptr->mMenuButtonPressed = true;
-			showMenu();
-			// showmenu结束后，在判断当前的鼠标位置是否是在subcontrol
-			d_ptr->updateStatusByMousePosition(mapFromGlobal(QCursor::pos()));
-			return;
-		}
-	}
-	d_ptr->mMenuButtonPressed = false;
-	//! 注意这里要用QAbstractButton的mousePressEvent，而不是QToolButton的mousePressEvent
-	//! QToolButton的mousePressEvent主要是为了弹出菜单，这里弹出菜单的方式是不一样的，因此不能执行QToolButton的mousePressEvent
-	QToolButton::mousePressEvent(e);
-}
-
-void SARibbonToolButton::mouseReleaseEvent(QMouseEvent* e)
-{
-	d_ptr->mMenuButtonPressed = false;
-	QToolButton::mouseReleaseEvent(e);
-}
-
-void SARibbonToolButton::focusOutEvent(QFocusEvent* e)
-{
-	d_ptr->mMouseOnSubControl = false;
-	QToolButton::focusOutEvent(e);
-}
-
-void SARibbonToolButton::leaveEvent(QEvent* e)
-{
-	d_ptr->mMouseOnSubControl = false;
-	QToolButton::leaveEvent(e);
-}
-
-bool SARibbonToolButton::hitButton(const QPoint& pos) const
-{
-	if (QToolButton::hitButton(pos)) {
-		return (!d_ptr->mMenuButtonPressed);
-	}
-	return (false);
-}
-
-/**
- * @brief 在resizeevent计算绘图所需的尺寸，避免在绘图过程中实时绘制提高效率
- * @param e
- */
-void SARibbonToolButton::resizeEvent(QResizeEvent* e)
-{
-	// 在resizeevent计算绘图所需的尺寸，避免在绘图过程中实时绘制提高效率
-	QToolButton::resizeEvent(e);
-	updateRect();
-}
-
-/**
- * @brief toolbutton的尺寸确定是先定下字体的尺寸，再定下icon的尺寸，自底向上，保证字体能显示两行
- * @note m_sizeHint的刷新需要注意
- * @return
- */
-QSize SARibbonToolButton::sizeHint() const
-{
-#if SA_RIBBON_TOOLBUTTON_DEBUG_PRINT
-	qDebug() << "| | |-SARibbonToolButton::sizeHint";
-#endif
-    if (d_ptr->mSizeHint.isValid()) {
-        return d_ptr->mSizeHint;
-    }
-	QStyleOptionToolButton opt;
-	initStyleOption(&opt);
-	d_ptr->updateSizeHint(opt);
-    return d_ptr->mSizeHint;
-}
-
-/**
  * @brief Sets the layout factor for fine-tuning the button's appearance / 设置布局系数以微调按钮外观
  *
  * This function allows you to customize the button's text height and maximum aspect ratio.
@@ -965,6 +873,9 @@ QSize SARibbonToolButton::sizeHint() const
  * lf.buttonMaximumAspectRatio = 1.6; // Allow a wider button/允许按钮更宽
  * myRibbonButton->setLayoutFactor(lf);
  * @endcode
+ *
+ * @param fac The new layout factor / 新的布局系数
+ * @sa layoutFactor, setButtonMaximumAspectRatio
  */
 void SARibbonToolButton::setLayoutFactor(const SARibbonToolButton::LayoutFactor& fac)
 {
@@ -974,258 +885,29 @@ void SARibbonToolButton::setLayoutFactor(const SARibbonToolButton::LayoutFactor&
 }
 
 /**
- * @brief SARibbonToolButton::layoutFactor
- * @return
+ * @brief Gets a const reference to the current layout factor / 获取当前布局系数的常量引用
+ * @return A const reference to the layout factor / 布局系数的常量引用
+ * @sa setLayoutFactor, setButtonMaximumAspectRatio
  */
 const SARibbonToolButton::LayoutFactor& SARibbonToolButton::layoutFactor() const
 {
     return d_ptr->layoutFactor;
 }
 
+/**
+ * @brief Gets a mutable reference to the current layout factor / 获取当前布局系数的可变引用
+ * @return A mutable reference to the layout factor / 布局系数的可变引用
+ * @sa setLayoutFactor, setButtonMaximumAspectRatio
+ */
 SARibbonToolButton::LayoutFactor& SARibbonToolButton::layoutFactor()
 {
     return d_ptr->layoutFactor;
 }
 
-void SARibbonToolButton::paintEvent(QPaintEvent* e)
-{
-	Q_UNUSED(e);
-	QPainter p(this);
-	QStyleOptionToolButton opt;
-	initStyleOption(&opt);
-	if (opt.features & QStyleOptionToolButton::MenuButtonPopup || opt.features & QStyleOptionToolButton::HasMenu) {
-		// 在菜单弹出消失后，需要通过此方法取消掉鼠标停留
-		if (!rect().contains(mapFromGlobal(QCursor::pos()))) {
-			opt.state &= ~QStyle::State_MouseOver;
-		}
-	}
-	paintButton(p, opt);
-	paintIcon(p, opt, d_ptr->mDrawIconRect);
-	paintText(p, opt, d_ptr->mDrawTextRect);
-	paintIndicator(p, opt, d_ptr->mDrawIndicatorArrowRect);
-}
-
 /**
- * @brief 绘制按钮
- * @param p
- * @param opt
- */
-void SARibbonToolButton::paintButton(QPainter& p, const QStyleOptionToolButton& opt)
-{
-	// QStyle::State_Sunken 代表按钮按下去了
-	// QStyle::State_On 代表按钮按checked
-	// QStyle::State_MouseOver 代表当前鼠标位于按钮上面
-	QStyleOption tool = opt;
-	bool autoRaise    = opt.state & QStyle::State_AutoRaise;
-	// 绘制按钮
-	if (autoRaise) {
-		// 这个是为了实现按钮点击下去后(QStyle::State_Sunken),能出现选中的状态
-		// 先绘制一个鼠标不在按钮上的状态
-		if (opt.state & QStyle::State_Sunken) {
-			tool.state &= ~QStyle::State_MouseOver;
-		}
-		style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
-	} else {
-		style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tool, &p, this);
-	}
-	// 针对MenuButtonPopup的ribbon样式的特殊绘制
-	if ((opt.subControls & QStyle::SC_ToolButton) && (opt.features & QStyleOptionToolButton::MenuButtonPopup)) {
-		if (opt.state & QStyle::State_MouseOver) {                       // 鼠标在按钮上才进行绘制
-			if (!(opt.activeSubControls & QStyle::SC_ToolButtonMenu)) {  // 按钮的菜单弹出时不做处理
-				if (LargeButton == d_ptr->mButtonType) {                 // 大按钮模式
-					if (d_ptr->mMouseOnSubControl) {                     // 此时鼠标在indecater那
-						// 鼠标在文字区，把图标显示为正常（就是鼠标不放上去的状态）
-						tool.rect = d_ptr->mDrawIconRect;
-						tool.state |= (QStyle::State_Raised);  // 把图标区域显示为正常
-						tool.state &= ~QStyle::State_MouseOver;
-						if (autoRaise) {
-							style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
-						} else {
-							style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tool, &p, this);
-						}
-					} else {
-						// 鼠标在图标区，把文字显示为正常
-						if (!tool.state.testFlag(QStyle::State_Sunken)) {
-							// State_Sunken说明此按钮正在按下，这时候，文本区域不需要绘制，只有在非按下状态才需要绘制
-							tool.state |= (QStyle::State_Raised);  // 把图标区域显示为正常
-							tool.state &= ~QStyle::State_MouseOver;
-							// 文字和Indicator都显示正常
-							tool.rect = d_ptr->mDrawTextRect.united(d_ptr->mDrawIndicatorArrowRect);
-							if (autoRaise) {
-								style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
-							} else {
-								style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tool, &p, this);
-							}
-						}
-					}
-				} else {                              // 小按钮模式
-					if (d_ptr->mMouseOnSubControl) {  // 此时鼠标在indecater那
-						// 鼠标在文字区，把图标和文字显示为正常
-						tool.rect  = d_ptr->mDrawIconRect.united(d_ptr->mDrawTextRect);
-						tool.state = (QStyle::State_Raised);  // 把图标区域显示为正常
-						if (autoRaise) {
-							style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
-						} else {
-							style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tool, &p, this);
-						}
-					} else {
-						// 鼠标在图标区，把文字显示为正常
-						tool.state = (QStyle::State_Raised);  // 把图标区域显示为正常
-						// 文字和Indicator都显示正常
-						tool.rect = d_ptr->mDrawIndicatorArrowRect;
-						if (autoRaise) {
-							style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
-						} else {
-							style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tool, &p, this);
-						}
-					}
-				}
-			}
-		}
-	}
-	// 绘制Focus
-	//     if (opt.state & QStyle::State_HasFocus) {
-	//         QStyleOptionFocusRect fr;
-	//         fr.QStyleOption::operator=(opt);
-	//         fr.rect.adjust(d_ptr->mSpacing, d_ptr->mSpacing, -d_ptr->mSpacing, -d_ptr->mSpacing);
-	//         style()->drawPrimitive(QStyle::PE_FrameFocusRect, &fr, &p, this);
-	//     }
-}
-
-/**
- * @brief 绘制图标
- * @param p
- * @param opt
- */
-void SARibbonToolButton::paintIcon(QPainter& p, const QStyleOptionToolButton& opt, const QRect& iconDrawRect)
-{
-	if (!iconDrawRect.isValid()) {
-		return;
-	}
-
-	QPixmap pm = d_ptr->createIconPixmap(opt, iconDrawRect.size());
-	style()->drawItemPixmap(&p, iconDrawRect, Qt::AlignCenter, pm);
-	SARIBBONTOOLBUTTON_DEBUG_DRAW_RECT(p, iconDrawRect);
-}
-
-/**
- * @brief 绘制文本
- * @param p
- * @param opt
- */
-void SARibbonToolButton::paintText(QPainter& p, const QStyleOptionToolButton& opt, const QRect& textDrawRect)
-{
-	int alignment = d_ptr->getTextAlignment();
-
-	if (!style()->styleHint(QStyle::SH_UnderlineShortcut, &opt, this)) {
-		alignment |= Qt::TextHideMnemonic;
-	}
-	QString text;
-	if (isSmallRibbonButton()) {
-        text = opt.fontMetrics.elidedText(PrivateData::simplifiedForRibbonButton(opt.text),
-                                          Qt::ElideRight,
-                                          textDrawRect.width(),
-                                          alignment);
-	} else {
-		if (!isEnableWordWrap()) {
-            text = opt.fontMetrics.elidedText(PrivateData::simplifiedForRibbonButton(opt.text),
-                                              Qt::ElideRight,
-                                              textDrawRect.width(),
-                                              alignment);
-		} else {
-			text = opt.text;
-		}
-	}
-	//! 以下内容参考QCommonStyle.cpp
-	//! void QCommonStyle::drawComplexControl(ComplexControl cc, const QStyleOptionComplex *opt,QPainter *p, const QWidget *widget) const
-	//! case CC_ToolButton:
-	QStyle::State bflags = opt.state & ~QStyle::State_Sunken;
-	if (bflags & QStyle::State_AutoRaise) {
-		if (!(bflags & QStyle::State_MouseOver) || !(bflags & QStyle::State_Enabled)) {
-			bflags &= ~QStyle::State_Raised;
-		}
-	}
-	if (opt.state & QStyle::State_Sunken) {
-		if (opt.activeSubControls & QStyle::SC_ToolButton) {
-			bflags |= QStyle::State_Sunken;
-		}
-	}
-	QStyleOptionToolButton label = opt;
-	label.state                  = bflags;
-    style()->drawItemText(&p, textDrawRect, alignment, label.palette, label.state & QStyle::State_Enabled, text, QPalette::ButtonText);
-	SARIBBONTOOLBUTTON_DEBUG_DRAW_RECT(p, textDrawRect);
-}
-
-/**
- * @brief 绘制Indicator
- * @param p
- * @param opt
- */
-void SARibbonToolButton::paintIndicator(QPainter& p, const QStyleOptionToolButton& opt, const QRect& indicatorDrawRect)
-{
-	if (!indicatorDrawRect.isValid() || !d_ptr->hasIndicator(opt)) {
-		return;
-	}
-
-	QStyleOption tool = opt;
-	tool.rect         = indicatorDrawRect;
-	style()->drawPrimitive(QStyle::PE_IndicatorArrowDown, &tool, &p, this);
-    SARIBBONTOOLBUTTON_DEBUG_DRAW_RECT(p, indicatorDrawRect);
-}
-
-/**
- * @brief 标记当前的sizehint缓存失效
- */
-void SARibbonToolButton::invalidateSizeHint()
-{
-    d_ptr->mSizeHint = QSize();
-    updateGeometry();
-}
-
-void SARibbonToolButton::drawArrow(const QStyle* style,
-                                   const QStyleOptionToolButton* toolbutton,
-                                   const QRect& rect,
-                                   QPainter* painter,
-                                   const QWidget* widget)
-{
-    QStyle::PrimitiveElement pe;
-
-	switch (toolbutton->arrowType) {
-	case Qt::LeftArrow:
-		pe = QStyle::PE_IndicatorArrowLeft;
-		break;
-
-	case Qt::RightArrow:
-		pe = QStyle::PE_IndicatorArrowRight;
-		break;
-
-	case Qt::UpArrow:
-		pe = QStyle::PE_IndicatorArrowUp;
-		break;
-
-	case Qt::DownArrow:
-		pe = QStyle::PE_IndicatorArrowDown;
-		break;
-
-	default:
-		return;
-	}
-	QStyleOption arrowOpt = *toolbutton;
-
-	arrowOpt.rect = rect;
-	style->drawPrimitive(pe, &arrowOpt, painter, widget);
-}
-
-void SARibbonToolButton::actionEvent(QActionEvent* e)
-{
-	QToolButton::actionEvent(e);
-    invalidateSizeHint();
-}
-
-/**
- * @brief 按钮样式
+ * @brief Gets the current button type (LargeButton or SmallButton) / 获取当前按钮的类型（大按钮或小按钮）
+ * @return The current button type / 当前按钮类型
  * @sa setButtonType
- * @return
  */
 SARibbonToolButton::RibbonButtonType SARibbonToolButton::buttonType() const
 {
@@ -1233,9 +915,17 @@ SARibbonToolButton::RibbonButtonType SARibbonToolButton::buttonType() const
 }
 
 /**
- * @brief 设置按钮样式
- * @note 设置按钮样式过程会调用setToolButtonStyle，如果要改变toolButtonStyle,如设置为Qt::ToolButtonIconOnly,需要在此函数之后设置
- * @param buttonType
+ * @brief Sets the button type to LargeButton or SmallButton / 设置按钮类型为大按钮或小按钮
+ *
+ * Changing the button type will invalidate the size hint and trigger a relayout.
+ * Note: This function may override the tool button style. If you need to set a specific style (e.g.,
+ * Qt::ToolButtonIconOnly), do so after calling this function.
+ *
+ * 设置按钮类型会令尺寸提示失效并触发重新布局。
+ * 注意：此函数可能会覆盖工具按钮样式。如需设置特定样式（例如 Qt::ToolButtonIconOnly），请在此函数调用之后设置。
+ *
+ * @param buttonType The new button type / 新的按钮类型
+ * @sa isLargeRibbonButton, isSmallRibbonButton
  */
 void SARibbonToolButton::setButtonType(const RibbonButtonType& buttonType)
 {
@@ -1252,8 +942,9 @@ void SARibbonToolButton::setButtonType(const RibbonButtonType& buttonType)
 }
 
 /**
- * @brief 是否是小按钮
- * @return
+ * @brief Checks if the button is a small ribbon button / 判断按钮是否为小Ribbon按钮
+ * @return `true` if the button type is `SmallButton`; otherwise `false` / 如果按钮类型为 `SmallButton` 则返回 `true`；否则返回 `false`
+ * @sa isLargeRibbonButton, buttonType
  */
 bool SARibbonToolButton::isSmallRibbonButton() const
 {
@@ -1261,22 +952,24 @@ bool SARibbonToolButton::isSmallRibbonButton() const
 }
 
 /**
- * @brief 是否是大按钮
- * @return
+ * @brief Checks if the button is a large ribbon button / 判断按钮是否为大Ribbon按钮
+ * @return `true` if the button type is `LargeButton`; otherwise `false` / 如果按钮类型为 `LargeButton` 则返回 `true`；否则返回 `false`
+ * @sa isSmallRibbonButton, buttonType
  */
 bool SARibbonToolButton::isLargeRibbonButton() const
 {
     return (d_ptr->mButtonType == LargeButton);
 }
 
-QSize SARibbonToolButton::minimumSizeHint() const
-{
-    return (sizeHint());
-}
-
 /**
- * @brief 间距是几个重要矩形的间隔
- * @return
+ * @brief Gets the current spacing value / 获取当前的间距值
+ *
+ * Spacing is the gap between the icon, text, indicator, and the button's border.
+ *
+ * 间距是图标、文字、指示器与按钮边框之间的间隙。
+ *
+ * @return The current spacing in pixels / 当前的间距值（像素）
+ * @sa setSpacing
  */
 int SARibbonToolButton::spacing() const
 {
@@ -1284,8 +977,16 @@ int SARibbonToolButton::spacing() const
 }
 
 /**
- * @brief 设置间隔，间隔是文字和图标以及图标和边界的间距
- * @param v
+ * @brief Sets the spacing between elements and the border / 设置元素与边框之间的间距
+ *
+ * This spacing affects the layout of the icon, text, and indicator within the button.
+ * After calling this function, the button's geometry will be invalidated to trigger a relayout.
+ *
+ * 此间距会影响按钮内图标、文字和指示器的布局。
+ * 调用此函数后，按钮的几何尺寸将被标记为无效，以触发重新布局。
+ *
+ * @param v The new spacing value in pixels / 新的间距值（像素）
+ * @sa spacing
  */
 void SARibbonToolButton::setSpacing(int v)
 {
@@ -1294,11 +995,18 @@ void SARibbonToolButton::setSpacing(int v)
 }
 
 /**
- * @brief 更新布局信息，同时会把当前的sizehint设置为无效
+ * @brief Forces an update of the internal layout rectangles / 强制更新内部布局矩形
  *
- * @note 此函数会清除 sizehint 缓存，但不会调用 updateGeometry()。
- *       如果需要触发布局更新，应在调用此函数后手动调用 updateGeometry()。
- *       在 resizeEvent 中调用此函数时，通常不需要额外调用 updateGeometry()。
+ * This function recalculates the drawing rectangles for the icon, text, and indicator based on the current button
+ * size and style. It also invalidates the cached size hint. This is typically called automatically during a resize
+ * event.
+ *
+ * 此函数会根据当前按钮尺寸和样式，重新计算图标、文字和指示器的绘制矩形。同时会使缓存的尺寸提示失效。
+ * 此函数通常在调整大小事件中被自动调用。
+ *
+ * @note This function invalidates the size hint cache but does not call `updateGeometry()`. If you need to trigger
+ * a parent layout update, call `updateGeometry()` manually after this function.
+ * / 此函数会清除 sizehint 缓存，但不会调用 updateGeometry()。如果需要触发布局更新，应在调用此函数后手动调用 updateGeometry()。
  */
 void SARibbonToolButton::updateRect()
 {
@@ -1310,8 +1018,24 @@ void SARibbonToolButton::updateRect()
 }
 
 /**
- * @brief 设置在是否允许文字换行，如果允许，则图标相对比较小，默认不允许
- * @param on
+ * @brief Enables or disables automatic text wrapping for large buttons / 为大按钮启用或禁用自动文字换行
+ *
+ * When enabled, the text in a large button will attempt to wrap onto a second line if it is too long to fit on one line.
+ * This is particularly useful for long action names in the Ribbon interface.
+ * The button's size hint will be recalculated after calling this function.
+ *
+ * 启用后，如果大按钮中的文字过长无法在一行内显示，将尝试换行到第二行。
+ * 这在Ribbon界面中处理较长的操作名称时非常有用。
+ * 调用此函数后，按钮的size hint将被重新计算。
+ *
+ * Example:
+ * @code
+ * // Enable word wrap for a button with a potentially long label/为一个可能有长标签的按钮启用文字换行
+ * myLongLabelButton->setEnableWordWrap(true);
+ * @endcode
+ *
+ * @param on `true` to enable word wrap; `false` to disable it / `true` 启用换行，`false` 禁用换行
+ * @sa isEnableWordWrap
  */
 void SARibbonToolButton::setEnableWordWrap(bool on)
 {
@@ -1321,8 +1045,9 @@ void SARibbonToolButton::setEnableWordWrap(bool on)
 }
 
 /**
- * @brief 否允许文字换行
- * @return
+ * @brief Checks if automatic text wrapping is enabled / 检查是否启用了自动文字换行
+ * @return `true` if word wrap is enabled; otherwise `false` / 如果启用了文字换行则返回 `true`；否则返回 `false`
+ * @sa setEnableWordWrap
  */
 bool SARibbonToolButton::isEnableWordWrap()
 {
@@ -1330,12 +1055,16 @@ bool SARibbonToolButton::isEnableWordWrap()
 }
 
 /**
- * @brief 设置按钮最大宽高比，这个系数决定按钮的最大宽度
+ * @brief Sets the button's maximum aspect ratio (width/height) / 设置按钮的最大宽高比
  *
- * 按钮的最大宽度为按钮高度*此系数，例如按钮高度为h，那么按钮最大宽度maxw=h*buttonMaximumAspectRatio
- * 如果在此宽度下文字还无法完全显示，那么按钮将不会继续横向扩展，将使用...替代未完全显示的文字
+ * This is a convenience function that directly sets the `buttonMaximumAspectRatio` member of the `LayoutFactor`
+ * structure. It has the same effect as modifying the structure and calling `setLayoutFactor`.
  *
- * @see buttonMaximumAspectRatio , layoutFactor
+ * 此函数是直接设置 `LayoutFactor` 结构体中 `buttonMaximumAspectRatio` 成员的便捷方法。
+ * 其效果等同于修改结构体后调用 `setLayoutFactor`。
+ *
+ * @param v The new maximum aspect ratio value / 新的最大宽高比值
+ * @sa buttonMaximumAspectRatio, setLayoutFactor
  */
 void SARibbonToolButton::setButtonMaximumAspectRatio(qreal v)
 {
@@ -1345,9 +1074,9 @@ void SARibbonToolButton::setButtonMaximumAspectRatio(qreal v)
 }
 
 /**
- * @brief 按钮最大宽高比，这个系数决定按钮的最大宽度
- * @return 按钮最大宽高比
- * @see setButtonMaximumAspectRatio setLayoutFactor
+ * @brief Gets the button's maximum aspect ratio (width/height) / 获取按钮的最大宽高比
+ * @return The current maximum aspect ratio / 当前的最大宽高比
+ * @sa setButtonMaximumAspectRatio, layoutFactor
  */
 qreal SARibbonToolButton::buttonMaximumAspectRatio() const
 {
@@ -1391,4 +1120,385 @@ void SARibbonToolButton::changeEvent(QEvent* e)
         }
 	}
 	QToolButton::changeEvent(e);
+}
+
+/**
+ * @brief 鼠标移动事件
+ *
+ * 由于Ribbon的Indicator和正常的Toolbutton不一样，因此无法用QStyleOptionToolButton的activeSubControls的状态
+ *
+ * 因此需要重新捕获鼠标的位置来更新按钮当前的一些状态
+ * @param e
+ */
+void SARibbonToolButton::mouseMoveEvent(QMouseEvent* e)
+{
+    d_ptr->updateStatusByMousePosition(e->pos());
+    QToolButton::mouseMoveEvent(e);
+}
+
+/**
+ * @brief SARibbonToolButton::mousePressEvent
+ * @param e
+ */
+void SARibbonToolButton::mousePressEvent(QMouseEvent* e)
+{
+    if ((e->button() == Qt::LeftButton) && (popupMode() == MenuButtonPopup)) {
+        d_ptr->updateStatusByMousePosition(e->pos());
+        if (d_ptr->mMouseOnSubControl) {
+            d_ptr->mMenuButtonPressed = true;
+            showMenu();
+            // showmenu结束后，在判断当前的鼠标位置是否是在subcontrol
+            d_ptr->updateStatusByMousePosition(mapFromGlobal(QCursor::pos()));
+            return;
+        }
+    }
+    d_ptr->mMenuButtonPressed = false;
+    //! 注意这里要用QAbstractButton的mousePressEvent，而不是QToolButton的mousePressEvent
+    //! QToolButton的mousePressEvent主要是为了弹出菜单，这里弹出菜单的方式是不一样的，因此不能执行QToolButton的mousePressEvent
+    QToolButton::mousePressEvent(e);
+}
+
+void SARibbonToolButton::mouseReleaseEvent(QMouseEvent* e)
+{
+    d_ptr->mMenuButtonPressed = false;
+    QToolButton::mouseReleaseEvent(e);
+}
+
+void SARibbonToolButton::focusOutEvent(QFocusEvent* e)
+{
+    d_ptr->mMouseOnSubControl = false;
+    QToolButton::focusOutEvent(e);
+}
+
+void SARibbonToolButton::leaveEvent(QEvent* e)
+{
+    d_ptr->mMouseOnSubControl = false;
+    QToolButton::leaveEvent(e);
+}
+
+bool SARibbonToolButton::hitButton(const QPoint& pos) const
+{
+    if (QToolButton::hitButton(pos)) {
+        return (!d_ptr->mMenuButtonPressed);
+    }
+    return (false);
+}
+
+/**
+ * @brief 在resizeevent计算绘图所需的尺寸，避免在绘图过程中实时绘制提高效率
+ * @param e
+ */
+void SARibbonToolButton::resizeEvent(QResizeEvent* e)
+{
+    // 在resizeevent计算绘图所需的尺寸，避免在绘图过程中实时绘制提高效率
+    QToolButton::resizeEvent(e);
+    updateRect();
+}
+
+/**
+ * @brief Returns the recommended size for the button / 返回按钮的推荐尺寸
+ *
+ * This size is calculated based on the button's type, text, icon, and current layout factors.
+ * The result is cached for performance. The cache is invalidated when relevant properties change.
+ *
+ * 此尺寸是根据按钮的类型、文字、图标和当前布局系数计算得出的。
+ * 为提高性能，计算结果会被缓存。当相关属性改变时，缓存会自动失效。
+ *
+ * @return The recommended size / 推荐的尺寸
+ */
+QSize SARibbonToolButton::sizeHint() const
+{
+#if SA_RIBBON_TOOLBUTTON_DEBUG_PRINT
+    qDebug() << "| | |-SARibbonToolButton::sizeHint";
+#endif
+    if (d_ptr->mSizeHint.isValid()) {
+        return d_ptr->mSizeHint;
+    }
+    QStyleOptionToolButton opt;
+    initStyleOption(&opt);
+    d_ptr->updateSizeHint(opt);
+    return d_ptr->mSizeHint;
+}
+
+/**
+ * @brief Returns the recommended minimum size for the button / 返回按钮的推荐最小尺寸
+ *
+ * For `SARibbonToolButton`, the minimum size hint is the same as the size hint.
+ *
+ * 对于 `SARibbonToolButton`，最小尺寸提示与尺寸提示相同。
+ *
+ * @return The recommended minimum size / 推荐的最小尺寸
+ */
+QSize SARibbonToolButton::minimumSizeHint() const
+{
+    return (sizeHint());
+}
+
+void SARibbonToolButton::actionEvent(QActionEvent* e)
+{
+    QToolButton::actionEvent(e);
+    invalidateSizeHint();
+}
+
+void SARibbonToolButton::paintEvent(QPaintEvent* e)
+{
+    Q_UNUSED(e);
+    QPainter p(this);
+    QStyleOptionToolButton opt;
+    initStyleOption(&opt);
+    if (opt.features & QStyleOptionToolButton::MenuButtonPopup || opt.features & QStyleOptionToolButton::HasMenu) {
+        // 在菜单弹出消失后，需要通过此方法取消掉鼠标停留
+        if (!rect().contains(mapFromGlobal(QCursor::pos()))) {
+            opt.state &= ~QStyle::State_MouseOver;
+        }
+    }
+    paintButton(p, opt);
+    paintIcon(p, opt, d_ptr->mDrawIconRect);
+    paintText(p, opt, d_ptr->mDrawTextRect);
+    paintIndicator(p, opt, d_ptr->mDrawIndicatorArrowRect);
+}
+
+/**
+ * @brief Paints the button's background and frame / 绘制按钮的背景和边框
+ *
+ * This function handles the special visual effects for the Ribbon style, particularly for the `MenuButtonPopup`
+ * mode where the icon and text areas can have different hover states.
+ *
+ * 此函数处理Ribbon样式的特殊视觉效果，特别是在 `MenuButtonPopup` 模式下，图标和文字区域可以有不同的悬停状态。
+ *
+ * @param p The painter to use / 用于绘制的painter
+ * @param opt The style option for the tool button / 工具按钮的样式选项
+ */
+void SARibbonToolButton::paintButton(QPainter& p, const QStyleOptionToolButton& opt)
+{
+    // QStyle::State_Sunken 代表按钮按下去了
+    // QStyle::State_On 代表按钮按checked
+    // QStyle::State_MouseOver 代表当前鼠标位于按钮上面
+    QStyleOption tool = opt;
+    bool autoRaise    = opt.state & QStyle::State_AutoRaise;
+    // 绘制按钮
+    if (autoRaise) {
+        // 这个是为了实现按钮点击下去后(QStyle::State_Sunken),能出现选中的状态
+        // 先绘制一个鼠标不在按钮上的状态
+        if (opt.state & QStyle::State_Sunken) {
+            tool.state &= ~QStyle::State_MouseOver;
+        }
+        style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
+    } else {
+        style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tool, &p, this);
+    }
+    // 针对MenuButtonPopup的ribbon样式的特殊绘制
+    if ((opt.subControls & QStyle::SC_ToolButton) && (opt.features & QStyleOptionToolButton::MenuButtonPopup)) {
+        if (opt.state & QStyle::State_MouseOver) {                       // 鼠标在按钮上才进行绘制
+            if (!(opt.activeSubControls & QStyle::SC_ToolButtonMenu)) {  // 按钮的菜单弹出时不做处理
+                if (LargeButton == d_ptr->mButtonType) {                 // 大按钮模式
+                    if (d_ptr->mMouseOnSubControl) {                     // 此时鼠标在indecater那
+                        // 鼠标在文字区，把图标显示为正常（就是鼠标不放上去的状态）
+                        tool.rect = d_ptr->mDrawIconRect;
+                        tool.state |= (QStyle::State_Raised);  // 把图标区域显示为正常
+                        tool.state &= ~QStyle::State_MouseOver;
+                        if (autoRaise) {
+                            style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
+                        } else {
+                            style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tool, &p, this);
+                        }
+                    } else {
+                        // 鼠标在图标区，把文字显示为正常
+                        if (!tool.state.testFlag(QStyle::State_Sunken)) {
+                            // State_Sunken说明此按钮正在按下，这时候，文本区域不需要绘制，只有在非按下状态才需要绘制
+                            tool.state |= (QStyle::State_Raised);  // 把图标区域显示为正常
+                            tool.state &= ~QStyle::State_MouseOver;
+                            // 文字和Indicator都显示正常
+                            tool.rect = d_ptr->mDrawTextRect.united(d_ptr->mDrawIndicatorArrowRect);
+                            if (autoRaise) {
+                                style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
+                            } else {
+                                style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tool, &p, this);
+                            }
+                        }
+                    }
+                } else {                              // 小按钮模式
+                    if (d_ptr->mMouseOnSubControl) {  // 此时鼠标在indecater那
+                        // 鼠标在文字区，把图标和文字显示为正常
+                        tool.rect  = d_ptr->mDrawIconRect.united(d_ptr->mDrawTextRect);
+                        tool.state = (QStyle::State_Raised);  // 把图标区域显示为正常
+                        if (autoRaise) {
+                            style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
+                        } else {
+                            style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tool, &p, this);
+                        }
+                    } else {
+                        // 鼠标在图标区，把文字显示为正常
+                        tool.state = (QStyle::State_Raised);  // 把图标区域显示为正常
+                        // 文字和Indicator都显示正常
+                        tool.rect = d_ptr->mDrawIndicatorArrowRect;
+                        if (autoRaise) {
+                            style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
+                        } else {
+                            style()->drawPrimitive(QStyle::PE_PanelButtonBevel, &tool, &p, this);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    // 绘制Focus
+    //     if (opt.state & QStyle::State_HasFocus) {
+    //         QStyleOptionFocusRect fr;
+    //         fr.QStyleOption::operator=(opt);
+    //         fr.rect.adjust(d_ptr->mSpacing, d_ptr->mSpacing, -d_ptr->mSpacing, -d_ptr->mSpacing);
+    //         style()->drawPrimitive(QStyle::PE_FrameFocusRect, &fr, &p, this);
+    //     }
+}
+
+/**
+ * @brief Paints the button's icon / 绘制按钮的图标
+ *
+ * The icon is painted within the specified rectangle, scaled appropriately based on the available space.
+ *
+ * 图标会在指定的矩形区域内绘制，并根据可用空间进行适当缩放。
+ *
+ * @param p The painter to use / 用于绘制的painter
+ * @param opt The style option for the tool button / 工具按钮的样式选项
+ * @param iconDrawRect The rectangle in which to draw the icon / 绘制图标的矩形区域
+ */
+void SARibbonToolButton::paintIcon(QPainter& p, const QStyleOptionToolButton& opt, const QRect& iconDrawRect)
+{
+    if (!iconDrawRect.isValid()) {
+        return;
+    }
+
+    QPixmap pm = d_ptr->createIconPixmap(opt, iconDrawRect.size());
+    style()->drawItemPixmap(&p, iconDrawRect, Qt::AlignCenter, pm);
+    SARIBBONTOOLBUTTON_DEBUG_DRAW_RECT(p, iconDrawRect);
+}
+
+/**
+ * @brief Paints the button's text / 绘制按钮的文字
+ *
+ * The text is painted within the specified rectangle, with alignment and elision (truncation with "...") handled
+ * according to the button's type and word-wrap setting.
+ *
+ * 文字会在指定的矩形区域内绘制，其对齐方式和省略（用“...”截断）会根据按钮的类型和文字换行设置进行处理。
+ *
+ * @param p The painter to use / 用于绘制的painter对象
+ * @param opt The style option for the tool button / 工具按钮的样式选项
+ * @param textDrawRect The rectangle in which to draw the text / 绘制文字的矩形区域
+ */
+void SARibbonToolButton::paintText(QPainter& p, const QStyleOptionToolButton& opt, const QRect& textDrawRect)
+{
+    int alignment = d_ptr->getTextAlignment();
+
+    if (!style()->styleHint(QStyle::SH_UnderlineShortcut, &opt, this)) {
+        alignment |= Qt::TextHideMnemonic;
+    }
+    QString text;
+    if (isSmallRibbonButton()) {
+        text = opt.fontMetrics.elidedText(PrivateData::simplifiedForRibbonButton(opt.text),
+                                          Qt::ElideRight,
+                                          textDrawRect.width(),
+                                          alignment);
+    } else {
+        if (!isEnableWordWrap()) {
+            text = opt.fontMetrics.elidedText(PrivateData::simplifiedForRibbonButton(opt.text),
+                                              Qt::ElideRight,
+                                              textDrawRect.width(),
+                                              alignment);
+        } else {
+            text = opt.text;
+        }
+    }
+    //! 以下内容参考QCommonStyle.cpp
+    //! void QCommonStyle::drawComplexControl(ComplexControl cc, const QStyleOptionComplex *opt,QPainter *p, const QWidget *widget) const
+    //! case CC_ToolButton:
+    QStyle::State bflags = opt.state & ~QStyle::State_Sunken;
+    if (bflags & QStyle::State_AutoRaise) {
+        if (!(bflags & QStyle::State_MouseOver) || !(bflags & QStyle::State_Enabled)) {
+            bflags &= ~QStyle::State_Raised;
+        }
+    }
+    if (opt.state & QStyle::State_Sunken) {
+        if (opt.activeSubControls & QStyle::SC_ToolButton) {
+            bflags |= QStyle::State_Sunken;
+        }
+    }
+    QStyleOptionToolButton label = opt;
+    label.state                  = bflags;
+    style()->drawItemText(&p, textDrawRect, alignment, label.palette, label.state & QStyle::State_Enabled, text, QPalette::ButtonText);
+    SARIBBONTOOLBUTTON_DEBUG_DRAW_RECT(p, textDrawRect);
+}
+
+/**
+ * @brief Paints the button's indicator (e.g., dropdown arrow) / 绘制按钮的指示器（例如下拉箭头）
+ *
+ * The indicator is painted within the specified rectangle if the button has a menu (i.e., features include
+ * `MenuButtonPopup` or `HasMenu`).
+ *
+ * 如果按钮有菜单（即特性包含 `MenuButtonPopup` 或 `HasMenu`），则会在指定的矩形区域内绘制指示器。
+ *
+ * @param p The painter to use / 用于绘制的painter对象
+ * @param opt The style option for the tool button / 工具按钮的样式选项
+ * @param indicatorDrawRect The rectangle in which to draw the indicator / 绘制指示器的矩形区域
+ */
+void SARibbonToolButton::paintIndicator(QPainter& p, const QStyleOptionToolButton& opt, const QRect& indicatorDrawRect)
+{
+    if (!indicatorDrawRect.isValid() || !d_ptr->hasIndicator(opt)) {
+        return;
+    }
+
+    QStyleOption tool = opt;
+    tool.rect         = indicatorDrawRect;
+    style()->drawPrimitive(QStyle::PE_IndicatorArrowDown, &tool, &p, this);
+    SARIBBONTOOLBUTTON_DEBUG_DRAW_RECT(p, indicatorDrawRect);
+}
+
+/**
+ * @brief Invalidates the cached size hint / 使缓存的size hint失效
+ *
+ * This function clears the internally cached `sizeHint()` value and calls `updateGeometry()`,
+ * which notifies the layout system that this widget needs to be relayouted.
+ * It is called automatically when properties affecting the size (like text, font, or button type) change.
+ *
+ * 此函数会清除内部缓存的 `sizeHint()` 值并调用 `updateGeometry()`，
+ * 通知布局系统此控件需要重新布局。
+ * 当影响尺寸的属性（如文字、字体或按钮类型）发生变化时，会自动调用此函数。
+ */
+void SARibbonToolButton::invalidateSizeHint()
+{
+    d_ptr->mSizeHint = QSize();
+    updateGeometry();
+}
+
+void SARibbonToolButton::drawArrow(const QStyle* style,
+                                   const QStyleOptionToolButton* toolbutton,
+                                   const QRect& rect,
+                                   QPainter* painter,
+                                   const QWidget* widget)
+{
+    QStyle::PrimitiveElement pe;
+
+    switch (toolbutton->arrowType) {
+    case Qt::LeftArrow:
+        pe = QStyle::PE_IndicatorArrowLeft;
+        break;
+
+    case Qt::RightArrow:
+        pe = QStyle::PE_IndicatorArrowRight;
+        break;
+
+    case Qt::UpArrow:
+        pe = QStyle::PE_IndicatorArrowUp;
+        break;
+
+    case Qt::DownArrow:
+        pe = QStyle::PE_IndicatorArrowDown;
+        break;
+
+    default:
+        return;
+    }
+    QStyleOption arrowOpt = *toolbutton;
+
+    arrowOpt.rect = rect;
+    style->drawPrimitive(pe, &arrowOpt, painter, widget);
 }
