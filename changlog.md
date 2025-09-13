@@ -1,5 +1,17 @@
 ﻿# 版本记录(change log):
 
+## 2025-09-10 -> 2.5.0
+
+- 调整`SARibbonToolButton`的`setEnableWordWrap`方法，由原来静态方法调整为成员函数，避免跨库创建导致状态不同步问题
+- `SARibbonToolButton`大按钮增加icononly和textonly模式
+- 调整`SARibbonToolButton`的实现，调整了刷新策略，增加了sizehint的缓存，提升性能
+- 把一些旧的c++方法改为cpp11
+- [解决一个添加上下文标签问题](https://gitee.com/czyt1988/SARibbon/issues/IA45AU)
+- doxygen文档添加例外，不导出内部类
+- 调整`SARibbonToolButton`原来的静态方法，把静态变量调整为成员变量，避免跨库状态不一致
+- 增加了`SARibbonBar::setButtonMaximumAspectRatio`方法，可以设置按钮的最大宽高比，从而调整按钮的文字显示效果
+- 完善了类的注释
+
 ## 2025-07-31 -> 2.4.2
 
 - 调整了`SARibbonApplicationButton`的布局比例，让其更协调

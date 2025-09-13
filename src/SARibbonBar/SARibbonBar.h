@@ -211,8 +211,9 @@ public:
 	void removeCategory(SARibbonCategory* category);
 
 	// 添加一个上下文标签
-	SARibbonContextCategory*
-	addContextCategory(const QString& title, const QColor& color = QColor(), const QVariant& id = QVariant());
+    SARibbonContextCategory* addContextCategory(const QString& title,
+                                                const QColor& color = QColor(),
+                                                const QVariant& id  = QVariant());
 	void addContextCategory(SARibbonContextCategory* context);
 
 	// 显示一个上下文标签
@@ -344,9 +345,9 @@ public:
 	void setEnableWordWrap(bool on);
 	bool isEnableWordWrap() const;
 
-	// 文本宽度估算时的宽度比高度系数,超过此系数的宽度时，开始尝试换行或者省略号显示
-	void setButtonTextEllipsisAspectFactor(qreal fac = 1.4);
-	qreal buttonTextEllipsisAspectFactor() const;
+    // 按钮的最大宽高比，这个系数决定按钮的最大宽度
+    void setButtonMaximumAspectRatio(qreal fac = 1.4);
+    qreal buttonMaximumAspectRatio() const;
 
 	// 设置pannel的标题栏高度
 	int pannelTitleHeight() const;
@@ -360,7 +361,7 @@ public:
 	void setPannelSpacing(int n);
 	int pannelSpacing() const;
 
-	// 设置pannel按钮的icon尺寸，large action不受此尺寸影响
+    // 设置pannel按钮(pannel右下角的功能按钮)的icon尺寸
 	void setPannelToolButtonIconSize(const QSize& s);
 	QSize pannelToolButtonIconSize() const;
 
@@ -383,7 +384,6 @@ public:
 	SARibbonAlignment ribbonAlignment() const;
 
 	// 此函数会遍历SARibbonBar下的所有Category，执行函数指针(bool(SARibbonCategory*))，函数指针返回false则停止迭代
-
 	bool iterateCategory(FpCategoryIterate fp) const;
 	// 此函数会遍历SARibbonBar下的所有Category,并迭代所有的pannel，执行函数指针(bool(SARibbonPannel*))，函数指针返回false则停止迭代
 	bool iteratePannel(FpPannelIterate fp) const;
@@ -478,8 +478,7 @@ protected:
 
 	virtual void paintTabbarBaseLine(QPainter& painter);
 	virtual void paintWindowTitle(QPainter& painter, const QString& title, const QRect& titleRegion);
-	virtual void
-	paintContextCategoryTab(QPainter& painter, const QString& title, const QRect& contextRect, const QColor& color);
+    virtual void paintContextCategoryTab(QPainter& painter, const QString& title, const QRect& contextRect, const QColor& color);
 #if SA_DEBUG_PRINT_SARIBBONBAR
 	SA_RIBBON_EXPORT friend QDebug operator<<(QDebug debug, const SARibbonBar& ribbon);
 #endif

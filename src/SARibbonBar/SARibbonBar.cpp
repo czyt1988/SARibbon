@@ -93,6 +93,8 @@ public:
 	SARibbonMainWindowStyles mMainWindowStyle;                   ///< 记录MainWindow的样式
 	FpContextCategoryHighlight mFpContextHighlight { nullptr };  ///< 上下文标签高亮
 	bool mEnableTabDoubleClickToMinimumMode { true };  ///< 是否允许tab双击激活ribbon的最小化模式
+    bool mEnableWordWrap { true };                     ///< 是否允许文字换行
+    qreal buttonMaximumAspectRatio { 1.4 };            ///< 按钮的最大宽高比
 public:
 	PrivateData(SARibbonBar* par) : q_ptr(par)
 	{
@@ -471,6 +473,7 @@ SARibbonCategory* SARibbonBar::addCategoryPage(const QString& title)
 
 	category->setObjectName(title);
 	category->setCategoryName(title);
+
 	addCategoryPage(category);
 	return (category);
 }
@@ -527,9 +530,11 @@ void SARibbonBar::insertCategoryPage(SARibbonCategory* category, int index)
 	if (nullptr == category) {
 		return;
 	}
-	category->setPannelLayoutMode(d_ptr->mDefaulePannelLayoutMode);
-	category->setPannelSpacing(d_ptr->mPannelSpacing);
-	category->setPannelToolButtonIconSize(d_ptr->mPannelToolButtonSize);
+    category->setPannelLayoutMode(pannelLayoutMode());
+    category->setPannelSpacing(pannelSpacing());
+    category->setPannelToolButtonIconSize(pannelToolButtonIconSize());
+    category->setEnableWordWrap(isEnableWordWrap());
+
 	int i = d_ptr->mRibbonTabBar->insertTab(index, category->categoryName());
 
 	_SARibbonTabData tabdata;
@@ -989,12 +994,14 @@ void SARibbonBar::showMinimumModeButton(bool isShow)
 		activeRightButtonGroup();
 
 		d_ptr->mMinimumCategoryButtonAction = new QAction(this);
-		d_ptr->mMinimumCategoryButtonAction->setIcon(style()->standardIcon(
-			isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton, nullptr));
+        d_ptr->mMinimumCategoryButtonAction->setIcon(
+            style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton,
+                                  nullptr));
 		connect(d_ptr->mMinimumCategoryButtonAction, &QAction::triggered, this, [ this ]() {
 			this->setMinimumMode(!isMinimumMode());
-			this->d_ptr->mMinimumCategoryButtonAction->setIcon(style()->standardIcon(
-				isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton, nullptr));
+            this->d_ptr->mMinimumCategoryButtonAction->setIcon(
+                style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton,
+                                      nullptr));
 		});
 		d_ptr->mRightButtonGroup->addAction(d_ptr->mMinimumCategoryButtonAction);
 	}
@@ -1651,6 +1658,7 @@ bool SARibbonBar::isTabOnTitle() const
 void SARibbonBar::setWindowTitleAligment(Qt::Alignment al)
 {
 	d_ptr->mTitleAligment = al;
+    update();
 }
 
 /**
@@ -1668,8 +1676,14 @@ Qt::Alignment SARibbonBar::windowTitleAligment() const
  */
 void SARibbonBar::setEnableWordWrap(bool on)
 {
-	SARibbonToolButton::setEnableWordWrap(on);
-	updateRibbonGeometry();
+    d_ptr->mEnableWordWrap = on;
+    iterateCategory([ on ](SARibbonCategory* category) -> bool {
+        if (category) {
+            category->setEnableWordWrap(on);
+        }
+        return true;
+    });
+    updateGeometry();
 }
 
 /**
@@ -1678,33 +1692,36 @@ void SARibbonBar::setEnableWordWrap(bool on)
  */
 bool SARibbonBar::isEnableWordWrap() const
 {
-    return SARibbonToolButton::isEnableWordWrap();
+    return d_ptr->mEnableWordWrap;
 }
 
 /**
- * @brief 文本宽度估算时的宽度比高度系数
- * @param fac 系数，默认为1.4，此系数越大，按钮允许的宽度越宽
+ * @brief 设置按钮最大宽高比，这个系数决定按钮的最大宽度
  *
- * 超过此系数的宽度时，开始尝试换行，例如按钮高度为h，如果单行文本的宽度大于h*系数，则按钮将不进行横向拉伸，类似于maxwidth效果
+ * 按钮的最大宽度为按钮高度*此系数，例如按钮高度为h，那么按钮最大宽度maxw=h*buttonMaximumAspectRatio
+ * 如果在此宽度下文字还无法完全显示，那么按钮将不会继续横向扩展，将使用...替代未完全显示的文字
  *
- * 此系数和maxwidth取最小值
+ * @see buttonMaximumAspectRatio
  */
-void SARibbonBar::setButtonTextEllipsisAspectFactor(qreal fac)
+void SARibbonBar::setButtonMaximumAspectRatio(qreal fac)
 {
-	SARibbonToolButton::setTextEllipsisAspectFactor(fac);
-	updateRibbonGeometry();
+    d_ptr->buttonMaximumAspectRatio = fac;
+    iterateCategory([ fac ](SARibbonCategory* category) -> bool {
+        if (category) {
+            category->setButtonMaximumAspectRatio(fac);
+        }
+        return true;
+    });
 }
 
 /**
- * @brief 文本宽度估算时的宽度比高度系数
- *
- * 超过此系数的宽度时，开始尝试换行，例如按钮高度为h，如果单行文本的宽度大于h*系数，则按钮将不进行横向拉伸，类似于maxwidth效果
- *
- * 此系数和maxwidth取最小值
+ * @brief 按钮最大宽高比，这个系数决定按钮的最大宽度
+ * @return 按钮最大宽高比
+ * @see setButtonMaximumAspectRatio
  */
-qreal SARibbonBar::buttonTextEllipsisAspectFactor() const
+qreal SARibbonBar::buttonMaximumAspectRatio() const
 {
-    return SARibbonToolButton::textEllipsisAspectFactor();
+    return d_ptr->buttonMaximumAspectRatio;
 }
 
 /**
@@ -1799,6 +1816,8 @@ void SARibbonBar::setPannelToolButtonIconSize(const QSize& s)
 
 /**
  * @brief pannel按钮的icon尺寸，large action不受此尺寸影响
+ *
+ * @note pannel按钮是指pannel右下角的功能按钮
  * @return
  */
 QSize SARibbonBar::pannelToolButtonIconSize() const
@@ -2228,9 +2247,9 @@ void SARibbonBar::paintInLooseStyle()
 		if (!contextData.tabPageIndex.isEmpty()) {
 			// 绘制
 			paintContextCategoryTab(p,
-									contextData.contextCategory->contextTitle(),
-									contextTitleRect,
-									contextData.contextCategory->contextColor());
+                                    contextData.contextCategory->contextTitle(),
+                                    contextTitleRect,
+                                    contextData.contextCategory->contextColor());
 		}
 	}
 
@@ -2258,9 +2277,9 @@ void SARibbonBar::paintInCompactStyle()
 		if (!contextData.tabPageIndex.isEmpty()) {
 			// 绘制
 			paintContextCategoryTab(p,
-									contextData.contextCategory->contextTitle(),
-									contextTitleRect,
-									contextData.contextCategory->contextColor());
+                                    contextData.contextCategory->contextTitle(),
+                                    contextTitleRect,
+                                    contextData.contextCategory->contextColor());
 		}
 	}
 

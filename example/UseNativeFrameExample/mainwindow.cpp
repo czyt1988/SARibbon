@@ -194,7 +194,7 @@ void MainWindow::onStyleClicked(int id)
 
 	SARibbonBar::RibbonStyles ribbonStyle = static_cast< SARibbonBar::RibbonStyles >(id);
 	ribbonBar()->setRibbonStyle(ribbonStyle);
-	mActionWordWrap->setChecked(SARibbonToolButton::isEnableWordWrap());
+    mActionWordWrap->setChecked(ribbonBar()->isEnableWordWrap());
 	switch (ribbonStyle) {
 	case SARibbonBar::RibbonStyleLooseThreeRow:
 		// cn:"LooseThreeRow"样式的文字显示是换行的，同时也会显示标题栏，你也可以通过SARibbonBar::setEnableWordWrap来控制按钮是否换行显示，
@@ -284,6 +284,7 @@ void MainWindow::onActionVisibleAllTriggered(bool on)
 		}
 	}
 	ribbonBar()->updateRibbonGeometry();
+    ribbonBar()->update();
 }
 
 /**
@@ -347,7 +348,8 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
 	actShowHideButton->trigger();
 
 	mActionWordWrap = createAction(tr("word wrap"), ":/icon/icon/wordwrap.svg");
-	mActionWordWrap->setCheckable(ribbonBar()->isEnableWordWrap());
+    mActionWordWrap->setCheckable(true);
+    mActionWordWrap->setChecked(ribbonBar()->isEnableWordWrap());
 	pannelStyle->addSmallAction(mActionWordWrap);
 	connect(mActionWordWrap, &QAction::triggered, this, &MainWindow::onActionWordWrapTriggered);
 
