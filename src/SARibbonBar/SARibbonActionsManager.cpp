@@ -315,8 +315,8 @@ QMap< int, SARibbonCategory* > SARibbonActionsManager::autoRegisteActions(SARibb
 	int tag                              = AutoCategoryDistinguishBeginTag;
 
 	for (SARibbonCategory* c : qAsConst(categorys)) {
-		QList< SARibbonPannel* > pannels = c->pannelList();
-		for (SARibbonPannel* p : qAsConst(pannels)) {
+		QList< SARibbonPanel* > panels = c->panelList();
+		for (SARibbonPanel* p : qAsConst(panels)) {
 			categoryActions += autoRegisteWidgetActions(p, tag, false);
 		}
 		setTagName(tag, c->categoryName());

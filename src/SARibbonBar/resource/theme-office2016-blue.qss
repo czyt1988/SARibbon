@@ -34,7 +34,7 @@
 {ToolButton.BorderColor:hover}:按钮hover状态的边框颜色
 {ToolButton.BKColor:hover}:按钮hover状态的背景颜色
 
-{PannelButtonGroup.BorderColor}:Pannel下的buttongroup的边框颜色，建议和{ToolButton.BorderColor:hover}一致
+{PanelButtonGroup.BorderColor}:Panel下的buttongroup的边框颜色，建议和{ToolButton.BorderColor:hover}一致
 
 {ControlButton.BKColor}:工具栏按钮的背景颜色，建议为透明
 {ControlButton.BorderColor}:工具栏按钮的边框颜色，建议为透明
@@ -63,9 +63,9 @@
 {Menu.BKColor:selected}菜单选中条目的背景颜色，建议为{ToolButton.BKColor:checked}
 {Menu.BKColor:hover}菜单hover条目的背景颜色，建议为 {ToolButton.BKColor:hover}
 
-{OptionButton.BKColor}:pannel下的OptionButton的背景颜色，建议为transparent
-{OptionButton.Color}:pannel下的OptionButton的文字颜色，建议为{ToolButton.Color}
-{OptionButton.BKColor:hover}:pannel下的OptionButton在hover状态下的背景颜色，建议为{ToolButton.BKColor:hover}
+{OptionButton.BKColor}:panel下的OptionButton的背景颜色，建议为transparent
+{OptionButton.Color}:panel下的OptionButton的文字颜色，建议为{ToolButton.Color}
+{OptionButton.BKColor:hover}:panel下的OptionButton在hover状态下的背景颜色，建议为{ToolButton.BKColor:hover}
 */
 
 
@@ -117,17 +117,17 @@ SARibbonCategory > SARibbonSeparatorWidget {
   margin-bottom:3px;
 }
 
-/*SARibbonPannel*/
+/*SARibbonPanel*/
 
-SARibbonPannel {
+SARibbonPanel {
   background-color: #f1f1f1;
   border: none;
   color: #666666;
 }
 
-/*SARibbonPannelLabel Pannel下标题栏*/
+/*SARibbonPanelLabel Panel下标题栏*/
 
-SARibbonPannelLabel {
+SARibbonPanelLabel {
     background-color: transparent;
     color: #666666;
 }
@@ -137,19 +137,19 @@ SARibbonPannelLabel {
 SARibbonButtonGroupWidget {
   background-color: transparent;
 }
-SARibbonPannel > SARibbonButtonGroupWidget {
-  border: 1px solid #c6c6c6;/* {PannelButtonGroup.BorderColor} */
+SARibbonPanel > SARibbonButtonGroupWidget {
+  border: 1px solid #c6c6c6;/* {PanelButtonGroup.BorderColor} */
 }
 
 
-/*SARibbonPannelOptionButton*/
+/*SARibbonPanelOptionButton*/
 
-SARibbonPannelOptionButton {
+SARibbonPanelOptionButton {
   background-color: transparent;/*{OptionButton.BKColor}*/
   color: #333;/*{OptionButton.Color}*/
 }
 
-SARibbonPannelOptionButton:hover {
+SARibbonPanelOptionButton:hover {
   background-color: #c5c5c5;/*{OptionButton.BKColor:hover}*/
   border: 0px;
 }
@@ -242,7 +242,7 @@ SARibbonTabBar::tab:hover:!selected {
 
 /*SARibbonToolButton*/
 /* 
-SARibbonToolButton的背景颜色必须和pannel或者category的颜色一致
+SARibbonToolButton的背景颜色必须和panel或者category的颜色一致
 不能设置为transparent，否则在ActionMenu模式下，上下区分的按钮无法显示 
 */
 SARibbonToolButton {

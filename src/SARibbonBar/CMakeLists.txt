@@ -47,10 +47,12 @@ SET(SARIBBON_HEADER_FILES
     SARibbonTabBar.h
     SARibbonCategory.h
     SARibbonContextCategory.h
-    SARibbonPannel.h
+    SARibbonPanel.h
+    SARibbonPanelLayout.h
+    SARibbonPanelItem.h
+    SARibbonPanelOptionButton.h
     SARibbonToolButton.h
     SARibbonMenu.h
-    SARibbonPannelOptionButton.h
     SARibbonSeparatorWidget.h
     SARibbonCategoryLayout.h
     SARibbonGallery.h
@@ -66,8 +68,6 @@ SET(SARIBBON_HEADER_FILES
     SARibbonStackedWidget.h
     SARibbonQuickAccessBar.h
     SARibbonCtrlContainer.h
-    SARibbonPannelLayout.h
-    SARibbonPannelItem.h
     SARibbonLineWidgetContainer.h
     SARibbonColorToolButton.h
     SARibbonApplicationWidget.h
@@ -90,10 +90,12 @@ SET(SARIBBON_SOURCE_FILES
     SARibbonTabBar.cpp
     SARibbonCategory.cpp
     SARibbonContextCategory.cpp
-    SARibbonPannel.cpp
+    SARibbonPanel.cpp
+    SARibbonPanelLayout.cpp
+    SARibbonPanelItem.cpp
+    SARibbonPanelOptionButton.cpp
     SARibbonToolButton.cpp
     SARibbonMenu.cpp
-    SARibbonPannelOptionButton.cpp
     SARibbonSeparatorWidget.cpp
     SARibbonCategoryLayout.cpp
     SARibbonGallery.cpp
@@ -109,8 +111,6 @@ SET(SARIBBON_SOURCE_FILES
     SARibbonStackedWidget.cpp
     SARibbonQuickAccessBar.cpp
     SARibbonCtrlContainer.cpp
-    SARibbonPannelLayout.cpp
-    SARibbonPannelItem.cpp
     SARibbonLineWidgetContainer.cpp
     SARibbonColorToolButton.cpp
     SARibbonApplicationWidget.cpp

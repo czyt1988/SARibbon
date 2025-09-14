@@ -12,10 +12,10 @@ MainWindow::MainWindow(QWidget* parent) : SARibbonMainWindow(parent)
 	pannel->addAction(tr("action1"), QIcon(":/app/icon/action.svg"), QToolButton::InstantPopup);
 	pannel->addAction(tr("action2"), QIcon(":/app/icon/customize0.svg"), QToolButton::InstantPopup);
 	pannel->addAction(tr("action3"), QIcon(":/app/icon/save.svg"), QToolButton::InstantPopup);
-	pannel->addAction(tr("action4"), QIcon(":/app/icon/item.svg"), QToolButton::InstantPopup, SARibbonPannelItem::Small);
+	pannel->addAction(tr("action4"), QIcon(":/app/icon/item.svg"), QToolButton::InstantPopup, SARibbonPanelItem::Small);
 	pannel->addAction(
-		tr("action5"), QIcon(":/app/icon/folder-star.svg"), QToolButton::InstantPopup, SARibbonPannelItem::Small);
-	pannel->addAction(tr("action6"), QIcon(":/app/icon/test1.svg"), QToolButton::InstantPopup, SARibbonPannelItem::Small);
+		tr("action5"), QIcon(":/app/icon/folder-star.svg"), QToolButton::InstantPopup, SARibbonPanelItem::Small);
+	pannel->addAction(tr("action6"), QIcon(":/app/icon/test1.svg"), QToolButton::InstantPopup, SARibbonPanelItem::Small);
 	SARibbonCategory* otherCate = bar->addCategoryPage(tr("Other"));
 	SARibbonPannel* pannel2     = otherCate->addPannel(tr("other"));
 	pannel2->addAction(tr("action1"), QIcon(":/app/icon/action.svg"), QToolButton::InstantPopup);

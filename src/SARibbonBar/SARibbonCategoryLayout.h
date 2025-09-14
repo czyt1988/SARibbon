@@ -6,7 +6,7 @@
 #include <QMap>
 #include "SARibbonCategory.h"
 
-class SARibbonPannel;
+class SARibbonPanel;
 class SARibbonCategoryLayoutItem;
 class SARibbonSeparatorWidget;
 
@@ -28,19 +28,19 @@ public:
 	virtual void addItem(QLayoutItem* item) override;
 	virtual QLayoutItem* itemAt(int index) const override;
 	virtual QLayoutItem* takeAt(int index) override;
-	SARibbonCategoryLayoutItem* takePannelItem(int index);
-	SARibbonCategoryLayoutItem* takePannelItem(SARibbonPannel* pannel);
-	bool takePannel(SARibbonPannel* pannel);
+	SARibbonCategoryLayoutItem* takePanelItem(int index);
+	SARibbonCategoryLayoutItem* takePanelItem(SARibbonPanel* panel);
+	bool takePanel(SARibbonPanel* panel);
 	virtual int count() const override;
 	void setGeometry(const QRect& rect) override;
 	QSize sizeHint() const override;
 	QSize minimumSize() const override;
 	Qt::Orientations expandingDirections() const override;
 	void invalidate() override;
-	// 追加一个pannel
-	void addPannel(SARibbonPannel* pannel);
-	// 插入一个pannel
-	void insertPannel(int index, SARibbonPannel* pannel);
+	// 追加一个panel
+	void addPanel(SARibbonPanel* panel);
+	// 插入一个panel
+	void insertPanel(int index, SARibbonPanel* panel);
 	//
 	QSize categoryContentSize() const;
 	// 更新尺寸
@@ -49,23 +49,23 @@ public:
 	// 执行位置调整
 	void doLayout();
 
-	// 返回所有pannels
-	QList< SARibbonPannel* > pannels() const;
+	// 返回所有panels
+	QList< SARibbonPanel* > panels() const;
 
-	// 通过obj name获取pannel
-	SARibbonPannel* pannelByObjectName(const QString& objname) const;
-	// 通过pannel name获取pannel
-	SARibbonPannel* pannelByName(const QString& pannelname) const;
-	// 通过索引找到pannel，如果超过索引范围，会返回nullptr
-	SARibbonPannel* pannelByIndex(int i) const;
-	// 移动pannel
-	void movePannel(int from, int to);
-	// pannel的数量
-	int pannelCount() const;
-	// pannel的索引
-	int pannelIndex(SARibbonPannel* p) const;
-	// 获取所有的pannel
-	QList< SARibbonPannel* > pannelList() const;
+	// 通过obj name获取panel
+	SARibbonPanel* panelByObjectName(const QString& objname) const;
+	// 通过panel name获取panel
+	SARibbonPanel* panelByName(const QString& panelname) const;
+	// 通过索引找到panel，如果超过索引范围，会返回nullptr
+	SARibbonPanel* panelByIndex(int i) const;
+	// 移动panel
+	void movePanel(int from, int to);
+	// panel的数量
+	int panelCount() const;
+	// panel的索引
+	int panelIndex(SARibbonPanel* p) const;
+	// 获取所有的panel
+	QList< SARibbonPanel* > panelList() const;
 	// 执行滚轮事件
 	void scroll(int px);
 	void scrollTo(int targetX);
@@ -102,12 +102,12 @@ private:
 class SA_RIBBON_EXPORT SARibbonCategoryLayoutItem : public QWidgetItem
 {
 public:
-	explicit SARibbonCategoryLayoutItem(SARibbonPannel* w);
+	explicit SARibbonCategoryLayoutItem(SARibbonPanel* w);
 	~SARibbonCategoryLayoutItem();
 	SARibbonSeparatorWidget* separatorWidget;
-	// 把内部的widget转换为pannel
-	SARibbonPannel* toPannelWidget();
-	QRect mWillSetGeometry;           ///< pannel将要设置的Geometry
-	QRect mWillSetSeparatorGeometry;  ///< pannel将要设置的Separator的Geometry
+	// 把内部的widget转换为panel
+	SARibbonPanel* toPanelWidget();
+	QRect mWillSetGeometry;           ///< panel将要设置的Geometry
+	QRect mWillSetSeparatorGeometry;  ///< panel将要设置的Separator的Geometry
 };
 #endif  // SARIBBONCATEGORYLAYOUT_H

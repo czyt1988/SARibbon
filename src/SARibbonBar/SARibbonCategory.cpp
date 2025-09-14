@@ -17,31 +17,31 @@
 #if SARIBBONCATEGORY_DEBUG_PRINT
 #include <QDebug>
 #endif
-///
-/// \brief ribbon页的代理类
-/// 如果需要修改重绘SARibbonCategory，可以通过设置SARibbonCategory::setProxy
-///
+
+/**
+ * @brief SARibbonCategory::PrivateData
+ */
 class SARibbonCategory::PrivateData
 {
 	SA_RIBBON_DECLARE_PUBLIC(SARibbonCategory)
 public:
 	PrivateData(SARibbonCategory* p);
 
-	SARibbonPannel* addPannel(const QString& title);
-	SARibbonPannel* insertPannel(const QString& title, int index);
-	void addPannel(SARibbonPannel* pannel);
-	void insertPannel(int index, SARibbonPannel* pannel);
+	SARibbonPanel* addPanel(const QString& title);
+	SARibbonPanel* insertPanel(const QString& title, int index);
+	void addPanel(SARibbonPanel* panel);
+	void insertPanel(int index, SARibbonPanel* panel);
 
-	// 把pannel从Category中移除，不会销毁，此时pannel的所有权归还操作者
-	bool takePannel(SARibbonPannel* pannel);
+	// 把panel从Category中移除，不会销毁，此时panel的所有权归还操作者
+	bool takePanel(SARibbonPanel* panel);
 
-	// 移除Pannel，Category会直接回收SARibbonPannel内存
-	bool removePannel(SARibbonPannel* pannel);
+	// 移除Panel，Category会直接回收SARibbonPanel内存
+	bool removePanel(SARibbonPanel* panel);
 	SARibbonCategory* ribbonCategory();
 	const SARibbonCategory* ribbonCategory() const;
 
-	// 返回所有的Pannel
-	QList< SARibbonPannel* > pannelList();
+	// 返回所有的Panel
+	QList< SARibbonPanel* > panelList();
 
 	// 更新item的布局,此函数会调用doItemLayout
 	void updateItemGeometry();
@@ -51,111 +51,111 @@ public:
 	void init(SARibbonCategory* c);
 
 public:
-    bool enableShowPannelTitle { true };     ///< 是否运行pannel的标题栏显示
-    int pannelTitleHeight { 15 };            ///< pannel的标题栏默认高度
-    bool isContextCategory { false };        ///< 标记是否是上下文标签
-    bool isCanCustomize { true };            ///< 标记是否可以自定义
-    int pannelSpacing { 0 };                 ///< pannel的spacing
-    bool isUseAnimating { true };            ///< 默认使用动画滚动
-    bool enableWordWrap { true };            ///< 是否文字换行
-    QSize pannelToolButtonSize { 22, 22 };   ///< 记录pannel的默认图标大小
-    int wheelScrollStep { 400 };             ///< 默认滚轮滚动步长
-    qreal buttonMaximumAspectRatio { 1.4 };  ///< 按钮最大宽高比，这个系数决定按钮的最大宽度
-    SARibbonPannel::PannelLayoutMode defaultPannelLayoutMode { SARibbonPannel::ThreeRowMode };
+	bool enableShowPanelTitle { true };      ///< 是否运行panel的标题栏显示
+	int panelTitleHeight { 15 };             ///< panel的标题栏默认高度
+	bool isContextCategory { false };        ///< 标记是否是上下文标签
+	bool isCanCustomize { true };            ///< 标记是否可以自定义
+	int panelSpacing { 0 };                  ///< panel的spacing
+	bool isUseAnimating { true };            ///< 默认使用动画滚动
+	bool enableWordWrap { true };            ///< 是否文字换行
+	QSize panelToolButtonSize { 22, 22 };    ///< 记录panel的默认图标大小
+	int wheelScrollStep { 400 };             ///< 默认滚轮滚动步长
+	qreal buttonMaximumAspectRatio { 1.4 };  ///< 按钮最大宽高比，这个系数决定按钮的最大宽度
+	SARibbonPanel::PanelLayoutMode defaultPanelLayoutMode { SARibbonPanel::ThreeRowMode };
 };
 SARibbonCategory::PrivateData::PrivateData(SARibbonCategory* p) : q_ptr(p)
 {
 }
 
-SARibbonPannel* SARibbonCategory::PrivateData::addPannel(const QString& title)
+SARibbonPanel* SARibbonCategory::PrivateData::addPanel(const QString& title)
 {
 	if (SARibbonCategoryLayout* lay = q_ptr->categoryLayout()) {
-		SARibbonPannel* p = insertPannel(title, lay->pannelCount());
+		SARibbonPanel* p = insertPanel(title, lay->panelCount());
 		return p;
 	}
 	return nullptr;
 }
 
-SARibbonPannel* SARibbonCategory::PrivateData::insertPannel(const QString& title, int index)
+SARibbonPanel* SARibbonCategory::PrivateData::insertPanel(const QString& title, int index)
 {
-	SARibbonPannel* pannel = RibbonSubElementFactory->createRibbonPannel(ribbonCategory());
+	SARibbonPanel* panel = RibbonSubElementFactory->createRibbonPanel(ribbonCategory());
 
-	pannel->setPannelName(title);
-	pannel->setObjectName(title);
-	insertPannel(index, pannel);
-	return (pannel);
+	panel->setPanelName(title);
+	panel->setObjectName(title);
+	insertPanel(index, panel);
+	return (panel);
 }
 
-void SARibbonCategory::PrivateData::addPannel(SARibbonPannel* pannel)
+void SARibbonCategory::PrivateData::addPanel(SARibbonPanel* panel)
 {
 	if (SARibbonCategoryLayout* lay = q_ptr->categoryLayout()) {
-		insertPannel(lay->pannelCount(), pannel);
+		insertPanel(lay->panelCount(), panel);
 	}
 }
 
 /**
- * @brief 插入pannel到layout
+ * @brief 插入panel到layout
  *
  * 所有的添加操作最终会调用此函数
  * @param index
- * @param pannel
+ * @param panel
  */
-void SARibbonCategory::PrivateData::insertPannel(int index, SARibbonPannel* pannel)
+void SARibbonCategory::PrivateData::insertPanel(int index, SARibbonPanel* panel)
 {
-	if (nullptr == pannel) {
+	if (nullptr == panel) {
 		return;
 	}
 	SARibbonCategoryLayout* lay = qobject_cast< SARibbonCategoryLayout* >(q_ptr->layout());
 	if (nullptr == lay) {
 		return;
 	}
-	if (pannel->parentWidget() != q_ptr) {
-		pannel->setParent(q_ptr);
+	if (panel->parentWidget() != q_ptr) {
+		panel->setParent(q_ptr);
 	}
 	// 同步状态
-    pannel->setEnableShowTitle(this->enableShowPannelTitle);
-    pannel->setTitleHeight(this->pannelTitleHeight);
-    pannel->setPannelLayoutMode(this->defaultPannelLayoutMode);
-    pannel->setSpacing(this->pannelSpacing);
-    pannel->setToolButtonIconSize(this->pannelToolButtonSize);
-    pannel->setEnableWordWrap(this->enableWordWrap);
+	panel->setEnableShowTitle(this->enableShowPanelTitle);
+	panel->setTitleHeight(this->panelTitleHeight);
+	panel->setPanelLayoutMode(this->defaultPanelLayoutMode);
+	panel->setSpacing(this->panelSpacing);
+	panel->setToolButtonIconSize(this->panelToolButtonSize);
+	panel->setEnableWordWrap(this->enableWordWrap);
 
 	index = qMax(0, index);
-	index = qMin(lay->pannelCount(), index);
-	lay->insertPannel(index, pannel);
-	pannel->setVisible(true);
+	index = qMin(lay->panelCount(), index);
+	lay->insertPanel(index, panel);
+	panel->setVisible(true);
 
-	QObject::connect(pannel, &SARibbonPannel::actionTriggered, ribbonCategory(), &SARibbonCategory::actionTriggered);
+	QObject::connect(panel, &SARibbonPanel::actionTriggered, ribbonCategory(), &SARibbonCategory::actionTriggered);
 	q_ptr->updateGeometry();  // 通知父布局这个控件的尺寸提示(sizeHint())可能已改变
 }
 
-bool SARibbonCategory::PrivateData::takePannel(SARibbonPannel* pannel)
+bool SARibbonCategory::PrivateData::takePanel(SARibbonPanel* panel)
 {
 	SARibbonCategoryLayout* lay = qobject_cast< SARibbonCategoryLayout* >(q_ptr->layout());
 	if (nullptr == lay) {
 		return false;
 	}
-	bool res = lay->takePannel(pannel);
+	bool res = lay->takePanel(panel);
 	q_ptr->updateGeometry();  // 通知父布局这个控件的尺寸提示(sizeHint())可能已改变
 	return res;
 }
 
-bool SARibbonCategory::PrivateData::removePannel(SARibbonPannel* pannel)
+bool SARibbonCategory::PrivateData::removePanel(SARibbonPanel* panel)
 {
-	if (takePannel(pannel)) {
-		pannel->hide();
-		pannel->deleteLater();
+	if (takePanel(panel)) {
+		panel->hide();
+		panel->deleteLater();
 		return (true);
 	}
 	return (false);
 }
 
-QList< SARibbonPannel* > SARibbonCategory::PrivateData::pannelList()
+QList< SARibbonPanel* > SARibbonCategory::PrivateData::panelList()
 {
 	if (SARibbonCategoryLayout* lay = q_ptr->categoryLayout()) {
-		return lay->pannelList();
+		return lay->panelList();
 	}
-	return QList< SARibbonPannel* >();
+	return QList< SARibbonPanel* >();
 }
 
 SARibbonCategory* SARibbonCategory::PrivateData::ribbonCategory()
@@ -177,9 +177,9 @@ void SARibbonCategory::PrivateData::updateItemGeometry()
 	if (!lay) {
 		return;
 	}
-	const QList< SARibbonPannel* > pannels = lay->pannelList();
-	for (auto pannel : pannels) {
-		pannel->updateItemGeometry();
+	const QList< SARibbonPanel* > panels = lay->panelList();
+	for (auto panel : panels) {
+		panel->updateItemGeometry();
 	}
 	lay->updateGeometryArr();
 	return;
@@ -193,7 +193,7 @@ void SARibbonCategory::PrivateData::doWheelEvent(QWheelEvent* event)
 	}
 
 	// 如果动画正在进行，忽略新的事件
-    if (isUseAnimating && lay->isAnimatingScroll()) {
+	if (isUseAnimating && lay->isAnimatingScroll()) {
 		event->ignore();
 		return;
 	}
@@ -202,7 +202,7 @@ void SARibbonCategory::PrivateData::doWheelEvent(QWheelEvent* event)
 	int totalWidth    = lay->categoryTotalWidth();
 
 	if (totalWidth > contentSize.width()) {
-        int scrollStep = wheelScrollStep;
+		int scrollStep = wheelScrollStep;
 
 		// 根据滚轮方向确定滚动方向
 		QPoint numPixels  = event->pixelDelta();
@@ -223,7 +223,7 @@ void SARibbonCategory::PrivateData::doWheelEvent(QWheelEvent* event)
 		}
 
 		// 根据设置选择滚动方式
-        if (isUseAnimating) {
+		if (isUseAnimating) {
 			lay->scrollByAnimate(scrollStep);
 		} else {
 			lay->scroll(scrollStep);
@@ -232,7 +232,7 @@ void SARibbonCategory::PrivateData::doWheelEvent(QWheelEvent* event)
 		event->ignore();
 		if (lay->isScrolled()) {
 			// 根据设置选择复位方式
-            if (isUseAnimating) {
+			if (isUseAnimating) {
 				lay->scrollToByAnimate(0);
 			} else {
 				lay->scroll(0);
@@ -253,7 +253,7 @@ void SARibbonCategory::PrivateData::init(SARibbonCategory* c)
 
 SARibbonCategory::SARibbonCategory(QWidget* p) : QFrame(p), d_ptr(new SARibbonCategory::PrivateData(this))
 {
-    d_ptr->init(this);
+	d_ptr->init(this);
 }
 
 /**
@@ -273,163 +273,164 @@ SARibbonCategory::~SARibbonCategory()
 }
 
 /**
- * @brief 获取Category名称
- * @return 当前Category的名称（即windowTitle）
+ * @brief Get the category name/获取Category名称
+ * @return Current category name (i.e., windowTitle)/当前Category的名称（即windowTitle）
  */
 QString SARibbonCategory::categoryName() const
 {
-    return (windowTitle());
+	return (windowTitle());
 }
 
 /**
- * @brief 设置Category名称
- * @param title 新名称（等价于setWindowTitle）
+ * @brief Set the category name/设置Category名称
+ * @param title New name (equivalent to setWindowTitle)/新名称（等价于setWindowTitle）
  */
 void SARibbonCategory::setCategoryName(const QString& title)
 {
-    setWindowTitle(title);
-}
-
-bool SARibbonCategory::event(QEvent* e)
-{
-#if SARIBBONCATEGORY_DEBUG_PRINT
-	if (e->type() != QEvent::Paint) {
-		qDebug() << "SARibbonCategory event(" << e->type() << "),name=" << categoryName();
-	}
-#endif
-	return QWidget::event(e);
+	setWindowTitle(title);
 }
 
 /**
- * @brief 获取面板布局模式
- * @return 当前所有面板的布局模式
+ * @brief Get the panel layout mode/获取面板布局模式
+ * @return Current layout mode for all panels/当前所有面板的布局模式
  */
-SARibbonPannel::PannelLayoutMode SARibbonCategory::pannelLayoutMode() const
+SARibbonPanel::PanelLayoutMode SARibbonCategory::panelLayoutMode() const
 {
-    return (d_ptr->defaultPannelLayoutMode);
+    return (d_ptr->defaultPanelLayoutMode);
 }
 
 /**
- * @brief 设置面板布局模式
+ * @brief Set the panel layout mode/设置面板布局模式
+ *
+ *  * When @ref SARibbonBar calls the @ref SARibbonBar::setRibbonStyle function, this function will be called for all
+ * SARibbonCategory objects to set the new SARibbonPanel::PanelLayoutMode
  *
  * 在@ref SARibbonBar 调用@ref SARibbonBar::setRibbonStyle 函数时，会对所有的SARibbonCategory调用此函数
- * 把新的SARibbonPannel::PannelLayoutMode设置进去
+ * 把新的SARibbonPanel::PanelLayoutMode设置进去
  * @param m
  */
-void SARibbonCategory::setPannelLayoutMode(SARibbonPannel::PannelLayoutMode m)
+void SARibbonCategory::setPanelLayoutMode(SARibbonPanel::PanelLayoutMode m)
 {
-    d_ptr->defaultPannelLayoutMode = m;
-	iteratePannel([ m ](SARibbonPannel* p) -> bool {
-		p->setPannelLayoutMode(m);
+	d_ptr->defaultPanelLayoutMode = m;
+	iteratePanel([ m ](SARibbonPanel* p) -> bool {
+		p->setPanelLayoutMode(m);
 		return true;
 	});
 	updateItemGeometry();
 }
 
 /**
- * @brief 添加面板(pannel)
+ * @brief Add a panel (panel)/添加面板(panel)
  *
- * @note 面板(pannel)的所有权由SARibbonCategory来管理，请不要在外部对其进行销毁
- * @param title 面板(pannel)的标题，在office/wps的三行模式下会显示在面板(pannel)的下方
- * @return 返回生成的@ref SARibbonPannel 指针
- * @see 对SARibbonPannel的其他操作，参考 @ref SARibbonCategory::takePannel
+ * @note The ownership of the panel (panel) is managed by SARibbonCategory, please do not destroy it
+ * externally/面板(panel)的所有权由SARibbonCategory来管理，请不要在外部对其进行销毁
+ *
+ * @param title Panel (panel) title, which will be displayed below the panel (panel) in the three-row mode of
+ * office/wps / 面板(panel)的标题，在office/wps的三行模式下会显示在面板(panel)的下方
+ *
+ * @return Returns a pointer to the generated @ref SARibbonPanel / 返回生成的@ref SARibbonPanel 指针
+ *
+ * @see For other operations on SARibbonPanel, refer to @ref SARibbonCategory::takePanel
+ *
+ * 对SARibbonPanel的其他操作，参考 @ref SARibbonCategory::takePanel
  */
-SARibbonPannel* SARibbonCategory::addPannel(const QString& title)
+SARibbonPanel* SARibbonCategory::addPanel(const QString& title)
 {
-    return (d_ptr->addPannel(title));
+    return (d_ptr->addPanel(title));
 }
 
 /**
- * @brief 添加pannel
- * @param pannel pannel的所有权SARibbonCategory来管理
+ * @brief Add panel/添加panel
+ * @param panel panel ownership is managed by SARibbonCategory
+ * panel的所有权SARibbonCategory来管理
  */
-void SARibbonCategory::addPannel(SARibbonPannel* pannel)
+void SARibbonCategory::addPanel(SARibbonPanel* panel)
 {
-    d_ptr->addPannel(pannel);
+    d_ptr->addPanel(panel);
 }
 
 /**
- * @brief qt designer专用
- * @param pannel
+ * @brief Qt Designer specific/Qt Designer专用
+ * @param panel
  */
-void SARibbonCategory::addPannel(QWidget* pannel)
+void SARibbonCategory::addPanel(QWidget* panel)
 {
-	SARibbonPannel* p = qobject_cast< SARibbonPannel* >(pannel);
+	SARibbonPanel* p = qobject_cast< SARibbonPanel* >(panel);
 	if (p) {
-		addPannel(p);
+		addPanel(p);
 	}
 }
 
 /**
- * @brief 新建一个pannel，并插入到index位置
- * @param title pannel的title
- * @param index 插入的位置，如果index超出category里pannel的个数，将插入到最后
- * @return 返回生成的@ref SARibbonPannel 指针
- * @note 如果
+ * @brief Create a new panel and insert it at the index position/新建一个panel，并插入到index位置
+ * @param title panel title/panel的title
+ * @param index Insertion position, if index exceeds the number of panels in the category, it will be inserted at the
+ * end/插入的位置，如果index超出category里panel的个数，将插入到最后
+ * @return Returns a pointer to the generated @ref SARibbonPanel
  */
-SARibbonPannel* SARibbonCategory::insertPannel(const QString& title, int index)
+SARibbonPanel* SARibbonCategory::insertPanel(const QString& title, int index)
 {
-    return (d_ptr->insertPannel(title, index));
+    return (d_ptr->insertPanel(title, index));
 }
 
 /**
- * @brief 通过名字查找pannel
+ * @brief Find panel by name/通过名字查找panel
  * @param title
- * @return 如果有重名，只会返回第一个符合条件的
+ * @return If there are duplicate names, only the first one that meets the condition will be returned/如果有重名，只会返回第一个符合条件的
  */
-SARibbonPannel* SARibbonCategory::pannelByName(const QString& title) const
+SARibbonPanel* SARibbonCategory::panelByName(const QString& title) const
 {
 	if (SARibbonCategoryLayout* lay = categoryLayout()) {
-		return lay->pannelByName(title);
+		return lay->panelByName(title);
 	}
 	return nullptr;
 }
 
 /**
- * @brief 通过ObjectName查找pannel
+ * @brief Find panel by ObjectName/通过ObjectName查找panel
  * @param objname
  * @return
  */
-SARibbonPannel* SARibbonCategory::pannelByObjectName(const QString& objname) const
+SARibbonPanel* SARibbonCategory::panelByObjectName(const QString& objname) const
 {
 	if (SARibbonCategoryLayout* lay = categoryLayout()) {
-		return lay->pannelByObjectName(objname);
+		return lay->panelByObjectName(objname);
 	}
 	return nullptr;
 }
 
 /**
- * @brief 通过索引找到pannel，如果超过索引范围，会返回nullptr
+ * @brief Find panel by index, returns nullptr if the index is out of range/通过索引找到panel，如果超过索引范围，会返回nullptr
  * @param index
- * @return 如果超过索引范围，会返回nullptr
+ * @return Returns nullptr if the index is out of range/如果超过索引范围，会返回nullptr
  */
-SARibbonPannel* SARibbonCategory::pannelByIndex(int index) const
+SARibbonPanel* SARibbonCategory::panelByIndex(int index) const
 {
 	if (SARibbonCategoryLayout* lay = categoryLayout()) {
-		return lay->pannelByIndex(index);
+		return lay->panelByIndex(index);
 	}
 	return nullptr;
 }
 
 /**
- * @brief 查找pannel对应的索引
+ * @brief Find the index corresponding to panel/查找panel对应的索引
  * @param p
- * @return 如果找不到，返回-1
+ * @return Returns -1 if not found/如果找不到，返回-1
  */
-int SARibbonCategory::pannelIndex(SARibbonPannel* p) const
+int SARibbonCategory::panelIndex(SARibbonPanel* p) const
 {
 	if (SARibbonCategoryLayout* lay = categoryLayout()) {
-		return lay->pannelIndex(p);
+		return lay->panelIndex(p);
 	}
 	return -1;
 }
 
 /**
- * @brief 移动一个Pannel从from index到to index
- * @param from 要移动pannel的index
- * @param to 要移动到的位置
+ * @brief Move a Panel from from index to to index/移动一个Panel从from index到to index
+ * @param from Index of the panel to move/要移动panel的index
+ * @param to Position to move to/要移动到的位置
  */
-void SARibbonCategory::movePannel(int from, int to)
+void SARibbonCategory::movePanel(int from, int to)
 {
 	if (from == to) {
 		return;
@@ -437,66 +438,69 @@ void SARibbonCategory::movePannel(int from, int to)
 	if (to < 0) {
 		to = 0;
 	}
-	if (to >= pannelCount()) {
-		to = pannelCount() - 1;
+	if (to >= panelCount()) {
+		to = panelCount() - 1;
 	}
 	if (SARibbonCategoryLayout* lay = categoryLayout()) {
-		lay->movePannel(from, to);
+		lay->movePanel(from, to);
 	}
 }
 
 /**
- * @brief 把pannel脱离SARibbonCategory的管理
- * @param pannel 需要提取的pannel
- * @return 成功返回true，否则返回false
+ * @brief Detach panel from SARibbonCategory management/把panel脱离SARibbonCategory的管理
+ * @param panel Panel to extract/需要提取的panel
+ * @return Returns true on success, otherwise false/成功返回true，否则返回false
  */
-bool SARibbonCategory::takePannel(SARibbonPannel* pannel)
+bool SARibbonCategory::takePanel(SARibbonPanel* panel)
 {
-    return (d_ptr->takePannel(pannel));
+    return (d_ptr->takePanel(panel));
 }
 
 /**
- * @brief 移除Pannel，Category会直接回收SARibbonPannel内存
- * @param pannel 需要移除的pannel
- * @note 移除后pannel为野指针，一般操作完建议把pannel指针设置为nullptr
+ * @brief Remove Panel, Category will directly recycle SARibbonPanel memory/移除Panel，Category会直接回收SARibbonPanel内存
+ * @param panel Panel to remove/需要移除的panel
+ * @note After removal, panel becomes a wild pointer. It is generally recommended to set the panel pointer to nullptr after the operation
+ *
+ * This operation is equivalent to:
  *
  * 此操作等同于：
  *
  * @code
- * SARibbonPannel* pannel;
+ * SARibbonPanel* panel;
  * ...
- * category->takePannel(pannel);
- * pannel->hide();
- * pannel->deleteLater();
+ * category->takePanel(panel);
+ * panel->hide();
+ * panel->deleteLater();
  * @endcode
+ * 移除后panel为野指针，一般操作完建议把panel指针设置为nullptr
  */
-bool SARibbonCategory::removePannel(SARibbonPannel* pannel)
+bool SARibbonCategory::removePanel(SARibbonPanel* panel)
 {
-    return (d_ptr->removePannel(pannel));
+    return (d_ptr->removePanel(panel));
 }
 
 /**
- * @brief 移除pannel
- * @param index pannel的索引，如果超出会返回false
- * @return 成功返回true
+ * @brief Remove panel/移除panel
+ * @param index Index of panel, returns false if it exceeds the limit/panel的索引，如果超出会返回false
+ * @return Returns true on success/成功返回true
  */
-bool SARibbonCategory::removePannel(int index)
+bool SARibbonCategory::removePanel(int index)
 {
-	SARibbonPannel* p = pannelByIndex(index);
+	SARibbonPanel* p = panelByIndex(index);
 
 	if (nullptr == p) {
 		return (false);
 	}
-	return (removePannel(p));
+	return (removePanel(p));
 }
 
 /**
- * @brief 返回Category下的所有pannel
- * @return
+ * @brief Return all panels under Category/返回Category下的所有panel
+ * @return List of all panels in the category/分类中所有panel的列表
  */
-QList< SARibbonPannel* > SARibbonCategory::pannelList() const
+QList< SARibbonPanel* > SARibbonCategory::panelList() const
 {
-    return (d_ptr->pannelList());
+    return (d_ptr->panelList());
 }
 
 QSize SARibbonCategory::sizeHint() const
@@ -508,90 +512,91 @@ QSize SARibbonCategory::sizeHint() const
 }
 
 /**
- * @brief 如果是ContextCategory，此函数返回true
- * @return
+ * @brief Returns true if it is a ContextCategory/如果是ContextCategory，此函数返回true
+ * @return True if this is a context category, false otherwise/如果是上下文分类返回true，否则返回false
  */
 bool SARibbonCategory::isContextCategory() const
 {
-    return (d_ptr->isContextCategory);
+	return (d_ptr->isContextCategory);
 }
 
 /**
- * @brief 返回pannel的个数
- * @return
+ * @brief Return the number of panels/返回panel的个数
+ * @return Number of panels in the category/分类中panel的数量
  */
-int SARibbonCategory::pannelCount() const
+int SARibbonCategory::panelCount() const
 {
 	if (SARibbonCategoryLayout* lay = categoryLayout()) {
-		return lay->pannelCount();
+		return lay->panelCount();
 	}
 	return -1;
 }
 
 /**
- * @brief 判断是否可以自定义
- * @return
+ * @brief Determine if customization is allowed/判断是否可以自定义
+ * @return True if customization is allowed, false otherwise/如果允许自定义返回true，否则返回false
  */
 bool SARibbonCategory::isCanCustomize() const
 {
-    return (d_ptr->isCanCustomize);
+	return (d_ptr->isCanCustomize);
 }
 
 /**
- * @brief 设置是否可以自定义
- * @param b
+ * @brief Set whether customization is allowed/设置是否可以自定义
+ * @param b True to allow customization, false to disallow/为true允许自定义，为false禁止自定义
  */
 void SARibbonCategory::setCanCustomize(bool b)
 {
-    d_ptr->isCanCustomize = b;
+	d_ptr->isCanCustomize = b;
 }
 
 /**
- * @brief pannel标题栏的高度
- * @return
+ * @brief Height of panel title bar/panel标题栏的高度
+ * @return Current height of panel title bars/当前panel标题栏的高度
  */
-int SARibbonCategory::pannelTitleHeight() const
+int SARibbonCategory::panelTitleHeight() const
 {
-    return d_ptr->pannelTitleHeight;
+    return d_ptr->panelTitleHeight;
 }
+
 /**
- * @brief 设置pannel的高度
- * @param h
+ * @brief Set the height of panel/设置panel的高度
+ * @param h New height for panel title bars/panel标题栏的新高度
  */
-void SARibbonCategory::setPannelTitleHeight(int h)
+void SARibbonCategory::setPanelTitleHeight(int h)
 {
-    d_ptr->pannelTitleHeight = h;
-	iteratePannel([ h ](SARibbonPannel* p) -> bool {
+	d_ptr->panelTitleHeight = h;
+	iteratePanel([ h ](SARibbonPanel* p) -> bool {
 		p->setTitleHeight(h);
 		return true;
 	});
 }
 
 /**
- * @brief 是否pannel显示标题栏
- * @return
+ * @brief Whether the panel title bar is displayed/是否panel显示标题栏
+ * @return True if panel title bars are displayed, false otherwise/如果显示panel标题栏返回true，否则返回false
  */
-bool SARibbonCategory::isEnableShowPannelTitle() const
+bool SARibbonCategory::isEnableShowPanelTitle() const
 {
-    return d_ptr->enableShowPannelTitle;
+    return d_ptr->enableShowPanelTitle;
 }
 
 /**
- * @brief 设置显示pannel标题
- * @param on
+ * @brief Set to display panel title/设置显示panel标题
+ * @param on True to display panel title bars, false to hide them/为true显示panel标题栏，为false隐藏它们
  */
-void SARibbonCategory::setEnableShowPannelTitle(bool on)
+void SARibbonCategory::setEnableShowPanelTitle(bool on)
 {
-    d_ptr->enableShowPannelTitle = on;
-	iteratePannel([ on ](SARibbonPannel* p) -> bool {
+	d_ptr->enableShowPanelTitle = on;
+	iteratePanel([ on ](SARibbonPanel* p) -> bool {
 		p->setEnableShowTitle(on);
 		return true;
 	});
 }
 
 /**
- * @brief 获取对应的ribbonbar
- * @return 如果没有加入ribbonbar的管理，此值为null
+ * @brief Get the corresponding ribbonbar, returns null if not managed by ribbonbar/获取对应的ribbonbar，如果没有加入ribbonbar的管理，此值为null
+ * @return Returns null if not managed by ribbonbar/如果没有加入ribbonbar的管理，此值为null
  */
 SARibbonBar* SARibbonCategory::ribbonBar() const
 {
@@ -610,7 +615,7 @@ SARibbonBar* SARibbonCategory::ribbonBar() const
 }
 
 /**
- * @brief 刷新category的布局，适用于改变ribbon的模式之后调用
+ * @brief Refresh the category layout, suitable for calling after changing the ribbon mode/刷新category的布局，适用于改变ribbon的模式之后调用
  */
 void SARibbonCategory::updateItemGeometry()
 {
@@ -621,44 +626,44 @@ void SARibbonCategory::updateItemGeometry()
 }
 
 /**
- * @brief 设置滚动时是否使用动画
- * @param useAnimating
+ * @brief Set whether to use animation when scrolling/设置滚动时是否使用动画
+ * @param useAnimating True to use animation, false to scroll directly/为true使用动画，为false直接滚动
  */
 void SARibbonCategory::setUseAnimatingScroll(bool useAnimating)
 {
-    d_ptr->isUseAnimating = useAnimating;
+	d_ptr->isUseAnimating = useAnimating;
 }
 
 /**
- * @brief 滚动时是否使用动画
- * @return
+ * @brief Whether to use animation when scrolling/滚动时是否使用动画
+ * @return True if animation is used, false otherwise/如果使用动画返回true，否则返回false
  */
 bool SARibbonCategory::isUseAnimatingScroll() const
 {
-    return d_ptr->isUseAnimating;
+	return d_ptr->isUseAnimating;
 }
 
 /**
- * @brief 设置滚轮滚动步长（px）
- * @param step
+ * @brief Set wheel scroll step (px)/设置滚轮滚动步长（px）
+ * @param step Scroll step in pixels/以像素为单位的滚动步长
  */
 void SARibbonCategory::setWheelScrollStep(int step)
 {
-    d_ptr->wheelScrollStep = qMax(10, step);  // 最小10像素
+	d_ptr->wheelScrollStep = qMax(10, step);  // 最小10像素
 }
 
 /**
- * @brief 滚轮的滚动步长
- * @return
+ * @brief Wheel scroll step/滚轮的滚动步长
+ * @return Current scroll step in pixels/当前以像素为单位的滚动步长
  */
 int SARibbonCategory::wheelScrollStep() const
 {
-    return d_ptr->wheelScrollStep;
+	return d_ptr->wheelScrollStep;
 }
 
 /**
- * @brief 设置动画持续时间
- * @param duration
+ * @brief Set animation duration/设置动画持续时间
+ * @param duration Animation duration in milliseconds/以毫秒为单位的动画持续时间
  */
 void SARibbonCategory::setAnimationDuration(int duration)
 {
@@ -668,83 +673,94 @@ void SARibbonCategory::setAnimationDuration(int duration)
 }
 
 /**
- * @brief 动画持续时间
- * @return
+ * @brief Animation duration/动画持续时间
+ * @return Current animation duration in milliseconds, or -1 if not available/当前以毫秒为单位的动画持续时间，如果不可用则返回-1
  */
 int SARibbonCategory::animationDuration() const
 {
 	if (SARibbonCategoryLayout* lay = categoryLayout()) {
 		return lay->animationDuration();
 	}
-    return -1;
+	return -1;
 }
 
 /**
- * @brief 设置pannel的按钮文字允许换行
- * @param on
- */
-void SARibbonCategory::setEnableWordWrap(bool on)
-{
-    d_ptr->enableWordWrap = on;
-    iteratePannel([ on ](SARibbonPannel* pannel) -> bool {
-        if (pannel) {
-            pannel->setEnableWordWrap(on);
-        }
-        return true;
-    });
-    updateGeometry();
-}
-
-/**
- * @brief 判断pannel的文字是否允许换行
- * @return
+ * @brief Determine whether the text of panel is allowed to wrap/判断panel的文字是否允许换行
+ * @return True if text wrapping is enabled, false otherwise/如果启用文字换行返回true，否则返回false
  */
 bool SARibbonCategory::isEnableWordWrap() const
 {
-    return d_ptr->enableWordWrap;
+	return d_ptr->enableWordWrap;
 }
 
 /**
- * @brief 设置按钮最大宽高比，这个系数决定按钮的最大宽度
+ * @brief Set whether the text of panel buttons is allowed to wrap/设置panel的按钮文字允许换行
+ * @param on True to enable text wrapping, false to disable/为true启用文字换行，为false禁用
+ */
+void SARibbonCategory::setEnableWordWrap(bool on)
+{
+	d_ptr->enableWordWrap = on;
+	iteratePanel([ on ](SARibbonPanel* panel) -> bool {
+		if (panel) {
+			panel->setEnableWordWrap(on);
+		}
+		return true;
+	});
+	updateGeometry();
+}
+
+/**
+ * @brief Set button maximum aspect ratio, this coefficient determines the maximum width of the button/设置按钮最大宽高比，这个系数决定按钮的最大宽度
+ *
+ * The maximum width of the button is button height * this coefficient. For example, if the button height is h,
+ * then the maximum button width maxw = h * buttonMaximumAspectRatio
+ * If the text cannot be fully displayed at this width, the button will not continue to expand horizontally,
+ * and ... will be used instead of the incompletely displayed text
  *
  * 按钮的最大宽度为按钮高度*此系数，例如按钮高度为h，那么按钮最大宽度maxw=h*buttonMaximumAspectRatio
  * 如果在此宽度下文字还无法完全显示，那么按钮将不会继续横向扩展，将使用...替代未完全显示的文字
  *
  * @see buttonMaximumAspectRatio
  *
- * @note 用户不应该调用@ref SARibbonCategory::setButtonMaximumAspectRatio 来设置，
+ * @note Users should not call @ref SARibbonCategory::setButtonMaximumAspectRatio to set,
+ * but call @ref SARibbonBar::setButtonMaximumAspectRatio to set the aspect ratio
+ *
+ * 用户不应该调用@ref SARibbonCategory::setButtonMaximumAspectRatio 来设置，
  * 而是调用@ref SARibbonBar::setButtonMaximumAspectRatio 设置宽高比
+ *
+ * @param fac New maximum aspect ratio/新的最大宽高比
  */
 void SARibbonCategory::setButtonMaximumAspectRatio(qreal fac)
 {
-    d_ptr->buttonMaximumAspectRatio = fac;
-    iteratePannel([ fac ](SARibbonPannel* pannel) -> bool {
-        if (pannel) {
-            pannel->setButtonMaximumAspectRatio(fac);
-        }
-        return true;
-    });
+	d_ptr->buttonMaximumAspectRatio = fac;
+	iteratePanel([ fac ](SARibbonPanel* panel) -> bool {
+		if (panel) {
+			panel->setButtonMaximumAspectRatio(fac);
+		}
+		return true;
+	});
 }
 
 /**
- * @brief 按钮最大宽高比，这个系数决定按钮的最大宽度
- * @return 按钮最大宽高比
+ * @brief Button maximum aspect ratio, this coefficient determines the maximum width of the button/按钮最大宽高比，这个系数决定按钮的最大宽度
+ * @return Current button maximum aspect ratio/当前按钮最大宽高比
  * @see setButtonMaximumAspectRatio
  */
 qreal SARibbonCategory::buttonMaximumAspectRatio() const
 {
-    return d_ptr->buttonMaximumAspectRatio;
+	return d_ptr->buttonMaximumAspectRatio;
 }
 
 /**
- * @brief 此函数会遍历Category下的所有pannel,执行函数指针
- * @param fp 函数指针返回false则停止迭代
- * @return 返回false代表没有迭代完所有的category，中途接收到回调函数的false返回而中断迭代
+ * @brief This function will iterate through all panels under Category and execute the function pointer/此函数会遍历Category下的所有panel,执行函数指针
+ * @param fp Function pointer returns false to stop iteration/函数指针返回false则停止迭代
+ * @return Returns false indicating that all categories have not been iterated. The iteration was interrupted by receiving
+ * a false return from the callback function/返回false代表没有迭代完所有的category，中途接收到回调函数的false返回而中断迭代
  */
-bool SARibbonCategory::iteratePannel(FpPannelIterate fp) const
+bool SARibbonCategory::iteratePanel(FpPanelIterate fp) const
 {
-	const QList< SARibbonPannel* > ps = pannelList();
-	for (SARibbonPannel* p : ps) {
+	const QList< SARibbonPanel* > ps = panelList();
+	for (SARibbonPanel* p : ps) {
 		if (!fp(p)) {
 			return false;
 		}
@@ -753,8 +769,8 @@ bool SARibbonCategory::iteratePannel(FpPannelIterate fp) const
 }
 
 /**
-   @brief 设置Category的对齐方式
-   @param al
+ * @brief Set the alignment of Category/设置Category的对齐方式
+ * @param al Alignment for the category/分类的对齐方式
  */
 void SARibbonCategory::setCategoryAlignment(SARibbonAlignment al)
 {
@@ -765,8 +781,8 @@ void SARibbonCategory::setCategoryAlignment(SARibbonAlignment al)
 }
 
 /**
-   @brief Category的对齐方式
-   @return
+ * @brief Category alignment/Category的对齐方式
+ * @return Current alignment of the category/分类的当前对齐方式
  */
 SARibbonAlignment SARibbonCategory::categoryAlignment() const
 {
@@ -778,62 +794,62 @@ SARibbonAlignment SARibbonCategory::categoryAlignment() const
 }
 
 /**
- * @brief 设置pannel的spacing
- * @param n
+ * @brief Set the spacing of panel/设置panel的spacing
+ * @param n Spacing between panels/panel之间的间距
  */
-void SARibbonCategory::setPannelSpacing(int n)
+void SARibbonCategory::setPanelSpacing(int n)
 {
-    d_ptr->pannelSpacing = n;
-	iteratePannel([ n ](SARibbonPannel* pannel) -> bool {
-		if (pannel) {
-			pannel->setSpacing(n);
+	d_ptr->panelSpacing = n;
+	iteratePanel([ n ](SARibbonPanel* panel) -> bool {
+		if (panel) {
+			panel->setSpacing(n);
 		}
 		return true;
 	});
 }
 
 /**
- * @brief pannel的spacing
- * @return
+ * @brief panel spacing/panel的spacing
+ * @return Current spacing between panels/当前panel之间的间距
  */
-int SARibbonCategory::pannelSpacing() const
+int SARibbonCategory::panelSpacing() const
 {
-    return d_ptr->pannelSpacing;
+    return d_ptr->panelSpacing;
 }
 
 /**
- * @brief 设置pannel按钮的icon尺寸，large action不受此尺寸影响
- * @param s
+ * @brief Set the icon size of panel buttons, large action is not affected/设置panel按钮的icon尺寸，large action不受此尺寸影响
+ * @param s New icon size for panel buttons/panel按钮的新图标大小
  */
-void SARibbonCategory::setPannelToolButtonIconSize(const QSize& s)
+void SARibbonCategory::setPanelToolButtonIconSize(const QSize& s)
 {
-    d_ptr->pannelToolButtonSize = s;
-	iteratePannel([ s ](SARibbonPannel* pannel) -> bool {
-		if (pannel) {
-			pannel->setToolButtonIconSize(s);
+	d_ptr->panelToolButtonSize = s;
+	iteratePanel([ s ](SARibbonPanel* panel) -> bool {
+		if (panel) {
+			panel->setToolButtonIconSize(s);
 		}
 		return true;
 	});
 }
 
 /**
- * @brief pannel按钮的icon尺寸，large action不受此尺寸影响
- * @return
+ * @brief Icon size of panel buttons, large action is not affected/panel按钮的icon尺寸，large action不受此尺寸影响
+ * @return Current icon size for panel buttons/当前panel按钮的图标大小
  */
-QSize SARibbonCategory::pannelToolButtonIconSize() const
+QSize SARibbonCategory::panelToolButtonIconSize() const
 {
-    return d_ptr->pannelToolButtonSize;
+    return d_ptr->panelToolButtonSize;
 }
 
 /**
  * @brief 滚动事件
  *
- * 在内容超出category的宽度情况下，滚轮可滚动pannel
+ * 在内容超出category的宽度情况下，滚轮可滚动panel
  * @param event
  */
 void SARibbonCategory::wheelEvent(QWheelEvent* event)
 {
-    d_ptr->doWheelEvent(event);
+	d_ptr->doWheelEvent(event);
 }
 
 void SARibbonCategory::changeEvent(QEvent* event)
@@ -852,7 +868,7 @@ void SARibbonCategory::changeEvent(QEvent* event)
 		qDebug() << "SARibbonCategory changeEvent(FontChange),categoryName=" << categoryName();
 #endif
 		QFont f = font();
-		iteratePannel([ f ](SARibbonPannel* p) -> bool {
+		iteratePanel([ f ](SARibbonPanel* p) -> bool {
 			p->setFont(f);
 			return true;
 		});
@@ -867,31 +883,50 @@ void SARibbonCategory::changeEvent(QEvent* event)
 }
 
 /**
- * @brief 标记这个是上下文标签
- * @param isContextCategory
+ * @brief Mark this as a context label/标记这个是上下文标签
+ * @param isContextCategory True to mark as context category, false otherwise/为true标记为上下文分类，否则为false
  */
 void SARibbonCategory::markIsContextCategory(bool isContextCategory)
 {
-    d_ptr->isContextCategory = isContextCategory;
+	d_ptr->isContextCategory = isContextCategory;
 }
 
 /**
- * @brief 获取SARibbonCategoryLayoutlayout
- * @return
+ * @brief Get SARibbonCategoryLayoutlayout/获取SARibbonCategoryLayoutlayout
+ * @return Pointer to the category layout, or nullptr if not available/指向分类布局的指针，如果不可用则返回nullptr
  */
 SARibbonCategoryLayout* SARibbonCategory::categoryLayout() const
 {
-    return qobject_cast< SARibbonCategoryLayout* >(layout());
+	return qobject_cast< SARibbonCategoryLayout* >(layout());
+}
+
+bool SARibbonCategory::event(QEvent* e)
+{
+#if SARIBBONCATEGORY_DEBUG_PRINT
+	if (e->type() != QEvent::Paint) {
+		qDebug() << "SARibbonCategory event(" << e->type() << "),name=" << categoryName();
+	}
+#endif
+	return QWidget::event(e);
 }
 
 //===================================================
 // SARibbonCategoryScrollButton
 //===================================================
+
+/**
+ * @brief Constructor with arrow type and optional parent/带箭头类型和可选父级的构造函数
+ * @param arr Arrow type for the button/按钮的箭头类型
+ * @param p Parent widget/父级控件
+ */
 SARibbonCategoryScrollButton::SARibbonCategoryScrollButton(Qt::ArrowType arr, QWidget* p) : QToolButton(p)
 {
-    setArrowType(arr);
+	setArrowType(arr);
 }
 
+/**
+ * @brief Destructor/析构函数
+ */
 SARibbonCategoryScrollButton::~SARibbonCategoryScrollButton()
 {
 }

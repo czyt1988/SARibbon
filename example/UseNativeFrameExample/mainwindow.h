@@ -8,7 +8,7 @@ class SARibbonCustomizeWidget;
 class SARibbonActionsManager;
 class SARibbonQuickAccessBar;
 class SARibbonButtonGroupWidget;
-class SARibbonPannel;
+class SARibbonPanel;
 class SARibbonApplicationWidget;
 class QTextEdit;
 class QComboBox;
@@ -19,9 +19,9 @@ class MainWindow : public SARibbonMainWindow
 {
 	Q_OBJECT
 public:
-    MainWindow(QWidget* par                   = nullptr,
-               SARibbonMainWindowStyles style = { static_cast< int >(SARibbonMainWindowStyleFlag::UseNativeFrame)
-                                                  | static_cast< int >(SARibbonMainWindowStyleFlag::UseRibbonMenuBar) });
+	MainWindow(QWidget* par                   = nullptr,
+			   SARibbonMainWindowStyles style = { static_cast< int >(SARibbonMainWindowStyleFlag::UseNativeFrame)
+												  | static_cast< int >(SARibbonMainWindowStyleFlag::UseRibbonMenuBar) });
 
 private:
 	// 创建ribbon-application菜单示例
@@ -29,7 +29,7 @@ private:
 	// 创建main菜单示例
 	void createCategoryMain(SARibbonCategory* page);
 	void createCategoryOther(SARibbonCategory* page);
-    void createContextCategory();
+	void createContextCategory();
 	void createQuickAccessBar();
 	void createRightButtonGroup();
 	void createWindowButtonGroupBar();
@@ -55,14 +55,14 @@ protected:
 	void closeEvent(QCloseEvent* e) override;
 
 private:
-    SARibbonContextCategory* mContextCategory { nullptr };
-    QTextEdit* mTextedit { nullptr };
+	SARibbonContextCategory* mContextCategory { nullptr };
+	QTextEdit* mTextedit { nullptr };
 	int mTagForActionText;
 	int mTagForActionIcon;
-    QMenu* mMenuApplicationBtn { nullptr };
-    QComboBox* mComboboxRibbonTheme { nullptr };
+	QMenu* mMenuApplicationBtn { nullptr };
+	QComboBox* mComboboxRibbonTheme { nullptr };
 	QLineEdit* mSearchEditor { nullptr };
-    SARibbonApplicationWidget* mAppWidget { nullptr };
+	SARibbonApplicationWidget* mAppWidget { nullptr };
 	//
 	QAction* mActionWordWrap { nullptr };
 	QAction* mActionDisable { nullptr };
@@ -81,7 +81,7 @@ private:
 	QAction* mOtherAction4 { nullptr };
 	QAction* mOtherAction5 { nullptr };
 	QAction* mOtherActionIcon1 { nullptr };
-	SARibbonPannel* mPannelVisbileExample { nullptr };
+	SARibbonPanel* mPanelVisbileExample { nullptr };
 	//
 	QAction* mActionVisibleAll { nullptr };    ///< 控制所有action是否可见的开关
 	bool mHasApplyCustomizeXmlFile { false };  ///< 程序启动后是否应用上次修改

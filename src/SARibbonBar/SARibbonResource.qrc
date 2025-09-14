@@ -1,6 +1,5 @@
-<RCC>
+﻿<RCC>
     <qresource prefix="/SARibbon/image">
-        <file>resource/ribbonPannelOptionButton.png</file>
         <file>resource/ArrowDown.png</file>
         <file>resource/ArrowMore.png</file>
         <file>resource/ArrowUp.png</file>
@@ -15,6 +14,7 @@
         <file>resource/Titlebar_Min_Hover.svg</file>
         <file>resource/Titlebar_Normal.svg</file>
         <file>resource/Titlebar_Normal_Hover.svg</file>
+        <file>resource/ribbonPanelOptionButton.png</file>
     </qresource>
     <qresource prefix="/theme">
         <file>resource/theme-win7.qss</file>

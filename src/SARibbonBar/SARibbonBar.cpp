@@ -85,16 +85,16 @@ public:
 	Qt::Alignment mTitleAligment { Qt::AlignCenter };       ///< 标题对齐方式
 	bool mIsTitleVisible { true };                          ///< 标题是否显示
 	QBrush mTitleBackgroundBrush { Qt::NoBrush };           ///< 标题的背景颜色
-	SARibbonAlignment mRibbonAlignment { SARibbonAlignment::AlignLeft };                         ///< 对齐方式
-	SARibbonPannel::PannelLayoutMode mDefaulePannelLayoutMode { SARibbonPannel::ThreeRowMode };  ///< 默认的PannelLayoutMode
-	bool mEnableShowPannelTitle { true };  ///< 是否允许pannel的标题栏显示
-	int mPannelSpacing { 0 };              ///< pannel的spacing,这个参数不参与布局，仅仅记录
-	QSize mPannelToolButtonSize { 22, 22 };  ///< 记录pannel的默认图标大小,这个参数不参与布局，仅仅记录
+	SARibbonAlignment mRibbonAlignment { SARibbonAlignment::AlignLeft };                       ///< 对齐方式
+	SARibbonPanel::PanelLayoutMode mDefaulePanelLayoutMode { SARibbonPanel::ThreeRowMode };  ///< 默认的PanelLayoutMode
+	bool mEnableShowPanelTitle { true };  ///< 是否允许panel的标题栏显示
+	int mPanelSpacing { 0 };              ///< panel的spacing,这个参数不参与布局，仅仅记录
+	QSize mPanelToolButtonSize { 22, 22 };  ///< 记录panel的默认图标大小,这个参数不参与布局，仅仅记录
 	SARibbonMainWindowStyles mMainWindowStyle;                   ///< 记录MainWindow的样式
 	FpContextCategoryHighlight mFpContextHighlight { nullptr };  ///< 上下文标签高亮
 	bool mEnableTabDoubleClickToMinimumMode { true };  ///< 是否允许tab双击激活ribbon的最小化模式
-    bool mEnableWordWrap { true };                     ///< 是否允许文字换行
-    qreal buttonMaximumAspectRatio { 1.4 };            ///< 按钮的最大宽高比
+	bool mEnableWordWrap { true };                     ///< 是否允许文字换行
+	qreal buttonMaximumAspectRatio { 1.4 };            ///< 按钮的最大宽高比
 public:
 	PrivateData(SARibbonBar* par) : q_ptr(par)
 	{
@@ -146,7 +146,7 @@ void SARibbonBar::PrivateData::init()
 	mQuickAccessBar->setObjectName(QStringLiteral("objSARibbonQuickAccessBar"));
 	mQuickAccessBar->setIcon(q_ptr->windowIcon());
 	//
-	mRightButtonGroup = RibbonSubElementFactory->craeteButtonGroupWidget(q_ptr);
+	mRightButtonGroup = RibbonSubElementFactory->createButtonGroupWidget(q_ptr);
 	//
 	setNormalMode();
 }
@@ -530,10 +530,10 @@ void SARibbonBar::insertCategoryPage(SARibbonCategory* category, int index)
 	if (nullptr == category) {
 		return;
 	}
-    category->setPannelLayoutMode(pannelLayoutMode());
-    category->setPannelSpacing(pannelSpacing());
-    category->setPannelToolButtonIconSize(pannelToolButtonIconSize());
-    category->setEnableWordWrap(isEnableWordWrap());
+	category->setPanelLayoutMode(panelLayoutMode());
+	category->setPanelSpacing(panelSpacing());
+	category->setPanelToolButtonIconSize(panelToolButtonIconSize());
+	category->setEnableWordWrap(isEnableWordWrap());
 
 	int i = d_ptr->mRibbonTabBar->insertTab(index, category->categoryName());
 
@@ -819,7 +819,7 @@ void SARibbonBar::showContextCategory(SARibbonContextCategory* context)
 	for (int i = 0; i < context->categoryCount(); ++i) {
 		SARibbonCategory* category = context->categoryPage(i);
 		// 此句如果模式重复设置不会进行多余操作
-		category->setPannelLayoutMode(d_ptr->mDefaulePannelLayoutMode);
+		category->setPanelLayoutMode(d_ptr->mDefaulePanelLayoutMode);
 		// 切换模式后会改变高度，上下文标签显示时要保证显示出来
 		int index = d_ptr->mRibbonTabBar->addTab(category->categoryName());
 		contextCategoryData.tabPageIndex.append(index);
@@ -994,14 +994,12 @@ void SARibbonBar::showMinimumModeButton(bool isShow)
 		activeRightButtonGroup();
 
 		d_ptr->mMinimumCategoryButtonAction = new QAction(this);
-        d_ptr->mMinimumCategoryButtonAction->setIcon(
-            style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton,
-                                  nullptr));
+		d_ptr->mMinimumCategoryButtonAction->setIcon(style()->standardIcon(
+			isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton, nullptr));
 		connect(d_ptr->mMinimumCategoryButtonAction, &QAction::triggered, this, [ this ]() {
 			this->setMinimumMode(!isMinimumMode());
-            this->d_ptr->mMinimumCategoryButtonAction->setIcon(
-                style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton,
-                                      nullptr));
+			this->d_ptr->mMinimumCategoryButtonAction->setIcon(style()->standardIcon(
+				isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton, nullptr));
 		});
 		d_ptr->mRightButtonGroup->addAction(d_ptr->mMinimumCategoryButtonAction);
 	}
@@ -1338,10 +1336,10 @@ int SARibbonBar::tabIndex(SARibbonCategory* obj)
 void SARibbonBar::synchronousCategoryData(bool autoUpdate)
 {
 	iterateCategory([ this ](SARibbonCategory* c) -> bool {
-		c->setEnableShowPannelTitle(this->isEnableShowPannelTitle());
-		c->setPannelTitleHeight(this->pannelTitleHeight());
+		c->setEnableShowPanelTitle(this->isEnableShowPanelTitle());
+		c->setPanelTitleHeight(this->panelTitleHeight());
 		c->setCategoryAlignment(this->ribbonAlignment());
-		c->setPannelLayoutMode(this->pannelLayoutMode());
+		c->setPanelLayoutMode(this->panelLayoutMode());
 		return true;
 	});
 	if (autoUpdate) {
@@ -1395,7 +1393,7 @@ QRect SARibbonBar::getWindowTitleRect() const
 SARibbonButtonGroupWidget* SARibbonBar::activeRightButtonGroup()
 {
 	if (nullptr == d_ptr->mRightButtonGroup) {
-		d_ptr->mRightButtonGroup = RibbonSubElementFactory->craeteButtonGroupWidget(this);
+		d_ptr->mRightButtonGroup = RibbonSubElementFactory->createButtonGroupWidget(this);
 	}
 	d_ptr->mRightButtonGroup->show();
 	return d_ptr->mRightButtonGroup;
@@ -1454,8 +1452,8 @@ void SARibbonBar::setRibbonStyle(SARibbonBar::RibbonStyles v)
 	setEnableWordWrap(isThreeRowStyle(v));
 	setTabOnTitle(isCompactStyle());
 	d_ptr->mQuickAccessBar->setEnableShowIcon(isLooseStyle());
-	setEnableShowPannelTitle(isThreeRowStyle(v));
-	setPannelLayoutMode(isThreeRowStyle(v) ? SARibbonPannel::ThreeRowMode : SARibbonPannel::TwoRowMode);
+	setEnableShowPanelTitle(isThreeRowStyle(v));
+	setPanelLayoutMode(isThreeRowStyle(v) ? SARibbonPanel::ThreeRowMode : SARibbonPanel::TwoRowMode);
 
 	// 此函数会调用setFixedHeight
 	synchronousCategoryData(false);  // 这里不急着刷新，下面会继续刷新
@@ -1515,7 +1513,7 @@ void SARibbonBar::raiseCategory(SARibbonCategory* category)
  */
 bool SARibbonBar::isTwoRowStyle() const
 {
-	return (d_ptr->mDefaulePannelLayoutMode == SARibbonPannel::TwoRowMode);
+    return (d_ptr->mDefaulePanelLayoutMode == SARibbonPanel::TwoRowMode);
 }
 
 /**
@@ -1524,7 +1522,7 @@ bool SARibbonBar::isTwoRowStyle() const
  */
 bool SARibbonBar::isThreeRowStyle() const
 {
-	return (d_ptr->mDefaulePannelLayoutMode == SARibbonPannel::ThreeRowMode);
+    return (d_ptr->mDefaulePanelLayoutMode == SARibbonPanel::ThreeRowMode);
 }
 
 /**
@@ -1603,27 +1601,27 @@ void SARibbonBar::updateRibbonGeometry()
 }
 
 /**
- * @brief SARibbonPannel的布局模式
+ * @brief SARibbonPanel的布局模式
  * @return
  */
-SARibbonPannel::PannelLayoutMode SARibbonBar::pannelLayoutMode() const
+SARibbonPanel::PanelLayoutMode SARibbonBar::panelLayoutMode() const
 {
-	return d_ptr->mDefaulePannelLayoutMode;
+    return d_ptr->mDefaulePanelLayoutMode;
 }
 
 /**
- * @brief SARibbonPannel的布局模式设置
+ * @brief SARibbonPanel的布局模式设置
  * @param m
  */
-void SARibbonBar::setPannelLayoutMode(SARibbonPannel::PannelLayoutMode m)
+void SARibbonBar::setPanelLayoutMode(SARibbonPanel::PanelLayoutMode m)
 {
-	d_ptr->mDefaulePannelLayoutMode = m;
+	d_ptr->mDefaulePanelLayoutMode = m;
 	// 设置布局时，让布局重新计算高度
 	if (SARibbonBarLayout* lay = qobject_cast< SARibbonBarLayout* >(layout())) {
 		lay->resetSize();
 	}
 	iterateCategory([ m ](SARibbonCategory* c) -> bool {
-		c->setPannelLayoutMode(m);
+		c->setPanelLayoutMode(m);
 		return true;
 	});
 }
@@ -1658,7 +1656,7 @@ bool SARibbonBar::isTabOnTitle() const
 void SARibbonBar::setWindowTitleAligment(Qt::Alignment al)
 {
 	d_ptr->mTitleAligment = al;
-    update();
+	update();
 }
 
 /**
@@ -1676,14 +1674,14 @@ Qt::Alignment SARibbonBar::windowTitleAligment() const
  */
 void SARibbonBar::setEnableWordWrap(bool on)
 {
-    d_ptr->mEnableWordWrap = on;
-    iterateCategory([ on ](SARibbonCategory* category) -> bool {
-        if (category) {
-            category->setEnableWordWrap(on);
-        }
-        return true;
-    });
-    updateGeometry();
+	d_ptr->mEnableWordWrap = on;
+	iterateCategory([ on ](SARibbonCategory* category) -> bool {
+		if (category) {
+			category->setEnableWordWrap(on);
+		}
+		return true;
+	});
+	updateGeometry();
 }
 
 /**
@@ -1705,13 +1703,13 @@ bool SARibbonBar::isEnableWordWrap() const
  */
 void SARibbonBar::setButtonMaximumAspectRatio(qreal fac)
 {
-    d_ptr->buttonMaximumAspectRatio = fac;
-    iterateCategory([ fac ](SARibbonCategory* category) -> bool {
-        if (category) {
-            category->setButtonMaximumAspectRatio(fac);
-        }
-        return true;
-    });
+	d_ptr->buttonMaximumAspectRatio = fac;
+	iterateCategory([ fac ](SARibbonCategory* category) -> bool {
+		if (category) {
+			category->setButtonMaximumAspectRatio(fac);
+		}
+		return true;
+	});
 }
 
 /**
@@ -1725,104 +1723,104 @@ qreal SARibbonBar::buttonMaximumAspectRatio() const
 }
 
 /**
- * @brief pannel标题栏的高度
+ * @brief panel标题栏的高度
  * @return
  */
-int SARibbonBar::pannelTitleHeight() const
+int SARibbonBar::panelTitleHeight() const
 {
 	if (SARibbonBarLayout* lay = qobject_cast< SARibbonBarLayout* >(layout())) {
-		return lay->pannelTitleHeight();
+		return lay->panelTitleHeight();
 	}
 	return -1;
 }
 
 /**
- * @brief 设置pannel的高度
+ * @brief 设置panel的高度
  * @param h
  */
-void SARibbonBar::setPannelTitleHeight(int h)
+void SARibbonBar::setPanelTitleHeight(int h)
 {
 	if (SARibbonBarLayout* lay = qobject_cast< SARibbonBarLayout* >(layout())) {
-		lay->setPannelTitleHeight(h);
+		lay->setPanelTitleHeight(h);
 	}
 	iterateCategory([ h ](SARibbonCategory* c) -> bool {
-		c->setPannelTitleHeight(h);
+		c->setPanelTitleHeight(h);
 		return true;
 	});
 }
 
 /**
- * @brief 是否pannel显示标题栏
+ * @brief 是否panel显示标题栏
  * @return
  */
-bool SARibbonBar::isEnableShowPannelTitle() const
+bool SARibbonBar::isEnableShowPanelTitle() const
 {
-	return d_ptr->mEnableShowPannelTitle;
+    return d_ptr->mEnableShowPanelTitle;
 }
 
 /**
- * @brief 设置显示pannel标题
+ * @brief 设置显示panel标题
  * @param on
  */
-void SARibbonBar::setEnableShowPannelTitle(bool on)
+void SARibbonBar::setEnableShowPanelTitle(bool on)
 {
-	d_ptr->mEnableShowPannelTitle = on;
+	d_ptr->mEnableShowPanelTitle = on;
 	iterateCategory([ on ](SARibbonCategory* c) -> bool {
-		c->setEnableShowPannelTitle(on);
+		c->setEnableShowPanelTitle(on);
 		return true;
 	});
 }
 
 /**
- * @brief 设置pannel的spacing
+ * @brief 设置panel的spacing
  * @param n
  */
-void SARibbonBar::setPannelSpacing(int n)
+void SARibbonBar::setPanelSpacing(int n)
 {
-	d_ptr->mPannelSpacing = n;
-	// 同步当前被SARibbonBar管理的SARibbonCategory的PannelSpacing
+	d_ptr->mPanelSpacing = n;
+	// 同步当前被SARibbonBar管理的SARibbonCategory的PanelSpacing
 	iterateCategory([ n ](SARibbonCategory* category) -> bool {
 		if (category) {
-			category->setPannelSpacing(n);
+			category->setPanelSpacing(n);
 		}
 		return true;
 	});
 }
 
 /**
- * @brief pannel的spacing
+ * @brief panel的spacing
  * @return
  */
-int SARibbonBar::pannelSpacing() const
+int SARibbonBar::panelSpacing() const
 {
-	return d_ptr->mPannelSpacing;
+    return d_ptr->mPanelSpacing;
 }
 
 /**
- * @brief 设置pannel按钮的icon尺寸，large action不受此尺寸影响
+ * @brief 设置panel按钮的icon尺寸，large action不受此尺寸影响
  * @param s
  */
-void SARibbonBar::setPannelToolButtonIconSize(const QSize& s)
+void SARibbonBar::setPanelToolButtonIconSize(const QSize& s)
 {
-	d_ptr->mPannelToolButtonSize = s;
-	// 同步当前被SARibbonBar管理的SARibbonCategory的PannelSpacing
+	d_ptr->mPanelToolButtonSize = s;
+	// 同步当前被SARibbonBar管理的SARibbonCategory的PanelSpacing
 	iterateCategory([ s ](SARibbonCategory* category) -> bool {
 		if (category) {
-			category->setPannelToolButtonIconSize(s);
+			category->setPanelToolButtonIconSize(s);
 		}
 		return true;
 	});
 }
 
 /**
- * @brief pannel按钮的icon尺寸，large action不受此尺寸影响
+ * @brief panel按钮的icon尺寸，large action不受此尺寸影响
  *
- * @note pannel按钮是指pannel右下角的功能按钮
+ * @note panel按钮是指panel右下角的功能按钮
  * @return
  */
-QSize SARibbonBar::pannelToolButtonIconSize() const
+QSize SARibbonBar::panelToolButtonIconSize() const
 {
-	return d_ptr->mPannelToolButtonSize;
+    return d_ptr->mPanelToolButtonSize;
 }
 
 /**
@@ -1967,15 +1965,15 @@ bool SARibbonBar::iterateCategory(FpCategoryIterate fp) const
 }
 
 /**
- * @brief 此函数会遍历SARibbonBar下的所有Category,并迭代所有的pannel，执行函数指针bool(SARibbonPannel*)
+ * @brief 此函数会遍历SARibbonBar下的所有Category,并迭代所有的panel，执行函数指针bool(SARibbonPanel*)
  * @param fp 函数指针返回false则停止迭代
  * @return 返回false代表没有迭代完所有的category，中途接收到回调函数的false返回而中断迭代
  */
-bool SARibbonBar::iteratePannel(FpPannelIterate fp) const
+bool SARibbonBar::iteratePanel(FpPanelIterate fp) const
 {
 	const QList< SARibbonCategory* > cs = categoryPages(true);
 	for (SARibbonCategory* c : cs) {
-		if (!c->iteratePannel(fp)) {
+		if (!c->iteratePanel(fp)) {
 			return false;
 		}
 	}
@@ -1995,17 +1993,17 @@ void SARibbonBar::setCornerWidgetVisible(bool on, Qt::Corner c)
 }
 
 /**
- * @brief 此函数会遍历所有pannel，并获取它下面的action
+ * @brief 此函数会遍历所有panel，并获取它下面的action
  * @return
  */
 QList< QAction* > SARibbonBar::allActions() const
 {
 	QList< QAction* > res;
-	auto fp = [ &res ](SARibbonPannel* pannel) -> bool {
-		res += pannel->actions();
+	auto fp = [ &res ](SARibbonPanel* panel) -> bool {
+		res += panel->actions();
 		return true;
 	};
-	iteratePannel(fp);
+	iteratePanel(fp);
 	return res;
 }
 
@@ -2247,9 +2245,9 @@ void SARibbonBar::paintInLooseStyle()
 		if (!contextData.tabPageIndex.isEmpty()) {
 			// 绘制
 			paintContextCategoryTab(p,
-                                    contextData.contextCategory->contextTitle(),
-                                    contextTitleRect,
-                                    contextData.contextCategory->contextColor());
+									contextData.contextCategory->contextTitle(),
+									contextTitleRect,
+									contextData.contextCategory->contextColor());
 		}
 	}
 
@@ -2277,9 +2275,9 @@ void SARibbonBar::paintInCompactStyle()
 		if (!contextData.tabPageIndex.isEmpty()) {
 			// 绘制
 			paintContextCategoryTab(p,
-                                    contextData.contextCategory->contextTitle(),
-                                    contextTitleRect,
-                                    contextData.contextCategory->contextColor());
+									contextData.contextCategory->contextTitle(),
+									contextTitleRect,
+									contextData.contextCategory->contextColor());
 		}
 	}
 

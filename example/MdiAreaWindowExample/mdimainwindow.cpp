@@ -1,10 +1,10 @@
-#include "mdimainwindow.h"
+﻿#include "mdimainwindow.h"
 #include "ui_MainWindow.h"
 #include <QTextEdit>
 #include <QMdiSubWindow>
 #include "SARibbonBar.h"
 #include "SARibbonCategory.h"
-#include "SARibbonPannel.h"
+#include "SARibbonPanel.h"
 MainWindow::MainWindow(QWidget* parent) : SARibbonMainWindow(parent), ui(new Ui::MainWindow)
 {
 	// 注意，你必须在ui文件中删除菜单栏，否则会拿到空的ribbon指针
@@ -24,9 +24,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::buildMainPage(SARibbonCategory* mainPage)
 {
-	SARibbonPannel* mainPannel = new SARibbonPannel("operate");
+	SARibbonPanel* mainPannel = new SARibbonPanel("operate");
 	mainPannel->addAction(ui->actionadd_window);
-	mainPage->addPannel(mainPannel);
+	mainPage->addPanel(mainPannel);
 }
 
 void MainWindow::on_actionadd_window_triggered()
@@ -58,7 +58,7 @@ void MainWindow::onMdiAreaSubWindowActivated(QMdiSubWindow* window)
 		}
 	}
 #else
-    Q_UNUSED(window);
+	Q_UNUSED(window);
 #endif
 }
 
@@ -69,7 +69,7 @@ void MainWindow::onMdiAreaSubWindowActivated(QMdiSubWindow* window)
  */
 void MainWindow::onSubWindowStateChanged(Qt::WindowStates oldState, Qt::WindowStates newState)
 {
-    Q_UNUSED(oldState);
+	Q_UNUSED(oldState);
 #if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
 	if (newState.testFlag(Qt::WindowMaximized)) {
 		SARibbonBar* ribbon = ribbonBar();
@@ -81,6 +81,6 @@ void MainWindow::onSubWindowStateChanged(Qt::WindowStates oldState, Qt::WindowSt
 		}
 	}
 #else
-    Q_UNUSED(newState);
+	Q_UNUSED(newState);
 #endif
 }

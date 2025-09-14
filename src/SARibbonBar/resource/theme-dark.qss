@@ -37,28 +37,28 @@ SARibbonCategory:focus {
   outline: none;
 }
 
-/*SARibbonPannel*/
+/*SARibbonPanel*/
 
-SARibbonPannel {
+SARibbonPanel {
   background-color: transparent;
   border: none;
 }
 
-/*SARibbonPannelLabel Pannel下标题栏*/
+/*SARibbonPanelLabel Panel下标题栏*/
 
-SARibbonPannelLabel {
+SARibbonPanelLabel {
     background-color: transparent;
     color: #242424;
 }
 
-/*SARibbonPannelOptionButton*/
-SARibbonPannelOptionButton {
+/*SARibbonPanelOptionButton*/
+SARibbonPanelOptionButton {
   border:none;
   background-color: transparent;
   color:#242424;
 }
 
-SARibbonPannelOptionButton:hover {
+SARibbonPanelOptionButton:hover {
   background-color:#a0a0a0;
 }
 
@@ -68,7 +68,7 @@ SARibbonButtonGroupWidget{
   color: #242424;
 }
 
-SARibbonPannel > SARibbonButtonGroupWidget {
+SARibbonPanel > SARibbonButtonGroupWidget {
   border: 1px solid #888888;
   background-color: transparent;
 }

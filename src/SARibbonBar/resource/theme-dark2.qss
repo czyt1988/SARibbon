@@ -56,35 +56,35 @@ SARibbonCategory > SARibbonSeparatorWidget {
   color: transparent;
 }
 
-/*SARibbonPannel*/
+/*SARibbonPanel*/
 
-SARibbonPannel {
+SARibbonPanel {
   background-color: #344253;
   border: none;
 }
 
 /*
-SARibbonPannel下的SARibbonSeparatorWidget
+SARibbonPanel下的SARibbonSeparatorWidget
 注意，SARibbonSeparatorWidget的背景颜色是使用color
 */
-SARibbonPannel > SARibbonSeparatorWidget {
+SARibbonPanel > SARibbonSeparatorWidget {
   color: #5d636a;
 }
 
-/*SARibbonPannelLabel Pannel下标题栏*/
-SARibbonPannelLabel {
+/*SARibbonPanelLabel Panel下标题栏*/
+SARibbonPanelLabel {
     background-color: #4d5973;
     color: #dadada;
 }
 
-/*SARibbonPannelOptionButton*/
-SARibbonPannelOptionButton {
+/*SARibbonPanelOptionButton*/
+SARibbonPanelOptionButton {
   border:none;
   background-color: transparent;
   color:#dadada;
 }
 
-SARibbonPannelOptionButton:hover {
+SARibbonPanelOptionButton:hover {
   background-color:#375d77;
 }
 
@@ -94,7 +94,7 @@ SARibbonButtonGroupWidget{
   color: #dadada;
 }
 
-SARibbonPannel > SARibbonButtonGroupWidget {
+SARibbonPanel > SARibbonButtonGroupWidget {
   border: 1px solid #2a8db5;
   background-color: transparent;
 }

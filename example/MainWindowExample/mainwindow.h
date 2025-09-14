@@ -8,7 +8,7 @@ class SARibbonCustomizeWidget;
 class SARibbonActionsManager;
 class SARibbonQuickAccessBar;
 class SARibbonButtonGroupWidget;
-class SARibbonPannel;
+class SARibbonPanel;
 class SARibbonApplicationWidget;
 class QTextEdit;
 class QComboBox;
@@ -74,9 +74,9 @@ private Q_SLOTS:
 	void onSpinBoxRibbonTitleHeightChanged(int h);
 	void onSpinBoxRibbonTabHeightChanged(int h);
 	void onSpinBoxRibbonCategoryHeightChanged(int h);
-	void onSpinBoxRibbonPannelTtitleHeightChanged(int h);
-	void onSpinBoxRibbonPannelSpacingChanged(int h);
-	void onSpinBoxRibbonPannelToolBtnIconSizeChanged(int h);
+	void onSpinBoxRibbonPanelTtitleHeightChanged(int h);
+	void onSpinBoxRibbonPanelSpacingChanged(int h);
+	void onSpinBoxRibbonPanelToolBtnIconSizeChanged(int h);
     void onDoubleSpinBoxToolbuttonMaximumAspectRatioChanged(double h);
 	// 此函数用来演示标题栏颜色改变
 	void onTitleBackgroundBrushChangedTimeout();
@@ -118,7 +118,7 @@ private:
 	QAction* mOtherAction4 { nullptr };
 	QAction* mOtherAction5 { nullptr };
 	QAction* mOtherActionIcon1 { nullptr };
-	SARibbonPannel* mPannelVisbileExample { nullptr };
+	SARibbonPanel* mPanelVisbileExample { nullptr };
 	//
 	QAction* mActionVisibleAll { nullptr };    ///< 控制所有action是否可见的开关
 	bool mHasApplyCustomizeXmlFile { false };  ///< 程序启动后是否应用上次修改

@@ -1,6 +1,6 @@
 ﻿#include "SARibbonCategoryLayout.h"
 #include <QLayoutItem>
-#include "SARibbonPannel.h"
+#include "SARibbonPanel.h"
 #include "SARibbonElementManager.h"
 #include "SARibbonSeparatorWidget.h"
 #include <QApplication>
@@ -70,28 +70,28 @@ int SARibbonCategoryLayout::PrivateData::totalSizeHintWidth() const
 #if SARibbonCategoryLayout_DEBUG_PRINT
 			++debug_i__;
 			debug_totalSizeHintWidth__ +=
-				QString("   [%1](%2)is empty skip\n").arg(debug_i__).arg(item->toPannelWidget()->pannelName());
+				QString("   [%1](%2)is empty skip\n").arg(debug_i__).arg(item->toPanelWidget()->panelName());
 #endif
 			continue;
 		}
-		// 这里要使用widget()->sizeHint()，因为pannel的标题会影总体布局，此处需要修改
+		// 这里要使用widget()->sizeHint()，因为panel的标题会影总体布局，此处需要修改
 		//  TODO
-		QSize pannelSize = item->widget()->sizeHint();
+		QSize panelSize = item->widget()->sizeHint();
 		QSize SeparatorSize(0, 0);
 		if (item->separatorWidget) {
 			SeparatorSize = item->separatorWidget->sizeHint();
 		}
-		total += pannelSize.width();
+		total += panelSize.width();
 		total += SeparatorSize.width();
 #if SARibbonCategoryLayout_DEBUG_PRINT
 		++debug_i__;
-		debug_totalSizeHintWidth__ += QString("|-[%1]pannelSize=(%2,%3),SeparatorSize=(%4,%5),name=(%6) \n")
+		debug_totalSizeHintWidth__ += QString("|-[%1]panelSize=(%2,%3),SeparatorSize=(%4,%5),name=(%6) \n")
 										  .arg(debug_i__)
-										  .arg(pannelSize.width())
-										  .arg(pannelSize.height())
+										  .arg(panelSize.width())
+										  .arg(panelSize.height())
 										  .arg(SeparatorSize.width())
 										  .arg(SeparatorSize.height())
-										  .arg(item->toPannelWidget()->pannelName());
+										  .arg(item->toPanelWidget()->panelName());
 #endif
 	}
 #if SARibbonCategoryLayout_DEBUG_PRINT
@@ -120,7 +120,7 @@ SARibbonCategoryLayout::SARibbonCategoryLayout(SARibbonCategory* parent)
 
 SARibbonCategoryLayout::~SARibbonCategoryLayout()
 {
-	while (auto item = takePannelItem(0)) {
+	while (auto item = takePanelItem(0)) {
 		delete item;
 	}
 }
@@ -133,15 +133,15 @@ SARibbonCategory* SARibbonCategoryLayout::ribbonCategory() const
 void SARibbonCategoryLayout::addItem(QLayoutItem* item)
 {
 	Q_UNUSED(item);
-	qWarning() << tr("in SARibbonCategoryLayout cannot addItem,use addPannel instead");
+	qWarning() << tr("in SARibbonCategoryLayout cannot addItem,use addPanel instead");
 	invalidate();
 }
 
 /**
- * @brief 返回pannel的layout
+ * @brief 返回panel的layout
  * @param index 索引
  * @return
- * @note 注意，pannel是和分割线一起的，但这个只返回一个pannel对应的layout
+ * @note 注意，panel是和分割线一起的，但这个只返回一个panel对应的layout
  */
 QLayoutItem* SARibbonCategoryLayout::itemAt(int index) const
 {
@@ -157,12 +157,12 @@ QLayoutItem* SARibbonCategoryLayout::itemAt(int index) const
  */
 QLayoutItem* SARibbonCategoryLayout::takeAt(int index)
 {
-	QLayoutItem* r = takePannelItem(index);
+	QLayoutItem* r = takePanelItem(index);
 	invalidate();
 	return r;
 }
 
-SARibbonCategoryLayoutItem* SARibbonCategoryLayout::takePannelItem(int index)
+SARibbonCategoryLayoutItem* SARibbonCategoryLayout::takePanelItem(int index)
 {
 	if ((index >= 0) && (index < d_ptr->mItemList.size())) {
 		SARibbonCategoryLayoutItem* item = d_ptr->mItemList.takeAt(index);
@@ -177,25 +177,25 @@ SARibbonCategoryLayoutItem* SARibbonCategoryLayout::takePannelItem(int index)
 	return (nullptr);
 }
 
-SARibbonCategoryLayoutItem* SARibbonCategoryLayout::takePannelItem(SARibbonPannel* pannel)
+SARibbonCategoryLayoutItem* SARibbonCategoryLayout::takePanelItem(SARibbonPanel* panel)
 {
 	for (int i = 0; i < d_ptr->mItemList.size(); ++i) {
 		SARibbonCategoryLayoutItem* item = d_ptr->mItemList[ i ];
-		if (item->widget() == pannel) {
-			return (takePannelItem(i));
+		if (item->widget() == panel) {
+			return (takePanelItem(i));
 		}
 	}
 	return (nullptr);
 }
 
 /**
- * @brief 移除pannel，对应的分割线也会删除
- * @param pannel
+ * @brief 移除panel，对应的分割线也会删除
+ * @param panel
  * @return
  */
-bool SARibbonCategoryLayout::takePannel(SARibbonPannel* pannel)
+bool SARibbonCategoryLayout::takePanel(SARibbonPanel* panel)
 {
-	SARibbonCategoryLayoutItem* i = takePannelItem(pannel);
+	SARibbonCategoryLayoutItem* i = takePanelItem(panel);
 	if (i) {
 		SARibbonSeparatorWidget* sp = i->separatorWidget;
 		if (sp) {
@@ -213,23 +213,23 @@ int SARibbonCategoryLayout::count() const
 	return (d_ptr->mItemList.size());
 }
 
-void SARibbonCategoryLayout::addPannel(SARibbonPannel* pannel)
+void SARibbonCategoryLayout::addPanel(SARibbonPanel* panel)
 {
-    insertPannel(d_ptr->mItemList.count(), pannel);
+    insertPanel(d_ptr->mItemList.count(), panel);
 }
 
 /**
- * @brief 插入一个pannel
+ * @brief 插入一个panel
  * @param index 索引
- * @param pannel
+ * @param panel
  * @return 返回对应的分割线SARibbonSeparatorWidget
- * @note 在SARibbonCategoryLayout的布局中，一个pannel会携带一个分割线
+ * @note 在SARibbonCategoryLayout的布局中，一个panel会携带一个分割线
  */
-void SARibbonCategoryLayout::insertPannel(int index, SARibbonPannel* pannel)
+void SARibbonCategoryLayout::insertPanel(int index, SARibbonPanel* panel)
 {
 	index                            = qMax(0, index);
 	index                            = qMin(d_ptr->mItemList.count(), index);
-	SARibbonCategoryLayoutItem* item = new SARibbonCategoryLayoutItem(pannel);
+	SARibbonCategoryLayoutItem* item = new SARibbonCategoryLayoutItem(panel);
 
 	// 分割线
 	item->separatorWidget = RibbonSubElementFactory->createRibbonSeparatorWidget(parentWidget());
@@ -354,9 +354,9 @@ void SARibbonCategoryLayout::updateGeometryArr()
 		//
 
 		for (SARibbonCategoryLayoutItem* item : qAsConst(d_ptr->mItemList)) {
-			if (SARibbonPannel* p = qobject_cast< SARibbonPannel* >(item->widget())) {
+			if (SARibbonPanel* p = qobject_cast< SARibbonPanel* >(item->widget())) {
 				if (p->isExpanding()) {
-					// pannel可扩展
+					// panel可扩展
 					++canExpandingCount;
 				}
 			}
@@ -370,7 +370,7 @@ void SARibbonCategoryLayout::updateGeometryArr()
 	}
 	int x = d_ptr->mXBase;
 	if ((categoryAlignment() == SARibbonAlignment::AlignCenter) && (total < categoryWidth) && (0 == expandWidth)) {
-		// 如果是居中对齐，同时没有伸缩的pannel，同时总宽度没有超过category的宽度
+		// 如果是居中对齐，同时没有伸缩的panel，同时总宽度没有超过category的宽度
 		x = (categoryWidth - total) / 2;
 	}
 	total = 0;  // total重新计算
@@ -379,29 +379,29 @@ void SARibbonCategoryLayout::updateGeometryArr()
 		if (item->isEmpty()) {
 			// 如果是hide就直接跳过
 			if (item->separatorWidget) {
-				// pannel hide分割线也要hide
+				// panel hide分割线也要hide
 				item->separatorWidget->hide();
 			}
 			item->mWillSetGeometry          = QRect(0, 0, 0, 0);
 			item->mWillSetSeparatorGeometry = QRect(0, 0, 0, 0);
 			continue;
 		}
-		SARibbonPannel* p = item->toPannelWidget();
+		SARibbonPanel* p = item->toPanelWidget();
 		if (nullptr == p) {
 			qDebug() << "unknow widget in SARibbonCategoryLayout";
 			continue;
 		}
 		// p->layout()->update();
-		QSize pannelSize = p->sizeHint();
+		QSize panelSize = p->sizeHint();
 		QSize SeparatorSize(0, 0);
 		if (item->separatorWidget) {
 			SeparatorSize = item->separatorWidget->sizeHint();
 		}
 		if (p->isExpanding()) {
-			// 可扩展，就把pannel扩展到最大
-			pannelSize.setWidth(pannelSize.width() + expandWidth);
+			// 可扩展，就把panel扩展到最大
+			panelSize.setWidth(panelSize.width() + expandWidth);
 		}
-		int w = pannelSize.width();
+		int w = panelSize.width();
 
 		item->mWillSetGeometry = QRect(x, y, w, height);
 		x += w;
@@ -455,7 +455,7 @@ void SARibbonCategoryLayout::doLayout()
 				hideWidgets << item->separatorWidget;
 			}
 #if SARibbonCategoryLayout_DEBUG_PRINT
-			qDebug() << "  |-[" << debug_i__ << "]pannelName(" << item->toPannelWidget()->pannelName() << ",will hide";
+			qDebug() << "  |-[" << debug_i__ << "]panelName(" << item->toPanelWidget()->panelName() << ",will hide";
 			++debug_i__;
 #endif
 		} else {
@@ -469,14 +469,14 @@ void SARibbonCategoryLayout::doLayout()
 			if (item->separatorWidget) {
 				item->separatorWidget->setGeometry(item->mWillSetSeparatorGeometry);
 				if (i == itemsize - 1) {
-					// 最后一个pannel的分割线隐藏
+					// 最后一个panel的分割线隐藏
 					hideWidgets << item->separatorWidget;
 				} else {
 					showWidgets << item->separatorWidget;
 				}
 			}
 #if SARibbonCategoryLayout_DEBUG_PRINT
-			qDebug() << "  |-[" << debug_i__ << "]pannelName(" << item->toPannelWidget()->pannelName()
+			qDebug() << "  |-[" << debug_i__ << "]panelName(" << item->toPanelWidget()->panelName()
 					 << "),willSetGeometry:" << item->mWillSetGeometry
 					 << ",WillSetSeparatorGeometry:" << item->mWillSetSeparatorGeometry;
 			++debug_i__;
@@ -492,7 +492,7 @@ void SARibbonCategoryLayout::doLayout()
 	if (d_ptr->mIsLeftScrollBtnShow) {
 		d_ptr->mLeftScrollBtn->raise();
 	}
-	// 不在上面那里进行show和hide因为这会触发SARibbonPannelLayout的重绘，导致循环绘制，非常影响效率
+	// 不在上面那里进行show和hide因为这会触发SARibbonPanelLayout的重绘，导致循环绘制，非常影响效率
 	for (QWidget* w : qAsConst(showWidgets)) {
 		if (!w->isVisible()) {
 			w->show();
@@ -507,31 +507,31 @@ void SARibbonCategoryLayout::doLayout()
 }
 
 /**
- * @brief 返回所有pannels
+ * @brief 返回所有panels
  * @return
  */
-QList< SARibbonPannel* > SARibbonCategoryLayout::pannels() const
+QList< SARibbonPanel* > SARibbonCategoryLayout::panels() const
 {
-	QList< SARibbonPannel* > res;
+	QList< SARibbonPanel* > res;
 
 	for (SARibbonCategoryLayoutItem* item : qAsConst(d_ptr->mItemList)) {
-		SARibbonPannel* p = item->toPannelWidget();
+		SARibbonPanel* p = item->toPanelWidget();
 		res.append(p);
 	}
 	return (res);
 }
 
 /**
- * @brief 通过ObjectName查找pannel
+ * @brief 通过ObjectName查找panel
  * @param objname
  * @return
  */
-SARibbonPannel* SARibbonCategoryLayout::pannelByObjectName(const QString& objname) const
+SARibbonPanel* SARibbonCategoryLayout::panelByObjectName(const QString& objname) const
 {
 	for (SARibbonCategoryLayoutItem* item : d_ptr->mItemList) {
-		if (SARibbonPannel* pannel = item->toPannelWidget()) {
-			if (pannel->objectName() == objname) {
-				return pannel;
+		if (SARibbonPanel* panel = item->toPanelWidget()) {
+			if (panel->objectName() == objname) {
+				return panel;
 			}
 		}
 	}
@@ -539,16 +539,16 @@ SARibbonPannel* SARibbonCategoryLayout::pannelByObjectName(const QString& objnam
 }
 
 /**
- * @brief 通过名字查找pannel
+ * @brief 通过名字查找panel
  * @param title
  * @return 如果有重名，只会返回第一个符合条件的
  */
-SARibbonPannel* SARibbonCategoryLayout::pannelByName(const QString& pannelname) const
+SARibbonPanel* SARibbonCategoryLayout::panelByName(const QString& panelname) const
 {
 	for (SARibbonCategoryLayoutItem* item : qAsConst(d_ptr->mItemList)) {
-		if (SARibbonPannel* pannel = item->toPannelWidget()) {
-			if (pannel->pannelName() == pannelname) {
-				return (pannel);
+		if (SARibbonPanel* panel = item->toPanelWidget()) {
+			if (panel->panelName() == panelname) {
+				return (panel);
 			}
 		}
 	}
@@ -556,49 +556,49 @@ SARibbonPannel* SARibbonCategoryLayout::pannelByName(const QString& pannelname) 
 }
 
 /**
- * @brief 通过索引找到pannel，如果超过索引范围，会返回nullptr
+ * @brief 通过索引找到panel，如果超过索引范围，会返回nullptr
  * @param i
  * @return
  */
-SARibbonPannel* SARibbonCategoryLayout::pannelByIndex(int i) const
+SARibbonPanel* SARibbonCategoryLayout::panelByIndex(int i) const
 {
 	if (i >= 0 && i < d_ptr->mItemList.size()) {
-		return d_ptr->mItemList[ i ]->toPannelWidget();
+		return d_ptr->mItemList[ i ]->toPanelWidget();
 	}
 	return nullptr;
 }
 
 /**
- * @brief 移动pannel
+ * @brief 移动panel
  * @param from
  * @param to
  */
-void SARibbonCategoryLayout::movePannel(int from, int to)
+void SARibbonCategoryLayout::movePanel(int from, int to)
 {
 	d_ptr->mItemList.move(from, to);
 	doLayout();
 }
 
 /**
- * @brief 返回pannel的个数
+ * @brief 返回panel的个数
  * @return
  */
-int SARibbonCategoryLayout::pannelCount() const
+int SARibbonCategoryLayout::panelCount() const
 {
     return d_ptr->mItemList.size();
 }
 
 /**
- * @brief 查找pannel对应的索引
+ * @brief 查找panel对应的索引
  * @param p
  * @return 如果找不到，返回-1
  */
-int SARibbonCategoryLayout::pannelIndex(SARibbonPannel* p) const
+int SARibbonCategoryLayout::panelIndex(SARibbonPanel* p) const
 {
-	int c = pannelCount();
+	int c = panelCount();
 
 	for (int i = 0; i < c; ++i) {
-		if (d_ptr->mItemList[ i ]->toPannelWidget() == p) {
+		if (d_ptr->mItemList[ i ]->toPanelWidget() == p) {
 			return (i);
 		}
 	}
@@ -606,15 +606,15 @@ int SARibbonCategoryLayout::pannelIndex(SARibbonPannel* p) const
 }
 
 /**
- * @brief 获取所有的pannel
+ * @brief 获取所有的panel
  * @return
  */
-QList< SARibbonPannel* > SARibbonCategoryLayout::pannelList() const
+QList< SARibbonPanel* > SARibbonCategoryLayout::panelList() const
 {
-	QList< SARibbonPannel* > res;
+	QList< SARibbonPanel* > res;
 
 	for (SARibbonCategoryLayoutItem* i : qAsConst(d_ptr->mItemList)) {
-		if (SARibbonPannel* p = i->toPannelWidget()) {
+		if (SARibbonPanel* p = i->toPanelWidget()) {
 			res.append(p);
 		}
 	}
@@ -743,7 +743,7 @@ int SARibbonCategoryLayout::categoryTotalWidth() const
 /**
    @brief 设置Category的对齐方式
 
-   居中对齐会让pannel以居中进行对齐
+   居中对齐会让panel以居中进行对齐
    @param al
  */
 void SARibbonCategoryLayout::setCategoryAlignment(SARibbonAlignment al)
@@ -831,7 +831,7 @@ void SARibbonCategoryLayout::setGeometry(const QRect& rect)
 // SARibbonCategoryLayoutItem
 //=============================================================
 
-SARibbonCategoryLayoutItem::SARibbonCategoryLayoutItem(SARibbonPannel* w) : QWidgetItem(w)
+SARibbonCategoryLayoutItem::SARibbonCategoryLayoutItem(SARibbonPanel* w) : QWidgetItem(w)
 {
 	separatorWidget = nullptr;
 }
@@ -840,7 +840,7 @@ SARibbonCategoryLayoutItem::~SARibbonCategoryLayoutItem()
 {
 }
 
-SARibbonPannel* SARibbonCategoryLayoutItem::toPannelWidget()
+SARibbonPanel* SARibbonCategoryLayoutItem::toPanelWidget()
 {
-	return qobject_cast< SARibbonPannel* >(widget());
+	return qobject_cast< SARibbonPanel* >(widget());
 }

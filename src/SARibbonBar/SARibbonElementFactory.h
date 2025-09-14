@@ -6,14 +6,14 @@
 #include <QSize>
 #include <QScopedPointer>
 #include "SARibbonBar.h"
-#include "SARibbonPannel.h"
+#include "SARibbonPanel.h"
 class QWidget;
 class SARibbonBar;
 class SARibbonTabBar;
 class SARibbonApplicationButton;
 class SARibbonCategory;
 class SARibbonContextCategory;
-class SARibbonPannel;
+class SARibbonPanel;
 class SARibbonSeparatorWidget;
 class SARibbonGallery;
 class SARibbonGalleryGroup;
@@ -22,7 +22,7 @@ class SARibbonControlButton;
 class SARibbonButtonGroupWidget;
 class SARibbonStackedWidget;
 class SARibbonQuickAccessBar;
-class SARibbonPannelOptionButton;
+class SARibbonPanelOptionButton;
 class SARibbonSystemButtonBar;
 
 ///
@@ -41,17 +41,17 @@ public:
 	virtual SARibbonApplicationButton* createRibbonApplicationButton(QWidget* parent);
 	virtual SARibbonCategory* createRibbonCategory(QWidget* parent);
 	virtual SARibbonContextCategory* createRibbonContextCategory(QWidget* parent);
-	virtual SARibbonPannel* createRibbonPannel(QWidget* parent);
+	virtual SARibbonPanel* createRibbonPanel(QWidget* parent);
 	virtual SARibbonSeparatorWidget* createRibbonSeparatorWidget(QWidget* parent);
 	virtual SARibbonGallery* createRibbonGallery(QWidget* parent);
 	virtual SARibbonGalleryGroup* createRibbonGalleryGroup(QWidget* parent);
 	virtual SARibbonToolButton* createRibbonToolButton(QWidget* parent);
 	virtual SARibbonControlButton* createRibbonControlButton(QWidget* parent);
 	virtual SARibbonStackedWidget* createRibbonStackedWidget(SARibbonBar* parent);
-	virtual SARibbonButtonGroupWidget* craeteButtonGroupWidget(QWidget* parent);
+	virtual SARibbonButtonGroupWidget* createButtonGroupWidget(QWidget* parent);
 	virtual SARibbonQuickAccessBar* createQuickAccessBar(QWidget* parent);
 	virtual SARibbonSystemButtonBar* createWindowButtonGroup(QWidget* parent);
-	virtual SARibbonPannelOptionButton* createRibbonPannelOptionButton(SARibbonPannel* pannel);
+	virtual SARibbonPanelOptionButton* createRibbonPanelOptionButton(SARibbonPanel* panel);
 };
 
 #endif  // SARIBBONELEMENTFACTORY_H

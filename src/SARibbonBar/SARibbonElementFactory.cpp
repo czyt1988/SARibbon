@@ -14,8 +14,8 @@
 #include "SARibbonButtonGroupWidget.h"
 #include "SARibbonStackedWidget.h"
 #include "SARibbonQuickAccessBar.h"
-#include "SARibbonPannelOptionButton.h"
-#include "SARibbonPannelLayout.h"
+#include "SARibbonPanelOptionButton.h"
+#include "SARibbonPanelLayout.h"
 #include "SARibbonSystemButtonBar.h"
 
 SARibbonElementFactory::SARibbonElementFactory()
@@ -51,9 +51,9 @@ SARibbonContextCategory* SARibbonElementFactory::createRibbonContextCategory(QWi
 	return (new SARibbonContextCategory(parent));
 }
 
-SARibbonPannel* SARibbonElementFactory::createRibbonPannel(QWidget* parent)
+SARibbonPanel* SARibbonElementFactory::createRibbonPanel(QWidget* parent)
 {
-	return (new SARibbonPannel(parent));
+	return (new SARibbonPanel(parent));
 }
 
 SARibbonSeparatorWidget* SARibbonElementFactory::createRibbonSeparatorWidget(QWidget* parent)
@@ -86,7 +86,7 @@ SARibbonStackedWidget* SARibbonElementFactory::createRibbonStackedWidget(SARibbo
 	return (new SARibbonStackedWidget(parent));
 }
 
-SARibbonButtonGroupWidget* SARibbonElementFactory::craeteButtonGroupWidget(QWidget* parent)
+SARibbonButtonGroupWidget* SARibbonElementFactory::createButtonGroupWidget(QWidget* parent)
 {
 	return (new SARibbonButtonGroupWidget(parent));
 }
@@ -102,12 +102,12 @@ SARibbonSystemButtonBar* SARibbonElementFactory::createWindowButtonGroup(QWidget
 }
 
 /**
- * @brief 创建SARibbonPannelOptionButton
- * @param pannel 附属的pannel
+ * @brief 创建SARibbonPanelOptionButton
+ * @param panel 附属的panel
  * @return
- * @sa SARibbonPannelOptionButton
+ * @sa SARibbonPanelOptionButton
  */
-SARibbonPannelOptionButton* SARibbonElementFactory::createRibbonPannelOptionButton(SARibbonPannel* pannel)
+SARibbonPanelOptionButton* SARibbonElementFactory::createRibbonPanelOptionButton(SARibbonPanel* panel)
 {
-    return (new SARibbonPannelOptionButton(pannel));
+    return (new SARibbonPanelOptionButton(panel));
 }

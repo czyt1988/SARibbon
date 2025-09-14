@@ -17,4 +17,4 @@ public:
 	~SARibbonControlButton();
 };
 
-#endif  // SARIBBONPANNELTOOLBUTTON_H
+#endif  // SARIBBONCONTROLBUTTON_H

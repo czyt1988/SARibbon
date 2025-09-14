@@ -27,7 +27,7 @@ public:
 	QRect titleRect;
 	int titleBarHeight { 30 };     ///< 标题栏高度
 	int tabBarHeight { 28 };       ///< tabbar高度
-	int pannelTitleHeight { 15 };  ///< pannel的标题栏默认高度
+	int panelTitleHeight { 15 };  ///< panel的标题栏默认高度
 	int categoryHeight { 60 };     ///< Category的高度
 
 	int maxMinWidth { 1000 };  ///< 最大的最小宽度，这个一般是屏幕宽度的0.8，避免太大导致超过屏幕
@@ -210,13 +210,13 @@ public:
 	{
 		int textH = ribbonBar->fontMetrics().lineSpacing();  // 这里用linespace，因为在换行的情况下，行距是不可忽略的，ribbon的大按钮默认是2行
 		if (ribbonBar->isThreeRowStyle()) {
-			// 5.5=（3*1.6+1） （三行）,1是给panneltitle预留的
-			return textH * 4.8 + pannelTitleHeight;
+			// 5.5=（3*1.6+1） （三行）,1是给paneltitle预留的
+			return textH * 4.8 + panelTitleHeight;
 		} else {
 			// 3=2*1.6
-			return textH * 3.2 + pannelTitleHeight;
+			return textH * 3.2 + panelTitleHeight;
 		}
-		return (textH * 4.8 + pannelTitleHeight);
+		return (textH * 4.8 + panelTitleHeight);
 	}
 
 	// 计算MainBar高度
@@ -489,21 +489,21 @@ void SARibbonBarLayout::setCategoryHeight(int h)
 }
 
 /**
- * @brief SARibbonBarLayout::pannelTitleHeight
+ * @brief SARibbonBarLayout::panelTitleHeight
  * @return
  */
-int SARibbonBarLayout::pannelTitleHeight() const
+int SARibbonBarLayout::panelTitleHeight() const
 {
-    return d_ptr->pannelTitleHeight;
+    return d_ptr->panelTitleHeight;
 }
 
 /**
- * @brief 设置pannel的高度
+ * @brief 设置panel的高度
  * @param h
  */
-void SARibbonBarLayout::setPannelTitleHeight(int h)
+void SARibbonBarLayout::setPanelTitleHeight(int h)
 {
-    d_ptr->pannelTitleHeight = h;
+    d_ptr->panelTitleHeight = h;
 }
 
 /**

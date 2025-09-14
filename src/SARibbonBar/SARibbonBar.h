@@ -51,15 +51,15 @@ class SARibbonStackedWidget;
 
   SARibbonBar和传统方法相似，不过相对于传统的Menu/ToolBar QMenu和QToolBar是平级的，
   Ribbon是有明显的层级关系，SARibbonBar下面是 @ref SARibbonCategory，
-  SARibbonCategory下面是@ref SARibbonPannel ，SARibbonPannel下面是@ref SARibbonToolButton ，
+  SARibbonCategory下面是@ref SARibbonPanel ，SARibbonPanel下面是@ref SARibbonToolButton ，
   SARibbonToolButton管理着QAction
 
   因此，生成一个ribbon只需以下几个函数：
   @code
   SARibbonCategory * SARibbonBar::addCategoryPage(const QString& title);
-  SARibbonPannel * SARibbonCategory::addPannel(const QString& title);
-  SARibbonToolButton * SARibbonPannel::addLargeAction(QAction *action);
-  SARibbonToolButton * SARibbonPannel::addSmallAction(QAction *action);
+  SARibbonPanel * SARibbonCategory::addPanel(const QString& title);
+  SARibbonToolButton * SARibbonPanel::addLargeAction(QAction *action);
+  SARibbonToolButton * SARibbonPanel::addSmallAction(QAction *action);
   @endcode
 
   因此生成步骤如下：
@@ -67,7 +67,7 @@ class SARibbonStackedWidget;
   @code
   //成员变量
   SARibbonCategory* categoryMain;
-  SARibbonPannel* FilePannel;
+  SARibbonPanel* FilePanel;
 
   //建立ui
   void setupRibbonUi()
@@ -78,14 +78,14 @@ class SARibbonStackedWidget;
       ribbon->setRibbonStyle(SARibbonBar::WpsLiteStyle);
       //添加一个Main标签
       categoryMain = ribbon->addCategoryPage(QStringLiteral("Main"));
-      //Main标签下添加一个File Pannel
-      FilePannel = categoryMain->addPannel(QStringLiteral("FilePannel"));
-      //开始为File Pannel添加action
-      FilePannel->addLargeAction(actionNew);
-      FilePannel->addLargeAction(actionOpen);
-      FilePannel->addLargeAction(actionSave);
-      FilePannel->addSmallAction(actionImportMesh);
-      FilePannel->addSmallAction(actionImportGeometry);
+      //Main标签下添加一个File Panel
+      FilePanel = categoryMain->addPanel(QStringLiteral("FilePanel"));
+      //开始为File Panel添加action
+      FilePanel->addLargeAction(actionNew);
+      FilePanel->addLargeAction(actionOpen);
+      FilePanel->addLargeAction(actionSave);
+      FilePanel->addSmallAction(actionImportMesh);
+      FilePanel->addSmallAction(actionImportGeometry);
   }
   @endcode
  */
@@ -102,9 +102,9 @@ class SA_RIBBON_EXPORT SARibbonBar : public QMenuBar
 	Q_PROPERTY(QColor tabBarBaseLineColor READ tabBarBaseLineColor WRITE setTabBarBaseLineColor)
 	Q_PROPERTY(Qt::Alignment windowTitleAligment READ windowTitleAligment WRITE setWindowTitleAligment)
 	Q_PROPERTY(bool enableWordWrap READ isEnableWordWrap WRITE setEnableWordWrap)
-	Q_PROPERTY(bool enableShowPannelTitle READ isEnableShowPannelTitle WRITE setEnableShowPannelTitle)
+	Q_PROPERTY(bool enableShowPanelTitle READ isEnableShowPanelTitle WRITE setEnableShowPanelTitle)
 	Q_PROPERTY(bool tabOnTitle READ isTabOnTitle WRITE setTabOnTitle)
-	Q_PROPERTY(SARibbonPannel::PannelLayoutMode pannelLayoutMode READ pannelLayoutMode WRITE setPannelLayoutMode)
+	Q_PROPERTY(SARibbonPanel::PanelLayoutMode panelLayoutMode READ panelLayoutMode WRITE setPanelLayoutMode)
 
 public:
 	enum RibbonStyleFlag
@@ -134,7 +134,7 @@ public:
 	Q_ENUM(RibbonMode)
 public:
 	using FpCategoryIterate = std::function< bool(SARibbonCategory*) >;
-	using FpPannelIterate   = SARibbonCategory::FpPannelIterate;
+	using FpPanelIterate    = SARibbonCategory::FpPanelIterate;
 	/**
 	 * @brief 这是针对上下文标签的高亮颜色绘制，用户可以设置一个函数指针，来针对上下文标签的高亮颜色进行调整
 	 */
@@ -211,9 +211,8 @@ public:
 	void removeCategory(SARibbonCategory* category);
 
 	// 添加一个上下文标签
-    SARibbonContextCategory* addContextCategory(const QString& title,
-                                                const QColor& color = QColor(),
-                                                const QVariant& id  = QVariant());
+	SARibbonContextCategory*
+	addContextCategory(const QString& title, const QColor& color = QColor(), const QVariant& id = QVariant());
 	void addContextCategory(SARibbonContextCategory* context);
 
 	// 显示一个上下文标签
@@ -313,9 +312,9 @@ public:
 	// 更新ribbon的布局数据，此函数适用于一些关键性尺寸变化，换起ribbon下面元素的布局,在发现刷新问题时，可以调用此函数
 	void updateRibbonGeometry();
 
-	// 设置pannel的模式
-	SARibbonPannel::PannelLayoutMode pannelLayoutMode() const;
-	void setPannelLayoutMode(SARibbonPannel::PannelLayoutMode m);
+	// 设置panel的模式
+	SARibbonPanel::PanelLayoutMode panelLayoutMode() const;
+	void setPanelLayoutMode(SARibbonPanel::PanelLayoutMode m);
 
 	// 设置tab在title上面，这样可以省略title区域
 	void setTabOnTitle(bool on);
@@ -345,25 +344,25 @@ public:
 	void setEnableWordWrap(bool on);
 	bool isEnableWordWrap() const;
 
-    // 按钮的最大宽高比，这个系数决定按钮的最大宽度
-    void setButtonMaximumAspectRatio(qreal fac = 1.4);
-    qreal buttonMaximumAspectRatio() const;
+	// 按钮的最大宽高比，这个系数决定按钮的最大宽度
+	void setButtonMaximumAspectRatio(qreal fac = 1.4);
+	qreal buttonMaximumAspectRatio() const;
 
-	// 设置pannel的标题栏高度
-	int pannelTitleHeight() const;
-	void setPannelTitleHeight(int h);
+	// 设置panel的标题栏高度
+	int panelTitleHeight() const;
+	void setPanelTitleHeight(int h);
 
-	// 设置pannel是否显示标题栏
-	bool isEnableShowPannelTitle() const;
-	void setEnableShowPannelTitle(bool on);
+	// 设置panel是否显示标题栏
+	bool isEnableShowPanelTitle() const;
+	void setEnableShowPanelTitle(bool on);
 
-	// 设置pannel的spacing
-	void setPannelSpacing(int n);
-	int pannelSpacing() const;
+	// 设置panel的spacing
+	void setPanelSpacing(int n);
+	int panelSpacing() const;
 
-    // 设置pannel按钮(pannel右下角的功能按钮)的icon尺寸
-	void setPannelToolButtonIconSize(const QSize& s);
-	QSize pannelToolButtonIconSize() const;
+	// 设置panel按钮(panel右下角的功能按钮)的icon尺寸
+	void setPanelToolButtonIconSize(const QSize& s);
+	QSize panelToolButtonIconSize() const;
 
 	// 获取SARibbonStackedWidget，谨慎使用此函数
 	SARibbonStackedWidget* ribbonStackedWidget();
@@ -385,13 +384,13 @@ public:
 
 	// 此函数会遍历SARibbonBar下的所有Category，执行函数指针(bool(SARibbonCategory*))，函数指针返回false则停止迭代
 	bool iterateCategory(FpCategoryIterate fp) const;
-	// 此函数会遍历SARibbonBar下的所有Category,并迭代所有的pannel，执行函数指针(bool(SARibbonPannel*))，函数指针返回false则停止迭代
-	bool iteratePannel(FpPannelIterate fp) const;
+	// 此函数会遍历SARibbonBar下的所有Category,并迭代所有的panel，执行函数指针(bool(SARibbonPanel*))，函数指针返回false则停止迭代
+	bool iteratePanel(FpPanelIterate fp) const;
 
 	// 设置边角widget可见性，对于mdi窗口，会出现TopLeftCorner和TopRightCorner两个corner widget
 	void setCornerWidgetVisible(bool on, Qt::Corner c = Qt::TopLeftCorner);
 
-	// 获取所有pannel下的action
+	// 获取所有panel下的action
 	QList< QAction* > allActions() const;
 	// 当前是否使用的无边框
 	bool isUseRibbonFrame() const;
@@ -478,7 +477,8 @@ protected:
 
 	virtual void paintTabbarBaseLine(QPainter& painter);
 	virtual void paintWindowTitle(QPainter& painter, const QString& title, const QRect& titleRegion);
-    virtual void paintContextCategoryTab(QPainter& painter, const QString& title, const QRect& contextRect, const QColor& color);
+	virtual void
+	paintContextCategoryTab(QPainter& painter, const QString& title, const QRect& contextRect, const QColor& color);
 #if SA_DEBUG_PRINT_SARIBBONBAR
 	SA_RIBBON_EXPORT friend QDebug operator<<(QDebug debug, const SARibbonBar& ribbon);
 #endif

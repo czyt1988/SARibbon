@@ -11,8 +11,8 @@
     class MyRibbonElementFactory : public SARibbonElementFactory{
     public:
         ...
-        virtual SARibbonPannel* createRibbonPannel(QWidget* parent){
-            return new MyRibbonPannel(parent);
+        virtual SARibbonPanel* createRibbonPanel(QWidget* parent){
+            return new MyRibbonPanel(parent);
         }
     };
     @endcode
@@ -25,22 +25,22 @@
     SARibbonElementManager::instance()->setupFactory(new MyRibbonElementFactory);
     @endcode
 
-    这样，SARibbon创建的pannel就是你自己重写的MyRibbonPannel
+    这样，SARibbon创建的panel就是你自己重写的MyRibbonPanel
 
  */
 class SA_RIBBON_EXPORT SARibbonElementManager
 {
 protected:
-    SARibbonElementManager();
+	SARibbonElementManager();
 
 public:
-    virtual ~SARibbonElementManager();
-    static SARibbonElementManager* instance();
-    SARibbonElementFactory* factory();
-    void setupFactory(SARibbonElementFactory* fac);
+	virtual ~SARibbonElementManager();
+	static SARibbonElementManager* instance();
+	SARibbonElementFactory* factory();
+	void setupFactory(SARibbonElementFactory* fac);
 
 private:
-    QScopedPointer< SARibbonElementFactory > mFactory;
+	QScopedPointer< SARibbonElementFactory > mFactory;
 };
 #ifndef RibbonSubElementMgr
 #define RibbonSubElementMgr SARibbonElementManager::instance()

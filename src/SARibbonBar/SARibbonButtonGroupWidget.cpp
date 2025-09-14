@@ -9,7 +9,7 @@
 #include "SARibbonControlButton.h"
 #include "SARibbonElementManager.h"
 #include "SARibbonSeparatorWidget.h"
-#include "SARibbonPannel.h"
+#include "SARibbonPanel.h"
 
 //===================================================
 // SARibbonButtonGroupWidget::PrivateData
@@ -84,8 +84,8 @@ SARibbonControlButton* SARibbonButtonGroupWidget::PrivateData::createButtonForAc
 	button->setIconSize(mIconSize);
 	button->setFocusPolicy(Qt::NoFocus);
 	button->setDefaultAction(a);
-	button->setPopupMode(SARibbonPannel::getActionToolButtonPopupModeProperty(a));
-	button->setToolButtonStyle(SARibbonPannel::getActionToolButtonStyleProperty(a));
+	button->setPopupMode(SARibbonPanel::getActionToolButtonPopupModeProperty(a));
+	button->setToolButtonStyle(SARibbonPanel::getActionToolButtonStyleProperty(a));
 	q_ptr->connect(button, &SARibbonControlButton::triggered, q_ptr, &SARibbonButtonGroupWidget::actionTriggered);
 	return button;
 }
@@ -130,8 +130,8 @@ QAction* SARibbonButtonGroupWidget::addAction(QAction* a,
                                               Qt::ToolButtonStyle buttonStyle,
                                               QToolButton::ToolButtonPopupMode popMode)
 {
-	SARibbonPannel::setActionToolButtonStyleProperty(a, buttonStyle);
-	SARibbonPannel::setActionToolButtonPopupModeProperty(a, popMode);
+	SARibbonPanel::setActionToolButtonStyleProperty(a, buttonStyle);
+	SARibbonPanel::setActionToolButtonPopupModeProperty(a, popMode);
 	QWidget::addAction(a);
 	return (a);
 }

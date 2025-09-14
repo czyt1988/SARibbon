@@ -60,15 +60,15 @@ SARibbonCategory > SARibbonSeparatorWidget {
   margin-bottom:3px;
 }
 
-/*SARibbonPannel*/
+/*SARibbonPanel*/
 
-SARibbonPannel {
+SARibbonPanel {
   background-color: white;
   border: none;
   color: #666666;
 }
 
-SARibbonPannel > SARibbonButtonGroupWidget {
+SARibbonPanel > SARibbonButtonGroupWidget {
   border: 1px solid #c2d0df;
 }
 /*SARibbonButtonGroupWidget*/
@@ -76,21 +76,21 @@ SARibbonButtonGroupWidget {
   background-color: transparent;
 }
 
-/*SARibbonPannelLabel Pannel下标题栏*/
+/*SARibbonPanelLabel Panel下标题栏*/
 
-SARibbonPannelLabel {
+SARibbonPanelLabel {
     background-color: transparent;
     color: #666666;
 }
 
-/*SARibbonPannelOptionButton*/
+/*SARibbonPanelOptionButton*/
 
-SARibbonPannelOptionButton {
+SARibbonPanelOptionButton {
   background-color: transparent;
   color: #333;
 }
 
-SARibbonPannelOptionButton:hover {
+SARibbonPanelOptionButton:hover {
   background-color: #cee7fc;
   border: 0px;
 }
@@ -161,7 +161,7 @@ SARibbonTabBar::tab:hover:!selected {
 
 /*SARibbonToolButton*/
 /* 
-SARibbonToolButton的背景颜色必须和pannel或者category的颜色一致
+SARibbonToolButton的背景颜色必须和panel或者category的颜色一致
 不能设置为transparent，否则在ActionMenu模式下，上下区分的按钮无法显示 
 */
 SARibbonToolButton {

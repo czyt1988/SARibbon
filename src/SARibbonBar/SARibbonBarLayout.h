@@ -79,9 +79,9 @@ public:
 	int categoryHeight() const;
 	void setCategoryHeight(int h);
 
-	// 设置pannel的标题栏高度
-	int pannelTitleHeight() const;
-	void setPannelTitleHeight(int h);
+	// 设置panel的标题栏高度
+	int panelTitleHeight() const;
+	void setPanelTitleHeight(int h);
 
 	// 获取元素
 	SARibbonBar* ribbonBar() const;
