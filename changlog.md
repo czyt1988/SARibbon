@@ -2,6 +2,7 @@
 
 ## 2025-09-10 -> 2.5.0
 
+- 修正了原来panel的拼写错误，原来所有pannel的拼写都改为panel
 - 调整`SARibbonToolButton`的`setEnableWordWrap`方法，由原来静态方法调整为成员函数，避免跨库创建导致状态不同步问题
 - `SARibbonToolButton`大按钮增加icononly和textonly模式
 - 调整`SARibbonToolButton`的实现，调整了刷新策略，增加了sizehint的缓存，提升性能
