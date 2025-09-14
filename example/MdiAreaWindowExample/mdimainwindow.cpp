@@ -24,9 +24,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::buildMainPage(SARibbonCategory* mainPage)
 {
-	SARibbonPanel* mainPannel = new SARibbonPanel("operate");
-	mainPannel->addAction(ui->actionadd_window);
-	mainPage->addPanel(mainPannel);
+	SARibbonPanel* mainPanel = new SARibbonPanel("operate");
+	mainPanel->addAction(ui->actionadd_window);
+	mainPage->addPanel(mainPanel);
 }
 
 void MainWindow::on_actionadd_window_triggered()

@@ -8,19 +8,19 @@ MainWindow::MainWindow(QWidget* parent) : SARibbonMainWindow(parent)
 	SARibbonBar* bar = ribbonBar();
 	bar->applicationButton()->setText(tr("&File"));
 	SARibbonCategory* mainCate = bar->addCategoryPage(tr("Main"));
-	SARibbonPannel* pannel     = mainCate->addPannel(tr("actions"));
-	pannel->addAction(tr("action1"), QIcon(":/app/icon/action.svg"), QToolButton::InstantPopup);
-	pannel->addAction(tr("action2"), QIcon(":/app/icon/customize0.svg"), QToolButton::InstantPopup);
-	pannel->addAction(tr("action3"), QIcon(":/app/icon/save.svg"), QToolButton::InstantPopup);
-	pannel->addAction(tr("action4"), QIcon(":/app/icon/item.svg"), QToolButton::InstantPopup, SARibbonPanelItem::Small);
-	pannel->addAction(
+	SARibbonPanel* panel     = mainCate->addPanel(tr("actions"));
+	panel->addAction(tr("action1"), QIcon(":/app/icon/action.svg"), QToolButton::InstantPopup);
+	panel->addAction(tr("action2"), QIcon(":/app/icon/customize0.svg"), QToolButton::InstantPopup);
+	panel->addAction(tr("action3"), QIcon(":/app/icon/save.svg"), QToolButton::InstantPopup);
+	panel->addAction(tr("action4"), QIcon(":/app/icon/item.svg"), QToolButton::InstantPopup, SARibbonPanelItem::Small);
+	panel->addAction(
 		tr("action5"), QIcon(":/app/icon/folder-star.svg"), QToolButton::InstantPopup, SARibbonPanelItem::Small);
-	pannel->addAction(tr("action6"), QIcon(":/app/icon/test1.svg"), QToolButton::InstantPopup, SARibbonPanelItem::Small);
+	panel->addAction(tr("action6"), QIcon(":/app/icon/test1.svg"), QToolButton::InstantPopup, SARibbonPanelItem::Small);
 	SARibbonCategory* otherCate = bar->addCategoryPage(tr("Other"));
-	SARibbonPannel* pannel2     = otherCate->addPannel(tr("other"));
-	pannel2->addAction(tr("action1"), QIcon(":/app/icon/action.svg"), QToolButton::InstantPopup);
+	SARibbonPanel* panel2     = otherCate->addPanel(tr("other"));
+	panel2->addAction(tr("action1"), QIcon(":/app/icon/action.svg"), QToolButton::InstantPopup);
 	QComboBox* combo = new QComboBox(this);
-	pannel2->addMediumWidget(combo);
+	panel2->addMediumWidget(combo);
 	combo->addItem("RibbonThemeWindows7", static_cast< int >(SARibbonTheme::RibbonThemeWindows7));
 	combo->addItem("RibbonThemeOffice2013", static_cast< int >(SARibbonTheme::RibbonThemeOffice2013));
 	combo->addItem("RibbonThemeOffice2016Blue", static_cast< int >(SARibbonTheme::RibbonThemeOffice2016Blue));
