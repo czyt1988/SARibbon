@@ -12,18 +12,22 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Install Doxygen
       run: sudo apt-get update && sudo apt-get install -y doxygen graphviz
 
     - name: Generate docs
       run: |
+        mkdir -p ../_site
         cd doc
-        doxygen Doxyfile-wiki-cn
-        # 确保生成 .nojekyll 文件
+        doxygen Doxyfile-wiki-cn || exit 1
+        cd ..
         touch _site/.nojekyll
+
+    - name: Debug: Verify _site content
+      run: |
+        ls -la ./_site
+        find ./_site -type f | wc -l
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
