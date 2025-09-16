@@ -85,7 +85,7 @@ public:
 	Qt::Alignment mTitleAligment { Qt::AlignCenter };       ///< 标题对齐方式
 	bool mIsTitleVisible { true };                          ///< 标题是否显示
 	QBrush mTitleBackgroundBrush { Qt::NoBrush };           ///< 标题的背景颜色
-	SARibbonAlignment mRibbonAlignment { SARibbonAlignment::AlignLeft };                       ///< 对齐方式
+    SARibbonAlignment mRibbonAlignment { SARibbonAlignment::AlignLeft };                     ///< 对齐方式
 	SARibbonPanel::PanelLayoutMode mDefaulePanelLayoutMode { SARibbonPanel::ThreeRowMode };  ///< 默认的PanelLayoutMode
 	bool mEnableShowPanelTitle { true };  ///< 是否允许panel的标题栏显示
 	int mPanelSpacing { 0 };              ///< panel的spacing,这个参数不参与布局，仅仅记录
@@ -2275,9 +2275,9 @@ void SARibbonBar::paintInCompactStyle()
 		if (!contextData.tabPageIndex.isEmpty()) {
 			// 绘制
 			paintContextCategoryTab(p,
-									contextData.contextCategory->contextTitle(),
-									contextTitleRect,
-									contextData.contextCategory->contextColor());
+                                    contextData.contextCategory->contextTitle(),
+                                    contextTitleRect,
+                                    contextData.contextCategory->contextColor());
 		}
 	}
 

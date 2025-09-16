@@ -31,7 +31,7 @@ target_link_libraries(MainWindowExample PUBLIC
                                        Qt${QT_VERSION_MAJOR}::Core 
                                        Qt${QT_VERSION_MAJOR}::Gui 
                                        Qt${QT_VERSION_MAJOR}::Widgets)
-                                           
+
 set_target_properties(MainWindowExample PROPERTIES
     AUTOMOC ON
     AUTORCC ON

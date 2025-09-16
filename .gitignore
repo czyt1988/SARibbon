@@ -1,5 +1,6 @@
 ﻿bin_*
 build*
+docs
 *.user
 *.autosave
 *.dll

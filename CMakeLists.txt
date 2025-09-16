@@ -12,7 +12,7 @@ set(SARIBBON_VERSION "${SARIBBON_VERSION_MAJOR}.${SARIBBON_VERSION_MINOR}.${SARI
 message(STATUS "SARibbon v${SARIBBON_VERSION}")
 project(SARibbon VERSION ${SARIBBON_VERSION} LANGUAGES CXX)
 
-# option(BUILD_SHARED_LIBS "build the SARibbonBar in shared lib mode" ON)
+option(SARIBBON_BUILD_STATIC_LIBS "build the SARibbonBar in static lib mode" OFF)
 option(SARIBBON_BUILD_EXAMPLES "build the examples" ON)
 # frameless能提供windows的窗口特效，如边缘吸附，且对高分屏多屏幕的支持更好,默认开启
 option(SARIBBON_USE_FRAMELESS_LIB "Using the QWindowKit library as a frameless solution" OFF)
@@ -180,6 +180,18 @@ configure_file (
 ##################################
 # 代码目录
 ##################################
+
+# 根据 SARIBBON_BUILD_STATIC_LIBS 的值来设置 BUILD_SHARED_LIBS
+# 如果 SARIBBON_BUILD_STATIC_LIBS 为 ON，则 BUILD_SHARED_LIBS 应为 OFF
+# 如果 SARIBBON_BUILD_STATIC_LIBS 为 OFF，则 BUILD_SHARED_LIBS 应为 ON
+# 注意：option() 命令不会覆盖已存在的变量值，所以需要使用 set() 和 FORCE
+if(SARIBBON_BUILD_STATIC_LIBS)
+    set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries (DLLs)" FORCE)
+    message(STATUS "SARIBBON_BUILD_STATIC_LIBS is ON. Setting BUILD_SHARED_LIBS to OFF (Static Library mode).")
+else()
+    set(BUILD_SHARED_LIBS ON CACHE BOOL "Build shared libraries (DLLs)" FORCE)
+    message(STATUS "SARIBBON_BUILD_STATIC_LIBS is OFF. Setting BUILD_SHARED_LIBS to ON (Shared Library/DLL mode).")
+endif()
 
 add_subdirectory(src)
 

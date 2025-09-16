@@ -125,12 +125,21 @@ SET(SARIBBON_RESOURCE_FILES
 message(STATUS "SARibbon resource file:${SARIBBON_RESOURCE_FILES}")
 ################################################################
 
+# 使用 qt5_add_resources 或 qt6_add_resources (根据您的 Qt 版本)
+# 这会生成一个 C++ 源文件列表，其中包含处理后的资源
+if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
+    qt6_add_resources(SARIBBON_GENERATED_RESOURCES ${SARIBBON_RESOURCE_FILES})
+else()
+    qt5_add_resources(SARIBBON_GENERATED_RESOURCES ${SARIBBON_RESOURCE_FILES})
+endif()
+
 add_library(${SARIBBON_LIB_NAME}
     ${SARIBBON_HEADER_FILES}
     ${SARIBBON_SOURCE_FILES}
-    ${SARIBBON_RESOURCE_FILES}
     ${SACOLOR_HEADER_FILES}
     ${SACOLOR_SOURCE_FILES}
+    # 这里不直接包含 .qrc 文件${SARIBBON_RESOURCE_FILES},而是包含由 Qt 工具生成的源文件
+    ${SARIBBON_GENERATED_RESOURCES}
 )
 add_library(${SARIBBON_LIB_NAME}::${SARIBBON_LIB_NAME} ALIAS ${SARIBBON_LIB_NAME})
 #################################################
@@ -169,13 +178,15 @@ set_target_properties(${SARIBBON_LIB_NAME} PROPERTIES
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}"
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}"
 )
-# 构建库定义的宏,此宏必须为PRIVATE
-if (BUILD_SHARED_LIBS)
+
+# 构建库定义的宏
+if (SARIBBON_BUILD_STATIC_LIBS)
+    target_compile_definitions(${SARIBBON_LIB_NAME} PRIVATE SA_RIBBON_BAR_NO_EXPORT)
+    target_compile_definitions(${SARIBBON_LIB_NAME} INTERFACE SA_RIBBON_BAR_NO_EXPORT)
+    message(STATUS "macros predefined:#define SA_RIBBON_BAR_NO_EXPORT")
+else()
     target_compile_definitions(${SARIBBON_LIB_NAME} PRIVATE SA_RIBBON_BAR_MAKE_LIB)
     message(STATUS "macros predefined:#define SA_RIBBON_BAR_MAKE_LIB")
-else()
-    target_compile_definitions(${SARIBBON_LIB_NAME} PRIVATE SA_RIBBON_BAR_NO_EXPORT)
-    message(STATUS "macros predefined:#define SA_RIBBON_BAR_NO_EXPORT")
 endif()
 
 # 使用SAColorWidgets但不作为库使用定义的宏,此宏必须为PRIVATE

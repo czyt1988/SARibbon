@@ -1,0 +1,33 @@
+name: Deploy Doxygen Docs to GitHub Pages
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Install Doxygen
+      run: sudo apt-get update && sudo apt-get install -y doxygen graphviz
+
+    - name: Generate docs
+      run: |
+        cd doc
+        doxygen Doxyfile-wiki-cn
+        # 确保生成 .nojekyll 文件
+        touch ../docs/.nojekyll
+
+    - name: Deploy to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        publish_dir: ./docs
+        keep_files: false

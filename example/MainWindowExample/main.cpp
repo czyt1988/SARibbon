@@ -43,6 +43,11 @@ void log_out_put(QtMsgType type, const QMessageLogContext& context, const QStrin
 #endif
 }
 
+#ifdef SA_RIBBON_BAR_NO_EXPORT
+// 针对静态编译，需要在库加载时显示的调用资源函数，否则资源不会加载
+extern int qInitResources_SARibbonResource();
+#endif
+
 int main(int argc, char* argv[])
 {
     // 以下是针对高分屏的设置，有高分屏需求都需要按照下面进行设置
@@ -50,6 +55,9 @@ int main(int argc, char* argv[])
 
     QApplication a(argc, argv);
     qInstallMessageHandler(log_out_put);
+#ifdef SA_RIBBON_BAR_NO_EXPORT
+    qInitResources_SARibbonResource();  // 针对静态库的资源加载
+#endif
     QFont f = a.font();
     f.setFamily(u8"微软雅黑");
     a.setFont(f);
