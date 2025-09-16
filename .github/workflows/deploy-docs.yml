@@ -23,11 +23,12 @@ jobs:
         cd doc
         doxygen Doxyfile-wiki-cn
         # 确保生成 .nojekyll 文件
-        touch ../docs/.nojekyll
+        touch _site/.nojekyll
 
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./docs
+        publish_dir: ./_site
+        publish_branch: gh-pages
         keep_files: false
