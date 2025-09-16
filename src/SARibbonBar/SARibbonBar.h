@@ -211,8 +211,9 @@ public:
 	void removeCategory(SARibbonCategory* category);
 
 	// 添加一个上下文标签
-	SARibbonContextCategory*
-	addContextCategory(const QString& title, const QColor& color = QColor(), const QVariant& id = QVariant());
+    SARibbonContextCategory* addContextCategory(const QString& title,
+                                                const QColor& color = QColor(),
+                                                const QVariant& id  = QVariant());
 	void addContextCategory(SARibbonContextCategory* context);
 
 	// 显示一个上下文标签
@@ -477,81 +478,11 @@ protected:
 
 	virtual void paintTabbarBaseLine(QPainter& painter);
 	virtual void paintWindowTitle(QPainter& painter, const QString& title, const QRect& titleRegion);
-	virtual void
-	paintContextCategoryTab(QPainter& painter, const QString& title, const QRect& contextRect, const QColor& color);
+    virtual void paintContextCategoryTab(QPainter& painter, const QString& title, const QRect& contextRect, const QColor& color);
 #if SA_DEBUG_PRINT_SARIBBONBAR
 	SA_RIBBON_EXPORT friend QDebug operator<<(QDebug debug, const SARibbonBar& ribbon);
 #endif
 };
 Q_DECLARE_OPERATORS_FOR_FLAGS(SARibbonBar::RibbonStyles)
 
-namespace SA
-{
-/**
- * @brief makeColorVibrant 让颜色鲜艳
- * @param c 原来的颜色
- * @param saturationDelta 增加饱和度（上限255）
- * @param valueDelta 增加明度（上限255）
- * @return
- */
-QColor SA_RIBBON_EXPORT makeColorVibrant(const QColor& c, int saturationDelta = 150, int valueDelta = 30);
-
-/**
- * @brief 按照指定的新高度，保持宽高比缩放 QSize。
- *
- * 此函数根据原始尺寸的宽高比，计算出在指定新高度下的对应宽度，
- * 并返回一个新的 QSize 对象。
- *
- * @param originalSize 原始尺寸。
- * @param newHeight    缩放后的新高度。
- * @return             按比例缩放后的 QSize。
- *
- * @par 示例：
- * @code
- * QSize original(800, 600);
- * QSize scaled = scaleSizeByHeight(original, 300);
- * // scaled 将是 (400, 300)
- * @endcode
- */
-QSize scaleSizeByHeight(const QSize& originalSize, int newHeight);
-
-/**
- * @brief 按照指定的新高度，宽高比为1:factor缩放 QSize。
- *
- * 此函数根据原始尺寸的宽高比，计算出在指定新高度下的对应宽度，
- * 并返回一个新的 QSize 对象。
- *
- * @param originalSize 原始尺寸。
- * @param newHeight    缩放后的新高度。
- * @param factor    宽高比 1:factor factor=1时，此函数和scaleSizeByHeight的两参数版本一样，如果factor=0.5，则宽高比为1:0.5，也就是高度扩充2倍，宽度扩充1倍
- * @return             按比例缩放后的 QSize。
- *
- * @par 示例：
- * @code
- * QSize original(800, 600);
- * QSize scaled = scaleSizeByHeight(original, 300, 2);
- * // scaled 将是 (600, 300)
- * @endcode
- */
-QSize scaleSizeByHeight(const QSize& originalSize, int newHeight, qreal factor);
-
-/**
- * @brief 按照指定的新宽度，保持宽高比缩放 QSize。
- *
- * 此函数根据原始尺寸的宽高比，计算出在指定新宽度下的对应高度，
- * 并返回一个新的 QSize 对象。
- *
- * @param originalSize 原始尺寸。
- * @param newWidth     缩放后的新宽度。
- * @return             按比例缩放后的 QSize。
- *
- * @par 示例：
- * @code
- * QSize original(800, 600);
- * QSize scaled = scaleSizeByWidth(original, 400);
- * // scaled 将是 (400, 300)
- * @endcode
- */
-QSize scaleSizeByWidth(const QSize& originalSize, int newWidth);
-}
 #endif  // SARIBBONBAR_H

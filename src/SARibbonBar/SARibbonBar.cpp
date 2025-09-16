@@ -12,6 +12,7 @@
 #include <QTimer>
 #include <QVariant>
 #include <QDateTime>
+#include "SARibbonUtil.h"
 #include "SARibbonButtonGroupWidget.h"
 #include "SARibbonElementManager.h"
 #include "SARibbonQuickAccessBar.h"
@@ -144,7 +145,7 @@ void SARibbonBar::PrivateData::init()
 	//
 	mQuickAccessBar = RibbonSubElementFactory->createQuickAccessBar(q_ptr);
 	mQuickAccessBar->setObjectName(QStringLiteral("objSARibbonQuickAccessBar"));
-	mQuickAccessBar->setIcon(q_ptr->windowIcon());
+    mQuickAccessBar->setIconSize(QSize(22, 22));
 	//
 	mRightButtonGroup = RibbonSubElementFactory->createButtonGroupWidget(q_ptr);
 	//
@@ -994,12 +995,14 @@ void SARibbonBar::showMinimumModeButton(bool isShow)
 		activeRightButtonGroup();
 
 		d_ptr->mMinimumCategoryButtonAction = new QAction(this);
-		d_ptr->mMinimumCategoryButtonAction->setIcon(style()->standardIcon(
-			isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton, nullptr));
+        d_ptr->mMinimumCategoryButtonAction->setIcon(
+            style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton,
+                                  nullptr));
 		connect(d_ptr->mMinimumCategoryButtonAction, &QAction::triggered, this, [ this ]() {
 			this->setMinimumMode(!isMinimumMode());
-			this->d_ptr->mMinimumCategoryButtonAction->setIcon(style()->standardIcon(
-				isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton, nullptr));
+            this->d_ptr->mMinimumCategoryButtonAction->setIcon(
+                style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton,
+                                      nullptr));
 		});
 		d_ptr->mRightButtonGroup->addAction(d_ptr->mMinimumCategoryButtonAction);
 	}
@@ -1157,8 +1160,8 @@ void SARibbonBar::onWindowTitleChanged(const QString& title)
 
 void SARibbonBar::onWindowIconChanged(const QIcon& i)
 {
-	if (quickAccessBar()) {
-		quickAccessBar()->setIcon(i);
+    if (SARibbonBarLayout* lay = qobject_cast< SARibbonBarLayout* >(layout())) {
+        lay->setWindowIcon(i);
 	}
 }
 
@@ -1417,7 +1420,6 @@ SARibbonQuickAccessBar* SARibbonBar::activeQuickAccessBar()
 	if (nullptr == d_ptr->mQuickAccessBar) {
 		d_ptr->mQuickAccessBar = RibbonSubElementFactory->createQuickAccessBar(this);
 		d_ptr->mQuickAccessBar->setObjectName(QStringLiteral("objSARibbonQuickAccessBar"));
-		d_ptr->mQuickAccessBar->setIcon(windowIcon());
 	}
 	d_ptr->mQuickAccessBar->show();
 	return d_ptr->mQuickAccessBar;
@@ -1451,7 +1453,6 @@ void SARibbonBar::setRibbonStyle(SARibbonBar::RibbonStyles v)
 	// 执行判断
 	setEnableWordWrap(isThreeRowStyle(v));
 	setTabOnTitle(isCompactStyle());
-	d_ptr->mQuickAccessBar->setEnableShowIcon(isLooseStyle());
 	setEnableShowPanelTitle(isThreeRowStyle(v));
 	setPanelLayoutMode(isThreeRowStyle(v) ? SARibbonPanel::ThreeRowMode : SARibbonPanel::TwoRowMode);
 
@@ -2245,9 +2246,9 @@ void SARibbonBar::paintInLooseStyle()
 		if (!contextData.tabPageIndex.isEmpty()) {
 			// 绘制
 			paintContextCategoryTab(p,
-									contextData.contextCategory->contextTitle(),
-									contextTitleRect,
-									contextData.contextCategory->contextColor());
+                                    contextData.contextCategory->contextTitle(),
+                                    contextTitleRect,
+                                    contextData.contextCategory->contextColor());
 		}
 	}
 
@@ -2471,67 +2472,4 @@ void SARibbonBar::paintWindowTitle(QPainter& painter, const QString& title, cons
 
 	painter.drawText(titleRegion, d_ptr->mTitleAligment, title);
 	painter.restore();
-}
-
-namespace SA
-{
-QColor makeColorVibrant(const QColor& c, int saturationDelta, int valueDelta)
-{
-	int h, s, v, a;
-	c.getHsv(&h, &s, &v, &a);  // 分解HSV分量
-
-	// 增加饱和度（上限255）
-	s = qMin(s + saturationDelta, 255);
-	// 增加明度（上限255）
-	v = qMin(v + valueDelta, 255);
-
-	return QColor::fromHsv(h, s, v, a);  // 重新生成颜色
-}
-
-QSize scaleSizeByHeight(const QSize& originalSize, int newHeight)
-{
-	// 检查原始尺寸高度、宽度是否有效，以及目标高度是否有效
-	if (originalSize.height() <= 0 || originalSize.width() < 0 || newHeight <= 0) {
-		return QSize(0, 0);  // 无效输入返回零尺寸
-	}
-
-	// 计算宽高比并缩放
-	float aspectRatio = static_cast< float >(originalSize.width()) / static_cast< float >(originalSize.height());
-	int newWidth      = static_cast< int >(newHeight * aspectRatio);
-	return QSize(newWidth, newHeight);
-}
-
-QSize scaleSizeByHeight(const QSize& originalSize, int newHeight, qreal factor)
-{
-	// 1. 参数合法性检查
-	if (originalSize.height() <= 0 || originalSize.width() < 0 || newHeight <= 0 || qFuzzyIsNull(factor)) {
-		return QSize(0, 0);
-	}
-
-	// 2. 计算原始宽高比
-	const qreal originalAspect = static_cast< qreal >(originalSize.width()) / static_cast< qreal >(originalSize.height());
-
-	// 3. 把用户提供的 1:factor 转换成真正的目标宽高比
-	//    目标宽高比 = originalAspect / factor
-	const qreal targetAspect = originalAspect / factor;
-
-	// 4. 根据新高度反推宽度
-	const int newWidth = qRound(newHeight * targetAspect);
-
-	return QSize(newWidth, newHeight);
-}
-
-QSize scaleSizeByWidth(const QSize& originalSize, int newWidth)
-{
-	// 检查原始尺寸宽度、高度是否有效，以及目标宽度是否有效
-	if (originalSize.width() <= 0 || originalSize.height() < 0 || newWidth <= 0) {
-		return QSize(0, 0);  // 无效输入返回零尺寸
-	}
-
-	// 计算高宽比并缩放
-	float aspectRatio = static_cast< float >(originalSize.height()) / static_cast< float >(originalSize.width());
-	int newHeight     = static_cast< int >(newWidth * aspectRatio);
-	return QSize(newWidth, newHeight);
-}
-
 }

@@ -1,4 +1,5 @@
 ﻿#include "SARibbonMainWindow.h"
+#include "SARibbonUtil.h"
 #include "SARibbonBar.h"
 #include "SARibbonElementManager.h"
 #include "SARibbonTabBar.h"
@@ -79,13 +80,13 @@ void SARibbonMainWindow::PrivateData::checkMainWindowFlag()
 {
 	// 如果都没有设置边框样式，默认设置为ribbon边框
 	if (!mRibbonMainWindowStyle.testFlag(SARibbonMainWindowStyleFlag::UseRibbonFrame)
-		&& !mRibbonMainWindowStyle.testFlag(SARibbonMainWindowStyleFlag::UseNativeFrame)) {
+        && !mRibbonMainWindowStyle.testFlag(SARibbonMainWindowStyleFlag::UseNativeFrame)) {
 		mRibbonMainWindowStyle.setFlag(SARibbonMainWindowStyleFlag::UseRibbonFrame, true);
 	}
 
 	// 如果都没有设置MenuBar，默认设置为ribbonbar
 	if (!mRibbonMainWindowStyle.testFlag(SARibbonMainWindowStyleFlag::UseRibbonMenuBar)
-		&& !mRibbonMainWindowStyle.testFlag(SARibbonMainWindowStyleFlag::UseNativeMenuBar)) {
+        && !mRibbonMainWindowStyle.testFlag(SARibbonMainWindowStyleFlag::UseNativeMenuBar)) {
 		mRibbonMainWindowStyle.setFlag(SARibbonMainWindowStyleFlag::UseRibbonMenuBar, true);
 	}
 }

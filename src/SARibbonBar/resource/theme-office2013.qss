@@ -13,7 +13,7 @@ SARibbonBar {
 
 /*SARibbonQuickAccessBar*/
 SARibbonQuickAccessBar {
-  background-color: #cee8fc;
+  background-color: transparent;
 }
 
 /*SARibbonCtrlContainer*/
@@ -61,7 +61,6 @@ SARibbonCategory > SARibbonSeparatorWidget {
 }
 
 /*SARibbonPanel*/
-
 SARibbonPanel {
   background-color: white;
   border: none;

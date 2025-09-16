@@ -83,6 +83,10 @@ public:
 	int panelTitleHeight() const;
 	void setPanelTitleHeight(int h);
 
+    // 设置图标
+    void setWindowIcon(const QIcon& icon);
+    QIcon windowIcon() const;
+
 	// 获取元素
 	SARibbonBar* ribbonBar() const;
 	SARibbonTabBar* ribbonTabBar() const;

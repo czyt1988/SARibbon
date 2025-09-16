@@ -33,6 +33,7 @@ SET(SACOLOR_SOURCE_FILES
 SET(SARIBBON_HEADER_FILES
     SARibbonBarVersionInfo.h
     SARibbonGlobal.h
+    SARibbonUtil.h
     SAFramelessHelper.h
     SARibbonActionsManager.h
     SARibbonBarLayout.h
@@ -76,6 +77,7 @@ SET(SARIBBON_HEADER_FILES
 # source files
 # cn:cpp文件
 SET(SARIBBON_SOURCE_FILES
+    SARibbonUtil.cpp
     SAFramelessHelper.cpp
     SARibbonActionsManager.cpp
     SARibbonBarLayout.cpp

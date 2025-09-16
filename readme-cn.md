@@ -20,6 +20,8 @@ QQ交流群:755294806、434014314(已满)
 <img src="./doc/SARibbon-qq交流群2.jpg" style="width:300px;"/>
 </div>
 
+项目文档：[https://czyt1988.github.io/SARibbon/](https://czyt1988.github.io/SARibbon/)
+
 ||Windows(latest)|Linux ubuntu(latest)|Mac(latest)|
 |:-|:-|:-|:-|
 |Qt5.12 LTS|[![cmake-win-qt5.12](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt5.12.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt5.12.yml)|[![CMake-Linux-Qt5.12](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt5.12.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt5.12.yml)|[![cmake-mac-qt5.12](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt5.12.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt5.12.yml)|

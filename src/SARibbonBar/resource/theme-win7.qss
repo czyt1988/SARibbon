@@ -14,7 +14,7 @@ SARibbonBar{
 
 /*SARibbonQuickAccessBar*/
 SARibbonQuickAccessBar{
-    background-color: #FF0000;
+  background-color: transparent;
 }
 
 
