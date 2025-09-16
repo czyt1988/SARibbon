@@ -183,15 +183,20 @@ set_target_properties(${SARIBBON_LIB_NAME} PROPERTIES
 if (SARIBBON_BUILD_STATIC_LIBS)
     target_compile_definitions(${SARIBBON_LIB_NAME} PRIVATE SA_RIBBON_BAR_NO_EXPORT)
     target_compile_definitions(${SARIBBON_LIB_NAME} INTERFACE SA_RIBBON_BAR_NO_EXPORT)
+    target_compile_definitions(${SARIBBON_LIB_NAME} PRIVATE SA_COLOR_WIDGETS_NO_DLL)
+    target_compile_definitions(${SARIBBON_LIB_NAME} INTERFACE SA_COLOR_WIDGETS_NO_DLL)
     message(STATUS "macros predefined:#define SA_RIBBON_BAR_NO_EXPORT")
+        message(STATUS "macros predefined:#define SA_COLOR_WIDGETS_NO_DLL")
 else()
     target_compile_definitions(${SARIBBON_LIB_NAME} PRIVATE SA_RIBBON_BAR_MAKE_LIB)
     message(STATUS "macros predefined:#define SA_RIBBON_BAR_MAKE_LIB")
+    # SAColorWidgets但不作为库使用定义的宏,此宏必须为PRIVATE
+    target_compile_definitions(${SARIBBON_LIB_NAME} PRIVATE SA_COLOR_WIDGETS_MAKE_LIB)
+    message(STATUS "macros predefined:#define SA_COLOR_WIDGETS_MAKE_LIB")
 endif()
 
-# 使用SAColorWidgets但不作为库使用定义的宏,此宏必须为PRIVATE
-target_compile_definitions(${SARIBBON_LIB_NAME} PRIVATE SA_COLOR_WIDGETS_MAKE_LIB)
-message(STATUS "macros predefined:#define SA_COLOR_WIDGETS_MAKE_LIB")
+
+
 if(_SARIBBON_USE_FRAMELESS_LIB)
     #使用frameless必须设置SARIBBON_USE_3RDPARTY_FRAMELESSHELPER宏为1,此宏必须为PUBLIC
     target_compile_definitions(${SARIBBON_LIB_NAME} PUBLIC SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1)
