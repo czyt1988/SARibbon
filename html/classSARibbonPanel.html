@@ -1,0 +1,2491 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "https://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="zh">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=11"/>
+<meta name="generator" content="Doxygen 1.9.8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>SARibbon: SARibbonPanel类 参考</title>
+<link href="tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="jquery.js"></script>
+<script type="text/javascript" src="dynsections.js"></script>
+<link href="navtree.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="resize.js"></script>
+<script type="text/javascript" src="navtreedata.js"></script>
+<script type="text/javascript" src="navtree.js"></script>
+<link href="search/search.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="search/searchdata.js"></script>
+<script type="text/javascript" src="search/search.js"></script>
+<link href="doxygen.css" rel="stylesheet" type="text/css" />
+<link href="doxygen-awesome.css" rel="stylesheet" type="text/css"/>
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+<div id="titlearea">
+<table cellspacing="0" cellpadding="0">
+ <tbody>
+ <tr id="projectrow">
+  <td id="projectlogo"><img alt="Logo" src="SA-logo.png"/></td>
+  <td id="projectalign">
+   <div id="projectname">SARibbon<span id="projectnumber">&#160;2.5.0</span>
+   </div>
+   <div id="projectbrief">SARibbon wiki</div>
+  </td>
+ </tr>
+ </tbody>
+</table>
+</div>
+<!-- end header part -->
+<!-- 制作者 Doxygen 1.9.8 -->
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+var searchBox = new SearchBox("searchBox", "search/",'.html');
+/* @license-end */
+</script>
+<script type="text/javascript" src="menudata.js"></script>
+<script type="text/javascript" src="menu.js"></script>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(function() {
+  initMenu('',true,false,'search.php','搜索');
+  $(document).ready(function() { init_search(); });
+});
+/* @license-end */
+</script>
+<div id="main-nav"></div>
+</div><!-- top -->
+<div id="side-nav" class="ui-resizable side-nav-resizable">
+  <div id="nav-tree">
+    <div id="nav-tree-contents">
+      <div id="nav-sync" class="sync"></div>
+    </div>
+  </div>
+  <div id="splitbar" style="-moz-user-select:none;" 
+       class="ui-resizable-handle">
+  </div>
+</div>
+<script type="text/javascript">
+/* @license magnet:?xt=urn:btih:d3d9a9a6595521f9666a5e94cc830dab83b65699&amp;dn=expat.txt MIT */
+$(document).ready(function(){initNavTree('classSARibbonPanel.html',''); initResizable(); });
+/* @license-end */
+</script>
+<div id="doc-content">
+<!-- window showing the filter options -->
+<div id="MSearchSelectWindow"
+     onmouseover="return searchBox.OnSearchSelectShow()"
+     onmouseout="return searchBox.OnSearchSelectHide()"
+     onkeydown="return searchBox.OnSearchSelectKey(event)">
+</div>
+
+<!-- iframe showing the search results (closed by default) -->
+<div id="MSearchResultsWindow">
+<div id="MSearchResults">
+<div class="SRPage">
+<div id="SRIndex">
+<div id="SRResults"></div>
+<div class="SRStatus" id="Loading">载入中...</div>
+<div class="SRStatus" id="Searching">搜索中...</div>
+<div class="SRStatus" id="NoMatches">未找到</div>
+</div>
+</div>
+</div>
+</div>
+
+<div class="header">
+  <div class="summary">
+<a href="#nested-classes">类</a> &#124;
+<a href="#pub-types">Public 类型</a> &#124;
+<a href="#signals">信号</a> &#124;
+<a href="#pub-methods">Public 成员函数</a> &#124;
+<a href="#pub-static-methods">静态 Public 成员函数</a> &#124;
+<a href="#pro-methods">Protected 成员函数</a> &#124;
+<a href="#properties">属性</a> &#124;
+<a href="#friends">友元</a> &#124;
+<a href="classSARibbonPanel-members.html">所有成员列表</a>  </div>
+  <div class="headertitle"><div class="title">SARibbonPanel类 参考</div></div>
+</div><!--header-->
+<div class="contents">
+
+<p>panel页窗口，panel是ribbon的面板用于承放控件 / Ribbon panel container, used to hold controls  
+ <a href="classSARibbonPanel.html#details">更多...</a></p>
+
+<p><code>#include &lt;<a class="el" href="SARibbonPanel_8h_source.html">SARibbonPanel.h</a>&gt;</code></p>
+<div class="dynheader">
+类 SARibbonPanel 继承关系图:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="classSARibbonPanel.png" alt=""/>
+ </div></div>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="nested-classes" name="nested-classes"></a>
+类</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><b>PrivateData</b></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-types" name="pub-types"></a>
+Public 类型</h2></td></tr>
+<tr class="memitem:a94ae3faab66b965f85480cfcaef84805" id="r_a94ae3faab66b965f85480cfcaef84805"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#a94ae3faab66b965f85480cfcaef84805">PanelLayoutMode</a> { <a class="el" href="classSARibbonPanel.html#a94ae3faab66b965f85480cfcaef84805aadb96810179ee98bdbc7725fae8e3f4d">ThreeRowMode</a>
+, <a class="el" href="classSARibbonPanel.html#a94ae3faab66b965f85480cfcaef84805a73d89111434a332ae84152bbacdfbf14">TwoRowMode</a>
+ }</td></tr>
+<tr class="memdesc:a94ae3faab66b965f85480cfcaef84805"><td class="mdescLeft">&#160;</td><td class="mdescRight">Layout mode for the panel / 面板的布局模式  <a href="classSARibbonPanel.html#a94ae3faab66b965f85480cfcaef84805">更多...</a><br /></td></tr>
+<tr class="separator:a94ae3faab66b965f85480cfcaef84805"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5eb5c135ebe6b90fbd835a1a26bd408c" id="r_a5eb5c135ebe6b90fbd835a1a26bd408c"><td class="memItemLeft" align="right" valign="top"><a id="a5eb5c135ebe6b90fbd835a1a26bd408c" name="a5eb5c135ebe6b90fbd835a1a26bd408c"></a>
+using&#160;</td><td class="memItemRight" valign="bottom"><b>FpRibbonToolButtonIterate</b> = std::function&lt; bool(<a class="el" href="classSARibbonToolButton.html">SARibbonToolButton</a> *) &gt;</td></tr>
+<tr class="separator:a5eb5c135ebe6b90fbd835a1a26bd408c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="signals" name="signals"></a>
+信号</h2></td></tr>
+<tr class="memitem:acf68e653683fb6d5fd078bad1977f6ef" id="r_acf68e653683fb6d5fd078bad1977f6ef"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#acf68e653683fb6d5fd078bad1977f6ef">actionTriggered</a> (QAction *action)</td></tr>
+<tr class="memdesc:acf68e653683fb6d5fd078bad1977f6ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">等同于QToolBar::actionTriggered  <br /></td></tr>
+<tr class="separator:acf68e653683fb6d5fd078bad1977f6ef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad923fa83f3116980ab1c9db2b004faf0" id="r_ad923fa83f3116980ab1c9db2b004faf0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#ad923fa83f3116980ab1c9db2b004faf0">panelNameChanged</a> (const QString &amp;n)</td></tr>
+<tr class="memdesc:ad923fa83f3116980ab1c9db2b004faf0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Emitted when the panel's name changes / 当面板名称改变时发出  <br /></td></tr>
+<tr class="separator:ad923fa83f3116980ab1c9db2b004faf0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public 成员函数</h2></td></tr>
+<tr class="memitem:aa55c1aea43e056b650b9532078be7832" id="r_aa55c1aea43e056b650b9532078be7832"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#aa55c1aea43e056b650b9532078be7832">SARibbonPanel</a> (QWidget *parent=nullptr)</td></tr>
+<tr class="memdesc:aa55c1aea43e056b650b9532078be7832"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a <a class="el" href="classSARibbonPanel.html" title="panel页窗口，panel是ribbon的面板用于承放控件 / Ribbon panel container, used to hold controls">SARibbonPanel</a> with the given parent / 使用给定的父对象构造SARibbonPanel  <br /></td></tr>
+<tr class="separator:aa55c1aea43e056b650b9532078be7832"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af43c096793b2a913a3ac1432613e34a8" id="r_af43c096793b2a913a3ac1432613e34a8"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#af43c096793b2a913a3ac1432613e34a8">SARibbonPanel</a> (const QString &amp;name, QWidget *parent=nullptr)</td></tr>
+<tr class="memdesc:af43c096793b2a913a3ac1432613e34a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs a <a class="el" href="classSARibbonPanel.html" title="panel页窗口，panel是ribbon的面板用于承放控件 / Ribbon panel container, used to hold controls">SARibbonPanel</a> with a name and the given parent / 使用名称和给定的父对象构造SARibbonPanel  <br /></td></tr>
+<tr class="separator:af43c096793b2a913a3ac1432613e34a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a044725c5b8ac4123f90e44e21ec58586" id="r_a044725c5b8ac4123f90e44e21ec58586"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#a044725c5b8ac4123f90e44e21ec58586">addAction</a> (QAction *action, <a class="el" href="classSARibbonPanelItem.html#a750c9ab520166584754d85b795af41b2">SARibbonPanelItem::RowProportion</a> rowProportion)</td></tr>
+<tr class="memdesc:a044725c5b8ac4123f90e44e21ec58586"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds an action to the panel / 向面板添加一个action  <br /></td></tr>
+<tr class="separator:a044725c5b8ac4123f90e44e21ec58586"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab53f006bab92ec478964265bc7f05afd" id="r_ab53f006bab92ec478964265bc7f05afd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#ab53f006bab92ec478964265bc7f05afd">addAction</a> (QAction *act, QToolButton::ToolButtonPopupMode popMode, <a class="el" href="classSARibbonPanelItem.html#a750c9ab520166584754d85b795af41b2">SARibbonPanelItem::RowProportion</a> rowProportion=<a class="el" href="classSARibbonPanelItem.html#a750c9ab520166584754d85b795af41b2ae165f14e7a21266f7a65a795dcb0d655">SARibbonPanelItem::Large</a>)</td></tr>
+<tr class="memdesc:ab53f006bab92ec478964265bc7f05afd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds an action with a specified popup mode / 添加一个具有指定弹出模式的action  <br /></td></tr>
+<tr class="separator:ab53f006bab92ec478964265bc7f05afd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2373bda81346cf222ad72684ac703953" id="r_a2373bda81346cf222ad72684ac703953"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#a2373bda81346cf222ad72684ac703953">addLargeAction</a> (QAction *action)</td></tr>
+<tr class="memdesc:a2373bda81346cf222ad72684ac703953"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a large action (occupies full height) / 添加一个大action（占据整个高度）  <br /></td></tr>
+<tr class="separator:a2373bda81346cf222ad72684ac703953"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf7dd6457e548d6afbd59a199026b0f1" id="r_abf7dd6457e548d6afbd59a199026b0f1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#abf7dd6457e548d6afbd59a199026b0f1">addMediumAction</a> (QAction *action)</td></tr>
+<tr class="memdesc:abf7dd6457e548d6afbd59a199026b0f1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a medium action / 添加一个中等action  <br /></td></tr>
+<tr class="separator:abf7dd6457e548d6afbd59a199026b0f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1f2b8ef6fd376dad7bdef16909444ac6" id="r_a1f2b8ef6fd376dad7bdef16909444ac6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#a1f2b8ef6fd376dad7bdef16909444ac6">addSmallAction</a> (QAction *action)</td></tr>
+<tr class="memdesc:a1f2b8ef6fd376dad7bdef16909444ac6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a small action / 添加一个小action  <br /></td></tr>
+<tr class="separator:a1f2b8ef6fd376dad7bdef16909444ac6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a02242fe111546a06059281c973425018" id="r_a02242fe111546a06059281c973425018"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#a02242fe111546a06059281c973425018">addSmallAction</a> (QAction *action, QToolButton::ToolButtonPopupMode popMode)</td></tr>
+<tr class="memdesc:a02242fe111546a06059281c973425018"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a small action with a specified popup mode / 添加一个具有指定弹出模式的小action  <br /></td></tr>
+<tr class="separator:a02242fe111546a06059281c973425018"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a24ee7492ae354086a68270148a4619c7" id="r_a24ee7492ae354086a68270148a4619c7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#a24ee7492ae354086a68270148a4619c7">addLargeAction</a> (QAction *action, QToolButton::ToolButtonPopupMode popMode)</td></tr>
+<tr class="memdesc:a24ee7492ae354086a68270148a4619c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a large action with a specified popup mode / 添加一个具有指定弹出模式的大action  <br /></td></tr>
+<tr class="separator:a24ee7492ae354086a68270148a4619c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9ed25b071a5fd2f7b4da72e4046b9b96" id="r_a9ed25b071a5fd2f7b4da72e4046b9b96"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#a9ed25b071a5fd2f7b4da72e4046b9b96">addMediumAction</a> (QAction *action, QToolButton::ToolButtonPopupMode popMode)</td></tr>
+<tr class="memdesc:a9ed25b071a5fd2f7b4da72e4046b9b96"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a medium action with a specified popup mode / 添加一个具有指定弹出模式的中等action  <br /></td></tr>
+<tr class="separator:a9ed25b071a5fd2f7b4da72e4046b9b96"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0ddebd286e9b6ed06b4db8f7dffc3253" id="r_a0ddebd286e9b6ed06b4db8f7dffc3253"><td class="memItemLeft" align="right" valign="top">QAction *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#a0ddebd286e9b6ed06b4db8f7dffc3253">addAction</a> (const QString &amp;text, const QIcon &amp;icon, QToolButton::ToolButtonPopupMode popMode, <a class="el" href="classSARibbonPanelItem.html#a750c9ab520166584754d85b795af41b2">SARibbonPanelItem::RowProportion</a> rowProportion=<a class="el" href="classSARibbonPanelItem.html#a750c9ab520166584754d85b795af41b2ae165f14e7a21266f7a65a795dcb0d655">SARibbonPanelItem::Large</a>)</td></tr>
+<tr class="memdesc:a0ddebd286e9b6ed06b4db8f7dffc3253"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates and adds a new action / 创建并添加一个新的action  <br /></td></tr>
+<tr class="separator:a0ddebd286e9b6ed06b4db8f7dffc3253"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a36ea36c652c30e4f5096576a06a10a20" id="r_a36ea36c652c30e4f5096576a06a10a20"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#a36ea36c652c30e4f5096576a06a10a20">addMenu</a> (QMenu *menu, <a class="el" href="classSARibbonPanelItem.html#a750c9ab520166584754d85b795af41b2">SARibbonPanelItem::RowProportion</a> rowProportion, QToolButton::ToolButtonPopupMode popMode=QToolButton::InstantPopup)</td></tr>
+<tr class="memdesc:a36ea36c652c30e4f5096576a06a10a20"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a menu to the panel / 向面板添加一个菜单  <br /></td></tr>
+<tr class="separator:a36ea36c652c30e4f5096576a06a10a20"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7510db2d0c5306c2160470199b2679ec" id="r_a7510db2d0c5306c2160470199b2679ec"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#a7510db2d0c5306c2160470199b2679ec">addLargeMenu</a> (QMenu *menu, QToolButton::ToolButtonPopupMode popMode=QToolButton::InstantPopup)</td></tr>
+<tr class="memdesc:a7510db2d0c5306c2160470199b2679ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a menu as a large button / 以大按钮形式添加一个菜单  <br /></td></tr>
+<tr class="separator:a7510db2d0c5306c2160470199b2679ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa0458234b9bc77a25d8629548fd57970" id="r_aa0458234b9bc77a25d8629548fd57970"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#aa0458234b9bc77a25d8629548fd57970">addSmallMenu</a> (QMenu *menu, QToolButton::ToolButtonPopupMode popMode=QToolButton::InstantPopup)</td></tr>
+<tr class="memdesc:aa0458234b9bc77a25d8629548fd57970"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a menu as a small button / 以小按钮形式添加一个菜单  <br /></td></tr>
+<tr class="separator:aa0458234b9bc77a25d8629548fd57970"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1cb414ebad098f3dff9880653cdef099" id="r_a1cb414ebad098f3dff9880653cdef099"><td class="memItemLeft" align="right" valign="top">QAction *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#a1cb414ebad098f3dff9880653cdef099">addWidget</a> (QWidget *w, <a class="el" href="classSARibbonPanelItem.html#a750c9ab520166584754d85b795af41b2">SARibbonPanelItem::RowProportion</a> rowProportion)</td></tr>
+<tr class="memdesc:a1cb414ebad098f3dff9880653cdef099"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a custom widget to the panel / 向面板添加一个自定义窗口部件  <br /></td></tr>
+<tr class="separator:a1cb414ebad098f3dff9880653cdef099"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acaa7332605074dc66902f71b461e918d" id="r_acaa7332605074dc66902f71b461e918d"><td class="memItemLeft" align="right" valign="top">QAction *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#acaa7332605074dc66902f71b461e918d">addSmallWidget</a> (QWidget *w)</td></tr>
+<tr class="memdesc:acaa7332605074dc66902f71b461e918d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a widget as a small button / 以小按钮形式添加一个窗口部件  <br /></td></tr>
+<tr class="separator:acaa7332605074dc66902f71b461e918d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad40ba30b193ed15f724bd6f7945128df" id="r_ad40ba30b193ed15f724bd6f7945128df"><td class="memItemLeft" align="right" valign="top">QAction *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#ad40ba30b193ed15f724bd6f7945128df">addMediumWidget</a> (QWidget *w)</td></tr>
+<tr class="memdesc:ad40ba30b193ed15f724bd6f7945128df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a widget as a medium button / 以中等按钮形式添加一个窗口部件  <br /></td></tr>
+<tr class="separator:ad40ba30b193ed15f724bd6f7945128df"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a864a80e6642a954302d31a67c73cf739" id="r_a864a80e6642a954302d31a67c73cf739"><td class="memItemLeft" align="right" valign="top">QAction *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#a864a80e6642a954302d31a67c73cf739">addLargeWidget</a> (QWidget *w)</td></tr>
+<tr class="memdesc:a864a80e6642a954302d31a67c73cf739"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a widget as a large button / 以大按钮形式添加一个窗口部件  <br /></td></tr>
+<tr class="separator:a864a80e6642a954302d31a67c73cf739"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a74fc7ef71b0c8d8ad823d4023426ccde" id="r_a74fc7ef71b0c8d8ad823d4023426ccde"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSARibbonGallery.html">SARibbonGallery</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#a74fc7ef71b0c8d8ad823d4023426ccde">addGallery</a> (bool expanding=true)</td></tr>
+<tr class="memdesc:a74fc7ef71b0c8d8ad823d4023426ccde"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a gallery widget to the panel / 向面板添加一个画廊窗口部件  <br /></td></tr>
+<tr class="separator:a74fc7ef71b0c8d8ad823d4023426ccde"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afc911bba543ed53b8baf1e73e2a033da" id="r_afc911bba543ed53b8baf1e73e2a033da"><td class="memItemLeft" align="right" valign="top">QAction *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#afc911bba543ed53b8baf1e73e2a033da">addSeparator</a> ()</td></tr>
+<tr class="memdesc:afc911bba543ed53b8baf1e73e2a033da"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a separator / 添加一个分隔符  <br /></td></tr>
+<tr class="separator:afc911bba543ed53b8baf1e73e2a033da"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0ff98230acd20d3f7cfecf92c2ac262a" id="r_a0ff98230acd20d3f7cfecf92c2ac262a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSARibbonToolButton.html">SARibbonToolButton</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#a0ff98230acd20d3f7cfecf92c2ac262a">actionToRibbonToolButton</a> (QAction *action)</td></tr>
+<tr class="memdesc:a0ff98230acd20d3f7cfecf92c2ac262a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieves the <a class="el" href="classSARibbonToolButton.html" title="Ribbon interface adapted tool button / Ribbon界面适用的toolButton">SARibbonToolButton</a> associated with an action / 获取与action关联的SARibbonToolButton  <br /></td></tr>
+<tr class="separator:a0ff98230acd20d3f7cfecf92c2ac262a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5c4e32cb9846f97deb854f161a69a032" id="r_a5c4e32cb9846f97deb854f161a69a032"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#a5c4e32cb9846f97deb854f161a69a032">setOptionAction</a> (QAction *action)</td></tr>
+<tr class="memdesc:a5c4e32cb9846f97deb854f161a69a032"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the option action for the panel / 为面板设置选项action  <br /></td></tr>
+<tr class="separator:a5c4e32cb9846f97deb854f161a69a032"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a27a02536f720ff3be58ce6584b43011c" id="r_a27a02536f720ff3be58ce6584b43011c"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#a27a02536f720ff3be58ce6584b43011c">isHaveOptionAction</a> () const</td></tr>
+<tr class="memdesc:a27a02536f720ff3be58ce6584b43011c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if an option action is set / 检查是否设置了选项action  <br /></td></tr>
+<tr class="separator:a27a02536f720ff3be58ce6584b43011c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6e40a06902e5f736778bcc69f26c36a1" id="r_a6e40a06902e5f736778bcc69f26c36a1"><td class="memItemLeft" align="right" valign="top">QList&lt; <a class="el" href="classSARibbonToolButton.html">SARibbonToolButton</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#a6e40a06902e5f736778bcc69f26c36a1">ribbonToolButtons</a> () const</td></tr>
+<tr class="memdesc:a6e40a06902e5f736778bcc69f26c36a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a list of all <a class="el" href="classSARibbonToolButton.html" title="Ribbon interface adapted tool button / Ribbon界面适用的toolButton">SARibbonToolButton</a> children / 返回所有SARibbonToolButton子对象的列表  <br /></td></tr>
+<tr class="separator:a6e40a06902e5f736778bcc69f26c36a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7139d9c05b3fe4e0672af1cebf67d2de" id="r_a7139d9c05b3fe4e0672af1cebf67d2de"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSARibbonPanel.html#a94ae3faab66b965f85480cfcaef84805">PanelLayoutMode</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#a7139d9c05b3fe4e0672af1cebf67d2de">panelLayoutMode</a> () const</td></tr>
+<tr class="memdesc:a7139d9c05b3fe4e0672af1cebf67d2de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the current layout mode / 获取当前的布局模式  <br /></td></tr>
+<tr class="separator:a7139d9c05b3fe4e0672af1cebf67d2de"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a738a78c58a01f782b9c679cc97bdbaa2" id="r_a738a78c58a01f782b9c679cc97bdbaa2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#a738a78c58a01f782b9c679cc97bdbaa2">setPanelLayoutMode</a> (<a class="el" href="classSARibbonPanel.html#a94ae3faab66b965f85480cfcaef84805">PanelLayoutMode</a> mode)</td></tr>
+<tr class="memdesc:a738a78c58a01f782b9c679cc97bdbaa2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the panel's layout mode / 设置面板的布局模式  <br /></td></tr>
+<tr class="separator:a738a78c58a01f782b9c679cc97bdbaa2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9b27de302f5183e9684f620e002c5ebf" id="r_a9b27de302f5183e9684f620e002c5ebf"><td class="memItemLeft" align="right" valign="top"><a id="a9b27de302f5183e9684f620e002c5ebf" name="a9b27de302f5183e9684f620e002c5ebf"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>resetToolButtonSize</b> ()</td></tr>
+<tr class="memdesc:a9b27de302f5183e9684f620e002c5ebf"><td class="mdescLeft">&#160;</td><td class="mdescRight">重置按钮的尺寸，在布局改变后（尤其高度变更），按钮的尺寸需要手动变更 <br /></td></tr>
+<tr class="separator:a9b27de302f5183e9684f620e002c5ebf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2a5b363e00858b79d93db4ac283305b3" id="r_a2a5b363e00858b79d93db4ac283305b3"><td class="memItemLeft" align="right" valign="top"><a id="a2a5b363e00858b79d93db4ac283305b3" name="a2a5b363e00858b79d93db4ac283305b3"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>isTwoRow</b> () const</td></tr>
+<tr class="separator:a2a5b363e00858b79d93db4ac283305b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afce08a48194a4847b9a15eb55d78573a" id="r_afce08a48194a4847b9a15eb55d78573a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#afce08a48194a4847b9a15eb55d78573a">setExpanding</a> (bool isExpanding=true)</td></tr>
+<tr class="memdesc:afce08a48194a4847b9a15eb55d78573a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the panel to expanding mode / 将面板设置为扩展模式  <br /></td></tr>
+<tr class="separator:afce08a48194a4847b9a15eb55d78573a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9436ede025d9de6c0ecb0bf7e0fcce3b" id="r_a9436ede025d9de6c0ecb0bf7e0fcce3b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#a9436ede025d9de6c0ecb0bf7e0fcce3b">isExpanding</a> () const</td></tr>
+<tr class="memdesc:a9436ede025d9de6c0ecb0bf7e0fcce3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if the panel is in expanding mode / 检查面板是否处于扩展模式  <br /></td></tr>
+<tr class="separator:a9436ede025d9de6c0ecb0bf7e0fcce3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ace44293541b922adf1e7c9943b86c5f4" id="r_ace44293541b922adf1e7c9943b86c5f4"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#ace44293541b922adf1e7c9943b86c5f4">titleHeight</a> () const</td></tr>
+<tr class="memdesc:ace44293541b922adf1e7c9943b86c5f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the height of the panel's title / 获取面板标题的高度  <br /></td></tr>
+<tr class="separator:ace44293541b922adf1e7c9943b86c5f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa014b6b2f815a323fbd1b75a13de519b" id="r_aa014b6b2f815a323fbd1b75a13de519b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#aa014b6b2f815a323fbd1b75a13de519b">isEnableShowTitle</a> () const</td></tr>
+<tr class="memdesc:aa014b6b2f815a323fbd1b75a13de519b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if the panel's title is visible / 检查面板标题是否可见  <br /></td></tr>
+<tr class="separator:aa014b6b2f815a323fbd1b75a13de519b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5d67bd343ba2d5257a6beba1c827f06f" id="r_a5d67bd343ba2d5257a6beba1c827f06f"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#a5d67bd343ba2d5257a6beba1c827f06f">actionIndex</a> (QAction *act) const</td></tr>
+<tr class="memdesc:a5d67bd343ba2d5257a6beba1c827f06f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the index of an action within the panel / 获取一个action在面板内的索引  <br /></td></tr>
+<tr class="separator:a5d67bd343ba2d5257a6beba1c827f06f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac48fc77cf00851f2c874f1f46be545f4" id="r_ac48fc77cf00851f2c874f1f46be545f4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#ac48fc77cf00851f2c874f1f46be545f4">moveAction</a> (int from, int to)</td></tr>
+<tr class="memdesc:ac48fc77cf00851f2c874f1f46be545f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Moves an action to a new position / 将一个action移动到新位置  <br /></td></tr>
+<tr class="separator:ac48fc77cf00851f2c874f1f46be545f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab486c4b1020cb6c75367af6cc4f32f4a" id="r_ab486c4b1020cb6c75367af6cc4f32f4a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#ab486c4b1020cb6c75367af6cc4f32f4a">isCanCustomize</a> () const</td></tr>
+<tr class="memdesc:ab486c4b1020cb6c75367af6cc4f32f4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if customization is allowed / 检查是否允许自定义  <br /></td></tr>
+<tr class="separator:ab486c4b1020cb6c75367af6cc4f32f4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8ac9bd4e3673aa159df0c4d53d4e07f3" id="r_a8ac9bd4e3673aa159df0c4d53d4e07f3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#a8ac9bd4e3673aa159df0c4d53d4e07f3">setCanCustomize</a> (bool b)</td></tr>
+<tr class="memdesc:a8ac9bd4e3673aa159df0c4d53d4e07f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets whether customization is allowed / 设置是否允许自定义  <br /></td></tr>
+<tr class="separator:a8ac9bd4e3673aa159df0c4d53d4e07f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2ba8946c383373cb19483f867f9d5a9b" id="r_a2ba8946c383373cb19483f867f9d5a9b"><td class="memItemLeft" align="right" valign="top">QString&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#a2ba8946c383373cb19483f867f9d5a9b">panelName</a> () const</td></tr>
+<tr class="memdesc:a2ba8946c383373cb19483f867f9d5a9b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the panel's name / 获取面板的名称  <br /></td></tr>
+<tr class="separator:a2ba8946c383373cb19483f867f9d5a9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac16846dcfbc4a1c0544c46e0ea15bbec" id="r_ac16846dcfbc4a1c0544c46e0ea15bbec"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#ac16846dcfbc4a1c0544c46e0ea15bbec">setPanelName</a> (const QString &amp;title)</td></tr>
+<tr class="memdesc:ac16846dcfbc4a1c0544c46e0ea15bbec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the panel's name / 设置面板的名称  <br /></td></tr>
+<tr class="separator:ac16846dcfbc4a1c0544c46e0ea15bbec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab95ff4876bc2dce9a9ae179cbc4b6780" id="r_ab95ff4876bc2dce9a9ae179cbc4b6780"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#ab95ff4876bc2dce9a9ae179cbc4b6780">largeButtonHeight</a> () const</td></tr>
+<tr class="memdesc:ab95ff4876bc2dce9a9ae179cbc4b6780"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the height of the large buttons in this panel / 获取此面板中大按钮的高度  <br /></td></tr>
+<tr class="separator:ab95ff4876bc2dce9a9ae179cbc4b6780"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab547ef27c48359ce81af44218acd390e" id="r_ab547ef27c48359ce81af44218acd390e"><td class="memItemLeft" align="right" valign="top">const QList&lt; <a class="el" href="classSARibbonPanelItem.html">SARibbonPanelItem</a> * &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#ab547ef27c48359ce81af44218acd390e">ribbonPanelItem</a> () const</td></tr>
+<tr class="memdesc:ab547ef27c48359ce81af44218acd390e"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取布局item  <br /></td></tr>
+<tr class="separator:ab547ef27c48359ce81af44218acd390e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4530332989d9b00ff7734c97f69c53d1" id="r_a4530332989d9b00ff7734c97f69c53d1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSARibbonPanelLayout.html">SARibbonPanelLayout</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#a4530332989d9b00ff7734c97f69c53d1">panelLayout</a> () const</td></tr>
+<tr class="memdesc:a4530332989d9b00ff7734c97f69c53d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the panel's layout object / 获取面板的布局对象  <br /></td></tr>
+<tr class="separator:a4530332989d9b00ff7734c97f69c53d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7a82858dd9b83f2b9e867b5296a28a3b" id="r_a7a82858dd9b83f2b9e867b5296a28a3b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#a7a82858dd9b83f2b9e867b5296a28a3b">updateItemGeometry</a> ()</td></tr>
+<tr class="memdesc:a7a82858dd9b83f2b9e867b5296a28a3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Updates the geometry of all items in the panel / 更新面板内所有项目的几何形状  <br /></td></tr>
+<tr class="separator:a7a82858dd9b83f2b9e867b5296a28a3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a83e75e0f5b2b8de01178fc012af0c956" id="r_a83e75e0f5b2b8de01178fc012af0c956"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSARibbonCategory.html">SARibbonCategory</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#a83e75e0f5b2b8de01178fc012af0c956">category</a> () const</td></tr>
+<tr class="memdesc:a83e75e0f5b2b8de01178fc012af0c956"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the parent <a class="el" href="classSARibbonCategory.html" title="Ribbon控件中的分类选项卡页面（Category）">SARibbonCategory</a> / 获取父SARibbonCategory  <br /></td></tr>
+<tr class="separator:a83e75e0f5b2b8de01178fc012af0c956"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad9b0b124a997ef15cb971bceebac5b89" id="r_ad9b0b124a997ef15cb971bceebac5b89"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSARibbonBar.html">SARibbonBar</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#ad9b0b124a997ef15cb971bceebac5b89">ribbonBar</a> () const</td></tr>
+<tr class="memdesc:ad9b0b124a997ef15cb971bceebac5b89"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the top-level <a class="el" href="classSARibbonBar.html" title="SARibbonBar继承于QMenuBar,在SARibbonMainWindow中直接替换了原来的QMenuBar">SARibbonBar</a> / 获取顶层的SARibbonBar  <br /></td></tr>
+<tr class="separator:ad9b0b124a997ef15cb971bceebac5b89"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af4c04c2a00708fe083766a1fa8ea4983" id="r_af4c04c2a00708fe083766a1fa8ea4983"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#af4c04c2a00708fe083766a1fa8ea4983">spacing</a> () const</td></tr>
+<tr class="memdesc:af4c04c2a00708fe083766a1fa8ea4983"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the spacing between elements in the panel / 获取面板内元素之间的间距  <br /></td></tr>
+<tr class="separator:af4c04c2a00708fe083766a1fa8ea4983"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2854265dec6244203252353fd9f52221" id="r_a2854265dec6244203252353fd9f52221"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#a2854265dec6244203252353fd9f52221">setToolButtonIconSize</a> (const QSize &amp;s)</td></tr>
+<tr class="memdesc:a2854265dec6244203252353fd9f52221"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the icon size for all tool buttons in the panel / 设置面板内所有工具按钮的图标尺寸  <br /></td></tr>
+<tr class="separator:a2854265dec6244203252353fd9f52221"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac3c9bfb02c1b0c65228b3763dfe8e12d" id="r_ac3c9bfb02c1b0c65228b3763dfe8e12d"><td class="memItemLeft" align="right" valign="top">QSize&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#ac3c9bfb02c1b0c65228b3763dfe8e12d">toolButtonIconSize</a> () const</td></tr>
+<tr class="memdesc:ac3c9bfb02c1b0c65228b3763dfe8e12d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the current default icon size for tool buttons / 获取工具按钮当前的默认图标尺寸  <br /></td></tr>
+<tr class="separator:ac3c9bfb02c1b0c65228b3763dfe8e12d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af6edf84b7485dbcb2629df245e37dbef" id="r_af6edf84b7485dbcb2629df245e37dbef"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSARibbonToolButton.html">SARibbonToolButton</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#af6edf84b7485dbcb2629df245e37dbef">lastAddActionButton</a> ()</td></tr>
+<tr class="memdesc:af6edf84b7485dbcb2629df245e37dbef"><td class="mdescLeft">&#160;</td><td class="mdescRight">获取最近添加的按钮  <br /></td></tr>
+<tr class="separator:af6edf84b7485dbcb2629df245e37dbef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a64d051be6c2aeee27a8556684364c99b" id="r_a64d051be6c2aeee27a8556684364c99b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classSARibbonPanelLabel.html">SARibbonPanelLabel</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#a64d051be6c2aeee27a8556684364c99b">titleLabel</a> () const</td></tr>
+<tr class="memdesc:a64d051be6c2aeee27a8556684364c99b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the title label widget / 获取标题标签窗口部件  <br /></td></tr>
+<tr class="separator:a64d051be6c2aeee27a8556684364c99b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a194cb3faac1f7c30e0a8534bcef9e145" id="r_a194cb3faac1f7c30e0a8534bcef9e145"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#a194cb3faac1f7c30e0a8534bcef9e145">isEnableWordWrap</a> () const</td></tr>
+<tr class="memdesc:a194cb3faac1f7c30e0a8534bcef9e145"><td class="mdescLeft">&#160;</td><td class="mdescRight">判断panel的文字是否允许换行  <br /></td></tr>
+<tr class="separator:a194cb3faac1f7c30e0a8534bcef9e145"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac0ea3bd761d619b6cccffba4a97b6987" id="r_ac0ea3bd761d619b6cccffba4a97b6987"><td class="memItemLeft" align="right" valign="top">qreal&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#ac0ea3bd761d619b6cccffba4a97b6987">buttonMaximumAspectRatio</a> () const</td></tr>
+<tr class="memdesc:ac0ea3bd761d619b6cccffba4a97b6987"><td class="mdescLeft">&#160;</td><td class="mdescRight">按钮最大宽高比，这个系数决定按钮的最大宽度  <br /></td></tr>
+<tr class="separator:ac0ea3bd761d619b6cccffba4a97b6987"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a435425eb22088764bacf47018973f787" id="r_a435425eb22088764bacf47018973f787"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#a435425eb22088764bacf47018973f787">iterateButton</a> (FpRibbonToolButtonIterate fp) const</td></tr>
+<tr class="memdesc:a435425eb22088764bacf47018973f787"><td class="mdescLeft">&#160;</td><td class="mdescRight">Iterates over all <a class="el" href="classSARibbonToolButton.html" title="Ribbon interface adapted tool button / Ribbon界面适用的toolButton">SARibbonToolButton</a> children / 遍历所有SARibbonToolButton子对象  <br /></td></tr>
+<tr class="separator:a435425eb22088764bacf47018973f787"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa4ff1b0645219d53a8821a197ac67fa4" id="r_aa4ff1b0645219d53a8821a197ac67fa4"><td class="memItemLeft" align="right" valign="top"><a id="aa4ff1b0645219d53a8821a197ac67fa4" name="aa4ff1b0645219d53a8821a197ac67fa4"></a>
+virtual QSize&#160;</td><td class="memItemRight" valign="bottom"><b>sizeHint</b> () const Q_DECL_OVERRIDE</td></tr>
+<tr class="separator:aa4ff1b0645219d53a8821a197ac67fa4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a74d8e22b4df6a2da7d4149dcb8d4fce4" id="r_a74d8e22b4df6a2da7d4149dcb8d4fce4"><td class="memItemLeft" align="right" valign="top"><a id="a74d8e22b4df6a2da7d4149dcb8d4fce4" name="a74d8e22b4df6a2da7d4149dcb8d4fce4"></a>
+virtual QSize&#160;</td><td class="memItemRight" valign="bottom"><b>minimumSizeHint</b> () const Q_DECL_OVERRIDE</td></tr>
+<tr class="separator:a74d8e22b4df6a2da7d4149dcb8d4fce4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
+静态 Public 成员函数</h2></td></tr>
+<tr class="memitem:a186f1e31a5250a560a373c728b0c88de" id="r_a186f1e31a5250a560a373c728b0c88de"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#a186f1e31a5250a560a373c728b0c88de">panelHeightHint</a> (const QFontMetrics &amp;fm, <a class="el" href="classSARibbonPanel.html#a94ae3faab66b965f85480cfcaef84805">PanelLayoutMode</a> layMode, int panelTitleHeight)</td></tr>
+<tr class="memdesc:a186f1e31a5250a560a373c728b0c88de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the panel's recommended height / 获取面板的推荐高度  <br /></td></tr>
+<tr class="separator:a186f1e31a5250a560a373c728b0c88de"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7c0b017faab3d53d4f09820039de85c7" id="r_a7c0b017faab3d53d4f09820039de85c7"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#a7c0b017faab3d53d4f09820039de85c7">setActionRowProportionProperty</a> (QAction *action, <a class="el" href="classSARibbonPanelItem.html#a750c9ab520166584754d85b795af41b2">SARibbonPanelItem::RowProportion</a> rp)</td></tr>
+<tr class="memdesc:a7c0b017faab3d53d4f09820039de85c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the row proportion property for an action / 为一个action设置行占比属性  <br /></td></tr>
+<tr class="separator:a7c0b017faab3d53d4f09820039de85c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9c6e7da74ae20dc756ad1d032d9b56b0" id="r_a9c6e7da74ae20dc756ad1d032d9b56b0"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="classSARibbonPanelItem.html#a750c9ab520166584754d85b795af41b2">SARibbonPanelItem::RowProportion</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#a9c6e7da74ae20dc756ad1d032d9b56b0">getActionRowProportionProperty</a> (QAction *action)</td></tr>
+<tr class="memdesc:a9c6e7da74ae20dc756ad1d032d9b56b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the row proportion property from an action / 从一个action获取行占比属性  <br /></td></tr>
+<tr class="separator:a9c6e7da74ae20dc756ad1d032d9b56b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeeba40a5dd8b99036cb691177250b1cd" id="r_aeeba40a5dd8b99036cb691177250b1cd"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#aeeba40a5dd8b99036cb691177250b1cd">setActionToolButtonPopupModeProperty</a> (QAction *action, QToolButton::ToolButtonPopupMode popMode)</td></tr>
+<tr class="memdesc:aeeba40a5dd8b99036cb691177250b1cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the ToolButtonPopupMode property for an action / 为一个action设置ToolButtonPopupMode属性  <br /></td></tr>
+<tr class="separator:aeeba40a5dd8b99036cb691177250b1cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae7e74febf049a0adacf236ae1f405a95" id="r_ae7e74febf049a0adacf236ae1f405a95"><td class="memItemLeft" align="right" valign="top">static QToolButton::ToolButtonPopupMode&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#ae7e74febf049a0adacf236ae1f405a95">getActionToolButtonPopupModeProperty</a> (QAction *action)</td></tr>
+<tr class="memdesc:ae7e74febf049a0adacf236ae1f405a95"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the ToolButtonPopupMode property from an action / 从一个action获取ToolButtonPopupMode属性  <br /></td></tr>
+<tr class="separator:ae7e74febf049a0adacf236ae1f405a95"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa818d102bc5de1498aefb151d8c48680" id="r_aa818d102bc5de1498aefb151d8c48680"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#aa818d102bc5de1498aefb151d8c48680">setActionToolButtonStyleProperty</a> (QAction *action, Qt::ToolButtonStyle buttonStyle)</td></tr>
+<tr class="memdesc:aa818d102bc5de1498aefb151d8c48680"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the ToolButtonStyle property for an action / 为一个action设置ToolButtonStyle属性  <br /></td></tr>
+<tr class="separator:aa818d102bc5de1498aefb151d8c48680"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a23e04d4b23ab31c8ffb5753193b21406" id="r_a23e04d4b23ab31c8ffb5753193b21406"><td class="memItemLeft" align="right" valign="top">static Qt::ToolButtonStyle&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#a23e04d4b23ab31c8ffb5753193b21406">getActionToolButtonStyleProperty</a> (QAction *action)</td></tr>
+<tr class="memdesc:a23e04d4b23ab31c8ffb5753193b21406"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets the ToolButtonStyle property from an action / 从一个action获取ToolButtonStyle属性  <br /></td></tr>
+<tr class="separator:a23e04d4b23ab31c8ffb5753193b21406"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-methods" name="pro-methods"></a>
+Protected 成员函数</h2></td></tr>
+<tr class="memitem:a331dbb7527bf543ab3b08d481d37d240" id="r_a331dbb7527bf543ab3b08d481d37d240"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#a331dbb7527bf543ab3b08d481d37d240">actionEvent</a> (QActionEvent *e) Q_DECL_OVERRIDE</td></tr>
+<tr class="memdesc:a331dbb7527bf543ab3b08d481d37d240"><td class="mdescLeft">&#160;</td><td class="mdescRight">Handles action events (add, remove, change) / 处理action事件（添加、移除、更改）  <br /></td></tr>
+<tr class="separator:a331dbb7527bf543ab3b08d481d37d240"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abf366ff8211bd13a690dfa8b3810ac19" id="r_abf366ff8211bd13a690dfa8b3810ac19"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#abf366ff8211bd13a690dfa8b3810ac19">changeEvent</a> (QEvent *e) Q_DECL_OVERRIDE</td></tr>
+<tr class="memdesc:abf366ff8211bd13a690dfa8b3810ac19"><td class="mdescLeft">&#160;</td><td class="mdescRight">Handles change events (e.g., font change) / 处理更改事件（例如，字体更改）  <br /></td></tr>
+<tr class="separator:abf366ff8211bd13a690dfa8b3810ac19"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aea9b655a4fb23d24fd43ff862d627412" id="r_aea9b655a4fb23d24fd43ff862d627412"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#aea9b655a4fb23d24fd43ff862d627412">setTitleHeight</a> (int h)</td></tr>
+<tr class="memdesc:aea9b655a4fb23d24fd43ff862d627412"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the height of the panel's title / 设置面板标题的高度  <br /></td></tr>
+<tr class="separator:aea9b655a4fb23d24fd43ff862d627412"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a023d69dceab91a6dc02b047b78a9acb3" id="r_a023d69dceab91a6dc02b047b78a9acb3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#a023d69dceab91a6dc02b047b78a9acb3">setSpacing</a> (int n)</td></tr>
+<tr class="memdesc:a023d69dceab91a6dc02b047b78a9acb3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the spacing between elements in the panel / 设置面板内元素之间的间距  <br /></td></tr>
+<tr class="separator:a023d69dceab91a6dc02b047b78a9acb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa920870968cb8f1ae4936ac9cc30bdc3" id="r_aa920870968cb8f1ae4936ac9cc30bdc3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#aa920870968cb8f1ae4936ac9cc30bdc3">setEnableShowTitle</a> (bool on)</td></tr>
+<tr class="memdesc:aa920870968cb8f1ae4936ac9cc30bdc3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets whether the panel's title is visible / 设置面板标题是否可见  <br /></td></tr>
+<tr class="separator:aa920870968cb8f1ae4936ac9cc30bdc3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab479f76b86045b46a4465324eccdc410" id="r_ab479f76b86045b46a4465324eccdc410"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#ab479f76b86045b46a4465324eccdc410">setEnableWordWrap</a> (bool on)</td></tr>
+<tr class="memdesc:ab479f76b86045b46a4465324eccdc410"><td class="mdescLeft">&#160;</td><td class="mdescRight">设置panel的按钮文字允许换行  <br /></td></tr>
+<tr class="separator:ab479f76b86045b46a4465324eccdc410"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac99f1567d9db70b1dcd8d837c7eb836f" id="r_ac99f1567d9db70b1dcd8d837c7eb836f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSARibbonPanel.html#ac99f1567d9db70b1dcd8d837c7eb836f">setButtonMaximumAspectRatio</a> (qreal fac=1.4)</td></tr>
+<tr class="memdesc:ac99f1567d9db70b1dcd8d837c7eb836f"><td class="mdescLeft">&#160;</td><td class="mdescRight">设置按钮最大宽高比，这个系数决定按钮的最大宽度  <br /></td></tr>
+<tr class="separator:ac99f1567d9db70b1dcd8d837c7eb836f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="properties" name="properties"></a>
+属性</h2></td></tr>
+<tr class="memitem:a772e3c17c1196bd9e33b49fe6046605c" id="r_a772e3c17c1196bd9e33b49fe6046605c"><td class="memItemLeft" align="right" valign="top"><a id="a772e3c17c1196bd9e33b49fe6046605c" name="a772e3c17c1196bd9e33b49fe6046605c"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>isCanCustomize</b></td></tr>
+<tr class="separator:a772e3c17c1196bd9e33b49fe6046605c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a67036bbe4d17445d57e0a1b4893d0a79" id="r_a67036bbe4d17445d57e0a1b4893d0a79"><td class="memItemLeft" align="right" valign="top"><a id="a67036bbe4d17445d57e0a1b4893d0a79" name="a67036bbe4d17445d57e0a1b4893d0a79"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>isExpanding</b></td></tr>
+<tr class="separator:a67036bbe4d17445d57e0a1b4893d0a79"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a44cc01a5c1a3c56625ffd20ea8464f05" id="r_a44cc01a5c1a3c56625ffd20ea8464f05"><td class="memItemLeft" align="right" valign="top"><a id="a44cc01a5c1a3c56625ffd20ea8464f05" name="a44cc01a5c1a3c56625ffd20ea8464f05"></a>
+QString&#160;</td><td class="memItemRight" valign="bottom"><b>panelName</b></td></tr>
+<tr class="separator:a44cc01a5c1a3c56625ffd20ea8464f05"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="friends" name="friends"></a>
+友元</h2></td></tr>
+<tr class="memitem:a1fb4c4fe02f19abd32864cc35bc2417a" id="r_a1fb4c4fe02f19abd32864cc35bc2417a"><td class="memItemLeft" align="right" valign="top"><a id="a1fb4c4fe02f19abd32864cc35bc2417a" name="a1fb4c4fe02f19abd32864cc35bc2417a"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>SARibbonBar</b></td></tr>
+<tr class="separator:a1fb4c4fe02f19abd32864cc35bc2417a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a23e7a1c4b7109a236a90b9a6a96671ee" id="r_a23e7a1c4b7109a236a90b9a6a96671ee"><td class="memItemLeft" align="right" valign="top"><a id="a23e7a1c4b7109a236a90b9a6a96671ee" name="a23e7a1c4b7109a236a90b9a6a96671ee"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>SARibbonCategory</b></td></tr>
+<tr class="separator:a23e7a1c4b7109a236a90b9a6a96671ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4b9c78af62a63cda7d10266a86a98a3b" id="r_a4b9c78af62a63cda7d10266a86a98a3b"><td class="memItemLeft" align="right" valign="top"><a id="a4b9c78af62a63cda7d10266a86a98a3b" name="a4b9c78af62a63cda7d10266a86a98a3b"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>SARibbonCategoryPrivate</b></td></tr>
+<tr class="separator:a4b9c78af62a63cda7d10266a86a98a3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d83e505aad8efa8bc6c4b8ce1d38d2b" id="r_a9d83e505aad8efa8bc6c4b8ce1d38d2b"><td class="memItemLeft" align="right" valign="top"><a id="a9d83e505aad8efa8bc6c4b8ce1d38d2b" name="a9d83e505aad8efa8bc6c4b8ce1d38d2b"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>SARibbonCustomizeWidgetPrivate</b></td></tr>
+<tr class="separator:a9d83e505aad8efa8bc6c4b8ce1d38d2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad655d8e4e0a1b3c8e6b05b4875bb50f4" id="r_ad655d8e4e0a1b3c8e6b05b4875bb50f4"><td class="memItemLeft" align="right" valign="top"><a id="ad655d8e4e0a1b3c8e6b05b4875bb50f4" name="ad655d8e4e0a1b3c8e6b05b4875bb50f4"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>SARibbonPanelLayout</b></td></tr>
+<tr class="separator:ad655d8e4e0a1b3c8e6b05b4875bb50f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
+<a name="details" id="details"></a><h2 class="groupheader">详细描述</h2>
+<div class="textblock"><p>panel页窗口，panel是ribbon的面板用于承放控件 / Ribbon panel container, used to hold controls </p>
+<p>The <code><a class="el" href="classSARibbonPanel.html" title="panel页窗口，panel是ribbon的面板用于承放控件 / Ribbon panel container, used to hold controls">SARibbonPanel</a></code> is a core component of the Ribbon interface. It acts as a container for <code>QAction</code> objects, automatically creating and managing <code><a class="el" href="classSARibbonToolButton.html" title="Ribbon interface adapted tool button / Ribbon界面适用的toolButton">SARibbonToolButton</a></code> instances based on the specified layout proportion (Large, Medium, Small). It supports dynamic layout modes (ThreeRowMode, TwoRowMode) and can display an optional title and an option button.</p>
+<p><code><a class="el" href="classSARibbonPanel.html" title="panel页窗口，panel是ribbon的面板用于承放控件 / Ribbon panel container, used to hold controls">SARibbonPanel</a></code> 是 Ribbon 界面的核心组件之一。它作为 <code>QAction</code> 对象的容器， 根据指定的布局比例（大、中、小）自动创建和管理 <code><a class="el" href="classSARibbonToolButton.html" title="Ribbon interface adapted tool button / Ribbon界面适用的toolButton">SARibbonToolButton</a></code> 实例。 它支持动态布局模式（三行模式、两行模式），并可显示可选的标题和选项按钮。</p>
+<hr  />
+<h3><a class="anchor" id="布局模式--layout-modes"></a>
+布局模式 / Layout Modes</h3>
+<p>The panel has two layout modes: two-row and three-row.</p><ul>
+<li><b>ThreeRowMode</b>: The Ribbon in Microsoft Office is a representative.</li>
+<li><b>TwoRowMode</b>: The "compact style" represented by WPS. You can specify the mode via SARibbonBar::RibbonStyle (using <a class="el" href="classSARibbonBar.html#a7ee2ffcde55433d35705980030b0a38d">SARibbonBar::setRibbonStyle</a>).</li>
+</ul>
+<p>ribbon的panel分为两行模式和三行模式。</p><ul>
+<li><b>三行模式</b>: 以 Microsoft Office 为代表。</li>
+<li><b>两行模式</b>: 以 WPS 为代表的“紧凑派”。 可通过 SARibbonBar::RibbonStyle (使用 <a class="el" href="classSARibbonBar.html#a7ee2ffcde55433d35705980030b0a38d">SARibbonBar::setRibbonStyle</a> 函数) 来指定模式。</li>
+</ul>
+<hr  />
+<h3><a class="anchor" id="扩展模式--expanding-mode"></a>
+扩展模式 / Expanding Mode</h3>
+<p>Within a panel, you can use <a class="el" href="classSARibbonPanel.html#afce08a48194a4847b9a15eb55d78573a">setExpanding</a> to specify horizontal expansion. <b>Recommendation</b>: Only use this if the panel contains expandable widgets (e.g., <a class="el" href="classSARibbonGallery.html">SARibbonGallery</a>). Otherwise, blank space will be left.</p>
+<p>在panel中，可以通过<a class="el" href="classSARibbonPanel.html#afce08a48194a4847b9a15eb55d78573a">setExpanding</a> 函数指定panel水平扩展。 <b>建议</b>: 仅在面板内包含可扩展控件（如 SARibbonGallery）时使用此函数。 否则，将会留白。</p>
+<hr  />
+<h3><a class="anchor" id="自定义布局--custom-layout"></a>
+自定义布局 / Custom Layout</h3>
+<p>The panel's layout is implemented by <a class="el" href="classSARibbonPanelLayout.html">SARibbonPanelLayout</a>. To use a custom layout, inherit from SARibbonElementCreateDelegate::createRibbonPanel.</p>
+<p>panel的布局通过<a class="el" href="classSARibbonPanelLayout.html">SARibbonPanelLayout</a> 来实现。 如需自定义布局，请继承 SARibbonElementCreateDelegate::createRibbonPanel 函数。</p>
+<hr  />
+<h3><a class="anchor" id="全局属性设置--global-property-settings"></a>
+全局属性设置 / Global Property Settings</h3>
+<p><code><a class="el" href="classSARibbonPanel.html" title="panel页窗口，panel是ribbon的面板用于承放控件 / Ribbon panel container, used to hold controls">SARibbonPanel</a></code> is a child of <code><a class="el" href="classSARibbonCategory.html" title="Ribbon控件中的分类选项卡页面（Category）">SARibbonCategory</a></code>, which belongs to <code><a class="el" href="classSARibbonBar.html" title="SARibbonBar继承于QMenuBar,在SARibbonMainWindow中直接替换了原来的QMenuBar">SARibbonBar</a></code>. <b>Important</b>: Setting properties directly on a standalone <code><a class="el" href="classSARibbonPanel.html" title="panel页窗口，panel是ribbon的面板用于承放控件 / Ribbon panel container, used to hold controls">SARibbonPanel</a></code> is often meaningless. Global properties (like title height, spacing) are managed by <code><a class="el" href="classSARibbonBar.html" title="SARibbonBar继承于QMenuBar,在SARibbonMainWindow中直接替换了原来的QMenuBar">SARibbonBar</a></code>. Use these functions in <code><a class="el" href="classSARibbonBar.html" title="SARibbonBar继承于QMenuBar,在SARibbonMainWindow中直接替换了原来的QMenuBar">SARibbonBar</a></code> instead:</p><ul>
+<li><code>panelTitleHeight</code></li>
+<li><code>isEnableShowPanelTitle</code></li>
+<li><code>panelSpacing</code></li>
+<li><code>panelToolButtonIconSize</code></li>
+</ul>
+<p><code><a class="el" href="classSARibbonPanel.html" title="panel页窗口，panel是ribbon的面板用于承放控件 / Ribbon panel container, used to hold controls">SARibbonPanel</a></code>属于<code><a class="el" href="classSARibbonCategory.html" title="Ribbon控件中的分类选项卡页面（Category）">SARibbonCategory</a></code>的子对象，<code><a class="el" href="classSARibbonCategory.html" title="Ribbon控件中的分类选项卡页面（Category）">SARibbonCategory</a></code>又属于<code><a class="el" href="classSARibbonBar.html" title="SARibbonBar继承于QMenuBar,在SARibbonMainWindow中直接替换了原来的QMenuBar">SARibbonBar</a></code>的对象。 <b>重要</b>: 单独设置一个<code><a class="el" href="classSARibbonPanel.html" title="panel页窗口，panel是ribbon的面板用于承放控件 / Ribbon panel container, used to hold controls">SARibbonPanel</a></code>的属性很多情况是没有意义的。 全局性属性（如标题高度、间距）由<code><a class="el" href="classSARibbonBar.html" title="SARibbonBar继承于QMenuBar,在SARibbonMainWindow中直接替换了原来的QMenuBar">SARibbonBar</a></code>统一管理。 请改用<code><a class="el" href="classSARibbonBar.html" title="SARibbonBar继承于QMenuBar,在SARibbonMainWindow中直接替换了原来的QMenuBar">SARibbonBar</a></code>中的以下函数：</p><ul>
+<li><code>panelTitleHeight</code></li>
+<li><code>isEnableShowPanelTitle</code></li>
+<li><code>panelSpacing</code></li>
+<li><code>panelToolButtonIconSize</code> </li>
+</ul>
+</div><h2 class="groupheader">成员枚举类型说明</h2>
+<a id="a94ae3faab66b965f85480cfcaef84805" name="a94ae3faab66b965f85480cfcaef84805"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a94ae3faab66b965f85480cfcaef84805">&#9670;&#160;</a></span>PanelLayoutMode</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum <a class="el" href="classSARibbonPanel.html#a94ae3faab66b965f85480cfcaef84805">SARibbonPanel::PanelLayoutMode</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Layout mode for the panel / 面板的布局模式 </p>
+<table class="fieldtable">
+<tr><th colspan="2">枚举值</th></tr><tr><td class="fieldname"><a id="a94ae3faab66b965f85480cfcaef84805aadb96810179ee98bdbc7725fae8e3f4d" name="a94ae3faab66b965f85480cfcaef84805aadb96810179ee98bdbc7725fae8e3f4d"></a>ThreeRowMode&#160;</td><td class="fielddoc"><p>Three-row layout mode / 三行布局模式 </p>
+<p>In this mode, small buttons are arranged in three rows, while medium buttons occupy two rows. Large buttons always occupy the full height.</p>
+<p>在此模式下，小按钮排列成三行，中等按钮占据两行。 大按钮始终占据整个高度。 </p>
+</td></tr>
+<tr><td class="fieldname"><a id="a94ae3faab66b965f85480cfcaef84805a73d89111434a332ae84152bbacdfbf14" name="a94ae3faab66b965f85480cfcaef84805a73d89111434a332ae84152bbacdfbf14"></a>TwoRowMode&#160;</td><td class="fielddoc"><p>Two-row layout mode / 两行布局模式 </p>
+<p>In this mode, both small and medium buttons are arranged in two rows. Large buttons always occupy the full height.</p>
+<p>在此模式下，小按钮和中等按钮都排列成两行。 大按钮始终占据整个高度。 </p>
+</td></tr>
+</table>
+
+</div>
+</div>
+<h2 class="groupheader">构造及析构函数说明</h2>
+<a id="aa55c1aea43e056b650b9532078be7832" name="aa55c1aea43e056b650b9532078be7832"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa55c1aea43e056b650b9532078be7832">&#9670;&#160;</a></span>SARibbonPanel() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">SARibbonPanel::SARibbonPanel </td>
+          <td>(</td>
+          <td class="paramtype">QWidget *&#160;</td>
+          <td class="paramname"><em>parent</em> = <code>nullptr</code></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructs a <a class="el" href="classSARibbonPanel.html" title="panel页窗口，panel是ribbon的面板用于承放控件 / Ribbon panel container, used to hold controls">SARibbonPanel</a> with the given parent / 使用给定的父对象构造SARibbonPanel </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">parent</td><td>The parent widget / 父窗口部件 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="af43c096793b2a913a3ac1432613e34a8" name="af43c096793b2a913a3ac1432613e34a8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af43c096793b2a913a3ac1432613e34a8">&#9670;&#160;</a></span>SARibbonPanel() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">SARibbonPanel::SARibbonPanel </td>
+          <td>(</td>
+          <td class="paramtype">const QString &amp;&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QWidget *&#160;</td>
+          <td class="paramname"><em>parent</em> = <code>nullptr</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructs a <a class="el" href="classSARibbonPanel.html" title="panel页窗口，panel是ribbon的面板用于承放控件 / Ribbon panel container, used to hold controls">SARibbonPanel</a> with a name and the given parent / 使用名称和给定的父对象构造SARibbonPanel </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td>The panel's display name / 面板的显示名称 </td></tr>
+    <tr><td class="paramname">parent</td><td>The parent widget / 父窗口部件 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<h2 class="groupheader">成员函数说明</h2>
+<a id="a331dbb7527bf543ab3b08d481d37d240" name="a331dbb7527bf543ab3b08d481d37d240"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a331dbb7527bf543ab3b08d481d37d240">&#9670;&#160;</a></span>actionEvent()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SARibbonPanel::actionEvent </td>
+          <td>(</td>
+          <td class="paramtype">QActionEvent *&#160;</td>
+          <td class="paramname"><em>e</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Handles action events (add, remove, change) / 处理action事件（添加、移除、更改） </p>
+<p>This function is called by Qt when actions are added, removed, or changed. It ensures the panel's layout is updated accordingly.</p>
+<p>当action被添加、移除或更改时，Qt会调用此函数。它确保面板的布局相应更新。</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">e</td><td>The action event / action事件 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a5d67bd343ba2d5257a6beba1c827f06f" name="a5d67bd343ba2d5257a6beba1c827f06f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5d67bd343ba2d5257a6beba1c827f06f">&#9670;&#160;</a></span>actionIndex()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int SARibbonPanel::actionIndex </td>
+          <td>(</td>
+          <td class="paramtype">QAction *&#160;</td>
+          <td class="paramname"><em>act</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Gets the index of an action within the panel / 获取一个action在面板内的索引 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">act</td><td>The action to find / 要查找的action </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>The index of the action, or -1 if not found / action的索引，如果未找到则返回-1 </dd></dl>
+
+</div>
+</div>
+<a id="a0ff98230acd20d3f7cfecf92c2ac262a" name="a0ff98230acd20d3f7cfecf92c2ac262a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0ff98230acd20d3f7cfecf92c2ac262a">&#9670;&#160;</a></span>actionToRibbonToolButton()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSARibbonToolButton.html">SARibbonToolButton</a> * SARibbonPanel::actionToRibbonToolButton </td>
+          <td>(</td>
+          <td class="paramtype">QAction *&#160;</td>
+          <td class="paramname"><em>action</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Retrieves the <a class="el" href="classSARibbonToolButton.html" title="Ribbon interface adapted tool button / Ribbon界面适用的toolButton">SARibbonToolButton</a> associated with an action / 获取与action关联的SARibbonToolButton </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">action</td><td>The action to query / 要查询的action </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>The associated tool button, or nullptr if not found / 关联的工具按钮，如果未找到则返回nullptr </dd></dl>
+
+</div>
+</div>
+<a id="acf68e653683fb6d5fd078bad1977f6ef" name="acf68e653683fb6d5fd078bad1977f6ef"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acf68e653683fb6d5fd078bad1977f6ef">&#9670;&#160;</a></span>actionTriggered</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SARibbonPanel::actionTriggered </td>
+          <td>(</td>
+          <td class="paramtype">QAction *&#160;</td>
+          <td class="paramname"><em>action</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">signal</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>等同于QToolBar::actionTriggered </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">action</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a0ddebd286e9b6ed06b4db8f7dffc3253" name="a0ddebd286e9b6ed06b4db8f7dffc3253"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0ddebd286e9b6ed06b4db8f7dffc3253">&#9670;&#160;</a></span>addAction() <span class="overload">[1/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QAction * SARibbonPanel::addAction </td>
+          <td>(</td>
+          <td class="paramtype">const QString &amp;&#160;</td>
+          <td class="paramname"><em>text</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const QIcon &amp;&#160;</td>
+          <td class="paramname"><em>icon</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QToolButton::ToolButtonPopupMode&#160;</td>
+          <td class="paramname"><em>popMode</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classSARibbonPanelItem.html#a750c9ab520166584754d85b795af41b2">SARibbonPanelItem::RowProportion</a>&#160;</td>
+          <td class="paramname"><em>rowProportion</em> = <code><a class="el" href="classSARibbonPanelItem.html#a750c9ab520166584754d85b795af41b2ae165f14e7a21266f7a65a795dcb0d655">SARibbonPanelItem::Large</a></code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Creates and adds a new action / 创建并添加一个新的action </p>
+<p>This is a convenience function that creates a new <code>QAction</code>, sets its properties, and adds it to the panel. The panel will take ownership of the action.</p>
+<p>这是一个便捷函数，用于创建一个新的 <code>QAction</code>，设置其属性，并将其添加到面板。 面板将拥有此action的所有权。</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">text</td><td>The action's text / action的文字 </td></tr>
+    <tr><td class="paramname">icon</td><td>The action's icon / action的图标 </td></tr>
+    <tr><td class="paramname">popMode</td><td>The button's popup mode / 按钮的弹出模式 </td></tr>
+    <tr><td class="paramname">rp</td><td>The action's row proportion / action的行占比 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>The newly created action / 新创建的action </dd></dl>
+
+</div>
+</div>
+<a id="ab53f006bab92ec478964265bc7f05afd" name="ab53f006bab92ec478964265bc7f05afd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab53f006bab92ec478964265bc7f05afd">&#9670;&#160;</a></span>addAction() <span class="overload">[2/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SARibbonPanel::addAction </td>
+          <td>(</td>
+          <td class="paramtype">QAction *&#160;</td>
+          <td class="paramname"><em>act</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QToolButton::ToolButtonPopupMode&#160;</td>
+          <td class="paramname"><em>popMode</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classSARibbonPanelItem.html#a750c9ab520166584754d85b795af41b2">SARibbonPanelItem::RowProportion</a>&#160;</td>
+          <td class="paramname"><em>rowProportion</em> = <code><a class="el" href="classSARibbonPanelItem.html#a750c9ab520166584754d85b795af41b2ae165f14e7a21266f7a65a795dcb0d655">SARibbonPanelItem::Large</a></code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Adds an action with a specified popup mode / 添加一个具有指定弹出模式的action </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">act</td><td>The action to add / 要添加的action </td></tr>
+    <tr><td class="paramname">popMode</td><td>The popup mode for the button / 按钮的弹出模式 </td></tr>
+    <tr><td class="paramname">rp</td><td>The row proportion for this action / 此action的行占比 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a044725c5b8ac4123f90e44e21ec58586" name="a044725c5b8ac4123f90e44e21ec58586"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a044725c5b8ac4123f90e44e21ec58586">&#9670;&#160;</a></span>addAction() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SARibbonPanel::addAction </td>
+          <td>(</td>
+          <td class="paramtype">QAction *&#160;</td>
+          <td class="paramname"><em>action</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classSARibbonPanelItem.html#a750c9ab520166584754d85b795af41b2">SARibbonPanelItem::RowProportion</a>&#160;</td>
+          <td class="paramname"><em>rowProportion</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Adds an action to the panel / 向面板添加一个action </p>
+<p>This is the primary method for populating the panel. The button created for this action will use the row proportion and popup mode previously set via the static property functions.</p>
+<p>这是填充面板的主要方法。为此action创建的按钮将使用之前通过静态属性函数设置的行占比和弹出模式。</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">action</td><td>The action to add / 要添加的action </td></tr>
+    <tr><td class="paramname">rp</td><td>The row proportion for this action / 此action的行占比 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="classSARibbonPanel.html#a2373bda81346cf222ad72684ac703953" title="Adds a large action (occupies full height) / 添加一个大action（占据整个高度）">addLargeAction</a>, <a class="el" href="classSARibbonPanel.html#abf7dd6457e548d6afbd59a199026b0f1" title="Adds a medium action / 添加一个中等action">addMediumAction</a>, <a class="el" href="classSARibbonPanel.html#a1f2b8ef6fd376dad7bdef16909444ac6" title="Adds a small action / 添加一个小action">addSmallAction</a> </dd></dl>
+
+</div>
+</div>
+<a id="a74fc7ef71b0c8d8ad823d4023426ccde" name="a74fc7ef71b0c8d8ad823d4023426ccde"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a74fc7ef71b0c8d8ad823d4023426ccde">&#9670;&#160;</a></span>addGallery()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSARibbonGallery.html">SARibbonGallery</a> * SARibbonPanel::addGallery </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>expanding</em> = <code>true</code></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Adds a gallery widget to the panel / 向面板添加一个画廊窗口部件 </p>
+<p>A gallery is a specialized widget for displaying a collection of items. If <code>expanding</code> is true, the panel's horizontal size policy will be set to <code>Expanding</code>.</p>
+<p>画廊是一个用于显示项目集合的专用窗口部件。如果 <code>expanding</code> 为true， 面板的水平尺寸策略将被设置为 <code>Expanding</code>。</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">expanding</td><td>If true, sets the panel's size policy to Expanding / 如果为true，将面板的尺寸策略设置为Expanding </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>The created <a class="el" href="classSARibbonGallery.html" title="Gallery控件">SARibbonGallery</a> / 创建的SARibbonGallery </dd></dl>
+
+</div>
+</div>
+<a id="a2373bda81346cf222ad72684ac703953" name="a2373bda81346cf222ad72684ac703953"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2373bda81346cf222ad72684ac703953">&#9670;&#160;</a></span>addLargeAction() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SARibbonPanel::addLargeAction </td>
+          <td>(</td>
+          <td class="paramtype">QAction *&#160;</td>
+          <td class="paramname"><em>action</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Adds a large action (occupies full height) / 添加一个大action（占据整个高度） </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">action</td><td>The action to add / 要添加的action </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a24ee7492ae354086a68270148a4619c7" name="a24ee7492ae354086a68270148a4619c7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a24ee7492ae354086a68270148a4619c7">&#9670;&#160;</a></span>addLargeAction() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SARibbonPanel::addLargeAction </td>
+          <td>(</td>
+          <td class="paramtype">QAction *&#160;</td>
+          <td class="paramname"><em>action</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QToolButton::ToolButtonPopupMode&#160;</td>
+          <td class="paramname"><em>popMode</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Adds a large action with a specified popup mode / 添加一个具有指定弹出模式的大action </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">action</td><td>The action to add / 要添加的action </td></tr>
+    <tr><td class="paramname">popMode</td><td>The popup mode for the button / 按钮的弹出模式 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a7510db2d0c5306c2160470199b2679ec" name="a7510db2d0c5306c2160470199b2679ec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7510db2d0c5306c2160470199b2679ec">&#9670;&#160;</a></span>addLargeMenu()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SARibbonPanel::addLargeMenu </td>
+          <td>(</td>
+          <td class="paramtype">QMenu *&#160;</td>
+          <td class="paramname"><em>menu</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QToolButton::ToolButtonPopupMode&#160;</td>
+          <td class="paramname"><em>popMode</em> = <code>QToolButton::InstantPopup</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Adds a menu as a large button / 以大按钮形式添加一个菜单 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">menu</td><td>The menu to add / 要添加的菜单 </td></tr>
+    <tr><td class="paramname">popMode</td><td>The popup mode / 弹出模式 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a864a80e6642a954302d31a67c73cf739" name="a864a80e6642a954302d31a67c73cf739"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a864a80e6642a954302d31a67c73cf739">&#9670;&#160;</a></span>addLargeWidget()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QAction * SARibbonPanel::addLargeWidget </td>
+          <td>(</td>
+          <td class="paramtype">QWidget *&#160;</td>
+          <td class="paramname"><em>w</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Adds a widget as a large button / 以大按钮形式添加一个窗口部件 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">w</td><td>The widget to add / 要添加的窗口部件 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>The created QWidgetAction / 创建的QWidgetAction </dd></dl>
+
+</div>
+</div>
+<a id="abf7dd6457e548d6afbd59a199026b0f1" name="abf7dd6457e548d6afbd59a199026b0f1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abf7dd6457e548d6afbd59a199026b0f1">&#9670;&#160;</a></span>addMediumAction() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SARibbonPanel::addMediumAction </td>
+          <td>(</td>
+          <td class="paramtype">QAction *&#160;</td>
+          <td class="paramname"><em>action</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Adds a medium action / 添加一个中等action </p>
+<p>In ThreeRowMode, a medium action occupies two rows. In TwoRowMode, it is equivalent to a small action.</p>
+<p>在三行模式下，中等action占据两行。在两行模式下，它等同于一个小action。</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">action</td><td>The action to add / 要添加的action </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a9ed25b071a5fd2f7b4da72e4046b9b96" name="a9ed25b071a5fd2f7b4da72e4046b9b96"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9ed25b071a5fd2f7b4da72e4046b9b96">&#9670;&#160;</a></span>addMediumAction() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SARibbonPanel::addMediumAction </td>
+          <td>(</td>
+          <td class="paramtype">QAction *&#160;</td>
+          <td class="paramname"><em>action</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QToolButton::ToolButtonPopupMode&#160;</td>
+          <td class="paramname"><em>popMode</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Adds a medium action with a specified popup mode / 添加一个具有指定弹出模式的中等action </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">action</td><td>The action to add / 要添加的action </td></tr>
+    <tr><td class="paramname">popMode</td><td>The popup mode for the button / 按钮的弹出模式 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ad40ba30b193ed15f724bd6f7945128df" name="ad40ba30b193ed15f724bd6f7945128df"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad40ba30b193ed15f724bd6f7945128df">&#9670;&#160;</a></span>addMediumWidget()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QAction * SARibbonPanel::addMediumWidget </td>
+          <td>(</td>
+          <td class="paramtype">QWidget *&#160;</td>
+          <td class="paramname"><em>w</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Adds a widget as a medium button / 以中等按钮形式添加一个窗口部件 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">w</td><td>The widget to add / 要添加的窗口部件 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>The created QWidgetAction / 创建的QWidgetAction </dd></dl>
+
+</div>
+</div>
+<a id="a36ea36c652c30e4f5096576a06a10a20" name="a36ea36c652c30e4f5096576a06a10a20"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a36ea36c652c30e4f5096576a06a10a20">&#9670;&#160;</a></span>addMenu()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SARibbonPanel::addMenu </td>
+          <td>(</td>
+          <td class="paramtype">QMenu *&#160;</td>
+          <td class="paramname"><em>menu</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classSARibbonPanelItem.html#a750c9ab520166584754d85b795af41b2">SARibbonPanelItem::RowProportion</a>&#160;</td>
+          <td class="paramname"><em>rowProportion</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QToolButton::ToolButtonPopupMode&#160;</td>
+          <td class="paramname"><em>popMode</em> = <code>QToolButton::InstantPopup</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Adds a menu to the panel / 向面板添加一个菜单 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">menu</td><td>The menu to add / 要添加的菜单 </td></tr>
+    <tr><td class="paramname">rp</td><td>The row proportion for the menu button / 菜单按钮的行占比 </td></tr>
+    <tr><td class="paramname">popMode</td><td>The popup mode, defaults to InstantPopup / 弹出模式，默认为InstantPopup </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="afc911bba543ed53b8baf1e73e2a033da" name="afc911bba543ed53b8baf1e73e2a033da"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afc911bba543ed53b8baf1e73e2a033da">&#9670;&#160;</a></span>addSeparator()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QAction * SARibbonPanel::addSeparator </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Adds a separator / 添加一个分隔符 </p>
+<dl class="section return"><dt>返回</dt><dd>The created separator action / 创建的分隔符action </dd></dl>
+
+</div>
+</div>
+<a id="a1f2b8ef6fd376dad7bdef16909444ac6" name="a1f2b8ef6fd376dad7bdef16909444ac6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1f2b8ef6fd376dad7bdef16909444ac6">&#9670;&#160;</a></span>addSmallAction() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SARibbonPanel::addSmallAction </td>
+          <td>(</td>
+          <td class="paramtype">QAction *&#160;</td>
+          <td class="paramname"><em>action</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Adds a small action / 添加一个小action </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">action</td><td>The action to add / 要添加的action </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a02242fe111546a06059281c973425018" name="a02242fe111546a06059281c973425018"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a02242fe111546a06059281c973425018">&#9670;&#160;</a></span>addSmallAction() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SARibbonPanel::addSmallAction </td>
+          <td>(</td>
+          <td class="paramtype">QAction *&#160;</td>
+          <td class="paramname"><em>action</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QToolButton::ToolButtonPopupMode&#160;</td>
+          <td class="paramname"><em>popMode</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Adds a small action with a specified popup mode / 添加一个具有指定弹出模式的小action </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">action</td><td>The action to add / 要添加的action </td></tr>
+    <tr><td class="paramname">popMode</td><td>The popup mode for the button / 按钮的弹出模式 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="aa0458234b9bc77a25d8629548fd57970" name="aa0458234b9bc77a25d8629548fd57970"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa0458234b9bc77a25d8629548fd57970">&#9670;&#160;</a></span>addSmallMenu()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SARibbonPanel::addSmallMenu </td>
+          <td>(</td>
+          <td class="paramtype">QMenu *&#160;</td>
+          <td class="paramname"><em>menu</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QToolButton::ToolButtonPopupMode&#160;</td>
+          <td class="paramname"><em>popMode</em> = <code>QToolButton::InstantPopup</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Adds a menu as a small button / 以小按钮形式添加一个菜单 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">menu</td><td>The menu to add / 要添加的菜单 </td></tr>
+    <tr><td class="paramname">popMode</td><td>The popup mode / 弹出模式 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="acaa7332605074dc66902f71b461e918d" name="acaa7332605074dc66902f71b461e918d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acaa7332605074dc66902f71b461e918d">&#9670;&#160;</a></span>addSmallWidget()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QAction * SARibbonPanel::addSmallWidget </td>
+          <td>(</td>
+          <td class="paramtype">QWidget *&#160;</td>
+          <td class="paramname"><em>w</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Adds a widget as a small button / 以小按钮形式添加一个窗口部件 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">w</td><td>The widget to add / 要添加的窗口部件 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>The created QWidgetAction / 创建的QWidgetAction </dd></dl>
+
+</div>
+</div>
+<a id="a1cb414ebad098f3dff9880653cdef099" name="a1cb414ebad098f3dff9880653cdef099"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1cb414ebad098f3dff9880653cdef099">&#9670;&#160;</a></span>addWidget()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QAction * SARibbonPanel::addWidget </td>
+          <td>(</td>
+          <td class="paramtype">QWidget *&#160;</td>
+          <td class="paramname"><em>w</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classSARibbonPanelItem.html#a750c9ab520166584754d85b795af41b2">SARibbonPanelItem::RowProportion</a>&#160;</td>
+          <td class="paramname"><em>rowProportion</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Adds a custom widget to the panel / 向面板添加一个自定义窗口部件 </p>
+<p>The panel will create a <code>QWidgetAction</code> to manage the widget. The panel does not take ownership of the widget; its lifetime is managed by its parent or the caller.</p>
+<p>面板将创建一个 <code>QWidgetAction</code> 来管理此窗口部件。面板不拥有此窗口部件的所有权； 其生命周期由其父对象或调用者管理。</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">w</td><td>The widget to add / 要添加的窗口部件 </td></tr>
+    <tr><td class="paramname">rp</td><td>The row proportion for the widget / 窗口部件的行占比 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>The created QWidgetAction / 创建的QWidgetAction </dd></dl>
+
+</div>
+</div>
+<a id="ac0ea3bd761d619b6cccffba4a97b6987" name="ac0ea3bd761d619b6cccffba4a97b6987"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac0ea3bd761d619b6cccffba4a97b6987">&#9670;&#160;</a></span>buttonMaximumAspectRatio()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">qreal SARibbonPanel::buttonMaximumAspectRatio </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>按钮最大宽高比，这个系数决定按钮的最大宽度 </p>
+<dl class="section return"><dt>返回</dt><dd>按钮最大宽高比 </dd></dl>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="classSARibbonPanel.html#ac99f1567d9db70b1dcd8d837c7eb836f" title="设置按钮最大宽高比，这个系数决定按钮的最大宽度">setButtonMaximumAspectRatio</a> </dd></dl>
+
+</div>
+</div>
+<a id="a83e75e0f5b2b8de01178fc012af0c956" name="a83e75e0f5b2b8de01178fc012af0c956"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a83e75e0f5b2b8de01178fc012af0c956">&#9670;&#160;</a></span>category()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSARibbonCategory.html">SARibbonCategory</a> * SARibbonPanel::category </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Gets the parent <a class="el" href="classSARibbonCategory.html" title="Ribbon控件中的分类选项卡页面（Category）">SARibbonCategory</a> / 获取父SARibbonCategory </p>
+<dl class="section return"><dt>返回</dt><dd>The parent category, or nullptr if not found / 父category，如果未找到则返回nullptr </dd></dl>
+
+</div>
+</div>
+<a id="abf366ff8211bd13a690dfa8b3810ac19" name="abf366ff8211bd13a690dfa8b3810ac19"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abf366ff8211bd13a690dfa8b3810ac19">&#9670;&#160;</a></span>changeEvent()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SARibbonPanel::changeEvent </td>
+          <td>(</td>
+          <td class="paramtype">QEvent *&#160;</td>
+          <td class="paramname"><em>e</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">virtual</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Handles change events (e.g., font change) / 处理更改事件（例如，字体更改） </p>
+<p>This function is called when properties like the font change. It propagates the change to child widgets and invalidates the layout.</p>
+<p>当字体等属性更改时会调用此函数。它将更改传播到子窗口部件并使布局失效。</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">e</td><td>The change event / 更改事件 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a9c6e7da74ae20dc756ad1d032d9b56b0" name="a9c6e7da74ae20dc756ad1d032d9b56b0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9c6e7da74ae20dc756ad1d032d9b56b0">&#9670;&#160;</a></span>getActionRowProportionProperty()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSARibbonPanelItem.html#a750c9ab520166584754d85b795af41b2">SARibbonPanelItem::RowProportion</a> SARibbonPanel::getActionRowProportionProperty </td>
+          <td>(</td>
+          <td class="paramtype">QAction *&#160;</td>
+          <td class="paramname"><em>action</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Gets the row proportion property from an action / 从一个action获取行占比属性 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">action</td><td>The action to query / 要查询的action </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>The row proportion, defaults to Large if not set / 行占比，如果未设置则默认为Large </dd></dl>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="classSARibbonPanel.html#a7c0b017faab3d53d4f09820039de85c7" title="Sets the row proportion property for an action / 为一个action设置行占比属性">setActionRowProportionProperty</a> </dd></dl>
+
+</div>
+</div>
+<a id="ae7e74febf049a0adacf236ae1f405a95" name="ae7e74febf049a0adacf236ae1f405a95"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae7e74febf049a0adacf236ae1f405a95">&#9670;&#160;</a></span>getActionToolButtonPopupModeProperty()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">QToolButton::ToolButtonPopupMode SARibbonPanel::getActionToolButtonPopupModeProperty </td>
+          <td>(</td>
+          <td class="paramtype">QAction *&#160;</td>
+          <td class="paramname"><em>action</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Gets the ToolButtonPopupMode property from an action / 从一个action获取ToolButtonPopupMode属性 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">action</td><td>The action to query / 要查询的action </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>The popup mode, defaults to InstantPopup if not set / 弹出模式，如果未设置则默认为InstantPopup </dd></dl>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="classSARibbonPanel.html#aeeba40a5dd8b99036cb691177250b1cd" title="Sets the ToolButtonPopupMode property for an action / 为一个action设置ToolButtonPopupMode属性">setActionToolButtonPopupModeProperty</a> </dd></dl>
+
+</div>
+</div>
+<a id="a23e04d4b23ab31c8ffb5753193b21406" name="a23e04d4b23ab31c8ffb5753193b21406"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a23e04d4b23ab31c8ffb5753193b21406">&#9670;&#160;</a></span>getActionToolButtonStyleProperty()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">Qt::ToolButtonStyle SARibbonPanel::getActionToolButtonStyleProperty </td>
+          <td>(</td>
+          <td class="paramtype">QAction *&#160;</td>
+          <td class="paramname"><em>action</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Gets the ToolButtonStyle property from an action / 从一个action获取ToolButtonStyle属性 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">action</td><td>The action to query / 要查询的action </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>The button style, defaults to ToolButtonIconOnly if not set / 按钮样式，如果未设置则默认为ToolButtonIconOnly </dd></dl>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="classSARibbonPanel.html#aa818d102bc5de1498aefb151d8c48680" title="Sets the ToolButtonStyle property for an action / 为一个action设置ToolButtonStyle属性">setActionToolButtonStyleProperty</a> </dd></dl>
+
+</div>
+</div>
+<a id="ab486c4b1020cb6c75367af6cc4f32f4a" name="ab486c4b1020cb6c75367af6cc4f32f4a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab486c4b1020cb6c75367af6cc4f32f4a">&#9670;&#160;</a></span>isCanCustomize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool SARibbonPanel::isCanCustomize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Checks if customization is allowed / 检查是否允许自定义 </p>
+<dl class="section return"><dt>返回</dt><dd>true if customization is allowed; otherwise false / 如果允许自定义则返回true；否则返回false </dd></dl>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="classSARibbonPanel.html#a8ac9bd4e3673aa159df0c4d53d4e07f3" title="Sets whether customization is allowed / 设置是否允许自定义">setCanCustomize</a> </dd></dl>
+
+</div>
+</div>
+<a id="aa014b6b2f815a323fbd1b75a13de519b" name="aa014b6b2f815a323fbd1b75a13de519b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa014b6b2f815a323fbd1b75a13de519b">&#9670;&#160;</a></span>isEnableShowTitle()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool SARibbonPanel::isEnableShowTitle </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Checks if the panel's title is visible / 检查面板标题是否可见 </p>
+<dl class="section return"><dt>返回</dt><dd>true if the title is visible; otherwise false / 如果标题可见则返回true；否则返回false </dd></dl>
+
+</div>
+</div>
+<a id="a194cb3faac1f7c30e0a8534bcef9e145" name="a194cb3faac1f7c30e0a8534bcef9e145"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a194cb3faac1f7c30e0a8534bcef9e145">&#9670;&#160;</a></span>isEnableWordWrap()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool SARibbonPanel::isEnableWordWrap </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>判断panel的文字是否允许换行 </p>
+<dl class="section return"><dt>返回</dt><dd></dd></dl>
+
+</div>
+</div>
+<a id="a9436ede025d9de6c0ecb0bf7e0fcce3b" name="a9436ede025d9de6c0ecb0bf7e0fcce3b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9436ede025d9de6c0ecb0bf7e0fcce3b">&#9670;&#160;</a></span>isExpanding()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool SARibbonPanel::isExpanding </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Checks if the panel is in expanding mode / 检查面板是否处于扩展模式 </p>
+<dl class="section return"><dt>返回</dt><dd>true if the horizontal size policy is Expanding; otherwise false / 如果水平尺寸策略为Expanding则返回true；否则返回false </dd></dl>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="classSARibbonPanel.html#afce08a48194a4847b9a15eb55d78573a" title="Sets the panel to expanding mode / 将面板设置为扩展模式">setExpanding</a> </dd></dl>
+
+</div>
+</div>
+<a id="a27a02536f720ff3be58ce6584b43011c" name="a27a02536f720ff3be58ce6584b43011c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a27a02536f720ff3be58ce6584b43011c">&#9670;&#160;</a></span>isHaveOptionAction()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool SARibbonPanel::isHaveOptionAction </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Checks if an option action is set / 检查是否设置了选项action </p>
+<dl class="section return"><dt>返回</dt><dd>true if an option action exists; otherwise false / 如果存在选项action则返回true；否则返回false </dd></dl>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="classSARibbonPanel.html#a5c4e32cb9846f97deb854f161a69a032" title="Sets the option action for the panel / 为面板设置选项action">setOptionAction</a> </dd></dl>
+
+</div>
+</div>
+<a id="a435425eb22088764bacf47018973f787" name="a435425eb22088764bacf47018973f787"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a435425eb22088764bacf47018973f787">&#9670;&#160;</a></span>iterateButton()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool SARibbonPanel::iterateButton </td>
+          <td>(</td>
+          <td class="paramtype">SARibbonPanel::FpRibbonToolButtonIterate&#160;</td>
+          <td class="paramname"><em>fp</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Iterates over all <a class="el" href="classSARibbonToolButton.html" title="Ribbon interface adapted tool button / Ribbon界面适用的toolButton">SARibbonToolButton</a> children / 遍历所有SARibbonToolButton子对象 </p>
+<p>Executes the provided function pointer for each <code><a class="el" href="classSARibbonToolButton.html" title="Ribbon interface adapted tool button / Ribbon界面适用的toolButton">SARibbonToolButton</a></code>. If the function returns <code>false</code>, iteration stops immediately.</p>
+<p>对每个 <code><a class="el" href="classSARibbonToolButton.html" title="Ribbon interface adapted tool button / Ribbon界面适用的toolButton">SARibbonToolButton</a></code> 执行提供的函数指针。如果函数返回 <code>false</code>， 迭代将立即停止。</p>
+<p>Example: </p><div class="fragment"><div class="line">myPanel-&gt;iterateButton([](<a class="code hl_class" href="classSARibbonToolButton.html">SARibbonToolButton</a>* btn) -&gt; <span class="keywordtype">bool</span> {</div>
+<div class="line">    btn-&gt;setToolTip(<span class="stringliteral">&quot;Visited&quot;</span>);</div>
+<div class="line">    <span class="keywordflow">return</span> <span class="keyword">true</span>; <span class="comment">// Continue to next button/继续下一个按钮</span></div>
+<div class="line">});</div>
+<div class="ttc" id="aclassSARibbonToolButton_html"><div class="ttname"><a href="classSARibbonToolButton.html">SARibbonToolButton</a></div><div class="ttdoc">Ribbon interface adapted tool button / Ribbon界面适用的toolButton</div><div class="ttdef"><b>Definition</b> SARibbonToolButton.h:20</div></div>
+</div><!-- fragment --><dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">fp</td><td>A function pointer that takes a SARibbonToolButton* and returns a bool / 一个接受SARibbonToolButton*并返回bool的函数指针 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>true if all buttons were iterated; false if iteration was stopped early / 如果遍历了所有按钮则返回true；如果提前停止则返回false </dd></dl>
+
+</div>
+</div>
+<a id="ab95ff4876bc2dce9a9ae179cbc4b6780" name="ab95ff4876bc2dce9a9ae179cbc4b6780"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab95ff4876bc2dce9a9ae179cbc4b6780">&#9670;&#160;</a></span>largeButtonHeight()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int SARibbonPanel::largeButtonHeight </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Gets the height of the large buttons in this panel / 获取此面板中大按钮的高度 </p>
+<dl class="section return"><dt>返回</dt><dd>The height of large buttons / 大按钮的高度 </dd></dl>
+
+</div>
+</div>
+<a id="af6edf84b7485dbcb2629df245e37dbef" name="af6edf84b7485dbcb2629df245e37dbef"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af6edf84b7485dbcb2629df245e37dbef">&#9670;&#160;</a></span>lastAddActionButton()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSARibbonToolButton.html">SARibbonToolButton</a> * SARibbonPanel::lastAddActionButton </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>获取最近添加的按钮 </p>
+<dl class="section return"><dt>返回</dt><dd>刚才添加的按钮的指针 </dd></dl>
+
+</div>
+</div>
+<a id="ac48fc77cf00851f2c874f1f46be545f4" name="ac48fc77cf00851f2c874f1f46be545f4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac48fc77cf00851f2c874f1f46be545f4">&#9670;&#160;</a></span>moveAction()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SARibbonPanel::moveAction </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>from</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>to</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Moves an action to a new position / 将一个action移动到新位置 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">from</td><td>The current index of the action / action的当前索引 </td></tr>
+    <tr><td class="paramname">to</td><td>The new index for the action / action的新索引 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a186f1e31a5250a560a373c728b0c88de" name="a186f1e31a5250a560a373c728b0c88de"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a186f1e31a5250a560a373c728b0c88de">&#9670;&#160;</a></span>panelHeightHint()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int SARibbonPanel::panelHeightHint </td>
+          <td>(</td>
+          <td class="paramtype">const QFontMetrics &amp;&#160;</td>
+          <td class="paramname"><em>fm</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classSARibbonPanel.html#a94ae3faab66b965f85480cfcaef84805">PanelLayoutMode</a>&#160;</td>
+          <td class="paramname"><em>layMode</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>panelTitleHeight</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Gets the panel's recommended height / 获取面板的推荐高度 </p>
+<p>This is a static helper function used internally for layout calculations.</p>
+<p>这是一个用于内部布局计算的静态辅助函数。</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">fm</td><td>The font metrics to use for calculation / 用于计算的字体度量 </td></tr>
+    <tr><td class="paramname">layMode</td><td>The layout mode / 布局模式 </td></tr>
+    <tr><td class="paramname">panelTitleHeight</td><td>The height of the panel's title / 面板标题的高度 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>返回</dt><dd>The recommended height / 推荐的高度 </dd></dl>
+
+</div>
+</div>
+<a id="a4530332989d9b00ff7734c97f69c53d1" name="a4530332989d9b00ff7734c97f69c53d1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4530332989d9b00ff7734c97f69c53d1">&#9670;&#160;</a></span>panelLayout()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSARibbonPanelLayout.html">SARibbonPanelLayout</a> * SARibbonPanel::panelLayout </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Gets the panel's layout object / 获取面板的布局对象 </p>
+<dl class="section return"><dt>返回</dt><dd>A pointer to the <a class="el" href="classSARibbonPanelLayout.html" title="Layout manager for SARibbonPanel / SARibbonPanel的布局管理器">SARibbonPanelLayout</a> / 指向SARibbonPanelLayout的指针 </dd></dl>
+
+</div>
+</div>
+<a id="a7139d9c05b3fe4e0672af1cebf67d2de" name="a7139d9c05b3fe4e0672af1cebf67d2de"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7139d9c05b3fe4e0672af1cebf67d2de">&#9670;&#160;</a></span>panelLayoutMode()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSARibbonPanel.html#a94ae3faab66b965f85480cfcaef84805">SARibbonPanel::PanelLayoutMode</a> SARibbonPanel::panelLayoutMode </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Gets the current layout mode / 获取当前的布局模式 </p>
+<dl class="section return"><dt>返回</dt><dd>The current layout mode / 当前的布局模式 </dd></dl>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="classSARibbonPanel.html#a738a78c58a01f782b9c679cc97bdbaa2" title="Sets the panel&#39;s layout mode / 设置面板的布局模式">setPanelLayoutMode</a> </dd></dl>
+
+</div>
+</div>
+<a id="a2ba8946c383373cb19483f867f9d5a9b" name="a2ba8946c383373cb19483f867f9d5a9b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2ba8946c383373cb19483f867f9d5a9b">&#9670;&#160;</a></span>panelName()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QString SARibbonPanel::panelName </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Gets the panel's name / 获取面板的名称 </p>
+<dl class="section return"><dt>返回</dt><dd>The panel's name / 面板的名称 </dd></dl>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="classSARibbonPanel.html#ac16846dcfbc4a1c0544c46e0ea15bbec" title="Sets the panel&#39;s name / 设置面板的名称">setPanelName</a> </dd></dl>
+
+</div>
+</div>
+<a id="ad923fa83f3116980ab1c9db2b004faf0" name="ad923fa83f3116980ab1c9db2b004faf0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad923fa83f3116980ab1c9db2b004faf0">&#9670;&#160;</a></span>panelNameChanged</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SARibbonPanel::panelNameChanged </td>
+          <td>(</td>
+          <td class="paramtype">const QString &amp;&#160;</td>
+          <td class="paramname"><em>n</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">signal</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Emitted when the panel's name changes / 当面板名称改变时发出 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">name</td><td>The new name / 新的名称 </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ad9b0b124a997ef15cb971bceebac5b89" name="ad9b0b124a997ef15cb971bceebac5b89"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad9b0b124a997ef15cb971bceebac5b89">&#9670;&#160;</a></span>ribbonBar()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSARibbonBar.html">SARibbonBar</a> * SARibbonPanel::ribbonBar </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Gets the top-level <a class="el" href="classSARibbonBar.html" title="SARibbonBar继承于QMenuBar,在SARibbonMainWindow中直接替换了原来的QMenuBar">SARibbonBar</a> / 获取顶层的SARibbonBar </p>
+<dl class="section return"><dt>返回</dt><dd>The ribbon bar, or nullptr if not found / Ribbon栏，如果未找到则返回nullptr </dd></dl>
+
+</div>
+</div>
+<a id="ab547ef27c48359ce81af44218acd390e" name="ab547ef27c48359ce81af44218acd390e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab547ef27c48359ce81af44218acd390e">&#9670;&#160;</a></span>ribbonPanelItem()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const QList&lt; <a class="el" href="classSARibbonPanelItem.html">SARibbonPanelItem</a> * &gt; &amp; SARibbonPanel::ribbonPanelItem </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>获取布局item </p>
+<dl class="section return"><dt>返回</dt><dd></dd></dl>
+
+</div>
+</div>
+<a id="a6e40a06902e5f736778bcc69f26c36a1" name="a6e40a06902e5f736778bcc69f26c36a1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6e40a06902e5f736778bcc69f26c36a1">&#9670;&#160;</a></span>ribbonToolButtons()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QList&lt; <a class="el" href="classSARibbonToolButton.html">SARibbonToolButton</a> * &gt; SARibbonPanel::ribbonToolButtons </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Returns a list of all <a class="el" href="classSARibbonToolButton.html" title="Ribbon interface adapted tool button / Ribbon界面适用的toolButton">SARibbonToolButton</a> children / 返回所有SARibbonToolButton子对象的列表 </p>
+<dl class="section return"><dt>返回</dt><dd>A list of pointers to <a class="el" href="classSARibbonToolButton.html" title="Ribbon interface adapted tool button / Ribbon界面适用的toolButton">SARibbonToolButton</a> / SARibbonToolButton指针的列表 </dd></dl>
+
+</div>
+</div>
+<a id="a7c0b017faab3d53d4f09820039de85c7" name="a7c0b017faab3d53d4f09820039de85c7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7c0b017faab3d53d4f09820039de85c7">&#9670;&#160;</a></span>setActionRowProportionProperty()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SARibbonPanel::setActionRowProportionProperty </td>
+          <td>(</td>
+          <td class="paramtype">QAction *&#160;</td>
+          <td class="paramname"><em>action</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classSARibbonPanelItem.html#a750c9ab520166584754d85b795af41b2">SARibbonPanelItem::RowProportion</a>&#160;</td>
+          <td class="paramname"><em>rp</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Sets the row proportion property for an action / 为一个action设置行占比属性 </p>
+<p>This property determines how much vertical space the corresponding button will occupy within the panel. It should be set before adding the action to the panel.</p>
+<p>此属性决定了对应按钮在面板内占据的垂直空间比例。 应在将action添加到面板之前设置。</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">action</td><td>The action to modify / 要修改的action </td></tr>
+    <tr><td class="paramname">rp</td><td>The row proportion (Large, Medium, Small) / 行占比（大、中、小） </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="classSARibbonPanel.html#a044725c5b8ac4123f90e44e21ec58586" title="Adds an action to the panel / 向面板添加一个action">addAction</a>, <a class="el" href="classSARibbonPanel.html#a9c6e7da74ae20dc756ad1d032d9b56b0" title="Gets the row proportion property from an action / 从一个action获取行占比属性">getActionRowProportionProperty</a> </dd></dl>
+
+</div>
+</div>
+<a id="aeeba40a5dd8b99036cb691177250b1cd" name="aeeba40a5dd8b99036cb691177250b1cd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aeeba40a5dd8b99036cb691177250b1cd">&#9670;&#160;</a></span>setActionToolButtonPopupModeProperty()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SARibbonPanel::setActionToolButtonPopupModeProperty </td>
+          <td>(</td>
+          <td class="paramtype">QAction *&#160;</td>
+          <td class="paramname"><em>action</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">QToolButton::ToolButtonPopupMode&#160;</td>
+          <td class="paramname"><em>popMode</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Sets the ToolButtonPopupMode property for an action / 为一个action设置ToolButtonPopupMode属性 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">action</td><td>The action to modify / 要修改的action </td></tr>
+    <tr><td class="paramname">popMode</td><td>The popup mode (e.g., InstantPopup, MenuButtonPopup) / 弹出模式（例如，InstantPopup, MenuButtonPopup） </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="classSARibbonPanel.html#ae7e74febf049a0adacf236ae1f405a95" title="Gets the ToolButtonPopupMode property from an action / 从一个action获取ToolButtonPopupMode属性">getActionToolButtonPopupModeProperty</a> </dd></dl>
+
+</div>
+</div>
+<a id="aa818d102bc5de1498aefb151d8c48680" name="aa818d102bc5de1498aefb151d8c48680"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa818d102bc5de1498aefb151d8c48680">&#9670;&#160;</a></span>setActionToolButtonStyleProperty()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SARibbonPanel::setActionToolButtonStyleProperty </td>
+          <td>(</td>
+          <td class="paramtype">QAction *&#160;</td>
+          <td class="paramname"><em>action</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">Qt::ToolButtonStyle&#160;</td>
+          <td class="paramname"><em>buttonStyle</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Sets the ToolButtonStyle property for an action / 为一个action设置ToolButtonStyle属性 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">action</td><td>The action to modify / 要修改的action </td></tr>
+    <tr><td class="paramname">buttonStyle</td><td>The button style (e.g., ToolButtonIconOnly, ToolButtonTextBesideIcon) / 按钮样式（例如，ToolButtonIconOnly, ToolButtonTextBesideIcon） </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="classSARibbonPanel.html#a23e04d4b23ab31c8ffb5753193b21406" title="Gets the ToolButtonStyle property from an action / 从一个action获取ToolButtonStyle属性">getActionToolButtonStyleProperty</a> </dd></dl>
+
+</div>
+</div>
+<a id="ac99f1567d9db70b1dcd8d837c7eb836f" name="ac99f1567d9db70b1dcd8d837c7eb836f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac99f1567d9db70b1dcd8d837c7eb836f">&#9670;&#160;</a></span>setButtonMaximumAspectRatio()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SARibbonPanel::setButtonMaximumAspectRatio </td>
+          <td>(</td>
+          <td class="paramtype">qreal&#160;</td>
+          <td class="paramname"><em>fac</em> = <code>1.4</code></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>设置按钮最大宽高比，这个系数决定按钮的最大宽度 </p>
+<p>按钮的最大宽度为按钮高度*此系数，例如按钮高度为h，那么按钮最大宽度maxw=h*buttonMaximumAspectRatio 如果在此宽度下文字还无法完全显示，那么按钮将不会继续横向扩展，将使用...替代未完全显示的文字</p>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="classSARibbonPanel.html#ac0ea3bd761d619b6cccffba4a97b6987" title="按钮最大宽高比，这个系数决定按钮的最大宽度">buttonMaximumAspectRatio</a></dd></dl>
+<dl class="section note"><dt>注解</dt><dd>用户不应该调用<a class="el" href="classSARibbonPanel.html#ac99f1567d9db70b1dcd8d837c7eb836f">SARibbonPanel::setButtonMaximumAspectRatio</a> 来设置， 而是调用<a class="el" href="classSARibbonBar.html#ad84312544fb7bdb0455f07fc7fcd1e6c">SARibbonBar::setButtonMaximumAspectRatio</a> 设置宽高比 </dd></dl>
+
+</div>
+</div>
+<a id="a8ac9bd4e3673aa159df0c4d53d4e07f3" name="a8ac9bd4e3673aa159df0c4d53d4e07f3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8ac9bd4e3673aa159df0c4d53d4e07f3">&#9670;&#160;</a></span>setCanCustomize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SARibbonPanel::setCanCustomize </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>b</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Sets whether customization is allowed / 设置是否允许自定义 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">b</td><td>If true, customization is allowed / 如果为true，则允许自定义 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>参见</dt><dd>isCanCustomize </dd></dl>
+
+</div>
+</div>
+<a id="aa920870968cb8f1ae4936ac9cc30bdc3" name="aa920870968cb8f1ae4936ac9cc30bdc3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa920870968cb8f1ae4936ac9cc30bdc3">&#9670;&#160;</a></span>setEnableShowTitle()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SARibbonPanel::setEnableShowTitle </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>on</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Sets whether the panel's title is visible / 设置面板标题是否可见 </p>
+<p>This function is typically called by <code><a class="el" href="classSARibbonBar.html" title="SARibbonBar继承于QMenuBar,在SARibbonMainWindow中直接替换了原来的QMenuBar">SARibbonBar</a></code> and is protected to prevent direct user manipulation.</p>
+<p>此函数通常由 <code><a class="el" href="classSARibbonBar.html" title="SARibbonBar继承于QMenuBar,在SARibbonMainWindow中直接替换了原来的QMenuBar">SARibbonBar</a></code> 调用，为防止用户直接操作而设为protected。</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">on</td><td>If true, the title is visible / 如果为true，则标题可见 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="classSARibbonBar.html#af3bb754092b343b12b1e0d963a082502" title="设置显示panel标题">SARibbonBar::setEnableShowPanelTitle</a> </dd></dl>
+
+</div>
+</div>
+<a id="ab479f76b86045b46a4465324eccdc410" name="ab479f76b86045b46a4465324eccdc410"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab479f76b86045b46a4465324eccdc410">&#9670;&#160;</a></span>setEnableWordWrap()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SARibbonPanel::setEnableWordWrap </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>on</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>设置panel的按钮文字允许换行 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">on</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="afce08a48194a4847b9a15eb55d78573a" name="afce08a48194a4847b9a15eb55d78573a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afce08a48194a4847b9a15eb55d78573a">&#9670;&#160;</a></span>setExpanding()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SARibbonPanel::setExpanding </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>isExpanding</em> = <code>true</code></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Sets the panel to expanding mode / 将面板设置为扩展模式 </p>
+<p>In expanding mode, the panel will try to occupy all available horizontal space in its parent layout.</p>
+<p>在扩展模式下，面板将尝试占据其父布局中所有可用的水平空间。</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">isExpanding</td><td>If true, sets the horizontal size policy to Expanding / 如果为true，将水平尺寸策略设置为Expanding </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>参见</dt><dd>isExpanding </dd></dl>
+
+</div>
+</div>
+<a id="a5c4e32cb9846f97deb854f161a69a032" name="a5c4e32cb9846f97deb854f161a69a032"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5c4e32cb9846f97deb854f161a69a032">&#9670;&#160;</a></span>setOptionAction()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SARibbonPanel::setOptionAction </td>
+          <td>(</td>
+          <td class="paramtype">QAction *&#160;</td>
+          <td class="paramname"><em>action</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Sets the option action for the panel / 为面板设置选项action </p>
+<p>The option action is typically displayed as a small button in the panel's title area. Pass <code>nullptr</code> to remove the current option action.</p>
+<p>选项action通常显示在面板标题区域的一个小按钮中。 传入 <code>nullptr</code> 以移除当前的选项action。</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">action</td><td>The option action, or nullptr to remove / 选项action，或传入nullptr以移除 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="classSARibbonPanel.html#a27a02536f720ff3be58ce6584b43011c" title="Checks if an option action is set / 检查是否设置了选项action">isHaveOptionAction</a> </dd></dl>
+
+</div>
+</div>
+<a id="a738a78c58a01f782b9c679cc97bdbaa2" name="a738a78c58a01f782b9c679cc97bdbaa2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a738a78c58a01f782b9c679cc97bdbaa2">&#9670;&#160;</a></span>setPanelLayoutMode()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SARibbonPanel::setPanelLayoutMode </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classSARibbonPanel.html#a94ae3faab66b965f85480cfcaef84805">SARibbonPanel::PanelLayoutMode</a>&#160;</td>
+          <td class="paramname"><em>mode</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Sets the panel's layout mode / 设置面板的布局模式 </p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">mode</td><td>The new layout mode (ThreeRowMode or TwoRowMode) / 新的布局模式（三行模式或两行模式） </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="classSARibbonPanel.html#a7139d9c05b3fe4e0672af1cebf67d2de" title="Gets the current layout mode / 获取当前的布局模式">panelLayoutMode</a> </dd></dl>
+
+</div>
+</div>
+<a id="ac16846dcfbc4a1c0544c46e0ea15bbec" name="ac16846dcfbc4a1c0544c46e0ea15bbec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac16846dcfbc4a1c0544c46e0ea15bbec">&#9670;&#160;</a></span>setPanelName()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SARibbonPanel::setPanelName </td>
+          <td>(</td>
+          <td class="paramtype">const QString &amp;&#160;</td>
+          <td class="paramname"><em>title</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Sets the panel's name / 设置面板的名称 </p>
+<p>Setting the name will also emit the <code>panelNameChanged</code> signal.</p>
+<p>设置名称还会发出 <code>panelNameChanged</code> 信号。</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">title</td><td>The new name for the panel / 面板的新名称 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>参见</dt><dd>panelName </dd></dl>
+
+</div>
+</div>
+<a id="a023d69dceab91a6dc02b047b78a9acb3" name="a023d69dceab91a6dc02b047b78a9acb3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a023d69dceab91a6dc02b047b78a9acb3">&#9670;&#160;</a></span>setSpacing()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SARibbonPanel::setSpacing </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>n</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Sets the spacing between elements in the panel / 设置面板内元素之间的间距 </p>
+<p>This function is typically called by <code><a class="el" href="classSARibbonBar.html" title="SARibbonBar继承于QMenuBar,在SARibbonMainWindow中直接替换了原来的QMenuBar">SARibbonBar</a></code> and is protected to prevent direct user manipulation.</p>
+<p>此函数通常由 <code><a class="el" href="classSARibbonBar.html" title="SARibbonBar继承于QMenuBar,在SARibbonMainWindow中直接替换了原来的QMenuBar">SARibbonBar</a></code> 调用，为防止用户直接操作而设为protected。</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">n</td><td>The new spacing value / 新的间距值 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="classSARibbonBar.html#a57ea38022c9e7a7f5fa8d09fd4a696f9" title="设置panel的spacing">SARibbonBar::setPanelSpacing</a> </dd></dl>
+
+</div>
+</div>
+<a id="aea9b655a4fb23d24fd43ff862d627412" name="aea9b655a4fb23d24fd43ff862d627412"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aea9b655a4fb23d24fd43ff862d627412">&#9670;&#160;</a></span>setTitleHeight()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SARibbonPanel::setTitleHeight </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>h</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Sets the height of the panel's title / 设置面板标题的高度 </p>
+<p>This function is typically called by <code><a class="el" href="classSARibbonBar.html" title="SARibbonBar继承于QMenuBar,在SARibbonMainWindow中直接替换了原来的QMenuBar">SARibbonBar</a></code> and is protected to prevent direct user manipulation.</p>
+<p>此函数通常由 <code><a class="el" href="classSARibbonBar.html" title="SARibbonBar继承于QMenuBar,在SARibbonMainWindow中直接替换了原来的QMenuBar">SARibbonBar</a></code> 调用，为防止用户直接操作而设为protected。</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">h</td><td>The new title height / 新的标题高度 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="classSARibbonBar.html#a613d9b3df07dc22afe4b7b843af927e4" title="设置panel的高度">SARibbonBar::setPanelTitleHeight</a> </dd></dl>
+
+</div>
+</div>
+<a id="a2854265dec6244203252353fd9f52221" name="a2854265dec6244203252353fd9f52221"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2854265dec6244203252353fd9f52221">&#9670;&#160;</a></span>setToolButtonIconSize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SARibbonPanel::setToolButtonIconSize </td>
+          <td>(</td>
+          <td class="paramtype">const QSize &amp;&#160;</td>
+          <td class="paramname"><em>s</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Sets the icon size for all tool buttons in the panel / 设置面板内所有工具按钮的图标尺寸 </p>
+<p>This sets the default icon size for newly created buttons and updates the icon size for existing buttons.</p>
+<p>此函数设置新创建按钮的默认图标尺寸，并更新现有按钮的图标尺寸。</p>
+<dl class="params"><dt>参数</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">s</td><td>The new icon size / 新的图标尺寸 </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="classSARibbonPanel.html#ac3c9bfb02c1b0c65228b3763dfe8e12d" title="Gets the current default icon size for tool buttons / 获取工具按钮当前的默认图标尺寸">toolButtonIconSize</a> </dd></dl>
+
+</div>
+</div>
+<a id="af4c04c2a00708fe083766a1fa8ea4983" name="af4c04c2a00708fe083766a1fa8ea4983"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af4c04c2a00708fe083766a1fa8ea4983">&#9670;&#160;</a></span>spacing()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int SARibbonPanel::spacing </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Gets the spacing between elements in the panel / 获取面板内元素之间的间距 </p>
+<dl class="section return"><dt>返回</dt><dd>The current spacing value / 当前的间距值 </dd></dl>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="classSARibbonPanel.html#a023d69dceab91a6dc02b047b78a9acb3" title="Sets the spacing between elements in the panel / 设置面板内元素之间的间距">setSpacing</a> </dd></dl>
+
+</div>
+</div>
+<a id="ace44293541b922adf1e7c9943b86c5f4" name="ace44293541b922adf1e7c9943b86c5f4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ace44293541b922adf1e7c9943b86c5f4">&#9670;&#160;</a></span>titleHeight()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int SARibbonPanel::titleHeight </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Gets the height of the panel's title / 获取面板标题的高度 </p>
+<dl class="section return"><dt>返回</dt><dd>The current title height / 当前的标题高度 </dd></dl>
+
+</div>
+</div>
+<a id="a64d051be6c2aeee27a8556684364c99b" name="a64d051be6c2aeee27a8556684364c99b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a64d051be6c2aeee27a8556684364c99b">&#9670;&#160;</a></span>titleLabel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classSARibbonPanelLabel.html">SARibbonPanelLabel</a> * SARibbonPanel::titleLabel </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Gets the title label widget / 获取标题标签窗口部件 </p>
+<dl class="section return"><dt>返回</dt><dd>A pointer to the <a class="el" href="classSARibbonPanelLabel.html" title="SARibbonPanel的标题label，此类用于qss">SARibbonPanelLabel</a> / 指向SARibbonPanelLabel的指针 </dd></dl>
+
+</div>
+</div>
+<a id="ac3c9bfb02c1b0c65228b3763dfe8e12d" name="ac3c9bfb02c1b0c65228b3763dfe8e12d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac3c9bfb02c1b0c65228b3763dfe8e12d">&#9670;&#160;</a></span>toolButtonIconSize()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">QSize SARibbonPanel::toolButtonIconSize </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Gets the current default icon size for tool buttons / 获取工具按钮当前的默认图标尺寸 </p>
+<dl class="section return"><dt>返回</dt><dd>The current icon size / 当前的图标尺寸 </dd></dl>
+<dl class="section see"><dt>参见</dt><dd><a class="el" href="classSARibbonPanel.html#a2854265dec6244203252353fd9f52221" title="Sets the icon size for all tool buttons in the panel / 设置面板内所有工具按钮的图标尺寸">setToolButtonIconSize</a> </dd></dl>
+
+</div>
+</div>
+<a id="a7a82858dd9b83f2b9e867b5296a28a3b" name="a7a82858dd9b83f2b9e867b5296a28a3b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7a82858dd9b83f2b9e867b5296a28a3b">&#9670;&#160;</a></span>updateItemGeometry()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void SARibbonPanel::updateItemGeometry </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Updates the geometry of all items in the panel / 更新面板内所有项目的几何形状 </p>
+<p>This function forces a recalculation of the layout and size hints for all buttons and items.</p>
+<p>此函数强制重新计算所有按钮和项目的布局及尺寸提示。 </p>
+
+</div>
+</div>
+<hr/>该类的文档由以下文件生成:<ul>
+<li>/home/runner/work/SARibbon/SARibbon/src/SARibbonBar/<a class="el" href="SARibbonPanel_8h_source.html">SARibbonPanel.h</a></li>
+<li>/home/runner/work/SARibbon/SARibbon/src/SARibbonBar/<b>SARibbonPanel.cpp</b></li>
+</ul>
+</div><!-- contents -->
+</div><!-- doc-content -->
+<!-- start footer part -->
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    <li class="navelem"><a class="el" href="classSARibbonPanel.html">SARibbonPanel</a></li>
+    <li class="footer">制作者 <a href="https://www.doxygen.org/index.html"><img class="footer" src="doxygen.svg" width="104" height="31" alt="doxygen"/></a> 1.9.8 </li>
+  </ul>
+</div>
+</body>
+</html>
