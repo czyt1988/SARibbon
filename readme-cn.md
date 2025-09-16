@@ -20,6 +20,10 @@ QQ交流群:755294806、434014314(已满)
 <img src="./doc/SARibbon-qq交流群2.jpg" style="width:300px;"/>
 </div>
 
+中文文档：[https://czyt1988.github.io/SARibbon](https://czyt1988.github.io/SARibbon)
+
+类列表：[https://czyt1988.github.io/SARibbon/annotated.html](https://czyt1988.github.io/SARibbon/annotated.html)
+
 ||Windows(latest)|Linux ubuntu(latest)|Mac(latest)|
 |:-|:-|:-|:-|
 |Qt5.12 LTS|[![cmake-win-qt5.12](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt5.12.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt5.12.yml)|[![CMake-Linux-Qt5.12](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt5.12.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt5.12.yml)|[![cmake-mac-qt5.12](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt5.12.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt5.12.yml)|
@@ -643,6 +647,12 @@ sa_apply_customize_from_xml_file("customization.xml", this, m_ribbonActionMgr);
 # 文档生成
 
 你可以通过doxygen生成qch和html类型的文档，`doc/Doxyfile-qch-cn`文件用于生成`.qch`格式的qt帮助文档,你可以把它集成到qt creator当中，`doc/Doxyfile-wiki-cn`文件用于生成html格式的文档，方便你在浏览器中查阅
+
+下面地址是通过github pages生成的，你可以直接点击链接查看
+
+中文文档：[https://czyt1988.github.io/SARibbon](https://czyt1988.github.io/SARibbon)
+
+类列表：[https://czyt1988.github.io/SARibbon/annotated.html](https://czyt1988.github.io/SARibbon/annotated.html)
 
 # 常见问题
 
