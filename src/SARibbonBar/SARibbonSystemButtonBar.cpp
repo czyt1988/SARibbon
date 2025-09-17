@@ -407,9 +407,9 @@ QSize SARibbonSystemButtonBar::iconSize() const
     return d_ptr->mButtonGroup->iconSize();
 }
 
-QAction* SARibbonSystemButtonBar::addAction(QAction* a, Qt::ToolButtonStyle buttonStyle, QToolButton::ToolButtonPopupMode popMode)
+QAction* SARibbonSystemButtonBar::addAction(QAction* a)
 {
-    return d_ptr->mButtonGroup->addAction(a, buttonStyle, popMode);
+    d_ptr->mButtonGroup->addAction(a);
 }
 
 QAction* SARibbonSystemButtonBar::addAction(const QString& text,

@@ -58,9 +58,7 @@ public:
     void setIconSize(const QSize& ic);
     QSize iconSize() const;
     // 生成并添加一个action
-    QAction* addAction(QAction* a,
-                       Qt::ToolButtonStyle buttonStyle          = Qt::ToolButtonIconOnly,
-                       QToolButton::ToolButtonPopupMode popMode = QToolButton::DelayedPopup);
+    QAction* addAction(QAction* a);
     QAction* addAction(const QString& text,
                        const QIcon& icon,
                        Qt::ToolButtonStyle buttonStyle          = Qt::ToolButtonIconOnly,
@@ -85,7 +83,7 @@ protected Q_SLOTS:
 };
 
 /**
- * @brief The SARibbonSystemToolButton class
+ * @brief The SARibbonSystemToolButton class/系统最大最小化按钮
  */
 class SARibbonSystemToolButton : public QToolButton
 {

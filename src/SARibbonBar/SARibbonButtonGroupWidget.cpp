@@ -12,92 +12,17 @@
 #include "SARibbonPanel.h"
 
 //===================================================
-// SARibbonButtonGroupWidget::PrivateData
-//===================================================
-class SARibbonButtonGroupWidget::PrivateData
-{
-	SA_RIBBON_DECLARE_PUBLIC(SARibbonButtonGroupWidget)
-public:
-	PrivateData(SARibbonButtonGroupWidget* p);
-	void init();
-	void removeAction(QAction* a);
-	SARibbonControlButton* createButtonForAction(QAction* a);
-
-public:
-	QSize mIconSize { 20, 20 };
-};
-
-SARibbonButtonGroupWidget::PrivateData::PrivateData(SARibbonButtonGroupWidget* p) : q_ptr(p)
-{
-}
-
-void SARibbonButtonGroupWidget::PrivateData::init()
-{
-	QHBoxLayout* layout = new QHBoxLayout(q_ptr);
-	// 上下保留一点间隙
-	layout->setContentsMargins(0, 0, 0, 0);
-	layout->setSpacing(1);
-	layout->setAlignment(Qt::AlignLeft);  // 左对齐防止居中留白
-	q_ptr->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
-}
-
-void SARibbonButtonGroupWidget::PrivateData::removeAction(QAction* a)
-{
-	QLayout* lay = q_ptr->layout();
-	int c        = lay->count();
-	QList< QLayoutItem* > willRemoveItems;
-	for (int i = 0; i < c; ++i) {
-		QLayoutItem* item = lay->itemAt(i);
-		if (!item) {
-			continue;
-		}
-		SARibbonControlButton* btn = qobject_cast< SARibbonControlButton* >(item->widget());
-		if (nullptr == btn) {
-			continue;
-		}
-		if (a == btn->defaultAction()) {
-			willRemoveItems.push_back(item);
-		}
-	}
-	// 从尾部删除
-	for (auto i = willRemoveItems.rbegin(); i != willRemoveItems.rend(); ++i) {
-		QLayoutItem* item = *i;
-		if (QWidget* widget = item->widget()) {
-			// 特殊处理 QWidgetAction
-			if (QWidgetAction* widgetAction = qobject_cast< QWidgetAction* >(a)) {
-				widgetAction->releaseWidget(widget);
-			}
-			widget->hide();
-			widget->deleteLater();
-		}
-		lay->removeItem(item);
-	}
-	// 在删除后强制布局重新计算
-	lay->invalidate();  // 标记布局需要更新
-	lay->activate();    // 立即激活新布局
-}
-
-SARibbonControlButton* SARibbonButtonGroupWidget::PrivateData::createButtonForAction(QAction* a)
-{
-	SARibbonControlButton* button = RibbonSubElementFactory->createRibbonControlButton(q_ptr);
-	button->setAutoRaise(true);
-	button->setIconSize(mIconSize);
-	button->setFocusPolicy(Qt::NoFocus);
-	button->setDefaultAction(a);
-	button->setPopupMode(SARibbonPanel::getActionToolButtonPopupModeProperty(a));
-	button->setToolButtonStyle(SARibbonPanel::getActionToolButtonStyleProperty(a));
-	q_ptr->connect(button, &SARibbonControlButton::triggered, q_ptr, &SARibbonButtonGroupWidget::actionTriggered);
-	return button;
-}
-
-//===================================================
 // SARibbonButtonGroupWidget
 //===================================================
 
-SARibbonButtonGroupWidget::SARibbonButtonGroupWidget(QWidget* parent)
-    : QFrame(parent), d_ptr(new SARibbonButtonGroupWidget::PrivateData(this))
+SARibbonButtonGroupWidget::SARibbonButtonGroupWidget(QWidget* parent) : QToolBar(parent)
 {
-    d_ptr->init();
+    setAutoFillBackground(false);
+    setAttribute(Qt::WA_NoSystemBackground);
+    setOrientation(Qt::Horizontal);
+    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    setMovable(false);    // 禁止移动
+    setFloatable(false);  // 禁止浮动
 }
 
 SARibbonButtonGroupWidget::~SARibbonButtonGroupWidget()
@@ -105,201 +30,178 @@ SARibbonButtonGroupWidget::~SARibbonButtonGroupWidget()
 }
 
 /**
- * @brief 设置图标尺寸
- * @param iconSize
- */
-void SARibbonButtonGroupWidget::setIconSize(const QSize& ic)
-{
-	d_ptr->mIconSize = ic;
-	iterateButton([ ic ](SARibbonControlButton* btn) -> bool {
-		btn->setIconSize(ic);
-		return true;
-	});
-}
-
-/**
- * @brief 图标尺寸
- * @return
- */
-QSize SARibbonButtonGroupWidget::iconSize() const
-{
-    return d_ptr->mIconSize;
-}
-
-QAction* SARibbonButtonGroupWidget::addAction(QAction* a,
-                                              Qt::ToolButtonStyle buttonStyle,
-                                              QToolButton::ToolButtonPopupMode popMode)
-{
-	SARibbonPanel::setActionToolButtonStyleProperty(a, buttonStyle);
-	SARibbonPanel::setActionToolButtonPopupModeProperty(a, popMode);
-	QWidget::addAction(a);
-	return (a);
-}
-
-/**
- * @brief 生成action
- * @note action的所有权归SARibbonButtonGroupWidget
- * @param text
- * @param icon
- * @param popMode
- * @return
- */
-QAction* SARibbonButtonGroupWidget::addAction(const QString& text,
-                                              const QIcon& icon,
-                                              Qt::ToolButtonStyle buttonStyle,
-                                              QToolButton::ToolButtonPopupMode popMode)
-{
-	QAction* a = new QAction(icon, text, this);
-	addAction(a, buttonStyle, popMode);
-	return (a);
-}
-
-QAction* SARibbonButtonGroupWidget::addMenu(QMenu* menu, Qt::ToolButtonStyle buttonStyle, QToolButton::ToolButtonPopupMode popMode)
-{
-	QAction* a = menu->menuAction();
-	addAction(a, buttonStyle, popMode);
-	return (a);
-}
-
-QAction* SARibbonButtonGroupWidget::addSeparator()
-{
-	QAction* a = new QAction(this);
-
-	a->setSeparator(true);
-	addAction(a);
-	return (a);
-}
-
-QAction* SARibbonButtonGroupWidget::addWidget(QWidget* w)
-{
-	QWidgetAction* a = new QWidgetAction(this);
-
-	a->setDefaultWidget(w);
-	w->setAttribute(Qt::WA_Hover);
-	addAction(a);
-	return (a);
-}
-
-SARibbonControlButton* SARibbonButtonGroupWidget::actionToRibbonControlToolButton(QAction* action)
-{
-	SARibbonControlButton* res = nullptr;
-	iterateButton([ &res, action ](SARibbonControlButton* btn) -> bool {
-		if (btn->defaultAction() == action) {
-			res = btn;
-			return false;  // 返回false退出迭代
-		}
-		return true;
-	});
-	return (res);
-}
-
-QSize SARibbonButtonGroupWidget::sizeHint() const
-{
-	return (layout()->sizeHint());
-}
-
-QSize SARibbonButtonGroupWidget::minimumSizeHint() const
-{
-    return layout()->minimumSize();
-}
-
-/**
- * @brief 此函数会遍历SARibbonButtonGroupWidget下的所有SARibbonControlButton，执行函数指针(bool(SARibbonControlButton*))，函数指针返回false则停止迭代
- * @param fp
- * @return 中途迭代退出返回false
- */
-bool SARibbonButtonGroupWidget::iterateButton(SARibbonButtonGroupWidget::FpButtonIterate fp)
-{
-	QLayout* lay = layout();
-	int c        = lay->count();
-	for (int i = 0; i < c; ++i) {
-		auto item = lay->itemAt(i);
-		if (!item) {
-			continue;
-		}
-		SARibbonControlButton* btn = qobject_cast< SARibbonControlButton* >(item->widget());
-		if (!btn) {
-			continue;
-		}
-		if (!fp(btn)) {
-			return false;
-		}
-	}
-	return true;
-}
-
-/**
- * @brief 处理action的事件
+ * @brief Add a menu QAction to the button group widget/在按钮栏中添加一个带菜单的 QAction
  *
- * 这里处理了ActionAdded，ActionChanged，ActionRemoved三个事件
- * ActionAdded时会生成窗口
- * @param e
+ * This function is used to add a QAction that has been associated with a menu to the toolbar and set its popup
+ * mode.The popup mode of the tool button determines how users interact with the menu.
+ *
+ * 此函数用于向工具栏添加一个已经关联了菜单的 QAction，并设置其弹出模式。工具按钮的弹出模式决定了用户如何与菜单进行交互。
+ *
+ * @param menuAction QAction object that has been set with a menu/已经设置了菜单的 QAction 对象
+ * @param popupMode Popup mode of the tool button, default is InstantPopup/工具按钮的弹出模式，默认为 InstantPopup
+ *
+ * @note If menuAction is not associated with a menu, this function will not perform any special processing/如果
+ * menuAction 没有关联菜单，此函数不会进行任何特殊处理
+ *
+ * @note This function will automatically find the corresponding QToolButton and set the popup
+ * mode/此函数会自动查找对应的 QToolButton 并设置弹出模式
+ *
+ * @par Example:/示例:
+ * @code
+ * QMenu *fileMenu = new QMenu("File");
+ * fileMenu->addAction("New");
+ * fileMenu->addAction("Open");
+ *
+ * QAction *fileAction = new QAction("File");
+ * fileAction->setMenu(fileMenu);
+ *
+ * // Add to button group widget/添加到按钮栏
+ * buttongroup->addMenuAction(fileAction, QToolButton::InstantPopup);
+ * @endcode
+ *
+ * @see QToolButton::ToolButtonPopupMode
  */
-void SARibbonButtonGroupWidget::actionEvent(QActionEvent* e)
+void SARibbonButtonGroupWidget::addMenuAction(QAction* menuAction, QToolButton::ToolButtonPopupMode popupMode)
 {
-	QAction* act = e->action();
-	if (!act) {
-		return;
-	}
+    if (!menuAction) {
+        return;
+    }
 
-	switch (e->type()) {
-	case QEvent::ActionAdded: {
-		QWidget* w = nullptr;
-		if (QWidgetAction* widgetAction = qobject_cast< QWidgetAction* >(act)) {
-			widgetAction->setParent(this);
-			w = widgetAction->requestWidget(this);
-			if (w != nullptr) {
-				w->setAttribute(Qt::WA_LayoutUsesWidgetRect);
-				w->setVisible(act->isVisible());
-				w->show();
-			}
-		} else if (act->isSeparator()) {
-			SARibbonSeparatorWidget* sp = RibbonSubElementFactory->createRibbonSeparatorWidget(this);
-			w                           = sp;
-		} else {  // 不是widget，自动生成ButtonTyle
-			w = d_ptr->createButtonForAction(act);
-		}
-		if (w) {
-			w->setVisible(act->isVisible());  // 新增：设置初始可见性
-			layout()->addWidget(w);
-		}
-		updateGeometry();
-	} break;
-	case QEvent::ActionChanged: {
-		// 处理可见性
-		QLayout* lay = layout();
-		for (int i = 0; i < lay->count(); ++i) {
-			QLayoutItem* item = lay->itemAt(i);
-			if (!item || !item->widget()) {
-				continue;
-			}
-			if (SARibbonControlButton* btn = qobject_cast< SARibbonControlButton* >(item->widget())) {
-				if (btn->defaultAction() == act) {
-					if (btn->isVisible() != act->isVisible()) {
-						btn->setVisible(act->isVisible());
-					}
-				}
-			} else if (QWidgetAction* wa = qobject_cast< QWidgetAction* >(act)) {
-				if (wa->defaultWidget() == item->widget()) {
-					if (item->widget()->isVisible() != act->isVisible()) {
-						item->widget()->setVisible(act->isVisible());
-					}
-				}
-			}
-		}
-		// 让布局重新绘制
-		layout()->invalidate();
-		updateGeometry();
-	} break;
+    // 添加动作到工具栏
+    addAction(menuAction);
 
-	case QEvent::ActionRemoved: {
-		act->disconnect(this);
-		d_ptr->removeAction(act);
-		updateGeometry();
-	} break;
+    // 如果动作有关联菜单，则设置工具按钮的弹出模式
+    if (menuAction->menu()) {
+        QToolButton* toolButton = qobject_cast< QToolButton* >(widgetForAction(menuAction));
+        if (toolButton) {
+            toolButton->setPopupMode(popupMode);
+        }
+    }
+}
 
-	default:
-		break;
-	}
-	QFrame::actionEvent(e);
+/**
+ * @brief Create and add a menu action to the button group widget/在按钮栏中创建并添加一个带菜单的动作
+ *
+ * This function creates a new QAction, associates it with the specified menu,adds it to the toolbar,
+ * and sets the corresponding popup mode.
+ *
+ * 此函数会创建一个新的 QAction，将其与指定的菜单关联，添加到工具栏中，并设置相应的弹出模式。
+ *
+ * @param text Button text/按钮文本
+ * @param icon Button icon/按钮图标
+ * @param menu Menu object to associate/要关联的菜单对象
+ * @param popupMode Popup mode of the tool button, default is InstantPopup/工具按钮的弹出模式，默认为 InstantPopup
+ * @return Returns the newly created QAction object, or nullptr if the parameter is invalid/返回新创建的 QAction 对象，如果参数无效则返回 nullptr
+ *
+ * @note The caller does not need to manually manage the lifecycle of the returned QAction,it will be automatically managed
+ * by the toolbar/调用者不需要手动管理返回的 QAction 的生命周期，它会由工具栏自动管理
+ * @note If the menu has a title, it will be automatically used as the QAction's text/如果菜单有标题，会自动用作 QAction 的文本
+ *
+ * @par Example:/示例:
+ * @code
+ * // Create menu/创建菜单
+ * QMenu *editMenu = new QMenu("Edit");
+ * editMenu->addAction("Cut");
+ * editMenu->addAction("Copy");
+ * editMenu->addAction("Paste");
+ *
+ * // Directly add menu to button group widget/直接添加菜单到按钮栏
+ * QAction *editAction = buttongroup->addMenuAction("Edit",QIcon(":/icons/edit.png"),editMenu, QToolButton::MenuButtonPopup);
+ * // You can further configure the returned action/可以进一步配置返回的动作
+ * @endcode
+ *
+ * @see QToolButton::ToolButtonPopupMode
+ */
+QAction* SARibbonButtonGroupWidget::addMenuAction(const QString& text,
+                                                  const QIcon& icon,
+                                                  QMenu* menu,
+                                                  QToolButton::ToolButtonPopupMode popupMode)
+{
+    if (!menu) {
+        return nullptr;
+    }
+
+    // 创建新的 QAction
+    QAction* menuAction = new QAction(icon, text, this);
+    menuAction->setMenu(menu);
+
+    // 添加到工具栏并设置弹出模式
+    addMenuAction(menuAction, popupMode);
+
+    return menuAction;
+}
+
+/**
+ * @brief Create and add a menu action to the button group widget (simplified version)/在按钮栏中创建并添加一个带菜单的动作（简化版本）
+ *
+ * This function creates a new QAction based on the menu's title and icon,
+ * associates it with the specified menu, adds it to the toolbar, and sets the popup mode.
+ *
+ * 此函数根据菜单的标题和图标创建一个新的 QAction，将其与指定菜单关联，添加到工具栏并设置弹出模式。
+ *
+ * @param menu Menu object to associate/要关联的菜单对象
+ * @param popupMode Popup mode of the tool button, default is InstantPopup/工具按钮的弹出模式，默认为 InstantPopup
+ * @return Returns the newly created QAction object, or nullptr if the parameter is invalid/返回新创建的 QAction 对象，如果参数无效则返回 nullptr
+ *
+ * @note The caller does not need to manually manage the lifecycle of the returned QAction,it will be automatically managed
+ * by the toolbar/调用者不需要手动管理返回的 QAction 的生命周期，它会由工具栏自动管理
+ *
+ * @par Example:/示例:
+ * @code
+ * // Create menu/创建菜单
+ * QMenu *viewMenu = new QMenu("View");
+ * viewMenu->addAction("Toolbars");
+ * viewMenu->addAction("Status Bar");
+ *
+ * // Add menu to button group widget using menu's title and icon/使用菜单的标题和图标添加到按钮栏
+ * QAction *viewAction = buttongroup->addMenuAction(viewMenu, QToolButton::InstantPopup);
+ * @endcode
+ *
+ * @see QToolButton::ToolButtonPopupMode
+ */
+QAction* SARibbonButtonGroupWidget::addMenuAction(const QString& text, QMenu* menu, QToolButton::ToolButtonPopupMode popupMode)
+{
+    if (!menu) {
+        return nullptr;
+    }
+    return addMenuAction(text, menu->icon(), menu, popupMode);
+}
+
+/**
+ * @brief Create and add a menu action to the button group widget (text only
+ * version)/在按钮栏中创建并添加一个带菜单的动作（仅文本版本）
+ *
+ * This function creates a new QAction based on the specified text,
+ * associates it with the specified menu, adds it to the toolbar, and sets the popup mode.
+ *
+ * 此函数根据指定的文本创建一个新的 QAction，将其与指定菜单关联，添加到工具栏并设置弹出模式。
+ *
+ * @param text Button text/按钮文本
+ * @param menu Menu object to associate/要关联的菜单对象
+ * @param popupMode Popup mode of the tool button, default is InstantPopup/工具按钮的弹出模式，默认为 InstantPopup
+ * @return Returns the newly created QAction object, or nullptr if the parameter is invalid/返回新创建的 QAction
+ * 对象，如果参数无效则返回 nullptr
+ *
+ * @note The caller does not need to manually manage the lifecycle of the returned QAction,it will be automatically
+ * managed by the toolbar/调用者不需要手动管理返回的 QAction 的生命周期， 它会由工具栏自动管理
+ *
+ * @par Example:/示例:
+ * @code
+ * // Create menu/创建菜单
+ * QMenu *helpMenu = new QMenu("Help");
+ * helpMenu->addAction("Contents");
+ * helpMenu->addAction("About");
+ *
+ * // Add menu to button group widget with custom text/使用自定义文本添加菜单到按钮栏
+ * QAction *helpAction = buttongroup->addMenuAction("Help", helpMenu, QToolButton::MenuButtonPopup);
+ * @endcode
+ *
+ * @see QToolButton::ToolButtonPopupMode
+ */
+QAction* SARibbonButtonGroupWidget::addMenuAction(QMenu* menu, QToolButton::ToolButtonPopupMode popupMode)
+{
+    if (!menu) {
+        return nullptr;
+    }
+    return addMenuAction(menu->title(), menu->icon(), menu, popupMode);
 }

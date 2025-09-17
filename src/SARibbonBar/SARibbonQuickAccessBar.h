@@ -1,12 +1,7 @@
 ﻿#ifndef SARIBBONQUICKACCESSBAR_H
 #define SARIBBONQUICKACCESSBAR_H
 #include "SARibbonGlobal.h"
-#include <QMenu>
-#include <QToolBar>
-#include <QToolButton>
-class SARibbonToolButton;
-class SARibbonButtonGroupWidget;
-
+#include "SARibbonButtonGroupWidget.h"
 /**
  * @brief Ribbon quick access toolbar in the top left corner/ribbon左上顶部的快速响应栏
  *
@@ -47,23 +42,12 @@ class SARibbonButtonGroupWidget;
  *
  * @see SARibbonBar
  */
-class SA_RIBBON_EXPORT SARibbonQuickAccessBar : public QToolBar
+class SA_RIBBON_EXPORT SARibbonQuickAccessBar : public SARibbonButtonGroupWidget
 {
     Q_OBJECT
 public:
     explicit SARibbonQuickAccessBar(QWidget* parent = nullptr);
     ~SARibbonQuickAccessBar();
-
-    // 在快速访问工具栏中添加一个带菜单的 QAction
-    void addMenuAction(QAction* menuAction, QToolButton::ToolButtonPopupMode popupMode = QToolButton::InstantPopup);
-    QAction* addMenuAction(const QString& text,
-                           const QIcon& icon,
-                           QMenu* menu,
-                           QToolButton::ToolButtonPopupMode popupMode = QToolButton::InstantPopup);
-    QAction* addMenuAction(const QString& text,
-                           QMenu* menu,
-                           QToolButton::ToolButtonPopupMode popupMode = QToolButton::InstantPopup);
-    QAction* addMenuAction(QMenu* menu, QToolButton::ToolButtonPopupMode popupMode = QToolButton::InstantPopup);
 };
 
 #endif  // SARIBBONQUICKACCESSBAR_H
