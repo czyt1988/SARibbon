@@ -1937,14 +1937,15 @@ void MainWindow::createQuickAccessBar()
 	quickAccessBar->addAction(actionCustomizeAndSaveWithApply);
 	connect(actionCustomizeAndSaveWithApply, &QAction::triggered, this, &MainWindow::onActionCustomizeAndSaveWithApplyTriggered);
 
-	//
 	mSearchEditor = new SARibbonLineEdit(this);
-	mSearchEditor->setFixedWidth(100);
+    mSearchEditor->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    mSearchEditor->setMinimumWidth(150);
 	mSearchEditor->setPlaceholderText("Search");
-	quickAccessBar->addWidget(mSearchEditor);
+    auto widgetAct = quickAccessBar->addWidget(mSearchEditor);
 	connect(mSearchEditor, &QLineEdit::editingFinished, this, [ this ]() {
-		this->mTextedit->append(this->mSearchEditor->text());
+        this->mTextedit->append(this->mSearchEditor->text());
 	});
+    widgetAct->setVisible(true);
 }
 
 /**

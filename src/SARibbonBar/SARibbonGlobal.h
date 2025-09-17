@@ -18,7 +18,43 @@ class QWidget;
 #endif
 
 /**
- * @def   模仿Q_DECLARE_PRIVATE，但不用前置声明而是作为一个内部类
+ * @def SA_RIBBON_DECLARE_PRIVATE
+ * @brief 模仿Q_DECLARE_PRIVATE，但不用前置声明而是作为一个内部类
+ *
+ * 例如:
+ *
+ * @code
+ * //header
+ * class A
+ * {
+ *  SA_RIBBON_DECLARE_PRIVATE(A)
+ * };
+ * @endcode
+ *
+ * 其展开效果为：
+ *
+ * @code
+ * class A{
+ *  class PrivateData;
+ *  friend class A::PrivateData;
+ *  std::unique_ptr< PrivateData > d_ptr;
+ * }
+ * @endcode
+ *
+ * 这样前置声明了一个内部类PrivateData，在cpp文件中建立这个内部类的实现
+ *
+ * @code
+ * //cpp
+ * class A::PrivateData{
+ *  DA_DECLARE_PUBLIC(A)
+ *  PrivateData(A* p):q_ptr(p){
+ *  }
+ * };
+ *
+ * A::A():d_ptr(new PrivateData(this)){
+ * }
+ * @endcode
+ *
  */
 #ifndef SA_RIBBON_DECLARE_PRIVATE
 #define SA_RIBBON_DECLARE_PRIVATE(classname)                                                                           \
@@ -26,8 +62,11 @@ class QWidget;
 	friend class classname::PrivateData;                                                                               \
 	std::unique_ptr< PrivateData > d_ptr;
 #endif
+
 /**
- * @def   模仿Q_DECLARE_PUBLIC
+ * @def 模仿Q_DECLARE_PUBLIC
+ *
+ * 配套SA_RIBBON_DECLARE_PRIVATE使用
  */
 #ifndef SA_RIBBON_DECLARE_PUBLIC
 #define SA_RIBBON_DECLARE_PUBLIC(classname)                                                                            \
@@ -35,6 +74,47 @@ class QWidget;
 	classname* q_ptr { nullptr };                                                                                      \
 	PrivateData(const PrivateData&)            = delete;                                                               \
 	PrivateData& operator=(const PrivateData&) = delete;
+#endif
+
+/**
+ * @def SA_RIBBON_IMPL_CONSTRUCT
+ *
+ * 配套SA_RIBBON_DECLARE_PRIVATE使用,在构造函数中构建PrivateData
+ */
+#ifndef SA_RIBBON_IMPL_CONSTRUCT
+#define SA_RIBBON_IMPL_CONSTRUCT d_ptr(std::make_unique< PrivateData >(this))
+#endif
+
+/**
+ *@def SA_D
+ *@brief impl获取指针，参考Q_D
+ */
+#ifndef SA_D
+#define SA_D(pointerName) PrivateData* pointerName = d_func()
+#endif
+
+/**
+ *@def SA_DC
+ *@brief impl获取指针，参考Q_DC
+ */
+#ifndef SA_DC
+#define SA_DC(pointerName) const PrivateData* pointerName = d_func()
+#endif
+
+/**
+ *@def SA_Q
+ *@brief impl获取指针，参考Q_Q
+ */
+#ifndef SA_Q
+#define SA_Q(pointerName) auto* pointerName = q_ptr
+#endif
+
+/**
+ *@def SA_QC
+ *@brief impl获取指针，参考Q_QC
+ */
+#ifndef SA_QC
+#define SA_QC(pointerName) const auto* pointerName = q_ptr
 #endif
 
 /**

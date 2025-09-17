@@ -103,6 +103,8 @@ public:
 		mFpContextHighlight       = [](const QColor& c) -> QColor { return SA::makeColorVibrant(c); };
 	}
 	void init();
+    // 创建QuickAccessBar
+    SARibbonQuickAccessBar* createQuickAccessBar();
 	// 创建一个默认的ApplicationButton
 	void createDefaultApplicationButton();
 	// 设置一个ApplicationButton
@@ -143,13 +145,20 @@ void SARibbonBar::PrivateData::init()
 	// 捕获事件，在popmode时必须用到
 	mStackedContainerWidget->installEventFilter(q_ptr);
 	//
-	mQuickAccessBar = RibbonSubElementFactory->createQuickAccessBar(q_ptr);
-	mQuickAccessBar->setObjectName(QStringLiteral("objSARibbonQuickAccessBar"));
-    mQuickAccessBar->setIconSize(QSize(22, 22));
+    createQuickAccessBar();
+
 	//
 	mRightButtonGroup = RibbonSubElementFactory->createButtonGroupWidget(q_ptr);
 	//
-	setNormalMode();
+    setNormalMode();
+}
+
+SARibbonQuickAccessBar* SARibbonBar::PrivateData::createQuickAccessBar()
+{
+    mQuickAccessBar = RibbonSubElementFactory->createQuickAccessBar(q_ptr);
+    mQuickAccessBar->setObjectName(QStringLiteral("objSARibbonQuickAccessBar"));
+    mQuickAccessBar->setIconSize(QSize(18, 18));
+    return mQuickAccessBar.data();
 }
 
 void SARibbonBar::PrivateData::createDefaultApplicationButton()
@@ -1417,12 +1426,12 @@ SARibbonButtonGroupWidget* SARibbonBar::rightButtonGroup()
  */
 SARibbonQuickAccessBar* SARibbonBar::activeQuickAccessBar()
 {
-	if (nullptr == d_ptr->mQuickAccessBar) {
-		d_ptr->mQuickAccessBar = RibbonSubElementFactory->createQuickAccessBar(this);
-		d_ptr->mQuickAccessBar->setObjectName(QStringLiteral("objSARibbonQuickAccessBar"));
+    SARibbonQuickAccessBar* bar = quickAccessBar();
+    if (!bar) {
+        bar = d_ptr->createQuickAccessBar();
 	}
-	d_ptr->mQuickAccessBar->show();
-	return d_ptr->mQuickAccessBar;
+    bar->show();
+    return bar;
 }
 
 SARibbonQuickAccessBar* SARibbonBar::quickAccessBar()

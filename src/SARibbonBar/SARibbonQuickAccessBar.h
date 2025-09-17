@@ -50,7 +50,6 @@ class SARibbonButtonGroupWidget;
 class SA_RIBBON_EXPORT SARibbonQuickAccessBar : public QToolBar
 {
     Q_OBJECT
-    SA_RIBBON_DECLARE_PRIVATE(SARibbonQuickAccessBar)
 public:
     explicit SARibbonQuickAccessBar(QWidget* parent = nullptr);
     ~SARibbonQuickAccessBar();

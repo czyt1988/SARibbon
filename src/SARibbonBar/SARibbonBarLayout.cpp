@@ -703,9 +703,12 @@ void SARibbonBarLayout::resizeInLooseStyle()
 	if (auto qb = quickAccessBar()) {
 		if (qb->isVisibleTo(ribbon)) {
             QSize quickAccessBarSize = qb->sizeHint();
-			quickAccessBarSize       = SA::scaleSizeByHeight(quickAccessBarSize, titleBarControlHeight);
+            //! 这里不用SA::scaleSizeByHeight缩减quickAccessBar的比例：
+            //! quickAccessBarSize = SA::scaleSizeByHeight(quickAccessBarSize, titleBarControlHeight);
+            //! 原因是，如果quickAccessBar最后是一个widget，如果长度不足，这个widget是不会显示出来，默认QToolBar的高度是32，
+            //! 而titlebar的高度一般是28，肯定会导致宽度缩减，如果宽度缩减，且最后是一个窗口，那么这个窗口会不显示
 			// 上下留1px的边线
-			qb->setGeometry(x, y + 1, quickAccessBarSize.width(), quickAccessBarSize.height());
+            qb->setGeometry(x, y + 1, quickAccessBarSize.width(), titleBarControlHeight);
 		}
 	}
 

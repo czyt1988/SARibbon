@@ -3,31 +3,16 @@
 #include "SARibbonSeparatorWidget.h"
 #include <QGuiApplication>
 
-/**
- * @brief The SARibbonQuickAccessBarPrivate class
- */
-class SARibbonQuickAccessBar::PrivateData
-{
-    SA_RIBBON_DECLARE_PUBLIC(SARibbonQuickAccessBar)
-public:
-    PrivateData(SARibbonQuickAccessBar* p);
-
-public:
-    SARibbonButtonGroupWidget* mGroupWidget { nullptr };
-};
-
-SARibbonQuickAccessBar::PrivateData::PrivateData(SARibbonQuickAccessBar* p) : q_ptr(p)
-{
-}
-
 //===================================================
 // SARibbonQuickAccessBar
 //===================================================
-SARibbonQuickAccessBar::SARibbonQuickAccessBar(QWidget* parent)
-    : QToolBar(parent), d_ptr(new SARibbonQuickAccessBar::PrivateData(this))
+SARibbonQuickAccessBar::SARibbonQuickAccessBar(QWidget* parent) : QToolBar(parent)
 {
     setAutoFillBackground(false);
     setAttribute(Qt::WA_NoSystemBackground);
+    setOrientation(Qt::Horizontal);
+    setMovable(false);    // 禁止移动
+    setFloatable(false);  // 禁止浮动
 }
 
 SARibbonQuickAccessBar::~SARibbonQuickAccessBar()
