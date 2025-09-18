@@ -1,13 +1,14 @@
-﻿//Global
+﻿// Global
 #include "../../src/SARibbonBar/colorWidgets/SAColorWidgetsGlobal.h"
 #include "../../src/SARibbonBar/SARibbonBarVersionInfo.h"
 #include "../../src/SARibbonBar/SARibbonGlobal.h"
-//color widget
+// color widget
 #include "../../src/SARibbonBar/colorWidgets/SAColorMenu.h"
 #include "../../src/SARibbonBar/colorWidgets/SAColorGridWidget.h"
 #include "../../src/SARibbonBar/colorWidgets/SAColorPaletteGridWidget.h"
 #include "../../src/SARibbonBar/colorWidgets/SAColorToolButton.h"
-//sa ribbon
+// sa ribbon
+#include "../../src/SARibbonBar/SARibbonUtil.h"
 #include "../../src/SARibbonBar/SAFramelessHelper.h"
 #include "../../src/SARibbonBar/SARibbonApplicationButton.h"
 #include "../../src/SARibbonBar/SARibbonSystemButtonBar.h"
@@ -15,16 +16,12 @@
 #include "../../src/SARibbonBar/SARibbonColorToolButton.h"
 #include "../../src/SARibbonBar/SARibbonLineWidgetContainer.h"
 #include "../../src/SARibbonBar/SARibbonActionsManager.h"
-#include "../../src/SARibbonBar/SARibbonLineEdit.h"
-#include "../../src/SARibbonBar/SARibbonCheckBox.h"
-#include "../../src/SARibbonBar/SARibbonComboBox.h"
 #include "../../src/SARibbonBar/SARibbonButtonGroupWidget.h"
 #include "../../src/SARibbonBar/SARibbonStackedWidget.h"
 #include "../../src/SARibbonBar/SARibbonSeparatorWidget.h"
 #include "../../src/SARibbonBar/SARibbonCtrlContainer.h"
 #include "../../src/SARibbonBar/SARibbonQuickAccessBar.h"
 #include "../../src/SARibbonBar/SARibbonTabBar.h"
-#include "../../src/SARibbonBar/SARibbonControlButton.h"
 #include "../../src/SARibbonBar/SARibbonMenu.h"
 
 #include "../../src/SARibbonBar/SARibbonPanelOptionButton.h"

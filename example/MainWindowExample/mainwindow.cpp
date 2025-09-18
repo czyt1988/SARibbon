@@ -6,13 +6,13 @@
 #include "SARibbonBar.h"
 #include "SARibbonButtonGroupWidget.h"
 #include "SARibbonCategory.h"
-#include "SARibbonCheckBox.h"
+#include <QCheckBox>
 #include "SARibbonColorToolButton.h"
-#include "SARibbonComboBox.h"
+#include <QComboBox>
 #include "SARibbonCustomizeDialog.h"
 #include "SARibbonCustomizeWidget.h"
 #include "SARibbonGallery.h"
-#include "SARibbonLineEdit.h"
+
 #include "SARibbonMenu.h"
 #include "SARibbonPanel.h"
 #include "SARibbonQuickAccessBar.h"
@@ -1017,7 +1017,7 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
 	connect(g, static_cast< void (QButtonGroup::*)(int) >(&QButtonGroup::buttonClicked), this, &MainWindow::onStyleClicked);
 #endif
 
-	mComboboxRibbonTheme = new SARibbonComboBox();
+    mComboboxRibbonTheme = new QComboBox();
 	mComboboxRibbonTheme->setWindowTitle(tr("RibbonTheme"));
 	mComboboxRibbonTheme->setObjectName("RibbonTheme");
 	mComboboxRibbonTheme->addItem("Theme Win7", static_cast< int >(SARibbonTheme::RibbonThemeWindows7));
@@ -1028,17 +1028,17 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
 	mComboboxRibbonTheme->addItem("Theme Dark2", static_cast< int >(SARibbonTheme::RibbonThemeDark2));
 	mComboboxRibbonTheme->setCurrentIndex(mComboboxRibbonTheme->findData(static_cast< int >(ribbonTheme())));
 	connect(mComboboxRibbonTheme,
-            QOverload< int >::of(&SARibbonComboBox::currentIndexChanged),
+            QOverload< int >::of(&QComboBox::currentIndexChanged),
             this,
             &MainWindow::onRibbonThemeComboBoxCurrentIndexChanged);
 	panelStyle->addSmallWidget(mComboboxRibbonTheme);
 
-	SARibbonCheckBox* checkBox = new SARibbonCheckBox(this);
+    QCheckBox* checkBox = new QCheckBox(this);
 
 	checkBox->setText(tr("Alignment Center"));
 	checkBox->setObjectName("checkBoxAlignmentCenter");
 	checkBox->setWindowTitle(checkBox->text());
-	connect(checkBox, &SARibbonCheckBox::clicked, this, &MainWindow::onCheckBoxAlignmentCenterClicked);
+    connect(checkBox, &QCheckBox::clicked, this, &MainWindow::onCheckBoxAlignmentCenterClicked);
 	panelStyle->addSmallWidget(checkBox);
 
 	SARibbonPanel* panelToolButtonStyle = page->addPanel(("sa ribbon toolbutton style"));
@@ -1165,17 +1165,17 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
 	SARibbonPanel* panelWidgetTest = page->addPanel(tr("widget test"));
 	panelWidgetTest->setObjectName(QStringLiteral(u"panelWidgetTest"));
 
-	SARibbonComboBox* com = new SARibbonComboBox(this);
-	com->setObjectName("SARibbonComboBox test");
+    QComboBox* com = new QComboBox(this);
+    com->setObjectName("QComboBox test");
 	com->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-	com->setWindowTitle(tr("SARibbonComboBox test"));
+    com->setWindowTitle(tr("QComboBox test"));
 	for (int i = 0; i < 40; ++i) {
-		com->addItem(QString("SARibbonComboBox test%1").arg(i + 1));
+        com->addItem(QString("QComboBox test%1").arg(i + 1));
 	}
 	com->setEditable(true);
 	panelWidgetTest->addSmallWidget(com);
 
-	com = new SARibbonComboBox(this);
+    com = new QComboBox(this);
 	com->setObjectName("ComboBox Editable");
 	com->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	com->setWindowTitle("ComboBox Editable");
@@ -1184,12 +1184,12 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
 	}
 	panelWidgetTest->addSmallWidget(com);
 
-	SARibbonLineEdit* lineEdit = new SARibbonLineEdit(this);
+    QLineEdit* lineEdit = new QLineEdit(this);
 
 	lineEdit->setObjectName("Line Edit");
 	lineEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	lineEdit->setWindowTitle("Line Edit");
-	lineEdit->setText("SARibbonLineEdit");
+    lineEdit->setText("LineEdit");
 	panelWidgetTest->addSmallWidget(lineEdit);
 	QWidget* w = lineEdit->parentWidget();
 
@@ -1937,7 +1937,7 @@ void MainWindow::createQuickAccessBar()
 	quickAccessBar->addAction(actionCustomizeAndSaveWithApply);
 	connect(actionCustomizeAndSaveWithApply, &QAction::triggered, this, &MainWindow::onActionCustomizeAndSaveWithApplyTriggered);
 
-	mSearchEditor = new SARibbonLineEdit(this);
+    mSearchEditor = new QLineEdit(this);
     mSearchEditor->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     mSearchEditor->setMinimumWidth(150);
 	mSearchEditor->setPlaceholderText("Search");
@@ -1984,8 +1984,12 @@ void MainWindow::createWindowButtonGroupBar()
 	if (!wbar) {
 		return;
 	}
-	QAction* a = wbar->addAction(tr("Login"), QIcon(), Qt::ToolButtonTextOnly);
-	connect(a, &QAction::triggered, this, [ this ]() { this->mTextedit->append("Login triggered"); });
+    QAction* a          = new QAction(QIcon(), tr("Login"));
+    QAction* actionHelp = createAction(tr("help"), ":/icon/icon/help.svg");
+    connect(a, &QAction::triggered, this, [ this ]() { this->mTextedit->append("Login triggered"); });
+    connect(actionHelp, &QAction::triggered, this, &MainWindow::onActionHelpTriggered);
+    wbar->addAction(a);
+    wbar->addAction(actionHelp);
 }
 
 /**

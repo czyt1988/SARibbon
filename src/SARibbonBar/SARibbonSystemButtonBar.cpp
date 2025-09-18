@@ -407,22 +407,32 @@ QSize SARibbonSystemButtonBar::iconSize() const
     return d_ptr->mButtonGroup->iconSize();
 }
 
-QAction* SARibbonSystemButtonBar::addAction(QAction* a)
+void SARibbonSystemButtonBar::addAction(QAction* a)
 {
     d_ptr->mButtonGroup->addAction(a);
 }
 
-QAction* SARibbonSystemButtonBar::addAction(const QString& text,
-                                            const QIcon& icon,
-                                            Qt::ToolButtonStyle buttonStyle,
-                                            QToolButton::ToolButtonPopupMode popMode)
+void SARibbonSystemButtonBar::addMenuAction(QAction* menuAction, QToolButton::ToolButtonPopupMode popupMode)
 {
-    return d_ptr->mButtonGroup->addAction(text, icon, buttonStyle, popMode);
+    d_ptr->mButtonGroup->addMenuAction(menuAction, popupMode);
 }
 
-QAction* SARibbonSystemButtonBar::addMenu(QMenu* menu, Qt::ToolButtonStyle buttonStyle, QToolButton::ToolButtonPopupMode popMode)
+QAction* SARibbonSystemButtonBar::addMenuAction(const QString& text,
+                                                const QIcon& icon,
+                                                QMenu* menu,
+                                                QToolButton::ToolButtonPopupMode popupMode)
 {
-    return d_ptr->mButtonGroup->addMenu(menu, buttonStyle, popMode);
+    return d_ptr->mButtonGroup->addMenuAction(text, icon, menu, popupMode);
+}
+
+QAction* SARibbonSystemButtonBar::addMenuAction(const QString& text, QMenu* menu, QToolButton::ToolButtonPopupMode popupMode)
+{
+    return d_ptr->mButtonGroup->addMenuAction(text, menu, popupMode);
+}
+
+QAction* SARibbonSystemButtonBar::addMenuAction(QMenu* menu, QToolButton::ToolButtonPopupMode popupMode)
+{
+    return d_ptr->mButtonGroup->addMenuAction(menu, popupMode);
 }
 
 QAction* SARibbonSystemButtonBar::addSeparator()

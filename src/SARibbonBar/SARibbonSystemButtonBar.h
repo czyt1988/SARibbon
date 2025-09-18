@@ -58,14 +58,16 @@ public:
     void setIconSize(const QSize& ic);
     QSize iconSize() const;
     // 生成并添加一个action
-    QAction* addAction(QAction* a);
-    QAction* addAction(const QString& text,
-                       const QIcon& icon,
-                       Qt::ToolButtonStyle buttonStyle          = Qt::ToolButtonIconOnly,
-                       QToolButton::ToolButtonPopupMode popMode = QToolButton::DelayedPopup);
-    QAction* addMenu(QMenu* menu,
-                     Qt::ToolButtonStyle buttonStyle          = Qt::ToolButtonIconOnly,
-                     QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
+    void addAction(QAction* a);
+    void addMenuAction(QAction* menuAction, QToolButton::ToolButtonPopupMode popupMode = QToolButton::InstantPopup);
+    QAction* addMenuAction(const QString& text,
+                           const QIcon& icon,
+                           QMenu* menu,
+                           QToolButton::ToolButtonPopupMode popupMode = QToolButton::InstantPopup);
+    QAction* addMenuAction(const QString& text,
+                           QMenu* menu,
+                           QToolButton::ToolButtonPopupMode popupMode = QToolButton::InstantPopup);
+    QAction* addMenuAction(QMenu* menu, QToolButton::ToolButtonPopupMode popupMode = QToolButton::InstantPopup);
     QAction* addSeparator();
     QAction* addWidget(QWidget* w);
 

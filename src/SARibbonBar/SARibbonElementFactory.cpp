@@ -10,7 +10,6 @@
 #include "SARibbonGallery.h"
 #include "SARibbonGalleryGroup.h"
 #include "SARibbonToolButton.h"
-#include "SARibbonControlButton.h"
 #include "SARibbonButtonGroupWidget.h"
 #include "SARibbonStackedWidget.h"
 #include "SARibbonQuickAccessBar.h"
@@ -74,11 +73,6 @@ SARibbonGalleryGroup* SARibbonElementFactory::createRibbonGalleryGroup(QWidget* 
 SARibbonToolButton* SARibbonElementFactory::createRibbonToolButton(QWidget* parent)
 {
 	return (new SARibbonToolButton(parent));
-}
-
-SARibbonControlButton* SARibbonElementFactory::createRibbonControlButton(QWidget* parent)
-{
-	return (new SARibbonControlButton(parent));
 }
 
 SARibbonStackedWidget* SARibbonElementFactory::createRibbonStackedWidget(SARibbonBar* parent)

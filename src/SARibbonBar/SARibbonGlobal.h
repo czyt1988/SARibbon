@@ -90,7 +90,7 @@ class QWidget;
  *@brief impl获取指针，参考Q_D
  */
 #ifndef SA_D
-#define SA_D(pointerName) PrivateData* pointerName = d_func()
+#define SA_D(pointerName) PrivateData* pointerName = d_ptr.get()
 #endif
 
 /**
@@ -98,7 +98,7 @@ class QWidget;
  *@brief impl获取指针，参考Q_DC
  */
 #ifndef SA_DC
-#define SA_DC(pointerName) const PrivateData* pointerName = d_func()
+#define SA_DC(pointerName) const PrivateData* pointerName = d_ptr.get()
 #endif
 
 /**

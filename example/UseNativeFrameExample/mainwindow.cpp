@@ -6,13 +6,13 @@
 #include "SARibbonBar.h"
 #include "SARibbonButtonGroupWidget.h"
 #include "SARibbonCategory.h"
-#include "SARibbonCheckBox.h"
+#include <QCheckBox>
 #include "SARibbonColorToolButton.h"
-#include "SARibbonComboBox.h"
+#include <QComboBox>
 #include "SARibbonCustomizeDialog.h"
 #include "SARibbonCustomizeWidget.h"
 #include "SARibbonGallery.h"
-#include "SARibbonLineEdit.h"
+#include <QLineEdit>
 #include "SARibbonMenu.h"
 #include "SARibbonPanel.h"
 #include "SARibbonQuickAccessBar.h"
@@ -125,6 +125,9 @@ MainWindow::MainWindow(QWidget* par, SARibbonMainWindowStyles style) : SARibbonM
 	connect(ribbon, &SARibbonBar::currentRibbonTabChanged, this, [ this ](int v) {
 		mTextedit->append(QString("SARibbonBar::currentRibbonTabChanged(%1)").arg(v));
 	});
+
+    //! 使用系统边框，应该设置为紧凑模式，避免上面的留白
+    ribbon->setRibbonStyle(SARibbonBar::RibbonStyleCompactThreeRow);
 	//! 全屏显示
 	showMaximized();
 }
@@ -147,30 +150,22 @@ void MainWindow::createRibbonApplicationButton()
 	}
 
 	btn->setText(("&File"));
-	if (0) {
-		SARibbonApplicationButton* appBtn = qobject_cast< SARibbonApplicationButton* >(btn);
-		if (!appBtn) {
-			return;
-		}
-		//! cn: SARibbonMenu和QMenu的操作是一样的
-		//! en: The operations of SARibbonMenu and QMenu are the same
-		if (!mMenuApplicationBtn) {
-			mMenuApplicationBtn = new SARibbonMenu(this);
-			mMenuApplicationBtn->addAction(createAction("appbtn-test1", ":/icon/icon/action.svg"));
-			mMenuApplicationBtn->addAction(createAction("appbtn-test2", ":/icon/icon/action2.svg"));
-			mMenuApplicationBtn->addAction(createAction("appbtn-test3", ":/icon/icon/action3.svg"));
-			mMenuApplicationBtn->addAction(createAction("appbtn-test4", ":/icon/icon/action4.svg"));
-		}
 
-		appBtn->setMenu(mMenuApplicationBtn);
-	} else {
-		mAppWidget = new SARibbonApplicationWidget(this);
-		mAppWidget->hide();
-		connect(btn, &QAbstractButton::clicked, this, [ this ](bool c) {
-			Q_UNUSED(c);
-			this->mAppWidget->show();
-		});
-	}
+    SARibbonApplicationButton* appBtn = qobject_cast< SARibbonApplicationButton* >(btn);
+    if (!appBtn) {
+        return;
+    }
+    //! cn: SARibbonMenu和QMenu的操作是一样的
+    //! en: The operations of SARibbonMenu and QMenu are the same
+    if (!mMenuApplicationBtn) {
+        mMenuApplicationBtn = new SARibbonMenu(this);
+        mMenuApplicationBtn->addAction(createAction("appbtn-test1", ":/icon/icon/action.svg"));
+        mMenuApplicationBtn->addAction(createAction("appbtn-test2", ":/icon/icon/action2.svg"));
+        mMenuApplicationBtn->addAction(createAction("appbtn-test3", ":/icon/icon/action3.svg"));
+        mMenuApplicationBtn->addAction(createAction("appbtn-test4", ":/icon/icon/action4.svg"));
+    }
+
+    appBtn->setMenu(mMenuApplicationBtn);
 }
 
 /**
@@ -200,36 +195,36 @@ void MainWindow::onStyleClicked(int id)
 		// cn:"LooseThreeRow"样式的文字显示是换行的，同时也会显示标题栏，你也可以通过SARibbonBar::setEnableWordWrap来控制按钮是否换行显示，
 		// 可以通过SARibbonBar::setEnableShowPanelTitle控制标题栏是否显示
 		mTextedit->append(
-			tr("\nThe text display of the \"LooseThreeRow\" style is word wrap and also displays the title bar. "
-			   "You can also control whether the button is line breaking through SARibbonBar::setEnableWordWrap,"
-			   "and whether the title bar is displayed through SARibbonBar::setEnableShowPanelTitle"));
+            tr("\nThe text display of the \"LooseThreeRow\" style is word wrap and also displays the title bar. "
+               "You can also control whether the button is line breaking through SARibbonBar::setEnableWordWrap,"
+               "and whether the title bar is displayed through SARibbonBar::setEnableShowPanelTitle"));
 		mTextedit->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::RibbonStyleLooseThreeRow);"));
 		break;
 	case SARibbonBar::RibbonStyleLooseTwoRow:
 		// cn:"LooseThreeRow"样式的文字显示是不换行的，同时也会显示标题栏，你也可以通过SARibbonBar::setEnableWordWrap来控制按钮是否换行显示，
 		// 可以通过SARibbonBar::setEnableShowPanelTitle控制标题栏是否显示
 		mTextedit->append(
-			tr("\nThe text display of the \"LooseTwoRow\" style is not word wrap and also displays the title bar. "
-			   "You can also control whether the button is line breaking through SARibbonBar::setEnableWordWrap,"
-			   "and whether the title bar is displayed through SARibbonBar::setEnableShowPanelTitle"));
+            tr("\nThe text display of the \"LooseTwoRow\" style is not word wrap and also displays the title bar. "
+               "You can also control whether the button is line breaking through SARibbonBar::setEnableWordWrap,"
+               "and whether the title bar is displayed through SARibbonBar::setEnableShowPanelTitle"));
 		mTextedit->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::RibbonStyleLooseTwoRow);"));
 		break;
 	case SARibbonBar::RibbonStyleCompactThreeRow:
 		// cn:"CompactThreeRow"样式的文字显示是换行的，不会显示标题栏，你也可以通过SARibbonBar::setEnableWordWrap来控制按钮是否换行显示，
 		// 可以通过SARibbonBar::setEnableShowPanelTitle控制标题栏是否显示
 		mTextedit->append(
-			tr("\nThe text display of the \"LooseThreeRow\" style is word wrap and not displays the title bar. "
-			   "You can also control whether the button is line breaking through SARibbonBar::setEnableWordWrap,"
-			   "and whether the title bar is displayed through SARibbonBar::setEnableShowPanelTitle"));
+            tr("\nThe text display of the \"LooseThreeRow\" style is word wrap and not displays the title bar. "
+               "You can also control whether the button is line breaking through SARibbonBar::setEnableWordWrap,"
+               "and whether the title bar is displayed through SARibbonBar::setEnableShowPanelTitle"));
 		mTextedit->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::RibbonStyleCompactThreeRow);"));
 		break;
 	case SARibbonBar::RibbonStyleCompactTwoRow:
 		// cn:"CompactTwoRow"样式的文字显示是不换行的，不会显示标题栏，你也可以通过SARibbonBar::setEnableWordWrap来控制按钮是否换行显示，
 		// 可以通过SARibbonBar::setEnableShowPanelTitle控制标题栏是否显示
 		mTextedit->append(
-			tr("\nThe text display of the \"CompactTwoRow\" style is not word wrap and not displays the title bar. "
-			   "You can also control whether the button is line breaking through SARibbonBar::setEnableWordWrap,"
-			   "and whether the title bar is displayed through SARibbonBar::setEnableShowPanelTitle"));
+            tr("\nThe text display of the \"CompactTwoRow\" style is not word wrap and not displays the title bar. "
+               "You can also control whether the button is line breaking through SARibbonBar::setEnableWordWrap,"
+               "and whether the title bar is displayed through SARibbonBar::setEnableShowPanelTitle"));
 		mTextedit->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::RibbonStyleCompactTwoRow);"));
 		break;
 	default:
@@ -240,22 +235,22 @@ void MainWindow::onStyleClicked(int id)
 void MainWindow::onActionHelpTriggered()
 {
 	QMessageBox::information(this,
-							 tr("infomation"),
-							 tr("\n ==============="
-								"\n SARibbonBar version:%1"
-								"\n Author:czy"
-								"\n Email:czy.t@163.com"
-								"\n ===============")
-								 .arg(SARibbonBar::versionString()));
+                             tr("infomation"),
+                             tr("\n ==============="
+                                "\n SARibbonBar version:%1"
+                                "\n Author:czy"
+                                "\n Email:czy.t@163.com"
+                                "\n ===============")
+                                 .arg(SARibbonBar::versionString()));
 }
 
 void MainWindow::onActionWordWrapTriggered(bool b)
 {
 	ribbonBar()->setEnableWordWrap(b);
 	mTextedit->append(tr("By using the SARibbonBar::setEnableWordWrap function, "
-						 "you can set whether text breaks or not.\n"
-						 "By default, the two line mode will not wrap, the three line mode will wrap.\n"
-						 "You can force the two line mode to wrap, or the three line mode to not wrap"));
+                         "you can set whether text breaks or not.\n"
+                         "By default, the two line mode will not wrap, the three line mode will wrap.\n"
+                         "You can force the two line mode to wrap, or the three line mode to not wrap"));
 	// cn:通过SARibbonBar::setEnableWordWrap函数可以设置文字是否换行。\n
 	// 默认情况下，两行模式都不会换行，三行模式下都会换行。\n
 	// 可以强制设置两行模式也换行，或者三行模式不换行
@@ -339,8 +334,7 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
 		actHideRibbon->setChecked(nowNode == SARibbonBar::MinimumRibbonMode);
 	});
 
-	QAction* actShowHideButton =
-		createAction(tr("show \nhide button"), ":/icon/icon/showHideButton.svg", "show hide button");
+    QAction* actShowHideButton = createAction(tr("show \nhide button"), ":/icon/icon/showHideButton.svg", "show hide button");
 	actShowHideButton->setCheckable(true);
 	panelStyle->addSmallAction(actShowHideButton);  // wrod wrap was not effect in small button
 	connect(actShowHideButton, &QAction::triggered, this, [ this ](bool b) {
@@ -395,7 +389,7 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
 	connect(g, static_cast< void (QButtonGroup::*)(int) >(&QButtonGroup::buttonClicked), this, &MainWindow::onStyleClicked);
 #endif
 
-	mComboboxRibbonTheme = new SARibbonComboBox();
+    mComboboxRibbonTheme = new QComboBox();
 	mComboboxRibbonTheme->setWindowTitle(tr("RibbonTheme"));
 	mComboboxRibbonTheme->setObjectName("RibbonTheme");
 	mComboboxRibbonTheme->addItem("Theme Win7", static_cast< int >(SARibbonTheme::RibbonThemeWindows7));
@@ -406,17 +400,17 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
 	mComboboxRibbonTheme->addItem("Theme Dark2", static_cast< int >(SARibbonTheme::RibbonThemeDark2));
 	mComboboxRibbonTheme->setCurrentIndex(mComboboxRibbonTheme->findData(static_cast< int >(ribbonTheme())));
 	connect(mComboboxRibbonTheme,
-			QOverload< int >::of(&SARibbonComboBox::currentIndexChanged),
-			this,
-			&MainWindow::onRibbonThemeComboBoxCurrentIndexChanged);
+            QOverload< int >::of(&QComboBox::currentIndexChanged),
+            this,
+            &MainWindow::onRibbonThemeComboBoxCurrentIndexChanged);
 	panelStyle->addSmallWidget(mComboboxRibbonTheme);
 
-	SARibbonCheckBox* checkBox = new SARibbonCheckBox(this);
+    QCheckBox* checkBox = new QCheckBox(this);
 
 	checkBox->setText(tr("Alignment Center"));
 	checkBox->setObjectName("checkBoxAlignmentCenter");
 	checkBox->setWindowTitle(checkBox->text());
-	connect(checkBox, &SARibbonCheckBox::clicked, this, &MainWindow::onCheckBoxAlignmentCenterClicked);
+    connect(checkBox, &QCheckBox::clicked, this, &MainWindow::onCheckBoxAlignmentCenterClicked);
 	panelStyle->addSmallWidget(checkBox);
 
 	SARibbonPanel* panelToolButtonStyle = page->addPanel(("sa ribbon toolbutton style"));
@@ -523,7 +517,7 @@ void MainWindow::createCategoryOther(SARibbonCategory* page)
 	connect(act, &QAction::triggered, this, [ this ](bool on) {
 		Q_UNUSED(on);
 		this->mTextedit->append(tr("Text can be manually wrapped(use \\n), and will appear as 1 line in the case of "
-								   "SARibbonBar::setEnableWordWrap (false)"));  // cn:文本中手动换行
+                                   "SARibbonBar::setEnableWordWrap (false)"));  // cn:文本中手动换行
 	});
 
 	act = createAction(tr("Word \nWrap"), ":/icon/icon/setText.svg");
@@ -532,7 +526,7 @@ void MainWindow::createCategoryOther(SARibbonCategory* page)
 	connect(act, &QAction::triggered, this, [ this ](bool on) {
 		Q_UNUSED(on);
 		this->mTextedit->append(tr("Text can be manually wrapped(use \\n), and will appear as 1 line in the case of "
-								   "SARibbonBar::setEnableWordWrap (false)"));  // cn:文本中手动换行
+                                   "SARibbonBar::setEnableWordWrap (false)"));  // cn:文本中手动换行
 	});
 	//! 3
 	//! panel 3 start -> widget test
@@ -541,17 +535,17 @@ void MainWindow::createCategoryOther(SARibbonCategory* page)
 	SARibbonPanel* panelWidgetTest = page->addPanel(tr("widget test"));
 	panelWidgetTest->setObjectName(QStringLiteral(u"panelWidgetTest"));
 
-	SARibbonComboBox* com = new SARibbonComboBox(this);
-	com->setObjectName("SARibbonComboBox test");
+    QComboBox* com = new QComboBox(this);
+    com->setObjectName("QComboBox test");
 	com->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-	com->setWindowTitle(tr("SARibbonComboBox test"));
+    com->setWindowTitle(tr("QComboBox test"));
 	for (int i = 0; i < 40; ++i) {
-		com->addItem(QString("SARibbonComboBox test%1").arg(i + 1));
+        com->addItem(QString("QComboBox test%1").arg(i + 1));
 	}
 	com->setEditable(true);
 	panelWidgetTest->addSmallWidget(com);
 
-	com = new SARibbonComboBox(this);
+    com = new QComboBox(this);
 	com->setObjectName("ComboBox Editable");
 	com->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	com->setWindowTitle("ComboBox Editable");
@@ -560,12 +554,12 @@ void MainWindow::createCategoryOther(SARibbonCategory* page)
 	}
 	panelWidgetTest->addSmallWidget(com);
 
-	SARibbonLineEdit* lineEdit = new SARibbonLineEdit(this);
+    QLineEdit* lineEdit = new QLineEdit(this);
 
 	lineEdit->setObjectName("Line Edit");
 	lineEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	lineEdit->setWindowTitle("Line Edit");
-	lineEdit->setText("SARibbonLineEdit");
+    lineEdit->setText("QLineEdit");
 	panelWidgetTest->addSmallWidget(lineEdit);
 	QWidget* w = lineEdit->parentWidget();
 
@@ -631,7 +625,8 @@ void MainWindow::createWindowButtonGroupBar()
 	if (!wbar) {
 		return;
 	}
-	QAction* a = wbar->addAction(tr("Login"), QIcon(), Qt::ToolButtonTextOnly);
+    QAction* a = new QAction(QIcon(), tr("Login"));
+    wbar->addAction(a);
 	connect(a, &QAction::triggered, this, [ this ]() { this->mTextedit->append("Login triggered"); });
 }
 
@@ -677,7 +672,7 @@ void MainWindow::onDelayedPopupCheckabletriggered(bool b)
 {
 	Q_UNUSED(b);
 	mTextedit->append(tr("The SARibbonToolButton::setPopupMode(QToolButton::DelayedPopup) method "
-						 "can be used to set the menu pop-up method to delayed pop-up. "
-						 "This also demonstrates manually setting text wrapping"));
+                         "can be used to set the menu pop-up method to delayed pop-up. "
+                         "This also demonstrates manually setting text wrapping"));
 	// cn:使用SARibbonToolButton::setPopupMode(QToolButton::DelayedPopup)方法可以设置菜单弹出方式为延迟弹出，这里也演示了手动设置文本的换行
 }

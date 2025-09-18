@@ -57,14 +57,10 @@ SET(SARIBBON_HEADER_FILES
     SARibbonSeparatorWidget.h
     SARibbonCategoryLayout.h
     SARibbonGallery.h
-    SARibbonControlButton.h
     SARibbonGalleryGroup.h
     SARibbonGalleryItem.h
-    SARibbonComboBox.h
     SARibbonElementFactory.h
     SARibbonElementManager.h
-    SARibbonLineEdit.h
-    SARibbonCheckBox.h
     SARibbonButtonGroupWidget.h
     SARibbonStackedWidget.h
     SARibbonQuickAccessBar.h
@@ -101,14 +97,10 @@ SET(SARIBBON_SOURCE_FILES
     SARibbonSeparatorWidget.cpp
     SARibbonCategoryLayout.cpp
     SARibbonGallery.cpp
-    SARibbonControlButton.cpp
     SARibbonGalleryGroup.cpp
     SARibbonGalleryItem.cpp
-    SARibbonComboBox.cpp
     SARibbonElementFactory.cpp
     SARibbonElementManager.cpp
-    SARibbonLineEdit.cpp
-    SARibbonCheckBox.cpp
     SARibbonButtonGroupWidget.cpp
     SARibbonStackedWidget.cpp
     SARibbonQuickAccessBar.cpp

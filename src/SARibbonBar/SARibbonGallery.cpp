@@ -1,5 +1,4 @@
 ﻿#include "SARibbonGallery.h"
-#include "SARibbonControlButton.h"
 #include <QIcon>
 #include <QApplication>
 #define ICON_ARROW_UP QIcon(":/SARibbon/image/resource/ArrowUp.png")

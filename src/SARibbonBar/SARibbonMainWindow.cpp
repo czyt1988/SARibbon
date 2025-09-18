@@ -195,6 +195,8 @@ void SARibbonMainWindow::setRibbonBar(SARibbonBar* ribbon)
 		// 设置window按钮
 		if (nullptr == d_ptr->mWindowButtonGroup) {
 			d_ptr->mWindowButtonGroup = RibbonSubElementFactory->createWindowButtonGroup(this);
+            d_ptr->mWindowButtonGroup->setObjectName(QStringLiteral("objSARibbonSystemButtonBar"));
+            d_ptr->mWindowButtonGroup->setIconSize(QSize(18, 18));
 			// SARibbonSystemButtonBar的eventfilter捕获mainwindow的事件
 			// 通过eventerfilter来处理mainwindow的事件，避免用户错误的继承resizeEvent导致systembar的位置异常
 			installEventFilter(d_ptr->mWindowButtonGroup);

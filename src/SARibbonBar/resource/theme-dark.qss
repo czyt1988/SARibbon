@@ -142,11 +142,6 @@ SARibbonTabBar::tab:!selected {
   background: transparent;
 }
 
-/*SARibbonCheckBox*/
-SARibbonCheckBox{
-    color:#242424;
-    background-color:transparent;
-}
 
 /*SARibbonToolButton*/
 
@@ -197,23 +192,6 @@ SARibbonControlToolButton:hover {
   background-color: #a0a0a0;/*{ControlToolButton.BKColor:hover}*/
 }
 
-/*SARibbonControlButton*/
-SARibbonControlButton{
-  background-color:transparent;
-  border: none;
-  color:#242424;
-}
-SARibbonControlButton:pressed{
-  background-color: #858585;
-}
-SARibbonControlButton:checked{
-  border: 1px solid #888888;
-  background-color: #9b9b9b;
-}
-SARibbonControlButton:hover {
-  border: 1px solid #888888;
-  background-color: #a0a0a0;
- }
 
 SARibbonGalleryButton{
   background-color:#b2b2b2;
@@ -272,47 +250,49 @@ SARibbonGalleryViewport {
   background-color: #ffffff;
 }
 
-/*SARibbonLineEdit*/
-SARibbonLineEdit {
+/*Panel下QLineEdit的特化*/
+SARibbonPanel > QLineEdit {
   border:1px solid #888888;
   background-color: white;
   color: #242424;
   selection-background-color: #6a9eff;
   selection-color: white;
 }
+SARibbonPanel > QLineEdit:hover{
+    border: 1px solid #cfcecc;
+}
+/*Panel下QCheckBox的特化*/
+SARibbonPanel > QCheckBox{
+    color:#242424;
+    background-color:transparent;
+}
 
-
-/*SARibbonComboBox*/
-SARibbonComboBox {
+/*Panel下QComboBox的特化*/
+SARibbonPanel > QComboBox {
   border: 1px  solid #888888;
   background-color: white;
 }
-
-SARibbonComboBox:hover{
+SARibbonPanel > QComboBox:hover{
   border: 1px solid #cfcecc;
   color : #242424;
 }
-
-SARibbonComboBox:editable {
+SARibbonPanel > QComboBox:editable {
   color : #242424;
   background-color: white;
   selection-background-color: #6a9eff;
   selection-color: white;
 }
-
-SARibbonComboBox::drop-down {
+SARibbonPanel > QComboBox::drop-down {
   subcontrol-origin: padding;
   subcontrol-position: top right;
   width: 1em;
   border: none;
 }
-
-SARibbonComboBox::drop-down:hover {
+SARibbonPanel > QComboBox::drop-down:hover {
   border: none;
   background-color: #a0a0a0;
 }
-
-SARibbonComboBox::down-arrow {
+SARibbonPanel > QComboBox::down-arrow {
   image: url(:/SARibbon/image/resource/ArrowDown.png);
 }
 

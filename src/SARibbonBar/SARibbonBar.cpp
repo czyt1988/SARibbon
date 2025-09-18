@@ -105,6 +105,8 @@ public:
 	void init();
     // 创建QuickAccessBar
     SARibbonQuickAccessBar* createQuickAccessBar();
+    // 创建右边工具栏
+    SARibbonButtonGroupWidget* createRightButton();
 	// 创建一个默认的ApplicationButton
 	void createDefaultApplicationButton();
 	// 设置一个ApplicationButton
@@ -144,11 +146,10 @@ void SARibbonBar::PrivateData::init()
 	q_ptr->connect(mStackedContainerWidget.data(), &SARibbonStackedWidget::hidWindow, q_ptr, &SARibbonBar::onStackWidgetHided);
 	// 捕获事件，在popmode时必须用到
 	mStackedContainerWidget->installEventFilter(q_ptr);
-	//
+    // 快速工具栏
     createQuickAccessBar();
-
-	//
-	mRightButtonGroup = RibbonSubElementFactory->createButtonGroupWidget(q_ptr);
+    // 右侧工具栏
+    createRightButton();
 	//
     setNormalMode();
 }
@@ -158,6 +159,14 @@ SARibbonQuickAccessBar* SARibbonBar::PrivateData::createQuickAccessBar()
     mQuickAccessBar = RibbonSubElementFactory->createQuickAccessBar(q_ptr);
     mQuickAccessBar->setObjectName(QStringLiteral("objSARibbonQuickAccessBar"));
     mQuickAccessBar->setIconSize(QSize(18, 18));
+    return mQuickAccessBar.data();
+}
+
+SARibbonButtonGroupWidget* SARibbonBar::PrivateData::createRightButton()
+{
+    mRightButtonGroup = RibbonSubElementFactory->createButtonGroupWidget(q_ptr);
+    mRightButtonGroup->setObjectName(QStringLiteral("objSARibbonRightButtonGroup"));
+    mRightButtonGroup->setIconSize(QSize(18, 18));
     return mQuickAccessBar.data();
 }
 
@@ -995,28 +1004,32 @@ bool SARibbonBar::isMinimumMode() const
 	return (d_ptr->mStackedContainerWidget->isPopupMode());
 }
 
-///
-/// \brief 设置显示隐藏ribbon按钮
-///
+/**
+ * @brief 显示隐藏ribbon的按钮
+ * @param isShow
+ */
 void SARibbonBar::showMinimumModeButton(bool isShow)
 {
-	if (isShow && !d_ptr->mMinimumCategoryButtonAction) {
+    SA_D(d);
+    if (isShow && !(d->mMinimumCategoryButtonAction)) {
 		activeRightButtonGroup();
 
-		d_ptr->mMinimumCategoryButtonAction = new QAction(this);
-        d_ptr->mMinimumCategoryButtonAction->setIcon(
+        d->mMinimumCategoryButtonAction = new QAction(this);
+        d->mMinimumCategoryButtonAction->setIcon(
             style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton,
                                   nullptr));
-		connect(d_ptr->mMinimumCategoryButtonAction, &QAction::triggered, this, [ this ]() {
+        connect(d->mMinimumCategoryButtonAction, &QAction::triggered, this, [ this, d ]() {
 			this->setMinimumMode(!isMinimumMode());
-            this->d_ptr->mMinimumCategoryButtonAction->setIcon(
+            d->mMinimumCategoryButtonAction->setIcon(
                 style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton,
                                       nullptr));
 		});
-		d_ptr->mRightButtonGroup->addAction(d_ptr->mMinimumCategoryButtonAction);
+        if (d->mRightButtonGroup) {
+            d->mRightButtonGroup->addAction(d->mMinimumCategoryButtonAction);
+        }
 	}
 
-	d_ptr->mMinimumCategoryButtonAction->setVisible(isShow);
+    d->mMinimumCategoryButtonAction->setVisible(isShow);
 }
 
 /**
@@ -1404,11 +1417,12 @@ QRect SARibbonBar::getWindowTitleRect() const
  */
 SARibbonButtonGroupWidget* SARibbonBar::activeRightButtonGroup()
 {
-	if (nullptr == d_ptr->mRightButtonGroup) {
-		d_ptr->mRightButtonGroup = RibbonSubElementFactory->createButtonGroupWidget(this);
+    SA_D(d);
+    if (!(d->mRightButtonGroup)) {
+        d->createRightButton();
 	}
-	d_ptr->mRightButtonGroup->show();
-	return d_ptr->mRightButtonGroup;
+    d->mRightButtonGroup->show();
+    return d->mRightButtonGroup.data();
 }
 
 /**
@@ -1417,7 +1431,7 @@ SARibbonButtonGroupWidget* SARibbonBar::activeRightButtonGroup()
  */
 SARibbonButtonGroupWidget* SARibbonBar::rightButtonGroup()
 {
-	return d_ptr->mRightButtonGroup;
+    return d_ptr->mRightButtonGroup.data();
 }
 
 /**

@@ -683,8 +683,8 @@ void SARibbonBarLayout::resizeInLooseStyle()
 	const int validTitleBarHeight = d_ptr->getActualTitleBarHeight();
 	const int titleBarControlHeight = validTitleBarHeight - 2;  // 标题栏上的控件高度是标题栏高度-2，上下各减1px
 	const int tabH                = d_ptr->getActualTabBarHeight();
-	const int tabBarControlHeight = tabH - 2;  // tabbar上面的控件高度是tabbar高度-2，上下各减1px
-	int barMinWidth               = 0;         ///< 记录ribbonBar的最小宽度，这个用于给推荐宽度
+    const int tabBarControlHeight = tabH;  // tabbar上面的控件高度是tabbar高度-2，上下各减1px
+    int barMinWidth               = 0;     ///< 记录ribbonBar的最小宽度，这个用于给推荐宽度
 #if SARIBBONBARLAYOUT_ENABLE_DEBUG_PRINT
 	qDebug() << "resizeInLooseStyle,validTitleBarHeight=" << validTitleBarHeight << ",tabH=" << tabH;
 #endif
@@ -705,8 +705,9 @@ void SARibbonBarLayout::resizeInLooseStyle()
             QSize quickAccessBarSize = qb->sizeHint();
             //! 这里不用SA::scaleSizeByHeight缩减quickAccessBar的比例：
             //! quickAccessBarSize = SA::scaleSizeByHeight(quickAccessBarSize, titleBarControlHeight);
-            //! 原因是，如果quickAccessBar最后是一个widget，如果长度不足，这个widget是不会显示出来，默认QToolBar的高度是32，
-            //! 而titlebar的高度一般是28，肯定会导致宽度缩减，如果宽度缩减，且最后是一个窗口，那么这个窗口会不显示
+            //! 原因是，如果quickAccessBar最后是一个widget，如果长度不足，这个widget是不会显示出来，假如默认QToolBar的高度是32，
+            //! 而titlebar的高度一是28，肯定会导致宽度缩减，如果宽度缩减，且最后是一个窗口，那么这个窗口会不显示
+            //! 针对工具栏类型的窗口，宽度高度都不进行比例缩减
 			// 上下留1px的边线
             qb->setGeometry(x, y + 1, quickAccessBarSize.width(), titleBarControlHeight);
 		}
@@ -754,10 +755,12 @@ void SARibbonBarLayout::resizeInLooseStyle()
 	if (auto rightBtnGroup = rightButtonGroup()) {
 		if (rightBtnGroup->isVisibleTo(ribbon)) {
 			QSize rightBtnGroupSize = rightBtnGroup->sizeHint();
-			rightBtnGroupSize       = SA::scaleSizeByHeight(rightBtnGroupSize, tabBarControlHeight);
+            //! 这里不用SA::scaleSizeByHeight缩减rightButtonGroup的比例：
+            //! rightBtnGroupSize       = SA::scaleSizeByHeight(rightBtnGroupSize, tabBarControlHeight);
+            //! 针对工具栏类型的窗口，宽度高度都不进行比例缩减
 			endX -= 1;  // 先偏移1px
 			endX -= rightBtnGroupSize.width();
-			d_ptr->rightButtonGroup()->setGeometry(endX, y + 1, rightBtnGroupSize.width(), rightBtnGroupSize.height());
+            d_ptr->rightButtonGroup()->setGeometry(endX, y + 1, rightBtnGroupSize.width(), tabBarControlHeight);
 			// 累加到最小宽度中
 			barMinWidth += rightBtnGroupSize.width();
 		}
@@ -865,9 +868,9 @@ void SARibbonBarLayout::resizeInCompactStyle()
 	if (auto rightBtnGroup = rightButtonGroup()) {
 		if (rightBtnGroup->isVisibleTo(ribbon)) {
 			QSize rightBtnGroupSize = rightBtnGroup->sizeHint();
-			rightBtnGroupSize       = SA::scaleSizeByHeight(rightBtnGroupSize, titleBarControlHeight);
+            // rightBtnGroupSize       = SA::scaleSizeByHeight(rightBtnGroupSize, titleBarControlHeight);
 			endX -= rightBtnGroupSize.width();
-			d_ptr->rightButtonGroup()->setGeometry(endX, y + 1, rightBtnGroupSize.width(), rightBtnGroupSize.height());
+            d_ptr->rightButtonGroup()->setGeometry(endX, y + 1, rightBtnGroupSize.width(), titleBarControlHeight);
 			// 累加到最小宽度中
 			barMinWidth += rightBtnGroupSize.width();
 		}
@@ -877,9 +880,9 @@ void SARibbonBarLayout::resizeInCompactStyle()
 	if (auto qb = quickAccessBar()) {
 		if (qb->isVisibleTo(ribbon)) {
 			QSize quickAccessBarSize = qb->sizeHint();
-			quickAccessBarSize       = SA::scaleSizeByHeight(quickAccessBarSize, titleBarControlHeight);
+            // quickAccessBarSize       = SA::scaleSizeByHeight(quickAccessBarSize, titleBarControlHeight);
 			endX -= quickAccessBarSize.width();
-			qb->setGeometry(endX, y + 1, quickAccessBarSize.width(), quickAccessBarSize.height());
+            qb->setGeometry(endX, y + 1, quickAccessBarSize.width(), titleBarControlHeight);
 			// 累加到最小宽度中
 			barMinWidth += quickAccessBarSize.width();
 		}
