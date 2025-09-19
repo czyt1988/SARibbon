@@ -20,6 +20,9 @@
 #include "SARibbonTabBar.h"
 #include "SARibbonApplicationButton.h"
 #include "SARibbonBarLayout.h"
+#include "SARibbonTitleIconWidget.h"
+#include "SARibbonMainWindow.h"
+
 #ifndef SARIBBONBAR_DEBUG_PRINT
 #define SARIBBONBAR_DEBUG_PRINT 0
 #endif
@@ -71,7 +74,9 @@ public:
 	QPointer< SARibbonStackedWidget > mStackedContainerWidget;
 	QPointer< SARibbonButtonGroupWidget > mRightButtonGroup;  ///< 在tab bar右边的按钮群
 	QPointer< SARibbonQuickAccessBar > mQuickAccessBar;       ///< 快速响应栏
-	QAction* mMinimumCategoryButtonAction { nullptr };        ///< 隐藏面板按钮action
+    QPointer< SARibbonTitleIconWidget > mTitleIconWidget;     ///< 标题栏图标
+
+    QAction* mMinimumCategoryButtonAction { nullptr };  ///< 隐藏面板按钮action
 	QList< _SAContextCategoryManagerData > mCurrentShowingContextCategory;
 	QList< SARibbonContextCategory* > mContextCategoryList;  ///< 存放所有的上下文标签
 	QList< _SARibbonTabData > mHidedCategory;
@@ -107,6 +112,8 @@ public:
     SARibbonQuickAccessBar* createQuickAccessBar();
     // 创建右边工具栏
     SARibbonButtonGroupWidget* createRightButton();
+    // 创建标题栏图标
+    SARibbonTitleIconWidget* createTitleIconWidget();
 	// 创建一个默认的ApplicationButton
 	void createDefaultApplicationButton();
 	// 设置一个ApplicationButton
@@ -128,10 +135,15 @@ public:
 
 	// 重新布局
 	void relayout();
+
+    // 初始化新的父对象
+    void initNewParent(QWidget* par);
 };
 
 void SARibbonBar::PrivateData::init()
 {
+    q_ptr->setNativeMenuBar(false);
+
 	createDefaultApplicationButton();
 	mRibbonTabBar = RibbonSubElementFactory->createRibbonTabBar(q_ptr);
 	mRibbonTabBar->setObjectName(QStringLiteral("objSARibbonTabBar"));
@@ -150,15 +162,21 @@ void SARibbonBar::PrivateData::init()
     createQuickAccessBar();
     // 右侧工具栏
     createRightButton();
-	//
+    // 创建图标窗口
+    createTitleIconWidget();
     setNormalMode();
+
+    SARibbonBarLayout* lay = new SARibbonBarLayout(q_ptr);
+    q_ptr->setLayout(lay);
+    q_ptr->setRibbonStyle(RibbonStyleLooseThreeRow);
+    q_ptr->ensurePolished();
 }
 
 SARibbonQuickAccessBar* SARibbonBar::PrivateData::createQuickAccessBar()
 {
     mQuickAccessBar = RibbonSubElementFactory->createQuickAccessBar(q_ptr);
     mQuickAccessBar->setObjectName(QStringLiteral("objSARibbonQuickAccessBar"));
-    mQuickAccessBar->setIconSize(QSize(18, 18));
+    mQuickAccessBar->setIconSize(QSize(22, 22));
     return mQuickAccessBar.data();
 }
 
@@ -166,8 +184,14 @@ SARibbonButtonGroupWidget* SARibbonBar::PrivateData::createRightButton()
 {
     mRightButtonGroup = RibbonSubElementFactory->createButtonGroupWidget(q_ptr);
     mRightButtonGroup->setObjectName(QStringLiteral("objSARibbonRightButtonGroup"));
-    mRightButtonGroup->setIconSize(QSize(18, 18));
+    mRightButtonGroup->setIconSize(QSize(22, 22));
     return mQuickAccessBar.data();
+}
+
+SARibbonTitleIconWidget* SARibbonBar::PrivateData::createTitleIconWidget()
+{
+    mTitleIconWidget = RibbonSubElementFactory->createRibbonTitleIconWidget(q_ptr);
+    return mTitleIconWidget.data();
 }
 
 void SARibbonBar::PrivateData::createDefaultApplicationButton()
@@ -324,7 +348,33 @@ void SARibbonBar::PrivateData::relayout()
 #if SARIBBONBAR_DEBUG_PRINT
 		qDebug() << "SARibbonBar relayout";
 #endif
-	}
+    }
+}
+
+void SARibbonBar::PrivateData::initNewParent(QWidget* par)
+{
+    if (!par) {
+        return;
+    }
+    q_ptr->connect(par, &QWidget::windowTitleChanged, q_ptr, &SARibbonBar::onWindowTitleChanged);
+    q_ptr->connect(par, &QWidget::windowIconChanged, q_ptr, &SARibbonBar::onWindowIconChanged);
+    // 父窗口发生了改变，一般就是加入到了MainWindow中，这时要同步父窗口的信息到图标
+    if (SARibbonTitleIconWidget* titleIcon = q_ptr->titleIconWidget()) {
+        if (SARibbonMainWindow* mainwindow = qobject_cast< SARibbonMainWindow* >(par)) {
+            // 说明加入了MainWindow中
+            int th = q_ptr->titleBarHeight();
+            titleIcon->setWindow(mainwindow);
+            titleIcon->setIcon(mainwindow->windowIcon());
+            titleIcon->setIconSize(QSize(th - 2, th - 2));
+            titleIcon->show();
+            titleIcon->raise();
+        } else {
+            // 说明加入的不是MainWindow中，把图标隐藏
+            if (SARibbonTitleIconWidget* titleIcon = q_ptr->titleIconWidget()) {
+                titleIcon->hide();
+            }
+        }
+    }
 }
 
 //===================================================
@@ -338,16 +388,7 @@ void SARibbonBar::PrivateData::relayout()
 SARibbonBar::SARibbonBar(QWidget* parent) : QMenuBar(parent), d_ptr(new SARibbonBar::PrivateData(this))
 {
 	d_ptr->init();
-	ensurePolished();
-	setNativeMenuBar(false);
-	if (parent) {
-		connect(parent, &QWidget::windowTitleChanged, this, &SARibbonBar::onWindowTitleChanged);
-		connect(parent, &QWidget::windowIconChanged, this, &SARibbonBar::onWindowIconChanged);
-	}
-	setRibbonStyle(RibbonStyleLooseThreeRow);
-	SARibbonBarLayout* lay = new SARibbonBarLayout(this);
-	setLayout(lay);
-	lay->resetSize();  // 设置ribbon的高度
+    d_ptr->initNewParent(parent);
 }
 
 SARibbonBar::~SARibbonBar()
@@ -1450,7 +1491,16 @@ SARibbonQuickAccessBar* SARibbonBar::activeQuickAccessBar()
 
 SARibbonQuickAccessBar* SARibbonBar::quickAccessBar()
 {
-	return (d_ptr->mQuickAccessBar);
+    return (d_ptr->mQuickAccessBar.data());
+}
+
+/**
+ * @brief 获取标题栏窗口
+ * @return
+ */
+SARibbonTitleIconWidget* SARibbonBar::titleIconWidget()
+{
+    return (d_ptr->mTitleIconWidget.data());
 }
 
 /**
@@ -2438,6 +2488,15 @@ void SARibbonBar::changeEvent(QEvent* e)
 	case QEvent::StyleChange: {
 		updateRibbonGeometry();
 	} break;
+    case QEvent::ParentChange: {
+        //! 这种是针对先new 一个对象，再设置到MainWindow的情况，例如
+        //! SARibbonBar* ribbon = new SARibbonBar();
+        //! mainwinodw->setRibbonBar(ribbon);
+        //!
+        //! 这种方式，构造的时候由于没有设置父窗口，因此，如果在构造函数绑定信号槽就有可能绑定不上（parent为空）
+        //! 所以在事件里绑定
+        d_ptr->initNewParent(parentWidget());
+    } break;
 	default:
 		break;
 	}

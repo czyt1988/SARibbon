@@ -49,6 +49,7 @@
 #include "../../src/SARibbonBar/SARibbonQuickAccessBar.cpp"
 #include "../../src/SARibbonBar/SARibbonTabBar.cpp"
 #include "../../src/SARibbonBar/SARibbonMenu.cpp"
+#include "../../src/SARibbonBar/SARibbonTitleIconWidget.cpp"
 
 #include "../../src/SARibbonBar/SARibbonPanelOptionButton.cpp"
 #include "../../src/SARibbonBar/SARibbonPanelItem.cpp"

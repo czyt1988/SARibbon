@@ -23,6 +23,7 @@
 #include "../../src/SARibbonBar/SARibbonQuickAccessBar.h"
 #include "../../src/SARibbonBar/SARibbonTabBar.h"
 #include "../../src/SARibbonBar/SARibbonMenu.h"
+#include "../../src/SARibbonBar/SARibbonTitleIconWidget.h"
 
 #include "../../src/SARibbonBar/SARibbonPanelOptionButton.h"
 #include "../../src/SARibbonBar/SARibbonPanelItem.h"

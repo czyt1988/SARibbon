@@ -94,6 +94,7 @@ public:
 	SARibbonQuickAccessBar* quickAccessBar() const;
 	SARibbonButtonGroupWidget* rightButtonGroup() const;
 	QAbstractButton* applicationButton() const;
+    SARibbonTitleIconWidget* titleIconWidget() const;
 
 protected:
 	void resizeInLooseStyle();

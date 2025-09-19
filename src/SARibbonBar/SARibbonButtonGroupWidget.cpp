@@ -22,6 +22,7 @@ SARibbonButtonGroupWidget::SARibbonButtonGroupWidget(QWidget* parent) : QToolBar
     setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     setMovable(false);    // 禁止移动
     setFloatable(false);  // 禁止浮动
+    setContentsMargins(0, 0, 0, 0);
     const int smallIconSize = QApplication::style()->pixelMetric(QStyle::PM_SmallIconSize);
     setIconSize(QSize(smallIconSize, smallIconSize));
 }

@@ -14,6 +14,7 @@ class SARibbonTabBar;
 class SARibbonButtonGroupWidget;
 class SARibbonQuickAccessBar;
 class SARibbonStackedWidget;
+class SARibbonTitleIconWidget;
 
 /**
   @brief SARibbonBar继承于QMenuBar,在SARibbonMainWindow中直接替换了原来的QMenuBar
@@ -288,6 +289,9 @@ public:
 
 	// 快速响应栏
 	SARibbonQuickAccessBar* quickAccessBar();
+
+    // 标题栏窗口
+    SARibbonTitleIconWidget* titleIconWidget();
 
 	// 设置ribbon的风格
 	void setRibbonStyle(RibbonStyles v);

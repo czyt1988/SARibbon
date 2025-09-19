@@ -11,6 +11,7 @@
 #include "SARibbonCategory.h"
 #include "SARibbonElementManager.h"
 #include "SARibbonUtil.h"
+#include "SARibbonTitleIconWidget.h"
 
 #ifndef SARIBBONBARLAYOUT_ENABLE_DEBUG_PRINT
 #define SARIBBONBARLAYOUT_ENABLE_DEBUG_PRINT 0
@@ -74,6 +75,11 @@ public:
 	{
 		return ribbonBar->rightButtonGroup();
 	}
+
+    SARibbonTitleIconWidget* titleIconWidget() const
+    {
+        return ribbonBar->titleIconWidget();
+    }
 
 	QAbstractButton* applicationButton() const
 	{
@@ -512,6 +518,7 @@ void SARibbonBarLayout::setPanelTitleHeight(int h)
  */
 void SARibbonBarLayout::setWindowIcon(const QIcon& icon)
 {
+    titleIconWidget()->setIcon(icon);
 }
 
 /**
@@ -555,6 +562,11 @@ SARibbonButtonGroupWidget* SARibbonBarLayout::rightButtonGroup() const
 QAbstractButton* SARibbonBarLayout::applicationButton() const
 {
     return d_ptr->applicationButton();
+}
+
+SARibbonTitleIconWidget* SARibbonBarLayout::titleIconWidget() const
+{
+    return d_ptr->titleIconWidget();
 }
 
 void SARibbonBarLayout::layoutTitleRect()
@@ -690,7 +702,6 @@ void SARibbonBarLayout::resizeInLooseStyle()
 #endif
 	SARibbonBar* ribbon = ribbonBar();
 	/// 1. 布局corner widget
-	x += 5;
 	if (QWidget* connerL = ribbon->cornerWidget(Qt::TopLeftCorner)) {
 		if (connerL->isVisibleTo(ribbon)) {
 			QSize connerSize = connerL->sizeHint();
@@ -699,6 +710,15 @@ void SARibbonBarLayout::resizeInLooseStyle()
 			x = connerL->geometry().right() + 5;
 		}
 	}
+    /// 2. 布局图标窗口
+    if (SARibbonTitleIconWidget* titleicon = titleIconWidget()) {
+        if (titleicon->isVisibleTo(ribbon)) {
+            QSize titleiconSizeHint = titleicon->sizeHint();
+            titleiconSizeHint.scale(titleBarControlHeight, titleBarControlHeight, Qt::KeepAspectRatio);
+            titleicon->setGeometry(x, y + 1, titleiconSizeHint.width(), titleiconSizeHint.height());
+            x += titleiconSizeHint.width();
+        }
+    }
 	/// 2. 布局quick access bar
 	if (auto qb = quickAccessBar()) {
 		if (qb->isVisibleTo(ribbon)) {

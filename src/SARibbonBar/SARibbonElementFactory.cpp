@@ -16,6 +16,7 @@
 #include "SARibbonPanelOptionButton.h"
 #include "SARibbonPanelLayout.h"
 #include "SARibbonSystemButtonBar.h"
+#include "SARibbonTitleIconWidget.h"
 
 SARibbonElementFactory::SARibbonElementFactory()
 {
@@ -104,4 +105,9 @@ SARibbonSystemButtonBar* SARibbonElementFactory::createWindowButtonGroup(QWidget
 SARibbonPanelOptionButton* SARibbonElementFactory::createRibbonPanelOptionButton(SARibbonPanel* panel)
 {
     return (new SARibbonPanelOptionButton(panel));
+}
+
+SARibbonTitleIconWidget* SARibbonElementFactory::createRibbonTitleIconWidget(QWidget* parent)
+{
+    return (new SARibbonTitleIconWidget(parent));
 }

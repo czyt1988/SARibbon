@@ -12,6 +12,7 @@
 
 #include "SARibbonSystemButtonBar.h"
 #include "SARibbonWidget.h"
+#include "SARibbonTitleIconWidget.h"
 #if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
 #include <QWKWidgets/widgetwindowagent.h>
 #include "SARibbonButtonGroupWidget.h"
@@ -206,6 +207,9 @@ void SARibbonMainWindow::setRibbonBar(SARibbonBar* ribbon)
 		sysBar->setWindowTitleHeight(th);
 		sysBar->raise();  // 确保sysbar在最顶层，避免第二次设置ribbonbar的时候，被ribbonbar覆盖了sysbar
 		sysBar->show();
+
+        // 图标
+        ribbon->titleIconWidget()->setIcon(windowIcon());
 #if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
 		auto helper = d_ptr->mFramelessHelper;
 		helper->setTitleBar(ribbon);
@@ -216,6 +220,7 @@ void SARibbonMainWindow::setRibbonBar(SARibbonBar* ribbon)
 		helper->setHitTestVisible(ribbon->applicationButton());    // IMPORTANT!
 		helper->setHitTestVisible(ribbon->quickAccessBar());       // IMPORTANT!
 		helper->setHitTestVisible(ribbon->ribbonStackedWidget());  // IMPORTANT!
+        helper->setHitTestVisible(ribbon->titleIconWidget());      // IMPORTANT!
 #if SARIBBON_ENABLE_SNAP_LAYOUT
 		if (sysBar->closeButton()) {
 			helper->setSystemButton(QWK::WindowAgentBase::Close, sysBar->closeButton());
@@ -273,10 +278,10 @@ bool SARibbonMainWindow::eventFilter(QObject* obj, QEvent* e)
 	// 这个过滤是为了把ribbonBar上的动作传递到mainwindow，再传递到frameless，
 	// 由于ribbonbar会遮挡掉frameless的区域，导致frameless无法捕获这些消息
 	// 因此必须ribbonBar()->installEventFilter(this);
-	// 20240101发现installEventFilter后，SARibbonMainWindow没有执行这个回调
+
 	if (obj == ribbonBar()) {
 		switch (e->type()) {
-		case QEvent::MouseButtonPress:
+        case QEvent::MouseButtonPress:
 		case QEvent::MouseButtonRelease:
 		case QEvent::MouseMove:
 		case QEvent::Leave:
