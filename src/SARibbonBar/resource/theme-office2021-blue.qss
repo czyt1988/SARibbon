@@ -373,8 +373,9 @@ SARibbonPanel > QComboBox::drop-down:hover {
   border: 1px solid #FDEEB3;
   background-color: #9ed2f9;
 }
-
-
+SARibbonPanel > QComboBox::down-arrow {
+  image: url(:/SARibbon/image/resource/ArrowDown.png);
+}
 /*SARibbonSeparatorWidget*/
 
 SARibbonSeparatorWidget {
