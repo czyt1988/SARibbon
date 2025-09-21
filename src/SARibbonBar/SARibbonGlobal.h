@@ -157,6 +157,8 @@ enum class SARibbonMainWindowStyleFlag : int
 	UseNativeMenuBar = 8
 };
 Q_DECLARE_FLAGS(SARibbonMainWindowStyles, SARibbonMainWindowStyleFlag)
+Q_DECLARE_OPERATORS_FOR_FLAGS(SARibbonMainWindowStyles)
+
 /**
  * @def 属性，用于标记是否可以进行自定义，用于动态设置到@ref SARibbonCategory 和@ref SARibbonPanel
  * 值为bool，在为true时，可以通过@ref SARibbonCustomizeWidget 改变这个SARibbonCategory和SARibbonPanel的布局，

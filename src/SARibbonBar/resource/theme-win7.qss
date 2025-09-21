@@ -21,17 +21,28 @@ SARibbonButtonGroupWidget > QToolButton {
     border: none;
     color: #444444;
     background-color: transparent;
-    padding: 1px 1px;
+    padding: 0 2px;
 }
+/* hover 状态 */
+SARibbonButtonGroupWidget > QToolButton:hover {
+    color: #000000;
+    background-color: #FDEEB3;
+}
+SARibbonButtonGroupWidget > QToolButton:pressed{
+    color: #444444;
+    background-color: #FDEEB3;
+    border:1px solid #FFD700;
+}
+SARibbonButtonGroupWidget > QToolButton:checked {
+    color: #444444;
+    background-color: #FDEEB3;
+    border:1px solid #FFD700;
+}
+
 /* 有菜单的按钮 */
+/*MenuButtonPopup*/
 SARibbonButtonGroupWidget > QToolButton[popupMode="1"]{
-    padding-right: 18px;
-}
-/* MenuButtonPopup 模式下的菜单按钮部分 */
-SARibbonButtonGroupWidget > QToolButton[popupMode="1"]::menu-button {
-    border: none;
-    border-radius: 0;
-    background-color: transparent;
+    padding-right: 12px;
 }
 /* hover 状态 - MenuButtonPopup 模式的菜单按钮部分 */
 SARibbonButtonGroupWidget > QToolButton[popupMode="1"]::menu-button:hover {
@@ -41,31 +52,15 @@ SARibbonButtonGroupWidget > QToolButton[popupMode="1"]::menu-button:hover {
 SARibbonButtonGroupWidget > QToolButton[popupMode="1"]::menu-button:pressed {
     background-color: #FFD700; /* 更深的黄色 */
 }
+/* 直接弹出菜单模式，偏移8px，让下拉按钮能看到 */
 SARibbonButtonGroupWidget > QToolButton[popupMode="2"] {
-    padding-right: 18px;
+    padding-right: 8px;
+}
+/* 无菜单的按钮保持小边距 */
+SARibbonButtonGroupWidget > QToolButton[popupMode="0"]{
+    padding: 0 2px;
 }
 
-/* 无菜单的 DelayedPopup 按钮保持小边距 */
-SARibbonButtonGroupWidget > QToolButton[popupMode="0"]{
-    padding-right: 1px;
-}
-/* hover 状态 */
-SARibbonButtonGroupWidget > QToolButton:hover {
-    color: #000000;
-    background-color: #FDEEB3;
-}
-SARibbonButtonGroupWidget > QToolButton:focus {
-    border: 1px solid #FCBF21;
-    color: #333;
-}
-SARibbonButtonGroupWidget > QToolButton:pressed{
-    color: #444444;
-    background-color: #FDEEB3;
-}
-SARibbonButtonGroupWidget > QToolButton:checked {
-    color: #444444;
-    background-color: #FDEEB3;
-}
 
 /*SARibbonQuickAccessBar*/
 SARibbonQuickAccessBar{

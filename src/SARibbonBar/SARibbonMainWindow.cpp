@@ -33,6 +33,7 @@ public:
 	void installFrameless(SARibbonMainWindow* p);
 	bool isUseRibbonBar() const;
 	bool isUseRibbonFrame() const;
+	bool isUseNativeFrame() const;
 	void checkMainWindowFlag();
 	static void updateTabBarMargins(SARibbonTabBar* tab, SARibbonTheme theme);
 	static void updateContextColors(SARibbonBar* bar, SARibbonTheme theme);
@@ -71,7 +72,12 @@ bool SARibbonMainWindow::PrivateData::isUseRibbonBar() const
 
 bool SARibbonMainWindow::PrivateData::isUseRibbonFrame() const
 {
-    return mRibbonMainWindowStyle.testFlag(SARibbonMainWindowStyleFlag::UseRibbonFrame);
+	return mRibbonMainWindowStyle.testFlag(SARibbonMainWindowStyleFlag::UseRibbonFrame);
+}
+
+bool SARibbonMainWindow::PrivateData::isUseNativeFrame() const
+{
+    return mRibbonMainWindowStyle.testFlag(SARibbonMainWindowStyleFlag::UseNativeFrame);
 }
 
 /**
@@ -81,13 +87,13 @@ void SARibbonMainWindow::PrivateData::checkMainWindowFlag()
 {
 	// 如果都没有设置边框样式，默认设置为ribbon边框
 	if (!mRibbonMainWindowStyle.testFlag(SARibbonMainWindowStyleFlag::UseRibbonFrame)
-        && !mRibbonMainWindowStyle.testFlag(SARibbonMainWindowStyleFlag::UseNativeFrame)) {
+		&& !mRibbonMainWindowStyle.testFlag(SARibbonMainWindowStyleFlag::UseNativeFrame)) {
 		mRibbonMainWindowStyle.setFlag(SARibbonMainWindowStyleFlag::UseRibbonFrame, true);
 	}
 
 	// 如果都没有设置MenuBar，默认设置为ribbonbar
 	if (!mRibbonMainWindowStyle.testFlag(SARibbonMainWindowStyleFlag::UseRibbonMenuBar)
-        && !mRibbonMainWindowStyle.testFlag(SARibbonMainWindowStyleFlag::UseNativeMenuBar)) {
+		&& !mRibbonMainWindowStyle.testFlag(SARibbonMainWindowStyleFlag::UseNativeMenuBar)) {
 		mRibbonMainWindowStyle.setFlag(SARibbonMainWindowStyleFlag::UseRibbonMenuBar, true);
 	}
 }
@@ -149,17 +155,50 @@ void SARibbonMainWindow::PrivateData::updateTabBarBaseLineColor(SARibbonBar* bar
 //===================================================
 // SARibbonMainWindow
 //===================================================
+
+/**
+ * @brief 构造一个 SARibbonMainWindow 实例。
+ *
+ * 此构造函数初始化一个带有 Ribbon 界面风格的主窗口，支持自定义窗口样式（如是否使用 Ribbon 边框、菜单栏等），
+ * 并根据样式自动配置窗口行为（如无边框、RibbonBar 安装等）。
+ *
+ * @param parent 父窗口部件
+ * @param style 窗口样式标志，控制窗口外观和行为。支持以下标志组合：
+ *        - @c SARibbonMainWindowStyleFlag::UseRibbonFrame：使用Ribbon自定义边框（会启用无边框窗口）（默认启用）。
+ *        - @c SARibbonMainWindowStyleFlag::UseNativeFrame：使用系统原生窗口边框。
+ *        - @c SARibbonMainWindowStyleFlag::UseRibbonMenuBar：使用 Ribbon 风格菜单栏（默认启用）。
+ *        - @c SARibbonMainWindowStyleFlag::UseNativeMenuBar：使用系统原生菜单栏（非ribbon）。
+ *        标志可通过位或（|）组合使用，例如：@c SARibbonMainWindowStyleFlag::UseRibbonFrame | SARibbonMainWindowStyleFlag::UseRibbonMenuBar
+ *
+ * @param flags 标准 Qt 窗口标志
+ *
+ * @note 如果启用了 @c UseRibbonFrame，则窗口将自动安装无边框支持。
+ *
+ * @sa SARibbonMainWindowStyleFlag, setRibbonBar(), ribbonTheme()
+ */
 SARibbonMainWindow::SARibbonMainWindow(QWidget* parent, SARibbonMainWindowStyles style, const Qt::WindowFlags flags)
     : QMainWindow(parent, flags), d_ptr(new SARibbonMainWindow::PrivateData(this))
 {
-	d_ptr->mRibbonMainWindowStyle = style;
-	d_ptr->checkMainWindowFlag();
-	if (d_ptr->isUseRibbonBar()) {
-		if (d_ptr->isUseRibbonFrame()) {
-			d_ptr->installFrameless(this);
+	SA_D(d);
+	d->mRibbonMainWindowStyle = style;
+	d->checkMainWindowFlag();
+	if (d->isUseRibbonBar()) {
+		if (d->isUseRibbonFrame()) {
+			d->installFrameless(this);
 		}
 		setRibbonBar(createRibbonBar());
 		setRibbonTheme(ribbonTheme());
+		if (d->isUseNativeFrame()) {
+			// 在ribbon模式下使用本地边框，将隐藏icon，同时默认设置为紧凑模式
+			if (SARibbonBar* bar = ribbonBar()) {
+				if (SARibbonTitleIconWidget* iconWidget = bar->titleIconWidget()) {
+					// 隐藏icon
+					iconWidget->hide();
+				}
+				// 设置为紧凑模式
+				bar->setRibbonStyle(SARibbonBar::RibbonStyleCompactThreeRow);
+			}
+		}
 	}
 	connect(qApp, &QApplication::primaryScreenChanged, this, &SARibbonMainWindow::onPrimaryScreenChanged);
 }
@@ -196,8 +235,8 @@ void SARibbonMainWindow::setRibbonBar(SARibbonBar* ribbon)
 		// 设置window按钮
 		if (nullptr == d_ptr->mWindowButtonGroup) {
 			d_ptr->mWindowButtonGroup = RibbonSubElementFactory->createWindowButtonGroup(this);
-            d_ptr->mWindowButtonGroup->setObjectName(QStringLiteral("objSARibbonSystemButtonBar"));
-            d_ptr->mWindowButtonGroup->setIconSize(QSize(18, 18));
+			d_ptr->mWindowButtonGroup->setObjectName(QStringLiteral("objSARibbonSystemButtonBar"));
+			d_ptr->mWindowButtonGroup->setIconSize(QSize(18, 18));
 			// SARibbonSystemButtonBar的eventfilter捕获mainwindow的事件
 			// 通过eventerfilter来处理mainwindow的事件，避免用户错误的继承resizeEvent导致systembar的位置异常
 			installEventFilter(d_ptr->mWindowButtonGroup);
@@ -208,8 +247,8 @@ void SARibbonMainWindow::setRibbonBar(SARibbonBar* ribbon)
 		sysBar->raise();  // 确保sysbar在最顶层，避免第二次设置ribbonbar的时候，被ribbonbar覆盖了sysbar
 		sysBar->show();
 
-        // 图标
-        ribbon->titleIconWidget()->setIcon(windowIcon());
+		// 图标
+		ribbon->titleIconWidget()->setIcon(windowIcon());
 #if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
 		auto helper = d_ptr->mFramelessHelper;
 		helper->setTitleBar(ribbon);
@@ -220,7 +259,7 @@ void SARibbonMainWindow::setRibbonBar(SARibbonBar* ribbon)
 		helper->setHitTestVisible(ribbon->applicationButton());    // IMPORTANT!
 		helper->setHitTestVisible(ribbon->quickAccessBar());       // IMPORTANT!
 		helper->setHitTestVisible(ribbon->ribbonStackedWidget());  // IMPORTANT!
-        helper->setHitTestVisible(ribbon->titleIconWidget());      // IMPORTANT!
+		helper->setHitTestVisible(ribbon->titleIconWidget());      // IMPORTANT!
 #if SARIBBON_ENABLE_SNAP_LAYOUT
 		if (sysBar->closeButton()) {
 			helper->setSystemButton(QWK::WindowAgentBase::Close, sysBar->closeButton());
@@ -281,7 +320,7 @@ bool SARibbonMainWindow::eventFilter(QObject* obj, QEvent* e)
 
 	if (obj == ribbonBar()) {
 		switch (e->type()) {
-        case QEvent::MouseButtonPress:
+		case QEvent::MouseButtonPress:
 		case QEvent::MouseButtonRelease:
 		case QEvent::MouseMove:
 		case QEvent::Leave:

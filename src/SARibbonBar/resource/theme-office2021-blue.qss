@@ -16,11 +16,12 @@ SARibbonBar {
   color:#242424;
 }
 
-
-/*SARibbonQuickAccessBar*/
-SARibbonQuickAccessBar {
+/*SARibbonButtonGroupWidget*/
+SARibbonButtonGroupWidget {
   background-color: transparent;
 }
+
+
 
 /*SARibbonCtrlContainer*/
 SARibbonCtrlContainer {
@@ -35,7 +36,6 @@ SARibbonSeparatorWidget
 SARibbonSeparatorWidget {
   color: #bec0c2;
 }
-
 /*SARibbonCategory*/
 SARibbonCategory:focus {
   outline: none;
@@ -61,11 +61,6 @@ SARibbonPanel {
   background-color: #ffffff;
   border: none;
   color: #666666;
-}
-
-/*SARibbonButtonGroupWidget*/
-SARibbonButtonGroupWidget {
-  background-color: transparent;
 }
 
 SARibbonPanel > SARibbonButtonGroupWidget {

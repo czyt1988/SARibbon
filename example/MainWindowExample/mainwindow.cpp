@@ -273,36 +273,36 @@ void MainWindow::onStyleClicked(int id)
 		// cn:"LooseThreeRow"样式的文字显示是换行的，同时也会显示标题栏，你也可以通过SARibbonBar::setEnableWordWrap来控制按钮是否换行显示，
 		// 可以通过SARibbonBar::setEnableShowPanelTitle控制标题栏是否显示
 		mTextedit->append(
-            tr("\nThe text display of the \"LooseThreeRow\" style is word wrap and also displays the title bar. "
-               "You can also control whether the button is line breaking through SARibbonBar::setEnableWordWrap,"
-               "and whether the title bar is displayed through SARibbonBar::setEnableShowPanelTitle"));
+			tr("\nThe text display of the \"LooseThreeRow\" style is word wrap and also displays the title bar. "
+			   "You can also control whether the button is line breaking through SARibbonBar::setEnableWordWrap,"
+			   "and whether the title bar is displayed through SARibbonBar::setEnableShowPanelTitle"));
 		mTextedit->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::RibbonStyleLooseThreeRow);"));
 		break;
 	case SARibbonBar::RibbonStyleLooseTwoRow:
 		// cn:"LooseThreeRow"样式的文字显示是不换行的，同时也会显示标题栏，你也可以通过SARibbonBar::setEnableWordWrap来控制按钮是否换行显示，
 		// 可以通过SARibbonBar::setEnableShowPanelTitle控制标题栏是否显示
 		mTextedit->append(
-            tr("\nThe text display of the \"LooseTwoRow\" style is not word wrap and also displays the title bar. "
-               "You can also control whether the button is line breaking through SARibbonBar::setEnableWordWrap,"
-               "and whether the title bar is displayed through SARibbonBar::setEnableShowPanelTitle"));
+			tr("\nThe text display of the \"LooseTwoRow\" style is not word wrap and also displays the title bar. "
+			   "You can also control whether the button is line breaking through SARibbonBar::setEnableWordWrap,"
+			   "and whether the title bar is displayed through SARibbonBar::setEnableShowPanelTitle"));
 		mTextedit->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::RibbonStyleLooseTwoRow);"));
 		break;
 	case SARibbonBar::RibbonStyleCompactThreeRow:
 		// cn:"CompactThreeRow"样式的文字显示是换行的，不会显示标题栏，你也可以通过SARibbonBar::setEnableWordWrap来控制按钮是否换行显示，
 		// 可以通过SARibbonBar::setEnableShowPanelTitle控制标题栏是否显示
 		mTextedit->append(
-            tr("\nThe text display of the \"LooseThreeRow\" style is word wrap and not displays the title bar. "
-               "You can also control whether the button is line breaking through SARibbonBar::setEnableWordWrap,"
-               "and whether the title bar is displayed through SARibbonBar::setEnableShowPanelTitle"));
+			tr("\nThe text display of the \"LooseThreeRow\" style is word wrap and not displays the title bar. "
+			   "You can also control whether the button is line breaking through SARibbonBar::setEnableWordWrap,"
+			   "and whether the title bar is displayed through SARibbonBar::setEnableShowPanelTitle"));
 		mTextedit->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::RibbonStyleCompactThreeRow);"));
 		break;
 	case SARibbonBar::RibbonStyleCompactTwoRow:
 		// cn:"CompactTwoRow"样式的文字显示是不换行的，不会显示标题栏，你也可以通过SARibbonBar::setEnableWordWrap来控制按钮是否换行显示，
 		// 可以通过SARibbonBar::setEnableShowPanelTitle控制标题栏是否显示
 		mTextedit->append(
-            tr("\nThe text display of the \"CompactTwoRow\" style is not word wrap and not displays the title bar. "
-               "You can also control whether the button is line breaking through SARibbonBar::setEnableWordWrap,"
-               "and whether the title bar is displayed through SARibbonBar::setEnableShowPanelTitle"));
+			tr("\nThe text display of the \"CompactTwoRow\" style is not word wrap and not displays the title bar. "
+			   "You can also control whether the button is line breaking through SARibbonBar::setEnableWordWrap,"
+			   "and whether the title bar is displayed through SARibbonBar::setEnableShowPanelTitle"));
 		mTextedit->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::RibbonStyleCompactTwoRow);"));
 		break;
 	default:
@@ -319,10 +319,8 @@ void MainWindow::onStyleClicked(int id)
 void MainWindow::onActionCustomizeTriggered()
 {
 	if (nullptr == mWidgetForCustomize) {
-        mWidgetForCustomize = new SARibbonCustomizeWidget(this,
-                                                          this,
-                                                          Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint
-                                                              | Qt::Dialog);
+		mWidgetForCustomize =
+			new SARibbonCustomizeWidget(this, this, Qt::WindowMinMaxButtonsHint | Qt::WindowCloseButtonHint | Qt::Dialog);
 		mWidgetForCustomize->setWindowModality(Qt::ApplicationModal);  // 设置阻塞类型
 		mWidgetForCustomize->setAttribute(Qt::WA_ShowModal, true);     // 属性设置 true:模态 false:非模态
 		mWidgetForCustomize->setupActionsManager(mActionsManager);
@@ -344,9 +342,8 @@ void MainWindow::onActionCustomizeAndSaveTriggered()
 	dlg.setupActionsManager(mActionsManager);
 	// 如果启动时未应用上次修改，先应用再读取,保持本地数据和ui一致
 	if (!mHasApplyCustomizeXmlFile) {
-        auto res = QMessageBox::question(this,
-                                         tr("question"),
-                                         tr("Apply the last modification?\nIf not, local data will be reset"));
+		auto res = QMessageBox::question(
+			this, tr("question"), tr("Apply the last modification?\nIf not, local data will be reset"));
 		if (res == QMessageBox::Yes) {
 			onActionLoadCustomizeXmlFileTriggered();
 			return;
@@ -408,9 +405,8 @@ void MainWindow::onActionCustomizeAndSaveWithApplyTriggered()
 {
 	// 如果启动时未应用上次修改，先应用再读取,保持本地数据和ui一致
 	if (!mHasApplyCustomizeXmlFile) {
-        auto res = QMessageBox::question(this,
-                                         tr("question"),
-                                         tr("Apply the last modification?\nIf not, local data will be reset"));
+		auto res = QMessageBox::question(
+			this, tr("question"), tr("Apply the last modification?\nIf not, local data will be reset"));
 		if (res == QMessageBox::Yes) {
 			onActionLoadCustomizeXmlFileTriggered();
 			return;
@@ -428,8 +424,8 @@ void MainWindow::onActionCustomizeAndSaveWithApplyTriggered()
 
 	main->addWidget(widgetForCustomize, 1);
 
-    QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel
-                                                       | QDialogButtonBox::Apply);
+	QDialogButtonBox* buttonBox =
+		new QDialogButtonBox(QDialogButtonBox::Save | QDialogButtonBox::Cancel | QDialogButtonBox::Apply);
 
 	main->addWidget(buttonBox);
 
@@ -499,13 +495,13 @@ void MainWindow::onActionCustomizeAndSaveWithApplyTriggered()
 void MainWindow::onActionHelpTriggered()
 {
 	QMessageBox::information(this,
-                             tr("infomation"),
-                             tr("\n ==============="
-                                "\n SARibbonBar version:%1"
-                                "\n Author:czy"
-                                "\n Email:czy.t@163.com"
-                                "\n ===============")
-                                 .arg(SARibbonBar::versionString()));
+							 tr("infomation"),
+							 tr("\n ==============="
+								"\n SARibbonBar version:%1"
+								"\n Author:czy"
+								"\n Email:czy.t@163.com"
+								"\n ===============")
+								 .arg(SARibbonBar::versionString()));
 }
 
 /**
@@ -647,9 +643,9 @@ void MainWindow::onActionWordWrapTriggered(bool b)
 {
 	ribbonBar()->setEnableWordWrap(b);
 	mTextedit->append(tr("By using the SARibbonBar::setEnableWordWrap function, "
-                         "you can set whether text breaks or not.\n"
-                         "By default, the two line mode will not wrap, the three line mode will wrap.\n"
-                         "You can force the two line mode to wrap, or the three line mode to not wrap"));
+						 "you can set whether text breaks or not.\n"
+						 "By default, the two line mode will not wrap, the three line mode will wrap.\n"
+						 "You can force the two line mode to wrap, or the three line mode to not wrap"));
 	// cn:通过SARibbonBar::setEnableWordWrap函数可以设置文字是否换行。\n
 	// 默认情况下，两行模式都不会换行，三行模式下都会换行。\n
 	// 可以强制设置两行模式也换行，或者三行模式不换行
@@ -962,7 +958,8 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
 
 	//! show hide button
 	// 注意，这里你可以看到文字设置时加了换行，在ribbon中，如果在多行文本模式下，会让文字主动换行，如果设置为单行文本，这个换行会忽略
-    QAction* actionShowHideButton = createAction(tr("show \nhide button"), ":/icon/icon/showHideButton.svg", "show hide button");
+	QAction* actionShowHideButton =
+		createAction(tr("show \nhide button"), ":/icon/icon/showHideButton.svg", "show hide button");
 	actionShowHideButton->setCheckable(true);
 	panelStyle->addSmallAction(actionShowHideButton);  // wrod wrap was not effect in small button
 	connect(actionShowHideButton, &QAction::triggered, this, [ this ](bool b) {
@@ -1017,7 +1014,7 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
 	connect(g, static_cast< void (QButtonGroup::*)(int) >(&QButtonGroup::buttonClicked), this, &MainWindow::onStyleClicked);
 #endif
 
-    mComboboxRibbonTheme = new QComboBox();
+	mComboboxRibbonTheme = new QComboBox();
 	mComboboxRibbonTheme->setWindowTitle(tr("RibbonTheme"));
 	mComboboxRibbonTheme->setObjectName("RibbonTheme");
 	mComboboxRibbonTheme->addItem("Theme Win7", static_cast< int >(SARibbonTheme::RibbonThemeWindows7));
@@ -1028,17 +1025,17 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
 	mComboboxRibbonTheme->addItem("Theme Dark2", static_cast< int >(SARibbonTheme::RibbonThemeDark2));
 	mComboboxRibbonTheme->setCurrentIndex(mComboboxRibbonTheme->findData(static_cast< int >(ribbonTheme())));
 	connect(mComboboxRibbonTheme,
-            QOverload< int >::of(&QComboBox::currentIndexChanged),
-            this,
-            &MainWindow::onRibbonThemeComboBoxCurrentIndexChanged);
+			QOverload< int >::of(&QComboBox::currentIndexChanged),
+			this,
+			&MainWindow::onRibbonThemeComboBoxCurrentIndexChanged);
 	panelStyle->addSmallWidget(mComboboxRibbonTheme);
 
-    QCheckBox* checkBox = new QCheckBox(this);
+	QCheckBox* checkBox = new QCheckBox(this);
 
 	checkBox->setText(tr("Alignment Center"));
 	checkBox->setObjectName("checkBoxAlignmentCenter");
 	checkBox->setWindowTitle(checkBox->text());
-    connect(checkBox, &QCheckBox::clicked, this, &MainWindow::onCheckBoxAlignmentCenterClicked);
+	connect(checkBox, &QCheckBox::clicked, this, &MainWindow::onCheckBoxAlignmentCenterClicked);
 	panelStyle->addSmallWidget(checkBox);
 
 	SARibbonPanel* panelToolButtonStyle = page->addPanel(("sa ribbon toolbutton style"));
@@ -1133,7 +1130,7 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
 	connect(act, &QAction::triggered, this, [ this ](bool on) {
 		Q_UNUSED(on);
 		this->mTextedit->append(tr("Text can be manually wrapped(use \\n), and will appear as 1 line in the case of "
-                                   "SARibbonBar::setEnableWordWrap (false)"));  // cn:文本中手动换行
+								   "SARibbonBar::setEnableWordWrap (false)"));  // cn:文本中手动换行
 	});
 
 	act = createAction(tr("Word \nWrap"), ":/icon/icon/setText.svg");
@@ -1142,7 +1139,7 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
 	connect(act, &QAction::triggered, this, [ this ](bool on) {
 		Q_UNUSED(on);
 		this->mTextedit->append(tr("Text can be manually wrapped(use \\n), and will appear as 1 line in the case of "
-                                   "SARibbonBar::setEnableWordWrap (false)"));  // cn:文本中手动换行
+								   "SARibbonBar::setEnableWordWrap (false)"));  // cn:文本中手动换行
 	});
 
 	act = createAction(QString(), ":/icon/icon/setText.svg", "ToolButtonIconOnly");
@@ -1165,45 +1162,30 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
 	SARibbonPanel* panelWidgetTest = page->addPanel(tr("widget test"));
 	panelWidgetTest->setObjectName(QStringLiteral(u"panelWidgetTest"));
 
-    QComboBox* com = new QComboBox(this);
-    com->setObjectName("QComboBox test");
-	com->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-    com->setWindowTitle(tr("QComboBox test"));
+	QComboBox* com1 = new QComboBox(this);
+	com1->setObjectName("QComboBox test");
 	for (int i = 0; i < 40; ++i) {
-        com->addItem(QString("QComboBox test%1").arg(i + 1));
+		com1->addItem(QString("QComboBox test%1").arg(i + 1));
 	}
-	com->setEditable(true);
-	panelWidgetTest->addSmallWidget(com);
+	com1->setEditable(true);
+	panelWidgetTest->addSmallWidget(com1);
 
-    com = new QComboBox(this);
-	com->setObjectName("ComboBox Editable");
-	com->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-	com->setWindowTitle("ComboBox Editable");
+	QComboBox* com2 = new QComboBox(this);
+	com2->setObjectName("ComboBox Editable");
 	for (int i = 0; i < 40; ++i) {
-		com->addItem(QString("item %1").arg(i + 1));
+		com2->addItem(QString("item %1").arg(i + 1));
 	}
-	panelWidgetTest->addSmallWidget(com);
+	panelWidgetTest->addSmallWidget(com2);
 
-    QLineEdit* lineEdit = new QLineEdit(this);
-
+	QLineEdit* lineEdit = new QLineEdit(this);
 	lineEdit->setObjectName("Line Edit");
-	lineEdit->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-	lineEdit->setWindowTitle("Line Edit");
-    lineEdit->setText("LineEdit");
+	lineEdit->setText("LineEdit");
 	panelWidgetTest->addSmallWidget(lineEdit);
-	QWidget* w = lineEdit->parentWidget();
-
-	while (w) {
-		qDebug() << w->metaObject()->className();
-		w = w->parentWidget();
-	}
 
 	panelWidgetTest->addSeparator();
 
 	QCalendarWidget* calendarWidget = new QCalendarWidget(this);
-	calendarWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	calendarWidget->setObjectName(("calendarWidget"));
-	calendarWidget->setWindowTitle("calendarWidget");
 	panelWidgetTest->addLargeWidget(calendarWidget);
 	optAct = new QAction(this);
 	connect(optAct, &QAction::triggered, this, [ this ](bool on) {
@@ -1228,31 +1210,32 @@ void MainWindow::createCategoryOther(SARibbonCategory* page)
 	SARibbonPanel* panel1 = new SARibbonPanel(tr("panel one"));
 	panel1->setObjectName("CategoryOther-panel1");
 	page->addPanel(panel1);
-	// 按钮组
+	// 按钮组1
 	SARibbonButtonGroupWidget* btnGroup1 = new SARibbonButtonGroupWidget(panel1);
 	btnGroup1->setObjectName("SARibbonButtonGroupWidget1");
-	btnGroup1->setWindowTitle("SARibbonButtonGroupWidget1");
 
 	btnGroup1->addAction(createAction(tr("Decrease Margin"), ":/icon/icon/Decrease-Margin.svg"));
 	btnGroup1->addAction(createAction(tr("Decrease Indent"), ":/icon/icon/Decrease-Indent.svg"));
 	btnGroup1->addAction(createAction(tr("Wrap Image Left"), ":/icon/icon/Wrap-Image Left.svg"));
 	btnGroup1->addAction(createAction(tr("Wrap Image Right"), ":/icon/icon/Wrap-Image Right.svg"));
 	panel1->addWidget(btnGroup1, SARibbonPanelItem::Medium);
+
+	// 按钮组2
 	SARibbonButtonGroupWidget* btnGroup2 = new SARibbonButtonGroupWidget(panel1);
 	btnGroup2->setObjectName("SARibbonButtonGroupWidget2");
-	btnGroup2->setWindowTitle("SARibbonButtonGroupWidget2");
 
-	QAction* titleAlgnment = createAction(tr("Align Right"), ":/icon/icon/Align-Right.svg");
-	titleAlgnment->setProperty("align", (int)Qt::AlignRight | Qt::AlignVCenter);
-	btnGroup2->addAction(titleAlgnment);
-	titleAlgnment = createAction(tr("Align Left"), ":/icon/icon/Align-Left.svg");
-	titleAlgnment->setProperty("align", (int)Qt::AlignLeft | Qt::AlignVCenter);
-	btnGroup2->addAction(titleAlgnment);
-	titleAlgnment = createAction(tr("Align Center"), ":/icon/icon/Align-Center.svg");
-	titleAlgnment->setProperty("align", (int)Qt::AlignCenter);
-	btnGroup2->addAction(titleAlgnment);
+	QAction* titleAlgnmentRight = createAction(tr("Align Right"), ":/icon/icon/Align-Right.svg");
+	titleAlgnmentRight->setProperty("align", (int)Qt::AlignRight | Qt::AlignVCenter);
+	btnGroup2->addAction(titleAlgnmentRight);
+	QAction* titleAlgnmentLeft = createAction(tr("Align Left"), ":/icon/icon/Align-Left.svg");
+	titleAlgnmentLeft->setProperty("align", (int)Qt::AlignLeft | Qt::AlignVCenter);
+	btnGroup2->addAction(titleAlgnmentLeft);
+	QAction* titleAlgnmentCenter = createAction(tr("Align Center"), ":/icon/icon/Align-Center.svg");
+	titleAlgnmentCenter->setProperty("align", (int)Qt::AlignCenter);
+	btnGroup2->addAction(titleAlgnmentCenter);
 	panel1->addWidget(btnGroup2, SARibbonPanelItem::Medium);
 	connect(btnGroup2, &SARibbonButtonGroupWidget::actionTriggered, this, &MainWindow::onButtonGroupActionTriggered);
+
 	// Gallery
 	SARibbonGallery* gallery = panel1->addGallery();
 	QList< QAction* > galleryActions;
@@ -1276,14 +1259,14 @@ void MainWindow::createCategoryOther(SARibbonCategory* page)
 	galleryActions.append(lambdaCreateGalleryAction("File Read Only", ":/gallery-icon/icon/gallery/File-Readonly.svg"));
 	galleryActions.append(lambdaCreateGalleryAction("File Settings", ":/gallery-icon/icon/gallery/File-Settings.svg"));
 	galleryActions.append(
-        lambdaCreateGalleryAction("Presentation File", ":/gallery-icon/icon/gallery/Presentation-File.svg"));
+		lambdaCreateGalleryAction("Presentation File", ":/gallery-icon/icon/gallery/Presentation-File.svg"));
 	SARibbonGalleryGroup* group1 = gallery->addCategoryActions(tr("Files"), galleryActions);
 	group1->setGalleryGroupStyle(SARibbonGalleryGroup::IconWithWordWrapText);
 	group1->setGridMinimumWidth(80);
 	galleryActions.clear();
 	galleryActions.append(lambdaCreateGalleryAction("Photoshop", ":/gallery-icon/icon/gallery/Photoshop.svg"));
 	galleryActions.append(
-        lambdaCreateGalleryAction("Internet-Explorer", ":/gallery-icon/icon/gallery/Internet-Explorer.svg"));
+		lambdaCreateGalleryAction("Internet-Explorer", ":/gallery-icon/icon/gallery/Internet-Explorer.svg"));
 	galleryActions.append(lambdaCreateGalleryAction("Illustrator", ":/gallery-icon/icon/gallery/Illustrator.svg"));
 	galleryActions.append(lambdaCreateGalleryAction("Google-Maps", ":/gallery-icon/icon/gallery/Google-Maps.svg"));
 	galleryActions.append(lambdaCreateGalleryAction("Adobe", ":/gallery-icon/icon/gallery/Adobe.svg"));
@@ -1305,9 +1288,8 @@ void MainWindow::createCategoryOther(SARibbonCategory* page)
 	connect(actionRemoveAppBtn, &QAction::toggled, this, &MainWindow::onActionRemoveAppBtnTriggered);
 	panel2->addLargeAction(actionRemoveAppBtn);
 
-    QAction* actionLongText = createAction(tr("show very long text in a button,balabalabala etc"),
-                                           ":/icon/icon/long-text.svg",
-                                           "long-text");
+	QAction* actionLongText =
+		createAction(tr("show very long text in a button,balabalabala etc"), ":/icon/icon/long-text.svg", "long-text");
 	panel2->addLargeAction(actionLongText);
 
 	SARibbonPanel* panelStyle = new SARibbonPanel(tr("style"));
@@ -1332,9 +1314,8 @@ void MainWindow::createCategoryOther(SARibbonCategory* page)
 	panelUtf8->setObjectName("CategoryOther-panelUtf8");
 	page->addPanel(panelUtf8);
 
-    QAction* actionChangeText = createAction(QStringLiteral(u"改变显示为英文"),
-                                             ":/icon/icon/chinese-char.svg",
-                                             "actionChangeText");
+	QAction* actionChangeText =
+		createAction(QStringLiteral(u"改变显示为英文"), ":/icon/icon/chinese-char.svg", "actionChangeText");
 	actionChangeText->setCheckable(true);
 	actionChangeText->setChecked(false);
 	panelUtf8->addLargeAction(actionChangeText);
@@ -1408,7 +1389,7 @@ void MainWindow::createCategorySize(SARibbonCategory* page)
 	//=========================
 	// panel ： Font
 	//=========================
-    SARibbonPanel* panel                       = page->addPanel(tr("Font"));
+	SARibbonPanel* panel                       = page->addPanel(tr("Font"));
 	SARibbonButtonGroupWidget* groupFontFamile = new SARibbonButtonGroupWidget(panel);
 	groupFontFamile->setObjectName(QStringLiteral(u"group1"));
 	QLabel* labelFontSize = new QLabel(groupFontFamile);
@@ -1460,7 +1441,7 @@ void MainWindow::createCategorySize(SARibbonCategory* page)
 	//=========================
 	// panel ： Font Size
 	//=========================
-    panel   = new SARibbonPanel(tr("Font Size"));
+	panel   = new SARibbonPanel(tr("Font Size"));
 	QFont f = font();
 	f.setPointSize(14);
 	panel->setFont(f);
@@ -1470,7 +1451,7 @@ void MainWindow::createCategorySize(SARibbonCategory* page)
 
 	// panel 3
 	// 这里演示了一个窗口,带有gridlayoout
-    panel          = new SARibbonPanel(tr("Grid"));
+	panel          = new SARibbonPanel(tr("Grid"));
 	QWidget* w     = new QWidget();
 	QGridLayout* g = new QGridLayout(w);
 
@@ -1486,15 +1467,15 @@ void MainWindow::createCategorySize(SARibbonCategory* page)
 	QSpinBox* spinboxRibbonCategoryHeight = new QSpinBox(w);
 	spinboxRibbonCategoryHeight->setRange(30, 300);
 
-    QLabel* lab3                             = new QLabel("Ribbon Panel Title:");
+	QLabel* lab3                             = new QLabel("Ribbon Panel Title:");
 	QSpinBox* spinboxRibbonPanelTtitleHeight = new QSpinBox(w);
 	spinboxRibbonPanelTtitleHeight->setRange(5, 99);
 
-    QLabel* lab4                        = new QLabel("Ribbon Panel Spacing:");
+	QLabel* lab4                        = new QLabel("Ribbon Panel Spacing:");
 	QSpinBox* spinboxRibbonPanelSpacing = new QSpinBox(w);
 	spinboxRibbonPanelSpacing->setRange(0, 25);
 
-    QLabel* lab5                                = new QLabel("Panel ToolButton Icon Size:");
+	QLabel* lab5                                = new QLabel("Panel ToolButton Icon Size:");
 	QSpinBox* spinboxRibbonPanelToolBtnIconSize = new QSpinBox(w);
 	spinboxRibbonPanelToolBtnIconSize->setRange(1, 99);
 
@@ -1531,42 +1512,42 @@ void MainWindow::createCategorySize(SARibbonCategory* page)
 	connect(spinboxRibbonPanelTtitleHeight, &QSpinBox::valueChanged, this, &MainWindow::onSpinBoxRibbonPanelTtitleHeightChanged);
 	connect(spinboxRibbonPanelSpacing, &QSpinBox::valueChanged, this, &MainWindow::onSpinBoxRibbonPanelSpacingChanged);
 	connect(spinboxRibbonPanelToolBtnIconSize,
-            &QSpinBox::valueChanged,
-            this,
-            &MainWindow::onSpinBoxRibbonPanelToolBtnIconSizeChanged);
+			&QSpinBox::valueChanged,
+			this,
+			&MainWindow::onSpinBoxRibbonPanelToolBtnIconSizeChanged);
 	connect(doublespinboxToolbuttonMaximumAspectRatio,
-            &QDoubleSpinBox::valueChanged,
-            this,
-            &MainWindow::onDoubleSpinBoxToolbuttonMaximumAspectRatioChanged);
+			&QDoubleSpinBox::valueChanged,
+			this,
+			&MainWindow::onDoubleSpinBoxToolbuttonMaximumAspectRatioChanged);
 #else
 	connect(spinboxRibbonTitleHeight,
-            QOverload< int >::of(&QSpinBox::valueChanged),
-            this,
-            &MainWindow::onSpinBoxRibbonTitleHeightChanged);
+			QOverload< int >::of(&QSpinBox::valueChanged),
+			this,
+			&MainWindow::onSpinBoxRibbonTitleHeightChanged);
 	connect(spinboxRibbonTabHeight,
-            QOverload< int >::of(&QSpinBox::valueChanged),
-            this,
-            &MainWindow::onSpinBoxRibbonTabHeightChanged);
+			QOverload< int >::of(&QSpinBox::valueChanged),
+			this,
+			&MainWindow::onSpinBoxRibbonTabHeightChanged);
 	connect(spinboxRibbonCategoryHeight,
-            QOverload< int >::of(&QSpinBox::valueChanged),
-            this,
-            &MainWindow::onSpinBoxRibbonCategoryHeightChanged);
+			QOverload< int >::of(&QSpinBox::valueChanged),
+			this,
+			&MainWindow::onSpinBoxRibbonCategoryHeightChanged);
 	connect(spinboxRibbonPanelTtitleHeight,
-            QOverload< int >::of(&QSpinBox::valueChanged),
-            this,
-            &MainWindow::onSpinBoxRibbonPanelTtitleHeightChanged);
+			QOverload< int >::of(&QSpinBox::valueChanged),
+			this,
+			&MainWindow::onSpinBoxRibbonPanelTtitleHeightChanged);
 	connect(spinboxRibbonPanelSpacing,
-            QOverload< int >::of(&QSpinBox::valueChanged),
-            this,
-            &MainWindow::onSpinBoxRibbonPanelSpacingChanged);
+			QOverload< int >::of(&QSpinBox::valueChanged),
+			this,
+			&MainWindow::onSpinBoxRibbonPanelSpacingChanged);
 	connect(spinboxRibbonPanelToolBtnIconSize,
-            QOverload< int >::of(&QSpinBox::valueChanged),
-            this,
-            &MainWindow::onSpinBoxRibbonPanelToolBtnIconSizeChanged);
+			QOverload< int >::of(&QSpinBox::valueChanged),
+			this,
+			&MainWindow::onSpinBoxRibbonPanelToolBtnIconSizeChanged);
 	connect(doublespinboxToolbuttonMaximumAspectRatio,
-            QOverload< double >::of(&QDoubleSpinBox::valueChanged),
-            this,
-            &MainWindow::onDoubleSpinBoxToolbuttonMaximumAspectRatioChanged);
+			QOverload< double >::of(&QDoubleSpinBox::valueChanged),
+			this,
+			&MainWindow::onDoubleSpinBoxToolbuttonMaximumAspectRatioChanged);
 #endif
 	panel->addLargeWidget(w);
 	page->addPanel(panel);
@@ -1775,7 +1756,7 @@ void MainWindow::createContextCategoryPage1(SARibbonCategory* page)
 		}
 	});
 	//
-    SARibbonPanel* panel4                 = page->addPanel(("widget"));
+	SARibbonPanel* panel4                 = page->addPanel(("widget"));
 	QSpinBox* spinbox                     = new QSpinBox(this);
 	SARibbonCtrlContainer* ctrlContainer1 = new SARibbonCtrlContainer(panel4);
 	ctrlContainer1->setContainerWidget(spinbox);
@@ -1812,69 +1793,56 @@ void MainWindow::createContextCategoryPage2(SARibbonCategory* page)
 	});
 	SARibbonPanel* panelLayout = page->addPanel(("特殊布局"));
 
-    panelLayout->addAction(createAction("Large", ":/icon/icon/layout.svg", "@Large1"),
-                           QToolButton::InstantPopup,
-                           SARibbonPanelItem::Large);
-    panelLayout->addAction(createAction("Small", ":/icon/icon/layout.svg", "@Small1"),
-                           QToolButton::InstantPopup,
-                           SARibbonPanelItem::Small);
-    panelLayout->addAction(createAction("Small", ":/icon/icon/layout.svg", "@Small2"),
-                           QToolButton::InstantPopup,
-                           SARibbonPanelItem::Small);
+	panelLayout->addAction(
+		createAction("Large", ":/icon/icon/layout.svg", "@Large1"), QToolButton::InstantPopup, SARibbonPanelItem::Large);
+	panelLayout->addAction(
+		createAction("Small", ":/icon/icon/layout.svg", "@Small1"), QToolButton::InstantPopup, SARibbonPanelItem::Small);
+	panelLayout->addAction(
+		createAction("Small", ":/icon/icon/layout.svg", "@Small2"), QToolButton::InstantPopup, SARibbonPanelItem::Small);
 	panelLayout->addSeparator();
-    panelLayout->addAction(createAction("Small", ":/icon/icon/layout.svg", "@Small3"),
-                           QToolButton::InstantPopup,
-                           SARibbonPanelItem::Small);
-    panelLayout->addAction(createAction("Small", ":/icon/icon/layout.svg", "@Small4"),
-                           QToolButton::InstantPopup,
-                           SARibbonPanelItem::Small);
-    panelLayout->addAction(createAction("Small", ":/icon/icon/layout.svg", "@Small5"),
-                           QToolButton::InstantPopup,
-                           SARibbonPanelItem::Small);
-    panelLayout->addAction(createAction("Small", ":/icon/icon/layout.svg", "@Small6"),
-                           QToolButton::InstantPopup,
-                           SARibbonPanelItem::Small);
+	panelLayout->addAction(
+		createAction("Small", ":/icon/icon/layout.svg", "@Small3"), QToolButton::InstantPopup, SARibbonPanelItem::Small);
+	panelLayout->addAction(
+		createAction("Small", ":/icon/icon/layout.svg", "@Small4"), QToolButton::InstantPopup, SARibbonPanelItem::Small);
+	panelLayout->addAction(
+		createAction("Small", ":/icon/icon/layout.svg", "@Small5"), QToolButton::InstantPopup, SARibbonPanelItem::Small);
+	panelLayout->addAction(
+		createAction("Small", ":/icon/icon/layout.svg", "@Small6"), QToolButton::InstantPopup, SARibbonPanelItem::Small);
 	panelLayout->addSeparator();
-    panelLayout->addAction(createAction("Large", ":/icon/icon/layout.svg", "@Large2"),
-                           QToolButton::InstantPopup,
-                           SARibbonPanelItem::Large);
+	panelLayout->addAction(
+		createAction("Large", ":/icon/icon/layout.svg", "@Large2"), QToolButton::InstantPopup, SARibbonPanelItem::Large);
 	panelLayout->addAction(createAction("Medium", ":/icon/icon/layout.svg", "@Medium1"),
-                           QToolButton::InstantPopup,
-                           SARibbonPanelItem::Medium);
+						   QToolButton::InstantPopup,
+						   SARibbonPanelItem::Medium);
 	panelLayout->addAction(createAction("Medium", ":/icon/icon/layout.svg", "@Medium2"),
-                           QToolButton::InstantPopup,
-                           SARibbonPanelItem::Medium);
-    panelLayout->addAction(createAction("Small", ":/icon/icon/layout.svg", "@Small7"),
-                           QToolButton::InstantPopup,
-                           SARibbonPanelItem::Small);
+						   QToolButton::InstantPopup,
+						   SARibbonPanelItem::Medium);
+	panelLayout->addAction(
+		createAction("Small", ":/icon/icon/layout.svg", "@Small7"), QToolButton::InstantPopup, SARibbonPanelItem::Small);
 	panelLayout->addAction(createAction("Medium", ":/icon/icon/layout.svg", "@Medium3"),
-                           QToolButton::InstantPopup,
-                           SARibbonPanelItem::Medium);
-    panelLayout->addAction(createAction("Large", ":/icon/icon/layout.svg", "@Large3"),
-                           QToolButton::InstantPopup,
-                           SARibbonPanelItem::Large);
+						   QToolButton::InstantPopup,
+						   SARibbonPanelItem::Medium);
+	panelLayout->addAction(
+		createAction("Large", ":/icon/icon/layout.svg", "@Large3"), QToolButton::InstantPopup, SARibbonPanelItem::Large);
 	panelLayout->addAction(createAction("Medium", ":/icon/icon/layout.svg", "@Medium4"),
-                           QToolButton::InstantPopup,
-                           SARibbonPanelItem::Medium);
+						   QToolButton::InstantPopup,
+						   SARibbonPanelItem::Medium);
 	panelLayout->addAction(createAction("Medium", ":/icon/icon/layout.svg", "@Medium5"),
-                           QToolButton::InstantPopup,
-                           SARibbonPanelItem::Medium);
-    panelLayout->addAction(createAction("Large", ":/icon/icon/layout.svg", "@Large4"),
-                           QToolButton::InstantPopup,
-                           SARibbonPanelItem::Large);
+						   QToolButton::InstantPopup,
+						   SARibbonPanelItem::Medium);
+	panelLayout->addAction(
+		createAction("Large", ":/icon/icon/layout.svg", "@Large4"), QToolButton::InstantPopup, SARibbonPanelItem::Large);
 	panelLayout->addSeparator();
 	panelLayout->addAction(createAction("Medium", ":/icon/icon/layout.svg", "@Medium6"),
-                           QToolButton::InstantPopup,
-                           SARibbonPanelItem::Medium);
-    panelLayout->addAction(createAction("Large", ":/icon/icon/layout.svg", "@Large5"),
-                           QToolButton::InstantPopup,
-                           SARibbonPanelItem::Large);
+						   QToolButton::InstantPopup,
+						   SARibbonPanelItem::Medium);
+	panelLayout->addAction(
+		createAction("Large", ":/icon/icon/layout.svg", "@Large5"), QToolButton::InstantPopup, SARibbonPanelItem::Large);
 	panelLayout->addAction(createAction("Medium", ":/icon/icon/layout.svg", "@Medium7"),
-                           QToolButton::InstantPopup,
-                           SARibbonPanelItem::Medium);
-    panelLayout->addAction(createAction("Small", ":/icon/icon/layout.svg", "@Small8"),
-                           QToolButton::InstantPopup,
-                           SARibbonPanelItem::Small);
+						   QToolButton::InstantPopup,
+						   SARibbonPanelItem::Medium);
+	panelLayout->addAction(
+		createAction("Small", ":/icon/icon/layout.svg", "@Small8"), QToolButton::InstantPopup, SARibbonPanelItem::Small);
 }
 
 /**
@@ -1910,20 +1878,14 @@ void MainWindow::createQuickAccessBar()
 	for (int i = 0; i < 10; ++i) {
 		m1->addAction(createAction(QString("file%1 - 1").arg(i + 1), ":/icon/icon/file.svg"));
 	}
-    // 创建 QAction
-    QAction* menuAction = new QAction("menu", this);
-    menuAction->setMenu(m1);
-    quickAccessBar->addMenuAction(menuAction);
+	quickAccessBar->addMenuAction(m1->menuAction());
 
 	QMenu* m2 = new QMenu("Presentation File 2", this);
 	m2->setIcon(QIcon(":/icon/icon/presentationFile.svg"));
 	for (int i = 0; i < 10; ++i) {
 		m2->addAction(createAction(QString("file%1 - 2").arg(i + 1), ":/icon/icon/file.svg"));
 	}
-    quickAccessBar->addMenuAction("Presentation File 2",
-                                  QIcon(":/icon/icon/presentationFile.svg"),
-                                  m2,
-                                  QToolButton::MenuButtonPopup);
+	quickAccessBar->addMenuAction(m2, QToolButton::MenuButtonPopup);
 
 	QAction* customize = createAction("customize", ":/icon/icon/customize0.svg", "customize2");
 	quickAccessBar->addAction(customize);
@@ -1937,15 +1899,13 @@ void MainWindow::createQuickAccessBar()
 	quickAccessBar->addAction(actionCustomizeAndSaveWithApply);
 	connect(actionCustomizeAndSaveWithApply, &QAction::triggered, this, &MainWindow::onActionCustomizeAndSaveWithApplyTriggered);
 
-    mSearchEditor = new QLineEdit(this);
-    mSearchEditor->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
-    mSearchEditor->setMinimumWidth(150);
+	mSearchEditor = new QLineEdit(this);
+	mSearchEditor->setMinimumWidth(150);
 	mSearchEditor->setPlaceholderText("Search");
-    auto widgetAct = quickAccessBar->addWidget(mSearchEditor);
+	quickAccessBar->addWidget(mSearchEditor);
 	connect(mSearchEditor, &QLineEdit::editingFinished, this, [ this ]() {
-        this->mTextedit->append(this->mSearchEditor->text());
+		this->mTextedit->append(this->mSearchEditor->text());
 	});
-    widgetAct->setVisible(true);
 }
 
 /**
@@ -1984,12 +1944,12 @@ void MainWindow::createWindowButtonGroupBar()
 	if (!wbar) {
 		return;
 	}
-    QAction* a          = new QAction(QIcon(), tr("Login"));
-    QAction* actionHelp = createAction(tr("help"), ":/icon/icon/help.svg");
-    connect(a, &QAction::triggered, this, [ this ]() { this->mTextedit->append("Login triggered"); });
-    connect(actionHelp, &QAction::triggered, this, &MainWindow::onActionHelpTriggered);
-    wbar->addAction(a);
-    wbar->addAction(actionHelp);
+	QAction* a          = new QAction(QIcon(), tr("Login"));
+	QAction* actionHelp = createAction(tr("help"), ":/icon/icon/help.svg");
+	connect(a, &QAction::triggered, this, [ this ]() { this->mTextedit->append("Login triggered"); });
+	connect(actionHelp, &QAction::triggered, this, &MainWindow::onActionHelpTriggered);
+	wbar->addAction(a);
+	wbar->addAction(actionHelp);
 }
 
 /**
@@ -2136,7 +2096,7 @@ void MainWindow::onDelayedPopupCheckabletriggered(bool b)
 {
 	Q_UNUSED(b);
 	mTextedit->append(tr("The SARibbonToolButton::setPopupMode(QToolButton::DelayedPopup) method "
-                         "can be used to set the menu pop-up method to delayed pop-up. "
-                         "This also demonstrates manually setting text wrapping"));
+						 "can be used to set the menu pop-up method to delayed pop-up. "
+						 "This also demonstrates manually setting text wrapping"));
 	// cn:使用SARibbonToolButton::setPopupMode(QToolButton::DelayedPopup)方法可以设置菜单弹出方式为延迟弹出，这里也演示了手动设置文本的换行
 }

@@ -16,15 +16,15 @@
 
 SARibbonButtonGroupWidget::SARibbonButtonGroupWidget(QWidget* parent) : QToolBar(parent)
 {
-    setAutoFillBackground(false);
-    setAttribute(Qt::WA_NoSystemBackground);
-    setOrientation(Qt::Horizontal);
-    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    setMovable(false);    // 禁止移动
-    setFloatable(false);  // 禁止浮动
-    setContentsMargins(0, 0, 0, 0);
-    const int smallIconSize = QApplication::style()->pixelMetric(QStyle::PM_SmallIconSize);
-    setIconSize(QSize(smallIconSize, smallIconSize));
+	setAutoFillBackground(false);
+	setAttribute(Qt::WA_NoSystemBackground);
+	setOrientation(Qt::Horizontal);
+	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+	setMovable(false);    // 禁止移动
+	setFloatable(false);  // 禁止浮动
+	setContentsMargins(0, 0, 0, 0);
+	const int smallIconSize = QApplication::style()->pixelMetric(QStyle::PM_SmallIconSize);
+	setIconSize(QSize(smallIconSize, smallIconSize));
 }
 
 SARibbonButtonGroupWidget::~SARibbonButtonGroupWidget()
@@ -65,108 +65,20 @@ SARibbonButtonGroupWidget::~SARibbonButtonGroupWidget()
  */
 void SARibbonButtonGroupWidget::addMenuAction(QAction* menuAction, QToolButton::ToolButtonPopupMode popupMode)
 {
-    if (!menuAction) {
-        return;
-    }
+	if (!menuAction) {
+		return;
+	}
 
-    // 添加动作到工具栏
-    addAction(menuAction);
+	// 添加动作到工具栏
+	addAction(menuAction);
 
-    // 如果动作有关联菜单，则设置工具按钮的弹出模式
-    if (menuAction->menu()) {
-        QToolButton* toolButton = qobject_cast< QToolButton* >(widgetForAction(menuAction));
-        if (toolButton) {
-            toolButton->setPopupMode(popupMode);
-        }
-    }
-}
-
-/**
- * @brief Create and add a menu action to the button group widget/在按钮栏中创建并添加一个带菜单的动作
- *
- * This function creates a new QAction, associates it with the specified menu,adds it to the toolbar,
- * and sets the corresponding popup mode.
- *
- * 此函数会创建一个新的 QAction，将其与指定的菜单关联，添加到工具栏中，并设置相应的弹出模式。
- *
- * @param text Button text/按钮文本
- * @param icon Button icon/按钮图标
- * @param menu Menu object to associate/要关联的菜单对象
- * @param popupMode Popup mode of the tool button, default is InstantPopup/工具按钮的弹出模式，默认为 InstantPopup
- * @return Returns the newly created QAction object, or nullptr if the parameter is invalid/返回新创建的 QAction 对象，如果参数无效则返回 nullptr
- *
- * @note The caller does not need to manually manage the lifecycle of the returned QAction,it will be automatically managed
- * by the toolbar/调用者不需要手动管理返回的 QAction 的生命周期，它会由工具栏自动管理
- * @note If the menu has a title, it will be automatically used as the QAction's text/如果菜单有标题，会自动用作 QAction 的文本
- *
- * @par Example:/示例:
- * @code
- * // Create menu/创建菜单
- * QMenu *editMenu = new QMenu("Edit");
- * editMenu->addAction("Cut");
- * editMenu->addAction("Copy");
- * editMenu->addAction("Paste");
- *
- * // Directly add menu to button group widget/直接添加菜单到按钮栏
- * QAction *editAction = buttongroup->addMenuAction("Edit",QIcon(":/icons/edit.png"),editMenu, QToolButton::MenuButtonPopup);
- * // You can further configure the returned action/可以进一步配置返回的动作
- * @endcode
- *
- * @see QToolButton::ToolButtonPopupMode
- */
-QAction* SARibbonButtonGroupWidget::addMenuAction(const QString& text,
-                                                  const QIcon& icon,
-                                                  QMenu* menu,
-                                                  QToolButton::ToolButtonPopupMode popupMode)
-{
-    if (!menu) {
-        return nullptr;
-    }
-
-    // 创建新的 QAction
-    QAction* menuAction = new QAction(icon, text, this);
-    menuAction->setMenu(menu);
-
-    // 添加到工具栏并设置弹出模式
-    addMenuAction(menuAction, popupMode);
-
-    return menuAction;
-}
-
-/**
- * @brief Create and add a menu action to the button group widget (simplified version)/在按钮栏中创建并添加一个带菜单的动作（简化版本）
- *
- * This function creates a new QAction based on the menu's title and icon,
- * associates it with the specified menu, adds it to the toolbar, and sets the popup mode.
- *
- * 此函数根据菜单的标题和图标创建一个新的 QAction，将其与指定菜单关联，添加到工具栏并设置弹出模式。
- *
- * @param menu Menu object to associate/要关联的菜单对象
- * @param popupMode Popup mode of the tool button, default is InstantPopup/工具按钮的弹出模式，默认为 InstantPopup
- * @return Returns the newly created QAction object, or nullptr if the parameter is invalid/返回新创建的 QAction 对象，如果参数无效则返回 nullptr
- *
- * @note The caller does not need to manually manage the lifecycle of the returned QAction,it will be automatically managed
- * by the toolbar/调用者不需要手动管理返回的 QAction 的生命周期，它会由工具栏自动管理
- *
- * @par Example:/示例:
- * @code
- * // Create menu/创建菜单
- * QMenu *viewMenu = new QMenu("View");
- * viewMenu->addAction("Toolbars");
- * viewMenu->addAction("Status Bar");
- *
- * // Add menu to button group widget using menu's title and icon/使用菜单的标题和图标添加到按钮栏
- * QAction *viewAction = buttongroup->addMenuAction(viewMenu, QToolButton::InstantPopup);
- * @endcode
- *
- * @see QToolButton::ToolButtonPopupMode
- */
-QAction* SARibbonButtonGroupWidget::addMenuAction(const QString& text, QMenu* menu, QToolButton::ToolButtonPopupMode popupMode)
-{
-    if (!menu) {
-        return nullptr;
-    }
-    return addMenuAction(text, menu->icon(), menu, popupMode);
+	// 如果动作有关联菜单，则设置工具按钮的弹出模式
+	if (menuAction->menu()) {
+		QToolButton* toolButton = qobject_cast< QToolButton* >(widgetForAction(menuAction));
+		if (toolButton) {
+			toolButton->setPopupMode(popupMode);
+		}
+	}
 }
 
 /**
@@ -202,8 +114,9 @@ QAction* SARibbonButtonGroupWidget::addMenuAction(const QString& text, QMenu* me
  */
 QAction* SARibbonButtonGroupWidget::addMenuAction(QMenu* menu, QToolButton::ToolButtonPopupMode popupMode)
 {
-    if (!menu) {
-        return nullptr;
-    }
-    return addMenuAction(menu->title(), menu->icon(), menu, popupMode);
+	if (!menu) {
+		return nullptr;
+	}
+	addMenuAction(menu->menuAction(), popupMode);
+	return menu->menuAction();
 }

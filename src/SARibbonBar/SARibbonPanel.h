@@ -168,10 +168,10 @@ public:
 	void addMenu(QMenu* menu,
 				 SARibbonPanelItem::RowProportion rowProportion,
 				 QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
-
 	// 添加普通大菜单
 	void addLargeMenu(QMenu* menu, QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
-
+	// 添加普通小按钮菜单
+	void addMediumMenu(QMenu* menu, QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
 	// 添加普通小按钮菜单
 	void addSmallMenu(QMenu* menu, QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
 

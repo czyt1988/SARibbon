@@ -399,14 +399,23 @@ QAction* SARibbonPanel::addAction(const QString& text,
  * @param menu The menu to add / 要添加的菜单
  * @param rp The row proportion for the menu button / 菜单按钮的行占比
  * @param popMode The popup mode, defaults to InstantPopup / 弹出模式，默认为InstantPopup
+ * @note 本函数会修改 menu->menuAction() 的部分属性（icon/text/objectName），如需保留自定义值，请提前设置。
+ *
  */
 void SARibbonPanel::addMenu(QMenu* menu, SARibbonPanelItem::RowProportion rowProportion, QToolButton::ToolButtonPopupMode popMode)
 {
 	Q_CHECK_PTR(menu);
 	QAction* action = menu->menuAction();
-	action->setIcon(menu->icon());
-	action->setText(menu->title());
-	action->setObjectName("action." + menu->objectName());
+	// 仅当未设置时才填充默认值，避免覆盖用户自定义
+	if (action->icon().isNull()) {
+		action->setIcon(menu->icon());
+	}
+	if (action->text().isEmpty()) {
+		action->setText(menu->title());
+	}
+	if (action->objectName().isEmpty()) {
+		action->setObjectName("action." + menu->objectName());
+	}
 	addAction(action, popMode, rowProportion);
 }
 
@@ -418,6 +427,16 @@ void SARibbonPanel::addMenu(QMenu* menu, SARibbonPanelItem::RowProportion rowPro
 void SARibbonPanel::addLargeMenu(QMenu* menu, QToolButton::ToolButtonPopupMode popMode)
 {
 	addMenu(menu, SARibbonPanelItem::Large, popMode);
+}
+
+/**
+ * @brief Adds a menu as a medium button / 以中按钮形式添加一个菜单
+ * @param menu The menu to add / 要添加的菜单
+ * @param popMode The popup mode / 弹出模式
+ */
+void SARibbonPanel::addMediumMenu(QMenu* menu, QToolButton::ToolButtonPopupMode popMode)
+{
+    addMenu(menu, SARibbonPanelItem::Medium, popMode);
 }
 
 /**

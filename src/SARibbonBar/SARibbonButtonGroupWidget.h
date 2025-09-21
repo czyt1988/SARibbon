@@ -14,16 +14,9 @@ public:
 	explicit SARibbonButtonGroupWidget(QWidget* parent = nullptr);
 	~SARibbonButtonGroupWidget();
 
-    // 在快速访问工具栏中添加一个带菜单的 QAction
-    void addMenuAction(QAction* menuAction, QToolButton::ToolButtonPopupMode popupMode = QToolButton::InstantPopup);
-    QAction* addMenuAction(const QString& text,
-                           const QIcon& icon,
-                           QMenu* menu,
-                           QToolButton::ToolButtonPopupMode popupMode = QToolButton::InstantPopup);
-    QAction* addMenuAction(const QString& text,
-                           QMenu* menu,
-                           QToolButton::ToolButtonPopupMode popupMode = QToolButton::InstantPopup);
-    QAction* addMenuAction(QMenu* menu, QToolButton::ToolButtonPopupMode popupMode = QToolButton::InstantPopup);
+	// 在快速访问工具栏中添加一个带菜单的 QAction
+	void addMenuAction(QAction* menuAction, QToolButton::ToolButtonPopupMode popupMode = QToolButton::InstantPopup);
+	QAction* addMenuAction(QMenu* menu, QToolButton::ToolButtonPopupMode popupMode = QToolButton::InstantPopup);
 };
 
 #endif  // SARIBBONBUTTONGROUPWIDGET_H

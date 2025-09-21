@@ -18,15 +18,15 @@ public:
  */
 class SARibbonContextCategory::PrivateData
 {
-    SA_RIBBON_DECLARE_PUBLIC(SARibbonContextCategory)
+	SA_RIBBON_DECLARE_PUBLIC(SARibbonContextCategory)
 public:
-    PrivateData(SARibbonContextCategory* p);
+	PrivateData(SARibbonContextCategory* p);
 
 public:
-    QList< SAPrivateRibbonCategoryData > mCategoryDataList;
-    QVariant mContextID;
-    QColor mContextColor;
-    QString mContextTitle;
+	QList< SAPrivateRibbonCategoryData > mCategoryDataList;
+	QVariant mContextID;
+	QColor mContextColor;
+	QString mContextTitle;
 };
 SARibbonContextCategory::PrivateData::PrivateData(SARibbonContextCategory* p) : q_ptr(p)
 {
@@ -50,10 +50,10 @@ SARibbonContextCategory::~SARibbonContextCategory()
  */
 SARibbonCategory* SARibbonContextCategory::addCategoryPage(const QString& title)
 {
-    SARibbonCategory* category = RibbonSubElementFactory->createRibbonCategory(parentWidget());
-    category->setCategoryName(title);
-    addCategoryPage(category);
-    return (category);
+	SARibbonCategory* category = RibbonSubElementFactory->createRibbonCategory(parentWidget());
+	category->setCategoryName(title);
+	addCategoryPage(category);
+	return (category);
 }
 
 /**
@@ -62,70 +62,70 @@ SARibbonCategory* SARibbonContextCategory::addCategoryPage(const QString& title)
  */
 void SARibbonContextCategory::addCategoryPage(SARibbonCategory* category)
 {
-    if (isHaveCategory(category)) {
-        // cn:SARibbonContextCategory已经持有标签：%1，将跳过
-        qWarning() << tr("SARibbonContextCategory have category %1,will skip").arg(category->categoryName());
-        return;
-    }
-    category->markIsContextCategory(true);
-    connect(category, &SARibbonCategory::categoryNameChanged, this, &SARibbonContextCategory::onCategoryTitleChanged);
-    SAPrivateRibbonCategoryData catData;
-    catData.categoryPage = category;
-    d_ptr->mCategoryDataList.append(catData);
-    category->installEventFilter(this);
-    Q_EMIT categoryPageAdded(category);
+	if (isHaveCategory(category)) {
+		// cn:SARibbonContextCategory已经持有标签：%1，将跳过
+		qWarning() << tr("SARibbonContextCategory have category %1,will skip").arg(category->categoryName());
+		return;
+	}
+	category->markIsContextCategory(true);
+	connect(category, &SARibbonCategory::categoryNameChanged, this, &SARibbonContextCategory::onCategoryTitleChanged);
+	SAPrivateRibbonCategoryData catData;
+	catData.categoryPage = category;
+	d_ptr->mCategoryDataList.append(catData);
+	category->installEventFilter(this);
+	Q_EMIT categoryPageAdded(category);
 }
 
 int SARibbonContextCategory::categoryCount() const
 {
-    return (d_ptr->mCategoryDataList.count());
+	return (d_ptr->mCategoryDataList.count());
 }
 
 void SARibbonContextCategory::setId(const QVariant& id)
 {
-    d_ptr->mContextID = id;
+	d_ptr->mContextID = id;
 }
 
 QVariant SARibbonContextCategory::id() const
 {
-    return (d_ptr->mContextID);
+	return (d_ptr->mContextID);
 }
 
 void SARibbonContextCategory::setContextColor(const QColor color)
 {
-    d_ptr->mContextColor = color;
+	d_ptr->mContextColor = color;
 }
 
 QColor SARibbonContextCategory::contextColor() const
 {
-    return (d_ptr->mContextColor);
+	return (d_ptr->mContextColor);
 }
 
 QWidget* SARibbonContextCategory::parentWidget() const
 {
-    return (qobject_cast< QWidget* >(parent()));
+	return (qobject_cast< QWidget* >(parent()));
 }
 
 bool SARibbonContextCategory::eventFilter(QObject* watched, QEvent* e)
 {
-    if (nullptr == watched) {
-        return (false);
-    }
-    switch (e->type()) {
-    case QEvent::Close: {
-        SARibbonCategory* c = qobject_cast< SARibbonCategory* >(watched);
-        if (c) {
+	if (nullptr == watched) {
+		return (false);
+	}
+	switch (e->type()) {
+	case QEvent::Close: {
+		SARibbonCategory* c = qobject_cast< SARibbonCategory* >(watched);
+		if (c) {
 #ifdef SA_RIBBON_DEBUG_HELP_DRAW
-            qDebug() << " -----------> close event";
+			qDebug() << " -----------> close event";
 #endif
-            takeCategory(c);
-        }
-    } break;
+			takeCategory(c);
+		}
+	} break;
 
-    default:
-        break;
-    }
-    return (false);
+	default:
+		break;
+	}
+	return (false);
 }
 
 /**
@@ -144,8 +144,8 @@ QString SARibbonContextCategory::contextTitle() const
  */
 void SARibbonContextCategory::setContextTitle(const QString& contextTitle)
 {
-    d_ptr->mContextTitle = contextTitle;
-    Q_EMIT contextTitleChanged(contextTitle);
+	d_ptr->mContextTitle = contextTitle;
+	Q_EMIT contextTitleChanged(contextTitle);
 }
 
 /**
@@ -164,12 +164,12 @@ SARibbonCategory* SARibbonContextCategory::categoryPage(int index)
  */
 QList< SARibbonCategory* > SARibbonContextCategory::categoryList() const
 {
-    QList< SARibbonCategory* > res;
+	QList< SARibbonCategory* > res;
 
-    for (const SAPrivateRibbonCategoryData& c : qAsConst(d_ptr->mCategoryDataList)) {
-        res.append(c.categoryPage);
-    }
-    return (res);
+	for (const SAPrivateRibbonCategoryData& c : qAsConst(d_ptr->mCategoryDataList)) {
+		res.append(c.categoryPage);
+	}
+	return (res);
 }
 
 /**
@@ -179,13 +179,13 @@ QList< SARibbonCategory* > SARibbonContextCategory::categoryList() const
  */
 bool SARibbonContextCategory::takeCategory(SARibbonCategory* category)
 {
-    for (int i = 0; i < d_ptr->mCategoryDataList.size(); ++i) {
-        if (d_ptr->mCategoryDataList[ i ].categoryPage == category) {
-            d_ptr->mCategoryDataList.takeAt(i);
-            return (true);
-        }
-    }
-    return (false);
+	for (int i = 0; i < d_ptr->mCategoryDataList.size(); ++i) {
+		if (d_ptr->mCategoryDataList[ i ].categoryPage == category) {
+			d_ptr->mCategoryDataList.takeAt(i);
+			return (true);
+		}
+	}
+	return (false);
 }
 
 /**
@@ -195,18 +195,49 @@ bool SARibbonContextCategory::takeCategory(SARibbonCategory* category)
  */
 bool SARibbonContextCategory::isHaveCategory(SARibbonCategory* category) const
 {
-    for (int i = 0; i < d_ptr->mCategoryDataList.size(); ++i) {
-        if (d_ptr->mCategoryDataList[ i ].categoryPage == category) {
-            return (true);
-        }
-    }
-    return (false);
+	for (int i = 0; i < d_ptr->mCategoryDataList.size(); ++i) {
+		if (d_ptr->mCategoryDataList[ i ].categoryPage == category) {
+			return (true);
+		}
+	}
+	return (false);
+}
+
+/**
+ * @brief hide contextCategory/隐藏上下文标签
+ *
+ * 此方法等同于：
+ * @code
+ * ribbon->hideContextCategory(this);
+ * @endcode
+ *
+ */
+void SARibbonContextCategory::hide()
+{
+	if (SARibbonBar* ribbon = qobject_cast< SARibbonBar* >(parent())) {
+		ribbon->hideContextCategory(this);
+	}
+}
+
+/**
+ * @brief show contextCategory/显示上下文标签
+ *
+ * 此方法等同于：
+ * @code
+ * ribbon->showContextCategory(this);
+ * @endcode
+ */
+void SARibbonContextCategory::show()
+{
+	if (SARibbonBar* ribbon = qobject_cast< SARibbonBar* >(parent())) {
+		ribbon->showContextCategory(this);
+	}
 }
 
 void SARibbonContextCategory::onCategoryTitleChanged(const QString& title)
 {
-    SARibbonCategory* category = qobject_cast< SARibbonCategory* >(sender());
-    if (category) {
-        Q_EMIT categoryTitleChanged(category, title);
-    }
+	SARibbonCategory* category = qobject_cast< SARibbonCategory* >(sender());
+	if (category) {
+		Q_EMIT categoryTitleChanged(category, title);
+	}
 }
