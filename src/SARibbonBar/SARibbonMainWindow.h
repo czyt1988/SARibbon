@@ -65,9 +65,9 @@ class SA_RIBBON_EXPORT SARibbonMainWindow : public QMainWindow
 
 public:
 	explicit SARibbonMainWindow(QWidget* parent                = nullptr,
-								SARibbonMainWindowStyles style = SARibbonMainWindowStyleFlag::UseRibbonMenuBar
-																 | SARibbonMainWindowStyleFlag::UseRibbonFrame,
-								const Qt::WindowFlags flags = Qt::WindowFlags());
+                                SARibbonMainWindowStyles style = SARibbonMainWindowStyleFlag::UseRibbonMenuBar
+                                                                 | SARibbonMainWindowStyleFlag::UseRibbonFrame,
+                                const Qt::WindowFlags flags = Qt::WindowFlags());
 	~SARibbonMainWindow() override;
 	// 返回SARibbonBar
 	SARibbonBar* ribbonBar() const;
@@ -82,19 +82,19 @@ public:
 #endif
 	// 此函数仅用于控制最小最大化和关闭按钮的显示
 	void updateWindowFlag(Qt::WindowFlags flags);
-
 	// 注意主题在构造函数设置主题会不完全生效，使用QTimer投放到队列最后执行即可
 	// QTimer::singleShot(0, this, [ this ]() { this->setRibbonTheme(SARibbonMainWindow::RibbonThemeDark); });
 	void setRibbonTheme(SARibbonTheme theme);
 	SARibbonTheme ribbonTheme() const;
 	// 判断当前是否使用ribbon模式
 	bool isUseRibbon() const;
-	// 把ribbonbar的事件传递到frameless
-	virtual bool eventFilter(QObject* obj, QEvent* e) Q_DECL_OVERRIDE;
 	// 获取最大化，最小化，关闭按钮所在的bar。可以通过此函数在最大最小化按钮旁边设置内容
 	SARibbonSystemButtonBar* windowButtonBar() const;
 	// 获取当前mainwidow的样式
 	SARibbonMainWindowStyles ribbonMainwindowStyle() const;
+
+    // 把ribbonbar的事件传递到frameless
+    virtual bool eventFilter(QObject* obj, QEvent* e) Q_DECL_OVERRIDE;
 
 protected:
 	// 创建ribbonbar的工厂函数

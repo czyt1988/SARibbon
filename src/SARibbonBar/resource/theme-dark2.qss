@@ -185,28 +185,6 @@ SARibbonToolButton:hover {
     background-color: #435c76;
 }
 
-/*SARibbonControlToolButton*/
-
-SARibbonControlToolButton {
-  background-color: transparent;/*{ControlToolButton.BKColor}*/
-  color: #dadada;
-  border: 1px solid transparent;
-}
-
-SARibbonControlToolButton:pressed {
-  background-color: #435c76;/*{ControlToolButton.BKColor:pressed}*/
-}
-
-SARibbonControlToolButton:checked {
-  border: 1px solid #2a8db5;/*{ControlToolButton.BorderColor:checked}*/
-  background-color: #435c76;/*{ControlToolButton.BKColor:checked}*/
-}
-
-SARibbonControlToolButton:hover {
-  color: #dadada;
-  border: 1px solid transparent;/*{ControlToolButton.BorderColor:hover}*/
-  background-color: #435c76;/*{ControlToolButton.BKColor:hover}*/
-}
 
 SARibbonGalleryButton{
   background-color:#344253;
