@@ -138,12 +138,12 @@ enum class SARibbonAlignment
  */
 enum class SARibbonTheme
 {
-	RibbonThemeOffice2013,      ///< office2013主题
-	RibbonThemeOffice2016Blue,  ///< office2016-蓝色主题
-	RibbonThemeOffice2021Blue,  ///< office2021-蓝色主题
-	RibbonThemeWindows7,        ///< win7主题
-	RibbonThemeDark,            ///< 暗色主题
-	RibbonThemeDark2
+    RibbonThemeOffice2013,      ///< office2013主题
+    RibbonThemeOffice2016Blue,  ///< office2016-蓝色主题
+    RibbonThemeOffice2021Blue,  ///< office2021-蓝色主题
+    RibbonThemeWindows7,        ///< win7主题
+    RibbonThemeDark,            ///< 暗色主题
+    RibbonThemeDark2            ///< 暗色主题2
 };
 
 /**

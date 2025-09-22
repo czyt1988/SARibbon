@@ -137,17 +137,17 @@ MainWindow::MainWindow(QWidget* par, SARibbonMainWindowStyles style) : SARibbonM
  */
 void MainWindow::createRibbonApplicationButton()
 {
-	SARibbonBar* ribbon = ribbonBar();
-	if (!ribbon) {
-		return;
-	}
+    SARibbonBar* ribbon = ribbonBar();
+    if (!ribbon) {
+        return;
+    }
 	QAbstractButton* btn = ribbon->applicationButton();
 	if (!btn) {
-		//! cn: SARibbonBar默认就会创建一个SARibbonApplicationButton，因此，在正常情况下，这个位置不会进入
-		//! en: SARibbonBar creates a SARibbonApplicationButton by default. Therefore, under normal circumstances, this location will not enter
+        //! cn: SARibbonBar默认就会创建一个SARibbonApplicationButton，因此，在正常情况下，这个位置不会进入
+        //! en: SARibbonBar creates a SARibbonApplicationButton by default. Therefore, under normal circumstances, this location will not enter
 		btn = new SARibbonApplicationButton(this);
 		ribbon->setApplicationButton(btn);
-	}
+    }
 
 	btn->setText(("&File"));
 
