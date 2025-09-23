@@ -1,6 +1,6 @@
-此文会详细介绍如何动态构建SARibbon，如果你不熟悉构建，建议你用静态引入的方法，你只需把SARibbon.h和SARibbon.cpp引入你的工程即可使用
+# SARibbon构建说明
 
-# 准备工作
+此文会详细介绍如何动态构建SARibbon，如果你不熟悉构建，建议你用静态引入的方法，你只需把SARibbon.h和SARibbon.cpp引入你的工程即可使用
 
 SARibbon采用[QWindowkit](https://github.com/stdware/qwindowkit)作为无边框窗口方案，同时也支持简单的无边框设置。如果你需要操作系统原生的窗口特性，如Windows 7及以后版本的贴边处理，或Windows 11的Snap Layout效果，建议启用[QWindowkit](https://github.com/stdware/qwindowkit)库。该库还能有效解决多屏幕移动问题。
 
@@ -14,13 +14,13 @@ SARibbon采用[QWindowkit](https://github.com/stdware/qwindowkit)作为无边框
 git submodule update --init --recursive
 ```
 
-# 关于安装位置
+## 关于安装位置
 
 通过CMake构建完成后，使用`install`命令可以安装所有依赖。引用库时，只需通过`find_package`命令，即可将所有依赖和预定义宏等配置一并引入，这是目前最推荐的做法。
 
 然而，在程序开发过程中，可能会遇到不同编译器（如MSVC、MinGW）和不同Qt版本的编译问题。如果使用默认的安装位置（Windows下为C:\Program Files），则只能安装一个版本的库。为了区分不同编译器和Qt版本，SARibbon默认使用本地安装。本地安装会根据编译器和Qt版本生成一个安装文件夹，文件夹命名格式为`bin_qt{version}_[MSVC/GNU]_x[64/86]`。通过`SARIBBON_INSTALL_IN_CURRENT_DIR`选项可以配置是否根据编译器和Qt版本安装到本地，该选项默认为`ON`，即会根据编译器和Qt版本生成一个本地文件夹进行安装。
 
-# 编译QWindowkit库(如果不开启跳过此步)
+## 编译QWindowkit库(如果不开启跳过此步)
 
 `QWindowkit`库仅提供CMake的编译方式，必须使用CMake进行编译。
 
@@ -28,7 +28,7 @@ git submodule update --init --recursive
 
 使用Qt Creator和Visual Studio进行构建和安装的方式基本相同。
 
-## 使用Qt Creator构建和安装QWindowkit库
+### 使用Qt Creator构建和安装QWindowkit库
 
 1. 使用Qt Creator打开`src/SARibbonBar/3rdparty/CMakeLists.txt`文件。
 
@@ -52,7 +52,7 @@ git submodule update --init --recursive
 
 至此，`QWindowkit`库的编译和安装已完成。
 
-## 使用visual studio构建和安装QWindowkit库
+### 使用visual studio构建和安装QWindowkit库
 
 1. 使用Visual Studio打开CMake项目，选择`src/SARibbonBar/3rdparty/CMakeLists.txt`文件。
 
@@ -76,7 +76,7 @@ git submodule update --init --recursive
 
 至此，`QWindowkit`库的编译和安装已完成。
 
-## 使用命令行构建(适用Qt5及vs2019以下)
+### 使用命令行构建(适用Qt5及vs2019以下)
 
 由于`QWindowkit`库要求的CMake版本较高，VS2019及以下版本内置的CMake版本可能无法满足需求。因此，需要通过命令行对`QWindowkit`库进行构建。以下是在Windows下通过CMD命令行构建`QWindowkit`库的步骤：
 
@@ -105,15 +105,15 @@ git submodule update --init --recursive
 "C:\Program Files (x86)\cmake3.27.9\bin\cmake.exe" --build build --target install --config Release
 ```
 
-# 构建SARibbonBar库
+## 构建SARibbonBar库
 
 `SARibbonBar`库提供CMake和QMake两种方式构建，推荐使用CMake。
 
 > 注意：Qt6之后不再维护QMake，逐渐转向CMake。SARibbon的未来版本可能会移除QMake支持。
 
-## 基于`CMake`构建`SARibbonBar`库
+### 基于`CMake`构建`SARibbonBar`库
 
-### vs下基于`cmake`的构建
+#### vs下基于`cmake`的构建
 
 1. 如果要启用`QWindowKit`，在`CMakeLists.txt`中将`SARIBBON_USE_FRAMELESS_LIB`的option值手动改为ON。
 2. 打开CMake项目，选中`CMakeLists.txt`。
@@ -136,7 +136,7 @@ git submodule update --init --recursive
 
    ![](./pic/build-cmake-install-dir.png)
 
-### Qt Creator下基于CMake的构建
+#### Qt Creator下基于CMake的构建
 
 点击文件->打开文件或项目选中CMakeLists.txt，加载完成后形成如下的构建树
 
@@ -160,15 +160,15 @@ Qt Creator可以在界面修改`SARIBBON_USE_FRAMELESS_LIB`值，也可以手动
 
 使用SARibbon的所有内容都在这个文件夹下
 
-## 基于QMake构建SARibbonBar
+### 基于QMake构建SARibbonBar
 
 qmake构建SARibbonBar只需使用Qt Creator打开`SARibbon.pro`文件即可
 
 > 注意，如果使用Qt Creator打开`SARibbon.pro`文件过程报错，那么你的账户可能是没有足够的写权限，不同版本的Qt Creator在不同操作系统由不一样的表现，建议使用cmake
 
-# 使用SARibbonBar库
+## 使用SARibbonBar库
 
-## 基于cmake引入SARibbonBar库
+### 基于cmake引入SARibbonBar库
 
 首先要通过cmake编译并执行安装，在自己的工程CMakeLists.txt按照如下步骤执行：
 
@@ -192,7 +192,7 @@ target_link_libraries(${myapp_target_name} PUBLIC
 )
 ```
 
-## 基于qmake引入SARibbonBar库
+### 基于qmake引入SARibbonBar库
 
 > Qt6开始，不再推荐使用`qmake`，SARibbon未来的版本有可能会取消qmake的支持
 
@@ -251,7 +251,7 @@ include($$PWD/3rdparty/SARibbon/importSARibbonBarLib.pri)
 
 > 再次声明：Qt6.0版本后已经放弃qmake，建议使用cmake来管理工程
 
-# 公开的预定义宏
+## 公开的预定义宏
 
 SARibbon在编译过程中有些预定义宏，这些宏在基于visual studio的库引入是必须的
 

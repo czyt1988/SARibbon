@@ -1,10 +1,10 @@
+# SARibbon栏按钮绘制说明
+
 Ribbon界面无法用普通的tab+toolbutton组合来实现主要就是因为ribbon界面对工具按钮有特殊的渲染方式，和经典菜单按钮是有很大不同的，在没有菜单的情况下没有什么区别，但有菜单的情况下，会有明显不同
 
 差别主要通过下面这个动图可以体现，尤其是在`MenuPopup`模式下，按钮会被拆分为两部分，普通的工具栏是左右拆分，而`ribbon`的工具按钮是上下拆分
 
 ![ribbon工具按钮](./pic/ribbon-toolbutton.gif)
-
-# ribbon工具栏按钮绘制方案
 
 `SARibbon`的工具栏按钮为`SARibbonToolButton`，它继承`QToolButton`，重写了其绘图方法
 
@@ -57,7 +57,7 @@ wps的方案尤其适合显示中文文本，但英文会有可能放不下，�
 
 ![](./pic/ribbon-toolbutton-largebutton-nowordwrap.png)
 
-# 如何布置一个更美观的Ribbon界面
+## 如何布置一个更美观的Ribbon界面
 
 如果文字都比较短，又没有菜单情况下，使用换行模式显示会有一行文本的留白，如果很多的话会不太美观
 

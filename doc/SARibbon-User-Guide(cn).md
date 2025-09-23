@@ -1,11 +1,11 @@
 
-# SARibbon 库使用指南
+# SARibbon使用指南
 
 SARibbon 是一个用于创建现代化 Ribbon 界面的 Qt 库，其界面风格类似于 Microsoft Office 或 WPS。它专为复杂桌面应用程序设计，能有效组织大量功能，常见于工业软件的界面开发。
 
 在开始编码之前，您需要将 SARibbon 库集成到您的 Qt 项目中。最简单的方式是**静态嵌入**，即直接将源文件`SARibbon.h`和`SARibbon.cpp`拷贝到您的工程即可。
 
-# Ribbon界面和传统menubar+toolbar的异同
+## Ribbon界面和传统menubar+toolbar的异同
 
 传统的menubar+toolbar是无法直接转化为ribbon界面的，Ribbon不仅仅是一个带`QToolBar`的工具栏，与传统菜单栏和工具栏相比它有如下特点：
 
@@ -13,9 +13,9 @@ SARibbon 是一个用于创建现代化 Ribbon 界面的 Qt 库，其界面风�
 - Ribbon还有一种叫上下文标签页`Context Category`的特殊标签页，例如，在Office Word中选中一张图片，会自动出现一个“图片编辑”标签页，提供裁剪、旋转等图片专属功能，取消选择后该标签页自动隐藏
 - Ribbon界面会带有一些特殊的控件，例如Gallery（word的样式选择就是Gallery控件）
 
-# 基于SARibbon创建Ribbon风格的窗口
+## 基于SARibbon创建Ribbon风格的窗口
 
-## 创建Ribbon风格的`MainWindow`
+### 创建Ribbon风格的`MainWindow`
 
 SARibbon 的核心是`SARibbonBar`这个类，它可以用于`MainWindow`也可以用于`Widget`
 
@@ -79,7 +79,7 @@ if (SARibbonBar* bar = ribbonBar()) {
 }
 ```
 
-## 创建Ribbon风格的`Widget`
+### 创建Ribbon风格的`Widget`
 
 除了主窗口，您也可以在普通的 `QWidget` 或 `QDialog` 上使用 Ribbon 界面，这在创建复杂对话框或子窗口时非常有用。为此，SARibbon 提供了 `SARibbonWidget` 类。
 
@@ -118,9 +118,9 @@ MyRibbonWidget::MyRibbonWidget(QWidget *parent)
 
 通过 `setWidget()` 方法，您可以将任意 `QWidget` 嵌入到 `SARibbonWidget` 中
 
-# Ribbon界面创建
+## Ribbon界面创建
 
-## Ribbon界面的层次结构
+### Ribbon界面的层次结构
 
 理解 SARibbon 的层次结构是构建界面的基础。其结构清晰，层次分明：
 
@@ -143,9 +143,9 @@ MyRibbonWidget::MyRibbonWidget(QWidget *parent)
 ![saribbonbar-level](./pic/saribbonbar-level.png)
 
 
-## 创建一个ribbon页面
+### 创建一个ribbon页面
 
-### Category(分类页)
+#### Category(分类页)
 
 创建分类页有两种方式：
 
@@ -171,9 +171,9 @@ insertCategory->setObjectName("insertCategory");
 ribbon->addCategoryPage(insertCategory);
 ```
 
-### Panel(面板)
+#### Panel(面板)
 
-#### 创建面板并添加动作
+##### 创建面板并添加动作
 
 面板是category下面的一组功能。您可以通过 `Category` 的 `addPanel` 方法创建面板，并通过 `addAction` 系列方法添加功能按钮
 
@@ -203,7 +203,7 @@ connect(newAction, &QAction::triggered, [] {
 });
 ```
 
-#### 创建菜单
+##### 创建菜单
 
 在 Ribbon 界面中，菜单（Menu）是组织复杂功能的重要手段。SARibbon允许您将菜单以不同风格的按钮形式添加到面板中。主要区别在于按钮的弹出模式 (QToolButton::ToolButtonPopupMode)，它决定了用户如何与菜单进行交互
 
@@ -227,7 +227,7 @@ SARibbon添加菜单有两种方法，第一种是调用`addXXAction`函数：
 
 ```cpp
 // 把action加入到panel，并以小图标显示
- void addSmallAction(QAction* action, QToolButton::ToolButtonPopupMode popMode);
+void addSmallAction(QAction* action, QToolButton::ToolButtonPopupMode popMode);
 // 把action加入到panel，并以大图标显示
 void addLargeAction(QAction* action, QToolButton::ToolButtonPopupMode popMode);
 // 把action加入到panel，在三行模式下会以中图标显示
@@ -284,7 +284,7 @@ void addSmallMenu(QMenu* menu, QToolButton::ToolButtonPopupMode popMode = QToolB
 
 这几个函数实际利用率menu自身的action进行管理，无需再单独创建一个action，注意，这几个方法会修改 `menu->menuAction()` 的部分属性（icon/text/objectName），如需保留自定义值，请提前设置。
 
-#### 面板的布局占位说明
+##### 面板的布局占位说明
 
 SARibbon 面板的布局目前有3种占位标志。当您调用 `addLargeAction`、`addMediumAction` 或 `addSmallAction` 时，您不仅是在添加一个按钮，还在指定它在网格布局中的“占位大小”。
 
@@ -304,7 +304,9 @@ SARibbonPanel支持两种布局方案，分别是2行模式和3行模式，通�
 
 ![pannelLayout2row](./pic/pannelLayout2row.png)
 
-#### 在面板中添加复杂控件 (Widget)
+2行模式下medium和small占位(`SARibbonPannelItem::RowProportion`)是一样的，不做区分。
+
+##### 在面板中添加复杂控件 (Widget)
 
 除了 `QAction`，您还可以直接在面板中添加任何 `QWidget`，例如组合框、微调框或自定义控件。
 
@@ -342,7 +344,7 @@ panelWidgetTest->addLargeWidget(calendarWidget);
 
 ![widget-in-panel](./pic/widget-in-panel.png)
 
-#### 使用按钮组 (Button Group)
+##### 使用按钮组 (Button Group)
 
 按钮组`SARibbonButtonGroupWidget` 可以将多个小按钮紧密排列在一起，和`QToolBar`类似，常用于一组相近功能的操作，如文本对齐
 
@@ -372,7 +374,7 @@ connect(btnGroup2, &SARibbonButtonGroupWidget::actionTriggered, this, &MainWindo
 
 ![button-group](./pic/button-group.png)
 
-#### 使用 Gallery (画廊)
+##### 使用 Gallery (画廊)
 
 Gallery (画廊)是一个Ribbon特有的控件，用于以网格形式展示带图标的选项，常用于在有限空间显示大量图标动作，例如word的样式选择
 
@@ -434,7 +436,7 @@ void MyRibbonMainWindow::buildGalleryExample(){
 
 ![saribbon-gallery-expand](./pic/saribbon-gallery-expand.png)
 
-### Context Category(上下文标签页)
+#### Context Category(上下文标签页)
 
 Context Category 是一种特殊标签页，通常在特定条件下（如选中某个对象）才显示，最常见的就是word中的“图片工具”和“表格工具”，是在选中图片或表格时才出现，这种有条件显示的标签称之为上下文标签
 
@@ -485,7 +487,7 @@ void MainWindow::onShowContextCategory(bool on)
 
 为了区分上下文标签页和普通的标签页，上下文标签页会有特殊的颜色进行标识，如上图所示。这个标识的颜色可以通过`SARibbonBar::setContextCategoryColor`设置
 
-### Application Button
+#### Application Button
 
 `Application Button` 是 Ribbon 界面左上角的主菜单按钮，通常用于“文件”操作
 
@@ -515,7 +517,43 @@ void MainWindow::createRibbonApplicationButton()
 ribbonBar()->setApplicationButton(nullptr); // 移除按钮
 ```
 
-#### 高级用法 (Application Widget)
+application button可以通过qss设置比较丰富的样式，下面是模仿win7风格的ribbon样式设置的qss演示：
+
+```css
+SARibbonApplicationButton{
+  color:white;
+  border: 1px solid #416ABD;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,stop:0 #467FBD, stop:0.5 #2A5FAC,stop:0.51 #1A4088,
+stop:1 #419ACF);
+}
+
+SARibbonApplicationButton:hover{
+  background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,stop:0 #7BB2EB, stop:0.5 #477ECD,stop:0.51 #114ECF,
+stop:1 #80E1FF);
+}
+
+SARibbonApplicationButton:pressed{
+  background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,stop:0 #467BBB, stop:0.5 #2F63AE,stop:0.51 #1C438A,
+stop:1 #358BC9);
+}
+
+SARibbonApplicationButton:focus{
+  outline: none;
+}
+
+SARibbonApplicationButton::menu-indicator {
+  /*subcontrol-position: right;*/
+  width:0px;
+}
+```
+
+上面的效果如下：
+
+![win7style-application-button](./pic/win7style-application-button.png)
+
+##### 高级用法 (Application Widget)
 
 在许多现代化应用（如 Microsoft Office）中，点击 `Application Button` 并不会弹出一个简单的下拉菜单，而是会弹出一个全屏或半屏的复杂页面，该页面可以包含最近文件列表、模板选择、账户设置、应用选项等丰富内容
 
@@ -562,7 +600,7 @@ void MainWindow::createRibbonApplicationButton()
 
 ![application-widget](./screenshot/application-widget.gif)
 
-### Quick Access Bar（快速访问工具栏）
+#### Quick Access Bar（快速访问工具栏）
 
 快速访问工具栏位于窗口最顶部，用于放置最常用的操作，如保存、撤销、重做。快速访问工具栏对应的类为`SARibbonQuickAccessBar`,它继承自`QToolBar`，你可以和操作工具栏一样使用它
 
@@ -611,7 +649,7 @@ void MainWindow::createQuickAccessBar()
 
 ![quick-access-bar](./pic/quick-access-bar.png)
 
-### Right Button Group（右侧按钮组）
+#### Right Button Group（右侧按钮组）
 
 `Right Button Group`（右侧按钮组）是 Ribbon 界面右上角按钮组，通常用于“帮助”、“设置”、“关于”等操作。`Right Button Group`（右侧按钮组）对应的类为`SARibbonButtonGroupWidget`,它继承自`QToolBar`，你可以和操作工具栏一样使用它
 
@@ -635,7 +673,7 @@ void MainWindow::createRightButtonGroup()
 
 ![right-button-group](./pic/right-button-group.png)
 
-### Window Button Bar（系统标题栏按钮旁的工具栏）
+#### Window Button Bar（系统标题栏按钮旁的工具栏）
 
 `Window Button Bar`（系统标题栏按钮旁的工具栏）是 Ribbon 界面系统最大最小化合关闭按钮组，`Window Button Bar`对应的类名为`SARibbonSystemButtonBar`，它默认会创建好窗口需要的最大最小化及关闭按钮，它会自动处理窗口的状态调整系统按钮的显示，`SARibbonSystemButtonBar`内部有一个`SARibbonButtonGroupWidget`，提供了`addAction`、`addSeparator`、`addWidget`等函数，用于在最大最小化旁边添加按钮
 
@@ -666,9 +704,55 @@ void MainWindow::createWindowButtonGroupBar()
 
 ![window-button-bar](./pic/window-button-bar.png)
 
-# Ribbon布局和主题设置
+#### 控制标题栏
 
-## SARibbon布局
+SARibbon 的标题栏（Title Bar）是位于 Ribbon 界面最顶部的区域，用于显示应用程序的窗口标题（windowTitle）。SARibbon 允许您对标题栏高度进行定制，同时可修改其文字颜色、背景颜色以及对齐方式。在office系列软件，会通过改变标题栏的背景颜色来进行明显的提示，如软件没有注册，会把标题栏变为红色。
+
+SARibbon通过下面方法改变标题栏的背景和字体及对齐方式（位于`SARibbonBar`类）：
+
+```cpp
+// 设置标题颜色
+void setWindowTitleTextColor(const QColor& clr);
+QColor windowTitleTextColor() const;
+
+// 设置是否显示标题
+void setTitleVisible(bool on = false);
+bool isTitleVisible() const;
+
+// 设置标题的背景颜色
+void setWindowTitleBackgroundBrush(const QBrush& bk);
+QBrush windowTitleBackgroundBrush() const;
+
+// 设置标题的对齐方式
+void setWindowTitleAligment(Qt::Alignment al);
+Qt::Alignment windowTitleAligment() const;
+···
+
+你可以通过这些函数实现特殊的标题栏显示：
+
+```cpp
+void MainWindow::setWindowTitleColor()
+{
+    SARibbonBar* ribbon = ribbonBar();
+    if (!ribbon) {
+        return;
+    }
+    // 设置标题背景为红色
+    ribbon->setWindowTitleBackgroundBrush(QColor(222, 79, 79));
+    // 设置标题颜色为白色
+    ribbon->setWindowTitleTextColor(Qt::white);
+    // 更新显示
+    ribbon->update();
+}
+```
+
+上面代码显示效果如下：
+
+![chang-title-background](./pic/chang-title-background.png)
+
+## Ribbon布局和主题设置
+
+### SARibbon布局
 
 SARibbon 支持四种布局方案：宽松三行、宽松两行、紧凑三行、紧凑两行，你可以动态切换它们的模式
 
@@ -689,13 +773,11 @@ enum RibbonStyleFlag
 };
 ```
 
-你可以通过`SARibbonBar::setRibbonStyle`设置SARibbon的布局风格
-
 宽松模式下各个控件的布局如下图所示
 
 ![saribbonbar-level](./pic/saribbonbar-level.png)
 
-紧凑模式下各个控件的布局如下图所示
+SARibbon中把带有标题栏和tab结合一起的布局方式称之为紧凑布局（Compact），紧凑模式下各个控件的布局如下图所示
 
 ![saribbonbar-level](./pic/saribbonbar-level-2.png)
 
@@ -707,7 +789,29 @@ enum RibbonStyleFlag
 
 ![ribbon-style-example](./pic/ribbon-style-example.png)
 
-## SARibbon尺寸设置
+SARibbon提供了`SARibbonBar::setRibbonStyle`函数，可以定义当前的布局方案，枚举`SARibbonBar::RibbonStyle`定义了四种布局方案：
+
+- `SARibbonBar::RibbonStyleLooseThreeRow`宽松结构，3行模式(v0.x版本为`SARibbonBar::OfficeStyle`)
+
+![SARibbonBar::RibbonStyleLooseThreeRow](./screenshot/office-3-style.png)
+
+- `SARibbonBar::RibbonStyleLooseTwoRow`宽松结构，2行模式(v0.x版本为`SARibbonBar::OfficeStyleTwoRow`)(文字换行效果)
+
+![SARibbonBar::RibbonStyleLooseTwoRow](./screenshot/office-2-style.png)
+
+- `SARibbonBar::RibbonStyleCompactThreeRow`紧凑结构，3行模式(v0.x版本为`SARibbonBar::WpsLiteStyle`)
+
+![SARibbonBar::RibbonStyleCompactThreeRow](./screenshot/wps-3-style.png)
+
+- `SARibbonBar::RibbonStyleCompactTwoRow`紧凑结构，2行模式(v0.x版本为`SARibbonBar::WpsLiteStyleTwoRow`)(文字换行效果)
+
+![SARibbonBar::RibbonStyleCompactTwoRow](./screenshot/wps-2-style.png)
+
+上面可以看到，在2行模式下，文字换行会导致图标非常小，因此，建议2行模式下，不要使用文字换行，可以通过`SARibbonBar::setEnableWordWrap`函数设置是否文字换行
+
+关于SARibbon的按钮布局，你可以参阅：[SARibbon按钮布局说明](./SARibbon-Button-Layout-Guide(cn).md)
+
+### SARibbon尺寸设置
 
 SARibbon 允许您精细调整各个部分的高度和间距。
 
@@ -718,21 +822,32 @@ ribbonBar()->setTitleBarHeight(40);
 // 设置标签栏高度
 ribbonBar()->setTabBarHeight(30);
 
+// 设置Category高度
+ribbonBar()->setCategoryHeight(96);
+
 // 设置面板标题高度
 ribbonBar()->setPanelTitleHeight(20);
 
 // 设置面板间间距
 ribbonBar()->setPanelSpacing(5);
 
+// 设置工具按钮图标大小
+ribbonBar()->setPanelToolButtonIconSize(QSize(32, 32));
+
 // 设置按钮最大宽高比
 ribbonBar()->setButtonMaximumAspectRatio(2.0);
 ```
 
-不同的尺寸组合能得到你想要的界面效果，你可以运行`example/MainWindowExample`例子，此例子的Size标签页下可以实时设置参数从而查看界面效果
+不同的尺寸能组合出不一样的显示效果，尤其针对图标大小的显示需求，SARibbon的图标不像工具栏那样设置一个固定的图标大小，而是根据ribbonBar的高度和文字的高度来决定图标的大小，SARibbon在布局的时候，会根据`CategoryHeight`,以及文字高度来决定图标的大小，因此，你想让图标变大，有两种方法：
+
+- 调整`CategoryHeight`，让ribbonbar变高，字体不变情况下，图标会变大
+- 调整字体换行方式（`SARibbonBar::setEnableWordWrap`），如果是双行模式，设置文字不换行，则在ribbonbar高度不变的情况下，会让图标变大
+
+各个部件的尺寸如何设置，可以通过运行`example/MainWindowExample`例子的`Size`标签页进行动态调整，并查看效果
 
 ![example-size](./pic/example-size.png)
 
-## 切换内置主题
+### 切换内置主题
 
 SARibbon 提供了多种内置主题，如 Windows 7、Office 2013、Office 2016、暗色主题等，主题定义在`SARibbonTheme`枚举类中：
 
@@ -789,3 +904,76 @@ dark2主题：
 ![SARibbon-theme-dark](./screenshot/SARibbon-theme-dark2.png)
 
 SARibbon的主题是通过qss实现的，如果你的窗口已经存在qss样式，你需要把你现有的qss样式和ribbon的qss样式进行合并，否则，最后设置的样式将会覆盖之前设置的样式
+
+## Ribbon的自定义
+
+### SARibbon的自定义功能
+
+ribbon的自定义是ribbon的一个特色，参考了office和wps的自定义界面，用户可以为自己的ribbon定义非常多的内容，甚至可以定义出一个完全和原来不一样的界面。
+
+以下是office的自定义界面
+
+![office的自定义界面](./screenshot/customize/customization-office-ui.png)
+
+SARibbon参考office和wps的界面，封装了方便使用的`SARibbonCustomize**`类，包括如下5个类：
+
+> - SARibbonCustomizeDialog
+> - SARibbonCustomizeWidget
+> - SARibbonCustomizeData
+> - SARibbonActionsManager
+> - SARibbonActionsManagerModel
+
+实际用户使用仅会面对`SARibbonActionsManager`和`SARibbonCustomizeDialog`/`SARibbonCustomizeWidget`，其余类用户正常不会使用。
+
+`SARibbonActionsManager`是用来管理`QAction`，把想要自定义的`QAction`添加到`SARibbonActionsManager`中管理，并可以对`QAction`进行分类，以便在`SARibbonCustomizeDialog`/`SARibbonCustomizeWidget`中显示
+
+`SARibbonCustomizeDialog`/`SARibbonCustomizeWidget`是具体的显示窗口，`SARibbonCustomizeDialog`把`SARibbonCustomizeWidget`封装为对话框，如果要实现office那样集成到配置对话框中可以使用`SARibbonCustomizeWidget`，`SARibbonCustomizeDialog`的效果如下图所示：
+
+![SARibbon的自定义界面](./screenshot/customize/customization-saribbon-ui.png)
+
+### 给界面添加自定义功能
+
+这里演示如何添加自定义功能
+
+首先定义`SARibbonActionsManager`作为MainWindow的成员变量
+
+```cpp
+//MainWindow.h 中定义成员变量
+SARibbonActionsManager* m_ribbonActionMgr;///< 用于管理所有action
+```
+
+在MainWindow的初始化过程中，还需要创建大量的`QAction`，`QAction`的父对象指定为MainWindow，另外还会生成ribbon布局，例如添加category，添加pannel等操作，在上述操作完成后添加如下步骤，自动让`SARibbonActionsManager`管理所有的`QAction`
+
+```cpp
+//MainWindow的初始化，生成QAction
+//生成ribbon布局
+m_ribbonActionMgr = new SARibbonActionsManager(mainWinowPtr);
+m_ribbonActionMgr->autoRegisteActions(mainWinowPtr);
+```
+
+`SARibbonActionsManager`的关键函数`autoRegisteActions`可以遍历 `SARibbonMainWindow`下的所有子object，找到action并注册，并会遍历所有`SARibbonCategory`,把`SARibbonCategory`下的action按`SARibbonCategory`的title name进行分类，此函数还会把`SARibbonMainWindow`下面的action，但不在任何一个category下的作为NotInRibbonCategoryTag标签注册，默认名字会赋予not in ribbon
+
+在需要调用`SARibbonCustomizeDialog`的地方如下操作：
+
+```cpp
+QString cfgpath = "customization.xml";
+SARibbonCustomizeDialog dlg(this, this);
+
+dlg.setupActionsManager(m_ribbonActionMgr);
+dlg.fromXml(cfgpath);//调用这一步是为了把已经存在的自定义步骤加载进来，在保存时能基于原有的自定义步骤上追加
+if (QDialog::Accepted == dlg.exec()) {
+    dlg.applys();//应用自定义步骤
+    dlg.toXml(cfgpath);//把自定义步骤保存到文件中
+}
+```
+
+在MainWindow生成前还需要把自定义的内容加载，因此在构造函数最后应该加入如下语句：
+
+```cpp
+//MainWindow的构造函数最后
+sa_apply_customize_from_xml_file("customization.xml", this, m_ribbonActionMgr);
+```
+
+`sa_apply_customize_from_xml_file`是`SARibbonCustomizeWidget.h`中提供的函数，直接把配置文件中的自定义内容应用到MainWindow中。
+
+这样软件每次启动都会按照配置文件加载。

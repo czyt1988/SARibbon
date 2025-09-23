@@ -15,7 +15,6 @@ SARibbonButtonGroupWidget{
   background-color: transparent;
 }
 
-
 /* SARibbonButtonGroupWidget下按钮设置*/
 SARibbonButtonGroupWidget > QToolButton {
     border: none;
@@ -23,23 +22,19 @@ SARibbonButtonGroupWidget > QToolButton {
     background-color: transparent;
     padding: 0 2px;
 }
-/* hover 状态 */
+/* SARibbonButtonGroupWidget下ToolButton按钮 hover.pressed.checked 状态 */
 SARibbonButtonGroupWidget > QToolButton:hover {
-    color: #000000;
     background-color: #FDEEB3;
 }
 SARibbonButtonGroupWidget > QToolButton:pressed{
-    color: #444444;
     background-color: #FDEEB3;
     border:1px solid #FFD700;
 }
 SARibbonButtonGroupWidget > QToolButton:checked {
-    color: #444444;
     background-color: #FDEEB3;
     border:1px solid #FFD700;
 }
-
-/* 有菜单的按钮 */
+/* SARibbonButtonGroupWidget下ToolButton按钮 菜单状态 */
 /*MenuButtonPopup*/
 SARibbonButtonGroupWidget > QToolButton[popupMode="1"]{
     padding-right: 12px;
@@ -62,10 +57,6 @@ SARibbonButtonGroupWidget > QToolButton[popupMode="0"]{
 }
 
 
-/*SARibbonQuickAccessBar*/
-SARibbonQuickAccessBar{
-  background-color: transparent;
-}
 
 /*
 * 如果你想定义SARibbonPanel下的SARibbonButtonGroupWidget，你可以类似下面这样操作

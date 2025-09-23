@@ -48,7 +48,7 @@ PROJECT_NAME           = SARibbon
 # could be handy for archiving the generated documentation or if some version
 # control system is used.
 
-PROJECT_NUMBER         = 2.4.2
+PROJECT_NUMBER         = 2.5.1
 
 # Using the PROJECT_BRIEF tag one can provide an optional one line description
 # for a project that appears at the top of each page and should give viewer a
@@ -953,8 +953,9 @@ INPUT                  = ../src/SARibbonBar \
                          ../src/SARibbonBar/colorWidgets \
                          ../readme-cn.md \
                          ../changlog.md \
-                         how-to-build-cn.md \
-                         ribbon-toolbutton.md
+                         SARibbon-Build-Instructions(cn).md \
+                         SARibbon-User-Guide(cn).md \
+                         SARibbon-Button-Layout-Guide(cn).md
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
