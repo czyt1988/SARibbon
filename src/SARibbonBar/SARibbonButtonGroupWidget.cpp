@@ -6,9 +6,7 @@
 #include <QActionEvent>
 #include <QWidgetAction>
 #include <QApplication>
-#include "SARibbonElementManager.h"
-#include "SARibbonSeparatorWidget.h"
-#include "SARibbonPanel.h"
+#include <QStyle>
 
 //===================================================
 // SARibbonButtonGroupWidget
@@ -16,15 +14,15 @@
 
 SARibbonButtonGroupWidget::SARibbonButtonGroupWidget(QWidget* parent) : QToolBar(parent)
 {
-	setAutoFillBackground(false);
-	setAttribute(Qt::WA_NoSystemBackground);
-	setOrientation(Qt::Horizontal);
-	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-	setMovable(false);    // 禁止移动
-	setFloatable(false);  // 禁止浮动
-	setContentsMargins(0, 0, 0, 0);
-	const int smallIconSize = QApplication::style()->pixelMetric(QStyle::PM_SmallIconSize);
-	setIconSize(QSize(smallIconSize, smallIconSize));
+    setAutoFillBackground(false);
+    setAttribute(Qt::WA_NoSystemBackground);
+    setOrientation(Qt::Horizontal);
+    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    setMovable(false);    // 禁止移动
+    setFloatable(false);  // 禁止浮动
+    setContentsMargins(0, 0, 0, 0);
+    const int smallIconSize = QApplication::style()->pixelMetric(QStyle::PM_SmallIconSize);
+    setIconSize(QSize(smallIconSize, smallIconSize));
 }
 
 SARibbonButtonGroupWidget::~SARibbonButtonGroupWidget()
@@ -65,20 +63,20 @@ SARibbonButtonGroupWidget::~SARibbonButtonGroupWidget()
  */
 void SARibbonButtonGroupWidget::addMenuAction(QAction* menuAction, QToolButton::ToolButtonPopupMode popupMode)
 {
-	if (!menuAction) {
-		return;
-	}
+    if (!menuAction) {
+        return;
+    }
 
-	// 添加动作到工具栏
-	addAction(menuAction);
+    // 添加动作到工具栏
+    addAction(menuAction);
 
-	// 如果动作有关联菜单，则设置工具按钮的弹出模式
-	if (menuAction->menu()) {
-		QToolButton* toolButton = qobject_cast< QToolButton* >(widgetForAction(menuAction));
-		if (toolButton) {
-			toolButton->setPopupMode(popupMode);
-		}
-	}
+    // 如果动作有关联菜单，则设置工具按钮的弹出模式
+    if (menuAction->menu()) {
+        QToolButton* toolButton = qobject_cast< QToolButton* >(widgetForAction(menuAction));
+        if (toolButton) {
+            toolButton->setPopupMode(popupMode);
+        }
+    }
 }
 
 /**
@@ -114,9 +112,9 @@ void SARibbonButtonGroupWidget::addMenuAction(QAction* menuAction, QToolButton::
  */
 QAction* SARibbonButtonGroupWidget::addMenuAction(QMenu* menu, QToolButton::ToolButtonPopupMode popupMode)
 {
-	if (!menu) {
-		return nullptr;
-	}
-	addMenuAction(menu->menuAction(), popupMode);
-	return menu->menuAction();
+    if (!menu) {
+        return nullptr;
+    }
+    addMenuAction(menu->menuAction(), popupMode);
+    return menu->menuAction();
 }

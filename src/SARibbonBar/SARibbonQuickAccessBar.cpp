@@ -1,6 +1,5 @@
 ﻿#include "SARibbonQuickAccessBar.h"
 #include "SARibbonButtonGroupWidget.h"
-#include "SARibbonSeparatorWidget.h"
 #include <QGuiApplication>
 
 //===================================================

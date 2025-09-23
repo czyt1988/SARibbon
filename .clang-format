@@ -6,7 +6,7 @@ Standard: Cpp11
 
 IndentWidth : 4
 TabWidth : 4
-UseTab : ForIndentation
+UseTab : Never
 # Indent width for line continuations.
 ContinuationIndentWidth: 4
 
