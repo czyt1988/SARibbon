@@ -1,4 +1,3 @@
-
 # SARibbon使用指南
 
 SARibbon 是一个用于创建现代化 Ribbon 界面的 Qt 库，其界面风格类似于 Microsoft Office 或 WPS。它专为复杂桌面应用程序设计，能有效组织大量功能，常见于工业软件的界面开发。
@@ -726,7 +725,7 @@ QBrush windowTitleBackgroundBrush() const;
 // 设置标题的对齐方式
 void setWindowTitleAligment(Qt::Alignment al);
 Qt::Alignment windowTitleAligment() const;
-···
+```
 
 你可以通过这些函数实现特殊的标题栏显示：
 
