@@ -14,7 +14,7 @@ SARibbon 是一个用于创建现代化 Ribbon 界面的 Qt 库，其界面风�
 
 ## 基于SARibbon创建Ribbon风格的窗口
 
-### 创建Ribbon风格的`MainWindow`
+### 创建Ribbon风格的MainWindow
 
 SARibbon 的核心是`SARibbonBar`这个类，它可以用于`MainWindow`也可以用于`Widget`
 
@@ -78,7 +78,7 @@ if (SARibbonBar* bar = ribbonBar()) {
 }
 ```
 
-### 创建Ribbon风格的`Widget`
+### 创建Ribbon风格的Widget
 
 除了主窗口，您也可以在普通的 `QWidget` 或 `QDialog` 上使用 Ribbon 界面，这在创建复杂对话框或子窗口时非常有用。为此，SARibbon 提供了 `SARibbonWidget` 类。
 

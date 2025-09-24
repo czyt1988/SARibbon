@@ -1090,7 +1090,12 @@ EXCLUDE_SYMBOLS        = *::PrivateData
 # that contain example code fragments that are included (see the \include
 # command).
 
-EXAMPLE_PATH           = ../src/example/MainWindowExample
+EXAMPLE_PATH           = ../example/MainWindowExample \
+						 ../example/MdiAreaWindowExample \
+						 ../example/UseNativeFrameExample \
+						 ../example/NormalMenuBarExample \
+						 ../example/WidgetWithRibbon \
+						 ../example/StaticExample
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the
 # EXAMPLE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp and
