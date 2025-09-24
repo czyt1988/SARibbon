@@ -1,7 +1,6 @@
 ﻿bin_*
 build*
 docs
-_site
 *.user
 *.autosave
 *.dll

@@ -1,0 +1,61 @@
+name: Build and Deploy Doxygen Documentation
+
+on:
+  push:
+    branches: [ master ] 
+  workflow_dispatch:  # 允许手动触发
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Install Doxygen
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen graphviz
+
+      - name: Generate Doxygen Documentation
+        run: |
+          doxygen doc/Doxyfile-wiki-cn
+
+      - name: Verify documentation generated
+        run: |
+          echo "Checking generated documentation..."
+          ls -la html/
+          if [ -f "html/index.html" ]; then
+            echo "✓ index.html exists"
+          else
+            echo "✗ ERROR: index.html does not exist!"
+            exit 1
+          fi
+
+      - name: Create .nojekyll
+        run: |
+          touch html/.nojekyll
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'html'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
