@@ -74,7 +74,7 @@ PROJECT_ICON           =
 # entered, it will be relative to the location where doxygen was started. If
 # left blank the current directory will be used.
 
-OUTPUT_DIRECTORY       = ./html
+OUTPUT_DIRECTORY       = .
 
 # If the CREATE_SUBDIRS tag is set to YES then doxygen will create up to 4096
 # sub-directories (in 2 levels) under the output directory of each output format
@@ -1181,7 +1181,9 @@ IMAGE_PATH             = pic/add-large-action.png \
                          screenshot/wps-3-style-nowrap.png \
                          screenshot/wps-mode.png \
                          screenshot/customize/customization-office-ui.png \
-                         screenshot/customize/customization-saribbon-ui.png
+                         screenshot/customize/customization-saribbon-ui.png \
+                         pic \
+                         screenshot
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should
 # invoke to filter for each input file. Doxygen will invoke the filter program

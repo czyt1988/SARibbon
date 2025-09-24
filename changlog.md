@@ -1,4 +1,13 @@
-﻿# 版本更新记录(change log):
+# 版本更新记录(change log):
+
+## 2025-09-24 -> 2.5.1
+
+- 调整了`SARibbonButtonGroupWidget`、`SARibbonQuickAccessBar`、`SARibbonSystemButtonBar`的实现方式，直接继承QToolBar，并通过`Qss`实现对应效果
+- 针对`SARibbonButtonGroupWidget`调整，对应调整了布局
+- 添加了`SARibbonTitleIconWidget`窗口，用于显示ribbon的图标，点击图标可以弹出系统菜单
+- 调整了qss内容
+- 完善了文档
+
 
 ## 2025-09-10 -> 2.5.0
 

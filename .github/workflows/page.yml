@@ -34,7 +34,27 @@ jobs:
 
       - name: Generate Doxygen Documentation
         run: |
-          doxygen doc/Doxyfile-wiki-cn
+          # 进入 doc 目录运行 Doxygen（这样相对路径才能正确解析）
+          cd doc
+          doxygen Doxyfile-wiki-cn
+          # 回到项目根目录
+          cd ..
+
+      - name: Fix directory structure
+        run: |
+          echo "Checking generated documentation structure..."
+          if [ -d "doc/html" ]; then
+            echo "Found html structure: doc/html"
+            ls -la doc/html/
+            # 将 html 目录移动到根目录的 html 目录
+            mkdir -p html
+            mv doc/html/* html/
+            echo "✓ Moved content to html/ directory"
+          else
+            echo "✗ No html directory found in expected locations"
+            find . -name "*.html" -type f | head -10
+            exit 1
+          fi
 
       - name: Verify documentation generated
         run: |
