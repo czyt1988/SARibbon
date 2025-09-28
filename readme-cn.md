@@ -19,12 +19,12 @@
 QQ交流群:755294806、434014314(已满)
 
 <div align="center">
-<img src="./doc/SARibbon-qq交流群2.jpg" style="width:300px;"/>
+<img src="./docs/assets/SARibbon-qq交流群2.jpg" style="width:300px;"/>
 </div>
 
 项目文档：[https://czyt1988.github.io/SARibbon/](https://czyt1988.github.io/SARibbon/)
 
-详细使用教程: [SARibbon使用指南](./doc/SARibbon-User-Guide(cn).md) 
+详细使用教程: [SARibbon使用指南](./docs/SARibbon-User-Guide(cn).md) 
 
 ||Windows(latest)|Linux ubuntu(latest)|Mac(latest)|
 |:-|:-|:-|:-|
@@ -49,47 +49,47 @@ QQ交流群:755294806、434014314(已满)
 
 - 针对Ribbon的布局和显示
 
-![Ribbon的布局和显示](./doc/screenshot/SARibbonBar-overview.png)
+![Ribbon的布局和显示](./docs/assets/screenshot/SARibbonBar-overview.png)
 
 - 支持最小化模式，ribbon只显示标签（默认双击标签会进行切换）,支持上下文标签tab
 
-![SARibbon最小化模式](./doc/screenshot/SARibbonBar-minMode.gif)
+![SARibbon最小化模式](./docs/assets/screenshot/SARibbonBar-minMode.gif)
 
 - 支持quickAccessBar（word快速菜单）和rightButtonGroup，在不同布局模式下会有不同的显示效果
 - 支持4种不同的ribbon button，普通按钮，延迟弹出菜单按钮，菜单按钮，action菜单按钮（action菜单按钮是此ribbon控件最主要解决的问题之一）
 
-![SARibbon-4种不同的ribbon button](./doc/screenshot/SARibbonBar-ribbonbutton.gif)
+![SARibbon-4种不同的ribbon button](./docs/assets/screenshot/SARibbonBar-ribbonbutton.gif)
 
 - 支持4种不同风格的布局样式
 
-![SARibbon-4种不同风格的布局样式](./doc/screenshot/SARibbonBar-style.gif)
+![SARibbon-4种不同风格的布局样式](./docs/assets/screenshot/SARibbonBar-style.gif)
 
 - 支持qss对ribbon进行自定义设置，可实时切换主题,内置了6种不同风格的主题
 
 win7主题：
-![SARibbon-theme-win7](./doc/screenshot/SARibbon-theme-win7.png)
+![SARibbon-theme-win7](./docs/assets/screenshot/SARibbon-theme-win7.png)
 office2013主题：
-![SARibbon-theme-office2013](./doc/screenshot/SARibbon-theme-office2013.png)
+![SARibbon-theme-office2013](./docs/assets/screenshot/SARibbon-theme-office2013.png)
 office2016主题：
-![SARibbon-theme-office2016](./doc/screenshot/SARibbon-theme-office2016.png)
+![SARibbon-theme-office2016](./docs/assets/screenshot/SARibbon-theme-office2016.png)
 office2021主题：
-![SARibbon-theme-office2021](./doc/screenshot/SARibbon-theme-office2021.png)
+![SARibbon-theme-office2021](./docs/assets/screenshot/SARibbon-theme-office2021.png)
 dark主题：
-![SARibbon-theme-dark](./doc/screenshot/SARibbon-theme-dark.png)
+![SARibbon-theme-dark](./docs/assets/screenshot/SARibbon-theme-dark.png)
 dark2主题：
-![SARibbon-theme-dark](./doc/screenshot/SARibbon-theme-dark2.png)
+![SARibbon-theme-dark](./docs/assets/screenshot/SARibbon-theme-dark2.png)
 
 - 提供Gallery控件
 
-![](./doc/screenshot/SARibbonBar-gallery.png)
+![](./docs/assets/screenshot/SARibbonBar-gallery.png)
 
 - 支持超长滚动和Option Action
 
-![](./doc/screenshot/SARibbonBar-option-action.gif)
+![](./docs/assets/screenshot/SARibbonBar-option-action.gif)
 
 - 提供居中对齐模式
 
-![](./doc/screenshot/SARibbon-aligment-center.png)
+![](./docs/assets/screenshot/SARibbon-aligment-center.png)
 
 - 支持4K屏和多屏幕扩展
 - 支持linux和MacOS（界面未做深度适配）
@@ -110,7 +110,7 @@ SARibbon提供qmake和cmake两种构建方式，同时提供了一个集成的SA
 
 开启`QWindowkit`后的效果如下：
 
-![](./doc/pic/set-qwindowkit-on-snap.gif)
+![](./docs/assets/pic/set-qwindowkit-on-snap.gif)
 
 如果你要依赖[QWindowkit](https://github.com/stdware/qwindowkit)库，需要先编译[QWindowkit](https://github.com/stdware/qwindowkit)库，[QWindowkit](https://github.com/stdware/qwindowkit)库作为SARibbon项目的submodules，如果在`git clone`时没有附带`--recursive`参数，需要执行`submodule update`命令:
 
@@ -209,7 +209,7 @@ target_link_libraries({your_target_name} PUBLIC SARibbonBar::SARibbonBar)
 
 Ribbon是把菜单栏和工具栏合并了，并通过一个tab控件进行展示，Ribbon是无法简单的使用Tab+Toolbar替代的，涉及到很多细节问题，`SARibbon`在设计时参考了MFC Ribbon接口的命名风格，标签页称之为`Category`(种类)，每个`Category`下面有多个`pannel`（面板），面板下面管理着toolbutton，`pannel`有点类似传统的`Toolbar`，其层次结构如下图所示，这些命名参考了MFC的ribbon界面类
 
-![msdn ribbon 介绍页](./doc/pic/msdn-ribbon.png)
+![msdn ribbon 介绍页](./docs/assets/pic/msdn-ribbon.png)
 
 一些常见的名词解释如下
 
@@ -222,7 +222,7 @@ Ribbon是把菜单栏和工具栏合并了，并通过一个tab控件进行展�
 
 SARibbonBar的层次如下图所示：
 
-![](./doc/pic/saribbonbar-level.png)
+![](./docs/assets/pic/saribbonbar-level.png)
 
 > 注：不同的布局方案影响着`Category`和`Quick Access Bar`的摆放方式，具体可见[SARibbonBar布局方案](#SARibbonBar布局方案)
 
@@ -234,9 +234,9 @@ SARibbonBar的层次如下图所示：
 
 - 这是使用SARibbon构建的软件截图
 
-![](./doc/screenshot/data-workbench-screenshot1-cn.gif)
-![](./doc/screenshot/data-workbench-screenshot01-en.png)
-![](./doc/screenshot/data-workbench-screenshot01-cn.png)
+![](./docs/assets/screenshot/data-workbench-screenshot1-cn.gif)
+![](./docs/assets/screenshot/data-workbench-screenshot01-en.png)
+![](./docs/assets/screenshot/data-workbench-screenshot01-cn.png)
 
 [github - https://github.com/czyt1988/data-workbench](https://github.com/czyt1988/data-workbench)
 
@@ -354,5 +354,5 @@ SARibbonBar_amalgamate
 
 如果项目对你有用，请你给我一个鼓励：
 <div style="text-align:center">
-    <img src="./doc/pic/赞赏码.png" alt="赞赏码" style="width:400px;" />
+    <img src="./docs/assets/pic/赞赏码.png" alt="赞赏码" style="width:400px;" />
 </div>

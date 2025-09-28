@@ -39,52 +39,52 @@ For the convenience of developing large-scale software, `SARibbon` encapsulates 
 
 - Ribbon layout and display
 
-![Ribbon Layout and Display](./doc/screenshot/SARibbonBar-overview.gif)
+![Ribbon Layout and Display](./docs/assets/screenshot/SARibbonBar-overview.gif)
 
 - Support for minimized mode, where the Ribbon only displays tabs (double-clicking a tab will toggle by default), and support for context tab.
 
-![SARibbon Minimized Mode](./doc/screenshot/SARibbonBar-minMode.gif)
+![SARibbon Minimized Mode](./docs/assets/screenshot/SARibbonBar-minMode.gif)
 
 - Support for quickAccessBar (similar to Word's quick menu), which has different display effects under different layout modes.
 
-![SARibbon-quickAccessBar](./doc/screenshot/SARibbonBar-quickAccessBar.gif)
+![SARibbon-quickAccessBar](./docs/assets/screenshot/SARibbonBar-quickAccessBar.gif)
 
 - Support for 4 types of Ribbon buttons: regular buttons, delayed pop-up menu buttons, menu buttons, and action menu buttons (the action menu button is one of the main issues this Ribbon widget addresses).
 
-![SARibbon-4 Types of Ribbon Buttons](./doc/screenshot/SARibbonBar-ribbonbutton.gif)
+![SARibbon-4 Types of Ribbon Buttons](./docs/assets/screenshot/SARibbonBar-ribbonbutton.gif)
 
 - Support for 4 different styles of layout.
 
-![SARibbon-4 Different Styles of Layout](./doc/screenshot/SARibbonBar-style.gif)
+![SARibbon-4 Different Styles of Layout](./docs/assets/screenshot/SARibbonBar-style.gif)
 
 - Support for customizing the Ribbon using qss, with real-time theme switching and 5 built-in different styles.
 
 Win7 theme:
-![SARibbon-theme-win7](./doc/screenshot/SARibbon-theme-win7.png)
+![SARibbon-theme-win7](./docs/assets/screenshot/SARibbon-theme-win7.png)
 
 Office2013 theme:
-![SARibbon-theme-office2013](./doc/screenshot/SARibbon-theme-office2013.png)
+![SARibbon-theme-office2013](./docs/assets/screenshot/SARibbon-theme-office2013.png)
 
 Office2016 theme:
-![SARibbon-theme-office2016](./doc/screenshot/SARibbon-theme-office2016.png)
+![SARibbon-theme-office2016](./docs/assets/screenshot/SARibbon-theme-office2016.png)
 
 Office2021 theme:
-![SARibbon-theme-office2021](./doc/screenshot/SARibbon-theme-office2021.png)
+![SARibbon-theme-office2021](./docs/assets/screenshot/SARibbon-theme-office2021.png)
 
 Dark theme:
-![SARibbon-theme-dark](./doc/screenshot/SARibbon-theme-dark.png)
+![SARibbon-theme-dark](./docs/assets/screenshot/SARibbon-theme-dark.png)
 
 - Provide Gallery widget.
 
-![](./doc/screenshot/SARibbonBar-gallery.gif)
+![](./docs/assets/screenshot/SARibbonBar-gallery.gif)
 
 - Support for long scrolling and Option Action.
 
-![](./doc/screenshot/SARibbonBar-option-action.gif)
+![](./docs/assets/screenshot/SARibbonBar-option-action.gif)
 
 - Provide center alignment mode.
 
-![](./doc/screenshot/SARibbon-aligment-center.png)
+![](./docs/assets/screenshot/SARibbon-aligment-center.png)
 
 - Support for 4K screens and multi-screen extension.
 - Support for Linux and MacOS (the interface is not deeply customized).
@@ -105,7 +105,7 @@ SARibbon offers both qmake and cmake build options. Additionally, it provides in
 
 The effect after enabling `QWindowkit` is as follows:
 
-![](./doc/pic/set-qwindowkit-on-snap.gif)
+![](./docs/assets/pic/set-qwindowkit-on-snap.gif)
 
 If you want to depend on the [QWindowkit](https://github.com/stdware/qwindowkit) library, you need to compile the [QWindowkit](https://github.com/stdware/qwindowkit) library first. As a submodule of the SARibbon project, if the `--recursive` parameter was not included during `git clone`, you need to run the `submodule update` command:
 
@@ -117,7 +117,7 @@ git submodule update --init --recursive
 
 ## Building as a Dynamic Library
 
-For the specific build process, refer to the document: [SARibbon Build](./doc/how-to-build.md)
+For the specific build process, refer to the document: [SARibbon Build](./docs/how-to-build.md)
 
 ## Static Project Integration
 
@@ -189,7 +189,7 @@ target_link_libraries({your_target_name} PUBLIC SARibbonBar::SARibbonBar)
 
 The Ribbon combines the menu bar and toolbar, displaying them through a tab widget. The Ribbon cannot be simply replaced by a Tab+Toolbar, as it involves many detailed issues. When designing `SARibbon`, the naming style of the MFC Ribbon interface was referenced. The tab page is called `Category` (kind), and each `Category` has multiple `pannel` (panels) under it, which manage toolbuttons. The `pannel` is somewhat similar to a traditional `Toolbar`. The hierarchy is shown in the figure below, and these names reference the Ribbon interface classes in MFC.
 
-![msdn ribbon introduction page](./doc/pic/msdn-ribbon.png)
+![msdn ribbon introduction page](./docs/assets/pic/msdn-ribbon.png)
 
 Some common terminology explanations are as follows:
 
@@ -202,7 +202,7 @@ Some common terminology explanations are as follows:
 
 The hierarchy of SARibbonBar is shown in the figure below:
 
-![](./doc/pic/saribbonbar-level.png)
+![](./docs/assets/pic/saribbonbar-level.png)
 
 > Note: Different layout schemes affect the placement of `Category` and `Quick Access Bar`. For more details, see [SARibbonBar Layout Schemes](#SARibbonBar Layout Schemes).
 
@@ -211,7 +211,7 @@ The hierarchy of SARibbonBar is shown in the figure below:
 To use SARibbon in MainWindow, you need to replace `QMainWindow` with `SARibbonMainWindow`. `SARibbonMainWindow` modifies the rendering of the menubar in `QMainWindow`.
 
 > Note: If you are using a ui file, delete the original menu in the ui file to avoid potential exceptions, as shown in the figure below:
-> ![](./doc/pic/remove-menu-bar-at-uifile.png)
+> ![](./docs/assets/pic/remove-menu-bar-at-uifile.png)
 
 Example code is as follows:
 
@@ -271,7 +271,7 @@ RibbonWidget::RibbonWidget(QWidget* parent) : SARibbonWidget(parent)
 
 The effect is as follows:
 
-![Ribbon Used in QWidget](./doc/screenshot/ribbonbar-use-in-qwidget.png)
+![Ribbon Used in QWidget](./docs/assets/screenshot/ribbonbar-use-in-qwidget.png)
 
 ### Creating Categories and Pannels
 
@@ -297,7 +297,7 @@ pannel1->addLargeAction(actSave);
 
 The above operation adds a button, and the effect is shown in the figure below:
 
-![](./doc/pic/add-large-action.png)
+![](./docs/assets/pic/add-large-action.png)
 
 Users can also directly create a SARibbonCategory and add it to the pannel. The following code has the same effect as the one above:
 
@@ -420,21 +420,21 @@ The `Office` mode is the most common Ribbon mode, where the `tab` and title bar 
 
 Comparison of screenshots of the Office Word interface and the WPS Word interface:
 
-![Office Interface Screenshot](./doc/pic/office-screenshot.png)
+![Office Interface Screenshot](./docs/assets/pic/office-screenshot.png)
 
-![WPS Changed Ribbon Layout](./doc/pic/wps-change-ribbon-1.jpg)
+![WPS Changed Ribbon Layout](./docs/assets/pic/wps-change-ribbon-1.jpg)
 
 Under normal screen conditions, the WPS style reduces the vertical height by at least 30 pixels compared to the Office style, which is equivalent to saving nearly 3% of the vertical space on a 1920*1080 screen.
 
 In `SARibbon`, the layout with a title bar is referred to as a loose layout (Loose), and the arrangement of its various elements is shown in the figure below:
 
-![Loose Layout](./doc/pic/ribbonbar-geometry-office3.png)
+![Loose Layout](./docs/assets/pic/ribbonbar-geometry-office3.png)
 
 This layout is consistent with the default layout in Office.
 
 The layout in `SARibbon` that combines the title bar and tab is called a compact layout (Compact), and the arrangement of its various elements is shown in the figure below:
 
-![Compact Layout](./doc/pic/ribbonbar-geometry-wps3.png)
+![Compact Layout](./docs/assets/pic/ribbonbar-geometry-wps3.png)
 
 The `SARibbonBar` provides the `setRibbonStyle` function to define the current layout scheme. The `SARibbonBar::RibbonStyle` enumeration defines four layout schemes:
 
@@ -479,7 +479,7 @@ In a standard pannel, a button (action) has three layouts. Taking Microsoft Offi
 - The second type allows two buttons in one pannel and is called `medium`.
 - The third type places three buttons in one pannel and is called `small`.
 
-![Word Pannel Layout Example](./doc/pic/pannelLayout3row-example.png)
+![Word Pannel Layout Example](./docs/assets/pic/pannelLayout3row-example.png)
 
 The `SARibbonPannelItem::RowProportion` enumeration represents the number of rows occupied by each widget in the pannel and is commonly used in pannel layouts. This enumeration is defined as follows:
 
@@ -503,7 +503,7 @@ Each action managed by `SARibbonPannel` has a private attribute (`SARibbonPannel
 
 The three-row mode is the traditional pannel layout, as shown in the figure below:
 
-![Three-Row Mode Ribbon Layout Example](./doc/pic/pannelLayout3row.png)
+![Three-Row Mode Ribbon Layout Example](./docs/assets/pic/pannelLayout3row.png)
 
 In the three-row mode, there are three types of proportions (`SARibbonPannelItem::RowProportion`): large, medium, and small.
 
@@ -513,7 +513,7 @@ The pannel in the three-row mode displays the pannel title in the `Pannel Title`
 
 The two-row mode is an improved layout method referenced from WPS (it is unclear whether WPS was the first to use this layout, but it was designed based on WPS's layout), as shown in the figure below:
 
-![Two-Row Mode Ribbon Layout Example](./doc/pic/pannelLayout2row.png)
+![Two-Row Mode Ribbon Layout Example](./docs/assets/pic/pannelLayout2row.png)
 
 In the two-row mode, the proportions of medium and small (`SARibbonPannelItem::RowProportion`) are the same and are not distinguished.
 
@@ -525,7 +525,7 @@ Customization is a key feature of Ribbon. Referencing the customization interfac
 
 Below is the customization interface of Office:
 
-![Office Customization Interface](./doc/screenshot/customize/customization-office-ui.png)
+![Office Customization Interface](./docs/assets/screenshot/customize/customization-office-ui.png)
 
 `SARibbon` encapsulates a set of convenient-to-use `SARibbonCustomize**` classes, including the following 5 classes:
 
@@ -541,7 +541,7 @@ In practice, users will only deal with `SARibbonActionsManager` and `SARibbonCus
 
 `SARibbonCustomizeDialog`/`SARibbonCustomizeWidget` are the actual display windows. `SARibbonCustomizeDialog` packages `SARibbonCustomizeWidget` into a dialog box. If you want to integrate it into a configuration dialog box like Office, you can use `SARibbonCustomizeWidget`. The effect of `SARibbonCustomizeDialog` is shown in the figure below:
 
-![SARibbon Customization Interface](./doc/screenshot/customize/customization-saribbon-ui.png)
+![SARibbon Customization Interface](./docs/assets/screenshot/customize/customization-saribbon-ui.png)
 
 #### Adding Customization Features to the Interface
 
@@ -594,10 +594,10 @@ In this way, the software will load according to the configuration file each tim
 
 - This is a screenshot of software built using SARibbon:
 
-![](./doc/screenshot/data-workbench-screenshot1-cn.gif)
-![](./doc/screenshot/data-workbench-screenshot01-en
+![](./docs/assets/screenshot/data-workbench-screenshot1-cn.gif)
+![](./docs/assets/screenshot/data-workbench-screenshot01-en
 .png)
-![](./doc/screenshot/data-workbench-screenshot01-cn.png)
+![](./docs/assets/screenshot/data-workbench-screenshot01-cn.png)
 
 [github - https://github.com/czyt1988/data-workbench](https://github.com/czyt1988/data-workbench)
 

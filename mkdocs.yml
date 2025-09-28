@@ -1,0 +1,101 @@
+site_name: SARibbon
+site_author: 'Chen ZongYan'
+site_description: 'Qt框架下的Ribbon控件'
+
+# 主题
+theme:
+  name: material
+  logo: assets/SA-logo.png
+  language: zh
+  palette:
+    - scheme: default
+      toggle:
+        icon: material/brightness-4
+        name: 切换浅色
+    - scheme: slate
+      toggle:
+        icon: material/brightness-7
+        name: 切换深色
+  features:
+    - navigation.sections # 侧边栏章节可折叠
+    - navigation.top # 右下角“回到顶部”按钮
+    - navigation.path # 顶部面包屑导航条
+    - navigation.expand        # 默认展开全部章节，一眼看到整本书
+    - navigation.indexes       # 允许章节首页可点击
+    - navigation.footer  # 底部导航条
+    - content.code.copy # 代码块右上角出现“复制”按钮
+    - content.code.annotate # 代码块行内注释气泡
+    - search.suggest # 搜索框实时联想补全
+    - search.highlight # 点击结果后正文高亮匹配关键词
+    - search.share # 支持复制带关键词的搜索链接
+    - toc.follow # 滚动时自动跟随当前章节
+
+plugins:
+  - i18n:
+      languages:          # ← 列表，每个元素是 dict
+        - locale: zh
+          name: 中文
+          default: true   # 可省略，default_language 已指定
+        # - locale: en
+        #   name: English
+  - search
+  # 需要版本切换再打开下面
+  # - git-revision-date
+  # - mike:                       
+  #    version_selector: true
+  # 需要导出pdf再打开下面
+  # - with-pdf:
+  #      # 启用整站 PDF 导出
+  #      output_path: pdf/DAWorkBench.pdf
+  #      cover: true
+  #      cover_title: DAWorkBench 用户手册
+  #      cover_subtitle: 基于工作流数据的分析工具
+  #      cover_logo: assets/icon.png 
+  #      verbose: true
+
+# 导航
+nav:
+    - 概述: 
+        - SARibbon简介: zh/index.md
+    - 构建指南:
+        - 构建说明: zh/build-guide/Build-Instructions.md
+        - 第三方库构建: zh/build-guide/build-3rdparty.md
+        - SARibbon库构建: zh/build-guide/build-SARibbon.md
+        - 构建常见错误 : zh/build/common-build-errors.md
+    - 使用指南: 
+        - 使用说明 : zh/use-guide/SARibbon-user-guide.md
+        - 库的导入 : zh/use-guide/command-line-arguments.md
+        - 创建Ribbon风格的窗口 : zh/use-guide/create-ribbon-style-window.md
+        - Ribbon界面的层次结构 : zh/use-guide/ribbon-interface-hierarchy.md
+        - 创建Ribbon界面 : zh/use-guide/create-ribbon-ui.md
+        - 标题栏的设置 : zh/use-guide/titlebar-setting.md
+        - Ribbon的布局方式 : zh/use-guide/layout-of-SARibbon.md
+        - Ribbon尺寸设置 : zh/use-guide/SARibbon-size-settings.md
+        - Ribbon主题 : zh/use-guide/SARibbon-theme.md
+        - Ribbon的用户配置化 : zh/use-guide/persistence-configuration-ribbon.md
+    - 常见问题: 
+        - 常见问题说明: zh/faq.md
+    - API文档: doxygen/index.html   # 
+
+markdown_extensions:
+  # ===== 基础官方扩展 =====
+  - meta                 # 允许在页头写 YAML 元数据（title / description / tags …）
+  - abbr                 # 缩写注解：正文里写 *[HTML]: 超文本标记语言，鼠标悬停显示全称
+  - attr_list            # 给图片、链接、段落等任意元素加 class/id，例如 ![](img.png){.shadow #pic}
+  - def_list             # 定义列表，写术语/释义更方便（HTML 的 <dl><dt><dd>）
+  - footnotes            # 脚注 [^1] 与文末 [^1]: 内容，自动编号、回链
+  - tables               # GitHub 风格管道符表格 | 表头 | 表头 |
+  - md_in_html           # 在原生 HTML 标签（如 <div>）里继续解析 Markdown
+  - toc:                 # 右侧/侧边目录；permalink: true 给每级标题加 ¶ 锚链
+      permalink: true
+  - fenced_code          # 支持 ``` 围栏代码块（高亮、行号等玩法的前提）
+  - nl2br                # 换行直接转 <br>，不用末尾再空两格
+  - admonition          # 开启 !!! 语法
+  - pymdownx.highlight:
+      linenums: true
+      linenums_style: table
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format

@@ -1,5 +1,7 @@
 ﻿bin_*
 build*
+# 针对文档添加否定规则
+!docs/zh/build-guide
 docs
 *.user
 *.autosave
@@ -16,6 +18,10 @@ tmp
 tmp-file
 .$*
 .vs
+
+#文档目录
+site
+site-doxygen
 
 # vscode 的隐藏文件
 .vscode
