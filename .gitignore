@@ -2,7 +2,6 @@
 build*
 # 针对文档添加否定规则
 !docs/zh/build-guide
-docs
 *.user
 *.autosave
 *.dll
