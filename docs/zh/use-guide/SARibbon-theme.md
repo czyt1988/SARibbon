@@ -32,26 +32,26 @@ enum class SARibbonTheme
 
 win7主题：
 
-![SARibbon-theme-win7](./screenshot/SARibbon-theme-win7.png)
+![SARibbon-theme-win7](../../assets/screenshot/SARibbon-theme-win7.png)
 
 office2013主题：
 
-![SARibbon-theme-office2013](./screenshot/SARibbon-theme-office2013.png)
+![SARibbon-theme-office2013](../../assets/screenshot/SARibbon-theme-office2013.png)
 
 office2016主题：
 
-![SARibbon-theme-office2016](./screenshot/SARibbon-theme-office2016.png)
+![SARibbon-theme-office2016](../../assets/screenshot/SARibbon-theme-office2016.png)
 
 office2021主题：
 
-![SARibbon-theme-office2021](./screenshot/SARibbon-theme-office2021.png)
+![SARibbon-theme-office2021](../../assets/screenshot/SARibbon-theme-office2021.png)
 
 dark主题：
 
-![SARibbon-theme-dark](./screenshot/SARibbon-theme-dark.png)
+![SARibbon-theme-dark](../../assets/screenshot/SARibbon-theme-dark.png)
 
 dark2主题：
 
-![SARibbon-theme-dark](./screenshot/SARibbon-theme-dark2.png)
+![SARibbon-theme-dark](../../assets/screenshot/SARibbon-theme-dark2.png)
 
 SARibbon的主题是通过qss实现的，如果你的窗口已经存在qss样式，你需要把你现有的qss样式和ribbon的qss样式进行合并，否则，最后设置的样式将会覆盖之前设置的样式

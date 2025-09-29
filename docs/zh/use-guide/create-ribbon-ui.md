@@ -341,7 +341,7 @@ void MainWindow::onShowContextCategory(bool on)
 
 上面的代码效果如下：
 
-![SARibbonBar-Context-Category](./screenshot/SARibbonBar-Context-Category.png)
+![SARibbonBar-Context-Category](../../assets/screenshot/SARibbonBar-Context-Category.png)
 
 为了区分上下文标签页和普通的标签页，上下文标签页会有特殊的颜色进行标识，如上图所示。这个标识的颜色可以通过`SARibbonBar::setContextCategoryColor`设置
 
@@ -456,7 +456,7 @@ void MainWindow::createRibbonApplicationButton()
 
 上面的代码效果如下：
 
-![application-widget](./screenshot/application-widget.gif)
+![application-widget](../../assets/screenshot/application-widget.gif)
 
 ## Quick Access Bar（快速访问工具栏）
 

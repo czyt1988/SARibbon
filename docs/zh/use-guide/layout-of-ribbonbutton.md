@@ -1,10 +1,10 @@
-# SARibbon栏按钮绘制说明
+# Ribbon栏按钮布局说明
 
 Ribbon界面无法用普通的tab+toolbutton组合来实现主要就是因为ribbon界面对工具按钮有特殊的渲染方式，和经典菜单按钮是有很大不同的，在没有菜单的情况下没有什么区别，但有菜单的情况下，会有明显不同
 
 差别主要通过下面这个动图可以体现，尤其是在`MenuPopup`模式下，按钮会被拆分为两部分，普通的工具栏是左右拆分，而`ribbon`的工具按钮是上下拆分
 
-![ribbon工具按钮](./pic/ribbon-toolbutton.gif)
+![ribbon工具按钮](../../assets/pic/ribbon-toolbutton.gif)
 
 `SARibbon`的工具栏按钮为`SARibbonToolButton`，它继承`QToolButton`，重写了其绘图方法
 
@@ -16,17 +16,17 @@ Ribbon界面无法用普通的tab+toolbutton组合来实现主要就是因为rib
 
 换行模式下，文本区域会占据两行行高，office的word就是这种布局方案
 
-![](./pic/office-word-wrodwrap.png)
+![](../../assets/pic/office-word-wrodwrap.png)
 
 可以看到，第一个pannel文本没有换行，会有一行的留白，第二个pannel文本都换行，充满了文本区域,且能看到菜单的箭头在第二行最右边
 
 对于没有换行的文本，但有菜单的情况下，indicator在第二行文本处
 
-![](./pic/office-word-wrodwrap2.png)
+![](../../assets/pic/office-word-wrodwrap2.png)
 
 下图为`SARibbonToolButton`文本换行的布局方案
 
-![](./pic/ribbon-toolbutton-largebutton.png)
+![](../../assets/pic/ribbon-toolbutton-largebutton.png)
 
 indicator是有菜单时的下箭头提示，在文本确切要换行时，下箭头在第二行文本的最右边，若在换行模式，但文本没有换行，第二行的位置就用来显示indicator
 
@@ -49,19 +49,19 @@ ribbonBar()->setEnableWordWrap(b);
 
 对于不换行的方案，最经典的就是wps的布局方案，wps-word所有文字都是一行，不存在换行的情况，indicator布置在最右边
 
-![](./pic/wps-word-nowrodwrap.png)
+![](../../assets/pic/wps-word-nowrodwrap.png)
 
 wps的方案尤其适合显示中文文本，但英文会有可能放不下，或者英文太长，单行很难显示全，因此如果要显示英文，建议使用换行方案，要显示中文，建议使用不换行方案
 
 `SARibbonToolButton`不换行的布局方案如下
 
-![](./pic/ribbon-toolbutton-largebutton-nowordwrap.png)
+![](../../assets/pic/ribbon-toolbutton-largebutton-nowordwrap.png)
 
 ## 如何布置一个更美观的Ribbon界面
 
 如果文字都比较短，又没有菜单情况下，使用换行模式显示会有一行文本的留白，如果很多的话会不太美观
 
-![](./pic/office-excel-oneline-spacing.png)
+![](../../assets/pic/office-excel-oneline-spacing.png)
 
 此时又如下几种方案：
 

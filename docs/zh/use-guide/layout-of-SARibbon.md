@@ -39,20 +39,20 @@ SARibbon提供了`SARibbonBar::setRibbonStyle`函数，可以定义当前的布�
 
 - `SARibbonBar::RibbonStyleLooseThreeRow`宽松结构，3行模式(v0.x版本为`SARibbonBar::OfficeStyle`)
 
-![SARibbonBar::RibbonStyleLooseThreeRow](./screenshot/office-3-style.png)
+![SARibbonBar::RibbonStyleLooseThreeRow](../../assets/screenshot/office-3-style.png)
 
 - `SARibbonBar::RibbonStyleLooseTwoRow`宽松结构，2行模式(v0.x版本为`SARibbonBar::OfficeStyleTwoRow`)(文字换行效果)
 
-![SARibbonBar::RibbonStyleLooseTwoRow](./screenshot/office-2-style.png)
+![SARibbonBar::RibbonStyleLooseTwoRow](../../assets/screenshot/office-2-style.png)
 
 - `SARibbonBar::RibbonStyleCompactThreeRow`紧凑结构，3行模式(v0.x版本为`SARibbonBar::WpsLiteStyle`)
 
-![SARibbonBar::RibbonStyleCompactThreeRow](./screenshot/wps-3-style.png)
+![SARibbonBar::RibbonStyleCompactThreeRow](../../assets/screenshot/wps-3-style.png)
 
 - `SARibbonBar::RibbonStyleCompactTwoRow`紧凑结构，2行模式(v0.x版本为`SARibbonBar::WpsLiteStyleTwoRow`)(文字换行效果)
 
-![SARibbonBar::RibbonStyleCompactTwoRow](./screenshot/wps-2-style.png)
+![SARibbonBar::RibbonStyleCompactTwoRow](../../assets/screenshot/wps-2-style.png)
 
 上面可以看到，在2行模式下，文字换行会导致图标非常小，因此，建议2行模式下，不要使用文字换行，可以通过`SARibbonBar::setEnableWordWrap`函数设置是否文字换行
 
-关于SARibbon的按钮布局，你可以参阅：[SARibbon按钮布局说明](./SARibbon-Button-Layout-Guide(cn).md)
+关于SARibbon的按钮布局，你可以参阅：[Ribbon按钮布局说明](./layout-of-ribbonbutton.md)

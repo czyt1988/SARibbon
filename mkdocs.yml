@@ -58,18 +58,19 @@ nav:
     - 概述: 
         - SARibbon简介: zh/index.md
     - 构建指南:
-        - 构建说明: zh/build-guide/Build-Instructions.md
+        - 构建说明: zh/build-guide/build-instructions.md
         - 第三方库构建: zh/build-guide/build-3rdparty.md
         - SARibbon库构建: zh/build-guide/build-SARibbon.md
-        - 构建常见错误 : zh/build/common-build-errors.md
+        - 构建常见错误 : zh/build-guide/common-build-errors.md
     - 使用指南: 
         - 使用说明 : zh/use-guide/SARibbon-user-guide.md
-        - 库的导入 : zh/use-guide/command-line-arguments.md
+        - 库的导入 : zh/use-guide/import-SARibbon.md
         - 创建Ribbon风格的窗口 : zh/use-guide/create-ribbon-style-window.md
         - Ribbon界面的层次结构 : zh/use-guide/ribbon-interface-hierarchy.md
         - 创建Ribbon界面 : zh/use-guide/create-ribbon-ui.md
         - 标题栏的设置 : zh/use-guide/titlebar-setting.md
         - Ribbon的布局方式 : zh/use-guide/layout-of-SARibbon.md
+        - Ribbon按钮布局说明 : zh/use-guide/layout-of-ribbonbutton.md
         - Ribbon尺寸设置 : zh/use-guide/SARibbon-size-settings.md
         - Ribbon主题 : zh/use-guide/SARibbon-theme.md
         - Ribbon的用户配置化 : zh/use-guide/persistence-configuration-ribbon.md
@@ -99,3 +100,7 @@ markdown_extensions:
         - name: mermaid
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
+          
+# 添加额外的 CSS 文件
+extra_css:
+  - stylesheets/extra.css
