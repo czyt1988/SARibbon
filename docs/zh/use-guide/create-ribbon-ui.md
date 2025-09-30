@@ -8,11 +8,15 @@
 
 ```cpp
 SARibbonBar* ribbon = ribbonBar();
-// 直接添加一个名为“主页”的分类页
-SARibbonCategory* homeCategory = ribbon->addCategoryPage("主页");
+// 直接添加一个名为“Main”的分类页
+SARibbonCategory* homeCategory = ribbon->addCategoryPage("Main");
 // 如果你需要进行ribbon界面自定义配置工具（SARibbonCustomizeDialog），你必须设置 objectName用于区分
-homeCategory->setObjectName("homeCategory");
+homeCategory->setObjectName("MainCategory");
 ```
+
+上面的代码将会添加一个名字为Main的标签页
+
+![add-category](../../assets/pic/add-category.png)
 
 **方式二：先创建后添加**
 

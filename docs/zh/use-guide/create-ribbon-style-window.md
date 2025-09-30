@@ -39,15 +39,15 @@ SARibbonMainWindow(QWidget* parent, SARibbonMainWindowStyles style, const Qt::Wi
 
 1. `SARibbonMainWindowStyleFlag::UseRibbonMenuBar|SARibbonMainWindowStyleFlag::UseRibbonFrame`
 
-此风格为默认风格，使用ribbon风格菜单栏和ribbon风格边框，这时候窗口是一个自定义边框，不使用原生边框，界面效果如下：
+    此风格为默认风格，使用ribbon风格菜单栏和ribbon风格边框，这时候窗口是一个自定义边框，不使用原生边框，界面效果如下：
 
-![mainwindow-ribbonbar+ribbonframe](../../assets/pic/mainwindow-ribbonbar+ribbonframe.png)
+    ![mainwindow-ribbonbar+ribbonframe](../../assets/pic/mainwindow-ribbonbar+ribbonframe.png)
 
 2. `SARibbonMainWindowStyleFlag::UseRibbonMenuBar|SARibbonMainWindowStyleFlag::UseNativeFrame`
 
-此风格为使用ribbon风格菜单栏和原生边框，这个界面的好处是支持操作系统的边框特效，例如win11的全局窗口快捷键，以及一些边框特效
+    此风格为使用ribbon风格菜单栏和原生边框，这个界面的好处是支持操作系统的边框特效，例如win11的全局窗口快捷键，以及一些边框特效
 
-![mainwindow-ribbonbar+nativeframe](../../assets/pic/mainwindow-ribbonbar+nativeframe.png)
+    ![mainwindow-ribbonbar+nativeframe](../../assets/pic/mainwindow-ribbonbar+nativeframe.png)
 
 在使用原生边框的时候，为了更适配原生边框，`SARibbonMainWindow`会把图标隐藏，同时把ribbonbar的样式设置为紧凑模式：
 
