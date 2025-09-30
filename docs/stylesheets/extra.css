@@ -1,0 +1,6 @@
+/* 导航栏一级标题样式 */
+.md-nav__item--section > .md-nav__link {
+    color: #497cad !important; /* 蓝色 */
+    font-weight: bold;
+    font-size: 1.1em;
+}

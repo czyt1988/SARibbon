@@ -12,7 +12,6 @@ SARibbon采用[QWindowkit](https://github.com/stdware/qwindowkit)作为无边框
 
 !!! warning "注意"
    作为SARibbon项目的子模块，如果你在`git clone`时没有使用`--recursive`参数，需执行`submodule update`命令：
-
    ```shell
    git submodule update --init --recursive
    ```

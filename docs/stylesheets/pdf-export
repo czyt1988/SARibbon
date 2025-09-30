@@ -1,0 +1,38 @@
+/* pdf-print.css - 专用于 PDF 导出的简化样式 */
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;700&display=swap");
+
+:root {
+  --md-primary-fg-color: #1e88e5;
+  --md-typeset-color: #000;
+}
+
+body {
+  font-family: "Noto Sans SC", "Microsoft YaHei", sans-serif;
+  line-height: 1.6;
+}
+
+/* 移除所有动画、阴影、mask 等 PDF 不支持的特性 */
+.md-typeset .admonition,
+.md-typeset details {
+  border-left-width: 4px;
+  border-left-style: solid;
+  box-shadow: none !important;
+}
+
+/* 用简单图标或文字替代 mask 图标 */
+.md-typeset .admonition::before {
+  content: "ⓘ ";
+  font-weight: bold;
+  margin-right: 0.5em;
+}
+
+/* 避免分页断裂 */
+h1, h2, h3, h4, pre {
+  break-inside: avoid;
+  break-after: avoid;
+}
+
+/* 代码块换行 */
+pre code {
+  white-space: pre-wrap;
+}
