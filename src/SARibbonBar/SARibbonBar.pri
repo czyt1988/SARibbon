@@ -37,6 +37,7 @@ message("SA_RIBBON_CONFIG="$${SA_RIBBON_CONFIG})
 #-------------------------------------------------
 
 SOURCES += \
+    $$PWD/SARibbonUtil.cpp \
     $$PWD/SAFramelessHelper.cpp \
     $$PWD/SARibbonActionsManager.cpp \
     $$PWD/SARibbonBarLayout.cpp \
@@ -52,31 +53,29 @@ SOURCES += \
     $$PWD/SARibbonTabBar.cpp \
     $$PWD/SARibbonCategory.cpp \
     $$PWD/SARibbonContextCategory.cpp \
-    $$PWD/SARibbonPannel.cpp \
+    $$PWD/SARibbonPanel.cpp \
     $$PWD/SARibbonToolButton.cpp \
     $$PWD/SARibbonMenu.cpp \
-    $$PWD/SARibbonPannelOptionButton.cpp \
+    $$PWD/SARibbonPanelOptionButton.cpp \
     $$PWD/SARibbonSeparatorWidget.cpp \
     $$PWD/SARibbonCategoryLayout.cpp \
     $$PWD/SARibbonGallery.cpp \
-    $$PWD/SARibbonControlButton.cpp \
     $$PWD/SARibbonGalleryGroup.cpp \
     $$PWD/SARibbonGalleryItem.cpp \
-    $$PWD/SARibbonComboBox.cpp \
     $$PWD/SARibbonElementManager.cpp \
-    $$PWD/SARibbonLineEdit.cpp \
-    $$PWD/SARibbonCheckBox.cpp \
     $$PWD/SARibbonButtonGroupWidget.cpp \
     $$PWD/SARibbonStackedWidget.cpp \
     $$PWD/SARibbonQuickAccessBar.cpp \
     $$PWD/SARibbonCtrlContainer.cpp \
-    $$PWD/SARibbonPannelLayout.cpp \
-    $$PWD/SARibbonPannelItem.cpp \
+    $$PWD/SARibbonPanelLayout.cpp \
+    $$PWD/SARibbonPanelItem.cpp \
     $$PWD/SARibbonLineWidgetContainer.cpp \
     $$PWD/SARibbonWidget.cpp \
+    $$PWD/SARibbonTitleIconWidget.cpp \
     $$PWD/SARibbonApplicationWidget.cpp
 
 HEADERS  += \
+    $$PWD/SARibbonUtil.h \
     $$PWD/SAFramelessHelper.h \
     $$PWD/SARibbonActionsManager.h \
     $$PWD/SARibbonBarLayout.h \
@@ -92,29 +91,26 @@ HEADERS  += \
     $$PWD/SARibbonTabBar.h \
     $$PWD/SARibbonCategory.h \
     $$PWD/SARibbonContextCategory.h \
-    $$PWD/SARibbonPannel.h \
+    $$PWD/SARibbonPanel.h \
     $$PWD/SARibbonToolButton.h \
     $$PWD/SARibbonMenu.h \
     $$PWD/SARibbonGlobal.h \
-    $$PWD/SARibbonPannelOptionButton.h \
+    $$PWD/SARibbonPanelOptionButton.h \
     $$PWD/SARibbonSeparatorWidget.h \
     $$PWD/SARibbonCategoryLayout.h \
     $$PWD/SARibbonGallery.h \
-    $$PWD/SARibbonControlButton.h \
     $$PWD/SARibbonGalleryGroup.h \
     $$PWD/SARibbonGalleryItem.h \
-    $$PWD/SARibbonComboBox.h \
     $$PWD/SARibbonElementManager.h \
-    $$PWD/SARibbonLineEdit.h \
-    $$PWD/SARibbonCheckBox.h \
     $$PWD/SARibbonButtonGroupWidget.h \
     $$PWD/SARibbonStackedWidget.h \
     $$PWD/SARibbonQuickAccessBar.h \
     $$PWD/SARibbonCtrlContainer.h \
-    $$PWD/SARibbonPannelLayout.h \
-    $$PWD/SARibbonPannelItem.h \
+    $$PWD/SARibbonPanelLayout.h \
+    $$PWD/SARibbonPanelItem.h \
     $$PWD/SARibbonLineWidgetContainer.h \
     $$PWD/SARibbonWidget.h \
+    $$PWD/SARibbonTitleIconWidget.h \
     $$PWD/SARibbonApplicationWidget.h
 
 RESOURCES += \
