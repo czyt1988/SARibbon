@@ -16,17 +16,18 @@ enum class SARibbonTheme
 
 通过`SARibbonMainWindow::setRibbonTheme`/`SARibbonWidget::setRibbonTheme`函数，可以设置Ribbon的主题，此函数的参数为`SARibbonTheme`对象
 
-> **注：**
->
-> 某些Qt版本，在构造函数设置主题会不完全生效，可以使用QTimer投放到队列最后执行：
->
-> ```cpp
-> MainWindow::MainWindow(QWidget* par) : SARibbonMainWindow(par)
-> {
->   ...
->   QTimer::singleShot(0, this, [ this ]() { this->setRibbonTheme(SARibbonMainWindow::RibbonThemeDark); });
-> }
-> ```
+!!! warning "注意"
+    某些Qt版本，在构造函数设置主题会不完全生效，可以使用QTimer投放到队列最后执行：
+    ```cpp
+    MainWindow::MainWindow(QWidget* par) : SARibbonMainWindow(par)
+    {
+        ...
+        QTimer::singleShot(0, this, [ this ]() { 
+            this->setRibbonTheme(SARibbonMainWindow::RibbonThemeDark); 
+        });
+    }
+    ```
+
 
 各个主题效果如下图所示：
 

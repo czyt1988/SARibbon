@@ -16,17 +16,17 @@ Ribbon界面无法用普通的tab+toolbutton组合来实现主要就是因为rib
 
 换行模式下，文本区域会占据两行行高，office的word就是这种布局方案
 
-![](../../assets/pic/office-word-wrodwrap.png)
+![office-word-wrodwrap](../../assets/pic/office-word-wrodwrap.png)
 
 可以看到，第一个pannel文本没有换行，会有一行的留白，第二个pannel文本都换行，充满了文本区域,且能看到菜单的箭头在第二行最右边
 
 对于没有换行的文本，但有菜单的情况下，indicator在第二行文本处
 
-![](../../assets/pic/office-word-wrodwrap2.png)
+![office-word-wrodwrap2](../../assets/pic/office-word-wrodwrap2.png)
 
 下图为`SARibbonToolButton`文本换行的布局方案
 
-![](../../assets/pic/ribbon-toolbutton-largebutton.png)
+![ribbon-toolbutton-largebutton](../../assets/pic/ribbon-toolbutton-largebutton.png)
 
 indicator是有菜单时的下箭头提示，在文本确切要换行时，下箭头在第二行文本的最右边，若在换行模式，但文本没有换行，第二行的位置就用来显示indicator
 
@@ -40,28 +40,29 @@ ribbonBar()->setEnableWordWrap(b);
 如果文本太长，`SARibbonToolButton`会尝试换行，由于英文的文本每个单词不是定长，因此会在原有文本单行显示的长度基础上先尝试1/2的长度能否换行完全显示，如果显示不了，就把长度递增为1/2+1/3，并继续尝试，如果3次都无法容纳下，就显示为原来的长度
 
 
+!!! warning "注意"
+    换行模式下，用户可以手动给文本换行，就是加入`\n`换行，加入`\n`的文本，`SARibbonToolButton`就不用进行换行估算
 
-> 注意，换行模式下，用户可以手动给文本换行，就是加入`\n`换行，加入`\n`的文本，`SARibbonToolButton`就不用进行换行估算
-
-> `SARibbonToolButton`会自动处理文字的换行，如果当前为单行显示模式，而文本里面有换行符`\n`，则`SARibbonToolButton`会忽略掉`\n`
+!!! info "说明"
+    `SARibbonToolButton`会自动处理文字的换行，如果当前为单行显示模式，而文本里面有换行符`\n`，则`SARibbonToolButton`会忽略掉`\n`
 
 ## 文字不换行显示的布局方案
 
 对于不换行的方案，最经典的就是wps的布局方案，wps-word所有文字都是一行，不存在换行的情况，indicator布置在最右边
 
-![](../../assets/pic/wps-word-nowrodwrap.png)
+![wps-word-nowrodwrap](../../assets/pic/wps-word-nowrodwrap.png)
 
 wps的方案尤其适合显示中文文本，但英文会有可能放不下，或者英文太长，单行很难显示全，因此如果要显示英文，建议使用换行方案，要显示中文，建议使用不换行方案
 
 `SARibbonToolButton`不换行的布局方案如下
 
-![](../../assets/pic/ribbon-toolbutton-largebutton-nowordwrap.png)
+![ribbon-toolbutton-largebutton-nowordwrap](../../assets/pic/ribbon-toolbutton-largebutton-nowordwrap.png)
 
 ## 如何布置一个更美观的Ribbon界面
 
 如果文字都比较短，又没有菜单情况下，使用换行模式显示会有一行文本的留白，如果很多的话会不太美观
 
-![](../../assets/pic/office-excel-oneline-spacing.png)
+![office-excel-oneline-spacing](../../assets/pic/office-excel-oneline-spacing.png)
 
 此时又如下几种方案：
 

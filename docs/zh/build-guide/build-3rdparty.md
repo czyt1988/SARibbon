@@ -1,9 +1,11 @@
 # 第三方库编译
 
 !!! warning "注意"
-   如果不开启QWindowkit,可以跳过此文档
+    如果不开启QWindowkit,可以跳过此文档。
 
-   QWindowkit提供了更好的无边框方案，能适配操作系统原生的交互，能支持多屏幕多分辨率的移动
+!!! tips "提示"
+    QWindowkit提供了更好的无边框方案，能适配操作系统原生的交互，能支持多屏幕多分辨率的移动。
+
 
 ## QWindowkit库编译
 
@@ -51,7 +53,8 @@
 
 ![build-cmake-vs](../../assets/pic/build-cmake-vs-04.png)
 
-> 注意：不同版本的Visual Studio操作可能略有不同，没有CMake菜单的，可以在`CMakeLists.txt`上点击右键。
+!!! tips "说明"
+    不同版本的Visual Studio操作可能略有不同，没有CMake菜单的，可以在`CMakeLists.txt`上点击右键。
 
 ![build-cmake-vs](../../assets/pic/build-cmake-vs-04-other.png)
 

@@ -86,11 +86,11 @@ lib/cmake/SARibbonBar[文件夹]
 SARibbonBar_amalgamate
 ```
 
-### 5、图标没有显示
+## 5、图标没有显示
 
 如果你遇到图标不显示，例如最大最小化按钮没有图标但有按钮，那么说明你的运行环境没有找到Qt的svg插件，你的程序目录下应该要有`imageformats/qsvg.dll`插件，你可以运行windeployqt拉取你程序的依赖，或者确保你的环境变量PATH配置中能找到`plugins/imageformats`文件夹
 
-### 6、提示Could not create pixmap from :\SARibbon\image\resource\xxx.svg
+## 6、提示Could not create pixmap from :\SARibbon\image\resource\xxx.svg
 
 此问题同问题5，你的程序目录下应该要有`imageformats/qsvg.dll`插件
 

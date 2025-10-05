@@ -1,7 +1,13 @@
 site_name: SARibbon
 site_author: 'Chen ZongYan'
-site_description: 'Qt框架下的Ribbon控件'
+site_description: 'Qt Framework Ribbon Control'
 
+# 多语言站点信息
+extra:
+  site_name:
+    zh: SARibbon
+    en: SARibbon
+    
 # 主题
 theme:
   name: material
@@ -30,15 +36,72 @@ theme:
     - search.share # 支持复制带关键词的搜索链接
     - toc.follow # 滚动时自动跟随当前章节
 
+# 插件配置
 plugins:
+  - search
   - i18n:
-      languages:          # ← 列表，每个元素是 dict
+      languages:
         - locale: zh
           name: 中文
-          default: true   # 可省略，default_language 已指定
-        # - locale: en
-        #   name: English
-  - search
+          default: true
+          build: true
+          # 中文导航配置
+          nav:
+            - 概述: 
+                - SARibbon简介: zh/index.md
+            - 构建指南:
+                - 构建说明: zh/build-guide/build-instructions.md
+                - 第三方库构建: zh/build-guide/build-3rdparty.md
+                - SARibbon库构建: zh/build-guide/build-SARibbon.md
+                - 构建常见错误: zh/build-guide/common-build-errors.md
+            - 使用指南: 
+                - 使用说明: zh/use-guide/SARibbon-user-guide.md
+                - 库的导入: zh/use-guide/import-SARibbon.md
+                - 创建Ribbon风格的窗口: zh/use-guide/create-ribbon-style-window.md
+                - Ribbon界面的层次结构: zh/use-guide/ribbon-interface-hierarchy.md
+                - 创建Ribbon界面: zh/use-guide/create-ribbon-ui.md
+                - 标题栏的设置: zh/use-guide/titlebar-setting.md
+                - Ribbon的布局方式: zh/use-guide/layout-of-SARibbon.md
+                - Ribbon按钮布局说明: zh/use-guide/layout-of-ribbonbutton.md
+                - Ribbon尺寸设置: zh/use-guide/SARibbon-size-settings.md
+                - Ribbon主题: zh/use-guide/SARibbon-theme.md
+                - Ribbon的用户配置化: zh/use-guide/persistence-configuration-ribbon.md
+            - 常见问题: 
+                - 常见问题说明: zh/faq.md
+            - API文档: 
+                - API文档首页: doxygen/index.html
+                - 类列表: doxygen/annotated.html
+                - 类索引: doxygen/classes.html
+        - locale: en
+          name: English
+          build: true
+          # 英文导航配置 - 注意路径前加 en/
+          nav:
+            - Overview: 
+                - SARibbon Introduction: en/index.md
+            - Build Guide:
+                - Build Instructions: en/build-guide/build-instructions.md
+                - Build Third-Party Libraries: en/build-guide/build-3rdparty.md
+                - Build SARibbon Library: en/build-guide/build-SARibbon.md
+                - Common Build Errors: en/build-guide/common-build-errors.md
+            - User Guide: 
+                - Usage Instructions: en/use-guide/SARibbon-user-guide.md
+                - Importing the Library: en/use-guide/import-SARibbon.md
+                - Create a Ribbon-Style Window: en/use-guide/create-ribbon-style-window.md
+                - Ribbon Interface Hierarchy: en/use-guide/ribbon-interface-hierarchy.md
+                - Creating the Ribbon UI: en/use-guide/create-ribbon-ui.md
+                - Title Bar Settings: en/use-guide/titlebar-setting.md
+                - Ribbon Layout Options: en/use-guide/layout-of-SARibbon.md
+                - Ribbon Button Layout Guide: en/use-guide/layout-of-ribbonbutton.md
+                - Ribbon Size Settings: en/use-guide/SARibbon-size-settings.md
+                - Ribbon Themes: en/use-guide/SARibbon-theme.md
+                - User-Configurable Ribbon: en/use-guide/persistence-configuration-ribbon.md
+            - FAQ: 
+                - FAQ Overview: en/faq.md
+            - API Documentation: 
+                - API Documentation Home: doxygen/index.html
+                - Class List: doxygen/annotated.html
+                - Class Index: doxygen/classes.html
   # 需要版本切换再打开下面
   # - git-revision-date
   # - mike:                       
@@ -52,31 +115,6 @@ plugins:
   #      cover_subtitle: 基于工作流数据的分析工具
   #      cover_logo: assets/icon.png 
   #      verbose: true
-
-# 导航
-nav:
-    - 概述: 
-        - SARibbon简介: zh/index.md
-    - 构建指南:
-        - 构建说明: zh/build-guide/build-instructions.md
-        - 第三方库构建: zh/build-guide/build-3rdparty.md
-        - SARibbon库构建: zh/build-guide/build-SARibbon.md
-        - 构建常见错误 : zh/build-guide/common-build-errors.md
-    - 使用指南: 
-        - 使用说明 : zh/use-guide/SARibbon-user-guide.md
-        - 库的导入 : zh/use-guide/import-SARibbon.md
-        - 创建Ribbon风格的窗口 : zh/use-guide/create-ribbon-style-window.md
-        - Ribbon界面的层次结构 : zh/use-guide/ribbon-interface-hierarchy.md
-        - 创建Ribbon界面 : zh/use-guide/create-ribbon-ui.md
-        - 标题栏的设置 : zh/use-guide/titlebar-setting.md
-        - Ribbon的布局方式 : zh/use-guide/layout-of-SARibbon.md
-        - Ribbon按钮布局说明 : zh/use-guide/layout-of-ribbonbutton.md
-        - Ribbon尺寸设置 : zh/use-guide/SARibbon-size-settings.md
-        - Ribbon主题 : zh/use-guide/SARibbon-theme.md
-        - Ribbon的用户配置化 : zh/use-guide/persistence-configuration-ribbon.md
-    - 常见问题: 
-        - 常见问题说明: zh/faq.md
-    - API文档: doxygen/index.html   # 
 
 markdown_extensions:
   # ===== 基础官方扩展 =====

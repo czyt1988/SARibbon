@@ -29,6 +29,7 @@ jobs:
       - name: Build Doxygen API docs
         run: |
           cd docs
+          cd doxygen
           doxygen Doxyfile-wiki-cn
 
       - name: Setup Python
