@@ -13,7 +13,8 @@ class QWidget;
  * SAFramelessHelper 提供了一系列方法来激活、移除无边框窗体，设置窗体的移动、缩放属性，
  * 以及橡皮筋效果等。通过事件过滤机制，它能够处理鼠标事件，从而实现窗体的移动和缩放操作。
  *
- * @example
+ * 示例：
+ *
  * @code
  * SAFramelessHelper* helper = new SAFramelessHelper(this);
  * helper->activateOn(myWidget);

@@ -26,6 +26,7 @@ jobs:
       - name: Install Doxygen
         run: sudo apt-get update && sudo apt-get install -y doxygen graphviz
 
+      # Doxygen会在docs目录下生成doxygen文件夹，里面为api文档
       - name: Build Doxygen API docs
         run: |
           cd docs
@@ -47,11 +48,6 @@ jobs:
 
       - name: Build site
         run: mkdocs build --clean
-
-      # 把 API 文档搬进 site ------------
-      - name: Move Doxygen output into site
-        run: |
-          mv site-doxygen/doxygen site
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
