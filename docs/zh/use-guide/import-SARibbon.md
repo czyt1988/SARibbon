@@ -127,7 +127,7 @@ include($$PWD/3rdparty/SARibbon/importSARibbonBarLib.pri)
 
 如果你编译时使用静态编译，(cmake中把`SARIBBON_BUILD_STATIC_LIBS`设置为ON)，引入方法和动态库一样，但在程序的`main`函数中应该手动进行资源初始化，否则会找不到资源
 
-```c++ hl_lines="4 6"
+```c++ hl_lines="4-6"
 int main(int argc, char* argv[])
 {
     QApplication a(argc, argv);
