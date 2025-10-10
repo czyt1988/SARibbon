@@ -24,7 +24,7 @@ FORMS += \
     ApplicationWidget.ui \
 
 RESOURCES += \
-    saribbonresouce.qrc \
+    resouce.qrc \
 
 # 下面演示了如何把SARibbon引入
 # 只需要下面2句话，只要把common.pri引入工程，就可以实现SARibbon的引入

@@ -1,8 +1,9 @@
-#ifndef SARIBBONUTIL_H
+﻿#ifndef SARIBBONUTIL_H
 #define SARIBBONUTIL_H
 #include "SARibbonGlobal.h"
 #include <QColor>
 #include <QSize>
+#include <QIcon>
 namespace SA
 {
 
@@ -24,5 +25,14 @@ QString SA_RIBBON_EXPORT getBuiltInRibbonThemeQss(SARibbonTheme theme);
 // 给窗口设置内置的ribbon主题
 void SA_RIBBON_EXPORT setBuiltInRibbonTheme(QWidget* w, SARibbonTheme theme);
 
+// 提供类似QIcon::pixmap(const QSize &size, qreal devicePixelRatio, Mode mode, State state) const（Qt6新增）的兼容函数
+QPixmap iconToPixmap(const QIcon& icon,
+                     const QSize& size,
+                     qreal devicePixelRatio,
+                     QIcon::Mode mode   = QIcon::Normal,
+                     QIcon::State state = QIcon::Off);
+
+// 获取窗口当前所在屏幕的dpr
+qreal widgetDevicePixelRatio(QWidget* w);
 }
 #endif  // SARIBBONUTIL_H

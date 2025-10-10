@@ -1,8 +1,10 @@
-#include "SARibbonUtil.h"
+﻿#include "SARibbonUtil.h"
 #include <QFile>
 #include <QWidget>
 #include <QDebug>
 #include <QDir>
+#include <QApplication>
+#include <QScreen>
 namespace SA
 {
 
@@ -177,6 +179,66 @@ void setBuiltInRibbonTheme(QWidget* w, SARibbonTheme theme)
         return;
     }
     w->setStyleSheet(getBuiltInRibbonThemeQss(theme));
+}
+
+/**
+ * @brief 为 QIcon 生成指定 devicePixelRatio 的高分辨率 pixmap
+ *
+ * 之所以提供此函数，是因为 Qt 5 的 QIcon::pixmap() 没有 devicePixelRatio 参数，
+ * 在高 DPI 多屏环境下，返回的 pixmap 其 devicePixelRatio() 恒为 1，
+ * 导致 Qt 在绘制时再次拉伸，图标发糊。
+ * 此函数先按物理像素尺寸索取图像，再手动打上正确的 DPR，
+ * 使 Qt 5 项目无需升级到 Qt 6 也能获得“图标随屏清晰”的效果。
+ *
+ * @param icon   图标源
+ * @param size   期望的逻辑像素大小（控件坐标系）
+ * @param devicePixelRatio    目标屏幕的实时 devicePixelRatio（可用 QWindow::devicePixelRatio() 获取）
+ * @param mode   图标模式（Normal/Disabled/Active/Selected）
+ * @param state  图标状态（On/Off）
+ * @return 已设置好 devicePixelRatio 的 QPixmap，可直接 drawPixmap 使用
+ */
+QPixmap iconToPixmap(const QIcon& icon, const QSize& size, qreal devicePixelRatio, QIcon::Mode mode, QIcon::State state)
+{
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    return icon.pixmap(size, devicePixelRatio, mode, state);
+#else
+    if (qFuzzyIsNull(devicePixelRatio) || size.isEmpty()) {
+        return QPixmap();
+    }
+
+    // 1. 换算成物理像素
+    const QSize physical = size * devicePixelRatio;
+
+    // 2. 让 QIcon 给出这么大的一张图
+    QPixmap pm = icon.pixmap(physical, mode, state);
+
+    // 3. 打上 DPR 戳，告诉 Qt “这张图已经高分辨率”
+    if (!pm.isNull())
+        pm.setDevicePixelRatio(devicePixelRatio);
+
+    return pm;
+#endif
+}
+
+/**
+ * @brief 获取窗口当前所在屏幕的dpr
+ * @param w
+ * @return
+ */
+qreal widgetDevicePixelRatio(QWidget* w)
+{
+    if (!w) {
+        return 1.0;
+    }
+    QScreen* sc = w->window()->screen();
+    if (!sc) {
+        // qApp->primaryScreen() 拿到的是“整个系统里被用户标记成 primary 的那一块屏,是“全局主屏”
+        sc = QApplication::primaryScreen();
+    }
+    if (!sc) {
+        return 1.0;
+    }
+    return sc->devicePixelRatio();
 }
 
 }

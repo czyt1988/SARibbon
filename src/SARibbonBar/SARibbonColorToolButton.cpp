@@ -2,7 +2,10 @@
 #include <QStylePainter>
 #include <QStyleOptionToolButton>
 #include <QDebug>
+#include <QApplication>
+#include <QScreen>
 #include "colorWidgets/SAColorMenu.h"
+#include "SARibbonUtil.h"
 //===================================================
 // SARibbonColorToolButton::PrivateData
 //===================================================
@@ -42,7 +45,8 @@ QPixmap SARibbonColorToolButton::PrivateData::createIconPixmap(const QStyleOptio
         mode = QIcon::Normal;
     }
     QSize realIconSize = iconsize - QSize(0, c_ribbonbutton_color_height + 1);
-    QPixmap pixmap     = opt.icon.pixmap(q_ptr->window()->windowHandle(), realIconSize, mode, state);
+    QPixmap pixmap     = SA::iconToPixmap(opt.icon, realIconSize, SA::widgetDevicePixelRatio(q_ptr), mode, state);
+    // QPixmap pixmap     = opt.icon.pixmap(q_ptr->window()->windowHandle(), realIconSize, mode, state);
     QPixmap res(pixmap.size() + QSize(4, c_ribbonbutton_color_height + 4));  // 宽度上，颜色块多出2px
     res.fill(Qt::transparent);
     QPainter painter(&res);

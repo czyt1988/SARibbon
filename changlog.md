@@ -2,10 +2,11 @@
 
 ## 2025-10-10 -> 2.5.2
 
-- 增加图标隐藏的接口
+- 增加标题栏图标隐藏的方法
 - 添加英文文档
 - 修正qmake的编译错误
 - 增加了getBuiltInRibbonThemeQss方法，可获取主题的qss内容
+- 增加了对不同屏幕的缩放比例的处理，`SARibbonToolButton`和`SARibbonColorToolButton`可以对不同屏幕比例进行自适应缩放绘制图标，不会应屏幕比例导致显示不清晰
 
 ## 2025-09-24 -> 2.5.1
 
