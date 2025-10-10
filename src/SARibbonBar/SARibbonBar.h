@@ -212,8 +212,9 @@ public:
     void removeCategory(SARibbonCategory* category);
 
     // 添加一个上下文标签
-    SARibbonContextCategory*
-    addContextCategory(const QString& title, const QColor& color = QColor(), const QVariant& id = QVariant());
+    SARibbonContextCategory* addContextCategory(const QString& title,
+                                                const QColor& color = QColor(),
+                                                const QVariant& id  = QVariant());
     void addContextCategory(SARibbonContextCategory* context);
 
     // 显示一个上下文标签
@@ -290,7 +291,12 @@ public:
     SARibbonQuickAccessBar* quickAccessBar();
 
     // 标题栏窗口
-    SARibbonTitleIconWidget* titleIconWidget();
+    SARibbonTitleIconWidget* titleIconWidget() const;
+
+    //  设置标题图标显示
+    void setTitleIconVisible(bool on = true);
+    // 图标是否显示
+    bool isTitleIconVisible() const;
 
     // 设置ribbon的风格
     void setRibbonStyle(RibbonStyles v);
@@ -481,8 +487,7 @@ protected:
 
     virtual void paintTabbarBaseLine(QPainter& painter);
     virtual void paintWindowTitle(QPainter& painter, const QString& title, const QRect& titleRegion);
-    virtual void
-    paintContextCategoryTab(QPainter& painter, const QString& title, const QRect& contextRect, const QColor& color);
+    virtual void paintContextCategoryTab(QPainter& painter, const QString& title, const QRect& contextRect, const QColor& color);
 #if SA_DEBUG_PRINT_SARIBBONBAR
     SA_RIBBON_EXPORT friend QDebug operator<<(QDebug debug, const SARibbonBar& ribbon);
 #endif

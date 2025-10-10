@@ -87,13 +87,13 @@ void SARibbonMainWindow::PrivateData::checkMainWindowFlag()
 {
 	// 如果都没有设置边框样式，默认设置为ribbon边框
 	if (!mRibbonMainWindowStyle.testFlag(SARibbonMainWindowStyleFlag::UseRibbonFrame)
-		&& !mRibbonMainWindowStyle.testFlag(SARibbonMainWindowStyleFlag::UseNativeFrame)) {
+        && !mRibbonMainWindowStyle.testFlag(SARibbonMainWindowStyleFlag::UseNativeFrame)) {
 		mRibbonMainWindowStyle.setFlag(SARibbonMainWindowStyleFlag::UseRibbonFrame, true);
 	}
 
 	// 如果都没有设置MenuBar，默认设置为ribbonbar
 	if (!mRibbonMainWindowStyle.testFlag(SARibbonMainWindowStyleFlag::UseRibbonMenuBar)
-		&& !mRibbonMainWindowStyle.testFlag(SARibbonMainWindowStyleFlag::UseNativeMenuBar)) {
+        && !mRibbonMainWindowStyle.testFlag(SARibbonMainWindowStyleFlag::UseNativeMenuBar)) {
 		mRibbonMainWindowStyle.setFlag(SARibbonMainWindowStyleFlag::UseRibbonMenuBar, true);
 	}
 }
@@ -191,10 +191,8 @@ SARibbonMainWindow::SARibbonMainWindow(QWidget* parent, SARibbonMainWindowStyles
 		if (d->isUseNativeFrame()) {
 			// 在ribbon模式下使用本地边框，将隐藏icon，同时默认设置为紧凑模式
 			if (SARibbonBar* bar = ribbonBar()) {
-				if (SARibbonTitleIconWidget* iconWidget = bar->titleIconWidget()) {
-					// 隐藏icon
-					iconWidget->hide();
-				}
+                // 隐藏icon
+                bar->setTitleIconVisible(false);
 				// 设置为紧凑模式
 				bar->setRibbonStyle(SARibbonBar::RibbonStyleCompactThreeRow);
 			}
@@ -378,7 +376,7 @@ void SARibbonMainWindow::updateWindowFlag(Qt::WindowFlags flags)
  */
 void SARibbonMainWindow::setRibbonTheme(SARibbonTheme theme)
 {
-	sa_set_ribbon_theme(this, theme);
+    SA::setBuiltInRibbonTheme(this, theme);
 	d_ptr->mCurrentRibbonTheme = theme;
 	if (SARibbonBar* bar = ribbonBar()) {
 		// 1. tab bar的间距

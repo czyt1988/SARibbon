@@ -1,5 +1,29 @@
 # SARibbon库的引入
 
+## 直接引入
+
+直接引入只需把`SARibbon.h`和`SARibbon.cpp`添加到工程里即可，此时默认是不开启`qwk`,如果你需要开启`qwk`，那么需要做如下处理：
+
+1. 添加预定义宏
+
+- 设置`SARIBBON_USE_3RDPARTY_FRAMELESSHELPER`为1
+- 设置`SARIBBON_ENABLE_SNAP_LAYOUT`为1
+
+如果是使用qmake，那么在`pro`文件中添加如下内容：
+
+```shell
+# 定义带值的宏
+DEFINES += SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1
+DEFINES += SARIBBON_ENABLE_SNAP_LAYOUT=1
+```
+
+如果使用vsproj
+
+你你可如下操作：
+- 右键点击项目 → 属性 (Properties)
+- 选择 C/C++ → 预处理器 (Preprocessor)
+- 在 预处理器定义 (Preprocessor Definitions) 中添加宏
+
 ## 基于cmake引入SARibbon库
 
 基于cmake引入SARibbon库，首先要通过cmake编译SARibbon并执行安装
@@ -99,6 +123,24 @@ include($$PWD/3rdparty/SARibbon/importSARibbonBarLib.pri)
 !!! warning "再次声明"
     Qt6.0版本后已经放弃qmake，建议使用cmake来管理工程
 
+## 静态库的引入
+
+如果你编译时使用静态编译，(cmake中把`SARIBBON_BUILD_STATIC_LIBS`设置为ON)，引入方法和动态库一样，但在程序的`main`函数中应该手动进行资源初始化，否则会找不到资源
+
+```c++ hl_lines="4 6"
+int main(int argc, char* argv[])
+{
+    QApplication a(argc, argv);
+#ifdef SA_RIBBON_BAR_NO_EXPORT
+    Q_INIT_RESOURCE(SARibbonResource);  // 针对静态库的资源加载
+#endif
+    MyRibbonWindow w;
+    w.show();
+    return a.exec();
+}
+
+```
+
 ## 公开的预定义宏
 
 SARibbon在编译过程中有些预定义宏，这些宏在基于visual studio的库引入是必须的
@@ -106,27 +148,3 @@ SARibbon在编译过程中有些预定义宏，这些宏在基于visual studio�
 `SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1/0`,此宏用来定义是否引入了`QWindowkit`库
 
 `SARIBBON_ENABLE_SNAP_LAYOUT=1/0`,此宏在SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1时才有用，用于定义是否开始windows11的snap layout效果
-
-## 静态引入如何开启qwk
-
-静态引入只需把`SARibbon.h`和`SARibbon.cpp`添加到工程里即可，此时默认是不开启`qwk`,如果你需要开启`qwk`，那么需要做如下处理：
-
-1. 添加预定义宏
-
-- 设置`SARIBBON_USE_3RDPARTY_FRAMELESSHELPER`为1
-- 设置`SARIBBON_ENABLE_SNAP_LAYOUT`为1
-
-如果是使用qmake，那么在`pro`文件中添加如下内容：
-
-```shell
-# 定义带值的宏
-DEFINES += SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1
-DEFINES += SARIBBON_ENABLE_SNAP_LAYOUT=1
-```
-
-如果使用vsproj
-
-你你可如下操作：
-- 右键点击项目 → 属性 (Properties)
-- 选择 C/C++ → 预处理器 (Preprocessor)
-- 在 预处理器定义 (Preprocessor Definitions) 中添加宏

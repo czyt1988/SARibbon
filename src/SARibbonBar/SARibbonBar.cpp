@@ -1056,12 +1056,14 @@ void SARibbonBar::showMinimumModeButton(bool isShow)
         activeRightButtonGroup();
 
         d->mMinimumCategoryButtonAction = new QAction(this);
-        d->mMinimumCategoryButtonAction->setIcon(style()->standardIcon(
-            isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton, nullptr));
+        d->mMinimumCategoryButtonAction->setIcon(
+            style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton,
+                                  nullptr));
         connect(d->mMinimumCategoryButtonAction, &QAction::triggered, this, [ this, d ]() {
             this->setMinimumMode(!isMinimumMode());
-            d->mMinimumCategoryButtonAction->setIcon(style()->standardIcon(
-                isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton, nullptr));
+            d->mMinimumCategoryButtonAction->setIcon(
+                style()->standardIcon(isMinimumMode() ? QStyle::SP_TitleBarUnshadeButton : QStyle::SP_TitleBarShadeButton,
+                                      nullptr));
         });
         if (d->mRightButtonGroup) {
             d->mRightButtonGroup->addAction(d->mMinimumCategoryButtonAction);
@@ -1496,9 +1498,33 @@ SARibbonQuickAccessBar* SARibbonBar::quickAccessBar()
  * @brief 获取标题栏窗口
  * @return
  */
-SARibbonTitleIconWidget* SARibbonBar::titleIconWidget()
+SARibbonTitleIconWidget* SARibbonBar::titleIconWidget() const
 {
     return (d_ptr->mTitleIconWidget.data());
+}
+
+/**
+ * @brief 设置标题图标可见性
+ * @param on 是否可见
+ */
+void SARibbonBar::setTitleIconVisible(bool on)
+{
+    SARibbonTitleIconWidget* w = titleIconWidget();
+    if (w) {
+        w->setVisible(on);
+    }
+}
+
+/**
+ * @brief 标题图标是否可见
+ * @return
+ */
+bool SARibbonBar::isTitleIconVisible() const
+{
+    SARibbonTitleIconWidget* w = titleIconWidget();
+    if (w) {
+        return w->isVisibleTo(this);
+    }
 }
 
 /**

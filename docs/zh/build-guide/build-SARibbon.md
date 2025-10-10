@@ -7,6 +7,30 @@
 
 ## 使用CMake构建SARibbon库
 
+
+### CMake构建选项
+
+| 编译选项名称               | 默认值                                  | 描述                                                                 | 备注                                                                                     |
+|----------------------------|-----------------------------------------|----------------------------------------------------------------------|------------------------------------------------------------------------------------------|
+| `SARIBBON_BUILD_STATIC_LIBS` | `OFF`                                   | 控制SARibbon库的构建模式，`ON`为静态库，`OFF`为动态库               | 静态库模式下强制`BUILD_SHARED_LIBS=OFF`，动态库模式下强制`BUILD_SHARED_LIBS=ON`          |
+| `SARIBBON_BUILD_EXAMPLES`   | `ON`                                    | 控制是否构建`example`目录下的示例程序（如`MainWindowExample`等）     | 关闭可加快编译速度，仅编译库本身                                                         |
+| `SARIBBON_USE_FRAMELESS_LIB` | `OFF`                                   | 是否使用`QWindowKit`库作为无边框窗口解决方案                         | 需Qt 5.14+、Qt 6.2+版本；启用后强制使用C++17标准，依赖`QWindowKit`库                     |
+| `SARIBBON_ENABLE_SNAPLAYOUT` | `OFF`                                   | 是否启用Windows 11的Snap Layout（窗口磁吸布局）效果                  | 仅当`SARIBBON_USE_FRAMELESS_LIB=ON`时有效，不同Qt版本可能存在兼容性问题                   |
+| `SARIBBON_INSTALL_IN_CURRENT_DIR` | Windows为`ON`，其他系统为`OFF` | 控制库的安装路径，`ON`安装到项目根目录下的版本区分文件夹，`OFF`使用系统默认路径 | 本地安装文件夹命名格式：`bin_qt<Qt版本>_<编译器>_x<架构>`（如`bin_qt5.14.2_msvc_x64`） |
+
+!!! tips "注意"
+    Qt 版本兼容性：
+    SARIBBON_USE_FRAMELESS_LIB 对 Qt 版本有严格要求（Qt 5.14+、Qt 6.2+），低版本 Qt 会自动禁用该选项并切换到 C++14 标准
+    其他功能最低支持 Qt 5.8 版本。
+
+!!! tips "注意"
+    启用 SARIBBON_USE_FRAMELESS_LIB 时，强制使用 C++17 标准；否则使用 C++14 标准（MSVC 下会自动添加对应编译 flags）。
+
+!!! tips "注意"
+    第三方依赖：
+    若启用 SARIBBON_USE_FRAMELESS_LIB，需确保 QWindowKit 库已正确编译并可被 CMake 找到（可通过 -DQWindowKit_DIR 指定路径）。
+
+
 ### 使用vs下构建
 
 1. 如果要启用`QWindowKit`，在`CMakeLists.txt`中将`SARIBBON_USE_FRAMELESS_LIB`的选项改为ON。

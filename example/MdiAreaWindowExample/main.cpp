@@ -49,6 +49,10 @@ int main(int argc, char* argv[])
 	SARibbonBar::initHighDpi();
 
 	QApplication a(argc, argv);
+
+#ifdef SA_RIBBON_BAR_NO_EXPORT
+    Q_INIT_RESOURCE(SARibbonResource);  // 针对静态库的资源加载
+#endif
 	qInstallMessageHandler(log_out_put);
 	QFont f = a.font();
 	f.setFamily(u8"微软雅黑");

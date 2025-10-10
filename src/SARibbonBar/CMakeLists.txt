@@ -121,22 +121,14 @@ SET(SARIBBON_RESOURCE_FILES
 message(STATUS "SARibbon resource file:${SARIBBON_RESOURCE_FILES}")
 ################################################################
 
-# 使用 qt5_add_resources 或 qt6_add_resources (根据您的 Qt 版本)
-# 这会生成一个 C++ 源文件列表，其中包含处理后的资源
-if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt6_add_resources(SARIBBON_GENERATED_RESOURCES ${SARIBBON_RESOURCE_FILES})
-else()
-    qt5_add_resources(SARIBBON_GENERATED_RESOURCES ${SARIBBON_RESOURCE_FILES})
-endif()
-
 add_library(${SARIBBON_LIB_NAME}
     ${SARIBBON_HEADER_FILES}
     ${SARIBBON_SOURCE_FILES}
     ${SACOLOR_HEADER_FILES}
     ${SACOLOR_SOURCE_FILES}
-    # 这里不直接包含 .qrc 文件${SARIBBON_RESOURCE_FILES},而是包含由 Qt 工具生成的源文件
-    ${SARIBBON_GENERATED_RESOURCES}
+    ${SARIBBON_RESOURCE_FILES}
 )
+message(STATUS "SARibbon SARIBBON_GENERATED_RESOURCES resource file:${SARIBBON_GENERATED_RESOURCES}")
 add_library(${SARIBBON_LIB_NAME}::${SARIBBON_LIB_NAME} ALIAS ${SARIBBON_LIB_NAME})
 #################################################
 # Qt相关的依赖

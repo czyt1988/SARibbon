@@ -1,5 +1,8 @@
 #include "SARibbonUtil.h"
-
+#include <QFile>
+#include <QWidget>
+#include <QDebug>
+#include <QDir>
 namespace SA
 {
 
@@ -119,6 +122,61 @@ QSize scaleSizeByWidth(const QSize& originalSize, int newWidth)
     float aspectRatio = static_cast< float >(originalSize.height()) / static_cast< float >(originalSize.width());
     int newHeight     = static_cast< int >(newWidth * aspectRatio);
     return QSize(newWidth, newHeight);
+}
+
+/**
+ * @brief 获取内置主题对应的qss
+ * @param theme
+ * @return
+ */
+QString getBuiltInRibbonThemeQss(SARibbonTheme theme)
+{
+    QFile file;
+    switch (theme) {
+    case SARibbonTheme::RibbonThemeWindows7:
+        file.setFileName(":/SARibbonTheme/resource/theme-win7.qss");
+        break;
+    case SARibbonTheme::RibbonThemeOffice2013:
+        file.setFileName(":/SARibbonTheme/resource/theme-office2013.qss");
+        break;
+    case SARibbonTheme::RibbonThemeOffice2016Blue:
+        file.setFileName(":/SARibbonTheme/resource/theme-office2016-blue.qss");
+        break;
+    case SARibbonTheme::RibbonThemeOffice2021Blue:
+        file.setFileName(":/SARibbonTheme/resource/theme-office2021-blue.qss");
+        break;
+    case SARibbonTheme::RibbonThemeDark:
+        file.setFileName(":/SARibbonTheme/resource/theme-dark.qss");
+        break;
+    case SARibbonTheme::RibbonThemeDark2:
+        file.setFileName(":/SARibbonTheme/resource/theme-dark2.qss");
+        break;
+    default:
+        file.setFileName(":/SARibbonTheme/resource/theme-office2013.qss");
+        break;
+    }
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qWarning() << "can not load build in ribbon theme,reason is :" << file.errorString();
+        return QString();
+    }
+    return QString::fromUtf8(file.readAll());
+}
+
+/**
+ * @brief 设置内置的ribbon主题
+ *
+ * 之所以提供此函数，是因为在某些情况下，SARibbonBar不用在SARibbonMainWindow情况下的时候，也需要设置主题，
+ * 但主题设置函数是SARibbonMainWindow的成员函数，因此，这里单独提供了这个函数给SARibbonWidget窗口使用
+ *
+ * @param w
+ * @param theme
+ */
+void setBuiltInRibbonTheme(QWidget* w, SARibbonTheme theme)
+{
+    if (!w) {
+        return;
+    }
+    w->setStyleSheet(getBuiltInRibbonThemeQss(theme));
 }
 
 }

@@ -11,7 +11,7 @@ add_executable(UseNativeFrameExample
     mainwindow.h
     mainwindow.cpp
     main.cpp
-    saribbonresouce.qrc
+    resouce.qrc
 )
 if(WIN32)
     set_target_properties(UseNativeFrameExample PROPERTIES

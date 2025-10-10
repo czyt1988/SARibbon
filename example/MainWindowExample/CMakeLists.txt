@@ -14,7 +14,7 @@ add_executable(MainWindowExample
     ApplicationWidget.cpp
     ApplicationWidget.ui
     main.cpp
-    saribbonresouce.qrc
+    resouce.qrc
 )
 if(WIN32)
     set_target_properties(MainWindowExample PROPERTIES

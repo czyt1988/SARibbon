@@ -1,6 +1,9 @@
 # SARibbon构建说明
 
-此文会详细介绍如何动态构建SARibbon，如果你不熟悉构建，建议你用静态引入的方法，你只需把SARibbon.h和SARibbon.cpp引入你的工程即可使用
+!!! tips "提示"
+    你不需要编译SARibbon，只需把`SARibbon.h`和`SARibbon.cpp`（这两个文件位于src目录下）引入你的工程即可
+
+此文会详细介绍如何构建SARibbon为**动态库**，如果你不熟悉C++的构建，你只需把`SARibbon.h`和`SARibbon.cpp`引入你的工程即可使用
 
 SARibbon采用[QWindowkit](https://github.com/stdware/qwindowkit)作为无边框窗口方案，同时也支持简单的无边框设置。如果你需要操作系统原生的窗口特性，如Windows 7及以后版本的贴边处理，或Windows 11的Snap Layout效果，建议启用[QWindowkit](https://github.com/stdware/qwindowkit)库。该库还能有效解决多屏幕移动问题。
 
@@ -11,10 +14,10 @@ SARibbon采用[QWindowkit](https://github.com/stdware/qwindowkit)作为无边框
 若要启用[QWindowkit](https://github.com/stdware/qwindowkit)，需先编译该库。
 
 !!! warning "注意"
-   作为SARibbon项目的子模块，如果你在`git clone`时没有使用`--recursive`参数，需执行`submodule update`命令：
-   ```shell
-   git submodule update --init --recursive
-   ```
+    作为SARibbon项目的子模块，如果你在`git clone`时没有使用`--recursive`参数，需执行`submodule update`命令：
+    ```shell
+    git submodule update --init --recursive
+    ```
 
 ## 关于安装位置
 

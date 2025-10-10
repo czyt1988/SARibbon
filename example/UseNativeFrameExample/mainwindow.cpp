@@ -264,6 +264,7 @@ void MainWindow::onRibbonThemeComboBoxCurrentIndexChanged(int index)
 {
 	SARibbonTheme t = static_cast< SARibbonTheme >(mComboboxRibbonTheme->itemData(index).toInt());
 	setRibbonTheme(t);
+    qDebug() << "setRibbonTheme:" << index << this->styleSheet();
 }
 
 /**
@@ -323,12 +324,11 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
 	// 快捷键设置示范，如果你想你的快捷键能在整个MainWindow生命周期都显示，你应该把这个action也添加到MainWindow中
 	actSave->setShortcut(QKeySequence(QLatin1String("Ctrl+S")));
 	addAction(actSave);
-
 	panelStyle->addLargeAction(actSave);
 
 	QAction* actHideRibbon = createAction(tr("hide ribbon"), ":/icon/icon/hideRibbon.svg", "actHideRibbon");
 	actHideRibbon->setCheckable(true);
-	panelStyle->addSmallAction(actHideRibbon);
+    panelStyle->addMediumAction(actHideRibbon);
 	connect(actHideRibbon, &QAction::triggered, this, [ this ](bool b) { this->ribbonBar()->setMinimumMode(b); });
 	connect(ribbonBar(), &SARibbonBar::ribbonModeChanged, this, [ actHideRibbon ](SARibbonBar::RibbonMode nowNode) {
 		actHideRibbon->setChecked(nowNode == SARibbonBar::MinimumRibbonMode);
@@ -336,17 +336,25 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
 
     QAction* actShowHideButton = createAction(tr("show \nhide button"), ":/icon/icon/showHideButton.svg", "show hide button");
 	actShowHideButton->setCheckable(true);
-	panelStyle->addSmallAction(actShowHideButton);  // wrod wrap was not effect in small button
+    actShowHideButton->setChecked(ribbonBar()->haveShowMinimumModeButton());
+    panelStyle->addMediumAction(actShowHideButton);  // wrod wrap was not effect in small button
 	connect(actShowHideButton, &QAction::triggered, this, [ this ](bool b) {
 		this->ribbonBar()->showMinimumModeButton(b);  // 显示ribbon最小化按钮
 	});
-	actShowHideButton->trigger();
 
 	mActionWordWrap = createAction(tr("word wrap"), ":/icon/icon/wordwrap.svg");
 	mActionWordWrap->setCheckable(true);
 	mActionWordWrap->setChecked(ribbonBar()->isEnableWordWrap());
-	panelStyle->addSmallAction(mActionWordWrap);
+    panelStyle->addMediumAction(mActionWordWrap);
 	connect(mActionWordWrap, &QAction::triggered, this, &MainWindow::onActionWordWrapTriggered);
+
+    QAction* actShowTitleIcon = createAction(tr("show\n title icon"), ":/icon/icon/showHideButton.svg", "show hide title icon");
+    actShowTitleIcon->setCheckable(true);
+    actShowTitleIcon->setChecked(ribbonBar()->isTitleIconVisible());
+    connect(actShowTitleIcon, &QAction::triggered, this, [ this ](bool b) {
+        this->ribbonBar()->setTitleIconVisible(b);  // 显示ribbon最小化按钮
+    });
+    panelStyle->addMediumAction(actShowTitleIcon);
 
 	QButtonGroup* g = new QButtonGroup(page);
 
