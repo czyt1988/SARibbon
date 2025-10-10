@@ -1,5 +1,12 @@
 # 版本更新记录(change log):
 
+## 2025-10-10 -> 2.5.2
+
+- 增加图标隐藏的接口
+- 添加英文文档
+- 修正qmake的编译错误
+- 增加了getBuiltInRibbonThemeQss方法，可获取主题的qss内容
+
 ## 2025-09-24 -> 2.5.1
 
 - 调整了`SARibbonButtonGroupWidget`、`SARibbonQuickAccessBar`、`SARibbonSystemButtonBar`的实现方式，直接继承QToolBar，并通过`Qss`实现对应效果
