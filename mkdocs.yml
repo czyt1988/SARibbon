@@ -1,6 +1,8 @@
 site_name: SARibbon
 site_author: 'Chen ZongYan'
 site_description: 'Qt Framework Ribbon Control'
+repo_url: https://github.com/czyt1988/SARibbon
+repo_name: SARibbon-github
 
 # 多语言站点信息
 extra:
