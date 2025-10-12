@@ -1,15 +1,9 @@
-#-------------------------------------------------
-#
-# Project created by QtCreator 2017-09-21T14:04:12
-#
-#-------------------------------------------------
-
 QT       += core gui
 # SARibbon 1.x 版本后引入frameless库，必须要cpp17及以上
 CONFIG += c++17
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-TARGET = SARibbonMainWindowExample
+TARGET = UseNativeFrameExample
 TEMPLATE = app
 
 SOURCES += main.cpp\
@@ -19,7 +13,7 @@ HEADERS  += \
     mainwindow.h
 
 RESOURCES += \
-    saribbonresouce.qrc \
+    resouce.qrc \
 
 # 下面演示了如何把SARibbon引入
 # 只需要下面2句话，只要把common.pri引入工程，就可以实现SARibbon的引入

@@ -1,0 +1,67 @@
+﻿/*
+这是模仿office2013的白色风格主题
+start ribbon set
+*/
+
+/*SARibbonBar*/
+SARibbonBar {
+  background-color: #004076;
+  border: solid #707070;
+  color:#b2b2b2;
+}
+
+/*SARibbonCategory*/
+SARibbonCategory {
+  background-color: #f5f5f5;
+}
+
+
+/*SARibbonToolButton*/
+SARibbonToolButton {
+  border: none;
+  color: black;
+  background-color: #f5f5f5; /*这里不能设置为transparent*/
+}
+
+SARibbonToolButton:pressed {
+  background-color: #d9d9d9;
+}
+
+SARibbonToolButton:checked {
+  background-color: #d9d9d9;
+}
+
+SARibbonToolButton:hover {
+  background-color: #d9d9d9;
+}
+
+
+/*SARibbonTabBar*/
+SARibbonTabBar {
+  background-color: transparent;
+}
+
+SARibbonTabBar::tab {
+  color: white;
+  border: 1px solid transparent;
+  background: transparent;
+  margin-top: 0px;
+  margin-right: 0px;
+  margin-left: 5px;
+  margin-bottom: 0px;
+  min-width: 100px;
+}
+
+SARibbonTabBar::tab:selected {
+  color: black;
+  background: #f5f5f5;
+}
+
+SARibbonTabBar::tab:hover:!selected {
+    color: white;
+    background: transparent;
+    border-top:1px solid #f5f5f5;
+    border-right:1px solid #f5f5f5;
+    border-left:1px solid #f5f5f5;
+    border-bottom:1px solid transparent;
+}

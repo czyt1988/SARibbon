@@ -5,7 +5,9 @@ SUBDIRS += \
            example/WidgetWithRibbon \
            example/MdiAreaWindowExample \
            example/StaticExample \
-           example/MainWindowExample
+           example/MainWindowExample \
+           example/UseNativeFrameExample \
+           example/MatlabUI
 
 
 CONFIG += ordered
