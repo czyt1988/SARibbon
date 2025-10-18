@@ -212,9 +212,8 @@ public:
     void removeCategory(SARibbonCategory* category);
 
     // 添加一个上下文标签
-    SARibbonContextCategory* addContextCategory(const QString& title,
-                                                const QColor& color = QColor(),
-                                                const QVariant& id  = QVariant());
+    SARibbonContextCategory*
+    addContextCategory(const QString& title, const QColor& color = QColor(), const QVariant& id = QVariant());
     void addContextCategory(SARibbonContextCategory* context);
 
     // 显示一个上下文标签
@@ -400,6 +399,10 @@ public:
     // 设置边角widget可见性，对于mdi窗口，会出现TopLeftCorner和TopRightCorner两个corner widget
     void setCornerWidgetVisible(bool on, Qt::Corner c = Qt::TopLeftCorner);
 
+    // 设置ApplicationButton垂直方向扩充，这样ApplicationButton能占用标题栏和tab栏两个栏的高度
+    void setApplicationButtonVerticalExpansion(bool on = true);
+    bool isApplicationButtonVerticalExpansion() const;
+
     // 获取所有panel下的action
     QList< QAction* > allActions() const;
     // 当前是否使用的无边框
@@ -487,7 +490,8 @@ protected:
 
     virtual void paintTabbarBaseLine(QPainter& painter);
     virtual void paintWindowTitle(QPainter& painter, const QString& title, const QRect& titleRegion);
-    virtual void paintContextCategoryTab(QPainter& painter, const QString& title, const QRect& contextRect, const QColor& color);
+    virtual void
+    paintContextCategoryTab(QPainter& painter, const QString& title, const QRect& contextRect, const QColor& color);
 #if SA_DEBUG_PRINT_SARIBBONBAR
     SA_RIBBON_EXPORT friend QDebug operator<<(QDebug debug, const SARibbonBar& ribbon);
 #endif

@@ -359,21 +359,26 @@ void SARibbonBar::PrivateData::initNewParent(QWidget* par)
     q_ptr->connect(par, &QWidget::windowTitleChanged, q_ptr, &SARibbonBar::onWindowTitleChanged);
     q_ptr->connect(par, &QWidget::windowIconChanged, q_ptr, &SARibbonBar::onWindowIconChanged);
     // 父窗口发生了改变，一般就是加入到了MainWindow中，这时要同步父窗口的信息到图标
-    if (SARibbonTitleIconWidget* titleIcon = q_ptr->titleIconWidget()) {
-        if (SARibbonMainWindow* mainwindow = qobject_cast< SARibbonMainWindow* >(par)) {
-            // 说明加入了MainWindow中
-            int th = q_ptr->titleBarHeight();
-            titleIcon->setWindow(mainwindow);
-            titleIcon->setIcon(mainwindow->windowIcon());
-            titleIcon->setIconSize(QSize(th - 2, th - 2));
-            titleIcon->show();
-            titleIcon->raise();
-        } else {
-            // 说明加入的不是MainWindow中，把图标隐藏
-            if (SARibbonTitleIconWidget* titleIcon = q_ptr->titleIconWidget()) {
-                titleIcon->hide();
-            }
-        }
+    SARibbonTitleIconWidget* titleIcon = q_ptr->titleIconWidget();
+    if (!titleIcon) {
+        return;
+    }
+
+    if (q_ptr->isApplicationButtonVerticalExpansion()) {
+        titleIcon->hide();
+        return;
+    }
+
+    // 非垂直展开模式：尝试设置为 MainWindow 的图标
+    if (auto* mainwindow = qobject_cast< SARibbonMainWindow* >(par)) {
+        int th = q_ptr->titleBarHeight();
+        titleIcon->setWindow(mainwindow);
+        titleIcon->setIcon(mainwindow->windowIcon());
+        titleIcon->setIconSize(QSize(th - 2, th - 2));
+        titleIcon->show();
+        titleIcon->raise();
+    } else {
+        titleIcon->hide();
     }
 }
 
@@ -2087,6 +2092,31 @@ void SARibbonBar::setCornerWidgetVisible(bool on, Qt::Corner c)
     if (QWidget* w = cornerWidget(c)) {
         w->setVisible(on);
     }
+}
+
+/**
+ * @brief 设置ApplicationButton垂直方向扩充，这样ApplicationButton能占用标题栏和tab栏两个栏的高度
+ * @param on
+ */
+void SARibbonBar::setApplicationButtonVerticalExpansion(bool on)
+{
+    if (SARibbonBarLayout* lay = qobject_cast< SARibbonBarLayout* >(layout())) {
+        lay->setApplicationButtonVerticalExpansion(on);
+    }
+}
+
+/**
+ * @brief applicationButton是否是在垂直方向扩充
+ *
+ * 默认为false
+ * @return
+ */
+bool SARibbonBar::isApplicationButtonVerticalExpansion() const
+{
+    if (SARibbonBarLayout* lay = qobject_cast< SARibbonBarLayout* >(layout())) {
+        return lay->isApplicationButtonVerticalExpansion();
+    }
+    return false;
 }
 
 /**

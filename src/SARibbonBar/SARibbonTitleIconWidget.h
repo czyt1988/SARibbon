@@ -1,4 +1,4 @@
-#ifndef SARIBBONTITLEICONWIDGET_H
+﻿#ifndef SARIBBONTITLEICONWIDGET_H
 #define SARIBBONTITLEICONWIDGET_H
 #include "SARibbonGlobal.h"
 #include <QWidget>
@@ -28,7 +28,7 @@ public:
     void setPadding(int v);
 
 public:
-    virtual QSize sizeHint() const;
+    virtual QSize sizeHint() const override;
 
 protected:
     // 绘制事件处理

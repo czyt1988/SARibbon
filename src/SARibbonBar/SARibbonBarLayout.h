@@ -87,6 +87,10 @@ public:
     void setWindowIcon(const QIcon& icon);
     QIcon windowIcon() const;
 
+    // 设置ApplicationButton垂直方向扩充，这样ApplicationButton能占用标题栏和tab栏两个栏的高度
+    void setApplicationButtonVerticalExpansion(bool on = true);
+    bool isApplicationButtonVerticalExpansion() const;
+
 	// 获取元素
 	SARibbonBar* ribbonBar() const;
 	SARibbonTabBar* ribbonTabBar() const;

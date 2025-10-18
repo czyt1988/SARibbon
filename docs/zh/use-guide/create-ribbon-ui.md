@@ -415,6 +415,26 @@ SARibbonApplicationButton::menu-indicator {
 
 ![win7style-application-button](../../assets/pic/win7style-application-button.png)
 
+在宽松模式下，`Application Button`可以设置为垂直扩展，这时候，`Application Button`将占用标题栏和tab栏的空间
+
+示例：
+
+```cpp
+ribbonBar()->setApplicationButtonVerticalExpansion(true);
+```
+
+上面的代码效果如图所示：
+
+![](../../assets/pic/set-application-btn-expand.png)
+
+!!! warning "注意"
+    `SARibbonBar::setApplicationButtonVerticalExpansion`函数会对`titleIconWidget`的可见性进行调整，如果设置`applicationButtonVerticalExpansion=true`，那么`titleIconWidget`会被隐藏，反之，`titleIconWidget`会被显示
+    但`SARibbonBar::setTitleIconVisible`函数不会对`applicationButtonVerticalExpansion`的状态有影响
+    因此，如果你动态调整`applicationButtonVerticalExpansion`的状态，如果你需要显示窗口图标，在设置`setApplicationButtonVerticalExpansion(false)`后，需要调用`setTitleIconVisible(true)`让窗口图标显示
+
+!!! warning "注意"
+    `ApplicationButtonVerticalExpansion`仅在宽松模式(`SARibbonBar::RibbonStyleLoose`)下有效
+
 ## Application Widget
 
 在许多现代化应用（如 Microsoft Office）中，点击 `Application Button` 并不会弹出一个简单的下拉菜单，而是会弹出一个全屏或半屏的复杂页面，该页面可以包含最近文件列表、模板选择、账户设置、应用选项等丰富内容
