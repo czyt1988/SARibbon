@@ -1035,9 +1035,8 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     panelStyle->addSmallWidget(r);
     buttongroup->addButton(r, SARibbonBar::RibbonStyleCompactTwoRow);
 
-//    connect(g, QOverload<int>::of(&QButtonGroup::buttonClicked), this, &MainWindow::onStyleClicked);
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    connect(g, static_cast< void (QButtonGroup::*)(int) >(&QButtonGroup::idClicked), this, &MainWindow::onStyleClicked);
+    connect(buttongroup, static_cast< void (QButtonGroup::*)(int) >(&QButtonGroup::idClicked), this, &MainWindow::onStyleClicked);
 #else
     connect(buttongroup,
             static_cast< void (QButtonGroup::*)(int) >(&QButtonGroup::buttonClicked),
