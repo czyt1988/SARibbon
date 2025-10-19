@@ -55,6 +55,7 @@ plugins:
                 - 构建说明: zh/build-guide/build-instructions.md
                 - 第三方库构建: zh/build-guide/build-3rdparty.md
                 - SARibbon库构建: zh/build-guide/build-SARibbon.md
+                - 多语言翻译: zh/build-guide/i18n.md
                 - 构建常见错误: zh/build-guide/common-build-errors.md
             - 使用指南: 
                 - 使用说明: zh/use-guide/SARibbon-user-guide.md
