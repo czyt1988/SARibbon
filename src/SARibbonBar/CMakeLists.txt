@@ -213,6 +213,36 @@ if(MSVC)
     message(STATUS "macros predefined:#define NOMINMAX")
 endif()
 
+##################################
+# 翻译
+##################################
+find_package(Qt${QT_VERSION_MAJOR}LinguistTools QUIET)
+    if(Qt${QT_VERSION_MAJOR}LinguistTools_FOUND)
+    # 2. 准备 ts 文件列表（可以写多个语言）
+    set(TS_FILES
+        i18n/SARibbon_zh_CN.ts
+        i18n/SARibbon_en_US.ts
+    )
+
+    set(TS_SOURCES
+        ${SARIBBON_HEADER_FILES}
+        ${SARIBBON_SOURCE_FILES}
+        ${SACOLOR_HEADER_FILES}
+        ${SACOLOR_SOURCE_FILES}
+    )
+    # 3. 生成/更新 ts 文件 + 编译出 qm 文件
+    #    这一步会在 build 目录里生成 myapp_zh_CN.qm 等
+    # 4. 根据 Qt 版本调对应宏
+    if(QT_VERSION_MAJOR EQUAL 5)
+        qt5_create_translation(QM_FILES ${TS_SOURCES} ${TS_FILES})
+    elseif(QT_VERSION_MAJOR EQUAL 6)
+        qt6_create_translation(QM_FILES ${TS_SOURCES} ${TS_FILES})
+    endif()
+    # 5. 把生成的 qm 挂到目标上
+    target_sources(${SARIBBON_LIB_NAME} PRIVATE ${QM_FILES})
+
+    message(STATUS "Translation support enabled (LinguistTools found).")
+endif()
 # ------------------------------- install script -------------------------------
 
 # 头文件
