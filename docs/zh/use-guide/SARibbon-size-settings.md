@@ -30,6 +30,6 @@ ribbonBar()->setButtonMaximumAspectRatio(2.0);
 - 调整`CategoryHeight`，让ribbonbar变高，字体不变情况下，图标会变大
 - 调整字体换行方式（`SARibbonBar::setEnableWordWrap`），如果是双行模式，设置文字不换行，则在ribbonbar高度不变的情况下，会让图标变大
 
-各个部件的尺寸如何设置，可以通过运行`example/MainWindowExample`例子的`Size`标签页进行动态调整，并查看效果
-
-![example-size](../../assets/pic/example-size.png)
+!!! example "尺寸设置例子"
+    各个部件的尺寸如何设置，可以通过运行`example/MainWindowExample`例子的`Size`标签页进行动态调整，并查看效果
+    ![example-size](../../assets/pic/example-size.png)

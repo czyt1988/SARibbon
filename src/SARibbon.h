@@ -97,14 +97,14 @@
  * @def ribbon的数字版本 MAJ.MIN.{PAT}
  */
 #ifndef SA_RIBBON_BAR_VERSION_PAT
-#define SA_RIBBON_BAR_VERSION_PAT 2
+#define SA_RIBBON_BAR_VERSION_PAT 3
 #endif
 
 /**
  * @def 版本号（字符串）
  */
 #ifndef SARIBBON_VERSION
-#define SARIBBON_VERSION "2.5.2"
+#define SARIBBON_VERSION "2.5.3"
 #endif
 
 #endif  // SARIBBONVERSIONINFO_H
@@ -1622,7 +1622,7 @@ public:
 	void setPadding(int v);
 
 public:
-	virtual QSize sizeHint() const;
+	virtual QSize sizeHint() const override;
 
 protected:
 	// 绘制事件处理
@@ -3270,8 +3270,8 @@ public:
 	void removeCategory(SARibbonCategory* category);
 
 	// 添加一个上下文标签
-    SARibbonContextCategory*
-    addContextCategory(const QString& title, const QColor& color = QColor(), const QVariant& id = QVariant());
+	SARibbonContextCategory*
+	addContextCategory(const QString& title, const QColor& color = QColor(), const QVariant& id = QVariant());
 	void addContextCategory(SARibbonContextCategory* context);
 
 	// 显示一个上下文标签
@@ -3457,6 +3457,10 @@ public:
 	// 设置边角widget可见性，对于mdi窗口，会出现TopLeftCorner和TopRightCorner两个corner widget
 	void setCornerWidgetVisible(bool on, Qt::Corner c = Qt::TopLeftCorner);
 
+	// 设置ApplicationButton垂直方向扩充，这样ApplicationButton能占用标题栏和tab栏两个栏的高度
+	void setApplicationButtonVerticalExpansion(bool on = true);
+	bool isApplicationButtonVerticalExpansion() const;
+
 	// 获取所有panel下的action
 	QList< QAction* > allActions() const;
 	// 当前是否使用的无边框
@@ -3544,8 +3548,8 @@ protected:
 
 	virtual void paintTabbarBaseLine(QPainter& painter);
 	virtual void paintWindowTitle(QPainter& painter, const QString& title, const QRect& titleRegion);
-    virtual void
-    paintContextCategoryTab(QPainter& painter, const QString& title, const QRect& contextRect, const QColor& color);
+	virtual void
+	paintContextCategoryTab(QPainter& painter, const QString& title, const QRect& contextRect, const QColor& color);
 #if SA_DEBUG_PRINT_SARIBBONBAR
 	SA_RIBBON_EXPORT friend QDebug operator<<(QDebug debug, const SARibbonBar& ribbon);
 #endif
@@ -3643,6 +3647,10 @@ public:
 	// 设置图标
 	void setWindowIcon(const QIcon& icon);
 	QIcon windowIcon() const;
+
+	// 设置ApplicationButton垂直方向扩充，这样ApplicationButton能占用标题栏和tab栏两个栏的高度
+	void setApplicationButtonVerticalExpansion(bool on = true);
+	bool isApplicationButtonVerticalExpansion() const;
 
 	// 获取元素
 	SARibbonBar* ribbonBar() const;

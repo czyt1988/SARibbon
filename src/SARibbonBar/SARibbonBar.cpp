@@ -2102,6 +2102,7 @@ void SARibbonBar::setApplicationButtonVerticalExpansion(bool on)
 {
     if (SARibbonBarLayout* lay = qobject_cast< SARibbonBarLayout* >(layout())) {
         lay->setApplicationButtonVerticalExpansion(on);
+        lay->invalidate();
     }
 }
 
