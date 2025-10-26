@@ -1,4 +1,4 @@
-﻿#ifndef SA_RIBBON_H
+#ifndef SA_RIBBON_H
 #define SA_RIBBON_H
 // 定义此宏，将SA_RIBBON_EXPORT定义为空
 #ifndef SA_RIBBON_BAR_NO_EXPORT
@@ -97,14 +97,14 @@
  * @def ribbon的数字版本 MAJ.MIN.{PAT}
  */
 #ifndef SA_RIBBON_BAR_VERSION_PAT
-#define SA_RIBBON_BAR_VERSION_PAT 3
+#define SA_RIBBON_BAR_VERSION_PAT 4
 #endif
 
 /**
  * @def 版本号（字符串）
  */
 #ifndef SARIBBON_VERSION
-#define SARIBBON_VERSION "2.5.3"
+#define SARIBBON_VERSION "2.5.4"
 #endif
 
 #endif  // SARIBBONVERSIONINFO_H
@@ -2807,8 +2807,7 @@ public:
 	virtual QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 	virtual void paintIconOnly(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
 	virtual void paintIconWithText(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
-	virtual void
-	paintIconWithTextWordWrap(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
+    virtual void paintIconWithTextWordWrap(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
 
 private:
 	SARibbonGalleryGroup* mGroup;
@@ -3270,8 +3269,9 @@ public:
 	void removeCategory(SARibbonCategory* category);
 
 	// 添加一个上下文标签
-	SARibbonContextCategory*
-	addContextCategory(const QString& title, const QColor& color = QColor(), const QVariant& id = QVariant());
+    SARibbonContextCategory* addContextCategory(const QString& title,
+                                                const QColor& color = QColor(),
+                                                const QVariant& id  = QVariant());
 	void addContextCategory(SARibbonContextCategory* context);
 
 	// 显示一个上下文标签
@@ -3548,8 +3548,7 @@ protected:
 
 	virtual void paintTabbarBaseLine(QPainter& painter);
 	virtual void paintWindowTitle(QPainter& painter, const QString& title, const QRect& titleRegion);
-	virtual void
-	paintContextCategoryTab(QPainter& painter, const QString& title, const QRect& contextRect, const QColor& color);
+    virtual void paintContextCategoryTab(QPainter& painter, const QString& title, const QRect& contextRect, const QColor& color);
 #if SA_DEBUG_PRINT_SARIBBONBAR
 	SA_RIBBON_EXPORT friend QDebug operator<<(QDebug debug, const SARibbonBar& ribbon);
 #endif
@@ -3841,8 +3840,10 @@ public:
 	static SARibbonCustomizeData makeAddCategoryCustomizeData(const QString& title, int index, const QString& objName);
 
 	// 对应AddPanelActionType
-	static SARibbonCustomizeData
-	makeAddPanelCustomizeData(const QString& title, int index, const QString& categoryobjName, const QString& objName);
+    static SARibbonCustomizeData makeAddPanelCustomizeData(const QString& title,
+                                                           int index,
+                                                           const QString& categoryobjName,
+                                                           const QString& objName);
 
 	// 对应AddActionActionType
 	static SARibbonCustomizeData makeAddActionCustomizeData(const QString& key,
@@ -3855,8 +3856,9 @@ public:
 	static SARibbonCustomizeData makeRenameCategoryCustomizeData(const QString& newname, const QString& categoryobjName);
 
 	// 对应RenamePanelActionType
-	static SARibbonCustomizeData
-	makeRenamePanelCustomizeData(const QString& newname, const QString& categoryobjName, const QString& panelObjName);
+    static SARibbonCustomizeData makeRenamePanelCustomizeData(const QString& newname,
+                                                              const QString& categoryobjName,
+                                                              const QString& panelObjName);
 
 	// 对应RemoveCategoryActionType
 	static SARibbonCustomizeData makeRemoveCategoryCustomizeData(const QString& categoryobjName);
@@ -3865,8 +3867,9 @@ public:
 	static SARibbonCustomizeData makeChangeCategoryOrderCustomizeData(const QString& categoryobjName, int moveindex);
 
 	// 对应ChangePanelOrderActionType
-	static SARibbonCustomizeData
-	makeChangePanelOrderCustomizeData(const QString& categoryobjName, const QString& panelObjName, int moveindex);
+    static SARibbonCustomizeData makeChangePanelOrderCustomizeData(const QString& categoryobjName,
+                                                                   const QString& panelObjName,
+                                                                   int moveindex);
 
 	// 对应ChangeActionOrderActionType
 	static SARibbonCustomizeData makeChangeActionOrderCustomizeData(const QString& categoryobjName,
