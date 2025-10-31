@@ -66,6 +66,7 @@ plugins:
                 - Ribbon的布局方式: zh/use-guide/layout-of-SARibbon.md
                 - Ribbon按钮布局说明: zh/use-guide/layout-of-ribbonbutton.md
                 - Ribbon尺寸设置: zh/use-guide/SARibbon-size-settings.md
+                - 内容边距设置: zh/use-guide/contents-margins-of-ribbon.md
                 - Ribbon主题: zh/use-guide/SARibbon-theme.md
                 - 自定义Ribbon主题: zh/use-guide/design-your-theme.md
                 - Ribbon的用户配置化: zh/use-guide/persistence-configuration-ribbon.md
