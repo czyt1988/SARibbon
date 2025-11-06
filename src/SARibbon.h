@@ -4295,7 +4295,10 @@ public:
 	void setRibbonBar(SARibbonBar* ribbon);
 #if !SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
 	// 返回SAFramelessHelper
-	SAFramelessHelper* framelessHelper();
+	SAFramelessHelper* framelessHelper() const;
+	// 设置缩放时，使用橡皮筋示意而不是立即缩放，这对于大渲染量的软件（如CAD、三维）比较友好
+	void setRubberBandOnResize(bool on);
+	bool isRubberBandOnResize() const;
 #else
 	// 如果ribbon中有自定义的窗口在标题栏等非点击区域加入后，想能点击，需要调用此接口告知可点击
 	void setFramelessHitTestVisible(QWidget* w, bool visible = true);

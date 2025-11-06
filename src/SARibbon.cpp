@@ -20063,6 +20063,7 @@ SARibbonMainWindow::SARibbonMainWindow(QWidget* parent, SARibbonMainWindowStyles
 		}
 		setRibbonBar(createRibbonBar());
 		setRibbonTheme(ribbonTheme());
+		setContentsMargins(2, 0, 2, 0);
 		if (d->isUseNativeFrame()) {
 			// 在ribbon模式下使用本地边框，将隐藏icon，同时默认设置为紧凑模式
 			if (SARibbonBar* bar = ribbonBar()) {
@@ -20176,11 +20177,49 @@ void SARibbonMainWindow::setFramelessHitTestVisible(QWidget* w, bool visible)
 }
 #else
 
-SAFramelessHelper* SARibbonMainWindow::framelessHelper()
+/**
+ * @brief 无边框辅助对象
+ * @return
+ */
+SAFramelessHelper* SARibbonMainWindow::framelessHelper() const
 {
 	return (d_ptr->mFramelessHelper);
 }
 
+/**
+ * @brief 设置在缩放时是否启用“橡皮筋”示意模式。
+ *
+ * 当启用时，窗口在拖拽缩放过程中不会立即重绘内容，而是先用一个半透明矩形框（橡皮筋）
+ * 显示目标尺寸，待用户释放鼠标后才一次性完成resize。此模式可显著降低
+ * CAD、三维渲染、大型图表等重负载应用在高频resize时的CPU/GPU消耗。
+ *
+ * @param on  true  启用橡皮筋缩放示意；
+ *             false 禁用橡皮筋，采用实时重绘（默认行为）。
+ *
+ * @see isRubberBandOnResize(), SAFramelessHelper::setRubberBandOnResize()
+ */
+void SARibbonMainWindow::setRubberBandOnResize(bool on)
+{
+	if (SAFramelessHelper* fl = framelessHelper()) {
+		fl->setRubberBandOnResize(on);
+	}
+}
+
+/**
+ * @brief 返回当前是否启用了橡皮筋缩放示意模式。
+ *
+ * @return true  橡皮筋模式已启用；
+ *         false 橡皮筋模式未启用
+ *
+ * @see setRubberBandOnResize(), SAFramelessHelper::rubberBandOnResize()
+ */
+bool SARibbonMainWindow::isRubberBandOnResize() const
+{
+	if (SAFramelessHelper* fl = framelessHelper()) {
+		return fl->rubberBandOnResisze();
+	}
+	return false;
+}
 #endif
 
 bool SARibbonMainWindow::eventFilter(QObject* obj, QEvent* e)
@@ -20284,7 +20323,6 @@ bool SARibbonMainWindow::isUseRibbon() const
 SARibbonBar* SARibbonMainWindow::createRibbonBar()
 {
 	SARibbonBar* bar = RibbonSubElementFactory->createRibbonBar(this);
-	bar->setContentsMargins(3, 0, 3, 0);
 	return bar;
 }
 
@@ -20319,7 +20357,8 @@ bool SARibbonMainWindowEventFilter::eventFilter(QObject* obj, QEvent* e)
 		if (e->type() == QEvent::Resize) {
 			if (SARibbonMainWindow* m = qobject_cast< SARibbonMainWindow* >(obj)) {
 				if (SARibbonBar* ribbon = m->ribbonBar()) {
-					ribbon->setFixedWidth(m->size().width());
+					QMargins mg = m->contentsMargins();
+					ribbon->setFixedWidth(m->size().width() - mg.left() - mg.right());
 				}
 			}
 		}
