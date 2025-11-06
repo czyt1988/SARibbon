@@ -14,39 +14,39 @@
 #if SARibbonPanelLayout_DEBUG_PRINT
 #ifndef SARibbonPanelLayout_HELP_DRAW_RECT
 #define SARibbonPanelLayout_HELP_DRAW_RECT(p, rect)                                                                    \
-	do {                                                                                                               \
-		p.save();                                                                                                      \
-		QPen _pen(Qt::DashLine);                                                                                       \
-		_pen.setColor(Qt::blue);                                                                                       \
-		p.setPen(_pen);                                                                                                \
-		p.setBrush(QBrush());                                                                                          \
-		p.drawRect(rect);                                                                                              \
-		p.restore();                                                                                                   \
-	} while (0)
+    do {                                                                                                               \
+        p.save();                                                                                                      \
+        QPen _pen(Qt::DashLine);                                                                                       \
+        _pen.setColor(Qt::blue);                                                                                       \
+        p.setPen(_pen);                                                                                                \
+        p.setBrush(QBrush());                                                                                          \
+        p.drawRect(rect);                                                                                              \
+        p.restore();                                                                                                   \
+    } while (0)
 #endif  // SARibbonPanelLayout_HELP_DRAW_RECT
 #endif  // SARibbonPanelLayout_DEBUG_PRINT
 SARibbonPanelLayout::SARibbonPanelLayout(QWidget* p) : QLayout(p), mColumnCount(0), mExpandFlag(false), mDirty(true)
 {
-	setSpacing(1);
-	SARibbonPanel* tb = qobject_cast< SARibbonPanel* >(p);
+    setSpacing(1);
+    SARibbonPanel* tb = qobject_cast< SARibbonPanel* >(p);
 
-	if (!tb) {
-		return;
-	}
+    if (!tb) {
+        return;
+    }
 }
 
 SARibbonPanelLayout::~SARibbonPanelLayout()
 {
-	// 参考QToolBarLayout
-	while (!mItems.isEmpty()) {
-		SARibbonPanelItem* item = mItems.takeFirst();
-		if (QWidgetAction* widgetAction = qobject_cast< QWidgetAction* >(item->action)) {
-			if (item->customWidget) {
-				widgetAction->releaseWidget(item->widget());
-			}
-		}
-		delete item;
-	}
+    // 参考QToolBarLayout
+    while (!mItems.isEmpty()) {
+        SARibbonPanelItem* item = mItems.takeFirst();
+        if (QWidgetAction* widgetAction = qobject_cast< QWidgetAction* >(item->action)) {
+            if (item->customWidget) {
+                widgetAction->releaseWidget(item->widget());
+            }
+        }
+        delete item;
+    }
 }
 
 /**
@@ -56,12 +56,12 @@ SARibbonPanelLayout::~SARibbonPanelLayout()
  */
 int SARibbonPanelLayout::indexByAction(QAction* action) const
 {
-	for (int i = 0; i < mItems.count(); ++i) {
-		if (mItems.at(i)->action == action) {
-			return (i);
-		}
-	}
-	return (-1);
+    for (int i = 0; i < mItems.count(); ++i) {
+        if (mItems.at(i)->action == action) {
+            return (i);
+        }
+    }
+    return (-1);
 }
 
 /**
@@ -85,9 +85,9 @@ SARibbonPanel* SARibbonPanelLayout::ribbonPanel() const
  */
 void SARibbonPanelLayout::addItem(QLayoutItem* item)
 {
-	Q_UNUSED(item);
-	qWarning("SARibbonPanelLayout::addItem(): please use addAction() instead");
-	return;
+    Q_UNUSED(item);
+    qWarning("SARibbonPanelLayout::addItem(): please use addAction() instead");
+    return;
 }
 
 /**
@@ -104,15 +104,15 @@ void SARibbonPanelLayout::addItem(QLayoutItem* item)
  */
 void SARibbonPanelLayout::insertAction(int index, QAction* act, SARibbonPanelItem::RowProportion rp)
 {
-	index                   = qMax(0, index);
-	index                   = qMin(mItems.count(), index);
-	SARibbonPanelItem* item = createItem(act, rp);
+    index                   = qMax(0, index);
+    index                   = qMin(mItems.count(), index);
+    SARibbonPanelItem* item = createItem(act, rp);
 
-	if (item) {
-		mItems.insert(index, item);
-		// 标记需要重新计算尺寸
-		invalidate();
-	}
+    if (item) {
+        mItems.insert(index, item);
+        // 标记需要重新计算尺寸
+        invalidate();
+    }
 }
 
 /**
@@ -128,36 +128,36 @@ void SARibbonPanelLayout::insertAction(int index, QAction* act, SARibbonPanelIte
  */
 void SARibbonPanelLayout::setOptionAction(QAction* action)
 {
-	SARibbonPanel* p = ribbonPanel();
-	if (!p) {
-		return;
-	}
-	if (action) {
-		// 创建option action
-		if (nullptr == mOptionActionBtn) {
-			mOptionActionBtn = RibbonSubElementFactory->createRibbonPanelOptionButton(p);
-			QObject::connect(mOptionActionBtn, &SARibbonToolButton::triggered, p, &SARibbonPanel::actionTriggered);
-			// 确保m_optionActionBtn在label之上
-			if (mTitleLabel) {
-				mTitleLabel->stackUnder(mOptionActionBtn);
-			}
-		}
-		mOptionActionBtn->setDefaultAction(action);
-		if (action->icon().isNull()) {
-			mOptionActionBtn->setIcon(QIcon(":/SARibbon/image/resource/ribbonPanelOptionButton.png"));
-		}
-		// 标记需要重新计算尺寸
-		invalidate();
-	} else {
-		// 取消option action
-		if (mOptionActionBtn) {
-			mOptionActionBtn->hide();
-			mOptionActionBtn->deleteLater();
-			mOptionActionBtn = nullptr;
-			// 标记需要重新计算尺寸
-			invalidate();
-		}
-	}
+    SARibbonPanel* p = ribbonPanel();
+    if (!p) {
+        return;
+    }
+    if (action) {
+        // 创建option action
+        if (nullptr == mOptionActionBtn) {
+            mOptionActionBtn = RibbonSubElementFactory->createRibbonPanelOptionButton(p);
+            QObject::connect(mOptionActionBtn, &SARibbonToolButton::triggered, p, &SARibbonPanel::actionTriggered);
+            // 确保m_optionActionBtn在label之上
+            if (mTitleLabel) {
+                mTitleLabel->stackUnder(mOptionActionBtn);
+            }
+        }
+        mOptionActionBtn->setDefaultAction(action);
+        if (action->icon().isNull()) {
+            mOptionActionBtn->setIcon(QIcon(":/SARibbon/image/resource/ribbonPanelOptionButton.png"));
+        }
+        // 标记需要重新计算尺寸
+        invalidate();
+    } else {
+        // 取消option action
+        if (mOptionActionBtn) {
+            mOptionActionBtn->hide();
+            mOptionActionBtn->deleteLater();
+            mOptionActionBtn = nullptr;
+            // 标记需要重新计算尺寸
+            invalidate();
+        }
+    }
 }
 
 /**
@@ -166,7 +166,7 @@ void SARibbonPanelLayout::setOptionAction(QAction* action)
  */
 bool SARibbonPanelLayout::isHaveOptionAction() const
 {
-	return (mOptionActionBtn != nullptr);
+    return (mOptionActionBtn != nullptr);
 }
 
 /**
@@ -176,10 +176,10 @@ bool SARibbonPanelLayout::isHaveOptionAction() const
  */
 QLayoutItem* SARibbonPanelLayout::itemAt(int index) const
 {
-	if ((index < 0) || (index >= mItems.count())) {
-		return (nullptr);
-	}
-	return (mItems.at(index));
+    if ((index < 0) || (index >= mItems.count())) {
+        return (nullptr);
+    }
+    return (mItems.at(index));
 }
 
 /**
@@ -189,23 +189,23 @@ QLayoutItem* SARibbonPanelLayout::itemAt(int index) const
  */
 QLayoutItem* SARibbonPanelLayout::takeAt(int index)
 {
-	if ((index < 0) || (index >= mItems.count())) {
-		return (nullptr);
-	}
-	SARibbonPanelItem* item = mItems.takeAt(index);
+    if ((index < 0) || (index >= mItems.count())) {
+        return (nullptr);
+    }
+    SARibbonPanelItem* item = mItems.takeAt(index);
 
-	QWidgetAction* widgetAction = qobject_cast< QWidgetAction* >(item->action);
+    QWidgetAction* widgetAction = qobject_cast< QWidgetAction* >(item->action);
 
-	if ((widgetAction != 0) && item->customWidget) {
-		widgetAction->releaseWidget(item->widget());
-	} else {
-		// destroy the QToolButton/QToolBarSeparator
-		item->widget()->hide();
-		item->widget()->deleteLater();
-	}
+    if ((widgetAction != 0) && item->customWidget) {
+        widgetAction->releaseWidget(item->widget());
+    } else {
+        // destroy the QToolButton/QToolBarSeparator
+        item->widget()->hide();
+        item->widget()->deleteLater();
+    }
 
-	invalidate();
-	return (item);
+    invalidate();
+    return (item);
 }
 
 /**
@@ -214,7 +214,7 @@ QLayoutItem* SARibbonPanelLayout::takeAt(int index)
  */
 int SARibbonPanelLayout::count() const
 {
-	return (mItems.count());
+    return (mItems.count());
 }
 
 /**
@@ -224,7 +224,7 @@ int SARibbonPanelLayout::count() const
 bool SARibbonPanelLayout::isEmpty() const
 {
 
-	return (mItems.isEmpty());
+    return (mItems.isEmpty());
 }
 
 /**
@@ -236,8 +236,8 @@ bool SARibbonPanelLayout::isEmpty() const
  */
 void SARibbonPanelLayout::invalidate()
 {
-	mDirty = true;
-	QLayout::invalidate();
+    mDirty = true;
+    QLayout::invalidate();
 }
 
 /**
@@ -246,22 +246,22 @@ void SARibbonPanelLayout::invalidate()
  */
 Qt::Orientations SARibbonPanelLayout::expandingDirections() const
 {
-	return (Qt::Horizontal);
+    return (Qt::Horizontal);
 }
 
 QSize SARibbonPanelLayout::minimumSize() const
 {
-	return (mSizeHint);
+    return (mSizeHint);
 }
 
 QSize SARibbonPanelLayout::sizeHint() const
 {
 #if SARibbonPanelLayout_DEBUG_PRINT
-	if (SARibbonPanel* panel = ribbonPanel()) {
-		qDebug() << "| |-SARibbonPanelLayout sizeHint,sizeHint = " << m_sizeHint;
-	}
+    if (SARibbonPanel* panel = ribbonPanel()) {
+        qDebug() << "| |-SARibbonPanelLayout sizeHint,sizeHint = " << m_sizeHint;
+    }
 #endif
-	return (mSizeHint);
+    return (mSizeHint);
 }
 
 /**
@@ -271,12 +271,12 @@ QSize SARibbonPanelLayout::sizeHint() const
  */
 SARibbonPanelItem* SARibbonPanelLayout::panelItem(QAction* action) const
 {
-	int index = indexByAction(action);
+    int index = indexByAction(action);
 
-	if (index >= 0) {
-		return (mItems[ index ]);
-	}
-	return (nullptr);
+    if (index >= 0) {
+        return (mItems[ index ]);
+    }
+    return (nullptr);
 }
 
 /**
@@ -285,10 +285,10 @@ SARibbonPanelItem* SARibbonPanelLayout::panelItem(QAction* action) const
  */
 SARibbonPanelItem* SARibbonPanelLayout::lastItem() const
 {
-	if (mItems.isEmpty()) {
-		return (nullptr);
-	}
-	return (mItems.last());
+    if (mItems.isEmpty()) {
+        return (nullptr);
+    }
+    return (mItems.last());
 }
 
 /**
@@ -297,12 +297,12 @@ SARibbonPanelItem* SARibbonPanelLayout::lastItem() const
  */
 QWidget* SARibbonPanelLayout::lastWidget() const
 {
-	SARibbonPanelItem* item = lastItem();
+    SARibbonPanelItem* item = lastItem();
 
-	if (item) {
-		return (item->widget());
-	}
-	return (nullptr);
+    if (item) {
+        return (item->widget());
+    }
+    return (nullptr);
 }
 
 /**
@@ -312,17 +312,17 @@ QWidget* SARibbonPanelLayout::lastWidget() const
  */
 void SARibbonPanelLayout::move(int from, int to)
 {
-	if (from == to) {
-		return;
-	}
-	if (to < 0) {
-		to = 0;
-	}
-	if (to >= count()) {
-		to = count() - 1;
-	}
-	mItems.move(from, to);
-	invalidate();
+    if (from == to) {
+        return;
+    }
+    if (to < 0) {
+        to = 0;
+    }
+    if (to >= count()) {
+        to = count() - 1;
+    }
+    mItems.move(from, to);
+    invalidate();
 }
 
 /**
@@ -331,12 +331,12 @@ void SARibbonPanelLayout::move(int from, int to)
  */
 bool SARibbonPanelLayout::isDirty() const
 {
-	return (mDirty);
+    return (mDirty);
 }
 
 void SARibbonPanelLayout::updateGeomArray()
 {
-	updateGeomArray(geometry());
+    updateGeomArray(geometry());
 }
 
 /**
@@ -345,55 +345,55 @@ void SARibbonPanelLayout::updateGeomArray()
 void SARibbonPanelLayout::doLayout()
 {
 #if SARibbonPanelLayout_DEBUG_PRINT
-	if (SARibbonPanel* panel = ribbonPanel()) {
-		qDebug() << "| |-SARibbonPanelLayout layoutActions,panel name = " << panel->panelName();
-	}
+    if (SARibbonPanel* panel = ribbonPanel()) {
+        qDebug() << "| |-SARibbonPanelLayout layoutActions,panel name = " << panel->panelName();
+    }
 #endif
-	if (isDirty()) {
-		updateGeomArray();
-	}
-	QList< QWidget* > showWidgets, hideWidgets;
-	SARibbonPanel* panel = ribbonPanel();
-	for (SARibbonPanelItem* item : qAsConst(mItems)) {
-		if (item->isEmpty()) {
-			hideWidgets << item->widget();
-		} else {
-			// 在category发现item->setGeometry有点奇怪的现象，这里统一使用item->widget->setgeo
-			// item->setGeometry(item->itemWillSetGeometry);
-			if (item->widget()) {
-				item->widget()->setGeometry(item->itemWillSetGeometry);
-			}
-			showWidgets << item->widget();
-		}
-	}
+    if (isDirty()) {
+        updateGeomArray();
+    }
+    QList< QWidget* > showWidgets, hideWidgets;
+    SARibbonPanel* panel = ribbonPanel();
+    for (SARibbonPanelItem* item : qAsConst(mItems)) {
+        if (item->isEmpty()) {
+            hideWidgets << item->widget();
+        } else {
+            // 在category发现item->setGeometry有点奇怪的现象，这里统一使用item->widget->setgeo
+            // item->setGeometry(item->itemWillSetGeometry);
+            if (item->widget()) {
+                item->widget()->setGeometry(item->itemWillSetGeometry);
+            }
+            showWidgets << item->widget();
+        }
+    }
 
-	// 不在上面那里进行show和hide因为这会触发SARibbonPanelLayout的重绘，导致循环绘制，非常影响效率
-	for (QWidget* w : qAsConst(showWidgets)) {
-		if (!w->isVisible())
-			w->show();
-	}
-	for (QWidget* w : qAsConst(hideWidgets)) {
-		if (w->isVisible())
-			w->hide();
-	}
-	// 布局label
-	if (mTitleLabel) {
-		if (isEnableShowPanelTitle()) {
-			mTitleLabel->setGeometry(mTitleLabelGeometry);
-			if (!mTitleLabel->isVisibleTo(panel)) {
-				mTitleLabel->show();
-			}
-		} else {
-			if (mTitleLabel->isVisibleTo(panel)) {
-				mTitleLabel->hide();
-			}
-		}
-	}
-	// 布局m_optionActionBtn
-	if (mOptionActionBtn) {
-		mOptionActionBtn->setGeometry(mOptionActionBtnGeometry);
-		mOptionActionBtn->setIconSize(QSize(mOptionActionBtnGeometry.width(), mOptionActionBtnGeometry.height()));
-	}
+    // 不在上面那里进行show和hide因为这会触发SARibbonPanelLayout的重绘，导致循环绘制，非常影响效率
+    for (QWidget* w : qAsConst(showWidgets)) {
+        if (!w->isVisible())
+            w->show();
+    }
+    for (QWidget* w : qAsConst(hideWidgets)) {
+        if (w->isVisible())
+            w->hide();
+    }
+    // 布局label
+    if (mTitleLabel) {
+        if (isEnableShowPanelTitle()) {
+            mTitleLabel->setGeometry(mTitleLabelGeometry);
+            if (!mTitleLabel->isVisibleTo(panel)) {
+                mTitleLabel->show();
+            }
+        } else {
+            if (mTitleLabel->isVisibleTo(panel)) {
+                mTitleLabel->hide();
+            }
+        }
+    }
+    // 布局m_optionActionBtn
+    if (mOptionActionBtn) {
+        mOptionActionBtn->setGeometry(mOptionActionBtnGeometry);
+        mOptionActionBtn->setIconSize(QSize(mOptionActionBtnGeometry.width(), mOptionActionBtnGeometry.height()));
+    }
 }
 
 /**
@@ -411,54 +411,55 @@ void SARibbonPanelLayout::doLayout()
  */
 SARibbonPanelItem* SARibbonPanelLayout::createItem(QAction* action, SARibbonPanelItem::RowProportion rp)
 {
-	bool customWidget    = false;
-	QWidget* widget      = nullptr;
-	SARibbonPanel* panel = qobject_cast< SARibbonPanel* >(parentWidget());
+    bool customWidget    = false;
+    QWidget* widget      = nullptr;
+    SARibbonPanel* panel = qobject_cast< SARibbonPanel* >(parentWidget());
 
-	if (!panel) {
-		// 在没有panel这个函数会返回nullptr
-		return (nullptr);
-	}
-	if (QWidgetAction* widgetAction = qobject_cast< QWidgetAction* >(action)) {
-		widget = widgetAction->requestWidget(panel);
-		if (widget != nullptr) {
-			widget->setAttribute(Qt::WA_LayoutUsesWidgetRect);
-			customWidget = true;  // 标记为true，在移除的时候是不会对这个窗口进行删除，false默认会进行删除如SARibbonSeparatorWidget和SARibbonToolButton
-			// 明确设置父对象，确保 releaseWidget 时能正确工作
-			widget->setParent(panel);
-		}
-	} else if (action->isSeparator()) {
-		SARibbonSeparatorWidget* sep = RibbonSubElementFactory->createRibbonSeparatorWidget(panel);
-		widget                       = sep;
-	}
-	// 不是widget，自动生成SARibbonToolbutton
-	if (!widget) {
-		SARibbonToolButton::RibbonButtonType buttonType =
-			((rp == SARibbonPanelItem::Large) ? SARibbonToolButton::LargeButton : SARibbonToolButton::SmallButton);
+    if (!panel) {
+        // 在没有panel这个函数会返回nullptr
+        return (nullptr);
+    }
+    if (QWidgetAction* widgetAction = qobject_cast< QWidgetAction* >(action)) {
+        widget = widgetAction->requestWidget(panel);
+        if (widget != nullptr) {
+            widget->setAttribute(Qt::WA_LayoutUsesWidgetRect);
+            customWidget = true;  // 标记为true，在移除的时候是不会对这个窗口进行删除，false默认会进行删除如SARibbonSeparatorWidget和SARibbonToolButton
+            // 明确设置父对象，确保 releaseWidget 时能正确工作
+            widget->setParent(panel);
+        }
+    } else if (action->isSeparator()) {
+        SARibbonSeparatorWidget* sep = RibbonSubElementFactory->createRibbonSeparatorWidget(panel);
+        widget                       = sep;
+    }
+    // 不是widget，自动生成SARibbonToolbutton
+    if (!widget) {
+        SARibbonToolButton::RibbonButtonType buttonType =
+            ((rp == SARibbonPanelItem::Large) ? SARibbonToolButton::LargeButton : SARibbonToolButton::SmallButton);
 
-		SARibbonToolButton* button = RibbonSubElementFactory->createRibbonToolButton(panel);
-		button->setFocusPolicy(Qt::NoFocus);
-		button->setButtonType(buttonType);
-		button->setDefaultAction(action);
-		button->setIconSize(mDefaultToolButtonIconSize);
-		button->setEnableWordWrap(isEnableWordWrap());
-		button->setButtonMaximumAspectRatio(mButtonMaximumAspectRatio);
-		// 属性设置
-		QToolButton::ToolButtonPopupMode popMode = SARibbonPanel::getActionToolButtonPopupModeProperty(action);
-		button->setPopupMode(popMode);
-		// 根据QAction的属性设置按钮的大小
+        SARibbonToolButton* button = RibbonSubElementFactory->createRibbonToolButton(panel);
+        button->setFocusPolicy(Qt::NoFocus);
+        button->setButtonType(buttonType);
+        button->setDefaultAction(action);
+        button->setIconSize(mSmallToolButtonIconSize);
+        button->setLargeIconSize(mLargeToolButtonIconSize);
+        button->setEnableWordWrap(isEnableWordWrap());
+        button->setButtonMaximumAspectRatio(mButtonMaximumAspectRatio);
+        // 属性设置
+        QToolButton::ToolButtonPopupMode popMode = SARibbonPanel::getActionToolButtonPopupModeProperty(action);
+        button->setPopupMode(popMode);
+        // 根据QAction的属性设置按钮的大小
 
-		QObject::connect(button, &SARibbonToolButton::triggered, panel, &SARibbonPanel::actionTriggered);
-		widget = button;
-	}
-	// 这时总会有widget
-	widget->hide();
-	SARibbonPanelItem* result = new SARibbonPanelItem(widget);
+        QObject::connect(button, &SARibbonToolButton::triggered, panel, &SARibbonPanel::actionTriggered);
+        widget = button;
+    }
+    // 这时总会有widget
+    widget->hide();
+    SARibbonPanelItem* result = new SARibbonPanelItem(widget);
 
-	result->rowProportion = rp;
-	result->customWidget  = customWidget;
-	result->action        = action;
-	return (result);
+    result->rowProportion = rp;
+    result->customWidget  = customWidget;
+    result->action        = action;
+    return (result);
 }
 
 /**
@@ -466,408 +467,408 @@ SARibbonPanelItem* SARibbonPanelLayout::createItem(QAction* action, SARibbonPane
  */
 void SARibbonPanelLayout::updateGeomArray(const QRect& setrect)
 {
-	SARibbonPanel* panel = qobject_cast< SARibbonPanel* >(parentWidget());
+    SARibbonPanel* panel = qobject_cast< SARibbonPanel* >(parentWidget());
 
-	if (!panel) {
-		return;
-	}
+    if (!panel) {
+        return;
+    }
 
-	const int height     = setrect.height();
-	const QMargins& mag  = contentsMargins();
-	const int spacing    = this->spacing();
-	const int spacingRow = 1;  // 高度间距，也就是行间距，不同行之间的距离
-	int x                = mag.left();
-	const int yBegin     = mag.top();
-	int titleH           = (mTitleHeight >= 0) ? mTitleHeight : 0;  // 防止负数影响
-	int titleSpace       = (mTitleHeight >= 0) ? mTitleSpace : 0;   // 对于没有标题的情况，spacing就不生效
-	if (!isEnableShowPanelTitle()) {
-		titleH     = 0;
-		titleSpace = 0;
-	}
-	// 获取panel的布局模式 3行或者2行
-	//  rowcount 是ribbon的行，有2行和3行两种
-	const short rowCount = (panel->panelLayoutMode() == SARibbonPanel::ThreeRowMode) ? 3 : 2;
-	// largeHeight是对应large占比的高度
-	const int largeHeight = height - mag.bottom() - mag.top() - titleH - titleSpace;
-	const int yTitleBegin = height - mag.bottom() - titleH;
-	mLargeHeight          = largeHeight;
-	// 计算smallHeight的高度
-	const int smallHeight = (largeHeight - (rowCount - 1) * spacingRow) / rowCount;
-	// Medium行的y位置
-	const int yMediumRow0 = (2 == rowCount) ? yBegin : (yBegin + ((largeHeight - 2 * smallHeight) / 3));
-	const int yMediumRow1 = (2 == rowCount) ? (yBegin + smallHeight + spacingRow)
-	                                        : (yBegin + ((largeHeight - 2 * smallHeight) / 3) * 2 + smallHeight);
-	// Small行的y位置
-	const int ySmallRow0 = yBegin;
-	const int ySmallRow1 = yBegin + smallHeight + spacingRow;
-	const int ySmallRow2 = yBegin + 2 * (smallHeight + spacingRow);
-	// row用于记录下个item应该属于第几行，item->rowIndex用于记录当前处于第几行，
-	// item->rowIndex主要用于SARibbonPanelItem::Medium
-	short row  = 0;
-	int column = 0;
-	// 记录每列最大的宽度
-	int columMaxWidth = 0;
-	// 记录总宽度
-	int totalWidth = 0;
+    const int height     = setrect.height();
+    const QMargins& mag  = contentsMargins();
+    const int spacing    = this->spacing();
+    const int spacingRow = 1;  // 高度间距，也就是行间距，不同行之间的距离
+    int x                = mag.left();
+    const int yBegin     = mag.top();
+    int titleH           = (mTitleHeight >= 0) ? mTitleHeight : 0;  // 防止负数影响
+    int titleSpace       = (mTitleHeight >= 0) ? mTitleSpace : 0;   // 对于没有标题的情况，spacing就不生效
+    if (!isEnableShowPanelTitle()) {
+        titleH     = 0;
+        titleSpace = 0;
+    }
+    // 获取panel的布局模式 3行或者2行
+    //  rowcount 是ribbon的行，有2行和3行两种
+    const short rowCount = (panel->panelLayoutMode() == SARibbonPanel::ThreeRowMode) ? 3 : 2;
+    // largeHeight是对应large占比的高度
+    const int largeHeight = height - mag.bottom() - mag.top() - titleH - titleSpace;
+    const int yTitleBegin = height - mag.bottom() - titleH;
+    mLargeHeight          = largeHeight;
+    // 计算smallHeight的高度
+    const int smallHeight = (largeHeight - (rowCount - 1) * spacingRow) / rowCount;
+    // Medium行的y位置
+    const int yMediumRow0 = (2 == rowCount) ? yBegin : (yBegin + ((largeHeight - 2 * smallHeight) / 3));
+    const int yMediumRow1 = (2 == rowCount) ? (yBegin + smallHeight + spacingRow)
+                                            : (yBegin + ((largeHeight - 2 * smallHeight) / 3) * 2 + smallHeight);
+    // Small行的y位置
+    const int ySmallRow0 = yBegin;
+    const int ySmallRow1 = yBegin + smallHeight + spacingRow;
+    const int ySmallRow2 = yBegin + 2 * (smallHeight + spacingRow);
+    // row用于记录下个item应该属于第几行，item->rowIndex用于记录当前处于第几行，
+    // item->rowIndex主要用于SARibbonPanelItem::Medium
+    short row  = 0;
+    int column = 0;
+    // 记录每列最大的宽度
+    int columMaxWidth = 0;
+    // 记录总宽度
+    int totalWidth = 0;
 
-	int itemCount = mItems.count();
+    int itemCount = mItems.count();
 
 #if SARibbonPanelLayout_DEBUG_PRINT
-	QString debug_print__log__;
+    QString debug_print__log__;
 #endif
-	// 本列第一、二行占比
-	SARibbonPanelItem::RowProportion thisColumnRP0 = SARibbonPanelItem::None;
-	SARibbonPanelItem* lastGeomItem                = nullptr;  // 记录最后一个设置位置的item
-	for (int i = 0; i < itemCount; ++i) {
-		SARibbonPanelItem* item = mItems.at(i);
-		if (item->isEmpty()) {
-			// 如果是hide就直接跳过
-			item->rowIndex    = -1;
-			item->columnIndex = -1;
-			continue;
-		}
-		// 当开始新的一列时，重置列宽
-		if (row == 0) {
-			columMaxWidth = 0;
-		}
-		QSize hint = item->sizeHint();
+    // 本列第一、二行占比
+    SARibbonPanelItem::RowProportion thisColumnRP0 = SARibbonPanelItem::None;
+    SARibbonPanelItem* lastGeomItem                = nullptr;  // 记录最后一个设置位置的item
+    for (int i = 0; i < itemCount; ++i) {
+        SARibbonPanelItem* item = mItems.at(i);
+        if (item->isEmpty()) {
+            // 如果是hide就直接跳过
+            item->rowIndex    = -1;
+            item->columnIndex = -1;
+            continue;
+        }
+        // 当开始新的一列时，重置列宽
+        if (row == 0) {
+            columMaxWidth = 0;
+        }
+        QSize hint = item->sizeHint();
 #if SARibbonPanelLayout_DEBUG_PRINT
-		if (SARibbonToolButton* tb = qobject_cast< SARibbonToolButton* >(item->widget())) {
-			auto ss__ = tb->sizeHint();
-			debug_print__log__ += QString("| | |-[%1]SARibbonToolButton.sizeHint=(%2,%3),ButtonText=%4\n")
-			                          .arg(i)
-			                          .arg(ss__.width())
-			                          .arg(ss__.height())
-			                          .arg(tb->text());
-		}
+        if (SARibbonToolButton* tb = qobject_cast< SARibbonToolButton* >(item->widget())) {
+            auto ss__ = tb->sizeHint();
+            debug_print__log__ += QString("| | |-[%1]SARibbonToolButton.sizeHint=(%2,%3),ButtonText=%4\n")
+                                      .arg(i)
+                                      .arg(ss__.width())
+                                      .arg(ss__.height())
+                                      .arg(tb->text());
+        }
 #endif
-		Qt::Orientations exp = item->expandingDirections();
-		if (item->widget()) {
-			// 有窗口是水平扩展，则标记为扩展
-			if ((item->widget()->sizePolicy().horizontalPolicy() & QSizePolicy::ExpandFlag)) {
-				mExpandFlag = true;
-			}
-		}
-		SARibbonPanelItem::RowProportion rp = item->rowProportion;
-		if (SARibbonPanelItem::None == rp) {
-			// 为定义行占比但是垂直扩展，就定义为Large占比，否则就是small占比
-			if (exp & Qt::Vertical) {
-				rp = SARibbonPanelItem::Large;
-			} else {
-				rp = SARibbonPanelItem::Small;
-			}
-		}
-		// 开始根据占比和layoutmode来布局
-		switch (rp) {
-		case SARibbonPanelItem::Large: {
-			// ！！在Large，如果不是处于新列的第一行，就需要进行换列处理
-			// 把large一直设置在下一列的开始
-			if (row != 0) {
-				x += (columMaxWidth + spacing);
-				++column;
-			}
-			//
-			item->rowIndex            = 0;
-			item->columnIndex         = column;
-			item->itemWillSetGeometry = QRect(x, yBegin, hint.width(), largeHeight);
-			columMaxWidth             = hint.width();
-			// 换列，x自动递增到下个坐标，列数增加，行数归零，最大列宽归零
-			x += (columMaxWidth + spacing);
-			row           = 0;
-			columMaxWidth = 0;
-			++column;
-		} break;
+        Qt::Orientations exp = item->expandingDirections();
+        if (item->widget()) {
+            // 有窗口是水平扩展，则标记为扩展
+            if ((item->widget()->sizePolicy().horizontalPolicy() & QSizePolicy::ExpandFlag)) {
+                mExpandFlag = true;
+            }
+        }
+        SARibbonPanelItem::RowProportion rp = item->rowProportion;
+        if (SARibbonPanelItem::None == rp) {
+            // 为定义行占比但是垂直扩展，就定义为Large占比，否则就是small占比
+            if (exp & Qt::Vertical) {
+                rp = SARibbonPanelItem::Large;
+            } else {
+                rp = SARibbonPanelItem::Small;
+            }
+        }
+        // 开始根据占比和layoutmode来布局
+        switch (rp) {
+        case SARibbonPanelItem::Large: {
+            // ！！在Large，如果不是处于新列的第一行，就需要进行换列处理
+            // 把large一直设置在下一列的开始
+            if (row != 0) {
+                x += (columMaxWidth + spacing);
+                ++column;
+            }
+            //
+            item->rowIndex            = 0;
+            item->columnIndex         = column;
+            item->itemWillSetGeometry = QRect(x, yBegin, hint.width(), largeHeight);
+            columMaxWidth             = hint.width();
+            // 换列，x自动递增到下个坐标，列数增加，行数归零，最大列宽归零
+            x += (columMaxWidth + spacing);
+            row           = 0;
+            columMaxWidth = 0;
+            ++column;
+        } break;
 
-		case SARibbonPanelItem::Medium: {
-			// 2行模式下Medium和small等价
-			if (2 == rowCount) {
-				if (0 == row) {
-					item->rowIndex            = 0;
-					item->columnIndex         = column;
-					item->itemWillSetGeometry = QRect(x, yMediumRow0, hint.width(), smallHeight);
-					thisColumnRP0             = SARibbonPanelItem::Medium;
-					columMaxWidth             = hint.width();
-					// 下个row为1
-					row = 1;
-					// x不变
-				} else {
-					item->rowIndex            = 1;
-					item->columnIndex         = column;
-					item->itemWillSetGeometry = QRect(x, yMediumRow1, hint.width(), smallHeight);
-					// 和上个进行比较得到最长宽度
-					columMaxWidth = qMax(columMaxWidth, hint.width());
-					// 换列，x自动递增到下个坐标，列数增加，行数归零，最大列宽归零
-					x += (columMaxWidth + spacing);
-					row           = 0;
-					columMaxWidth = 0;
-					++column;
-				}
-			} else {
-				// 3行模式
-				if (0 == row) {
-					item->rowIndex            = 0;
-					item->columnIndex         = column;
-					item->itemWillSetGeometry = QRect(x, yMediumRow0, hint.width(), smallHeight);
-					thisColumnRP0             = SARibbonPanelItem::Medium;
-					columMaxWidth             = hint.width();
-					row                       = 1;
-					// x不变
-				} else if (1 == row) {
-					item->rowIndex            = 1;
-					item->columnIndex         = column;
-					item->itemWillSetGeometry = QRect(x, yMediumRow1, hint.width(), smallHeight);
-					columMaxWidth             = qMax(columMaxWidth, hint.width());
-					// 换列，x自动递增到下个坐标，列数增加，行数归零，最大列宽归零
-					x += (columMaxWidth + spacing);
-					row           = 0;
-					columMaxWidth = 0;
-					++column;
-				} else {
-					// 这种模式一般情况会发生在当前列前两行是Small，添加了一个Medium
-					// 这时需要先换列
-					// 换列，x自动递增到下个坐标，列数增加，行数归零，最大列宽归零
-					x += (columMaxWidth + spacing);
-					++column;
-					// 换列后此时等价于0 == row
-					item->rowIndex            = 0;
-					item->columnIndex         = column;
-					item->itemWillSetGeometry = QRect(x, yMediumRow0, hint.width(), smallHeight);
-					thisColumnRP0             = SARibbonPanelItem::Medium;
-					columMaxWidth             = hint.width();
-					row                       = 1;
-				}
-			}
-		} break;
+        case SARibbonPanelItem::Medium: {
+            // 2行模式下Medium和small等价
+            if (2 == rowCount) {
+                if (0 == row) {
+                    item->rowIndex            = 0;
+                    item->columnIndex         = column;
+                    item->itemWillSetGeometry = QRect(x, yMediumRow0, hint.width(), smallHeight);
+                    thisColumnRP0             = SARibbonPanelItem::Medium;
+                    columMaxWidth             = hint.width();
+                    // 下个row为1
+                    row = 1;
+                    // x不变
+                } else {
+                    item->rowIndex            = 1;
+                    item->columnIndex         = column;
+                    item->itemWillSetGeometry = QRect(x, yMediumRow1, hint.width(), smallHeight);
+                    // 和上个进行比较得到最长宽度
+                    columMaxWidth = qMax(columMaxWidth, hint.width());
+                    // 换列，x自动递增到下个坐标，列数增加，行数归零，最大列宽归零
+                    x += (columMaxWidth + spacing);
+                    row           = 0;
+                    columMaxWidth = 0;
+                    ++column;
+                }
+            } else {
+                // 3行模式
+                if (0 == row) {
+                    item->rowIndex            = 0;
+                    item->columnIndex         = column;
+                    item->itemWillSetGeometry = QRect(x, yMediumRow0, hint.width(), smallHeight);
+                    thisColumnRP0             = SARibbonPanelItem::Medium;
+                    columMaxWidth             = hint.width();
+                    row                       = 1;
+                    // x不变
+                } else if (1 == row) {
+                    item->rowIndex            = 1;
+                    item->columnIndex         = column;
+                    item->itemWillSetGeometry = QRect(x, yMediumRow1, hint.width(), smallHeight);
+                    columMaxWidth             = qMax(columMaxWidth, hint.width());
+                    // 换列，x自动递增到下个坐标，列数增加，行数归零，最大列宽归零
+                    x += (columMaxWidth + spacing);
+                    row           = 0;
+                    columMaxWidth = 0;
+                    ++column;
+                } else {
+                    // 这种模式一般情况会发生在当前列前两行是Small，添加了一个Medium
+                    // 这时需要先换列
+                    // 换列，x自动递增到下个坐标，列数增加，行数归零，最大列宽归零
+                    x += (columMaxWidth + spacing);
+                    ++column;
+                    // 换列后此时等价于0 == row
+                    item->rowIndex            = 0;
+                    item->columnIndex         = column;
+                    item->itemWillSetGeometry = QRect(x, yMediumRow0, hint.width(), smallHeight);
+                    thisColumnRP0             = SARibbonPanelItem::Medium;
+                    columMaxWidth             = hint.width();
+                    row                       = 1;
+                }
+            }
+        } break;
 
-		case SARibbonPanelItem::Small: {
-			if (0 == row) {
-				// 第一行
-				item->rowIndex            = 0;
-				item->columnIndex         = column;
-				item->itemWillSetGeometry = QRect(x, ySmallRow0, hint.width(), smallHeight);
-				thisColumnRP0             = SARibbonPanelItem::Small;
-				columMaxWidth             = hint.width();
-				// 下个row为1
-				row = 1;
-				// x不变
-			} else if (1 == row) {
-				// 第二行
-				item->rowIndex            = 1;
-				item->columnIndex         = column;
-				item->itemWillSetGeometry = QRect(x, ySmallRow1, hint.width(), smallHeight);
-				if ((3 == rowCount) && (SARibbonPanelItem::Medium == thisColumnRP0)) {
-					// 三行模式，并且第一行是Medium
-					item->itemWillSetGeometry = QRect(x, yMediumRow1, hint.width(), smallHeight);
-				}
-				// 和上个进行比较得到最长宽度
-				columMaxWidth = qMax(columMaxWidth, hint.width());
-				// 这里要看两行还是三行，确定是否要换列
-				if (2 == rowCount) {
-					// 两行模式，换列
-					// 换列，x自动递增到下个坐标，列数增加，行数归零，最大列宽归零
-					x += (columMaxWidth + spacing);
-					row           = 0;
-					columMaxWidth = 0;
-					++column;
-				} else {
-					// 三行模式，继续增加行数
-					row = 2;
-					// x不变
-				}
-				if ((3 == rowCount) && (SARibbonPanelItem::Medium == thisColumnRP0)) {
-					// 三行模式，并且第一行是Medium，换列
-					// 换列，x自动递增到下个坐标，列数增加，行数归零，最大列宽归零
-					x += (columMaxWidth + spacing);
-					row           = 0;
-					columMaxWidth = 0;
-					++column;
-				}
-			} else {
-				// 第三行
-				item->rowIndex            = 2;
-				item->columnIndex         = column;
-				item->itemWillSetGeometry = QRect(x, ySmallRow2, hint.width(), smallHeight);
-				// 和上个进行比较得到最长宽度
-				columMaxWidth = qMax(columMaxWidth, hint.width());
-				// 换列，x自动递增到下个坐标，列数增加，行数归零，最大列宽归零
-				x += (columMaxWidth + spacing);
-				row           = 0;
-				columMaxWidth = 0;
-				++column;
-			}
-		} break;
+        case SARibbonPanelItem::Small: {
+            if (0 == row) {
+                // 第一行
+                item->rowIndex            = 0;
+                item->columnIndex         = column;
+                item->itemWillSetGeometry = QRect(x, ySmallRow0, hint.width(), smallHeight);
+                thisColumnRP0             = SARibbonPanelItem::Small;
+                columMaxWidth             = hint.width();
+                // 下个row为1
+                row = 1;
+                // x不变
+            } else if (1 == row) {
+                // 第二行
+                item->rowIndex            = 1;
+                item->columnIndex         = column;
+                item->itemWillSetGeometry = QRect(x, ySmallRow1, hint.width(), smallHeight);
+                if ((3 == rowCount) && (SARibbonPanelItem::Medium == thisColumnRP0)) {
+                    // 三行模式，并且第一行是Medium
+                    item->itemWillSetGeometry = QRect(x, yMediumRow1, hint.width(), smallHeight);
+                }
+                // 和上个进行比较得到最长宽度
+                columMaxWidth = qMax(columMaxWidth, hint.width());
+                // 这里要看两行还是三行，确定是否要换列
+                if (2 == rowCount) {
+                    // 两行模式，换列
+                    // 换列，x自动递增到下个坐标，列数增加，行数归零，最大列宽归零
+                    x += (columMaxWidth + spacing);
+                    row           = 0;
+                    columMaxWidth = 0;
+                    ++column;
+                } else {
+                    // 三行模式，继续增加行数
+                    row = 2;
+                    // x不变
+                }
+                if ((3 == rowCount) && (SARibbonPanelItem::Medium == thisColumnRP0)) {
+                    // 三行模式，并且第一行是Medium，换列
+                    // 换列，x自动递增到下个坐标，列数增加，行数归零，最大列宽归零
+                    x += (columMaxWidth + spacing);
+                    row           = 0;
+                    columMaxWidth = 0;
+                    ++column;
+                }
+            } else {
+                // 第三行
+                item->rowIndex            = 2;
+                item->columnIndex         = column;
+                item->itemWillSetGeometry = QRect(x, ySmallRow2, hint.width(), smallHeight);
+                // 和上个进行比较得到最长宽度
+                columMaxWidth = qMax(columMaxWidth, hint.width());
+                // 换列，x自动递增到下个坐标，列数增加，行数归零，最大列宽归零
+                x += (columMaxWidth + spacing);
+                row           = 0;
+                columMaxWidth = 0;
+                ++column;
+            }
+        } break;
 
-		default:
-			// 不可能出现
-			break;
-		}
-		lastGeomItem = item;
-	}
-	// 最后一个元素，更新列数
-	//  2022-06-20 此句本来在循环里面，如果最后一个元素隐藏，会导致无法到达此判断导致异常
-	if (lastGeomItem) {  // 最后一个元素，更新totalWidth
-		if (lastGeomItem->columnIndex != column) {
-			// 说明最后一个元素处于最后位置，触发了换列，此时真实列数需要减1，直接等于column索引
-			mColumnCount = column;
-			// 由于最后一个元素触发了换列，x值是新一列的位置，直接作为totalWidth要减去已经加入的spacing
-			totalWidth = x - spacing + mag.right();
-		} else {
-			// 说明最后一个元素处于非最后位置，没有触发下一个换列，此时真实列数等于column索引+1
-			mColumnCount = column + 1;
-			// 由于最后一个元素未触发换列，需要计算totalWidth
-			totalWidth = x + columMaxWidth + mag.right();
-		}
-	}
+        default:
+            // 不可能出现
+            break;
+        }
+        lastGeomItem = item;
+    }
+    // 最后一个元素，更新列数
+    //  2022-06-20 此句本来在循环里面，如果最后一个元素隐藏，会导致无法到达此判断导致异常
+    if (lastGeomItem) {  // 最后一个元素，更新totalWidth
+        if (lastGeomItem->columnIndex != column) {
+            // 说明最后一个元素处于最后位置，触发了换列，此时真实列数需要减1，直接等于column索引
+            mColumnCount = column;
+            // 由于最后一个元素触发了换列，x值是新一列的位置，直接作为totalWidth要减去已经加入的spacing
+            totalWidth = x - spacing + mag.right();
+        } else {
+            // 说明最后一个元素处于非最后位置，没有触发下一个换列，此时真实列数等于column索引+1
+            mColumnCount = column + 1;
+            // 由于最后一个元素未触发换列，需要计算totalWidth
+            totalWidth = x + columMaxWidth + mag.right();
+        }
+    }
 
-	// 在设置完所有窗口后，再设置扩展属性的窗口
-	if (totalWidth < setrect.width() && (setrect.width() - totalWidth) > 10) {
-		// 说明可以设置扩展属性的窗口
-		recalcExpandGeomArray(setrect);
-	}
-	// 布局label
-	bool isTitleWidthThanPanel = false;
-	if (isEnableShowPanelTitle()) {
-		mTitleLabelGeometry.setRect(mag.left(), yTitleBegin, setrect.width() - mag.left() - mag.right(), titleH);
-		// 这里要确认标题宽度是否大于totalWidth，如果大于，则要把标题的宽度作为totalwidth
-		QFontMetrics fm = mTitleLabel->fontMetrics();
-		int textWidth   = SA_FONTMETRICS_WIDTH(fm, panel->panelName());
-		textWidth += 4;
-		if (totalWidth < textWidth) {
-			totalWidth            = textWidth;
-			isTitleWidthThanPanel = true;  // 说明标题的长度大于按钮布局的长度
-		}
-	}
-	// 布局optionActionButton
+    // 在设置完所有窗口后，再设置扩展属性的窗口
+    if (totalWidth < setrect.width() && (setrect.width() - totalWidth) > 10) {
+        // 说明可以设置扩展属性的窗口
+        recalcExpandGeomArray(setrect);
+    }
+    // 布局label
+    bool isTitleWidthThanPanel = false;
+    if (isEnableShowPanelTitle()) {
+        mTitleLabelGeometry.setRect(mag.left(), yTitleBegin, setrect.width() - mag.left() - mag.right(), titleH);
+        // 这里要确认标题宽度是否大于totalWidth，如果大于，则要把标题的宽度作为totalwidth
+        QFontMetrics fm = mTitleLabel->fontMetrics();
+        int textWidth   = SA_FONTMETRICS_WIDTH(fm, panel->panelName());
+        textWidth += 4;
+        if (totalWidth < textWidth) {
+            totalWidth            = textWidth;
+            isTitleWidthThanPanel = true;  // 说明标题的长度大于按钮布局的长度
+        }
+    }
+    // 布局optionActionButton
 
-	if (isHaveOptionAction()) {
-		QSize optBtnSize = optionActionButtonSize();
-		if (isEnableShowPanelTitle()) {
-			// 有标题
-			mOptionActionBtnGeometry.setRect(mTitleLabelGeometry.right() - mTitleLabelGeometry.height(),
-			                                 mTitleLabelGeometry.y(),
-			                                 mTitleLabelGeometry.height(),
-			                                 mTitleLabelGeometry.height());
+    if (isHaveOptionAction()) {
+        QSize optBtnSize = optionActionButtonSize();
+        if (isEnableShowPanelTitle()) {
+            // 有标题
+            mOptionActionBtnGeometry.setRect(mTitleLabelGeometry.right() - mTitleLabelGeometry.height(),
+                                             mTitleLabelGeometry.y(),
+                                             mTitleLabelGeometry.height(),
+                                             mTitleLabelGeometry.height());
 
-			// 特殊情况，如果panel的标题长度大于totalWidth，那么说明totalWidth比较短
-			// 这时候，optionActionBtn的宽度要加上到标题宽度上
-			if (isTitleWidthThanPanel) {
-				// 由于文字是居中对齐，因此要扩展2个按钮的宽度
-				totalWidth += (2 * titleH);
-			}
-		} else {
-			// 无标题
-			mOptionActionBtnGeometry.setRect(setrect.right() - optBtnSize.width() - mag.right(),
-			                                 setrect.bottom() - optBtnSize.height() - mag.bottom(),
-			                                 optBtnSize.width(),
-			                                 optBtnSize.height());
-			totalWidth += optBtnSize.width();
-		}
-	}
-	// 刷新sizeHint
-	int heightHint  = SARibbonPanel::panelHeightHint(panel->fontMetrics(), panel->panelLayoutMode(), titleH);
-	this->mSizeHint = QSize(totalWidth, heightHint);
+            // 特殊情况，如果panel的标题长度大于totalWidth，那么说明totalWidth比较短
+            // 这时候，optionActionBtn的宽度要加上到标题宽度上
+            if (isTitleWidthThanPanel) {
+                // 由于文字是居中对齐，因此要扩展2个按钮的宽度
+                totalWidth += (2 * titleH);
+            }
+        } else {
+            // 无标题
+            mOptionActionBtnGeometry.setRect(setrect.right() - optBtnSize.width() - mag.right(),
+                                             setrect.bottom() - optBtnSize.height() - mag.bottom(),
+                                             optBtnSize.width(),
+                                             optBtnSize.height());
+            totalWidth += optBtnSize.width();
+        }
+    }
+    // 刷新sizeHint
+    int heightHint  = SARibbonPanel::panelHeightHint(panel->fontMetrics(), panel->panelLayoutMode(), titleH);
+    this->mSizeHint = QSize(totalWidth, heightHint);
 #if SARibbonPanelLayout_DEBUG_PRINT
-	qDebug() << "| |-SARibbonPanelLayout updateGeomArray(" << setrect << "),panel name = " << panel->panelName()
-	         << "\n| | |-size hint =" << this->m_sizeHint  //
-	         << "\n| | |-totalWidth=" << totalWidth        //
-	         << "\n| | |-last x=" << x                     //
-	         << "\n| | |-columMaxWidth=" << columMaxWidth  //
-	         << "\n| | |-spacing=" << spacing              //
-	         << "\n| | |-mag=" << mag                      //
-	         << "\n| | |-largeHeight=" << largeHeight      //
-	         << "\n| | |-smallHeight=" << smallHeight      //
-	    ;
-	qDebug().noquote() << debug_print__log__;
+    qDebug() << "| |-SARibbonPanelLayout updateGeomArray(" << setrect << "),panel name = " << panel->panelName()
+             << "\n| | |-size hint =" << this->m_sizeHint  //
+             << "\n| | |-totalWidth=" << totalWidth        //
+             << "\n| | |-last x=" << x                     //
+             << "\n| | |-columMaxWidth=" << columMaxWidth  //
+             << "\n| | |-spacing=" << spacing              //
+             << "\n| | |-mag=" << mag                      //
+             << "\n| | |-largeHeight=" << largeHeight      //
+             << "\n| | |-smallHeight=" << smallHeight      //
+        ;
+    qDebug().noquote() << debug_print__log__;
 #endif
 }
 
 void SARibbonPanelLayout::recalcExpandGeomArray(const QRect& setrect)
 {
-	// 计算能扩展的尺寸
-	int expandwidth = setrect.width() - this->mSizeHint.width();
+    // 计算能扩展的尺寸
+    int expandwidth = setrect.width() - this->mSizeHint.width();
 
-	if (expandwidth <= 0) {
-		// 没有必要设置
-		return;
-	}
-	// 列扩展信息
-	struct _columnExpandInfo
-	{
-		int oldColumnWidth      = 0;   ///< 原来的列宽
-		int columnMaximumWidth  = -1;  ///< 列的最大宽度
-		int columnExpandedWidth = 0;   ///< 扩展后列的宽度
-		QList< SARibbonPanelItem* > expandItems;
-	};
-	// 此变量用于记录可以水平扩展的列和控件，在布局结束后，如果还有空间，就把水平扩展的控件进行扩展
-	QMap< int, _columnExpandInfo > columnExpandInfo;
+    if (expandwidth <= 0) {
+        // 没有必要设置
+        return;
+    }
+    // 列扩展信息
+    struct _columnExpandInfo
+    {
+        int oldColumnWidth      = 0;   ///< 原来的列宽
+        int columnMaximumWidth  = -1;  ///< 列的最大宽度
+        int columnExpandedWidth = 0;   ///< 扩展后列的宽度
+        QList< SARibbonPanelItem* > expandItems;
+    };
+    // 此变量用于记录可以水平扩展的列和控件，在布局结束后，如果还有空间，就把水平扩展的控件进行扩展
+    QMap< int, _columnExpandInfo > columnExpandInfo;
 
-	for (SARibbonPanelItem* item : qAsConst(mItems)) {
-		if ((!item->isEmpty()) && item->expandingDirections() & Qt::Horizontal) {
-			// 只获取可见的
-			QMap< int, _columnExpandInfo >::iterator i = columnExpandInfo.find(item->columnIndex);
-			if (i == columnExpandInfo.end()) {
-				i = columnExpandInfo.insert(item->columnIndex, _columnExpandInfo());
-			}
-			i.value().expandItems.append(item);
-		}
-	}
-	if (columnExpandInfo.size() <= 0) {
-		// 没有需要扩展的就退出
-		return;
-	}
-	// 获取完可扩展的列和控件后，计算对应的列的尺寸
-	// 计算能扩展的尺寸
-	int oneColCanexpandWidth = expandwidth / columnExpandInfo.size();
+    for (SARibbonPanelItem* item : qAsConst(mItems)) {
+        if ((!item->isEmpty()) && item->expandingDirections() & Qt::Horizontal) {
+            // 只获取可见的
+            QMap< int, _columnExpandInfo >::iterator i = columnExpandInfo.find(item->columnIndex);
+            if (i == columnExpandInfo.end()) {
+                i = columnExpandInfo.insert(item->columnIndex, _columnExpandInfo());
+            }
+            i.value().expandItems.append(item);
+        }
+    }
+    if (columnExpandInfo.size() <= 0) {
+        // 没有需要扩展的就退出
+        return;
+    }
+    // 获取完可扩展的列和控件后，计算对应的列的尺寸
+    // 计算能扩展的尺寸
+    int oneColCanexpandWidth = expandwidth / columnExpandInfo.size();
 
-	for (QMap< int, _columnExpandInfo >::iterator i = columnExpandInfo.begin(); i != columnExpandInfo.end();) {
-		int& oldColumnWidth     = i.value().oldColumnWidth;
-		int& columnMaximumWidth = i.value().columnMaximumWidth;
-		this->columnWidthInfo(i.key(), oldColumnWidth, columnMaximumWidth);
-		if ((oldColumnWidth <= 0) || (oldColumnWidth > columnMaximumWidth)) {
-			// 如果小于0说明没有这个列，这种属于异常，删除继续
-			//  oldColumnWidth > columnMaximumWidth也是异常
-			i = columnExpandInfo.erase(i);
-			continue;
-		}
-		// 开始调整
-		int colwidth = oneColCanexpandWidth + oldColumnWidth;  // 先扩展了
-		if (colwidth >= columnMaximumWidth) {
-			// 过最大宽度要求
-			i.value().columnExpandedWidth = columnMaximumWidth;
-		} else {
-			i.value().columnExpandedWidth = colwidth;
-		}
-		++i;
-	}
-	// 从新调整尺寸
-	// 由于会涉及其他列的变更，因此需要所有都遍历一下
-	for (auto i = columnExpandInfo.begin(); i != columnExpandInfo.end(); ++i) {
-		int moveXLen = i.value().columnExpandedWidth - i.value().oldColumnWidth;
-		for (SARibbonPanelItem* item : qAsConst(mItems)) {
-			if (item->isEmpty() || (item->columnIndex < i.key())) {
-				// 之前的列不用管
-				continue;
-			}
-			if (item->columnIndex == i.key()) {
-				// 此列的扩展
-				if (i.value().expandItems.contains(item)) {
-					// 此列需要扩展的item才扩展尺寸
-					item->itemWillSetGeometry.setWidth(i.value().columnExpandedWidth);
-				} else {
-					// 此列不扩展的模块保持原来的尺寸
-					continue;
-				}
-			} else {
-				// 后面的移动
-				item->itemWillSetGeometry.moveLeft(item->itemWillSetGeometry.x() + moveXLen);
-			}
-		}
-	}
+    for (QMap< int, _columnExpandInfo >::iterator i = columnExpandInfo.begin(); i != columnExpandInfo.end();) {
+        int& oldColumnWidth     = i.value().oldColumnWidth;
+        int& columnMaximumWidth = i.value().columnMaximumWidth;
+        this->columnWidthInfo(i.key(), oldColumnWidth, columnMaximumWidth);
+        if ((oldColumnWidth <= 0) || (oldColumnWidth > columnMaximumWidth)) {
+            // 如果小于0说明没有这个列，这种属于异常，删除继续
+            //  oldColumnWidth > columnMaximumWidth也是异常
+            i = columnExpandInfo.erase(i);
+            continue;
+        }
+        // 开始调整
+        int colwidth = oneColCanexpandWidth + oldColumnWidth;  // 先扩展了
+        if (colwidth >= columnMaximumWidth) {
+            // 过最大宽度要求
+            i.value().columnExpandedWidth = columnMaximumWidth;
+        } else {
+            i.value().columnExpandedWidth = colwidth;
+        }
+        ++i;
+    }
+    // 从新调整尺寸
+    // 由于会涉及其他列的变更，因此需要所有都遍历一下
+    for (auto i = columnExpandInfo.begin(); i != columnExpandInfo.end(); ++i) {
+        int moveXLen = i.value().columnExpandedWidth - i.value().oldColumnWidth;
+        for (SARibbonPanelItem* item : qAsConst(mItems)) {
+            if (item->isEmpty() || (item->columnIndex < i.key())) {
+                // 之前的列不用管
+                continue;
+            }
+            if (item->columnIndex == i.key()) {
+                // 此列的扩展
+                if (i.value().expandItems.contains(item)) {
+                    // 此列需要扩展的item才扩展尺寸
+                    item->itemWillSetGeometry.setWidth(i.value().columnExpandedWidth);
+                } else {
+                    // 此列不扩展的模块保持原来的尺寸
+                    continue;
+                }
+            } else {
+                // 后面的移动
+                item->itemWillSetGeometry.moveLeft(item->itemWillSetGeometry.x() + moveXLen);
+            }
+        }
+    }
 #if SARibbonPanelLayout_DEBUG_PRINT
-	qDebug() << "| |-SARibbonPanelLayout recalcExpandGeomArray(" << setrect
-			 << ") panelName=" << ribbonPanel()->panelName()  //
-			 << ",expandwidth=" << expandwidth                //
-	    ;
+    qDebug() << "| |-SARibbonPanelLayout recalcExpandGeomArray(" << setrect
+             << ") panelName=" << ribbonPanel()->panelName()  //
+             << ",expandwidth=" << expandwidth                //
+        ;
 #endif
 }
 
@@ -879,14 +880,14 @@ void SARibbonPanelLayout::recalcExpandGeomArray(const QRect& setrect)
  */
 void SARibbonPanelLayout::columnWidthInfo(int colindex, int& width, int& maximum) const
 {
-	width   = -1;
-	maximum = -1;
-	for (SARibbonPanelItem* item : mItems) {
-		if (!item->isEmpty() && (item->columnIndex == colindex)) {
-			width   = qMax(width, item->itemWillSetGeometry.width());
-			maximum = qMax(maximum, item->widget()->maximumWidth());
-		}
-	}
+    width   = -1;
+    maximum = -1;
+    for (SARibbonPanelItem* item : mItems) {
+        if (!item->isEmpty() && (item->columnIndex == colindex)) {
+            width   = qMax(width, item->itemWillSetGeometry.width());
+            maximum = qMax(maximum, item->widget()->maximumWidth());
+        }
+    }
 }
 
 /**
@@ -895,7 +896,7 @@ void SARibbonPanelLayout::columnWidthInfo(int colindex, int& width, int& maximum
  */
 SARibbonPanelLabel* SARibbonPanelLayout::panelTitleLabel() const
 {
-	return mTitleLabel;
+    return mTitleLabel;
 }
 
 /**
@@ -903,9 +904,10 @@ SARibbonPanelLabel* SARibbonPanelLayout::panelTitleLabel() const
  * @param s The new icon size / 新的图标尺寸
  * @sa toolButtonIconSize
  */
-void SARibbonPanelLayout::setToolButtonIconSize(const QSize& s)
+void SARibbonPanelLayout::setToolButtonIconSize(const QSize& smallSize, const QSize& largeSize)
 {
-	mDefaultToolButtonIconSize = s;
+    mSmallToolButtonIconSize = smallSize;
+    mLargeToolButtonIconSize = largeSize;
 }
 
 /**
@@ -913,9 +915,45 @@ void SARibbonPanelLayout::setToolButtonIconSize(const QSize& s)
  * @return The current icon size / 当前的图标尺寸
  * @sa setToolButtonIconSize
  */
-QSize SARibbonPanelLayout::toolButtonIconSize() const
+QPair< QSize, QSize > SARibbonPanelLayout::toolButtonIconSize() const
 {
-    return mDefaultToolButtonIconSize;
+    return qMakePair(mSmallToolButtonIconSize, mLargeToolButtonIconSize);
+}
+
+/**
+ * @brief 设置大按钮图标尺寸
+ * @param largeSize
+ */
+void SARibbonPanelLayout::setLargeIconSize(const QSize& largeSize)
+{
+    mLargeToolButtonIconSize = largeSize;
+}
+
+/**
+ * @brief 大按钮图标尺寸
+ * @return
+ */
+QSize SARibbonPanelLayout::largeIconSize() const
+{
+    return mLargeToolButtonIconSize;
+}
+
+/**
+ * @brief 设置小按钮图标尺寸
+ * @param largeSize
+ */
+void SARibbonPanelLayout::setSmallIconSize(const QSize& largeSize)
+{
+    mSmallToolButtonIconSize = largeSize;
+}
+
+/**
+ * @brief 小按钮图标尺寸
+ * @return
+ */
+QSize SARibbonPanelLayout::smallIconSize() const
+{
+    return mSmallToolButtonIconSize;
 }
 
 /**
@@ -933,13 +971,13 @@ QSize SARibbonPanelLayout::optionActionButtonSize() const
  */
 void SARibbonPanelLayout::setPanelTitleLabel(SARibbonPanelLabel* newTitleLabel)
 {
-	mTitleLabel = newTitleLabel;
-	// 确保m_optionActionBtn在label之上
-	if (mOptionActionBtn) {
-		if (mTitleLabel) {
-			mTitleLabel->stackUnder(mOptionActionBtn);
-		}
-	}
+    mTitleLabel = newTitleLabel;
+    // 确保m_optionActionBtn在label之上
+    if (mOptionActionBtn) {
+        if (mTitleLabel) {
+            mTitleLabel->stackUnder(mOptionActionBtn);
+        }
+    }
 }
 
 /**
@@ -957,16 +995,16 @@ bool SARibbonPanelLayout::isEnableWordWrap() const
  */
 void SARibbonPanelLayout::setEnableWordWrap(bool on)
 {
-	mEnableWordWrap = on;
-	// 遍历所有SARibbonToolButton
-	for (SARibbonPanelItem* item : qAsConst(mItems)) {
-		if (!item) {
-			continue;
-		}
-		if (SARibbonToolButton* toolbtn = qobject_cast< SARibbonToolButton* >(item->widget())) {
-			toolbtn->setEnableWordWrap(on);
-		}
-	}
+    mEnableWordWrap = on;
+    // 遍历所有SARibbonToolButton
+    for (SARibbonPanelItem* item : qAsConst(mItems)) {
+        if (!item) {
+            continue;
+        }
+        if (SARibbonToolButton* toolbtn = qobject_cast< SARibbonToolButton* >(item->widget())) {
+            toolbtn->setEnableWordWrap(on);
+        }
+    }
 }
 
 /**
@@ -982,16 +1020,16 @@ void SARibbonPanelLayout::setEnableWordWrap(bool on)
  */
 void SARibbonPanelLayout::setButtonMaximumAspectRatio(qreal fac)
 {
-	mButtonMaximumAspectRatio = fac;
-	// 遍历所有SARibbonToolButton
-	for (SARibbonPanelItem* item : qAsConst(mItems)) {
-		if (!item) {
-			continue;
-		}
-		if (SARibbonToolButton* toolbtn = qobject_cast< SARibbonToolButton* >(item->widget())) {
-			toolbtn->setButtonMaximumAspectRatio(fac);
-		}
-	}
+    mButtonMaximumAspectRatio = fac;
+    // 遍历所有SARibbonToolButton
+    for (SARibbonPanelItem* item : qAsConst(mItems)) {
+        if (!item) {
+            continue;
+        }
+        if (SARibbonToolButton* toolbtn = qobject_cast< SARibbonToolButton* >(item->widget())) {
+            toolbtn->setButtonMaximumAspectRatio(fac);
+        }
+    }
 }
 
 /**
@@ -1021,11 +1059,11 @@ int SARibbonPanelLayout::panelTitleSpace() const
  */
 void SARibbonPanelLayout::setPanelTitleSpace(int newTitleSpace)
 {
-	if (mTitleSpace == newTitleSpace) {
-		return;
-	}
-	mTitleSpace = newTitleSpace;
-	invalidate();
+    if (mTitleSpace == newTitleSpace) {
+        return;
+    }
+    mTitleSpace = newTitleSpace;
+    invalidate();
 }
 
 /**
@@ -1035,7 +1073,7 @@ void SARibbonPanelLayout::setPanelTitleSpace(int newTitleSpace)
  */
 int SARibbonPanelLayout::panelTitleHeight() const
 {
-	return mTitleHeight;
+    return mTitleHeight;
 }
 
 /**
@@ -1045,11 +1083,11 @@ int SARibbonPanelLayout::panelTitleHeight() const
  */
 void SARibbonPanelLayout::setPanelTitleHeight(int newTitleHeight)
 {
-	if (mTitleHeight == newTitleHeight) {
-		return;
-	}
-	mTitleHeight = newTitleHeight;
-	invalidate();
+    if (mTitleHeight == newTitleHeight) {
+        return;
+    }
+    mTitleHeight = newTitleHeight;
+    invalidate();
 }
 
 /**
@@ -1059,7 +1097,7 @@ void SARibbonPanelLayout::setPanelTitleHeight(int newTitleHeight)
  */
 bool SARibbonPanelLayout::isEnableShowPanelTitle() const
 {
-	return mEnableShowTitle;
+    return mEnableShowTitle;
 }
 
 /**
@@ -1069,11 +1107,11 @@ bool SARibbonPanelLayout::isEnableShowPanelTitle() const
  */
 void SARibbonPanelLayout::setEnableShowPanelTitle(bool on)
 {
-	if (mEnableShowTitle == on) {
-		return;
-	}
-	mEnableShowTitle = on;
-	invalidate();
+    if (mEnableShowTitle == on) {
+        return;
+    }
+    mEnableShowTitle = on;
+    invalidate();
 }
 
 /**
@@ -1082,20 +1120,20 @@ void SARibbonPanelLayout::setEnableShowPanelTitle(bool on)
  */
 int SARibbonPanelLayout::largeButtonHeight() const
 {
-	return mLargeHeight;
+    return mLargeHeight;
 }
 
 void SARibbonPanelLayout::setGeometry(const QRect& rect)
 {
-	QRect old = geometry();
-	if (old == rect) {
-		return;
-	}
+    QRect old = geometry();
+    if (old == rect) {
+        return;
+    }
 #if SARibbonPanelLayout_DEBUG_PRINT
-	qDebug() << "| |----->SARibbonPanelLayout.setGeometry(" << rect << "(" << ribbonPanel()->panelName() << ")=======";
+    qDebug() << "| |----->SARibbonPanelLayout.setGeometry(" << rect << "(" << ribbonPanel()->panelName() << ")=======";
 #endif
-	QLayout::setGeometry(rect);
-	mDirty = false;
-	updateGeomArray(rect);
-	doLayout();
+    QLayout::setGeometry(rect);
+    mDirty = false;
+    updateGeomArray(rect);
+    doLayout();
 }

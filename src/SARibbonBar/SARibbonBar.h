@@ -369,9 +369,17 @@ public:
     void setPanelSpacing(int n);
     int panelSpacing() const;
 
-    // 设置panel按钮(panel右下角的功能按钮)的icon尺寸
-    void setPanelToolButtonIconSize(const QSize& s);
-    QSize panelToolButtonIconSize() const;
+    // 设置panel按钮的icon尺寸,第一个参数为小图标尺寸，第二个参数为大图标尺寸
+    void setPanelToolButtonIconSize(const QSize& smallSize, const QSize& largeSize);
+    QPair< QSize, QSize > panelToolButtonIconSize() const;
+
+    // 大按钮图标尺寸
+    void setPanelLargeIconSize(const QSize& largeSize);
+    QSize panelLargeIconSize() const;
+
+    // 小按钮图标尺寸
+    void setPanelSmallIconSize(const QSize& smallSize);
+    QSize panelSmallIconSize() const;
 
     // 获取SARibbonStackedWidget，谨慎使用此函数
     SARibbonStackedWidget* ribbonStackedWidget();

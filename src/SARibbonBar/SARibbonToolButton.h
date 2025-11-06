@@ -18,26 +18,26 @@
  */
 class SA_RIBBON_EXPORT SARibbonToolButton : public QToolButton
 {
-	Q_OBJECT
-	SA_RIBBON_DECLARE_PRIVATE(SARibbonToolButton)
+    Q_OBJECT
+    SA_RIBBON_DECLARE_PRIVATE(SARibbonToolButton)
 public:
     /**
      * @brief Button type enumeration / 按钮样式枚举
      */
-	enum RibbonButtonType
-	{
+    enum RibbonButtonType
+    {
         /**
          * @brief Large button type, corresponding to the large button in SARibbonBar / 大按钮类型，此类型对应SARibbonBar的大按钮
          */
-		LargeButton,
+        LargeButton,
 
         /**
          * @brief Small button type, corresponding to the small button in SARibbonBar, equivalent to a normal toolbar
          * button / 小按钮类型，此类型对应SARibbonBar的小按钮，等同于普通工具条的按钮
          */
-		SmallButton
-	};
-	Q_ENUM(RibbonButtonType)
+        SmallButton
+    };
+    Q_ENUM(RibbonButtonType)
 
     /**
      * @brief Layout factor structure for fine-tuning button appearance / 用于微调按钮外观的布局系数结构体
@@ -89,27 +89,27 @@ public:
     };
 
 public:
-	explicit SARibbonToolButton(QWidget* parent = nullptr);
-	explicit SARibbonToolButton(QAction* defaultAction, QWidget* parent = nullptr);
-	~SARibbonToolButton();
+    explicit SARibbonToolButton(QWidget* parent = nullptr);
+    explicit SARibbonToolButton(QAction* defaultAction, QWidget* parent = nullptr);
+    ~SARibbonToolButton();
 
     // Gets the current button type (LargeButton or SmallButton) / 获取当前按钮的类型（大按钮或小按钮）
-	RibbonButtonType buttonType() const;
+    RibbonButtonType buttonType() const;
     // Sets the button type to LargeButton or SmallButton / 设置按钮类型为大按钮或小按钮
-	void setButtonType(const RibbonButtonType& buttonType);
+    void setButtonType(const RibbonButtonType& buttonType);
 
     // Checks if the button is a small ribbon button / 判断按钮是否为小Ribbon按钮
-	bool isSmallRibbonButton() const;
+    bool isSmallRibbonButton() const;
     //  Checks if the button is a large ribbon button / 判断按钮是否为大Ribbon按钮
-	bool isLargeRibbonButton() const;
+    bool isLargeRibbonButton() const;
 
     // Gets the current spacing value / 获取当前的间距值
-	int spacing() const;
+    int spacing() const;
     // Sets the spacing between elements and the border / 设置元素与边框之间的间距
     void setSpacing(int v);
 
     // Forces an update of the internal layout rectangles / 强制更新内部布局矩形
-	void updateRect();
+    void updateRect();
 
     // Sets the layout factor for fine-tuning the button's appearance / 设置布局系数以微调按钮外观
     void setLayoutFactor(const LayoutFactor& fac);
@@ -130,34 +130,42 @@ public:
     // Invalidates the cached size hint / 使缓存的size hint失效
     void invalidateSizeHint();
 
+    // 大按钮尺寸
+    void setLargeIconSize(const QSize& largeSize);
+    QSize largeIconSize() const;
+
+    // 小按钮尺寸
+    void setSmallIconSize(const QSize& smallSize);
+    QSize smallIconSize() const;
+
 public:
     virtual QSize sizeHint() const Q_DECL_OVERRIDE;
     virtual QSize minimumSizeHint() const Q_DECL_OVERRIDE;
 
 protected:
-	virtual void paintEvent(QPaintEvent* e) Q_DECL_OVERRIDE;
-	virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
-	virtual void mouseMoveEvent(QMouseEvent* e) Q_DECL_OVERRIDE;
-	virtual void mousePressEvent(QMouseEvent* e) Q_DECL_OVERRIDE;
-	virtual void mouseReleaseEvent(QMouseEvent* e) Q_DECL_OVERRIDE;
-	virtual void focusOutEvent(QFocusEvent* e) Q_DECL_OVERRIDE;
-	virtual void leaveEvent(QEvent* e) Q_DECL_OVERRIDE;
-	virtual bool hitButton(const QPoint& pos) const Q_DECL_OVERRIDE;
-	virtual bool event(QEvent* e) Q_DECL_OVERRIDE;
-	virtual void changeEvent(QEvent* e) Q_DECL_OVERRIDE;
-	virtual void actionEvent(QActionEvent* e) Q_DECL_OVERRIDE;
+    virtual void paintEvent(QPaintEvent* e) Q_DECL_OVERRIDE;
+    virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
+    virtual void mouseMoveEvent(QMouseEvent* e) Q_DECL_OVERRIDE;
+    virtual void mousePressEvent(QMouseEvent* e) Q_DECL_OVERRIDE;
+    virtual void mouseReleaseEvent(QMouseEvent* e) Q_DECL_OVERRIDE;
+    virtual void focusOutEvent(QFocusEvent* e) Q_DECL_OVERRIDE;
+    virtual void leaveEvent(QEvent* e) Q_DECL_OVERRIDE;
+    virtual bool hitButton(const QPoint& pos) const Q_DECL_OVERRIDE;
+    virtual bool event(QEvent* e) Q_DECL_OVERRIDE;
+    virtual void changeEvent(QEvent* e) Q_DECL_OVERRIDE;
+    virtual void actionEvent(QActionEvent* e) Q_DECL_OVERRIDE;
 
     // Paints the button's background and frame / 绘制按钮的背景和边框
-	virtual void paintButton(QPainter& p, const QStyleOptionToolButton& opt);
+    virtual void paintButton(QPainter& p, const QStyleOptionToolButton& opt);
     // Paints the button's icon / 绘制按钮的图标
-	virtual void paintIcon(QPainter& p, const QStyleOptionToolButton& opt, const QRect& iconDrawRect);
+    virtual void paintIcon(QPainter& p, const QStyleOptionToolButton& opt, const QRect& iconDrawRect);
     // Paints the button's text / 绘制按钮的文字
-	virtual void paintText(QPainter& p, const QStyleOptionToolButton& opt, const QRect& textDrawRect);
+    virtual void paintText(QPainter& p, const QStyleOptionToolButton& opt, const QRect& textDrawRect);
     // Paints the button's indicator (e.g., dropdown arrow) / 绘制按钮的指示器（例如下拉箭头）
-	virtual void paintIndicator(QPainter& p, const QStyleOptionToolButton& opt, const QRect& indicatorDrawRect);
+    virtual void paintIndicator(QPainter& p, const QStyleOptionToolButton& opt, const QRect& indicatorDrawRect);
 
 private:
-	static void drawArrow(const QStyle* style,
+    static void drawArrow(const QStyle* style,
                           const QStyleOptionToolButton* toolbutton,
                           const QRect& rect,
                           QPainter* painter,
