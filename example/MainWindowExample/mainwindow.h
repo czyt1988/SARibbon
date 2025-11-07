@@ -15,11 +15,17 @@ class QComboBox;
 class QCloseEvent;
 class QLineEdit;
 
+namespace Ui
+{
+class MainWindow;
+}
+
 class MainWindow : public SARibbonMainWindow
 {
     Q_OBJECT
 public:
-    MainWindow(QWidget* par = nullptr);
+    explicit MainWindow(QWidget* par = nullptr);
+    ~MainWindow();
 
 private:
     // 创建ribbon-application菜单示例
@@ -87,6 +93,8 @@ private Q_SLOTS:
 private:
     // 创建其它actions，这些actions并不在SARibbonBar管理
     void createOtherActions();
+    // 初始化ui
+    void initUI();
 
 protected:
     void closeEvent(QCloseEvent* e) override;
@@ -95,7 +103,7 @@ private:
     SARibbonContextCategory* mContextCategory { nullptr };
     SARibbonContextCategory* mContextCategory2 { nullptr };
     SARibbonCustomizeWidget* mWidgetForCustomize { nullptr };
-    QTextEdit* mTextedit { nullptr };
+
     SARibbonActionsManager* mActionsManager { nullptr };
     QMenu* mMenuApplicationBtn { nullptr };
     QComboBox* mComboboxRibbonTheme { nullptr };
@@ -126,6 +134,8 @@ private:
     int mTagForActionText;
     int mTagForActionIcon;
     QTimer mChangeTitleBkColorTimer;  ///< 用于周期改变标题颜色的一个定时器
+private:
+    Ui::MainWindow* ui;
 };
 
 #endif  // MAINWINDOW_H

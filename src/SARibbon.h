@@ -1,4 +1,4 @@
-﻿#ifndef SA_RIBBON_H
+#ifndef SA_RIBBON_H
 #define SA_RIBBON_H
 // 定义此宏，将SA_RIBBON_EXPORT定义为空
 #ifndef SA_RIBBON_BAR_NO_EXPORT
@@ -97,14 +97,14 @@
  * @def ribbon的数字版本 MAJ.MIN.{PAT}
  */
 #ifndef SA_RIBBON_BAR_VERSION_PAT
-#define SA_RIBBON_BAR_VERSION_PAT 4
+#define SA_RIBBON_BAR_VERSION_PAT 5
 #endif
 
 /**
  * @def 版本号（字符串）
  */
 #ifndef SARIBBON_VERSION
-#define SARIBBON_VERSION "2.5.4"
+#define SARIBBON_VERSION "2.5.5"
 #endif
 
 #endif  // SARIBBONVERSIONINFO_H
@@ -3443,17 +3443,17 @@ public:
     void setEnableWordWrap(bool on);
     bool isEnableWordWrap() const;
 
-    // 按钮的最大宽高比，这个系数决定按钮的最大宽度
+    // 按钮的最大宽高比，这个系数决定按钮的最大宽度，系数越大，按钮能显示的越宽
     void setButtonMaximumAspectRatio(qreal fac = 1.4);
     qreal buttonMaximumAspectRatio() const;
 
     // 设置panel的标题栏高度
-    int panelTitleHeight() const;
     void setPanelTitleHeight(int h);
+    int panelTitleHeight() const;
 
     // 设置panel是否显示标题栏
-    bool isEnableShowPanelTitle() const;
     void setEnableShowPanelTitle(bool on);
+    bool isEnableShowPanelTitle() const;
 
     // 设置panel的spacing
     void setPanelSpacing(int n);

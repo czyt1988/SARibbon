@@ -353,17 +353,17 @@ public:
     void setEnableWordWrap(bool on);
     bool isEnableWordWrap() const;
 
-    // 按钮的最大宽高比，这个系数决定按钮的最大宽度
+    // 按钮的最大宽高比，这个系数决定按钮的最大宽度，系数越大，按钮能显示的越宽
     void setButtonMaximumAspectRatio(qreal fac = 1.4);
     qreal buttonMaximumAspectRatio() const;
 
     // 设置panel的标题栏高度
-    int panelTitleHeight() const;
     void setPanelTitleHeight(int h);
+    int panelTitleHeight() const;
 
     // 设置panel是否显示标题栏
-    bool isEnableShowPanelTitle() const;
     void setEnableShowPanelTitle(bool on);
+    bool isEnableShowPanelTitle() const;
 
     // 设置panel的spacing
     void setPanelSpacing(int n);

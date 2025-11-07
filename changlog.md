@@ -1,5 +1,19 @@
 # 版本更新记录(change log):
 
+## 2025-11-07 -> 2.5.5
+
+- 增加setPanelLargeIconSize、setPanelSmallIconSize等接口，可设置按钮图标大小
+- MainWindowExample例子修改，增加了ui文件
+- 兼容Qt5.12
+
+## 2025-10-15 -> 2.5.4
+
+- 增加application button纵向扩展功能
+- 修正了对不同屏幕的缩放比例的处理
+- 添加matlab主题教程
+- 增加多语言翻译
+- 调整contents magins的默认值，ribbonbar的宽度适配主窗口的magins
+
 ## 2025-10-10 -> 2.5.2
 
 - 增加标题栏图标隐藏的方法

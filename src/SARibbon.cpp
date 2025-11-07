@@ -1,4 +1,4 @@
-﻿// 定义此宏，将SA_RIBBON_EXPORT定义为空
+// 定义此宏，将SA_RIBBON_EXPORT定义为空
 #ifndef SA_RIBBON_BAR_NO_EXPORT
 #define SA_RIBBON_BAR_NO_EXPORT
 #endif
@@ -3350,6 +3350,10 @@ void SAColorToolButton::paintColor(QStylePainter* p,
 #include <QDir>
 #include <QApplication>
 #include <QScreen>
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+#include <QDesktopWidget>
+#else
+#endif
 namespace SA
 {
 
@@ -3558,7 +3562,22 @@ qreal widgetDevicePixelRatio(QWidget* w)
     if (!w) {
         return 1.0;
     }
-    QScreen* sc = w->window()->screen();
+    // 获取窗口所在的屏幕（优先当前窗口的屏幕）
+    QScreen* sc = nullptr;
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+    if (QDesktopWidget* dw = QApplication::desktop()) {
+        int idx = dw->screenNumber(w);  // -1 表示主屏
+        if (QScreen* sc = dw->screen(idx)) {
+            return sc->devicePixelRatio();
+        }
+    }
+#else
+    // 先获取窗口的顶层窗口（避免子部件直接调用screen()可能返回null的问题）
+    QWidget* topWidget = w->window();
+    if (topWidget) {
+        sc = topWidget->screen();
+    }
+#endif
     if (!sc) {
         // qApp->primaryScreen() 拿到的是“整个系统里被用户标记成 primary 的那一块屏,是“全局主屏”
         sc = QApplication::primaryScreen();

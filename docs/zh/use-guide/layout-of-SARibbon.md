@@ -31,7 +31,8 @@ SARibbon中把带有标题栏和tab结合一起的布局方式称之为紧凑布
 
 在使用原生边框的时候（`SARibbonMainWindowStyleFlag::UseRibbonMenuBar|SARibbonMainWindowStyleFlag::UseNativeFrame`），建议使用紧凑模式，避免有较大的标题栏留白
 
-你可以运行`example/MainWindowExample`例子，此例子可以设置不同的样式观察不同样式的ribbon风格和布局
+!!! example "示例"
+    你可以运行`example/MainWindowExample`例子，此例子可以设置不同的样式观察不同样式的ribbon风格和布局
 
 ![ribbon-style-example](../../assets/pic/ribbon-style-example.png)
 

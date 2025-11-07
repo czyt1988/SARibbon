@@ -168,6 +168,41 @@ SARibbonPanel支持两种布局方案，分别是2行模式和3行模式，通�
 
 2行模式下medium和small占位(`SARibbonPannelItem::RowProportion`)是一样的，不做区分。
 
+关于面板按钮的布局，详细可见：[Ribbon栏按钮布局说明](./layout-of-ribbonbutton.md)，以及：[SARibbon布局方式](./layout-of-SARibbon.md)
+
+面板犹如一个`Toolbar`,添加的action最终会以按钮的方式进行渲染，`SARibbonBar`的提供了许多函数可以统一设置面板的属性：
+
+- 设置panel按钮图标尺寸：
+
+    ```cpp
+    // 大按钮图标尺寸
+    void setPanelLargeIconSize(const QSize& largeSize);
+    // 小按钮图标尺寸
+    void setPanelSmallIconSize(const QSize& smallSize);
+    ```
+
+- 设置panel的一些渲染属性：
+
+    ```cpp
+    // 设置按钮是否允许换行
+    void setEnableWordWrap(bool on);
+    // 设置panel是否显示标题栏
+    void setEnableShowPanelTitle(bool on);
+    ```
+
+- 设置panel的一些位置尺寸：
+
+    ```cpp
+    // 设置panel与panel之间的间距
+    void setPanelSpacing(int n);
+    // 设置panel的标题栏高度
+    void setPanelTitleHeight(int h);
+    // 按钮的最大宽高比，这个系数决定按钮的最大宽度，系数越大，按钮能显示的越宽
+    void setButtonMaximumAspectRatio(qreal fac = 1.4);
+    ```
+
+上面的方法会作用到每一个已经设置的panel和对应的按钮
+
 ### 在面板中添加复杂控件 (Widget)
 
 除了 `QAction`，您还可以直接在面板中添加任何 `QWidget`，例如组合框、微调框或自定义控件。
@@ -425,7 +460,7 @@ ribbonBar()->setApplicationButtonVerticalExpansion(true);
 
 上面的代码效果如图所示：
 
-![](../../assets/pic/set-application-btn-expand.png)
+![set-application-btn-expand](../../assets/pic/set-application-btn-expand.png)
 
 !!! warning "注意"
     `SARibbonBar::setApplicationButtonVerticalExpansion`函数会对`titleIconWidget`的可见性进行调整，如果设置`applicationButtonVerticalExpansion=true`，那么`titleIconWidget`会被隐藏，反之，`titleIconWidget`会被显示
