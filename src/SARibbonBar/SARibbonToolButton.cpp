@@ -206,6 +206,8 @@ public:
     int getTextAlignment() const;
     // 确认文字是否确切要换行显示
     bool isTextNeedWrap() const;
+    // 获取真实的icon尺寸
+    QSize realIconSize() const;
     // 仅仅对\n进行剔除，和QString::simplified不一样
     static QString simplifiedForRibbonButton(const QString& str);
 
@@ -220,6 +222,7 @@ public:
     QRect mDrawTextRect;                                     ///< 记录text的绘制位置
     QRect mDrawIndicatorArrowRect;                           ///< 记录IndicatorArrow的绘制位置
     QSize mSizeHint;                                         ///< 保存计算好的sizehint
+    QSize mLargeButtonSizeHint;                              ///< 大按钮的尺寸
     bool mIsTextNeedWrap { false };                          ///< 标记文字是否需要换行显示
     SARibbonToolButton::LayoutFactor layoutFactor;           ///< 布局系数
     std::unique_ptr< SARibbonToolButtonProxyStyle > mStyle;  ///< 按钮样式，主要为了绘制箭头
@@ -808,6 +811,18 @@ bool SARibbonToolButton::PrivateData::isTextNeedWrap() const
 }
 
 /**
+ * @brief 获取正真的icon尺寸
+ * @return
+ */
+QSize SARibbonToolButton::PrivateData::realIconSize() const
+{
+    if (mButtonType == SARibbonToolButton::LargeButton) {
+        return mLargeButtonSizeHint;
+    }
+    return q_ptr->smallIconSize();
+}
+
+/**
  * @brief 仅仅对\n进行剔除
  * @param str
  * @return
@@ -1363,7 +1378,7 @@ void SARibbonToolButton::paintIcon(QPainter& p, const QStyleOptionToolButton& op
         return;
     }
 
-    QPixmap pm = d_ptr->createIconPixmap(opt, iconDrawRect.size());
+    QPixmap pm = d_ptr->createIconPixmap(opt, d_ptr->realIconSize());
     style()->drawItemPixmap(&p, iconDrawRect, Qt::AlignCenter, pm);
     SARIBBONTOOLBUTTON_DEBUG_DRAW_RECT(p, iconDrawRect);
 }
@@ -1459,6 +1474,42 @@ void SARibbonToolButton::invalidateSizeHint()
 {
     d_ptr->mSizeHint = QSize();
     updateGeometry();
+}
+
+/**
+ * @brief 大按钮的尺寸
+ * @param largeSize
+ */
+void SARibbonToolButton::setLargeIconSize(const QSize& largeSize)
+{
+    d_ptr->mLargeButtonSizeHint = largeSize;
+}
+
+/**
+ * @brief 大按钮的尺寸
+ * @return
+ */
+QSize SARibbonToolButton::largeIconSize() const
+{
+    return d_ptr->mLargeButtonSizeHint;
+}
+
+/**
+ * @brief 小按钮尺寸
+ * @param smallSize
+ */
+void SARibbonToolButton::setSmallIconSize(const QSize& smallSize)
+{
+    setIconSize(smallSize);
+}
+
+/**
+ * @brief 小按钮尺寸
+ * @return
+ */
+QSize SARibbonToolButton::smallIconSize() const
+{
+    return iconSize();
 }
 
 void SARibbonToolButton::drawArrow(const QStyle* style,

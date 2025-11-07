@@ -353,25 +353,33 @@ public:
     void setEnableWordWrap(bool on);
     bool isEnableWordWrap() const;
 
-    // 按钮的最大宽高比，这个系数决定按钮的最大宽度
+    // 按钮的最大宽高比，这个系数决定按钮的最大宽度，系数越大，按钮能显示的越宽
     void setButtonMaximumAspectRatio(qreal fac = 1.4);
     qreal buttonMaximumAspectRatio() const;
 
     // 设置panel的标题栏高度
-    int panelTitleHeight() const;
     void setPanelTitleHeight(int h);
+    int panelTitleHeight() const;
 
     // 设置panel是否显示标题栏
-    bool isEnableShowPanelTitle() const;
     void setEnableShowPanelTitle(bool on);
+    bool isEnableShowPanelTitle() const;
 
     // 设置panel的spacing
     void setPanelSpacing(int n);
     int panelSpacing() const;
 
-    // 设置panel按钮(panel右下角的功能按钮)的icon尺寸
-    void setPanelToolButtonIconSize(const QSize& s);
-    QSize panelToolButtonIconSize() const;
+    // 设置panel按钮的icon尺寸,第一个参数为小图标尺寸，第二个参数为大图标尺寸
+    void setPanelToolButtonIconSize(const QSize& smallSize, const QSize& largeSize);
+    QPair< QSize, QSize > panelToolButtonIconSize() const;
+
+    // 大按钮图标尺寸
+    void setPanelLargeIconSize(const QSize& largeSize);
+    QSize panelLargeIconSize() const;
+
+    // 小按钮图标尺寸
+    void setPanelSmallIconSize(const QSize& smallSize);
+    QSize panelSmallIconSize() const;
 
     // 获取SARibbonStackedWidget，谨慎使用此函数
     SARibbonStackedWidget* ribbonStackedWidget();

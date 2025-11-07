@@ -93,9 +93,10 @@ public:
     QBrush mTitleBackgroundBrush { Qt::NoBrush };           ///< 标题的背景颜色
     SARibbonAlignment mRibbonAlignment { SARibbonAlignment::AlignLeft };                     ///< 对齐方式
     SARibbonPanel::PanelLayoutMode mDefaulePanelLayoutMode { SARibbonPanel::ThreeRowMode };  ///< 默认的PanelLayoutMode
-    bool mEnableShowPanelTitle { true };  ///< 是否允许panel的标题栏显示
-    int mPanelSpacing { 0 };              ///< panel的spacing,这个参数不参与布局，仅仅记录
-    QSize mPanelToolButtonSize { 22, 22 };  ///< 记录panel的默认图标大小,这个参数不参与布局，仅仅记录
+    bool mEnableShowPanelTitle { true };                         ///< 是否允许panel的标题栏显示
+    int mPanelSpacing { 0 };                                     ///< panel的spacing
+    QSize mPanelSmallToolButtonSize { 20, 20 };                  ///< 记录panel的默认图标大小
+    QSize mPanelLargeToolButtonSize { 32, 32 };                  ///< 记录panel的大图标尺寸
     SARibbonMainWindowStyles mMainWindowStyle;                   ///< 记录MainWindow的样式
     FpContextCategoryHighlight mFpContextHighlight { nullptr };  ///< 上下文标签高亮
     bool mEnableTabDoubleClickToMinimumMode { true };  ///< 是否允许tab双击激活ribbon的最小化模式
@@ -597,7 +598,8 @@ void SARibbonBar::insertCategoryPage(SARibbonCategory* category, int index)
     }
     category->setPanelLayoutMode(panelLayoutMode());
     category->setPanelSpacing(panelSpacing());
-    category->setPanelToolButtonIconSize(panelToolButtonIconSize());
+    category->setPanelLargeIconSize(panelLargeIconSize());
+    category->setPanelSmallIconSize(panelSmallIconSize());
     category->setEnableWordWrap(isEnableWordWrap());
 
     int i = d_ptr->mRibbonTabBar->insertTab(index, category->categoryName());
@@ -1900,15 +1902,16 @@ int SARibbonBar::panelSpacing() const
 
 /**
  * @brief 设置panel按钮的icon尺寸，large action不受此尺寸影响
- * @param s
+ * @param smallSize
  */
-void SARibbonBar::setPanelToolButtonIconSize(const QSize& s)
+void SARibbonBar::setPanelToolButtonIconSize(const QSize& smallSize, const QSize& largeSize)
 {
-    d_ptr->mPanelToolButtonSize = s;
+    d_ptr->mPanelSmallToolButtonSize = smallSize;
+    d_ptr->mPanelLargeToolButtonSize = largeSize;
     // 同步当前被SARibbonBar管理的SARibbonCategory的PanelSpacing
-    iterateCategory([ s ](SARibbonCategory* category) -> bool {
+    iterateCategory([ smallSize, largeSize ](SARibbonCategory* category) -> bool {
         if (category) {
-            category->setPanelToolButtonIconSize(s);
+            category->setPanelToolButtonIconSize(smallSize, largeSize);
         }
         return true;
     });
@@ -1920,9 +1923,59 @@ void SARibbonBar::setPanelToolButtonIconSize(const QSize& s)
  * @note panel按钮是指panel右下角的功能按钮
  * @return
  */
-QSize SARibbonBar::panelToolButtonIconSize() const
+QPair< QSize, QSize > SARibbonBar::panelToolButtonIconSize() const
 {
-    return d_ptr->mPanelToolButtonSize;
+    return qMakePair(d_ptr->mPanelSmallToolButtonSize, d_ptr->mPanelLargeToolButtonSize);
+}
+
+/**
+ * @brief 设置panel的大按钮图标尺寸
+ * @param largeSize
+ */
+void SARibbonBar::setPanelLargeIconSize(const QSize& largeSize)
+{
+    d_ptr->mPanelLargeToolButtonSize = largeSize;
+    // 同步当前被SARibbonBar管理的SARibbonCategory的PanelSpacing
+    iterateCategory([ largeSize ](SARibbonCategory* category) -> bool {
+        if (category) {
+            category->setPanelLargeIconSize(largeSize);
+        }
+        return true;
+    });
+}
+
+/**
+ * @brief panel的大按钮图标尺寸
+ * @return
+ */
+QSize SARibbonBar::panelLargeIconSize() const
+{
+    return d_ptr->mPanelLargeToolButtonSize;
+}
+
+/**
+ * @brief 设置panel的小按钮图标尺寸
+ * @param smallSize
+ */
+void SARibbonBar::setPanelSmallIconSize(const QSize& smallSize)
+{
+    d_ptr->mPanelSmallToolButtonSize = smallSize;
+    // 同步当前被SARibbonBar管理的SARibbonCategory的PanelSpacing
+    iterateCategory([ smallSize ](SARibbonCategory* category) -> bool {
+        if (category) {
+            category->setPanelSmallIconSize(smallSize);
+        }
+        return true;
+    });
+}
+
+/**
+ * @brief panel的小按钮图标尺寸
+ * @return
+ */
+QSize SARibbonBar::panelSmallIconSize() const
+{
+    return d_ptr->mPanelSmallToolButtonSize;
 }
 
 /**

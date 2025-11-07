@@ -12,6 +12,26 @@ Ribbon界面无法用普通的tab+toolbutton组合来实现主要就是因为rib
 
 三个区域会有两种布局方案，根据文本是否换行来进行布局
 
+## 按钮图标设置
+
+Ribbon的按钮有大、中、小三种按钮，大按钮的图标大小为32x32，中按钮和小按钮的图标大小为20x20
+
+`SARibbonBar`提供了如下函数用于设置大按钮和小按钮的尺寸：
+
+```cpp
+// 大按钮图标尺寸
+void setPanelLargeIconSize(const QSize& largeSize);
+// 小按钮图标尺寸
+void setPanelSmallIconSize(const QSize& smallSize);
+// 设置panel按钮的icon尺寸,第一个参数为小图标尺寸，第二个参数为大图标尺寸
+void setPanelToolButtonIconSize(const QSize& smallSize, const QSize& largeSize);
+```
+
+通过这些函数你可以在自定义布局时设置自己的图标尺寸
+
+!!! example "示例"
+    你可以运行`example/MainWindowExample`例子手动设置尺寸进行修改测试
+
 ## 文字换行显示的布局方案
 
 换行模式下，文本区域会占据两行行高，office的word就是这种布局方案
