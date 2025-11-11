@@ -186,7 +186,7 @@ SARibbonButtonGroupWidget* SARibbonBar::PrivateData::createRightButton()
     mRightButtonGroup = RibbonSubElementFactory->createButtonGroupWidget(q_ptr);
     mRightButtonGroup->setObjectName(QStringLiteral("objSARibbonRightButtonGroup"));
     mRightButtonGroup->setIconSize(QSize(22, 22));
-    return mQuickAccessBar.data();
+    return mRightButtonGroup.data();
 }
 
 SARibbonTitleIconWidget* SARibbonBar::PrivateData::createTitleIconWidget()
@@ -406,16 +406,17 @@ SARibbonBar::~SARibbonBar()
  * @param s
  * @return 2行返回true，返回false代表当前是3行
  */
-bool SARibbonBar::isTwoRowStyle(SARibbonBar::RibbonStyles s)
-{
-    return s.testFlag(SARibbonBar::RibbonStyleTwoRow);
-}
 
 /**
  * @brief 判断样式是否为3行
  * @param s
  * @return 3行返回true，返回false代表当前是2行
  */
+bool SARibbonBar::isTwoRowStyle(RibbonStyles s)
+{
+    return s.testFlag(SARibbonBar::RibbonStyleTwoRow);
+}
+
 bool SARibbonBar::isThreeRowStyle(RibbonStyles s)
 {
     return s.testFlag(SARibbonBar::RibbonStyleThreeRow);
@@ -2043,7 +2044,7 @@ void SARibbonBar::setContextCategoryColorList(const QList< QColor >& cls)
     }
     d_ptr->mContextCategoryColorListIndex = 0;
     // 这时需要对已经显示的contextCategoryData的颜色进行重新设置
-    for (SARibbonContextCategory* c : d_ptr->mContextCategoryList) {
+    for (SARibbonContextCategory* c : qAsConst(d_ptr->mContextCategoryList)) {
         c->setContextColor(d_ptr->getContextCategoryColor());
     }
 }
