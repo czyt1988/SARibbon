@@ -373,7 +373,7 @@ void SARibbonBar::PrivateData::initNewParent(QWidget* par)
     // 非垂直展开模式：尝试设置为 MainWindow 的图标
     if (auto* mainwindow = qobject_cast< SARibbonMainWindow* >(par)) {
         int th = q_ptr->titleBarHeight();
-        titleIcon->setWindow(mainwindow);
+        titleIcon->setWidget(mainwindow);
         titleIcon->setIcon(mainwindow->windowIcon());
         titleIcon->setIconSize(QSize(th - 2, th - 2));
         titleIcon->show();

@@ -16,16 +16,21 @@ public:
     // 构造函数
     explicit SARibbonTitleIconWidget(QWidget* parent = nullptr);
 
-    // 设置关联的窗口
-    void setWindow(QWidget* window);
+    // 关联的窗口
+    void setWidget(QWidget* window);
+    QWidget* widget() const;
 
-    // 设置图标
+    // 图标
     void setIcon(const QIcon& icon);
+    QIcon icon() const;
 
-    // 设置图标大小
+    // 图标大小
     void setIconSize(const QSize& size);
-    int padding() const;
+    QSize iconSize() const;
+
+    // 内边距
     void setPadding(int v);
+    int padding() const;
 
 public:
     virtual QSize sizeHint() const override;
@@ -67,7 +72,7 @@ private Q_SLOTS:
     void onClose();
 
 private:
-    QPointer< QWidget > m_window;  ///< 关联的窗口对象
+    QPointer< QWidget > m_widget;  ///< 关联的窗口对象
     QIcon m_icon;                  ///< 显示的图标
     QSize m_iconSize;              ///< 图标大小
     QMenu* m_contextMenu;          ///< 上下文菜单

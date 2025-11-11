@@ -28,67 +28,67 @@ SARibbonElementFactory::~SARibbonElementFactory()
 
 SARibbonBar* SARibbonElementFactory::createRibbonBar(QWidget* parent)
 {
-	return (new SARibbonBar(parent));
+    return (new SARibbonBar(parent));
 }
 
 SARibbonTabBar* SARibbonElementFactory::createRibbonTabBar(QWidget* parent)
 {
-	return (new SARibbonTabBar(parent));
+    return (new SARibbonTabBar(parent));
 }
 
 SARibbonApplicationButton* SARibbonElementFactory::createRibbonApplicationButton(QWidget* parent)
 {
-	return (new SARibbonApplicationButton(parent));
+    return (new SARibbonApplicationButton(parent));
 }
 
 SARibbonCategory* SARibbonElementFactory::createRibbonCategory(QWidget* parent)
 {
-	return (new SARibbonCategory(parent));
+    return (new SARibbonCategory(parent));
 }
 
 SARibbonContextCategory* SARibbonElementFactory::createRibbonContextCategory(QWidget* parent)
 {
-	return (new SARibbonContextCategory(parent));
+    return (new SARibbonContextCategory(parent));
 }
 
 SARibbonPanel* SARibbonElementFactory::createRibbonPanel(QWidget* parent)
 {
-	return (new SARibbonPanel(parent));
+    return (new SARibbonPanel(parent));
 }
 
 SARibbonSeparatorWidget* SARibbonElementFactory::createRibbonSeparatorWidget(QWidget* parent)
 {
-	return (new SARibbonSeparatorWidget(parent));
+    return (new SARibbonSeparatorWidget(parent));
 }
 
 SARibbonGallery* SARibbonElementFactory::createRibbonGallery(QWidget* parent)
 {
-	return (new SARibbonGallery(parent));
+    return (new SARibbonGallery(parent));
 }
 
 SARibbonGalleryGroup* SARibbonElementFactory::createRibbonGalleryGroup(QWidget* parent)
 {
-	return (new SARibbonGalleryGroup(parent));
+    return (new SARibbonGalleryGroup(parent));
 }
 
 SARibbonToolButton* SARibbonElementFactory::createRibbonToolButton(QWidget* parent)
 {
-	return (new SARibbonToolButton(parent));
+    return (new SARibbonToolButton(parent));
 }
 
 SARibbonStackedWidget* SARibbonElementFactory::createRibbonStackedWidget(SARibbonBar* parent)
 {
-	return (new SARibbonStackedWidget(parent));
+    return (new SARibbonStackedWidget(parent));
 }
 
 SARibbonButtonGroupWidget* SARibbonElementFactory::createButtonGroupWidget(QWidget* parent)
 {
-	return (new SARibbonButtonGroupWidget(parent));
+    return (new SARibbonButtonGroupWidget(parent));
 }
 
 SARibbonQuickAccessBar* SARibbonElementFactory::createQuickAccessBar(QWidget* parent)
 {
-	return (new SARibbonQuickAccessBar(parent));
+    return (new SARibbonQuickAccessBar(parent));
 }
 
 SARibbonSystemButtonBar* SARibbonElementFactory::createWindowButtonGroup(QWidget* parent)
@@ -110,4 +110,14 @@ SARibbonPanelOptionButton* SARibbonElementFactory::createRibbonPanelOptionButton
 SARibbonTitleIconWidget* SARibbonElementFactory::createRibbonTitleIconWidget(QWidget* parent)
 {
     return (new SARibbonTitleIconWidget(parent));
+}
+
+/**
+ * @brief 创建SARibbonPanelLabel
+ * @param parent
+ * @return
+ */
+SARibbonPanelLabel* SARibbonElementFactory::createRibbonPanelLabel(QWidget* parent)
+{
+    return (new SARibbonPanelLabel(parent));
 }

@@ -248,32 +248,32 @@
 <context>
     <name>SARibbonTitleIconWidget</name>
     <message>
-        <location filename="../SARibbonTitleIconWidget.cpp" line="135"/>
+        <location filename="../SARibbonTitleIconWidget.cpp" line="162"/>
         <source>Restore(R)</source>
         <translation>恢复(R)</translation>
     </message>
     <message>
-        <location filename="../SARibbonTitleIconWidget.cpp" line="140"/>
+        <location filename="../SARibbonTitleIconWidget.cpp" line="167"/>
         <source>Move(M)</source>
         <translation>移动(M)</translation>
     </message>
     <message>
-        <location filename="../SARibbonTitleIconWidget.cpp" line="144"/>
+        <location filename="../SARibbonTitleIconWidget.cpp" line="171"/>
         <source>Size(S)</source>
         <translation>大小(S)</translation>
     </message>
     <message>
-        <location filename="../SARibbonTitleIconWidget.cpp" line="151"/>
+        <location filename="../SARibbonTitleIconWidget.cpp" line="178"/>
         <source>Minimize(N)</source>
         <translation>最小化(N)</translation>
     </message>
     <message>
-        <location filename="../SARibbonTitleIconWidget.cpp" line="156"/>
+        <location filename="../SARibbonTitleIconWidget.cpp" line="183"/>
         <source>Maximize(X)</source>
         <translation>最大化(X)</translation>
     </message>
     <message>
-        <location filename="../SARibbonTitleIconWidget.cpp" line="164"/>
+        <location filename="../SARibbonTitleIconWidget.cpp" line="191"/>
         <source>Close(C)</source>
         <translation>关闭(C)</translation>
     </message>

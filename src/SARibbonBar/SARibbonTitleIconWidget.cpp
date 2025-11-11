@@ -15,20 +15,29 @@
  * @param parent 父窗口部件
  */
 SARibbonTitleIconWidget::SARibbonTitleIconWidget(QWidget* parent)
-    : QWidget(parent), m_window(nullptr), m_iconSize(16, 16), mPadding(1)
+    : QWidget(parent), m_widget(nullptr), m_iconSize(16, 16), mPadding(1)
 {
-	setCursor(Qt::ArrowCursor);
-	createContextMenu();
+    setCursor(Qt::ArrowCursor);
+    createContextMenu();
 }
 
 /**
- * @brief SARibbonTitleIconWidget::setWindow
+ * @brief SARibbonTitleIconWidget::setWidget
  * 设置关联的窗口对象，使用QPointer确保安全性
  * @param window 要关联的窗口
  */
-void SARibbonTitleIconWidget::setWindow(QWidget* window)
+void SARibbonTitleIconWidget::setWidget(QWidget* window)
 {
-    m_window = window;
+    m_widget = window;
+}
+
+/**
+ * @brief 关联的窗口对象
+ * @return
+ */
+QWidget* SARibbonTitleIconWidget::widget() const
+{
+    return m_widget.data();
 }
 
 /**
@@ -38,8 +47,17 @@ void SARibbonTitleIconWidget::setWindow(QWidget* window)
  */
 void SARibbonTitleIconWidget::setIcon(const QIcon& icon)
 {
-	m_icon = icon;
-	update();
+    m_icon = icon;
+    update();
+}
+
+/**
+ * @brief 图标
+ * @return
+ */
+QIcon SARibbonTitleIconWidget::icon() const
+{
+    return m_icon;
 }
 
 /**
@@ -49,8 +67,17 @@ void SARibbonTitleIconWidget::setIcon(const QIcon& icon)
  */
 void SARibbonTitleIconWidget::setIconSize(const QSize& size)
 {
-	m_iconSize = size;
-	update();
+    m_iconSize = size;
+    update();
+}
+
+/**
+ * @brief 图标大小
+ * @return
+ */
+QSize SARibbonTitleIconWidget::iconSize() const
+{
+    return m_iconSize;
 }
 
 /**
@@ -78,43 +105,43 @@ QSize SARibbonTitleIconWidget::sizeHint() const
 
 void SARibbonTitleIconWidget::paintEvent(QPaintEvent* event)
 {
-	Q_UNUSED(event)
+    Q_UNUSED(event)
 
-	QPainter painter(this);
-	// 绘制图标
-	if (!m_icon.isNull()) {
-		QSize iconSize = m_iconSize.scaled(rect().size(), Qt::KeepAspectRatio);
-		iconSize.setWidth(iconSize.width() - 2 * padding());
-		iconSize.setHeight(iconSize.height() - 2 * padding());
-		iconSize       = iconSize.expandedTo(QSize(8, 8));
-		QRect iconRect = QRect(
-			(width() - iconSize.width()) / 2, (height() - iconSize.height()) / 2, iconSize.width(), iconSize.height());
-		m_icon.paint(&painter, iconRect);
-	}
+    QPainter painter(this);
+    // 绘制图标
+    if (!m_icon.isNull()) {
+        QSize iconSize = m_iconSize.scaled(rect().size(), Qt::KeepAspectRatio);
+        iconSize.setWidth(iconSize.width() - 2 * padding());
+        iconSize.setHeight(iconSize.height() - 2 * padding());
+        iconSize       = iconSize.expandedTo(QSize(8, 8));
+        QRect iconRect = QRect(
+            (width() - iconSize.width()) / 2, (height() - iconSize.height()) / 2, iconSize.width(), iconSize.height());
+        m_icon.paint(&painter, iconRect);
+    }
 }
 
 void SARibbonTitleIconWidget::mousePressEvent(QMouseEvent* event)
 {
-	if (event->button() == Qt::LeftButton && m_window) {
-		if (m_contextMenu) {
-			QPoint menuPos = mapToGlobal(QPoint(0, height()));
-			m_contextMenu->popup(menuPos);
-			event->accept();
-			return;
-		}
-	}
-	QWidget::mousePressEvent(event);
+    if (event->button() == Qt::LeftButton && m_widget) {
+        if (m_contextMenu) {
+            QPoint menuPos = mapToGlobal(QPoint(0, height()));
+            m_contextMenu->popup(menuPos);
+            event->accept();
+            return;
+        }
+    }
+    QWidget::mousePressEvent(event);
 }
 
 void SARibbonTitleIconWidget::contextMenuEvent(QContextMenuEvent* event)
 {
-	if (m_contextMenu && m_window) {
-		QPoint menuPos = mapToGlobal(event->pos());
-		m_contextMenu->popup(menuPos);
-		event->accept();
-		return;
-	}
-	QWidget::contextMenuEvent(event);
+    if (m_contextMenu && m_widget) {
+        QPoint menuPos = mapToGlobal(event->pos());
+        m_contextMenu->popup(menuPos);
+        event->accept();
+        return;
+    }
+    QWidget::contextMenuEvent(event);
 }
 
 /**
@@ -122,8 +149,8 @@ void SARibbonTitleIconWidget::contextMenuEvent(QContextMenuEvent* event)
  */
 void SARibbonTitleIconWidget::createContextMenu()
 {
-	m_contextMenu = new QMenu(this);
-	setupMenuActions();
+    m_contextMenu = new QMenu(this);
+    setupMenuActions();
 }
 
 /**
@@ -131,47 +158,47 @@ void SARibbonTitleIconWidget::createContextMenu()
  */
 void SARibbonTitleIconWidget::setupMenuActions()
 {
-	// 还原菜单项
-	QAction* restoreAction = new QAction(tr("Restore(R)"), this);  // cn:还原
-	restoreAction->setIcon(style()->standardIcon(QStyle::SP_TitleBarNormalButton));
-	connect(restoreAction, &QAction::triggered, this, &SARibbonTitleIconWidget::onRestore);
+    // 还原菜单项
+    QAction* restoreAction = new QAction(tr("Restore(R)"), this);  // cn:还原
+    restoreAction->setIcon(style()->standardIcon(QStyle::SP_TitleBarNormalButton));
+    connect(restoreAction, &QAction::triggered, this, &SARibbonTitleIconWidget::onRestore);
 
-	// 移动菜单项
-	QAction* moveAction = new QAction(tr("Move(M)"), this);  // cn:移动
-	connect(moveAction, &QAction::triggered, this, &SARibbonTitleIconWidget::onMove);
+    // 移动菜单项
+    QAction* moveAction = new QAction(tr("Move(M)"), this);  // cn:移动
+    connect(moveAction, &QAction::triggered, this, &SARibbonTitleIconWidget::onMove);
 
-	// 大小菜单项
-	QAction* sizeAction = new QAction(tr("Size(S)"), this);  // cn:大小
-	connect(sizeAction, &QAction::triggered, this, &SARibbonTitleIconWidget::onSize);
+    // 大小菜单项
+    QAction* sizeAction = new QAction(tr("Size(S)"), this);  // cn:大小
+    connect(sizeAction, &QAction::triggered, this, &SARibbonTitleIconWidget::onSize);
 
-	// 分隔线
-	m_contextMenu->addSeparator();
+    // 分隔线
+    m_contextMenu->addSeparator();
 
-	// 最小化菜单项
-	QAction* minimizeAction = new QAction(tr("Minimize(N)"), this);  // cn:最小化
-	minimizeAction->setIcon(style()->standardIcon(QStyle::SP_TitleBarMinButton));
-	connect(minimizeAction, &QAction::triggered, this, &SARibbonTitleIconWidget::onMinimize);
+    // 最小化菜单项
+    QAction* minimizeAction = new QAction(tr("Minimize(N)"), this);  // cn:最小化
+    minimizeAction->setIcon(style()->standardIcon(QStyle::SP_TitleBarMinButton));
+    connect(minimizeAction, &QAction::triggered, this, &SARibbonTitleIconWidget::onMinimize);
 
-	// 最大化菜单项
-	QAction* maximizeAction = new QAction(tr("Maximize(X)"), this);  // cn:最小化
-	maximizeAction->setIcon(style()->standardIcon(QStyle::SP_TitleBarMaxButton));
-	connect(maximizeAction, &QAction::triggered, this, &SARibbonTitleIconWidget::onMaximize);
+    // 最大化菜单项
+    QAction* maximizeAction = new QAction(tr("Maximize(X)"), this);  // cn:最小化
+    maximizeAction->setIcon(style()->standardIcon(QStyle::SP_TitleBarMaxButton));
+    connect(maximizeAction, &QAction::triggered, this, &SARibbonTitleIconWidget::onMaximize);
 
-	// 分隔线
-	m_contextMenu->addSeparator();
+    // 分隔线
+    m_contextMenu->addSeparator();
 
-	// 关闭菜单项
-	QAction* closeAction = new QAction(tr("Close(C)"), this);  // cn:关闭
-	closeAction->setIcon(style()->standardIcon(QStyle::SP_TitleBarCloseButton));
-	connect(closeAction, &QAction::triggered, this, &SARibbonTitleIconWidget::onClose);
+    // 关闭菜单项
+    QAction* closeAction = new QAction(tr("Close(C)"), this);  // cn:关闭
+    closeAction->setIcon(style()->standardIcon(QStyle::SP_TitleBarCloseButton));
+    connect(closeAction, &QAction::triggered, this, &SARibbonTitleIconWidget::onClose);
 
-	// 添加到菜单
-	m_contextMenu->addAction(restoreAction);
-	m_contextMenu->addAction(moveAction);
-	m_contextMenu->addAction(sizeAction);
-	m_contextMenu->addAction(minimizeAction);
-	m_contextMenu->addAction(maximizeAction);
-	m_contextMenu->addAction(closeAction);
+    // 添加到菜单
+    m_contextMenu->addAction(restoreAction);
+    m_contextMenu->addAction(moveAction);
+    m_contextMenu->addAction(sizeAction);
+    m_contextMenu->addAction(minimizeAction);
+    m_contextMenu->addAction(maximizeAction);
+    m_contextMenu->addAction(closeAction);
 }
 
 /**
@@ -180,9 +207,9 @@ void SARibbonTitleIconWidget::setupMenuActions()
  */
 void SARibbonTitleIconWidget::onRestore()
 {
-	if (m_window) {
-		m_window->showNormal();
-	}
+    if (m_widget) {
+        m_widget->showNormal();
+    }
 }
 
 /**
@@ -191,11 +218,11 @@ void SARibbonTitleIconWidget::onRestore()
  */
 void SARibbonTitleIconWidget::onMove()
 {
-	if (m_window) {
-		// 在实际应用中，这里可以触发窗口移动逻辑
-		// 或者通过其他方式实现移动功能
-		m_window->setFocus();
-	}
+    if (m_widget) {
+        // 在实际应用中，这里可以触发窗口移动逻辑
+        // 或者通过其他方式实现移动功能
+        m_widget->setFocus();
+    }
 }
 
 /**
@@ -204,11 +231,11 @@ void SARibbonTitleIconWidget::onMove()
  */
 void SARibbonTitleIconWidget::onSize()
 {
-	if (m_window) {
-		// 在实际应用中，这里可以触发窗口大小调整逻辑
-		// 或者通过其他方式实现大小调整功能
-		m_window->setFocus();
-	}
+    if (m_widget) {
+        // 在实际应用中，这里可以触发窗口大小调整逻辑
+        // 或者通过其他方式实现大小调整功能
+        m_widget->setFocus();
+    }
 }
 
 /**
@@ -217,9 +244,9 @@ void SARibbonTitleIconWidget::onSize()
  */
 void SARibbonTitleIconWidget::onMinimize()
 {
-	if (m_window) {
-		m_window->showMinimized();
-	}
+    if (m_widget) {
+        m_widget->showMinimized();
+    }
 }
 
 /**
@@ -228,13 +255,13 @@ void SARibbonTitleIconWidget::onMinimize()
  */
 void SARibbonTitleIconWidget::onMaximize()
 {
-	if (m_window) {
-		if (m_window->isMaximized()) {
-			m_window->showNormal();
-		} else {
-			m_window->showMaximized();
-		}
-	}
+    if (m_widget) {
+        if (m_widget->isMaximized()) {
+            m_widget->showNormal();
+        } else {
+            m_widget->showMaximized();
+        }
+    }
 }
 
 /**
@@ -243,7 +270,7 @@ void SARibbonTitleIconWidget::onMaximize()
  */
 void SARibbonTitleIconWidget::onClose()
 {
-	if (m_window) {
-		m_window->close();
-	}
+    if (m_widget) {
+        m_widget->close();
+    }
 }
