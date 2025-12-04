@@ -248,32 +248,32 @@
 <context>
     <name>SARibbonTitleIconWidget</name>
     <message>
-        <location filename="../SARibbonTitleIconWidget.cpp" line="135"/>
+        <location filename="../SARibbonTitleIconWidget.cpp" line="162"/>
         <source>Restore(R)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SARibbonTitleIconWidget.cpp" line="140"/>
+        <location filename="../SARibbonTitleIconWidget.cpp" line="167"/>
         <source>Move(M)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SARibbonTitleIconWidget.cpp" line="144"/>
+        <location filename="../SARibbonTitleIconWidget.cpp" line="171"/>
         <source>Size(S)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SARibbonTitleIconWidget.cpp" line="151"/>
+        <location filename="../SARibbonTitleIconWidget.cpp" line="178"/>
         <source>Minimize(N)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SARibbonTitleIconWidget.cpp" line="156"/>
+        <location filename="../SARibbonTitleIconWidget.cpp" line="183"/>
         <source>Maximize(X)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SARibbonTitleIconWidget.cpp" line="164"/>
+        <location filename="../SARibbonTitleIconWidget.cpp" line="191"/>
         <source>Close(C)</source>
         <translation type="unfinished"></translation>
     </message>

@@ -51,8 +51,6 @@ class SARibbonPanel::PrivateData
     SA_RIBBON_DECLARE_PUBLIC(SARibbonPanel)
 public:
     PrivateData(SARibbonPanel* p);
-    // 根据m_panelLayoutMode返回gridLayout应该增加的行数
-    int rowadded();
     void createLayout();
     // 获取layout
     SARibbonPanelLayout* panelLayout() const;
@@ -76,24 +74,9 @@ SARibbonPanel::PrivateData::PrivateData(SARibbonPanel* p) : q_ptr(p)
     createLayout();
 }
 
-int SARibbonPanel::PrivateData::rowadded()
-{
-    switch (m_panelLayoutMode) {
-    case SARibbonPanel::ThreeRowMode:
-        return (2);
-
-    case SARibbonPanel::TwoRowMode:
-        return (3);
-
-    default:
-        break;
-    }
-    return (2);
-}
-
 void SARibbonPanel::PrivateData::createLayout()
 {
-    m_label = new SARibbonPanelLabel(q_ptr);
+    m_label = RibbonSubElementFactory->createRibbonPanelLabel(q_ptr);
     m_label->setAlignment(Qt::AlignCenter);
     SARibbonPanelLayout* lay = new SARibbonPanelLayout(q_ptr);
     lay->setPanelTitleLabel(m_label);

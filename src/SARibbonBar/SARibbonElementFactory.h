@@ -24,6 +24,7 @@ class SARibbonQuickAccessBar;
 class SARibbonPanelOptionButton;
 class SARibbonSystemButtonBar;
 class SARibbonTitleIconWidget;
+class SARibbonPanelLabel;
 ///
 /// \brief SARibbon的子元素创建的工厂，SARibbon内部创建子元素都通过SARibbonElementFactory来创建
 ///
@@ -33,24 +34,25 @@ class SARibbonTitleIconWidget;
 class SA_RIBBON_EXPORT SARibbonElementFactory
 {
 public:
-	SARibbonElementFactory();
-	virtual ~SARibbonElementFactory();
-	virtual SARibbonBar* createRibbonBar(QWidget* parent);
-	virtual SARibbonTabBar* createRibbonTabBar(QWidget* parent);
-	virtual SARibbonApplicationButton* createRibbonApplicationButton(QWidget* parent);
-	virtual SARibbonCategory* createRibbonCategory(QWidget* parent);
-	virtual SARibbonContextCategory* createRibbonContextCategory(QWidget* parent);
-	virtual SARibbonPanel* createRibbonPanel(QWidget* parent);
-	virtual SARibbonSeparatorWidget* createRibbonSeparatorWidget(QWidget* parent);
-	virtual SARibbonGallery* createRibbonGallery(QWidget* parent);
-	virtual SARibbonGalleryGroup* createRibbonGalleryGroup(QWidget* parent);
-	virtual SARibbonToolButton* createRibbonToolButton(QWidget* parent);
-	virtual SARibbonStackedWidget* createRibbonStackedWidget(SARibbonBar* parent);
-	virtual SARibbonButtonGroupWidget* createButtonGroupWidget(QWidget* parent);
-	virtual SARibbonQuickAccessBar* createQuickAccessBar(QWidget* parent);
-	virtual SARibbonSystemButtonBar* createWindowButtonGroup(QWidget* parent);
-	virtual SARibbonPanelOptionButton* createRibbonPanelOptionButton(SARibbonPanel* panel);
+    SARibbonElementFactory();
+    virtual ~SARibbonElementFactory();
+    virtual SARibbonBar* createRibbonBar(QWidget* parent);
+    virtual SARibbonTabBar* createRibbonTabBar(QWidget* parent);
+    virtual SARibbonApplicationButton* createRibbonApplicationButton(QWidget* parent);
+    virtual SARibbonCategory* createRibbonCategory(QWidget* parent);
+    virtual SARibbonContextCategory* createRibbonContextCategory(QWidget* parent);
+    virtual SARibbonPanel* createRibbonPanel(QWidget* parent);
+    virtual SARibbonSeparatorWidget* createRibbonSeparatorWidget(QWidget* parent);
+    virtual SARibbonGallery* createRibbonGallery(QWidget* parent);
+    virtual SARibbonGalleryGroup* createRibbonGalleryGroup(QWidget* parent);
+    virtual SARibbonToolButton* createRibbonToolButton(QWidget* parent);
+    virtual SARibbonStackedWidget* createRibbonStackedWidget(SARibbonBar* parent);
+    virtual SARibbonButtonGroupWidget* createButtonGroupWidget(QWidget* parent);
+    virtual SARibbonQuickAccessBar* createQuickAccessBar(QWidget* parent);
+    virtual SARibbonSystemButtonBar* createWindowButtonGroup(QWidget* parent);
+    virtual SARibbonPanelOptionButton* createRibbonPanelOptionButton(SARibbonPanel* panel);
     virtual SARibbonTitleIconWidget* createRibbonTitleIconWidget(QWidget* parent);
+    virtual SARibbonPanelLabel* createRibbonPanelLabel(QWidget* parent);
 };
 
 #endif  // SARIBBONELEMENTFACTORY_H

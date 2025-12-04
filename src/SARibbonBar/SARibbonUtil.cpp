@@ -6,7 +6,7 @@
 #include <QApplication>
 #include <QScreen>
 #if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
-#include <QDesktopWidget>
+#include <QWindow>
 #else
 #endif
 namespace SA
@@ -219,12 +219,10 @@ qreal widgetDevicePixelRatio(QWidget* w)
     }
     // 获取窗口所在的屏幕（优先当前窗口的屏幕）
     QScreen* sc = nullptr;
+
 #if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
-    if (QDesktopWidget* dw = QApplication::desktop()) {
-        int idx = dw->screenNumber(w);  // -1 表示主屏
-        if (QScreen* sc = dw->screen(idx)) {
-            return sc->devicePixelRatio();
-        }
+    if (QWindow* wh = w->windowHandle()) {
+        sc = wh->screen();
     }
 #else
     // 先获取窗口的顶层窗口（避免子部件直接调用screen()可能返回null的问题）
