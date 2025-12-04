@@ -22,6 +22,7 @@ HEADERS  +=              \
 
 FORMS += \
     ApplicationWidget.ui \
+    mainwindow.ui
 
 RESOURCES += \
     resouce.qrc \
