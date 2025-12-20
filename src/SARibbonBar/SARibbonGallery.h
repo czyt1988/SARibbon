@@ -3,10 +3,13 @@
 #include "SARibbonGlobal.h"
 #include <QFrame>
 #include <QToolButton>
+#include <QScrollArea>
 #include "SARibbonGalleryGroup.h"
-#include <QSizeGrip>
 class QLabel;
 class QVBoxLayout;
+class QSizeGrip;
+class QShowEvent;
+class QHideEvent;
 class SARibbonGalleryViewport;
 
 /**
@@ -14,10 +17,10 @@ class SARibbonGalleryViewport;
  */
 class SA_RIBBON_EXPORT SARibbonGalleryButton : public QToolButton
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	explicit SARibbonGalleryButton(QWidget* parent = nullptr);
-	~SARibbonGalleryButton();
+    explicit SARibbonGalleryButton(QWidget* parent = nullptr);
+    ~SARibbonGalleryButton();
 };
 
 /**
@@ -43,83 +46,95 @@ public:
  */
 class SA_RIBBON_EXPORT SARibbonGallery : public QFrame
 {
-	Q_OBJECT
-	SA_RIBBON_DECLARE_PRIVATE(SARibbonGallery)
+    Q_OBJECT
+    SA_RIBBON_DECLARE_PRIVATE(SARibbonGallery)
 public:
-	explicit SARibbonGallery(QWidget* parent = nullptr);
-	virtual ~SARibbonGallery();
-	virtual QSize sizeHint() const override;
-	// 添加一个GalleryGroup
-	SARibbonGalleryGroup* addGalleryGroup();
-	// 添加一个GalleryGroup
-	void addGalleryGroup(SARibbonGalleryGroup* group);
-	// 快速添加一组actions
-	SARibbonGalleryGroup* addCategoryActions(const QString& title, QList< QAction* > actions);
-	// 设置当前显示的SARibbonGalleryGroup
-	void setCurrentViewGroup(SARibbonGalleryGroup* group);
-	// 获取当前显示的SARibbonGalleryGroup
-	SARibbonGalleryGroup* currentViewGroup() const;
-	// 获取弹出窗口指针
-	SARibbonGalleryViewport* getPopupViewPort() const;
+    explicit SARibbonGallery(QWidget* parent = nullptr);
+    virtual ~SARibbonGallery();
+    // 添加一个GalleryGroup
+    SARibbonGalleryGroup* addGalleryGroup();
+    // 添加一个GalleryGroup
+    void addGalleryGroup(SARibbonGalleryGroup* group);
+    // 快速添加一组actions
+    SARibbonGalleryGroup* addCategoryActions(const QString& title, QList< QAction* > actions);
+    // 设置当前显示的SARibbonGalleryGroup
+    void setCurrentViewGroup(SARibbonGalleryGroup* group);
+    // 获取当前显示的SARibbonGalleryGroup
+    SARibbonGalleryGroup* currentViewGroup() const;
+    // 获取弹出窗口指针
+    SARibbonGalleryViewport* getPopupViewPort() const;
 
 public:
-	// 设置最右边三个控制按钮的最大宽度（默认15）
-	static void setGalleryButtonMaximumWidth(int w);
+    // 设置最右边三个控制按钮的最大宽度（默认15）
+    static void setGalleryButtonMaximumWidth(int w);
 Q_SIGNALS:
-	/**
-	 * @brief 转发管理的SARibbonGalleryGroup::triggered
-	 * 所有加入SARibbonGallery的action都会被一个QActionGroup管理,可以通过@sa getActionGroup 获取到对应的actiongroup
-	 * @param action
-	 */
-	void triggered(QAction* action);
-	/**
-	 * @brief 转发管理的SARibbonGalleryGroup::hovered
-	 * @note 此属性需要确保SARibbonGalleryGroup::setMouseTracking(true)
-	 * @param action
-	 */
-	void hovered(QAction* action);
+    /**
+     * @brief 转发管理的SARibbonGalleryGroup::triggered
+     * 所有加入SARibbonGallery的action都会被一个QActionGroup管理,可以通过@sa getActionGroup 获取到对应的actiongroup
+     * @param action
+     */
+    void triggered(QAction* action);
+    /**
+     * @brief 转发管理的SARibbonGalleryGroup::hovered
+     * @note 此属性需要确保SARibbonGalleryGroup::setMouseTracking(true)
+     * @param action
+     */
+    void hovered(QAction* action);
 
 public Q_SLOTS:
-	// 上翻页
-	virtual void pageUp();
-	// 下翻页
-	virtual void pageDown();
-	// 显示更多触发，默认弹出内部管理的SARibbonGalleryViewport，用户可重载此函数实现自定义的弹出
-	virtual void showMoreDetail();
+    // 上翻页
+    virtual void pageUp();
+    // 下翻页
+    virtual void pageDown();
+    // 显示更多触发，默认弹出内部管理的SARibbonGalleryViewport，用户可重载此函数实现自定义的弹出
+    virtual void showMoreDetail();
 protected Q_SLOTS:
-	void onItemClicked(const QModelIndex& index);
-	virtual void onTriggered(QAction* action);
+    void onItemClicked(const QModelIndex& index);
+    virtual void onTriggered(QAction* action);
 
 private:
-	SARibbonGalleryViewport* ensureGetPopupViewPort();
+    SARibbonGalleryViewport* ensureGetPopupViewPort();
 
 protected:
-	void resizeEvent(QResizeEvent* event) override;
-	void paintEvent(QPaintEvent* event) override;
+    void resizeEvent(QResizeEvent* event) override;
 };
 
 ///
 /// \brief SARibbonGallery的Viewport class
 ///
-class SARibbonGalleryViewport : public QWidget
+class SARibbonGalleryViewport : public QScrollArea
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
-	SARibbonGalleryViewport(QWidget* parent);
-	// 添加窗口不带标题
-	void addWidget(QWidget* w);
-	// 添加窗口，带标题
-	void addWidget(QWidget* w, const QString& title);
-	// 通过SARibbonGalleryGroup获取对应的标题，用户可以通过此函数设置QLabel的属性
-	QLabel* titleLabel(QWidget* w);
-	// 移除窗口
-	void removeWidget(QWidget* w);
+    explicit SARibbonGalleryViewport(QWidget* parent);
+    // 添加窗口不带标题
+    void addWidget(QWidget* w);
+    // 添加窗口，带标题
+    void addWidget(QWidget* w, const QString& title);
+    // 通过SARibbonGalleryGroup获取对应的标题，用户可以通过此函数设置QLabel的属性
+    QLabel* titleLabel(QWidget* w);
+    // 移除窗口
+    void removeWidget(QWidget* w);
+    // 获取此窗口下所有的SARibbonGalleryGroup
+    QList< SARibbonGalleryGroup* > galleryGroupList() const;
+    // 获取gallery的高度
+    int galleryHeight() const;
+    // 根据宽度计算高度推荐值
+    int heightHintForWidth(int w) const;
 public Q_SLOTS:
-	void onTitleChanged(QWidget* w, const QString& title);
+    void onTitleChanged(QWidget* w, const QString& title);
+
+protected:  // 新增
+    bool eventFilter(QObject* o, QEvent* e) override;
+    void showEvent(QShowEvent* e) override;
+    void hideEvent(QHideEvent* e) override;
+    void resizeEvent(QResizeEvent* e) override;
 
 private:
-	QVBoxLayout* m_layout;
-	QMap< QWidget*, QLabel* > _widgetToTitleLable;  ///< QWidget和lable的对应
+    QWidget* m_contentWidget { nullptr };            ///< 滚动区域的内容窗口
+    QVBoxLayout* m_layout;                           ///< 内容窗口的布局
+    QMap< QWidget*, QLabel* > m_widgetToTitleLabel;  ///< 窗口到标题标签的映射
+    QSizeGrip* m_sizeGrip;                           ///< 尺寸调整手柄
 };
 
 #endif  // SARIBBONGALLERY_H

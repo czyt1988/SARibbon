@@ -61,7 +61,9 @@ void SARibbonGalleryGroupItemDelegate::paint(QPainter* painter, const QStyleOpti
     }
 }
 
-void SARibbonGalleryGroupItemDelegate::paintIconOnly(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
+void SARibbonGalleryGroupItemDelegate::paintIconOnly(QPainter* painter,
+                                                     const QStyleOptionViewItem& option,
+                                                     const QModelIndex& index) const
 {
     QStyle* style = mGroup->style();
     int sp        = mGroup->spacing();
@@ -79,7 +81,9 @@ void SARibbonGalleryGroupItemDelegate::paintIconOnly(QPainter* painter, const QS
     painter->restore();
 }
 
-void SARibbonGalleryGroupItemDelegate::paintIconWithText(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
+void SARibbonGalleryGroupItemDelegate::paintIconWithText(QPainter* painter,
+                                                         const QStyleOptionViewItem& option,
+                                                         const QModelIndex& index) const
 {
     QStyledItemDelegate::paint(painter, option, index);
 }
@@ -187,11 +191,24 @@ SARibbonGalleryItem* SARibbonGalleryGroupModel::take(int row)
     return (item);
 }
 
+/**
+ * @brief 插入条目，item的内存由SARibbonGalleryGroupModel管理
+ * @param item
+ */
 void SARibbonGalleryGroupModel::append(SARibbonGalleryItem* item)
 {
     beginInsertRows(QModelIndex(), mItems.count(), mItems.count() + 1);
     mItems.append(item);
     endInsertRows();
+}
+
+/**
+ * @brief 获取条目数量
+ * @return
+ */
+int SARibbonGalleryGroupModel::itemSize() const
+{
+    return mItems.size();
 }
 
 //===================================================
@@ -202,12 +219,13 @@ SARibbonGalleryGroup::SARibbonGalleryGroup(QWidget* w)
 {
     setViewMode(QListView::IconMode);
     setResizeMode(QListView::Adjust);
+    setFlow(QListView::LeftToRight);
     setSelectionRectVisible(true);
     setUniformItemSizes(true);
     setSpacing(1);
     setItemDelegate(new SARibbonGalleryGroupItemDelegate(this, this));
     connect(this, &QAbstractItemView::clicked, this, &SARibbonGalleryGroup::onItemClicked);
-    SARibbonGalleryGroupModel* m = new SARibbonGalleryGroupModel(this);
+    SARibbonGalleryGroupModel* m = setupGroupModel();
     setModel(m);
 }
 
@@ -215,19 +233,6 @@ SARibbonGalleryGroup::~SARibbonGalleryGroup()
 {
 }
 
-/**
- * @brief 是否禁止计算
- * @param on
- */
-void SARibbonGalleryGroup::setRecalcGridSizeBlock(bool on)
-{
-    d_ptr->mBlockRecalc = on;
-}
-
-bool SARibbonGalleryGroup::isRecalcGridSizeBlock() const
-{
-    return d_ptr->mBlockRecalc;
-}
 
 /**
  * @brief 重新计算grid和icon的尺寸
@@ -239,9 +244,6 @@ void SARibbonGalleryGroup::recalcGridSize()
 
 void SARibbonGalleryGroup::recalcGridSize(int galleryHeight)
 {
-    if (isRecalcGridSizeBlock()) {
-        return;
-    }
     // 首先通过DisplayRow计算GridSize
     int dr = static_cast< int >(displayRow());
     if (dr < 1) {
@@ -266,7 +268,8 @@ void SARibbonGalleryGroup::recalcGridSize(int galleryHeight)
     }
     setGridSize(QSize(w, h));
     // 在通过GalleryGroupStyle确定icon的尺寸
-    const int shiftpix = 4;  // 这个是移动像素，qt在鼠标移动到图标上时会移动一下，给用户明确的动态，导致如果布局很满会超出显示范围，因此要在此基础上缩放一点
+    const int shiftpix =
+        4;  // 这个是移动像素，qt在鼠标移动到图标上时会移动一下，给用户明确的动态，导致如果布局很满会超出显示范围，因此要在此基础上缩放一点
     switch (galleryGroupStyle()) {
     case IconWithText: {
         int textHeight = fontMetrics().lineSpacing();
@@ -310,9 +313,7 @@ void SARibbonGalleryGroup::recalcGridSize(int galleryHeight)
 void SARibbonGalleryGroup::setGalleryGroupStyle(SARibbonGalleryGroup::GalleryGroupStyle style)
 {
     d_ptr->mPreStyle = style;
-    if (style == IconWithWordWrapText) {
-        setWordWrap(true);
-    }
+    setWordWrap(style == IconWithWordWrapText);
     recalcGridSize();
 }
 
@@ -366,15 +367,19 @@ void SARibbonGalleryGroup::addActionItemList(const QList< QAction* >& acts)
     }
 }
 
-///
-/// \brief 构建一个model，这个model的父类是SARibbonGalleryGroup，如果要共享model，需要手动处理model的父类
-///
-void SARibbonGalleryGroup::setupGroupModel()
+
+/**
+ * @brief 构建一个model，这个model的父类是SARibbonGalleryGroup，如果要共享model，需要手动处理model的父类
+ * @return
+ */
+SARibbonGalleryGroupModel* SARibbonGalleryGroup::setupGroupModel()
 {
-    setModel(new SARibbonGalleryGroupModel(this));
+    SARibbonGalleryGroupModel* m = new SARibbonGalleryGroupModel(this);
+    setModel(m);
+    return m;
 }
 
-SARibbonGalleryGroupModel* SARibbonGalleryGroup::groupModel()
+SARibbonGalleryGroupModel* SARibbonGalleryGroup::groupModel() const
 {
     return (qobject_cast< SARibbonGalleryGroupModel* >(model()));
 }
@@ -468,6 +473,68 @@ QActionGroup* SARibbonGalleryGroup::actionGroup() const
 {
     return d_ptr->mActionGroup;
 }
+
+/**
+ * @brief 计算行数
+ * @return
+ */
+int SARibbonGalleryGroup::gridRowCount() const
+{
+    SARibbonGalleryGroupModel* model = groupModel();
+    if (nullptr == model) {
+        return 0;
+    }
+    int gcol = gridColumnCount();
+    if (gcol == 0) {
+        return 0;
+    }
+    // 这里的rowcount是item的数量
+    int itemCnt = model->rowCount(QModelIndex());
+    return (itemCnt / gcol) + 1;
+}
+
+int SARibbonGalleryGroup::gridColumnCount() const
+{
+    auto vp = viewport();
+    if (!vp) {
+        return 0;
+    }
+    int w    = viewport()->width();
+    QSize gs = gridSize();
+    return w / gs.width();
+}
+
+/**
+ * @brief 计算最紧凑的高度
+ * @return
+ */
+int SARibbonGalleryGroup::preferredHeightForWidth(int w) const
+{
+    SARibbonGalleryGroupModel* model = groupModel();
+    if (nullptr == model) {
+        return -1;
+    }
+    int viewWidth = w - 2 * frameWidth();
+    QSize gs      = gridSize();
+    int gcol      = viewWidth / gs.width();
+    if (gcol == 0) {
+        return -1;
+    }
+    int itemCnt = model->rowCount(QModelIndex());
+    int grow    = (itemCnt / gcol) + 1;
+    return grow * gs.height() + 2 * frameWidth() + 5;  // 这里加上5是留下一定余量，避免刚好触发滚动条
+}
+
+bool SARibbonGalleryGroup::hasHeightForWidth() const
+{
+    return true;
+}
+
+int SARibbonGalleryGroup::heightForWidth(int w) const
+{
+    return preferredHeightForWidth(w);
+}
+
 
 void SARibbonGalleryGroup::onItemClicked(const QModelIndex& index)
 {
