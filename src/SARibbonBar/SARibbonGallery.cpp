@@ -8,6 +8,7 @@
 #include <QLabel>
 #include <QSizeGrip>
 #include <QActionGroup>
+#include <QScreen>
 #include "SARibbonElementManager.h"
 
 #define ICON_ARROW_UP QIcon(":/SARibbon/image/resource/ArrowUp.png")
@@ -141,7 +142,7 @@ SARibbonGalleryViewport::SARibbonGalleryViewport(QWidget* parent) : QScrollArea(
     m_sizeGrip      = new QSizeGrip(this);
     // 配置内容窗口
     m_contentWidget->setObjectName("contentWidget");
-    m_contentWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
+    m_contentWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     m_layout->setSpacing(0);
     m_layout->setContentsMargins(1, 1, 1, 20);  // 底部预留手柄空间
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
@@ -207,7 +208,7 @@ void SARibbonGalleryViewport::addWidget(QWidget* w, const QString& title)
     if (w->parentWidget() != m_contentWidget) {
         w->setParent(m_contentWidget);
     }
-    w->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    w->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
     m_layout->addWidget(label);
     m_layout->addWidget(w);
 
@@ -254,7 +255,7 @@ void SARibbonGalleryViewport::removeWidget(QWidget* w)
 
 QList< SARibbonGalleryGroup* > SARibbonGalleryViewport::galleryGroupList() const
 {
-    return m_contentWidget->findChildren< SARibbonGalleryGroup* >();
+    return m_contentWidget->findChildren< SARibbonGalleryGroup* >(QString(), Qt::FindDirectChildrenOnly);
 }
 
 int SARibbonGalleryViewport::galleryHeight() const
@@ -265,6 +266,31 @@ int SARibbonGalleryViewport::galleryHeight() const
         }
     }
     return 40;
+}
+
+/**
+ * @brief 根据宽度计算高度推荐值
+ * @param w
+ * @return
+ */
+int SARibbonGalleryViewport::heightHintForWidth(int w) const
+{
+    const QList< QWidget* > cws = m_contentWidget->findChildren< QWidget* >(QString(), Qt::FindDirectChildrenOnly);
+    int h                       = 0;
+    for (QWidget* widget : cws) {
+        if (widget->hasHeightForWidth()) {
+            h += widget->heightForWidth(w);
+        } else {
+            h += widget->sizeHint().height();
+        }
+    }
+    QMargins mag = m_layout->contentsMargins();
+    // 最后加上margin
+    h += mag.top();
+    h += mag.bottom();
+    h += frameWidth() * 2;
+    // 再加2是为了留2px余量避免显示滚动条
+    return h + 2;
 }
 
 
@@ -309,15 +335,6 @@ void SARibbonGalleryViewport::hideEvent(QHideEvent* e)
 void SARibbonGalleryViewport::resizeEvent(QResizeEvent* e)
 {
     QScrollArea::resizeEvent(e);
-    const QList< SARibbonGalleryGroup* > gs = galleryGroupList();
-    int h                                   = 40;
-    for (SARibbonGalleryGroup* g : gs) {
-        qDebug() << "preferredHeightForViewport=" << g->preferredHeightForViewport() << ",sizehint=" << g->sizeHint();
-        h += g->preferredHeightForViewport();
-    }
-    m_contentWidget->setFixedSize(QSize(width(), h));
-
-
     const int gripSize = 16;
     const int x        = viewport()->width() - gripSize;
     const int y        = viewport()->height() - gripSize;
@@ -451,19 +468,34 @@ void SARibbonGallery::pageUp()
  */
 void SARibbonGallery::showMoreDetail()
 {
-    if (nullptr == d_ptr->mPopupWidget) {
+    if (Q_UNLIKELY(!d_ptr->mPopupWidget))
         return;
-    }
-    QSize popupMenuSize = d_ptr->mPopupWidget->sizeHint();
-    QPoint start        = mapToGlobal(QPoint(0, 0));
+
+    const QPoint start = mapToGlobal(QPoint(0, 0));
+    const QScreen* scr = QGuiApplication::screenAt(start);
+    if (!scr)  // 罕见情况：跨屏拖动后原屏幕消失
+        scr = QGuiApplication::primaryScreen();
+    const QRect avail = scr->availableGeometry();  // 去掉任务栏/Dock
 
     int w = width();
-    if (d_ptr->mCurrentViewportGroup) {
-        w = d_ptr->mCurrentViewportGroup->width();  // viewport
+    if (d_ptr->mCurrentViewportGroup)
+        w = d_ptr->mCurrentViewportGroup->width();
+    w += style()->pixelMetric(QStyle::PM_ScrollBarExtent);
+
+    /* ---- 宽度不超过屏幕右边缘 ---- */
+    w = qMin(w, avail.right() - start.x() + 1);
+    w = qMax(w, 1);  // 保险：至少 1 px
+
+    /* ---- 计算期望高度 ---- */
+    int h = d_ptr->mPopupWidget->heightHintForWidth(w);
+
+    /* ---- 高度不超过屏幕底部 ---- */
+    int maxH = avail.bottom() - start.y() + 1;
+    if (h > maxH) {
+        h = maxH;
     }
 
-    w += style()->pixelMetric(QStyle::PM_ScrollBarExtent);  // scrollbar
-    d_ptr->mPopupWidget->setGeometry(start.x(), start.y(), w, popupMenuSize.height());
+    d_ptr->mPopupWidget->setGeometry(start.x(), start.y(), w, h);
     d_ptr->mPopupWidget->show();
 }
 

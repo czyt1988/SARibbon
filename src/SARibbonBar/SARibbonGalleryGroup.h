@@ -113,10 +113,16 @@ public:
     int gridMaximumWidth() const;
     // 获取SARibbonGalleryGroup管理的actiongroup
     QActionGroup* actionGroup() const;
-    // 仅给 viewport 用,计算最紧凑的高度
-    int preferredHeightForViewport() const;
+    // 行数
+    int gridRowCount() const;
+    // 列数量
+    int gridColumnCount() const;
+    // 根据宽度计算推荐高度
+    int preferredHeightForWidth(int w) const;
+    // 流式listview，需要让它变为高度由宽度决定
+    bool hasHeightForWidth() const override;
     //
-    int heightForWidth(int w) const;
+    int heightForWidth(int w) const override;
 private Q_SLOTS:
     void onItemClicked(const QModelIndex& index);
     void onItemEntered(const QModelIndex& index);

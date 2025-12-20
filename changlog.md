@@ -1,5 +1,11 @@
 # 版本更新记录(change log):
 
+## 2025-12-20 -> 2.5.6
+- `SARibbonGallery`的窗口尺寸根据内容自适应
+- `SARibbonGallery`的弹出菜单改为滚动区域，且增加尺寸调整功能，如果空间不够，用户可实时调整尺寸
+- `SARibbonGallery`的弹出窗口可根据当前屏幕位置进行尺寸调整，不会超出屏幕尺寸范围，如果不够显示会显示滚动条
+- `SARibbonGalleryGroup`针对流式布局的`heightForWidth`功能
+
 ## 2025-11-07 -> 2.5.5
 
 - 增加setPanelLargeIconSize、setPanelSmallIconSize等接口，可设置按钮图标大小

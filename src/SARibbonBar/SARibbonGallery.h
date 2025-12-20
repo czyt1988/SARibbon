@@ -119,6 +119,8 @@ public:
     QList< SARibbonGalleryGroup* > galleryGroupList() const;
     // 获取gallery的高度
     int galleryHeight() const;
+    // 根据宽度计算高度推荐值
+    int heightHintForWidth(int w) const;
 public Q_SLOTS:
     void onTitleChanged(QWidget* w, const QString& title);
 

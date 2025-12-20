@@ -4,7 +4,7 @@ SUBDIRS += \
            example/NormalMenuBarExample\
            example/WidgetWithRibbon \
            example/MdiAreaWindowExample \
-           # example/StaticExample \
+           example/StaticExample \
            example/MainWindowExample \
            example/UseNativeFrameExample \
            example/MatlabUI

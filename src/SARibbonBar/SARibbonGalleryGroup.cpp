@@ -219,6 +219,7 @@ SARibbonGalleryGroup::SARibbonGalleryGroup(QWidget* w)
 {
     setViewMode(QListView::IconMode);
     setResizeMode(QListView::Adjust);
+    setFlow(QListView::LeftToRight);
     setSelectionRectVisible(true);
     setUniformItemSizes(true);
     setSpacing(1);
@@ -474,28 +475,66 @@ QActionGroup* SARibbonGalleryGroup::actionGroup() const
 }
 
 /**
- * @brief 计算最紧凑的高度
+ * @brief 计算行数
  * @return
  */
-int SARibbonGalleryGroup::preferredHeightForViewport() const
+int SARibbonGalleryGroup::gridRowCount() const
 {
     SARibbonGalleryGroupModel* model = groupModel();
     if (nullptr == model) {
-        return 50;
+        return 0;
     }
+    int gcol = gridColumnCount();
+    if (gcol == 0) {
+        return 0;
+    }
+    // 这里的rowcount是item的数量
+    int itemCnt = model->rowCount(QModelIndex());
+    return (itemCnt / gcol) + 1;
+}
 
-    QSize gs   = gridSize();
-    int w      = width();
-    int colCnt = w / gs.width();
-    int rows   = (model->itemSize() + colCnt - 1) / colCnt;
-    // 通过行数计算高度
-    return rows * gs.height();
+int SARibbonGalleryGroup::gridColumnCount() const
+{
+    auto vp = viewport();
+    if (!vp) {
+        return 0;
+    }
+    int w    = viewport()->width();
+    QSize gs = gridSize();
+    return w / gs.width();
+}
+
+/**
+ * @brief 计算最紧凑的高度
+ * @return
+ */
+int SARibbonGalleryGroup::preferredHeightForWidth(int w) const
+{
+    SARibbonGalleryGroupModel* model = groupModel();
+    if (nullptr == model) {
+        return -1;
+    }
+    int viewWidth = w - 2 * frameWidth();
+    QSize gs      = gridSize();
+    int gcol      = viewWidth / gs.width();
+    if (gcol == 0) {
+        return -1;
+    }
+    int itemCnt = model->rowCount(QModelIndex());
+    int grow    = (itemCnt / gcol) + 1;
+    return grow * gs.height() + 2 * frameWidth() + 5;  // 这里加上5是留下一定余量，避免刚好触发滚动条
+}
+
+bool SARibbonGalleryGroup::hasHeightForWidth() const
+{
+    return true;
 }
 
 int SARibbonGalleryGroup::heightForWidth(int w) const
 {
-    return preferredHeightForViewport();
+    return preferredHeightForWidth(w);
 }
+
 
 void SARibbonGalleryGroup::onItemClicked(const QModelIndex& index)
 {
