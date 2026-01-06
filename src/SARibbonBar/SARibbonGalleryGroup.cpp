@@ -210,20 +210,21 @@ void SARibbonGalleryGroupModel::append(SARibbonGalleryItem* item)
  */
 bool SARibbonGalleryGroupModel::remove(const QString& act_object_name)
 {
-    size_t index = 0;
-    for (; index < mItems.size(); ++index)
+    for (size_t index = 0; index < mItems.size(); ++index)
     {
-        if (item->action().objectName() == act_object_name)
+        if (mItems.at(index)->action()->objectName() == act_object_name)
         {
-            break;
+            beginRemoveRows(QModelIndex(), index, index);
+            SARibbonGalleryItem* item = mItems.takeAt(index);
+            endRemoveRows();
+
+            delete item;
+
+            return true;
         }
     }
 
-    beginRemoveRows(QModelIndex(), index, index);
-    SARibbonGalleryItem* item = mItems.takeAt(row);
-    endRemoveRows();
-
-    delete item;
+    return false;
 }
 
 /**
@@ -402,7 +403,7 @@ bool SARibbonGalleryGroup::removeActionItem(QAction* act)
         return false;
     }else {
         d_ptr->mActionGroup->removeAction(act);
-        return groupModel()->remove(act.objectName());
+        return groupModel()->remove(act->objectName());
     }
 }
 
