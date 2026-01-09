@@ -44,6 +44,7 @@ public:
     void insert(int row, SARibbonGalleryItem* item);
     SARibbonGalleryItem* take(int row);
     void append(SARibbonGalleryItem* item);
+    bool remove(const QString& act_object_name);
     // 条目数量
     int itemSize() const;
 
@@ -96,7 +97,7 @@ public:
     // 以一个aciton作为item添加
     void addActionItem(QAction* act);
     void addActionItemList(const QList< QAction* >& acts);
-
+    bool removeActionItem(QAction* act);
     SARibbonGalleryGroupModel* groupModel() const;
     // 标题
     void setGroupTitle(const QString& title);

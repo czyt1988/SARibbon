@@ -198,8 +198,33 @@ SARibbonGalleryItem* SARibbonGalleryGroupModel::take(int row)
 void SARibbonGalleryGroupModel::append(SARibbonGalleryItem* item)
 {
     beginInsertRows(QModelIndex(), mItems.count(), mItems.count() + 1);
+
     mItems.append(item);
     endInsertRows();
+}
+
+/**
+ * @brief remove the inner GalleryItem by the object name of QAction
+ * @param act_object_name [const QString&]
+ * @return the result of removal operation
+ */
+bool SARibbonGalleryGroupModel::remove(const QString& act_object_name)
+{
+    for (size_t index = 0; index < mItems.size(); ++index)
+    {
+        if (mItems.at(index)->action()->objectName() == act_object_name)
+        {
+            beginRemoveRows(QModelIndex(), index, index);
+            SARibbonGalleryItem* item = mItems.takeAt(index);
+            endRemoveRows();
+
+            delete item;
+
+            return true;
+        }
+    }
+
+    return false;
 }
 
 /**
@@ -364,6 +389,21 @@ void SARibbonGalleryGroup::addActionItemList(const QList< QAction* >& acts)
     }
     for (int i = 0; i < acts.size(); ++i) {
         model->append(new SARibbonGalleryItem(acts[ i ]));
+    }
+}
+
+/**
+ * @brief remove one QAction in current GalleryGroup, and this function can't be replace by removeAction.
+ * @param act [QAction*] the pointer for the QAction which will be removed.
+ * @return the result of removal operation
+ */
+bool SARibbonGalleryGroup::removeActionItem(QAction* act)
+{
+    if (nullptr == groupModel()) {
+        return false;
+    }else {
+        d_ptr->mActionGroup->removeAction(act);
+        return groupModel()->remove(act->objectName());
     }
 }
 

@@ -18,11 +18,11 @@ ribbonBar()->setPanelTitleHeight(20);
 // 设置面板间间距
 ribbonBar()->setPanelSpacing(5);
 
-// 设置工具按钮图标大小
-ribbonBar()->setPanelToolButtonIconSize(QSize(32, 32));
+// 设置工具按钮小图标和大图标的大小
+ribbonBar()->setPanelToolButtonIconSize(QSize(20, 20),QSize(32, 32));
 
 // 设置按钮最大宽高比
-ribbonBar()->setButtonMaximumAspectRatio(2.0);
+ribbonBar()->setButtonMaximumAspectRatio(1.4);
 ```
 
 不同的尺寸能组合出不一样的显示效果，尤其针对图标大小的显示需求，SARibbon的图标不像工具栏那样设置一个固定的图标大小，而是根据ribbonBar的高度和文字的高度来决定图标的大小，SARibbon在布局的时候，会根据`CategoryHeight`,以及文字高度来决定图标的大小，因此，你想让图标变大，有两种方法：
