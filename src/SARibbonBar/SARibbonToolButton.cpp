@@ -222,7 +222,7 @@ public:
     QRect mDrawTextRect;                                     ///< 记录text的绘制位置
     QRect mDrawIndicatorArrowRect;                           ///< 记录IndicatorArrow的绘制位置
     QSize mSizeHint;                                         ///< 保存计算好的sizehint
-    QSize mLargeButtonSizeHint;                              ///< 大按钮的尺寸
+    QSize mLargeButtonSizeHint { 32, 32 };                   ///< 大按钮的尺寸
     bool mIsTextNeedWrap { false };                          ///< 标记文字是否需要换行显示
     SARibbonToolButton::LayoutFactor layoutFactor;           ///< 布局系数
     std::unique_ptr< SARibbonToolButtonProxyStyle > mStyle;  ///< 按钮样式，主要为了绘制箭头

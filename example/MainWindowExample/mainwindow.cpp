@@ -1386,8 +1386,11 @@ void MainWindow::createCategoryOther(SARibbonCategory* page)
     gallery->setCurrentViewGroup(group1);
 
     QAction* optAct = new QAction(this);
-
-    optAct->setObjectName(("debug"));
+    optAct->setObjectName(("add gallery item"));
+    connect(optAct, &QAction::triggered, this, [ group2 ]() {
+        QAction* act = new QAction(QIcon(":/gallery-icon/icon/gallery/Document-File.svg"), QString("New Action"));
+        group2->addActionItem(act);
+    });
     panel1->setOptionAction(optAct);
 
     SARibbonPanel* panel2 = new SARibbonPanel(tr("panel two"));

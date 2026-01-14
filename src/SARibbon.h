@@ -1,4 +1,4 @@
-﻿#ifndef SA_RIBBON_H
+#ifndef SA_RIBBON_H
 #define SA_RIBBON_H
 // 定义此宏，将SA_RIBBON_EXPORT定义为空
 #ifndef SA_RIBBON_BAR_NO_EXPORT
@@ -8,7 +8,6 @@
 #ifndef SA_COLOR_WIDGETS_NO_DLL
 #define SA_COLOR_WIDGETS_NO_DLL
 #endif
-
 
 /*** Start of inlined file: SARibbonAmalgamTemplatePublicHeaders.h ***/
 // Global
@@ -75,7 +74,6 @@
 
 /*** End of inlined file: SAColorWidgetsGlobal.h ***/
 
-
 /*** Start of inlined file: SARibbonBarVersionInfo.h ***/
 #ifndef SARIBBONVERSIONINFO_H
 #define SARIBBONVERSIONINFO_H
@@ -112,7 +110,6 @@
 #endif  // SARIBBONVERSIONINFO_H
 
 /*** End of inlined file: SARibbonBarVersionInfo.h ***/
-
 
 /*** Start of inlined file: SARibbonGlobal.h ***/
 #ifndef SARIBBONGLOBAL_H
@@ -378,7 +375,6 @@ private:
 
 /*** End of inlined file: SAColorMenu.h ***/
 
-
 /*** Start of inlined file: SAColorGridWidget.h ***/
 #ifndef SACOLORGRIDWIDGET_H
 #define SACOLORGRIDWIDGET_H
@@ -476,7 +472,6 @@ SA_COLOR_WIDGETS_API QList< QColor > getStandardColorList();
 
 /*** End of inlined file: SAColorGridWidget.h ***/
 
-
 /*** Start of inlined file: SAColorPaletteGridWidget.h ***/
 #ifndef SACOLORPALETTEGRIDWIDGET_H
 #define SACOLORPALETTEGRIDWIDGET_H
@@ -525,7 +520,6 @@ Q_SIGNALS:
 #endif  // SACOLORPALETTEGRIDWIDGET_H
 
 /*** End of inlined file: SAColorPaletteGridWidget.h ***/
-
 
 /*** Start of inlined file: SAColorToolButton.h ***/
 #ifndef SACOLORTOOLBUTTON_H
@@ -680,7 +674,6 @@ qreal widgetDevicePixelRatio(QWidget* w);
 
 /*** End of inlined file: SARibbonUtil.h ***/
 
-
 /*** Start of inlined file: SAFramelessHelper.h ***/
 #ifndef SAFRAMELESSHELPER_H
 #define SAFRAMELESSHELPER_H
@@ -755,7 +748,6 @@ protected:
 
 /*** End of inlined file: SAFramelessHelper.h ***/
 
-
 /*** Start of inlined file: SARibbonApplicationButton.h ***/
 #ifndef SARIBBONAPPLICATIONBUTTON_H
 #define SARIBBONAPPLICATIONBUTTON_H
@@ -779,7 +771,6 @@ public:
 #endif  // SARIBBONAPPLICATIONBUTTON_H
 
 /*** End of inlined file: SARibbonApplicationButton.h ***/
-
 
 /*** Start of inlined file: SARibbonSystemButtonBar.h ***/
 #ifndef SARIBBONSYSTEMBUTTONBAR_H
@@ -874,7 +865,6 @@ public:
 #endif  // SARIBBONSYSTEMBUTTONBAR_H
 
 /*** End of inlined file: SARibbonSystemButtonBar.h ***/
-
 
 /*** Start of inlined file: SARibbonToolButton.h ***/
 #ifndef SARIBBONTOOLBUTTON_H
@@ -1059,7 +1049,6 @@ QDebug operator<<(QDebug debug, const QStyleOptionToolButton& opt);
 
 /*** End of inlined file: SARibbonToolButton.h ***/
 
-
 /*** Start of inlined file: SARibbonColorToolButton.h ***/
 #ifndef SARIBBONCOLORTOOLBUTTON_H
 #define SARIBBONCOLORTOOLBUTTON_H
@@ -1118,7 +1107,6 @@ protected:
 
 /*** End of inlined file: SARibbonColorToolButton.h ***/
 
-
 /*** Start of inlined file: SARibbonLineWidgetContainer.h ***/
 #ifndef SARIBBONLINEWIDGETCONTAINER_H
 #define SARIBBONLINEWIDGETCONTAINER_H
@@ -1165,7 +1153,6 @@ private:
 #endif  // SARIBBONWIDGETCONTAINER_H
 
 /*** End of inlined file: SARibbonLineWidgetContainer.h ***/
-
 
 /*** Start of inlined file: SARibbonActionsManager.h ***/
 #ifndef SARIBBONACTIONSMANAGER_H
@@ -1319,7 +1306,6 @@ private Q_SLOTS:
 
 /*** End of inlined file: SARibbonActionsManager.h ***/
 
-
 /*** Start of inlined file: SARibbonButtonGroupWidget.h ***/
 #ifndef SARIBBONBUTTONGROUPWIDGET_H
 #define SARIBBONBUTTONGROUPWIDGET_H
@@ -1345,7 +1331,6 @@ public:
 #endif  // SARIBBONBUTTONGROUPWIDGET_H
 
 /*** End of inlined file: SARibbonButtonGroupWidget.h ***/
-
 
 /*** Start of inlined file: SARibbonStackedWidget.h ***/
 #ifndef SARIBBONSTACKEDWIDGET_H
@@ -1433,7 +1418,6 @@ private Q_SLOTS:
 
 /*** End of inlined file: SARibbonStackedWidget.h ***/
 
-
 /*** Start of inlined file: SARibbonSeparatorWidget.h ***/
 #ifndef SARIBBONSEPARATORWIDGET_H
 #define SARIBBONSEPARATORWIDGET_H
@@ -1455,7 +1439,6 @@ public:
 #endif  // SARIBBONSEPARATORWIDGET_H
 
 /*** End of inlined file: SARibbonSeparatorWidget.h ***/
-
 
 /*** Start of inlined file: SARibbonCtrlContainer.h ***/
 #ifndef SARIBBONCTROLCONTAINER_H
@@ -1502,7 +1485,6 @@ public:
 #endif  // SARIBBONCTROLCONTAINER_H
 
 /*** End of inlined file: SARibbonCtrlContainer.h ***/
-
 
 /*** Start of inlined file: SARibbonQuickAccessBar.h ***/
 #ifndef SARIBBONQUICKACCESSBAR_H
@@ -1560,7 +1542,6 @@ public:
 
 /*** End of inlined file: SARibbonQuickAccessBar.h ***/
 
-
 /*** Start of inlined file: SARibbonTabBar.h ***/
 #ifndef SARIBBONTABBAR_H
 #define SARIBBONTABBAR_H
@@ -1591,7 +1572,6 @@ private:
 
 /*** End of inlined file: SARibbonTabBar.h ***/
 
-
 /*** Start of inlined file: SARibbonMenu.h ***/
 #ifndef SARIBBONMENU_H
 #define SARIBBONMENU_H
@@ -1618,7 +1598,6 @@ public:
 #endif  // SARIBBONMENU_H
 
 /*** End of inlined file: SARibbonMenu.h ***/
-
 
 /*** Start of inlined file: SARibbonTitleIconWidget.h ***/
 #ifndef SARIBBONTITLEICONWIDGET_H
@@ -1706,7 +1685,6 @@ private:
 
 /*** End of inlined file: SARibbonTitleIconWidget.h ***/
 
-
 /*** Start of inlined file: SARibbonPanelOptionButton.h ***/
 #ifndef SARIBBONPANELOPTIONBUTTON_H
 #define SARIBBONPANELOPTIONBUTTON_H
@@ -1734,7 +1712,6 @@ public:
 #endif  // SAROBBONPANELOPTIONBUTTON_H
 
 /*** End of inlined file: SARibbonPanelOptionButton.h ***/
-
 
 /*** Start of inlined file: SARibbonPanelItem.h ***/
 #ifndef SARIBBONPANELITEM_H
@@ -1789,7 +1766,6 @@ public:
 #endif  // SARIBBONPANELITEM_H
 
 /*** End of inlined file: SARibbonPanelItem.h ***/
-
 
 /*** Start of inlined file: SARibbonPanelLayout.h ***/
 #ifndef SARIBBONPANELLAYOUT_H
@@ -1963,7 +1939,6 @@ private:
 #endif  // SARIBBONPANELLAYOUT_H
 
 /*** End of inlined file: SARibbonPanelLayout.h ***/
-
 
 /*** Start of inlined file: SARibbonPanel.h ***/
 #ifndef SARIBBONPANEL_H
@@ -2318,7 +2293,6 @@ protected:
 
 /*** End of inlined file: SARibbonPanel.h ***/
 
-
 /*** Start of inlined file: SARibbonCategory.h ***/
 #ifndef SARIBBONCATEGORY_H
 #define SARIBBONCATEGORY_H
@@ -2576,7 +2550,6 @@ public:
 
 /*** End of inlined file: SARibbonCategory.h ***/
 
-
 /*** Start of inlined file: SARibbonCategoryLayout.h ***/
 #ifndef SARIBBONCATEGORYLAYOUT_H
 #define SARIBBONCATEGORYLAYOUT_H
@@ -2693,7 +2666,6 @@ public:
 
 /*** End of inlined file: SARibbonCategoryLayout.h ***/
 
-
 /*** Start of inlined file: SARibbonContextCategory.h ***/
 #ifndef SARIBBONCONTEXTCATEGORY_H
 #define SARIBBONCONTEXTCATEGORY_H
@@ -2783,7 +2755,6 @@ protected:
 
 /*** End of inlined file: SARibbonContextCategory.h ***/
 
-
 /*** Start of inlined file: SARibbonGalleryItem.h ***/
 #ifndef SARIBBONGALLERYITEM_H
 #define SARIBBONGALLERYITEM_H
@@ -2852,7 +2823,6 @@ private:
 
 /*** End of inlined file: SARibbonGalleryItem.h ***/
 
-
 /*** Start of inlined file: SARibbonGalleryGroup.h ***/
 #ifndef SARIBBONGALLERYGROUP_H
 #define SARIBBONGALLERYGROUP_H
@@ -2874,7 +2844,8 @@ public:
     virtual QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const override;
     virtual void paintIconOnly(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
     virtual void paintIconWithText(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
-    virtual void paintIconWithTextWordWrap(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
+    virtual void
+    paintIconWithTextWordWrap(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
 
 private:
     SARibbonGalleryGroup* mGroup;
@@ -2899,6 +2870,7 @@ public:
     void insert(int row, SARibbonGalleryItem* item);
     SARibbonGalleryItem* take(int row);
     void append(SARibbonGalleryItem* item);
+    bool remove(const QString& act_object_name);
     // 条目数量
     int itemSize() const;
 
@@ -2951,7 +2923,7 @@ public:
     // 以一个aciton作为item添加
     void addActionItem(QAction* act);
     void addActionItemList(const QList< QAction* >& acts);
-
+    bool removeActionItem(QAction* act);
     SARibbonGalleryGroupModel* groupModel() const;
     // 标题
     void setGroupTitle(const QString& title);
@@ -3005,7 +2977,6 @@ private:
 #endif  // SARIBBONGALLERYGROUP_H
 
 /*** End of inlined file: SARibbonGalleryGroup.h ***/
-
 
 /*** Start of inlined file: SARibbonGallery.h ***/
 #ifndef SARIBBONGALLERY_H
@@ -3150,7 +3121,6 @@ private:
 #endif  // SARIBBONGALLERY_H
 
 /*** End of inlined file: SARibbonGallery.h ***/
-
 
 /*** Start of inlined file: SARibbonBar.h ***/
 #ifndef SARIBBONBAR_H
@@ -3365,9 +3335,8 @@ public:
     void removeCategory(SARibbonCategory* category);
 
     // 添加一个上下文标签
-    SARibbonContextCategory* addContextCategory(const QString& title,
-                                                const QColor& color = QColor(),
-                                                const QVariant& id  = QVariant());
+    SARibbonContextCategory*
+    addContextCategory(const QString& title, const QColor& color = QColor(), const QVariant& id = QVariant());
     void addContextCategory(SARibbonContextCategory* context);
 
     // 显示一个上下文标签
@@ -3652,7 +3621,8 @@ protected:
 
     virtual void paintTabbarBaseLine(QPainter& painter);
     virtual void paintWindowTitle(QPainter& painter, const QString& title, const QRect& titleRegion);
-    virtual void paintContextCategoryTab(QPainter& painter, const QString& title, const QRect& contextRect, const QColor& color);
+    virtual void
+    paintContextCategoryTab(QPainter& painter, const QString& title, const QRect& contextRect, const QColor& color);
 #if SA_DEBUG_PRINT_SARIBBONBAR
     SA_RIBBON_EXPORT friend QDebug operator<<(QDebug debug, const SARibbonBar& ribbon);
 #endif
@@ -3662,7 +3632,6 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(SARibbonBar::RibbonStyles)
 #endif  // SARIBBONBAR_H
 
 /*** End of inlined file: SARibbonBar.h ***/
-
 
 /*** Start of inlined file: SARibbonBarLayout.h ***/
 #ifndef SARIBBONBARLAYOUT_H
@@ -3777,7 +3746,6 @@ private:
 
 /*** End of inlined file: SARibbonBarLayout.h ***/
 
-
 /*** Start of inlined file: SARibbonElementFactory.h ***/
 #ifndef SARIBBONELEMENTFACTORY_H
 #define SARIBBONELEMENTFACTORY_H
@@ -3839,7 +3807,6 @@ public:
 
 /*** End of inlined file: SARibbonElementFactory.h ***/
 
-
 /*** Start of inlined file: SARibbonElementManager.h ***/
 #ifndef SARIBBONELEMENTMANAGER_H
 #define SARIBBONELEMENTMANAGER_H
@@ -3893,7 +3860,6 @@ private:
 #endif  // SARIBBONELEMENTMANAGER_H
 
 /*** End of inlined file: SARibbonElementManager.h ***/
-
 
 /*** Start of inlined file: SARibbonCustomizeData.h ***/
 #ifndef SARIBBONCUSTOMIZEDATA_H
@@ -3950,10 +3916,8 @@ public:
     static SARibbonCustomizeData makeAddCategoryCustomizeData(const QString& title, int index, const QString& objName);
 
     // 对应AddPanelActionType
-    static SARibbonCustomizeData makeAddPanelCustomizeData(const QString& title,
-                                                           int index,
-                                                           const QString& categoryobjName,
-                                                           const QString& objName);
+    static SARibbonCustomizeData
+    makeAddPanelCustomizeData(const QString& title, int index, const QString& categoryobjName, const QString& objName);
 
     // 对应AddActionActionType
     static SARibbonCustomizeData makeAddActionCustomizeData(const QString& key,
@@ -3966,9 +3930,8 @@ public:
     static SARibbonCustomizeData makeRenameCategoryCustomizeData(const QString& newname, const QString& categoryobjName);
 
     // 对应RenamePanelActionType
-    static SARibbonCustomizeData makeRenamePanelCustomizeData(const QString& newname,
-                                                              const QString& categoryobjName,
-                                                              const QString& panelObjName);
+    static SARibbonCustomizeData
+    makeRenamePanelCustomizeData(const QString& newname, const QString& categoryobjName, const QString& panelObjName);
 
     // 对应RemoveCategoryActionType
     static SARibbonCustomizeData makeRemoveCategoryCustomizeData(const QString& categoryobjName);
@@ -3977,9 +3940,8 @@ public:
     static SARibbonCustomizeData makeChangeCategoryOrderCustomizeData(const QString& categoryobjName, int moveindex);
 
     // 对应ChangePanelOrderActionType
-    static SARibbonCustomizeData makeChangePanelOrderCustomizeData(const QString& categoryobjName,
-                                                                   const QString& panelObjName,
-                                                                   int moveindex);
+    static SARibbonCustomizeData
+    makeChangePanelOrderCustomizeData(const QString& categoryobjName, const QString& panelObjName, int moveindex);
 
     // 对应ChangeActionOrderActionType
     static SARibbonCustomizeData makeChangeActionOrderCustomizeData(const QString& categoryobjName,
@@ -4048,7 +4010,6 @@ typedef QList< SARibbonCustomizeData > SARibbonCustomizeDataList;
 #endif  // SARIBBONCUSTOMIZEDATA_H
 
 /*** End of inlined file: SARibbonCustomizeData.h ***/
-
 
 /*** Start of inlined file: SARibbonCustomizeWidget.h ***/
 #ifndef SARIBBONCUSTOMIZEWIDGET_H
@@ -4265,7 +4226,6 @@ bool SA_RIBBON_EXPORT sa_apply_customize_from_xml_file(const QString& filePath, 
 
 /*** End of inlined file: SARibbonCustomizeWidget.h ***/
 
-
 /*** Start of inlined file: SARibbonCustomizeDialog.h ***/
 #ifndef SARIBBONCUSTOMIZEDIALOG_H
 #define SARIBBONCUSTOMIZEDIALOG_H
@@ -4328,7 +4288,6 @@ private:
 #endif  // SARIBBONCUSTOMIZEDIALOG_H
 
 /*** End of inlined file: SARibbonCustomizeDialog.h ***/
-
 
 /*** Start of inlined file: SARibbonMainWindow.h ***/
 #ifndef SARIBBONMAINWINDOW_H
@@ -4455,7 +4414,6 @@ public:
 
 /*** End of inlined file: SARibbonMainWindow.h ***/
 
-
 /*** Start of inlined file: SARibbonWidget.h ***/
 #ifndef SARIBBONWIDGET_H
 #define SARIBBONWIDGET_H
@@ -4504,7 +4462,6 @@ private Q_SLOTS:
 #endif  // SARIBBONWIDGET_H
 
 /*** End of inlined file: SARibbonWidget.h ***/
-
 
 /*** Start of inlined file: SARibbonApplicationWidget.h ***/
 #ifndef SARIBBONAPPLICATIONWIDGET_H
