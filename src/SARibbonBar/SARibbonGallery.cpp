@@ -9,6 +9,7 @@
 #include <QSizeGrip>
 #include <QActionGroup>
 #include <QScreen>
+#include "SARibbonQt5Compat.hpp"
 #include "SARibbonElementManager.h"
 
 #define ICON_ARROW_UP QIcon(":/SARibbon/image/resource/ArrowUp.png")
@@ -293,7 +294,6 @@ int SARibbonGalleryViewport::heightHintForWidth(int w) const
     return h + 2;
 }
 
-
 /**
  * @brief widget的标题改变
  * @param g
@@ -311,9 +311,9 @@ bool SARibbonGalleryViewport::eventFilter(QObject* o, QEvent* e)
     if (e->type() == QEvent::MouseButtonPress) {
         auto* me = static_cast< QMouseEvent* >(e);
         if (isVisible()) {  // 一定要加是否可见
-            if (!rect().contains(mapFromGlobal(me->globalPos()))) {
+            if (!rect().contains(mapFromGlobal(SA::compat::eventGlobalPos(me)))) {
                 close();
-                return true;  // 吃掉事件，防止继续传递
+                return true;  // 防止继续传递
             }
         }
     }
@@ -357,7 +357,6 @@ SARibbonGallery::SARibbonGallery(QWidget* parent) : QFrame(parent), d_ptr(new SA
 SARibbonGallery::~SARibbonGallery()
 {
 }
-
 
 /**
  * @brief 获取一个空白SARibbonGalleryGroup

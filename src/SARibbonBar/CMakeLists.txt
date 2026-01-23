@@ -33,6 +33,7 @@ SET(SACOLOR_SOURCE_FILES
 SET(SARIBBON_HEADER_FILES
     SARibbonBarVersionInfo.h
     SARibbonGlobal.h
+    SARibbonQt5Compat.hpp
     SARibbonUtil.h
     SAFramelessHelper.h
     SARibbonActionsManager.h
@@ -127,6 +128,7 @@ add_library(${SARIBBON_LIB_NAME}
     ${SACOLOR_HEADER_FILES}
     ${SACOLOR_SOURCE_FILES}
     ${SARIBBON_RESOURCE_FILES}
+    SARibbonQt5Compat.hpp
 )
 message(STATUS "SARibbon SARIBBON_GENERATED_RESOURCES resource file:${SARIBBON_GENERATED_RESOURCES}")
 add_library(${SARIBBON_LIB_NAME}::${SARIBBON_LIB_NAME} ALIAS ${SARIBBON_LIB_NAME})

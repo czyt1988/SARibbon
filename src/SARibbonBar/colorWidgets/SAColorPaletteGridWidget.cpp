@@ -11,7 +11,7 @@ class SAColorPaletteGridWidget::PrivateData
     SA_COLOR_WIDGETS_DECLARE_PUBLIC(SAColorPaletteGridWidget)
 public:
     PrivateData(SAColorPaletteGridWidget* p);
-    //生成color palette
+    // 生成color palette
     QList< QColor > makeColorPalette(const QList< QColor >& clrList) const;
 
 public:
@@ -41,8 +41,8 @@ SAColorPaletteGridWidget::PrivateData::PrivateData(SAColorPaletteGridWidget* p) 
 QList< QColor > SAColorPaletteGridWidget::PrivateData::makeColorPalette(const QList< QColor >& clrList) const
 {
     QList< QColor > res;
-    for (int f : qAsConst(mFactor)) {
-        for (const QColor& c : qAsConst(clrList)) {
+    for (int f : sacolor_as_const(mFactor)) {
+        for (const QColor& c : sacolor_as_const(clrList)) {
             res.append(c.lighter(f));
         }
     }

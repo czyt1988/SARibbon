@@ -14,7 +14,7 @@
 #include <QApplication>
 #include <QScreen>
 #include <QProxyStyle>
-
+#include "SARibbonQt5Compat.hpp"
 #include "SARibbonUtil.h"
 
 /**
@@ -605,7 +605,7 @@ QSize SARibbonToolButton::PrivateData::calcSmallButtonSizeHint(const QStyleOptio
     } break;
     case Qt::ToolButtonTextOnly: {
         QSize textSize = opt.fontMetrics.size(Qt::TextShowMnemonic, simplifiedForRibbonButton(opt.text));
-        textSize.setWidth(textSize.width() + SA_FONTMETRICS_WIDTH(opt.fontMetrics, (QLatin1Char(' '))) * 2);
+        textSize.setWidth(textSize.width() + SA::compat::horizontalAdvance(opt.fontMetrics, (QLatin1Char(' '))) * 2);
         textSize.setHeight(calcTextDrawRectHeight(opt));
         w = textSize.width() + 2 * mSpacing;
         h = textSize.height() + 2 * mSpacing;
@@ -617,7 +617,7 @@ QSize SARibbonToolButton::PrivateData::calcSmallButtonSizeHint(const QStyleOptio
         // 再加入文本的长度
         if (!opt.text.isEmpty()) {
             QSize textSize = opt.fontMetrics.size(Qt::TextShowMnemonic, simplifiedForRibbonButton(opt.text));
-            textSize.setWidth(textSize.width() + SA_FONTMETRICS_WIDTH(opt.fontMetrics, (QLatin1Char(' '))) * 2);
+            textSize.setWidth(textSize.width() + SA::compat::horizontalAdvance(opt.fontMetrics, (QLatin1Char(' '))) * 2);
             textSize.setHeight(calcTextDrawRectHeight(opt));
             w += mSpacing;
             w += textSize.width();
@@ -706,7 +706,7 @@ int SARibbonToolButton::PrivateData::estimateLargeButtonTextWidth(int buttonHeig
                                                                   int maxTrycount)
 {
     QSize textSize;
-    int space        = SA_FONTMETRICS_WIDTH(fm, (QLatin1Char(' '))) * 2;
+    int space        = SA::compat::horizontalAdvance(fm, (QLatin1Char(' '))) * 2;
     int hintMaxWidth = qMin(static_cast< int >(buttonHeight * layoutFactor.buttonMaximumAspectRatio),
                             q_ptr->maximumWidth());  ///< 建议的宽度
     if (q_ptr->isEnableWordWrap()) {
@@ -1142,7 +1142,7 @@ void SARibbonToolButton::changeEvent(QEvent* e)
  */
 void SARibbonToolButton::mouseMoveEvent(QMouseEvent* e)
 {
-    d_ptr->updateStatusByMousePosition(e->pos());
+    d_ptr->updateStatusByMousePosition(SA::compat::eventPos(e));
     QToolButton::mouseMoveEvent(e);
 }
 
@@ -1153,7 +1153,7 @@ void SARibbonToolButton::mouseMoveEvent(QMouseEvent* e)
 void SARibbonToolButton::mousePressEvent(QMouseEvent* e)
 {
     if ((e->button() == Qt::LeftButton) && (popupMode() == MenuButtonPopup)) {
-        d_ptr->updateStatusByMousePosition(e->pos());
+        d_ptr->updateStatusByMousePosition(SA::compat::eventPos(e));
         if (d_ptr->mMouseOnSubControl) {
             d_ptr->mMenuButtonPressed = true;
             showMenu();

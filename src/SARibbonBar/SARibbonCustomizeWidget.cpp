@@ -433,7 +433,7 @@ void SARibbonCustomizeWidget::PrivateData::updateModel()
 	SARibbonBar* ribbonbar               = mRibbonBar;
 	QList< SARibbonCategory* > categorys = ribbonbar->categoryPages();
 
-	for (const SARibbonCategory* c : qAsConst(categorys)) {
+	for (const SARibbonCategory* c : sa_as_const(categorys)) {
 		if ((mShowType == SARibbonCustomizeWidget::ShowMainCategory) && c->isContextCategory()) {
 			// 如果是只显示主内容，如果是上下文标签就忽略
 			continue;
@@ -453,7 +453,7 @@ void SARibbonCustomizeWidget::PrivateData::updateModel()
 		ci->setData(0, SARibbonCustomizeWidget::LevelRole);
 		ci->setData(QVariant::fromValue< qintptr >(qintptr(c)), SARibbonCustomizeWidget::PointerRole);
 		QList< SARibbonPanel* > panels = c->panelList();
-		for (const SARibbonPanel* p : qAsConst(panels)) {
+		for (const SARibbonPanel* p : sa_as_const(panels)) {
 			QStandardItem* pi = new QStandardItem(p->panelName());
 			pi->setData(1, SARibbonCustomizeWidget::LevelRole);
 			pi->setData(QVariant::fromValue< qintptr >(qintptr(p)), SARibbonCustomizeWidget::PointerRole);
@@ -462,7 +462,7 @@ void SARibbonCustomizeWidget::PrivateData::updateModel()
 			}
 			ci->appendRow(pi);
 			const QList< SARibbonPanelItem* >& items = p->ribbonPanelItem();
-			for (SARibbonPanelItem* i : qAsConst(items)) {
+			for (SARibbonPanelItem* i : sa_as_const(items)) {
 				if (i->action->isSeparator()) {
 					continue;
 				}
@@ -720,7 +720,7 @@ void SARibbonCustomizeWidget::setupActionsManager(SARibbonActionsManager* mgr)
 	QList< int > tags = mgr->actionTags();
 
 	ui->comboBoxActionIndex->clear();
-	for (int tag : qAsConst(tags)) {
+	for (int tag : sa_as_const(tags)) {
 		if (mgr->tagName(tag).isEmpty())
 			continue;
 		ui->comboBoxActionIndex->addItem(mgr->tagName(tag), tag);

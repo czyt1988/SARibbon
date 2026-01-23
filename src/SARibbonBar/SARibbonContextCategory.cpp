@@ -166,7 +166,7 @@ QList< SARibbonCategory* > SARibbonContextCategory::categoryList() const
 {
 	QList< SARibbonCategory* > res;
 
-	for (const SAPrivateRibbonCategoryData& c : qAsConst(d_ptr->mCategoryDataList)) {
+	for (const SAPrivateRibbonCategoryData& c : sa_as_const(d_ptr->mCategoryDataList)) {
 		res.append(c.categoryPage);
 	}
 	return (res);

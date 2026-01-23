@@ -136,7 +136,7 @@ void SARibbonTitleIconWidget::mousePressEvent(QMouseEvent* event)
 void SARibbonTitleIconWidget::contextMenuEvent(QContextMenuEvent* event)
 {
     if (m_contextMenu && m_widget) {
-        QPoint menuPos = mapToGlobal(event->pos());
+        QPoint menuPos = event->globalPos();
         m_contextMenu->popup(menuPos);
         event->accept();
         return;

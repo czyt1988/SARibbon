@@ -2,6 +2,7 @@
 #include "../../src/SARibbonBar/colorWidgets/SAColorWidgetsGlobal.h"
 #include "../../src/SARibbonBar/SARibbonBarVersionInfo.h"
 #include "../../src/SARibbonBar/SARibbonGlobal.h"
+#include "../../src/SARibbonBar/SARibbonQt5Compat.hpp"
 // color widget
 #include "../../src/SARibbonBar/colorWidgets/SAColorMenu.h"
 #include "../../src/SARibbonBar/colorWidgets/SAColorGridWidget.h"

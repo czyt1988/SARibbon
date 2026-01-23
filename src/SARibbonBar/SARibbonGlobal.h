@@ -58,9 +58,9 @@ class QWidget;
  */
 #ifndef SA_RIBBON_DECLARE_PRIVATE
 #define SA_RIBBON_DECLARE_PRIVATE(classname)                                                                           \
-	class PrivateData;                                                                                                 \
-	friend class classname::PrivateData;                                                                               \
-	std::unique_ptr< PrivateData > d_ptr;
+    class PrivateData;                                                                                                 \
+    friend class classname::PrivateData;                                                                               \
+    std::unique_ptr< PrivateData > d_ptr;
 #endif
 
 /**
@@ -70,10 +70,10 @@ class QWidget;
  */
 #ifndef SA_RIBBON_DECLARE_PUBLIC
 #define SA_RIBBON_DECLARE_PUBLIC(classname)                                                                            \
-	friend class classname;                                                                                            \
-	classname* q_ptr { nullptr };                                                                                      \
-	PrivateData(const PrivateData&)            = delete;                                                               \
-	PrivateData& operator=(const PrivateData&) = delete;
+    friend class classname;                                                                                            \
+    classname* q_ptr { nullptr };                                                                                      \
+    PrivateData(const PrivateData&)            = delete;                                                               \
+    PrivateData& operator=(const PrivateData&) = delete;
 #endif
 
 /**
@@ -124,8 +124,8 @@ class QWidget;
  */
 enum class SARibbonAlignment
 {
-	AlignLeft,   ///< 左对齐，tab栏左对齐，同时category也是左对齐
-	AlignCenter  ///< 居中对其，tab栏居中对齐，同时category也是居中对齐
+    AlignLeft,   ///< 左对齐，tab栏左对齐，同时category也是左对齐
+    AlignCenter  ///< 居中对其，tab栏居中对齐，同时category也是居中对齐
 };
 
 /**
@@ -151,10 +151,10 @@ enum class SARibbonTheme
  */
 enum class SARibbonMainWindowStyleFlag : int
 {
-	UseRibbonFrame   = 1,  ///< 代表使用ribbon边框，ribbon边框会更紧凑
-	UseNativeFrame   = 2,  ///< 代表使用操作系统的边框
-	UseRibbonMenuBar = 4,
-	UseNativeMenuBar = 8
+    UseRibbonFrame   = 1,  ///< 代表使用ribbon边框，ribbon边框会更紧凑
+    UseNativeFrame   = 2,  ///< 代表使用操作系统的边框
+    UseRibbonMenuBar = 4,
+    UseNativeMenuBar = 8
 };
 Q_DECLARE_FLAGS(SARibbonMainWindowStyles, SARibbonMainWindowStyleFlag)
 Q_DECLARE_OPERATORS_FOR_FLAGS(SARibbonMainWindowStyles)
@@ -168,33 +168,14 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(SARibbonMainWindowStyles)
 #define SA_RIBBON_BAR_PROP_CAN_CUSTOMIZE "_sa_isCanCustomize"
 #endif
 
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 11, 0))
-#ifndef SA_FONTMETRICS_WIDTH
-#define SA_FONTMETRICS_WIDTH(fm, str) fm.horizontalAdvance(str)
+#if (__cplusplus >= 201703L) || (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)
+#ifndef sa_as_const
+#define sa_as_const std::as_const
 #endif
 #else
-#ifndef SA_FONTMETRICS_WIDTH
-#define SA_FONTMETRICS_WIDTH(fm, str) fm.width(str)
-#endif
-#endif
-
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
-#ifndef SA_MOUSEEVENT_GLOBALPOS_POINT
-#define SA_MOUSEEVENT_GLOBALPOS_POINT(MouseEventPtr) MouseEventPtr->globalPosition().toPoint()
-#endif
-#else
-#ifndef SA_MOUSEEVENT_GLOBALPOS_POINT
-#define SA_MOUSEEVENT_GLOBALPOS_POINT(MouseEventPtr) MouseEventPtr->globalPos()
-#endif
-#endif
-
-#if (QT_VERSION >= QT_VERSION_CHECK(6, 0, 0))
-#ifndef SA_HOVEREVENT_POS_POINT
-#define SA_HOVEREVENT_POS_POINT(HoverEventPtr) HoverEventPtr->position().toPoint()
-#endif
-#else
-#ifndef SA_HOVEREVENT_POS_POINT
-#define SA_HOVEREVENT_POS_POINT(HoverEventPtr) HoverEventPtr->pos()
+// C++14 及以下版本使用 Qt 的 qwt_as_const
+#ifndef sa_as_const
+#define sa_as_const qAsConst
 #endif
 #endif
 

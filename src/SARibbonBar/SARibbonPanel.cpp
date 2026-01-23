@@ -541,7 +541,7 @@ QAction* SARibbonPanel::addSeparator()
  */
 SARibbonToolButton* SARibbonPanel::actionToRibbonToolButton(QAction* action)
 {
-    for (auto obj : qAsConst(children())) {
+    for (auto obj : sa_as_const(children())) {
         if (obj->isWidgetType()) {
             if (SARibbonToolButton* btn = qobject_cast< SARibbonToolButton* >(obj)) {
                 if (btn->defaultAction() == action) {
@@ -1041,7 +1041,7 @@ void SARibbonPanel::resetToolButtonSize()
 {
     QList< SARibbonToolButton* > btns = ribbonToolButtons();
 
-    for (SARibbonToolButton* b : qAsConst(btns)) {
+    for (SARibbonToolButton* b : sa_as_const(btns)) {
         if ((nullptr == b)) {
             continue;
         }

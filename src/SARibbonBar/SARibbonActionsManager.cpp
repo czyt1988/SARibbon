@@ -84,13 +84,13 @@ void SARibbonActionsManager::removeTag(int tag)
     for (auto i = d_ptr->mTagToActions.begin(); i != d_ptr->mTagToActions.end(); ++i) {
         total += i.value();
     }
-    for (QAction* a : qAsConst(oldacts)) {
+    for (QAction* a : sa_as_const(oldacts)) {
         if (!total.contains(a)) {
             needRemoveAct.append(a);
         }
     }
     // 从总表移除action
-    for (QAction* a : qAsConst(needRemoveAct)) {
+    for (QAction* a : sa_as_const(needRemoveAct)) {
         auto i = d_ptr->mActionToKey.find(a);
         if (i != d_ptr->mActionToKey.end()) {
             d_ptr->mKeyToAction.remove(i.value());
@@ -196,7 +196,7 @@ void SARibbonActionsManager::removeAction(QAction* act, bool enableEmit)
     d_ptr->mTagToActions.swap(tagToActions);
     // 发射信号
     if (enableEmit) {
-        for (int tagdelete : qAsConst(deletedTags)) {
+        for (int tagdelete : sa_as_const(deletedTags)) {
             Q_EMIT actionTagChanged(tagdelete, true);
         }
     }
@@ -295,7 +295,7 @@ QMap< int, SARibbonCategory* > SARibbonActionsManager::autoRegisteActions(SARibb
     QWidget* parWidget = bar->parentWidget();
     QSet< QAction* > mainwindowActions;
     if (parWidget) {
-        for (QObject* o : qAsConst(parWidget->children())) {
+        for (QObject* o : sa_as_const(parWidget->children())) {
             if (QAction* a = qobject_cast< QAction* >(o)) {
                 // 说明是action
                 if (!a->objectName().isEmpty()) {
@@ -314,9 +314,9 @@ QMap< int, SARibbonCategory* > SARibbonActionsManager::autoRegisteActions(SARibb
     QList< SARibbonCategory* > categorys = bar->categoryPages();
     int tag                              = AutoCategoryDistinguishBeginTag;
 
-    for (SARibbonCategory* c : qAsConst(categorys)) {
+    for (SARibbonCategory* c : sa_as_const(categorys)) {
         QList< SARibbonPanel* > panels = c->panelList();
-        for (SARibbonPanel* p : qAsConst(panels)) {
+        for (SARibbonPanel* p : sa_as_const(panels)) {
             categoryActions += autoRegisteWidgetActions(p, tag, false);
         }
         setTagName(tag, c->categoryName());
@@ -326,7 +326,7 @@ QMap< int, SARibbonCategory* > SARibbonActionsManager::autoRegisteActions(SARibb
     // 找到不在功能区的actions
     QSet< QAction* > notincategory = mainwindowActions - categoryActions;
 
-    for (QAction* a : qAsConst(notincategory)) {
+    for (QAction* a : sa_as_const(notincategory)) {
         if (!a->objectName().isEmpty()) {
             registeAction(a, NotInRibbonCategoryTag, a->objectName(), false);
         }
@@ -353,7 +353,7 @@ QSet< QAction* > SARibbonActionsManager::autoRegisteWidgetActions(QWidget* w, in
     QSet< QAction* > res;
     QList< QAction* > was = w->actions();
 
-    for (QAction* a : qAsConst(was)) {
+    for (QAction* a : sa_as_const(was)) {
         if (res.contains(a) || a->objectName().isEmpty()) {
             // 重复内容不重复加入
             // 没有object name不加入
@@ -384,7 +384,7 @@ QList< QAction* > SARibbonActionsManager::search(const QString& text)
         kws.append(text);
     }
 
-    for (const QString& k : qAsConst(kws)) {
+    for (const QString& k : sa_as_const(kws)) {
         for (auto i = d_ptr->mActionToKey.begin(); i != d_ptr->mActionToKey.end(); ++i) {
             if (i.key()->text().contains(k, Qt::CaseInsensitive)) {
                 res.append(i.key());

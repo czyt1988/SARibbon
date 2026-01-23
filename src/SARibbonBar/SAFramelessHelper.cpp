@@ -7,6 +7,7 @@
 #include <QDebug>
 #include <QScreen>
 #include <QWindow>
+#include "SARibbonQt5Compat.hpp"
 #include "SARibbonMainWindow.h"
 class SAPrivateFramelessWidgetData;
 
@@ -297,7 +298,7 @@ void SAPrivateFramelessWidgetData::resizeWidget(const QPoint& gMousePos)
     int right  = origRect.right();
     int bottom = origRect.bottom();
 
-    origRect.getCoords(&left, &top, &right, &bottom);
+    // origRect.getCoords(&left, &top, &right, &bottom);
 
     int minWidth  = m_pWidget->minimumWidth();
     int minHeight = m_pWidget->minimumHeight();
@@ -369,17 +370,16 @@ bool SAPrivateFramelessWidgetData::handleMousePressEvent(QMouseEvent* event)
     if (event->button() == Qt::LeftButton) {
         m_bLeftButtonPressed = true;
 
-        // m_bLeftButtonTitlePressed = event->pos().y() < m_moveMousePos.s_titleHeight;
-        qreal dpiScale            = SAFramelessHelper::getScreenDpiScale(m_pWidget);
-        int scaledTitleHeight     = SAPrivateFramelessCursorPosCalculator::s_titleHeight * dpiScale;
-        m_bLeftButtonTitlePressed = event->pos().y() < scaledTitleHeight;
+        qreal dpiScale        = SAFramelessHelper::getScreenDpiScale(m_pWidget);
+        int scaledTitleHeight = SAPrivateFramelessCursorPosCalculator::s_titleHeight * dpiScale;
+        // 这里要用eventPosY获取相对位置
+        m_bLeftButtonTitlePressed = SA::compat::eventPosY(event) < scaledTitleHeight;
 
         QRect frameRect = m_pWidget->frameGeometry();
-        auto gp         = SA_MOUSEEVENT_GLOBALPOS_POINT(event);
+        auto gp         = SA::compat::eventGlobalPos(event);
         m_pressedMousePos.recalculate(gp, frameRect);
 
         m_ptDragPos = gp - frameRect.topLeft();
-
         if (m_pressedMousePos.mIsOnEdges) {
             if (m_pWidget->isMaximized()) {
                 // 窗口在最大化状态时，点击边界不做任何处理
@@ -420,14 +420,14 @@ bool SAPrivateFramelessWidgetData::handleMouseReleaseEvent(QMouseEvent* event)
 
 bool SAPrivateFramelessWidgetData::handleMouseMoveEvent(QMouseEvent* event)
 {
-    QPoint p = SA_MOUSEEVENT_GLOBALPOS_POINT(event);
+    QPoint globalpos = SA::compat::eventGlobalPos(event);
     if (m_bLeftButtonPressed) {
         if (d->m_bWidgetResizable && m_pressedMousePos.mIsOnEdges) {
             if (m_pWidget->isMaximized()) {
                 // 窗口在最大化状态时，点击边界不做任何处理
                 return (false);
             }
-            resizeWidget(p);
+            resizeWidget(globalpos);
             return (true);
         } else if (d->m_bWidgetMovable && m_bLeftButtonTitlePressed) {
             if (m_pWidget->isMaximized()) {
@@ -440,20 +440,20 @@ bool SAPrivateFramelessWidgetData::handleMouseMoveEvent(QMouseEvent* event)
 
                 // 修改后：使用DPI缩放偏移量
                 qreal dpiScale = SAFramelessHelper::getScreenDpiScale(m_pWidget);
-                p.ry() -= 10 * dpiScale;  // 缩放偏移量
-                p.rx() -= (normalGeometry.width() / 2);
+                globalpos.ry() -= 10 * dpiScale;  // 缩放偏移量
+                globalpos.rx() -= (normalGeometry.width() / 2);
 
-                m_pWidget->move(p);
+                m_pWidget->move(globalpos);
                 // 这时要重置m_ptDragPos
                 m_ptDragPos = QPoint(normalGeometry.width() / 2, 10);
                 return (true);
             }
-            moveWidget(p);
+            moveWidget(globalpos);
             return (true);
         }
         return (false);
     } else if (d->m_bWidgetResizable) {
-        updateCursorShape(p);
+        updateCursorShape(globalpos);
     }
     return (false);
 }
@@ -471,7 +471,11 @@ bool SAPrivateFramelessWidgetData::handleLeaveEvent(QEvent* event)
 bool SAPrivateFramelessWidgetData::handleHoverMoveEvent(QHoverEvent* event)
 {
     if (d->m_bWidgetResizable) {
-        updateCursorShape(m_pWidget->mapToGlobal(SA_HOVEREVENT_POS_POINT(event)));
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+        updateCursorShape(m_pWidget->mapToGlobal(event->pos()));
+#else
+        updateCursorShape(SA::compat::eventGlobalPos(event));
+#endif
     }
     return (false);
 }
@@ -485,13 +489,10 @@ bool SAPrivateFramelessWidgetData::handleDoubleClickedMouseEvent(QMouseEvent* ev
                 if (mainwindow->windowFlags() & Qt::WindowMaximizeButtonHint) {
                     // 在最大化按钮显示时才进行shownormal处理
 
-                    // 修改前：
-                    // bool titlePressed = event->pos().y() < m_moveMousePos.s_titleHeight;
-
                     // 修改后：考虑DPI缩放
                     qreal dpiScale        = SAFramelessHelper::getScreenDpiScale(m_pWidget);
                     int scaledTitleHeight = SAPrivateFramelessCursorPosCalculator::s_titleHeight * dpiScale;
-                    bool titlePressed     = event->pos().y() < scaledTitleHeight;
+                    bool titlePressed     = SA::compat::eventPosY(event) < scaledTitleHeight;
 
                     if (titlePressed) {
                         if (m_pWidget->isMaximized()) {

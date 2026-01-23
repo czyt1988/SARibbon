@@ -55,4 +55,15 @@
 #endif
 #endif
 
+#if (__cplusplus >= 201703L) || (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)
+#ifndef sacolor_as_const
+#define sacolor_as_const std::as_const
+#endif
+#else
+// C++14 及以下版本使用 Qt 的 qwt_as_const
+#ifndef sacolor_as_const
+#define sacolor_as_const qAsConst
+#endif
+#endif
+
 #endif  // SACOLORWIDGETSGLOBAL_H

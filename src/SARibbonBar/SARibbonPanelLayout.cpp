@@ -6,6 +6,7 @@
 #include <QQueue>
 #include "SARibbonPanel.h"
 #include "SARibbonPanelItem.h"
+#include "SARibbonQt5Compat.hpp"
 
 #ifndef SARibbonPanelLayout_DEBUG_PRINT
 #define SARibbonPanelLayout_DEBUG_PRINT 0
@@ -344,7 +345,7 @@ void SARibbonPanelLayout::updateGeomArray()
  */
 void SARibbonPanelLayout::doLayout()
 {
-#if SARibbonPanelLayout_DEBUG_PRINT
+#if 1  // SARibbonPanelLayout_DEBUG_PRINT
     if (SARibbonPanel* panel = ribbonPanel()) {
         qDebug() << "| |-SARibbonPanelLayout layoutActions,panel name = " << panel->panelName();
     }
@@ -354,7 +355,7 @@ void SARibbonPanelLayout::doLayout()
     }
     QList< QWidget* > showWidgets, hideWidgets;
     SARibbonPanel* panel = ribbonPanel();
-    for (SARibbonPanelItem* item : qAsConst(mItems)) {
+    for (SARibbonPanelItem* item : sa_as_const(mItems)) {
         if (item->isEmpty()) {
             hideWidgets << item->widget();
         } else {
@@ -368,25 +369,19 @@ void SARibbonPanelLayout::doLayout()
     }
 
     // 不在上面那里进行show和hide因为这会触发SARibbonPanelLayout的重绘，导致循环绘制，非常影响效率
-    for (QWidget* w : qAsConst(showWidgets)) {
+    for (QWidget* w : sa_as_const(showWidgets)) {
         if (!w->isVisible())
             w->show();
     }
-    for (QWidget* w : qAsConst(hideWidgets)) {
+    for (QWidget* w : sa_as_const(hideWidgets)) {
         if (w->isVisible())
             w->hide();
     }
+
     // 布局label
     if (mTitleLabel) {
         if (isEnableShowPanelTitle()) {
             mTitleLabel->setGeometry(mTitleLabelGeometry);
-            if (!mTitleLabel->isVisibleTo(panel)) {
-                mTitleLabel->show();
-            }
-        } else {
-            if (mTitleLabel->isVisibleTo(panel)) {
-                mTitleLabel->hide();
-            }
         }
     }
     // 布局m_optionActionBtn
@@ -489,11 +484,11 @@ void SARibbonPanelLayout::updateGeomArray(const QRect& setrect)
     //  rowcount 是ribbon的行，有2行和3行两种
     const short rowCount = (panel->panelLayoutMode() == SARibbonPanel::ThreeRowMode) ? 3 : 2;
     // largeHeight是对应large占比的高度
-    const int largeHeight = height - mag.bottom() - mag.top() - titleH - titleSpace;
-    const int yTitleBegin = height - mag.bottom() - titleH;
-    mLargeHeight          = largeHeight;
+    const int largeHeight = qMax(height - mag.bottom() - mag.top() - titleH - titleSpace, 2);  // 大按钮高度不小于2
+
+    mLargeHeight = largeHeight;
     // 计算smallHeight的高度
-    const int smallHeight = (largeHeight - (rowCount - 1) * spacingRow) / rowCount;
+    const int smallHeight = qMax((largeHeight - (rowCount - 1) * spacingRow) / rowCount, 1);
     // Medium行的y位置
     const int yMediumRow0 = (2 == rowCount) ? yBegin : (yBegin + ((largeHeight - 2 * smallHeight) / 3));
     const int yMediumRow1 = (2 == rowCount) ? (yBegin + smallHeight + spacingRow)
@@ -726,12 +721,13 @@ void SARibbonPanelLayout::updateGeomArray(const QRect& setrect)
         recalcExpandGeomArray(setrect);
     }
     // 布局label
+    const int yTitleBegin      = qMax(height - mag.bottom() - titleH, 1);
     bool isTitleWidthThanPanel = false;
     if (isEnableShowPanelTitle()) {
         mTitleLabelGeometry.setRect(mag.left(), yTitleBegin, setrect.width() - mag.left() - mag.right(), titleH);
         // 这里要确认标题宽度是否大于totalWidth，如果大于，则要把标题的宽度作为totalwidth
         QFontMetrics fm = mTitleLabel->fontMetrics();
-        int textWidth   = SA_FONTMETRICS_WIDTH(fm, panel->panelName());
+        int textWidth   = SA::compat::horizontalAdvance(fm, panel->panelName());
         textWidth += 4;
         if (totalWidth < textWidth) {
             totalWidth            = textWidth;
@@ -787,7 +783,7 @@ void SARibbonPanelLayout::recalcExpandGeomArray(const QRect& setrect)
     // 计算能扩展的尺寸
     int expandwidth = setrect.width() - this->mSizeHint.width();
 
-    if (expandwidth <= 0) {
+    if (expandwidth <= 1) {
         // 没有必要设置
         return;
     }
@@ -802,7 +798,7 @@ void SARibbonPanelLayout::recalcExpandGeomArray(const QRect& setrect)
     // 此变量用于记录可以水平扩展的列和控件，在布局结束后，如果还有空间，就把水平扩展的控件进行扩展
     QMap< int, _columnExpandInfo > columnExpandInfo;
 
-    for (SARibbonPanelItem* item : qAsConst(mItems)) {
+    for (SARibbonPanelItem* item : sa_as_const(mItems)) {
         if ((!item->isEmpty()) && item->expandingDirections() & Qt::Horizontal) {
             // 只获取可见的
             QMap< int, _columnExpandInfo >::iterator i = columnExpandInfo.find(item->columnIndex);
@@ -844,7 +840,7 @@ void SARibbonPanelLayout::recalcExpandGeomArray(const QRect& setrect)
     // 由于会涉及其他列的变更，因此需要所有都遍历一下
     for (auto i = columnExpandInfo.begin(); i != columnExpandInfo.end(); ++i) {
         int moveXLen = i.value().columnExpandedWidth - i.value().oldColumnWidth;
-        for (SARibbonPanelItem* item : qAsConst(mItems)) {
+        for (SARibbonPanelItem* item : sa_as_const(mItems)) {
             if (item->isEmpty() || (item->columnIndex < i.key())) {
                 // 之前的列不用管
                 continue;
@@ -997,7 +993,7 @@ void SARibbonPanelLayout::setEnableWordWrap(bool on)
 {
     mEnableWordWrap = on;
     // 遍历所有SARibbonToolButton
-    for (SARibbonPanelItem* item : qAsConst(mItems)) {
+    for (SARibbonPanelItem* item : sa_as_const(mItems)) {
         if (!item) {
             continue;
         }
@@ -1022,7 +1018,7 @@ void SARibbonPanelLayout::setButtonMaximumAspectRatio(qreal fac)
 {
     mButtonMaximumAspectRatio = fac;
     // 遍历所有SARibbonToolButton
-    for (SARibbonPanelItem* item : qAsConst(mItems)) {
+    for (SARibbonPanelItem* item : sa_as_const(mItems)) {
         if (!item) {
             continue;
         }
@@ -1127,6 +1123,9 @@ void SARibbonPanelLayout::setGeometry(const QRect& rect)
 {
     QRect old = geometry();
     if (old == rect) {
+        return;
+    }
+    if (rect.width() <= 0 || rect.height() <= 0) {
         return;
     }
 #if SARibbonPanelLayout_DEBUG_PRINT

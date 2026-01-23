@@ -22,6 +22,7 @@
 #include "SARibbonBarLayout.h"
 #include "SARibbonTitleIconWidget.h"
 #include "SARibbonMainWindow.h"
+#include "SARibbonQt5Compat.hpp"
 
 #ifndef SARIBBONBAR_DEBUG_PRINT
 #define SARIBBONBAR_DEBUG_PRINT 0
@@ -815,7 +816,7 @@ void SARibbonBar::removeCategory(SARibbonCategory* category)
     d_ptr->mStackedContainerWidget->removeWidget(category);
     // 同时验证这个category是否是contexcategory里的
 
-    for (SARibbonContextCategory* c : qAsConst(d_ptr->mContextCategoryList)) {
+    for (SARibbonContextCategory* c : sa_as_const(d_ptr->mContextCategoryList)) {
         c->takeCategory(category);
     }
     // 这时要刷新所有tabdata的index信息
@@ -991,7 +992,7 @@ void SARibbonBar::destroyContextCategory(SARibbonContextCategory* context)
     //!
     QList< SARibbonCategory* > res = context->categoryList();
 
-    for (SARibbonCategory* c : qAsConst(res)) {
+    for (SARibbonCategory* c : sa_as_const(res)) {
         c->hide();
         c->deleteLater();
     }
@@ -1006,7 +1007,7 @@ void SARibbonBar::destroyContextCategory(SARibbonContextCategory* context)
 QList< int > SARibbonBar::currentVisibleContextCategoryTabIndexs() const
 {
     QList< int > res;
-    for (const _SAContextCategoryManagerData& data : qAsConst(d_ptr->mCurrentShowingContextCategory)) {
+    for (const _SAContextCategoryManagerData& data : sa_as_const(d_ptr->mCurrentShowingContextCategory)) {
         res += data.tabPageIndex;
     }
     if (res.size() > 1) {
@@ -1277,9 +1278,12 @@ void SARibbonBar::onCurrentRibbonTabChanged(int index)
         if (!d_ptr->mStackedContainerWidget->isVisible()) {
             if (d_ptr->mStackedContainerWidget->isPopupMode()) {
                 // 在stackedContainerWidget弹出前，先给tabbar一个QHoverEvent,让tabbar知道鼠标已经移开
-                QHoverEvent ehl(QEvent::HoverLeave,
-                                d_ptr->mRibbonTabBar->mapToGlobal(QCursor::pos()),
-                                d_ptr->mRibbonTabBar->mapToGlobal(QCursor::pos()));
+                QPoint pos = d_ptr->mRibbonTabBar->mapFromGlobal(QCursor::pos());
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+                QHoverEvent ehl(QEvent::HoverLeave, pos, pos);
+#else
+                QHoverEvent ehl(QEvent::HoverLeave, QPointF(pos), QPointF(pos));
+#endif
                 QApplication::sendEvent(d_ptr->mRibbonTabBar, &ehl);
                 if (SARibbonBarLayout* lay = qobject_cast< SARibbonBarLayout* >(layout())) {
                     lay->layoutStackedContainerWidget();
@@ -1314,11 +1318,13 @@ void SARibbonBar::onCurrentRibbonTabClicked(int index)
     if (isMinimumMode()) {
         if (!d_ptr->mStackedContainerWidget->isVisible()) {
             if (d_ptr->mStackedContainerWidget->isPopupMode()) {
-                qDebug() << "QHoverEvent";
-                // 在stackedContainerWidget弹出前，先给tabbar一个QHoverEvent,让tabbar知道鼠标已经移开
-                QHoverEvent ehl(QEvent::HoverLeave,
-                                d_ptr->mRibbonTabBar->mapToGlobal(QCursor::pos()),
-                                d_ptr->mRibbonTabBar->mapToGlobal(QCursor::pos()));
+                QPoint pos = d_ptr->mRibbonTabBar->mapFromGlobal(QCursor::pos());
+// 在stackedContainerWidget弹出前，先给tabbar一个QHoverEvent,让tabbar知道鼠标已经移开
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+                QHoverEvent ehl(QEvent::HoverLeave, pos, pos);
+#else
+                QHoverEvent ehl(QEvent::HoverLeave, QPointF(pos), QPointF(pos));
+#endif
                 QApplication::sendEvent(d_ptr->mRibbonTabBar, &ehl);
                 // 弹出前都调整一下位置，避免移动后位置异常
                 if (SARibbonBarLayout* lay = qobject_cast< SARibbonBarLayout* >(layout())) {
@@ -1338,7 +1344,6 @@ void SARibbonBar::onCurrentRibbonTabClicked(int index)
  */
 void SARibbonBar::onCurrentRibbonTabDoubleClicked(int index)
 {
-    qDebug() << "onCurrentRibbonTabDoubleClicked";
     Q_UNUSED(index);
     d_ptr->mTabBarLastClickTime = QDateTime::currentMSecsSinceEpoch();  // 更新时间
     if (isEnableTabDoubleClickToMinimumMode()) {
@@ -2044,7 +2049,7 @@ void SARibbonBar::setContextCategoryColorList(const QList< QColor >& cls)
     }
     d_ptr->mContextCategoryColorListIndex = 0;
     // 这时需要对已经显示的contextCategoryData的颜色进行重新设置
-    for (SARibbonContextCategory* c : qAsConst(d_ptr->mContextCategoryList)) {
+    for (SARibbonContextCategory* c : sa_as_const(d_ptr->mContextCategoryList)) {
         c->setContextColor(d_ptr->getContextCategoryColor());
     }
 }
@@ -2222,12 +2227,13 @@ bool SARibbonBar::eventFilter(QObject* obj, QEvent* e)
                 if (d_ptr->mStackedContainerWidget->isPopupMode()) {
                     QMouseEvent* mouseEvent = static_cast< QMouseEvent* >(e);
                     if (!d_ptr->mStackedContainerWidget->rect().contains(mouseEvent->pos())) {
-                        QWidget* clickedWidget = QApplication::widgetAt(mouseEvent->globalPos());
+                        QPoint golPos          = SA::compat::eventGlobalPos(mouseEvent);
+                        QWidget* clickedWidget = QApplication::widgetAt(golPos);
                         if (clickedWidget == d_ptr->mRibbonTabBar) {
-                            const QPoint targetPoint = clickedWidget->mapFromGlobal(mouseEvent->globalPos());
+                            const QPoint targetPoint = clickedWidget->mapFromGlobal(golPos);
                             QMouseEvent* evPress     = new QMouseEvent(mouseEvent->type(),
                                                                    targetPoint,
-                                                                   mouseEvent->globalPos(),
+                                                                   golPos,
                                                                    mouseEvent->button(),
                                                                    mouseEvent->buttons(),
                                                                    mouseEvent->modifiers());
