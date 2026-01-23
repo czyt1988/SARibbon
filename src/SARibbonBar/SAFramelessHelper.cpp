@@ -22,7 +22,7 @@ class SAFramelessHelper::PrivateData
 
 public:
     PrivateData(SAFramelessHelper* p);
-    QHash< QWidget*, SAPrivateFramelessWidgetData* > m_widgetDataHash;
+    std::unique_ptr< SAPrivateFramelessWidgetData > m_widgetData;
     bool m_bWidgetMovable { true };
     bool m_bWidgetResizable { true };
     bool m_bRubberBandOnResize { true };
@@ -448,6 +448,21 @@ bool SAPrivateFramelessWidgetData::handleMouseMoveEvent(QMouseEvent* event)
                 m_ptDragPos = QPoint(normalGeometry.width() / 2, 10);
                 return (true);
             }
+
+            bool isOutScreen          = true;
+            QList< QScreen* > screens = QGuiApplication::screens();
+            for (int i = 0; i < screens.size(); i++) {
+                QScreen* pScreen   = screens[ i ];
+                QRect geometryRect = pScreen->availableGeometry();
+                if (geometryRect.contains(globalpos)) {
+                    isOutScreen = false;
+                    break;
+                }
+            }
+            if (isOutScreen) {
+                event->ignore();
+                return false;
+            }
             moveWidget(globalpos);
             return (true);
         }
@@ -533,12 +548,6 @@ SAFramelessHelper::SAFramelessHelper(QObject* parent) : QObject(parent), d_ptr(n
 
 SAFramelessHelper::~SAFramelessHelper()
 {
-    QList< QWidget* > keys = d_ptr->m_widgetDataHash.keys();
-    int size               = keys.size();
-
-    for (int i = 0; i < size; ++i) {
-        delete d_ptr->m_widgetDataHash.take(keys[ i ]);
-    }
 }
 
 bool SAFramelessHelper::eventFilter(QObject* obj, QEvent* event)
@@ -550,9 +559,8 @@ bool SAFramelessHelper::eventFilter(QObject* obj, QEvent* event)
     case QEvent::MouseButtonRelease:
     case QEvent::MouseButtonDblClick:
     case QEvent::Leave: {
-        SAPrivateFramelessWidgetData* data = d_ptr->m_widgetDataHash.value(static_cast< QWidget* >(obj));
-        if (data) {
-            return (data->handleWidgetEvent(event));
+        if (d_ptr->m_widgetData) {
+            return (d_ptr->m_widgetData->handleWidgetEvent(event));
         }
         break;
     }
@@ -570,12 +578,8 @@ bool SAFramelessHelper::eventFilter(QObject* obj, QEvent* event)
  */
 void SAFramelessHelper::activateOn(QWidget* topLevelWidget)
 {
-    if (!d_ptr->m_widgetDataHash.contains(topLevelWidget)) {
-        SAPrivateFramelessWidgetData* data = new SAPrivateFramelessWidgetData(d_ptr.get(), topLevelWidget);
-        d_ptr->m_widgetDataHash.insert(topLevelWidget, data);
-
-        topLevelWidget->installEventFilter(this);
-    }
+    d_ptr->m_widgetData.reset(new SAPrivateFramelessWidgetData(d_ptr.get(), topLevelWidget));
+    topLevelWidget->installEventFilter(this);
 }
 
 /**
@@ -585,21 +589,15 @@ void SAFramelessHelper::activateOn(QWidget* topLevelWidget)
  */
 void SAFramelessHelper::removeFrom(QWidget* topLevelWidget)
 {
-    SAPrivateFramelessWidgetData* data = d_ptr->m_widgetDataHash.take(topLevelWidget);
-
-    if (data) {
-        topLevelWidget->removeEventFilter(this);
-        delete data;
-    }
+    d_ptr->m_widgetData.reset(nullptr);
+    topLevelWidget->removeEventFilter(this);
 }
 
 void SAFramelessHelper::setRubberBandOnMove(bool movable)
 {
-    d_ptr->m_bRubberBandOnMove                        = movable;
-    const QList< SAPrivateFramelessWidgetData* > list = d_ptr->m_widgetDataHash.values();
-
-    for (SAPrivateFramelessWidgetData* data : list) {
-        data->updateRubberBandStatus();
+    d_ptr->m_bRubberBandOnMove = movable;
+    if (d_ptr->m_widgetData) {
+        d_ptr->m_widgetData->updateRubberBandStatus();
     }
 }
 
@@ -615,11 +613,9 @@ void SAFramelessHelper::setWidgetResizable(bool resizable)
 
 void SAFramelessHelper::setRubberBandOnResize(bool resizable)
 {
-    d_ptr->m_bRubberBandOnResize                      = resizable;
-    const QList< SAPrivateFramelessWidgetData* > list = d_ptr->m_widgetDataHash.values();
-
-    for (SAPrivateFramelessWidgetData* data : list) {
-        data->updateRubberBandStatus();
+    d_ptr->m_bRubberBandOnResize = resizable;
+    if (d_ptr->m_widgetData) {
+        d_ptr->m_widgetData->updateRubberBandStatus();
     }
 }
 
