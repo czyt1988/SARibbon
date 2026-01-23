@@ -210,10 +210,8 @@ void SARibbonGalleryGroupModel::append(SARibbonGalleryItem* item)
  */
 bool SARibbonGalleryGroupModel::remove(const QString& act_object_name)
 {
-    for (size_t index = 0; index < mItems.size(); ++index)
-    {
-        if (mItems.at(index)->action()->objectName() == act_object_name)
-        {
+    for (int index = 0; index < mItems.size(); ++index) {
+        if (mItems.at(index)->action()->objectName() == act_object_name) {
             beginRemoveRows(QModelIndex(), index, index);
             SARibbonGalleryItem* item = mItems.takeAt(index);
             endRemoveRows();
@@ -257,7 +255,6 @@ SARibbonGalleryGroup::SARibbonGalleryGroup(QWidget* w)
 SARibbonGalleryGroup::~SARibbonGalleryGroup()
 {
 }
-
 
 /**
  * @brief 重新计算grid和icon的尺寸
@@ -401,12 +398,11 @@ bool SARibbonGalleryGroup::removeActionItem(QAction* act)
 {
     if (nullptr == groupModel()) {
         return false;
-    }else {
+    } else {
         d_ptr->mActionGroup->removeAction(act);
         return groupModel()->remove(act->objectName());
     }
 }
-
 
 /**
  * @brief 构建一个model，这个model的父类是SARibbonGalleryGroup，如果要共享model，需要手动处理model的父类
@@ -574,7 +570,6 @@ int SARibbonGalleryGroup::heightForWidth(int w) const
 {
     return preferredHeightForWidth(w);
 }
-
 
 void SARibbonGalleryGroup::onItemClicked(const QModelIndex& index)
 {

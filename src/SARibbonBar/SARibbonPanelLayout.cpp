@@ -345,7 +345,7 @@ void SARibbonPanelLayout::updateGeomArray()
  */
 void SARibbonPanelLayout::doLayout()
 {
-#if 1  // SARibbonPanelLayout_DEBUG_PRINT
+#if SARibbonPanelLayout_DEBUG_PRINT
     if (SARibbonPanel* panel = ribbonPanel()) {
         qDebug() << "| |-SARibbonPanelLayout layoutActions,panel name = " << panel->panelName();
     }
@@ -354,7 +354,6 @@ void SARibbonPanelLayout::doLayout()
         updateGeomArray();
     }
     QList< QWidget* > showWidgets, hideWidgets;
-    SARibbonPanel* panel = ribbonPanel();
     for (SARibbonPanelItem* item : sa_as_const(mItems)) {
         if (item->isEmpty()) {
             hideWidgets << item->widget();
