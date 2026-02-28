@@ -380,7 +380,14 @@ void SARibbonPanelLayout::doLayout()
     // 布局label
     if (mTitleLabel) {
         if (isEnableShowPanelTitle()) {
+            if (mTitleLabel->isHidden()) {
+                mTitleLabel->show();
+            }
             mTitleLabel->setGeometry(mTitleLabelGeometry);
+        } else {
+            if (mTitleLabel->isVisible()) {
+                mTitleLabel->hide();
+            }
         }
     }
     // 布局m_optionActionBtn
@@ -417,7 +424,8 @@ SARibbonPanelItem* SARibbonPanelLayout::createItem(QAction* action, SARibbonPane
         widget = widgetAction->requestWidget(panel);
         if (widget != nullptr) {
             widget->setAttribute(Qt::WA_LayoutUsesWidgetRect);
-            customWidget = true;  // 标记为true，在移除的时候是不会对这个窗口进行删除，false默认会进行删除如SARibbonSeparatorWidget和SARibbonToolButton
+            customWidget =
+                true;  // 标记为true，在移除的时候是不会对这个窗口进行删除，false默认会进行删除如SARibbonSeparatorWidget和SARibbonToolButton
             // 明确设置父对象，确保 releaseWidget 时能正确工作
             widget->setParent(panel);
         }
@@ -739,10 +747,12 @@ void SARibbonPanelLayout::updateGeomArray(const QRect& setrect)
         QSize optBtnSize = optionActionButtonSize();
         if (isEnableShowPanelTitle()) {
             // 有标题
-            mOptionActionBtnGeometry.setRect(mTitleLabelGeometry.right() - mTitleLabelGeometry.height(),
-                                             mTitleLabelGeometry.y(),
-                                             mTitleLabelGeometry.height(),
-                                             mTitleLabelGeometry.height());
+            mOptionActionBtnGeometry.setRect(
+                mTitleLabelGeometry.right() - mTitleLabelGeometry.height(),
+                mTitleLabelGeometry.y(),
+                mTitleLabelGeometry.height(),
+                mTitleLabelGeometry.height()
+            );
 
             // 特殊情况，如果panel的标题长度大于totalWidth，那么说明totalWidth比较短
             // 这时候，optionActionBtn的宽度要加上到标题宽度上
@@ -752,10 +762,12 @@ void SARibbonPanelLayout::updateGeomArray(const QRect& setrect)
             }
         } else {
             // 无标题
-            mOptionActionBtnGeometry.setRect(setrect.right() - optBtnSize.width() - mag.right(),
-                                             setrect.bottom() - optBtnSize.height() - mag.bottom(),
-                                             optBtnSize.width(),
-                                             optBtnSize.height());
+            mOptionActionBtnGeometry.setRect(
+                setrect.right() - optBtnSize.width() - mag.right(),
+                setrect.bottom() - optBtnSize.height() - mag.bottom(),
+                optBtnSize.width(),
+                optBtnSize.height()
+            );
             totalWidth += optBtnSize.width();
         }
     }
