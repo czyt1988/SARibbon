@@ -88,6 +88,7 @@ plugins:
                 - Build Instructions: en/build-guide/build-instructions.md
                 - Build Third-Party Libraries: en/build-guide/build-3rdparty.md
                 - Build SARibbon Library: en/build-guide/build-SARibbon.md
+                - Internationalization (i18n): en/build-guide/i18n.md
                 - Common Build Errors: en/build-guide/common-build-errors.md
             - User Guide: 
                 - Usage Instructions: en/use-guide/SARibbon-user-guide.md
@@ -99,7 +100,9 @@ plugins:
                 - Ribbon Layout Options: en/use-guide/layout-of-SARibbon.md
                 - Ribbon Button Layout Guide: en/use-guide/layout-of-ribbonbutton.md
                 - Ribbon Size Settings: en/use-guide/SARibbon-size-settings.md
+                - Content Margins: en/use-guide/contents-margins-of-ribbon.md
                 - Ribbon Themes: en/use-guide/SARibbon-theme.md
+                - Customize Your Theme: en/use-guide/design-your-theme.md
                 - User-Configurable Ribbon: en/use-guide/persistence-configuration-ribbon.md
             - FAQ: 
                 - FAQ Overview: en/faq.md

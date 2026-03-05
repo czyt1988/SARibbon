@@ -1,8 +1,7 @@
 # Webkit style was loosely based on the Qt style
 BasedOnStyle: WebKit
 
-Standard: Cpp11
-
+Standard: Cpp11       
 
 IndentWidth : 4
 TabWidth : 4

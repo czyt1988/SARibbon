@@ -254,6 +254,19 @@ public:
                                               isTabOnTitle,
                                               ribbonBar->currentRibbonState());
         // 处于最小模式下时，bar的高度为tabbar的bottom,这个调整必须在resize event之后
+        // 升级到qt6后，setFixedHeight容易出现异常，主要原因是setFixedHeight的实现如下：
+        // void QWidget::setFixedHeight(int h) {
+        //     // ...
+        //     setMinimumSize(minimumSize().width(), h);  // 先设置最小高度
+        //     setMaximumSize(maximumSize().width(), h);  // 再设置最大高度
+        //     // ...
+        // }
+        // 如果调用前 maximumSize().height() 已经小于你要设置的 h，那么先调用 setMinimumSize(h)
+        // 时，最小高度会大于当前最大高度，这会触发Qt6的断言检查。 因此在调用 setFixedHeight 前，先重置最大尺寸限制：
+        int maximumHeight = ribbonBar->maximumHeight();
+        if (maximumHeight < mainBarHeight) {
+            ribbonBar->setMaximumHeight(QWIDGETSIZE_MAX);
+        }
         ribbonBar->setFixedHeight(mainBarHeight);
         minHeight = mainBarHeight;  // minHeight和mainBarHeight一致
     }

@@ -2,19 +2,23 @@
 
 ## SARibbon的自定义功能
 
-ribbon的自定义是ribbon的一个特色，参考了office和wps的自定义界面，用户可以为自己的ribbon定义非常多的内容，甚至可以定义出一个完全和原来不一样的界面。
+Ribbon的自定义是Ribbon的一个特色，参考了Office和WPS的自定义界面，用户可以为自己的Ribbon定义非常多的内容，甚至可以定义出一个完全和原来不一样的界面。
 
-以下是office的自定义界面
+以下是Office的自定义界面：
 
 ![office的自定义界面](../../assets/screenshot/customize/customization-office-ui.png)
 
-SARibbon参考office和wps的界面，封装了方便使用的`SARibbonCustomize**`类，包括如下5个类：
+## 核心类说明
 
-> - SARibbonCustomizeDialog
-> - SARibbonCustomizeWidget
-> - SARibbonCustomizeData
-> - SARibbonActionsManager
-> - SARibbonActionsManagerModel
+SARibbon参考Office和WPS的界面，封装了方便使用的自定义类：
+
+| 类名 | 作用 | 用户是否直接使用 |
+|------|------|----------------|
+| `SARibbonActionsManager` | 管理所有 QAction，支持按 Category 分类 | 是 |
+| `SARibbonCustomizeDialog` | 自定义对话框（封装了 Widget） | 是 |
+| `SARibbonCustomizeWidget` | 自定义控件，可嵌入到其他对话框 | 可选 |
+| `SARibbonCustomizeData` | 存储单条自定义操作数据 | 内部使用 |
+| `SARibbonActionsManagerModel` | 为 Widget 提供数据模型 | 内部使用 |
 
 实际用户使用仅会面对`SARibbonActionsManager`和`SARibbonCustomizeDialog`/`SARibbonCustomizeWidget`，其余类用户正常不会使用。
 
@@ -70,3 +74,74 @@ sa_apply_customize_from_xml_file("customization.xml", this, m_ribbonActionMgr);
 `sa_apply_customize_from_xml_file`是`SARibbonCustomizeWidget.h`中提供的函数，直接把配置文件中的自定义内容应用到MainWindow中。
 
 这样软件每次启动都会按照配置文件加载。
+
+## 完整工作流程
+
+```mermaid
+flowchart TD
+    A[程序启动] --> B[创建 QAction 和 Ribbon 布局]
+    B --> C[创建 SARibbonActionsManager]
+    C --> D[autoRegisteActions 自动注册所有 Action]
+    D --> E[sa_apply_customize_from_xml_file 加载已有配置]
+    E --> F[程序正常运行]
+    F --> G{用户点击自定义按钮}
+    G --> H[创建 SARibbonCustomizeDialog]
+    H --> I[setupActionsManager 设置 Action 管理器]
+    I --> J[fromXml 加载已有配置步骤]
+    J --> K{用户编辑完成}
+    K -->|确认| L[dlg.applys 应用更改]
+    L --> M[dlg.toXml 保存到XML]
+    M --> F
+    K -->|取消| F
+```
+
+## 完整示例代码
+
+以下是将自定义功能集成到 MainWindow 的完整示例（参考 `example/MainWindowExample`）：
+
+```cpp
+// === MainWindow.h ===
+class MainWindow : public SARibbonMainWindow
+{
+    Q_OBJECT
+public:
+    MainWindow(QWidget* par = nullptr);
+private slots:
+    void onActionCustomizeTriggered();
+private:
+    void initRibbon();
+    SARibbonActionsManager* m_ribbonActionMgr { nullptr };
+};
+
+// === MainWindow.cpp ===
+MainWindow::MainWindow(QWidget* par) : SARibbonMainWindow(par)
+{
+    initRibbon();
+    
+    // 创建ActionsManager并自动注册
+    m_ribbonActionMgr = new SARibbonActionsManager(this);
+    m_ribbonActionMgr->autoRegisteActions(this);
+    
+    // 加载已有的自定义配置
+    sa_apply_customize_from_xml_file("customization.xml", this, m_ribbonActionMgr);
+}
+
+void MainWindow::onActionCustomizeTriggered()
+{
+    QString cfgpath = "customization.xml";
+    SARibbonCustomizeDialog dlg(this, this);
+    dlg.setupActionsManager(m_ribbonActionMgr);
+    dlg.fromXml(cfgpath);  // 加载已有步骤
+    
+    if (QDialog::Accepted == dlg.exec()) {
+        dlg.applys();        // 应用自定义
+        dlg.toXml(cfgpath);  // 保存配置
+    }
+}
+```
+
+!!! warning "注意"
+    `autoRegisteActions` 必须在所有 Category、Panel、Action 都创建完成后调用，否则无法注册所有 Action。
+
+!!! tips "提示"
+    如果你希望把自定义对话框嵌入到自己的设置页面中，可以使用 `SARibbonCustomizeWidget` 代替 `SARibbonCustomizeDialog`，两者的 API 基本一致。

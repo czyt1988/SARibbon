@@ -17,7 +17,6 @@
 
 ![matlab-ribbon-ui](../../assets/screenshot/matlab-ribbon-ui.png)
 
-
 ## 实现步骤
 
 ### 1. 启用原生窗口边框
@@ -39,7 +38,6 @@ MainWindow::MainWindow(QWidget* par)
 
 !!! tips "注意"
     不要忘记了SARibbonMainWindowStyleFlag::UseRibbonMenuBar标志位
-
 
 ### 2. 设置为紧凑布局
 
@@ -271,3 +269,30 @@ SARibbonTabBar::tab:hover:!selected {
 ---
 
 本教程源码位于`example/MatlabUI`
+
+## 附录：SARibbon QSS 选择器参考
+
+以下列出了 SARibbon 中可用的 QSS 类选择器及其对应的界面元素：
+
+| QSS 选择器 | 对应组件 | 常用属性 |
+|-----------|---------|---------|
+| `SARibbonBar` | Ribbon 主栏 | `background-color`, `border` |
+| `SARibbonCategory` | 分类页（Category） | `background-color` |
+| `SARibbonPanel` | 面板（Panel） | `background-color`, `border` |
+| `SARibbonToolButton` | Ribbon 工具按钮 | `background-color`, `color`, `border` |
+| `SARibbonToolButton:hover` | 按钮悬停状态 | `background-color` |
+| `SARibbonToolButton:pressed` | 按钮按下状态 | `background-color` |
+| `SARibbonToolButton:checked` | 按钮选中状态 | `background-color` |
+| `SARibbonTabBar` | Tab 标签栏 | `background-color` |
+| `SARibbonTabBar::tab` | 单个 Tab 标签 | `color`, `background`, `margin-*`, `min-width` |
+| `SARibbonTabBar::tab:selected` | 选中的 Tab | `color`, `background` |
+| `SARibbonTabBar::tab:hover:!selected` | 悬停未选中 Tab | `border-*`, `color` |
+| `SARibbonApplicationButton` | Application 按钮 | `background-color`, `border-radius`, `color` |
+| `SARibbonQuickAccessBar` | 快速访问工具栏 | `background-color` |
+| `SARibbonButtonGroupWidget` | 按钮组 | `background-color`, `border` |
+| `SARibbonPanelOptionButton` | Panel 选项按钮 | `background-color`, `border` |
+| `SARibbonGallery` | Gallery 画廊 | `background-color`, `border` |
+| `SARibbonSystemButtonBar` | 系统按钮栏 | `background-color` |
+
+!!! tips "提示"
+    内置主题 QSS 文件位于 `src/SARibbonBar/resource` 目录，建议以内置主题为基础进行修改，可避免遗漏关键选择器。

@@ -43,3 +43,34 @@ void MainWindow::setWindowTitleColor()
 上面代码显示效果如下：
 
 ![chang-title-background](../../assets/pic/chang-title-background.png)
+
+## 常用场景
+
+| 场景 | 推荐设置 | 说明 |
+|------|---------|------|
+| 未注册/试用提示 | 红色背景 + 白色文字 | 醒目提示用户软件状态 |
+| 只读模式 | 灰色背景 + 深色文字 | 表示当前文档不可编辑 |
+| 隐藏标题栏 | `setTitleVisible(false)` | 适用于紧凑模式、原生边框模式 |
+| 自定义对齐 | `setWindowTitleAligment(Qt::AlignLeft)` | 标题左对齐，类似 WPS 风格 |
+
+## 动态恢复标题栏
+
+在某些应用场景中，你可能需要动态改变标题栏颜色后再恢复为默认状态：
+
+```cpp
+void MainWindow::resetTitleBar()
+{
+    SARibbonBar* ribbon = ribbonBar();
+    if (!ribbon) {
+        return;
+    }
+    // 恢复为透明背景（使用主题默认色）
+    ribbon->setWindowTitleBackgroundBrush(Qt::NoBrush);
+    // 恢复为默认文字颜色（跟随主题）
+    ribbon->setWindowTitleTextColor(QColor());
+    ribbon->update();
+}
+```
+
+!!! tips "提示"
+    标题栏设置仅在宽松模式（Loose）下可见。在紧凑模式下，标题栏和 Tab 栏合并，标题栏背景色设置不会有明显效果，但文字颜色仍然生效。

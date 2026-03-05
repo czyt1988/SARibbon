@@ -602,7 +602,7 @@ void SAColorToolButton::paintText(QStylePainter* p, const QRect& textRect, const
                           opt.palette,
                           opt.state & QStyle::State_Enabled,
                           opt.text,
-                          QPalette::ButtonText);
+                          QPalette::WindowText);
     p->restore();
 }
 
