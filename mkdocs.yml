@@ -1,12 +1,10 @@
 site_name: SARibbon
 site_author: 'Chen ZongYan'
 site_description: 'Qt Framework Ribbon Control'
-repo_url: https://github.com/czyt1988/SARibbon
-repo_name: SARibbon-github
 # 完整站点URL（包含仓库子路径）
 site_url: https://czyt1988.github.io/SARibbon/
-# 仓库子路径（适配GitHub Pages的子路径部署）
-site_dir: site
+repo_url: https://github.com/czyt1988/SARibbon
+repo_name: SARibbon-github
 base_url: /SARibbon/
 
 # 多语言站点信息
@@ -47,6 +45,9 @@ theme:
 plugins:
   - search
   - i18n:
+      base_urls:
+        zh: /SARibbon/zh/
+        en: /SARibbon/en/
       languages:
         - locale: zh
           name: 中文
