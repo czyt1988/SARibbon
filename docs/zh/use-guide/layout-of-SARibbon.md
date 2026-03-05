@@ -2,6 +2,20 @@
 
 SARibbon 支持四种布局方案：**宽松三行**、**宽松两行**、**紧凑三行**、**紧凑两行**，你可以动态切换它们的模式
 
+## 布局方案速查
+
+| 布局方案 | 枚举值 | 特点 | 推荐场景 |
+|---------|-------|------|---------|
+| 宽松三行 | `RibbonStyleLooseThreeRow` | 独立标题栏 + Tab栏 + 3行Panel | 传统 Office 风格，功能按钮较多 |
+| 宽松两行 | `RibbonStyleLooseTwoRow` | 独立标题栏 + Tab栏 + 2行Panel | 屏幕高度有限但需要标题栏 |
+| 紧凑三行 | `RibbonStyleCompactThreeRow` | Tab栏与标题合并 + 3行Panel | WPS 风格，节省垂直空间 |
+| 紧凑两行 | `RibbonStyleCompactTwoRow` | Tab栏与标题合并 + 2行Panel | 最紧凑布局，适合嵌入式或小窗口 |
+
+!!! tips "如何选择布局方案"
+    - **SARibbonMainWindow** 使用无边框模式时，建议使用宽松布局（Loose），因为标题栏由 SARibbon 绘制
+    - **SARibbonMainWindow** 使用原生边框模式时（`UseNativeFrame`），建议使用紧凑布局（Compact），避免标题栏留白
+    - **SARibbonWidget** 嵌入到其他窗口时，建议使用紧凑布局（Compact）
+
 ## SARibbon布局设置
 
 SARibbon提供了`SARibbonBar::setRibbonStyle`函数，可以定义当前的布局方案，枚举`SARibbonBar::RibbonStyle`定义了四种布局方案：
@@ -58,6 +72,7 @@ void SARibbonBar::setRibbonStyle(SARibbonBar::RibbonStyles v)
 可以看到，SARibbonBar的布局实际上主要通过`SARibbonBar::setTabOnTitle`、`SARibbonBar::setEnableShowPanelTitle`、`SARibbonBar::setPanelLayoutMode`、`SARibbonPanel::setEnableWordWrap`这四个函数的组合来控制
 
 这四个函数的主要功能如下：
+
 - `SARibbonBar::setTabOnTitle`: 设置是否将tab栏按钮放在标题栏上，这样tab栏和标题栏共用不会有单独的标题栏
 - `SARibbonBar::setEnableShowPanelTitle`: 设置是否显示panel底部的标题
 - `SARibbonBar::setPanelLayoutMode`: 设置panel的布局模式（3行模式还是2行模式）
@@ -68,6 +83,7 @@ void SARibbonBar::setRibbonStyle(SARibbonBar::RibbonStyles v)
 ## panel的布局方案
 
 `SARibbonPanel`提供了三个添加action的方法：
+
 - `addLargeAction`
 - `addMediumAction`
 - `addSmallAction`
@@ -127,7 +143,6 @@ enum PanelLayoutMode
 !!! warning "2行模式注意事项"
     默认2行模式下panel是不显示标题的，但你可以通过函数`SARibbonBar::setEnableShowPanelTitle`让其显示panel标题,同理，三行模式下你也可以通过此函数让其不显示标题
 
-
 ## 不同布局下的控件排布
 
 不同布局下的ribbon内置控件有不同的排布形式
@@ -149,3 +164,39 @@ SARibbon中把带有标题栏和tab结合一起的布局方式称之为紧凑布
 ![ribbon-style-example](../../assets/pic/ribbon-style-example.png)
 
 在此例子中，你可以点击`use office style`、`use wps style`、`use office 2row style`、`use wps 2row style`按钮，查看四种样式的ribbon风格和布局的变化
+
+## 动态切换布局示例
+
+以下代码演示如何在运行时动态切换布局方案：
+
+```cpp
+void MainWindow::switchRibbonStyle(int styleIndex)
+{
+    SARibbonBar* ribbon = ribbonBar();
+    switch (styleIndex) {
+    case 0:
+        ribbon->setRibbonStyle(SARibbonBar::RibbonStyleLooseThreeRow);
+        break;
+    case 1:
+        ribbon->setRibbonStyle(SARibbonBar::RibbonStyleCompactThreeRow);
+        break;
+    case 2:
+        ribbon->setRibbonStyle(SARibbonBar::RibbonStyleLooseTwoRow);
+        break;
+    case 3:
+        ribbon->setRibbonStyle(SARibbonBar::RibbonStyleCompactTwoRow);
+        break;
+    }
+}
+```
+
+你也可以通过组合四个底层函数实现更灵活的自定义布局：
+
+```cpp
+// 示例：紧凑布局 + 3行Panel + 不显示Panel标题 + 不换行文字
+SARibbonBar* ribbon = ribbonBar();
+ribbon->setTabOnTitle(true);                    // Tab栏放在标题栏上
+ribbon->setEnableShowPanelTitle(false);         // 不显示Panel标题
+ribbon->setPanelLayoutMode(SARibbonPanel::ThreeRowMode);  // 3行模式
+ribbon->setEnableWordWrap(false);               // 文字不换行
+```

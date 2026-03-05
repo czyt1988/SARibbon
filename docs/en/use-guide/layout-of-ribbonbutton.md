@@ -76,4 +76,4 @@ Too much blank space can look unbalanced:
 Remedies:
 
 1. **Mix button sizes** – e.g. two large buttons + three small ones in the same row.  
-2. **Force a break** with `\n`, especially for 4-character titles (two + two).# Ribbon Button Layout Guide
+2. **Force a break** with `\n`, especially for 4-character titles (two + two).

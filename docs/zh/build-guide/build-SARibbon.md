@@ -7,7 +7,6 @@
 
 ## 使用CMake构建SARibbon库
 
-
 ### CMake构建选项
 
 | 编译选项名称               | 默认值                                  | 描述                                                                 | 备注                                                                                     |
@@ -29,7 +28,6 @@
 !!! tips "注意"
     第三方依赖：
     若启用 SARIBBON_USE_FRAMELESS_LIB，需确保 QWindowKit 库已正确编译并可被 CMake 找到（可通过 -DQWindowKit_DIR 指定路径）。
-
 
 ### 使用vs下构建
 
@@ -82,4 +80,4 @@ Qt Creator可以在界面修改`SARIBBON_USE_FRAMELESS_LIB`值，也可以手动
 qmake构建SARibbon只需使用Qt Creator打开`SARibbon.pro`文件即可
 
 !!! warning "注意"
-    果使用Qt Creator打开`SARibbon.pro`文件过程报错，那么你的账户可能是没有足够的写权限，不同版本的Qt Creator在不同操作系统由不一样的表现，建议使用cmake
+    如果使用Qt Creator打开`SARibbon.pro`文件过程报错，那么你的账户可能没有足够的写权限，不同版本的Qt Creator在不同操作系统有不一样的表现，建议使用CMake进行构建。

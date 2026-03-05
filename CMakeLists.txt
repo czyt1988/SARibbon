@@ -5,8 +5,8 @@
 cmake_minimum_required(VERSION 3.5)
 
 set(SARIBBON_VERSION_MAJOR 2)
-set(SARIBBON_VERSION_MINOR 5)
-set(SARIBBON_VERSION_PATCH 8)
+set(SARIBBON_VERSION_MINOR 6)
+set(SARIBBON_VERSION_PATCH 0)
 
 set(SARIBBON_VERSION "${SARIBBON_VERSION_MAJOR}.${SARIBBON_VERSION_MINOR}.${SARIBBON_VERSION_PATCH}")
 message(STATUS "SARibbon v${SARIBBON_VERSION}")
@@ -25,9 +25,9 @@ else()
     option(SARIBBON_INSTALL_IN_CURRENT_DIR "Whether to install in the current directory" OFF)
 endif()
 
-# load Qt library, minimum version required is 5.8
-# cn:Qt库加载,最低版本要求为5.8
-set(SARIBBON_MIN_QT_VERSION 5.8)
+# load Qt library, minimum version required is 5.12
+# cn:Qt库加载,最低版本要求为5.12
+set(SARIBBON_MIN_QT_VERSION 5.12)
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} ${SARIBBON_MIN_QT_VERSION} COMPONENTS
     Core

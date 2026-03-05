@@ -3,6 +3,8 @@ build*
 # 针对文档添加否定规则
 !docs/zh/build-guide
 !docs/zh/build-guide/**
+!docs/en/build-guide
+!docs/en/build-guide/**
 *.user
 *.autosave
 *.dll
@@ -18,6 +20,9 @@ tmp
 tmp-file
 .$*
 .vs
+.qoder
+nul
+.qtcreator
 
 #文档目录
 site

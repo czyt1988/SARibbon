@@ -101,3 +101,79 @@ MyRibbonWidget::MyRibbonWidget(QWidget *parent)
 ```
 
 通过 `setWidget()` 方法，您可以将任意 `QWidget` 嵌入到 `SARibbonWidget` 中
+
+## 完整的原生边框示例
+
+下面是一个使用原生边框模式的完整示例（参考自 `example/UseNativeFrameExample`）：
+
+```cpp
+#include "SARibbon.h"
+
+class MainWindow : public SARibbonMainWindow
+{
+    Q_OBJECT
+public:
+    MainWindow(QWidget* par = nullptr)
+        : SARibbonMainWindow(par,
+            SARibbonMainWindowStyleFlag::UseNativeFrame
+            | SARibbonMainWindowStyleFlag::UseRibbonMenuBar)
+    {
+        SARibbonBar* ribbon = ribbonBar();
+        // 原生边框下推荐使用紧凑模式
+        ribbon->setRibbonStyle(SARibbonBar::RibbonStyleCompactThreeRow);
+        // 取消 Application Button 的垂直扩展
+        ribbon->setApplicationButtonVerticalExpansion(false);
+
+        // 创建分类页和面板
+        SARibbonCategory* category = ribbon->addCategoryPage(tr("Main"));
+        SARibbonPanel* panel = category->addPanel(tr("Operations"));
+
+        QAction* act = new QAction(QIcon(":/icon/save.svg"), tr("Save"), this);
+        panel->addLargeAction(act);
+
+        resize(800, 600);
+    }
+};
+```
+
+## 完整的SARibbonWidget示例
+
+下面是在普通对话框中使用 `SARibbonWidget` 的完整示例（参考自 `example/WidgetWithRibbon`）：
+
+```cpp
+#include "SARibbon.h"
+#include <QVBoxLayout>
+#include <QTextEdit>
+
+class MyDialog : public QDialog
+{
+    Q_OBJECT
+public:
+    MyDialog(QWidget* parent = nullptr) : QDialog(parent)
+    {
+        // 创建 SARibbonWidget
+        SARibbonWidget* ribbonWidget = new SARibbonWidget(this);
+        SARibbonBar* ribbon = ribbonWidget->ribbonBar();
+
+        // Widget 模式推荐设置
+        ribbon->setTitleVisible(false);
+        ribbon->setApplicationButton(nullptr);
+        ribbon->setRibbonStyle(SARibbonBar::RibbonStyleCompactThreeRow);
+
+        // 添加 Ribbon 内容
+        SARibbonCategory* cat = ribbon->addCategoryPage(tr("Edit"));
+        SARibbonPanel* panel = cat->addPanel(tr("Tools"));
+        panel->addLargeAction(new QAction(QIcon(":/icon/edit.svg"), tr("Edit"), this));
+
+        // 设置中心内容
+        QTextEdit* editor = new QTextEdit(this);
+        ribbonWidget->setWidget(editor);
+
+        // 布局
+        QVBoxLayout* layout = new QVBoxLayout(this);
+        layout->setContentsMargins(0, 0, 0, 0);
+        layout->addWidget(ribbonWidget);
+        resize(600, 400);
+    }
+};
+```

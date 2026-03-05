@@ -363,9 +363,8 @@ SARibbonSystemToolButton:focus {
 /* 深色模式的系统按钮设置 */
 /*Min*/
 SARibbonSystemToolButton#SAMinimizeWindowButton {
-  background-position:center;
-  background-repeat: no-repeat;
-  background-image: url(:/SARibbon/image/resource/Titlebar_Min_Hover.svg);
+  image: url(:/SARibbon/image/resource/Titlebar_Min_Hover.svg);
+  padding: 4px;
 }
 SARibbonSystemToolButton#SAMinimizeWindowButton:hover{
   background-color: #b2b2b2;
@@ -375,23 +374,21 @@ SARibbonSystemToolButton#SAMinimizeWindowButton:pressed{
 }
 /*Max*/
 SARibbonSystemToolButton#SAMaximizeWindowButton {
-    background-position:center;
-    background-repeat: no-repeat;
-    background-image: url(:/SARibbon/image/resource/Titlebar_Max_Hover.svg);
+    image: url(:/SARibbon/image/resource/Titlebar_Max_Hover.svg);
+    padding: 4px;
 }
 SARibbonSystemToolButton#SAMaximizeWindowButton:hover {
     background-color: #b2b2b2;
 }
 SARibbonSystemToolButton#SAMaximizeWindowButton:checked {
-    background-image: url(:/SARibbon/image/resource/Titlebar_Normal_Hover.svg) center;
+    image: url(:/SARibbon/image/resource/Titlebar_Normal_Hover.svg);
 }
 
 
 /*Close*/
 SARibbonSystemToolButton#SACloseWindowButton {
-    background-position:center;
-    background-repeat: no-repeat;
-    background-image: url(:/SARibbon/image/resource/Titlebar_Close_Hover.svg);
+    image: url(:/SARibbon/image/resource/Titlebar_Close_Hover.svg);
+    padding: 4px;
 }
 SARibbonSystemToolButton#SACloseWindowButton:hover {
   background-color: #e81123;
