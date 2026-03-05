@@ -250,7 +250,11 @@ void MainWindow::initUI()
     mChangeTitleBkColorTimer.start();
     connect(&mChangeTitleBkColorTimer, &QTimer::timeout, this, &MainWindow::onChangedTitleTimeout);
     //! 全屏显示
+#if QT_VERSION >= QT_VERSION_CHECK(6, 8, 0)
+    QTimer::singleShot(0, this, &QWidget::showMaximized);
+#else
     showMaximized();
+#endif
 }
 
 /**
