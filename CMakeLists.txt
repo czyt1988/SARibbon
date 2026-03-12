@@ -224,3 +224,4 @@ install(FILES
     DESTINATION lib/qmake/SARibbonBar
     COMPONENT qmake
 )
+

@@ -42,8 +42,14 @@ set_target_properties(UseNativeFrameExample PROPERTIES
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
 )
 
+include(GNUInstallDirs)
 install(TARGETS UseNativeFrameExample
-    RUNTIME DESTINATION bin
-    LIBRARY DESTINATION bin
-    ARCHIVE DESTINATION lib
+    BUNDLE DESTINATION .
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
+if(QT_VERSION_MAJOR EQUAL 6)
+    qt_finalize_executable(UseNativeFrameExample)
+endif()
+

@@ -47,17 +47,17 @@
 #include <QLineEdit>
 #include <QDialogButtonBox>
 #define PRINT_COST_START()                                                                                             \
-	QElapsedTimer __TMP_COST;                                                                                          \
-	__TMP_COST.start();                                                                                                \
-	int __TMP_LASTTIMES = 0
+    QElapsedTimer __TMP_COST;                                                                                          \
+    __TMP_COST.start();                                                                                                \
+    int __TMP_LASTTIMES = 0
 
 #define PRINT_COST(STR)                                                                                                \
-	do {                                                                                                               \
-		int ___TMP_INT = __TMP_COST.elapsed();                                                                         \
-		qDebug() << STR << " cost " << ___TMP_INT - __TMP_LASTTIMES << " ms (" << ___TMP_INT << ")";                   \
-		mTextedit->append(QString("%1 cost %2 ms(%3)").arg(STR).arg(___TMP_INT - __TMP_LASTTIMES).arg(___TMP_INT));    \
-		__TMP_LASTTIMES = ___TMP_INT;                                                                                  \
-	} while (0)
+    do {                                                                                                               \
+        int ___TMP_INT = __TMP_COST.elapsed();                                                                         \
+        qDebug() << STR << " cost " << ___TMP_INT - __TMP_LASTTIMES << " ms (" << ___TMP_INT << ")";                   \
+        mTextedit->append(QString("%1 cost %2 ms(%3)").arg(STR).arg(___TMP_INT - __TMP_LASTTIMES).arg(___TMP_INT));    \
+        __TMP_LASTTIMES = ___TMP_INT;                                                                                  \
+    } while (0)
 
 MainWindow::MainWindow(QWidget* par)
     : SARibbonMainWindow(par,
@@ -65,61 +65,60 @@ MainWindow::MainWindow(QWidget* par)
                              | SARibbonMainWindowStyleFlag::UseRibbonMenuBar)  // 使用原生边框，使用ribbon
 {
     setWindowTitle(("MATLAB UI[*]"));
-	mTextedit = new QTextEdit(this);
-	setCentralWidget(mTextedit);
-	setStatusBar(new QStatusBar());
-
-	SARibbonBar* ribbon = ribbonBar();
-	//! 通过setContentsMargins设置ribbon四周的间距
+    mTextedit = new QTextEdit(this);
+    setCentralWidget(mTextedit);
+    setStatusBar(new QStatusBar());
+    SARibbonBar* ribbon = ribbonBar();
+    //! 通过setContentsMargins设置ribbon四周的间距
     ribbon->setContentsMargins(0, 0, 0, 0);
 
-	connect(ribbon, &SARibbonBar::actionTriggered, this, [ this ](QAction* action) {
-		mTextedit->append(QString("action object name=%1 triggered").arg(action->objectName()));
-	});
+    connect(ribbon, &SARibbonBar::actionTriggered, this, [ this ](QAction* action) {
+        mTextedit->append(QString("action object name=%1 triggered").arg(action->objectName()));
+    });
 
-	//! cn:
+    //! cn:
     //! matlab ui 没有Application button
     ribbon->setApplicationButton(nullptr);
 
-	//! cn:
-	//! 添加主标签页,这里演示通过SARibbonBar::addCategoryPage函数添加一个标签页
-	//! en:
-	//! Add the main tab. Here we show how to add a tab through the SARibbonBar::addCategoryPage function
-	SARibbonCategory* categoryMain = ribbon->addCategoryPage(tr("&Main"));
-	//! cn: SARibbonBar的Category和Panel，以及对应的Action都应该设置ObjectName，因为如果要自定义action，这些ObjectName是必不可少的
-	//! en: The category , panel and actions of SARibbonBar, should be set with Object Names, as these Object Names are essential for customizing actions
-	categoryMain->setObjectName(("categoryMain"));
-	createCategoryMain(categoryMain);
+    //! cn:
+    //! 添加主标签页,这里演示通过SARibbonBar::addCategoryPage函数添加一个标签页
+    //! en:
+    //! Add the main tab. Here we show how to add a tab through the SARibbonBar::addCategoryPage function
+    SARibbonCategory* categoryMain = ribbon->addCategoryPage(tr("&Main"));
+    //! cn: SARibbonBar的Category和Panel，以及对应的Action都应该设置ObjectName，因为如果要自定义action，这些ObjectName是必不可少的
+    //! en: The category , panel and actions of SARibbonBar, should be set with Object Names, as these Object Names are essential for customizing actions
+    categoryMain->setObjectName(("categoryMain"));
+    createCategoryMain(categoryMain);
 
-	//! cn:这里演示了另外一种添加标签页的方式，先创建SARibbonCategory指针，并通过SARibbonBar::addCategoryPage函数把SARibbonCategory指针传递给SARibbonBar
-	//! en:Here is another way to add a tab: first create a SARibbonCategory pointer and pass it to SARibbonBar through the SARibbonBar::addCategoryPage function
-	SARibbonCategory* categoryOther = new SARibbonCategory();
-	categoryOther->setCategoryName(tr("Other"));
-	categoryOther->setObjectName(("categoryOther"));
-	createCategoryOther(categoryOther);
-	ribbon->addCategoryPage(categoryOther);
+    //! cn:这里演示了另外一种添加标签页的方式，先创建SARibbonCategory指针，并通过SARibbonBar::addCategoryPage函数把SARibbonCategory指针传递给SARibbonBar
+    //! en:Here is another way to add a tab: first create a SARibbonCategory pointer and pass it to SARibbonBar through the SARibbonBar::addCategoryPage function
+    SARibbonCategory* categoryOther = new SARibbonCategory();
+    categoryOther->setCategoryName(tr("Other"));
+    categoryOther->setObjectName(("categoryOther"));
+    createCategoryOther(categoryOther);
+    ribbon->addCategoryPage(categoryOther);
 
-	createContextCategory();
+    createContextCategory();
 
-	//! cn:
-	//! 创建RightButtonGroup,RightButtonGroup类似一个在右上角的工具栏，给用户放置一些快捷图标，例如关于、帮助等图标，
-	//! RightButtonGroup在SARibbonBar创建时就会构建一个默认的SARibbonButtonGroupWidget，可以通过SARibbonBar::rightButtonGroup函数获取
-	//! en:
-	//! Create a RightButtonGroup, which is similar to a toolbar in the upper right corner,
-	//! providing users with shortcut icons such as About, Help, etc. RightButtonGroup will build a default SARibbonButtonGroupWidget when creating SARibbonBar,
-	//! which can be obtained through the SARibbonBar::rightButtonGroup function
-	createRightButtonGroup();
+    //! cn:
+    //! 创建RightButtonGroup,RightButtonGroup类似一个在右上角的工具栏，给用户放置一些快捷图标，例如关于、帮助等图标，
+    //! RightButtonGroup在SARibbonBar创建时就会构建一个默认的SARibbonButtonGroupWidget，可以通过SARibbonBar::rightButtonGroup函数获取
+    //! en:
+    //! Create a RightButtonGroup, which is similar to a toolbar in the upper right corner,
+    //! providing users with shortcut icons such as About, Help, etc. RightButtonGroup will build a default SARibbonButtonGroupWidget when creating SARibbonBar,
+    //! which can be obtained through the SARibbonBar::rightButtonGroup function
+    createRightButtonGroup();
 
-	//! cn:
-	//! 这里演示了如何在系统窗口最小化最大化关闭按钮旁边添加其他按钮
-	createWindowButtonGroupBar();
+    //! cn:
+    //! 这里演示了如何在系统窗口最小化最大化关闭按钮旁边添加其他按钮
+    createWindowButtonGroupBar();
 
-	setMinimumWidth(500);
-	setWindowIcon(QIcon(":/icon/icon/SA.svg"));
+    setMinimumWidth(500);
+    setWindowIcon(QIcon(":/icon/icon/SA.svg"));
 
-	connect(ribbon, &SARibbonBar::currentRibbonTabChanged, this, [ this ](int v) {
-		mTextedit->append(QString("SARibbonBar::currentRibbonTabChanged(%1)").arg(v));
-	});
+    connect(ribbon, &SARibbonBar::currentRibbonTabChanged, this, [ this ](int v) {
+        mTextedit->append(QString("SARibbonBar::currentRibbonTabChanged(%1)").arg(v));
+    });
 
     //! matlab ui 由于使用系统边框，应该设置为紧凑模式，避免上面的留白
     ribbon->setRibbonStyle(SARibbonBar::RibbonStyleCompactThreeRow);
@@ -132,8 +131,8 @@ MainWindow::MainWindow(QWidget* par)
         QTimer::singleShot(0, [ this, qss ]() { this->setStyleSheet(qss); });
         qDebug() << "qss:" << qss;
     }
-	//! 全屏显示
-	showMaximized();
+    //! 全屏显示
+    showMaximized();
 }
 
 /**
@@ -149,7 +148,7 @@ void MainWindow::onShowContextCategory(bool on)
         this->ribbonBar()->showContextCategory(mContextCategory);
     } else {
         this->ribbonBar()->hideContextCategory(mContextCategory);
-	}
+    }
 }
 
 void MainWindow::onStyleClicked(int id)
@@ -197,7 +196,7 @@ void MainWindow::onStyleClicked(int id)
         break;
     default:
         break;
-	}
+    }
 }
 
 void MainWindow::onActionHelpTriggered()
@@ -234,7 +233,7 @@ void MainWindow::onActionVisibleAllTriggered(bool on)
     for (QAction* a : acts) {
         if (a != mActionVisibleAll) {
             a->setVisible(on);
-		}
+        }
     }
     ribbonBar()->updateRibbonGeometry();
     ribbonBar()->update();
@@ -250,7 +249,7 @@ void MainWindow::onCheckBoxAlignmentCenterClicked(bool checked)
         ribbonBar()->setRibbonAlignment(SARibbonAlignment::AlignCenter);
     } else {
         ribbonBar()->setRibbonAlignment(SARibbonAlignment::AlignLeft);
-	}
+    }
 }
 
 void MainWindow::closeEvent(QCloseEvent* e)
@@ -260,7 +259,7 @@ void MainWindow::closeEvent(QCloseEvent* e)
         e->accept();
     } else {
         e->ignore();
-	}
+    }
 }
 
 void MainWindow::createCategoryMain(SARibbonCategory* page)
@@ -373,7 +372,7 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
         for (int i = 0; i < 5; ++i) {
             a = menu->addAction(itemicon, tr("item %1").arg(i + 1));
             a->setObjectName(QString("menuItem %1").arg(i + 1));
-		}
+        }
     }
 
     QAction* act = createAction(tr("test 1"), ":/icon/icon/test1.svg");
@@ -436,12 +435,12 @@ void MainWindow::createCategoryOther(SARibbonCategory* page)
 {
     SARibbonMenu* menu = new SARibbonMenu(this);
     QAction* a         = nullptr;
-	{
+    {
         QIcon itemicon = QIcon(":/icon/icon/item.svg");
         for (int i = 0; i < 5; ++i) {
             a = menu->addAction(itemicon, tr("item %1").arg(i + 1));
             a->setObjectName(QString("menu2Item %1").arg(i + 1));
-		}
+        }
     }
     //! 2
     //! panel 2 start
@@ -555,7 +554,7 @@ void MainWindow::createRightButtonGroup()
     SARibbonBar* ribbon = ribbonBar();
     if (!ribbon) {
         return;
-	}
+    }
     SARibbonButtonGroupWidget* rightBar = ribbon->rightButtonGroup();
     QAction* actionHelp                 = createAction(tr("help"), ":/icon/icon/help.svg");
     mActionVisibleAll                   = createAction(tr("Visible"), ":/icon/icon/visible-true.svg");
@@ -575,7 +574,7 @@ void MainWindow::createWindowButtonGroupBar()
     SARibbonSystemButtonBar* wbar = windowButtonBar();
     if (!wbar) {
         return;
-	}
+    }
     QAction* a = new QAction(QIcon(), tr("Login"));
     wbar->addAction(a);
     connect(a, &QAction::triggered, this, [ this ]() { this->mTextedit->append("Login triggered"); });

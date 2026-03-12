@@ -106,3 +106,14 @@ else()
     #不使用frameless必须设置SARIBBON_USE_3RDPARTY_FRAMELESSHELPER宏为0
     target_compile_definitions(StaticExample PRIVATE SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=0)
 endif()
+
+include(GNUInstallDirs)
+install(TARGETS StaticExample
+    BUNDLE DESTINATION .
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+)
+if(QT_VERSION_MAJOR EQUAL 6)
+    qt_finalize_executable(StaticExample)
+endif()

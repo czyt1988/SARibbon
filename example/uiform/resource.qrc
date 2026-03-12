@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/uiform">
+        <file>folder-checkmark.svg</file>
+    </qresource>
+</RCC>
