@@ -1,4 +1,4 @@
-﻿#include "SARibbonGallery.h"
+#include "SARibbonGallery.h"
 #include <QIcon>
 #include <QApplication>
 #include <QResizeEvent>
@@ -346,6 +346,17 @@ void SARibbonGalleryViewport::resizeEvent(QResizeEvent* e)
 // SARibbonGallery
 //===================================================
 
+/**
+ * \if ENGLISH
+ * @brief Constructor for SARibbonGallery
+ * @param parent Parent widget
+ * \endif
+ *
+ * \if CHINESE
+ * @brief SARibbonGallery构造函数
+ * @param parent 父窗口部件
+ * \endif
+ */
 SARibbonGallery::SARibbonGallery(QWidget* parent) : QFrame(parent), d_ptr(new SARibbonGallery::PrivateData(this))
 {
     d_ptr->init();
@@ -354,13 +365,31 @@ SARibbonGallery::SARibbonGallery(QWidget* parent) : QFrame(parent), d_ptr(new SA
     setMinimumWidth(200);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Destructor for SARibbonGallery
+ * \endif
+ *
+ * \if CHINESE
+ * @brief SARibbonGallery析构函数
+ * \endif
+ */
 SARibbonGallery::~SARibbonGallery()
 {
 }
 
 /**
+ * \if ENGLISH
+ * @brief Get a blank SARibbonGalleryGroup
+ * @return Pointer to the created SARibbonGalleryGroup
+ * @details Creates and returns a new empty gallery group. The group is automatically added to the gallery.
+ * \endif
+ *
+ * \if CHINESE
  * @brief 获取一个空白SARibbonGalleryGroup
- * @return
+ * @return 创建的SARibbonGalleryGroup指针
+ * @details 创建并返回一个新的空白图库组。该组会自动添加到图库中。
+ * \endif
  */
 SARibbonGalleryGroup* SARibbonGallery::addGalleryGroup()
 {
@@ -372,6 +401,19 @@ SARibbonGalleryGroup* SARibbonGallery::addGalleryGroup()
 /**
  * @brief 添加一组SARibbonGalleryGroup
  * @param group
+ */
+/**
+ * \if ENGLISH
+ * @brief Add an existing SARibbonGalleryGroup to the gallery
+ * @param group Pointer to the gallery group to add
+ * @details Adds a pre-existing gallery group to the gallery. The group will be displayed in the popup viewport.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 添加一个已存在的SARibbonGalleryGroup到图库
+ * @param group 要添加的图库组指针
+ * @details 将已存在的图库组添加到图库中。该组将在弹出视口中显示。
+ * \endif
  */
 void SARibbonGallery::addGalleryGroup(SARibbonGalleryGroup* group)
 {
@@ -396,6 +438,23 @@ void SARibbonGallery::addGalleryGroup(SARibbonGalleryGroup* group)
  * @param actions
  * @return 返回SARibbonGalleryGroup，用户可以通过修改SARibbonGalleryGroup属性控制其显示方法
  */
+/**
+ * \if ENGLISH
+ * @brief Quickly add a set of actions as a gallery group
+ * @param title Title for the gallery group
+ * @param actions List of actions to add to the group
+ * @return Pointer to the created SARibbonGalleryGroup
+ * @details Creates a new gallery group with the specified title and adds the provided actions to it.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 快速添加一组动作作为图库组
+ * @param title 图库组标题
+ * @param actions 要添加到组中的动作列表
+ * @return 创建的SARibbonGalleryGroup指针
+ * @details 创建一个具有指定标题的新图库组，并将提供的动作添加到其中。
+ * \endif
+ */
 SARibbonGalleryGroup* SARibbonGallery::addCategoryActions(const QString& title, QList< QAction* > actions)
 {
     SARibbonGalleryGroup* group = RibbonSubElementFactory->createRibbonGalleryGroup(this);
@@ -407,12 +466,36 @@ SARibbonGalleryGroup* SARibbonGallery::addCategoryActions(const QString& title, 
     return (group);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Set the currently displayed gallery group
+ * @param group Pointer to the gallery group to display
+ * @details Sets which gallery group should be displayed in the main gallery view (not the popup).
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置当前显示的图库组
+ * @param group 要显示的图库组指针
+ * @details 设置哪个图库组应该在主图库视图中显示（非弹出窗口）。
+ * \endif
+ */
 void SARibbonGallery::setCurrentViewGroup(SARibbonGalleryGroup* group)
 {
     d_ptr->setViewPort(group);
     QApplication::postEvent(this, new QResizeEvent(size(), size()));
 }
 
+/**
+ * \if ENGLISH
+ * @brief Get the currently displayed gallery group
+ * @return Pointer to the current gallery group, or nullptr if none is set
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取当前显示的图库组
+ * @return 当前图库组指针，如果未设置则返回nullptr
+ * \endif
+ */
 SARibbonGalleryGroup* SARibbonGallery::currentViewGroup() const
 {
     return (d_ptr->mCurrentViewportGroup);
@@ -421,6 +504,19 @@ SARibbonGalleryGroup* SARibbonGallery::currentViewGroup() const
 /**
  * @brief 获取弹出窗口
  * @return
+ */
+/**
+ * \if ENGLISH
+ * @brief Get the popup viewport widget
+ * @return Pointer to the popup viewport, or nullptr if not created yet
+ * @details The popup viewport displays all gallery groups when the "more" button is clicked.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取弹出视口部件
+ * @return 弹出视口指针，如果尚未创建则返回nullptr
+ * @details 弹出视口在点击"更多"按钮时显示所有图库组。
+ * \endif
  */
 SARibbonGalleryViewport* SARibbonGallery::getPopupViewPort() const
 {
@@ -431,6 +527,19 @@ SARibbonGalleryViewport* SARibbonGallery::getPopupViewPort() const
  * @brief 设置最右边三个控制按钮的最大宽度（默认15）
  * @param w
  */
+/**
+ * \if ENGLISH
+ * @brief Set the maximum width for gallery control buttons
+ * @param w Maximum width in pixels
+ * @details Sets the maximum width for the up, down, and more buttons on the gallery.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置图库控制按钮的最大宽度
+ * @param w 最大宽度（像素）
+ * @details 设置图库上、下和更多按钮的最大宽度。
+ * \endif
+ */
 void SARibbonGallery::setGalleryButtonMaximumWidth(int w)
 {
     SARibbonGallery::PrivateData::sGalleryButtonMaximumWidth = w;
@@ -438,6 +547,17 @@ void SARibbonGallery::setGalleryButtonMaximumWidth(int w)
 
 /**
  * @brief 上翻页
+ */
+/**
+ * \if ENGLISH
+ * @brief Scroll down one page in the current gallery group
+ * @details Scrolls the current gallery group view down by one page (if a scrollbar is present).
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 在当前图库组中向下滚动一页
+ * @details 将当前图库组视图向下滚动一页（如果存在滚动条）。
+ * \endif
  */
 void SARibbonGallery::pageDown()
 {
@@ -452,6 +572,17 @@ void SARibbonGallery::pageDown()
 /**
  * @brief 下翻页
  */
+/**
+ * \if ENGLISH
+ * @brief Scroll up one page in the current gallery group
+ * @details Scrolls the current gallery group view up by one page (if a scrollbar is present).
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 在当前图库组中向上滚动一页
+ * @details 将当前图库组视图向上滚动一页（如果存在滚动条）。
+ * \endif
+ */
 void SARibbonGallery::pageUp()
 {
     if (d_ptr->mCurrentViewportGroup) {
@@ -464,6 +595,19 @@ void SARibbonGallery::pageUp()
 
 /**
  * @brief 显示更多触发，默认弹出内部管理的SARibbonGalleryViewport，用户可重载此函数实现自定义的弹出
+ */
+/**
+ * \if ENGLISH
+ * @brief Show the popup viewport with all gallery groups
+ * @details Displays the popup viewport containing all gallery groups when the "more" button is clicked.
+ *          Users can override this function to implement custom popup behavior.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 显示包含所有图库组的弹出视口
+ * @details 当点击"更多"按钮时，显示包含所有图库组的弹出视口。
+ *          用户可以重写此函数以实现自定义的弹出行为。
+ * \endif
  */
 void SARibbonGallery::showMoreDetail()
 {
@@ -498,6 +642,19 @@ void SARibbonGallery::showMoreDetail()
     d_ptr->mPopupWidget->show();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Slot called when an item in a gallery group is clicked
+ * @param index Model index of the clicked item
+ * @details Handles item click events from gallery groups and triggers the corresponding action.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 当图库组中的项目被点击时调用的槽函数
+ * @param index 被点击项目的模型索引
+ * @details 处理来自图库组的项目点击事件并触发相应的动作。
+ * \endif
+ */
 void SARibbonGallery::onItemClicked(const QModelIndex& index)
 {
     QObject* obj                = sender();
@@ -510,6 +667,19 @@ void SARibbonGallery::onItemClicked(const QModelIndex& index)
     }
 }
 
+/**
+ * \if ENGLISH
+ * @brief Slot called when an action is triggered from the gallery
+ * @param action Pointer to the triggered action
+ * @details Handles action trigger events and closes the popup viewport if it's open.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 当从图库触发动作时调用的槽函数
+ * @param action 被触发动作的指针
+ * @details 处理动作触发事件，并在弹出视口打开时关闭它。
+ * \endif
+ */
 void SARibbonGallery::onTriggered(QAction* action)
 {
     Q_UNUSED(action);
@@ -529,6 +699,19 @@ SARibbonGalleryViewport* SARibbonGallery::ensureGetPopupViewPort()
     return (d_ptr->mPopupWidget);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Handle resize events for the gallery
+ * @param event Resize event
+ * @details Updates the layout of gallery groups when the gallery is resized.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 处理图库的调整大小事件
+ * @param event 调整大小事件
+ * @details 在图库调整大小时更新图库组的布局。
+ * \endif
+ */
 void SARibbonGallery::resizeEvent(QResizeEvent* event)
 {
     QFrame::resizeEvent(event);

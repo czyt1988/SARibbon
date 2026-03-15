@@ -1,4 +1,4 @@
-﻿#ifndef SARIBBONBAR_H
+#ifndef SARIBBONBAR_H
 #define SARIBBONBAR_H
 #include "SARibbonCategory.h"
 #include "SARibbonContextCategory.h"
@@ -17,79 +17,156 @@ class SARibbonStackedWidget;
 class SARibbonTitleIconWidget;
 
 /**
- @brief SARibbonBar继承于QMenuBar,在SARibbonMainWindow中直接替换了原来的QMenuBar
-
- 通过setRibbonStyle函数设置ribbon的风格:
-
- @code
- void setRibbonStyle(RibbonStyles v);
- @endcode
-
- SARibbonBar参考office和wps，提供了四种风格的Ribbon模式,@ref SARibbonBar::RibbonStyles
-
- 如果想ribbon占用的空间足够小，WpsLiteStyleTwoRow模式能比OfficeStyle节省35%的高度空间
-
- 如何生成ribbon?先看看一个传统的Menu/ToolBar是如何生成的：
-
- @code
- void MainWindow::MainWindow()
- {
-  QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
-  QToolBar *fileToolBar = addToolBar(tr("File"));
-  //生成action
-  QAction *newAct = new QAction(newIcon, tr("&New"), this);
-  fileMenu->addAction(newAct);
-  fileToolBar->addAction(newAct);
-
-  QAction *openAct = new QAction(openIcon, tr("&Open..."), this);
-  fileMenu->addAction(openAct);
-  fileToolBar->addAction(openAct);
- }
- @endcode
-
- 传统的Menu/ToolBar主要通过QMenu的addMenu添加菜单,通过QMainWindow::addToolBar生成QToolBar,
- 再把QAction设置进QMenu和QToolBar中
-
- SARibbonBar和传统方法相似，不过相对于传统的Menu/ToolBar QMenu和QToolBar是平级的，
- Ribbon是有明显的层级关系，SARibbonBar下面是 @ref SARibbonCategory，
- SARibbonCategory下面是@ref SARibbonPanel ，SARibbonPanel下面是@ref SARibbonToolButton ，
- SARibbonToolButton管理着QAction
-
- 因此，生成一个ribbon只需以下几个函数：
- @code
- SARibbonCategory * SARibbonBar::addCategoryPage(const QString& title);
- SARibbonPanel * SARibbonCategory::addPanel(const QString& title);
- SARibbonToolButton * SARibbonPanel::addLargeAction(QAction *action);
- SARibbonToolButton * SARibbonPanel::addSmallAction(QAction *action);
- @endcode
-
- 因此生成步骤如下：
-
- @code
- //成员变量
- SARibbonCategory* categoryMain;
- SARibbonPanel* FilePanel;
-
- //建立ui
- void setupRibbonUi()
- {
-   ......
-   //ribbonwindow为SARibbonMainWindow
-   SARibbonBar* ribbon = ribbonwindow->ribbonBar();
-   ribbon->setRibbonStyle(SARibbonBar::WpsLiteStyle);
-   //添加一个Main标签
-   categoryMain = ribbon->addCategoryPage(QStringLiteral("Main"));
-   //Main标签下添加一个File Panel
-   FilePanel = categoryMain->addPanel(QStringLiteral("FilePanel"));
-   //开始为File Panel添加action
-   FilePanel->addLargeAction(actionNew);
-   FilePanel->addLargeAction(actionOpen);
-   FilePanel->addLargeAction(actionSave);
-   FilePanel->addSmallAction(actionImportMesh);
-   FilePanel->addSmallAction(actionImportGeometry);
-}
-@endcode
-*/
+ * \if ENGLISH
+ * @brief SARibbonBar inherits from QMenuBar and directly replaces the original QMenuBar in SARibbonMainWindow
+ *
+ * Set the ribbon style using the setRibbonStyle function:
+ *
+ * @code
+ * void setRibbonStyle(RibbonStyles v);
+ * @endcode
+ *
+ * SARibbonBar references Office and WPS, providing four styles of Ribbon modes, @ref SARibbonBar::RibbonStyles
+ *
+ * If you want the ribbon to occupy minimal space, WpsLiteStyleTwoRow mode can save 35% height space compared to OfficeStyle
+ *
+ * How to create a ribbon? First, let's see how a traditional Menu/ToolBar is created:
+ *
+ * @code
+ * void MainWindow::MainWindow()
+ * {
+ *  QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
+ *  QToolBar *fileToolBar = addToolBar(tr("File"));
+ *  // Create action
+ *  QAction *newAct = new QAction(newIcon, tr("&New"), this);
+ *  fileMenu->addAction(newAct);
+ *  fileToolBar->addAction(newAct);
+ *
+ *  QAction *openAct = new QAction(openIcon, tr("&Open..."), this);
+ *  fileMenu->addAction(openAct);
+ *  fileToolBar->addAction(openAct);
+ * }
+ * @endcode
+ *
+ * Traditional Menu/ToolBar mainly uses QMenu's addMenu to add menus, and QMainWindow::addToolBar to generate QToolBar,
+ * then sets QAction into QMenu and QToolBar.
+ *
+ * SARibbonBar is similar to the traditional method, but compared to traditional Menu/ToolBar where QMenu and QToolBar are at the same level,
+ * Ribbon has a clear hierarchical relationship: SARibbonBar is above @ref SARibbonCategory,
+ * SARibbonCategory is above @ref SARibbonPanel, SARibbonPanel is above @ref SARibbonToolButton,
+ * and SARibbonToolButton manages QAction.
+ *
+ * Therefore, creating a ribbon only requires the following functions:
+ * @code
+ * SARibbonCategory * SARibbonBar::addCategoryPage(const QString& title);
+ * SARibbonPanel * SARibbonCategory::addPanel(const QString& title);
+ * SARibbonToolButton * SARibbonPanel::addLargeAction(QAction *action);
+ * SARibbonToolButton * SARibbonPanel::addSmallAction(QAction *action);
+ * @endcode
+ *
+ * Therefore, the creation steps are as follows:
+ *
+ * @code
+ * // Member variables
+ * SARibbonCategory* categoryMain;
+ * SARibbonPanel* FilePanel;
+ *
+ * // Build UI
+ * void setupRibbonUi()
+ * {
+ *   ......
+ *   // ribbonwindow is SARibbonMainWindow
+ *   SARibbonBar* ribbon = ribbonwindow->ribbonBar();
+ *   ribbon->setRibbonStyle(SARibbonBar::WpsLiteStyle);
+ *   // Add a Main tab
+ *   categoryMain = ribbon->addCategoryPage(QStringLiteral("Main"));
+ *   // Add a File Panel under the Main tab
+ *   FilePanel = categoryMain->addPanel(QStringLiteral("FilePanel"));
+ *   // Start adding actions to File Panel
+ *   FilePanel->addLargeAction(actionNew);
+ *   FilePanel->addLargeAction(actionOpen);
+ *   FilePanel->addLargeAction(actionSave);
+ *   FilePanel->addSmallAction(actionImportMesh);
+ *   FilePanel->addSmallAction(actionImportGeometry);
+ * }
+ * @endcode
+ * \endif
+ *
+ * \if CHINESE
+ * @brief SARibbonBar继承于QMenuBar,在SARibbonMainWindow中直接替换了原来的QMenuBar
+ *
+ * 通过setRibbonStyle函数设置ribbon的风格:
+ *
+ * @code
+ * void setRibbonStyle(RibbonStyles v);
+ * @endcode
+ *
+ * SARibbonBar参考office和wps，提供了四种风格的Ribbon模式,@ref SARibbonBar::RibbonStyles
+ *
+ * 如果想ribbon占用的空间足够小，WpsLiteStyleTwoRow模式能比OfficeStyle节省35%的高度空间
+ *
+ * 如何生成ribbon?先看看一个传统的Menu/ToolBar是如何生成的：
+ *
+ * @code
+ * void MainWindow::MainWindow()
+ * {
+ *  QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
+ *  QToolBar *fileToolBar = addToolBar(tr("File"));
+ *  //生成action
+ *  QAction *newAct = new QAction(newIcon, tr("&New"), this);
+ *  fileMenu->addAction(newAct);
+ *  fileToolBar->addAction(newAct);
+ *
+ *  QAction *openAct = new QAction(openIcon, tr("&Open..."), this);
+ *  fileMenu->addAction(openAct);
+ *  fileToolBar->addAction(openAct);
+ * }
+ * @endcode
+ *
+ * 传统的Menu/ToolBar主要通过QMenu的addMenu添加菜单,通过QMainWindow::addToolBar生成QToolBar,
+ * 再把QAction设置进QMenu和QToolBar中
+ *
+ * SARibbonBar和传统方法相似，不过相对于传统的Menu/ToolBar QMenu和QToolBar是平级的，
+ * Ribbon是有明显的层级关系，SARibbonBar下面是 @ref SARibbonCategory，
+ * SARibbonCategory下面是@ref SARibbonPanel ，SARibbonPanel下面是@ref SARibbonToolButton ，
+ * SARibbonToolButton管理着QAction
+ *
+ * 因此，生成一个ribbon只需以下几个函数：
+ * @code
+ * SARibbonCategory * SARibbonBar::addCategoryPage(const QString& title);
+ * SARibbonPanel * SARibbonCategory::addPanel(const QString& title);
+ * SARibbonToolButton * SARibbonPanel::addLargeAction(QAction *action);
+ * SARibbonToolButton * SARibbonPanel::addSmallAction(QAction *action);
+ * @endcode
+ *
+ * 因此生成步骤如下：
+ *
+ * @code
+ * //成员变量
+ * SARibbonCategory* categoryMain;
+ * SARibbonPanel* FilePanel;
+ *
+ * //建立ui
+ * void setupRibbonUi()
+ * {
+ *   ......
+ *   //ribbonwindow为SARibbonMainWindow
+ *   SARibbonBar* ribbon = ribbonwindow->ribbonBar();
+ *   ribbon->setRibbonStyle(SARibbonBar::WpsLiteStyle);
+ *   //添加一个Main标签
+ *   categoryMain = ribbon->addCategoryPage(QStringLiteral("Main"));
+ *   //Main标签下添加一个File Panel
+ *   FilePanel = categoryMain->addPanel(QStringLiteral("FilePanel"));
+ *   //开始为File Panel添加action
+ *   FilePanel->addLargeAction(actionNew);
+ *   FilePanel->addLargeAction(actionOpen);
+ *   FilePanel->addLargeAction(actionSave);
+ *   FilePanel->addSmallAction(actionImportMesh);
+ *   FilePanel->addSmallAction(actionImportGeometry);
+ * }
+ * @endcode
+ * \endif
+ */
 class SA_RIBBON_EXPORT SARibbonBar : public QMenuBar
 {
     Q_OBJECT
