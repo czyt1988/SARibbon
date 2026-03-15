@@ -527,40 +527,84 @@ public:
 Q_SIGNALS:
 
     /**
-     @brief 应用按钮点击响应 - 左上角的按钮，通过关联此信号触发应用按钮点击的效果
-
-     例如想点击按钮后弹出一个全屏的窗口（如office这些）
+     * \if ENGLISH
+     * @brief Application button click response - the button in the top-left corner, connect to this signal to trigger application button click effect
+     *
+     * For example, clicking the button can pop up a full-screen window (like in Office)
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 应用按钮点击响应 - 左上角的按钮，通过关联此信号触发应用按钮点击的效果
+     *
+     * 例如想点击按钮后弹出一个全屏的窗口（如office这些）
+     * \endif
      */
     void applicationButtonClicked();
 
     /**
-     @brief 标签页变化触发的信号
-     @param index
+     * \if ENGLISH
+     * @brief Signal triggered when tab page changes
+     * @param index New tab index
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 标签页变化触发的信号
+     * @param index 新的标签页索引
+     * \endif
      */
     void currentRibbonTabChanged(int index);
 
     /**
-     @brief ribbon的状态发生了变化后触发此信号
-     @param nowState 变更之后的ribbon状态
+     * \if ENGLISH
+     * @brief Signal triggered when ribbon state changes
+     * @param nowState New ribbon state after change
+     * \endif
+     *
+     * \if CHINESE
+     * @brief ribbon的状态发生了变化后触发此信号
+     * @param nowState 变更之后的ribbon状态
+     * \endif
      */
     void ribbonModeChanged(SARibbonBar::RibbonMode nowState);
 
     /**
-     @brief ribbon的状态发生了变化后触发此信号
-     @param nowStyle 变更之后的ribbon样式
+     * \if ENGLISH
+     * @brief Signal triggered when ribbon style changes
+     * @param nowStyle New ribbon style after change
+     * \endif
+     *
+     * \if CHINESE
+     * @brief ribbon的状态发生了变化后触发此信号
+     * @param nowStyle 变更之后的ribbon样式
+     * \endif
      */
     void ribbonStyleChanged(SARibbonBar::RibbonStyles nowStyle);
 
     /**
-       @brief 标题栏高度发生了变化的信号
-       @param oldHeight
-       @param newHeight
+     * \if ENGLISH
+     * @brief Signal triggered when title bar height changes
+     * @param oldHeight Old title bar height
+     * @param newHeight New title bar height
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 标题栏高度发生了变化的信号
+     * @param oldHeight 旧的标题栏高度
+     * @param newHeight 新的标题栏高度
+     * \endif
      */
     void titleBarHeightChanged(int oldHeight, int newHeight);
 
     /**
+     * \if ENGLISH
+     * @brief Signal similar to QToolBar::actionTriggered
+     * @param action Triggered action
+     * \endif
+     *
+     * \if CHINESE
      * @brief 参考QToolBar::actionTriggered的信号
-     * @param action
+     * @param action 触发的action
+     * \endif
      */
     void actionTriggered(QAction* action);
 

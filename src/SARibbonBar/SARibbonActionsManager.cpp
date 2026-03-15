@@ -1,4 +1,4 @@
-﻿#include "SARibbonActionsManager.h"
+#include "SARibbonActionsManager.h"
 #include <QMap>
 #include <QHash>
 #include <QDebug>
@@ -34,21 +34,50 @@ void SARibbonActionsManager::PrivateData::clear()
     mSale = 0;
 }
 
+/**
+ * \if ENGLISH
+ * @brief Constructor
+ * @param bar SARibbonBar pointer
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 构造函数
+ * @param bar SARibbonBar指针
+ * \endif
+ */
 SARibbonActionsManager::SARibbonActionsManager(SARibbonBar* bar)
     : QObject(bar), d_ptr(new SARibbonActionsManager::PrivateData(this))
 {
     autoRegisteActions(bar);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Destructor
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 析构函数
+ * \endif
+ */
 SARibbonActionsManager::~SARibbonActionsManager()
 {
 }
 
 /**
+ * \if ENGLISH
+ * @brief Set the name corresponding to the tag, this allows getting the mapping between tag and text
+ * @param tag Tag value
+ * @param name Tag name
+ * @note In multi-language environments, this needs to be reset when language changes
+ * \endif
+ *
+ * \if CHINESE
  * @brief 设置tag对应的名字，通过这个可以得到tag和文本的映射
- * @param tag
- * @param name
+ * @param tag 标签值
+ * @param name 标签名
  * @note 在支持多语言的环境下，在语言切换时需要重新设置，以更新名字
+ * \endif
  */
 void SARibbonActionsManager::setTagName(int tag, const QString& name)
 {
@@ -56,9 +85,17 @@ void SARibbonActionsManager::setTagName(int tag, const QString& name)
 }
 
 /**
- * @brief 获取tag对应的中文名字
- * @param tag
- * @return
+ * \if ENGLISH
+ * @brief Get the name corresponding to the tag
+ * @param tag Tag value
+ * @return Tag name
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取tag对应的名字
+ * @param tag 标签值
+ * @return 标签名
+ * \endif
  */
 QString SARibbonActionsManager::tagName(int tag) const
 {
@@ -66,9 +103,17 @@ QString SARibbonActionsManager::tagName(int tag) const
 }
 
 /**
+ * \if ENGLISH
+ * @brief Remove tag
+ * @param tag Tag to remove
+ * @note This function is time-consuming
+ * \endif
+ *
+ * \if CHINESE
  * @brief 移除tag
+ * @param tag 要移除的标签
  * @note 注意，这个函数非常耗时
- * @param tag
+ * \endif
  */
 void SARibbonActionsManager::removeTag(int tag)
 {
@@ -100,16 +145,31 @@ void SARibbonActionsManager::removeTag(int tag)
 }
 
 /**
+ * \if ENGLISH
+ * @brief Register action to the manager
+ * @param act Action to register
+ * @param tag Tag can be combined by bitwise OR, see @ref ActionTag.
+ * For custom tags, it's recommended to use values greater than @ref ActionTag::UserDefineActionTag
+ * @param key Key for the action, one key corresponds to one action. Default is QString(), which uses QAction's objectName
+ * @param enableEmit Whether to emit @ref actionTagChanged signal
+ * @return true if registration succeeded
+ * @note Same action registered with different tags can be found by tag, but only the last registered tag can be found by action
+ * @note New tag will trigger actionTagChanged signal
+ * \endif
+ *
+ * \if CHINESE
  * @brief 把action注册到管理器中，实现action的管理
- * @param act
+ * @param act 要注册的action
  * @param tag tag是可以按照位进行叠加，见 @ref ActionTag 如果
  * 要定义自己的标签，建议定义大于@ref ActionTag::UserDefineActionTag 的值，
  * registeAction的tag是直接记录进去的，如果要多个标签并存，在registe之前先或好tag
  * @param key key是action对应的key，一个key只对应一个action，是查找action的关键
  * ,默认情况为一个QString(),这时key是QAction的objectName
  * @param enableEmit 控制是否发射@ref actionTagChanged 信号
+ * @return 注册成功返回true
  * @note 同一个action多次注册不同的tag可以通过tag索引到action，但通过action只能索引到最后一个注册的tag
  * @note tag的新增会触发actionTagChanged信号
+ * \endif
  */
 bool SARibbonActionsManager::registeAction(QAction* act, int tag, const QString& key, bool enableEmit)
 {
@@ -141,12 +201,25 @@ bool SARibbonActionsManager::registeAction(QAction* act, int tag, const QString&
 }
 
 /**
+ * \if ENGLISH
+ * @brief Unregister action
+ *
+ * If the last action corresponding to a tag is removed, the tag will also be deleted
+ * @param act Action to unregister
+ * @param enableEmit Whether to emit signal
+ * @note Tag deletion will trigger actionTagChanged signal
+ * @note If action is associated with multiple tags, the action will be removed from all tags, same for key
+ * \endif
+ *
+ * \if CHINESE
  * @brief 取消action的注册
  *
  * 如果tag对应的最后一个action被撤销，tag也将一块删除
- * @param act
+ * @param act 要取消注册的action
+ * @param enableEmit 是否发射信号
  * @note tag的删除会触发actionTagChanged信号
  * @note 如果action关联了多个tag，这些tag里的action都会被删除，对应的key也同理
+ * \endif
  */
 void SARibbonActionsManager::unregisteAction(QAction* act, bool enableEmit)
 {
@@ -203,9 +276,17 @@ void SARibbonActionsManager::removeAction(QAction* act, bool enableEmit)
 }
 
 /**
- * @brief 等同actions
- * @param tag
- * @return
+ * \if ENGLISH
+ * @brief Equivalent to actions function
+ * @param tag Action tag
+ * @return Reference to action list for the tag
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 等同actions函数
+ * @param tag 动作标签
+ * @return 对应标签的动作列表引用
+ * \endif
  */
 QList< QAction* >& SARibbonActionsManager::filter(int tag)
 {
@@ -213,23 +294,51 @@ QList< QAction* >& SARibbonActionsManager::filter(int tag)
 }
 
 /**
+ * \if ENGLISH
+ * @brief Get actions by tag
+ * @param tag Action tag
+ * @return Reference to action list for the tag
+ * \endif
+ *
+ * \if CHINESE
  * @brief 根据tag得到actions
- * @param tag
- * @return
+ * @param tag 动作标签
+ * @return 对应标签的动作列表引用
+ * \endif
  */
 QList< QAction* >& SARibbonActionsManager::actions(int tag)
 {
     return (d_ptr->mTagToActions[ tag ]);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Get actions by tag (const version)
+ * @param tag Action tag
+ * @return Action list for the tag
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 根据tag得到actions（常量版本）
+ * @param tag 动作标签
+ * @return 对应标签的动作列表
+ * \endif
+ */
 const QList< QAction* > SARibbonActionsManager::actions(int tag) const
 {
     return (d_ptr->mTagToActions[ tag ]);
 }
 
 /**
+ * \if ENGLISH
+ * @brief Get all tags
+ * @return List of all action tags
+ * \endif
+ *
+ * \if CHINESE
  * @brief 获取所有的标签
- * @return
+ * @return 所有动作标签的列表
+ * \endif
  */
 QList< int > SARibbonActionsManager::actionTags() const
 {
@@ -237,9 +346,17 @@ QList< int > SARibbonActionsManager::actionTags() const
 }
 
 /**
+ * \if ENGLISH
+ * @brief Get action by key
+ * @param key Action key
+ * @return Action pointer, returns nullptr if key not found
+ * \endif
+ *
+ * \if CHINESE
  * @brief 通过key获取action
- * @param key
- * @return 如果没有key，返回nullptr
+ * @param key 动作键
+ * @return 动作指针，如果没有key，返回nullptr
+ * \endif
  */
 QAction* SARibbonActionsManager::action(const QString& key) const
 {
@@ -247,9 +364,17 @@ QAction* SARibbonActionsManager::action(const QString& key) const
 }
 
 /**
+ * \if ENGLISH
+ * @brief Get key by action
+ * @param act Action pointer
+ * @return Action key, returns empty QString if action not found
+ * \endif
+ *
+ * \if CHINESE
  * @brief 通过action找到key
- * @param act
- * @return 如果找不到，返回QString()
+ * @param act 动作指针
+ * @return 动作键，如果找不到，返回QString()
+ * \endif
  */
 QString SARibbonActionsManager::key(QAction* act) const
 {
@@ -257,8 +382,15 @@ QString SARibbonActionsManager::key(QAction* act) const
 }
 
 /**
+ * \if ENGLISH
+ * @brief Get count of all managed actions
+ * @return Number of managed actions
+ * \endif
+ *
+ * \if CHINESE
  * @brief 返回所有管理的action数
- * @return
+ * @return 管理的动作数量
+ * \endif
  */
 int SARibbonActionsManager::count() const
 {
@@ -266,8 +398,15 @@ int SARibbonActionsManager::count() const
 }
 
 /**
+ * \if ENGLISH
+ * @brief Get all managed actions
+ * @return List of all managed actions
+ * \endif
+ *
+ * \if CHINESE
  * @brief 返回所有管理的actions
- * @return
+ * @return 所有管理的动作列表
+ * \endif
  */
 QList< QAction* > SARibbonActionsManager::allActions() const
 {

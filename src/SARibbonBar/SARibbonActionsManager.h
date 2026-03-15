@@ -1,4 +1,4 @@
-﻿#ifndef SARIBBONACTIONSMANAGER_H
+#ifndef SARIBBONACTIONSMANAGER_H
 #define SARIBBONACTIONSMANAGER_H
 #include "SARibbonGlobal.h"
 #include <QObject>
@@ -11,27 +11,19 @@ class SARibbonBar;
 class SARibbonCategory;
 
 /**
- * @brief 用于管理SARibbon的所有Action
+ * \if ENGLISH
+ * @brief Manager for all SARibbon actions
  *
- * SARibbonActionsManager维护着两个表，一个是tag（标签）对应的Action list，
- * 一个是所有接受SARibbonActionsManager管理的action list。
+ * SARibbonActionsManager maintains two tables: one for tag-to-action list mapping,
+ * and another for all actions under management.
+ * \endif
  *
- * SARibbonActionsManager的标签对应一组actions，每个标签对应的action可以重复出现，
- * 但SARibbonActionsManager维护的action list里只有一份action，不会重复出现。
+ * \if CHINESE
+ * @brief SARibbon动作管理器
  *
- * tag用于对action list分组，每个tag的实体名字通过@ref setTagName 进行设置，在语言变化时需要及时调用
- * setTagName设置新的标签对应的文本。
- *
- * SARibbonActionsManager默认预设了6个常用标签见@ref SARibbonActionsManager::ActionTag ，用户自定义标签需要在
- * SARibbonActionsManager::UserDefineActionTag值的基础上进行累加。
- *
- * @ref filter （等同@ref actions ）函数用于提取标签管理的action list，@ref allActions 函数返回SARibbonActionsManager
- * 管理的所有标签。
- *
- * 通过@ref autoRegisteActions 函数可以快速的建立action的管理，此函数会遍历@ref SARibbonBar下所有@ref SARibbonPanel
- * 添加的action,并给予Category建立tag，正常使用用户仅需关注此autoRegisteActions函数即可
- *
- *
+ * SARibbonActionsManager维护两个表：一个用于标签到动作列表的映射，
+ * 另一个用于管理下的所有动作。
+ * \endif
  */
 class SA_RIBBON_EXPORT SARibbonActionsManager : public QObject
 {
@@ -40,76 +32,87 @@ class SA_RIBBON_EXPORT SARibbonActionsManager : public QObject
 	friend class SARibbonActionsManagerModel;
 
 public:
-	/**
-	 * @brief 定义action的标签
-	 */
+	/// Action tag definition
 	enum ActionTag
 	{
-		UnknowActionTag              = 0,     ///< 未知的tag
-		CommonlyUsedActionTag        = 0x01,  ///< 预设tag-常用命令
-		NotInFunctionalAreaActionTag = 0x02,  ///< 预设tag-不在功能区命令
-		AutoCategoryDistinguishBeginTag = 0x1000,  ///< 自动按Category划分的标签起始，在@ref autoRegisteActions 函数会用到
-		AutoCategoryDistinguishEndTag = 0x2000,  ///< 自动按Category划分的标签结束，在@ref autoRegisteActions 函数会用到
-		NotInRibbonCategoryTag = 0x2001,  ///< 不在功能区的标签@ref autoRegisteActions 函数会遍历所有category的action
-		UserDefineActionTag = 0x8000  ///< 自定义标签，所有用户自定义tag要大于此tag
+		UnknowActionTag              = 0,     ///< Unknown tag
+		CommonlyUsedActionTag        = 0x01,  ///< Preset tag - commonly used commands
+		NotInFunctionalAreaActionTag = 0x02,  ///< Preset tag - commands not in functional area
+		AutoCategoryDistinguishBeginTag = 0x1000,  ///< Auto category distinguish begin tag
+		AutoCategoryDistinguishEndTag = 0x2000,  ///< Auto category distinguish end tag
+		NotInRibbonCategoryTag = 0x2001,  ///< Tag for actions not in ribbon category
+		UserDefineActionTag = 0x8000  ///< User defined tag, all custom tags should be greater than this
 	};
+	/// Constructor
 	explicit SARibbonActionsManager(SARibbonBar* bar);
+	/// Destructor
 	~SARibbonActionsManager();
-	// 设置tag对应的名字
+	/// Set tag name
 	void setTagName(int tag, const QString& name);
 
-	// 获取tag对应的名字
+	/// Get tag name
 	QString tagName(int tag) const;
 
-	// 移除tag，注意，这个函数非常耗时
+	/// Remove tag, note this function is time-consuming
 	void removeTag(int tag);
 
-	// 注册action
+	/// Register action
 	bool registeAction(QAction* act, int tag, const QString& key = QString(), bool enableEmit = true);
 
-	// 取消action的注册
+	/// Unregister action
 	void unregisteAction(QAction* act, bool enableEmit = true);
 
-	// 过滤得到actions对应的引用，实际是一个迭代器
+	/// Filter actions by tag, returns a reference
 	QList< QAction* >& filter(int tag);
 
-	// 通过tag筛选出系列action
+	/// Get actions by tag
 	QList< QAction* >& actions(int tag);
+	/// Get actions by tag (const version)
 	const QList< QAction* > actions(int tag) const;
 
-	// 获取所有的标签
+	/// Get all tags
 	QList< int > actionTags() const;
 
-	// 通过key获取action
+	/// Get action by key
 	QAction* action(const QString& key) const;
 
-	// 通过action找到key
+	/// Get key by action
 	QString key(QAction* act) const;
 
-	// 返回所有管理的action数
+	/// Get count of all managed actions
 	int count() const;
 
-	// 返回所有管理的actions
+	/// Get all managed actions
 	QList< QAction* > allActions() const;
 
-	// 自动加载action,返回tag对应的Category指针
+	/// Auto register actions from SARibbonBar, returns tag-to-category mapping
 	QMap< int, SARibbonCategory* > autoRegisteActions(SARibbonBar* bar);
 
-	// 自动加载widget下的actions函数返回的action,返回加载的数量，这些
+	/// Auto register widget actions
 	QSet< QAction* > autoRegisteWidgetActions(QWidget* w, int tag, bool enableEmit = false);
 
-	// 根据标题查找action
+	/// Search actions by text
 	QList< QAction* > search(const QString& text);
 
-	// 清除
+	/// Clear all
 	void clear();
 
 Q_SIGNALS:
 
 	/**
-	 * @brief 标签变化触发的信号，变化包括新增和删除
-	 */
-	void actionTagChanged(int tag, bool isdelete);
+     * \if ENGLISH
+     * @brief Signal emitted when action tag changed
+     * @param tag Changed tag
+     * @param isdelete Whether the tag is deleted (true) or added (false)
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 当action标签发生变化时发射的信号
+     * @param tag 发生变化的标签
+     * @param isdelete 标签是否被删除（true表示删除，false表示添加）
+     * \endif
+     */
+    void actionTagChanged(int tag, bool isdelete);
 
 private Q_SLOTS:
 	void onActionDestroyed(QObject* o);
@@ -120,25 +123,44 @@ private:
 };
 
 /**
- * @brief SARibbonActionsManager 对应的model
+ * \if ENGLISH
+ * @brief Model for SARibbonActionsManager
+ * \endif
+ *
+ * \if CHINESE
+ * @brief SARibbonActionsManager的模型类
+ * \endif
  */
 class SA_RIBBON_EXPORT SARibbonActionsManagerModel : public QAbstractListModel
 {
 	Q_OBJECT
 	SA_RIBBON_DECLARE_PRIVATE(SARibbonActionsManagerModel)
 public:
+	/// Constructor
 	explicit SARibbonActionsManagerModel(QObject* p = nullptr);
+	/// Constructor with SARibbonActionsManager
 	explicit SARibbonActionsManagerModel(SARibbonActionsManager* m, QObject* p = nullptr);
+	/// Destructor
 	~SARibbonActionsManagerModel();
+	/// Get row count
 	virtual int rowCount(const QModelIndex& parent) const override;
+	/// Get header data
 	virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
+	/// Get item flags
 	virtual Qt::ItemFlags flags(const QModelIndex& index) const override;
+	/// Get data
 	virtual QVariant data(const QModelIndex& index, int role) const override;
+	/// Set filter tag
 	void setFilter(int tag);
+	/// Update model
 	void update();
+	/// Setup actions manager
 	void setupActionsManager(SARibbonActionsManager* m);
+	/// Uninstall actions manager
 	void uninstallActionsManager();
+	/// Get action from model index
 	QAction* indexToAction(QModelIndex index) const;
+	/// Search actions
 	void search(const QString& text);
 
 private Q_SLOTS:
