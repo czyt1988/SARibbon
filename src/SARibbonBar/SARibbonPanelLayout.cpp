@@ -353,6 +353,10 @@ void SARibbonPanelLayout::doLayout()
     if (isDirty()) {
         updateGeomArray();
     }
+    QWidget* par = parentWidget();
+    if (!par) {
+        return;
+    }
     QList< QWidget* > showWidgets, hideWidgets;
     for (SARibbonPanelItem* item : sa_as_const(mItems)) {
         if (item->isEmpty()) {
@@ -380,18 +384,21 @@ void SARibbonPanelLayout::doLayout()
     // 布局label
     if (mTitleLabel) {
         if (isEnableShowPanelTitle()) {
-            if (mTitleLabel->isHidden()) {
+            mTitleLabel->setGeometry(mTitleLabelGeometry);
+            if (!mTitleLabel->isVisibleTo(par)) {
                 mTitleLabel->show();
             }
-            mTitleLabel->setGeometry(mTitleLabelGeometry);
         } else {
-            if (mTitleLabel->isVisible()) {
+            if (mTitleLabel->isVisibleTo(par)) {
                 mTitleLabel->hide();
             }
         }
     }
     // 布局m_optionActionBtn
     if (mOptionActionBtn) {
+        if (!mOptionActionBtn->isVisibleTo(par)) {
+            mOptionActionBtn->show();
+        }
         mOptionActionBtn->setGeometry(mOptionActionBtnGeometry);
         mOptionActionBtn->setIconSize(QSize(mOptionActionBtnGeometry.width(), mOptionActionBtnGeometry.height()));
     }
