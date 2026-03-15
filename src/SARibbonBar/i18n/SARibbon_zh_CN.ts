@@ -70,7 +70,7 @@
 <context>
     <name>SARibbonActionsManager</name>
     <message>
-        <location filename="../SARibbonActionsManager.cpp" line="335"/>
+        <location filename="../SARibbonActionsManager.cpp" line="474"/>
         <source>not in ribbon</source>
         <translation>不在ribbon</translation>
     </message>
@@ -78,7 +78,7 @@
 <context>
     <name>SARibbonActionsManagerModel</name>
     <message>
-        <location filename="../SARibbonActionsManager.cpp" line="529"/>
+        <location filename="../SARibbonActionsManager.cpp" line="668"/>
         <source>action name</source>
         <translation>动作名称</translation>
     </message>
@@ -235,12 +235,12 @@
 <context>
     <name>SARibbonSystemButtonBar</name>
     <message>
-        <location filename="../SARibbonSystemButtonBar.cpp" line="314"/>
+        <location filename="../SARibbonSystemButtonBar.cpp" line="448"/>
         <source>Restore</source>
         <translation>恢复</translation>
     </message>
     <message>
-        <location filename="../SARibbonSystemButtonBar.cpp" line="314"/>
+        <location filename="../SARibbonSystemButtonBar.cpp" line="448"/>
         <source>Maximize</source>
         <translation>最大化</translation>
     </message>
