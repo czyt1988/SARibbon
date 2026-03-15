@@ -1,20 +1,27 @@
-﻿#ifndef SARIBBONTOOLBUTTON_H
+#ifndef SARIBBONTOOLBUTTON_H
 #define SARIBBONTOOLBUTTON_H
 #include "SARibbonGlobal.h"
 #include <QToolButton>
 #include <QDebug>
 /**
- * @brief Ribbon interface adapted tool button / Ribbon界面适用的toolButton
+ * \if ENGLISH
+ * @brief Ribbon interface adapted tool button
  *
  * This button is designed specifically for the Ribbon interface, supporting two display modes: large buttons and small
  * buttons. It also supports automatic text wrapping for large buttons to optimize space usage.
+ *
+ * @note The icon size is dynamically adjusted according to the button size and cannot be set manually via `setIconSize`
+ * \endif
+ *
+ * \if CHINESE
+ * @brief Ribbon界面适用的toolButton
  *
  * 该按钮专为Ribbon界面设计，支持大按钮和小按钮两种显示模式。
  * 图标尺寸会根据按钮尺寸动态调整，无法通过 `setIconSize` 手动设置。
  * 大按钮模式下还支持文字自动换行，以优化空间利用。
  *
- * @note The icon size is dynamically adjusted according to the button size and cannot be set manually via
- * `setIconSize` / `setIconSize` 函数不在起作用，iconsize是根据当前尺寸动态调整的
+ * @note `setIconSize` 函数不在起作用，iconsize是根据当前尺寸动态调整的
+ * \endif
  */
 class SA_RIBBON_EXPORT SARibbonToolButton : public QToolButton
 {
@@ -93,28 +100,29 @@ public:
     explicit SARibbonToolButton(QAction* defaultAction, QWidget* parent = nullptr);
     ~SARibbonToolButton();
 
-    // Gets the current button type (LargeButton or SmallButton) / 获取当前按钮的类型（大按钮或小按钮）
+    /// Get the current button type (LargeButton or SmallButton)
     RibbonButtonType buttonType() const;
-    // Sets the button type to LargeButton or SmallButton / 设置按钮类型为大按钮或小按钮
+    /// Set the button type to LargeButton or SmallButton
     void setButtonType(const RibbonButtonType& buttonType);
 
-    // Checks if the button is a small ribbon button / 判断按钮是否为小Ribbon按钮
+    /// Check if the button is a small ribbon button
     bool isSmallRibbonButton() const;
-    //  Checks if the button is a large ribbon button / 判断按钮是否为大Ribbon按钮
+    /// Check if the button is a large ribbon button
     bool isLargeRibbonButton() const;
 
-    // Gets the current spacing value / 获取当前的间距值
+    /// Get the current spacing value
     int spacing() const;
-    // Sets the spacing between elements and the border / 设置元素与边框之间的间距
+    /// Set the spacing between elements and the border
     void setSpacing(int v);
 
-    // Forces an update of the internal layout rectangles / 强制更新内部布局矩形
+    /// Force an update of the internal layout rectangles
     void updateRect();
 
-    // Sets the layout factor for fine-tuning the button's appearance / 设置布局系数以微调按钮外观
+    /// Set the layout factor for fine-tuning the button's appearance
     void setLayoutFactor(const LayoutFactor& fac);
-    // layout factor for fine-tuning the button's appearance / 布局系数以微调按钮外观
+    /// Get the layout factor for fine-tuning the button's appearance (const version)
     const LayoutFactor& layoutFactor() const;
+    /// Get the layout factor for fine-tuning the button's appearance (non-const version)
     LayoutFactor& layoutFactor();
 
     // Enables or disables automatic text wrapping for large buttons / 为大按钮启用或禁用自动文字换行

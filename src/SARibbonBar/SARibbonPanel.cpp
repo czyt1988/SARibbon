@@ -146,6 +146,17 @@ void SARibbonPanel::PrivateData::setPanelName(const QString& title)
  * @param parent 父窗口部件
  * \endif
  */
+/**
+ * \if ENGLISH
+ * @brief Constructor for SARibbonPanel
+ * @param parent Parent widget
+ * \endif
+ *
+ * \if CHINESE
+ * @brief SARibbonPanel构造函数
+ * @param parent 父窗口部件
+ * \endif
+ */
 SARibbonPanel::SARibbonPanel(QWidget* parent) : QFrame(parent), d_ptr(new SARibbonPanel::PrivateData(this))
 {
     setPanelLayoutMode(ThreeRowMode);

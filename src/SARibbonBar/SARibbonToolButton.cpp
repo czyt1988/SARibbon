@@ -1,4 +1,4 @@
-﻿#include "SARibbonToolButton.h"
+#include "SARibbonToolButton.h"
 #include "SARibbonPanel.h"
 
 #include <QAction>
@@ -838,6 +838,17 @@ QString SARibbonToolButton::PrivateData::simplifiedForRibbonButton(const QString
 // SARibbonToolButton
 //===================================================
 
+/**
+ * \if ENGLISH
+ * @brief Constructor for SARibbonToolButton
+ * @param parent Parent widget
+ * \endif
+ *
+ * \if CHINESE
+ * @brief SARibbonToolButton构造函数
+ * @param parent 父窗口部件
+ * \endif
+ */
 SARibbonToolButton::SARibbonToolButton(QWidget* parent)
     : QToolButton(parent), d_ptr(new SARibbonToolButton::PrivateData(this))
 {
@@ -853,6 +864,19 @@ SARibbonToolButton::SARibbonToolButton(QWidget* parent)
     setMouseTracking(true);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Constructor for SARibbonToolButton with default action
+ * @param defaultAction Default action for the button
+ * @param parent Parent widget
+ * \endif
+ *
+ * \if CHINESE
+ * @brief SARibbonToolButton构造函数（带默认动作）
+ * @param defaultAction 按钮的默认动作
+ * @param parent 父窗口部件
+ * \endif
+ */
 SARibbonToolButton::SARibbonToolButton(QAction* defaultAction, QWidget* parent)
     : QToolButton(parent), d_ptr(new SARibbonToolButton::PrivateData(this))
 {
@@ -863,6 +887,15 @@ SARibbonToolButton::SARibbonToolButton(QAction* defaultAction, QWidget* parent)
     setMouseTracking(true);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Destructor for SARibbonToolButton
+ * \endif
+ *
+ * \if CHINESE
+ * @brief SARibbonToolButton析构函数
+ * \endif
+ */
 SARibbonToolButton::~SARibbonToolButton()
 {
 }
@@ -919,23 +952,41 @@ SARibbonToolButton::LayoutFactor& SARibbonToolButton::layoutFactor()
  * @return The current button type / 当前按钮类型
  * @sa setButtonType
  */
+/**
+ * \if ENGLISH
+ * @brief Get the current button type
+ * @return Current button type (LargeButton or SmallButton)
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取当前按钮的类型
+ * @return 当前按钮类型（大按钮或小按钮）
+ * \endif
+ */
 SARibbonToolButton::RibbonButtonType SARibbonToolButton::buttonType() const
 {
     return (d_ptr->mButtonType);
 }
 
 /**
- * @brief Sets the button type to LargeButton or SmallButton / 设置按钮类型为大按钮或小按钮
+ * \if ENGLISH
+ * @brief Sets the button type to LargeButton or SmallButton
  *
  * Changing the button type will invalidate the size hint and trigger a relayout.
  * Note: This function may override the tool button style. If you need to set a specific style (e.g.,
  * Qt::ToolButtonIconOnly), do so after calling this function.
+ * @param buttonType The new button type
+ * @sa isLargeRibbonButton, isSmallRibbonButton
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置按钮类型为大按钮或小按钮
  *
  * 设置按钮类型会令尺寸提示失效并触发重新布局。
  * 注意：此函数可能会覆盖工具按钮样式。如需设置特定样式（例如 Qt::ToolButtonIconOnly），请在此函数调用之后设置。
- *
- * @param buttonType The new button type / 新的按钮类型
+ * @param buttonType 新的按钮类型
  * @sa isLargeRibbonButton, isSmallRibbonButton
+ * \endif
  */
 void SARibbonToolButton::setButtonType(const RibbonButtonType& buttonType)
 {
