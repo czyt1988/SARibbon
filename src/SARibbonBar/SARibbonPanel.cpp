@@ -1,4 +1,4 @@
-﻿#include "SARibbonPanel.h"
+#include "SARibbonPanel.h"
 #include "SARibbonCategory.h"
 #include "SARibbonElementManager.h"
 #include "SARibbonGallery.h"
@@ -65,7 +65,7 @@ public:
 public:
     bool m_isCanCustomize { true };                                                    ///< 记录是否可自定义
     SARibbonPanel::PanelLayoutMode m_panelLayoutMode { SARibbonPanel::ThreeRowMode };  ///< panel的布局模式，默认为3行模式ThreeRowMode
-    SARibbonPanelOptionButton* m_optionActionButton { nullptr };  ///< 标题栏的y距离
+    SARibbonPanelOptionButton* m_optionActionButton { nullptr };                       ///< 标题栏的y距离
     SARibbonPanelLabel* m_label { nullptr };
 };
 
@@ -136,8 +136,15 @@ void SARibbonPanel::PrivateData::setPanelName(const QString& title)
 //==================================================
 
 /**
- * @brief Constructs a SARibbonPanel with the given parent / 使用给定的父对象构造SARibbonPanel
- * @param parent The parent widget / 父窗口部件
+ * \if ENGLISH
+ * @brief Constructs a SARibbonPanel with the given parent
+ * @param parent The parent widget
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 使用给定的父对象构造SARibbonPanel
+ * @param parent 父窗口部件
+ * \endif
  */
 SARibbonPanel::SARibbonPanel(QWidget* parent) : QFrame(parent), d_ptr(new SARibbonPanel::PrivateData(this))
 {
@@ -145,9 +152,17 @@ SARibbonPanel::SARibbonPanel(QWidget* parent) : QFrame(parent), d_ptr(new SARibb
 }
 
 /**
- * @brief Constructs a SARibbonPanel with a name and the given parent / 使用名称和给定的父对象构造SARibbonPanel
- * @param name The panel's display name / 面板的显示名称
- * @param parent The parent widget / 父窗口部件
+ * \if ENGLISH
+ * @brief Constructs a SARibbonPanel with a name and the given parent
+ * @param name The panel's display name
+ * @param parent The parent widget
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 使用名称和给定的父对象构造SARibbonPanel
+ * @param name 面板的显示名称
+ * @param parent 父窗口部件
+ * \endif
  */
 SARibbonPanel::SARibbonPanel(const QString& name, QWidget* parent)
     : QFrame(parent), d_ptr(new SARibbonPanel::PrivateData(this))
@@ -156,22 +171,41 @@ SARibbonPanel::SARibbonPanel(const QString& name, QWidget* parent)
     setPanelName(name);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Destructor
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 析构函数
+ * \endif
+ */
 SARibbonPanel::~SARibbonPanel()
 {
 }
 
 /**
- * @brief Sets the row proportion property for an action / 为一个action设置行占比属性
+ * \if ENGLISH
+ * @brief Sets the row proportion property for an action
  *
  * This property determines how much vertical space the corresponding button will occupy within the panel.
  * It should be set before adding the action to the panel.
  *
+ * @param action The action to modify
+ * @param rp The row proportion (Large, Medium, Small)
+ * @sa addAction, getActionRowProportionProperty
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 为一个action设置行占比属性
+ *
  * 此属性决定了对应按钮在面板内占据的垂直空间比例。
  * 应在将action添加到面板之前设置。
  *
- * @param action The action to modify / 要修改的action
- * @param rp The row proportion (Large, Medium, Small) / 行占比（大、中、小）
+ * @param action 要修改的action
+ * @param rp 行占比（大、中、小）
  * @sa addAction, getActionRowProportionProperty
+ * \endif
  */
 void SARibbonPanel::setActionRowProportionProperty(QAction* action, SARibbonPanelItem::RowProportion rp)
 {
@@ -180,10 +214,19 @@ void SARibbonPanel::setActionRowProportionProperty(QAction* action, SARibbonPane
 }
 
 /**
- * @brief Gets the row proportion property from an action / 从一个action获取行占比属性
- * @param action The action to query / 要查询的action
- * @return The row proportion, defaults to Large if not set / 行占比，如果未设置则默认为Large
+ * \if ENGLISH
+ * @brief Gets the row proportion property from an action
+ * @param action The action to query
+ * @return The row proportion, defaults to Large if not set
  * @sa setActionRowProportionProperty
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 从一个action获取行占比属性
+ * @param action 要查询的action
+ * @return 行占比，如果未设置则默认为Large
+ * @sa setActionRowProportionProperty
+ * \endif
  */
 SARibbonPanelItem::RowProportion SARibbonPanel::getActionRowProportionProperty(QAction* action)
 {
@@ -197,10 +240,19 @@ SARibbonPanelItem::RowProportion SARibbonPanel::getActionRowProportionProperty(Q
 }
 
 /**
- * @brief Sets the ToolButtonPopupMode property for an action / 为一个action设置ToolButtonPopupMode属性
- * @param action The action to modify / 要修改的action
- * @param popMode The popup mode (e.g., InstantPopup, MenuButtonPopup) / 弹出模式（例如，InstantPopup, MenuButtonPopup）
+ * \if ENGLISH
+ * @brief Sets the ToolButtonPopupMode property for an action
+ * @param action The action to modify
+ * @param popMode The popup mode (e.g., InstantPopup, MenuButtonPopup)
  * @sa getActionToolButtonPopupModeProperty
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 为一个action设置ToolButtonPopupMode属性
+ * @param action 要修改的action
+ * @param popMode 弹出模式（例如，InstantPopup, MenuButtonPopup）
+ * @sa getActionToolButtonPopupModeProperty
+ * \endif
  */
 void SARibbonPanel::setActionToolButtonPopupModeProperty(QAction* action, QToolButton::ToolButtonPopupMode popMode)
 {
@@ -209,10 +261,19 @@ void SARibbonPanel::setActionToolButtonPopupModeProperty(QAction* action, QToolB
 }
 
 /**
- * @brief Gets the ToolButtonPopupMode property from an action / 从一个action获取ToolButtonPopupMode属性
- * @param action The action to query / 要查询的action
- * @return The popup mode, defaults to InstantPopup if not set / 弹出模式，如果未设置则默认为InstantPopup
+ * \if ENGLISH
+ * @brief Gets the ToolButtonPopupMode property from an action
+ * @param action The action to query
+ * @return The popup mode, defaults to InstantPopup if not set
  * @sa setActionToolButtonPopupModeProperty
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 从一个action获取ToolButtonPopupMode属性
+ * @param action 要查询的action
+ * @return 弹出模式，如果未设置则默认为InstantPopup
+ * @sa setActionToolButtonPopupModeProperty
+ * \endif
  */
 QToolButton::ToolButtonPopupMode SARibbonPanel::getActionToolButtonPopupModeProperty(QAction* action)
 {
@@ -226,11 +287,19 @@ QToolButton::ToolButtonPopupMode SARibbonPanel::getActionToolButtonPopupModeProp
 }
 
 /**
- * @brief Sets the ToolButtonStyle property for an action / 为一个action设置ToolButtonStyle属性
- * @param action The action to modify / 要修改的action
- * @param buttonStyle The button style (e.g., ToolButtonIconOnly, ToolButtonTextBesideIcon) /
- * 按钮样式（例如，ToolButtonIconOnly, ToolButtonTextBesideIcon）
+ * \if ENGLISH
+ * @brief Sets the ToolButtonStyle property for an action
+ * @param action The action to modify
+ * @param buttonStyle The button style (e.g., ToolButtonIconOnly, ToolButtonTextBesideIcon)
  * @sa getActionToolButtonStyleProperty
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 为一个action设置ToolButtonStyle属性
+ * @param action 要修改的action
+ * @param buttonStyle 按钮样式（例如，ToolButtonIconOnly, ToolButtonTextBesideIcon）
+ * @sa getActionToolButtonStyleProperty
+ * \endif
  */
 void SARibbonPanel::setActionToolButtonStyleProperty(QAction* action, Qt::ToolButtonStyle buttonStyle)
 {
@@ -239,10 +308,19 @@ void SARibbonPanel::setActionToolButtonStyleProperty(QAction* action, Qt::ToolBu
 }
 
 /**
- * @brief Gets the ToolButtonStyle property from an action / 从一个action获取ToolButtonStyle属性
- * @param action The action to query / 要查询的action
- * @return The button style, defaults to ToolButtonIconOnly if not set / 按钮样式，如果未设置则默认为ToolButtonIconOnly
+ * \if ENGLISH
+ * @brief Gets the ToolButtonStyle property from an action
+ * @param action The action to query
+ * @return The button style, defaults to ToolButtonIconOnly if not set
  * @sa setActionToolButtonStyleProperty
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 从一个action获取ToolButtonStyle属性
+ * @param action 要查询的action
+ * @return 按钮样式，如果未设置则默认为ToolButtonIconOnly
+ * @sa setActionToolButtonStyleProperty
+ * \endif
  */
 Qt::ToolButtonStyle SARibbonPanel::getActionToolButtonStyleProperty(QAction* action)
 {
@@ -256,16 +334,26 @@ Qt::ToolButtonStyle SARibbonPanel::getActionToolButtonStyleProperty(QAction* act
 }
 
 /**
- * @brief Adds an action to the panel / 向面板添加一个action
+ * \if ENGLISH
+ * @brief Adds an action to the panel
  *
  * This is the primary method for populating the panel. The button created for this action will use the
  * row proportion and popup mode previously set via the static property functions.
  *
+ * @param action The action to add
+ * @param rp The row proportion for this action
+ * @sa addLargeAction, addMediumAction, addSmallAction
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 向面板添加一个action
+ *
  * 这是填充面板的主要方法。为此action创建的按钮将使用之前通过静态属性函数设置的行占比和弹出模式。
  *
- * @param action The action to add / 要添加的action
- * @param rp The row proportion for this action / 此action的行占比
+ * @param action 要添加的action
+ * @param rp 此action的行占比
  * @sa addLargeAction, addMediumAction, addSmallAction
+ * \endif
  */
 void SARibbonPanel::addAction(QAction* action, SARibbonPanelItem::RowProportion rowProportion)
 {
@@ -275,10 +363,19 @@ void SARibbonPanel::addAction(QAction* action, SARibbonPanelItem::RowProportion 
 }
 
 /**
- * @brief Adds an action with a specified popup mode / 添加一个具有指定弹出模式的action
- * @param act The action to add / 要添加的action
- * @param popMode The popup mode for the button / 按钮的弹出模式
- * @param rp The row proportion for this action / 此action的行占比
+ * \if ENGLISH
+ * @brief Adds an action with a specified popup mode
+ * @param act The action to add
+ * @param popMode The popup mode for the button
+ * @param rp The row proportion for this action
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 添加一个具有指定弹出模式的action
+ * @param act 要添加的action
+ * @param popMode 按钮的弹出模式
+ * @param rp 此action的行占比
+ * \endif
  */
 void SARibbonPanel::addAction(QAction* act,
                               QToolButton::ToolButtonPopupMode popMode,
@@ -291,8 +388,15 @@ void SARibbonPanel::addAction(QAction* act,
 }
 
 /**
- * @brief Adds a large action (occupies full height) / 添加一个大action（占据整个高度）
- * @param action The action to add / 要添加的action
+ * \if ENGLISH
+ * @brief Adds a large action (occupies full height)
+ * @param action The action to add
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 添加一个大action（占据整个高度）
+ * @param action 要添加的action
+ * \endif
  */
 void SARibbonPanel::addLargeAction(QAction* action)
 {
@@ -300,13 +404,21 @@ void SARibbonPanel::addLargeAction(QAction* action)
 }
 
 /**
- * @brief Adds a medium action / 添加一个中等action
+ * \if ENGLISH
+ * @brief Adds a medium action
  *
  * In ThreeRowMode, a medium action occupies two rows. In TwoRowMode, it is equivalent to a small action.
  *
+ * @param action The action to add
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 添加一个中等action
+ *
  * 在三行模式下，中等action占据两行。在两行模式下，它等同于一个小action。
  *
- * @param action The action to add / 要添加的action
+ * @param action 要添加的action
+ * \endif
  */
 void SARibbonPanel::addMediumAction(QAction* action)
 {
@@ -314,8 +426,15 @@ void SARibbonPanel::addMediumAction(QAction* action)
 }
 
 /**
- * @brief Adds a small action / 添加一个小action
- * @param action The action to add / 要添加的action
+ * \if ENGLISH
+ * @brief Adds a small action
+ * @param action The action to add
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 添加一个小action
+ * @param action 要添加的action
+ * \endif
  */
 void SARibbonPanel::addSmallAction(QAction* action)
 {
@@ -323,9 +442,17 @@ void SARibbonPanel::addSmallAction(QAction* action)
 }
 
 /**
- * @brief Adds a small action with a specified popup mode / 添加一个具有指定弹出模式的小action
- * @param action The action to add / 要添加的action
- * @param popMode The popup mode for the button / 按钮的弹出模式
+ * \if ENGLISH
+ * @brief Adds a small action with a specified popup mode
+ * @param action The action to add
+ * @param popMode The popup mode for the button
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 添加一个具有指定弹出模式的小action
+ * @param action 要添加的action
+ * @param popMode 按钮的弹出模式
+ * \endif
  */
 void SARibbonPanel::addSmallAction(QAction* action, QToolButton::ToolButtonPopupMode popMode)
 {
@@ -333,9 +460,17 @@ void SARibbonPanel::addSmallAction(QAction* action, QToolButton::ToolButtonPopup
 }
 
 /**
- * @brief Adds a large action with a specified popup mode / 添加一个具有指定弹出模式的大action
- * @param action The action to add / 要添加的action
- * @param popMode The popup mode for the button / 按钮的弹出模式
+ * \if ENGLISH
+ * @brief Adds a large action with a specified popup mode
+ * @param action The action to add
+ * @param popMode The popup mode for the button
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 添加一个具有指定弹出模式的大action
+ * @param action 要添加的action
+ * @param popMode 按钮的弹出模式
+ * \endif
  */
 void SARibbonPanel::addLargeAction(QAction* action, QToolButton::ToolButtonPopupMode popMode)
 {
@@ -343,9 +478,17 @@ void SARibbonPanel::addLargeAction(QAction* action, QToolButton::ToolButtonPopup
 }
 
 /**
- * @brief Adds a medium action with a specified popup mode / 添加一个具有指定弹出模式的中等action
- * @param action The action to add / 要添加的action
- * @param popMode The popup mode for the button / 按钮的弹出模式
+ * \if ENGLISH
+ * @brief Adds a medium action with a specified popup mode
+ * @param action The action to add
+ * @param popMode The popup mode for the button
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 添加一个具有指定弹出模式的中等action
+ * @param action 要添加的action
+ * @param popMode 按钮的弹出模式
+ * \endif
  */
 void SARibbonPanel::addMediumAction(QAction* action, QToolButton::ToolButtonPopupMode popMode)
 {
@@ -353,19 +496,31 @@ void SARibbonPanel::addMediumAction(QAction* action, QToolButton::ToolButtonPopu
 }
 
 /**
- * @brief Creates and adds a new action / 创建并添加一个新的action
+ * \if ENGLISH
+ * @brief Creates and adds a new action
  *
  * This is a convenience function that creates a new `QAction`, sets its properties, and adds it to the panel.
  * The panel will take ownership of the action.
  *
+ * @param text The action's text
+ * @param icon The action's icon
+ * @param popMode The button's popup mode
+ * @param rp The action's row proportion
+ * @return The newly created action
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 创建并添加一个新的action
+ *
  * 这是一个便捷函数，用于创建一个新的 `QAction`，设置其属性，并将其添加到面板。
  * 面板将拥有此action的所有权。
  *
- * @param text The action's text / action的文字
- * @param icon The action's icon / action的图标
- * @param popMode The button's popup mode / 按钮的弹出模式
- * @param rp The action's row proportion / action的行占比
- * @return The newly created action / 新创建的action
+ * @param text action的文字
+ * @param icon action的图标
+ * @param popMode 按钮的弹出模式
+ * @param rp action的行占比
+ * @return 新创建的action
+ * \endif
  */
 QAction* SARibbonPanel::addAction(const QString& text,
                                   const QIcon& icon,
@@ -378,12 +533,22 @@ QAction* SARibbonPanel::addAction(const QString& text,
 }
 
 /**
- * @brief Adds a menu to the panel / 向面板添加一个菜单
- * @param menu The menu to add / 要添加的菜单
- * @param rp The row proportion for the menu button / 菜单按钮的行占比
- * @param popMode The popup mode, defaults to InstantPopup / 弹出模式，默认为InstantPopup
- * @note 本函数会修改 menu->menuAction() 的部分属性（icon/text/objectName），如需保留自定义值，请提前设置。
+ * \if ENGLISH
+ * @brief Adds a menu to the panel
+ * @param menu The menu to add
+ * @param rp The row proportion for the menu button
+ * @param popMode The popup mode, defaults to InstantPopup
+ * @note This function will modify some properties of menu->menuAction() (icon/text/objectName). If you need to preserve
+ * custom values, please set them in advance.
+ * \endif
  *
+ * \if CHINESE
+ * @brief 向面板添加一个菜单
+ * @param menu 要添加的菜单
+ * @param rp 菜单按钮的行占比
+ * @param popMode 弹出模式，默认为InstantPopup
+ * @note 本函数会修改 menu->menuAction() 的部分属性（icon/text/objectName），如需保留自定义值，请提前设置。
+ * \endif
  */
 void SARibbonPanel::addMenu(QMenu* menu, SARibbonPanelItem::RowProportion rowProportion, QToolButton::ToolButtonPopupMode popMode)
 {
@@ -403,9 +568,17 @@ void SARibbonPanel::addMenu(QMenu* menu, SARibbonPanelItem::RowProportion rowPro
 }
 
 /**
- * @brief Adds a menu as a large button / 以大按钮形式添加一个菜单
- * @param menu The menu to add / 要添加的菜单
- * @param popMode The popup mode / 弹出模式
+ * \if ENGLISH
+ * @brief Adds a menu as a large button
+ * @param menu The menu to add
+ * @param popMode The popup mode
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 以大按钮形式添加一个菜单
+ * @param menu 要添加的菜单
+ * @param popMode 弹出模式
+ * \endif
  */
 void SARibbonPanel::addLargeMenu(QMenu* menu, QToolButton::ToolButtonPopupMode popMode)
 {
@@ -413,9 +586,17 @@ void SARibbonPanel::addLargeMenu(QMenu* menu, QToolButton::ToolButtonPopupMode p
 }
 
 /**
- * @brief Adds a menu as a medium button / 以中按钮形式添加一个菜单
- * @param menu The menu to add / 要添加的菜单
- * @param popMode The popup mode / 弹出模式
+ * \if ENGLISH
+ * @brief Adds a menu as a medium button
+ * @param menu The menu to add
+ * @param popMode The popup mode
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 以中按钮形式添加一个菜单
+ * @param menu 要添加的菜单
+ * @param popMode 弹出模式
+ * \endif
  */
 void SARibbonPanel::addMediumMenu(QMenu* menu, QToolButton::ToolButtonPopupMode popMode)
 {
@@ -423,9 +604,17 @@ void SARibbonPanel::addMediumMenu(QMenu* menu, QToolButton::ToolButtonPopupMode 
 }
 
 /**
- * @brief Adds a menu as a small button / 以小按钮形式添加一个菜单
- * @param menu The menu to add / 要添加的菜单
- * @param popMode The popup mode / 弹出模式
+ * \if ENGLISH
+ * @brief Adds a menu as a small button
+ * @param menu The menu to add
+ * @param popMode The popup mode
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 以小按钮形式添加一个菜单
+ * @param menu 要添加的菜单
+ * @param popMode 弹出模式
+ * \endif
  */
 void SARibbonPanel::addSmallMenu(QMenu* menu, QToolButton::ToolButtonPopupMode popMode)
 {
@@ -433,17 +622,27 @@ void SARibbonPanel::addSmallMenu(QMenu* menu, QToolButton::ToolButtonPopupMode p
 }
 
 /**
- * @brief Adds a custom widget to the panel / 向面板添加一个自定义窗口部件
+ * \if ENGLISH
+ * @brief Adds a custom widget to the panel
  *
  * The panel will create a `QWidgetAction` to manage the widget. The panel does not take ownership of the widget;
  * its lifetime is managed by its parent or the caller.
  *
+ * @param w The widget to add
+ * @param rp The row proportion for the widget
+ * @return The created QWidgetAction
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 向面板添加一个自定义窗口部件
+ *
  * 面板将创建一个 `QWidgetAction` 来管理此窗口部件。面板不拥有此窗口部件的所有权；
  * 其生命周期由其父对象或调用者管理。
  *
- * @param w The widget to add / 要添加的窗口部件
- * @param rp The row proportion for the widget / 窗口部件的行占比
- * @return The created QWidgetAction / 创建的QWidgetAction
+ * @param w 要添加的窗口部件
+ * @param rp 窗口部件的行占比
+ * @return 创建的QWidgetAction
+ * \endif
  */
 QAction* SARibbonPanel::addWidget(QWidget* w, SARibbonPanelItem::RowProportion rowProportion)
 {
@@ -468,9 +667,17 @@ QAction* SARibbonPanel::addWidget(QWidget* w, SARibbonPanelItem::RowProportion r
 }
 
 /**
- * @brief Adds a widget as a small button / 以小按钮形式添加一个窗口部件
- * @param w The widget to add / 要添加的窗口部件
- * @return The created QWidgetAction / 创建的QWidgetAction
+ * \if ENGLISH
+ * @brief Adds a widget as a small button
+ * @param w The widget to add
+ * @return The created QWidgetAction
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 以小按钮形式添加一个窗口部件
+ * @param w 要添加的窗口部件
+ * @return 创建的QWidgetAction
+ * \endif
  */
 QAction* SARibbonPanel::addSmallWidget(QWidget* w)
 {
@@ -478,9 +685,17 @@ QAction* SARibbonPanel::addSmallWidget(QWidget* w)
 }
 
 /**
- * @brief Adds a widget as a medium button / 以中等按钮形式添加一个窗口部件
- * @param w The widget to add / 要添加的窗口部件
- * @return The created QWidgetAction / 创建的QWidgetAction
+ * \if ENGLISH
+ * @brief Adds a widget as a medium button
+ * @param w The widget to add
+ * @return The created QWidgetAction
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 以中等按钮形式添加一个窗口部件
+ * @param w 要添加的窗口部件
+ * @return 创建的QWidgetAction
+ * \endif
  */
 QAction* SARibbonPanel::addMediumWidget(QWidget* w)
 {
@@ -488,9 +703,17 @@ QAction* SARibbonPanel::addMediumWidget(QWidget* w)
 }
 
 /**
- * @brief Adds a widget as a large button / 以大按钮形式添加一个窗口部件
- * @param w The widget to add / 要添加的窗口部件
- * @return The created QWidgetAction / 创建的QWidgetAction
+ * \if ENGLISH
+ * @brief Adds a widget as a large button
+ * @param w The widget to add
+ * @return The created QWidgetAction
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 以大按钮形式添加一个窗口部件
+ * @param w 要添加的窗口部件
+ * @return 创建的QWidgetAction
+ * \endif
  */
 QAction* SARibbonPanel::addLargeWidget(QWidget* w)
 {
@@ -498,16 +721,25 @@ QAction* SARibbonPanel::addLargeWidget(QWidget* w)
 }
 
 /**
- * @brief Adds a gallery widget to the panel / 向面板添加一个画廊窗口部件
+ * \if ENGLISH
+ * @brief Adds a gallery widget to the panel
  *
  * A gallery is a specialized widget for displaying a collection of items. If `expanding` is true,
  * the panel's horizontal size policy will be set to `Expanding`.
  *
+ * @param expanding If true, sets the panel's size policy to Expanding
+ * @return The created SARibbonGallery
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 向面板添加一个画廊窗口部件
+ *
  * 画廊是一个用于显示项目集合的专用窗口部件。如果 `expanding` 为true，
  * 面板的水平尺寸策略将被设置为 `Expanding`。
  *
- * @param expanding If true, sets the panel's size policy to Expanding / 如果为true，将面板的尺寸策略设置为Expanding
- * @return The created SARibbonGallery / 创建的SARibbonGallery
+ * @param expanding 如果为true，将面板的尺寸策略设置为Expanding
+ * @return 创建的SARibbonGallery
+ * \endif
  */
 SARibbonGallery* SARibbonPanel::addGallery(bool expanding)
 {
@@ -521,8 +753,15 @@ SARibbonGallery* SARibbonPanel::addGallery(bool expanding)
 }
 
 /**
- * @brief Adds a separator / 添加一个分隔符
- * @return The created separator action / 创建的分隔符action
+ * \if ENGLISH
+ * @brief Adds a separator
+ * @return The created separator action
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 添加一个分隔符
+ * @return 创建的分隔符action
+ * \endif
  */
 QAction* SARibbonPanel::addSeparator()
 {
@@ -535,9 +774,17 @@ QAction* SARibbonPanel::addSeparator()
 }
 
 /**
- * @brief Retrieves the SARibbonToolButton associated with an action / 获取与action关联的SARibbonToolButton
- * @param action The action to query / 要查询的action
- * @return The associated tool button, or nullptr if not found / 关联的工具按钮，如果未找到则返回nullptr
+ * \if ENGLISH
+ * @brief Retrieves the SARibbonToolButton associated with an action
+ * @param action The action to query
+ * @return The associated tool button, or nullptr if not found
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取与action关联的SARibbonToolButton
+ * @param action 要查询的action
+ * @return 关联的工具按钮，如果未找到则返回nullptr
+ * \endif
  */
 SARibbonToolButton* SARibbonPanel::actionToRibbonToolButton(QAction* action)
 {
@@ -554,8 +801,15 @@ SARibbonToolButton* SARibbonPanel::actionToRibbonToolButton(QAction* action)
 }
 
 /**
- * @brief Returns a list of all SARibbonToolButton children / 返回所有SARibbonToolButton子对象的列表
- * @return A list of pointers to SARibbonToolButton / SARibbonToolButton指针的列表
+ * \if ENGLISH
+ * @brief Returns a list of all SARibbonToolButton children
+ * @return A list of pointers to SARibbonToolButton
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 返回所有SARibbonToolButton子对象的列表
+ * @return SARibbonToolButton指针的列表
+ * \endif
  */
 QList< SARibbonToolButton* > SARibbonPanel::ribbonToolButtons() const
 {
@@ -572,9 +826,17 @@ QList< SARibbonToolButton* > SARibbonPanel::ribbonToolButtons() const
 }
 
 /**
- * @brief Sets the panel's layout mode / 设置面板的布局模式
- * @param mode The new layout mode (ThreeRowMode or TwoRowMode) / 新的布局模式（三行模式或两行模式）
+ * \if ENGLISH
+ * @brief Sets the panel's layout mode
+ * @param mode The new layout mode (ThreeRowMode or TwoRowMode)
  * @sa panelLayoutMode
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置面板的布局模式
+ * @param mode 新的布局模式（三行模式或两行模式）
+ * @sa panelLayoutMode
+ * \endif
  */
 void SARibbonPanel::setPanelLayoutMode(SARibbonPanel::PanelLayoutMode mode)
 {
@@ -586,9 +848,17 @@ void SARibbonPanel::setPanelLayoutMode(SARibbonPanel::PanelLayoutMode mode)
 }
 
 /**
- * @brief Gets the current layout mode / 获取当前的布局模式
- * @return The current layout mode / 当前的布局模式
+ * \if ENGLISH
+ * @brief Gets the current layout mode
+ * @return The current layout mode
  * @sa setPanelLayoutMode
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取当前的布局模式
+ * @return 当前的布局模式
+ * @sa setPanelLayoutMode
+ * \endif
  */
 SARibbonPanel::PanelLayoutMode SARibbonPanel::panelLayoutMode() const
 {
@@ -596,16 +866,25 @@ SARibbonPanel::PanelLayoutMode SARibbonPanel::panelLayoutMode() const
 }
 
 /**
- * @brief Sets the option action for the panel / 为面板设置选项action
+ * \if ENGLISH
+ * @brief Sets the option action for the panel
  *
  * The option action is typically displayed as a small button in the panel's title area.
  * Pass `nullptr` to remove the current option action.
  *
+ * @param action The option action, or nullptr to remove
+ * @sa isHaveOptionAction
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 为面板设置选项action
+ *
  * 选项action通常显示在面板标题区域的一个小按钮中。
  * 传入 `nullptr` 以移除当前的选项action。
  *
- * @param action The option action, or nullptr to remove / 选项action，或传入nullptr以移除
+ * @param action 选项action，或传入nullptr以移除
  * @sa isHaveOptionAction
+ * \endif
  */
 void SARibbonPanel::setOptionAction(QAction* action)
 {
@@ -615,9 +894,17 @@ void SARibbonPanel::setOptionAction(QAction* action)
 }
 
 /**
- * @brief Checks if an option action is set / 检查是否设置了选项action
- * @return true if an option action exists; otherwise false / 如果存在选项action则返回true；否则返回false
+ * \if ENGLISH
+ * @brief Checks if an option action is set
+ * @return true if an option action exists; otherwise false
  * @sa setOptionAction
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 检查是否设置了选项action
+ * @return 如果存在选项action则返回true；否则返回false
+ * @sa setOptionAction
+ * \endif
  */
 bool SARibbonPanel::isHaveOptionAction() const
 {
@@ -627,6 +914,17 @@ bool SARibbonPanel::isHaveOptionAction() const
     return false;
 }
 
+/**
+ * \if ENGLISH
+ * @brief Returns the recommended size for the widget
+ * @return The recommended size for the widget
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 返回窗口部件的推荐大小
+ * @return 窗口部件的推荐大小
+ * \endif
+ */
 QSize SARibbonPanel::sizeHint() const
 {
     int shWidth  = 500;
@@ -639,20 +937,42 @@ QSize SARibbonPanel::sizeHint() const
     return QSize(shWidth, shHeight);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Returns the minimum recommended size for the widget
+ * @return The minimum recommended size for the widget
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 返回窗口部件的最小推荐大小
+ * @return 窗口部件的最小推荐大小
+ * \endif
+ */
 QSize SARibbonPanel::minimumSizeHint() const
 {
     return (layout()->minimumSize());
 }
 
 /**
- * @brief Sets the icon size for all tool buttons in the panel / 设置面板内所有工具按钮的图标尺寸
+ * \if ENGLISH
+ * @brief Sets the icon size for all tool buttons in the panel
  *
  * This sets the default icon size for newly created buttons and updates the icon size for existing buttons.
  *
+ * @param smallSize The new small icon size
+ * @param largeSize The new large icon size
+ * @sa toolButtonIconSize
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置面板内所有工具按钮的图标尺寸
+ *
  * 此函数设置新创建按钮的默认图标尺寸，并更新现有按钮的图标尺寸。
  *
- * @param smallSize The new icon size / 新的图标尺寸
+ * @param smallSize 新的小图标尺寸
+ * @param largeSize 新的大图标尺寸
  * @sa toolButtonIconSize
+ * \endif
  */
 void SARibbonPanel::setToolButtonIconSize(const QSize& smallSize, const QSize& largeSize)
 {
@@ -668,9 +988,17 @@ void SARibbonPanel::setToolButtonIconSize(const QSize& smallSize, const QSize& l
 }
 
 /**
- * @brief Gets the current default icon size for tool buttons / 获取工具按钮当前的默认图标尺寸
- * @return The current icon size / 当前的图标尺寸
+ * \if ENGLISH
+ * @brief Gets the current default icon size for tool buttons
+ * @return The current icon size (small size, large size)
  * @sa setToolButtonIconSize
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取工具按钮当前的默认图标尺寸
+ * @return 当前的图标尺寸（小图标尺寸，大图标尺寸）
+ * @sa setToolButtonIconSize
+ * \endif
  */
 QPair< QSize, QSize > SARibbonPanel::toolButtonIconSize() const
 {
@@ -680,6 +1008,17 @@ QPair< QSize, QSize > SARibbonPanel::toolButtonIconSize() const
     return QPair< QSize, QSize >();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Sets the large icon size for tool buttons
+ * @param largeSize The new large icon size
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置工具按钮的大图标尺寸
+ * @param largeSize 新的大图标尺寸
+ * \endif
+ */
 void SARibbonPanel::setLargeIconSize(const QSize& largeSize)
 {
     if (SARibbonPanelLayout* lay = panelLayout()) {
@@ -692,6 +1031,17 @@ void SARibbonPanel::setLargeIconSize(const QSize& largeSize)
     });
 }
 
+/**
+ * \if ENGLISH
+ * @brief Gets the large icon size for tool buttons
+ * @return The current large icon size
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取工具按钮的大图标尺寸
+ * @return 当前的大图标尺寸
+ * \endif
+ */
 QSize SARibbonPanel::largeIconSize() const
 {
     if (SARibbonPanelLayout* lay = panelLayout()) {
@@ -700,6 +1050,17 @@ QSize SARibbonPanel::largeIconSize() const
     return QSize();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Sets the small icon size for tool buttons
+ * @param smallSize The new small icon size
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置工具按钮的小图标尺寸
+ * @param smallSize 新的小图标尺寸
+ * \endif
+ */
 void SARibbonPanel::setSmallIconSize(const QSize& smallSize)
 {
     if (SARibbonPanelLayout* lay = panelLayout()) {
@@ -712,6 +1073,17 @@ void SARibbonPanel::setSmallIconSize(const QSize& smallSize)
     });
 }
 
+/**
+ * \if ENGLISH
+ * @brief Gets the small icon size for tool buttons
+ * @return The current small icon size
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取工具按钮的小图标尺寸
+ * @return 当前的小图标尺寸
+ * \endif
+ */
 QSize SARibbonPanel::smallIconSize() const
 {
     if (SARibbonPanelLayout* lay = panelLayout()) {
@@ -721,24 +1093,41 @@ QSize SARibbonPanel::smallIconSize() const
 }
 
 /**
- * @brief Iterates over all SARibbonToolButton children / 遍历所有SARibbonToolButton子对象
+ * \if ENGLISH
+ * @brief Iterates over all SARibbonToolButton children
  *
  * Executes the provided function pointer for each `SARibbonToolButton`. If the function returns `false`,
  * iteration stops immediately.
- *
- * 对每个 `SARibbonToolButton` 执行提供的函数指针。如果函数返回 `false`，
- * 迭代将立即停止。
  *
  * Example:
  * @code
  * myPanel->iterateButton([](SARibbonToolButton* btn) -> bool {
  *     btn->setToolTip("Visited");
- *     return true; // Continue to next button/继续下一个按钮
+ *     return true; // Continue to next button
  * });
  * @endcode
  *
- * @param fp A function pointer that takes a SARibbonToolButton* and returns a bool / 一个接受SARibbonToolButton*并返回bool的函数指针
- * @return true if all buttons were iterated; false if iteration was stopped early / 如果遍历了所有按钮则返回true；如果提前停止则返回false
+ * @param fp A function pointer that takes a SARibbonToolButton* and returns a bool
+ * @return true if all buttons were iterated; false if iteration was stopped early
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 遍历所有SARibbonToolButton子对象
+ *
+ * 对每个 `SARibbonToolButton` 执行提供的函数指针。如果函数返回 `false`，
+ * 迭代将立即停止。
+ *
+ * 示例：
+ * @code
+ * myPanel->iterateButton([](SARibbonToolButton* btn) -> bool {
+ *     btn->setToolTip("Visited");
+ *     return true; // 继续下一个按钮
+ * });
+ * @endcode
+ *
+ * @param fp 一个接受SARibbonToolButton*并返回bool的函数指针
+ * @return 如果遍历了所有按钮则返回true；如果提前停止则返回false
+ * \endif
  */
 bool SARibbonPanel::iterateButton(SARibbonPanel::FpRibbonToolButtonIterate fp) const
 {
@@ -754,14 +1143,23 @@ bool SARibbonPanel::iterateButton(SARibbonPanel::FpRibbonToolButtonIterate fp) c
 }
 
 /**
- * @brief Sets the panel to expanding mode / 将面板设置为扩展模式
+ * \if ENGLISH
+ * @brief Sets the panel to expanding mode
  *
  * In expanding mode, the panel will try to occupy all available horizontal space in its parent layout.
  *
+ * @param isExpanding If true, sets the horizontal size policy to Expanding
+ * @sa isExpanding
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 将面板设置为扩展模式
+ *
  * 在扩展模式下，面板将尝试占据其父布局中所有可用的水平空间。
  *
- * @param isExpanding If true, sets the horizontal size policy to Expanding / 如果为true，将水平尺寸策略设置为Expanding
+ * @param isExpanding 如果为true，将水平尺寸策略设置为Expanding
  * @sa isExpanding
+ * \endif
  */
 void SARibbonPanel::setExpanding(bool isExpanding)
 {
@@ -769,9 +1167,17 @@ void SARibbonPanel::setExpanding(bool isExpanding)
 }
 
 /**
- * @brief Checks if the panel is in expanding mode / 检查面板是否处于扩展模式
- * @return true if the horizontal size policy is Expanding; otherwise false / 如果水平尺寸策略为Expanding则返回true；否则返回false
+ * \if ENGLISH
+ * @brief Checks if the panel is in expanding mode
+ * @return true if the horizontal size policy is Expanding; otherwise false
  * @sa setExpanding
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 检查面板是否处于扩展模式
+ * @return 如果水平尺寸策略为Expanding则返回true；否则返回false
+ * @sa setExpanding
+ * \endif
  */
 bool SARibbonPanel::isExpanding() const
 {
@@ -781,14 +1187,23 @@ bool SARibbonPanel::isExpanding() const
 }
 
 /**
- * @brief Sets the height of the panel's title / 设置面板标题的高度
+ * \if ENGLISH
+ * @brief Sets the height of the panel's title
  *
  * This function is typically called by `SARibbonBar` and is protected to prevent direct user manipulation.
  *
+ * @param h The new title height
+ * @sa SARibbonBar::setPanelTitleHeight
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置面板标题的高度
+ *
  * 此函数通常由 `SARibbonBar` 调用，为防止用户直接操作而设为protected。
  *
- * @param h The new title height / 新的标题高度
+ * @param h 新的标题高度
  * @sa SARibbonBar::setPanelTitleHeight
+ * \endif
  */
 void SARibbonPanel::setTitleHeight(int h)
 {
@@ -799,8 +1214,15 @@ void SARibbonPanel::setTitleHeight(int h)
 }
 
 /**
- * @brief Gets the height of the panel's title / 获取面板标题的高度
- * @return The current title height / 当前的标题高度
+ * \if ENGLISH
+ * @brief Gets the height of the panel's title
+ * @return The current title height
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取面板标题的高度
+ * @return 当前的标题高度
+ * \endif
  */
 int SARibbonPanel::titleHeight() const
 {
@@ -811,8 +1233,15 @@ int SARibbonPanel::titleHeight() const
 }
 
 /**
- * @brief Checks if the panel's title is visible / 检查面板标题是否可见
- * @return true if the title is visible; otherwise false / 如果标题可见则返回true；否则返回false
+ * \if ENGLISH
+ * @brief Checks if the panel's title is visible
+ * @return true if the title is visible; otherwise false
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 检查面板标题是否可见
+ * @return 如果标题可见则返回true；否则返回false
+ * \endif
  */
 bool SARibbonPanel::isEnableShowTitle() const
 {
@@ -823,14 +1252,23 @@ bool SARibbonPanel::isEnableShowTitle() const
 }
 
 /**
- * @brief Sets whether the panel's title is visible / 设置面板标题是否可见
+ * \if ENGLISH
+ * @brief Sets whether the panel's title is visible
  *
  * This function is typically called by `SARibbonBar` and is protected to prevent direct user manipulation.
  *
+ * @param on If true, the title is visible
+ * @sa SARibbonBar::setEnableShowPanelTitle
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置面板标题是否可见
+ *
  * 此函数通常由 `SARibbonBar` 调用，为防止用户直接操作而设为protected。
  *
- * @param on If true, the title is visible / 如果为true，则标题可见
+ * @param on 如果为true，则标题可见
  * @sa SARibbonBar::setEnableShowPanelTitle
+ * \endif
  */
 void SARibbonPanel::setEnableShowTitle(bool on)
 {
@@ -840,9 +1278,17 @@ void SARibbonPanel::setEnableShowTitle(bool on)
 }
 
 /**
- * @brief Gets the index of an action within the panel / 获取一个action在面板内的索引
- * @param act The action to find / 要查找的action
- * @return The index of the action, or -1 if not found / action的索引，如果未找到则返回-1
+ * \if ENGLISH
+ * @brief Gets the index of an action within the panel
+ * @param act The action to find
+ * @return The index of the action, or -1 if not found
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取一个action在面板内的索引
+ * @param act 要查找的action
+ * @return action的索引，如果未找到则返回-1
+ * \endif
  */
 int SARibbonPanel::actionIndex(QAction* act) const
 {
@@ -853,9 +1299,17 @@ int SARibbonPanel::actionIndex(QAction* act) const
 }
 
 /**
- * @brief Moves an action to a new position / 将一个action移动到新位置
- * @param from The current index of the action / action的当前索引
- * @param to The new index for the action / action的新索引
+ * \if ENGLISH
+ * @brief Moves an action to a new position
+ * @param from The current index of the action
+ * @param to The new index for the action
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 将一个action移动到新位置
+ * @param from action的当前索引
+ * @param to action的新索引
+ * \endif
  */
 void SARibbonPanel::moveAction(int from, int to)
 {
@@ -866,9 +1320,17 @@ void SARibbonPanel::moveAction(int from, int to)
 }
 
 /**
- * @brief Checks if customization is allowed / 检查是否允许自定义
- * @return true if customization is allowed; otherwise false / 如果允许自定义则返回true；否则返回false
+ * \if ENGLISH
+ * @brief Checks if customization is allowed
+ * @return true if customization is allowed; otherwise false
  * @sa setCanCustomize
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 检查是否允许自定义
+ * @return 如果允许自定义则返回true；否则返回false
+ * @sa setCanCustomize
+ * \endif
  */
 bool SARibbonPanel::isCanCustomize() const
 {
@@ -876,9 +1338,17 @@ bool SARibbonPanel::isCanCustomize() const
 }
 
 /**
- * @brief Sets whether customization is allowed / 设置是否允许自定义
- * @param b If true, customization is allowed / 如果为true，则允许自定义
+ * \if ENGLISH
+ * @brief Sets whether customization is allowed
+ * @param b If true, customization is allowed
  * @sa isCanCustomize
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置是否允许自定义
+ * @param b 如果为true，则允许自定义
+ * @sa isCanCustomize
+ * \endif
  */
 void SARibbonPanel::setCanCustomize(bool b)
 {
@@ -886,9 +1356,17 @@ void SARibbonPanel::setCanCustomize(bool b)
 }
 
 /**
- * @brief Gets the panel's name / 获取面板的名称
- * @return The panel's name / 面板的名称
+ * \if ENGLISH
+ * @brief Gets the panel's name
+ * @return The panel's name
  * @sa setPanelName
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取面板的名称
+ * @return 面板的名称
+ * @sa setPanelName
+ * \endif
  */
 QString SARibbonPanel::panelName() const
 {
@@ -896,14 +1374,23 @@ QString SARibbonPanel::panelName() const
 }
 
 /**
- * @brief Sets the panel's name / 设置面板的名称
+ * \if ENGLISH
+ * @brief Sets the panel's name
  *
  * Setting the name will also emit the `panelNameChanged` signal.
  *
+ * @param title The new name for the panel
+ * @sa panelName
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置面板的名称
+ *
  * 设置名称还会发出 `panelNameChanged` 信号。
  *
- * @param title The new name for the panel / 面板的新名称
+ * @param title 面板的新名称
  * @sa panelName
+ * \endif
  */
 void SARibbonPanel::setPanelName(const QString& title)
 {
@@ -915,8 +1402,15 @@ void SARibbonPanel::setPanelName(const QString& title)
 }
 
 /**
- * @brief Gets the height of the large buttons in this panel / 获取此面板中大按钮的高度
- * @return The height of large buttons / 大按钮的高度
+ * \if ENGLISH
+ * @brief Gets the height of the large buttons in this panel
+ * @return The height of large buttons
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取此面板中大按钮的高度
+ * @return 大按钮的高度
+ * \endif
  */
 int SARibbonPanel::largeButtonHeight() const
 {
@@ -925,8 +1419,15 @@ int SARibbonPanel::largeButtonHeight() const
 }
 
 /**
- * @brief Gets the panel's layout object / 获取面板的布局对象
- * @return A pointer to the SARibbonPanelLayout / 指向SARibbonPanelLayout的指针
+ * \if ENGLISH
+ * @brief Gets the panel's layout object
+ * @return A pointer to the SARibbonPanelLayout
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取面板的布局对象
+ * @return 指向SARibbonPanelLayout的指针
+ * \endif
  */
 SARibbonPanelLayout* SARibbonPanel::panelLayout() const
 {
@@ -934,11 +1435,19 @@ SARibbonPanelLayout* SARibbonPanel::panelLayout() const
 }
 
 /**
- * @brief Updates the geometry of all items in the panel / 更新面板内所有项目的几何形状
+ * \if ENGLISH
+ * @brief Updates the geometry of all items in the panel
  *
  * This function forces a recalculation of the layout and size hints for all buttons and items.
  *
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 更新面板内所有项目的几何形状
+ *
  * 此函数强制重新计算所有按钮和项目的布局及尺寸提示。
+ *
+ * \endif
  */
 void SARibbonPanel::updateItemGeometry()
 {
@@ -953,8 +1462,15 @@ void SARibbonPanel::updateItemGeometry()
 }
 
 /**
- * @brief Gets the parent SARibbonCategory / 获取父SARibbonCategory
- * @return The parent category, or nullptr if not found / 父category，如果未找到则返回nullptr
+ * \if ENGLISH
+ * @brief Gets the parent SARibbonCategory
+ * @return The parent category, or nullptr if not found
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取父SARibbonCategory
+ * @return 父category，如果未找到则返回nullptr
+ * \endif
  */
 SARibbonCategory* SARibbonPanel::category() const
 {
@@ -962,8 +1478,15 @@ SARibbonCategory* SARibbonPanel::category() const
 }
 
 /**
- * @brief Gets the top-level SARibbonBar / 获取顶层的SARibbonBar
- * @return The ribbon bar, or nullptr if not found / Ribbon栏，如果未找到则返回nullptr
+ * \if ENGLISH
+ * @brief Gets the top-level SARibbonBar
+ * @return The ribbon bar, or nullptr if not found
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取顶层的SARibbonBar
+ * @return Ribbon栏，如果未找到则返回nullptr
+ * \endif
  */
 SARibbonBar* SARibbonPanel::ribbonBar() const
 {
@@ -974,14 +1497,23 @@ SARibbonBar* SARibbonPanel::ribbonBar() const
 }
 
 /**
- * @brief Sets the spacing between elements in the panel / 设置面板内元素之间的间距
+ * \if ENGLISH
+ * @brief Sets the spacing between elements in the panel
  *
  * This function is typically called by `SARibbonBar` and is protected to prevent direct user manipulation.
  *
+ * @param n The new spacing value
+ * @sa SARibbonBar::setPanelSpacing
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置面板内元素之间的间距
+ *
  * 此函数通常由 `SARibbonBar` 调用，为防止用户直接操作而设为protected。
  *
- * @param n The new spacing value / 新的间距值
+ * @param n 新的间距值
  * @sa SARibbonBar::setPanelSpacing
+ * \endif
  */
 void SARibbonPanel::setSpacing(int n)
 {
@@ -991,9 +1523,17 @@ void SARibbonPanel::setSpacing(int n)
 }
 
 /**
- * @brief Gets the spacing between elements in the panel / 获取面板内元素之间的间距
- * @return The current spacing value / 当前的间距值
+ * \if ENGLISH
+ * @brief Gets the spacing between elements in the panel
+ * @return The current spacing value
  * @sa setSpacing
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取面板内元素之间的间距
+ * @return 当前的间距值
+ * @sa setSpacing
+ * \endif
  */
 int SARibbonPanel::spacing() const
 {
@@ -1004,16 +1544,27 @@ int SARibbonPanel::spacing() const
 }
 
 /**
- * @brief Gets the panel's recommended height / 获取面板的推荐高度
+ * \if ENGLISH
+ * @brief Gets the panel's recommended height
  *
  * This is a static helper function used internally for layout calculations.
  *
+ * @param fm The font metrics to use for calculation
+ * @param layMode The layout mode
+ * @param panelTitleHeight The height of the panel's title
+ * @return The recommended height
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取面板的推荐高度
+ *
  * 这是一个用于内部布局计算的静态辅助函数。
  *
- * @param fm The font metrics to use for calculation / 用于计算的字体度量
- * @param layMode The layout mode / 布局模式
- * @param panelTitleHeight The height of the panel's title / 面板标题的高度
- * @return The recommended height / 推荐的高度
+ * @param fm 用于计算的字体度量
+ * @param layMode 布局模式
+ * @param panelTitleHeight 面板标题的高度
+ * @return 推荐的高度
+ * \endif
  */
 int SARibbonPanel::panelHeightHint(const QFontMetrics& fm, PanelLayoutMode layMode, int panelTitleHeight)
 {
@@ -1035,7 +1586,13 @@ int SARibbonPanel::panelHeightHint(const QFontMetrics& fm, PanelLayoutMode layMo
 }
 
 /**
+ * \if ENGLISH
+ * @brief Resets the size of buttons, after layout changes (especially height changes), the button size needs to be manually changed
+ * \endif
+ *
+ * \if CHINESE
  * @brief 重置按钮的尺寸，在布局改变后（尤其高度变更），按钮的尺寸需要手动变更
+ * \endif
  */
 void SARibbonPanel::resetToolButtonSize()
 {
@@ -1049,20 +1606,39 @@ void SARibbonPanel::resetToolButtonSize()
     }
 }
 
+/**
+ * \if ENGLISH
+ * @brief Checks if the panel is in two-row mode
+ * @return true if the panel is in two-row mode, false otherwise
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 检查面板是否处于两行模式
+ * @return 如果面板处于两行模式返回true，否则返回false
+ * \endif
+ */
 bool SARibbonPanel::isTwoRow() const
 {
     return (TwoRowMode == panelLayoutMode());
 }
 
 /**
- * @brief Handles action events (add, remove, change) / 处理action事件（添加、移除、更改）
+ * \if ENGLISH
+ * @brief Handles action events (add, remove, change)
  *
  * This function is called by Qt when actions are added, removed, or changed. It ensures the panel's
  * layout is updated accordingly.
  *
+ * @param e The action event
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 处理action事件（添加、移除、更改）
+ *
  * 当action被添加、移除或更改时，Qt会调用此函数。它确保面板的布局相应更新。
  *
- * @param e The action event / action事件
+ * @param e action事件
+ * \endif
  */
 void SARibbonPanel::actionEvent(QActionEvent* e)
 {
@@ -1120,14 +1696,22 @@ void SARibbonPanel::actionEvent(QActionEvent* e)
 }
 
 /**
- * @brief Handles change events (e.g., font change) / 处理更改事件（例如，字体更改）
+ * \if ENGLISH
+ * @brief Handles change events (e.g., font change)
  *
  * This function is called when properties like the font change. It propagates the change to child
  * widgets and invalidates the layout.
  *
+ * @param e The change event
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 处理更改事件（例如，字体更改）
+ *
  * 当字体等属性更改时会调用此函数。它将更改传播到子窗口部件并使布局失效。
  *
- * @param e The change event / 更改事件
+ * @param e 更改事件
+ * \endif
  */
 void SARibbonPanel::changeEvent(QEvent* e)
 {
@@ -1147,8 +1731,15 @@ void SARibbonPanel::changeEvent(QEvent* e)
 }
 
 /**
+ * \if ENGLISH
+ * @brief Gets the layout items
+ * @return Reference to the list of SARibbonPanelItem
+ * \endif
+ *
+ * \if CHINESE
  * @brief 获取布局item
- * @return
+ * @return SARibbonPanelItem的列表引用
+ * \endif
  */
 const QList< SARibbonPanelItem* >& SARibbonPanel::ribbonPanelItem() const
 {
@@ -1156,8 +1747,15 @@ const QList< SARibbonPanelItem* >& SARibbonPanel::ribbonPanelItem() const
 }
 
 /**
+ * \if ENGLISH
+ * @brief Gets the last added button
+ * @return Pointer to the last added button
+ * \endif
+ *
+ * \if CHINESE
  * @brief 获取最近添加的按钮
  * @return 刚才添加的按钮的指针
+ * \endif
  */
 SARibbonToolButton* SARibbonPanel::lastAddActionButton()
 {
@@ -1165,8 +1763,15 @@ SARibbonToolButton* SARibbonPanel::lastAddActionButton()
 }
 
 /**
- * @brief Gets the title label widget / 获取标题标签窗口部件
- * @return A pointer to the SARibbonPanelLabel / 指向SARibbonPanelLabel的指针
+ * \if ENGLISH
+ * @brief Gets the title label widget
+ * @return A pointer to the SARibbonPanelLabel
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取标题标签窗口部件
+ * @return 指向SARibbonPanelLabel的指针
+ * \endif
  */
 SARibbonPanelLabel* SARibbonPanel::titleLabel() const
 {
@@ -1174,8 +1779,15 @@ SARibbonPanelLabel* SARibbonPanel::titleLabel() const
 }
 
 /**
+ * \if ENGLISH
+ * @brief Sets whether the panel's button text allows line wrapping
+ * @param on If true, enables word wrapping for button text
+ * \endif
+ *
+ * \if CHINESE
  * @brief 设置panel的按钮文字允许换行
- * @param on
+ * @param on 如果为true，启用按钮文字换行
+ * \endif
  */
 void SARibbonPanel::setEnableWordWrap(bool on)
 {
@@ -1187,8 +1799,15 @@ void SARibbonPanel::setEnableWordWrap(bool on)
 }
 
 /**
+ * \if ENGLISH
+ * @brief Checks if the panel's text allows line wrapping
+ * @return true if word wrapping is enabled for button text, false otherwise
+ * \endif
+ *
+ * \if CHINESE
  * @brief 判断panel的文字是否允许换行
- * @return
+ * @return 如果按钮文字换行已启用返回true，否则返回false
+ * \endif
  */
 bool SARibbonPanel::isEnableWordWrap() const
 {
@@ -1199,6 +1818,23 @@ bool SARibbonPanel::isEnableWordWrap() const
 }
 
 /**
+ * \if ENGLISH
+ * @brief Sets the button maximum aspect ratio, this coefficient determines the maximum width of the button
+ *
+ * The maximum width of the button is button height * this coefficient. For example, if the button height is h,
+ * then the maximum button width maxw = h * buttonMaximumAspectRatio
+ * If the text cannot be fully displayed at this width, the button will not continue to expand horizontally,
+ * and ... will be used instead of the incompletely displayed text
+ *
+ * @see buttonMaximumAspectRatio
+ *
+ * @note Users should not call @ref SARibbonPanel::setButtonMaximumAspectRatio to set,
+ * but call @ref SARibbonBar::setButtonMaximumAspectRatio to set the aspect ratio
+ *
+ * @param fac New maximum aspect ratio
+ * \endif
+ *
+ * \if CHINESE
  * @brief 设置按钮最大宽高比，这个系数决定按钮的最大宽度
  *
  * 按钮的最大宽度为按钮高度*此系数，例如按钮高度为h，那么按钮最大宽度maxw=h*buttonMaximumAspectRatio
@@ -1208,6 +1844,9 @@ bool SARibbonPanel::isEnableWordWrap() const
  *
  * @note 用户不应该调用@ref SARibbonPanel::setButtonMaximumAspectRatio 来设置，
  * 而是调用@ref SARibbonBar::setButtonMaximumAspectRatio 设置宽高比
+ *
+ * @param fac 新的最大宽高比
+ * \endif
  */
 void SARibbonPanel::setButtonMaximumAspectRatio(qreal fac)
 {
@@ -1218,9 +1857,17 @@ void SARibbonPanel::setButtonMaximumAspectRatio(qreal fac)
 }
 
 /**
+ * \if ENGLISH
+ * @brief Button maximum aspect ratio, this coefficient determines the maximum width of the button
+ * @return Current button maximum aspect ratio
+ * @see setButtonMaximumAspectRatio
+ * \endif
+ *
+ * \if CHINESE
  * @brief 按钮最大宽高比，这个系数决定按钮的最大宽度
  * @return 按钮最大宽高比
  * @see setButtonMaximumAspectRatio
+ * \endif
  */
 qreal SARibbonPanel::buttonMaximumAspectRatio() const
 {
