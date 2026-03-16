@@ -1,4 +1,4 @@
-﻿#ifndef SARIBBONBARLAYOUT_H
+#ifndef SARIBBONBARLAYOUT_H
 #define SARIBBONBARLAYOUT_H
 
 #include "SARibbonGlobal.h"
@@ -12,99 +12,145 @@ class SARibbonQuickAccessBar;
 class SARibbonButtonGroupWidget;
 class SARibbonContextCategory;
 
+/**
+ * \if ENGLISH
+ * @brief Layout class for SARibbonBar
+ * @details This class handles the layout of all components in the ribbon bar, including title bar, tab bar, quick access bar, and categories.
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief SARibbonBar 的布局类
+ * @details 此类处理功能区栏中所有组件的布局，包括标题栏、标签栏、快速访问栏和类别。
+ * \endif
+ */
 class SA_RIBBON_EXPORT SARibbonBarLayout : public QLayout
 {
 	Q_OBJECT
 	SA_RIBBON_DECLARE_PRIVATE(SARibbonBarLayout)
 public:
+	// Constructor for SARibbonBarLayout
 	explicit SARibbonBarLayout(SARibbonBar* parent);
+	// Destructor for SARibbonBarLayout
 	virtual ~SARibbonBarLayout();
 
-	// QLayout 必须实现的接口
+	// QLayout interface implementations
+	// Add a layout item
 	void addItem(QLayoutItem* item) override;
+	// Get the layout item at the specified index
 	QLayoutItem* itemAt(int index) const override;
+	// Take and remove the layout item at the specified index
 	QLayoutItem* takeAt(int index) override;
+	// Get the number of layout items
 	int count() const override;
+	// Get the recommended size for the layout
 	QSize sizeHint() const override;
+	// Get the minimum size for the layout
 	QSize minimumSize() const override;
+	// Set the geometry of the layout
 	void setGeometry(const QRect& rect) override;
 
-	// 执行布局
+	// Perform the layout
 	virtual void doLayout();
 
-	// 样式相关
+	// Style related methods
+	// Check if the current style is loose style
 	bool isLooseStyle() const;
+	// Check if the current style is compact style
 	bool isCompactStyle() const;
 
-	// 标题区域
+	// Title rectangle
+	// Get the title rectangle
 	const QRect& titleRect() const;
 
-	// 计算最小TabBar宽度
+	// Calculate minimum TabBar width
 	int calcMinTabBarWidth() const;
 
-	// 重置尺寸，这个是在ribbon模式发生改变的时候调用，例如setMinimumMode或者setNormalMode,此函数会触发重新布局
+	// Reset size, called when ribbon mode changes
 	void resetSize();
 
-	// 更新标题区域
+	// Update title rectangle
 	void layoutTitleRect();
 
-	// 调整StackedContainerWidget的位置
+	// Adjust StackedContainerWidget position
 	void layoutStackedContainerWidget();
 
-	// 让category重新布局，这个函数在调整category的对其方式的时候调用，由于对其方式改变StackedContainerWidget的尺寸没有改变，但category要重新布局
+	// Re-layout category, called when category alignment changes
 	void layoutCategory();
 
-	// 设置系统按钮大小
+	// Set system button size
 	void setSystemButtonSize(const QSize& size);
 
-	// 设置tab在title上面，这样可以省略title区域
+	// Set whether tab is on title bar
 	void setTabOnTitle(bool on);
+	// Check if tab is on title bar
 	bool isTabOnTitle() const;
 
-	// 最小模式下的MainBar高度
+	// Get main bar height in minimum mode
 	int minimumModeMainBarHeight() const;
 
-	// 获取正常模式下的mainBar的高度
+	// Get main bar height in normal mode
 	int normalModeMainBarHeight() const;
 
-	// ribbon tab的高度
+	// Ribbon tab bar height
+	// Get tab bar height
 	int tabBarHeight() const;
+	// Set tab bar height
 	void setTabBarHeight(int h);
 
-	// 标题栏的高度
+	// Title bar height
+	// Get title bar height
 	int titleBarHeight() const;
+	// Set title bar height
 	void setTitleBarHeight(int h);
 
-	// category的高度
+	// Category height
+	// Get category height
 	int categoryHeight() const;
+	// Set category height
 	void setCategoryHeight(int h);
 
-	// 设置panel的标题栏高度
+	// Panel title height
+	// Get panel title height
 	int panelTitleHeight() const;
+	// Set panel title height
 	void setPanelTitleHeight(int h);
 
-    // 设置图标
+    // Window icon
+    // Set window icon
     void setWindowIcon(const QIcon& icon);
+    // Get window icon
     QIcon windowIcon() const;
 
-    // 设置ApplicationButton垂直方向扩充，这样ApplicationButton能占用标题栏和tab栏两个栏的高度
+    // Application button vertical expansion
+    // Set whether application button is vertically expanded
     void setApplicationButtonVerticalExpansion(bool on = true);
+    // Check if application button is vertically expanded
     bool isApplicationButtonVerticalExpansion() const;
 
-	// 获取元素
+	// Get elements
+	// Get ribbon bar
 	SARibbonBar* ribbonBar() const;
+	// Get ribbon tab bar
 	SARibbonTabBar* ribbonTabBar() const;
+	// Get stacked container widget
 	SARibbonStackedWidget* stackedContainerWidget() const;
+	// Get quick access bar
 	SARibbonQuickAccessBar* quickAccessBar() const;
+	// Get right button group
 	SARibbonButtonGroupWidget* rightButtonGroup() const;
+	// Get application button
 	QAbstractButton* applicationButton() const;
+	// Get title icon widget
     SARibbonTitleIconWidget* titleIconWidget() const;
 
 protected:
+	// Resize in loose style
 	void resizeInLooseStyle();
+	// Resize in compact style
 	void resizeInCompactStyle();
 
 private:
+	// Initialize the layout
 	void init();
 };
 

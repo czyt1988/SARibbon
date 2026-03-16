@@ -1,4 +1,4 @@
-﻿#include "SARibbonBarLayout.h"
+#include "SARibbonBarLayout.h"
 #include <QStyle>
 #include <QApplication>
 #include <QScreen>
@@ -19,27 +19,38 @@ public:
     SARibbonBar* ribbonBar;
     QList< QLayoutItem* > items;
     QRect titleRect;
-    int titleBarHeight { 30 };    ///< 标题栏高度
-    int tabBarHeight { 28 };      ///< tabbar高度
-    int panelTitleHeight { 15 };  ///< panel的标题栏默认高度
-    int categoryHeight { 60 };    ///< Category的高度
+    int titleBarHeight { 30 };    ///< Title bar height
+    int tabBarHeight { 28 };      ///< Tab bar height
+    int panelTitleHeight { 15 };  ///< Panel title default height
+    int categoryHeight { 60 };    ///< Category height
 
-    int maxMinWidth { 1000 };  ///< 最大的最小宽度，这个一般是屏幕宽度的0.8，避免太大导致超过屏幕
+    int maxMinWidth { 1000 };  ///< Maximum minimum width, usually 0.8 of screen width to avoid exceeding screen
     int minWidth { 500 };
     int minHeight { 0 };
-    bool isTabOnTitle { false };  ///< 是否tab在标题栏上
-    std::unique_ptr< int > userDefTitleBarHeight;  ///< 用户定义的标题栏高度，正常不使用用户设定的高度，而是使用自动计算的高度
-    std::unique_ptr< int > userDefTabBarHeight;  ///< 用户定义的tabbar高度，正常不使用用户设定的高度，而是使用自动计算的高度
-    std::unique_ptr< int > userDefCategoryHeight;  ///< 用户定义的Category的高度，正常不使用用户设定的高度，而是使用自动计算的高度
-    QSize systemButtonSize;  ///< 由SARibbonMainWindow告诉窗口的关闭最大化等按钮的尺寸
+    bool isTabOnTitle { false };  ///< Whether tab is on title bar
+    std::unique_ptr< int > userDefTitleBarHeight;  ///< User-defined title bar height, normally auto-calculated
+    std::unique_ptr< int > userDefTabBarHeight;  ///< User-defined tab bar height, normally auto-calculated
+    std::unique_ptr< int > userDefCategoryHeight;  ///< User-defined category height, normally auto-calculated
+    QSize systemButtonSize;  ///< System button size (close, maximize, etc.) from SARibbonMainWindow
     bool isApplicationButtonVerticalExpansion {
         false
-    };  ///< Application button是否纵向扩展，纵向扩展的Application button将占用title和tab的高度
+    };  ///< Whether application button is vertically expanded, which will occupy both title and tab heights
 
 public:
+    /**
+     * \if ENGLISH
+     * @brief Constructor for PrivateData
+     * @param bar The SARibbonBar instance
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief PrivateData 构造函数
+     * @param bar SARibbonBar 实例
+     * \endif
+     */
     PrivateData(SARibbonBar* bar) : ribbonBar(bar), systemButtonSize(0, 0)
     {
-        // 获取主屏幕的尺寸
+        // Get primary screen size
         QScreen* primaryScreen = QGuiApplication::primaryScreen();
         QRect screenGeometry   = primaryScreen->geometry();
         if (currentRibbonMode() == SARibbonBar::MinimumRibbonMode) {
@@ -48,54 +59,164 @@ public:
             minHeight = getActualTitleBarHeight() + getActualCategoryHeight()
                         + (isTabOnTitle ? 0 : getActualTabBarHeight());
         }
-        maxMinWidth = screenGeometry.width() * 0.8;  // 屏幕宽度
+        maxMinWidth = screenGeometry.width() * 0.8;  // Screen width
     }
 
+    /**
+     * \if ENGLISH
+     * @brief Get the ribbon tab bar
+     * @return The SARibbonTabBar instance
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 获取功能区标签栏
+     * @return SARibbonTabBar 实例
+     * \endif
+     */
     SARibbonTabBar* ribbonTabBar() const
     {
         return ribbonBar->ribbonTabBar();
     }
 
+    /**
+     * \if ENGLISH
+     * @brief Get the stacked container widget
+     * @return The SARibbonStackedWidget instance
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 获取堆叠容器窗口
+     * @return SARibbonStackedWidget 实例
+     * \endif
+     */
     SARibbonStackedWidget* stackedContainerWidget() const
     {
         return ribbonBar->ribbonStackedWidget();
     }
 
+    /**
+     * \if ENGLISH
+     * @brief Get the quick access bar
+     * @return The SARibbonQuickAccessBar instance
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 获取快速访问栏
+     * @return SARibbonQuickAccessBar 实例
+     * \endif
+     */
     SARibbonQuickAccessBar* quickAccessBar() const
     {
         return ribbonBar->quickAccessBar();
     }
 
+    /**
+     * \if ENGLISH
+     * @brief Get the right button group
+     * @return The SARibbonButtonGroupWidget instance
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 获取右侧按钮组
+     * @return SARibbonButtonGroupWidget 实例
+     * \endif
+     */
     SARibbonButtonGroupWidget* rightButtonGroup() const
     {
         return ribbonBar->rightButtonGroup();
     }
 
+    /**
+     * \if ENGLISH
+     * @brief Get the title icon widget
+     * @return The SARibbonTitleIconWidget instance
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 获取标题图标窗口
+     * @return SARibbonTitleIconWidget 实例
+     * \endif
+     */
     SARibbonTitleIconWidget* titleIconWidget() const
     {
         return ribbonBar->titleIconWidget();
     }
 
+    /**
+     * \if ENGLISH
+     * @brief Get the application button
+     * @return The application button
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 获取应用程序按钮
+     * @return 应用程序按钮
+     * \endif
+     */
     QAbstractButton* applicationButton() const
     {
         return ribbonBar->applicationButton();
     }
 
+    /**
+     * \if ENGLISH
+     * @brief Get the current ribbon mode
+     * @return The current ribbon mode
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 获取当前功能区模式
+     * @return 当前功能区模式
+     * \endif
+     */
     SARibbonBar::RibbonMode currentRibbonMode() const
     {
         return ribbonBar->currentRibbonState();
     }
 
+    /**
+     * \if ENGLISH
+     * @brief Get the contents margins
+     * @return The contents margins
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 获取内容边距
+     * @return 内容边距
+     * \endif
+     */
     QMargins contentsMargins() const
     {
         return ribbonBar->contentsMargins();
     }
 
+    /**
+     * \if ENGLISH
+     * @brief Get the ribbon style
+     * @return The current ribbon style
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 获取功能区样式
+     * @return 当前功能区样式
+     * \endif
+     */
     SARibbonBar::RibbonStyles ribbonStyle() const
     {
         return ribbonBar->currentRibbonStyle();
     }
 
+    /**
+     * \if ENGLISH
+     * @brief Set the title bar height
+     * @param h The height to set
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 设置标题栏高度
+     * @param h 要设置的高度
+     * \endif
+     */
     void setTitleBarHeight(int h)
     {
         if (!userDefTitleBarHeight) {
@@ -105,6 +226,17 @@ public:
         }
     }
 
+    /**
+     * \if ENGLISH
+     * @brief Set the tab bar height
+     * @param h The height to set
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 设置标签栏高度
+     * @param h 要设置的高度
+     * \endif
+     */
     void setTabBarHeight(int h)
     {
         if (!userDefTabBarHeight) {
@@ -114,6 +246,17 @@ public:
         }
     }
 
+    /**
+     * \if ENGLISH
+     * @brief Set the category height
+     * @param h The height to set
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 设置类别高度
+     * @param h 要设置的高度
+     * \endif
+     */
     void setCategoryHeight(int h)
     {
         if (!userDefCategoryHeight) {
@@ -123,6 +266,17 @@ public:
         }
     }
 
+    /**
+     * \if ENGLISH
+     * @brief Get the actual title bar height
+     * @return The actual title bar height
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 获取实际标题栏高度
+     * @return 实际标题栏高度
+     * \endif
+     */
     int getActualTitleBarHeight() const
     {
         if (userDefTitleBarHeight) {
@@ -132,6 +286,17 @@ public:
         }
     }
 
+    /**
+     * \if ENGLISH
+     * @brief Get the actual tab bar height
+     * @return The actual tab bar height
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 获取实际标签栏高度
+     * @return 实际标签栏高度
+     * \endif
+     */
     int getActualTabBarHeight() const
     {
         if (userDefTabBarHeight) {
@@ -141,6 +306,17 @@ public:
         }
     }
 
+    /**
+     * \if ENGLISH
+     * @brief Get the actual category height
+     * @return The actual category height
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 获取实际类别高度
+     * @return 实际类别高度
+     * \endif
+     */
     int getActualCategoryHeight() const
     {
         if (userDefCategoryHeight) {
@@ -150,14 +326,34 @@ public:
         }
     }
 
+    /**
+     * \if ENGLISH
+     * @brief Estimate size hints for various components
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 估算各个组件的尺寸提示
+     * \endif
+     */
     void estimateSizeHint()
     {
         titleBarHeight = calcDefaultTitleBarHeight();
-        // tabBarHeight有大于0的值说明用户设置了，就使用用户设置的值
+        // If tabBarHeight is greater than 0, use user-set value
         tabBarHeight   = calcDefaultTabBarHeight();
         categoryHeight = calcCategoryHeight();
     }
 
+    /**
+     * \if ENGLISH
+     * @brief Get the system tab bar height
+     * @return The system tab bar height
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 获取系统标签栏高度
+     * @return 系统标签栏高度
+     * \endif
+     */
     int systemTabBarHeight() const
     {
         QStyle* style = ribbonBar->style();
@@ -166,17 +362,23 @@ public:
     }
 
     /**
-     * @brief 估算tabbar的高度
-     * @param fm
-     * @return
+     * \if ENGLISH
+     * @brief Calculate default tab bar height
+     * @return The calculated tab bar height
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 估算标签栏的高度
+     * @return 计算出的标签栏高度
+     * \endif
      */
     int calcDefaultTabBarHeight()
     {
         int defaultHeight = systemTabBarHeight();
-        int fontHeight = ribbonBar->fontMetrics().lineSpacing();  // 不要用height，像宋体这种字体，height=12，lineSpacing=14，有些就无法显示
+        int fontHeight = ribbonBar->fontMetrics().lineSpacing();  // Use lineSpacing instead of height for better font compatibility
         int defaultHeight2 = fontHeight * 1.6;
         if (defaultHeight2 < fontHeight + 10) {
-            defaultHeight2 = fontHeight + 10;  // 主要为了满足office2021主题，tab下有个4px的横杠
+            defaultHeight2 = fontHeight + 10;  // To accommodate office2021 theme with 4px bottom bar
         }
         int r = qMax(defaultHeight, defaultHeight2);
         if (r < 20) {
@@ -186,9 +388,15 @@ public:
     }
 
     /**
+     * \if ENGLISH
+     * @brief Calculate default title bar height
+     * @return The calculated title bar height
+     * \endif
+     * 
+     * \if CHINESE
      * @brief 估算标题栏的高度
-     * @param fm
-     * @return
+     * @return 计算出的标题栏高度
+     * \endif
      */
     int calcDefaultTitleBarHeight()
     {
@@ -202,31 +410,57 @@ public:
     }
 
     /**
-     * @brief 估算category的高度
+     * \if ENGLISH
+     * @brief Calculate category height
+     * @note 1.6 line height is close to Office's height
+     * @return The calculated category height
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 估算类别的高度
      * @note 经过对照，1.6行高和office的高度比较接近
-     * @param fm
-     * @param s
-     * @return
+     * @return 计算出的类别高度
+     * \endif
      */
     int calcCategoryHeight()
     {
-        int textH = ribbonBar->fontMetrics().lineSpacing();  // 这里用linespace，因为在换行的情况下，行距是不可忽略的，ribbon的大按钮默认是2行
+        int textH = ribbonBar->fontMetrics().lineSpacing();  // Use lineSpacing for better handling of wrapped text
         if (ribbonBar->isThreeRowStyle()) {
-            // 5.5=（3*1.6+1） （三行）,1是给paneltitle预留的
+            // 5.5 = (3*1.6+1) for three rows, 1 reserved for panel title
             return textH * 4.8 + panelTitleHeight;
         } else {
-            // 3=2*1.6
+            // 3 = 2*1.6 for two rows
             return textH * 3.2 + panelTitleHeight;
         }
         return (textH * 4.8 + panelTitleHeight);
     }
 
-    // 计算MainBar高度
+    /**
+     * \if ENGLISH
+     * @brief Calculate main bar height
+     * @param tabHegith Tab bar height
+     * @param titleHeight Title bar height
+     * @param categoryHeight Category height
+     * @param tabOnTitle Whether tab is on title
+     * @param rMode Ribbon mode
+     * @return The calculated main bar height
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 计算主栏高度
+     * @param tabHegith 标签栏高度
+     * @param titleHeight 标题栏高度
+     * @param categoryHeight 类别高度
+     * @param tabOnTitle 标签是否在标题栏上
+     * @param rMode 功能区模式
+     * @return 计算出的主栏高度
+     * \endif
+     */
     static int
     calcMainBarHeight(int tabHegith, int titleHeight, int categoryHeight, bool tabOnTitle, SARibbonBar::RibbonMode rMode)
     {
         if (rMode == SARibbonBar::MinimumRibbonMode) {
-            // 最小模式，没有categoryHeight
+            // Minimum mode, no category height
             if (tabOnTitle) {
                 return titleHeight;
             } else {
@@ -243,7 +477,13 @@ public:
     }
 
     /**
+     * \if ENGLISH
+     * @brief Reset the size
+     * \endif
+     * 
+     * \if CHINESE
      * @brief 重新计算尺寸
+     * \endif
      */
     void resetSize()
     {
@@ -253,24 +493,36 @@ public:
                                               getActualCategoryHeight(),
                                               isTabOnTitle,
                                               ribbonBar->currentRibbonState());
-        // 处于最小模式下时，bar的高度为tabbar的bottom,这个调整必须在resize event之后
-        // 升级到qt6后，setFixedHeight容易出现异常，主要原因是setFixedHeight的实现如下：
+        // In minimum mode, bar height is tab bar bottom, this adjustment must be after resize event
+        // After upgrading to Qt 6, setFixedHeight can cause exceptions because:
         // void QWidget::setFixedHeight(int h) {
         //     // ...
-        //     setMinimumSize(minimumSize().width(), h);  // 先设置最小高度
-        //     setMaximumSize(maximumSize().width(), h);  // 再设置最大高度
+        //     setMinimumSize(minimumSize().width(), h);  // Set minimum height first
+        //     setMaximumSize(maximumSize().width(), h);  // Then set maximum height
         //     // ...
         // }
-        // 如果调用前 maximumSize().height() 已经小于你要设置的 h，那么先调用 setMinimumSize(h)
-        // 时，最小高度会大于当前最大高度，这会触发Qt6的断言检查。 因此在调用 setFixedHeight 前，先重置最大尺寸限制：
+        // If maximumSize().height() is already less than h before calling, setting minimumSize(h) first
+        // will make minimum height greater than current maximum height, triggering Qt 6 assertion check.
+        // Therefore, reset maximum size limit before calling setFixedHeight:
         int maximumHeight = ribbonBar->maximumHeight();
         if (maximumHeight < mainBarHeight) {
             ribbonBar->setMaximumHeight(QWIDGETSIZE_MAX);
         }
         ribbonBar->setFixedHeight(mainBarHeight);
-        minHeight = mainBarHeight;  // minHeight和mainBarHeight一致
+        minHeight = mainBarHeight;  // minHeight matches mainBarHeight
     }
 
+    /**
+     * \if ENGLISH
+     * @brief Get main bar height in minimum mode
+     * @return Main bar height in minimum mode
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 最小模式下的主栏高度
+     * @return 最小模式下的主栏高度
+     * \endif
+     */
     int minimumModeMainBarHeight()
     {
         return calcMainBarHeight(getActualTabBarHeight(),
@@ -280,6 +532,17 @@ public:
                                  SARibbonBar::MinimumRibbonMode);
     }
 
+    /**
+     * \if ENGLISH
+     * @brief Get main bar height in normal mode
+     * @return Main bar height in normal mode
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 正常模式下的主栏高度
+     * @return 正常模式下的主栏高度
+     * \endif
+     */
     int normalModeMainBarHeight()
     {
         return calcMainBarHeight(getActualTabBarHeight(),
@@ -290,11 +553,31 @@ public:
     }
 };
 
+/**
+ * \if ENGLISH
+ * @brief Constructor for SARibbonBarLayout
+ * @param parent The parent SARibbonBar
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief SARibbonBarLayout 构造函数
+ * @param parent 父窗口 SARibbonBar
+ * \endif
+ */
 SARibbonBarLayout::SARibbonBarLayout(SARibbonBar* parent) : QLayout(parent), d_ptr(new PrivateData(parent))
 {
     init();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Destructor for SARibbonBarLayout
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief SARibbonBarLayout 析构函数
+ * \endif
+ */
 SARibbonBarLayout::~SARibbonBarLayout()
 {
     while (!d_ptr->items.isEmpty()) {
@@ -306,16 +589,49 @@ SARibbonBarLayout::~SARibbonBarLayout()
     }
 }
 
+/**
+ * \if ENGLISH
+ * @brief Initialize the layout
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 初始化布局
+ * \endif
+ */
 void SARibbonBarLayout::init()
 {
     // 不需要初始化子控件，它们会从ribbonBar获取
 }
 
+/**
+ * \if ENGLISH
+ * @brief Add a layout item
+ * @param item The layout item to add
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 添加布局项
+ * @param item 要添加的布局项
+ * \endif
+ */
 void SARibbonBarLayout::addItem(QLayoutItem* item)
 {
     d_ptr->items.append(item);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Get the layout item at the specified index
+ * @param index The index of the item
+ * @return The layout item at the index, or nullptr if not found
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 获取指定索引处的布局项
+ * @param index 项的索引
+ * @return 指定索引处的布局项，如果未找到则返回 nullptr
+ * \endif
+ */
 QLayoutItem* SARibbonBarLayout::itemAt(int index) const
 {
     if (index >= 0 && index < d_ptr->items.size()) {
@@ -324,6 +640,19 @@ QLayoutItem* SARibbonBarLayout::itemAt(int index) const
     return nullptr;
 }
 
+/**
+ * \if ENGLISH
+ * @brief Take and remove the layout item at the specified index
+ * @param index The index of the item
+ * @return The layout item at the index, or nullptr if not found
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 取出并移除指定索引处的布局项
+ * @param index 项的索引
+ * @return 指定索引处的布局项，如果未找到则返回 nullptr
+ * \endif
+ */
 QLayoutItem* SARibbonBarLayout::takeAt(int index)
 {
     if (index < 0 || index >= d_ptr->items.count()) {
@@ -332,11 +661,33 @@ QLayoutItem* SARibbonBarLayout::takeAt(int index)
     return d_ptr->items.takeAt(index);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Get the number of layout items
+ * @return The number of layout items
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 获取布局项的数量
+ * @return 布局项的数量
+ * \endif
+ */
 int SARibbonBarLayout::count() const
 {
     return d_ptr->items.size();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Get the recommended size for the layout
+ * @return The recommended size
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 获取布局的推荐尺寸
+ * @return 推荐尺寸
+ * \endif
+ */
 QSize SARibbonBarLayout::sizeHint() const
 {
     int height = d_ptr->minHeight;
@@ -347,17 +698,48 @@ QSize SARibbonBarLayout::sizeHint() const
     return QSize(width, height);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Get the minimum size for the layout
+ * @return The minimum size
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 获取布局的最小尺寸
+ * @return 最小尺寸
+ * \endif
+ */
 QSize SARibbonBarLayout::minimumSize() const
 {
     return sizeHint();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Set the geometry of the layout
+ * @param rect The rectangle to set
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 设置布局的几何区域
+ * @param rect 要设置的矩形区域
+ * \endif
+ */
 void SARibbonBarLayout::setGeometry(const QRect& rect)
 {
     QLayout::setGeometry(rect);
     doLayout();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Perform the layout
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 执行布局
+ * \endif
+ */
 void SARibbonBarLayout::doLayout()
 {
     if (isLooseStyle()) {
@@ -367,27 +749,66 @@ void SARibbonBarLayout::doLayout()
     }
 }
 
+/**
+ * \if ENGLISH
+ * @brief Check if the current style is loose style
+ * @return True if loose style, false otherwise
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 检查当前样式是否为宽松样式
+ * @return 如果是宽松样式返回 true，否则返回 false
+ * \endif
+ */
 bool SARibbonBarLayout::isLooseStyle() const
 {
     return SARibbonBar::isLooseStyle(d_ptr->ribbonStyle());
 }
 
+/**
+ * \if ENGLISH
+ * @brief Check if the current style is compact style
+ * @return True if compact style, false otherwise
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 检查当前样式是否为紧凑样式
+ * @return 如果是紧凑样式返回 true，否则返回 false
+ * \endif
+ */
 bool SARibbonBarLayout::isCompactStyle() const
 {
     return SARibbonBar::isCompactStyle(d_ptr->ribbonStyle());
 }
 
+/**
+ * \if ENGLISH
+ * @brief Get the title rectangle
+ * @return The title rectangle
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 获取标题栏矩形区域
+ * @return 标题栏矩形区域
+ * \endif
+ */
 const QRect& SARibbonBarLayout::titleRect() const
 {
     return d_ptr->titleRect;
 }
 
 /**
+ * \if ENGLISH
+ * @brief Calculate the minimum tab bar width
+ * @return The minimum tab bar width
+ * @details This function calculates the minimum width for the tab bar when it is centered. The tab bar does not occupy the entire width, but uses the minimum width to fit its content, leaving space for the main window to receive mouse events for dragging and other operations.
+ * \endif
+ * 
+ * \if CHINESE
  * @brief 计算tabbar的最小尺寸
- *
- * 此函数的作用是在tabbar居中布局时，tabbar不是占满整个宽度，而是按照最小尺寸来占据宽度，让tabbar的长度刚刚好，
- * 这样能让出mainwindow的空间，接受鼠标事件，从而实现拖动等操作，否则tabbar占用整个顶栏，鼠标无法点击到mainwindow
- * @return
+ * @return tabbar的最小宽度
+ * @details 此函数的作用是在tabbar居中布局时，tabbar不是占满整个宽度，而是按照最小尺寸来占据宽度，让tabbar的长度刚刚好，这样能让出mainwindow的空间，接受鼠标事件，从而实现拖动等操作，否则tabbar占用整个顶栏，鼠标无法点击到mainwindow
+ * \endif
  */
 int SARibbonBarLayout::calcMinTabBarWidth() const
 {
@@ -399,11 +820,33 @@ int SARibbonBarLayout::calcMinTabBarWidth() const
     return tabBar->sizeHint().width() + (mg.left() + mg.right());
 }
 
+/**
+ * \if ENGLISH
+ * @brief Set the system button size
+ * @param size The size to set
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 设置系统按钮尺寸
+ * @param size 要设置的尺寸
+ * \endif
+ */
 void SARibbonBarLayout::setSystemButtonSize(const QSize& size)
 {
     d_ptr->systemButtonSize = size;
 }
 
+/**
+ * \if ENGLISH
+ * @brief Set whether the tab bar is on the title bar
+ * @param on True to place tab on title, false otherwise
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 设置tab是否在标题栏上
+ * @param on true 表示 tab 在标题栏上，false 表示不在
+ * \endif
+ */
 void SARibbonBarLayout::setTabOnTitle(bool on)
 {
     if (d_ptr->isTabOnTitle != on) {
@@ -413,8 +856,15 @@ void SARibbonBarLayout::setTabOnTitle(bool on)
 }
 
 /**
- * @brief 设置tab在title上面，这样可以省略title区域
- * @param on
+ * \if ENGLISH
+ * @brief Check if the tab bar is on the title bar
+ * @return True if tab is on title, false otherwise
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 检查tab是否在标题栏上
+ * @return 如果 tab 在标题栏上返回 true，否则返回 false
+ * \endif
  */
 bool SARibbonBarLayout::isTabOnTitle() const
 {
@@ -422,8 +872,15 @@ bool SARibbonBarLayout::isTabOnTitle() const
 }
 
 /**
-   @brief 最小模式下的高度
-   @return
+ * \if ENGLISH
+ * @brief Get the main bar height in minimum mode
+ * @return The main bar height in minimum mode
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 最小模式下的主栏高度
+ * @return 最小模式下的主栏高度
+ * \endif
  */
 int SARibbonBarLayout::minimumModeMainBarHeight() const
 {
@@ -431,10 +888,17 @@ int SARibbonBarLayout::minimumModeMainBarHeight() const
 }
 
 /**
- * @brief 正常模式下的高度
- *
- * 有可能SARibbonBar::height和mainBarHeight不相等，这种情况发生在RibbonState::MinimumRibbonMode状态下
- * @return 高度
+ * \if ENGLISH
+ * @brief Get the main bar height in normal mode
+ * @return The main bar height in normal mode
+ * @note SARibbonBar::height and mainBarHeight may not be equal in RibbonState::MinimumRibbonMode
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 正常模式下的主栏高度
+ * @return 正常模式下的主栏高度
+ * @note 有可能SARibbonBar::height和mainBarHeight不相等，这种情况发生在RibbonState::MinimumRibbonMode状态下
+ * \endif
  */
 int SARibbonBarLayout::normalModeMainBarHeight() const
 {
@@ -442,8 +906,15 @@ int SARibbonBarLayout::normalModeMainBarHeight() const
 }
 
 /**
-   @brief tabBar的高度
-   @return
+ * \if ENGLISH
+ * @brief Get the tab bar height
+ * @return The tab bar height
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 获取标签栏高度
+ * @return 标签栏高度
+ * \endif
  */
 int SARibbonBarLayout::tabBarHeight() const
 {
@@ -451,8 +922,15 @@ int SARibbonBarLayout::tabBarHeight() const
 }
 
 /**
- * @brief 设置tabBar的高度
- * @param h
+ * \if ENGLISH
+ * @brief Set the tab bar height
+ * @param h The height to set
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 设置标签栏高度
+ * @param h 要设置的高度
+ * \endif
  */
 void SARibbonBarLayout::setTabBarHeight(int h)
 {
@@ -460,9 +938,17 @@ void SARibbonBarLayout::setTabBarHeight(int h)
 }
 
 /**
-   @brief 返回标题栏高度
-   @sa setTitleBarHeight
-   @return
+ * \if ENGLISH
+ * @brief Get the title bar height
+ * @return The title bar height
+ * @sa setTitleBarHeight
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 获取标题栏高度
+ * @return 标题栏高度
+ * @sa setTitleBarHeight
+ * \endif
  */
 int SARibbonBarLayout::titleBarHeight() const
 {
@@ -470,10 +956,19 @@ int SARibbonBarLayout::titleBarHeight() const
 }
 
 /**
-   @brief 设置标题栏的高度
-   @sa titleBarHeight
-   @note 此操作会发射@ref titleBarHeightChanged 信号
-   @param h
+ * \if ENGLISH
+ * @brief Set the title bar height
+ * @param h The height to set
+ * @note This operation will emit titleBarHeightChanged signal
+ * @sa titleBarHeight
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 设置标题栏高度
+ * @param h 要设置的高度
+ * @note 此操作会发射 titleBarHeightChanged 信号
+ * @sa titleBarHeight
+ * \endif
  */
 void SARibbonBarLayout::setTitleBarHeight(int h)
 {
@@ -481,8 +976,15 @@ void SARibbonBarLayout::setTitleBarHeight(int h)
 }
 
 /**
- * @brief category的高度
- * @return
+ * \if ENGLISH
+ * @brief Get the category height
+ * @return The category height
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 获取类别高度
+ * @return 类别高度
+ * \endif
  */
 int SARibbonBarLayout::categoryHeight() const
 {
@@ -490,8 +992,15 @@ int SARibbonBarLayout::categoryHeight() const
 }
 
 /**
- * @brief 设置category的高度
- * @param h
+ * \if ENGLISH
+ * @brief Set the category height
+ * @param h The height to set
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 设置类别高度
+ * @param h 要设置的高度
+ * \endif
  */
 void SARibbonBarLayout::setCategoryHeight(int h)
 {
@@ -499,8 +1008,15 @@ void SARibbonBarLayout::setCategoryHeight(int h)
 }
 
 /**
- * @brief SARibbonBarLayout::panelTitleHeight
- * @return
+ * \if ENGLISH
+ * @brief Get the panel title height
+ * @return The panel title height
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 获取面板标题高度
+ * @return 面板标题高度
+ * \endif
  */
 int SARibbonBarLayout::panelTitleHeight() const
 {
@@ -508,8 +1024,15 @@ int SARibbonBarLayout::panelTitleHeight() const
 }
 
 /**
- * @brief 设置panel的高度
- * @param h
+ * \if ENGLISH
+ * @brief Set the panel title height
+ * @param h The height to set
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 设置面板标题高度
+ * @param h 要设置的高度
+ * \endif
  */
 void SARibbonBarLayout::setPanelTitleHeight(int h)
 {
@@ -517,8 +1040,15 @@ void SARibbonBarLayout::setPanelTitleHeight(int h)
 }
 
 /**
+ * \if ENGLISH
+ * @brief Set the window icon
+ * @param icon The icon to set
+ * \endif
+ * 
+ * \if CHINESE
  * @brief 设置主窗口左上角的图标
- * @param icon
+ * @param icon 要设置的图标
+ * \endif
  */
 void SARibbonBarLayout::setWindowIcon(const QIcon& icon)
 {
@@ -526,8 +1056,15 @@ void SARibbonBarLayout::setWindowIcon(const QIcon& icon)
 }
 
 /**
- * @brief 左上角图标
- * @return
+ * \if ENGLISH
+ * @brief Get the window icon
+ * @return The window icon
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 获取窗口图标
+ * @return 窗口图标
+ * \endif
  */
 QIcon SARibbonBarLayout::windowIcon() const
 {
@@ -535,8 +1072,17 @@ QIcon SARibbonBarLayout::windowIcon() const
 }
 
 /**
- * @brief 设置ApplicationButton垂直方向扩充，这样ApplicationButton能占用标题栏和tab栏两个栏的高度
- * @param on
+ * \if ENGLISH
+ * @brief Set whether the application button is vertically expanded
+ * @param on True to expand vertically, false otherwise
+ * @details When vertically expanded, the application button will occupy both the title bar and tab bar heights
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 设置ApplicationButton是否垂直方向扩充
+ * @param on true 表示垂直扩充，false 表示不扩充
+ * @details 垂直扩充时，ApplicationButton能占用标题栏和tab栏两个栏的高度
+ * \endif
  */
 void SARibbonBarLayout::setApplicationButtonVerticalExpansion(bool on)
 {
@@ -549,10 +1095,17 @@ void SARibbonBarLayout::setApplicationButtonVerticalExpansion(bool on)
 }
 
 /**
- * @brief applicationButton是否是在垂直方向扩充
- *
- * 默认为false
- * @return
+ * \if ENGLISH
+ * @brief Check if the application button is vertically expanded
+ * @return True if vertically expanded, false otherwise
+ * @note Default is false
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 检查applicationButton是否在垂直方向扩充
+ * @return 如果垂直扩充返回 true，否则返回 false
+ * @note 默认为 false
+ * \endif
  */
 bool SARibbonBarLayout::isApplicationButtonVerticalExpansion() const
 {
@@ -560,44 +1113,126 @@ bool SARibbonBarLayout::isApplicationButtonVerticalExpansion() const
 }
 
 /**
- * @brief tab是否在title上面
- * @return
+ * \if ENGLISH
+ * @brief Get the ribbon bar
+ * @return The ribbon bar
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 获取功能区栏
+ * @return 功能区栏
+ * \endif
  */
 SARibbonBar* SARibbonBarLayout::ribbonBar() const
 {
     return d_ptr->ribbonBar;
 }
 
+/**
+ * \if ENGLISH
+ * @brief Get the ribbon tab bar
+ * @return The ribbon tab bar
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 获取功能区标签栏
+ * @return 功能区标签栏
+ * \endif
+ */
 SARibbonTabBar* SARibbonBarLayout::ribbonTabBar() const
 {
     return d_ptr->ribbonTabBar();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Get the stacked container widget
+ * @return The stacked container widget
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 获取堆叠容器窗口
+ * @return 堆叠容器窗口
+ * \endif
+ */
 SARibbonStackedWidget* SARibbonBarLayout::stackedContainerWidget() const
 {
     return d_ptr->stackedContainerWidget();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Get the quick access bar
+ * @return The quick access bar
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 获取快速访问栏
+ * @return 快速访问栏
+ * \endif
+ */
 SARibbonQuickAccessBar* SARibbonBarLayout::quickAccessBar() const
 {
     return d_ptr->quickAccessBar();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Get the right button group
+ * @return The right button group
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 获取右侧按钮组
+ * @return 右侧按钮组
+ * \endif
+ */
 SARibbonButtonGroupWidget* SARibbonBarLayout::rightButtonGroup() const
 {
     return d_ptr->rightButtonGroup();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Get the application button
+ * @return The application button
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 获取应用程序按钮
+ * @return 应用程序按钮
+ * \endif
+ */
 QAbstractButton* SARibbonBarLayout::applicationButton() const
 {
     return d_ptr->applicationButton();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Get the title icon widget
+ * @return The title icon widget
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 获取标题图标窗口
+ * @return 标题图标窗口
+ * \endif
+ */
 SARibbonTitleIconWidget* SARibbonBarLayout::titleIconWidget() const
 {
     return d_ptr->titleIconWidget();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Layout the title rectangle
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 布局标题栏矩形区域
+ * \endif
+ */
 void SARibbonBarLayout::layoutTitleRect()
 {
     SARibbonBar* ribbon                    = d_ptr->ribbonBar;
@@ -661,11 +1296,29 @@ void SARibbonBarLayout::layoutTitleRect()
     }
 }
 
+/**
+ * \if ENGLISH
+ * @brief Reset the size
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 重置尺寸
+ * \endif
+ */
 void SARibbonBarLayout::resetSize()
 {
     d_ptr->resetSize();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Layout the stacked container widget
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 布局堆叠容器窗口
+ * \endif
+ */
 void SARibbonBarLayout::layoutStackedContainerWidget()
 {
     SARibbonBar* ribbon                  = ribbonBar();
@@ -693,10 +1346,17 @@ void SARibbonBarLayout::layoutStackedContainerWidget()
     //    stackedWidget->setFixedSize(QSize(w, h));
     stackedWidget->setNormalGeometry(QRect(x, y, w, h));
 }
+
 /**
+ * \if ENGLISH
+ * @brief Layout the category
+ * @details This function is called when adjusting the alignment of the category. Since the size of StackedContainerWidget does not change when the alignment changes, but the category needs to be re-layouted, a request needs to be emitted.
+ * \endif
+ * 
+ * \if CHINESE
  * @brief 让category重新布局
- *
- *这个函数在调整category的对其方式的时候调用，由于对其方式改变StackedContainerWidget的尺寸没有改变，但category要重新布局,因此需要发射一个
+ * @details 这个函数在调整category的对其方式的时候调用，由于对其方式改变StackedContainerWidget的尺寸没有改变，但category要重新布局,因此需要发射一个
+ * \endif
  */
 void SARibbonBarLayout::layoutCategory()
 {
@@ -705,6 +1365,15 @@ void SARibbonBarLayout::layoutCategory()
     }
 }
 
+/**
+ * \if ENGLISH
+ * @brief Resize in loose style
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 宽松模式下调整尺寸
+ * \endif
+ */
 void SARibbonBarLayout::resizeInLooseStyle()
 {
 
@@ -859,6 +1528,15 @@ void SARibbonBarLayout::resizeInLooseStyle()
     layoutStackedContainerWidget();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Resize in compact style
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 紧凑模式下调整尺寸
+ * \endif
+ */
 void SARibbonBarLayout::resizeInCompactStyle()
 {
     QMargins border               = d_ptr->contentsMargins();
