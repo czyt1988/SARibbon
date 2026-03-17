@@ -1,24 +1,175 @@
-﻿#include "SAColorGridWidget.h"
+#include "SAColorGridWidget.h"
 #include "SAColorToolButton.h"
 #include <QGridLayout>
 #include <cmath>
 #include <QButtonGroup>
 
+/**
+ * \if ENGLISH
+ * @brief Private data class for SAColorGridWidget
+ * \endif
+ *
+ * \if CHINESE
+ * @brief SAColorGridWidget的私有数据类
+ * \endif
+ */
 class SAColorGridWidget::PrivateData
 {
     SA_COLOR_WIDGETS_DECLARE_PUBLIC(SAColorGridWidget)
 public:
+    /**
+     * \if ENGLISH
+     * @brief Constructor for PrivateData
+     * @param p Parent SAColorGridWidget
+     * \endif
+     *
+     * \if CHINESE
+     * @brief PrivateData构造函数
+     * @param p 父SAColorGridWidget
+     * \endif
+     */
     PrivateData(SAColorGridWidget* p);
-    // 获取ColorToolButton
+    
+    /**
+     * \if ENGLISH
+     * @brief Get ColorToolButton by index
+     * @param index Index of the button
+     * @return SAColorToolButton at the specified index
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 根据索引获取ColorToolButton
+     * @param index 按钮的索引
+     * @return 指定索引处的SAColorToolButton
+     * \endif
+     */
     SAColorToolButton* getColorToolButtonAt(int index);
+    
+    /**
+     * \if ENGLISH
+     * @brief Get ColorToolButton by row and column
+     * @param r Row index
+     * @param c Column index
+     * @return SAColorToolButton at the specified position
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 根据行列获取ColorToolButton
+     * @param r 行索引
+     * @param c 列索引
+     * @return 指定位置的SAColorToolButton
+     * \endif
+     */
     SAColorToolButton* getColorToolButtonAt(int r, int c);
+    
+    /**
+     * \if ENGLISH
+     * @brief Get the currently checked button
+     * @return Currently checked SAColorToolButton
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 获取当前选中的按钮
+     * @return 当前选中的SAColorToolButton
+     * \endif
+     */
     SAColorToolButton* getCheckedButton() const;
+    
+    /**
+     * \if ENGLISH
+     * @brief Update grid layout based on mColors
+     * @param isRemoveSpacer Whether to remove spacer items
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 根据mColors更新布局
+     * @param isRemoveSpacer 是否移除间隔项
+     * \endif
+     */
     void updateGridColor(bool isRemoveSpacer = false);
+    
+    /**
+     * \if ENGLISH
+     * @brief Update color button sizes
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 更新颜色按钮大小
+     * \endif
+     */
     void updateGridColorSize();
+    
+    /**
+     * \if ENGLISH
+     * @brief Update color button checkable state
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 更新颜色按钮的可选中状态
+     * \endif
+     */
     void updateGridColorCheckable();
+    
+    /**
+     * \if ENGLISH
+     * @brief Iterate through all color buttons
+     * @param fn Function to apply to each button
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 遍历所有颜色按钮
+     * @param fn 应用于每个按钮的函数
+     * \endif
+     */
     void iterationColorBtns(SAColorGridWidget::FunColorBtn fn);
+    
+    /**
+     * \if ENGLISH
+     * @brief Remove widget at specified position
+     * @param r Row index
+     * @param c Column index
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 删除指定位置的部件
+     * @param r 行索引
+     * @param c 列索引
+     * \endif
+     */
     void removeAt(int r, int c);
+    
+    /**
+     * \if ENGLISH
+     * @brief Set color at specified position
+     * @param clr Color to set
+     * @param r Row index
+     * @param c Column index
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 在指定位置设置颜色
+     * @param clr 要设置的颜色
+     * @param r 行索引
+     * @param c 列索引
+     * \endif
+     */
     void setColorAt(const QColor& clr, int r, int c);
+    
+    /**
+     * \if ENGLISH
+     * @brief Check if specified position is a spacer
+     * @param r Row index
+     * @param c Column index
+     * @return true if the position is a spacer, false otherwise
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 检查指定位置是否是间隔
+     * @param r 行索引
+     * @param c 列索引
+     * @return 如果位置是间隔返回true，否则返回false
+     * \endif
+     */
     bool isSpacer(int r, int c) const;
 
 public:
@@ -206,6 +357,17 @@ bool SAColorGridWidget::PrivateData::isSpacer(int r, int c) const
 // SAColorGridWidget
 //==============================================================
 
+/**
+ * \if ENGLISH
+ * @brief Constructor for SAColorGridWidget
+ * @param par Parent widget
+ * \endif
+ *
+ * \if CHINESE
+ * @brief SAColorGridWidget构造函数
+ * @param par 父部件
+ * \endif
+ */
 SAColorGridWidget::SAColorGridWidget(QWidget* par) : QWidget(par), d_ptr(new SAColorGridWidget::PrivateData(this))
 {
     connect(d_ptr->mButtonGroup,
@@ -226,13 +388,30 @@ SAColorGridWidget::SAColorGridWidget(QWidget* par) : QWidget(par), d_ptr(new SAC
             &SAColorGridWidget::onButtonToggled);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Destructor for SAColorGridWidget
+ * \endif
+ *
+ * \if CHINESE
+ * @brief SAColorGridWidget析构函数
+ * \endif
+ */
 SAColorGridWidget::~SAColorGridWidget()
 {
 }
 
 /**
+ * \if ENGLISH
+ * @brief Set column count, row count will be determined by column count
+ * @details If set to -1 or 0, column count is not limited, resulting in a single row
+ * @param c Column count
+ * \endif
+ *
+ * \if CHINESE
  * @brief 设置列数，行数量会根据列数量来匹配,如果设置-1或者0，说明不限定列数量，这样会只有一行
- * @param c
+ * @param c 列数
+ * \endif
  */
 void SAColorGridWidget::setColumnCount(int c)
 {
@@ -245,8 +424,15 @@ void SAColorGridWidget::setColumnCount(int c)
 }
 
 /**
+ * \if ENGLISH
+ * @brief Set color list
+ * @param cls Color list
+ * \endif
+ *
+ * \if CHINESE
  * @brief 设置颜色列表
- * @param c
+ * @param cls 颜色列表
+ * \endif
  */
 void SAColorGridWidget::setColorList(const QList< QColor >& cls)
 {
@@ -256,8 +442,15 @@ void SAColorGridWidget::setColorList(const QList< QColor >& cls)
 }
 
 /**
+ * \if ENGLISH
+ * @brief Get color list
+ * @return Color list
+ * \endif
+ *
+ * \if CHINESE
  * @brief 获取颜色列表
- * @return
+ * @return 颜色列表
+ * \endif
  */
 QList< QColor > SAColorGridWidget::getColorList() const
 {
@@ -265,8 +458,15 @@ QList< QColor > SAColorGridWidget::getColorList() const
 }
 
 /**
+ * \if ENGLISH
+ * @brief Get spacing
+ * @return Spacing value
+ * \endif
+ *
+ * \if CHINESE
  * @brief 获取间隔
- * @return
+ * @return 间隔值
+ * \endif
  */
 int SAColorGridWidget::spacing() const
 {
@@ -274,8 +474,15 @@ int SAColorGridWidget::spacing() const
 }
 
 /**
+ * \if ENGLISH
+ * @brief Set spacing
+ * @param v Spacing value
+ * \endif
+ *
+ * \if CHINESE
  * @brief 设置间隔
- * @param v
+ * @param v 间隔值
+ * \endif
  */
 void SAColorGridWidget::setSpacing(int v)
 {
@@ -283,8 +490,15 @@ void SAColorGridWidget::setSpacing(int v)
 }
 
 /**
+ * \if ENGLISH
+ * @brief Get color count
+ * @return Number of colors
+ * \endif
+ *
+ * \if CHINESE
  * @brief 获取颜色的数量
- * @return
+ * @return 颜色数量
+ * \endif
  */
 int SAColorGridWidget::colorCount() const
 {
@@ -292,8 +506,15 @@ int SAColorGridWidget::colorCount() const
 }
 
 /**
+ * \if ENGLISH
+ * @brief Set color icon size
+ * @param s Icon size
+ * \endif
+ *
+ * \if CHINESE
  * @brief 设置图标 size
- * @return
+ * @param s 图标大小
+ * \endif
  */
 void SAColorGridWidget::setColorIconSize(const QSize& s)
 {
@@ -304,8 +525,15 @@ void SAColorGridWidget::setColorIconSize(const QSize& s)
 }
 
 /**
+ * \if ENGLISH
+ * @brief Get color icon size
+ * @return Icon size
+ * \endif
+ *
+ * \if CHINESE
  * @brief 获取图标 size
- * @return
+ * @return 图标大小
+ * \endif
  */
 QSize SAColorGridWidget::colorIconSize() const
 {
@@ -313,10 +541,17 @@ QSize SAColorGridWidget::colorIconSize() const
 }
 
 /**
- * @brief 设置颜色是否是checkable
+ * \if ENGLISH
+ * @brief Set whether colors are checkable
+ * @details Checkable color buttons can be checked
+ * @param on Checkable state
+ * \endif
  *
- * checkable的颜色按钮是可checked的
- * @param on
+ * \if CHINESE
+ * @brief 设置颜色是否是checkable
+ * @details checkable的颜色按钮是可checked的
+ * @param on 可选中状态
+ * \endif
  */
 void SAColorGridWidget::setColorCheckable(bool on)
 {
@@ -325,8 +560,15 @@ void SAColorGridWidget::setColorCheckable(bool on)
 }
 
 /**
+ * \if ENGLISH
+ * @brief Check if colors are checkable
+ * @return Checkable state
+ * \endif
+ *
+ * \if CHINESE
  * @brief 颜色是否是checkable
- * @return
+ * @return 可选中状态
+ * \endif
  */
 bool SAColorGridWidget::isColorCheckable() const
 {
@@ -334,8 +576,15 @@ bool SAColorGridWidget::isColorCheckable() const
 }
 
 /**
+ * \if ENGLISH
+ * @brief Get currently checked color
+ * @return Currently checked color
+ * \endif
+ *
+ * \if CHINESE
  * @brief 获取当前选中的颜色
- * @return
+ * @return 当前选中的颜色
+ * \endif
  */
 QColor SAColorGridWidget::currentCheckedColor() const
 {
@@ -351,9 +600,17 @@ QColor SAColorGridWidget::currentCheckedColor() const
 }
 
 /**
+ * \if ENGLISH
+ * @brief Get color button by index
+ * @param index Button index
+ * @return SAColorToolButton at the specified index, or nullptr if not found
+ * \endif
+ *
+ * \if CHINESE
  * @brief 获取index对应的colorbutton
- * @param index
+ * @param index 按钮索引
  * @return 如果没有返回nullptr
+ * \endif
  */
 SAColorToolButton* SAColorGridWidget::colorButton(int index) const
 {
@@ -361,32 +618,63 @@ SAColorToolButton* SAColorGridWidget::colorButton(int index) const
 }
 
 /**
+ * \if ENGLISH
+ * @brief Set vertical spacing (equivalent to GridLayout's VerticalSpacing property)
+ * @param v Vertical spacing value
+ * \endif
+ *
+ * \if CHINESE
  * @brief 等同GridLayout的VerticalSpacing属性
- * @param v
+ * @param v 垂直间隔值
+ * \endif
  */
 void SAColorGridWidget::setVerticalSpacing(int v)
 {
     d_ptr->mGridLayout->setVerticalSpacing(v);
 }
+
 /**
+ * \if ENGLISH
+ * @brief Get vertical spacing (equivalent to GridLayout's VerticalSpacing property)
+ * @return Vertical spacing value
+ * \endif
+ *
+ * \if CHINESE
  * @brief 等同GridLayout的VerticalSpacing属性
- * @return
+ * @return 垂直间隔值
+ * \endif
  */
 int SAColorGridWidget::verticalSpacing() const
 {
     return d_ptr->mGridLayout->verticalSpacing();
 }
+
 /**
+ * \if ENGLISH
+ * @brief Set horizontal spacing (equivalent to GridLayout's HorizontalSpacing property)
+ * @param v Horizontal spacing value
+ * \endif
+ *
+ * \if CHINESE
  * @brief 等同GridLayout的HorizontalSpacing属性
- * @param v
+ * @param v 水平间隔值
+ * \endif
  */
 void SAColorGridWidget::setHorizontalSpacing(int v)
 {
     d_ptr->mGridLayout->setHorizontalSpacing(v);
 }
+
 /**
+ * \if ENGLISH
+ * @brief Get horizontal spacing (equivalent to GridLayout's HorizontalSpacing property)
+ * @return Horizontal spacing value
+ * \endif
+ *
+ * \if CHINESE
  * @brief 等同GridLayout的HorizontalSpacing属性
- * @return
+ * @return 水平间隔值
+ * \endif
  */
 int SAColorGridWidget::horizontalSpacing() const
 {
@@ -394,7 +682,29 @@ int SAColorGridWidget::horizontalSpacing() const
 }
 
 /**
+ * \if ENGLISH
+ * @brief Get column count
+ * @return Column count
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取列数
+ * @return 列数
+ * \endif
+ */
+int SAColorGridWidget::columnCount() const
+{
+    return d_ptr->mColumnCount;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Clear checked state, no color will be selected
+ * \endif
+ *
+ * \if CHINESE
  * @brief 清除选中状态，这时没有颜色是选中的
+ * \endif
  */
 void SAColorGridWidget::clearCheckedState()
 {
@@ -414,16 +724,51 @@ void SAColorGridWidget::clearCheckedState()
     }
 }
 
+/**
+ * \if ENGLISH
+ * @brief Iterate through all color buttons
+ * @param fn Function to apply to each button
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 遍历所有颜色按钮
+ * @param fn 应用于每个按钮的函数
+ * \endif
+ */
 void SAColorGridWidget::iterationColorBtns(SAColorGridWidget::FunColorBtn fn)
 {
     d_ptr->iterationColorBtns(fn);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Set minimum height for a specific row
+ * @param row Row index
+ * @param minSize Minimum height
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置指定行的最小高度
+ * @param row 行索引
+ * @param minSize 最小高度
+ * \endif
+ */
 void SAColorGridWidget::setRowMinimumHeight(int row, int minSize)
 {
     d_ptr->mGridLayout->setRowMinimumHeight(row, minSize);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Set horizontal spacer to the right
+ * @param on Whether to enable horizontal spacer
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置右侧水平间隔
+ * @param on 是否启用水平间隔
+ * \endif
+ */
 void SAColorGridWidget::setHorizontalSpacerToRight(bool on)
 {
     if (on) {
@@ -435,6 +780,17 @@ void SAColorGridWidget::setHorizontalSpacerToRight(bool on)
     d_ptr->mHorizontalSpacerToRight = on;
 }
 
+/**
+ * \if ENGLISH
+ * @brief Handle button clicked event
+ * @param btn Clicked button
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 处理按钮点击事件
+ * @param btn 被点击的按钮
+ * \endif
+ */
 void SAColorGridWidget::onButtonClicked(QAbstractButton* btn)
 {
     SAColorToolButton* t = qobject_cast< SAColorToolButton* >(btn);
@@ -443,6 +799,17 @@ void SAColorGridWidget::onButtonClicked(QAbstractButton* btn)
     }
 }
 
+/**
+ * \if ENGLISH
+ * @brief Handle button pressed event
+ * @param btn Pressed button
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 处理按钮按下事件
+ * @param btn 被按下的按钮
+ * \endif
+ */
 void SAColorGridWidget::onButtonPressed(QAbstractButton* btn)
 {
     SAColorToolButton* t = qobject_cast< SAColorToolButton* >(btn);
@@ -451,6 +818,19 @@ void SAColorGridWidget::onButtonPressed(QAbstractButton* btn)
     }
 }
 
+/**
+ * \if ENGLISH
+ * @brief Handle button toggled event
+ * @param btn Toggled button
+ * @param on Toggle state
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 处理按钮切换事件
+ * @param btn 被切换的按钮
+ * @param on 切换状态
+ * \endif
+ */
 void SAColorGridWidget::onButtonToggled(QAbstractButton* btn, bool on)
 {
     SAColorToolButton* t = qobject_cast< SAColorToolButton* >(btn);
@@ -459,6 +839,17 @@ void SAColorGridWidget::onButtonToggled(QAbstractButton* btn, bool on)
     }
 }
 
+/**
+ * \if ENGLISH
+ * @brief Get size hint
+ * @return Recommended size
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取尺寸提示
+ * @return 推荐尺寸
+ * \endif
+ */
 QSize SAColorGridWidget::sizeHint() const
 {
     return d_ptr->mGridLayout->sizeHint();
@@ -476,6 +867,17 @@ QSize SAColorGridWidget::sizeHint() const
     //    return QSize(w, h);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Handle button released event
+ * @param btn Released button
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 处理按钮释放事件
+ * @param btn 被释放的按钮
+ * \endif
+ */
 void SAColorGridWidget::onButtonReleased(QAbstractButton* btn)
 {
     SAColorToolButton* t = qobject_cast< SAColorToolButton* >(btn);
@@ -487,6 +889,17 @@ void SAColorGridWidget::onButtonReleased(QAbstractButton* btn)
 namespace SA
 {
 
+/**
+ * \if ENGLISH
+ * @brief Get standard color list
+ * @return Standard color list
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取标准颜色列表
+ * @return 标准颜色列表
+ * \endif
+ */
 QList< QColor > getStandardColorList()
 {
     static QList< QColor > s_standardColorList({ QColor(192, 0, 0),

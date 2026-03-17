@@ -1,4 +1,4 @@
-﻿#ifndef SACOLORGRIDWIDGET_H
+#ifndef SACOLORGRIDWIDGET_H
 #define SACOLORGRIDWIDGET_H
 #include <QWidget>
 #include <functional>
@@ -6,15 +6,21 @@
 class QAbstractButton;
 class SAColorToolButton;
 /**
+ * \if ENGLISH
+ * @brief A grid-based color layout widget
+ * @details This widget displays a grid of color buttons like:
+ * @details □□□□□□□□□
+ * @details □□□□□□□□□
+ * @details □□□□□□□□□
+ * \endif
+ *
+ * \if CHINESE
  * @brief 一个grid的Color布局
- *
- * 一个形如下面的颜色grid：
- *
- * □□□□□□□□□
- *
- * □□□□□□□□□
- *
- * □□□□□□□□□
+ * @details 一个形如下面的颜色grid：
+ * @details □□□□□□□□□
+ * @details □□□□□□□□□
+ * @details □□□□□□□□□
+ * \endif
  */
 class SA_COLOR_WIDGETS_API SAColorGridWidget : public QWidget
 {
@@ -25,42 +31,51 @@ public:
     using FunColorBtn = std::function< void(SAColorToolButton*) >;
 
 public:
+    /// Constructor for SAColorGridWidget
     SAColorGridWidget(QWidget* par = nullptr);
+    /// Destructor for SAColorGridWidget
     ~SAColorGridWidget();
-    // 设置列数，行数量会根据列数量来匹配,如果设置-1或者0，说明不限定列数量，这样会只有一行
+    /// Set column count, row count will be determined by column count
     void setColumnCount(int c);
+    /// Get column count
     int columnCount() const;
-    // 设置当前的颜色列表
+    /// Set current color list
     void setColorList(const QList< QColor >& cls);
+    /// Get color list
     QList< QColor > getColorList() const;
-    // 间隔
+    /// Get spacing
     int spacing() const;
+    /// Set spacing
     void setSpacing(int v);
-    // 获取颜色的数量
+    /// Get color count
     int colorCount() const;
-    // 图标的尺寸
+    /// Set color icon size
     void setColorIconSize(const QSize& s);
+    /// Get color icon size
     QSize colorIconSize() const;
-    // 设置颜色是否是checkable
+    /// Set whether colors are checkable
     void setColorCheckable(bool on = true);
+    /// Check if colors are checkable
     bool isColorCheckable() const;
-    // 获取当前选中的颜色
+    /// Get currently checked color
     QColor currentCheckedColor() const;
-    // 获取index对于的colorbutton
+    /// Get color button by index
     SAColorToolButton* colorButton(int index) const;
-    // 垂直间距
+    /// Set vertical spacing
     void setVerticalSpacing(int v);
+    /// Get vertical spacing
     int verticalSpacing() const;
-    // 水平间距
+    /// Set horizontal spacing
     void setHorizontalSpacing(int v);
+    /// Get horizontal spacing
     int horizontalSpacing() const;
-    // 清除当前选中状态，这时没有颜色是选中的
+    /// Clear checked state, no color will be selected
     void clearCheckedState();
-    // 对所有的colorbtn就行遍历处理，可以通过此函数进行tooltip设置等操作
+    /// Iterate through all color buttons
     void iterationColorBtns(FunColorBtn fn);
-    // 设置行最小高度
+    /// Set row minimum height
     void setRowMinimumHeight(int row, int minSize);
-    // 让颜色块左对齐
+    /// Set horizontal spacer to right
     void setHorizontalSpacerToRight(bool on = true);
 private Q_SLOTS:
     void onButtonClicked(QAbstractButton* btn);
@@ -70,24 +85,66 @@ private Q_SLOTS:
 
 Q_SIGNALS:
     /**
-     * @brief 对于check模式，check的颜色触发的信号
-     * @param c
-     * @param on
+     * \if ENGLISH
+     * @brief Signal emitted when a color is clicked
+     * @param c Clicked color
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 颜色被点击时发出的信号
+     * @param c 被点击的颜色
+     * \endif
      */
     void colorClicked(const QColor& c);
+    
+    /**
+     * \if ENGLISH
+     * @brief Signal emitted when a color is pressed
+     * @param c Pressed color
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 颜色被按下时发出的信号
+     * @param c 被按下的颜色
+     * \endif
+     */
     void colorPressed(const QColor& c);
+    
+    /**
+     * \if ENGLISH
+     * @brief Signal emitted when a color is released
+     * @param c Released color
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 颜色被释放时发出的信号
+     * @param c 被释放的颜色
+     * \endif
+     */
     void colorReleased(const QColor& c);
+    
+    /**
+     * \if ENGLISH
+     * @brief Signal emitted when a color is toggled (for checkable mode)
+     * @param c Toggled color
+     * @param on Toggle state
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 对于check模式，check的颜色触发的信号
+     * @param c 被切换的颜色
+     * @param on 切换状态
+     * \endif
+     */
     void colorToggled(const QColor& c, bool on);
 
 public:
+    /// Get size hint
     virtual QSize sizeHint() const Q_DECL_OVERRIDE;
 };
 namespace SA
 {
-/**
- * @brief 获取标准色列表（一共10种颜色）
- * @return
- */
+/// Get standard color list (10 colors in total)
 SA_COLOR_WIDGETS_API QList< QColor > getStandardColorList();
 }
 #endif  // SACOLORGRIDWIDGET_H
