@@ -106,9 +106,7 @@ Q_SIGNALS:
 - `src/SARibbonBar/SARibbonPanel.cpp`
 - `src/SARibbonBar/SARibbonTabBar.h`
 
-### 未处理文件
-
-#### 核心文件（Batch 1）
+#### Batch 1 已完成 (2026-03-16)
 
 - `src/SARibbonBar/SARibbonBarVersionInfo.h`
 - `src/SARibbonBar/SARibbonButtonGroupWidget.cpp`
@@ -122,7 +120,7 @@ Q_SIGNALS:
 - `src/SARibbonBar/SARibbonCtrlContainer.cpp`
 - `src/SARibbonBar/SARibbonCtrlContainer.h`
 
-#### 核心文件（Batch 2）
+#### Batch 2 已完成 (2026-03-17)
 
 - `src/SARibbonBar/SARibbonCustomizeData.cpp`
 - `src/SARibbonBar/SARibbonCustomizeData.h`
@@ -130,6 +128,9 @@ Q_SIGNALS:
 - `src/SARibbonBar/SARibbonCustomizeDialog.h`
 - `src/SARibbonBar/SARibbonCustomizeWidget.cpp`
 - `src/SARibbonBar/SARibbonCustomizeWidget.h`
+
+#### Batch 3 已完成 (2026-03-18)
+
 - `src/SARibbonBar/SARibbonElementFactory.cpp`
 - `src/SARibbonBar/SARibbonElementFactory.h`
 - `src/SARibbonBar/SARibbonElementManager.cpp`
@@ -140,7 +141,9 @@ Q_SIGNALS:
 - `src/SARibbonBar/SARibbonGalleryItem.h`
 - `src/SARibbonBar/SARibbonGlobal.h`
 
-#### 核心文件（Batch 3）
+### 未处理文件
+
+#### 核心文件（Batch 4）
 
 - `src/SARibbonBar/SARibbonLineWidgetContainer.cpp`
 - `src/SARibbonBar/SARibbonLineWidgetContainer.h`
@@ -158,7 +161,7 @@ Q_SIGNALS:
 - `src/SARibbonBar/SARibbonSeparatorWidget.cpp`
 - `src/SARibbonBar/SARibbonSeparatorWidget.h`
 
-#### 核心文件（Batch 4）
+#### 核心文件（Batch 5）
 
 - `src/SARibbonBar/SARibbonStackedWidget.cpp`
 - `src/SARibbonBar/SARibbonStackedWidget.h`
@@ -175,7 +178,7 @@ Q_SIGNALS:
 - `src/SARibbonBar/SAFramelessHelper.cpp`
 - `src/SARibbonBar/SAFramelessHelper.h`
 
-#### 颜色组件文件（Batch 5）
+#### 颜色组件文件（Batch 6）
 
 - `src/SARibbonBar/colorWidgets/SAColorGridWidget.cpp`
 - `src/SARibbonBar/colorWidgets/SAColorGridWidget.h`

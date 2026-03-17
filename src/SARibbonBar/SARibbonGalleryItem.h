@@ -1,4 +1,4 @@
-﻿#ifndef SARIBBONGALLERYITEM_H
+#ifndef SARIBBONGALLERYITEM_H
 #define SARIBBONGALLERYITEM_H
 #include "SARibbonGlobal.h"
 #include <QIcon>
@@ -7,52 +7,71 @@
 #include <QAction>
 class SARibbonGalleryGroup;
 
-///
-/// \brief 类似QStandardItem的GalleryItem
-///
+/**
+ * \if ENGLISH
+ * @brief GalleryItem similar to QStandardItem
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 类似QStandardItem的GalleryItem
+ * \endif
+ */
 class SA_RIBBON_EXPORT SARibbonGalleryItem
 {
     friend class SARibbonGalleryGroupModel;
 
 public:
+    /// Default constructor
     explicit SARibbonGalleryItem();
+    /// Constructor with text and icon
     explicit SARibbonGalleryItem(const QString& text, const QIcon& icon);
+    /// Constructor with QAction
     explicit SARibbonGalleryItem(QAction* act);
+    /// Destructor
     virtual ~SARibbonGalleryItem();
-    // 设置角色
+    /// Set data for role
     void setData(int role, const QVariant& data);
+    /// Get data for role
     virtual QVariant data(int role) const;
 
-    // 设置文字描述
+    /// Set text
     void setText(const QString& text);
+    /// Get text
     QString text() const;
 
-    // 设置tooltip
+    /// Set tool tip
     void setToolTip(const QString& text);
+    /// Get tool tip
     QString toolTip() const;
 
-    // 设置图标
+    /// Set icon
     void setIcon(const QIcon& ico);
+    /// Get icon
     QIcon icon() const;
 
-    // 设置是否可见
+    /// Check if selectable
     bool isSelectable() const;
+    /// Set selectable
     void setSelectable(bool isSelectable);
 
-    // 设置是否可选
+    /// Check if enabled
     bool isEnable() const;
+    /// Set enable
     void setEnable(bool isEnable);
 
-    // 设置item的flag
+    /// Set item flags
     void setFlags(Qt::ItemFlags flag);
+    /// Get item flags
     virtual Qt::ItemFlags flags() const;
 
-    // 设置action
+    /// Set action
     void setAction(QAction* act);
+    /// Get action
     QAction* action();
 
-    // 文字对齐方式
+    /// Set text alignment
     void setTextAlignment(Qt::Alignment a);
+    /// Get text alignment
     Qt::Alignment textAlignment() const;
 
 private:

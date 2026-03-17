@@ -1,4 +1,4 @@
-﻿#ifndef SARIBBONGALLERYGROUP_H
+#ifndef SARIBBONGALLERYGROUP_H
 #define SARIBBONGALLERYGROUP_H
 #include "SARibbonGlobal.h"
 #include <QList>
@@ -6,46 +6,79 @@
 #include <QStyledItemDelegate>
 #include "SARibbonGalleryItem.h"
 
-///
-/// \brief SARibbonGalleryGroup对应的显示代理
-///
+/**
+ * \if ENGLISH
+ * @brief Delegate for SARibbonGalleryGroup display
+ * \endif
+ *
+ * \if CHINESE
+ * @brief SARibbonGalleryGroup对应的显示代理
+ * \endif
+ */
 class SA_RIBBON_EXPORT SARibbonGalleryGroupItemDelegate : public QStyledItemDelegate
 {
 public:
+    /// Constructor for SARibbonGalleryGroupItemDelegate
     explicit SARibbonGalleryGroupItemDelegate(SARibbonGalleryGroup* group, QObject* parent = nullptr);
+    /// Destructor for SARibbonGalleryGroupItemDelegate
     ~SARibbonGalleryGroupItemDelegate();
+    /// Paint the item
     virtual void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 
+    /// Get size hint
     virtual QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const override;
+    /// Paint only icon
     virtual void paintIconOnly(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
+    /// Paint icon with text
     virtual void paintIconWithText(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
-    virtual void paintIconWithTextWordWrap(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
+    /// Paint icon with word wrap text
+    virtual void
+    paintIconWithTextWordWrap(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
 
 private:
     SARibbonGalleryGroup* mGroup;
 };
 
-///
-/// \brief SARibbonGalleryGroup对应的model
-///
+/**
+ * \if ENGLISH
+ * @brief Model for SARibbonGalleryGroup
+ * \endif
+ *
+ * \if CHINESE
+ * @brief SARibbonGalleryGroup对应的model
+ * \endif
+ */
 class SA_RIBBON_EXPORT SARibbonGalleryGroupModel : public QAbstractListModel
 {
     Q_OBJECT
 public:
+    /// Constructor for SARibbonGalleryGroupModel
     SARibbonGalleryGroupModel(QObject* parent = Q_NULLPTR);
+    /// Destructor for SARibbonGalleryGroupModel
     ~SARibbonGalleryGroupModel();
+    /// Get row count
     virtual int rowCount(const QModelIndex& parent) const Q_DECL_OVERRIDE;
+    /// Get item flags
     virtual Qt::ItemFlags flags(const QModelIndex& index) const Q_DECL_OVERRIDE;
+    /// Get data at index
     virtual QVariant data(const QModelIndex& index, int role) const Q_DECL_OVERRIDE;
+    /// Create model index
     virtual QModelIndex index(int row, int column, const QModelIndex& parent) const Q_DECL_OVERRIDE;
+    /// Set data at index
     virtual bool setData(const QModelIndex& index, const QVariant& value, int role) Q_DECL_OVERRIDE;
+    /// Clear all items
     void clear();
+    /// Get item at row
     SARibbonGalleryItem* at(int row) const;
+    /// Insert item at row
     void insert(int row, SARibbonGalleryItem* item);
+    /// Take item at row
     SARibbonGalleryItem* take(int row);
+    /// Append item
     void append(SARibbonGalleryItem* item);
+    /// Remove item by action object name
     bool remove(const QString& act_object_name);
-    // 条目数量
+    /// Get item count
     int itemSize() const;
 
 private:
@@ -53,9 +86,15 @@ private:
 };
 
 /**
- * @brief Gallery的组
+ * \if ENGLISH
+ * @brief Gallery group
+ * @details The group is responsible for displaying and managing Gallery Items
+ * \endif
  *
- * 组负责显示管理Gallery Item
+ * \if CHINESE
+ * @brief Gallery的组
+ * @details 组负责显示管理Gallery Item
+ * \endif
  */
 class SA_RIBBON_EXPORT SARibbonGalleryGroup : public QListView
 {
@@ -63,88 +102,129 @@ class SA_RIBBON_EXPORT SARibbonGalleryGroup : public QListView
     SA_RIBBON_DECLARE_PRIVATE(SARibbonGalleryGroup)
 public:
     /**
-     * @brief GalleryGroup显示的样式
+     * @brief GalleryGroup display style
      */
     enum GalleryGroupStyle
     {
-        IconWithText,          ///< 图标带文字
-        IconWithWordWrapText,  ///< 图标带文字,文字会换行显示，此模式只会对DisplayOneRow生效，如果不是DisplayOneRow，等同IconWithText
-        IconOnly               ///< 只有图标
+        IconWithText,          ///< Icon with text
+        IconWithWordWrapText,  ///< Icon with text that wraps, only works for DisplayOneRow
+        IconOnly               ///< Icon only
     };
 
     /**
-     * @brief 定义Gallery在一个panel下面显示的图标行数
+     * @brief Define the number of icon rows displayed under a panel
      */
     enum DisplayRow
     {
-        DisplayOneRow   = 1,  ///< 显示1行，默认
-        DisplayTwoRow   = 2,
-        DisplayThreeRow = 3
+        DisplayOneRow   = 1,  ///< Display 1 row (default)
+        DisplayTwoRow   = 2,  ///< Display 2 rows
+        DisplayThreeRow = 3   ///< Display 3 rows
     };
 
+    /// Constructor
     SARibbonGalleryGroup(QWidget* w = 0);
 
+    /// Destructor
     virtual ~SARibbonGalleryGroup();
-    // 重新计算grid尺寸
+    /// Recalculate grid size
     void recalcGridSize();
+    /// Recalculate grid size
     void recalcGridSize(int galleryHeight);
-    // 设置显示的样式
+    /// Set display style
     void setGalleryGroupStyle(GalleryGroupStyle style);
+    /// Get gallery group style
     GalleryGroupStyle galleryGroupStyle() const;
-    // 添加一个item
+    /// Add item
     void addItem(const QString& text, const QIcon& icon);
+    /// Add item
     void addItem(SARibbonGalleryItem* item);
-    // 以一个aciton作为item添加
+    /// Add action as item
     void addActionItem(QAction* act);
+    /// Add action item list
     void addActionItemList(const QList< QAction* >& acts);
+    /// Remove action item
     bool removeActionItem(QAction* act);
+    /// Get group model
     SARibbonGalleryGroupModel* groupModel() const;
-    // 标题
+    /// Set group title
     void setGroupTitle(const QString& title);
+    /// Get group title
     QString groupTitle() const;
+    /// Select by index
     void selectByIndex(int i);
-    // 设置显示的行数
+    /// Set display row
     void setDisplayRow(DisplayRow r);
+    /// Get display row
     DisplayRow displayRow() const;
-    // 设置grid最小的宽度，默认为0（不限制），可以限定grid的宽度
+    /// Set grid minimum width (default 0: no limit)
     void setGridMinimumWidth(int w);
+    /// Get grid minimum width
     int gridMinimumWidth() const;
-    // 设置grid最大的宽度，默认为0（不限制），可以限定grid的宽度
+    /// Set grid maximum width (default 0: no limit)
     void setGridMaximumWidth(int w);
+    /// Get grid maximum width
     int gridMaximumWidth() const;
-    // 获取SARibbonGalleryGroup管理的actiongroup
+    /// Get action group
     QActionGroup* actionGroup() const;
-    // 行数
+    /// Get grid row count
     int gridRowCount() const;
-    // 列数量
+    /// Get grid column count
     int gridColumnCount() const;
-    // 根据宽度计算推荐高度
+    /// Calculate preferred height for width
     int preferredHeightForWidth(int w) const;
-    // 流式listview，需要让它变为高度由宽度决定
+    /// Check if has height for width
     bool hasHeightForWidth() const override;
-    //
+    /// Get height for width
     int heightForWidth(int w) const override;
 private Q_SLOTS:
     void onItemClicked(const QModelIndex& index);
     void onItemEntered(const QModelIndex& index);
 Q_SIGNALS:
+    /**
+     * \if ENGLISH
+     * @brief Signal when group title changed
+     * @param title New title
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 组标题改变时的信号
+     * @param title 新标题
+     * \endif
+     */
     void groupTitleChanged(const QString& title);
     /**
+     * \if ENGLISH
+     * @brief Equivalent to QActionGroup::triggered
+     * @details All actions added to SARibbonGalleryGroup are managed by a QActionGroup
+     * @param action Triggered action
+     * \endif
+     *
+     * \if CHINESE
      * @brief 等同QActionGroup的triggered
-     * 所有加入SARibbonGalleryGroup的action都会被一个QActionGroup管理,可以通过@sa getActionGroup 获取到对应的actiongroup
-     * @param action
+     * @details 所有加入SARibbonGalleryGroup的action都会被一个QActionGroup管理
+     * @param action 触发的动作
+     * \endif
      */
     void triggered(QAction* action);
     /**
-     * @brief 等同QActionGroup的triggered
-     * 所有加入SARibbonGalleryGroup的action都会被一个QActionGroup管理,可以通过@sa getActionGroup 获取到对应的actiongroup
+     * \if ENGLISH
+     * @brief Equivalent to QActionGroup::hovered
+     * @details All actions added to SARibbonGalleryGroup are managed by a QActionGroup
+     * @note This property needs to be activated by QAbstractItemView::entered(const QModelIndex &index), so ensure setMouseTracking(true) is set
+     * @param action Hovered action
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 等同QActionGroup的hovered
+     * @details 所有加入SARibbonGalleryGroup的action都会被一个QActionGroup管理
      * @note 此属性需要通过QAbstractItemView::entered(const QModelIndex &index)激活，因此要保证设置了setMouseTracking(true)
-     * @param action
+     * @param action 悬停的动作
+     * \endif
      */
     void hovered(QAction* action);
 
 private:
-    // 构建一个model，这个model的父类是SARibbonGalleryGroup，如果要共享model，需要手动处理model的父类
+    /// Setup group model
     SARibbonGalleryGroupModel* setupGroupModel();
 };
 
