@@ -1,4 +1,4 @@
-﻿#ifndef SARIBBONPANEL_H
+#ifndef SARIBBONPANEL_H
 #define SARIBBONPANEL_H
 #include "SARibbonGlobal.h"
 #include "SARibbonPanelItem.h"
@@ -15,12 +15,19 @@ class SARibbonCategory;
 class SARibbonBar;
 
 /**
+ * \if ENGLISH
+ * @brief Title label for SARibbonPanel, used for qss styling
+ * \endif
+ *
+ * \if CHINESE
  * @brief SARibbonPanel的标题label，此类用于qss
+ * \endif
  */
 class SA_RIBBON_EXPORT SARibbonPanelLabel : public QLabel
 {
     Q_OBJECT
 public:
+    /// Constructor for SARibbonPanelLabel
     SARibbonPanelLabel(QWidget* parent = nullptr);
 };
 
@@ -134,217 +141,247 @@ public:
     using FpRibbonToolButtonIterate = std::function< bool(SARibbonToolButton*) >;
 
 public:
+    /// Constructor for SARibbonPanel
     explicit SARibbonPanel(QWidget* parent = nullptr);
+    /// Constructor for SARibbonPanel with name
     explicit SARibbonPanel(const QString& name, QWidget* parent = nullptr);
+    /// Destructor for SARibbonPanel
     ~SARibbonPanel() Q_DECL_OVERRIDE;
     using QWidget::addAction;
 
-    // 把action加入到panel
+    /// Add action to panel with specified row proportion
     void addAction(QAction* action, SARibbonPanelItem::RowProportion rowProportion);
-    // 生成并添加一个action
+    /// Generate and add an action with specified popup mode and row proportion
     void addAction(QAction* act,
                    QToolButton::ToolButtonPopupMode popMode,
                    SARibbonPanelItem::RowProportion rowProportion = SARibbonPanelItem::Large);
-    // 把action加入到panel，并以大图标显示
+    /// Add action to panel with large icon display
     void addLargeAction(QAction* action);
-    // 把action加入到panel，在三行模式下会以中图标显示
+    /// Add action to panel with medium icon display in three-row mode
     void addMediumAction(QAction* action);
-    // 把action加入到panel，并以小图标显示
+    /// Add action to panel with small icon display
     void addSmallAction(QAction* action);
 
-    // 把action加入到panel，并以小图标显示
+    /// Add action to panel with small icon display and specified popup mode
     void addSmallAction(QAction* action, QToolButton::ToolButtonPopupMode popMode);
-    // 把action加入到panel，并以大图标显示
+    /// Add action to panel with large icon display and specified popup mode
     void addLargeAction(QAction* action, QToolButton::ToolButtonPopupMode popMode);
-    // 把action加入到panel，在三行模式下会以中图标显示
+    /// Add action to panel with medium icon display in three-row mode and specified popup mode
     void addMediumAction(QAction* action, QToolButton::ToolButtonPopupMode popMode);
-    // 生成并添加一个action
+    /// Generate and add an action with text, icon, popup mode, and row proportion
     QAction* addAction(const QString& text,
                        const QIcon& icon,
                        QToolButton::ToolButtonPopupMode popMode,
                        SARibbonPanelItem::RowProportion rowProportion = SARibbonPanelItem::Large);
 
-    // 添加menu
+    /// Add menu with specified row proportion and popup mode
     void addMenu(QMenu* menu,
                  SARibbonPanelItem::RowProportion rowProportion,
                  QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
-    // 添加普通大菜单
+    /// Add large menu with specified popup mode
     void addLargeMenu(QMenu* menu, QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
-    // 添加普通小按钮菜单
+    /// Add medium menu with specified popup mode
     void addMediumMenu(QMenu* menu, QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
-    // 添加普通小按钮菜单
+    /// Add small menu with specified popup mode
     void addSmallMenu(QMenu* menu, QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
 
-    // 添加窗口
+    /// Add widget with specified row proportion
     QAction* addWidget(QWidget* w, SARibbonPanelItem::RowProportion rowProportion);
 
-    // 添加窗口,占用ribbon的一行
+    /// Add small widget (occupies one row of ribbon)
     QAction* addSmallWidget(QWidget* w);
 
-    // 添加窗口,占用ribbon的一行
+    /// Add medium widget (occupies one row of ribbon)
     QAction* addMediumWidget(QWidget* w);
 
-    // 添加窗口，占用所有行
+    /// Add large widget (occupies all rows)
     QAction* addLargeWidget(QWidget* w);
 
-    // 添加一个Gallery
+    /// Add a gallery
     SARibbonGallery* addGallery(bool expanding = true);
 
-    // 添加分割线
+    /// Add separator
     QAction* addSeparator();
 
-    // 从panel中把action对应的button提取出来，如果action没有对应的button，就返回nullptr
+    /// Extract the button corresponding to the action from the panel, returns nullptr if no corresponding button
     SARibbonToolButton* actionToRibbonToolButton(QAction* action);
 
-    // 设置操作action，如果要去除，传入nullptr指针即可，SARibbonPanel不会对QAction的所有权进行管理
-    // OptionAction也会触发actionTriggered信号
+    /// Set option action, pass nullptr to remove, SARibbonPanel does not manage QAction ownership
+    /// OptionAction also triggers actionTriggered signal
     void setOptionAction(QAction* action);
 
-    // 判断是否存在OptionAction
+    /// Check if option action exists
     bool isHaveOptionAction() const;
 
-    // 获取所有的buttons
+    /// Get all buttons
     QList< SARibbonToolButton* > ribbonToolButtons() const;
 
-    // 获取PanelLayoutMode
+    /// Get PanelLayoutMode
     PanelLayoutMode panelLayoutMode() const;
+    /// Set PanelLayoutMode
     void setPanelLayoutMode(PanelLayoutMode mode);
 
-    // 更新按钮的尺寸，这个函数在panel的布局状态变换后需要调用刷新
+    /// Update button sizes, this function needs to be called after panel layout state changes
     void resetToolButtonSize();
 
-    // 判断是否为2行模式
+    /// Check if it is two-row mode
     bool isTwoRow() const;
 
-    // 把panel设置为扩展模式，此时会撑大水平区域
+    /// Set panel to expanding mode, which will expand the horizontal area
     void setExpanding(bool isExpanding = true);
-    // 是否是扩展模式
+    /// Check if it is expanding mode
     bool isExpanding() const;
 
-    // 标题栏高度
+    /// Title bar height
     int titleHeight() const;
 
-    // 是否显示标题，显示标题后，标题的高度需要设置，默认高度为15
+    /// Check if title is enabled, after enabling title, the title height needs to be set, default height is 15
     bool isEnableShowTitle() const;
 
-    // action对应的布局index，此操作一般用于移动moveAction，其他意义不大
+    /// Layout index corresponding to action, this operation is generally used for moveAction, other meanings are not significant
     int actionIndex(QAction* act) const;
 
-    // 移动action
+    /// Move action
     void moveAction(int from, int to);
 
-    // 判断是否可以自定义
+    /// Check if customization is allowed
     bool isCanCustomize() const;
+    /// Set customization allowed
     void setCanCustomize(bool b);
 
-    // 标题
+    /// Panel name
     QString panelName() const;
+    /// Set panel name
     void setPanelName(const QString& title);
 
-    // 大图标的高度
+    /// Large button height
     int largeButtonHeight() const;
 
-    // 获取布局对应的item,此函数目前仅仅在自定义过程中用到
+    /// Get layout corresponding items, this function is currently only used in the customization process
     const QList< SARibbonPanelItem* >& ribbonPanelItem() const;
 
-    // 获取panel layout
+    /// Get panel layout
     SARibbonPanelLayout* panelLayout() const;
 
-    // 更新布局
+    /// Update layout
     void updateItemGeometry();
 
-    // 获取category指针，如果没有parent，或者不在category管理，返回nullptr
+    /// Get category pointer, returns nullptr if no parent or not managed by category
     SARibbonCategory* category() const;
 
-    // 获取ribbonBar指针，如果没有返回nullptr
+    /// Get ribbonBar pointer, returns nullptr if none
     SARibbonBar* ribbonBar() const;
 
-    // 按钮之间的间隔
+    /// Spacing between buttons
     int spacing() const;
 
-    // 设置按钮的icon尺寸
+    /// Set button icon sizes
     void setToolButtonIconSize(const QSize& smallSize, const QSize& largeSize);
+    /// Get button icon sizes
     QPair< QSize, QSize > toolButtonIconSize() const;
 
-    // 大按钮图标尺寸
+    /// Large button icon size
     void setLargeIconSize(const QSize& largeSize);
+    /// Get large icon size
     QSize largeIconSize() const;
 
-    // 小按钮图标尺寸
+    /// Small button icon size
     void setSmallIconSize(const QSize& smallSize);
+    /// Get small icon size
     QSize smallIconSize() const;
 
-    // 获取最近添加的按钮
+    /// Get last added button
     SARibbonToolButton* lastAddActionButton();
 
-    // 获取panel标题的label控件
+    /// Get panel title label widget
     SARibbonPanelLabel* titleLabel() const;
 
-    // 是否允许换行
+    /// Check if word wrap is enabled
     bool isEnableWordWrap() const;
 
-    // 按钮的最大宽高比，这个系数决定按钮的最大宽度
+    /// Maximum aspect ratio of buttons, this coefficient determines the maximum width of buttons
     qreal buttonMaximumAspectRatio() const;
 
-    // 此函数会遍历SARibbonPanel下的所有RibbonToolButton，执行函数指针(bool(SARibbonRibbonToolButton*))，函数指针返回false则停止迭代
+    /// This function will iterate through all RibbonToolButton under SARibbonPanel, execute function pointer
+    /// (bool(SARibbonRibbonToolButton*)), function pointer returns false to stop iteration
     bool iterateButton(FpRibbonToolButtonIterate fp) const;
 
 public:
+    /// Get size hint
     virtual QSize sizeHint() const Q_DECL_OVERRIDE;
+    /// Get minimum size hint
     virtual QSize minimumSizeHint() const Q_DECL_OVERRIDE;
 
 public:
-    // panel高度推荐
+    /// Recommended panel height
     static int panelHeightHint(const QFontMetrics& fm, PanelLayoutMode layMode, int panelTitleHeight);
-    // 把action的行属性设置进action中，action自身携带了行属性
+    /// Set action row proportion property into action, action itself carries row property
     static void setActionRowProportionProperty(QAction* action, SARibbonPanelItem::RowProportion rp);
-    // 获取action的行属性
+    /// Get action row proportion property
     static SARibbonPanelItem::RowProportion getActionRowProportionProperty(QAction* action);
-    // 把action的PopupMode属性设置进action中，action自身携带了PopupMode属性
+    /// Set action PopupMode property into action, action itself carries PopupMode property
     static void setActionToolButtonPopupModeProperty(QAction* action, QToolButton::ToolButtonPopupMode popMode);
-    // 获取action的PopupMode属性
+    /// Get action PopupMode property
     static QToolButton::ToolButtonPopupMode getActionToolButtonPopupModeProperty(QAction* action);
-    // 把action的ToolButtonStyle属性设置进action中，action自身携带了ToolButtonStyle属性
+    /// Set action ToolButtonStyle property into action, action itself carries ToolButtonStyle property
     static void setActionToolButtonStyleProperty(QAction* action, Qt::ToolButtonStyle buttonStyle);
-    // 获取action的ToolButtonStyle属性
+    /// Get action ToolButtonStyle property
     static Qt::ToolButtonStyle getActionToolButtonStyleProperty(QAction* action);
 
 Q_SIGNALS:
 
     /**
+     * \if ENGLISH
+     * @brief Equivalent to QToolBar::actionTriggered
+     * @param action
+     * \endif
+     *
+     * \if CHINESE
      * @brief 等同于QToolBar::actionTriggered
      * @param action
+     * \endif
      */
     void actionTriggered(QAction* action);
 
     /**
-     * @brief Emitted when the panel's name changes / 当面板名称改变时发出
-     * @param name The new name / 新的名称
+     * \if ENGLISH
+     * @brief Emitted when the panel's name changes
+     * @param n The new name
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 当面板名称改变时发出
+     * @param n 新的名称
+     * \endif
      */
     void panelNameChanged(const QString& n);
 
 protected:
+    /// Handle action events
     virtual void actionEvent(QActionEvent* e) Q_DECL_OVERRIDE;
+    /// Handle change events
     virtual void changeEvent(QEvent* e) Q_DECL_OVERRIDE;
 
 protected:
-    // 以下这些方法是为了接收SARibbonBar的对应接口的参数，用户在操作SARibbonPanel的时候不需要进行设置
-    // SARibbonPanel在被设置到SARibbonCategory的时候，SARibbonCategory会重新把自身的这些参数同步到panel中
-    // 同理，SARibbonCategory加入SARibbonBar的时候，SARibbonBar会重新把自身的这些参数同步到category
+    // The following methods are for receiving parameters from the corresponding interfaces of SARibbonBar, users do not
+    // need to set them when operating SARibbonPanel When SARibbonPanel is set to SARibbonCategory, SARibbonCategory
+    // will resynchronize its own parameters to the panel Similarly, when SARibbonCategory is added to SARibbonBar,
+    // SARibbonBar will resynchronize its own parameters to the category
 
-    // 设置标题栏高度
+    /// Set title bar height
     void setTitleHeight(int h);
 
-    // 设置按钮之间的间隔
+    /// Set spacing between buttons
     void setSpacing(int n);
 
-    // 是否显示标题，显示标题后，标题的高度需要设置，默认高度为15
+    /// Set whether to show title, after showing title, the title height needs to be set, default height is 15
     void setEnableShowTitle(bool on);
 
-    // 设置按钮允许换行，注意图标大小是由文字决定的，两行文字会让图标变小，如果想图标变大，文字不换行是最好的
+    /// Set whether buttons are allowed to wrap, note that the icon size is determined by the text, two lines of text
+    /// will make the icon smaller, if you want the icon to be larger, it is best not to wrap the text
     void setEnableWordWrap(bool on);
 
-    // 按钮的最大宽高比，这个系数决定按钮的最大宽度
+    /// Set the maximum aspect ratio of buttons, this coefficient determines the maximum width of buttons
     void setButtonMaximumAspectRatio(qreal fac = 1.4);
 };
 

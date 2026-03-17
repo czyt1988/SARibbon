@@ -1,4 +1,4 @@
-﻿#ifndef SARIBBONPANELLAYOUT_H
+#ifndef SARIBBONPANELLAYOUT_H
 #define SARIBBONPANELLAYOUT_H
 #include "SARibbonGlobal.h"
 #include <QLayout>
@@ -8,14 +8,18 @@ class SARibbonPanel;
 class SARibbonPanelLabel;
 
 /**
- * @brief Layout manager for SARibbonPanel / SARibbonPanel的布局管理器
+ * \if ENGLISH
+ * @brief Layout manager for SARibbonPanel
+ * @details `SARibbonPanelLayout` is a custom `QLayout` subclass responsible for arranging `SARibbonToolButton`
+ * @details and other widgets within a `SARibbonPanel`. It handles the complex Ribbon-specific layout logic,
+ * @details including Large, Medium, and Small button proportions, and the optional title and option button.
+ * \endif
  *
- * `SARibbonPanelLayout` is a custom `QLayout` subclass responsible for arranging `SARibbonToolButton`
- * and other widgets within a `SARibbonPanel`. It handles the complex Ribbon-specific layout logic,
- * including Large, Medium, and Small button proportions, and the optional title and option button.
- *
- * `SARibbonPanelLayout` 是一个自定义的 `QLayout` 子类，负责在 `SARibbonPanel` 内排列 `SARibbonToolButton`
- * 和其他窗口部件。它处理复杂的Ribbon特定布局逻辑，包括大、中、小按钮比例，以及可选的标题和选项按钮。
+ * \if CHINESE
+ * @brief SARibbonPanel的布局管理器
+ * @details `SARibbonPanelLayout` 是一个自定义的 `QLayout` 子类，负责在 `SARibbonPanel` 内排列 `SARibbonToolButton`
+ * @details 和其他窗口部件。它处理复杂的Ribbon特定布局逻辑，包括大、中、小按钮比例，以及可选的标题和选项按钮。
+ * \endif
  */
 class SA_RIBBON_EXPORT SARibbonPanelLayout : public QLayout
 {
@@ -23,127 +27,135 @@ class SA_RIBBON_EXPORT SARibbonPanelLayout : public QLayout
     friend class SARibbonPanel;
 
 public:
+    /// Constructor for SARibbonPanelLayout
     explicit SARibbonPanelLayout(QWidget* p = nullptr);
+    /// Destructor for SARibbonPanelLayout
     ~SARibbonPanelLayout();
-    // Gets the SARibbonPanel that owns this layout / 获取拥有此布局的SARibbonPanel
+    /// Gets the SARibbonPanel that owns this layout
     SARibbonPanel* ribbonPanel() const;
 
-    // Inserts an action at a specific index / 在指定索引处插入一个action
+    /// Inserts an action at a specific index
     void insertAction(int index, QAction* act, SARibbonPanelItem::RowProportion rp = SARibbonPanelItem::None);
 
-    // Sets the option action for the panel / 为面板设置选项action
+    /// Sets the option action for the panel
     void setOptionAction(QAction* action);
 
-    // Checks if an option action is set / 检查是否设置了选项action
+    /// Checks if an option action is set
     bool isHaveOptionAction() const;
 
-    // Retrieves the SARibbonPanelItem associated with an action / 获取与action关联的SARibbonPanelItem
+    /// Retrieves the SARibbonPanelItem associated with an action
     SARibbonPanelItem* panelItem(QAction* action) const;
 
-    // Gets the last item added to the layout / 获取最后添加到布局的项目
+    /// Gets the last item added to the layout
     SARibbonPanelItem* lastItem() const;
 
-    // Gets the widget associated with the last item / 获取与最后一个项目关联的窗口部件
+    /// Gets the widget associated with the last item
     QWidget* lastWidget() const;
 
-    // Moves an item from one index to another / 将一个项目从一个索引移动到另一个索引
+    /// Moves an item from one index to another
     void move(int from, int to);
-    // 判断是否需要重新布局
+    /// Checks if layout needs to be reorganized
     bool isDirty() const;
-    // 更新尺寸
+    /// Updates size
     void updateGeomArray();
 
-    // Finds the index of an action in the layout / 在布局中查找一个action的索引
+    /// Finds the index of an action in the layout
     int indexByAction(QAction* action) const;
 
-    // Gets the height of the panel's title / 获取面板标题的高度
+    /// Gets the height of the panel's title
     int panelTitleHeight() const;
 
-    // Sets the height of the panel's title / 设置面板标题的高度
+    /// Sets the height of the panel's title
     void setPanelTitleHeight(int newTitleHeight);
 
-    // Checks if the panel's title is enabled for display / 检查面板标题是否启用显示
+    /// Checks if the panel's title is enabled for display
     bool isEnableShowPanelTitle() const;
 
-    // Sets whether the panel's title is enabled for display / 设置面板标题是否启用显示
+    /// Sets whether the panel's title is enabled for display
     void setEnableShowPanelTitle(bool on);
 
-    // Gets the height of large buttons / 获取大按钮的高度
+    /// Gets the height of large buttons
     int largeButtonHeight() const;
 
-    // Gets the spacing between the title and the buttons / 获取标题与按钮之间的间距
+    /// Gets the spacing between the title and the buttons
     int panelTitleSpace() const;
 
-    // Sets the spacing between the title and the buttons / 设置标题与按钮之间的间距
+    /// Sets the spacing between the title and the buttons
     void setPanelTitleSpace(int newTitleSpace);
 
-    // Gets the panel's title label / 获取面板的标题标签
+    /// Gets the panel's title label
     SARibbonPanelLabel* panelTitleLabel() const;
 
-    // Sets the default icon size for tool buttons / 设置工具按钮的默认图标尺寸
+    /// Sets the default icon size for tool buttons
     void setToolButtonIconSize(const QSize& smallSize, const QSize& largeSize);
-    // Gets the default icon size for tool buttons / 获取工具按钮的默认图标尺寸
+    /// Gets the default icon size for tool buttons
     QPair< QSize, QSize > toolButtonIconSize() const;
 
-    // 大按钮图标尺寸
+    /// Large button icon size
     void setLargeIconSize(const QSize& largeSize);
+    /// Get large icon size
     QSize largeIconSize() const;
 
-    // 小按钮图标尺寸
+    /// Small button icon size
     void setSmallIconSize(const QSize& largeSize);
+    /// Get small icon size
     QSize smallIconSize() const;
 
-    // 是否允许文字换行
+    /// Check if word wrap is enabled
     bool isEnableWordWrap() const;
-    // 按钮的最大宽高比，这个系数决定按钮的最大宽度
+    /// Maximum aspect ratio of buttons, this coefficient determines the maximum width of buttons
     qreal buttonMaximumAspectRatio() const;
 
 public:
-    // Adds an item to the layout (SARibbonPanelLayout not supported) / 向布局添加一个项目（SARibbonPanelLayout不支持）
+    /// Adds an item to the layout (SARibbonPanelLayout not supported)
     void addItem(QLayoutItem* item) Q_DECL_OVERRIDE;
 
-    // QLayout 所必须的重载函数
+    /// QLayout required override functions
     QLayoutItem* itemAt(int index) const Q_DECL_OVERRIDE;
 
-    // Removes and returns the item at the specified index / 移除并返回指定索引处的项目
+    /// Removes and returns the item at the specified index
     QLayoutItem* takeAt(int index) Q_DECL_OVERRIDE;
 
-    // Gets the number of items in the layout / 获取布局中项目的数量
+    /// Gets the number of items in the layout
     int count() const Q_DECL_OVERRIDE;
 
-    // Checks if the layout is empty / 检查布局是否为空
+    /// Checks if the layout is empty
     bool isEmpty() const Q_DECL_OVERRIDE;
 
-    // Invalidates the layout, marking it as dirty / 使布局失效，将其标记为“脏”
+    /// Invalidates the layout, marking it as dirty
     void invalidate() Q_DECL_OVERRIDE;
 
-    // Returns the directions in which the layout can expand / 返回布局可以扩展的方向
+    /// Returns the directions in which the layout can expand
     Qt::Orientations expandingDirections() const Q_DECL_OVERRIDE;
+    /// Set geometry
     void setGeometry(const QRect& rect) Q_DECL_OVERRIDE;
+    /// Get minimum size
     QSize minimumSize() const Q_DECL_OVERRIDE;
+    /// Get size hint
     QSize sizeHint() const Q_DECL_OVERRIDE;
 
 protected:
-    // Gets the size of the option action button / 获取选项action按钮的尺寸
+    /// Gets the size of the option action button
     QSize optionActionButtonSize() const;
-    // 布局action
+    /// Layout action
     void doLayout();
-    // 把action转换为item，对于纯Action，此函数会创建SARibbonToolButton,
-    //  rp用于告诉Layout生成什么样的窗口，详细见SARibbonPanelItem::RowProportion
+    /// Convert action to item, for pure Action, this function will create SARibbonToolButton
+    /// rp is used to tell Layout what kind of window to generate, see SARibbonPanelItem::RowProportion for details
     SARibbonPanelItem* createItem(QAction* action, SARibbonPanelItem::RowProportion rp = SARibbonPanelItem::None);
+    /// Update geometry array
     void updateGeomArray(const QRect& setrect);
-    // 重新计算扩展条码，此函数必须在updateGeomArray函数之后调用
+    /// Recalculate expansion bar code, this function must be called after updateGeomArray function
     void recalcExpandGeomArray(const QRect& setrect);
-    // 设置文字允许换行
+    /// Set text wrap enabled
     void setEnableWordWrap(bool on);
-    // 按钮的最大宽高比，这个系数决定按钮的最大宽度
+    /// Set maximum aspect ratio of buttons, this coefficient determines the maximum width of buttons
     void setButtonMaximumAspectRatio(qreal fac = 1.4);
 
 private:
-    // 根据列数，计算窗口的宽度，以及最大宽度
+    /// Calculate window width and maximum width based on column count
     void columnWidthInfo(int colindex, int& width, int& maximum) const;
 
-    //  Sets the panel's title label / 设置面板的标题标签
+    /// Sets the panel's title label
     void setPanelTitleLabel(SARibbonPanelLabel* newTitleLabel);
 
 private:

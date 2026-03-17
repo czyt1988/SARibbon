@@ -1,4 +1,4 @@
-﻿#include "SARibbonColorToolButton.h"
+#include "SARibbonColorToolButton.h"
 #include <QStylePainter>
 #include <QStyleOptionToolButton>
 #include <QDebug>
@@ -11,12 +11,55 @@
 //===================================================
 const int c_ribbonbutton_color_height = 5;  ///< 颜色块的高度
 
+/**
+ * \if ENGLISH
+ * @brief Private data class for SARibbonColorToolButton
+ * @details This class holds private data for SARibbonColorToolButton to implement the PIMPL idiom.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief SARibbonColorToolButton 的私有数据类
+ * @details 此类持有 SARibbonColorToolButton 的私有数据，实现 PIMPL 设计模式。
+ * \endif
+ */
 class SARibbonColorToolButton::PrivateData
 {
     SA_RIBBON_DECLARE_PUBLIC(SARibbonColorToolButton)
 public:
     PrivateData(SARibbonColorToolButton* p);
+
+    /**
+     * \if ENGLISH
+     * @brief Create an icon pixmap with color under the icon
+     * @param opt Style option for the tool button
+     * @param iconsize Size of the icon
+     * @return Pixmap with color under the icon
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 创建一个带有颜色的图标 pixmap
+     * @param opt 工具按钮的样式选项
+     * @param iconsize 图标的大小
+     * @return 带有颜色的图标 pixmap
+     * \endif
+     */
     QPixmap createIconPixmap(const QStyleOptionToolButton& opt, const QSize& iconsize) const;
+
+    /**
+     * \if ENGLISH
+     * @brief Create a color icon
+     * @param c Color for the icon
+     * @param size Size of the icon
+     * @return Icon with the specified color
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 创建一个颜色图标
+     * @param c 图标的颜色
+     * @param size 图标的大小
+     * @return 带有指定颜色的图标
+     * \endif
+     */
     QIcon createColorIcon(const QColor& c, const QSize& size) const;
 
 public:
@@ -115,8 +158,15 @@ SARibbonColorToolButton::~SARibbonColorToolButton()
 }
 
 /**
+ * \if ENGLISH
+ * @brief Get the color maintained by the button
+ * @return Current color
+ * \endif
+ *
+ * \if CHINESE
  * @brief 获取按钮维护的颜色
- * @return
+ * @return 当前颜色
+ * \endif
  */
 QColor SARibbonColorToolButton::color() const
 {
@@ -124,8 +174,15 @@ QColor SARibbonColorToolButton::color() const
 }
 
 /**
+ * \if ENGLISH
+ * @brief Set the color display style
+ * @param s Color style to set
+ * \endif
+ *
+ * \if CHINESE
  * @brief 设置颜色显示的样式
- * @param s
+ * @param s 要设置的颜色样式
+ * \endif
  */
 void SARibbonColorToolButton::setColorStyle(SARibbonColorToolButton::ColorStyle s)
 {
@@ -143,8 +200,15 @@ void SARibbonColorToolButton::setColorStyle(SARibbonColorToolButton::ColorStyle 
 }
 
 /**
+ * \if ENGLISH
+ * @brief Get the color display style
+ * @return Current color style
+ * \endif
+ *
+ * \if CHINESE
  * @brief 颜色显示的样式
- * @return
+ * @return 当前颜色样式
+ * \endif
  */
 SARibbonColorToolButton::ColorStyle SARibbonColorToolButton::colorStyle() const
 {
@@ -152,8 +216,15 @@ SARibbonColorToolButton::ColorStyle SARibbonColorToolButton::colorStyle() const
 }
 
 /**
+ * \if ENGLISH
+ * @brief Set up a standard color menu
+ * @return Created SAColorMenu object
+ * \endif
+ *
+ * \if CHINESE
  * @brief 建立标准的颜色菜单
- * @return
+ * @return 创建的 SAColorMenu 对象
+ * \endif
  */
 SAColorMenu* SARibbonColorToolButton::setupStandardColorMenu()
 {
@@ -172,11 +243,17 @@ SAColorMenu* SARibbonColorToolButton::setupStandardColorMenu()
 }
 
 /**
- * @brief 设置按钮的颜色
+ * \if ENGLISH
+ * @brief Set the color of the button
+ * @param c Color to set
+ * @note This will generate a new icon and emit the colorChanged signal
+ * \endif
  *
- * 此时会生成一个新的icon
- * @note 会发射@sa colorChanged 信号
- * @param c
+ * \if CHINESE
+ * @brief 设置按钮的颜色
+ * @param c 要设置的颜色
+ * @note 此时会生成一个新的icon，并发射 colorChanged 信号
+ * \endif
  */
 void SARibbonColorToolButton::setColor(const QColor& c)
 {
@@ -196,10 +273,19 @@ void SARibbonColorToolButton::onButtonClicked(bool checked)
 }
 
 /**
+ * \if ENGLISH
+ * @brief Override paintIcon function to add color under the icon
+ * @param p Painter to use for drawing
+ * @param opt Style option for the tool button
+ * @param iconDrawRect Rectangle where the icon should be drawn
+ * \endif
+ *
+ * \if CHINESE
  * @brief 重写paintIcon函数，把颜色加到icon下面
- * @param p
- * @param opt
- * @param iconDrawRect
+ * @param p 用于绘制的painter
+ * @param opt 工具按钮的样式选项
+ * @param iconDrawRect 图标应该绘制的矩形区域
+ * \endif
  */
 void SARibbonColorToolButton::paintIcon(QPainter& p, const QStyleOptionToolButton& opt, const QRect& iconDrawRect)
 {

@@ -1,4 +1,4 @@
-﻿#ifndef SARIBBONLINEWIDGETCONTAINER_H
+#ifndef SARIBBONLINEWIDGETCONTAINER_H
 #define SARIBBONLINEWIDGETCONTAINER_H
 
 #include <QtCore/qglobal.h>
@@ -7,31 +7,38 @@
 #include "SARibbonGlobal.h"
 
 /**
+ * \if ENGLISH
+ * @brief A widget container that places the widget in the middle, with text before and after, mainly used for small widgets on the panel
+ * @details Implements the following effect:
+ * @details PrefixLabel|_Widget_|SuffixLabel
+ * \endif
+ *
+ * \if CHINESE
  * @brief 一个窗口容器，把窗口放置中间，前面后面都可以设置文本，主要用于放置在panel上的小窗口
- *
- * 实现如下效果：
- *
- * PrefixLabel|_Widget_|SuffixLabel
- *
+ * @details 实现如下效果：
+ * @details PrefixLabel|_Widget_|SuffixLabel
+ * \endif
  */
 class SA_RIBBON_EXPORT SARibbonLineWidgetContainer : public QWidget
 {
 public:
+	/// Constructor for SARibbonLineWidgetContainer
 	explicit SARibbonLineWidgetContainer(QWidget* par = nullptr);
+	/// Destructor for SARibbonLineWidgetContainer
 	~SARibbonLineWidgetContainer();
-	// 设置widget,不允许设置一个nullptr
+	/// Set widget (nullptr is not allowed)
 	void setWidget(QWidget* innerWidget);
 
-	// 设置前缀
+	/// Set prefix
 	void setPrefix(const QString& str);
 
-	// 设置后缀
+	/// Set suffix
 	void setSuffix(const QString& str);
 
-	// 前缀文本框
+	/// Prefix text box
 	QLabel* labelPrefix() const;
 
-	// 后缀文本框
+	/// Suffix text box
 	QLabel* labelSuffix() const;
 
 private:

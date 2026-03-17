@@ -1,4 +1,4 @@
-﻿#ifndef SARIBBONCUSTOMIZEDATA_H
+#ifndef SARIBBONCUSTOMIZEDATA_H
 #define SARIBBONCUSTOMIZEDATA_H
 #include "SARibbonGlobal.h"
 #include "SARibbonActionsManager.h"
@@ -8,12 +8,28 @@ class SARibbonBar;
 class SARibbonMainWindow;
 
 /**
+ * \if ENGLISH
+ * @brief Data class for recording all customization operations
+ * @note This data depends on @ref SARibbonActionsManager, use this class after SARibbonActionsManager
+ * \endif
+ *
+ * \if CHINESE
  * @brief 记录所有自定义操作的数据类
  * @note 此数据依赖于@ref SARibbonActionsManager 要在SARibbonActionsManager之后使用此类
+ * \endif
  */
 class SA_RIBBON_EXPORT SARibbonCustomizeData
 {
 public:
+	/**
+	 * \if ENGLISH
+	 * @brief Action type enumeration
+	 * \endif
+	 *
+	 * \if CHINESE
+	 * @brief 操作类型枚举
+	 * \endif
+	 */
 	enum ActionType
 	{
 		UnknowActionType = 0,           ///< 未知操作
@@ -30,109 +46,140 @@ public:
 		RenamePanelActionType,          ///< 对Panel更名操作(11)
 		VisibleCategoryActionType       ///< 对category执行隐藏/显示操作(12)
 	};
+	/// Default constructor
 	SARibbonCustomizeData();
+	/// Constructor with action type and manager
 	SARibbonCustomizeData(ActionType type, SARibbonActionsManager* mgr = nullptr);
-	// 获取CustomizeData的action type
+	/// Get the action type of the CustomizeData
 	ActionType actionType() const;
 
-	// 设置CustomizeData的action type
+	/// Set the action type of the CustomizeData
 	void setActionType(ActionType a);
 
-	// 判断是否是一个正常的CustomizeData
+	/// Check if this is a valid CustomizeData
 	bool isValid() const;
 
-	// 应用SARibbonCustomizeData
+	/// Apply SARibbonCustomizeData to SARibbonBar
 	bool apply(SARibbonBar* bar) const;
 
-	// 获取actionmanager指针
+	/// Get the action manager pointer
 	SARibbonActionsManager* actionManager();
 
-	// 设置ActionsManager
+	/// Set the ActionsManager
 	void setActionsManager(SARibbonActionsManager* mgr);
 
-	// 对应AddCategoryActionType
+	/// Create AddCategoryActionType SARibbonCustomizeData
 	static SARibbonCustomizeData makeAddCategoryCustomizeData(const QString& title, int index, const QString& objName);
 
-	// 对应AddPanelActionType
+	/// Create AddPanelActionType SARibbonCustomizeData
 	static SARibbonCustomizeData
 	makeAddPanelCustomizeData(const QString& title, int index, const QString& categoryobjName, const QString& objName);
 
-	// 对应AddActionActionType
+	/// Create AddActionActionType SARibbonCustomizeData
 	static SARibbonCustomizeData makeAddActionCustomizeData(const QString& key,
 															SARibbonActionsManager* mgr,
 															SARibbonPanelItem::RowProportion rp,
 															const QString& categoryObjName,
 															const QString& panelObjName);
 
-	// 对应RenameCategoryActionType
+	/// Create RenameCategoryActionType SARibbonCustomizeData
 	static SARibbonCustomizeData makeRenameCategoryCustomizeData(const QString& newname, const QString& categoryobjName);
 
-	// 对应RenamePanelActionType
+	/// Create RenamePanelActionType SARibbonCustomizeData
 	static SARibbonCustomizeData
 	makeRenamePanelCustomizeData(const QString& newname, const QString& categoryobjName, const QString& panelObjName);
 
-	// 对应RemoveCategoryActionType
+	/// Create RemoveCategoryActionType SARibbonCustomizeData
 	static SARibbonCustomizeData makeRemoveCategoryCustomizeData(const QString& categoryobjName);
 
-	// 对应ChangeCategoryOrderActionType
+	/// Create ChangeCategoryOrderActionType SARibbonCustomizeData
 	static SARibbonCustomizeData makeChangeCategoryOrderCustomizeData(const QString& categoryobjName, int moveindex);
 
-	// 对应ChangePanelOrderActionType
+	/// Create ChangePanelOrderActionType SARibbonCustomizeData
 	static SARibbonCustomizeData
 	makeChangePanelOrderCustomizeData(const QString& categoryobjName, const QString& panelObjName, int moveindex);
 
-	// 对应ChangeActionOrderActionType
+	/// Create ChangeActionOrderActionType SARibbonCustomizeData
 	static SARibbonCustomizeData makeChangeActionOrderCustomizeData(const QString& categoryobjName,
 																	const QString& panelObjName,
 																	const QString& key,
 																	SARibbonActionsManager* mgr,
 																	int moveindex);
 
-	// 对应RemovePanelActionType
+	/// Create RemovePanelActionType SARibbonCustomizeData
 	static SARibbonCustomizeData makeRemovePanelCustomizeData(const QString& categoryobjName, const QString& panelObjName);
 
-	// 对应RemoveActionActionType
+	/// Create RemoveActionActionType SARibbonCustomizeData
 	static SARibbonCustomizeData makeRemoveActionCustomizeData(const QString& categoryobjName,
 															   const QString& panelObjName,
 															   const QString& key,
 															   SARibbonActionsManager* mgr);
 
-	// 对应VisibleCategoryActionType
+	/// Create VisibleCategoryActionType SARibbonCustomizeData
 	static SARibbonCustomizeData makeVisibleCategoryCustomizeData(const QString& categoryobjName, bool isShow);
 
-	// 判断是否可以自定义,如果某个action不想被编辑，可以通过此函数设置
+	/// Check if customization is allowed for the object
 	static bool isCanCustomize(QObject* obj);
+	/// Set whether customization is allowed for the object
 	static void setCanCustomize(QObject* obj, bool canbe = true);
 
-	// 对QList<SARibbonCustomizeData>进行简化
+	/// Simplify QList<SARibbonCustomizeData>
 	static QList< SARibbonCustomizeData > simplify(const QList< SARibbonCustomizeData >& csd);
 
 public:
 	/**
-	 * @brief 记录顺序的参数
+	 * \if ENGLISH
+	 * @brief Parameter for recording order
+	 * @details When actionType==AddCategoryActionType, this parameter records the insert position of Category,
+	 *          When actionType==AddPanelActionType, this parameter records the insert position of panel,
+	 *          When actionType==AddActionActionType, this parameter records the insert position of action
+	 * \endif
 	 *
-	 * 在actionType==AddCategoryActionType时，此参数记录Category的insert位置,
-	 * 在actionType==AddPanelActionType时，此参数记录panel的insert位置,
-	 * 在actionType==AddActionActionType时，此参数记录panel的insert位置
+	 * \if CHINESE
+	 * @brief 记录顺序的参数
+	 * @details 在actionType==AddCategoryActionType时，此参数记录Category的insert位置,
+	 *          在actionType==AddPanelActionType时，此参数记录panel的insert位置,
+	 *          在actionType==AddActionActionType时，此参数记录panel的insert位置
+	 * \endif
 	 */
 	int indexValue;
 
 	/**
-	 * @brief 记录标题、索引等参数
+	 * \if ENGLISH
+	 * @brief Parameter for recording title, index, etc.
+	 * @details When actionType==AddCategoryActionType, key is the category title,
+	 *          When actionType==AddPanelActionType, key is the panel title,
+	 *          When actionType==AddActionActionType, key is the action query basis, based on SARibbonActionsManager::action query
+	 * \endif
 	 *
-	 * 在actionType==AddCategoryActionType时，key为category标题，
-	 * 在actionType==AddPanelActionType时，key为panel标题，
-	 * 在actionType==AddActionActionType时，key为action的查询依据，基于SARibbonActionsManager::action查询
+	 * \if CHINESE
+	 * @brief 记录标题、索引等参数
+	 * @details 在actionType==AddCategoryActionType时，key为category标题，
+	 *          在actionType==AddPanelActionType时，key为panel标题，
+	 *          在actionType==AddActionActionType时，key为action的查询依据，基于SARibbonActionsManager::action查询
+	 * \endif
 	 */
 	QString keyValue;
 
 	/**
+	 * \if ENGLISH
+	 * @brief Record categoryObjName for locating Category
+	 * \endif
+	 *
+	 * \if CHINESE
 	 * @brief 记录categoryObjName，用于定位Category
+	 * \endif
 	 */
 	QString categoryObjNameValue;
 
 	/**
+	 * \if ENGLISH
+	 * @brief Record panelObjName, SARibbon's Customize index is mostly based on objname
+	 * \endif
+	 *
+	 * \if CHINESE
 	 * @brief 记录panelObjName，saribbon的Customize索引大部分基于objname
+	 * \endif
 	 */
 	QString panelObjNameValue;
 

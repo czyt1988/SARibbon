@@ -1,4 +1,4 @@
-﻿#ifndef SARIBBONCUSTOMIZEWIDGET_H
+#ifndef SARIBBONCUSTOMIZEWIDGET_H
 #define SARIBBONCUSTOMIZEWIDGET_H
 #include "SARibbonGlobal.h"
 #include <QWidget>
@@ -19,195 +19,260 @@ class QXmlStreamWriter;
 class QXmlStreamReader;
 
 /**
- * @brief 自定义界面窗口
+ * \if ENGLISH
+ * @brief Customization interface widget
+ * @note SARibbon customization is step-based. If @ref sa_apply_customize_from_xml_file or similar functions are called
+ * before the window is generated, you need to call @ref SARibbonCustomizeWidget::fromXml before the dialog is generated
+ * to synchronize the configuration file, so that the modified configuration file is consistent.
+ * \endif
  *
+ * \if CHINESE
+ * @brief 自定义界面窗口
  * @note SARibbon的自定义是基于步骤的，如果在窗口生成前调用了@ref sa_apply_customize_from_xml_file 类似函数
- * 那么在对话框生成前为了保证同步需要调用@ref SARibbonCustomizeWidget::fromXml 同步配置文件，这样再次修改后的配置文件就一致
+ *       那么在对话框生成前为了保证同步需要调用@ref SARibbonCustomizeWidget::fromXml
+ * 同步配置文件，这样再次修改后的配置文件就一致
+ * \endif
  */
 class SA_RIBBON_EXPORT SARibbonCustomizeWidget : public QWidget
 {
-	Q_OBJECT
-	SA_RIBBON_DECLARE_PRIVATE(SARibbonCustomizeWidget)
+    Q_OBJECT
+    SA_RIBBON_DECLARE_PRIVATE(SARibbonCustomizeWidget)
 public:
-	// 保留接口
-	explicit SARibbonCustomizeWidget(SARibbonMainWindow* ribbonWindow,
-									 QWidget* parent   = nullptr,
-									 Qt::WindowFlags f = Qt::WindowFlags());
-	// 对于不使用SARibbonMainWindow的情况，使用此构造函数
-	explicit SARibbonCustomizeWidget(SARibbonBar* ribbonbar,
-									 QWidget* parent   = nullptr,
-									 Qt::WindowFlags f = Qt::WindowFlags());
-	~SARibbonCustomizeWidget();
+    /// Constructor using SARibbonMainWindow
+    explicit SARibbonCustomizeWidget(SARibbonMainWindow* ribbonWindow,
+                                     QWidget* parent   = nullptr,
+                                     Qt::WindowFlags f = Qt::WindowFlags());
+    /// Constructor using SARibbonBar directly
+    explicit SARibbonCustomizeWidget(SARibbonBar* ribbonbar,
+                                     QWidget* parent   = nullptr,
+                                     Qt::WindowFlags f = Qt::WindowFlags());
+    ~SARibbonCustomizeWidget();
 
-	/**
-	 * @brief 定义ribbon树的显示类型
-	 */
-	enum RibbonTreeShowType
-	{
-		ShowAllCategory,  ///< 显示所有Category，包括contextcategory
-		ShowMainCategory  ///< 显示主要的category，不包含上下文
-	};
+    /**
+     * \if ENGLISH
+     * @brief Ribbon tree display type
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 定义ribbon树的显示类型
+     * \endif
+     */
+    enum RibbonTreeShowType
+    {
+        ShowAllCategory,  ///< Show all categories including context categories
+        ShowMainCategory  ///< Show main categories only, excluding context categories
+    };
 
-	/**
-	 * @brief QStandardItem对应的role
-	 */
-	enum ItemRole
-	{
-		LevelRole        = Qt::UserRole + 1,  ///< 代表这是层级，有0：category 1：panel 2：item
-		PointerRole      = Qt::UserRole + 2,  ///< 代表这是存放指针。根据LevelRole来进行转
-		CanCustomizeRole = Qt::UserRole + 3,  ///< 代表个item是可以自定义的.bool
-		CustomizeRole = Qt::UserRole + 4,  ///< 代表这个是自定义的item,bool,主要用于那些自己添加的标签和panel，有此角色必有CanCustomizeRole
-		CustomizeObjNameRole = Qt::UserRole + 5  ///< 记录了临时的自定义内容的obj名 QString
-	};
+    /**
+     * \if ENGLISH
+     * @brief Item roles for QStandardItem
+     * \endif
+     *
+     * \if CHINESE
+     * @brief QStandardItem对应的role
+     * \endif
+     */
+    enum ItemRole
+    {
+        LevelRole        = Qt::UserRole + 1,  ///< Level: 0=category, 1=panel, 2=item
+        PointerRole      = Qt::UserRole + 2,  ///< Pointer storage, cast based on LevelRole
+        CanCustomizeRole = Qt::UserRole + 3,  ///< Whether this item can be customized (bool)
+        CustomizeRole = Qt::UserRole + 4,  ///< Whether this is a custom item (bool), mainly for self-added tabs and panels
+        CustomizeObjNameRole = Qt::UserRole + 5  ///< Temporary custom content object name (QString)
+    };
 
-	// 设置action管理器
-	void setupActionsManager(SARibbonActionsManager* mgr);
+    /// Set the action manager
+    void setupActionsManager(SARibbonActionsManager* mgr);
 
-	// 判断用户是否有要存储的内容，对应save动作
-	bool isApplied() const;
+    /// Check if there is content to store, corresponding to save action
+    bool isApplied() const;
 
-	// 判断用户是否有改动内容，对应apply动作
-	bool isCached() const;
+    /// Check if there are modified contents, corresponding to apply action
+    bool isCached() const;
 
-	// 获取model
-	const QStandardItemModel* model() const;
+    /// Get the model
+    const QStandardItemModel* model() const;
 
-	// 根据当前的radiobutton选项来更新model
-	void updateModel();
+    /// Update model based on current radiobutton selection
+    void updateModel();
 
-	// 更新model
-	void updateModel(RibbonTreeShowType type);
+    /// Update model with specified type
+    void updateModel(RibbonTreeShowType type);
 
-	// 应用所有的设定
-	bool applys();
+    /// Apply all settings
+    bool applys();
 
-	// 转换为xml
-	bool toXml(QXmlStreamWriter* xml) const;
-	bool toXml(const QString& xmlpath) const;
+    /// Convert to XML
+    bool toXml(QXmlStreamWriter* xml) const;
+    /// Convert to XML file
+    bool toXml(const QString& xmlpath) const;
 
-	// 从xml中加载QList<SARibbonCustomizeData>，对于基于配置文件的设置，对话框显示前建议调用此函数，保证叠加设置的正确记录
-	void fromXml(QXmlStreamReader* xml);
-	void fromXml(const QString& xmlpath);
+    /// Load from XML, for file-based settings, it is recommended to call this function before the dialog is displayed
+    void fromXml(QXmlStreamReader* xml);
+    /// Load from XML file
+    void fromXml(const QString& xmlpath);
 
-	// 应用xml配置，可以结合customize_datas_from_xml和customize_datas_apply函数
-	static bool fromXml(QXmlStreamReader* xml, SARibbonBar* bar, SARibbonActionsManager* mgr);
+    /// Apply XML configuration
+    static bool fromXml(QXmlStreamReader* xml, SARibbonBar* bar, SARibbonActionsManager* mgr);
 
-	// 缓存应用的动作,这些动作不会被clear清除，用于本地存储
-	void makeActionsApplied();
+    /// Cache applied actions, these actions will not be cleared by clear(), used for local storage
+    void makeActionsApplied();
 
-	// 清除applied的动作，cancel操作后需要清空已应用的动作
-	void clearApplied();
-	// 清除缓存动作，在执行applys函数后，如果要继续调用，应该clear，否则会导致异常
-	void clearCache();
-	// 清除所有动作，不包含本地读取的数据
-	void clear();
+    /// Clear applied actions, need to clear applied actions after cancel operation
+    void clearApplied();
+    /// Clear cached actions, after executing applys function, if you want to continue calling, you should clear, otherwise it will cause exceptions
+    void clearCache();
+    /// Clear all actions, excluding locally read data
+    void clear();
 
 protected:
-	// 把QList<SARibbonCustomizeData>进行裁剪,把一些动作合并
-	void simplify();
+    /// Simplify QList<SARibbonCustomizeData>, merge some actions
+    void simplify();
 
-	SARibbonPanelItem::RowProportion selectedRowProportion() const;
+    /// Get the row proportion selected in the current interface
+    SARibbonPanelItem::RowProportion selectedRowProportion() const;
 
-	QAction* selectedAction() const;
-	QAction* itemToAction(QStandardItem* item) const;
+    /// Get the action selected in listview
+    QAction* selectedAction() const;
+    /// Convert item to action
+    QAction* itemToAction(QStandardItem* item) const;
 
-	QStandardItem* selectedItem() const;
+    /// Get the selected item in ribbon tree
+    QStandardItem* selectedItem() const;
 
-	// 获取选中的ribbon tree 的level
-	int selectedRibbonLevel() const;
+    /// Get the level of selected ribbon tree item
+    int selectedRibbonLevel() const;
 
-	// 根据选中的item判断
-	int itemLevel(QStandardItem* item) const;
+    /// Get the level based on selected item
+    int itemLevel(QStandardItem* item) const;
 
-	// 设置某个item被选中
-	void setSelectItem(QStandardItem* item, bool ensureVisible = true);
+    /// Set an item to be selected
+    void setSelectItem(QStandardItem* item, bool ensureVisible = true);
 
-	// 判断itemn能否改动，可以改动返回true
-	bool isItemCanCustomize(QStandardItem* item) const;
-	bool isSelectedItemCanCustomize() const;
+    /// Check if item can be customized
+    bool isItemCanCustomize(QStandardItem* item) const;
+    bool isSelectedItemCanCustomize() const;
 
-	// 判断item是否是自定义的item
-	bool isCustomizeItem(QStandardItem* item) const;
-	bool isSelectedItemIsCustomize() const;
+    /// Check if item is a customize item
+    bool isCustomizeItem(QStandardItem* item) const;
+    bool isSelectedItemIsCustomize() const;
 
-	// 删除一个item
-	void removeItem(QStandardItem* item);
+    /// Remove an item
+    void removeItem(QStandardItem* item);
 
 private Q_SLOTS:
-	void onComboBoxActionIndexCurrentIndexChanged(int index);
-	void onRadioButtonGroupButtonClicked(QAbstractButton* b);
-	void onPushButtonNewCategoryClicked();
-	void onPushButtonNewPanelClicked();
-	void onPushButtonRenameClicked();
-	void onPushButtonAddClicked();
-	void onPushButtonDeleteClicked();
-	void onListViewSelectClicked(const QModelIndex& index);
-	void onTreeViewResultClicked(const QModelIndex& index);
-	void onToolButtonUpClicked();
-	void onToolButtonDownClicked();
-	void onItemChanged(QStandardItem* item);
-	void onLineEditSearchActionTextEdited(const QString& text);
-	void onPushButtonResetClicked();
+    void onComboBoxActionIndexCurrentIndexChanged(int index);
+    void onRadioButtonGroupButtonClicked(QAbstractButton* b);
+    void onPushButtonNewCategoryClicked();
+    void onPushButtonNewPanelClicked();
+    void onPushButtonRenameClicked();
+    void onPushButtonAddClicked();
+    void onPushButtonDeleteClicked();
+    void onListViewSelectClicked(const QModelIndex& index);
+    void onTreeViewResultClicked(const QModelIndex& index);
+    void onToolButtonUpClicked();
+    void onToolButtonDownClicked();
+    void onItemChanged(QStandardItem* item);
+    void onLineEditSearchActionTextEdited(const QString& text);
+    void onPushButtonResetClicked();
 
 private:
-	void init(SARibbonBar* ribbonbar);
-	void initConnection();
+    void init(SARibbonBar* ribbonbar);
+    void initConnection();
 
 private:
-	SARibbonCustomizeWidgetUi* ui;
+    SARibbonCustomizeWidgetUi* ui;
 };
 
 /**
- * @brief 转换为xml
+ * \if ENGLISH
+ * @brief Convert to XML
+ * @details This function only writes elements, not document related content.
+ * @param xml QXmlStreamWriter pointer
+ * @param cds Steps generated based on QList<SARibbonCustomizeData>
+ * @return Returns false if exception occurs, also returns false if there is no customization data
+ * \endif
  *
- * 此函数仅会写element，不会写document相关内容，因此如果需要写document，
- * 需要在此函数前调用QXmlStreamWriter::writeStartDocument(),在此函数后调用QXmlStreamWriter::writeEndDocument()
+ * \if CHINESE
+ * @brief 转换为xml
+ * @details 此函数仅会写element，不会写document相关内容
  * @param xml QXmlStreamWriter指针
- * @note 注意，在传入QXmlStreamWriter之前，需要设置编码为utf-8:xml->setCodec("utf-8");
- * @note 由于QXmlStreamWriter在QString作为io时，是不支持编码的，而此又无法保证自定义过程不出现中文字符，
- * 因此，QXmlStreamWriter不应该通过QString进行构造，如果需要用到string，也需要通过QByteArray构造，如：
  * @param cds 基于QList<SARibbonCustomizeData>生成的步骤
  * @return 如果出现异常，返回false,如果没有自定义数据也会返回false
+ * \endif
  */
 bool SA_RIBBON_EXPORT sa_customize_datas_to_xml(QXmlStreamWriter* xml, const QList< SARibbonCustomizeData >& cds);
 
 /**
- * @brief 通过xml获取QList<SARibbonCustomizeData>
- * @param xml
+ * \if ENGLISH
+ * @brief Get QList<SARibbonCustomizeData> from XML
+ * @param xml XML stream reader
+ * @param mgr Action manager
  * @return QList<SARibbonCustomizeData>
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 通过xml获取QList<SARibbonCustomizeData>
+ * @param xml XML流读取器
+ * @param mgr Action管理器
+ * @return QList<SARibbonCustomizeData>
+ * \endif
  */
 QList< SARibbonCustomizeData > SA_RIBBON_EXPORT sa_customize_datas_from_xml(QXmlStreamReader* xml,
                                                                             SARibbonActionsManager* mgr);
 
 /**
+ * \if ENGLISH
+ * @brief Apply QList<SARibbonCustomizeData>
+ * @param cds Customize data list
+ * @param w SARibbonBar pointer
+ * @return Number of successfully applied items
+ * \endif
+ *
+ * \if CHINESE
  * @brief 应用QList<SARibbonCustomizeData>
- * @param cds
+ * @param cds 自定义数据列表
  * @param w SARibbonBar指针
  * @return 成功应用的个数
+ * \endif
  */
 int SA_RIBBON_EXPORT sa_customize_datas_apply(const QList< SARibbonCustomizeData >& cds, SARibbonBar* w);
 
 /**
+ * \if ENGLISH
+ * @brief Reverse apply QList<SARibbonCustomizeData>
+ * @param cds Customize data list
+ * @param w SARibbonBar pointer
+ * @return Number of successfully reversed items
+ * \endif
+ *
+ * \if CHINESE
  * @brief 反向取消应用
- * @param cds
+ * @param cds 自定义数据列表
  * @param w SARibbonBar指针
  * @return 成功应用的个数
+ * \endif
  */
 int SA_RIBBON_EXPORT sa_customize_datas_reverse(const QList< SARibbonCustomizeData >& cds, SARibbonBar* w);
 
 /**
+ * \if ENGLISH
+ * @brief Directly load XML customization file for ribbon customization display
+ * @param filePath XML configuration file path
+ * @param bar SARibbonBar pointer
+ * @param mgr Action manager
+ * @return Returns true if successful
+ * @note Repeating loading a configuration file will cause exceptions. To avoid this, generally use a variable to ensure it is only loaded once.
+ * \endif
+ *
+ * \if CHINESE
  * @brief 直接加载xml自定义ribbon配置文件用于ribbon的自定义显示
- * @param filePath xml配置文件
- * @param w 主窗体
+ * @param filePath xml配置文件路径
+ * @param bar SARibbonBar指针
  * @param mgr action管理器
  * @return 成功返回true
- * @note 重复加载一个配置文件会发生异常，为了避免此类事件发生，一般通过一个变量保证只加载一次，如：
- * @code
- * static bool has_call = false;
- * if (!has_call) {
- *     has_call = sa_apply_customize_from_xml_file("customize.xml", this, m_actMgr);
- * }
- * @endcode
+ * @note 重复加载一个配置文件会发生异常，为了避免此类事件发生，一般通过一个变量保证只加载一次
+ * \endif
  */
 bool SA_RIBBON_EXPORT sa_apply_customize_from_xml_file(const QString& filePath, SARibbonBar* bar, SARibbonActionsManager* mgr);
 

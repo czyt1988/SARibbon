@@ -1,10 +1,18 @@
-﻿#ifndef SARIBBONCOLORTOOLBUTTON_H
+#ifndef SARIBBONCOLORTOOLBUTTON_H
 #define SARIBBONCOLORTOOLBUTTON_H
 #include "SARibbonToolButton.h"
 #include "SARibbonGlobal.h"
 class SAColorMenu;
 /**
- * @brief Refer to the color setting button in the office, which can display the color below the icon(参考office的颜色设置按钮，可以显示颜色在图标下方)
+ * \if ENGLISH
+ * @brief Color tool button similar to Office color setting buttons
+ * @details This button can display color below the icon or use color as the icon itself
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 参考office的颜色设置按钮，可以显示颜色在图标下方
+ * @details 此按钮可以在图标下方显示颜色，或使用颜色作为图标本身
+ * \endif
  */
 class SA_RIBBON_EXPORT SARibbonColorToolButton : public SARibbonToolButton
 {
@@ -12,7 +20,13 @@ class SA_RIBBON_EXPORT SARibbonColorToolButton : public SARibbonToolButton
     SA_RIBBON_DECLARE_PRIVATE(SARibbonColorToolButton)
 public:
     /**
+     * \if ENGLISH
+     * @brief Color display style
+     * \endif
+     *
+     * \if CHINESE
      * @brief 颜色样式
+     * \endif
      */
     enum ColorStyle
     {
@@ -21,34 +35,55 @@ public:
     };
 
 public:
+    /// Constructor for SARibbonColorToolButton
     explicit SARibbonColorToolButton(QWidget* parent = nullptr);
+    /// Constructor with default action
     explicit SARibbonColorToolButton(QAction* defaultAction, QWidget* parent = nullptr);
+    /// Destructor for SARibbonColorToolButton
     ~SARibbonColorToolButton();
-    // 获取颜色
+    /// Get the current color
     QColor color() const;
-    // 设置颜色显示方案
+    /// Set the color display style
     void setColorStyle(ColorStyle s);
+    /// Get the current color display style
     ColorStyle colorStyle() const;
-    // 建立标准的颜色菜单
+    /// Set up a standard color menu
     SAColorMenu* setupStandardColorMenu();
 public Q_SLOTS:
-    // 设置颜色,会发射colorChanged信号
+    /// Set the color, emits colorChanged signal
     void setColor(const QColor& c);
 private Q_SLOTS:
     void onButtonClicked(bool checked = false);
 Q_SIGNALS:
     /**
+     * \if ENGLISH
+     * @brief Signal emitted when color is clicked
+     * @param color The clicked color
+     * @param checked Whether the button is checked
+     * \endif
+     *
+     * \if CHINESE
      * @brief 颜色被点击的响应
-     * @param color
+     * @param color 点击的颜色
+     * @param checked 按钮是否被选中
+     * \endif
      */
     void colorClicked(const QColor& color, bool checked = false);
     /**
+     * \if ENGLISH
+     * @brief Signal emitted when color is changed
+     * @param color The new color
+     * \endif
+     *
+     * \if CHINESE
      * @brief 颜色改变信号
-     * @param color
+     * @param color 新的颜色
+     * \endif
      */
     void colorChanged(const QColor& color);
 
 protected:
+    /// Override paintIcon to add color under the icon
     void paintIcon(QPainter& p, const QStyleOptionToolButton& opt, const QRect& iconDrawRect);
 };
 

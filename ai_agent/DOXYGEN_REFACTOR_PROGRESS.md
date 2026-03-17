@@ -103,8 +103,23 @@ Q_SIGNALS:
 - `src/SARibbonBar/SARibbonGallery.cpp`
 - `src/SARibbonBar/SARibbonGallery.h`
 - `src/SARibbonBar/SARibbonMainWindow.cpp`
+- `src/SARibbonBar/SARibbonMainWindow.h`
+- `src/SARibbonBar/SARibbonMenu.cpp`
+- `src/SARibbonBar/SARibbonMenu.h`
 - `src/SARibbonBar/SARibbonPanel.cpp`
+- `src/SARibbonBar/SARibbonPanel.h`
+- `src/SARibbonBar/SARibbonPanelItem.cpp`
+- `src/SARibbonBar/SARibbonPanelItem.h`
+- `src/SARibbonBar/SARibbonPanelLayout.h`
+- `src/SARibbonBar/SARibbonPanelOptionButton.cpp`
+- `src/SARibbonBar/SARibbonPanelOptionButton.h`
+- `src/SARibbonBar/SARibbonQuickAccessBar.cpp`
+- `src/SARibbonBar/SARibbonQuickAccessBar.h`
+- `src/SARibbonBar/SARibbonSeparatorWidget.cpp`
+- `src/SARibbonBar/SARibbonSeparatorWidget.h`
 - `src/SARibbonBar/SARibbonTabBar.h`
+- `src/SARibbonBar/SARibbonLineWidgetContainer.cpp`
+- `src/SARibbonBar/SARibbonLineWidgetContainer.h`
 
 #### Batch 1 已完成 (2026-03-16)
 
@@ -140,43 +155,16 @@ Q_SIGNALS:
 - `src/SARibbonBar/SARibbonGalleryItem.cpp`
 - `src/SARibbonBar/SARibbonGalleryItem.h`
 - `src/SARibbonBar/SARibbonGlobal.h`
-
-### 未处理文件
-
-#### 核心文件（Batch 4）
-
-- `src/SARibbonBar/SARibbonLineWidgetContainer.cpp`
-- `src/SARibbonBar/SARibbonLineWidgetContainer.h`
-- `src/SARibbonBar/SARibbonMainWindow.h`
-- `src/SARibbonBar/SARibbonMenu.cpp`
-- `src/SARibbonBar/SARibbonMenu.h`
-- `src/SARibbonBar/SARibbonPanel.h`
-- `src/SARibbonBar/SARibbonPanelItem.cpp`
-- `src/SARibbonBar/SARibbonPanelItem.h`
-- `src/SARibbonBar/SARibbonPanelLayout.h`
-- `src/SARibbonBar/SARibbonPanelOptionButton.cpp`
-- `src/SARibbonBar/SARibbonPanelOptionButton.h`
-- `src/SARibbonBar/SARibbonQuickAccessBar.cpp`
-- `src/SARibbonBar/SARibbonQuickAccessBar.h`
-- `src/SARibbonBar/SARibbonSeparatorWidget.cpp`
-- `src/SARibbonBar/SARibbonSeparatorWidget.h`
-
-#### 核心文件（Batch 5）
-
 - `src/SARibbonBar/SARibbonStackedWidget.cpp`
 - `src/SARibbonBar/SARibbonStackedWidget.h`
 - `src/SARibbonBar/SARibbonSystemButtonBar.cpp`
 - `src/SARibbonBar/SARibbonSystemButtonBar.h`
-- `src/SARibbonBar/SARibbonTabBar.cpp`
-- `src/SARibbonBar/SARibbonTitleIconWidget.cpp`
-- `src/SARibbonBar/SARibbonTitleIconWidget.h`
-- `src/SARibbonBar/SARibbonToolButton.cpp`
-- `src/SARibbonBar/SARibbonUtil.cpp`
-- `src/SARibbonBar/SARibbonUtil.h`
-- `src/SARibbonBar/SARibbonWidget.cpp`
-- `src/SARibbonBar/SARibbonWidget.h`
-- `src/SARibbonBar/SAFramelessHelper.cpp`
-- `src/SARibbonBar/SAFramelessHelper.h`
+
+### 未处理文件
+
+#### 核心文件（Batch 4）- 已完成
+
+#### 核心文件（Batch 5）- 已完成
 
 #### 颜色组件文件（Batch 6）
 

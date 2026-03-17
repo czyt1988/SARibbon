@@ -5,6 +5,17 @@
 #include <QPainter>
 #include <QDebug>
 
+/**
+ * \if ENGLISH
+ * @brief Constructor for SARibbonSeparatorWidget
+ * @param parent Parent widget
+ * \endif
+ *
+ * \if CHINESE
+ * @brief SARibbonSeparatorWidget 构造函数
+ * @param parent 父窗口
+ * \endif
+ */
 SARibbonSeparatorWidget::SARibbonSeparatorWidget(QWidget* parent) : QFrame(parent)
 {
     setFrameShape(QFrame::VLine);
@@ -23,6 +34,15 @@ SARibbonSeparatorWidget::SARibbonSeparatorWidget(QWidget* parent) : QFrame(paren
     }
 }
 
+/**
+ * \if ENGLISH
+ * @brief Destructor for SARibbonSeparatorWidget
+ * \endif
+ *
+ * \if CHINESE
+ * @brief SARibbonSeparatorWidget 析构函数
+ * \endif
+ */
 SARibbonSeparatorWidget::~SARibbonSeparatorWidget()
 {
 }
