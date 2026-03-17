@@ -1,4 +1,4 @@
-﻿#include "SAColorPaletteGridWidget.h"
+#include "SAColorPaletteGridWidget.h"
 // Qt
 #include <QMenu>
 #include <QWidgetAction>
@@ -6,12 +6,45 @@
 #include <QColorDialog>
 // SA
 #include "SAColorGridWidget.h"
+/**
+ * \if ENGLISH
+ * @brief Private data class for SAColorPaletteGridWidget
+ * \endif
+ *
+ * \if CHINESE
+ * @brief SAColorPaletteGridWidget的私有数据类
+ * \endif
+ */
 class SAColorPaletteGridWidget::PrivateData
 {
     SA_COLOR_WIDGETS_DECLARE_PUBLIC(SAColorPaletteGridWidget)
 public:
+    /**
+     * \if ENGLISH
+     * @brief Constructor for PrivateData
+     * @param p Parent SAColorPaletteGridWidget
+     * \endif
+     *
+     * \if CHINESE
+     * @brief PrivateData构造函数
+     * @param p 父SAColorPaletteGridWidget
+     * \endif
+     */
     PrivateData(SAColorPaletteGridWidget* p);
-    // 生成color palette
+    
+    /**
+     * \if ENGLISH
+     * @brief Generate color palette
+     * @param clrList Color list
+     * @return Generated color palette
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 生成color palette
+     * @param clrList 颜色列表
+     * @return 生成的颜色面板
+     * \endif
+     */
     QList< QColor > makeColorPalette(const QList< QColor >& clrList) const;
 
 public:
@@ -49,12 +82,19 @@ QList< QColor > SAColorPaletteGridWidget::PrivateData::makeColorPalette(const QL
     return res;
 }
 //==============================================================
-// name
+// SAColorPaletteGridWidget
 //==============================================================
 
 /**
+ * \if ENGLISH
+ * @brief Constructor for SAColorPaletteGridWidget with default standard colors
+ * @param par Parent widget
+ * \endif
+ *
+ * \if CHINESE
  * @brief 使用默认的标准颜色生成一个color palette
- * @param par
+ * @param par 父部件
+ * \endif
  */
 SAColorPaletteGridWidget::SAColorPaletteGridWidget(QWidget* par) : QWidget(par), d_ptr(new PrivateData(this))
 {
@@ -63,9 +103,17 @@ SAColorPaletteGridWidget::SAColorPaletteGridWidget(QWidget* par) : QWidget(par),
 }
 
 /**
+ * \if ENGLISH
+ * @brief Constructor for SAColorPaletteGridWidget with specified colors
+ * @param cls Color list
+ * @param par Parent widget
+ * \endif
+ *
+ * \if CHINESE
  * @brief 根据指定的颜色生成一个color palette
- * @param cls
- * @param par
+ * @param cls 颜色列表
+ * @param par 父部件
+ * \endif
  */
 SAColorPaletteGridWidget::SAColorPaletteGridWidget(const QList< QColor >& cls, QWidget* par)
     : QWidget(par), d_ptr(new PrivateData(this))
@@ -74,9 +122,28 @@ SAColorPaletteGridWidget::SAColorPaletteGridWidget(const QList< QColor >& cls, Q
     setColorList(cls);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Destructor for SAColorPaletteGridWidget
+ * \endif
+ *
+ * \if CHINESE
+ * @brief SAColorPaletteGridWidget析构函数
+ * \endif
+ */
 SAColorPaletteGridWidget::~SAColorPaletteGridWidget()
 {
 }
+
+/**
+ * \if ENGLISH
+ * @brief Initialize widget
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 初始化部件
+ * \endif
+ */
 void SAColorPaletteGridWidget::init()
 {
     connect(d_ptr->mMainColorList, &SAColorGridWidget::colorClicked, this, &SAColorPaletteGridWidget::onMainColorClicked);
@@ -87,8 +154,16 @@ void SAColorPaletteGridWidget::init()
 }
 
 /**
+ * \if ENGLISH
+ * @brief Set color list, the number of colors determines the number of main color cards
+ * @details Palette color cards will be generated based on factor
+ * @param cls Color list
+ * \endif
+ *
+ * \if CHINESE
  * @brief 设置颜色系列，颜色系列的个数决定了主色卡的数量，palette色卡会根据factor进行生成
- * @param cls
+ * @param cls 颜色列表
+ * \endif
  */
 void SAColorPaletteGridWidget::setColorList(const QList< QColor >& cls)
 {
@@ -99,8 +174,15 @@ void SAColorPaletteGridWidget::setColorList(const QList< QColor >& cls)
 }
 
 /**
+ * \if ENGLISH
+ * @brief Get color list
+ * @return Color list
+ * \endif
+ *
+ * \if CHINESE
  * @brief 获取颜色系列
- * @return
+ * @return 颜色列表
+ * \endif
  */
 QList< QColor > SAColorPaletteGridWidget::colorList() const
 {
@@ -108,10 +190,18 @@ QList< QColor > SAColorPaletteGridWidget::colorList() const
 }
 
 /**
- * @brief 设置颜色深浅比例factor，factor决定了palette的行数，factor有5个，就有5行
+ * \if ENGLISH
+ * @brief Set color shade factor, factor determines the number of palette rows
+ * @details Default factor is { 180, 160, 140, 75, 50 }, which will generate 5 rows
+ * @details Each factor will apply QColor::lighter operation to standard colors
+ * @param factor Factor list
+ * \endif
  *
- * 默认为{ 180, 160, 140, 75, 50 },相当于会有5行，每个系数会对标准颜色执行QColor::lighter操作
- * @param factor
+ * \if CHINESE
+ * @brief 设置颜色深浅比例factor，factor决定了palette的行数，factor有5个，就有5行
+ * @details 默认为{ 180, 160, 140, 75, 50 },相当于会有5行，每个系数会对标准颜色执行QColor::lighter操作
+ * @param factor 因子列表
+ * \endif
  */
 void SAColorPaletteGridWidget::setFactor(const QList< int >& factor)
 {
@@ -120,8 +210,15 @@ void SAColorPaletteGridWidget::setFactor(const QList< int >& factor)
 }
 
 /**
+ * \if ENGLISH
+ * @brief Get factor list
+ * @return Factor list
+ * \endif
+ *
+ * \if CHINESE
  * @brief 获取色卡
- * @return
+ * @return 因子列表
+ * \endif
  */
 QList< int > SAColorPaletteGridWidget::factor() const
 {
@@ -129,8 +226,15 @@ QList< int > SAColorPaletteGridWidget::factor() const
 }
 
 /**
+ * \if ENGLISH
+ * @brief Set color icon size, default is 10*10
+ * @param s Icon size
+ * \endif
+ *
+ * \if CHINESE
  * @brief 设置颜色块的尺寸，默认为10*10
- * @param s
+ * @param s 图标大小
+ * \endif
  */
 void SAColorPaletteGridWidget::setColorIconSize(const QSize& s)
 {
@@ -138,14 +242,32 @@ void SAColorPaletteGridWidget::setColorIconSize(const QSize& s)
     d_ptr->mPaletteColorGrid->setColorIconSize(s);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Get color icon size
+ * @return Icon size
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取颜色块尺寸
+ * @return 图标大小
+ * \endif
+ */
 QSize SAColorPaletteGridWidget::colorIconSize() const
 {
     return d_ptr->mMainColorList->colorIconSize();
 }
 
 /**
+ * \if ENGLISH
+ * @brief Set whether color blocks are checkable
+ * @param on Checkable state
+ * \endif
+ *
+ * \if CHINESE
  * @brief 设置颜色块是否能被checked
- * @param on
+ * @param on 可选中状态
+ * \endif
  */
 void SAColorPaletteGridWidget::setColorCheckable(bool on)
 {
@@ -153,17 +275,50 @@ void SAColorPaletteGridWidget::setColorCheckable(bool on)
     d_ptr->mPaletteColorGrid->setColorCheckable(on);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Check if color blocks are checkable
+ * @return Checkable state
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 检查颜色块是否可选中
+ * @return 可选中状态
+ * \endif
+ */
 bool SAColorPaletteGridWidget::isColorCheckable() const
 {
     return d_ptr->mMainColorList->isColorCheckable();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Handle main color clicked
+ * @param c Clicked color
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 处理主颜色点击
+ * @param c 点击的颜色
+ * \endif
+ */
 void SAColorPaletteGridWidget::onMainColorClicked(const QColor& c)
 {
     d_ptr->mPaletteColorGrid->clearCheckedState();
     Q_EMIT colorClicked(c);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Handle palette color clicked
+ * @param c Clicked color
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 处理调色板颜色点击
+ * @param c 点击的颜色
+ * \endif
+ */
 void SAColorPaletteGridWidget::onPaletteColorClicked(const QColor& c)
 {
     d_ptr->mMainColorList->clearCheckedState();
