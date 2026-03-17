@@ -170,8 +170,8 @@ Q_SIGNALS:
 
 - ✅ `src/SARibbonBar/colorWidgets/SAColorGridWidget.cpp`
 - ✅ `src/SARibbonBar/colorWidgets/SAColorGridWidget.h`
-- `src/SARibbonBar/colorWidgets/SAColorMenu.cpp`
-- `src/SARibbonBar/colorWidgets/SAColorMenu.h`
+- ✅ `src/SARibbonBar/colorWidgets/SAColorMenu.cpp`
+- ✅ `src/SARibbonBar/colorWidgets/SAColorMenu.h`
 - `src/SARibbonBar/colorWidgets/SAColorPaletteGridWidget.cpp`
 - `src/SARibbonBar/colorWidgets/SAColorPaletteGridWidget.h`
 - `src/SARibbonBar/colorWidgets/SAColorToolButton.cpp`

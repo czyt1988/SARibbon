@@ -1,4 +1,4 @@
-﻿#include "SAColorMenu.h"
+#include "SAColorMenu.h"
 #include <QWidgetAction>
 #include <QColorDialog>
 #include <QDebug>
@@ -8,15 +8,86 @@
 #include "SAColorGridWidget.h"
 #include "SAColorPaletteGridWidget.h"
 #include "SAColorToolButton.h"
+/**
+ * \if ENGLISH
+ * @brief Private data class for SAColorMenu
+ * \endif
+ *
+ * \if CHINESE
+ * @brief SAColorMenu的私有数据类
+ * \endif
+ */
 class SAColorMenu::PrivateData
 {
     SA_COLOR_WIDGETS_DECLARE_PUBLIC(SAColorMenu)
 public:
+    /**
+     * \if ENGLISH
+     * @brief Constructor for PrivateData
+     * @param p Parent SAColorMenu
+     * \endif
+     *
+     * \if CHINESE
+     * @brief PrivateData构造函数
+     * @param p 父SAColorMenu
+     * \endif
+     */
     PrivateData(SAColorMenu* p);
+    
+    /**
+     * \if ENGLISH
+     * @brief Get color from color dialog
+     * @return Selected color, or invalid color if dialog is canceled
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 通过对话框获取颜色
+     * @return 选中的颜色，如果对话框被取消则返回无效颜色
+     * \endif
+     */
     QColor getColorByDialog();
+    
+    /**
+     * \if ENGLISH
+     * @brief Record custom color
+     * @param c Color to record
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 记录自定义颜色
+     * @param c 要记录的颜色
+     * \endif
+     */
     void recordCustomColor(const QColor& c);
+    
+    /**
+     * \if ENGLISH
+     * @brief Add widget to menu
+     * @param w Widget to add
+     * @return Created QWidgetAction
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 向菜单添加部件
+     * @param w 要添加的部件
+     * @return 创建的QWidgetAction
+     * \endif
+     */
     QWidgetAction* addWidget(QWidget* w);
-    //创建一个无颜色的icon
+    
+    /**
+     * \if ENGLISH
+     * @brief Create a none color icon
+     * @param baseSize Icon base size
+     * @return Created icon
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 创建一个无颜色的icon
+     * @param baseSize 图标基础大小
+     * @return 创建的图标
+     * \endif
+     */
     QIcon createNoneColorIcon(QSize baseSize = QSize(32, 32));
 
 public:
@@ -81,24 +152,64 @@ QIcon SAColorMenu::PrivateData::createNoneColorIcon(QSize baseSize)
 // SAColorMenu
 //===================================================
 
+/**
+ * \if ENGLISH
+ * @brief Constructor for SAColorMenu
+ * @param parent Parent widget
+ * \endif
+ *
+ * \if CHINESE
+ * @brief SAColorMenu构造函数
+ * @param parent 父部件
+ * \endif
+ */
 SAColorMenu::SAColorMenu(QWidget* parent) : QMenu(parent), d_ptr(new SAColorMenu::PrivateData(this))
 {
     init(SA::getStandardColorList());
 }
 
+/**
+ * \if ENGLISH
+ * @brief Constructor for SAColorMenu with title
+ * @param title Menu title
+ * @param parent Parent widget
+ * \endif
+ *
+ * \if CHINESE
+ * @brief SAColorMenu构造函数（带标题）
+ * @param title 菜单标题
+ * @param parent 父部件
+ * \endif
+ */
 SAColorMenu::SAColorMenu(const QString& title, QWidget* parent)
     : QMenu(title, parent), d_ptr(new SAColorMenu::PrivateData(this))
 {
     init(SA::getStandardColorList());
 }
 
+/**
+ * \if ENGLISH
+ * @brief Destructor for SAColorMenu
+ * \endif
+ *
+ * \if CHINESE
+ * @brief SAColorMenu析构函数
+ * \endif
+ */
 SAColorMenu::~SAColorMenu()
 {
 }
 
 /**
+ * \if ENGLISH
+ * @brief Quick bind to SAColorToolButton
+ * @param btn SAColorToolButton to bind
+ * \endif
+ *
+ * \if CHINESE
  * @brief 快速绑定ColorToolButton
- * @param btn
+ * @param btn 要绑定的SAColorToolButton
+ * \endif
  */
 void SAColorMenu::bindToColorToolButton(SAColorToolButton* btn)
 {
@@ -112,8 +223,15 @@ void SAColorMenu::bindToColorToolButton(SAColorToolButton* btn)
 }
 
 /**
+ * \if ENGLISH
+ * @brief Get theme colors palette action
+ * @return Theme colors palette action
+ * \endif
+ *
+ * \if CHINESE
  * @brief ThemeColorsPalette对应的action
- * @return
+ * @return 主题颜色面板对应的action
+ * \endif
  */
 QWidgetAction* SAColorMenu::themeColorsPaletteAction() const
 {
@@ -121,8 +239,15 @@ QWidgetAction* SAColorMenu::themeColorsPaletteAction() const
 }
 
 /**
+ * \if ENGLISH
+ * @brief Get custom colors widget action
+ * @return Custom colors widget action
+ * \endif
+ *
+ * \if CHINESE
  * @brief CustomColorsWidget对应的action
- * @return
+ * @return 自定义颜色窗口对应的action
+ * \endif
  */
 QWidgetAction* SAColorMenu::getCustomColorsWidgetAction() const
 {
@@ -130,8 +255,15 @@ QWidgetAction* SAColorMenu::getCustomColorsWidgetAction() const
 }
 
 /**
+ * \if ENGLISH
+ * @brief Get custom color action
+ * @return Custom color action
+ * \endif
+ *
+ * \if CHINESE
  * @brief 自定义颜色action
- * @return
+ * @return 自定义颜色action
+ * \endif
  */
 QAction* SAColorMenu::customColorAction() const
 {
@@ -139,8 +271,15 @@ QAction* SAColorMenu::customColorAction() const
 }
 
 /**
+ * \if ENGLISH
+ * @brief Get theme colors palette widget
+ * @return Theme colors palette widget
+ * \endif
+ *
+ * \if CHINESE
  * @brief 获取ThemeColorsPalette
- * @return
+ * @return 主题颜色面板部件
+ * \endif
  */
 SAColorPaletteGridWidget* SAColorMenu::colorPaletteGridWidget() const
 {
@@ -148,8 +287,15 @@ SAColorPaletteGridWidget* SAColorMenu::colorPaletteGridWidget() const
 }
 
 /**
+ * \if ENGLISH
+ * @brief Get custom colors widget
+ * @return Custom colors widget
+ * \endif
+ *
+ * \if CHINESE
  * @brief 获取自定义颜色grid
- * @return
+ * @return 自定义颜色网格部件
+ * \endif
  */
 SAColorGridWidget* SAColorMenu::customColorsWidget() const
 {
@@ -157,10 +303,17 @@ SAColorGridWidget* SAColorMenu::customColorsWidget() const
 }
 
 /**
- * @brief 建立没有颜色的action，可以选择无颜色
+ * \if ENGLISH
+ * @brief Enable none color action
+ * @details None color selection will emit selectedColor(QColor())
+ * @param on Whether to enable none color action
+ * \endif
  *
- * 无颜色选中会发射selectedColor(QColor())
- * @param on
+ * \if CHINESE
+ * @brief 建立没有颜色的action，可以选择无颜色
+ * @details 无颜色选中会发射selectedColor(QColor())
+ * @param on 是否启用无颜色action
+ * \endif
  */
 void SAColorMenu::enableNoneColorAction(bool on)
 {
@@ -186,10 +339,17 @@ void SAColorMenu::enableNoneColorAction(bool on)
 }
 
 /**
- * @brief 获取None Color Action
+ * \if ENGLISH
+ * @brief Get none color action
+ * @note Note that enableNoneColorAction(true) must be called before this returns non-nullptr
+ * @return None color action, or nullptr if not created
+ * \endif
  *
+ * \if CHINESE
+ * @brief 获取None Color Action
  * @note 注意，enableNoneColorAction(true),之后才不是nullptr
  * @return 如果没有建立NoneColorAction，会返回nullptr
+ * \endif
  */
 QAction* SAColorMenu::noneColorAction() const
 {
@@ -197,8 +357,16 @@ QAction* SAColorMenu::noneColorAction() const
 }
 
 /**
+ * \if ENGLISH
+ * @brief Helper slot function to emit selectedColor signal and hide menu
+ * @details This function allows other custom actions to be associated with the menu
+ * @param c Selected color
+ * \endif
+ *
+ * \if CHINESE
  * @brief 这是一个辅助槽函数，为了让用户自定义的其他action也能关联menu，可以调用此槽函数，实现selectedColor信号以及menu的隐藏
- * @param c
+ * @param c 选中的颜色
+ * \endif
  */
 void SAColorMenu::emitSelectedColor(const QColor& c)
 {
@@ -206,6 +374,17 @@ void SAColorMenu::emitSelectedColor(const QColor& c)
     hide();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Initialize menu
+ * @param themeCls Theme color list
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 初始化菜单
+ * @param themeCls 主题颜色列表
+ * \endif
+ */
 void SAColorMenu::init(const QList< QColor >& themeCls)
 {
     d_ptr->mTitleLabel = new QLabel(this);
@@ -234,8 +413,15 @@ void SAColorMenu::init(const QList< QColor >& themeCls)
 }
 
 /**
+ * \if ENGLISH
+ * @brief Handle custom color action triggered
+ * @param on Triggered state
+ * \endif
+ *
+ * \if CHINESE
  * @brief 自定义颜色
- * @param on
+ * @param on 触发状态
+ * \endif
  */
 void SAColorMenu::onCustomColorActionTriggered(bool on)
 {
@@ -250,8 +436,15 @@ void SAColorMenu::onCustomColorActionTriggered(bool on)
 }
 
 /**
+ * \if ENGLISH
+ * @brief Handle none color action triggered
+ * @param on Triggered state
+ * \endif
+ *
+ * \if CHINESE
  * @brief 无颜色
- * @param on
+ * @param on 触发状态
+ * \endif
  */
 void SAColorMenu::onNoneColorActionTriggered(bool on)
 {
