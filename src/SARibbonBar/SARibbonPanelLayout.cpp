@@ -1,4 +1,4 @@
-﻿#include "SARibbonPanelLayout.h"
+#include "SARibbonPanelLayout.h"
 #include "SARibbonPanelOptionButton.h"
 #include "SARibbonSeparatorWidget.h"
 #include "SARibbonElementManager.h"
@@ -26,6 +26,17 @@
     } while (0)
 #endif  // SARibbonPanelLayout_HELP_DRAW_RECT
 #endif  // SARibbonPanelLayout_DEBUG_PRINT
+/**
+ * \if ENGLISH
+ * @brief Constructs a SARibbonPanelLayout instance
+ * @param p Parent widget
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 构造一个 SARibbonPanelLayout 实例
+ * @param p 父窗口部件
+ * \endif
+ */
 SARibbonPanelLayout::SARibbonPanelLayout(QWidget* p) : QLayout(p), mColumnCount(0), mExpandFlag(false), mDirty(true)
 {
     setSpacing(1);
@@ -36,6 +47,15 @@ SARibbonPanelLayout::SARibbonPanelLayout(QWidget* p) : QLayout(p), mColumnCount(
     }
 }
 
+/**
+ * \if ENGLISH
+ * @brief Destructor for SARibbonPanelLayout
+ * \endif
+ *
+ * \if CHINESE
+ * @brief SARibbonPanelLayout析构函数
+ * \endif
+ */
 SARibbonPanelLayout::~SARibbonPanelLayout()
 {
     // 参考QToolBarLayout
@@ -51,9 +71,17 @@ SARibbonPanelLayout::~SARibbonPanelLayout()
 }
 
 /**
- * @brief Finds the index of an action in the layout / 在布局中查找一个action的索引
- * @param action The action to find / 要查找的action
- * @return The index of the action, or -1 if not found / action的索引，如果未找到则返回-1
+ * \if ENGLISH
+ * @brief Finds the index of an action in the layout
+ * @param action The action to find
+ * @return The index of the action, or -1 if not found
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 在布局中查找一个action的索引
+ * @param action 要查找的action
+ * @return action的索引，如果未找到则返回-1
+ * \endif
  */
 int SARibbonPanelLayout::indexByAction(QAction* action) const
 {
@@ -66,8 +94,15 @@ int SARibbonPanelLayout::indexByAction(QAction* action) const
 }
 
 /**
- * @brief Gets the SARibbonPanel that owns this layout / 获取拥有此布局的SARibbonPanel
- * @return A pointer to the parent SARibbonPanel, or nullptr if not found / 指向父SARibbonPanel的指针，如果未找到则返回nullptr
+ * \if ENGLISH
+ * @brief Gets the SARibbonPanel that owns this layout
+ * @return A pointer to the parent SARibbonPanel, or nullptr if not found
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取拥有此布局的SARibbonPanel
+ * @return 指向父SARibbonPanel的指针，如果未找到则返回nullptr
+ * \endif
  */
 SARibbonPanel* SARibbonPanelLayout::ribbonPanel() const
 {
@@ -75,14 +110,22 @@ SARibbonPanel* SARibbonPanelLayout::ribbonPanel() const
 }
 
 /**
- * @brief Adds an item to the layout (not supported) / 向布局添加一个项目（不支持）
+ * \if ENGLISH
+ * @brief Adds an item to the layout (not supported)
  *
  * This layout only accepts items created from `QAction` via `insertAction`. Calling this function
  * directly will result in a warning.
  *
+ * @param item The layout item to add
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 向布局添加一个项目（不支持）
+ *
  * 此布局仅接受通过 `insertAction` 从 `QAction` 创建的项目。直接调用此函数将导致警告。
  *
- * @param item The layout item to add / 要添加的布局项目
+ * @param item 要添加的布局项目
+ * \endif
  */
 void SARibbonPanelLayout::addItem(QLayoutItem* item)
 {
@@ -92,16 +135,26 @@ void SARibbonPanelLayout::addItem(QLayoutItem* item)
 }
 
 /**
- * @brief Inserts an action at a specific index / 在指定索引处插入一个action
+ * \if ENGLISH
+ * @brief Inserts an action at a specific index
  *
  * This is the primary method for adding content to the layout. It creates a `SARibbonPanelItem`
  * from the `QAction` and inserts it at the specified position.
  *
+ * @param index The index at which to insert the action
+ * @param act The action to insert
+ * @param rp The row proportion for the action
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 在指定索引处插入一个action
+ *
  * 这是向布局添加内容的主要方法。它从 `QAction` 创建一个 `SARibbonPanelItem` 并将其插入到指定位置。
  *
- * @param index The index at which to insert the action / 插入action的索引
- * @param act The action to insert / 要插入的action
- * @param rp The row proportion for the action / action的行占比
+ * @param index 插入action的索引
+ * @param act 要插入的action
+ * @param rp action的行占比
+ * \endif
  */
 void SARibbonPanelLayout::insertAction(int index, QAction* act, SARibbonPanelItem::RowProportion rp)
 {
@@ -117,15 +170,23 @@ void SARibbonPanelLayout::insertAction(int index, QAction* act, SARibbonPanelIte
 }
 
 /**
- * @brief Sets the option action for the panel / 为面板设置选项action
+ * \if ENGLISH
+ * @brief Sets the option action for the panel
  *
  * The option action is displayed as a button in the panel's title area.
  * Pass `nullptr` to remove the current option action.
  *
+ * @param action The option action, or nullptr to remove
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 为面板设置选项action
+ *
  * 选项action显示在面板标题区域的一个按钮中。
  * 传入 `nullptr` 以移除当前的选项action。
  *
- * @param action The option action, or nullptr to remove / 选项action，或传入nullptr以移除
+ * @param action 选项action，或传入nullptr以移除
+ * \endif
  */
 void SARibbonPanelLayout::setOptionAction(QAction* action)
 {
@@ -162,8 +223,15 @@ void SARibbonPanelLayout::setOptionAction(QAction* action)
 }
 
 /**
- * @brief Checks if an option action is set / 检查是否设置了选项action
- * @return true if an option action exists; otherwise false / 如果存在选项action则返回true；否则返回false
+ * \if ENGLISH
+ * @brief Checks if an option action is set
+ * @return true if an option action exists; otherwise false
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 检查是否设置了选项action
+ * @return 如果存在选项action则返回true；否则返回false
+ * \endif
  */
 bool SARibbonPanelLayout::isHaveOptionAction() const
 {
@@ -171,9 +239,17 @@ bool SARibbonPanelLayout::isHaveOptionAction() const
 }
 
 /**
- * @brief Retrieves the item at the specified index / 获取指定索引处的项目
- * @param index The index of the item / 项目的索引
- * @return The layout item, or nullptr if index is invalid / 布局项目，如果索引无效则返回nullptr
+ * \if ENGLISH
+ * @brief Retrieves the item at the specified index
+ * @param index The index of the item
+ * @return The layout item, or nullptr if index is invalid
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取指定索引处的项目
+ * @param index 项目的索引
+ * @return 布局项目，如果索引无效则返回nullptr
+ * \endif
  */
 QLayoutItem* SARibbonPanelLayout::itemAt(int index) const
 {
@@ -184,9 +260,17 @@ QLayoutItem* SARibbonPanelLayout::itemAt(int index) const
 }
 
 /**
- * @brief Removes and returns the item at the specified index / 移除并返回指定索引处的项目
- * @param index The index of the item to remove / 要移除的项目的索引
- * @return The removed layout item, or nullptr if index is invalid / 被移除的布局项目，如果索引无效则返回nullptr
+ * \if ENGLISH
+ * @brief Removes and returns the item at the specified index
+ * @param index The index of the item to remove
+ * @return The removed layout item, or nullptr if index is invalid
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 移除并返回指定索引处的项目
+ * @param index 要移除的项目的索引
+ * @return 被移除的布局项目，如果索引无效则返回nullptr
+ * \endif
  */
 QLayoutItem* SARibbonPanelLayout::takeAt(int index)
 {
@@ -210,8 +294,15 @@ QLayoutItem* SARibbonPanelLayout::takeAt(int index)
 }
 
 /**
- * @brief Gets the number of items in the layout / 获取布局中项目的数量
- * @return The item count / 项目数量
+ * \if ENGLISH
+ * @brief Gets the number of items in the layout
+ * @return The item count
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取布局中项目的数量
+ * @return 项目数量
+ * \endif
  */
 int SARibbonPanelLayout::count() const
 {
@@ -219,8 +310,15 @@ int SARibbonPanelLayout::count() const
 }
 
 /**
- * @brief Checks if the layout is empty / 检查布局是否为空
- * @return true if the layout has no items; otherwise false / 如果布局没有项目则返回true；否则返回false
+ * \if ENGLISH
+ * @brief Checks if the layout is empty
+ * @return true if the layout has no items; otherwise false
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 检查布局是否为空
+ * @return 如果布局没有项目则返回true；否则返回false
+ * \endif
  */
 bool SARibbonPanelLayout::isEmpty() const
 {
@@ -229,11 +327,19 @@ bool SARibbonPanelLayout::isEmpty() const
 }
 
 /**
- * @brief Invalidates the layout, marking it as dirty / 使布局失效，将其标记为“脏”
+ * \if ENGLISH
+ * @brief Invalidates the layout, marking it as dirty
  *
  * This forces a recalculation of the layout geometry on the next update.
  *
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 使布局失效，将其标记为“脏”
+ *
  * 这会强制在下次更新时重新计算布局几何形状。
+ *
+ * \endif
  */
 void SARibbonPanelLayout::invalidate()
 {
@@ -242,19 +348,48 @@ void SARibbonPanelLayout::invalidate()
 }
 
 /**
- * @brief Returns the directions in which the layout can expand / 返回布局可以扩展的方向
- * @return The expanding directions (always Qt::Horizontal for this layout) / 扩展方向（此布局始终为Qt::Horizontal）
+ * \if ENGLISH
+ * @brief Returns the directions in which the layout can expand
+ * @return The expanding directions (always Qt::Horizontal for this layout)
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 返回布局可以扩展的方向
+ * @return 扩展方向（此布局始终为Qt::Horizontal）
+ * \endif
  */
 Qt::Orientations SARibbonPanelLayout::expandingDirections() const
 {
     return (Qt::Horizontal);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Gets the minimum size of the layout
+ * @return The minimum size
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取布局的最小尺寸
+ * @return 最小尺寸
+ * \endif
+ */
 QSize SARibbonPanelLayout::minimumSize() const
 {
     return (mSizeHint);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Gets the size hint of the layout
+ * @return The size hint
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取布局的尺寸提示
+ * @return 尺寸提示
+ * \endif
+ */
 QSize SARibbonPanelLayout::sizeHint() const
 {
 #if SARibbonPanelLayout_DEBUG_PRINT
@@ -266,9 +401,17 @@ QSize SARibbonPanelLayout::sizeHint() const
 }
 
 /**
- * @brief Retrieves the SARibbonPanelItem associated with an action / 获取与action关联的SARibbonPanelItem
- * @param action The action to query / 要查询的action
- * @return The associated item, or nullptr if not found / 关联的项目，如果未找到则返回nullptr
+ * \if ENGLISH
+ * @brief Retrieves the SARibbonPanelItem associated with an action
+ * @param action The action to query
+ * @return The associated item, or nullptr if not found
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取与action关联的SARibbonPanelItem
+ * @param action 要查询的action
+ * @return 关联的项目，如果未找到则返回nullptr
+ * \endif
  */
 SARibbonPanelItem* SARibbonPanelLayout::panelItem(QAction* action) const
 {
@@ -281,8 +424,15 @@ SARibbonPanelItem* SARibbonPanelLayout::panelItem(QAction* action) const
 }
 
 /**
- * @brief Gets the last item added to the layout / 获取最后添加到布局的项目
- * @return The last item, or nullptr if the layout is empty / 最后一个项目，如果布局为空则返回nullptr
+ * \if ENGLISH
+ * @brief Gets the last item added to the layout
+ * @return The last item, or nullptr if the layout is empty
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取最后添加到布局的项目
+ * @return 最后一个项目，如果布局为空则返回nullptr
+ * \endif
  */
 SARibbonPanelItem* SARibbonPanelLayout::lastItem() const
 {
@@ -293,8 +443,15 @@ SARibbonPanelItem* SARibbonPanelLayout::lastItem() const
 }
 
 /**
- * @brief Gets the widget associated with the last item / 获取与最后一个项目关联的窗口部件
- * @return The widget, or nullptr if not found / 窗口部件，如果未找到则返回nullptr
+ * \if ENGLISH
+ * @brief Gets the widget associated with the last item
+ * @return The widget, or nullptr if not found
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取与最后一个项目关联的窗口部件
+ * @return 窗口部件，如果未找到则返回nullptr
+ * \endif
  */
 QWidget* SARibbonPanelLayout::lastWidget() const
 {
@@ -307,9 +464,17 @@ QWidget* SARibbonPanelLayout::lastWidget() const
 }
 
 /**
- * @brief Moves an item from one index to another / 将一个项目从一个索引移动到另一个索引
- * @param from The current index of the item / 项目的当前索引
- * @param to The new index for the item / 项目的新索引
+ * \if ENGLISH
+ * @brief Moves an item from one index to another
+ * @param from The current index of the item
+ * @param to The new index for the item
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 将一个项目从一个索引移动到另一个索引
+ * @param from 项目的当前索引
+ * @param to 项目的新索引
+ * \endif
  */
 void SARibbonPanelLayout::move(int from, int to)
 {
@@ -327,21 +492,43 @@ void SARibbonPanelLayout::move(int from, int to)
 }
 
 /**
+ * \if ENGLISH
+ * @brief Checks if the layout needs to be relayouted
+ * @return true if the layout is dirty and needs relayouting, false otherwise
+ * \endif
+ *
+ * \if CHINESE
  * @brief 判断是否需要重新布局
- * @return
+ * @return 如果布局需要重新布局则返回true，否则返回false
+ * \endif
  */
 bool SARibbonPanelLayout::isDirty() const
 {
     return (mDirty);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Updates the geometry array using the current geometry
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 使用当前几何形状更新几何数组
+ * \endif
+ */
 void SARibbonPanelLayout::updateGeomArray()
 {
     updateGeomArray(geometry());
 }
 
 /**
+ * \if ENGLISH
+ * @brief Lays out all actions
+ * \endif
+ *
+ * \if CHINESE
  * @brief 布局所有action
+ * \endif
  */
 void SARibbonPanelLayout::doLayout()
 {
@@ -405,17 +592,33 @@ void SARibbonPanelLayout::doLayout()
 }
 
 /**
+ * \if ENGLISH
+ * @brief Converts an action to an item
+ *
+ * This function references QToolBarItem *QToolBarLayout::createItem(QAction *action)
+ *
+ * For regular QAction, this function creates a SARibbonToolButton. The type of SARibbonToolButton
+ * is determined by SARibbonPanelItem::RowProportion.
+ *
+ * @param action The action to convert
+ * @param rp Row proportion
+ * @return The converted SARibbonPanelItem
+ * @note Each SARibbonPanelItem will eventually carry a widget. If a QWidgetAction is passed,
+ * it will directly use the widget carried by QWidgetAction. Otherwise, it will internally generate a SARibbonToolButton.
+ * \endif
+ *
+ * \if CHINESE
  * @brief 把action转换为item
  *
  * 此函数参考QToolBarItem *QToolBarLayout::createItem(QAction *action)
  *
  * 对于普通QAction，此函数会创建SARibbonToolButton，SARibbonToolButton的类型参考SARibbonPanelItem::RowProportion，
- * @param action
+ * @param action 要转换的action
  * @param rp 行高占比情况
  * @return 转换的SARibbonPanelItem
  * @note 每个SARibbonPanelItem最终都会携带一个widget，传入的是QWidgetAction的话，会直接使用QWidgetAction带的widget，
  * 否则会内部生成一个SARibbonToolButton
- *
+ * \endif
  */
 SARibbonPanelItem* SARibbonPanelLayout::createItem(QAction* action, SARibbonPanelItem::RowProportion rp)
 {
@@ -472,7 +675,15 @@ SARibbonPanelItem* SARibbonPanelLayout::createItem(QAction* action, SARibbonPane
 }
 
 /**
+ * \if ENGLISH
+ * @brief Updates the geometry array
+ * @param setrect The rectangle to update
+ * \endif
+ *
+ * \if CHINESE
  * @brief 更新尺寸
+ * @param setrect 要更新的矩形
+ * \endif
  */
 void SARibbonPanelLayout::updateGeomArray(const QRect& setrect)
 {
@@ -796,6 +1007,17 @@ void SARibbonPanelLayout::updateGeomArray(const QRect& setrect)
 #endif
 }
 
+/**
+ * \if ENGLISH
+ * @brief Recalculates the expand geometry array
+ * @param setrect The rectangle to recalculate
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 重新计算扩展几何数组
+ * @param setrect 要重新计算的矩形
+ * \endif
+ */
 void SARibbonPanelLayout::recalcExpandGeomArray(const QRect& setrect)
 {
     // 计算能扩展的尺寸
@@ -887,10 +1109,19 @@ void SARibbonPanelLayout::recalcExpandGeomArray(const QRect& setrect)
 }
 
 /**
+ * \if ENGLISH
+ * @brief Calculates the width and maximum width of the window based on the column index
+ * @param colindex Column index
+ * @param width Returns -1 if the column does not exist
+ * @param maximum Returns -1 if the column does not exist
+ * \endif
+ *
+ * \if CHINESE
  * @brief 根据列数，计算窗口的宽度，以及最大宽度
- * @param colindex
+ * @param colindex 列索引
  * @param width 如果传入没有这个列，返回-1
  * @param maximum 如果传入没有这个列，返回-1
+ * \endif
  */
 void SARibbonPanelLayout::columnWidthInfo(int colindex, int& width, int& maximum) const
 {
@@ -905,8 +1136,15 @@ void SARibbonPanelLayout::columnWidthInfo(int colindex, int& width, int& maximum
 }
 
 /**
- * @brief Gets the panel's title label / 获取面板的标题标签
- * @return A pointer to the SARibbonPanelLabel / 指向SARibbonPanelLabel的指针
+ * \if ENGLISH
+ * @brief Gets the panel's title label
+ * @return A pointer to the SARibbonPanelLabel
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取面板的标题标签
+ * @return 指向SARibbonPanelLabel的指针
+ * \endif
  */
 SARibbonPanelLabel* SARibbonPanelLayout::panelTitleLabel() const
 {
@@ -914,9 +1152,19 @@ SARibbonPanelLabel* SARibbonPanelLayout::panelTitleLabel() const
 }
 
 /**
- * @brief Sets the default icon size for tool buttons / 设置工具按钮的默认图标尺寸
- * @param s The new icon size / 新的图标尺寸
+ * \if ENGLISH
+ * @brief Sets the default icon size for tool buttons
+ * @param smallSize Small icon size
+ * @param largeSize Large icon size
  * @sa toolButtonIconSize
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置工具按钮的默认图标尺寸
+ * @param smallSize 小图标尺寸
+ * @param largeSize 大图标尺寸
+ * @sa toolButtonIconSize
+ * \endif
  */
 void SARibbonPanelLayout::setToolButtonIconSize(const QSize& smallSize, const QSize& largeSize)
 {
@@ -925,9 +1173,17 @@ void SARibbonPanelLayout::setToolButtonIconSize(const QSize& smallSize, const QS
 }
 
 /**
- * @brief Gets the default icon size for tool buttons / 获取工具按钮的默认图标尺寸
- * @return The current icon size / 当前的图标尺寸
+ * \if ENGLISH
+ * @brief Gets the default icon size for tool buttons
+ * @return The current icon size
  * @sa setToolButtonIconSize
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取工具按钮的默认图标尺寸
+ * @return 当前的图标尺寸
+ * @sa setToolButtonIconSize
+ * \endif
  */
 QPair< QSize, QSize > SARibbonPanelLayout::toolButtonIconSize() const
 {
@@ -935,8 +1191,15 @@ QPair< QSize, QSize > SARibbonPanelLayout::toolButtonIconSize() const
 }
 
 /**
+ * \if ENGLISH
+ * @brief Sets the large button icon size
+ * @param largeSize Large icon size
+ * \endif
+ *
+ * \if CHINESE
  * @brief 设置大按钮图标尺寸
- * @param largeSize
+ * @param largeSize 大图标尺寸
+ * \endif
  */
 void SARibbonPanelLayout::setLargeIconSize(const QSize& largeSize)
 {
@@ -944,8 +1207,15 @@ void SARibbonPanelLayout::setLargeIconSize(const QSize& largeSize)
 }
 
 /**
+ * \if ENGLISH
+ * @brief Gets the large button icon size
+ * @return Large icon size
+ * \endif
+ *
+ * \if CHINESE
  * @brief 大按钮图标尺寸
- * @return
+ * @return 大图标尺寸
+ * \endif
  */
 QSize SARibbonPanelLayout::largeIconSize() const
 {
@@ -953,8 +1223,15 @@ QSize SARibbonPanelLayout::largeIconSize() const
 }
 
 /**
+ * \if ENGLISH
+ * @brief Sets the small button icon size
+ * @param largeSize Small icon size
+ * \endif
+ *
+ * \if CHINESE
  * @brief 设置小按钮图标尺寸
- * @param largeSize
+ * @param largeSize 小图标尺寸
+ * \endif
  */
 void SARibbonPanelLayout::setSmallIconSize(const QSize& largeSize)
 {
@@ -962,8 +1239,15 @@ void SARibbonPanelLayout::setSmallIconSize(const QSize& largeSize)
 }
 
 /**
+ * \if ENGLISH
+ * @brief Gets the small button icon size
+ * @return Small icon size
+ * \endif
+ *
+ * \if CHINESE
  * @brief 小按钮图标尺寸
- * @return
+ * @return 小图标尺寸
+ * \endif
  */
 QSize SARibbonPanelLayout::smallIconSize() const
 {
@@ -971,8 +1255,15 @@ QSize SARibbonPanelLayout::smallIconSize() const
 }
 
 /**
- * @brief Gets the size of the option action button / 获取选项action按钮的尺寸
- * @return The button's size / 按钮的尺寸
+ * \if ENGLISH
+ * @brief Gets the size of the option action button
+ * @return The button's size
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取选项action按钮的尺寸
+ * @return 按钮的尺寸
+ * \endif
  */
 QSize SARibbonPanelLayout::optionActionButtonSize() const
 {
@@ -980,8 +1271,15 @@ QSize SARibbonPanelLayout::optionActionButtonSize() const
 }
 
 /**
- * @brief Sets the panel's title label / 设置面板的标题标签
- * @param newTitleLabel The new title label widget / 新的标题标签窗口部件
+ * \if ENGLISH
+ * @brief Sets the panel's title label
+ * @param newTitleLabel The new title label widget
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置面板的标题标签
+ * @param newTitleLabel 新的标题标签窗口部件
+ * \endif
  */
 void SARibbonPanelLayout::setPanelTitleLabel(SARibbonPanelLabel* newTitleLabel)
 {
@@ -995,8 +1293,15 @@ void SARibbonPanelLayout::setPanelTitleLabel(SARibbonPanelLabel* newTitleLabel)
 }
 
 /**
+ * \if ENGLISH
+ * @brief Checks if word wrap is enabled
+ * @return true if word wrap is enabled, false otherwise
+ * \endif
+ *
+ * \if CHINESE
  * @brief 是否允许文字换行
- * @return
+ * @return 如果允许文字换行则返回true，否则返回false
+ * \endif
  */
 bool SARibbonPanelLayout::isEnableWordWrap() const
 {
@@ -1004,8 +1309,15 @@ bool SARibbonPanelLayout::isEnableWordWrap() const
 }
 
 /**
+ * \if ENGLISH
+ * @brief Sets whether word wrap is enabled
+ * @param on If true, word wrap is enabled
+ * \endif
+ *
+ * \if CHINESE
  * @brief 设置文字允许换行
- * @param enableWordWrap
+ * @param on 如果为true，则允许文字换行
+ * \endif
  */
 void SARibbonPanelLayout::setEnableWordWrap(bool on)
 {
@@ -1022,15 +1334,31 @@ void SARibbonPanelLayout::setEnableWordWrap(bool on)
 }
 
 /**
+ * \if ENGLISH
+ * @brief Sets the maximum button aspect ratio, which determines the maximum width of the button
+ *
+ * The maximum width of the button is button height * this coefficient. For example, if the button height is h, then the maximum button width is maxw = h * buttonMaximumAspectRatio
+ * If the text cannot be fully displayed at this width, the button will not continue to expand horizontally, and ... will be used to replace the text that is not fully displayed
+ *
+ * @param fac Aspect ratio factor
+ * @see buttonMaximumAspectRatio
+ *
+ * @note Users should not call @ref SARibbonPanelLayout::setButtonMaximumAspectRatio to set it,
+ * but instead call @ref SARibbonBar::setButtonMaximumAspectRatio to set the aspect ratio
+ * \endif
+ *
+ * \if CHINESE
  * @brief 设置按钮最大宽高比，这个系数决定按钮的最大宽度
  *
  * 按钮的最大宽度为按钮高度*此系数，例如按钮高度为h，那么按钮最大宽度maxw=h*buttonMaximumAspectRatio
  * 如果在此宽度下文字还无法完全显示，那么按钮将不会继续横向扩展，将使用...替代未完全显示的文字
  *
+ * @param fac 宽高比系数
  * @see buttonMaximumAspectRatio
  *
  * @note 用户不应该调用@ref SARibbonPanelLayout::setButtonMaximumAspectRatio 来设置，
  * 而是调用@ref SARibbonBar::setButtonMaximumAspectRatio 设置宽高比
+ * \endif
  */
 void SARibbonPanelLayout::setButtonMaximumAspectRatio(qreal fac)
 {
@@ -1047,9 +1375,17 @@ void SARibbonPanelLayout::setButtonMaximumAspectRatio(qreal fac)
 }
 
 /**
+ * \if ENGLISH
+ * @brief Gets the maximum button aspect ratio, which determines the maximum width of the button
+ * @return The maximum button aspect ratio
+ * @see setButtonMaximumAspectRatio
+ * \endif
+ *
+ * \if CHINESE
  * @brief 按钮最大宽高比，这个系数决定按钮的最大宽度
  * @return 按钮最大宽高比
  * @see setButtonMaximumAspectRatio
+ * \endif
  */
 qreal SARibbonPanelLayout::buttonMaximumAspectRatio() const
 {
@@ -1057,9 +1393,17 @@ qreal SARibbonPanelLayout::buttonMaximumAspectRatio() const
 }
 
 /**
- * @brief Gets the spacing between the title and the buttons / 获取标题与按钮之间的间距
- * @return The current spacing value / 当前的间距值
+ * \if ENGLISH
+ * @brief Gets the spacing between the title and the buttons
+ * @return The current spacing value
  * @sa setPanelTitleSpace
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取标题与按钮之间的间距
+ * @return 当前的间距值
+ * @sa setPanelTitleSpace
+ * \endif
  */
 int SARibbonPanelLayout::panelTitleSpace() const
 {
@@ -1067,9 +1411,17 @@ int SARibbonPanelLayout::panelTitleSpace() const
 }
 
 /**
- * @brief Sets the spacing between the title and the buttons / 设置标题与按钮之间的间距
- * @param newTitleSpace The new spacing value / 新的间距值
+ * \if ENGLISH
+ * @brief Sets the spacing between the title and the buttons
+ * @param newTitleSpace The new spacing value
  * @sa panelTitleSpace
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置标题与按钮之间的间距
+ * @param newTitleSpace 新的间距值
+ * @sa panelTitleSpace
+ * \endif
  */
 void SARibbonPanelLayout::setPanelTitleSpace(int newTitleSpace)
 {
@@ -1081,9 +1433,17 @@ void SARibbonPanelLayout::setPanelTitleSpace(int newTitleSpace)
 }
 
 /**
- * @brief Gets the height of the panel's title / 获取面板标题的高度
- * @return The current title height / 当前的标题高度
+ * \if ENGLISH
+ * @brief Gets the height of the panel's title
+ * @return The current title height
  * @sa setPanelTitleHeight
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取面板标题的高度
+ * @return 当前的标题高度
+ * @sa setPanelTitleHeight
+ * \endif
  */
 int SARibbonPanelLayout::panelTitleHeight() const
 {
@@ -1091,9 +1451,17 @@ int SARibbonPanelLayout::panelTitleHeight() const
 }
 
 /**
- * @brief Sets the height of the panel's title / 设置面板标题的高度
- * @param newTitleHeight The new title height / 新的标题高度
+ * \if ENGLISH
+ * @brief Sets the height of the panel's title
+ * @param newTitleHeight The new title height
  * @sa panelTitleHeight
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置面板标题的高度
+ * @param newTitleHeight 新的标题高度
+ * @sa panelTitleHeight
+ * \endif
  */
 void SARibbonPanelLayout::setPanelTitleHeight(int newTitleHeight)
 {

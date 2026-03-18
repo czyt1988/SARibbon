@@ -1,4 +1,4 @@
-﻿#include "SAColorToolButton.h"
+#include "SAColorToolButton.h"
 #include <QApplication>
 #include <QPaintEvent>
 #include <QStylePainter>
@@ -8,20 +8,194 @@
 #include <QDebug>
 #include "SAColorMenu.h"
 
+/**
+ * \if ENGLISH
+ * @brief Private data class for SAColorToolButton
+ * \endif
+ *
+ * \if CHINESE
+ * @brief SAColorToolButton的私有数据类
+ * \endif
+ */
 class SAColorToolButton::PrivateData
 {
     SA_COLOR_WIDGETS_DECLARE_PUBLIC(SAColorToolButton)
 public:
+    /**
+     * \if ENGLISH
+     * @brief Constructor for PrivateData
+     * @param p Parent SAColorToolButton
+     * \endif
+     *
+     * \if CHINESE
+     * @brief PrivateData构造函数
+     * @param p 父SAColorToolButton
+     * \endif
+     */
     PrivateData(SAColorToolButton* p);
+    
+    /**
+     * \if ENGLISH
+     * @brief Calculate sizes for icon-only tool button
+     * @param opt Style option
+     * @param iconRect Icon rectangle
+     * @param textRect Text rectangle
+     * @param colorRect Color rectangle
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 计算仅图标工具按钮的尺寸
+     * @param opt 样式选项
+     * @param iconRect 图标矩形
+     * @param textRect 文本矩形
+     * @param colorRect 颜色矩形
+     * \endif
+     */
     void calcSizeOfToolButtonIconOnly(const QStyleOptionToolButton& opt, QRect& iconRect, QRect& textRect, QRect& colorRect);
+    
+    /**
+     * \if ENGLISH
+     * @brief Calculate sizes for text-only tool button
+     * @param opt Style option
+     * @param iconRect Icon rectangle
+     * @param textRect Text rectangle
+     * @param colorRect Color rectangle
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 计算仅文本工具按钮的尺寸
+     * @param opt 样式选项
+     * @param iconRect 图标矩形
+     * @param textRect 文本矩形
+     * @param colorRect 颜色矩形
+     * \endif
+     */
     void calcSizeOfToolButtonTextOnly(const QStyleOptionToolButton& opt, QRect& iconRect, QRect& textRect, QRect& colorRect);
+    
+    /**
+     * \if ENGLISH
+     * @brief Calculate sizes for text-beside-icon tool button
+     * @param opt Style option
+     * @param iconRect Icon rectangle
+     * @param textRect Text rectangle
+     * @param colorRect Color rectangle
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 计算文本在图标旁边的工具按钮尺寸
+     * @param opt 样式选项
+     * @param iconRect 图标矩形
+     * @param textRect 文本矩形
+     * @param colorRect 颜色矩形
+     * \endif
+     */
     void calcSizeOfToolButtonTextBesideIcon(const QStyleOptionToolButton& opt, QRect& iconRect, QRect& textRect, QRect& colorRect);
+    
+    /**
+     * \if ENGLISH
+     * @brief Calculate sizes for text-under-icon tool button
+     * @param opt Style option
+     * @param iconRect Icon rectangle
+     * @param textRect Text rectangle
+     * @param colorRect Color rectangle
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 计算文本在图标下方的工具按钮尺寸
+     * @param opt 样式选项
+     * @param iconRect 图标矩形
+     * @param textRect 文本矩形
+     * @param colorRect 颜色矩形
+     * \endif
+     */
     void calcSizeOfToolButtonTextUnderIcon(const QStyleOptionToolButton& opt, QRect& iconRect, QRect& textRect, QRect& colorRect);
+    
+    /**
+     * \if ENGLISH
+     * @brief Create icon pixmap
+     * @param opt Style option
+     * @param iconRect Icon rectangle
+     * @return Created pixmap
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 创建图标像素图
+     * @param opt 样式选项
+     * @param iconRect 图标矩形
+     * @return 创建的像素图
+     * \endif
+     */
     QPixmap createIconPixmap(const QStyleOptionToolButton& opt, const QRect& iconRect);
+    
+    /**
+     * \if ENGLISH
+     * @brief Get button rectangle
+     * @param opt Style option
+     * @return Button rectangle
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 获取按钮的矩形区域
+     * @param opt 样式选项
+     * @return 按钮矩形
+     * \endif
+     */
     QRect getButtonRect(const QStyleOptionToolButton& opt);
+    
+    /**
+     * \if ENGLISH
+     * @brief Get indicator rectangle
+     * @param opt Style option
+     * @return Indicator rectangle
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 获取ToolButtonMenu的区域
+     * @param opt 样式选项
+     * @return 指示器矩形
+     * \endif
+     */
     QRect getIndicatorRect(const QStyleOptionToolButton& opt);
+    
+    /**
+     * \if ENGLISH
+     * @brief Get button style state
+     * @param opt Style option
+     * @return Button style state
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 基于Qt qcommonStyle源码，对QStyleOptionToolButton的style修正
+     * @param opt 样式选项
+     * @return 按钮样式状态
+     * \endif
+     */
     QStyle::State getButtonStyleState(const QStyleOptionToolButton& opt);
+    
+    /**
+     * \if ENGLISH
+     * @brief Get button menu style state
+     * @param opt Style option
+     * @return Button menu style state
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 基于Qt qcommonStyle源码，对QStyleOptionToolButton的style修正
+     * @param opt 样式选项
+     * @return 按钮菜单样式状态
+     * \endif
+     */
     QStyle::State getButtonMenuStyleState(const QStyleOptionToolButton& opt);
+    
+    /**
+     * \if ENGLISH
+     * @brief Remove menu
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 移除菜单
+     * \endif
+     */
     void removeMenu();
 
 public:
@@ -295,12 +469,36 @@ void SAColorToolButton::PrivateData::removeMenu()
 // SAColorToolButton
 //==============================================================
 
+/**
+ * \if ENGLISH
+ * @brief Constructor for SAColorToolButton
+ * @param parent Parent widget
+ * \endif
+ *
+ * \if CHINESE
+ * @brief SAColorToolButton构造函数
+ * @param parent 父部件
+ * \endif
+ */
 SAColorToolButton::SAColorToolButton(QWidget* parent) : QToolButton(parent), d_ptr(new PrivateData(this))
 {
     setColorToolButtonStyle(WithColorMenu);
     connect(this, &QToolButton::clicked, this, &SAColorToolButton::onButtonClicked);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Constructor for SAColorToolButton with style
+ * @param style Color tool button style
+ * @param parent Parent widget
+ * \endif
+ *
+ * \if CHINESE
+ * @brief SAColorToolButton构造函数（带样式）
+ * @param style 颜色工具按钮样式
+ * @param parent 父部件
+ * \endif
+ */
 SAColorToolButton::SAColorToolButton(ColorToolButtonStyle style, QWidget* parent)
     : QToolButton(parent), d_ptr(new PrivateData(this))
 {
@@ -308,13 +506,29 @@ SAColorToolButton::SAColorToolButton(ColorToolButtonStyle style, QWidget* parent
     connect(this, &QToolButton::clicked, this, &SAColorToolButton::onButtonClicked);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Destructor for SAColorToolButton
+ * \endif
+ *
+ * \if CHINESE
+ * @brief SAColorToolButton析构函数
+ * \endif
+ */
 SAColorToolButton::~SAColorToolButton()
 {
 }
 
 /**
+ * \if ENGLISH
+ * @brief Get color
+ * @return Current color
+ * \endif
+ *
+ * \if CHINESE
  * @brief 获取颜色
- * @return
+ * @return 当前颜色
+ * \endif
  */
 QColor SAColorToolButton::color() const
 {
@@ -322,8 +536,15 @@ QColor SAColorToolButton::color() const
 }
 
 /**
+ * \if ENGLISH
+ * @brief Set margins
+ * @param mg Margins
+ * \endif
+ *
+ * \if CHINESE
  * @brief 设置Margins
- * @param mg
+ * @param mg 边距
+ * \endif
  */
 void SAColorToolButton::setMargins(const QMargins& mg)
 {
@@ -331,15 +552,34 @@ void SAColorToolButton::setMargins(const QMargins& mg)
     repaint();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Get margins
+ * @return Margins
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取边距
+ * @return 边距
+ * \endif
+ */
 QMargins SAColorToolButton::margins() const
 {
     return d_ptr->mMargins;
 }
 
 /**
+ * \if ENGLISH
+ * @brief Paint none color indication
+ * @param p Painter
+ * @param colorRect Color rectangle
+ * \endif
+ *
+ * \if CHINESE
  * @brief 绘制无颜色表示
- * @param p
+ * @param p  painter
  * @param colorRect 绘制的区域
+ * \endif
  */
 void SAColorToolButton::paintNoneColor(QPainter* p, const QRect& colorRect)
 {
@@ -357,8 +597,15 @@ void SAColorToolButton::paintNoneColor(QPainter* p, const QRect& colorRect)
 }
 
 /**
+ * \if ENGLISH
+ * @brief Set color tool button style
+ * @param s Style
+ * \endif
+ *
+ * \if CHINESE
  * @brief 设置颜色按钮的样式
- * @param s
+ * @param s 样式
+ * \endif
  */
 void SAColorToolButton::setColorToolButtonStyle(ColorToolButtonStyle s)
 {
@@ -371,8 +618,15 @@ void SAColorToolButton::setColorToolButtonStyle(ColorToolButtonStyle s)
 }
 
 /**
+ * \if ENGLISH
+ * @brief Get color tool button style
+ * @return Style
+ * \endif
+ *
+ * \if CHINESE
  * @brief 颜色按钮的样式
- * @return
+ * @return 样式
+ * \endif
  */
 SAColorToolButton::ColorToolButtonStyle SAColorToolButton::colorToolButtonStyle() const
 {
@@ -380,10 +634,17 @@ SAColorToolButton::ColorToolButtonStyle SAColorToolButton::colorToolButtonStyle(
 }
 
 /**
- * @brief 获取colorMenu
+ * \if ENGLISH
+ * @brief Get color menu
+ * @note Note that this function may return nullptr if ColorToolButtonStyle is set to NoColorMenu or if a custom menu is set
+ * @return SAColorMenu pointer, or nullptr if not available
+ * \endif
  *
+ * \if CHINESE
+ * @brief 获取colorMenu
  * @note 注意，这个函数很有可能会返回nullptr，如果ColorToolButtonStyle设置为NoColorMenu或者自己设置了菜单，此函数返回nullptr
  * @return SAColorMenu指针，如果没有，返回nullptr
+ * \endif
  */
 SAColorMenu* SAColorToolButton::colorMenu() const
 {
@@ -391,8 +652,15 @@ SAColorMenu* SAColorToolButton::colorMenu() const
 }
 
 /**
+ * \if ENGLISH
+ * @brief Create standard color menu
+ * @return Created SAColorMenu
+ * \endif
+ *
+ * \if CHINESE
  * @brief 建立标准的颜色菜单
- * @return
+ * @return 创建的SAColorMenu
+ * \endif
  */
 SAColorMenu* SAColorToolButton::createColorMenu()
 {
@@ -409,9 +677,17 @@ SAColorMenu* SAColorToolButton::createColorMenu()
 }
 
 /**
+ * \if ENGLISH
+ * @brief Set color
+ * @note Will emit @sa colorChanged signal
+ * @param c Color
+ * \endif
+ *
+ * \if CHINESE
  * @brief 设置颜色
  * @note 会发射@sa colorChanged 信号
- * @param c
+ * @param c 颜色
+ * \endif
  */
 void SAColorToolButton::setColor(const QColor& c)
 {
@@ -423,11 +699,21 @@ void SAColorToolButton::setColor(const QColor& c)
 }
 
 /**
+ * \if ENGLISH
+ * @brief Calculate positions of basic components
+ * @param opt Style option
+ * @param iconRect Icon rectangle
+ * @param textRect Text rectangle
+ * @param colorRect Color rectangle
+ * \endif
+ *
+ * \if CHINESE
  * @brief 计算各个基本组件的位置
- * @param opt
+ * @param opt 样式选项
  * @param iconRect 图标区域
  * @param textRect 文本区域
  * @param colorRect 颜色区域
+ * \endif
  */
 void SAColorToolButton::calcRect(const QStyleOptionToolButton& opt, QRect& iconRect, QRect& textRect, QRect& colorRect)
 {
@@ -451,6 +737,17 @@ void SAColorToolButton::calcRect(const QStyleOptionToolButton& opt, QRect& iconR
     }
 }
 
+/**
+ * \if ENGLISH
+ * @brief Handle paint event
+ * @param e Paint event
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 处理绘制事件
+ * @param e 绘制事件
+ * \endif
+ */
 void SAColorToolButton::paintEvent(QPaintEvent* e)
 {
     Q_UNUSED(e);
@@ -470,6 +767,17 @@ void SAColorToolButton::paintEvent(QPaintEvent* e)
     paintColor(&p, colorRect, d_ptr->mColor, opt);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Handle resize event
+ * @param e Resize event
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 处理尺寸改变事件
+ * @param e 尺寸改变事件
+ * \endif
+ */
 void SAColorToolButton::resizeEvent(QResizeEvent* e)
 {
     // 在resizeevent计算绘图所需的尺寸，避免在绘图过程中实时绘制提高效率
@@ -477,8 +785,15 @@ void SAColorToolButton::resizeEvent(QResizeEvent* e)
 }
 
 /**
+ * \if ENGLISH
+ * @brief Override sizeHint
+ * @return Recommended size
+ * \endif
+ *
+ * \if CHINESE
  * @brief sizeHint重载
- * @return
+ * @return 推荐尺寸
+ * \endif
  */
 QSize SAColorToolButton::sizeHint() const
 {
@@ -519,15 +834,34 @@ QSize SAColorToolButton::sizeHint() const
     return style()->sizeFromContents(QStyle::CT_ToolButton, &opt, QSize(w, h), this).expandedTo(QSize(2, 2));
 }
 
+/**
+ * \if ENGLISH
+ * @brief Handle button clicked
+ * @param checked Checked state
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 处理按钮点击
+ * @param checked 选中状态
+ * \endif
+ */
 void SAColorToolButton::onButtonClicked(bool checked)
 {
     Q_EMIT colorClicked(color(), checked);
 }
 
 /**
+ * \if ENGLISH
+ * @brief Paint button
+ * @param p Painter
+ * @param opt Style option
+ * \endif
+ *
+ * \if CHINESE
  * @brief 绘制按钮
- * @param p
- * @param opt
+ * @param p  painter
+ * @param opt 样式选项
+ * \endif
  */
 void SAColorToolButton::paintButton(QStylePainter* p, const QStyleOptionToolButton& opt)
 {
@@ -561,10 +895,19 @@ void SAColorToolButton::paintButton(QStylePainter* p, const QStyleOptionToolButt
 }
 
 /**
+ * \if ENGLISH
+ * @brief Paint icon
+ * @param p Painter
+ * @param iconRect Icon rectangle
+ * @param opt Style option
+ * \endif
+ *
+ * \if CHINESE
  * @brief 绘制icon
- * @param p
- * @param iconRect
- * @param opt icon信息从QStyleOptionToolButton获取
+ * @param p  painter
+ * @param iconRect 图标矩形
+ * @param opt 样式选项
+ * \endif
  */
 void SAColorToolButton::paintIcon(QStylePainter* p, const QRect& iconRect, const QStyleOptionToolButton& opt)
 {
@@ -575,10 +918,19 @@ void SAColorToolButton::paintIcon(QStylePainter* p, const QRect& iconRect, const
 }
 
 /**
+ * \if ENGLISH
+ * @brief Paint text
+ * @param p Painter
+ * @param textRect Text rectangle
+ * @param opt Style option
+ * \endif
+ *
+ * \if CHINESE
  * @brief 绘制文本
- * @param p
- * @param textRect
- * @param opt
+ * @param p  painter
+ * @param textRect 文本矩形
+ * @param opt 样式选项
+ * \endif
  */
 void SAColorToolButton::paintText(QStylePainter* p, const QRect& textRect, const QStyleOptionToolButton& opt)
 {
@@ -607,10 +959,21 @@ void SAColorToolButton::paintText(QStylePainter* p, const QRect& textRect, const
 }
 
 /**
+ * \if ENGLISH
+ * @brief Paint color
+ * @param p Painter
+ * @param colorRect Color rectangle
+ * @param color Color
+ * @param opt Style option
+ * \endif
+ *
+ * \if CHINESE
  * @brief 绘制color
- * @param p
- * @param iconRect
- * @param opt
+ * @param p  painter
+ * @param colorRect 颜色矩形
+ * @param color 颜色
+ * @param opt 样式选项
+ * \endif
  */
 void SAColorToolButton::paintColor(QStylePainter* p,
                                    const QRect& colorRect,
