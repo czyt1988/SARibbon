@@ -81,3 +81,6 @@ qmake构建SARibbon只需使用Qt Creator打开`SARibbon.pro`文件即可
 
 !!! warning "注意"
     如果使用Qt Creator打开`SARibbon.pro`文件过程报错，那么你的账户可能没有足够的写权限，不同版本的Qt Creator在不同操作系统有不一样的表现，建议使用CMake进行构建。
+
+!!! warning "注意"
+    SARibbon在v2.6.3版本后移除了qmake构建方式，仅支持cmake构建方式，如果你需要使用qmake构建方式，请使用v2.6.2及以下版本。

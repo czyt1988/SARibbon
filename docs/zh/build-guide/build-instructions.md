@@ -24,6 +24,9 @@ flowchart TD
     I --> J[在项目中引用库]
 ```
 
+!!! warning "注意"
+    SARibbon在v2.6.3版本后移除了qmake构建方式，仅支持cmake构建方式，如果你需要使用qmake构建方式，请使用v2.6.2及以下版本。
+
 ## QWindowKit 第三方库
 
 SARibbon 采用 [QWindowKit](https://github.com/stdware/qwindowkit) 作为无边框窗口方案，同时也支持简单的无边框设置。如果你需要操作系统原生的窗口特性，如 Windows 7 及以后版本的贴边处理，或 Windows 11 的 Snap Layout 效果，建议启用 [QWindowKit](https://github.com/stdware/qwindowkit) 库。该库还能有效解决多屏幕移动问题。
