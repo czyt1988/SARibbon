@@ -1,11 +1,11 @@
 # 版本更新记录(change log):
 
-## 2026-03-28 -> 2.6.1 (dev)
-- 实现`SARibbonCategory::insertPanel(SARibbonPanel*, int)`函数，支持在指定位置插入panel
+## 2026-03-28 -> 2.6.1
+- 增加`SARibbonCategory::insertPanel(SARibbonPanel*, int)`函数，支持在指定位置插入panel
 - 添加ribbonbar的时候进行raise操作避免被其它窗口覆盖
 - 修复panel下的title有些情况没有完全隐藏的问题
 - 更新qwk到1.4.0
-- 大量Doxygen双语注释重构，完善API文档
+- 使用AI进行了大量Doxygen双语注释重构，完善API文档
 
 ## 2026-03-05 -> 2.6.0
 - 使用AI进行了代码优化和重构
