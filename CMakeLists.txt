@@ -218,17 +218,6 @@ set(SARIBBON_DOC_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/readme.md
     ${CMAKE_CURRENT_SOURCE_DIR}/readme-cn.md
     ${CMAKE_CURRENT_SOURCE_DIR}/LICENSE
-    )
-
-
-# 把针对cmake安装的两个pri文件复制到根目录下
-set(SARIBBON_QMAKE_FILES
-    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/common.pri
-    ${CMAKE_CURRENT_SOURCE_DIR}/cmake/SARibbonBar.pri
-    )
-install(FILES
-    ${SARIBBON_QMAKE_FILES}
-    DESTINATION lib/qmake/SARibbonBar
-    COMPONENT qmake
 )
+
 

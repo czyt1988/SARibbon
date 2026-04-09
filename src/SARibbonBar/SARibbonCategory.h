@@ -71,6 +71,9 @@ public:
     /// Create and insert a new panel at index position
     SARibbonPanel* insertPanel(const QString& title, int index);
 
+    /// Insert an existing panel at index position
+    void insertPanel(SARibbonPanel* panel, int index);
+
     /// Find panel by name
     SARibbonPanel* panelByName(const QString& title) const;
 

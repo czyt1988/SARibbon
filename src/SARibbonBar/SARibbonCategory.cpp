@@ -437,6 +437,46 @@ SARibbonPanel* SARibbonCategory::insertPanel(const QString& title, int index)
 
 /**
  * \if ENGLISH
+ * @brief Insert an existing panel at the specified index position
+ *
+ * This function inserts an existing SARibbonPanel object at the specified index position.
+ * The panel's ownership will be transferred to SARibbonCategory.
+ *
+ * @param panel Pointer to the SARibbonPanel to insert, if nullptr the function does nothing
+ * @param index Insertion position index
+ *              - If index < 0, the panel will be inserted at the beginning (index 0)
+ *              - If index >= panelCount(), the panel will be appended at the end
+ *
+ * @note The panel's parent widget will be set to this SARibbonCategory
+ * @note The panel will inherit the category's display settings (title height, layout mode, etc.)
+ *
+ * @see addPanel(SARibbonPanel*), takePanel(SARibbonPanel*)
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 在指定索引位置插入已存在的面板
+ *
+ * 此函数将一个已存在的SARibbonPanel对象插入到指定的索引位置。
+ * 面板的所有权将转移给SARibbonCategory管理。
+ *
+ * @param panel 要插入的SARibbonPanel指针，如果为nullptr则函数不执行任何操作
+ * @param index 插入位置的索引
+ *              - 如果index < 0，面板将被插入到开头（索引0）
+ *              - 如果index >= panelCount()，面板将被追加到末尾
+ *
+ * @note 面板的父窗口将被设置为此SARibbonCategory
+ * @note 面板将继承Category的显示设置（标题高度、布局模式等）
+ *
+ * @see addPanel(SARibbonPanel*), takePanel(SARibbonPanel*)
+ * \endif
+ */
+void SARibbonCategory::insertPanel(SARibbonPanel* panel, int index)
+{
+    d_ptr->insertPanel(index, panel);
+}
+
+/**
+ * \if ENGLISH
  * @brief Find panel by name
  * @param title Panel title to search for
  * @return If there are duplicate names, only the first one that meets the condition will be returned
@@ -1038,8 +1078,8 @@ qreal SARibbonCategory::buttonMaximumAspectRatio() const
  * \if ENGLISH
  * @brief This function will iterate through all panels under Category and execute the function pointer
  * @param fp Function pointer returns false to stop iteration
- * @return Returns false indicating that all categories have not been iterated. The iteration was interrupted by receiving
- * a false return from the callback function
+ * @return Returns false indicating that all categories have not been iterated. The iteration was interrupted by
+ * receiving a false return from the callback function
  * \endif
  *
  * \if CHINESE

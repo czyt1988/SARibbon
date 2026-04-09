@@ -1,5 +1,27 @@
 # 版本更新记录(change log):
 
+## 2026-03-28 -> 2.6.1
+- 增加`SARibbonCategory::insertPanel(SARibbonPanel*, int)`函数，支持在指定位置插入panel
+- 添加ribbonbar的时候进行raise操作避免被其它窗口覆盖
+- 修复panel下的title有些情况没有完全隐藏的问题
+- 更新qwk到1.4.0
+- 使用AI进行了大量Doxygen双语注释重构，完善API文档
+
+## 2026-03-05 -> 2.6.0
+- 使用AI进行了代码优化和重构
+- 调整注释信息，完善文档
+
+## 2026-02-28 -> 2.5.8
+- 修正label text没有隐藏的问题
+- 原生无边框方案增加对多屏幕的判断
+- 修复MainWindowExample示例窗口缩放问题
+
+## 2026-01-23 -> 2.5.7
+- 完善对Qt6的支持，修复了一个潜在的重大异常
+- 修复颜色按钮在大按钮模式下，在一些特殊情况图标不显示问题
+- `SARibbonGalleryGroup`增加`removeItem`接口，支持移除gallery项(感谢[@AndyYangjd](https://github.com/AndyYangjd)的贡献)
+- qwk更新到v1.4.0
+
 ## 2025-12-20 -> 2.5.6
 - `SARibbonGallery`的窗口尺寸根据内容自适应
 - `SARibbonGallery`的弹出菜单改为滚动区域，且增加尺寸调整功能，如果空间不够，用户可实时调整尺寸
