@@ -35,22 +35,22 @@ public:
     };
 
 public:
-    /// Constructor for SARibbonColorToolButton
+    // Constructor for SARibbonColorToolButton
     explicit SARibbonColorToolButton(QWidget* parent = nullptr);
-    /// Constructor with default action
+    // Constructor with default action
     explicit SARibbonColorToolButton(QAction* defaultAction, QWidget* parent = nullptr);
-    /// Destructor for SARibbonColorToolButton
+    // Destructor for SARibbonColorToolButton
     ~SARibbonColorToolButton();
-    /// Get the current color
+    // Get the current color
     QColor color() const;
-    /// Set the color display style
+    // Set the color display style
     void setColorStyle(ColorStyle s);
-    /// Get the current color display style
+    // Get the current color display style
     ColorStyle colorStyle() const;
-    /// Set up a standard color menu
+    // Set up a standard color menu
     SAColorMenu* setupStandardColorMenu();
 public Q_SLOTS:
-    /// Set the color, emits colorChanged signal
+    // Set the color, emits colorChanged signal
     void setColor(const QColor& c);
 private Q_SLOTS:
     void onButtonClicked(bool checked = false);
@@ -83,8 +83,8 @@ Q_SIGNALS:
     void colorChanged(const QColor& color);
 
 protected:
-    /// Override paintIcon to add color under the icon
-    void paintIcon(QPainter& p, const QStyleOptionToolButton& opt, const QRect& iconDrawRect);
+    /// Override createIconPixmap to add color under the icon
+    QPixmap createIconPixmap(const QStyleOptionToolButton& opt, const QSize& iconSize) const override;
 };
 
 #endif  // SARIBBONCOLORTOOLBUTTON_H

@@ -3,6 +3,10 @@
 #include "SARibbonGlobal.h"
 #include <QToolButton>
 #include <QDebug>
+
+// 前向声明
+class SARibbonButtonLayoutStrategy;
+struct SARibbonButtonLayoutContext;
 /**
  * \if ENGLISH
  * @brief Ribbon interface adapted tool button
@@ -63,7 +67,7 @@ public:
          * @note This value should be greater than 2. / 此值应该大于2
          * @default 2.05
          */
-        qreal twoLineHeightFactor { 2.05 };
+        qreal twoLineHeightFactor { 2.05 };  // Note: Kept as literal for header inline initialization compatibility
 
         /**
          * @brief Coefficient for the height of single-line text in large button mode / 大按钮模式下，单行文本高度系数
@@ -100,35 +104,35 @@ public:
     explicit SARibbonToolButton(QAction* defaultAction, QWidget* parent = nullptr);
     ~SARibbonToolButton();
 
-    /// Get the current button type (LargeButton or SmallButton)
+    // Get the current button type (LargeButton or SmallButton)
     RibbonButtonType buttonType() const;
-    /// Set the button type to LargeButton or SmallButton
+    // Set the button type to LargeButton or SmallButton
     void setButtonType(const RibbonButtonType& buttonType);
 
-    /// Check if the button is a small ribbon button
+    // Check if the button is a small ribbon button
     bool isSmallRibbonButton() const;
-    /// Check if the button is a large ribbon button
+    // Check if the button is a large ribbon button
     bool isLargeRibbonButton() const;
 
-    /// Get the current spacing value
+    // Get the current spacing value
     int spacing() const;
-    /// Set the spacing between elements and the border
+    // Set the spacing between elements and the border
     void setSpacing(int v);
 
-    /// Force an update of the internal layout rectangles
+    // Force an update of the internal layout rectangles
     void updateRect();
 
-    /// Set the layout factor for fine-tuning the button's appearance
+    // Set the layout factor for fine-tuning the button's appearance
     void setLayoutFactor(const LayoutFactor& fac);
-    /// Get the layout factor for fine-tuning the button's appearance (const version)
+    // Get the layout factor for fine-tuning the button's appearance (const version)
     const LayoutFactor& layoutFactor() const;
-    /// Get the layout factor for fine-tuning the button's appearance (non-const version)
+    // Get the layout factor for fine-tuning the button's appearance (non-const version)
     LayoutFactor& layoutFactor();
 
     // Enables or disables automatic text wrapping for large buttons / 为大按钮启用或禁用自动文字换行
     void setEnableWordWrap(bool on);
     // Checks if automatic text wrapping is enabled / 检查是否启用了自动文字换行
-    bool isEnableWordWrap();
+    bool isEnableWordWrap() const;
 
     // Sets the button's maximum aspect ratio (width/height) / 设置按钮的最大宽高比
     void setButtonMaximumAspectRatio(qreal v = 1.4);
@@ -171,6 +175,15 @@ protected:
     virtual void paintText(QPainter& p, const QStyleOptionToolButton& opt, const QRect& textDrawRect);
     // Paints the button's indicator (e.g., dropdown arrow) / 绘制按钮的指示器（例如下拉箭头）
     virtual void paintIndicator(QPainter& p, const QStyleOptionToolButton& opt, const QRect& indicatorDrawRect);
+
+    /**
+     * @brief 创建图标pixmap，子类可以重写此函数以自定义图标绘制
+     * @param opt 样式选项
+     * @param iconSize 图标尺寸
+     * @return 图标pixmap
+     * @note 此函数在paintIcon中被调用，提供扩展点给子类
+     */
+    virtual QPixmap createIconPixmap(const QStyleOptionToolButton& opt, const QSize& iconSize) const;
 
 private:
     static void drawArrow(const QStyle* style,

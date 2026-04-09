@@ -13,6 +13,24 @@ Each button is divided into **three rectangles**:
 
 There are **two layout strategies**, chosen automatically according to **word-wrap** mode.
 
+## Layout Strategy Architecture (v2.7.0+)
+
+Starting from v2.7.0, the layout calculation of `SARibbonToolButton` has been refactored using the **Strategy Pattern**, introducing the `SARibbonButtonLayoutStrategy` class hierarchy:
+
+```
+SARibbonButtonLayoutStrategy (abstract base)
+    ├── SARibbonLargeButtonLayoutStrategy (large button layout)
+    └── SARibbonSmallButtonLayoutStrategy (small button layout)
+```
+
+This design enables:
+
+- Cleaner separation of layout logic
+- Easy extension for new button type layouts
+- Better unit test support
+
+The layout context `SARibbonButtonLayoutContext` encapsulates all parameters needed for layout calculation, including spacing, icon sizes, and word-wrap settings.
+
 ---
 
 ## Word-Wrap Mode (Office Word style)
@@ -37,10 +55,14 @@ Enable / disable wrapping globally:
 ribbonBar()->setEnableWordWrap(true);   // or false
 ```
 
-**Automatic line-break algorithm**  
-For long **English** labels the button first tries to break at **½** of the single-line width.  
-If that is still too wide it increases the trial width to ½ + ⅓, then ½ + ⅓ + ¼.  
-After **three failed attempts** the original single-line text is kept.
+**Automatic line-break algorithm (Optimized in v2.7.0)**  
+For long **English** labels, the button uses a **binary search** algorithm (up to 10 iterations) to find the optimal width, which is more efficient than the previous linear approach.
+
+Algorithm logic:
+
+1. Start by halving the text width (1/2)
+2. Use binary search within the [1/2, original width] range
+3. Ensure the text fits within two lines
 
 !!! warning
     You can **force** a break by inserting `\n` in the text.  

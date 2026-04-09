@@ -5,8 +5,8 @@
 cmake_minimum_required(VERSION 3.5)
 
 set(SARIBBON_VERSION_MAJOR 2)
-set(SARIBBON_VERSION_MINOR 6)
-set(SARIBBON_VERSION_PATCH 1)
+set(SARIBBON_VERSION_MINOR 7)
+set(SARIBBON_VERSION_PATCH 0)
 
 set(SARIBBON_VERSION "${SARIBBON_VERSION_MAJOR}.${SARIBBON_VERSION_MINOR}.${SARIBBON_VERSION_PATCH}")
 message(STATUS "SARibbon v${SARIBBON_VERSION}")
@@ -59,11 +59,19 @@ if(SARIBBON_USE_FRAMELESS_LIB)
 endif()
 
 # 如果是使用frameless库，需要c++17，否则c++14
-if(_SARIBBON_USE_FRAMELESS_LIB)
+# Qt6 需要 C++17，Qt5 使用 C++14
+if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
     set(CMAKE_CXX_STANDARD 17)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
     if(MSVC)
-        # CMAKE_CXX_STANDARD对有些版本的msvc无效
+        # 不要显式添加 /std:c++17，让 CMake 自动处理
+        # Qt6 的 CMake 工具链会自动添加正确的标准选项
+    endif()
+    message(STATUS "Qt6 detected, using C++17")
+elseif(_SARIBBON_USE_FRAMELESS_LIB)
+    set(CMAKE_CXX_STANDARD 17)
+    set(CMAKE_CXX_STANDARD_REQUIRED ON)
+    if(MSVC)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
     endif()
     message(STATUS "The current QT version can use the frameless library and enable C++17")
@@ -71,7 +79,6 @@ else()
     set(CMAKE_CXX_STANDARD 14)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
     if(MSVC)
-        # CMAKE_CXX_STANDARD对有些版本的msvc无效
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++14")
     endif()
     message(STATUS "The current qt version cannot use the frameless library, enable C++14")

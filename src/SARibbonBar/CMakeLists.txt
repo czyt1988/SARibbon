@@ -54,6 +54,7 @@ SET(SARIBBON_HEADER_FILES
     SARibbonPanelItem.h
     SARibbonPanelOptionButton.h
     SARibbonToolButton.h
+    SARibbonButtonLayoutStrategy.h
     SARibbonMenu.h
     SARibbonSeparatorWidget.h
     SARibbonCategoryLayout.h
@@ -95,6 +96,7 @@ SET(SARIBBON_SOURCE_FILES
     SARibbonPanelItem.cpp
     SARibbonPanelOptionButton.cpp
     SARibbonToolButton.cpp
+    SARibbonButtonLayoutStrategy.cpp
     SARibbonMenu.cpp
     SARibbonSeparatorWidget.cpp
     SARibbonCategoryLayout.cpp

@@ -12,6 +12,24 @@ Ribbon界面无法用普通的tab+toolbutton组合来实现主要就是因为rib
 
 三个区域会有两种布局方案，根据文本是否换行来进行布局
 
+## 布局策略架构 (v2.7.0+)
+
+从 v2.7.0 版本开始，`SARibbonToolButton` 的布局计算被重构为**策略模式**，引入了 `SARibbonButtonLayoutStrategy` 类层次结构：
+
+```
+SARibbonButtonLayoutStrategy (抽象基类)
+    ├── SARibbonLargeButtonLayoutStrategy (大按钮布局)
+    └── SARibbonSmallButtonLayoutStrategy (小按钮布局)
+```
+
+这种设计允许：
+
+- 更清晰的布局逻辑分离
+- 易于扩展新的按钮类型布局
+- 更好的单元测试支持
+
+布局上下文 `SARibbonButtonLayoutContext` 封装了布局计算所需的所有参数，包括间距、图标尺寸、文本换行设置等。
+
 ## 按钮图标设置
 
 Ribbon的按钮有大、中、小三种按钮，大按钮的图标大小为32x32，中按钮和小按钮的图标大小为20x20
@@ -57,7 +75,13 @@ SARibbon可以通过以下方式设置是否换行：
 ribbonBar()->setEnableWordWrap(b);
 ```
 
-如果文本太长，`SARibbonToolButton`会尝试换行，由于英文的文本每个单词不是定长，因此会在原有文本单行显示的长度基础上先尝试1/2的长度能否换行完全显示，如果显示不了，就把长度递增为1/2+1/3，并继续尝试，如果3次都无法容纳下，就显示为原来的长度
+如果文本太长，`SARibbonToolButton`会尝试换行。从 v2.7.0 开始，换行估算算法已优化为**二分查找**，最多进行 10 次迭代，性能比原来的线性尝试更好。
+
+算法逻辑：
+
+1. 首先尝试将文本宽度减半（1/2）
+2. 使用二分查找在 [1/2, 原宽度] 范围内寻找最优宽度
+3. 确保文本能在两行内完整显示
 
 !!! warning "注意"
     换行模式下，用户可以手动给文本换行，就是加入`\n`换行，加入`\n`的文本，`SARibbonToolButton`就不用进行换行估算
