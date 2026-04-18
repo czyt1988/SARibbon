@@ -21,6 +21,8 @@ tmp-file
 .$*
 .vs
 .qoder
+.sisyphus
+.kilo
 nul
 .qtcreator
 
@@ -30,6 +32,7 @@ site-doxygen
 
 # vscode 的隐藏文件
 .vscode
+
 
 # This file is used to ignore files which are generated
 # ----------------------------------------------------------------------------
