@@ -100,4 +100,111 @@ MyRibbonWidget::MyRibbonWidget(QWidget *parent)
 }
 ```
 
-You can embed any `QWidget` into `SARibbonWidget` through the `setWidget()` method.
+You can embed any `QWidget` into `SARibbonWidget` through the `setWidget()` method. Here is a typical usage example:
+
+```cpp
+// Using SARibbonWidget in a QDialog and setting the central content
+SARibbonWidget* ribbonWidget = new SARibbonWidget(this);
+
+// Configure the RibbonBar (recommended settings for Widget mode)
+SARibbonBar* ribbon = ribbonWidget->ribbonBar();
+ribbon->setTitleVisible(false);
+ribbon->setApplicationButton(nullptr);
+ribbon->setRibbonStyle(SARibbonBar::RibbonStyleCompactThreeRow);
+
+// Create the central content widget
+QWidget* contentWidget = new QWidget(this);
+// ... Set up the layout and configuration for contentWidget ...
+
+// Embed the central content into SARibbonWidget
+ribbonWidget->setWidget(contentWidget);
+
+// Add SARibbonWidget to the dialog layout
+QVBoxLayout* layout = new QVBoxLayout(this);
+layout->setContentsMargins(0, 0, 0, 0);
+layout->addWidget(ribbonWidget);
+```
+
+!!! tip "setWidget() Usage Tips"
+    - `setWidget()` automatically manages the passed `QWidget` as the central area of `SARibbonWidget`, without the need for manual layout.
+    - After calling `setWidget()`, the previously set central widget will be replaced. To remove the central widget, call `setWidget(nullptr)`.
+    - The central widget will automatically adjust to follow the size changes of `SARibbonWidget`.
+
+!!! info "More Information"
+    For more details on using `SARibbonWidget` in dialogs, sub-windows, and other scenarios, including different embedding modes, layout strategies, and advanced usage, please refer to the [SARibbonWidget Detailed Guide](./SARibbonWidget-guide.md).
+
+## Complete Native Frame Example
+
+Here is a complete example using the native frame mode (referenced from `example/UseNativeFrameExample`):
+
+```cpp
+#include "SARibbon.h"
+
+class MainWindow : public SARibbonMainWindow
+{
+    Q_OBJECT
+public:
+    MainWindow(QWidget* par = nullptr)
+        : SARibbonMainWindow(par,
+            SARibbonMainWindowStyleFlag::UseNativeFrame
+            | SARibbonMainWindowStyleFlag::UseRibbonMenuBar)
+    {
+        SARibbonBar* ribbon = ribbonBar();
+        // Compact mode is recommended when using the native frame
+        ribbon->setRibbonStyle(SARibbonBar::RibbonStyleCompactThreeRow);
+        // Disable vertical expansion of the Application Button
+        ribbon->setApplicationButtonVerticalExpansion(false);
+
+        // Create category pages and panels
+        SARibbonCategory* category = ribbon->addCategoryPage(tr("Main"));
+        SARibbonPanel* panel = category->addPanel(tr("Operations"));
+
+        QAction* act = new QAction(QIcon(":/icon/save.svg"), tr("Save"), this);
+        panel->addLargeAction(act);
+
+        resize(800, 600);
+    }
+};
+```
+
+## Complete SARibbonWidget Example
+
+Here is a complete example of using `SARibbonWidget` in an ordinary dialog (referenced from `example/WidgetWithRibbon`):
+
+```cpp
+#include "SARibbon.h"
+#include <QVBoxLayout>
+#include <QTextEdit>
+
+class MyDialog : public QDialog
+{
+    Q_OBJECT
+public:
+    MyDialog(QWidget* parent = nullptr) : QDialog(parent)
+    {
+        // Create SARibbonWidget
+        SARibbonWidget* ribbonWidget = new SARibbonWidget(this);
+        SARibbonBar* ribbon = ribbonWidget->ribbonBar();
+
+        // Recommended settings for Widget mode
+        ribbon->setTitleVisible(false);
+        ribbon->setApplicationButton(nullptr);
+        ribbon->setRibbonStyle(SARibbonBar::RibbonStyleCompactThreeRow);
+
+        // Add Ribbon content
+        SARibbonCategory* cat = ribbon->addCategoryPage(tr("Edit"));
+        SARibbonPanel* panel = cat->addPanel(tr("Tools"));
+        panel->addLargeAction(new QAction(QIcon(":/icon/edit.svg"), tr("Edit"), this));
+
+        // Set the central content
+        QTextEdit* editor = new QTextEdit(this);
+        ribbonWidget->setWidget(editor);
+
+        // Layout
+        QVBoxLayout* layout = new QVBoxLayout(this);
+        layout->setContentsMargins(0, 0, 0, 0);
+        layout->addWidget(ribbonWidget);
+        resize(600, 400);
+    }
+};
+```
