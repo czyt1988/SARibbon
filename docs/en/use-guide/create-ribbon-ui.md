@@ -555,7 +555,7 @@ void MainWindow::createWindowButtonGroupBar()
     QAction* actionLogin = new QAction(QIcon(), "Login",this);
     QAction* actionHelp = new QAction(QIcon(":/icon/icon/help.svg"),"help",this);
     ...
-    wbar->addAction(a);
+    wbar->addAction(actionLogin);
     wbar->addAction(actionHelp);
 }
 ```

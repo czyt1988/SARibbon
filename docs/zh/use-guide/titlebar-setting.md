@@ -72,5 +72,5 @@ void MainWindow::resetTitleBar()
 }
 ```
 
-!!! tips "提示"
+!!! tip "提示"
     标题栏设置仅在宽松模式（Loose）下可见。在紧凑模式下，标题栏和 Tab 栏合并，标题栏背景色设置不会有明显效果，但文字颜色仍然生效。

@@ -143,5 +143,5 @@ void MainWindow::onActionCustomizeTriggered()
 !!! warning "注意"
     `autoRegisteActions` 必须在所有 Category、Panel、Action 都创建完成后调用，否则无法注册所有 Action。
 
-!!! tips "提示"
+!!! tip "提示"
     如果你希望把自定义对话框嵌入到自己的设置页面中，可以使用 `SARibbonCustomizeWidget` 代替 `SARibbonCustomizeDialog`，两者的 API 基本一致。

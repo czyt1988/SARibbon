@@ -106,5 +106,5 @@ if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
 }
 ```
 
-!!! tips "提示"
+!!! tip "提示"
     内置主题的QSS文件位于 `src/SARibbonBar/resource` 目录，你可以直接参考这些文件来编写自定义主题。如果需要完全自定义主题，请参阅 [自定义Ribbon主题](./design-your-theme.md)。

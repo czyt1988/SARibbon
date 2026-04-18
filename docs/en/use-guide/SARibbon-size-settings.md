@@ -18,8 +18,8 @@ ribbonBar()->setPanelTitleHeight(20);
 // Set the spacing between panels
 ribbonBar()->setPanelSpacing(5);
 
-// Set the icon size of panel tool buttons
-ribbonBar()->setPanelToolButtonIconSize(QSize(32, 32));
+// Set the small and large icon sizes of panel tool buttons
+ribbonBar()->setPanelToolButtonIconSize(QSize(20, 20), QSize(32, 32));
 
 // Set the maximum aspect ratio of buttons
 ribbonBar()->setButtonMaximumAspectRatio(2.0);

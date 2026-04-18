@@ -36,7 +36,7 @@ int main(int argc, char* argv[])
 
 | Topic | Document | Description |
 |-------|----------|-------------|
-| Building | [Build Instructions](../../en/build-guide/build-instructions.md) | How to build SARibbon (CMake/QMake) |
+| Building | [Build Instructions](../build-guide/build-instructions.md) | How to build SARibbon (CMake/QMake) |
 | Integration | [Importing the Library](./import-SARibbon.md) | Static/dynamic integration into your project |
 | Window Setup | [Create a Ribbon-Style Window](./create-ribbon-style-window.md) | SARibbonMainWindow / SARibbonWidget usage |
 | UI Creation | [Creating the Ribbon UI](./create-ribbon-ui.md) | Category, Panel, Action, Gallery, etc. |

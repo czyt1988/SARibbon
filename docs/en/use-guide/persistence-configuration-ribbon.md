@@ -40,8 +40,8 @@ During the initialization of MainWindow, a large number of `QAction`s need to be
 ```cpp
 // Initialization of MainWindow, generating QActions
 // Generate ribbon layout
-m_ribbonActionMgr = new SARibbonActionsManager(mainWinowPtr);
-m_ribbonActionMgr->autoRegisteActions(mainWinowPtr);
+m_ribbonActionMgr = new SARibbonActionsManager(mainWindowPtr);
+m_ribbonActionMgr->autoRegisteActions(mainWindowPtr);
 ```
 
 The key function `autoRegisteActions` of `SARibbonActionsManager` can traverse all child objects under `SARibbonMainWindow`, find and register actions, and traverse all `SARibbonCategory` to classify the actions under `SARibbonCategory` by the title name of `SARibbonCategory`. This function will also register the actions under `SARibbonMainWindow` that are not in any category with the NotInRibbonCategoryTag label, and the default name will be "not in ribbon".

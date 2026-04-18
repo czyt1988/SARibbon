@@ -68,7 +68,7 @@ Algorithm logic:
     You can **force** a break by inserting `\n` in the text.  
     If `\n` is present, the automatic algorithm is **skipped**.
 
-!!! tips
+!!! tip
     In **single-line mode** any `\n` characters are **ignored**.
 
 ---

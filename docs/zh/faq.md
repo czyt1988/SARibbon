@@ -1,4 +1,4 @@
-﻿# 常见问题说明
+# 常见问题说明
 
 ## 1、高分屏显示问题
 
@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
 }
 ```
 
-!!! tips "Qt6 说明"
+!!! tip "Qt6 说明"
     Qt6 默认启用了高DPI缩放，不再需要手动设置 `AA_EnableHighDpiScaling` 和 `AA_UseHighDpiPixmaps`（这两个属性在 Qt6 中已被移除）。如果你使用 Qt6，只需关注 `setHighDpiScaleFactorRoundingPolicy` 即可。
 
 如果你使用OpenGL窗口发生了一些奇怪的问题，你可以把上面这些语句去掉看看，最新版Qt已经不需要进行上述的处理了

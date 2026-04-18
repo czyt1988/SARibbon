@@ -36,7 +36,7 @@ MainWindow::MainWindow(QWidget* par)
 }
 ```
 
-!!! tips "注意"
+!!! tip "注意"
     不要忘记了SARibbonMainWindowStyleFlag::UseRibbonMenuBar标志位
 
 ### 2. 设置为紧凑布局
@@ -294,5 +294,5 @@ SARibbonTabBar::tab:hover:!selected {
 | `SARibbonGallery` | Gallery 画廊 | `background-color`, `border` |
 | `SARibbonSystemButtonBar` | 系统按钮栏 | `background-color` |
 
-!!! tips "提示"
+!!! tip "提示"
     内置主题 QSS 文件位于 `src/SARibbonBar/resource` 目录，建议以内置主题为基础进行修改，可避免遗漏关键选择器。

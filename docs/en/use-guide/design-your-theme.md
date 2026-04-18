@@ -244,5 +244,5 @@ Tutorial source code is located in `example/MatlabUI`
 | `SARibbonButtonGroupWidget` | Button group | `background-color`, `border` |
 | `SARibbonGallery` | Gallery widget | `background-color`, `border` |
 
-!!! tips "Tip"
+!!! tip "Tip"
     Built-in theme QSS files are located in `src/SARibbonBar/resource`. It is recommended to base your custom theme on these files to avoid missing critical selectors.

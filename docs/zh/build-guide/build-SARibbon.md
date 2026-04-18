@@ -17,15 +17,15 @@
 | `SARIBBON_ENABLE_SNAPLAYOUT` | `OFF`                                   | 是否启用Windows 11的Snap Layout（窗口磁吸布局）效果                  | 仅当`SARIBBON_USE_FRAMELESS_LIB=ON`时有效，不同Qt版本可能存在兼容性问题                   |
 | `SARIBBON_INSTALL_IN_CURRENT_DIR` | Windows为`ON`，其他系统为`OFF` | 控制库的安装路径，`ON`安装到项目根目录下的版本区分文件夹，`OFF`使用系统默认路径 | 本地安装文件夹命名格式：`bin_qt<Qt版本>_<编译器>_x<架构>`（如`bin_qt5.14.2_msvc_x64`） |
 
-!!! tips "注意"
+!!! tip "注意"
     Qt 版本兼容性：
     SARIBBON_USE_FRAMELESS_LIB 对 Qt 版本有严格要求（Qt 5.14+、Qt 6.2+），低版本 Qt 会自动禁用该选项并切换到 C++14 标准
     其他功能最低支持 Qt 5.8 版本。
 
-!!! tips "注意"
+!!! tip "注意"
     启用 SARIBBON_USE_FRAMELESS_LIB 时，强制使用 C++17 标准；否则使用 C++14 标准（MSVC 下会自动添加对应编译 flags）。
 
-!!! tips "注意"
+!!! tip "注意"
     第三方依赖：
     若启用 SARIBBON_USE_FRAMELESS_LIB，需确保 QWindowKit 库已正确编译并可被 CMake 找到（可通过 -DQWindowKit_DIR 指定路径）。
 
