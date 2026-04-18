@@ -2,7 +2,7 @@
 
 - ✅ **High-DPI adaptation**: covers Qt5/6 high-DPI scaling attributes and rounding policy configuration
 - ✅ **Global shortcut response**: resolves hidden-panel shortcut failures in Ribbon mode
-- ✅ **Theme timing**: workaround for themes not applying in constructors, see [Theme Switching](../use-guide/SARibbon-theme.md)
+- ✅ **Theme timing**: workaround for themes not applying in constructors, see [Theme Switching](use-guide/SARibbon-theme.md)
 - ✅ **SVG icon dependency**: troubleshooting missing Qt SVG plugin at runtime
 
 ## 1. High-DPI Display Issues
@@ -47,7 +47,7 @@ int main(int argc, char* argv[])
 !!! note
     If you're using an OpenGL window and encounter strange rendering issues, try removing the above settings—recent versions of Qt may no longer require them.
 
-    For more Ribbon sizing configuration, see [Size Settings](../use-guide/SARibbon-size-settings.md).
+    For more Ribbon sizing configuration, see [Size Settings](use-guide/SARibbon-size-settings.md).
 
 ---
 
@@ -87,7 +87,7 @@ QTimer::singleShot(0, this, [this]() {
 });
 ```
 
-For detailed explanations and more theme switching usage, see [Theme Switching](../use-guide/SARibbon-theme.md).
+For detailed explanations and more theme switching usage, see [Theme Switching](use-guide/SARibbon-theme.md).
 
 ---
 
@@ -104,7 +104,7 @@ If you encounter this issue, verify that your compiled library files (`.dll`, `.
 - `lib/cmake/SARibbonBar/` (directory)
 - `SARibbonBar_amalgamate`
 
-For more title bar configuration, see [Title Bar Settings](../use-guide/titlebar-setting.md).
+For more title bar configuration, see [Title Bar Settings](use-guide/titlebar-setting.md).
 
 ---
 

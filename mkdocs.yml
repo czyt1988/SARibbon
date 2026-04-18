@@ -5,8 +5,6 @@ site_description: 'Qt Framework Ribbon Control'
 site_url: https://czyt1988.github.io/SARibbon/
 repo_url: https://github.com/czyt1988/SARibbon
 repo_name: SARibbon-github
-base_url: /SARibbon/
-
 # 多语言站点信息
 extra:
   site_name:
@@ -45,9 +43,7 @@ theme:
 plugins:
   - search
   - i18n:
-      base_urls:
-        zh: /SARibbon/zh/
-        en: /SARibbon/en/
+      docs_structure: folder
       languages:
         - locale: zh
           name: 中文
@@ -55,8 +51,7 @@ plugins:
           build: true
           # 中文导航配置
           nav:
-            - 概述: 
-                - SARibbon简介: zh/index.md
+            - SARibbon简介: zh/index.md
             - 构建指南:
                 - 构建说明: zh/build-guide/build-instructions.md
                 - 第三方库构建: zh/build-guide/build-3rdparty.md
@@ -82,16 +77,15 @@ plugins:
             - 常见问题: 
                 - 常见问题说明: zh/faq.md
             - API文档: 
-                - API文档首页: doxygen/index.html
-                - 类列表: doxygen/annotated.html
-                - 类索引: doxygen/classes.html
+                - API文档首页: https://czyt1988.github.io/SARibbon/doxygen/index.html
+                - 类列表: https://czyt1988.github.io/SARibbon/doxygen/annotated.html
+                - 类索引: https://czyt1988.github.io/SARibbon/doxygen/classes.html
         - locale: en
           name: English
           build: true
           # 英文导航配置 - 注意路径前加 en/
           nav:
-            - Overview: 
-                - SARibbon Introduction: en/index.md
+            - SARibbon Introduction: en/index.md
             - Build Guide:
                 - Build Instructions: en/build-guide/build-instructions.md
                 - Build Third-Party Libraries: en/build-guide/build-3rdparty.md
@@ -117,9 +111,9 @@ plugins:
             - FAQ: 
                 - FAQ Overview: en/faq.md
             - API Documentation: 
-                - API Documentation Home: doxygen/index.html
-                - Class List: doxygen/annotated.html
-                - Class Index: doxygen/classes.html
+                - API Documentation Home: https://czyt1988.github.io/SARibbon/doxygen/index.html
+                - Class List: https://czyt1988.github.io/SARibbon/doxygen/annotated.html
+                - Class Index: https://czyt1988.github.io/SARibbon/doxygen/classes.html
   # 需要版本切换再打开下面
   # - git-revision-date
   # - mike:                       

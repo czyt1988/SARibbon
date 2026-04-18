@@ -1,6 +1,6 @@
 # SARibbon Introduction
 
-[View Chinese version](../zh/index.md)
+[View Chinese version](https://czyt1988.github.io/SARibbon/zh/)
 
 <div align="center">
 <p>
