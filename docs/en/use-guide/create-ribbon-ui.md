@@ -414,6 +414,26 @@ The effect is as follows:
 
 ![win7style-application-button](../../assets/pic/win7style-application-button.png)
 
+In loose mode, the `Application Button` can be set to vertical expansion. In this case, the `Application Button` will occupy the space of both the title bar and the tab bar.
+
+Example:
+
+```cpp
+ribbonBar()->setApplicationButtonVerticalExpansion(true);
+```
+
+The effect of the above code is as shown in the figure:
+
+![set-application-btn-expand](../../assets/pic/set-application-btn-expand.png)
+
+!!! warning "Note"
+    The `SARibbonBar::setApplicationButtonVerticalExpansion` function adjusts the visibility of `titleIconWidget`. If `applicationButtonVerticalExpansion=true` is set, `titleIconWidget` will be hidden; conversely, `titleIconWidget` will be displayed.
+    However, the `SARibbonBar::setTitleIconVisible` function does not affect the state of `applicationButtonVerticalExpansion`.
+    Therefore, if you dynamically adjust the state of `applicationButtonVerticalExpansion` and need to display the window icon, after setting `setApplicationButtonVerticalExpansion(false)`, you must call `setTitleIconVisible(true)` to make the window icon visible.
+
+!!! warning "Note"
+    `ApplicationButtonVerticalExpansion` is only effective in loose mode (`SARibbonBar::RibbonStyleLoose`).
+
 ## Application Widget
 
 In many modern applications (such as Microsoft Office), clicking the `Application Button` does not pop up a simple drop-down menu, but a full-screen or half-screen complex page. This page can contain rich content such as a list of recent files, template selection, account settings, and application options.
@@ -460,6 +480,16 @@ void MainWindow::createRibbonApplicationButton()
 The effect of the above code is as follows:
 
 ![application-widget](../../assets/screenshot/application-widget.gif)
+
+### API Summary
+
+| Method | Return Value | Description |
+|--------|--------|------|
+| `SARibbonApplicationWidget(SARibbonMainWindow* parent)` | Constructor | Create an application widget |
+| `resizeToParent(const QSize& parentSize)` | void | Scale relative to parent window (overridable) |
+| `eventFilter(QObject*, QEvent*)` | bool | Filter parent window events |
+| `showEvent(QShowEvent*)` | void | Handle show events |
+| `keyPressEvent(QKeyEvent*)` | void | Handle keyboard events (ESC to close) |
 
 ## Quick Access Bar
 
@@ -563,3 +593,290 @@ void MainWindow::createWindowButtonGroupBar()
 The effect of the above code is as follows:
 
 ![window-button-bar](../../assets/pic/window-button-bar.png)
+
+## SARibbonMenu Detailed Usage
+
+`SARibbonMenu` is a menu class designed specifically for Ribbon interfaces, inheriting from `QMenu`. It can be styled independently via StyleSheet without affecting the global `QMenu` style, making it suitable for use in Ribbon environments.
+
+### Differences from QMenu
+
+| Feature | QMenu | SARibbonMenu |
+|------|-------|-------------|
+| Style isolation | QSS affects all QMenu instances | Only affects SARibbonMenu instances |
+| Submenu type | Returns plain QMenu | Returns SARibbonMenu |
+| Widget support | Supports addWidget | Provides addWidget method |
+
+### API Summary
+
+| Method | Return Value | Description |
+|--------|--------|------|
+| `SARibbonMenu(QWidget* parent)` | Constructor | Create an empty menu |
+| `SARibbonMenu(const QString& title, QWidget* parent)` | Constructor | Create a menu with a title |
+| `addRibbonMenu(SARibbonMenu* menu)` | `QAction*` | Add an existing SARibbonMenu as a submenu |
+| `addRibbonMenu(const QString& title)` | `SARibbonMenu*` | Create and add a submenu with the specified title |
+| `addRibbonMenu(const QIcon& icon, const QString& title)` | `SARibbonMenu*` | Create and add a submenu with an icon and title |
+| `addWidget(QWidget* w)` | `QAction*` | Add a custom widget to the menu |
+
+### Code Example
+
+```cpp
+// Create SARibbonMenu
+SARibbonMenu* mainMenu = new SARibbonMenu(tr("File Operations"), panel);
+
+// Add regular actions
+mainMenu->addAction("New");
+mainMenu->addAction("Open");
+mainMenu->addSeparator();
+
+// Add a submenu (using addRibbonMenu)
+SARibbonMenu* recentSubmenu = mainMenu->addRibbonMenu(tr("Recent Files"));
+recentSubmenu->addAction("document1.docx");
+recentSubmenu->addAction("document2.docx");
+
+// Add a submenu with an icon
+SARibbonMenu* exportSubmenu = mainMenu->addRibbonMenu(
+    QIcon(":/icon/export.svg"), tr("Export"));
+exportSubmenu->addAction("PDF");
+exportSubmenu->addAction("HTML");
+
+// Add a custom widget to the menu
+QLabel* label = new QLabel(tr("Custom Content"));
+label->setStyleSheet("padding: 8px;");
+mainMenu->addWidget(label);
+
+// Associate the menu with a panel button
+actionExport->setMenu(mainMenu);
+panel->addLargeAction(actionExport, QToolButton::MenuButtonPopup);
+```
+
+## SARibbonGalleryGroup API Details
+
+`SARibbonGalleryGroup` is an action group within the Gallery control, inheriting from `QListView`. It is responsible for displaying and managing a set of `SARibbonGalleryItem` in a grid format.
+
+### Enum Types
+
+#### GalleryGroupStyle Display Style
+
+| Enum Value | Description |
+|--------|------|
+| `IconWithText` | Icon + text (text displayed in one line) |
+| `IconWithWordWrapText` | Icon + word-wrapped text (only effective under DisplayOneRow) |
+| `IconOnly` | Display icon only |
+
+#### DisplayRow Display Row Count
+
+| Enum Value | Description |
+|--------|------|
+| `DisplayOneRow` (1) | Display 1 row (default) |
+| `DisplayTwoRow` (2) | Display 2 rows |
+| `DisplayThreeRow` (3) | Display 3 rows |
+
+### API Summary
+
+| Method | Return Value | Description |
+|--------|--------|------|
+| `setGalleryGroupStyle(GalleryGroupStyle)` | void | Set the display style |
+| `galleryGroupStyle()` | `GalleryGroupStyle` | Get the current display style |
+| `setDisplayRow(DisplayRow)` | void | Set the number of display rows |
+| `displayRow()` | `DisplayRow` | Get the current number of display rows |
+| `setGridMinimumWidth(int)` | void | Set the minimum grid width (default 0: no limit) |
+| `gridMinimumWidth()` | int | Get the minimum grid width |
+| `setGridMaximumWidth(int)` | void | Set the maximum grid width (default 0: no limit) |
+| `gridMaximumWidth()` | int | Get the maximum grid width |
+| `addItem(const QString&, const QIcon&)` | void | Add an item |
+| `addItem(SARibbonGalleryItem*)` | void | Add an item object |
+| `addActionItem(QAction*)` | void | Add a QAction as an item |
+| `addActionItemList(const QList<QAction*>&)` | void | Batch add QAction items |
+| `removeActionItem(QAction*)` | bool | Remove the specified QAction item |
+| `setGroupTitle(const QString&)` | void | Set the group title |
+| `groupTitle()` | QString | Get the group title |
+| `groupModel()` | `SARibbonGalleryGroupModel*` | Get the underlying model |
+| `actionGroup()` | `QActionGroup*` | Get the managed QActionGroup |
+| `gridRowCount()` | int | Get the number of grid rows |
+| `gridColumnCount()` | int | Get the number of grid columns |
+| `selectByIndex(int)` | void | Select an item by index |
+| `recalcGridSize()` | void | Recalculate grid size |
+| `preferredHeightForWidth(int)` | int | Get the preferred height for a given width |
+
+### Code Example
+
+```cpp
+// Create a Gallery Group and set its style
+SARibbonGalleryGroup* group = gallery->addCategoryActions(tr("Styles"), actions);
+group->setGalleryGroupStyle(SARibbonGalleryGroup::IconWithWordWrapText);
+group->setDisplayRow(SARibbonGalleryGroup::DisplayTwoRow);
+group->setGridMinimumWidth(80);
+group->setGridMaximumWidth(120);
+
+// Respond to trigger signal
+connect(group, &SARibbonGalleryGroup::triggered, this, [](QAction* act) {
+    qDebug() << "Selected:" << act->text();
+});
+
+// Listen for hover signal (mouse tracking must be enabled)
+group->setMouseTracking(true);
+connect(group, &SARibbonGalleryGroup::hovered, this, [](QAction* act) {
+    qDebug() << "Hovered:" << act->text();
+});
+```
+
+## SARibbonGalleryItem Usage
+
+`SARibbonGalleryItem` is a single data item in the Gallery, similar to `QStandardItem`. It is used to set icons, text, associated actions, and other data.
+
+### API Summary
+
+| Method | Return Value | Description |
+|--------|--------|------|
+| `SARibbonGalleryItem()` | Constructor | Create an empty item |
+| `SARibbonGalleryItem(const QString&, const QIcon&)` | Constructor | Create an item with text and icon |
+| `SARibbonGalleryItem(QAction*)` | Constructor | Create from a QAction |
+| `setText(const QString&)` | void | Set the text |
+| `text()` | QString | Get the text |
+| `setToolTip(const QString&)` | void | Set the tooltip |
+| `toolTip()` | QString | Get the tooltip |
+| `setIcon(const QIcon&)` | void | Set the icon |
+| `icon()` | QIcon | Get the icon |
+| `setAction(QAction*)` | void | Set the associated action |
+| `action()` | `QAction*` | Get the associated action |
+| `setSelectable(bool)` | void | Set whether the item is selectable |
+| `isSelectable()` | bool | Whether the item is selectable |
+| `setEnable(bool)` | void | Set whether the item is enabled |
+| `isEnable()` | bool | Whether the item is enabled |
+| `setTextAlignment(Qt::Alignment)` | void | Set the text alignment |
+| `textAlignment()` | `Qt::Alignment` | Get the text alignment |
+| `setData(int role, const QVariant&)` | void | Set data for the specified role |
+| `data(int role)` | QVariant | Get data for the specified role |
+
+### Code Example
+
+```cpp
+// Method 1: Direct construction
+SARibbonGalleryItem* item1 = new SARibbonGalleryItem(
+    tr("Heading Style 1"), QIcon(":/icons/style1.svg"));
+item1->setToolTip(tr("Apply Heading Style 1"));
+group->addItem(item1);
+
+// Method 2: Create from QAction
+QAction* act = new QAction(QIcon(":/icons/style2.svg"), tr("Style 2"), this);
+SARibbonGalleryItem* item2 = new SARibbonGalleryItem(act);
+item2->setTextAlignment(Qt::AlignHCenter | Qt::AlignBottom);
+group->addItem(item2);
+
+// Method 3: Create and set data afterwards
+SARibbonGalleryItem* item3 = new SARibbonGalleryItem();
+item3->setText(tr("Custom Style"));
+item3->setIcon(QIcon(":/icons/style3.svg"));
+item3->setToolTip(tr("Apply Custom Heading Style"));
+item3->setSelectable(true);
+group->addItem(item3);
+```
+
+## SARibbonGalleryViewport Details
+
+`SARibbonGalleryViewport` is the viewport window that displays all GalleryGroups when `SARibbonGallery` is expanded, inheriting from `QScrollArea`. It uses a vertical layout internally to manage multiple GalleryGroups.
+
+### API Summary
+
+| Method | Return Value | Description |
+|--------|--------|------|
+| `addWidget(QWidget*)` | void | Add a widget (without title) |
+| `addWidget(QWidget*, const QString&)` | void | Add a widget with a title |
+| `titleLabel(QWidget*)` | `QLabel*` | Get the title label corresponding to the widget |
+| `removeWidget(QWidget*)` | void | Remove a widget |
+| `galleryGroupList()` | `QList<SARibbonGalleryGroup*>` | Get all GalleryGroups |
+| `galleryHeight()` | int | Get the Gallery height |
+| `heightHintForWidth(int)` | int | Get the recommended height based on width |
+
+### Code Example
+
+```cpp
+// Get the Viewport and customize it
+SARibbonGalleryViewport* viewport = gallery->getPopupViewPort();
+if (viewport) {
+    // Modify the title style of a GalleryGroup
+    QLabel* title = viewport->titleLabel(group1);
+    if (title) {
+        title->setStyleSheet("font-size: 14px; font-weight: bold; color: #333;");
+    }
+
+    // Add a custom widget to the Viewport
+    QWidget* customWidget = new QWidget(viewport);
+    viewport->addWidget(customWidget, tr("Custom Area"));
+
+    // Remove unwanted widgets
+    // viewport->removeWidget(someWidget);
+}
+
+// Respond to the expand button to show more
+connect(gallery, &SARibbonGallery::triggered, this, [](QAction* act) {
+    qDebug() << "Gallery item triggered:" << act->text();
+});
+```
+
+## SARibbonSystemButtonBar Detailed Methods
+
+`SARibbonSystemButtonBar` is the system button bar on the right side of the window title bar, containing minimize, maximize, and close buttons. It also supports adding custom buttons and widgets.
+
+### API Summary
+
+| Method | Return Value | Description |
+|--------|--------|------|
+| `addAction(QAction*)` | void | Add an action button |
+| `addMenuAction(QAction*, popupMode)` | void | Add a menu action |
+| `addMenuAction(QMenu*, popupMode)` | `QAction*` | Add a menu and return the menu action |
+| `addSeparator()` | `QAction*` | Add a separator |
+| `addWidget(QWidget*)` | `QAction*` | Add a custom widget |
+| `setupMinimizeButton(bool)` | void | Set the visibility of the minimize button |
+| `setupMaximizeButton(bool)` | void | Set the visibility of the maximize button |
+| `setupCloseButton(bool)` | void | Set the visibility of the close button |
+| `setButtonWidthStretch(close, max, min)` | void | Set the button width ratio |
+| `setWindowTitleHeight(int)` | void | Set the title bar height |
+| `windowTitleHeight()` | int | Get the title bar height |
+| `setWindowButtonWidth(int)` | void | Set the system button width |
+| `windowButtonWidth()` | int | Get the system button width |
+| `setWindowStates(Qt::WindowStates)` | void | Set the window state |
+| `windowButtonFlags()` | `Qt::WindowFlags` | Get the button flags |
+| `minimizeButton()` | `QAbstractButton*` | Get the minimize button |
+| `maximizeButton()` | `QAbstractButton*` | Get the maximize button |
+| `closeButton()` | `QAbstractButton*` | Get the close button |
+| `setIconSize(const QSize&)` | void | Set the icon size |
+| `iconSize()` | QSize | Get the icon size |
+| `updateWindowFlag()` | void | Update window flags |
+
+### Code Example
+
+```cpp
+void MainWindow::setupSystemButtonBar()
+{
+    SARibbonSystemButtonBar* sysBar = windowButtonBar();
+    if (!sysBar) {
+        return;
+    }
+
+    // Customize button width ratio
+    sysBar->setButtonWidthStretch(4, 3, 3);
+
+    // Add a separator
+    sysBar->addSeparator();
+
+    // Add a login button
+    QAction* loginAction = new QAction(QIcon(":/icon/login.svg"), tr("Login"), this);
+    sysBar->addAction(loginAction);
+    connect(loginAction, &QAction::triggered, this, &MainWindow::onLogin);
+
+    // Add a dropdown button with a menu
+    QMenu* themeMenu = new QMenu(tr("Theme"), this);
+    themeMenu->addAction(tr("Light"));
+    themeMenu->addAction(tr("Dark"));
+    sysBar->addMenuAction(themeMenu, QToolButton::MenuButtonPopup);
+
+    // Add a custom widget
+    QLabel* statusLabel = new QLabel(tr("Online"), sysBar);
+    statusLabel->setStyleSheet("color: green; padding: 0 4px;");
+    sysBar->addWidget(statusLabel);
+
+    // Customize system button icon and size
+    sysBar->setIconSize(QSize(16, 16));
+}
+```
