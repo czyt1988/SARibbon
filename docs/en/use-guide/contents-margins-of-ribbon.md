@@ -1,5 +1,12 @@
 # Content Margins Settings
 
+- ✅ **Dual-layer margin control**: SARibbonMainWindow and SARibbonBar margins set independently
+- ✅ **Flexible combined effects**: Both margins stack for border, indent, and other visual effects
+- ✅ **Native frame adaptation**: Use only RibbonBar margins in native frame mode
+- ✅ **Default 2px left/right margins**: SARibbonMainWindow provides a thin border by default
+
+---
+
 SARibbon allows you to control content margins through the `setContentsMargins` methods of both `SARibbonMainWindow` and `SARibbonBar`, enabling window border effects and fine-tuning of Ribbon control positioning.
 
 ## SARibbonMainWindow Margins

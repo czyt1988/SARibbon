@@ -1,5 +1,34 @@
 # 自定义样式
 
+- ✅ **QSS完全自定义**：通过 Qt StyleSheet 深度定制界面颜色、边框、字体等所有视觉元素
+- ✅ **原生边框模式**：UseNativeFrame 标志启用系统边框，适合无自定义标题栏的场景
+- ✅ **样式合并机制**：内置主题 QSS 与自定义 QSS 可合并叠加，不互相覆盖
+- ✅ **15种QSS选择器**：覆盖 SARibbonBar/Category/Panel/ToolButton/TabBar 等所有核心组件
+- ✅ **内置主题参考**：`src/SARibbonBar/resource` 目录提供6套完整 QSS 文件作为修改基础
+
+## QSS选择器与组件对应关系
+
+自定义 QSS 时，需要了解各选择器对应的界面组件层级关系：
+
+```mermaid
+flowchart TD
+    A[SARibbonBar] --> B[SARibbonTabBar]
+    A --> C[SARibbonCategory]
+    A --> D[SARibbonQuickAccessBar]
+    A --> E[SARibbonButtonGroupWidget]
+    A --> F[SARibbonApplicationButton]
+    B --> G["SARibbonTabBar::tab"]
+    C --> H[SARibbonPanel]
+    C --> I[SARibbonPanelOptionButton]
+    H --> J[SARibbonToolButton]
+    H --> K[SARibbonGallery]
+    J --> L["SARibbonToolButton:hover"]
+    J --> M["SARibbonToolButton:pressed"]
+    J --> N["SARibbonToolButton:checked"]
+```
+
+---
+
 `SARibbon` 支持通过 QSS（Qt StyleSheet）自定义样式，从而实现不同风格的 Ribbon 界面。本文将以 **Matlab 2024** 的 Ribbon 风格为例，介绍如何通过 QSS 样式定制实现类似的界面效果。
 
 !!! example "教程源码"

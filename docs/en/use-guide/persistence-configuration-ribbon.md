@@ -1,5 +1,13 @@
 # User Configuration of Ribbon
 
+- ✅ **Office-style customization**: SARibbonCustomizeDialog provides a full customization dialog like Office
+- ✅ **Action auto-registration**: autoRegisteActions traverses and registers all QActions, classified by Category
+- ✅ **XML persistence**: Custom config saved as XML, auto-loaded on startup to restore user interface
+- ✅ **Widget embedding mode**: SARibbonCustomizeWidget can be embedded into your own settings page
+- ✅ **Complete workflow**: Create → Register → Load → Edit → Apply → Save, one-stop closed loop
+
+---
+
 ## Customization Features of SARibbon
 
 The customization of the ribbon is a distinctive feature of SARibbon. Referencing the custom interfaces of Office and WPS, users can define a great deal of content for their own ribbons, and can even create a completely different interface from the original one.

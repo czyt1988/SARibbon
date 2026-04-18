@@ -5,6 +5,19 @@
 - ✅ **QSS合并机制**：内置主题QSS可与自定义样式合并，不会互相覆盖
 - ✅ **完全自定义主题**：基于QSS编写任意风格，参见 [自定义Ribbon主题](./design-your-theme.md)
 
+## 主题切换流程
+
+```mermaid
+flowchart TD
+    A[调用 setRibbonTheme] --> B{是否有自定义 QSS?}
+    B -->|否| C[直接应用内置主题 QSS]
+    B -->|是| D[获取内置主题 QSS: sa_get_ribbon_theme_qss]
+    D --> E[合并: 内置QSS + 自定义QSS]
+    E --> F[setStyleSheet 应用合并后的样式]
+    C --> G[界面更新完成]
+    F --> G
+```
+
 SARibbon 提供了多种内置主题，如 Windows 7、Office 2013、Office 2016、暗色主题等，主题定义在`SARibbonTheme`枚举类中：
 
 ```cpp

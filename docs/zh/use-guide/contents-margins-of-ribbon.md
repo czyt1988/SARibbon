@@ -1,5 +1,12 @@
 # SARibbon的内容边距设置
 
+- ✅ **双层边距控制**：SARibbonMainWindow 和 SARibbonBar 可独立设置内容边距
+- ✅ **组合效果灵活**：两种边距叠加使用，实现边框、缩进等多种视觉效果
+- ✅ **原生边框适配**：原生边框模式下可仅通过 RibbonBar 边距调整内容位置
+- ✅ **默认2px左右边距**：SARibbonMainWindow 默认提供细边框效果
+
+---
+
 SARibbon 通过 `SARibbonMainWindow` 和 `SARibbonBar` 的 `setContentsMargins` 方法组合设置内容边距，从而实现窗口边框效果或调整 Ribbon 控件的位置。
 
 ## SARibbonMainWindow 的边距

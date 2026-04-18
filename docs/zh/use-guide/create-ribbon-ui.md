@@ -1,5 +1,26 @@
 # 创建Ribbon界面
 
+## Ribbon组件创建流程
+
+从获取 SARibbonBar 到创建各类 UI 元素，遵循以下层级递进的创建流程：
+
+```mermaid
+flowchart TD
+    A[获取 SARibbonBar] --> B[创建 SARibbonCategory]
+    B --> C[创建 SARibbonPanel]
+    C --> D{选择组件类型}
+    D -->|按钮| E[addLargeAction/addMediumAction/addSmallAction]
+    D -->|菜单按钮| F[addLargeAction + ToolButtonPopupMode]
+    D -->|Widget| G[addSmallWidget/addLargeWidget]
+    D -->|Gallery| H[addGallery + addCategoryActions]
+    D -->|按钮组| I[创建 SARibbonButtonGroupWidget + addWidget]
+    B -->|上下文标签| J[addContextCategory + addCategoryPage]
+    A --> K[配置 QuickAccessBar]
+    A --> L[配置 RightButtonGroup]
+    A --> M[配置 ApplicationButton]
+    J --> N[showContextCategory/hideContextCategory]
+```
+
 ## Category(分类页)
 
 创建分类页有两种方式：

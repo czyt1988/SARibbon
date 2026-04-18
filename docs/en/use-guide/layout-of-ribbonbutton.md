@@ -1,5 +1,13 @@
 # Ribbon Button Layout Guide
 
+- ✅ **Strategy Pattern architecture**: v2.7.0+ introduces SARibbonButtonLayoutStrategy hierarchy, clean layout logic separation
+- ✅ **Two layout schemes**: Word-wrap (Office style) and non-wrap (WPS style), choose by language context
+- ✅ **Three button sizes**: Large(32×32)/Medium/Small(20×20), icon size auto-adapts to button mode
+- ✅ **Binary search line-break**: Long text auto-wraps with up to 10 iterations for optimal width
+- ✅ **MenuButtonPopup vertical split**: Ribbon-specific button mode, top half executes default action, bottom pops menu
+
+---
+
 The Ribbon UI cannot be implemented with a simple `QTabBar + QToolButton` combination mainly because ribbon buttons are rendered in a special way. They differ significantly from classic menu buttons. The difference is obvious when a **menu is present**, especially in `MenuPopup` mode: classic toolbars split the button **horizontally** (icon | arrow), while **Ribbon splits it vertically** (icon on top, text + arrow at the bottom).
 
 ![ribbon-toolbutton](../../assets/pic/ribbon-toolbutton.gif)
@@ -17,10 +25,39 @@ There are **two layout strategies**, chosen automatically according to **word-wr
 
 Starting from v2.7.0, the layout calculation of `SARibbonToolButton` has been refactored using the **Strategy Pattern**, introducing the `SARibbonButtonLayoutStrategy` class hierarchy:
 
-```
-SARibbonButtonLayoutStrategy (abstract base)
-    ├── SARibbonLargeButtonLayoutStrategy (large button layout)
-    └── SARibbonSmallButtonLayoutStrategy (small button layout)
+```mermaid
+classDiagram
+    class SARibbonButtonLayoutStrategy {
+        <<abstract>>
+        +layout(SARibbonButtonLayoutContext*) QRectList
+        +iconRect() QRect
+        +textRect() QRect
+        +indicatorRect() QRect
+    }
+    class SARibbonLargeButtonLayoutStrategy {
+        +layout(context) QRectList
+        +iconRect() QRect
+        +textRect() QRect
+        +indicatorRect() QRect
+    }
+    class SARibbonSmallButtonLayoutStrategy {
+        +layout(context) QRectList
+        +iconRect() QRect
+        +textRect() QRect
+        +indicatorRect() QRect
+    }
+    class SARibbonButtonLayoutContext {
+        +buttonSize : QSize
+        +iconSize : QSize
+        +spacing : int
+        +wordWrap : bool
+        +hasMenu : bool
+        +text : QString
+        +fontMetrics : QFontMetrics
+    }
+    SARibbonButtonLayoutStrategy <|-- SARibbonLargeButtonLayoutStrategy
+    SARibbonButtonLayoutStrategy <|-- SARibbonSmallButtonLayoutStrategy
+    SARibbonButtonLayoutStrategy --> SARibbonButtonLayoutContext : uses
 ```
 
 This design enables:

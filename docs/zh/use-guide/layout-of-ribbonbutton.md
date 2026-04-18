@@ -1,5 +1,13 @@
 # Ribbon栏按钮布局说明
 
+- ✅ **策略模式架构**：v2.7.0+ 引入 SARibbonButtonLayoutStrategy 类层次，布局逻辑清晰分离
+- ✅ **两种布局方案**：文字换行（Office风格）和不换行（WPS风格），按语言场景选择
+- ✅ **三种按钮尺寸**：Large(32×32)/Medium/Small(20×20)，图标尺寸自动随按钮模式适配
+- ✅ **二分查找换行算法**：长文本自动换行，最多10次迭代找到最优宽度
+- ✅ **MenuButtonPopup上下分割**：Ribbon特色按钮模式，上半执行默认动作，下半弹出菜单
+
+---
+
 Ribbon界面无法用普通的tab+toolbutton组合来实现主要就是因为ribbon界面对工具按钮有特殊的渲染方式，和经典菜单按钮是有很大不同的，在没有菜单的情况下没有什么区别，但有菜单的情况下，会有明显不同
 
 差别主要通过下面这个动图可以体现，尤其是在`MenuPopup`模式下，按钮会被拆分为两部分，普通的工具栏是左右拆分，而`ribbon`的工具按钮是上下拆分
@@ -16,10 +24,39 @@ Ribbon界面无法用普通的tab+toolbutton组合来实现主要就是因为rib
 
 从 v2.7.0 版本开始，`SARibbonToolButton` 的布局计算被重构为**策略模式**，引入了 `SARibbonButtonLayoutStrategy` 类层次结构：
 
-```
-SARibbonButtonLayoutStrategy (抽象基类)
-    ├── SARibbonLargeButtonLayoutStrategy (大按钮布局)
-    └── SARibbonSmallButtonLayoutStrategy (小按钮布局)
+```mermaid
+classDiagram
+    class SARibbonButtonLayoutStrategy {
+        <<abstract>>
+        +layout(SARibbonButtonLayoutContext*) QRectList
+        +iconRect() QRect
+        +textRect() QRect
+        +indicatorRect() QRect
+    }
+    class SARibbonLargeButtonLayoutStrategy {
+        +layout(context) QRectList
+        +iconRect() QRect
+        +textRect() QRect
+        +indicatorRect() QRect
+    }
+    class SARibbonSmallButtonLayoutStrategy {
+        +layout(context) QRectList
+        +iconRect() QRect
+        +textRect() QRect
+        +indicatorRect() QRect
+    }
+    class SARibbonButtonLayoutContext {
+        +buttonSize : QSize
+        +iconSize : QSize
+        +spacing : int
+        +wordWrap : bool
+        +hasMenu : bool
+        +text : QString
+        +fontMetrics : QFontMetrics
+    }
+    SARibbonButtonLayoutStrategy <|-- SARibbonLargeButtonLayoutStrategy
+    SARibbonButtonLayoutStrategy <|-- SARibbonSmallButtonLayoutStrategy
+    SARibbonButtonLayoutStrategy --> SARibbonButtonLayoutContext : uses
 ```
 
 这种设计允许：

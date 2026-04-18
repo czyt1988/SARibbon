@@ -1,5 +1,14 @@
 # SARibbon User Guide
 
+- ✅ **Quick start**: Static embedding needs only 2 files, 5 lines of code to create a Ribbon interface
+- ✅ **MFC-style naming**: Category/Panel/Action naming follows MFC Ribbon conventions
+- ✅ **Contextual tabs**: SARibbonContextCategory condition-based show/hide for specific feature groups
+- ✅ **Gallery widget**: Grid-style display for large icon option sets
+- ✅ **Customization persistence**: User-customizable UI with XML save/load configuration
+- ✅ **12-step documentation**: From import to advanced, covering all core features
+
+---
+
 SARibbon is a Qt library for creating modern Ribbon interfaces, with a style similar to Microsoft Office or WPS. It is designed for complex desktop applications, effectively organizing a large number of functions, and is commonly used in the interface development of industrial software.
 
 Before starting coding, you need to integrate the SARibbon library into your Qt project. The simplest way is **static embedding**, which is to directly copy the source files `SARibbon.h` and `SARibbon.cpp` into your project.

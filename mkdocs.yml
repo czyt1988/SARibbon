@@ -77,6 +77,8 @@ plugins:
                 - Ribbon主题: zh/use-guide/SARibbon-theme.md
                 - 自定义Ribbon主题: zh/use-guide/design-your-theme.md
                 - Ribbon的用户配置化: zh/use-guide/persistence-configuration-ribbon.md
+                - SARibbonWidget详细指南: zh/use-guide/SARibbonWidget-guide.md
+                - Color Widgets: zh/use-guide/color-widgets.md
             - 常见问题: 
                 - 常见问题说明: zh/faq.md
             - API文档: 
@@ -110,6 +112,8 @@ plugins:
                 - Ribbon Themes: en/use-guide/SARibbon-theme.md
                 - Customize Your Theme: en/use-guide/design-your-theme.md
                 - User-Configurable Ribbon: en/use-guide/persistence-configuration-ribbon.md
+                - SARibbonWidget Guide: en/use-guide/SARibbonWidget-guide.md
+                - Color Widgets: en/use-guide/color-widgets.md
             - FAQ: 
                 - FAQ Overview: en/faq.md
             - API Documentation: 

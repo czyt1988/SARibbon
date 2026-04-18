@@ -5,6 +5,19 @@
 - ✅ **QSS merge mechanism**: built-in theme QSS can be merged with custom stylesheets without overwriting each other
 - ✅ **Fully custom themes**: write any style with QSS, see [Design Your Own Theme](./design-your-theme.md)
 
+## Theme Switching Flow
+
+```mermaid
+flowchart TD
+    A[Call setRibbonTheme] --> B{Has custom QSS?}
+    B -->|No| C[Apply built-in theme QSS directly]
+    B -->|Yes| D[Get built-in QSS: sa_get_ribbon_theme_qss]
+    D --> E[Merge: built-in QSS + custom QSS]
+    E --> F[setStyleSheet with merged stylesheet]
+    C --> G[UI updated]
+    F --> G
+```
+
 SARibbon ships with several built-in themes: Windows 7, Office 2013, Office 2016, dark variants, etc.  
 They are defined in the `SARibbonTheme` enum:
 

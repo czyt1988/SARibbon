@@ -1,5 +1,34 @@
 # Customize Your Theme
 
+- ✅ **Full QSS customization**: Deeply customize all visual elements — colors, borders, fonts — via Qt StyleSheet
+- ✅ **Native frame mode**: UseNativeFrame flag enables system border, suited for no-custom-titlebar scenarios
+- ✅ **Style merge mechanism**: Built-in theme QSS and custom QSS merge without overwriting each other
+- ✅ **15 QSS selectors**: Covers SARibbonBar/Category/Panel/ToolButton/TabBar and all core components
+- ✅ **Built-in theme reference**: `src/SARibbonBar/resource` provides 6 complete QSS files as modification base
+
+## QSS Selector-Component Mapping
+
+When writing custom QSS, you need to understand the selector-to-component hierarchy:
+
+```mermaid
+flowchart TD
+    A[SARibbonBar] --> B[SARibbonTabBar]
+    A --> C[SARibbonCategory]
+    A --> D[SARibbonQuickAccessBar]
+    A --> E[SARibbonButtonGroupWidget]
+    A --> F[SARibbonApplicationButton]
+    B --> G["SARibbonTabBar::tab"]
+    C --> H[SARibbonPanel]
+    C --> I[SARibbonPanelOptionButton]
+    H --> J[SARibbonToolButton]
+    H --> K[SARibbonGallery]
+    J --> L["SARibbonToolButton:hover"]
+    J --> M["SARibbonToolButton:pressed"]
+    J --> N["SARibbonToolButton:checked"]
+```
+
+---
+
 `SARibbon` supports custom styling through QSS (Qt StyleSheet), allowing you to create different Ribbon interface styles. This tutorial uses the **Matlab 2024** Ribbon style as an example to demonstrate how to achieve a similar interface through QSS customization.
 
 !!! example "Tutorial Source Code"

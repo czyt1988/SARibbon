@@ -1,5 +1,31 @@
 # SARibbon Layout Methods
 
+- ✅ **Four layout schemes**: Loose 3-row, Loose 2-row, Compact 3-row, Compact 2-row, switchable at runtime
+- ✅ **Combinatorial control**: setTabOnTitle + setEnableShowPanelTitle + setPanelLayoutMode + setEnableWordWrap
+- ✅ **Panel three row proportions**: Large/Medium/Small, all effective in 3-row mode, Medium equals Small in 2-row
+- ✅ **Word-wrap control**: setEnableWordWrap toggles button text wrapping, recommended off in 2-row mode
+- ✅ **Layout recommendations**: Loose for frameless, Compact for native frame or embedded use
+
+## Layout Selection Decision Flow
+
+Choose the appropriate layout scheme based on your window type and requirements:
+
+```mermaid
+flowchart TD
+    A[Choose layout scheme] --> B{Window type?}
+    B -->|SARibbonMainWindow frameless| C[Loose layout]
+    B -->|SARibbonMainWindow native frame| D[Compact layout]
+    B -->|SARibbonWidget embedded| D
+    C --> E{Button text length?}
+    D --> E
+    E -->|Short Chinese text| F[RibbonStyleLooseTwoRow / RibbonStyleCompactTwoRow]
+    E -->|Long English text| G[RibbonStyleLooseThreeRow / RibbonStyleCompactThreeRow]
+    G --> H[Enable setEnableWordWrap]
+    F --> I[Disable setEnableWordWrap]
+```
+
+---
+
 SARibbon supports four layout schemes: loose three-row, loose two-row, compact three-row, and compact two-row. You can dynamically switch between these modes.
 
 The style enumeration definitions of SARibbon are as follows (located in SARibbonBar):

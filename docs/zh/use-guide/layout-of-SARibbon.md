@@ -1,5 +1,31 @@
 # SARibbon布局方式
 
+- ✅ **四种布局方案**：宽松三行、宽松两行、紧凑三行、紧凑两行，运行时动态切换
+- ✅ **组合控制函数**：setTabOnTitle + setEnableShowPanelTitle + setPanelLayoutMode + setEnableWordWrap 四函数组合
+- ✅ **Panel三种占位**：Large/Medium/Small 行占比，3行模式全部生效，2行模式 Medium等同 Small
+- ✅ **文字换行控制**：setEnableWordWrap 决定按钮文字是否换行，2行模式建议关闭
+- ✅ **布局模式推荐**：无边框用宽松布局，原生边框/嵌入用紧凑布局
+
+## 布局选择决策流程
+
+根据窗口类型和需求选择合适的布局方案：
+
+```mermaid
+flowchart TD
+    A[选择布局方案] --> B{窗口类型?}
+    B -->|SARibbonMainWindow 无边框| C[宽松布局 Loose]
+    B -->|SARibbonMainWindow 原生边框| D[紧凑布局 Compact]
+    B -->|SARibbonWidget 嵌入| D
+    C --> E{按钮文字长度?}
+    D --> E
+    E -->|中文短文本| F[RibbonStyleLooseTwoRow / RibbonStyleCompactTwoRow]
+    E -->|英文长文本| G[RibbonStyleLooseThreeRow / RibbonStyleCompactThreeRow]
+    G --> H[开启 setEnableWordWrap]
+    F --> I[关闭 setEnableWordWrap]
+```
+
+---
+
 SARibbon 支持四种布局方案：**宽松三行**、**宽松两行**、**紧凑三行**、**紧凑两行**，你可以动态切换它们的模式
 
 ## 布局方案速查

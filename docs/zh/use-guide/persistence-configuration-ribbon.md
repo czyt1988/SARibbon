@@ -1,5 +1,13 @@
 # Ribbon的用户配置化
 
+- ✅ **Office风格自定义界面**：SARibbonCustomizeDialog 提供类似 Office 的完整自定义对话框
+- ✅ **Action自动注册**：autoRegisteActions 自动遍历并注册所有 QAction，按 Category 分类
+- ✅ **XML持久化**：自定义配置保存为 XML 文件，启动时自动加载还原用户界面
+- ✅ **Widget嵌入模式**：SARibbonCustomizeWidget 可嵌入到自己的设置页面中
+- ✅ **完整工作流**：创建→注册→加载→编辑→应用→保存，一站式闭环
+
+---
+
 ## SARibbon的自定义功能
 
 Ribbon的自定义是Ribbon的一个特色，参考了Office和WPS的自定义界面，用户可以为自己的Ribbon定义非常多的内容，甚至可以定义出一个完全和原来不一样的界面。

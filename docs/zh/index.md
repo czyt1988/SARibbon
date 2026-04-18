@@ -1,4 +1,4 @@
-﻿# SARibbon简介
+# SARibbon简介
 
 [Click here for English](../en/index.md)
 
@@ -54,7 +54,16 @@
 
 ## 功能特点
 
-- 针对Ribbon的布局和显示
+- ✅ **四层嵌套布局**：RibbonBar → Category → Panel → ToolButton，层次清晰，功能组织有序
+- ✅ **四种布局模式**：宽松三行、宽松两行、紧凑三行、紧凑两行，运行时动态切换
+- ✅ **6种内置主题**：Win7/Office2013/2016/2021/Dark/Dark2，一键切换，支持QSS自定义扩展
+- ✅ **上下文标签页**：SARibbonContextCategory 按条件显示/隐藏，如选中图片时出现"图片工具"
+- ✅ **Gallery画廊控件**：网格形式展示图标选项，支持弹出式分组浏览
+- ✅ **最小化模式**：双击标签切换，仅显示标签栏，点击临时弹出内容面板
+
+---
+
+针对Ribbon的布局和显示
 
 ![Ribbon的布局和显示](../assets/screenshot/SARibbonBar-overview.png)
 

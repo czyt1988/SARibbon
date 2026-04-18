@@ -1,5 +1,13 @@
 # SARibbon库的引入
 
+- ✅ **静态嵌入**：只需拷贝 `SARibbon.h` + `SARibbon.cpp` 两个文件即可集成
+- ✅ **CMake find_package**：编译安装后通过 `find_package(SARibbonBar)` 引入动态库
+- ✅ **qmake pri引入**：提供 `importSARibbonBarLib.pri` 一行语句完成引入
+- ✅ **QWindowKit可选**：通过预定义宏启用无边框窗口和 Windows 11 Snap Layout
+- ✅ **静态库资源初始化**：静态编译时通过 `Q_INIT_RESOURCE` 自动加载资源
+
+---
+
 ## 直接引入
 
 直接引入是最简单的集成方式，只需把 `src/SARibbon.h` 和 `src/SARibbon.cpp` 添加到工程里即可。此时默认不开启 `QWindowKit`（qwk），如果你需要开启 `qwk`，那么需要做如下处理：

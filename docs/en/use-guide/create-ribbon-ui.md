@@ -1,5 +1,26 @@
 # Creating a Ribbon Interface
 
+## Ribbon Component Creation Flow
+
+From obtaining SARibbonBar to creating UI elements, follow this hierarchical creation flow:
+
+```mermaid
+flowchart TD
+    A[Obtain SARibbonBar] --> B[Create SARibbonCategory]
+    B --> C[Create SARibbonPanel]
+    C --> D{Choose component type}
+    D -->|Button| E[addLargeAction/addMediumAction/addSmallAction]
+    D -->|Menu button| F[addLargeAction + ToolButtonPopupMode]
+    D -->|Widget| G[addSmallWidget/addLargeWidget]
+    D -->|Gallery| H[addGallery + addCategoryActions]
+    D -->|Button group| I[Create SARibbonButtonGroupWidget + addWidget]
+    B -->|Context category| J[addContextCategory + addCategoryPage]
+    A --> K[Configure QuickAccessBar]
+    A --> L[Configure RightButtonGroup]
+    A --> M[Configure ApplicationButton]
+    J --> N[showContextCategory/hideContextCategory]
+```
+
 ## Category
 
 There are two ways to create a category page:

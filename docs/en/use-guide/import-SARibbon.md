@@ -1,5 +1,13 @@
 # Importing the SARibbon Library
 
+- ✅ **Static embedding**: Just copy `SARibbon.h` + `SARibbon.cpp` to integrate
+- ✅ **CMake find_package**: Build & install, then `find_package(SARibbonBar)` to link dynamic library
+- ✅ **qmake pri inclusion**: One-line `importSARibbonBarLib.pri` completes integration
+- ✅ **Optional QWindowKit**: Enable borderless window & Windows 11 Snap Layout via preprocessor macros
+- ✅ **Static lib resource init**: `Q_INIT_RESOURCE` auto-loads resources when built as static library
+
+---
+
 ## Bringing SARibbon into a CMake project
 
 1. Build and install SARibbon with CMake first.
