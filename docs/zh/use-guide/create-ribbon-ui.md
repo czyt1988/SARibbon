@@ -478,6 +478,16 @@ SARibbon提供了`SARibbonApplicationWidget`，它能自动帮你覆盖主窗口
 
 `SARibbonApplicationWidget`提供了`resizeToParent`函数来决定如何相对父窗口进行缩放，默认是完全覆盖父窗口，如果你想覆盖一半或者其他尺寸，你可以重写此函数
 
+### API摘要
+
+| 方法名 | 返回值 | 说明 |
+|--------|--------|------|
+| `SARibbonApplicationWidget(SARibbonMainWindow* parent)` | 构造 | 创建应用窗口控件 |
+| `resizeToParent(const QSize& parentSize)` | void | 相对父窗口缩放（可重写） |
+| `eventFilter(QObject*, QEvent*)` | bool | 过滤父窗口事件 |
+| `showEvent(QShowEvent*)` | void | 处理显示事件 |
+| `keyPressEvent(QKeyEvent*)` | void | 处理键盘事件（ESC关闭） |
+
 使用`Application Widget`的例子如下：
 
 继承`SARibbonApplicationWidget`实现自己的窗口
@@ -619,3 +629,290 @@ void MainWindow::createWindowButtonGroupBar()
 上面代码的效果如下：
 
 ![window-button-bar](../../assets/pic/window-button-bar.png)
+
+## SARibbonMenu 详细用法
+
+`SARibbonMenu` 是专为 Ribbon 界面设计的菜单类，继承自 `QMenu`。它可以通过 StyleSheet 独立设置样式而不影响全局的 `QMenu` 样式，适合在 Ribbon 环境中使用。
+
+### 与 QMenu 的区别
+
+| 特性 | QMenu | SARibbonMenu |
+|------|-------|-------------|
+| 样式隔离 | 通过 QSS 会影响所有 QMenu | 仅影响 SARibbonMenu 实例 |
+| 子菜单类型 | 返回普通 QMenu | 返回 SARibbonMenu |
+| 控件支持 | 支持 addWidget | 提供 addWidget 方法 |
+
+### API摘要
+
+| 方法名 | 返回值 | 说明 |
+|--------|--------|------|
+| `SARibbonMenu(QWidget* parent)` | 构造 | 创建空菜单 |
+| `SARibbonMenu(const QString& title, QWidget* parent)` | 构造 | 创建带标题的菜单 |
+| `addRibbonMenu(SARibbonMenu* menu)` | `QAction*` | 添加已存在的 SARibbonMenu 作为子菜单 |
+| `addRibbonMenu(const QString& title)` | `SARibbonMenu*` | 创建并添加指定标题的子菜单 |
+| `addRibbonMenu(const QIcon& icon, const QString& title)` | `SARibbonMenu*` | 创建并添加带图标和标题的子菜单 |
+| `addWidget(QWidget* w)` | `QAction*` | 向菜单中添加自定义控件 |
+
+### 代码示例
+
+```cpp
+// 创建 SARibbonMenu
+SARibbonMenu* mainMenu = new SARibbonMenu(tr("文件操作"), panel);
+
+// 添加普通动作
+mainMenu->addAction("新建");
+mainMenu->addAction("打开");
+mainMenu->addSeparator();
+
+// 添加子菜单（使用 addRibbonMenu）
+SARibbonMenu* recentSubmenu = mainMenu->addRibbonMenu(tr("最近文件"));
+recentSubmenu->addAction("document1.docx");
+recentSubmenu->addAction("document2.docx");
+
+// 添加带图标的子菜单
+SARibbonMenu* exportSubmenu = mainMenu->addRibbonMenu(
+    QIcon(":/icon/export.svg"), tr("导出"));
+exportSubmenu->addAction("PDF");
+exportSubmenu->addAction("HTML");
+
+// 添加自定义控件到菜单
+QLabel* label = new QLabel(tr("自定义内容"));
+label->setStyleSheet("padding: 8px;");
+mainMenu->addWidget(label);
+
+// 将菜单关联到面板按钮
+actionExport->setMenu(mainMenu);
+panel->addLargeAction(actionExport, QToolButton::MenuButtonPopup);
+```
+
+## SARibbonGalleryGroup API 详解
+
+`SARibbonGalleryGroup` 是 Gallery 控件中的动作组，继承自 `QListView`，负责以网格形式显示和管理一组 `SARibbonGalleryItem`。
+
+### 枚举类型
+
+#### GalleryGroupStyle 显示样式
+
+| 枚举值 | 说明 |
+|--------|------|
+| `IconWithText` | 图标+文字（文字在一行显示） |
+| `IconWithWordWrapText` | 图标+自动换行文字（仅在 DisplayOneRow 下生效） |
+| `IconOnly` | 仅显示图标 |
+
+#### DisplayRow 显示行数
+
+| 枚举值 | 说明 |
+|--------|------|
+| `DisplayOneRow` (1) | 显示1行（默认） |
+| `DisplayTwoRow` (2) | 显示2行 |
+| `DisplayThreeRow` (3) | 显示3行 |
+
+### API摘要
+
+| 方法名 | 返回值 | 说明 |
+|--------|--------|------|
+| `setGalleryGroupStyle(GalleryGroupStyle)` | void | 设置显示样式 |
+| `galleryGroupStyle()` | `GalleryGroupStyle` | 获取当前显示样式 |
+| `setDisplayRow(DisplayRow)` | void | 设置显示行数 |
+| `displayRow()` | `DisplayRow` | 获取当前显示行数 |
+| `setGridMinimumWidth(int)` | void | 设置网格最小宽度（默认0:不限制） |
+| `gridMinimumWidth()` | int | 获取网格最小宽度 |
+| `setGridMaximumWidth(int)` | void | 设置网格最大宽度（默认0:不限制） |
+| `gridMaximumWidth()` | int | 获取网格最大宽度 |
+| `addItem(const QString&, const QIcon&)` | void | 添加项 |
+| `addItem(SARibbonGalleryItem*)` | void | 添加项对象 |
+| `addActionItem(QAction*)` | void | 将 QAction 添加为项 |
+| `addActionItemList(const QList<QAction*>&)` | void | 批量添加 QAction |
+| `removeActionItem(QAction*)` | bool | 移除指定 QAction 项 |
+| `setGroupTitle(const QString&)` | void | 设置组标题 |
+| `groupTitle()` | QString | 获取组标题 |
+| `groupModel()` | `SARibbonGalleryGroupModel*` | 获取底层模型 |
+| `actionGroup()` | `QActionGroup*` | 获取管理的 QActionGroup |
+| `gridRowCount()` | int | 获取网格行数 |
+| `gridColumnCount()` | int | 获取网格列数 |
+| `selectByIndex(int)` | void | 按索引选中项 |
+| `recalcGridSize()` | void | 重新计算网格大小 |
+| `preferredHeightForWidth(int)` | int | 获取指定宽度的推荐高度 |
+
+### 代码示例
+
+```cpp
+// 创建 Gallery Group 并设置样式
+SARibbonGalleryGroup* group = gallery->addCategoryActions(tr("样式"), actions);
+group->setGalleryGroupStyle(SARibbonGalleryGroup::IconWithWordWrapText);
+group->setDisplayRow(SARibbonGalleryGroup::DisplayTwoRow);
+group->setGridMinimumWidth(80);
+group->setGridMaximumWidth(120);
+
+// 响应触发信号
+connect(group, &SARibbonGalleryGroup::triggered, this, [](QAction* act) {
+    qDebug() << "Selected:" << act->text();
+});
+
+// 监听悬停信号（需启用鼠标跟踪）
+group->setMouseTracking(true);
+connect(group, &SARibbonGalleryGroup::hovered, this, [](QAction* act) {
+    qDebug() << "Hovered:" << act->text();
+});
+```
+
+## SARibbonGalleryItem 用法
+
+`SARibbonGalleryItem` 是 Gallery 中的单个数据项，类似 `QStandardItem`，用于设置图标、文字、关联动作等数据。
+
+### API摘要
+
+| 方法名 | 返回值 | 说明 |
+|--------|--------|------|
+| `SARibbonGalleryItem()` | 构造 | 创建空项 |
+| `SARibbonGalleryItem(const QString&, const QIcon&)` | 构造 | 创建带文字和图标的项 |
+| `SARibbonGalleryItem(QAction*)` | 构造 | 从 QAction 创建 |
+| `setText(const QString&)` | void | 设置文字 |
+| `text()` | QString | 获取文字 |
+| `setToolTip(const QString&)` | void | 设置工具提示 |
+| `toolTip()` | QString | 获取工具提示 |
+| `setIcon(const QIcon&)` | void | 设置图标 |
+| `icon()` | QIcon | 获取图标 |
+| `setAction(QAction*)` | void | 设置关联的动作 |
+| `action()` | `QAction*` | 获取关联的动作 |
+| `setSelectable(bool)` | void | 设置是否可选中 |
+| `isSelectable()` | bool | 是否可选中 |
+| `setEnable(bool)` | void | 设置是否可用 |
+| `isEnable()` | bool | 是否可用 |
+| `setTextAlignment(Qt::Alignment)` | void | 设置文字对齐方式 |
+| `textAlignment()` | `Qt::Alignment` | 获取文字对齐方式 |
+| `setData(int role, const QVariant&)` | void | 设置指定角色的数据 |
+| `data(int role)` | QVariant | 获取指定角色的数据 |
+
+### 代码示例
+
+```cpp
+// 方式一：直接构造
+SARibbonGalleryItem* item1 = new SARibbonGalleryItem(
+    tr("标题样式1"), QIcon(":/icons/style1.svg"));
+item1->setToolTip(tr("应用标题样式1"));
+group->addItem(item1);
+
+// 方式二：从 QAction 创建
+QAction* act = new QAction(QIcon(":/icons/style2.svg"), tr("样式2"), this);
+SARibbonGalleryItem* item2 = new SARibbonGalleryItem(act);
+item2->setTextAlignment(Qt::AlignHCenter | Qt::AlignBottom);
+group->addItem(item2);
+
+// 方式三：创建后设置数据
+SARibbonGalleryItem* item3 = new SARibbonGalleryItem();
+item3->setText(tr("自定义样式"));
+item3->setIcon(QIcon(":/icons/style3.svg"));
+item3->setToolTip(tr("应用自定义标题样式"));
+item3->setSelectable(true);
+group->addItem(item3);
+```
+
+## SARibbonGalleryViewport 详解
+
+`SARibbonGalleryViewport` 是 `SARibbonGallery` 弹出时显示所有 GalleryGroup 的视口窗口，继承自 `QScrollArea`。内部使用垂直布局管理多个 GalleryGroup。
+
+### API摘要
+
+| 方法名 | 返回值 | 说明 |
+|--------|--------|------|
+| `addWidget(QWidget*)` | void | 添加控件（不带标题） |
+| `addWidget(QWidget*, const QString&)` | void | 添加控件并设置标题 |
+| `titleLabel(QWidget*)` | `QLabel*` | 获取控件对应的标题标签 |
+| `removeWidget(QWidget*)` | void | 移除控件 |
+| `galleryGroupList()` | `QList<SARibbonGalleryGroup*>` | 获取所有 GalleryGroup |
+| `galleryHeight()` | int | 获取 Gallery 高度 |
+| `heightHintForWidth(int)` | int | 根据宽度获取推荐高度 |
+
+### 代码示例
+
+```cpp
+// 获取 Viewport 并自定义
+SARibbonGalleryViewport* viewport = gallery->getPopupViewPort();
+if (viewport) {
+    // 修改某个 GalleryGroup 的标题样式
+    QLabel* title = viewport->titleLabel(group1);
+    if (title) {
+        title->setStyleSheet("font-size: 14px; font-weight: bold; color: #333;");
+    }
+
+    // 添加自定义控件到 Viewport
+    QWidget* customWidget = new QWidget(viewport);
+    viewport->addWidget(customWidget, tr("自定义区域"));
+
+    // 移除不需要的控件
+    // viewport->removeWidget(someWidget);
+}
+
+// 响应展开按钮显示更多
+connect(gallery, &SARibbonGallery::triggered, this, [](QAction* act) {
+    qDebug() << "Gallery item triggered:" << act->text();
+});
+```
+
+## SARibbonSystemButtonBar 详细方法
+
+`SARibbonSystemButtonBar` 是窗口标题栏右侧的系统按钮栏，包含最小化、最大化、关闭按钮，并支持添加自定义按钮和控件。
+
+### API摘要
+
+| 方法名 | 返回值 | 说明 |
+|--------|--------|------|
+| `addAction(QAction*)` | void | 添加动作按钮 |
+| `addMenuAction(QAction*, popupMode)` | void | 添加菜单动作 |
+| `addMenuAction(QMenu*, popupMode)` | `QAction*` | 添加菜单并返回菜单动作 |
+| `addSeparator()` | `QAction*` | 添加分隔线 |
+| `addWidget(QWidget*)` | `QAction*` | 添加自定义控件 |
+| `setupMinimizeButton(bool)` | void | 设置最小化按钮显隐 |
+| `setupMaximizeButton(bool)` | void | 设置最大化按钮显隐 |
+| `setupCloseButton(bool)` | void | 设置关闭按钮显隐 |
+| `setButtonWidthStretch(close, max, min)` | void | 设置按钮宽度比例 |
+| `setWindowTitleHeight(int)` | void | 设置标题栏高度 |
+| `windowTitleHeight()` | int | 获取标题栏高度 |
+| `setWindowButtonWidth(int)` | void | 设置系统按钮宽度 |
+| `windowButtonWidth()` | int | 获取系统按钮宽度 |
+| `setWindowStates(Qt::WindowStates)` | void | 设置窗口状态 |
+| `windowButtonFlags()` | `Qt::WindowFlags` | 获取按钮标志 |
+| `minimizeButton()` | `QAbstractButton*` | 获取最小化按钮 |
+| `maximizeButton()` | `QAbstractButton*` | 获取最大化按钮 |
+| `closeButton()` | `QAbstractButton*` | 获取关闭按钮 |
+| `setIconSize(const QSize&)` | void | 设置图标尺寸 |
+| `iconSize()` | QSize | 获取图标尺寸 |
+| `updateWindowFlag()` | void | 更新窗口标志 |
+
+### 代码示例
+
+```cpp
+void MainWindow::setupSystemButtonBar()
+{
+    SARibbonSystemButtonBar* sysBar = windowButtonBar();
+    if (!sysBar) {
+        return;
+    }
+
+    // 自定义按钮宽度比例
+    sysBar->setButtonWidthStretch(4, 3, 3);
+
+    // 添加分隔线
+    sysBar->addSeparator();
+
+    // 添加登录按钮
+    QAction* loginAction = new QAction(QIcon(":/icon/login.svg"), tr("登录"), this);
+    sysBar->addAction(loginAction);
+    connect(loginAction, &QAction::triggered, this, &MainWindow::onLogin);
+
+    // 添加带菜单的下拉按钮
+    QMenu* themeMenu = new QMenu(tr("主题"), this);
+    themeMenu->addAction(tr("浅色"));
+    themeMenu->addAction(tr("深色"));
+    sysBar->addMenuAction(themeMenu, QToolButton::MenuButtonPopup);
+
+    // 添加自定义控件
+    QLabel* statusLabel = new QLabel(tr("在线"), sysBar);
+    statusLabel->setStyleSheet("color: green; padding: 0 4px;");
+    sysBar->addWidget(statusLabel);
+
+    // 自定义系统按钮图标和尺寸
+    sysBar->setIconSize(QSize(16, 16));
+}
+```
