@@ -1,5 +1,9 @@
 # Third-Party Library Build Guide
 
+- ✅ **QWindowKit native windows**: supports Windows snap-to-edge, Snap Layouts, and multi-monitor relocation
+- ✅ **Multi-IDE support**: three build routes — Qt Creator, Visual Studio, and command-line
+- ✅ **Auto local install**: compiled library auto-installs into the same version-isolated directory as SARibbon
+
 !!! warning 
     Skip this document if you do not plan to enable **QWindowkit**.  
     QWindowkit offers a superior borderless-window solution that respects native OS behaviors (snap, maximize animations, etc.) and handles multi-monitor / mixed-DPI relocation correctly.

@@ -1,5 +1,10 @@
 # SARibbon主题切换
 
+- ✅ **6种内置主题**：Office2013/2016/2021、Windows7、Dark/Dark2，一键切换
+- ✅ **运行时动态切换**：通过 `setRibbonTheme()` 即时更换主题，无需重启
+- ✅ **QSS合并机制**：内置主题QSS可与自定义样式合并，不会互相覆盖
+- ✅ **完全自定义主题**：基于QSS编写任意风格，参见 [自定义Ribbon主题](./design-your-theme.md)
+
 SARibbon 提供了多种内置主题，如 Windows 7、Office 2013、Office 2016、暗色主题等，主题定义在`SARibbonTheme`枚举类中：
 
 ```cpp
@@ -64,6 +69,17 @@ dark2主题：
 | `RibbonThemeWindows7` | Windows 7 经典 | 兼容传统风格 |
 | `RibbonThemeDark` | 暗色主题 | 长时间使用/夜间模式 |
 | `RibbonThemeDark2` | 暗色主题（变体） | 对比度更高的暗色需求 |
+
+## 主题API摘要
+
+| 方法 / 属性 | 所属类 | 说明 |
+|-------------|--------|------|
+| `setRibbonTheme(SARibbonTheme)` | SARibbonMainWindow / SARibbonWidget | 设置Ribbon主题 |
+| `ribbonTheme()` → `SARibbonTheme` | SARibbonMainWindow / SARibbonWidget | 获取当前主题 |
+| `Q_PROPERTY(ribbonTheme)` | SARibbonMainWindow / SARibbonWidget | 主题属性，可通过QSS或代码绑定 |
+
+!!! note "构造函数中设置主题的时机"
+    某些Qt版本在构造函数中直接调用 `setRibbonTheme()` 可能不完全生效，原因是QSS在构造阶段尚未完全加载。推荐使用 `QTimer::singleShot(0)` 将主题设置延迟到事件循环开始后执行。
 
 ## 动态切换主题示例
 

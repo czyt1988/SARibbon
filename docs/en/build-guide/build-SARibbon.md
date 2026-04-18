@@ -1,5 +1,10 @@
 # Building SARibbon Library
 
+- ✅ **CMake build**: supports Visual Studio and Qt Creator, with 5 configurable options
+- ✅ **QMake build**: compatible with older versions via Qt Creator (v2.6.2 and below)
+- ✅ **Local install isolation**: auto-creates version-specific install directories per compiler/Qt version
+- ✅ **Optional QWindowKit**: enables native window features (Snap Layout, etc.)
+
 The `SARibbon` library provides two build methods: `CMake` and `QMake`, with `CMake` being recommended.
 
 !!! warning "Note"

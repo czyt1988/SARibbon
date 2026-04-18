@@ -1,7 +1,23 @@
 # SARibbon Build Instructions
 
+- ✅ **Static approach**: add `SARibbon.h` + `SARibbon.cpp` directly — no build needed
+- ✅ **Dynamic library build**: CMake-based, with compiler/version-isolated install
+- ✅ **Optional QWindowKit**: native OS window features (snap layout, multi-monitor)
+
+!!! tip
+    You don't need to compile SARibbon — just add `SARibbon.h` and `SARibbon.cpp` (located in the `src` directory) to your project.
+
 This document explains in detail how to build SARibbon dynamically.  
 If you are not familiar with building, we recommend the static approach: simply add `SARibbon.h` and `SARibbon.cpp` to your project and you are ready to go.
+
+## Sub-document Navigation
+
+| Document | Content |
+|----------|---------|
+| [Building SARibbon Library](./build-SARibbon.md) | CMake/QMake build options and detailed steps |
+| [Third-Party Library Build](./build-3rdparty.md) | How to compile QWindowKit |
+| [Common Build Errors](./common-build-errors.md) | Troubleshooting compilation issues |
+| [Internationalization](./i18n.md) | Translation file generation and new languages |
 
 SARibbon uses [QWindowkit](https://github.com/stdware/qwindowkit) as its borderless-window solution, but also supports a minimal built-in borderless mode.  
 If you need native OS window features—such as Windows 7+ snap-to-edge or Windows 11 Snap Layouts—it is strongly advised to enable the [QWindowkit](https://github.com/stdware/qwindowkit) library, which also fixes multi-monitor relocation issues.

@@ -1,5 +1,9 @@
 # 第三方库编译
 
+- ✅ **QWindowKit原生窗口**：支持Windows贴边/Snap Layout和多屏幕移动
+- ✅ **多IDE支持**：Qt Creator、Visual Studio和命令行三种编译方式
+- ✅ **自动本地安装**：编译后自动安装到与SARibbon一致的版本隔离目录
+
 !!! warning "注意"
     如果不开启QWindowkit,可以跳过此文档。
 

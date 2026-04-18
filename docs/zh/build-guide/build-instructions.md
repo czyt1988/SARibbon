@@ -5,6 +5,15 @@
 
 此文详细介绍如何构建SARibbon为**动态库**。如果你不熟悉C++的构建流程，只需把 `SARibbon.h` 和 `SARibbon.cpp` 引入你的工程即可使用。
 
+## 子文档导航
+
+| 文档 | 内容 |
+|------|------|
+| [SARibbon库构建](./build-SARibbon.md) | CMake/QMake构建选项和详细步骤 |
+| [第三方库编译](./build-3rdparty.md) | QWindowKit库的编译方法 |
+| [构建常见错误](./common-build-errors.md) | 编译问题排查与解决 |
+| [多语言翻译](./i18n.md) | 翻译文件生成与新增语言 |
+
 ## 构建流程总览
 
 SARibbon 的构建分为两个部分：第三方依赖库（可选）和 SARibbon 本身。下面的流程图展示了构建的整体路线：

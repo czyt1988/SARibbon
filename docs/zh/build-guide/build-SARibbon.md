@@ -1,5 +1,10 @@
 # SARibbon库构建
 
+- ✅ **CMake构建**：支持Visual Studio和Qt Creator，含5个可配置选项
+- ✅ **QMake构建**：兼容旧版本，通过Qt Creator直接打开（v2.6.2以下）
+- ✅ **本地安装隔离**：按编译器/Qt版本自动创建独立安装目录，避免版本冲突
+- ✅ **可选QWindowKit**：启用后支持原生窗口特性（Snap Layout等）
+
 `SARibbon`库提供`CMake`和`QMake`两种方式构建，推荐使用`CMake`
 
 !!! warning "注意"

@@ -1,6 +1,16 @@
 # 构建过程常见错误
 
-## vs2017编译器构建出错
+- ✅ **VS2017路径问题**：中文路径和长路径限制的解决方案
+- ✅ **MOC编译异常**：首次构建批量MOC操作失败的简单修复
+- ✅ **QWindowKit依赖缺失**：找不到第三方库时的配置排查
+
+| 错误现象 | 原因 | 解决方案 |
+|----------|------|----------|
+| `error D8050: 无法执行 c1xx.dll` | 构建路径含中文或超过260字符限制 | 设置英文构建路径，启用Win32长路径 |
+| MOC相关编译错误 | 首次构建批量MOC操作异常 | 保留build目录，重新构建1-2次 |
+| `Could not find QWindowKit` | 未编译或安装QWindowKit库 | 先编译QWindowKit，或指定 `-DQWindowKit_DIR` 路径 |
+
+!!! bug "VS2017编译器构建出错"
 
 > error D8050: 无法执行 xxx/c1xx.dll  未能将命令行放入调试记录中
 
@@ -43,11 +53,11 @@
 
 如果还是不行，把项目移动到其他目录下，比如D盘，或者C盘，这样路径长度就变短了，这样问题就解决啦
 
-## 构建过程中出现moc错误
+!!! bug "构建过程中出现MOC错误"
 
 在编译输出中看到moc相关的错误时，只需要再多几次构建即可。这个问题尤其发生在第一次构建的时候，大批量的moc操作有时会出现异常，只要保留build目录，继续构建即可。
 
-## QWindowKit 找不到
+!!! bug "QWindowKit 找不到"
 
 如果构建时启用了 `SARIBBON_USE_FRAMELESS_LIB=ON`，但出现类似 `Could not find a package configuration file provided by "QWindowKit"` 的错误，说明 QWindowKit 库未正确编译或安装。
 

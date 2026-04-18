@@ -1,5 +1,10 @@
 # 常见问题说明
 
+- ✅ **高分屏适配**：涵盖Qt5/6高DPI缩放属性与缩放策略配置
+- ✅ **快捷键全局响应**：解决Ribbon模式下隐藏面板快捷键失效的问题
+- ✅ **主题设置时机**：构造函数中主题不生效的解决方案，详见 [主题切换](./use-guide/SARibbon-theme.md)
+- ✅ **SVG图标依赖**：运行环境缺少Qt SVG插件时的排查方法
+
 ## 1、高分屏显示问题
 
 针对高分屏显示，有如下两个方面准备
@@ -42,6 +47,8 @@ int main(int argc, char* argv[])
 !!! tip "Qt6 说明"
     Qt6 默认启用了高DPI缩放，不再需要手动设置 `AA_EnableHighDpiScaling` 和 `AA_UseHighDpiPixmaps`（这两个属性在 Qt6 中已被移除）。如果你使用 Qt6，只需关注 `setHighDpiScaleFactorRoundingPolicy` 即可。
 
+    更多关于Ribbon尺寸配置的信息，请参阅 [尺寸设置](./use-guide/SARibbon-size-settings.md)。
+
 如果你使用OpenGL窗口发生了一些奇怪的问题，你可以把上面这些语句去掉看看，最新版Qt已经不需要进行上述的处理了
 
 ## 2、快捷键问题
@@ -76,6 +83,8 @@ QTimer::singleShot(0, this, [ this ]() {
     });
 ```
 
+详细说明和更多主题切换用法，请参阅 [主题切换](./use-guide/SARibbon-theme.md)。
+
 ## 4、最大最小化图标不在右上角而在左上角
 
 如果你遇到这个问题，确认编译的库文件和头文件是否匹配，通常这个问题发生在局部更新上，也就是仅仅替换了dll，而没有替换h文件导致的，有些工程在拉取了最新的SARibbon版本后，更新完直接替换lib和dll文件，头文件没有替换就会发生此问题，修复此问题的方法是确保所有文件的版本一致性，你可以把原来涉及的文件都删除掉，如果你用cmake安装的话，将涉及如下文件/文件夹：
@@ -89,10 +98,16 @@ lib/cmake/SARibbonBar[文件夹]
 SARibbonBar_amalgamate
 ```
 
-## 5、图标没有显示
+关于标题栏的更多配置，请参阅 [标题栏设置](./use-guide/titlebar-setting.md)。
 
-如果你遇到图标不显示，例如最大最小化按钮没有图标但有按钮，那么说明你的运行环境没有找到Qt的svg插件，你的程序目录下应该要有`imageformats/qsvg.dll`插件，你可以运行windeployqt拉取你程序的依赖，或者确保你的环境变量PATH配置中能找到`plugins/imageformats`文件夹
+## 5、图标没有显示或提示 "Could not create pixmap from xxx.svg"
 
-## 6、提示Could not create pixmap from :\SARibbon\image\resource\xxx.svg
+如果你遇到图标不显示（如最大最小化按钮有按钮但无图标），或控制台提示 `Could not create pixmap from :\SARibbon\image\resource\xxx.svg`，说明运行环境缺少Qt的SVG插件。你的程序目录下需要有 `imageformats/qsvg.dll`（Windows）或对应的 `qsvg` 插件。
 
-此问题同问题5，你的程序目录下应该要有`imageformats/qsvg.dll`插件
+解决方法：
+
+- 运行 `windeployqt` 拉取程序依赖，自动拷贝所需插件
+- 或确保环境变量 `PATH` 中能找到 `plugins/imageformats` 文件夹
+
+!!! tip
+    此问题在所有依赖SVG资源的控件中都会出现，包括Ribbon图标、Gallery项等。
