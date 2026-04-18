@@ -100,7 +100,38 @@ MyRibbonWidget::MyRibbonWidget(QWidget *parent)
 }
 ```
 
-通过 `setWidget()` 方法，您可以将任意 `QWidget` 嵌入到 `SARibbonWidget` 中
+通过 `setWidget()` 方法，您可以将任意 `QWidget` 嵌入到 `SARibbonWidget` 中。下面是一个典型的用法示例：
+
+```cpp
+// 在 QDialog 中使用 SARibbonWidget 并设置中心内容
+SARibbonWidget* ribbonWidget = new SARibbonWidget(this);
+
+// 配置 RibbonBar（Widget 模式推荐设置）
+SARibbonBar* ribbon = ribbonWidget->ribbonBar();
+ribbon->setTitleVisible(false);
+ribbon->setApplicationButton(nullptr);
+ribbon->setRibbonStyle(SARibbonBar::RibbonStyleCompactThreeRow);
+
+// 创建中心内容 widget
+QWidget* contentWidget = new QWidget(this);
+// ... 对 contentWidget 进行布局和设置 ...
+
+// 将中心内容嵌入 SARibbonWidget
+ribbonWidget->setWidget(contentWidget);
+
+// 将 SARibbonWidget 加入对话框布局
+QVBoxLayout* layout = new QVBoxLayout(this);
+layout->setContentsMargins(0, 0, 0, 0);
+layout->addWidget(ribbonWidget);
+```
+
+!!! tip "setWidget() 使用提示"
+    - `setWidget()` 会自动将传入的 `QWidget` 作为 `SARibbonWidget` 的中心区域进行管理，无需手动布局。
+    - 调用 `setWidget()` 后，之前设置的中心 widget 会被替换。如需移除中心 widget，可调用 `setWidget(nullptr)`。
+    - 中心 widget 会自动跟随 `SARibbonWidget` 的尺寸变化进行调整。
+
+!!! info "更多信息"
+    更多关于在对话框、子窗口等场景使用 `SARibbonWidget` 的详细内容，包括不同嵌入模式、布局策略和进阶用法，请参见 [SARibbonWidget 详细指南](./SARibbonWidget-guide.md)。
 
 ## 完整的原生边框示例
 
