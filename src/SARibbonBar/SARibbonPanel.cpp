@@ -1729,7 +1729,8 @@ void SARibbonPanel::changeEvent(QEvent* e)
     if (nullptr == e) {
         return;
     }
-    if (e->type() == QEvent::FontChange) {
+    switch (e->type()) {
+    case QEvent::FontChange: {
         if (d_ptr->m_label) {
             d_ptr->m_label->setFont(font());
         }
@@ -1737,6 +1738,16 @@ void SARibbonPanel::changeEvent(QEvent* e)
             lay->invalidate();
         }
         d_ptr->resetTitleLabelFont();
+    } break;
+    case QEvent::LayoutDirectionChange: {
+        // 布局方向改变（如 LTR→RTL），失效布局并触发重绘
+        if (QLayout* lay = layout()) {
+            lay->invalidate();
+        }
+        update();
+    } break;
+    default:
+        break;
     }
     QWidget::changeEvent(e);
 }

@@ -1,4 +1,4 @@
-﻿#include "SARibbonUtil.h"
+#include "SARibbonUtil.h"
 #include <QFile>
 #include <QWidget>
 #include <QDebug>
@@ -239,6 +239,47 @@ qreal widgetDevicePixelRatio(QWidget* w)
         return 1.0;
     }
     return sc->devicePixelRatio();
+}
+
+/**
+ * \if ENGLISH
+ * @brief Check if the application layout direction is Right-to-Left (RTL)
+ * @return true if layout direction is Qt::RightToLeft, false otherwise
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 检查应用程序布局方向是否为从右到左（RTL）
+ * @return 如果布局方向为 Qt::RightToLeft 返回 true，否则返回 false
+ * \endif
+ */
+bool saIsRTL()
+{
+    return QApplication::layoutDirection() == Qt::RightToLeft;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Mirror X coordinate for RTL layout support
+ * @param x The original X coordinate
+ * @param containerWidth The width of the container
+ * @param elementWidth The width of the element
+ * @return containerWidth - x - elementWidth when RTL, x unchanged when LTR
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 为 RTL 布局支持镜像 X 坐标
+ * @param x 原始 X 坐标
+ * @param containerWidth 容器宽度
+ * @param elementWidth 元素宽度
+ * @return RTL 时返回 containerWidth - x - elementWidth，LTR 时返回 x 不变
+ * \endif
+ */
+int saMirrorX(int x, int containerWidth, int elementWidth)
+{
+    if (saIsRTL()) {
+        return containerWidth - x - elementWidth;
+    }
+    return x;
 }
 
 }

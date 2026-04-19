@@ -3743,35 +3743,6 @@ void SARibbonBar::changeEvent(QEvent* e)
     }
     QMenuBar::changeEvent(e);
 }
-    switch (e->type()) {
-    case QEvent::FontChange: {
-        QFont f                       = font();
-        QList< QWidget* > listWidgets = findChildren< QWidget* >();
-        for (QWidget* w : listWidgets) {
-            w->setFont(f);
-        }
-        // 字体改变总体布局调整
-        if (SARibbonBarLayout* lay = qobject_cast< SARibbonBarLayout* >(layout())) {
-            lay->resetSize();
-        }
-    } break;
-    case QEvent::StyleChange: {
-        updateRibbonGeometry();
-    } break;
-    case QEvent::ParentChange: {
-        //! 这种是针对先new 一个对象，再设置到MainWindow的情况，例如
-        //! SARibbonBar* ribbon = new SARibbonBar();
-        //! mainwinodw->setRibbonBar(ribbon);
-        //!
-        //! 这种方式，构造的时候由于没有设置父窗口，因此，如果在构造函数绑定信号槽就有可能绑定不上（parent为空）
-        //! 所以在事件里绑定
-        d_ptr->initNewParent(parentWidget());
-    } break;
-    default:
-        break;
-    }
-    QMenuBar::changeEvent(e);
-}
 
 /**
  * \if ENGLISH

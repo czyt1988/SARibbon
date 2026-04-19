@@ -1231,6 +1231,10 @@ void SARibbonToolButton::changeEvent(QEvent* e)
             // 说明字体改变，需要重新计算和字体相关的信息
             invalidateSizeHint();
         } break;
+        case QEvent::LayoutDirectionChange: {
+            // 布局方向改变（如 LTR→RTL），触发重绘以更新内部绘制矩形
+            update();
+        } break;
         case QEvent::ScreenChangeInternal:
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
         case QEvent::DevicePixelRatioChange:

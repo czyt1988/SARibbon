@@ -1335,6 +1335,13 @@ void SARibbonCategory::changeEvent(QEvent* event)
             layout()->invalidate();
         }
     } break;
+    case QEvent::LayoutDirectionChange: {
+        // 布局方向改变（如 LTR→RTL），失效布局并触发重绘
+        if (layout()) {
+            layout()->invalidate();
+        }
+        update();
+    } break;
     case QEvent::FontChange: {
 #if SARIBBONCATEGORY_DEBUG_PRINT
         qDebug() << "SARibbonCategory changeEvent(FontChange),categoryName=" << categoryName();
