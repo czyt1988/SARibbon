@@ -326,6 +326,30 @@ private Q_SLOTS:
     // Show or hide context category 2
     void onContextCategory2ActionTriggered(bool visible);
 
+    // Toggle RTL layout direction
+    void onToggleLayoutDirection();
+
+    // Set ribbon alignment to left
+    void onSetAlignmentLeft();
+
+    // Set ribbon alignment to center
+    void onSetAlignmentCenter();
+
+    // Set ribbon alignment to right
+    void onSetAlignmentRight();
+
+    // Set ribbon style - Loose Three Row
+    void onSetStyleLooseThreeRow();
+
+    // Set ribbon style - Loose Two Row
+    void onSetStyleLooseTwoRow();
+
+    // Set ribbon style - Compact Three Row
+    void onSetStyleCompactThreeRow();
+
+    // Set ribbon style - Compact Two Row
+    void onSetStyleCompactTwoRow();
+
 protected:
     // Handles the close event for the main window
     void closeEvent(QCloseEvent* closeEvent) override;
@@ -362,6 +386,14 @@ private:
     int mTagForActionIcon;                                ///< Tag for action icon in actions manager
     QTimer mChangeTitleBkColorTimer;                      ///< Timer for changing title background color
     QAction* mActionDeleteContext { nullptr };            ///< Action for deleting context category
+    QAction* mActionToggleRTL { nullptr };                 ///< Action for toggling RTL layout direction
+    QAction* mActionAlignLeft { nullptr };                   ///< Action for setting alignment to left
+    QAction* mActionAlignCenter { nullptr };               ///< Action for setting alignment to center
+    QAction* mActionAlignRight { nullptr };                ///< Action for setting alignment to right
+    QAction* mActionStyleLooseThreeRow { nullptr };        ///< Action for setting style to Loose Three Row
+    QAction* mActionStyleLooseTwoRow { nullptr };          ///< Action for setting style to Loose Two Row
+    QAction* mActionStyleCompactThreeRow { nullptr };      ///< Action for setting style to Compact Three Row
+    QAction* mActionStyleCompactTwoRow { nullptr };        ///< Action for setting style to Compact Two Row
     Ui::MainWindow* ui;                                   ///< UI form pointer (Qt Designer generated)
 };
 

@@ -1,4 +1,4 @@
-﻿#include "mainwindow.h"
+#include "mainwindow.h"
 #include "ui_mainwindow.h"
 #if !SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
 #include "SAFramelessHelper.h"
@@ -319,6 +319,54 @@ void MainWindow::createRibbonApplicationButton()
         mMenuApplicationBtn->addAction(createAction("test2", ":/icon/icon/action2.svg"));
         mMenuApplicationBtn->addAction(createAction("test3", ":/icon/icon/action3.svg"));
         mMenuApplicationBtn->addAction(createAction("test4", ":/icon/icon/action4.svg"));
+
+        // Add separator before RTL/Layout menu items
+        mMenuApplicationBtn->addSeparator();
+
+        // Add RTL toggle action
+        mActionToggleRTL = createAction(tr("Switch to RTL"), ":/icon/icon/layout.svg", "actionToggleRTL");
+        connect(mActionToggleRTL, &QAction::triggered, this, &MainWindow::onToggleLayoutDirection);
+        mMenuApplicationBtn->addAction(mActionToggleRTL);
+
+        // Add Layout Direction submenu
+        QMenu* menuLayoutDirection = mMenuApplicationBtn->addMenu(tr("Layout Direction"));
+        menuLayoutDirection->setObjectName("menuLayoutDirection");
+
+        // Add Alignment submenu
+        QMenu* menuAlignment = mMenuApplicationBtn->addMenu(tr("Ribbon Alignment"));
+        menuAlignment->setObjectName("menuAlignment");
+
+        mActionAlignLeft = createAction(tr("Align Left"), ":/icon/icon/Align-Left.svg", "actionAlignLeft");
+        connect(mActionAlignLeft, &QAction::triggered, this, &MainWindow::onSetAlignmentLeft);
+        menuAlignment->addAction(mActionAlignLeft);
+
+        mActionAlignCenter = createAction(tr("Align Center"), ":/icon/icon/Align-Center.svg", "actionAlignCenter");
+        connect(mActionAlignCenter, &QAction::triggered, this, &MainWindow::onSetAlignmentCenter);
+        menuAlignment->addAction(mActionAlignCenter);
+
+        mActionAlignRight = createAction(tr("Align Right"), ":/icon/icon/Align-Right.svg", "actionAlignRight");
+        connect(mActionAlignRight, &QAction::triggered, this, &MainWindow::onSetAlignmentRight);
+        menuAlignment->addAction(mActionAlignRight);
+
+        // Add Style submenu
+        QMenu* menuStyle = mMenuApplicationBtn->addMenu(tr("Ribbon Style"));
+        menuStyle->setObjectName("menuStyle");
+
+        mActionStyleLooseThreeRow = createAction(tr("Loose Three Row"), ":/icon/icon/layout.svg", "actionStyleLooseThreeRow");
+        connect(mActionStyleLooseThreeRow, &QAction::triggered, this, &MainWindow::onSetStyleLooseThreeRow);
+        menuStyle->addAction(mActionStyleLooseThreeRow);
+
+        mActionStyleLooseTwoRow = createAction(tr("Loose Two Row"), ":/icon/icon/layout.svg", "actionStyleLooseTwoRow");
+        connect(mActionStyleLooseTwoRow, &QAction::triggered, this, &MainWindow::onSetStyleLooseTwoRow);
+        menuStyle->addAction(mActionStyleLooseTwoRow);
+
+        mActionStyleCompactThreeRow = createAction(tr("Compact Three Row"), ":/icon/icon/layout.svg", "actionStyleCompactThreeRow");
+        connect(mActionStyleCompactThreeRow, &QAction::triggered, this, &MainWindow::onSetStyleCompactThreeRow);
+        menuStyle->addAction(mActionStyleCompactThreeRow);
+
+        mActionStyleCompactTwoRow = createAction(tr("Compact Two Row"), ":/icon/icon/layout.svg", "actionStyleCompactTwoRow");
+        connect(mActionStyleCompactTwoRow, &QAction::triggered, this, &MainWindow::onSetStyleCompactTwoRow);
+        menuStyle->addAction(mActionStyleCompactTwoRow);
     }
     SARibbonApplicationButton* ribbonAppBtn = qobject_cast< SARibbonApplicationButton* >(applicationButton);
     if (!ribbonAppBtn) {
@@ -2974,4 +3022,153 @@ void MainWindow::onDelayedPopupCheckabletriggered(bool checked)
     ui->textBrowser->append(tr("The SARibbonToolButton::setPopupMode(QToolButton::DelayedPopup) method "
                                "can be used to set the menu pop-up method to delayed pop-up. "
                                "This also demonstrates manually setting text wrapping"));
+}
+
+/**
+ * \if ENGLISH
+ * @brief Toggle layout direction between RTL and LTR
+ * @details Switches the application layout direction between Right-to-Left and Left-to-Right.
+ *          This demonstrates RTL support in the SARibbon library.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 切换布局方向（RTL/LTR）
+ * @details 在从右到左（RTL）和从左到右（LTR）布局方向之间切换应用程序布局。
+ *          这演示了SARibbon库中的RTL支持。
+ * \endif
+ */
+void MainWindow::onToggleLayoutDirection()
+{
+    if (qApp->layoutDirection() == Qt::LeftToRight) {
+        qApp->setLayoutDirection(Qt::RightToLeft);
+        ui->textBrowser->append(tr("Layout direction changed to RTL (Right-to-Left)"));
+        if (mActionToggleRTL) {
+            mActionToggleRTL->setText(tr("Switch to LTR"));
+        }
+    } else {
+        qApp->setLayoutDirection(Qt::LeftToRight);
+        ui->textBrowser->append(tr("Layout direction changed to LTR (Left-to-Right)"));
+        if (mActionToggleRTL) {
+            mActionToggleRTL->setText(tr("Switch to RTL"));
+        }
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set ribbon alignment to left
+ * @details Sets the ribbon alignment to left-aligned mode.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置Ribbon左对齐
+ * @details 将Ribbon对齐方式设置为左对齐模式。
+ * \endif
+ */
+void MainWindow::onSetAlignmentLeft()
+{
+    ribbonBar()->setRibbonAlignment(SARibbonAlignment::AlignLeft);
+    ui->textBrowser->append(tr("Ribbon alignment set to Left"));
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set ribbon alignment to center
+ * @details Sets the ribbon alignment to center-aligned mode.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置Ribbon居中对齐
+ * @details 将Ribbon对齐方式设置为居中对齐模式。
+ * \endif
+ */
+void MainWindow::onSetAlignmentCenter()
+{
+    ribbonBar()->setRibbonAlignment(SARibbonAlignment::AlignCenter);
+    ui->textBrowser->append(tr("Ribbon alignment set to Center"));
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set ribbon alignment to right
+ * @details Sets the ribbon alignment to right-aligned mode.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置Ribbon右对齐
+ * @details 将Ribbon对齐方式设置为右对齐模式。
+ * \endif
+ */
+void MainWindow::onSetAlignmentRight()
+{
+    ribbonBar()->setRibbonAlignment(SARibbonAlignment::AlignRight);
+    ui->textBrowser->append(tr("Ribbon alignment set to Right"));
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set ribbon style to Loose Three Row
+ * @details Sets the ribbon style to Loose Three Row mode.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置Ribbon样式为宽松三行
+ * @details 将Ribbon样式设置为宽松三行模式。
+ * \endif
+ */
+void MainWindow::onSetStyleLooseThreeRow()
+{
+    ribbonBar()->setRibbonStyle(SARibbonBar::RibbonStyleLooseThreeRow);
+    ui->textBrowser->append(tr("Ribbon style set to Loose Three Row"));
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set ribbon style to Loose Two Row
+ * @details Sets the ribbon style to Loose Two Row mode.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置Ribbon样式为宽松两行
+ * @details 将Ribbon样式设置为宽松两行模式。
+ * \endif
+ */
+void MainWindow::onSetStyleLooseTwoRow()
+{
+    ribbonBar()->setRibbonStyle(SARibbonBar::RibbonStyleLooseTwoRow);
+    ui->textBrowser->append(tr("Ribbon style set to Loose Two Row"));
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set ribbon style to Compact Three Row
+ * @details Sets the ribbon style to Compact Three Row mode.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置Ribbon样式为紧凑三行
+ * @details 将Ribbon样式设置为紧凑三行模式。
+ * \endif
+ */
+void MainWindow::onSetStyleCompactThreeRow()
+{
+    ribbonBar()->setRibbonStyle(SARibbonBar::RibbonStyleCompactThreeRow);
+    ui->textBrowser->append(tr("Ribbon style set to Compact Three Row"));
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set ribbon style to Compact Two Row
+ * @details Sets the ribbon style to Compact Two Row mode.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置Ribbon样式为紧凑两行
+ * @details 将Ribbon样式设置为紧凑两行模式。
+ * \endif
+ */
+void MainWindow::onSetStyleCompactTwoRow()
+{
+    ribbonBar()->setRibbonStyle(SARibbonBar::RibbonStyleCompactTwoRow);
+    ui->textBrowser->append(tr("Ribbon style set to Compact Two Row"));
 }
