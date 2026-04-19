@@ -1,4 +1,4 @@
-#ifndef MAINWINDOW_H
+﻿#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 #include "SARibbonMainWindow.h"
 #include <QTimer>
@@ -327,7 +327,7 @@ private Q_SLOTS:
     void onContextCategory2ActionTriggered(bool visible);
 
     // Toggle RTL layout direction
-    void onToggleLayoutDirection();
+    void onTriggeredLayoutDirection();
 
     // Set ribbon alignment to left
     void onSetAlignmentLeft();

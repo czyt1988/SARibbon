@@ -235,12 +235,12 @@
 <context>
     <name>SARibbonSystemButtonBar</name>
     <message>
-        <location filename="../SARibbonSystemButtonBar.cpp" line="448"/>
+        <location filename="../SARibbonSystemButtonBar.cpp" line="486"/>
         <source>Restore</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../SARibbonSystemButtonBar.cpp" line="448"/>
+        <location filename="../SARibbonSystemButtonBar.cpp" line="486"/>
         <source>Maximize</source>
         <translation type="unfinished"></translation>
     </message>
