@@ -8,6 +8,7 @@
 #include "SARibbonMainWindow.h"
 #include "SARibbonBar.h"
 #include "SARibbonButtonGroupWidget.h"
+#include "SARibbonUtil.h"
 
 // 为了避免使用此框架的app设置了全局的qpushbutton 的 qss样式影响此按钮，定义了一个类
 
@@ -116,26 +117,63 @@ public:
         resizeElement(q_ptr->size());
     }
 
+    /**
+     * \if ENGLISH
+     * @brief Resizes and positions all elements in the button bar
+     * @param size New size of the button bar
+     * @details Handles both LTR and RTL layouts: in LTR, system buttons are positioned at the right edge;
+     *          in RTL, system buttons are positioned at the left edge while maintaining the same order (min → max → close)
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 调整按钮栏中所有元素的大小和位置
+     * @param size 按钮栏的新尺寸
+     * @details 同时处理LTR和RTL布局：在LTR模式下，系统按钮位于右边缘；
+     *          在RTL模式下，系统按钮位于左边缘，同时保持相同的顺序（最小化→最大化→关闭）
+     * \endif
+     */
     void resizeElement(QSize size)
     {
-        int x = size.width();
-        if (buttonClose) {
-            int w = closeButtonWidthHint();
-            x -= w;
-            buttonClose->setGeometry(x, 0, w, size.height());
-        }
-        if (buttonMaximize) {
-            int w = maxButtonWidthHint();
-            x -= w;
-            buttonMaximize->setGeometry(x, 0, w, size.height());
-        }
-        if (buttonMinimize) {
-            int w = minButtonWidthHint();
-            x -= w;
-            buttonMinimize->setGeometry(x, 0, w, size.height());
-        }
-        if (mButtonGroup) {
-            mButtonGroup->setGeometry(0, 0, x, size.height());
+        if (SA::saIsRTL()) {
+            int x = 0;
+            if (buttonMinimize) {
+                int w = minButtonWidthHint();
+                buttonMinimize->setGeometry(x, 0, w, size.height());
+                x += w;
+            }
+            if (buttonMaximize) {
+                int w = maxButtonWidthHint();
+                buttonMaximize->setGeometry(x, 0, w, size.height());
+                x += w;
+            }
+            if (buttonClose) {
+                int w = closeButtonWidthHint();
+                buttonClose->setGeometry(x, 0, w, size.height());
+                x += w;
+            }
+            if (mButtonGroup) {
+                mButtonGroup->setGeometry(x, 0, size.width() - x, size.height());
+            }
+        } else {
+            int x = size.width();
+            if (buttonClose) {
+                int w = closeButtonWidthHint();
+                x -= w;
+                buttonClose->setGeometry(x, 0, w, size.height());
+            }
+            if (buttonMaximize) {
+                int w = maxButtonWidthHint();
+                x -= w;
+                buttonMaximize->setGeometry(x, 0, w, size.height());
+            }
+            if (buttonMinimize) {
+                int w = minButtonWidthHint();
+                x -= w;
+                buttonMinimize->setGeometry(x, 0, w, size.height());
+            }
+            if (mButtonGroup) {
+                mButtonGroup->setGeometry(0, 0, x, size.height());
+            }
         }
     }
 
@@ -531,7 +569,11 @@ bool SARibbonSystemButtonBar::eventFilter(QObject* obj, QEvent* event)
             }
             QRect fr         = mainWindow->geometry();
             QSize wgSizeHint = sizeHint();
-            setGeometry(fr.width() - wgSizeHint.width(), 0, wgSizeHint.width(), wgSizeHint.height());
+            if (SA::saIsRTL()) {
+                setGeometry(0, 0, wgSizeHint.width(), wgSizeHint.height());
+            } else {
+                setGeometry(fr.width() - wgSizeHint.width(), 0, wgSizeHint.width(), wgSizeHint.height());
+            }
             // 把设置好的尺寸给ribbonbar
             if (ribbonBar) {
                 ribbonBar->setSystemButtonGroupSize(size());

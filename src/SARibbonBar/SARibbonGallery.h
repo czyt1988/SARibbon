@@ -1,4 +1,4 @@
-﻿#ifndef SARIBBONGALLERY_H
+#ifndef SARIBBONGALLERY_H
 #define SARIBBONGALLERY_H
 #include "SARibbonGlobal.h"
 #include <QFrame>
@@ -150,6 +150,8 @@ private:
 protected:
     /// Handle resize events for the gallery
     void resizeEvent(QResizeEvent* event) override;
+    /// Handle change events for the gallery
+    void changeEvent(QEvent* event) override;
 };
 
 /**
