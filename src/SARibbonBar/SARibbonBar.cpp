@@ -975,6 +975,59 @@ void SARibbonBar::showCategory(SARibbonCategory* category)
 
 /**
  * \if ENGLISH
+ * @brief Batch set multiple categories visible or hidden, only triggers one relayout at the end for better performance
+ * @param[in] categories List of SARibbonCategory pointers to operate on
+ * @param[in] visible True to show categories, false to hide them
+ * @details This function is optimized for batch operations, avoiding multiple relayout calls that would occur when
+ *          calling hideCategory/showCategory repeatedly for multiple categories. It performs all tab operations first,
+ *          then calls updateTabData, relayout and update only once at the end.
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 批量设置多个分类的显示或隐藏状态，仅在最后触发一次布局刷新以提升性能
+ * @param[in] categories 要操作的SARibbonCategory指针列表
+ * @param[in] visible 为true时显示分类，为false时隐藏分类
+ * @details 此函数针对批量操作进行了优化，避免了对多个分类重复调用hideCategory/showCategory时会出现的多次布局刷新。
+ *          它首先执行所有标签操作，然后在最后仅调用一次updateTabData、relayout和update。
+ * \endif
+ */
+void SARibbonBar::setCategoriesVisible(const QList<SARibbonCategory*>& categories, bool visible)
+{
+    if (visible) {
+        // Show all categories in batch
+        for (auto* category : categories) {
+            // Find in mHidedCategory list
+            for (auto i = d_ptr->mHidedCategory.begin(); i != d_ptr->mHidedCategory.end(); ++i) {
+                if (i->category == category) {
+                    int insertPos = d_ptr->calcCategoryInsertTabIndex(i->category);
+                    int index = d_ptr->mRibbonTabBar->insertTab(insertPos, i->category->categoryName());
+                    d_ptr->setCategoryToTab(index, i->category);
+                    d_ptr->mHidedCategory.erase(i);
+                    break;
+                }
+            }
+        }
+    } else {
+        // Hide all categories in batch
+        for (auto* category : categories) {
+            int tabIndex = d_ptr->tabIndexForCategory(category);
+            if (tabIndex >= 0) {
+                _SARibbonHiddenCategoryData hiddenData;
+                hiddenData.category = category;
+                hiddenData.originalIndex = tabIndex;
+                d_ptr->mHidedCategory.append(hiddenData);
+                d_ptr->mRibbonTabBar->removeTab(tabIndex);
+            }
+        }
+    }
+    // Only update tab data and relayout ONCE at the end
+    d_ptr->updateTabData();
+    d_ptr->relayout();
+    update();
+}
+
+/**
+ * \if ENGLISH
  * @brief Check if this category is visible, i.e., the tabbar has this category
  * @param c SARibbonCategory pointer
  * @return True if category is visible

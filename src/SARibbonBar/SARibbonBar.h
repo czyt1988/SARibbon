@@ -278,6 +278,9 @@ public:
     /// Show hidden category
     void showCategory(SARibbonCategory* category);
 
+    // Batch set categories visible or hidden, only triggers one relayout at the end
+    void setCategoriesVisible(const QList<SARibbonCategory*>& categories, bool visible);
+
     /// Check if category is visible
     bool isCategoryVisible(const SARibbonCategory* c) const;
 
