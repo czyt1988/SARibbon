@@ -959,9 +959,10 @@ void SARibbonCategoryLayout::setScrollPosition(int pos)
 
         if (d_ptr->mXBase != newXBase) {
             d_ptr->mXBase = newXBase;
-            invalidate();  // Mark for relayout
-
-            // Immediately execute layout update
+            invalidate();  // Mark layout as dirty for deferred relayout
+            // NOT REDUNDANT: invalidate() triggers deferred layout pass, update() schedules repaint
+            // Both are required for smooth scrolling animation: removing update() would cause 1-frame lag
+            // Using activate() instead would force synchronous layout which is more expensive during animation
             if (parentWidget()) {
                 parentWidget()->update();
             }
@@ -973,9 +974,10 @@ void SARibbonCategoryLayout::setScrollPosition(int pos)
 
         if (d_ptr->mXBase != newXBase) {
             d_ptr->mXBase = newXBase;
-            invalidate();  // Mark for relayout
-
-            // Immediately execute layout update
+            invalidate();  // Mark layout as dirty for deferred relayout
+            // NOT REDUNDANT: invalidate() triggers deferred layout pass, update() schedules repaint
+            // Both are required for smooth scrolling animation: removing update() would cause 1-frame lag
+            // Using activate() instead would force synchronous layout which is more expensive during animation
             if (parentWidget()) {
                 parentWidget()->update();
             }
