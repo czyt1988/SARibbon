@@ -2,6 +2,7 @@
 #include "SARibbonToolButton.h"
 #include "SARibbonPanel.h"
 #include "SARibbonQt5Compat.hpp"
+#include "SARibbonUtil.h"
 #include <QFontMetrics>
 #include <QLatin1Char>
 
@@ -166,6 +167,23 @@ void SARibbonLargeButtonLayoutStrategy::calculateDrawRects(const QStyleOptionToo
     }
 }
 
+/**
+ * \if ENGLISH
+ * @brief Calculate layout rects for large button with icon only style
+ * @param[in] opt Style option for the tool button
+ * @param[out] rects Output rectangles collection
+ * @param[in] ctx Layout context containing layout parameters
+ * @details Supports both LTR and RTL layouts. In RTL mode, indicator is positioned at bottom-left corner.
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 计算仅显示图标的大按钮布局矩形
+ * @param[in] opt 工具按钮的样式选项
+ * @param[out] rects 输出的矩形集合
+ * @param[in] ctx 包含布局参数的布局上下文
+ * @details 同时支持LTR和RTL布局。在RTL模式下，指示器位于左下角。
+ * \endif
+ */
 void SARibbonLargeButtonLayoutStrategy::calculateIconOnlyRects(const QStyleOptionToolButton& opt,
                                                                SARibbonButtonLayoutRects& rects,
                                                                const SARibbonButtonLayoutContext& ctx) const
@@ -192,6 +210,23 @@ void SARibbonLargeButtonLayoutStrategy::calculateIconOnlyRects(const QStyleOptio
     }
 }
 
+/**
+ * \if ENGLISH
+ * @brief Calculate layout rects for large button with text only style
+ * @param[in] opt Style option for the tool button
+ * @param[out] rects Output rectangles collection
+ * @param[in] ctx Layout context containing layout parameters
+ * @details Supports both LTR and RTL layouts. In RTL mode, text is right-aligned.
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 计算仅显示文本的大按钮布局矩形
+ * @param[in] opt 工具按钮的样式选项
+ * @param[out] rects 输出的矩形集合
+ * @param[in] ctx 包含布局参数的布局上下文
+ * @details 同时支持LTR和RTL布局。在RTL模式下，文本右对齐。
+ * \endif
+ */
 void SARibbonLargeButtonLayoutStrategy::calculateTextOnlyRects(const QStyleOptionToolButton& opt,
                                                                SARibbonButtonLayoutRects& rects,
                                                                const SARibbonButtonLayoutContext& ctx) const
@@ -218,6 +253,29 @@ void SARibbonLargeButtonLayoutStrategy::calculateTextOnlyRects(const QStyleOptio
     }
 }
 
+/**
+ * \if ENGLISH
+ * @brief Calculate layout rects for large button with both icon and text
+ * @param[in] opt Style option for the tool button
+ * @param[out] rects Output rectangles collection
+ * @param[in] ctx Layout context containing layout parameters
+ * @details Supports both LTR and RTL layouts. In RTL mode:
+ * - Indicator is positioned at bottom-left corner
+ * - Text is right-aligned
+ * - Icon remains centered
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 计算同时显示图标和文本的大按钮布局矩形
+ * @param[in] opt 工具按钮的样式选项
+ * @param[out] rects 输出的矩形集合
+ * @param[in] ctx 包含布局参数的布局上下文
+ * @details 同时支持LTR和RTL布局。在RTL模式下：
+ * - 指示器位于左下角
+ * - 文本右对齐
+ * - 图标保持居中
+ * \endif
+ */
 void SARibbonLargeButtonLayoutStrategy::calculateIconAndTextRects(const QStyleOptionToolButton& opt,
                                                                   SARibbonButtonLayoutRects& rects,
                                                                   const SARibbonButtonLayoutContext& ctx) const
@@ -238,8 +296,15 @@ void SARibbonLargeButtonLayoutStrategy::calculateIconAndTextRects(const QStyleOp
                                opt.rect.width() - 2 * spacing - indicatorLen,
                                textHeight);
         if (hasInd) {
+            int indX = rects.textRect.right();
+            if (SA::saIsRTL()) {
+                indX = SA::saMirrorX(indX, opt.rect.width(), indicatorLen);
+                rects.textRect.moveLeft(opt.rect.right() - spacing - rects.textRect.width());
+            }
             rects.indicatorRect = QRect(
-                rects.textRect.right(), rects.textRect.y() + rects.textRect.height() / 2, indicatorLen, textHeight / 2);
+                indX, rects.textRect.y() + rects.textRect.height() / 2, indicatorLen, textHeight / 2);
+        } else if (SA::saIsRTL()) {
+            rects.textRect.moveLeft(opt.rect.right() - spacing - rects.textRect.width());
         }
     } else if (ctx.enableWordWrap) {
         rects.textRect = QRect(
@@ -250,13 +315,27 @@ void SARibbonLargeButtonLayoutStrategy::calculateIconAndTextRects(const QStyleOp
             rects.indicatorRect =
                 QRect(rects.textRect.left(), rects.textRect.top() + dy, rects.textRect.width(), indicatorLen);
         }
+        if (SA::saIsRTL()) {
+            rects.textRect.moveLeft(opt.rect.right() - spacing - rects.textRect.width());
+        }
     } else {
         int y = opt.rect.bottom() - spacing - textHeight;
         if (hasInd) {
-            rects.indicatorRect = QRect(opt.rect.right() - indicatorLen - spacing, y, indicatorLen, textHeight);
-            rects.textRect      = QRect(spacing, y, rects.indicatorRect.x() - spacing, textHeight);
+            int indX = opt.rect.right() - indicatorLen - spacing;
+            int textX = spacing;
+            int textWidth = indX - spacing;
+            if (SA::saIsRTL()) {
+                indX = spacing;
+                textX = indX + indicatorLen;
+                textWidth = opt.rect.width() - 2 * spacing - indicatorLen;
+            }
+            rects.indicatorRect = QRect(indX, y, indicatorLen, textHeight);
+            rects.textRect      = QRect(textX, y, textWidth, textHeight);
         } else {
             rects.textRect = QRect(opt.rect.left() + spacing, y, opt.rect.width() - 2 * spacing, textHeight);
+            if (SA::saIsRTL()) {
+                rects.textRect.moveLeft(opt.rect.right() - spacing - rects.textRect.width());
+            }
         }
     }
 
@@ -322,6 +401,27 @@ void SARibbonSmallButtonLayoutStrategy::calculateDrawRects(const QStyleOptionToo
     }
 }
 
+/**
+ * \if ENGLISH
+ * @brief Calculate layout rects for small button with icon only style
+ * @param[in] opt Style option for the tool button
+ * @param[out] rects Output rectangles collection
+ * @param[in] ctx Layout context containing layout parameters
+ * @details Supports both LTR and RTL layouts. In RTL mode:
+ * - Indicator is positioned at left edge
+ * - Icon is positioned at right side of the indicator
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 计算仅显示图标的小按钮布局矩形
+ * @param[in] opt 工具按钮的样式选项
+ * @param[out] rects 输出的矩形集合
+ * @param[in] ctx 包含布局参数的布局上下文
+ * @details 同时支持LTR和RTL布局。在RTL模式下：
+ * - 指示器位于左边缘
+ * - 图标位于指示器的右侧
+ * \endif
+ */
 void SARibbonSmallButtonLayoutStrategy::calculateIconOnlyRects(const QStyleOptionToolButton& opt,
                                                                SARibbonButtonLayoutRects& rects,
                                                                const SARibbonButtonLayoutContext& ctx) const
@@ -330,14 +430,40 @@ void SARibbonSmallButtonLayoutStrategy::calculateIconOnlyRects(const QStyleOptio
     int indicatorLen = ctx.indicatorLength;
 
     if (hasIndicator(opt)) {
-        rects.iconRect = opt.rect.adjusted(spacing, spacing, -indicatorLen - spacing, -spacing);
-        rects.indicatorRect =
-            QRect(opt.rect.right() - indicatorLen - spacing, rects.iconRect.y(), indicatorLen, rects.iconRect.height());
+        if (SA::saIsRTL()) {
+            rects.indicatorRect = QRect(opt.rect.left() + spacing, opt.rect.top() + spacing, indicatorLen, opt.rect.height() - 2 * spacing);
+            rects.iconRect = opt.rect.adjusted(indicatorLen + spacing, spacing, -spacing, -spacing);
+        } else {
+            rects.iconRect = opt.rect.adjusted(spacing, spacing, -indicatorLen - spacing, -spacing);
+            rects.indicatorRect =
+                QRect(opt.rect.right() - indicatorLen - spacing, rects.iconRect.y(), indicatorLen, rects.iconRect.height());
+        }
     } else {
         rects.iconRect = opt.rect.adjusted(spacing, spacing, -spacing, -spacing);
     }
 }
 
+/**
+ * \if ENGLISH
+ * @brief Calculate layout rects for small button with text only style
+ * @param[in] opt Style option for the tool button
+ * @param[out] rects Output rectangles collection
+ * @param[in] ctx Layout context containing layout parameters
+ * @details Supports both LTR and RTL layouts. In RTL mode:
+ * - Indicator is positioned at left edge
+ * - Text is positioned at right side of the indicator
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 计算仅显示文本的小按钮布局矩形
+ * @param[in] opt 工具按钮的样式选项
+ * @param[out] rects 输出的矩形集合
+ * @param[in] ctx 包含布局参数的布局上下文
+ * @details 同时支持LTR和RTL布局。在RTL模式下：
+ * - 指示器位于左边缘
+ * - 文本位于指示器的右侧
+ * \endif
+ */
 void SARibbonSmallButtonLayoutStrategy::calculateTextOnlyRects(const QStyleOptionToolButton& opt,
                                                                SARibbonButtonLayoutRects& rects,
                                                                const SARibbonButtonLayoutContext& ctx) const
@@ -346,14 +472,42 @@ void SARibbonSmallButtonLayoutStrategy::calculateTextOnlyRects(const QStyleOptio
     int indicatorLen = ctx.indicatorLength;
 
     if (hasIndicator(opt)) {
-        rects.textRect = opt.rect.adjusted(spacing, spacing, -indicatorLen - spacing, -spacing);
-        rects.indicatorRect =
-            QRect(opt.rect.right() - indicatorLen - spacing, spacing, indicatorLen, rects.textRect.height());
+        if (SA::saIsRTL()) {
+            rects.indicatorRect = QRect(opt.rect.left() + spacing, spacing, indicatorLen, opt.rect.height() - 2 * spacing);
+            rects.textRect = opt.rect.adjusted(indicatorLen + spacing, spacing, -spacing, -spacing);
+        } else {
+            rects.textRect = opt.rect.adjusted(spacing, spacing, -indicatorLen - spacing, -spacing);
+            rects.indicatorRect =
+                QRect(opt.rect.right() - indicatorLen - spacing, spacing, indicatorLen, rects.textRect.height());
+        }
     } else {
         rects.textRect = opt.rect.adjusted(spacing, spacing, -spacing, -spacing);
     }
 }
 
+/**
+ * \if ENGLISH
+ * @brief Calculate layout rects for small button with both icon and text
+ * @param[in] opt Style option for the tool button
+ * @param[out] rects Output rectangles collection
+ * @param[in] ctx Layout context containing layout parameters
+ * @details Supports both LTR and RTL layouts. In RTL mode:
+ * - Indicator is positioned at left edge
+ * - Text is positioned at left side, next to indicator
+ * - Icon is positioned at right edge
+ * \endif
+ * 
+ * \if CHINESE
+ * @brief 计算同时显示图标和文本的小按钮布局矩形
+ * @param[in] opt 工具按钮的样式选项
+ * @param[out] rects 输出的矩形集合
+ * @param[in] ctx 包含布局参数的布局上下文
+ * @details 同时支持LTR和RTL布局。在RTL模式下：
+ * - 指示器位于左边缘
+ * - 文本位于左侧，紧邻指示器
+ * - 图标位于右边缘
+ * \endif
+ */
 void SARibbonSmallButtonLayoutStrategy::calculateIconAndTextRects(const QStyleOptionToolButton& opt,
                                                                   SARibbonButtonLayoutRects& rects,
                                                                   const SARibbonButtonLayoutContext& ctx) const
@@ -367,26 +521,34 @@ void SARibbonSmallButtonLayoutStrategy::calculateIconAndTextRects(const QStyleOp
 
     if (!opt.icon.isNull()) {
         QSize iconSize = adjustIconSize(buttonRect, opt.iconSize);
+        int iconX = buttonRect.x();
+        if (SA::saIsRTL()) {
+            iconX = buttonRect.right() - iconSize.width();
+        }
         rects.iconRect =
-            QRect(buttonRect.x(), buttonRect.y(), iconSize.width(), qMax(iconSize.height(), buttonRect.height()));
+            QRect(iconX, buttonRect.y(), iconSize.width(), qMax(iconSize.height(), buttonRect.height()));
     }
 
     if (!opt.text.isEmpty()) {
         int adjx = rects.iconRect.isValid() ? (rects.iconRect.width() + spacing) : 0;
-        if (hasInd) {
-            rects.textRect = buttonRect.adjusted(adjx, 0, -indicatorLen, 0);
-        } else {
-            rects.textRect = buttonRect.adjusted(adjx, 0, 0, 0);
-        }
+        int textX = rects.iconRect.isValid() ? (SA::saIsRTL() ? buttonRect.x() : rects.iconRect.right() + spacing) : buttonRect.x();
+        int textRightMargin = hasInd ? indicatorLen : 0;
+        int textWidth = SA::saIsRTL() ? (rects.iconRect.isValid() ? (rects.iconRect.x() - spacing - textX - textRightMargin) : (buttonRect.width() - textRightMargin)) : (buttonRect.width() - adjx - textRightMargin);
+        
+        rects.textRect = QRect(textX, buttonRect.y(), textWidth, buttonRect.height());
     }
 
     if (hasInd) {
+        int indX = buttonRect.right() - indicatorLen + 1;
+        if (SA::saIsRTL()) {
+            indX = buttonRect.left();
+        }
         if (rects.textRect.isValid()) {
             rects.indicatorRect =
-                QRect(buttonRect.right() - indicatorLen + 1, rects.textRect.y(), indicatorLen, rects.textRect.height());
+                QRect(indX, rects.textRect.y(), indicatorLen, rects.textRect.height());
         } else if (rects.iconRect.isValid()) {
             rects.indicatorRect =
-                QRect(buttonRect.right() - indicatorLen + 1, rects.iconRect.y(), indicatorLen, rects.iconRect.height());
+                QRect(indX, rects.iconRect.y(), indicatorLen, rects.iconRect.height());
         } else {
             rects.indicatorRect = buttonRect;
         }
