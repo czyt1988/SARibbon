@@ -3291,8 +3291,18 @@ bool SARibbonBar::eventFilter(QObject* obj, QEvent* e)
     if (obj) {
         // 调整多文档时在窗口模式下的按钮更新
         if ((obj == cornerWidget(Qt::TopLeftCorner)) || (obj == cornerWidget(Qt::TopRightCorner))) {
+            /**
+             * \if ENGLISH
+             * Fix #123: Handle QEvent::WindowStateChange to refresh corner widget when MDI window is maximized or restored
+             * \endif
+             *
+             * \if CHINESE
+             * 修复 #123: 处理 QEvent::WindowStateChange 事件，确保MDI窗口最大化/还原时 corner widget 正确刷新
+             * \endif
+             */
             if ((QEvent::UpdateLater == e->type()) || (QEvent::MouseButtonRelease == e->type())
-                || (QEvent::WindowActivate == e->type())) {
+                || (QEvent::WindowActivate == e->type())
+                || (QEvent::WindowStateChange == e->type())) {
                 // 这个是多文档系统按钮的更新
                 d_ptr->relayout();
             }
