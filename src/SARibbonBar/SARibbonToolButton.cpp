@@ -352,20 +352,36 @@ void SARibbonToolButton::PrivateData::calcDrawRects(const QStyleOptionToolButton
 }
 
 /**
+ * \if ENGLISH
+ * @brief Calculate draw rectangles for small button mode
+ * @param[in] opt Style option for the tool button
+ * @param[out] iconRect Calculated icon rectangle
+ * @param[out] textRect Calculated text rectangle
+ * @param[out] indicatorArrowRect Calculated indicator (dropdown arrow) rectangle
+ * @param[in] spacing Spacing between elements
+ * @param[in] indicatorLen Width reserved for the indicator arrow
+ * @details In LTR mode, the indicator is on the right side and the icon starts from the left.
+ *          In RTL mode, positions are mirrored: indicator moves to the left side, icon/text start from the right.
+ * \endif
+ *
+ * \if CHINESE
  * @brief 计算小按钮模式下的绘制尺寸
- * @param opt
- * @param iconRect
- * @param textRect
- * @param indicatorArrowRect
- * @param spacing
- * @param indicatorLen
+ * @param[in] opt 工具按钮的样式选项
+ * @param[out] iconRect 计算出的图标矩形
+ * @param[out] textRect 计算出的文字矩形
+ * @param[out] indicatorArrowRect 计算出的指示器（下拉箭头）矩形
+ * @param[in] spacing 元素之间的间距
+ * @param[in] indicatorLen 为指示器箭头预留的宽度
+ * @details 在LTR模式下，指示器在右侧，图标从左侧开始。
+ *          在RTL模式下，位置镜像：指示器移到左侧，图标/文字从右侧开始。
+ * \endif
  */
 void SARibbonToolButton::PrivateData::calcSmallButtonDrawRects(const QStyleOptionToolButton& opt,
-                                                               QRect& iconRect,
-                                                               QRect& textRect,
-                                                               QRect& indicatorArrowRect,
-                                                               int spacing,
-                                                               int indicatorLen) const
+                                                                QRect& iconRect,
+                                                                QRect& textRect,
+                                                                QRect& indicatorArrowRect,
+                                                                int spacing,
+                                                                int indicatorLen) const
 {
     switch (opt.toolButtonStyle) {
     case Qt::ToolButtonIconOnly: {
@@ -413,7 +429,7 @@ void SARibbonToolButton::PrivateData::calcSmallButtonDrawRects(const QStyleOptio
         } else {
             // 分有菜单和没菜单两种情况
             int adjx = iconRect.isValid() ? (iconRect.width() + spacing)
-                                          : 0;  // 在buttonRect上变换，因此如果没有图标是不用偏移spacing
+                                           : 0;  // 在buttonRect上变换，因此如果没有图标是不用偏移spacing
             if (hasInd) {
                 textRect = buttonRect.adjusted(adjx, 0, -indicatorLen, 0);
             } else {
@@ -436,23 +452,82 @@ void SARibbonToolButton::PrivateData::calcSmallButtonDrawRects(const QStyleOptio
         }
     }
     }
+
+    /**
+     * \if ENGLISH
+     * @brief Mirror all horizontal positions for RTL layout
+     * @details In RTL mode, the indicator (dropdown arrow) moves to the LEFT side instead of the RIGHT side.
+     *          The icon and text positions are mirrored: icon starts from the right edge, text flows RTL.
+     *          All x-coordinates are mirrored using SA::saMirrorX() within the button rect width.
+     *          Coordinates are first converted to relative positions within opt.rect, then mirrored, then converted back.
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 为RTL布局镜像所有水平位置
+     * @details 在RTL模式下，指示器（下拉箭头）移到左侧而非右侧。
+     *          图标和文字位置镜像：图标从右边缘开始，文字从右到左排列。
+     *          所有x坐标先转换为opt.rect内的相对位置，再使用SA::saMirrorX()在按钮矩形宽度内镜像，最后转换回绝对位置。
+     * \endif
+     */
+    if (SA::saIsRTL()) {
+        int containerWidth = opt.rect.width();
+        int rectLeft       = opt.rect.x();
+        // Mirror iconRect x position
+        if (iconRect.isValid()) {
+            int relX       = iconRect.x() - rectLeft;
+            int mirroredX  = SA::saMirrorX(relX, containerWidth, iconRect.width());
+            iconRect.moveLeft(rectLeft + mirroredX);
+        }
+        // Mirror textRect x position
+        if (textRect.isValid()) {
+            int relX       = textRect.x() - rectLeft;
+            int mirroredX  = SA::saMirrorX(relX, containerWidth, textRect.width());
+            textRect.moveLeft(rectLeft + mirroredX);
+        }
+        // Mirror indicatorArrowRect x position
+        if (indicatorArrowRect.isValid()) {
+            int relX       = indicatorArrowRect.x() - rectLeft;
+            int mirroredX  = SA::saMirrorX(relX, containerWidth, indicatorArrowRect.width());
+            indicatorArrowRect.moveLeft(rectLeft + mirroredX);
+        }
+    }
 }
 
 /**
- * @brief 计算大按钮模式下的绘制尺寸（普通）
- * @param opt
- * @param iconRect
- * @param textRect
- * @param indicatorArrowRect
- * @param spacing
- * @param indicatorLen
+ * \if ENGLISH
+ * @brief Calculate draw rectangles for large button mode
+ * @param[in] opt Style option for the tool button
+ * @param[out] iconRect Calculated icon rectangle
+ * @param[out] textRect Calculated text rectangle
+ * @param[out] indicatorArrowRect Calculated indicator (dropdown arrow) rectangle
+ * @param[in] spacing Spacing between elements
+ * @param[in] indicatorLen Width reserved for the indicator arrow
+ * @details In LTR mode, the indicator is at the bottom-right of the button and text is left/center aligned.
+ *          In RTL mode, the indicator moves to the bottom-left corner, and text aligns right.
+ *          Icon remains centered in large buttons regardless of layout direction.
+ *          All x-coordinates are mirrored using SA::saMirrorX() within the button rect width.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 计算大按钮模式下的绘制尺寸
+ * @param[in] opt 工具按钮的样式选项
+ * @param[out] iconRect 计算出的图标矩形
+ * @param[out] textRect 计算出的文字矩形
+ * @param[out] indicatorArrowRect 计算出的指示器（下拉箭头）矩形
+ * @param[in] spacing 元素之间的间距
+ * @param[in] indicatorLen 为指示器箭头预留的宽度
+ * @details 在LTR模式下，指示器在按钮右下角，文字左对齐/居中对齐。
+ *          在RTL模式下，指示器移到左下角，文字右对齐。
+ *          大按钮中的图标保持居中，不受布局方向影响。
+ *          所有x坐标使用SA::saMirrorX()在按钮矩形宽度内镜像。
+ * \endif
  */
 void SARibbonToolButton::PrivateData::calcLargeButtonDrawRects(const QStyleOptionToolButton& opt,
-                                                               QRect& iconRect,
-                                                               QRect& textRect,
-                                                               QRect& indicatorArrowRect,
-                                                               int spacing,
-                                                               int indicatorLen) const
+                                                                QRect& iconRect,
+                                                                QRect& textRect,
+                                                                QRect& indicatorArrowRect,
+                                                                int spacing,
+                                                                int indicatorLen) const
 {
     //! 3行模式的图标比较大，文字换行情况下，indicator会动态调整
 
@@ -556,6 +631,48 @@ void SARibbonToolButton::PrivateData::calcLargeButtonDrawRects(const QStyleOptio
         }
         // 剩下就是icon区域
         iconRect = QRect(spacing, spacing, opt.rect.width() - 2 * spacing, textRect.top() - 2 * spacing);
+    }
+
+    /**
+     * \if ENGLISH
+     * @brief Mirror all horizontal positions for RTL layout
+     * @details In RTL mode, the indicator (dropdown arrow) moves to the LEFT side instead of the RIGHT side.
+     *          For large buttons: indicator appears at bottom-left instead of bottom-right,
+     *          text alignment is right-aligned instead of left/center-aligned,
+     *          and the icon remains centered (full-width rects are symmetric, mirroring preserves center position).
+     *          All x-coordinates are converted to relative positions within opt.rect, mirrored, then converted back.
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 为RTL布局镜像所有水平位置
+     * @details 在RTL模式下，指示器（下拉箭头）移到左侧而非右侧。
+     *          对于大按钮：指示器出现在左下角而非右下角，
+     *          文字右对齐而非左对齐/居中对齐，
+     *          图标保持居中（全宽矩形是对称的，镜像保持居中位置）。
+     *          所有x坐标先转换为opt.rect内的相对位置，再镜像，最后转换回绝对位置。
+     * \endif
+     */
+    if (SA::saIsRTL()) {
+        int containerWidth = opt.rect.width();
+        int rectLeft       = opt.rect.x();
+        // Mirror iconRect x position (full-width centered rects stay centered after mirroring)
+        if (iconRect.isValid()) {
+            int relX       = iconRect.x() - rectLeft;
+            int mirroredX  = SA::saMirrorX(relX, containerWidth, iconRect.width());
+            iconRect.moveLeft(rectLeft + mirroredX);
+        }
+        // Mirror textRect x position
+        if (textRect.isValid()) {
+            int relX       = textRect.x() - rectLeft;
+            int mirroredX  = SA::saMirrorX(relX, containerWidth, textRect.width());
+            textRect.moveLeft(rectLeft + mirroredX);
+        }
+        // Mirror indicatorArrowRect x position
+        if (indicatorArrowRect.isValid()) {
+            int relX       = indicatorArrowRect.x() - rectLeft;
+            int mirroredX  = SA::saMirrorX(relX, containerWidth, indicatorArrowRect.width());
+            indicatorArrowRect.moveLeft(rectLeft + mirroredX);
+        }
     }
 }
 
