@@ -86,7 +86,7 @@
 <context>
     <name>SARibbonCategoryLayout</name>
     <message>
-        <location filename="../SARibbonCategoryLayout.cpp" line="155"/>
+        <location filename="../SARibbonCategoryLayout.cpp" line="156"/>
         <source>in SARibbonCategoryLayout cannot addItem,use addPanel instead</source>
         <translation type="unfinished"></translation>
     </message>

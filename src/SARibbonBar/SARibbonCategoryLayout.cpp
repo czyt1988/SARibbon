@@ -3,6 +3,7 @@
 #include "SARibbonPanel.h"
 #include "SARibbonElementManager.h"
 #include "SARibbonSeparatorWidget.h"
+#include "SARibbonUtil.h"
 #include <QApplication>
 #include <QPropertyAnimation>
 
@@ -400,19 +401,37 @@ void SARibbonCategoryLayout::updateGeometryArr()
 #endif
 
     if (needsScrolling) {
-        // 超过总长度，需要显示滚动按钮
-        if (0 == d_ptr->mXBase) {
-            // 已经移动到最左，需要可以向右移动
-            d_ptr->mIsRightScrollBtnShow = true;
-            d_ptr->mIsLeftScrollBtnShow  = false;
-        } else if (d_ptr->mXBase <= (categoryWidth - total)) {
-            // 已经移动到最右，需要可以向左移动
-            d_ptr->mIsRightScrollBtnShow = false;
-            d_ptr->mIsLeftScrollBtnShow  = true;
+        if (SA::saIsRTL()) {
+            // RTL: mXBase ranges from 0 (start, rightmost) to total-categoryWidth (end, leftmost)
+            const int maxBase = total - categoryWidth;
+            if (0 == d_ptr->mXBase) {
+                // At start (rightmost), can scroll left only
+                d_ptr->mIsRightScrollBtnShow = false;
+                d_ptr->mIsLeftScrollBtnShow  = true;
+            } else if (d_ptr->mXBase >= maxBase) {
+                // At end (leftmost), can scroll right only
+                d_ptr->mIsRightScrollBtnShow = true;
+                d_ptr->mIsLeftScrollBtnShow  = false;
+            } else {
+                // In between: both buttons
+                d_ptr->mIsRightScrollBtnShow = true;
+                d_ptr->mIsLeftScrollBtnShow  = true;
+            }
         } else {
-            // 移动到中间两边都可以动
-            d_ptr->mIsRightScrollBtnShow = true;
-            d_ptr->mIsLeftScrollBtnShow  = true;
+            // LTR: mXBase ranges from categoryWidth-total (negative, end, rightmost) to 0 (start, leftmost)
+            if (0 == d_ptr->mXBase) {
+                // Already moved to leftmost, can scroll right
+                d_ptr->mIsRightScrollBtnShow = true;
+                d_ptr->mIsLeftScrollBtnShow  = false;
+            } else if (d_ptr->mXBase <= (categoryWidth - total)) {
+                // Already moved to rightmost, can scroll left
+                d_ptr->mIsRightScrollBtnShow = false;
+                d_ptr->mIsLeftScrollBtnShow  = true;
+            } else {
+                // In between: both buttons
+                d_ptr->mIsRightScrollBtnShow = true;
+                d_ptr->mIsLeftScrollBtnShow  = true;
+            }
         }
     } else {
         // 说明total 小于 categoryWidth
@@ -443,9 +462,17 @@ void SARibbonCategoryLayout::updateGeometryArr()
         }
     }
     int x = d_ptr->mXBase;
-    if ((categoryAlignment() == SARibbonAlignment::AlignCenter) && (total < categoryWidth) && (0 == expandWidth)) {
-        // 如果是居中对齐，同时没有伸缩的panel，同时总宽度没有超过category的宽度
-        x = (categoryWidth - total) / 2;
+    if (!needsScrolling && (0 == expandWidth)) {
+        // Alignment offset when no scrolling needed and no expanding panels
+        SARibbonAlignment align = categoryAlignment();
+        if (align == SARibbonAlignment::AlignCenter) {
+            // Center alignment: panels centered within category width
+            x = (categoryWidth - total) / 2;
+        } else if (align == SARibbonAlignment::AlignRight) {
+            // Right alignment: panels start from right edge
+            x = categoryWidth - total;
+        }
+        // AlignLeft: x = d_ptr->mXBase (default, starts from left edge)
     }
     total = 0;  // total重新计算
     // 先按照sizeHint设置所有的尺寸
@@ -488,6 +515,23 @@ void SARibbonCategoryLayout::updateGeometryArr()
     d_ptr->mTotalWidth  = total;
     d_ptr->mSizeHint    = QSize(d_ptr->mTotalWidth, height);
     d_ptr->mMinSizeHint = QSize(categoryWidth, height);
+
+    // RTL mirroring: mirror panel and separator x-coordinates
+    if (SA::saIsRTL()) {
+        for (SARibbonCategoryLayoutItem* item : sa_as_const(d_ptr->mItemList)) {
+            if (!item->isEmpty()) {
+                // Mirror panel geometry
+                QRect panelGeo     = item->mWillSetGeometry;
+                int mirroredX      = SA::saMirrorX(panelGeo.x(), categoryWidth, panelGeo.width());
+                item->mWillSetGeometry = QRect(mirroredX, panelGeo.y(), panelGeo.width(), panelGeo.height());
+
+                // Mirror separator geometry
+                QRect sepGeo       = item->mWillSetSeparatorGeometry;
+                int mirroredSepX   = SA::saMirrorX(sepGeo.x(), categoryWidth, sepGeo.width());
+                item->mWillSetSeparatorGeometry = QRect(mirroredSepX, sepGeo.y(), sepGeo.width(), sepGeo.height());
+            }
+        }
+    }
 #if SARibbonCategoryLayout_DEBUG_PRINT
     qDebug() << "  SARibbonCategoryLayout updateGeometryArr,SizeHint=" << d_ptr->mSizeHint
              << ",Category name=" << category->categoryName();
@@ -520,9 +564,14 @@ void SARibbonCategoryLayout::doLayout()
         return;
     }
     SARibbonCategory* category = ribbonCategory();
-    // 两个滚动按钮的位置永远不变
-    d_ptr->mLeftScrollBtn->setGeometry(0, 0, 12, category->height());
-    d_ptr->mRightScrollBtn->setGeometry(category->width() - 12, 0, 12, category->height());
+    // Scroll button positions: in RTL, swap left/right button positions
+    if (SA::saIsRTL()) {
+        d_ptr->mLeftScrollBtn->setGeometry(category->width() - 12, 0, 12, category->height());
+        d_ptr->mRightScrollBtn->setGeometry(0, 0, 12, category->height());
+    } else {
+        d_ptr->mLeftScrollBtn->setGeometry(0, 0, 12, category->height());
+        d_ptr->mRightScrollBtn->setGeometry(category->width() - 12, 0, 12, category->height());
+    }
     QList< QWidget* > showWidgets, hideWidgets;
 #if SARibbonCategoryLayout_DEBUG_PRINT
     int debug_i__(0);
@@ -770,18 +819,20 @@ QList< SARibbonPanel* > SARibbonCategoryLayout::panelList() const
  * \if ENGLISH
  * @brief Execute scrolling
  * @param px Scroll distance in pixels
+ * @details In LTR mode, positive px scrolls right (decreases mXBase), negative scrolls left. In RTL mode, positive px scrolls right (increases mXBase), negative scrolls left.
  * \endif
  *
  * \if CHINESE
  * @brief 执行滚动
  * @param px 滚动的像素距离
+ * @details 在 LTR 模式下，正 px 向右滚动（减小 mXBase），负 px 向左滚动。在 RTL 模式下，正 px 向右滚动（增加 mXBase），负 px 向左滚动。
  * \endif
  */
 void SARibbonCategoryLayout::scroll(int px)
 {
-    // 计算新位置
+    // Calculate new position
     int targetX = d_ptr->mXBase + px;
-    // 直接设置位置
+    // Set position directly
     scrollTo(targetX);
 }
 
@@ -789,11 +840,13 @@ void SARibbonCategoryLayout::scroll(int px)
  * \if ENGLISH
  * @brief Scroll to a specified position
  * @param targetX Target scroll position in pixels
+ * @details Delegates to setScrollPosition() which handles RTL boundary bounds.
  * \endif
  *
  * \if CHINESE
  * @brief 滚动到指定位置
  * @param targetX 目标滚动位置（像素）
+ * @details 委托给 setScrollPosition()，该函数处理 RTL 边界限制。
  * \endif
  */
 void SARibbonCategoryLayout::scrollTo(int targetX)
@@ -805,11 +858,13 @@ void SARibbonCategoryLayout::scrollTo(int targetX)
  * \if ENGLISH
  * @brief Animate scrolling by a specified distance
  * @param px Scroll distance in pixels
+ * @details Boundary checking is handled by scrollToByAnimate(), which applies RTL-specific bounds when saIsRTL() is true.
  * \endif
  *
  * \if CHINESE
  * @brief 带动画的滚动
  * @param px 滚动的像素距离
+ * @details 边界检查由 scrollToByAnimate() 处理，当 saIsRTL() 为 true 时会应用 RTL 特定边界。
  * \endif
  */
 void SARibbonCategoryLayout::scrollByAnimate(int px)
@@ -822,11 +877,13 @@ void SARibbonCategoryLayout::scrollByAnimate(int px)
  * \if ENGLISH
  * @brief Animate scrolling to a specified position
  * @param targetX Target scroll position in pixels
+ * @details In LTR mode, targetX is bounded to [availableWidth-totalWidth, 0]. In RTL mode, targetX is bounded to [0, totalWidth-availableWidth].
  * \endif
  *
  * \if CHINESE
  * @brief 滚动到指定位置，带动画
  * @param targetX 目标滚动位置（像素）
+ * @details 在 LTR 模式下，targetX 被限制在 [availableWidth-totalWidth, 0]。在 RTL 模式下，targetX 被限制在 [0, totalWidth-availableWidth]。
  * \endif
  */
 void SARibbonCategoryLayout::scrollToByAnimate(int targetX)
@@ -836,19 +893,27 @@ void SARibbonCategoryLayout::scrollToByAnimate(int targetX)
         scrollTo(targetX);
     }
     if (isAnimatingScroll() && targetX == d_ptr->mTargetScrollPosition) {
-        return;  // 已经是目标位置
+        return;  // Already at target position
     }
-    // 计算边界
-    const int availableWidth     = categoryContentSize().width();
-    const int minBase            = qMin(availableWidth - d_ptr->mTotalWidth, 0);
-    d_ptr->mTargetScrollPosition = qBound(minBase, targetX, 0);
+    // Calculate boundaries
+    if (SA::saIsRTL()) {
+        // RTL: mXBase ranges from 0 (start) to totalWidth-availableWidth (end)
+        const int availableWidth     = categoryContentSize().width();
+        const int maxBase            = qMax(0, d_ptr->mTotalWidth - availableWidth);
+        d_ptr->mTargetScrollPosition = qBound(0, targetX, maxBase);
+    } else {
+        // LTR: mXBase ranges from availableWidth-totalWidth (min) to 0 (max)
+        const int availableWidth     = categoryContentSize().width();
+        const int minBase            = qMin(availableWidth - d_ptr->mTotalWidth, 0);
+        d_ptr->mTargetScrollPosition = qBound(minBase, targetX, 0);
+    }
 
-    // 如果动画正在进行，停止当前动画
+    // If animation is running, stop current animation
     if (animation->state() == QPropertyAnimation::Running) {
         animation->stop();
     }
 
-    // 设置动画参数
+    // Set animation parameters
     animation->setStartValue(d_ptr->mXBase);
     animation->setEndValue(d_ptr->mTargetScrollPosition);
     animation->start();
@@ -874,28 +939,46 @@ int SARibbonCategoryLayout::scrollPosition() const
  * \if ENGLISH
  * @brief Set the scroll position
  * @param pos New scroll position in pixels
+ * @details In LTR mode, mXBase ranges from [availableWidth-totalWidth, 0] (negative values). In RTL mode, mXBase ranges from [0, totalWidth-availableWidth] (positive values).
  * \endif
  *
  * \if CHINESE
  * @brief 设置滚动位置
  * @param pos 新的滚动位置（像素）
+ * @details 在 LTR 模式下，mXBase 范围为 [availableWidth-totalWidth, 0]（负值）。在 RTL 模式下，mXBase 范围为 [0, totalWidth-availableWidth]（正值）。
  * \endif
  */
 void SARibbonCategoryLayout::setScrollPosition(int pos)
 {
-    // 边界检查
+    // Boundary check
     const int availableWidth = categoryContentSize().width();
-    const int minBase        = qMin(availableWidth - d_ptr->mTotalWidth, 0);
-    const int newXBase       = qBound(minBase, pos, 0);
+    if (SA::saIsRTL()) {
+        // RTL: mXBase ranges from 0 (start, rightmost) to totalWidth-availableWidth (end, leftmost)
+        const int maxBase  = qMax(0, d_ptr->mTotalWidth - availableWidth);
+        const int newXBase = qBound(0, pos, maxBase);
 
-    if (d_ptr->mXBase != newXBase) {
-        d_ptr->mXBase = newXBase;
-        invalidate();  // 标记需要重新布局
+        if (d_ptr->mXBase != newXBase) {
+            d_ptr->mXBase = newXBase;
+            invalidate();  // Mark for relayout
 
-        // 立即执行布局更新（而不是等待事件循环）
-        if (parentWidget()) {
-            // setGeometry(parentWidget()->geometry());
-            parentWidget()->update();
+            // Immediately execute layout update
+            if (parentWidget()) {
+                parentWidget()->update();
+            }
+        }
+    } else {
+        // LTR: mXBase ranges from availableWidth-totalWidth (negative, end) to 0 (start, leftmost)
+        const int minBase  = qMin(availableWidth - d_ptr->mTotalWidth, 0);
+        const int newXBase = qBound(minBase, pos, 0);
+
+        if (d_ptr->mXBase != newXBase) {
+            d_ptr->mXBase = newXBase;
+            invalidate();  // Mark for relayout
+
+            // Immediately execute layout update
+            if (parentWidget()) {
+                parentWidget()->update();
+            }
         }
     }
 }
@@ -919,12 +1002,14 @@ bool SARibbonCategoryLayout::isAnimatingScroll() const
 /**
  * \if ENGLISH
  * @brief Check if the layout has been scrolled
- * @return True if the layout has been scrolled, false otherwise
+ * @return True if the layout has been scrolled (mXBase != 0), false otherwise
+ * @details In LTR, mXBase is non-zero (negative) when scrolled. In RTL, mXBase is non-zero (positive) when scrolled.
  * \endif
  *
  * \if CHINESE
  * @brief 判断是否滚动过
  * @return 布局已滚动返回true，否则返回false
+ * @details 在 LTR 模式下，mXBase 非零（负值）表示已滚动。在 RTL 模式下，mXBase 非零（正值）表示已滚动。
  * \endif
  */
 bool SARibbonCategoryLayout::isScrolled() const
@@ -1035,20 +1120,52 @@ void SARibbonCategoryLayout::setupAnimateScroll()
     }
 }
 
+/**
+ * \if ENGLISH
+ * @brief Handle left scroll button click
+ * @details In LTR mode, scrolls panels to the right (reveals right-side hidden panels). In RTL mode, reverses direction to scroll left.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 处理左滚动按钮点击
+ * @details 在 LTR 模式下，将面板向右滚动（显示右侧隐藏的面板）。在 RTL 模式下，反向滚动（向左）。
+ * \endif
+ */
 void SARibbonCategoryLayout::onLeftScrollButtonClicked()
 {
     SARibbonCategory* category = qobject_cast< SARibbonCategory* >(parentWidget());
     int width                  = category->width();
     width /= 2;
-    scrollByAnimate(width);
+    // In RTL mode, reverse scroll direction: left button scrolls left instead of right
+    if (SA::saIsRTL()) {
+        scrollByAnimate(-width);
+    } else {
+        scrollByAnimate(width);
+    }
 }
 
+/**
+ * \if ENGLISH
+ * @brief Handle right scroll button click
+ * @details In LTR mode, scrolls panels to the left (reveals left-side hidden panels). In RTL mode, reverses direction to scroll right.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 处理右滚动按钮点击
+ * @details 在 LTR 模式下，将面板向左滚动（显示左侧隐藏的面板）。在 RTL 模式下，反向滚动（向右）。
+ * \endif
+ */
 void SARibbonCategoryLayout::onRightScrollButtonClicked()
 {
     SARibbonCategory* category = qobject_cast< SARibbonCategory* >(parentWidget());
     int width                  = category->width();
     width /= 2;
-    scrollByAnimate(-width);
+    // In RTL mode, reverse scroll direction: right button scrolls right instead of left
+    if (SA::saIsRTL()) {
+        scrollByAnimate(width);
+    } else {
+        scrollByAnimate(-width);
+    }
 }
 
 void SARibbonCategoryLayout::setGeometry(const QRect& rect)
