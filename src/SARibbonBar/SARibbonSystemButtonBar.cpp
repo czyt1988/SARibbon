@@ -582,6 +582,46 @@ bool SARibbonSystemButtonBar::eventFilter(QObject* obj, QEvent* event)
         case QEvent::WindowStateChange: {
             setWindowStates(mainWindow->windowState());
         } break;
+        case QEvent::LayoutDirectionChange: {
+            /**
+             * \if ENGLISH
+             * @brief Handle layout direction change (LTR/RTL) - recalculate position
+             * @details When the application's layout direction changes, the system button bar
+             * needs to reposition itself (left edge for RTL, right edge for LTR).
+             * This case replicates the Resize logic to ensure proper positioning.
+             * Event is NOT consumed - it continues to propagate.
+             * \endif
+             *
+             * \if CHINESE
+             * @brief 处理布局方向变化 (从左到右/从右到左) - 重新计算位置
+             * @details 当应用程序的布局方向改变时，系统按钮栏需要重新定位
+             * (RTL 时在左侧，LTR 时在右侧)。此 case 复制 Resize 逻辑以确保正确定位。
+             * 事件不会被消费 - 它将继续传播。
+             * \endif
+             */
+            int th = 25;
+
+            SARibbonBar* ribbonBar = mainWindow->ribbonBar();
+            if (ribbonBar) {
+                th = ribbonBar->titleBarHeight();
+            }
+            if (th != height()) {
+                setWindowTitleHeight(th);
+            }
+            QRect fr         = mainWindow->geometry();
+            QSize wgSizeHint = sizeHint();
+            if (SA::saIsRTL()) {
+                setGeometry(0, 0, wgSizeHint.width(), wgSizeHint.height());
+            } else {
+                setGeometry(fr.width() - wgSizeHint.width(), 0, wgSizeHint.width(), wgSizeHint.height());
+            }
+            // 把设置好的尺寸给 ribbonbar
+            if (ribbonBar) {
+                ribbonBar->setSystemButtonGroupSize(size());
+            }
+            // 重新定位内部按钮
+            d_ptr->resizeElement(size());
+        } break;
         default:
             break;
         }
@@ -772,6 +812,36 @@ void SARibbonSystemButtonBar::resizeEvent(QResizeEvent* e)
 {
     Q_UNUSED(e);
     d_ptr->resizeElement(size());
+}
+
+/**
+ * \if ENGLISH
+ * @brief Handles change events, specifically layout direction changes
+ * @param e Change event
+ * @details When layout direction changes (LTR to RTL or vice versa), repositions internal buttons
+ *          by calling resizeElement() to handle RTL/LTR positioning correctly.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 处理变更事件，特别是布局方向变更
+ * @param e 变更事件
+ * @details 当布局方向改变时（LTR 到 RTL 或反之），通过调用 resizeElement() 重新定位内部按钮，
+ *          以正确处理 RTL/LTR 布局。
+ * \endif
+ */
+void SARibbonSystemButtonBar::changeEvent(QEvent* e)
+{
+    if (nullptr == e) {
+        return;
+    }
+    switch (e->type()) {
+    case QEvent::LayoutDirectionChange: {
+        d_ptr->resizeElement(size());
+    } break;
+    default:
+        break;
+    }
+    QFrame::changeEvent(e);
 }
 
 /**

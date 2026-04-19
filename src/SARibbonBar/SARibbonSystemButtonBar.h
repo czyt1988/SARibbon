@@ -102,6 +102,8 @@ public:
 protected:
     /// Handle resize event
     virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
+    /// Handle change event for layout direction changes
+    virtual void changeEvent(QEvent* e) override;
 
 protected Q_SLOTS:
     /// Close window slot
