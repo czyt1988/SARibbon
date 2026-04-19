@@ -1585,6 +1585,140 @@ void SARibbonBarLayout::resizeInLooseStyle()
                 connerSize       = SA::scaleSizeByHeight(connerSize, validTitleBarHeight);
                 connerL->setGeometry(x, y, connerSize.width(), connerSize.height());
                 x = connerL->geometry().right() + 5;
+            }
+        }
+
+        /// 2. 布局图标窗口或app button
+        if (isAppBtnVExpan) {
+            //! 如果Application button是纵向扩展模式，那么不显示titleicon
+            //! 纵向扩展的Application button将占用title和tab的高度
+            if (appBtn && appBtn->isVisibleTo(ribbon)) {
+                QSize appBtnSize = appBtn->sizeHint();
+                // 纵向扩展模式，appBtn的高度撑满titleBarControlHeight+tabH
+                int appHeight = titleBarControlHeight + tabH;
+                appHeight -= 2;  // 上下留1px
+                appBtnSize = SA::scaleSizeByHeight(appBtnSize, appHeight, 1.5);
+                appBtn->setGeometry(x, y + 1, appBtnSize.width(), appBtnSize.height());
+                x = appBtn->geometry().right();
+            }
+        } else {
+            //! Application button不是纵向扩展，显示icon
+            if (titleIcon && titleIcon->isVisibleTo(ribbon)) {
+                QSize titleiconSizeHint = titleIcon->sizeHint();
+                titleiconSizeHint.scale(titleBarControlHeight, titleBarControlHeight, Qt::KeepAspectRatio);
+                titleIcon->setGeometry(x, y + 1, titleiconSizeHint.width(), titleiconSizeHint.height());
+                x += titleiconSizeHint.width();
+            }
+        }
+
+        /// 3. 布局quick access bar
+        if (qb && qb->isVisibleTo(ribbon)) {
+            QSize quickAccessBarSize = qb->sizeHint();
+            //! 这里不用SA::scaleSizeByHeight缩减quickAccessBar的比例：
+            //! quickAccessBarSize = SA::scaleSizeByHeight(quickAccessBarSize, titleBarControlHeight);
+            //! 原因是，如果quickAccessBar最后是一个widget，如果长度不足，这个widget是不会显示出来，假如默认QToolBar的高度是32，
+            //! 而titlebar的高度一是28，肯定会导致宽度缩减，如果宽度缩减，且最后是一个窗口，那么这个窗口会不显示
+            //! 针对工具栏类型的窗口，宽度高度都不进行比例缩减
+            // 上下留1px的边线
+            qb->setGeometry(x, y + 1, quickAccessBarSize.width(), titleBarControlHeight);
+        }
+
+        /// titleBar上的元素布局完成，开始布局第二行
+        x = border.left();
+        y += validTitleBarHeight;  // 此时，y值在titlebar下面
+
+        /// 4. 布局 applicationButton（第二行）
+        if (appBtn && appBtn->isVisibleTo(ribbon)) {
+            if (isAppBtnVExpan) {
+                ///! 如果是纵向扩展的Application button则只更新x位置，在第2步已经设定了位置
+                x = appBtn->geometry().right();
+            } else {
+                QSize appBtnSize = appBtn->sizeHint();
+                // appBtnSize的sizehint是根据文字宽度来推荐，如果按高度来扩展，会显得有点大，直接设置高度，又显得有点小
+                // 因此宽高不按1:1比例扩展，按1:1.5比例扩展，也就是高度扩展3倍，宽度扩展3/1.5倍
+                // 目前看这个比例相对比较协调
+                appBtnSize = SA::scaleSizeByHeight(appBtnSize, tabBarControlHeight, 1.5);
+                appBtn->setGeometry(x, y + 1, appBtnSize.width(), appBtnSize.height());
+                x = appBtn->geometry().right();
+                // 累加到最小宽度中
+                barMinWidth += appBtnSize.width();
+            }
+        }
+
+        /// 5. 布局右上角corner widget
+        /// cornerWidget(Qt::TopRightCorner)是一定要配置的，对于多文档窗口，子窗口的缩放恢复按钮就是通过这个窗口实现，
+        /// 由于这个窗口一定要在最右，因此先对这个窗口进行布局
+        int endX = ribbon->width() - border.right();
+
+        if (QWidget* connerTR = ribbon->cornerWidget(Qt::TopRightCorner)) {
+            if (connerTR->isVisibleTo(ribbon)) {
+                QSize connerSize = connerTR->sizeHint();
+                connerSize       = SA::scaleSizeByHeight(connerSize, tabBarControlHeight);
+                endX -= connerSize.width();
+                connerTR->setGeometry(endX, y + 1, connerSize.width(), connerSize.height());
+                // 累加到最小宽度中
+                barMinWidth += connerSize.width();
+            }
+        }
+
+        /// 6. tabBar右边的附加按钮组rightButtonGroup，这里一般会附加一些类似登录等按钮组
+        if (rightBtnGroup && rightBtnGroup->isVisibleTo(ribbon)) {
+            QSize rightBtnGroupSize = rightBtnGroup->sizeHint();
+            //! 这里不用SA::scaleSizeByHeight缩减rightButtonGroup的比例：
+            //! rightBtnGroupSize       = SA::scaleSizeByHeight(rightBtnGroupSize, tabBarControlHeight);
+            //! 针对工具栏类型的窗口，宽度高度都不进行比例缩减
+            endX -= 1;  // 先偏移1px
+            endX -= rightBtnGroupSize.width();
+            d_ptr->rightButtonGroup()->setGeometry(endX, y + 1, rightBtnGroupSize.width(), tabBarControlHeight);
+            // 累加到最小宽度中
+            barMinWidth += rightBtnGroupSize.width();
+        }
+
+        /// 7. 布局tabbar，此时已经确定了applicationButton的位置，以及最右边rightButtonGroup的位置，剩下的区域都给tabbar
+        int tabBarWidth = endX - x;
+        // 这里极度压缩有可能导致负数因此不能小于0
+        if (tabBarWidth < 10) {
+            tabBarWidth = 10;
+        }
+
+        int mintabBarWidth = calcMinTabBarWidth();
+        // 累加到最小宽度中
+        barMinWidth += mintabBarWidth;
+        if (tabBar) {
+            if (ribbon->ribbonAlignment() == SARibbonAlignment::AlignLeft) {
+                // 左对齐的tabbar，直接设置位置
+                tabBar->setGeometry(x, y, tabBarWidth, tabH);
+            } else if (ribbon->ribbonAlignment() == SARibbonAlignment::AlignRight) {
+                // 右对齐的情况下，Tab要靠右显示
+                if (mintabBarWidth >= tabBarWidth) {
+                    // 这时tabbar没有右对齐的必要性，空间位置不够了
+                    tabBar->setGeometry(x, y, tabBarWidth, tabH);
+                } else {
+                    // 说明tabbar的宽度有右对齐的可能性
+                    tabBar->setGeometry(endX - mintabBarWidth, y, mintabBarWidth, tabH);
+                }
+            } else {
+                // 居中对齐的情况下，Tab要居中显示
+                // 得到tab的推荐尺寸
+                if (mintabBarWidth >= tabBarWidth) {
+                    // 这时tabbar没有居中对齐的必要性，空间位置不够了
+                    tabBar->setGeometry(x, y, tabBarWidth, tabH);
+                } else {
+                    // 说明tabbar的宽度有居中的可能性
+                    int xoffset = (tabBarWidth - mintabBarWidth) / 2;
+                    tabBar->setGeometry(x + xoffset, y, mintabBarWidth, tabH);
+                }
+            }
+        }
+
+        d_ptr->minWidth = barMinWidth;
+
+        // 5. 更新标题区域
+        layoutTitleRect();
+
+        // 6. 调整 stackedContainerWidget
+        layoutStackedContainerWidget();
+    }
 }
 
 /**
