@@ -185,19 +185,20 @@ class QWidget;
 
 /**
  * \if ENGLISH
- * @brief Define Ribbon alignment, currently supports left alignment and center alignment
- * @note If your compiler reports: illegal qualified name in member declaration, check if the file line endings are LF, if so, change them to CRLF
+ * @brief Define the alignment mode of Ribbon, supports left alignment, center alignment and right alignment
+ * @note If your compiler reports: the qualified name of the member declaration is illegal, then check if the file line break is LF, if so, change the file line break to CRLF
  * \endif
  *
  * \if CHINESE
- * @brief 定义Ribbon的对其方式，目前支持左对齐和居中对其
- * @note 如果你编译器提示：成员声明的限定名称非法，那么留意一下文件换行是否为LF，如果是把文件换行改为CRLF
+ * @brief 定义 Ribbon 的对其方式，支持左对齐、居中对其和右对齐
+ * @note 如果你编译器提示：成员声明的限定名称非法，那么留意一下文件换行是否为 LF，如果是把文件换行改为 CRLF
  * \endif
  */
 enum class SARibbonAlignment
 {
     AlignLeft,   ///< Left alignment, tab bar left aligned, category also left aligned
-    AlignCenter  ///< Center alignment, tab bar center aligned, category also center aligned
+    AlignCenter, ///< Center alignment, tab bar center aligned, category also center aligned
+    AlignRight   ///< Right alignment, tab bar right aligned, category also right aligned
 };
 
 /**
