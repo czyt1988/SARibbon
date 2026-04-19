@@ -11,6 +11,7 @@
 #include <QScreen>
 #include "SARibbonQt5Compat.hpp"
 #include "SARibbonElementManager.h"
+#include "SARibbonUtil.h"
 
 #define ICON_ARROW_UP QIcon(":/SARibbon/image/resource/ArrowUp.png")
 #define ICON_ARROW_DOWN QIcon(":/SARibbon/image/resource/ArrowDown.png")
@@ -71,7 +72,8 @@ public:
         mButtonLayout->addWidget(mButtonUp);
         mButtonLayout->addWidget(mButtonDown);
         mButtonLayout->addWidget(mButtonMore);
-        mLayout = new QBoxLayout(QBoxLayout::RightToLeft);
+        QBoxLayout::Direction layoutDir = SA::saIsRTL() ? QBoxLayout::LeftToRight : QBoxLayout::RightToLeft;
+        mLayout = new QBoxLayout(layoutDir);
         mLayout->setSpacing(0);
         mLayout->setContentsMargins(0, 0, 0, 0);
         mLayout->addLayout(mButtonLayout);
@@ -332,12 +334,30 @@ void SARibbonGalleryViewport::hideEvent(QHideEvent* e)
     qApp->removeEventFilter(this);  // 隐藏后不监听,避免监听太多
 }
 
+/**
+ * \if ENGLISH
+ * @brief Handle resize events for the gallery viewport
+ * @param e Resize event
+ * @details Updates the position of the size grip, positioning it at bottom-right for LTR and bottom-left for RTL.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 处理图库视口的调整大小事件
+ * @param e 调整大小事件
+ * @details 更新尺寸手柄的位置，LTR时位于右下角，RTL时位于左下角。
+ * \endif
+ */
 void SARibbonGalleryViewport::resizeEvent(QResizeEvent* e)
 {
     QScrollArea::resizeEvent(e);
     const int gripSize = 16;
-    const int x        = viewport()->width() - gripSize;
-    const int y        = viewport()->height() - gripSize;
+    int x;
+    if (SA::saIsRTL()) {
+        x = 0;
+    } else {
+        x = viewport()->width() - gripSize;
+    }
+    const int y = viewport()->height() - gripSize;
     m_sizeGrip->move(x, y);
     m_sizeGrip->raise();  // 再保险一次
 }
@@ -726,6 +746,31 @@ void SARibbonGallery::resizeEvent(QResizeEvent* event)
         const QList< SARibbonGalleryGroup* > groups = d_ptr->mPopupWidget->galleryGroupList();
         for (SARibbonGalleryGroup* group : groups) {
             group->recalcGridSize(h);
+        }
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Handle change events for the gallery
+ * @param event Change event
+ * @details Updates the layout direction when layout direction changes.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 处理图库的更改事件
+ * @param event 更改事件
+ * @details 在布局方向更改时更新布局方向。
+ * \endif
+ */
+void SARibbonGallery::changeEvent(QEvent* event)
+{
+    QFrame::changeEvent(event);
+    if (event->type() == QEvent::LayoutDirectionChange) {
+        QBoxLayout::Direction layoutDir = SA::saIsRTL() ? QBoxLayout::LeftToRight : QBoxLayout::RightToLeft;
+        d_ptr->mLayout->setDirection(layoutDir);
+        if (d_ptr->mPopupWidget) {
+            d_ptr->mPopupWidget->update();
         }
     }
 }
