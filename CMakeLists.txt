@@ -210,6 +210,7 @@ endif()
 
 if(BUILD_TESTS)
     message(STATUS "build tests")
+    enable_testing()
     add_subdirectory(tests)
 endif()
 
