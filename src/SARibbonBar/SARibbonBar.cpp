@@ -919,6 +919,17 @@ void SARibbonBar::hideCategory(SARibbonCategory* category)
         d_ptr->mRibbonTabBar->removeTab(tabIndex);
         // 注意Category隐藏后，context的位置就会发生变化，需要更新
         d_ptr->updateTabData();
+        /**
+         * \if ENGLISH
+         * @brief Fix issue #147: Force layout refresh and repaint after hiding category to avoid display anomalies when batch hiding/showing categories
+         * \endif
+         *
+         * \if CHINESE
+         * @brief 修复 #147 问题：隐藏category后强制刷新布局并重绘，避免批量隐藏/显示category后出现显示异常
+         * \endif
+         */
+        d_ptr->relayout();
+        update();
     }
 }
 
@@ -944,6 +955,17 @@ void SARibbonBar::showCategory(SARibbonCategory* category)
             d_ptr->mHidedCategory.erase(i);  // 移除
             // 更新上下文标签的索引信息
             d_ptr->updateTabData();
+            /**
+             * \if ENGLISH
+             * @brief Fix issue #147: Force layout refresh and repaint before raising category to avoid display anomalies when batch hiding/showing categories
+             * \endif
+             *
+             * \if CHINESE
+             * @brief 修复 #147 问题：显示category前强制刷新布局并重绘，避免批量隐藏/显示category后出现显示异常
+             * \endif
+             */
+            d_ptr->relayout();
+            update();
             raiseCategory(category);
             return;
         }
