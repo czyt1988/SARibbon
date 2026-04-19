@@ -7,6 +7,7 @@
 #include "SARibbonPanel.h"
 #include "SARibbonPanelItem.h"
 #include "SARibbonQt5Compat.hpp"
+#include "SARibbonUtil.h"
 
 #ifndef SARibbonPanelLayout_DEBUG_PRINT
 #define SARibbonPanelLayout_DEBUG_PRINT 0
@@ -987,6 +988,52 @@ void SARibbonPanelLayout::updateGeomArray(const QRect& setrect)
                 optBtnSize.height()
             );
             totalWidth += optBtnSize.width();
+        }
+    }
+
+    /**
+     * \if ENGLISH
+     * @brief Handle RTL mirroring for all layout elements
+     * @details In RTL mode, all x coordinates are mirrored horizontally across the panel width.
+     *          Button columns are reversed, option button moves to the left, and title aligns right.
+     * \endif
+     * 
+     * \if CHINESE
+     * @brief 处理所有布局元素的RTL镜像
+     * @details 在RTL模式下，所有x坐标沿面板宽度水平镜像。按钮列反转，选项按钮移动到左侧，标题右对齐。
+     * \endif
+     */
+    if (SA::saIsRTL()) {
+        // Mirror all panel items' x coordinates
+        for (SARibbonPanelItem* item : sa_as_const(mItems)) {
+            if (!item->isEmpty()) {
+                int mirroredX = SA::saMirrorX(
+                    item->itemWillSetGeometry.x(),
+                    setrect.width(),
+                    item->itemWillSetGeometry.width()
+                );
+                item->itemWillSetGeometry.moveLeft(mirroredX);
+            }
+        }
+
+        // Mirror option button position
+        if (isHaveOptionAction()) {
+            int mirroredOptX = SA::saMirrorX(
+                mOptionActionBtnGeometry.x(),
+                setrect.width(),
+                mOptionActionBtnGeometry.width()
+            );
+            mOptionActionBtnGeometry.moveLeft(mirroredOptX);
+        }
+
+        // Adjust title alignment for RTL
+        if (mTitleLabel && isEnableShowPanelTitle()) {
+            mTitleLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
+        }
+    } else {
+        // Reset title alignment to center for LTR
+        if (mTitleLabel && isEnableShowPanelTitle()) {
+            mTitleLabel->setAlignment(Qt::AlignCenter | Qt::AlignVCenter);
         }
     }
     // 刷新sizeHint
