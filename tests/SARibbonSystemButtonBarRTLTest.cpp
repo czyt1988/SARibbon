@@ -20,9 +20,11 @@ void SARibbonSystemButtonBarRTLTest::testSystemButtonsPosition()
 
     // Test LTR: buttons should be on the right edge
     QApplication::setLayoutDirection(Qt::LeftToRight);
-    QList<QPushButton*> buttons = buttonBar.systemButtons();
-    QVERIFY(buttons.size() >= 3); // Min, Max, Close
-    for (QPushButton* btn : buttons) {
+    QAbstractButton *minBtn = buttonBar.minimizeButton();
+    QAbstractButton *maxBtn = buttonBar.maximizeButton();
+    QAbstractButton *closeBtn = buttonBar.closeButton();
+    QVERIFY(minBtn && maxBtn && closeBtn); // Min, Max, Close exist
+    for (QAbstractButton* btn : {minBtn, maxBtn, closeBtn}) {
         QVERIFY(btn->geometry().right() <= buttonBar.width());
         QVERIFY(btn->geometry().left() > buttonBar.width() - 150); // Right area
     }
@@ -30,7 +32,7 @@ void SARibbonSystemButtonBarRTLTest::testSystemButtonsPosition()
     // Test RTL: buttons should be on the left edge
     QApplication::setLayoutDirection(Qt::RightToLeft);
     QApplication::processEvents();
-    for (QPushButton* btn : buttons) {
+    for (QAbstractButton* btn : {minBtn, maxBtn, closeBtn}) {
         QVERIFY(btn->geometry().left() >= 0);
         QVERIFY(btn->geometry().right() < 150); // Left area
     }
@@ -47,13 +49,15 @@ void SARibbonSystemButtonBarRTLTest::testSystemButtonsOrder()
     buttonBar.show();
     QApplication::processEvents();
 
-    QList<QPushButton*> buttons = buttonBar.systemButtons();
-    QVERIFY(buttons.size() >= 3);
+    QAbstractButton *minBtn = buttonBar.minimizeButton();
+    QAbstractButton *maxBtn = buttonBar.maximizeButton();
+    QAbstractButton *closeBtn = buttonBar.closeButton();
+    QVERIFY(minBtn && maxBtn && closeBtn);
 
     // Get button positions in LTR
     QApplication::setLayoutDirection(Qt::LeftToRight);
     QList<int> ltrLeftPositions;
-    for (QPushButton* btn : buttons) {
+    for (QAbstractButton* btn : {minBtn, maxBtn, closeBtn}) {
         ltrLeftPositions.append(btn->geometry().left());
     }
     std::sort(ltrLeftPositions.begin(), ltrLeftPositions.end());
@@ -63,7 +67,7 @@ void SARibbonSystemButtonBarRTLTest::testSystemButtonsOrder()
     QApplication::setLayoutDirection(Qt::RightToLeft);
     QApplication::processEvents();
     QList<int> rtlRightPositions;
-    for (QPushButton* btn : buttons) {
+    for (QAbstractButton* btn : {minBtn, maxBtn, closeBtn}) {
         rtlRightPositions.append(btn->geometry().right());
     }
     std::sort(rtlRightPositions.begin(), rtlRightPositions.end());
@@ -71,10 +75,6 @@ void SARibbonSystemButtonBarRTLTest::testSystemButtonsOrder()
     // So the order of buttons themselves is preserved
 
     // Verify order is same (button positions relative to each other unchanged)
-    QCOMPARE(buttons.size(), 3);
-    QPushButton *minBtn = buttonBar.minimizeButton();
-    QPushButton *maxBtn = buttonBar.maximizeButton();
-    QPushButton *closeBtn = buttonBar.closeButton();
 
     // In LTR: min.x < max.x < close.x
     QVERIFY(minBtn->geometry().left() < maxBtn->geometry().left());
