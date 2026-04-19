@@ -1,4 +1,4 @@
-﻿
+
 # Cmake的命令不区分大小写，例如message，set等命令；但Cmake的变量区分大小写
 # 为统一风格，本项目的Cmake命令全部采用小写，变量全部采用大写加下划线组合。
 
@@ -14,6 +14,7 @@ project(SARibbon VERSION ${SARIBBON_VERSION} LANGUAGES CXX)
 
 option(SARIBBON_BUILD_STATIC_LIBS "build the SARibbonBar in static lib mode" OFF)
 option(SARIBBON_BUILD_EXAMPLES "build the examples" ON)
+option(BUILD_TESTS "Build unit tests" OFF)
 # frameless能提供windows的窗口特效，如边缘吸附，且对高分屏多屏幕的支持更好,默认开启
 option(SARIBBON_USE_FRAMELESS_LIB "Using the QWindowKit library as a frameless solution" OFF)
 # frameless能提供windows的窗口特效，如边缘吸附，且对高分屏多屏幕的支持更好,默认开启
@@ -205,6 +206,11 @@ add_subdirectory(src)
 if(SARIBBON_BUILD_EXAMPLES)
     message(STATUS "build example")
     add_subdirectory(example)
+endif()
+
+if(BUILD_TESTS)
+    message(STATUS "build tests")
+    add_subdirectory(tests)
 endif()
 
 
