@@ -134,7 +134,26 @@ public:
          * 在此模式下，小按钮和中等按钮都排列成两行。
          * 大按钮始终占据整个高度。
          */
-        TwoRowMode
+        TwoRowMode,
+
+        /**
+         * \if ENGLISH
+         * @brief Single-row layout mode
+         *
+         * In this mode, all buttons are arranged in a single horizontal row.
+         * Large, Medium and Small row proportions all behave as Small.
+         * Panel titles are hidden by default.
+         * \endif
+         *
+         * \if CHINESE
+         * @brief 单行布局模式
+         *
+         * 在此模式下，所有按钮排列在单行水平行中。
+         * Large、Medium 和 Small 行占比都等效为 Small。
+         * Panel 标题默认隐藏。
+         * \endif
+         */
+        SingleRowMode
     };
     Q_ENUM(PanelLayoutMode)
 public:

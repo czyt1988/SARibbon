@@ -185,17 +185,20 @@ class SA_RIBBON_EXPORT SARibbonBar : public QMenuBar
     Q_PROPERTY(SARibbonPanel::PanelLayoutMode panelLayoutMode READ panelLayoutMode WRITE setPanelLayoutMode)
 
 public:
-    enum RibbonStyleFlag
+enum RibbonStyleFlag
     {
-        RibbonStyleLoose    = 0x0001,  // bit:0000 0001
-        RibbonStyleCompact  = 0x0002,  // bit:0000 0010
-        RibbonStyleThreeRow = 0x0010,  // bit:0001 0000
-        RibbonStyleTwoRow   = 0x0020,  // bit:0010 0000
+        RibbonStyleLoose       = 0x0001,  // bit:0000 0001
+        RibbonStyleCompact     = 0x0002,  // bit:0000 0010
+        RibbonStyleThreeRow    = 0x0010,  // bit:0001 0000
+        RibbonStyleTwoRow      = 0x0020,  // bit:0010 0000
+        RibbonStyleSingleRow   = 0x0040,  // bit:0100 0000
 
-        RibbonStyleLooseThreeRow   = RibbonStyleLoose | RibbonStyleThreeRow,    ///< 宽松结构，3行模式
-        RibbonStyleCompactThreeRow = RibbonStyleCompact | RibbonStyleThreeRow,  ///< 紧凑结构，3行模式
-        RibbonStyleLooseTwoRow     = RibbonStyleLoose | RibbonStyleTwoRow,      ///< 宽松结构，2行模式
-        RibbonStyleCompactTwoRow   = RibbonStyleCompact | RibbonStyleTwoRow     ///< 紧凑结构，2行模式
+        RibbonStyleLooseThreeRow   = RibbonStyleLoose | RibbonStyleThreeRow,    ///< 宽松结构，3 行模式
+        RibbonStyleCompactThreeRow = RibbonStyleCompact | RibbonStyleThreeRow,  ///< 紧凑结构，3 行模式
+        RibbonStyleLooseTwoRow     = RibbonStyleLoose | RibbonStyleTwoRow,      ///< 宽松结构，2 行模式
+        RibbonStyleCompactTwoRow   = RibbonStyleCompact | RibbonStyleTwoRow,    ///< 紧凑结构，2 行模式
+        RibbonStyleLooseSingleRow   = RibbonStyleLoose | RibbonStyleSingleRow,  ///< 宽松结构，1 行模式
+        RibbonStyleCompactSingleRow = RibbonStyleCompact | RibbonStyleSingleRow ///< 紧凑结构，1 行模式
     };
     Q_ENUM(RibbonStyleFlag)
     Q_DECLARE_FLAGS(RibbonStyles, RibbonStyleFlag)
@@ -227,6 +230,8 @@ public:
     static bool isLooseStyle(RibbonStyles s);
     /// Check if the ribbon style is compact (WPS) style
     static bool isCompactStyle(RibbonStyles s);
+    /// Check if the ribbon style is single-row mode
+    static bool isSingleRowStyle(RibbonStyles s);
     /// Get version information
     static QString versionString();
 
@@ -410,6 +415,8 @@ public:
     bool isLooseStyle() const;
     /// Check if current style is compact
     bool isCompactStyle() const;
+    /// Check if current style is single-row
+    bool isSingleRowStyle() const;
 
     /// Update ribbon geometry
     void updateRibbonGeometry();
