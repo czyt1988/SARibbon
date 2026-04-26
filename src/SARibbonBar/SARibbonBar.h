@@ -181,6 +181,7 @@ class SA_RIBBON_EXPORT SARibbonBar : public QMenuBar
     Q_PROPERTY(Qt::Alignment windowTitleAligment READ windowTitleAligment WRITE setWindowTitleAligment)
     Q_PROPERTY(bool enableWordWrap READ isEnableWordWrap WRITE setEnableWordWrap)
     Q_PROPERTY(bool enableShowPanelTitle READ isEnableShowPanelTitle WRITE setEnableShowPanelTitle)
+    Q_PROPERTY(bool enableIconRightText READ isEnableIconRightText WRITE setEnableIconRightText)
     Q_PROPERTY(bool tabOnTitle READ isTabOnTitle WRITE setTabOnTitle)
     Q_PROPERTY(SARibbonPanel::PanelLayoutMode panelLayoutMode READ panelLayoutMode WRITE setPanelLayoutMode)
 
@@ -460,6 +461,11 @@ public:
     void setEnableWordWrap(bool on);
     /// Check if word wrap is enabled
     bool isEnableWordWrap() const;
+
+    /// Set whether button text is displayed to the right of the icon
+    void setEnableIconRightText(bool on);
+    /// Check if icon-right-text mode is enabled
+    bool isEnableIconRightText() const;
 
     /// Set button maximum aspect ratio
     void setButtonMaximumAspectRatio(qreal fac = 1.4);

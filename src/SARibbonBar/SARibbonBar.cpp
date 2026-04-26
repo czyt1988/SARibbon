@@ -91,6 +91,7 @@ public:
     SARibbonAlignment mRibbonAlignment { SARibbonAlignment::AlignLeft };  ///< 对齐方式
     SARibbonPanel::PanelLayoutMode mDefaulePanelLayoutMode { SARibbonPanel::ThreeRowMode };  ///< 默认的PanelLayoutMode
     bool mEnableShowPanelTitle { true };                         ///< 是否允许panel的标题栏显示
+    bool mEnableIconRightText { false };                         ///< 鏄惁鍚敤鍥炬爣鍙充晶鏂囧瓧妯″紡
     int mPanelSpacing { 0 };                                     ///< panel的spacing
     QSize mPanelSmallToolButtonSize { 20, 20 };                  ///< 记录panel的默认图标大小
     QSize mPanelLargeToolButtonSize { 32, 32 };                  ///< 记录panel的大图标尺寸
@@ -2789,6 +2790,7 @@ void SARibbonBar::setPanelTitleHeight(int h)
 bool SARibbonBar::isEnableShowPanelTitle() const
 {
     return d_ptr->mEnableShowPanelTitle;
+    bool mEnableIconRightText { false };                         ///< 鏄惁鍚敤鍥炬爣鍙充晶鏂囧瓧妯″紡
 }
 
 /**
@@ -2809,6 +2811,54 @@ void SARibbonBar::setEnableShowPanelTitle(bool on)
         c->setEnableShowPanelTitle(on);
         return true;
     });
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set whether button text is displayed to the right of the icon
+ * @param on If true, buttons will show text to the right of the icon (horizontal layout).
+ *           If false, buttons use the default vertical layout (icon above, text below).
+ * @details This property cascades to all categories, panels, and toolbuttons.
+ *           When setRibbonStyle is called with a SingleRow style, this is automatically set to true.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置按钮文字是否显示在图标右侧
+ * @param on 如果为 true，按钮将显示图标在左、文字在右的水平布局。
+ *           如果为 false，按钮使用默认的垂直布局（图标在上，文字在下）。
+ * @details 此属性会级联传递到所有 category、panel 和 toolbutton。
+ *           当 setRibbonStyle 设置为 SingleRow 样式时，此属性会自动设置为 true。
+ * \endif
+ */
+void SARibbonBar::setEnableIconRightText(bool on)
+{
+    SA_D(d);
+    if (d->enableIconRightText == on) {
+        return;
+    }
+    d->enableIconRightText = on;
+    iterateCategory([on](SARibbonCategory* cat) {
+        cat->setEnableIconRightText(on);
+        return true;
+    });
+    updateRibbonGeometry();
+}
+
+/**
+ * \if ENGLISH
+ * @brief Check if icon-right-text mode is enabled
+ * @return true if icon-right-text mode is enabled
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 检查图标右侧文字模式是否启用
+ * @return 如果启用图标右侧文字模式返回 true
+ * \endif
+ */
+bool SARibbonBar::isEnableIconRightText() const
+{
+    SA_DC(d);
+    return d->enableIconRightText;
 }
 
 /**
