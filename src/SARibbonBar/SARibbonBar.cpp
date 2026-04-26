@@ -540,6 +540,24 @@ bool SARibbonBar::isCompactStyle(RibbonStyles s)
 
 /**
  * \if ENGLISH
+ * @brief Check if the ribbon style is single-row mode
+ * @param s Ribbon style
+ * @return true if it's single-row style
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 判断样式是否为单行模式
+ * @param s ribbon样式
+ * @return 单行返回true
+ * \endif
+ */
+bool SARibbonBar::isSingleRowStyle(RibbonStyles s)
+{
+    return s.testFlag(SARibbonBar::RibbonStyleSingleRow);
+}
+
+/**
+ * \if ENGLISH
  * @brief Get version information
  * @return {SA_RIBBON_BAR_VERSION_MAJ}.{SA_RIBBON_BAR_VERSION_MIN}.{SA_RIBBON_BAR_VERSION_PAT}
  * \endif
@@ -2404,6 +2422,11 @@ bool SARibbonBar::isLooseStyle() const
 bool SARibbonBar::isCompactStyle() const
 {
     return (SARibbonBar::isCompactStyle(currentRibbonStyle()));
+}
+
+bool SARibbonBar::isSingleRowStyle() const
+{
+    return isSingleRowStyle(currentRibbonStyle());
 }
 
 /**
