@@ -361,6 +361,14 @@ void MainWindow::createRibbonApplicationButton()
             createAction(tr("Compact Two Row"), ":/icon/icon/layout.svg", "actionStyleCompactTwoRow");
         connect(mActionStyleCompactTwoRow, &QAction::triggered, this, &MainWindow::onSetStyleCompactTwoRow);
         menuStyle->addAction(mActionStyleCompactTwoRow);
+
+        mActionStyleLooseSingleRow = createAction(tr("Loose Single Row"), ":/icon/icon/layout.svg", "actionStyleLooseSingleRow");
+        connect(mActionStyleLooseSingleRow, &QAction::triggered, this, &MainWindow::onSetStyleLooseSingleRow);
+        menuStyle->addAction(mActionStyleLooseSingleRow);
+
+        mActionStyleCompactSingleRow = createAction(tr("Compact Single Row"), ":/icon/icon/layout.svg", "actionStyleCompactSingleRow");
+        connect(mActionStyleCompactSingleRow, &QAction::triggered, this, &MainWindow::onSetStyleCompactSingleRow);
+        menuStyle->addAction(mActionStyleCompactSingleRow);
     }
     SARibbonApplicationButton* ribbonAppBtn = qobject_cast< SARibbonApplicationButton* >(applicationButton);
     if (!ribbonAppBtn) {
@@ -454,6 +462,22 @@ void MainWindow::onStyleClicked(int styleId)
                "and whether the title bar is displayed through SARibbonBar::setEnableShowPanelTitle")
         );
         ui->textBrowser->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::RibbonStyleCompactTwoRow);"));
+        break;
+    case SARibbonBar::RibbonStyleLooseSingleRow:
+        ui->textBrowser->append(
+            tr("\nThe \"LooseSingleRow\" style is an ultra-compact single-row layout "
+               "with icon-right-text display, no panel titles, and no gallery scroll buttons. "
+               "This mimics the Outlook 2025/OneNote 2025 ribbon interface.")
+        );
+        ui->textBrowser->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::RibbonStyleLooseSingleRow);"));
+        break;
+    case SARibbonBar::RibbonStyleCompactSingleRow:
+        ui->textBrowser->append(
+            tr("\nThe \"CompactSingleRow\" style is an ultra-compact single-row layout "
+               "with icon-right-text display, no panel titles, and no gallery scroll buttons. "
+               "This mimics the Outlook 2025/OneNote 2025 ribbon interface in compact mode.")
+        );
+        ui->textBrowser->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::RibbonStyleCompactSingleRow);"));
         break;
     default:
         break;
@@ -1919,6 +1943,22 @@ void MainWindow::createCategoryMain(SARibbonCategory* categoryPage)
     panelStyle->addSmallWidget(radioWps2RowStyle);
     styleButtonGroup->addButton(radioWps2RowStyle, SARibbonBar::RibbonStyleCompactTwoRow);
 
+    QRadioButton* radioLooseSingleRowStyle = new QRadioButton();
+    radioLooseSingleRowStyle->setObjectName("use loose single row style");
+    radioLooseSingleRowStyle->setText(tr("use loose single row style"));
+    radioLooseSingleRowStyle->setWindowTitle(radioLooseSingleRowStyle->text());
+    radioLooseSingleRowStyle->setChecked(false);
+    panelStyle->addSmallWidget(radioLooseSingleRowStyle);
+    styleButtonGroup->addButton(radioLooseSingleRowStyle, SARibbonBar::RibbonStyleLooseSingleRow);
+
+    QRadioButton* radioCompactSingleRowStyle = new QRadioButton();
+    radioCompactSingleRowStyle->setObjectName("use compact single row style");
+    radioCompactSingleRowStyle->setText(tr("use compact single row style"));
+    radioCompactSingleRowStyle->setWindowTitle(radioCompactSingleRowStyle->text());
+    radioCompactSingleRowStyle->setChecked(false);
+    panelStyle->addSmallWidget(radioCompactSingleRowStyle);
+    styleButtonGroup->addButton(radioCompactSingleRowStyle, SARibbonBar::RibbonStyleCompactSingleRow);
+
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     connect(styleButtonGroup, static_cast< void (QButtonGroup::*)(int) >(&QButtonGroup::idClicked), this, &MainWindow::onStyleClicked);
 #else
@@ -3184,4 +3224,46 @@ void MainWindow::onSetStyleCompactTwoRow()
 {
     ribbonBar()->setRibbonStyle(SARibbonBar::RibbonStyleCompactTwoRow);
     ui->textBrowser->append(tr("Ribbon style set to Compact Two Row"));
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set ribbon style to Loose Single Row
+ * @details Sets the ribbon style to Loose Single Row mode, which is an ultra-compact single-row layout
+ *          with icon-right-text display, no panel titles, and no gallery scroll buttons.
+ *          This mimics the Outlook 2025/OneNote 2025 ribbon interface.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置Ribbon样式为宽松单行
+ * @details 将Ribbon样式设置为宽松单行模式，这是一种超紧凑的单行布局，
+ *          图标在左文字在右显示，无面板标题，无图库滚动按钮。
+ *          模仿Outlook 2025/OneNote 2025功能区界面。
+ * \endif
+ */
+void MainWindow::onSetStyleLooseSingleRow()
+{
+    ribbonBar()->setRibbonStyle(SARibbonBar::RibbonStyleLooseSingleRow);
+    ui->textBrowser->append(tr("Ribbon style set to Loose Single Row"));
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set ribbon style to Compact Single Row
+ * @details Sets the ribbon style to Compact Single Row mode, which is an ultra-compact single-row layout
+ *          with icon-right-text display, no panel titles, and no gallery scroll buttons.
+ *          This mimics the Outlook 2025/OneNote 2025 ribbon interface in compact mode.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置Ribbon样式为紧凑单行
+ * @details 将Ribbon样式设置为紧凑单行模式，这是一种超紧凑的单行布局，
+ *          图标在左文字在右显示，无面板标题，无图库滚动按钮。
+ *          模仿紧凑模式下的Outlook 2025/OneNote 2025功能区界面。
+ * \endif
+ */
+void MainWindow::onSetStyleCompactSingleRow()
+{
+    ribbonBar()->setRibbonStyle(SARibbonBar::RibbonStyleCompactSingleRow);
+    ui->textBrowser->append(tr("Ribbon style set to Compact Single Row"));
 }

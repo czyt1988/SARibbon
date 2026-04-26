@@ -349,6 +349,10 @@ private Q_SLOTS:
 
     // Set ribbon style - Compact Two Row
     void onSetStyleCompactTwoRow();
+    // Set ribbon style - Loose Single Row
+    void onSetStyleLooseSingleRow();
+    // Set ribbon style - Compact Single Row
+    void onSetStyleCompactSingleRow();
 
 protected:
     // Handles the close event for the main window
@@ -394,6 +398,8 @@ private:
     QAction* mActionStyleLooseTwoRow { nullptr };          ///< Action for setting style to Loose Two Row
     QAction* mActionStyleCompactThreeRow { nullptr };      ///< Action for setting style to Compact Three Row
     QAction* mActionStyleCompactTwoRow { nullptr };        ///< Action for setting style to Compact Two Row
+    QAction* mActionStyleLooseSingleRow { nullptr };       ///< Action for setting style to Loose Single Row
+    QAction* mActionStyleCompactSingleRow { nullptr };     ///< Action for setting style to Compact Single Row
     Ui::MainWindow* ui;                                   ///< UI form pointer (Qt Designer generated)
 };
 
