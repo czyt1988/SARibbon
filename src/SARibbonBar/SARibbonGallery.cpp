@@ -35,6 +35,7 @@ public:
     SARibbonGalleryGroup* mCurrentViewportGroup { nullptr };
     QBoxLayout* mButtonLayout { nullptr };
     QBoxLayout* mLayout { nullptr };
+    bool mSingleRowMode { false };
     PrivateData(SARibbonGallery* p) : q_ptr(p)
     {
     }
@@ -566,6 +567,61 @@ void SARibbonGallery::setGalleryButtonMaximumWidth(int w)
 }
 
 /**
+ * \if ENGLISH
+ * @brief Set single-row display mode for gallery
+ * @param on True to enable single-row mode, false to restore normal mode
+ * @details In single-row mode, the scroll up/down buttons are hidden and only the dropdown
+ *          "more" button remains visible. The button layout direction changes from vertical
+ *          (TopToBottom) to horizontal (LeftToRight or RightToLeft depending on layout direction),
+ *          so the dropdown button sits beside the gallery content instead of stacked vertically.
+ *          When disabled, all three buttons are shown and the layout direction is restored to
+ *          TopToBottom.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置图库的单行显示模式
+ * @param on true启用单行模式，false恢复普通模式
+ * @details 在单行模式下，上翻和下翻按钮被隐藏，仅保留下拉"更多"按钮可见。
+ *          按钮布局方向从垂直（TopToBottom）变为水平（LeftToRight或RightToLeft，取决于布局方向），
+ *          使下拉按钮与图库内容并排显示而非垂直堆叠。
+ *          禁用时，恢复显示三个按钮并将布局方向恢复为TopToBottom。
+ * \endif
+ */
+void SARibbonGallery::setSingleRowMode(bool on)
+{
+    d_ptr->mSingleRowMode = on;
+    if (on) {
+        d_ptr->mButtonUp->setVisible(false);
+        d_ptr->mButtonDown->setVisible(false);
+        d_ptr->mButtonMore->setVisible(true);
+        QBoxLayout::Direction buttonDir = SA::saIsRTL() ? QBoxLayout::RightToLeft : QBoxLayout::LeftToRight;
+        d_ptr->mButtonLayout->setDirection(buttonDir);
+    } else {
+        d_ptr->mButtonUp->setVisible(true);
+        d_ptr->mButtonDown->setVisible(true);
+        d_ptr->mButtonMore->setVisible(true);
+        d_ptr->mButtonLayout->setDirection(QBoxLayout::TopToBottom);
+    }
+    d_ptr->mButtonLayout->update();
+}
+
+/**
+ * \if ENGLISH
+ * @brief Check if gallery is in single-row mode
+ * @return True if single-row mode is active, false otherwise
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 检查图库是否处于单行模式
+ * @return 如果单行模式激活则返回true，否则返回false
+ * \endif
+ */
+bool SARibbonGallery::isSingleRowMode() const
+{
+    return d_ptr->mSingleRowMode;
+}
+
+/**
  * @brief 上翻页
  */
 /**
@@ -769,6 +825,11 @@ void SARibbonGallery::changeEvent(QEvent* event)
     if (event->type() == QEvent::LayoutDirectionChange) {
         QBoxLayout::Direction layoutDir = SA::saIsRTL() ? QBoxLayout::LeftToRight : QBoxLayout::RightToLeft;
         d_ptr->mLayout->setDirection(layoutDir);
+        if (d_ptr->mSingleRowMode) {
+            QBoxLayout::Direction buttonDir = SA::saIsRTL() ? QBoxLayout::RightToLeft : QBoxLayout::LeftToRight;
+            d_ptr->mButtonLayout->setDirection(buttonDir);
+            d_ptr->mButtonLayout->update();
+        }
         if (d_ptr->mPopupWidget) {
             d_ptr->mPopupWidget->update();
         }

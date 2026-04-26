@@ -101,6 +101,10 @@ public:
 public:
     /// Set the maximum width for gallery control buttons (default 15)
     static void setGalleryButtonMaximumWidth(int w);
+    /// Set single-row display mode for gallery
+    void setSingleRowMode(bool on);
+    /// Check if gallery is in single-row mode
+    bool isSingleRowMode() const;
 Q_SIGNALS:
     /**
      * \if ENGLISH

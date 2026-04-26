@@ -1889,26 +1889,6 @@ bool SARibbonPanel::isEnableIconRightText() const
     SA_DC(d);
     return d->enableIconRightText;
 }
-}
-
-/**
- * \if ENGLISH
- * @brief Checks if the panel's text allows line wrapping
- * @return true if word wrapping is enabled for button text, false otherwise
- * \endif
- *
- * \if CHINESE
- * @brief 判断panel的文字是否允许换行
- * @return 如果按钮文字换行已启用返回true，否则返回false
- * \endif
- */
-bool SARibbonPanel::isEnableWordWrap() const
-{
-    if (SARibbonPanelLayout* lay = qobject_cast< SARibbonPanelLayout* >(layout())) {
-        return lay->isEnableWordWrap();
-    }
-    return false;
-}
 
 /**
  * \if ENGLISH

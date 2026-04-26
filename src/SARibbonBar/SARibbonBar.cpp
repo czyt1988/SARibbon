@@ -2804,8 +2804,7 @@ void SARibbonBar::setPanelTitleHeight(int h)
  */
 bool SARibbonBar::isEnableShowPanelTitle() const
 {
-    return d_ptr->mEnableShowPanelTitle;
-    bool mEnableIconRightText { false };                         ///< 鏄惁鍚敤鍥炬爣鍙充晶鏂囧瓧妯″紡
+return d_ptr->mEnableShowPanelTitle;
 }
 
 /**
@@ -2848,10 +2847,10 @@ void SARibbonBar::setEnableShowPanelTitle(bool on)
 void SARibbonBar::setEnableIconRightText(bool on)
 {
     SA_D(d);
-    if (d->enableIconRightText == on) {
+    if (d->mEnableIconRightText == on) {
         return;
     }
-    d->enableIconRightText = on;
+    d->mEnableIconRightText = on;
     iterateCategory([on](SARibbonCategory* cat) {
         cat->setEnableIconRightText(on);
         return true;
@@ -2873,7 +2872,7 @@ void SARibbonBar::setEnableIconRightText(bool on)
 bool SARibbonBar::isEnableIconRightText() const
 {
     SA_DC(d);
-    return d->enableIconRightText;
+    return d->mEnableIconRightText;
 }
 
 /**

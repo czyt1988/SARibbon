@@ -411,28 +411,32 @@ public:
 
     /**
      * \if ENGLISH
-     * @brief Calculate category height
-     * @note 1.6 line height is close to Office's height
+     * @brief Calculate category height based on current ribbon style
+     * @note 1.6 line height is close to Office's height.
+     *       SingleRow mode has no panel title, so panelTitleHeight is not added.
      * @return The calculated category height
      * \endif
-     * 
+     *
      * \if CHINESE
-     * @brief 估算类别的高度
-     * @note 经过对照，1.6行高和office的高度比较接近
+     * @brief 根据当前Ribbon风格估算类别的高度
+     * @note 经过对照，1.6行高和office的高度比较接近。
+     *       SingleRow模式下面板标题隐藏，因此不添加panelTitleHeight。
      * @return 计算出的类别高度
      * \endif
      */
     int calcCategoryHeight()
     {
-        int textH = ribbonBar->fontMetrics().lineSpacing();  // Use lineSpacing for better handling of wrapped text
+        int textH = ribbonBar->fontMetrics().lineSpacing();
         if (ribbonBar->isThreeRowStyle()) {
-            // 5.5 = (3*1.6+1) for three rows, 1 reserved for panel title
+            // 4.8 = 3*1.6 for three rows
             return textH * 4.8 + panelTitleHeight;
+        } else if (ribbonBar->isSingleRowStyle()) {
+            // 1.6 for single row, no panel title in single-row mode
+            return textH * 1.6;
         } else {
-            // 3 = 2*1.6 for two rows
+            // 3.2 = 2*1.6 for two rows
             return textH * 3.2 + panelTitleHeight;
         }
-        return (textH * 4.8 + panelTitleHeight);
     }
 
     /**

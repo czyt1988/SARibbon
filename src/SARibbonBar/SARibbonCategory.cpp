@@ -1018,22 +1018,6 @@ void SARibbonCategory::setEnableWordWrap(bool on)
 
 /**
  * \if ENGLISH
- * @brief Determine whether the text of panel is allowed to wrap
- * @return True if text wrapping is enabled, false otherwise
- * \endif
- *
- * \if CHINESE
- * @brief 判断 panel 的文字是否允许换行
- * @return 如果启用文字换行返回 true，否则返回 false
- * \endif
- */
-bool SARibbonCategory::isEnableWordWrap() const
-{
-    return d_ptr->enableWordWrap;
-}
-
-/**
- * \if ENGLISH
  * @brief Set whether button text is displayed to the right of the icon
  * @param on If true, all toolbuttons in panels will show text to the right of icon
  * @details This cascades to all panels in this category
@@ -1072,11 +1056,7 @@ void SARibbonCategory::setEnableIconRightText(bool on)
 bool SARibbonCategory::isEnableIconRightText() const
 {
     SA_DC(d);
-    return d->enableIconRightText;
-}
-        return true;
-    });
-    updateGeometry();
+return d->enableIconRightText;
 }
 
 /**
