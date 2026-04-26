@@ -1590,6 +1590,10 @@ int SARibbonPanel::panelHeightHint(const QFontMetrics& fm, PanelLayoutMode layMo
         // 3=2*1.6
         return textH * 3.2 + panelTitleHeight;
     } break;
+    case SARibbonPanel::SingleRowMode: {
+        // Single row: 1.6x text height, no panel title (hidden by default)
+        return textH * 1.6;
+    } break;
     default: {
         qWarning() << "unknow SARibbonPanel::PanelLayoutMode:" << layMode;
     }

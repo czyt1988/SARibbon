@@ -2278,11 +2278,26 @@ void SARibbonBar::setRibbonStyle(SARibbonBar::RibbonStyles v)
              << "\n  isCompactStyle=" << isCompactStyle()    //
         ;
 #endif
-    // 执行判断
-    setEnableWordWrap(isThreeRowStyle(v));
-    setTabOnTitle(isCompactStyle());
-    setEnableShowPanelTitle(isThreeRowStyle(v));
-    setPanelLayoutMode(isThreeRowStyle(v) ? SARibbonPanel::ThreeRowMode : SARibbonPanel::TwoRowMode);
+    // 执行判断——SingleRow需优先判断，因其不含ThreeRow/TwoRow位标记
+    if (isSingleRowStyle(v)) {
+        setEnableWordWrap(false);
+        setTabOnTitle(isCompactStyle());
+        setEnableShowPanelTitle(false);
+        setPanelLayoutMode(SARibbonPanel::SingleRowMode);
+        setEnableIconRightText(true);
+    } else if (isThreeRowStyle(v)) {
+        setEnableWordWrap(true);
+        setTabOnTitle(isCompactStyle());
+        setEnableShowPanelTitle(true);
+        setPanelLayoutMode(SARibbonPanel::ThreeRowMode);
+        setEnableIconRightText(false);
+    } else {
+        setEnableWordWrap(false);
+        setTabOnTitle(isCompactStyle());
+        setEnableShowPanelTitle(false);
+        setPanelLayoutMode(SARibbonPanel::TwoRowMode);
+        setEnableIconRightText(false);
+    }
 
     // 此函数会调用setFixedHeight
     synchronousCategoryData(false);  // 这里不急着刷新，下面会继续刷新

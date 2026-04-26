@@ -708,7 +708,9 @@ void SARibbonPanelLayout::updateGeomArray(const QRect& setrect)
     }
     // 获取panel的布局模式 3行或者2行
     //  rowcount 是ribbon的行，有2行和3行两种
-    const short rowCount = (panel->panelLayoutMode() == SARibbonPanel::ThreeRowMode) ? 3 : 2;
+    const short rowCount = (panel->panelLayoutMode() == SARibbonPanel::ThreeRowMode) ? 3
+                      : (panel->panelLayoutMode() == SARibbonPanel::TwoRowMode) ? 2
+                      : 1;
     // largeHeight是对应large占比的高度
     const int largeHeight = qMax(height - mag.bottom() - mag.top() - titleH - titleSpace, 2);  // 大按钮高度不小于2
 
@@ -753,6 +755,19 @@ void SARibbonPanelLayout::updateGeomArray(const QRect& setrect)
             columMaxWidth = 0;
         }
         QSize hint = item->sizeHint();
+        // SingleRowMode：所有item在同一行，横向排列
+        if (1 == rowCount) {
+            item->rowIndex            = 0;
+            item->columnIndex         = column;
+            item->itemWillSetGeometry = QRect(x, yBegin, hint.width(), smallHeight);
+            columMaxWidth             = hint.width();
+            x += (columMaxWidth + spacing);
+            row           = 0;
+            columMaxWidth = 0;
+            ++column;
+            lastGeomItem = item;
+            continue;
+        }
 #if SARibbonPanelLayout_DEBUG_PRINT
         if (SARibbonToolButton* tb = qobject_cast< SARibbonToolButton* >(item->widget())) {
             auto ss__ = tb->sizeHint();
