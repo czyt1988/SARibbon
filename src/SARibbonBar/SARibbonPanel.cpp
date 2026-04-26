@@ -64,9 +64,10 @@ public:
 
 public:
     bool m_isCanCustomize { true };                                                    ///< 记录是否可自定义
-    SARibbonPanel::PanelLayoutMode m_panelLayoutMode { SARibbonPanel::ThreeRowMode };  ///< panel的布局模式，默认为3行模式ThreeRowMode
-    SARibbonPanelOptionButton* m_optionActionButton { nullptr };                       ///< 标题栏的y距离
+    SARibbonPanel::PanelLayoutMode m_panelLayoutMode { SARibbonPanel::ThreeRowMode };  ///< panel 的布局模式，默认为 3 行模式 ThreeRowMode
+    SARibbonPanelOptionButton* m_optionActionButton { nullptr };                       ///< 标题栏的 y 距离
     SARibbonPanelLabel* m_label { nullptr };
+    bool enableIconRightText { false };                                                ///< 是否启用图标右侧文字模式
 };
 
 SARibbonPanel::PrivateData::PrivateData(SARibbonPanel* p) : q_ptr(p)
@@ -1807,8 +1808,8 @@ SARibbonPanelLabel* SARibbonPanel::titleLabel() const
  * \endif
  *
  * \if CHINESE
- * @brief 设置panel的按钮文字允许换行
- * @param on 如果为true，启用按钮文字换行
+ * @brief 设置 panel 的按钮文字允许换行
+ * @param on 如果为 true，启用按钮文字换行
  * \endif
  */
 void SARibbonPanel::setEnableWordWrap(bool on)
@@ -1818,6 +1819,72 @@ void SARibbonPanel::setEnableWordWrap(bool on)
         lay->setEnableWordWrap(on);
         updateGeometry();
     }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Checks if the panel's text allows line wrapping
+ * @return true if word wrapping is enabled for button text, false otherwise
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 判断 panel 的文字是否允许换行
+ * @return 如果按钮文字换行已启用返回 true，否则返回 false
+ * \endif
+ */
+bool SARibbonPanel::isEnableWordWrap() const
+{
+    if (SARibbonPanelLayout* lay = qobject_cast< SARibbonPanelLayout* >(layout())) {
+        return lay->isEnableWordWrap();
+    }
+    return false;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set whether button text is displayed to the right of the icon
+ * @param on If true, all toolbuttons will show text to the right of icon
+ * @details This cascades to all SARibbonToolButton widgets in this panel.
+ *           When enabled, Large buttons are rendered with horizontal layout
+ *           (icon-left, text-right) instead of the default vertical layout.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置按钮文字是否显示在图标右侧
+ * @param on 如果为 true，所有 toolbutton 将显示图标在左、文字在右
+ * @details 此属性会级联传递到 panel 中所有 SARibbonToolButton。
+ *           启用时，Large 按钮使用水平布局（图标左、文字右）代替默认的垂直布局。
+ * \endif
+ */
+void SARibbonPanel::setEnableIconRightText(bool on)
+{
+    SA_D(d);
+    if (d->enableIconRightText == on) {
+        return;
+    }
+    d->enableIconRightText = on;
+    iterateButton([on](SARibbonToolButton* btn) {
+        btn->setEnableIconRightText(on);
+        return true;
+    });
+}
+
+/**
+ * \if ENGLISH
+ * @brief Check if icon-right-text mode is enabled
+ * @return true if icon-right-text mode is enabled
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 检查图标右侧文字模式是否启用
+ * @return 如果启用图标右侧文字模式返回 true
+ * \endif
+ */
+bool SARibbonPanel::isEnableIconRightText() const
+{
+    SA_DC(d);
+    return d->enableIconRightText;
+}
 }
 
 /**

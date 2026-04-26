@@ -318,6 +318,11 @@ public:
     /// Check if word wrap is enabled
     bool isEnableWordWrap() const;
 
+    /// Set whether button text is displayed to the right of the icon
+    void setEnableIconRightText(bool on);
+    /// Check if icon-right-text mode is enabled
+    bool isEnableIconRightText() const;
+
     /// Maximum aspect ratio of buttons, this coefficient determines the maximum width of buttons
     qreal buttonMaximumAspectRatio() const;
 

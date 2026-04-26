@@ -171,6 +171,9 @@ public:
     /// Check if panel text word wrap is enabled
     bool isEnableWordWrap() const;
 
+    /// Check if icon-right-text mode is enabled
+    bool isEnableIconRightText() const;
+
     /// Get button maximum aspect ratio
     qreal buttonMaximumAspectRatio() const;
 
@@ -200,6 +203,9 @@ protected:
 
     /// Set whether panel button text word wrap is enabled
     void setEnableWordWrap(bool on);
+
+    /// Set whether button text is displayed to the right of the icon
+    void setEnableIconRightText(bool on);
 
     /// Set button maximum aspect ratio
     void setButtonMaximumAspectRatio(qreal fac = 1.4);

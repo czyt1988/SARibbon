@@ -58,8 +58,9 @@ public:
     int panelSpacing { 0 };                         ///< panel的spacing
     bool isUseAnimating { true };                   ///< 默认使用动画滚动
     bool enableWordWrap { true };                   ///< 是否文字换行
-    QSize panelSmallToolButtonIconSize { 20, 20 };  ///< 记录panel的默认小图标大小
-    QSize panelLargeToolButtonIconSize { 32, 32 };  ///< 记录panel的默认大图标大小
+    bool enableIconRightText { false };             ///< 是否启用图标右侧文字模式
+    QSize panelSmallToolButtonIconSize { 20, 20 };  ///< 记录 panel 的默认小图标大小
+    QSize panelLargeToolButtonIconSize { 32, 32 };  ///< 记录 panel 的默认大图标大小
     int wheelScrollStep { 400 };                    ///< 默认滚轮滚动步长
     qreal buttonMaximumAspectRatio { 1.4 };         ///< 按钮最大宽高比，这个系数决定按钮的最大宽度
     SARibbonPanel::PanelLayoutMode defaultPanelLayoutMode { SARibbonPanel::ThreeRowMode };
@@ -120,6 +121,7 @@ void SARibbonCategory::PrivateData::insertPanel(int index, SARibbonPanel* panel)
     panel->setSpacing(this->panelSpacing);
     panel->setToolButtonIconSize(this->panelSmallToolButtonIconSize, this->panelLargeToolButtonIconSize);
     panel->setEnableWordWrap(this->enableWordWrap);
+    panel->setEnableIconRightText(this->enableIconRightText);
 
     index = qMax(0, index);
     index = qMin(lay->panelCount(), index);
@@ -998,8 +1000,8 @@ bool SARibbonCategory::isEnableWordWrap() const
  * \endif
  *
  * \if CHINESE
- * @brief 设置panel的按钮文字允许换行
- * @param on 为true启用文字换行，为false禁用
+ * @brief 设置 panel 的按钮文字允许换行
+ * @param on 为 true 启用文字换行，为 false 禁用
  * \endif
  */
 void SARibbonCategory::setEnableWordWrap(bool on)
@@ -1009,6 +1011,69 @@ void SARibbonCategory::setEnableWordWrap(bool on)
         if (panel) {
             panel->setEnableWordWrap(on);
         }
+        return true;
+    });
+    updateGeometry();
+}
+
+/**
+ * \if ENGLISH
+ * @brief Determine whether the text of panel is allowed to wrap
+ * @return True if text wrapping is enabled, false otherwise
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 判断 panel 的文字是否允许换行
+ * @return 如果启用文字换行返回 true，否则返回 false
+ * \endif
+ */
+bool SARibbonCategory::isEnableWordWrap() const
+{
+    return d_ptr->enableWordWrap;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set whether button text is displayed to the right of the icon
+ * @param on If true, all toolbuttons in panels will show text to the right of icon
+ * @details This cascades to all panels in this category
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置按钮文字是否显示在图标右侧
+ * @param on 如果为 true，所有 panel 中的 toolbutton 将显示图标在左、文字在右
+ * @details 此属性会级联传递到所有 panel
+ * \endif
+ */
+void SARibbonCategory::setEnableIconRightText(bool on)
+{
+    SA_D(d);
+    if (d->enableIconRightText == on) {
+        return;
+    }
+    d->enableIconRightText = on;
+    iteratePanel([on](SARibbonPanel* panel) {
+        panel->setEnableIconRightText(on);
+        return true;
+    });
+}
+
+/**
+ * \if ENGLISH
+ * @brief Check if icon-right-text mode is enabled
+ * @return true if icon-right-text mode is enabled
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 检查图标右侧文字模式是否启用
+ * @return 如果启用图标右侧文字模式返回 true
+ * \endif
+ */
+bool SARibbonCategory::isEnableIconRightText() const
+{
+    SA_DC(d);
+    return d->enableIconRightText;
+}
         return true;
     });
     updateGeometry();
