@@ -230,11 +230,14 @@ public:
     QSize realIconSize() const;
     // 仅仅对\n进行剔除，和QString::simplified不一样
     static QString simplifiedForRibbonButton(const QString& str);
+    // 获取有效的按钮类型（当enableIconRightText为true时，强制返回SmallButton）
+    SARibbonToolButton::RibbonButtonType effectiveButtonType() const;
 
 public:
     bool mMouseOnSubControl { false };  ///< 这个用于标记MenuButtonPopup模式下，鼠标在文本区域
     bool mMenuButtonPressed { false };  ///< 由于Indicator改变，因此hitButton不能用QToolButton的hitButton
     bool mWordWrap { true };            ///< 标记是否文字换行 @default false
+    bool enableIconRightText { false }; ///< 是否启用图标右侧文字模式
     SARibbonToolButton::RibbonButtonType mButtonType { SARibbonToolButton::LargeButton };
     int mSpacing { SARibbonToolButtonConstants::DEFAULT_SPACING };                   ///< 按钮和边框的距离
     int mIndicatorLen { SARibbonToolButtonConstants::DEFAULT_INDICATOR_LEN_LARGE };  ///< Indicator的长度
@@ -265,6 +268,14 @@ SARibbonToolButton::PrivateData::PrivateData(SARibbonToolButton* p) : q_ptr(p)
     mStyle = std::make_unique< SARibbonToolButtonProxyStyle >();
 }
 
+SARibbonToolButton::RibbonButtonType SARibbonToolButton::PrivateData::effectiveButtonType() const
+{
+    if (enableIconRightText) {
+        return SARibbonToolButton::SmallButton;
+    }
+    return mButtonType;
+}
+
 /**
  * @brief 根据鼠标的位置更新状态，主要用于判断鼠标是否位于subcontrol
  *
@@ -274,7 +285,7 @@ SARibbonToolButton::PrivateData::PrivateData(SARibbonToolButton* p) : q_ptr(p)
 void SARibbonToolButton::PrivateData::updateStatusByMousePosition(const QPoint& pos)
 {
     bool isMouseOnSubControl(false);
-    if (SARibbonToolButton::LargeButton == mButtonType) {
+    if (SARibbonToolButton::LargeButton == effectiveButtonType()) {
         isMouseOnSubControl = mDrawTextRect.united(mDrawIndicatorArrowRect).contains(pos);
     } else {
         // 小按钮模式就和普通toolbutton一样
@@ -309,7 +320,7 @@ void SARibbonToolButton::PrivateData::updateDrawRect(const QStyleOptionToolButto
     // 先更新IndicatorLen
     mIndicatorLen = q_ptr->style()->pixelMetric(QStyle::PM_MenuButtonIndicator, &opt, q_ptr);
     if (mIndicatorLen < 3) {
-        if (SARibbonToolButton::LargeButton == mButtonType) {
+        if (SARibbonToolButton::LargeButton == effectiveButtonType()) {
             mIndicatorLen = SARibbonToolButtonConstants::DEFAULT_INDICATOR_LEN_LARGE;
         } else {
             mIndicatorLen = SARibbonToolButtonConstants::DEFAULT_INDICATOR_LEN_SMALL;
@@ -343,7 +354,7 @@ void SARibbonToolButton::PrivateData::calcDrawRects(const QStyleOptionToolButton
                                                     int spacing,
                                                     int indicatorLen) const
 {
-    if (SARibbonToolButton::LargeButton == mButtonType) {
+    if (SARibbonToolButton::LargeButton == effectiveButtonType()) {
         calcLargeButtonDrawRects(opt, iconRect, textRect, indicatorArrowRect, spacing, indicatorLen);
 
     } else {
@@ -739,7 +750,7 @@ bool SARibbonToolButton::PrivateData::hasIndicator(const QStyleOptionToolButton&
  */
 QSize SARibbonToolButton::PrivateData::calcSizeHint(const QStyleOptionToolButton& opt)
 {
-    if (SARibbonToolButton::LargeButton == mButtonType) {
+    if (SARibbonToolButton::LargeButton == effectiveButtonType()) {
         return calcLargeButtonSizeHint(opt);
     }
     return calcSmallButtonSizeHint(opt);
@@ -834,7 +845,7 @@ QSize SARibbonToolButton::PrivateData::calcLargeButtonSizeHint(const QStyleOptio
  */
 int SARibbonToolButton::PrivateData::calcTextDrawRectHeight(const QStyleOptionToolButton& opt) const
 {
-    if (SARibbonToolButton::LargeButton == mButtonType) {
+    if (SARibbonToolButton::LargeButton == effectiveButtonType()) {
         if (q_ptr->isEnableWordWrap()) {
             return opt.fontMetrics.lineSpacing() * layoutFactor.twoLineHeightFactor + opt.fontMetrics.leading();
         } else {
@@ -965,7 +976,7 @@ int SARibbonToolButton::PrivateData::getTextAlignment() const
         return Qt::TextShowMnemonic | Qt::AlignCenter;
     }
 
-    if (SARibbonToolButton::LargeButton == mButtonType) {
+    if (SARibbonToolButton::LargeButton == effectiveButtonType()) {
         return Qt::TextShowMnemonic
                | (q_ptr->isEnableWordWrap() ? (Qt::TextWordWrap | Qt::AlignTop | Qt::AlignHCenter) : Qt::AlignCenter);
     }
@@ -988,7 +999,7 @@ bool SARibbonToolButton::PrivateData::isTextNeedWrap() const
  */
 QSize SARibbonToolButton::PrivateData::realIconSize() const
 {
-    if (mButtonType == SARibbonToolButton::LargeButton) {
+    if (effectiveButtonType() == SARibbonToolButton::LargeButton) {
         return mLargeButtonSizeHint;
     }
     return q_ptr->smallIconSize();
@@ -1291,6 +1302,54 @@ bool SARibbonToolButton::isEnableWordWrap() const
 }
 
 /**
+ * \if ENGLISH
+ * @brief Set whether text is displayed to the right of the icon
+ * @param on If true, the button uses horizontal layout (icon-left, text-right),
+ *           regardless of the current RibbonButtonType.
+ *           When false, the button uses the default layout based on RibbonButtonType.
+ * @details When this mode is enabled, LargeButton type buttons are rendered with
+ *           the SmallButton horizontal layout strategy. The button's mButtonType
+ *           remains unchanged internally.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置文字是否显示在图标右侧
+ * @param on 如果为true，按钮使用水平布局（图标在左，文字在右），
+ *           不受当前RibbonButtonType的影响。
+ *           当为false时，按钮根据RibbonButtonType使用默认布局。
+ * @details 启用此模式时，LargeButton类型的按钮使用SmallButton的水平布局策略渲染。
+ *           按钮的mButtonType在内部保持不变。
+ * \endif
+ */
+void SARibbonToolButton::setEnableIconRightText(bool on)
+{
+    SA_D(d);
+    if (d->enableIconRightText == on) {
+        return;
+    }
+    d->enableIconRightText = on;
+    // When enableIconRightText changes, update size policy to match effective type
+    if (on) {
+        // Force horizontal layout - use SmallButton-style size policy
+        setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
+    } else {
+        // Restore size policy based on actual button type
+        if (LargeButton == d->mButtonType) {
+            setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Expanding);
+        } else {
+            setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
+        }
+    }
+    invalidateSizeHint();
+}
+
+bool SARibbonToolButton::isEnableIconRightText() const
+{
+    SA_DC(d);
+    return d->enableIconRightText;
+}
+
+/**
  * @brief Sets the button's maximum aspect ratio (width/height) / 设置按钮的最大宽高比
  *
  * This is a convenience function that directly sets the `buttonMaximumAspectRatio` member of the `LayoutFactor`
@@ -1543,7 +1602,7 @@ void SARibbonToolButton::paintButton(QPainter& p, const QStyleOptionToolButton& 
     if ((opt.subControls & QStyle::SC_ToolButton) && (opt.features & QStyleOptionToolButton::MenuButtonPopup)) {
         if (opt.state & QStyle::State_MouseOver) {                       // 鼠标在按钮上才进行绘制
             if (!(opt.activeSubControls & QStyle::SC_ToolButtonMenu)) {  // 按钮的菜单弹出时不做处理
-                if (LargeButton == d_ptr->mButtonType) {                 // 大按钮模式
+                if (LargeButton == d_ptr->effectiveButtonType()) {                 // 大按钮模式
                     if (d_ptr->mMouseOnSubControl) {                     // 此时鼠标在indecater那
                         // 鼠标在文字区，把图标显示为正常（就是鼠标不放上去的状态）
                         tool.rect = d_ptr->mDrawIconRect;
@@ -1653,7 +1712,7 @@ void SARibbonToolButton::paintText(QPainter& p, const QStyleOptionToolButton& op
         alignment |= Qt::TextHideMnemonic;
     }
     QString text;
-    if (isSmallRibbonButton()) {
+    if (d_ptr->effectiveButtonType() == SARibbonToolButton::SmallButton) {
         text = opt.fontMetrics.elidedText(
             PrivateData::simplifiedForRibbonButton(opt.text), Qt::ElideRight, textDrawRect.width(), alignment);
     } else {
