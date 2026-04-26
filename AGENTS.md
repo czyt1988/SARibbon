@@ -1,106 +1,56 @@
 # SARibbon开发要求
 
+
+## 项目概述
+
+- 项目仓库：[github](https://github.com/czyt1988/SARibbon),[gitee](https://gitee.com/czyt1988/SARibbon)
+- 源码文件位置：`src/SARibbonBar`
+- 项目文档位置: `docs/zh`
+- 核心头文件: `src/SARibbonBar/SARibbonGlobal.h`（包含SA_RIBBON_EXPORT、SA_RIBBON_DECLARE_PRIVATE等宏定义）
+
 **注意**：
 - `src/SARibbon.cpp`和`src/SARibbon.h`文件是整个项目的合并文件，所有agent禁止读取这两个文件，不要对这两个文件进行任何修改
 
-## Qt 集成方案
+## 构建指引
 
-### 1. 信号槽设计
+具体构建过程可参阅：[build.md文件](./build.md)
+
+## 编码要求
+
+### Qt 集成方案
+
+#### 1. 信号槽设计
 
 充分发挥Qt的信号槽机制，工具类使用信号和槽进行事件通讯。
 
-### 2. 属性暴露方式
+#### 2. 属性暴露方式
 
-为了贴合Qt框架，类的属性使用`Q_PROPERTY`暴露
+为了贴合Qt框架，类的属性使用`Q_PROPERTY`暴露。
 
-如：
+#### 3. PIMPL模式
 
-```cpp
-// 数据属性
-Q_PROPERTY(QImAbstractDataSeries* data READ data WRITE setData NOTIFY dataChanged)
+SARibbon使用PIMPL模式封装私有实现，使用 `SA_RIBBON_DECLARE_PRIVATE`/`SA_RIBBON_DECLARE_PUBLIC` 系列宏。
 
-// 样式属性
-Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
-Q_PROPERTY(float size READ size WRITE setSize NOTIFY sizeChanged)
-Q_PROPERTY(float opacity READ opacity WRITE setOpacity NOTIFY opacityChanged)
+### 注释与文档规范
 
-// 可见性属性
-Q_PROPERTY(bool visible READ isVisible WRITE setVisible NOTIFY visibilityChanged)
-```
+以下是最关键的规范要点速查，详细内容请阅读对应文档：
 
-## 注释与文档规范
+- **Qt宏**：禁止使用 `slots`/`signals`/`emit`，必须使用 `Q_SLOTS`/`Q_SIGNALS`/`Q_EMIT`
+- **注释规范（强制）**：
+    - ❌ **头文件 public 函数**：禁止双语 Doxygen，只能用单行英文 `///`
+    - ❌ **Q_PROPERTY**：禁止加任何 Doxygen 注释
+    - ❌ **类注释**：禁止使用 `@param`、`@class`、`@ingroup`，仅允许 `@brief`/`@details`/`@note`/`@see`
+    - ✅ **源文件(.cpp)**：必须使用双语 Doxygen（`\if ENGLISH`/`\if CHINESE`）
+    - ✅ **类和信号**：在头文件中必须使用双语 Doxygen
+    - ⚠️ 详细规范见 [coding-standards.md](docs/zh/dev-guide/coding-standards.md)，**务必在开始编码前阅读**
 
-### 1️. 代码风格
+### 开发规范文档
 
-- 严格保持与现有代码一致（命名规范、缩进、头文件组织等）
-- 遵循 Qt 开发最佳实践（使用 `Q_PROPERTY`、`Q_SIGNALS`、`Q_SLOT` 等宏，禁止使用`slot`、`signal`等小写命名的宏）
-- 行内注释请不要修改
-
-### 2️. 注释规范（强制）
-
-#### 2.1 源文件（.cpp）注释规范
-
-所有新增代码必须使用 **Doxygen 格式**，并区分中英文：
-
-```cpp
-/**
- * \if ENGLISH
- * @brief [English brief description]
- * @param[in] param_name [English parameter description]
- * @return [English return value description]
- * @details [English detailed explanation]
- * \endif
- * 
- * \if CHINESE
- * @brief [中文简要说明]
- * @param[in] param_name [中文参数描述]
- * @return [中文返回值描述]
- * @details [中文详细说明]
- * \endif
- */
-```
-
-#### 2.2 头文件（.h）注释规范
-
-- 头文件中的 `public` 函数声明旁，仅添加**单行英文简要注释**（使用 `//`  或简洁的 `/** */`）。
-- **不要**在头文件中写入详细的双语 Doxygen 块（类的doxygen注释除外、信号的doxygen注释除外），详细内容应保留在对应的 `.cpp` 文件中，以保持头文件整洁。
-- 示例：
-
-```cpp
-// 类的注释规范建见下一节
-class MyClass {
-public:
-    // Constructor for MyClass (English only)
-    MyClass(); 
-};
-```
-
-- 但有些特例，例如qt的信号（头文件中Q_SIGNALS关键字下面的函数），它没有在cpp中的定义，这些函数的doxygen注释需要在头文件中按上面中英文要求添加，你需要把信号的doxygen注释转换为中英双语。
-- 另外类的doxygen注释也需要在头文件中按上面中英文要求添加。
-
-#### 2.3 类的doxygen注释规范
-
-- 类的doxygen注释需要在头文件中按上面中英文要求添加。
-- 示例：
-
-```cpp
-/**
- * \if ENGLISH
- * @brief [English description]
- * \endif
- *
- * \if CHINESE
- * @brief [中文说明]
- * \endif
- */
-class MyClass {
-public:
-    // Constructor for MyClass (English only)
-    MyClass(); 
-};
-```
-
-- 对于功能性较强的类，类的注释中应该加入使用示例，以便使用者了解如何使用
+| 文档 | 说明 |
+|------|------|
+| [代码风格与注释规范](docs/zh/dev-guide/coding-standards.md) | 命名规范、Doxygen注释格式、Git提交规范 |
+| [PIMPL开发规范](docs/zh/dev-guide/pimpl-dev-guide.md) | SA_RIBBON_DECLARE_PRIVATE等宏的使用方式和规范 |
+| [Qt集成规范](docs/zh/dev-guide/qt-integration.md) | Q_PROPERTY、信号槽、Qt宏使用规范 |
 
 ## Git 提交
 
