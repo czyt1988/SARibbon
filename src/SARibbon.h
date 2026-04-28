@@ -19,26 +19,52 @@
 #include <QScopedPointer>
 
 /**
+ * \if ENGLISH
+ * @def color-widgets version MAJ.MIN.PAT
+ * \endif
+ *
+ * \if CHINESE
  * @def color-widgets的数字版本 MAJ.MIN.PAT
+ * \endif
  */
 #ifndef SA_COLOR_WIDGETS_VERSION_MAJ
 #define SA_COLOR_WIDGETS_VERSION_MAJ 0
 #endif
+
 /**
+ * \if ENGLISH
+ * @def color-widgets version MAJ.MIN.PAT
+ * \endif
+ *
+ * \if CHINESE
  * @def color-widgets的数字版本 MAJ.MIN.PAT
+ * \endif
  */
 #ifndef SA_COLOR_WIDGETS_VERSION_MIN
 #define SA_COLOR_WIDGETS_VERSION_MIN 1
 #endif
+
 /**
+ * \if ENGLISH
+ * @def color-widgets version MAJ.MIN.PAT
+ * \endif
+ *
+ * \if CHINESE
  * @def color-widgets的数字版本 MAJ.MIN.PAT
+ * \endif
  */
 #ifndef SA_COLOR_WIDGETS_VERSION_PAT
 #define SA_COLOR_WIDGETS_VERSION_PAT 0
 #endif
 
 /**
- * @def   模仿Q_DECLARE_PRIVATE，但不用前置声明而是作为一个内部类
+ * \if ENGLISH
+ * @def Imitates Q_DECLARE_PRIVATE but uses an internal class instead of forward declaration
+ * \endif
+ *
+ * \if CHINESE
+ * @def 模仿Q_DECLARE_PRIVATE，但不用前置声明而是作为一个内部类
+ * \endif
  */
 #ifndef SA_COLOR_WIDGETS_DECLARE_PRIVATE
 #define SA_COLOR_WIDGETS_DECLARE_PRIVATE(classname)                                                                    \
@@ -46,8 +72,15 @@
 	friend class classname::PrivateData;                                                                               \
 	QScopedPointer< PrivateData > d_ptr;
 #endif
+
 /**
- * @def   模仿Q_DECLARE_PUBLIC
+ * \if ENGLISH
+ * @def Imitates Q_DECLARE_PUBLIC
+ * \endif
+ *
+ * \if CHINESE
+ * @def 模仿Q_DECLARE_PUBLIC
+ * \endif
  */
 #ifndef SA_COLOR_WIDGETS_DECLARE_PUBLIC
 #define SA_COLOR_WIDGETS_DECLARE_PUBLIC(classname)                                                                     \
@@ -55,6 +88,15 @@
 	classname* q_ptr { nullptr };
 #endif
 
+/**
+ * \if ENGLISH
+ * @def API declaration for color widgets library
+ * \endif
+ *
+ * \if CHINESE
+ * @def 颜色组件库的API声明
+ * \endif
+ */
 #ifndef SA_COLOR_WIDGETS_NO_DLL
 #if defined(SA_COLOR_WIDGETS_MAKE_LIB)  // 定义此宏将构建library
 #ifndef SA_COLOR_WIDGETS_API
@@ -71,6 +113,15 @@
 #endif
 #endif
 
+/**
+ * \if ENGLISH
+ * @def const helper for different C++ standards
+ * \endif
+ *
+ * \if CHINESE
+ * @def 不同C++标准的const辅助宏
+ * \endif
+ */
 #if (__cplusplus >= 201703L) || (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)
 #ifndef sacolor_as_const
 #define sacolor_as_const std::as_const
@@ -105,20 +156,20 @@
  * @def ribbon的数字版本 MAJ.{MIN}.PAT
  */
 #ifndef SA_RIBBON_BAR_VERSION_MIN
-#define SA_RIBBON_BAR_VERSION_MIN 6
+#define SA_RIBBON_BAR_VERSION_MIN 8
 #endif
 /**
  * @def ribbon的数字版本 MAJ.MIN.{PAT}
  */
 #ifndef SA_RIBBON_BAR_VERSION_PAT
-#define SA_RIBBON_BAR_VERSION_PAT 2
+#define SA_RIBBON_BAR_VERSION_PAT 0
 #endif
 
 /**
  * @def 版本号（字符串）
  */
 #ifndef SARIBBON_VERSION
-#define SARIBBON_VERSION "2.6.2"
+#define SARIBBON_VERSION "2.7.0"
 #endif
 
 #endif // SARIBBONVERSIONINFO_H
@@ -314,19 +365,20 @@ class QWidget;
 
 /**
  * \if ENGLISH
- * @brief Define Ribbon alignment, currently supports left alignment and center alignment
- * @note If your compiler reports: illegal qualified name in member declaration, check if the file line endings are LF, if so, change them to CRLF
+ * @brief Define the alignment mode of Ribbon, supports left alignment, center alignment and right alignment
+ * @note If your compiler reports: the qualified name of the member declaration is illegal, then check if the file line break is LF, if so, change the file line break to CRLF
  * \endif
  *
  * \if CHINESE
- * @brief 定义Ribbon的对其方式，目前支持左对齐和居中对其
- * @note 如果你编译器提示：成员声明的限定名称非法，那么留意一下文件换行是否为LF，如果是把文件换行改为CRLF
+ * @brief 定义 Ribbon 的对其方式，支持左对齐、居中对其和右对齐
+ * @note 如果你编译器提示：成员声明的限定名称非法，那么留意一下文件换行是否为 LF，如果是把文件换行改为 CRLF
  * \endif
  */
 enum class SARibbonAlignment
 {
 	AlignLeft,   ///< Left alignment, tab bar left aligned, category also left aligned
-	AlignCenter  ///< Center alignment, tab bar center aligned, category also center aligned
+	AlignCenter, ///< Center alignment, tab bar center aligned, category also center aligned
+	AlignRight   ///< Right alignment, tab bar right aligned, category also right aligned
 };
 
 /**
@@ -869,8 +921,38 @@ class QPainter;
 class QStylePainter;
 class SAColorMenu;
 /**
- * @brief 这是一个只显示颜色的toolbutton
+ * \if ENGLISH
+ * @brief A tool button that displays color
  *
+ * In ToolButtonIconOnly mode, if no icon is set, the color occupies the entire area:
+ *
+ * ┌─────┐
+ * │color│
+ * └─────┘
+ *
+ * If an icon is set in ToolButtonIconOnly mode, the icon is displayed above and the color below:
+ *
+ * ┌─────┐
+ * │icon │
+ * │color│
+ * └─────┘
+ *
+ * In ToolButtonTextBesideIcon and ToolButtonTextUnderIcon modes, setIconSize can specify the color size,
+ * but it only works in ToolButtonTextBesideIcon and ToolButtonTextUnderIcon modes.
+ *
+ * If no icon is set (setIcon(QIcon())), iconSize is used as the color block size:
+ *
+ * ┌─────────┐
+ * │┌─┐      │
+ * │└─┘      │
+ * └─────────┘
+ *
+ * If there is an icon, the color bar will be below the icon, 1/4 of the icon height and the same width as the icon.
+ * If it exceeds the size of the control, it will automatically shrink.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 这是一个只显示颜色的toolbutton
  *
  * 在ToolButtonIconOnly模式下，如果没有setIcon,则颜色占用所有区域，如下图所示
  *
@@ -896,7 +978,7 @@ class SAColorMenu;
  * └─────────┘
  *
  * 如果有图标，颜色条会在图标下方，为图标高度的1/4 为图标宽度一致，如若超过控件的大小，会自动缩小体积
- *
+ * \endif
  */
 class SA_COLOR_WIDGETS_API SAColorToolButton : public QToolButton
 {
@@ -904,61 +986,88 @@ class SA_COLOR_WIDGETS_API SAColorToolButton : public QToolButton
 	SA_COLOR_WIDGETS_DECLARE_PRIVATE(SAColorToolButton)
 public:
 	/**
-	 * @brief 颜色按钮的内置样式
-	 * @param parent
-	 * @return
+	 * @brief Color button built-in styles
 	 */
 	enum ColorToolButtonStyle
 	{
-		WithColorMenu,  ///< 默认会构建一个SAColorMenu
-		NoColorMenu     ///< 没有ColorMenu
+		WithColorMenu,  ///< Default will build a SAColorMenu
+		NoColorMenu     ///< No ColorMenu
 	};
 
 public:
+	/// Constructor for SAColorToolButton
 	explicit SAColorToolButton(QWidget* parent = nullptr);
+	/// Constructor for SAColorToolButton with style
 	explicit SAColorToolButton(ColorToolButtonStyle style, QWidget* parent = nullptr);
+	/// Destructor for SAColorToolButton
 	~SAColorToolButton();
-	// 获取颜色
+	/// Get color
 	QColor color() const;
-	// 设置Margins
+	/// Set margins
 	void setMargins(const QMargins& mg);
+	/// Get margins
 	QMargins margins() const;
-	// 绘制无颜色
+	/// Paint none color
 	static void paintNoneColor(QPainter* p, const QRect& colorRect);
-	// 设置颜色按钮的样式
+	/// Set color tool button style
 	void setColorToolButtonStyle(ColorToolButtonStyle s);
+	/// Get color tool button style
 	ColorToolButtonStyle colorToolButtonStyle() const;
-	// 获取colorMenu，注意，这个函数很有可能会返回nullptr，如果ColorToolButtonStyle设置为NoColorMenu或者自己设置了菜单，此函数返回nullptr
+	/// Get colorMenu, note that this function may return nullptr if ColorToolButtonStyle is set to NoColorMenu or if a custom menu is set
 	SAColorMenu* colorMenu() const;
-	// 建立标准的颜色菜单
+	/// Create standard color menu
 	SAColorMenu* createColorMenu();
 public Q_SLOTS:
-	// 设置颜色,会发射colorChanged信号
+	/// Set color, will emit colorChanged signal
 	void setColor(const QColor& c);
 
 protected:
-	// 获取关键的三个rect位置
+	/// Calculate positions of basic components
 	virtual void calcRect(const QStyleOptionToolButton& opt, QRect& iconRect, QRect& textRect, QRect& colorRect);
+	/// Paint button
 	virtual void paintButton(QStylePainter* p, const QStyleOptionToolButton& opt);
+	/// Paint icon
 	virtual void paintIcon(QStylePainter* p, const QRect& iconRect, const QStyleOptionToolButton& opt);
+	/// Paint text
 	virtual void paintText(QStylePainter* p, const QRect& textRect, const QStyleOptionToolButton& opt);
+	/// Paint color
 	virtual void paintColor(QStylePainter* p, const QRect& colorRect, const QColor& color, const QStyleOptionToolButton& opt);
 
 protected:
+	/// Handle paint event
 	virtual void paintEvent(QPaintEvent* e) Q_DECL_OVERRIDE;
+	/// Handle resize event
 	virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
+	/// Override sizeHint
 	virtual QSize sizeHint() const Q_DECL_OVERRIDE;
 private Q_SLOTS:
+	/// Handle button clicked
 	void onButtonClicked(bool checked = false);
 Q_SIGNALS:
 	/**
+	 * \if ENGLISH
+	 * @brief Signal emitted when color is clicked
+	 * @param color The clicked color
+	 * @param checked Checked state
+	 * \endif
+	 *
+	 * \if CHINESE
 	 * @brief 颜色被点击的响应
-	 * @param color
+	 * @param color 颜色
+	 * @param checked 选中状态
+	 * \endif
 	 */
 	void colorClicked(const QColor& color, bool checked = false);
 	/**
+	 * \if ENGLISH
+	 * @brief Signal emitted when color changes
+	 * @param color The new color
+	 * \endif
+	 *
+	 * \if CHINESE
 	 * @brief 颜色改变信号
-	 * @param color
+	 * @param color 颜色
+	 * \endif
 	 */
 	void colorChanged(const QColor& color);
 };
@@ -1006,6 +1115,38 @@ QPixmap iconToPixmap(const QIcon& icon,
 
 // 获取窗口当前所在屏幕的dpr
 qreal widgetDevicePixelRatio(QWidget* w);
+
+/**
+ * \if ENGLISH
+ * @brief Check if the application layout direction is Right-to-Left (RTL)
+ * @return true if layout direction is Qt::RightToLeft, false otherwise
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 检查应用程序布局方向是否为从右到左（RTL）
+ * @return 如果布局方向为 Qt::RightToLeft 返回 true，否则返回 false
+ * \endif
+ */
+bool SA_RIBBON_EXPORT saIsRTL();
+
+/**
+ * \if ENGLISH
+ * @brief Mirror X coordinate for RTL layout support
+ * @param x The original X coordinate
+ * @param containerWidth The width of the container
+ * @param elementWidth The width of the element
+ * @return containerWidth - x - elementWidth when RTL, x unchanged when LTR
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 为 RTL 布局支持镜像 X 坐标
+ * @param x 原始 X 坐标
+ * @param containerWidth 容器宽度
+ * @param elementWidth 元素宽度
+ * @return RTL 时返回 containerWidth - x - elementWidth，LTR 时返回 x 不变
+ * \endif
+ */
+int SA_RIBBON_EXPORT saMirrorX(int x, int containerWidth, int elementWidth);
 }
 #endif  // SARIBBONUTIL_H
 
@@ -1218,6 +1359,8 @@ public:
 protected:
 	/// Handle resize event
 	virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
+	/// Handle change event for layout direction changes
+	virtual void changeEvent(QEvent* e) override;
 
 protected Q_SLOTS:
 	/// Close window slot
@@ -1256,6 +1399,10 @@ public:
 
 #include <QToolButton>
 #include <QDebug>
+
+// 前向声明
+class SARibbonButtonLayoutStrategy;
+struct SARibbonButtonLayoutContext;
 /**
  * \if ENGLISH
  * @brief Ribbon interface adapted tool button
@@ -1316,7 +1463,7 @@ public:
 		 * @note This value should be greater than 2. / 此值应该大于2
 		 * @default 2.05
 		 */
-		qreal twoLineHeightFactor { 2.05 };
+		qreal twoLineHeightFactor { 2.05 };  // Note: Kept as literal for header inline initialization compatibility
 
 		/**
 		 * @brief Coefficient for the height of single-line text in large button mode / 大按钮模式下，单行文本高度系数
@@ -1353,35 +1500,40 @@ public:
 	explicit SARibbonToolButton(QAction* defaultAction, QWidget* parent = nullptr);
 	~SARibbonToolButton();
 
-	/// Get the current button type (LargeButton or SmallButton)
+	// Get the current button type (LargeButton or SmallButton)
 	RibbonButtonType buttonType() const;
-	/// Set the button type to LargeButton or SmallButton
+	// Set the button type to LargeButton or SmallButton
 	void setButtonType(const RibbonButtonType& buttonType);
 
-	/// Check if the button is a small ribbon button
+	/// Set whether text is displayed to the right of the icon
+	void setEnableIconRightText(bool on);
+	/// Check if icon-right-text mode is enabled
+	bool isEnableIconRightText() const;
+
+	// Check if the button is a small ribbon button
 	bool isSmallRibbonButton() const;
-	/// Check if the button is a large ribbon button
+	// Check if the button is a large ribbon button
 	bool isLargeRibbonButton() const;
 
-	/// Get the current spacing value
+	// Get the current spacing value
 	int spacing() const;
-	/// Set the spacing between elements and the border
+	// Set the spacing between elements and the border
 	void setSpacing(int v);
 
-	/// Force an update of the internal layout rectangles
+	// Force an update of the internal layout rectangles
 	void updateRect();
 
-	/// Set the layout factor for fine-tuning the button's appearance
+	// Set the layout factor for fine-tuning the button's appearance
 	void setLayoutFactor(const LayoutFactor& fac);
-	/// Get the layout factor for fine-tuning the button's appearance (const version)
+	// Get the layout factor for fine-tuning the button's appearance (const version)
 	const LayoutFactor& layoutFactor() const;
-	/// Get the layout factor for fine-tuning the button's appearance (non-const version)
+	// Get the layout factor for fine-tuning the button's appearance (non-const version)
 	LayoutFactor& layoutFactor();
 
 	// Enables or disables automatic text wrapping for large buttons / 为大按钮启用或禁用自动文字换行
 	void setEnableWordWrap(bool on);
 	// Checks if automatic text wrapping is enabled / 检查是否启用了自动文字换行
-	bool isEnableWordWrap();
+	bool isEnableWordWrap() const;
 
 	// Sets the button's maximum aspect ratio (width/height) / 设置按钮的最大宽高比
 	void setButtonMaximumAspectRatio(qreal v = 1.4);
@@ -1424,6 +1576,15 @@ protected:
 	virtual void paintText(QPainter& p, const QStyleOptionToolButton& opt, const QRect& textDrawRect);
 	// Paints the button's indicator (e.g., dropdown arrow) / 绘制按钮的指示器（例如下拉箭头）
 	virtual void paintIndicator(QPainter& p, const QStyleOptionToolButton& opt, const QRect& indicatorDrawRect);
+
+	/**
+	 * @brief 创建图标pixmap，子类可以重写此函数以自定义图标绘制
+	 * @param opt 样式选项
+	 * @param iconSize 图标尺寸
+	 * @return 图标pixmap
+	 * @note 此函数在paintIcon中被调用，提供扩展点给子类
+	 */
+	virtual QPixmap createIconPixmap(const QStyleOptionToolButton& opt, const QSize& iconSize) const;
 
 private:
 	static void drawArrow(const QStyle* style,
@@ -1479,22 +1640,22 @@ public:
 	};
 
 public:
-	/// Constructor for SARibbonColorToolButton
+	// Constructor for SARibbonColorToolButton
 	explicit SARibbonColorToolButton(QWidget* parent = nullptr);
-	/// Constructor with default action
+	// Constructor with default action
 	explicit SARibbonColorToolButton(QAction* defaultAction, QWidget* parent = nullptr);
-	/// Destructor for SARibbonColorToolButton
+	// Destructor for SARibbonColorToolButton
 	~SARibbonColorToolButton();
-	/// Get the current color
+	// Get the current color
 	QColor color() const;
-	/// Set the color display style
+	// Set the color display style
 	void setColorStyle(ColorStyle s);
-	/// Get the current color display style
+	// Get the current color display style
 	ColorStyle colorStyle() const;
-	/// Set up a standard color menu
+	// Set up a standard color menu
 	SAColorMenu* setupStandardColorMenu();
 public Q_SLOTS:
-	/// Set the color, emits colorChanged signal
+	// Set the color, emits colorChanged signal
 	void setColor(const QColor& c);
 private Q_SLOTS:
 	void onButtonClicked(bool checked = false);
@@ -1527,8 +1688,8 @@ Q_SIGNALS:
 	void colorChanged(const QColor& color);
 
 protected:
-	/// Override paintIcon to add color under the icon
-	void paintIcon(QPainter& p, const QStyleOptionToolButton& opt, const QRect& iconDrawRect);
+	/// Override createIconPixmap to add color under the icon
+	QPixmap createIconPixmap(const QStyleOptionToolButton& opt, const QSize& iconSize) const override;
 };
 
 #endif  // SARIBBONCOLORTOOLBUTTON_H
@@ -2712,7 +2873,26 @@ public:
 		 * 在此模式下，小按钮和中等按钮都排列成两行。
 		 * 大按钮始终占据整个高度。
 		 */
-		TwoRowMode
+		TwoRowMode,
+
+		/**
+		 * \if ENGLISH
+		 * @brief Single-row layout mode
+		 *
+		 * In this mode, all buttons are arranged in a single horizontal row.
+		 * Large, Medium and Small row proportions all behave as Small.
+		 * Panel titles are hidden by default.
+		 * \endif
+		 *
+		 * \if CHINESE
+		 * @brief 单行布局模式
+		 *
+		 * 在此模式下，所有按钮排列在单行水平行中。
+		 * Large、Medium 和 Small 行占比都等效为 Small。
+		 * Panel 标题默认隐藏。
+		 * \endif
+		 */
+		SingleRowMode
 	};
 	Q_ENUM(PanelLayoutMode)
 public:
@@ -2876,6 +3056,11 @@ public:
 
 	/// Check if word wrap is enabled
 	bool isEnableWordWrap() const;
+
+	/// Set whether button text is displayed to the right of the icon
+	void setEnableIconRightText(bool on);
+	/// Check if icon-right-text mode is enabled
+	bool isEnableIconRightText() const;
 
 	/// Maximum aspect ratio of buttons, this coefficient determines the maximum width of buttons
 	qreal buttonMaximumAspectRatio() const;
@@ -3142,6 +3327,9 @@ public:
 	/// Check if panel text word wrap is enabled
 	bool isEnableWordWrap() const;
 
+	/// Check if icon-right-text mode is enabled
+	bool isEnableIconRightText() const;
+
 	/// Get button maximum aspect ratio
 	qreal buttonMaximumAspectRatio() const;
 
@@ -3171,6 +3359,9 @@ protected:
 
 	/// Set whether panel button text word wrap is enabled
 	void setEnableWordWrap(bool on);
+
+	/// Set whether button text is displayed to the right of the icon
+	void setEnableIconRightText(bool on);
 
 	/// Set button maximum aspect ratio
 	void setButtonMaximumAspectRatio(qreal fac = 1.4);
@@ -3904,6 +4095,10 @@ public:
 public:
 	/// Set the maximum width for gallery control buttons (default 15)
 	static void setGalleryButtonMaximumWidth(int w);
+	/// Set single-row display mode for gallery
+	void setSingleRowMode(bool on);
+	/// Check if gallery is in single-row mode
+	bool isSingleRowMode() const;
 Q_SIGNALS:
 	/**
 	 * \if ENGLISH
@@ -3953,6 +4148,8 @@ private:
 protected:
 	/// Handle resize events for the gallery
 	void resizeEvent(QResizeEvent* event) override;
+	/// Handle change events for the gallery
+	void changeEvent(QEvent* event) override;
 };
 
 /**
@@ -4186,21 +4383,25 @@ class SA_RIBBON_EXPORT SARibbonBar : public QMenuBar
 	Q_PROPERTY(Qt::Alignment windowTitleAligment READ windowTitleAligment WRITE setWindowTitleAligment)
 	Q_PROPERTY(bool enableWordWrap READ isEnableWordWrap WRITE setEnableWordWrap)
 	Q_PROPERTY(bool enableShowPanelTitle READ isEnableShowPanelTitle WRITE setEnableShowPanelTitle)
+	Q_PROPERTY(bool enableIconRightText READ isEnableIconRightText WRITE setEnableIconRightText)
 	Q_PROPERTY(bool tabOnTitle READ isTabOnTitle WRITE setTabOnTitle)
 	Q_PROPERTY(SARibbonPanel::PanelLayoutMode panelLayoutMode READ panelLayoutMode WRITE setPanelLayoutMode)
 
 public:
-	enum RibbonStyleFlag
+enum RibbonStyleFlag
 	{
-		RibbonStyleLoose    = 0x0001,  // bit:0000 0001
-		RibbonStyleCompact  = 0x0002,  // bit:0000 0010
-		RibbonStyleThreeRow = 0x0010,  // bit:0001 0000
-		RibbonStyleTwoRow   = 0x0020,  // bit:0010 0000
+		RibbonStyleLoose       = 0x0001,  // bit:0000 0001
+		RibbonStyleCompact     = 0x0002,  // bit:0000 0010
+		RibbonStyleThreeRow    = 0x0010,  // bit:0001 0000
+		RibbonStyleTwoRow      = 0x0020,  // bit:0010 0000
+		RibbonStyleSingleRow   = 0x0040,  // bit:0100 0000
 
-		RibbonStyleLooseThreeRow   = RibbonStyleLoose | RibbonStyleThreeRow,    ///< 宽松结构，3行模式
-		RibbonStyleCompactThreeRow = RibbonStyleCompact | RibbonStyleThreeRow,  ///< 紧凑结构，3行模式
-		RibbonStyleLooseTwoRow     = RibbonStyleLoose | RibbonStyleTwoRow,      ///< 宽松结构，2行模式
-		RibbonStyleCompactTwoRow   = RibbonStyleCompact | RibbonStyleTwoRow     ///< 紧凑结构，2行模式
+		RibbonStyleLooseThreeRow   = RibbonStyleLoose | RibbonStyleThreeRow,    ///< 宽松结构，3 行模式
+		RibbonStyleCompactThreeRow = RibbonStyleCompact | RibbonStyleThreeRow,  ///< 紧凑结构，3 行模式
+		RibbonStyleLooseTwoRow     = RibbonStyleLoose | RibbonStyleTwoRow,      ///< 宽松结构，2 行模式
+		RibbonStyleCompactTwoRow   = RibbonStyleCompact | RibbonStyleTwoRow,    ///< 紧凑结构，2 行模式
+		RibbonStyleLooseSingleRow   = RibbonStyleLoose | RibbonStyleSingleRow,  ///< 宽松结构，1 行模式
+		RibbonStyleCompactSingleRow = RibbonStyleCompact | RibbonStyleSingleRow ///< 紧凑结构，1 行模式
 	};
 	Q_ENUM(RibbonStyleFlag)
 	Q_DECLARE_FLAGS(RibbonStyles, RibbonStyleFlag)
@@ -4232,6 +4433,8 @@ public:
 	static bool isLooseStyle(RibbonStyles s);
 	/// Check if the ribbon style is compact (WPS) style
 	static bool isCompactStyle(RibbonStyles s);
+	/// Check if the ribbon style is single-row mode
+	static bool isSingleRowStyle(RibbonStyles s);
 	/// Get version information
 	static QString versionString();
 
@@ -4282,6 +4485,9 @@ public:
 
 	/// Show hidden category
 	void showCategory(SARibbonCategory* category);
+
+	// Batch set categories visible or hidden, only triggers one relayout at the end
+	void setCategoriesVisible(const QList< SARibbonCategory* >& categories, bool visible);
 
 	/// Check if category is visible
 	bool isCategoryVisible(const SARibbonCategory* c) const;
@@ -4412,6 +4618,8 @@ public:
 	bool isLooseStyle() const;
 	/// Check if current style is compact
 	bool isCompactStyle() const;
+	/// Check if current style is single-row
+	bool isSingleRowStyle() const;
 
 	/// Update ribbon geometry
 	void updateRibbonGeometry();
@@ -4455,6 +4663,11 @@ public:
 	void setEnableWordWrap(bool on);
 	/// Check if word wrap is enabled
 	bool isEnableWordWrap() const;
+
+	/// Set whether button text is displayed to the right of the icon
+	void setEnableIconRightText(bool on);
+	/// Check if icon-right-text mode is enabled
+	bool isEnableIconRightText() const;
 
 	/// Set button maximum aspect ratio
 	void setButtonMaximumAspectRatio(qreal fac = 1.4);

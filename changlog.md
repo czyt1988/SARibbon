@@ -1,5 +1,50 @@
 # 版本更新记录(change log):
 
+## 2026-04-28 -> 2.8.0
+
+- 新增`SingleRow`（单行）布局模式，Ribbon可在单行样式下展示按钮，图标在左侧文字在右侧，适合空间受限的场景
+- 新增`SARibbonBar::enableIconRightText`属性及级联方法，启用后所有按钮使用SmallButton横向布局（图标左、文字右）
+- 新增`isSingleRowStyle()`静态和实例辅助方法，便于判断当前是否为单行样式
+- 新增`SingleRowMode`枚举扩展，完善单行模式的枚举定义
+- `SARibbonPanelLayout`新增`SingleRowMode`布局计算，单行模式下按钮按横向排列
+- `setRibbonStyle`的`SingleRow`级联设置，自动调整Gallery、BarLayout高度等
+- MainWindowExample新增SingleRow样式切换演示
+
+## 2026-04-19 -> 2.7.1
+
+- 新增RTL（从右到左）布局支持，包括`saIsRTL`/`saMirrorX`辅助函数、`SARibbonAlignment::AlignRight`枚举值、`LayoutDirectionChange`事件处理
+- `SARibbonBarLayout`新增RTL镜像绘制，支持loose/compact样式及标题区域的RTL适配
+- `SARibbonCategoryLayout`新增RTL镜像滚动和布局反转
+- `SARibbonPanelLayout`新增RTL镜像，按钮列、选项按钮和标题均支持RTL
+- `SARibbonButtonLayoutStrategy`新增RTL绘制区域镜像
+- `SARibbonToolButton`新增RTL指示器和图标位置镜像
+- `SARibbonContextCategory`新增RTL适配，上下文标签绘制和标题区域计算支持RTL
+- `SARibbonSystemButtonBar`新增RTL定位（按钮在左侧边缘）及`LayoutDirectionChange`事件处理
+- `SARibbonGallery`修正`saIsRTL()`函数调用
+- 新增`setCategoriesVisible`批量设置Category可见性API
+- Fix #123：在`SARibbonBar::eventFilter`中添加`WindowStateChange`事件处理，修复MDI窗口最大化时右上角corner widget显示异常问题
+- Fix #147：在`hideCategory()`和`showCategory()`中添加`relayout()`和`update()`，修复批量隐藏/显示Category时的显示异常
+- 优化：为`SARibbonCategoryLayout::setScrollPosition()`添加注释说明刷新模式正确性
+- MainWindowExample新增RTL布局方向切换和样式/对齐方式循环演示
+- 新增Qt Test框架及RTL布局单元测试
+- 新增6个RTL单元测试文件覆盖LayoutDirectionChange、ToolButton、ButtonLayoutStrategy、Gallery、SystemButtonBar、ContextCategory
+
+## 2026-04-18 -> 2.7.0 (docs)
+
+- 大幅重写和扩展文档：zh/ribbon-interface-hierarchy.md（94→305行）、en/ribbon-interface-hierarchy.md（33→305行）
+- 重写zh/SARibbon-size-settings.md（86→115行）、en/SARibbon-size-settings.md（35→115行）
+- 重写zh/titlebar-setting.md（76→158行）、en/titlebar-setting.md（48→158行）
+- 新增zh/en/SARibbonWidget-guide.md、zh/en/color-widgets.md文档页面
+- 扩展zh/en/create-ribbon-ui.md、zh/en/create-ribbon-style-window.md文档
+- 扩展theme/faq/build-guide页面（zh+en）
+- 添加mkdocs.yml i18n配置修复和导航补全
+- 修复8处跨语言文档错误
+
+## 2026-04-02 ~ 2026-04-09 -> 2.6.2
+
+- 移除qmake构建方式，彻底移除pri相关文件，删除qmake相关的安装配置
+- 优化Ribbon按钮的渲染实现
+
 ## 2026-03-28 -> 2.6.1
 - 增加`SARibbonCategory::insertPanel(SARibbonPanel*, int)`函数，支持在指定位置插入panel
 - 添加ribbonbar的时候进行raise操作避免被其它窗口覆盖

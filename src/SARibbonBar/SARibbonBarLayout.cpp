@@ -431,8 +431,8 @@ public:
             // 4.8 = 3*1.6 for three rows
             return textH * 4.8 + panelTitleHeight;
         } else if (ribbonBar->isSingleRowStyle()) {
-            // 1.6 for single row, no panel title in single-row mode
-            return textH * 1.6;
+            // 1.8 for single row, no panel title in single-row mode
+            return textH * 2;
         } else {
             // 3.2 = 2*1.6 for two rows
             return textH * 3.2 + panelTitleHeight;
