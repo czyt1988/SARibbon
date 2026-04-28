@@ -49,7 +49,7 @@ int main(int argc, char* argv[])
 | Integration | [Importing the Library](./import-SARibbon.md) | Static/dynamic integration into your project |
 | Window Setup | [Create a Ribbon-Style Window](./create-ribbon-style-window.md) | SARibbonMainWindow / SARibbonWidget usage |
 | UI Creation | [Creating the Ribbon UI](./create-ribbon-ui.md) | Category, Panel, Action, Gallery, etc. |
-| Layout | [Ribbon Layout Options](./layout-of-SARibbon.md) | Loose/Compact, 2-row/3-row modes |
+| Layout | [Ribbon Layout Options](./layout-of-SARibbon.md) | Loose/Compact, 2-row/3-row/SingleRow modes |
 | Theming | [Ribbon Themes](./SARibbon-theme.md) | Built-in themes and custom QSS styling |
 | Customization | [User-Configurable Ribbon](./persistence-configuration-ribbon.md) | Runtime customization and XML persistence |
 

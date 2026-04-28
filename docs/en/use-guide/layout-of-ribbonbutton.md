@@ -3,6 +3,7 @@
 - ✅ **Strategy Pattern architecture**: v2.7.0+ introduces SARibbonButtonLayoutStrategy hierarchy, clean layout logic separation
 - ✅ **Two layout schemes**: Word-wrap (Office style) and non-wrap (WPS style), choose by language context
 - ✅ **Three button sizes**: Large(32×32)/Medium/Small(20×20), icon size auto-adapts to button mode
+- ✅ **Single-row horizontal layout**: v2.8.0 adds enableIconRightText property, icon-left text-right horizontal arrangement
 - ✅ **Binary search line-break**: Long text auto-wraps with up to 10 iterations for optimal width
 - ✅ **MenuButtonPopup vertical split**: Ribbon-specific button mode, top half executes default action, bottom pops menu
 
@@ -136,3 +137,24 @@ Remedies:
 
 1. **Mix button sizes** – e.g. two large buttons + three small ones in the same row.  
 2. **Force a break** with `\n`, especially for 4-character titles (two + two).
+
+---
+
+## Single-row Mode Button Rendering (v2.8.0+)
+
+Starting from v2.8.0, SARibbon adds the single-row layout mode (`SingleRowMode`). In this mode:
+
+- All buttons (Large/Medium/Small) use Small horizontal layout: icon on the left, text on the right
+- `SARibbonBar::setEnableIconRightText(true)` forces all buttons to use horizontal icon-left, text-right layout (also usable in non-single-row modes)
+- Text does not wrap; long text will be truncated
+
+How to enable:
+
+```cpp
+// Method 1: Auto cascade via setRibbonStyle
+ribbonBar()->setRibbonStyle(SARibbonBar::RibbonStyleCompactSingleRow);
+// setRibbonStyle automatically enables enableIconRightText in SingleRow mode
+
+// Method 2: Enable enableIconRightText separately (works in any mode)
+ribbonBar()->setEnableIconRightText(true);
+```

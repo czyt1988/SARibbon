@@ -67,7 +67,7 @@
 
 ![SARibbon-多种不同风格的ribbon button](./docs/assets/screenshot/SARibbonBar-ribbonbutton.gif)
 
-- 支持多种不同风格的布局样式
+- 支持多种不同风格的布局样式，包括宽松三行、宽松两行、紧凑三行、紧凑两行、宽松单行、紧凑单行
 
 ![SARibbon-多种不同风格的布局样式](./docs/assets/screenshot/SARibbonBar-style.gif)
 

@@ -289,6 +289,15 @@ public:
 > ribbon->setApplicationButton(nullptr);
 > ribbon->setRibbonStyle(SARibbonBar::RibbonStyleCompactThreeRow);
 > ```
+>
+> 如果空间极度受限（如嵌入式设备或小窗口），推荐使用单行模式：
+>
+> ```cpp
+> ribbon->setTitleVisible(false);
+> ribbon->setApplicationButton(nullptr);
+> ribbon->setRibbonStyle(SARibbonBar::RibbonStyleCompactSingleRow);
+> ribbon->setEnableIconRightText(true);
+> ```
 
 ## 主题切换注意事项
 

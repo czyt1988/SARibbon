@@ -177,7 +177,7 @@ SARibbon panels currently have 3 types of placeholder markers. When you call `ad
 
 These row proportions will have different rendering effects in different layout schemes.
 
-SARibbonPanel supports two layout schemes: 2-row mode and 3-row mode. You can set different layout styles through the `SARibbonBar::setRibbonStyle` function.
+SARibbonPanel supports three layout schemes: 3-row mode, 2-row mode, and single-row mode (new in v2.8.0). You can set different layout styles through the `SARibbonBar::setRibbonStyle` function.
 
 For the 3-row mode, the effects of the above three row placeholders are as shown in the following figure:
 
@@ -188,6 +188,8 @@ For the 2-row mode, the effects of the above three row placeholders are as shown
 ![pannelLayout2row](../../assets/pic/pannelLayout2row.png)
 
 In 2-row mode, the medium and small placeholders (`SARibbonPannelItem::RowProportion`) are the same and not distinguished.
+
+In single-row mode (new in v2.8.0), all buttons are arranged in a single horizontal row with icon on left and text on right. Large, Medium, and Small placeholders all behave as Small. It is recommended to enable `SARibbonBar::setEnableIconRightText(true)` for the best visual effect.
 
 ### Adding Complex Controls (Widgets) in Panels
 

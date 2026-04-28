@@ -54,7 +54,7 @@ This is a **Ribbon UI control** for **Qt**, providing an interface similar to Mi
   *(The action menu button addresses one of the core challenges this Ribbon control aims to solve.)*  
   ![Ribbon Buttons](./docs/assets/screenshot/SARibbonBar-ribbonbutton.gif)
 
-- Offers **four distinct layout styles**.  
+- Offers **six distinct layout styles** — Loose 3-row, Loose 2-row, Compact 3-row, Compact 2-row, Loose Single-row, Compact Single-row — with Single-row mode ideal for space-constrained scenarios.  
   ![Layout Styles](./docs/assets/screenshot/SARibbonBar-style.gif)
 
 - Fully customizable via **QSS**, with **real-time theme switching** support. Includes **6 built-in themes**:

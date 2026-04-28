@@ -51,6 +51,7 @@
 
 - ✅ **Four-layer nesting layout**: RibbonBar → Category → Panel → ToolButton, clear hierarchy, organized functionality
 - ✅ **Four layout modes**: Loose 3-row, Loose 2-row, Compact 3-row, Compact 2-row, switchable at runtime
+- ✅ **Single-row layout mode**: New in v2.8.0, icon-left text-right horizontal layout, recommended for space-constrained scenarios
 - ✅ **6 built-in themes**: Win7/Office2013/2016/2021/Dark/Dark2, one-call switching, QSS custom extension supported
 - ✅ **Contextual tabs**: SARibbonContextCategory condition-based show/hide, e.g., "Picture Tools" when an image is selected
 - ✅ **Gallery widget**: Grid-style icon option display with popup group browsing

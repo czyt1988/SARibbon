@@ -59,6 +59,9 @@ The vertical height of the Ribbon is composed of multiple layers stacked togethe
 **Total height formula** (compact mode):
 > Ribbon total height = Tab bar height + Category height (compact mode has no title bar)
 
+**Total height formula** (single-row mode):
+> Ribbon total height = Tab bar height + Category height (in single-row mode, Category height contains only one row of buttons; panel titles are hidden)
+
 The Category height internally includes the panel content area and the panel title area. The panel title height is controlled separately through `setPanelTitleHeight` and is displayed at the bottom of the panel by default.
 
 ## Usage Example

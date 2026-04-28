@@ -289,6 +289,15 @@ public:
 > ribbon->setApplicationButton(nullptr);
 > ribbon->setRibbonStyle(SARibbonBar::RibbonStyleCompactThreeRow);
 > ```
+>
+> For space-constrained scenarios (e.g., embedded devices or small windows), single-row mode is recommended:
+>
+> ```cpp
+> ribbon->setTitleVisible(false);
+> ribbon->setApplicationButton(nullptr);
+> ribbon->setRibbonStyle(SARibbonBar::RibbonStyleCompactSingleRow);
+> ribbon->setEnableIconRightText(true);
+> ```
 
 ## Theme Switching Considerations
 
