@@ -10,9 +10,14 @@
 - `setRibbonStyle`的`SingleRow`级联设置，自动调整Gallery、BarLayout高度等
 - MainWindowExample新增SingleRow样式切换演示
 
+![single-style-loose](./docs/assets/screenshot/single-style-loose.png)
+
+![single-style-compact](./docs/assets/screenshot/single-style-compact.png)
+
 ## 2026-04-19 -> 2.7.1
 
 - 新增RTL（从右到左）布局支持，包括`saIsRTL`/`saMirrorX`辅助函数、`SARibbonAlignment::AlignRight`枚举值、`LayoutDirectionChange`事件处理
+  ![SARibbon-RTL](./docs/assets/screenshot/SARibbon-RTL.png)
 - `SARibbonBarLayout`新增RTL镜像绘制，支持loose/compact样式及标题区域的RTL适配
 - `SARibbonCategoryLayout`新增RTL镜像滚动和布局反转
 - `SARibbonPanelLayout`新增RTL镜像，按钮列、选项按钮和标题均支持RTL
@@ -23,11 +28,13 @@
 - `SARibbonGallery`修正`saIsRTL()`函数调用
 - 新增`setCategoriesVisible`批量设置Category可见性API
 - Fix #123：在`SARibbonBar::eventFilter`中添加`WindowStateChange`事件处理，修复MDI窗口最大化时右上角corner widget显示异常问题
+  ![mdi-window](./docs/assets/screenshot/mdiwindow.png)
 - Fix #147：在`hideCategory()`和`showCategory()`中添加`relayout()`和`update()`，修复批量隐藏/显示Category时的显示异常
 - 优化：为`SARibbonCategoryLayout::setScrollPosition()`添加注释说明刷新模式正确性
 - MainWindowExample新增RTL布局方向切换和样式/对齐方式循环演示
 - 新增Qt Test框架及RTL布局单元测试
 - 新增6个RTL单元测试文件覆盖LayoutDirectionChange、ToolButton、ButtonLayoutStrategy、Gallery、SystemButtonBar、ContextCategory
+
 
 ## 2026-04-18 -> 2.7.0 (docs)
 

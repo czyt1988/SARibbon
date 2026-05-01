@@ -169,7 +169,7 @@
  * @def 版本号（字符串）
  */
 #ifndef SARIBBON_VERSION
-#define SARIBBON_VERSION "2.7.0"
+#define SARIBBON_VERSION "2.8.0"
 #endif
 
 #endif // SARIBBONVERSIONINFO_H
