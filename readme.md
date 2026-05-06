@@ -1,10 +1,11 @@
 # SARibbon Introduction
+
 [中文文档点击这里](./readme-cn.md)
 
 <div align="center">
 <p>
 <img src="https://img.shields.io/badge/C++-17-blue"/>
-<img src="https://img.shields.io/badge/ -5.14+-green"/>
+<img src="https://img.shields.io/badge/Qt-5.14+-green"/>
 <img src="https://img.shields.io/badge/Qt-6-green"/>
 <img src="https://img.shields.io/badge/license-MIT-yellow"/>
 </p>
@@ -15,25 +16,38 @@
 </p>
 </div>
 
-Project Documentation: [https://czyt1988.github.io/SARibbon/en](https://czyt1988.github.io/SARibbon/en)  
-Detailed User Guide: [SARibbon User Guide](./docs/SARibbon-User-Guide(en).md)
+📚 **Project Documentation**: [https://czyt1988.github.io/SARibbon/en](https://czyt1988.github.io/SARibbon/en)  
+Detailed User Guide: [SARibbon User Guide](./docs/en/use-guide/SARibbon-user-guide.md)
 
 ||Windows (latest)|Linux Ubuntu (latest)|Mac (latest)|
 |:-|:-|:-|:-|
-|Qt 5.12 LTS|![Build Status](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt5.12.yml/badge.svg)|![Build Status](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt5.12.yml/badge.svg)|![Build Status](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt5.12.yml/badge.svg)|
-|Qt 5.14|![Build Status](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt5.14.yml/badge.svg)|![Build Status](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt5.14.yml/badge.svg)|![Build Status](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt5.14.yml/badge.svg)|
-|Qt 5.15 LTS|![Build Status](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt5.15.yml/badge.svg)|![Build Status](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt5.15.yml/badge.svg)|![Build Status](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt5.15.yml/badge.svg)|
-|Qt 6.2 LTS|![Build Status](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt6.2.yml/badge.svg)|![Build Status](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt6.2.yml/badge.svg)|![Build Status](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt6.2.yml/badge.svg)|
-|Qt 6.5 LTS|![Build Status](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt6.5.yml/badge.svg)|![Build Status](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt6.5.yml/badge.svg)|![Build Status](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt6.5.yml/badge.svg)|
-|Qt 6.8 LTS|![Build Status](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt6.8.yml/badge.svg)|![Build Status](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt6.8.yml/badge.svg)|![Build Status](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt6.8.yml/badge.svg)|
+|Qt 5.12 LTS|[![cmake-win-qt5.12](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt5.12.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt5.12.yml)|[![CMake-Linux-Qt5.12](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt5.12.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt5.12.yml)|[![cmake-mac-qt5.12](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt5.12.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt5.12.yml)|
+|Qt 5.14|[![cmake-win-qt5.14](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt5.14.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt5.14.yml)|[![CMake-Linux-Qt5.14](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt5.14.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt5.14.yml)|[![cmake-mac-qt5.14](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt5.14.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt5.14.yml)|
+|Qt 5.15 LTS|[![cmake-win-qt5.15](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt5.15.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt5.15.yml)|[![CMake-Linux-Qt5.15](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt5.15.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt5.15.yml)|[![cmake-mac-qt5.15](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt5.15.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt5.15.yml)|
+|Qt 6.2 LTS|[![cmake-win-qt6.2](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt6.2.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt6.2.yml)|[![CMake-Linux-Qt6.2](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt6.2.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt6.2.yml)|[![cmake-mac-qt6.2](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt6.2.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt6.2.yml)|
+|Qt 6.5 LTS|[![cmake-win-qt6.5](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt6.5.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt6.5.yml)|[![CMake-Linux-Qt6.5](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt6.5.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt6.5.yml)|[![cmake-mac-qt6.5](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt6.5.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt6.5.yml)|
+|Qt 6.8 LTS|[![cmake-win-qt6.8](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt6.8.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-win-qt6.8.yml)|[![CMake-Linux-Qt6.8](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt6.8.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-linux-qt6.8.yml)|[![cmake-mac-qt6.8](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt6.8.yml/badge.svg)](https://github.com/czyt1988/SARibbon/actions/workflows/cmake-mac-qt6.8.yml)|
 
-This is a **Ribbon UI control** for **Qt**, providing an interface similar to Microsoft Office applications.
+---
 
-- `SARibbon` is suitable for large-scale software, industrial applications, and complex UIs.
-- It adopts naming conventions inspired by **MFC Ribbon** interfaces.
-- The visual style draws from both **Microsoft Office** and **WPS Office** Ribbon interfaces, combining the best features of both.
-- `SARibbon` supports multiple customizable themes and allows rapid styling via **Qt Style Sheets (QSS)**.
-- To facilitate development of large applications, `SARibbon` includes encapsulated common functional widgets, such as [color picker buttons and color panels](https://github.com/czyt1988/SAColorWidgets).
+## Project Overview
+
+**SARibbon** is a **Ribbon UI control library** for **Qt**, designed to provide desktop applications with a modern interface similar to Microsoft Office applications.
+
+### Use Cases
+
+- Large-scale software
+- Industrial software
+- Complex desktop applications
+
+### Design Philosophy
+
+- Interface naming inspired by **MFC Ribbon**
+- Visual style blends the best of **Microsoft Office** and **WPS Office** Ribbon interfaces
+- Supports rapid theme customization via **QSS (Qt Style Sheets)**
+- Includes encapsulated common functional widgets, such as [color picker buttons and color panels](https://github.com/czyt1988/SAColorWidgets)
+
+---
 
 ## Features
 
@@ -44,18 +58,18 @@ This is a **Ribbon UI control** for **Qt**, providing an interface similar to Mi
 - Supports **minimized mode**, where only tabs are shown (double-clicking a tab toggles minimization by default). Contextual tabs are also supported.  
   ![Minimized Mode](./docs/assets/screenshot/SARibbonBar-minMode.gif)
 
-- Supports **Quick Access Bar** (like Word’s quick menu) and **Right Button Group**, with adaptive layout behavior in different modes.
+- Supports **Quick Access Bar** (like Word's quick menu) and **Right Button Group**, with adaptive layout behavior in different modes.
 
-- Supports **four types of Ribbon buttons**:
-  - Standard push button
-  - Delayed popup menu button
-  - Menu button
-  - Action menu button  
-  *(The action menu button addresses one of the core challenges this Ribbon control aims to solve.)*  
-  ![Ribbon Buttons](./docs/assets/screenshot/SARibbonBar-ribbonbutton.gif)
+- Supports **four types of Ribbon buttons**: standard push button, delayed popup menu button, menu button, and action menu button. *(The action menu button addresses one of the core challenges this Ribbon control aims to solve.)*  
+  ![Ribbon Buttons](./docs/assets/screenshot/SARibbonBar-ribbonbutton.gif)  
+  See: [Ribbon Button Layout Guide](./docs/en/use-guide/layout-of-ribbonbutton.md)
 
 - Offers **six distinct layout styles** — Loose 3-row, Loose 2-row, Compact 3-row, Compact 2-row, Loose Single-row, Compact Single-row — with Single-row mode ideal for space-constrained scenarios.  
-  ![Layout Styles](./docs/assets/screenshot/SARibbonBar-style.gif)
+  Layout styles:  
+  ![Layout Styles](./docs/assets/screenshot/SARibbonBar-style.gif)  
+  Single-row layout:  
+  ![Single-row Compact](./docs/assets/screenshot/single-style-compact.png)  
+  See: [SARibbon Layout Guide](./docs/en/use-guide/layout-of-SARibbon.md)
 
 - Fully customizable via **QSS**, with **real-time theme switching** support. Includes **6 built-in themes**:
   - Windows 7  
@@ -70,6 +84,8 @@ This is a **Ribbon UI control** for **Qt**, providing an interface similar to Mi
     ![Dark Theme](./docs/assets/screenshot/SARibbon-theme-dark.png)
   - Dark 2  
     ![Dark 2 Theme](./docs/assets/screenshot/SARibbon-theme-dark2.png)
+  
+  You can design any theme via QSS. See: [Design Your Theme](./docs/en/use-guide/design-your-theme.md)
 
 - Provides a **Gallery widget**.  
   ![Gallery](./docs/assets/screenshot/SARibbonBar-gallery.png)
@@ -84,7 +100,10 @@ This is a **Ribbon UI control** for **Qt**, providing an interface similar to Mi
 
 - Supports **Linux** and **macOS** (*UI not deeply optimized for these platforms*).
 
-- Licensed under the **MIT License** — contributions and feedback are welcome!
+- Provides **RTL mode** with automatic system detection.
+
+**License**: MIT (free to use, modify, and distribute)  
+**Contributions welcome**: feel free to submit Issues, PRs, or join discussions!
 
 ### Repositories
 
@@ -95,14 +114,22 @@ This is a **Ribbon UI control** for **Qt**, providing an interface similar to Mi
 
 ## Building and Usage
 
-- Project documentation is located in the `docs/en/` folder. You can access it directly here:  
-  [https://czyt1988.github.io/SARibbon/en](https://czyt1988.github.io/SARibbon/en)
+`SARibbon` provides amalgamated integration files (`SARibbon.h` and `SARibbon.cpp`) in the `src/` directory — just include them in your project to get started.
 
-- Doxygen-generated API documentation is deployed at:  
-  [https://czyt1988.github.io/SARibbon/doxygen/index.html](https://czyt1988.github.io/SARibbon/doxygen/index.html)
+To build as a dynamic library, see: [SARibbon Build Instructions](./docs/en/build-guide/build-instructions.md)
 
-- Learn how to use `SARibbon` by exploring the example project:  
-  `example/MainWindowExample`. You can run it to experience the Ribbon’s features interactively.
+Quick start guides:
+
+- [Create a Ribbon-Style Window](./docs/en/use-guide/create-ribbon-style-window.md)
+- [Create a Ribbon Interface](./docs/en/use-guide/create-ribbon-ui.md)
+
+**We recommend starting with the `example/MainWindowExample` project to learn SARibbon usage. You can run it directly to explore all features interactively.**
+
+Project documentation is in the `docs/en/` folder:  
+[https://czyt1988.github.io/SARibbon/en](https://czyt1988.github.io/SARibbon/en)
+
+Doxygen-generated API documentation is deployed at:  
+[https://czyt1988.github.io/SARibbon/doxygen/index.html](https://czyt1988.github.io/SARibbon/doxygen/index.html)
 
 ---
 
@@ -124,11 +151,10 @@ For actual Ribbon implementation code, see:
 
 ## Documentation Generation
 
-You can generate documentation using **Doxygen**:
+Project documentation is built with **MkDocs** and deployed to GitHub Pages:  
+[https://czyt1988.github.io/SARibbon/en](https://czyt1988.github.io/SARibbon/en)
+
+You can also generate documentation using **Doxygen**:
 
 - `docs/Doxyfile-qch-en`: generates `.qch` files for integration into **Qt Creator** as Qt Help documentation.
 - `docs/Doxyfile-wiki-en`: generates HTML documentation for browser viewing.
-
-This project’s documentation is built with **MkDocs** and deployed to GitHub Pages:  
-[https://czyt1988.github.io/SARibbon/en](https://czyt1988.github.io/SARibbon/en)
-

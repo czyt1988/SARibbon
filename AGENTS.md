@@ -28,24 +28,44 @@ docs/zh/build-guide/      ← 构建指引
 
 ## 构建
 
-CMake 构建，最低 Qt 5.12，支持 Qt5 和 Qt6：
+CMake 构建，最低 Qt 5.12，支持 Qt5 和 Qt6，C++ 标准由 CMakeLists 根据 Qt 版本和选项自动设定（最低 C++14）。
 
-必须使用 Visual Studio 生成器，不要使用 Ninja（PowerShell 中 MSVC 环境无法通过 vcvars64.bat 注入）：
+推荐使用 **Visual Studio 生成器**，它会自动初始化 MSVC 编译器环境。如果使用 Ninja 生成器，需要手动初始化 MSVC 环境变量（`INCLUDE`、`LIB`、`PATH` 等），否则编译器会找不到标准库头文件。详见 [build.md](build.md)。
 
-示例：
+### Visual Studio 生成器（推荐）
 
 ```powershell
+# 在项目根目录下
 cmake -S . -B build -G "Visual Studio 16 2019" -A x64 -DCMAKE_PREFIX_PATH="C:/Qt/6.7.3/msvc2019_64"
 cmake --build build --config Release
 ```
 
+### Ninja 生成器（需手动初始化 MSVC 环境）
+
+```powershell
+# 先初始化 MSVC 环境变量（vcvarsall.bat 会设置 INCLUDE、LIB、PATH 等关键变量）
+cmd /c '"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat" x64 & set' | ForEach-Object {
+    if ($_ -match '^([^=]+)=(.*)$') {
+        [Environment]::SetEnvironmentVariable($matches[1], $matches[2], 'Process')
+    }
+}
+
+# 然后使用 Ninja 构建
+cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="C:/Qt/6.7.3/msvc2019_64"
+cmake --build build
+```
+
 > 构建损坏时先关掉 `build/bin` 下占用的程序，再 `Remove-Item -Recurse -Force build` 重配。
 
-关键选项：
+### CMake 选项
+
 - `SARIBBON_BUILD_STATIC_LIBS=ON` → 静态库，自动定义 `SA_RIBBON_BAR_NO_EXPORT`
-- `SARIBBON_USE_FRAMELESS_LIB=ON` → 强制 C++17，需 QWindowKit 库；OFF 时 Qt5 用 C++14，Qt6 用 C++17
-- `SARIBBON_BUILD_EXAMPLES` 默认 ON
-- Windows 默认 `SARIBBON_INSTALL_IN_CURRENT_DIR=ON`，安装到 `bin_qt{版本}_{编译器}_x{架构}/`
+- `SARIBBON_USE_FRAMELESS_LIB=ON` → 使用 QWindowKit 无边框方案，需 C++17 和 QWindowKit 库；OFF 时由 CMakeLists 根据 Qt 版本自动选择 C++ 标准
+- `SARIBBON_BUILD_EXAMPLES` → 默认 ON，控制是否编译示例程序
+- `SARIBBON_ENABLE_SNAPLAYOUT=ON` → 启用 Windows 11 Snap Layout（仅 `SARIBBON_USE_FRAMELESS_LIB=ON` 时有效）
+- `SARIBBON_INSTALL_IN_CURRENT_DIR` → Windows 默认 ON，安装到 `bin_qt{版本}_{编译器}_x{架构}/`
+
+> 根据实际 Qt 安装位置调整 `CMAKE_PREFIX_PATH`。
 
 ## 注释规范（强制，AI代码尤其容易违反）
 

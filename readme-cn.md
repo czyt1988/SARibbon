@@ -42,11 +42,13 @@
 **SARibbon** 是一个基于 **Qt** 的 Ribbon 界面控件库，旨在为桌面应用程序提供类似 Microsoft Office 系列软件的现代化操作界面。
 
 ### 适用场景
+
 - 大型软件
 - 工业级软件
 - 功能复杂的桌面应用
 
 ### 设计理念
+
 - 接口命名风格参考 **MFC Ribbon**
 - 界面样式融合 **Microsoft Office** 与 **WPS Office** 的优点
 - 支持通过 **QSS（Qt 样式表）** 快速自定义主题风格
@@ -56,53 +58,56 @@
 
 - 针对Ribbon的布局和显示
 
-![Ribbon的布局和显示](./docs/assets/screenshot/SARibbonBar-overview.png)
+    ![Ribbon的布局和显示](./docs/assets/screenshot/SARibbonBar-overview.png)
 
 - 支持最小化模式，ribbon只显示标签（默认双击标签会进行切换）,支持上下文标签tab
 
-![SARibbon最小化模式](./docs/assets/screenshot/SARibbonBar-minMode.gif)
+    ![SARibbon最小化模式](./docs/assets/screenshot/SARibbonBar-minMode.gif)
 
 - 支持quickAccessBar（word快速菜单）和rightButtonGroup，在不同布局模式下会有不同的显示效果
 - 支持多种不同风格的ribbon button，普通按钮，延迟弹出菜单按钮，菜单按钮，action菜单按钮（action菜单按钮是此ribbon控件最主要解决的问题之一）
-
-![SARibbon-多种不同风格的ribbon button](./docs/assets/screenshot/SARibbonBar-ribbonbutton.gif)
+    ![SARibbon-多种不同风格的ribbon button](./docs/assets/screenshot/SARibbonBar-ribbonbutton.gif)
+    具体可参阅文档：[Ribbon栏按钮布局说明](./docs/zh/use-guide/layout-of-ribbonbutton.md)
 
 - 支持多种不同风格的布局样式，包括宽松三行、宽松两行、紧凑三行、紧凑两行、宽松单行、紧凑单行
-
-![SARibbon-多种不同风格的布局样式](./docs/assets/screenshot/SARibbonBar-style.gif)
+  - 布局风格
+    ![SARibbon-多种不同风格的布局样式](./docs/assets/screenshot/SARibbonBar-style.gif)
+  - 单行布局
+    ![single-style-compact](./docs/assets/screenshot/single-style-compact.png)
+  具体可参阅文档：[SARibbon布局方式](./docs/zh/use-guide/layout-of-SARibbon.md)
 
 - 支持qss对ribbon进行自定义设置，可实时切换主题,内置了6种不同风格的主题
 
-win7主题：
-![SARibbon-theme-win7](./docs/assets/screenshot/SARibbon-theme-win7.png)
-office2013主题：
-![SARibbon-theme-office2013](./docs/assets/screenshot/SARibbon-theme-office2013.png)
-office2016主题：
-![SARibbon-theme-office2016](./docs/assets/screenshot/SARibbon-theme-office2016.png)
-office2021主题：
-![SARibbon-theme-office2021](./docs/assets/screenshot/SARibbon-theme-office2021.png)
-dark主题：
-![SARibbon-theme-dark](./docs/assets/screenshot/SARibbon-theme-dark.png)
-dark2主题：
-![SARibbon-theme-dark](./docs/assets/screenshot/SARibbon-theme-dark2.png)
+  - win7主题：
+        ![SARibbon-theme-win7](./docs/assets/screenshot/SARibbon-theme-win7.png)
+  - office2013主题：
+        ![SARibbon-theme-office2013](./docs/assets/screenshot/SARibbon-theme-office2013.png)
+  - office2016主题：
+        ![SARibbon-theme-office2016](./docs/assets/screenshot/SARibbon-theme-office2016.png)
+  - office2021主题：
+        ![SARibbon-theme-office2021](./docs/assets/screenshot/SARibbon-theme-office2021.png)
+  - dark主题：
+        ![SARibbon-theme-dark](./docs/assets/screenshot/SARibbon-theme-dark.png)
+  - dark2主题：
+        ![SARibbon-theme-dark](./docs/assets/screenshot/SARibbon-theme-dark2.png)
+
+    你可以通过qss定制任意主题，具体可参阅文档：[自定义样式](./docs/zh/use-guide/design-your-theme.md)
 
 - 提供Gallery控件
-
-![SARibbonBar-gallery](./docs/assets/screenshot/SARibbonBar-gallery.png)
+    ![SARibbonBar-gallery](./docs/assets/screenshot/SARibbonBar-gallery.png)
 
 - 支持超长滚动和Option Action
-
-![SARibbonBar-option-action](./docs/assets/screenshot/SARibbonBar-option-action.gif)
+    ![SARibbonBar-option-action](./docs/assets/screenshot/SARibbonBar-option-action.gif)
 
 - 提供居中对齐模式
-
-![SARibbon-aligment-center](./docs/assets/screenshot/SARibbon-aligment-center.png)
+    ![SARibbon-aligment-center](./docs/assets/screenshot/SARibbon-aligment-center.png)
 
 - 支持4K屏和多屏幕扩展
 - 支持linux和MacOS（界面未做深度适配）
+- 提供RTL模式，可根据系统自动适配
 
-- **协议**：MIT（自由使用、修改、分发）
-- **欢迎贡献**：欢迎提交 Issue、PR 或加入交流群讨论！
+**协议**：MIT（自由使用、修改、分发）
+**欢迎贡献**：欢迎提交 Issue、PR 或加入交流群讨论！
 
 [gitee(码云) - https://gitee.com/czyt1988/SARibbon](https://gitee.com/czyt1988/SARibbon)
 
@@ -110,9 +115,11 @@ dark2主题：
 
 ## 构建及使用
 
-**项目文档位于 docs/zh文件夹下，你可以直接点击此链接：**[https://czyt1988.github.io/SARibbon/zh](https://czyt1988.github.io/SARibbon/zh)
+SARibbon提供了集成文件，位于src目录下，你只需要在项目中引入`SARibbon.h`和`SARibbon.cpp`即可使用
 
-**项目的doxygen文档部署于：**[https://czyt1988.github.io/SARibbon/doxygen/index.html](https://czyt1988.github.io/SARibbon/doxygen/index.html)
+如果你想编译为动态库，你可以参考下面文档[SARibbon构建说明](./docs/zh/build-guide/build-instructions.md)
+
+快速开始可以参阅:[创建Ribbon风格的窗口](./docs/zh/use-guide/create-ribbon-style-window.md)和[创建Ribbon界面](./docs/zh/use-guide/create-ribbon-ui.md)两篇入门文章
 
 **推荐从 `example/MainWindowExample` 入手学习 SARibbon 的使用方式，你也可以直接运行该示例，体验各项功能**
 
@@ -134,11 +141,14 @@ dark2主题：
 
 ## 文档生成
 
+**项目文档位于 docs/zh文件夹下，你可以直接点击此链接：**[https://czyt1988.github.io/SARibbon/zh](https://czyt1988.github.io/SARibbon/zh)
+
+**项目的doxygen文档部署于：**[https://czyt1988.github.io/SARibbon/doxygen/index.html](https://czyt1988.github.io/SARibbon/doxygen/index.html)
+
 - 使用 `doxygen` 生成 HTML 或 `.qch` 格式文档：
   - `docs/Doxyfile-wiki-cn` → 生成网页版文档
   - `docs/Doxyfile-qch-cn` → 生成 Qt Creator 可集成的帮助文档
 - 项目静态文档通过 `mkdocs` 构建并部署于 GitHub Pages，你可以通过此链接来访问：[https://czyt1988.github.io/SARibbon/zh](https://czyt1988.github.io/SARibbon/zh)
-
 
 ## 给我一个鼓励❤️
 
