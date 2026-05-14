@@ -1,9 +1,10 @@
 # 常见问题说明
 
-- ✅ **高分屏适配**：涵盖Qt5/6高DPI缩放属性与缩放策略配置
-- ✅ **快捷键全局响应**：解决Ribbon模式下隐藏面板快捷键失效的问题
+- ✅ **高分屏适配**：涵盖 Qt5/6 高 DPI 缩放属性与缩放策略配置
+- ✅ **快捷键全局响应**：解决 Ribbon 模式下隐藏面板快捷键失效的问题
 - ✅ **主题设置时机**：构造函数中主题不生效的解决方案，详见 [主题切换](./use-guide/SARibbon-theme.md)
-- ✅ **SVG图标依赖**：运行环境缺少Qt SVG插件时的排查方法
+- ✅ **SVG图标依赖**：运行环境缺少 Qt SVG 插件时的排查方法
+- ✅ **多屏不同 DPI 跨屏抖动**：多显示器缩放比例不同时窗口拖动抖动的排查与解决
 
 ## 1、高分屏显示问题
 
@@ -110,4 +111,49 @@ SARibbonBar_amalgamate
 - 或确保环境变量 `PATH` 中能找到 `plugins/imageformats` 文件夹
 
 !!! tip
-    此问题在所有依赖SVG资源的控件中都会出现，包括Ribbon图标、Gallery项等。
+    此问题在所有依赖 SVG 资源的控件中都会出现，包括 Ribbon 图标、Gallery 项等。
+
+## 6、多显示器不同 DPI 缩放时窗口跨屏拖动抖动
+
+当电脑连接了多个显示器且设置了不同的缩放比例（例如屏幕 A 为 200%，屏幕 B 为 150%），将窗口从高缩放屏幕拖向低缩放屏幕边缘时，窗口会发生剧烈抖动，在两个屏幕之间反复跳变。
+
+### 原因
+
+窗口跨越 DPI 边界时，Qt 会根据新屏幕的缩放比重新计算逻辑尺寸（Logical Size）。以屏幕 A（2.0x）到屏幕 B（1.5x）为例：
+
+- 在屏幕 A 上：逻辑尺寸为 2816 × 2804，对应物理像素 5632 × 5608
+- 窗口跨越到屏幕 B 时：逻辑尺寸被重新计算为 2112 × 2103
+- 由于逻辑尺寸骤然变小，窗口右侧边缘向左猛缩，导致窗口重心回落到屏幕 A，系统再次触发 DPI 切换，陷入死循环
+
+### 解决方法
+
+1. **推荐开启 QWindowKit 无边框方案**
+
+    QWindowKit 是一个跨平台的第三方无边框方案，对多屏不同 DPI 的处理更加完善，同时也支持 Windows 11 贴边特效（Snap Layout）等系统特性。编译时设置 CMake 选项：
+
+    ```cmake
+    SARIBBON_USE_FRAMELESS_LIB=ON
+    ```
+
+    !!! note
+        开启 QWindowKit 需要 C++17 并安装 [QWindowKit](https://github.com/stdware/qwindowkit) 库。具体配置请参阅 [构建指引](../build-guide/build-SARibbon.md)。
+
+2. **使用 Qt6 + 最新版 SARibbon**
+
+    Qt5 本身存在多屏 DPI 的已知 Bug，建议使用 Qt6（6.2 以上版本）。配合最新版 SARibbon，即使不开启 QWindowKit（使用纯 Qt 模拟无边框方案），多屏不同 DPI 也可以正常工作。
+
+3. **如需嵌入原生 HWND 窗口，设置 `AA_DontCreateNativeWidgetSiblings`**
+
+    开启 QWindowKit 后，如果在 SARibbonMainWindow 中嵌入了原生 HWND 窗口（如 DockWidget 内包含 Win32 原生控件），可能导致窗口句柄（Window Handle）损坏，拖动标题栏失效。此问题与 [QWindowKit Issue #32](https://github.com/stdware/qwindowkit/issues/32) 类似，解决方法是在 `main` 函数中添加：
+
+    ```cpp
+    int main(int argc, char* argv[])
+    {
+        QGuiApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
+        QApplication a(argc, argv);
+        // ...
+    }
+    ```
+
+    !!! warning
+        `Qt::AA_DontCreateNativeWidgetSiblings` 是 Qt 的全局属性，会影响所有 QWidget 的原生窗口创建行为。仅在确实需要嵌入原生 HWND 窗口时才设置此属性。
