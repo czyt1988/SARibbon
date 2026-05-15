@@ -1,6 +1,6 @@
 # SARibbon简介
 
-[Click here for English](https://czyt1988.github.io/SARibbon/en/)
+[Click here for English](https://czyt1988.github.io/SARibbon/)
 
 <div align="center">
 <p>
@@ -94,7 +94,7 @@ office2021主题：
 dark主题：
 ![SARibbon-theme-dark](../assets/screenshot/SARibbon-theme-dark.png)
 dark2主题：
-![SARibbon-theme-dark](../assets/screenshot/SARibbon-theme-dark2.png)
+![SARibbon-theme-dark2](../assets/screenshot/SARibbon-theme-dark2.png)
 
 - 提供Gallery控件
 
@@ -145,8 +145,8 @@ dark2主题：
 ## 文档生成
 
 - 使用 `doxygen` 生成 HTML 或 `.qch` 格式文档：
-  - `docs/Doxyfile-wiki-cn` → 生成网页版文档
-  - `docs/Doxyfile-qch-cn` → 生成 Qt Creator 可集成的帮助文档
+  - `docs/doxygen-doc-file/Doxyfile-wiki-cn` → 生成网页版文档
+  - `docs/doxygen-doc-file/Doxyfile-qch-cn` → 生成 Qt Creator 可集成的帮助文档
 - 项目静态文档通过 `mkdocs` 构建并部署于 GitHub Pages，你可以通过此链接来访问：[https://czyt1988.github.io/SARibbon/zh](https://czyt1988.github.io/SARibbon/zh)
 
 
