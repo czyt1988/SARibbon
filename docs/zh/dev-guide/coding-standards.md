@@ -122,9 +122,9 @@ Q_PROPERTY(bool minimumModeButton READ haveShowMinimumModeButton WRITE showMinim
 ```
 
 !!! danger "强制规则"
-    - 头文件 public 函数：禁止双语 Doxygen，只能用单行英文 `//`
+    - 头文件 public 函数：禁止双语 Doxygen，只能用单行英文 `///`
     - Q_PROPERTY：禁止加任何注释（包括 Doxygen 块）
-    - 类注释：禁止 `@param`、`@class`、`@ingroup`，仅允许 `@brief`/`@details`/`@note`/`@see`
+    - 类注释：禁止 `@param`、`@class`、`@ingroup`，仅允许 `@brief`/`@details`/`@note`/`see`
 
 ### 源文件（.cpp）注释规范
 
@@ -155,7 +155,7 @@ Q_PROPERTY(bool minimumModeButton READ haveShowMinimumModeButton WRITE showMinim
 
 头文件中的注释遵循以下规则：
 
-1. **`public` 函数声明**：仅添加**单行英文简要注释**（使用 `//`）
+1. **`public` 函数声明**：仅添加**单行英文简要注释**（使用 `///`）
 2. **禁止**在头文件的类成员函数中写入双语 Doxygen 块
 3. **特例**：Qt 信号（`Q_SIGNALS` 区域下的函数）和类的注释需在头文件中使用双语 Doxygen
 

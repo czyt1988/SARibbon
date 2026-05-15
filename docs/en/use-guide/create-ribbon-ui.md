@@ -187,7 +187,7 @@ For the 2-row mode, the effects of the above three row placeholders are as shown
 
 ![pannelLayout2row](../../assets/pic/pannelLayout2row.png)
 
-In 2-row mode, the medium and small placeholders (`SARibbonPannelItem::RowProportion`) are the same and not distinguished.
+In 2-row mode, the medium and small placeholders (`SARibbonPanelItem::RowProportion`) are the same and not distinguished.
 
 In single-row mode (new in v2.8.0), all buttons are arranged in a single horizontal row with icon on left and text on right. Large, Medium, and Small placeholders all behave as Small. It is recommended to enable `SARibbonBar::setEnableIconRightText(true)` for the best visual effect.
 
@@ -369,7 +369,7 @@ The effect of the above code is as follows:
 
 ![SARibbonBar-Context-Category](../../assets/screenshot/SARibbonBar-Context-Category.png)
 
-To distinguish context tab pages from ordinary tab pages, context tab pages are marked with a special color, as shown in the figure above. The color of this mark can be set via `SARibbonBar::setContextCategoryColor`.
+To distinguish context tab pages from ordinary tab pages, context tab pages are marked with a special color, as shown in the figure above. The color of this mark can be set via `SARibbonBar::setContextCategoryColorList`.
 
 ## Application Button
 

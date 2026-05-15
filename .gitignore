@@ -19,6 +19,7 @@ build*
 tmp
 tmp-file
 .$*
+.qtcreator
 .vs
 .qoder
 .sisyphus
@@ -27,7 +28,22 @@ tmp-file
 .codebuddy
 docs/superpowers
 nul
-.qtcreator
+.opencode/
+.claude/
+.codex/
+.vibe/
+.opencode/
+.windsurf/
+.gemini/
+.cursor/
+.qwen/
+.kilocode/
+.augment/
+.roo/
+.amazonq/
+.kiro/
+.agent/
+.github/copilot/
 
 #文档目录
 site

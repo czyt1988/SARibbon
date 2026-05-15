@@ -2,5 +2,6 @@ mkdocs==1.6.1
 mkdocs-material==9.6.20
 mkdocs-static-i18n==1.3.0
 mkdocs-with-pdf
+pymdown-extensions
 # 如果以后上多版本再放开
 # mike==2.1.0

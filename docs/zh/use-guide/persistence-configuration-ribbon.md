@@ -52,8 +52,8 @@ SARibbonActionsManager* m_ribbonActionMgr;///< 用于管理所有action
 ```cpp
 //MainWindow的初始化，生成QAction
 //生成ribbon布局
-m_ribbonActionMgr = new SARibbonActionsManager(mainWinowPtr);
-m_ribbonActionMgr->autoRegisteActions(mainWinowPtr);
+m_ribbonActionMgr = new SARibbonActionsManager(ribbonBar());
+m_ribbonActionMgr->autoRegisteActions(ribbonBar());
 ```
 
 `SARibbonActionsManager`的关键函数`autoRegisteActions`可以遍历 `SARibbonMainWindow`下的所有子object，找到action并注册，并会遍历所有`SARibbonCategory`,把`SARibbonCategory`下的action按`SARibbonCategory`的title name进行分类，此函数还会把`SARibbonMainWindow`下面的action，但不在任何一个category下的作为NotInRibbonCategoryTag标签注册，默认名字会赋予not in ribbon
@@ -76,7 +76,7 @@ if (QDialog::Accepted == dlg.exec()) {
 
 ```cpp
 //MainWindow的构造函数最后
-sa_apply_customize_from_xml_file("customization.xml", this, m_ribbonActionMgr);
+sa_apply_customize_from_xml_file("customization.xml", ribbonBar(), m_ribbonActionMgr);
 ```
 
 `sa_apply_customize_from_xml_file`是`SARibbonCustomizeWidget.h`中提供的函数，直接把配置文件中的自定义内容应用到MainWindow中。
@@ -114,7 +114,7 @@ class MainWindow : public SARibbonMainWindow
     Q_OBJECT
 public:
     MainWindow(QWidget* par = nullptr);
-private slots:
+private Q_SLOTS:
     void onActionCustomizeTriggered();
 private:
     void initRibbon();
@@ -126,12 +126,12 @@ MainWindow::MainWindow(QWidget* par) : SARibbonMainWindow(par)
 {
     initRibbon();
     
-    // 创建ActionsManager并自动注册
-    m_ribbonActionMgr = new SARibbonActionsManager(this);
-    m_ribbonActionMgr->autoRegisteActions(this);
+    // 创建ActionsManager并自动注册（SARibbonActionsManager和autoRegisteActions需要SARibbonBar*，使用ribbonBar()获取）
+    m_ribbonActionMgr = new SARibbonActionsManager(ribbonBar());
+    m_ribbonActionMgr->autoRegisteActions(ribbonBar());
     
     // 加载已有的自定义配置
-    sa_apply_customize_from_xml_file("customization.xml", this, m_ribbonActionMgr);
+    sa_apply_customize_from_xml_file("customization.xml", ribbonBar(), m_ribbonActionMgr);
 }
 
 void MainWindow::onActionCustomizeTriggered()

@@ -48,6 +48,10 @@ SARibbon supports six layout schemes: loose three-row, loose two-row, compact th
     - **SARibbonWidget** embedded in other windows: use Compact layout
     - **Space extremely limited** (embedded devices, small windows): use SingleRow layout, combined with `setEnableIconRightText`
 
+## SARibbon Layout Settings
+
+SARibbon provides the `SARibbonBar::setRibbonStyle` function to define the current layout scheme. The enum `SARibbonBar::RibbonStyleFlag` defines six layout options:
+
 The style enumeration definitions of SARibbon are as follows (located in SARibbonBar):
 
 ```cpp
@@ -67,24 +71,6 @@ enum RibbonStyleFlag
     RibbonStyleCompactSingleRow = RibbonStyleCompact | RibbonStyleSingleRow ///< Compact structure, 1-row mode
 };
 ```
-
-The layout of each control in loose mode is shown in the following figure:
-
-![saribbonbar-level](../../assets/pic/saribbonbar-level.png)
-
-In SARibbon, the layout that combines the title bar and tab is called compact layout (Compact). The layout of each control in compact mode is shown in the following figure:
-
-![saribbonbar-level](../../assets/pic/saribbonbar-level-2.png)
-
-When using SARibbonWidget, it is recommended to use the compact mode to avoid large blank spaces in the title bar.
-
-When using the native border (`SARibbonMainWindowStyleFlag::UseRibbonMenuBar|SARibbonMainWindowStyleFlag::UseNativeFrame`), it is recommended to use the compact mode to avoid large blank spaces in the title bar.
-
-You can run the `example/MainWindowExample` example, which allows you to set different styles to observe different ribbon styles and layouts.
-
-![ribbon-style-example](../../assets/pic/ribbon-style-example.png)
-
-SARibbon provides the `SARibbonBar::setRibbonStyle` function, which can define the current layout scheme. The enumeration `SARibbonBar::RibbonStyle` defines six layout schemes:
 
 - `SARibbonBar::RibbonStyleLooseThreeRow`: Loose structure, 3-row mode (equivalent to `SARibbonBar::OfficeStyle` in v0.x version)
 
@@ -143,6 +129,30 @@ These five functions have the following main purposes:
 - `SARibbonBar::setPanelLayoutMode`: Set the panel layout mode (3-row, 2-row, or single-row)
 - `SARibbonBar::setEnableWordWrap`: Set whether button text can wrap
 - `SARibbonBar::setEnableIconRightText`: Set whether buttons use horizontal layout with icon on left, text on right; enabled by default in single-row mode
+
+For ribbon button layout details, refer to: [Ribbon Button Layout Guide](./layout-of-ribbonbutton.md)
+
+## Widget Arrangement Under Different Layouts
+
+Built-in ribbon controls have different arrangement forms depending on the layout mode.
+
+In loose mode, the arrangement of each control is shown in the following figure:
+
+![saribbonbar-level](../../assets/pic/saribbonbar-level.png)
+
+In SARibbon, the layout that combines the title bar and tab is called compact layout (Compact). The arrangement of each control in compact mode is shown in the following figure:
+
+![saribbonbar-level](../../assets/pic/saribbonbar-level-2.png)
+
+When using SARibbonWidget, it is recommended to use compact mode to avoid large blank spaces in the title bar.
+
+When using native border (`SARibbonMainWindowStyleFlag::UseRibbonMenuBar|SARibbonMainWindowStyleFlag::UseNativeFrame`), it is recommended to use compact mode to avoid large blank spaces in the title bar.
+
+You can run the `example/MainWindowExample` example to set different styles and observe different ribbon styles and layout changes.
+
+![ribbon-style-example](../../assets/pic/ribbon-style-example.png)
+
+In this example, you can click the `use office style`, `use wps style`, `use office 2row style`, `use wps 2row style`, and `use single row style` buttons to see how different ribbon styles and layouts change.
 
 ## Panel Layout Schemes
 

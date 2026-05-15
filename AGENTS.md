@@ -28,34 +28,45 @@ docs/zh/build-guide/      ← 构建指引
 
 ## 构建
 
-CMake 构建，最低 Qt 5.12，支持 Qt5 和 Qt6，C++ 标准由 CMakeLists 根据 Qt 版本和选项自动设定（最低 C++14）。
+CMake 构建，最低 Qt 5.12，支持 Qt5 和 Qt6，C++ 标准由 CMakeLists 根据 Qt 版本和选项自动设定（最低 C++14）。详见 [build.md](build.md)。
 
-推荐使用 **Visual Studio 生成器**，它会自动初始化 MSVC 编译器环境。如果使用 Ninja 生成器，需要手动初始化 MSVC 环境变量（`INCLUDE`、`LIB`、`PATH` 等），否则编译器会找不到标准库头文件。详见 [build.md](build.md)。
+### 构建环境
 
-### Visual Studio 生成器（推荐）
+- **Windows**：CMake 3.15+，Visual Studio 2019（MSVC 14.29+），Qt 6.7+ 或 Qt 5.12+
+- **Linux / WSL**：CMake 3.15+，GCC 9+（推荐 GCC 13+），Qt 6.x（apt）或 Qt 5.12+（手动安装）
+
+### Windows (Visual Studio 生成器，推荐)
 
 ```powershell
-# 在项目根目录下
 cmake -S . -B build -G "Visual Studio 16 2019" -A x64 -DCMAKE_PREFIX_PATH="C:/Qt/6.7.3/msvc2019_64"
 cmake --build build --config Release
 ```
 
-### Ninja 生成器（需手动初始化 MSVC 环境）
+### Windows (Ninja 生成器，需初始化 MSVC 环境)
 
 ```powershell
-# 先初始化 MSVC 环境变量（vcvarsall.bat 会设置 INCLUDE、LIB、PATH 等关键变量）
+# 先初始化 MSVC 环境变量
 cmd /c '"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat" x64 & set' | ForEach-Object {
     if ($_ -match '^([^=]+)=(.*)$') {
         [Environment]::SetEnvironmentVariable($matches[1], $matches[2], 'Process')
     }
 }
-
-# 然后使用 Ninja 构建
 cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="C:/Qt/6.7.3/msvc2019_64"
 cmake --build build
 ```
 
-> 构建损坏时先关掉 `build/bin` 下占用的程序，再 `Remove-Item -Recurse -Force build` 重配。
+### Linux / WSL
+
+```bash
+# Ubuntu 24.04 Qt6 依赖安装
+sudo apt install qt6-base-dev qt6-base-dev-tools qt6-svg-dev qt6-tools-dev ninja-build
+
+# 构建
+cmake -S . -B build-linux -G Ninja -DCMAKE_BUILD_TYPE=Release
+cmake --build build-linux --parallel
+```
+
+> 构建损坏时先关掉 `build/bin` 下占用的程序，再删除 build 目录重配。Linux apt 安装的 Qt6 无需指定 `CMAKE_PREFIX_PATH`。
 
 ### CMake 选项
 
@@ -64,6 +75,7 @@ cmake --build build
 - `SARIBBON_BUILD_EXAMPLES` → 默认 ON，控制是否编译示例程序
 - `SARIBBON_ENABLE_SNAPLAYOUT=ON` → 启用 Windows 11 Snap Layout（仅 `SARIBBON_USE_FRAMELESS_LIB=ON` 时有效）
 - `SARIBBON_INSTALL_IN_CURRENT_DIR` → Windows 默认 ON，安装到 `bin_qt{版本}_{编译器}_x{架构}/`
+- `BUILD_TESTS=ON` → 启用单元测试（Qt Test 框架）
 
 > 根据实际 Qt 安装位置调整 `CMAKE_PREFIX_PATH`。
 

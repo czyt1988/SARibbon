@@ -199,7 +199,7 @@ enum PanelLayoutMode
 
 单行模式是 v2.8.0 新增的布局方案，所有按钮在同一行内按横向排列，图标在左侧、文字在右侧，适合空间极度受限的场景。如下图所示：
 
-![1行模式ribbon布局示例](../../assets/pic/pannelLayout1row.png)
+![1行模式ribbon布局示例](../../assets/screenshot/single-style-compact.png)
 
 单行模式下 Large、Medium 和 Small 行占比（`SARibbonPanelItem::RowProportion`）都等效为 Small，不做区分。所有按钮使用图标左、文字右的横向布局。
 

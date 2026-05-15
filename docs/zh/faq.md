@@ -80,7 +80,7 @@ void MainWindow::initRibbon(){
 
 ```cpp
 QTimer::singleShot(0, this, [ this ]() { 
-    this->setRibbonTheme(SARibbonMainWindow::RibbonThemeDark); 
+    this->setRibbonTheme(SARibbonTheme::RibbonThemeDark); 
     });
 ```
 
@@ -136,7 +136,7 @@ SARibbonBar_amalgamate
     ```
 
     !!! note
-        开启 QWindowKit 需要 C++17 并安装 [QWindowKit](https://github.com/stdware/qwindowkit) 库。具体配置请参阅 [构建指引](../build-guide/build-SARibbon.md)。
+        开启 QWindowKit 需要 C++17 并安装 [QWindowKit](https://github.com/stdware/qwindowkit) 库。具体配置请参阅 [构建指引](./build-guide/build-SARibbon.md)。
 
 2. **使用 Qt6 + 最新版 SARibbon**
 

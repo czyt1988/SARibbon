@@ -156,5 +156,5 @@ Project documentation is built with **MkDocs** and deployed to GitHub Pages:
 
 You can also generate documentation using **Doxygen**:
 
-- `docs/Doxyfile-qch-en`: generates `.qch` files for integration into **Qt Creator** as Qt Help documentation.
-- `docs/Doxyfile-wiki-en`: generates HTML documentation for browser viewing.
+- `docs/doxygen-doc-file/Doxyfile-qch-en`: generates `.qch` files for integration into **Qt Creator** as Qt Help documentation. *(Note: the `-en` variant does not yet exist — use `Doxyfile-qch-cn` as a reference, or create the `-en` version from it.)*
+- `docs/doxygen-doc-file/Doxyfile-wiki-en`: generates HTML documentation for browser viewing. *(Note: the `-en` variant does not yet exist — use `Doxyfile-wiki-cn` as a reference, or create the `-en` version from it.)*

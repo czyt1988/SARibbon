@@ -14,26 +14,51 @@ If you are not familiar with building, we recommend the static approach: simply 
 
 | Document | Content |
 |----------|---------|
-| [Building SARibbon Library](./build-SARibbon.md) | CMake/QMake build options and detailed steps |
+| [Building SARibbon Library](./build-SARibbon.md) | CMake build options and detailed steps |
 | [Third-Party Library Build](./build-3rdparty.md) | How to compile QWindowKit |
 | [Common Build Errors](./common-build-errors.md) | Troubleshooting compilation issues |
 | [Internationalization](./i18n.md) | Translation file generation and new languages |
 
-SARibbon uses [QWindowkit](https://github.com/stdware/qwindowkit) as its borderless-window solution, but also supports a minimal built-in borderless mode.  
-If you need native OS window features—such as Windows 7+ snap-to-edge or Windows 11 Snap Layouts—it is strongly advised to enable the [QWindowkit](https://github.com/stdware/qwindowkit) library, which also fixes multi-monitor relocation issues.
+## Build Workflow Overview
 
-With QWindowkit enabled you will get effects like:
+SARibbon building is divided into two parts: third-party dependencies (optional) and SARibbon itself. The following flowchart shows the overall build route:
+
+```mermaid
+flowchart TD
+    A[Start Build] --> B{Need native window features?}
+    B -->|Yes| C[Build QWindowKit third-party library]
+    B -->|No| D[Skip third-party library]
+    C --> E[Build SARibbon library]
+    D --> E
+    E --> F[CMake Build]
+    F --> G[Install to local directory]
+    G --> H[Reference library in project]
+```
+
+!!! warning "Note"
+    SARibbon removed qmake-based builds after v2.6.3 and only supports CMake. If you need qmake support, use v2.6.2 or earlier.
+
+## QWindowKit Third-Party Library
+
+SARibbon uses [QWindowKit](https://github.com/stdware/qwindowkit) as its borderless-window solution, while also supporting a simple built-in borderless mode. If you need native OS window features, such as Windows 7+ snap-to-edge handling or Windows 11 Snap Layout effects, it is recommended to enable the [QWindowKit](https://github.com/stdware/qwindowkit) library. This library also effectively addresses multi-monitor movement issues.
+
+After enabling QWindowKit, you will be able to achieve effects like:
 
 ![set-qwindowkit-on-snap](../../assets/pic/set-qwindowkit-on-snap.gif)
 
-To enable [QWindowkit](https://github.com/stdware/qwindowkit) you must first build that library.
+To enable [QWindowKit](https://github.com/stdware/qwindowkit), you need to compile the library first. For detailed steps, see [Third-Party Library Build](./build-3rdparty.md).
 
 !!! warning "Note"
-    QWindowkit is a submodule of SARibbon.  
-    If you cloned without `--recursive`, run:
+    As a submodule of the SARibbon project, if you did not use the `--recursive` flag during `git clone`, run:
     ```shell
     git submodule update --init --recursive
     ```
+
+## Building the SARibbon Library
+
+SARibbon only supports the CMake build approach (qmake support was removed after v2.6.3). For detailed build steps and configuration options, see [Building SARibbon Library](./build-SARibbon.md).
+
+If you encounter issues during the build process, see [Common Build Errors](./common-build-errors.md).
 
 ## Installation Location
 

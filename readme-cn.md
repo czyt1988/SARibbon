@@ -146,8 +146,8 @@ SARibbon提供了集成文件，位于src目录下，你只需要在项目中引
 **项目的doxygen文档部署于：**[https://czyt1988.github.io/SARibbon/doxygen/index.html](https://czyt1988.github.io/SARibbon/doxygen/index.html)
 
 - 使用 `doxygen` 生成 HTML 或 `.qch` 格式文档：
-  - `docs/Doxyfile-wiki-cn` → 生成网页版文档
-  - `docs/Doxyfile-qch-cn` → 生成 Qt Creator 可集成的帮助文档
+  - `docs/doxygen-doc-file/Doxyfile-wiki-cn` → 生成网页版文档
+  - `docs/doxygen-doc-file/Doxyfile-qch-cn` → 生成 Qt Creator 可集成的帮助文档
 - 项目静态文档通过 `mkdocs` 构建并部署于 GitHub Pages，你可以通过此链接来访问：[https://czyt1988.github.io/SARibbon/zh](https://czyt1988.github.io/SARibbon/zh)
 
 ## 给我一个鼓励❤️

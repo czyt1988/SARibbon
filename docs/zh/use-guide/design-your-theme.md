@@ -11,7 +11,7 @@
 自定义 QSS 时，需要了解各选择器对应的界面组件层级关系：
 
 ```mermaid
-flowchart TD
+flowchart LR
     A[SARibbonBar] --> B[SARibbonTabBar]
     A --> C[SARibbonCategory]
     A --> D[SARibbonQuickAccessBar]

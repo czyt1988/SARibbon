@@ -8,6 +8,29 @@
 
 ---
 
+## Direct Inclusion
+
+Direct inclusion is the simplest integration method. Just add `src/SARibbon.h` and `src/SARibbon.cpp` to your project. By default, QWindowKit (qwk) is not enabled. If you need to enable it, do the following:
+
+1. Add preprocessor macros
+
+- Set `SARIBBON_USE_3RDPARTY_FRAMELESSHELPER` to 1
+- Set `SARIBBON_ENABLE_SNAP_LAYOUT` to 1
+
+If using qmake, add the following to your `.pro` file:
+
+```shell
+# Define macros with values
+DEFINES += SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1
+DEFINES += SARIBBON_ENABLE_SNAP_LAYOUT=1
+```
+
+If using a Visual Studio project:
+
+- Right-click the project → Properties
+- Select C/C++ → Preprocessor
+- Add the macros under Preprocessor Definitions
+
 ## Bringing SARibbon into a CMake project
 
 1. Build and install SARibbon with CMake first.
@@ -132,3 +155,53 @@ To turn it on:
    Preprocessor Definitions → add the two macros above.
 
 Rebuild—QWindowKit support is now active even in the single-header/static mode.
+
+## Complete CMakeLists.txt Example for Direct Inclusion
+
+Below is a complete CMakeLists.txt configuration for directly embedding `SARibbon.h` and `SARibbon.cpp` into your project (referenced from `example/StaticExample`):
+
+```cmake
+cmake_minimum_required(VERSION 3.5)
+project(MyRibbonApp VERSION 0.1 LANGUAGES CXX)
+
+set(CMAKE_AUTOUIC ON)
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+
+# Qt6 requires C++17, Qt5 uses C++14
+if(QT_VERSION_MAJOR EQUAL 6)
+    set(CMAKE_CXX_STANDARD 17)
+else()
+    set(CMAKE_CXX_STANDARD 14)
+endif()
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+# Find Qt
+find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Core Gui Widgets)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Core Gui Widgets)
+
+# SARibbon source file paths (adjust according to actual location)
+set(SARIBBON_DIR ${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/SARibbon/src)
+
+# Add your source files and the two SARibbon files
+add_executable(${PROJECT_NAME}
+    main.cpp
+    mainwindow.cpp
+    mainwindow.h
+    ${SARIBBON_DIR}/SARibbon.h
+    ${SARIBBON_DIR}/SARibbon.cpp
+)
+
+# This macro must be defined for static inclusion
+target_compile_definitions(${PROJECT_NAME} PRIVATE SA_RIBBON_BAR_NO_EXPORT)
+
+# Link Qt libraries
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Gui
+    Qt${QT_VERSION_MAJOR}::Widgets
+)
+```
+
+!!! tip "Tip"
+    Direct inclusion is the simplest approach, suitable for quick start. For larger projects or when sharing SARibbon across multiple projects, it is recommended to build as a dynamic library and include via `find_package`.

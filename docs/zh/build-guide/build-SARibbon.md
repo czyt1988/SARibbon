@@ -1,14 +1,13 @@
 # SARibbon库构建
 
-- ✅ **CMake构建**：支持Visual Studio和Qt Creator，含5个可配置选项
-- ✅ **QMake构建**：兼容旧版本，通过Qt Creator直接打开（v2.6.2以下）
+- ✅ **CMake构建**：支持Visual Studio和Qt Creator，含6个可配置选项
 - ✅ **本地安装隔离**：按编译器/Qt版本自动创建独立安装目录，避免版本冲突
 - ✅ **可选QWindowKit**：启用后支持原生窗口特性（Snap Layout等）
 
-`SARibbon`库提供`CMake`和`QMake`两种方式构建，推荐使用`CMake`
+`SARibbon`库使用`CMake`进行构建
 
 !!! warning "注意"
-    Qt6之后不再维护`QMake`，逐渐转向`CMake`。SARibbon的未来版本将会移除`QMake`支持。
+    SARibbon在v2.6.3版本后移除了`QMake`（qmake）构建方式，仅支持`CMake`构建。
 
 ## 使用CMake构建SARibbon库
 
@@ -21,14 +20,18 @@
 | `SARIBBON_USE_FRAMELESS_LIB` | `OFF`                                   | 是否使用`QWindowKit`库作为无边框窗口解决方案                         | 需Qt 5.14+、Qt 6.2+版本；启用后强制使用C++17标准，依赖`QWindowKit`库                     |
 | `SARIBBON_ENABLE_SNAPLAYOUT` | `OFF`                                   | 是否启用Windows 11的Snap Layout（窗口磁吸布局）效果                  | 仅当`SARIBBON_USE_FRAMELESS_LIB=ON`时有效，不同Qt版本可能存在兼容性问题                   |
 | `SARIBBON_INSTALL_IN_CURRENT_DIR` | Windows为`ON`，其他系统为`OFF` | 控制库的安装路径，`ON`安装到项目根目录下的版本区分文件夹，`OFF`使用系统默认路径 | 本地安装文件夹命名格式：`bin_qt<Qt版本>_<编译器>_x<架构>`（如`bin_qt5.14.2_msvc_x64`） |
+| `BUILD_TESTS` | `OFF` | 控制是否构建单元测试（tests目录下的Qt Test框架测试） | 需设置`BUILD_TESTS=ON`并确保测试依赖可用 |
 
 !!! tip "注意"
     Qt 版本兼容性：
     SARIBBON_USE_FRAMELESS_LIB 对 Qt 版本有严格要求（Qt 5.14+、Qt 6.2+），低版本 Qt 会自动禁用该选项并切换到 C++14 标准
-    其他功能最低支持 Qt 5.8 版本。
+    其他功能最低支持 Qt 5.12 版本。
 
 !!! tip "注意"
-    启用 SARIBBON_USE_FRAMELESS_LIB 时，强制使用 C++17 标准；否则使用 C++14 标准（MSVC 下会自动添加对应编译 flags）。
+    C++ 标准要求：
+    - Qt6 构建时始终使用 C++17 标准
+    - 启用 SARIBBON_USE_FRAMELESS_LIB 时，强制使用 C++17 标准（Qt5 同理）
+    - 其他情况（Qt5 且不启用 frameless）使用 C++14 标准（MSVC 下会自动添加对应编译 flags）
 
 !!! tip "注意"
     第三方依赖：
@@ -80,12 +83,5 @@ Qt Creator可以在界面修改`SARIBBON_USE_FRAMELESS_LIB`值，也可以手动
 
 使用SARibbon的所有内容都在这个文件夹下
 
-## 使用QMake构建SARibbonBar
-
-qmake构建SARibbon只需使用Qt Creator打开`SARibbon.pro`文件即可
-
 !!! warning "注意"
-    如果使用Qt Creator打开`SARibbon.pro`文件过程报错，那么你的账户可能没有足够的写权限，不同版本的Qt Creator在不同操作系统有不一样的表现，建议使用CMake进行构建。
-
-!!! warning "注意"
-    SARibbon在v2.6.3版本后移除了qmake构建方式，仅支持cmake构建方式，如果你需要使用qmake构建方式，请使用v2.6.2及以下版本。
+    SARibbon在v2.6.3版本后移除了qmake构建方式，仅支持cmake构建方式。本文档不再包含QMake构建说明。如果你需要使用qmake构建方式，请使用v2.6.2及以下版本。

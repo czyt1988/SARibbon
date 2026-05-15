@@ -4,6 +4,7 @@
 - ✅ **Global shortcut response**: resolves hidden-panel shortcut failures in Ribbon mode
 - ✅ **Theme timing**: workaround for themes not applying in constructors, see [Theme Switching](use-guide/SARibbon-theme.md)
 - ✅ **SVG icon dependency**: troubleshooting missing Qt SVG plugin at runtime
+- ✅ **Multi-monitor DPI jittering**: resolving window jump when dragging across monitors with different DPI scaling
 
 ## 1. High-DPI Display Issues
 
@@ -44,10 +45,13 @@ int main(int argc, char* argv[])
 }
 ```
 
-!!! note
-    If you're using an OpenGL window and encounter strange rendering issues, try removing the above settings—recent versions of Qt may no longer require them.
+!!! tip "Qt6 note"
+    Qt6 enables high-DPI scaling by default and no longer requires `AA_EnableHighDpiScaling` or `AA_UseHighDpiPixmaps` (both attributes were removed in Qt6). For Qt6 users, you only need to configure `setHighDpiScaleFactorRoundingPolicy`.
 
     For more Ribbon sizing configuration, see [Size Settings](use-guide/SARibbon-size-settings.md).
+
+!!! note
+    If you're using an OpenGL window and encounter strange rendering issues, try removing the above settings. Recent versions of Qt no longer require them.
 
 ---
 
@@ -83,7 +87,7 @@ In some Qt versions, setting the ribbon theme in the constructor may not fully a
 
 ```cpp
 QTimer::singleShot(0, this, [this]() {
-    this->setRibbonTheme(SARibbonMainWindow::RibbonThemeDark);
+    this->setRibbonTheme(SARibbonTheme::RibbonThemeDark);
 });
 ```
 
@@ -119,3 +123,50 @@ If icons (e.g., minimize/maximize buttons) appear as blank buttons, or the conso
 
 !!! tip
     This issue affects all widgets that depend on SVG resources, including Ribbon icons and Gallery items.
+
+---
+
+## 6. Window Jitter When Dragging Across Multi-Monitor DPI Boundaries
+
+When you have multiple monitors with different scaling factors (for example, Screen A at 200 percent and Screen B at 150 percent), dragging a window from the high-scaling screen toward the low-scaling screen edge can cause the window to shake violently, jumping back and forth between the two screens.
+
+### Cause
+
+When a window crosses a DPI boundary, Qt recalculates the logical size based on the new monitor's scaling factor. For example, moving from Screen A (2.0x) to Screen B (1.5x):
+
+- On Screen A: logical size is 2816 x 2804, corresponding to physical pixels 5632 x 5608
+- When crossing to Screen B: logical size is recalculated to 2112 x 2103
+- Because the logical size suddenly shrinks, the right edge of the window moves sharply left, causing the window center to fall back onto Screen A. Qt triggers DPI switching again, creating an infinite loop
+
+### Solutions
+
+1. **Recommended: Enable the QWindowKit frameless solution**
+
+    QWindowKit is a cross-platform third-party frameless solution with improved handling of multi-monitor DPI differences. It also supports Windows 11 Snap Layout and other system features. Set the CMake option when building:
+
+    ```cmake
+    SARIBBON_USE_FRAMELESS_LIB=ON
+    ```
+
+    !!! note
+        Enabling QWindowKit requires C++17 and the [QWindowKit](https://github.com/stdware/qwindowkit) library to be installed. For configuration details, see the [Build Guide](./build-guide/build-SARibbon.md).
+
+2. **Use Qt6 with the latest SARibbon**
+
+    Qt5 has known multi-monitor DPI bugs. We recommend using Qt6 (version 6.2 or later). With the latest SARibbon, multi-monitor DPI works correctly even without QWindowKit (using the pure Qt frameless simulation).
+
+3. **Set `AA_DontCreateNativeWidgetSiblings` when embedding native HWND windows**
+
+    After enabling QWindowKit, if you embed a native HWND window inside `SARibbonMainWindow` (for example, a DockWidget containing a Win32 native control), it may cause the window handle to break and dragging via the title bar to fail. This is similar to [QWindowKit Issue #32](https://github.com/stdware/qwindowkit/issues/32). Add the following in your `main` function:
+
+    ```cpp
+    int main(int argc, char* argv[])
+    {
+        QGuiApplication::setAttribute(Qt::AA_DontCreateNativeWidgetSiblings);
+        QApplication a(argc, argv);
+        // ...
+    }
+    ```
+
+    !!! warning
+        `Qt::AA_DontCreateNativeWidgetSiblings` is a global Qt attribute that affects the native widget creation behavior of all QWidgets. Set this attribute only when you actually need to embed a native HWND window.

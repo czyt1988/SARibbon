@@ -12,6 +12,32 @@ The `SARibbon` library provides two build methods: `CMake` and `QMake`, with `CM
 
 ## Building the SARibbon Library with CMake
 
+### CMake Build Options
+
+| Option Name | Default Value | Description | Notes |
+|-------------|---------------|-------------|-------|
+| `SARIBBON_BUILD_STATIC_LIBS` | `OFF` | Controls SARibbon build mode: `ON` for static, `OFF` for dynamic | Static mode forces `BUILD_SHARED_LIBS=OFF`, dynamic mode forces `BUILD_SHARED_LIBS=ON` |
+| `SARIBBON_BUILD_EXAMPLES` | `ON` | Controls whether to build example programs under `example/` (e.g. `MainWindowExample`) | Disable to speed up compilation, builds only the library itself |
+| `SARIBBON_USE_FRAMELESS_LIB` | `OFF` | Whether to use `QWindowKit` as borderless window solution | Requires Qt 5.14+, Qt 6.2+; forces C++17 standard, depends on `QWindowKit` library |
+| `SARIBBON_ENABLE_SNAPLAYOUT` | `OFF` | Whether to enable Windows 11 Snap Layout effect | Only effective when `SARIBBON_USE_FRAMELESS_LIB=ON`, compatibility issues possible with different Qt versions |
+| `SARIBBON_INSTALL_IN_CURRENT_DIR` | `ON` on Windows, `OFF` on other systems | Controls install path: `ON` installs to version-distinguished folder under project root, `OFF` uses system default | Local install folder naming: `bin_qt<Qt version>_<compiler>_x<architecture>` (e.g. `bin_qt5.14.2_msvc_x64`) |
+| `BUILD_TESTS` | `OFF` | Controls whether to build unit tests (Qt Test framework tests under `tests/`) | Requires `BUILD_TESTS=ON` and test dependencies available |
+
+!!! tip "Note"
+    Qt version compatibility:
+    `SARIBBON_USE_FRAMELESS_LIB` has strict Qt version requirements (Qt 5.14+, Qt 6.2+). Lower Qt versions will automatically disable this option and switch to C++14 standard.
+    Other features require a minimum of Qt 5.12.
+
+!!! tip "Note"
+    C++ standard requirements:
+    - Qt6 builds always use C++17
+    - When `SARIBBON_USE_FRAMELESS_LIB` is enabled, C++17 is forced (same for Qt5)
+    - In all other cases (Qt5 without frameless), C++14 is used (MSVC adds corresponding compiler flags automatically)
+
+!!! tip "Note"
+    Third-party dependencies:
+    If `SARIBBON_USE_FRAMELESS_LIB` is enabled, ensure QWindowKit is properly compiled and discoverable by CMake (use `-DQWindowKit_DIR` to specify its path).
+
 ### Building under Visual Studio
 
 1. If you want to enable `QWindowKit`, change the option `SARIBBON_USE_FRAMELESS_LIB` to ON in `CMakeLists.txt`.

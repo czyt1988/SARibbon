@@ -11,11 +11,10 @@
 flowchart TD
     A[Call setRibbonTheme] --> B{Has custom QSS?}
     B -->|No| C[Apply built-in theme QSS directly]
-    B -->|Yes| D[Get built-in QSS: sa_get_ribbon_theme_qss]
-    D --> E[Merge: built-in QSS + custom QSS]
-    E --> F[setStyleSheet with merged stylesheet]
+    B -->|Yes| D[Call setRibbonTheme to apply built-in theme]
+    D --> E[Call setStyleSheet to merge custom QSS]
     C --> G[UI updated]
-    F --> G
+    E --> G
 ```
 
 SARibbon ships with several built-in themes: Windows 7, Office 2013, Office 2016, dark variants, etc.  
@@ -107,13 +106,12 @@ The following code demonstrates switching themes via a ComboBox (see `example/Ma
 void MainWindow::onThemeChanged(int index)
 {
     SARibbonTheme theme = static_cast<SARibbonTheme>(index);
-    // Merge with custom QSS if needed
-    if (m_customStyleSheet.isEmpty()) {
-        setRibbonTheme(theme);
-    } else {
-        QString ribbonQss = sa_get_ribbon_theme_qss(theme);
-        QString mergedQss = ribbonQss + "\n" + m_customStyleSheet;
-        this->setStyleSheet(mergedQss);
+    setRibbonTheme(theme);
+    // If the app has custom QSS, append it after setting the theme
+    if (!m_customStyleSheet.isEmpty()) {
+        // setRibbonTheme automatically applies built-in theme QSS
+        // setStyleSheet appends custom QSS without overwriting the built-in theme styles
+        this->setStyleSheet(m_customStyleSheet);
     }
 }
 ```
@@ -123,10 +121,11 @@ void MainWindow::onThemeChanged(int index)
 SARibbon themes are QSS-based. If your window already has a stylesheet, you must merge both; otherwise the later one overwrites the earlier.
 
 ```cpp
-// Option 1: Get theme QSS and merge manually
-QString ribbonQss = sa_get_ribbon_theme_qss(SARibbonTheme::RibbonThemeOffice2021Blue);
-QString myQss = loadMyCustomStyleSheet();
-this->setStyleSheet(ribbonQss + "\n" + myQss);
+// Option 1: Set built-in theme first, then append custom QSS
+// setRibbonTheme automatically applies built-in theme QSS to the window
+setRibbonTheme(SARibbonTheme::RibbonThemeOffice2021Blue);
+// Then append custom QSS (setStyleSheet appends, does not overwrite built-in theme QSS)
+this->setStyleSheet(loadMyCustomStyleSheet());
 
 // Option 2: Skip built-in themes entirely — use your own QSS
 // See example/MatlabUI for reference
@@ -135,6 +134,9 @@ if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
     this->setStyleSheet(QString::fromUtf8(file.readAll()));
 }
 ```
+
+!!! warning
+    `sa_get_ribbon_theme_qss` was mentioned in earlier documentation, but this function **does not exist** in the current codebase. The only way to apply built-in theme QSS is via `setRibbonTheme()`, which automatically applies it. There is no public API to obtain theme QSS as a string.
 
 !!! tip
     Built-in theme QSS files are in `src/SARibbonBar/resource`. Use them as a reference when writing custom themes. For full customization, see [Design Your Own Theme](./design-your-theme.md).

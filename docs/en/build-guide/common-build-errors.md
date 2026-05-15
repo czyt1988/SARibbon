@@ -43,16 +43,20 @@ If VS is installed correctly but this error still appears, two situations are us
    ```
 
 2. **Maximum path length limitation (260 chars)**  
-   Windows still enforces the legacy MAX_PATH limit by default.  
-   Enable long-path support:
+    Windows still enforces the legacy MAX_PATH limit by default.  
+    Enable long-path support via Group Policy Editor:
 
-   - Press `Win + R`, type `gpedit.msc`  
-   - Navigate to:  
-     *Computer Configuration → Administrative Templates → System → Filesystem*  
-   - Enable **"Enable Win32 long paths"**  
-   - Reboot
+    ```txt
+    Press Win + R, type gpedit.msc.
 
-   If the problem persists, simply move the project to a shorter location (e.g. `D:\src`) to reduce path length.
+    Navigate to:
+    Computer Configuration > Administrative Templates > System > Filesystem
+    Enable "Enable Win32 long paths".
+
+    Reboot the system.
+    ```
+
+    If the problem persists, simply move the project to a shorter location (e.g. `D:\src`) to reduce path length.
 
 !!! bug "MOC errors during build"
 

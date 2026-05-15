@@ -42,38 +42,80 @@ class SA_RIBBON_EXPORT SARibbonBar : public QMenuBar
     // ...
 Q_SIGNALS:
     /**
+     * \if ENGLISH
+     * @brief Application button click response - left upper corner button
+     * \endif
+     *
+     * \if CHINESE
      * @brief 应用按钮点击响应 - 左上角的按钮
+     * \endif
      */
     void applicationButtonClicked();
 
     /**
+     * \if ENGLISH
+     * @brief Signal triggered when tab page changes
+     * @param index New tab index
+     * \endif
+     *
+     * \if CHINESE
      * @brief 标签页变化触发的信号
      * @param index 新的标签页索引
+     * \endif
      */
     void currentRibbonTabChanged(int index);
 
     /**
+     * \if ENGLISH
+     * @brief Signal triggered when ribbon state changes
+     * @param nowState New ribbon state after change
+     * \endif
+     *
+     * \if CHINESE
      * @brief ribbon的状态发生了变化后触发此信号
      * @param nowState 变更之后的ribbon状态
+     * \endif
      */
     void ribbonModeChanged(SARibbonBar::RibbonMode nowState);
 
     /**
+     * \if ENGLISH
+     * @brief Signal triggered when ribbon style changes
+     * @param nowStyle New ribbon style after change
+     * \endif
+     *
+     * \if CHINESE
      * @brief ribbon的样式发生了变化后触发此信号
      * @param nowStyle 变更之后的ribbon样式
+     * \endif
      */
     void ribbonStyleChanged(SARibbonBar::RibbonStyles nowStyle);
 
     /**
+     * \if ENGLISH
+     * @brief Signal triggered when title bar height changes
+     * @param oldHeight Old title bar height
+     * @param newHeight New title bar height
+     * \endif
+     *
+     * \if CHINESE
      * @brief 标题栏高度发生了变化的信号
      * @param oldHeight 旧的标题栏高度
      * @param newHeight 新的标题栏高度
+     * \endif
      */
     void titleBarHeightChanged(int oldHeight, int newHeight);
 
     /**
+     * \if ENGLISH
+     * @brief Signal triggered when an action is triggered (similar to QToolBar::actionTriggered)
+     * @param action The triggered action
+     * \endif
+     *
+     * \if CHINESE
      * @brief 参考QToolBar::actionTriggered的信号
      * @param action 触发的action
+     * \endif
      */
     void actionTriggered(QAction* action);
 };
@@ -229,7 +271,11 @@ protected Q_SLOTS:  // 保护槽
     void onWindowIconChanged(const QIcon& i);
     void onCategoryWindowTitleChanged(const QString& title);
     virtual void onCurrentRibbonTabChanged(int index);
-private Q_SLOTS:  // 私有槽
+    void onStackWidgetHided();
+    void onCurrentRibbonTabClicked();
+    void onCurrentRibbonTabDoubleClicked();
+    void onContextsCategoryPageAdded();
+    void onContextsCategoryCategoryNameChanged();
     void onTabMoved(int from, int to);
 };
 ```

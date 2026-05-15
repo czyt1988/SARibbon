@@ -11,11 +11,10 @@
 flowchart TD
     A[调用 setRibbonTheme] --> B{是否有自定义 QSS?}
     B -->|否| C[直接应用内置主题 QSS]
-    B -->|是| D[获取内置主题 QSS: sa_get_ribbon_theme_qss]
-    D --> E[合并: 内置QSS + 自定义QSS]
-    E --> F[setStyleSheet 应用合并后的样式]
+    B -->|是| D[先调用 setRibbonTheme 设置内置主题]
+    D --> E[再调用 setStyleSheet 合并自定义QSS]
     C --> G[界面更新完成]
-    F --> G
+    E --> G
 ```
 
 SARibbon 提供了多种内置主题，如 Windows 7、Office 2013、Office 2016、暗色主题等，主题定义在`SARibbonTheme`枚举类中：
@@ -41,7 +40,7 @@ enum class SARibbonTheme
     {
         ...
         QTimer::singleShot(0, this, [ this ]() {
-            this->setRibbonTheme(SARibbonMainWindow::RibbonThemeDark);
+            this->setRibbonTheme(SARibbonTheme::RibbonThemeDark);
         });
     }
     ```
@@ -70,7 +69,7 @@ dark主题：
 
 dark2主题：
 
-![SARibbon-theme-dark](../../assets/screenshot/SARibbon-theme-dark2.png)
+![SARibbon-theme-dark2](../../assets/screenshot/SARibbon-theme-dark2.png)
 
 ## 主题对照表
 
@@ -102,15 +101,12 @@ dark2主题：
 void MainWindow::onThemeChanged(int index)
 {
     SARibbonTheme theme = static_cast<SARibbonTheme>(index);
-    // 如果程序有自定义的QSS，需要合并
-    if (m_customStyleSheet.isEmpty()) {
-        // 没有自定义QSS，直接设置主题
-        setRibbonTheme(theme);
-    } else {
-        // 有自定义QSS，需要先获取主题的QSS再合并
-        QString ribbonQss = sa_get_ribbon_theme_qss(theme);
-        QString mergedQss = ribbonQss + "\n" + m_customStyleSheet;
-        this->setStyleSheet(mergedQss);
+    setRibbonTheme(theme);
+    // 如果程序有自定义的QSS，需要在设置主题后再叠加
+    if (!m_customStyleSheet.isEmpty()) {
+        // setRibbonTheme会自动应用内置主题QSS，setStyleSheet会叠加自定义QSS
+        // 注意：setStyleSheet追加的内容不会覆盖之前由setRibbonTheme设置的样式
+        this->setStyleSheet(m_customStyleSheet);
     }
 }
 ```
@@ -122,10 +118,11 @@ SARibbon的主题是通过QSS实现的。如果你的窗口已经存在QSS样式
 合并方法：
 
 ```cpp
-// 方法一：通过 sa_get_ribbon_theme_qss 获取主题QSS后手动合并
-QString ribbonQss = sa_get_ribbon_theme_qss(SARibbonTheme::RibbonThemeOffice2021Blue);
-QString myQss = loadMyCustomStyleSheet();  // 加载你自己的QSS
-this->setStyleSheet(ribbonQss + "\n" + myQss);
+// 方法一：先设置内置主题，再叠加自定义QSS
+// setRibbonTheme会自动应用内置主题的QSS到窗口
+setRibbonTheme(SARibbonTheme::RibbonThemeOffice2021Blue);
+// 之后追加自定义QSS（setStyleSheet会叠加，不会覆盖内置主题QSS）
+this->setStyleSheet(loadMyCustomStyleSheet());
 
 // 方法二：如果你不需要内置主题，完全使用自定义QSS
 // 参考 example/MatlabUI 的实现方式
@@ -134,6 +131,9 @@ if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
     this->setStyleSheet(QString::fromUtf8(file.readAll()));
 }
 ```
+
+!!! warning "注意"
+    `sa_get_ribbon_theme_qss` 函数在早期文档中被提及，但该函数**不存在于当前代码库中**。获取内置主题QSS的唯一方式是通过 `setRibbonTheme()` 自动应用，没有公共API可以直接获取主题QSS字符串。
 
 !!! tip "提示"
     内置主题的QSS文件位于 `src/SARibbonBar/resource` 目录，你可以直接参考这些文件来编写自定义主题。如果需要完全自定义主题，请参阅 [自定义Ribbon主题](./design-your-theme.md)。

@@ -69,6 +69,26 @@ This design enables:
 
 The layout context `SARibbonButtonLayoutContext` encapsulates all parameters needed for layout calculation, including spacing, icon sizes, and word-wrap settings.
 
+## Button Icon Settings
+
+Ribbon buttons come in three sizes: large, medium, and small. Large button icons are 32x32, while medium and small button icons are 20x20.
+
+`SARibbonBar` provides the following functions for setting icon sizes for large and small buttons:
+
+```cpp
+// Large button icon size
+void setPanelLargeIconSize(const QSize& largeSize);
+// Small button icon size
+void setPanelSmallIconSize(const QSize& smallSize);
+// Set panel button icon sizes, first parameter is small icon size, second is large icon size
+void setPanelToolButtonIconSize(const QSize& smallSize, const QSize& largeSize);
+```
+
+These functions allow you to set your own icon sizes when customizing the layout.
+
+!!! example "Example"
+    You can run the `example/MainWindowExample` and manually adjust the sizes for testing.
+
 ---
 
 ## Word-Wrap Mode (Office Word style)
@@ -137,6 +157,22 @@ Remedies:
 
 1. **Mix button sizes** – e.g. two large buttons + three small ones in the same row.  
 2. **Force a break** with `\n`, especially for 4-character titles (two + two).
+
+## Button Layout Best Practices
+
+The following table summarizes recommended layout approaches for different scenarios:
+
+| Scenario | Recommended Approach | Description |
+|----------|---------------------|-------------|
+| Chinese interface | Non-wrap mode | Chinese characters are concise, single-line display works well, use `setEnableWordWrap(false)` |
+| English interface | Word-wrap mode | English words are longer, wrapping ensures full display, use `setEnableWordWrap(true)` |
+| Space extremely limited | Single-row mode + enableIconRightText | Icon-left text-right horizontal layout, use `RibbonStyleCompactSingleRow` + `setEnableIconRightText(true)` |
+| Important features | Large buttons | Large icon + text, immediately visible |
+| Common features | Medium buttons | Moderate size, occupies 2 rows in 3-row mode |
+| Auxiliary features | Small buttons | Small icons, saves space |
+| Related operations group | ButtonGroup | Use `SARibbonButtonGroupWidget` for tight grouping, e.g. alignment button group |
+| Short text without menu | Mix button sizes | 2 Large + 3 Small to avoid blank lines |
+| Four-character Chinese button | Manual line break | Use `\n` to force line breaks in pairs, e.g. `"File\nManage"` |
 
 ---
 

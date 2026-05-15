@@ -9,7 +9,7 @@
 
 | 文档 | 内容 |
 |------|------|
-| [SARibbon库构建](./build-SARibbon.md) | CMake/QMake构建选项和详细步骤 |
+| [SARibbon库构建](./build-SARibbon.md) | CMake构建选项和详细步骤 |
 | [第三方库编译](./build-3rdparty.md) | QWindowKit库的编译方法 |
 | [构建常见错误](./common-build-errors.md) | 编译问题排查与解决 |
 | [多语言翻译](./i18n.md) | 翻译文件生成与新增语言 |
@@ -25,12 +25,9 @@ flowchart TD
     B -->|否| D[跳过第三方库]
     C --> E[构建 SARibbon 库]
     D --> E
-    E --> F{选择构建方式}
-    F -->|CMake| G[CMake 构建]
-    F -->|QMake| H[QMake 构建]
-    G --> I[安装到本地目录]
-    H --> I
-    I --> J[在项目中引用库]
+    E --> F[CMake 构建]
+    F --> G[安装到本地目录]
+    G --> H[在项目中引用库]
 ```
 
 !!! warning "注意"
@@ -54,7 +51,7 @@ SARibbon 采用 [QWindowKit](https://github.com/stdware/qwindowkit) 作为无边
 
 ## 构建 SARibbon 库
 
-SARibbon 支持 CMake 和 QMake 两种构建方式，详细的构建步骤和配置选项请参阅 [SARibbon库构建](./build-SARibbon.md)。
+SARibbon 仅支持 CMake 构建方式（v2.6.3后移除了QMake支持），详细的构建步骤和配置选项请参阅 [SARibbon库构建](./build-SARibbon.md)。
 
 如果在构建过程中遇到问题，请参阅 [构建常见错误](./common-build-errors.md)。
 

@@ -88,14 +88,8 @@ public:
 #define SA_RIBBON_IMPL_CONSTRUCT d_ptr(std::make_unique< PrivateData >(this))
 ```
 
-等效展开为：
-
-```cpp
-SARibbonCategory::SARibbonCategory(QWidget* p)
-    : QFrame(p), d_ptr(std::make_unique<PrivateData>(this))
-{
-}
-```
+!!! warning "注意"
+    `SA_RIBBON_IMPL_CONSTRUCT` 宏虽然定义在 `SARibbonGlobal.h` 中，但**整个项目从未使用此宏**。所有构造函数均使用 `d_ptr(new X::PrivateData(this))` 手动初始化。建议新代码也使用手动初始化方式，与项目现有风格保持一致。
 
 ### SA_D 和 SA_DC
 
@@ -149,6 +143,9 @@ SARibbonMainWindow::SARibbonMainWindow(QWidget* parent, SARibbonMainWindowStyles
 #define SA_Q(pointerName) auto* pointerName = q_ptr
 #define SA_QC(pointerName) const auto* pointerName = q_ptr
 ```
+
+!!! warning "注意"
+    `SA_Q` 和 `SA_QC` 宏虽然定义在 `SARibbonGlobal.h` 中，但**整个项目从未使用这两个宏**。`PrivateData` 方法中直接通过 `q_ptr` 访问属主类，而非通过 `SA_Q`/`SA_QC` 宏。新代码中也建议直接使用 `q_ptr`，无需引入这些宏。
 
 ## 使用方法
 
@@ -223,7 +220,7 @@ SARibbonCategory::PrivateData::PrivateData(SARibbonCategory* p) : q_ptr(p)
 // 省略SARibbonCategory::PrivateData的函数实现
 
 SARibbonCategory::SARibbonCategory(QWidget* p)
-    : QFrame(p), d_ptr(std::make_unique<PrivateData>(this))  // SA_RIBBON_IMPL_CONSTRUCT
+    : QFrame(p), d_ptr(new SARibbonCategory::PrivateData(this))  // 项目惯用 d_ptr(new ...) 而非 SA_RIBBON_IMPL_CONSTRUCT
 {
 }
 
