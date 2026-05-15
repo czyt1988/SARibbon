@@ -1,0 +1,526 @@
+{% extends "main.html" %}
+
+{% block tabs %}
+{{ super() }}
+
+<style>
+  /* Hide navigation elements for landing page */
+  .md-header { position: initial; }
+  .md-main__inner { margin: 0; }
+  .md-content { display: none; }
+  .md-sidebar--primary { display: none; }
+  .md-sidebar--secondary { display: none; }
+  .md-footer__inner { display: none; }
+  .md-footer-meta { display: none; }
+
+  /* Landing page container */
+  .mdx-container {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+
+  /* Template-specific hero adjustments */
+  .mdx-hero {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 4rem 1.5rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .mdx-hero::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(ellipse at center, rgba(255,255,255,0.1) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .mdx-hero__content {
+    max-width: 900px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 1;
+  }
+
+  .mdx-hero__logo {
+    margin-bottom: 1.5rem;
+  }
+
+  .mdx-hero__logo img {
+    width: 120px;
+    height: auto;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+  }
+
+  .mdx-hero__title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    background: linear-gradient(90deg, #fff 0%, #e0e7ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    line-height: 1.2;
+  }
+
+  .mdx-hero__subtitle {
+    font-size: 1.5rem;
+    font-weight: 300;
+    margin: 0 0 1.5rem 0;
+    opacity: 0.95;
+  }
+
+  .mdx-hero__description {
+    font-size: 1.1rem;
+    margin: 0 auto 2rem auto;
+    opacity: 0.9;
+    line-height: 1.6;
+    max-width: 700px;
+  }
+
+  .mdx-hero__badges {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 2rem;
+  }
+
+  .mdx-hero__badges img {
+    height: 22px;
+  }
+
+  /* Language selector section */
+  .mdx-languages {
+    padding: 3rem 1.5rem;
+    background: var(--md-default-bg-color);
+    text-align: center;
+  }
+
+  .mdx-languages__title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    color: var(--md-default-fg-color);
+  }
+
+  .mdx-languages__grid {
+    display: flex;
+    justify-content: center;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+
+  .mdx-language-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 2.5rem;
+    background: var(--md-default-bg-color);
+    border: 2px solid var(--md-default-fg-color--lightest);
+    border-radius: 16px;
+    text-decoration: none;
+    color: var(--md-default-fg-color);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 180px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .mdx-language-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+  }
+
+  .mdx-language-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+    border-color: #667eea;
+  }
+
+  .mdx-language-card:hover::before {
+    transform: scaleX(1);
+  }
+
+  .mdx-language-card__icon {
+    width: 56px;
+    height: 56px;
+    margin-bottom: 1rem;
+    color: #667eea;
+  }
+
+  .mdx-language-card__icon svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .mdx-language-card__title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+  }
+
+  .mdx-language-card__desc {
+    font-size: 0.9rem;
+    color: var(--md-default-fg-color--light);
+    margin: 0;
+  }
+
+  /* Features section */
+  .mdx-features {
+    padding: 3rem 1.5rem;
+    background: var(--md-default-bg-color--lighter, #f8f9fa);
+    text-align: center;
+  }
+
+  .mdx-features__title {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    color: var(--md-default-fg-color);
+  }
+
+  .mdx-features__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .mdx-feature-item {
+    padding: 1.5rem;
+    background: var(--md-default-bg-color);
+    border: 1px solid var(--md-default-fg-color--lightest);
+    border-radius: 12px;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+
+  .mdx-feature-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    border-color: #667eea;
+  }
+
+  .mdx-feature-item__icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    line-height: 1;
+  }
+
+  .mdx-feature-item__title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0 0 0.5rem 0;
+    color: var(--md-default-fg-color);
+  }
+
+  .mdx-feature-item__desc {
+    font-size: 0.9rem;
+    color: var(--md-default-fg-color--light);
+    margin: 0;
+    line-height: 1.5;
+  }
+
+  /* Screenshot section */
+  .mdx-screenshot {
+    padding: 3rem 1.5rem;
+    background: var(--md-default-bg-color);
+    text-align: center;
+  }
+
+  .mdx-screenshot__title {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: var(--md-default-fg-color);
+  }
+
+  .mdx-screenshot__container {
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+
+  .mdx-screenshot__image {
+    width: 100%;
+    border-radius: 8px;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.2);
+    transition: transform 0.3s ease;
+  }
+
+  .mdx-screenshot__image:hover {
+    transform: scale(1.01);
+  }
+
+  /* CTA section */
+  .mdx-cta {
+    padding: 3rem 1.5rem;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    text-align: center;
+  }
+
+  .mdx-cta__title {
+    font-size: 1.75rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: white;
+  }
+
+  .mdx-cta__buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .mdx-cta__button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.875rem 1.75rem;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+  }
+
+  .mdx-cta__button--primary {
+    background: white;
+    color: #667eea;
+  }
+
+  .mdx-cta__button--primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  }
+
+  .mdx-cta__button--secondary {
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255,255,255,0.8);
+  }
+
+  .mdx-cta__button--secondary:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: white;
+    transform: translateY(-2px);
+  }
+
+  /* Dark mode adjustments */
+  [data-md-color-scheme="slate"] .mdx-hero {
+    background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+  }
+
+  [data-md-color-scheme="slate"] .mdx-hero__title {
+    background: linear-gradient(90deg, #fff 0%, #a0aec0 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+  }
+
+  [data-md-color-scheme="slate"] .mdx-language-card:hover {
+    border-color: #9f7aea;
+  }
+
+  [data-md-color-scheme="slate"] .mdx-language-card__icon {
+    color: #9f7aea;
+  }
+
+  [data-md-color-scheme="slate"] .mdx-language-card::before {
+    background: linear-gradient(90deg, #9f7aea 0%, #667eea 100%);
+  }
+
+  [data-md-color-scheme="slate"] .mdx-feature-item:hover {
+    border-color: #9f7aea;
+  }
+
+  [data-md-color-scheme="slate"] .mdx-cta {
+    background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+  }
+
+  [data-md-color-scheme="slate"] .mdx-cta__button--primary {
+    color: #4a5568;
+  }
+
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .mdx-hero__title {
+      font-size: 2.5rem;
+    }
+
+    .mdx-hero__subtitle {
+      font-size: 1.2rem;
+    }
+
+    .mdx-languages__grid {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .mdx-language-card {
+      width: 100%;
+      max-width: 280px;
+    }
+
+    .mdx-features__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .mdx-hero__badges {
+      gap: 0.25rem;
+    }
+
+    .mdx-hero__badges img {
+      height: 18px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .mdx-hero__title {
+      font-size: 2rem;
+    }
+
+    .mdx-hero__subtitle {
+      font-size: 1rem;
+    }
+
+    .mdx-hero__description {
+      font-size: 0.95rem;
+    }
+  }
+</style>
+
+<section class="mdx-container">
+  <div class="mdx-hero">
+    <div class="mdx-hero__content">
+      <div class="mdx-hero__logo">
+        <img src="{{ 'assets/SA-logo.png' | url }}" alt="SARibbon Logo">
+      </div>
+      <h1 class="mdx-hero__title">SARibbon</h1>
+      <p class="mdx-hero__subtitle">Qt Ribbon UI Control Library</p>
+      <p class="mdx-hero__description">
+        A modern, cross-platform Ribbon UI library for Qt applications. Create beautiful Microsoft Office-style interfaces with minimal effort. Supports Qt5, Qt6, and customizable themes via QSS.
+      </p>
+      <div class="mdx-hero__badges">
+        <img src="https://img.shields.io/badge/C++-17-blue" alt="C++17">
+        <img src="https://img.shields.io/badge/Qt-5.14+-green" alt="Qt 5.14+">
+        <img src="https://img.shields.io/badge/Qt-6-green" alt="Qt 6">
+        <img src="https://img.shields.io/badge/license-MIT-yellow" alt="MIT License">
+      </div>
+    </div>
+  </div>
+
+  <div class="mdx-languages">
+    <h2 class="mdx-languages__title">Choose Your Language</h2>
+    <div class="mdx-languages__grid">
+      <a href="{{ page.next_page.url | url }}" class="mdx-language-card">
+        <div class="mdx-language-card__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <line x1="2" y1="12" x2="22" y2="12"/>
+            <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+          </svg>
+        </div>
+        <h3 class="mdx-language-card__title">English</h3>
+        <p class="mdx-language-card__desc">Documentation in English</p>
+      </a>
+      <a href="{{ 'zh/' | url }}" class="mdx-language-card">
+        <div class="mdx-language-card__icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M12 2v20M2 12h20"/>
+            <path d="M7 7l10 10M17 7L7 17"/>
+          </svg>
+        </div>
+        <h3 class="mdx-language-card__title">Chinese</h3>
+        <p class="mdx-language-card__desc">中文文档</p>
+      </a>
+    </div>
+  </div>
+
+  <div class="mdx-features">
+    <h2 class="mdx-features__title">Key Features</h2>
+    <div class="mdx-features__grid">
+      <div class="mdx-feature-item">
+        <div class="mdx-feature-item__icon">&#127912;</div>
+        <h4 class="mdx-feature-item__title">Modern Ribbon UI</h4>
+        <p class="mdx-feature-item__desc">Microsoft Office-style ribbon interface with tabs, panels, and tool buttons</p>
+      </div>
+      <div class="mdx-feature-item">
+        <div class="mdx-feature-item__icon">&#128187;</div>
+        <h4 class="mdx-feature-item__title">Qt5 & Qt6 Support</h4>
+        <p class="mdx-feature-item__desc">Compatible with Qt 5.14+ and Qt 6.x LTS versions</p>
+      </div>
+      <div class="mdx-feature-item">
+        <div class="mdx-feature-item__icon">&#127758;</div>
+        <h4 class="mdx-feature-item__title">Cross-Platform</h4>
+        <p class="mdx-feature-item__desc">Works on Windows, Linux, and macOS with native look and feel</p>
+      </div>
+      <div class="mdx-feature-item">
+        <div class="mdx-feature-item__icon">&#127912;</div>
+        <h4 class="mdx-feature-item__title">6 Built-in Themes</h4>
+        <p class="mdx-feature-item__desc">Win7, Office 2013/2016/2021, Dark, and Dark2 themes included</p>
+      </div>
+      <div class="mdx-feature-item">
+        <div class="mdx-feature-item__icon">&#128295;</div>
+        <h4 class="mdx-feature-item__title">QSS Customizable</h4>
+        <p class="mdx-feature-item__desc">Full theme customization via Qt Style Sheets with live switching</p>
+      </div>
+      <div class="mdx-feature-item">
+        <div class="mdx-feature-item__icon">&#128444;</div>
+        <h4 class="mdx-feature-item__title">Gallery Widget</h4>
+        <p class="mdx-feature-item__desc">Grid-style icon gallery with popup browsing for rich content display</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="mdx-screenshot">
+    <h2 class="mdx-screenshot__title">See It In Action</h2>
+    <div class="mdx-screenshot__container">
+      <img src="{{ 'assets/screenshot/SARibbonBar-overview.png' | url }}" alt="SARibbon Overview" class="mdx-screenshot__image">
+    </div>
+  </div>
+
+  <div class="mdx-cta">
+    <h2 class="mdx-cta__title">Ready to Get Started?</h2>
+    <div class="mdx-cta__buttons">
+      <a href="https://github.com/czyt1988/SARibbon" class="mdx-cta__button mdx-cta__button--secondary" target="_blank" rel="noopener">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+        </svg>
+        GitHub
+      </a>
+      <a href="https://gitee.com/czyt1988/SARibbon" class="mdx-cta__button mdx-cta__button--secondary" target="_blank" rel="noopener">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M11.984 0C5.375 0 0 5.375 0 12c0 6.625 5.375 12 11.984 12C18.602 24 24 18.625 24 12c0-6.625-5.398-12-12.016-12zM12 21.5c-5.25 0-9.5-4.25-9.5-9.5S6.75 2.5 12 2.5s9.5 4.25 9.5 9.5-4.25 9.5-9.5 9.5z"/>
+        </svg>
+        Gitee
+      </a>
+      <a href="{{ page.next_page.url | url }}" class="mdx-cta__button mdx-cta__button--primary">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+          <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+        </svg>
+        Get Started
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block content %}{% endblock %}
