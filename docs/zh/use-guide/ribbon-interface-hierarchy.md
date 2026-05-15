@@ -14,51 +14,84 @@
 
 ## 层次关系图
 
-下面展示了 SARibbon 各组件之间的**继承关系**与**包含关系**。实线表示继承，虚线表示组合/聚合：
+### 继承关系
+
+SARibbonBar 继承自 QMenuBar，在 SARibbonMainWindow 中替代了传统菜单栏。其余所有 SARibbon 组件均继承自 QWidget 或其子类（QFrame、QTabBar 等）。继承关系仅此一处，下文重点讨论包含（组合）关系。
+
+### 包含关系（核心层次结构）
+
+Ribbon 界面的构建遵循严格的四层包含模型。为了清晰展示，将包含关系拆分为三个子图。
+
+#### 1. 主链路 — 四层包含层次
+
+从窗口到按钮的核心包含链路：
 
 ```mermaid
-classDiagram
-    class QMenuBar
-    class QFrame
-    class QTabBar
-    class QToolButton
-    class QToolBar
-    class QObject
+flowchart TD
+    MW["SARibbonMainWindow<br/>顶级窗口容器"] -->|"ribbonBar()"| BAR["SARibbonBar<br/>Ribbon 栏（继承 QMenuBar）"]
+    BAR -->|"addCategoryPage()"| CAT["SARibbonCategory<br/>分类页（如：开始、插入）"]
+    CAT -->|"addPanel()"| PNL["SARibbonPanel<br/>功能面板（如：字体、段落）"]
+    PNL -->|"addLargeAction()"| BTN["SARibbonToolButton<br/>工具按钮（自动包装 QAction）"]
+    PNL -->|"addWidget()"| WGT["QWidget<br/>任意自定义控件"]
+    PNL -->|"addGallery()"| GAL["SARibbonGallery<br/>画廊选择器"]
 
-    class SARibbonMainWindow
-    class SARibbonBar
-    class SARibbonCategory
-    class SARibbonPanel
-    class SARibbonToolButton
-    class SARibbonTabBar
-    class SARibbonQuickAccessBar
-    class SARibbonButtonGroupWidget
-    class SARibbonContextCategory
-    class SARibbonGallery
+    classDef layer1 fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef layer2 fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef layer3 fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef layer4 fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
 
-    QMenuBar <|-- SARibbonBar
-    QFrame <|-- SARibbonCategory
-    QFrame <|-- SARibbonPanel
-    QTabBar <|-- SARibbonTabBar
-    QToolButton <|-- SARibbonToolButton
-    QToolBar <|-- SARibbonButtonGroupWidget
-    SARibbonButtonGroupWidget <|-- SARibbonQuickAccessBar
-    QObject <|-- SARibbonContextCategory
-    QFrame <|-- SARibbonGallery
-
-    SARibbonMainWindow --> SARibbonBar : ribbonBar()
-    SARibbonBar --> SARibbonTabBar : ribbonTabBar()
-    SARibbonBar --> SARibbonCategory : addCategoryPage()
-    SARibbonBar --> SARibbonContextCategory : addContextCategory()
-    SARibbonBar --> SARibbonQuickAccessBar : quickAccessBar()
-    SARibbonBar --> SARibbonButtonGroupWidget : rightButtonGroup()
-    SARibbonCategory --> SARibbonPanel : addPanel()
-    SARibbonPanel --> SARibbonToolButton : addLargeAction()
-    SARibbonPanel --> SARibbonGallery : addGallery()
-    SARibbonContextCategory --> SARibbonCategory : addCategoryPage()
+    class MW layer1
+    class BAR layer2
+    class CAT,PNL layer3
+    class BTN,WGT,GAL layer4
 ```
 
-上图的包含关系说明了 Ribbon 的构建方向：从 `SARibbonMainWindow` 获取 `SARibbonBar`，然后逐层添加 Category、Panel，最后放入按钮和控件。
+#### 2. SARibbonBar 的辅助组件
+
+SARibbonBar 除管理 Category 外，还直接包含以下辅助组件：
+
+```mermaid
+flowchart LR
+    BAR["SARibbonBar"] --> QA["SARibbonQuickAccessBar<br/>quickAccessBar()"]
+    BAR --> RB["SARibbonButtonGroupWidget<br/>rightButtonGroup()"]
+    BAR --> TAB["SARibbonTabBar<br/>ribbonTabBar()"]
+    BAR --> APP["QAbstractButton<br/>applicationButton()"]
+
+    QA -. "继承" .-> RB
+
+    classDef bar fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef aux fill:#e8f5e9,stroke:#2e7d32,stroke-width:1px
+
+    class BAR bar
+    class QA,RB,TAB,APP aux
+```
+
+#### 3. 上下文分类 — 条件触发的标签页
+
+`SARibbonContextCategory` 是一种特殊的分类管理器，条件触发时动态显示/隐藏标签页：
+
+```mermaid
+flowchart TD
+    BAR["SARibbonBar<br/>ribbonBar()"] -->|"addContextCategory()"| CTX["SARibbonContextCategory<br/>上下文分类组<br/>（如：绘图工具）"]
+    CTX -->|"addCategoryPage()"| CTXCAT["SARibbonCategory<br/>条件触发的分类页<br/>（如：格式）"]
+    CTXCAT -->|"addPanel()"| CTXPNL["SARibbonPanel<br/>面板"]
+
+    classDef bar fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef ctx fill:#fff4e6,stroke:#e67e22,stroke-width:2px
+
+    class BAR bar
+    class CTX,CTXCAT,CTXPNL ctx
+```
+
+上下文分类默认隐藏，通过 `showContextCategory()` / `hideContextCategory()` 控制显隐。
+
+**图例说明：**
+- 实线箭头表示**包含关系**（父组件持有并管理子组件）
+- 虚线箭头表示**继承关系**（仅在辅助组件图中出现）
+- 橙色节点表示上下文分类相关组件（条件触发，默认隐藏）
+- 蓝色→橙色→紫色→绿色 对应四层包含层次（第一层→第四层）
+
+包含关系说明了 Ribbon 的构建方向：从 `SARibbonMainWindow` 获取 `SARibbonBar`，然后逐层添加 Category、Panel，最后放入按钮和控件。
 
 ## 组件查找表
 
@@ -80,15 +113,44 @@ classDiagram
 
 ## 层次结构文字说明
 
-`SARibbonBar` 继承自 `QMenuBar`，在 `SARibbonMainWindow` 中完全替代了传统的菜单栏。与传统 Menu/ToolBar 的平级关系不同，Ribbon 具有严格的层级：**SARibbonBar** 之下是 **SARibbonCategory**（标签页），Category 之下是 **SARibbonPanel**（面板），Panel 之下是 **SARibbonToolButton**（工具按钮），ToolButton 内部管理着 **QAction**。
+Ribbon 界面采用严格的**四层包含模型**。理解每一层的包含关系，是构建 Ribbon 界面的关键。
 
-`SARibbonCategory` 代表一个完整的功能场景，例如 Word 中的"开始"、"插入"、"设计"。每个 Category 可以包含多个 Panel，并且 Category 通过 `SARibbonTabBar` 显示为用户可见的标签页。通过 `SARibbonStackedWidget` 实现当前激活 Category 的切换显示。
+### 第一层：SARibbonBar（Ribbon 栏）
 
-`SARibbonPanel` 是 Category 内的功能分组容器。每个 Panel 可放置多个 QAction（自动包装为 SARibbonToolButton）、任意 QWidget（如组合框、编辑框）、以及 SARibbonGallery 等控件。Panel 支持两行和三行两种布局模式，分别对应 WPS 风格的紧凑布局和 Office 风格的宽松布局。
+`SARibbonBar` 是 Ribbon 的顶层管理器（继承自 QMenuBar），在 `SARibbonMainWindow` 中完全替代了传统菜单栏。通过 `ribbonBar()` 方法从主窗口获取。
 
-`SARibbonToolButton` 是专为 Ribbon 设计的工具按钮，支持 Large/Small 两种尺寸模式。图标尺寸会根据按钮尺寸动态自适应，不能通过 `setIconSize` 手动设置。大按钮模式还支持文字自动换行以优化空间利用。
+SARibbonBar 不仅管理 Category 的创建与切换，还直接包含以下辅助组件：
+
+| 组件 | 获取方法 | 职责 |
+|------|----------|------|
+| `SARibbonTabBar` | `ribbonTabBar()` | 显示 Category 标签页的导航栏 |
+| `SARibbonQuickAccessBar` | `quickAccessBar()` | 顶部高频命令快速访问栏 |
+| `SARibbonButtonGroupWidget` | `rightButtonGroup()` | 右上角功能按钮组 |
+| `QAbstractButton` | `applicationButton()` | 左上角应用菜单入口 |
+
+### 第二层：SARibbonCategory（分类页）与 SARibbonContextCategory（上下文分类）
+
+`SARibbonCategory` 代表一个完整的功能场景，例如 Word 中的"开始"、"插入"、"设计"。通过 `addCategoryPage()` 添加到 SARibbonBar 中。每个 Category 可以包含多个 Panel，并且通过 `SARibbonTabBar` 显示为用户可见的标签页。
 
 `SARibbonContextCategory` 是一种特殊的分类管理器（继承自 QObject），它内部可以管理多个 `SARibbonCategory`。上下文分类通常用于特定条件触发，例如在 Word 中选中图片后才出现"图片工具"标签。通过 `show()`/`hide()` 控制其显隐。
+
+### 第三层：SARibbonPanel（功能面板）
+
+`SARibbonPanel` 是 Category 内的功能分组容器，通过 `category->addPanel()` 创建。每个 Panel 可放置以下内容：
+
+- **QAction**：通过 `addLargeAction`、`addMediumAction`、`addSmallAction` 添加到 Panel，Panel 自动将其包装为 `SARibbonToolButton`
+- **QWidget**：通过 `addWidget` 添加任意自定义控件（如组合框、编辑框、微调框等）
+- **SARibbonGallery**：通过 `addGallery` 添加网格形式的选项选择器
+
+Panel 支持两行和三行两种布局模式，分别对应 WPS 风格的紧凑布局和 Office 风格的宽松布局。
+
+### 第四层：SARibbonToolButton / QWidget / SARibbonGallery（具体控件）
+
+第四层是最终呈现给用户交互的具体控件：
+
+- **SARibbonToolButton**：专为 Ribbon 设计的工具按钮，支持 Large/Small 两种尺寸模式。图标尺寸会根据按钮尺寸动态自适应，不能通过 `setIconSize` 手动设置。大按钮模式还支持文字自动换行以优化空间利用。
+- **QWidget**：开发者可嵌入任意 Qt 控件，实现自定义功能区域。
+- **SARibbonGallery**：网格形式的选项选择器，支持弹出式分组浏览，适合用在"样式选择"、"主题预览"等场景。
 
 ## 各层次导航方法
 

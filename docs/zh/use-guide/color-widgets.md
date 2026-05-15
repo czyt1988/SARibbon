@@ -14,57 +14,58 @@
 
 ## 类关系图
 
+### 继承关系
+
 ```mermaid
-classDiagram
-    class SARibbonColorToolButton {
-        +ColorStyle colorStyle()
-        +void setColor(QColor)
-        +QColor color()
-        +SAColorMenu* setupStandardColorMenu()
-        <<signal>> colorClicked(QColor, bool)
-        <<signal>> colorChanged(QColor)
-    }
-    class SAColorToolButton {
-        +ColorToolButtonStyle colorToolButtonStyle()
-        +void setColor(QColor)
-        +QColor color()
-        +SAColorMenu* createColorMenu()
-        <<signal>> colorClicked(QColor, bool)
-        <<signal>> colorChanged(QColor)
-    }
-    class SAColorMenu {
-        +void bindToColorToolButton(SAColorToolButton)
-        +SAColorPaletteGridWidget* colorPaletteGridWidget()
-        +SAColorGridWidget* customColorsWidget()
-        +void enableNoneColorAction(bool)
-        <<signal>> selectedColor(QColor)
-    }
-    class SAColorGridWidget {
-        +void setColorList(QList~QColor~)
-        +void setColumnCount(int)
-        +SAColorToolButton* colorButton(int)
-        +void setColorCheckable(bool)
-        <<signal>> colorClicked(QColor)
-        <<signal>> colorToggled(QColor, bool)
-    }
-    class SAColorPaletteGridWidget {
-        +void setColorList(QList~QColor~)
-        +void setFactor(QList~int~)
-        +void setColorCheckable(bool)
-        <<signal>> colorClicked(QColor)
-    }
+flowchart TD
+    SARibbonToolButton --> SARibbonColorToolButton
+    QToolButton --> SAColorToolButton
+    QMenu --> SAColorMenu
+    QWidget --> SAColorGridWidget
+    QWidget --> SAColorPaletteGridWidget
 
-    SARibbonToolButton <|-- SARibbonColorToolButton
-    QToolButton <|-- SAColorToolButton
-    QMenu <|-- SAColorMenu
-    QWidget <|-- SAColorGridWidget
-    QWidget <|-- SAColorPaletteGridWidget
+    classDef base fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef derived fill:#fff3e0,stroke:#e65100,stroke-width:2px
 
-    SARibbonColorToolButton --> SAColorMenu : creates
-    SAColorToolButton --> SAColorMenu : creates
-    SAColorMenu --> SAColorPaletteGridWidget : contains
-    SAColorMenu --> SAColorGridWidget : contains
-    SAColorGridWidget --> SAColorToolButton : manages buttons
+    class SARibbonToolButton,QToolButton,QMenu,QWidget base
+    class SARibbonColorToolButton,SAColorToolButton,SAColorMenu,SAColorGridWidget,SAColorPaletteGridWidget derived
+```
+
+### 使用关系 — 按钮如何创建菜单
+
+两种颜色按钮均可一键创建 `SAColorMenu` 下拉菜单：
+
+```mermaid
+flowchart TD
+    RCTB["SARibbonColorToolButton<br/>Ribbon 专用颜色按钮"] -->|"setupStandardColorMenu()"| CM["SAColorMenu"]
+    CTB["SAColorToolButton<br/>通用颜色按钮"] -->|"createColorMenu()"| CM
+
+    classDef button fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef menu fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+
+    class RCTB,CTB button
+    class CM menu
+```
+
+### 包含关系 — SAColorMenu 的内部结构
+
+`SAColorMenu` 内部由三个区域组成：主题色板、自定义颜色网格、无颜色选项：
+
+```mermaid
+flowchart TD
+    CM["SAColorMenu<br/>颜色下拉菜单"] --> PAL["SAColorPaletteGridWidget<br/>colorPaletteGridWidget()<br/>主题色板（标准色 + 深/浅变体）"]
+    CM --> CG["SAColorGridWidget<br/>customColorsWidget()<br/>自定义颜色网格（最近使用的颜色）"]
+    CM --> NA["noneColorAction()<br/>无颜色选项"]
+
+    CG -->|"colorButton(i)"| CTB2["SAColorToolButton<br/>每个颜色单元格"]
+
+    classDef menu fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef widget fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+    classDef cell fill:#fff9c4,stroke:#f9a825,stroke-width:1px
+
+    class CM menu
+    class PAL,CG widget
+    class CTB2,NA cell
 ```
 
 ## SARibbonColorToolButton 使用方法

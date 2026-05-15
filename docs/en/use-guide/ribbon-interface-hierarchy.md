@@ -14,51 +14,86 @@ Understanding the SARibbon hierarchy is the foundation for building interfaces. 
 
 ## Hierarchy Diagram
 
-The diagram below shows **inheritance relationships** and **containment relationships** among SARibbon components. Solid lines represent inheritance; dashed lines represent composition/aggregation:
+The relationship between SARibbon components consists of two dimensions: inheritance (what each class extends) and containment (what each class holds). Inheritance is straightforward; containment is the key to understanding how Ribbon interfaces are assembled.
+
+### Inheritance (Simplified)
+
+`SARibbonBar` inherits `QMenuBar`; all other SARibbon components inherit `QWidget` or one of its direct subclasses (`QFrame`, `QTabBar`, `QToolBar`, etc.). This design is intentional: `SARibbonBar` replaces the traditional menu bar, while every other element is a standard widget you can place, style, and compose freely.
+
+### Containment Hierarchy
+
+SARibbon organizes its interface through a strict **four-layer containment model**. For clarity, the containment relationships are split into three sub-diagrams.
+
+#### 1. Main Chain — Four-Layer Containment
+
+The core containment chain from window to button:
 
 ```mermaid
-classDiagram
-    class QMenuBar
-    class QFrame
-    class QTabBar
-    class QToolButton
-    class QToolBar
-    class QObject
+flowchart TD
+    MW["SARibbonMainWindow<br/>Top-level window container"] -->|"ribbonBar()"| BAR["SARibbonBar<br/>Ribbon bar (inherits QMenuBar)"]
+    BAR -->|"addCategoryPage()"| CAT["SARibbonCategory<br/>Category page (e.g. Home, Insert)"]
+    CAT -->|"addPanel()"| PNL["SARibbonPanel<br/>Functional panel (e.g. Font, Paragraph)"]
+    PNL -->|"addLargeAction()"| BTN["SARibbonToolButton<br/>Tool button (auto-wraps QAction)"]
+    PNL -->|"addWidget()"| WGT["QWidget<br/>Any custom widget"]
+    PNL -->|"addGallery()"| GAL["SARibbonGallery<br/>Gallery selector"]
 
-    class SARibbonMainWindow
-    class SARibbonBar
-    class SARibbonCategory
-    class SARibbonPanel
-    class SARibbonToolButton
-    class SARibbonTabBar
-    class SARibbonQuickAccessBar
-    class SARibbonButtonGroupWidget
-    class SARibbonContextCategory
-    class SARibbonGallery
+    classDef layer1 fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    classDef layer2 fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef layer3 fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef layer4 fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
 
-    QMenuBar <|-- SARibbonBar
-    QFrame <|-- SARibbonCategory
-    QFrame <|-- SARibbonPanel
-    QTabBar <|-- SARibbonTabBar
-    QToolButton <|-- SARibbonToolButton
-    QToolBar <|-- SARibbonButtonGroupWidget
-    SARibbonButtonGroupWidget <|-- SARibbonQuickAccessBar
-    QObject <|-- SARibbonContextCategory
-    QFrame <|-- SARibbonGallery
-
-    SARibbonMainWindow --> SARibbonBar : ribbonBar()
-    SARibbonBar --> SARibbonTabBar : ribbonTabBar()
-    SARibbonBar --> SARibbonCategory : addCategoryPage()
-    SARibbonBar --> SARibbonContextCategory : addContextCategory()
-    SARibbonBar --> SARibbonQuickAccessBar : quickAccessBar()
-    SARibbonBar --> SARibbonButtonGroupWidget : rightButtonGroup()
-    SARibbonCategory --> SARibbonPanel : addPanel()
-    SARibbonPanel --> SARibbonToolButton : addLargeAction()
-    SARibbonPanel --> SARibbonGallery : addGallery()
-    SARibbonContextCategory --> SARibbonCategory : addCategoryPage()
+    class MW layer1
+    class BAR layer2
+    class CAT,PNL layer3
+    class BTN,WGT,GAL layer4
 ```
 
-The containment relationships in the diagram illustrate the Ribbon construction direction: obtain `SARibbonBar` from `SARibbonMainWindow`, then progressively add Categories, Panels, and finally buttons and widgets.
+#### 2. SARibbonBar Auxiliary Components
+
+Besides managing Categories, `SARibbonBar` also directly contains these auxiliary components:
+
+```mermaid
+flowchart LR
+    BAR["SARibbonBar"] --> QA["SARibbonQuickAccessBar<br/>quickAccessBar()"]
+    BAR --> RB["SARibbonButtonGroupWidget<br/>rightButtonGroup()"]
+    BAR --> TAB["SARibbonTabBar<br/>ribbonTabBar()"]
+    BAR --> APP["QAbstractButton<br/>applicationButton()"]
+
+    QA -. "inherits" .-> RB
+
+    classDef bar fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef aux fill:#e8f5e9,stroke:#2e7d32,stroke-width:1px
+
+    class BAR bar
+    class QA,RB,TAB,APP aux
+```
+
+#### 3. Contextual Category — Condition-Triggered Tab Pages
+
+`SARibbonContextCategory` is a special category manager that dynamically shows/hides tab pages based on conditions:
+
+```mermaid
+flowchart TD
+    BAR["SARibbonBar<br/>ribbonBar()"] -->|"addContextCategory()"| CTX["SARibbonContextCategory<br/>Contextual category group<br/>(e.g. Drawing Tools)"]
+    CTX -->|"addCategoryPage()"| CTXCAT["SARibbonCategory<br/>Condition-triggered category page<br/>(e.g. Format)"]
+    CTXCAT -->|"addPanel()"| CTXPNL["SARibbonPanel<br/>Panel"]
+
+    classDef bar fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef ctx fill:#fff4e6,stroke:#e67e22,stroke-width:2px
+
+    class BAR bar
+    class CTX,CTXCAT,CTXPNL ctx
+```
+
+Contextual categories are hidden by default; visibility is controlled via `showContextCategory()` / `hideContextCategory()`.
+
+**Legend**:
+- Solid arrows = **containment** (parent owns and manages the child)
+- Dashed arrows = **inheritance** (only appears in the auxiliary component diagram)
+- Orange nodes = contextual category chain (condition-triggered, hidden by default)
+- Blue → Orange → Purple → Green corresponds to the four containment layers (layer 1 → layer 4)
+
+The containment relationships trace the Ribbon construction direction: start from `SARibbonMainWindow`, obtain `SARibbonBar`, progressively add Category pages and auxiliary components, then populate each Category with Panels, and finally fill Panels with Action buttons, galleries, or custom widgets.
 
 ## Component Lookup Table
 
@@ -80,15 +115,19 @@ The table below lists each core component in the Ribbon hierarchy with its class
 
 ## Hierarchy Text Description
 
-`SARibbonBar` inherits from `QMenuBar` and fully replaces the traditional menu bar within `SARibbonMainWindow`. Unlike the flat relationship between traditional Menu/ToolBar, Ribbon has a strict hierarchy: below **SARibbonBar** are **SARibbonCategory** (tab pages), below Category are **SARibbonPanel** (panels), below Panel are **SARibbonToolButton** (tool buttons), and inside ToolButton a **QAction** is managed.
+### Four-Layer Containment Model
 
-`SARibbonCategory` represents a complete functional scenario, such as "Start", "Insert", or "Design" in Word. Each Category can contain multiple Panels, and Categories are displayed as user-visible tabs via `SARibbonTabBar`. Switching between active Categories is implemented through `SARibbonStackedWidget`.
+SARibbon organizes its interface through a strict four-layer containment chain:
 
-`SARibbonPanel` is the functional grouping container within a Category. Each Panel can hold multiple QActions (automatically wrapped as SARibbonToolButton), arbitrary QWidgets (such as combo boxes and edit fields), and SARibbonGallery widgets. Panels support both two-row and three-row layout modes, corresponding to the compact WPS-style layout and the spacious Office-style layout respectively.
+1. **SARibbonBar** (layer 1) . The top-level manager, obtained via `ribbonBar()`. It replaces the traditional `QMenuBar` and serves as the container for everything else. Alongside the main Category chain, `SARibbonBar` also holds auxiliary components: `SARibbonQuickAccessBar`, `SARibbonButtonGroupWidget` (right button group), `SARibbonTabBar`, and the application menu button.
 
-`SARibbonToolButton` is a tool button designed specifically for Ribbon, supporting both Large and Small size modes. Icon sizes adapt dynamically based on button size and cannot be set manually via `setIconSize`. The large button mode also supports automatic text wrapping for optimized space utilization.
+2. **SARibbonCategory** (layer 2) . Each Category is a tab page visible to the user, corresponding to a functional scenario such as "Home", "Insert", or "Design". Categories are added to `SARibbonBar` with `addCategoryPage()` and displayed as tabs via `SARibbonTabBar`. Switching between active Categories is handled internally by `SARibbonStackedWidget`. A special variant, `SARibbonContextCategory`, manages a group of Categories that appear only under certain conditions (for instance, "Picture Tools" appears after selecting an image). Contextual categories are hidden by default and must be shown programmatically.
 
-`SARibbonContextCategory` is a special category manager (inheriting from QObject) that internally manages multiple `SARibbonCategory` instances. Contextual categories are typically triggered by specific conditions, such as the "Picture Tools" tab that appears only after selecting an image in Word. Visibility is controlled via `show()`/`hide()`.
+3. **SARibbonPanel** (layer 3) . Each Panel is a named section within a Category, such as "Font" or "Paragraph". Panels are added with `category->addPanel()`. They act as functional grouping containers and support both two-row (WPS compact style) and three-row (Office spacious style) layouts.
+
+4. **SARibbonToolButton / QAction / QWidget / SARibbonGallery** (layer 4) . The innermost layer. Actions are added to a Panel via `addLargeAction()`/`addSmallAction()` and automatically wrapped into `SARibbonToolButton` instances. Arbitrary `QWidget` subclasses can be embedded with `addWidget()`. A `SARibbonGallery` provides a grid-style option selector within the Panel.
+
+Developers build the Ribbon interface by moving down these layers: obtain the bar, create categories, add panels, and populate with buttons or widgets. Lookup methods (`categoryByName`, `panelByIndex`, `actionToRibbonToolButton`, etc.) allow navigation in the reverse direction, as documented in the tables below.
 
 ## Navigation Methods at Each Level
 
