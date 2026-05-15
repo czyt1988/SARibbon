@@ -5,6 +5,7 @@ site_description: 'Qt Framework Ribbon Control'
 site_url: https://czyt1988.github.io/SARibbon/
 repo_url: https://github.com/czyt1988/SARibbon
 repo_name: SARibbon-github
+
 # 多语言站点信息
 extra:
   site_name:
@@ -14,8 +15,9 @@ extra:
 # 主题
 theme:
   name: material
+  custom_dir: docs/overrides
   logo: assets/SA-logo.png
-  language: zh
+  language: en
   palette:
     - scheme: default
       toggle:
@@ -45,9 +47,49 @@ plugins:
   - i18n:
       docs_structure: folder
       languages:
+        - locale: en
+          name: English
+          default: true
+          build: true
+          # English navigation config
+          nav:
+            - Home: en/index.md
+            - Introduction: en/introduction.md
+            - Build Guide:
+                - Build Instructions: en/build-guide/build-instructions.md
+                - Build Third-Party Libraries: en/build-guide/build-3rdparty.md
+                - Build SARibbon Library: en/build-guide/build-SARibbon.md
+                - Internationalization (i18n): en/build-guide/i18n.md
+                - Common Build Errors: en/build-guide/common-build-errors.md
+            - User Guide: 
+                - Usage Instructions: en/use-guide/SARibbon-user-guide.md
+                - Importing the Library: en/use-guide/import-SARibbon.md
+                - Create a Ribbon-Style Window: en/use-guide/create-ribbon-style-window.md
+                - Ribbon Interface Hierarchy: en/use-guide/ribbon-interface-hierarchy.md
+                - Creating the Ribbon UI: en/use-guide/create-ribbon-ui.md
+                - Title Bar Settings: en/use-guide/titlebar-setting.md
+                - Ribbon Layout Options: en/use-guide/layout-of-SARibbon.md
+                - Ribbon Button Layout Guide: en/use-guide/layout-of-ribbonbutton.md
+                - Ribbon Size Settings: en/use-guide/SARibbon-size-settings.md
+                - Content Margins: en/use-guide/contents-margins-of-ribbon.md
+                - Ribbon Themes: en/use-guide/SARibbon-theme.md
+                - Customize Your Theme: en/use-guide/design-your-theme.md
+                - User-Configurable Ribbon: en/use-guide/persistence-configuration-ribbon.md
+                - SARibbonWidget Guide: en/use-guide/SARibbonWidget-guide.md
+                - Color Widgets: en/use-guide/color-widgets.md
+            - Development Guide:
+                - Coding Standards: en/dev-guide/coding-standards.md
+                - PIMPL Development Guide: en/dev-guide/pimpl-dev-guide.md
+                - Qt Integration Guide: en/dev-guide/qt-integration.md
+            - FAQ: 
+                - FAQ Overview: en/faq.md
+            - API Documentation: 
+                - API Documentation Home: https://czyt1988.github.io/SARibbon/doxygen/index.html
+                - Class List: https://czyt1988.github.io/SARibbon/doxygen/annotated.html
+                - Class Index: https://czyt1988.github.io/SARibbon/doxygen/classes.html
+            - Doc Writing Guide: en/doc-writing-guide.md
         - locale: zh
           name: 中文
-          default: true
           build: true
           # 中文导航配置
           nav:
@@ -74,46 +116,17 @@ plugins:
                 - Ribbon的用户配置化: zh/use-guide/persistence-configuration-ribbon.md
                 - SARibbonWidget详细指南: zh/use-guide/SARibbonWidget-guide.md
                 - Color Widgets: zh/use-guide/color-widgets.md
+            - 开发规范:
+                - 编码规范: zh/dev-guide/coding-standards.md
+                - PIMPL开发指南: zh/dev-guide/pimpl-dev-guide.md
+                - Qt集成规范: zh/dev-guide/qt-integration.md
             - 常见问题: 
                 - 常见问题说明: zh/faq.md
             - API文档: 
                 - API文档首页: https://czyt1988.github.io/SARibbon/doxygen/index.html
                 - 类列表: https://czyt1988.github.io/SARibbon/doxygen/annotated.html
                 - 类索引: https://czyt1988.github.io/SARibbon/doxygen/classes.html
-        - locale: en
-          name: English
-          build: true
-          # 英文导航配置 - 注意路径前加 en/
-          nav:
-            - SARibbon Introduction: en/index.md
-            - Build Guide:
-                - Build Instructions: en/build-guide/build-instructions.md
-                - Build Third-Party Libraries: en/build-guide/build-3rdparty.md
-                - Build SARibbon Library: en/build-guide/build-SARibbon.md
-                - Internationalization (i18n): en/build-guide/i18n.md
-                - Common Build Errors: en/build-guide/common-build-errors.md
-            - User Guide: 
-                - Usage Instructions: en/use-guide/SARibbon-user-guide.md
-                - Importing the Library: en/use-guide/import-SARibbon.md
-                - Create a Ribbon-Style Window: en/use-guide/create-ribbon-style-window.md
-                - Ribbon Interface Hierarchy: en/use-guide/ribbon-interface-hierarchy.md
-                - Creating the Ribbon UI: en/use-guide/create-ribbon-ui.md
-                - Title Bar Settings: en/use-guide/titlebar-setting.md
-                - Ribbon Layout Options: en/use-guide/layout-of-SARibbon.md
-                - Ribbon Button Layout Guide: en/use-guide/layout-of-ribbonbutton.md
-                - Ribbon Size Settings: en/use-guide/SARibbon-size-settings.md
-                - Content Margins: en/use-guide/contents-margins-of-ribbon.md
-                - Ribbon Themes: en/use-guide/SARibbon-theme.md
-                - Customize Your Theme: en/use-guide/design-your-theme.md
-                - User-Configurable Ribbon: en/use-guide/persistence-configuration-ribbon.md
-                - SARibbonWidget Guide: en/use-guide/SARibbonWidget-guide.md
-                - Color Widgets: en/use-guide/color-widgets.md
-            - FAQ: 
-                - FAQ Overview: en/faq.md
-            - API Documentation: 
-                - API Documentation Home: https://czyt1988.github.io/SARibbon/doxygen/index.html
-                - Class List: https://czyt1988.github.io/SARibbon/doxygen/annotated.html
-                - Class Index: https://czyt1988.github.io/SARibbon/doxygen/classes.html
+            - 文档写作指南: zh/doc-writing-guide.md
   # 需要版本切换再打开下面
   # - git-revision-date
   # - mike:                       
