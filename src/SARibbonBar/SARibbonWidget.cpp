@@ -6,6 +6,7 @@
 #include <QFile>
 #include <QScreen>
 #include "SARibbonUtil.h"
+#include "SARibbonThemeManager.h"
 #include <QTimer>
 /**
  * @brief The SARibbonWidget::PrivateData class
@@ -134,68 +135,8 @@ void SARibbonWidget::setRibbonBar(SARibbonBar* bar)
  */
 void SARibbonWidget::setRibbonTheme(SARibbonTheme theme)
 {
-    SA::setBuiltInRibbonTheme(this, theme);
-	d_ptr->mCurrentRibbonTheme = theme;
-	if (SARibbonBar* bar = ribbonBar()) {
-		auto theme = ribbonTheme();
-		// 尺寸修正
-		switch (theme) {
-		case SARibbonTheme::RibbonThemeWindows7:
-		case SARibbonTheme::RibbonThemeOffice2013:
-		case SARibbonTheme::RibbonThemeOffice2016Blue:
-		case SARibbonTheme::RibbonThemeDark:
-		case SARibbonTheme::RibbonThemeDark2: {
-			//! 在设置qss后需要针对margin信息重新设置进SARibbonTabBar中
-			//! office2013.qss的margin信息如下设置
-			//! margin-top: 0px;
-			//! margin-right: 0px;
-			//! margin-left: 5px;
-			//! margin-bottom: 0px;
-			SARibbonTabBar* tab = bar->ribbonTabBar();
-			if (!tab) {
-				break;
-			}
-			tab->setTabMargin(QMargins(5, 0, 0, 0));
-		} break;
-		case SARibbonTheme::RibbonThemeOffice2021Blue: {
-			SARibbonTabBar* tab = bar->ribbonTabBar();
-			if (!tab) {
-				break;
-			}
-			//! 在设置qss后需要针对margin信息重新设置进SARibbonTabBar中
-			//! office2021.qss的margin信息如下设置
-			//! margin-top: 0px;
-			//! margin-right: 5px;
-			//! margin-left: 5px;
-			//! margin-bottom: 0px;
-			tab->setTabMargin(QMargins(5, 0, 5, 0));
-		}
-		default:
-			break;
-		}
-		// 上下文标签颜色设置,以及基线颜色设置
-		switch (theme) {
-		case SARibbonTheme::RibbonThemeWindows7:
-		case SARibbonTheme::RibbonThemeOffice2013:
-		case SARibbonTheme::RibbonThemeDark:
-			bar->setContextCategoryColorList(QList< QColor >());  //< 设置空颜色列表会重置为默认色系
-			break;
-		case SARibbonTheme::RibbonThemeOffice2016Blue:
-			bar->setContextCategoryColorList(QList< QColor >() << QColor(18, 64, 120));  //< 设置空颜色列表会重置为默认色系
-			break;
-		case SARibbonTheme::RibbonThemeOffice2021Blue:
-			bar->setContextCategoryColorList(QList< QColor >() << QColor(209, 207, 209));  //< 设置空颜色列表会重置为默认色系
-			break;
-		default:
-			break;
-		}
-		// 基线颜色设置
-		if (SARibbonTheme::RibbonThemeOffice2013 == theme) {
-			bar->setTabBarBaseLineColor(QColor(186, 201, 219));
-		} else {
-			bar->setTabBarBaseLineColor(QColor());
-		}
-	}
+    d_ptr->mCurrentRibbonTheme = theme;
+    SA::applyRibbonTheme(this, ribbonBar(), theme);
 }
 
 /**

@@ -3,6 +3,7 @@
 #include "SARibbonBar.h"
 #include "SARibbonElementManager.h"
 #include "SARibbonTabBar.h"
+#include "SARibbonThemeManager.h"
 #include <QApplication>
 #include <QDebug>
 #include <QFile>
@@ -36,9 +37,6 @@ public:
     bool isUseRibbonFrame() const;
     bool isUseNativeFrame() const;
     void checkMainWindowFlag();
-    static void updateTabBarMargins(SARibbonTabBar* tab, SARibbonTheme theme);
-    static void updateContextColors(SARibbonBar* bar, SARibbonTheme theme);
-    static void updateTabBarBaseLineColor(SARibbonBar* bar, SARibbonTheme theme);
 
 public:
     SARibbonMainWindowStyles mRibbonMainWindowStyle;
@@ -96,60 +94,6 @@ void SARibbonMainWindow::PrivateData::checkMainWindowFlag()
     if (!mRibbonMainWindowStyle.testFlag(SARibbonMainWindowStyleFlag::UseRibbonMenuBar)
         && !mRibbonMainWindowStyle.testFlag(SARibbonMainWindowStyleFlag::UseNativeMenuBar)) {
         mRibbonMainWindowStyle.setFlag(SARibbonMainWindowStyleFlag::UseRibbonMenuBar, true);
-    }
-}
-
-void SARibbonMainWindow::PrivateData::updateTabBarMargins(SARibbonTabBar* tab, SARibbonTheme theme)
-{
-    static const std::map< SARibbonTheme, QMargins > themeMargins = {
-        { SARibbonTheme::RibbonThemeWindows7, { 5, 0, 0, 0 } },
-        { SARibbonTheme::RibbonThemeOffice2013, { 5, 0, 0, 0 } },
-        { SARibbonTheme::RibbonThemeOffice2016Blue, { 5, 0, 0, 0 } },
-        { SARibbonTheme::RibbonThemeDark, { 5, 0, 0, 0 } },
-        { SARibbonTheme::RibbonThemeDark2, { 5, 0, 0, 0 } },
-        { SARibbonTheme::RibbonThemeOffice2021Blue, { 5, 0, 5, 0 } }
-    };
-    auto it = themeMargins.find(theme);
-    if (it != themeMargins.end()) {
-        tab->setTabMargin(it->second);
-    }
-}
-
-void SARibbonMainWindow::PrivateData::updateContextColors(SARibbonBar* bar, SARibbonTheme theme)
-{
-    static const SARibbonBar::FpContextCategoryHighlight cs_darkerHighlight = [](const QColor& c) -> QColor {
-        return c.darker();
-    };
-    static const SARibbonBar::FpContextCategoryHighlight cs_vibrantHighlight = [](const QColor& c) -> QColor {
-        return SA::makeColorVibrant(c);
-    };
-
-    switch (theme) {
-    case SARibbonTheme::RibbonThemeWindows7:
-    case SARibbonTheme::RibbonThemeOffice2013:
-    case SARibbonTheme::RibbonThemeDark:
-        bar->setContextCategoryColorList({});  // 重置为默认色系
-        bar->setContextCategoryColorHighLight(cs_vibrantHighlight);
-        break;
-    case SARibbonTheme::RibbonThemeOffice2016Blue:
-        bar->setContextCategoryColorList({ QColor(18, 64, 120) });
-        bar->setContextCategoryColorHighLight(cs_darkerHighlight);
-        break;
-    case SARibbonTheme::RibbonThemeOffice2021Blue:
-        bar->setContextCategoryColorList({ QColor(209, 207, 209) });
-        bar->setContextCategoryColorHighLight([](const QColor& c) -> QColor { return QColor(39, 96, 167); });
-        break;
-    default:
-        break;
-    }
-}
-
-void SARibbonMainWindow::PrivateData::updateTabBarBaseLineColor(SARibbonBar* bar, SARibbonTheme theme)
-{
-    if (theme == SARibbonTheme::RibbonThemeOffice2013) {
-        bar->setTabBarBaseLineColor(QColor(186, 201, 219));
-    } else {
-        bar->setTabBarBaseLineColor(QColor());
     }
 }
 
@@ -574,18 +518,8 @@ void SARibbonMainWindow::updateWindowFlag(Qt::WindowFlags flags)
  */
 void SARibbonMainWindow::setRibbonTheme(SARibbonTheme theme)
 {
-    SA::setBuiltInRibbonTheme(this, theme);
     d_ptr->mCurrentRibbonTheme = theme;
-    if (SARibbonBar* bar = ribbonBar()) {
-        // 1. tab bar的间距
-        if (SARibbonTabBar* tab = bar->ribbonTabBar()) {
-            SARibbonMainWindow::PrivateData::updateTabBarMargins(tab, theme);
-        }
-        // 2. 上下文颜色设置
-        SARibbonMainWindow::PrivateData::updateContextColors(bar, theme);
-        // 3. tabbar的基线颜色
-        SARibbonMainWindow::PrivateData::updateTabBarBaseLineColor(bar, theme);
-    }
+    SA::applyRibbonTheme(this, ribbonBar(), theme);
 }
 
 /**
