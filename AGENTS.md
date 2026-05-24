@@ -28,40 +28,29 @@ docs/zh/build-guide/      ← 构建指引
 
 ## 构建
 
-CMake 构建，最低 Qt 5.12，支持 Qt5 和 Qt6，C++ 标准由 CMakeLists 根据 Qt 版本和选项自动设定（最低 C++14）。详见 [build.md](build.md)。
+CMake 构建，最低 Qt 5.12，支持 Qt5 和 Qt6，C++ 标准由 CMakeLists 根据 Qt 版本和选项自动设定（最低 C++14）。完整构建指引见 [build.md](build.md)。
 
 ### 构建环境
 
-- **Windows**：CMake 3.15+，Visual Studio 2019（MSVC 14.29+），Qt 6.7+ 或 Qt 5.12+
+- **Windows**：CMake 3.15+，Visual Studio 2019（MSVC 14.29+）或 2022（MSVC 14.34+），Qt 6.7+ 或 Qt 5.12+
 - **Linux / WSL**：CMake 3.15+，GCC 9+（推荐 GCC 13+），Qt 6.x（apt）或 Qt 5.12+（手动安装）
 
-### Windows (Visual Studio 生成器，推荐)
+### 快速构建（推荐使用 build.ps1 脚本）
+
+Windows 下推荐使用 `scripts/build.ps1` 脚本，自动检测 Qt 路径和 MSVC 版本：
 
 ```powershell
-cmake -S . -B build -G "Visual Studio 16 2019" -A x64 -DCMAKE_PREFIX_PATH="C:/Qt/6.7.3/msvc2019_64"
-cmake --build build --config Release
+.\scripts\build.ps1                  # Release，自动检测 Qt 和 MSVC
+.\scripts\build.ps1 -Config Debug    # Debug 构建
+.\scripts\build.ps1 -Clean           # 清理并重建
+.\scripts\build.ps1 -EnableTests     # 构建并运行测试
+.\scripts\build.ps1 -MsvcVersion 2022  # 指定 MSVC 2022
 ```
 
-### Windows (Ninja 生成器，需初始化 MSVC 环境)
-
-```powershell
-# 先初始化 MSVC 环境变量
-cmd /c '"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat" x64 & set' | ForEach-Object {
-    if ($_ -match '^([^=]+)=(.*)$') {
-        [Environment]::SetEnvironmentVariable($matches[1], $matches[2], 'Process')
-    }
-}
-cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="C:/Qt/6.7.3/msvc2019_64"
-cmake --build build
-```
-
-### Linux / WSL
+Linux/WSL 快速构建：
 
 ```bash
-# Ubuntu 24.04 Qt6 依赖安装
 sudo apt install qt6-base-dev qt6-base-dev-tools qt6-svg-dev qt6-tools-dev ninja-build
-
-# 构建
 cmake -S . -B build-linux -G Ninja -DCMAKE_BUILD_TYPE=Release
 cmake --build build-linux --parallel
 ```
@@ -70,12 +59,14 @@ cmake --build build-linux --parallel
 
 ### CMake 选项
 
-- `SARIBBON_BUILD_STATIC_LIBS=ON` → 静态库，自动定义 `SA_RIBBON_BAR_NO_EXPORT`
-- `SARIBBON_USE_FRAMELESS_LIB=ON` → 使用 QWindowKit 无边框方案，需 C++17 和 QWindowKit 库；OFF 时由 CMakeLists 根据 Qt 版本自动选择 C++ 标准
-- `SARIBBON_BUILD_EXAMPLES` → 默认 ON，控制是否编译示例程序
-- `SARIBBON_ENABLE_SNAPLAYOUT=ON` → 启用 Windows 11 Snap Layout（仅 `SARIBBON_USE_FRAMELESS_LIB=ON` 时有效）
-- `SARIBBON_INSTALL_IN_CURRENT_DIR` → Windows 默认 ON，安装到 `bin_qt{版本}_{编译器}_x{架构}/`
-- `BUILD_TESTS=ON` → 启用单元测试（Qt Test 框架）
+| 选项 | 默认值 | 说明 |
+|------|--------|------|
+| `SARIBBON_BUILD_STATIC_LIBS` | OFF | 静态库，ON 时自动定义 `SA_RIBBON_BAR_NO_EXPORT` |
+| `SARIBBON_USE_FRAMELESS_LIB` | OFF | 使用 QWindowKit 无边框方案，需 C++17 和 QWindowKit 库 |
+| `SARIBBON_BUILD_EXAMPLES` | ON | 控制是否编译示例程序 |
+| `SARIBBON_ENABLE_SNAPLAYOUT` | OFF | 启用 Windows 11 Snap Layout（仅 frameless 模式有效） |
+| `SARIBBON_INSTALL_IN_CURRENT_DIR` | ON (Windows) | 安装到 `bin_qt{版本}_{编译器}_x{架构}/` |
+| `BUILD_TESTS` | OFF | 启用单元测试（Qt Test 框架） |
 
 > 根据实际 Qt 安装位置调整 `CMAKE_PREFIX_PATH`。
 
