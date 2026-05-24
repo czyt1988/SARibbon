@@ -29,11 +29,12 @@ endif()
 # load Qt library, minimum version required is 5.12
 # cn:Qt库加载,最低版本要求为5.12
 set(SARIBBON_MIN_QT_VERSION 5.12)
-find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
+find_package(QT NAMES Qt6 Qt5 COMPONENTS Core Widgets Svg REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} ${SARIBBON_MIN_QT_VERSION} COMPONENTS
     Core
     Gui
     Widgets
+    Svg
     REQUIRED
 )
 message(STATUS "current Qt version is Qt${QT_VERSION_MAJOR}.${QT_VERSION_MINOR}.${QT_VERSION_PATCH}")

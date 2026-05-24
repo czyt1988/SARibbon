@@ -49,6 +49,7 @@ SET(SARIBBON_HEADER_FILES
     SARibbonTabBar.h
     SARibbonThemeManager.h
     SARibbonThemePalette.h
+    SARibbonIconHelper.h
     SARibbonCategory.h
     SARibbonContextCategory.h
     SARibbonPanel.h
@@ -93,6 +94,7 @@ SET(SARIBBON_SOURCE_FILES
     SARibbonTabBar.cpp
     SARibbonThemeManager.cpp
     SARibbonThemePalette.cpp
+    SARibbonIconHelper.cpp
     SARibbonCategory.cpp
     SARibbonContextCategory.cpp
     SARibbonPanel.cpp
@@ -146,8 +148,9 @@ add_library(${SARIBBON_LIB_NAME}::${SARIBBON_LIB_NAME} ALIAS ${SARIBBON_LIB_NAME
 target_link_libraries(${SARIBBON_LIB_NAME} PUBLIC
                       Qt${QT_VERSION_MAJOR}::Core
                       Qt${QT_VERSION_MAJOR}::Gui
-                      Qt${QT_VERSION_MAJOR}::Widgets)
-message(STATUS "link ${SARIBBON_LIB_NAME} PUBLIC Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::Widgets")
+                      Qt${QT_VERSION_MAJOR}::Widgets
+                      Qt${QT_VERSION_MAJOR}::Svg)
+message(STATUS "link ${SARIBBON_LIB_NAME} PUBLIC Qt${QT_VERSION_MAJOR}::Core Qt${QT_VERSION_MAJOR}::Gui Qt${QT_VERSION_MAJOR}::Widgets Qt${QT_VERSION_MAJOR}::Svg")
 
 #################################################
 # frameless相关的依赖
