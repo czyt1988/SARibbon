@@ -1968,12 +1968,12 @@ void MainWindow::createCategoryMain(SARibbonCategory* categoryPage)
     mComboboxRibbonTheme = new QComboBox();
     mComboboxRibbonTheme->setWindowTitle(tr("RibbonTheme"));
     mComboboxRibbonTheme->setObjectName("RibbonTheme");
-    mComboboxRibbonTheme->addItem("Theme Win7", static_cast< int >(SARibbonTheme::RibbonThemeWindows7));
-    mComboboxRibbonTheme->addItem("Theme Office2013", static_cast< int >(SARibbonTheme::RibbonThemeOffice2013));
-    mComboboxRibbonTheme->addItem("Theme Office2016 Blue", static_cast< int >(SARibbonTheme::RibbonThemeOffice2016Blue));
-    mComboboxRibbonTheme->addItem("Theme Office2021 Blue", static_cast< int >(SARibbonTheme::RibbonThemeOffice2021Blue));
-    mComboboxRibbonTheme->addItem("Theme Dark", static_cast< int >(SARibbonTheme::RibbonThemeDark));
-    mComboboxRibbonTheme->addItem("Theme Dark2", static_cast< int >(SARibbonTheme::RibbonThemeDark2));
+    mComboboxRibbonTheme->addItem(tr("Windows 7"), static_cast< int >(SARibbonTheme::RibbonThemeWindows7));
+    mComboboxRibbonTheme->addItem(tr("Office 2013"), static_cast< int >(SARibbonTheme::RibbonThemeOffice2013));
+    mComboboxRibbonTheme->addItem(tr("Office 2016 Blue"), static_cast< int >(SARibbonTheme::RibbonThemeOffice2016Blue));
+    mComboboxRibbonTheme->addItem(tr("Office 2021 Blue"), static_cast< int >(SARibbonTheme::RibbonThemeOffice2021Blue));
+    mComboboxRibbonTheme->addItem(tr("Dark"), static_cast< int >(SARibbonTheme::RibbonThemeDark));
+    mComboboxRibbonTheme->addItem(tr("Dark 2"), static_cast< int >(SARibbonTheme::RibbonThemeDark2));
     mComboboxRibbonTheme->setCurrentIndex(mComboboxRibbonTheme->findData(static_cast< int >(ribbonTheme())));
     connect(
         mComboboxRibbonTheme, QOverload< int >::of(&QComboBox::currentIndexChanged), this, &MainWindow::onRibbonThemeComboBoxCurrentIndexChanged
