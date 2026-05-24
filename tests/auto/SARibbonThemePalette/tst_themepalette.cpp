@@ -1,5 +1,6 @@
 #include <QtTest>
 #include "SARibbonThemePalette.h"
+#include "SARibbonUtil.h"
 
 class TestThemePalette : public QObject
 {
@@ -9,6 +10,8 @@ private Q_SLOTS:
     void testLoadFromJson();
     void testDerivation();
     void testDarkDerivation();
+    void testTokenReplacement();
+    void testOpacityModifier();
 };
 
 void TestThemePalette::testLoadFromJson()
@@ -68,6 +71,37 @@ void TestThemePalette::testDarkDerivation()
     QColor hover = palette.color("accent-hover");
     // In dark mode, lighten becomes darken
     QVERIFY(hover.lightness() < QColor("#225497").lightness());
+}
+
+void TestThemePalette::testTokenReplacement()
+{
+    SA::SARibbonThemePalette palette;
+    QByteArray json = R"({
+        "name": "test",
+        "keyColors": {
+            "accent": "#225497",
+            "content-bg": "#f1f1f1"
+        }
+    })";
+    palette.loadFromJson(json);
+
+    QString templateQss = "SARibbonBar { background: {{accent}}; }";
+    QString result        = SA::replaceQssTokens(templateQss, palette);
+    QCOMPARE(result, QString("SARibbonBar { background: #225497; }"));
+}
+
+void TestThemePalette::testOpacityModifier()
+{
+    SA::SARibbonThemePalette palette;
+    QByteArray json = R"({
+        "name": "test",
+        "keyColors": {"accent": "#225497"}
+    })";
+    palette.loadFromJson(json);
+
+    QString templateQss = "QToolButton { bg: {{accent|opacity(0.5)}}; }";
+    QString result        = SA::replaceQssTokens(templateQss, palette);
+    QCOMPARE(result, QString("QToolButton { bg: #80225497; }"));
 }
 
 QTEST_MAIN(TestThemePalette)

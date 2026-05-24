@@ -1,4 +1,5 @@
 #include "SARibbonUtil.h"
+#include "SARibbonThemePalette.h"
 #include <QFile>
 #include <QWidget>
 #include <QDebug>
@@ -9,6 +10,7 @@
 #include <QStyleHints>
 #include <QSettings>
 #include <QProcess>
+#include <QRegularExpression>
 #if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
 #include <QWindow>
 #else
@@ -342,6 +344,54 @@ bool isOperatingSystemInDarkMode()
     // Unknown platform or headless: assume light mode
     return false;
 #endif
+}
+
+/**
+ * @brief Replace {{token}} and {{token|opacity(value)}} patterns in QSS templates with actual color values
+ * @param templateQss The QSS template string containing tokens
+ * @param palette The theme palette providing color values
+ * @return The QSS string with all tokens replaced
+ */
+QString replaceQssTokens(const QString& templateQss, const SARibbonThemePalette& palette)
+{
+    QString result               = templateQss;
+    QHash<QString, QString> vars = palette.variables();
+
+    QRegularExpression re("\\{\\{([^}|]+)(?:\\|opacity\\(([^)]+)\\))?\\}\\}");
+    QRegularExpressionMatchIterator it = re.globalMatch(result);
+
+    int offset = 0;
+    while (it.hasNext()) {
+        QRegularExpressionMatch match = it.next();
+        QString tokenName  = match.captured(1);
+        QString opacityStr = match.captured(2);
+
+        QString replacement;
+        if (vars.contains(tokenName)) {
+            QColor color(vars.value(tokenName));
+            if (!opacityStr.isEmpty()) {
+                bool ok;
+                float opacity = opacityStr.toFloat(&ok);
+                if (ok) {
+                    int alpha = qRound(opacity * 255);
+                    replacement = QString("#%1%2").arg(alpha, 2, 16, QChar('0')).arg(color.name().mid(1));
+                } else {
+                    replacement = color.name();
+                }
+            } else {
+                replacement = color.name();
+            }
+        }
+
+        if (!replacement.isEmpty()) {
+            int start  = match.capturedStart() + offset;
+            int length = match.capturedLength();
+            result.replace(start, length, replacement);
+            offset += replacement.length() - length;
+        }
+    }
+
+    return result;
 }
 
 }
