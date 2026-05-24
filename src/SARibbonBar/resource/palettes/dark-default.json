@@ -1,0 +1,52 @@
+{
+  "name": "Dark Default",
+  "version": "1.0",
+  "isDark": true,
+
+  "keyColors": {
+    "accent":             "#1e1e1e",
+    "accent-hover":       "#4a4a4a",
+    "accent-pressed":     "#555555",
+    "accent-text":        "#f0f1f2",
+    "content-bg":         "#2d2d2d",
+    "content-hover-bg":   "#3a3a3a",
+    "content-pressed-bg": "#505050",
+    "text-color":         "#e0e0e0",
+    "text-disabled":      "#666666",
+    "bar-border":         "#1e1e1e",
+    "ribbon-text":        "#b2b2b2",
+    "separator":          "#5a5a5a",
+    "subtitle":           "#999999",
+    "panel-border":       "#4a4a4a",
+    "border-color":       "#4a4a4a",
+    "input-border":       "#4a4a4a",
+    "input-focus":        "#5a5a5a",
+    "selection-bg":       "#6a9eff",
+    "menu-border":        "#3a3a3a",
+    "close-bg":           "#e81123",
+    "close-bg-pressed":   "#f1707a",
+    "sys-button-hover":   "#4a4a4a",
+    "sys-button-pressed": "#555555"
+  },
+
+  "derived": {},
+
+  "fixed": {
+    "white":         "#ffffff",
+    "black":         "#000000",
+    "input-base":    "#3a3a3a",
+    "input-text":    "#e0e0e0"
+  },
+
+  "comments": {
+    "accent":          "Ribbon bar background (darkest)",
+    "accent-hover":    "Button hover states, system button hover",
+    "accent-pressed":  "Button pressed states, system button pressed",
+    "accent-text":     "Tab unselected text",
+    "content-bg":      "Category/Panel/Menu/Gallery background",
+    "content-hover-bg":"Slightly lighter for hover states",
+    "content-pressed-bg":"Pressed/checked state for buttons, menu items, gallery",
+    "text-color":      "Light text on dark background",
+    "text-disabled":   "Disabled text color"
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "name": "Office 2021 Blue",
+  "version": "1.0",
+  "isDark": false,
+
+  "keyColors": {
+    "accent":             "#e5e3e5",
+    "accent-text":        "#242424",
+    "content-bg":         "#ffffff",
+    "text-color":         "#242424",
+    "bar-border":         "#e5e3e5",
+    "ribbon-text":        "#b2b2b2",
+    "separator":          "#bec0c2",
+    "subtitle":           "#666666",
+    "panel-border":       "#606060",
+    "border-color":       "#c5c5c5",
+    "input-border":       "#c0c2c4",
+    "input-focus":        "#269bf4",
+    "selection-bg":       "#9bbbf7",
+    "menu-border":        "#fcfcfc",
+    "close-bg":           "#e81123",
+    "close-bg-pressed":   "#f1707a",
+    "sys-button-hover":   "#f5f6f6",
+    "sys-button-pressed": "#cacacb"
+  },
+
+  "derived": {
+    "accent-hover":       { "fn": "darken",  "base": "accent",       "amount": 10 },
+    "accent-pressed":     { "fn": "darken",  "base": "accent",       "amount": 15 },
+    "content-hover-bg":   { "fn": "darken",  "base": "content-bg",   "amount": 17 },
+    "content-pressed-bg": { "fn": "darken",  "base": "content-bg",   "amount": 23 }
+  },
+
+  "fixed": {
+    "white":         "#ffffff",
+    "black":         "#000000",
+    "bar-border":    "#e5e3e5",
+    "ribbon-text":   "#b2b2b2",
+    "separator":     "#bec0c2",
+    "input-base":    "#ffffff",
+    "input-text":    "#000000"
+  },
+
+  "comments": {
+    "accent":          "Ribbon bar background + application widget background",
+    "accent-hover":    "Tab hover, application button hover",
+    "accent-pressed":  "Application button pressed",
+    "accent-text":     "Tab unselected text (maps to text-color in office2021)",
+    "content-bg":      "Category/Panel/ToolButton/Gallery/Menu background",
+    "content-hover-bg":"Hover state for buttons, scroll buttons, menu items",
+    "content-pressed-bg":"Pressed/checked state for tool buttons, menu items",
+    "text-color":      "Primary text color (tool buttons, menus, gallery)"
+  }
+}
