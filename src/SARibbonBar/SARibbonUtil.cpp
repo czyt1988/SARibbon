@@ -5,6 +5,10 @@
 #include <QDir>
 #include <QApplication>
 #include <QScreen>
+#include <QGuiApplication>
+#include <QStyleHints>
+#include <QSettings>
+#include <QProcess>
 #if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
 #include <QWindow>
 #else
@@ -280,6 +284,55 @@ int saMirrorX(int x, int containerWidth, int elementWidth)
         return containerWidth - x - elementWidth;
     }
     return x;
+}
+
+/**
+ * @brief Check if the operating system uses dark mode
+ *
+ * Detects dark mode via three tiers:
+ * 1. Qt 6.5+: Uses QGuiApplication::styleHints()->colorScheme()
+ * 2. Qt < 6.5 Windows: Reads registry AppsUseLightTheme
+ * 3. Qt < 6.5 macOS: Runs 'defaults read -g AppleInterfaceStyle'
+ * 4. Qt < 6.5 Linux: Runs 'gsettings get org.gnome.desktop.interface color-scheme'
+ * 5. All other cases: Returns false (assume light mode)
+ *
+ * @return true if OS dark mode is active, false otherwise
+ */
+bool isOperatingSystemInDarkMode()
+{
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+    // Qt 6.5+ has native cross-platform API
+    return QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark;
+#elif defined(Q_OS_WIN32)
+    // Windows: Read registry AppsUseLightTheme
+    // DWORD value 0 = dark mode, 1 = light mode
+    // Registry path: HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize
+    QSettings settings(
+        "HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
+        QSettings::NativeFormat);
+    bool ok = false;
+    int value = settings.value("AppsUseLightTheme", 1).toInt(&ok);
+    return (ok && value == 0);
+#elif defined(Q_OS_MACOS)
+    // macOS: Run 'defaults read -g AppleInterfaceStyle'
+    // Returns "Dark" if dark mode is active, empty otherwise
+    QProcess process;
+    process.start("/usr/bin/defaults", QStringList() << "read" << "-g" << "AppleInterfaceStyle");
+    process.waitForFinished(3000);
+    QString output = QString::fromUtf8(process.readAllStandardOutput()).trimmed();
+    return output.contains("Dark", Qt::CaseInsensitive);
+#elif defined(Q_OS_LINUX)
+    // Linux: Try gsettings for GNOME 42+
+    // Returns "dark" or "prefer-dark" in dark mode
+    QProcess process;
+    process.start("gsettings", QStringList() << "get" << "org.gnome.desktop.interface" << "color-scheme");
+    process.waitForFinished(3000);
+    QString output = QString::fromUtf8(process.readAllStandardOutput()).trimmed();
+    return output.contains("dark", Qt::CaseInsensitive);
+#else
+    // Unknown platform or headless: assume light mode
+    return false;
+#endif
 }
 
 }

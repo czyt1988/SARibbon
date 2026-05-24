@@ -66,5 +66,8 @@ bool SA_RIBBON_EXPORT saIsRTL();
  * \endif
  */
 int SA_RIBBON_EXPORT saMirrorX(int x, int containerWidth, int elementWidth);
+
+// Check if the operating system uses dark mode (cross-platform)
+bool SA_RIBBON_EXPORT isOperatingSystemInDarkMode();
 }
 #endif  // SARIBBONUTIL_H
