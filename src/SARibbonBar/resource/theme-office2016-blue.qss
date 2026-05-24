@@ -3,6 +3,13 @@ start ribbon set
 office 2016 style theme
 */
 
+/*SARibbonApplicationWidget*/
+SARibbonApplicationWidget{
+    background-color: #225497;/* {Ribbon.BKColor} */
+    border: solid #225497;
+    color:#b2b2b2;
+}
+
 /*SARibbonBar*/
 SARibbonBar {
   background-color: #225497;/* {Ribbon.BKColor} */
@@ -118,6 +125,14 @@ SARibbonPanel > SARibbonButtonGroupWidget {
   border: 1px solid #c6c6c6;/* {PanelButtonGroup.BorderColor} */
 }
 
+/*
+SARibbonPanel下的SARibbonSeparatorWidget
+注意，SARibbonSeparatorWidget的背景颜色是使用color
+*/
+SARibbonPanel > SARibbonSeparatorWidget {
+  color: #bec0c2;
+}
+
 
 /*SARibbonPanelOptionButton*/
 
@@ -134,6 +149,7 @@ SARibbonPanelOptionButton:hover {
 /*SARibbonCategoryScrollButton*/
 
 SARibbonCategoryScrollButton {
+  border-radius:2px;
   border: 1px solid #c5c5c5;/*{CategoryScrollButton.BorderColor}*/
   background-color: #f1f1f1;/*{CategoryScrollButton.BKColor}*/
 }
@@ -163,6 +179,7 @@ SARibbonStackedWidget:focus {
 
 /*SARibbonApplicationButton*/
 SARibbonApplicationButton {
+  border-radius:2px;
   color: white;
   border:none;
   background-color: #225497;/* {ApplicationButton.BKColor} */
@@ -172,7 +189,7 @@ SARibbonApplicationButton:hover {
   background-color: #3e6db5;/* {ApplicationButton.BKColor:hover} */
 }
 
-SARibbonApplicationButton::pressed {
+SARibbonApplicationButton:pressed {
   background-color: #225497;/* {ApplicationButton.BKColor:hover} */
 }
 
@@ -224,26 +241,44 @@ SARibbonToolButton的背景颜色必须和panel或者category的颜色一致
 */
 SARibbonToolButton {
   border: none;
+  border-radius:4px;
   color: #333;/* {ToolButton.Color} */
   background-color: #f1f1f1;/* {ToolButton.BKColor} */
 }
 
 SARibbonToolButton:pressed {
+  border-radius:4px;
   color: #000;/* {ToolButton.Color:pressed} */
   border: 1px solid #c5c3c6;/* {ToolButton.BorderColor:pressed} */
   background-color: #c5c3c6;/* {ToolButton.BKColor:pressed} */
 }
 
 SARibbonToolButton:checked {
+  border-radius:4px;
   color: #333;/* {ToolButton.Color:checked} */
   border: 1px solid #c6c6c6;/* {ToolButton.BorderColor:checked} */
   background-color: #c6c6c6;/* {ToolButton.BKColor:checked} */
 }
 
 SARibbonToolButton:hover {
+  border-radius:4px;
   color: #000;/* {ToolButton.Color:hover} */
   border: 1px solid #c5c5c5;/* {ToolButton.BorderColor:hover} */
   background-color: #c5c5c5;/* {ToolButton.BKColor:hover} */
+}
+
+SARibbonToolButton:checked:hover {
+  border-radius:4px;
+  color: #333;/* {ToolButton.Color:checked:hover} */
+  border: 1px solid #c5c5c5;/* {ToolButton.BorderColor:checked:hover} */
+  background-color: #c5c3c6;/* {ToolButton.BKColor:checked:hover} */
+}
+
+SARibbonToolButton:focus {
+  border: 1px solid #3e6db5;/* {ToolButton.BorderColor:focus} */
+  border-radius:4px;
+  color: #333;/* {ToolButton.Color:focus} */
+  background-color: #f1f1f1;/* {ToolButton.BKColor:focus} */
 }
 
 
@@ -283,6 +318,10 @@ SARibbonGalleryGroup::item:selected {
 SARibbonGalleryGroup::item:hover {
   border: 1px solid #c5c5c5;
   background-color: #c5c5c5;
+}
+
+SARibbonGalleryGroup::item {
+  color: #333;
 }
 
 /*RibbonGalleryViewport*/
@@ -333,6 +372,12 @@ SARibbonPanel > QLineEdit:hover{
 
 /*Panel下QCheckBox的特化*/
 SARibbonPanel > QCheckBox{
+    color:#333;
+    background-color:transparent;
+}
+
+/*Panel下QRadioButton的特化*/
+SARibbonPanel > QRadioButton{
     color:#333;
     background-color:transparent;
 }

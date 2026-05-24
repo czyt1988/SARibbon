@@ -3,6 +3,13 @@ start ribbon set
 win7 style theme
 */
 
+/*SARibbonApplicationWidget*/
+SARibbonApplicationWidget{
+    background-color: #E3E6E8;
+    border: solid #E3E6E8;
+    color:#242424;
+}
+
 /*SARibbonBar*/
 
 SARibbonBar{
@@ -55,15 +62,31 @@ SARibbonButtonGroupWidget > QToolButton[popupMode="2"] {
 SARibbonButtonGroupWidget > QToolButton[popupMode="0"]{
     padding: 0 2px;
 }
+/* focus 状态 - 获取焦点时的样式 */
+SARibbonButtonGroupWidget > QToolButton:focus {
+    border: 1px solid #FFD700;
+    background-color: #FDEEB3;
+}
+/* checked:hover 状态 - 已选中时hover */
+SARibbonButtonGroupWidget > QToolButton:checked:hover {
+    background-color: #FDEEB3;
+    border: 1px solid #FFD700;
+}
+/* checked 状态 - MenuButtonPopup 模式的菜单按钮部分 */
+SARibbonButtonGroupWidget > QToolButton[popupMode="1"]::menu-button:checked {
+    background-color: #FDEEB3;
+    border: 1px solid #FFD700;
+}
+/* menu-indicator 隐藏 - 按钮组不需要菜单指示箭头 */
+SARibbonButtonGroupWidget > QToolButton::menu-indicator {
+    width: 0px;
+}
 
 
-
-/*
-* 如果你想定义SARibbonPanel下的SARibbonButtonGroupWidget，你可以类似下面这样操作
-* SARibbonPanel > SARibbonButtonGroupWidget {
-*   border: 1px solid #e3e6e8;
-* }
-*/
+/* SARibbonPanel下的SARibbonButtonGroupWidget */
+SARibbonPanel > SARibbonButtonGroupWidget {
+    border: 1px solid #C0C2C4;
+}
 
 /***********************************/
 
@@ -134,12 +157,13 @@ SARibbonStackedWidget:focus{
 
 /*SARibbonApplicationButton*/
 SARibbonApplicationButton{
+  border-radius:2px;
   color:white;
   border: 1px solid #416ABD;
   border-top-left-radius: 4px;
   border-top-right-radius: 4px;
   background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,stop:0 #467FBD, stop:0.5 #2A5FAC,stop:0.51 #1A4088,
-stop:1 #419ACF);
+ stop:1 #419ACF);
 }
 
 SARibbonApplicationButton:hover{
@@ -249,23 +273,28 @@ SARibbonPanel > QComboBox::down-arrow {
 /*SARibbonToolButton*/
 SARibbonToolButton{
     border:none;
+    border-radius:4px;
     color:#444444;
     background-color:white;
 }
 SARibbonToolButton:focus {
   border: 1px solid #FCBF21;
+  border-radius:4px;
   color: #333;
   background-color: #FCD364;
 }
 SARibbonToolButton:pressed{
+    border-radius:4px;
     color:#444444;
     background-color: #FDEEB3;
 }
 SARibbonToolButton:checked{
+    border-radius:4px;
     color:#444444;
     background-color: #FDEEB3;
 }
 SARibbonToolButton:hover {
+    border-radius:4px;
     color:#000000;
     background-color: #FDEEB3;
 }
@@ -323,13 +352,14 @@ SARibbonGalleryGroup::item:hover {
   border: 1px solid #FDEEB3;
 }
 
-/*RibbonGalleryViewport*/
+/*SARibbonGalleryViewport*/
 
-RibbonGalleryViewport {
+SARibbonGalleryViewport {
   background-color: white;
 }
 
 SARibbonCategoryScrollButton {
+  border-radius:2px;
   border: 1px solid #c5d2e0;
   color: #444444;
   background-color: white;

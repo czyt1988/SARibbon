@@ -16,11 +16,56 @@ SARibbonBar {
   color:#242424;
 }
 
-/*SARibbonButtonGroupWidget*/
+/*SARibbonButtonGroupWidget,SARibbonSystemButtonBar和RightButtonGroup都是使用此控件，pannel里面的按钮组也是使用此控件*/
 SARibbonButtonGroupWidget {
   background-color: transparent;
 }
 
+/* SARibbonButtonGroupWidget下按钮设置*/
+SARibbonButtonGroupWidget > QToolButton {
+  border: none;
+  border-radius: 4px;
+  color: #242424;/* {ButtonGroupToolButton.Color} */
+  background-color: transparent;
+  padding: 0 2px;
+}
+/* hover 状态 */
+SARibbonButtonGroupWidget > QToolButton:hover {
+  border-radius: 4px;
+  background-color: #f5f6f6;/* {ButtonGroupToolButton.BKColor:hover} */
+}
+SARibbonButtonGroupWidget > QToolButton:pressed {
+  border: 1px solid #c5c5c5;/* {ButtonGroupToolButton.BorderColor:pressed} */
+  border-radius: 4px;
+  background-color: #e1e1e1;/* {ButtonGroupToolButton.BKColor:pressed} */
+}
+SARibbonButtonGroupWidget > QToolButton:checked {
+  border: 1px solid #5f5f5f;/* {ButtonGroupToolButton.BorderColor:checked} */
+  border-radius: 4px;
+  background-color: #ebebeb;/* {ButtonGroupToolButton.BKColor:checked} */
+}
+
+/* 有菜单的按钮 */
+/*MenuButtonPopup*/
+SARibbonButtonGroupWidget > QToolButton[popupMode="1"] {
+  padding-right: 12px;
+}
+/* hover 状态 - MenuButtonPopup 模式的菜单按钮部分 */
+SARibbonButtonGroupWidget > QToolButton[popupMode="1"]::menu-button:hover {
+  background-color: #e1e1e1;/* {ButtonGroupToolButton.MenuButton.BKColor:hover} */
+}
+/* pressed 状态 - MenuButtonPopup 模式的菜单按钮部分 */
+SARibbonButtonGroupWidget > QToolButton[popupMode="1"]::menu-button:pressed {
+  background-color: #d0ced1;/* {ButtonGroupToolButton.MenuButton.BKColor:pressed} */
+}
+/* 直接弹出菜单模式，偏移8px，让下拉按钮能看到 */
+SARibbonButtonGroupWidget > QToolButton[popupMode="2"] {
+  padding-right: 8px;
+}
+/* 无菜单的按钮保持小边距 */
+SARibbonButtonGroupWidget > QToolButton[popupMode="0"] {
+  padding: 0 2px;
+}
 
 
 /*SARibbonCtrlContainer*/
@@ -92,6 +137,7 @@ SARibbonPanelOptionButton:hover {
 /*SARibbonCategoryScrollButton*/
 
 SARibbonCategoryScrollButton {
+  border-radius:2px;
   border: 1px solid #c5c5c5;/*{CategoryScrollButton.BorderColor}*/
   background-color: #f1f1f1;/*{CategoryScrollButton.BKColor}*/
 }
@@ -121,6 +167,7 @@ SARibbonStackedWidget:focus {
 
 /*SARibbonApplicationButton*/
 SARibbonApplicationButton {
+  border-radius:2px;
   border:none;
   color: #242424;
   background-color: transparent;/* {ApplicationButton.BKColor} */

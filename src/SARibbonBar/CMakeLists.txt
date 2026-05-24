@@ -47,6 +47,7 @@ SET(SARIBBON_HEADER_FILES
     SARibbonSystemButtonBar.h
     SARibbonApplicationButton.h
     SARibbonTabBar.h
+    SARibbonThemeManager.h
     SARibbonCategory.h
     SARibbonContextCategory.h
     SARibbonPanel.h
@@ -89,6 +90,7 @@ SET(SARIBBON_SOURCE_FILES
     SARibbonSystemButtonBar.cpp
     SARibbonApplicationButton.cpp
     SARibbonTabBar.cpp
+    SARibbonThemeManager.cpp
     SARibbonCategory.cpp
     SARibbonContextCategory.cpp
     SARibbonPanel.cpp

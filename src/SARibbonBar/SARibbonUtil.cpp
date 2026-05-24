@@ -141,6 +141,14 @@ QSize scaleSizeByWidth(const QSize& originalSize, int newWidth)
  */
 QString getBuiltInRibbonThemeQss(SARibbonTheme theme)
 {
+    // Load base QSS (common styles without colors) first
+    QFile baseFile(":/SARibbonTheme/resource/theme-base.qss");
+    QString baseQss;
+    if (baseFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        baseQss = QString::fromUtf8(baseFile.readAll());
+    }
+
+    // Then load theme-specific QSS
     QFile file;
     switch (theme) {
     case SARibbonTheme::RibbonThemeWindows7:
@@ -167,9 +175,10 @@ QString getBuiltInRibbonThemeQss(SARibbonTheme theme)
     }
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qWarning() << "can not load build in ribbon theme,reason is :" << file.errorString();
-        return QString();
+        return baseQss;
     }
-    return QString::fromUtf8(file.readAll());
+    QString themeQss = QString::fromUtf8(file.readAll());
+    return baseQss + "\n" + themeQss;
 }
 
 /**

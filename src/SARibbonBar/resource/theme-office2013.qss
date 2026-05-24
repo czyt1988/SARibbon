@@ -3,6 +3,13 @@
 start ribbon set
 */
 
+/*SARibbonApplicationWidget*/
+SARibbonApplicationWidget{
+    background-color: white;
+    border: solid white;
+    color:#b2b2b2;
+}
+
 /*SARibbonBar*/
 SARibbonBar {
   background-color: white;
@@ -67,11 +74,62 @@ SARibbonButtonGroupWidget {
   background-color: transparent;
 }
 
+/* SARibbonButtonGroupWidget下按钮设置*/
+SARibbonButtonGroupWidget > QToolButton {
+    border: none;
+    color: #333;
+    background-color: transparent;
+    padding: 0 2px;
+}
+/* hover 状态 */
+SARibbonButtonGroupWidget > QToolButton:hover {
+    background-color: #cee7fc;
+}
+SARibbonButtonGroupWidget > QToolButton:pressed {
+    border: 1px solid #badffa;
+    background-color: #9ed2f9;
+}
+SARibbonButtonGroupWidget > QToolButton:checked {
+    background-color: #cee8fc;
+}
+
+
+/* 有菜单的按钮 */
+/*MenuButtonPopup*/
+SARibbonButtonGroupWidget > QToolButton[popupMode="1"] {
+    padding-right: 12px;
+}
+/* hover 状态 - MenuButtonPopup 模式的菜单按钮部分 */
+SARibbonButtonGroupWidget > QToolButton[popupMode="1"]::menu-button:hover {
+    background-color: #9ed2f9;
+}
+/* pressed 状态 - MenuButtonPopup 模式的菜单按钮部分 */
+SARibbonButtonGroupWidget > QToolButton[popupMode="1"]::menu-button:pressed {
+    background-color: #9ed2f9;
+}
+/* 直接弹出菜单模式，偏移8px，让下拉按钮能看到 */
+SARibbonButtonGroupWidget > QToolButton[popupMode="2"] {
+    padding-right: 8px;
+}
+/* 无菜单的按钮保持小边距 */
+SARibbonButtonGroupWidget > QToolButton[popupMode="0"] {
+    padding: 0 2px;
+}
+
+/*SARibbonQuickAccessBar*/
+SARibbonQuickAccessBar {
+  background-color: transparent;
+}
+
 /*SARibbonPanelLabel Panel下标题栏*/
 
 SARibbonPanelLabel {
     background-color: transparent;
     color: #666666;
+}
+
+SARibbonPanel > SARibbonButtonGroupWidget {
+  border: 1px solid #c5d2e0;
 }
 
 /*SARibbonPanelOptionButton*/
@@ -89,6 +147,7 @@ SARibbonPanelOptionButton:hover {
 
 /*SARibbonApplicationButton*/
 SARibbonApplicationButton {
+  border-radius:2px;
   color: white;
   border-top-left-radius: 2px;
   border-top-right-radius: 2px;
@@ -157,37 +216,54 @@ SARibbonToolButton的背景颜色必须和panel或者category的颜色一致
 */
 SARibbonToolButton {
   border: none;
+  border-radius:4px;
   color: #333;
   background-color: white;
 }
 
 SARibbonToolButton:focus {
   border: 1px solid #b9defa;
+  border-radius:4px;
   color: #333;
   background-color: #fcfdfe;
 }
 
 SARibbonToolButton:pressed {
+  border-radius:4px;
   color: #000;
   border: 1px solid #269bf4;
   background-color: #9ed2f9;
 }
 
 SARibbonToolButton:checked {
+  border-radius:4px;
   color: #333;
   border: 1px solid #b9defa;
   background-color: #cee8fc;
 }
 
 SARibbonToolButton:hover {
+  border-radius:4px;
   color: #000;
   border: 1px solid #badffa;
   background-color: #cee7fc;
 }
 
+SARibbonToolButton:checked:hover {
+  border-radius:4px;
+  color: #000;
+  border: 1px solid #b9defa;
+  background-color: #b8d6f7;
+}
+
 
 SARibbonGalleryButton {
   border: 1px solid #cee8fc;
+}
+
+SARibbonGalleryButton:hover {
+  border: 1px solid #badffa;
+  background-color: #cee7fc;
 }
 
 /*SARibbonMenu*/
@@ -246,7 +322,7 @@ SARibbonGalleryGroup::item:hover {
   background-color: #cee7fc;
 }
 
-/*RibbonGalleryViewport*/
+/*SARibbonGalleryViewport*/
 
 SARibbonGalleryViewport {
   background-color: #ffffff;
@@ -307,6 +383,7 @@ SARibbonSeparatorWidget {
 }
 
 SARibbonCategoryScrollButton {
+  border-radius:2px;
   border: 1px solid #c5d2e0;
   color: #333;
   background-color: white;

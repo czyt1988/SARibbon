@@ -1,0 +1,98 @@
+/*
+ * SARibbon Theme Base QSS
+ *
+ * Common selectors shared across all 6 themes (win7, office2013, office2016-blue,
+ * office2021-blue, dark, dark2). Contains only non-theme-specific values
+ * (transparent, none, generic sizes). Theme-specific QSS files override
+ * colors and theme-dependent properties when concatenated after this base.
+ *
+ * Usage: Load this file first, then load the theme-specific QSS file.
+ */
+
+/* == Focus Outlines ==
+ * Remove default focus outline from all widgets — themes add their own
+ * focus styles (e.g. colored borders) where needed.
+ */
+*:focus {
+    outline: none;
+}
+
+/* == Transparent Background Containers == */
+SARibbonCtrlContainer {
+    background-color: transparent;
+}
+
+SARibbonButtonGroupWidget {
+    background-color: transparent;
+}
+
+SARibbonTabBar {
+    background-color: transparent;
+}
+
+/* == System Tool Buttons == */
+SARibbonSystemToolButton {
+    background-color: transparent;
+    border: none;
+}
+
+/* == Separator Widget ==
+ * SARibbonSeparatorWidget uses the 'color' property as its visual line color.
+ * The value is theme-specific — override in theme QSS.
+ */
+SARibbonSeparatorWidget {
+    /* color: <theme-specific>; */
+}
+
+/* == Menu Common Styles == */
+SARibbonMenu::item {
+    padding: 5px;
+    background-color: transparent;
+}
+
+SARibbonMenu::icon {
+    margin-left: 1px;
+}
+
+/* == Gallery Common Styles == */
+SARibbonGalleryGroup {
+    show-decoration-selected: 1;
+    background-color: transparent;
+}
+
+SARibbonGalleryGroup::item:selected {
+    color: black;
+}
+
+/* == Application Button Common == */
+SARibbonApplicationButton::menu-indicator {
+    width: 0px;
+}
+
+/* == ButtonGroupWidget ToolButton Common == */
+SARibbonButtonGroupWidget > QToolButton {
+    border: none;
+    background-color: transparent;
+    padding: 0 2px;
+}
+
+SARibbonButtonGroupWidget > QToolButton[popupMode="1"] {
+    padding-right: 12px;
+}
+
+SARibbonButtonGroupWidget > QToolButton[popupMode="2"] {
+    padding-right: 8px;
+}
+
+SARibbonButtonGroupWidget > QToolButton[popupMode="0"] {
+    padding: 0 2px;
+}
+
+/* == Category Scroll Button Arrow Types == */
+SARibbonCategoryScrollButton[arrowType="3"] {
+    border-right-width: 1px;
+}
+
+SARibbonCategoryScrollButton[arrowType="4"] {
+    border-left-width: 1px;
+}
