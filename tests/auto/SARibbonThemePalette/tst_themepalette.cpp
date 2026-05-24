@@ -7,6 +7,8 @@ class TestThemePalette : public QObject
 
 private Q_SLOTS:
     void testLoadFromJson();
+    void testDerivation();
+    void testDarkDerivation();
 };
 
 void TestThemePalette::testLoadFromJson()
@@ -26,6 +28,46 @@ void TestThemePalette::testLoadFromJson()
     QCOMPARE(palette.color("accent").name(), QColor("#225497").name());
     QCOMPARE(palette.color("content-bg").name(), QColor("#f1f1f1").name());
     QCOMPARE(palette.isDark(), false);
+}
+
+void TestThemePalette::testDerivation()
+{
+    SA::SARibbonThemePalette palette;
+    QByteArray json = R"({
+        "name": "test",
+        "isDark": false,
+        "keyColors": {
+            "accent": "#225497"
+        },
+        "derived": {
+            "accent-hover": {"fn": "lighten", "base": "accent", "amount": 15}
+        }
+    })";
+
+    palette.loadFromJson(json);
+    QColor hover = palette.color("accent-hover");
+    QVERIFY(hover.isValid());
+    QVERIFY(hover.lightness() > QColor("#225497").lightness());
+}
+
+void TestThemePalette::testDarkDerivation()
+{
+    SA::SARibbonThemePalette palette;
+    QByteArray json = R"({
+        "name": "test-dark",
+        "isDark": true,
+        "keyColors": {
+            "accent": "#225497"
+        },
+        "derived": {
+            "accent-hover": {"fn": "lighten", "base": "accent", "amount": 15}
+        }
+    })";
+
+    palette.loadFromJson(json);
+    QColor hover = palette.color("accent-hover");
+    // In dark mode, lighten becomes darken
+    QVERIFY(hover.lightness() < QColor("#225497").lightness());
 }
 
 QTEST_MAIN(TestThemePalette)

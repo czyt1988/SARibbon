@@ -2,6 +2,27 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 
+namespace {
+QColor deriveColor(const QColor& base, const QString& fn, int amount, bool isDark)
+{
+    if (isDark) {
+        // Reverse direction for dark themes
+        if (fn == "darken") {
+            return base.lighter(100 + amount);
+        } else if (fn == "lighten") {
+            return base.darker(100 + amount);
+        }
+    } else {
+        if (fn == "darken") {
+            return base.darker(100 + amount);
+        } else if (fn == "lighten") {
+            return base.lighter(100 + amount);
+        }
+    }
+    return base;
+}
+} // anonymous namespace
+
 namespace SA {
 
 SARibbonThemePalette::SARibbonThemePalette() = default;
@@ -20,6 +41,27 @@ bool SARibbonThemePalette::loadFromJson(const QByteArray& json)
     QJsonObject keyColors = obj.value("keyColors").toObject();
     for (auto it = keyColors.begin(); it != keyColors.end(); ++it) {
         m_keyColors.insert(it.key(), QColor(it.value().toString()));
+    }
+
+    // Parse derived colors
+    QJsonObject derived = obj.value("derived").toObject();
+    for (auto it = derived.begin(); it != derived.end(); ++it) {
+        QJsonObject rule = it.value().toObject();
+        QString fn = rule.value("fn").toString();
+        QString baseName = rule.value("base").toString();
+        int amount = rule.value("amount").toInt(10);
+
+        if (m_keyColors.contains(baseName)) {
+            QColor base = m_keyColors.value(baseName);
+            QColor derivedC = ::deriveColor(base, fn, amount, m_isDark);
+            m_derivedColors.insert(it.key(), derivedC);
+        }
+    }
+
+    // Parse fixed colors
+    QJsonObject fixed = obj.value("fixed").toObject();
+    for (auto it = fixed.begin(); it != fixed.end(); ++it) {
+        m_fixedColors.insert(it.key(), QColor(it.value().toString()));
     }
 
     return true;
