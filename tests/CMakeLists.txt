@@ -40,3 +40,4 @@ add_saribbon_test(SARibbonContextCategoryRTLTest SARibbonContextCategoryRTLTest.
 add_saribbon_test(SARibbonCategoryVisibilityTest SARibbonCategoryVisibilityTest.cpp)
 add_saribbon_test(SARibbonBarEventFilterTest SARibbonBarEventFilterTest.cpp)
 add_saribbon_test(ThemeCoverageTest ThemeCoverageTest.cpp)
+add_saribbon_test(SARibbonThemePaletteTest auto/SARibbonThemePalette/tst_themepalette.cpp)
