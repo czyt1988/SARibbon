@@ -145,10 +145,10 @@ void MainWindow::onThemeChanged(int index)
 SARibbon themes are QSS-based. If your window already has a stylesheet, you must merge both; otherwise the later one overwrites the earlier.
 
 ```cpp
-// Option 1: Set built-in theme first, then append custom QSS
+// Option 1: Set built-in theme first, then apply custom QSS
 // setRibbonTheme automatically applies built-in theme QSS to the window
 setRibbonTheme(SARibbonTheme::RibbonThemeOffice2021Blue);
-// Then append custom QSS (setStyleSheet appends, does not overwrite built-in theme QSS)
+// Then apply custom QSS (Note: setStyleSheet replaces, not appends — custom QSS will override built-in theme QSS)
 this->setStyleSheet(loadMyCustomStyleSheet());
 
 // Option 2: Skip built-in themes entirely — use your own QSS
