@@ -6,6 +6,7 @@
 #include <QFile>
 #include <QScreen>
 #include "SARibbonUtil.h"
+#include <QTimer>
 /**
  * @brief The SARibbonWidget::PrivateData class
  */
@@ -48,6 +49,14 @@ SARibbonWidget::SARibbonWidget(QWidget* parent) : QWidget(parent), d_ptr(new SAR
 	SARibbonBar* ribbon = new SARibbonBar(this);
 	setRibbonBar(ribbon);
 	connect(qApp, &QApplication::primaryScreenChanged, this, &SARibbonWidget::onPrimaryScreenChanged);
+	QTimer::singleShot(0, this, [this]() {
+		SA_D(d);
+		if (SA::isOperatingSystemInDarkMode()
+			&& d->mCurrentRibbonTheme == SARibbonTheme::RibbonThemeOffice2021Blue) {
+			d->mCurrentRibbonTheme = SARibbonTheme::RibbonThemeDark;
+		}
+		setRibbonTheme(ribbonTheme());
+	});
 }
 
 /**
