@@ -2,9 +2,13 @@
 #include "SARibbonBar.h"
 #include "SARibbonTabBar.h"
 #include "SARibbonUtil.h"
+#include "SARibbonThemePalette.h"
 #include <map>
 #include <QMargins>
 #include <QColor>
+#include <QFile>
+#include <QDir>
+#include <QCoreApplication>
 
 namespace SA
 {
@@ -100,8 +104,23 @@ static const std::map< SARibbonTheme, QColor > s_themeBaselineColors = {
  */
 void applyRibbonTheme(QWidget* w, SARibbonBar* bar, SARibbonTheme theme)
 {
-    // 1. Load the QSS stylesheet for the theme
-    SA::setBuiltInRibbonTheme(w, theme);
+    applyRibbonTheme(w, bar, theme, SARibbonThemePalette());
+}
+
+/// Apply a ribbon theme with custom color palette.
+/// If the palette is empty, falls back to default behavior.
+void applyRibbonTheme(QWidget* w, SARibbonBar* bar, SARibbonTheme theme,
+                      const SARibbonThemePalette& palette)
+{
+    // If palette is provided, use template-based approach
+    if (palette.variables().size() > 0) {
+         // TODO: Implement template loading path in Task 6
+         // For now, fall back to existing behavior
+         SA::setBuiltInRibbonTheme(w, theme);
+    } else {
+         // Empty palette, default behavior
+         SA::setBuiltInRibbonTheme(w, theme);
+    }
 
     if (!bar) {
         return;
