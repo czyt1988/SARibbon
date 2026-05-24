@@ -52,6 +52,45 @@ site-doxygen
 # vscode 的隐藏文件
 .vscode
 
+# ai相关
+.claude/
+.codex/
+.vibe/
+.opencode/
+.windsurf/
+.gemini/
+.cursor/
+.qwen/
+.kilocode/
+.augment/
+.roo/
+.amazonq/
+.kiro/
+.agent/
+.github/copilot/
+.kittify/.dashboard
+.kittify/charter/context-state.json
+.kittify/charter/directives.yaml
+.kittify/charter/governance.yaml
+.kittify/charter/metadata.yaml
+.kittify/charter/references.yaml
+.kittify/dossiers/
+.kittify/events/
+.kittify/merge-state.json
+.kittify/missions/__pycache__/
+.kittify/runtime/
+.kittify/workspaces/
+.qtcreator
+.qoder
+.trae
+.kilo
+.sisyphus
+.superpowers
+.omc
+.omo
+opencode.md
+docs/superpowers
+nul
 
 # This file is used to ignore files which are generated
 # ----------------------------------------------------------------------------
