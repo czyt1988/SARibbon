@@ -7,6 +7,7 @@
 #include <QMargins>
 #include <QColor>
 #include <QFile>
+#include <QIODevice>
 #include <QDir>
 #include <QCoreApplication>
 
@@ -107,19 +108,55 @@ void applyRibbonTheme(QWidget* w, SARibbonBar* bar, SARibbonTheme theme)
     applyRibbonTheme(w, bar, theme, SARibbonThemePalette());
 }
 
+/// Map SARibbonTheme enum to the corresponding QSS template resource path.
+/// Returns empty string if no template exists for the given theme.
+static QString themeToTemplatePath(SARibbonTheme theme)
+{
+    switch (theme) {
+    case SARibbonTheme::RibbonThemeOffice2016Blue:
+        return ":/SARibbonTheme/resource/templates/office2016.qss";
+    case SARibbonTheme::RibbonThemeOffice2021Blue:
+        return ":/SARibbonTheme/resource/templates/office2021.qss";
+    case SARibbonTheme::RibbonThemeDark:
+        return ":/SARibbonTheme/resource/templates/dark.qss";
+    default:
+        // Themes without templates (win7, office2013, dark2) fall back to fixed QSS
+        return QString();
+    }
+}
+
 /// Apply a ribbon theme with custom color palette.
-/// If the palette is empty, falls back to default behavior.
+/// If the palette is empty or no template exists, falls back to default behavior.
 void applyRibbonTheme(QWidget* w, SARibbonBar* bar, SARibbonTheme theme,
                       const SARibbonThemePalette& palette)
 {
-    // If palette is provided, use template-based approach
-    if (palette.variables().size() > 0) {
-         // TODO: Implement template loading path in Task 6
-         // For now, fall back to existing behavior
-         SA::setBuiltInRibbonTheme(w, theme);
+    // If palette is provided and a template exists, use template-based approach
+    QString templatePath = themeToTemplatePath(theme);
+    if (palette.variables().size() > 0 && !templatePath.isEmpty() && w) {
+        // Load base QSS (common structural styles)
+        QString qss = SA::getBuiltInRibbonThemeQss(SARibbonTheme::RibbonThemeOffice2013);
+        // Extract only the base portion (getBuiltInRibbonThemeQss concatenates base + theme)
+        // We need to load base separately, then the template separately
+        QFile baseFile(":/SARibbonTheme/resource/theme-base.qss");
+        QString baseQss;
+        if (baseFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            baseQss = QString::fromUtf8(baseFile.readAll());
+        }
+
+        // Load the QSS template
+        QFile templateFile(templatePath);
+        if (templateFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            QString templateQss = QString::fromUtf8(templateFile.readAll());
+            // Replace {{token}} placeholders with palette colors
+            QString processedQss = SA::replaceQssTokens(templateQss, palette);
+            w->setStyleSheet(baseQss + "\n" + processedQss);
+        } else {
+            // Template file not found, fall back to fixed QSS
+            SA::setBuiltInRibbonTheme(w, theme);
+        }
     } else {
-         // Empty palette, default behavior
-         SA::setBuiltInRibbonTheme(w, theme);
+        // Empty palette or no template, default behavior
+        SA::setBuiltInRibbonTheme(w, theme);
     }
 
     if (!bar) {

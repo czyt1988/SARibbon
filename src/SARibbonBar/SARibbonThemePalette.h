@@ -15,6 +15,9 @@ public:
 
     bool loadFromJson(const QByteArray& json);
 
+    // Load palette from a JSON file (filesystem path or Qt resource path)
+    bool loadFromFile(const QString& jsonPath);
+
     void setAccentColor(const QColor& color);
     void setContentBgColor(const QColor& color);
     void setTextColor(const QColor& color);

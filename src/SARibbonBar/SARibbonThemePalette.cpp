@@ -1,6 +1,7 @@
 #include "SARibbonThemePalette.h"
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QFile>
 
 namespace {
 QColor deriveColor(const QColor& base, const QString& fn, int amount, bool isDark)
@@ -26,6 +27,17 @@ QColor deriveColor(const QColor& base, const QString& fn, int amount, bool isDar
 namespace SA {
 
 SARibbonThemePalette::SARibbonThemePalette() = default;
+
+bool SARibbonThemePalette::loadFromFile(const QString& jsonPath)
+{
+    QFile file(jsonPath);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        return false;
+    }
+    QByteArray data = file.readAll();
+    file.close();
+    return loadFromJson(data);
+}
 
 bool SARibbonThemePalette::loadFromJson(const QByteArray& json)
 {
