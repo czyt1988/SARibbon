@@ -1,0 +1,49 @@
+{
+  "name": "Office 2016 Dark",
+  "version": "1.0",
+  "isDark": true,
+
+  "keyColors": {
+    "accent":             "#1e1e1e",
+    "accent-hover":       "#4a4a4a",
+    "accent-pressed":     "#555555",
+    "accent-text":        "#e0e0e0",
+    "content-bg":         "#2d2d2d",
+    "content-hover-bg":   "#3a3a3a",
+    "content-pressed-bg": "#505050",
+    "text-color":         "#e0e0e0",
+    "bar-border":         "#1e1e1e",
+    "ribbon-text":        "#b2b2b2",
+    "separator":          "#5a5a5a",
+    "subtitle":           "#999999",
+    "panel-border":       "#3a3a3a",
+    "input-border":       "#3a3a3a",
+    "input-focus":        "#269bf4",
+    "selection-bg":       "#264f78",
+    "menu-border":        "#3a3a3a",
+    "close-bg":           "#e81123",
+    "close-bg-pressed":   "#f1707a",
+    "sys-button-hover":   "#404040",
+    "sys-button-pressed": "#505050"
+  },
+
+  "derived": {},
+
+  "fixed": {
+    "white":         "#ffffff",
+    "black":         "#000000",
+    "input-base":    "#2d2d2d",
+    "input-text":    "#e0e0e0"
+  },
+
+  "comments": {
+    "accent":          "Ribbon bar background (darkest)",
+    "accent-hover":    "Button hover states",
+    "accent-pressed":  "Button pressed states",
+    "accent-text":     "Text on dark backgrounds",
+    "content-bg":      "Category/Panel background",
+    "content-hover-bg":"Slightly lighter for hover",
+    "content-pressed-bg":"Pressed state",
+    "text-color":      "#e0e0e0 light text on dark background"
+  }
+}

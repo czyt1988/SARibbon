@@ -1,0 +1,42 @@
+{
+  "name": "Office 2016 Green",
+  "version": "1.0",
+  "isDark": false,
+
+  "keyColors": {
+    "accent":             "#2d7d46",
+    "accent-text":        "#d2ffd8",
+    "content-bg":         "#f1f1f1",
+    "text-color":         "#333333",
+    "bar-border":         "#707070",
+    "ribbon-text":        "#b2b2b2",
+    "separator":          "#bec0c2",
+    "subtitle":           "#666666",
+    "panel-border":       "#c6c6c6",
+    "input-border":       "#c2d0df",
+    "input-focus":        "#269bf4",
+    "selection-bg":       "#9bbbf7",
+    "menu-border":        "#fcfcfc",
+    "close-bg":           "#e81123",
+    "close-bg-pressed":   "#f1707a",
+    "sys-button-hover":   "#b8b8b8",
+    "sys-button-pressed": "#cacacb"
+  },
+
+  "derived": {
+    "accent-hover":       { "fn": "lighten", "base": "accent",       "amount": 15 },
+    "accent-pressed":     { "fn": "darken",  "base": "accent",       "amount": 20 },
+    "content-hover-bg":   { "fn": "darken",  "base": "content-bg",   "amount": 17 },
+    "content-pressed-bg": { "fn": "darken",  "base": "content-bg",   "amount": 23 }
+  },
+
+  "fixed": {
+    "white":         "#ffffff",
+    "black":         "#000000",
+    "bar-border":    "#707070",
+    "ribbon-text":   "#b2b2b2",
+    "separator":     "#bec0c2",
+    "input-base":    "#ffffff",
+    "input-text":    "#000000"
+  }
+}

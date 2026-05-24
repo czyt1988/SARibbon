@@ -1,0 +1,53 @@
+{
+  "name": "Office 2016 Blue",
+  "version": "1.0",
+  "isDark": false,
+
+  "keyColors": {
+    "accent":             "#225497",
+    "accent-text":        "#d2e4ff",
+    "content-bg":         "#f1f1f1",
+    "text-color":         "#333333",
+    "bar-border":         "#707070",
+    "ribbon-text":        "#b2b2b2",
+    "separator":          "#bec0c2",
+    "subtitle":           "#666666",
+    "panel-border":       "#c6c6c6",
+    "input-border":       "#c2d0df",
+    "input-focus":        "#269bf4",
+    "selection-bg":       "#9bbbf7",
+    "menu-border":        "#fcfcfc",
+    "close-bg":           "#e81123",
+    "close-bg-pressed":   "#f1707a",
+    "sys-button-hover":   "#b8b8b8",
+    "sys-button-pressed": "#cacacb"
+  },
+
+  "derived": {
+    "accent-hover":       { "fn": "lighten", "base": "accent",       "amount": 15 },
+    "accent-pressed":     { "fn": "darken",  "base": "accent",       "amount": 20 },
+    "content-hover-bg":   { "fn": "darken",  "base": "content-bg",   "amount": 17 },
+    "content-pressed-bg": { "fn": "darken",  "base": "content-bg",   "amount": 23 }
+  },
+
+  "fixed": {
+    "white":         "#ffffff",
+    "black":         "#000000",
+    "bar-border":    "#707070",
+    "ribbon-text":   "#b2b2b2",
+    "separator":     "#bec0c2",
+    "input-base":    "#ffffff",
+    "input-text":    "#000000"
+  },
+
+  "comments": {
+    "accent":          "Ribbon bar background + application button",
+    "accent-hover":    "Application button hover, tab hover",
+    "accent-pressed":  "Tool button pressed state, button group pressed",
+    "accent-text":     "Tab unselected text, button group text",
+    "content-bg":      "Category/Panel/ToolButton/Gallery/Menu background",
+    "content-hover-bg":"Hover state for buttons, scroll buttons, menu items",
+    "content-pressed-bg":"Pressed state for tool buttons",
+    "text-color":      "#333333 primary text (tool buttons, menus, gallery)"
+  }
+}
