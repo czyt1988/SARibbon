@@ -9,6 +9,7 @@
 #include <QHash>
 #include <QWindowStateChangeEvent>
 #include <QScreen>
+#include <QTimer>
 
 #include "SARibbonSystemButtonBar.h"
 #include "SARibbonWidget.h"
@@ -210,7 +211,14 @@ SARibbonMainWindow::SARibbonMainWindow(QWidget* parent, SARibbonMainWindowStyles
             d->installFrameless(this);
         }
         setRibbonBar(createRibbonBar());
-        setRibbonTheme(ribbonTheme());
+        QTimer::singleShot(0, this, [this]() {
+            SA_D(d);
+            if (SA::isOperatingSystemInDarkMode()
+                && d->mCurrentRibbonTheme == SARibbonTheme::RibbonThemeOffice2021Blue) {
+                d->mCurrentRibbonTheme = SARibbonTheme::RibbonThemeDark;
+            }
+            setRibbonTheme(ribbonTheme());
+        });
         setContentsMargins(2, 0, 2, 0);
         if (d->isUseNativeFrame()) {
             // 在ribbon模式下使用本地边框，将隐藏icon，同时默认设置为紧凑模式
