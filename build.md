@@ -1,170 +1,169 @@
-# 构建指引
+# SARibbon 构建指南
 
-## 构建环境
+## 前置依赖
 
-### Windows
+| 依赖 | 最低版本 | 说明 |
+|------|---------|------|
+| CMake | 3.15+ | 项目使用 CMake 构建系统（脚本自动检测 VS 内嵌或独立安装） |
+| C++14/C++17 编译器 | - | MSVC 2019+ / GCC 9+；Qt6 或启用 frameless 时强制 C++17 |
+| Qt | 5.12+ | 需要 Core、Gui、Widgets、Svg 模块；Qt6 额外需要 Core5Compat（可选） |
 
-- CMake 3.15+
-- Visual Studio 2019（MSVC 14.29+）或 Visual Studio 2022（MSVC 14.34+）
-- Qt 6.7+ (msvc2019\_64 / msvc2022\_64) 或 Qt 5.12+
+> **注意**：`SARIBBON_USE_FRAMELESS_LIB` 对 Qt 版本有要求：Qt 5.14+、Qt 6.2+，低版本会自动禁用。
 
-### Linux / WSL
+## 一键构建（推荐）
 
-- CMake 3.15+
-- GCC 9+（推荐 GCC 13+）
-- Qt 6.x（通过 apt 安装 `qt6-base-dev` 等）或 Qt 5.12+（手动安装）
-
-#### Ubuntu 24.04 (WSL) apt 依赖安装
-
-```bash
-# Qt6 核心开发包（必需）
-sudo apt install qt6-base-dev qt6-base-dev-tools qt6-svg-dev
-
-# Qt6 扩展模块（翻译工具 LinguistTools 需要）
-sudo apt install qt6-tools-dev
-
-# Ninja（推荐，编译更快）
-sudo apt install ninja-build
-```
-
-> **注意**：SARibbon 不依赖 Qt private headers，因此 `qt6-base-private-dev` 不是必需的。如使用 `SARIBBON_USE_FRAMELESS_LIB=ON` 启用 QWindowKit 无边框方案，则可能需要 Qt private headers，请参考 QWindowKit 的构建要求。
-
-## 构建步骤
-
-### 第一步：获取源码
-
-```bash
-git clone https://github.com/czyt1988/SARibbon.git
-cd SARibbon
-
-# 如果未使用 --recursive 参数克隆，需拉取子模块（QWindowKit 等）
-git submodule update --init --recursive
-```
-
-### 第二步：构建 SARibbon
-
-#### Windows (推荐：使用 build.ps1 脚本)
-
-`scripts/build.ps1` 自动完成所有环境设置（检测 Qt 路径、自动匹配 VS 版本、清理构建、配置和编译），无需手动指定任何路径：
+`scripts/build.ps1` 脚本自动探测 Qt 安装路径、VS 版本、CMake 位置，无需手动指定任何路径：
 
 ```powershell
-# 标准构建（Release，自动检测 Qt 和 MSVC）
+# 一键构建（默认 Release + Examples ON）
 .\scripts\build.ps1
 
-# Debug 构建
-.\scripts\build.ps1 -Config Debug
-
-# 清理并重建
-.\scripts\build.ps1 -Clean
-
-# 指定 Qt 路径（如果不从 C:\Qt 自动检测）
-.\scripts\build.ps1 -QtPath "D:/Qt/6.7.3/msvc2019_64"
-
-# 指定 MSVC 版本（2019 或 2022，默认从 Qt 路径自动推断）
-.\scripts\build.ps1 -MsvcVersion 2022
+# 常用操作
+.\scripts\build.ps1 build            # 增量编译
+.\scripts\build.ps1 rebuild          # 清除 + 重配 + 编译
+.\scripts\build.ps1 configure -Examples OFF  # 仅库（不编示例）
+.\scripts\build.ps1 help             # 查看所有选项
 ```
 
-> 首次使用可能需要 `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned` 以允许执行 PowerShell 脚本。
+脚本功能：
+- **Qt 自动检测**：搜索 `D:\Qt`、`C:\Qt`、`~\Qt`、`Program Files\Qt` 等常见目录，查找 msvc*_64 安装
+- **VS 自动检测**：通过 vswhere.exe 自动确定 Visual Studio 版本（2019/2022）
+- **CMake 自动检测**：先查 PATH，再查 VS 内嵌路径，最后查独立安装
+- **锁定文件保护**：清除构建目录前检测运行中的 exe，提示用户先关闭
 
-#### Windows (手动构建 — Visual Studio 生成器)
-
-如果不使用脚本，需手动完成以下步骤：
+也可手动指定路径（覆盖自动检测）：
 
 ```powershell
-# 1. CMake 配置
-cmake -S . -B build -G "Visual Studio 16 2019" -A x64 -DCMAKE_PREFIX_PATH="C:/Qt/6.7.3/msvc2019_64"
-
-# 2. 构建
-cmake --build build --config Release --parallel
+.\scripts\build.ps1 full -QtPath "D:\Qt\Qt5.15.16\5.15.16\msvc2019_64" -VSVersion 2019
 ```
 
-#### Windows (手动构建 — Ninja 生成器，需初始化 MSVC 环境)
+## 手动构建
+
+如果不使用脚本，需手动指定所有参数。**关键注意事项**：
+
+1. **必须使用 Visual Studio 生成器**，不要用 Ninja — PowerShell 中 `vcvars64.bat` 无法注入 MSVC 环境
+2. **Qt 版本必须与 VS 编译器匹配**：Qt msvc2019 对应 VS2019，Qt msvc2022 对应 VS2022
+3. **CMake 可能不在 PATH 中**：VS2019 内嵌的 CMake 在 `C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin\cmake.exe`
 
 ```powershell
-# 初始化 MSVC 环境（vcvarsall.bat 会设置 INCLUDE、LIB、PATH 等关键变量）
-cmd /c '"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat" x64 & set' | ForEach-Object {
-    if ($_ -match '^([^=]+)=(.*)$') {
-        [Environment]::SetEnvironmentVariable($matches[1], $matches[2], 'Process')
-    }
-}
-
-# 然后使用 Ninja 构建
-cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH="C:/Qt/6.7.3/msvc2019_64"
-cmake --build build
+# 配置（首次）
+cmake -S . -B build -G "Visual Studio 16 2019" -A x64 -DCMAKE_PREFIX_PATH="<Qt安装路径>"
+# 编译
+cmake --build build --config Release
+# 安装（可选）
+cmake --install build --config Release
 ```
 
-> **注意**：Ninja 生成器是单配置生成器，`CMAKE_BUILD_TYPE` 在配置时指定，构建时无需再传 `--config`。
-
-#### Linux / WSL
-
-```bash
-# 使用 Ninja 构建（推荐）
-cmake -S . -B build-linux -G Ninja -DCMAKE_BUILD_TYPE=Release
-cmake --build build-linux --parallel
-
-# 或使用 Unix Makefiles
-cmake -S . -B build-linux -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release
-cmake --build build-linux --parallel
+常见 Qt 安装路径示例（仅作参考，实际路径取决于安装位置）：
+```powershell
+# Qt 5.15.x
+-DCMAKE_PREFIX_PATH="D:/Qt/Qt5.15.16/5.15.16/msvc2019_64"
+# Qt 6.x.x
+-DCMAKE_PREFIX_PATH="C:/Qt/6.7.3/msvc2019_64"
 ```
 
-> **注意**：Linux 上系统 Qt6 通过 apt 安装后无需指定 `CMAKE_PREFIX_PATH`，cmake 会自动找到。如使用自定义 Qt 安装路径，需添加 `-DCMAKE_PREFIX_PATH=<Qt路径>`。
+## 常见构建问题
 
-### 第三步：运行测试（可选）
+### 1. CMake 找不到 / 不在 PATH
 
-使用脚本一键构建并运行测试：
+**原因**：VS2019 内嵌的 CMake 不在系统 PATH 中。
+
+**解决方案**：使用 `scripts/build.ps1`（自动检测），或将 CMake 加入 PATH：
+```powershell
+# VS2019 内嵌 CMake 路径（视 VS 安装版本而定）
+$env:PATH += ";C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\IDE\CommonExtensions\Microsoft\CMake\CMake\bin"
+```
+
+### 2. Qt 路径找不到
+
+**原因**：`CMAKE_PREFIX_PATH` 指向了不存在的 Qt 目录。
+
+**解决方案**：
+- **推荐**：使用 `scripts/build.ps1`（自动探测 Qt）
+- 手动确认 Qt 安装路径是否存在，常见位置：`D:\Qt\Qt5.x.x\5.x.x\msvc2019_64`、`C:\Qt\6.x.x\msvc2019_64`
+- Qt 目录下应有 `lib/cmake/Qt5/Qt5Config.cmake` 或 `lib/cmake/Qt6/Qt6Config.cmake`
+
+### 3. `fatal error C1083: 无法打开包括文件: "memory"/"type_traits"`
+
+**原因**：使用 Ninja 生成器但 MSVC 环境未注入。
+
+**解决方案**：**不要用 Ninja**。使用 VS 生成器或 `scripts/build.ps1`。
+
+### 4. Qt 版本与 VS 编译器不匹配
+
+**原因**：Qt msvc2019 安装配合 VS2022 编译器，或反之。
+
+**解决方案**：确保 Qt 编译器版本与 VS 版本一致。使用 `scripts/build.ps1` 会自动匹配。
+
+### 5. 构建目录损坏需要重新配置
 
 ```powershell
-# 方式一：通过 build.ps1（自动检测 CTest）
-.\scripts\build.ps1 -EnableTests
+# 使用脚本
+.\scripts\build.ps1 rebuild
 
-# 方式二：手动运行
-cmake --build build --config Release --target SARibbonThemePaletteTest
-cd build && ctest --output-on-failure -C Release
+# 手动
+Remove-Item -Recurse -Force build
+cmake -S . -B build -G "Visual Studio 16 2019" -A x64 -DCMAKE_PREFIX_PATH="<Qt安装路径>"
+cmake --build build --config Release
 ```
 
-```bash
-# Linux / WSL
-cmake -S . -B build-linux -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTS=ON
-cmake --build build-linux --parallel
-cd build-linux && ctest --output-on-failure
-```
+> **注意**：如果 `build/bin` 下有正在运行的程序占用文件，需要先关闭该程序再删除。`scripts/build.ps1 rebuild` 会检测并提示。
 
-## CMake 选项
+### 6. vcvars64.bat 在 PowerShell 中不生效
+
+**原因**：PowerShell 与 bat 脚本交互的已知限制 — 环境变量不会传递给后续命令。
+
+**解决方案**：**不要依赖 vcvars64.bat**。使用 VS 生成器（自动处理 MSVC 环境）或 `scripts/build.ps1`。
+
+## CMake 构建选项
 
 | 选项 | 默认值 | 说明 |
 |------|--------|------|
 | `SARIBBON_BUILD_STATIC_LIBS` | OFF | 静态库，ON 时自动定义 `SA_RIBBON_BAR_NO_EXPORT` |
-| `SARIBBON_USE_FRAMELESS_LIB` | OFF | 使用 QWindowKit 无边框方案，需 C++17 和 QWindowKit 库；OFF 时由 CMakeLists 根据 Qt 版本自动选择 C++ 标准 |
-| `SARIBBON_BUILD_EXAMPLES` | ON | 控制是否编译示例程序（如 MainWindowExample 等） |
-| `SARIBBON_ENABLE_SNAPLAYOUT` | OFF | 启用 Windows 11 Snap Layout（仅 `SARIBBON_USE_FRAMELESS_LIB=ON` 时有效） |
+| `SARIBBON_BUILD_EXAMPLES` | ON | 构建示例程序 |
+| `SARIBBON_USE_FRAMELESS_LIB` | OFF | 使用 QWindowKit 无边框方案，需 C++17 和 QWindowKit 库 |
+| `SARIBBON_ENABLE_SNAPLAYOUT` | OFF | 启用 Windows 11 Snap Layout（仅 frameless 模式有效） |
 | `SARIBBON_INSTALL_IN_CURRENT_DIR` | ON (Windows) | 安装到 `bin_qt{版本}_{编译器}_x{架构}/` |
 | `BUILD_TESTS` | OFF | 启用单元测试（Qt Test 框架） |
 
-## 注意事项
+脚本对应参数：`-Examples <ON|OFF>`、`-Tests <ON|OFF>`、`-StaticLibs <ON|OFF>`、`-Frameless <ON|OFF>`、`-SnapLayout <ON|OFF>`。
 
-1. **生成器选择**：Windows 推荐使用 Visual Studio 生成器（自动处理 MSVC 环境）；如使用 Ninja 需先初始化 MSVC 环境变量；Linux/WSL 推荐 Ninja（编译更快）
-2. **Qt 路径**：Windows 需指定 `CMAKE_PREFIX_PATH`；Linux apt 安装的 Qt6 无需指定
-3. **清理构建**：如需重新配置，删除 `build` 目录重新 cmake 即可。需先关掉 `build/bin` 下占用的程序
-4. **安装目录命名**：自动生成的安装目录名为 `bin_qt{版本}_{编译器}_x{架构}`，例如 Windows 下为 `bin_qt6.7.3_msvc2019_x64`
-5. **C++ 标准**：Qt6 构建始终使用 C++17；启用 `SARIBBON_USE_FRAMELESS_LIB` 时强制 C++17；其余情况使用 C++14
-6. **安装命令**：构建完成后可执行 `cmake --install build --config Release` 将库安装到本地目录，便于其他项目通过 `find_package` 引用
+手动示例：
+```powershell
+cmake -S . -B build -G "Visual Studio 16 2019" -A x64 `
+    -DCMAKE_PREFIX_PATH="<Qt安装路径>" `
+    -DSARIBBON_BUILD_EXAMPLES=OFF `
+    -DSARIBBON_BUILD_STATIC_LIBS=OFF
+```
 
-## 常见问题
+## 构建产物
 
-### Linux 构建常见问题
+构建完成后，运行 install 步骤将产物安装到 `bin_qt{版本}_{编译器}_x{架构}/` 目录：
 
-| 问题 | 原因 | 解决方案 |
-|------|------|---------|
-| `Could NOT find Qt6LinguistTools` | 缺少 Qt6 Tools 开发包 | `sudo apt install qt6-tools-dev` |
-| `QIODevice` incomplete type | 缺少 `#include <QIODevice>` | Qt6 不再通过 `QDataStream` 隐式包含，需手动添加 |
-| `uint64_t` ambiguous overload | Linux 上 `uint64_t` = `unsigned long` ≠ `unsigned long long` | 使用 `qulonglong` 或 `static_cast<qulonglong>()` |
-| moc 异常退出 / 不完整类型 | Qt 信号槽传递自定义类型指针时只有前向声明 | 在 .cpp 文件中 `#include` 完整头文件而非仅前向声明 |
-| SARibbonAlignment 枚举编译错误 | 文件换行为 LF 而非 CRLF | SARibbonGlobal.h 要求 CRLF 换行，用 `git config core.autocrlf true` 或手动转换 |
+```
+bin_qt6.7.3_MSVC_x64/
+├── bin/                  # 可执行文件和 DLL
+│   ├── SARibbon.dll
+│   └── *.exe             # 示例程序
+├── lib/                  # 导入库（.lib）
+├── include/              # 头文件
+└── share/                # CMake config 文件
+```
 
-### Windows 构建常见问题
+## 快速参考（Agent 专用）
 
-| 问题 | 原因 | 解决方案 |
-|------|------|---------|
-| Ninja 生成器找不到标准库头文件 | 未初始化 MSVC 环境变量 | 先运行 `vcvarsall.bat x64` 或使用 VS 生成器 |
-| moc 异常退出 | Qt moc 大量项目时的已知 bug | 重新构建即可 |
-| 构建损坏 / 无法重配 | `build/bin` 下程序占用了文件 | 先关掉占用程序，再 `Remove-Item -Recurse -Force build` 重配 |
+```powershell
+# 一键构建（推荐）
+.\scripts\build.ps1                          # 全量构建
+.\scripts\build.ps1 build                    # 增量编译
+.\scripts\build.ps1 rebuild                  # 清除重配重编
+.\scripts\build.ps1 configure -Examples OFF  # 仅库
+.\scripts\build.ps1 configure -StaticLibs ON # 静态库
+
+# 手动构建（不推荐，需自行确定路径）
+cmake -S . -B build -G "Visual Studio 16 2019" -A x64 -DCMAKE_PREFIX_PATH="<Qt路径>"
+cmake --build build --config Release
+cmake --install build --config Release
+```
+
+> **务必使用 Visual Studio 生成器**，不要用 Ninja，因为在 PowerShell 中 MSVC 编译器环境无法通过 `vcvars64.bat` 正确注入。`scripts/build.ps1` 自动处理此问题。

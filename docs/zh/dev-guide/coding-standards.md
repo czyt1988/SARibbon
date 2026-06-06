@@ -45,7 +45,7 @@
 QString categoryName() const;
 
 // 正确：头文件 public 函数仅用单行英文注释
-/// Get the category name
+// Get the category name
 QString categoryName() const;
 ```
 
@@ -122,7 +122,7 @@ Q_PROPERTY(bool minimumModeButton READ haveShowMinimumModeButton WRITE showMinim
 ```
 
 !!! danger "强制规则"
-    - 头文件 public 函数：禁止双语 Doxygen，只能用单行英文 `///`
+    - 头文件 public 函数：禁止双语 Doxygen，只能用单行英文 `//`
     - Q_PROPERTY：禁止加任何注释（包括 Doxygen 块）
     - 类注释：禁止 `@param`、`@class`、`@ingroup`，仅允许 `@brief`/`@details`/`@note`/`see`
 
@@ -155,7 +155,7 @@ Q_PROPERTY(bool minimumModeButton READ haveShowMinimumModeButton WRITE showMinim
 
 头文件中的注释遵循以下规则：
 
-1. **`public` 函数声明**：仅添加**单行英文简要注释**（使用 `///`）
+1. **`public` 函数声明**：仅添加**单行英文简要注释**（使用 `//`）
 2. **禁止**在头文件的类成员函数中写入双语 Doxygen 块
 3. **特例**：Qt 信号（`Q_SIGNALS` 区域下的函数）和类的注释需在头文件中使用双语 Doxygen
 
@@ -274,10 +274,10 @@ class SA_RIBBON_EXPORT SARibbonBar : public QMenuBar
     Q_PROPERTY(bool minimumMode READ isMinimumMode WRITE setMinimumMode)
 
 public:
-    /// Check if the ribbon style is two-row mode
+    // Check if the ribbon style is two-row mode
     static bool isTwoRowStyle(RibbonStyles s);
 
-    /// Add a category page
+    // Add a category page
     SARibbonCategory* addCategoryPage(const QString& title);
 };
 ```
@@ -336,7 +336,7 @@ Q_SIGNALS:
 | 注释类型 | 位置 | 格式 |
 |----------|------|------|
 | 函数详细注释 | `.cpp` | 双语 Doxygen 块 |
-| public 函数简要注释 | `.h` | 单行英文 `///` |
+| public 函数简要注释 | `.h` | 单行英文 `//` |
 | 类注释 | `.h` | 双语 Doxygen 块（仅 @brief/@details/@note/@see） |
 | 信号注释 | `.h` | 双语 Doxygen 块 |
 | **Q_PROPERTY 注释** | **禁止** | **不加任何注释** |
