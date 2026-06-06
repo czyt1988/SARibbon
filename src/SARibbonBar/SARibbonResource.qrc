@@ -27,10 +27,12 @@
         <file>resource/templates/office2016.qss</file>
         <file>resource/templates/office2021.qss</file>
         <file>resource/templates/dark.qss</file>
+        <file>resource/templates/dark2.qss</file>
         <file>resource/palettes/office2016-blue.json</file>
         <file>resource/palettes/office2016-green.json</file>
         <file>resource/palettes/office2016-dark.json</file>
         <file>resource/palettes/office2021-blue.json</file>
         <file>resource/palettes/dark-default.json</file>
+        <file>resource/palettes/dark2-default.json</file>
     </qresource>
 </RCC>

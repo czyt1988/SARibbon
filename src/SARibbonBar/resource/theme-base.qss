@@ -61,7 +61,7 @@ SARibbonGalleryGroup {
 }
 
 SARibbonGalleryGroup::item:selected {
-    color: black;
+    /* color: theme-specific; override in theme QSS */
 }
 
 /* == Application Button Common == */

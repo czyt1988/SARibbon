@@ -1,0 +1,36 @@
+{
+  "name": "Dark2 Default",
+  "isDark": true,
+
+  "keyColors": {
+    "accent":             "#192430",
+    "accent-hover":       "#435c76",
+    "accent-pressed":     "#435c76",
+    "accent-text":        "#afafa6",
+    "content-bg":         "#344253",
+    "content-hover-bg":   "#4d5973",
+    "content-pressed-bg": "#435c76",
+    "text-color":         "#dadada",
+    "text-disabled":      "#5d636a",
+    "bar-border":         "#192430",
+    "ribbon-text":        "#dadada",
+    "separator":          "#5d636a",
+    "subtitle":           "#dadada",
+    "panel-border":       "#2a8db5",
+    "border-color":       "#2a8db5",
+    "input-border":       "#192430",
+    "input-focus":        "#2a8db5",
+    "selection-bg":       "#2a8db5",
+    "menu-border":        "#888888",
+    "close-bg":           "#e81123",
+    "close-bg-pressed":   "#f1707a",
+    "sys-button-hover":   "#375d77",
+    "sys-button-pressed": "#cacacb"
+  },
+
+  "derived": {},
+  "fixed": {
+    "white": "#ffffff",
+    "black": "#000000"
+  }
+}

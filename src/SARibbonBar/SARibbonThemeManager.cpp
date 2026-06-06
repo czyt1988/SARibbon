@@ -119,24 +119,53 @@ static QString themeToTemplatePath(SARibbonTheme theme)
         return ":/SARibbonTheme/resource/templates/office2021.qss";
     case SARibbonTheme::RibbonThemeDark:
         return ":/SARibbonTheme/resource/templates/dark.qss";
+    case SARibbonTheme::RibbonThemeDark2:
+        return ":/SARibbonTheme/resource/templates/dark2.qss";
     default:
-        // Themes without templates (win7, office2013, dark2) fall back to fixed QSS
+        // Themes without templates (win7, office2013) fall back to fixed QSS
         return QString();
     }
 }
 
-/// Apply a ribbon theme with custom color palette.
-/// If the palette is empty or no template exists, falls back to default behavior.
+/**
+ * \if ENGLISH
+ * @brief Apply a ribbon theme with custom color palette
+ *
+ * This overload loads the QSS template for the specified theme and replaces color tokens
+ * using the provided palette. If the palette is empty or no template is found for the theme,
+ * it falls back to the default fixed-QSS behavior (equivalent to the 3-arg overload).
+ *
+ * After applying the stylesheet, the function also configures theme-dependent ribbon bar
+ * properties: tab bar margins, context category colors, context category highlight function,
+ * and tab bar baseline color.
+ *
+ * @param w The widget that receives the QSS stylesheet
+ * @param bar The SARibbonBar whose theme-dependent properties are configured (may be null)
+ * @param theme The built-in ribbon theme to apply
+ * @param palette The color palette for token replacement in the QSS template
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 使用自定义调色板应用ribbon主题
+ *
+ * 此重载加载指定主题的QSS模板，并使用提供的调色板替换颜色标记。
+ * 如果调色板为空或主题没有对应的模板，则回退到默认的固定QSS行为（等同于3参数重载）。
+ *
+ * 应用样式表后，此函数还会配置主题依赖的ribbon栏属性：标签栏边距、上下文标签颜色、
+ * 上下文标签高亮函数以及标签栏基线颜色。
+ *
+ * @param w 接收QSS样式表的窗口部件
+ * @param bar 需要配置主题依赖属性的SARibbonBar（可为null）
+ * @param theme 要应用的内置ribbon主题
+ * @param palette 用于QSS模板中标记替换的调色板
+ * \endif
+ */
 void applyRibbonTheme(QWidget* w, SARibbonBar* bar, SARibbonTheme theme,
                       const SARibbonThemePalette& palette)
 {
     // If palette is provided and a template exists, use template-based approach
     QString templatePath = themeToTemplatePath(theme);
     if (palette.variables().size() > 0 && !templatePath.isEmpty() && w) {
-        // Load base QSS (common structural styles)
-        QString qss = SA::getBuiltInRibbonThemeQss(SARibbonTheme::RibbonThemeOffice2013);
-        // Extract only the base portion (getBuiltInRibbonThemeQss concatenates base + theme)
-        // We need to load base separately, then the template separately
         QFile baseFile(":/SARibbonTheme/resource/theme-base.qss");
         QString baseQss;
         if (baseFile.open(QIODevice::ReadOnly | QIODevice::Text)) {

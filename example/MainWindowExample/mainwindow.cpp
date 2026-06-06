@@ -23,6 +23,8 @@
 #include "colorWidgets/SAColorPaletteGridWidget.h"
 #include "SARibbonSystemButtonBar.h"
 #include "SARibbonApplicationWidget.h"
+#include "SARibbonThemePalette.h"
+#include "SARibbonThemeManager.h"
 #include "ApplicationWidget.h"
 #include <QAbstractButton>
 #include <QAction>
@@ -943,7 +945,13 @@ void MainWindow::onColorButtonColorClicked(const QColor& selectedColor, bool cli
 void MainWindow::onRibbonThemeComboBoxCurrentIndexChanged(int themeIndex)
 {
     SARibbonTheme selectedTheme = static_cast< SARibbonTheme >(mComboboxRibbonTheme->itemData(themeIndex).toInt());
-    setRibbonTheme(selectedTheme);
+    if (selectedTheme == SARibbonTheme::RibbonThemeDark2) {
+        SA::SARibbonThemePalette palette;
+        palette.loadFromFile(":/SARibbonTheme/resource/palettes/dark2-default.json");
+        SA::applyRibbonTheme(this, ribbonBar(), selectedTheme, palette);
+    } else {
+        setRibbonTheme(selectedTheme);
+    }
 }
 
 /**

@@ -4,14 +4,14 @@
 
 /*SARibbonApplicationWidget*/
 SARibbonApplicationWidget{
-    background-color: #e5e3e5;/* {Ribbon.BKColor} */
+    background-color: #e5e3e5;
     border: solid #e5e3e5;
     color:#242424;
 }
 
 /*SARibbonBar*/
 SARibbonBar {
-  background-color: #e5e3e5;/* {Ribbon.BKColor} */
+  background-color: #e5e3e5;
   border: solid #e5e3e5;
   color:#242424;
 }

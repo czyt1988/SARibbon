@@ -5,14 +5,14 @@ office 2016 style theme
 
 /*SARibbonApplicationWidget*/
 SARibbonApplicationWidget{
-    background-color: #225497;/* {Ribbon.BKColor} */
+    background-color: #225497;
     border: solid #225497;
     color:#b2b2b2;
 }
 
 /*SARibbonBar*/
 SARibbonBar {
-  background-color: #225497;/* {Ribbon.BKColor} */
+  background-color: #225497;
   border: solid #707070;
   color:#b2b2b2;
 }
