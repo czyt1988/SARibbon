@@ -113,6 +113,7 @@ bool SARibbonThemePalette::loadFromJson(const QByteArray& json)
         QString baseName = rule.value("base").toString();
         int amount = rule.value("amount").toInt(10);
 
+        m_deriveRules.insert(it.key(), { fn, baseName, amount });
         if (m_keyColors.contains(baseName)) {
             QColor base = m_keyColors.value(baseName);
             QColor derivedC = ::deriveColor(base, fn, amount, m_isDark);
@@ -165,26 +166,29 @@ QColor SARibbonThemePalette::color(const QString& tokenName) const
  * @brief Get all color variables as name-to-hex-string pairs
  * @return A hash mapping token names to their hex color strings (e.g. "#ff0000")
  * @details Merges all three layers (key, derived, fixed) into a single hash.
- * If the same name exists in multiple layers, the last written layer wins.
+ * Insertion order ensures derived colors take priority over key colors, and
+ * key colors over fixed colors, matching the color() lookup order.
  * \endif
  *
  * \if CHINESE
  * @brief 获取所有颜色变量（名称到十六进制字符串的映射）
  * @return 将标记名映射到其十六进制颜色字符串（例如"#ff0000"）的哈希表
  * @details 将三个层（键色、派生色、固定色）合并到单个哈希表中。
- * 如果多个层中存在相同的名称，最后写入的层优先。
+ * 插入顺序确保派生色优先于键色，键色优先于固定色，与color()查找顺序一致。
  * \endif
  */
 QHash<QString, QString> SARibbonThemePalette::variables() const
 {
     QHash<QString, QString> vars;
+    // Insert order matters for conflicts: last writer wins
+    // Priority: derived > key > fixed (matches color() lookup order)
+    for (auto it = m_fixedColors.cbegin(); it != m_fixedColors.cend(); ++it) {
+        vars.insert(it.key(), it.value().name());
+    }
     for (auto it = m_keyColors.cbegin(); it != m_keyColors.cend(); ++it) {
         vars.insert(it.key(), it.value().name());
     }
     for (auto it = m_derivedColors.cbegin(); it != m_derivedColors.cend(); ++it) {
-        vars.insert(it.key(), it.value().name());
-    }
-    for (auto it = m_fixedColors.cbegin(); it != m_fixedColors.cend(); ++it) {
         vars.insert(it.key(), it.value().name());
     }
     return vars;
@@ -206,6 +210,20 @@ bool SARibbonThemePalette::isDark() const
     return m_isDark;
 }
 
+/// Recalculate all derived colors from stored rules and current key colors
+void SARibbonThemePalette::recalculateDerived()
+{
+    m_derivedColors.clear();
+    for (auto it = m_deriveRules.cbegin(); it != m_deriveRules.cend(); ++it) {
+        const DeriveRule& rule = it.value();
+        if (m_keyColors.contains(rule.base)) {
+            QColor base = m_keyColors.value(rule.base);
+            QColor derivedC = ::deriveColor(base, rule.fn, rule.amount, m_isDark);
+            m_derivedColors.insert(it.key(), derivedC);
+        }
+    }
+}
+
 /**
  * \if ENGLISH
  * @brief Set the accent key color
@@ -222,6 +240,7 @@ bool SARibbonThemePalette::isDark() const
 void SARibbonThemePalette::setAccentColor(const QColor& color)
 {
     m_keyColors.insert("accent", color);
+    recalculateDerived();
 }
 
 /**
@@ -240,6 +259,7 @@ void SARibbonThemePalette::setAccentColor(const QColor& color)
 void SARibbonThemePalette::setContentBgColor(const QColor& color)
 {
     m_keyColors.insert("content-bg", color);
+    recalculateDerived();
 }
 
 /**
@@ -258,6 +278,7 @@ void SARibbonThemePalette::setContentBgColor(const QColor& color)
 void SARibbonThemePalette::setTextColor(const QColor& color)
 {
     m_keyColors.insert("text-color", color);
+    recalculateDerived();
 }
 
 } // namespace SA

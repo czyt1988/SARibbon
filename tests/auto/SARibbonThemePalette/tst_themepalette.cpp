@@ -21,6 +21,9 @@ private Q_SLOTS:
     void testPaletteAutoLoadingWin7();
     void testAllPalettesLoad();
     void testNewPalettesContainAllTokens();
+    void testSetterRecalculateDerived();
+    void testDarkSetterRecalculate();
+    void testVariablesPriority();
 };
 
 void TestThemePalette::testLoadFromJson()
@@ -260,6 +263,120 @@ void TestThemePalette::testNewPalettesContainAllTokens()
                          .constData());
         }
     }
+}
+
+void TestThemePalette::testSetterRecalculateDerived()
+{
+    SA::SARibbonThemePalette palette;
+    QByteArray json = R"({
+        "name": "test-recalc",
+        "isDark": false,
+        "keyColors": {
+            "accent": "#225497"
+        },
+        "derived": {
+            "accent-hover": {"fn": "lighten", "base": "accent", "amount": 15},
+            "accent-pressed": {"fn": "darken", "base": "accent", "amount": 10}
+        }
+    })";
+
+    palette.loadFromJson(json);
+    QString originalHover = palette.color("accent-hover").name();
+    QString originalPressed = palette.color("accent-pressed").name();
+
+    // Change accent color
+    palette.setAccentColor(QColor("#ff0000"));
+
+    // Derived colors should be recalculated
+    QString newHover = palette.color("accent-hover").name();
+    QString newPressed = palette.color("accent-pressed").name();
+
+    QVERIFY2(newHover != originalHover,
+             "accent-hover should change after setAccentColor");
+    QVERIFY2(newPressed != originalPressed,
+             "accent-pressed should change after setAccentColor");
+
+    // Verify derived colors are based on new accent
+    QColor newAccent("#ff0000");
+    QColor expectedHover = newAccent.lighter(115);  // lighten 15%
+    QCOMPARE(palette.color("accent-hover").name(), expectedHover.name());
+
+    QColor expectedPressed = newAccent.darker(110);  // darken 10%
+    QCOMPARE(palette.color("accent-pressed").name(), expectedPressed.name());
+}
+
+void TestThemePalette::testDarkSetterRecalculate()
+{
+    SA::SARibbonThemePalette palette;
+    QByteArray json = R"({
+        "name": "test-dark-recalc",
+        "isDark": true,
+        "keyColors": {
+            "accent": "#225497"
+        },
+        "derived": {
+            "accent-hover": {"fn": "lighten", "base": "accent", "amount": 15}
+        }
+    })";
+
+    palette.loadFromJson(json);
+
+    // In dark mode, lighten becomes darken
+    QColor originalHover = palette.color("accent-hover");
+    QVERIFY2(originalHover.lightness() < QColor("#225497").lightness(),
+             "Dark mode: lighten should actually darken");
+
+    palette.setAccentColor(QColor("#ff0000"));
+
+    QColor newHover = palette.color("accent-hover");
+    // Dark mode reversal: lighten -> darker
+    QVERIFY2(newHover.lightness() < QColor("#ff0000").lightness(),
+             "Dark mode: after setter, lighten should still darken");
+    QVERIFY2(newHover != originalHover,
+             "Derived color should change after setter");
+}
+
+void TestThemePalette::testVariablesPriority()
+{
+    // Test that variables() priority matches color() lookup order:
+    // derived > key > fixed
+    SA::SARibbonThemePalette palette;
+    QByteArray json = R"({
+        "name": "priority-test",
+        "isDark": false,
+        "keyColors": {
+            "dupe-token": "#ff0000",
+            "key-only": "#00ff00"
+        },
+        "derived": {
+            "dupe-token": {"fn": "lighten", "base": "key-only", "amount": 10}
+        },
+        "fixed": {
+            "dupe-token": "#0000ff",
+            "fixed-only": "#808080"
+        }
+    })";
+
+    palette.loadFromJson(json);
+
+    // "dupe-token" exists in all three layers
+    // color() should return derived value (lighten of key-only)
+    QColor colorResult = palette.color("dupe-token");
+    QString varResult   = palette.variables().value("dupe-token");
+
+    // Both should agree
+    QCOMPARE(varResult, colorResult.name());
+
+    // Verify derived wins: dupe-token should be lighten(#00ff00, 10), NOT #ff0000 or #0000ff
+    QVERIFY(colorResult.lightness() > QColor("#00ff00").lightness());
+
+    // "key-only" exists only in key layer
+    QCOMPARE(palette.color("key-only").name(), QColor("#00ff00").name());
+    QCOMPARE(palette.variables().value("key-only"), QColor("#00ff00").name());
+
+    // "fixed-only" exists only in fixed layer
+    QCOMPARE(palette.color("fixed-only").name(), QColor("#808080").name());
+    QCOMPARE(palette.variables().value("fixed-only"), QColor("#808080").name());
 }
 
 QTEST_MAIN(TestThemePalette)

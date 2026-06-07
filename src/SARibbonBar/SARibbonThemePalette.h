@@ -154,9 +154,19 @@ public:
     bool isDark() const;
 
 private:
+    struct DeriveRule
+    {
+        QString fn;
+        QString base;
+        int amount;
+    };
+
+    void recalculateDerived();
+
     QHash<QString, QColor> m_keyColors;
     QHash<QString, QColor> m_derivedColors;
     QHash<QString, QColor> m_fixedColors;
+    QHash<QString, DeriveRule> m_deriveRules;  ///< Stored derive rules for recalculation
     bool m_isDark { false };
 };
 

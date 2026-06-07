@@ -395,6 +395,16 @@ QString replaceQssTokens(const QString& templateQss, const SARibbonThemePalette&
         }
     }
 
+    // Scan for any unreplaced tokens and warn about them
+    {
+        QRegularExpression unreplacedRe("\\{\\{([^}|]+)(?:\\|opacity\\([^)]+\\))?\\}\\}");
+        QRegularExpressionMatchIterator warnIt = unreplacedRe.globalMatch(result);
+        while (warnIt.hasNext()) {
+            QRegularExpressionMatch warnMatch = warnIt.next();
+            qWarning() << "replaceQssTokens: unreplaced token:" << warnMatch.captured(1).trimmed();
+        }
+    }
+
     return result;
 }
 
