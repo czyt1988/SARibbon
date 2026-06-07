@@ -16,6 +16,7 @@ build*
 ~*.pptx
 ~*.docx
 *.drawio.bkp
+.cache
 tmp
 tmp-file
 .$*
