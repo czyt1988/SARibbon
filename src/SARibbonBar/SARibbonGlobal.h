@@ -220,6 +220,8 @@ enum class SARibbonTheme
 {
     RibbonThemeOffice2013,      ///< Office 2013 theme
     RibbonThemeOffice2016Blue,  ///< Office 2016 - Blue theme
+    RibbonThemeOffice2016Green, ///< Office 2016 - Green theme
+    RibbonThemeOffice2016Dark,  ///< Office 2016 - Dark theme
     RibbonThemeOffice2021Blue,  ///< Office 2021 - Blue theme
     RibbonThemeWindows7,        ///< Windows 7 theme
     RibbonThemeDark,            ///< Dark theme

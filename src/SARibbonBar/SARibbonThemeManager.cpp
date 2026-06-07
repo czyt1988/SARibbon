@@ -24,6 +24,8 @@ static const std::map< SARibbonTheme, QMargins > s_themeMargins = {
     { SARibbonTheme::RibbonThemeWindows7, QMargins(5, 0, 0, 0) },
     { SARibbonTheme::RibbonThemeOffice2013, QMargins(5, 0, 0, 0) },
     { SARibbonTheme::RibbonThemeOffice2016Blue, QMargins(5, 0, 0, 0) },
+    { SARibbonTheme::RibbonThemeOffice2016Green, QMargins(5, 0, 0, 0) },
+    { SARibbonTheme::RibbonThemeOffice2016Dark, QMargins(5, 0, 0, 0) },
     { SARibbonTheme::RibbonThemeDark, QMargins(5, 0, 0, 0) },
     { SARibbonTheme::RibbonThemeDark2, QMargins(5, 0, 0, 0) },
     { SARibbonTheme::RibbonThemeOffice2021Blue, QMargins(5, 0, 5, 0) },
@@ -47,6 +49,8 @@ static const std::map< SARibbonTheme, SARibbonBar::FpContextCategoryHighlight > 
     { SARibbonTheme::RibbonThemeOffice2013, s_csVibrantHighlight },
     { SARibbonTheme::RibbonThemeDark, s_csVibrantHighlight },
     { SARibbonTheme::RibbonThemeOffice2016Blue, s_csDarkerHighlight },
+    { SARibbonTheme::RibbonThemeOffice2016Green, s_csDarkerHighlight },
+    { SARibbonTheme::RibbonThemeOffice2016Dark, s_csDarkerHighlight },
     { SARibbonTheme::RibbonThemeOffice2021Blue, [](const QColor&) -> QColor { return QColor(39, 96, 167); } },
     { SARibbonTheme::RibbonThemeDark2, s_csVibrantHighlight },
     { SARibbonTheme::RibbonThemeOffice2021Green, s_csVibrantHighlight },
@@ -59,6 +63,8 @@ static const std::map< SARibbonTheme, QList< QColor > > s_themeContextColorLists
     { SARibbonTheme::RibbonThemeOffice2013, {} },
     { SARibbonTheme::RibbonThemeDark, {} },
     { SARibbonTheme::RibbonThemeOffice2016Blue, { QColor(18, 64, 120) } },
+    { SARibbonTheme::RibbonThemeOffice2016Green, { QColor(24, 96, 48) } },
+    { SARibbonTheme::RibbonThemeOffice2016Dark, { QColor(60, 60, 60) } },
     { SARibbonTheme::RibbonThemeOffice2021Blue, { QColor(209, 207, 209) } },
     { SARibbonTheme::RibbonThemeDark2, { QColor(42, 141, 181) } },
     { SARibbonTheme::RibbonThemeOffice2021Green, { QColor(180, 200, 180) } },
@@ -70,6 +76,8 @@ static const std::map< SARibbonTheme, QColor > s_themeBaselineColors = {
     { SARibbonTheme::RibbonThemeWindows7, QColor() },
     { SARibbonTheme::RibbonThemeOffice2013, QColor(186, 201, 219) },
     { SARibbonTheme::RibbonThemeOffice2016Blue, QColor() },
+    { SARibbonTheme::RibbonThemeOffice2016Green, QColor() },
+    { SARibbonTheme::RibbonThemeOffice2016Dark, QColor() },
     { SARibbonTheme::RibbonThemeOffice2021Blue, QColor() },
     { SARibbonTheme::RibbonThemeDark, QColor() },
     { SARibbonTheme::RibbonThemeDark2, QColor() },
@@ -136,6 +144,8 @@ static QString themeToTemplatePath(SARibbonTheme theme)
 {
     switch (theme) {
     case SARibbonTheme::RibbonThemeOffice2016Blue:
+    case SARibbonTheme::RibbonThemeOffice2016Green:
+    case SARibbonTheme::RibbonThemeOffice2016Dark:
         return ":/SARibbonTheme/resource/templates/office2016.qss";
     case SARibbonTheme::RibbonThemeOffice2021Blue:
     case SARibbonTheme::RibbonThemeOffice2021Green:
@@ -158,6 +168,10 @@ static QString themeToPalettePath(SARibbonTheme theme)
     switch (theme) {
     case SARibbonTheme::RibbonThemeOffice2016Blue:
         return ":/SARibbonTheme/resource/palettes/office2016-blue.json";
+    case SARibbonTheme::RibbonThemeOffice2016Green:
+        return ":/SARibbonTheme/resource/palettes/office2016-green.json";
+    case SARibbonTheme::RibbonThemeOffice2016Dark:
+        return ":/SARibbonTheme/resource/palettes/office2016-dark.json";
     case SARibbonTheme::RibbonThemeOffice2021Blue:
         return ":/SARibbonTheme/resource/palettes/office2021-blue.json";
     case SARibbonTheme::RibbonThemeOffice2021Green:
