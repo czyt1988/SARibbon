@@ -15,9 +15,6 @@
 namespace SA
 {
 
-// Internal-only function (defined in SARibbonUtil.cpp, no public header declaration)
-QString getBuiltInRibbonThemeQss(SARibbonTheme theme);
-
 // ===================================================
 // Static theme data maps
 // ===================================================
@@ -203,7 +200,7 @@ static QString themeToPalettePath(SARibbonTheme theme)
  *
  * This overload loads the QSS template for the specified theme and replaces color tokens
  * using the provided palette. If the palette is empty or no template is found for the theme,
- * it falls back to the default fixed-QSS behavior (equivalent to the 3-arg overload).
+ * it falls back to loading the base QSS only (without theme-specific colors).
  *
  * After applying the stylesheet, the function also configures theme-dependent ribbon bar
  * properties: tab bar margins, context category colors, context category highlight function,
@@ -219,7 +216,7 @@ static QString themeToPalettePath(SARibbonTheme theme)
  * @brief 使用自定义调色板应用ribbon主题
  *
  * 此重载加载指定主题的QSS模板，并使用提供的调色板替换颜色标记。
- * 如果调色板为空或主题没有对应的模板，则回退到默认的固定QSS行为（等同于3参数重载）。
+ * 如果调色板为空或主题没有对应的模板，则回退到仅加载基础QSS（不含主题特定颜色）。
  *
  * 应用样式表后，此函数还会配置主题依赖的ribbon栏属性：标签栏边距、上下文标签颜色、
  * 上下文标签高亮函数以及标签栏基线颜色。
@@ -259,19 +256,10 @@ void applyRibbonTheme(QWidget* w, SARibbonBar* bar, SARibbonTheme theme,
             }
         }
     } else if (w) {
-        // Empty palette or no template (Win7/Office2013) — load hardcoded QSS
-        QString palettePath = themeToPalettePath(theme);
-        if (palettePath.isEmpty() && !templatePath.isEmpty()) {
-            // Template theme with no palette — warning + base QSS fallback
-            qWarning() << "applyRibbonTheme: no palette for template theme"
-                       << static_cast<int>(theme) << "- using base QSS only";
-            QFile baseQss(":/SARibbonTheme/resource/theme-base.qss");
-            if (baseQss.open(QIODevice::ReadOnly | QIODevice::Text)) {
-                w->setStyleSheet(QString::fromUtf8(baseQss.readAll()));
-            }
-        } else {
-            // Win7/Office2013 — use internal hardcoded QSS (not exposed publicly)
-            w->setStyleSheet(SA::getBuiltInRibbonThemeQss(theme));
+        // Empty palette — fall back to base QSS only
+        QFile baseQss(":/SARibbonTheme/resource/theme-base.qss");
+        if (baseQss.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            w->setStyleSheet(QString::fromUtf8(baseQss.readAll()));
         }
     }
 

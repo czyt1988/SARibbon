@@ -159,7 +159,6 @@ void ThemeCoverageTest::testAllThemesLoad()
 void ThemeCoverageTest::testSelectorCoverage()
 {
     // For template-supported themes, load template QSS from filesystem and verify key selectors
-    // This replaces the old getBuiltInRibbonThemeQss approach
     QString rdir = resourceDir();
     struct ThemeTemplatePair {
         SARibbonTheme theme;

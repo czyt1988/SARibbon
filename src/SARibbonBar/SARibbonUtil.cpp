@@ -137,39 +137,102 @@ QSize scaleSizeByWidth(const QSize& originalSize, int newWidth)
 }
 
 /**
- * @brief 获取内置主题对应的qss
- * @param theme
- * @return
+ * \if ENGLISH
+ * @brief Get the complete QSS stylesheet string for a built-in ribbon theme
+ * @details Loads the base QSS, theme template, and the default palette for the given theme,
+ * then returns the fully resolved stylesheet with all {{token}} placeholders replaced.
+ * Returns an empty string if the theme has no template or palette.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取指定内置ribbon主题的完整QSS样式表字符串
+ * @details 加载基础QSS、主题模板和指定主题的默认调色板，返回所有{{token}}占位符已替换的完整样式表。
+ * 如果主题没有模板或调色板，则返回空字符串。
+ * \endif
  */
 QString getBuiltInRibbonThemeQss(SARibbonTheme theme)
 {
-    // Load base QSS (common styles without colors) first
+    // Load base QSS (common styles without colors)
     QFile baseFile(":/SARibbonTheme/resource/theme-base.qss");
     QString baseQss;
     if (baseFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
         baseQss = QString::fromUtf8(baseFile.readAll());
     }
 
-    // Then load theme-specific QSS (only Win7 and Office2013 have hardcoded QSS;
-    // all template-supported themes fall back to base QSS only)
-    QFile file;
-    switch (theme) {
-    case SARibbonTheme::RibbonThemeWindows7:
-        file.setFileName(":/SARibbonTheme/resource/theme-win7.qss");
-        break;
-    case SARibbonTheme::RibbonThemeOffice2013:
-        file.setFileName(":/SARibbonTheme/resource/theme-office2013.qss");
-        break;
-    default:
-        // All template-supported themes fall back to base QSS only
+    // Resolve template resource path for the theme
+    auto themeToTemplatePath = [](SARibbonTheme t) -> QString {
+        switch (t) {
+        case SARibbonTheme::RibbonThemeOffice2016Blue:
+        case SARibbonTheme::RibbonThemeOffice2016Green:
+        case SARibbonTheme::RibbonThemeOffice2016Dark:
+            return ":/SARibbonTheme/resource/templates/office2016.qss";
+        case SARibbonTheme::RibbonThemeOffice2021Blue:
+        case SARibbonTheme::RibbonThemeOffice2021Green:
+        case SARibbonTheme::RibbonThemeOffice2021Dark:
+            return ":/SARibbonTheme/resource/templates/office2021.qss";
+        case SARibbonTheme::RibbonThemeDark:
+            return ":/SARibbonTheme/resource/templates/dark.qss";
+        case SARibbonTheme::RibbonThemeDark2:
+            return ":/SARibbonTheme/resource/templates/dark2.qss";
+        case SARibbonTheme::RibbonThemeWindows7:
+            return ":/SARibbonTheme/resource/templates/win7.qss";
+        case SARibbonTheme::RibbonThemeOffice2013:
+            return ":/SARibbonTheme/resource/templates/office2013.qss";
+        default:
+            return QString();
+        }
+    };
+
+    // Resolve default palette resource path for the theme
+    auto themeToPalettePath = [](SARibbonTheme t) -> QString {
+        switch (t) {
+        case SARibbonTheme::RibbonThemeOffice2016Blue:
+            return ":/SARibbonTheme/resource/palettes/office2016-blue.json";
+        case SARibbonTheme::RibbonThemeOffice2016Green:
+            return ":/SARibbonTheme/resource/palettes/office2016-green.json";
+        case SARibbonTheme::RibbonThemeOffice2016Dark:
+            return ":/SARibbonTheme/resource/palettes/office2016-dark.json";
+        case SARibbonTheme::RibbonThemeOffice2021Blue:
+            return ":/SARibbonTheme/resource/palettes/office2021-blue.json";
+        case SARibbonTheme::RibbonThemeOffice2021Green:
+            return ":/SARibbonTheme/resource/palettes/office2021-green.json";
+        case SARibbonTheme::RibbonThemeOffice2021Dark:
+            return ":/SARibbonTheme/resource/palettes/office2021-dark.json";
+        case SARibbonTheme::RibbonThemeDark:
+            return ":/SARibbonTheme/resource/palettes/dark-default.json";
+        case SARibbonTheme::RibbonThemeDark2:
+            return ":/SARibbonTheme/resource/palettes/dark2-default.json";
+        case SARibbonTheme::RibbonThemeWindows7:
+            return ":/SARibbonTheme/resource/palettes/win7-default.json";
+        case SARibbonTheme::RibbonThemeOffice2013:
+            return ":/SARibbonTheme/resource/palettes/office2013-default.json";
+        default:
+            return QString();
+        }
+    };
+
+    QString templatePath = themeToTemplatePath(theme);
+    QString palettePath  = themeToPalettePath(theme);
+    if (templatePath.isEmpty() || palettePath.isEmpty()) {
         return baseQss;
     }
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qWarning() << "can not load build in ribbon theme,reason is :" << file.errorString();
+
+    // Load the default palette
+    SARibbonThemePalette palette;
+    if (!palette.loadFromFile(palettePath)) {
+        qWarning() << "getBuiltInRibbonThemeQss: failed to load palette" << palettePath;
         return baseQss;
     }
-    QString themeQss = QString::fromUtf8(file.readAll());
-    return baseQss + "\n" + themeQss;
+
+    // Load template and replace tokens
+    QFile templateFile(templatePath);
+    if (!templateFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qWarning() << "getBuiltInRibbonThemeQss: failed to load template" << templatePath;
+        return baseQss;
+    }
+    QString templateQss = QString::fromUtf8(templateFile.readAll());
+    QString resolvedQss = replaceQssTokens(templateQss, palette);
+    return baseQss + "\n" + resolvedQss;
 }
 
 /**
