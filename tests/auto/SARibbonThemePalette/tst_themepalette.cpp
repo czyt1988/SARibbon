@@ -21,6 +21,7 @@ private Q_SLOTS:
     void testPaletteAutoLoadingWin7();
     void testAllPalettesLoad();
     void testNewPalettesContainAllTokens();
+    void testWin7AndOffice2013TokenCoverage();
     void testSetterRecalculateDerived();
     void testDarkSetterRecalculate();
     void testVariablesPriority();
@@ -141,6 +142,10 @@ void TestThemePalette::testQssTokenCoverage()
           ":/SARibbonTheme/resource/templates/dark.qss" },
         { ":/SARibbonTheme/resource/palettes/dark2-default.json",
           ":/SARibbonTheme/resource/templates/dark2.qss" },
+        { ":/SARibbonTheme/resource/palettes/win7-default.json",
+          ":/SARibbonTheme/resource/templates/win7.qss" },
+        { ":/SARibbonTheme/resource/palettes/office2013-default.json",
+          ":/SARibbonTheme/resource/templates/office2013.qss" },
     };
 
     for (const auto& tc : cases) {
@@ -182,7 +187,11 @@ void TestThemePalette::testPaletteAutoLoading()
         { SARibbonTheme::RibbonThemeDark,
           ":/SARibbonTheme/resource/palettes/dark-default.json" },
         { SARibbonTheme::RibbonThemeDark2,
-          ":/SARibbonTheme/resource/palettes/dark2-default.json" }
+          ":/SARibbonTheme/resource/palettes/dark2-default.json" },
+        { SARibbonTheme::RibbonThemeWindows7,
+          ":/SARibbonTheme/resource/palettes/win7-default.json" },
+        { SARibbonTheme::RibbonThemeOffice2013,
+          ":/SARibbonTheme/resource/palettes/office2013-default.json" }
     };
 
     for (const auto& tp : supported) {
@@ -198,16 +207,18 @@ void TestThemePalette::testPaletteAutoLoading()
 
 void TestThemePalette::testPaletteAutoLoadingWin7()
 {
-    // Themes without template/palette support should not have palette resource files
-    QVector<QString> unsupportedPaths = {
-        ":/SARibbonTheme/resource/palettes/win7.json",
-        ":/SARibbonTheme/resource/palettes/office2013.json"
+    // Win7 and Office2013 now have palette and template support
+    QVector<QString> supportedPaths = {
+        ":/SARibbonTheme/resource/palettes/win7-default.json",
+        ":/SARibbonTheme/resource/palettes/office2013-default.json",
+        ":/SARibbonTheme/resource/templates/win7.qss",
+        ":/SARibbonTheme/resource/templates/office2013.qss"
     };
 
-    for (const auto& path : unsupportedPaths) {
+    for (const auto& path : supportedPaths) {
         QFile f(path);
-        QVERIFY2(!f.exists(),
-                 QString("No palette should exist for unsupported theme at %1")
+        QVERIFY2(f.exists(),
+                 QString("Palette/template resource should exist at %1")
                      .arg(path)
                      .toUtf8()
                      .constData());
@@ -225,7 +236,9 @@ void TestThemePalette::testAllPalettesLoad()
         ":/SARibbonTheme/resource/palettes/office2021-green.json",
         ":/SARibbonTheme/resource/palettes/office2021-dark.json",
         ":/SARibbonTheme/resource/palettes/dark-default.json",
-        ":/SARibbonTheme/resource/palettes/dark2-default.json"
+        ":/SARibbonTheme/resource/palettes/dark2-default.json",
+        ":/SARibbonTheme/resource/palettes/win7-default.json",
+        ":/SARibbonTheme/resource/palettes/office2013-default.json"
     };
 
     for (const auto& path : palettePaths) {
@@ -269,6 +282,54 @@ void TestThemePalette::testNewPalettesContainAllTokens()
                      QString("Palette %1 missing required token '%2'")
                          .arg(path)
                          .arg(token)
+                         .toUtf8()
+                         .constData());
+        }
+    }
+}
+
+void TestThemePalette::testWin7AndOffice2013TokenCoverage()
+{
+    struct TemplatePalette {
+        QString templatePath;
+        QString palettePath;
+    };
+
+    QVector< TemplatePalette > cases = {
+        { ":/SARibbonTheme/resource/templates/win7.qss",
+          ":/SARibbonTheme/resource/palettes/win7-default.json" },
+        { ":/SARibbonTheme/resource/templates/office2013.qss",
+          ":/SARibbonTheme/resource/palettes/office2013-default.json" }
+    };
+
+    QRegularExpression tokenRe("\\{\\{([^}|]+)");
+
+    for (const auto& tc : cases) {
+        QFile templateFile(tc.templatePath);
+        QVERIFY2(templateFile.open(QIODevice::ReadOnly | QIODevice::Text),
+                 QString("Failed to open template: %1").arg(tc.templatePath).toUtf8().constData());
+        QString templateQss = QString::fromUtf8(templateFile.readAll());
+
+        QSet< QString > requiredTokens;
+        QRegularExpressionMatchIterator it = tokenRe.globalMatch(templateQss);
+        while (it.hasNext()) {
+            QRegularExpressionMatch match = it.next();
+            requiredTokens.insert(match.captured(1));
+        }
+        QVERIFY2(requiredTokens.size() > 0,
+                 QString("Template %1 should contain at least one token").arg(tc.templatePath).toUtf8().constData());
+
+        SA::SARibbonThemePalette palette;
+        QVERIFY2(palette.loadFromFile(tc.palettePath),
+                 QString("Failed to load palette: %1").arg(tc.palettePath).toUtf8().constData());
+
+        QHash< QString, QString > vars = palette.variables();
+        for (const QString& token : requiredTokens) {
+            QVERIFY2(vars.contains(token),
+                     QString("Palette %1 missing token '%2' required by template %3")
+                         .arg(tc.palettePath)
+                         .arg(token)
+                         .arg(tc.templatePath)
                          .toUtf8()
                          .constData());
         }

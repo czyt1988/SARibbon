@@ -400,6 +400,8 @@ enum class SARibbonTheme
 {
 	RibbonThemeOffice2013,      ///< Office 2013 theme
 	RibbonThemeOffice2016Blue,  ///< Office 2016 - Blue theme
+	RibbonThemeOffice2016Green, ///< Office 2016 - Green theme
+	RibbonThemeOffice2016Dark,  ///< Office 2016 - Dark theme
 	RibbonThemeOffice2021Blue,  ///< Office 2021 - Blue theme
 	RibbonThemeWindows7,        ///< Windows 7 theme
 	RibbonThemeDark,            ///< Dark theme
@@ -1101,12 +1103,6 @@ QSize SA_RIBBON_EXPORT scaleSizeByHeight(const QSize& originalSize, int newHeigh
 
 // 按照指定的新宽度，保持宽高比缩放 QSize
 QSize SA_RIBBON_EXPORT scaleSizeByWidth(const QSize& originalSize, int newWidth);
-
-// 获取内置的ribbon主题对应的qss内容
-QString SA_RIBBON_EXPORT getBuiltInRibbonThemeQss(SARibbonTheme theme);
-
-// 给窗口设置内置的ribbon主题
-void SA_RIBBON_EXPORT setBuiltInRibbonTheme(QWidget* w, SARibbonTheme theme);
 
 // 提供类似QIcon::pixmap(const QSize &size, qreal devicePixelRatio, Mode mode, State state) const（Qt6新增）的兼容函数
 QPixmap iconToPixmap(const QIcon& icon,

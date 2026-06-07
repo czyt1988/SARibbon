@@ -158,8 +158,11 @@ static QString themeToTemplatePath(SARibbonTheme theme)
         return ":/SARibbonTheme/resource/templates/dark.qss";
     case SARibbonTheme::RibbonThemeDark2:
         return ":/SARibbonTheme/resource/templates/dark2.qss";
+    case SARibbonTheme::RibbonThemeWindows7:
+        return ":/SARibbonTheme/resource/templates/win7.qss";
+    case SARibbonTheme::RibbonThemeOffice2013:
+        return ":/SARibbonTheme/resource/templates/office2013.qss";
     default:
-        // Themes without templates (win7, office2013) fall back to fixed QSS
         return QString();
     }
 }
@@ -185,8 +188,11 @@ static QString themeToPalettePath(SARibbonTheme theme)
         return ":/SARibbonTheme/resource/palettes/dark-default.json";
     case SARibbonTheme::RibbonThemeDark2:
         return ":/SARibbonTheme/resource/palettes/dark2-default.json";
+    case SARibbonTheme::RibbonThemeWindows7:
+        return ":/SARibbonTheme/resource/palettes/win7-default.json";
+    case SARibbonTheme::RibbonThemeOffice2013:
+        return ":/SARibbonTheme/resource/palettes/office2013-default.json";
     default:
-        // Themes without palette definitions (win7, office2013) return empty
         return QString();
     }
 }

@@ -1,0 +1,41 @@
+{
+  "name": "Office 2013",
+  "version": "1.0",
+  "isDark": false,
+
+  "keyColors": {
+    "accent":             "#2b579a",
+    "content-bg":         "#ffffff",
+    "text-color":         "#333333",
+    "subtitle":           "#666666"
+  },
+
+  "derived": {
+    "accent-hover":       { "fn": "lighten", "base": "accent", "amount": 20 },
+    "accent-pressed":     { "fn": "lighten", "base": "accent", "amount": 12 }
+  },
+
+  "fixed": {
+    "white":                   "#ffffff",
+    "black":                   "#000000",
+    "bar-border":              "#707070",
+    "tab-text":                "#5779af",
+    "border-color":            "#c5d2e0",
+    "separator":               "#bec0c2",
+    "content-hover-bg":        "#cee7fc",
+    "content-pressed-bg":      "#9ed2f9",
+    "content-checked-bg":      "#cee8fc",
+    "content-checked-hover-bg":"#b8d6f7",
+    "hover-border":            "#badffa",
+    "focus-border":            "#b9defa",
+    "focus-highlight":         "#269bf4",
+    "input-border":            "#c0c2c4",
+    "selection-bg":            "#9bbbf7",
+    "menu-bg":                 "#fcfcfc",
+    "menu-border":             "#c2d0df",
+    "sys-button-hover":        "#e5e5e5",
+    "sys-button-pressed":      "#cacacb",
+    "close-bg":                "#e81123",
+    "close-bg-pressed":        "#f1707a"
+  }
+}

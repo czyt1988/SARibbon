@@ -1,0 +1,40 @@
+{
+  "name": "Windows 7",
+  "version": "1.0",
+  "isDark": false,
+
+  "keyColors": {
+    "accent":             "#e3e6e8",
+    "content-bg":         "#ffffff",
+    "text-color":         "#444444",
+    "subtitle":           "#666666"
+  },
+
+  "derived": {},
+
+  "fixed": {
+    "white":               "#ffffff",
+    "black":               "#000000",
+    "hover-bg":            "#fdeeb3",
+    "hover-border":        "#ffd700",
+    "tab-hover-border":    "#ecbc3d",
+    "border-color":        "#c0c2c4",
+    "separator":           "#bec0c2",
+    "focus-border":        "#fcbf21",
+    "focus-bg":            "#fcd364",
+    "tab-selected-border": "#bac9db",
+    "selection-bg":        "#9bbbf7",
+    "menu-bg":             "#fcfcfc",
+    "menu-border":         "#8492a6",
+    "menu-btn-hover":      "#ffe580",
+    "scroll-border":       "#c5d2e0",
+    "sys-button-hover":    "#f5f6f6",
+    "sys-button-pressed":  "#cacacb",
+    "close-bg":            "#e81123",
+    "close-bg-pressed":    "#f1707a",
+    "app-btn-bg":          "qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,stop:0 #467FBD, stop:0.5 #2A5FAC,stop:0.51 #1A4088,stop:1 #419ACF)",
+    "app-btn-hover-bg":    "qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,stop:0 #7BB2EB, stop:0.5 #477ECD,stop:0.51 #114ECF,stop:1 #80E1FF)",
+    "app-btn-pressed-bg":  "qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,stop:0 #467BBB, stop:0.5 #2F63AE,stop:0.51 #1C438A,stop:1 #358BC9)",
+    "gallery-selected-bg": "qlineargradient(spread:pad, x1:0, y1:0, x2:0, y2:1,stop:0 #FDEEB3, stop:0.1282 #FDE38A,stop:0.8333 #FCE58C,stop:1 #FDFDEB)"
+  }
+}

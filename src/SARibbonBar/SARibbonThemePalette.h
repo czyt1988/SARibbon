@@ -147,6 +147,9 @@ public:
     // Get a color by token name, searching derived, key, then fixed layers
     QColor color(const QString& tokenName) const;
 
+    // Get raw string value for a token (supports non-color CSS values like qlineargradient)
+    QString rawValue(const QString& tokenName) const;
+
     // Get all color variables as name-to-hex-string pairs
     QHash<QString, QString> variables() const;
 
@@ -166,6 +169,7 @@ private:
     QHash<QString, QColor> m_keyColors;
     QHash<QString, QColor> m_derivedColors;
     QHash<QString, QColor> m_fixedColors;
+    QHash<QString, QString> m_rawStrings;
     QHash<QString, DeriveRule> m_deriveRules;  ///< Stored derive rules for recalculation
     bool m_isDark { false };
 };

@@ -24,6 +24,8 @@
         <file>resource/templates/office2021.qss</file>
         <file>resource/templates/dark.qss</file>
         <file>resource/templates/dark2.qss</file>
+        <file>resource/templates/win7.qss</file>
+        <file>resource/templates/office2013.qss</file>
         <file>resource/palettes/office2016-blue.json</file>
         <file>resource/palettes/office2016-green.json</file>
         <file>resource/palettes/office2016-dark.json</file>
@@ -32,5 +34,7 @@
         <file>resource/palettes/office2021-dark.json</file>
         <file>resource/palettes/dark-default.json</file>
         <file>resource/palettes/dark2-default.json</file>
+        <file>resource/palettes/win7-default.json</file>
+        <file>resource/palettes/office2013-default.json</file>
     </qresource>
 </RCC>

@@ -4633,9 +4633,19 @@ public:
 	bool isDark() const;
 
 private:
+	struct DeriveRule
+	{
+		QString fn;
+		QString base;
+		int amount;
+	};
+
+	void recalculateDerived();
+
 	QHash<QString, QColor> m_keyColors;
 	QHash<QString, QColor> m_derivedColors;
 	QHash<QString, QColor> m_fixedColors;
+	QHash<QString, DeriveRule> m_deriveRules;  ///< Stored derive rules for recalculation
 	bool m_isDark { false };
 };
 
@@ -4794,7 +4804,8 @@ QString getBuiltInRibbonThemeQss(SARibbonTheme theme)
 		baseQss = QString::fromUtf8(baseFile.readAll());
 	}
 
-	// Then load theme-specific QSS
+	// Then load theme-specific QSS (only Win7 and Office2013 have hardcoded QSS;
+	// all template-supported themes fall back to base QSS only)
 	QFile file;
 	switch (theme) {
 	case SARibbonTheme::RibbonThemeWindows7:
@@ -4803,25 +4814,9 @@ QString getBuiltInRibbonThemeQss(SARibbonTheme theme)
 	case SARibbonTheme::RibbonThemeOffice2013:
 		file.setFileName(":/SARibbonTheme/resource/theme-office2013.qss");
 		break;
-	case SARibbonTheme::RibbonThemeOffice2016Blue:
-		file.setFileName(":/SARibbonTheme/resource/theme-office2016-blue.qss");
-		break;
-	case SARibbonTheme::RibbonThemeOffice2021Blue:
-		file.setFileName(":/SARibbonTheme/resource/theme-office2021-blue.qss");
-		break;
-	case SARibbonTheme::RibbonThemeDark:
-		file.setFileName(":/SARibbonTheme/resource/theme-dark.qss");
-		break;
-	case SARibbonTheme::RibbonThemeDark2:
-		file.setFileName(":/SARibbonTheme/resource/theme-dark2.qss");
-		break;
-	case SARibbonTheme::RibbonThemeOffice2021Green:
-	case SARibbonTheme::RibbonThemeOffice2021Dark:
-		file.setFileName(":/SARibbonTheme/resource/theme-office2021-blue.qss");
-		break;
 	default:
-		file.setFileName(":/SARibbonTheme/resource/theme-office2013.qss");
-		break;
+		// All template-supported themes fall back to base QSS only
+		return baseQss;
 	}
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
 		qWarning() << "can not load build in ribbon theme,reason is :" << file.errorString();
@@ -4829,23 +4824,6 @@ QString getBuiltInRibbonThemeQss(SARibbonTheme theme)
 	}
 	QString themeQss = QString::fromUtf8(file.readAll());
 	return baseQss + "\n" + themeQss;
-}
-
-/**
- * @brief 设置内置的ribbon主题
- *
- * 之所以提供此函数，是因为在某些情况下，SARibbonBar不用在SARibbonMainWindow情况下的时候，也需要设置主题，
- * 但主题设置函数是SARibbonMainWindow的成员函数，因此，这里单独提供了这个函数给SARibbonWidget窗口使用
- *
- * @param w
- * @param theme
- */
-void setBuiltInRibbonTheme(QWidget* w, SARibbonTheme theme)
-{
-	if (!w) {
-		return;
-	}
-	w->setStyleSheet(getBuiltInRibbonThemeQss(theme));
 }
 
 /**
@@ -5039,6 +5017,16 @@ QString replaceQssTokens(const QString& templateQss, const SARibbonThemePalette&
 		}
 	}
 
+	// Scan for any unreplaced tokens and warn about them
+	{
+		QRegularExpression unreplacedRe("\\{\\{([^}|]+)(?:\\|opacity\\([^)]+\\))?\\}\\}");
+		QRegularExpressionMatchIterator warnIt = unreplacedRe.globalMatch(result);
+		while (warnIt.hasNext()) {
+			QRegularExpressionMatch warnMatch = warnIt.next();
+			qWarning() << "replaceQssTokens: unreplaced token:" << warnMatch.captured(1).trimmed();
+		}
+	}
+
 	return result;
 }
 
@@ -5087,6 +5075,9 @@ SA_RIBBON_EXPORT void applyRibbonTheme(QWidget* w, SARibbonBar* bar, SARibbonThe
 namespace SA
 {
 
+// Internal-only function (defined in SARibbonUtil.cpp, no public header declaration)
+QString getBuiltInRibbonThemeQss(SARibbonTheme theme);
+
 // ===================================================
 // Static theme data maps
 // ===================================================
@@ -5096,6 +5087,8 @@ static const std::map< SARibbonTheme, QMargins > s_themeMargins = {
 	{ SARibbonTheme::RibbonThemeWindows7, QMargins(5, 0, 0, 0) },
 	{ SARibbonTheme::RibbonThemeOffice2013, QMargins(5, 0, 0, 0) },
 	{ SARibbonTheme::RibbonThemeOffice2016Blue, QMargins(5, 0, 0, 0) },
+	{ SARibbonTheme::RibbonThemeOffice2016Green, QMargins(5, 0, 0, 0) },
+	{ SARibbonTheme::RibbonThemeOffice2016Dark, QMargins(5, 0, 0, 0) },
 	{ SARibbonTheme::RibbonThemeDark, QMargins(5, 0, 0, 0) },
 	{ SARibbonTheme::RibbonThemeDark2, QMargins(5, 0, 0, 0) },
 	{ SARibbonTheme::RibbonThemeOffice2021Blue, QMargins(5, 0, 5, 0) },
@@ -5119,6 +5112,8 @@ static const std::map< SARibbonTheme, SARibbonBar::FpContextCategoryHighlight > 
 	{ SARibbonTheme::RibbonThemeOffice2013, s_csVibrantHighlight },
 	{ SARibbonTheme::RibbonThemeDark, s_csVibrantHighlight },
 	{ SARibbonTheme::RibbonThemeOffice2016Blue, s_csDarkerHighlight },
+	{ SARibbonTheme::RibbonThemeOffice2016Green, s_csDarkerHighlight },
+	{ SARibbonTheme::RibbonThemeOffice2016Dark, s_csDarkerHighlight },
 	{ SARibbonTheme::RibbonThemeOffice2021Blue, [](const QColor&) -> QColor { return QColor(39, 96, 167); } },
 	{ SARibbonTheme::RibbonThemeDark2, s_csVibrantHighlight },
 	{ SARibbonTheme::RibbonThemeOffice2021Green, s_csVibrantHighlight },
@@ -5131,6 +5126,8 @@ static const std::map< SARibbonTheme, QList< QColor > > s_themeContextColorLists
 	{ SARibbonTheme::RibbonThemeOffice2013, {} },
 	{ SARibbonTheme::RibbonThemeDark, {} },
 	{ SARibbonTheme::RibbonThemeOffice2016Blue, { QColor(18, 64, 120) } },
+	{ SARibbonTheme::RibbonThemeOffice2016Green, { QColor(24, 96, 48) } },
+	{ SARibbonTheme::RibbonThemeOffice2016Dark, { QColor(60, 60, 60) } },
 	{ SARibbonTheme::RibbonThemeOffice2021Blue, { QColor(209, 207, 209) } },
 	{ SARibbonTheme::RibbonThemeDark2, { QColor(42, 141, 181) } },
 	{ SARibbonTheme::RibbonThemeOffice2021Green, { QColor(180, 200, 180) } },
@@ -5142,6 +5139,8 @@ static const std::map< SARibbonTheme, QColor > s_themeBaselineColors = {
 	{ SARibbonTheme::RibbonThemeWindows7, QColor() },
 	{ SARibbonTheme::RibbonThemeOffice2013, QColor(186, 201, 219) },
 	{ SARibbonTheme::RibbonThemeOffice2016Blue, QColor() },
+	{ SARibbonTheme::RibbonThemeOffice2016Green, QColor() },
+	{ SARibbonTheme::RibbonThemeOffice2016Dark, QColor() },
 	{ SARibbonTheme::RibbonThemeOffice2021Blue, QColor() },
 	{ SARibbonTheme::RibbonThemeDark, QColor() },
 	{ SARibbonTheme::RibbonThemeDark2, QColor() },
@@ -5208,6 +5207,8 @@ static QString themeToTemplatePath(SARibbonTheme theme)
 {
 	switch (theme) {
 	case SARibbonTheme::RibbonThemeOffice2016Blue:
+	case SARibbonTheme::RibbonThemeOffice2016Green:
+	case SARibbonTheme::RibbonThemeOffice2016Dark:
 		return ":/SARibbonTheme/resource/templates/office2016.qss";
 	case SARibbonTheme::RibbonThemeOffice2021Blue:
 	case SARibbonTheme::RibbonThemeOffice2021Green:
@@ -5230,6 +5231,10 @@ static QString themeToPalettePath(SARibbonTheme theme)
 	switch (theme) {
 	case SARibbonTheme::RibbonThemeOffice2016Blue:
 		return ":/SARibbonTheme/resource/palettes/office2016-blue.json";
+	case SARibbonTheme::RibbonThemeOffice2016Green:
+		return ":/SARibbonTheme/resource/palettes/office2016-green.json";
+	case SARibbonTheme::RibbonThemeOffice2016Dark:
+		return ":/SARibbonTheme/resource/palettes/office2016-dark.json";
 	case SARibbonTheme::RibbonThemeOffice2021Blue:
 		return ":/SARibbonTheme/resource/palettes/office2021-blue.json";
 	case SARibbonTheme::RibbonThemeOffice2021Green:
@@ -5299,12 +5304,29 @@ void applyRibbonTheme(QWidget* w, SARibbonBar* bar, SARibbonTheme theme,
 			QString processedQss = SA::replaceQssTokens(templateQss, palette);
 			w->setStyleSheet(baseQss + "\n" + processedQss);
 		} else {
-			// Template file not found, fall back to fixed QSS
-			SA::setBuiltInRibbonTheme(w, theme);
+			// Template file not found, fall back to base QSS
+			qWarning() << "applyRibbonTheme: template not found:" << templatePath
+					   << "- falling back to base QSS";
+			QFile baseOnly(":/SARibbonTheme/resource/theme-base.qss");
+			if (baseOnly.open(QIODevice::ReadOnly | QIODevice::Text)) {
+				w->setStyleSheet(QString::fromUtf8(baseOnly.readAll()));
+			}
 		}
-	} else {
-		// Empty palette or no template, default behavior
-		SA::setBuiltInRibbonTheme(w, theme);
+	} else if (w) {
+		// Empty palette or no template (Win7/Office2013) — load hardcoded QSS
+		QString palettePath = themeToPalettePath(theme);
+		if (palettePath.isEmpty() && !templatePath.isEmpty()) {
+			// Template theme with no palette — warning + base QSS fallback
+			qWarning() << "applyRibbonTheme: no palette for template theme"
+					   << static_cast<int>(theme) << "- using base QSS only";
+			QFile baseQss(":/SARibbonTheme/resource/theme-base.qss");
+			if (baseQss.open(QIODevice::ReadOnly | QIODevice::Text)) {
+				w->setStyleSheet(QString::fromUtf8(baseQss.readAll()));
+			}
+		} else {
+			// Win7/Office2013 — use internal hardcoded QSS (not exposed publicly)
+			w->setStyleSheet(SA::getBuiltInRibbonThemeQss(theme));
+		}
 	}
 
 	if (!bar) {
@@ -5463,6 +5485,7 @@ bool SARibbonThemePalette::loadFromJson(const QByteArray& json)
 		QString baseName = rule.value("base").toString();
 		int amount = rule.value("amount").toInt(10);
 
+		m_deriveRules.insert(it.key(), { fn, baseName, amount });
 		if (m_keyColors.contains(baseName)) {
 			QColor base = m_keyColors.value(baseName);
 			QColor derivedC = ::deriveColor(base, fn, amount, m_isDark);
@@ -5515,26 +5538,29 @@ QColor SARibbonThemePalette::color(const QString& tokenName) const
  * @brief Get all color variables as name-to-hex-string pairs
  * @return A hash mapping token names to their hex color strings (e.g. "#ff0000")
  * @details Merges all three layers (key, derived, fixed) into a single hash.
- * If the same name exists in multiple layers, the last written layer wins.
+ * Insertion order ensures derived colors take priority over key colors, and
+ * key colors over fixed colors, matching the color() lookup order.
  * \endif
  *
  * \if CHINESE
  * @brief 获取所有颜色变量（名称到十六进制字符串的映射）
  * @return 将标记名映射到其十六进制颜色字符串（例如"#ff0000"）的哈希表
  * @details 将三个层（键色、派生色、固定色）合并到单个哈希表中。
- * 如果多个层中存在相同的名称，最后写入的层优先。
+ * 插入顺序确保派生色优先于键色，键色优先于固定色，与color()查找顺序一致。
  * \endif
  */
 QHash<QString, QString> SARibbonThemePalette::variables() const
 {
 	QHash<QString, QString> vars;
+	// Insert order matters for conflicts: last writer wins
+	// Priority: derived > key > fixed (matches color() lookup order)
+	for (auto it = m_fixedColors.cbegin(); it != m_fixedColors.cend(); ++it) {
+		vars.insert(it.key(), it.value().name());
+	}
 	for (auto it = m_keyColors.cbegin(); it != m_keyColors.cend(); ++it) {
 		vars.insert(it.key(), it.value().name());
 	}
 	for (auto it = m_derivedColors.cbegin(); it != m_derivedColors.cend(); ++it) {
-		vars.insert(it.key(), it.value().name());
-	}
-	for (auto it = m_fixedColors.cbegin(); it != m_fixedColors.cend(); ++it) {
 		vars.insert(it.key(), it.value().name());
 	}
 	return vars;
@@ -5556,6 +5582,20 @@ bool SARibbonThemePalette::isDark() const
 	return m_isDark;
 }
 
+/// Recalculate all derived colors from stored rules and current key colors
+void SARibbonThemePalette::recalculateDerived()
+{
+	m_derivedColors.clear();
+	for (auto it = m_deriveRules.cbegin(); it != m_deriveRules.cend(); ++it) {
+		const DeriveRule& rule = it.value();
+		if (m_keyColors.contains(rule.base)) {
+			QColor base = m_keyColors.value(rule.base);
+			QColor derivedC = ::deriveColor(base, rule.fn, rule.amount, m_isDark);
+			m_derivedColors.insert(it.key(), derivedC);
+		}
+	}
+}
+
 /**
  * \if ENGLISH
  * @brief Set the accent key color
@@ -5572,6 +5612,7 @@ bool SARibbonThemePalette::isDark() const
 void SARibbonThemePalette::setAccentColor(const QColor& color)
 {
 	m_keyColors.insert("accent", color);
+	recalculateDerived();
 }
 
 /**
@@ -5590,6 +5631,7 @@ void SARibbonThemePalette::setAccentColor(const QColor& color)
 void SARibbonThemePalette::setContentBgColor(const QColor& color)
 {
 	m_keyColors.insert("content-bg", color);
+	recalculateDerived();
 }
 
 /**
@@ -5608,6 +5650,7 @@ void SARibbonThemePalette::setContentBgColor(const QColor& color)
 void SARibbonThemePalette::setTextColor(const QColor& color)
 {
 	m_keyColors.insert("text-color", color);
+	recalculateDerived();
 }
 
 } // namespace SA

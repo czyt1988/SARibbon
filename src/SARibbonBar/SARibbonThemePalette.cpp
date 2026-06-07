@@ -121,10 +121,16 @@ bool SARibbonThemePalette::loadFromJson(const QByteArray& json)
         }
     }
 
-    // Parse fixed colors
+    // Parse fixed colors — store non-color values (e.g. qlineargradient) as raw strings
     QJsonObject fixed = obj.value("fixed").toObject();
     for (auto it = fixed.begin(); it != fixed.end(); ++it) {
-        m_fixedColors.insert(it.key(), QColor(it.value().toString()));
+        QString value = it.value().toString();
+        QColor c(value);
+        if (c.isValid()) {
+            m_fixedColors.insert(it.key(), c);
+        } else if (!value.isEmpty()) {
+            m_rawStrings.insert(it.key(), value);
+        }
     }
 
     return true;
@@ -163,6 +169,43 @@ QColor SARibbonThemePalette::color(const QString& tokenName) const
 
 /**
  * \if ENGLISH
+ * @brief Get a raw string value for a token name, supporting non-color CSS values
+ * @param[in] tokenName The token name to look up
+ * @return The raw string value (e.g. "qlineargradient(...)"), or the hex color name
+ *         if the token is a color, or an empty QString if the token is not found
+ * @details Lookup order: raw strings first, then derived colors, then key colors,
+ * then fixed colors. Raw strings take highest priority since they represent
+ * complex CSS values that cannot be expressed as a single color.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取标记名的原始字符串值，支持非颜色CSS值
+ * @param[in] tokenName 要查找的标记名
+ * @return 原始字符串值（例如"qlineargradient(...)"），如果标记是颜色则返回十六进制颜色名，
+ *         如果标记未找到则返回空QString
+ * @details 查找顺序：先查原始字符串，再查派生色，再查键色，最后查固定色。
+ * 原始字符串优先级最高，因为它们代表无法用单一颜色表达的复杂CSS值。
+ * \endif
+ */
+QString SARibbonThemePalette::rawValue(const QString& tokenName) const
+{
+    if (m_rawStrings.contains(tokenName)) {
+        return m_rawStrings.value(tokenName);
+    }
+    if (m_derivedColors.contains(tokenName)) {
+        return m_derivedColors.value(tokenName).name();
+    }
+    if (m_keyColors.contains(tokenName)) {
+        return m_keyColors.value(tokenName).name();
+    }
+    if (m_fixedColors.contains(tokenName)) {
+        return m_fixedColors.value(tokenName).name();
+    }
+    return QString();
+}
+
+/**
+ * \if ENGLISH
  * @brief Get all color variables as name-to-hex-string pairs
  * @return A hash mapping token names to their hex color strings (e.g. "#ff0000")
  * @details Merges all three layers (key, derived, fixed) into a single hash.
@@ -181,7 +224,7 @@ QHash<QString, QString> SARibbonThemePalette::variables() const
 {
     QHash<QString, QString> vars;
     // Insert order matters for conflicts: last writer wins
-    // Priority: derived > key > fixed (matches color() lookup order)
+    // Priority: rawStrings > derived > key > fixed (matches rawValue() lookup order)
     for (auto it = m_fixedColors.cbegin(); it != m_fixedColors.cend(); ++it) {
         vars.insert(it.key(), it.value().name());
     }
@@ -190,6 +233,9 @@ QHash<QString, QString> SARibbonThemePalette::variables() const
     }
     for (auto it = m_derivedColors.cbegin(); it != m_derivedColors.cend(); ++it) {
         vars.insert(it.key(), it.value().name());
+    }
+    for (auto it = m_rawStrings.cbegin(); it != m_rawStrings.cend(); ++it) {
+        vars.insert(it.key(), it.value());
     }
     return vars;
 }

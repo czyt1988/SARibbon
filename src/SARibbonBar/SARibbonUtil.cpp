@@ -326,47 +326,62 @@ bool isOperatingSystemInDarkMode()
  */
 QString replaceQssTokens(const QString& templateQss, const SARibbonThemePalette& palette)
 {
-    QString result               = templateQss;
-    QHash<QString, QString> vars = palette.variables();
+    QString result = templateQss;
 
     QRegularExpression re("\\{\\{([^}|]+)(?:\\|opacity\\(([^)]+)\\))?\\}\\}");
-    QRegularExpressionMatchIterator it = re.globalMatch(result);
 
-    int offset = 0;
+    // First pass: collect all token matches and their replacements
+    struct TokenMatch
+    {
+        qsizetype start;
+        qsizetype length;
+        QString replacement;
+    };
+    QVector<TokenMatch> matches;
+
+    QRegularExpressionMatchIterator it = re.globalMatch(result);
     while (it.hasNext()) {
-        QRegularExpressionMatch match = it.next();
-        QString tokenName  = match.captured(1);
-        QString opacityStr = match.captured(2);
+        QRegularExpressionMatch match  = it.next();
+        QString           tokenName    = match.captured(1);
+        QString           opacityStr   = match.captured(2);
+        QString           raw          = palette.rawValue(tokenName);
 
         QString replacement;
-        if (vars.contains(tokenName)) {
-            QColor color(vars.value(tokenName));
-            if (!opacityStr.isEmpty()) {
-                bool ok;
-                float opacity = opacityStr.toFloat(&ok);
-                if (ok) {
-                    int alpha = qRound(opacity * 255);
-                    replacement = QString("#%1%2").arg(alpha, 2, 16, QChar('0')).arg(color.name().mid(1));
+        if (!raw.isEmpty()) {
+            QColor color(raw);
+            if (color.isValid()) {
+                if (!opacityStr.isEmpty()) {
+                    bool  ok;
+                    float opacity = opacityStr.toFloat(&ok);
+                    if (ok) {
+                        int alpha       = qRound(opacity * 255);
+                        replacement = QString("#%1%2").arg(alpha, 2, 16, QChar('0')).arg(color.name().mid(1));
+                    } else {
+                        replacement = color.name();
+                    }
                 } else {
                     replacement = color.name();
                 }
             } else {
-                replacement = color.name();
+                // Non-color raw string (e.g. qlineargradient(...)) — use directly
+                replacement = raw;
             }
         }
 
         if (!replacement.isEmpty()) {
-            int start  = match.capturedStart() + offset;
-            int length = match.capturedLength();
-            result.replace(start, length, replacement);
-            offset += replacement.length() - length;
+            matches.append({ match.capturedStart(), match.capturedLength(), replacement });
         }
+    }
+
+    // Apply replacements in reverse order to preserve offsets
+    for (qsizetype i = matches.size() - 1; i >= 0; --i) {
+        result.replace(matches[i].start, matches[i].length, matches[i].replacement);
     }
 
     // Scan for any unreplaced tokens and warn about them
     {
-        QRegularExpression unreplacedRe("\\{\\{([^}|]+)(?:\\|opacity\\([^)]+\\))?\\}\\}");
-        QRegularExpressionMatchIterator warnIt = unreplacedRe.globalMatch(result);
+        QRegularExpression                unreplacedRe("\\{\\{([^}|]+)(?:\\|opacity\\([^)]+\\))?\\}\\}");
+        QRegularExpressionMatchIterator   warnIt = unreplacedRe.globalMatch(result);
         while (warnIt.hasNext()) {
             QRegularExpressionMatch warnMatch = warnIt.next();
             qWarning() << "replaceQssTokens: unreplaced token:" << warnMatch.captured(1).trimmed();
