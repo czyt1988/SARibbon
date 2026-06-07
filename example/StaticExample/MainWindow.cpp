@@ -27,6 +27,8 @@ MainWindow::MainWindow(QWidget* parent) : SARibbonMainWindow(parent)
 	combo->addItem("RibbonThemeOffice2021Blue", static_cast< int >(SARibbonTheme::RibbonThemeOffice2021Blue));
 	combo->addItem("RibbonThemeDark", static_cast< int >(SARibbonTheme::RibbonThemeDark));
 	combo->addItem("RibbonThemeDark2", static_cast< int >(SARibbonTheme::RibbonThemeDark2));
+	combo->addItem("RibbonThemeOffice2021Green", static_cast< int >(SARibbonTheme::RibbonThemeOffice2021Green));
+	combo->addItem("RibbonThemeOffice2021Dark", static_cast< int >(SARibbonTheme::RibbonThemeOffice2021Dark));
 	combo->setCurrentIndex(3);
 	connect(combo, QOverload< int >::of(&QComboBox::currentIndexChanged), [ this, combo ](int index) {
 		SARibbonTheme th = static_cast< SARibbonTheme >(combo->itemData(index).toInt());

@@ -1,0 +1,54 @@
+{
+  "name": "Office 2021 Dark",
+  "version": "1.0",
+  "isDark": true,
+
+  "keyColors": {
+    "accent":             "#1e1e1e",
+    "accent-text":        "#e0e0e0",
+    "content-bg":         "#2d2d2d",
+    "text-color":         "#e0e0e0",
+    "bar-border":         "#1e1e1e",
+    "ribbon-text":        "#b2b2b2",
+    "separator":          "#5a5a5a",
+    "subtitle":           "#999999",
+    "panel-border":       "#4a4a4a",
+    "border-color":       "#4a4a4a",
+    "input-border":       "#4a4a4a",
+    "input-focus":        "#5a5a5a",
+    "selection-bg":       "#6a9eff",
+    "menu-border":        "#3a3a3a",
+    "close-bg":           "#e81123",
+    "close-bg-pressed":   "#f1707a",
+    "sys-button-hover":   "#4a4a4a",
+    "sys-button-pressed": "#555555"
+  },
+
+  "derived": {
+    "accent-hover":       { "fn": "darken",  "base": "accent",       "amount": 10 },
+    "accent-pressed":     { "fn": "darken",  "base": "accent",       "amount": 15 },
+    "content-hover-bg":   { "fn": "darken",  "base": "content-bg",   "amount": 17 },
+    "content-pressed-bg": { "fn": "darken",  "base": "content-bg",   "amount": 23 }
+  },
+
+  "fixed": {
+    "white":         "#ffffff",
+    "black":         "#000000",
+    "bar-border":    "#1e1e1e",
+    "ribbon-text":   "#b2b2b2",
+    "separator":     "#5a5a5a",
+    "input-base":    "#3a3a3a",
+    "input-text":    "#e0e0e0"
+  },
+
+  "comments": {
+    "accent":          "Ribbon bar background (darkest), application widget background",
+    "accent-hover":    "Tab hover, app button hover - derived: darken reverses to lighter (isDark=true)",
+    "accent-pressed":  "App button pressed - derived: darken reverses to even lighter (isDark=true)",
+    "accent-text":     "Tab unselected text (light on dark bg)",
+    "content-bg":      "Category/Panel/ToolButton/Gallery/Menu background",
+    "content-hover-bg":"Hover state - derived: darken reverses to lighter (isDark=true)",
+    "content-pressed-bg":"Pressed/checked state - derived: darken reverses to even lighter (isDark=true)",
+    "text-color":      "Primary text color (light on dark backgrounds)"
+  }
+}

@@ -32,6 +32,8 @@
         <file>resource/palettes/office2016-green.json</file>
         <file>resource/palettes/office2016-dark.json</file>
         <file>resource/palettes/office2021-blue.json</file>
+        <file>resource/palettes/office2021-green.json</file>
+        <file>resource/palettes/office2021-dark.json</file>
         <file>resource/palettes/dark-default.json</file>
         <file>resource/palettes/dark2-default.json</file>
     </qresource>

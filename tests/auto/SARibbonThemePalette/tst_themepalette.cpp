@@ -1,6 +1,10 @@
 #include <QtTest>
 #include "SARibbonThemePalette.h"
 #include "SARibbonUtil.h"
+#include "SARibbonGlobal.h"
+#include <QFile>
+#include <QRegularExpression>
+#include <QSet>
 
 class TestThemePalette : public QObject
 {
@@ -12,6 +16,11 @@ private Q_SLOTS:
     void testDarkDerivation();
     void testTokenReplacement();
     void testOpacityModifier();
+    void testQssTokenCoverage();
+    void testPaletteAutoLoading();
+    void testPaletteAutoLoadingWin7();
+    void testAllPalettesLoad();
+    void testNewPalettesContainAllTokens();
 };
 
 void TestThemePalette::testLoadFromJson()
@@ -102,6 +111,155 @@ void TestThemePalette::testOpacityModifier()
     QString templateQss = "QToolButton { bg: {{accent|opacity(0.5)}}; }";
     QString result        = SA::replaceQssTokens(templateQss, palette);
     QCOMPARE(result, QString("QToolButton { bg: #80225497; }"));
+}
+
+void TestThemePalette::testQssTokenCoverage()
+{
+    // Each palette maps to a template QSS; after token replacement, no {{ should remain
+    struct PaletteTemplate {
+        QString palettePath;
+        QString templatePath;
+    };
+
+    QVector<PaletteTemplate> cases = {
+        { ":/SARibbonTheme/resource/palettes/office2016-blue.json",
+          ":/SARibbonTheme/resource/templates/office2016.qss" },
+        { ":/SARibbonTheme/resource/palettes/office2021-blue.json",
+          ":/SARibbonTheme/resource/templates/office2021.qss" },
+        { ":/SARibbonTheme/resource/palettes/office2021-green.json",
+          ":/SARibbonTheme/resource/templates/office2021.qss" },
+        { ":/SARibbonTheme/resource/palettes/office2021-dark.json",
+          ":/SARibbonTheme/resource/templates/office2021.qss" },
+        { ":/SARibbonTheme/resource/palettes/dark-default.json",
+          ":/SARibbonTheme/resource/templates/dark.qss" },
+        { ":/SARibbonTheme/resource/palettes/dark2-default.json",
+          ":/SARibbonTheme/resource/templates/dark2.qss" },
+    };
+
+    for (const auto& tc : cases) {
+        SA::SARibbonThemePalette palette;
+        QVERIFY2(palette.loadFromFile(tc.palettePath),
+                 ("Failed to load palette: " + tc.palettePath).toUtf8().constData());
+
+        QFile templateFile(tc.templatePath);
+        QVERIFY2(templateFile.open(QIODevice::ReadOnly | QIODevice::Text),
+                 ("Failed to open template: " + tc.templatePath).toUtf8().constData());
+        QString templateQss = QString::fromUtf8(templateFile.readAll());
+
+        QString result = SA::replaceQssTokens(templateQss, palette);
+        QVERIFY2(!result.contains("{{"),
+                 ("Unreplaced tokens in palette: " + tc.palettePath).toUtf8().constData());
+    }
+}
+
+void TestThemePalette::testPaletteAutoLoading()
+{
+    // Verify that template-supported themes have palette resource files at the expected paths
+    struct ThemePath {
+        SARibbonTheme theme;
+        QString path;
+    };
+    QVector<ThemePath> supported = {
+        { SARibbonTheme::RibbonThemeOffice2016Blue,
+          ":/SARibbonTheme/resource/palettes/office2016-blue.json" },
+        { SARibbonTheme::RibbonThemeOffice2021Blue,
+          ":/SARibbonTheme/resource/palettes/office2021-blue.json" },
+        { SARibbonTheme::RibbonThemeOffice2021Green,
+          ":/SARibbonTheme/resource/palettes/office2021-green.json" },
+        { SARibbonTheme::RibbonThemeOffice2021Dark,
+          ":/SARibbonTheme/resource/palettes/office2021-dark.json" },
+        { SARibbonTheme::RibbonThemeDark,
+          ":/SARibbonTheme/resource/palettes/dark-default.json" },
+        { SARibbonTheme::RibbonThemeDark2,
+          ":/SARibbonTheme/resource/palettes/dark2-default.json" }
+    };
+
+    for (const auto& tp : supported) {
+        QFile f(tp.path);
+        QVERIFY2(f.exists(),
+                 QString("Palette resource for theme %1 should exist at %2")
+                     .arg(static_cast<int>(tp.theme))
+                     .arg(tp.path)
+                     .toUtf8()
+                     .constData());
+    }
+}
+
+void TestThemePalette::testPaletteAutoLoadingWin7()
+{
+    // Themes without template/palette support should not have palette resource files
+    QVector<QString> unsupportedPaths = {
+        ":/SARibbonTheme/resource/palettes/win7.json",
+        ":/SARibbonTheme/resource/palettes/office2013.json"
+    };
+
+    for (const auto& path : unsupportedPaths) {
+        QFile f(path);
+        QVERIFY2(!f.exists(),
+                 QString("No palette should exist for unsupported theme at %1")
+                     .arg(path)
+                     .toUtf8()
+                     .constData());
+    }
+}
+
+void TestThemePalette::testAllPalettesLoad()
+{
+    // Verify all 6 palette JSONs can be loaded successfully by SARibbonThemePalette::loadFromFile
+    QVector<QString> palettePaths = {
+        ":/SARibbonTheme/resource/palettes/office2016-blue.json",
+        ":/SARibbonTheme/resource/palettes/office2021-blue.json",
+        ":/SARibbonTheme/resource/palettes/office2021-green.json",
+        ":/SARibbonTheme/resource/palettes/office2021-dark.json",
+        ":/SARibbonTheme/resource/palettes/dark-default.json",
+        ":/SARibbonTheme/resource/palettes/dark2-default.json"
+    };
+
+    for (const auto& path : palettePaths) {
+        SA::SARibbonThemePalette palette;
+        QVERIFY2(palette.loadFromFile(path),
+                 QString("Failed to load palette from %1").arg(path).toUtf8().constData());
+    }
+}
+
+void TestThemePalette::testNewPalettesContainAllTokens()
+{
+    // Extract all token names from the office2021.qss template
+    QFile templateFile(":/SARibbonTheme/resource/templates/office2021.qss");
+    QVERIFY2(templateFile.open(QIODevice::ReadOnly | QIODevice::Text),
+             "Failed to open office2021.qss template");
+    QString templateQss = QString::fromUtf8(templateFile.readAll());
+
+    QRegularExpression tokenRe("\\{\\{([^}|]+)");
+    QSet<QString> requiredTokens;
+    QRegularExpressionMatchIterator it = tokenRe.globalMatch(templateQss);
+    while (it.hasNext()) {
+        QRegularExpressionMatch match = it.next();
+        requiredTokens.insert(match.captured(1));
+    }
+    QVERIFY2(requiredTokens.size() > 0, "Template should contain at least one token");
+
+    // Verify office2021-green and office2021-dark contain all required tokens
+    QVector<QString> newPalettePaths = {
+        ":/SARibbonTheme/resource/palettes/office2021-green.json",
+        ":/SARibbonTheme/resource/palettes/office2021-dark.json"
+    };
+
+    for (const auto& path : newPalettePaths) {
+        SA::SARibbonThemePalette palette;
+        QVERIFY2(palette.loadFromFile(path),
+                 QString("Failed to load palette: %1").arg(path).toUtf8().constData());
+
+        QHash<QString, QString> vars = palette.variables();
+        for (const QString& token : requiredTokens) {
+            QVERIFY2(vars.contains(token),
+                     QString("Palette %1 missing required token '%2'")
+                         .arg(path)
+                         .arg(token)
+                         .toUtf8()
+                         .constData());
+        }
+    }
 }
 
 QTEST_MAIN(TestThemePalette)

@@ -50,6 +50,8 @@ void RibbonWidget::buildRibbon(SARibbonBar* bar)
 	mComboTheme->addItem("Theme Office2021 Blue", static_cast< int >(SARibbonTheme::RibbonThemeOffice2021Blue));
 	mComboTheme->addItem("Theme Dark", static_cast< int >(SARibbonTheme::RibbonThemeDark));
 	mComboTheme->addItem("Theme Dark2", static_cast< int >(SARibbonTheme::RibbonThemeDark2));
+	mComboTheme->addItem("Theme Office2021 Green", static_cast< int >(SARibbonTheme::RibbonThemeOffice2021Green));
+	mComboTheme->addItem("Theme Office2021 Dark", static_cast< int >(SARibbonTheme::RibbonThemeOffice2021Dark));
 	mComboTheme->setCurrentIndex(mComboTheme->findData(static_cast< int >(SARibbonTheme::RibbonThemeOffice2013)));
 	connect(mComboTheme,
 	        QOverload< int >::of(&QComboBox::currentIndexChanged),

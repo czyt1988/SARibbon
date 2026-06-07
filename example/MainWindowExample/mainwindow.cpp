@@ -945,13 +945,7 @@ void MainWindow::onColorButtonColorClicked(const QColor& selectedColor, bool cli
 void MainWindow::onRibbonThemeComboBoxCurrentIndexChanged(int themeIndex)
 {
     SARibbonTheme selectedTheme = static_cast< SARibbonTheme >(mComboboxRibbonTheme->itemData(themeIndex).toInt());
-    if (selectedTheme == SARibbonTheme::RibbonThemeDark2) {
-        SA::SARibbonThemePalette palette;
-        palette.loadFromFile(":/SARibbonTheme/resource/palettes/dark2-default.json");
-        SA::applyRibbonTheme(this, ribbonBar(), selectedTheme, palette);
-    } else {
-        setRibbonTheme(selectedTheme);
-    }
+    setRibbonTheme(selectedTheme);
 }
 
 /**
@@ -1982,6 +1976,8 @@ void MainWindow::createCategoryMain(SARibbonCategory* categoryPage)
     mComboboxRibbonTheme->addItem(tr("Office 2021 Blue"), static_cast< int >(SARibbonTheme::RibbonThemeOffice2021Blue));
     mComboboxRibbonTheme->addItem(tr("Dark"), static_cast< int >(SARibbonTheme::RibbonThemeDark));
     mComboboxRibbonTheme->addItem(tr("Dark 2"), static_cast< int >(SARibbonTheme::RibbonThemeDark2));
+    mComboboxRibbonTheme->addItem(tr("Office 2021 Green"), static_cast< int >(SARibbonTheme::RibbonThemeOffice2021Green));
+    mComboboxRibbonTheme->addItem(tr("Office 2021 Dark"), static_cast< int >(SARibbonTheme::RibbonThemeOffice2021Dark));
     mComboboxRibbonTheme->setCurrentIndex(mComboboxRibbonTheme->findData(static_cast< int >(ribbonTheme())));
     connect(
         mComboboxRibbonTheme, QOverload< int >::of(&QComboBox::currentIndexChanged), this, &MainWindow::onRibbonThemeComboBoxCurrentIndexChanged

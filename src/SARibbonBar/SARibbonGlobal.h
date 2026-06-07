@@ -223,7 +223,9 @@ enum class SARibbonTheme
     RibbonThemeOffice2021Blue,  ///< Office 2021 - Blue theme
     RibbonThemeWindows7,        ///< Windows 7 theme
     RibbonThemeDark,            ///< Dark theme
-    RibbonThemeDark2            ///< Dark theme 2
+    RibbonThemeDark2,           ///< Dark theme 2
+    RibbonThemeOffice2021Green,   ///< Office 2021 - Green theme
+    RibbonThemeOffice2021Dark     ///< Office 2021 - Dark theme
 };
 
 /**

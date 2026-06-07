@@ -171,6 +171,10 @@ QString getBuiltInRibbonThemeQss(SARibbonTheme theme)
     case SARibbonTheme::RibbonThemeDark2:
         file.setFileName(":/SARibbonTheme/resource/theme-dark2.qss");
         break;
+    case SARibbonTheme::RibbonThemeOffice2021Green:
+    case SARibbonTheme::RibbonThemeOffice2021Dark:
+        file.setFileName(":/SARibbonTheme/resource/theme-office2021-blue.qss");
+        break;
     default:
         file.setFileName(":/SARibbonTheme/resource/theme-office2013.qss");
         break;

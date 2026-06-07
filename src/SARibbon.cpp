@@ -4475,12 +4475,186 @@ void SAColorToolButton::paintColor(QStylePainter* p,
 //sa ribbon
 
 /*** Start of inlined file: SARibbonUtil.cpp ***/
+
+/*** Start of inlined file: SARibbonThemePalette.h ***/
+#ifndef SARIBBONTHEMEPALETTE_H
+#define SARIBBONTHEMEPALETTE_H
+
+#include <QColor>
+#include <QHash>
+#include <QString>
+#include <QByteArray>
+
+namespace SA {
+
+/**
+ * \if ENGLISH
+ * @brief Color palette for SARibbon theme system
+ *
+ * SARibbonThemePalette manages a set of named color tokens used by the ribbon theming engine.
+ * Colors are organized into three layers: key colors (primary design tokens), derived colors
+ * (computed from key colors via lighten/darken rules), and fixed colors (absolute values).
+ *
+ * A palette is loaded from a JSON file or byte array. The JSON structure is as follows:
+ *
+ * @code
+ * {
+ *     "name": "office-blue",          // Optional. Theme name for identification only
+ *     "isDark": false,                // Optional. Defaults to false if omitted. true = dark theme; false = light theme.
+ *                                     // When true, derived rules reverse direction
+ *                                     // (darken becomes lighten and vice versa).
+ *
+ *     "keyColors": {                  // Required. Primary design tokens (name -> hex color string)
+ *         "accent": "#225497",        //   Main accent / brand color
+ *         "content-bg": "#f1f1f1",    //   Content area background color
+ *         "text-color": "#1a1a1a"     //   Default text color
+ *         // ... any number of custom token names
+ *     },
+ *
+ *     "derived": {                    // Optional. Colors derived from keyColors via rules
+ *         "accent-hover": {           //   Token name for the derived color
+ *             "fn": "lighten",        //   Derive function: "lighten" or "darken"
+ *             "base": "accent",       //   Source key color token name to derive from
+ *             "amount": 15            //   Intensity percentage (e.g. 15 = lighter(115) or darker(115))
+ *         },
+ *         "accent-pressed": {
+ *             "fn": "darken",
+ *             "base": "accent",
+ *             "amount": 10
+ *         }
+ *     },
+ *
+ *     "fixed": {                      // Optional. Absolute colors not tied to keyColors (name -> hex string)
+ *         "window-border": "#c0c0c0",
+ *         "separator": "#d0d0d0"
+ *     }
+ * }
+ * @endcode
+ *
+ * Color lookup priority via color(): derived colors are checked first, then keyColors, then fixed.
+ *
+ * Usage example:
+ * @code
+ * SA::SARibbonThemePalette palette;
+ * palette.loadFromFile(":/themes/light.json");
+ * QColor accent = palette.color("accent");
+ * QHash<QString, QString> allVars = palette.variables();
+ * @endcode
+ *
+ * @note When isDark() is true, derive rules automatically reverse direction
+ * (darken becomes lighten and vice versa) to maintain correct contrast.
+ * @see SARibbonBar
+ * \endif
+ *
+ * \if CHINESE
+ * @brief SARibbon主题系统的调色板
+ *
+ * SARibbonThemePalette管理Ribbon主题引擎使用的一组命名颜色标记。
+ * 颜色分为三层：键色（主要设计标记）、派生色（通过变亮/变暗规则从键色计算）和固定色（绝对值）。
+ *
+ * 调色板通过JSON文件或字节数组加载。JSON结构如下：
+ *
+ * @code
+ * {
+ *     "name": "office-blue",          // 可选。主题名称，仅作标识用途
+ *     "isDark": false,                // 可选。默认为false。true = 深色主题；false = 浅色主题
+ *                                     // 为true时，派生规则自动反转方向
+ *                                     // （变暗变为变亮，反之亦然）
+ *
+ *     "keyColors": {                  // 必填。主要设计标记（名称 -> 十六进制颜色字符串）
+ *         "accent": "#225497",        //   主色调/品牌色
+ *         "content-bg": "#f1f1f1",    //   内容区域背景色
+ *         "text-color": "#1a1a1a"     //   默认文字颜色
+ *         // ... 可自定义任意数量的标记名
+ *     },
+ *
+ *     "derived": {                    // 可选。通过规则从keyColors派生的颜色
+ *         "accent-hover": {           //   派生颜色的标记名
+ *             "fn": "lighten",        //   派生函数："lighten"（变亮）或"darken"（变暗）
+ *             "base": "accent",       //   源键色标记名，从此颜色进行派生
+ *             "amount": 15            //   强度百分比（例如15 = lighter(115)或darker(115)）
+ *         },
+ *         "accent-pressed": {
+ *             "fn": "darken",
+ *             "base": "accent",
+ *             "amount": 10
+ *         }
+ *     },
+ *
+ *     "fixed": {                      // 可选。不依赖键色的绝对颜色（名称 -> 十六进制字符串）
+ *         "window-border": "#c0c0c0",
+ *         "separator": "#d0d0d0"
+ *     }
+ * }
+ * @endcode
+ *
+ * color()查找优先级：先查派生色，再查键色，最后查固定色。
+ *
+ * 使用示例：
+ * @code
+ * SA::SARibbonThemePalette palette;
+ * palette.loadFromFile(":/themes/light.json");
+ * QColor accent = palette.color("accent");
+ * QHash<QString, QString> allVars = palette.variables();
+ * @endcode
+ *
+ * @note 当isDark()为true时，派生规则自动反转方向（变暗变为变亮，反之亦然），以保持正确的对比度。
+ * @see SARibbonBar
+ * \endif
+ */
+class SA_RIBBON_EXPORT SARibbonThemePalette
+{
+public:
+	// Constructor
+	SARibbonThemePalette();
+
+	// Load palette from a JSON byte array
+	bool loadFromJson(const QByteArray& json);
+
+	// Load palette from a JSON file (filesystem path or Qt resource path)
+	bool loadFromFile(const QString& jsonPath);
+
+	// Set the accent key color
+	void setAccentColor(const QColor& color);
+
+	// Set the content background key color
+	void setContentBgColor(const QColor& color);
+
+	// Set the text key color
+	void setTextColor(const QColor& color);
+
+	// Get a color by token name, searching derived, key, then fixed layers
+	QColor color(const QString& tokenName) const;
+
+	// Get all color variables as name-to-hex-string pairs
+	QHash<QString, QString> variables() const;
+
+	// Check if this palette is a dark theme
+	bool isDark() const;
+
+private:
+	QHash<QString, QColor> m_keyColors;
+	QHash<QString, QColor> m_derivedColors;
+	QHash<QString, QColor> m_fixedColors;
+	bool m_isDark { false };
+};
+
+} // namespace SA
+#endif // SARIBBONTHEMEPALETTE_H
+
+/*** End of inlined file: SARibbonThemePalette.h ***/
+
 #include <QFile>
 #include <QWidget>
 #include <QDebug>
 #include <QDir>
 #include <QApplication>
 #include <QScreen>
+#include <QGuiApplication>
+#include <QStyleHints>
+#include <QSettings>
+#include <QProcess>
+#include <QRegularExpression>
 #if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
 #include <QWindow>
 #else
@@ -4613,6 +4787,14 @@ QSize scaleSizeByWidth(const QSize& originalSize, int newWidth)
  */
 QString getBuiltInRibbonThemeQss(SARibbonTheme theme)
 {
+	// Load base QSS (common styles without colors) first
+	QFile baseFile(":/SARibbonTheme/resource/theme-base.qss");
+	QString baseQss;
+	if (baseFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+		baseQss = QString::fromUtf8(baseFile.readAll());
+	}
+
+	// Then load theme-specific QSS
 	QFile file;
 	switch (theme) {
 	case SARibbonTheme::RibbonThemeWindows7:
@@ -4633,15 +4815,20 @@ QString getBuiltInRibbonThemeQss(SARibbonTheme theme)
 	case SARibbonTheme::RibbonThemeDark2:
 		file.setFileName(":/SARibbonTheme/resource/theme-dark2.qss");
 		break;
+	case SARibbonTheme::RibbonThemeOffice2021Green:
+	case SARibbonTheme::RibbonThemeOffice2021Dark:
+		file.setFileName(":/SARibbonTheme/resource/theme-office2021-blue.qss");
+		break;
 	default:
 		file.setFileName(":/SARibbonTheme/resource/theme-office2013.qss");
 		break;
 	}
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
 		qWarning() << "can not load build in ribbon theme,reason is :" << file.errorString();
-		return QString();
+		return baseQss;
 	}
-	return QString::fromUtf8(file.readAll());
+	QString themeQss = QString::fromUtf8(file.readAll());
+	return baseQss + "\n" + themeQss;
 }
 
 /**
@@ -4758,10 +4945,834 @@ int saMirrorX(int x, int containerWidth, int elementWidth)
 	return x;
 }
 
+/**
+ * @brief Check if the operating system uses dark mode
+ *
+ * Detects dark mode via three tiers:
+ * 1. Qt 6.5+: Uses QGuiApplication::styleHints()->colorScheme()
+ * 2. Qt < 6.5 Windows: Reads registry AppsUseLightTheme
+ * 3. Qt < 6.5 macOS: Runs 'defaults read -g AppleInterfaceStyle'
+ * 4. Qt < 6.5 Linux: Runs 'gsettings get org.gnome.desktop.interface color-scheme'
+ * 5. All other cases: Returns false (assume light mode)
+ *
+ * @return true if OS dark mode is active, false otherwise
+ */
+bool isOperatingSystemInDarkMode()
+{
+#if QT_VERSION >= QT_VERSION_CHECK(6, 5, 0)
+	// Qt 6.5+ has native cross-platform API
+	return QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark;
+#elif defined(Q_OS_WIN32)
+	// Windows: Read registry AppsUseLightTheme
+	// DWORD value 0 = dark mode, 1 = light mode
+	// Registry path: HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize
+	QSettings settings(
+		"HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
+		QSettings::NativeFormat);
+	bool ok = false;
+	int value = settings.value("AppsUseLightTheme", 1).toInt(&ok);
+	return (ok && value == 0);
+#elif defined(Q_OS_MACOS)
+	// macOS: Run 'defaults read -g AppleInterfaceStyle'
+	// Returns "Dark" if dark mode is active, empty otherwise
+	QProcess process;
+	process.start("/usr/bin/defaults", QStringList() << "read" << "-g" << "AppleInterfaceStyle");
+	process.waitForFinished(3000);
+	QString output = QString::fromUtf8(process.readAllStandardOutput()).trimmed();
+	return output.contains("Dark", Qt::CaseInsensitive);
+#elif defined(Q_OS_LINUX)
+	// Linux: Try gsettings for GNOME 42+
+	// Returns "dark" or "prefer-dark" in dark mode
+	QProcess process;
+	process.start("gsettings", QStringList() << "get" << "org.gnome.desktop.interface" << "color-scheme");
+	process.waitForFinished(3000);
+	QString output = QString::fromUtf8(process.readAllStandardOutput()).trimmed();
+	return output.contains("dark", Qt::CaseInsensitive);
+#else
+	// Unknown platform or headless: assume light mode
+	return false;
+#endif
+}
+
+/**
+ * @brief Replace {{token}} and {{token|opacity(value)}} patterns in QSS templates with actual color values
+ * @param templateQss The QSS template string containing tokens
+ * @param palette The theme palette providing color values
+ * @return The QSS string with all tokens replaced
+ */
+QString replaceQssTokens(const QString& templateQss, const SARibbonThemePalette& palette)
+{
+	QString result               = templateQss;
+	QHash<QString, QString> vars = palette.variables();
+
+	QRegularExpression re("\\{\\{([^}|]+)(?:\\|opacity\\(([^)]+)\\))?\\}\\}");
+	QRegularExpressionMatchIterator it = re.globalMatch(result);
+
+	int offset = 0;
+	while (it.hasNext()) {
+		QRegularExpressionMatch match = it.next();
+		QString tokenName  = match.captured(1);
+		QString opacityStr = match.captured(2);
+
+		QString replacement;
+		if (vars.contains(tokenName)) {
+			QColor color(vars.value(tokenName));
+			if (!opacityStr.isEmpty()) {
+				bool ok;
+				float opacity = opacityStr.toFloat(&ok);
+				if (ok) {
+					int alpha = qRound(opacity * 255);
+					replacement = QString("#%1%2").arg(alpha, 2, 16, QChar('0')).arg(color.name().mid(1));
+				} else {
+					replacement = color.name();
+				}
+			} else {
+				replacement = color.name();
+			}
+		}
+
+		if (!replacement.isEmpty()) {
+			int start  = match.capturedStart() + offset;
+			int length = match.capturedLength();
+			result.replace(start, length, replacement);
+			offset += replacement.length() - length;
+		}
+	}
+
+	return result;
+}
+
 }
 
 /*** End of inlined file: SARibbonUtil.cpp ***/
 
+
+
+/*** Start of inlined file: SARibbonThemeManager.cpp ***/
+
+/*** Start of inlined file: SARibbonThemeManager.h ***/
+#ifndef SARIBBONTHEMEMANAGER_H
+#define SARIBBONTHEMEMANAGER_H
+
+class QWidget;
+class SARibbonBar;
+enum class SARibbonTheme;
+
+namespace SA
+{
+
+class SARibbonThemePalette;
+
+// Apply a built-in ribbon theme with fixed QSS to the widget and configure ribbon bar properties
+SA_RIBBON_EXPORT void applyRibbonTheme(QWidget* w, SARibbonBar* bar, SARibbonTheme theme);
+
+// Apply a ribbon theme with custom color palette, falling back to fixed QSS if palette is empty or no template found
+SA_RIBBON_EXPORT void applyRibbonTheme(QWidget* w, SARibbonBar* bar, SARibbonTheme theme,
+									   const SARibbonThemePalette& palette);
+
+}
+
+#endif  // SARIBBONTHEMEMANAGER_H
+/*** End of inlined file: SARibbonThemeManager.h ***/
+
+#include <map>
+#include <QMargins>
+#include <QColor>
+#include <QFile>
+#include <QIODevice>
+#include <QDir>
+#include <QCoreApplication>
+#include <QDebug>
+
+namespace SA
+{
+
+// ===================================================
+// Static theme data maps
+// ===================================================
+
+/// Tab margin per theme (affects SARibbonContextCategory drawing)
+static const std::map< SARibbonTheme, QMargins > s_themeMargins = {
+	{ SARibbonTheme::RibbonThemeWindows7, QMargins(5, 0, 0, 0) },
+	{ SARibbonTheme::RibbonThemeOffice2013, QMargins(5, 0, 0, 0) },
+	{ SARibbonTheme::RibbonThemeOffice2016Blue, QMargins(5, 0, 0, 0) },
+	{ SARibbonTheme::RibbonThemeDark, QMargins(5, 0, 0, 0) },
+	{ SARibbonTheme::RibbonThemeDark2, QMargins(5, 0, 0, 0) },
+	{ SARibbonTheme::RibbonThemeOffice2021Blue, QMargins(5, 0, 5, 0) },
+	{ SARibbonTheme::RibbonThemeOffice2021Green, QMargins(5, 0, 5, 0) },
+	{ SARibbonTheme::RibbonThemeOffice2021Dark, QMargins(5, 0, 5, 0) }
+};
+
+/// Highlight function: produce a darker variant of the context category color
+static const SARibbonBar::FpContextCategoryHighlight s_csDarkerHighlight = [](const QColor& c) -> QColor {
+	return c.darker();
+};
+
+/// Highlight function: produce a more vibrant variant of the context category color
+static const SARibbonBar::FpContextCategoryHighlight s_csVibrantHighlight = [](const QColor& c) -> QColor {
+	return SA::makeColorVibrant(c);
+};
+
+/// Context category highlight function per theme
+static const std::map< SARibbonTheme, SARibbonBar::FpContextCategoryHighlight > s_themeContextHighlights = {
+	{ SARibbonTheme::RibbonThemeWindows7, s_csVibrantHighlight },
+	{ SARibbonTheme::RibbonThemeOffice2013, s_csVibrantHighlight },
+	{ SARibbonTheme::RibbonThemeDark, s_csVibrantHighlight },
+	{ SARibbonTheme::RibbonThemeOffice2016Blue, s_csDarkerHighlight },
+	{ SARibbonTheme::RibbonThemeOffice2021Blue, [](const QColor&) -> QColor { return QColor(39, 96, 167); } },
+	{ SARibbonTheme::RibbonThemeDark2, s_csVibrantHighlight },
+	{ SARibbonTheme::RibbonThemeOffice2021Green, s_csVibrantHighlight },
+	{ SARibbonTheme::RibbonThemeOffice2021Dark, s_csVibrantHighlight }
+};
+
+/// Context category color list per theme
+static const std::map< SARibbonTheme, QList< QColor > > s_themeContextColorLists = {
+	{ SARibbonTheme::RibbonThemeWindows7, {} },
+	{ SARibbonTheme::RibbonThemeOffice2013, {} },
+	{ SARibbonTheme::RibbonThemeDark, {} },
+	{ SARibbonTheme::RibbonThemeOffice2016Blue, { QColor(18, 64, 120) } },
+	{ SARibbonTheme::RibbonThemeOffice2021Blue, { QColor(209, 207, 209) } },
+	{ SARibbonTheme::RibbonThemeDark2, { QColor(42, 141, 181) } },
+	{ SARibbonTheme::RibbonThemeOffice2021Green, { QColor(180, 200, 180) } },
+	{ SARibbonTheme::RibbonThemeOffice2021Dark, { QColor(80, 80, 80) } }
+};
+
+/// Tab bar baseline color per theme (only Office2013 has a visible baseline)
+static const std::map< SARibbonTheme, QColor > s_themeBaselineColors = {
+	{ SARibbonTheme::RibbonThemeWindows7, QColor() },
+	{ SARibbonTheme::RibbonThemeOffice2013, QColor(186, 201, 219) },
+	{ SARibbonTheme::RibbonThemeOffice2016Blue, QColor() },
+	{ SARibbonTheme::RibbonThemeOffice2021Blue, QColor() },
+	{ SARibbonTheme::RibbonThemeDark, QColor() },
+	{ SARibbonTheme::RibbonThemeDark2, QColor() },
+	{ SARibbonTheme::RibbonThemeOffice2021Green, QColor() },
+	{ SARibbonTheme::RibbonThemeOffice2021Dark, QColor() }
+};
+
+// ===================================================
+// applyRibbonTheme
+// ===================================================
+
+/**
+ * \if ENGLISH
+ * @brief Apply a built-in ribbon theme to the widget and configure the ribbon bar's theme-dependent properties.
+ *
+ * This performs the full theme-switch sequence:
+ * 1. Loads the QSS stylesheet for the theme onto @p w
+ * 2. Adjusts the tab bar margins to match the theme's QSS layout
+ * 3. Sets the context category color list for context tabs
+ * 4. Registers the context category highlight function (controls tab color when selected)
+ * 5. Sets the tab bar baseline color (visible only in Office2013)
+ *
+ * @param w The widget that receives the QSS stylesheet
+ * @param bar The SARibbonBar whose theme-dependent properties are configured (may be null)
+ * @param theme The built-in ribbon theme to apply
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 对窗口部件应用内置ribbon主题，并配置ribbon栏的主题依赖属性。
+ *
+ * 此函数执行完整的主题切换序列：
+ * 1. 将主题的 QSS 样式表加载到 @p w 上
+ * 2. 根据主题调整标签栏边距以匹配 QSS 布局
+ * 3. 设置上下文标签的颜色列表
+ * 4. 注册上下文标签高亮函数（控制标签选中时的颜色）
+ * 5. 设置标签栏基线颜色（仅在 Office2013 主题中可见）
+ *
+ * @param w 接收 QSS 样式表的窗口部件
+ * @param bar 需要配置主题依赖属性的 SARibbonBar（可为 null）
+ * @param theme 要应用的内置 ribbon 主题
+ * \endif
+ */
+// Forward declaration — defined later in this file
+static QString themeToPalettePath(SARibbonTheme theme);
+
+void applyRibbonTheme(QWidget* w, SARibbonBar* bar, SARibbonTheme theme)
+{
+	SARibbonThemePalette palette;
+	QString palettePath = themeToPalettePath(theme);
+	if (!palettePath.isEmpty()) {
+		if (palette.loadFromFile(palettePath)) {
+			applyRibbonTheme(w, bar, theme, palette);
+			return;
+		}
+		qWarning() << "applyRibbonTheme: failed to load palette" << palettePath
+					 << "for theme" << static_cast<int>(theme) << "- falling back to built-in QSS";
+	}
+	applyRibbonTheme(w, bar, theme, SARibbonThemePalette());
+}
+
+/// Map SARibbonTheme enum to the corresponding QSS template resource path.
+/// Returns empty string if no template exists for the given theme.
+static QString themeToTemplatePath(SARibbonTheme theme)
+{
+	switch (theme) {
+	case SARibbonTheme::RibbonThemeOffice2016Blue:
+		return ":/SARibbonTheme/resource/templates/office2016.qss";
+	case SARibbonTheme::RibbonThemeOffice2021Blue:
+	case SARibbonTheme::RibbonThemeOffice2021Green:
+	case SARibbonTheme::RibbonThemeOffice2021Dark:
+		return ":/SARibbonTheme/resource/templates/office2021.qss";
+	case SARibbonTheme::RibbonThemeDark:
+		return ":/SARibbonTheme/resource/templates/dark.qss";
+	case SARibbonTheme::RibbonThemeDark2:
+		return ":/SARibbonTheme/resource/templates/dark2.qss";
+	default:
+		// Themes without templates (win7, office2013) fall back to fixed QSS
+		return QString();
+	}
+}
+
+/// Map SARibbonTheme enum to the corresponding default palette JSON resource path.
+/// Returns empty string if no palette exists for the given theme.
+static QString themeToPalettePath(SARibbonTheme theme)
+{
+	switch (theme) {
+	case SARibbonTheme::RibbonThemeOffice2016Blue:
+		return ":/SARibbonTheme/resource/palettes/office2016-blue.json";
+	case SARibbonTheme::RibbonThemeOffice2021Blue:
+		return ":/SARibbonTheme/resource/palettes/office2021-blue.json";
+	case SARibbonTheme::RibbonThemeOffice2021Green:
+		return ":/SARibbonTheme/resource/palettes/office2021-green.json";
+	case SARibbonTheme::RibbonThemeOffice2021Dark:
+		return ":/SARibbonTheme/resource/palettes/office2021-dark.json";
+	case SARibbonTheme::RibbonThemeDark:
+		return ":/SARibbonTheme/resource/palettes/dark-default.json";
+	case SARibbonTheme::RibbonThemeDark2:
+		return ":/SARibbonTheme/resource/palettes/dark2-default.json";
+	default:
+		// Themes without palette definitions (win7, office2013) return empty
+		return QString();
+	}
+}
+
+/**
+ * \if ENGLISH
+ * @brief Apply a ribbon theme with custom color palette
+ *
+ * This overload loads the QSS template for the specified theme and replaces color tokens
+ * using the provided palette. If the palette is empty or no template is found for the theme,
+ * it falls back to the default fixed-QSS behavior (equivalent to the 3-arg overload).
+ *
+ * After applying the stylesheet, the function also configures theme-dependent ribbon bar
+ * properties: tab bar margins, context category colors, context category highlight function,
+ * and tab bar baseline color.
+ *
+ * @param w The widget that receives the QSS stylesheet
+ * @param bar The SARibbonBar whose theme-dependent properties are configured (may be null)
+ * @param theme The built-in ribbon theme to apply
+ * @param palette The color palette for token replacement in the QSS template
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 使用自定义调色板应用ribbon主题
+ *
+ * 此重载加载指定主题的QSS模板，并使用提供的调色板替换颜色标记。
+ * 如果调色板为空或主题没有对应的模板，则回退到默认的固定QSS行为（等同于3参数重载）。
+ *
+ * 应用样式表后，此函数还会配置主题依赖的ribbon栏属性：标签栏边距、上下文标签颜色、
+ * 上下文标签高亮函数以及标签栏基线颜色。
+ *
+ * @param w 接收QSS样式表的窗口部件
+ * @param bar 需要配置主题依赖属性的SARibbonBar（可为null）
+ * @param theme 要应用的内置ribbon主题
+ * @param palette 用于QSS模板中标记替换的调色板
+ * \endif
+ */
+void applyRibbonTheme(QWidget* w, SARibbonBar* bar, SARibbonTheme theme,
+					  const SARibbonThemePalette& palette)
+{
+	// If palette is provided and a template exists, use template-based approach
+	QString templatePath = themeToTemplatePath(theme);
+	if (palette.variables().size() > 0 && !templatePath.isEmpty() && w) {
+		QFile baseFile(":/SARibbonTheme/resource/theme-base.qss");
+		QString baseQss;
+		if (baseFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+			baseQss = QString::fromUtf8(baseFile.readAll());
+		}
+
+		// Load the QSS template
+		QFile templateFile(templatePath);
+		if (templateFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+			QString templateQss = QString::fromUtf8(templateFile.readAll());
+			// Replace {{token}} placeholders with palette colors
+			QString processedQss = SA::replaceQssTokens(templateQss, palette);
+			w->setStyleSheet(baseQss + "\n" + processedQss);
+		} else {
+			// Template file not found, fall back to fixed QSS
+			SA::setBuiltInRibbonTheme(w, theme);
+		}
+	} else {
+		// Empty palette or no template, default behavior
+		SA::setBuiltInRibbonTheme(w, theme);
+	}
+
+	if (!bar) {
+		return;
+	}
+
+	// 2. Adjust tab bar margins to match the theme's QSS layout
+	if (SARibbonTabBar* tab = bar->ribbonTabBar()) {
+		auto itMargins = s_themeMargins.find(theme);
+		if (itMargins != s_themeMargins.end()) {
+			tab->setTabMargin(itMargins->second);
+		}
+	}
+
+	// 3. Set context category color list
+	{
+		auto itColors = s_themeContextColorLists.find(theme);
+		if (itColors != s_themeContextColorLists.end()) {
+			bar->setContextCategoryColorList(itColors->second);
+		}
+	}
+
+	// 4. Register context category highlight function
+	{
+		auto itHighlight = s_themeContextHighlights.find(theme);
+		if (itHighlight != s_themeContextHighlights.end()) {
+			bar->setContextCategoryColorHighLight(itHighlight->second);
+		}
+	}
+
+	// 5. Set tab bar baseline color
+	{
+		auto itBaseline = s_themeBaselineColors.find(theme);
+		if (itBaseline != s_themeBaselineColors.end()) {
+			bar->setTabBarBaseLineColor(itBaseline->second);
+		}
+	}
+}
+
+}
+/*** End of inlined file: SARibbonThemeManager.cpp ***/
+
+
+/*** Start of inlined file: SARibbonThemePalette.cpp ***/
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QFile>
+
+namespace {
+// Apply a lighten/darken derive operation to a base color; reverses direction for dark themes
+QColor deriveColor(const QColor& base, const QString& fn, int amount, bool isDark)
+{
+	if (isDark) {
+		// Reverse direction for dark themes
+		if (fn == "darken") {
+			return base.lighter(100 + amount);
+		} else if (fn == "lighten") {
+			return base.darker(100 + amount);
+		}
+	} else {
+		if (fn == "darken") {
+			return base.darker(100 + amount);
+		} else if (fn == "lighten") {
+			return base.lighter(100 + amount);
+		}
+	}
+	return base;
+}
+} // anonymous namespace
+
+namespace SA {
+
+/**
+ * \if ENGLISH
+ * @brief Default constructor
+ * @details Creates an empty palette. Call loadFromJson() or loadFromFile() to populate it.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 默认构造函数
+ * @details 创建一个空调色板。调用loadFromJson()或loadFromFile()来填充颜色数据。
+ * \endif
+ */
+SARibbonThemePalette::SARibbonThemePalette() = default;
+
+/**
+ * \if ENGLISH
+ * @brief Load palette from a JSON file
+ * @param[in] jsonPath Filesystem path or Qt resource path (e.g. ":/themes/light.json")
+ * @return true if the file was read and parsed successfully, false otherwise
+ * @details Opens the file in read-only text mode, reads all content, then delegates to loadFromJson().
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 从JSON文件加载调色板
+ * @param[in] jsonPath 文件系统路径或Qt资源路径（例如":/themes/light.json"）
+ * @return 文件读取并解析成功返回true，否则返回false
+ * @details 以只读文本模式打开文件，读取全部内容后委托给loadFromJson()处理。
+ * \endif
+ */
+bool SARibbonThemePalette::loadFromFile(const QString& jsonPath)
+{
+	QFile file(jsonPath);
+	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+		return false;
+	}
+	QByteArray data = file.readAll();
+	file.close();
+	return loadFromJson(data);
+}
+
+/**
+ * \if ENGLISH
+ * @brief Load palette from a JSON byte array
+ * @param[in] json Raw JSON data containing the palette definition
+ * @return true if the JSON was parsed successfully, false on parse or format error
+ * @details The JSON object must contain the following top-level keys:
+ * - "isDark": boolean indicating dark theme mode
+ * - "keyColors": object mapping token names to hex color strings
+ * - "derived": object mapping token names to derive rules (fn, base, amount)
+ * - "fixed": object mapping token names to hex color strings
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 从JSON字节数组加载调色板
+ * @param[in] json 包含调色板定义的原始JSON数据
+ * @return JSON解析成功返回true，解析或格式错误返回false
+ * @details JSON对象必须包含以下顶层键：
+ * - "isDark"：布尔值，表示是否为深色主题
+ * - "keyColors"：将标记名映射到十六进制颜色字符串的对象
+ * - "derived"：将标记名映射到派生规则（fn、base、amount）的对象
+ * - "fixed"：将标记名映射到十六进制颜色字符串的对象
+ * \endif
+ */
+bool SARibbonThemePalette::loadFromJson(const QByteArray& json)
+{
+	QJsonParseError error;
+	QJsonDocument doc = QJsonDocument::fromJson(json, &error);
+	if (error.error != QJsonParseError::NoError) {
+		return false;
+	}
+
+	QJsonObject obj = doc.object();
+	m_isDark = obj.value("isDark").toBool(false);
+
+	QJsonObject keyColors = obj.value("keyColors").toObject();
+	for (auto it = keyColors.begin(); it != keyColors.end(); ++it) {
+		m_keyColors.insert(it.key(), QColor(it.value().toString()));
+	}
+
+	// Parse derived colors
+	QJsonObject derived = obj.value("derived").toObject();
+	for (auto it = derived.begin(); it != derived.end(); ++it) {
+		QJsonObject rule = it.value().toObject();
+		QString fn = rule.value("fn").toString();
+		QString baseName = rule.value("base").toString();
+		int amount = rule.value("amount").toInt(10);
+
+		if (m_keyColors.contains(baseName)) {
+			QColor base = m_keyColors.value(baseName);
+			QColor derivedC = ::deriveColor(base, fn, amount, m_isDark);
+			m_derivedColors.insert(it.key(), derivedC);
+		}
+	}
+
+	// Parse fixed colors
+	QJsonObject fixed = obj.value("fixed").toObject();
+	for (auto it = fixed.begin(); it != fixed.end(); ++it) {
+		m_fixedColors.insert(it.key(), QColor(it.value().toString()));
+	}
+
+	return true;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Get a color by token name
+ * @param[in] tokenName The color token name to look up
+ * @return The resolved QColor, or an invalid QColor if the token is not found
+ * @details Lookup order: derived colors first, then key colors, then fixed colors.
+ * Derived colors take precedence so that overrides via derive rules always win.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 按标记名获取颜色
+ * @param[in] tokenName 要查找的颜色标记名
+ * @return 解析后的QColor，如果标记未找到则返回无效的QColor
+ * @details 查找顺序：先查派生色，再查键色，最后查固定色。
+ * 派生色优先，以确保通过派生规则设置的覆盖始终生效。
+ * \endif
+ */
+QColor SARibbonThemePalette::color(const QString& tokenName) const
+{
+	if (m_derivedColors.contains(tokenName)) {
+		return m_derivedColors.value(tokenName);
+	}
+	if (m_keyColors.contains(tokenName)) {
+		return m_keyColors.value(tokenName);
+	}
+	if (m_fixedColors.contains(tokenName)) {
+		return m_fixedColors.value(tokenName);
+	}
+	return QColor();
+}
+
+/**
+ * \if ENGLISH
+ * @brief Get all color variables as name-to-hex-string pairs
+ * @return A hash mapping token names to their hex color strings (e.g. "#ff0000")
+ * @details Merges all three layers (key, derived, fixed) into a single hash.
+ * If the same name exists in multiple layers, the last written layer wins.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取所有颜色变量（名称到十六进制字符串的映射）
+ * @return 将标记名映射到其十六进制颜色字符串（例如"#ff0000"）的哈希表
+ * @details 将三个层（键色、派生色、固定色）合并到单个哈希表中。
+ * 如果多个层中存在相同的名称，最后写入的层优先。
+ * \endif
+ */
+QHash<QString, QString> SARibbonThemePalette::variables() const
+{
+	QHash<QString, QString> vars;
+	for (auto it = m_keyColors.cbegin(); it != m_keyColors.cend(); ++it) {
+		vars.insert(it.key(), it.value().name());
+	}
+	for (auto it = m_derivedColors.cbegin(); it != m_derivedColors.cend(); ++it) {
+		vars.insert(it.key(), it.value().name());
+	}
+	for (auto it = m_fixedColors.cbegin(); it != m_fixedColors.cend(); ++it) {
+		vars.insert(it.key(), it.value().name());
+	}
+	return vars;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Check if this palette represents a dark theme
+ * @return true if the palette was loaded with "isDark": true, false otherwise
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 检查此调色板是否表示深色主题
+ * @return 如果加载的调色板中"isDark"为true，则返回true，否则返回false
+ * \endif
+ */
+bool SARibbonThemePalette::isDark() const
+{
+	return m_isDark;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set the accent key color
+ * @param[in] color The new accent color
+ * @details Overwrites the "accent" entry in the key colors layer.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置强调色（键色层）
+ * @param[in] color 新的强调色
+ * @details 覆盖键色层中的"accent"条目。
+ * \endif
+ */
+void SARibbonThemePalette::setAccentColor(const QColor& color)
+{
+	m_keyColors.insert("accent", color);
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set the content background key color
+ * @param[in] color The new content background color
+ * @details Overwrites the "content-bg" entry in the key colors layer.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置内容背景色（键色层）
+ * @param[in] color 新的内容背景色
+ * @details 覆盖键色层中的"content-bg"条目。
+ * \endif
+ */
+void SARibbonThemePalette::setContentBgColor(const QColor& color)
+{
+	m_keyColors.insert("content-bg", color);
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set the text key color
+ * @param[in] color The new text color
+ * @details Overwrites the "text-color" entry in the key colors layer.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置文字颜色（键色层）
+ * @param[in] color 新的文字颜色
+ * @details 覆盖键色层中的"text-color"条目。
+ * \endif
+ */
+void SARibbonThemePalette::setTextColor(const QColor& color)
+{
+	m_keyColors.insert("text-color", color);
+}
+
+} // namespace SA
+
+/*** End of inlined file: SARibbonThemePalette.cpp ***/
+
+
+/*** Start of inlined file: SARibbonIconHelper.cpp ***/
+
+/*** Start of inlined file: SARibbonIconHelper.h ***/
+#ifndef SARIBBONTHEMEICONHELPER_H
+#define SARIBBONTHEMEICONHELPER_H
+
+#include <QIcon>
+#include <QPixmap>
+#include <QColor>
+#include <QSize>
+#include <QString>
+
+namespace SA {
+
+/**
+ * @brief Helper class for creating themed icons from SVG files
+ *
+ * Uses QPainter::CompositionMode_SourceIn to apply theme colors to monochrome SVGs,
+ * with QPixmapCache for performance. Supports HiDPI scaling.
+ */
+class SA_RIBBON_EXPORT SARibbonIconHelper
+{
+public:
+	/**
+	 * @brief Create a themed icon from an SVG file
+	 * @param svgPath Path to the SVG resource (e.g., ":/icons/menu.svg")
+	 * @param color Theme color to apply
+	 * @param size Target icon size (default 24x24)
+	 * @return QIcon with themed pixmap (includes @2x for HiDPI)
+	 */
+	static QIcon themedIcon(const QString& svgPath,
+						   const QColor& color,
+						   const QSize& size = QSize(24, 24));
+
+	/**
+	 * @brief Create themed icon with explicit cache key
+	 * @param svgPath Path to the SVG resource
+	 * @param color Theme color to apply
+	 * @param size Target icon size
+	 * @param cacheKey Unique cache identifier (auto-generated if empty)
+	 * @return QIcon with themed pixmap
+	 */
+	static QIcon themedIcon(const QString& svgPath,
+						   const QColor& color,
+						   const QSize& size,
+						   const QString& cacheKey);
+
+	/**
+	 * @brief Clear all cached themed icons
+	 *
+	 * Call this when the theme changes to prevent stale cached icons.
+	 */
+	static void clearIconCache();
+
+private:
+	static QPixmap createThemedPixmap(const QString& svgPath,
+									 const QColor& color,
+									 const QSize& size,
+									 qreal dpr);
+};
+
+} // end namespace SA
+
+#endif // SARIBBONTHEMEICONHELPER_H
+
+/*** End of inlined file: SARibbonIconHelper.h ***/
+
+#include <QSvgRenderer>
+#include <QPainter>
+#include <QPixmapCache>
+#include <QCryptographicHash>
+#include <QBuffer>
+
+namespace SA {
+
+QIcon SARibbonIconHelper::themedIcon(const QString& svgPath,
+									 const QColor& color,
+									 const QSize& size)
+{
+	// Generate cache key from svgPath + color
+	QString cacheKey = QString("sa_themed_%1_%2")
+		.arg(svgPath)
+		.arg(color.name(QColor::HexRgb));
+
+	return themedIcon(svgPath, color, size, cacheKey);
+}
+
+QIcon SARibbonIconHelper::themedIcon(const QString& svgPath,
+									 const QColor& color,
+									 const QSize& size,
+									 const QString& cacheKey)
+{
+	QString key1x = cacheKey + "_1x";
+	QString key2x = cacheKey + "_2x";
+
+	QPixmap pm1x, pm2x;
+
+	// Check cache for 1x pixmap
+	if (!QPixmapCache::find(key1x, &pm1x)) {
+		pm1x = createThemedPixmap(svgPath, color, size, 1.0);
+		if (!pm1x.isNull()) {
+			QPixmapCache::insert(key1x, pm1x);
+		}
+	}
+
+	// Check cache for 2x pixmap
+	if (!QPixmapCache::find(key2x, &pm2x)) {
+		pm2x = createThemedPixmap(svgPath, color, size, 2.0);
+		if (!pm2x.isNull()) {
+			QPixmapCache::insert(key2x, pm2x);
+		}
+	}
+
+	QIcon icon;
+	if (!pm1x.isNull()) {
+		icon.addPixmap(pm1x);
+	}
+	if (!pm2x.isNull()) {
+		icon.addPixmap(pm2x);
+	}
+
+	return icon;
+}
+
+void SARibbonIconHelper::clearIconCache()
+{
+	QPixmapCache::clear();
+}
+
+QPixmap SARibbonIconHelper::createThemedPixmap(const QString& svgPath,
+												const QColor& color,
+												const QSize& size,
+												qreal dpr)
+{
+	QSvgRenderer renderer(svgPath);
+	if (!renderer.isValid()) {
+		return QPixmap();
+	}
+
+	QSize pxSize = size * dpr;
+	QPixmap px(pxSize);
+	px.fill(Qt::transparent);
+	px.setDevicePixelRatio(dpr);
+
+	QPainter painter(&px);
+	painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+	renderer.render(&painter);
+
+	painter.setCompositionMode(QPainter::CompositionMode_SourceIn);
+	painter.fillRect(px.rect(), color);
+	painter.end();
+
+	return px;
+}
+
+} // end namespace SA
+
+/*** End of inlined file: SARibbonIconHelper.cpp ***/
 
 
 /*** Start of inlined file: SAFramelessHelper.cpp ***/
@@ -8505,6 +9516,618 @@ void SARibbonToolButton::drawArrow(const QStyle* style,
 }
 
 /*** End of inlined file: SARibbonToolButton.cpp ***/
+
+
+/*** Start of inlined file: SARibbonButtonLayoutStrategy.cpp ***/
+#include <QFontMetrics>
+#include <QLatin1Char>
+
+// 布局常量定义 (与SARibbonToolButton.cpp中保持一致)
+namespace
+{
+constexpr int MIN_BUTTON_WIDTH               = 16;
+constexpr int GLOBAL_STRUT_WIDTH             = 2;
+constexpr int GLOBAL_STRUT_HEIGHT            = 2;
+constexpr qreal LARGE_BUTTON_HEIGHT_FACTOR   = 4.8;
+constexpr qreal LARGE_BUTTON_MIN_WIDTH_RATIO = 0.75;
+constexpr int SMALL_BUTTON_HEIGHT_OFFSET     = 2;
+constexpr int INDICATOR_HEIGHT_FACTOR_NUM    = 12;
+constexpr int INDICATOR_HEIGHT_FACTOR_DEN    = 10;
+}
+
+// SARibbonButtonLayoutContext
+
+SARibbonButtonLayoutContext::SARibbonButtonLayoutContext(const SARibbonToolButton* btn) : buttonWidget(btn)
+{
+	if (btn) {
+		spacing                  = btn->spacing();
+		largeIconSize            = btn->largeIconSize();
+		smallIconSize            = btn->smallIconSize();
+		const auto& factor       = btn->layoutFactor();
+		twoLineHeightFactor      = factor.twoLineHeightFactor;
+		oneLineHeightFactor      = factor.oneLineHeightFactor;
+		buttonMaximumAspectRatio = factor.buttonMaximumAspectRatio;
+		enableWordWrap           = btn->isEnableWordWrap();
+		maximumWidth             = btn->maximumWidth();
+	}
+}
+
+// SARibbonButtonLayoutStrategy
+
+bool SARibbonButtonLayoutStrategy::hasIndicator(const QStyleOptionToolButton& opt)
+{
+	return ((opt.features & QStyleOptionToolButton::MenuButtonPopup) || (opt.features & QStyleOptionToolButton::HasMenu));
+}
+
+QSize SARibbonButtonLayoutStrategy::adjustIconSize(const QRect& buttonRect, const QSize& originIconSize)
+{
+	if (buttonRect.isEmpty() || originIconSize.isEmpty()) {
+		return QSize(0, 0);
+	}
+
+	QSize iconSize = originIconSize;
+
+	if (iconSize.width() <= buttonRect.width() && iconSize.height() <= buttonRect.height()) {
+		return iconSize;
+	}
+
+	qreal aspectRatio = static_cast< qreal >(originIconSize.width()) / originIconSize.height();
+
+	if (iconSize.height() > buttonRect.height()) {
+		iconSize.setHeight(buttonRect.height());
+		iconSize.setWidth(qRound(buttonRect.height() * aspectRatio));
+	}
+
+	if (iconSize.width() > buttonRect.width()) {
+		iconSize.setWidth(buttonRect.width());
+		iconSize.setHeight(qRound(buttonRect.width() / aspectRatio));
+	}
+
+	iconSize.setWidth(qMin(iconSize.width(), buttonRect.width()));
+	iconSize.setHeight(qMin(iconSize.height(), buttonRect.height()));
+
+	return iconSize;
+}
+
+QString SARibbonButtonLayoutStrategy::simplifiedText(const QString& str)
+{
+	QString res = str;
+	res.remove('\n');
+	return res;
+}
+
+int SARibbonButtonLayoutStrategy::estimateTextWidth(int buttonHeight,
+													int textHeight,
+													const QString& text,
+													const QFontMetrics& fm,
+													SARibbonButtonLayoutContext& ctx) const
+{
+	QSize textSize;
+	int space        = SA::compat::horizontalAdvance(fm, QLatin1Char(' ')) * 2;
+	int hintMaxWidth = qMin(static_cast< int >(buttonHeight * ctx.buttonMaximumAspectRatio), ctx.maximumWidth);
+
+	if (ctx.enableWordWrap) {
+		textSize = fm.size(Qt::TextShowMnemonic, text);
+		textSize.setWidth(textSize.width() + space);
+
+		if (textSize.height() > fm.lineSpacing() * 1.1) {
+			ctx.isTextNeedWrap = true;
+			return textSize.width();
+		}
+
+		if (textSize.width() <= hintMaxWidth) {
+			ctx.isTextNeedWrap = false;
+			return textSize.width();
+		}
+
+		int alignment = Qt::TextShowMnemonic | Qt::TextWordWrap;
+		int minWidth  = textSize.width() / 2;
+		int maxWidth  = textSize.width();
+		int bestWidth = maxWidth;
+
+		for (int i = 0; i < 10; ++i) {
+			int midWidth = (minWidth + maxWidth) / 2;
+			QRect textRect(0, 0, midWidth, textHeight);
+			textRect = fm.boundingRect(textRect, alignment, text);
+
+			if (textRect.height() <= fm.lineSpacing() * 2) {
+				bestWidth = midWidth;
+				maxWidth  = midWidth - 1;
+			} else {
+				minWidth = midWidth + 1;
+			}
+
+			if (minWidth > maxWidth) {
+				break;
+			}
+		}
+
+		ctx.isTextNeedWrap = true;
+		return bestWidth;
+	}
+
+	ctx.isTextNeedWrap = false;
+	textSize           = fm.size(Qt::TextShowMnemonic, simplifiedText(text));
+	textSize.setWidth(textSize.width() + space);
+
+	if (textSize.width() < hintMaxWidth) {
+		return textSize.width();
+	}
+	return hintMaxWidth;
+}
+
+// SARibbonLargeButtonLayoutStrategy
+
+void SARibbonLargeButtonLayoutStrategy::calculateDrawRects(const QStyleOptionToolButton& opt,
+														   SARibbonButtonLayoutRects& rects,
+														   const SARibbonButtonLayoutContext& ctx) const
+{
+	rects.clear();
+
+	switch (opt.toolButtonStyle) {
+	case Qt::ToolButtonIconOnly:
+		calculateIconOnlyRects(opt, rects, ctx);
+		break;
+	case Qt::ToolButtonTextOnly:
+		calculateTextOnlyRects(opt, rects, ctx);
+		break;
+	default:
+		calculateIconAndTextRects(opt, rects, ctx);
+		break;
+	}
+}
+
+/**
+ * \if ENGLISH
+ * @brief Calculate layout rects for large button with icon only style
+ * @param[in] opt Style option for the tool button
+ * @param[out] rects Output rectangles collection
+ * @param[in] ctx Layout context containing layout parameters
+ * @details Supports both LTR and RTL layouts. In RTL mode, indicator is positioned at bottom-left corner.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 计算仅显示图标的大按钮布局矩形
+ * @param[in] opt 工具按钮的样式选项
+ * @param[out] rects 输出的矩形集合
+ * @param[in] ctx 包含布局参数的布局上下文
+ * @details 同时支持LTR和RTL布局。在RTL模式下，指示器位于左下角。
+ * \endif
+ */
+void SARibbonLargeButtonLayoutStrategy::calculateIconOnlyRects(const QStyleOptionToolButton& opt,
+															   SARibbonButtonLayoutRects& rects,
+															   const SARibbonButtonLayoutContext& ctx) const
+{
+	bool hasInd      = hasIndicator(opt);
+	int spacing      = ctx.spacing;
+	int indicatorLen = ctx.indicatorLength;
+
+	if (hasInd) {
+		int indicatorHeight = static_cast< int >(indicatorLen * INDICATOR_HEIGHT_FACTOR_NUM / INDICATOR_HEIGHT_FACTOR_DEN);
+		rects.indicatorRect = QRect(opt.rect.left() + spacing,
+									opt.rect.bottom() - indicatorHeight - spacing,
+									opt.rect.width() - 2 * spacing,
+									indicatorHeight);
+		rects.iconRect      = QRect(opt.rect.left() + spacing,
+							   opt.rect.top() + spacing,
+							   opt.rect.width() - 2 * spacing,
+							   opt.rect.height() - 2 * spacing - indicatorHeight);
+	} else {
+		rects.iconRect = QRect(opt.rect.left() + spacing,
+							   opt.rect.top() + spacing,
+							   opt.rect.width() - 2 * spacing,
+							   opt.rect.height() - 2 * spacing);
+	}
+}
+
+/**
+ * \if ENGLISH
+ * @brief Calculate layout rects for large button with text only style
+ * @param[in] opt Style option for the tool button
+ * @param[out] rects Output rectangles collection
+ * @param[in] ctx Layout context containing layout parameters
+ * @details Supports both LTR and RTL layouts. In RTL mode, text is right-aligned.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 计算仅显示文本的大按钮布局矩形
+ * @param[in] opt 工具按钮的样式选项
+ * @param[out] rects 输出的矩形集合
+ * @param[in] ctx 包含布局参数的布局上下文
+ * @details 同时支持LTR和RTL布局。在RTL模式下，文本右对齐。
+ * \endif
+ */
+void SARibbonLargeButtonLayoutStrategy::calculateTextOnlyRects(const QStyleOptionToolButton& opt,
+															   SARibbonButtonLayoutRects& rects,
+															   const SARibbonButtonLayoutContext& ctx) const
+{
+	bool hasInd      = hasIndicator(opt);
+	int spacing      = ctx.spacing;
+	int indicatorLen = ctx.indicatorLength;
+
+	if (hasInd) {
+		int indicatorHeight = static_cast< int >(indicatorLen * INDICATOR_HEIGHT_FACTOR_NUM / INDICATOR_HEIGHT_FACTOR_DEN);
+		rects.indicatorRect = QRect(opt.rect.left() + spacing,
+									opt.rect.bottom() - indicatorHeight - spacing,
+									opt.rect.width() - 2 * spacing,
+									indicatorHeight);
+		rects.textRect      = QRect(opt.rect.left() + spacing,
+							   opt.rect.top() + spacing,
+							   opt.rect.width() - 2 * spacing,
+							   opt.rect.height() - 2 * spacing - indicatorHeight);
+	} else {
+		rects.textRect = QRect(opt.rect.left() + spacing,
+							   opt.rect.top() + spacing,
+							   opt.rect.width() - 2 * spacing,
+							   opt.rect.height() - 2 * spacing);
+	}
+}
+
+/**
+ * \if ENGLISH
+ * @brief Calculate layout rects for large button with both icon and text
+ * @param[in] opt Style option for the tool button
+ * @param[out] rects Output rectangles collection
+ * @param[in] ctx Layout context containing layout parameters
+ * @details Supports both LTR and RTL layouts. In RTL mode:
+ * - Indicator is positioned at bottom-left corner
+ * - Text is right-aligned
+ * - Icon remains centered
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 计算同时显示图标和文本的大按钮布局矩形
+ * @param[in] opt 工具按钮的样式选项
+ * @param[out] rects 输出的矩形集合
+ * @param[in] ctx 包含布局参数的布局上下文
+ * @details 同时支持LTR和RTL布局。在RTL模式下：
+ * - 指示器位于左下角
+ * - 文本右对齐
+ * - 图标保持居中
+ * \endif
+ */
+void SARibbonLargeButtonLayoutStrategy::calculateIconAndTextRects(const QStyleOptionToolButton& opt,
+																  SARibbonButtonLayoutRects& rects,
+																  const SARibbonButtonLayoutContext& ctx) const
+{
+	int spacing      = ctx.spacing;
+	int indicatorLen = ctx.indicatorLength;
+	bool hasInd      = hasIndicator(opt);
+
+	if (!hasInd) {
+		indicatorLen = 0;
+	}
+
+	int textHeight = calculateTextHeight(opt, ctx);
+
+	if (ctx.enableWordWrap && ctx.isTextNeedWrap) {
+		rects.textRect = QRect(opt.rect.left() + spacing,
+							   opt.rect.bottom() - spacing - textHeight,
+							   opt.rect.width() - 2 * spacing - indicatorLen,
+							   textHeight);
+		if (hasInd) {
+			int indX = rects.textRect.right();
+			if (SA::saIsRTL()) {
+				indX = SA::saMirrorX(indX, opt.rect.width(), indicatorLen);
+				rects.textRect.moveLeft(opt.rect.right() - spacing - rects.textRect.width());
+			}
+			rects.indicatorRect = QRect(
+				indX, rects.textRect.y() + rects.textRect.height() / 2, indicatorLen, textHeight / 2);
+		} else if (SA::saIsRTL()) {
+			rects.textRect.moveLeft(opt.rect.right() - spacing - rects.textRect.width());
+		}
+	} else if (ctx.enableWordWrap) {
+		rects.textRect = QRect(
+			opt.rect.left() + spacing, opt.rect.bottom() - spacing - textHeight, opt.rect.width() - 2 * spacing, textHeight);
+		if (hasInd) {
+			int dy = rects.textRect.height() / 2;
+			dy += (dy - indicatorLen) / 2;
+			rects.indicatorRect =
+				QRect(rects.textRect.left(), rects.textRect.top() + dy, rects.textRect.width(), indicatorLen);
+		}
+		if (SA::saIsRTL()) {
+			rects.textRect.moveLeft(opt.rect.right() - spacing - rects.textRect.width());
+		}
+	} else {
+		int y = opt.rect.bottom() - spacing - textHeight;
+		if (hasInd) {
+			int indX = opt.rect.right() - indicatorLen - spacing;
+			int textX = spacing;
+			int textWidth = indX - spacing;
+			if (SA::saIsRTL()) {
+				indX = spacing;
+				textX = indX + indicatorLen;
+				textWidth = opt.rect.width() - 2 * spacing - indicatorLen;
+			}
+			rects.indicatorRect = QRect(indX, y, indicatorLen, textHeight);
+			rects.textRect      = QRect(textX, y, textWidth, textHeight);
+		} else {
+			rects.textRect = QRect(opt.rect.left() + spacing, y, opt.rect.width() - 2 * spacing, textHeight);
+			if (SA::saIsRTL()) {
+				rects.textRect.moveLeft(opt.rect.right() - spacing - rects.textRect.width());
+			}
+		}
+	}
+
+	rects.iconRect = QRect(spacing, spacing, opt.rect.width() - 2 * spacing, rects.textRect.top() - 2 * spacing);
+}
+
+QSize SARibbonLargeButtonLayoutStrategy::calculateSizeHint(const QStyleOptionToolButton& opt,
+														   const SARibbonButtonLayoutContext& ctx) const
+{
+	int w    = 0;
+	int h    = opt.fontMetrics.lineSpacing() * LARGE_BUTTON_HEIGHT_FACTOR;
+	int minW = static_cast< int >(h * LARGE_BUTTON_MIN_WIDTH_RATIO);
+
+	if (ctx.buttonWidget) {
+		if (SARibbonPanel* panel = qobject_cast< SARibbonPanel* >(ctx.buttonWidget->parent())) {
+			h = panel->largeButtonHeight();
+		}
+	}
+
+	int textHeight = calculateTextHeight(opt, ctx);
+
+	SARibbonButtonLayoutContext mutableCtx = ctx;
+	w                                      = estimateTextWidth(h, textHeight, opt.text, opt.fontMetrics, mutableCtx);
+	w += (2 * ctx.spacing);
+
+	if (ctx.enableWordWrap && mutableCtx.isTextNeedWrap) {
+		w += ctx.indicatorLength;
+	}
+
+	return QSize(w, h).expandedTo(QSize(minW, textHeight)).expandedTo(QSize(GLOBAL_STRUT_WIDTH, GLOBAL_STRUT_HEIGHT));
+}
+
+int SARibbonLargeButtonLayoutStrategy::calculateTextHeight(const QStyleOptionToolButton& opt,
+														   const SARibbonButtonLayoutContext& ctx) const
+{
+	if (ctx.enableWordWrap) {
+		return opt.fontMetrics.lineSpacing() * ctx.twoLineHeightFactor + opt.fontMetrics.leading();
+	} else {
+		return opt.fontMetrics.lineSpacing() * ctx.oneLineHeightFactor;
+	}
+}
+
+// SARibbonSmallButtonLayoutStrategy
+
+void SARibbonSmallButtonLayoutStrategy::calculateDrawRects(const QStyleOptionToolButton& opt,
+														   SARibbonButtonLayoutRects& rects,
+														   const SARibbonButtonLayoutContext& ctx) const
+{
+	rects.clear();
+
+	switch (opt.toolButtonStyle) {
+	case Qt::ToolButtonIconOnly:
+		calculateIconOnlyRects(opt, rects, ctx);
+		break;
+	case Qt::ToolButtonTextOnly:
+		calculateTextOnlyRects(opt, rects, ctx);
+		break;
+	default:
+		calculateIconAndTextRects(opt, rects, ctx);
+		break;
+	}
+}
+
+/**
+ * \if ENGLISH
+ * @brief Calculate layout rects for small button with icon only style
+ * @param[in] opt Style option for the tool button
+ * @param[out] rects Output rectangles collection
+ * @param[in] ctx Layout context containing layout parameters
+ * @details Supports both LTR and RTL layouts. In RTL mode:
+ * - Indicator is positioned at left edge
+ * - Icon is positioned at right side of the indicator
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 计算仅显示图标的小按钮布局矩形
+ * @param[in] opt 工具按钮的样式选项
+ * @param[out] rects 输出的矩形集合
+ * @param[in] ctx 包含布局参数的布局上下文
+ * @details 同时支持LTR和RTL布局。在RTL模式下：
+ * - 指示器位于左边缘
+ * - 图标位于指示器的右侧
+ * \endif
+ */
+void SARibbonSmallButtonLayoutStrategy::calculateIconOnlyRects(const QStyleOptionToolButton& opt,
+															   SARibbonButtonLayoutRects& rects,
+															   const SARibbonButtonLayoutContext& ctx) const
+{
+	int spacing      = ctx.spacing;
+	int indicatorLen = ctx.indicatorLength;
+
+	if (hasIndicator(opt)) {
+		if (SA::saIsRTL()) {
+			rects.indicatorRect = QRect(opt.rect.left() + spacing, opt.rect.top() + spacing, indicatorLen, opt.rect.height() - 2 * spacing);
+			rects.iconRect = opt.rect.adjusted(indicatorLen + spacing, spacing, -spacing, -spacing);
+		} else {
+			rects.iconRect = opt.rect.adjusted(spacing, spacing, -indicatorLen - spacing, -spacing);
+			rects.indicatorRect =
+				QRect(opt.rect.right() - indicatorLen - spacing, rects.iconRect.y(), indicatorLen, rects.iconRect.height());
+		}
+	} else {
+		rects.iconRect = opt.rect.adjusted(spacing, spacing, -spacing, -spacing);
+	}
+}
+
+/**
+ * \if ENGLISH
+ * @brief Calculate layout rects for small button with text only style
+ * @param[in] opt Style option for the tool button
+ * @param[out] rects Output rectangles collection
+ * @param[in] ctx Layout context containing layout parameters
+ * @details Supports both LTR and RTL layouts. In RTL mode:
+ * - Indicator is positioned at left edge
+ * - Text is positioned at right side of the indicator
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 计算仅显示文本的小按钮布局矩形
+ * @param[in] opt 工具按钮的样式选项
+ * @param[out] rects 输出的矩形集合
+ * @param[in] ctx 包含布局参数的布局上下文
+ * @details 同时支持LTR和RTL布局。在RTL模式下：
+ * - 指示器位于左边缘
+ * - 文本位于指示器的右侧
+ * \endif
+ */
+void SARibbonSmallButtonLayoutStrategy::calculateTextOnlyRects(const QStyleOptionToolButton& opt,
+															   SARibbonButtonLayoutRects& rects,
+															   const SARibbonButtonLayoutContext& ctx) const
+{
+	int spacing      = ctx.spacing;
+	int indicatorLen = ctx.indicatorLength;
+
+	if (hasIndicator(opt)) {
+		if (SA::saIsRTL()) {
+			rects.indicatorRect = QRect(opt.rect.left() + spacing, spacing, indicatorLen, opt.rect.height() - 2 * spacing);
+			rects.textRect = opt.rect.adjusted(indicatorLen + spacing, spacing, -spacing, -spacing);
+		} else {
+			rects.textRect = opt.rect.adjusted(spacing, spacing, -indicatorLen - spacing, -spacing);
+			rects.indicatorRect =
+				QRect(opt.rect.right() - indicatorLen - spacing, spacing, indicatorLen, rects.textRect.height());
+		}
+	} else {
+		rects.textRect = opt.rect.adjusted(spacing, spacing, -spacing, -spacing);
+	}
+}
+
+/**
+ * \if ENGLISH
+ * @brief Calculate layout rects for small button with both icon and text
+ * @param[in] opt Style option for the tool button
+ * @param[out] rects Output rectangles collection
+ * @param[in] ctx Layout context containing layout parameters
+ * @details Supports both LTR and RTL layouts. In RTL mode:
+ * - Indicator is positioned at left edge
+ * - Text is positioned at left side, next to indicator
+ * - Icon is positioned at right edge
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 计算同时显示图标和文本的小按钮布局矩形
+ * @param[in] opt 工具按钮的样式选项
+ * @param[out] rects 输出的矩形集合
+ * @param[in] ctx 包含布局参数的布局上下文
+ * @details 同时支持LTR和RTL布局。在RTL模式下：
+ * - 指示器位于左边缘
+ * - 文本位于左侧，紧邻指示器
+ * - 图标位于右边缘
+ * \endif
+ */
+void SARibbonSmallButtonLayoutStrategy::calculateIconAndTextRects(const QStyleOptionToolButton& opt,
+																  SARibbonButtonLayoutRects& rects,
+																  const SARibbonButtonLayoutContext& ctx) const
+{
+	bool hasInd      = hasIndicator(opt);
+	int spacing      = ctx.spacing;
+	int indicatorLen = ctx.indicatorLength;
+
+	QRect buttonRect = opt.rect;
+	buttonRect.adjust(spacing, spacing, -spacing, -spacing);
+
+	if (!opt.icon.isNull()) {
+		QSize iconSize = adjustIconSize(buttonRect, opt.iconSize);
+		int iconX = buttonRect.x();
+		if (SA::saIsRTL()) {
+			iconX = buttonRect.right() - iconSize.width();
+		}
+		rects.iconRect =
+			QRect(iconX, buttonRect.y(), iconSize.width(), qMax(iconSize.height(), buttonRect.height()));
+	}
+
+	if (!opt.text.isEmpty()) {
+		int adjx = rects.iconRect.isValid() ? (rects.iconRect.width() + spacing) : 0;
+		int textX = rects.iconRect.isValid() ? (SA::saIsRTL() ? buttonRect.x() : rects.iconRect.right() + spacing) : buttonRect.x();
+		int textRightMargin = hasInd ? indicatorLen : 0;
+		int textWidth = SA::saIsRTL() ? (rects.iconRect.isValid() ? (rects.iconRect.x() - spacing - textX - textRightMargin) : (buttonRect.width() - textRightMargin)) : (buttonRect.width() - adjx - textRightMargin);
+
+		rects.textRect = QRect(textX, buttonRect.y(), textWidth, buttonRect.height());
+	}
+
+	if (hasInd) {
+		int indX = buttonRect.right() - indicatorLen + 1;
+		if (SA::saIsRTL()) {
+			indX = buttonRect.left();
+		}
+		if (rects.textRect.isValid()) {
+			rects.indicatorRect =
+				QRect(indX, rects.textRect.y(), indicatorLen, rects.textRect.height());
+		} else if (rects.iconRect.isValid()) {
+			rects.indicatorRect =
+				QRect(indX, rects.iconRect.y(), indicatorLen, rects.iconRect.height());
+		} else {
+			rects.indicatorRect = buttonRect;
+		}
+	}
+}
+
+QSize SARibbonSmallButtonLayoutStrategy::calculateSizeHint(const QStyleOptionToolButton& opt,
+														   const SARibbonButtonLayoutContext& ctx) const
+{
+	int w = 0, h = 0;
+	int spacing = ctx.spacing;
+
+	switch (opt.toolButtonStyle) {
+	case Qt::ToolButtonIconOnly:
+		w = opt.iconSize.width() + 2 * spacing;
+		h = opt.iconSize.height() + 2 * spacing;
+		break;
+	case Qt::ToolButtonTextOnly: {
+		QSize textSize = opt.fontMetrics.size(Qt::TextShowMnemonic, simplifiedText(opt.text));
+		textSize.setWidth(textSize.width() + SA::compat::horizontalAdvance(opt.fontMetrics, QLatin1Char(' ')) * 2);
+		textSize.setHeight(calculateTextHeight(opt, ctx));
+		w = textSize.width() + 2 * spacing;
+		h = textSize.height() + 2 * spacing;
+	} break;
+	default:
+		w = opt.iconSize.width() + 2 * spacing;
+		h = opt.iconSize.height() + 2 * spacing;
+		if (!opt.text.isEmpty()) {
+			QSize textSize = opt.fontMetrics.size(Qt::TextShowMnemonic, simplifiedText(opt.text));
+			textSize.setWidth(textSize.width() + SA::compat::horizontalAdvance(opt.fontMetrics, QLatin1Char(' ')) * 2);
+			textSize.setHeight(calculateTextHeight(opt, ctx));
+			w += spacing + textSize.width();
+			h = qMax(h, textSize.height() + 2 * spacing);
+		} else {
+			QSize textSize = opt.fontMetrics.size(Qt::TextShowMnemonic, QStringLiteral(" "));
+			h              = qMax(h, textSize.height() + 2 * spacing);
+		}
+	}
+
+	if (hasIndicator(opt)) {
+		w += ctx.indicatorLength;
+	}
+
+	if (w < MIN_BUTTON_WIDTH) {
+		w = MIN_BUTTON_WIDTH;
+	}
+
+	return QSize(w, h).expandedTo(QSize(GLOBAL_STRUT_WIDTH, GLOBAL_STRUT_HEIGHT));
+}
+
+int SARibbonSmallButtonLayoutStrategy::calculateTextHeight(const QStyleOptionToolButton& opt,
+														   const SARibbonButtonLayoutContext& ctx) const
+{
+	Q_UNUSED(ctx)
+	return opt.rect.height() - SMALL_BUTTON_HEIGHT_OFFSET;
+}
+
+// SARibbonButtonLayoutStrategyFactory
+
+std::unique_ptr< SARibbonButtonLayoutStrategy > SARibbonButtonLayoutStrategyFactory::createStrategy(SARibbonButtonType type)
+{
+	switch (type) {
+	case SARibbonButtonType::LargeButton:
+		return std::make_unique< SARibbonLargeButtonLayoutStrategy >();
+	case SARibbonButtonType::SmallButton:
+	default:
+		return std::make_unique< SARibbonSmallButtonLayoutStrategy >();
+	}
+}
+
+/*** End of inlined file: SARibbonButtonLayoutStrategy.cpp ***/
 
 
 /*** Start of inlined file: SARibbonColorToolButton.cpp ***/
@@ -29728,6 +31351,7 @@ SARibbonCustomizeWidget* SARibbonCustomizeDialog::customizeWidget() const
 #include <QHash>
 #include <QWindowStateChangeEvent>
 #include <QScreen>
+#include <QTimer>
 
 #if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
 #include <QWKWidgets/widgetwindowagent.h>
@@ -29749,9 +31373,6 @@ public:
 	bool isUseRibbonFrame() const;
 	bool isUseNativeFrame() const;
 	void checkMainWindowFlag();
-	static void updateTabBarMargins(SARibbonTabBar* tab, SARibbonTheme theme);
-	static void updateContextColors(SARibbonBar* bar, SARibbonTheme theme);
-	static void updateTabBarBaseLineColor(SARibbonBar* bar, SARibbonTheme theme);
 
 public:
 	SARibbonMainWindowStyles mRibbonMainWindowStyle;
@@ -29809,60 +31430,6 @@ void SARibbonMainWindow::PrivateData::checkMainWindowFlag()
 	if (!mRibbonMainWindowStyle.testFlag(SARibbonMainWindowStyleFlag::UseRibbonMenuBar)
 		&& !mRibbonMainWindowStyle.testFlag(SARibbonMainWindowStyleFlag::UseNativeMenuBar)) {
 		mRibbonMainWindowStyle.setFlag(SARibbonMainWindowStyleFlag::UseRibbonMenuBar, true);
-	}
-}
-
-void SARibbonMainWindow::PrivateData::updateTabBarMargins(SARibbonTabBar* tab, SARibbonTheme theme)
-{
-	static const std::map< SARibbonTheme, QMargins > themeMargins = {
-		{ SARibbonTheme::RibbonThemeWindows7, { 5, 0, 0, 0 } },
-		{ SARibbonTheme::RibbonThemeOffice2013, { 5, 0, 0, 0 } },
-		{ SARibbonTheme::RibbonThemeOffice2016Blue, { 5, 0, 0, 0 } },
-		{ SARibbonTheme::RibbonThemeDark, { 5, 0, 0, 0 } },
-		{ SARibbonTheme::RibbonThemeDark2, { 5, 0, 0, 0 } },
-		{ SARibbonTheme::RibbonThemeOffice2021Blue, { 5, 0, 5, 0 } }
-	};
-	auto it = themeMargins.find(theme);
-	if (it != themeMargins.end()) {
-		tab->setTabMargin(it->second);
-	}
-}
-
-void SARibbonMainWindow::PrivateData::updateContextColors(SARibbonBar* bar, SARibbonTheme theme)
-{
-	static const SARibbonBar::FpContextCategoryHighlight cs_darkerHighlight = [](const QColor& c) -> QColor {
-		return c.darker();
-	};
-	static const SARibbonBar::FpContextCategoryHighlight cs_vibrantHighlight = [](const QColor& c) -> QColor {
-		return SA::makeColorVibrant(c);
-	};
-
-	switch (theme) {
-	case SARibbonTheme::RibbonThemeWindows7:
-	case SARibbonTheme::RibbonThemeOffice2013:
-	case SARibbonTheme::RibbonThemeDark:
-		bar->setContextCategoryColorList({});  // 重置为默认色系
-		bar->setContextCategoryColorHighLight(cs_vibrantHighlight);
-		break;
-	case SARibbonTheme::RibbonThemeOffice2016Blue:
-		bar->setContextCategoryColorList({ QColor(18, 64, 120) });
-		bar->setContextCategoryColorHighLight(cs_darkerHighlight);
-		break;
-	case SARibbonTheme::RibbonThemeOffice2021Blue:
-		bar->setContextCategoryColorList({ QColor(209, 207, 209) });
-		bar->setContextCategoryColorHighLight([](const QColor& c) -> QColor { return QColor(39, 96, 167); });
-		break;
-	default:
-		break;
-	}
-}
-
-void SARibbonMainWindow::PrivateData::updateTabBarBaseLineColor(SARibbonBar* bar, SARibbonTheme theme)
-{
-	if (theme == SARibbonTheme::RibbonThemeOffice2013) {
-		bar->setTabBarBaseLineColor(QColor(186, 201, 219));
-	} else {
-		bar->setTabBarBaseLineColor(QColor());
 	}
 }
 
@@ -29924,7 +31491,14 @@ SARibbonMainWindow::SARibbonMainWindow(QWidget* parent, SARibbonMainWindowStyles
 			d->installFrameless(this);
 		}
 		setRibbonBar(createRibbonBar());
-		setRibbonTheme(ribbonTheme());
+		QTimer::singleShot(0, this, [this]() {
+			SA_D(d);
+			if (SA::isOperatingSystemInDarkMode()
+				&& d->mCurrentRibbonTheme == SARibbonTheme::RibbonThemeOffice2021Blue) {
+				d->mCurrentRibbonTheme = SARibbonTheme::RibbonThemeDark;
+			}
+			setRibbonTheme(ribbonTheme());
+		});
 		setContentsMargins(2, 0, 2, 0);
 		if (d->isUseNativeFrame()) {
 			// 在ribbon模式下使用本地边框，将隐藏icon，同时默认设置为紧凑模式
@@ -30280,18 +31854,8 @@ void SARibbonMainWindow::updateWindowFlag(Qt::WindowFlags flags)
  */
 void SARibbonMainWindow::setRibbonTheme(SARibbonTheme theme)
 {
-	SA::setBuiltInRibbonTheme(this, theme);
 	d_ptr->mCurrentRibbonTheme = theme;
-	if (SARibbonBar* bar = ribbonBar()) {
-		// 1. tab bar的间距
-		if (SARibbonTabBar* tab = bar->ribbonTabBar()) {
-			SARibbonMainWindow::PrivateData::updateTabBarMargins(tab, theme);
-		}
-		// 2. 上下文颜色设置
-		SARibbonMainWindow::PrivateData::updateContextColors(bar, theme);
-		// 3. tabbar的基线颜色
-		SARibbonMainWindow::PrivateData::updateTabBarBaseLineColor(bar, theme);
-	}
+	SA::applyRibbonTheme(this, ribbonBar(), theme);
 }
 
 /**
@@ -30403,6 +31967,7 @@ bool SARibbonMainWindowEventFilter::eventFilter(QObject* obj, QEvent* e)
 #include <QFile>
 #include <QScreen>
 
+#include <QTimer>
 /**
  * @brief The SARibbonWidget::PrivateData class
  */
@@ -30445,6 +32010,14 @@ SARibbonWidget::SARibbonWidget(QWidget* parent) : QWidget(parent), d_ptr(new SAR
 	SARibbonBar* ribbon = new SARibbonBar(this);
 	setRibbonBar(ribbon);
 	connect(qApp, &QApplication::primaryScreenChanged, this, &SARibbonWidget::onPrimaryScreenChanged);
+	QTimer::singleShot(0, this, [this]() {
+		SA_D(d);
+		if (SA::isOperatingSystemInDarkMode()
+			&& d->mCurrentRibbonTheme == SARibbonTheme::RibbonThemeOffice2021Blue) {
+			d->mCurrentRibbonTheme = SARibbonTheme::RibbonThemeDark;
+		}
+		setRibbonTheme(ribbonTheme());
+	});
 }
 
 /**
@@ -30522,68 +32095,8 @@ void SARibbonWidget::setRibbonBar(SARibbonBar* bar)
  */
 void SARibbonWidget::setRibbonTheme(SARibbonTheme theme)
 {
-	SA::setBuiltInRibbonTheme(this, theme);
 	d_ptr->mCurrentRibbonTheme = theme;
-	if (SARibbonBar* bar = ribbonBar()) {
-		auto theme = ribbonTheme();
-		// 尺寸修正
-		switch (theme) {
-		case SARibbonTheme::RibbonThemeWindows7:
-		case SARibbonTheme::RibbonThemeOffice2013:
-		case SARibbonTheme::RibbonThemeOffice2016Blue:
-		case SARibbonTheme::RibbonThemeDark:
-		case SARibbonTheme::RibbonThemeDark2: {
-			//! 在设置qss后需要针对margin信息重新设置进SARibbonTabBar中
-			//! office2013.qss的margin信息如下设置
-			//! margin-top: 0px;
-			//! margin-right: 0px;
-			//! margin-left: 5px;
-			//! margin-bottom: 0px;
-			SARibbonTabBar* tab = bar->ribbonTabBar();
-			if (!tab) {
-				break;
-			}
-			tab->setTabMargin(QMargins(5, 0, 0, 0));
-		} break;
-		case SARibbonTheme::RibbonThemeOffice2021Blue: {
-			SARibbonTabBar* tab = bar->ribbonTabBar();
-			if (!tab) {
-				break;
-			}
-			//! 在设置qss后需要针对margin信息重新设置进SARibbonTabBar中
-			//! office2021.qss的margin信息如下设置
-			//! margin-top: 0px;
-			//! margin-right: 5px;
-			//! margin-left: 5px;
-			//! margin-bottom: 0px;
-			tab->setTabMargin(QMargins(5, 0, 5, 0));
-		}
-		default:
-			break;
-		}
-		// 上下文标签颜色设置,以及基线颜色设置
-		switch (theme) {
-		case SARibbonTheme::RibbonThemeWindows7:
-		case SARibbonTheme::RibbonThemeOffice2013:
-		case SARibbonTheme::RibbonThemeDark:
-			bar->setContextCategoryColorList(QList< QColor >());  //< 设置空颜色列表会重置为默认色系
-			break;
-		case SARibbonTheme::RibbonThemeOffice2016Blue:
-			bar->setContextCategoryColorList(QList< QColor >() << QColor(18, 64, 120));  //< 设置空颜色列表会重置为默认色系
-			break;
-		case SARibbonTheme::RibbonThemeOffice2021Blue:
-			bar->setContextCategoryColorList(QList< QColor >() << QColor(209, 207, 209));  //< 设置空颜色列表会重置为默认色系
-			break;
-		default:
-			break;
-		}
-		// 基线颜色设置
-		if (SARibbonTheme::RibbonThemeOffice2013 == theme) {
-			bar->setTabBarBaseLineColor(QColor(186, 201, 219));
-		} else {
-			bar->setTabBarBaseLineColor(QColor());
-		}
-	}
+	SA::applyRibbonTheme(this, ribbonBar(), theme);
 }
 
 /**

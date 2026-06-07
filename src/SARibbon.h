@@ -403,7 +403,9 @@ enum class SARibbonTheme
 	RibbonThemeOffice2021Blue,  ///< Office 2021 - Blue theme
 	RibbonThemeWindows7,        ///< Windows 7 theme
 	RibbonThemeDark,            ///< Dark theme
-	RibbonThemeDark2            ///< Dark theme 2
+	RibbonThemeDark2,           ///< Dark theme 2
+	RibbonThemeOffice2021Green,   ///< Office 2021 - Green theme
+	RibbonThemeOffice2021Dark     ///< Office 2021 - Dark theme
 };
 
 /**
@@ -1147,6 +1149,16 @@ bool SA_RIBBON_EXPORT saIsRTL();
  * \endif
  */
 int SA_RIBBON_EXPORT saMirrorX(int x, int containerWidth, int elementWidth);
+
+// Check if the operating system uses dark mode (cross-platform)
+bool SA_RIBBON_EXPORT isOperatingSystemInDarkMode();
+
+// Forward declaration
+class SARibbonThemePalette;
+
+/// Replace {{token}} and {{token|opacity(value)}} patterns in QSS templates with actual color values
+QString SA_RIBBON_EXPORT replaceQssTokens(const QString& templateQss, const SARibbonThemePalette& palette);
+
 }
 #endif  // SARIBBONUTIL_H
 

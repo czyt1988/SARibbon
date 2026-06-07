@@ -10,6 +10,7 @@
 #include <QIODevice>
 #include <QDir>
 #include <QCoreApplication>
+#include <QDebug>
 
 namespace SA
 {
@@ -25,7 +26,9 @@ static const std::map< SARibbonTheme, QMargins > s_themeMargins = {
     { SARibbonTheme::RibbonThemeOffice2016Blue, QMargins(5, 0, 0, 0) },
     { SARibbonTheme::RibbonThemeDark, QMargins(5, 0, 0, 0) },
     { SARibbonTheme::RibbonThemeDark2, QMargins(5, 0, 0, 0) },
-    { SARibbonTheme::RibbonThemeOffice2021Blue, QMargins(5, 0, 5, 0) }
+    { SARibbonTheme::RibbonThemeOffice2021Blue, QMargins(5, 0, 5, 0) },
+    { SARibbonTheme::RibbonThemeOffice2021Green, QMargins(5, 0, 5, 0) },
+    { SARibbonTheme::RibbonThemeOffice2021Dark, QMargins(5, 0, 5, 0) }
 };
 
 /// Highlight function: produce a darker variant of the context category color
@@ -45,7 +48,9 @@ static const std::map< SARibbonTheme, SARibbonBar::FpContextCategoryHighlight > 
     { SARibbonTheme::RibbonThemeDark, s_csVibrantHighlight },
     { SARibbonTheme::RibbonThemeOffice2016Blue, s_csDarkerHighlight },
     { SARibbonTheme::RibbonThemeOffice2021Blue, [](const QColor&) -> QColor { return QColor(39, 96, 167); } },
-    { SARibbonTheme::RibbonThemeDark2, s_csVibrantHighlight }
+    { SARibbonTheme::RibbonThemeDark2, s_csVibrantHighlight },
+    { SARibbonTheme::RibbonThemeOffice2021Green, s_csVibrantHighlight },
+    { SARibbonTheme::RibbonThemeOffice2021Dark, s_csVibrantHighlight }
 };
 
 /// Context category color list per theme
@@ -55,7 +60,9 @@ static const std::map< SARibbonTheme, QList< QColor > > s_themeContextColorLists
     { SARibbonTheme::RibbonThemeDark, {} },
     { SARibbonTheme::RibbonThemeOffice2016Blue, { QColor(18, 64, 120) } },
     { SARibbonTheme::RibbonThemeOffice2021Blue, { QColor(209, 207, 209) } },
-    { SARibbonTheme::RibbonThemeDark2, { QColor(42, 141, 181) } }
+    { SARibbonTheme::RibbonThemeDark2, { QColor(42, 141, 181) } },
+    { SARibbonTheme::RibbonThemeOffice2021Green, { QColor(180, 200, 180) } },
+    { SARibbonTheme::RibbonThemeOffice2021Dark, { QColor(80, 80, 80) } }
 };
 
 /// Tab bar baseline color per theme (only Office2013 has a visible baseline)
@@ -65,7 +72,9 @@ static const std::map< SARibbonTheme, QColor > s_themeBaselineColors = {
     { SARibbonTheme::RibbonThemeOffice2016Blue, QColor() },
     { SARibbonTheme::RibbonThemeOffice2021Blue, QColor() },
     { SARibbonTheme::RibbonThemeDark, QColor() },
-    { SARibbonTheme::RibbonThemeDark2, QColor() }
+    { SARibbonTheme::RibbonThemeDark2, QColor() },
+    { SARibbonTheme::RibbonThemeOffice2021Green, QColor() },
+    { SARibbonTheme::RibbonThemeOffice2021Dark, QColor() }
 };
 
 // ===================================================
@@ -103,8 +112,21 @@ static const std::map< SARibbonTheme, QColor > s_themeBaselineColors = {
  * @param theme 要应用的内置 ribbon 主题
  * \endif
  */
+// Forward declaration — defined later in this file
+static QString themeToPalettePath(SARibbonTheme theme);
+
 void applyRibbonTheme(QWidget* w, SARibbonBar* bar, SARibbonTheme theme)
 {
+    SARibbonThemePalette palette;
+    QString palettePath = themeToPalettePath(theme);
+    if (!palettePath.isEmpty()) {
+        if (palette.loadFromFile(palettePath)) {
+            applyRibbonTheme(w, bar, theme, palette);
+            return;
+        }
+        qWarning() << "applyRibbonTheme: failed to load palette" << palettePath
+                     << "for theme" << static_cast<int>(theme) << "- falling back to built-in QSS";
+    }
     applyRibbonTheme(w, bar, theme, SARibbonThemePalette());
 }
 
@@ -116,6 +138,8 @@ static QString themeToTemplatePath(SARibbonTheme theme)
     case SARibbonTheme::RibbonThemeOffice2016Blue:
         return ":/SARibbonTheme/resource/templates/office2016.qss";
     case SARibbonTheme::RibbonThemeOffice2021Blue:
+    case SARibbonTheme::RibbonThemeOffice2021Green:
+    case SARibbonTheme::RibbonThemeOffice2021Dark:
         return ":/SARibbonTheme/resource/templates/office2021.qss";
     case SARibbonTheme::RibbonThemeDark:
         return ":/SARibbonTheme/resource/templates/dark.qss";
@@ -123,6 +147,29 @@ static QString themeToTemplatePath(SARibbonTheme theme)
         return ":/SARibbonTheme/resource/templates/dark2.qss";
     default:
         // Themes without templates (win7, office2013) fall back to fixed QSS
+        return QString();
+    }
+}
+
+/// Map SARibbonTheme enum to the corresponding default palette JSON resource path.
+/// Returns empty string if no palette exists for the given theme.
+static QString themeToPalettePath(SARibbonTheme theme)
+{
+    switch (theme) {
+    case SARibbonTheme::RibbonThemeOffice2016Blue:
+        return ":/SARibbonTheme/resource/palettes/office2016-blue.json";
+    case SARibbonTheme::RibbonThemeOffice2021Blue:
+        return ":/SARibbonTheme/resource/palettes/office2021-blue.json";
+    case SARibbonTheme::RibbonThemeOffice2021Green:
+        return ":/SARibbonTheme/resource/palettes/office2021-green.json";
+    case SARibbonTheme::RibbonThemeOffice2021Dark:
+        return ":/SARibbonTheme/resource/palettes/office2021-dark.json";
+    case SARibbonTheme::RibbonThemeDark:
+        return ":/SARibbonTheme/resource/palettes/dark-default.json";
+    case SARibbonTheme::RibbonThemeDark2:
+        return ":/SARibbonTheme/resource/palettes/dark2-default.json";
+    default:
+        // Themes without palette definitions (win7, office2013) return empty
         return QString();
     }
 }
