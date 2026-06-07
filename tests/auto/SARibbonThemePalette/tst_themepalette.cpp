@@ -127,6 +127,10 @@ void TestThemePalette::testQssTokenCoverage()
     QVector<PaletteTemplate> cases = {
         { ":/SARibbonTheme/resource/palettes/office2016-blue.json",
           ":/SARibbonTheme/resource/templates/office2016.qss" },
+        { ":/SARibbonTheme/resource/palettes/office2016-green.json",
+          ":/SARibbonTheme/resource/templates/office2016.qss" },
+        { ":/SARibbonTheme/resource/palettes/office2016-dark.json",
+          ":/SARibbonTheme/resource/templates/office2016.qss" },
         { ":/SARibbonTheme/resource/palettes/office2021-blue.json",
           ":/SARibbonTheme/resource/templates/office2021.qss" },
         { ":/SARibbonTheme/resource/palettes/office2021-green.json",
@@ -165,6 +169,10 @@ void TestThemePalette::testPaletteAutoLoading()
     QVector<ThemePath> supported = {
         { SARibbonTheme::RibbonThemeOffice2016Blue,
           ":/SARibbonTheme/resource/palettes/office2016-blue.json" },
+        { SARibbonTheme::RibbonThemeOffice2016Green,
+          ":/SARibbonTheme/resource/palettes/office2016-green.json" },
+        { SARibbonTheme::RibbonThemeOffice2016Dark,
+          ":/SARibbonTheme/resource/palettes/office2016-dark.json" },
         { SARibbonTheme::RibbonThemeOffice2021Blue,
           ":/SARibbonTheme/resource/palettes/office2021-blue.json" },
         { SARibbonTheme::RibbonThemeOffice2021Green,
@@ -208,9 +216,11 @@ void TestThemePalette::testPaletteAutoLoadingWin7()
 
 void TestThemePalette::testAllPalettesLoad()
 {
-    // Verify all 6 palette JSONs can be loaded successfully by SARibbonThemePalette::loadFromFile
+    // Verify all 8 palette JSONs can be loaded successfully by SARibbonThemePalette::loadFromFile
     QVector<QString> palettePaths = {
         ":/SARibbonTheme/resource/palettes/office2016-blue.json",
+        ":/SARibbonTheme/resource/palettes/office2016-green.json",
+        ":/SARibbonTheme/resource/palettes/office2016-dark.json",
         ":/SARibbonTheme/resource/palettes/office2021-blue.json",
         ":/SARibbonTheme/resource/palettes/office2021-green.json",
         ":/SARibbonTheme/resource/palettes/office2021-dark.json",
