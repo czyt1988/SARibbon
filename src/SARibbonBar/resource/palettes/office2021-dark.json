@@ -28,7 +28,8 @@
     "accent-hover":       { "fn": "darken",  "base": "accent",       "amount": 10 },
     "accent-pressed":     { "fn": "darken",  "base": "accent",       "amount": 15 },
     "content-hover-bg":   { "fn": "darken",  "base": "content-bg",   "amount": 17 },
-    "content-pressed-bg": { "fn": "darken",  "base": "content-bg",   "amount": 23 }
+    "content-pressed-bg": { "fn": "darken",  "base": "content-bg",   "amount": 23 },
+    "tab-accent-hover":   { "fn": "darken",  "base": "accent",       "amount": 5  }
   },
 
   "fixed": {
@@ -38,7 +39,8 @@
     "ribbon-text":   "#b2b2b2",
     "separator":     "#5a5a5a",
     "input-base":    "#3a3a3a",
-    "input-text":    "#e0e0e0"
+    "input-text":    "#e0e0e0",
+    "tab-accent":    "#6a9eff"
   },
 
   "comments": {
@@ -49,6 +51,8 @@
     "content-bg":      "Category/Panel/ToolButton/Gallery/Menu background",
     "content-hover-bg":"Hover state - derived: darken reverses to lighter (isDark=true)",
     "content-pressed-bg":"Pressed/checked state - derived: darken reverses to even lighter (isDark=true)",
-    "text-color":      "Primary text color (light on dark backgrounds)"
+    "text-color":      "Primary text color (light on dark backgrounds)",
+    "tab-accent":      "Tab selected text color and underline (blue highlight on dark bg)",
+    "tab-accent-hover":"Tab hover underline, derived from accent"
   }
 }

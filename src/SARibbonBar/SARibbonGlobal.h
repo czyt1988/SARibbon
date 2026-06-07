@@ -1,4 +1,4 @@
-#ifndef SARIBBONGLOBAL_H
+﻿#ifndef SARIBBONGLOBAL_H
 #define SARIBBONGLOBAL_H
 #include <memory>
 #include <QtGlobal>
@@ -186,8 +186,8 @@ class QWidget;
 /**
  * \if ENGLISH
  * @brief Define the alignment mode of Ribbon, supports left alignment, center alignment and right alignment
- * @note If your compiler reports: the qualified name of the member declaration is illegal, then check if the file line break is LF, if so, change the file line break to CRLF
- * \endif
+ * @note If your compiler reports: the qualified name of the member declaration is illegal, then check if the file line
+ * break is LF, if so, change the file line break to CRLF \endif
  *
  * \if CHINESE
  * @brief 定义 Ribbon 的对其方式，支持左对齐、居中对其和右对齐
@@ -196,9 +196,9 @@ class QWidget;
  */
 enum class SARibbonAlignment
 {
-    AlignLeft,   ///< Left alignment, tab bar left aligned, category also left aligned
-    AlignCenter, ///< Center alignment, tab bar center aligned, category also center aligned
-    AlignRight   ///< Right alignment, tab bar right aligned, category also right aligned
+    AlignLeft,    ///< Left alignment, tab bar left aligned, category also left aligned
+    AlignCenter,  ///< Center alignment, tab bar center aligned, category also center aligned
+    AlignRight    ///< Right alignment, tab bar right aligned, category also right aligned
 };
 
 /**
@@ -218,16 +218,17 @@ enum class SARibbonAlignment
  */
 enum class SARibbonTheme
 {
-    RibbonThemeOffice2013,      ///< Office 2013 theme
-    RibbonThemeOffice2016Blue,  ///< Office 2016 - Blue theme
-    RibbonThemeOffice2016Green, ///< Office 2016 - Green theme
-    RibbonThemeOffice2016Dark,  ///< Office 2016 - Dark theme
-    RibbonThemeOffice2021Blue,  ///< Office 2021 - Blue theme
-    RibbonThemeWindows7,        ///< Windows 7 theme
-    RibbonThemeDark,            ///< Dark theme
-    RibbonThemeDark2,           ///< Dark theme 2
-    RibbonThemeOffice2021Green,   ///< Office 2021 - Green theme
-    RibbonThemeOffice2021Dark     ///< Office 2021 - Dark theme
+    RibbonThemeWindows7 = 0,     ///< Windows 7 theme
+    RibbonThemeOffice2013,       ///< Office 2013 theme
+    RibbonThemeOffice2016Blue,   ///< Office 2016 - Blue theme
+    RibbonThemeOffice2016Green,  ///< Office 2016 - Green theme
+    RibbonThemeOffice2016Dark,   ///< Office 2016 - Dark theme
+    RibbonThemeOffice2021Blue,   ///< Office 2021 - Blue theme
+    RibbonThemeOffice2021Green,  ///< Office 2021 - Green theme
+    RibbonThemeOffice2021Dark,   ///< Office 2021 - Dark theme
+    RibbonThemeDark,             ///< Dark theme
+    RibbonThemeDark2,            ///< Dark theme 2
+    RibbonThemeUserDefine = 1000
 };
 
 /**

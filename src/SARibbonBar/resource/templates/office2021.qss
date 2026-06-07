@@ -226,16 +226,16 @@ SARibbonTabBar::tab {
 }
 
 SARibbonTabBar::tab:selected {
-  color: {{accent}};
+  color: {{tab-accent}};
   /*顶部要给一个透明的border高度，否则文字会向上偏移*/
   border-top:4px solid transparent;
-  border-bottom: 4px solid {{accent}};
+  border-bottom: 4px solid {{tab-accent}};
 }
 
 SARibbonTabBar::tab:hover:!selected {
   /*顶部要给一个透明的border高度，否则文字会向上偏移*/
   border-top:4px solid transparent;
-  border-bottom: 4px solid {{accent-hover}};
+  border-bottom: 4px solid {{tab-accent-hover}};
   color: {{text-color}};
 }
 

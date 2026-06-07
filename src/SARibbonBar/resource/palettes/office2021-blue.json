@@ -28,7 +28,8 @@
     "accent-hover":       { "fn": "darken",  "base": "accent",       "amount": 10 },
     "accent-pressed":     { "fn": "darken",  "base": "accent",       "amount": 15 },
     "content-hover-bg":   { "fn": "darken",  "base": "content-bg",   "amount": 17 },
-    "content-pressed-bg": { "fn": "darken",  "base": "content-bg",   "amount": 23 }
+    "content-pressed-bg": { "fn": "darken",  "base": "content-bg",   "amount": 23 },
+    "tab-accent-hover":   { "fn": "darken",  "base": "accent",       "amount": 5  }
   },
 
   "fixed": {
@@ -38,7 +39,8 @@
     "ribbon-text":   "#b2b2b2",
     "separator":     "#bec0c2",
     "input-base":    "#ffffff",
-    "input-text":    "#000000"
+    "input-text":    "#000000",
+    "tab-accent":    "#2760a7"
   },
 
   "comments": {
@@ -49,6 +51,8 @@
     "content-bg":      "Category/Panel/ToolButton/Gallery/Menu background",
     "content-hover-bg":"Hover state for buttons, scroll buttons, menu items",
     "content-pressed-bg":"Pressed/checked state for tool buttons, menu items",
-    "text-color":      "Primary text color (tool buttons, menus, gallery)"
+    "text-color":      "Primary text color (tool buttons, menus, gallery)",
+    "tab-accent":      "Tab selected text color and underline",
+    "tab-accent-hover":"Tab hover underline, derived from accent"
   }
 }

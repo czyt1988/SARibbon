@@ -242,6 +242,12 @@ SARibbonPanel > QCheckBox {
     background-color: transparent;
 }
 
+/*Panel下QRadioButton的特化*/
+SARibbonPanel > QRadioButton {
+    color: {{text-color}};
+    background-color: transparent;
+}
+
 /*Panel下QComboBox的特化*/
 SARibbonPanel > QComboBox {
     border: 1px solid {{menu-border}};
@@ -257,9 +263,18 @@ SARibbonPanel > QComboBox:editable {
     selection-background-color: {{selection-bg}};
     selection-color: {{black}};
 }
+SARibbonPanel > QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    width: 1em;
+    border: none;
+}
 SARibbonPanel > QComboBox::drop-down:hover {
     border: 1px solid {{content-hover-bg}};
     background-color: {{content-pressed-bg}};
+}
+SARibbonPanel > QComboBox::down-arrow {
+    image: url(:/SARibbon/image/resource/ArrowDown.png);
 }
 
 /*SARibbonSeparatorWidget*/
@@ -279,6 +294,10 @@ SARibbonCategoryScrollButton:hover {
 }
 
 /*Min*/
+SARibbonSystemToolButton#SAMinimizeWindowButton {
+    image: url(:/SARibbon/image/resource/Titlebar_Min.svg);
+    padding: 4px;
+}
 SARibbonSystemToolButton#SAMinimizeWindowButton:hover {
     background-color: {{sys-button-hover}};
 }
@@ -286,10 +305,21 @@ SARibbonSystemToolButton#SAMinimizeWindowButton:pressed {
     background-color: {{sys-button-pressed}};
 }
 /*Max*/
+SARibbonSystemToolButton#SAMaximizeWindowButton {
+    image: url(:/SARibbon/image/resource/Titlebar_Max.svg);
+    padding: 4px;
+}
 SARibbonSystemToolButton#SAMaximizeWindowButton:hover {
     background-color: {{sys-button-hover}};
 }
+SARibbonSystemToolButton#SAMaximizeWindowButton:checked {
+    image: url(:/SARibbon/image/resource/Titlebar_Normal.svg);
+}
 /*Close*/
+SARibbonSystemToolButton#SACloseWindowButton {
+    image: url(:/SARibbon/image/resource/Titlebar_Close.svg);
+    padding: 4px;
+}
 SARibbonSystemToolButton#SACloseWindowButton:hover {
     background-color: {{close-bg}};
 }

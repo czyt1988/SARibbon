@@ -364,11 +364,13 @@ void MainWindow::createRibbonApplicationButton()
         connect(mActionStyleCompactTwoRow, &QAction::triggered, this, &MainWindow::onSetStyleCompactTwoRow);
         menuStyle->addAction(mActionStyleCompactTwoRow);
 
-        mActionStyleLooseSingleRow = createAction(tr("Loose Single Row"), ":/icon/icon/layout.svg", "actionStyleLooseSingleRow");
+        mActionStyleLooseSingleRow =
+            createAction(tr("Loose Single Row"), ":/icon/icon/layout.svg", "actionStyleLooseSingleRow");
         connect(mActionStyleLooseSingleRow, &QAction::triggered, this, &MainWindow::onSetStyleLooseSingleRow);
         menuStyle->addAction(mActionStyleLooseSingleRow);
 
-        mActionStyleCompactSingleRow = createAction(tr("Compact Single Row"), ":/icon/icon/layout.svg", "actionStyleCompactSingleRow");
+        mActionStyleCompactSingleRow =
+            createAction(tr("Compact Single Row"), ":/icon/icon/layout.svg", "actionStyleCompactSingleRow");
         connect(mActionStyleCompactSingleRow, &QAction::triggered, this, &MainWindow::onSetStyleCompactSingleRow);
         menuStyle->addAction(mActionStyleCompactSingleRow);
     }
@@ -466,19 +468,15 @@ void MainWindow::onStyleClicked(int styleId)
         ui->textBrowser->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::RibbonStyleCompactTwoRow);"));
         break;
     case SARibbonBar::RibbonStyleLooseSingleRow:
-        ui->textBrowser->append(
-            tr("\nThe \"LooseSingleRow\" style is an ultra-compact single-row layout "
-               "with icon-right-text display, no panel titles, and no gallery scroll buttons. "
-               "This mimics the Outlook 2025/OneNote 2025 ribbon interface.")
-        );
+        ui->textBrowser->append(tr("\nThe \"LooseSingleRow\" style is an ultra-compact single-row layout "
+                                   "with icon-right-text display, no panel titles, and no gallery scroll buttons. "
+                                   "This mimics the Outlook 2025/OneNote 2025 ribbon interface."));
         ui->textBrowser->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::RibbonStyleLooseSingleRow);"));
         break;
     case SARibbonBar::RibbonStyleCompactSingleRow:
-        ui->textBrowser->append(
-            tr("\nThe \"CompactSingleRow\" style is an ultra-compact single-row layout "
-               "with icon-right-text display, no panel titles, and no gallery scroll buttons. "
-               "This mimics the Outlook 2025/OneNote 2025 ribbon interface in compact mode.")
-        );
+        ui->textBrowser->append(tr("\nThe \"CompactSingleRow\" style is an ultra-compact single-row layout "
+                                   "with icon-right-text display, no panel titles, and no gallery scroll buttons. "
+                                   "This mimics the Outlook 2025/OneNote 2025 ribbon interface in compact mode."));
         ui->textBrowser->append(tr("ribbonBar()->setRibbonStyle(SARibbonBar::RibbonStyleCompactSingleRow);"));
         break;
     default:
@@ -1971,14 +1969,20 @@ void MainWindow::createCategoryMain(SARibbonCategory* categoryPage)
     mComboboxRibbonTheme->setWindowTitle(tr("RibbonTheme"));
     mComboboxRibbonTheme->setObjectName("RibbonTheme");
     mComboboxRibbonTheme->addItem(tr("Windows 7"), static_cast< int >(SARibbonTheme::RibbonThemeWindows7));
+    mComboboxRibbonTheme->insertSeparator(mComboboxRibbonTheme->count());
     mComboboxRibbonTheme->addItem(tr("Office 2013"), static_cast< int >(SARibbonTheme::RibbonThemeOffice2013));
+    mComboboxRibbonTheme->insertSeparator(mComboboxRibbonTheme->count());
     mComboboxRibbonTheme->addItem(tr("Office 2016 Blue"), static_cast< int >(SARibbonTheme::RibbonThemeOffice2016Blue));
+    mComboboxRibbonTheme->insertSeparator(mComboboxRibbonTheme->count());
     mComboboxRibbonTheme->addItem(tr("Office 2021 Blue"), static_cast< int >(SARibbonTheme::RibbonThemeOffice2021Blue));
-    mComboboxRibbonTheme->addItem(tr("Dark"), static_cast< int >(SARibbonTheme::RibbonThemeDark));
-    mComboboxRibbonTheme->addItem(tr("Dark 2"), static_cast< int >(SARibbonTheme::RibbonThemeDark2));
     mComboboxRibbonTheme->addItem(tr("Office 2021 Green"), static_cast< int >(SARibbonTheme::RibbonThemeOffice2021Green));
     mComboboxRibbonTheme->addItem(tr("Office 2021 Dark"), static_cast< int >(SARibbonTheme::RibbonThemeOffice2021Dark));
+    mComboboxRibbonTheme->insertSeparator(mComboboxRibbonTheme->count());
+    mComboboxRibbonTheme->addItem(tr("Dark"), static_cast< int >(SARibbonTheme::RibbonThemeDark));
+    mComboboxRibbonTheme->insertSeparator(mComboboxRibbonTheme->count());
+    mComboboxRibbonTheme->addItem(tr("Dark 2"), static_cast< int >(SARibbonTheme::RibbonThemeDark2));
     mComboboxRibbonTheme->setCurrentIndex(mComboboxRibbonTheme->findData(static_cast< int >(ribbonTheme())));
+    mComboboxRibbonTheme->setSizeAdjustPolicy(QComboBox::AdjustToContentsOnFirstShow);
     connect(
         mComboboxRibbonTheme, QOverload< int >::of(&QComboBox::currentIndexChanged), this, &MainWindow::onRibbonThemeComboBoxCurrentIndexChanged
     );

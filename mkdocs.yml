@@ -73,6 +73,7 @@ plugins:
                 - Ribbon Size Settings: en/use-guide/SARibbon-size-settings.md
                 - Content Margins: en/use-guide/contents-margins-of-ribbon.md
                 - Ribbon Themes: en/use-guide/SARibbon-theme.md
+                - JSON Theme Configuration: en/use-guide/json-theme-config.md
                 - Customize Your Theme: en/use-guide/design-your-theme.md
                 - User-Configurable Ribbon: en/use-guide/persistence-configuration-ribbon.md
                 - SARibbonWidget Guide: en/use-guide/SARibbonWidget-guide.md
@@ -112,6 +113,7 @@ plugins:
                 - Ribbon尺寸设置: zh/use-guide/SARibbon-size-settings.md
                 - 内容边距设置: zh/use-guide/contents-margins-of-ribbon.md
                 - Ribbon主题: zh/use-guide/SARibbon-theme.md
+                - JSON主题配置: zh/use-guide/json-theme-config.md
                 - 自定义Ribbon主题: zh/use-guide/design-your-theme.md
                 - Ribbon的用户配置化: zh/use-guide/persistence-configuration-ribbon.md
                 - SARibbonWidget详细指南: zh/use-guide/SARibbonWidget-guide.md

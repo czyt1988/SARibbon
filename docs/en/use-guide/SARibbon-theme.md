@@ -1,9 +1,10 @@
 # SARibbon Theme Switching
 
-- ✅ **6 built-in themes**: Office2013/2016/2021, Windows7, Dark/Dark2 — switch with one call
+- ✅ **10 built-in themes**: Office2013, Office2016 (Blue/Green/Dark), Office2021 (Blue/Green/Dark), Windows7, Dark, Dark2 — switch with one call
 - ✅ **Runtime dynamic switching**: change themes instantly via `setRibbonTheme()`, no restart needed
-- ✅ **QSS styling**: built-in theme QSS can be applied or replaced via `setStyleSheet()`, see QSS section below
+- ✅ **QSS styling**: built-in theme QSS is generated from templates + palettes, see Template + Palette Architecture below
 - ✅ **Fully custom themes**: write any style with QSS, see [Design Your Own Theme](./design-your-theme.md)
+- ✅ **JSON palette configuration**: customize colors via palette JSON files without editing QSS, see [JSON Theme Configuration Guide](./json-theme-config.md)
 
 ## Theme Switching Flow
 
@@ -23,12 +24,16 @@ They are defined in the `SARibbonTheme` enum:
 ```cpp
 enum class SARibbonTheme
 {
-    RibbonThemeOffice2013,      ///< Office 2013 look
-    RibbonThemeOffice2016Blue,  ///< Office 2016 blue
-    RibbonThemeOffice2021Blue,  ///< Office 2021 blue
-    RibbonThemeWindows7,        ///< Windows 7 look
+    RibbonThemeOffice2013,      ///< Office 2013 theme
+    RibbonThemeOffice2016Blue,  ///< Office 2016 - Blue theme
+    RibbonThemeOffice2016Green, ///< Office 2016 - Green theme  (since 1.4.0)
+    RibbonThemeOffice2016Dark,  ///< Office 2016 - Dark theme   (since 1.4.0)
+    RibbonThemeOffice2021Blue,  ///< Office 2021 - Blue theme
+    RibbonThemeWindows7,        ///< Windows 7 theme
     RibbonThemeDark,            ///< Dark theme
-    RibbonThemeDark2            ///< Dark theme #2
+    RibbonThemeDark2,           ///< Dark theme 2
+    RibbonThemeOffice2021Green, ///< Office 2021 - Green theme  (since 1.4.0)
+    RibbonThemeOffice2021Dark   ///< Office 2021 - Dark theme   (since 1.4.0)
 };
 ```
 
@@ -63,11 +68,23 @@ Windows 7
 Office 2013  
 ![SARibbon-theme-office2013](../../assets/screenshot/SARibbon-theme-office2013.png)
 
-Office 2016  
+Office 2016 Blue  
 ![SARibbon-theme-office2016](../../assets/screenshot/SARibbon-theme-office2016.png)
 
-Office 2021  
+Office 2016 Green <!-- TODO: add screenshot -->  
+<!-- ![SARibbon-theme-office2016-green](../../assets/screenshot/SARibbon-theme-office2016-green.png) -->
+
+Office 2016 Dark <!-- TODO: add screenshot -->  
+<!-- ![SARibbon-theme-office2016-dark](../../assets/screenshot/SARibbon-theme-office2016-dark.png) -->
+
+Office 2021 Blue  
 ![SARibbon-theme-office2021](../../assets/screenshot/SARibbon-theme-office2021.png)
+
+Office 2021 Green <!-- TODO: add screenshot -->  
+<!-- ![SARibbon-theme-office2021-green](../../assets/screenshot/SARibbon-theme-office2021-green.png) -->
+
+Office 2021 Dark <!-- TODO: add screenshot -->  
+<!-- ![SARibbon-theme-office2021-dark](../../assets/screenshot/SARibbon-theme-office2021-dark.png) -->
 
 Dark  
 ![SARibbon-theme-dark](../../assets/screenshot/SARibbon-theme-dark.png)
@@ -84,7 +101,11 @@ If your application already applies its own style sheets, **merge** the Ribbon Q
 |------------|--------------|---------------|
 | `RibbonThemeOffice2013` | Office 2013 classic white | Clean, bright interface |
 | `RibbonThemeOffice2016Blue` | Office 2016 blue accent | Business / enterprise apps |
+| `RibbonThemeOffice2016Green` | Office 2016 green accent | Eco / health apps |
+| `RibbonThemeOffice2016Dark` | Office 2016 dark | Low-light environments |
 | `RibbonThemeOffice2021Blue` | Office 2021 blue accent | Modern UI design |
+| `RibbonThemeOffice2021Green` | Office 2021 green accent | Eco / health apps |
+| `RibbonThemeOffice2021Dark` | Office 2021 dark | Low-light environments |
 | `RibbonThemeWindows7` | Windows 7 classic | Legacy compatibility |
 | `RibbonThemeDark` | Dark theme | Extended use / night mode |
 | `RibbonThemeDark2` | Dark theme (variant) | Higher contrast dark UI |
@@ -159,11 +180,16 @@ if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
 }
 ```
 
-!!! warning
-    `sa_get_ribbon_theme_qss` was mentioned in earlier documentation, but this function **does not exist** in the current codebase. The only way to apply built-in theme QSS is via `setRibbonTheme()`, which automatically applies it. There is no public API to obtain theme QSS as a string.
+!!! tip
+    Use `SA::getBuiltInRibbonThemeQss(SARibbonTheme)` (declared in `SARibbonUtil.h`) to obtain the fully resolved QSS stylesheet for any built-in theme. It loads the template + default palette and returns the complete stylesheet string. This is useful for debugging or as a starting point for custom theme overrides:
+
+    ```cpp
+    QString qss = SA::getBuiltInRibbonThemeQss(SARibbonTheme::RibbonThemeOffice2021Blue);
+    // qss now contains theme-base.qss + the resolved office2021 template with palette colors
+    ```
 
 !!! tip
-    Built-in theme QSS files are in `src/SARibbonBar/resource`. Use them as a reference when writing custom themes. For full customization, see [Design Your Own Theme](./design-your-theme.md).
+    Built-in theme templates are in `src/SARibbonBar/resource/templates/` and palettes in `src/SARibbonBar/resource/palettes/`. Use them as a reference when writing custom themes. For full customization, see [Design Your Own Theme](./design-your-theme.md). For detailed JSON palette configuration, see [JSON Theme Configuration Guide](./json-theme-config.md).
 
 ## Post-QSS Internal Adjustment Mechanism
 
@@ -180,22 +206,27 @@ After `setStyleSheet()` is called, `setRibbonTheme()` performs three programmati
 | `RibbonThemeWindows7` | `QMargins(5, 0, 0, 0)` | Reset to default (empty list) | `makeColorVibrant()` | Cleared |
 | `RibbonThemeOffice2013` | `QMargins(5, 0, 0, 0)` | Reset to default (empty list) | `makeColorVibrant()` | `QColor(186, 201, 219)` |
 | `RibbonThemeOffice2016Blue` | `QMargins(5, 0, 0, 0)` | `QColor(18, 64, 120)` | `QColor::darker()` | Cleared |
+| `RibbonThemeOffice2016Green` | `QMargins(5, 0, 0, 0)` | `QColor(24, 96, 48)` | `QColor::darker()` | Cleared |
+| `RibbonThemeOffice2016Dark` | `QMargins(5, 0, 0, 0)` | `QColor(60, 60, 60)` | `QColor::darker()` | Cleared |
 | `RibbonThemeOffice2021Blue` | `QMargins(5, 0, 5, 0)` | `QColor(209, 207, 209)` | Always returns `QColor(39, 96, 167)` | Cleared |
+| `RibbonThemeOffice2021Green` | `QMargins(5, 0, 5, 0)` | `QColor(180, 200, 180)` | `makeColorVibrant()` | Cleared |
+| `RibbonThemeOffice2021Dark` | `QMargins(5, 0, 5, 0)` | `QColor(80, 80, 80)` | `makeColorVibrant()` | Cleared |
 | `RibbonThemeDark` | `QMargins(5, 0, 0, 0)` | Reset to default (empty list) | `makeColorVibrant()` | Cleared |
-| `RibbonThemeDark2` | `QMargins(5, 0, 0, 0)` | Not adjusted | None | Cleared |
+| `RibbonThemeDark2` | `QMargins(5, 0, 0, 0)` | `QColor(42, 141, 181)` | `makeColorVibrant()` | Cleared |
 
 Key observations:
-- Only `RibbonThemeOffice2021Blue` uses `QMargins(5, 0, 5, 0)` (right margin 5px); all others use `QMargins(5, 0, 0, 0)`.
+- All three Office2021 variants (Blue, Green, Dark) use `QMargins(5, 0, 5, 0)` (right margin 5px); all others use `QMargins(5, 0, 0, 0)`.
 - Only `RibbonThemeOffice2013` sets a baseline color; all others clear it.
-- Highlight function definitions (`SARibbonMainWindow.cpp:120-125`):
+- All three Office2016 variants (Blue, Green, Dark) use `QColor::darker()` as their highlight function.
+- Highlight function definitions are centralized in `SARibbonThemeManager.cpp`:
 
 ```cpp
-// Make colors more vibrant
-static const SARibbonBar::FpContextCategoryHighlight cs_vibrantHighlight = [](const QColor& c) -> QColor {
+// Make colors more vibrant (used by Win7, Office2013, Dark, Dark2, Office2021Green/Dark)
+static const SARibbonBar::FpContextCategoryHighlight s_csVibrantHighlight = [](const QColor& c) -> QColor {
     return SA::makeColorVibrant(c);
 };
-// Make colors darker
-static const SARibbonBar::FpContextCategoryHighlight cs_darkerHighlight = [](const QColor& c) -> QColor {
+// Make colors darker (used by all Office2016 variants)
+static const SARibbonBar::FpContextCategoryHighlight s_csDarkerHighlight = [](const QColor& c) -> QColor {
     return c.darker();
 };
 ```
@@ -205,9 +236,12 @@ static const SARibbonBar::FpContextCategoryHighlight cs_darkerHighlight = [](con
 ```mermaid
 flowchart TD
     A[setRibbonTheme] --> B[Phase 1: Apply QSS]
-    B --> B1[SA::setBuiltInRibbonTheme]
-    B1 --> B2[getBuiltInRibbonThemeQss]
-    B2 --> B3[QWidget::setStyleSheet]
+    B --> B1[SA::applyRibbonTheme]
+    B1 --> B2[Load palette JSON]
+    B2 --> B3[Load template QSS]
+    B3 --> B4[Replace {{token}} placeholders]
+    B4 --> B5[theme-base.qss + resolved QSS]
+    B5 --> B6[w->setStyleSheet]
 
     A --> C[Phase 2: Post-QSS Adjustments]
     C --> C1[updateTabBarMargins]
@@ -219,4 +253,74 @@ flowchart TD
     C3 --> D
 ```
 
-The diagram above illustrates the two-phase flow of `setRibbonTheme()`. Phase 1 applies the QSS stylesheet from Qt resources. Phase 2 applies the programmatic corrections that are specific to each theme.
+The diagram above illustrates the two-phase flow of `setRibbonTheme()`. Phase 1 loads the palette JSON, loads the QSS template, replaces `{{token}}` placeholders with palette colors, concatenates `theme-base.qss` with the resolved template, and applies it via `setStyleSheet()`. Phase 2 applies the programmatic corrections (tab margins, context category colors, baseline color) that are specific to each theme and defined in static maps inside `SARibbonThemeManager.cpp`.
+
+## Template + Palette Architecture
+
+SARibbon uses a **template + palette** architecture to generate theme QSS. This system enables multiple color variants (Blue, Green, Dark) to share a single QSS template while producing visually different results through different palette JSON files.
+
+### Templates
+
+Templates are `.qss` files located in `src/SARibbonBar/resource/templates/` that contain CSS-like rules with `{{token}}` placeholders instead of hardcoded color values:
+
+```css
+SARibbonBar {
+    background-color: {{accent}};
+    color: {{text-color}};
+}
+```
+
+There are 6 template files, each corresponding to a visual layout family:
+
+| Template File | Themes that use it |
+|---|---|
+| `office2016.qss` | Office2016Blue, Office2016Green, Office2016Dark |
+| `office2021.qss` | Office2021Blue, Office2021Green, Office2021Dark |
+| `dark.qss` | Dark |
+| `dark2.qss` | Dark2 |
+| `win7.qss` | Windows7 |
+| `office2013.qss` | Office2013 |
+
+### Palettes
+
+Palettes are `.json` files located in `src/SARibbonBar/resource/palettes/` that define the color tokens used to fill `{{token}}` placeholders in templates. Each palette has three sections:
+
+- **`keyColors`** (required) — Primary design tokens: `accent`, `content-bg`, `text-color`, etc.
+- **`derived`** (optional) — Colors computed from key colors via lighten/darken rules, e.g. `accent-hover` derived from `accent` by `lighten(15)`
+- **`fixed`** (optional) — Absolute color values that don't depend on key colors
+
+There are 10 palette files, one per theme:
+
+| Palette File | Theme |
+|---|---|
+| `office2016-blue.json` | Office2016Blue |
+| `office2016-green.json` | Office2016Green |
+| `office2016-dark.json` | Office2016Dark |
+| `office2021-blue.json` | Office2021Blue |
+| `office2021-green.json` | Office2021Green |
+| `office2021-dark.json` | Office2021Dark |
+| `dark-default.json` | Dark |
+| `dark2-default.json` | Dark2 |
+| `win7-default.json` | Windows7 |
+| `office2013-default.json` | Office2013 |
+
+### Color Lookup
+
+When resolving a `{{token}}` placeholder, the palette searches in this order: **derived** → **keyColors** → **fixed**. If `isDark` is `true` in the palette JSON, derived rules automatically reverse direction (darken becomes lighten and vice versa) to maintain correct contrast in dark themes.
+
+### Public APIs
+
+| API | Header | Description |
+|---|---|---|
+| `SA::getBuiltInRibbonThemeQss(SARibbonTheme)` | `SARibbonUtil.h` | Returns the fully resolved QSS string (base + template with default palette) |
+| `SA::applyRibbonTheme(w, bar, theme)` | `SARibbonThemeManager.h` | Applies a built-in theme using the default palette |
+| `SA::applyRibbonTheme(w, bar, theme, palette)` | `SARibbonThemeManager.h` | Applies a built-in theme with a custom palette (enables custom color variants) |
+
+!!! example "Custom palette example"
+    ```cpp
+    // Load a built-in theme template but with your own palette colors
+    SA::SARibbonThemePalette customPalette;
+    customPalette.loadFromFile(":/my-custom-palette.json");
+    SA::applyRibbonTheme(mainWindow, ribbonBar(),
+                         SARibbonTheme::RibbonThemeOffice2021Blue, customPalette);
+    ```
