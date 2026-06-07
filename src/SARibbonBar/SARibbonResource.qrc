@@ -19,10 +19,6 @@
     <qresource prefix="/SARibbonTheme">
         <file>resource/theme-win7.qss</file>
         <file>resource/theme-office2013.qss</file>
-        <file>resource/theme-dark.qss</file>
-        <file>resource/theme-office2016-blue.qss</file>
-        <file>resource/theme-office2021-blue.qss</file>
-        <file>resource/theme-dark2.qss</file>
         <file>resource/theme-base.qss</file>
         <file>resource/templates/office2016.qss</file>
         <file>resource/templates/office2021.qss</file>

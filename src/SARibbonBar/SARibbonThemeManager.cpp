@@ -15,6 +15,9 @@
 namespace SA
 {
 
+// Internal-only function (defined in SARibbonUtil.cpp, no public header declaration)
+QString getBuiltInRibbonThemeQss(SARibbonTheme theme);
+
 // ===================================================
 // Static theme data maps
 // ===================================================
@@ -241,12 +244,29 @@ void applyRibbonTheme(QWidget* w, SARibbonBar* bar, SARibbonTheme theme,
             QString processedQss = SA::replaceQssTokens(templateQss, palette);
             w->setStyleSheet(baseQss + "\n" + processedQss);
         } else {
-            // Template file not found, fall back to fixed QSS
-            SA::setBuiltInRibbonTheme(w, theme);
+            // Template file not found, fall back to base QSS
+            qWarning() << "applyRibbonTheme: template not found:" << templatePath
+                       << "- falling back to base QSS";
+            QFile baseOnly(":/SARibbonTheme/resource/theme-base.qss");
+            if (baseOnly.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                w->setStyleSheet(QString::fromUtf8(baseOnly.readAll()));
+            }
         }
-    } else {
-        // Empty palette or no template, default behavior
-        SA::setBuiltInRibbonTheme(w, theme);
+    } else if (w) {
+        // Empty palette or no template (Win7/Office2013) — load hardcoded QSS
+        QString palettePath = themeToPalettePath(theme);
+        if (palettePath.isEmpty() && !templatePath.isEmpty()) {
+            // Template theme with no palette — warning + base QSS fallback
+            qWarning() << "applyRibbonTheme: no palette for template theme"
+                       << static_cast<int>(theme) << "- using base QSS only";
+            QFile baseQss(":/SARibbonTheme/resource/theme-base.qss");
+            if (baseQss.open(QIODevice::ReadOnly | QIODevice::Text)) {
+                w->setStyleSheet(QString::fromUtf8(baseQss.readAll()));
+            }
+        } else {
+            // Win7/Office2013 — use internal hardcoded QSS (not exposed publicly)
+            w->setStyleSheet(SA::getBuiltInRibbonThemeQss(theme));
+        }
     }
 
     if (!bar) {
