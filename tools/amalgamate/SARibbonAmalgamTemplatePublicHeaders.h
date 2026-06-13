@@ -9,6 +9,8 @@
 #include "../../src/SARibbonBar/colorWidgets/SAColorPaletteGridWidget.h"
 #include "../../src/SARibbonBar/colorWidgets/SAColorToolButton.h"
 // sa ribbon
+#include "../../src/SARibbonBar/SARibbonThemeManager.h"
+#include "../../src/SARibbonBar/SARibbonThemePalette.h"
 #include "../../src/SARibbonBar/SARibbonUtil.h"
 #include "../../src/SARibbonBar/SAFramelessHelper.h"
 #include "../../src/SARibbonBar/SARibbonApplicationButton.h"

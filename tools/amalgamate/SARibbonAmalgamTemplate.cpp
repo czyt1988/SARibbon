@@ -37,7 +37,6 @@
 #include "../../src/SARibbonBar/SARibbonUtil.cpp"
 #include "../../src/SARibbonBar/SARibbonThemeManager.cpp"
 #include "../../src/SARibbonBar/SARibbonThemePalette.cpp"
-#include "../../src/SARibbonBar/SARibbonIconHelper.cpp"
 #include "../../src/SARibbonBar/SAFramelessHelper.cpp"
 #include "../../src/SARibbonBar/SARibbonApplicationButton.cpp"
 #include "../../src/SARibbonBar/SARibbonSystemButtonBar.cpp"

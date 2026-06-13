@@ -156,7 +156,7 @@
  * @def ribbon的数字版本 MAJ.{MIN}.PAT
  */
 #ifndef SA_RIBBON_BAR_VERSION_MIN
-#define SA_RIBBON_BAR_VERSION_MIN 8
+#define SA_RIBBON_BAR_VERSION_MIN 9
 #endif
 /**
  * @def ribbon的数字版本 MAJ.MIN.{PAT}
@@ -169,7 +169,7 @@
  * @def 版本号（字符串）
  */
 #ifndef SARIBBON_VERSION
-#define SARIBBON_VERSION "2.8.0"
+#define SARIBBON_VERSION "2.9.0"
 #endif
 
 #endif // SARIBBONVERSIONINFO_H
@@ -366,8 +366,8 @@ class QWidget;
 /**
  * \if ENGLISH
  * @brief Define the alignment mode of Ribbon, supports left alignment, center alignment and right alignment
- * @note If your compiler reports: the qualified name of the member declaration is illegal, then check if the file line break is LF, if so, change the file line break to CRLF
- * \endif
+ * @note If your compiler reports: the qualified name of the member declaration is illegal, then check if the file line
+ * break is LF, if so, change the file line break to CRLF \endif
  *
  * \if CHINESE
  * @brief 定义 Ribbon 的对其方式，支持左对齐、居中对其和右对齐
@@ -376,10 +376,11 @@ class QWidget;
  */
 enum class SARibbonAlignment
 {
-	AlignLeft,   ///< Left alignment, tab bar left aligned, category also left aligned
-	AlignCenter, ///< Center alignment, tab bar center aligned, category also center aligned
-	AlignRight   ///< Right alignment, tab bar right aligned, category also right aligned
+	AlignLeft,    ///< Left alignment, tab bar left aligned, category also left aligned
+	AlignCenter,  ///< Center alignment, tab bar center aligned, category also center aligned
+	AlignRight    ///< Right alignment, tab bar right aligned, category also right aligned
 };
+Q_DECLARE_METATYPE(SARibbonAlignment)
 
 /**
  * \if ENGLISH
@@ -398,17 +399,19 @@ enum class SARibbonAlignment
  */
 enum class SARibbonTheme
 {
-	RibbonThemeOffice2013,      ///< Office 2013 theme
-	RibbonThemeOffice2016Blue,  ///< Office 2016 - Blue theme
-	RibbonThemeOffice2016Green, ///< Office 2016 - Green theme
-	RibbonThemeOffice2016Dark,  ///< Office 2016 - Dark theme
-	RibbonThemeOffice2021Blue,  ///< Office 2021 - Blue theme
-	RibbonThemeWindows7,        ///< Windows 7 theme
-	RibbonThemeDark,            ///< Dark theme
-	RibbonThemeDark2,           ///< Dark theme 2
-	RibbonThemeOffice2021Green,   ///< Office 2021 - Green theme
-	RibbonThemeOffice2021Dark     ///< Office 2021 - Dark theme
+	RibbonThemeWindows7 = 0,     ///< Windows 7 theme
+	RibbonThemeOffice2013,       ///< Office 2013 theme
+	RibbonThemeOffice2016Blue,   ///< Office 2016 - Blue theme
+	RibbonThemeOffice2016Green,  ///< Office 2016 - Green theme
+	RibbonThemeOffice2016Dark,   ///< Office 2016 - Dark theme
+	RibbonThemeOffice2021Blue,   ///< Office 2021 - Blue theme
+	RibbonThemeOffice2021Green,  ///< Office 2021 - Green theme
+	RibbonThemeOffice2021Dark,   ///< Office 2021 - Dark theme
+	RibbonThemeDark,             ///< Dark theme
+	RibbonThemeDark2,            ///< Dark theme 2
+	RibbonThemeUserDefine = 1000
 };
+Q_DECLARE_METATYPE(SARibbonTheme)
 
 /**
  * \if ENGLISH
@@ -1082,6 +1085,216 @@ Q_SIGNALS:
 
 // sa ribbon
 
+/*** Start of inlined file: SARibbonThemeManager.h ***/
+#ifndef SARIBBONTHEMEMANAGER_H
+#define SARIBBONTHEMEMANAGER_H
+
+class QWidget;
+class SARibbonBar;
+enum class SARibbonTheme;
+
+namespace SA
+{
+
+class SARibbonThemePalette;
+
+// Apply a built-in ribbon theme with fixed QSS to the widget and configure ribbon bar properties
+SA_RIBBON_EXPORT void applyRibbonTheme(QWidget* w, SARibbonBar* bar, SARibbonTheme theme);
+
+// Apply a ribbon theme with custom color palette, falling back to fixed QSS if palette is empty or no template found
+SA_RIBBON_EXPORT void applyRibbonTheme(QWidget* w, SARibbonBar* bar, SARibbonTheme theme,
+									   const SARibbonThemePalette& palette);
+
+}
+
+#endif  // SARIBBONTHEMEMANAGER_H
+/*** End of inlined file: SARibbonThemeManager.h ***/
+
+
+
+/*** Start of inlined file: SARibbonThemePalette.h ***/
+#ifndef SARIBBONTHEMEPALETTE_H
+#define SARIBBONTHEMEPALETTE_H
+
+#include <QColor>
+#include <QHash>
+#include <QString>
+#include <QByteArray>
+
+namespace SA {
+
+/**
+ * \if ENGLISH
+ * @brief Color palette for SARibbon theme system
+ *
+ * SARibbonThemePalette manages a set of named color tokens used by the ribbon theming engine.
+ * Colors are organized into three layers: key colors (primary design tokens), derived colors
+ * (computed from key colors via lighten/darken rules), and fixed colors (absolute values).
+ *
+ * A palette is loaded from a JSON file or byte array. The JSON structure is as follows:
+ *
+ * @code
+ * {
+ *     "name": "office-blue",          // Optional. Theme name for identification only
+ *     "isDark": false,                // Optional. Defaults to false if omitted. true = dark theme; false = light theme.
+ *                                     // When true, derived rules reverse direction
+ *                                     // (darken becomes lighten and vice versa).
+ *
+ *     "keyColors": {                  // Required. Primary design tokens (name -> hex color string)
+ *         "accent": "#225497",        //   Main accent / brand color
+ *         "content-bg": "#f1f1f1",    //   Content area background color
+ *         "text-color": "#1a1a1a"     //   Default text color
+ *         // ... any number of custom token names
+ *     },
+ *
+ *     "derived": {                    // Optional. Colors derived from keyColors via rules
+ *         "accent-hover": {           //   Token name for the derived color
+ *             "fn": "lighten",        //   Derive function: "lighten" or "darken"
+ *             "base": "accent",       //   Source key color token name to derive from
+ *             "amount": 15            //   Intensity percentage (e.g. 15 = lighter(115) or darker(115))
+ *         },
+ *         "accent-pressed": {
+ *             "fn": "darken",
+ *             "base": "accent",
+ *             "amount": 10
+ *         }
+ *     },
+ *
+ *     "fixed": {                      // Optional. Absolute colors not tied to keyColors (name -> hex string)
+ *         "window-border": "#c0c0c0",
+ *         "separator": "#d0d0d0"
+ *     }
+ * }
+ * @endcode
+ *
+ * Color lookup priority via color(): derived colors are checked first, then keyColors, then fixed.
+ *
+ * Usage example:
+ * @code
+ * SA::SARibbonThemePalette palette;
+ * palette.loadFromFile(":/themes/light.json");
+ * QColor accent = palette.color("accent");
+ * QHash<QString, QString> allVars = palette.variables();
+ * @endcode
+ *
+ * @note When isDark() is true, derive rules automatically reverse direction
+ * (darken becomes lighten and vice versa) to maintain correct contrast.
+ * @see SARibbonBar
+ * \endif
+ *
+ * \if CHINESE
+ * @brief SARibbon主题系统的调色板
+ *
+ * SARibbonThemePalette管理Ribbon主题引擎使用的一组命名颜色标记。
+ * 颜色分为三层：键色（主要设计标记）、派生色（通过变亮/变暗规则从键色计算）和固定色（绝对值）。
+ *
+ * 调色板通过JSON文件或字节数组加载。JSON结构如下：
+ *
+ * @code
+ * {
+ *     "name": "office-blue",          // 可选。主题名称，仅作标识用途
+ *     "isDark": false,                // 可选。默认为false。true = 深色主题；false = 浅色主题
+ *                                     // 为true时，派生规则自动反转方向
+ *                                     // （变暗变为变亮，反之亦然）
+ *
+ *     "keyColors": {                  // 必填。主要设计标记（名称 -> 十六进制颜色字符串）
+ *         "accent": "#225497",        //   主色调/品牌色
+ *         "content-bg": "#f1f1f1",    //   内容区域背景色
+ *         "text-color": "#1a1a1a"     //   默认文字颜色
+ *         // ... 可自定义任意数量的标记名
+ *     },
+ *
+ *     "derived": {                    // 可选。通过规则从keyColors派生的颜色
+ *         "accent-hover": {           //   派生颜色的标记名
+ *             "fn": "lighten",        //   派生函数："lighten"（变亮）或"darken"（变暗）
+ *             "base": "accent",       //   源键色标记名，从此颜色进行派生
+ *             "amount": 15            //   强度百分比（例如15 = lighter(115)或darker(115)）
+ *         },
+ *         "accent-pressed": {
+ *             "fn": "darken",
+ *             "base": "accent",
+ *             "amount": 10
+ *         }
+ *     },
+ *
+ *     "fixed": {                      // 可选。不依赖键色的绝对颜色（名称 -> 十六进制字符串）
+ *         "window-border": "#c0c0c0",
+ *         "separator": "#d0d0d0"
+ *     }
+ * }
+ * @endcode
+ *
+ * color()查找优先级：先查派生色，再查键色，最后查固定色。
+ *
+ * 使用示例：
+ * @code
+ * SA::SARibbonThemePalette palette;
+ * palette.loadFromFile(":/themes/light.json");
+ * QColor accent = palette.color("accent");
+ * QHash<QString, QString> allVars = palette.variables();
+ * @endcode
+ *
+ * @note 当isDark()为true时，派生规则自动反转方向（变暗变为变亮，反之亦然），以保持正确的对比度。
+ * @see SARibbonBar
+ * \endif
+ */
+class SA_RIBBON_EXPORT SARibbonThemePalette
+{
+public:
+	// Constructor
+	SARibbonThemePalette();
+
+	// Load palette from a JSON byte array
+	bool loadFromJson(const QByteArray& json);
+
+	// Load palette from a JSON file (filesystem path or Qt resource path)
+	bool loadFromFile(const QString& jsonPath);
+
+	// Set the accent key color
+	void setAccentColor(const QColor& color);
+
+	// Set the content background key color
+	void setContentBgColor(const QColor& color);
+
+	// Set the text key color
+	void setTextColor(const QColor& color);
+
+	// Get a color by token name, searching derived, key, then fixed layers
+	QColor color(const QString& tokenName) const;
+
+	// Get raw string value for a token (supports non-color CSS values like qlineargradient)
+	QString rawValue(const QString& tokenName) const;
+
+	// Get all color variables as name-to-hex-string pairs
+	QHash<QString, QString> variables() const;
+
+	// Check if this palette is a dark theme
+	bool isDark() const;
+
+private:
+	struct DeriveRule
+	{
+		QString fn;
+		QString base;
+		int amount;
+	};
+
+	void recalculateDerived();
+
+	QHash<QString, QColor> m_keyColors;
+	QHash<QString, QColor> m_derivedColors;
+	QHash<QString, QColor> m_fixedColors;
+	QHash<QString, QString> m_rawStrings;
+	QHash<QString, DeriveRule> m_deriveRules;  ///< Stored derive rules for recalculation
+	bool m_isDark { false };
+};
+
+} // namespace SA
+#endif // SARIBBONTHEMEPALETTE_H
+
+/*** End of inlined file: SARibbonThemePalette.h ***/
+
+
 /*** Start of inlined file: SARibbonUtil.h ***/
 #ifndef SARIBBONUTIL_H
 #define SARIBBONUTIL_H
@@ -1155,11 +1368,26 @@ class SARibbonThemePalette;
 /// Replace {{token}} and {{token|opacity(value)}} patterns in QSS templates with actual color values
 QString SA_RIBBON_EXPORT replaceQssTokens(const QString& templateQss, const SARibbonThemePalette& palette);
 
+/**
+ * \if ENGLISH
+ * @brief Get the complete QSS stylesheet string for a built-in ribbon theme
+ * @details Loads the base QSS, theme template, and default palette, then returns the fully
+ * resolved stylesheet with all tokens replaced. Useful for debugging, inspecting generated
+ * QSS, or as a starting point for custom theme overrides.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取指定内置ribbon主题的完整QSS样式表字符串
+ * @details 加载基础QSS、主题模板和默认调色板，返回所有标记已替换的完整样式表。
+ * 适用于调试、检查生成的QSS，或作为自定义主题覆盖的起点。
+ * \endif
+ */
+QString SA_RIBBON_EXPORT getBuiltInRibbonThemeQss(SARibbonTheme theme);
+
 }
 #endif  // SARIBBONUTIL_H
 
 /*** End of inlined file: SARibbonUtil.h ***/
-
 
 
 /*** Start of inlined file: SAFramelessHelper.h ***/
@@ -2854,7 +3082,7 @@ class SA_RIBBON_EXPORT SARibbonPanel : public QFrame
 	friend class SARibbonPanelLayout;
 	Q_PROPERTY(bool isCanCustomize READ isCanCustomize WRITE setCanCustomize)
 	Q_PROPERTY(bool isExpanding READ isExpanding WRITE setExpanding)
-	Q_PROPERTY(QString panelName READ panelName WRITE setPanelName)
+	Q_PROPERTY(QString panelName READ panelName WRITE setPanelName NOTIFY panelNameChanged)
 public:
 	/**
 	 * @brief Layout mode for the panel / 面板的布局模式
@@ -3199,7 +3427,7 @@ class SA_RIBBON_EXPORT SARibbonCategory : public QFrame
 	friend class SARibbonBar;
 	friend class SARibbonContextCategory;
 	Q_PROPERTY(bool isCanCustomize READ isCanCustomize WRITE setCanCustomize)
-	Q_PROPERTY(QString categoryName READ categoryName WRITE setCategoryName)
+	Q_PROPERTY(QString categoryName READ categoryName WRITE setCategoryName NOTIFY categoryNameChanged)
 public:
 	using FpPanelIterate = std::function< bool(SARibbonPanel*) >;
 
@@ -3418,6 +3646,10 @@ class SA_RIBBON_EXPORT SARibbonCategoryLayout : public QLayout
 	SA_RIBBON_DECLARE_PRIVATE(SARibbonCategoryLayout)
 public:
 	Q_PROPERTY(int scrollPosition READ scrollPosition WRITE setScrollPosition)
+	// == Cache members (mutable for const lazy evaluation) ==
+private:
+	mutable QSize mCachedSizeHint;
+	mutable QSize mCachedMinSizeHint;
 public:
 	/// Constructor for SARibbonCategoryLayout
 	explicit SARibbonCategoryLayout(SARibbonCategory* parent);
@@ -3684,6 +3916,7 @@ protected:
 #include <QVariant>
 #include <QMap>
 #include <QAction>
+#include <QPointer>
 class SARibbonGalleryGroup;
 
 /**
@@ -3756,7 +3989,7 @@ public:
 private:
 	QMap< int, QVariant > mDatas;
 	Qt::ItemFlags mFlags;
-	QAction* mAction;
+	QPointer< QAction > mAction;
 };
 
 #endif  // SARIBBONGALLERYITEM_H
@@ -4383,12 +4616,12 @@ class SA_RIBBON_EXPORT SARibbonBar : public QMenuBar
 	SA_RIBBON_DECLARE_PRIVATE(SARibbonBar)
 	friend class SARibbonMainWindow;
 	friend class SARibbonSystemButtonBar;
-	Q_PROPERTY(RibbonStyles ribbonStyle READ currentRibbonStyle WRITE setRibbonStyle)
-	Q_PROPERTY(bool minimumMode READ isMinimumMode WRITE setMinimumMode)
-	Q_PROPERTY(bool minimumModeButton READ haveShowMinimumModeButton WRITE showMinimumModeButton)
+	Q_PROPERTY(RibbonStyles ribbonStyle READ currentRibbonStyle WRITE setRibbonStyle NOTIFY ribbonStyleChanged)
+	Q_PROPERTY(bool minimumMode READ isMinimumMode WRITE setMinimumMode NOTIFY ribbonModeChanged)
+	Q_PROPERTY(bool minimumModeButton READ isMinimumModeButtonVisible WRITE showMinimumModeButton)
 	Q_PROPERTY(QColor windowTitleTextColor READ windowTitleTextColor WRITE setWindowTitleTextColor)
 	Q_PROPERTY(QColor tabBarBaseLineColor READ tabBarBaseLineColor WRITE setTabBarBaseLineColor)
-	Q_PROPERTY(Qt::Alignment windowTitleAligment READ windowTitleAligment WRITE setWindowTitleAligment)
+	Q_PROPERTY(Qt::Alignment windowTitleAlignment READ windowTitleAlignment WRITE setWindowTitleAlignment)
 	Q_PROPERTY(bool enableWordWrap READ isEnableWordWrap WRITE setEnableWordWrap)
 	Q_PROPERTY(bool enableShowPanelTitle READ isEnableShowPanelTitle WRITE setEnableShowPanelTitle)
 	Q_PROPERTY(bool enableIconRightText READ isEnableIconRightText WRITE setEnableIconRightText)
@@ -4549,7 +4782,7 @@ public:
 	void showMinimumModeButton(bool isShow = true);
 
 	/// Check if minimum mode button is shown
-	bool haveShowMinimumModeButton() const;
+	bool isMinimumModeButtonVisible() const;
 
 	/// Get minimum mode action
 	QAction* minimumModeAction() const;
@@ -4663,9 +4896,9 @@ public:
 	QBrush windowTitleBackgroundBrush() const;
 
 	/// Set window title alignment
-	void setWindowTitleAligment(Qt::Alignment al);
+	void setWindowTitleAlignment(Qt::Alignment al);
 	/// Get window title alignment
-	Qt::Alignment windowTitleAligment() const;
+	Qt::Alignment windowTitleAlignment() const;
 
 	/// Set enable word wrap
 	void setEnableWordWrap(bool on);
@@ -5877,7 +6110,7 @@ class SA_RIBBON_EXPORT SARibbonMainWindow : public QMainWindow
 	Q_OBJECT
 	SA_RIBBON_DECLARE_PRIVATE(SARibbonMainWindow)
 	friend class SARibbonBar;
-	Q_PROPERTY(SARibbonTheme ribbonTheme READ ribbonTheme WRITE setRibbonTheme)
+	Q_PROPERTY(SARibbonTheme ribbonTheme READ ribbonTheme WRITE setRibbonTheme NOTIFY ribbonThemeChanged)
 
 public:
 	/// Constructor for SARibbonMainWindow
@@ -5926,6 +6159,9 @@ protected:
 private Q_SLOTS:
 	/// Handle primary screen changed event
 	void onPrimaryScreenChanged(QScreen* screen);
+Q_SIGNALS:
+	/// Emitted when ribbon theme changes
+	void ribbonThemeChanged(SARibbonTheme theme);
 };
 
 /**
@@ -5974,7 +6210,7 @@ class SA_RIBBON_EXPORT SARibbonWidget : public QWidget
 	Q_OBJECT
 	SA_RIBBON_DECLARE_PRIVATE(SARibbonWidget)
 	friend class SARibbonBar;
-	Q_PROPERTY(SARibbonTheme ribbonTheme READ ribbonTheme WRITE setRibbonTheme)
+	Q_PROPERTY(SARibbonTheme ribbonTheme READ ribbonTheme WRITE setRibbonTheme NOTIFY ribbonThemeChanged)
 
 public:
 	explicit SARibbonWidget(QWidget* parent = nullptr);
@@ -5997,6 +6233,9 @@ public:
 	QWidget* takeWidget();
 private Q_SLOTS:
 	void onPrimaryScreenChanged(QScreen* screen);
+Q_SIGNALS:
+	/// Emitted when ribbon theme changes
+	void ribbonThemeChanged(SARibbonTheme theme);
 };
 
 #endif  // SARIBBONWIDGET_H
