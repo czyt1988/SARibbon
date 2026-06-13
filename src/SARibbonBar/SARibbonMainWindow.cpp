@@ -522,8 +522,11 @@ void SARibbonMainWindow::updateWindowFlag(Qt::WindowFlags flags)
  */
 void SARibbonMainWindow::setRibbonTheme(SARibbonTheme theme)
 {
-    d_ptr->mCurrentRibbonTheme = theme;
-    SA::applyRibbonTheme(this, ribbonBar(), theme);
+    if (d_ptr->mCurrentRibbonTheme != theme) {
+        d_ptr->mCurrentRibbonTheme = theme;
+        SA::applyRibbonTheme(this, ribbonBar(), theme);
+        Q_EMIT ribbonThemeChanged(theme);
+    }
 }
 
 /**

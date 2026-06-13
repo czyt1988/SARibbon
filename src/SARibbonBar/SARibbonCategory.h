@@ -35,7 +35,7 @@ class SA_RIBBON_EXPORT SARibbonCategory : public QFrame
     friend class SARibbonBar;
     friend class SARibbonContextCategory;
     Q_PROPERTY(bool isCanCustomize READ isCanCustomize WRITE setCanCustomize)
-    Q_PROPERTY(QString categoryName READ categoryName WRITE setCategoryName)
+    Q_PROPERTY(QString categoryName READ categoryName WRITE setCategoryName NOTIFY categoryNameChanged)
 public:
     using FpPanelIterate = std::function< bool(SARibbonPanel*) >;
 

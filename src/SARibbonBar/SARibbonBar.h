@@ -173,12 +173,12 @@ class SA_RIBBON_EXPORT SARibbonBar : public QMenuBar
     SA_RIBBON_DECLARE_PRIVATE(SARibbonBar)
     friend class SARibbonMainWindow;
     friend class SARibbonSystemButtonBar;
-    Q_PROPERTY(RibbonStyles ribbonStyle READ currentRibbonStyle WRITE setRibbonStyle)
-    Q_PROPERTY(bool minimumMode READ isMinimumMode WRITE setMinimumMode)
-    Q_PROPERTY(bool minimumModeButton READ haveShowMinimumModeButton WRITE showMinimumModeButton)
+    Q_PROPERTY(RibbonStyles ribbonStyle READ currentRibbonStyle WRITE setRibbonStyle NOTIFY ribbonStyleChanged)
+    Q_PROPERTY(bool minimumMode READ isMinimumMode WRITE setMinimumMode NOTIFY ribbonModeChanged)
+    Q_PROPERTY(bool minimumModeButton READ isMinimumModeButtonVisible WRITE showMinimumModeButton)
     Q_PROPERTY(QColor windowTitleTextColor READ windowTitleTextColor WRITE setWindowTitleTextColor)
     Q_PROPERTY(QColor tabBarBaseLineColor READ tabBarBaseLineColor WRITE setTabBarBaseLineColor)
-    Q_PROPERTY(Qt::Alignment windowTitleAligment READ windowTitleAligment WRITE setWindowTitleAligment)
+    Q_PROPERTY(Qt::Alignment windowTitleAlignment READ windowTitleAlignment WRITE setWindowTitleAlignment)
     Q_PROPERTY(bool enableWordWrap READ isEnableWordWrap WRITE setEnableWordWrap)
     Q_PROPERTY(bool enableShowPanelTitle READ isEnableShowPanelTitle WRITE setEnableShowPanelTitle)
     Q_PROPERTY(bool enableIconRightText READ isEnableIconRightText WRITE setEnableIconRightText)
@@ -339,7 +339,7 @@ public:
     void showMinimumModeButton(bool isShow = true);
 
     /// Check if minimum mode button is shown
-    bool haveShowMinimumModeButton() const;
+    bool isMinimumModeButtonVisible() const;
 
     /// Get minimum mode action
     QAction* minimumModeAction() const;
@@ -453,9 +453,9 @@ public:
     QBrush windowTitleBackgroundBrush() const;
 
     /// Set window title alignment
-    void setWindowTitleAligment(Qt::Alignment al);
+    void setWindowTitleAlignment(Qt::Alignment al);
     /// Get window title alignment
-    Qt::Alignment windowTitleAligment() const;
+    Qt::Alignment windowTitleAlignment() const;
 
     /// Set enable word wrap
     void setEnableWordWrap(bool on);

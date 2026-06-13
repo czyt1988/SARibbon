@@ -85,11 +85,11 @@ public:
     QColor mTitleTextColor;  ///< 标题文字颜色,默认无效，无效的情况下和SARibbonBar的qss:color属性一致
     QColor mTabBarBaseLineColor { QColor(186, 201, 219) };                ///< tabbar 底部会绘制一条线条，定义线条颜色
     QColor mContextCategoryTitleTextColor { Qt::black };                  ///< 记录Context category的标题字体颜色
-    Qt::Alignment mTitleAligment { Qt::AlignCenter };                     ///< 标题对齐方式
+    Qt::Alignment mTitleAlignment { Qt::AlignCenter };                     ///< 标题对齐方式
     bool mIsTitleVisible { true };                                        ///< 标题是否显示
     QBrush mTitleBackgroundBrush { Qt::NoBrush };                         ///< 标题的背景颜色
     SARibbonAlignment mRibbonAlignment { SARibbonAlignment::AlignLeft };  ///< 对齐方式
-    SARibbonPanel::PanelLayoutMode mDefaulePanelLayoutMode { SARibbonPanel::ThreeRowMode };  ///< 默认的PanelLayoutMode
+    SARibbonPanel::PanelLayoutMode mDefaultPanelLayoutMode { SARibbonPanel::ThreeRowMode };  ///< 默认的PanelLayoutMode
     bool mEnableShowPanelTitle { true };                         ///< 是否允许panel的标题栏显示
     bool mEnableIconRightText { false };                         ///< 鏄惁鍚敤鍥炬爣鍙充晶鏂囧瓧妯″紡
     int mPanelSpacing { 0 };                                     ///< panel的spacing
@@ -1267,7 +1267,7 @@ void SARibbonBar::showContextCategory(SARibbonContextCategory* context)
     for (int i = 0; i < context->categoryCount(); ++i) {
         SARibbonCategory* category = context->categoryPage(i);
         // 此句如果模式重复设置不会进行多余操作
-        category->setPanelLayoutMode(d_ptr->mDefaulePanelLayoutMode);
+        category->setPanelLayoutMode(d_ptr->mDefaultPanelLayoutMode);
         // 切换模式后会改变高度，上下文标签显示时要保证显示出来
         int index = d_ptr->mRibbonTabBar->addTab(category->categoryName());
         contextCategoryData.tabPageIndex.append(index);
@@ -1542,7 +1542,7 @@ void SARibbonBar::showMinimumModeButton(bool isShow)
  * @return 如果按钮显示返回true
  * \endif
  */
-bool SARibbonBar::haveShowMinimumModeButton() const
+bool SARibbonBar::isMinimumModeButtonVisible() const
 {
     return (nullptr != d_ptr->mMinimumCategoryButtonAction);
 }
@@ -2389,7 +2389,7 @@ void SARibbonBar::raiseCategory(SARibbonCategory* category)
  */
 bool SARibbonBar::isTwoRowStyle() const
 {
-    return (d_ptr->mDefaulePanelLayoutMode == SARibbonPanel::TwoRowMode);
+    return (d_ptr->mDefaultPanelLayoutMode == SARibbonPanel::TwoRowMode);
 }
 
 /**
@@ -2405,7 +2405,7 @@ bool SARibbonBar::isTwoRowStyle() const
  */
 bool SARibbonBar::isThreeRowStyle() const
 {
-    return (d_ptr->mDefaulePanelLayoutMode == SARibbonPanel::ThreeRowMode);
+    return (d_ptr->mDefaultPanelLayoutMode == SARibbonPanel::ThreeRowMode);
 }
 
 /**
@@ -2559,7 +2559,7 @@ void SARibbonBar::updateRibbonGeometry()
  */
 SARibbonPanel::PanelLayoutMode SARibbonBar::panelLayoutMode() const
 {
-    return d_ptr->mDefaulePanelLayoutMode;
+    return d_ptr->mDefaultPanelLayoutMode;
 }
 
 /**
@@ -2575,7 +2575,7 @@ SARibbonPanel::PanelLayoutMode SARibbonBar::panelLayoutMode() const
  */
 void SARibbonBar::setPanelLayoutMode(SARibbonPanel::PanelLayoutMode m)
 {
-    d_ptr->mDefaulePanelLayoutMode = m;
+    d_ptr->mDefaultPanelLayoutMode = m;
     // 设置布局时，让布局重新计算高度
     if (SARibbonBarLayout* lay = qobject_cast< SARibbonBarLayout* >(layout())) {
         lay->resetSize();
@@ -2635,9 +2635,9 @@ bool SARibbonBar::isTabOnTitle() const
  * @param al 标题的对齐方式
  * \endif
  */
-void SARibbonBar::setWindowTitleAligment(Qt::Alignment al)
+void SARibbonBar::setWindowTitleAlignment(Qt::Alignment al)
 {
-    d_ptr->mTitleAligment = al;
+    d_ptr->mTitleAlignment = al;
     update();
 }
 
@@ -2652,9 +2652,9 @@ void SARibbonBar::setWindowTitleAligment(Qt::Alignment al)
  * @return 标题的对齐方式
  * \endif
  */
-Qt::Alignment SARibbonBar::windowTitleAligment() const
+Qt::Alignment SARibbonBar::windowTitleAlignment() const
 {
-    return d_ptr->mTitleAligment;
+    return d_ptr->mTitleAlignment;
 }
 
 /**
@@ -3980,6 +3980,6 @@ void SARibbonBar::paintWindowTitle(QPainter& painter, const QString& title, cons
         painter.setPen(palette().color(QPalette::WindowText));
     }
 
-    painter.drawText(titleRegion, d_ptr->mTitleAligment, title);
+    painter.drawText(titleRegion, d_ptr->mTitleAlignment, title);
     painter.restore();
 }

@@ -107,7 +107,7 @@ class SA_RIBBON_EXPORT SARibbonPanel : public QFrame
     friend class SARibbonPanelLayout;
     Q_PROPERTY(bool isCanCustomize READ isCanCustomize WRITE setCanCustomize)
     Q_PROPERTY(bool isExpanding READ isExpanding WRITE setExpanding)
-    Q_PROPERTY(QString panelName READ panelName WRITE setPanelName)
+    Q_PROPERTY(QString panelName READ panelName WRITE setPanelName NOTIFY panelNameChanged)
 public:
     /**
      * @brief Layout mode for the panel / 面板的布局模式

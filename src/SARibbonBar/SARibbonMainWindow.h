@@ -87,7 +87,7 @@ class SA_RIBBON_EXPORT SARibbonMainWindow : public QMainWindow
     Q_OBJECT
     SA_RIBBON_DECLARE_PRIVATE(SARibbonMainWindow)
     friend class SARibbonBar;
-    Q_PROPERTY(SARibbonTheme ribbonTheme READ ribbonTheme WRITE setRibbonTheme)
+    Q_PROPERTY(SARibbonTheme ribbonTheme READ ribbonTheme WRITE setRibbonTheme NOTIFY ribbonThemeChanged)
 
 public:
     /// Constructor for SARibbonMainWindow
@@ -136,6 +136,9 @@ protected:
 private Q_SLOTS:
     /// Handle primary screen changed event
     void onPrimaryScreenChanged(QScreen* screen);
+Q_SIGNALS:
+    /// Emitted when ribbon theme changes
+    void ribbonThemeChanged(SARibbonTheme theme);
 };
 
 /**
