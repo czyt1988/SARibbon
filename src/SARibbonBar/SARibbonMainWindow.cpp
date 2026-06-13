@@ -155,13 +155,18 @@ SARibbonMainWindow::SARibbonMainWindow(QWidget* parent, SARibbonMainWindowStyles
             d->installFrameless(this);
         }
         setRibbonBar(createRibbonBar());
+        if (SA::isOperatingSystemInDarkMode()
+            && d->mCurrentRibbonTheme == SARibbonTheme::RibbonThemeOffice2021Blue) {
+            d->mCurrentRibbonTheme = SARibbonTheme::RibbonThemeDark;
+        }
         QTimer::singleShot(0, this, [this]() {
             SA_D(d);
-            if (SA::isOperatingSystemInDarkMode()
-                && d->mCurrentRibbonTheme == SARibbonTheme::RibbonThemeOffice2021Blue) {
-                d->mCurrentRibbonTheme = SARibbonTheme::RibbonThemeDark;
+            SARibbonTheme t = ribbonTheme();
+            if (d->mCurrentRibbonTheme == t) {
+                SA::applyRibbonTheme(this, ribbonBar(), t);
+            } else {
+                setRibbonTheme(t);
             }
-            setRibbonTheme(ribbonTheme());
         });
         setContentsMargins(2, 0, 2, 0);
         if (d->isUseNativeFrame()) {

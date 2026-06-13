@@ -50,13 +50,19 @@ SARibbonWidget::SARibbonWidget(QWidget* parent) : QWidget(parent), d_ptr(new SAR
 	SARibbonBar* ribbon = new SARibbonBar(this);
 	setRibbonBar(ribbon);
 	connect(qApp, &QApplication::primaryScreenChanged, this, &SARibbonWidget::onPrimaryScreenChanged);
+	SA_D(d);
+	if (SA::isOperatingSystemInDarkMode()
+		&& d->mCurrentRibbonTheme == SARibbonTheme::RibbonThemeOffice2021Blue) {
+		d->mCurrentRibbonTheme = SARibbonTheme::RibbonThemeDark;
+	}
 	QTimer::singleShot(0, this, [this]() {
 		SA_D(d);
-		if (SA::isOperatingSystemInDarkMode()
-			&& d->mCurrentRibbonTheme == SARibbonTheme::RibbonThemeOffice2021Blue) {
-			d->mCurrentRibbonTheme = SARibbonTheme::RibbonThemeDark;
+		SARibbonTheme t = ribbonTheme();
+		if (d->mCurrentRibbonTheme == t) {
+			SA::applyRibbonTheme(this, ribbonBar(), t);
+		} else {
+			setRibbonTheme(t);
 		}
-		setRibbonTheme(ribbonTheme());
 	});
 }
 
