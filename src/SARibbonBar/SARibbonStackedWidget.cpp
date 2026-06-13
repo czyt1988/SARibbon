@@ -537,6 +537,7 @@ void SARibbonStackedWidget::showEvent(QShowEvent* e)
 
         // 确保动画已启动
         QCoreApplication::processEvents();
+        QStackedWidget::showEvent(e);
     } else {
         QStackedWidget::showEvent(e);
     }

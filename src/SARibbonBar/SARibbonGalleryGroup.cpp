@@ -997,9 +997,8 @@ int SARibbonGalleryGroup::gridRowCount() const
     if (gcol == 0) {
         return 0;
     }
-    // 这里的rowcount是item的数量
     int itemCnt = model->rowCount(QModelIndex());
-    return (itemCnt / gcol) + 1;
+    return (itemCnt + gcol - 1) / gcol;
 }
 
 /**
@@ -1021,6 +1020,9 @@ int SARibbonGalleryGroup::gridColumnCount() const
     }
     int w    = viewport()->width();
     QSize gs = gridSize();
+    if (gs.width() <= 0) {
+        return 0;
+    }
     return w / gs.width();
 }
 
@@ -1045,6 +1047,9 @@ int SARibbonGalleryGroup::preferredHeightForWidth(int w) const
     }
     int viewWidth = w - 2 * frameWidth();
     QSize gs      = gridSize();
+    if (gs.width() <= 0) {
+        return -1;
+    }
     int gcol      = viewWidth / gs.width();
     if (gcol == 0) {
         return -1;

@@ -251,6 +251,8 @@ bool SARibbonContextCategory::takeCategory(SARibbonCategory* category)
     for (int i = 0; i < d_ptr->mCategoryDataList.size(); ++i) {
         if (d_ptr->mCategoryDataList[ i ].categoryPage == category) {
             d_ptr->mCategoryDataList.takeAt(i);
+            category->removeEventFilter(this);
+            Q_EMIT categoryPageRemoved(category);
             return (true);
         }
     }

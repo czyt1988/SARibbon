@@ -46,7 +46,7 @@ public:
         horizontalLayoutButtonGroup->addWidget(pushButtonCancel);
 
         pushButtonOk = new QPushButton(customizeDialog);
-        pushButtonOk->setObjectName(QStringLiteral("pushButtonCancel"));
+        pushButtonOk->setObjectName(QStringLiteral("pushButtonOk"));
         horizontalLayoutButtonGroup->addWidget(pushButtonOk);
         verticalLayoutMain->addItem(horizontalLayoutButtonGroup);
         retranslateUi(customizeDialog);
@@ -84,6 +84,7 @@ SARibbonCustomizeDialog::SARibbonCustomizeDialog(SARibbonMainWindow* ribbonWindo
  */
 SARibbonCustomizeDialog::~SARibbonCustomizeDialog()
 {
+    delete ui;
 }
 void SARibbonCustomizeDialog::setupActionsManager(SARibbonActionsManager* mgr)
 {
