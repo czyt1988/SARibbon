@@ -1,12 +1,12 @@
-ï»¿cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.5)
 SET(VERSION_SHORT 0.1)
 project(UseNativeFrameExample VERSION ${VERSION_SHORT})
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
-# qtåº“åŠ è½½ï¼Œæœ€ä½è¦æ±‚5.8
+# qt¿â¼ÓÔØ£¬×îµÍÒªÇó5.8
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} 5.8 COMPONENTS Core Gui Widgets REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} 5.12 COMPONENTS Core Gui Widgets REQUIRED)
 add_executable(UseNativeFrameExample
     mainwindow.h
     mainwindow.cpp
@@ -19,12 +19,12 @@ if(WIN32)
     )
 endif()
 if(NOT TARGET SARibbonBar)
-    # è¯´æ˜è¿™ä¸ªä¾‹å­æ˜¯å•ç‹¬åŠ è½½
+    # ËµÃ÷Õâ¸öÀı×ÓÊÇµ¥¶À¼ÓÔØ
     message(STATUS "NOT TARGET SARibbonBar find_package(SARibbonBar REQUIRED)")
     find_package(SARibbonBar REQUIRED)
 endif()
-target_link_libraries(UseNativeFrameExample PUBLIC SARibbonBar::SARibbonBar)
-target_link_libraries(UseNativeFrameExample PUBLIC
+target_link_libraries(UseNativeFrameExample PRIVATE SARibbonBar::SARibbonBar)
+target_link_libraries(UseNativeFrameExample PRIVATE
                                        Qt${QT_VERSION_MAJOR}::Core 
                                        Qt${QT_VERSION_MAJOR}::Gui 
                                        Qt${QT_VERSION_MAJOR}::Widgets)

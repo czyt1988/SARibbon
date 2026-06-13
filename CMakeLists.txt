@@ -190,16 +190,12 @@ configure_file (
 # 代码目录
 ##################################
 
-# 根据 SARIBBON_BUILD_STATIC_LIBS 的值来设置 BUILD_SHARED_LIBS
-# 如果 SARIBBON_BUILD_STATIC_LIBS 为 ON，则 BUILD_SHARED_LIBS 应为 OFF
-# 如果 SARIBBON_BUILD_STATIC_LIBS 为 OFF，则 BUILD_SHARED_LIBS 应为 ON
-# 注意：option() 命令不会覆盖已存在的变量值，所以需要使用 set() 和 FORCE
+# 根据 SARIBBON_BUILD_STATIC_LIBS 决定库类型（在 add_library 中显式指定）
+# 不再使用 FORCE 覆盖 BUILD_SHARED_LIBS，避免影响子项目嵌入场景
 if(SARIBBON_BUILD_STATIC_LIBS)
-    set(BUILD_SHARED_LIBS OFF CACHE BOOL "Build shared libraries (DLLs)" FORCE)
-    message(STATUS "SARIBBON_BUILD_STATIC_LIBS is ON. Setting BUILD_SHARED_LIBS to OFF (Static Library mode).")
+    message(STATUS "SARIBBON_BUILD_STATIC_LIBS is ON. Building Static Library.")
 else()
-    set(BUILD_SHARED_LIBS ON CACHE BOOL "Build shared libraries (DLLs)" FORCE)
-    message(STATUS "SARIBBON_BUILD_STATIC_LIBS is OFF. Setting BUILD_SHARED_LIBS to ON (Shared Library/DLL mode).")
+    message(STATUS "SARIBBON_BUILD_STATIC_LIBS is OFF. Building Shared Library/DLL.")
 endif()
 
 add_subdirectory(src)

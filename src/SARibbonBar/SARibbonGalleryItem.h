@@ -5,6 +5,7 @@
 #include <QVariant>
 #include <QMap>
 #include <QAction>
+#include <QPointer>
 class SARibbonGalleryGroup;
 
 /**
@@ -77,7 +78,7 @@ public:
 private:
     QMap< int, QVariant > mDatas;
     Qt::ItemFlags mFlags;
-    QAction* mAction;
+    QPointer< QAction > mAction;
 };
 
 #endif  // SARIBBONGALLERYITEM_H

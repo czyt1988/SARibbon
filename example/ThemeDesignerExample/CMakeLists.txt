@@ -5,7 +5,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 set(CMAKE_AUTOMOC ON)
 
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} 5.8 COMPONENTS Core Gui Widgets REQUIRED)
+find_package(Qt${QT_VERSION_MAJOR} 5.12 COMPONENTS Core Gui Widgets REQUIRED)
 add_executable(ThemeDesignerExample
     mainwindow.h
     mainwindow.cpp
@@ -22,8 +22,8 @@ if(NOT TARGET SARibbonBar)
     message(STATUS "NOT TARGET SARibbonBar find_package(SARibbonBar REQUIRED)")
     find_package(SARibbonBar REQUIRED)
 endif()
-target_link_libraries(ThemeDesignerExample PUBLIC SARibbonBar::SARibbonBar)
-target_link_libraries(ThemeDesignerExample PUBLIC
+target_link_libraries(ThemeDesignerExample PRIVATE SARibbonBar::SARibbonBar)
+target_link_libraries(ThemeDesignerExample PRIVATE
     Qt${QT_VERSION_MAJOR}::Core
     Qt${QT_VERSION_MAJOR}::Gui
     Qt${QT_VERSION_MAJOR}::Widgets)

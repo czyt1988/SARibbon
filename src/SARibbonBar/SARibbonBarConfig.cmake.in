@@ -4,6 +4,9 @@
 # @PROJECT_NAME@_LIBRARIES, where to find the libs
 @PACKAGE_INIT@
 
+include(CMakeFindDependencyMacro)
+find_dependency(Qt@QT_VERSION_MAJOR@ COMPONENTS Core Gui Widgets Svg)
+
 set (PackageName @SARIBBON_LIB_NAME@)
 set (@SARIBBON_LIB_NAME@_VERSION @SARIBBON_VERSION@)
 

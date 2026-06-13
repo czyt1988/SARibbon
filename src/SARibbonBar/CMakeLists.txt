@@ -128,7 +128,14 @@ SET(SARIBBON_RESOURCE_FILES
 message(STATUS "SARibbon resource file:${SARIBBON_RESOURCE_FILES}")
 ################################################################
 
-add_library(${SARIBBON_LIB_NAME}
+# 根据 SARIBBON_BUILD_STATIC_LIBS 决定库类型
+if(SARIBBON_BUILD_STATIC_LIBS)
+    set(SARIBBON_LIB_TYPE STATIC)
+else()
+    set(SARIBBON_LIB_TYPE SHARED)
+endif()
+
+add_library(${SARIBBON_LIB_NAME} ${SARIBBON_LIB_TYPE}
     ${SARIBBON_HEADER_FILES}
     ${SARIBBON_SOURCE_FILES}
     ${SACOLOR_HEADER_FILES}
