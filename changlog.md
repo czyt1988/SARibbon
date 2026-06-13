@@ -1,5 +1,25 @@
 # 版本更新记录(change log):
 
+## 2026-06-13 -> 2.9.0
+
+- 新增Office 2016 Green/Dark和Office 2021 Green/Dark主题变体，内置主题总数扩展至6种
+- 新增`SARibbonThemePalette`类，支持从JSON文件加载主题调色板，实现主题的外部配置和动态加载
+- 新增基于模板的QSS主题系统，支持`{{token}}`占位符替换和透明度修饰符（`|opacity`）
+- 新增`SARibbonBar::loadFromFile`接口，可从外部文件加载自定义主题
+- 新增`SA::applyRibbonTheme()`统一主题应用逻辑，整合调色板、QSS模板和运行时调整
+- 新增Office 2016 QSS模板（`office2016.qss`）和基础主题模板（`theme-base.qss`）
+- 新增主题覆盖冒烟测试和`SARibbonThemePalette` JSON加载测试，集成CTest
+- 新增ThemeDesignerExample示例程序，支持主题切分布局与QSS/JSON语法高亮
+- MainWindowExample新增主题预览ComboBox，可实时切换内置主题
+- 重构主题架构，统一`SARibbonTheme`枚举管理，移除旧的`SARibbonIconHelper`
+- 重构`SARibbonMainWindowStyleFlag`和主题切换流程，支持深色模式自动检测
+- 修复5个严重bug：`SARibbonGalleryGroup`除零崩溃、`SARibbonContextCategory::takeCategory`未发射信号、`SARibbonCustomizeDialog`析构内存泄漏、`SARibbonStackedWidget::showEvent`未调基类、objectName错误
+- 修复11个中等严重度问题，涵盖信号缺失、布局计算和状态同步
+- `Q_PROPERTY`全面补充`NOTIFY`信号，修正API拼写错误
+- CMake构建系统优化，新增PowerShell自动化构建脚本（`scripts/build.ps1`）
+- CI工作流启用`BUILD_TESTS`和ctest自动执行
+- 更新构建文档和编码规范文档
+
 ## 2026-04-28 -> 2.8.0
 
 - 新增`SingleRow`（单行）布局模式，Ribbon可在单行样式下展示按钮，图标在左侧文字在右侧，适合空间受限的场景
