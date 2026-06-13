@@ -11,6 +11,8 @@ add_executable(ThemeDesignerExample
     mainwindow.cpp
     helpdialog.h
     helpdialog.cpp
+    syntaxhighlighter.h
+    syntaxhighlighter.cpp
     main.cpp
 )
 if(WIN32)

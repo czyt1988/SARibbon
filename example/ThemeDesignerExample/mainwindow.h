@@ -4,6 +4,8 @@
 #include "SARibbonMainWindow.h"
 #include "SARibbonGlobal.h"
 #include <QTextEdit>
+#include <QSplitter>
+#include <QTabWidget>
 #include <QMap>
 
 class SARibbonBar;
@@ -34,6 +36,10 @@ private:
                            const QString& displayName, const QColor& defaultColor,
                            bool isLarge);
     void syncColorButtonsFromPalette(const QString& palettePath);
+    QString templatePathForTheme(SARibbonTheme theme) const;
+    void updateTemplateDisplay(SARibbonTheme theme);
+    void updateBuiltinQssDisplay(SARibbonTheme theme);
+    void removeCustomTab();
 
 private Q_SLOTS:
     void onGalleryTriggered(QAction* action);
@@ -42,7 +48,12 @@ private Q_SLOTS:
     void onShowContextCategory(bool show);
 
 private:
-    QTextEdit* m_textEdit;
+    QSplitter* m_splitter;
+    QTextEdit* m_templateEdit;
+    QTabWidget* m_tabWidget;
+    QTextEdit* m_builtinQssEdit;
+    QTextEdit* m_customJsonEdit;
+    QTextEdit* m_customQssEdit;
     QMap<QString, SARibbonColorToolButton*> m_colorButtons;
     SARibbonTheme m_currentBaseTheme;
     QMap<QString, SARibbonTheme> m_galleryThemeMap;

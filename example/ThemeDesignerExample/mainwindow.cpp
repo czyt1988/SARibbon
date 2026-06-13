@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "helpdialog.h"
+#include "syntaxhighlighter.h"
 #include "SARibbonBar.h"
 #include "SARibbonCategory.h"
 #include "SARibbonPanel.h"
@@ -8,6 +9,7 @@
 #include "SARibbonColorToolButton.h"
 #include "SARibbonThemeManager.h"
 #include "SARibbonThemePalette.h"
+#include "SARibbonUtil.h"
 #include "SARibbonToolButton.h"
 #include "SARibbonButtonGroupWidget.h"
 #include "SARibbonQuickAccessBar.h"
@@ -126,18 +128,38 @@ static bool isInArray(const char* token, const char* const* arr, int count)
 
 MainWindow::MainWindow(QWidget* parent)
     : SARibbonMainWindow(parent)
-    , m_textEdit(nullptr)
+    , m_splitter(nullptr)
+    , m_templateEdit(nullptr)
+    , m_tabWidget(nullptr)
+    , m_builtinQssEdit(nullptr)
+    , m_customJsonEdit(nullptr)
+    , m_customQssEdit(nullptr)
     , m_currentBaseTheme(SARibbonTheme::RibbonThemeOffice2021Blue)
     , m_contextCategory(nullptr)
 {
     setWindowTitle(tr("Theme Designer Example"));
     setMinimumSize(1000, 700);
 
-    m_textEdit = new QTextEdit(this);
-    m_textEdit->setReadOnly(true);
-    m_textEdit->setFont(QFont("Consolas", 10));
-    m_textEdit->setPlaceholderText(tr("Click 'Generate' to create and display the theme JSON here."));
-    setCentralWidget(m_textEdit);
+    m_splitter = new QSplitter(Qt::Horizontal, this);
+
+    m_templateEdit = new QTextEdit();
+    m_templateEdit->setReadOnly(true);
+    m_templateEdit->setFont(QFont("Consolas", 10));
+    m_templateEdit->setPlaceholderText(tr("QSS Template"));
+    new QssSyntaxHighlighter(m_templateEdit->document());
+
+    m_tabWidget = new QTabWidget();
+    m_builtinQssEdit = new QTextEdit();
+    m_builtinQssEdit->setReadOnly(true);
+    m_builtinQssEdit->setFont(QFont("Consolas", 10));
+    new QssSyntaxHighlighter(m_builtinQssEdit->document());
+    m_tabWidget->addTab(m_builtinQssEdit, tr("Built-in QSS"));
+
+    m_splitter->addWidget(m_templateEdit);
+    m_splitter->addWidget(m_tabWidget);
+    m_splitter->setStretchFactor(0, 1);
+    m_splitter->setStretchFactor(1, 1);
+    setCentralWidget(m_splitter);
 
     SARibbonBar* bar = ribbonBar();
 
@@ -156,6 +178,8 @@ MainWindow::MainWindow(QWidget* parent)
     statusBar()->showMessage(tr("Note: Some color tokens only apply to specific templates (e.g. Win7 gradients, Office 2013 specific colors)."));
 
     applyBuiltinTheme(m_currentBaseTheme);
+    updateTemplateDisplay(m_currentBaseTheme);
+    updateBuiltinQssDisplay(m_currentBaseTheme);
 }
 
 void MainWindow::createCategoryDesigner(SARibbonCategory* category)
@@ -460,6 +484,9 @@ void MainWindow::onGalleryTriggered(QAction* action)
         const ThemeEntry& entry = s_builtinThemes[idx];
         applyBuiltinTheme(entry.theme);
         syncColorButtonsFromPalette(entry.palettePath);
+        updateTemplateDisplay(entry.theme);
+        updateBuiltinQssDisplay(entry.theme);
+        removeCustomTab();
     }
 }
 
@@ -478,9 +505,37 @@ void MainWindow::onGenerate()
     QJsonObject root = generatePaletteJson();
     QJsonDocument doc(root);
     QByteArray jsonData = doc.toJson(QJsonDocument::Indented);
-    m_textEdit->setText(QString::fromUtf8(jsonData));
     SA::SARibbonThemePalette palette;
     palette.loadFromJson(jsonData);
+
+    // Generate custom QSS by replacing tokens in the template
+    QString templatePath = templatePathForTheme(m_currentBaseTheme);
+    QFile templateFile(templatePath);
+    QString customQss;
+    if (templateFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QString templateQss = QString::fromUtf8(templateFile.readAll());
+        customQss = SA::replaceQssTokens(templateQss, palette);
+    }
+
+    if (!m_customJsonEdit) {
+        m_customJsonEdit = new QTextEdit();
+        m_customJsonEdit->setReadOnly(true);
+        m_customJsonEdit->setFont(QFont("Consolas", 10));
+        new JsonSyntaxHighlighter(m_customJsonEdit->document());
+        m_tabWidget->addTab(m_customJsonEdit, tr("Custom JSON"));
+    }
+    m_customJsonEdit->setText(QString::fromUtf8(jsonData));
+
+    if (!m_customQssEdit) {
+        m_customQssEdit = new QTextEdit();
+        m_customQssEdit->setReadOnly(true);
+        m_customQssEdit->setFont(QFont("Consolas", 10));
+        new QssSyntaxHighlighter(m_customQssEdit->document());
+        m_tabWidget->addTab(m_customQssEdit, tr("Custom QSS"));
+    }
+    m_customQssEdit->setText(customQss);
+    m_tabWidget->setCurrentWidget(m_customJsonEdit);
+
     SA::applyRibbonTheme(this, ribbonBar(), m_currentBaseTheme, palette);
 }
 
@@ -542,4 +597,62 @@ QJsonObject MainWindow::generatePaletteJson() const
     root["fixed"] = fixed;
 
     return root;
+}
+
+QString MainWindow::templatePathForTheme(SARibbonTheme theme) const
+{
+    switch (theme) {
+    case SARibbonTheme::RibbonThemeOffice2016Blue:
+    case SARibbonTheme::RibbonThemeOffice2016Green:
+    case SARibbonTheme::RibbonThemeOffice2016Dark:
+        return ":/SARibbonTheme/resource/templates/office2016.qss";
+    case SARibbonTheme::RibbonThemeOffice2021Blue:
+    case SARibbonTheme::RibbonThemeOffice2021Green:
+    case SARibbonTheme::RibbonThemeOffice2021Dark:
+        return ":/SARibbonTheme/resource/templates/office2021.qss";
+    case SARibbonTheme::RibbonThemeDark:
+        return ":/SARibbonTheme/resource/templates/dark.qss";
+    case SARibbonTheme::RibbonThemeDark2:
+        return ":/SARibbonTheme/resource/templates/dark2.qss";
+    case SARibbonTheme::RibbonThemeWindows7:
+        return ":/SARibbonTheme/resource/templates/win7.qss";
+    case SARibbonTheme::RibbonThemeOffice2013:
+        return ":/SARibbonTheme/resource/templates/office2013.qss";
+    default:
+        return QString();
+    }
+}
+
+void MainWindow::updateTemplateDisplay(SARibbonTheme theme)
+{
+    QString path = templatePathForTheme(theme);
+    QFile file(path);
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        m_templateEdit->setText(QString::fromUtf8(file.readAll()));
+    } else {
+        m_templateEdit->clear();
+    }
+}
+
+void MainWindow::updateBuiltinQssDisplay(SARibbonTheme theme)
+{
+    m_builtinQssEdit->setText(SA::getBuiltInRibbonThemeQss(theme));
+}
+
+void MainWindow::removeCustomTab()
+{
+    if (m_customJsonEdit) {
+        int idx = m_tabWidget->indexOf(m_customJsonEdit);
+        if (idx >= 0)
+            m_tabWidget->removeTab(idx);
+        delete m_customJsonEdit;
+        m_customJsonEdit = nullptr;
+    }
+    if (m_customQssEdit) {
+        int idx = m_tabWidget->indexOf(m_customQssEdit);
+        if (idx >= 0)
+            m_tabWidget->removeTab(idx);
+        delete m_customQssEdit;
+        m_customQssEdit = nullptr;
+    }
 }
