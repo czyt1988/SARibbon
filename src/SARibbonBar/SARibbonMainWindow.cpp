@@ -239,6 +239,10 @@ void SARibbonMainWindow::setRibbonBar(SARibbonBar* ribbon)
             // SARibbonSystemButtonBar的eventfilter捕获mainwindow的事件
             // 通过eventerfilter来处理mainwindow的事件，避免用户错误的继承resizeEvent导致systembar的位置异常
             installEventFilter(d_ptr->mWindowButtonGroup);
+        } else {
+            // 避免重复 installEventFilter（Qt 文档：同一 filter 多次 install 会被调用多次）
+            removeEventFilter(d_ptr->mWindowButtonGroup);
+            installEventFilter(d_ptr->mWindowButtonGroup);
         }
 
         SARibbonSystemButtonBar* sysBar = d_ptr->mWindowButtonGroup;

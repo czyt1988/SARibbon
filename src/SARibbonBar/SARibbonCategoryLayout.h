@@ -27,6 +27,10 @@ class SA_RIBBON_EXPORT SARibbonCategoryLayout : public QLayout
     SA_RIBBON_DECLARE_PRIVATE(SARibbonCategoryLayout)
 public:
     Q_PROPERTY(int scrollPosition READ scrollPosition WRITE setScrollPosition)
+    // == Cache members (mutable for const lazy evaluation) ==
+private:
+    mutable QSize mCachedSizeHint;
+    mutable QSize mCachedMinSizeHint;
 public:
     /// Constructor for SARibbonCategoryLayout
     explicit SARibbonCategoryLayout(SARibbonCategory* parent);

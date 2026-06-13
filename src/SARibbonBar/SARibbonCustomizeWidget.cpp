@@ -804,10 +804,10 @@ void SARibbonCustomizeWidget::initConnection()
  */
 void SARibbonCustomizeWidget::setupActionsManager(SARibbonActionsManager* mgr)
 {
-    d_ptr->mActionMgr = mgr;
     if (d_ptr->mActionMgr) {
         d_ptr->mAcionModel->uninstallActionsManager();
     }
+    d_ptr->mActionMgr = mgr;
     d_ptr->mAcionModel->setupActionsManager(mgr);
     // 更新左边复选框
     QList< int > tags = mgr->actionTags();

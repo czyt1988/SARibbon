@@ -1408,7 +1408,8 @@ void SARibbonToolButton::changeEvent(QEvent* e)
             invalidateSizeHint();
         } break;
         case QEvent::LayoutDirectionChange: {
-            // 布局方向改变（如 LTR→RTL），触发重绘以更新内部绘制矩形
+            // 布局方向改变（如 LTR→RTL），重新计算绘制矩形和尺寸提示
+            invalidateSizeHint();
             update();
         } break;
         case QEvent::ScreenChangeInternal:

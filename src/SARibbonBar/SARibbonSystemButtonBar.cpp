@@ -812,6 +812,7 @@ void SARibbonSystemButtonBar::resizeEvent(QResizeEvent* e)
 {
     Q_UNUSED(e);
     d_ptr->resizeElement(size());
+    QFrame::resizeEvent(e);
 }
 
 /**

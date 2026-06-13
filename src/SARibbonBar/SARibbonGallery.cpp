@@ -639,7 +639,10 @@ void SARibbonGallery::pageDown()
 {
     if (d_ptr->mCurrentViewportGroup) {
         QScrollBar* vscrollBar = d_ptr->mCurrentViewportGroup->verticalScrollBar();
-        int v                  = vscrollBar->value();
+        if (!vscrollBar) {
+            return;
+        }
+        int v = vscrollBar->value();
         v += vscrollBar->singleStep();
         vscrollBar->setValue(v);
     }
@@ -663,7 +666,10 @@ void SARibbonGallery::pageUp()
 {
     if (d_ptr->mCurrentViewportGroup) {
         QScrollBar* vscrollBar = d_ptr->mCurrentViewportGroup->verticalScrollBar();
-        int v                  = vscrollBar->value();
+        if (!vscrollBar) {
+            return;
+        }
+        int v = vscrollBar->value();
         v -= vscrollBar->singleStep();
         vscrollBar->setValue(v);
     }

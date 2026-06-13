@@ -964,7 +964,7 @@ void SARibbonPanelLayout::updateGeomArray(const QRect& setrect)
     // 布局label
     const int yTitleBegin      = qMax(height - mag.bottom() - titleH, 1);
     bool isTitleWidthThanPanel = false;
-    if (isEnableShowPanelTitle()) {
+    if (isEnableShowPanelTitle() && mTitleLabel) {
         mTitleLabelGeometry.setRect(mag.left(), yTitleBegin, setrect.width() - mag.left() - mag.right(), titleH);
         // 这里要确认标题宽度是否大于totalWidth，如果大于，则要把标题的宽度作为totalwidth
         QFontMetrics fm = mTitleLabel->fontMetrics();

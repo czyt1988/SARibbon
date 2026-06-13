@@ -1356,6 +1356,7 @@ QPair< QSize, QSize > SARibbonCategory::panelToolButtonIconSize() const
 void SARibbonCategory::wheelEvent(QWheelEvent* event)
 {
     d_ptr->doWheelEvent(event);
+    QWidget::wheelEvent(event);
 }
 
 /**

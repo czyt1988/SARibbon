@@ -294,20 +294,18 @@ void SARibbonCategoryLayout::insertPanel(int index, SARibbonPanel* panel)
 
 QSize SARibbonCategoryLayout::sizeHint() const
 {
-    if (d_ptr->mSizeHint.isNull()) {
-        SARibbonCategoryLayout* that = const_cast< SARibbonCategoryLayout* >(this);
-        that->updateGeometryArr();
+    if (mCachedSizeHint.isNull()) {
+        const_cast< SARibbonCategoryLayout* >(this)->updateGeometryArr();
     }
-    return (d_ptr->mSizeHint);
+    return mCachedSizeHint;
 }
 
 QSize SARibbonCategoryLayout::minimumSize() const
 {
-    if (d_ptr->mMinSizeHint.isNull()) {
-        SARibbonCategoryLayout* that = const_cast< SARibbonCategoryLayout* >(this);
-        that->updateGeometryArr();
+    if (mCachedMinSizeHint.isNull()) {
+        const_cast< SARibbonCategoryLayout* >(this)->updateGeometryArr();
     }
-    return (d_ptr->mMinSizeHint);
+    return mCachedMinSizeHint;
 }
 
 /**
@@ -328,7 +326,9 @@ Qt::Orientations SARibbonCategoryLayout::expandingDirections() const
 
 void SARibbonCategoryLayout::invalidate()
 {
-    d_ptr->mDirty = true;
+    mCachedSizeHint    = QSize();
+    mCachedMinSizeHint = QSize();
+    d_ptr->mDirty      = true;
     QLayout::invalidate();
 }
 /**
@@ -512,9 +512,9 @@ void SARibbonCategoryLayout::updateGeometryArr()
         x += w;
         total += w;
     }
-    d_ptr->mTotalWidth  = total;
-    d_ptr->mSizeHint    = QSize(d_ptr->mTotalWidth, height);
-    d_ptr->mMinSizeHint = QSize(categoryWidth, height);
+    d_ptr->mTotalWidth      = total;
+    mCachedSizeHint         = QSize(d_ptr->mTotalWidth, height);
+    mCachedMinSizeHint      = QSize(categoryWidth, height);
 
     // RTL mirroring: mirror panel and separator x-coordinates
     if (SA::saIsRTL()) {
@@ -533,7 +533,7 @@ void SARibbonCategoryLayout::updateGeometryArr()
         }
     }
 #if SARibbonCategoryLayout_DEBUG_PRINT
-    qDebug() << "  SARibbonCategoryLayout updateGeometryArr,SizeHint=" << d_ptr->mSizeHint
+    qDebug() << "  SARibbonCategoryLayout updateGeometryArr,SizeHint=" << mCachedSizeHint
              << ",Category name=" << category->categoryName();
 #endif
 }

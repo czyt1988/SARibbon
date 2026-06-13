@@ -200,6 +200,7 @@ enum class SARibbonAlignment
     AlignCenter,  ///< Center alignment, tab bar center aligned, category also center aligned
     AlignRight    ///< Right alignment, tab bar right aligned, category also right aligned
 };
+Q_DECLARE_METATYPE(SARibbonAlignment)
 
 /**
  * \if ENGLISH
@@ -230,6 +231,7 @@ enum class SARibbonTheme
     RibbonThemeDark2,            ///< Dark theme 2
     RibbonThemeUserDefine = 1000
 };
+Q_DECLARE_METATYPE(SARibbonTheme)
 
 /**
  * \if ENGLISH

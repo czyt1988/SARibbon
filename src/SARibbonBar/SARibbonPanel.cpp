@@ -295,7 +295,8 @@ QToolButton::ToolButtonPopupMode SARibbonPanel::getActionToolButtonPopupModeProp
     if (isok) {
         return (static_cast< QToolButton::ToolButtonPopupMode >(r));
     }
-    return (QToolButton::InstantPopup);
+    // 使用 QToolButton 的默认值 DelayedPopup，保持一致性
+    return (QToolButton::DelayedPopup);
 }
 
 /**
