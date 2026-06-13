@@ -902,7 +902,7 @@ void MainWindow::onButtonGroupActionTriggered(QAction* triggeredAction)
         if (!ribbonBar()) {
             return;
         }
-        ribbonBar()->setWindowTitleAligment(alignment);
+        ribbonBar()->setWindowTitleAlignment(alignment);
     }
 }
 
@@ -1879,7 +1879,7 @@ void MainWindow::createCategoryMain(SARibbonCategory* categoryPage)
     QAction* actionShowHideButton =
         createAction(tr("show \nhide button"), ":/icon/icon/showHideButton.svg", "show hide button");
     actionShowHideButton->setCheckable(true);
-    actionShowHideButton->setChecked(ribbonBar()->haveShowMinimumModeButton());
+    actionShowHideButton->setChecked(ribbonBar()->isMinimumModeButtonVisible());
     panelStyle->addSmallAction(actionShowHideButton);
     connect(actionShowHideButton, &QAction::triggered, this, &MainWindow::onShowHideButtonActionTriggered);
 

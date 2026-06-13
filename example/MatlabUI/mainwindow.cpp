@@ -293,7 +293,7 @@ void MainWindow::createCategoryMain(SARibbonCategory* page)
     QAction* actShowHideButton =
         createAction(tr("show \nhide button"), ":/icon/icon/showHideButton.svg", "show hide button");
     actShowHideButton->setCheckable(true);
-    actShowHideButton->setChecked(ribbonBar()->haveShowMinimumModeButton());
+    actShowHideButton->setChecked(ribbonBar()->isMinimumModeButtonVisible());
     panelStyle->addMediumAction(actShowHideButton);  // wrod wrap was not effect in small button
     connect(actShowHideButton, &QAction::triggered, this, [ this ](bool b) {
         this->ribbonBar()->showMinimumModeButton(b);  // 显示ribbon最小化按钮
