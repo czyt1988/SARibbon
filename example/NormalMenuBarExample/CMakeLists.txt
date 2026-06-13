@@ -6,7 +6,7 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} 5.12 COMPONENTS Core Gui Widgets REQUIRED)
 
-# linuxœ¬ª·±®
+# linux‰∏ã‰ºöÊä•
 set(CMAKE_AUTOUIC_SEARCH_PATHS ${CMAKE_CURRENT_LIST_DIR})
 add_executable(NormalMenuBarExample
     MainWindow.h
@@ -18,17 +18,17 @@ if(WIN32)
     set_target_properties(NormalMenuBarExample PROPERTIES WIN32_EXECUTABLE TRUE)
 endif()
 if(NOT TARGET SARibbonBar)
-    # Àµ√˜’‚∏ˆ¿˝◊” «µ•∂¿º”‘ÿ
+    # ËØ¥ÊòéËøô‰∏™‰æãÂ≠êÊòØÂçïÁã¨Âä†ËΩΩ
     message(STATUS "NOT TARGET SARibbonBar find_package(SARibbonBar REQUIRED)")
     find_package(SARibbonBar REQUIRED)
 endif()
 
 target_link_libraries(NormalMenuBarExample PRIVATE SARibbonBar::SARibbonBar)
 target_link_libraries(NormalMenuBarExample PRIVATE
-                                       Qt${QT_VERSION_MAJOR}::Core 
-                                       Qt${QT_VERSION_MAJOR}::Gui 
+                                       Qt${QT_VERSION_MAJOR}::Core
+                                       Qt${QT_VERSION_MAJOR}::Gui
                                        Qt${QT_VERSION_MAJOR}::Widgets)
-                                           
+
 set_target_properties(NormalMenuBarExample PROPERTIES
     AUTOMOC ON
     AUTORCC ON
@@ -51,4 +51,3 @@ install(TARGETS NormalMenuBarExample
 if(QT_VERSION_MAJOR EQUAL 6)
     qt_finalize_executable(NormalMenuBarExample)
 endif()
-

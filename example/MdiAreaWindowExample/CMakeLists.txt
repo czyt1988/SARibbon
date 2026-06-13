@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.5)
 SET(VERSION_SHORT 0.1)
 project(MdiAreaWindowExample VERSION ${VERSION_SHORT})
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-# qtø‚º”‘ÿ£¨◊ÓµÕ“™«Û5.8
+# qtÂ∫ìÂä†ËΩΩÔºåÊúÄ‰ΩéË¶ÅÊ±Ç5.8
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} 5.12 COMPONENTS Core Gui Widgets REQUIRED)
 file(GLOB HEADER_FILES "${CMAKE_CURRENT_LIST_DIR}/*.h")
@@ -21,17 +21,17 @@ if(WIN32)
     )
 endif()
 if(NOT TARGET SARibbonBar)
-    # Àµ√˜’‚∏ˆ¿˝◊” «µ•∂¿º”‘ÿ
+    # ËØ¥ÊòéËøô‰∏™‰æãÂ≠êÊòØÂçïÁã¨Âä†ËΩΩ
     message(STATUS "NOT TARGET SARibbonBar find_package(SARibbonBar REQUIRED)")
     find_package(SARibbonBar REQUIRED)
 endif()
 
 target_link_libraries(MdiAreaWindowExample PRIVATE SARibbonBar::SARibbonBar)
 target_link_libraries(MdiAreaWindowExample PRIVATE
-                                       Qt${QT_VERSION_MAJOR}::Core 
-                                       Qt${QT_VERSION_MAJOR}::Gui 
+                                       Qt${QT_VERSION_MAJOR}::Core
+                                       Qt${QT_VERSION_MAJOR}::Gui
                                        Qt${QT_VERSION_MAJOR}::Widgets)
-                                           
+
 set_target_properties(MdiAreaWindowExample PROPERTIES
     AUTOMOC ON
     AUTORCC ON
