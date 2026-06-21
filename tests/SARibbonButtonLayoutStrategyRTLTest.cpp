@@ -1,5 +1,7 @@
 #include <QtTest>
 #include <QApplication>
+#include <QFontMetrics>
+#include <QStyleOptionToolButton>
 #include "SARibbonButtonLayoutStrategy.h"
 #include "SARibbonToolButton.h"
 
@@ -21,24 +23,34 @@ void SARibbonButtonLayoutStrategyRTLTest::testSmallButtonStrategyIndicator()
     button.setText("Test");
     button.resize(80, 30);
 
-    SARibbonSmallButtonLayoutStrategy smallStrategy(&button);
+    SARibbonSmallButtonLayoutStrategy smallStrategy;
+    SARibbonButtonLayoutContext ctx(&button);
 
-    // Test LTR
+    QStyleOptionToolButton opt;
+    opt.rect            = button.rect();
+    opt.state          |= QStyle::State_Enabled;
+    opt.features       |= QStyleOptionToolButton::MenuButtonPopup;
+    opt.text            = QStringLiteral("Test");
+    opt.toolButtonStyle = Qt::ToolButtonTextOnly;
+    opt.fontMetrics     = QFontMetrics(button.font());
+
+    // LTR: indicator on the right
     QApplication::setLayoutDirection(Qt::LeftToRight);
-    SARibbonButtonLayoutStrategy::DrawRects ltrRects = smallStrategy.calcDrawRects(button.rect());
+    SARibbonButtonLayoutRects ltrRects;
+    smallStrategy.calculateDrawRects(opt, ltrRects, ctx);
     QVERIFY(ltrRects.indicatorRect.isValid());
-    QVERIFY(ltrRects.indicatorRect.left() > button.width() / 2); // Right side
+    QVERIFY(ltrRects.indicatorRect.left() > button.width() / 2);
 
-    // Test RTL
+    // RTL: indicator on the left
     QApplication::setLayoutDirection(Qt::RightToLeft);
-    SARibbonButtonLayoutStrategy::DrawRects rtlRects = smallStrategy.calcDrawRects(button.rect());
+    SARibbonButtonLayoutRects rtlRects;
+    smallStrategy.calculateDrawRects(opt, rtlRects, ctx);
     QVERIFY(rtlRects.indicatorRect.isValid());
-    QVERIFY(rtlRects.indicatorRect.right() < button.width() / 2); // Left side
+    QVERIFY(rtlRects.indicatorRect.right() < button.width() / 2);
 
-    // Icon should be mirrored
+    // Icon rect size should be identical in both directions
     QCOMPARE(ltrRects.iconRect.size(), rtlRects.iconRect.size());
 
-    // Reset to LTR
     QApplication::setLayoutDirection(Qt::LeftToRight);
 }
 
@@ -50,26 +62,37 @@ void SARibbonButtonLayoutStrategyRTLTest::testLargeButtonStrategyIndicator()
     button.setText("Test");
     button.resize(80, 60);
 
-    SARibbonLargeButtonLayoutStrategy largeStrategy(&button);
+    SARibbonLargeButtonLayoutStrategy largeStrategy;
+    SARibbonButtonLayoutContext ctx(&button);
+    ctx.enableWordWrap = false;  // single-line mode for compact indicator placement
 
-    // Test LTR
+    QStyleOptionToolButton opt;
+    opt.rect            = button.rect();
+    opt.state          |= QStyle::State_Enabled;
+    opt.features       |= QStyleOptionToolButton::MenuButtonPopup;
+    opt.text            = QStringLiteral("Test");
+    opt.toolButtonStyle = Qt::ToolButtonTextUnderIcon;
+    opt.fontMetrics     = QFontMetrics(button.font());
+
+    // LTR: indicator at bottom-right
     QApplication::setLayoutDirection(Qt::LeftToRight);
-    SARibbonButtonLayoutStrategy::DrawRects ltrRects = largeStrategy.calcDrawRects(button.rect());
+    SARibbonButtonLayoutRects ltrRects;
+    largeStrategy.calculateDrawRects(opt, ltrRects, ctx);
     QVERIFY(ltrRects.indicatorRect.isValid());
-    QVERIFY(ltrRects.indicatorRect.left() > button.width() / 2); // Right side
-    QVERIFY(ltrRects.indicatorRect.top() > button.height() / 2); // Bottom side
+    QVERIFY(ltrRects.indicatorRect.left() > button.width() / 2);
+    QVERIFY(ltrRects.indicatorRect.top() > button.height() / 2);
 
-    // Test RTL
+    // RTL: indicator at bottom-left
     QApplication::setLayoutDirection(Qt::RightToLeft);
-    SARibbonButtonLayoutStrategy::DrawRects rtlRects = largeStrategy.calcDrawRects(button.rect());
+    SARibbonButtonLayoutRects rtlRects;
+    largeStrategy.calculateDrawRects(opt, rtlRects, ctx);
     QVERIFY(rtlRects.indicatorRect.isValid());
-    QVERIFY(rtlRects.indicatorRect.right() < button.width() / 2); // Left side
-    QVERIFY(rtlRects.indicatorRect.top() > button.height() / 2); // Bottom side
+    QVERIFY(rtlRects.indicatorRect.right() < button.width() / 2);
+    QVERIFY(rtlRects.indicatorRect.top() > button.height() / 2);
 
-    // Icon should be mirrored
+    // Icon rect size should be identical in both directions
     QCOMPARE(ltrRects.iconRect.size(), rtlRects.iconRect.size());
 
-    // Reset to LTR
     QApplication::setLayoutDirection(Qt::LeftToRight);
 }
 
@@ -79,24 +102,30 @@ void SARibbonButtonLayoutStrategyRTLTest::testStrategySizeHintConsistency()
     button.setButtonType(SARibbonToolButton::SmallButton);
     button.setText("Test");
 
-    SARibbonSmallButtonLayoutStrategy smallStrategy(&button);
-    SARibbonLargeButtonLayoutStrategy largeStrategy(&button);
+    SARibbonSmallButtonLayoutStrategy smallStrategy;
+    SARibbonLargeButtonLayoutStrategy largeStrategy;
+    SARibbonButtonLayoutContext ctx(&button);
 
-    // Test small button size hint same in LTR and RTL
+    QStyleOptionToolButton opt;
+    opt.state          |= QStyle::State_Enabled;
+    opt.text            = QStringLiteral("Test");
+    opt.toolButtonStyle = Qt::ToolButtonTextBesideIcon;
+    opt.fontMetrics     = QFontMetrics(button.font());
+
+    // Small button size hint should be the same in LTR and RTL
     QApplication::setLayoutDirection(Qt::LeftToRight);
-    QSize ltrSmallSize = smallStrategy.sizeHint(Qt::MinimumSize);
+    QSize ltrSmallSize = smallStrategy.calculateSizeHint(opt, ctx);
     QApplication::setLayoutDirection(Qt::RightToLeft);
-    QSize rtlSmallSize = smallStrategy.sizeHint(Qt::MinimumSize);
+    QSize rtlSmallSize = smallStrategy.calculateSizeHint(opt, ctx);
     QCOMPARE(ltrSmallSize, rtlSmallSize);
 
-    // Test large button size hint same in LTR and RTL
+    // Large button size hint should be the same in LTR and RTL
     QApplication::setLayoutDirection(Qt::LeftToRight);
-    QSize ltrLargeSize = largeStrategy.sizeHint(Qt::MinimumSize);
+    QSize ltrLargeSize = largeStrategy.calculateSizeHint(opt, ctx);
     QApplication::setLayoutDirection(Qt::RightToLeft);
-    QSize rtlLargeSize = largeStrategy.sizeHint(Qt::MinimumSize);
+    QSize rtlLargeSize = largeStrategy.calculateSizeHint(opt, ctx);
     QCOMPARE(ltrLargeSize, rtlLargeSize);
 
-    // Reset to LTR
     QApplication::setLayoutDirection(Qt::LeftToRight);
 }
 

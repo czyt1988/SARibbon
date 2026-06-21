@@ -7,66 +7,68 @@ class SARibbonToolButtonRTLTest : public QObject
     Q_OBJECT
 
 private slots:
-    void testSmallButtonIndicatorPosition();
-    void testLargeButtonIndicatorPosition();
+    void testSmallButtonSizeHintConsistency();
+    void testLargeButtonSizeHintConsistency();
+    void testButtonPaintInRTL();
 };
 
-void SARibbonToolButtonRTLTest::testSmallButtonIndicatorPosition()
+void SARibbonToolButtonRTLTest::testSmallButtonSizeHintConsistency()
 {
     SARibbonToolButton button;
     button.setButtonType(SARibbonToolButton::SmallButton);
     button.setPopupMode(QToolButton::MenuButtonPopup);
     button.setText("Test");
-    button.resize(80, 30);
-    button.show();
-    QApplication::processEvents();
 
-    // Test LTR: indicator should be on the right
     QApplication::setLayoutDirection(Qt::LeftToRight);
-    QRect indicatorRect = button.calcSmallButtonDrawRects().indicatorRect;
-    QVERIFY(indicatorRect.isValid());
-    QVERIFY(indicatorRect.left() > button.width() / 2); // Right side
+    button.invalidateSizeHint();
+    QSize ltrSize = button.sizeHint();
 
-    // Test RTL: indicator should be on the left
     QApplication::setLayoutDirection(Qt::RightToLeft);
-    QApplication::processEvents();
-    indicatorRect = button.calcSmallButtonDrawRects().indicatorRect;
-    QVERIFY(indicatorRect.isValid());
-    QVERIFY(indicatorRect.right() < button.width() / 2); // Left side
+    button.invalidateSizeHint();
+    QSize rtlSize = button.sizeHint();
 
-    // Reset to LTR
+    QCOMPARE(ltrSize, rtlSize);
     QApplication::setLayoutDirection(Qt::LeftToRight);
-    button.hide();
 }
 
-void SARibbonToolButtonRTLTest::testLargeButtonIndicatorPosition()
+void SARibbonToolButtonRTLTest::testLargeButtonSizeHintConsistency()
+{
+    SARibbonToolButton button;
+    button.setButtonType(SARibbonToolButton::LargeButton);
+    button.setPopupMode(QToolButton::MenuButtonPopup);
+    button.setText("Test");
+
+    QApplication::setLayoutDirection(Qt::LeftToRight);
+    button.invalidateSizeHint();
+    QSize ltrSize = button.sizeHint();
+
+    QApplication::setLayoutDirection(Qt::RightToLeft);
+    button.invalidateSizeHint();
+    QSize rtlSize = button.sizeHint();
+
+    QCOMPARE(ltrSize, rtlSize);
+    QApplication::setLayoutDirection(Qt::LeftToRight);
+}
+
+void SARibbonToolButtonRTLTest::testButtonPaintInRTL()
 {
     SARibbonToolButton button;
     button.setButtonType(SARibbonToolButton::LargeButton);
     button.setPopupMode(QToolButton::MenuButtonPopup);
     button.setText("Test");
     button.resize(80, 60);
+
+    QApplication::setLayoutDirection(Qt::RightToLeft);
     button.show();
     QApplication::processEvents();
+    QVERIFY(button.isVisible());
 
-    // Test LTR: indicator should be at bottom-right
-    QApplication::setLayoutDirection(Qt::LeftToRight);
-    QRect indicatorRect = button.calcLargeButtonDrawRects().indicatorRect;
-    QVERIFY(indicatorRect.isValid());
-    QVERIFY(indicatorRect.left() > button.width() / 2); // Right side
-    QVERIFY(indicatorRect.top() > button.height() / 2); // Bottom side
-
-    // Test RTL: indicator should be at bottom-left
-    QApplication::setLayoutDirection(Qt::RightToLeft);
+    // Trigger a repaint — should not crash in RTL
+    button.update();
     QApplication::processEvents();
-    indicatorRect = button.calcLargeButtonDrawRects().indicatorRect;
-    QVERIFY(indicatorRect.isValid());
-    QVERIFY(indicatorRect.right() < button.width() / 2); // Left side
-    QVERIFY(indicatorRect.top() > button.height() / 2); // Bottom side
 
-    // Reset to LTR
-    QApplication::setLayoutDirection(Qt::LeftToRight);
     button.hide();
+    QApplication::setLayoutDirection(Qt::LeftToRight);
 }
 
 QTEST_MAIN(SARibbonToolButtonRTLTest)
