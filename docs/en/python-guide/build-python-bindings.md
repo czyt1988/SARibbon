@@ -1,4 +1,4 @@
-﻿# Python Bindings Build Guide
+# Python Bindings Build Guide
 
 This document describes how to build the SARibbon Python bindings (PyQtSARibbon) from source.
 
@@ -10,8 +10,6 @@ This document describes how to build the SARibbon Python bindings (PyQtSARibbon)
 | [Use Python Bindings](./use-python-bindings.md) | Use SARibbon in Python |
 
 ## Prerequisites
-
-Before building, ensure the following software is installed:
 
 | Software | Version | Description |
 |----------|---------|-------------|
@@ -26,75 +24,58 @@ Before building, ensure the following software is installed:
 
 ### 1. Install Python Dependencies
 
-Use pip to install the required Python packages:
-
-`ash
+```bash
 pip install PyQt5 PyQt5-sip PyQt-builder
-`
+```
 
 Verify the installation:
 
-`ash
+```bash
 python -c "import PyQt5; print(PyQt5.__version__)"
 python -c "import sipbuild; print(sipbuild.version.SIP_VERSION_STR)"
-`
+```
 
 ### 2. Verify Qt Installation
 
-Ensure Qt is properly installed and configured in your PATH:
-
-`ash
+```bash
 qmake --version
-`
-
-If the command is not found, add Qt's bin directory to your system PATH.
+```
 
 ### 3. Configure Compiler
 
 #### Windows (MSVC)
 
-Use the Visual Studio Developer Command Prompt:
-
-`ash
-# Search for "x64 Native Tools Command Prompt for VS 2019" in Start Menu
-# Or run:
-"C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
-`
+```bash
+# Use "x64 Native Tools Command Prompt for VS 2019"
+"C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\Community\\VC\\Auxiliary\\Build\\vcvarsall.bat" x64
+```
 
 #### Linux (GCC)
 
-Ensure development tools are installed:
-
-`ash
+```bash
 sudo apt-get install build-essential
-`
+```
 
 #### macOS (Clang)
 
-Ensure Xcode Command Line Tools are installed:
-
-`ash
+```bash
 xcode-select --install
-`
+```
 
 ## Build Steps
 
 ### 1. Clone Source Code
 
-If you haven't cloned the SARibbon repository yet:
-
-`ash
+```bash
 git clone https://github.com/czyt1988/SARibbon.git
 cd SARibbon
-`
+```
 
 ### 2. Build Python Bindings
 
-From the project root directory, run:
-
-`ash
+```bash
 sip-build --build-dir build-python
-`
+```
 
 This command will:
 
@@ -103,97 +84,70 @@ This command will:
 3. Generate PyQtSARibbon.pyd (Windows) or PyQtSARibbon.so (Linux/macOS)
 
 !!! tip
-    If you encounter Qt path errors during the build, you can explicitly specify the qmake path:
-    `ash
+    If you encounter Qt path errors, specify the qmake path explicitly:
+
+    ```bash
     sip-build --qmake /path/to/qmake --build-dir build-python
-    `
+    ```
 
 ### 3. Install Module
 
-After a successful build, copy the compiled module to Python's site-packages directory:
-
 #### Windows
 
-`ash
+```bash
 copy build-python\PyQtSARibbon\PyQtSARibbon.pyd <Python_path>\Lib\site-packages\
-`
+```
 
 #### Linux/macOS
 
-`ash
+```bash
 cp build-python/PyQtSARibbon/PyQtSARibbon.so <Python_path>/lib/python3.x/site-packages/
-`
+```
 
-Or use pip to install:
+Or use pip:
 
-`ash
+```bash
 pip install .
-`
+```
 
 ## Verify Installation
 
-After installation, verify the module is available:
-
-`ash
+```bash
 python -c "from PyQtSARibbon import SARibbonBar; print('PyQtSARibbon installed successfully!')"
-`
-
-If you see "PyQtSARibbon installed successfully!", the installation is correct.
+```
 
 ## Troubleshooting
 
-### Issue 1: Qt headers not found
+### Qt headers not found
 
 **Error**: atal error: QtWidgets: No such file or directory
 
-**Solution**: Set the Qt header path
-
-`ash
+```bash
 sip-build --qmake /path/to/qmake --build-dir build-python
-`
+```
 
-### Issue 2: Compiler not found
+### Compiler not found
 
-**Error**: Cannot run compiler 'cl' (Windows) or compiler not found
+**Error**: Cannot run compiler 'cl'
 
-**Solution**: Make sure you run the build command in the correct development environment. Windows users should use the Visual Studio Developer Command Prompt.
+Use the Visual Studio Developer Command Prompt.
 
-### Issue 3: DLL load failed
+### DLL load failed
 
 **Error**: ImportError: DLL load failed while importing PyQtSARibbon
 
-**Solution**: Copy Qt DLLs to Python's site-packages directory:
+Copy Qt DLLs to site-packages:
 
-`ash
+```bash
 copy <Qt_path>\bin\Qt5Widgets.dll <Python_path>\Lib\site-packages\
 copy <Qt_path>\bin\Qt5Gui.dll <Python_path>\Lib\site-packages\
 copy <Qt_path>\bin\Qt5Core.dll <Python_path>\Lib\site-packages\
-`
+```
 
-### Issue 4: Version mismatch
+### Version mismatch
 
-**Error**: ImportError: Module use of python3x.dll conflicts with this version of Python
-
-**Solution**: Ensure PyQt5, sip, and Python versions are compatible. It's recommended to use PyQt5 and Python from the same source.
-
-## Uninstallation
-
-To uninstall PyQtSARibbon:
-
-`ash
-pip uninstall PyQtSARibbon
-`
-
-Or manually delete:
-
-`ash
-# Windows
-del <Python_path>\Lib\site-packages\PyQtSARibbon.pyd
-
-# Linux/macOS
-rm <Python_path>/lib/python3.x/site-packages/PyQtSARibbon.so
-`
+Ensure PyQt5, sip, and Python versions are compatible.
 
 ## Next Steps
 
-After building, see [Use Python Bindings](./use-python-bindings.md) to learn how to use SARibbon in Python.
+See [Use Python Bindings](./use-python-bindings.md) to learn how to use SARibbon in Python.
