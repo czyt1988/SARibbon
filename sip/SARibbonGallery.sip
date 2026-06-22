@@ -1,7 +1,5 @@
 %Import QtWidgets/QtWidgetsmod.sip
 
-%If (Qt_5_0_0 -)
-
 class SARibbonGalleryButton : QToolButton
 {
     %TypeHeaderCode
@@ -64,5 +62,3 @@ protected:
     void resizeEvent(QResizeEvent* event);
     void changeEvent(QEvent* event);
 };
-
-%End

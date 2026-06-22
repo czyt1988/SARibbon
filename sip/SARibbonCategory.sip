@@ -1,7 +1,5 @@
 %Import QtWidgets/QtWidgetsmod.sip
 
-%If (Qt_5_0_0 -)
-
 class SARibbonCategory : QFrame
 {
     %TypeHeaderCode
@@ -90,6 +88,4 @@ protected:
     void wheelEvent(QWheelEvent* event);
     void changeEvent(QEvent* event);
 };
-
-%End
 

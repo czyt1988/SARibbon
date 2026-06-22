@@ -1,7 +1,5 @@
 %Import QtWidgets/QtWidgetsmod.sip
 
-%If (Qt_5_0_0 -)
-
 class SARibbonPanelLabel : QLabel
 {
     %TypeHeaderCode
@@ -93,5 +91,3 @@ signals:
 protected:
     virtual bool event(QEvent* e);
 };
-
-%End

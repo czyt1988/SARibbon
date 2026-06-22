@@ -1,7 +1,5 @@
 %Import QtWidgets/QtWidgetsmod.sip
 
-%If (Qt_5_0_0 -)
-
 class SARibbonContextCategory : QObject
 {
     %TypeHeaderCode
@@ -44,5 +42,3 @@ signals:
 protected:
     virtual bool eventFilter(QObject* watched, QEvent* e);
 };
-
-%End

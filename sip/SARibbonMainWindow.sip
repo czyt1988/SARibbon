@@ -1,7 +1,5 @@
 %Import QtWidgets/QtWidgetsmod.sip
 
-%If (Qt_5_0_0 -)
-
 class SARibbonMainWindow : QMainWindow
 {
     %TypeHeaderCode
@@ -31,5 +29,3 @@ public:
 protected:
     SARibbonBar* createRibbonBar();
 };
-
-%End

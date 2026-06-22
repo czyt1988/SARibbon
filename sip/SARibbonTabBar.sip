@@ -1,7 +1,5 @@
 %Import QtWidgets/QtWidgetsmod.sip
 
-%If (Qt_5_0_0 -)
-
 class SARibbonTabBar : QTabBar
 {
     %TypeHeaderCode
@@ -17,5 +15,3 @@ public:
 protected:
     QSize tabSizeHint(int index) const;
 };
-
-%End

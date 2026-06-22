@@ -1,7 +1,5 @@
 %Import QtWidgets/QtWidgetsmod.sip
 
-%If (Qt_5_0_0 -)
-
 class SARibbonPanelItem : QWidgetItem
 {
     %TypeHeaderCode
@@ -21,5 +19,3 @@ public:
     ~SARibbonPanelItem();
     bool isEmpty() const;
 };
-
-%End

@@ -1,7 +1,5 @@
 %Import QtWidgets/QtWidgetsmod.sip
 
-%If (Qt_5_0_0 -)
-
 class SARibbonGalleryItem
 {
     %TypeHeaderCode
@@ -41,5 +39,3 @@ public:
     void setTextAlignment(Qt::Alignment a);
     Qt::Alignment textAlignment() const;
 };
-
-%End

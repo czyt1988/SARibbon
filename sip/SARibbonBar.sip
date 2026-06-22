@@ -1,7 +1,5 @@
 %Import QtWidgets/QtWidgetsmod.sip
 
-%If (Qt_5_0_0 -)
-
 class SARibbonBar : QMenuBar
 {
     %TypeHeaderCode
@@ -143,7 +141,3 @@ signals:
 protected:
     bool eventFilter(QObject* obj, QEvent* e);
 };
-
-
-
-%End

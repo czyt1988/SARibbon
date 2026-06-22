@@ -2,8 +2,6 @@
 #include <SARibbonGlobal.h>
 %End
 
-%If (Qt_5_0_0 -)
-
 %MappedType SARibbonAlignment
 {
 %TypeHeaderCode
@@ -62,5 +60,3 @@
 };
 
 typedef QFlags<SARibbonMainWindowStyleFlag> SARibbonMainWindowStyles;
-
-%End

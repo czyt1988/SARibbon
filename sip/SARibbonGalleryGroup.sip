@@ -1,7 +1,5 @@
 %Import QtWidgets/QtWidgetsmod.sip
 
-%If (Qt_5_0_0 -)
-
 class SARibbonGalleryGroup : QListView
 {
     %TypeHeaderCode
@@ -65,5 +63,3 @@ signals:
     void triggered(QAction* action);
     void hovered(QAction* action);
 };
-
-%End

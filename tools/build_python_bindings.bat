@@ -3,8 +3,42 @@ setlocal enabledelayedexpansion
 
 REM ============================================================
 REM  SARibbon Python Bindings - Build & Install Script
-REM  Usage: tools\build_python_bindings.bat [PYTHON_DIR] [QMAKE_PATH]
+REM  Usage: tools\build_python_bindings.bat [PYTHON_DIR] [QMAKE_PATH] [--pyqt6]
+REM
+REM  By default, builds PyQt5 bindings.
+REM  Pass --pyqt6 to build PyQt6 bindings instead.
 REM ============================================================
+
+REM --- Parse --pyqt6 flag from arguments ---
+set "USE_PYQT6=0"
+set "ARGS="
+for %%A in (%*) do (
+    if /i "%%A"=="--pyqt6" (
+        set "USE_PYQT6=1"
+    ) else (
+        set "ARGS=!ARGS! %%A"
+    )
+)
+
+REM --- Re-parse positional args (PYTHON_DIR QMAKE_PATH) from filtered list ---
+set "PYTHON_DIR="
+set "QMAKE_PATH="
+set "ARG_IDX=0"
+for %%A in (!ARGS!) do (
+    set /a ARG_IDX+=1
+    if !ARG_IDX! equ 1 set "PYTHON_DIR=%%A"
+    if !ARG_IDX! equ 2 set "QMAKE_PATH=%%A"
+)
+
+if "!USE_PYQT6!"=="1" (
+    echo === Building PyQt6 bindings ===
+    set "BUILD_DIR=build-python6"
+    set "PYQT_VERSION=PyQt6"
+) else (
+    echo === Building PyQt5 bindings ===
+    set "BUILD_DIR=build-python"
+    set "PYQT_VERSION=PyQt5"
+)
 
 REM --- Resolve project root (parent of tools\ directory) ---
 set "SCRIPT_DIR=%~dp0"
@@ -13,7 +47,6 @@ cd /d "%SRC_DIR%"
 for %%I in ("%SRC_DIR%\..") do set "SRC_DIR=%%~fI"
 
 REM --- Python directory (override via arg or auto-detect) ---
-set "PYTHON_DIR=%~1"
 if "%PYTHON_DIR%"=="" (
     where python >nul 2>nul
     if !errorlevel! equ 0 (
@@ -22,13 +55,12 @@ if "%PYTHON_DIR%"=="" (
 )
 if "%PYTHON_DIR%"=="" (
     echo ERROR: Cannot locate Python. Please pass PYTHON_DIR as argument.
-    echo        Example: tools\build_python_bindings.bat "C:\Python311"
+    echo        Example: tools\build_python_bindings.bat "C:\Python311" --pyqt6
     exit /b 1
 )
 echo === Python: %PYTHON_DIR% ===
 
 REM --- qmake path (override via arg or auto-detect) ---
-set "QMAKE_PATH=%~2"
 if "%QMAKE_PATH%"=="" (
     where qmake >nul 2>nul
     if !errorlevel! equ 0 (
@@ -37,7 +69,7 @@ if "%QMAKE_PATH%"=="" (
 )
 if "%QMAKE_PATH%"=="" (
     echo ERROR: Cannot locate qmake. Please pass QMAKE_PATH as argument.
-    echo        Example: tools\build_python_bindings.bat "C:\Python311" "D:\Qt\5.15.16\msvc2019_64\bin\qmake.exe"
+    echo        Example: tools\build_python_bindings.bat "C:\Python311" "D:\Qt\6.7.3\msvc2019_64\bin\qmake.exe" --pyqt6
     exit /b 1
 )
 echo === qmake: %QMAKE_PATH% ===
@@ -93,25 +125,49 @@ set "INSTALL_DIR=%SITE_PACKAGES%\PyQtSARibbon"
 
 echo === Cleaning old build ===
 cd /d "%SRC_DIR%"
-if exist build-python rmdir /s /q build-python
+if exist "!BUILD_DIR!" rmdir /s /q "!BUILD_DIR!"
 if exist "%INSTALL_DIR%" rmdir /s /q "%INSTALL_DIR%"
 
+REM --- Swap pyproject.toml for PyQt6 if needed ---
+if "!USE_PYQT6!"=="1" (
+    if not exist "pyproject-pyqt6.toml" (
+        echo ERROR: pyproject-pyqt6.toml not found in project root
+        exit /b 1
+    )
+    echo === Swapping pyproject.toml with pyproject-pyqt6.toml ===
+    copy /y "pyproject.toml" "pyproject.toml.bak" >nul
+    copy /y "pyproject-pyqt6.toml" "pyproject.toml" >nul
+)
+
 echo === Starting sip-build ===
-"%PYTHON_DIR%\Scripts\sip-build.exe" --build-dir build-python --qmake "%QMAKE_PATH%" --verbose
-if errorlevel 1 (
+"%PYTHON_DIR%\Scripts\sip-build.exe" --build-dir "!BUILD_DIR!" --qmake "%QMAKE_PATH%" --verbose
+set "BUILD_RESULT=!errorlevel!"
+
+REM --- Restore original pyproject.toml if swapped ---
+if "!USE_PYQT6!"=="1" (
+    echo === Restoring original pyproject.toml ===
+    copy /y "pyproject.toml.bak" "pyproject.toml" >nul
+    del /q "pyproject.toml.bak" >nul
+)
+
+if !BUILD_RESULT! neq 0 (
     echo ERROR: sip-build failed
     exit /b 1
 )
 
 echo === Installing to %INSTALL_DIR% ===
 mkdir "%INSTALL_DIR%"
-copy /y "build-python\py.typed" "%INSTALL_DIR%\py.typed" >nul
-copy /y "build-python\sip.pyi" "%INSTALL_DIR%\sip.pyi" >nul
-copy /y "build-python\saribbon\saribbon.pyd" "%INSTALL_DIR%\saribbon.pyd" >nul
-copy /y "build-python\saribbon\saribbon.pyi" "%INSTALL_DIR%\saribbon.pyi" >nul
+copy /y "!BUILD_DIR!\py.typed" "%INSTALL_DIR%\py.typed" >nul
+copy /y "!BUILD_DIR!\sip.pyi" "%INSTALL_DIR%\sip.pyi" >nul
+copy /y "!BUILD_DIR!\saribbon\saribbon.pyd" "%INSTALL_DIR%\saribbon.pyd" >nul
+copy /y "!BUILD_DIR!\saribbon\saribbon.pyi" "%INSTALL_DIR%\saribbon.pyi" >nul
 
-REM --- Write __init__.py with PyQt5 DLL path fix ---
-> "%INSTALL_DIR%\__init__.py" echo import PyQt5.QtCore  # noqa: F401
+REM --- Write __init__.py with PyQt DLL path fix ---
+if "!USE_PYQT6!"=="1" (
+    > "%INSTALL_DIR%\__init__.py" echo import PyQt6.QtCore  # noqa: F401
+) else (
+    > "%INSTALL_DIR%\__init__.py" echo import PyQt5.QtCore  # noqa: F401
+)
 
 echo === Build and install complete ===
 "%PYTHON_DIR%\python.exe" -c "from PyQtSARibbon import saribbon; print('Import OK:', saribbon.SARibbonMainWindow)"

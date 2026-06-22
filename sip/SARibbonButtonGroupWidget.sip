@@ -1,7 +1,5 @@
 %Import QtWidgets/QtWidgetsmod.sip
 
-%If (Qt_5_0_0 -)
-
 class SARibbonButtonGroupWidget : QToolBar
 {
     %TypeHeaderCode
@@ -26,5 +24,3 @@ public:
     explicit SARibbonQuickAccessBar(QWidget* parent /TransferThis/ = Q_NULLPTR);
     ~SARibbonQuickAccessBar();
 };
-
-%End
