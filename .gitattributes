@@ -1,0 +1,4 @@
+# lupdate always writes LF; force LF to avoid autocrlf conflicts
+*.ts text eol=lf
+# Compiled translation files are binary
+*.qm binary

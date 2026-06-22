@@ -232,6 +232,7 @@ endif()
 ##################################
 # 翻译
 ##################################
+option(SARIBBON_UPDATE_TRANSLATIONS "Run lupdate to update .ts source files (modifies .ts files)" OFF)
 find_package(Qt${QT_VERSION_MAJOR}LinguistTools QUIET)
     if(Qt${QT_VERSION_MAJOR}LinguistTools_FOUND)
     # 2. 准备 ts 文件列表（可以写多个语言）
@@ -249,10 +250,20 @@ find_package(Qt${QT_VERSION_MAJOR}LinguistTools QUIET)
     # 3. 生成/更新 ts 文件 + 编译出 qm 文件
     #    这一步会在 build 目录里生成 myapp_zh_CN.qm 等
     # 4. 根据 Qt 版本调对应宏
-    if(QT_VERSION_MAJOR EQUAL 5)
-        qt5_create_translation(QM_FILES ${TS_SOURCES} ${TS_FILES})
-    elseif(QT_VERSION_MAJOR EQUAL 6)
-        qt6_create_translation(QM_FILES ${TS_SOURCES} ${TS_FILES})
+    if(SARIBBON_UPDATE_TRANSLATIONS)
+        # lupdate + lrelease: updates .ts files with new strings from source
+        if(QT_VERSION_MAJOR EQUAL 5)
+            qt5_create_translation(QM_FILES ${TS_SOURCES} ${TS_FILES})
+        elseif(QT_VERSION_MAJOR EQUAL 6)
+            qt6_create_translation(QM_FILES ${TS_SOURCES} ${TS_FILES})
+        endif()
+    else()
+        # lrelease only: compiles existing .ts -> .qm without modifying .ts
+        if(QT_VERSION_MAJOR EQUAL 5)
+            qt5_add_translation(QM_FILES ${TS_FILES})
+        elseif(QT_VERSION_MAJOR EQUAL 6)
+            qt6_add_translation(QM_FILES ${TS_FILES})
+        endif()
     endif()
     # 5. 把生成的 qm 挂到目标上
     target_sources(${SARIBBON_LIB_NAME} PRIVATE ${QM_FILES})
