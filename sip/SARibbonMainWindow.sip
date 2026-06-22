@@ -9,17 +9,9 @@ class SARibbonMainWindow : QMainWindow
     %End
 
 public:
-    SARibbonMainWindow();
-    %MethodCode
-        sipCpp = new ::SARibbonMainWindow();
-    %End
-
-    SARibbonMainWindow(QWidget* parent /TransferThis/, int style);
-    %MethodCode
-        sipCpp = new ::SARibbonMainWindow(a0, (::SARibbonMainWindowStyles)a1);
-    %End
-
+    SARibbonMainWindow(QWidget* parent /TransferThis/ = nullptr);
     ~SARibbonMainWindow();
+
     SARibbonBar* ribbonBar() const;
     void setRibbonBar(SARibbonBar* ribbon /Transfer/);
     void updateWindowFlag(Qt::WindowFlags flags);

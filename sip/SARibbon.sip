@@ -1,4 +1,4 @@
-%Module(name=PyQtSARibbon, call_super_init=True, keyword_arguments="Optional", use_limited_api=True)
+%Module(name=PyQtSARibbon.saribbon, call_super_init=True, keyword_arguments="Optional", use_limited_api=True)
 
 %Import QtCore/QtCoremod.sip
 %Import QtWidgets/QtWidgetsmod.sip
@@ -9,6 +9,7 @@
 %Include SARibbonTabBar.sip
 %Include SARibbonButtonGroupWidget.sip
 %Include SARibbonBar.sip
+%Include SARibbonMainWindow.sip
 %Include SARibbonCategory.sip
 %Include SARibbonPanel.sip
 %Include SARibbonPanelItem.sip

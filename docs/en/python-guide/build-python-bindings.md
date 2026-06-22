@@ -81,7 +81,7 @@ This command will:
 
 1. Generate C++ binding code
 2. Compile the native extension module
-3. Generate PyQtSARibbon.pyd (Windows) or PyQtSARibbon.so (Linux/macOS)
+3. Generate a PyQtSARibbon package directory containing `__init__.py` and `saribbon.pyd` (Windows) or `saribbon.so` (Linux/macOS)
 
 !!! tip
     If you encounter Qt path errors, specify the qmake path explicitly:
@@ -95,13 +95,13 @@ This command will:
 #### Windows
 
 ```bash
-copy build-python\PyQtSARibbon\PyQtSARibbon.pyd <Python_path>\Lib\site-packages\
+xcopy /s /y build-python\PyQtSARibbon <Python_path>\Lib\site-packages\PyQtSARibbon\
 ```
 
 #### Linux/macOS
 
 ```bash
-cp build-python/PyQtSARibbon/PyQtSARibbon.so <Python_path>/lib/python3.x/site-packages/
+cp -r build-python/PyQtSARibbon <Python_path>/lib/python3.x/site-packages/
 ```
 
 Or use pip:
@@ -113,7 +113,7 @@ pip install .
 ## Verify Installation
 
 ```bash
-python -c "from PyQtSARibbon import SARibbonBar; print('PyQtSARibbon installed successfully!')"
+python -c "from PyQtSARibbon import saribbon; print('PyQtSARibbon installed successfully!')"
 ```
 
 ## Troubleshooting

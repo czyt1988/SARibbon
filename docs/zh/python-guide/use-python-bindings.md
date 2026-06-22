@@ -18,7 +18,7 @@
 ```python
 import sys
 from PyQt5.QtWidgets import QApplication, QAction
-from PyQtSARibbon import SARibbonBar, SARibbonCategory, SARibbonPanel
+from PyQtSARibbon.saribbon import SARibbonBar, SARibbonCategory, SARibbonPanel
 
 # 创建应用程序
 app = QApplication(sys.argv)
@@ -67,7 +67,7 @@ SARibbonBar (工具栏)
 SARibbonBar 是整个 Ribbon 控件的容器。
 
 ```python
-from PyQtSARibbon import SARibbonBar
+from PyQtSARibbon.saribbon import SARibbonBar
 
 # 创建 Ribbon 工具栏
 ribbon = SARibbonBar()
@@ -87,7 +87,7 @@ ribbon.setCurrentIndex(1)
 SARibbonCategory 代表 Ribbon 中的一个标签页。
 
 ```python
-from PyQtSARibbon import SARibbonCategory
+from PyQtSARibbon.saribbon import SARibbonCategory
 
 # 创建类别
 category = SARibbonCategory("Home")
@@ -107,7 +107,7 @@ category.setCategoryName("Start")
 SARibbonPanel 是类别中的功能分组。
 
 ```python
-from PyQtSARibbon import SARibbonPanel
+from PyQtSARibbon.saribbon import SARibbonPanel
 
 # 创建面板
 panel = SARibbonPanel("Clipboard", category)
@@ -174,7 +174,7 @@ panel.addSeparator()
 画廊是一种下拉菜单，显示多个选项。
 
 ```python
-from PyQtSARibbon import SARibbonGallery
+from PyQtSARibbon.saribbon import SARibbonGallery
 
 # 创建画廊面板
 gallery_panel = SARibbonPanel("Styles", category)
@@ -230,7 +230,7 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt
-from PyQtSARibbon import SARibbonBar, SARibbonCategory, SARibbonPanel
+from PyQtSARibbon.saribbon import SARibbonBar, SARibbonCategory, SARibbonPanel
 
 class RibbonWindow(QMainWindow):
     def __init__(self):
@@ -351,6 +351,7 @@ if __name__ == "__main__":
 
 | 类名 | 说明 |
 |------|------|
+| SARibbonMainWindow | Ribbon 主窗口（替代 QMainWindow） |
 | SARibbonBar | 主 Ribbon 工具栏 |
 | SARibbonCategory | Ribbon 类别（标签页） |
 | SARibbonPanel | 面板（功能分组） |

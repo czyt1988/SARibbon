@@ -98,7 +98,7 @@ sip-build --build-dir build-python
 
 1. 生成 C++ 绑定代码
 2. 编译原生扩展模块
-3. 生成 PyQtSARibbon.pyd (Windows) 或 PyQtSARibbon.so (Linux/macOS)
+3. 生成 PyQtSARibbon 包目录，包含 `__init__.py` 和 `saribbon.pyd` (Windows) 或 `saribbon.so` (Linux/macOS)
 
 !!! tip "提示"
     如果构建过程中出现 Qt 路径错误，可以显式指定 qmake 路径：
@@ -114,13 +114,13 @@ sip-build --build-dir build-python
 #### Windows
 
 ```bash
-copy build-python\PyQtSARibbon\PyQtSARibbon.pyd <Python路径>\Lib\site-packages\
+xcopy /s /y build-python\PyQtSARibbon <Python路径>\Lib\site-packages\PyQtSARibbon\
 ```
 
 #### Linux/macOS
 
 ```bash
-cp build-python/PyQtSARibbon/PyQtSARibbon.so <Python路径>/lib/python3.x/site-packages/
+cp -r build-python/PyQtSARibbon <Python路径>/lib/python3.x/site-packages/
 ```
 
 或者使用 pip 安装：
@@ -132,7 +132,7 @@ pip install .
 ## 验证安装
 
 ```bash
-python -c "from PyQtSARibbon import SARibbonBar; print('PyQtSARibbon 安装成功！')"
+python -c "from PyQtSARibbon import saribbon; print('PyQtSARibbon 安装成功！')"
 ```
 
 ## 常见问题

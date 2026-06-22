@@ -22,6 +22,7 @@ define-macros = ["SA_RIBBON_BAR_NO_EXPORT", "SARIBBON_USE_3RDPARTY_FRAMELESSHELP
 sip-file = "SARibbon.sip"
 include-dirs = ["src/SARibbonBar", "src/SARibbonBar/colorWidgets"]
 qmake-QT = ["widgets"]
+builder-settings = ["RESOURCES += ../../src/SARibbonBar/SARibbonResource.qrc"]
 headers = [
     "src/SARibbonBar/SARibbonGlobal.h",
     "src/SARibbonBar/SARibbonBarVersionInfo.h",

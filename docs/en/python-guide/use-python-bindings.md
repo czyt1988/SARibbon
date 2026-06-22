@@ -16,7 +16,7 @@ This document describes how to use the SARibbon bindings (PyQtSARibbon) in Pytho
 ```python
 import sys
 from PyQt5.QtWidgets import QApplication, QAction
-from PyQtSARibbon import SARibbonBar, SARibbonCategory, SARibbonPanel
+from PyQtSARibbon.saribbon import SARibbonBar, SARibbonCategory, SARibbonPanel
 
 app = QApplication(sys.argv)
 
@@ -56,7 +56,7 @@ SARibbonBar (Toolbar)
 ### SARibbonBar - Main Toolbar
 
 ```python
-from PyQtSARibbon import SARibbonBar
+from PyQtSARibbon.saribbon import SARibbonBar
 
 ribbon = SARibbonBar()
 ribbon.setRibbonStyle(SARibbonBar.RibbonStyleLooseThreeRow)
@@ -67,7 +67,7 @@ ribbon.setCurrentIndex(1)
 ### SARibbonCategory - Category (Tab)
 
 ```python
-from PyQtSARibbon import SARibbonCategory
+from PyQtSARibbon.saribbon import SARibbonCategory
 
 category = SARibbonCategory("Home")
 ribbon.addCategoryPage(category)
@@ -78,7 +78,7 @@ category.setCategoryName("Start")
 ### SARibbonPanel - Panel
 
 ```python
-from PyQtSARibbon import SARibbonPanel
+from PyQtSARibbon.saribbon import SARibbonPanel
 
 panel = SARibbonPanel("Clipboard", category)
 category.addPanel(panel)
@@ -124,7 +124,7 @@ panel.addSeparator()
 ## Creating Gallery
 
 ```python
-from PyQtSARibbon import SARibbonGallery
+from PyQtSARibbon.saribbon import SARibbonGallery
 
 gallery_panel = SARibbonPanel("Styles", category)
 category.addPanel(gallery_panel)
@@ -164,7 +164,7 @@ from PyQt5.QtWidgets import (
 )
 from PyQt5.QtGui import QFont
 from PyQt5.QtCore import Qt
-from PyQtSARibbon import SARibbonBar, SARibbonCategory, SARibbonPanel
+from PyQtSARibbon.saribbon import SARibbonBar, SARibbonCategory, SARibbonPanel
 
 class RibbonWindow(QMainWindow):
     def __init__(self):
@@ -278,6 +278,7 @@ if __name__ == "__main__":
 
 | Class | Description |
 |-------|-------------|
+| SARibbonMainWindow | Ribbon main window (replaces QMainWindow) |
 | SARibbonBar | Main Ribbon toolbar |
 | SARibbonCategory | Ribbon category (tab) |
 | SARibbonPanel | Panel (functional group) |
