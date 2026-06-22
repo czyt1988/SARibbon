@@ -128,3 +128,9 @@ CMakeSettings.json
 # --------
 *.dll
 *.exe
+
+# Python bindings build artifacts
+*.pyd
+*.egg-info/
+dist/
+build/

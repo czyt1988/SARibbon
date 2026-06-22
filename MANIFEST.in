@@ -1,0 +1,4 @@
+include project.py
+include pyproject.toml
+recursive-include sip *.sip
+recursive-include src/SARibbonBar *.h *.hpp *.cpp *.qrc
