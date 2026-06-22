@@ -1,4 +1,4 @@
-site_name: SARibbon
+﻿site_name: SARibbon
 site_author: 'Chen ZongYan'
 site_description: 'Qt Framework Ribbon Control'
 # 完整站点URL（包含仓库子路径）
@@ -83,6 +83,9 @@ plugins:
                 - Qt Integration Guide: en/dev-guide/qt-integration.md
             - FAQ: 
                 - FAQ Overview: en/faq.md
+            - Python Guide:
+                - Build Python Bindings: en/python-guide/build-python-bindings.md
+                - Use Python Bindings: en/python-guide/use-python-bindings.md
             - API Documentation: 
                 - API Documentation Home: https://czyt1988.github.io/SARibbon/doxygen/index.html
                 - Class List: https://czyt1988.github.io/SARibbon/doxygen/annotated.html
@@ -122,6 +125,9 @@ plugins:
                 - Qt集成规范: zh/dev-guide/qt-integration.md
             - 常见问题: 
                 - 常见问题说明: zh/faq.md
+            - Python指南:
+                - 构建Python绑定: zh/python-guide/build-python-bindings.md
+                - 使用Python绑定: zh/python-guide/use-python-bindings.md
             - API文档: 
                 - API文档首页: https://czyt1988.github.io/SARibbon/doxygen/index.html
                 - 类列表: https://czyt1988.github.io/SARibbon/doxygen/annotated.html

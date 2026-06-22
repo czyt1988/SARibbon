@@ -5,6 +5,10 @@ build*
 !docs/zh/build-guide/**
 !docs/en/build-guide
 !docs/en/build-guide/**
+!docs/zh/python-guide
+!docs/zh/python-guide/**
+!docs/en/python-guide
+!docs/en/python-guide/**
 *.user
 *.autosave
 *.dll
