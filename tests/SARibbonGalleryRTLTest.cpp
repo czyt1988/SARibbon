@@ -1,5 +1,6 @@
 #include <QtTest>
 #include <QApplication>
+#include <QSizeGrip>
 #include "SARibbonGallery.h"
 
 class SARibbonGalleryRTLTest : public QObject
@@ -44,7 +45,6 @@ void SARibbonGalleryRTLTest::testGalleryButtonsPosition()
 void SARibbonGalleryRTLTest::testSizeGripPosition()
 {
     SARibbonGallery gallery;
-    gallery.setSizeAdjustPolicy(QComboBox::AdjustToContents);
     gallery.resize(300, 200);
     gallery.show();
     QApplication::processEvents();

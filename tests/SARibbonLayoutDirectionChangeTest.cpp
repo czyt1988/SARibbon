@@ -48,7 +48,7 @@ void SARibbonLayoutDirectionChangeTest::testRibbonBarLayoutDirectionChange()
 void SARibbonLayoutDirectionChangeTest::testCategoryLayoutDirectionChange()
 {
     SARibbonBar ribbonBar;
-    SARibbonCategory* category = ribbonBar.addCategory("Test Category");
+    SARibbonCategory* category = ribbonBar.addCategoryPage("Test Category");
     ribbonBar.resize(800, 200);
     ribbonBar.show();
     QApplication::processEvents();
@@ -75,7 +75,7 @@ void SARibbonLayoutDirectionChangeTest::testCategoryLayoutDirectionChange()
 void SARibbonLayoutDirectionChangeTest::testPanelLayoutDirectionChange()
 {
     SARibbonBar ribbonBar;
-    SARibbonCategory* category = ribbonBar.addCategory("Test Category");
+    SARibbonCategory* category = ribbonBar.addCategoryPage("Test Category");
     SARibbonPanel* panel = category->addPanel("Test Panel");
     ribbonBar.resize(800, 200);
     ribbonBar.show();

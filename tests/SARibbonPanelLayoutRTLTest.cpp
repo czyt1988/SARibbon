@@ -11,21 +11,8 @@ class SARibbonPanelLayoutRTLTest : public QObject
     Q_OBJECT
 
 private slots:
-    void initTestCase();
-    void cleanupTestCase();
     void testButtonOrderInRTL();
 };
-
-void SARibbonPanelLayoutRTLTest::initTestCase()
-{
-    int argc = 0;
-    char** argv = nullptr;
-    QApplication app(argc, argv);
-}
-
-void SARibbonPanelLayoutRTLTest::cleanupTestCase()
-{
-}
 
 void SARibbonPanelLayoutRTLTest::testButtonOrderInRTL()
 {

@@ -16,6 +16,9 @@ function(add_saribbon_test TEST_NAME TEST_SOURCE)
     target_include_directories(${TEST_NAME} PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/../src/SARibbonBar
     )
+    target_compile_definitions(${TEST_NAME} PRIVATE
+        QT_TESTCASE_SOURCEDIR="${CMAKE_CURRENT_SOURCE_DIR}"
+    )
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
     set_target_properties(${TEST_NAME} PROPERTIES
         AUTOMOC ON

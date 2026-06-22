@@ -4,68 +4,60 @@
 #include "SARibbonCategory.h"
 #include "SARibbonGlobal.h"
 #include "SARibbonUtil.h"
+#include "SARibbonTabBar.h"
 
 class SARibbonBarLayoutRTLTest : public QObject
 {
     Q_OBJECT
 
 private slots:
-    void initTestCase();
-    void cleanupTestCase();
     void testBarLayoutDirectionChange();
     void testRTLLayoutMirroring();
 };
-
-void SARibbonBarLayoutRTLTest::initTestCase()
-{
-    int argc = 0;
-    char** argv = nullptr;
-    QApplication app(argc, argv);
-}
-
-void SARibbonBarLayoutRTLTest::cleanupTestCase()
-{
-}
 
 void SARibbonBarLayoutRTLTest::testBarLayoutDirectionChange()
 {
     SARibbonBar ribbonBar;
     ribbonBar.resize(800, 200);
-    SARibbonCategory* category1 = ribbonBar.addCategoryPage("Category 1");
-    SARibbonCategory* category2 = ribbonBar.addCategoryPage("Category 2");
-    SARibbonCategory* category3 = ribbonBar.addCategoryPage("Category 3");
+    ribbonBar.addCategoryPage("Category 1");
+    ribbonBar.addCategoryPage("Category 2");
+    ribbonBar.addCategoryPage("Category 3");
 
     ribbonBar.show();
     QApplication::processEvents();
+
+    SARibbonTabBar* tabBar = ribbonBar.ribbonTabBar();
+    QVERIFY(tabBar != nullptr);
+    QVERIFY(tabBar->count() >= 3);
 
     // Test LTR mode
     QApplication::setLayoutDirection(Qt::LeftToRight);
     QVERIFY(!SA::saIsRTL());
     QApplication::processEvents();
-    QRect category1RectLTR = category1->geometry();
-    QRect category2RectLTR = category2->geometry();
-    QRect category3RectLTR = category3->geometry();
+    QRect tab1RectLTR = tabBar->tabRect(0);
+    QRect tab2RectLTR = tabBar->tabRect(1);
+    QRect tab3RectLTR = tabBar->tabRect(2);
 
-    // Verify categories are ordered left to right
-    QVERIFY(category1RectLTR.left() < category2RectLTR.left());
-    QVERIFY(category2RectLTR.left() < category3RectLTR.left());
+    // Verify tabs are ordered left to right
+    QVERIFY(tab1RectLTR.left() < tab2RectLTR.left());
+    QVERIFY(tab2RectLTR.left() < tab3RectLTR.left());
 
     // Switch to RTL mode
     QApplication::setLayoutDirection(Qt::RightToLeft);
     QVERIFY(SA::saIsRTL());
     QApplication::processEvents();
-    QRect category1RectRTL = category1->geometry();
-    QRect category2RectRTL = category2->geometry();
-    QRect category3RectRTL = category3->geometry();
+    QRect tab1RectRTL = tabBar->tabRect(0);
+    QRect tab2RectRTL = tabBar->tabRect(1);
+    QRect tab3RectRTL = tabBar->tabRect(2);
 
-    // Verify categories are ordered right to left
-    QVERIFY(category1RectRTL.left() > category2RectRTL.left());
-    QVERIFY(category2RectRTL.left() > category3RectRTL.left());
+    // Verify tabs are ordered right to left
+    QVERIFY(tab1RectRTL.left() > tab2RectRTL.left());
+    QVERIFY(tab2RectRTL.left() > tab3RectRTL.left());
 
-    // Verify total width is preserved
-    QCOMPARE(category1RectLTR.width(), category1RectRTL.width());
-    QCOMPARE(category2RectLTR.width(), category2RectRTL.width());
-    QCOMPARE(category3RectLTR.width(), category3RectRTL.width());
+    // Verify tab widths are preserved
+    QCOMPARE(tab1RectLTR.width(), tab1RectRTL.width());
+    QCOMPARE(tab2RectLTR.width(), tab2RectRTL.width());
+    QCOMPARE(tab3RectLTR.width(), tab3RectRTL.width());
 
     // Reset to LTR
     QApplication::setLayoutDirection(Qt::LeftToRight);

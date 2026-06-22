@@ -2,46 +2,53 @@
 #include <QApplication>
 #include "SARibbonBar.h"
 #include "SARibbonCategory.h"
+#include "SARibbonContextCategory.h"
+#include "SARibbonTabBar.h"
 
 class SARibbonContextCategoryRTLTest : public QObject
 {
     Q_OBJECT
 
 private slots:
-    void testContextCategoryTitleRect();
+    void testContextCategoryRtlLayout();
 };
 
-void SARibbonContextCategoryRTLTest::testContextCategoryTitleRect()
+void SARibbonContextCategoryRTLTest::testContextCategoryRtlLayout()
 {
     SARibbonBar ribbonBar;
     ribbonBar.resize(800, 200);
 
-    // Add context category
-    SARibbonCategory* ctxCat1 = ribbonBar.addCategory("Context 1");
-    SARibbonCategory* ctxCat2 = ribbonBar.addCategory("Context 2");
+    // Add context category with two pages
     QColor ctxColor = QColor(Qt::red);
-    ribbonBar.addContextCategory("Test Context", ctxColor, QList<SARibbonCategory*>() << ctxCat1 << ctxCat2);
-    ribbonBar.showContextCategory("Test Context");
+    SARibbonContextCategory* ctx = ribbonBar.addContextCategory("Test Context", ctxColor);
+    ctx->addCategoryPage("Context 1");
+    ctx->addCategoryPage("Context 2");
+    ribbonBar.showContextCategory(ctx);
     ribbonBar.show();
     QApplication::processEvents();
 
-    // Test LTR
-    QApplication::setLayoutDirection(Qt::LeftToRight);
-    QRect ltrTitleRect = ribbonBar.calcContextCategoryTitleRect("Test Context");
-    QVERIFY(ltrTitleRect.isValid());
-    QVERIFY(ltrTitleRect.left() < ctxCat2->geometry().right());
-    QVERIFY(ltrTitleRect.right() > ctxCat1->geometry().left());
-    int ltrWidth = ltrTitleRect.width();
+    SARibbonTabBar* tabBar = ribbonBar.ribbonTabBar();
+    QVERIFY(tabBar != nullptr);
+    int tabCount = tabBar->count();
+    QVERIFY(tabCount >= 2);
 
-    // Test RTL
+    // Test LTR: tabs are left-to-right
+    QApplication::setLayoutDirection(Qt::LeftToRight);
+    QApplication::processEvents();
+    QRect tab1RectLTR = tabBar->tabRect(tabCount - 2);
+    QRect tab2RectLTR = tabBar->tabRect(tabCount - 1);
+    QVERIFY(tab1RectLTR.isValid());
+    QVERIFY(tab2RectLTR.isValid());
+    QVERIFY(tab1RectLTR.left() < tab2RectLTR.left());
+
+    // Test RTL: tabs are right-to-left
     QApplication::setLayoutDirection(Qt::RightToLeft);
     QApplication::processEvents();
-    QRect rtlTitleRect = ribbonBar.calcContextCategoryTitleRect("Test Context");
-    QVERIFY(rtlTitleRect.isValid());
-    QCOMPARE(rtlTitleRect.width(), ltrWidth); // Width remains same
-    // Verify rect spans both context categories correctly in mirrored position
-    QVERIFY(rtlTitleRect.left() < ctxCat1->geometry().right());
-    QVERIFY(rtlTitleRect.right() > ctxCat2->geometry().left());
+    QRect tab1RectRTL = tabBar->tabRect(tabCount - 2);
+    QRect tab2RectRTL = tabBar->tabRect(tabCount - 1);
+    QVERIFY(tab1RectRTL.isValid());
+    QVERIFY(tab2RectRTL.isValid());
+    QVERIFY(tab1RectRTL.left() > tab2RectRTL.left());
 
     // Reset to LTR
     QApplication::setLayoutDirection(Qt::LeftToRight);

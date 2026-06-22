@@ -10,22 +10,9 @@ class SARibbonCategoryLayoutRTLTest : public QObject
     Q_OBJECT
 
 private slots:
-    void initTestCase();
-    void cleanupTestCase();
     void testPanelOrderInRTL();
     void testScrollButtonsInRTL();
 };
-
-void SARibbonCategoryLayoutRTLTest::initTestCase()
-{
-    int argc = 0;
-    char** argv = nullptr;
-    QApplication app(argc, argv);
-}
-
-void SARibbonCategoryLayoutRTLTest::cleanupTestCase()
-{
-}
 
 void SARibbonCategoryLayoutRTLTest::testPanelOrderInRTL()
 {
@@ -75,7 +62,7 @@ void SARibbonCategoryLayoutRTLTest::testScrollButtonsInRTL()
     SARibbonBar ribbonBar;
     ribbonBar.resize(400, 200); // Small width to force scrolling
     SARibbonCategory* category = ribbonBar.addCategoryPage("Test Category");
-    
+
     // Add many panels to force scroll
     for (int i = 0; i < 10; ++i) {
         category->addPanel(QString("Panel %1").arg(i+1));
@@ -89,16 +76,26 @@ void SARibbonCategoryLayoutRTLTest::testScrollButtonsInRTL()
     QApplication::processEvents();
     QList<QAbstractButton*> scrollButtonsLTR = category->findChildren<QAbstractButton*>();
     QVERIFY(scrollButtonsLTR.size() >= 2); // Left and right scroll buttons
-    int rightButtonLeftLTR = scrollButtonsLTR.last()->geometry().left();
-    QVERIFY(rightButtonLeftLTR > ribbonBar.width() / 2); // Right button on right side
+
+    // Find rightmost button in LTR
+    int maxLeftLTR = 0;
+    for (QAbstractButton* btn : scrollButtonsLTR) {
+        maxLeftLTR = std::max(maxLeftLTR, btn->geometry().left());
+    }
+    QVERIFY(maxLeftLTR > ribbonBar.width() / 2); // Rightmost button on right side
 
     // RTL mode - scroll buttons should be at left
     QApplication::setLayoutDirection(Qt::RightToLeft);
     QApplication::processEvents();
     QList<QAbstractButton*> scrollButtonsRTL = category->findChildren<QAbstractButton*>();
     QVERIFY(scrollButtonsRTL.size() >= 2);
-    int rightButtonLeftRTL = scrollButtonsRTL.first()->geometry().left();
-    QVERIFY(rightButtonLeftRTL < ribbonBar.width() / 2); // Right button now on left side
+
+    // Find leftmost button in RTL
+    int minLeftRTL = ribbonBar.width();
+    for (QAbstractButton* btn : scrollButtonsRTL) {
+        minLeftRTL = std::min(minLeftRTL, btn->geometry().left());
+    }
+    QVERIFY(minLeftRTL < ribbonBar.width() / 2); // Leftmost button on left side
 
     // Reset to LTR
     QApplication::setLayoutDirection(Qt::LeftToRight);
