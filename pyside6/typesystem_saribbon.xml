@@ -1,0 +1,95 @@
+<?xml version="1.0"?>
+<typesystem package="PySideSARibbon.saribbon">
+  <load-typesystem name="typesystem_core.xml" generate="no"/>
+  <load-typesystem name="typesystem_gui.xml" generate="no"/>
+  <load-typesystem name="typesystem_widgets.xml" generate="no"/>
+
+  <!-- ============================================================
+       Global enums (from SARibbonGlobal.h)
+       SARibbonAlignment, SARibbonTheme, SARibbonMainWindowStyleFlag
+       ============================================================ -->
+  <enum-type identified-by-value="SARibbonAlignment" name="SARibbonAlignment"/>
+  <enum-type identified-by-value="SARibbonTheme" name="SARibbonTheme"/>
+  <enum-type name="SARibbonMainWindowStyleFlag" flags="yes" flags-name="SARibbonMainWindowStyles"/>
+
+  <!-- ============================================================
+       SARibbonPanelItem (QWidgetItem)
+       ============================================================ -->
+  <object-type name="SARibbonPanelItem">
+    <enum-type name="RowProportion"/>
+  </object-type>
+
+  <!-- ============================================================
+       SARibbonToolButton (QToolButton)
+       ============================================================ -->
+  <object-type name="SARibbonToolButton">
+    <enum-type name="RibbonButtonType"/>
+  </object-type>
+
+  <!-- ============================================================
+       SARibbonTabBar (QTabBar)
+       ============================================================ -->
+  <object-type name="SARibbonTabBar"/>
+
+  <!-- ============================================================
+       SARibbonButtonGroupWidget (QToolBar)
+       SARibbonQuickAccessBar (SARibbonButtonGroupWidget)
+       ============================================================ -->
+  <object-type name="SARibbonButtonGroupWidget"/>
+  <object-type name="SARibbonQuickAccessBar"/>
+
+  <!-- ============================================================
+       SARibbonGalleryItem (non-QObject, value-type)
+       ============================================================ -->
+  <value-type name="SARibbonGalleryItem"/>
+
+  <!-- ============================================================
+       SARibbonGalleryGroup (QListView)
+       ============================================================ -->
+  <object-type name="SARibbonGalleryGroup">
+    <enum-type name="GalleryGroupStyle"/>
+    <enum-type name="DisplayRow"/>
+  </object-type>
+
+  <!-- ============================================================
+       SARibbonGallery (QFrame)
+       SARibbonGalleryButton (QToolButton)
+       SARibbonGalleryViewport (QScrollArea)
+       ============================================================ -->
+  <object-type name="SARibbonGalleryButton"/>
+  <object-type name="SARibbonGalleryViewport"/>
+  <object-type name="SARibbonGallery"/>
+
+  <!-- ============================================================
+       SARibbonContextCategory (QObject)
+       ============================================================ -->
+  <object-type name="SARibbonContextCategory"/>
+
+  <!-- ============================================================
+       SARibbonPanelLabel (QLabel)
+       SARibbonPanel (QFrame)
+       ============================================================ -->
+  <object-type name="SARibbonPanelLabel"/>
+  <object-type name="SARibbonPanel">
+    <enum-type name="PanelLayoutMode"/>
+  </object-type>
+
+  <!-- ============================================================
+       SARibbonCategory (QFrame)
+       ============================================================ -->
+  <object-type name="SARibbonCategory"/>
+
+  <!-- ============================================================
+       SARibbonBar (QMenuBar)
+       ============================================================ -->
+  <object-type name="SARibbonBar">
+    <enum-type name="RibbonStyleFlag" flags="yes" flags-name="RibbonStyles"/>
+    <enum-type name="RibbonMode"/>
+  </object-type>
+
+  <!-- ============================================================
+       SARibbonMainWindow (QMainWindow)
+       ============================================================ -->
+  <object-type name="SARibbonMainWindow"/>
+
+</typesystem>

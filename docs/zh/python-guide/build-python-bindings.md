@@ -2,13 +2,14 @@
 
 本文档详细介绍如何从源码构建 SARibbon 的 Python 绑定（PyQtSARibbon）。
 
-SARibbon 同时支持 PyQt5 和 PyQt6 绑定，两者共享同一套 SIP 绑定源码，仅构建配置不同。
+SARibbon 同时支持 PyQt5 和 PyQt6 绑定，两者共享同一套 SIP 绑定源码，仅构建配置不同。如需 PySide6（Qt 官方绑定），请参阅 [PySide6 绑定构建指南](./build-pyside6-bindings.md)。
 
 ## 子文档导航
 
 | 文档 | 内容 |
 |------|------|
-| [构建 Python 绑定](./build-python-bindings.md) | 编译安装 PyQtSARibbon |
+| [构建 PyQt 绑定](./build-python-bindings.md) | 编译安装 PyQtSARibbon (PyQt5/6) |
+| [构建 PySide6 绑定](./build-pyside6-bindings.md) | 编译安装 PySideSARibbon (Shiboken6) |
 | [使用 Python 绑定](./use-python-bindings.md) | 在 Python 中使用 SARibbon |
 
 ## 环境要求

@@ -12,6 +12,7 @@ build*
 # tools 目录下的构建脚本需要追踪
 !tools/
 !tools/build_python_bindings.bat
+!tools/build_pyside6_bindings.bat
 *.user
 *.autosave
 *.dll

@@ -6,7 +6,8 @@ This document describes how to build the SARibbon Python bindings (PyQtSARibbon)
 
 | Document | Content |
 |----------|---------|
-| [Build Python Bindings](./build-python-bindings.md) | Compile and install PyQtSARibbon |
+| [Build PyQt Bindings](./build-python-bindings.md) | Compile and install PyQtSARibbon (PyQt5/6) |
+| [Build PySide6 Bindings](./build-pyside6-bindings.md) | Compile and install PySideSARibbon (Shiboken6) |
 | [Use Python Bindings](./use-python-bindings.md) | Use SARibbon in Python |
 
 ## Prerequisites
