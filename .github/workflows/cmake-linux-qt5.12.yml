@@ -48,5 +48,7 @@ jobs:
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --parallel
 
     - name: Test
+      env:
+        QT_QPA_PLATFORM: offscreen
       run: ctest --output-on-failure -C ${{env.BUILD_TYPE}}
       working-directory: ${{github.workspace}}/build

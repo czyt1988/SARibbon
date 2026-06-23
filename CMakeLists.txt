@@ -106,6 +106,9 @@ endif()
 
 if(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4819")
+    # Qt 6.5.3 的 qvarlengtharray.h 使用了 stdext::unchecked_array_iterator，
+    # 新版 MSVC STL 在 C++17 模式下不再声明 stdext 命名空间（_HAS_AUTO_PTR_ETC=0）
+    add_compile_definitions(_HAS_AUTO_PTR_ETC=1)
 endif()
 
 

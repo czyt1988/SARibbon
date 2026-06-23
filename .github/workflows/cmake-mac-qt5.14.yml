@@ -13,7 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        macos_version: [latest]
+        macos_version: [13]  # Qt 5.14 has no arm64 packages, use Intel runner
         qt_version: [5.14.*]
         shared: [ON]
 
