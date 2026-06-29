@@ -1,15 +1,29 @@
 # 标题栏设置
 
+- **自定义标题高度**: 通过 `setTitleBarHeight()` 精确控制标题栏高度
+- **标题颜色定制**: 支持设置标题文字颜色和背景色（QBrush），可用于未注册/只读等状态提示
+- **标题对齐方式**: 支持左对齐、居中对齐，可模拟 WPS 风格
+- **标题图标支持**: 通过 `SARibbonTitleIconWidget` 显示窗口图标，支持左键点击和右键菜单
+- **显示/隐藏切换**: 支持动态隐藏或显示标题栏，适配紧凑模式
+
 SARibbon 的标题栏（Title Bar）是位于 Ribbon 界面最顶部的区域，用于显示应用程序的窗口标题（windowTitle）。SARibbon 允许您完整定制标题栏的高度、背景颜色、文字颜色、对齐方式，以及标题图标和功能按钮。
 
-**主要功能特性**
+## 标题栏组件结构
 
-- ✅ **自定义标题高度**：通过 `setTitleBarHeight()` 精确控制标题栏高度
-- ✅ **标题颜色定制**：支持设置标题文字颜色和背景色（QBrush）
-- ✅ **标题对齐方式**：支持左对齐、居中对齐，模拟 WPS 风格
-- ✅ **标题图标支持**：通过 `SARibbonTitleIconWidget` 显示窗口图标及右键菜单
-- ✅ **显示/隐藏切换**：支持动态隐藏或显示标题栏
-- ✅ **词换行控制**：通过 `enableWordWrap` 控制标题文字是否自动换行
+标题栏由多个子组件协同构成，它们的关系如下：
+
+```mermaid
+flowchart TD
+    TitleBar["SARibbonBar 标题栏区域"]
+    TitleBar --> TitleIcon["SARibbonTitleIconWidget<br/>窗口图标（左键/右键菜单）"]
+    TitleBar --> TitleText["标题文字<br/>windowTitle"]
+    TitleBar --> QuickAccess["SARibbonQuickAccessBar<br/>快速访问工具栏"]
+    TitleBar --> SystemButtons["SARibbonSystemButtonBar<br/>最小化/最大化/关闭"]
+    SystemButtons --> CustomActions["自定义 Action 按钮"]
+    SystemButtons --> MinBtn["最小化按钮"]
+    SystemButtons --> MaxBtn["最大化按钮"]
+    SystemButtons --> CloseBtn["关闭按钮"]
+```
 
 ## 核心 API
 

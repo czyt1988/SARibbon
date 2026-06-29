@@ -1,5 +1,28 @@
 # 创建Ribbon风格的窗口
 
+- **SARibbonMainWindow**: 继承即用，自动创建 RibbonBar 并管理标题栏、系统按钮等窗口组件
+- **SARibbonWidget**: 在普通 QWidget/QDialog 中嵌入 Ribbon 界面，适用于子窗口和复杂对话框
+- **窗口风格选择**: 支持自定义边框（RibbonFrame）和原生边框（NativeFrame）两种模式
+- **紧凑与宽松模式**: 原生边框自动切换紧凑模式，自定义边框保留完整的宽松 Ribbon 风格
+
+## 选择窗口类型
+
+在选择窗口类型之前，可以参考以下决策流程：
+
+```mermaid
+flowchart TD
+    A[需要 Ribbon 界面] --> B{是否为主窗口?}
+    B -->|是| C{需要原生边框特效?}
+    C -->|是| D["SARibbonMainWindow<br/>UseNativeFrame"]
+    C -->|否| E["SARibbonMainWindow<br/>UseRibbonFrame（默认）"]
+    B -->|否| F{需要独立标题栏?}
+    F -->|是| G["SARibbonWidget<br/>保留标题栏"]
+    F -->|否| H["SARibbonWidget<br/>隐藏标题栏"]
+```
+
+!!! tip "推荐从 MainWindowExample 开始学习"
+    如果您是首次使用 SARibbon，建议先运行 `example/MainWindowExample` 示例程序，直观感受不同窗口风格和布局模式的效果，再决定您的项目应采用哪种窗口类型。
+
 ## 创建Ribbon风格的MainWindow
 
 SARibbon 的核心是`SARibbonBar`这个类，它可以用于`MainWindow`也可以用于`Widget`

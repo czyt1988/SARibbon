@@ -118,13 +118,90 @@ dark2主题：
 
 [github - https://github.com/czyt1988/SARibbon](https://github.com/czyt1988/SARibbon)
 
+## 文档导航
+
+| 文档 | 说明 |
+|------|------|
+| [构建说明](./build-guide/build-instructions.md) | 从零构建 SARibbon |
+| [快速上手](./use-guide/SARibbon-user-guide.md) | 5分钟了解使用方法 |
+| [创建Ribbon窗口](./use-guide/create-ribbon-style-window.md) | 创建第一个 Ribbon 窗口 |
+| [开发者指南](./dev-guide/developer-guide.md) | 参与项目开发 |
+| [常见问题](./faq.md) | 解答常见疑问 |
+
+## 架构概览
+
+SARibbon 采用四层嵌套结构，从主窗口到按钮逐层组织：
+
+```mermaid
+graph TD
+    A[SARibbonMainWindow] --> B[SARibbonBar]
+    B --> C[SARibbonCategory]
+    B --> D[SARibbonContextCategory]
+    C --> E[SARibbonPanel]
+    E --> F[SARibbonToolButton]
+    E --> G[SARibbonGallery]
+    E --> H[SARibbonComboBox]
+```
+
+每一层职责明确：
+
+- **SARibbonMainWindow** — 顶层主窗口，管理标题栏和主题切换
+- **SARibbonBar** — 标签栏容器，控制整体布局风格和最小化模式
+- **SARibbonCategory** — 单个标签页，包含若干面板
+- **SARibbonPanel** — 功能面板，将相关按钮分组展示
+- **SARibbonToolButton** — 操作按钮，支持大/中/小三种尺寸
+
+## 30秒快速上手
+
+只需三步即可创建带有 Ribbon 界面的窗口：
+
+```cpp
+#include "SARibbonMainWindow.h"
+#include "SARibbonBar.h"
+#include "SARibbonCategory.h"
+#include "SARibbonPanel.h"
+
+class MyMainWindow : public SARibbonMainWindow
+{
+public:
+    MyMainWindow(QWidget* parent = nullptr) : SARibbonMainWindow(parent)
+    {
+        // 1. 获取 Ribbon 栏并设置样式
+        SARibbonBar* ribbon = ribbonBar();
+        ribbon->setRibbonStyle(SARibbonBar::RibbonStyleLooseThreeRow);
+
+        // 2. 创建标签页和面板
+        SARibbonCategory* category = ribbon->addCategoryPage("开始");
+        SARibbonPanel* panel = category->addPanel("常用操作");
+
+        // 3. 向面板添加按钮
+        QAction* act = new QAction("打开", this);
+        act->setIcon(QIcon(":/icons/open.png"));
+        panel->addLargeAction(act);
+    }
+};
+```
+
+在 `main.cpp` 中创建并显示窗口即可运行：
+
+```cpp
+int main(int argc, char* argv[])
+{
+    QApplication app(argc, argv);
+    MyMainWindow w;
+    w.show();
+    return app.exec();
+}
+```
+
+!!! tip "推荐入手方式"
+    建议从 `example/MainWindowExample` 示例项目入手学习 SARibbon 的使用方式。该示例覆盖了所有核心功能，可以直接运行体验各项特性。
+
 ## 构建及使用
 
 **项目文档位于 docs/zh文件夹下，你可以直接点击此链接：**[https://czyt1988.github.io/SARibbon/zh](https://czyt1988.github.io/SARibbon/zh)
 
 **项目的doxygen文档部署于：**[https://czyt1988.github.io/SARibbon/doxygen/index.html](https://czyt1988.github.io/SARibbon/doxygen/index.html)
-
-**推荐从 `example/MainWindowExample` 入手学习 SARibbon 的使用方式，你也可以直接运行该示例，体验各项功能**
 
 ## 更多截图
 

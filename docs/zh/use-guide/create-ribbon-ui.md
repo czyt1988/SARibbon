@@ -1,5 +1,34 @@
 # 创建Ribbon界面
 
+- **Category（分类页）**: Ribbon 界面的顶层标签页，通过 `addCategoryPage` 创建和管理
+- **Panel（面板）**: Category 下的功能分组容器，支持 Large/Medium/Small 三种按钮占位模式
+- **菜单按钮**: 支持 DelayedPopup、MenuButtonPopup、InstantPopup 三种弹出模式
+- **按钮组（ButtonGroup）**: 继承 QToolBar，将多个小按钮紧密排列，适合文本对齐等相近功能
+- **Gallery（画廊）**: Ribbon 特有控件，以网格形式展示带图标的选项，如 Word 的样式选择器
+- **Context Category（上下文标签页）**: 按需显示/隐藏的特殊标签页，如选中图片时出现的"图片工具"
+- **Application Button**: 左上角主菜单按钮，支持自定义 QSS 样式和垂直扩展
+- **Application Widget**: 全屏/半屏弹出式窗口，实现类似 Office 的文件操作界面
+- **Quick Access Bar**: 窗口顶部的快速访问工具栏，放置保存、撤销等常用操作
+- **Right Button Group / Window Button Bar**: 右侧功能按钮组和系统标题栏按钮旁的自定义工具栏
+
+## 文档导航
+
+本文档较长，您可以根据需要直接跳转到对应章节：
+
+| 章节 | 内容概要 | 适合场景 |
+|------|---------|---------|
+| [Ribbon组件创建流程](#ribbon组件创建流程) | 组件层级关系和创建顺序总览 | 首次了解整体架构 |
+| [Category（分类页）](#category分类页) | 创建和管理标签页 | 添加"主页""插入"等标签 |
+| [Panel（面板）](#panel面板) | 面板创建、按钮添加、菜单弹出模式、布局占位、嵌入控件 | 组织功能按钮和菜单 |
+| [按钮组（Button Group）](#使用按钮组-button-group) | 紧密排列的小按钮组 | 文本对齐、格式切换等 |
+| [Gallery（画廊）](#使用gallery画廊) | 网格图标选项控件 | 样式选择器、模板列表 |
+| [Context Category](#context-category上下文标签页) | 按条件显示的上下文标签页 | 图片工具、表格工具 |
+| [Application Button](#application-button) | 左上角主菜单按钮 | 文件菜单、自定义 QSS |
+| [Application Widget](#application-widget) | 全屏弹出式应用窗口 | 类似 Office 的文件操作页 |
+| [Quick Access Bar](#quick-access-bar快速访问工具栏) | 顶部快速访问工具栏 | 保存、撤销、搜索框 |
+| [Right Button Group / Window Button Bar](#right-button-group右侧按钮组) | 右侧按钮组和系统按钮栏 | 帮助、登录、设置按钮 |
+| [SARibbonMenu / GalleryGroup / GalleryItem](#saribbonmenu-详细用法) | 详细 API 参考 | 查阅具体接口用法 |
+
 ## Ribbon组件创建流程
 
 从获取 SARibbonBar 到创建各类 UI 元素，遵循以下层级递进的创建流程：

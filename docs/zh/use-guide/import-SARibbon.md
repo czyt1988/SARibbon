@@ -8,6 +8,28 @@
 
 ---
 
+## 选择引入方式
+
+根据项目需求选择合适的引入方式：
+
+```mermaid
+flowchart TD
+    A[选择引入方式] --> B{是否需要独立编译?}
+    B -->|是| C{需要共享库?}
+    C -->|是| D[CMake 动态库<br/>find_package 引入]
+    C -->|否| E[CMake 静态库<br/>SARIBBON_BUILD_STATIC_LIBS=ON]
+    B -->|否| F{项目规模}
+    F -->|简单项目<br/>快速集成| G[Amalgamate 单文件引入<br/>拷贝 .h + .cpp]
+    F -->|大型项目<br/>多模块共享| H[CMake add_subdirectory<br/>或 qmake pri 引入]
+```
+
+!!! tip "快速选择"
+    - **最快上手**：直接拷贝 `SARibbon.h` + `SARibbon.cpp` 到项目中
+    - **正式项目**：编译为动态库后通过 `find_package` 引入
+    - **qmake 项目**：使用 `importSARibbonBarLib.pri` 一行引入（Qt6 不推荐）
+
+下面分别介绍每种方式的具体操作。
+
 ## 直接引入
 
 直接引入是最简单的集成方式，只需把 `src/SARibbon.h` 和 `src/SARibbon.cpp` 添加到工程里即可。此时默认不开启 `QWindowKit`（qwk），如果你需要开启 `qwk`，那么需要做如下处理：
