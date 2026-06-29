@@ -137,6 +137,9 @@ CMakeSettings.json
 *.dll
 *.exe
 
+# vcpkg installed dependencies
+vcpkg_installed/
+
 # Python bindings build artifacts
 *.pyd
 *.egg-info/

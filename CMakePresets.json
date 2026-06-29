@@ -1,0 +1,114 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 25,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "vcpkg-base",
+      "hidden": true,
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_TOOLCHAIN_FILE": {
+          "value": "$env{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake",
+          "type": "FILEPATH"
+        },
+        "VCPKG_INSTALLED_DIR": {
+          "value": "${sourceDir}/vcpkg_installed",
+          "type": "PATH"
+        },
+        "X_VCPKG_APPLOCAL_DEPS_INSTALL": {
+          "value": "ON",
+          "type": "BOOL"
+        }
+      }
+    },
+    {
+      "name": "vcpkg-msvc-x64-debug",
+      "displayName": "MSVC x64 Debug (vcpkg)",
+      "description": "Build with MSVC x64 Debug using vcpkg for dependencies",
+      "inherits": "vcpkg-base",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "VCPKG_TARGET_TRIPLET": "x64-windows"
+      }
+    },
+    {
+      "name": "vcpkg-msvc-x64-release",
+      "displayName": "MSVC x64 Release (vcpkg)",
+      "description": "Build with MSVC x64 Release using vcpkg for dependencies",
+      "inherits": "vcpkg-base",
+      "generator": "Ninja",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "VCPKG_TARGET_TRIPLET": "x64-windows"
+      }
+    },
+    {
+      "name": "vcpkg-msvc-x64-debug-static",
+      "displayName": "MSVC x64 Debug Static (vcpkg)",
+      "description": "Build static lib with MSVC x64 Debug using vcpkg",
+      "inherits": "vcpkg-msvc-x64-debug",
+      "cacheVariables": {
+        "SARIBBON_BUILD_STATIC_LIBS": "ON",
+        "VCPKG_TARGET_TRIPLET": "x64-windows-static"
+      }
+    },
+    {
+      "name": "vcpkg-msvc-x64-release-static",
+      "displayName": "MSVC x64 Release Static (vcpkg)",
+      "description": "Build static lib with MSVC x64 Release using vcpkg",
+      "inherits": "vcpkg-msvc-x64-release",
+      "cacheVariables": {
+        "SARIBBON_BUILD_STATIC_LIBS": "ON",
+        "VCPKG_TARGET_TRIPLET": "x64-windows-static"
+      }
+    },
+    {
+      "name": "vcpkg-msvc-x64-debug-frameless",
+      "displayName": "MSVC x64 Debug + Frameless (vcpkg)",
+      "description": "Build with QWindowKit frameless support using vcpkg",
+      "inherits": "vcpkg-msvc-x64-debug",
+      "cacheVariables": {
+        "SARIBBON_USE_FRAMELESS_LIB": "ON",
+        "VCPKG_HOST_TRIPLET": "x64-windows",
+        "VCPKG_TARGET_TRIPLET": "x64-windows",
+        "VCPKG_MANIFEST_FEATURES": "frameless"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "vcpkg-msvc-x64-debug",
+      "configurePreset": "vcpkg-msvc-x64-debug"
+    },
+    {
+      "name": "vcpkg-msvc-x64-release",
+      "configurePreset": "vcpkg-msvc-x64-release"
+    },
+    {
+      "name": "vcpkg-msvc-x64-debug-static",
+      "configurePreset": "vcpkg-msvc-x64-debug-static"
+    },
+    {
+      "name": "vcpkg-msvc-x64-release-static",
+      "configurePreset": "vcpkg-msvc-x64-release-static"
+    },
+    {
+      "name": "vcpkg-msvc-x64-debug-frameless",
+      "configurePreset": "vcpkg-msvc-x64-debug-frameless"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "vcpkg-msvc-x64-debug",
+      "configurePreset": "vcpkg-msvc-x64-debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    }
+  ]
+}
