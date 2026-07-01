@@ -1,0 +1,31 @@
+[build-system]
+requires = [
+    "scikit-build-core>=0.10",
+    "PySide6>=6.5",
+    "shiboken6-generator>=6.5",
+]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "PySideSARibbon"
+version = "2.8.0"
+description = "Python bindings for SARibbon - a Qt Ribbon UI framework (PySide6)"
+license = "MIT"
+requires-python = ">=3.10"
+dependencies = ["PySide6>=6.5"]
+
+[project.urls]
+Homepage = "https://github.com/czyt1988/SARibbon"
+Repository = "https://github.com/czyt1988/SARibbon"
+
+[tool.scikit-build]
+cmake.version = ">=3.22"
+ninja.version = ">=1.10"
+wheel.packages = ["PySideSARibbon"]
+cmake.source-dir = "."
+
+# Install the Python package from CMake install targets
+install.components = ["PySideSARibbon"]
+
+# Build configuration
+cmake.build-type = "Release"

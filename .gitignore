@@ -5,6 +5,14 @@ build*
 !docs/zh/build-guide/**
 !docs/en/build-guide
 !docs/en/build-guide/**
+!docs/zh/python-guide
+!docs/zh/python-guide/**
+!docs/en/python-guide
+!docs/en/python-guide/**
+# tools 目录下的构建脚本需要追踪
+!tools/
+!tools/build_python_bindings.bat
+!tools/build_pyside6_bindings.bat
 *.user
 *.autosave
 *.dll
@@ -168,3 +176,14 @@ CMakeSettings.json
 # --------
 *.dll
 *.exe
+
+# vcpkg installed dependencies
+vcpkg_installed/
+
+# Python bindings build artifacts
+*.pyd
+*.egg-info/
+dist/
+build/
+__pycache__
+aqtinstall.log

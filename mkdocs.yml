@@ -1,4 +1,4 @@
-site_name: SARibbon
+﻿site_name: SARibbon
 site_author: 'Chen ZongYan'
 site_description: 'Qt Framework Ribbon Control'
 # 完整站点URL（包含仓库子路径）
@@ -28,18 +28,20 @@ theme:
         icon: material/brightness-7
         name: 切换深色
   features:
-    - navigation.sections # 侧边栏章节可折叠
-    - navigation.top # 右下角“回到顶部”按钮
-    - navigation.path # 顶部面包屑导航条
-    - navigation.expand        # 默认展开全部章节，一眼看到整本书
+    - navigation.tabs          # 一级导航显示为顶部水平标签栏，左侧只显示当前 tab 的子项
+    - navigation.tabs.sticky   # 滚动时顶部标签栏保持可见
+    - navigation.sections      # 侧边栏章节可折叠
+    - navigation.top           # 右下角"回到顶部"按钮
+    - navigation.path          # 顶部面包屑导航条
     - navigation.indexes       # 允许章节首页可点击
-    - navigation.footer  # 底部导航条
-    - content.code.copy # 代码块右上角出现“复制”按钮
-    - content.code.annotate # 代码块行内注释气泡
-    - search.suggest # 搜索框实时联想补全
-    - search.highlight # 点击结果后正文高亮匹配关键词
-    - search.share # 支持复制带关键词的搜索链接
-    - toc.follow # 滚动时自动跟随当前章节
+    - navigation.prune         # 只渲染当前 tab 的侧边栏，减少 DOM 体积
+    - navigation.footer        # 底部导航条
+    - content.code.copy        # 代码块右上角出现"复制"按钮
+    - content.code.annotate    # 代码块行内注释气泡
+    - search.suggest           # 搜索框实时联想补全
+    - search.highlight         # 点击结果后正文高亮匹配关键词
+    - search.share             # 支持复制带关键词的搜索链接
+    - toc.follow               # 滚动时自动跟随当前章节
 
 # 插件配置
 plugins:
@@ -51,17 +53,16 @@ plugins:
           name: English
           default: true
           build: true
-          # English navigation config
+          # English navigation config (top-level items = header tab bar)
           nav:
             - Home: en/index.md
-            - Introduction: en/introduction.md
             - Build Guide:
                 - Build Instructions: en/build-guide/build-instructions.md
                 - Build Third-Party Libraries: en/build-guide/build-3rdparty.md
                 - Build SARibbon Library: en/build-guide/build-SARibbon.md
                 - Internationalization (i18n): en/build-guide/i18n.md
                 - Common Build Errors: en/build-guide/common-build-errors.md
-            - User Guide: 
+            - User Guide:
                 - Usage Instructions: en/use-guide/SARibbon-user-guide.md
                 - Importing the Library: en/use-guide/import-SARibbon.md
                 - Create a Ribbon-Style Window: en/use-guide/create-ribbon-style-window.md
@@ -78,30 +79,36 @@ plugins:
                 - User-Configurable Ribbon: en/use-guide/persistence-configuration-ribbon.md
                 - SARibbonWidget Guide: en/use-guide/SARibbonWidget-guide.md
                 - Color Widgets: en/use-guide/color-widgets.md
+                - FAQ: en/faq.md
             - Development Guide:
+                - Developer Guide: en/dev-guide/developer-guide.md
+                - Architecture: en/dev-guide/architecture.md
+                - Module Breakdown: en/dev-guide/module-breakdown.md
                 - Coding Standards: en/dev-guide/coding-standards.md
                 - PIMPL Development Guide: en/dev-guide/pimpl-dev-guide.md
                 - Qt Integration Guide: en/dev-guide/qt-integration.md
-            - FAQ: 
-                - FAQ Overview: en/faq.md
-            - API Documentation: 
+                - Contributing: en/dev-guide/contributing.md
+                - Doc Writing Guide: en/doc-writing-guide.md
+            - Python Guide:
+                - Build Python Bindings: en/python-guide/build-python-bindings.md
+                - Use Python Bindings: en/python-guide/use-python-bindings.md
+            - API Documentation:
                 - API Documentation Home: https://czyt1988.github.io/SARibbon/doxygen/index.html
                 - Class List: https://czyt1988.github.io/SARibbon/doxygen/annotated.html
                 - Class Index: https://czyt1988.github.io/SARibbon/doxygen/classes.html
-            - Doc Writing Guide: en/doc-writing-guide.md
         - locale: zh
           name: 中文
           build: true
-          # 中文导航配置
+          # 中文导航配置（一级项 = 顶部 Tab 标签栏）
           nav:
-            - SARibbon简介: zh/index.md
+            - 首页: zh/index.md
             - 构建指南:
                 - 构建说明: zh/build-guide/build-instructions.md
                 - 第三方库构建: zh/build-guide/build-3rdparty.md
                 - SARibbon库构建: zh/build-guide/build-SARibbon.md
                 - 多语言翻译: zh/build-guide/i18n.md
                 - 构建常见错误: zh/build-guide/common-build-errors.md
-            - 使用指南: 
+            - 使用指南:
                 - 使用说明: zh/use-guide/SARibbon-user-guide.md
                 - 库的导入: zh/use-guide/import-SARibbon.md
                 - 创建Ribbon风格的窗口: zh/use-guide/create-ribbon-style-window.md
@@ -118,17 +125,23 @@ plugins:
                 - Ribbon的用户配置化: zh/use-guide/persistence-configuration-ribbon.md
                 - SARibbonWidget详细指南: zh/use-guide/SARibbonWidget-guide.md
                 - Color Widgets: zh/use-guide/color-widgets.md
+                - 常见问题: zh/faq.md
             - 开发规范:
+                - 开发者指南: zh/dev-guide/developer-guide.md
+                - 架构设计: zh/dev-guide/architecture.md
+                - 模块详解: zh/dev-guide/module-breakdown.md
                 - 编码规范: zh/dev-guide/coding-standards.md
                 - PIMPL开发指南: zh/dev-guide/pimpl-dev-guide.md
                 - Qt集成规范: zh/dev-guide/qt-integration.md
-            - 常见问题: 
-                - 常见问题说明: zh/faq.md
-            - API文档: 
+                - 贡献指南: zh/dev-guide/contributing.md
+                - 文档写作指南: zh/doc-writing-guide.md
+            - Python指南:
+                - 构建Python绑定: zh/python-guide/build-python-bindings.md
+                - 使用Python绑定: zh/python-guide/use-python-bindings.md
+            - API文档:
                 - API文档首页: https://czyt1988.github.io/SARibbon/doxygen/index.html
                 - 类列表: https://czyt1988.github.io/SARibbon/doxygen/annotated.html
                 - 类索引: https://czyt1988.github.io/SARibbon/doxygen/classes.html
-            - 文档写作指南: zh/doc-writing-guide.md
   # 需要版本切换再打开下面
   # - git-revision-date
   # - mike:                       
@@ -157,6 +170,8 @@ markdown_extensions:
   - fenced_code          # 支持 ``` 围栏代码块（高亮、行号等玩法的前提）
   - nl2br                # 换行直接转 <br>，不用末尾再空两格
   - admonition          # 开启 !!! 语法
+  - pymdownx.tabbed:
+      alternate_style: true
   - pymdownx.highlight:
       linenums: true
       linenums_style: table

@@ -1,0 +1,29 @@
+{
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "saribbonbar",
+  "version": "2.8.0",
+  "description": "Ribbon control library for Qt applications",
+  "homepage": "https://github.com/czyt1988/SARibbon",
+  "license": "MIT",
+  "dependencies": [
+    "qtbase",
+    {
+      "name": "qttools",
+      "features": ["linguist"]
+    }
+  ],
+  "features": {
+    "frameless": {
+      "description": "Use QWindowKit as a frameless window solution with native Windows effects (edge snapping, etc.)",
+      "dependencies": [
+        "qwindowkit"
+      ]
+    },
+    "svg": {
+      "description": "Enable SVG icon rendering support via Qt SVG module",
+      "dependencies": [
+        "qtsvg"
+      ]
+    }
+  }
+}

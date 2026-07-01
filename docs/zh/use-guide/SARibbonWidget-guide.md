@@ -15,6 +15,35 @@
 | **Q_PROPERTY 支持** | 暴露 `ribbonTheme` 属性，支持 Qt 属性系统和快速切换主题 |
 | **完整 Ribbon 功能** | 与 `SARibbonMainWindow` 相同的全部 Ribbon 能力（分类页、面板、快速访问栏等） |
 
+### 内部布局结构
+
+`SARibbonWidget` 内部使用垂直布局将 `SARibbonBar` 固定在顶部，用户通过 `setWidget()` 设置的内容区域自动填充剩余空间：
+
+```mermaid
+flowchart TD
+    subgraph host["宿主窗口（QDialog / QWidget / QMdiSubWindow）"]
+        subgraph rw["SARibbonWidget（内部 QVBoxLayout）"]
+            bar["SARibbonBar（固定在顶部）"]
+            subgraph bar_detail["RibbonBar 内部结构"]
+                tb["TabBar 标签栏"]
+                cat["Category 内容区域"]
+            end
+            widget["用户内容区域<br/>（通过 setWidget 设置）"]
+        end
+    end
+    bar --> bar_detail
+    bar --> widget
+
+    style host fill:#f5f5f5,stroke:#666666
+    style rw fill:#e8f4f8,stroke:#6c8ebf
+    style bar fill:#dae8fc,stroke:#6c8ebf
+    style bar_detail fill:#fff2cc,stroke:#d6b656
+    style widget fill:#d5e8d4,stroke:#82b366
+```
+
+!!! warning "布局冲突警告"
+    **不要**对 `SARibbonWidget` 自身调用 `setLayout()`，否则会破坏内部布局导致 Ribbon 显示异常。内容区域统一通过 `setWidget()` 管理。
+
 ---
 
 ## SARibbonWidget vs SARibbonMainWindow 对比

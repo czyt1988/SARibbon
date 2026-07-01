@@ -43,6 +43,36 @@ MainWindow::MainWindow(QWidget* par) : SARibbonMainWindow(par)
 
 ![contents-margins-of-ribbon](../../assets/pic/contents-margins-ribbonbar.png)
 
+## 两层边距的层级关系
+
+SARibbon 的边距由两层独立控制，外层由 `SARibbonMainWindow` 管理，内层由 `SARibbonBar` 管理：
+
+```mermaid
+flowchart TD
+    subgraph window["SARibbonMainWindow"]
+        subgraph outer["MainWindow.setContentsMargins（外层边距）"]
+            subgraph ribbon["SARibbonBar"]
+                subgraph inner["ribbonBar().setContentsMargins（内层边距）"]
+                    content["Ribbon 内容区域<br/>TabBar + Category"]
+                end
+            end
+        end
+    end
+
+    style window fill:#f5f5f5,stroke:#666666
+    style outer fill:#dae8fc,stroke:#6c8ebf
+    style ribbon fill:#fff2cc,stroke:#d6b656
+    style inner fill:#d5e8d4,stroke:#82b366
+    style content fill:#f8cecc,stroke:#b85450
+```
+
+外层边距控制窗口整体边框效果，内层边距控制 Ribbon 内容的额外缩进。两者叠加后的总缩进 = 外层边距 + 内层边距。
+
+!!! tip "推荐默认值"
+    - **常规场景**：MainWindow `(2, 0, 2, 0)` + RibbonBar `(0, 0, 0, 0)` — 默认细边框效果，无需额外设置
+    - **原生边框模式**（`UseNativeFrame`）：MainWindow `(0, 0, 0, 0)` + RibbonBar `(5, 0, 5, 0)` — 让操作系统绘制边框，仅通过 RibbonBar 边距调整内容位置
+    - **完全无边框**：MainWindow `(0, 0, 0, 0)` + RibbonBar `(0, 0, 0, 0)`
+
 ## 组合效果与推荐配置
 
 两种边距可以组合使用，产生不同的视觉效果：

@@ -1,0 +1,119 @@
+# Build system configuration
+[build-system]
+requires = ["sip >=6.0.2", "PyQt-builder >=1.6", "PyQt5>=5.15", "PyQt5-sip>=12.8"]
+build-backend = "sipbuild.api"
+
+# PEP 621 metadata
+[project]
+name = "PyQtSARibbon"
+version = "2.8.0"
+description = "Python bindings for SARibbon - a Qt Ribbon UI framework (PyQt5)"
+license = "MIT"
+requires-python = ">=3.8"
+dependencies = ["PyQt5 (>=5.15.4)"]
+
+[project.urls]
+Homepage = "https://github.com/czyt1988/SARibbon"
+Repository = "https://github.com/czyt1988/SARibbon"
+
+[tool.sip.project]
+tag-prefix = "SARibbon"
+dunder-init = true
+
+[tool.sip.bindings.saribbon]
+pep484-pyi = true
+define-macros = ["SA_RIBBON_BAR_NO_EXPORT", "SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=0", "NOMINMAX", "SA_COLOR_WIDGETS_NO_DLL"]
+sip-file = "SARibbon.sip"
+include-dirs = ["src/SARibbonBar", "src/SARibbonBar/colorWidgets"]
+qmake-QT = ["widgets"]
+builder-settings = ["RESOURCES += ../../src/SARibbonBar/SARibbonResource.qrc"]
+headers = [
+    "src/SARibbonBar/SARibbonGlobal.h",
+    "src/SARibbonBar/SARibbonBarVersionInfo.h",
+    "src/SARibbonBar/SARibbonQt5Compat.hpp",
+    "src/SARibbonBar/SARibbonMainWindow.h",
+    "src/SARibbonBar/SARibbonBar.h",
+    "src/SARibbonBar/SARibbonBarLayout.h",
+    "src/SARibbonBar/SARibbonCategory.h",
+    "src/SARibbonBar/SARibbonCategoryLayout.h",
+    "src/SARibbonBar/SARibbonPanel.h",
+    "src/SARibbonBar/SARibbonPanelLayout.h",
+    "src/SARibbonBar/SARibbonPanelItem.h",
+    "src/SARibbonBar/SARibbonPanelOptionButton.h",
+    "src/SARibbonBar/SARibbonToolButton.h",
+    "src/SARibbonBar/SARibbonButtonLayoutStrategy.h",
+    "src/SARibbonBar/SARibbonContextCategory.h",
+    "src/SARibbonBar/SARibbonGallery.h",
+    "src/SARibbonBar/SARibbonGalleryGroup.h",
+    "src/SARibbonBar/SARibbonGalleryItem.h",
+    "src/SARibbonBar/SARibbonTabBar.h",
+    "src/SARibbonBar/SARibbonMenu.h",
+    "src/SARibbonBar/SARibbonApplicationButton.h",
+    "src/SARibbonBar/SARibbonApplicationWidget.h",
+    "src/SARibbonBar/SARibbonButtonGroupWidget.h",
+    "src/SARibbonBar/SARibbonStackedWidget.h",
+    "src/SARibbonBar/SARibbonQuickAccessBar.h",
+    "src/SARibbonBar/SARibbonSystemButtonBar.h",
+    "src/SARibbonBar/SARibbonCtrlContainer.h",
+    "src/SARibbonBar/SARibbonLineWidgetContainer.h",
+    "src/SARibbonBar/SARibbonSeparatorWidget.h",
+    "src/SARibbonBar/SARibbonTitleIconWidget.h",
+    "src/SARibbonBar/SARibbonElementFactory.h",
+    "src/SARibbonBar/SARibbonElementManager.h",
+    "src/SARibbonBar/SARibbonActionsManager.h",
+    "src/SARibbonBar/SARibbonCustomizeData.h",
+    "src/SARibbonBar/SARibbonCustomizeDialog.h",
+    "src/SARibbonBar/SARibbonCustomizeWidget.h",
+    "src/SARibbonBar/SARibbonUtil.h",
+    "src/SARibbonBar/SAFramelessHelper.h",
+    "src/SARibbonBar/SARibbonWidget.h",
+    "src/SARibbonBar/SARibbonColorToolButton.h",
+    "src/SARibbonBar/colorWidgets/SAColorWidgetsGlobal.h",
+    "src/SARibbonBar/colorWidgets/SAColorToolButton.h",
+    "src/SARibbonBar/colorWidgets/SAColorGridWidget.h",
+    "src/SARibbonBar/colorWidgets/SAColorPaletteGridWidget.h",
+    "src/SARibbonBar/colorWidgets/SAColorMenu.h",
+]
+sources = [
+    "src/SARibbonBar/SARibbonMainWindow.cpp",
+    "src/SARibbonBar/SARibbonBar.cpp",
+    "src/SARibbonBar/SARibbonBarLayout.cpp",
+    "src/SARibbonBar/SARibbonCategory.cpp",
+    "src/SARibbonBar/SARibbonCategoryLayout.cpp",
+    "src/SARibbonBar/SARibbonPanel.cpp",
+    "src/SARibbonBar/SARibbonPanelLayout.cpp",
+    "src/SARibbonBar/SARibbonPanelItem.cpp",
+    "src/SARibbonBar/SARibbonPanelOptionButton.cpp",
+    "src/SARibbonBar/SARibbonToolButton.cpp",
+    "src/SARibbonBar/SARibbonButtonLayoutStrategy.cpp",
+    "src/SARibbonBar/SARibbonContextCategory.cpp",
+    "src/SARibbonBar/SARibbonGallery.cpp",
+    "src/SARibbonBar/SARibbonGalleryGroup.cpp",
+    "src/SARibbonBar/SARibbonGalleryItem.cpp",
+    "src/SARibbonBar/SARibbonTabBar.cpp",
+    "src/SARibbonBar/SARibbonMenu.cpp",
+    "src/SARibbonBar/SARibbonApplicationButton.cpp",
+    "src/SARibbonBar/SARibbonApplicationWidget.cpp",
+    "src/SARibbonBar/SARibbonButtonGroupWidget.cpp",
+    "src/SARibbonBar/SARibbonStackedWidget.cpp",
+    "src/SARibbonBar/SARibbonQuickAccessBar.cpp",
+    "src/SARibbonBar/SARibbonSystemButtonBar.cpp",
+    "src/SARibbonBar/SARibbonCtrlContainer.cpp",
+    "src/SARibbonBar/SARibbonLineWidgetContainer.cpp",
+    "src/SARibbonBar/SARibbonSeparatorWidget.cpp",
+    "src/SARibbonBar/SARibbonTitleIconWidget.cpp",
+    "src/SARibbonBar/SARibbonElementFactory.cpp",
+    "src/SARibbonBar/SARibbonElementManager.cpp",
+    "src/SARibbonBar/SARibbonActionsManager.cpp",
+    "src/SARibbonBar/SARibbonCustomizeData.cpp",
+    "src/SARibbonBar/SARibbonCustomizeDialog.cpp",
+    "src/SARibbonBar/SARibbonCustomizeWidget.cpp",
+    "src/SARibbonBar/SARibbonUtil.cpp",
+    "src/SARibbonBar/SAFramelessHelper.cpp",
+    "src/SARibbonBar/SARibbonWidget.cpp",
+    "src/SARibbonBar/SARibbonColorToolButton.cpp",
+    "src/SARibbonBar/colorWidgets/SAColorToolButton.cpp",
+    "src/SARibbonBar/colorWidgets/SAColorGridWidget.cpp",
+    "src/SARibbonBar/colorWidgets/SAColorPaletteGridWidget.cpp",
+    "src/SARibbonBar/colorWidgets/SAColorMenu.cpp",
+]

@@ -40,6 +40,31 @@ SARibbon 允许您精细调整 ribbon 各个部分的高度和间距，以适应
 
 Ribbon 的垂直高度由多个层级叠加而成，理解这些关系有助于合理配置尺寸：
 
+```mermaid
+block-beta
+    columns 1
+    block:title["TitleBar — setTitleBarHeight(h)（仅宽松模式可见）"]
+        title_inner["标题栏区域"]
+    end
+    block:tab["TabBar — setTabBarHeight(h)"]
+        tab_inner["标签栏区域"]
+    end
+    block:cat["Category — setCategoryHeight(h)"]
+        columns 3
+        p1["Panel 1"]
+        p2["Panel 2"]
+        p3["Panel 3"]
+        pt["面板标题 — setPanelTitleHeight(h)"]:3
+    end
+
+    style title fill:#dae8fc,stroke:#6c8ebf
+    style tab fill:#fff2cc,stroke:#d6b656
+    style cat fill:#d5e8d4,stroke:#82b366
+    style pt fill:#f8cecc,stroke:#b85450
+```
+
+Ribbon 各层级的层级关系和包含结构如下：
+
 ```
 ┌─────────────────────────────────────┐  ← 标题栏高度 (setTitleBarHeight)
 │  标题栏 (仅宽松模式可见)              │

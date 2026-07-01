@@ -1,0 +1,7 @@
+include project.py
+include pyproject.toml
+include pyproject-pyqt6.toml
+recursive-include sip *.sip
+recursive-include pyqt6 *.sip *.toml
+recursive-include pyside6 *.xml *.txt *.py *.h CMakeLists.txt pyproject.toml
+recursive-include src/SARibbonBar *.h *.hpp *.cpp *.qrc

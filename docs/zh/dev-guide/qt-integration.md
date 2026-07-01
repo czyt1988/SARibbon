@@ -1,6 +1,118 @@
 # Qt集成规范
 
+- **原生继承**: 所有核心类直接继承 Qt Widgets 基类（QMainWindow、QMenuBar、QFrame、QToolButton），零外部依赖
+- **信号槽驱动**: 所有 UI 交互通过 Qt 信号槽机制通讯，状态变化均触发对应 `*Changed` 信号
+- **Q_PROPERTY 暴露**: 关键配置属性通过 Qt 元对象系统暴露，支持 QSS 样式设置和动态绑定
+- **Qt 宏规范**: 强制使用 `Q_OBJECT`/`Q_SIGNALS`/`Q_SLOTS`/`Q_EMIT` 大写宏，兼容 `QT_NO_KEYWORDS` 编译
+- **PIMPL 封装**: 核心类采用 `std::unique_ptr` + PIMPL 模式，ABI 稳定且编译隔离
+- **枚举安全**: 布局风格、模式等通过 `Q_ENUM` 注册，支持 Qt 元对象反射和字符串转换
+
 SARibbon是一个Qt Ribbon UI控件库，直接继承自Qt Widgets类（QMenuBar、QFrame、QToolButton等），为Qt应用程序提供类似Microsoft Office的Ribbon界面。本文档描述SARibbon如何与Qt框架集成。
+
+## 核心类继承关系
+
+```mermaid
+classDiagram
+    class QMainWindow {
+        +setCentralWidget()
+        +menuBar()
+        +statusBar()
+    }
+    class QMenuBar {
+        +addMenu()
+        +clear()
+    }
+    class QFrame {
+        +setFrameStyle()
+    }
+    class QToolButton {
+        +setDefaultAction()
+        +setPopupMode()
+    }
+    class SARibbonMainWindow {
+        +ribbonBar() SARibbonBar*
+        +setRibbonTheme()
+        +ribbonTheme() SARibbonTheme
+    }
+    class SARibbonBar {
+        +addCategoryPage()
+        +setRibbonStyle()
+        +currentRibbonStyle()
+        +setMinimumMode()
+    }
+    class SARibbonCategory {
+        +addPanel()
+        +setCategoryName()
+        +categoryName()
+    }
+    class SARibbonContextCategory {
+        +addCategoryPage()
+        +setContextTitle()
+    }
+    class SARibbonPanel {
+        +addLargeAction()
+        +addSmallAction()
+        +setPanelName()
+    }
+    class SARibbonToolButton {
+        +setButtonType()
+    }
+    class SARibbonWidget {
+        +ribbonBar() SARibbonBar*
+    }
+
+    QMainWindow <|-- SARibbonMainWindow
+    QMenuBar <|-- SARibbonBar
+    QFrame <|-- SARibbonCategory
+    QFrame <|-- SARibbonPanel
+    QToolButton <|-- SARibbonToolButton
+    QMainWindow <|-- SARibbonWidget
+    SARibbonMainWindow --> SARibbonBar : contains
+    SARibbonBar --> SARibbonCategory : contains
+    SARibbonBar --> SARibbonContextCategory : manages
+    SARibbonCategory --> SARibbonPanel : contains
+    SARibbonPanel --> SARibbonToolButton : contains
+```
+
+## 核心信号流转
+
+下图展示了用户操作触发信号在核心组件间的传播路径：
+
+```mermaid
+flowchart LR
+    subgraph 用户操作
+        U1[点击标签页]
+        U2[切换样式]
+        U3[点击按钮]
+        U4[双击标签栏]
+    end
+
+    subgraph SARibbonBar
+        S1[currentRibbonTabChanged]
+        S2[ribbonStyleChanged]
+        S3[actionTriggered]
+        S4[ribbonModeChanged]
+        S5[titleBarHeightChanged]
+    end
+
+    subgraph 外部响应
+        E1[更新中央区域内容]
+        E2[重新布局所有面板]
+        E3[执行业务逻辑]
+        E4[切换最小化/正常模式]
+    end
+
+    U1 -->|tabBar clicked| S1
+    U2 -->|setRibbonStyle| S2
+    U3 -->|QAction triggered| S3
+    U4 -->|toggleMinimumMode| S4
+
+    S1 --> E1
+    S2 --> E2
+    S3 --> E3
+    S4 --> E4
+    S2 -->|布局高度变化| S5
+```
 
 ## 概述
 

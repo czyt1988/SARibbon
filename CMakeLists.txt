@@ -26,6 +26,22 @@ else()
     option(SARIBBON_INSTALL_IN_CURRENT_DIR "Whether to install in the current directory" OFF)
 endif()
 
+# vcpkg detection
+# When using vcpkg toolchain, CMAKE_TOOLCHAIN_FILE points to vcpkg.cmake
+# and VCPKG_TOOLCHAIN is defined by the toolchain file.
+if(VCPKG_TOOLCHAIN)
+    message(STATUS "vcpkg toolchain detected")
+    message(STATUS "  VCPKG_TARGET_TRIPLET: ${VCPKG_TARGET_TRIPLET}")
+    if(VCPKG_INSTALLED_DIR)
+        message(STATUS "  VCPKG_INSTALLED_DIR: ${VCPKG_INSTALLED_DIR}")
+    endif()
+    # When vcpkg manifest feature "frameless" is active, auto-enable the option
+    if("frameless" IN_LIST VCPKG_MANIFEST_FEATURES)
+        set(SARIBBON_USE_FRAMELESS_LIB ON CACHE BOOL "Auto-enabled by vcpkg frameless feature" FORCE)
+        message(STATUS "  vcpkg feature 'frameless' is active, SARIBBON_USE_FRAMELESS_LIB=ON")
+    endif()
+endif()
+
 # load Qt library, minimum version required is 5.12
 # cn:Qt库加载,最低版本要求为5.12
 set(SARIBBON_MIN_QT_VERSION 5.12)
