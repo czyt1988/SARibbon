@@ -91,7 +91,9 @@ plugins:
                 - Doc Writing Guide: en/doc-writing-guide.md
             - Python Guide:
                 - Build Python Bindings: en/python-guide/build-python-bindings.md
+                - Build PySide6 Bindings: en/python-guide/build-pyside6-bindings.md
                 - Use Python Bindings: en/python-guide/use-python-bindings.md
+                - Publish to PyPI: en/python-guide/publish-to-pypi.md
             - API Documentation:
                 - API Documentation Home: https://czyt1988.github.io/SARibbon/doxygen/index.html
                 - Class List: https://czyt1988.github.io/SARibbon/doxygen/annotated.html
@@ -137,7 +139,9 @@ plugins:
                 - 文档写作指南: zh/doc-writing-guide.md
             - Python指南:
                 - 构建Python绑定: zh/python-guide/build-python-bindings.md
+                - 构建PySide6绑定: zh/python-guide/build-pyside6-bindings.md
                 - 使用Python绑定: zh/python-guide/use-python-bindings.md
+                - 发布到PyPI: zh/python-guide/publish-to-pypi.md
             - API文档:
                 - API文档首页: https://czyt1988.github.io/SARibbon/doxygen/index.html
                 - 类列表: https://czyt1988.github.io/SARibbon/doxygen/annotated.html

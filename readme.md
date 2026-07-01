@@ -7,6 +7,7 @@
 <img src="https://img.shields.io/badge/C++-17-blue"/>
 <img src="https://img.shields.io/badge/Qt-5.14+-green"/>
 <img src="https://img.shields.io/badge/Qt-6-green"/>
+<img src="https://img.shields.io/badge/Python-PyQt5%20%7C%20PyQt6%20%7C%20PySide6-blueviolet"/>
 <img src="https://img.shields.io/badge/license-MIT-yellow"/>
 </p>
 <p>
@@ -128,8 +129,36 @@ Quick start guides:
 Project documentation is in the `docs/en/` folder:  
 [https://czyt1988.github.io/SARibbon/en](https://czyt1988.github.io/SARibbon/en)
 
-Doxygen-generated API documentation is deployed at:  
+Doxygen-generated API documentation is deployed at:
 [https://czyt1988.github.io/SARibbon/doxygen/index.html](https://czyt1988.github.io/SARibbon/doxygen/index.html)
+
+---
+
+## Python Bindings
+
+SARibbon provides Python bindings for three frameworks, allowing you to use SARibbon in Python applications:
+
+| Binding | Framework | Build Tool |
+|---------|-----------|------------|
+| PyQtSARibbon | PyQt5 | SIP |
+| PyQtSARibbon6 | PyQt6 | SIP |
+| PySideSARibbon | PySide6 | Shiboken6 |
+
+Install via pip:
+
+```bash
+pip install PyQtSARibbon    # PyQt5
+pip install PyQtSARibbon6   # PyQt6
+pip install PySideSARibbon  # PySide6
+```
+
+For building from source and detailed usage, see:
+- [Build Python Bindings](./docs/en/python-guide/build-python-bindings.md)
+- [Use Python Bindings](./docs/en/python-guide/use-python-bindings.md)
+- [Build PySide6 Bindings](./docs/en/python-guide/build-pyside6-bindings.md)
+- [Publish to PyPI](./docs/en/python-guide/publish-to-pypi.md)
+
+Python demo examples are in the `pyexamples/` directory.
 
 ---
 

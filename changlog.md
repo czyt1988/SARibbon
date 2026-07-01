@@ -1,5 +1,23 @@
 # 版本更新记录(change log):
 
+## 2026-07-01 -> 2.9.2
+
+- 新增Python绑定支持，提供三种绑定方案：
+  - **PyQt5绑定**：基于SIP构建，提供完整的SARibbon API封装
+  - **PyQt6绑定**：基于SIP构建，独立sip目录和pyproject配置
+  - **PySide6绑定**：基于Shiboken6构建，提供typesystem XML和CMake构建脚本
+- 新增PyPI发布支持，三种绑定均可通过GitHub Actions自动构建并发布到PyPI
+- 新增Python示例程序（`pyexamples/`），覆盖PyQt5/PyQt6/PySide6三种绑定的完整演示
+- 新增Python绑定文档（中英文），包含构建指南、使用指南、PySide6构建指南和PyPI发布指南
+- 新增vcpkg工具链集成（`vcpkg.json`、`CMakePresets.json`），支持vcpkg manifest模式一键安装依赖
+- 新增MSVC兼容性修复（`_HAS_AUTO_PTR_ETC=1`），解决Qt 6.5.3与新版MSVC STL的兼容问题
+- 修复CMake每次构建后`.ts`翻译文件被git标记为已修改的问题（通过`.gitattributes`规范化行尾）
+- 修复测试用例API不匹配及`initTestCase`中QApplication重复创建导致SEGFAULT的问题
+- 修复RTL测试API不匹配导致CI编译失败的问题
+- 修复CI流水线在macOS、Linux和MSVC环境下的构建问题
+- 新增开发指南文档：架构设计、模块详解、贡献指南、开发者指南
+- 完善中文构建文档和常见构建错误指南
+
 ## 2026-06-13 -> 2.9.0
 
 - 新增Office 2016 Green/Dark和Office 2021 Green/Dark主题变体，内置主题总数扩展至6种

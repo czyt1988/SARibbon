@@ -7,6 +7,7 @@
 <img src="https://img.shields.io/badge/C++-17-blue"/>
 <img src="https://img.shields.io/badge/Qt-5.14+-green"/>
 <img src="https://img.shields.io/badge/Qt-6-green"/>
+<img src="https://img.shields.io/badge/Python-PyQt5%20%7C%20PyQt6%20%7C%20PySide6-blueviolet"/>
 <img src="https://img.shields.io/badge/license-MIT-yellow"/>
 </p>
 <p>
@@ -122,6 +123,32 @@ SARibbon提供了集成文件，位于src目录下，你只需要在项目中引
 快速开始可以参阅:[创建Ribbon风格的窗口](./docs/zh/use-guide/create-ribbon-style-window.md)和[创建Ribbon界面](./docs/zh/use-guide/create-ribbon-ui.md)两篇入门文章
 
 **推荐从 `example/MainWindowExample` 入手学习 SARibbon 的使用方式，你也可以直接运行该示例，体验各项功能**
+
+## Python绑定
+
+SARibbon 提供了三种 Python 绑定方案，可在 Python 应用中使用 SARibbon：
+
+| 绑定包名 | 框架 | 构建工具 |
+|----------|------|----------|
+| PyQtSARibbon | PyQt5 | SIP |
+| PyQtSARibbon6 | PyQt6 | SIP |
+| PySideSARibbon | PySide6 | Shiboken6 |
+
+通过 pip 安装：
+
+```bash
+pip install PyQtSARibbon    # PyQt5
+pip install PyQtSARibbon6   # PyQt6
+pip install PySideSARibbon  # PySide6
+```
+
+构建和使用文档：
+- [构建Python绑定](./docs/zh/python-guide/build-python-bindings.md)
+- [使用Python绑定](./docs/zh/python-guide/use-python-bindings.md)
+- [构建PySide6绑定](./docs/zh/python-guide/build-pyside6-bindings.md)
+- [发布到PyPI](./docs/zh/python-guide/publish-to-pypi.md)
+
+Python 示例程序位于 `pyexamples/` 目录。
 
 ## 更多截图
 

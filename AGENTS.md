@@ -19,9 +19,18 @@ src/SARibbonBar/3rdparty/      ← 第三方代码
 src/SARibbonBar/i18n/          ← 翻译文件 (.ts/.qm)
 example/                  ← 示例程序（MainWindowExample是最主要的）
 tests/                    ← 单元测试（Qt Test框架，需 BUILD_TESTS=ON）
-tools/                    ← Amalgamate合并工具
+tools/                    ← Amalgamate合并工具，以及Python绑定构建脚本
+sip/                      ← PyQt5 SIP绑定定义文件（.sip）
+pyqt6/sip/                ← PyQt6 SIP绑定定义文件（独立维护）
+pyside6/                  ← PySide6绑定（Shiboken6）：CMakeLists.txt、typesystem XML、glue代码
+pyexamples/               ← Python示例程序（pyqt5/pyqt6/pyside6三个子目录）
+pyproject.toml            ← PyQt5 PyPI打包配置
+pyproject-pyqt6.toml      ← PyQt6 PyPI打包配置
+pyside6/pyproject.toml    ← PySide6 PyPI打包配置
 docs/zh/dev-guide/        ← 开发规范文档（编码前必读）
 docs/zh/build-guide/      ← 构建指引
+docs/zh/python-guide/     ← Python绑定文档（中文）
+docs/en/python-guide/     ← Python绑定文档（英文）
 ```
 
 核心头文件 `src/SARibbonBar/SARibbonGlobal.h` 定义了：`SA_RIBBON_EXPORT`、`SA_RIBBON_DECLARE_PRIVATE`/`SA_RIBBON_DECLARE_PUBLIC`、`SA_RIBBON_IMPL_CONSTRUCT`、`SA_D`/`SA_DC`/`SA_Q`/`SA_QC`、`SARibbonAlignment`/`SARibbonTheme`/`SARibbonMainWindowStyleFlag` 枚举。
@@ -60,6 +69,18 @@ cmake --build build-linux --parallel
 ```
 
 > 构建损坏时先关掉 `build/bin` 下占用的程序，再删除 build 目录重配。Linux apt 安装的 Qt6 无需指定 `CMAKE_PREFIX_PATH`。
+
+### vcpkg 构建
+
+项目支持 vcpkg manifest 模式，`vcpkg.json` 声明了依赖，`CMakePresets.json` 提供了预设配置：
+
+```bash
+# 使用 vcpkg preset 构建（自动拉取依赖）
+cmake --preset=vcpkg-msvc-x64-release
+cmake --build --preset=vcpkg-msvc-x64-release
+```
+
+vcpkg 的 `frameless` feature 会自动启用 `SARIBBON_USE_FRAMELESS_LIB`。
 
 ### CMake 选项
 

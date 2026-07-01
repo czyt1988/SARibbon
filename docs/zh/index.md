@@ -61,6 +61,7 @@
 - ✅ **上下文标签页**：SARibbonContextCategory 按条件显示/隐藏，如选中图片时出现"图片工具"
 - ✅ **Gallery画廊控件**：网格形式展示图标选项，支持弹出式分组浏览
 - ✅ **最小化模式**：双击标签切换，仅显示标签栏，点击临时弹出内容面板
+- ✅ **Python绑定**：v2.9.2 新增，支持 PyQt5/PyQt6/PySide6 三种绑定，可通过 pip 安装
 
 ---
 
@@ -125,6 +126,7 @@ dark2主题：
 | [构建说明](./build-guide/build-instructions.md) | 从零构建 SARibbon |
 | [快速上手](./use-guide/SARibbon-user-guide.md) | 5分钟了解使用方法 |
 | [创建Ribbon窗口](./use-guide/create-ribbon-style-window.md) | 创建第一个 Ribbon 窗口 |
+| [Python绑定](./python-guide/use-python-bindings.md) | 在 Python 中使用 SARibbon |
 | [开发者指南](./dev-guide/developer-guide.md) | 参与项目开发 |
 | [常见问题](./faq.md) | 解答常见疑问 |
 
