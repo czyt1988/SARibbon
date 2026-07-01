@@ -333,13 +333,21 @@ endif()
 
 # =====================================================================
 # Install
+# Use SKBUILD_PLATLIB_DIR (provided by scikit-build-core) when building
+# wheels, or fall back to PYTHON_SITE_PACKAGES for standalone CMake builds.
 # =====================================================================
+if(DEFINED SKBUILD_PLATLIB_DIR)
+    set(_INSTALL_LIBDIR "${SKBUILD_PLATLIB_DIR}/PySideSARibbon")
+else()
+    set(_INSTALL_LIBDIR "${PYTHON_SITE_PACKAGES}/PySideSARibbon")
+endif()
+
 install(TARGETS saribbon
-    LIBRARY DESTINATION "${PYTHON_SITE_PACKAGES}/PySideSARibbon"
-    RUNTIME DESTINATION "${PYTHON_SITE_PACKAGES}/PySideSARibbon"
+    LIBRARY DESTINATION "${_INSTALL_LIBDIR}"
+    RUNTIME DESTINATION "${_INSTALL_LIBDIR}"
 )
 
 install(FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/PySideSARibbon/__init__.py
-    DESTINATION "${PYTHON_SITE_PACKAGES}/PySideSARibbon"
+    DESTINATION "${_INSTALL_LIBDIR}"
 )

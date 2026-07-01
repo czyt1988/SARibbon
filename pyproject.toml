@@ -7,10 +7,14 @@ build-backend = "sipbuild.api"
 [project]
 name = "PyQtSARibbon"
 version = "2.8.0"
-description = "Python bindings for SARibbon - a Qt Ribbon UI framework"
+description = "Python bindings for SARibbon - a Qt Ribbon UI framework (PyQt5)"
 license = "MIT"
 requires-python = ">=3.8"
 dependencies = ["PyQt5 (>=5.15.4)"]
+
+[project.urls]
+Homepage = "https://github.com/czyt1988/SARibbon"
+Repository = "https://github.com/czyt1988/SARibbon"
 
 [tool.sip.project]
 tag-prefix = "SARibbon"

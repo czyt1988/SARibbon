@@ -1,0 +1,218 @@
+name: Publish Python Bindings
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  # ==================================================================
+  # PySide6 bindings — uses scikit-build-core (CMake backend)
+  # ==================================================================
+  build-pyside6:
+    name: PySide6 ${{ matrix.os }} py${{ matrix.python }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+        python: ["3.10", "3.11", "3.12"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install Python build dependencies
+        run: |
+          pip install -U pip
+          pip install build twine
+
+      - name: Install PySide6 and shiboken6
+        run: pip install PySide6 shiboken6-generator
+
+      # --- Qt installation per platform ---
+      - name: Install Qt (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y qt6-base-dev qt6-base-dev-tools qt6-svg-dev
+
+      - name: Install Qt (macOS)
+        if: runner.os == 'macOS'
+        run: brew install qt
+
+      - name: Install Qt (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          pip install aqtinstall
+          python -m aqt install-qt windows desktop 6.8.3 win64_msvc2022_64 -O ${{ github.workspace }}\Qt
+          echo "${{ github.workspace }}\Qt\6.8.3\msvc2022_64\bin" >> $GITHUB_PATH
+
+      - name: Set MSVC environment (Windows)
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Set Qt path (Linux/macOS)
+        if: runner.os != 'Windows'
+        run: |
+          # On Linux/macOS, Qt is installed system-wide or via brew
+          echo "CMAKE_PREFIX_PATH auto-detected by CMake"
+
+      - name: Build wheel
+        run: |
+          pip install -U pip build
+          python -m build --wheel pyside6/
+        env:
+          CMAKE_PREFIX_PATH: ${{ runner.os == 'Windows' && format('{0}\\Qt\\6.8.3\\msvc2022_64', github.workspace) || '' }}
+
+      - name: Check wheel
+        run: twine check pyside6/dist/*.whl
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pyside6-wheel-${{ matrix.os }}-${{ matrix.python }}
+          path: pyside6/dist/*.whl
+
+  # ==================================================================
+  # PyQt5 bindings — uses SIP/PyQt-builder
+  # ==================================================================
+  build-pyqt5:
+    name: PyQt5 ${{ matrix.os }} py${{ matrix.python }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+        python: ["3.10", "3.11", "3.12"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install build dependencies
+        run: |
+          pip install -U pip
+          pip install build twine sip PyQt-builder PyQt5 PyQt5-sip
+
+      - name: Install Qt (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y qtbase5-dev qt5-qmake qtbase5-dev-tools libqt5svg5-dev
+
+      - name: Install Qt (macOS)
+        if: runner.os == 'macOS'
+        run: brew install qt@5
+
+      - name: Install Qt (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          pip install aqtinstall
+          python -m aqt install-qt windows desktop 5.15.2 win64_msvc2019_64 -O ${{ github.workspace }}\Qt
+          echo "${{ github.workspace }}\Qt\5.15.2\msvc2019_64\bin" >> $GITHUB_PATH
+
+      - name: Set MSVC environment (Windows)
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Build wheel
+        run: python -m build --wheel --no-isolation
+        env:
+          QT_QMAKE_PATH: ${{ runner.os == 'Windows' && format('{0}\\Qt\\5.15.2\\msvc2019_64\\bin\\qmake.exe', github.workspace) || '' }}
+
+      - name: Check wheel
+        run: twine check dist/*.whl
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pyqt5-wheel-${{ matrix.os }}-${{ matrix.python }}
+          path: dist/*.whl
+
+  # ==================================================================
+  # PyQt6 bindings — uses SIP/PyQt-builder from pyqt6/ directory
+  # ==================================================================
+  build-pyqt6:
+    name: PyQt6 ${{ matrix.os }} py${{ matrix.python }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
+        python: ["3.10", "3.11", "3.12"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install build dependencies
+        run: |
+          pip install -U pip
+          pip install build twine sip PyQt-builder PyQt6 PyQt6-sip
+
+      - name: Install Qt (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y qt6-base-dev qt6-base-dev-tools qt6-svg-dev
+
+      - name: Install Qt (macOS)
+        if: runner.os == 'macOS'
+        run: brew install qt
+
+      - name: Install Qt (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          pip install aqtinstall
+          python -m aqt install-qt windows desktop 6.8.3 win64_msvc2022_64 -O ${{ github.workspace }}\Qt
+          echo "${{ github.workspace }}\Qt\6.8.3\msvc2022_64\bin" >> $GITHUB_PATH
+
+      - name: Set MSVC environment (Windows)
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Build wheel
+        run: python -m build --wheel --no-isolation pyqt6/
+        env:
+          QT_QMAKE_PATH: ${{ runner.os == 'Windows' && format('{0}\\Qt\\6.8.3\\msvc2022_64\\bin\\qmake.exe', github.workspace) || '' }}
+
+      - name: Check wheel
+        run: twine check pyqt6/dist/*.whl
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pyqt6-wheel-${{ matrix.os }}-${{ matrix.python }}
+          path: pyqt6/dist/*.whl
+
+  # ==================================================================
+  # Publish to PyPI
+  # ==================================================================
+  publish:
+    name: Publish to PyPI
+    needs: [build-pyside6, build-pyqt5, build-pyqt6]
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write  # Trusted publishing (OIDC)
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: List wheels
+        run: ls -la dist/*.whl
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        # Uses trusted publishing (OIDC) — no API token needed.
+        # Configure trusted publishers at https://pypi.org/manage/account/publishing/
