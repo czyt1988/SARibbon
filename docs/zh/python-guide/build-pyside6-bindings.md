@@ -157,13 +157,15 @@ python pyexamples/pyside6/ribbon_demo.py
 
 ### 问题 1：找不到 shiboken6-generator
 
-**错误信息**：`Could not find a package configuration file provided by "Shiboken6Tools"`
+**错误信息**：`Could not find shiboken6 executable`
 
 **解决方案**：确保已安装 shiboken6-generator：
 
 ```bash
 pip install shiboken6-generator
 ```
+
+> **注意**：当前 CMakeLists.txt 不依赖 `find_package(Shiboken6Tools)`，而是手动定位 `shiboken6.exe`、库文件和头文件路径。PySide6 6.8.x 不包含 `Shiboken6ToolsConfig.cmake`，因此旧版本的 `find_package(Shiboken6Tools)` 方式不再使用。
 
 ### 问题 2：找不到 Qt 头文件
 
@@ -196,6 +198,40 @@ python -m venv venv-pyside6
 venv-pyside6\Scripts\activate
 pip install PySide6 shiboken6-generator
 ```
+
+### 问题 6：PySide6 与 Qt6 版本不匹配
+
+**现象**：构建成功但运行时崩溃，或出现 `qjsonparseerror.h: No such file or directory` 等头文件版本不匹配错误。
+
+**根因**：PySide6 pip 包中的 Qt 头文件版本必须与系统安装的 Qt6 C++ 开发包版本匹配。例如 PySide6 6.8.3 需要搭配 Qt 6.8.3 开发包。
+
+**解决方案**：确保版本一致：
+
+```bash
+# 检查 PySide6 版本
+python -c "import PySide6; print(PySide6.__version__)"
+
+# 安装匹配的 Qt6 开发包（以 6.8.3 为例）
+python -m aqt install-qt windows desktop 6.8.3 win64_msvc2022_64 -O D:\Qt
+```
+
+### 问题 7：运行时主题和图标不显示
+
+**现象**：窗口启动后无 QSS 主题样式、图标不显示，控制台输出 `can not load build in ribbon theme`。
+
+**根因**：Qt 资源文件（`.qrc`）的 RCC 静态初始化器被 MSVC 链接器的 `/OPT:REF` 优化剥离。当 `qt_add_resources` 的输出放在静态库 `saribbon_lib` 中时，由于没有代码显式引用 qrc 生成的符号，整个 qrc 对象文件被从最终的 `.pyd` 中移除。
+
+**解决方案**：确保 `qt_add_resources` 的输出编译进最终的 MODULE 目标（`.pyd`），而非静态库。当前 CMakeLists.txt 已正确处理此问题，注释中说明了原因：
+
+```cmake
+# NOTE: qrc resources are NOT added to saribbon_lib. They are compiled
+# directly into the final .pyd module (see below) to ensure the RCC
+# static initializer is included.
+```
+
+### 问题 8：QAction 构造函数间接引用崩溃
+
+> **更新**：经深入排查，此问题并非 shiboken 类型注册冲突导致，而是文件编码问题引起的假象。间接引用 Qt 类（通过变量、字典、模块属性）在 PySide6 绑定中**完全正常**，符合 Python 惯例。确保 Python 源文件统一使用 UTF-8 无 BOM 编码、LF 换行即可。
 
 ## 下一步
 

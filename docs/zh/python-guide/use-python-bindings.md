@@ -1,353 +1,279 @@
 # Python 绑定使用指南
 
-本文档详细介绍如何在 Python 中使用 SARibbon 绑定（PyQtSARibbon）。
+本文档介绍如何在 Python 中使用 SARibbon 绑定，涵盖 PyQt5、PyQt6 和 PySide6 三种绑定。
 
-## 子文档导航
+## 三种绑定概览
 
-| 文档 | 内容 |
-|------|------|
-| [构建 Python 绑定](./build-python-bindings.md) | 编译安装 PyQtSARibbon |
-| [使用 Python 绑定](./use-python-bindings.md) | 在 Python 中使用 SARibbon |
+| 绑定 | 模块名 | 构建工具 | 包名 |
+|------|--------|----------|------|
+| PyQt5 | `PyQtSARibbon.saribbon` | SIP + PyQt-builder | `PyQtSARibbon` |
+| PyQt6 | `PyQtSARibbon.saribbon` | SIP + PyQt-builder | `PyQtSARibbon` |
+| PySide6 | `PySideSARibbon.saribbon` | Shiboken6 + CMake | `PySideSARibbon` |
+
+### 导入方式
+
+```python
+# PyQt5
+from PyQtSARibbon import saribbon
+
+# PyQt6
+from PyQtSARibbon import saribbon
+
+# PySide6
+from PySideSARibbon import saribbon
+```
+
+### 绑定差异
+
+在编写跨绑定兼容的代码时，需注意以下差异：
+
+| 差异点 | PyQt5 | PyQt6 / PySide6 |
+|--------|-------|-----------------|
+| QAction 导入 | `from PyQt5.QtWidgets import QAction` | `from PyQt6.QtGui import QAction` / `from PySide6.QtGui import QAction` |
+| Qt 颜色枚举 | `Qt.red` | `Qt.GlobalColor.red` |
+| app.exec | `app.exec_()` | `app.exec()` |
+| QButtonGroup 信号 | `buttonClicked[int]` | `idClicked(int)` |
+| 枚举类型 | SIP 中部分枚举映射为 int | PySide6 中为原生 Python Enum |
+| SARibbonTheme | SIP: `setRibbonTheme(int)` | PySide6: `setRibbonTheme(SARibbonTheme)` |
+
+### 类覆盖差异
+
+PySide6 绑定比 SIP 绑定暴露了更多类：
+
+| 类 | PyQt5/6 (SIP) | PySide6 (Shiboken6) |
+|----|:---:|:---:|
+| SARibbonMainWindow, SARibbonBar, SARibbonCategory, SARibbonPanel | ✓ | ✓ |
+| SARibbonToolButton, SARibbonTabBar, SARibbonContextCategory | ✓ | ✓ |
+| SARibbonGallery, SARibbonGalleryGroup, SARibbonGalleryItem | ✓ | ✓ |
+| SARibbonButtonGroupWidget, SARibbonQuickAccessBar | ✓ | ✓ |
+| SARibbonPanelItem, SARibbonPanelLabel | ✓ | ✓ |
+| **SARibbonWidget** | ✗ | ✓ |
+| **SARibbonMenu** | ✗ | ✓ |
+| **SARibbonApplicationButton** | ✗ | ✓ |
+| **SARibbonColorToolButton** | ✗ | ✓ |
+| **SARibbonActionsManager, SARibbonActionsManagerModel** | ✗ | ✓ |
+| **SARibbonCustomizeData, SARibbonCustomizeWidget, SARibbonCustomizeDialog** | ✗ | ✓ |
 
 ## 快速开始
 
-### 基本示例
-
-下面是一个最简单的 PyQtSARibbon 示例：
+### 基本示例（PySide6）
 
 ```python
 import sys
-from PyQt5.QtWidgets import QApplication, QAction
-from PyQtSARibbon.saribbon import SARibbonBar, SARibbonCategory, SARibbonPanel
+from PySide6.QtWidgets import QApplication
+from PySide6.QtGui import QAction, QIcon
+from PySideSARibbon import saribbon
 
-# 创建应用程序
 app = QApplication(sys.argv)
 
-# 创建 Ribbon 工具栏
-ribbon = SARibbonBar()
+# Create ribbon main window
+win = saribbon.SARibbonMainWindow()
+win.setWindowTitle("My Ribbon App")
 
-# 创建类别（标签页）
-home_category = SARibbonCategory("Home")
-ribbon.addCategoryPage(home_category)
+# Get the ribbon bar
+ribbon = win.ribbonBar()
+ribbon.setRibbonStyle(saribbon.SARibbonBar.RibbonStyleLooseThreeRow)
 
-# 创建面板
-clipboard_panel = SARibbonPanel("Clipboard", home_category)
-home_category.addPanel(clipboard_panel)
+# Add a category (tab page)
+home = ribbon.addCategoryPage("Home")
 
-# 添加动作
-paste_action = QAction("Paste", clipboard_panel)
-clipboard_panel.addLargeAction(paste_action)
+# Add a panel (button group)
+file_panel = home.addPanel("File")
 
-cut_action = QAction("Cut", clipboard_panel)
-clipboard_panel.addSmallAction(cut_action)
+# Add actions
+act_new = QAction(QIcon("new.svg"), "New")
+file_panel.addLargeAction(act_new)
 
-copy_action = QAction("Copy", clipboard_panel)
-clipboard_panel.addSmallAction(copy_action)
+act_open = QAction(QIcon("open.svg"), "Open")
+file_panel.addSmallAction(act_open)
 
-# 显示 Ribbon
-ribbon.show()
+# Set central widget
+from PySide6.QtWidgets import QTextEdit
+editor = QTextEdit()
+win.setCentralWidget(editor)
 
-sys.exit(app.exec_())
+win.show()
+sys.exit(app.exec())
 ```
 
-## 核心概念
-
-PyQtSARibbon 的界面层次结构：
+## 界面层次结构
 
 ```
-SARibbonBar (工具栏)
-└── SARibbonCategory (类别/标签页)
-    └── SARibbonPanel (面板)
-        ├── QAction (动作/按钮)
-        └── SARibbonGallery (画廊)
+SARibbonMainWindow
+├── SARibbonBar (ribbon bar)
+│   ├── SARibbonApplicationButton (top-left button)
+│   ├── SARibbonCategory (tab page)
+│   │   └── SARibbonPanel (panel / button group)
+│   │       ├── QAction via addLargeAction / addSmallAction
+│   │       ├── QWidget via addWidget / addSmallWidget / addLargeWidget
+│   │       └── SARibbonGallery (gallery)
+│   ├── SARibbonContextCategory (hidden tab, shown on demand)
+│   ├── SARibbonQuickAccessBar (top toolbar)
+│   └── SARibbonButtonGroupWidget (right button group)
+└── Central widget (QTextEdit, etc.)
 ```
 
-### SARibbonBar - 主工具栏
+## 核心 API
 
-SARibbonBar 是整个 Ribbon 控件的容器。
+### SARibbonMainWindow
+
+SARibbonMainWindow 是 QMainWindow 的子类，内置 SARibbonBar。
 
 ```python
-from PyQtSARibbon.saribbon import SARibbonBar
+win = saribbon.SARibbonMainWindow()
 
-# 创建 Ribbon 工具栏
-ribbon = SARibbonBar()
+# Get the ribbon bar
+ribbon = win.ribbonBar()
 
-# 设置样式
-ribbon.setRibbonStyle(SARibbonBar.RibbonStyleLooseThreeRow)
+# Set ribbon theme (6 built-in themes)
+win.setRibbonTheme(saribbon.SARibbonTheme.RibbonThemeOffice2021Blue)
 
-# 获取当前选中的类别索引
-index = ribbon.currentIndex()
-
-# 设置当前类别
-ribbon.setCurrentIndex(1)
+# Set central widget (same as QMainWindow)
+win.setCentralWidget(editor)
 ```
 
-### SARibbonCategory - 类别（标签页）
+### SARibbonBar
 
-SARibbonCategory 代表 Ribbon 中的一个标签页。
+管理所有分类、面板和应用按钮。
 
 ```python
-from PyQtSARibbon.saribbon import SARibbonCategory
+ribbon = win.ribbonBar()
 
-# 创建类别
-category = SARibbonCategory("Home")
+# Set ribbon style (6 styles)
+ribbon.setRibbonStyle(saribbon.SARibbonBar.RibbonStyleLooseThreeRow)
 
-# 添加到 Ribbon
-ribbon.addCategoryPage(category)
+# Add a category
+home = ribbon.addCategoryPage("Home")
 
-# 获取类别名称
-name = category.categoryName()
+# Context category (hidden by default)
+ctx = ribbon.addContextCategory("Drawing Tools", Qt.GlobalColor.red)
+ribbon.showContextCategory(ctx)
+ribbon.hideContextCategory(ctx)
 
-# 设置类别名称
-category.setCategoryName("Start")
+# Minimum mode (collapse ribbon to tab bar only)
+ribbon.setMinimumMode(True)
+ribbon.setMinimumMode(False)
+
+# Word wrap for action text
+ribbon.setEnableWordWrap(True)
+
+# QuickAccessBar and right button group
+qab = ribbon.quickAccessBar()
+rbg = ribbon.rightButtonGroup()
+
+# Application button
+btn = saribbon.SARibbonApplicationButton("File")
+ribbon.setApplicationButton(btn)
 ```
 
-### SARibbonPanel - 面板
+### SARibbonCategory
 
-SARibbonPanel 是类别中的功能分组。
+代表 Ribbon 中的一个标签页。
 
 ```python
-from PyQtSARibbon.saribbon import SARibbonPanel
-
-# 创建面板
-panel = SARibbonPanel("Clipboard", category)
-
-# 添加到类别
-category.addPanel(panel)
-
-# 添加动作
-panel.addLargeAction(action)  # 大按钮
-panel.addSmallAction(action)  # 小按钮
-panel.addSeparator()          # 分隔符
+home = ribbon.addCategoryPage("Home")
+home.categoryName()        # "Home"
+home.setCategoryName("Start")
 ```
 
-## 添加动作到面板
+### SARibbonPanel
 
-### 大按钮（Large Action）
-
-大按钮显示图标和文字，图标在上方。
+面板是分类中的功能分组。
 
 ```python
-from PyQt5.QtWidgets import QAction
-from PyQt5.QtGui import QIcon
+panel = home.addPanel("File")
 
-# 创建动作
-paste_action = QAction(QIcon("paste.png"), "Paste", panel)
-paste_action.triggered.connect(lambda: print("Paste clicked"))
+# Add actions (icon + text buttons)
+panel.addLargeAction(action)   # icon above text
+panel.addSmallAction(action)   # icon beside text
+panel.addSeparator()           # visual separator
 
-# 添加大按钮
-panel.addLargeAction(paste_action)
+# Add widgets (for non-action controls like QComboBox, QRadioButton)
+# RowProportion controls the widget's height within the panel:
+#   SARibbonPanelItem.Large  — fills full panel height
+#   SARibbonPanelItem.Medium — half height (two-row mode only)
+#   SARibbonPanelItem.Small  — one row
+RP = saribbon.SARibbonPanelItem
+panel.addWidget(my_combobox, RP.Small)
+
+# Add tool button widgets (SARibbonToolButton / SARibbonColorToolButton)
+# Use addSmallWidget/addLargeWidget instead of addWidget
+panel.addSmallWidget(tool_btn)
+panel.addLargeWidget(tool_btn)
+
+# Expanding panel (stretches to fill available width)
+panel.setExpanding(True)
 ```
 
-### 小按钮（Small Action）
+### SARibbonGallery
 
-小按钮只显示小图标和文字。
-
-```python
-# 创建动作
-cut_action = QAction("Cut", panel)
-copy_action = QAction("Copy", panel)
-
-# 添加小按钮
-panel.addSmallAction(cut_action)
-panel.addSmallAction(copy_action)
-```
-
-### 中按钮（Medium Action）
-
-中按钮显示图标和文字并排。
+画廊是弹出式网格控件，支持多个可滚动分组。
 
 ```python
-# 添加中按钮
-panel.addMediumAction(action)
-```
+gallery = panel.addGallery()
 
-### 分隔符
+# Create actions
+actions = [QAction(icon, "Item {}".format(i+1)) for i in range(12)]
 
-```python
-# 添加分隔符
-panel.addSeparator()
-```
-
-## 创建画廊（Gallery）
-
-画廊是一种下拉菜单，显示多个选项。
-
-```python
-from PyQtSARibbon.saribbon import SARibbonGallery
-
-# 创建画廊面板
-gallery_panel = SARibbonPanel("Styles", category)
-category.addPanel(gallery_panel)
-
-# 添加画廊
-gallery = gallery_panel.addGallery()
-
-# 创建动作列表
-actions = []
-for i in range(12):
-    action = QAction(f"Style {i+1}")
-    actions.append(action)
-
-# 添加到画廊
-group = gallery.addCategoryActions("Preset Styles", actions)
-
-# 设置当前显示
+# Add a group
+group = gallery.addCategoryActions("Items", actions)
 gallery.setCurrentViewGroup(group)
+
+# Multiple groups
+group2 = gallery.addCategoryActions("Apps", more_actions)
 ```
 
-## 上下文类别
+### SARibbonColorToolButton (PySide6 only)
 
-上下文类别是在特定条件下显示的标签页。
+颜色选择按钮，继承自 SARibbonToolButton。
 
 ```python
-from PyQt5.QtCore import Qt
+btn = saribbon.SARibbonColorToolButton()
+btn.setColor(QColor("#FF0000"))
+btn.setColorStyle(saribbon.SARibbonColorToolButton.ColorFillToIcon)
+btn.setText("Red")
+panel.addSmallWidget(btn)  # use addSmallWidget, NOT addWidget
 
-# 创建上下文类别
-context = ribbon.addContextCategory("Drawing Tools", Qt.red)
-
-# 在上下文中添加类别
-format_category = context.addCategoryPage("Format")
-
-# 添加面板
-format_panel = format_category.addPanel("Shape")
-format_panel.addLargeAction(fill_action)
-
-# 显示/隐藏上下文类别
-ribbon.setContextCategoryVisible(context, True)
-ribbon.setContextCategoryVisible(context, False)
+# Large variant
+btn2 = saribbon.SARibbonColorToolButton()
+btn2.setColor(QColor("#0000FF"))
+btn2.setButtonType(saribbon.SARibbonToolButton.LargeButton)
+btn2.setColorStyle(saribbon.SARibbonColorToolButton.ColorFillToIcon)
+btn2.setText("Blue")
+panel.addLargeWidget(btn2)
 ```
 
-## 完整示例
+### SARibbonApplicationButton (PySide6)
 
-下面是一个完整的 Ribbon 应用程序示例：
+左上角的应用按钮。
 
 ```python
-import sys
-from PyQt5.QtWidgets import (
-    QApplication, QMainWindow, QAction, QTextEdit,
-    QFileDialog, QMessageBox
-)
-from PyQt5.QtGui import QFont
-from PyQt5.QtCore import Qt
-from PyQtSARibbon.saribbon import SARibbonBar, SARibbonCategory, SARibbonPanel
+btn = saribbon.SARibbonApplicationButton("File")
+ribbon.setApplicationButton(btn)
+```
 
-class RibbonWindow(QMainWindow):
-    def __init__(self):
-        super().__init__()
-        self.setWindowTitle("SARibbon Python Example")
-        self.resize(1024, 680)
-        
-        # 创建 Ribbon
-        self.ribbon = SARibbonBar()
-        self.setMenuWidget(self.ribbon)
-        
-        # 创建中央编辑器
-        self.editor = QTextEdit()
-        self.editor.setFont(QFont("Consolas", 11))
-        self.setCentralWidget(self.editor)
-        
-        # 设置 Ribbon 界面
-        self._setup_ribbon()
-    
-    def _setup_ribbon(self):
-        # === Home Tab ===
-        home = SARibbonCategory("Home")
-        self.ribbon.addCategoryPage(home)
-        
-        # File panel
-        file_panel = SARibbonPanel("File", home)
-        home.addPanel(file_panel)
-        
-        new_action = QAction("New", file_panel)
-        new_action.setShortcut("Ctrl+N")
-        new_action.triggered.connect(self._on_new)
-        file_panel.addLargeAction(new_action)
-        
-        open_action = QAction("Open", file_panel)
-        open_action.setShortcut("Ctrl+O")
-        open_action.triggered.connect(self._on_open)
-        file_panel.addLargeAction(open_action)
-        
-        save_action = QAction("Save", file_panel)
-        save_action.setShortcut("Ctrl+S")
-        save_action.triggered.connect(self._on_save)
-        file_panel.addLargeAction(save_action)
-        
-        # Edit panel
-        edit_panel = SARibbonPanel("Edit", home)
-        home.addPanel(edit_panel)
-        
-        undo_action = QAction("Undo", edit_panel)
-        undo_action.triggered.connect(self.editor.undo)
-        edit_panel.addSmallAction(undo_action)
-        
-        redo_action = QAction("Redo", edit_panel)
-        redo_action.triggered.connect(self.editor.redo)
-        edit_panel.addSmallAction(redo_action)
-        
-        edit_panel.addSeparator()
-        
-        cut_action = QAction("Cut", edit_panel)
-        cut_action.triggered.connect(self.editor.cut)
-        edit_panel.addSmallAction(cut_action)
-        
-        copy_action = QAction("Copy", edit_panel)
-        copy_action.triggered.connect(self.editor.copy)
-        edit_panel.addSmallAction(copy_action)
-        
-        paste_action = QAction("Paste", edit_panel)
-        paste_action.triggered.connect(self.editor.paste)
-        edit_panel.addSmallAction(paste_action)
-        
-        # === View Tab ===
-        view = SARibbonCategory("View")
-        self.ribbon.addCategoryPage(view)
-        
-        zoom_panel = SARibbonPanel("Zoom", view)
-        view.addPanel(zoom_panel)
-        
-        zoom_in = QAction("Zoom In", zoom_panel)
-        zoom_in.triggered.connect(self._zoom_in)
-        zoom_panel.addLargeAction(zoom_in)
-        
-        zoom_out = QAction("Zoom Out", zoom_panel)
-        zoom_out.triggered.connect(self._zoom_out)
-        zoom_panel.addLargeAction(zoom_out)
-    
-    def _on_new(self):
-        self.editor.clear()
-    
-    def _on_open(self):
-        path, _ = QFileDialog.getOpenFileName(
-            self, "Open File", "", "Text Files (*.txt);;All Files (*)"
-        )
-        if path:
-            with open(path, "r", encoding="utf-8") as f:
-                self.editor.setPlainText(f.read())
-    
-    def _on_save(self):
-        QMessageBox.information(self, "Info", "Save function triggered")
-    
-    def _zoom_in(self):
-        self.editor.zoomIn(1)
-    
-    def _zoom_out(self):
-        self.editor.zoomOut(1)
+### SARibbonWidget (PySide6)
 
+带 RibbonBar 的 Widget（用于非 MainWindow 场景）。
 
-def main():
-    app = QApplication(sys.argv)
-    window = RibbonWindow()
-    window.show()
-    sys.exit(app.exec_())
+```python
+widget = saribbon.SARibbonWidget()
+ribbon = widget.ribbonBar()
+```
 
+### SARibbonMenu (PySide6)
 
-if __name__ == "__main__":
-    main()
+Ribbon 专用菜单，支持添加子菜单和控件。
+
+```python
+menu = saribbon.SARibbonMenu("Test Menu")
+sub = menu.addRibbonMenu("Submenu")
+menu.addAction("Item")
 ```
 
 ## 可用类列表
+
+### 所有绑定共有
 
 | 类名 | 说明 |
 |------|------|
@@ -355,30 +281,105 @@ if __name__ == "__main__":
 | SARibbonBar | 主 Ribbon 工具栏 |
 | SARibbonCategory | Ribbon 类别（标签页） |
 | SARibbonPanel | 面板（功能分组） |
+| SARibbonPanelItem | 面板布局项（含 RowProportion 枚举） |
+| SARibbonPanelLabel | 面板标题标签 |
 | SARibbonToolButton | Ribbon 按钮 |
+| SARibbonTabBar | 标签栏 |
+| SARibbonContextCategory | 上下文类别 |
 | SARibbonGallery | 画廊控件 |
 | SARibbonGalleryGroup | 画廊分组 |
 | SARibbonGalleryItem | 画廊项目 |
-| SARibbonContextCategory | 上下文类别 |
 | SARibbonButtonGroupWidget | 按钮组 |
-| SARibbonTabBar | 标签栏 |
 | SARibbonQuickAccessBar | 快速访问工具栏 |
+| SARibbonGalleryButton | 画廊滚动按钮 |
+| SARibbonGalleryViewport | 画廊视口 |
+
+### 仅 PySide6
+
+| 类名 | 说明 |
+|------|------|
+| SARibbonWidget | 带 RibbonBar 的 Widget |
+| SARibbonMenu | Ribbon 专用菜单 |
+| SARibbonApplicationButton | 应用按钮 |
+| SARibbonColorToolButton | 颜色选择按钮 |
+| SARibbonActionsManager | 动作管理器 |
+| SARibbonActionsManagerModel | 动作管理器模型 |
+| SARibbonCustomizeData | 自定义数据 |
+| SARibbonCustomizeWidget | 自定义界面窗口 |
+| SARibbonCustomizeDialog | 自定义对话框 |
 
 ## 面板方法参考
 
 | 方法 | 说明 |
 |------|------|
-| addLargeAction(action) | 添加大按钮（图标在上，文字在下） |
-| addMediumAction(action) | 添加中按钮（图标和文字并排） |
-| addSmallAction(action) | 添加小按钮（只显示图标） |
-| addLargeWidget(widget) | 添加大控件 |
-| addMediumWidget(widget) | 添加中控件 |
-| addSmallWidget(widget) | 添加小控件 |
-| addGallery() | 添加画廊控件 |
-| addMenu(menu) | 添加菜单按钮 |
-| addSeparator() | 添加分隔符 |
+| `addLargeAction(action)` | 添加大按钮（图标在上，文字在下） |
+| `addSmallAction(action)` | 添加小按钮（图标和文字并排） |
+| `addMediumAction(action)` | 添加中按钮 |
+| `addLargeWidget(widget)` | 添加大控件（SARibbonToolButton 等用） |
+| `addSmallWidget(widget)` | 添加小控件 |
+| `addMediumWidget(widget)` | 添加中控件 |
+| `addWidget(widget, rowProportion)` | 添加控件并指定行比例（QRadioButton/QComboBox 等用） |
+| `addGallery()` | 添加画廊控件 |
+| `addSeparator()` | 添加分隔符 |
+| `setExpanding(bool)` | 设置面板是否扩展填充剩余空间 |
+
+## 枚举参考
+
+### SARibbonBar.RibbonStyleFlag
+
+| 值 | 说明 |
+|------|------|
+| `RibbonStyleLooseThreeRow` | Office 风格，3 行，显示面板标题 |
+| `RibbonStyleCompactThreeRow` | WPS 风格，3 行，不显示面板标题 |
+| `RibbonStyleLooseTwoRow` | Office 风格，2 行 |
+| `RibbonStyleCompactTwoRow` | WPS 风格，2 行 |
+| `RibbonStyleLooseSingleRow` | 超紧凑单行（Outlook 2025 风格） |
+| `RibbonStyleCompactSingleRow` | 紧凑单行 |
+
+### SARibbonTheme
+
+| 值 | 说明 |
+|------|------|
+| `RibbonThemeWindows7` | Windows 7 主题 |
+| `RibbonThemeOffice2013` | Office 2013 主题 |
+| `RibbonThemeOffice2016Blue` | Office 2016 蓝色主题 |
+| `RibbonThemeOffice2021Blue` | Office 2021 蓝色主题（默认） |
+| `RibbonThemeDark` | 深色主题 |
+| `RibbonThemeDark2` | 深色主题 2 |
+
+### SARibbonBar.RibbonMode
+
+| 值 | 说明 |
+|------|------|
+| `NormalRibbonMode` | 正常模式（显示完整 Ribbon） |
+| `MinimumRibbonMode` | 最小模式（仅显示标签栏） |
+
+### SARibbonPanelItem.RowProportion
+
+| 值 | 说明 |
+|------|------|
+| `None` | 自动判断 |
+| `Large` | 填充整个面板高度 |
+| `Medium` | 半高（仅三行模式） |
+| `Small` | 单行高度 |
+
+## 示例程序
+
+```bash
+# PySide6
+python pyexamples/pyside6/ribbon_demo.py
+
+# PyQt5
+python pyexamples/pyqt5/ribbon_demo.py
+
+# PyQt6
+python pyexamples/pyqt6/ribbon_demo.py
+```
+
+每个 demo 展示了：多分类/面板、样式切换、主题切换、Gallery、上下文类别、QuickAccessBar、颜色按钮、字体控制等。
 
 ## 下一步
 
-- 查看 pyexamples/ribbon_demo.py 获取完整示例代码
+- 查看 `pyexamples/` 下的 demo 获取完整示例代码
 - 参考 C++ API 文档了解更多功能
+- 参考 [构建 Python 绑定](./build-python-bindings.md) 和 [构建 PySide6 绑定](./build-pyside6-bindings.md)

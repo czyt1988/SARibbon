@@ -1,6 +1,6 @@
-# Python Bindings Build Guide
+# Python Bindings Build Guide (PyQt5 / PyQt6)
 
-This document describes how to build the SARibbon Python bindings (PyQtSARibbon) from source.
+This document describes how to build the SARibbon Python bindings (PyQtSARibbon) from source, for both PyQt5 and PyQt6.
 
 ## Documentation Navigation
 
@@ -12,6 +12,8 @@ This document describes how to build the SARibbon Python bindings (PyQtSARibbon)
 
 ## Prerequisites
 
+### PyQt5
+
 | Software | Version | Description |
 |----------|---------|-------------|
 | Python | 3.8 or higher | 3.10+ recommended |
@@ -21,28 +23,39 @@ This document describes how to build the SARibbon Python bindings (PyQtSARibbon)
 | PyQt-builder | 1.6 or higher | PyQt build system |
 | C++ Compiler | MSVC 2019+ / GCC 9+ | Native code compiler |
 
+### PyQt6
+
+| Software | Version | Description |
+|----------|---------|-------------|
+| Python | 3.8 or higher | 3.10+ recommended |
+| PyQt6 | 6.2 or higher | Python Qt bindings |
+| PyQt6-sip | 13.4 or higher | SIP support for PyQt6 |
+| Qt | 6.2 or higher | C++ Qt framework |
+| sip | 6.0.2 or higher | PyQt build tools |
+| PyQt-builder | 1.6 or higher | PyQt build system |
+| C++ Compiler | MSVC 2019+ / GCC 9+ | Native code compiler |
+
 ## Installing Dependencies
 
-### 1. Install Python Dependencies
+### PyQt5
 
 ```bash
 pip install PyQt5 PyQt5-sip PyQt-builder
 ```
 
-Verify the installation:
+### PyQt6
 
 ```bash
-python -c "import PyQt5; print(PyQt5.__version__)"
-python -c "import sipbuild; print(sipbuild.version.SIP_VERSION_STR)"
+pip install PyQt6 PyQt6-sip PyQt-builder
 ```
 
-### 2. Verify Qt Installation
+### Verify Qt Installation
 
 ```bash
 qmake --version
 ```
 
-### 3. Configure Compiler
+### Configure Compiler
 
 #### Windows (MSVC)
 
@@ -57,12 +70,6 @@ qmake --version
 sudo apt-get install build-essential
 ```
 
-#### macOS (Clang)
-
-```bash
-xcode-select --install
-```
-
 ## Build Steps
 
 ### 1. Clone Source Code
@@ -74,15 +81,27 @@ cd SARibbon
 
 ### 2. Build Python Bindings
 
+#### PyQt5
+
 ```bash
 sip-build --build-dir build-python
 ```
 
-This command will:
+#### PyQt6
 
-1. Generate C++ binding code
-2. Compile the native extension module
-3. Generate a PyQtSARibbon package directory containing `__init__.py` and `saribbon.pyd` (Windows) or `saribbon.so` (Linux/macOS)
+The project includes `pyproject-pyqt6.toml` for PyQt6 builds. Use the build script with the `--pyqt6` flag:
+
+```bash
+tools\build_python_bindings.bat --pyqt6
+```
+
+Or manually swap the config file and build:
+
+```bash
+copy pyproject-pyqt6.toml pyproject.toml
+sip-build --build-dir build-python6
+copy pyproject.toml pyproject-pyqt6.toml
+```
 
 !!! tip
     If you encounter Qt path errors, specify the qmake path explicitly:
@@ -96,13 +115,21 @@ This command will:
 #### Windows
 
 ```bash
+# PyQt5
 xcopy /s /y build-python\PyQtSARibbon <Python_path>\Lib\site-packages\PyQtSARibbon\
+
+# PyQt6
+xcopy /s /y build-python6\PyQtSARibbon <Python_path>\Lib\site-packages\PyQtSARibbon\
 ```
 
 #### Linux/macOS
 
 ```bash
+# PyQt5
 cp -r build-python/PyQtSARibbon <Python_path>/lib/python3.x/site-packages/
+
+# PyQt6
+cp -r build-python6/PyQtSARibbon <Python_path>/lib/python3.x/site-packages/
 ```
 
 Or use pip:
@@ -121,7 +148,7 @@ python -c "from PyQtSARibbon import saribbon; print('PyQtSARibbon installed succ
 
 ### Qt headers not found
 
-**Error**: atal error: QtWidgets: No such file or directory
+**Error**: `fatal error: QtWidgets: No such file or directory`
 
 ```bash
 sip-build --qmake /path/to/qmake --build-dir build-python
@@ -135,19 +162,23 @@ Use the Visual Studio Developer Command Prompt.
 
 ### DLL load failed
 
-**Error**: ImportError: DLL load failed while importing PyQtSARibbon
+**Error**: `ImportError: DLL load failed while importing PyQtSARibbon`
 
-Copy Qt DLLs to site-packages:
+Copy Qt DLLs to site-packages, or add Qt bin directory to PATH.
+
+### PyQt5 / PyQt6 conflict
+
+Use a virtual environment to isolate PyQt5 and PyQt6:
 
 ```bash
-copy <Qt_path>\bin\Qt5Widgets.dll <Python_path>\Lib\site-packages\
-copy <Qt_path>\bin\Qt5Gui.dll <Python_path>\Lib\site-packages\
-copy <Qt_path>\bin\Qt5Core.dll <Python_path>\Lib\site-packages\
+python -m venv venv-pyqt5
+venv-pyqt5\Scripts\activate
+pip install PyQt5 PyQt5-sip PyQt-builder
 ```
 
 ### Version mismatch
 
-Ensure PyQt5, sip, and Python versions are compatible.
+Ensure PyQt, sip, and Python versions are compatible.
 
 ## Next Steps
 

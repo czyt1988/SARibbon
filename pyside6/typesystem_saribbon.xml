@@ -4,18 +4,45 @@
   <load-typesystem name="typesystem_gui.xml" generate="no"/>
   <load-typesystem name="typesystem_widgets.xml" generate="no"/>
 
+  <!-- Inject SARibbon headers and glue code into generated code -->
+  <inject-code class="native" position="beginning">
+    #include "SARibbonGlobal.h"
+    #include "SARibbonMainWindow.h"
+    #include "SARibbonBar.h"
+    #include "SARibbonCategory.h"
+    #include "SARibbonPanel.h"
+    #include "SARibbonPanelItem.h"
+    #include "SARibbonToolButton.h"
+    #include "SARibbonColorToolButton.h"
+    #include "SARibbonTabBar.h"
+    #include "SARibbonButtonGroupWidget.h"
+    #include "SARibbonQuickAccessBar.h"
+    #include "SARibbonGallery.h"
+    #include "SARibbonGalleryGroup.h"
+    #include "SARibbonGalleryItem.h"
+    #include "SARibbonContextCategory.h"
+    #include "SARibbonWidget.h"
+    #include "SARibbonMenu.h"
+    #include "SARibbonApplicationButton.h"
+    #include "SARibbonActionsManager.h"
+    #include "SARibbonCustomizeData.h"
+    #include "SARibbonCustomizeWidget.h"
+    #include "SARibbonCustomizeDialog.h"
+    #include "saribbon_python_glue.h"
+  </inject-code>
+
   <!-- ============================================================
        Global enums (from SARibbonGlobal.h)
-       SARibbonAlignment, SARibbonTheme, SARibbonMainWindowStyleFlag
        ============================================================ -->
-  <enum-type identified-by-value="SARibbonAlignment" name="SARibbonAlignment"/>
-  <enum-type identified-by-value="SARibbonTheme" name="SARibbonTheme"/>
+  <enum-type name="SARibbonAlignment"/>
+  <enum-type name="SARibbonTheme"/>
   <enum-type name="SARibbonMainWindowStyleFlag" flags="yes" flags-name="SARibbonMainWindowStyles"/>
 
   <!-- ============================================================
        SARibbonPanelItem (QWidgetItem)
        ============================================================ -->
   <object-type name="SARibbonPanelItem">
+    <include file-name="SARibbonPanelItem.h" location="global"/>
     <enum-type name="RowProportion"/>
   </object-type>
 
@@ -23,30 +50,49 @@
        SARibbonToolButton (QToolButton)
        ============================================================ -->
   <object-type name="SARibbonToolButton">
+    <include file-name="SARibbonToolButton.h" location="global"/>
     <enum-type name="RibbonButtonType"/>
+  </object-type>
+
+  <!-- ============================================================
+       SARibbonColorToolButton (SARibbonToolButton)
+       ============================================================ -->
+  <object-type name="SARibbonColorToolButton">
+    <include file-name="SARibbonColorToolButton.h" location="global"/>
+    <enum-type name="ColorStyle"/>
+    <modify-function signature="setupStandardColorMenu()" remove="all"/>
   </object-type>
 
   <!-- ============================================================
        SARibbonTabBar (QTabBar)
        ============================================================ -->
-  <object-type name="SARibbonTabBar"/>
+  <object-type name="SARibbonTabBar">
+    <include file-name="SARibbonTabBar.h" location="global"/>
+  </object-type>
 
   <!-- ============================================================
        SARibbonButtonGroupWidget (QToolBar)
        SARibbonQuickAccessBar (SARibbonButtonGroupWidget)
        ============================================================ -->
-  <object-type name="SARibbonButtonGroupWidget"/>
-  <object-type name="SARibbonQuickAccessBar"/>
+  <object-type name="SARibbonButtonGroupWidget">
+    <include file-name="SARibbonButtonGroupWidget.h" location="global"/>
+  </object-type>
+  <object-type name="SARibbonQuickAccessBar">
+    <include file-name="SARibbonQuickAccessBar.h" location="global"/>
+  </object-type>
 
   <!-- ============================================================
        SARibbonGalleryItem (non-QObject, value-type)
        ============================================================ -->
-  <value-type name="SARibbonGalleryItem"/>
+  <value-type name="SARibbonGalleryItem">
+    <include file-name="SARibbonGalleryItem.h" location="global"/>
+  </value-type>
 
   <!-- ============================================================
        SARibbonGalleryGroup (QListView)
        ============================================================ -->
   <object-type name="SARibbonGalleryGroup">
+    <include file-name="SARibbonGalleryGroup.h" location="global"/>
     <enum-type name="GalleryGroupStyle"/>
     <enum-type name="DisplayRow"/>
   </object-type>
@@ -56,40 +102,236 @@
        SARibbonGalleryButton (QToolButton)
        SARibbonGalleryViewport (QScrollArea)
        ============================================================ -->
-  <object-type name="SARibbonGalleryButton"/>
-  <object-type name="SARibbonGalleryViewport"/>
-  <object-type name="SARibbonGallery"/>
+  <object-type name="SARibbonGalleryButton">
+    <include file-name="SARibbonGallery.h" location="global"/>
+  </object-type>
+  <object-type name="SARibbonGalleryViewport">
+    <include file-name="SARibbonGallery.h" location="global"/>
+    <modify-function signature="addWidget(QWidget*)">
+      <modify-argument index="1">
+        <parent index="this" action="add"/>
+      </modify-argument>
+    </modify-function>
+    <modify-function signature="addWidget(QWidget*, const QString&amp;)">
+      <modify-argument index="1">
+        <parent index="this" action="add"/>
+      </modify-argument>
+    </modify-function>
+  </object-type>
+  <object-type name="SARibbonGallery">
+    <include file-name="SARibbonGallery.h" location="global"/>
+    <modify-function signature="addGalleryGroup(SARibbonGalleryGroup*)">
+      <modify-argument index="1">
+        <parent index="this" action="add"/>
+      </modify-argument>
+    </modify-function>
+  </object-type>
 
   <!-- ============================================================
        SARibbonContextCategory (QObject)
        ============================================================ -->
-  <object-type name="SARibbonContextCategory"/>
+  <object-type name="SARibbonContextCategory">
+    <include file-name="SARibbonContextCategory.h" location="global"/>
+    <modify-function signature="addCategoryPage(SARibbonCategory*)">
+      <modify-argument index="1">
+        <parent index="this" action="add"/>
+      </modify-argument>
+    </modify-function>
+    <modify-function signature="takeCategory(SARibbonCategory*)">
+      <modify-argument index="1">
+        <parent index="this" action="remove"/>
+      </modify-argument>
+    </modify-function>
+  </object-type>
 
   <!-- ============================================================
        SARibbonPanelLabel (QLabel)
        SARibbonPanel (QFrame)
        ============================================================ -->
-  <object-type name="SARibbonPanelLabel"/>
+  <object-type name="SARibbonPanelLabel">
+    <include file-name="SARibbonPanel.h" location="global"/>
+  </object-type>
   <object-type name="SARibbonPanel">
+    <include file-name="SARibbonPanel.h" location="global"/>
+    <inject-code class="native" position="beginning">
+      #include "saribbon_python_glue.h"
+    </inject-code>
     <enum-type name="PanelLayoutMode"/>
+    <!-- Reject std::function parameter (shiboken cannot handle) -->
+    <modify-function signature="iterateButton(FpRibbonToolButtonIterate)const" remove="all"/>
+    <!-- Reject QPair return type -->
+    <modify-function signature="toolButtonIconSize()const" remove="all"/>
+    <!-- Reject QWidget::addAction overloads that trigger PySide6 glue code
+         (addActionWithPyObject is not available in custom bindings) -->
+    <modify-function signature="addAction(QString)" remove="all"/>
+    <modify-function signature="addAction(QIcon,QString)" remove="all"/>
+    <modify-function signature="addAction(QString,QKeySequence)" remove="all"/>
+    <modify-function signature="addAction(QIcon,QString,QKeySequence)" remove="all"/>
   </object-type>
 
   <!-- ============================================================
        SARibbonCategory (QFrame)
        ============================================================ -->
-  <object-type name="SARibbonCategory"/>
+  <object-type name="SARibbonCategory">
+    <include file-name="SARibbonCategory.h" location="global"/>
+    <modify-function signature="addPanel(SARibbonPanel*)">
+      <modify-argument index="1">
+        <parent index="this" action="add"/>
+      </modify-argument>
+    </modify-function>
+    <modify-function signature="insertPanel(SARibbonPanel*, int)">
+      <modify-argument index="1">
+        <parent index="this" action="add"/>
+      </modify-argument>
+    </modify-function>
+    <modify-function signature="takePanel(SARibbonPanel*)">
+      <modify-argument index="1">
+        <parent index="this" action="remove"/>
+      </modify-argument>
+    </modify-function>
+    <modify-function signature="addPanel(QWidget*)" remove="all"/>
+    <modify-function signature="iteratePanel(FpPanelIterate)const" remove="all"/>
+    <modify-function signature="panelToolButtonIconSize()const" remove="all"/>
+  </object-type>
 
   <!-- ============================================================
        SARibbonBar (QMenuBar)
        ============================================================ -->
   <object-type name="SARibbonBar">
+    <include file-name="SARibbonBar.h" location="global"/>
     <enum-type name="RibbonStyleFlag" flags="yes" flags-name="RibbonStyles"/>
     <enum-type name="RibbonMode"/>
+    <modify-function signature="setApplicationButton(QAbstractButton*)">
+      <modify-argument index="1">
+        <parent index="this" action="add"/>
+      </modify-argument>
+    </modify-function>
+    <modify-function signature="addCategoryPage(SARibbonCategory*)">
+      <modify-argument index="1">
+        <parent index="this" action="add"/>
+      </modify-argument>
+    </modify-function>
+    <modify-function signature="insertCategoryPage(SARibbonCategory*, int)">
+      <modify-argument index="1">
+        <parent index="this" action="add"/>
+      </modify-argument>
+    </modify-function>
+    <modify-function signature="addContextCategory(SARibbonContextCategory*)">
+      <modify-argument index="1">
+        <parent index="this" action="add"/>
+      </modify-argument>
+    </modify-function>
+    <modify-function signature="removeCategory(SARibbonCategory*)">
+      <modify-argument index="1">
+        <parent index="this" action="remove"/>
+      </modify-argument>
+    </modify-function>
+    <modify-function signature="destroyContextCategory(SARibbonContextCategory*)">
+      <modify-argument index="1">
+        <parent index="this" action="remove"/>
+      </modify-argument>
+    </modify-function>
+    <modify-function signature="addCategoryPage(QWidget*)" remove="all"/>
+    <modify-function signature="setContextCategoryColorHighLight(FpContextCategoryHighlight)" remove="all"/>
+    <modify-function signature="iterateCategory(FpCategoryIterate)const" remove="all"/>
+    <modify-function signature="iteratePanel(FpPanelIterate)const" remove="all"/>
+    <modify-function signature="panelToolButtonIconSize()const" remove="all"/>
+    <!-- Reject protected method that has no implementation -->
+    <modify-function signature="setRibbonMainwindowStyle()" remove="all"/>
   </object-type>
 
   <!-- ============================================================
        SARibbonMainWindow (QMainWindow)
        ============================================================ -->
-  <object-type name="SARibbonMainWindow"/>
+  <object-type name="SARibbonMainWindow">
+    <include file-name="SARibbonMainWindow.h" location="global"/>
+  </object-type>
+
+  <!-- ============================================================
+       SARibbonWidget (QWidget)
+       ============================================================ -->
+  <object-type name="SARibbonWidget">
+    <include file-name="SARibbonWidget.h" location="global"/>
+    <modify-function signature="setRibbonBar(SARibbonBar*)">
+      <modify-argument index="1">
+        <parent index="this" action="add"/>
+      </modify-argument>
+    </modify-function>
+    <modify-function signature="setWidget(QWidget*)">
+      <modify-argument index="1">
+        <parent index="this" action="add"/>
+      </modify-argument>
+    </modify-function>
+    <modify-function signature="takeWidget()">
+      <modify-argument index="return">
+        <parent index="this" action="remove"/>
+      </modify-argument>
+    </modify-function>
+  </object-type>
+
+  <!-- ============================================================
+       SARibbonMenu (QMenu)
+       ============================================================ -->
+  <object-type name="SARibbonMenu">
+    <include file-name="SARibbonMenu.h" location="global"/>
+    <modify-function signature="addRibbonMenu(SARibbonMenu*)">
+      <modify-argument index="1">
+        <parent index="this" action="add"/>
+      </modify-argument>
+    </modify-function>
+    <modify-function signature="addWidget(QWidget*)">
+      <modify-argument index="1">
+        <parent index="this" action="add"/>
+      </modify-argument>
+    </modify-function>
+  </object-type>
+
+  <!-- ============================================================
+       SARibbonApplicationButton (QToolButton)
+       ============================================================ -->
+  <object-type name="SARibbonApplicationButton">
+    <include file-name="SARibbonApplicationButton.h" location="global"/>
+  </object-type>
+
+  <!-- ============================================================
+       SARibbonActionsManager (QObject)
+       SARibbonActionsManagerModel (QAbstractListModel)
+       ============================================================ -->
+  <object-type name="SARibbonActionsManager">
+    <include file-name="SARibbonActionsManager.h" location="global"/>
+    <enum-type name="ActionTag"/>
+  </object-type>
+  <object-type name="SARibbonActionsManagerModel">
+    <include file-name="SARibbonActionsManager.h" location="global"/>
+  </object-type>
+
+  <!-- ============================================================
+       SARibbonCustomizeData (value-type, non-QObject)
+       ============================================================ -->
+  <value-type name="SARibbonCustomizeData">
+    <include file-name="SARibbonCustomizeData.h" location="global"/>
+    <enum-type name="ActionType"/>
+  </value-type>
+
+  <!-- ============================================================
+       SARibbonCustomizeWidget (QWidget)
+       ============================================================ -->
+  <object-type name="SARibbonCustomizeWidget">
+    <include file-name="SARibbonCustomizeWidget.h" location="global"/>
+    <enum-type name="RibbonTreeShowType"/>
+    <enum-type name="ItemRole"/>
+    <modify-function signature="toXml(QXmlStreamWriter*)const" remove="all"/>
+    <modify-function signature="fromXml(QXmlStreamReader*)" remove="all"/>
+    <modify-function signature="fromXml(QXmlStreamReader*, SARibbonBar*, SARibbonActionsManager*)" remove="all"/>
+  </object-type>
+
+  <!-- ============================================================
+       SARibbonCustomizeDialog (QDialog)
+       ============================================================ -->
+  <object-type name="SARibbonCustomizeDialog">
+    <include file-name="SARibbonCustomizeDialog.h" location="global"/>
+    <modify-function signature="toXml(QXmlStreamWriter*)const" remove="all"/>
+    <modify-function signature="fromXml(QXmlStreamReader*)" remove="all"/>
+  </object-type>
 
 </typesystem>

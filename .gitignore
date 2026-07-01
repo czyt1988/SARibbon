@@ -146,3 +146,4 @@ vcpkg_installed/
 dist/
 build/
 __pycache__
+aqtinstall.log

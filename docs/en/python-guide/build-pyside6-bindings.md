@@ -152,11 +152,13 @@ python pyexamples/pyside6/ribbon_demo.py
 
 ### shiboken6-generator not found
 
-**Error**: `Could not find a package configuration file provided by "Shiboken6Tools"`
+**Error**: `Could not find shiboken6 executable`
 
 ```bash
 pip install shiboken6-generator
 ```
+
+> **Note**: The current CMakeLists.txt does not use `find_package(Shiboken6Tools)`. Instead, it manually locates `shiboken6.exe`, library files, and include directories. PySide6 6.8.x does not include `Shiboken6ToolsConfig.cmake`, so the old `find_package(Shiboken6Tools)` approach is no longer used.
 
 ### Qt headers not found
 
@@ -186,6 +188,40 @@ Use a virtual environment to isolate PyQt and PySide6:
 python -m venv venv-pyside6
 venv-pyside6\Scripts\activate
 pip install PySide6 shiboken6-generator
+```
+
+### Qt class constructors crash when accessed indirectly
+
+> **Update**: After thorough investigation, this issue is NOT caused by shiboken type registration conflicts. Indirect access to Qt classes works **perfectly fine**. The original crash was caused by file encoding issues (mixed BOM/CRLF/LF). Ensure Python source files use UTF-8 without BOM and LF line endings.
+
+### PySide6 and Qt6 version mismatch
+
+**Symptom**: Build succeeds but crashes at runtime, or `qjsonparseerror.h: No such file or directory` error during build.
+
+**Root cause**: The Qt header version in the PySide6 pip package must match the system-installed Qt6 C++ development package version. For example, PySide6 6.8.3 requires Qt 6.8.3 dev package.
+
+**Solution**: Ensure version match:
+
+```bash
+# Check PySide6 version
+python -c "import PySide6; print(PySide6.__version__)"
+
+# Install matching Qt6 dev package (e.g. 6.8.3)
+python -m aqt install-qt windows desktop 6.8.3 win64_msvc2022_64 -O D:\Qt
+```
+
+### Themes and icons not showing at runtime
+
+**Symptom**: Window starts with no QSS theme styling, icons missing, console shows `can not load build in ribbon theme`.
+
+**Root cause**: The RCC static initializer for Qt resource files (`.qrc`) is stripped by MSVC linker's `/OPT:REF` optimization. When `qt_add_resources` output is placed in the static library `saribbon_lib`, no code explicitly references the qrc-generated symbols, so the entire qrc object file is removed from the final `.pyd`.
+
+**Solution**: Ensure `qt_add_resources` output is compiled into the final MODULE target (`.pyd`), not the static library. The current CMakeLists.txt handles this correctly:
+
+```cmake
+# NOTE: qrc resources are NOT added to saribbon_lib. They are compiled
+# directly into the final .pyd module (see below) to ensure the RCC
+# static initializer is included.
 ```
 
 ## Next Steps
