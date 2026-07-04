@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.15)
 SET(VERSION_SHORT 0.1)
 project(MainWindowExample VERSION ${VERSION_SHORT})
 set(CMAKE_INCLUDE_CURRENT_DIR ON)

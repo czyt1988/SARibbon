@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.15)
 project(SARibbonBar LANGUAGES CXX VERSION ${SARIBBON_VERSION})
 set(SARIBBON_LIB_NAME SARibbonBar)
 message(STATUS "SARIBBON_LIB_NAME=${SARIBBON_LIB_NAME}")
