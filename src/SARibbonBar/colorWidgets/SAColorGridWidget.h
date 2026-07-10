@@ -31,51 +31,51 @@ public:
     using FunColorBtn = std::function< void(SAColorToolButton*) >;
 
 public:
-    /// Constructor for SAColorGridWidget
+    // Constructor for SAColorGridWidget
     SAColorGridWidget(QWidget* par = nullptr);
-    /// Destructor for SAColorGridWidget
+    // Destructor for SAColorGridWidget
     ~SAColorGridWidget();
-    /// Set column count, row count will be determined by column count
+    // Set column count, row count will be determined by column count
     void setColumnCount(int c);
-    /// Get column count
+    // Get column count
     int columnCount() const;
-    /// Set current color list
+    // Set current color list
     void setColorList(const QList< QColor >& cls);
-    /// Get color list
+    // Get color list
     QList< QColor > getColorList() const;
-    /// Get spacing
+    // Get spacing
     int spacing() const;
-    /// Set spacing
+    // Set spacing
     void setSpacing(int v);
-    /// Get color count
+    // Get color count
     int colorCount() const;
-    /// Set color icon size
+    // Set color icon size
     void setColorIconSize(const QSize& s);
-    /// Get color icon size
+    // Get color icon size
     QSize colorIconSize() const;
-    /// Set whether colors are checkable
+    // Set whether colors are checkable
     void setColorCheckable(bool on = true);
-    /// Check if colors are checkable
+    // Check if colors are checkable
     bool isColorCheckable() const;
-    /// Get currently checked color
+    // Get currently checked color
     QColor currentCheckedColor() const;
-    /// Get color button by index
+    // Get color button by index
     SAColorToolButton* colorButton(int index) const;
-    /// Set vertical spacing
+    // Set vertical spacing
     void setVerticalSpacing(int v);
-    /// Get vertical spacing
+    // Get vertical spacing
     int verticalSpacing() const;
-    /// Set horizontal spacing
+    // Set horizontal spacing
     void setHorizontalSpacing(int v);
-    /// Get horizontal spacing
+    // Get horizontal spacing
     int horizontalSpacing() const;
-    /// Clear checked state, no color will be selected
+    // Clear checked state, no color will be selected
     void clearCheckedState();
-    /// Iterate through all color buttons
+    // Iterate through all color buttons
     void iterationColorBtns(FunColorBtn fn);
-    /// Set row minimum height
+    // Set row minimum height
     void setRowMinimumHeight(int row, int minSize);
-    /// Set horizontal spacer to right
+    // Set horizontal spacer to right
     void setHorizontalSpacerToRight(bool on = true);
 private Q_SLOTS:
     void onButtonClicked(QAbstractButton* btn);
@@ -139,12 +139,12 @@ Q_SIGNALS:
     void colorToggled(const QColor& c, bool on);
 
 public:
-    /// Get size hint
+    // Get size hint
     virtual QSize sizeHint() const Q_DECL_OVERRIDE;
 };
 namespace SA
 {
-/// Get standard color list (10 colors in total)
+// Get standard color list (10 colors in total)
 SA_COLOR_WIDGETS_API QList< QColor > getStandardColorList();
 }
 #endif  // SACOLORGRIDWIDGET_H

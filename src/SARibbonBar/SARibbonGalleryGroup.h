@@ -18,20 +18,20 @@
 class SA_RIBBON_EXPORT SARibbonGalleryGroupItemDelegate : public QStyledItemDelegate
 {
 public:
-    /// Constructor for SARibbonGalleryGroupItemDelegate
+    // Constructor for SARibbonGalleryGroupItemDelegate
     explicit SARibbonGalleryGroupItemDelegate(SARibbonGalleryGroup* group, QObject* parent = nullptr);
-    /// Destructor for SARibbonGalleryGroupItemDelegate
+    // Destructor for SARibbonGalleryGroupItemDelegate
     ~SARibbonGalleryGroupItemDelegate();
-    /// Paint the item
+    // Paint the item
     virtual void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 
-    /// Get size hint
+    // Get size hint
     virtual QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const override;
-    /// Paint only icon
+    // Paint only icon
     virtual void paintIconOnly(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
-    /// Paint icon with text
+    // Paint icon with text
     virtual void paintIconWithText(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
-    /// Paint icon with word wrap text
+    // Paint icon with word wrap text
     virtual void
     paintIconWithTextWordWrap(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
 
@@ -52,33 +52,33 @@ class SA_RIBBON_EXPORT SARibbonGalleryGroupModel : public QAbstractListModel
 {
     Q_OBJECT
 public:
-    /// Constructor for SARibbonGalleryGroupModel
+    // Constructor for SARibbonGalleryGroupModel
     SARibbonGalleryGroupModel(QObject* parent = Q_NULLPTR);
-    /// Destructor for SARibbonGalleryGroupModel
+    // Destructor for SARibbonGalleryGroupModel
     ~SARibbonGalleryGroupModel();
-    /// Get row count
+    // Get row count
     virtual int rowCount(const QModelIndex& parent) const Q_DECL_OVERRIDE;
-    /// Get item flags
+    // Get item flags
     virtual Qt::ItemFlags flags(const QModelIndex& index) const Q_DECL_OVERRIDE;
-    /// Get data at index
+    // Get data at index
     virtual QVariant data(const QModelIndex& index, int role) const Q_DECL_OVERRIDE;
-    /// Create model index
+    // Create model index
     virtual QModelIndex index(int row, int column, const QModelIndex& parent) const Q_DECL_OVERRIDE;
-    /// Set data at index
+    // Set data at index
     virtual bool setData(const QModelIndex& index, const QVariant& value, int role) Q_DECL_OVERRIDE;
-    /// Clear all items
+    // Clear all items
     void clear();
-    /// Get item at row
+    // Get item at row
     SARibbonGalleryItem* at(int row) const;
-    /// Insert item at row
+    // Insert item at row
     void insert(int row, SARibbonGalleryItem* item);
-    /// Take item at row
+    // Take item at row
     SARibbonGalleryItem* take(int row);
-    /// Append item
+    // Append item
     void append(SARibbonGalleryItem* item);
-    /// Remove item by action object name
+    // Remove item by action object name
     bool remove(const QString& act_object_name);
-    /// Get item count
+    // Get item count
     int itemSize() const;
 
 private:
@@ -121,60 +121,60 @@ public:
         DisplayThreeRow = 3   ///< Display 3 rows
     };
 
-    /// Constructor
+    // Constructor
     SARibbonGalleryGroup(QWidget* w = 0);
 
-    /// Destructor
+    // Destructor
     virtual ~SARibbonGalleryGroup();
-    /// Recalculate grid size
+    // Recalculate grid size
     void recalcGridSize();
-    /// Recalculate grid size
+    // Recalculate grid size
     void recalcGridSize(int galleryHeight);
-    /// Set display style
+    // Set display style
     void setGalleryGroupStyle(GalleryGroupStyle style);
-    /// Get gallery group style
+    // Get gallery group style
     GalleryGroupStyle galleryGroupStyle() const;
-    /// Add item
+    // Add item
     void addItem(const QString& text, const QIcon& icon);
-    /// Add item
+    // Add item
     void addItem(SARibbonGalleryItem* item);
-    /// Add action as item
+    // Add action as item
     void addActionItem(QAction* act);
-    /// Add action item list
+    // Add action item list
     void addActionItemList(const QList< QAction* >& acts);
-    /// Remove action item
+    // Remove action item
     bool removeActionItem(QAction* act);
-    /// Get group model
+    // Get group model
     SARibbonGalleryGroupModel* groupModel() const;
-    /// Set group title
+    // Set group title
     void setGroupTitle(const QString& title);
-    /// Get group title
+    // Get group title
     QString groupTitle() const;
-    /// Select by index
+    // Select by index
     void selectByIndex(int i);
-    /// Set display row
+    // Set display row
     void setDisplayRow(DisplayRow r);
-    /// Get display row
+    // Get display row
     DisplayRow displayRow() const;
-    /// Set grid minimum width (default 0: no limit)
+    // Set grid minimum width (default 0: no limit)
     void setGridMinimumWidth(int w);
-    /// Get grid minimum width
+    // Get grid minimum width
     int gridMinimumWidth() const;
-    /// Set grid maximum width (default 0: no limit)
+    // Set grid maximum width (default 0: no limit)
     void setGridMaximumWidth(int w);
-    /// Get grid maximum width
+    // Get grid maximum width
     int gridMaximumWidth() const;
-    /// Get action group
+    // Get action group
     QActionGroup* actionGroup() const;
-    /// Get grid row count
+    // Get grid row count
     int gridRowCount() const;
-    /// Get grid column count
+    // Get grid column count
     int gridColumnCount() const;
-    /// Calculate preferred height for width
+    // Calculate preferred height for width
     int preferredHeightForWidth(int w) const;
-    /// Check if has height for width
+    // Check if has height for width
     bool hasHeightForWidth() const override;
-    /// Get height for width
+    // Get height for width
     int heightForWidth(int w) const override;
 private Q_SLOTS:
     void onItemClicked(const QModelIndex& index);
@@ -224,7 +224,7 @@ Q_SIGNALS:
     void hovered(QAction* action);
 
 private:
-    /// Setup group model
+    // Setup group model
     SARibbonGalleryGroupModel* setupGroupModel();
 };
 

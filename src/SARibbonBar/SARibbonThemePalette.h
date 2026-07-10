@@ -164,6 +164,7 @@ private:
         int amount;
     };
 
+    // Recalculate all derived colors from stored rules and current key colors
     void recalculateDerived();
 
     QHash<QString, QColor> m_keyColors;

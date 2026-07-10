@@ -28,34 +28,34 @@ class SA_RIBBON_EXPORT SARibbonCtrlContainer : public QWidget
     Q_OBJECT
     SA_RIBBON_DECLARE_PRIVATE(SARibbonCtrlContainer)
 public:
-    /// Constructor for SARibbonCtrlContainer
+    // Constructor for SARibbonCtrlContainer
     explicit SARibbonCtrlContainer(QWidget* parent = nullptr);
-    /// Destructor for SARibbonCtrlContainer
+    // Destructor for SARibbonCtrlContainer
     ~SARibbonCtrlContainer();
 
-    /// Enable or disable icon display
+    // Enable or disable icon display
     void setEnableShowIcon(bool b);
-    /// Enable or disable title display
+    // Enable or disable title display
     void setEnableShowTitle(bool b);
-    /// Check if container widget exists
+    // Check if container widget exists
     bool hasContainerWidget() const;
-    /// Set the icon
+    // Set the icon
     void setIcon(const QIcon& i);
-    /// Set the icon from pixmap
+    // Set the icon from pixmap
     void setIcon(const QPixmap& pixmap);
-    /// Get the icon
+    // Get the icon
     QIcon icon() const;
-    /// Set the text
+    // Set the text
     void setText(const QString& t);
-    /// Get the text
+    // Get the text
     QString text() const;
-    /// Set the container widget
+    // Set the container widget
     void setContainerWidget(QWidget* w);
-    /// Get the container widget
+    // Get the container widget
     QWidget* containerWidget();
-    /// Get the container widget (const)
+    // Get the container widget (const)
     const QWidget* containerWidget() const;
-    /// Get the widget displaying the icon
+    // Get the widget displaying the icon
     QWidget* iconWidget() const;
 };
 

@@ -17,9 +17,9 @@ class SA_RIBBON_EXPORT SARibbonSeparatorWidget : public QFrame
 {
     Q_OBJECT
 public:
-    /// Constructor for SARibbonSeparatorWidget
+    // Constructor for SARibbonSeparatorWidget
     explicit SARibbonSeparatorWidget(QWidget* parent = nullptr);
-    /// Destructor for SARibbonSeparatorWidget
+    // Destructor for SARibbonSeparatorWidget
     ~SARibbonSeparatorWidget();
 };
 

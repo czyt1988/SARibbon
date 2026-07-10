@@ -33,12 +33,12 @@ public:
  * \if ENGLISH
  * @brief Gallery control widget
  *
- * The Gallery control consists of a currently active @sa SARibbonGalleryGroup and a popup @sa SARibbonGalleryViewport.
+ * The Gallery control consists of a currently active SARibbonGalleryGroup and a popup SARibbonGalleryViewport.
  *
- * @sa SARibbonGalleryGroup inherits from @sa QListView and displays actions through icons.
+ * SARibbonGalleryGroup inherits from QListView and displays actions through icons.
  *     Related properties can be set according to QListView.
  *
- * @sa SARibbonGalleryViewport is a window with an internal vertical layout that displays
+ * SARibbonGalleryViewport is a window with an internal vertical layout that displays
  *     all managed SARibbonGalleryGroups when popped up.
  *
  * Example usage:
@@ -52,16 +52,18 @@ public:
  * gallery->addCategoryActions(tr("Apps"), galleryActions);
  * gallery->setCurrentViewGroup(group1);
  * @endcode
+ * @note Uses the PIMPL pattern via SA_RIBBON_DECLARE_PRIVATE for encapsulation.
+ * @see SARibbonGalleryGroup, SARibbonGalleryViewport
  * \endif
  *
  * \if CHINESE
  * @brief Gallery控件
  *
- * Gallery控件是由一个当前激活的@sa SARibbonGalleryGroup 和弹出的 @sa SARibbonGalleryViewport 组成
+ * Gallery控件是由一个当前激活的SARibbonGalleryGroup 和弹出的 SARibbonGalleryViewport 组成
  *
- * @sa SARibbonGalleryGroup 是继承@sa QListView actions通过icon展示出来，相关的属性可以按照QListView设置
+ * SARibbonGalleryGroup 是继承QListView，actions通过icon展示出来，相关的属性可以按照QListView设置
  *
- * @sa SARibbonGalleryViewport 是一个内部有垂直布局的窗体，在弹出激活时，把管理的SARibbonGalleryGroup都展示出来
+ * SARibbonGalleryViewport 是一个内部有垂直布局的窗体，在弹出激活时，把管理的SARibbonGalleryGroup都展示出来
  *
  * 示例如下：
  * @code
@@ -74,6 +76,8 @@ public:
  * gallery->addCategoryActions(tr("Apps"), galleryActions);
  * gallery->setCurrentViewGroup(group1);
  * @endcode
+ * @note 通过SA_RIBBON_DECLARE_PRIVATE采用PIMPL模式实现封装。
+ * @see SARibbonGalleryGroup, SARibbonGalleryViewport
  * \endif
  */
 class SA_RIBBON_EXPORT SARibbonGallery : public QFrame
@@ -81,29 +85,29 @@ class SA_RIBBON_EXPORT SARibbonGallery : public QFrame
     Q_OBJECT
     SA_RIBBON_DECLARE_PRIVATE(SARibbonGallery)
 public:
-    /// Constructor for SARibbonGallery
+    // Constructor for SARibbonGallery
     explicit SARibbonGallery(QWidget* parent = nullptr);
-    /// Destructor for SARibbonGallery
+    // Destructor for SARibbonGallery
     virtual ~SARibbonGallery();
-    /// Get a blank SARibbonGalleryGroup
+    // Get a blank SARibbonGalleryGroup
     SARibbonGalleryGroup* addGalleryGroup();
-    /// Add an existing SARibbonGalleryGroup to the gallery
+    // Add an existing SARibbonGalleryGroup to the gallery
     void addGalleryGroup(SARibbonGalleryGroup* group);
-    /// Quickly add a set of actions as a gallery group
+    // Quickly add a set of actions as a gallery group
     SARibbonGalleryGroup* addCategoryActions(const QString& title, QList< QAction* > actions);
-    /// Set the currently displayed gallery group
+    // Set the currently displayed gallery group
     void setCurrentViewGroup(SARibbonGalleryGroup* group);
-    /// Get the currently displayed gallery group
+    // Get the currently displayed gallery group
     SARibbonGalleryGroup* currentViewGroup() const;
-    /// Get the popup viewport widget
+    // Get the popup viewport widget
     SARibbonGalleryViewport* getPopupViewPort() const;
 
 public:
-    /// Set the maximum width for gallery control buttons (default 15)
+    // Set the maximum width for gallery control buttons (default 15)
     static void setGalleryButtonMaximumWidth(int w);
-    /// Set single-row display mode for gallery
+    // Set single-row display mode for gallery
     void setSingleRowMode(bool on);
-    /// Check if gallery is in single-row mode
+    // Check if gallery is in single-row mode
     bool isSingleRowMode() const;
 Q_SIGNALS:
     /**
@@ -136,25 +140,25 @@ Q_SIGNALS:
     void hovered(QAction* action);
 
 public Q_SLOTS:
-    /// Scroll up one page in the current gallery group
+    // Scroll up one page in the current gallery group
     virtual void pageUp();
-    /// Scroll down one page in the current gallery group
+    // Scroll down one page in the current gallery group
     virtual void pageDown();
-    /// Show the popup viewport with all gallery groups
+    // Show the popup viewport with all gallery groups
     virtual void showMoreDetail();
 protected Q_SLOTS:
-    /// Slot called when an item in a gallery group is clicked
+    // Slot called when an item in a gallery group is clicked
     void onItemClicked(const QModelIndex& index);
-    /// Slot called when an action is triggered from the gallery
+    // Slot called when an action is triggered from the gallery
     virtual void onTriggered(QAction* action);
 
 private:
     SARibbonGalleryViewport* ensureGetPopupViewPort();
 
 protected:
-    /// Handle resize events for the gallery
+    // Handle resize events for the gallery
     void resizeEvent(QResizeEvent* event) override;
-    /// Handle change events for the gallery
+    // Handle change events for the gallery
     void changeEvent(QEvent* event) override;
 };
 

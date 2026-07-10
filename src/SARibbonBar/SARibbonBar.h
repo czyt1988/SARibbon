@@ -223,322 +223,322 @@ public:
     using FpContextCategoryHighlight = std::function< QColor(const QColor&) >;
 
 public:
-    /// Check if the ribbon style is two-row mode
+    // Check if the ribbon style is two-row mode
     static bool isTwoRowStyle(RibbonStyles s);
-    /// Check if the ribbon style is three-row mode
+    // Check if the ribbon style is three-row mode
     static bool isThreeRowStyle(RibbonStyles s);
-    /// Check if the ribbon style is loose (Office) style
+    // Check if the ribbon style is loose (Office) style
     static bool isLooseStyle(RibbonStyles s);
-    /// Check if the ribbon style is compact (WPS) style
+    // Check if the ribbon style is compact (WPS) style
     static bool isCompactStyle(RibbonStyles s);
-    /// Check if the ribbon style is single-row mode
+    // Check if the ribbon style is single-row mode
     static bool isSingleRowStyle(RibbonStyles s);
-    /// Get version information
+    // Get version information
     static QString versionString();
 
-    /// Get default context category color list
+    // Get default context category color list
     static QList< QColor > defaultContextCategoryColorList();
 
-    /// Initialize high DPI support
+    // Initialize high DPI support
     static void initHighDpi();
 
 public:
-    /// Constructor
+    // Constructor
     explicit SARibbonBar(QWidget* parent = nullptr);
-    /// Destructor
+    // Destructor
     ~SARibbonBar();
-    /// Get application button
+    // Get application button
     QAbstractButton* applicationButton();
 
-    /// Set application button
+    // Set application button
     void setApplicationButton(QAbstractButton* btn);
 
-    /// Get ribbon tab bar
+    // Get ribbon tab bar
     SARibbonTabBar* ribbonTabBar();
 
-    /// Add a category page
+    // Add a category page
     SARibbonCategory* addCategoryPage(const QString& title);
-    /// Add a category page
+    // Add a category page
     void addCategoryPage(SARibbonCategory* category);
 
-    /// Overloaded function for Qt designer support
+    // Overloaded function for Qt designer support
     Q_INVOKABLE void addCategoryPage(QWidget* category);
 
-    /// Insert a category page at specified index
+    // Insert a category page at specified index
     SARibbonCategory* insertCategoryPage(const QString& title, int index);
-    /// Insert a category page at specified index
+    // Insert a category page at specified index
     void insertCategoryPage(SARibbonCategory* category, int index);
 
-    /// Find category by name
+    // Find category by name
     SARibbonCategory* categoryByName(const QString& title) const;
 
-    /// Find category by object name
+    // Find category by object name
     SARibbonCategory* categoryByObjectName(const QString& objname) const;
 
-    /// Find category by index
+    // Find category by index
     SARibbonCategory* categoryByIndex(int index) const;
 
-    /// Hide category (not delete)
+    // Hide category (not delete)
     void hideCategory(SARibbonCategory* category);
 
-    /// Show hidden category
+    // Show hidden category
     void showCategory(SARibbonCategory* category);
 
     // Batch set categories visible or hidden, only triggers one relayout at the end
     void setCategoriesVisible(const QList< SARibbonCategory* >& categories, bool visible);
 
-    /// Check if category is visible
+    // Check if category is visible
     bool isCategoryVisible(const SARibbonCategory* c) const;
 
-    /// Get category index
+    // Get category index
     int categoryIndex(const SARibbonCategory* c) const;
 
-    /// Move category from one index to another
+    // Move category from one index to another
     void moveCategory(int from, int to);
 
-    /// Get all category pages
+    // Get all category pages
     QList< SARibbonCategory* > categoryPages(bool getAll = true) const;
 
-    /// Remove category
+    // Remove category
     void removeCategory(SARibbonCategory* category);
 
-    /// Add a context category
+    // Add a context category
     SARibbonContextCategory*
     addContextCategory(const QString& title, const QColor& color = QColor(), const QVariant& id = QVariant());
-    /// Add a context category
+    // Add a context category
     void addContextCategory(SARibbonContextCategory* context);
 
-    /// Show context category
+    // Show context category
     void showContextCategory(SARibbonContextCategory* context);
 
-    /// Hide context category
+    // Hide context category
     void hideContextCategory(SARibbonContextCategory* context);
 
-    /// Check if context category is visible
+    // Check if context category is visible
     bool isContextCategoryVisible(SARibbonContextCategory* context);
 
-    /// Set context category visibility
+    // Set context category visibility
     void setContextCategoryVisible(SARibbonContextCategory* context, bool visible);
 
-    /// Get all context categories
+    // Get all context categories
     QList< SARibbonContextCategory* > contextCategoryList() const;
 
-    /// Destroy context category
+    // Destroy context category
     void destroyContextCategory(SARibbonContextCategory* context);
 
-    /// Get current visible context category tab indexes
+    // Get current visible context category tab indexes
     QList< int > currentVisibleContextCategoryTabIndexs() const;
 
-    /// Set minimum mode
+    // Set minimum mode
     void setMinimumMode(bool isHide);
 
-    /// Check if in minimum mode
+    // Check if in minimum mode
     bool isMinimumMode() const;
 
-    /// Show minimum mode button
+    // Show minimum mode button
     void showMinimumModeButton(bool isShow = true);
 
-    /// Check if minimum mode button is shown
+    // Check if minimum mode button is shown
     bool isMinimumModeButtonVisible() const;
 
-    /// Get minimum mode action
+    // Get minimum mode action
     QAction* minimumModeAction() const;
 
-    /// Check if tab double click enables minimum mode
+    // Check if tab double click enables minimum mode
     bool isEnableTabDoubleClickToMinimumMode() const;
-    /// Set tab double click to enable minimum mode
+    // Set tab double click to enable minimum mode
     void setTabDoubleClickToMinimumMode(bool on = true) const;
 
-    /// Get current ribbon state
+    // Get current ribbon state
     RibbonMode currentRibbonState() const;
 
-    /// Get tab bar height
+    // Get tab bar height
     int tabBarHeight() const;
-    /// Set tab bar height
+    // Set tab bar height
     void setTabBarHeight(int h, bool resizeByNow = true);
 
-    /// Get title bar height
+    // Get title bar height
     int titleBarHeight() const;
-    /// Set title bar height
+    // Set title bar height
     void setTitleBarHeight(int h, bool resizeByNow = true);
 
-    /// Get category height
+    // Get category height
     int categoryHeight() const;
-    /// Set category height
+    // Set category height
     void setCategoryHeight(int h, bool resizeByNow = true);
 
-    /// Get main bar height in normal mode
+    // Get main bar height in normal mode
     int normalModeMainBarHeight() const;
 
-    /// Get main bar height in minimum mode
+    // Get main bar height in minimum mode
     int minimumModeMainBarHeight() const;
 
-    /// Get active right button group
+    // Get active right button group
     SARibbonButtonGroupWidget* activeRightButtonGroup();
 
-    /// Get right button group
+    // Get right button group
     SARibbonButtonGroupWidget* rightButtonGroup();
 
-    /// Get active quick access bar
+    // Get active quick access bar
     SARibbonQuickAccessBar* activeQuickAccessBar();
 
-    /// Get quick access bar
+    // Get quick access bar
     SARibbonQuickAccessBar* quickAccessBar();
 
-    /// Get title icon widget
+    // Get title icon widget
     SARibbonTitleIconWidget* titleIconWidget() const;
 
-    /// Set title icon visibility
+    // Set title icon visibility
     void setTitleIconVisible(bool on = true);
-    /// Check if title icon is visible
+    // Check if title icon is visible
     bool isTitleIconVisible() const;
 
-    /// Set ribbon style
+    // Set ribbon style
     void setRibbonStyle(RibbonStyles v);
-    /// Get current ribbon style
+    // Get current ribbon style
     RibbonStyles currentRibbonStyle() const;
 
-    /// Set current ribbon index
+    // Set current ribbon index
     void setCurrentIndex(int index);
 
-    /// Get current tab index
+    // Get current tab index
     int currentIndex();
 
-    /// Raise category to show it
+    // Raise category to show it
     void raiseCategory(SARibbonCategory* category);
 
-    /// Check if current style is two-row
+    // Check if current style is two-row
     bool isTwoRowStyle() const;
-    /// Check if current style is three-row
+    // Check if current style is three-row
     bool isThreeRowStyle() const;
 
-    /// Check if current style is loose
+    // Check if current style is loose
     bool isLooseStyle() const;
-    /// Check if current style is compact
+    // Check if current style is compact
     bool isCompactStyle() const;
-    /// Check if current style is single-row
+    // Check if current style is single-row
     bool isSingleRowStyle() const;
 
-    /// Update ribbon geometry
+    // Update ribbon geometry
     void updateRibbonGeometry();
 
-    /// Get panel layout mode
+    // Get panel layout mode
     SARibbonPanel::PanelLayoutMode panelLayoutMode() const;
-    /// Set panel layout mode
+    // Set panel layout mode
     void setPanelLayoutMode(SARibbonPanel::PanelLayoutMode m);
 
-    /// Set tab on title
+    // Set tab on title
     void setTabOnTitle(bool on);
-    /// Check if tab is on title
+    // Check if tab is on title
     bool isTabOnTitle() const;
 
-    /// Set tab bar baseline color
+    // Set tab bar baseline color
     void setTabBarBaseLineColor(const QColor& clr);
-    /// Get tab bar baseline color
+    // Get tab bar baseline color
     QColor tabBarBaseLineColor() const;
 
-    /// Set window title text color
+    // Set window title text color
     void setWindowTitleTextColor(const QColor& clr);
-    /// Get window title text color
+    // Get window title text color
     QColor windowTitleTextColor() const;
 
-    /// Set title visibility
+    // Set title visibility
     void setTitleVisible(bool on = false);
-    /// Check if title is visible
+    // Check if title is visible
     bool isTitleVisible() const;
 
-    /// Set window title background brush
+    // Set window title background brush
     void setWindowTitleBackgroundBrush(const QBrush& bk);
-    /// Get window title background brush
+    // Get window title background brush
     QBrush windowTitleBackgroundBrush() const;
 
-    /// Set window title alignment
+    // Set window title alignment
     void setWindowTitleAlignment(Qt::Alignment al);
-    /// Get window title alignment
+    // Get window title alignment
     Qt::Alignment windowTitleAlignment() const;
 
-    /// Set enable word wrap
+    // Set enable word wrap
     void setEnableWordWrap(bool on);
-    /// Check if word wrap is enabled
+    // Check if word wrap is enabled
     bool isEnableWordWrap() const;
 
-    /// Set whether button text is displayed to the right of the icon
+    // Set whether button text is displayed to the right of the icon
     void setEnableIconRightText(bool on);
-    /// Check if icon-right-text mode is enabled
+    // Check if icon-right-text mode is enabled
     bool isEnableIconRightText() const;
 
-    /// Set button maximum aspect ratio
+    // Set button maximum aspect ratio
     void setButtonMaximumAspectRatio(qreal fac = 1.4);
-    /// Get button maximum aspect ratio
+    // Get button maximum aspect ratio
     qreal buttonMaximumAspectRatio() const;
 
-    /// Set panel title height
+    // Set panel title height
     void setPanelTitleHeight(int h);
-    /// Get panel title height
+    // Get panel title height
     int panelTitleHeight() const;
 
-    /// Set enable show panel title
+    // Set enable show panel title
     void setEnableShowPanelTitle(bool on);
-    /// Check if panel title is shown
+    // Check if panel title is shown
     bool isEnableShowPanelTitle() const;
 
-    /// Set panel spacing
+    // Set panel spacing
     void setPanelSpacing(int n);
-    /// Get panel spacing
+    // Get panel spacing
     int panelSpacing() const;
 
-    /// Set panel tool button icon sizes
+    // Set panel tool button icon sizes
     void setPanelToolButtonIconSize(const QSize& smallSize, const QSize& largeSize);
-    /// Get panel tool button icon sizes
+    // Get panel tool button icon sizes
     QPair< QSize, QSize > panelToolButtonIconSize() const;
 
-    /// Set panel large icon size
+    // Set panel large icon size
     void setPanelLargeIconSize(const QSize& largeSize);
-    /// Get panel large icon size
+    // Get panel large icon size
     QSize panelLargeIconSize() const;
 
-    /// Set panel small icon size
+    // Set panel small icon size
     void setPanelSmallIconSize(const QSize& smallSize);
-    /// Get panel small icon size
+    // Get panel small icon size
     QSize panelSmallIconSize() const;
 
-    /// Get ribbon stacked widget
+    // Get ribbon stacked widget
     SARibbonStackedWidget* ribbonStackedWidget();
 
-    /// Set context category color list
+    // Set context category color list
     void setContextCategoryColorList(const QList< QColor >& cls);
-    /// Get context category color list
+    // Get context category color list
     QList< QColor > contextCategoryColorList() const;
 
-    /// Set context category title text color
+    // Set context category title text color
     void setContextCategoryTitleTextColor(const QColor& clr);
-    /// Get context category title text color
+    // Get context category title text color
     QColor contextCategoryTitleTextColor() const;
 
-    /// Set context category color highlight function
+    // Set context category color highlight function
     void setContextCategoryColorHighLight(FpContextCategoryHighlight fp);
 
-    /// Set ribbon alignment
+    // Set ribbon alignment
     void setRibbonAlignment(SARibbonAlignment al);
-    /// Get ribbon alignment
+    // Get ribbon alignment
     SARibbonAlignment ribbonAlignment() const;
 
-    /// Iterate through all categories
+    // Iterate through all categories
     bool iterateCategory(FpCategoryIterate fp) const;
-    /// Iterate through all panels
+    // Iterate through all panels
     bool iteratePanel(FpPanelIterate fp) const;
 
-    /// Set corner widget visibility
+    // Set corner widget visibility
     void setCornerWidgetVisible(bool on, Qt::Corner c = Qt::TopLeftCorner);
 
-    /// Set application button vertical expansion
+    // Set application button vertical expansion
     void setApplicationButtonVerticalExpansion(bool on = true);
-    /// Check if application button is vertically expanded
+    // Check if application button is vertically expanded
     bool isApplicationButtonVerticalExpansion() const;
 
-    /// Get all actions in panels
+    // Get all actions in panels
     QList< QAction* > allActions() const;
-    /// Check if ribbon frame is used
+    // Check if ribbon frame is used
     bool isUseRibbonFrame() const;
 Q_SIGNALS:
 
@@ -625,36 +625,36 @@ Q_SIGNALS:
     void actionTriggered(QAction* action);
 
 protected:
-    /// Event filter
+    // Event filter
     bool eventFilter(QObject* obj, QEvent* e) override;
-    /// Calculate minimum tab bar width
+    // Calculate minimum tab bar width
     int calcMinTabBarWidth() const;
-    /// Update category title to tab name
+    // Update category title to tab name
     void updateCategoryTitleToTabName();
-    /// Set system button group size
+    // Set system button group size
     void setSystemButtonGroupSize(const QSize& s);
-    /// Set main window styles
+    // Set main window styles
     void setMainWindowStyles(SARibbonMainWindowStyles s);
 protected Q_SLOTS:
-    /// Slot for window title changed
+    // Slot for window title changed
     void onWindowTitleChanged(const QString& title);
-    /// Slot for window icon changed
+    // Slot for window icon changed
     void onWindowIconChanged(const QIcon& i);
-    /// Slot for category window title changed
+    // Slot for category window title changed
     void onCategoryWindowTitleChanged(const QString& title);
-    /// Slot for stack widget hided
+    // Slot for stack widget hided
     void onStackWidgetHided();
-    /// Slot for current ribbon tab changed
+    // Slot for current ribbon tab changed
     virtual void onCurrentRibbonTabChanged(int index);
-    /// Slot for current ribbon tab clicked
+    // Slot for current ribbon tab clicked
     virtual void onCurrentRibbonTabClicked(int index);
-    /// Slot for current ribbon tab double clicked
+    // Slot for current ribbon tab double clicked
     virtual void onCurrentRibbonTabDoubleClicked(int index);
-    /// Slot for contexts category page added
+    // Slot for contexts category page added
     void onContextsCategoryPageAdded(SARibbonCategory* category);
-    /// Slot for contexts category name changed
+    // Slot for contexts category name changed
     void onContextsCategoryCategoryNameChanged(SARibbonCategory* category, const QString& title);
-    /// Slot for tab moved
+    // Slot for tab moved
     void onTabMoved(int from, int to);
 
 private:
@@ -671,20 +671,20 @@ private:
     QRect getWindowTitleRect() const;
 
 protected:
-    /// Set ribbon main window style
+    // Set ribbon main window style
     void setRibbonMainwindowStyle();
-    /// Paint event handler
+    // Paint event handler
     virtual void paintEvent(QPaintEvent* e) override;
-    /// Move event handler
+    // Move event handler
     virtual void moveEvent(QMoveEvent* e) override;
-    /// Change event handler
+    // Change event handler
     virtual void changeEvent(QEvent* e) override;
 
-    /// Paint tab bar baseline
+    // Paint tab bar baseline
     virtual void paintTabbarBaseLine(QPainter& painter);
-    /// Paint window title
+    // Paint window title
     virtual void paintWindowTitle(QPainter& painter, const QString& title, const QRect& titleRegion);
-    /// Paint context category tab
+    // Paint context category tab
     virtual void
     paintContextCategoryTab(QPainter& painter, const QString& title, const QRect& contextRect, const QColor& color);
 #if SA_DEBUG_PRINT_SARIBBONBAR

@@ -18,19 +18,19 @@ class SA_RIBBON_EXPORT SARibbonMenu : public QMenu
 {
     Q_OBJECT
 public:
-    /// Constructor for SARibbonMenu
+    // Constructor for SARibbonMenu
     explicit SARibbonMenu(QWidget* parent = nullptr);
-    /// Constructor for SARibbonMenu with title
+    // Constructor for SARibbonMenu with title
     explicit SARibbonMenu(const QString& title, QWidget* parent = nullptr);
-    /// Destructor for SARibbonMenu
+    // Destructor for SARibbonMenu
     ~SARibbonMenu();
-    /// Add a submenu to this menu
+    // Add a submenu to this menu
     QAction* addRibbonMenu(SARibbonMenu* menu);
-    /// Create and add a submenu with the given title
+    // Create and add a submenu with the given title
     SARibbonMenu* addRibbonMenu(const QString& title);
-    /// Create and add a submenu with the given icon and title
+    // Create and add a submenu with the given icon and title
     SARibbonMenu* addRibbonMenu(const QIcon& icon, const QString& title);
-    /// Add a custom widget to the menu
+    // Add a custom widget to the menu
     QAction* addWidget(QWidget* w);
 };
 

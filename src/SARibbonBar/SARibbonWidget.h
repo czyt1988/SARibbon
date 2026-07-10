@@ -41,7 +41,17 @@ public:
 private Q_SLOTS:
 	void onPrimaryScreenChanged(QScreen* screen);
 Q_SIGNALS:
-	/// Emitted when ribbon theme changes
+	/**
+	 * \if ENGLISH
+	 * @brief Emitted when ribbon theme changes
+	 * @param theme New ribbon theme
+	 * \endif
+	 *
+	 * \if CHINESE
+	 * @brief ribbon主题改变时触发的信号
+	 * @param theme 新的ribbon主题
+	 * \endif
+	 */
 	void ribbonThemeChanged(SARibbonTheme theme);
 };
 

@@ -19,7 +19,7 @@ namespace SA
 // Static theme data maps
 // ===================================================
 
-/// Tab margin per theme (affects SARibbonContextCategory drawing)
+// Tab margin per theme (affects SARibbonContextCategory drawing)
 static const std::map< SARibbonTheme, QMargins > s_themeMargins = {
     { SARibbonTheme::RibbonThemeWindows7, QMargins(5, 0, 0, 0) },
     { SARibbonTheme::RibbonThemeOffice2013, QMargins(5, 0, 0, 0) },
@@ -33,17 +33,17 @@ static const std::map< SARibbonTheme, QMargins > s_themeMargins = {
     { SARibbonTheme::RibbonThemeOffice2021Dark, QMargins(5, 0, 5, 0) }
 };
 
-/// Highlight function: produce a darker variant of the context category color
+// Highlight function: produce a darker variant of the context category color
 static const SARibbonBar::FpContextCategoryHighlight s_csDarkerHighlight = [](const QColor& c) -> QColor {
     return c.darker();
 };
 
-/// Highlight function: produce a more vibrant variant of the context category color
+// Highlight function: produce a more vibrant variant of the context category color
 static const SARibbonBar::FpContextCategoryHighlight s_csVibrantHighlight = [](const QColor& c) -> QColor {
     return SA::makeColorVibrant(c);
 };
 
-/// Context category highlight function per theme
+// Context category highlight function per theme
 static const std::map< SARibbonTheme, SARibbonBar::FpContextCategoryHighlight > s_themeContextHighlights = {
     { SARibbonTheme::RibbonThemeWindows7, s_csVibrantHighlight },
     { SARibbonTheme::RibbonThemeOffice2013, s_csVibrantHighlight },
@@ -57,7 +57,7 @@ static const std::map< SARibbonTheme, SARibbonBar::FpContextCategoryHighlight > 
     { SARibbonTheme::RibbonThemeOffice2021Dark, s_csVibrantHighlight }
 };
 
-/// Context category color list per theme
+// Context category color list per theme
 static const std::map< SARibbonTheme, QList< QColor > > s_themeContextColorLists = {
     { SARibbonTheme::RibbonThemeWindows7, {} },
     { SARibbonTheme::RibbonThemeOffice2013, {} },
@@ -71,7 +71,7 @@ static const std::map< SARibbonTheme, QList< QColor > > s_themeContextColorLists
     { SARibbonTheme::RibbonThemeOffice2021Dark, { QColor(80, 80, 80) } }
 };
 
-/// Tab bar baseline color per theme (only Office2013 has a visible baseline)
+// Tab bar baseline color per theme (only Office2013 has a visible baseline)
 static const std::map< SARibbonTheme, QColor > s_themeBaselineColors = {
     { SARibbonTheme::RibbonThemeWindows7, QColor() },
     { SARibbonTheme::RibbonThemeOffice2013, QColor(186, 201, 219) },
@@ -138,8 +138,17 @@ void applyRibbonTheme(QWidget* w, SARibbonBar* bar, SARibbonTheme theme)
     applyRibbonTheme(w, bar, theme, SARibbonThemePalette());
 }
 
-/// Map SARibbonTheme enum to the corresponding QSS template resource path.
-/// Returns empty string if no template exists for the given theme.
+/**
+ * \if ENGLISH
+ * @brief Map SARibbonTheme enum to the corresponding QSS template resource path
+ * @return Resource path of the QSS template for the given theme, or an empty string if no template exists
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 将 SARibbonTheme 枚举映射到对应的 QSS 模板资源路径
+ * @return 给定主题对应的 QSS 模板资源路径，若该主题无模板则返回空字符串
+ * \endif
+ */
 static QString themeToTemplatePath(SARibbonTheme theme)
 {
     switch (theme) {
@@ -164,8 +173,17 @@ static QString themeToTemplatePath(SARibbonTheme theme)
     }
 }
 
-/// Map SARibbonTheme enum to the corresponding default palette JSON resource path.
-/// Returns empty string if no palette exists for the given theme.
+/**
+ * \if ENGLISH
+ * @brief Map SARibbonTheme enum to the corresponding default palette JSON resource path
+ * @return Resource path of the default palette JSON for the given theme, or an empty string if no palette exists
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 将 SARibbonTheme 枚举映射到对应的默认调色板 JSON 资源路径
+ * @return 给定主题对应的默认调色板 JSON 资源路径，若该主题无调色板则返回空字符串
+ * \endif
+ */
 static QString themeToPalettePath(SARibbonTheme theme)
 {
     switch (theme) {

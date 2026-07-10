@@ -90,54 +90,64 @@ class SA_RIBBON_EXPORT SARibbonMainWindow : public QMainWindow
     Q_PROPERTY(SARibbonTheme ribbonTheme READ ribbonTheme WRITE setRibbonTheme NOTIFY ribbonThemeChanged)
 
 public:
-    /// Constructor for SARibbonMainWindow
+    // Constructor for SARibbonMainWindow
     explicit SARibbonMainWindow(QWidget* parent                = nullptr,
                                 SARibbonMainWindowStyles style = SARibbonMainWindowStyleFlag::UseRibbonMenuBar
                                                                  | SARibbonMainWindowStyleFlag::UseRibbonFrame,
                                 const Qt::WindowFlags flags = Qt::WindowFlags());
-    /// Destructor for SARibbonMainWindow
+    // Destructor for SARibbonMainWindow
     ~SARibbonMainWindow() override;
-    /// Return SARibbonBar
+    // Return SARibbonBar
     SARibbonBar* ribbonBar() const;
-    /// Set ribbonbar
+    // Set ribbonbar
     void setRibbonBar(SARibbonBar* ribbon);
 #if !SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
-    /// Return SAFramelessHelper
+    // Return SAFramelessHelper
     SAFramelessHelper* framelessHelper() const;
-    /// Set to use rubber band indication instead of immediate scaling during resizing, which is more friendly for software with large rendering (such as CAD, 3D)
+    // Set to use rubber band indication instead of immediate scaling during resizing, which is more friendly for software with large rendering (such as CAD, 3D)
     void setRubberBandOnResize(bool on);
-    /// Check if rubber band is used on resize
+    // Check if rubber band is used on resize
     bool isRubberBandOnResize() const;
 #else
-    /// If there are custom windows in the ribbon added to non-clickable areas such as the title bar, and you want them
-    /// to be clickable, you need to call this interface to inform them that they are clickable
+    // If there are custom windows in the ribbon added to non-clickable areas such as the title bar, and you want them
+    // to be clickable, you need to call this interface to inform them that they are clickable
     void setFramelessHitTestVisible(QWidget* w, bool visible = true);
 #endif
-    /// This function is only used to control the display of minimize, maximize and close buttons
+    // This function is only used to control the display of minimize, maximize and close buttons
     void updateWindowFlag(Qt::WindowFlags flags);
-    /// Note: Setting the theme in the constructor will not take full effect, use QTimer to put it at the end of the queue to execute
-    /// QTimer::singleShot(0, this, [ this ]() { this->setRibbonTheme(SARibbonMainWindow::RibbonThemeDark); });
+    // Note: Setting the theme in the constructor will not take full effect, use QTimer to put it at the end of the queue to execute
+    // QTimer::singleShot(0, this, [ this ]() { this->setRibbonTheme(SARibbonMainWindow::RibbonThemeDark); });
     void setRibbonTheme(SARibbonTheme theme);
-    /// Get ribbon theme
+    // Get ribbon theme
     SARibbonTheme ribbonTheme() const;
-    /// Determine whether the current mode is ribbon mode
+    // Determine whether the current mode is ribbon mode
     bool isUseRibbon() const;
-    /// Get the bar where the maximize, minimize, and close buttons are located. You can set content next to the maximize and minimize buttons through this function
+    // Get the bar where the maximize, minimize, and close buttons are located. You can set content next to the maximize and minimize buttons through this function
     SARibbonSystemButtonBar* windowButtonBar() const;
-    /// Get the current mainwindow style
+    // Get the current mainwindow style
     SARibbonMainWindowStyles ribbonMainwindowStyle() const;
 
-    /// Pass ribbonbar events to frameless
+    // Pass ribbonbar events to frameless
     virtual bool eventFilter(QObject* obj, QEvent* e) Q_DECL_OVERRIDE;
 
 protected:
-    /// Factory function to create ribbonbar
+    // Factory function to create ribbonbar
     SARibbonBar* createRibbonBar();
 private Q_SLOTS:
-    /// Handle primary screen changed event
+    // Handle primary screen changed event
     void onPrimaryScreenChanged(QScreen* screen);
 Q_SIGNALS:
-    /// Emitted when ribbon theme changes
+    /**
+     * \if ENGLISH
+     * @brief Emitted when ribbon theme changes
+     * @param theme New ribbon theme
+     * \endif
+     *
+     * \if CHINESE
+     * @brief ribbon主题改变时触发的信号
+     * @param theme 新的ribbon主题
+     * \endif
+     */
     void ribbonThemeChanged(SARibbonTheme theme);
 };
 
@@ -154,11 +164,11 @@ class SA_RIBBON_EXPORT SARibbonMainWindowEventFilter : public QObject
 {
     Q_OBJECT
 public:
-    /// Constructor for SARibbonMainWindowEventFilter
+    // Constructor for SARibbonMainWindowEventFilter
     explicit SARibbonMainWindowEventFilter(QObject* par);
-    /// Destructor for SARibbonMainWindowEventFilter
+    // Destructor for SARibbonMainWindowEventFilter
     ~SARibbonMainWindowEventFilter();
-    /// Event filter
+    // Event filter
     virtual bool eventFilter(QObject* obj, QEvent* e) override;
 };
 

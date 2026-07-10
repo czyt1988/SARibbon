@@ -27,7 +27,7 @@ class SA_RIBBON_EXPORT SARibbonPanelLabel : public QLabel
 {
     Q_OBJECT
 public:
-    /// Constructor for SARibbonPanelLabel
+    // Constructor for SARibbonPanelLabel
     SARibbonPanelLabel(QWidget* parent = nullptr);
 };
 
@@ -160,196 +160,196 @@ public:
     using FpRibbonToolButtonIterate = std::function< bool(SARibbonToolButton*) >;
 
 public:
-    /// Constructor for SARibbonPanel
+    // Constructor for SARibbonPanel
     explicit SARibbonPanel(QWidget* parent = nullptr);
-    /// Constructor for SARibbonPanel with name
+    // Constructor for SARibbonPanel with name
     explicit SARibbonPanel(const QString& name, QWidget* parent = nullptr);
-    /// Destructor for SARibbonPanel
+    // Destructor for SARibbonPanel
     ~SARibbonPanel() Q_DECL_OVERRIDE;
     using QWidget::addAction;
 
-    /// Add action to panel with specified row proportion
+    // Add action to panel with specified row proportion
     void addAction(QAction* action, SARibbonPanelItem::RowProportion rowProportion);
-    /// Generate and add an action with specified popup mode and row proportion
+    // Generate and add an action with specified popup mode and row proportion
     void addAction(QAction* act,
                    QToolButton::ToolButtonPopupMode popMode,
                    SARibbonPanelItem::RowProportion rowProportion = SARibbonPanelItem::Large);
-    /// Add action to panel with large icon display
+    // Add action to panel with large icon display
     void addLargeAction(QAction* action);
-    /// Add action to panel with medium icon display in three-row mode
+    // Add action to panel with medium icon display in three-row mode
     void addMediumAction(QAction* action);
-    /// Add action to panel with small icon display
+    // Add action to panel with small icon display
     void addSmallAction(QAction* action);
 
-    /// Add action to panel with small icon display and specified popup mode
+    // Add action to panel with small icon display and specified popup mode
     void addSmallAction(QAction* action, QToolButton::ToolButtonPopupMode popMode);
-    /// Add action to panel with large icon display and specified popup mode
+    // Add action to panel with large icon display and specified popup mode
     void addLargeAction(QAction* action, QToolButton::ToolButtonPopupMode popMode);
-    /// Add action to panel with medium icon display in three-row mode and specified popup mode
+    // Add action to panel with medium icon display in three-row mode and specified popup mode
     void addMediumAction(QAction* action, QToolButton::ToolButtonPopupMode popMode);
-    /// Generate and add an action with text, icon, popup mode, and row proportion
+    // Generate and add an action with text, icon, popup mode, and row proportion
     QAction* addAction(const QString& text,
                        const QIcon& icon,
                        QToolButton::ToolButtonPopupMode popMode,
                        SARibbonPanelItem::RowProportion rowProportion = SARibbonPanelItem::Large);
 
-    /// Add menu with specified row proportion and popup mode
+    // Add menu with specified row proportion and popup mode
     void addMenu(QMenu* menu,
                  SARibbonPanelItem::RowProportion rowProportion,
                  QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
-    /// Add large menu with specified popup mode
+    // Add large menu with specified popup mode
     void addLargeMenu(QMenu* menu, QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
-    /// Add medium menu with specified popup mode
+    // Add medium menu with specified popup mode
     void addMediumMenu(QMenu* menu, QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
-    /// Add small menu with specified popup mode
+    // Add small menu with specified popup mode
     void addSmallMenu(QMenu* menu, QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
 
-    /// Add widget with specified row proportion
+    // Add widget with specified row proportion
     QAction* addWidget(QWidget* w, SARibbonPanelItem::RowProportion rowProportion);
 
-    /// Add small widget (occupies one row of ribbon)
+    // Add small widget (occupies one row of ribbon)
     QAction* addSmallWidget(QWidget* w);
 
-    /// Add medium widget (occupies one row of ribbon)
+    // Add medium widget (occupies one row of ribbon)
     QAction* addMediumWidget(QWidget* w);
 
-    /// Add large widget (occupies all rows)
+    // Add large widget (occupies all rows)
     QAction* addLargeWidget(QWidget* w);
 
-    /// Add a gallery
+    // Add a gallery
     SARibbonGallery* addGallery(bool expanding = true);
 
-    /// Add separator
+    // Add separator
     QAction* addSeparator();
 
-    /// Extract the button corresponding to the action from the panel, returns nullptr if no corresponding button
+    // Extract the button corresponding to the action from the panel, returns nullptr if no corresponding button
     SARibbonToolButton* actionToRibbonToolButton(QAction* action);
 
-    /// Set option action, pass nullptr to remove, SARibbonPanel does not manage QAction ownership
-    /// OptionAction also triggers actionTriggered signal
+    // Set option action, pass nullptr to remove, SARibbonPanel does not manage QAction ownership
+    // OptionAction also triggers actionTriggered signal
     void setOptionAction(QAction* action);
 
-    /// Check if option action exists
+    // Check if option action exists
     bool isHaveOptionAction() const;
 
-    /// Get all buttons
+    // Get all buttons
     QList< SARibbonToolButton* > ribbonToolButtons() const;
 
-    /// Get PanelLayoutMode
+    // Get PanelLayoutMode
     PanelLayoutMode panelLayoutMode() const;
-    /// Set PanelLayoutMode
+    // Set PanelLayoutMode
     void setPanelLayoutMode(PanelLayoutMode mode);
 
-    /// Update button sizes, this function needs to be called after panel layout state changes
+    // Update button sizes, this function needs to be called after panel layout state changes
     void resetToolButtonSize();
 
-    /// Check if it is two-row mode
+    // Check if it is two-row mode
     bool isTwoRow() const;
 
-    /// Set panel to expanding mode, which will expand the horizontal area
+    // Set panel to expanding mode, which will expand the horizontal area
     void setExpanding(bool isExpanding = true);
-    /// Check if it is expanding mode
+    // Check if it is expanding mode
     bool isExpanding() const;
 
-    /// Title bar height
+    // Title bar height
     int titleHeight() const;
 
-    /// Check if title is enabled, after enabling title, the title height needs to be set, default height is 15
+    // Check if title is enabled, after enabling title, the title height needs to be set, default height is 15
     bool isEnableShowTitle() const;
 
-    /// Layout index corresponding to action, this operation is generally used for moveAction, other meanings are not significant
+    // Layout index corresponding to action, this operation is generally used for moveAction, other meanings are not significant
     int actionIndex(QAction* act) const;
 
-    /// Move action
+    // Move action
     void moveAction(int from, int to);
 
-    /// Check if customization is allowed
+    // Check if customization is allowed
     bool isCanCustomize() const;
-    /// Set customization allowed
+    // Set customization allowed
     void setCanCustomize(bool b);
 
-    /// Panel name
+    // Panel name
     QString panelName() const;
-    /// Set panel name
+    // Set panel name
     void setPanelName(const QString& title);
 
-    /// Large button height
+    // Large button height
     int largeButtonHeight() const;
 
-    /// Get layout corresponding items, this function is currently only used in the customization process
+    // Get layout corresponding items, this function is currently only used in the customization process
     const QList< SARibbonPanelItem* >& ribbonPanelItem() const;
 
-    /// Get panel layout
+    // Get panel layout
     SARibbonPanelLayout* panelLayout() const;
 
-    /// Update layout
+    // Update layout
     void updateItemGeometry();
 
-    /// Get category pointer, returns nullptr if no parent or not managed by category
+    // Get category pointer, returns nullptr if no parent or not managed by category
     SARibbonCategory* category() const;
 
-    /// Get ribbonBar pointer, returns nullptr if none
+    // Get ribbonBar pointer, returns nullptr if none
     SARibbonBar* ribbonBar() const;
 
-    /// Spacing between buttons
+    // Spacing between buttons
     int spacing() const;
 
-    /// Set button icon sizes
+    // Set button icon sizes
     void setToolButtonIconSize(const QSize& smallSize, const QSize& largeSize);
-    /// Get button icon sizes
+    // Get button icon sizes
     QPair< QSize, QSize > toolButtonIconSize() const;
 
-    /// Large button icon size
+    // Large button icon size
     void setLargeIconSize(const QSize& largeSize);
-    /// Get large icon size
+    // Get large icon size
     QSize largeIconSize() const;
 
-    /// Small button icon size
+    // Small button icon size
     void setSmallIconSize(const QSize& smallSize);
-    /// Get small icon size
+    // Get small icon size
     QSize smallIconSize() const;
 
-    /// Get last added button
+    // Get last added button
     SARibbonToolButton* lastAddActionButton();
 
-    /// Get panel title label widget
+    // Get panel title label widget
     SARibbonPanelLabel* titleLabel() const;
 
-    /// Check if word wrap is enabled
+    // Check if word wrap is enabled
     bool isEnableWordWrap() const;
 
-    /// Set whether button text is displayed to the right of the icon
+    // Set whether button text is displayed to the right of the icon
     void setEnableIconRightText(bool on);
-    /// Check if icon-right-text mode is enabled
+    // Check if icon-right-text mode is enabled
     bool isEnableIconRightText() const;
 
-    /// Maximum aspect ratio of buttons, this coefficient determines the maximum width of buttons
+    // Maximum aspect ratio of buttons, this coefficient determines the maximum width of buttons
     qreal buttonMaximumAspectRatio() const;
 
-    /// This function will iterate through all RibbonToolButton under SARibbonPanel, execute function pointer
-    /// (bool(SARibbonRibbonToolButton*)), function pointer returns false to stop iteration
+    // This function will iterate through all RibbonToolButton under SARibbonPanel, execute function pointer
+    // (bool(SARibbonRibbonToolButton*)), function pointer returns false to stop iteration
     bool iterateButton(FpRibbonToolButtonIterate fp) const;
 
 public:
-    /// Get size hint
+    // Get size hint
     virtual QSize sizeHint() const Q_DECL_OVERRIDE;
-    /// Get minimum size hint
+    // Get minimum size hint
     virtual QSize minimumSizeHint() const Q_DECL_OVERRIDE;
 
 public:
-    /// Recommended panel height
+    // Recommended panel height
     static int panelHeightHint(const QFontMetrics& fm, PanelLayoutMode layMode, int panelTitleHeight);
-    /// Set action row proportion property into action, action itself carries row property
+    // Set action row proportion property into action, action itself carries row property
     static void setActionRowProportionProperty(QAction* action, SARibbonPanelItem::RowProportion rp);
-    /// Get action row proportion property
+    // Get action row proportion property
     static SARibbonPanelItem::RowProportion getActionRowProportionProperty(QAction* action);
-    /// Set action PopupMode property into action, action itself carries PopupMode property
+    // Set action PopupMode property into action, action itself carries PopupMode property
     static void setActionToolButtonPopupModeProperty(QAction* action, QToolButton::ToolButtonPopupMode popMode);
-    /// Get action PopupMode property
+    // Get action PopupMode property
     static QToolButton::ToolButtonPopupMode getActionToolButtonPopupModeProperty(QAction* action);
-    /// Set action ToolButtonStyle property into action, action itself carries ToolButtonStyle property
+    // Set action ToolButtonStyle property into action, action itself carries ToolButtonStyle property
     static void setActionToolButtonStyleProperty(QAction* action, Qt::ToolButtonStyle buttonStyle);
-    /// Get action ToolButtonStyle property
+    // Get action ToolButtonStyle property
     static Qt::ToolButtonStyle getActionToolButtonStyleProperty(QAction* action);
 
 Q_SIGNALS:
@@ -381,9 +381,9 @@ Q_SIGNALS:
     void panelNameChanged(const QString& n);
 
 protected:
-    /// Handle action events
+    // Handle action events
     virtual void actionEvent(QActionEvent* e) Q_DECL_OVERRIDE;
-    /// Handle change events
+    // Handle change events
     virtual void changeEvent(QEvent* e) Q_DECL_OVERRIDE;
 
 protected:
@@ -392,20 +392,20 @@ protected:
     // will resynchronize its own parameters to the panel Similarly, when SARibbonCategory is added to SARibbonBar,
     // SARibbonBar will resynchronize its own parameters to the category
 
-    /// Set title bar height
+    // Set title bar height
     void setTitleHeight(int h);
 
-    /// Set spacing between buttons
+    // Set spacing between buttons
     void setSpacing(int n);
 
-    /// Set whether to show title, after showing title, the title height needs to be set, default height is 15
+    // Set whether to show title, after showing title, the title height needs to be set, default height is 15
     void setEnableShowTitle(bool on);
 
-    /// Set whether buttons are allowed to wrap, note that the icon size is determined by the text, two lines of text
-    /// will make the icon smaller, if you want the icon to be larger, it is best not to wrap the text
+    // Set whether buttons are allowed to wrap, note that the icon size is determined by the text, two lines of text
+    // will make the icon smaller, if you want the icon to be larger, it is best not to wrap the text
     void setEnableWordWrap(bool on);
 
-    /// Set the maximum aspect ratio of buttons, this coefficient determines the maximum width of buttons
+    // Set the maximum aspect ratio of buttons, this coefficient determines the maximum width of buttons
     void setButtonMaximumAspectRatio(qreal fac = 1.4);
 };
 

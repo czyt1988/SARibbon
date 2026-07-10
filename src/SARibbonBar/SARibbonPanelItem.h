@@ -40,12 +40,12 @@ public:
 		Medium,  ///< Medium proportion, only works when @ref SARibbonPanel::panelLayoutMode is @ref SARibbonPanel::ThreeRowMode, and when both in the same column are Medium, they will occupy two rows in three rows
 		Small  ///< Small proportion, occupies one row of SARibbonPanel, Medium will also become Small when conditions are not met, but will not become Large
 	};
-	/// Constructor for SARibbonPanelItem
+	// Constructor for SARibbonPanelItem
 	explicit SARibbonPanelItem(QWidget* widget);
-	/// Destructor for SARibbonPanelItem
+	// Destructor for SARibbonPanelItem
 	~SARibbonPanelItem();
 
-	/// Check if the item is empty
+	// Check if the item is empty
 	bool isEmpty() const Q_DECL_OVERRIDE;
 
 	short rowIndex;             ///< Record which row the current item belongs to, -1 in hide mode

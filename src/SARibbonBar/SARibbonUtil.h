@@ -67,7 +67,7 @@ bool SA_RIBBON_EXPORT isOperatingSystemInDarkMode();
 // Forward declaration
 class SARibbonThemePalette;
 
-/// Replace {{token}} and {{token|opacity(value)}} patterns in QSS templates with actual color values
+// Replace {{token}} and {{token|opacity(value)}} patterns in QSS templates with actual color values
 QString SA_RIBBON_EXPORT replaceQssTokens(const QString& templateQss, const SARibbonThemePalette& palette);
 
 /**

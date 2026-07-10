@@ -30,36 +30,36 @@ class SA_RIBBON_EXPORT SARibbonCustomizeDialog : public QDialog
 {
     Q_OBJECT
 public:
-    /// Constructor for SARibbonCustomizeDialog
+    // Constructor for SARibbonCustomizeDialog
     explicit SARibbonCustomizeDialog(SARibbonMainWindow *ribbonWindow, QWidget *p = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
-    /// Destructor for SARibbonCustomizeDialog
+    // Destructor for SARibbonCustomizeDialog
     ~SARibbonCustomizeDialog();
-    /// Set the action manager
+    // Set the action manager
     void setupActionsManager(SARibbonActionsManager *mgr);
 
-	/// Check if there is content to store, corresponding to save action
+	// Check if there is content to store, corresponding to save action
 	bool isApplied() const;
 
-	/// Check if there are modified contents, corresponding to apply action
+	// Check if there are modified contents, corresponding to apply action
 	bool isCached() const;
 
-    /// Apply all settings
+    // Apply all settings
     bool applys();
 
-    /// Clear all actions
+    // Clear all actions
     void clear();
 
-    /// Convert to XML
+    // Convert to XML
     bool toXml(QXmlStreamWriter *xml) const;
-    /// Convert to XML file
+    // Convert to XML file
     bool toXml(const QString& xmlpath) const;
 
-    /// Load from XML, for file-based settings, it is recommended to call this function before the dialog is displayed
+    // Load from XML, for file-based settings, it is recommended to call this function before the dialog is displayed
     void fromXml(QXmlStreamReader *xml);
-    /// Load from XML file
+    // Load from XML file
     void fromXml(const QString& xmlpath);
 
-    /// Return the SARibbonCustomizeWidget pointer
+    // Return the SARibbonCustomizeWidget pointer
     SARibbonCustomizeWidget *customizeWidget() const;
 
 private:

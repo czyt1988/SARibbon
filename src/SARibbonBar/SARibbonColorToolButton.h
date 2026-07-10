@@ -83,7 +83,7 @@ Q_SIGNALS:
     void colorChanged(const QColor& color);
 
 protected:
-    /// Override createIconPixmap to add color under the icon
+    // Override createIconPixmap to add color under the icon
     QPixmap createIconPixmap(const QStyleOptionToolButton& opt, const QSize& iconSize) const override;
 };
 

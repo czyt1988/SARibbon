@@ -17,17 +17,17 @@ class SA_RIBBON_EXPORT SARibbonTabBar : public QTabBar
 {
 	Q_OBJECT
 public:
-	/// Constructs a SARibbonTabBar instance
+	// Constructs a SARibbonTabBar instance
 	explicit SARibbonTabBar(QWidget* parent = nullptr);
-    /// Destructor
+    // Destructor
     ~SARibbonTabBar();
-	/// Gets the tab margin
+	// Gets the tab margin
 	const QMargins& tabMargin() const;
-	/// Sets the tab margin
+	// Sets the tab margin
 	void setTabMargin(const QMargins& tabMargin);
 
 protected:
-	/// Estimates the size of a tab
+	// Estimates the size of a tab
 	QSize tabSizeHint(int index) const;
 
 private:

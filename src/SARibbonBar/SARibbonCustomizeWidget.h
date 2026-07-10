@@ -38,11 +38,11 @@ class SA_RIBBON_EXPORT SARibbonCustomizeWidget : public QWidget
     Q_OBJECT
     SA_RIBBON_DECLARE_PRIVATE(SARibbonCustomizeWidget)
 public:
-    /// Constructor using SARibbonMainWindow
+    // Constructor using SARibbonMainWindow
     explicit SARibbonCustomizeWidget(SARibbonMainWindow* ribbonWindow,
                                      QWidget* parent   = nullptr,
                                      Qt::WindowFlags f = Qt::WindowFlags());
-    /// Constructor using SARibbonBar directly
+    // Constructor using SARibbonBar directly
     explicit SARibbonCustomizeWidget(SARibbonBar* ribbonbar,
                                      QWidget* parent   = nullptr,
                                      Qt::WindowFlags f = Qt::WindowFlags());
@@ -81,83 +81,83 @@ public:
         CustomizeObjNameRole = Qt::UserRole + 5  ///< Temporary custom content object name (QString)
     };
 
-    /// Set the action manager
+    // Set the action manager
     void setupActionsManager(SARibbonActionsManager* mgr);
 
-    /// Check if there is content to store, corresponding to save action
+    // Check if there is content to store, corresponding to save action
     bool isApplied() const;
 
-    /// Check if there are modified contents, corresponding to apply action
+    // Check if there are modified contents, corresponding to apply action
     bool isCached() const;
 
-    /// Get the model
+    // Get the model
     const QStandardItemModel* model() const;
 
-    /// Update model based on current radiobutton selection
+    // Update model based on current radiobutton selection
     void updateModel();
 
-    /// Update model with specified type
+    // Update model with specified type
     void updateModel(RibbonTreeShowType type);
 
-    /// Apply all settings
+    // Apply all settings
     bool applys();
 
-    /// Convert to XML
+    // Convert to XML
     bool toXml(QXmlStreamWriter* xml) const;
-    /// Convert to XML file
+    // Convert to XML file
     bool toXml(const QString& xmlpath) const;
 
-    /// Load from XML, for file-based settings, it is recommended to call this function before the dialog is displayed
+    // Load from XML, for file-based settings, it is recommended to call this function before the dialog is displayed
     void fromXml(QXmlStreamReader* xml);
-    /// Load from XML file
+    // Load from XML file
     void fromXml(const QString& xmlpath);
 
-    /// Apply XML configuration
+    // Apply XML configuration
     static bool fromXml(QXmlStreamReader* xml, SARibbonBar* bar, SARibbonActionsManager* mgr);
 
-    /// Cache applied actions, these actions will not be cleared by clear(), used for local storage
+    // Cache applied actions, these actions will not be cleared by clear(), used for local storage
     void makeActionsApplied();
 
-    /// Clear applied actions, need to clear applied actions after cancel operation
+    // Clear applied actions, need to clear applied actions after cancel operation
     void clearApplied();
-    /// Clear cached actions, after executing applys function, if you want to continue calling, you should clear, otherwise it will cause exceptions
+    // Clear cached actions, after executing applys function, if you want to continue calling, you should clear, otherwise it will cause exceptions
     void clearCache();
-    /// Clear all actions, excluding locally read data
+    // Clear all actions, excluding locally read data
     void clear();
 
 protected:
-    /// Simplify QList<SARibbonCustomizeData>, merge some actions
+    // Simplify QList<SARibbonCustomizeData>, merge some actions
     void simplify();
 
-    /// Get the row proportion selected in the current interface
+    // Get the row proportion selected in the current interface
     SARibbonPanelItem::RowProportion selectedRowProportion() const;
 
-    /// Get the action selected in listview
+    // Get the action selected in listview
     QAction* selectedAction() const;
-    /// Convert item to action
+    // Convert item to action
     QAction* itemToAction(QStandardItem* item) const;
 
-    /// Get the selected item in ribbon tree
+    // Get the selected item in ribbon tree
     QStandardItem* selectedItem() const;
 
-    /// Get the level of selected ribbon tree item
+    // Get the level of selected ribbon tree item
     int selectedRibbonLevel() const;
 
-    /// Get the level based on selected item
+    // Get the level based on selected item
     int itemLevel(QStandardItem* item) const;
 
-    /// Set an item to be selected
+    // Set an item to be selected
     void setSelectItem(QStandardItem* item, bool ensureVisible = true);
 
-    /// Check if item can be customized
+    // Check if item can be customized
     bool isItemCanCustomize(QStandardItem* item) const;
     bool isSelectedItemCanCustomize() const;
 
-    /// Check if item is a customize item
+    // Check if item is a customize item
     bool isCustomizeItem(QStandardItem* item) const;
     bool isSelectedItemIsCustomize() const;
 
-    /// Remove an item
+    // Remove an item
     void removeItem(QStandardItem* item);
 
 private Q_SLOTS:

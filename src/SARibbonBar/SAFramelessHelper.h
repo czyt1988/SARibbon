@@ -7,13 +7,12 @@
 class QWidget;
 
 /**
- * @class SAFramelessHelper
- * @brief 该类用于帮助实现无边框窗体的移动和缩放功能。
+ * \if ENGLISH
+ * @brief Helper class for implementing frameless window moving and resizing
  *
- * SAFramelessHelper 提供了一系列方法来激活、移除无边框窗体，设置窗体的移动、缩放属性，
- * 以及橡皮筋效果等。通过事件过滤机制，它能够处理鼠标事件，从而实现窗体的移动和缩放操作。
- *
- * 示例：
+ * SAFramelessHelper provides a series of methods to activate and remove frameless windows,
+ * set window moving and resizing attributes, and configure rubber band effects.
+ * Through the event filter mechanism, it handles mouse events to implement window moving and resizing.
  *
  * @code
  * SAFramelessHelper* helper = new SAFramelessHelper(this);
@@ -21,6 +20,23 @@ class QWidget;
  * helper->setWidgetMovable(true);
  * helper->setWidgetResizable(true);
  * @endcode
+ * @note Uses the PIMPL pattern via SA_RIBBON_DECLARE_PRIVATE for encapsulation.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 该类用于帮助实现无边框窗体的移动和缩放功能
+ *
+ * SAFramelessHelper 提供了一系列方法来激活、移除无边框窗体，设置窗体的移动、缩放属性，
+ * 以及橡皮筋效果等。通过事件过滤机制，它能够处理鼠标事件，从而实现窗体的移动和缩放操作。
+ *
+ * @code
+ * SAFramelessHelper* helper = new SAFramelessHelper(this);
+ * helper->activateOn(myWidget);
+ * helper->setWidgetMovable(true);
+ * helper->setWidgetResizable(true);
+ * @endcode
+ * @note 通过SA_RIBBON_DECLARE_PRIVATE采用PIMPL模式实现封装。
+ * \endif
  */
 class SA_RIBBON_EXPORT SAFramelessHelper : public QObject
 {

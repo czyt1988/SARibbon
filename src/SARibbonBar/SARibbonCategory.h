@@ -40,178 +40,206 @@ public:
     using FpPanelIterate = std::function< bool(SARibbonPanel*) >;
 
 public:
-    /// Constructor
+    // Constructor
     explicit SARibbonCategory(QWidget* p = nullptr);
-    /// Constructor with name
+    // Constructor with name
     explicit SARibbonCategory(const QString& name, QWidget* p = nullptr);
-    /// Destructor
+    // Destructor
     ~SARibbonCategory();
 
-    /// Get the category name
+    // Get the category name
     QString categoryName() const;
 
-    /// Set the category name
+    // Set the category name
     void setCategoryName(const QString& title);
 
-    /// Get the panel layout mode
+    // Get the panel layout mode
     SARibbonPanel::PanelLayoutMode panelLayoutMode() const;
 
-    /// Set the panel layout mode
+    // Set the panel layout mode
     void setPanelLayoutMode(SARibbonPanel::PanelLayoutMode m);
 
-    /// Add a panel with title
+    // Add a panel with title
     SARibbonPanel* addPanel(const QString& title);
 
-    /// Add an existing panel
+    // Add an existing panel
     void addPanel(SARibbonPanel* panel);
 
-    /// Add panel for Qt Designer
+    // Add panel for Qt Designer
     Q_INVOKABLE void addPanel(QWidget* panel);
 
-    /// Create and insert a new panel at index position
+    // Create and insert a new panel at index position
     SARibbonPanel* insertPanel(const QString& title, int index);
 
-    /// Insert an existing panel at index position
+    // Insert an existing panel at index position
     void insertPanel(SARibbonPanel* panel, int index);
 
-    /// Find panel by name
+    // Find panel by name
     SARibbonPanel* panelByName(const QString& title) const;
 
-    /// Find panel by ObjectName
+    // Find panel by ObjectName
     SARibbonPanel* panelByObjectName(const QString& objname) const;
 
-    /// Find panel by index, returns nullptr if out of range
+    // Find panel by index, returns nullptr if out of range
     SARibbonPanel* panelByIndex(int index) const;
 
-    /// Get the index of a panel
+    // Get the index of a panel
     int panelIndex(SARibbonPanel* p) const;
 
-    /// Move a panel from one index to another
+    // Move a panel from one index to another
     void movePanel(int from, int to);
 
-    /// Detach panel from SARibbonCategory management
+    // Detach panel from SARibbonCategory management
     bool takePanel(SARibbonPanel* panel);
 
-    /// Remove panel and delete it
+    // Remove panel and delete it
     bool removePanel(SARibbonPanel* panel);
 
-    /// Remove panel by index
+    // Remove panel by index
     bool removePanel(int index);
 
-    /// Get all panels
+    // Get all panels
     QList< SARibbonPanel* > panelList() const;
 
-    /// Check if this is a context category
+    // Check if this is a context category
     bool isContextCategory() const;
 
-    /// Get the number of panels
+    // Get the number of panels
     int panelCount() const;
 
-    /// Check if customization is allowed
+    // Check if customization is allowed
     bool isCanCustomize() const;
-    /// Set whether customization is allowed
+    // Set whether customization is allowed
     void setCanCustomize(bool b);
 
-    /// Get panel title bar height
+    // Get panel title bar height
     int panelTitleHeight() const;
-    /// Set panel title bar height
+    // Set panel title bar height
     void setPanelTitleHeight(int h);
 
-    /// Check if panel title bar is displayed
+    // Check if panel title bar is displayed
     bool isEnableShowPanelTitle() const;
-    /// Set whether to display panel title
+    // Set whether to display panel title
     void setEnableShowPanelTitle(bool on);
 
-    /// Set category alignment
+    // Set category alignment
     void setCategoryAlignment(SARibbonAlignment al);
-    /// Get category alignment
+    // Get category alignment
     SARibbonAlignment categoryAlignment() const;
 
-    /// Set panel spacing
+    // Set panel spacing
     void setPanelSpacing(int n);
-    /// Get panel spacing
+    // Get panel spacing
     int panelSpacing() const;
 
-    /// Set panel large icon size
+    // Set panel large icon size
     void setPanelLargeIconSize(const QSize& largeSize);
-    /// Get panel large icon size
+    // Get panel large icon size
     QSize panelLargeIconSize() const;
 
-    /// Set panel small icon size
+    // Set panel small icon size
     void setPanelSmallIconSize(const QSize& smallSize);
-    /// Get panel small icon size
+    // Get panel small icon size
     QSize panelSmallIconSize() const;
 
-    /// Set panel tool button icon sizes
+    // Set panel tool button icon sizes
     void setPanelToolButtonIconSize(const QSize& smallSize, const QSize& largeSize);
-    /// Get panel tool button icon sizes
+    // Get panel tool button icon sizes
     QPair< QSize, QSize > panelToolButtonIconSize() const;
 
-    /// Get the parent ribbonbar, returns null if not managed
+    // Get the parent ribbonbar, returns null if not managed
     SARibbonBar* ribbonBar() const;
 
-    /// Refresh category layout, call after changing ribbon mode
+    // Refresh category layout, call after changing ribbon mode
     void updateItemGeometry();
 
-    /// Set whether to use animation when scrolling
+    // Set whether to use animation when scrolling
     void setUseAnimatingScroll(bool useAnimating);
-    /// Check if animation is used when scrolling
+    // Check if animation is used when scrolling
     bool isUseAnimatingScroll() const;
 
-    /// Set wheel scroll step in pixels
+    // Set wheel scroll step in pixels
     void setWheelScrollStep(int step);
-    /// Get wheel scroll step
+    // Get wheel scroll step
     int wheelScrollStep() const;
 
-    /// Set animation duration in milliseconds
+    // Set animation duration in milliseconds
     void setAnimationDuration(int duration);
-    /// Get animation duration in milliseconds
+    // Get animation duration in milliseconds
     int animationDuration() const;
 
-    /// Check if panel text word wrap is enabled
+    // Check if panel text word wrap is enabled
     bool isEnableWordWrap() const;
 
-    /// Check if icon-right-text mode is enabled
+    // Check if icon-right-text mode is enabled
     bool isEnableIconRightText() const;
 
-    /// Get button maximum aspect ratio
+    // Get button maximum aspect ratio
     qreal buttonMaximumAspectRatio() const;
 
-    /// Iterate through all panels
+    // Iterate through all panels
     bool iteratePanel(FpPanelIterate fp) const;
 
     QSize sizeHint() const Q_DECL_OVERRIDE;
 Q_SIGNALS:
-    /// Emitted when category name changes
+    /**
+     * \if ENGLISH
+     * @brief Emitted when category name changes
+     * @param n New category name
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 标签名改变时触发的信号
+     * @param n 新的标签名
+     * \endif
+     */
     void categoryNameChanged(const QString& n);
 
-    /// Emitted when an action is triggered
+    /**
+     * \if ENGLISH
+     * @brief Emitted when an action is triggered
+     * @param action Triggered action
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 动作被触发时触发的信号
+     * @param action 被触发的动作
+     * \endif
+     */
     void actionTriggered(QAction* action);
 
 protected:
     virtual bool event(QEvent* e) override;
-    /// Handle wheel event
+    // Handle wheel event
     void wheelEvent(QWheelEvent* event) override;
-    /// Handle change event
+    // Handle change event
     void changeEvent(QEvent* event) override;
 
-    /// Mark this as a context category
+    // Mark this as a context category
     void markIsContextCategory(bool isContextCategory = true);
 
-    /// Get the category layout
+    // Get the category layout
     SARibbonCategoryLayout* categoryLayout() const;
 
-    /// Set whether panel button text word wrap is enabled
+    // Set whether panel button text word wrap is enabled
     void setEnableWordWrap(bool on);
 
-    /// Set whether button text is displayed to the right of the icon
+    // Set whether button text is displayed to the right of the icon
     void setEnableIconRightText(bool on);
 
-    /// Set button maximum aspect ratio
+    // Set button maximum aspect ratio
     void setButtonMaximumAspectRatio(qreal fac = 1.4);
 };
 
-/// Scroll button for SARibbonCategory when content exceeds width
+/**
+ * \if ENGLISH
+ * @brief Scroll button for SARibbonCategory when content exceeds width
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 当内容超出宽度时SARibbonCategory的滚动按钮
+ * \endif
+ */
 class SA_RIBBON_EXPORT SARibbonCategoryScrollButton : public QToolButton
 {
     Q_OBJECT

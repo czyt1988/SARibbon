@@ -47,17 +47,17 @@
 class SA_RIBBON_EXPORT SARibbonElementManager
 {
 protected:
-	/// Constructor for SARibbonElementManager
+	// Constructor for SARibbonElementManager
 	SARibbonElementManager();
 
 public:
-	/// Destructor for SARibbonElementManager
+	// Destructor for SARibbonElementManager
 	virtual ~SARibbonElementManager();
-	/// Get the singleton instance
+	// Get the singleton instance
 	static SARibbonElementManager* instance();
-	/// Get the current factory
+	// Get the current factory
 	SARibbonElementFactory* factory();
-	/// Set the factory
+	// Set the factory
 	void setupFactory(SARibbonElementFactory* fac);
 
 private:

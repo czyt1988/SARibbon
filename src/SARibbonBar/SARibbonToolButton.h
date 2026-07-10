@@ -109,9 +109,9 @@ public:
     // Set the button type to LargeButton or SmallButton
     void setButtonType(const RibbonButtonType& buttonType);
 
-    /// Set whether text is displayed to the right of the icon
+    // Set whether text is displayed to the right of the icon
     void setEnableIconRightText(bool on);
-    /// Check if icon-right-text mode is enabled
+    // Check if icon-right-text mode is enabled
     bool isEnableIconRightText() const;
 
     // Check if the button is a small ribbon button

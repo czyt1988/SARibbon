@@ -42,43 +42,43 @@ class SARibbonPanelLabel;
 class SA_RIBBON_EXPORT SARibbonElementFactory
 {
 public:
-    /// Constructor for SARibbonElementFactory
+    // Constructor for SARibbonElementFactory
     SARibbonElementFactory();
-    /// Destructor for SARibbonElementFactory
+    // Destructor for SARibbonElementFactory
     virtual ~SARibbonElementFactory();
-    /// Create SARibbonBar
+    // Create SARibbonBar
     virtual SARibbonBar* createRibbonBar(QWidget* parent);
-    /// Create SARibbonTabBar
+    // Create SARibbonTabBar
     virtual SARibbonTabBar* createRibbonTabBar(QWidget* parent);
-    /// Create SARibbonApplicationButton
+    // Create SARibbonApplicationButton
     virtual SARibbonApplicationButton* createRibbonApplicationButton(QWidget* parent);
-    /// Create SARibbonCategory
+    // Create SARibbonCategory
     virtual SARibbonCategory* createRibbonCategory(QWidget* parent);
-    /// Create SARibbonContextCategory
+    // Create SARibbonContextCategory
     virtual SARibbonContextCategory* createRibbonContextCategory(QWidget* parent);
-    /// Create SARibbonPanel
+    // Create SARibbonPanel
     virtual SARibbonPanel* createRibbonPanel(QWidget* parent);
-    /// Create SARibbonSeparatorWidget
+    // Create SARibbonSeparatorWidget
     virtual SARibbonSeparatorWidget* createRibbonSeparatorWidget(QWidget* parent);
-    /// Create SARibbonGallery
+    // Create SARibbonGallery
     virtual SARibbonGallery* createRibbonGallery(QWidget* parent);
-    /// Create SARibbonGalleryGroup
+    // Create SARibbonGalleryGroup
     virtual SARibbonGalleryGroup* createRibbonGalleryGroup(QWidget* parent);
-    /// Create SARibbonToolButton
+    // Create SARibbonToolButton
     virtual SARibbonToolButton* createRibbonToolButton(QWidget* parent);
-    /// Create SARibbonStackedWidget
+    // Create SARibbonStackedWidget
     virtual SARibbonStackedWidget* createRibbonStackedWidget(SARibbonBar* parent);
-    /// Create SARibbonButtonGroupWidget
+    // Create SARibbonButtonGroupWidget
     virtual SARibbonButtonGroupWidget* createButtonGroupWidget(QWidget* parent);
-    /// Create SARibbonQuickAccessBar
+    // Create SARibbonQuickAccessBar
     virtual SARibbonQuickAccessBar* createQuickAccessBar(QWidget* parent);
-    /// Create SARibbonSystemButtonBar
+    // Create SARibbonSystemButtonBar
     virtual SARibbonSystemButtonBar* createWindowButtonGroup(QWidget* parent);
-    /// Create SARibbonPanelOptionButton
+    // Create SARibbonPanelOptionButton
     virtual SARibbonPanelOptionButton* createRibbonPanelOptionButton(SARibbonPanel* panel);
-    /// Create SARibbonTitleIconWidget
+    // Create SARibbonTitleIconWidget
     virtual SARibbonTitleIconWidget* createRibbonTitleIconWidget(QWidget* parent);
-    /// Create SARibbonPanelLabel
+    // Create SARibbonPanelLabel
     virtual SARibbonPanelLabel* createRibbonPanelLabel(QWidget* parent);
 };
 

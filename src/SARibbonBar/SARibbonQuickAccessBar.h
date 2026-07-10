@@ -67,9 +67,9 @@ class SA_RIBBON_EXPORT SARibbonQuickAccessBar : public SARibbonButtonGroupWidget
 {
     Q_OBJECT
 public:
-    /// Constructor for SARibbonQuickAccessBar
+    // Constructor for SARibbonQuickAccessBar
     explicit SARibbonQuickAccessBar(QWidget* parent = nullptr);
-    /// Destructor for SARibbonQuickAccessBar
+    // Destructor for SARibbonQuickAccessBar
     ~SARibbonQuickAccessBar();
 };
 

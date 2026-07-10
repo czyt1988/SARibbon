@@ -20,30 +20,30 @@ class SA_COLOR_WIDGETS_API SAColorMenu : public QMenu
     Q_OBJECT
     SA_COLOR_WIDGETS_DECLARE_PRIVATE(SAColorMenu)
 public:
-    /// Constructor for SAColorMenu
+    // Constructor for SAColorMenu
     explicit SAColorMenu(QWidget* parent = nullptr);
-    /// Constructor for SAColorMenu with title
+    // Constructor for SAColorMenu with title
     explicit SAColorMenu(const QString& title, QWidget* parent = nullptr);
-    /// Destructor for SAColorMenu
+    // Destructor for SAColorMenu
     ~SAColorMenu();
-    /// Quick bind to color button
+    // Quick bind to color button
     void bindToColorToolButton(SAColorToolButton* btn);
-    /// Get theme colors palette action
+    // Get theme colors palette action
     QWidgetAction* themeColorsPaletteAction() const;
-    /// Get custom colors widget action
+    // Get custom colors widget action
     QWidgetAction* getCustomColorsWidgetAction() const;
-    /// Get custom color action
+    // Get custom color action
     QAction* customColorAction() const;
-    /// Get theme colors palette widget
+    // Get theme colors palette widget
     SAColorPaletteGridWidget* colorPaletteGridWidget() const;
-    /// Get custom colors widget
+    // Get custom colors widget
     SAColorGridWidget* customColorsWidget() const;
-    /// Enable none color action, disabled by default
+    // Enable none color action, disabled by default
     void enableNoneColorAction(bool on = true);
-    /// Get none color action, returns nullptr until enableNoneColorAction(true) is called
+    // Get none color action, returns nullptr until enableNoneColorAction(true) is called
     QAction* noneColorAction() const;
 public Q_SLOTS:
-    /// Helper slot function to emit selectedColor signal and hide menu
+    // Helper slot function to emit selectedColor signal and hide menu
     void emitSelectedColor(const QColor& c);
 Q_SIGNALS:
     /**

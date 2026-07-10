@@ -19,27 +19,27 @@ class SA_COLOR_WIDGETS_API SAColorPaletteGridWidget : public QWidget
     Q_OBJECT
     SA_COLOR_WIDGETS_DECLARE_PRIVATE(SAColorPaletteGridWidget)
 public:
-    /// Constructor for SAColorPaletteGridWidget
+    // Constructor for SAColorPaletteGridWidget
     SAColorPaletteGridWidget(QWidget* par = nullptr);
-    /// Constructor for SAColorPaletteGridWidget with specified colors
+    // Constructor for SAColorPaletteGridWidget with specified colors
     SAColorPaletteGridWidget(const QList< QColor >& cls, QWidget* par = nullptr);
-    /// Destructor for SAColorPaletteGridWidget
+    // Destructor for SAColorPaletteGridWidget
     ~SAColorPaletteGridWidget();
-    /// Set color list maintained by the widget
+    // Set color list maintained by the widget
     void setColorList(const QList< QColor >& cls);
-    /// Get color list
+    // Get color list
     QList< QColor > colorList() const;
-    /// Set color shade factor, default is { 180, 160, 140, 75, 50 }
+    // Set color shade factor, default is { 180, 160, 140, 75, 50 }
     void setFactor(const QList< int >& factor);
-    /// Get factor list
+    // Get factor list
     QList< int > factor() const;
-    /// Set color icon size
+    // Set color icon size
     void setColorIconSize(const QSize& s);
-    /// Get color icon size
+    // Get color icon size
     QSize colorIconSize() const;
-    /// Set whether colors are checkable
+    // Set whether colors are checkable
     void setColorCheckable(bool on = true);
-    /// Check if colors are checkable
+    // Check if colors are checkable
     bool isColorCheckable() const;
 private Q_SLOTS:
     void onMainColorClicked(const QColor& c);

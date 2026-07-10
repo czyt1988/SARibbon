@@ -25,9 +25,9 @@ class SA_RIBBON_EXPORT SARibbonPanelOptionButton : public QToolButton
 {
 	Q_OBJECT
 public:
-	/// Constructor for SARibbonPanelOptionButton
+	// Constructor for SARibbonPanelOptionButton
 	explicit SARibbonPanelOptionButton(QWidget* parent = nullptr);
-	/// Destructor for SARibbonPanelOptionButton
+	// Destructor for SARibbonPanelOptionButton
 	~SARibbonPanelOptionButton();
 };
 

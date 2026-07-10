@@ -20,48 +20,48 @@ class SA_RIBBON_EXPORT SARibbonContextCategory : public QObject
 	Q_OBJECT
 	SA_RIBBON_DECLARE_PRIVATE(SARibbonContextCategory)
 public:
-	/// Constructor for SARibbonContextCategory
+	// Constructor for SARibbonContextCategory
 	explicit SARibbonContextCategory(QWidget* parent = nullptr);
-	/// Destructor for SARibbonContextCategory
+	// Destructor for SARibbonContextCategory
 	~SARibbonContextCategory();
-	/// Add a category page with title
+	// Add a category page with title
 	SARibbonCategory* addCategoryPage(const QString& title);
-	/// Add an existing category page
+	// Add an existing category page
 	void addCategoryPage(SARibbonCategory* category);
-	/// Get the number of managed category pages
+	// Get the number of managed category pages
 	int categoryCount() const;
 
-	/// Set the context ID
+	// Set the context ID
 	void setId(const QVariant& id);
-	/// Get the context ID
+	// Get the context ID
 	QVariant id() const;
 
-	/// Set the context color
+	// Set the context color
 	void setContextColor(const QColor color);
-	/// Get the context color
+	// Get the context color
 	QColor contextColor() const;
 
-	/// Get the context title
+	// Get the context title
 	QString contextTitle() const;
-	/// Set the context title
+	// Set the context title
 	void setContextTitle(const QString& contextTitle);
 
-	/// Get the category page at the specified index
+	// Get the category page at the specified index
 	SARibbonCategory* categoryPage(int index);
 
-	/// Get all SARibbonCategory objects
+	// Get all SARibbonCategory objects
 	QList< SARibbonCategory* > categoryList() const;
 
-	/// Remove a category from management
+	// Remove a category from management
 	bool takeCategory(SARibbonCategory* category);
 
-	/// Check if the context manages this category
+	// Check if the context manages this category
 	bool isHaveCategory(SARibbonCategory* category) const;
 public Q_SLOTS:
-	/// Hide the context category
+	// Hide the context category
 	void hide();
 
-	/// Show the context category
+	// Show the context category
 	void show();
 Q_SIGNALS:
 	/**
@@ -121,7 +121,7 @@ private Q_SLOTS:
 	void onCategoryTitleChanged(const QString& title);
 
 protected:
-	/// Get the parent widget
+	// Get the parent widget
 	QWidget* parentWidget() const;
 	virtual bool eventFilter(QObject* watched, QEvent* e) override;
 };

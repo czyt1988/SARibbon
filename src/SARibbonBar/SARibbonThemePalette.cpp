@@ -256,7 +256,18 @@ bool SARibbonThemePalette::isDark() const
     return m_isDark;
 }
 
-/// Recalculate all derived colors from stored rules and current key colors
+/**
+ * \if ENGLISH
+ * @brief Recalculate all derived colors from stored rules and current key colors
+ * @details Iterates over all derivation rules, resolves each derived color from the current
+ * key colors and fixed colors, and refreshes the internal derived color cache.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 根据存储的规则和当前关键色重新计算所有派生颜色
+ * @details 遍历所有派生规则，依据当前关键色和固定色解析每个派生颜色，并刷新内部派生颜色缓存。
+ * \endif
+ */
 void SARibbonThemePalette::recalculateDerived()
 {
     m_derivedColors.clear();

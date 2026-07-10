@@ -42,75 +42,75 @@ class SA_RIBBON_EXPORT SARibbonSystemButtonBar : public QFrame
     Q_OBJECT
     SA_RIBBON_DECLARE_PRIVATE(SARibbonSystemButtonBar)
 public:
-    /// Constructor for SARibbonSystemButtonBar
+    // Constructor for SARibbonSystemButtonBar
     explicit SARibbonSystemButtonBar(QWidget* parent);
-    /// Constructor with window flags
+    // Constructor with window flags
     explicit SARibbonSystemButtonBar(QWidget* parent, Qt::WindowFlags flags);
-    /// Destructor for SARibbonSystemButtonBar
+    // Destructor for SARibbonSystemButtonBar
     ~SARibbonSystemButtonBar();
-    /// Setup minimize button
+    // Setup minimize button
     void setupMinimizeButton(bool on);
-    /// Setup maximize button
+    // Setup maximize button
     void setupMaximizeButton(bool on);
-    /// Setup close button
+    // Setup close button
     void setupCloseButton(bool on);
-    /// Use the WindowFlag of the top-level widget as WindowFlag
+    // Use the WindowFlag of the top-level widget as WindowFlag
     void updateWindowFlag();
-    /// Update window flag with specified flags
+    // Update window flag with specified flags
     void updateWindowFlag(Qt::WindowFlags flags);
-    /// Set button width ratio, final button width will be set according to this ratio
+    // Set button width ratio, final button width will be set according to this ratio
     void setButtonWidthStretch(int close = 4, int max = 3, int min = 3);
-    /// Set title bar height
+    // Set title bar height
     void setWindowTitleHeight(int h);
-    /// Get title bar height
+    // Get title bar height
     int windowTitleHeight() const;
-    /// Set standard system button width
+    // Set standard system button width
     void setWindowButtonWidth(int w);
-    /// Get standard system button width
+    // Get standard system button width
     int windowButtonWidth() const;
-    /// Set Qt::WindowStates
+    // Set Qt::WindowStates
     void setWindowStates(Qt::WindowStates s);
-    /// Get button states only
+    // Get button states only
     Qt::WindowFlags windowButtonFlags() const;
-    /// Get minimize button
+    // Get minimize button
     QAbstractButton* minimizeButton() const;
-    /// Get maximize button
+    // Get maximize button
     QAbstractButton* maximizeButton() const;
-    /// Get close button
+    // Get close button
     QAbstractButton* closeButton() const;
 
-    /// Set icon size
+    // Set icon size
     void setIconSize(const QSize& ic);
-    /// Get icon size
+    // Get icon size
     QSize iconSize() const;
-    /// Generate and add an action
+    // Generate and add an action
     void addAction(QAction* a);
-    /// Add menu action
+    // Add menu action
     void addMenuAction(QAction* menuAction, QToolButton::ToolButtonPopupMode popupMode = QToolButton::InstantPopup);
-    /// Add menu action and return the action
+    // Add menu action and return the action
     QAction* addMenuAction(QMenu* menu, QToolButton::ToolButtonPopupMode popupMode = QToolButton::InstantPopup);
-    /// Add separator
+    // Add separator
     QAction* addSeparator();
-    /// Add widget
+    // Add widget
     QAction* addWidget(QWidget* w);
 
-    /// Get size hint
+    // Get size hint
     virtual QSize sizeHint() const Q_DECL_OVERRIDE;
-    /// Capture mainwindow events
+    // Capture mainwindow events
     bool eventFilter(QObject* obj, QEvent* event) override;
 
 protected:
-    /// Handle resize event
+    // Handle resize event
     virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
-    /// Handle change event for layout direction changes
+    // Handle change event for layout direction changes
     virtual void changeEvent(QEvent* e) override;
 
 protected Q_SLOTS:
-    /// Close window slot
+    // Close window slot
     Q_SLOT void closeWindow();
-    /// Minimize window slot
+    // Minimize window slot
     Q_SLOT void minimizeWindow();
-    /// Maximize window slot
+    // Maximize window slot
     Q_SLOT void maximizeWindow();
 };
 
@@ -127,7 +127,7 @@ class SARibbonSystemToolButton : public QToolButton
 {
     Q_OBJECT
 public:
-    /// Constructor for SARibbonSystemToolButton
+    // Constructor for SARibbonSystemToolButton
     SARibbonSystemToolButton(QWidget* p = nullptr);
 };
 

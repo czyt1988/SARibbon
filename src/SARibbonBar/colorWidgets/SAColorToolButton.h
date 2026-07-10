@@ -82,53 +82,53 @@ public:
     };
 
 public:
-    /// Constructor for SAColorToolButton
+    // Constructor for SAColorToolButton
     explicit SAColorToolButton(QWidget* parent = nullptr);
-    /// Constructor for SAColorToolButton with style
+    // Constructor for SAColorToolButton with style
     explicit SAColorToolButton(ColorToolButtonStyle style, QWidget* parent = nullptr);
-    /// Destructor for SAColorToolButton
+    // Destructor for SAColorToolButton
     ~SAColorToolButton();
-    /// Get color
+    // Get color
     QColor color() const;
-    /// Set margins
+    // Set margins
     void setMargins(const QMargins& mg);
-    /// Get margins
+    // Get margins
     QMargins margins() const;
-    /// Paint none color
+    // Paint none color
     static void paintNoneColor(QPainter* p, const QRect& colorRect);
-    /// Set color tool button style
+    // Set color tool button style
     void setColorToolButtonStyle(ColorToolButtonStyle s);
-    /// Get color tool button style
+    // Get color tool button style
     ColorToolButtonStyle colorToolButtonStyle() const;
-    /// Get colorMenu, note that this function may return nullptr if ColorToolButtonStyle is set to NoColorMenu or if a custom menu is set
+    // Get colorMenu, note that this function may return nullptr if ColorToolButtonStyle is set to NoColorMenu or if a custom menu is set
     SAColorMenu* colorMenu() const;
-    /// Create standard color menu
+    // Create standard color menu
     SAColorMenu* createColorMenu();
 public Q_SLOTS:
-    /// Set color, will emit colorChanged signal
+    // Set color, will emit colorChanged signal
     void setColor(const QColor& c);
 
 protected:
-    /// Calculate positions of basic components
+    // Calculate positions of basic components
     virtual void calcRect(const QStyleOptionToolButton& opt, QRect& iconRect, QRect& textRect, QRect& colorRect);
-    /// Paint button
+    // Paint button
     virtual void paintButton(QStylePainter* p, const QStyleOptionToolButton& opt);
-    /// Paint icon
+    // Paint icon
     virtual void paintIcon(QStylePainter* p, const QRect& iconRect, const QStyleOptionToolButton& opt);
-    /// Paint text
+    // Paint text
     virtual void paintText(QStylePainter* p, const QRect& textRect, const QStyleOptionToolButton& opt);
-    /// Paint color
+    // Paint color
     virtual void paintColor(QStylePainter* p, const QRect& colorRect, const QColor& color, const QStyleOptionToolButton& opt);
 
 protected:
-    /// Handle paint event
+    // Handle paint event
     virtual void paintEvent(QPaintEvent* e) Q_DECL_OVERRIDE;
-    /// Handle resize event
+    // Handle resize event
     virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
-    /// Override sizeHint
+    // Override sizeHint
     virtual QSize sizeHint() const Q_DECL_OVERRIDE;
 private Q_SLOTS:
-    /// Handle button clicked
+    // Handle button clicked
     void onButtonClicked(bool checked = false);
 Q_SIGNALS:
     /**

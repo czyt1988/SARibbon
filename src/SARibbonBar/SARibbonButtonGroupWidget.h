@@ -19,14 +19,14 @@ class SA_RIBBON_EXPORT SARibbonButtonGroupWidget : public QToolBar
 {
     Q_OBJECT
 public:
-    /// Constructor for SARibbonButtonGroupWidget
+    // Constructor for SARibbonButtonGroupWidget
     explicit SARibbonButtonGroupWidget(QWidget* parent = nullptr);
-    /// Destructor for SARibbonButtonGroupWidget
+    // Destructor for SARibbonButtonGroupWidget
     ~SARibbonButtonGroupWidget();
 
-    /// Add a menu QAction to the button group widget
+    // Add a menu QAction to the button group widget
     void addMenuAction(QAction* menuAction, QToolButton::ToolButtonPopupMode popupMode = QToolButton::InstantPopup);
-    /// Create and add a menu action to the button group widget
+    // Create and add a menu action to the button group widget
     QAction* addMenuAction(QMenu* menu, QToolButton::ToolButtonPopupMode popupMode = QToolButton::InstantPopup);
 };
 

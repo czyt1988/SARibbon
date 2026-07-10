@@ -22,23 +22,23 @@
 class SA_RIBBON_EXPORT SARibbonLineWidgetContainer : public QWidget
 {
 public:
-	/// Constructor for SARibbonLineWidgetContainer
+	// Constructor for SARibbonLineWidgetContainer
 	explicit SARibbonLineWidgetContainer(QWidget* par = nullptr);
-	/// Destructor for SARibbonLineWidgetContainer
+	// Destructor for SARibbonLineWidgetContainer
 	~SARibbonLineWidgetContainer();
-	/// Set widget (nullptr is not allowed)
+	// Set widget (nullptr is not allowed)
 	void setWidget(QWidget* innerWidget);
 
-	/// Set prefix
+	// Set prefix
 	void setPrefix(const QString& str);
 
-	/// Set suffix
+	// Set suffix
 	void setSuffix(const QString& str);
 
-	/// Prefix text box
+	// Prefix text box
 	QLabel* labelPrefix() const;
 
-	/// Suffix text box
+	// Suffix text box
 	QLabel* labelSuffix() const;
 
 private:

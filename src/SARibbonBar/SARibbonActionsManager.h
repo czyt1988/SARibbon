@@ -32,7 +32,7 @@ class SA_RIBBON_EXPORT SARibbonActionsManager : public QObject
 	friend class SARibbonActionsManagerModel;
 
 public:
-	/// Action tag definition
+	// Action tag definition
 	enum ActionTag
 	{
 		UnknowActionTag              = 0,     ///< Unknown tag
@@ -43,58 +43,58 @@ public:
 		NotInRibbonCategoryTag = 0x2001,  ///< Tag for actions not in ribbon category
 		UserDefineActionTag = 0x8000  ///< User defined tag, all custom tags should be greater than this
 	};
-	/// Constructor
+	// Constructor
 	explicit SARibbonActionsManager(SARibbonBar* bar);
-	/// Destructor
+	// Destructor
 	~SARibbonActionsManager();
-	/// Set tag name
+	// Set tag name
 	void setTagName(int tag, const QString& name);
 
-	/// Get tag name
+	// Get tag name
 	QString tagName(int tag) const;
 
-	/// Remove tag, note this function is time-consuming
+	// Remove tag, note this function is time-consuming
 	void removeTag(int tag);
 
-	/// Register action
+	// Register action
 	bool registeAction(QAction* act, int tag, const QString& key = QString(), bool enableEmit = true);
 
-	/// Unregister action
+	// Unregister action
 	void unregisteAction(QAction* act, bool enableEmit = true);
 
-	/// Filter actions by tag, returns a reference
+	// Filter actions by tag, returns a reference
 	QList< QAction* >& filter(int tag);
 
-	/// Get actions by tag
+	// Get actions by tag
 	QList< QAction* >& actions(int tag);
-	/// Get actions by tag (const version)
+	// Get actions by tag (const version)
 	const QList< QAction* > actions(int tag) const;
 
-	/// Get all tags
+	// Get all tags
 	QList< int > actionTags() const;
 
-	/// Get action by key
+	// Get action by key
 	QAction* action(const QString& key) const;
 
-	/// Get key by action
+	// Get key by action
 	QString key(QAction* act) const;
 
-	/// Get count of all managed actions
+	// Get count of all managed actions
 	int count() const;
 
-	/// Get all managed actions
+	// Get all managed actions
 	QList< QAction* > allActions() const;
 
-	/// Auto register actions from SARibbonBar, returns tag-to-category mapping
+	// Auto register actions from SARibbonBar, returns tag-to-category mapping
 	QMap< int, SARibbonCategory* > autoRegisteActions(SARibbonBar* bar);
 
-	/// Auto register widget actions
+	// Auto register widget actions
 	QSet< QAction* > autoRegisteWidgetActions(QWidget* w, int tag, bool enableEmit = false);
 
-	/// Search actions by text
+	// Search actions by text
 	QList< QAction* > search(const QString& text);
 
-	/// Clear all
+	// Clear all
 	void clear();
 
 Q_SIGNALS:
@@ -136,31 +136,31 @@ class SA_RIBBON_EXPORT SARibbonActionsManagerModel : public QAbstractListModel
 	Q_OBJECT
 	SA_RIBBON_DECLARE_PRIVATE(SARibbonActionsManagerModel)
 public:
-	/// Constructor
+	// Constructor
 	explicit SARibbonActionsManagerModel(QObject* p = nullptr);
-	/// Constructor with SARibbonActionsManager
+	// Constructor with SARibbonActionsManager
 	explicit SARibbonActionsManagerModel(SARibbonActionsManager* m, QObject* p = nullptr);
-	/// Destructor
+	// Destructor
 	~SARibbonActionsManagerModel();
-	/// Get row count
+	// Get row count
 	virtual int rowCount(const QModelIndex& parent) const override;
-	/// Get header data
+	// Get header data
 	virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
-	/// Get item flags
+	// Get item flags
 	virtual Qt::ItemFlags flags(const QModelIndex& index) const override;
-	/// Get data
+	// Get data
 	virtual QVariant data(const QModelIndex& index, int role) const override;
-	/// Set filter tag
+	// Set filter tag
 	void setFilter(int tag);
-	/// Update model
+	// Update model
 	void update();
-	/// Setup actions manager
+	// Setup actions manager
 	void setupActionsManager(SARibbonActionsManager* m);
-	/// Uninstall actions manager
+	// Uninstall actions manager
 	void uninstallActionsManager();
-	/// Get action from model index
+	// Get action from model index
 	QAction* indexToAction(QModelIndex index) const;
-	/// Search actions
+	// Search actions
 	void search(const QString& text);
 
 private Q_SLOTS:
