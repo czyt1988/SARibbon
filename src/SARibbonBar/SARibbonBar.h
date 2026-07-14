@@ -664,8 +664,8 @@ protected Q_SLOTS:
 
 private:
     int tabIndex(SARibbonCategory* obj);
-    void paintInLooseStyle();
-    void paintInCompactStyle();
+    void paintInLooseStyle(const QRect& paintRect);
+    void paintInCompactStyle(const QRect& paintRect);
 
     // 刷新所有ContextCategoryManagerData，这个在单独一个Category删除时调用
     void updateContextCategoryManagerData();

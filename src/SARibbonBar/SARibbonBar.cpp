@@ -106,11 +106,14 @@ public:
     bool mPendingShowPanelTitleChange { false };                 ///< 待刷新的 showPanelTitle 变更
     bool mPendingPanelLayoutModeChange { false };                ///< 待刷新的 panelLayoutMode 变更
     bool mPendingIconRightTextChange { false };                  ///< 待刷新的 iconRightText 变更
+    QTimer mRelayoutTimer;                                      ///< 延迟合并 relayout 请求的定时器
 public:
     PrivateData(SARibbonBar* par) : q_ptr(par)
     {
         mContextCategoryColorList = SARibbonBar::defaultContextCategoryColorList();
         mFpContextHighlight       = [](const QColor& c) -> QColor { return SA::makeColorVibrant(c); };
+        mRelayoutTimer.setSingleShot(true);
+        QObject::connect(&mRelayoutTimer, &QTimer::timeout, par, [this]() { this->relayout(); });
     }
     void init();
     // 创建QuickAccessBar
@@ -1796,7 +1799,8 @@ void SARibbonBar::setCategoryHeight(int h, bool resizeByNow)
 void SARibbonBar::onWindowTitleChanged(const QString& title)
 {
     Q_UNUSED(title);
-    update();
+    // 仅更新标题区域，避免全量重绘
+    update(getWindowTitleRect());
 }
 
 /**
@@ -3578,8 +3582,8 @@ bool SARibbonBar::eventFilter(QObject* obj, QEvent* e)
             if ((QEvent::UpdateLater == e->type()) || (QEvent::MouseButtonRelease == e->type())
                 || (QEvent::WindowActivate == e->type())
                 || (QEvent::WindowStateChange == e->type())) {
-                // 这个是多文档系统按钮的更新
-                d_ptr->relayout();
+                // 使用延迟定时器合并多次 relayout 请求，避免 MDI 场景下连续触发
+                d_ptr->mRelayoutTimer.start(0);
             }
         } else if (obj == d_ptr->mStackedContainerWidget) {
             // 在stack 是popup模式时，点击的是stackedContainerWidget区域外的时候，如果是在ribbonTabBar上点击
@@ -3703,7 +3707,7 @@ void SARibbonBar::updateCategoryTitleToTabName()
             tab->setTabText(i, category->categoryName());
         }
     }
-    repaint();
+    update();  ///< 使用 update() 而非 repaint()，让 Qt 合并重绘请求
 }
 
 /**
@@ -3807,11 +3811,12 @@ void SARibbonBar::setMainWindowStyles(SARibbonMainWindowStyles s)
 
 void SARibbonBar::paintEvent(QPaintEvent* e)
 {
-    Q_UNUSED(e);
+    // 裁剪绘制区域：仅重绘 QPaintEvent::rect() 指定的范围
+    const QRect paintRect = e->rect();
     if (isLooseStyle()) {
-        paintInLooseStyle();
+        paintInLooseStyle(paintRect);
     } else {
-        paintInCompactStyle();
+        paintInCompactStyle(paintRect);
     }
 #if SARIBBONBAR_DEBUG_PRINT
     QPainter p(this);
@@ -3830,18 +3835,26 @@ void SARibbonBar::paintEvent(QPaintEvent* e)
 #endif
 }
 
-void SARibbonBar::paintInLooseStyle()
+void SARibbonBar::paintInLooseStyle(const QRect& paintRect)
 {
     QPainter p(this);
 
     //! 1.绘制tabbar下的基线，这个函数仅仅对office2013主题有用，大部分主题都不绘制基线
-    paintTabbarBaseLine(p);
+    // 仅当重绘区域与 tabbar 底部线相交时才绘制
+    if (d_ptr->mRibbonTabBar) {
+        const int lineY          = d_ptr->mRibbonTabBar->geometry().bottom();
+        const QMargins border    = contentsMargins();
+        const QRect lineRegion(border.left(), lineY, width() - border.left() - border.right(), 1);
+        if (paintRect.intersects(lineRegion)) {
+            paintTabbarBaseLine(p);
+        }
+    }
 
     //! 2.显示上下文标签
     const QList< _SAContextCategoryManagerData >& contextCategoryDataList = d_ptr->mCurrentShowingContextCategory;
     for (const _SAContextCategoryManagerData& contextData : contextCategoryDataList) {
         QRect contextTitleRect = d_ptr->calcContextCategoryTitleRect(contextData);
-        if (!contextData.tabPageIndex.isEmpty()) {
+        if (!contextData.tabPageIndex.isEmpty() && paintRect.intersects(contextTitleRect)) {
             // 绘制
             paintContextCategoryTab(p,
                                     contextData.contextCategory->contextTitle(),
@@ -3854,24 +3867,35 @@ void SARibbonBar::paintInLooseStyle()
     if (d_ptr->isUseRibbonFrame()) {
         QWidget* parWindow = parentWidget();
         if (parWindow && isTitleVisible()) {
-            paintWindowTitle(p, toDisplayTitleText(parWindow->windowTitle()), getWindowTitleRect());
+            QRect titleRect = getWindowTitleRect();
+            if (paintRect.intersects(titleRect)) {
+                paintWindowTitle(p, toDisplayTitleText(parWindow->windowTitle()), titleRect);
+            }
         }
     }
 }
 
-void SARibbonBar::paintInCompactStyle()
+void SARibbonBar::paintInCompactStyle(const QRect& paintRect)
 {
     QPainter p(this);
 
     //! 1.绘制tabbar下的基线，这个函数仅仅对office2013主题有用，大部分主题都不绘制基线
-    paintTabbarBaseLine(p);
+    // 仅当重绘区域与 tabbar 底部线相交时才绘制
+    if (d_ptr->mRibbonTabBar) {
+        const int lineY          = d_ptr->mRibbonTabBar->geometry().bottom();
+        const QMargins border    = contentsMargins();
+        const QRect lineRegion(border.left(), lineY, width() - border.left() - border.right(), 1);
+        if (paintRect.intersects(lineRegion)) {
+            paintTabbarBaseLine(p);
+        }
+    }
 
     //! 显示上下文标签
 
     const QList< _SAContextCategoryManagerData >& contextCategoryDataList = d_ptr->mCurrentShowingContextCategory;
     for (const _SAContextCategoryManagerData& contextData : contextCategoryDataList) {
         QRect contextTitleRect = d_ptr->calcContextCategoryTitleRect(contextData);
-        if (!contextData.tabPageIndex.isEmpty()) {
+        if (!contextData.tabPageIndex.isEmpty() && paintRect.intersects(contextTitleRect)) {
             // 绘制
             paintContextCategoryTab(p,
                                     contextData.contextCategory->contextTitle(),
@@ -3884,7 +3908,10 @@ void SARibbonBar::paintInCompactStyle()
     if (d_ptr->isUseRibbonFrame()) {
         QWidget* parWindow = parentWidget();
         if (parWindow && isTitleVisible()) {
-            paintWindowTitle(p, toDisplayTitleText(parWindow->windowTitle()), getWindowTitleRect());
+            QRect titleRect = getWindowTitleRect();
+            if (paintRect.intersects(titleRect)) {
+                paintWindowTitle(p, toDisplayTitleText(parWindow->windowTitle()), titleRect);
+            }
         }
     }
 }
