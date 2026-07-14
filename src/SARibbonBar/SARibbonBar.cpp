@@ -101,6 +101,11 @@ public:
     bool mEnableTabDoubleClickToMinimumMode { true };            ///< 是否允许tab双击激活ribbon的最小化模式
     bool mEnableWordWrap { true };                               ///< 是否允许文字换行
     qreal buttonMaximumAspectRatio { 1.4 };                      ///< 按钮的最大宽高比
+    int mUpdateDepth { 0 };                                      ///< 批量更新嵌套深度，>0 时跳过遍历
+    bool mPendingWordWrapChange { false };                       ///< 待刷新的 wordWrap 变更
+    bool mPendingShowPanelTitleChange { false };                 ///< 待刷新的 showPanelTitle 变更
+    bool mPendingPanelLayoutModeChange { false };                ///< 待刷新的 panelLayoutMode 变更
+    bool mPendingIconRightTextChange { false };                  ///< 待刷新的 iconRightText 变更
 public:
     PrivateData(SARibbonBar* par) : q_ptr(par)
     {
@@ -2291,6 +2296,8 @@ void SARibbonBar::setRibbonStyle(SARibbonBar::RibbonStyles v)
              << "\n  isCompactStyle=" << isCompactStyle()    //
         ;
 #endif
+    // 批量更新：所有 setter 仅设值不遍历，endUpdate 执行单次遍历 + relayout
+    beginUpdate();
     // 执行判断——SingleRow需优先判断，因其不含ThreeRow/TwoRow位标记
     if (isSingleRowStyle(v)) {
         setEnableWordWrap(false);
@@ -2311,12 +2318,7 @@ void SARibbonBar::setRibbonStyle(SARibbonBar::RibbonStyles v)
         setPanelLayoutMode(SARibbonPanel::TwoRowMode);
         setEnableIconRightText(false);
     }
-
-    // 此函数会调用setFixedHeight
-    synchronousCategoryData(false);  // 这里不急着刷新，下面会继续刷新
-    if (SARibbonBarLayout* lay = qobject_cast< SARibbonBarLayout* >(layout())) {
-        lay->resetSize();
-    }
+    endUpdate();  // 此处执行单次遍历 + 单次 relayout
 
     Q_EMIT ribbonStyleChanged(d_ptr->mRibbonStyle);
 }
@@ -2335,6 +2337,98 @@ void SARibbonBar::setRibbonStyle(SARibbonBar::RibbonStyles v)
 SARibbonBar::RibbonStyles SARibbonBar::currentRibbonStyle() const
 {
     return (d_ptr->mRibbonStyle);
+}
+
+/**
+ * \if ENGLISH
+ * @brief Begin batch update mode
+ * @details When in batch update mode, property setters (setEnableWordWrap, setEnableShowPanelTitle,
+ *          setPanelLayoutMode, setEnableIconRightText) only update their stored values and defer
+ *          category iteration. The actual iteration happens once in endUpdate().
+ *          beginUpdate/endUpdate calls can be nested; only the outermost endUpdate triggers the flush.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 开始批量更新模式
+ * @details 在批量更新模式下，属性设置函数（setEnableWordWrap、setEnableShowPanelTitle、
+ *          setPanelLayoutMode、setEnableIconRightText）仅更新存储值，推迟 category 遍历。
+ *          实际遍历在 endUpdate() 中一次性完成。
+ *          beginUpdate/endUpdate 可嵌套调用，仅最外层的 endUpdate 触发刷新。
+ * \endif
+ */
+void SARibbonBar::beginUpdate()
+{
+    SA_D(d);
+    ++d->mUpdateDepth;
+}
+
+/**
+ * \if ENGLISH
+ * @brief End batch update mode and flush all pending changes
+ * @details Decrements the update depth counter. When the counter reaches zero (outermost endUpdate),
+ *          performs a single iterateCategory pass that applies all pending property changes at once,
+ *          then calls updateRibbonGeometry() for a single relayout + item geometry update.
+ *          This reduces N property changes from N*iterateCategory to 1*iterateCategory.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 结束批量更新模式并刷新所有待处理变更
+ * @details 递减更新深度计数器。当计数器归零时（最外层的 endUpdate），
+ *          执行一次 iterateCategory 遍历，一次性应用所有待处理的属性变更，
+ *          然后调用 updateRibbonGeometry() 进行单次 relayout 和 item geometry 更新。
+ *          这将 N 次属性变更的 N*iterateCategory 减少为 1*iterateCategory。
+ * \endif
+ */
+void SARibbonBar::endUpdate()
+{
+    SA_D(d);
+    if (d->mUpdateDepth == 0) {
+        return;
+    }
+    if (--d->mUpdateDepth > 0) {
+        return;
+    }
+    // Only flush when the outermost endUpdate is reached
+    const bool hasWordWrap        = d->mPendingWordWrapChange;
+    const bool hasShowPanelTitle  = d->mPendingShowPanelTitleChange;
+    const bool hasPanelLayoutMode = d->mPendingPanelLayoutModeChange;
+    const bool hasIconRightText   = d->mPendingIconRightTextChange;
+
+    // Reset pending flags unconditionally
+    d->mPendingWordWrapChange        = false;
+    d->mPendingShowPanelTitleChange  = false;
+    d->mPendingPanelLayoutModeChange = false;
+    d->mPendingIconRightTextChange   = false;
+
+    // Single iteration applying all pending property changes
+    if (hasWordWrap || hasShowPanelTitle || hasPanelLayoutMode || hasIconRightText) {
+        iterateCategory([ this, hasWordWrap, hasShowPanelTitle, hasPanelLayoutMode, hasIconRightText ](
+                            SARibbonCategory* c) -> bool {
+            if (hasWordWrap) {
+                c->setEnableWordWrap(isEnableWordWrap());
+            }
+            if (hasShowPanelTitle) {
+                c->setEnableShowPanelTitle(isEnableShowPanelTitle());
+            }
+            if (hasPanelLayoutMode) {
+                c->setPanelLayoutMode(panelLayoutMode());
+            }
+            if (hasIconRightText) {
+                c->setEnableIconRightText(isEnableIconRightText());
+            }
+            return true;
+        });
+    }
+
+    // Single relayout + item geometry update
+    if (SARibbonBarLayout* lay = qobject_cast< SARibbonBarLayout* >(layout())) {
+        lay->resetSize();
+    }
+    iterateCategory([](SARibbonCategory* c) -> bool {
+        c->updateItemGeometry();
+        return true;
+    });
+    updateGeometry();
 }
 
 /**
@@ -2588,7 +2682,15 @@ SARibbonPanel::PanelLayoutMode SARibbonBar::panelLayoutMode() const
  */
 void SARibbonBar::setPanelLayoutMode(SARibbonPanel::PanelLayoutMode m)
 {
-    d_ptr->mDefaultPanelLayoutMode = m;
+    SA_D(d);
+    if (d->mDefaultPanelLayoutMode == m) {
+        return;
+    }
+    d->mDefaultPanelLayoutMode = m;
+    if (d->mUpdateDepth > 0) {
+        d->mPendingPanelLayoutModeChange = true;
+        return;
+    }
     // 设置布局时，让布局重新计算高度
     if (SARibbonBarLayout* lay = qobject_cast< SARibbonBarLayout* >(layout())) {
         lay->resetSize();
@@ -2683,7 +2785,15 @@ Qt::Alignment SARibbonBar::windowTitleAlignment() const
  */
 void SARibbonBar::setEnableWordWrap(bool on)
 {
-    d_ptr->mEnableWordWrap = on;
+    SA_D(d);
+    if (d->mEnableWordWrap == on) {
+        return;
+    }
+    d->mEnableWordWrap = on;
+    if (d->mUpdateDepth > 0) {
+        d->mPendingWordWrapChange = true;
+        return;
+    }
     iterateCategory([ on ](SARibbonCategory* category) -> bool {
         if (category) {
             category->setEnableWordWrap(on);
@@ -2833,7 +2943,15 @@ return d_ptr->mEnableShowPanelTitle;
  */
 void SARibbonBar::setEnableShowPanelTitle(bool on)
 {
-    d_ptr->mEnableShowPanelTitle = on;
+    SA_D(d);
+    if (d->mEnableShowPanelTitle == on) {
+        return;
+    }
+    d->mEnableShowPanelTitle = on;
+    if (d->mUpdateDepth > 0) {
+        d->mPendingShowPanelTitleChange = true;
+        return;
+    }
     iterateCategory([ on ](SARibbonCategory* c) -> bool {
         c->setEnableShowPanelTitle(on);
         return true;
@@ -2864,6 +2982,10 @@ void SARibbonBar::setEnableIconRightText(bool on)
         return;
     }
     d->mEnableIconRightText = on;
+    if (d->mUpdateDepth > 0) {
+        d->mPendingIconRightTextChange = true;
+        return;
+    }
     iterateCategory([on](SARibbonCategory* cat) {
         cat->setEnableIconRightText(on);
         return true;

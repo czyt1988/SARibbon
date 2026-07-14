@@ -352,7 +352,11 @@ SARibbonPanel::PanelLayoutMode SARibbonCategory::panelLayoutMode() const
  */
 void SARibbonCategory::setPanelLayoutMode(SARibbonPanel::PanelLayoutMode m)
 {
-    d_ptr->defaultPanelLayoutMode = m;
+    SA_D(d);
+    if (d->defaultPanelLayoutMode == m) {
+        return;
+    }
+    d->defaultPanelLayoutMode = m;
     iteratePanel([ m ](SARibbonPanel* p) -> bool {
         p->setPanelLayoutMode(m);
         return true;
@@ -831,7 +835,11 @@ bool SARibbonCategory::isEnableShowPanelTitle() const
  */
 void SARibbonCategory::setEnableShowPanelTitle(bool on)
 {
-    d_ptr->enableShowPanelTitle = on;
+    SA_D(d);
+    if (d->enableShowPanelTitle == on) {
+        return;
+    }
+    d->enableShowPanelTitle = on;
     iteratePanel([ on ](SARibbonPanel* p) -> bool {
         p->setEnableShowTitle(on);
         return true;
@@ -1013,7 +1021,11 @@ bool SARibbonCategory::isEnableWordWrap() const
  */
 void SARibbonCategory::setEnableWordWrap(bool on)
 {
-    d_ptr->enableWordWrap = on;
+    SA_D(d);
+    if (d->enableWordWrap == on) {
+        return;
+    }
+    d->enableWordWrap = on;
     iteratePanel([ on ](SARibbonPanel* panel) -> bool {
         if (panel) {
             panel->setEnableWordWrap(on);

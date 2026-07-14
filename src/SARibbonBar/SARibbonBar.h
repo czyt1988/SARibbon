@@ -398,6 +398,11 @@ public:
     // Get current ribbon style
     RibbonStyles currentRibbonStyle() const;
 
+    // Begin batch update - defer category iteration until endUpdate
+    void beginUpdate();
+    // End batch update - flush all pending changes with a single category iteration
+    void endUpdate();
+
     // Set current ribbon index
     void setCurrentIndex(int index);
 
