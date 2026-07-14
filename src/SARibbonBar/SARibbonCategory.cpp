@@ -122,6 +122,7 @@ void SARibbonCategory::PrivateData::insertPanel(int index, SARibbonPanel* panel)
     panel->setToolButtonIconSize(this->panelSmallToolButtonIconSize, this->panelLargeToolButtonIconSize);
     panel->setEnableWordWrap(this->enableWordWrap);
     panel->setEnableIconRightText(this->enableIconRightText);
+    panel->setButtonMaximumAspectRatio(this->buttonMaximumAspectRatio);
 
     index = qMax(0, index);
     index = qMin(lay->panelCount(), index);
@@ -138,6 +139,7 @@ bool SARibbonCategory::PrivateData::takePanel(SARibbonPanel* panel)
     if (nullptr == lay) {
         return false;
     }
+    QObject::disconnect(panel, &SARibbonPanel::actionTriggered, ribbonCategory(), &SARibbonCategory::actionTriggered);
     bool res = lay->takePanel(panel);
     q_ptr->updateGeometry();  // 通知父布局这个控件的尺寸提示(sizeHint())可能已改变
     return res;
@@ -576,6 +578,9 @@ int SARibbonCategory::panelIndex(SARibbonPanel* p) const
  */
 void SARibbonCategory::movePanel(int from, int to)
 {
+    if (from < 0 || from >= panelCount()) {
+        return;
+    }
     if (from == to) {
         return;
     }
@@ -1356,6 +1361,9 @@ QPair< QSize, QSize > SARibbonCategory::panelToolButtonIconSize() const
 void SARibbonCategory::wheelEvent(QWheelEvent* event)
 {
     d_ptr->doWheelEvent(event);
+    if (event->isAccepted()) {
+        return;
+    }
     QWidget::wheelEvent(event);
 }
 
