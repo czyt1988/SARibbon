@@ -127,7 +127,9 @@ void SARibbonGalleryGroupItemDelegate::paintIconOnly(QPainter* painter,
     QRect iconRect = option.rect;
 
     iconRect.adjust(sp, sp, -sp, -sp);
-    QIcon ico = qvariant_cast< QIcon >(index.data(Qt::DecorationRole));
+    // Bypass QVariant conversion: directly access the item via internalPointer
+    SARibbonGalleryItem* item = static_cast< SARibbonGalleryItem* >(index.internalPointer());
+    QIcon ico                 = item ? item->icon() : QIcon();
 
     ico.paint(painter, iconRect, Qt::AlignCenter, QIcon::Normal, QIcon::On);
     painter->restore();

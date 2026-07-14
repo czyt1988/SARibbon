@@ -323,10 +323,32 @@ bool SARibbonGalleryViewport::eventFilter(QObject* o, QEvent* e)
     return QScrollArea::eventFilter(o, e);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Handle show events for the gallery viewport
+ * @param e Show event
+ * @details Installs an application-wide event filter to capture outside clicks,
+ *          and recalculates grid sizes for all gallery groups to ensure correct
+ *          sizing when the popup becomes visible.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 处理图库视口的显示事件
+ * @param e 显示事件
+ * @details 安装应用级事件过滤器以捕获外部点击，
+ *          并重新计算所有图库组的grid尺寸，确保弹窗显示时尺寸正确。
+ * \endif
+ */
 void SARibbonGalleryViewport::showEvent(QShowEvent* e)
 {
     QScrollArea::showEvent(e);
     qApp->installEventFilter(this);  // 监听整个应用的所有事件
+    // 弹窗显示时重新计算所有group的grid尺寸，确保尺寸正确
+    const int h                           = galleryHeight();
+    const QList< SARibbonGalleryGroup* > groups = galleryGroupList();
+    for (SARibbonGalleryGroup* group : groups) {
+        group->recalcGridSize(h);
+    }
 }
 
 void SARibbonGalleryViewport::hideEvent(QHideEvent* e)
@@ -803,8 +825,9 @@ void SARibbonGallery::resizeEvent(QResizeEvent* event)
         h = d_ptr->mCurrentViewportGroup->height();
         d_ptr->mCurrentViewportGroup->recalcGridSize();
     }
-    // 尺寸变化后必须重新计算gridsize
-    if (d_ptr->mPopupWidget) {
+    // 尺寸变化后必须重新计算gridsize，但仅在弹窗可见时才执行
+    // 弹窗一旦创建就持久存在，关闭后仍会触发冗余重算
+    if (d_ptr->mPopupWidget && d_ptr->mPopupWidget->isVisible()) {
         const QList< SARibbonGalleryGroup* > groups = d_ptr->mPopupWidget->galleryGroupList();
         for (SARibbonGalleryGroup* group : groups) {
             group->recalcGridSize(h);
