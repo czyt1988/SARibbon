@@ -380,6 +380,9 @@ Qt::Orientations SARibbonPanelLayout::expandingDirections() const
  */
 QSize SARibbonPanelLayout::minimumSize() const
 {
+    if (mDirty) {
+        const_cast< SARibbonPanelLayout* >(this)->updateGeomArray();
+    }
     return (mSizeHint);
 }
 
@@ -396,9 +399,12 @@ QSize SARibbonPanelLayout::minimumSize() const
  */
 QSize SARibbonPanelLayout::sizeHint() const
 {
+    if (mDirty) {
+        const_cast< SARibbonPanelLayout* >(this)->updateGeomArray();
+    }
 #if SARibbonPanelLayout_DEBUG_PRINT
     if (SARibbonPanel* panel = ribbonPanel()) {
-        qDebug() << "| |-SARibbonPanelLayout sizeHint,sizeHint = " << m_sizeHint;
+        qDebug() << "| |-SARibbonPanelLayout sizeHint,sizeHint = " << mSizeHint;
     }
 #endif
     return (mSizeHint);
@@ -580,26 +586,28 @@ void SARibbonPanelLayout::doLayout()
     if (!par) {
         return;
     }
-    QList< QWidget* > showWidgets, hideWidgets;
+    // 复用预分配容器，避免每次 doLayout 分配新 QList
+    mShowWidgets.clear();
+    mHideWidgets.clear();
     for (SARibbonPanelItem* item : sa_as_const(mItems)) {
         if (item->isEmpty()) {
-            hideWidgets << item->widget();
+            mHideWidgets << item->widget();
         } else {
             // 在category发现item->setGeometry有点奇怪的现象，这里统一使用item->widget->setgeo
             // item->setGeometry(item->itemWillSetGeometry);
             if (item->widget()) {
                 item->widget()->setGeometry(item->itemWillSetGeometry);
             }
-            showWidgets << item->widget();
+            mShowWidgets << item->widget();
         }
     }
 
     // 不在上面那里进行show和hide因为这会触发SARibbonPanelLayout的重绘，导致循环绘制，非常影响效率
-    for (QWidget* w : sa_as_const(showWidgets)) {
+    for (QWidget* w : sa_as_const(mShowWidgets)) {
         if (!w->isVisible())
             w->show();
     }
-    for (QWidget* w : sa_as_const(hideWidgets)) {
+    for (QWidget* w : sa_as_const(mHideWidgets)) {
         if (w->isVisible())
             w->hide();
     }
@@ -1092,9 +1100,10 @@ void SARibbonPanelLayout::updateGeomArray(const QRect& setrect)
     // 刷新sizeHint
     int heightHint  = SARibbonPanel::panelHeightHint(panel->fontMetrics(), panel->panelLayoutMode(), titleH);
     this->mSizeHint = QSize(totalWidth, heightHint);
+    mDirty = false;
 #if SARibbonPanelLayout_DEBUG_PRINT
     qDebug() << "| |-SARibbonPanelLayout updateGeomArray(" << setrect << "),panel name = " << panel->panelName()
-             << "\n| | |-size hint =" << this->m_sizeHint  //
+             << "\n| | |-size hint =" << this->mSizeHint  //
              << "\n| | |-totalWidth=" << totalWidth        //
              << "\n| | |-last x=" << x                     //
              << "\n| | |-columMaxWidth=" << columMaxWidth  //
@@ -1111,11 +1120,16 @@ void SARibbonPanelLayout::updateGeomArray(const QRect& setrect)
  * \if ENGLISH
  * @brief Recalculates the expand geometry array
  * @param setrect The rectangle to recalculate
+ * @details This optimized version collects column width info and expand items in a single pass,
+ *          eliminating the O(m*n) columnWidthInfo() calls. Uses a flag on items instead of
+ *          QList::contains() for O(1) membership check.
  * \endif
  *
  * \if CHINESE
  * @brief 重新计算扩展几何数组
  * @param setrect 要重新计算的矩形
+ * @details 优化版本：单次遍历同时收集列宽信息和可扩展item，消除 O(m*n) 的 columnWidthInfo() 调用。
+ *          使用 item 上的标志位替代 QList::contains() 实现 O(1) 成员判断。
  * \endif
  */
 void SARibbonPanelLayout::recalcExpandGeomArray(const QRect& setrect)
@@ -1135,48 +1149,64 @@ void SARibbonPanelLayout::recalcExpandGeomArray(const QRect& setrect)
         int columnExpandedWidth = 0;   ///< 扩展后列的宽度
         QList< SARibbonPanelItem* > expandItems;
     };
-    // 此变量用于记录可以水平扩展的列和控件，在布局结束后，如果还有空间，就把水平扩展的控件进行扩展
+
+    // Step 1: 单次遍历同时收集列宽信息和可扩展item
+    // 原代码先收集可扩展item，再对每个可扩展列调用 columnWidthInfo() 全量遍历
+    // 优化后合并为一次遍历，消除 O(m*n) 嵌套遍历
     QMap< int, _columnExpandInfo > columnExpandInfo;
 
     for (SARibbonPanelItem* item : sa_as_const(mItems)) {
-        if ((!item->isEmpty()) && item->expandingDirections() & Qt::Horizontal) {
-            // 只获取可见的
-            QMap< int, _columnExpandInfo >::iterator i = columnExpandInfo.find(item->columnIndex);
-            if (i == columnExpandInfo.end()) {
-                i = columnExpandInfo.insert(item->columnIndex, _columnExpandInfo());
-            }
-            i.value().expandItems.append(item);
+        if (item->isEmpty()) {
+            continue;
+        }
+        QMap< int, _columnExpandInfo >::iterator ci = columnExpandInfo.find(item->columnIndex);
+        if (ci == columnExpandInfo.end()) {
+            ci = columnExpandInfo.insert(item->columnIndex, _columnExpandInfo());
+        }
+        // 收集列宽信息（替代 columnWidthInfo() 调用）
+        ci.value().oldColumnWidth     = qMax(ci.value().oldColumnWidth, item->itemWillSetGeometry.width());
+        ci.value().columnMaximumWidth = qMax(ci.value().columnMaximumWidth, item->widget()->maximumWidth());
+        // 收集可扩展item并设置标志位
+        if (item->expandingDirections() & Qt::Horizontal) {
+            ci.value().expandItems.append(item);
+            item->isExpandItem = true;
         }
     }
-    if (columnExpandInfo.size() <= 0) {
+
+    // 移除无可扩展item的列，并验证列宽有效性
+    for (QMap< int, _columnExpandInfo >::iterator i = columnExpandInfo.begin(); i != columnExpandInfo.end();) {
+        if (i.value().expandItems.isEmpty()) {
+            i = columnExpandInfo.erase(i);
+        } else if ((i.value().oldColumnWidth <= 0) || (i.value().oldColumnWidth > i.value().columnMaximumWidth)) {
+            // 重置无效列中item的标志位
+            for (SARibbonPanelItem* item : sa_as_const(i.value().expandItems)) {
+                item->isExpandItem = false;
+            }
+            i = columnExpandInfo.erase(i);
+        } else {
+            ++i;
+        }
+    }
+
+    if (columnExpandInfo.isEmpty()) {
         // 没有需要扩展的就退出
         return;
     }
-    // 获取完可扩展的列和控件后，计算对应的列的尺寸
-    // 计算能扩展的尺寸
+
+    // Step 2: 计算扩展后的列宽（直接使用预收集的列宽信息，无需调用 columnWidthInfo()）
     int oneColCanexpandWidth = expandwidth / columnExpandInfo.size();
 
-    for (QMap< int, _columnExpandInfo >::iterator i = columnExpandInfo.begin(); i != columnExpandInfo.end();) {
-        int& oldColumnWidth     = i.value().oldColumnWidth;
-        int& columnMaximumWidth = i.value().columnMaximumWidth;
-        this->columnWidthInfo(i.key(), oldColumnWidth, columnMaximumWidth);
-        if ((oldColumnWidth <= 0) || (oldColumnWidth > columnMaximumWidth)) {
-            // 如果小于0说明没有这个列，这种属于异常，删除继续
-            //  oldColumnWidth > columnMaximumWidth也是异常
-            i = columnExpandInfo.erase(i);
-            continue;
-        }
-        // 开始调整
-        int colwidth = oneColCanexpandWidth + oldColumnWidth;  // 先扩展了
-        if (colwidth >= columnMaximumWidth) {
+    for (QMap< int, _columnExpandInfo >::iterator i = columnExpandInfo.begin(); i != columnExpandInfo.end(); ++i) {
+        int colwidth = oneColCanexpandWidth + i.value().oldColumnWidth;  // 先扩展了
+        if (colwidth >= i.value().columnMaximumWidth) {
             // 过最大宽度要求
-            i.value().columnExpandedWidth = columnMaximumWidth;
+            i.value().columnExpandedWidth = i.value().columnMaximumWidth;
         } else {
             i.value().columnExpandedWidth = colwidth;
         }
-        ++i;
     }
-    // 从新调整尺寸
+
+    // Step 3: 重新调整尺寸（使用标志位替代 contains() 调用，O(1) 判断）
     // 由于会涉及其他列的变更，因此需要所有都遍历一下
     for (auto i = columnExpandInfo.begin(); i != columnExpandInfo.end(); ++i) {
         int moveXLen = i.value().columnExpandedWidth - i.value().oldColumnWidth;
@@ -1186,10 +1216,10 @@ void SARibbonPanelLayout::recalcExpandGeomArray(const QRect& setrect)
                 continue;
             }
             if (item->columnIndex == i.key()) {
-                // 此列的扩展
-                if (i.value().expandItems.contains(item)) {
-                    // 此列需要扩展的item才扩展尺寸
+                // 此列的扩展：使用标志位判断（替代 contains()）
+                if (item->isExpandItem) {
                     item->itemWillSetGeometry.setWidth(i.value().columnExpandedWidth);
+                    item->isExpandItem = false;  // 重置标志位
                 } else {
                     // 此列不扩展的模块保持原来的尺寸
                     continue;
