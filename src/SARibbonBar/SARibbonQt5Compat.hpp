@@ -140,5 +140,5 @@ inline int wheelEventDelta(QWheelEvent* e)
 #endif
 }
 }  // namespace   compat
-}  // namespace   qwt
+}  // namespace   SA
 #endif  // SARIBBONQT5COMPAT_HPP

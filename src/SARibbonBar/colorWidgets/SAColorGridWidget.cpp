@@ -337,7 +337,7 @@ void SAColorGridWidget::PrivateData::setColorAt(const QColor& clr, int r, int c)
         tl->setColor(clr);
         tl->setCheckable(mColorCheckable);
         tl->setAutoRaise(true);
-        mButtonGroup->addButton(tl, r + c);
+        mButtonGroup->addButton(tl, r * mColumnCount + c);
         mGridLayout->addWidget(tl, r, c);
     }
 }

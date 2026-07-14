@@ -417,7 +417,7 @@ QString replaceQssTokens(const QString& templateQss, const SARibbonThemePalette&
                     bool  ok;
                     float opacity = opacityStr.toFloat(&ok);
                     if (ok) {
-                        int alpha       = qRound(opacity * 255);
+                        int alpha       = qBound(0, qRound(opacity * 255), 255);
                         replacement = QString("#%1%2").arg(alpha, 2, 16, QChar('0')).arg(color.name().mid(1));
                     } else {
                         replacement = color.name();

@@ -159,10 +159,11 @@ SARibbonMainWindow::SARibbonMainWindow(QWidget* parent, SARibbonMainWindowStyles
             && d->mCurrentRibbonTheme == SARibbonTheme::RibbonThemeOffice2021Blue) {
             d->mCurrentRibbonTheme = SARibbonTheme::RibbonThemeDark;
         }
-        QTimer::singleShot(0, this, [this]() {
+        SARibbonTheme themeAtConstruction = d->mCurrentRibbonTheme;
+        QTimer::singleShot(0, this, [this, themeAtConstruction]() {
             SA_D(d);
             SARibbonTheme t = ribbonTheme();
-            if (d->mCurrentRibbonTheme == t) {
+            if (d->mCurrentRibbonTheme == themeAtConstruction) {
                 SA::applyRibbonTheme(this, ribbonBar(), t);
             } else {
                 setRibbonTheme(t);

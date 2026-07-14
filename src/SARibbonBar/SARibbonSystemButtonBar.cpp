@@ -43,6 +43,7 @@ public:
 
         if (on) {
             if (buttonMinimize) {
+                buttonMinimize->hide();
                 buttonMinimize->deleteLater();
                 buttonMinimize = nullptr;
             }
@@ -53,6 +54,7 @@ public:
             par->connect(buttonMinimize, &QAbstractButton::clicked, par, &SARibbonSystemButtonBar::minimizeWindow);
         } else {
             if (buttonMinimize) {
+                buttonMinimize->hide();
                 buttonMinimize->deleteLater();
                 buttonMinimize = nullptr;
             }
@@ -66,6 +68,7 @@ public:
 
         if (on) {
             if (buttonMaximize) {
+                buttonMaximize->hide();
                 buttonMaximize->deleteLater();
                 buttonMaximize = nullptr;
             }
@@ -78,8 +81,8 @@ public:
             par->connect(buttonMaximize, &QAbstractButton::clicked, par, &SARibbonSystemButtonBar::maximizeWindow);
         } else {
             if (buttonMaximize) {
+                buttonMaximize->hide();
                 buttonMaximize->deleteLater();
-                ;
                 buttonMaximize = nullptr;
             }
         }
@@ -92,6 +95,7 @@ public:
 
         if (on) {
             if (buttonClose) {
+                buttonClose->hide();
                 buttonClose->deleteLater();
                 buttonClose = nullptr;
             }
@@ -104,8 +108,8 @@ public:
             buttonClose->show();
         } else {
             if (buttonClose) {
+                buttonClose->hide();
                 buttonClose->deleteLater();
-                ;
                 buttonClose = nullptr;
             }
         }
@@ -180,18 +184,27 @@ public:
     int closeButtonWidthHint() const
     {
         qreal t = mCloseStretch + mMaxStretch + mMinStretch;
+        if (qFuzzyIsNull(t)) {
+            return mWindowButtonWidth;
+        }
         return (mCloseStretch * (3 * mWindowButtonWidth)) / t;
     }
 
     int maxButtonWidthHint() const
     {
         qreal t = mCloseStretch + mMaxStretch + mMinStretch;
+        if (qFuzzyIsNull(t)) {
+            return mWindowButtonWidth;
+        }
         return (mMaxStretch * (3 * mWindowButtonWidth)) / t;
     }
 
     int minButtonWidthHint() const
     {
         qreal t = mCloseStretch + mMaxStretch + mMinStretch;
+        if (qFuzzyIsNull(t)) {
+            return mWindowButtonWidth;
+        }
         return (mMinStretch * (3 * mWindowButtonWidth)) / t;
     }
 
