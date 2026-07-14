@@ -48,7 +48,7 @@ public:
      */
     bool isAnimationRunning() const
     {
-        return (isAnimating || animation->state() == QAbstractAnimation::Running);
+        return (isAnimating || (animation && animation->state() == QAbstractAnimation::Running));
     }
 };
 
@@ -137,6 +137,10 @@ void SARibbonStackedWidget::setAnimationWidgetHeight(int h)
 
     if (d_ptr->isAnimationRunning() && isPopupMode()) {
         // 更新窗口大小和位置
+        // setFixedSize 内部会调用 setMinimumSize 和 setMaximumSize，如果当前的最大/最小高度限制
+        // 与目标高度冲突，会触发 Qt6 的断言检查，因此先重置限制
+        if (maximumHeight() < h) setMaximumHeight(QWIDGETSIZE_MAX);
+        if (minimumHeight() > h) setMinimumHeight(0);
         setFixedSize(d_ptr->normalGeometry.width(), h);
 #if SARIBBONSTACKEDWIDGET_DEBUG_PRINT
         qDebug() << "setAnimationWidgetHeight setFixedSize=" << d_ptr->normalGeometry.width() << "," << h;

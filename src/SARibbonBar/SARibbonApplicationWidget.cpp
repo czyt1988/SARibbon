@@ -23,8 +23,8 @@
 SARibbonApplicationWidget::SARibbonApplicationWidget(SARibbonMainWindow* parent) : QFrame(parent)
 {
     setWindowFlags(windowFlags() | Qt::FramelessWindowHint);  // 去除边框
-    parent->installEventFilter(this);
     if (parent) {
+        parent->installEventFilter(this);
         setGeometry(0, 0, parent->width(), parent->height());
     } else {
         setGeometry(0, 0, 300, 300);
@@ -123,7 +123,8 @@ void SARibbonApplicationWidget::keyPressEvent(QKeyEvent* ev)
             hide();
             qDebug() << "Key_Escape";
             ev->accept();
+            return;
         }
     }
-    return QFrame::keyPressEvent(ev);
+    QFrame::keyPressEvent(ev);
 }
