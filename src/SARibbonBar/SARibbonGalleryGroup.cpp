@@ -444,9 +444,38 @@ SARibbonGalleryItem* SARibbonGalleryGroupModel::take(int row)
  */
 void SARibbonGalleryGroupModel::append(SARibbonGalleryItem* item)
 {
-    beginInsertRows(QModelIndex(), mItems.count(), mItems.count());
-
+    int row = mItems.count();
+    beginInsertRows(QModelIndex(), row, row);
     mItems.append(item);
+    endInsertRows();
+}
+
+/**
+ * \if ENGLISH
+ * @brief Append a list of items in a single batch
+ * @details Uses a single beginInsertRows/endInsertRows pair for the entire range,
+ *          reducing N signal emissions to 1.
+ * @param items List of SARibbonGalleryItem pointers (memory managed by this model)
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 批量添加条目
+ * @details 使用单次beginInsertRows/endInsertRows覆盖整个范围，
+ *          将N次信号发射降为1次，避免逐项触发布局重算。
+ * @param items SARibbonGalleryItem指针列表，内存由本model管理
+ * \endif
+ */
+void SARibbonGalleryGroupModel::appendList(const QList< SARibbonGalleryItem* >& items)
+{
+    if (items.isEmpty()) {
+        return;
+    }
+    int first = mItems.count();
+    int last  = first + items.size() - 1;
+    beginInsertRows(QModelIndex(), first, last);
+    for (SARibbonGalleryItem* item : items) {
+        mItems.append(item);
+    }
     endInsertRows();
 }
 
@@ -743,9 +772,13 @@ void SARibbonGalleryGroup::addActionItemList(const QList< QAction* >& acts)
     for (QAction* a : acts) {
         d_ptr->mActionGroup->addAction(a);
     }
+    // 批量创建GalleryItem，使用appendList一次性插入，避免逐项触发rowsInserted信号
+    QList< SARibbonGalleryItem* > items;
+    items.reserve(acts.size());
     for (int i = 0; i < acts.size(); ++i) {
-        model->append(new SARibbonGalleryItem(acts[ i ]));
+        items.append(new SARibbonGalleryItem(acts[ i ]));
     }
+    model->appendList(items);
 }
 
 /**

@@ -76,6 +76,8 @@ public:
     SARibbonGalleryItem* take(int row);
     // Append item
     void append(SARibbonGalleryItem* item);
+    // Append a list of items in a single batch
+    void appendList(const QList< SARibbonGalleryItem* >& items);
     // Remove item by action object name
     bool remove(const QString& act_object_name);
     // Get item count
