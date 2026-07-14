@@ -92,9 +92,50 @@ QDebug operator<<(QDebug debug, const QStyleOptionToolButton& opt)
 // SARibbonToolButtonProxyStyle
 //===================================================
 
+/**
+ * \if ENGLISH
+ * @brief Custom proxy style that draws arrow indicators directly on the target painter
+ * @details This class overrides drawPrimitive to draw arrow indicators (up/down/left/right)
+ *          directly on the passed QPainter, eliminating the intermediate QImage allocation,
+ *          QPainter creation, and QPixmap::fromImage conversion that the original implementation
+ *          performed on every paint call. Qt's painter automatically handles device pixel ratio
+ *          scaling, so no manual DPR handling is needed.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 自定义代理样式，直接在目标 QPainter 上绘制箭头指示器
+ * @details 此类重写 drawPrimitive，将箭头指示器（上/下/左/右）直接绘制在传入的 QPainter 上，
+ *          省去了原实现中每次绘制都进行的 QImage 分配、QPainter 创建和 QPixmap::fromImage 转换。
+ *          Qt 的 painter 会自动处理设备像素比缩放，无需手动处理 DPR。
+ * \endif
+ */
 class SARibbonToolButtonProxyStyle : public QProxyStyle
 {
 public:
+    /**
+     * \if ENGLISH
+     * @brief Draw primitive elements with optimized arrow indicator rendering
+     * @details For arrow indicators (PE_IndicatorArrowUp/Down/Left/Right), the polygon is drawn
+     *          directly on the target painter \a p using logical coordinates. Pen width (1.4) is
+     *          in logical pixels, producing slightly thicker lines on high-DPI displays for better
+     *          visibility. For all other primitive elements, the base QProxyStyle is used.
+     * @param pe The primitive element to draw
+     * @param opt Style option containing rect, state, and palette
+     * @param p Target painter (operates in logical coordinates)
+     * @param widget The widget being painted
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 绘制基本元素，优化了箭头指示器的渲染
+     * @details 对于箭头指示器（PE_IndicatorArrowUp/Down/Left/Right），直接在目标 painter \a p 上
+     *          使用逻辑坐标绘制多边形。画笔宽度（1.4）以逻辑像素为单位，在高 DPI 屏幕上线条
+     *          略粗以提升可见性。对于其他基本元素，使用基类 QProxyStyle 的实现。
+     * @param pe 要绘制的基本元素
+     * @param opt 包含矩形、状态和调色板的样式选项
+     * @param p 目标 painter（以逻辑坐标工作）
+     * @param widget 正在绘制的控件
+     * \endif
+     */
     void drawPrimitive(PrimitiveElement pe, const QStyleOption* opt, QPainter* p, const QWidget* widget = nullptr) const override
     {
         if (pe == PE_IndicatorArrowUp || pe == PE_IndicatorArrowDown || pe == PE_IndicatorArrowRight
@@ -103,15 +144,10 @@ public:
                 return;
             }
 
-            QRect r  = opt->rect;
-            int size = qMin(r.height(), r.width());
-            QPixmap pixmap;
-            qreal pixelRatio = p->device()->devicePixelRatio();
-            int border       = qRound(pixelRatio * (size / 4));
-            int sqsize       = qRound(pixelRatio * (2 * (size / 2)));
-            QImage image(sqsize, sqsize, QImage::Format_ARGB32_Premultiplied);
-            image.fill(Qt::transparent);
-            QPainter imagePainter(&image);
+            QRect r    = opt->rect;
+            int size   = qMin(r.height(), r.width());
+            int border = size / 4;
+            int sqsize = 2 * (size / 2);
 
             QPolygon a;
             switch (pe) {
@@ -142,26 +178,25 @@ public:
             QRect bounds = a.boundingRect();
             int sx       = sqsize / 2 - bounds.center().x() - 1;
             int sy       = sqsize / 2 - bounds.center().y() - 1;
-            imagePainter.translate(sx + bsx, sy + bsy);
-            imagePainter.setPen(QPen(opt->palette.buttonText().color(), 1.4));
-            imagePainter.setBrush(Qt::NoBrush);
-
-            if (!(opt->state & State_Enabled)) {
-                imagePainter.translate(1, 1);
-                imagePainter.setPen(QPen(opt->palette.light().color(), 1.4));
-                imagePainter.drawPolyline(a);
-                imagePainter.translate(-1, -1);
-                imagePainter.setPen(QPen(opt->palette.mid().color(), 1.4));
-            }
-
-            imagePainter.drawPolyline(a);
-            imagePainter.end();
-            pixmap = QPixmap::fromImage(image);
-            pixmap.setDevicePixelRatio(pixelRatio);
 
             int xOffset = r.x() + (r.width() - size) / 2;
             int yOffset = r.y() + (r.height() - size) / 2;
-            p->drawPixmap(xOffset, yOffset, pixmap);
+
+            p->save();
+            p->translate(xOffset + sx + bsx, yOffset + sy + bsy);
+            p->setPen(QPen(opt->palette.buttonText().color(), 1.4));
+            p->setBrush(Qt::NoBrush);
+
+            if (!(opt->state & State_Enabled)) {
+                p->translate(1, 1);
+                p->setPen(QPen(opt->palette.light().color(), 1.4));
+                p->drawPolyline(a);
+                p->translate(-1, -1);
+                p->setPen(QPen(opt->palette.mid().color(), 1.4));
+            }
+
+            p->drawPolyline(a);
+            p->restore();
         } else {
             QProxyStyle::drawPrimitive(pe, opt, p, widget);
         }
