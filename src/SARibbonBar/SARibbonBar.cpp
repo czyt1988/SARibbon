@@ -12,6 +12,7 @@
 #include <QTimer>
 #include <QVariant>
 #include <QDateTime>
+#include <algorithm>
 #include "SARibbonUtil.h"
 #include "SARibbonButtonGroupWidget.h"
 #include "SARibbonElementManager.h"
@@ -814,6 +815,10 @@ void SARibbonBar::insertCategoryPage(SARibbonCategory* category, int index)
     category->setPanelLargeIconSize(panelLargeIconSize());
     category->setPanelSmallIconSize(panelSmallIconSize());
     category->setEnableWordWrap(isEnableWordWrap());
+    category->setEnableShowPanelTitle(isEnableShowPanelTitle());
+    category->setEnableIconRightText(isEnableIconRightText());
+    category->setButtonMaximumAspectRatio(buttonMaximumAspectRatio());
+    category->setPanelTitleHeight(panelTitleHeight());
 
     int i = d_ptr->mRibbonTabBar->insertTab(index, category->categoryName());
 
@@ -1168,6 +1173,12 @@ void SARibbonBar::removeCategory(SARibbonCategory* category)
     for (SARibbonContextCategory* c : sa_as_const(d_ptr->mContextCategoryList)) {
         c->takeCategory(category);
     }
+    // 从隐藏列表中移除，避免悬空指针
+    d_ptr->mHidedCategory.erase(
+        std::remove_if(d_ptr->mHidedCategory.begin(),
+                       d_ptr->mHidedCategory.end(),
+                       [ category ](const _SARibbonHiddenCategoryData& item) { return item.category == category; }),
+        d_ptr->mHidedCategory.end());
     // 这时要刷新所有tabdata的index信息
     if (isupdate) {
         d_ptr->updateTabData();
@@ -1528,7 +1539,9 @@ void SARibbonBar::showMinimumModeButton(bool isShow)
         }
     }
 
-    d->mMinimumCategoryButtonAction->setVisible(isShow);
+    if (d->mMinimumCategoryButtonAction) {
+        d->mMinimumCategoryButtonAction->setVisible(isShow);
+    }
 }
 
 /**
@@ -1544,7 +1557,7 @@ void SARibbonBar::showMinimumModeButton(bool isShow)
  */
 bool SARibbonBar::isMinimumModeButtonVisible() const
 {
-    return (nullptr != d_ptr->mMinimumCategoryButtonAction);
+    return (d_ptr->mMinimumCategoryButtonAction && d_ptr->mMinimumCategoryButtonAction->isVisible());
 }
 
 /**
@@ -1590,7 +1603,7 @@ bool SARibbonBar::isEnableTabDoubleClickToMinimumMode() const
  * @param on 是否开启
  * \endif
  */
-void SARibbonBar::setTabDoubleClickToMinimumMode(bool on) const
+void SARibbonBar::setTabDoubleClickToMinimumMode(bool on)
 {
     d_ptr->mEnableTabDoubleClickToMinimumMode = on;
 }
@@ -2389,7 +2402,7 @@ void SARibbonBar::raiseCategory(SARibbonCategory* category)
  */
 bool SARibbonBar::isTwoRowStyle() const
 {
-    return (d_ptr->mDefaultPanelLayoutMode == SARibbonPanel::TwoRowMode);
+    return (SARibbonBar::isTwoRowStyle(currentRibbonStyle()));
 }
 
 /**
@@ -2405,7 +2418,7 @@ bool SARibbonBar::isTwoRowStyle() const
  */
 bool SARibbonBar::isThreeRowStyle() const
 {
-    return (d_ptr->mDefaultPanelLayoutMode == SARibbonPanel::ThreeRowMode);
+    return (SARibbonBar::isThreeRowStyle(currentRibbonStyle()));
 }
 
 /**
@@ -3153,7 +3166,7 @@ void SARibbonBar::setContextCategoryColorList(const QList< QColor >& cls)
     if (d_ptr->mContextCategoryColorList.isEmpty()) {
         d_ptr->mContextCategoryColorList = defaultContextCategoryColorList();
     }
-    d_ptr->mContextCategoryColorListIndex = 0;
+    d_ptr->mContextCategoryColorListIndex = -1;
     // 这时需要对已经显示的contextCategoryData的颜色进行重新设置
     for (SARibbonContextCategory* c : sa_as_const(d_ptr->mContextCategoryList)) {
         c->setContextColor(d_ptr->getContextCategoryColor());

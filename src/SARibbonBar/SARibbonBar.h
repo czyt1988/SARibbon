@@ -347,7 +347,7 @@ public:
     // Check if tab double click enables minimum mode
     bool isEnableTabDoubleClickToMinimumMode() const;
     // Set tab double click to enable minimum mode
-    void setTabDoubleClickToMinimumMode(bool on = true) const;
+    void setTabDoubleClickToMinimumMode(bool on = true);
 
     // Get current ribbon state
     RibbonMode currentRibbonState() const;
