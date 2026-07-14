@@ -52,14 +52,16 @@ public:
     {
         // Get primary screen size
         QScreen* primaryScreen = QGuiApplication::primaryScreen();
-        QRect screenGeometry   = primaryScreen->geometry();
         if (currentRibbonMode() == SARibbonBar::MinimumRibbonMode) {
             minHeight = getActualTitleBarHeight() + (isTabOnTitle ? 0 : getActualTabBarHeight());
         } else {
             minHeight = getActualTitleBarHeight() + getActualCategoryHeight()
                         + (isTabOnTitle ? 0 : getActualTabBarHeight());
         }
-        maxMinWidth = screenGeometry.width() * 0.8;  // Screen width
+        if (primaryScreen) {
+            QRect screenGeometry = primaryScreen->geometry();
+            maxMinWidth = screenGeometry.width() * 0.8;  // Screen width
+        }
     }
 
     /**
@@ -477,7 +479,6 @@ public:
                 return tabHegith + titleHeight + categoryHeight;
             }
         }
-        return tabHegith + titleHeight + categoryHeight;
     }
 
     /**
@@ -1860,7 +1861,7 @@ void SARibbonBarLayout::resizeInCompactStyle()
         // LTR mode: original compact style layout logic unchanged
 
         // 1.  布局corner widget - TopLeftCorner
-        if (QWidget* connerL = ribbon->cornerWidget(Qt::TopRightCorner)) {
+        if (QWidget* connerL = ribbon->cornerWidget(Qt::TopLeftCorner)) {
             if (connerL->isVisibleTo(ribbon)) {
                 QSize connerSize = connerL->sizeHint();
                 connerSize       = SA::scaleSizeByHeight(connerSize, validTitleBarHeight);
@@ -1950,6 +1951,15 @@ void SARibbonBarLayout::resizeInCompactStyle()
                     tabBarWidth = mintabBarWidth;
                 }
                 tabBar->setGeometry(x, y, tabBarWidth, tabH);
+            } else if (ribbon->ribbonAlignment() == SARibbonAlignment::AlignRight) {
+                // 右对齐的情况下，Tab要靠右显示
+                if (mintabBarWidth >= tabBarWidth) {
+                    // 这时tabbar没有右对齐的必要性，空间位置不够了
+                    tabBar->setGeometry(x, y, tabBarWidth, tabH);
+                } else {
+                    // 说明tabbar的宽度有右对齐的可能性
+                    tabBar->setGeometry(endX - mintabBarWidth, y, mintabBarWidth, tabH);
+                }
             } else {
                 // 居中对齐的情况下，Tab要居中显示
                 // 得到tab的推荐尺寸
