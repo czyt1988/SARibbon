@@ -1420,11 +1420,8 @@ void SARibbonCategory::changeEvent(QEvent* event)
 #if SARIBBONCATEGORY_DEBUG_PRINT
         qDebug() << "SARibbonCategory changeEvent(FontChange),categoryName=" << categoryName();
 #endif
-        QFont f = font();
-        iteratePanel([ f ](SARibbonPanel* p) -> bool {
-            p->setFont(f);
-            return true;
-        });
+        // 字体传播依赖 Qt 继承机制，由 QWidget::changeEvent 自动传播到子 panel，
+        // 不再使用 iteratePanel + setFont 遍历（会破坏 Qt 字体继承机制）
         if (layout()) {
             layout()->invalidate();
         }

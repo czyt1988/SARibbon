@@ -4019,16 +4019,15 @@ void SARibbonBar::changeEvent(QEvent* e)
     }
     switch (e->type()) {
     case QEvent::FontChange: {
-        QFont f                       = font();
-        QList< QWidget* > listWidgets = findChildren< QWidget* >();
-        for (QWidget* w : listWidgets) {
-            w->setFont(f);
-        }
+        // 先调用父类，让 Qt 字体继承机制自动传播到无显式字体的子控件，
+        // 不再使用 findChildren + setFont 全量遍历（会破坏 Qt 字体继承机制）
+        QMenuBar::changeEvent(e);
         // 字体改变总体布局调整
         if (SARibbonBarLayout* lay = qobject_cast< SARibbonBarLayout* >(layout())) {
             lay->resetSize();
         }
-    } break;
+        return; // 已调用父类处理，不再走末尾的 QMenuBar::changeEvent(e)
+    }
     case QEvent::StyleChange: {
         updateRibbonGeometry();
     } break;

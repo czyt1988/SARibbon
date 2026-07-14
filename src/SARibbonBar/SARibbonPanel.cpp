@@ -1739,9 +1739,8 @@ void SARibbonPanel::changeEvent(QEvent* e)
     }
     switch (e->type()) {
     case QEvent::FontChange: {
-        if (d_ptr->m_label) {
-            d_ptr->m_label->setFont(font());
-        }
+        // label 的特殊字号由 resetTitleLabelFont 处理，
+        // 字体传播依赖 Qt 继承机制，不再手动 setFont 破坏继承
         if (QLayout* lay = layout()) {
             lay->invalidate();
         }
