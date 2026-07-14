@@ -27,6 +27,8 @@ public:
     bool m_bWidgetResizable { true };
     bool m_bRubberBandOnResize { true };
     bool m_bRubberBandOnMove { true };
+    int m_borderWidth { 5 };
+    int m_titleHeight { 30 };
 };
 
 SAFramelessHelper::PrivateData::PrivateData(SAFramelessHelper* p) : q_ptr(p)
@@ -45,7 +47,7 @@ public:
     // 重置鼠标位置状态
     void reset();
     // 根据全局鼠标位置和窗口矩形重新计算鼠标位置状态。
-    void recalculate(const QPoint& globalMousePos, const QRect& frameRect);
+    void recalculate(const QPoint& globalMousePos, const QRect& frameRect, int borderWidth);
 
 public:
     bool mIsOnEdges { true };
@@ -57,13 +59,7 @@ public:
     bool mIsOnBottomLeftEdge { true };
     bool mIsOnTopRightEdge { true };
     bool mIsOnBottomRightEdge { true };
-
-    static int s_borderWidth;
-    static int s_titleHeight;
 };
-
-int SAPrivateFramelessCursorPosCalculator::s_borderWidth = 5;
-int SAPrivateFramelessCursorPosCalculator::s_titleHeight = 30;
 
 /***** CursorPosCalculator *****/
 SAPrivateFramelessCursorPosCalculator::SAPrivateFramelessCursorPosCalculator()
@@ -94,10 +90,10 @@ void SAPrivateFramelessCursorPosCalculator::reset()
  * @param globalMousePos 全局鼠标位置。
  * @param frameRect 窗口的矩形区域。
  */
-void SAPrivateFramelessCursorPosCalculator::recalculate(const QPoint& gMousePos, const QRect& frameRect)
+void SAPrivateFramelessCursorPosCalculator::recalculate(const QPoint& gMousePos, const QRect& frameRect, int borderWidth)
 {
     qreal dpiScale        = SAFramelessHelper::getScreenDpiScale(QApplication::widgetAt(gMousePos));
-    int scaledBorderWidth = s_borderWidth * dpiScale;
+    int scaledBorderWidth = borderWidth * dpiScale;
     int globalMouseX      = gMousePos.x();
     int globalMouseY      = gMousePos.y();
 
@@ -245,7 +241,7 @@ void SAPrivateFramelessWidgetData::updateRubberBandStatus()
 {
     if (d->m_bRubberBandOnMove || d->m_bRubberBandOnResize) {
         if (NULL == m_pRubberBand) {
-            m_pRubberBand = new QRubberBand(QRubberBand::Rectangle);
+            m_pRubberBand = new QRubberBand(QRubberBand::Rectangle, m_pWidget);
         }
     } else {
         delete m_pRubberBand;
@@ -262,7 +258,7 @@ void SAPrivateFramelessWidgetData::updateCursorShape(const QPoint& gMousePos)
         return;
     }
 
-    m_moveMousePos.recalculate(gMousePos, m_pWidget->frameGeometry());
+    m_moveMousePos.recalculate(gMousePos, m_pWidget->frameGeometry(), d->m_borderWidth);
 
     if (m_moveMousePos.mIsOnTopLeftEdge || m_moveMousePos.mIsOnBottomRightEdge) {
         m_pWidget->setCursor(Qt::SizeFDiagCursor);
@@ -371,13 +367,13 @@ bool SAPrivateFramelessWidgetData::handleMousePressEvent(QMouseEvent* event)
         m_bLeftButtonPressed = true;
 
         qreal dpiScale        = SAFramelessHelper::getScreenDpiScale(m_pWidget);
-        int scaledTitleHeight = SAPrivateFramelessCursorPosCalculator::s_titleHeight * dpiScale;
+        int scaledTitleHeight = d->m_titleHeight * dpiScale;
         // 这里要用eventPosY获取相对位置
         m_bLeftButtonTitlePressed = SA::compat::eventPosY(event) < scaledTitleHeight;
 
         QRect frameRect = m_pWidget->frameGeometry();
         auto gp         = SA::compat::eventGlobalPos(event);
-        m_pressedMousePos.recalculate(gp, frameRect);
+        m_pressedMousePos.recalculate(gp, frameRect, d->m_borderWidth);
 
         m_ptDragPos = gp - frameRect.topLeft();
         if (m_pressedMousePos.mIsOnEdges) {
@@ -506,7 +502,7 @@ bool SAPrivateFramelessWidgetData::handleDoubleClickedMouseEvent(QMouseEvent* ev
 
                     // 修改后：考虑DPI缩放
                     qreal dpiScale        = SAFramelessHelper::getScreenDpiScale(m_pWidget);
-                    int scaledTitleHeight = SAPrivateFramelessCursorPosCalculator::s_titleHeight * dpiScale;
+                    int scaledTitleHeight = d->m_titleHeight * dpiScale;
                     bool titlePressed     = SA::compat::eventPosY(event) < scaledTitleHeight;
 
                     if (titlePressed) {
@@ -529,10 +525,6 @@ bool SAPrivateFramelessWidgetData::handleDoubleClickedMouseEvent(QMouseEvent* ev
 //===================================================
 SAFramelessHelper::SAFramelessHelper(QObject* parent) : QObject(parent), d_ptr(new SAFramelessHelper::PrivateData(this))
 {
-    d_ptr->m_bWidgetMovable      = true;
-    d_ptr->m_bWidgetResizable    = true;
-    d_ptr->m_bRubberBandOnResize = false;
-    d_ptr->m_bRubberBandOnMove   = false;
     if (parent) {
         QWidget* w = qobject_cast< QWidget* >(parent);
         if (w) {
@@ -622,14 +614,14 @@ void SAFramelessHelper::setRubberBandOnResize(bool resizable)
 void SAFramelessHelper::setBorderWidth(int width)
 {
     if (width > 0) {
-        SAPrivateFramelessCursorPosCalculator::s_borderWidth = width;
+        d_ptr->m_borderWidth = width;
     }
 }
 
 void SAFramelessHelper::setTitleHeight(int height)
 {
     if (height > 0) {
-        SAPrivateFramelessCursorPosCalculator::s_titleHeight = height;
+        d_ptr->m_titleHeight = height;
     }
 }
 
@@ -655,12 +647,12 @@ bool SAFramelessHelper::rubberBandOnResisze()
 
 uint SAFramelessHelper::borderWidth()
 {
-    return (SAPrivateFramelessCursorPosCalculator::s_borderWidth);
+    return (d_ptr->m_borderWidth);
 }
 
 uint SAFramelessHelper::titleHeight()
 {
-    return (SAPrivateFramelessCursorPosCalculator::s_titleHeight);
+    return (d_ptr->m_titleHeight);
 }
 
 qreal SAFramelessHelper::getScreenDpiScale(const QWidget* widget)
