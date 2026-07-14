@@ -161,7 +161,6 @@ private:
 private:
     QList< SARibbonPanelItem* > mItems;
     int mColumnCount { 0 };                       ///< 记录有多少列
-    bool mExpandFlag { false };                   ///< 标记是否是会扩展的
     QSize mSizeHint;                              ///< sizeHint返回的尺寸
     QSize mSmallToolButtonIconSize { 22, 22 };    ///< 记录小按钮图标尺寸
     QSize mLargeToolButtonIconSize { 32, 32 };    ///< 记录大按钮图标尺寸

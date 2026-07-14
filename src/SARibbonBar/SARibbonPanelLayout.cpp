@@ -38,7 +38,7 @@
  * @param p 父窗口部件
  * \endif
  */
-SARibbonPanelLayout::SARibbonPanelLayout(QWidget* p) : QLayout(p), mColumnCount(0), mExpandFlag(false), mDirty(true)
+SARibbonPanelLayout::SARibbonPanelLayout(QWidget* p) : QLayout(p), mColumnCount(0), mDirty(true)
 {
     setSpacing(1);
     SARibbonPanel* tb = qobject_cast< SARibbonPanel* >(p);
@@ -779,12 +779,6 @@ void SARibbonPanelLayout::updateGeomArray(const QRect& setrect)
         }
 #endif
         Qt::Orientations exp = item->expandingDirections();
-        if (item->widget()) {
-            // 有窗口是水平扩展，则标记为扩展
-            if ((item->widget()->sizePolicy().horizontalPolicy() & QSizePolicy::ExpandFlag)) {
-                mExpandFlag = true;
-            }
-        }
         SARibbonPanelItem::RowProportion rp = item->rowProportion;
         if (SARibbonPanelItem::None == rp) {
             // 为定义行占比但是垂直扩展，就定义为Large占比，否则就是small占比

@@ -4,6 +4,7 @@
 #include <QStylePainter>
 #include <QPainter>
 #include <QDebug>
+#include <QWindow>
 
 /**
  * \if ENGLISH
@@ -21,7 +22,15 @@ SARibbonSeparatorWidget::SARibbonSeparatorWidget(QWidget* parent) : QFrame(paren
     setFrameShape(QFrame::VLine);
     setFrameShadow(QFrame::Plain);
 
-    if (QScreen* screen = QApplication::primaryScreen()) {
+    // Use the widget's own screen instead of primary screen for correct DPR on multi-monitor setups
+    QScreen* screen = nullptr;
+    if (QWindow* handle = windowHandle()) {
+        screen = handle->screen();
+    }
+    if (!screen) {
+        screen = QGuiApplication::primaryScreen();
+    }
+    if (screen) {
         qreal dpr           = screen->physicalDotsPerInch() / screen->logicalDotsPerInch();
         int scaledLineWidth = qRound(1.0 * dpr);  // 假设基础 lineWidth 是 1
         if (scaledLineWidth < 1) {

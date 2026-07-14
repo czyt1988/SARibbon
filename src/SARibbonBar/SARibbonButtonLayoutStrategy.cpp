@@ -5,6 +5,7 @@
 #include "SARibbonUtil.h"
 #include <QFontMetrics>
 #include <QLatin1Char>
+#include <QStyle>
 
 // 布局常量定义 (与SARibbonToolButton.cpp中保持一致)
 namespace
@@ -35,6 +36,7 @@ SARibbonButtonLayoutContext::SARibbonButtonLayoutContext(const SARibbonToolButto
         buttonMaximumAspectRatio = factor.buttonMaximumAspectRatio;
         enableWordWrap           = btn->isEnableWordWrap();
         maximumWidth             = btn->maximumWidth();
+        indicatorLength          = btn->style()->pixelMetric(QStyle::PM_MenuButtonIndicator);
     }
 }
 
@@ -531,10 +533,21 @@ void SARibbonSmallButtonLayoutStrategy::calculateIconAndTextRects(const QStyleOp
 
     if (!opt.text.isEmpty()) {
         int adjx = rects.iconRect.isValid() ? (rects.iconRect.width() + spacing) : 0;
-        int textX = rects.iconRect.isValid() ? (SA::saIsRTL() ? buttonRect.x() : rects.iconRect.right() + spacing) : buttonRect.x();
         int textRightMargin = hasInd ? indicatorLen : 0;
-        int textWidth = SA::saIsRTL() ? (rects.iconRect.isValid() ? (rects.iconRect.x() - spacing - textX - textRightMargin) : (buttonRect.width() - textRightMargin)) : (buttonRect.width() - adjx - textRightMargin);
-        
+        int textX;
+        int textWidth;
+        if (SA::saIsRTL()) {
+            // RTL: indicator at left edge, icon at right edge, text in between
+            textX = buttonRect.x();
+            if (hasInd) {
+                textX += indicatorLen;
+            }
+            textWidth = rects.iconRect.isValid() ? (rects.iconRect.x() - spacing - textX) : (buttonRect.right() + 1 - textX);
+        } else {
+            textX     = rects.iconRect.isValid() ? (rects.iconRect.right() + spacing) : buttonRect.x();
+            textWidth = buttonRect.width() - adjx - textRightMargin;
+        }
+
         rects.textRect = QRect(textX, buttonRect.y(), textWidth, buttonRect.height());
     }
 

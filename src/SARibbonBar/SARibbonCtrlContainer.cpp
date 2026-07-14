@@ -59,6 +59,9 @@ public:
      */
     void setContainerWidget(QWidget* w)
     {
+        if (w == mContainerWidget) {
+            return;
+        }
         if (mContainerWidget) {
             // 原来有widget
             QWidget* oldwidget = mContainerWidget;
