@@ -101,6 +101,9 @@ QPixmap SARibbonColorToolButton::PrivateData::createIconPixmap(const QStyleOptio
                          - QSize(0,
                                  SARibbonColorToolButtonConstants::COLOR_BLOCK_HEIGHT
                                      + SARibbonColorToolButtonConstants::COLOR_BLOCK_MARGIN);
+    if (realIconSize.isEmpty()) {
+        return QPixmap();
+    }
     QPixmap pixmap = SA::iconToPixmap(opt.icon, realIconSize, SA::widgetDevicePixelRatio(q_ptr), mode, state);
     // QPixmap pixmap     = opt.icon.pixmap(q_ptr->window()->windowHandle(), realIconSize, mode, state);
     QPixmap res(pixmap.size()
@@ -146,8 +149,8 @@ QIcon SARibbonColorToolButton::PrivateData::createColorIcon(const QColor& c, con
     QPainter painter(&res);
     QRect colorRect(SARibbonColorToolButtonConstants::COLOR_BLOCK_MARGIN,
                     SARibbonColorToolButtonConstants::COLOR_BLOCK_MARGIN,
-                    res.height() - 2 * SARibbonColorToolButtonConstants::COLOR_BLOCK_MARGIN,
-                    res.width() - 2 * SARibbonColorToolButtonConstants::COLOR_BLOCK_MARGIN);
+                    res.width() - 2 * SARibbonColorToolButtonConstants::COLOR_BLOCK_MARGIN,
+                    res.height() - 2 * SARibbonColorToolButtonConstants::COLOR_BLOCK_MARGIN);
     if (c.isValid()) {
         painter.fillRect(colorRect, c);
     } else {
@@ -220,9 +223,11 @@ void SARibbonColorToolButton::setColorStyle(SARibbonColorToolButton::ColorStyle 
     }
     d_ptr->mColorStyle = s;
     if (ColorUnderIcon == s) {
+        SARibbonToolButton::invalidateIconCache();
         setIcon(d_ptr->mOldIcon);
     } else {
         d_ptr->mOldIcon = icon();
+        SARibbonToolButton::invalidateIconCache();
         setIcon(d_ptr->createColorIcon(d_ptr->mColor,
                                        QSize(SARibbonColorToolButtonConstants::DEFAULT_COLOR_ICON_SIZE,
                                              SARibbonColorToolButtonConstants::DEFAULT_COLOR_ICON_SIZE)));
@@ -260,6 +265,10 @@ SARibbonColorToolButton::ColorStyle SARibbonColorToolButton::colorStyle() const
 SAColorMenu* SARibbonColorToolButton::setupStandardColorMenu()
 {
     setPopupMode(QToolButton::MenuButtonPopup);
+    if (QMenu* oldMenu = menu()) {
+        setMenu(nullptr);
+        oldMenu->deleteLater();
+    }
     SAColorMenu* m = new SAColorMenu(this);
     m->enableNoneColorAction(true);
     if (QAction* customColor = m->customColorAction()) {
@@ -290,6 +299,7 @@ void SARibbonColorToolButton::setColor(const QColor& c)
     if (d_ptr->mColor != c) {
         d_ptr->mColor = c;
         if (ColorFillToIcon == colorStyle()) {
+            SARibbonToolButton::invalidateIconCache();
             setIcon(d_ptr->createColorIcon(c,
                                            QSize(SARibbonColorToolButtonConstants::DEFAULT_COLOR_ICON_SIZE,
                                                  SARibbonColorToolButtonConstants::DEFAULT_COLOR_ICON_SIZE)));
