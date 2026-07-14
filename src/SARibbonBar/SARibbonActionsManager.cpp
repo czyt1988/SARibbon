@@ -142,6 +142,7 @@ void SARibbonActionsManager::removeTag(int tag)
             d_ptr->mActionToKey.erase(i);
         }
     }
+    Q_EMIT actionTagChanged(tag, true);
 }
 
 /**
@@ -249,7 +250,7 @@ void SARibbonActionsManager::removeAction(QAction* act, bool enableEmit)
         int count = 0;
         for (int j = 0; j < i.value().size(); ++j) {
             if (i.value()[ j ] != act) {
-                tmpi.value().append(act);
+                tmpi.value().append(i.value()[ j ]);
                 ++count;
             }
         }
@@ -326,7 +327,7 @@ QList< QAction* >& SARibbonActionsManager::actions(int tag)
  */
 const QList< QAction* > SARibbonActionsManager::actions(int tag) const
 {
-    return (d_ptr->mTagToActions[ tag ]);
+    return (d_ptr->mTagToActions.value(tag));
 }
 
 /**
@@ -430,6 +431,11 @@ QList< QAction* > SARibbonActionsManager::allActions() const
 QMap< int, SARibbonCategory* > SARibbonActionsManager::autoRegisteActions(SARibbonBar* bar)
 {
     QMap< int, SARibbonCategory* > res;
+
+    if (nullptr == bar) {
+        // 非ribbon模式，直接退出
+        return (res);
+    }
     // 先遍历SARibbonBar的父窗口(一般是SARibbonMainWindow)下的所有子对象，把所有action找到
     QWidget* parWidget = bar->parentWidget();
     QSet< QAction* > mainwindowActions;
@@ -445,10 +451,6 @@ QMap< int, SARibbonCategory* > SARibbonActionsManager::autoRegisteActions(SARibb
     }
     // 开始遍历每个category，加入action
 
-    if (nullptr == bar) {
-        // 非ribbon模式，直接退出
-        return (res);
-    }
     QSet< QAction* > categoryActions;
     QList< SARibbonCategory* > categorys = bar->categoryPages();
     int tag                              = AutoCategoryDistinguishBeginTag;
@@ -523,13 +525,15 @@ QList< QAction* > SARibbonActionsManager::search(const QString& text)
         kws.append(text);
     }
 
+    QSet< QAction* > seen;
     for (const QString& k : sa_as_const(kws)) {
         for (auto i = d_ptr->mActionToKey.begin(); i != d_ptr->mActionToKey.end(); ++i) {
             if (i.key()->text().contains(k, Qt::CaseInsensitive)) {
-                res.append(i.key());
+                seen.insert(i.key());
             }
         }
     }
+    res = seen.values();
     return (res);
 }
 
@@ -724,6 +728,9 @@ void SARibbonActionsManagerModel::update()
 
 void SARibbonActionsManagerModel::setupActionsManager(SARibbonActionsManager* m)
 {
+    if (nullptr == m) {
+        return;
+    }
     d_ptr->mMgr     = m;
     d_ptr->mTag     = SARibbonActionsManager::CommonlyUsedActionTag;
     d_ptr->mActions = m->filter(d_ptr->mTag);
