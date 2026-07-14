@@ -141,6 +141,9 @@ SARibbonCategoryLayout::SARibbonCategoryLayout(SARibbonCategory* parent)
 SARibbonCategoryLayout::~SARibbonCategoryLayout()
 {
     while (auto item = takePanelItem(0)) {
+        if (item->separatorWidget) {
+            item->separatorWidget->deleteLater();
+        }
         delete item;
     }
 }
@@ -461,7 +464,7 @@ void SARibbonCategoryLayout::updateGeometryArr()
             expandWidth = 0;
         }
     }
-    int x = d_ptr->mXBase;
+    int x = d_ptr->mXBase + mag.left();
     if (!needsScrolling && (0 == expandWidth)) {
         // Alignment offset when no scrolling needed and no expanding panels
         SARibbonAlignment align = categoryAlignment();
@@ -599,12 +602,7 @@ void SARibbonCategoryLayout::doLayout()
             showWidgets << item->widget();
             if (item->separatorWidget) {
                 item->separatorWidget->setGeometry(item->mWillSetSeparatorGeometry);
-                if (i == itemsize - 1) {
-                    // 最后一个panel的分割线隐藏
-                    hideWidgets << item->separatorWidget;
-                } else {
-                    showWidgets << item->separatorWidget;
-                }
+                showWidgets << item->separatorWidget;
             }
 #if SARibbonCategoryLayout_DEBUG_PRINT
             qDebug() << "  |-[" << debug_i__ << "]panelName(" << item->toPanelWidget()->panelName()
@@ -612,6 +610,17 @@ void SARibbonCategoryLayout::doLayout()
                      << ",WillSetSeparatorGeometry:" << item->mWillSetSeparatorGeometry;
             ++debug_i__;
 #endif
+        }
+    }
+
+    // Hide the separator of the last visible panel
+    for (int i = itemsize - 1; i >= 0; --i) {
+        SARibbonCategoryLayoutItem* item = d_ptr->mItemList[ i ];
+        if (!item->isEmpty()) {
+            if (item->separatorWidget) {
+                hideWidgets << item->separatorWidget;
+            }
+            break;
         }
     }
 
@@ -891,6 +900,7 @@ void SARibbonCategoryLayout::scrollToByAnimate(int targetX)
     QPropertyAnimation* animation = d_ptr->mScrollAnimation;
     if (!animation) {
         scrollTo(targetX);
+        return;
     }
     if (isAnimatingScroll() && targetX == d_ptr->mTargetScrollPosition) {
         return;  // Already at target position
@@ -1052,6 +1062,7 @@ void SARibbonCategoryLayout::setCategoryAlignment(SARibbonAlignment al)
 {
     if (d_ptr->mCategoryAlignment != al) {
         d_ptr->mCategoryAlignment = al;
+        invalidate();
     }
 }
 
