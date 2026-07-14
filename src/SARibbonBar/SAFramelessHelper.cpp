@@ -46,8 +46,8 @@ public:
     explicit SAPrivateFramelessCursorPosCalculator();
     // 重置鼠标位置状态
     void reset();
-    // 根据全局鼠标位置和窗口矩形重新计算鼠标位置状态。
-    void recalculate(const QPoint& globalMousePos, const QRect& frameRect, int borderWidth);
+    // Recalculate cursor position state with dpi scale provided by caller
+    void recalculate(const QPoint& globalMousePos, const QRect& frameRect, int borderWidth, qreal dpiScale);
 
 public:
     bool mIsOnEdges { true };
@@ -89,10 +89,12 @@ void SAPrivateFramelessCursorPosCalculator::reset()
  * @brief 根据全局鼠标位置和窗口矩形重新计算鼠标位置状态。
  * @param globalMousePos 全局鼠标位置。
  * @param frameRect 窗口的矩形区域。
+ * @param borderWidth 边框宽度。
+ * @param dpiScale DPI缩放因子，由调用方传入以避免内部调用 QApplication::widgetAt。
  */
-void SAPrivateFramelessCursorPosCalculator::recalculate(const QPoint& gMousePos, const QRect& frameRect, int borderWidth)
+void SAPrivateFramelessCursorPosCalculator::recalculate(
+    const QPoint& gMousePos, const QRect& frameRect, int borderWidth, qreal dpiScale)
 {
-    qreal dpiScale        = SAFramelessHelper::getScreenDpiScale(QApplication::widgetAt(gMousePos));
     int scaledBorderWidth = borderWidth * dpiScale;
     int globalMouseX      = gMousePos.x();
     int globalMouseY      = gMousePos.y();
@@ -258,7 +260,8 @@ void SAPrivateFramelessWidgetData::updateCursorShape(const QPoint& gMousePos)
         return;
     }
 
-    m_moveMousePos.recalculate(gMousePos, m_pWidget->frameGeometry(), d->m_borderWidth);
+    qreal dpiScale = SAFramelessHelper::getScreenDpiScale(m_pWidget);
+    m_moveMousePos.recalculate(gMousePos, m_pWidget->frameGeometry(), d->m_borderWidth, dpiScale);
 
     if (m_moveMousePos.mIsOnTopLeftEdge || m_moveMousePos.mIsOnBottomRightEdge) {
         m_pWidget->setCursor(Qt::SizeFDiagCursor);
@@ -373,7 +376,7 @@ bool SAPrivateFramelessWidgetData::handleMousePressEvent(QMouseEvent* event)
 
         QRect frameRect = m_pWidget->frameGeometry();
         auto gp         = SA::compat::eventGlobalPos(event);
-        m_pressedMousePos.recalculate(gp, frameRect, d->m_borderWidth);
+        m_pressedMousePos.recalculate(gp, frameRect, d->m_borderWidth, dpiScale);
 
         m_ptDragPos = gp - frameRect.topLeft();
         if (m_pressedMousePos.mIsOnEdges) {
