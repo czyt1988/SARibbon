@@ -370,8 +370,8 @@ QAction* SAColorMenu::noneColorAction() const
  */
 void SAColorMenu::emitSelectedColor(const QColor& c)
 {
-    Q_EMIT selectedColor(c);
     hide();
+    Q_EMIT selectedColor(c);
 }
 
 /**

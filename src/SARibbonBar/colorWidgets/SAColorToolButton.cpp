@@ -549,6 +549,7 @@ QColor SAColorToolButton::color() const
 void SAColorToolButton::setMargins(const QMargins& mg)
 {
     d_ptr->mMargins = mg;
+    updateGeometry();
     repaint();
 }
 
@@ -615,6 +616,7 @@ void SAColorToolButton::setColorToolButtonStyle(ColorToolButtonStyle s)
         createColorMenu();
     }
     d_ptr->mColorButtonStyle = s;
+    update();
 }
 
 /**
