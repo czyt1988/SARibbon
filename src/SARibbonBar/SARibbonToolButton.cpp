@@ -1,5 +1,6 @@
 #include "SARibbonToolButton.h"
 #include "SARibbonPanel.h"
+#include "SARibbonPanelLayout.h"
 #include "SARibbonButtonLayoutStrategy.h"
 
 #include <QAction>
@@ -1785,6 +1786,13 @@ void SARibbonToolButton::paintIndicator(QPainter& p, const QStyleOptionToolButto
 void SARibbonToolButton::invalidateSizeHint()
 {
     d_ptr->mSizeHint = QSize();
+    // Notify parent panel layout to invalidate this button's cache entry
+    // This avoids stale cached sizeHints when button properties change
+    if (SARibbonPanel* panel = qobject_cast< SARibbonPanel* >(parentWidget())) {
+        if (SARibbonPanelLayout* lay = panel->panelLayout()) {
+            lay->invalidateButtonSizeHintCache(this);
+        }
+    }
     updateGeometry();
 }
 

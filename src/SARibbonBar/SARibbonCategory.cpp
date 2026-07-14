@@ -799,6 +799,7 @@ void SARibbonCategory::setPanelTitleHeight(int h)
         p->setTitleHeight(h);
         return true;
     });
+    updateItemGeometry();
 }
 
 /**
@@ -835,6 +836,7 @@ void SARibbonCategory::setEnableShowPanelTitle(bool on)
         p->setEnableShowTitle(on);
         return true;
     });
+    updateItemGeometry();
 }
 
 /**
@@ -1018,7 +1020,7 @@ void SARibbonCategory::setEnableWordWrap(bool on)
         }
         return true;
     });
-    updateGeometry();
+    updateItemGeometry();
 }
 
 /**
@@ -1045,6 +1047,7 @@ void SARibbonCategory::setEnableIconRightText(bool on)
         panel->setEnableIconRightText(on);
         return true;
     });
+    updateItemGeometry();
 }
 
 /**
@@ -1104,6 +1107,7 @@ void SARibbonCategory::setButtonMaximumAspectRatio(qreal fac)
         }
         return true;
     });
+    updateItemGeometry();
 }
 
 /**
@@ -1208,6 +1212,7 @@ void SARibbonCategory::setPanelSpacing(int n)
         }
         return true;
     });
+    updateItemGeometry();
 }
 
 /**
@@ -1246,6 +1251,7 @@ void SARibbonCategory::setPanelLargeIconSize(const QSize& largeSize)
         }
         return true;
     });
+    updateItemGeometry();
 }
 
 /**
@@ -1284,6 +1290,7 @@ void SARibbonCategory::setPanelSmallIconSize(const QSize& smallSize)
         }
         return true;
     });
+    updateItemGeometry();
 }
 
 /**
@@ -1325,6 +1332,7 @@ void SARibbonCategory::setPanelToolButtonIconSize(const QSize& smallSize, const 
         }
         return true;
     });
+    updateItemGeometry();
 }
 
 /**

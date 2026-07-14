@@ -117,6 +117,9 @@ private Q_SLOTS:
 
 	// Setup animation
 	void setupAnimation();
+
+	// Handle current widget change to resize new visible widget
+	void onCurrentChanged(int index);
 };
 
 #endif  // SARIBBONSTACKEDWIDGET_H

@@ -289,6 +289,8 @@ QLayoutItem* SARibbonPanelLayout::takeAt(int index)
         item->widget()->hide();
         item->widget()->deleteLater();
     }
+    // Remove from cache to prevent stale entries
+    mButtonSizeHintCache.remove(item->widget());
 
     invalidate();
     return (item);
@@ -345,6 +347,7 @@ bool SARibbonPanelLayout::isEmpty() const
 void SARibbonPanelLayout::invalidate()
 {
     mDirty = true;
+    mButtonSizeHintCache.clear();
     QLayout::invalidate();
 }
 
@@ -520,6 +523,38 @@ bool SARibbonPanelLayout::isDirty() const
 void SARibbonPanelLayout::updateGeomArray()
 {
     updateGeomArray(geometry());
+}
+
+/**
+ * \if ENGLISH
+ * @brief Invalidate all cached button sizeHints
+ * @details Clears the entire button sizeHint cache, forcing recalculation on next updateGeomArray call
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 使所有缓存的按钮sizeHint失效
+ * @details 清除整个按钮sizeHint缓存，下次调用updateGeomArray时将重新计算
+ * \endif
+ */
+void SARibbonPanelLayout::invalidateButtonSizeHintCache()
+{
+    mButtonSizeHintCache.clear();
+}
+
+/**
+ * \if ENGLISH
+ * @brief Invalidate cached sizeHint for a specific widget
+ * @param w The widget whose cached sizeHint should be removed
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 使指定窗口部件的缓存sizeHint失效
+ * @param w 要移除缓存sizeHint的窗口部件
+ * \endif
+ */
+void SARibbonPanelLayout::invalidateButtonSizeHintCache(QWidget* w)
+{
+    mButtonSizeHintCache.remove(w);
 }
 
 /**
@@ -754,7 +789,16 @@ void SARibbonPanelLayout::updateGeomArray(const QRect& setrect)
         if (row == 0) {
             columMaxWidth = 0;
         }
-        QSize hint = item->sizeHint();
+        // Use cached sizeHint to avoid repeated recalculations during resize
+        QSize hint;
+        QWidget* hintWidget = item->widget();
+        auto cacheIt = mButtonSizeHintCache.find(hintWidget);
+        if (cacheIt != mButtonSizeHintCache.end()) {
+            hint = cacheIt.value();
+        } else {
+            hint = item->sizeHint();
+            mButtonSizeHintCache[hintWidget] = hint;
+        }
         // SingleRowMode：所有item在同一行，横向排列
         if (1 == rowCount) {
             item->rowIndex            = 0;

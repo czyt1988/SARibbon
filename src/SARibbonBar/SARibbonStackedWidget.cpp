@@ -68,6 +68,7 @@ SARibbonStackedWidget::SARibbonStackedWidget(QWidget* parent)
 {
     setNormalMode();
     setupAnimation();
+    connect(this, &SARibbonStackedWidget::currentChanged, this, &SARibbonStackedWidget::onCurrentChanged);
 }
 
 /**
@@ -197,29 +198,31 @@ QRect SARibbonStackedWidget::normalGeometry() const
 /**
  * \if ENGLISH
  * @brief Send layout request to inner widgets
- * @details This method will invalidate and recalculate the layout of child widgets
+ * @details This method resizes all child widgets to the current size, invalidates and recalculates
+ *          their layouts. Unlike updateInnerWidgetGeometry() which only handles the current widget,
+ *          this method forces all widgets to update, used when category alignment changes.
  * \endif
  *
  * \if CHINESE
  * @brief 对内部窗口发送布局请求
- * @details 这个方法会让子窗口布局失效同时重新计算布局
+ * @details 此方法会先将所有子窗口调整为当前尺寸，然后失效并重新计算布局。
+ *          与仅处理当前窗口的 updateInnerWidgetGeometry() 不同，此方法强制更新所有窗口，
+ *          用于category对齐方式变化等需要全部重新布局的场景。
  * \endif
  */
 void SARibbonStackedWidget::layoutRequestInnerWidgets()
 {
-    // 确保所有子部件都填满整个区域
+    const QSize newSize = size();
     for (int i = 0; i < count(); ++i) {
         QWidget* innerWidget = widget(i);
         if (!innerWidget) {
             continue;
         }
-        // 方法1 update（不生效）
-        //  innerWidget->update();
-
-        // 方法2 postEvent（不生效）
-        //  QApplication::postEvent(innerWidget, new QEvent(QEvent::LayoutRequest));
-
-        // 方法3 invalidate+activate（生效）
+        // Ensure correct size for all widgets before activating layout
+        innerWidget->move(0, 0);
+        if (innerWidget->size() != newSize) {
+            innerWidget->setFixedSize(newSize);
+        }
         if (auto lay = innerWidget->layout()) {
             lay->invalidate();
             lay->activate();
@@ -577,39 +580,26 @@ void SARibbonStackedWidget::hideEvent(QHideEvent* e)
 /**
  * \if ENGLISH
  * @brief Update inner widget geometry
+ * @details Only resizes the currently visible widget for performance. Non-visible widgets are
+ *          resized lazily when they become current (see onCurrentChanged).
  * \endif
  *
  * \if CHINESE
  * @brief 更新内部窗口几何位置
+ * @details 仅调整当前可见窗口的尺寸以提升性能。非可见窗口在切换为当前窗口时延迟调整（见onCurrentChanged）。
  * \endif
  */
 void SARibbonStackedWidget::updateInnerWidgetGeometry()
 {
-    // 确保所有子部件都填满整个区域
+    // Only resize the current visible widget; non-visible widgets are deferred
+    // to avoid triggering layout cascades on hidden categories during resize
     const QSize newSize = size();
-    for (int i = 0; i < count(); ++i) {
-        QWidget* innerWidget = widget(i);
-        if (!innerWidget)
-            continue;
-
-        if (i == currentIndex()) {
-            // 确保当前部件也填满整个区域
-            if (innerWidget->size() != newSize) {
-                innerWidget->move(0, 0);
-                innerWidget->setFixedSize(newSize);
-            }
-            continue;
+    QWidget* current = currentWidget();
+    if (current) {
+        if (current->size() != newSize) {
+            current->move(0, 0);
+            current->setFixedSize(newSize);
         }
-
-        // 设置非活动部件的位置和大小
-        innerWidget->move(0, 0);
-        innerWidget->setFixedSize(newSize);
-        // innerWidget->setGeometry(0, 0, newSize.width(), newSize.height());
-        // 通知部件布局可能需要更新
-#if SARIBBONSTACKEDWIDGET_DEBUG_PRINT
-        qDebug() << "SARibbonStackedWidget::resizeEvent [not Animation]innerWidget move to:" << innerWidget->geometry();
-#endif
-        QApplication::postEvent(innerWidget, new QEvent(QEvent::LayoutRequest));
     }
 }
 
@@ -652,4 +642,34 @@ void SARibbonStackedWidget::resizeEvent(QResizeEvent* e)
     }
     // 调用基类处理
     QStackedWidget::resizeEvent(e);
+}
+
+/**
+ * \if ENGLISH
+ * @brief Handle current widget change
+ * @param index The new current index
+ * @details Resizes the newly visible widget to match the stacked widget's size,
+ *          ensuring correct layout when switching categories. Non-visible widgets
+ *          are not resized during normal resize events for performance.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 处理当前窗口切换
+ * @param index 新的当前窗口索引
+ * @details 将新可见窗口调整为与堆叠窗口相同的尺寸，确保切换category时布局正确。
+ *          非可见窗口在正常resize事件中不会被调整尺寸以提升性能。
+ * \endif
+ */
+void SARibbonStackedWidget::onCurrentChanged(int index)
+{
+    Q_UNUSED(index);
+    QWidget* current = currentWidget();
+    if (!current) {
+        return;
+    }
+    const QSize newSize = size();
+    if (current->size() != newSize) {
+        current->move(0, 0);
+        current->setFixedSize(newSize);
+    }
 }
