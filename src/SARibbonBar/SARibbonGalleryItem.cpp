@@ -331,6 +331,9 @@ void SARibbonGalleryItem::setFlags(Qt::ItemFlags flag)
  */
 Qt::ItemFlags SARibbonGalleryItem::flags() const
 {
+    if (mAction && !mAction->isEnabled()) {
+        return (mFlags & ~Qt::ItemIsEnabled);
+    }
     return (mFlags);
 }
 

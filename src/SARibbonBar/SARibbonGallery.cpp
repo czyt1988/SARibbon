@@ -643,7 +643,7 @@ void SARibbonGallery::pageDown()
             return;
         }
         int v = vscrollBar->value();
-        v += vscrollBar->singleStep();
+        v += vscrollBar->pageStep();
         vscrollBar->setValue(v);
     }
 }
@@ -670,7 +670,7 @@ void SARibbonGallery::pageUp()
             return;
         }
         int v = vscrollBar->value();
-        v -= vscrollBar->singleStep();
+        v -= vscrollBar->pageStep();
         vscrollBar->setValue(v);
     }
 }

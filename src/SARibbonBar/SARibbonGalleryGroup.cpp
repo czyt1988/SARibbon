@@ -444,7 +444,7 @@ SARibbonGalleryItem* SARibbonGalleryGroupModel::take(int row)
  */
 void SARibbonGalleryGroupModel::append(SARibbonGalleryItem* item)
 {
-    beginInsertRows(QModelIndex(), mItems.count(), mItems.count() + 1);
+    beginInsertRows(QModelIndex(), mItems.count(), mItems.count());
 
     mItems.append(item);
     endInsertRows();
@@ -466,7 +466,8 @@ void SARibbonGalleryGroupModel::append(SARibbonGalleryItem* item)
 bool SARibbonGalleryGroupModel::remove(const QString& act_object_name)
 {
     for (int index = 0; index < mItems.size(); ++index) {
-        if (mItems.at(index)->action()->objectName() == act_object_name) {
+        QAction* act = mItems.at(index)->action();
+        if (act && (act->objectName() == act_object_name)) {
             beginRemoveRows(QModelIndex(), index, index);
             SARibbonGalleryItem* item = mItems.takeAt(index);
             endRemoveRows();
@@ -1055,7 +1056,10 @@ int SARibbonGalleryGroup::preferredHeightForWidth(int w) const
         return -1;
     }
     int itemCnt = model->rowCount(QModelIndex());
-    int grow    = (itemCnt / gcol) + 1;
+    if (itemCnt == 0) {
+        return 0;
+    }
+    int grow = (itemCnt + gcol - 1) / gcol;
     return grow * gs.height() + 2 * frameWidth() + 5;  // 这里加上5是留下一定余量，避免刚好触发滚动条
 }
 
