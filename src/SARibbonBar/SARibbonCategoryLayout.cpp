@@ -947,15 +947,118 @@ int SARibbonCategoryLayout::scrollPosition() const
 
 /**
  * \if ENGLISH
+ * @brief Update scroll button visibility flags based on current scroll position
+ * @details This is a lightweight alternative to updateGeometryArr() when only the scroll position has changed.
+ *          It avoids calling sizeHint() on every panel by reusing the cached mTotalWidth.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 根据当前滚动位置更新滚动按钮可见性标志
+ * @details 这是 updateGeometryArr() 的轻量级替代方案，仅当滚动位置改变时使用。
+ *          通过复用缓存的 mTotalWidth 避免对每个面板调用 sizeHint()。
+ * \endif
+ */
+void SARibbonCategoryLayout::updateScrollButtonVisibility()
+{
+    const int categoryWidth   = categoryContentSize().width();
+    const int total           = d_ptr->mTotalWidth;
+    const bool needsScrolling = (total > categoryWidth);
+
+    if (!needsScrolling) {
+        d_ptr->mIsRightScrollBtnShow = false;
+        d_ptr->mIsLeftScrollBtnShow  = false;
+        return;
+    }
+    if (SA::saIsRTL()) {
+        // RTL: mXBase ranges from 0 (start, rightmost) to total-categoryWidth (end, leftmost)
+        const int maxBase = qMax(0, total - categoryWidth);
+        if (0 == d_ptr->mXBase) {
+            d_ptr->mIsRightScrollBtnShow = false;
+            d_ptr->mIsLeftScrollBtnShow  = true;
+        } else if (d_ptr->mXBase >= maxBase) {
+            d_ptr->mIsRightScrollBtnShow = true;
+            d_ptr->mIsLeftScrollBtnShow  = false;
+        } else {
+            d_ptr->mIsRightScrollBtnShow = true;
+            d_ptr->mIsLeftScrollBtnShow  = true;
+        }
+    } else {
+        // LTR: mXBase ranges from categoryWidth-total (negative, end) to 0 (start, leftmost)
+        if (0 == d_ptr->mXBase) {
+            d_ptr->mIsRightScrollBtnShow = true;
+            d_ptr->mIsLeftScrollBtnShow  = false;
+        } else if (d_ptr->mXBase <= (categoryWidth - total)) {
+            d_ptr->mIsRightScrollBtnShow = false;
+            d_ptr->mIsLeftScrollBtnShow  = true;
+        } else {
+            d_ptr->mIsRightScrollBtnShow = true;
+            d_ptr->mIsLeftScrollBtnShow  = true;
+        }
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Update scroll offset by translating pre-calculated geometries
+ * @param newXBase New scroll position
+ * @details This method avoids full layout recalculation by translating existing mWillSetGeometry values.
+ *          If the layout is dirty (mDirty == true), it falls back to full updateGeometryArr() recalculation.
+ *          This is used by setScrollPosition() during scroll animation to avoid per-frame invalidate().
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 通过平移已计算的几何来更新滚动偏移
+ * @param newXBase 新的滚动位置
+ * @details 此方法通过平移已有的 mWillSetGeometry 值来避免全量布局重算。
+ *          如果布局已标记为脏（mDirty == true），则回退到完整的 updateGeometryArr() 重算路径。
+ *          供 setScrollPosition() 在滚动动画期间使用，避免每帧调用 invalidate()。
+ * \endif
+ */
+void SARibbonCategoryLayout::updateScrollOffset(int newXBase)
+{
+    // If layout is dirty, fall back to full recalculation path
+    if (d_ptr->mDirty) {
+        d_ptr->mXBase = newXBase;
+        d_ptr->mDirty = false;
+        updateGeometryArr();
+        doLayout();
+        return;
+    }
+    // Calculate offset delta
+    const int delta = newXBase - d_ptr->mXBase;
+    if (0 == delta) {
+        return;
+    }
+    // Update scroll position
+    d_ptr->mXBase = newXBase;
+    // Translate pre-calculated geometries by delta
+    // In RTL mode, mWillSetGeometry contains mirrored coordinates, so negate delta
+    const int actualDelta = SA::saIsRTL() ? -delta : delta;
+    for (SARibbonCategoryLayoutItem* item : sa_as_const(d_ptr->mItemList)) {
+        if (!item->isEmpty()) {
+            item->mWillSetGeometry.translate(actualDelta, 0);
+            item->mWillSetSeparatorGeometry.translate(actualDelta, 0);
+        }
+    }
+    // Update scroll button visibility for new position
+    updateScrollButtonVisibility();
+    // Apply translated geometries (mDirty is false, so doLayout skips updateGeometryArr)
+    doLayout();
+}
+
+/**
+ * \if ENGLISH
  * @brief Set the scroll position
  * @param pos New scroll position in pixels
  * @details In LTR mode, mXBase ranges from [availableWidth-totalWidth, 0] (negative values). In RTL mode, mXBase ranges from [0, totalWidth-availableWidth] (positive values).
+ *          Uses updateScrollOffset() to avoid full layout recalculation during scroll animation.
  * \endif
  *
  * \if CHINESE
  * @brief 设置滚动位置
  * @param pos 新的滚动位置（像素）
  * @details 在 LTR 模式下，mXBase 范围为 [availableWidth-totalWidth, 0]（负值）。在 RTL 模式下，mXBase 范围为 [0, totalWidth-availableWidth]（正值）。
+ *          使用 updateScrollOffset() 避免滚动动画期间的全量布局重算。
  * \endif
  */
 void SARibbonCategoryLayout::setScrollPosition(int pos)
@@ -968,11 +1071,7 @@ void SARibbonCategoryLayout::setScrollPosition(int pos)
         const int newXBase = qBound(0, pos, maxBase);
 
         if (d_ptr->mXBase != newXBase) {
-            d_ptr->mXBase = newXBase;
-            invalidate();  // Mark layout as dirty for deferred relayout
-            // NOT REDUNDANT: invalidate() triggers deferred layout pass, update() schedules repaint
-            // Both are required for smooth scrolling animation: removing update() would cause 1-frame lag
-            // Using activate() instead would force synchronous layout which is more expensive during animation
+            updateScrollOffset(newXBase);
             if (parentWidget()) {
                 parentWidget()->update();
             }
@@ -983,11 +1082,7 @@ void SARibbonCategoryLayout::setScrollPosition(int pos)
         const int newXBase = qBound(minBase, pos, 0);
 
         if (d_ptr->mXBase != newXBase) {
-            d_ptr->mXBase = newXBase;
-            invalidate();  // Mark layout as dirty for deferred relayout
-            // NOT REDUNDANT: invalidate() triggers deferred layout pass, update() schedules repaint
-            // Both are required for smooth scrolling animation: removing update() would cause 1-frame lag
-            // Using activate() instead would force synchronous layout which is more expensive during animation
+            updateScrollOffset(newXBase);
             if (parentWidget()) {
                 parentWidget()->update();
             }

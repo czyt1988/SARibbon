@@ -125,6 +125,10 @@ private Q_SLOTS:
 
 private:
     void setupAnimateScroll();
+    // Update scroll offset by translating pre-calculated geometries without full recalculation
+    void updateScrollOffset(int newXBase);
+    // Update scroll button visibility flags based on current scroll position
+    void updateScrollButtonVisibility();
 };
 
 /**
