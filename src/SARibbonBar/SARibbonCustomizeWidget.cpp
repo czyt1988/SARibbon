@@ -142,43 +142,35 @@ int sa_customize_datas_reverse(const QList< SARibbonCustomizeData >& cds, SARibb
     // Reverse order: undo last operation first
     for (int i = cds.size() - 1; i >= 0; --i) {
         const SARibbonCustomizeData& d = cds[ i ];
+        SARibbonActionsManager* mgr = const_cast< SARibbonCustomizeData& >(d).actionManager();
         SARibbonCustomizeData rd;
 
         switch (d.actionType()) {
         case SARibbonCustomizeData::AddCategoryActionType:
-            // Reverse of add category is remove category
             rd = SARibbonCustomizeData::makeRemoveCategoryCustomizeData(d.categoryObjNameValue);
             break;
         case SARibbonCustomizeData::AddPanelActionType:
-            // Reverse of add panel is remove panel
             rd = SARibbonCustomizeData::makeRemovePanelCustomizeData(d.categoryObjNameValue, d.panelObjNameValue);
             break;
         case SARibbonCustomizeData::AddActionActionType:
-            // Reverse of add action is remove action
             rd = SARibbonCustomizeData::makeRemoveActionCustomizeData(
-                d.categoryObjNameValue, d.panelObjNameValue, d.keyValue, d.actionManager());
+                d.categoryObjNameValue, d.panelObjNameValue, d.keyValue, mgr);
             break;
         case SARibbonCustomizeData::ChangeCategoryOrderActionType:
-            // Reverse of category order change is negate the index
             rd = SARibbonCustomizeData::makeChangeCategoryOrderCustomizeData(d.categoryObjNameValue, -d.indexValue);
             break;
         case SARibbonCustomizeData::ChangePanelOrderActionType:
-            // Reverse of panel order change is negate the index
             rd = SARibbonCustomizeData::makeChangePanelOrderCustomizeData(
                 d.categoryObjNameValue, d.panelObjNameValue, -d.indexValue);
             break;
         case SARibbonCustomizeData::ChangeActionOrderActionType:
-            // Reverse of action order change is negate the index
             rd = SARibbonCustomizeData::makeChangeActionOrderCustomizeData(
-                d.categoryObjNameValue, d.panelObjNameValue, d.keyValue, d.actionManager(), -d.indexValue);
+                d.categoryObjNameValue, d.panelObjNameValue, d.keyValue, mgr, -d.indexValue);
             break;
         case SARibbonCustomizeData::VisibleCategoryActionType:
-            // Reverse of visibility is toggle
             rd = SARibbonCustomizeData::makeVisibleCategoryCustomizeData(d.categoryObjNameValue, d.indexValue != 1);
             break;
         default:
-            // RemoveCategory, RemovePanel, RemoveAction, RenameCategory, RenamePanel
-            // cannot be reliably reversed without additional context
             continue;
         }
         if (rd.apply(bar)) {
