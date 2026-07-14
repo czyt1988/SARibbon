@@ -147,6 +147,12 @@ public:
     // Invalidates the cached size hint / 使缓存的size hint失效
     void invalidateSizeHint();
 
+    /// Invalidate the cached icon pixmap so the next paint regenerates it
+    void invalidateIconCache();
+
+    /// Set the button icon, invalidating any cached icon pixmap first
+    void setIcon(const QIcon& icon);
+
     // 大按钮尺寸
     void setLargeIconSize(const QSize& largeSize);
     QSize largeIconSize() const;

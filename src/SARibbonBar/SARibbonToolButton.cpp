@@ -615,7 +615,7 @@ void SARibbonToolButton::PrivateData::calcLargeButtonDrawRects(const QStyleOptio
                 if (hIndicator) {
                     // indicator在文字的右边
                     indicatorArrowRect =
-                        QRect(textRect.right(), textRect.y() + textRect.height() / 2, indicatorLen, textHeight / 2);
+                        QRect(textRect.right() + 1, textRect.y() + textRect.height() / 2, indicatorLen, textHeight / 2);
                 }
             } else {
                 // 如果文字不需要换行，由于文字下面会有一行的空白，因此indicator布局在文字下面
@@ -641,7 +641,7 @@ void SARibbonToolButton::PrivateData::calcLargeButtonDrawRects(const QStyleOptio
             }
         }
         // 剩下就是icon区域
-        iconRect = QRect(spacing, spacing, opt.rect.width() - 2 * spacing, textRect.top() - 2 * spacing);
+        iconRect = QRect(opt.rect.left() + spacing, spacing, opt.rect.width() - 2 * spacing, textRect.top() - 2 * spacing);
     }
 
     /**
@@ -806,7 +806,7 @@ QSize SARibbonToolButton::PrivateData::calcSmallButtonSizeHint(const QStyleOptio
 QSize SARibbonToolButton::PrivateData::calcLargeButtonSizeHint(const QStyleOptionToolButton& opt)
 {
     int w    = 0;
-    int h    = opt.fontMetrics.lineSpacing() * SARibbonToolButtonConstants::LARGE_BUTTON_HEIGHT_FACTOR;
+    int h    = qRound(opt.fontMetrics.lineSpacing() * SARibbonToolButtonConstants::LARGE_BUTTON_HEIGHT_FACTOR);
     int minW = static_cast< int >(
         h * SARibbonToolButtonConstants::LARGE_BUTTON_MIN_WIDTH_RATIO);  // 最小宽度，在panel里面的按钮，最小宽度要和icon适应
 
@@ -1387,8 +1387,8 @@ bool SARibbonToolButton::event(QEvent* e)
     case QEvent::ActionChanged:
     case QEvent::ActionRemoved:
     case QEvent::ActionAdded: {
+        // invalidateSizeHint is handled in actionEvent(); keep only sub-control reset here
         d_ptr->mMouseOnSubControl = false;
-        invalidateSizeHint();
     } break;
     default:
         break;
@@ -1633,7 +1633,8 @@ void SARibbonToolButton::paintButton(QPainter& p, const QStyleOptionToolButton& 
                     if (d_ptr->mMouseOnSubControl) {  // 此时鼠标在indecater那
                         // 鼠标在文字区，把图标和文字显示为正常
                         tool.rect  = d_ptr->mDrawIconRect.united(d_ptr->mDrawTextRect);
-                        tool.state = (QStyle::State_Raised);  // 把图标区域显示为正常
+                        tool.state |= (QStyle::State_Raised);  // 把图标区域显示为正常
+                        tool.state &= ~QStyle::State_MouseOver;
                         if (autoRaise) {
                             style()->drawPrimitive(QStyle::PE_PanelButtonTool, &tool, &p, this);
                         } else {
@@ -1641,7 +1642,8 @@ void SARibbonToolButton::paintButton(QPainter& p, const QStyleOptionToolButton& 
                         }
                     } else {
                         // 鼠标在图标区，把文字显示为正常
-                        tool.state = (QStyle::State_Raised);  // 把图标区域显示为正常
+                        tool.state |= (QStyle::State_Raised);  // 把图标区域显示为正常
+                        tool.state &= ~QStyle::State_MouseOver;
                         // 文字和Indicator都显示正常
                         tool.rect = d_ptr->mDrawIndicatorArrowRect;
                         if (autoRaise) {
@@ -1784,6 +1786,17 @@ void SARibbonToolButton::invalidateSizeHint()
 {
     d_ptr->mSizeHint = QSize();
     updateGeometry();
+}
+
+void SARibbonToolButton::invalidateIconCache()
+{
+    d_ptr->invalidateIconCache();
+}
+
+void SARibbonToolButton::setIcon(const QIcon& icon)
+{
+    invalidateIconCache();
+    QToolButton::setIcon(icon);
 }
 
 /**
