@@ -100,6 +100,12 @@ bool SARibbonThemePalette::loadFromJson(const QByteArray& json)
     QJsonObject obj = doc.object();
     m_isDark = obj.value("isDark").toBool(false);
 
+    m_keyColors.clear();
+    m_deriveRules.clear();
+    m_derivedColors.clear();
+    m_fixedColors.clear();
+    m_rawStrings.clear();
+
     QJsonObject keyColors = obj.value("keyColors").toObject();
     for (auto it = keyColors.begin(); it != keyColors.end(); ++it) {
         m_keyColors.insert(it.key(), QColor(it.value().toString()));

@@ -13,6 +13,7 @@
 #include <QIcon>
 #include <QMenu>
 #include <QPainter>
+#include <QPointer>
 #include <QResizeEvent>
 #include <QWidgetAction>
 
@@ -664,10 +665,11 @@ QAction* SARibbonPanel::addWidget(QWidget* w, SARibbonPanelItem::RowProportion r
     action->setDefaultWidget(w);
 
     action->setEnabled(w->isEnabled());
-    // 建立 Action -> Widget 的单向同步
-    connect(action, &QWidgetAction::changed, this, [ w, action ]() {
-        if (w) {
-            w->setEnabled(action->isEnabled());
+    // 建立 Action -> Widget 的单向同步，使用 QPointer 防止悬空指针
+    QPointer< QWidget > wPtr(w);
+    connect(action, &QWidgetAction::changed, this, [ wPtr, action ]() {
+        if (wPtr) {
+            wPtr->setEnabled(action->isEnabled());
         }
     });
     action->setIcon(w->windowIcon());
@@ -1428,7 +1430,7 @@ void SARibbonPanel::setPanelName(const QString& title)
 int SARibbonPanel::largeButtonHeight() const
 {
     const QMargins& mag = contentsMargins();
-    return height() - mag.top() - mag.bottom() - titleHeight();
+    return qMax(0, height() - mag.top() - mag.bottom() - titleHeight());
 }
 
 /**

@@ -205,7 +205,9 @@ void SARibbonWidget::setWidget(QWidget* w)
 		oldwidget->deleteLater();
 	}
 	if (QLayout* lay = layout()) {
-		lay->addWidget(w);
+		if (w) {
+			lay->addWidget(w);
+		}
 	}
 }
 

@@ -100,7 +100,7 @@ void SARibbonTitleIconWidget::setPadding(int v)
 
 QSize SARibbonTitleIconWidget::sizeHint() const
 {
-    return QSize(m_iconSize.width() + mPadding, m_iconSize.height() + mPadding);
+    return QSize(m_iconSize.width() + 2 * mPadding, m_iconSize.height() + 2 * mPadding);
 }
 
 void SARibbonTitleIconWidget::paintEvent(QPaintEvent* event)
@@ -171,9 +171,6 @@ void SARibbonTitleIconWidget::setupMenuActions()
     QAction* sizeAction = new QAction(tr("Size(S)"), this);  // cn:大小
     connect(sizeAction, &QAction::triggered, this, &SARibbonTitleIconWidget::onSize);
 
-    // 分隔线
-    m_contextMenu->addSeparator();
-
     // 最小化菜单项
     QAction* minimizeAction = new QAction(tr("Minimize(N)"), this);  // cn:最小化
     minimizeAction->setIcon(style()->standardIcon(QStyle::SP_TitleBarMinButton));
@@ -184,20 +181,19 @@ void SARibbonTitleIconWidget::setupMenuActions()
     maximizeAction->setIcon(style()->standardIcon(QStyle::SP_TitleBarMaxButton));
     connect(maximizeAction, &QAction::triggered, this, &SARibbonTitleIconWidget::onMaximize);
 
-    // 分隔线
-    m_contextMenu->addSeparator();
-
     // 关闭菜单项
     QAction* closeAction = new QAction(tr("Close(C)"), this);  // cn:关闭
     closeAction->setIcon(style()->standardIcon(QStyle::SP_TitleBarCloseButton));
     connect(closeAction, &QAction::triggered, this, &SARibbonTitleIconWidget::onClose);
 
-    // 添加到菜单
+    // 添加到菜单：Restore Move Size (separator) Minimize Maximize (separator) Close
     m_contextMenu->addAction(restoreAction);
     m_contextMenu->addAction(moveAction);
     m_contextMenu->addAction(sizeAction);
+    m_contextMenu->addSeparator();
     m_contextMenu->addAction(minimizeAction);
     m_contextMenu->addAction(maximizeAction);
+    m_contextMenu->addSeparator();
     m_contextMenu->addAction(closeAction);
 }
 

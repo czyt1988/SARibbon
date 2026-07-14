@@ -55,7 +55,9 @@ void SARibbonLineWidgetContainer::setWidget(QWidget *innerWidget)
     QHBoxLayout *lay = static_cast<QHBoxLayout *>(layout());
 
     if (m_innerWidget) {
+        QWidget *old = m_innerWidget;
         lay->replaceWidget(m_innerWidget, innerWidget);
+        old->deleteLater();
     }else{
         lay->insertWidget(1, innerWidget);
     }
