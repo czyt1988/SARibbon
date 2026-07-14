@@ -15,6 +15,26 @@
 #endif
 /**
  * \if ENGLISH
+ * @brief Struct to hold collected size hint data from a single pass
+ * @details This struct is used by collectSizeHints() to return total width, expanding panel count,
+ *          and per-item size hints in a single traversal
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 单次遍历收集的 sizeHint 数据结构
+ * @details 此结构体供 collectSizeHints() 使用，在单次遍历中返回总宽度、可扩展面板数量和每个 item 的 sizeHint
+ * \endif
+ */
+struct SizeHintCollection
+{
+    int totalWidth { 0 };            ///< Total width including margins
+    int canExpandingCount { 0 };     ///< Number of expanding panels
+    QVector<QSize> panelSizes;       ///< Per-item panel size hints
+    QVector<QSize> separatorSizes;   ///< Per-item separator size hints
+};
+
+/**
+ * \if ENGLISH
  * @brief Private data class for SARibbonCategoryLayout
  * @details This class holds private data for SARibbonCategoryLayout to implement the PIMPL idiom.
  * \endif
@@ -32,16 +52,16 @@ public:
 
     /**
      * \if ENGLISH
-     * @brief Calculate total width of all elements' size hints
-     * @return Total width of all elements
+     * @brief Collect size hints from all items in a single pass
+     * @return Struct containing total width, expanding panel count, and per-item size hints
      * \endif
      *
      * \if CHINESE
-     * @brief 计算所有元素的sizehint总宽度
-     * @return 所有元素的总宽度
+     * @brief 单次遍历收集所有 item 的 sizeHint
+     * @return 包含总宽度、可扩展面板数量和每个 item 的 sizeHint 的结构体
      * \endif
      */
-    int totalSizeHintWidth() const;
+    SizeHintCollection collectSizeHints() const;
 
 public:
     bool mDirty { true };
@@ -69,56 +89,77 @@ SARibbonCategoryLayout::PrivateData::PrivateData(SARibbonCategoryLayout* p) : q_
 }
 
 /**
- * @brief 计算所有元素的SizeHint宽度总和
- * @return
+ * \if ENGLISH
+ * @brief Collect size hints from all items in a single pass
+ * @details This method traverses mItemList once to collect total width, expanding panel count,
+ *          and per-item panel/separator size hints, eliminating the need for a separate
+ *          totalSizeHintWidth() call followed by per-item sizeHint() calls in updateGeometryArr()
+ * @return Struct containing all collected data
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 单次遍历收集所有 item 的 sizeHint
+ * @details 此方法遍历 mItemList 一次，收集总宽度、可扩展面板数量和每个 item 的面板/分隔符 sizeHint，
+ *          消除 updateGeometryArr() 中先调用 totalSizeHintWidth() 再逐个调用 sizeHint() 的双重遍历
+ * @return 包含所有收集数据的结构体
+ * \endif
  */
-int SARibbonCategoryLayout::PrivateData::totalSizeHintWidth() const
+SizeHintCollection SARibbonCategoryLayout::PrivateData::collectSizeHints() const
 {
-    int total    = 0;
+    SizeHintCollection result;
+    result.panelSizes.resize(mItemList.size());
+    result.separatorSizes.resize(mItemList.size());
+
     QMargins mag = q_ptr->contentsMargins();
+    if (!mag.isNull()) {
+        result.totalWidth += (mag.left() + mag.right());
+    }
 #if SARibbonCategoryLayout_DEBUG_PRINT
     int debug_i__ = 0;
-    QString debug_totalSizeHintWidth__;
+    QString debug_collectSizeHints__;
 #endif
-    if (!mag.isNull()) {
-        total += (mag.left() + mag.right());
-    }
-    // 先计算总长
-    for (SARibbonCategoryLayoutItem* item : sa_as_const(mItemList)) {
+    for (int i = 0; i < mItemList.size(); ++i) {
+        SARibbonCategoryLayoutItem* item = mItemList[ i ];
         if (item->isEmpty()) {
 // 如果是hide就直接跳过
 #if SARibbonCategoryLayout_DEBUG_PRINT
             ++debug_i__;
-            debug_totalSizeHintWidth__ +=
+            debug_collectSizeHints__ +=
                 QString("   [%1](%2)is empty skip\n").arg(debug_i__).arg(item->toPanelWidget()->panelName());
 #endif
             continue;
         }
-        // 这里要使用widget()->sizeHint()，因为panel的标题会影总体布局，此处需要修改
-        //  TODO
         QSize panelSize = item->widget()->sizeHint();
         QSize SeparatorSize(0, 0);
         if (item->separatorWidget) {
             SeparatorSize = item->separatorWidget->sizeHint();
         }
-        total += panelSize.width();
-        total += SeparatorSize.width();
+        result.panelSizes[ i ]     = panelSize;
+        result.separatorSizes[ i ] = SeparatorSize;
+        result.totalWidth += panelSize.width();
+        result.totalWidth += SeparatorSize.width();
+        if (SARibbonPanel* p = qobject_cast< SARibbonPanel* >(item->widget())) {
+            if (p->isExpanding()) {
+                ++result.canExpandingCount;
+            }
+        }
 #if SARibbonCategoryLayout_DEBUG_PRINT
         ++debug_i__;
-        debug_totalSizeHintWidth__ += QString("|-[%1]panelSize=(%2,%3),SeparatorSize=(%4,%5),name=(%6) \n")
-                                          .arg(debug_i__)
-                                          .arg(panelSize.width())
-                                          .arg(panelSize.height())
-                                          .arg(SeparatorSize.width())
-                                          .arg(SeparatorSize.height())
-                                          .arg(item->toPanelWidget()->panelName());
+        debug_collectSizeHints__ += QString("|-[%1]panelSize=(%2,%3),SeparatorSize=(%4,%5),name=(%6) \n")
+                                        .arg(debug_i__)
+                                        .arg(panelSize.width())
+                                        .arg(panelSize.height())
+                                        .arg(SeparatorSize.width())
+                                        .arg(SeparatorSize.height())
+                                        .arg(item->toPanelWidget()->panelName());
 #endif
     }
 #if SARibbonCategoryLayout_DEBUG_PRINT
-    qDebug() << "SARibbonCategoryLayout.totalSizeHintWidth=" << total;
-    qDebug().noquote() << debug_totalSizeHintWidth__;
+    qDebug() << "SARibbonCategoryLayout.collectSizeHints: totalWidth=" << result.totalWidth
+             << ", canExpandingCount=" << result.canExpandingCount;
+    qDebug().noquote() << debug_collectSizeHints__;
 #endif
-    return (total);
+    return result;
 }
 
 //=============================================================
@@ -386,7 +427,9 @@ void SARibbonCategoryLayout::updateGeometryArr()
         // categoryWidth -= (mag.right() + mag.left());
     }
     // total 是总宽，不是x坐标系，x才是坐标系
-    int total = d_ptr->totalSizeHintWidth();
+    // 单次遍历收集 sizeHint，避免后续重复调用
+    SizeHintCollection hints = d_ptr->collectSizeHints();
+    int total = hints.totalWidth;
 
     // 扩展的宽度
     int expandWidth = 0;
@@ -438,8 +481,6 @@ void SARibbonCategoryLayout::updateGeometryArr()
         }
     } else {
         // 说明total 小于 categoryWidth
-        // 记录可以扩展的数量
-        int canExpandingCount        = 0;
         d_ptr->mIsRightScrollBtnShow = false;
         d_ptr->mIsLeftScrollBtnShow  = false;
         // 这个是避免一开始totalWidth > categorySize.width()，通过滚动按钮调整了m_d->mBaseX
@@ -447,19 +488,10 @@ void SARibbonCategoryLayout::updateGeometryArr()
         // 无法显示，必须这里把mBaseX设置为0
 
         d_ptr->mXBase = 0;
-        //
 
-        for (SARibbonCategoryLayoutItem* item : sa_as_const(d_ptr->mItemList)) {
-            if (SARibbonPanel* p = qobject_cast< SARibbonPanel* >(item->widget())) {
-                if (p->isExpanding()) {
-                    // panel可扩展
-                    ++canExpandingCount;
-                }
-            }
-        }
-        // 计算可扩展的宽度
-        if (canExpandingCount > 0) {
-            expandWidth = (categoryWidth - total) / canExpandingCount;
+        // 计算可扩展的宽度，canExpandingCount 已由 collectSizeHints 收集
+        if (hints.canExpandingCount > 0) {
+            expandWidth = (categoryWidth - total) / hints.canExpandingCount;
         } else {
             expandWidth = 0;
         }
@@ -478,8 +510,9 @@ void SARibbonCategoryLayout::updateGeometryArr()
         // AlignLeft: x = d_ptr->mXBase (default, starts from left edge)
     }
     total = 0;  // total重新计算
-    // 先按照sizeHint设置所有的尺寸
-    for (SARibbonCategoryLayoutItem* item : sa_as_const(d_ptr->mItemList)) {
+    // 先按照sizeHint设置所有的尺寸，使用 collectSizeHints 收集的结果避免重复调用 sizeHint()
+    for (int i = 0; i < d_ptr->mItemList.size(); ++i) {
+        SARibbonCategoryLayoutItem* item = d_ptr->mItemList[ i ];
         if (item->isEmpty()) {
             // 如果是hide就直接跳过
             if (item->separatorWidget) {
@@ -495,12 +528,9 @@ void SARibbonCategoryLayout::updateGeometryArr()
             qDebug() << "unknow widget in SARibbonCategoryLayout";
             continue;
         }
-        // p->layout()->update();
-        QSize panelSize = p->sizeHint();
-        QSize SeparatorSize(0, 0);
-        if (item->separatorWidget) {
-            SeparatorSize = item->separatorWidget->sizeHint();
-        }
+        // 使用 collectSizeHints 收集的 sizeHint，避免重复调用
+        QSize panelSize     = hints.panelSizes[ i ];
+        QSize SeparatorSize = hints.separatorSizes[ i ];
         if (p->isExpanding()) {
             // 可扩展，就把panel扩展到最大
             panelSize.setWidth(panelSize.width() + expandWidth);
