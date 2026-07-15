@@ -41,7 +41,6 @@
 #include "../../src/SARibbonBar/SARibbonApplicationButton.cpp"
 #include "../../src/SARibbonBar/SARibbonSystemButtonBar.cpp"
 #include "../../src/SARibbonBar/SARibbonToolButton.cpp"
-#include "../../src/SARibbonBar/SARibbonButtonLayoutStrategy.cpp"
 #include "../../src/SARibbonBar/SARibbonColorToolButton.cpp"
 #include "../../src/SARibbonBar/SARibbonLineWidgetContainer.cpp"
 #include "../../src/SARibbonBar/SARibbonActionsManager.cpp"

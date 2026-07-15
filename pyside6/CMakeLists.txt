@@ -89,7 +89,6 @@ set(SARIBBON_HEADERS
     ${SARIBBON_SOURCE_DIR}/SARibbonPanelItem.h
     ${SARIBBON_SOURCE_DIR}/SARibbonPanelOptionButton.h
     ${SARIBBON_SOURCE_DIR}/SARibbonToolButton.h
-    ${SARIBBON_SOURCE_DIR}/SARibbonButtonLayoutStrategy.h
     ${SARIBBON_SOURCE_DIR}/SARibbonContextCategory.h
     ${SARIBBON_SOURCE_DIR}/SARibbonGallery.h
     ${SARIBBON_SOURCE_DIR}/SARibbonGalleryGroup.h
@@ -137,7 +136,6 @@ set(SARIBBON_SOURCES
     ${SARIBBON_SOURCE_DIR}/SARibbonPanelItem.cpp
     ${SARIBBON_SOURCE_DIR}/SARibbonPanelOptionButton.cpp
     ${SARIBBON_SOURCE_DIR}/SARibbonToolButton.cpp
-    ${SARIBBON_SOURCE_DIR}/SARibbonButtonLayoutStrategy.cpp
     ${SARIBBON_SOURCE_DIR}/SARibbonContextCategory.cpp
     ${SARIBBON_SOURCE_DIR}/SARibbonGallery.cpp
     ${SARIBBON_SOURCE_DIR}/SARibbonGalleryGroup.cpp

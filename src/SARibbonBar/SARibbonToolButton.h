@@ -4,9 +4,6 @@
 #include <QToolButton>
 #include <QDebug>
 
-// 前向声明
-class SARibbonButtonLayoutStrategy;
-struct SARibbonButtonLayoutContext;
 /**
  * \if ENGLISH
  * @brief Ribbon interface adapted tool button

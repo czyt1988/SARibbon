@@ -1,7 +1,6 @@
 #include "SARibbonToolButton.h"
 #include "SARibbonPanel.h"
 #include "SARibbonPanelLayout.h"
-#include "SARibbonButtonLayoutStrategy.h"
 
 #include <QAction>
 #include <QApplication>
