@@ -78,8 +78,6 @@ public:
     // 动画相关
     QPropertyAnimation* mScrollAnimation { nullptr };
     int mTargetScrollPosition { 0 };
-    QList< QWidget* > mShowWidgets;  ///< Pre-allocated list for doLayout reuse
-    QList< QWidget* > mHideWidgets;  ///< Pre-allocated list for doLayout reuse
 };
 
 //=============================================================
@@ -607,9 +605,7 @@ void SARibbonCategoryLayout::doLayout()
         d_ptr->mLeftScrollBtn->setGeometry(0, 0, 12, category->height());
         d_ptr->mRightScrollBtn->setGeometry(category->width() - 12, 0, 12, category->height());
     }
-    // 复用预分配容器，避免每次 doLayout 分配新 QList
-    d_ptr->mShowWidgets.clear();
-    d_ptr->mHideWidgets.clear();
+    QList< QWidget* > showWidgets, hideWidgets;
 #if SARibbonCategoryLayout_DEBUG_PRINT
     int debug_i__(0);
     qDebug() << "SARibbonCategoryLayout::doLayout(),name=" << category->categoryName();
@@ -618,9 +614,9 @@ void SARibbonCategoryLayout::doLayout()
     for (int i = 0; i < itemsize; ++i) {
         SARibbonCategoryLayoutItem* item = d_ptr->mItemList[ i ];
         if (item->isEmpty()) {
-            d_ptr->mHideWidgets << item->widget();
+            hideWidgets << item->widget();
             if (item->separatorWidget) {
-                d_ptr->mHideWidgets << item->separatorWidget;
+                hideWidgets << item->separatorWidget;
             }
 #if SARibbonCategoryLayout_DEBUG_PRINT
             qDebug() << "  |-[" << debug_i__ << "]panelName(" << item->toPanelWidget()->panelName() << ",will hide";
@@ -633,10 +629,10 @@ void SARibbonCategoryLayout::doLayout()
             //            item->widget()->setFixedSize(item->mWillSetGeometry.size());
             //            item->widget()->move(item->mWillSetGeometry.topLeft());
             //            item->setGeometry(item->mWillSetGeometry);
-            d_ptr->mShowWidgets << item->widget();
+            showWidgets << item->widget();
             if (item->separatorWidget) {
                 item->separatorWidget->setGeometry(item->mWillSetSeparatorGeometry);
-                d_ptr->mShowWidgets << item->separatorWidget;
+                showWidgets << item->separatorWidget;
             }
 #if SARibbonCategoryLayout_DEBUG_PRINT
             qDebug() << "  |-[" << debug_i__ << "]panelName(" << item->toPanelWidget()->panelName()
@@ -652,7 +648,7 @@ void SARibbonCategoryLayout::doLayout()
         SARibbonCategoryLayoutItem* item = d_ptr->mItemList[ i ];
         if (!item->isEmpty()) {
             if (item->separatorWidget) {
-                d_ptr->mHideWidgets << item->separatorWidget;
+                hideWidgets << item->separatorWidget;
             }
             break;
         }
@@ -667,12 +663,12 @@ void SARibbonCategoryLayout::doLayout()
         d_ptr->mLeftScrollBtn->raise();
     }
     // 不在上面那里进行show和hide因为这会触发SARibbonPanelLayout的重绘，导致循环绘制，非常影响效率
-    for (QWidget* w : sa_as_const(d_ptr->mShowWidgets)) {
+    for (QWidget* w : sa_as_const(showWidgets)) {
         if (!w->isVisible()) {
             w->show();
         }
     }
-    for (QWidget* w : sa_as_const(d_ptr->mHideWidgets)) {
+    for (QWidget* w : sa_as_const(hideWidgets)) {
         if (w->isVisible()) {
             w->hide();
         }

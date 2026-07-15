@@ -586,28 +586,26 @@ void SARibbonPanelLayout::doLayout()
     if (!par) {
         return;
     }
-    // 复用预分配容器，避免每次 doLayout 分配新 QList
-    mShowWidgets.clear();
-    mHideWidgets.clear();
+    QList< QWidget* > showWidgets, hideWidgets;
     for (SARibbonPanelItem* item : sa_as_const(mItems)) {
         if (item->isEmpty()) {
-            mHideWidgets << item->widget();
+            hideWidgets << item->widget();
         } else {
             // 在category发现item->setGeometry有点奇怪的现象，这里统一使用item->widget->setgeo
             // item->setGeometry(item->itemWillSetGeometry);
             if (item->widget()) {
                 item->widget()->setGeometry(item->itemWillSetGeometry);
             }
-            mShowWidgets << item->widget();
+            showWidgets << item->widget();
         }
     }
 
     // 不在上面那里进行show和hide因为这会触发SARibbonPanelLayout的重绘，导致循环绘制，非常影响效率
-    for (QWidget* w : sa_as_const(mShowWidgets)) {
+    for (QWidget* w : sa_as_const(showWidgets)) {
         if (!w->isVisible())
             w->show();
     }
-    for (QWidget* w : sa_as_const(mHideWidgets)) {
+    for (QWidget* w : sa_as_const(hideWidgets)) {
         if (w->isVisible())
             w->hide();
     }

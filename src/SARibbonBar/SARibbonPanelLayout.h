@@ -181,8 +181,6 @@ private:
     QRect mOptionActionBtnGeometry;               ///< optionAction的位置
     bool mEnableWordWrap { true };                ///< 是否允许文字换行
     qreal mButtonMaximumAspectRatio { 1.4 };      ///< 按钮的宽高比
-    QList< QWidget* > mShowWidgets;               ///< Pre-allocated list for doLayout reuse
-    QList< QWidget* > mHideWidgets;               ///< Pre-allocated list for doLayout reuse
 };
 
 #endif  // SARIBBONPANELLAYOUT_H
