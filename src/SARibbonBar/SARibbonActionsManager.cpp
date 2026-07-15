@@ -15,7 +15,7 @@ public:
     QMap< int, QList< QAction* > > mTagToActions;   ///< tag : QList<QAction*>
     QMap< int, QString > mTagToName;                ///< tag对应的名字
     QHash< QString, QAction* > mKeyToAction;        ///< key对应action
-    QMap< QAction*, QString > mActionToKey;         ///< action对应key
+    QHash< QAction*, QString > mActionToKey;        ///< action对应key
     QMap< int, SARibbonCategory* > mTagToCategory;  ///< 仅仅在autoRegisteActions函数会有用
     int mSale;  ///< 盐用于生成固定的id，在用户不主动设置key时，id基于msale生成，只要SARibbonActionsManager的调用registeAction顺序不变，生成的id都不变，因为它是基于自增实现的
 };
@@ -106,13 +106,13 @@ QString SARibbonActionsManager::tagName(int tag) const
  * \if ENGLISH
  * @brief Remove tag
  * @param tag Tag to remove
- * @note This function is time-consuming
+ * @note Actions not referenced by other tags will be removed from the manager
  * \endif
  *
  * \if CHINESE
  * @brief 移除tag
  * @param tag 要移除的标签
- * @note 注意，这个函数非常耗时
+ * @note 不被其他tag引用的action将从管理器中移除
  * \endif
  */
 void SARibbonActionsManager::removeTag(int tag)
@@ -124,10 +124,12 @@ void SARibbonActionsManager::removeTag(int tag)
     d_ptr->mTagToName.remove(tag);
     // 开始查找需要移出总表的action
     QList< QAction* > needRemoveAct;
-    QList< QAction* > total;
+    QSet< QAction* > total;
 
     for (auto i = d_ptr->mTagToActions.begin(); i != d_ptr->mTagToActions.end(); ++i) {
-        total += i.value();
+        for (QAction* a : i.value()) {
+            total.insert(a);
+        }
     }
     for (QAction* a : sa_as_const(oldacts)) {
         if (!total.contains(a)) {
@@ -521,12 +523,19 @@ QList< QAction* > SARibbonActionsManager::search(const QString& text)
     }
     QStringList kws = text.split(" ");
 
-    if (kws.isEmpty()) {
-        kws.append(text);
+    // 关键词去重并过滤空串
+    QSet< QString > uniqueKws;
+    for (const QString& k : kws) {
+        if (!k.isEmpty()) {
+            uniqueKws.insert(k);
+        }
+    }
+    if (uniqueKws.isEmpty()) {
+        return (res);
     }
 
     QSet< QAction* > seen;
-    for (const QString& k : sa_as_const(kws)) {
+    for (const QString& k : uniqueKws) {
         for (auto i = d_ptr->mActionToKey.begin(); i != d_ptr->mActionToKey.end(); ++i) {
             if (i.key()->text().contains(k, Qt::CaseInsensitive)) {
                 seen.insert(i.key());

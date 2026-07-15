@@ -53,7 +53,7 @@ public:
 	// Get tag name
 	QString tagName(int tag) const;
 
-	// Remove tag, note this function is time-consuming
+	// Remove tag and clean up orphan actions
 	void removeTag(int tag);
 
 	// Register action
