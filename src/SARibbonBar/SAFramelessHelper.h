@@ -5,6 +5,7 @@
 #include <QObject>
 
 class QWidget;
+class QScreen;
 
 /**
  * \if ENGLISH
@@ -82,6 +83,10 @@ public:
 protected:
 	// 事件过滤，进行移动、缩放等
 	virtual bool eventFilter(QObject* obj, QEvent* event);
+
+private Q_SLOTS:
+	// Refresh cached screen list when screen configuration changes during drag
+	void onScreenAdded(QScreen* screen);
 };
 
 #endif  // FRAMELESSHELPER_H

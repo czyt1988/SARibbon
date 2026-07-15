@@ -139,6 +139,9 @@ public:
     // 更新橡皮筋状态
     void updateRubberBandStatus();
 
+    // Refresh cached screen list during drag (for screen hot-plug)
+    void refreshScreenCache();
+
 private:
     // 更新鼠标样式
     void updateCursorShape(const QPoint& gMousePos);
@@ -178,6 +181,7 @@ private:
     bool m_bCursorShapeChanged;
     bool m_bLeftButtonTitlePressed;
     Qt::WindowFlags m_windowFlags;
+    QList< QScreen* > mCachedScreens;  ///< Cached screen list during drag to avoid per-MouseMove allocation
 };
 
 /***** WidgetData *****/
@@ -248,6 +252,13 @@ void SAPrivateFramelessWidgetData::updateRubberBandStatus()
     } else {
         delete m_pRubberBand;
         m_pRubberBand = NULL;
+    }
+}
+
+void SAPrivateFramelessWidgetData::refreshScreenCache()
+{
+    if (m_bLeftButtonPressed) {
+        mCachedScreens = QGuiApplication::screens();
     }
 }
 
@@ -369,6 +380,9 @@ bool SAPrivateFramelessWidgetData::handleMousePressEvent(QMouseEvent* event)
     if (event->button() == Qt::LeftButton) {
         m_bLeftButtonPressed = true;
 
+        // Cache screen list at drag start to avoid per-MouseMove allocation
+        mCachedScreens = QGuiApplication::screens();
+
         qreal dpiScale        = SAFramelessHelper::getScreenDpiScale(m_pWidget);
         int scaledTitleHeight = d->m_titleHeight * dpiScale;
         // 这里要用eventPosY获取相对位置
@@ -408,6 +422,7 @@ bool SAPrivateFramelessWidgetData::handleMouseReleaseEvent(QMouseEvent* event)
         m_bLeftButtonPressed      = false;
         m_bLeftButtonTitlePressed = false;
         m_pressedMousePos.reset();
+        mCachedScreens.clear();
         if (m_pRubberBand && m_pRubberBand->isVisible()) {
             m_pRubberBand->hide();
             m_pWidget->setGeometry(m_pRubberBand->geometry());
@@ -448,8 +463,8 @@ bool SAPrivateFramelessWidgetData::handleMouseMoveEvent(QMouseEvent* event)
                 return (true);
             }
 
-            bool isOutScreen          = true;
-            QList< QScreen* > screens = QGuiApplication::screens();
+            bool isOutScreen            = true;
+            const QList< QScreen* >& screens = mCachedScreens;
             for (int i = 0; i < screens.size(); i++) {
                 QScreen* pScreen   = screens[ i ];
                 QRect geometryRect = pScreen->availableGeometry();
@@ -528,6 +543,10 @@ bool SAPrivateFramelessWidgetData::handleDoubleClickedMouseEvent(QMouseEvent* ev
 //===================================================
 SAFramelessHelper::SAFramelessHelper(QObject* parent) : QObject(parent), d_ptr(new SAFramelessHelper::PrivateData(this))
 {
+    // Monitor screen configuration changes to refresh drag-time cache
+    connect(qApp, &QGuiApplication::screenAdded, this, &SAFramelessHelper::onScreenAdded);
+    connect(qApp, &QGuiApplication::screenRemoved, this, &SAFramelessHelper::onScreenAdded);
+
     if (parent) {
         QWidget* w = qobject_cast< QWidget* >(parent);
         if (w) {
@@ -586,6 +605,14 @@ void SAFramelessHelper::removeFrom(QWidget* topLevelWidget)
 {
     d_ptr->m_widgetData.reset(nullptr);
     topLevelWidget->removeEventFilter(this);
+}
+
+void SAFramelessHelper::onScreenAdded(QScreen* screen)
+{
+    Q_UNUSED(screen)
+    if (d_ptr->m_widgetData) {
+        d_ptr->m_widgetData->refreshScreenCache();
+    }
 }
 
 void SAFramelessHelper::setRubberBandOnMove(bool movable)
