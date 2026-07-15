@@ -76,6 +76,22 @@ public:
     QColor mColor;                                                                                ///< 记录颜色
     SARibbonColorToolButton::ColorStyle mColorStyle { SARibbonColorToolButton::ColorUnderIcon };  ///< 颜色显示样式
     QIcon mOldIcon;                                                                               ///< 记录旧的icon
+
+    // Color pixmap cache (ColorUnderIcon mode only)
+    // Cache key dimensions: icon cache key, size, mode, state, color
+    mutable QPixmap mCachedColorPixmap;                            ///< 缓存的合成后 pixmap
+    mutable QSize mCachedColorPixmapSize;                           ///< 缓存对应的图标尺寸
+    mutable QIcon::Mode mCachedColorPixmapMode { QIcon::Normal };   ///< 缓存对应的模式
+    mutable QIcon::State mCachedColorPixmapState { QIcon::Off };    ///< 缓存对应的状态
+    mutable QColor mCachedColorPixmapColor;                         ///< 缓存对应的颜色
+    mutable qint64 mCachedColorPixmapIconKey { 0 };                 ///< 缓存对应图标的 cacheKey
+    mutable bool mColorPixmapCacheValid { false };                  ///< 缓存是否有效
+
+    /// Invalidate the color pixmap cache so the next paint regenerates it
+    void invalidateColorPixmapCache()
+    {
+        mColorPixmapCacheValid = false;
+    }
 };
 
 SARibbonColorToolButton::PrivateData::PrivateData(SARibbonColorToolButton* p) : q_ptr(p)
@@ -96,6 +112,16 @@ QPixmap SARibbonColorToolButton::PrivateData::createIconPixmap(const QStyleOptio
         mode = QIcon::Active;
     } else {
         mode = QIcon::Normal;
+    }
+    // Check color pixmap cache — key includes icon cache key, size, mode, state, and color
+    qint64 iconKey = opt.icon.cacheKey();
+    if (mColorPixmapCacheValid
+        && mCachedColorPixmapSize == iconsize
+        && mCachedColorPixmapMode == mode
+        && mCachedColorPixmapState == state
+        && mCachedColorPixmapColor == mColor
+        && mCachedColorPixmapIconKey == iconKey) {
+        return mCachedColorPixmap;
     }
     QSize realIconSize = iconsize
                          - QSize(0,
@@ -138,6 +164,14 @@ QPixmap SARibbonColorToolButton::PrivateData::createIconPixmap(const QStyleOptio
         painter.setPen(pen);
         painter.drawRect(colorRect);
     }
+    // Fill color pixmap cache
+    mCachedColorPixmap        = res;
+    mCachedColorPixmapSize    = iconsize;
+    mCachedColorPixmapMode    = mode;
+    mCachedColorPixmapState   = state;
+    mCachedColorPixmapColor   = mColor;
+    mCachedColorPixmapIconKey = iconKey;
+    mColorPixmapCacheValid   = true;
     return res;
 }
 
@@ -222,6 +256,7 @@ void SARibbonColorToolButton::setColorStyle(SARibbonColorToolButton::ColorStyle 
         return;
     }
     d_ptr->mColorStyle = s;
+    d_ptr->invalidateColorPixmapCache();
     if (ColorUnderIcon == s) {
         SARibbonToolButton::invalidateIconCache();
         setIcon(d_ptr->mOldIcon);
@@ -298,6 +333,7 @@ void SARibbonColorToolButton::setColor(const QColor& c)
 {
     if (d_ptr->mColor != c) {
         d_ptr->mColor = c;
+        d_ptr->invalidateColorPixmapCache();
         if (ColorFillToIcon == colorStyle()) {
             SARibbonToolButton::invalidateIconCache();
             setIcon(d_ptr->createColorIcon(c,

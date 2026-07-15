@@ -11,6 +11,7 @@
 #include <QDir>
 #include <QCoreApplication>
 #include <QDebug>
+#include <QHash>
 
 namespace SA
 {
@@ -120,6 +121,46 @@ static const std::map< SARibbonTheme, QColor > s_themeBaselineColors = {
  * @param theme 要应用的内置 ribbon 主题
  * \endif
  */
+// ===================================================
+// QSS resource text cache
+// ===================================================
+
+/**
+ * \if ENGLISH
+ * @brief Load text content from a Qt resource path with static caching
+ * @details The file content is cached in a static QHash for the lifetime of the process.
+ *          Repeated calls with the same path return the cached content without disk I/O.
+ *          Qt resources are memory-mapped, so the initial read is already fast, but this
+ *          avoids redundant string allocations on repeated theme switches.
+ * @param path Qt resource path (e.g. ":/SARibbonTheme/resource/theme-base.qss")
+ * @return File content as a UTF-8 string, or an empty string if the file cannot be opened
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 从 Qt 资源路径加载文本内容，带有静态缓存
+ * @details 文件内容缓存在静态 QHash 中，生命周期为整个进程。
+ *          使用相同路径的重复调用返回缓存内容，无需磁盘 I/O。
+ *          Qt 资源文件是内存映射的，因此首次读取已经很快，但此函数
+ *          避免了重复主题切换时的冗余字符串分配。
+ * @param path Qt 资源路径（如 ":/SARibbonTheme/resource/theme-base.qss"）
+ * @return 文件内容的 UTF-8 字符串，若无法打开则返回空字符串
+ * \endif
+ */
+static QString loadResourceText(const QString& path)
+{
+    static QHash< QString, QString > cache;
+    auto it = cache.constFind(path);
+    if (it != cache.constEnd()) {
+        return it.value();
+    }
+    QFile f(path);
+    if (f.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        cache[path] = QString::fromUtf8(f.readAll());
+        return cache[path];
+    }
+    return QString();
+}
+
 // Forward declaration — defined later in this file
 static QString themeToPalettePath(SARibbonTheme theme);
 
@@ -251,16 +292,11 @@ void applyRibbonTheme(QWidget* w, SARibbonBar* bar, SARibbonTheme theme,
     // If palette is provided and a template exists, use template-based approach
     QString templatePath = themeToTemplatePath(theme);
     if (palette.variables().size() > 0 && !templatePath.isEmpty() && w) {
-        QFile baseFile(":/SARibbonTheme/resource/theme-base.qss");
-        QString baseQss;
-        if (baseFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            baseQss = QString::fromUtf8(baseFile.readAll());
-        }
+        QString baseQss = loadResourceText(":/SARibbonTheme/resource/theme-base.qss");
 
         // Load the QSS template
-        QFile templateFile(templatePath);
-        if (templateFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            QString templateQss = QString::fromUtf8(templateFile.readAll());
+        QString templateQss = loadResourceText(templatePath);
+        if (!templateQss.isEmpty()) {
             // Replace {{token}} placeholders with palette colors
             QString processedQss = SA::replaceQssTokens(templateQss, palette);
             w->setStyleSheet(baseQss + "\n" + processedQss);
@@ -268,17 +304,11 @@ void applyRibbonTheme(QWidget* w, SARibbonBar* bar, SARibbonTheme theme,
             // Template file not found, fall back to base QSS
             qWarning() << "applyRibbonTheme: template not found:" << templatePath
                        << "- falling back to base QSS";
-            QFile baseOnly(":/SARibbonTheme/resource/theme-base.qss");
-            if (baseOnly.open(QIODevice::ReadOnly | QIODevice::Text)) {
-                w->setStyleSheet(QString::fromUtf8(baseOnly.readAll()));
-            }
+            w->setStyleSheet(loadResourceText(":/SARibbonTheme/resource/theme-base.qss"));
         }
     } else if (w) {
         // Empty palette — fall back to base QSS only
-        QFile baseQss(":/SARibbonTheme/resource/theme-base.qss");
-        if (baseQss.open(QIODevice::ReadOnly | QIODevice::Text)) {
-            w->setStyleSheet(QString::fromUtf8(baseQss.readAll()));
-        }
+        w->setStyleSheet(loadResourceText(":/SARibbonTheme/resource/theme-base.qss"));
     }
 
     if (!bar) {
