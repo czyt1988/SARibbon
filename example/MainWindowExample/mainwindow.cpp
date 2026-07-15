@@ -51,6 +51,7 @@
 #include <QShortcut>
 #include <QLineEdit>
 #include <QDialogButtonBox>
+#include <QPointer>
 
 /**
  * \if ENGLISH
@@ -2323,8 +2324,12 @@ void MainWindow::createCategoryDelete(SARibbonCategory* categoryPage)
     SARibbonPanel* panelCategoryTest = new SARibbonPanel(("panel 2"));
 
     QAction* actionRemovePanel = createAction(tr("remove panel"), ":/icon/icon/remove.svg");
-    connect(actionRemovePanel, &QAction::triggered, this, [ this, categoryPage, panelCategoryTest ]() {
-        onRemovePanelActionTriggered(categoryPage, panelCategoryTest);
+    QPointer< SARibbonPanel > panelCategoryTestPtr = panelCategoryTest;
+    connect(actionRemovePanel, &QAction::triggered, this, [ this, categoryPage, panelCategoryTestPtr, actionRemovePanel ]() {
+        if (panelCategoryTestPtr) {
+            onRemovePanelActionTriggered(categoryPage, panelCategoryTestPtr);
+            actionRemovePanel->setDisabled(true);
+        }
     });
     panelRemoveTest->addLargeAction(actionRemovePanel);
 

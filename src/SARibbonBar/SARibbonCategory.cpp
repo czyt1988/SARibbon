@@ -139,9 +139,13 @@ bool SARibbonCategory::PrivateData::takePanel(SARibbonPanel* panel)
     if (nullptr == lay) {
         return false;
     }
-    QObject::disconnect(panel, &SARibbonPanel::actionTriggered, ribbonCategory(), &SARibbonCategory::actionTriggered);
+    // 先从布局移除（仅指针比较，不解引用 panel），成功后再断开信号连接，
+    // 避免传入悬空指针时 disconnect 解引用已释放内存导致崩溃
     bool res = lay->takePanel(panel);
-    q_ptr->updateGeometry();  // 通知父布局这个控件的尺寸提示(sizeHint())可能已改变
+    if (res) {
+        QObject::disconnect(panel, &SARibbonPanel::actionTriggered, ribbonCategory(), &SARibbonCategory::actionTriggered);
+        q_ptr->updateGeometry();  // 通知父布局这个控件的尺寸提示(sizeHint())可能已改变
+    }
     return res;
 }
 
