@@ -2428,6 +2428,10 @@ void SARibbonBar::endUpdate()
     if (SARibbonBarLayout* lay = qobject_cast< SARibbonBarLayout* >(layout())) {
         lay->resetSize();
     }
+    // resetSize may not trigger doLayout if the height didn't change (e.g. setTabOnTitle
+    // already called resetSize during the batch). Force a relayout so that items are
+    // repositioned based on the updated category properties.
+    d_ptr->relayout();
     iterateCategory([](SARibbonCategory* c) -> bool {
         c->updateItemGeometry();
         return true;
