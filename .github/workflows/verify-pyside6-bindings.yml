@@ -12,6 +12,9 @@ on:
     # master — это продукт: из него собираются колёса для приложения,
     # поэтому проверяется в первую очередь именно он
     branches: [master, ci/verify-bindings, 'fix/**']
+    # Тег вида pyside6-6.10.3-1 гоняет ту же проверку и, если она зелёная,
+    # публикует собранные колёса ассетами в GitHub Release этого тега.
+    tags: ['pyside6-*']
   workflow_dispatch:
 
 jobs:
@@ -115,3 +118,36 @@ jobs:
           name: screenshot-${{ matrix.os }}
           path: ribbon-*.png
           if-no-files-found: warn
+
+  # Публикация колёс. Отдельный job, а не шаг внутри verify: он должен
+  # запуститься один раз после того, как ЗЕЛЁНЫМИ станут все три платформы
+  # (needs: verify ждёт всю матрицу), и только по тегу — на push в ветки
+  # пропускается. Публикуется ровно тот артефакт, что прошёл 11 проверок:
+  # отдельного пути сборки, который мог бы разойтись с проверенным, нет.
+  release:
+    name: Attach verified wheels to GitHub Release
+    needs: verify
+    if: startsWith(github.ref, 'refs/tags/pyside6-')
+    runs-on: ubuntu-latest
+    permissions:
+      # право создать релиз для тега и залить в него ассеты; сборочному
+      # job оно не нужно, поэтому выдаётся точечно здесь
+      contents: write
+    steps:
+      - name: Download wheels from all platforms
+        uses: actions/download-artifact@v4
+        with:
+          # verify грузит их под именами wheel-<os>-py<ver>; собираем в один каталог
+          pattern: wheel-*
+          path: dist
+          merge-multiple: true
+
+      - name: List wheels
+        run: ls -la dist/*.whl
+
+      - name: Publish wheels to the release
+        uses: softprops/action-gh-release@v2
+        with:
+          # релиз для тега создаётся, если его ещё нет; ассеты перезаписываются
+          files: dist/*.whl
+          fail_on_unmatched_files: true
