@@ -16,6 +16,21 @@ set(CMAKE_AUTOUIC ON)
 # =====================================================================
 find_package(Qt6 COMPONENTS Core Gui Widgets REQUIRED)
 
+# Qt6::Gui exposes WrapOpenGL in its link interface, so every consumer links
+# libOpenGL/libGLX even when it never calls OpenGL. This module does not: it
+# references zero symbols from either library and records no GL version
+# references, yet without this the wheel still carries DT_NEEDED on
+# libOpenGL.so.0 / libGLX.so.0 and fails to import on systems without libglvnd
+# (minimal CI images, headless servers). -Wl,--as-needed does not drop them.
+#
+# Qt's headers still need GL/gl.h (via qopengl.h), so the include directory is
+# added back explicitly before the link interface is cleared. Qt6::Gui keeps its
+# own DT_NEEDED on libGL, so GL still resolves for Qt itself at runtime.
+find_package(OpenGL)
+if(TARGET WrapOpenGL::WrapOpenGL)
+    set_property(TARGET WrapOpenGL::WrapOpenGL PROPERTY INTERFACE_LINK_LIBRARIES "")
+endif()
+
 # =====================================================================
 # Find Python and Shiboken6 / PySide6
 #
@@ -34,7 +49,8 @@ execute_process(
 )
 
 # --- Shiboken6 include and lib ---
-set(SHIBOKEN6_INCLUDE_DIR "${PYTHON_SITE_PACKAGES}/shiboken6_generator/include")
+# Shiboken headers ship in the shiboken6 runtime package, not in shiboken6_generator
+set(SHIBOKEN6_INCLUDE_DIR "${PYTHON_SITE_PACKAGES}/shiboken6/include")
 set(SHIBOKEN6_LIB_DIR "${PYTHON_SITE_PACKAGES}/shiboken6")
 
 # Find shiboken6 generator executable
@@ -55,16 +71,30 @@ set(PYSIDE_LIB_DIR "${PYTHON_SITE_PACKAGES}/PySide6")
 set(PYSIDE_TYPESYSTEMS "${PYTHON_SITE_PACKAGES}/PySide6/typesystems")
 
 # --- Locate shiboken6.lib ---
-find_library(SHIBOKEN6_LIBRARY
-    NAMES shiboken6 shiboken6d "shiboken6.abi3"
-    HINTS ${SHIBOKEN6_LIB_DIR}
-    REQUIRED)
+# The wheels ship only versioned libraries (libshiboken6.abi3.so.6.11) with no
+# unversioned symlink, so find_library() cannot see them.
+file(GLOB SHIBOKEN6_LIBRARY_CANDIDATES
+    "${SHIBOKEN6_LIB_DIR}/libshiboken6.abi3.so*"
+    "${SHIBOKEN6_LIB_DIR}/libshiboken6*.dylib"
+    "${SHIBOKEN6_LIB_DIR}/shiboken6.abi3.lib"
+    "${SHIBOKEN6_LIB_DIR}/shiboken6.lib")
+list(GET SHIBOKEN6_LIBRARY_CANDIDATES 0 SHIBOKEN6_LIBRARY)
+if(NOT SHIBOKEN6_LIBRARY)
+    message(FATAL_ERROR "shiboken6 library not found in ${SHIBOKEN6_LIB_DIR}")
+endif()
+message(STATUS "SHIBOKEN6_LIBRARY: ${SHIBOKEN6_LIBRARY}")
 
 # --- Locate pyside6.lib ---
-find_library(PYSIDE6_LIBRARY
-    NAMES pyside6 pyside6d "pyside6.abi3"
-    HINTS ${PYSIDE_LIB_DIR}
-    REQUIRED)
+file(GLOB PYSIDE6_LIBRARY_CANDIDATES
+    "${PYSIDE_LIB_DIR}/libpyside6.abi3.so*"
+    "${PYSIDE_LIB_DIR}/libpyside6*.dylib"
+    "${PYSIDE_LIB_DIR}/pyside6.abi3.lib"
+    "${PYSIDE_LIB_DIR}/pyside6.lib")
+list(GET PYSIDE6_LIBRARY_CANDIDATES 0 PYSIDE6_LIBRARY)
+if(NOT PYSIDE6_LIBRARY)
+    message(FATAL_ERROR "pyside6 library not found in ${PYSIDE_LIB_DIR}")
+endif()
+message(STATUS "PYSIDE6_LIBRARY: ${PYSIDE6_LIBRARY}")
 
 # =====================================================================
 # Paths
@@ -161,6 +191,8 @@ set(SARIBBON_SOURCES
     ${SARIBBON_SOURCE_DIR}/SARibbonCustomizeDialog.cpp
     ${SARIBBON_SOURCE_DIR}/SARibbonCustomizeWidget.cpp
     ${SARIBBON_SOURCE_DIR}/SARibbonUtil.cpp
+    ${SARIBBON_SOURCE_DIR}/SARibbonThemeManager.cpp
+    ${SARIBBON_SOURCE_DIR}/SARibbonThemePalette.cpp
     ${SARIBBON_SOURCE_DIR}/SAFramelessHelper.cpp
     ${SARIBBON_SOURCE_DIR}/SARibbonWidget.cpp
     ${SARIBBON_SOURCE_DIR}/SARibbonColorToolButton.cpp
@@ -191,6 +223,7 @@ target_compile_definitions(saribbon_lib PRIVATE
 target_include_directories(saribbon_lib PUBLIC
     ${SARIBBON_SOURCE_DIR}
     ${SARIBBON_COLORWIDGETS_DIR}
+    ${OPENGL_INCLUDE_DIR}
 )
 
 target_link_libraries(saribbon_lib PUBLIC
@@ -300,6 +333,7 @@ target_include_directories(saribbon PRIVATE
     ${SARIBBON_COLORWIDGETS_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}
     ${Python_INCLUDE_DIRS}
+    ${OPENGL_INCLUDE_DIR}
 )
 
 target_link_libraries(saribbon PRIVATE
@@ -322,6 +356,19 @@ set_target_properties(saribbon PROPERTIES
     PREFIX ""
     OUTPUT_NAME "saribbon"
 )
+
+# The module is installed into site-packages/PySideSARibbon/ while Qt, libpyside6
+# and libshiboken6 live in sibling packages. Without an RPATH the module can only
+# be imported with LD_LIBRARY_PATH set, which also breaks PyInstaller bundles.
+if(APPLE)
+    set_target_properties(saribbon PROPERTIES
+        BUILD_WITH_INSTALL_RPATH ON
+        INSTALL_RPATH "@loader_path/../PySide6/Qt/lib;@loader_path/../PySide6;@loader_path/../shiboken6")
+elseif(UNIX)
+    set_target_properties(saribbon PROPERTIES
+        BUILD_WITH_INSTALL_RPATH ON
+        INSTALL_RPATH "$ORIGIN/../PySide6/Qt/lib;$ORIGIN/../PySide6;$ORIGIN/../shiboken6")
+endif()
 
 if(WIN32)
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
