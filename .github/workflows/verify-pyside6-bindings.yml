@@ -21,6 +21,8 @@ jobs:
         os: [windows-latest, macos-latest, ubuntu-latest]
         python: ["3.12"]
     runs-on: ${{ matrix.os }}
+    env:
+      PYSIDE_VER: "6.10.3"
     defaults:
       run:
         shell: bash
@@ -33,7 +35,12 @@ jobs:
           python-version: ${{ matrix.python }}
 
       - name: Install Python build dependencies
-        run: pip install -U pip build PySide6 shiboken6-generator aqtinstall
+        run: |
+          # PySide6 зафиксирован: aqtinstall 3.3.0 не умеет ставить Qt 6.11.x под Windows
+          # ("Failed to locate XML data for Qt version"), тогда как 6.10.x доступен на всех
+          # трёх хостах. Версия Qt всё равно выводится из PySide6 — инвариант сохраняется.
+          pip install -U pip build scikit-build-core cmake ninja aqtinstall
+          pip install "PySide6==${PYSIDE_VER}" "shiboken6-generator==${PYSIDE_VER}"
 
       - name: Resolve Qt version from PySide6
         run: |
@@ -62,9 +69,12 @@ jobs:
           echo "QT_PREFIX=$PWD/Qt/$QT_VER/gcc_64" >> $GITHUB_ENV
           # find_package(Qt6 COMPONENTS Gui) resolves WrapOpenGL and fails without these
           sudo apt-get update
-          sudo apt-get install -y libgl-dev mesa-common-dev clang libclang-dev
+          # llvm-dev нужен ради llvm-config: пакеты clang/libclang-dev его не приносят
+          sudo apt-get install -y libgl-dev mesa-common-dev clang libclang-dev llvm-dev
           # shiboken6 embeds libclang but ships no builtin headers
-          echo "LLVM_INSTALL_DIR=$(llvm-config --prefix)" >> $GITHUB_ENV
+          LLVM_DIR=$(llvm-config --prefix 2>/dev/null || ls -d /usr/lib/llvm-* | sort -V | tail -1)
+          echo "LLVM_INSTALL_DIR=$LLVM_DIR" >> $GITHUB_ENV
+          echo "using LLVM at $LLVM_DIR"
 
       - name: Set up MSVC
         if: runner.os == 'Windows'
