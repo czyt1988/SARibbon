@@ -1,4 +1,4 @@
-"""Проверка PySideSARibbon на всех платформах.
+"""Cross-platform verification of PySideSARibbon.
 
 Строит ленту эталонного объёма и проверяет четыре свойства, которые нужны
 приложению: контекстная вкладка, встроенный виджет в панели, сворачивание,
@@ -79,37 +79,37 @@ def main() -> int:
     app.processEvents()
 
     print("checks:")
-    check("категории созданы", len(bar.categoryPages()) >= 2)
-    check("встроенный виджет в панели", combo.parent() is not None)
+    check("categories created", len(bar.categoryPages()) >= 2)
+    check("widget embedded in panel", combo.parent() is not None)
 
-    check("контекстная вкладка скрыта изначально", not bar.isContextCategoryVisible(context))
+    check("context category hidden initially", not bar.isContextCategoryVisible(context))
     bar.showContextCategory(context)
     app.processEvents()
-    check("контекстная вкладка показывается", bar.isContextCategoryVisible(context))
+    check("context category shows", bar.isContextCategoryVisible(context))
     bar.hideContextCategory(context)
     app.processEvents()
-    check("контекстная вкладка скрывается", not bar.isContextCategoryVisible(context))
+    check("context category hides", not bar.isContextCategoryVisible(context))
 
     bar.setMinimumMode(True)
     app.processEvents()
-    check("лента сворачивается", bar.isMinimumMode())
+    check("ribbon collapses", bar.isMinimumMode())
     bar.setMinimumMode(False)
     app.processEvents()
-    check("лента разворачивается", not bar.isMinimumMode())
+    check("ribbon expands", not bar.isMinimumMode())
 
-    check("quick access bar доступен", quick is not None)
+    check("quick access bar available", quick is not None)
 
     run_action.setEnabled(False)
-    check("команда гасится", not run_action.isEnabled())
+    check("command can be disabled", not run_action.isEnabled())
     run_action.setEnabled(True)
     run_action.trigger()
-    check("сигнал доходит", triggered == ["sim.run"])
+    check("signal delivered", triggered == ["sim.run"])
 
     out = f"ribbon-{sys.platform}.png"
-    check("окно отрисовывается", window.grab().save(out))
+    check("window renders", window.grab().save(out))
 
     if failures:
-        print(f"\nFAILED: {len(failures)} — {failures}")
+        print(f"\nFAILED: {len(failures)} -> {failures}")
         return 1
     print("\nALL CHECKS PASSED")
     return 0

@@ -23,6 +23,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     env:
       PYSIDE_VER: "6.10.3"
+      # консоль Windows — cp1252; без этого падает любой не-ASCII вывод
+      PYTHONIOENCODING: "utf-8"
     defaults:
       run:
         shell: bash
@@ -71,6 +73,9 @@ jobs:
           sudo apt-get update
           # llvm-dev нужен ради llvm-config: пакеты clang/libclang-dev его не приносят
           sudo apt-get install -y libgl-dev mesa-common-dev clang libclang-dev llvm-dev
+          # рантайм для Qt внутри PySide6: его libQt6Gui линкован с libEGL/libGL,
+          # а на голом раннере их нет — падает импорт, а не сборка
+          sudo apt-get install -y libegl1 libgl1
           # shiboken6 embeds libclang but ships no builtin headers
           LLVM_DIR=$(llvm-config --prefix 2>/dev/null || ls -d /usr/lib/llvm-* | sort -V | tail -1)
           echo "LLVM_INSTALL_DIR=$LLVM_DIR" >> $GITHUB_ENV
