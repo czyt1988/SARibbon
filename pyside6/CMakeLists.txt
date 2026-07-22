@@ -381,6 +381,15 @@ if(WIN32)
     target_link_libraries(saribbon PRIVATE python3)
 endif()
 
+# Python extension modules on macOS must leave the CPython symbols undefined and
+# let the interpreter resolve them at load time. Without this the module fails to
+# link with "Undefined symbols: _PyExc_TypeError, _Py_FatalError, ...".
+# On Linux undefined symbols in a shared object are allowed by default; on Windows
+# the module links python3 explicitly above.
+if(APPLE)
+    target_link_options(saribbon PRIVATE "-undefined" "dynamic_lookup")
+endif()
+
 # Target properties
 set_target_properties(saribbon PROPERTIES
     PREFIX ""
