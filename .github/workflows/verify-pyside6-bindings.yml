@@ -9,7 +9,7 @@ name: Verify PySide6 Bindings
 
 on:
   push:
-    branches: [ci/verify-bindings]
+    branches: [ci/verify-bindings, fix/pyside6-macos-frameworks]
   workflow_dispatch:
 
 jobs:

@@ -259,6 +259,36 @@ foreach(module Core Gui Widgets)
     endforeach()
 endforeach()
 
+# On macOS Qt ships as frameworks, so the include directories above point at
+# <Qt>/lib/QtCore.framework/Headers. Qt's own headers include <QtCore/qtcoreglobal.h>,
+# which resolves only through a framework search path, not through -I. Without this
+# shiboken's parser stops with:
+#   qglobal.h: fatal error: 'QtCore/qtcoreglobal.h' file not found
+if(APPLE)
+    set(SHIBOKEN_FRAMEWORK_PATHS "")
+    foreach(module Core Gui Widgets)
+        get_property(module_includes TARGET Qt6::${module} PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
+        foreach(inc ${module_includes})
+            if("${inc}" MATCHES "^(.+)/[^/]+\\.framework/Headers$")
+                list(APPEND SHIBOKEN_FRAMEWORK_PATHS "${CMAKE_MATCH_1}")
+            endif()
+        endforeach()
+    endforeach()
+    if(NOT SHIBOKEN_FRAMEWORK_PATHS)
+        # Fallback: derive <Qt>/lib from the imported location of Qt6::Core
+        get_target_property(_qt_core_location Qt6::Core LOCATION)
+        if(_qt_core_location)
+            string(REGEX REPLACE "/[^/]+\\.framework/.*$" "" _qt_lib_dir "${_qt_core_location}")
+            list(APPEND SHIBOKEN_FRAMEWORK_PATHS "${_qt_lib_dir}")
+        endif()
+    endif()
+    list(REMOVE_DUPLICATES SHIBOKEN_FRAMEWORK_PATHS)
+    foreach(fp ${SHIBOKEN_FRAMEWORK_PATHS})
+        list(APPEND SHIBOKEN_OPTIONS "--framework-include-paths=${fp}")
+        message(STATUS "shiboken framework include path: ${fp}")
+    endforeach()
+endif()
+
 # Add PySide typesystems path
 list(APPEND SHIBOKEN_OPTIONS "-T${PYSIDE_TYPESYSTEMS}")
 list(APPEND SHIBOKEN_OPTIONS "--enable-pyside-extensions")
@@ -349,6 +379,15 @@ target_link_libraries(saribbon PRIVATE
 if(WIN32)
     target_link_directories(saribbon PRIVATE "${Python_LIBRARY_DIRS}")
     target_link_libraries(saribbon PRIVATE python3)
+endif()
+
+# Python extension modules on macOS must leave the CPython symbols undefined and
+# let the interpreter resolve them at load time. Without this the module fails to
+# link with "Undefined symbols: _PyExc_TypeError, _Py_FatalError, ...".
+# On Linux undefined symbols in a shared object are allowed by default; on Windows
+# the module links python3 explicitly above.
+if(APPLE)
+    target_link_options(saribbon PRIVATE "-undefined" "dynamic_lookup")
 endif()
 
 # Target properties
