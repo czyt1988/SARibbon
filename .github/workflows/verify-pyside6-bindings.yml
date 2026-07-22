@@ -1,0 +1,115 @@
+# Проверочный workflow: собирает PySide6-биндинги и прогоняет smoke-тест
+# на Windows, macOS и Linux. Ничего никуда не публикует.
+#
+# Отличие от publish-python-bindings.yml: версия Qt берётся из установленного
+# PySide6, а не прибита к 6.8.3. Биндинги линкуются с тем Qt, что стоит при
+# сборке, но в рантайме грузят Qt из колеса PySide6 — расхождение даёт не
+# ошибку сборки, а плавающие падения.
+name: Verify PySide6 Bindings
+
+on:
+  push:
+    branches: [ci/verify-bindings]
+  workflow_dispatch:
+
+jobs:
+  verify:
+    name: ${{ matrix.os }} py${{ matrix.python }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+        python: ["3.12"]
+    runs-on: ${{ matrix.os }}
+    env:
+      PYSIDE_VER: "6.10.3"
+      # консоль Windows — cp1252; без этого падает любой не-ASCII вывод
+      PYTHONIOENCODING: "utf-8"
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install Python build dependencies
+        run: |
+          # PySide6 зафиксирован: aqtinstall 3.3.0 не умеет ставить Qt 6.11.x под Windows
+          # ("Failed to locate XML data for Qt version"), тогда как 6.10.x доступен на всех
+          # трёх хостах. Версия Qt всё равно выводится из PySide6 — инвариант сохраняется.
+          pip install -U pip build scikit-build-core cmake ninja aqtinstall
+          pip install "PySide6==${PYSIDE_VER}" "shiboken6-generator==${PYSIDE_VER}"
+
+      - name: Resolve Qt version from PySide6
+        run: |
+          QT_VER=$(python -c "from PySide6.QtCore import qVersion; print(qVersion())")
+          echo "QT_VER=$QT_VER" >> $GITHUB_ENV
+          echo "Qt bundled in PySide6: $QT_VER"
+
+      - name: Install Qt (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          # pwd -W даёт нативный путь (D:/a/...); MSYS-путь /d/a/... не поймут ни aqt, ни CMake
+          QT_ROOT="$(pwd -W)/Qt"
+          python -m aqt install-qt windows desktop "$QT_VER" win64_msvc2022_64 -O "$QT_ROOT"
+          echo "QT_PREFIX=$QT_ROOT/$QT_VER/msvc2022_64" >> $GITHUB_ENV
+
+      - name: Install Qt (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          python -m aqt install-qt mac desktop "$QT_VER" clang_64 -O "$PWD/Qt"
+          echo "QT_PREFIX=$PWD/Qt/$QT_VER/macos" >> $GITHUB_ENV
+
+      - name: Install Qt and Linux prerequisites
+        if: runner.os == 'Linux'
+        run: |
+          python -m aqt install-qt linux desktop "$QT_VER" linux_gcc_64 -O "$PWD/Qt"
+          echo "QT_PREFIX=$PWD/Qt/$QT_VER/gcc_64" >> $GITHUB_ENV
+          # find_package(Qt6 COMPONENTS Gui) resolves WrapOpenGL and fails without these
+          sudo apt-get update
+          # llvm-dev нужен ради llvm-config: пакеты clang/libclang-dev его не приносят
+          sudo apt-get install -y libgl-dev mesa-common-dev clang libclang-dev llvm-dev
+          # рантайм для Qt внутри PySide6: его libQt6Gui линкован с libEGL/libGL,
+          # а на голом раннере их нет — падает импорт, а не сборка
+          sudo apt-get install -y libegl1 libgl1
+          # shiboken6 embeds libclang but ships no builtin headers
+          LLVM_DIR=$(llvm-config --prefix 2>/dev/null || ls -d /usr/lib/llvm-* | sort -V | tail -1)
+          echo "LLVM_INSTALL_DIR=$LLVM_DIR" >> $GITHUB_ENV
+          echo "using LLVM at $LLVM_DIR"
+
+      - name: Set up MSVC
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Build wheel
+        env:
+          CMAKE_PREFIX_PATH: ${{ env.QT_PREFIX }}
+        run: python -m build --wheel --no-isolation pyside6/
+
+      - name: Install wheel
+        run: pip install pyside6/dist/*.whl
+
+      - name: Verify bindings
+        run: python .github/scripts/verify_bindings.py
+
+      - name: Upload wheel
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: wheel-${{ matrix.os }}-py${{ matrix.python }}
+          path: pyside6/dist/*.whl
+          if-no-files-found: warn
+
+      - name: Upload screenshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshot-${{ matrix.os }}
+          path: ribbon-*.png
+          if-no-files-found: warn
