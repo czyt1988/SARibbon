@@ -9,7 +9,9 @@ name: Verify PySide6 Bindings
 
 on:
   push:
-    branches: [ci/verify-bindings, fix/pyside6-macos-frameworks]
+    # master — это продукт: из него собираются колёса для приложения,
+    # поэтому проверяется в первую очередь именно он
+    branches: [master, ci/verify-bindings, 'fix/**']
   workflow_dispatch:
 
 jobs:
