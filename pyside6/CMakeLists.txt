@@ -340,6 +340,19 @@ set_target_properties(saribbon PROPERTIES
     OUTPUT_NAME "saribbon"
 )
 
+# The module is installed into site-packages/PySideSARibbon/ while Qt, libpyside6
+# and libshiboken6 live in sibling packages. Without an RPATH the module can only
+# be imported with LD_LIBRARY_PATH set, which also breaks PyInstaller bundles.
+if(APPLE)
+    set_target_properties(saribbon PROPERTIES
+        BUILD_WITH_INSTALL_RPATH ON
+        INSTALL_RPATH "@loader_path/../PySide6/Qt/lib;@loader_path/../PySide6;@loader_path/../shiboken6")
+elseif(UNIX)
+    set_target_properties(saribbon PROPERTIES
+        BUILD_WITH_INSTALL_RPATH ON
+        INSTALL_RPATH "$ORIGIN/../PySide6/Qt/lib;$ORIGIN/../PySide6;$ORIGIN/../shiboken6")
+endif()
+
 if(WIN32)
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")
         set_target_properties(saribbon PROPERTIES SUFFIX "_d.pyd")
