@@ -176,6 +176,8 @@ set(SARIBBON_SOURCES
     ${SARIBBON_SOURCE_DIR}/SARibbonCustomizeDialog.cpp
     ${SARIBBON_SOURCE_DIR}/SARibbonCustomizeWidget.cpp
     ${SARIBBON_SOURCE_DIR}/SARibbonUtil.cpp
+    ${SARIBBON_SOURCE_DIR}/SARibbonThemeManager.cpp
+    ${SARIBBON_SOURCE_DIR}/SARibbonThemePalette.cpp
     ${SARIBBON_SOURCE_DIR}/SAFramelessHelper.cpp
     ${SARIBBON_SOURCE_DIR}/SARibbonWidget.cpp
     ${SARIBBON_SOURCE_DIR}/SARibbonColorToolButton.cpp
