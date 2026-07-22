@@ -34,7 +34,8 @@ execute_process(
 )
 
 # --- Shiboken6 include and lib ---
-set(SHIBOKEN6_INCLUDE_DIR "${PYTHON_SITE_PACKAGES}/shiboken6_generator/include")
+# Shiboken headers ship in the shiboken6 runtime package, not in shiboken6_generator
+set(SHIBOKEN6_INCLUDE_DIR "${PYTHON_SITE_PACKAGES}/shiboken6/include")
 set(SHIBOKEN6_LIB_DIR "${PYTHON_SITE_PACKAGES}/shiboken6")
 
 # Find shiboken6 generator executable
@@ -55,16 +56,30 @@ set(PYSIDE_LIB_DIR "${PYTHON_SITE_PACKAGES}/PySide6")
 set(PYSIDE_TYPESYSTEMS "${PYTHON_SITE_PACKAGES}/PySide6/typesystems")
 
 # --- Locate shiboken6.lib ---
-find_library(SHIBOKEN6_LIBRARY
-    NAMES shiboken6 shiboken6d "shiboken6.abi3"
-    HINTS ${SHIBOKEN6_LIB_DIR}
-    REQUIRED)
+# The wheels ship only versioned libraries (libshiboken6.abi3.so.6.11) with no
+# unversioned symlink, so find_library() cannot see them.
+file(GLOB SHIBOKEN6_LIBRARY_CANDIDATES
+    "${SHIBOKEN6_LIB_DIR}/libshiboken6.abi3.so*"
+    "${SHIBOKEN6_LIB_DIR}/libshiboken6*.dylib"
+    "${SHIBOKEN6_LIB_DIR}/shiboken6.abi3.lib"
+    "${SHIBOKEN6_LIB_DIR}/shiboken6.lib")
+list(GET SHIBOKEN6_LIBRARY_CANDIDATES 0 SHIBOKEN6_LIBRARY)
+if(NOT SHIBOKEN6_LIBRARY)
+    message(FATAL_ERROR "shiboken6 library not found in ${SHIBOKEN6_LIB_DIR}")
+endif()
+message(STATUS "SHIBOKEN6_LIBRARY: ${SHIBOKEN6_LIBRARY}")
 
 # --- Locate pyside6.lib ---
-find_library(PYSIDE6_LIBRARY
-    NAMES pyside6 pyside6d "pyside6.abi3"
-    HINTS ${PYSIDE_LIB_DIR}
-    REQUIRED)
+file(GLOB PYSIDE6_LIBRARY_CANDIDATES
+    "${PYSIDE_LIB_DIR}/libpyside6.abi3.so*"
+    "${PYSIDE_LIB_DIR}/libpyside6*.dylib"
+    "${PYSIDE_LIB_DIR}/pyside6.abi3.lib"
+    "${PYSIDE_LIB_DIR}/pyside6.lib")
+list(GET PYSIDE6_LIBRARY_CANDIDATES 0 PYSIDE6_LIBRARY)
+if(NOT PYSIDE6_LIBRARY)
+    message(FATAL_ERROR "pyside6 library not found in ${PYSIDE_LIB_DIR}")
+endif()
+message(STATUS "PYSIDE6_LIBRARY: ${PYSIDE6_LIBRARY}")
 
 # =====================================================================
 # Paths
