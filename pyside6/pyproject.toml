@@ -24,8 +24,9 @@ ninja.version = ">=1.10"
 wheel.packages = ["PySideSARibbon"]
 cmake.source-dir = "."
 
-# Install the Python package from CMake install targets
-install.components = ["PySideSARibbon"]
+# NOTE: the install() rules in CMakeLists.txt do not declare a COMPONENT, so they
+# land in the default "Unspecified" component. Filtering on "PySideSARibbon" here
+# silently excluded the compiled module from the wheel.
 
 # Build configuration
 cmake.build-type = "Release"
