@@ -433,10 +433,10 @@ SARibbonSystemToolButton#SAMinimizeWindowButton {
   padding: 4px;
 }
 SARibbonSystemToolButton#SAMinimizeWindowButton:hover{
-  background-color: #b8b8b8;
+  background-color: {{sys-button-hover}};
 }
 SARibbonSystemToolButton#SAMinimizeWindowButton:pressed{
-  background-color: #cacacb;
+  background-color: {{sys-button-pressed}};
 }
 /*Max*/
 SARibbonSystemToolButton#SAMaximizeWindowButton {
@@ -444,7 +444,10 @@ SARibbonSystemToolButton#SAMaximizeWindowButton {
     padding: 4px;
 }
 SARibbonSystemToolButton#SAMaximizeWindowButton:hover {
-    background-color: #b8b8b8;
+    background-color: {{sys-button-hover}};
+}
+SARibbonSystemToolButton#SAMaximizeWindowButton:pressed {
+    background-color: {{sys-button-pressed}};
 }
 SARibbonSystemToolButton#SAMaximizeWindowButton:checked {
     image: url(:/SARibbon/image/resource/Titlebar_Normal_Hover.svg);
@@ -460,6 +463,6 @@ SARibbonSystemToolButton#SACloseWindowButton:hover {
   background-color: {{close-bg}};
 }
 SARibbonSystemToolButton#SACloseWindowButton:pressed {
-    background-color: #f1707a;
+    background-color: {{close-bg-pressed}};
 }
 

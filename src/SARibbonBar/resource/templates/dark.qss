@@ -440,6 +440,9 @@ SARibbonSystemToolButton#SAMaximizeWindowButton {
 SARibbonSystemToolButton#SAMaximizeWindowButton:hover {
     background-color: {{accent-hover}};
 }
+SARibbonSystemToolButton#SAMaximizeWindowButton:pressed {
+    background-color: {{accent-pressed}};
+}
 SARibbonSystemToolButton#SAMaximizeWindowButton:checked {
     image: url(:/SARibbon/image/resource/Titlebar_Normal_Hover.svg);
 }
