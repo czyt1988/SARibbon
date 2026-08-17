@@ -213,22 +213,30 @@ void SARibbonCategory::PrivateData::doWheelEvent(QWheelEvent* event)
     if (totalWidth > contentSize.width()) {
         int scrollStep = wheelScrollStep;
 
-        // 根据滚轮方向确定滚动方向
+        // 优先使用水平分量（水平滚轮/触控板水平手势），为 0 时回退到垂直分量
         QPoint numPixels  = event->pixelDelta();
         QPoint numDegrees = event->angleDelta() / 8;
 
-        if (!numPixels.isNull()) {
-            scrollStep = (numPixels.y() < 0) ? -scrollStep : scrollStep;
-        } else if (!numDegrees.isNull()) {
-            scrollStep = (numDegrees.y() < 0) ? -scrollStep : scrollStep;
+        int delta = 0;
+        if (numPixels.x() != 0) {
+            delta = numPixels.x();
+        } else if (numPixels.y() != 0) {
+            delta = numPixels.y();
+        } else if (numDegrees.x() != 0) {
+            delta = numDegrees.x();
+        } else if (numDegrees.y() != 0) {
+            delta = numDegrees.y();
         }
 
-        // 动态调整步长 - 滚动越快步长越大
-        const int absDelta = qMax(qAbs(numPixels.y()), qAbs(numDegrees.y()));
-        if (absDelta > 60) {
-            scrollStep *= 2;
-        } else if (absDelta < 20) {
-            scrollStep /= 2;
+        if (delta != 0) {
+            scrollStep = (delta < 0) ? -scrollStep : scrollStep;
+            // 动态调整步长 - 滚动越快步长越大
+            const int absDelta = qAbs(delta);
+            if (absDelta > 60) {
+                scrollStep *= 2;
+            } else if (absDelta < 20) {
+                scrollStep /= 2;
+            }
         }
 
         // 根据设置选择滚动方式
