@@ -21,7 +21,8 @@ Unlike the PyQt bindings (based on SIP), the PySide6 bindings use Shiboken6 + CM
 | Python | 3.9 or higher | 3.10+ recommended |
 | PySide6 | 6.5 or higher | Official Qt Python bindings |
 | shiboken6-generator | matching PySide6 | Shiboken6 binding generator |
-| **Qt6 Dev Package** | 6.5 or higher | **Required**: Qt6 C++ headers and CMake config |
+| **Qt6 Dev Package** | matching PySide6's Qt | **Required**: Qt6 C++ headers and CMake config |
+| LLVM / Clang | 15 or higher | Linux/macOS: Shiboken6 needs Clang's builtin headers |
 | CMake | 3.22 or higher | Build system |
 | Ninja | latest | Recommended build backend |
 | C++ Compiler | MSVC 2019+ / GCC 9+ | Native code compiler |
@@ -30,6 +31,16 @@ Unlike the PyQt bindings (based on SIP), the PySide6 bindings use Shiboken6 + CM
     The PySide6 pip package does **not** include full Qt6 C++ development headers
     (such as `qglobal.h`). You must install Qt6 development package via the
     Qt Online Installer or `aqtinstall`.
+
+!!! warning "Match the Qt version to PySide6"
+    The bindings are linked against the Qt you build with, but at run time they
+    load the Qt bundled inside the PySide6 wheel. Install the Qt version that
+    PySide6 itself reports, otherwise you get subtle run-time failures rather
+    than a build error:
+
+    ```bash
+    python -c "from PySide6.QtCore import qVersion; print(qVersion())"
+    ```
 
 ### Install Qt6 Development Package
 
@@ -85,6 +96,17 @@ pip install cmake ninja
 
 ```bash
 sudo apt-get install build-essential
+# Qt6::Gui requires the OpenGL development files through WrapOpenGL
+sudo apt-get install libgl-dev mesa-common-dev
+# Shiboken6 needs Clang's builtin headers (stddef.h and friends)
+sudo apt-get install clang libclang-dev
+```
+
+If Clang is installed but `llvm-config` is not on `PATH`, point Shiboken at it
+explicitly:
+
+```bash
+export LLVM_INSTALL_DIR=/usr/lib/llvm-18
 ```
 
 ## Build Steps
@@ -166,6 +188,28 @@ pip install shiboken6-generator
 
 ```bash
 cmake -S pyside6 -B build-pyside6 -DCMAKE_PREFIX_PATH="/path/to/Qt/6.7.3/msvc2019_64"
+```
+
+### Clang builtin headers not found
+
+**Error**: `Unable to locate Clang's built-in include directory`, followed by
+`/usr/include/wchar.h: fatal error: 'stddef.h' file not found`
+
+Shiboken6 embeds libclang but does not ship Clang's builtin headers. Install
+Clang and, if `llvm-config` is not on `PATH`, set `LLVM_INSTALL_DIR`:
+
+```bash
+sudo apt-get install clang libclang-dev
+export LLVM_INSTALL_DIR=/usr/lib/llvm-18
+```
+
+### OpenGL development files not found
+
+**Error**: `Could NOT find WrapOpenGL (missing: WrapOpenGL_FOUND)`, which makes
+`find_package(Qt6 COMPONENTS Gui)` fail.
+
+```bash
+sudo apt-get install libgl-dev mesa-common-dev
 ```
 
 ### Compiler not found
