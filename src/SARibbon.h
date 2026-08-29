@@ -610,7 +610,7 @@ inline int wheelEventDelta(QWheelEvent* e)
 #endif
 }
 }  // namespace   compat
-}  // namespace   qwt
+}  // namespace   SA
 #endif  // SARIBBONQT5COMPAT_HPP
 
 /*** End of inlined file: SARibbonQt5Compat.hpp ***/
@@ -640,30 +640,30 @@ class SA_COLOR_WIDGETS_API SAColorMenu : public QMenu
 	Q_OBJECT
 	SA_COLOR_WIDGETS_DECLARE_PRIVATE(SAColorMenu)
 public:
-	/// Constructor for SAColorMenu
+	// Constructor for SAColorMenu
 	explicit SAColorMenu(QWidget* parent = nullptr);
-	/// Constructor for SAColorMenu with title
+	// Constructor for SAColorMenu with title
 	explicit SAColorMenu(const QString& title, QWidget* parent = nullptr);
-	/// Destructor for SAColorMenu
+	// Destructor for SAColorMenu
 	~SAColorMenu();
-	/// Quick bind to color button
+	// Quick bind to color button
 	void bindToColorToolButton(SAColorToolButton* btn);
-	/// Get theme colors palette action
+	// Get theme colors palette action
 	QWidgetAction* themeColorsPaletteAction() const;
-	/// Get custom colors widget action
+	// Get custom colors widget action
 	QWidgetAction* getCustomColorsWidgetAction() const;
-	/// Get custom color action
+	// Get custom color action
 	QAction* customColorAction() const;
-	/// Get theme colors palette widget
+	// Get theme colors palette widget
 	SAColorPaletteGridWidget* colorPaletteGridWidget() const;
-	/// Get custom colors widget
+	// Get custom colors widget
 	SAColorGridWidget* customColorsWidget() const;
-	/// Enable none color action, disabled by default
+	// Enable none color action, disabled by default
 	void enableNoneColorAction(bool on = true);
-	/// Get none color action, returns nullptr until enableNoneColorAction(true) is called
+	// Get none color action, returns nullptr until enableNoneColorAction(true) is called
 	QAction* noneColorAction() const;
 public Q_SLOTS:
-	/// Helper slot function to emit selectedColor signal and hide menu
+	// Helper slot function to emit selectedColor signal and hide menu
 	void emitSelectedColor(const QColor& c);
 Q_SIGNALS:
 	/**
@@ -726,51 +726,51 @@ public:
 	using FunColorBtn = std::function< void(SAColorToolButton*) >;
 
 public:
-	/// Constructor for SAColorGridWidget
+	// Constructor for SAColorGridWidget
 	SAColorGridWidget(QWidget* par = nullptr);
-	/// Destructor for SAColorGridWidget
+	// Destructor for SAColorGridWidget
 	~SAColorGridWidget();
-	/// Set column count, row count will be determined by column count
+	// Set column count, row count will be determined by column count
 	void setColumnCount(int c);
-	/// Get column count
+	// Get column count
 	int columnCount() const;
-	/// Set current color list
+	// Set current color list
 	void setColorList(const QList< QColor >& cls);
-	/// Get color list
+	// Get color list
 	QList< QColor > getColorList() const;
-	/// Get spacing
+	// Get spacing
 	int spacing() const;
-	/// Set spacing
+	// Set spacing
 	void setSpacing(int v);
-	/// Get color count
+	// Get color count
 	int colorCount() const;
-	/// Set color icon size
+	// Set color icon size
 	void setColorIconSize(const QSize& s);
-	/// Get color icon size
+	// Get color icon size
 	QSize colorIconSize() const;
-	/// Set whether colors are checkable
+	// Set whether colors are checkable
 	void setColorCheckable(bool on = true);
-	/// Check if colors are checkable
+	// Check if colors are checkable
 	bool isColorCheckable() const;
-	/// Get currently checked color
+	// Get currently checked color
 	QColor currentCheckedColor() const;
-	/// Get color button by index
+	// Get color button by index
 	SAColorToolButton* colorButton(int index) const;
-	/// Set vertical spacing
+	// Set vertical spacing
 	void setVerticalSpacing(int v);
-	/// Get vertical spacing
+	// Get vertical spacing
 	int verticalSpacing() const;
-	/// Set horizontal spacing
+	// Set horizontal spacing
 	void setHorizontalSpacing(int v);
-	/// Get horizontal spacing
+	// Get horizontal spacing
 	int horizontalSpacing() const;
-	/// Clear checked state, no color will be selected
+	// Clear checked state, no color will be selected
 	void clearCheckedState();
-	/// Iterate through all color buttons
+	// Iterate through all color buttons
 	void iterationColorBtns(FunColorBtn fn);
-	/// Set row minimum height
+	// Set row minimum height
 	void setRowMinimumHeight(int row, int minSize);
-	/// Set horizontal spacer to right
+	// Set horizontal spacer to right
 	void setHorizontalSpacerToRight(bool on = true);
 private Q_SLOTS:
 	void onButtonClicked(QAbstractButton* btn);
@@ -834,12 +834,12 @@ Q_SIGNALS:
 	void colorToggled(const QColor& c, bool on);
 
 public:
-	/// Get size hint
+	// Get size hint
 	virtual QSize sizeHint() const Q_DECL_OVERRIDE;
 };
 namespace SA
 {
-/// Get standard color list (10 colors in total)
+// Get standard color list (10 colors in total)
 SA_COLOR_WIDGETS_API QList< QColor > getStandardColorList();
 }
 #endif  // SACOLORGRIDWIDGET_H
@@ -869,27 +869,27 @@ class SA_COLOR_WIDGETS_API SAColorPaletteGridWidget : public QWidget
 	Q_OBJECT
 	SA_COLOR_WIDGETS_DECLARE_PRIVATE(SAColorPaletteGridWidget)
 public:
-	/// Constructor for SAColorPaletteGridWidget
+	// Constructor for SAColorPaletteGridWidget
 	SAColorPaletteGridWidget(QWidget* par = nullptr);
-	/// Constructor for SAColorPaletteGridWidget with specified colors
+	// Constructor for SAColorPaletteGridWidget with specified colors
 	SAColorPaletteGridWidget(const QList< QColor >& cls, QWidget* par = nullptr);
-	/// Destructor for SAColorPaletteGridWidget
+	// Destructor for SAColorPaletteGridWidget
 	~SAColorPaletteGridWidget();
-	/// Set color list maintained by the widget
+	// Set color list maintained by the widget
 	void setColorList(const QList< QColor >& cls);
-	/// Get color list
+	// Get color list
 	QList< QColor > colorList() const;
-	/// Set color shade factor, default is { 180, 160, 140, 75, 50 }
+	// Set color shade factor, default is { 180, 160, 140, 75, 50 }
 	void setFactor(const QList< int >& factor);
-	/// Get factor list
+	// Get factor list
 	QList< int > factor() const;
-	/// Set color icon size
+	// Set color icon size
 	void setColorIconSize(const QSize& s);
-	/// Get color icon size
+	// Get color icon size
 	QSize colorIconSize() const;
-	/// Set whether colors are checkable
+	// Set whether colors are checkable
 	void setColorCheckable(bool on = true);
-	/// Check if colors are checkable
+	// Check if colors are checkable
 	bool isColorCheckable() const;
 private Q_SLOTS:
 	void onMainColorClicked(const QColor& c);
@@ -1002,53 +1002,53 @@ public:
 	};
 
 public:
-	/// Constructor for SAColorToolButton
+	// Constructor for SAColorToolButton
 	explicit SAColorToolButton(QWidget* parent = nullptr);
-	/// Constructor for SAColorToolButton with style
+	// Constructor for SAColorToolButton with style
 	explicit SAColorToolButton(ColorToolButtonStyle style, QWidget* parent = nullptr);
-	/// Destructor for SAColorToolButton
+	// Destructor for SAColorToolButton
 	~SAColorToolButton();
-	/// Get color
+	// Get color
 	QColor color() const;
-	/// Set margins
+	// Set margins
 	void setMargins(const QMargins& mg);
-	/// Get margins
+	// Get margins
 	QMargins margins() const;
-	/// Paint none color
+	// Paint none color
 	static void paintNoneColor(QPainter* p, const QRect& colorRect);
-	/// Set color tool button style
+	// Set color tool button style
 	void setColorToolButtonStyle(ColorToolButtonStyle s);
-	/// Get color tool button style
+	// Get color tool button style
 	ColorToolButtonStyle colorToolButtonStyle() const;
-	/// Get colorMenu, note that this function may return nullptr if ColorToolButtonStyle is set to NoColorMenu or if a custom menu is set
+	// Get colorMenu, note that this function may return nullptr if ColorToolButtonStyle is set to NoColorMenu or if a custom menu is set
 	SAColorMenu* colorMenu() const;
-	/// Create standard color menu
+	// Create standard color menu
 	SAColorMenu* createColorMenu();
 public Q_SLOTS:
-	/// Set color, will emit colorChanged signal
+	// Set color, will emit colorChanged signal
 	void setColor(const QColor& c);
 
 protected:
-	/// Calculate positions of basic components
+	// Calculate positions of basic components
 	virtual void calcRect(const QStyleOptionToolButton& opt, QRect& iconRect, QRect& textRect, QRect& colorRect);
-	/// Paint button
+	// Paint button
 	virtual void paintButton(QStylePainter* p, const QStyleOptionToolButton& opt);
-	/// Paint icon
+	// Paint icon
 	virtual void paintIcon(QStylePainter* p, const QRect& iconRect, const QStyleOptionToolButton& opt);
-	/// Paint text
+	// Paint text
 	virtual void paintText(QStylePainter* p, const QRect& textRect, const QStyleOptionToolButton& opt);
-	/// Paint color
+	// Paint color
 	virtual void paintColor(QStylePainter* p, const QRect& colorRect, const QColor& color, const QStyleOptionToolButton& opt);
 
 protected:
-	/// Handle paint event
+	// Handle paint event
 	virtual void paintEvent(QPaintEvent* e) Q_DECL_OVERRIDE;
-	/// Handle resize event
+	// Handle resize event
 	virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
-	/// Override sizeHint
+	// Override sizeHint
 	virtual QSize sizeHint() const Q_DECL_OVERRIDE;
 private Q_SLOTS:
-	/// Handle button clicked
+	// Handle button clicked
 	void onButtonClicked(bool checked = false);
 Q_SIGNALS:
 	/**
@@ -1279,6 +1279,7 @@ private:
 		int amount;
 	};
 
+	// Recalculate all derived colors from stored rules and current key colors
 	void recalculateDerived();
 
 	QHash<QString, QColor> m_keyColors;
@@ -1365,7 +1366,7 @@ bool SA_RIBBON_EXPORT isOperatingSystemInDarkMode();
 // Forward declaration
 class SARibbonThemePalette;
 
-/// Replace {{token}} and {{token|opacity(value)}} patterns in QSS templates with actual color values
+// Replace {{token}} and {{token|opacity(value)}} patterns in QSS templates with actual color values
 QString SA_RIBBON_EXPORT replaceQssTokens(const QString& templateQss, const SARibbonThemePalette& palette);
 
 /**
@@ -1397,15 +1398,15 @@ QString SA_RIBBON_EXPORT getBuiltInRibbonThemeQss(SARibbonTheme theme);
 #include <QObject>
 
 class QWidget;
+class QScreen;
 
 /**
- * @class SAFramelessHelper
- * @brief 该类用于帮助实现无边框窗体的移动和缩放功能。
+ * \if ENGLISH
+ * @brief Helper class for implementing frameless window moving and resizing
  *
- * SAFramelessHelper 提供了一系列方法来激活、移除无边框窗体，设置窗体的移动、缩放属性，
- * 以及橡皮筋效果等。通过事件过滤机制，它能够处理鼠标事件，从而实现窗体的移动和缩放操作。
- *
- * 示例：
+ * SAFramelessHelper provides a series of methods to activate and remove frameless windows,
+ * set window moving and resizing attributes, and configure rubber band effects.
+ * Through the event filter mechanism, it handles mouse events to implement window moving and resizing.
  *
  * @code
  * SAFramelessHelper* helper = new SAFramelessHelper(this);
@@ -1413,6 +1414,23 @@ class QWidget;
  * helper->setWidgetMovable(true);
  * helper->setWidgetResizable(true);
  * @endcode
+ * @note Uses the PIMPL pattern via SA_RIBBON_DECLARE_PRIVATE for encapsulation.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 该类用于帮助实现无边框窗体的移动和缩放功能
+ *
+ * SAFramelessHelper 提供了一系列方法来激活、移除无边框窗体，设置窗体的移动、缩放属性，
+ * 以及橡皮筋效果等。通过事件过滤机制，它能够处理鼠标事件，从而实现窗体的移动和缩放操作。
+ *
+ * @code
+ * SAFramelessHelper* helper = new SAFramelessHelper(this);
+ * helper->activateOn(myWidget);
+ * helper->setWidgetMovable(true);
+ * helper->setWidgetResizable(true);
+ * @endcode
+ * @note 通过SA_RIBBON_DECLARE_PRIVATE采用PIMPL模式实现封装。
+ * \endif
  */
 class SA_RIBBON_EXPORT SAFramelessHelper : public QObject
 {
@@ -1458,6 +1476,10 @@ public:
 protected:
 	// 事件过滤，进行移动、缩放等
 	virtual bool eventFilter(QObject* obj, QEvent* event);
+
+private Q_SLOTS:
+	// Refresh cached screen list when screen configuration changes during drag
+	void onScreenAdded(QScreen* screen);
 };
 
 #endif  // FRAMELESSHELPER_H
@@ -1535,75 +1557,75 @@ class SA_RIBBON_EXPORT SARibbonSystemButtonBar : public QFrame
 	Q_OBJECT
 	SA_RIBBON_DECLARE_PRIVATE(SARibbonSystemButtonBar)
 public:
-	/// Constructor for SARibbonSystemButtonBar
+	// Constructor for SARibbonSystemButtonBar
 	explicit SARibbonSystemButtonBar(QWidget* parent);
-	/// Constructor with window flags
+	// Constructor with window flags
 	explicit SARibbonSystemButtonBar(QWidget* parent, Qt::WindowFlags flags);
-	/// Destructor for SARibbonSystemButtonBar
+	// Destructor for SARibbonSystemButtonBar
 	~SARibbonSystemButtonBar();
-	/// Setup minimize button
+	// Setup minimize button
 	void setupMinimizeButton(bool on);
-	/// Setup maximize button
+	// Setup maximize button
 	void setupMaximizeButton(bool on);
-	/// Setup close button
+	// Setup close button
 	void setupCloseButton(bool on);
-	/// Use the WindowFlag of the top-level widget as WindowFlag
+	// Use the WindowFlag of the top-level widget as WindowFlag
 	void updateWindowFlag();
-	/// Update window flag with specified flags
+	// Update window flag with specified flags
 	void updateWindowFlag(Qt::WindowFlags flags);
-	/// Set button width ratio, final button width will be set according to this ratio
+	// Set button width ratio, final button width will be set according to this ratio
 	void setButtonWidthStretch(int close = 4, int max = 3, int min = 3);
-	/// Set title bar height
+	// Set title bar height
 	void setWindowTitleHeight(int h);
-	/// Get title bar height
+	// Get title bar height
 	int windowTitleHeight() const;
-	/// Set standard system button width
+	// Set standard system button width
 	void setWindowButtonWidth(int w);
-	/// Get standard system button width
+	// Get standard system button width
 	int windowButtonWidth() const;
-	/// Set Qt::WindowStates
+	// Set Qt::WindowStates
 	void setWindowStates(Qt::WindowStates s);
-	/// Get button states only
+	// Get button states only
 	Qt::WindowFlags windowButtonFlags() const;
-	/// Get minimize button
+	// Get minimize button
 	QAbstractButton* minimizeButton() const;
-	/// Get maximize button
+	// Get maximize button
 	QAbstractButton* maximizeButton() const;
-	/// Get close button
+	// Get close button
 	QAbstractButton* closeButton() const;
 
-	/// Set icon size
+	// Set icon size
 	void setIconSize(const QSize& ic);
-	/// Get icon size
+	// Get icon size
 	QSize iconSize() const;
-	/// Generate and add an action
+	// Generate and add an action
 	void addAction(QAction* a);
-	/// Add menu action
+	// Add menu action
 	void addMenuAction(QAction* menuAction, QToolButton::ToolButtonPopupMode popupMode = QToolButton::InstantPopup);
-	/// Add menu action and return the action
+	// Add menu action and return the action
 	QAction* addMenuAction(QMenu* menu, QToolButton::ToolButtonPopupMode popupMode = QToolButton::InstantPopup);
-	/// Add separator
+	// Add separator
 	QAction* addSeparator();
-	/// Add widget
+	// Add widget
 	QAction* addWidget(QWidget* w);
 
-	/// Get size hint
+	// Get size hint
 	virtual QSize sizeHint() const Q_DECL_OVERRIDE;
-	/// Capture mainwindow events
+	// Capture mainwindow events
 	bool eventFilter(QObject* obj, QEvent* event) override;
 
 protected:
-	/// Handle resize event
+	// Handle resize event
 	virtual void resizeEvent(QResizeEvent* e) Q_DECL_OVERRIDE;
-	/// Handle change event for layout direction changes
+	// Handle change event for layout direction changes
 	virtual void changeEvent(QEvent* e) override;
 
 protected Q_SLOTS:
-	/// Close window slot
+	// Close window slot
 	Q_SLOT void closeWindow();
-	/// Minimize window slot
+	// Minimize window slot
 	Q_SLOT void minimizeWindow();
-	/// Maximize window slot
+	// Maximize window slot
 	Q_SLOT void maximizeWindow();
 };
 
@@ -1620,7 +1642,7 @@ class SARibbonSystemToolButton : public QToolButton
 {
 	Q_OBJECT
 public:
-	/// Constructor for SARibbonSystemToolButton
+	// Constructor for SARibbonSystemToolButton
 	SARibbonSystemToolButton(QWidget* p = nullptr);
 };
 
@@ -1636,9 +1658,6 @@ public:
 #include <QToolButton>
 #include <QDebug>
 
-// 前向声明
-class SARibbonButtonLayoutStrategy;
-struct SARibbonButtonLayoutContext;
 /**
  * \if ENGLISH
  * @brief Ribbon interface adapted tool button
@@ -1741,9 +1760,9 @@ public:
 	// Set the button type to LargeButton or SmallButton
 	void setButtonType(const RibbonButtonType& buttonType);
 
-	/// Set whether text is displayed to the right of the icon
+	// Set whether text is displayed to the right of the icon
 	void setEnableIconRightText(bool on);
-	/// Check if icon-right-text mode is enabled
+	// Check if icon-right-text mode is enabled
 	bool isEnableIconRightText() const;
 
 	// Check if the button is a small ribbon button
@@ -1778,6 +1797,12 @@ public:
 
 	// Invalidates the cached size hint / 使缓存的size hint失效
 	void invalidateSizeHint();
+
+	/// Invalidate the cached icon pixmap so the next paint regenerates it
+	void invalidateIconCache();
+
+	/// Set the button icon, invalidating any cached icon pixmap first
+	void setIcon(const QIcon& icon);
 
 	// 大按钮尺寸
 	void setLargeIconSize(const QSize& largeSize);
@@ -1924,7 +1949,7 @@ Q_SIGNALS:
 	void colorChanged(const QColor& color);
 
 protected:
-	/// Override createIconPixmap to add color under the icon
+	// Override createIconPixmap to add color under the icon
 	QPixmap createIconPixmap(const QStyleOptionToolButton& opt, const QSize& iconSize) const override;
 };
 
@@ -1957,23 +1982,23 @@ protected:
 class SA_RIBBON_EXPORT SARibbonLineWidgetContainer : public QWidget
 {
 public:
-	/// Constructor for SARibbonLineWidgetContainer
+	// Constructor for SARibbonLineWidgetContainer
 	explicit SARibbonLineWidgetContainer(QWidget* par = nullptr);
-	/// Destructor for SARibbonLineWidgetContainer
+	// Destructor for SARibbonLineWidgetContainer
 	~SARibbonLineWidgetContainer();
-	/// Set widget (nullptr is not allowed)
+	// Set widget (nullptr is not allowed)
 	void setWidget(QWidget* innerWidget);
 
-	/// Set prefix
+	// Set prefix
 	void setPrefix(const QString& str);
 
-	/// Set suffix
+	// Set suffix
 	void setSuffix(const QString& str);
 
-	/// Prefix text box
+	// Prefix text box
 	QLabel* labelPrefix() const;
 
-	/// Suffix text box
+	// Suffix text box
 	QLabel* labelSuffix() const;
 
 private:
@@ -2023,7 +2048,7 @@ class SA_RIBBON_EXPORT SARibbonActionsManager : public QObject
 	friend class SARibbonActionsManagerModel;
 
 public:
-	/// Action tag definition
+	// Action tag definition
 	enum ActionTag
 	{
 		UnknowActionTag              = 0,     ///< Unknown tag
@@ -2034,58 +2059,58 @@ public:
 		NotInRibbonCategoryTag = 0x2001,  ///< Tag for actions not in ribbon category
 		UserDefineActionTag = 0x8000  ///< User defined tag, all custom tags should be greater than this
 	};
-	/// Constructor
+	// Constructor
 	explicit SARibbonActionsManager(SARibbonBar* bar);
-	/// Destructor
+	// Destructor
 	~SARibbonActionsManager();
-	/// Set tag name
+	// Set tag name
 	void setTagName(int tag, const QString& name);
 
-	/// Get tag name
+	// Get tag name
 	QString tagName(int tag) const;
 
-	/// Remove tag, note this function is time-consuming
+	// Remove tag and clean up orphan actions
 	void removeTag(int tag);
 
-	/// Register action
+	// Register action
 	bool registeAction(QAction* act, int tag, const QString& key = QString(), bool enableEmit = true);
 
-	/// Unregister action
+	// Unregister action
 	void unregisteAction(QAction* act, bool enableEmit = true);
 
-	/// Filter actions by tag, returns a reference
+	// Filter actions by tag, returns a reference
 	QList< QAction* >& filter(int tag);
 
-	/// Get actions by tag
+	// Get actions by tag
 	QList< QAction* >& actions(int tag);
-	/// Get actions by tag (const version)
+	// Get actions by tag (const version)
 	const QList< QAction* > actions(int tag) const;
 
-	/// Get all tags
+	// Get all tags
 	QList< int > actionTags() const;
 
-	/// Get action by key
+	// Get action by key
 	QAction* action(const QString& key) const;
 
-	/// Get key by action
+	// Get key by action
 	QString key(QAction* act) const;
 
-	/// Get count of all managed actions
+	// Get count of all managed actions
 	int count() const;
 
-	/// Get all managed actions
+	// Get all managed actions
 	QList< QAction* > allActions() const;
 
-	/// Auto register actions from SARibbonBar, returns tag-to-category mapping
+	// Auto register actions from SARibbonBar, returns tag-to-category mapping
 	QMap< int, SARibbonCategory* > autoRegisteActions(SARibbonBar* bar);
 
-	/// Auto register widget actions
+	// Auto register widget actions
 	QSet< QAction* > autoRegisteWidgetActions(QWidget* w, int tag, bool enableEmit = false);
 
-	/// Search actions by text
+	// Search actions by text
 	QList< QAction* > search(const QString& text);
 
-	/// Clear all
+	// Clear all
 	void clear();
 
 Q_SIGNALS:
@@ -2127,31 +2152,31 @@ class SA_RIBBON_EXPORT SARibbonActionsManagerModel : public QAbstractListModel
 	Q_OBJECT
 	SA_RIBBON_DECLARE_PRIVATE(SARibbonActionsManagerModel)
 public:
-	/// Constructor
+	// Constructor
 	explicit SARibbonActionsManagerModel(QObject* p = nullptr);
-	/// Constructor with SARibbonActionsManager
+	// Constructor with SARibbonActionsManager
 	explicit SARibbonActionsManagerModel(SARibbonActionsManager* m, QObject* p = nullptr);
-	/// Destructor
+	// Destructor
 	~SARibbonActionsManagerModel();
-	/// Get row count
+	// Get row count
 	virtual int rowCount(const QModelIndex& parent) const override;
-	/// Get header data
+	// Get header data
 	virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const override;
-	/// Get item flags
+	// Get item flags
 	virtual Qt::ItemFlags flags(const QModelIndex& index) const override;
-	/// Get data
+	// Get data
 	virtual QVariant data(const QModelIndex& index, int role) const override;
-	/// Set filter tag
+	// Set filter tag
 	void setFilter(int tag);
-	/// Update model
+	// Update model
 	void update();
-	/// Setup actions manager
+	// Setup actions manager
 	void setupActionsManager(SARibbonActionsManager* m);
-	/// Uninstall actions manager
+	// Uninstall actions manager
 	void uninstallActionsManager();
-	/// Get action from model index
+	// Get action from model index
 	QAction* indexToAction(QModelIndex index) const;
-	/// Search actions
+	// Search actions
 	void search(const QString& text);
 
 private Q_SLOTS:
@@ -2185,14 +2210,14 @@ class SA_RIBBON_EXPORT SARibbonButtonGroupWidget : public QToolBar
 {
 	Q_OBJECT
 public:
-	/// Constructor for SARibbonButtonGroupWidget
+	// Constructor for SARibbonButtonGroupWidget
 	explicit SARibbonButtonGroupWidget(QWidget* parent = nullptr);
-	/// Destructor for SARibbonButtonGroupWidget
+	// Destructor for SARibbonButtonGroupWidget
 	~SARibbonButtonGroupWidget();
 
-	/// Add a menu QAction to the button group widget
+	// Add a menu QAction to the button group widget
 	void addMenuAction(QAction* menuAction, QToolButton::ToolButtonPopupMode popupMode = QToolButton::InstantPopup);
-	/// Create and add a menu action to the button group widget
+	// Create and add a menu action to the button group widget
 	QAction* addMenuAction(QMenu* menu, QToolButton::ToolButtonPopupMode popupMode = QToolButton::InstantPopup);
 };
 
@@ -2211,27 +2236,27 @@ class QResizeEvent;
 
 /**
  * \if ENGLISH
- * @class SARibbonStackedWidget
  * @brief Stacked widget with popup menu functionality
  * @details This class extends QStackedWidget and adds two working modes:
- * @details 1. Normal mode: As a regular stacked widget, embedded in the parent window layout
- * @details 2. Popup mode: As an independent popup window, can be used to implement menu-like display effects
- * @details In popup mode, the window will be displayed as a frameless panel and supports modal event loop (exec() method),
- * @details which makes it usable like a menu or dialog.
+ * 1. Normal mode: As a regular stacked widget, embedded in the parent window layout
+ * 2. Popup mode: As an independent popup window, can be used to implement menu-like display effects
+ * In popup mode, the window will be displayed as a frameless panel and supports modal event loop (exec() method),
+ * which makes it usable like a menu or dialog.
  * @note Switching modes will automatically handle window state and event loop
- * @sa QStackedWidget
+ * @note Uses the PIMPL pattern via SA_RIBBON_DECLARE_PRIVATE for encapsulation.
+ * @see QStackedWidget
  * \endif
  *
  * \if CHINESE
- * @class SARibbonStackedWidget
  * @brief 具有弹出式菜单功能的堆叠窗口部件
  * @details 此类扩展了 QStackedWidget，添加了两种工作模式：
- * @details 1. 正常模式：作为常规的堆叠部件，嵌入在父窗口布局中
- * @details 2. 弹出模式：作为独立的弹出窗口，可用于实现类似菜单的显示效果
- * @details 在弹出模式下，窗口将显示为无边框面板，并支持模态事件循环（exec()方法），
- * @details 这使得它可以像菜单或对话框一样使用。
+ * 1. 正常模式：作为常规的堆叠部件，嵌入在父窗口布局中
+ * 2. 弹出模式：作为独立的弹出窗口，可用于实现类似菜单的显示效果
+ * 在弹出模式下，窗口将显示为无边框面板，并支持模态事件循环（exec()方法），
+ * 这使得它可以像菜单或对话框一样使用。
  * @note 切换模式时会自动处理窗口状态和事件循环
- * @sa QStackedWidget
+ * @note 通过SA_RIBBON_DECLARE_PRIVATE采用PIMPL模式实现封装。
+ * @see QStackedWidget
  * \endif
  */
 class SA_RIBBON_EXPORT SARibbonStackedWidget : public QStackedWidget
@@ -2239,57 +2264,57 @@ class SA_RIBBON_EXPORT SARibbonStackedWidget : public QStackedWidget
 	Q_OBJECT
 	SA_RIBBON_DECLARE_PRIVATE(SARibbonStackedWidget)
 public:
-	Q_PROPERTY(int animationWidgetHeight READ animationWidgetHeight WRITE setAnimationWidgetHeight)  // Add custom property
+	Q_PROPERTY(int animationWidgetHeight READ animationWidgetHeight WRITE setAnimationWidgetHeight)
 public:
-	/// Constructor for SARibbonStackedWidget
+	// Constructor for SARibbonStackedWidget
 	explicit SARibbonStackedWidget(QWidget* parent);
 
-	/// Destructor for SARibbonStackedWidget
+	// Destructor for SARibbonStackedWidget
 	~SARibbonStackedWidget();
 
-	/// Set popup mode
+	// Set popup mode
 	void setPopupMode();
 
-	/// Check if currently in popup mode
+	// Check if currently in popup mode
 	bool isPopupMode() const;
 
-	/// Set normal mode, same as normal stackwidget
+	// Set normal mode, same as normal stackwidget
 	void setNormalMode();
 
-	/// Check if currently in normal mode
+	// Check if currently in normal mode
 	bool isNormalMode() const;
 
-	/// Run event loop modally in popup mode
+	// Run event loop modally in popup mode
 	void exec();
 
-	/// Similar to tabbar's moveTab function, swap the index of two widgets
+	// Similar to tabbar's moveTab function, swap the index of two widgets
 	void moveWidget(int from, int to);
 
-	/// Set whether to enable popup animation
+	// Set whether to enable popup animation
 	void setUseAnimation(bool on);
 
-	/// Check if animation is enabled
+	// Check if animation is enabled
 	bool isUseAnimation() const;
 
-	/// Set animation duration (milliseconds)
+	// Set animation duration (milliseconds)
 	void setAnimationDuration(int duration);
 
-	/// Get animation duration
+	// Get animation duration
 	int animationDuration() const;
 
-	/// Get animation widget height
+	// Get animation widget height
 	int animationWidgetHeight() const;
 
-	/// Set animation widget height
+	// Set animation widget height
 	void setAnimationWidgetHeight(int h);
 
-	/// Set window normalGeometry, since this window has animation, to prevent size setting from being overwritten by animation during animation process
+	// Set window normalGeometry, since this window has animation, to prevent size setting from being overwritten by animation during animation process
 	void setNormalGeometry(const QRect& normalGeometry);
 
-	/// Get normal geometry
+	// Get normal geometry
 	QRect normalGeometry() const;
 
-	/// Send layout request to inner widgets
+	// Send layout request to inner widgets
 	void layoutRequestInnerWidgets();
 Q_SIGNALS:
 	/**
@@ -2304,23 +2329,26 @@ Q_SIGNALS:
 	void hidWindow();
 
 protected:
-	/// Handle show event
+	// Handle show event
 	void showEvent(QShowEvent* e) override;
 
-	/// Handle hide event
+	// Handle hide event
 	void hideEvent(QHideEvent* e) override;
 
-	/// Handle resize event
+	// Handle resize event
 	virtual void resizeEvent(QResizeEvent* e) override;
 
-	/// Update inner widget geometry
+	// Update inner widget geometry
 	void updateInnerWidgetGeometry();
 private Q_SLOTS:
-	/// Animation finished slot function
+	// Animation finished slot function
 	void onAnimationFinished();
 
-	/// Setup animation
+	// Setup animation
 	void setupAnimation();
+
+	// Handle current widget change to resize and relayout new visible widget
+	void onCurrentChanged(int index);
 };
 
 #endif  // SARIBBONSTACKEDWIDGET_H
@@ -2348,9 +2376,9 @@ class SA_RIBBON_EXPORT SARibbonSeparatorWidget : public QFrame
 {
 	Q_OBJECT
 public:
-	/// Constructor for SARibbonSeparatorWidget
+	// Constructor for SARibbonSeparatorWidget
 	explicit SARibbonSeparatorWidget(QWidget* parent = nullptr);
-	/// Destructor for SARibbonSeparatorWidget
+	// Destructor for SARibbonSeparatorWidget
 	~SARibbonSeparatorWidget();
 };
 
@@ -2390,34 +2418,34 @@ class SA_RIBBON_EXPORT SARibbonCtrlContainer : public QWidget
 	Q_OBJECT
 	SA_RIBBON_DECLARE_PRIVATE(SARibbonCtrlContainer)
 public:
-	/// Constructor for SARibbonCtrlContainer
+	// Constructor for SARibbonCtrlContainer
 	explicit SARibbonCtrlContainer(QWidget* parent = nullptr);
-	/// Destructor for SARibbonCtrlContainer
+	// Destructor for SARibbonCtrlContainer
 	~SARibbonCtrlContainer();
 
-	/// Enable or disable icon display
+	// Enable or disable icon display
 	void setEnableShowIcon(bool b);
-	/// Enable or disable title display
+	// Enable or disable title display
 	void setEnableShowTitle(bool b);
-	/// Check if container widget exists
+	// Check if container widget exists
 	bool hasContainerWidget() const;
-	/// Set the icon
+	// Set the icon
 	void setIcon(const QIcon& i);
-	/// Set the icon from pixmap
+	// Set the icon from pixmap
 	void setIcon(const QPixmap& pixmap);
-	/// Get the icon
+	// Get the icon
 	QIcon icon() const;
-	/// Set the text
+	// Set the text
 	void setText(const QString& t);
-	/// Get the text
+	// Get the text
 	QString text() const;
-	/// Set the container widget
+	// Set the container widget
 	void setContainerWidget(QWidget* w);
-	/// Get the container widget
+	// Get the container widget
 	QWidget* containerWidget();
-	/// Get the container widget (const)
+	// Get the container widget (const)
 	const QWidget* containerWidget() const;
-	/// Get the widget displaying the icon
+	// Get the widget displaying the icon
 	QWidget* iconWidget() const;
 };
 
@@ -2495,9 +2523,9 @@ class SA_RIBBON_EXPORT SARibbonQuickAccessBar : public SARibbonButtonGroupWidget
 {
 	Q_OBJECT
 public:
-	/// Constructor for SARibbonQuickAccessBar
+	// Constructor for SARibbonQuickAccessBar
 	explicit SARibbonQuickAccessBar(QWidget* parent = nullptr);
-	/// Destructor for SARibbonQuickAccessBar
+	// Destructor for SARibbonQuickAccessBar
 	~SARibbonQuickAccessBar();
 };
 
@@ -2526,17 +2554,17 @@ class SA_RIBBON_EXPORT SARibbonTabBar : public QTabBar
 {
 	Q_OBJECT
 public:
-	/// Constructs a SARibbonTabBar instance
+	// Constructs a SARibbonTabBar instance
 	explicit SARibbonTabBar(QWidget* parent = nullptr);
-	/// Destructor
+	// Destructor
 	~SARibbonTabBar();
-	/// Gets the tab margin
+	// Gets the tab margin
 	const QMargins& tabMargin() const;
-	/// Sets the tab margin
+	// Sets the tab margin
 	void setTabMargin(const QMargins& tabMargin);
 
 protected:
-	/// Estimates the size of a tab
+	// Estimates the size of a tab
 	QSize tabSizeHint(int index) const;
 
 private:
@@ -2569,19 +2597,19 @@ class SA_RIBBON_EXPORT SARibbonMenu : public QMenu
 {
 	Q_OBJECT
 public:
-	/// Constructor for SARibbonMenu
+	// Constructor for SARibbonMenu
 	explicit SARibbonMenu(QWidget* parent = nullptr);
-	/// Constructor for SARibbonMenu with title
+	// Constructor for SARibbonMenu with title
 	explicit SARibbonMenu(const QString& title, QWidget* parent = nullptr);
-	/// Destructor for SARibbonMenu
+	// Destructor for SARibbonMenu
 	~SARibbonMenu();
-	/// Add a submenu to this menu
+	// Add a submenu to this menu
 	QAction* addRibbonMenu(SARibbonMenu* menu);
-	/// Create and add a submenu with the given title
+	// Create and add a submenu with the given title
 	SARibbonMenu* addRibbonMenu(const QString& title);
-	/// Create and add a submenu with the given icon and title
+	// Create and add a submenu with the given icon and title
 	SARibbonMenu* addRibbonMenu(const QIcon& icon, const QString& title);
-	/// Add a custom widget to the menu
+	// Add a custom widget to the menu
 	QAction* addWidget(QWidget* w);
 };
 
@@ -2705,9 +2733,9 @@ class SA_RIBBON_EXPORT SARibbonPanelOptionButton : public QToolButton
 {
 	Q_OBJECT
 public:
-	/// Constructor for SARibbonPanelOptionButton
+	// Constructor for SARibbonPanelOptionButton
 	explicit SARibbonPanelOptionButton(QWidget* parent = nullptr);
-	/// Destructor for SARibbonPanelOptionButton
+	// Destructor for SARibbonPanelOptionButton
 	~SARibbonPanelOptionButton();
 };
 
@@ -2759,12 +2787,12 @@ public:
 		Medium,  ///< Medium proportion, only works when @ref SARibbonPanel::panelLayoutMode is @ref SARibbonPanel::ThreeRowMode, and when both in the same column are Medium, they will occupy two rows in three rows
 		Small  ///< Small proportion, occupies one row of SARibbonPanel, Medium will also become Small when conditions are not met, but will not become Large
 	};
-	/// Constructor for SARibbonPanelItem
+	// Constructor for SARibbonPanelItem
 	explicit SARibbonPanelItem(QWidget* widget);
-	/// Destructor for SARibbonPanelItem
+	// Destructor for SARibbonPanelItem
 	~SARibbonPanelItem();
 
-	/// Check if the item is empty
+	// Check if the item is empty
 	bool isEmpty() const Q_DECL_OVERRIDE;
 
 	short rowIndex;             ///< Record which row the current item belongs to, -1 in hide mode
@@ -2773,6 +2801,7 @@ public:
 	QAction* action;            /// < Record action, reference QToolBarLayoutItem
 	bool customWidget;  ///< For action without window, there will actually be a SARibbonToolButton, which needs to be deleted during destruction
 	SARibbonPanelItem::RowProportion rowProportion;  ///< Row proportion, there are three types of proportions in ribbon: large, medium and small, see @ref RowProportion
+	bool isExpandItem { false };  ///< Temporary flag used by recalcExpandGeomArray to mark expandable items
 };
 #ifndef SA_ActionPropertyName_RowProportion
 #define SA_ActionPropertyName_RowProportion "_sa_RowProportion"
@@ -2793,6 +2822,7 @@ public:
 #define SARIBBONPANELLAYOUT_H
 
 #include <QLayout>
+#include <QHash>
 
 class QToolButton;
 class SARibbonPanel;
@@ -2818,142 +2848,146 @@ class SA_RIBBON_EXPORT SARibbonPanelLayout : public QLayout
 	friend class SARibbonPanel;
 
 public:
-	/// Constructor for SARibbonPanelLayout
+	// Constructor for SARibbonPanelLayout
 	explicit SARibbonPanelLayout(QWidget* p = nullptr);
-	/// Destructor for SARibbonPanelLayout
+	// Destructor for SARibbonPanelLayout
 	~SARibbonPanelLayout();
-	/// Gets the SARibbonPanel that owns this layout
+	// Gets the SARibbonPanel that owns this layout
 	SARibbonPanel* ribbonPanel() const;
 
-	/// Inserts an action at a specific index
+	// Inserts an action at a specific index
 	void insertAction(int index, QAction* act, SARibbonPanelItem::RowProportion rp = SARibbonPanelItem::None);
 
-	/// Sets the option action for the panel
+	// Sets the option action for the panel
 	void setOptionAction(QAction* action);
 
-	/// Checks if an option action is set
+	// Checks if an option action is set
 	bool isHaveOptionAction() const;
 
-	/// Retrieves the SARibbonPanelItem associated with an action
+	// Retrieves the SARibbonPanelItem associated with an action
 	SARibbonPanelItem* panelItem(QAction* action) const;
 
-	/// Gets the last item added to the layout
+	// Gets the last item added to the layout
 	SARibbonPanelItem* lastItem() const;
 
-	/// Gets the widget associated with the last item
+	// Gets the widget associated with the last item
 	QWidget* lastWidget() const;
 
-	/// Moves an item from one index to another
+	// Moves an item from one index to another
 	void move(int from, int to);
-	/// Checks if layout needs to be reorganized
+	// Checks if layout needs to be reorganized
 	bool isDirty() const;
-	/// Updates size
+	// Updates size
 	void updateGeomArray();
+	/// Invalidate cached button sizeHints
+	void invalidateButtonSizeHintCache();
+	/// Invalidate cached sizeHint for a specific widget
+	void invalidateButtonSizeHintCache(QWidget* w);
 
-	/// Finds the index of an action in the layout
+	// Finds the index of an action in the layout
 	int indexByAction(QAction* action) const;
 
-	/// Gets the height of the panel's title
+	// Gets the height of the panel's title
 	int panelTitleHeight() const;
 
-	/// Sets the height of the panel's title
+	// Sets the height of the panel's title
 	void setPanelTitleHeight(int newTitleHeight);
 
-	/// Checks if the panel's title is enabled for display
+	// Checks if the panel's title is enabled for display
 	bool isEnableShowPanelTitle() const;
 
-	/// Sets whether the panel's title is enabled for display
+	// Sets whether the panel's title is enabled for display
 	void setEnableShowPanelTitle(bool on);
 
-	/// Gets the height of large buttons
+	// Gets the height of large buttons
 	int largeButtonHeight() const;
 
-	/// Gets the spacing between the title and the buttons
+	// Gets the spacing between the title and the buttons
 	int panelTitleSpace() const;
 
-	/// Sets the spacing between the title and the buttons
+	// Sets the spacing between the title and the buttons
 	void setPanelTitleSpace(int newTitleSpace);
 
-	/// Gets the panel's title label
+	// Gets the panel's title label
 	SARibbonPanelLabel* panelTitleLabel() const;
 
-	/// Sets the default icon size for tool buttons
+	// Sets the default icon size for tool buttons
 	void setToolButtonIconSize(const QSize& smallSize, const QSize& largeSize);
-	/// Gets the default icon size for tool buttons
+	// Gets the default icon size for tool buttons
 	QPair< QSize, QSize > toolButtonIconSize() const;
 
-	/// Large button icon size
+	// Large button icon size
 	void setLargeIconSize(const QSize& largeSize);
-	/// Get large icon size
+	// Get large icon size
 	QSize largeIconSize() const;
 
-	/// Small button icon size
+	// Small button icon size
 	void setSmallIconSize(const QSize& largeSize);
-	/// Get small icon size
+	// Get small icon size
 	QSize smallIconSize() const;
 
-	/// Check if word wrap is enabled
+	// Check if word wrap is enabled
 	bool isEnableWordWrap() const;
-	/// Maximum aspect ratio of buttons, this coefficient determines the maximum width of buttons
+	// Maximum aspect ratio of buttons, this coefficient determines the maximum width of buttons
 	qreal buttonMaximumAspectRatio() const;
 
 public:
-	/// Adds an item to the layout (SARibbonPanelLayout not supported)
+	// Adds an item to the layout (SARibbonPanelLayout not supported)
 	void addItem(QLayoutItem* item) Q_DECL_OVERRIDE;
 
-	/// QLayout required override functions
+	// QLayout required override functions
 	QLayoutItem* itemAt(int index) const Q_DECL_OVERRIDE;
 
-	/// Removes and returns the item at the specified index
+	// Removes and returns the item at the specified index
 	QLayoutItem* takeAt(int index) Q_DECL_OVERRIDE;
 
-	/// Gets the number of items in the layout
+	// Gets the number of items in the layout
 	int count() const Q_DECL_OVERRIDE;
 
-	/// Checks if the layout is empty
+	// Checks if the layout is empty
 	bool isEmpty() const Q_DECL_OVERRIDE;
 
-	/// Invalidates the layout, marking it as dirty
+	// Invalidates the layout, marking it as dirty
 	void invalidate() Q_DECL_OVERRIDE;
 
-	/// Returns the directions in which the layout can expand
+	// Returns the directions in which the layout can expand
 	Qt::Orientations expandingDirections() const Q_DECL_OVERRIDE;
-	/// Set geometry
+	// Set geometry
 	void setGeometry(const QRect& rect) Q_DECL_OVERRIDE;
-	/// Get minimum size
+	// Get minimum size
 	QSize minimumSize() const Q_DECL_OVERRIDE;
-	/// Get size hint
+	// Get size hint
 	QSize sizeHint() const Q_DECL_OVERRIDE;
 
 protected:
-	/// Gets the size of the option action button
+	// Gets the size of the option action button
 	QSize optionActionButtonSize() const;
-	/// Layout action
+	// Layout action
 	void doLayout();
-	/// Convert action to item, for pure Action, this function will create SARibbonToolButton
-	/// rp is used to tell Layout what kind of window to generate, see SARibbonPanelItem::RowProportion for details
+	// Convert action to item, for pure Action, this function will create SARibbonToolButton
+	// rp is used to tell Layout what kind of window to generate, see SARibbonPanelItem::RowProportion for details
 	SARibbonPanelItem* createItem(QAction* action, SARibbonPanelItem::RowProportion rp = SARibbonPanelItem::None);
-	/// Update geometry array
+	// Update geometry array
 	void updateGeomArray(const QRect& setrect);
-	/// Recalculate expansion bar code, this function must be called after updateGeomArray function
+	// Recalculate expansion bar code, this function must be called after updateGeomArray function
 	void recalcExpandGeomArray(const QRect& setrect);
-	/// Set text wrap enabled
+	// Set text wrap enabled
 	void setEnableWordWrap(bool on);
-	/// Set maximum aspect ratio of buttons, this coefficient determines the maximum width of buttons
+	// Set maximum aspect ratio of buttons, this coefficient determines the maximum width of buttons
 	void setButtonMaximumAspectRatio(qreal fac = 1.4);
 
 private:
-	/// Calculate window width and maximum width based on column count
+	// Calculate window width and maximum width based on column count
 	void columnWidthInfo(int colindex, int& width, int& maximum) const;
 
-	/// Sets the panel's title label
+	// Sets the panel's title label
 	void setPanelTitleLabel(SARibbonPanelLabel* newTitleLabel);
 
 private:
 	QList< SARibbonPanelItem* > mItems;
 	int mColumnCount { 0 };                       ///< 记录有多少列
-	bool mExpandFlag { false };                   ///< 标记是否是会扩展的
 	QSize mSizeHint;                              ///< sizeHint返回的尺寸
+	QHash<QWidget*, QSize> mButtonSizeHintCache;  ///< 缓存按钮的sizeHint，避免重复计算
 	QSize mSmallToolButtonIconSize { 22, 22 };    ///< 记录小按钮图标尺寸
 	QSize mLargeToolButtonIconSize { 32, 32 };    ///< 记录大按钮图标尺寸
 	bool mDirty { true };                         ///< 用于标记是否需要刷新元素，参考QToolBarLayout源码
@@ -3002,7 +3036,7 @@ class SA_RIBBON_EXPORT SARibbonPanelLabel : public QLabel
 {
 	Q_OBJECT
 public:
-	/// Constructor for SARibbonPanelLabel
+	// Constructor for SARibbonPanelLabel
 	SARibbonPanelLabel(QWidget* parent = nullptr);
 };
 
@@ -3135,196 +3169,196 @@ public:
 	using FpRibbonToolButtonIterate = std::function< bool(SARibbonToolButton*) >;
 
 public:
-	/// Constructor for SARibbonPanel
+	// Constructor for SARibbonPanel
 	explicit SARibbonPanel(QWidget* parent = nullptr);
-	/// Constructor for SARibbonPanel with name
+	// Constructor for SARibbonPanel with name
 	explicit SARibbonPanel(const QString& name, QWidget* parent = nullptr);
-	/// Destructor for SARibbonPanel
+	// Destructor for SARibbonPanel
 	~SARibbonPanel() Q_DECL_OVERRIDE;
 	using QWidget::addAction;
 
-	/// Add action to panel with specified row proportion
+	// Add action to panel with specified row proportion
 	void addAction(QAction* action, SARibbonPanelItem::RowProportion rowProportion);
-	/// Generate and add an action with specified popup mode and row proportion
+	// Generate and add an action with specified popup mode and row proportion
 	void addAction(QAction* act,
 				   QToolButton::ToolButtonPopupMode popMode,
 				   SARibbonPanelItem::RowProportion rowProportion = SARibbonPanelItem::Large);
-	/// Add action to panel with large icon display
+	// Add action to panel with large icon display
 	void addLargeAction(QAction* action);
-	/// Add action to panel with medium icon display in three-row mode
+	// Add action to panel with medium icon display in three-row mode
 	void addMediumAction(QAction* action);
-	/// Add action to panel with small icon display
+	// Add action to panel with small icon display
 	void addSmallAction(QAction* action);
 
-	/// Add action to panel with small icon display and specified popup mode
+	// Add action to panel with small icon display and specified popup mode
 	void addSmallAction(QAction* action, QToolButton::ToolButtonPopupMode popMode);
-	/// Add action to panel with large icon display and specified popup mode
+	// Add action to panel with large icon display and specified popup mode
 	void addLargeAction(QAction* action, QToolButton::ToolButtonPopupMode popMode);
-	/// Add action to panel with medium icon display in three-row mode and specified popup mode
+	// Add action to panel with medium icon display in three-row mode and specified popup mode
 	void addMediumAction(QAction* action, QToolButton::ToolButtonPopupMode popMode);
-	/// Generate and add an action with text, icon, popup mode, and row proportion
+	// Generate and add an action with text, icon, popup mode, and row proportion
 	QAction* addAction(const QString& text,
 					   const QIcon& icon,
 					   QToolButton::ToolButtonPopupMode popMode,
 					   SARibbonPanelItem::RowProportion rowProportion = SARibbonPanelItem::Large);
 
-	/// Add menu with specified row proportion and popup mode
+	// Add menu with specified row proportion and popup mode
 	void addMenu(QMenu* menu,
 				 SARibbonPanelItem::RowProportion rowProportion,
 				 QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
-	/// Add large menu with specified popup mode
+	// Add large menu with specified popup mode
 	void addLargeMenu(QMenu* menu, QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
-	/// Add medium menu with specified popup mode
+	// Add medium menu with specified popup mode
 	void addMediumMenu(QMenu* menu, QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
-	/// Add small menu with specified popup mode
+	// Add small menu with specified popup mode
 	void addSmallMenu(QMenu* menu, QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
 
-	/// Add widget with specified row proportion
+	// Add widget with specified row proportion
 	QAction* addWidget(QWidget* w, SARibbonPanelItem::RowProportion rowProportion);
 
-	/// Add small widget (occupies one row of ribbon)
+	// Add small widget (occupies one row of ribbon)
 	QAction* addSmallWidget(QWidget* w);
 
-	/// Add medium widget (occupies one row of ribbon)
+	// Add medium widget (occupies one row of ribbon)
 	QAction* addMediumWidget(QWidget* w);
 
-	/// Add large widget (occupies all rows)
+	// Add large widget (occupies all rows)
 	QAction* addLargeWidget(QWidget* w);
 
-	/// Add a gallery
+	// Add a gallery
 	SARibbonGallery* addGallery(bool expanding = true);
 
-	/// Add separator
+	// Add separator
 	QAction* addSeparator();
 
-	/// Extract the button corresponding to the action from the panel, returns nullptr if no corresponding button
+	// Extract the button corresponding to the action from the panel, returns nullptr if no corresponding button
 	SARibbonToolButton* actionToRibbonToolButton(QAction* action);
 
-	/// Set option action, pass nullptr to remove, SARibbonPanel does not manage QAction ownership
-	/// OptionAction also triggers actionTriggered signal
+	// Set option action, pass nullptr to remove, SARibbonPanel does not manage QAction ownership
+	// OptionAction also triggers actionTriggered signal
 	void setOptionAction(QAction* action);
 
-	/// Check if option action exists
+	// Check if option action exists
 	bool isHaveOptionAction() const;
 
-	/// Get all buttons
+	// Get all buttons
 	QList< SARibbonToolButton* > ribbonToolButtons() const;
 
-	/// Get PanelLayoutMode
+	// Get PanelLayoutMode
 	PanelLayoutMode panelLayoutMode() const;
-	/// Set PanelLayoutMode
+	// Set PanelLayoutMode
 	void setPanelLayoutMode(PanelLayoutMode mode);
 
-	/// Update button sizes, this function needs to be called after panel layout state changes
+	// Update button sizes, this function needs to be called after panel layout state changes
 	void resetToolButtonSize();
 
-	/// Check if it is two-row mode
+	// Check if it is two-row mode
 	bool isTwoRow() const;
 
-	/// Set panel to expanding mode, which will expand the horizontal area
+	// Set panel to expanding mode, which will expand the horizontal area
 	void setExpanding(bool isExpanding = true);
-	/// Check if it is expanding mode
+	// Check if it is expanding mode
 	bool isExpanding() const;
 
-	/// Title bar height
+	// Title bar height
 	int titleHeight() const;
 
-	/// Check if title is enabled, after enabling title, the title height needs to be set, default height is 15
+	// Check if title is enabled, after enabling title, the title height needs to be set, default height is 15
 	bool isEnableShowTitle() const;
 
-	/// Layout index corresponding to action, this operation is generally used for moveAction, other meanings are not significant
+	// Layout index corresponding to action, this operation is generally used for moveAction, other meanings are not significant
 	int actionIndex(QAction* act) const;
 
-	/// Move action
+	// Move action
 	void moveAction(int from, int to);
 
-	/// Check if customization is allowed
+	// Check if customization is allowed
 	bool isCanCustomize() const;
-	/// Set customization allowed
+	// Set customization allowed
 	void setCanCustomize(bool b);
 
-	/// Panel name
+	// Panel name
 	QString panelName() const;
-	/// Set panel name
+	// Set panel name
 	void setPanelName(const QString& title);
 
-	/// Large button height
+	// Large button height
 	int largeButtonHeight() const;
 
-	/// Get layout corresponding items, this function is currently only used in the customization process
+	// Get layout corresponding items, this function is currently only used in the customization process
 	const QList< SARibbonPanelItem* >& ribbonPanelItem() const;
 
-	/// Get panel layout
+	// Get panel layout
 	SARibbonPanelLayout* panelLayout() const;
 
-	/// Update layout
+	// Update layout
 	void updateItemGeometry();
 
-	/// Get category pointer, returns nullptr if no parent or not managed by category
+	// Get category pointer, returns nullptr if no parent or not managed by category
 	SARibbonCategory* category() const;
 
-	/// Get ribbonBar pointer, returns nullptr if none
+	// Get ribbonBar pointer, returns nullptr if none
 	SARibbonBar* ribbonBar() const;
 
-	/// Spacing between buttons
+	// Spacing between buttons
 	int spacing() const;
 
-	/// Set button icon sizes
+	// Set button icon sizes
 	void setToolButtonIconSize(const QSize& smallSize, const QSize& largeSize);
-	/// Get button icon sizes
+	// Get button icon sizes
 	QPair< QSize, QSize > toolButtonIconSize() const;
 
-	/// Large button icon size
+	// Large button icon size
 	void setLargeIconSize(const QSize& largeSize);
-	/// Get large icon size
+	// Get large icon size
 	QSize largeIconSize() const;
 
-	/// Small button icon size
+	// Small button icon size
 	void setSmallIconSize(const QSize& smallSize);
-	/// Get small icon size
+	// Get small icon size
 	QSize smallIconSize() const;
 
-	/// Get last added button
+	// Get last added button
 	SARibbonToolButton* lastAddActionButton();
 
-	/// Get panel title label widget
+	// Get panel title label widget
 	SARibbonPanelLabel* titleLabel() const;
 
-	/// Check if word wrap is enabled
+	// Check if word wrap is enabled
 	bool isEnableWordWrap() const;
 
-	/// Set whether button text is displayed to the right of the icon
+	// Set whether button text is displayed to the right of the icon
 	void setEnableIconRightText(bool on);
-	/// Check if icon-right-text mode is enabled
+	// Check if icon-right-text mode is enabled
 	bool isEnableIconRightText() const;
 
-	/// Maximum aspect ratio of buttons, this coefficient determines the maximum width of buttons
+	// Maximum aspect ratio of buttons, this coefficient determines the maximum width of buttons
 	qreal buttonMaximumAspectRatio() const;
 
-	/// This function will iterate through all RibbonToolButton under SARibbonPanel, execute function pointer
-	/// (bool(SARibbonRibbonToolButton*)), function pointer returns false to stop iteration
+	// This function will iterate through all RibbonToolButton under SARibbonPanel, execute function pointer
+	// (bool(SARibbonRibbonToolButton*)), function pointer returns false to stop iteration
 	bool iterateButton(FpRibbonToolButtonIterate fp) const;
 
 public:
-	/// Get size hint
+	// Get size hint
 	virtual QSize sizeHint() const Q_DECL_OVERRIDE;
-	/// Get minimum size hint
+	// Get minimum size hint
 	virtual QSize minimumSizeHint() const Q_DECL_OVERRIDE;
 
 public:
-	/// Recommended panel height
+	// Recommended panel height
 	static int panelHeightHint(const QFontMetrics& fm, PanelLayoutMode layMode, int panelTitleHeight);
-	/// Set action row proportion property into action, action itself carries row property
+	// Set action row proportion property into action, action itself carries row property
 	static void setActionRowProportionProperty(QAction* action, SARibbonPanelItem::RowProportion rp);
-	/// Get action row proportion property
+	// Get action row proportion property
 	static SARibbonPanelItem::RowProportion getActionRowProportionProperty(QAction* action);
-	/// Set action PopupMode property into action, action itself carries PopupMode property
+	// Set action PopupMode property into action, action itself carries PopupMode property
 	static void setActionToolButtonPopupModeProperty(QAction* action, QToolButton::ToolButtonPopupMode popMode);
-	/// Get action PopupMode property
+	// Get action PopupMode property
 	static QToolButton::ToolButtonPopupMode getActionToolButtonPopupModeProperty(QAction* action);
-	/// Set action ToolButtonStyle property into action, action itself carries ToolButtonStyle property
+	// Set action ToolButtonStyle property into action, action itself carries ToolButtonStyle property
 	static void setActionToolButtonStyleProperty(QAction* action, Qt::ToolButtonStyle buttonStyle);
-	/// Get action ToolButtonStyle property
+	// Get action ToolButtonStyle property
 	static Qt::ToolButtonStyle getActionToolButtonStyleProperty(QAction* action);
 
 Q_SIGNALS:
@@ -3356,9 +3390,9 @@ Q_SIGNALS:
 	void panelNameChanged(const QString& n);
 
 protected:
-	/// Handle action events
+	// Handle action events
 	virtual void actionEvent(QActionEvent* e) Q_DECL_OVERRIDE;
-	/// Handle change events
+	// Handle change events
 	virtual void changeEvent(QEvent* e) Q_DECL_OVERRIDE;
 
 protected:
@@ -3367,20 +3401,20 @@ protected:
 	// will resynchronize its own parameters to the panel Similarly, when SARibbonCategory is added to SARibbonBar,
 	// SARibbonBar will resynchronize its own parameters to the category
 
-	/// Set title bar height
+	// Set title bar height
 	void setTitleHeight(int h);
 
-	/// Set spacing between buttons
+	// Set spacing between buttons
 	void setSpacing(int n);
 
-	/// Set whether to show title, after showing title, the title height needs to be set, default height is 15
+	// Set whether to show title, after showing title, the title height needs to be set, default height is 15
 	void setEnableShowTitle(bool on);
 
-	/// Set whether buttons are allowed to wrap, note that the icon size is determined by the text, two lines of text
-	/// will make the icon smaller, if you want the icon to be larger, it is best not to wrap the text
+	// Set whether buttons are allowed to wrap, note that the icon size is determined by the text, two lines of text
+	// will make the icon smaller, if you want the icon to be larger, it is best not to wrap the text
 	void setEnableWordWrap(bool on);
 
-	/// Set the maximum aspect ratio of buttons, this coefficient determines the maximum width of buttons
+	// Set the maximum aspect ratio of buttons, this coefficient determines the maximum width of buttons
 	void setButtonMaximumAspectRatio(qreal fac = 1.4);
 };
 
@@ -3432,178 +3466,206 @@ public:
 	using FpPanelIterate = std::function< bool(SARibbonPanel*) >;
 
 public:
-	/// Constructor
+	// Constructor
 	explicit SARibbonCategory(QWidget* p = nullptr);
-	/// Constructor with name
+	// Constructor with name
 	explicit SARibbonCategory(const QString& name, QWidget* p = nullptr);
-	/// Destructor
+	// Destructor
 	~SARibbonCategory();
 
-	/// Get the category name
+	// Get the category name
 	QString categoryName() const;
 
-	/// Set the category name
+	// Set the category name
 	void setCategoryName(const QString& title);
 
-	/// Get the panel layout mode
+	// Get the panel layout mode
 	SARibbonPanel::PanelLayoutMode panelLayoutMode() const;
 
-	/// Set the panel layout mode
+	// Set the panel layout mode
 	void setPanelLayoutMode(SARibbonPanel::PanelLayoutMode m);
 
-	/// Add a panel with title
+	// Add a panel with title
 	SARibbonPanel* addPanel(const QString& title);
 
-	/// Add an existing panel
+	// Add an existing panel
 	void addPanel(SARibbonPanel* panel);
 
-	/// Add panel for Qt Designer
+	// Add panel for Qt Designer
 	Q_INVOKABLE void addPanel(QWidget* panel);
 
-	/// Create and insert a new panel at index position
+	// Create and insert a new panel at index position
 	SARibbonPanel* insertPanel(const QString& title, int index);
 
-	/// Insert an existing panel at index position
+	// Insert an existing panel at index position
 	void insertPanel(SARibbonPanel* panel, int index);
 
-	/// Find panel by name
+	// Find panel by name
 	SARibbonPanel* panelByName(const QString& title) const;
 
-	/// Find panel by ObjectName
+	// Find panel by ObjectName
 	SARibbonPanel* panelByObjectName(const QString& objname) const;
 
-	/// Find panel by index, returns nullptr if out of range
+	// Find panel by index, returns nullptr if out of range
 	SARibbonPanel* panelByIndex(int index) const;
 
-	/// Get the index of a panel
+	// Get the index of a panel
 	int panelIndex(SARibbonPanel* p) const;
 
-	/// Move a panel from one index to another
+	// Move a panel from one index to another
 	void movePanel(int from, int to);
 
-	/// Detach panel from SARibbonCategory management
+	// Detach panel from SARibbonCategory management
 	bool takePanel(SARibbonPanel* panel);
 
-	/// Remove panel and delete it
+	// Remove panel and delete it
 	bool removePanel(SARibbonPanel* panel);
 
-	/// Remove panel by index
+	// Remove panel by index
 	bool removePanel(int index);
 
-	/// Get all panels
+	// Get all panels
 	QList< SARibbonPanel* > panelList() const;
 
-	/// Check if this is a context category
+	// Check if this is a context category
 	bool isContextCategory() const;
 
-	/// Get the number of panels
+	// Get the number of panels
 	int panelCount() const;
 
-	/// Check if customization is allowed
+	// Check if customization is allowed
 	bool isCanCustomize() const;
-	/// Set whether customization is allowed
+	// Set whether customization is allowed
 	void setCanCustomize(bool b);
 
-	/// Get panel title bar height
+	// Get panel title bar height
 	int panelTitleHeight() const;
-	/// Set panel title bar height
+	// Set panel title bar height
 	void setPanelTitleHeight(int h);
 
-	/// Check if panel title bar is displayed
+	// Check if panel title bar is displayed
 	bool isEnableShowPanelTitle() const;
-	/// Set whether to display panel title
+	// Set whether to display panel title
 	void setEnableShowPanelTitle(bool on);
 
-	/// Set category alignment
+	// Set category alignment
 	void setCategoryAlignment(SARibbonAlignment al);
-	/// Get category alignment
+	// Get category alignment
 	SARibbonAlignment categoryAlignment() const;
 
-	/// Set panel spacing
+	// Set panel spacing
 	void setPanelSpacing(int n);
-	/// Get panel spacing
+	// Get panel spacing
 	int panelSpacing() const;
 
-	/// Set panel large icon size
+	// Set panel large icon size
 	void setPanelLargeIconSize(const QSize& largeSize);
-	/// Get panel large icon size
+	// Get panel large icon size
 	QSize panelLargeIconSize() const;
 
-	/// Set panel small icon size
+	// Set panel small icon size
 	void setPanelSmallIconSize(const QSize& smallSize);
-	/// Get panel small icon size
+	// Get panel small icon size
 	QSize panelSmallIconSize() const;
 
-	/// Set panel tool button icon sizes
+	// Set panel tool button icon sizes
 	void setPanelToolButtonIconSize(const QSize& smallSize, const QSize& largeSize);
-	/// Get panel tool button icon sizes
+	// Get panel tool button icon sizes
 	QPair< QSize, QSize > panelToolButtonIconSize() const;
 
-	/// Get the parent ribbonbar, returns null if not managed
+	// Get the parent ribbonbar, returns null if not managed
 	SARibbonBar* ribbonBar() const;
 
-	/// Refresh category layout, call after changing ribbon mode
+	// Refresh category layout, call after changing ribbon mode
 	void updateItemGeometry();
 
-	/// Set whether to use animation when scrolling
+	// Set whether to use animation when scrolling
 	void setUseAnimatingScroll(bool useAnimating);
-	/// Check if animation is used when scrolling
+	// Check if animation is used when scrolling
 	bool isUseAnimatingScroll() const;
 
-	/// Set wheel scroll step in pixels
+	// Set wheel scroll step in pixels
 	void setWheelScrollStep(int step);
-	/// Get wheel scroll step
+	// Get wheel scroll step
 	int wheelScrollStep() const;
 
-	/// Set animation duration in milliseconds
+	// Set animation duration in milliseconds
 	void setAnimationDuration(int duration);
-	/// Get animation duration in milliseconds
+	// Get animation duration in milliseconds
 	int animationDuration() const;
 
-	/// Check if panel text word wrap is enabled
+	// Check if panel text word wrap is enabled
 	bool isEnableWordWrap() const;
 
-	/// Check if icon-right-text mode is enabled
+	// Check if icon-right-text mode is enabled
 	bool isEnableIconRightText() const;
 
-	/// Get button maximum aspect ratio
+	// Get button maximum aspect ratio
 	qreal buttonMaximumAspectRatio() const;
 
-	/// Iterate through all panels
+	// Iterate through all panels
 	bool iteratePanel(FpPanelIterate fp) const;
 
 	QSize sizeHint() const Q_DECL_OVERRIDE;
 Q_SIGNALS:
-	/// Emitted when category name changes
+	/**
+	 * \if ENGLISH
+	 * @brief Emitted when category name changes
+	 * @param n New category name
+	 * \endif
+	 *
+	 * \if CHINESE
+	 * @brief 标签名改变时触发的信号
+	 * @param n 新的标签名
+	 * \endif
+	 */
 	void categoryNameChanged(const QString& n);
 
-	/// Emitted when an action is triggered
+	/**
+	 * \if ENGLISH
+	 * @brief Emitted when an action is triggered
+	 * @param action Triggered action
+	 * \endif
+	 *
+	 * \if CHINESE
+	 * @brief 动作被触发时触发的信号
+	 * @param action 被触发的动作
+	 * \endif
+	 */
 	void actionTriggered(QAction* action);
 
 protected:
 	virtual bool event(QEvent* e) override;
-	/// Handle wheel event
+	// Handle wheel event
 	void wheelEvent(QWheelEvent* event) override;
-	/// Handle change event
+	// Handle change event
 	void changeEvent(QEvent* event) override;
 
-	/// Mark this as a context category
+	// Mark this as a context category
 	void markIsContextCategory(bool isContextCategory = true);
 
-	/// Get the category layout
+	// Get the category layout
 	SARibbonCategoryLayout* categoryLayout() const;
 
-	/// Set whether panel button text word wrap is enabled
+	// Set whether panel button text word wrap is enabled
 	void setEnableWordWrap(bool on);
 
-	/// Set whether button text is displayed to the right of the icon
+	// Set whether button text is displayed to the right of the icon
 	void setEnableIconRightText(bool on);
 
-	/// Set button maximum aspect ratio
+	// Set button maximum aspect ratio
 	void setButtonMaximumAspectRatio(qreal fac = 1.4);
 };
 
-/// Scroll button for SARibbonCategory when content exceeds width
+/**
+ * \if ENGLISH
+ * @brief Scroll button for SARibbonCategory when content exceeds width
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 当内容超出宽度时SARibbonCategory的滚动按钮
+ * \endif
+ */
 class SA_RIBBON_EXPORT SARibbonCategoryScrollButton : public QToolButton
 {
 	Q_OBJECT
@@ -3651,92 +3713,92 @@ private:
 	mutable QSize mCachedSizeHint;
 	mutable QSize mCachedMinSizeHint;
 public:
-	/// Constructor for SARibbonCategoryLayout
+	// Constructor for SARibbonCategoryLayout
 	explicit SARibbonCategoryLayout(SARibbonCategory* parent);
-	/// Destructor for SARibbonCategoryLayout
+	// Destructor for SARibbonCategoryLayout
 	~SARibbonCategoryLayout();
 
-	/// Get the parent SARibbonCategory
+	// Get the parent SARibbonCategory
 	SARibbonCategory* ribbonCategory() const;
 
-	/// Add a layout item (overridden from QLayout)
+	// Add a layout item (overridden from QLayout)
 	virtual void addItem(QLayoutItem* item) override;
-	/// Get the layout item at the specified index (overridden from QLayout)
+	// Get the layout item at the specified index (overridden from QLayout)
 	virtual QLayoutItem* itemAt(int index) const override;
-	/// Take the layout item at the specified index (overridden from QLayout)
+	// Take the layout item at the specified index (overridden from QLayout)
 	virtual QLayoutItem* takeAt(int index) override;
-	/// Take the panel item at the specified index
+	// Take the panel item at the specified index
 	SARibbonCategoryLayoutItem* takePanelItem(int index);
-	/// Take the panel item for the specified panel
+	// Take the panel item for the specified panel
 	SARibbonCategoryLayoutItem* takePanelItem(SARibbonPanel* panel);
-	/// Remove a panel and its separator
+	// Remove a panel and its separator
 	bool takePanel(SARibbonPanel* panel);
-	/// Get the number of layout items (overridden from QLayout)
+	// Get the number of layout items (overridden from QLayout)
 	virtual int count() const override;
-	/// Set the geometry of the layout (overridden from QLayout)
+	// Set the geometry of the layout (overridden from QLayout)
 	void setGeometry(const QRect& rect) override;
-	/// Get the size hint of the layout (overridden from QLayout)
+	// Get the size hint of the layout (overridden from QLayout)
 	QSize sizeHint() const override;
-	/// Get the minimum size of the layout (overridden from QLayout)
+	// Get the minimum size of the layout (overridden from QLayout)
 	QSize minimumSize() const override;
-	/// Get the expanding directions of the layout (overridden from QLayout)
+	// Get the expanding directions of the layout (overridden from QLayout)
 	Qt::Orientations expandingDirections() const override;
-	/// Invalidate the layout (overridden from QLayout)
+	// Invalidate the layout (overridden from QLayout)
 	void invalidate() override;
-	/// Add a panel to the layout
+	// Add a panel to the layout
 	void addPanel(SARibbonPanel* panel);
-	/// Insert a panel at the specified index
+	// Insert a panel at the specified index
 	void insertPanel(int index, SARibbonPanel* panel);
-	/// Get the content size of the category
+	// Get the content size of the category
 	QSize categoryContentSize() const;
-	/// Update geometry of the layout
+	// Update geometry of the layout
 	void updateGeometryArr();
 
-	/// Execute layout adjustment
+	// Execute layout adjustment
 	void doLayout();
 
-	/// Get all panels in the layout
+	// Get all panels in the layout
 	QList< SARibbonPanel* > panels() const;
 
-	/// Find a panel by its object name
+	// Find a panel by its object name
 	SARibbonPanel* panelByObjectName(const QString& objname) const;
-	/// Find a panel by its name
+	// Find a panel by its name
 	SARibbonPanel* panelByName(const QString& panelname) const;
-	/// Find a panel by its index
+	// Find a panel by its index
 	SARibbonPanel* panelByIndex(int i) const;
-	/// Move a panel from one position to another
+	// Move a panel from one position to another
 	void movePanel(int from, int to);
-	/// Get the number of panels
+	// Get the number of panels
 	int panelCount() const;
-	/// Find the index of a panel
+	// Find the index of a panel
 	int panelIndex(SARibbonPanel* p) const;
-	/// Get all panels in the layout
+	// Get all panels in the layout
 	QList< SARibbonPanel* > panelList() const;
-	/// Execute scrolling
+	// Execute scrolling
 	void scroll(int px);
-	/// Scroll to a specified position
+	// Scroll to a specified position
 	void scrollTo(int targetX);
-	/// Animate scrolling by a specified distance
+	// Animate scrolling by a specified distance
 	void scrollByAnimate(int px);
-	/// Animate scrolling to a specified position
+	// Animate scrolling to a specified position
 	void scrollToByAnimate(int targetX);
-	/// Get the current scroll position
+	// Get the current scroll position
 	int scrollPosition() const;
-	/// Set the scroll position
+	// Set the scroll position
 	void setScrollPosition(int pos);
-	/// Check if scrolling animation is in progress
+	// Check if scrolling animation is in progress
 	bool isAnimatingScroll() const;
-	/// Check if the layout has been scrolled
+	// Check if the layout has been scrolled
 	bool isScrolled() const;
-	/// Get the total width of the content
+	// Get the total width of the content
 	int categoryTotalWidth() const;
-	/// Set the alignment of the category
+	// Set the alignment of the category
 	void setCategoryAlignment(SARibbonAlignment al);
-	/// Get the alignment of the category
+	// Get the alignment of the category
 	SARibbonAlignment categoryAlignment() const;
-	/// Set the duration of the animation
+	// Set the duration of the animation
 	void setAnimationDuration(int duration);
-	/// Get the duration of the animation
+	// Get the duration of the animation
 	int animationDuration() const;
 private Q_SLOTS:
 	void onLeftScrollButtonClicked();
@@ -3744,6 +3806,10 @@ private Q_SLOTS:
 
 private:
 	void setupAnimateScroll();
+	// Update scroll offset by translating pre-calculated geometries without full recalculation
+	void updateScrollOffset(int newXBase);
+	// Update scroll button visibility flags based on current scroll position
+	void updateScrollButtonVisibility();
 };
 
 /**
@@ -3760,12 +3826,12 @@ private:
 class SA_RIBBON_EXPORT SARibbonCategoryLayoutItem : public QWidgetItem
 {
 public:
-	/// Constructor for SARibbonCategoryLayoutItem
+	// Constructor for SARibbonCategoryLayoutItem
 	explicit SARibbonCategoryLayoutItem(SARibbonPanel* w);
-	/// Destructor for SARibbonCategoryLayoutItem
+	// Destructor for SARibbonCategoryLayoutItem
 	~SARibbonCategoryLayoutItem();
 	SARibbonSeparatorWidget* separatorWidget;
-	/// Convert the internal widget to a SARibbonPanel
+	// Convert the internal widget to a SARibbonPanel
 	SARibbonPanel* toPanelWidget();
 	QRect mWillSetGeometry;           ///< panel将要设置的Geometry
 	QRect mWillSetSeparatorGeometry;  ///< panel将要设置的Separator的Geometry
@@ -3797,48 +3863,48 @@ class SA_RIBBON_EXPORT SARibbonContextCategory : public QObject
 	Q_OBJECT
 	SA_RIBBON_DECLARE_PRIVATE(SARibbonContextCategory)
 public:
-	/// Constructor for SARibbonContextCategory
+	// Constructor for SARibbonContextCategory
 	explicit SARibbonContextCategory(QWidget* parent = nullptr);
-	/// Destructor for SARibbonContextCategory
+	// Destructor for SARibbonContextCategory
 	~SARibbonContextCategory();
-	/// Add a category page with title
+	// Add a category page with title
 	SARibbonCategory* addCategoryPage(const QString& title);
-	/// Add an existing category page
+	// Add an existing category page
 	void addCategoryPage(SARibbonCategory* category);
-	/// Get the number of managed category pages
+	// Get the number of managed category pages
 	int categoryCount() const;
 
-	/// Set the context ID
+	// Set the context ID
 	void setId(const QVariant& id);
-	/// Get the context ID
+	// Get the context ID
 	QVariant id() const;
 
-	/// Set the context color
+	// Set the context color
 	void setContextColor(const QColor color);
-	/// Get the context color
+	// Get the context color
 	QColor contextColor() const;
 
-	/// Get the context title
+	// Get the context title
 	QString contextTitle() const;
-	/// Set the context title
+	// Set the context title
 	void setContextTitle(const QString& contextTitle);
 
-	/// Get the category page at the specified index
+	// Get the category page at the specified index
 	SARibbonCategory* categoryPage(int index);
 
-	/// Get all SARibbonCategory objects
+	// Get all SARibbonCategory objects
 	QList< SARibbonCategory* > categoryList() const;
 
-	/// Remove a category from management
+	// Remove a category from management
 	bool takeCategory(SARibbonCategory* category);
 
-	/// Check if the context manages this category
+	// Check if the context manages this category
 	bool isHaveCategory(SARibbonCategory* category) const;
 public Q_SLOTS:
-	/// Hide the context category
+	// Hide the context category
 	void hide();
 
-	/// Show the context category
+	// Show the context category
 	void show();
 Q_SIGNALS:
 	/**
@@ -3898,7 +3964,7 @@ private Q_SLOTS:
 	void onCategoryTitleChanged(const QString& title);
 
 protected:
-	/// Get the parent widget
+	// Get the parent widget
 	QWidget* parentWidget() const;
 	virtual bool eventFilter(QObject* watched, QEvent* e) override;
 };
@@ -3933,57 +3999,57 @@ class SA_RIBBON_EXPORT SARibbonGalleryItem
 	friend class SARibbonGalleryGroupModel;
 
 public:
-	/// Default constructor
+	// Default constructor
 	explicit SARibbonGalleryItem();
-	/// Constructor with text and icon
+	// Constructor with text and icon
 	explicit SARibbonGalleryItem(const QString& text, const QIcon& icon);
-	/// Constructor with QAction
+	// Constructor with QAction
 	explicit SARibbonGalleryItem(QAction* act);
-	/// Destructor
+	// Destructor
 	virtual ~SARibbonGalleryItem();
-	/// Set data for role
+	// Set data for role
 	void setData(int role, const QVariant& data);
-	/// Get data for role
+	// Get data for role
 	virtual QVariant data(int role) const;
 
-	/// Set text
+	// Set text
 	void setText(const QString& text);
-	/// Get text
+	// Get text
 	QString text() const;
 
-	/// Set tool tip
+	// Set tool tip
 	void setToolTip(const QString& text);
-	/// Get tool tip
+	// Get tool tip
 	QString toolTip() const;
 
-	/// Set icon
+	// Set icon
 	void setIcon(const QIcon& ico);
-	/// Get icon
+	// Get icon
 	QIcon icon() const;
 
-	/// Check if selectable
+	// Check if selectable
 	bool isSelectable() const;
-	/// Set selectable
+	// Set selectable
 	void setSelectable(bool isSelectable);
 
-	/// Check if enabled
+	// Check if enabled
 	bool isEnable() const;
-	/// Set enable
+	// Set enable
 	void setEnable(bool isEnable);
 
-	/// Set item flags
+	// Set item flags
 	void setFlags(Qt::ItemFlags flag);
-	/// Get item flags
+	// Get item flags
 	virtual Qt::ItemFlags flags() const;
 
-	/// Set action
+	// Set action
 	void setAction(QAction* act);
-	/// Get action
+	// Get action
 	QAction* action();
 
-	/// Set text alignment
+	// Set text alignment
 	void setTextAlignment(Qt::Alignment a);
-	/// Get text alignment
+	// Get text alignment
 	Qt::Alignment textAlignment() const;
 
 private:
@@ -4017,20 +4083,20 @@ private:
 class SA_RIBBON_EXPORT SARibbonGalleryGroupItemDelegate : public QStyledItemDelegate
 {
 public:
-	/// Constructor for SARibbonGalleryGroupItemDelegate
+	// Constructor for SARibbonGalleryGroupItemDelegate
 	explicit SARibbonGalleryGroupItemDelegate(SARibbonGalleryGroup* group, QObject* parent = nullptr);
-	/// Destructor for SARibbonGalleryGroupItemDelegate
+	// Destructor for SARibbonGalleryGroupItemDelegate
 	~SARibbonGalleryGroupItemDelegate();
-	/// Paint the item
+	// Paint the item
 	virtual void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const override;
 
-	/// Get size hint
+	// Get size hint
 	virtual QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const override;
-	/// Paint only icon
+	// Paint only icon
 	virtual void paintIconOnly(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
-	/// Paint icon with text
+	// Paint icon with text
 	virtual void paintIconWithText(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
-	/// Paint icon with word wrap text
+	// Paint icon with word wrap text
 	virtual void
 	paintIconWithTextWordWrap(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
 
@@ -4051,33 +4117,35 @@ class SA_RIBBON_EXPORT SARibbonGalleryGroupModel : public QAbstractListModel
 {
 	Q_OBJECT
 public:
-	/// Constructor for SARibbonGalleryGroupModel
+	// Constructor for SARibbonGalleryGroupModel
 	SARibbonGalleryGroupModel(QObject* parent = Q_NULLPTR);
-	/// Destructor for SARibbonGalleryGroupModel
+	// Destructor for SARibbonGalleryGroupModel
 	~SARibbonGalleryGroupModel();
-	/// Get row count
+	// Get row count
 	virtual int rowCount(const QModelIndex& parent) const Q_DECL_OVERRIDE;
-	/// Get item flags
+	// Get item flags
 	virtual Qt::ItemFlags flags(const QModelIndex& index) const Q_DECL_OVERRIDE;
-	/// Get data at index
+	// Get data at index
 	virtual QVariant data(const QModelIndex& index, int role) const Q_DECL_OVERRIDE;
-	/// Create model index
+	// Create model index
 	virtual QModelIndex index(int row, int column, const QModelIndex& parent) const Q_DECL_OVERRIDE;
-	/// Set data at index
+	// Set data at index
 	virtual bool setData(const QModelIndex& index, const QVariant& value, int role) Q_DECL_OVERRIDE;
-	/// Clear all items
+	// Clear all items
 	void clear();
-	/// Get item at row
+	// Get item at row
 	SARibbonGalleryItem* at(int row) const;
-	/// Insert item at row
+	// Insert item at row
 	void insert(int row, SARibbonGalleryItem* item);
-	/// Take item at row
+	// Take item at row
 	SARibbonGalleryItem* take(int row);
-	/// Append item
+	// Append item
 	void append(SARibbonGalleryItem* item);
-	/// Remove item by action object name
+	// Append a list of items in a single batch
+	void appendList(const QList< SARibbonGalleryItem* >& items);
+	// Remove item by action object name
 	bool remove(const QString& act_object_name);
-	/// Get item count
+	// Get item count
 	int itemSize() const;
 
 private:
@@ -4120,60 +4188,60 @@ public:
 		DisplayThreeRow = 3   ///< Display 3 rows
 	};
 
-	/// Constructor
+	// Constructor
 	SARibbonGalleryGroup(QWidget* w = 0);
 
-	/// Destructor
+	// Destructor
 	virtual ~SARibbonGalleryGroup();
-	/// Recalculate grid size
+	// Recalculate grid size
 	void recalcGridSize();
-	/// Recalculate grid size
+	// Recalculate grid size
 	void recalcGridSize(int galleryHeight);
-	/// Set display style
+	// Set display style
 	void setGalleryGroupStyle(GalleryGroupStyle style);
-	/// Get gallery group style
+	// Get gallery group style
 	GalleryGroupStyle galleryGroupStyle() const;
-	/// Add item
+	// Add item
 	void addItem(const QString& text, const QIcon& icon);
-	/// Add item
+	// Add item
 	void addItem(SARibbonGalleryItem* item);
-	/// Add action as item
+	// Add action as item
 	void addActionItem(QAction* act);
-	/// Add action item list
+	// Add action item list
 	void addActionItemList(const QList< QAction* >& acts);
-	/// Remove action item
+	// Remove action item
 	bool removeActionItem(QAction* act);
-	/// Get group model
+	// Get group model
 	SARibbonGalleryGroupModel* groupModel() const;
-	/// Set group title
+	// Set group title
 	void setGroupTitle(const QString& title);
-	/// Get group title
+	// Get group title
 	QString groupTitle() const;
-	/// Select by index
+	// Select by index
 	void selectByIndex(int i);
-	/// Set display row
+	// Set display row
 	void setDisplayRow(DisplayRow r);
-	/// Get display row
+	// Get display row
 	DisplayRow displayRow() const;
-	/// Set grid minimum width (default 0: no limit)
+	// Set grid minimum width (default 0: no limit)
 	void setGridMinimumWidth(int w);
-	/// Get grid minimum width
+	// Get grid minimum width
 	int gridMinimumWidth() const;
-	/// Set grid maximum width (default 0: no limit)
+	// Set grid maximum width (default 0: no limit)
 	void setGridMaximumWidth(int w);
-	/// Get grid maximum width
+	// Get grid maximum width
 	int gridMaximumWidth() const;
-	/// Get action group
+	// Get action group
 	QActionGroup* actionGroup() const;
-	/// Get grid row count
+	// Get grid row count
 	int gridRowCount() const;
-	/// Get grid column count
+	// Get grid column count
 	int gridColumnCount() const;
-	/// Calculate preferred height for width
+	// Calculate preferred height for width
 	int preferredHeightForWidth(int w) const;
-	/// Check if has height for width
+	// Check if has height for width
 	bool hasHeightForWidth() const override;
-	/// Get height for width
+	// Get height for width
 	int heightForWidth(int w) const override;
 private Q_SLOTS:
 	void onItemClicked(const QModelIndex& index);
@@ -4223,7 +4291,7 @@ Q_SIGNALS:
 	void hovered(QAction* action);
 
 private:
-	/// Setup group model
+	// Setup group model
 	SARibbonGalleryGroupModel* setupGroupModel();
 };
 
@@ -4268,12 +4336,12 @@ public:
  * \if ENGLISH
  * @brief Gallery control widget
  *
- * The Gallery control consists of a currently active @sa SARibbonGalleryGroup and a popup @sa SARibbonGalleryViewport.
+ * The Gallery control consists of a currently active SARibbonGalleryGroup and a popup SARibbonGalleryViewport.
  *
- * @sa SARibbonGalleryGroup inherits from @sa QListView and displays actions through icons.
+ * SARibbonGalleryGroup inherits from QListView and displays actions through icons.
  *     Related properties can be set according to QListView.
  *
- * @sa SARibbonGalleryViewport is a window with an internal vertical layout that displays
+ * SARibbonGalleryViewport is a window with an internal vertical layout that displays
  *     all managed SARibbonGalleryGroups when popped up.
  *
  * Example usage:
@@ -4287,16 +4355,18 @@ public:
  * gallery->addCategoryActions(tr("Apps"), galleryActions);
  * gallery->setCurrentViewGroup(group1);
  * @endcode
+ * @note Uses the PIMPL pattern via SA_RIBBON_DECLARE_PRIVATE for encapsulation.
+ * @see SARibbonGalleryGroup, SARibbonGalleryViewport
  * \endif
  *
  * \if CHINESE
  * @brief Gallery控件
  *
- * Gallery控件是由一个当前激活的@sa SARibbonGalleryGroup 和弹出的 @sa SARibbonGalleryViewport 组成
+ * Gallery控件是由一个当前激活的SARibbonGalleryGroup 和弹出的 SARibbonGalleryViewport 组成
  *
- * @sa SARibbonGalleryGroup 是继承@sa QListView actions通过icon展示出来，相关的属性可以按照QListView设置
+ * SARibbonGalleryGroup 是继承QListView，actions通过icon展示出来，相关的属性可以按照QListView设置
  *
- * @sa SARibbonGalleryViewport 是一个内部有垂直布局的窗体，在弹出激活时，把管理的SARibbonGalleryGroup都展示出来
+ * SARibbonGalleryViewport 是一个内部有垂直布局的窗体，在弹出激活时，把管理的SARibbonGalleryGroup都展示出来
  *
  * 示例如下：
  * @code
@@ -4309,6 +4379,8 @@ public:
  * gallery->addCategoryActions(tr("Apps"), galleryActions);
  * gallery->setCurrentViewGroup(group1);
  * @endcode
+ * @note 通过SA_RIBBON_DECLARE_PRIVATE采用PIMPL模式实现封装。
+ * @see SARibbonGalleryGroup, SARibbonGalleryViewport
  * \endif
  */
 class SA_RIBBON_EXPORT SARibbonGallery : public QFrame
@@ -4316,29 +4388,29 @@ class SA_RIBBON_EXPORT SARibbonGallery : public QFrame
 	Q_OBJECT
 	SA_RIBBON_DECLARE_PRIVATE(SARibbonGallery)
 public:
-	/// Constructor for SARibbonGallery
+	// Constructor for SARibbonGallery
 	explicit SARibbonGallery(QWidget* parent = nullptr);
-	/// Destructor for SARibbonGallery
+	// Destructor for SARibbonGallery
 	virtual ~SARibbonGallery();
-	/// Get a blank SARibbonGalleryGroup
+	// Get a blank SARibbonGalleryGroup
 	SARibbonGalleryGroup* addGalleryGroup();
-	/// Add an existing SARibbonGalleryGroup to the gallery
+	// Add an existing SARibbonGalleryGroup to the gallery
 	void addGalleryGroup(SARibbonGalleryGroup* group);
-	/// Quickly add a set of actions as a gallery group
+	// Quickly add a set of actions as a gallery group
 	SARibbonGalleryGroup* addCategoryActions(const QString& title, QList< QAction* > actions);
-	/// Set the currently displayed gallery group
+	// Set the currently displayed gallery group
 	void setCurrentViewGroup(SARibbonGalleryGroup* group);
-	/// Get the currently displayed gallery group
+	// Get the currently displayed gallery group
 	SARibbonGalleryGroup* currentViewGroup() const;
-	/// Get the popup viewport widget
+	// Get the popup viewport widget
 	SARibbonGalleryViewport* getPopupViewPort() const;
 
 public:
-	/// Set the maximum width for gallery control buttons (default 15)
+	// Set the maximum width for gallery control buttons (default 15)
 	static void setGalleryButtonMaximumWidth(int w);
-	/// Set single-row display mode for gallery
+	// Set single-row display mode for gallery
 	void setSingleRowMode(bool on);
-	/// Check if gallery is in single-row mode
+	// Check if gallery is in single-row mode
 	bool isSingleRowMode() const;
 Q_SIGNALS:
 	/**
@@ -4371,25 +4443,25 @@ Q_SIGNALS:
 	void hovered(QAction* action);
 
 public Q_SLOTS:
-	/// Scroll up one page in the current gallery group
+	// Scroll up one page in the current gallery group
 	virtual void pageUp();
-	/// Scroll down one page in the current gallery group
+	// Scroll down one page in the current gallery group
 	virtual void pageDown();
-	/// Show the popup viewport with all gallery groups
+	// Show the popup viewport with all gallery groups
 	virtual void showMoreDetail();
 protected Q_SLOTS:
-	/// Slot called when an item in a gallery group is clicked
+	// Slot called when an item in a gallery group is clicked
 	void onItemClicked(const QModelIndex& index);
-	/// Slot called when an action is triggered from the gallery
+	// Slot called when an action is triggered from the gallery
 	virtual void onTriggered(QAction* action);
 
 private:
 	SARibbonGalleryViewport* ensureGetPopupViewPort();
 
 protected:
-	/// Handle resize events for the gallery
+	// Handle resize events for the gallery
 	void resizeEvent(QResizeEvent* event) override;
-	/// Handle change events for the gallery
+	// Handle change events for the gallery
 	void changeEvent(QEvent* event) override;
 };
 
@@ -4666,322 +4738,327 @@ public:
 	using FpContextCategoryHighlight = std::function< QColor(const QColor&) >;
 
 public:
-	/// Check if the ribbon style is two-row mode
+	// Check if the ribbon style is two-row mode
 	static bool isTwoRowStyle(RibbonStyles s);
-	/// Check if the ribbon style is three-row mode
+	// Check if the ribbon style is three-row mode
 	static bool isThreeRowStyle(RibbonStyles s);
-	/// Check if the ribbon style is loose (Office) style
+	// Check if the ribbon style is loose (Office) style
 	static bool isLooseStyle(RibbonStyles s);
-	/// Check if the ribbon style is compact (WPS) style
+	// Check if the ribbon style is compact (WPS) style
 	static bool isCompactStyle(RibbonStyles s);
-	/// Check if the ribbon style is single-row mode
+	// Check if the ribbon style is single-row mode
 	static bool isSingleRowStyle(RibbonStyles s);
-	/// Get version information
+	// Get version information
 	static QString versionString();
 
-	/// Get default context category color list
+	// Get default context category color list
 	static QList< QColor > defaultContextCategoryColorList();
 
-	/// Initialize high DPI support
+	// Initialize high DPI support
 	static void initHighDpi();
 
 public:
-	/// Constructor
+	// Constructor
 	explicit SARibbonBar(QWidget* parent = nullptr);
-	/// Destructor
+	// Destructor
 	~SARibbonBar();
-	/// Get application button
+	// Get application button
 	QAbstractButton* applicationButton();
 
-	/// Set application button
+	// Set application button
 	void setApplicationButton(QAbstractButton* btn);
 
-	/// Get ribbon tab bar
+	// Get ribbon tab bar
 	SARibbonTabBar* ribbonTabBar();
 
-	/// Add a category page
+	// Add a category page
 	SARibbonCategory* addCategoryPage(const QString& title);
-	/// Add a category page
+	// Add a category page
 	void addCategoryPage(SARibbonCategory* category);
 
-	/// Overloaded function for Qt designer support
+	// Overloaded function for Qt designer support
 	Q_INVOKABLE void addCategoryPage(QWidget* category);
 
-	/// Insert a category page at specified index
+	// Insert a category page at specified index
 	SARibbonCategory* insertCategoryPage(const QString& title, int index);
-	/// Insert a category page at specified index
+	// Insert a category page at specified index
 	void insertCategoryPage(SARibbonCategory* category, int index);
 
-	/// Find category by name
+	// Find category by name
 	SARibbonCategory* categoryByName(const QString& title) const;
 
-	/// Find category by object name
+	// Find category by object name
 	SARibbonCategory* categoryByObjectName(const QString& objname) const;
 
-	/// Find category by index
+	// Find category by index
 	SARibbonCategory* categoryByIndex(int index) const;
 
-	/// Hide category (not delete)
+	// Hide category (not delete)
 	void hideCategory(SARibbonCategory* category);
 
-	/// Show hidden category
+	// Show hidden category
 	void showCategory(SARibbonCategory* category);
 
 	// Batch set categories visible or hidden, only triggers one relayout at the end
 	void setCategoriesVisible(const QList< SARibbonCategory* >& categories, bool visible);
 
-	/// Check if category is visible
+	// Check if category is visible
 	bool isCategoryVisible(const SARibbonCategory* c) const;
 
-	/// Get category index
+	// Get category index
 	int categoryIndex(const SARibbonCategory* c) const;
 
-	/// Move category from one index to another
+	// Move category from one index to another
 	void moveCategory(int from, int to);
 
-	/// Get all category pages
+	// Get all category pages
 	QList< SARibbonCategory* > categoryPages(bool getAll = true) const;
 
-	/// Remove category
+	// Remove category
 	void removeCategory(SARibbonCategory* category);
 
-	/// Add a context category
+	// Add a context category
 	SARibbonContextCategory*
 	addContextCategory(const QString& title, const QColor& color = QColor(), const QVariant& id = QVariant());
-	/// Add a context category
+	// Add a context category
 	void addContextCategory(SARibbonContextCategory* context);
 
-	/// Show context category
+	// Show context category
 	void showContextCategory(SARibbonContextCategory* context);
 
-	/// Hide context category
+	// Hide context category
 	void hideContextCategory(SARibbonContextCategory* context);
 
-	/// Check if context category is visible
+	// Check if context category is visible
 	bool isContextCategoryVisible(SARibbonContextCategory* context);
 
-	/// Set context category visibility
+	// Set context category visibility
 	void setContextCategoryVisible(SARibbonContextCategory* context, bool visible);
 
-	/// Get all context categories
+	// Get all context categories
 	QList< SARibbonContextCategory* > contextCategoryList() const;
 
-	/// Destroy context category
+	// Destroy context category
 	void destroyContextCategory(SARibbonContextCategory* context);
 
-	/// Get current visible context category tab indexes
+	// Get current visible context category tab indexes
 	QList< int > currentVisibleContextCategoryTabIndexs() const;
 
-	/// Set minimum mode
+	// Set minimum mode
 	void setMinimumMode(bool isHide);
 
-	/// Check if in minimum mode
+	// Check if in minimum mode
 	bool isMinimumMode() const;
 
-	/// Show minimum mode button
+	// Show minimum mode button
 	void showMinimumModeButton(bool isShow = true);
 
-	/// Check if minimum mode button is shown
+	// Check if minimum mode button is shown
 	bool isMinimumModeButtonVisible() const;
 
-	/// Get minimum mode action
+	// Get minimum mode action
 	QAction* minimumModeAction() const;
 
-	/// Check if tab double click enables minimum mode
+	// Check if tab double click enables minimum mode
 	bool isEnableTabDoubleClickToMinimumMode() const;
-	/// Set tab double click to enable minimum mode
-	void setTabDoubleClickToMinimumMode(bool on = true) const;
+	// Set tab double click to enable minimum mode
+	void setTabDoubleClickToMinimumMode(bool on = true);
 
-	/// Get current ribbon state
+	// Get current ribbon state
 	RibbonMode currentRibbonState() const;
 
-	/// Get tab bar height
+	// Get tab bar height
 	int tabBarHeight() const;
-	/// Set tab bar height
+	// Set tab bar height
 	void setTabBarHeight(int h, bool resizeByNow = true);
 
-	/// Get title bar height
+	// Get title bar height
 	int titleBarHeight() const;
-	/// Set title bar height
+	// Set title bar height
 	void setTitleBarHeight(int h, bool resizeByNow = true);
 
-	/// Get category height
+	// Get category height
 	int categoryHeight() const;
-	/// Set category height
+	// Set category height
 	void setCategoryHeight(int h, bool resizeByNow = true);
 
-	/// Get main bar height in normal mode
+	// Get main bar height in normal mode
 	int normalModeMainBarHeight() const;
 
-	/// Get main bar height in minimum mode
+	// Get main bar height in minimum mode
 	int minimumModeMainBarHeight() const;
 
-	/// Get active right button group
+	// Get active right button group
 	SARibbonButtonGroupWidget* activeRightButtonGroup();
 
-	/// Get right button group
+	// Get right button group
 	SARibbonButtonGroupWidget* rightButtonGroup();
 
-	/// Get active quick access bar
+	// Get active quick access bar
 	SARibbonQuickAccessBar* activeQuickAccessBar();
 
-	/// Get quick access bar
+	// Get quick access bar
 	SARibbonQuickAccessBar* quickAccessBar();
 
-	/// Get title icon widget
+	// Get title icon widget
 	SARibbonTitleIconWidget* titleIconWidget() const;
 
-	/// Set title icon visibility
+	// Set title icon visibility
 	void setTitleIconVisible(bool on = true);
-	/// Check if title icon is visible
+	// Check if title icon is visible
 	bool isTitleIconVisible() const;
 
-	/// Set ribbon style
+	// Set ribbon style
 	void setRibbonStyle(RibbonStyles v);
-	/// Get current ribbon style
+	// Get current ribbon style
 	RibbonStyles currentRibbonStyle() const;
 
-	/// Set current ribbon index
+	// Begin batch update - defer category iteration until endUpdate
+	void beginUpdate();
+	// End batch update - flush all pending changes with a single category iteration
+	void endUpdate();
+
+	// Set current ribbon index
 	void setCurrentIndex(int index);
 
-	/// Get current tab index
+	// Get current tab index
 	int currentIndex();
 
-	/// Raise category to show it
+	// Raise category to show it
 	void raiseCategory(SARibbonCategory* category);
 
-	/// Check if current style is two-row
+	// Check if current style is two-row
 	bool isTwoRowStyle() const;
-	/// Check if current style is three-row
+	// Check if current style is three-row
 	bool isThreeRowStyle() const;
 
-	/// Check if current style is loose
+	// Check if current style is loose
 	bool isLooseStyle() const;
-	/// Check if current style is compact
+	// Check if current style is compact
 	bool isCompactStyle() const;
-	/// Check if current style is single-row
+	// Check if current style is single-row
 	bool isSingleRowStyle() const;
 
-	/// Update ribbon geometry
+	// Update ribbon geometry
 	void updateRibbonGeometry();
 
-	/// Get panel layout mode
+	// Get panel layout mode
 	SARibbonPanel::PanelLayoutMode panelLayoutMode() const;
-	/// Set panel layout mode
+	// Set panel layout mode
 	void setPanelLayoutMode(SARibbonPanel::PanelLayoutMode m);
 
-	/// Set tab on title
+	// Set tab on title
 	void setTabOnTitle(bool on);
-	/// Check if tab is on title
+	// Check if tab is on title
 	bool isTabOnTitle() const;
 
-	/// Set tab bar baseline color
+	// Set tab bar baseline color
 	void setTabBarBaseLineColor(const QColor& clr);
-	/// Get tab bar baseline color
+	// Get tab bar baseline color
 	QColor tabBarBaseLineColor() const;
 
-	/// Set window title text color
+	// Set window title text color
 	void setWindowTitleTextColor(const QColor& clr);
-	/// Get window title text color
+	// Get window title text color
 	QColor windowTitleTextColor() const;
 
-	/// Set title visibility
+	// Set title visibility
 	void setTitleVisible(bool on = false);
-	/// Check if title is visible
+	// Check if title is visible
 	bool isTitleVisible() const;
 
-	/// Set window title background brush
+	// Set window title background brush
 	void setWindowTitleBackgroundBrush(const QBrush& bk);
-	/// Get window title background brush
+	// Get window title background brush
 	QBrush windowTitleBackgroundBrush() const;
 
-	/// Set window title alignment
+	// Set window title alignment
 	void setWindowTitleAlignment(Qt::Alignment al);
-	/// Get window title alignment
+	// Get window title alignment
 	Qt::Alignment windowTitleAlignment() const;
 
-	/// Set enable word wrap
+	// Set enable word wrap
 	void setEnableWordWrap(bool on);
-	/// Check if word wrap is enabled
+	// Check if word wrap is enabled
 	bool isEnableWordWrap() const;
 
-	/// Set whether button text is displayed to the right of the icon
+	// Set whether button text is displayed to the right of the icon
 	void setEnableIconRightText(bool on);
-	/// Check if icon-right-text mode is enabled
+	// Check if icon-right-text mode is enabled
 	bool isEnableIconRightText() const;
 
-	/// Set button maximum aspect ratio
+	// Set button maximum aspect ratio
 	void setButtonMaximumAspectRatio(qreal fac = 1.4);
-	/// Get button maximum aspect ratio
+	// Get button maximum aspect ratio
 	qreal buttonMaximumAspectRatio() const;
 
-	/// Set panel title height
+	// Set panel title height
 	void setPanelTitleHeight(int h);
-	/// Get panel title height
+	// Get panel title height
 	int panelTitleHeight() const;
 
-	/// Set enable show panel title
+	// Set enable show panel title
 	void setEnableShowPanelTitle(bool on);
-	/// Check if panel title is shown
+	// Check if panel title is shown
 	bool isEnableShowPanelTitle() const;
 
-	/// Set panel spacing
+	// Set panel spacing
 	void setPanelSpacing(int n);
-	/// Get panel spacing
+	// Get panel spacing
 	int panelSpacing() const;
 
-	/// Set panel tool button icon sizes
+	// Set panel tool button icon sizes
 	void setPanelToolButtonIconSize(const QSize& smallSize, const QSize& largeSize);
-	/// Get panel tool button icon sizes
+	// Get panel tool button icon sizes
 	QPair< QSize, QSize > panelToolButtonIconSize() const;
 
-	/// Set panel large icon size
+	// Set panel large icon size
 	void setPanelLargeIconSize(const QSize& largeSize);
-	/// Get panel large icon size
+	// Get panel large icon size
 	QSize panelLargeIconSize() const;
 
-	/// Set panel small icon size
+	// Set panel small icon size
 	void setPanelSmallIconSize(const QSize& smallSize);
-	/// Get panel small icon size
+	// Get panel small icon size
 	QSize panelSmallIconSize() const;
 
-	/// Get ribbon stacked widget
+	// Get ribbon stacked widget
 	SARibbonStackedWidget* ribbonStackedWidget();
 
-	/// Set context category color list
+	// Set context category color list
 	void setContextCategoryColorList(const QList< QColor >& cls);
-	/// Get context category color list
+	// Get context category color list
 	QList< QColor > contextCategoryColorList() const;
 
-	/// Set context category title text color
+	// Set context category title text color
 	void setContextCategoryTitleTextColor(const QColor& clr);
-	/// Get context category title text color
+	// Get context category title text color
 	QColor contextCategoryTitleTextColor() const;
 
-	/// Set context category color highlight function
+	// Set context category color highlight function
 	void setContextCategoryColorHighLight(FpContextCategoryHighlight fp);
 
-	/// Set ribbon alignment
+	// Set ribbon alignment
 	void setRibbonAlignment(SARibbonAlignment al);
-	/// Get ribbon alignment
+	// Get ribbon alignment
 	SARibbonAlignment ribbonAlignment() const;
 
-	/// Iterate through all categories
+	// Iterate through all categories
 	bool iterateCategory(FpCategoryIterate fp) const;
-	/// Iterate through all panels
+	// Iterate through all panels
 	bool iteratePanel(FpPanelIterate fp) const;
 
-	/// Set corner widget visibility
+	// Set corner widget visibility
 	void setCornerWidgetVisible(bool on, Qt::Corner c = Qt::TopLeftCorner);
 
-	/// Set application button vertical expansion
+	// Set application button vertical expansion
 	void setApplicationButtonVerticalExpansion(bool on = true);
-	/// Check if application button is vertically expanded
+	// Check if application button is vertically expanded
 	bool isApplicationButtonVerticalExpansion() const;
 
-	/// Get all actions in panels
+	// Get all actions in panels
 	QList< QAction* > allActions() const;
-	/// Check if ribbon frame is used
+	// Check if ribbon frame is used
 	bool isUseRibbonFrame() const;
 Q_SIGNALS:
 
@@ -5068,42 +5145,42 @@ Q_SIGNALS:
 	void actionTriggered(QAction* action);
 
 protected:
-	/// Event filter
+	// Event filter
 	bool eventFilter(QObject* obj, QEvent* e) override;
-	/// Calculate minimum tab bar width
+	// Calculate minimum tab bar width
 	int calcMinTabBarWidth() const;
-	/// Update category title to tab name
+	// Update category title to tab name
 	void updateCategoryTitleToTabName();
-	/// Set system button group size
+	// Set system button group size
 	void setSystemButtonGroupSize(const QSize& s);
-	/// Set main window styles
+	// Set main window styles
 	void setMainWindowStyles(SARibbonMainWindowStyles s);
 protected Q_SLOTS:
-	/// Slot for window title changed
+	// Slot for window title changed
 	void onWindowTitleChanged(const QString& title);
-	/// Slot for window icon changed
+	// Slot for window icon changed
 	void onWindowIconChanged(const QIcon& i);
-	/// Slot for category window title changed
+	// Slot for category window title changed
 	void onCategoryWindowTitleChanged(const QString& title);
-	/// Slot for stack widget hided
+	// Slot for stack widget hided
 	void onStackWidgetHided();
-	/// Slot for current ribbon tab changed
+	// Slot for current ribbon tab changed
 	virtual void onCurrentRibbonTabChanged(int index);
-	/// Slot for current ribbon tab clicked
+	// Slot for current ribbon tab clicked
 	virtual void onCurrentRibbonTabClicked(int index);
-	/// Slot for current ribbon tab double clicked
+	// Slot for current ribbon tab double clicked
 	virtual void onCurrentRibbonTabDoubleClicked(int index);
-	/// Slot for contexts category page added
+	// Slot for contexts category page added
 	void onContextsCategoryPageAdded(SARibbonCategory* category);
-	/// Slot for contexts category name changed
+	// Slot for contexts category name changed
 	void onContextsCategoryCategoryNameChanged(SARibbonCategory* category, const QString& title);
-	/// Slot for tab moved
+	// Slot for tab moved
 	void onTabMoved(int from, int to);
 
 private:
 	int tabIndex(SARibbonCategory* obj);
-	void paintInLooseStyle();
-	void paintInCompactStyle();
+	void paintInLooseStyle(const QRect& paintRect);
+	void paintInCompactStyle(const QRect& paintRect);
 
 	// 刷新所有ContextCategoryManagerData，这个在单独一个Category删除时调用
 	void updateContextCategoryManagerData();
@@ -5114,20 +5191,20 @@ private:
 	QRect getWindowTitleRect() const;
 
 protected:
-	/// Set ribbon main window style
+	// Set ribbon main window style
 	void setRibbonMainwindowStyle();
-	/// Paint event handler
+	// Paint event handler
 	virtual void paintEvent(QPaintEvent* e) override;
-	/// Move event handler
+	// Move event handler
 	virtual void moveEvent(QMoveEvent* e) override;
-	/// Change event handler
+	// Change event handler
 	virtual void changeEvent(QEvent* e) override;
 
-	/// Paint tab bar baseline
+	// Paint tab bar baseline
 	virtual void paintTabbarBaseLine(QPainter& painter);
-	/// Paint window title
+	// Paint window title
 	virtual void paintWindowTitle(QPainter& painter, const QString& title, const QRect& titleRegion);
-	/// Paint context category tab
+	// Paint context category tab
 	virtual void
 	paintContextCategoryTab(QPainter& painter, const QString& title, const QRect& contextRect, const QColor& color);
 #if SA_DEBUG_PRINT_SARIBBONBAR
@@ -5345,43 +5422,43 @@ class SARibbonPanelLabel;
 class SA_RIBBON_EXPORT SARibbonElementFactory
 {
 public:
-	/// Constructor for SARibbonElementFactory
+	// Constructor for SARibbonElementFactory
 	SARibbonElementFactory();
-	/// Destructor for SARibbonElementFactory
+	// Destructor for SARibbonElementFactory
 	virtual ~SARibbonElementFactory();
-	/// Create SARibbonBar
+	// Create SARibbonBar
 	virtual SARibbonBar* createRibbonBar(QWidget* parent);
-	/// Create SARibbonTabBar
+	// Create SARibbonTabBar
 	virtual SARibbonTabBar* createRibbonTabBar(QWidget* parent);
-	/// Create SARibbonApplicationButton
+	// Create SARibbonApplicationButton
 	virtual SARibbonApplicationButton* createRibbonApplicationButton(QWidget* parent);
-	/// Create SARibbonCategory
+	// Create SARibbonCategory
 	virtual SARibbonCategory* createRibbonCategory(QWidget* parent);
-	/// Create SARibbonContextCategory
+	// Create SARibbonContextCategory
 	virtual SARibbonContextCategory* createRibbonContextCategory(QWidget* parent);
-	/// Create SARibbonPanel
+	// Create SARibbonPanel
 	virtual SARibbonPanel* createRibbonPanel(QWidget* parent);
-	/// Create SARibbonSeparatorWidget
+	// Create SARibbonSeparatorWidget
 	virtual SARibbonSeparatorWidget* createRibbonSeparatorWidget(QWidget* parent);
-	/// Create SARibbonGallery
+	// Create SARibbonGallery
 	virtual SARibbonGallery* createRibbonGallery(QWidget* parent);
-	/// Create SARibbonGalleryGroup
+	// Create SARibbonGalleryGroup
 	virtual SARibbonGalleryGroup* createRibbonGalleryGroup(QWidget* parent);
-	/// Create SARibbonToolButton
+	// Create SARibbonToolButton
 	virtual SARibbonToolButton* createRibbonToolButton(QWidget* parent);
-	/// Create SARibbonStackedWidget
+	// Create SARibbonStackedWidget
 	virtual SARibbonStackedWidget* createRibbonStackedWidget(SARibbonBar* parent);
-	/// Create SARibbonButtonGroupWidget
+	// Create SARibbonButtonGroupWidget
 	virtual SARibbonButtonGroupWidget* createButtonGroupWidget(QWidget* parent);
-	/// Create SARibbonQuickAccessBar
+	// Create SARibbonQuickAccessBar
 	virtual SARibbonQuickAccessBar* createQuickAccessBar(QWidget* parent);
-	/// Create SARibbonSystemButtonBar
+	// Create SARibbonSystemButtonBar
 	virtual SARibbonSystemButtonBar* createWindowButtonGroup(QWidget* parent);
-	/// Create SARibbonPanelOptionButton
+	// Create SARibbonPanelOptionButton
 	virtual SARibbonPanelOptionButton* createRibbonPanelOptionButton(SARibbonPanel* panel);
-	/// Create SARibbonTitleIconWidget
+	// Create SARibbonTitleIconWidget
 	virtual SARibbonTitleIconWidget* createRibbonTitleIconWidget(QWidget* parent);
-	/// Create SARibbonPanelLabel
+	// Create SARibbonPanelLabel
 	virtual SARibbonPanelLabel* createRibbonPanelLabel(QWidget* parent);
 };
 
@@ -5438,17 +5515,17 @@ public:
 class SA_RIBBON_EXPORT SARibbonElementManager
 {
 protected:
-	/// Constructor for SARibbonElementManager
+	// Constructor for SARibbonElementManager
 	SARibbonElementManager();
 
 public:
-	/// Destructor for SARibbonElementManager
+	// Destructor for SARibbonElementManager
 	virtual ~SARibbonElementManager();
-	/// Get the singleton instance
+	// Get the singleton instance
 	static SARibbonElementManager* instance();
-	/// Get the current factory
+	// Get the current factory
 	SARibbonElementFactory* factory();
-	/// Set the factory
+	// Set the factory
 	void setupFactory(SARibbonElementFactory* fac);
 
 private:
@@ -5513,84 +5590,84 @@ public:
 		RenamePanelActionType,          ///< 对Panel更名操作(11)
 		VisibleCategoryActionType       ///< 对category执行隐藏/显示操作(12)
 	};
-	/// Default constructor
+	// Default constructor
 	SARibbonCustomizeData();
-	/// Constructor with action type and manager
+	// Constructor with action type and manager
 	SARibbonCustomizeData(ActionType type, SARibbonActionsManager* mgr = nullptr);
-	/// Get the action type of the CustomizeData
+	// Get the action type of the CustomizeData
 	ActionType actionType() const;
 
-	/// Set the action type of the CustomizeData
+	// Set the action type of the CustomizeData
 	void setActionType(ActionType a);
 
-	/// Check if this is a valid CustomizeData
+	// Check if this is a valid CustomizeData
 	bool isValid() const;
 
-	/// Apply SARibbonCustomizeData to SARibbonBar
+	// Apply SARibbonCustomizeData to SARibbonBar
 	bool apply(SARibbonBar* bar) const;
 
-	/// Get the action manager pointer
+	// Get the action manager pointer
 	SARibbonActionsManager* actionManager();
 
-	/// Set the ActionsManager
+	// Set the ActionsManager
 	void setActionsManager(SARibbonActionsManager* mgr);
 
-	/// Create AddCategoryActionType SARibbonCustomizeData
+	// Create AddCategoryActionType SARibbonCustomizeData
 	static SARibbonCustomizeData makeAddCategoryCustomizeData(const QString& title, int index, const QString& objName);
 
-	/// Create AddPanelActionType SARibbonCustomizeData
+	// Create AddPanelActionType SARibbonCustomizeData
 	static SARibbonCustomizeData
 	makeAddPanelCustomizeData(const QString& title, int index, const QString& categoryobjName, const QString& objName);
 
-	/// Create AddActionActionType SARibbonCustomizeData
+	// Create AddActionActionType SARibbonCustomizeData
 	static SARibbonCustomizeData makeAddActionCustomizeData(const QString& key,
 															SARibbonActionsManager* mgr,
 															SARibbonPanelItem::RowProportion rp,
 															const QString& categoryObjName,
 															const QString& panelObjName);
 
-	/// Create RenameCategoryActionType SARibbonCustomizeData
+	// Create RenameCategoryActionType SARibbonCustomizeData
 	static SARibbonCustomizeData makeRenameCategoryCustomizeData(const QString& newname, const QString& categoryobjName);
 
-	/// Create RenamePanelActionType SARibbonCustomizeData
+	// Create RenamePanelActionType SARibbonCustomizeData
 	static SARibbonCustomizeData
 	makeRenamePanelCustomizeData(const QString& newname, const QString& categoryobjName, const QString& panelObjName);
 
-	/// Create RemoveCategoryActionType SARibbonCustomizeData
+	// Create RemoveCategoryActionType SARibbonCustomizeData
 	static SARibbonCustomizeData makeRemoveCategoryCustomizeData(const QString& categoryobjName);
 
-	/// Create ChangeCategoryOrderActionType SARibbonCustomizeData
+	// Create ChangeCategoryOrderActionType SARibbonCustomizeData
 	static SARibbonCustomizeData makeChangeCategoryOrderCustomizeData(const QString& categoryobjName, int moveindex);
 
-	/// Create ChangePanelOrderActionType SARibbonCustomizeData
+	// Create ChangePanelOrderActionType SARibbonCustomizeData
 	static SARibbonCustomizeData
 	makeChangePanelOrderCustomizeData(const QString& categoryobjName, const QString& panelObjName, int moveindex);
 
-	/// Create ChangeActionOrderActionType SARibbonCustomizeData
+	// Create ChangeActionOrderActionType SARibbonCustomizeData
 	static SARibbonCustomizeData makeChangeActionOrderCustomizeData(const QString& categoryobjName,
 																	const QString& panelObjName,
 																	const QString& key,
 																	SARibbonActionsManager* mgr,
 																	int moveindex);
 
-	/// Create RemovePanelActionType SARibbonCustomizeData
+	// Create RemovePanelActionType SARibbonCustomizeData
 	static SARibbonCustomizeData makeRemovePanelCustomizeData(const QString& categoryobjName, const QString& panelObjName);
 
-	/// Create RemoveActionActionType SARibbonCustomizeData
+	// Create RemoveActionActionType SARibbonCustomizeData
 	static SARibbonCustomizeData makeRemoveActionCustomizeData(const QString& categoryobjName,
 															   const QString& panelObjName,
 															   const QString& key,
 															   SARibbonActionsManager* mgr);
 
-	/// Create VisibleCategoryActionType SARibbonCustomizeData
+	// Create VisibleCategoryActionType SARibbonCustomizeData
 	static SARibbonCustomizeData makeVisibleCategoryCustomizeData(const QString& categoryobjName, bool isShow);
 
-	/// Check if customization is allowed for the object
+	// Check if customization is allowed for the object
 	static bool isCanCustomize(QObject* obj);
-	/// Set whether customization is allowed for the object
+	// Set whether customization is allowed for the object
 	static void setCanCustomize(QObject* obj, bool canbe = true);
 
-	/// Simplify QList<SARibbonCustomizeData>
+	// Simplify QList<SARibbonCustomizeData>
 	static QList< SARibbonCustomizeData > simplify(const QList< SARibbonCustomizeData >& csd);
 
 public:
@@ -5702,11 +5779,11 @@ class SA_RIBBON_EXPORT SARibbonCustomizeWidget : public QWidget
 	Q_OBJECT
 	SA_RIBBON_DECLARE_PRIVATE(SARibbonCustomizeWidget)
 public:
-	/// Constructor using SARibbonMainWindow
+	// Constructor using SARibbonMainWindow
 	explicit SARibbonCustomizeWidget(SARibbonMainWindow* ribbonWindow,
 									 QWidget* parent   = nullptr,
 									 Qt::WindowFlags f = Qt::WindowFlags());
-	/// Constructor using SARibbonBar directly
+	// Constructor using SARibbonBar directly
 	explicit SARibbonCustomizeWidget(SARibbonBar* ribbonbar,
 									 QWidget* parent   = nullptr,
 									 Qt::WindowFlags f = Qt::WindowFlags());
@@ -5745,83 +5822,83 @@ public:
 		CustomizeObjNameRole = Qt::UserRole + 5  ///< Temporary custom content object name (QString)
 	};
 
-	/// Set the action manager
+	// Set the action manager
 	void setupActionsManager(SARibbonActionsManager* mgr);
 
-	/// Check if there is content to store, corresponding to save action
+	// Check if there is content to store, corresponding to save action
 	bool isApplied() const;
 
-	/// Check if there are modified contents, corresponding to apply action
+	// Check if there are modified contents, corresponding to apply action
 	bool isCached() const;
 
-	/// Get the model
+	// Get the model
 	const QStandardItemModel* model() const;
 
-	/// Update model based on current radiobutton selection
+	// Update model based on current radiobutton selection
 	void updateModel();
 
-	/// Update model with specified type
+	// Update model with specified type
 	void updateModel(RibbonTreeShowType type);
 
-	/// Apply all settings
+	// Apply all settings
 	bool applys();
 
-	/// Convert to XML
+	// Convert to XML
 	bool toXml(QXmlStreamWriter* xml) const;
-	/// Convert to XML file
+	// Convert to XML file
 	bool toXml(const QString& xmlpath) const;
 
-	/// Load from XML, for file-based settings, it is recommended to call this function before the dialog is displayed
+	// Load from XML, for file-based settings, it is recommended to call this function before the dialog is displayed
 	void fromXml(QXmlStreamReader* xml);
-	/// Load from XML file
+	// Load from XML file
 	void fromXml(const QString& xmlpath);
 
-	/// Apply XML configuration
+	// Apply XML configuration
 	static bool fromXml(QXmlStreamReader* xml, SARibbonBar* bar, SARibbonActionsManager* mgr);
 
-	/// Cache applied actions, these actions will not be cleared by clear(), used for local storage
+	// Cache applied actions, these actions will not be cleared by clear(), used for local storage
 	void makeActionsApplied();
 
-	/// Clear applied actions, need to clear applied actions after cancel operation
+	// Clear applied actions, need to clear applied actions after cancel operation
 	void clearApplied();
-	/// Clear cached actions, after executing applys function, if you want to continue calling, you should clear, otherwise it will cause exceptions
+	// Clear cached actions, after executing applys function, if you want to continue calling, you should clear, otherwise it will cause exceptions
 	void clearCache();
-	/// Clear all actions, excluding locally read data
+	// Clear all actions, excluding locally read data
 	void clear();
 
 protected:
-	/// Simplify QList<SARibbonCustomizeData>, merge some actions
+	// Simplify QList<SARibbonCustomizeData>, merge some actions
 	void simplify();
 
-	/// Get the row proportion selected in the current interface
+	// Get the row proportion selected in the current interface
 	SARibbonPanelItem::RowProportion selectedRowProportion() const;
 
-	/// Get the action selected in listview
+	// Get the action selected in listview
 	QAction* selectedAction() const;
-	/// Convert item to action
+	// Convert item to action
 	QAction* itemToAction(QStandardItem* item) const;
 
-	/// Get the selected item in ribbon tree
+	// Get the selected item in ribbon tree
 	QStandardItem* selectedItem() const;
 
-	/// Get the level of selected ribbon tree item
+	// Get the level of selected ribbon tree item
 	int selectedRibbonLevel() const;
 
-	/// Get the level based on selected item
+	// Get the level based on selected item
 	int itemLevel(QStandardItem* item) const;
 
-	/// Set an item to be selected
+	// Set an item to be selected
 	void setSelectItem(QStandardItem* item, bool ensureVisible = true);
 
-	/// Check if item can be customized
+	// Check if item can be customized
 	bool isItemCanCustomize(QStandardItem* item) const;
 	bool isSelectedItemCanCustomize() const;
 
-	/// Check if item is a customize item
+	// Check if item is a customize item
 	bool isCustomizeItem(QStandardItem* item) const;
 	bool isSelectedItemIsCustomize() const;
 
-	/// Remove an item
+	// Remove an item
 	void removeItem(QStandardItem* item);
 
 private Q_SLOTS:
@@ -5977,36 +6054,36 @@ class SA_RIBBON_EXPORT SARibbonCustomizeDialog : public QDialog
 {
 	Q_OBJECT
 public:
-	/// Constructor for SARibbonCustomizeDialog
+	// Constructor for SARibbonCustomizeDialog
 	explicit SARibbonCustomizeDialog(SARibbonMainWindow *ribbonWindow, QWidget *p = nullptr, Qt::WindowFlags f = Qt::WindowFlags());
-	/// Destructor for SARibbonCustomizeDialog
+	// Destructor for SARibbonCustomizeDialog
 	~SARibbonCustomizeDialog();
-	/// Set the action manager
+	// Set the action manager
 	void setupActionsManager(SARibbonActionsManager *mgr);
 
-	/// Check if there is content to store, corresponding to save action
+	// Check if there is content to store, corresponding to save action
 	bool isApplied() const;
 
-	/// Check if there are modified contents, corresponding to apply action
+	// Check if there are modified contents, corresponding to apply action
 	bool isCached() const;
 
-	/// Apply all settings
+	// Apply all settings
 	bool applys();
 
-	/// Clear all actions
+	// Clear all actions
 	void clear();
 
-	/// Convert to XML
+	// Convert to XML
 	bool toXml(QXmlStreamWriter *xml) const;
-	/// Convert to XML file
+	// Convert to XML file
 	bool toXml(const QString& xmlpath) const;
 
-	/// Load from XML, for file-based settings, it is recommended to call this function before the dialog is displayed
+	// Load from XML, for file-based settings, it is recommended to call this function before the dialog is displayed
 	void fromXml(QXmlStreamReader *xml);
-	/// Load from XML file
+	// Load from XML file
 	void fromXml(const QString& xmlpath);
 
-	/// Return the SARibbonCustomizeWidget pointer
+	// Return the SARibbonCustomizeWidget pointer
 	SARibbonCustomizeWidget *customizeWidget() const;
 
 private:
@@ -6113,54 +6190,64 @@ class SA_RIBBON_EXPORT SARibbonMainWindow : public QMainWindow
 	Q_PROPERTY(SARibbonTheme ribbonTheme READ ribbonTheme WRITE setRibbonTheme NOTIFY ribbonThemeChanged)
 
 public:
-	/// Constructor for SARibbonMainWindow
+	// Constructor for SARibbonMainWindow
 	explicit SARibbonMainWindow(QWidget* parent                = nullptr,
 								SARibbonMainWindowStyles style = SARibbonMainWindowStyleFlag::UseRibbonMenuBar
 																 | SARibbonMainWindowStyleFlag::UseRibbonFrame,
 								const Qt::WindowFlags flags = Qt::WindowFlags());
-	/// Destructor for SARibbonMainWindow
+	// Destructor for SARibbonMainWindow
 	~SARibbonMainWindow() override;
-	/// Return SARibbonBar
+	// Return SARibbonBar
 	SARibbonBar* ribbonBar() const;
-	/// Set ribbonbar
+	// Set ribbonbar
 	void setRibbonBar(SARibbonBar* ribbon);
 #if !SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
-	/// Return SAFramelessHelper
+	// Return SAFramelessHelper
 	SAFramelessHelper* framelessHelper() const;
-	/// Set to use rubber band indication instead of immediate scaling during resizing, which is more friendly for software with large rendering (such as CAD, 3D)
+	// Set to use rubber band indication instead of immediate scaling during resizing, which is more friendly for software with large rendering (such as CAD, 3D)
 	void setRubberBandOnResize(bool on);
-	/// Check if rubber band is used on resize
+	// Check if rubber band is used on resize
 	bool isRubberBandOnResize() const;
 #else
-	/// If there are custom windows in the ribbon added to non-clickable areas such as the title bar, and you want them
-	/// to be clickable, you need to call this interface to inform them that they are clickable
+	// If there are custom windows in the ribbon added to non-clickable areas such as the title bar, and you want them
+	// to be clickable, you need to call this interface to inform them that they are clickable
 	void setFramelessHitTestVisible(QWidget* w, bool visible = true);
 #endif
-	/// This function is only used to control the display of minimize, maximize and close buttons
+	// This function is only used to control the display of minimize, maximize and close buttons
 	void updateWindowFlag(Qt::WindowFlags flags);
-	/// Note: Setting the theme in the constructor will not take full effect, use QTimer to put it at the end of the queue to execute
-	/// QTimer::singleShot(0, this, [ this ]() { this->setRibbonTheme(SARibbonMainWindow::RibbonThemeDark); });
+	// Note: Setting the theme in the constructor will not take full effect, use QTimer to put it at the end of the queue to execute
+	// QTimer::singleShot(0, this, [ this ]() { this->setRibbonTheme(SARibbonMainWindow::RibbonThemeDark); });
 	void setRibbonTheme(SARibbonTheme theme);
-	/// Get ribbon theme
+	// Get ribbon theme
 	SARibbonTheme ribbonTheme() const;
-	/// Determine whether the current mode is ribbon mode
+	// Determine whether the current mode is ribbon mode
 	bool isUseRibbon() const;
-	/// Get the bar where the maximize, minimize, and close buttons are located. You can set content next to the maximize and minimize buttons through this function
+	// Get the bar where the maximize, minimize, and close buttons are located. You can set content next to the maximize and minimize buttons through this function
 	SARibbonSystemButtonBar* windowButtonBar() const;
-	/// Get the current mainwindow style
+	// Get the current mainwindow style
 	SARibbonMainWindowStyles ribbonMainwindowStyle() const;
 
-	/// Pass ribbonbar events to frameless
+	// Pass ribbonbar events to frameless
 	virtual bool eventFilter(QObject* obj, QEvent* e) Q_DECL_OVERRIDE;
 
 protected:
-	/// Factory function to create ribbonbar
+	// Factory function to create ribbonbar
 	SARibbonBar* createRibbonBar();
 private Q_SLOTS:
-	/// Handle primary screen changed event
+	// Handle primary screen changed event
 	void onPrimaryScreenChanged(QScreen* screen);
 Q_SIGNALS:
-	/// Emitted when ribbon theme changes
+	/**
+	 * \if ENGLISH
+	 * @brief Emitted when ribbon theme changes
+	 * @param theme New ribbon theme
+	 * \endif
+	 *
+	 * \if CHINESE
+	 * @brief ribbon主题改变时触发的信号
+	 * @param theme 新的ribbon主题
+	 * \endif
+	 */
 	void ribbonThemeChanged(SARibbonTheme theme);
 };
 
@@ -6177,11 +6264,11 @@ class SA_RIBBON_EXPORT SARibbonMainWindowEventFilter : public QObject
 {
 	Q_OBJECT
 public:
-	/// Constructor for SARibbonMainWindowEventFilter
+	// Constructor for SARibbonMainWindowEventFilter
 	explicit SARibbonMainWindowEventFilter(QObject* par);
-	/// Destructor for SARibbonMainWindowEventFilter
+	// Destructor for SARibbonMainWindowEventFilter
 	~SARibbonMainWindowEventFilter();
-	/// Event filter
+	// Event filter
 	virtual bool eventFilter(QObject* obj, QEvent* e) override;
 };
 
@@ -6234,7 +6321,17 @@ public:
 private Q_SLOTS:
 	void onPrimaryScreenChanged(QScreen* screen);
 Q_SIGNALS:
-	/// Emitted when ribbon theme changes
+	/**
+	 * \if ENGLISH
+	 * @brief Emitted when ribbon theme changes
+	 * @param theme New ribbon theme
+	 * \endif
+	 *
+	 * \if CHINESE
+	 * @brief ribbon主题改变时触发的信号
+	 * @param theme 新的ribbon主题
+	 * \endif
+	 */
 	void ribbonThemeChanged(SARibbonTheme theme);
 };
 

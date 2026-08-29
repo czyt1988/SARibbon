@@ -80,6 +80,7 @@ SET(SARIBBON_SOURCE_FILES
     SARibbonUtil.cpp
     SAFramelessHelper.cpp
     SARibbonActionsManager.cpp
+    SARibbonMdiControlsStyle.cpp
     SARibbonBarLayout.cpp
     SARibbonBar.cpp
     SARibbonCustomizeData.cpp

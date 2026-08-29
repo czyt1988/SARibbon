@@ -12,6 +12,7 @@
 #include "SARibbonElementManager.h"
 #include "SARibbonUtil.h"
 #include "SARibbonTitleIconWidget.h"
+#include "SARibbonMdiControlsStyle.h"
 
 class SARibbonBarLayout::PrivateData
 {
@@ -1531,6 +1532,8 @@ void SARibbonBarLayout::resizeInLooseStyle()
 
         if (QWidget* connerTR = ribbon->cornerWidget(Qt::TopRightCorner)) {
             if (connerTR->isVisibleTo(ribbon)) {
+                // MDI子窗口的控制按钮在Qt6高分屏下会被原生主题缩放模糊，这里应用自绘样式保证清晰
+                SARibbonMdiControlsStyle::applyToMdiControllerWidget(connerTR);
                 QSize connerSize = connerTR->sizeHint();
                 connerSize       = SA::scaleSizeByHeight(connerSize, tabBarControlHeight);
                 connerTR->setGeometry(endX, y + 1, connerSize.width(), connerSize.height());
@@ -1657,6 +1660,8 @@ void SARibbonBarLayout::resizeInLooseStyle()
 
         if (QWidget* connerTR = ribbon->cornerWidget(Qt::TopRightCorner)) {
             if (connerTR->isVisibleTo(ribbon)) {
+                // MDI子窗口的控制按钮在Qt6高分屏下会被原生主题缩放模糊，这里应用自绘样式保证清晰
+                SARibbonMdiControlsStyle::applyToMdiControllerWidget(connerTR);
                 QSize connerSize = connerTR->sizeHint();
                 connerSize       = SA::scaleSizeByHeight(connerSize, tabBarControlHeight);
                 endX -= connerSize.width();
@@ -1794,6 +1799,8 @@ void SARibbonBarLayout::resizeInCompactStyle()
         // 4. 布局corner widget - TopRightCorner becomes left side in RTL
         if (QWidget* connerTR = ribbon->cornerWidget(Qt::TopRightCorner)) {
             if (connerTR->isVisibleTo(ribbon)) {
+                // MDI子窗口的控制按钮在Qt6高分屏下会被原生主题缩放模糊，这里应用自绘样式保证清晰
+                SARibbonMdiControlsStyle::applyToMdiControllerWidget(connerTR);
                 QSize connerSize = connerTR->sizeHint();
                 connerSize       = SA::scaleSizeByHeight(connerSize, validTitleBarHeight);
                 connerTR->setGeometry(endX, y, connerSize.width(), connerSize.height());
@@ -1899,6 +1906,8 @@ void SARibbonBarLayout::resizeInCompactStyle()
         // 4. 布局右上角corner widget
         if (QWidget* connerTR = ribbon->cornerWidget(Qt::TopRightCorner)) {
             if (connerTR->isVisibleTo(ribbon)) {
+                // MDI子窗口的控制按钮在Qt6高分屏下会被原生主题缩放模糊，这里应用自绘样式保证清晰
+                SARibbonMdiControlsStyle::applyToMdiControllerWidget(connerTR);
                 QSize connerSize = connerTR->sizeHint();
                 connerSize       = SA::scaleSizeByHeight(connerSize, validTitleBarHeight);
                 endX -= connerSize.width();
