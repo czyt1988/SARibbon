@@ -160,6 +160,9 @@ SARibbonMainWindow::SARibbonMainWindow(QWidget* parent, SARibbonMainWindowStyles
             d->mCurrentRibbonTheme = SARibbonTheme::RibbonThemeDark;
         }
         SARibbonTheme themeAtConstruction = d->mCurrentRibbonTheme;
+        // 同步应用主题：确保 QSS 在窗口 show() 之前就挂载，避免首帧绘制默认灰底后重绘造成的闪现
+        SA::applyRibbonTheme(this, ribbonBar(), themeAtConstruction);
+        // 兜底：部分 Qt 版本在构造函数中应用样式可能未完全生效，事件循环启动后重应用一次
         QTimer::singleShot(0, this, [this, themeAtConstruction]() {
             SA_D(d);
             SARibbonTheme t = ribbonTheme();

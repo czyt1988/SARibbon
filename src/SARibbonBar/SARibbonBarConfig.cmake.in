@@ -4,6 +4,10 @@
 # @PROJECT_NAME@_LIBRARIES, where to find the libs
 @PACKAGE_INIT@
 
+# find_dependency(Qt) 会重新 include QtConfig.cmake，把 PACKAGE_PREFIX_DIR 覆盖为 Qt 的安装前缀，
+# 因此必须先保存 SARibbonBar 自己的安装前缀
+set(_SARIBBON_PACKAGE_PREFIX_DIR "${PACKAGE_PREFIX_DIR}")
+
 include(CMakeFindDependencyMacro)
 find_dependency(Qt@QT_VERSION_MAJOR@ COMPONENTS Core Gui Widgets Svg)
 
@@ -11,7 +15,7 @@ set (PackageName @SARIBBON_LIB_NAME@)
 set (@SARIBBON_LIB_NAME@_VERSION @SARIBBON_VERSION@)
 
 include ( ${CMAKE_CURRENT_LIST_DIR}/${PackageName}Targets.cmake )
-set_and_check ( ${PackageName}_INCLUDE_DIR ${PACKAGE_PREFIX_DIR}/@SARIBBON_LIB_INCLUDE_INSTALL_DIR@ )
+set_and_check ( ${PackageName}_INCLUDE_DIR ${_SARIBBON_PACKAGE_PREFIX_DIR}/@SARIBBON_LIB_INCLUDE_INSTALL_DIR@ )
 set ( ${PackageName}_LIBRARIES)
 list ( APPEND ${PackageName}_LIBRARIES ${PackageName})
 

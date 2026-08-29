@@ -159,6 +159,7 @@ set(SARIBBON_SOURCES
     ${SARIBBON_SOURCE_DIR}/SARibbonMainWindow.cpp
     ${SARIBBON_SOURCE_DIR}/SARibbonBar.cpp
     ${SARIBBON_SOURCE_DIR}/SARibbonBarLayout.cpp
+    ${SARIBBON_SOURCE_DIR}/SARibbonMdiControlsStyle.cpp
     ${SARIBBON_SOURCE_DIR}/SARibbonCategory.cpp
     ${SARIBBON_SOURCE_DIR}/SARibbonCategoryLayout.cpp
     ${SARIBBON_SOURCE_DIR}/SARibbonPanel.cpp

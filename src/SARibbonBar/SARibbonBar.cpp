@@ -3583,9 +3583,11 @@ bool SARibbonBar::eventFilter(QObject* obj, QEvent* e)
              * 修复 #123: 处理 QEvent::WindowStateChange 事件，确保MDI窗口最大化/还原时 corner widget 正确刷新
              * \endif
              */
-            if ((QEvent::UpdateLater == e->type()) || (QEvent::MouseButtonRelease == e->type())
-                || (QEvent::WindowActivate == e->type())
-                || (QEvent::WindowStateChange == e->type())) {
+            if (QEvent::WindowActivate == e->type()) {
+                // 窗口激活是首帧关键路径，同步 relayout 避免首帧布局未结算导致的闪现
+                d_ptr->relayout();
+            } else if ((QEvent::UpdateLater == e->type()) || (QEvent::MouseButtonRelease == e->type())
+                       || (QEvent::WindowStateChange == e->type())) {
                 // 使用延迟定时器合并多次 relayout 请求，避免 MDI 场景下连续触发
                 d_ptr->mRelayoutTimer.start(0);
             }
