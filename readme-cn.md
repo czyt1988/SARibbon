@@ -149,18 +149,17 @@ Python 示例程序位于 `pyexamples/` 目录。
 ## 更多截图
 
 - 这是使用SARibbon构建的软件截图
+    DAWorkbench，地址：[github](https://github.com/czyt1988/data-workbench)、[gitee](https://gitee.com/czyt1988/data-workbench)
+    
+    这是一个带agent的数据分析软件，支持工作流，ai agent分析，如果你想了解如何在c++/Qt程序中嵌入agent,也可以通过此软件了解
 
-![data-workbench-screenshot1-cn](./docs/assets/screenshot/data-workbench-screenshot1-cn.gif)
-![data-workbench-screenshot01-en](./docs/assets/screenshot/data-workbench-screenshot01-en.png)
-![data-workbench-screenshot01-cn](./docs/assets/screenshot/data-workbench-screenshot01-cn.png)
+    ![data-workbench-screenshot1-cn](./docs/assets/screenshot/data-workbench-screenshot1-cn.gif)
+    ![data-workbench-screenshot01-en](./docs/assets/screenshot/data-workbench-screenshot02-cn.png)
+    ![data-workbench-screenshot01-cn](./docs/assets/screenshot/data-workbench-screenshot01-cn.png)
 
-[github - https://github.com/czyt1988/data-workbench](https://github.com/czyt1988/data-workbench)
+    具体Ribbon的生成代码可见：
 
-[gitee - https://gitee.com/czyt1988/data-workbench](https://gitee.com/czyt1988/data-workbench)
-
-具体Ribbon的生成代码可见：
-
-[https://github.com/czyt1988/data-workbench/blob/master/src/APP/DAAppRibbonArea.cpp](https://github.com/czyt1988/data-workbench/blob/master/src/APP/DAAppRibbonArea.cpp)
+    [https://github.com/czyt1988/data-workbench/blob/master/src/APP/DAAppRibbonArea.cpp](https://github.com/czyt1988/data-workbench/blob/master/src/APP/DAAppRibbonArea.cpp)
 
 ## 文档生成
 
