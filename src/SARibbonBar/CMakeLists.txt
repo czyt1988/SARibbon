@@ -268,6 +268,23 @@ find_package(Qt${QT_VERSION_MAJOR}LinguistTools QUIET)
     target_sources(${SARIBBON_LIB_NAME} PRIVATE ${QM_FILES})
 
     message(STATUS "Translation support enabled (LinguistTools found).")
+
+    # 安装 SARibbon 翻译到 bin/translations/
+    install(FILES ${QM_FILES}
+        DESTINATION ${CMAKE_INSTALL_BINDIR}/translations
+        COMPONENT translations
+    )
+
+    # 复制到构建输出目录，供开发调试时使用
+    set(_saribbon_qm_output_dir "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}/translations")
+    file(MAKE_DIRECTORY "${_saribbon_qm_output_dir}")
+    foreach(_qm_file ${QM_FILES})
+        add_custom_command(TARGET ${SARIBBON_LIB_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${_qm_file}" "${_saribbon_qm_output_dir}/"
+            COMMENT "Copying SARibbon translation ${_qm_file}"
+        )
+    endforeach()
 endif()
 # ------------------------------- install script -------------------------------
 
