@@ -135,7 +135,7 @@ Doxygen-generated API documentation is deployed at:
 SARibbon provides Python bindings for three frameworks, allowing you to use SARibbon in Python applications:
 
 | Binding | Framework | Build Tool |
-|---------|-----------|------------|
+| --------- | ----------- | ------------ |
 | PyQtSARibbon | PyQt5 | SIP |
 | PyQtSARibbon6 | PyQt6 | SIP |
 | PySideSARibbon | PySide6 | Shiboken6 |
@@ -149,6 +149,7 @@ pip install PySideSARibbon  # PySide6
 ```
 
 For building from source and detailed usage, see:
+
 - [Build Python Bindings](./docs/en/python-guide/build-python-bindings.md)
 - [Use Python Bindings](./docs/en/python-guide/use-python-bindings.md)
 - [Build PySide6 Bindings](./docs/en/python-guide/build-pyside6-bindings.md)
@@ -160,17 +161,18 @@ Python demo examples are in the `pyexamples/` directory.
 
 ## More Screenshots
 
-Screenshots of real applications built with SARibbon:
+- Screenshots of software built with SARibbon:
 
-![Data Workbench GIF](./docs/assets/screenshot/data-workbench-screenshot1-cn.gif)  
-![Data Workbench EN](./docs/assets/screenshot/data-workbench-screenshot01-en.png)  
-![Data Workbench CN](./docs/assets/screenshot/data-workbench-screenshot01-cn.png)
+    DAWorkbench: [GitHub](https://github.com/czyt1988/data-workbench) | [Gitee](https://gitee.com/czyt1988/data-workbench)
 
-- [GitHub - data-workbench](https://github.com/czyt1988/data-workbench)  
-- [Gitee - data-workbench](https://gitee.com/czyt1988/data-workbench)
+    This is a data analysis application with agent support. It provides workflow and AI agent analysis capabilities — if you want to learn how to embed an AI agent into a C++/Qt application, this software is a good reference.
 
-For actual Ribbon implementation code, see:  
-[https://github.com/czyt1988/data-workbench/blob/master/src/APP/DAAppRibbonArea.cpp](https://github.com/czyt1988/data-workbench/blob/master/src/APP/DAAppRibbonArea.cpp)
+    ![Data Workbench GIF](./docs/assets/screenshot/data-workbench-screenshot1-cn.gif)  
+    ![Data Workbench CN](./docs/assets/screenshot/data-workbench-screenshot01-cn.png)
+
+    The actual Ribbon generation code is available at:
+
+    [https://github.com/czyt1988/data-workbench/blob/master/src/APP/DAAppRibbonArea.cpp](https://github.com/czyt1988/data-workbench/blob/master/src/APP/DAAppRibbonArea.cpp)
 
 ---
 

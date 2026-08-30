@@ -53,6 +53,7 @@ nul
 .kiro/
 .agent/
 .github/copilot/
+.zcode/
 
 #文档目录
 site
