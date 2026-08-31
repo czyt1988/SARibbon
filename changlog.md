@@ -1,5 +1,35 @@
 # 版本更新记录(change log):
 
+## 2026-08-31 -> 2.9.3
+
+- 全面性能优化：
+  - `SARibbonToolButton`增加sizeHint缓存，`SARibbonStackedWidget`尺寸调整优化
+  - `setRibbonStyle`新增`beginUpdate`/`endUpdate`批量更新机制，样式切换时一次性完成重排
+  - Category滚动动画优化，不再每帧全量重算布局
+  - Gallery支持批量`appendList`插入，绘制路径绕过QVariant转换
+  - 无边框方案光标计算消除`QApplication::widgetAt`调用，窗口拖动时缓存屏幕列表避免频繁分配
+  - paint事件裁剪优化，重排请求延迟合并，不可见子控件跳过布局与重绘
+  - ThemeManager增加静态QSS缓存，ColorToolButton增加pixmap缓存
+  - `SARibbonActionsManager`的removeTag和search改用QSet优化
+- 修复约60个缺陷（B1~B67、R1~R6系列），主要覆盖：
+  - `SARibbonActionsManager`数据损坏与空指针、`SARibbonBar`空指针崩溃与属性不同步
+  - `SARibbonBarLayout`/`SARibbonCategoryLayout`空指针与布局计算错误
+  - Gallery模型行计数与空指针、`SARibbonStackedWidget`在Qt6下的断言
+  - `SARibbonToolButton`图标缓存失效与绘制状态错误、SAColorMenu/SAColorToolButton信号时序
+  - 自定义（Customize）对话框方向错误、FramelessHelper静态成员等杂项问题
+- 修复panel移除时的use-after-free以及doLayout重入导致的崩溃
+- 修复启动时主题延迟应用导致的闪现
+- 修复Qt6下MDI子窗口控制按钮显示模糊的问题
+- 修复窗口系统按钮按下反馈与Office2016主题颜色不一致的问题
+- Category滚动支持横向滚轮
+- 修复PySide6绑定在Linux/macOS下的构建问题：RPATH设置、framework头文件路径、dynamic_lookup链接、wheel打包、绑定库补充主题源文件等（感谢[@MurzinR](https://github.com/MurzinR)的PR #151）
+- CMake：安装时把翻译qm文件复制到`bin/translations`；修复SARibbonBar安装前缀在`find_dependency`之前被覆盖的问题
+- CI矩阵精简并修复workflow共性问题
+- 注释风格全库标准化，补全双语Doxygen注释
+- 移除废弃代码`SARibbonButtonLayoutStrategy`及其测试
+- MainWindowExample：完善ToolButton最大宽高比spinbox的交互
+- 文档：readme更新DAWorkbench软件截图介绍，英文readme同步更新
+
 ## 2026-07-01 -> 2.9.2
 
 - 新增Python绑定支持，提供三种绑定方案：
