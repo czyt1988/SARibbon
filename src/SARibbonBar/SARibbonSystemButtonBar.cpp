@@ -641,7 +641,7 @@ bool SARibbonSystemButtonBar::eventFilter(QObject* obj, QEvent* event)
         } break;
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
         case QEvent::ScreenChangeInternal:
-#if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
         case QEvent::DevicePixelRatioChange:
 #endif
         {
