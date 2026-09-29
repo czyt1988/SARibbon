@@ -8,7 +8,10 @@
 
 本目录把 v2 计划的 M0–M4 里程碑拆成 **4 份可独立执行的重构计划**，每份计划都是
 自包含的：包含前置条件、逐步操作、验证命令、提交点与验收门。执行时**严格按顺序**，
-不跳步、不在"红"状态下跨步。
+不跳步、不在"红"状态下跨步。另有一份**参考资料**（非执行计划）：
+[appendix-reference-architecture.md](appendix-reference-architecture.md)（参考架构学习手册，
+QWindowKit/KDDockWidgets 的已裁决借鉴模式总表与"明确不抄清单"——执行 01~04 时遇到
+"参考项目怎么做的"类问题先查它，不必重读参考项目源码）。
 
 ## 计划清单与执行顺序
 
@@ -23,6 +26,7 @@
 | 02 | [02-core-sinking.md](02-core-sinking.md) | M1 | theme/metrics/contract/layout/data/factory 六子系统下沉 core；三个布局类退化为适配器；黄金几何测试证明行为零变化 | v2 M1 全部判据：黄金测试 100% 绿、纯净扫描绿、现有测试全绿（ctest == N₀）、6 张截图与度量对照表逐项相等 |
 | 03 | [03-build-ecosystem.md](03-build-ecosystem.md) | M2 | amalgamate 按模块改造且产物不入库；sip/PyQt6/PySide6 绑定适配；CI 全矩阵；安装细节 | CI 绿；单文件产物可编译 StaticExample；Python 轮子可构建；回归 ctest == N₀ 且 tests/core 全绿 |
 | 04 | [04-qml-and-release.md](04-qml-and-release.md) | M3+M4 | SARibbonQml P0 类型（C++ 结构宿主 + QML 叶子）；跨前端一致性套件；文档、迁移指南、3.0.0 发布 | QML 与 widgets 同屏视觉一致；一致性测试绿；发布物料齐备（tag `v3.0.0` + GitHub Release + 迁移指南） |
+| 附录 | [appendix-reference-architecture.md](appendix-reference-architecture.md) | —（**参考资料，非执行计划**） | 参考架构学习手册：QWK/KDDW 机制借鉴总表（机制｜实证 文件:行｜SARibbon 落点｜抄/不抄/改造）、两家共同点提炼、明确不抄清单 | —（无出口判据；随评审轮次由整合 agent 维护，见其 §6） |
 
 ## 通用执行规则（所有计划共用，执行前必读）
 
@@ -106,6 +110,10 @@ Qt5 验证：**本机 Qt 5.14.2 低于 3.0 的 5.15 门槛（v2 D1），Qt5 路�
      根/模块 `CMakeLists.txt`、`cmake/SARibbonUtils.cmake` 均为 UTF-8（B4，原记录有误已更正）。
    - ctest 注册项为 26（`tests/` 顶层 25 个 .cpp + `tests/auto/` 1 个），此前文档写"24 个"
      有误（B8）。
+   - **QML 注册路线已单轨化**（B9，round2）：v2 §5.3 原"Qt5 命令式 / Qt6 qt_add_qml_module"
+     双轨表述已修订为命令式单轨（Qt5/Qt6 同码），04 S1 已落地；声明式轨为 3.1+ 候选。
+   - **新增 `SARIBBON_INSTALL` 选项**（B10，round2）：默认 ON，全部 install/export/包配置规则
+     收进守卫（v2 §6.4）；01 S4 选项清单已补行、S5/S6/S11 的 install 规则已标注守卫。
 
 ### R5. 术语
 
@@ -114,8 +122,9 @@ Qt5 验证：**本机 Qt 5.14.2 低于 3.0 的 5.15 门槛（v2 D1），Qt5 路�
 | Step A | 布局算法"接口化原地重构"：仍在 2.x 文件内，仅把算法的输入输出改经契约接口 |
 | Step B | "纯搬移"：算法函数体整体 move 进 core 引擎，不改一行逻辑，diff 可 review |
 | 黄金几何测试 | 以 fixture 数据锁定布局引擎输入→输出映射的确定性测试（fixture 录制见计划 02 S5.0；三引擎测试分别在 S5.2/S6/S7；覆盖矩阵补全在 S8） |
-| 契约接口 | `SARibbon::Core::SARibbonAbstractLayoutItem/Host` 等窄接口（v2 §3.4.1） |
+| 契约接口 | `SARibbon::Core::SARibbonAbstractLayoutItem/Host` 等窄接口（v2 §3.4.1，最终代码块以计划 02 S4.1-5 为准） |
 | 适配器 | widgets 侧退化的 QLayout 子类：收集 items → 调引擎 → 应用几何 |
+| 命令式单轨 | 3.0 的 QML 类型注册唯一路线（round2 修订，v2 §5.3）：Qt5/Qt6 同码的 `saRibbonRegisterQmlTypes()`（`qmlRegisterType`/`qmlRegisterSingletonInstance`/`qmlRegisterUncreatableType` + `qmlRegisterModule`，static-once + 静态构建 `Q_INIT_RESOURCE` 守卫），应用在 `engine.load()` 前显式调用；QML 叶子进 qrc 随库二进制、安装期零新增产物；`qt_add_qml_module` 声明式轨降为 3.1+ 候选（04 S1 附注预案、v2 §9 候选清单 B-3） |
 
 ### R6. 双分支与同步
 
@@ -143,10 +152,20 @@ Qt5 验证：**本机 Qt 5.14.2 低于 3.0 的 5.15 门槛（v2 D1），Qt5 路�
      维护者澄清，**禁止自行想象 v1 内容**；
    - 后续修订这四份文档时，应逐步把悬空的 "v1 §x" 引用改为指向 v2 章节或删除（round1 评审
      已将完整清单记录在 reviews/round1/cross-findings.md）。
-3. **修订历史**：本套文档（README/NOTES/v2 计划/01~04）按评审轮次修订，每轮评审的证据与
-   修改记录存于 `plans/3.0/reviews/round<N>/`。第 1 轮（2026-09-29，视角=跨文档一致性与
-   事实准确性）：本 README、NOTES.md、v2 计划由评审 agent 直接修订；01~04 由并行 agent
-   修订，该轮发现的跨文档问题清单见 [reviews/round1/cross-findings.md](reviews/round1/cross-findings.md)。
+3. **修订历史**：本套文档（README/NOTES/v2 计划/01~04/附录）按评审轮次修订，每轮评审的证据与
+   修改记录存于 `plans/3.0/reviews/round<N>/`。
+   - 第 1 轮（2026-09-29，视角=跨文档一致性与事实准确性）：本 README、NOTES.md、v2 计划由
+     评审 agent 直接修订；01~04 由并行 agent 修订，该轮发现的跨文档问题清单见
+     [reviews/round1/cross-findings.md](reviews/round1/cross-findings.md)。
+   - 第 2 轮（2026-09-29，视角=参考项目深度学习）：3 个并行 agent 分别深读 QWindowKit 构建体系
+     （修订 01/03，findings：[reviews/round2/qwk-build-findings.md](reviews/round2/qwk-build-findings.md)）、
+     KDDockWidgets core（修订 02，findings：[reviews/round2/kddw-core-findings.md](reviews/round2/kddw-core-findings.md)）、
+     KDDW qtquick + QWK quick（修订 04，findings：[reviews/round2/kddw-qtquick-findings.md](reviews/round2/kddw-qtquick-findings.md)）；
+     整合 agent 完成设计级修订上达 v2 计划（§5.3 QML 注册命令式单轨化、§3.4.1 契约代码块同步、
+     §3.7 禁区两层化、§6.4 新增 SARIBBON_INSTALL 选项、§7.1/§7.4 测试策略增补、§9 新增"3.1+
+     候选项清单"），新建 [appendix-reference-architecture.md](appendix-reference-architecture.md)
+     与本目录 [reviews/round2/synthesis-findings.md](reviews/round2/synthesis-findings.md)
+     （整合裁决记录），NOTES.md 追加 B9/B10，并对 01/02/03/04 做跨文件一致性小修。
 4. **参考项目获取方式**：本套文档大量引用两个参考项目的 `文件:行号` 证据，评审时使用的是
    本机副本 `F:\src\3rdparty\qwindowkit` 与 `F:\src\3rdparty\KDDockWidgets`（仓库内的
    qwindowkit submodule 未初始化，为空目录）。在其他环境执行/复核时：QWindowKit 可

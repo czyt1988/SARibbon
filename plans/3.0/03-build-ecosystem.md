@@ -264,6 +264,8 @@ ctest 带 `QT_QPA_PLATFORM=offscreen`。**不用 vcpkg**。计划 01 S10 已改�
 
 2. 新增独立 workflow `amalgamation.yml`：**`runs-on: windows-latest`**（`tools/Amalgamate.exe` 是 Windows 二进制且仓库无其源码；若日后要 linux 跑，需按 `tools/Amalgamate.md` 从 vinniefalco/Amalgamate 源码现编，本计划不做）。步骤：checkout → `jurplel/install-qt-action`（6.8.*，win64_msvc2022_64）→ `working-directory: tools` 跑 `bash Amalgamate.sh`（依赖 S1-2 的非交互改造，否则挂死）→ `cmake -S examples/widgets/StaticExample -B build-static -DCMAKE_PREFIX_PATH=<Qt>` + build（standalone 工程，不必开全量 examples）→（可选）offscreen 运行冒烟。触发：push 到 dev-3.0 + `workflow_dispatch`。
 3. vcpkg preset 验证（手动一次并记 NOTES，或加 dispatch-only job）：`CMakePresets.json` 已核实存在 preset `vcpkg-msvc-x64-release`（另有 `-debug`、`-debug-static`、`-release-static`、`-debug-frameless`），presets version 6 → **需 CMake ≥ 3.25 且设置 `VCPKG_ROOT` 环境变量**；`vcpkg.json`（name=`saribbonbar`, version=2.8.0→S7 升 3.0.0）含 `frameless`（qwindowkit）与 `svg`（qtsvg）feature。**注意：release preset 不含 frameless 联动**——"frameless feature 联动"验证要么用 `vcpkg-msvc-x64-debug-frameless`（它设 `VCPKG_MANIFEST_FEATURES=frameless`，根 CMakeLists 检测到后自动 `SARIBBON_USE_FRAMELESS_LIB=ON`），要么新增 `vcpkg-msvc-x64-release-frameless` preset（一行 inherits + features，推荐，顺带交付）。frameless=ON 需 C++17 与 QWindowKit 可解析（vcpkg 装），配置通过即可，不要求编 qwindowkit submodule。
+4. **ctest 防空转纪律复核**（round2 从 QWK 上游 CI 抄入，承接 01-S10-7）：本步矩阵扩项后，6 个平台 workflow 与 amalgamation job 的所有 ctest 调用统一带 **`--no-tests=error`**——ctest 在"0 个测试"时退出码为 0，矩阵/选项改动一旦让测试静默不注册（如 static 项把 `SARIBBON_BUILD_TESTS` 联动关掉却仍跑 ctest），CI 会假绿。证据：QWK 上游 main `.github/workflows/ci.yml` Test 步骤 `ctest --test-dir build --output-on-failure --no-tests=error`（本地 QWK 快照 1fb3ec7 无 `.github/`，经 GitHub API 从上游抓取，详见 reviews/round2/qwk-build-findings.md §一.6）。
+5. **可选增强：安装包消费测试注册进 ctest**（QWK 上游同款模式，建议随 S6-3 的 test-find-package 复核一并做，做不做记 NOTES）：QWK 上游把"安装后以 cmake/qmake/msbuild 三种构建系统消费安装包"注册为 ctest 测试（`buildsystems.cmake/qmake/msbuild`），并在 CI 里用专门步骤核对测试已注册（`ctest -N -R` 逐项检查，防"工具缺失→测试静默跳过"）。SARibbon 对应做法：`tools/test-find-package/` 由手动冒烟升级为 `add_test(NAME consumer.cmake COMMAND ${CMAKE_COMMAND} ...)`（在 install 后 configure+build 该最小工程），纳入 01-S11.4/本计划 S6-3 的验收链。此条超出 01-S11.4 的"手动冒烟"基线，属增强项，不阻塞验收。
 
 **验证**：push 后全部 workflow 绿（含 dry-run、amalgamation、static 项）。
 
@@ -281,13 +283,14 @@ ctest 带 `QT_QPA_PLATFORM=offscreen`。**不用 vcpkg**。计划 01 S10 已改�
 **操作**：
 1. qm 编译进构建：机制已在（上述翻译块），本步只做**迁移复核**——01-S6 重写 `src/widgets/CMakeLists.txt` 后确认翻译块存活、`TS_SOURCES` 引用的源清单变量与拆分后清单一致（core 骨架无 `tr()` 字符串，i18n 归属 widgets；若 02 下沉的代码引入 `tr()`，评估是否给 core 单独 TS，记 NOTES）；Qt5/Qt6 分支（`qt5_*`/`qt6_*`）保持。install 目的地 `bin/translations` 不动（运行时路径逻辑不存在"库内加载函数"，无需兼容层）。
 2. lupdate 维护入口：无独立脚本，就是 `-DSARIBBON_UPDATE_TRANSLATIONS=ON` 的 CMake 选项（01 重写后若选项被更名/遗漏，在此恢复）；`.ts` 内相对路径由 lupdate 扫描源生成，目录搬移后跑一次 ON 构建核对 `git diff *.ts` 只有位置类变化（.gitattributes 已固定 `*.ts text eol=lf`，不会出现换行噪音）。
-3. 安装树复核（`cmake --install build --config Release` 后逐项打勾）：
+3. 安装树复核（`cmake --install build --config Release` 后逐项打勾；round2 整合注：全部 install 规则在 `SARIBBON_INSTALL`（默认 ON）守卫内——v2 §6.4/01 S4，本复核以默认 ON 执行）：
    - `include/SARibbonCore/`、`include/SARibbonWidgets/`（含 `colorWidgets/` 子目录）
    - 旧路径转发头 `include/SARibbonBar/`（01-S11 产物，复核每个公共头都有转发）
    - `lib/cmake/SARibbon/{SARibbonConfig,SARibbonConfigVersion,SARibbonTargets}.cmake`，`find_package(SARibbon COMPONENTS Core|Widgets)` 可用，target 为 `SARibbon::Core`/`SARibbon::Widgets`
    - `bin/translations/SARibbon_{zh_CN,en_US}.qm`（Qt Linguist Tools 在位时）
    - `share/*_amalgamate` 的处置结果与 S1-3-4 的决定一致
-   - `tools/test-find-package/` 在 01-S11 版本上**补一个 `COMPONENTS Core` 最小消费 TU**（只 include core 头、只链 `SARibbon::Core`，证明 core 可独立消费）
+   - `tools/test-find-package/` 在 01-S11 版本上**补一个 `COMPONENTS Core` 最小消费 TU**（只 include core 头、只链 `SARibbon::Core`，证明 core 可独立消费；可选升级为 ctest 注册测试，见 S5-5）
+   - **QML 安装布局结论（round2 补预警，round2 整合已解除为终态）**：本清单**没有** qml 相关项即为**终态正确状态**——计划 04 S1 已定型**命令式单轨**（v2 §5.3 round2 修订、NOTES B9），QML 叶子全部进 qrc 编入 SARibbonQml 库二进制，**安装期零新增产物**（无 qmldir/qmltypes/plugin 安装项），SARibbonQml 的安装与普通 C++ 库完全同构。实证：QWK 1.0.1 quick 库安装无任何 qml 项（`qwindowkit/src/quick/CMakeLists.txt` 全文 38 行、`src/CMakeLists.txt:100-115` 统一 install）；KDDW qtquick 前端安装仅头+库+cmake 包（`src/CMakeLists.txt:634-666`）。仅当 3.1+ 启用 `qt_add_qml_module` 声明式轨（v2 §9 候选清单 B-3、04 S1 附注预案）时，安装树才会新增 `lib/qt6/qml/SARibbon/` 一类条目（布局随 Qt 版本变化、两家均无先例），届时本清单必须增补对应复核项。`SARibbonConfig` 的 Qml 组件依赖只需 `find_dependency(Qt Quick/Qml)`（01 S11 骨架已补，QuickControls2 视 04 S5 决策）
 4. 文档：根 `build.md` 与 `docs/{zh,en}/build-guide/build-SARibbon.md` 增加"单文件发行（生成方法：tools/ 下 bash Amalgamate.sh；产物不入库）"与"vcpkg/组件化 find_package"两节的 3.0 说明；`docs/{zh,en}/build-guide/i18n.md` 顺手修正示例——现文档用 `translator.load("SARibbon_zh_CN.qm", ":/i18n/")`（Qt 资源路径），与实际交付方式（安装树/构建目录 `bin/translations/` 下的文件路径加载）不符。
 5. **tests 链接目标切换**（承接计划 01 S6-6 留给本计划的义务）：`tests/`（01 后 `tests/widgets/`）里 `target_link_libraries(... SARibbonBar)` 全部改为 `SARibbon::Widgets`；兼容别名 `add_library(SARibbonBar ALIAS SARibbonWidgets)` **保留**（对外过渡一个版本周期，01-S6 决定），仅切换仓库内部用法。`git grep -n "SARibbonBar)" tests/` 复核清零（别名定义处除外）。
 

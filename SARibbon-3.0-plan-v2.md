@@ -11,6 +11,10 @@
 >   其建库宏实名 `qwk_add_library`，见副本 `src/CMakeLists.txt:38`）
 > - **KDDockWidgets**（`F:\src\3rdparty\KDDockWidgets`）→ 借鉴其**分层模式**（core 后端 + 多前端、ViewInterface 契约、纯几何 layouting 引擎、跨前端测试）
 > 基线版本：SARibbon 2.9.5（单 target `SARibbonBar`；dev/v3/origin/dev 同指 `7a617fc`）
+> **round2 修订（2026-09-29，视角=参考项目深度学习）**：正文中以【round2 修订】/【round2 精确化】
+> 标注的设计级修订，证据出处为 `plans/3.0/reviews/round2/` 三份 findings（qwk-build /
+> kddw-core / kddw-qtquick）与整合记录 `synthesis-findings.md`；两个参考项目的已裁决实现模式
+> 汇编于 `plans/3.0/appendix-reference-architecture.md`（参考架构学习手册，执行 agent 配套读物）。
 
 ---
 
@@ -23,7 +27,7 @@
 | P3 | **缺契约层**：没有任何接口抽象，widgets 与 QML 无法对接同一套逻辑 | 引入 KDDock 式 **ViewInterface 契约**：`SARibbonAbstractLayoutItem` / `SARibbonAbstractLayoutHost` 等窄接口 |
 | P4 | **度量体系无归属**：tabBarHeight/categoryHeight/panelTitleHeight 等视觉一致性关键数值散落在 BarLayout 私有函数里 | 新增 **`SARibbonMetrics`**：全部尺寸常量与派生计算的唯一权威来源，双前端共用 |
 | P5 | **无跨前端一致性测试策略**：单测仅"按模块拆分" | 引入 KDDW 的**跨前端测试**实践：黄金几何测试 + 前端一致性套件 |
-| 保留 | v1 的构建体系（QWK 式三库 + `sa_add_library`）、ThemeManager 拆分方向、QML 双轨注册、兼容层策略 | 全部保留，仅增强 core 纯净性门禁 |
+| 保留 | v1 的构建体系（QWK 式三库 + `sa_add_library`）、ThemeManager 拆分方向、QML 双轨注册（【round2 修订】已单轨化为命令式，见 §5.3）、兼容层策略 | 全部保留，仅增强 core 纯净性门禁 |
 
 ---
 
@@ -34,7 +38,7 @@
 1. **三库拆分 + 严格单向依赖**（Core ← Widgets / Qml）。方向正确。
 2. **构建体系采用 QWindowKit 模式**（`sa_add_library`——SARibbon 侧新函数名，QWK 原型为 `qwk_add_library`、统一导出宏、组件化 `find_package`、`SARibbon::Core` 命名空间 target）。KDDockWidgets 用的是"单库 + configure 时选前端源码拼合"（其 `src/CMakeLists.txt:304` 把 `KDDW_FRONTEND_QTWIDGETS_SRCS` 并入 `DOCKSLIBS_SRCS`，`:327` `add_library(kddockwidgets ...)` 单一 target），这由它的双许可与私有符号共享需求决定；对 SARibbon 而言**三库更优**——amalgamate 单文件发行和 Python 绑定都依赖清晰的库边界。维持 v1。
 3. **ThemeManager 拆分**为 core 数据层 + widgets QSS 应用层。方向正确（细化见 §3.2）。
-4. **QML 注册双轨**（Qt5 命令式 / Qt6 `qt_add_qml_module` 声明式）。
+4. **QML 注册双轨**（Qt5 命令式 / Qt6 `qt_add_qml_module` 声明式）。**【round2 修订】已改为命令式单轨（Qt5/Qt6 同码），`qt_add_qml_module` 声明式轨降为 3.1+ 可选优化——实证与理由见 §5.3 及 plans/3.0/reviews/round2/kddw-qtquick-findings.md §三.1；本条保留为 v1 审查历史记录。**
 5. **兼容层**：转发头 + 兼容宏 + 旧 target 名过渡一个版本周期。
 6. **CI 组合构建门禁**（`SARIBBON_BUILD_WIDGETS=OFF` 强制 core 独立编译）。
 
@@ -64,6 +68,11 @@ v1 §6.4 的理由是"避免过早抽象把 widgets 拖入 Quick 依赖"。这�
 | `SARibbonBarLayout` | 1993 | `tabBarHeight()/categoryHeight()/panelTitleHeight()/normalModeMainBarHeight()/minimumModeMainBarHeight()/calcMinTabBarWidth()`（.h :66/:89/:92/:96/:108/:114）是**纯度量计算**（QML 必须拿到同样数值否则双版本高矮不一）；`layoutTitleRect()`（.cpp :1242）是标题区几何；`doLayout()` 中 windowButtonBar/frameless 部分是 widget 专属 | 度量与标题区几何可下沉；系统按钮栏、无边框逻辑留守 |
 
 KDDW 的对应物是 `src/core/layouting/`（Item、SizingInfo、LayoutingHost、LayoutingGuest）——一个**零 GUI 依赖**、注释里明说"可被非 KDDW 项目复用"（`LayoutingGuest_p.h:29` 原注 "reused by non-KDDW projects"）的独立布局引擎。宿主与成员各自只需实现极小的纯虚接口（`LayoutingGuest`：`minSize/maxSizeHint/setGeometry/setVisible/geometry/setHost/host/id` 8 个纯虚，见 `LayoutingGuest_p.h:31-43`）。SARibbon 的布局远比停靠布局简单，没有理由做不到同样的分离。
+
+> 【round2 精确化】（kddw-core-findings.md §一.1/§一.3/§一.5；**不改变本段结论**）：
+> ① "零 GUI 依赖"需精确化——`layouting/` 子目录的 include 面是**事实净室**（仅 QtCore/std/kdbindings/nlohmann + `<QTimer>`，Item.cpp:13-30），但引擎节点 `Item` 本身**是 QObject**（Item_p.h:190-192，Qt 前端 `Core::Object` = QObject，QtCompat_p.h:80-83），真正 QObject-free 的是**契约面**（LayoutingGuest/Host/Separator 三接口，信号用 KDBindings 而非 Qt 信号）。SARibbon 引擎设计为瞬态纯函数（连 Item 层 QObject 都不需要，layout() 返回 Result），是比 KDDW 更彻底的**有意分叉**，不是缺口。
+> ② KDDW core 整体**并非绝对零 GUI**——widget 触点靠前端宏在编译期裁剪（DragController.cpp:30-37 在 `#ifdef KDDW_FRONTEND_QTWIDGETS` 内 include QWidget/QApplication）；SARibbon 用三库物理隔离 + 扫描门禁，强于宏裁剪（§3.7）。
+> ③ KDDW 引擎**完全无 RTL 概念**（`grep RightToLeft|isRTL|layoutDirection src/core/` 零命中）——SARibbon 的 RTL 入参化（计划 02 S6）无先例可抄，是自主设计项，不得以"参考项目没做"为由裁剪。
 
 #### P3：缺契约层
 
@@ -146,7 +155,7 @@ KDDW 的杀手级实践：`Platform::tests_*` 抽象（`tests_pressOn/tests_wait
 |-----------|-------------------|------|
 | Controller/View 全面分离（每个交互类一个 controller） | **部分采用**：3.0 只为布局引擎引入契约接口；结构控制器（RibbonBar/Category/Panel 的 model）列为 Tier 2，按 QML 实际需求触发（D7） | SARibbon 复杂度集中在几何与渲染，不在交互状态机；全面拆分动 40 个类的内部结构，与 2.x API 兼容目标冲突，收益/成本比不成立 |
 | `core/views/*ViewInterface` 窄接口族 | **采用**（`contract/`） | 布局引擎回调用，规模小、无侵入 |
-| 纯几何 layouting 引擎独立于 GUI | **采用**（`layout/`） | 本方案核心 |
+| 纯几何 layouting 引擎独立于 GUI | **采用**（`layout/`） | 本方案核心。【round2 精确化】KDDW 引擎节点 Item 本身是 QObject（QObject-free 的是契约面）；SARibbon 引擎为无 QObject 的瞬态纯函数，属更彻底的有意分叉（kddw-core-findings.md §一.1，详见 §1.2-P2 批注） |
 | 通用 `Core::View` 巨型接口（约 60 纯虚，`src/core/View.h`） | **不采用** | SARibbon 无跨窗口拖放/平台窗口操作需求 |
 | `Platform` 单例抽象 | **不采用**（3.0） | 无跨前端平台操作需求；若 Tier 2 引入结构控制器时需要 tests 抽象，再引入最小版 |
 | `qtcommon` 中间层（双 Qt 前端共享胶水） | **不采用**（3.0） | SARibbon 的 Qt 胶水量远小于 KDDW（无 Wayland 拖放等）；Qt5Compat 留 core。若日后膨胀可增设 |
@@ -249,6 +258,8 @@ public:
 
 #### 3.4.1 契约接口（contract/，KDDW `LayoutingGuest` 模式的窄化）
 
+**【round2 修订】**以下代码块与计划 02 S4.1-5 的**最终契约代码块**同步（以 02 为准；整合轮1缺口修订 + 轮2增补）。相对原草案的关键变化：① 回写几何字段定名 **`resultGeometry`**——原草案 `QRect geometry` 在双继承（`SARibbonPanelItem : QWidgetItem + 契约`）下与 `QLayoutItem::geometry()` 产生"成员函数 vs 数据成员"歧义、编译失败（02 S4.1-2）；② 新增 **`debugName()`** 默认虚函数（KDDW `LayoutingGuest_p.h:50-53` 同款，`Item.cpp:884-898` 用它做 objectName、dumpLayout 打名字不打地址——黄金测试失败诊断从 "item=0x7ff…" 变成可读名字，kddw-core-findings.md §三.1）；③ 新增 `maximumWidth()`/`stretchFactor()` 两个默认虚（算法实况所需，02 S4.1-1，消费点 SARibbonPanelLayout.cpp:1238/:1244-1246）；④ `rowIndex/columnIndex` 定 **`int`**——2.x `SARibbonPanelItem::rowIndex` 实为 `short`（SARibbonPanelItem.h:51），读/赋值场景隐式转换兼容，全仓无 `short*`/`short&` 取址用法（round2 已预验证 git grep），兼容处理与复核命令见 02 S4.1-3，NOTES.md 记录此微小类型差异；⑤ `rowProportion` 默认值对齐 2.x 构造行为为 `Large`（SARibbonPanelItem.cpp:15，02 S1）；⑥ Category 侧"panel 本体 + separator"双几何经 `SARibbonAbstractCategoryItem` 扩展（02 S4.1-1）。
+
 ```cpp
 // core/contract/SARibbonAbstractLayoutItem.h
 namespace SARibbon::Core {
@@ -257,25 +268,32 @@ class SARIBBON_CORE_EXPORT SARibbonAbstractLayoutItem
 {
 public:
     virtual ~SARibbonAbstractLayoutItem();
-
-    // —— 前端提供（引擎的输入）——
+    // —— 前端提供（引擎输入，全纯虚）——
     virtual QSize sizeHint() const = 0;
     virtual QSize minimumSizeHint() const = 0;
-    virtual bool isHidden() const = 0;                  // 引擎跳过隐藏项
+    virtual bool isHidden() const = 0;   // Panel 侧=action 不可见；Category 侧=QWidgetItem::isEmpty 语义（计划 02 S5.1-1/S6-1，不得统一）
     virtual Qt::Orientations expandingDirections() const = 0;
-
-    // —— 前端实现（引擎的输出回写）——
-    virtual void applyGeometry(const QRect& rect) = 0;  // widgets: widget->setGeometry;
-                                                        // qml: QQuickItem::setGeometry
-
-    // —— 引擎回写（引擎填，双端读取）——
-    int rowIndex = -1;
+    // —— 前端提供（带默认实现，按需覆写）——
+    virtual int maximumWidth() const { return 16777215; }  // =QWIDGETSIZE_MAX 值（该宏属 QtWidgets 头，core 禁 include，用字面量；KDDW 同款做法 Platform.h:342）；默认即 QWidget::maximumWidth() 缺省值，行为等价（cpp:1238 消费）
+    virtual int stretchFactor() const { return 0; }               // 仅 Gallery 适配器覆写（cpp:1244-1246，引擎禁 qobject_cast）
+    virtual QString debugName() const { return {}; }              // 诊断名（KDDW LayoutingGuest_p.h:50 同款），测试输出用
+    // —— 前端实现（引擎输出回写）——
+    virtual void applyGeometry(const QRect& rect) = 0;  // widgets: widget()->setGeometry; qml: QQuickItem 几何
+    // —— 引擎回写字段（引擎填，双端读取；命名避开 QLayoutItem::geometry() 成员函数冲突）——
+    int rowIndex = -1;                 // 2.x 为 short（PanelItem.h:51），契约定 int（见上④）
     int columnIndex = -1;
-    QRect geometry;
+    QRect resultGeometry;              // 对应 2.x itemWillSetGeometry / mWillSetGeometry
     bool isExpandItem = false;
-
     // —— 共享数据 ——
-    RowProportion rowProportion = RowProportion::None;  // 枚举移入 core/global
+    SARibbonRowProportion rowProportion = SARibbonRowProportion::Large;  // 默认值对齐 2.x 构造行为（PanelItem.cpp:15），见计划 02 S1
+};
+
+// Category 专用扩展（panel 本体 + separator 双几何，计划 02 S4.1-1）：
+class SARIBBON_CORE_EXPORT SARibbonAbstractCategoryItem : public SARibbonAbstractLayoutItem
+{
+public:
+    QRect resultSeparatorGeometry;      // 对应 2.x mWillSetSeparatorGeometry（CategoryLayout.h:156）
+    bool isSeparatorHidden = false;     // 引擎输出，适配器据此 hide/show separatorWidget（cpp:538-541 的应用侧）
 };
 }
 ```
@@ -287,15 +305,15 @@ class SARIBBON_CORE_EXPORT SARibbonAbstractLayoutHost
 {
 public:
     virtual ~SARibbonAbstractLayoutHost();
-    virtual const SARibbonMetrics& metrics() const = 0; // 度量来源
+    virtual const SARibbonMetrics& metrics() const = 0;  // 度量来源；isRTL/margins/spacing 等一律走引擎 Input（计划 02 S4.1-4），Host 仅此一个纯虚
 };
 }
 ```
 
 设计要点：
 
-- 接口保持**最小**。sizeHint 缓存策略（2.x 的 `mButtonSizeHintCache`）在引擎内部以 item 指针为 key 实现，`largeHeight` 变化时统一失效——缓存逻辑也随算法进 core，QML 免费获得同等性能优化。
-- **不用** `std::shared_ptr`/句柄层（KDDW 因 Flutter 前端生命周期不同才需要），Qt 前端父子所有权模型足够。
+- 接口保持**最小**：最终纯虚仅 Item 5 个 + Host 1 个，**比 KDDW `LayoutingGuest`（8 纯虚）更窄**——裁掉 host 迁移（`setHost/host()`）、序列化（`id()`）、可见性回写（`setVisible`）三组，均无对应需求，逐项理由见 02 S4.1-5。sizeHint 缓存策略（2.x 的 `mButtonSizeHintCache`）在引擎内部以 item 指针为 key 实现，`largeHeight` 变化时统一失效——缓存逻辑也随算法进 core，QML 免费获得同等性能优化。
+- **不用** `std::shared_ptr`/句柄层（KDDW 因 Flutter 前端生命周期不同才需要），Qt 前端父子所有权模型足够；悬垂防护不抄 KDDW 的 ObjectGuard/beingDestroyed 重方案（Item.cpp:4122-4147），靠适配器不变量：takeAt → 引擎 `removeFromCache(item)`、invalidate → `clearCache()`（02 S5.1-2，2.x 既有清理行为的等价迁移，SARibbonPanelLayout.cpp:302-303/:367-368）。
 
 #### 3.4.2 PanelLayoutEngine（从 `SARibbonPanelLayout::updateGeomArray` + `recalcExpandGeomArray` 提取）
 
@@ -395,12 +413,22 @@ public:
 
 实际做法对齐 KDDW：**接口定义放 core、实现类留 widgets**。widgets 的 `SARibbonElementFactory` 保持 2.x 类名与全部 API（用户子类无感知），只是虚函数的落点改从 core 接口继承。QML 模块 3.0 不提供 ElementFactory（QML 用户用 delegation 定制），接口预留使其 3.x 可以提供而不破坏 core。**若 M1 阶段评估发现接口化成本高，允许降级为"仅命名空间对齐、暂不继承"，列入 D7 决策一并定**——不为纯预留付大成本。
 
-### 3.7 core 的禁区（CI 强制）
+### 3.7 core 的禁区（CI 强制；【round2 修订】两层化）
 
-- 禁止 include：`QWidget`、`QLayout`、`QSS`/`QStyle`、`QQuickItem`、`QQml*`、`QApplication`
+原单层清单未区分"QtGui 合法依赖"与"引擎确定性要求"：`QGuiApplication`/`QScreen`/`QFontMetrics` 属 **QtGui**，S1/S2 合法下沉的暗色模式采集（`isOperatingSystemInDarkMode` 用 QGuiApplication::styleHints）等依赖它们，一刀切会误杀；反之引擎里偷调 `QGuiApplication::layoutDirection()` 又会被放过。round2 按 KDDW 实测定调为**两层门禁**（kddw-core-findings.md §一.3/§三.2；执行细则与扫描命令见计划 02 S8-3）：
+
+**第一层：模块层纯净（硬门，CI 扫描 + 链接检查，`src/core/` 全目录）**
+
+- 禁止 include：`QWidget`、`QApplication`、`QStyle`、`QStyledItemDelegate`、`QLayout`（及 `Q*Layout` 族）、`QQuickItem`、`QQuickPaintedItem`、`QQml*`，以及**模块化 include 路径形式** `<QtWidgets/`、`<QtQuick/`（`#include <QtWidgets/QWidget>` 可绕过裸类名扫描）
 - 禁止链接：`Qt::Widgets`、`Qt::Quick`、`Qt::Qml`
-- 唯一 Qt 模块依赖：`Qt::Core`、`Qt::Gui`
+- 唯一 Qt 模块依赖：`Qt::Core`、`Qt::Gui`——**明确合法（扫描不得误伤）**：`QGuiApplication`/`QScreen`/`QFontMetrics`/`QColor`/`QIcon` 属 QtGui
 - Qt6 下 `QAction` 属 QtGui 但 **Qt5 属 QtWidgets** → core 一律不 include `QAction`（D3 维持方案 a：GalleryItem 整体留 widgets；见 §9-D3/D8）
+
+**第二层：引擎确定性层（引擎专属，CI 定向 grep + 评审门，仅 `src/core/layout/`）**
+
+- 三引擎文件内禁止调用 QGuiApplication 动态状态（`layoutDirection()`/`styleHints()`/`primaryScreen()`/`screens()` 遍历）——引擎必须"同输入同输出"以保黄金测试跨平台有效，这些值只能经 Input/Metrics 字段进来（02 S4.1-4/S3.0）
+- global/theme/metrics 的采集器函数（core 版 `saIsRTL`、`isOperatingSystemInDarkMode` 等）**不受此层约束**——它们本来就是"采集器"
+- KDDW 佐证：`layouting/` 净室对 Platform 的唯一触碰是析构期守卫且被前端宏隔离（Item.cpp:1114-1122）；DPI/屏幕全部数据化（Screen_p.h:41 `devicePixelRatio()` 纯虚由前端实现）
 
 ---
 
@@ -459,6 +487,7 @@ void SARibbonPanelLayout::doLayout()
   **【现实更新：拼写修正已由 2.9.x 完成（f553de7），现仓库公开 API 只有单 n 的 `SARibbonPanel`，
   此别名过渡不再需要——见 plans/3.0/NOTES.md B1；本条仅存档 v1/v2 原始方案】**
 - 2.x 公共 API 全量保留：布局算法下沉是**内部实现替换**，`SARibbonPanelLayout` 类名、公共方法、信号均不变
+- 【round2 修订】转发头与兼容包（旧 `SARibbonBarConfig` 薄壳）的**安装规则**随全部 install/export 规则收进 `SARIBBON_INSTALL` 选项守卫（§6.4）：`add_subdirectory` 嵌入场景（`SARIBBON_INSTALL=OFF`）不产生任何安装物，兼容层语义不变
 
 ---
 
@@ -471,6 +500,8 @@ v1 D5 在 `QQuickPaintedItem` 与"纯 QML/Controls2 Style"之间二选一，两�
 - **结构宿主 = C++ QQuickItem**（`qtquick/views/TabBar.h:44` —— C++ 类，实现 `Core::TabBarViewInterface`，持有 `DockWidgetModel`）；负责接收引擎几何、管理模型、处理事件
 - **视觉叶子 = .qml 文件**（`qtquick/views/qml/TabBar.qml` 等 15 个）组合样式
 - **Instantiator = 声明式包装**（`DockWidgetInstantiator` 等，`QmlTypes.cpp:23-26` 注册）供用户在 QML 里声明式构建
+
+> 【round2 修订】（kddw-qtquick-findings.md §一.1/§一.4）：① 混合模式的宿主↔叶子配对机制已被 round2 深读**全面实证**（握手属性 `tabBarQmlItem`、叶子创建三部曲 QQmlComponent→create→setProperty 注入→双 setParent、析构 deleteLater 禁直接 delete、Base-视觉两层——落地骨架见计划 04 S3 与 appendix-reference-architecture.md §3.3）。② SARibbon P0 **不需要独立 Instantiator 包装类**：KDDW Instantiator 的唯一存在理由是"真身构造需要 QML 解析完才齐的属性（uniqueName）"（DockWidgetInstantiator.h:27-34 注释原文），而 SARibbon 宿主本身就是 QQuickItem，直接 `qmlRegisterType` 即获声明式用法，子项嵌套经 QQuickItem 天然子项树 + `componentComplete()` 向父宿主显式登记成立；Instantiator 模式（连同 `std::optional` 属性缓冲）留作 Tier 2——D7 引入 core controller、宿主变成"薄包装 + 延迟构造真身"时照 KDDW 抄（04 S3 评估结论）。
 
 SARibbonQml 照搬此模式：
 
@@ -508,13 +539,25 @@ ApplicationWindow {
 | `RibbonQuickAccessBar` | C++ 宿主 | metrics | P1（v1 未列，补） |
 | `RibbonGallery` / `RibbonColorButton` / `RibbonMenu` | 后期 | （GalleryItem 在 widgets，需 D8） | P2 |
 
-### 5.3 注册方式（保留 v1 双轨）
+> 【round2 修订】`RibbonMetrics` 形态已在计划 04 S2 定为 **singleton**（attached 形态需"多 RibbonBar 各带不同字体"的真实需求才触发，降为 3.1+ 候选）。本表经 round2 核对无 `qt_add_qml_module`/`QML_ELEMENT` 相关表述——注册单轨化（§5.3）不影响类型清单本身。
 
-Qt5：`saRibbonRegisterQmlTypes(QQmlEngine*)` 命令式；Qt6：`qt_add_qml_module(URI SARibbon VERSION 3.0)`。URI 统一 `SARibbon`，版本 3.0。qmldir/plugin 资源随 qml 模块安装。
+### 5.3 注册方式（【round2 修订】命令式单轨）
+
+**原方案（v1 双轨，保留为历史记录）**：Qt5 `saRibbonRegisterQmlTypes(QQmlEngine*)` 命令式；Qt6 `qt_add_qml_module(URI SARibbon VERSION 3.0)` 声明式；qmldir/plugin 资源随 qml 模块安装。
+
+**round2 修订：默认命令式单轨（Qt5/Qt6 同码），声明式轨降为 3.1+ 可选优化。**裁决出处：kddw-qtquick-findings.md §三.1（计划 04 S1 已落地）+ qwk-build-findings.md §一.5（QWK 侧实证）+ synthesis-findings.md：
+
+- **3.0 唯一路线**：`saRibbonRegisterQmlTypes(QQmlEngine* = nullptr)`（`SA_RIBBON_QML_EXPORT` 导出），实现 = `qmlRegisterType` / `qmlRegisterSingletonInstance` / `qmlRegisterUncreatableType` + `qmlRegisterModule("SARibbon", 3, 0)`，带 static-once 防重入守卫与静态构建 `Q_INIT_RESOURCE` 守卫；QML 叶子全部进 qrc 随 SARibbonQml 库二进制；应用在 `engine.load()` 前显式调用一次（QWK 示例同款，examples/qml/main.cpp:25-27）。
+- **实证（两家生产级库在 Qt6 下均无 `qt_add_qml_module` 先例）**：KDDW 2.0.1 支持 Qt 6.2+（`QT_MIN_VERSION "6.2.0"`，CMakeLists.txt:146——`qt_add_qml_module` 自 6.2 起可用，KDDW 明知而不用），只用命令式注册（QmlTypes.cpp:21-30，Qt5/Qt6 零条件编译；全仓 grep 无 qt_add_qml_module/qmldir）；QWK 1.0.1 quick 模块 7 个源文件零 `QT_VERSION` 分支（qwkquickglobal.cpp:14-25，README.md:246 明确 Qt6 下 URI import 方式不变）；命令式 API 全集在本机双版本 Qt 头同签名存在（04 S1 复核清单）。
+- URI 统一 `SARibbon`，版本 3.0，对外承诺 `import SARibbon 3.0` 不变。
+- **声明式轨触发条件（任一）**：需要 qmltypes IDE 补全 / qmllint / qmlcachegen AOT——3.1+ 按 04 S1"附注：声明式轨预案"启用（round1 对 Qt6QmlMacros 的硬约束核实成果保留在该附注内，知识不丢）；已列入 §9"3.1+ 候选项清单"B-3。
+- 原"qmldir/plugin 资源随 qml 模块安装"一句**作废**：单轨下安装期零 QML 新增产物（§6.1 批注②、03 S6-3 终态结论）。
 
 ### 5.4 主题桥
 
-`RibbonTheme` 单例（`qmlRegisterSingletonType`）包装 core 的 `SARibbonThemeData`：暴露 palette 颜色为 QML 属性、转发 `themeChanged`。QML 控件绑定这些属性 → core 一处切主题，widget 窗口与 QML 窗口同步变化。
+`RibbonTheme` 单例（注册实现定为 `qmlRegisterSingletonInstance`，见下批注）包装 core 的 `SARibbonThemeData`：暴露 palette 颜色为 QML 属性、转发 `themeChanged`。QML 控件绑定这些属性 → core 一处切主题，widget 窗口与 QML 窗口同步变化。
+
+> 【round2 修订】注册前必须 `QQmlEngine::setObjectOwnership(obj, QQmlEngine::CppOwnership)`（04 S1.3/S2.1）——`qmlRegisterSingletonInstance` 注册的对象默认归**引擎**所有，而 RibbonTheme 包装的是 core 进程级单例，不设所有权则多引擎场景（测试逐个建 QQmlEngine）第二次即悬空。`qmlRegisterSingletonType` 回调式（原方案）保留为 3.1+ 声明式轨预案件（04 S2.1 的 `static create()` 转发）。
 
 ### 5.5 与 widgets 的关系（修订 v1 §6.4 的表述）
 
@@ -522,30 +565,48 @@ Qt5：`saRibbonRegisterQmlTypes(QQmlEngine*)` 命令式；Qt6：`qt_add_qml_modu
 
 ---
 
-## 6. 构建体系（保留 v1 §5，增强两点）
+## 6. 构建体系（保留 v1 §5，增强两点；【round2 修订】另增 §6.4 安装守卫选项）
 
 ### 6.1 保留
 
 `sa_add_library` / `sa_sync_include` / 组件化 `SARibbonConfig.cmake` / 命名空间 target / 静态导出宏方案 / `SARIBBON_BUILD_QML` 默认 OFF / amalgamate 按模块改造 / Python 绑定路径适配——全部维持 v1 设计，不赘述。（2026-09 注：QWK 原型宏实名 `qwk_add_library`，`sa_*` 为 SARibbon 侧新命名，由计划 01 S5 实现；现仓库 `cmake/SARibbonUtils.cmake` 仅含一个未被调用的 16 行 `saribbon_set_bin_name` 宏，见 plans/3.0/NOTES.md 与 cross-findings。）
+
+**【round2 修订】两点增补**：
+
+① 所有 install/export/包配置规则收进新增的默认 ON 公共选项 **`SARIBBON_INSTALL`** 守卫，见 §6.4（qwk-build-findings.md §三 D1，已采纳）。
+
+② **QML 安装布局结论**（kddw-qtquick-findings.md §三.2 + qwk-build-findings.md §一.5，与 §5.3 单轨化配套）：QML 叶子经 qrc 随 SARibbonQml 库二进制走，**安装期零新增产物**——无 qmldir/qmltypes/plugin 安装项，SARibbonQml 的安装与普通 C++ 库完全同构（头 + 库 + cmake 包）。实证：KDDW qtquick 前端安装仅头文件+库+cmake 包（src/CMakeLists.txt:634-666）；QWK quick 库同构（src/quick/CMakeLists.txt 全文 38 行 + src/CMakeLists.txt:100-115 统一 install）。`SARibbonConfig.cmake` 的 Qml 组件只需 `find_dependency(Qt Quick/Qml)`（QuickControls2 是否加入取决于计划 04 S5 的叶子实现决策）。计划 01 S11 / 03 S6-3 已按此结论同步。
 
 ### 6.2 增强：core 纯净性门禁（新增）
 
 v1 只有"core 独立编译"一个 CI job，**挡不住** core 源码里 sneak 进 `#include <QWidget>`（QtGui 传递可见性下照样编过）。增加：
 
 ```yaml
-# CI step: core purity scan
+# CI step: core purity scan（【round2 修订】按 §3.7 两层化，清单与计划 02 S8-3 模块层一致）
 - script: |
-    # 1) 头文件扫描：禁用 include 清单
-    python tools/check_core_purity.py src/core/ \
-        --forbid-include QWidget QLayout QStyle QQuickItem QQmlEngine QApplication QAction
-    # 2) 组合构建：Widgets=OFF Qml=ON、Widgets=OFF Qml=OFF 两个矩阵项
+    # 1) 模块层硬门：禁用 include 清单（含模块化路径形式 <QtWidgets/ <QtQuick/；
+    #    QGuiApplication/QScreen/QFontMetrics 属 QtGui 合法依赖，不在清单——见 §3.7）
+    python3 tools/check_core_purity.py src/core/ \
+        --forbid-include QWidget QApplication QStyle QStyledItemDelegate QLayout \
+                         QQuickItem QQuickPaintedItem QQml QAction "<QtWidgets/" "<QtQuick/"
+    # 2) 引擎确定性层：layout/ 引擎禁调 QGuiApplication 动态状态（定向 grep，命中即失败）
+    git grep -n -E "QGuiApplication|QScreen|primaryScreen|styleHints|layoutDirection\(\)" -- src/core/layout/ && exit 1 || exit 0
+    # 3) 组合构建：Widgets=OFF Qml=ON、Widgets=OFF Qml=OFF 两个矩阵项
 ```
 
-扫描脚本进 `tools/`，本地 `cmake --build` 前也建议跑（可选 pre-commit hook）。
+扫描脚本进 `tools/`，本地 `cmake --build` 前也建议跑（可选 pre-commit hook）。第一层由脚本在每次构建/CI 执行；第二层的定向 grep 并入脚本还是独立 CI step，由计划 02 S8-3 执行时选定并记 NOTES。
 
 ### 6.3 增强：测试目录升格（见 §7）
 
 `tests/core/` 承载引擎黄金值测试，成为**双前端共同依赖的契约测试**，CI 中强制最先运行。
+
+### 6.4 【round2 修订】SARIBBON_INSTALL 安装守卫选项（新增）
+
+新增公共选项 **`SARIBBON_INSTALL`（默认 ON）**：全部 `install(TARGETS/EXPORT/DIRECTORY/FILES)`、`SARibbonConfig`/`ConfigVersion` 生成与安装、兼容转发头与旧包名薄壳（§4.4）、qm 翻译安装规则统一收进该选项守卫；`SARIBBON_INSTALL=OFF` 时无任何安装产物，保护 `add_subdirectory` 嵌入场景——宿主工程不被 SARibbon 的 install/export 规则污染（计划 01 S4 第 7 条的 `CMAKE_SOURCE_DIR` 顶层守卫只覆盖 examples/tests，覆盖不到 install，两者互补）。
+
+- 实证：QWK 用 `QWINDOWKIT_INSTALL` 守卫一切安装物（QWK:CMakeLists.txt:13,36-39——GNUInstallDirs/CMakePackageConfigHelpers 仅 INSTALL 时 include；src/CMakeLists.txt:29,100,181——qwkconfig.h 安装、install(TARGETS)+INSTALL_INTERFACE、Config/Targets 生成安装全在守卫内）。
+- 落地：计划 01 S4.3 选项清单已补该行，S5.3/S5.4 骨架的 install 规则、S6.7 的 install(EXPORT)、S11 的包配置/转发头安装均在守卫内；01 S4.2 原"不抄 1"条目已按本决策翻转。
+- 证据出处：qwk-build-findings.md §三 D1；裁决记录 synthesis-findings.md；NOTES.md B10。
 
 ---
 
@@ -573,6 +634,8 @@ void TestPanelLayoutEngine::threeRowMixedProportions()
 - 黄金值先用 2.9.5 跑现有面板录制（保证行为不变），再作为 3.0 回归基线
 - `FakeLayoutItem`（纯内存实现契约接口）使测试无需真实控件，**双前端共享同一套期望值**
 - 覆盖：三行/两行/单行 × Large/Medium/Small 任意排列、隐藏项、expand 项（`recalcExpandGeomArray`）、sizeHint 缓存失效
+- 【round2 修订】**fixture 双介质制**（kddw-core-findings.md §一.5-6/§三.3）：录制介质 **JSON**——dump 工具（`tools/dump_panel_geometry.py`）产出入库 `tests/core/fixtures/recorded/*.json`，可 diff 审查、可重录对账、退化场景可手工构造（KDDW `tests/layouts/*.json` 同款实践：文件名即场景，`invalid*` 族专测畸形输入的优雅处理，回放见 tst_docks.cpp:3464-3485）；回放介质仍是 **C++ 结构体**（`tests/core/layout_fixtures.h`，编译期类型安全），二者对账一致。JSON 是正式交付物而非临时件（计划 02 S5.0-2/S5.0-3 已落地）
+- 【round2 修订】**断言双轨**：绝对黄金值（管"与 2.x 一致"）+ **关系不变量**（管"跨平台/跨字体也恒真"，如"同行项 x 严格递增且互不重叠""列宽=该列最大项宽"——KDDW 引擎测试以关系断言为主，tst_multisplitter.cpp:284-285, 352-364；落地在计划 02 S8-1）。失败时附**诊断 dump**（打印整个 Result 全字段 + 每项输入/输出，KDDW checkSanity 失败前自动 dumpLayout 同款，Item.cpp:738-741, 821-842；落地在 02 S5.0-2 的 fixture_dump.h）
 
 ### 7.2 跨前端一致性套件（KDDW tests_* 模式的轻量版）
 
@@ -590,6 +653,12 @@ widgets 类的测试随类走；主题/颜色测试下沉 `tests/core/`。
 （2026-09 实测：`tests/CMakeLists.txt` 共注册 26 个 `add_saribbon_test()`——`tests/` 顶层
 25 个 .cpp 各一项，另有 `tests/auto/SARibbonThemePalette/tst_themepalette.cpp` 注册为
 `SARibbonThemePaletteTest`；ctest 基线 N₀=26，见 plans/3.0/NOTES.md B8。）
+
+### 7.4 【round2 修订】前瞻条款：错误零容忍（3.x 候选，不进 3.0 验收）
+
+KDDW 以 fatal_logger 执行"错误零容忍"政策：自定义日志 sink 对任何 ≥err 级日志直接 `std::terminate()`（tests/fatal_logger.h:19-32，政策注释原话 "KDDW should be error free"；fatal_logger.cpp:21-58），`main()` 第一件事安装（tests_main.h:40-42）；唯一豁免通道是 `SetExpectedWarning` RAII 白名单（子串匹配则降级为 warn，fatal_logger.cpp:29-37；Platform.h:315-329）。
+
+SARibbon 3.0 的 core 无日志设施（调试打印不随算法迁移，§3.4.2），M1 零成本，本节仅记录政策：**3.1+ 若 core 引入任何日志/警告输出，引擎测试应把非预期 qWarning 视为失败信号**（白名单豁免用 RAII 同款机制）。出处：kddw-core-findings.md §一.5-5/§三.4；已列入 §9"3.1+ 候选项清单"B-4。
 
 ---
 
@@ -617,14 +686,26 @@ widgets 类的测试随类走；主题/颜色测试下沉 `tests/core/`。
 
 | # | 决策 | 建议 |
 |---|------|------|
-| D1 最低 Qt 版本 | **5.15**（维持 v1 建议）。理由补充：`qt_add_qml_module` 需 6.2+，5.15 是最后支持双轨注册的 5.x；QWindowKit 亦以 5.15 为界 | ✅ 采纳 5.15 |
+| D1 最低 Qt 版本 | **5.15**（维持 v1 建议）。理由补充：`qt_add_qml_module` 需 6.2+，5.15 是最后支持双轨注册的 5.x；QWindowKit 亦以 5.15 为界。【round2 修订】注册单轨化（§5.3）后"双轨注册"这一理由失效，但 **5.15 结论不变**：KDDW 的 Qt5 下限同为 5.15（KDDW:CMakeLists.txt:149），且命令式单轨所依赖的 `qmlRegisterSingletonInstance` 需 Qt 5.14+（本机双版本 qqml.h 复核，04 S1）——5.15 仍是命令式轨在 5.x 的稳妥基线 | ✅ 采纳 5.15 |
 | D2 target 命名 | `SARibbonCore/Widgets/Qml` + 别名 `SARibbon::Widgets`；**额外**提供 `SARibbonBar` 兼容别名 target 一个版本周期 | ✅ v1 方案 + 别名增强 |
 | D3 GalleryItem 归属 | **方案 a：整体留 widgets**。补充论证：KDDW 为解同类问题自研 `Core::Action`，成本一个独立抽象层——仅当 Gallery 要进 QML（P2/Tier 3）时才值得付，与 D8 合并决策 | ✅ 维持 a |
 | D4 colorWidgets 宏 | 废除独立宏并入 widgets 导出宏（v1 建议）。colorWidgets 是纯 widget 控件，无 QML 共享诉求 | ✅ 维持 |
-| D5 QML 实现技术 | **废弃二选一，改混合模式**：结构宿主 C++ QQuickItem（接引擎几何/模型/事件），视觉叶子 QML 优先、复杂自绘项允许 QQuickPaintedItem（KDDW qtquick 同款）。渲染层允许混用，结构层禁止 QML 自行计算布局 | 🔄 v2 修订 |
+| D5 QML 实现技术 | **废弃二选一，改混合模式**：结构宿主 C++ QQuickItem（接引擎几何/模型/事件），视觉叶子 QML 优先、复杂自绘项允许 QQuickPaintedItem（KDDW qtquick 同款）。渲染层允许混用，结构层禁止 QML 自行计算布局 | 🔄 v2 修订。【round2 修订】混合模式被 round2 深读**全面实证**（宿主/叶子配对机制：握手属性、叶子创建三部曲、Base-视觉两层——kddw-qtquick-findings.md §一.1/.2，落地骨架在 04 S3）；注册配套从"双轨"改为**命令式单轨**（§5.3），D5 结论本身不变且被强化 |
 | **D6 布局引擎提取深度**（新） | 本方案 §3.4 全量（三引擎 + 契约 + metrics）。替代 v1 的"布局全留 widgets" | 建议：全量。若 M1 排期压力，**降级顺序**：BarGeometryEngine 可只下沉度量部分（doLayout 几何留 widgets），Panel/Category 引擎不可降——它们是 QML P0 的一致性根基 |
 | **D7 结构控制器时机**（新） | Tier 2（3.1）。gate 条件：出现 QML 用户需要 ① C++ 运行时驱动同一 ribbon 数据双端显示，或 ② 跨端运行时定制。满足任一才启动 controller 拆分（widgets 类转为视图+API 转发，工作量大）；否则维持"双端各自结构管理 + 共享枚举/语义/一致性测试" | 建议：3.0 不做，写死 gate |
-| **D8 core Action 抽象**（新） | 不做（3.0/3.1）。触发条件：Gallery 或 ActionsManager 需要进 core（即 QML P2 启动时）。届时按 KDDW `Core::Action` 模式评估：包装层 vs Qt6-only 双轨 | 建议：推迟 |
+| **D8 core Action 抽象**（新） | 不做（3.0/3.1）。触发条件：Gallery 或 ActionsManager 需要进 core（即 QML P2 启动时）。届时按 KDDW `Core::Action` 模式评估：包装层 vs Qt6-only 双轨 | 建议：推迟。【round2 补证】KDDW 单价量化：core 142 行 + 三前端 264 行 ≈ 406 行基础设施只服务 core 内 2 个消费点（kddw-core-findings.md §一.7），SARibbon 触发时成本下限即 400+ 行 × 消费面放大 + Qt5/Qt6 QAction 归属双轨 |
+
+### 3.1+ 候选项清单（【round2 修订】新增，round2 评审收口；本表各项均**不进 3.0 验收**）
+
+| # | 候选项 | 一句话说明 | 出处（round2 findings） |
+|---|--------|-----------|------------------------|
+| B-1 | SizingInfo 式显式中间态结构体化 | Panel 引擎的 `columMaxWidth` 等散落局部量收敛为可拷贝/可序列化/可单测的中间态结构体，加权分配段（recalcExpandGeomArray cpp:1275-1329）提为静态纯函数（对照 KDDW `calculateSqueezes`，Item.cpp:3069-3136）；**M1 严禁执行**，防纯 move 纪律被"顺手优化"破坏（02 S5.2-2 已注明） | kddw-core-findings.md §三.6 |
+| B-2 | CI 多编译器轴与 MinGW 独立 job | linux clang、windows clang-cl 轴 + msys2/MinGW 独立 job（QWK-upstream ci.yml 的 matrix include 组织；价值真实——QWK 注释明言 win32 context 在 MinGW 下才暴露 SDK 头差异），3.0 CI 范围已由 01 S10/03 S5 锁定，扩轴成本与 runner 时间显著，3.x 单独评估 | qwk-build-findings.md §三 D3 |
+| B-3 | qt_add_qml_module 声明式轨 | 触发条件：需要 qmltypes IDE 补全 / qmllint / qmlcachegen AOT 任一；按 04 S1"附注：声明式轨预案"的硬约束启用，届时 qmldir/plugin 安装布局**无参考实现**，需在 Qt6.5/6.8 两版实测并增补 03 S6-3 安装清单 | kddw-qtquick-findings.md §三.1；qwk-build-findings.md §三 D5 |
+| B-4 | 错误零容忍（fatal_logger 轻量版） | core 引入日志设施后，引擎测试把非预期 qWarning 视为失败（§7.4 前瞻条款），白名单豁免用 RAII 机制 | kddw-core-findings.md §三.4 |
+| B-5 | 多引擎注册时序与 Q_INIT_RESOURCE × AUTORCC 交互验证 | "第二个引擎在注册发生之前/之后创建"的时序组合在 tst_themeBridge 各测一次；`Q_INIT_RESOURCE(saribbon_qml)` 的 qrc 基名与资源初始化符号以实际构建产物核实（Q_INIT_RESOURCE 不可在 namespace 内调用；sa_add_library 若对 qrc 有特殊处理则宏名随之调整） | kddw-qtquick-findings.md §四.1/§四.2 |
+| B-6 | Loader 宿主引用转发 | P0 叶子直接 `setParentItem(宿主)`、不引 Loader；3.1+ 若菜单弹出等场景引入 Loader/Popup，需逐层转发 panelCpp 或改显式 setProperty 注入（KDDW Loader 转发属性先例 Group.qml:171-175），禁止混用两种取宿主方式 | kddw-qtquick-findings.md §四.3 |
+| B-7 | QuickControls2 库侧链接决策 | 由 04 S5 按 RibbonToolButton 菜单实现（Controls Menu/Popup vs 自绘叶子）定案（预期 3.0 执行期定案并记 NOTES，此处列为观察项：若 3.0 未定案则顺延 3.1；KDDW 因叶子用 Controls TabBar/TabButton 而 PUBLIC 链接，src/CMakeLists.txt:495-496） | kddw-qtquick-findings.md §四.5 |
 
 ---
 
@@ -639,7 +720,8 @@ widgets 类的测试随类走；主题/颜色测试下沉 `tests/core/`。
 | R5 黄金值测试平台字体差异 | 测试固定字体（QFont("fixed test font") 或部署字体文件），不依赖系统字体 |
 | R6 Tier 2 结构控制器迟迟不做导致双端行为漂移 | §7.2 一致性套件持续在 CI 对拍双端语义；漂移在测试层暴露而非用户层 |
 | R7 双分支同步（2.x bugfix vs 3.0） | 维持 v1 策略：2.x bugfix 尽量落在将整体搬移的文件内；**引擎文件除外**——引擎内的 2.x fix 必须手动同步 core 版并跑黄金测试 |
-| R8 core 纯净性被悄悄破坏 | §6.2 扫描脚本 CI 前置，merge blocking |
+| R8 core 纯净性被悄悄破坏 | §6.2 扫描脚本 CI 前置，merge blocking；【round2 修订】扫描按 §3.7 两层化（模块层清单扩 `<QtWidgets/` 路径形式；引擎确定性层禁 QGuiApplication 动态状态） |
+| R9 注册单轨化残余风险：应用漏调 `saRibbonRegisterQmlTypes()` 致 `import SARibbon 3.0` 报 "module not installed"（§5.3 round2 修订引入；声明式轨的 plugin 加载/RESOURCE_PREFIX/静态 plugin_init 整类风险已随单轨化消除） | 示例/迁移指南模板固定该调用（04 S6/S9）；04 S1 导入专项检查（注册后无 qmldir import 成功）+ 静态组合 Q_INIT_RESOURCE 检查；错误排障说明进 QML 文档（04 风险表同款） |
 
 ---
 
@@ -648,10 +730,10 @@ widgets 类的测试随类走；主题/颜色测试下沉 `tests/core/`。
 | KDDockWidgets | SARibbon 3.0 (v2) | 说明 |
 |---------------|-------------------|------|
 | `src/core/`（114 文件：69 .h + 45 .cpp，全部 controller + 引擎） | `src/core/`（theme/metrics/layout/contract/data/factory） | KDDW 全面 controller 化；SARibbon 取其引擎与契约，控制器分期（D7） |
-| `src/core/layouting/`（Item/SizingInfo，零 GUI） | `src/core/layout/`（三引擎 + FakeItem 可测） | 同一思想：布局引擎独立成库内最纯净的部分 |
+| `src/core/layouting/`（Item/SizingInfo，零 GUI） | `src/core/layout/`（三引擎 + FakeItem 可测） | 同一思想：布局引擎独立成库内最纯净的部分。【round2 精确化】KDDW 的"零 GUI"指 include 面净室与契约面 QObject-free——Item 本身是 QObject（Item_p.h:190-192），且引擎无 RTL；SARibbon 引擎为无 QObject 的瞬态纯函数 + RTL 入参化，均属有意分叉（kddw-core-findings.md §一.1/§一.5） |
 | `core/views/TabBarViewInterface.h`（窄契约） | `contract/SARibbonAbstractLayoutItem.h` 等 | KDDW 契约面向 controller↔view；SARibbon 面向 engine↔前端 |
 | `src/qtcommon/`（双 Qt 前端共享胶水） | 不设（Qt5Compat 留 core） | SARibbon 胶水量小，膨胀时再设 |
 | `src/qtwidgets/views/` + `src/qtquick/views/`（每 controller 一对视图） | widgets 控件 + qml C++ 宿主 | SARibbon widgets 侧保持 2.x 类名做视图 |
-| `qtquick/*Instantiator` + `views/qml/*.qml` | `Ribbon*` QML 类型（C++ 宿主 + qml 叶子） | 声明式 API 模式一致 |
+| `qtquick/*Instantiator` + `views/qml/*.qml` | `Ribbon*` QML 类型（C++ 宿主 + qml 叶子） | 声明式 API 模式一致。【round2 修订】P0 不需要 Instantiator 包装类（宿主本身是 QQuickItem，直接注册即可声明式使用，04 S3/§5.1 批注）；Tier 2 引入 controller 时再照抄 |
 | `Core::Platform` + `tests_*` 跨前端测试 | `tests/common/` 一致性套件 | 取其神（同套测试双端跑），不搬其形（Platform 单例） |
 | 单库拼合构建 | QWK 三库 | 保持 v1 |

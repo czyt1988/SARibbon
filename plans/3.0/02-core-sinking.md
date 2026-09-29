@@ -106,7 +106,16 @@ NOTES.md 并单独提交修复（修复前后黄金测试都要过）。引擎�
    注意：`FpContextCategoryHighlight` 类型别名现定义于 `SARibbonBar.h`（widgets）。数据表入 core 需先把该 `using` 提升到 core（`std::function<QColor(const QColor&)>`，无 widget 依赖，可安全 move，widgets 侧留别名转发）。
 3. `SARibbonThemePalette.*` → `git mv` 到 `src/core/theme/`（已核实无 widget 依赖；`replaceQssTokens` 虽签名只碰 QString+palette，但按 v2 §3.2 "QSS 模板渲染留 widgets" 的决策**留在 widgets** 的 SARibbonUtil 中，core 化 palette 后 widgets 侧照常可用）。
 4. widgets 的 `SA::applyRibbonTheme` **两个重载签名与行为完全不变**（它是公共 API），实现改为"写 `SARibbonThemeData` → 读回数据刷 QSS/设置 bar 属性"或维持现状仅数据来源改为 core 表——**M1 期间允许先只做数据表 move、不改函数体**，信号驱动重构可留到 QML 桥（计划 04）真正需要时，避免为纯 widgets 场景引入无消费者的信号链（在 NOTES.md 记录取舍）。
-5. ThemeData 需要单例访问（双前端共享一个信号源）：`SARibbonThemeData::instance()`（core 内，QObject 单例——注意 core 不能 include QApplication，用 `Q_GLOBAL_STATIC` 或父子挂到 `QCoreApplication::instance()`，在 NOTES.md 记录选型）。
+5. ThemeData 需要单例访问（双前端共享一个信号源）：`SARibbonThemeData::instance()`。**选型已定案（评审轮2，依据 KDDW 2.0.1 三个单例的实证）：Meyers 函数内静态对象**，不挂 QCoreApplication，不用 Q_GLOBAL_STATIC：
+   ```cpp
+   // src/core/theme/SARibbonThemeData.cpp
+   SARibbonThemeData* SARibbonThemeData::instance()
+   {
+       static SARibbonThemeData s_themeData;  // C++11 magic static，线程安全初始化
+       return &s_themeData;
+   }
+   ```
+   理由与 KDDW 证据：① KDDW 三个 core 单例无一挂 app 对象、无一用 Q_GLOBAL_STATIC——Config 就是同款 Meyers 静态对象（Config.cpp:76-78），DockRegistry 源码注释明言"please don't change this to be deleted at static dtor time with Q_GLOBAL_STATIC"（DockRegistry.cpp:82-84，它为 LSAN 采用"空时自删"，ThemeData 常驻且极小，不需要）；② 挂 `QCoreApplication::instance()` 有硬伤：`instance()` 可能在 app 创建前被调（单测/静态初始化期），parent 为 null 且永不补挂，行为随调用时序漂移。**注意事项（写进代码注释与 NOTES.md）**：析构函数不得发射信号、不得触碰 QCoreApplication（静态析构期 app 已亡）；监听方 widgets/QML 桥先亡无风险（QObject 析构自动断连）；对象线程亲和为主线程（首次调用应在主线程，跨线程只读数据字段可以，连接信号自动按接收者线程投递）。
 
 **验证**：构建绿 + ctest == N₀（`SARibbonThemeAutoSwitchTest`、`ThemeCoverageTest`、`SARibbonUtilTest` 重点跑——暗色自动切换依赖 `SA::isOperatingSystemInDarkMode`/`isEnableSystemDarkModeAutoSwitch`，其调用点在 SARibbonMainWindow.cpp:242、SARibbonWidget.cpp:55，函数去向见附录 B）+ 6 张主题截图对比。
 
@@ -131,6 +140,7 @@ NOTES.md 并单独提交修复（修复前后黄金测试都要过）。引擎�
   - `calcCategoryHeight()` cpp:430-443：依赖 `fontMetrics().lineSpacing()` + `ribbonBar->isThreeRowStyle()/isSingleRowStyle()`（可由 `RibbonStyles` 值代替，`SARibbonBar::isThreeRowStyle(s)` 本身是静态纯函数，Bar.h 已声明）+ `panelTitleHeight` 字段 → 入参化后纯。
 - `calcMinTabBarWidth()` **不能纯 move**：`SARibbonTabBar::sizeHint()`/`tabMargin()` 是控件查询。处理方式二选一（NOTES.md 记录）：(a) 留在 `SARibbonBarLayout`（v2 §3.4.4 表格允许，它本质是"引擎引用"的输入采集）；(b) metrics 提供 `minTabBarWidth(int tabBarSizeHintWidth, const QMargins& tabMargin)` 纯函数，适配器采集入参。
 - `SARibbonMetrics` 的输入**不止 v2 §3.3 示例的 QFontMetrics + devicePixelRatio**，按上述实况至少还需：`pmTabBarBaseHeight/pmTabBarTabHSpace/pmTabBarTabOverlap/pmTitleBarHeight`（style 派生 int）、`userDef*` 三个可选覆盖（对应 PrivateData 的 `std::unique_ptr<int>` 语义，cpp:32-34，可用 `std::optional<int>` 或 -1 哨兵，选型记 NOTES.md）。
+- **"适配器采集平台数值 → 引擎只读纯数据"模式有 KDDW 同构实证（评审轮2）**：KDDW core 全程无 QStyle，其"平台像素值"（separatorThickness、绝对 min/max 尺寸）由前端经 Config 门面写入引擎静态量（Config.cpp:156-174, 235-256 → Item_p.h:211-213），DPI/屏幕尺寸则抽象为 core `Screen` 接口由前端实现（Screen_p.h:41 `devicePixelRatio()` 纯虚）。SARibbon 的 Metrics 实例字段方案与之同构且**更优**：每 layout 实例一份字段，天然多窗口隔离，且无 KDDW"必须在创建任何窗口前设置全局静态量"的启动时序约束（Config.h:60-62）——`userDef*` 覆盖走实例字段而非全局 Config 正是对这一点的规避，执行时不得把任何度量常量改回全局静态。
 
 **S3.1 建类**：新建 `src/core/metrics/SARibbonMetrics.h/.cpp`（同步目录平铺为 `SARibbonCore/SARibbonMetrics.h`）：
 - 输入：`QFontMetrics`（构造传入）、`devicePixelRatio`、上述 style 派生 pixelMetric 字段；core 内**不查询任何控件**（v2 要点）。
@@ -169,15 +179,67 @@ NOTES.md 并单独提交修复（修复前后黄金测试都要过）。引擎�
    - `isHidden()` 语义按布局不同（见 S5.1-1 修正）：Panel 侧 = action 不可见，Category 侧 = widget 隐藏——契约只约定"引擎跳过 isHidden()==true 的项"，具体语义由各前端 item 实现；
    - Category 侧每 item 有**两块几何**（panel 本体 + separatorWidget，SARibbonCategoryLayout.h:155-156 `mWillSetGeometry`/`mWillSetSeparatorGeometry`），契约单一 `geometry` 字段不够——为 Category 引擎定义 core 侧扩展结构（如 `SARibbonAbstractCategoryItem : SARibbonAbstractLayoutItem` 增加 `separatorGeometry` 字段与 `separatorHidden` 输出），不要塞进通用契约。
 2. **命名冲突警示（必须规避）**：v2 草案把引擎回写字段命名为 `QRect geometry;`。双继承场景（`SARibbonPanelItem : QWidgetItem + 契约`）下，`QLayoutItem::geometry()` 是继承来的成员函数，与契约数据成员 `geometry` 同名——派生类中 `item->geometry` 将产生"成员函数 vs 数据成员"歧义，编译失败。契约字段改名（建议 `resultGeometry` 或 `itemGeometry`），v2 草案此处不可照抄。
-3. 共享数据字段（rowIndex/columnIndex/isExpandItem/rowProportion）与 2.x `SARibbonPanelItem` 公有字段同名同型（PanelItem.h:51-57），搬入基类后删除派生类字段即可保持源码兼容；`itemWillSetGeometry`（h:53）是 2.x 公有字段，若引擎统一写契约字段，为兼容存量代码可在 `SARibbonPanelItem` 保留 `QRect& itemWillSetGeometry` 引用成员绑定到基类字段（构造时初始化），或在 NOTES.md 记录为 3.0 允许的源码破坏项（3.0 是大版本，二选一，定稿记 NOTES.md）。
+3. 共享数据字段（rowIndex/columnIndex/isExpandItem/rowProportion）与 2.x `SARibbonPanelItem` 公有字段同名（PanelItem.h:51-57），搬入基类后删除派生类字段即可保持源码兼容——**类型注意（评审轮2修正，轮1"同名同型"不准确）**：2.x 的 `rowIndex` 是 **`short`**（PanelItem.h:51），契约基类定为 `int`（与 v2 草案一致，引擎内部计算全 int，避免 short/int 混用提升警告）；读/赋值场景隐式转换兼容，仅 `short*`/`short&` 取址绑定会断——**轮2已预验证**：`git grep -n "rowIndex" -- src/ tests/ example/ sip/ pyside6/ pyqt6/` 命中全部为赋值/读取（无取址用法），sip/pyside6 未以 short 暴露该字段；落地时按同命令复核一遍即可，NOTES.md 记录此微小类型差异；`itemWillSetGeometry`（h:53）是 2.x 公有字段，若引擎统一写契约字段，为兼容存量代码可在 `SARibbonPanelItem` 保留 `QRect& itemWillSetGeometry` 引用成员绑定到基类字段（构造时初始化），或在 NOTES.md 记录为 3.0 允许的源码破坏项（3.0 是大版本，二选一，定稿记 NOTES.md）。
 4. Host 接口仅 `metrics()` 不够：引擎还需要 `isRTL`（现读 `SA::saIsRTL()`，其实现用 `QApplication::layoutDirection()`，SARibbonUtil.cpp:307，core 禁调）、contentsMargins、spacing（现读 `QLayout::spacing()`/`contentsMargins()`，cpp:804-805）。这些走引擎 `Input` 结构（值传参）而非 Host 虚接口，保持引擎无状态依赖。
+5. **对照 KDDW 的设计说明（评审轮2新增，含最终契约代码块）**。KDDW 契约 `LayoutingGuest` 为 8 纯虚（minSize/maxSizeHint/setGeometry/setVisible/geometry/setHost/host/id）+ 2 默认虚（freed/debugName）+ 3 个 KDBindings 信号（LayoutingGuest_p.h:31-70）。SARibbon 契约与之的关键分叉及理由：
+   - **不需要 `id()`/序列化**：KDDW 的 QString id 只服务 LayoutSaver 的 JSON 存恢（Item.cpp:242-243, 252-257）；SARibbon 3.0 无布局保存需求（CustomizeData 的 keyValue 是数据层字符串，不是布局 id）。identity = item 指针（单次 layout() 调用期 + 引擎缓存 key），悬垂防护不抄 KDDW 的 ObjectGuard/beingDestroyed 重方案（Item.cpp:4122-4147），改用 2.x 既有不变量：takeAt 移除缓存条目（cpp:302-303）+ invalidate() 全清（cpp:367-368），见 S5.1-2。
+   - **不需要 `setHost/host()`**：KDDW guest 会在 host 间迁移（浮动窗口）；SARibbon item 不跨 panel 迁移。
+   - **`isHidden()` 只读、不做 KDDW 式 `setVisible` 回写**：KDDW 引擎常驻且有 placeholder 语义（关闭的 dock 保留不可见 Item 待原位恢复，Item.cpp:874-882），可见性权威在引擎，故必须回写；SARibbon 引擎是瞬态纯函数（layout() 一进一出），可见性权威在 widget/action 侧，引擎的显隐决策（如 Category separator）经 Result 标志流向适配器批处理（S6-3），信息流等价而纯净性更强。
+   - **新增 `debugName()`（默认空实现）**：抄 KDDW（LayoutingGuest_p.h:50-53，Item.cpp:884-898 用它做诊断名、dumpLayout 打名字不打地址）；widgets 适配器返回 `widget()->objectName()`，黄金测试失败诊断可读（S5.0-2）。
+   - **信号面为零**：KDDW 用 KDBindings 信号做约束变化通知（layoutInvalidated→重拉 min/max，Item.cpp:212-213, 913-931），因为它要服务非 Qt 前端；SARibbon 双前端都在 Qt 内，约束变化由 QLayout::invalidate 驱动重入 layout()，契约不需要任何信号/回调注册。
+   - **最终契约代码块（S4.1 落地以此为准，整合 v2 §3.4.1 草案 + 轮1缺口修订 + 轮2增补；round2 整合已把 v2 §3.4.1 代码块同步为本块——两处字段/方法名一致，本块仍是执行依据）**：
+   ```cpp
+   // src/core/contract/SARibbonAbstractLayoutItem.h
+   namespace SARibbon::Core {
+   class SARIBBON_CORE_EXPORT SARibbonAbstractLayoutItem
+   {
+   public:
+       virtual ~SARibbonAbstractLayoutItem();
+       // —— 前端提供（引擎输入，全纯虚）——
+       virtual QSize sizeHint() const = 0;
+       virtual QSize minimumSizeHint() const = 0;
+       virtual bool isHidden() const = 0;   // Panel 侧=action 不可见；Category 侧=QWidgetItem::isEmpty 语义（S5.1-1/S6-1，不得统一）
+       virtual Qt::Orientations expandingDirections() const = 0;
+       // —— 前端提供（带默认实现，按需覆写）——
+       virtual int maximumWidth() const { return 16777215; }  // =QWIDGETSIZE_MAX 值（该宏属 QtWidgets 头，core 禁 include，用字面量；KDDW 同款做法 Platform.h:342）；默认即 QWidget::maximumWidth() 缺省值，行为等价（cpp:1238 消费）
+       virtual int stretchFactor() const { return 0; }               // 仅 Gallery 适配器覆写（cpp:1244-1246，引擎禁 qobject_cast）
+       virtual QString debugName() const { return {}; }              // 诊断名（KDDW LayoutingGuest_p.h:50 同款），测试输出用
+       // —— 前端实现（引擎输出回写）——
+       virtual void applyGeometry(const QRect& rect) = 0;  // widgets: widget()->setGeometry; qml: QQuickItem 几何
+       // —— 引擎回写字段（引擎填，双端读取；命名避开 QLayoutItem::geometry() 成员函数冲突，见上第 2 条）——
+       int rowIndex = -1;                 // 2.x 为 short（PanelItem.h:51），契约定 int，见上第 3 条
+       int columnIndex = -1;
+       QRect resultGeometry;              // 对应 2.x itemWillSetGeometry / mWillSetGeometry
+       bool isExpandItem = false;
+       // —— 共享数据 ——
+       SARibbonRowProportion rowProportion = SARibbonRowProportion::Large;  // 默认值对齐 2.x 构造行为（PanelItem.cpp:15），见 S1
+   };
+   // Category 专用扩展（panel 本体 + separator 双几何，S4.1-1）：
+   class SARIBBON_CORE_EXPORT SARibbonAbstractCategoryItem : public SARibbonAbstractLayoutItem
+   {
+   public:
+       QRect resultSeparatorGeometry;      // 对应 2.x mWillSetSeparatorGeometry（CategoryLayout.h:156）
+       bool isSeparatorHidden = false;     // 引擎输出，适配器据此 hide/show separatorWidget（cpp:538-541 的应用侧）
+   };
+   }
+   // src/core/contract/SARibbonAbstractLayoutHost.h
+   namespace SARibbon::Core {
+   class SARIBBON_CORE_EXPORT SARibbonAbstractLayoutHost
+   {
+   public:
+       virtual ~SARibbonAbstractLayoutHost();
+       virtual const SARibbonMetrics& metrics() const = 0;  // isRTL/margins/spacing 等一律走引擎 Input（S4.1-4），Host 仅此一个纯虚
+   };
+   }
+   ```
+   对照结论：KDDW Guest 契约 8 纯虚，SARibbon 采纳其"输入约束 + 几何回写"骨架，裁掉 host 迁移/序列化(id)/可见性回写(setVisible)三组（均无对应需求，理由见上），补 maximumWidth/stretchFactor/debugName 三个 SARibbon 算法实况所需（全部带默认实现，不加重实现负担）——最终纯虚仅 Item 5 个 + Host 1 个，**比 KDDW 更窄**，符合 v2 §3.4.1"接口保持最小"要点。
 
 **S4.2 data/**：`SARibbonCustomizeData.h/.cpp` 已核实成员构成（h:21-204）：
 - **纯数据部分（入 core）**：`ActionType` 枚举（h:33-51，16 个值 UnknowActionType=0 … ChangeQuickActionOrderActionType=15）+ 公有字段 `int indexValue`（h:159）、`QString keyValue`（h:176）、`QString categoryObjNameValue`（h:187）、`QString panelObjNameValue`（h:198）、`actionRowProportionValue`（h:200，类型改用 core 自由枚举 `SARibbonRowProportion`）+ 私有 `ActionType mType`（h:202）+ `isValid()`（cpp:68-71，纯：`actionType() != UnknowActionType`）。
 - **含 widget 依赖部分（留 widgets）**：`mActionsManagerPointer`（h:203，`SARibbonActionsManager*`，**类中唯一指针成员**；无 QWidget*/QAction* 直接成员）、`apply(SARibbonBar*)`（cpp:86 起，内部经 manager 取 QAction、操作 quickAccessBar）、全部 `make*CustomizeData` 静态工厂（其中 8 个签名带 `SARibbonActionsManager*`）、`simplify()`（cpp:926，**待核实**其实现是否只读纯字段——核实命令：`sed -n '926,1000p' src/widgets/SARibbonCustomizeData.cpp`，若纯则一并入 core）、`isCanCustomize/setCanCustomize(QObject*)`（基于动态属性 `SA_RIBBON_BAR_PROP_CAN_CUSTOMIZE`，QObject 属 QtCore 技术上可入 core，但语义绑定 widgets 类，建议留 widgets，NOTES.md 记录）。
 - 现头文件 include `SARibbonActionsManager.h` 与 `SARibbonPanel.h`（h:4-5）——core 版记录结构必须摆脱这两个 include（RowProportion 用 core 枚举，manager 指针留 widgets 壳类）。widgets 旧类**包含**（组合）core 记录结构，公共 API（含 Q_DECLARE_METATYPE h:205、typedef h:207）不变。
 
-**S4.3 factory/**（D6/D7 允许降级）：已核实 `SARibbonElementFactory`（SARibbonElementFactory.h:42-83）共 **17 个虚 create 函数 + 虚析构**，全部返回 widgets 类型指针（createRibbonBar/TabBar/ApplicationButton/Category/ContextCategory/Panel/SeparatorWidget/Gallery/GalleryGroup/ToolButton/StackedWidget/ButtonGroupWidget(createButtonGroupWidget)/QuickAccessBar/SystemButtonBar(createWindowButtonGroup)/PanelOptionButton/TitleIconWidget/PanelLabel），入参为 `QWidget*` 或 `SARibbonBar*`/`SARibbonPanel*`；单例入口 `SARibbonElementManager::instance()`（SARibbonElementManager.h:57）+ 宏 `RibbonSubElementFactory`（h:69-70）。core 接口化只能返回 void*/不透明句柄，成本高且 3.0 无 QML 消费者——**确认执行降级路径**：只建 `src/core/factory/SARibbonElementFactoryInterface.h` 占位头（仅虚析构 + 注释），NOTES.md 记录"接口化推迟到 QML 需要时（D7 gate）"。
+**S4.3 factory/**（D6/D7 允许降级）：已核实 `SARibbonElementFactory`（SARibbonElementFactory.h:42-83）共 **17 个虚 create 函数 + 虚析构**，全部返回 widgets 类型指针（createRibbonBar/TabBar/ApplicationButton/Category/ContextCategory/Panel/SeparatorWidget/Gallery/GalleryGroup/ToolButton/StackedWidget/ButtonGroupWidget(createButtonGroupWidget)/QuickAccessBar/SystemButtonBar(createWindowButtonGroup)/PanelOptionButton/TitleIconWidget/PanelLabel），入参为 `QWidget*` 或 `SARibbonBar*`/`SARibbonPanel*`；单例入口 `SARibbonElementManager::instance()`（SARibbonElementManager.h:57）+ 宏 `RibbonSubElementFactory`（h:69-70）。core 接口化只能返回 void*/不透明句柄，成本高且 3.0 无 QML 消费者——**确认执行降级路径**：只建 `src/core/factory/SARibbonElementFactoryInterface.h` 占位头（仅虚析构 + 注释），NOTES.md 记录"接口化推迟到 QML 需要时（D7 gate）"。**KDDW 成本实证（评审轮2，同时支撑 D8"推迟 core Action 抽象"）**：KDDW 为跨前端抽象一个 `Core::Action` 付出 core 142 行（Action.h 65 + Action.cpp 36 + Action_p.h 41）+ 三前端实现 264 行 ≈ **406 行基础设施，而 core 内消费点只有 2 处**（DockWidget.h:151/157 的 toggleAction/floatAction）——SARibbon 的 action 面（属性系统/`_sa_RowProportion` 动态属性/ActionsManager 分组语义）远大于此，D8 触发时的成本下限即 400+ 行 × 消费面放大；其完全体形态（factory 接口放 core、实现留前端、Config 可整体替换：ViewFactory.h:68-136）与本节降级路径方向一致，QML 需要时按附录 F 衔接。
 
 **验证**：构建绿 + ctest == N₀ + 纯净扫描绿。
 
@@ -189,6 +251,11 @@ NOTES.md 并单独提交修复（修复前后黄金测试都要过）。引擎�
 1. 新建 `tests/core/` 目录骨架与 `tests/core/CMakeLists.txt`（独立小工程，链接 `SARibbon::Core` + `Qt::Test`，无 widget 依赖；根 CMakeLists 在 `SARIBBON_BUILD_TESTS` 下 `add_subdirectory(tests/core)`，**CI 中最先运行**，v2 §6.3）。**测试注册名必须带 `core_` 前缀或设置 `LABELS core`**（现有 tests/CMakeLists.txt 的 `add_saribbon_test` 以文件名作 ctest 测试名，如 `SARibbonUtilTest`，不含 "core" 字样；S9 的 `ctest -R core`/`-L core` 过滤依赖此约定）。
 2. 写 `tests/core/layout_fixtures.h`：`struct PanelCase { 名字; 项列表(sizeHint,minSizeHint,hidden,expanding,maxWidth,stretchFactor,rowProportion); availableRect; contentsMargins; spacing; Input(mode,showPanelTitle,enableExpanding,isRTL,titleTextWidth,optionBtnSize); 期望输出(每项 resultGeometry/rowIndex/columnIndex + titleGeometry/optionBtnGeometry + Result{sizeHint,columnCount,largeHeight}) }`。
    **确定性关键**：fixture 的 sizeHint/minSizeHint/maxWidth 全部是**显式录入的 QSize/int 输入**，Step B 后的 core 测试用 FakeItem 直接喂这些值——**引擎级黄金测试完全不依赖字体与平台**（字体只影响 S5.0-3 录制工具产出的输入值，不影响"输入→输出"映射的确定性）。
+   **fixture 四项补强（评审轮2，对照 KDDW 测试实践）**：
+   - **失败诊断 dump**：提供 `tests/core/fixture_dump.h` helper——首个断言失败即打印整个 case 名 + Result 全字段 + 每项的输入（sizeHint/maxWidth/stretch/rowProportion/debugName）与实际输出（resultGeometry/rowIndex/columnIndex），对照 KDDW checkSanity 失败前自动 `dumpLayout()` 打全树的做法（Item.cpp:738-741, 821-842）；契约字段全 public，测试侧直接打印，core 不引入任何日志设施。
+   - **退化输入 fixture 族**：仿 KDDW `tests/layouts/invalid*.json`（畸形真实场景录制回放，tst_docks.cpp:3464-3485）——空 items、零宽/负宽 availableRect、全隐藏项、min 总和超可用宽（溢出）、maxWidth<minimumSizeHint 的矛盾输入；先对 2.9.5 录制"不崩溃 + 实际行为"作黄金值（**只录不改**，2.x 若有未定义行为原样记录并在 NOTES.md 标注）。
+   - **dpr 变体**：每个代表性 case 增加 devicePixelRatio=1.0 与 2.0 两份 Metrics 输入，断言取整确定性（对照 KDDW 把 DPI 数据化为 Screen 抽象输入、引擎不查屏，Screen_p.h:41）。
+   - **录制 JSON 保留为可审查源**：S5.0-3 dump 工具产出的 JSON 入库到 `tests/core/fixtures/recorded/*.json`（黄金值的可 diff 审查介质；layout_fixtures.h 的 C++ 结构体仍是回放介质，二者对账一致）。
 3. 写 `tools/dump_panel_geometry.py` + 配套 `tools/dump_panel_geometry.cpp`（临时 main，**链接 2.9.5 的 SARibbonWidgets**，用真实 `SARibbonPanel` 构造各类场景：3 行/2 行/单行模式 × Large/Medium/Small 任意排列 × 隐藏项 × expand 项）。读取路径已核实可行：`SARibbonPanelLayout::updateGeomArray()` 是公共无参函数（h:61，cpp:547-550 转发 `updateGeomArray(geometry())`），调用后直接读 `SARibbonPanelItem` 的公共字段 `itemWillSetGeometry`/`rowIndex`/`columnIndex`（h:51-53）；或 `panel->show()` + `QApplication::processEvents()` 激活布局后读 `item->geometry()`（QWidgetItem 继承，= widget 几何）。CI/无显示环境用 `QT_QPA_PLATFORM=offscreen`。打印 JSON，跑一次，人工抽查 3 例与截图一致，fixture 固化为黄金值。
    - **字体（细化 v2 R5）**：`QFont("SimSun", 9)` 在 linux/mac CI 不存在（现有 25 个测试均未固定字体，已核实无 SimSun 引用），会导致录制值不可复现。方案：随仓库部署一开源字体（如 Noto Sans SC 或 DejaVu Sans）到 `tests/core/fonts/`，录制工具与 core 测试启动时 `QFontDatabase::addApplicationFont(":/...或磁盘路径")` 后 `QFont(该家族, 9)`；录制前断言 `QFontInfo(f).family()` 命中（防静默 fallback）。**同一 fixture 的录制与回放必须用同一字体文件**；由于 fixture 输入是显式尺寸（见 S5.0-2），Qt5/Qt6、win/linux 的字体度量差异不会进入引擎断言。
 4. `tests/core/tst_panelLayoutEngineBaseline.cpp`：此时尚无引擎，先**直接调 2.9.5 的 `SARibbonPanelLayout`**（该测试临时链接 widgets，文件头注释注明"Step B 后改链 core 引擎"）跑 fixture 全绿。
@@ -199,6 +266,7 @@ NOTES.md 并单独提交修复（修复前后黄金测试都要过）。引擎�
    **`isHidden()` 语义修正（评审轮1，旧稿错误）**：旧稿写 `isHidden() = widget()->isHidden() && !widget()->isWindow()`"照抄 2.x isEmpty() 语义"——**错**。那是 `QWidgetItem::isEmpty()` 的默认语义；2.x 的 `SARibbonPanelItem` 覆盖了它：`isEmpty() const { return action == nullptr || !action->isVisible(); }`（SARibbonPanelItem.cpp:43-46），算法各处 `item->isEmpty()` 判断的都是 **action 可见性**。因此契约 `isHidden()` 的 Panel 侧实现必须是 `return action == nullptr || !action->isVisible();`（与现 `isEmpty()` 等价），照抄 widget isHidden 会把"action 隐藏但 widget 未隐藏"的项错误参与布局，黄金测试必炸。
    `applyGeometry(rect)` = `widget()->setGeometry(rect)`；`maximumWidth()` = `widget()->maximumWidth()`；`stretchFactor()` = Gallery 时返回其值否则 0（见 S4.1-1）；`rowProportion` 字段改用契约基类的（删除派生类字段，类型经 S1 的 using 别名保持源码兼容；注意构造默认值 Large 的对齐问题，见 S1）。
 2. `updateGeomArray(const QRect&)`（cpp:795-1186）/`recalcExpandGeomArray`（cpp:1204-1371）内全部 `item->widget()->xxx()` 改为经接口：sizeHint 缓存（实名已核实 `mButtonSizeHintCache`，`QHash<QWidget*, QSize>`，h:174；失效锚 `mButtonSizeHintCacheLargeHeight` h:175，逻辑 cpp:826-829）的 key 从 widget 指针改为 item 指针；所有几何写入维持"先写 `itemWillSetGeometry`、doLayout 统一应用"的 2.x 现状（cpp:636 `item->widget()->setGeometry(item->itemWillSetGeometry)`——**2.x 已是两阶段**，Step A 只需把第二阶段归口到 `applyGeometry`）。
+   **缓存生命周期不变量（评审轮2新增，纯 move 时最易丢的副作用）**：key 换指针后，2.x 的两处既有清理必须同步换成引擎缓存 API——① `takeAt()` 移除单个条目（cpp:302-303 `mButtonSizeHintCache.remove(item->widget())`，原注释 "Remove from cache to prevent stale entries"；且 takeAt 内 widget 被 `deleteLater()`，若漏掉此清理，新 item 复用地址会命中陈旧缓存）→ 引擎提供 `removeFromCache(SARibbonAbstractLayoutItem*)`，适配器 takeAt 调用；② `invalidate()` 全清 + 锚复位（cpp:367-368）→ 引擎 `clearCache()`。这是 SARibbon 对 KDDW"ObjectGuard/beingDestroyed 生命周期握手"（Item.cpp:4122-4147, 900-911）的轻量替代：引擎瞬态调用 + 适配器持缓存，悬垂防护完全靠这两条不变量，**G-A/G-B 验证门需含"takeAt 后重建同尺寸新 item，断言无陈旧缓存命中"用例**。
 3. 标题/optionButton **不进 items 循环**（实况与 v2 示意不同）：2.x 在 `updateGeomArray` 末尾特殊处理——标题宽度用 `mTitleLabel->fontMetrics()` 对 `panel->panelName()` 求 `horizontalAdvance + 4`（cpp:1085-1087）并回抬 totalWidth（cpp:1088-1091），optionButton 几何依赖标题几何（cpp:1095-1122），`optionActionButtonSize()` 本身是纯函数（cpp:1530-1533：有标题 12×12，无标题 mTitleHeight 见方）。Step A 做法：适配器把 `titleTextWidth`（上述 fontMetrics 计算结果）与 `optionBtnSize` 作为引擎 Input，引擎算出 `titleGeometry/optionBtnGeometry` 放 Result 回写；**不要**把标题/optionButton 伪项化塞进装箱循环——那会改变算法结构，违反"纯 move"。RTL 分支里 `mTitleLabel->setAlignment(...)`（cpp:1160-1167）是 widget 操作，留适配器，按引擎 Result 的 isRTL 应用。
 4. **逐函数机械替换，不重排逻辑**；每改一个函数就构建 + 跑 S5.0 基线测试。函数级去向总表见**附录 C**（40 个函数逐一定性：move 引擎 / 留适配器 / 死代码）。
 
@@ -207,8 +275,9 @@ NOTES.md 并单独提交修复（修复前后黄金测试都要过）。引擎�
 **提交**：`重构：SARibbonPanelLayout 算法改经契约接口读写（Step A）`
 
 **S5.2 Step B 纯 move 搬移**：
-1. 新建 `src/core/layout/SARibbonPanelLayoutEngine.h/.cpp`（同步目录平铺 `SARibbonCore/SARibbonPanelLayoutEngine.h`）：`Result layout(QVector<SARibbonAbstractLayoutItem*>&, const QRect&, const SARibbonMetrics&, const Input&)` + sizeHint 缓存结构（以 item 指针为 key，`largeHeight` 变化统一失效，v2 §3.4.1 要点）。引擎持有缓存实例由适配器保存（无状态引擎 + 适配器持缓存，或引擎带缓存——**选引擎带缓存、适配器长期持有引擎实例**，与 2.x 生命周期一致）。`Input` 至少含：mode/showPanelTitle/enableExpanding/isRTL/contentsMargins/spacing/titleTextWidth(-1=无标题)/optionBtnSize/titleHeight/titleSpace；`Result` 至少含：sizeHint/columnCount/largeHeight/titleGeometry/optionBtnGeometry/totalWidth。引擎还需 `panelHeightHint` 公式——`SARibbonPanel::panelHeightHint(fm, layMode, panelTitleHeight)`（SARibbonPanel.h:344，cpp:1587-1608）**已核实是静态纯函数**（仅 fm.lineSpacing() × 系数 + titleHeight），随引擎 move 进 core（SARibbonPanel 侧保留转发以兼容公共 API）。
+1. 新建 `src/core/layout/SARibbonPanelLayoutEngine.h/.cpp`（同步目录平铺 `SARibbonCore/SARibbonPanelLayoutEngine.h`）：`Result layout(QVector<SARibbonAbstractLayoutItem*>&, const QRect&, const SARibbonMetrics&, const Input&)` + sizeHint 缓存结构（以 item 指针为 key，`largeHeight` 变化统一失效，v2 §3.4.1 要点）。引擎持有缓存实例由适配器保存（无状态引擎 + 适配器持缓存，或引擎带缓存——**选引擎带缓存、适配器长期持有引擎实例**，与 2.x 生命周期一致）。缓存公共 API 随迁：`removeFromCache(item)`/`clearCache()`（对应 S5.1-2 不变量，适配器 takeAt/invalidate 调用；`invalidateButtonSizeHintCache(QWidget*)` 重载经 key 映射转发或标记 deprecated，见 S5.2-3）。`Input` 至少含：mode/showPanelTitle/enableExpanding/isRTL/contentsMargins/spacing/titleTextWidth(-1=无标题)/optionBtnSize/titleHeight/titleSpace；`Result` 至少含：sizeHint/columnCount/largeHeight/titleGeometry/optionBtnGeometry/totalWidth。引擎还需 `panelHeightHint` 公式——`SARibbonPanel::panelHeightHint(fm, layMode, panelTitleHeight)`（SARibbonPanel.h:344，cpp:1587-1608）**已核实是静态纯函数**（仅 fm.lineSpacing() × 系数 + titleHeight），随引擎 move 进 core（SARibbonPanel 侧保留转发以兼容公共 API）。
 2. `updateGeomArray(const QRect&)` + `recalcExpandGeomArray` 函数体**整体 move** 进 `layout()`，`widget()` 相关残留全数已在 Step A 消除；调试打印（实名已核实：宏 `SARibbonPanelLayout_DEBUG_PRINT`，cpp:14-15 默认 0；伴生宏 `SARibbonPanelLayout_HELP_DRAW_RECT` cpp:27；静态计数器 `s_p_debug_seq`/`s_p_doLayoutDepth`）**不随迁**，留适配器（v2 §3.4.2 末段）。**死代码警示**：`columnWidthInfo`（h:165，cpp:1388-1398）在 2.9.5 已无任何调用者（仅注释提及，recalc 优化后废弃）——**不 move**；建议 S8 清扫时删除并单独提交（删除私有死函数不破坏 API），或保留原地并在 NOTES.md 记录。
+   **禁止顺手结构体化（评审轮2新增）**：KDDW 把中间计算状态显式化为可序列化的 `SizingInfo::List` 快照（Item_p.h:93-188；算法三段式"快照→纯函数→统一回写"，Item.cpp:3021-3067），Panel 侧的 `columMaxWidth` 等散量按此收敛会更可测——但那是**结构重构，M1 纯 move 纪律禁止**；列为 3.1 引擎优化项（见 round2 findings 设计级建议 6）。唯一例外：Category 侧已有的 `SizeHintCollection`（SARibbonCategoryLayout.cpp:30-35）本身就是半显式中间态，S6 搬移时**保留其结构体形态**、不得打散回局部变量。
 3. widgets 侧 `SARibbonPanelLayout`：`doLayout()`/`sizeHint()`/`setGeometry()` 契约为"collectItems → mEngine.layout(...) → items 逐个 applyGeometry → show/hide 批处理与标题应用 → 通知重绘"（v2 §4.2 示意）；**重入守卫（cpp:1831-1843 `setGeometry` 的 `mInDoLayout` 检查，h:190；doLayout 内 RAII guard cpp:612-620）、LayoutRequest 投递、QLayout 系统交互全部留在适配器**（v2 R2）。公共 API 全保留：无参 `updateGeomArray()`（h:61）退化为一行转发（注意它是**公共 API**，不可删），`invalidate()`（cpp:356-370，含清缓存副作用）改为"清引擎缓存 + QLayout::invalidate"，`invalidateButtonSizeHintCache()` 两个重载（cpp:563/579）转发引擎缓存 API（QWidget* 版重载按 key 映射处理或标记 deprecated，NOTES.md 记录）。行数目标修正：v2 的"< 300 行"是对适配逻辑的估计，实测 PanelLayout.cpp 还有约 40 个属性存取/QLayout 重写/工厂函数留守（见附录 C），**行数不作硬门**，以验收门"算法体零残留"（S8-2 的标记物 grep）为准。
 4. `tests/core/tst_panelLayoutEngine.cpp`：改为链接 core，`FakeLayoutItem`（纯内存实现契约接口，喂 fixture 的显式 sizeHint/maxWidth/stretch）跑同一 fixture；删除 S5.0 的 widgets 版基线测试（或保留为 `tests/widgets/` 的适配器级回归）。CI：`tests/core` 不再依赖 widgets。
 
@@ -241,7 +310,7 @@ NOTES.md 并单独提交修复（修复前后黄金测试都要过）。引擎�
 
 ### S8 黄金测试补全 + widgets 侧残留清扫
 
-1. 覆盖矩阵补全（v2 §7.1）：三行/两行/单行 × Large/Medium/Small 任意排列、隐藏项、expand 项（`recalcExpandGeomArray`，含 Gallery stretchFactor 加权分支 cpp:1275-1329）、sizeHint 缓存失效（改 metrics 再 layout 断言新值；对应 cpp:826-829 的 largeHeight 锚定逻辑）、RTL 镜像（cpp:1136-1168）。
+1. 覆盖矩阵补全（v2 §7.1）：三行/两行/单行 × Large/Medium/Small 任意排列、隐藏项、expand 项（`recalcExpandGeomArray`，含 Gallery stretchFactor 加权分支 cpp:1275-1329）、sizeHint 缓存失效（改 metrics 再 layout 断言新值；对应 cpp:826-829 的 largeHeight 锚定逻辑）、RTL 镜像（cpp:1136-1168）。**矩阵四类补强（评审轮2，对照 KDDW）**：① **关系不变量断言**与绝对黄金值并用——如"同行项 x 严格递增且互不重叠""列宽 = 该列最大项宽""Result.sizeHint ≥ 各项 min 之和 + spacing"（KDDW 引擎测试以关系断言为主：`CHECK(item3->x() > item2->x())`、`CHECK_EQ(container3->height(), item3->height() + st + item31->height())`，tst_multisplitter.cpp:284-285, 352-364；黄金值管"与 2.x 一致"，不变量管"跨平台恒真"）；② **退化输入族**入矩阵（空 items/零宽 rect/全隐藏/溢出/矛盾约束，见 S5.0-2）；③ **dpr 变体**入矩阵（dpr=1.0/2.0，见 S5.0-2）；④ **takeAt 陈旧缓存用例**（S5.1-2 不变量的验证门）。
 2. 残留清扫校验（**命令修正**：`updateGeomArray`/`invalidateButtonSizeHintCache` 是保留的公共 API 转发壳，按函数名 grep 必然命中，不能作为判据；改按**算法体内部标记物**检查）：
    ```bash
    git grep -n -E "columMaxWidth|yMediumRow|ySmallRow|columnExpandInfo|spacingRow" -- src/widgets/
@@ -249,6 +318,12 @@ NOTES.md 并单独提交修复（修复前后黄金测试都要过）。引擎�
    ```
    两者均应零命中（算法体已全在 core；R4-禁止双实现）。`columnWidthInfo` 死代码处置见 S5.2-2。
 3. 运行 `python tools/check_core_purity.py src/core`；core-only 构建 `cmake -S . -B build-3.0-coreonly -DSARIBBON_BUILD_WIDGETS=OFF` + `cmake --build` 通过。
+   **纯净门禁分两层（评审轮2细化，对 v2 §3.7 清单的执行语义定调；KDDW 实证见 round2 findings 一-3。round2 整合注：v2 §3.7 已修订为与本节一致的两层表述，v2 §6.2 的 CI 扫描示例已同步两层命令）**：
+   - **模块层（硬门，CI 阻断）**：`src/core/` 全目录禁止 include QtWidgets/QtQuick 头、禁止链接 Qt::Widgets/Qt::Quick。扫描清单在 v2 §3.7 基础上扩充为：`QWidget`、`QApplication`、`QStyle`、`QStyledItemDelegate`、`QLayout`（及 `Q*Layout` 族）、`QQuickItem`、`QQml`、以及**模块化 include 路径形式** `<QtWidgets/`、`<QtQuick/`（裸类名扫描可被其绕过）。**明确合法（不得误伤）**：`QGuiApplication`/`QScreen`/`QFontMetrics`/`QColor`/`QIcon` 属 QtGui——S1 的 `isOperatingSystemInDarkMode`（QGuiApplication::styleHints）、S2 的 ThemeData 等合法依赖它们；`QAction` 维持 v2 §3.7 的 Qt5/Qt6 归属分歧处理（core 一律不 include）。
+   - **确定性层（引擎专属，CI 定向 grep + 评审门）**：`src/core/layout/` 三引擎文件内禁止调用 QGuiApplication 的动态状态（`layoutDirection()`/`styleHints()`/`primaryScreen()`/`screens()`）——引擎必须"同输入同输出"以保黄金测试跨平台有效，这些值只能经 Input/Metrics 字段进来（S4.1-4、S3.0）。global/theme/metrics 的采集器函数不受此层约束。KDDW 佐证：其 layouting/ 净室对 Platform 的唯一触碰是析构期守卫且被前端宏隔离（Item.cpp:1114-1122），DPI/屏幕全部数据化（Screen_p.h:41）。扫描命令（进 check_core_purity.py 或 CI step）：
+   ```bash
+   git grep -n -E "QGuiApplication|QScreen|primaryScreen|styleHints|layoutDirection\(\)" -- src/core/layout/ && exit 1 || exit 0
+   ```
 4. 6 张截图终验 + 度量对照表复核。
 
 **提交**：`测试：黄金几何测试覆盖矩阵补全；清扫 widgets 侧算法残留`
@@ -261,7 +336,7 @@ NOTES.md 并单独提交修复（修复前后黄金测试都要过）。引擎�
 
 ### S10 文档与收尾
 
-1. `docs/zh/dev-guide/` 新增或更新：core 模块结构说明（六子系统）、契约接口用法、引擎适配器模式、"纯计算归 core"checklist（v2 §2.2 六问照抄成中文小节）。
+1. `docs/zh/dev-guide/` 新增或更新：core 模块结构说明（六子系统）、契约接口用法、引擎适配器模式、"纯计算归 core"checklist（v2 §2.2 六问照抄成中文小节）；**附最小 FakeItem 走查示例**（评审轮2，仿 KDDW 的独立复用示例 `src/core/layouting/examples/qtwidgets/main.cpp:14-30`——用裸 QWidget 子类化三个 layouting 接口即可驱动引擎，证明契约面自足）：dev-guide 用 tests/core 的 FakeLayoutItem 展示"不建 QApplication 跑一次 PanelLayoutEngine::layout()"的完整代码路径。
 2. 更新 AGENTS.md 项目结构段（`src/core/` 各子目录）。
 3. NOTES.md 汇总：每笔 Step B 的 diff 行数、度量对照表结论、降级决策（D6/D7/S4.3）。
 
@@ -304,6 +379,13 @@ NOTES.md 并单独提交修复（修复前后黄金测试都要过）。引擎�
 - 旧稿 `isHidden()` 照抄 widget-isHidden 语义错误：Panel 侧 2.x `isEmpty()` 实为 action 可见性判断（S5.1-1）。
 - v2 metrics 示例 `spacing = 1` 与实测 Panel 默认 `setSpacing(2)` 不符（S3.1 常量表）。
 - `SARibbonPanelLayout::columnWidthInfo` 是死代码（无调用者），不随算法迁移（S5.2-2）。
+
+评审轮2（KDDW core 深读，证据详见 [reviews/round2/kddw-core-findings.md](reviews/round2/kddw-core-findings.md)）新增已核实偏差与决策：
+- 轮1 S4.1-3"共享数据字段同名**同型**"不准确：2.x `rowIndex` 是 `short`（SARibbonPanelItem.h:51），契约定 `int`，处置与验证命令见 S4.1-3。
+- KDDW core 并非绝对零 GUI（widget 触点靠前端宏裁剪：DragController.cpp:30-37 等），其 `layouting/` 子目录才是真净室——v2 §3.7 禁区清单按"模块层/确定性层"两层执行，扩充与豁免清单见 S8-3。
+- "引擎不持有 QObject"的通行说法需纠偏：KDDW 引擎节点 Item 本身是 QObject（Item_p.h:190-192，Qt 前端 Core::Object=QObject，QtCompat_p.h:83），QObject-free 的是契约面（Guest/Host/Separator）；SARibbon 引擎连 Item 层 QObject 都不需要（瞬态纯函数 + Result 返回），是比 KDDW 更彻底的形态，属有意分叉而非缺口。
+- ThemeData 单例选型定案：Meyers 函数内静态对象（S2.1-5），Q_GLOBAL_STATIC 与挂 QCoreApplication 两案否决。
+- KDDW 引擎完全无 RTL 支持（src/core/ grep RightToLeft/isRTL/layoutDirection 零命中）——SARibbon 的 RTL 入参化设计无先例可抄，S6-2/S8-1 的 RTL fixture 是唯一保障，不得以"参考项目没做"为由裁剪。
 
 ---
 
@@ -368,7 +450,7 @@ NOTES.md 并单独提交修复（修复前后黄金测试都要过）。引擎�
 | `insertAction` | 169 | 适配器 | 结构管理 |
 | `setOptionAction` | 201 | 适配器 | 创建 optionBtn（widget） |
 | `isHaveOptionAction` | 246 | 适配器 | Input 数据源 |
-| `itemAt` / `takeAt` / `count` | 264 / 285 / 319 | 适配器 | QLayout 协议 |
+| `itemAt` / `takeAt` / `count` | 264 / 285 / 319 | 适配器 | QLayout 协议；**takeAt 含缓存清理副作用**（cpp:302-303 remove + widget deleteLater），Step A/B 改为调引擎 `removeFromCache(item)`，不得丢（S5.1-2 不变量） |
 | `isEmpty` | 335 | 适配器 | **QLayout 语义**：`mItems.isEmpty()`，与 item 级 isEmpty 无关 |
 | `invalidate` | 356-370 | 适配器 | mDirty + 清引擎缓存 + QLayout::invalidate |
 | `expandingDirections` | 383 | 适配器 | 恒 Qt::Horizontal |
@@ -436,4 +518,29 @@ NOTES.md 并单独提交修复（修复前后黄金测试都要过）。引擎�
 | `layoutCategory` | 1430-1445 | 适配器 | widget 摆放 |
 | `resizeInLooseStyle` | 1446-1742 | **留 widgets**（D6） | 约 300 行 widget 摆放（quickAccess/appButton/tabBar/context/systemButtons/stacked 全部实控件） |
 | `resizeInCompactStyle` | 1743-1993 | **留 widgets**（D6） | 约 250 行，同上 |
+
+## 附录 F：Tier2 结构控制器接口预案（评审轮2新增；**仅 3.1+ D7 gate 触发后生效，M1 不实施**）
+
+目的：若 Tier2 做 RibbonBar/Category/Panel 的结构控制器下沉（v2 D7），接口形态照此预案，避免届时重新发明。依据 KDDW `core/views/*ViewInterface` 族的实测形态（2.0.1）：
+
+1. **每控制器一个窄接口，只含控制器需要命令视图的方法**。KDDW 实测规模：DockWidgetViewInterface 2 个虚函数、SideBar 3、MainWindow/Stack/TitleBar 各 4、Group 5、TabBar 11（`grep -c virtual src/core/views/*ViewInterface.h`）。SARibbon 对应示例（Category）：
+   ```cpp
+   // 3.1 才建：src/core/contract/SARibbonCategoryViewInterface.h
+   class SARibbonCategoryViewInterface
+   {
+   public:
+       explicit SARibbonCategoryViewInterface(SARibbonCategoryController* c);  // ctor 收控制器并存 protected const 成员（KDDW TabBarViewInterface.h:33,57 形态）
+       virtual ~SARibbonCategoryViewInterface();
+       virtual void applyPanelGeometry(int index, const QRect&) = 0;   // 控制器算好，视图只执行
+       virtual void setScrollButtonsVisible(bool left, bool right) = 0;
+       virtual void setScrollButtonsGeometry(const QRect& l, const QRect& r);  // 可选能力给默认实现（KDDW :36-38 setTabsAreMovable 形态）
+       virtual int nonContentHeight() const = 0;                        // 视图回供控制器的唯一"平台数值"（对照 KDDW GroupViewInterface.h:36 唯一纯虚）
+       virtual QString panelText(int index) const { return {}; }        // 测试专用方法允许进接口但必须注明（KDDW TabBarViewInterface.h:40-42 text() 先例）
+   protected:
+       SARibbonCategoryController* const m_controller;
+   };
+   ```
+2. **控制器消费方式**：KDDW 控制器持通用 View、用 `dynamic_cast<XxxViewInterface*>(view())` 取窄接口（TabBar.cpp:70,158）。SARibbon 无 god-View（v2 §2.3 已否决 Core::View 巨型接口），控制器直接持对应窄接口指针即可，**不需要 dynamic_cast 层**。
+3. **视图创建走 factory**：接口定义放 core、实现类留 widgets/QML，经 `SARibbonElementFactoryInterface` 创建（KDDW ViewFactory.h:68-136 + Config::setViewFactory 可整体替换的形态；S4.3 占位头即其衔接点）。
+4. **不抄的部分**：KDDW 窄接口建立在 god-View + Controller 基类（Controller.h:48-103）之上，且信号用 KDBindings 以兼容 Flutter——SARibbon 双前端皆 Qt，用 Qt 信号槽；控制器基类是否需要，等 D7 触发时按实际控制器数量再定，不预建。
 

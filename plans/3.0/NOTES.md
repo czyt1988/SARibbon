@@ -95,6 +95,42 @@
   的相对路径断裂——修正建议已记入 cross-findings 交 01 的修订 agent。
 - 影响计划：01（S7、P3 的 N₀ 记录）
 
+### B9：QML 注册路线单轨化（与 v2 原文冲突，round2 已修订）
+
+- 日期：2026-09-29（round2 评审发现，round2 整合裁决采纳）
+- 发现位置：round2 评审（04 S1 路线决策段，原标"⚠️设计级变更待整合者复核"）；冲突对象为
+  v2 计划 §5.3 原文（"保留 v1 双轨：Qt5 命令式 / Qt6 qt_add_qml_module"）与 §1.1-4、§0"保留"行
+- 证据：KDDW 2.0.1 支持 Qt 6.2+（`QT_MIN_VERSION "6.2.0"`，KDDW:CMakeLists.txt:146——
+  qt_add_qml_module 自 6.2 起可用，明知而不用）却只用命令式注册（src/qtquick/QmlTypes.cpp:21-30，
+  Qt5/Qt6 零条件编译；全仓 grep 无 qt_add_qml_module/qmldir）；QWK 1.0.1 quick 模块 7 个源文件
+  零 QT_VERSION 分支（qwkquickglobal.cpp:14-25，README.md:246 明确 Qt6 下 URI import 不变）；
+  命令式 API 全集在本机 Qt 5.14.2/6.7.3 头文件同签名存在（逐项行号见
+  reviews/round2/kddw-qtquick-findings.md §一.3）
+- 处理：整合裁决**采纳单轨化**——v2 §5.3 已修订为"默认命令式单轨（Qt5/Qt6 同码），声明式轨
+  降为 3.1+ 可选优化（触发条件：qmltypes 补全/qmllint/qmlcachegen 任一）"，原双轨表述保留为
+  历史记录；v2 §0/§1.1-4/§5.4/§9-D5/§10-R9 相应加批注；04 S1 的"待整合者复核"标记已改为
+  "已复核采纳"；01 S6-5 实证注记与 03 S6-3 安装预警按终态更新。QML 安装布局结论随之定案：
+  叶子进 qrc 随库二进制、安装期零新增产物（v2 §6.1 批注②）。裁决详情见
+  reviews/round2/synthesis-findings.md
+- 影响计划：04（S1/S2/S6/S7/风险表）、01（S6-5）、03（S6-3）、v2（§0/§1.1/§5.1-§5.4/§6.1/§9/§10）
+
+### B10：新增 SARIBBON_INSTALL 安装守卫选项（与 v2/01 原文冲突，round2 已修订）
+
+- 日期：2026-09-29（round2 评审建议 D1，round2 整合裁决采纳）
+- 发现位置：round2 评审（reviews/round2/qwk-build-findings.md §三 D1）；冲突对象为
+  01 S4.2 原"不抄 1：QWINDOWKIT_INSTALL 安装守卫选项"条目（原文写"是否新增属设计级决策，
+  本计划正文不擅自加"）与 v2 §6.1（原无此选项）
+- 证据：QWK 用 `QWINDOWKIT_INSTALL` 守卫一切安装物（QWK:CMakeLists.txt:13,36-39——
+  GNUInstallDirs/CMakePackageConfigHelpers 仅 INSTALL 时 include；src/CMakeLists.txt:29,100,181——
+  config 头安装、install(TARGETS)+INSTALL_INTERFACE、Config/Targets 生成安装全在守卫内）；
+  SARibbon 2.9.5 的 install 规则无条件生效，`add_subdirectory` 嵌入场景会污染宿主工程的
+  install/export 规则；01 S4 第 7 条的 CMAKE_SOURCE_DIR 顶层守卫只覆盖 examples/tests，覆盖不到 install
+- 处理：整合裁决**采纳**——v2 新增 §6.4（`SARIBBON_INSTALL` 默认 ON，全部
+  install(TARGETS/EXPORT/DIRECTORY/FILES)、Config/ConfigVersion 生成安装、兼容转发头与旧包名
+  薄壳、qm 翻译安装收进守卫）；01 S4.3 选项清单补行、S4.1 处置表同步、S4.2"不抄 1"翻转为
+  "已采纳"、S5.3/S5.4/S6.7/S11 的 install 规则加守卫注记；03 S6-3 复核前提注明"以默认 ON 执行"
+- 影响计划：01（S4/S5/S6.7/S11/S12）、03（S6）、v2（§4.4/§6.1/§6.4）
+
 ---
 
 ## 执行中追加（模板，勿删）

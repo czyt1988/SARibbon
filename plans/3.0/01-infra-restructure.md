@@ -165,7 +165,7 @@ git commit -m "文档：新增 3.0 重构执行计划（plans/3.0）"
 
    消费者证据：`src/SARibbonBar/SARibbonBarVersionInfo.h.in` 用 `@SARIBBON_VERSION_MAJOR@` 等三宏与 `#cmakedefine SARIBBON_VERSION "@SARIBBON_VERSION@"`；`src/SARibbonBar/CMakeLists.txt:2` `project(SARibbonBar ... VERSION ${SARIBBON_VERSION})`；10 个 example 的 `set_target_properties(... VERSION ${SARIBBON_VERSION})`。
    注：本条只改 CMake 工程版本；`vcpkg.json`（现写 2.8.0）、`pyproject*.toml`、`changlog.md` 的版本元数据归计划 03/04，此处不动、记入 NOTES。
-3. 选项统一（全部 `option()` 带英文描述）：`SARIBBON_BUILD_WIDGETS`(ON)、`SARIBBON_BUILD_QML`(OFF)、`SARIBBON_BUILD_STATIC_LIBS`(OFF)、`SARIBBON_BUILD_EXAMPLES`(ON)、`SARIBBON_BUILD_TESTS`(OFF)、`SARIBBON_USE_FRAMELESS_LIB`(OFF)、`SARIBBON_ENABLE_SNAPLAYOUT`(OFF)、`SARIBBON_INSTALL_IN_CURRENT_DIR`(win ON/其他 OFF，现 L23-27 写法保留)。
+3. 选项统一（全部 `option()` 带英文描述）：`SARIBBON_BUILD_WIDGETS`(ON)、`SARIBBON_BUILD_QML`(OFF)、`SARIBBON_BUILD_STATIC_LIBS`(OFF)、`SARIBBON_BUILD_EXAMPLES`(ON)、`SARIBBON_BUILD_TESTS`(OFF)、`SARIBBON_USE_FRAMELESS_LIB`(OFF)、`SARIBBON_ENABLE_SNAPLAYOUT`(OFF)、`SARIBBON_INSTALL_IN_CURRENT_DIR`(win ON/其他 OFF，现 L23-27 写法保留)、**`SARIBBON_INSTALL`(ON)**（round2 D1 采纳，v2 §6.4/NOTES B10：全部 install/export/包配置规则收进守卫，保护 `add_subdirectory` 嵌入场景；**与 `SARIBBON_INSTALL_IN_CURRENT_DIR`（安装目的地选项）是两个不同选项，勿混淆**——前者管"装不装"，后者管"装到哪"）。
    兼容旧名一版：`if(DEFINED BUILD_TESTS) set(SARIBBON_BUILD_TESTS "${BUILD_TESTS}" CACHE BOOL "" FORCE) endif()` 并 `message(DEPRECATION ...)` 提示改名（shim 只兜底 CI/脚本过渡期，正式改名见第 11 条与 S10）。
 4. `set(SARIBBON_MIN_QT_VERSION 5.15)`（v2 D1 落地，现值 5.12 在 L47），`find_package(QT NAMES Qt6 Qt5 ...)` 两段式（L48-55）保留。
 5. **删除 L79-103 的 `set(CMAKE_CXX_FLAGS ... /std:c++xx)` 手术**；但 S4~S6 之间存在过渡窗口（旧 `src/SARibbonBar/CMakeLists.txt` 尚未走 `sa_add_library`，无任何 target 级标准设定，Qt6 下会掉回编译器默认标准而失败），因此**过渡期在根保留**：
@@ -190,7 +190,7 @@ git commit -m "文档：新增 3.0 重构执行计划（plans/3.0）"
 | L2-3 | 中文风格注释（命令小写/变量大写） | 保留（转写为正确编码的注释，遵守 NOTES B4：不做全仓编码清洗，重写文件用 UTF-8） |
 | L5 | `cmake_minimum_required(VERSION 3.15)` | 改 3.21（见上） |
 | L7-13 | `SARIBBON_VERSION_*` 三变量 + `project()` | 改为 `project(SARibbon VERSION 3.0.0)` + 第 2 条的派生 set |
-| L15-27 | 6 个 option（实名核实：`SARIBBON_BUILD_STATIC_LIBS`、`SARIBBON_BUILD_EXAMPLES`、`BUILD_TESTS`、`SARIBBON_USE_FRAMELESS_LIB`、`SARIBBON_ENABLE_SNAPLAYOUT`、`SARIBBON_INSTALL_IN_CURRENT_DIR` win ON/else OFF） | 保留语义；`BUILD_TESTS`→`SARIBBON_BUILD_TESTS` + shim；新增 `SARIBBON_BUILD_WIDGETS`(ON)/`SARIBBON_BUILD_QML`(OFF) |
+| L15-27 | 6 个 option（实名核实：`SARIBBON_BUILD_STATIC_LIBS`、`SARIBBON_BUILD_EXAMPLES`、`BUILD_TESTS`、`SARIBBON_USE_FRAMELESS_LIB`、`SARIBBON_ENABLE_SNAPLAYOUT`、`SARIBBON_INSTALL_IN_CURRENT_DIR` win ON/else OFF） | 保留语义；`BUILD_TESTS`→`SARIBBON_BUILD_TESTS` + shim；新增 `SARIBBON_BUILD_WIDGETS`(ON)/`SARIBBON_BUILD_QML`(OFF)/`SARIBBON_INSTALL`(ON，round2 D1→v2 §6.4) |
 | L32-43 | vcpkg 检测 + frameless feature 联动 | 原样保留 |
 | L45-56 | Qt 探测（`SARIBBON_MIN_QT_VERSION 5.12`） | 保留，5.12→5.15 |
 | L58-77 | frameless Qt 版本门槛 → `_SARIBBON_USE_FRAMELESS_LIB` | 原样保留（内部变量名不可改，模块 CMakeLists 引用它） |
@@ -208,6 +208,20 @@ git commit -m "文档：新增 3.0 重构执行计划（plans/3.0）"
 | L235-244 | `set(SARIBBON_DOC_FILES readme.md readme-cn.md LICENSE)` | **死变量**（全仓无任何 `install()` 消费，`git grep SARIBBON_DOC_FILES` 仅此一处）→ 删除；若想真正安装文档，另加 `install(FILES ${SARIBBON_DOC_FILES} DESTINATION .)` 属行为变化，本计划不做，记 NOTES |
 | （新增） | `include(GNUInstallDirs)`、`include(CMakePackageConfigHelpers)`、`CMAKE_MODULE_PATH` + `include(SARibbonUtils)` | 第 8/9 条 |
 
+#### S4.2 附注：QWK 顶层 CMake 组织对照（round2 补充，非执行步骤）
+
+QWK 顶层 `CMakeLists.txt`（83 行，floor 3.19）逐项对照结论，行号指 `qwindowkit/CMakeLists.txt`：
+
+- **抄（已体现在 S4 正文）**：选项命名 `<项目>_BUILD_<对象>` 全大写模式（:8-13，`QWINDOWKIT_BUILD_STATIC/WIDGETS/QUICK/EXAMPLES/DOCUMENTATIONS/INSTALL`）——SARibbon 新选项 `SARIBBON_BUILD_WIDGETS/QML/TESTS` 与之同构，命名一致性有实证先例；`GNUInstallDirs`+`CMakePackageConfigHelpers` 顶层统一 include（:36-39，S4 第 8 条）。
+- **抄（S4.1 表 L105-121 行的补充说明）**：QWK 对 debug 后缀用 `if(NOT DEFINED CMAKE_DEBUG_POSTFIX)` 守卫再设默认 "d"（:28-30）。SARibbon 现状用 `set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING ...)`（根 `CMakeLists.txt:105`），CACHE 变量同样尊重用户预设，**等价、不需要改**。
+- **已采纳（round2 整合裁决，原"不抄 1"翻转；NOTES.md B10）：`SARIBBON_INSTALL` 安装守卫选项**（QWK 实证 `QWINDOWKIT_INSTALL`，:13,36-39；`src/CMakeLists.txt:29,100,181` 所有 install/包配置规则都在其内）。新增 `SARIBBON_INSTALL`（默认 ON，S4 第 3 条已补行），把全部 `install()`/`install(EXPORT)`/Config 生成/转发头安装规则（S5.3/S5.4 骨架、S6.7、S11）收进守卫——`add_subdirectory` 嵌入场景（OFF）不产生任何安装物、不污染宿主工程；S4 第 7 条的顶层守卫只覆盖 examples/tests，与此互补。决策与证据：v2 §6.4、reviews/round2/qwk-build-findings.md §三 D1、reviews/round2/synthesis-findings.md。
+- **不抄 2：qmsetup 全家桶**（:50-75 `find_package(qmsetup QUIET)` + submodule 就地构建回退 + `qm_import`/`qm_init_directories`）。理由：引入构建期外部工具链（corecmd 二进制）与其就地编译回退逻辑，对 SARibbon 收益不成比例；`sa_*` 自实现已覆盖所需能力（S5.1 决策）。
+- **不抄 3：MSVC `/utf-8` 与 `/manifest:no`**（:22-26）。SARibbon 已有自己的编码警告处置（`/wd4819`，S4.1 表 L123-128 保留）且不玩 manifest 手术；`/utf-8` 会改变既有 GBK 源文件的解析行为，违反"行为零变化"。
+- **不抄 4：MinGW 去 lib 前缀**（:31-33，`CMAKE_STATIC/SHARED_LIBRARY_PREFIX ""`）。会改变 MinGW 产物名（libSARibbonBar.dll→SARibbonBar.dll），属行为变化；若 3.x 想对齐 Windows 命名惯例，记 NOTES 供后续版本单独决策。
+- **不抄 5：惰性 Qt 探测**。QWK 顶层不 find_package(Qt)，由各模块链接时经 `qm_find_qt` 按需探测（`qmsetup:QMSetupAPI.cmake:106-116`，`find_package(QT NAMES Qt6 Qt5 ...)` 顺序由 `QMSETUP_FIND_QT_ORDER` 控制 :37-38）。SARibbon 顶层两段式探测**必须保留**——frameless 的 Qt 版本门槛块（现 L58-77）与 `SARIBBON_MIN_QT_VERSION` 检查依赖顶层已知 `QT_VERSION_MAJOR`（S4 第 4/6 条）。
+- **不抄 6：统一输出目录 `out-<arch>-<config>/{bin,lib}`**（`qmsetup:Filesystem.cmake:12-24` `qm_init_directories`）。SARibbon 维持现状 `${CMAKE_BINARY_DIR}/{bin,lib}`（S5.3 骨架照抄现有属性集），改布局会破坏 build.ps1/CI 的既有路径假设。
+- **注意：QWK 顶层没有 examples/tests 的 `CMAKE_SOURCE_DIR` 守卫**（:82-84 仅靠选项开关）；SARibbon S4 第 7 条的守卫是** stricter 的自有做法**，保留（QWK 无先例不构成反证，嵌入场景守卫是 SARibbon 既有需求）。
+
 **验证**：`cmake -S . -B build-tmp -DCMAKE_PREFIX_PATH=<Qt6路径>` 配置通过，且 `cmake --build build-tmp --config Release` 可编译（S4 提交点必须全绿：新根 + 旧 src 结构是兼容的——旧模块消费的 `SARIBBON_VERSION*`、`_SARIBBON_USE_FRAMELESS_LIB`、`CMAKE_DEBUG_POSTFIX`、`SARIBBON_MIN_QT_VERSION` 均已保留；`build-tmp` 验证后删除，避免与 build.ps1 的 `build/` 混淆）。
 
 **提交**：`重构：根 CMakeLists 现代化（floor 3.21/选项统一/C++17 过渡设定/清理死变量）`
@@ -219,14 +233,16 @@ git commit -m "文档：新增 3.0 重构执行计划（plans/3.0）"
 #### S5.1 现状与参考实现证据
 
 - `cmake/SARibbonUtils.cmake` 现为 **16 行**、仅含 `saribbon_set_bin_name` 宏（已核实）。该宏**全仓库零调用**（`git grep saribbon_set_bin_name` 仅命中定义处），且宏体是外来项目残留（内部设 `DA_MIN_QT_VERSION`、`endmacro(damacro_set_bin_name)` 名称与宏不符）——属死代码，可保留不调用或直接删除（建议删除并在提交信息注明；若保留，"备用"二字写明无人使用）。
-- 参考实现 QWindowKit 的建库封装 `qwk_add_library` **定义在 `F:\src\3rdparty\qwindowkit\src\CMakeLists.txt:38-124`**（不在 qmsetup/ 里；qmsetup 是 QWK 的 submodule，提供参考机上未初始化、为空目录，其 `qm_export_defines`/`qm_configure_target`/`qm_sync_include` 的实现源码本地不可读。下述规格由 qwk_add_library 调用点语义 + QWK 头文件宏形态反推，`sa_*` 函数全部自实现，**不依赖 qmsetup**）。
-- `qwk_add_library` 的关键机制（源文件可查证）：
-  - `macro(qwk_add_library _target)`，参数 `AUTOGEN / NO_SYNC_INCLUDE / NO_WIN_RC` 选项 + `SYNC_INCLUDE_PREFIX / PREFIX` 单值 + 其余透传 `qm_configure_target`（SOURCES/LINKS/LINKS_PRIVATE/QT_LINKS/INCLUDE_PRIVATE 等，见 `src/core/CMakeLists.txt:86-94` 的实际调用）；
-  - `QWINDOWKIT_BUILD_STATIC` 决定 STATIC/SHARED；
-  - `qm_export_defines(${_target} PREFIX ${FUNC_PREFIX})` 统一打导出宏；
-  - 由 target 名正则 `^QWK(.+)` 推导 `EXPORT_NAME`（QWKCore→Core），并 `add_library(QWindowKit::Core ALIAS QWKCore)`；
-  - `install(TARGETS ... EXPORT QWindowKitTargets RUNTIME/LIBRARY/ARCHIVE 按 GNUInstallDirs)`；
-  - `qm_sync_include(. "${CMAKE_BINARY_DIR}/include/<模块名>" INSTALL_DIR include/QWindowKit/<模块名>)` + `target_include_directories(PUBLIC $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/include>)`，消费端因此可写 `#include <QWKCore/qwkglobal.h>`。
+- 参考实现 QWindowKit 的建库封装 `qwk_add_library` **定义在 `F:\src\3rdparty\qwindowkit\src\CMakeLists.txt:38-126`**（不在 qmsetup/ 里；qmsetup 是 QWK 的 submodule，本地副本未初始化、为空目录，但**其实现已从上游核实**：`.gitmodules` pin 的是 `stdware/qmsetup@99ca80fd63e34f4bb54dcc48db09a66e86f5517d`（QWK `.gitmodules:2-4` + `git submodule status`），round2 评审已通过 GitHub API 抓取该 commit 的 `cmake/QMSetupAPI.cmake`、`cmake/modules/Preprocess.cmake`、`cmake/modules/Filesystem.cmake` 全文核对，下文引用格式 `qmsetup:QMSetupAPI.cmake:行号`）。`sa_*` 函数仍**全部自实现、不依赖 qmsetup**——qmsetup 的 `qm_sync_include` 依赖其自带的外部二进制工具 `corecmd`（`qmsetup:Preprocess.cmake:49-51`，工具缺失直接 FATAL_ERROR），SARibbon 不引入构建期外部工具依赖，此决策不变。
+- `qwk_add_library` 的关键机制（**round2 已全部按源码实证**，未注前缀的行号指 `qwindowkit/src/CMakeLists.txt`）：
+  - `macro(qwk_add_library _target)`（:38-126），参数 `AUTOGEN / NO_SYNC_INCLUDE / NO_WIN_RC` 选项 + `SYNC_INCLUDE_PREFIX / PREFIX` 单值 + 其余透传 `qm_configure_target`（SOURCES/LINKS/LINKS_PRIVATE/QT_LINKS/QT_INCLUDE_PRIVATE/INCLUDE_PRIVATE 等，签名实证 `qmsetup:QMSetupAPI.cmake:164-196`；实际调用见 `src/core/CMakeLists.txt:88-97`）；
+  - `AUTOGEN` 关键字触发的是**目录级** `CMAKE_AUTOMOC/AUTOUIC/AUTORCC ON`（:44-48），非 target 属性——SARibbon 骨架用 target 属性（AUTOMOC/AUTORCC/AUTOUIC ON），等价且作用域更窄，维持；
+  - `QWINDOWKIT_BUILD_STATIC` 决定 STATIC/SHARED（:50-54）；WIN32 且 SHARED 且非 NO_WIN_RC 时打版本资源 `qm_add_win_rc`（:58-64）；
+  - `qm_export_defines(${_target} PREFIX ${FUNC_PREFIX})` 统一打导出宏（:73；实现实证 `qmsetup:QMSetupAPI.cmake:200-230`：STATIC 库时 `PUBLIC <PREFIX>_STATIC`，而 `<PREFIX>_LIBRARY` **恒 PRIVATE 定义（静态构建也定义）**——两者不互斥，优先级由头文件"先 `ifdef STATIC`"裁决；PREFIX 缺省 = target 名 TOUPPER，QWK 各模块显式传 `QWK_CORE/QWK_WIDGETS/QWK_QUICK`）；
+  - C++ 标准**不在宏内**：各模块自行 `set_target_properties(... CXX_STANDARD 17 CXX_STANDARD_REQUIRED TRUE)`（`src/core/CMakeLists.txt:99-102`，widgets/quick 同构）——SARibbon 把 `target_compile_features(PUBLIC cxx_std_17)` 集中进 `sa_add_library`，少一处重复且 PUBLIC 传播给消费者，属有意优于 QWK 的差异，维持；
+  - 由 target 名正则 `^QWK(.+)` 推导 `EXPORT_NAME`（QWKCore→Core），并 `add_library(QWindowKit::Core ALIAS QWKCore)`（:83-90）；
+  - `install(TARGETS ... EXPORT QWindowKitTargets RUNTIME/LIBRARY/ARCHIVE 按 GNUInstallDirs，三个 DESTINATION 均带 OPTIONAL)`（:100-106），且整段在 `QWINDOWKIT_INSTALL` 守卫内；`install(EXPORT ... NAMESPACE QWindowKit::)` 与 Config/ConfigVersion 生成只在 src 层写一次（:181-212）；
+  - include 传播三件套：模块源目录 `.` **PRIVATE**（:80）、构建期生成头目录 PUBLIC `$<BUILD_INTERFACE:.../include>`（:117-124）、安装树 PUBLIC `$<INSTALL_INTERFACE:include/QWindowKit>`（:108-110）。`qm_sync_include` 的机制是调外部工具 `corecmd incsync` 生成**转发头**（一行间接 include 的引用文件，非内容复制；`qmsetup:Preprocess.cmake:27-41` 注释 "Generate indirect reference files"），默认 STANDARD public-private 模式（`qmsetup:Preprocess.cmake:20-22`），安装期经 `install(CODE)` 在安装前缀下重新生成（`qmsetup:Preprocess.cmake:107-140`），支持 `EXCLUDE` 正则（用例：style agent 关闭时排除 `style/` 全部头，`src/core/CMakeLists.txt:85`）。消费端因此可写 `#include <QWKCore/qwkglobal.h>`。
 
 #### S5.2 导出宏三段式准确形态（原 v1 §5.3 模板，此处内联）
 
@@ -256,6 +272,10 @@ SARibbon 映射（PREFIX 由 `sa_add_library` 传入）：
 
 对应现状（`src/SARibbonBar/CMakeLists.txt:186-199`）：动态定义 PRIVATE `SA_RIBBON_BAR_MAKE_LIB` + PRIVATE `SA_COLOR_WIDGETS_MAKE_LIB`；静态定义 PRIVATE+INTERFACE（≈PUBLIC）`SA_RIBBON_BAR_NO_EXPORT` 与 `SA_COLOR_WIDGETS_NO_DLL`。旧宏名的兼容映射在 S6.3/S6.4 的头文件里做，CMake 侧只发新宏。
 
+**round2 实证补注**：
+- **互斥性**：QWK/qmsetup 并**不**在 CMake 层做 `<PREFIX>_LIBRARY` 与 `<PREFIX>_STATIC` 的互斥——`qm_export_defines` 恒 PRIVATE 定义 `_LIBRARY`、静态时再 PUBLIC 定义 `_STATIC`（`qmsetup:QMSetupAPI.cmake:222-228`），完全靠三段式头文件"先 `ifdef STATIC` 走空宏"的顺序裁决（`qwkglobal.h:12-22`）。S5.3 骨架选择的 if/else 互斥发宏与之**行为等价**（且与 2.9.5 现状"静态只发 NO_EXPORT、动态只发 MAKE_LIB"一致，`src/SARibbonBar/CMakeLists.txt:186-199`），同时 S6.9 头文件保持同样优先级顺序 = 双保险，维持骨架写法。
+- **旧宏映射方向已核实未写反**：`src/SARibbonBar/SARibbonGlobal.h:9-18` 实证 `SA_RIBBON_BAR_NO_EXPORT` 被定义时 `SA_RIBBON_EXPORT` 为空（静态语义），未定义时按 `SA_RIBBON_BAR_MAKE_LIB` 分 EXPORT/IMPORT；`colorWidgets/SAColorWidgetsGlobal.h:97-111` 同构（`NO_DLL` 外层优先）。故 S6.9 代码块 C 的 `SA_RIBBON_BAR_NO_EXPORT → SA_RIBBON_WIDGETS_STATIC`、`SA_RIBBON_BAR_MAKE_LIB → SA_RIBBON_WIDGETS_LIBRARY` 方向正确。
+
 #### S5.3 sa_add_library 规格与骨架
 
 签名：`sa_add_library(<target> SOURCES <files...> PREFIX <前缀> QT_LINKS <Qt组件...> [LINKS <内部库...>] [LINKS_PRIVATE <私有依赖...>] [NO_WIN_RC])`
@@ -268,7 +288,7 @@ SARibbon 映射（PREFIX 由 `sa_add_library` 传入）：
 - `LINKS SARibbonCore` → 正则改写为 `SARibbon::Core` 再 PUBLIC 链接；`LINKS_PRIVATE` 给 frameless 的 `QWindowKit::Widgets` 这类私有依赖（现 L167）。
 - 别名：`add_library(SARibbon::<Comp> ALIAS <target>)`，`<Comp>` 由 `^SARibbon(.+)` 剥离（SARibbonCore→Core，与 QWK 的 `^QWK(.+)` 同款）；`EXPORT_NAME` 同设为 `<Comp>`，使导出的 Targets 文件里出现 `SARibbon::Core/Widgets`（v2 D2）。
 - include 传播：**见 S5.5 决策**（源目录与同步目录双 PUBLIC）。
-- install：`install(TARGETS <target> EXPORT SARibbonTargets ...)`（RUNTIME/LIBRARY/ARCHIVE 按 GNUInstallDirs）。**三个模块共用一个 export set `SARibbonTargets`，`install(EXPORT ...)` 只在 `src/CMakeLists.txt` 写一次**（S6.7/S11）。Windows 且 `SARIBBON_INSTALL_IN_CURRENT_DIR=ON` 时根 CMakeLists 已把 `CMAKE_INSTALL_PREFIX` 整体指到 `bin_qtX_编译器_x架构/`（现 L144-148），DESTINATION 无需特判，旧行为自动维持。私有头（`*_p.h`）不安装（现仓库尚无 _p.h，规则先立）。
+- install：`install(TARGETS <target> EXPORT SARibbonTargets ...)`（RUNTIME/LIBRARY/ARCHIVE 按 GNUInstallDirs，**三个 DESTINATION 均带 `OPTIONAL`**——照抄 QWK `src/CMakeLists.txt:101-106`，静态/动态与平台产物类型差异下容忍某类产物缺席，install 不报错），**整段包在 `if(SARIBBON_INSTALL)` 守卫内**（round2 整合：v2 §6.4，QWK 同段亦在 `QWINDOWKIT_INSTALL` 守卫内，src/CMakeLists.txt:100-106）。**三个模块共用一个 export set `SARibbonTargets`，`install(EXPORT ...)` 只在 `src/CMakeLists.txt` 写一次**（S6.7/S11；QWK 同构：per-module 只 `install(TARGETS ... EXPORT QWindowKitTargets)`，`install(EXPORT)` 唯一一处在其 `src/CMakeLists.txt:208-212`）。Windows 且 `SARIBBON_INSTALL_IN_CURRENT_DIR=ON` 时根 CMakeLists 已把 `CMAKE_INSTALL_PREFIX` 整体指到 `bin_qtX_编译器_x架构/`（现 L144-148），DESTINATION 无需特判，旧行为自动维持。私有头（`*_p.h`）不安装（现仓库尚无 _p.h，规则先立）。
 - WIN32 且 SHARED 且未给 NO_WIN_RC 时调 `create_win32_resource_version`（现 L356-363 的行为并入）。
 
 可直接落地的骨架（写入 `cmake/SARibbonUtils.cmake`）：
@@ -292,7 +312,11 @@ function(sa_add_library _target)
     add_library(${_target} ${_type})
     target_sources(${_target} PRIVATE ${FUNC_SOURCES})
 
-    # Export macros, see plan-01 S5.2 (QWK qwkglobal.h three-way pattern)
+    # Export macros, see plan-01 S5.2 (QWK qwkglobal.h three-way pattern).
+    # qm_export_defines always defines <PREFIX>_LIBRARY PRIVATE and adds
+    # <PREFIX>_STATIC PUBLIC for static builds (qmsetup:QMSetupAPI.cmake:222-228);
+    # the if/else below is the stricter mutually-exclusive variant, matching
+    # 2.9.5 behavior. Headers must keep STATIC-first precedence either way.
     if(_type STREQUAL "STATIC")
         target_compile_definitions(${_target} PUBLIC ${FUNC_PREFIX}_STATIC)
     else()
@@ -345,11 +369,16 @@ function(sa_add_library _target)
         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
     )
 
-    install(TARGETS ${_target} EXPORT SARibbonTargets
-        RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}"
-        LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-        ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}"
-    )
+    # OPTIONAL on every artifact kind, same as QWK (src/CMakeLists.txt:101-106);
+    # whole block under SARIBBON_INSTALL guard (v2 §6.4, round2 D1; QWK's
+    # install rules live inside QWINDOWKIT_INSTALL the same way)
+    if(SARIBBON_INSTALL)
+        install(TARGETS ${_target} EXPORT SARibbonTargets
+            RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}" OPTIONAL
+            LIBRARY DESTINATION "${CMAKE_INSTALL_LIBDIR}" OPTIONAL
+            ARCHIVE DESTINATION "${CMAKE_INSTALL_LIBDIR}" OPTIONAL
+        )
+    endif()
 
     if(WIN32 AND NOT FUNC_NO_WIN_RC AND _type STREQUAL "SHARED")
         create_win32_resource_version(
@@ -364,7 +393,7 @@ endfunction()
 
 #### S5.4 sa_sync_include 规格与骨架
 
-签名：`sa_sync_include(<target> <模块名>)`。把模块源树的公共头（排除 `*_p.h`）在**配置期**复制到 `${CMAKE_BINARY_DIR}/include/<模块名>/`（保持相对子目录，如 `SARibbonWidgets/colorWidgets/SAColorToolButton.h`），清单存入 `<target>_SYNC_FILES`（PARENT_SCOPE），并生成 install 规则。与 QWK 的 `qm_sync_include(. "${QWINDOWKIT_GENERATED_INCLUDE_DIR}/QWKCore" INSTALL_DIR ...)`（qwindowkit/src/CMakeLists.txt:119-121）语义一致。
+签名：`sa_sync_include(<target> <模块名>)`。把模块源树的公共头（排除 `*_p.h`）在**配置期**复制到 `${CMAKE_BINARY_DIR}/include/<模块名>/`（保持相对子目录，如 `SARibbonWidgets/colorWidgets/SAColorToolButton.h`），清单存入 `<target>_SYNC_FILES`（PARENT_SCOPE），并生成 install 规则。与 QWK 的 `qm_sync_include(. "${QWINDOWKIT_GENERATED_INCLUDE_DIR}/QWKCore" INSTALL_DIR ...)`（qwindowkit/src/CMakeLists.txt:117-125）**语义层一致**（构建期命名空间头目录 + PUBLIC BUILD_INTERFACE + 安装期同布局再生），**机制层不同且有意为之**：QWK 经外部工具 `corecmd incsync` 生成一行式**转发头**（`qmsetup:Preprocess.cmake:27-41,92-104`，每次 configure 带 FORCE 重刷；`_p.h` 排除靠其 STANDARD public-private 默认模式 `:20-22`；安装期 `install(CODE)` 在目标前缀下重跑工具 `:107-140`），SARibbon 用纯 CMake `file(COPY)` 复制内容、`_p\\.h$` 文件名正则显式排除——**不引入构建期外部二进制依赖**（qmsetup 找不到 corecmd 即 FATAL_ERROR，`qmsetup:Preprocess.cmake:49-51`），代价是产物体积略大（真实内容 vs 一行转发），可接受。
 
 ```cmake
 # sa_sync_include: mirror public headers into ${CMAKE_BINARY_DIR}/include/<module>/
@@ -383,9 +412,11 @@ function(sa_sync_include _target _module)
         list(APPEND _synced "${_dst_root}/${_h}")
     endforeach()
     set(${_target}_SYNC_FILES "${_synced}" PARENT_SCOPE)
-    install(DIRECTORY "${_dst_root}/"
-        DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/${_module}"
-        FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
+    if(SARIBBON_INSTALL)   # v2 §6.4 (round2 D1)
+        install(DIRECTORY "${_dst_root}/"
+            DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/${_module}"
+            FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp")
+    endif()
 endfunction()
 ```
 
@@ -397,7 +428,7 @@ endfunction()
 #### S5.5 include 传播决策（修正原稿，关键）
 
 - 现状 2.9.5：`src/SARibbonBar/CMakeLists.txt:221-224` 是 `PUBLIC $<INSTALL_INTERFACE:include/SARibbonBar> + $<BUILD_INTERFACE:源目录>`；tests/examples 共 **190 处**平铺 include（`#include "SARibbonBar.h"` 形式，`git grep -c` 实测），依赖源目录 PUBLIC 传播或显式 include 路径。
-- QWK 模式是**源目录 PRIVATE** + 同步目录 PUBLIC，消费端一律 `<QWKCore/qwkglobal.h>` 命名空间形式。
+- QWK 模式是**源目录 PRIVATE** + 同步目录 PUBLIC，消费端一律 `<QWKCore/qwkglobal.h>` 命名空间形式（实证：`qwindowkit/src/CMakeLists.txt:80` 源目录 `.` PRIVATE、`:122-124` 同步目录 `$<BUILD_INTERFACE:...>` PUBLIC、`:108-110` `$<INSTALL_INTERFACE:include/QWindowKit>` PUBLIC）。安装树布局差异注意：QWK 在 include 下多一层伞目录（`include/QWindowKit/QWKCore/...`，INSTALL_INTERFACE 指向伞目录），SARibbon 计划为**无伞目录**（`include/SARibbonCore/...`，INSTALL_INTERFACE 指向 `include/`）——两种布局下消费端 include 写法相同（`<模块名/头名>`），SARibbon 与 2.9.5 的 `include/SARibbonBar/` 现状同层级，维持无伞目录。
 - **本计划取零改动方案**：源目录 PUBLIC（平铺兼容，build 树内）+ 同步目录 PUBLIC（`<SARibbonWidgets/...>` 新形式同时可用）+ INSTALL_INTERFACE 只暴露同步目录形态（安装树里只有 `include/SARibbonCore|SARibbonWidgets|SARibbonBar(转发)`，见 S11）。原稿"PRIVATE 模块源目录"**作废**——它会把 190 处平铺 include 全部打断，违背"行为零变化"。命名空间化改造归计划 03/04。
 
 **验证**：`cmake -P` 级自测不可行，直接以 S6 的三个 target 使用作为验证（S6 构建绿 = S5 正确）。
@@ -508,7 +539,13 @@ endfunction()
    include 形式**必须用 `"../SARibbonWidgetsGlobal.h"`**（相对本文件上一级），四种消费场景才可全部解析：源码树（`src/widgets/colorWidgets/../` = `src/widgets/`）、同步目录（`include/SARibbonWidgets/colorWidgets/../`）、安装树（同前）、amalgamate（相对包含文件目录解析）。平铺 `"SARibbonWidgetsGlobal.h"` 在安装树断裂（消费者 include 根下没有该文件），`<SARibbonWidgets/...>` 则需给 amalgamate 再加一层镜像（S8），都不如相对上一级简单。
 
    其余内容**保留不动**：版本宏 `SA_COLOR_WIDGETS_VERSION_MAJ/MIN/PAT`、`SA_COLOR_WIDGETS_DECLARE_PRIVATE/PUBLIC`（QScopedPointer 版 PIMPL，与 core 的 unique_ptr 版并存，5 个文件在用）、`sacolor_as_const`。`SA_COLOR_WIDGETS_NO_DLL` 宏在新结构下不再被 CMake 定义，但 amalgamate 模板仍会定义它（S8），无副作用，符号保留以防外部旧脚本。
-5. **qml 空骨架**：建 `src/qml/SARibbonQmlGlobal.h`（三段式 `SA_RIBBON_QML_*`，照 S5.2 模板）+ `src/qml/CMakeLists.txt` **只放占位**：`message(STATUS "SARibbonQml: placeholder, implemented in plan 04")`，**不建 target**（无源文件的 add_library 会直接报错；这是默认路径而非原稿的"报错才降级"）。`src/CMakeLists.txt` 里 `if(SARIBBON_BUILD_QML) add_subdirectory(qml) endif()` 照常写。
+5. **qml 空骨架**：建 `src/qml/SARibbonQmlGlobal.h`（三段式 `SA_RIBBON_QML_*`，照 S5.2 模板）+ `src/qml/CMakeLists.txt` **只放占位**：`message(STATUS "SARibbonQml: placeholder, implemented in plan 04")`，**不建 target**（无源文件的 add_library 会直接报错；这是默认路径而非原稿的"报错才降级"）。`src/CMakeLists.txt` 里 `if(SARIBBON_BUILD_QML) add_subdirectory(qml) endif()` 照常写（QWK 同构：`src/CMakeLists.txt:133-139` 的 `if(QWINDOWKIT_BUILD_WIDGETS/QUICK) add_subdirectory(...)`）。
+
+   **QWK quick 模块构建实证（round2 补充，供计划 04 的构建/安装侧直接参考；QML 类型实现细节归 04，此处只记构建事实）**：
+   - QWK 1.0.1 的 `src/quick/CMakeLists.txt`（全文 38 行）建的 QWKQuick 是**纯 C++ 库**：`qwk_add_library(QWKQuick AUTOGEN SOURCES ... LINKS QWKCore QT_LINKS Core Gui Quick PREFIX QWK_QUICK)`（:22-29）——**没有 qt_add_qml_module、没有 qmldir、没有 QML 文件、没有 qml 目录安装规则**，安装与普通库完全同构（走 qwk_add_library 的统一 install）。
+   - QML 类型注册是**命令式导出函数**：`QWK_QUICK_EXPORT void registerTypes(QQmlEngine*)`（`qwkquickglobal.h:27`），实现为 `qmlRegisterType<QuickWindowAgent>("QWindowKit", 1, 0, "WindowAgent") + qmlRegisterModule(...)` 带一次性守卫（`qwkquickglobal.cpp:14-25`），由应用 `main()` 在 `engine.load()` 前手动调用（`examples/qml/main.cpp:26`）；qml 文件放**应用侧 qrc**（`examples/qml/qml.qrc`），不进库。
+   - 对 SARibbonQml 的含义：v2 §5.3 双轨中 **Qt5 命令式轨有 QWK 完整同款先例**（库 + `SA_RIBBON_QML_EXPORT saRibbonRegisterQmlTypes(QQmlEngine*)`）；**Qt6 `qt_add_qml_module` 轨在 QWK 1.0.1 无任何先例可抄**（其 qmldir/plugin 安装布局、URI/IMPORT_VERSION 设置需计划 04 自行设计）。**【round2 整合更新】计划 04 S1 已定型为命令式单轨（Qt5/Qt6 同码，v2 §5.3 已修订、NOTES B9），`qt_add_qml_module` 降为 3.1+ 预案（04 S1 附注）——"Qt6 轨无先例"的风险已随单轨化消除；03-S6 安装树清单维持"无 qml 项"即为终态**（叶子进 qrc 随库二进制、安装期零新增产物，v2 §6.1 批注②、kddw-qtquick-findings.md §三.2）。
+   - 链接细节：QWKQuick 只显式链 `Core Gui Quick` 不链 `Qml`（Qt6 下 Qml 由 Quick 传递；`src/quick/CMakeLists.txt:25`），而 QML **示例**显式链 `Core Gui Qml Quick`（`examples/qml/CMakeLists.txt:7`）——SARibbonQml 建 target 时建议显式 `QT_LINKS Core Gui Qml Quick`（Qt5/Qt6 两轨都稳），示例照 QWK 显式四件。
 6. **旧 target 名兼容（D2）**：见第 1 条骨架末尾——`SARibbonBar` 与 `SARibbonBar::SARibbonBar` **两个别名都必须加**（原稿只写了前者）：tests 链裸 `SARibbonBar`（tests/CMakeLists.txt:11），10 个 example 链 `SARibbonBar::SARibbonBar` 且以 `if(NOT TARGET SARibbonBar)` 作独立构建探测（如 example/MainWindowExample/CMakeLists.txt:25-30）。过渡一个版本周期，计划 03 统一改 `SARibbon::Widgets`。
 7. **src/CMakeLists.txt**：现内容仅 `add_subdirectory(SARibbonBar)` + 注释掉的 DesignerPlugin 块。改为：
 
@@ -520,13 +557,18 @@ endfunction()
    if(SARIBBON_BUILD_QML)
        add_subdirectory(qml)
    endif()
-   # 统一导出（三模块共用一个 export set，只在这里 install 一次）
-   install(EXPORT SARibbonTargets
-       FILE SARibbonTargets.cmake
-       NAMESPACE SARibbon::
-       DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/SARibbon)
-   # 组件化 SARibbonConfig 的生成/安装见 S11
+   # 统一导出（三模块共用一个 export set，只在这里 install 一次；
+   # SARIBBON_INSTALL 守卫内——v2 §6.4/round2 D1，与 S5.3/S11 的安装规则同守卫）
+   if(SARIBBON_INSTALL)
+       install(EXPORT SARibbonTargets
+           FILE SARibbonTargets.cmake
+           NAMESPACE SARibbon::
+           DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/SARibbon)
+   endif()
+   # 组件化 SARibbonConfig 的生成/安装见 S11（同样在 SARIBBON_INSTALL 守卫内）
    ```
+
+   QWK 同构实证（`qwindowkit/src/CMakeLists.txt`）：子目录按选项进（:131-139）；`install(EXPORT QWindowKitTargets FILE QWindowKitTargets.cmake NAMESPACE QWindowKit:: DESTINATION lib/cmake/QWindowKit)` 全项目唯一一处（:208-212）；Config/ConfigVersion 的生成与安装也集中在 src 层（:181-205），模块层只 `install(TARGETS ... EXPORT ...)`。组件间依赖（Widgets→Core）无需在 Config 里手写：`LINKS QWKCore` 以 PUBLIC 进 target 属性（`src/widgets/CMakeLists.txt:23` + `qmsetup:QMSetupAPI.cmake:186`），导出的 Targets 文件自动携带 `INTERFACE_LINK_LIBRARIES QWindowKit::Core`——SARibbon 的 `LINKS SARibbonCore`（S6.1 骨架）同理自动传播。
 
 8. i18n/resource 路径盘点：`git grep -n "SARibbonBar/i18n\|SARibbonBar/resource"` 实测构建系统内**零命中**（.ts 在模块 CMakeLists 里是相对模块目录的 `i18n/*.ts`，随目录整体搬移不受影响）；命中仅在 `docs/`（8 个文件）与 `AGENTS.md`——docs 归计划 04，AGENTS.md 在 S12 改。
 
@@ -660,6 +702,7 @@ ctest --test-dir build -C Release --output-on-failure   # 通过数 == N₀（=2
    `QDir(QT_TESTCASE_SOURCEDIR).absoluteFilePath("../src/SARibbonBar/resource")` →
    `"../../src/widgets/resource"`（SOURCEDIR 随 CMakeLists 移到 tests/widgets/ 后自动变为新目录，相对段需同步加一级并改模块名；这是 tests 内唯一 `src/SARibbonBar` 硬编码，`git grep -n "src/SARibbonBar" tests` 可复核）。
 4. examples：**统一决策为保持现状零改动**（原稿"二选一"作废）——链接继续走 `SARibbonBar::SARibbonBar` 别名（S6.6 保证存在），include 继续平铺（S5.5 保证传播）；`find_package(SARibbonBar REQUIRED)` fallback 由 S11.2 的兼容包继续支撑。切换到 `SARibbon::Widgets` 与 `<SARibbonWidgets/...>` 归计划 03。唯一例外是 StaticExample 的 `SARIBBON_DIR`（已在 S2 第 4 条修复）。
+   QWK 对照（round2 实证，支持既有方向、不改决策）：QWK 树内消费者一律链**裸 target 名**（examples 的 `LINKS QWKWidgets/QWKQuick` → `target_link_libraries PUBLIC`，`examples/mainwindow/CMakeLists.txt:5-9`、`examples/qml/CMakeLists.txt:5-9`、`qmsetup:QMSetupAPI.cmake:186`；共享辅助库 WidgetFrame 也是裸名 STATIC 库 `examples/shared/widgetframe/CMakeLists.txt:9-14`），命名空间别名 `QWindowKit::*` 在树内定义（`src/CMakeLists.txt:90`）但主要服务安装导出（`install(EXPORT ... NAMESPACE)` :208-212）与外部消费。SARibbon 的对应终态即：tests 链裸 `SARibbonWidgets`（本 S7 第 2 条已建议）、examples 在 03 切 `SARibbon::Widgets`（安装态消费口径）、别名只作过渡兼容。
 5. 根 CMakeLists tests 开关改 `SARIBBON_BUILD_TESTS`（S4 已就位，此处仅确认生效）。
 
 **验证**：构建 + `ctest --test-dir build -C Release --output-on-failure` 通过数 == N₀（26）；`git log --follow tests/widgets/SARibbonUtilTest.cpp` 历史可见；`MainWindowExample` 运行冒烟（手动/截图对比 2.9.5，视觉应完全一致）。
@@ -706,7 +749,7 @@ ctest --test-dir build -C Release --output-on-failure   # 通过数 == N₀（=2
 ### S9 core 纯净性门禁（v2 §6.2）
 
 **操作**：新建 `tools/check_core_purity.py`：
-- 扫描 `src/core/` 全部 `*.h/*.hpp/*.cpp`：禁止 `#include` 清单 `QWidget QLayout QStyle QQuickItem QQmlEngine QApplication QAction QQuickPaintedItem`（与 v2 §6.2 清单一致；按 `#include <X...>` / `#include "X..."` 两种形式匹配，且以前缀命中——`QQuickItem` 应同时拦下 `QQuickItem` 与其派生头名）。
+- 扫描 `src/core/` 全部 `*.h/*.hpp/*.cpp`：禁止 `#include` 清单 `QWidget QLayout QStyle QStyledItemDelegate QQuickItem QQmlEngine QApplication QAction QQuickPaintedItem` 以及**模块化 include 路径形式** `<QtWidgets/`、`<QtQuick/`（与 round2 修订后的 v2 §3.7/§6.2 模块层清单一致，02 S8-3 为执行细则；按 `#include <X...>` / `#include "X..."` 两种形式匹配，且以前缀命中——`QQuickItem` 应同时拦下 `QQuickItem` 与其派生头名；`<QtWidgets/` 形式防"模块化路径绕过裸类名扫描"）。**明确合法不得误伤**：`QGuiApplication`/`QScreen`/`QFontMetrics`/`QColor`/`QIcon` 属 QtGui（v2 §3.7 第一层）。
 - 禁止出现 `qApp`、`QApplication::`、`QWidget`、`QLayout` 等类型名使用（词法级 `\b` 词边界匹配即可，误报宁多勿漏）。
 - 违规即打印 `文件:行号` 与违规内容，exit 1；`--forbid-include` 参数化（默认值 = 上述清单）。
 - python3 标准库（`re/os/sys/argparse/pathlib`），无第三方依赖；shebang `#!/usr/bin/env python3`。
@@ -741,6 +784,7 @@ ctest --test-dir build -C Release --output-on-failure   # 通过数 == N₀（=2
 4. **publish-python-bindings.yml：不改**（原稿"删除 push/tag 触发、改 dispatch-only"与事实不符——本就没有 push/tag 触发，且 dev-3.0 分支上的修改对 master 的 release 触发无效）。sip/pyqt6/pyside6 的 CI 恢复归计划 03；本计划在 NOTES 记录此核实结论即可。
 5. `CMakePresets.json`：保留全部 vcpkg presets 与 `"version": 6`（不降版本字段）；新增 `win-msvc-qt6-debug/release`（generator "Visual Studio 17 2022"，`CMAKE_PREFIX_PATH` 留 `${sourceDir}` 相对占位或文档注明需本地覆盖）与 `linux-ninja-release` 常规 presets，binaryDir 统一 `build-${presetName}`；对应 buildPresets/testPresets 补齐。
 6. `page.yml`（mkdocs 文档发布）与构建无关，不动。
+7. **ctest 加 `--no-tests=error`**（round2 从 QWK 上游 CI 抄入，6 个 workflow 的 Test 步骤统一改）：现 ctest 行为 `ctest --output-on-failure -C ${{env.BUILD_TYPE}}`（如 `cmake-linux-qt6.8.yml:52-55`），**0 个测试时照样退出 0**——本步第 1 条把 `-DBUILD_TESTS` 改名 `-DSARIBBON_BUILD_TESTS` 后，若哪个 workflow 漏改导致测试静默不注册，CI 会假绿。改为 `ctest --output-on-failure --no-tests=error -C ...` 即可把"零测试"变成硬失败。证据：QWK 上游 main 分支 `.github/workflows/ci.yml` 的 Test 步骤用 `ctest --test-dir build --output-on-failure --no-tests=error`，并配注释 "ctest exits 0 when it finds nothing to run"（**溯源说明**：本地 QWK 快照 1fb3ec7 不含 `.github/`，该证据经 GitHub API 从上游 main 抓取，属比快照新的版本，见 reviews/round2/qwk-build-findings.md §一.6）。QWK 上游的其余 CI 做法（matrix include 组织、多编译器轴、MinGW/msys2 独立 job、把安装包消费测试注册进 ctest）记入 findings §三设计级建议，本步不抄。已核实 SARibbon 6 个 workflow 均已有 `fail-fast: false` 与 `jurplel/install-qt-action@v4 + cache: 'true'`（`cmake-linux-qt6.8.yml:17-37`），与 QWK 上游同款，无需重复添加。
 
 **验证**：push 后 6 个 workflow 全绿（含新增 core-only 矩阵项与 purity step）；`cmake --preset=vcpkg-msvc-x64-release` 本机配置通过（需 vcpkg 环境；无环境则记 NOTES 降级为"仅语法核查 preset JSON"）。
 
@@ -761,9 +805,17 @@ ctest --test-dir build -C Release --output-on-failure   # 通过数 == N₀（=2
    ```cmake
    @PACKAGE_INIT@
    include(CMakeFindDependencyMacro)
-   find_dependency(Qt@QT_VERSION_MAJOR@ COMPONENTS Core Gui)
+   # REQUIRED 必带（QWK QWindowKitConfig.cmake.in:5-6 同款）：否则 Qt 缺失时
+   # find_dependency 静默返回，错误延迟到 Targets 引用 Qt6::Core 时才爆出，难排查
+   find_dependency(Qt@QT_VERSION_MAJOR@ COMPONENTS Core Gui REQUIRED)
    if(@SARIBBON_BUILD_WIDGETS@)
-       find_dependency(Qt@QT_VERSION_MAJOR@ COMPONENTS Widgets Svg)
+       find_dependency(Qt@QT_VERSION_MAJOR@ COMPONENTS Widgets Svg REQUIRED)
+   endif()
+   if(@SARIBBON_BUILD_QML@)
+       # round2 整合（kddw-qtquick-findings.md §三.2）：命令式单轨下 Qml 组件
+       # 只需 Quick/Qml——无任何 qmldir/qmltypes 安装物；QuickControls2 是否
+       # 追加由计划 04 S5 的叶子实现决策定（候选清单 B-7）
+       find_dependency(Qt@QT_VERSION_MAJOR@ COMPONENTS Qml Quick REQUIRED)
    endif()
    include("${CMAKE_CURRENT_LIST_DIR}/SARibbonTargets.cmake")
    # 组件语义：COMPONENTS Widgets/Qml 映射到 target 存在性
@@ -781,7 +833,14 @@ ctest --test-dir build -C Release --output-on-failure   # 通过数 == N₀（=2
    check_required_components(SARibbon)
    ```
 
-   在 `src/CMakeLists.txt` 用 `configure_package_config_file` + `write_basic_package_version_file`（VERSION ${SARIBBON_VERSION}，COMPATIBILITY SameMajorVersion）生成并安装到 `lib/cmake/SARibbon/`；`install(EXPORT SARibbonTargets NAMESPACE SARibbon:: ...)` 已在 S6.7。
+   在 `src/CMakeLists.txt` 用 `configure_package_config_file` + `write_basic_package_version_file`（VERSION ${SARIBBON_VERSION}，COMPATIBILITY SameMajorVersion）生成并安装到 `lib/cmake/SARibbon/`；`install(EXPORT SARibbonTargets NAMESPACE SARibbon:: ...)` 已在 S6.7。**（round2 整合）本条全部生成/安装规则与 S11.2 兼容包、S11.3 转发头的 install 规则均在 `SARIBBON_INSTALL` 守卫内（v2 §6.4/NOTES B10；QWK 同构——Config/Targets 生成安装在 QWINDOWKIT_INSTALL 内，src/CMakeLists.txt:181-215）。**
+
+   **QWK 对照附注（round2 实证，实现时必读）**：
+   - **QWK 1.0.1 没有组件化 Config 可抄**：其 `QWindowKitConfig.cmake.in` 全文仅 8 行（find_dependency + include Targets，无 COMPONENTS 逻辑），且 `configure_package_config_file` 传了 **`NO_CHECK_REQUIRED_COMPONENTS_MACRO`**（`src/CMakeLists.txt:193-198`），三模块共用单一 export set `QWindowKitTargets`（:208-212）。SARibbon 上面的组件逻辑是**自主设计**（比 QWK 更进一步）；实现时 `configure_package_config_file` **不得**带 `NO_CHECK_REQUIRED_COMPONENTS_MACRO`，否则骨架里的 `check_required_components(SARibbon)` 未定义、消费端直接报错——照抄 QWK 的调用方式会踩这个坑。
+   - 单 export set 恰好支撑组件语义：`SARibbonTargets.cmake` 自动携带 `SARibbon::Widgets → SARibbon::Core` 的 INTERFACE 依赖（PUBLIC 链接被导出，证据见 S6.7 附注），组件间依赖传递无需 Config 手写。
+   - 版本兼容策略差异：QWK 用 `AnyNewerVersion`（`src/CMakeLists.txt:186-190`）；SARibbon 维持 `SameMajorVersion`（与 2.9.5 现状一致，`src/SARibbonBar/CMakeLists.txt:325-329`，且更严格——拒绝跨大版本静默消费）。不抄 QWK。
+   - **不抄 QWK 的两段式 find_dependency**（`QWindowKitConfig.cmake.in:5-6`：`find_dependency(QT NAMES Qt6 Qt5 ...)` + `find_dependency(Qt${QT_VERSION_MAJOR} ...)`，把 Qt 大版本裁决权交给消费端环境）：SARibbon 的 Targets 文件在生产端已固定 `Qt@QT_VERSION_MAJOR@::Core`，若消费端先探测到另一 Qt 大版本会链接混版；baked-in 写法与导出文件确定一致，且与现状 `SARibbonBarConfig.cmake.in:12` 同款。维持骨架写法。
+   - 旧包名 `SARibbonBarConfig` 兼容薄壳（第 2 条）：QWK 无旧包名先例，不构成参照也不构成反证；薄壳的 INTERFACE IMPORTED 转发方案自洽，维持。
 2. **旧 `SARibbonBarConfig` 兼容包保留一个版本周期**（10 个 example 独立构建的 `find_package(SARibbonBar REQUIRED)` fallback 依赖它）：旧 `SARibbonBarConfig.cmake.in` 改为薄壳——include 新 `SARibbonTargets.cmake` 并 `if(NOT TARGET SARibbonBar::SARibbonBar) add_library(SARibbonBar::SARibbonBar INTERFACE IMPORTED) target_link_libraries(SARibbonBar::SARibbonBar INTERFACE SARibbon::Widgets) endif()`，仍装到 `lib/cmake/SARibbonBar/`。
 3. 转发头目录 `include/SARibbonBar/`（旧路径兼容，v2 §4.4；原 v1 §7.1 引用悬空，规则即"对每个公共头生成同名转发文件"）：在 `src/widgets/CMakeLists.txt` 末尾按清单生成（不手维护）：
 
@@ -794,12 +853,14 @@ ctest --test-dir build -C Release --output-on-failure   # 通过数 == N₀（=2
        file(WRITE "${_compat_dir}/${_name}"
            "#pragma once\n#include <SARibbonWidgets/${_name}>\n")
    endforeach()
-   install(DIRECTORY "${_compat_dir}/" DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/SARibbonBar")
+   if(SARIBBON_INSTALL)   # v2 §6.4 (round2 D1)
+       install(DIRECTORY "${_compat_dir}/" DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/SARibbonBar")
+   endif()
    ```
 
    （colorWidgets 头如也需要旧路径 `include/SARibbonBar/colorWidgets/`，同法对 `SACOLOR_HEADER_FILES` 生成到 `${_compat_dir}/colorWidgets/`，转发目标 `<SARibbonWidgets/colorWidgets/<name>>`。）
 4. 外部消费冒烟：`tools/test-find-package/` 下建最小工程——`main.cpp` 分别以 `#include <SARibbonBar/SARibbonBar.h>`（旧路径转发头）与 `#include <SARibbonWidgets/SARibbonBar.h>`（新路径）各编一个 TU；CMakeLists：`find_package(SARibbon 3.0 REQUIRED COMPONENTS Widgets)` + `target_link_libraries(app PRIVATE SARibbon::Widgets)`；命令：`cmake -S tools/test-find-package -B build-fp -DCMAKE_PREFIX_PATH=<install目录>` + 编译通过。该工程不挂进主构建（独立冒烟用）。
-5. `cmake --install build --config Release` 后检查安装树：`include/SARibbonCore/`、`include/SARibbonWidgets/`（含 `colorWidgets/`）、`include/SARibbonBar/`（转发头）、`lib/cmake/SARibbon/{SARibbonConfig,SARibbonConfigVersion,SARibbonTargets}.cmake`、`lib/cmake/SARibbonBar/`（兼容壳）、`share/SARibbonBar_amalgamate/`、`bin/translations/*.qm`、库/DLL 本体（Windows + `SARIBBON_INSTALL_IN_CURRENT_DIR=ON` 时整体落在 `bin_qtX_编译器_x架构/`，行为同 2.9.5）。
+5. `cmake --install build --config Release` 后检查安装树：`include/SARibbonCore/`、`include/SARibbonWidgets/`（含 `colorWidgets/`）、`include/SARibbonBar/`（转发头）、`lib/cmake/SARibbon/{SARibbonConfig,SARibbonConfigVersion,SARibbonTargets}.cmake`、`lib/cmake/SARibbonBar/`（兼容壳）、`share/SARibbonBar_amalgamate/`、`bin/translations/*.qm`、库/DLL 本体（Windows + `SARIBBON_INSTALL_IN_CURRENT_DIR=ON` 时整体落在 `bin_qtX_编译器_x架构/`，行为同 2.9.5）。（round2 整合注：① 本条以 `SARIBBON_INSTALL=ON`（默认）执行，OFF 组合应无任何安装产物——v2 §6.4；② 清单**无 qml 项即为终态正确状态**——命令式单轨下 QML 叶子进 qrc 随库二进制，安装期零新增产物，04 S1/03 S6-3 同结论。）
 
 **提交**：`重构：安装转发头与 find_package 组件化验收`
 
@@ -807,7 +868,7 @@ ctest --test-dir build -C Release --output-on-failure   # 通过数 == N₀（=2
 
 **操作**：
 1. [AGENTS.md](../../AGENTS.md)：项目结构图改为 3.0 布局（`src/SARibbonBar/` → `src/widgets/`，新增 `src/core`、`src/qml`、顶层 `3rdparty/`、`plans/3.0/`）；"禁止触碰合并文件"段落（L5）改为指向 `src/SARibbon.h/.cpp` 由 `tools/Amalgamate.sh` 从 `src/widgets + src/core` 生成；核心头文件段（L36，`src/SARibbonBar/SARibbonGlobal.h`）改为"宏基座在 `src/core/SARibbonCoreGlobal.h`，`src/widgets/SARibbonGlobal.h` 为兼容转发头"；补充"3.0 开发在 dev-3.0 分支"。实测 AGENTS.md 共 6 处 `src/SARibbonBar` 引用需改（L5/L15/L17/L18/L19/L36）。
-2. [build.md](../../build.md)：选项表（L120-127）更新为新选项名（`BUILD_TESTS`→`SARIBBON_BUILD_TESTS` 在 L127，新增 `SARIBBON_BUILD_WIDGETS/QML`）、Qt 门槛 5.15（L11 frameless 版本注一并核对）、CMake 门槛 **3.21**。
+2. [build.md](../../build.md)：选项表（L120-127）更新为新选项名（`BUILD_TESTS`→`SARIBBON_BUILD_TESTS` 在 L127，新增 `SARIBBON_BUILD_WIDGETS/QML` 与 `SARIBBON_INSTALL`）、Qt 门槛 5.15（L11 frameless 版本注一并核对）、CMake 门槛 **3.21**。
 3. `submodule.md`：2 处旧 submodule 路径（L20/L29）改 `3rdparty/qwindowkit`；其 url 写 `stdware/qwindowkit` 与 `.gitmodules` 实际 `czyt1988/qwindowkit`（fork）不符，一并修正。
 4. `changlog.md`（**拼写确认为 changlog，非 changelog，文件名不改**）顶部加"3.0 开发分支启动（目录重组、三模块构建）"条目。
 5. `docs/zh|en/` 下 8 个文件引用 `src/SARibbonBar/i18n|resource` 旧路径——**本计划不动 docs/**（批量文档更新归计划 04），在 NOTES 登记清单。
