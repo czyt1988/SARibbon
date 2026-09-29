@@ -27,13 +27,13 @@ core（必要时回计划 02 补一个引擎缺口），**禁止在 QML 里重�
 | P1 | 计划 03 验收门全绿 | 复核 [03-build-ecosystem.md](03-build-ecosystem.md) 第 6 节验收门全勾 |
 | P2 | core 引擎可用 | `tests/core` 三引擎黄金测试全绿；`SARibbonMetrics`/契约接口在同步头目录可被 `<SARibbonCore/...>` include |
 | P3 | QML 构建开关 | `SARIBBON_BUILD_QML` 存在且默认 OFF（计划 01 S4.3）；`src/qml/` 骨架在位（计划 01 S6.5） |
-| P4 | 本机 Qt Quick 可用 | `find_package(Qt6 COMPONENTS Quick Qml QuickControls2)` 通过（Qt 6.7.3 全装通常满足；若缺组件，先装齐再开工。QuickControls2 供示例 `ApplicationWindow` 与 Controls 叶子使用，KDDW 库侧同样链接之，KDDW `src/CMakeLists.txt:496`） |
+| P4 | 本机 Qt Quick 可用 | **只读验证（find_package 需 configure 才能跑，此处用文件存在性核对）**：检查 Qt 安装下三个 cmake 包目录齐备——`ls <QtPath>/lib/cmake/ \| grep -E "Qt6Quick$\|Qt6Qml$\|Qt6QuickControls2$"`（Qt5 侧改 `Qt5Quick/Qt5Qml/Qt5QuickControls2`）。本机已核实：`D:/Qt/6.7.3/msvc2019_64/lib/cmake/` 下 `Qt6Quick/Qt6Qml/Qt6QuickControls2` 三者均含各自 `*Config.cmake`（2026-09-29 round3 复核）。缺组件则先装齐再开工。QuickControls2 供示例 `ApplicationWindow` 与 Controls 叶子使用，KDDW 库侧同样链接之（KDDW `src/CMakeLists.txt:496`）；SARibbon 库侧是否链 Controls2 在 S5 定（叶子用 Controls 才链，见 S1 操作1） |
 | P5 | 测试基线 | ctest == N₀（widgets 侧无回归） |
 | P6 | 纯净脚本在位 | `tools/check_core_purity.py` 已由计划 01 S9 创建并通过 core 扫描（本计划 S8 在其上扩展，非从零新建） |
 
 ## 4. 全程纪律
 
-- [README.md](README.md) R1–R4 适用。
+- [README.md](README.md) **R1–R6 全部适用**（round3 由原"R1–R4"扩全：本计划大量使用 **R5 术语**——Step A/B、黄金几何测试、契约接口、适配器、命令式单轨均出自 R5 表；S10.6 依赖 **R6 双分支与同步**——2.x bugfix 与引擎 fix 手动同步 core 的规则。与 01/02/03 §4 的"R1–R6"表述对齐）。
 - 每新增一个 QML 类型，同步更新 `tests/qml/` 的一致性测试与 `examples/qml/`（不留"只写类型不写测试"的空窗）。
 - QML 模块**禁止链接 SARibbonWidgets**（依赖矩阵红线，v2 §5.5）；CI 有专项验证（S8）。
 
@@ -67,14 +67,24 @@ core（必要时回计划 02 补一个引擎缺口），**禁止在 QML 里重�
        qmlRegisterType<SARibbonQml::RibbonBar>("SARibbon", 3, 0, "RibbonBar");
        // … RibbonCategory / RibbonTab / RibbonPanel / RibbonToolButton（S3-S5 逐个补）
        qmlRegisterUncreatableType<SARibbonQml::RibbonEnums>("SARibbon", 3, 0, "Ribbon", "Enum access only"); // S3.4
-       // 单例（S2）：先 QQmlEngine::setObjectOwnership(obj, QQmlEngine::CppOwnership) 再注册
-       qmlRegisterSingletonInstance("SARibbon", 3, 0, "RibbonTheme", RibbonTheme::instance());
+       // 单例（S2）：⚠️用回调式 qmlRegisterSingletonType，不用 qmlRegisterSingletonInstance
+       //   （后者在 Qt5.14/Qt6 把实例硬绑到首个引擎，第二个引擎取到 nullptr——见下"单例注册坑"）
+       qmlRegisterSingletonType<SARibbonQml::RibbonTheme>("SARibbon", 3, 0, "RibbonTheme",
+           [](QQmlEngine*, QJSEngine*) -> QObject* {
+               QObject* o = SARibbonQml::RibbonTheme::instance();
+               QQmlEngine::setObjectOwnership(o, QQmlEngine::CppOwnership); // 防引擎析构 GC 掉 core 单例
+               return o;
+           });
+       // RibbonMetrics 同法（S2）
        qmlRegisterModule("SARibbon", 3, 0);   // QWK qwkquickglobal.cpp:24：无 qmldir 时保证 import 模块解析
    }
    ```
 
    - 普通类型：`qmlRegisterType<T>("SARibbon", 3, 0, "RibbonPanel")`；不可实例化枚举持有类：`qmlRegisterUncreatableType<...>`（KDDW QmlTypes.cpp:28 的 metaObject 变体要求枚举在 `Q_NAMESPACE` 内——KDDW 在 `namespace KDDockWidgets` 上挂 `Q_NAMESPACE`（`src/KDDockWidgets.h:51-53`）+ 枚举 `Q_ENUM_NS`（:65-71）；SARibbon 枚举现状不满足且计划 02:67 已决策**维持全局命名空间**，见 S3.4）。
-   - **所有权坑（必做）**：`qmlRegisterSingletonInstance`/回调式注册的单例对象默认归**引擎**所有（引擎析构即 delete），而 RibbonTheme/RibbonMetrics 包装的是 core 进程级单例——注册前 `QQmlEngine::setObjectOwnership(obj, QQmlEngine::CppOwnership)`，否则多引擎（测试逐个建 QQmlEngine）第二次即悬空。
+   - **单例注册坑（必做，round3 对本机 Qt 源码实测修正——原文的所有权论断方向有误）**：RibbonTheme/RibbonMetrics 包装的是 core 进程级单例，且测试会连续建多个 QQmlEngine，**必须用回调式 `qmlRegisterSingletonType<T>(uri,maj,min,name, callback)`（callback 返回 `instance()` 并在其中设 CppOwnership），禁止用 `qmlRegisterSingletonInstance`**。两条 Qt 源码实证（5.14/6.7 行为一致）：
+     - ① `qmlRegisterSingletonInstance` 把实例**硬绑到首个访问它的引擎**：Qt 内部 `SingletonInstanceFunctor` 首次调用记下 `m_engine` 并自动 `setObjectOwnership(CppOwnership)`，第二个不同引擎访问即 `return nullptr` 并告警 `"Singleton registered by registerSingletonInstance must only be accessed from one engine"`（6.7.3 `Src/qtdeclarative/src/qml/qml/qqml.cpp:397/402-418` + `qqmlprivate.h:788-798`，注释明言 m_engine 故意用裸指针"不可改派到别的引擎"；5.14.2 `qqml.cpp:80-104` 的 `alreadyCalled` 守卫同款）。→ 本计划的多引擎测试策略（S2 验证"连续建两个引擎"、S7 骨架每个用例各自 `QQmlEngine engine;`）在 instance 式下**第二个引擎必拿 nullptr**，叶子主题绑定失效、断言崩，故 instance 式不可用。
+     - ② 回调式**无单引擎绑定**：`siinfo->qobjectCallback(q, q)` 按引擎逐个调用（6.7.3 `qqmlengine.cpp:1834`），每个引擎都能拿到同一 `instance()`；**但回调式不自动设所有权**——无父对象默认 JavaScriptOwnership，引擎析构会 GC 掉 core 单例，故**必须在 callback 内 `setObjectOwnership(instance(), CppOwnership)`**（原"所有权坑"的真正落点在回调式，不是 instance 式）。
+     - 两版 Qt 回调式签名齐备：`std::function<QObject*(QQmlEngine*,QJSEngine*)>`（6.7.3 qqml.h:701/706；5.14.2 :645/:663）。
    - **调用时机模型 = QWK 显式调用**：应用在 `engine.load()` 前调一次（QWK `examples/qml/main.cpp:25-27`）。KDDW 的"库内自动调用"（Platform.cpp:86）依赖其 frontend-init 单例步骤，SARibbon 无此步骤，不模仿；static-once 保证多次调用无害。写入迁移指南与示例模板（S6/S9）。
 4. `src/qml/SARibbonQmlGlobal.h` 完善导出宏——**QWK `qwkquickglobal.h:9-19` 的三态宏（`QWK_QUICK_STATIC` 空 / `QWK_QUICK_LIBRARY` 导出 / 否则导入）可逐字照抄**为 `SA_RIBBON_QML_STATIC`/`SA_RIBBON_QML_LIBRARY`/`SA_RIBBON_QML_EXPORT`（与计划 01 S5 的 PREFIX 方案衔接）；私有实现头用 `_p.h`。
 
@@ -87,17 +97,17 @@ core（必要时回计划 02 补一个引擎缺口），**禁止在 QML 里重�
 ### S2 主题与度量桥（P0：RibbonTheme / RibbonMetrics）
 
 **操作**：
-1. `src/qml/theme/RibbonTheme.h/.cpp`（C++ QObject 单例）：包装 core `SARibbonThemeData::instance()`（计划 02 S2.1/S2.3 产物：QObject 单例，信号 `themeChanged(SARibbonTheme)`、`paletteChanged()`）——palette 颜色暴露为 QML 属性（`NOTIFY` 转发上述两信号）、`currentTheme` 可读写。**不实现任何颜色计算**（core 已有）。注册：单轨 `qmlRegisterSingletonInstance`（S1.3，Qt5.14+/Qt6 同签名：5.14.2 qqml.h:681、6.7.3 :727），**注册前设 CppOwnership**（S1.3 所有权坑）。（原"Qt6 轨 QML_SINGLETON + static create()"随声明式轨移入 S1 附注；`static create()` 转发函数可以顺手保留——3.1+ 启用声明式轨时是必需件，现在无害。）
+1. `src/qml/theme/RibbonTheme.h/.cpp`（C++ QObject 单例）：包装 core `SARibbonThemeData::instance()`（计划 02 S2.1/S2.3 产物：QObject 单例，信号 `themeChanged(SARibbonTheme)`、`paletteChanged()`）——palette 颜色暴露为 QML 属性（`NOTIFY` 转发上述两信号）、`currentTheme` 可读写。**不实现任何颜色计算**（core 已有）。注册：**回调式 `qmlRegisterSingletonType`**（见 S1.3"单例注册坑"——**禁用 `qmlRegisterSingletonInstance`**，它把实例绑到首个引擎，多引擎测试第二个即 nullptr），callback 内 `return RibbonTheme::instance()` 并 `setObjectOwnership(CppOwnership)`（回调式不自动设所有权，不设则引擎析构 GC 掉 core 单例）。（原"Qt6 轨 QML_SINGLETON + static create()"随声明式轨移入 S1 附注；`static create()` 转发函数可以顺手保留——3.1+ 启用声明式轨时是必需件，现在无害。）
 2. `src/qml/metrics/RibbonMetrics.h/.cpp`：桥 `SARibbonMetrics`（core 构造签名 = `QFontMetrics` + `devicePixelRatio`，计划 02 S3.1）。**度量全部在 C++ 内构造，QML 侧不参与**：
    - 默认 `QFontMetrics(QGuiApplication::font())`；暴露 `font` Q_PROPERTY(QFont) 允许覆盖（对应 widgets 侧"以 bar 的 fontMetrics 为准"的语义，现状度量公式即取 `ribbonBar->fontMetrics()`，`SARibbonBarLayout.cpp:381/407/432`）；
-   - 在 `qApp` 上装事件过滤器监听 `QEvent::ApplicationFontChange`（与计划 02 S3.2 widgets 侧同一事件源），变化时重建 metrics 并 `Q_EMIT metricsChanged`；
+   - 在 `qApp` 上装事件过滤器监听 `QEvent::ApplicationFontChange`（**注意：这不是 widgets 侧的"同一事件源"**——widgets 走各控件自身的 `QEvent::FontChange`，计划 02 S3.2 / `SARibbonBar.cpp:4112` 及 Category/Panel/ToolButton 各自 case；QML metrics 单例无控件、只能收应用级 `ApplicationFontChange`（`QGuiApplication::setFont` 触发）。二者"字体变→重建 metrics"的目的相同但事件不同，一致性测试须设**应用字体**才能同时触发两端，记 NOTES），变化时重建 metrics 并 `Q_EMIT metricsChanged`；
    - `devicePixelRatio` 取 `QGuiApplication::devicePixelRatio()`；RibbonBar 宿主可用所在窗口的 `QQuickWindow::effectiveDevicePixelRatio()`（public，6.7.3 `qquickwindow.h:141`）覆盖；
    - 暴露 `tabBarHeight/categoryHeight/panelTitleHeight/...` 为只读属性。
    - 形态：P0 只做**单例**（v2 §5.2 "singleton 或 attached"二选一时取 singleton）；attached 形态需要多 RibbonBar 各带不同字体时才值得做（`QML_ATTACHED`/`qmlRegisterAttachedType`），推迟。
    - ⚠️ 原稿"从 qml fontMetrics 构造"不成立：QML 未暴露 `QFontMetrics` 类型；内建 `TextMetrics`（QtQuick）只有 advanceWidth/boundingRect/elidedText，**没有** `lineSpacing()`/`height()`——而 SARibbon 度量公式恰依赖这两者（上行号）。已按上述 C++ 方案改写。
 3. `src/qml/qml/` 下视觉叶子起步（如叶子需要主题色，绑定 RibbonTheme 单例属性）。
 
-**验证**：QML 单测 `tests/qml/tst_themeBridge.cpp`：C++ 改 `SARibbonThemeData::instance()` 的主题 setter，QML 侧断言属性变化信号触发——**双端同一信号源**（v2 §3.2-1 的验收）。测试经与应用相同的注册入口建 QQmlEngine（统一：先调 `saRibbonRegisterQmlTypes()`，S1.3 static-once 保证多引擎重复调用无害）；连续建两个引擎重复断言，顺带验证 CppOwnership 无悬空。
+**验证**：QML 单测 `tests/qml/tst_themeBridge.cpp`：C++ 改 `SARibbonThemeData::instance()` 的主题 setter，QML 侧断言属性变化信号触发——**双端同一信号源**（v2 §3.2-1 的验收）。测试经与应用相同的注册入口建 QQmlEngine（统一：先调 `saRibbonRegisterQmlTypes()`，S1.3 static-once 保证注册只发生一次）。**"连续建两个引擎重复断言"能成立的前提就是 S1.3/S2.1 用了回调式注册**——`qmlRegisterSingletonInstance` 会让第二个引擎拿到 nullptr（S1.3 单例注册坑①），故本用例同时也是"未误用 instance 式"的回归哨兵；两引擎先后销毁再断言 core 单例仍存活，验证回调内 CppOwnership 生效（无悬空）。
 
 **提交**：`feat：QML 主题与度量桥接单例`
 
@@ -140,17 +150,20 @@ protected:
                                          // ② 创建视觉叶子（见下 ensureQmlItem）
                                          // 时机实证：KDDW DockWidgetInstantiator.h:27-34 注释——"QML 解析结束、所有属性就位后"才构造实体
     void updatePolish() override;        // 布局唯一入口（上节要点3）：
-                                         //   取显式列表 sizeHint → 构造 QVector<SARibbonAbstractLayoutItem*>（契约适配器）
-                                         //   → SARibbonPanelLayoutEngine::layout(...)
-                                         //   → 逐项 item->setPosition(QPointF) + item->setSize(QSizeF)
+                                         //   取显式列表 sizeHint → 构造 QVector<SARibbonAbstractLayoutItem*>（契约项，见操作1决策）
+                                         //   → SARibbonPanelLayoutEngine::layout(items, availRect, metrics, input)
+                                         //     引擎回写每项 item->resultGeometry / rowIndex / columnIndex（契约输出字段，02 S4.1 最终代码块）
+                                         //   → 逐项 item->applyGeometry(item->resultGeometry)：QML 侧 applyGeometry 实现即
+                                         //     setPosition(rect.topLeft()) + setSize(rect.size())
                                          //     （KDDW 几何应用同款：View.cpp:157-161 setGeometry = setSize + move；View.cpp:232-244 move = setX/setY）
                                          //   → setImplicitSize(w, h)（类内调 protected 合法）
     void itemChange(ItemChange change, const ItemChangeData& data) override;
                                          // ItemChildRemovedChange/ItemVisibleHasChanged → 同步显式列表 + polish()
                                          // KDDW 先例：View.cpp:202-209 用 itemChange 补 QQuickItem 不发的 Visible 事件
 private:
-    void ensureQmlItem();                // 叶子创建三部曲（KDDW Group.cpp:105-116 逐行同款）：
-                                         //   QQmlComponent component(qmlEngine(this), leafUrl);  // 引擎获取见下注
+    void ensureQmlItem(QQmlEngine* engine = nullptr);  // 叶子创建三部曲（KDDW Group.cpp:105-116 逐行同款）：
+                                         //   QQmlEngine* e = engine ? engine : qmlEngine(this);  // 测试纯手工建宿主时 qmlEngine(this) 可能为空，须显式传 engine（S7 白盒路径）；QML 声明创建时 qmlEngine(this) 有效
+                                         //   QQmlComponent component(e, leafUrl);  // 引擎获取见下注
                                          //   m_qmlItem = component.create();
                                          //   m_qmlItem->setProperty("panelCpp", QVariant::fromValue(this)); // 自注入
                                          //   m_qmlItem->setParentItem(this); m_qmlItem->setParent(this);    // 双 setParent 都要
@@ -170,14 +183,29 @@ private:
 **Instantiator 模式评估结论（第2轮，设计附注）**：SARibbon P0 **不需要** Instantiator 式包装类。KDDW 用它的唯一理由写在注释里：真实对象（Core::DockWidget 控制器）构造需要 `uniqueName`，而该值要到 QML 解析结束才齐——故用 `DockWidgetInstantiator : QQuickItem` 先接住声明、`componentComplete()` 时才经 ViewFactory 构造实体（`DockWidgetInstantiator.h:27-35` 注释 + `.cpp:180-238`；`MainWindowInstantiator.h:30,71-72` 同构）。SARibbon 宿主**本身就是那个 QQuickItem**，没有"构造参数必须先于对象存在"的问题，属性写进成员、`componentComplete` 时向父宿主登记即可（上骨架）。两个顺带实证：①KDDW 收集单个声明式子内容也直接用 `childItems()`（`DockWidgetInstantiator.cpp:197-202` 校验 size==1）——QQuickItem 天然子项树够用，SARibbon 的显式列表是为了**布局序稳定**（z 值/装饰项扰动，上节要点4），不是子项发现；②"属性先缓冲、实体后建"时 KDDW 用 `std::optional` 缓冲（`DockWidgetInstantiator.h:113` + `.cpp:234-235`）——若 Tier 2（D7）引入 core controller，再照此上 Instantiator 族。
 
 **操作**：
-1. `src/qml/panel/RibbonPanel.h/.cpp`：C++ `QQuickItem` 子类；`updatePolish()` 中取显式子项列表的 sizeHint → 构造 `QVector<SARibbonAbstractLayoutItem*>`（QML 侧适配器实现契约接口，或直接让 RibbonToolButton 实现契约接口）→ 调 `SARibbon::Core::SARibbonPanelLayoutEngine::layout(...)` → 按结果对每个子项 `setPosition(QPointF)` + `setSize(QSizeF)`，宿主自身 `setImplicitSize`（类内，protected 合法）。**引擎一个字都不改**（v2 §5.1）。
+1. `src/qml/panel/RibbonPanel.h/.cpp`：C++ `QQuickItem` 子类；`updatePolish()` 中取显式子项列表的 sizeHint → 构造 `QVector<SARibbon::Core::SARibbonAbstractLayoutItem*>` → 调 `SARibbon::Core::SARibbonPanelLayoutEngine::layout(items, availRect, metrics, input)`（引擎把每项的 `resultGeometry`/`rowIndex`/`columnIndex` 回写——契约输出字段名以 02 S4.1 最终代码块为准，**注意不是 `geometry`**，该字段名在 02 S4.1-2 已因与 `QLayoutItem::geometry()` 冲突而改名）→ 逐项 `item->applyGeometry(item->resultGeometry)`（QML 侧 `applyGeometry` 实现 = `setPosition(rect.topLeft()) + setSize(rect.size())`），宿主自身 `setImplicitSize`（类内，protected 合法）。**引擎一个字都不改**（v2 §5.1）。
+   - **契约项形态决策（round3 定案，消除原"或"二选一）**：P0 的按钮类子项**直接多继承实现契约**——`class RibbonToolButton : public QQuickItem, public SARibbon::Core::SARibbonAbstractLayoutItem`，与 widgets 侧 `SARibbonPanelItem : QWidgetItem + 契约`（02 S5.1-1）完全同构；实现契约的 `sizeHint/minimumSizeHint/isHidden/expandingDirections/applyGeometry` 五个纯虚 + `rowProportion` 字段，`debugName()` 返回 `objectName()` 供黄金测试诊断（02 S4.1 契约含 `debugName`）。安全性：契约基类是**非 QObject 纯接口**，与 QQuickItem（唯一 QObject 基）多继承不引入 moc 二义。**独立适配器对象仅用于"纯 QML 叶子、无 C++ 宿主"的子项**（如 P1 的 RibbonSeparator/RibbonLine 若做成 leaf-only）：宿主侧持一个轻量适配器，把叶子的 implicit 尺寸映射进契约。理由记 NOTES。
+   - **登记列表用契约基类型**：显式列表与 `registerChildItem` 参数应为 `SARibbonAbstractLayoutItem*`（或同时是 QQuickItem 的子项基类型），不要写死 `RibbonToolButton*`——P1 的 Separator/Line 也是 panel 子项，异构收集才能进同一个 `QVector<SARibbonAbstractLayoutItem*>`（骨架里 `registerChildItem(RibbonToolButton*)` 是示意，落地按契约基类型泛化）。
 2. `panelTitle`/`optionButton` 作伪项传入（引擎不感知）。
 3. `src/qml/qml/RibbonPanel.qml`（视觉叶子，标题条/边框/背景色绑定 RibbonTheme）+ `RibbonPanelBase.qml`(契约层)：宿主经 `QQmlComponent` 加载为自身子项（三部曲见上骨架注记；KDDW `View::createItem`，View.cpp:163-173/:840-873）。叶子只做渲染，**不写任何几何计算**；Base/视觉两层拆分与配对规则见下"QML 叶子组织规范"。
-4. 输入参数（`PanelLayoutMode`、`RowProportion` 等）的 QML 枚举暴露：**不用 `QML_ENUM`——该宏在 Qt 5.14.2 / 6.7.3 / 6.10.1 公共头树中均不存在（grep `define QML_ENUM` 无命中，第1轮核实，第2轮未回退），KDDW 也未使用**。可行做法：在已注册的 QObject 子类内定义镜像枚举 + `Q_ENUM`（`qmlRegisterType` 注册路径会把 Q_ENUM 带进 QML；若 3.1+ 启用声明式轨，`QML_ELEMENT` 路径同样携带），如 `RibbonToolButton` 内 `enum RowProportion { None, Large, Medium, Small }; Q_ENUM(RowProportion)` + 同名 Q_PROPERTY。core 侧枚举现状（第2轮复核）：`RowProportion` 是 `SARibbonPanelItem`（非 QObject）的类内普通 enum（`SARibbonPanelItem.h:36`），全局的 `SARibbonAlignment/SARibbonTheme` 是全局 enum class（`SARibbonGlobal.h:197/220`，全文件无 Q_NAMESPACE/namespace 包裹）——KDDW 的 `qmlRegisterUncreatableMetaObject` 方案（前提：`namespace KDDockWidgets` 挂 `Q_NAMESPACE`（KDDW `src/KDDockWidgets.h:51-53`）+ 枚举 `Q_ENUM_NS`（:65-71），注册见 QmlTypes.cpp:28）对 SARibbon 不可直接用；且计划 02:67 已决策枚举**维持全局命名空间**（避免 3.0 用户改名），Q_NAMESPACE 路线在 3.0 被封死。故跨类型共享的枚举放一个 uncreatable 注册类（暂名 `Ribbon`，对应 v2 §5.1 示例的 `Ribbon.Large` 写法）统一挂 Q_ENUM；若未来 core 枚举命名空间化（计划 02:77 预留了 Q_NAMESPACE+Q_ENUM_NS 选项），可切回 KDDW 的 metaObject 注册方式（记 NOTES 观察项）。镜像枚举与 core 枚举间的转换函数集中在一个 `_p` 头，static_assert 值一致。
+4. 输入参数（`PanelLayoutMode`、`RowProportion` 等）的 QML 枚举暴露：**不用 `QML_ENUM`——该宏在 Qt 5.14.2 / 6.7.3 / 6.10.1 公共头树中均不存在（grep `define QML_ENUM` 无命中，第1轮核实，第2轮未回退），KDDW 也未使用**。可行做法：在已注册的 QObject 子类内定义镜像枚举 + `Q_ENUM`（`qmlRegisterType` 注册路径会把 Q_ENUM 带进 QML；若 3.1+ 启用声明式轨，`QML_ELEMENT` 路径同样携带）。**归属规则（round3 明确，消除原示例与 v2 §5.1 的冲突）**：凡在用户 QML 里以 `Ribbon.Xxx` 形式出现的枚举（`RowProportion` 的 Large/Medium/Small/None、`SARibbonAlignment`、`SARibbonTheme`、`PanelLayoutMode` 等——即 v2 §5.1 示例用 `Ribbon.Large` 的那些），**统一挂在一个 uncreatable 注册类 `Ribbon`（暂名）内做镜像 Q_ENUM**，不散进各宿主类；宿主的 Q_PROPERTY 直接用 `Ribbon::RowProportion` 作类型（跨类枚举属性只要 `Ribbon` 已注册 + Q_ENUM 即合法，QML 侧写 `rowProportion: Ribbon.Large`）。**只有确属单一类型私有、用户 QML 不以 `Ribbon.` 前缀访问的枚举**才挂在该宿主内。原"把 RowProportion 放进 RibbonToolButton"的示例写法**作废**——它会让用户写 `RibbonToolButton.Large`，与 v2 §5.1 的 `Ribbon.Large` 冲突。core 侧枚举现状（第2轮复核）：`RowProportion` 是 `SARibbonPanelItem`（非 QObject）的类内普通 enum（`SARibbonPanelItem.h:36`），全局的 `SARibbonAlignment/SARibbonTheme` 是全局 enum class（`SARibbonGlobal.h:197/220`，全文件无 Q_NAMESPACE/namespace 包裹）——KDDW 的 `qmlRegisterUncreatableMetaObject` 方案（前提：`namespace KDDockWidgets` 挂 `Q_NAMESPACE`（KDDW `src/KDDockWidgets.h:51-53`）+ 枚举 `Q_ENUM_NS`（:65-71），注册见 QmlTypes.cpp:28）对 SARibbon 不可直接用；且计划 02:67 已决策枚举**维持全局命名空间**（避免 3.0 用户改名），Q_NAMESPACE 路线在 3.0 被封死。故跨类型共享的枚举放一个 uncreatable 注册类（暂名 `Ribbon`，对应 v2 §5.1 示例的 `Ribbon.Large` 写法）统一挂 Q_ENUM；若未来 core 枚举命名空间化（计划 02:77 预留了 Q_NAMESPACE+Q_ENUM_NS 选项），可切回 KDDW 的 metaObject 注册方式（记 NOTES 观察项）。镜像枚举与 core 枚举间的转换函数集中在一个 `_p` 头，static_assert 值一致。
 
 **QML 叶子组织规范（S3–S5 共用，第2轮评审补，KDDW `src/qtquick/views/qml/` 15 个叶子实证）**：
 - **两层拆分**：`XxxBase.qml`（契约层）+ `Xxx.qml`（默认视觉层，继承 Base）。Base 声明与 C++ 宿主的全部交互面；视觉层只管外观。实证：KDDW `TitleBarBase.qml:14-23` 头注释（"要自定义外观请直接派生 TitleBarBase.qml 而非 TitleBar.qml"）+ `TitleBar.qml:17-20` 派生关系；`TabBarBase.qml:75-88` 在 Base 里放"必须由派生叶子实现"的抽象 JS 函数（`console.warn` 占位），`TabBar.qml:31-73` 实现之。SARibbon P0 至少 RibbonPanel/RibbonToolButton 走两层（自定义需求最高），其余类型可先单文件、留 Base 化重构余地。
-- **宿主配对 = 父链属性查找 + C++ 注入，不用 required property、不用 context property**：宿主创建叶子后 `setProperty("panelCpp", QVariant::fromValue(this))`（Group.cpp:114）；Base 叶子首行 `readonly property QtObject panelCpp: parent.panelCpp`（KDDW 同款：`TabBarBase.qml:20-21` `parent.groupCpp`、`TitleBarBase.qml:27` `parent.titleBarCpp // It's set in the loader`）。所有状态读取带空守卫：`panelCpp ? panelCpp.panelTitle : ""`（TitleBarBase.qml:28-34 全组同款）。**注意**：KDDW 因经 Loader 加载叶子，parent 是 Loader，需 Loader 上声明转发属性（Group.qml:171-175）；SARibbon P0 叶子直接 `setParentItem(宿主)`，parent 即宿主，**不引入 Loader 层**（少一层转发，见 findings §四）。context property 只用于全局服务对象（KDDW 仅 3 个：`_kddwHelpers/_kddwDockRegistry/_kddw_widgetFactory`，Platform.cpp:182-186）——SARibbon 对应物是 RibbonTheme/RibbonMetrics 单例（已走类型注册，不占 context property）。
+- **宿主配对 = C++ setProperty 注入 + 叶子把自己赋回（不用 Loader、不用 required property、不用 context property）**：宿主创建叶子后 `m_qmlItem->setProperty("panelCpp", QVariant::fromValue(this))`（骨架 ensureQmlItem；KDDW Group.cpp:114 同款）。**SARibbon 叶子直接 `setParentItem(宿主)`、无 Loader 层，`parent` 即宿主本身**——因此叶子根的 panelCpp 有两种等价取法，**二选一、勿混用**：①根声明**可写** `property QtObject panelCpp`，由 C++ setProperty 注入（骨架走这条）；②`readonly property QtObject panelCpp: parent`（parent 就是宿主，免注入）。KDDW 的 `readonly ... parent.panelCpp`（TabBarBase.qml:20-21、TitleBarBase.qml:27）是它**经 Loader**加载、parent 是 Loader、需在 Loader 上声明转发属性（Group.qml:171-175）的模式，SARibbon 无 Loader 不照搬。配对与握手代码（round3 补，握手仿 KDDW TabBarBase.qml:65-73）：
+
+  ```qml
+  // RibbonPanelBase.qml（契约层，根）
+  Item {
+      id: root
+      property QtObject panelCpp: null                                  // C++ setProperty 注入（取法①；取法②改 readonly ... : parent）
+      onPanelCppChanged: if (panelCpp) panelCpp.panelQmlItem = root      // 握手：把自己赋回宿主的 panelQmlItem（测试可达性通道，仿 KDDW TabBarBase.qml:70-71 "供单测访问内部项"注释）
+      readonly property string title: panelCpp ? panelCpp.panelTitle : "" // 状态读取一律带空守卫（TitleBarBase.qml:28-34 全组同款）
+      // … 其余从 panelCpp 派生的只读属性 / 对外 signal
+  }
+  ```
+
+  宿主 `panelQmlItem`（骨架 Q_PROPERTY）由此收到叶子根——它既是"C++ 调叶子 JS 函数/读叶子属性"的通道（S3 骨架注记），也是测试 `findChild` 下钻叶子内部项的可达性入口（S7）。context property 只用于全局服务对象（KDDW 仅 3 个：`_kddwHelpers/_kddwDockRegistry/_kddw_widgetFactory`，Platform.cpp:182-186）——SARibbon 对应物是 RibbonTheme/RibbonMetrics 单例（已走回调式类型注册，不占 context property）。
 - **QML→C++ 事件回传**：Base 叶子声明 signal（TitleBarBase.qml:47-58 `closeButtonClicked` 等），视觉层触发，Base 的 handler 调宿主 Q_INVOKABLE（TitleBarBase.qml:86-101 → TitleBar.h:80-90 `onCloseClicked/onFloatClicked...`）。SARibbon 对应：叶子里按钮 `onClicked: panelCpp.optionButtonClicked()`，宿主 Q_INVOKABLE 转 Q_SIGNALS。
 - **交互事件重定向**（叶子内 MouseArea 事件转给 C++ 宿主处理）：KDDW 用 `redirectMouseEvents(mouseArea)` Q_INVOKABLE + 事件过滤器（TabBarBase.qml:65-68 握手、View.h:115、View.cpp:39-104 MouseEventRedirector/:175-185）。SARibbon P0 按钮交互直接在叶子的 MouseArea/AbstractButton 里发 signal 即可，**不做通用重定向器**（KDDW 需要它是因为拖拽等逻辑在 C++ controller；SARibbon 交互留前端，D7）。
 - **主题绑定规则（SARibbon 特有增强，KDDW 无先例）**：KDDW qtquick 叶子颜色全部硬编码（TitleBar.qml:27 `"#eff0f1"`、Group.qml:33-38 border `"#b8b8b8"`），换肤 = 换叶子文件；SARibbon 改为叶子内**一切颜色/尺寸绑定 RibbonTheme/RibbonMetrics 单例属性**，禁止散落颜色常量（评审检查点：叶子里出现字面量色值 = 打回）。绑定点集中在 Base 层，视觉层引用 Base 的 readonly 属性。
@@ -205,6 +233,7 @@ private:
 
 **操作**：
 1. `src/qml/button/RibbonToolButton.h/.cpp`（若需自绘）+ `src/qml/qml/RibbonToolButton.qml`：大/中/小三态（`RowProportion`）、图标+文字、菜单弹出的最小实现；视觉复杂度允许 `QQuickPaintedItem`（public 头 `qquickpainteditem.h:13`，继承 QQuickItem；D5：渲染层允许混用）。
+   - **sizeHint 传导链（round3 补，锁定 round1 findings §三.4 遗留项）**：`RibbonToolButton` 作为契约项（S3 操作1 的多继承决策）实现的 `sizeHint()`，**必须在 C++ 侧由 core `SARibbonMetrics` 算出**（图标尺寸 largeIconSize/smallIconSize + 字体度量公式源自 metrics 的三态高/宽推导），**不得取 QML 叶子的 implicitWidth/Height 反推**——叶子 implicit 尺寸是纯视觉结果，拿它喂引擎 = 让 QML 自报几何，违反铁律（第二实现风险）。完整链：core metrics → 宿主 C++ `sizeHint()` → `layout()` 装箱 → `resultGeometry` → `applyGeometry`（setPosition+setSize）→ 叶子随宿主几何填充。文字测量用 `QFontMetrics`（来自 metrics 字段），**不用 QML 的 `TextMetrics` 二次测量**（TextMetrics 无 lineSpacing/height，S2.2）。若发现三态 sizeHint 公式 core metrics 未提供 = core 缺口，停下回计划 02 补（铁律），禁止在 QML/C++ 宿主里现推。
 2. `action` 属性（模块归属已核：Qt6 `QAction` 在 QtGui——`6.7.3/include/QtGui/qaction.h` 存在；Qt5 在 QtWidgets——`5.14.2/include/QtWidgets/qaction.h` 存在且 QtGui 下无此头。v2 计划行文中的"Qt6/GuiGui"系笔误，以本条为准）：core 一律不 include QAction（v2 计划 §3.7）；QML 按钮此处用自有属性（`text/iconSource/shortcut`）承接，QAction 桥接列入 D8/Tier 3 不做。**为什么不学 KDDW 自研 Action**：KDDW 的 `Core::Action` 存在理由是其 controller 层在 core、要跨 QtQuick 与 Flutter 双 GUI 前端驱动按钮（`src/core/Action.h:17` 注释原文 "Class to abstract QAction, so code still works with QtQuick and Flutter"；QtQuick 端实现是纯 QObject，`src/qtquick/Action.h:21-80`）。SARibbon 3.0 的交互控制留在各前端（D7 Tier 2），core 不消费 action，抽象层没有消费方——与 v2 §2.3 "自研 Core::Action：观察（D8）"一致。
 3. P1：`RibbonSeparator.qml`、`RibbonLine.qml`、`RibbonQuickAccessBar`（C++ 宿主 + metrics）。
 
@@ -230,7 +259,7 @@ private:
        set_target_properties(QmlMainWindowExample PROPERTIES WIN32_EXECUTABLE TRUE)  # 照 example/MainWindowExample/CMakeLists.txt:21-25 现例
    endif()
    if(NOT TARGET SARibbonQml)                  # 独立构建 fallback（KDDW 示例 :21-28 同型）
-       find_package(SARibbon REQUIRED)         # 组件名以计划 03 的 SARibbonConfig 定稿为准
+       find_package(SARibbon REQUIRED COMPONENTS Qml)  # 链 SARibbon::Qml 须请求 Qml 组件；组件名以计划 01 S11/03 的 SARibbonConfig 定稿为准
    endif()
    target_link_libraries(QmlMainWindowExample PRIVATE SARibbon::Qml Qt${QT_VERSION_MAJOR}::QuickControls2)
    ```
@@ -248,7 +277,7 @@ private:
        QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling); // KDDW 示例 main.cpp:31-34（Qt6 默认开启，无需设）
        QGuiApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
    #endif
-       qputenv("QT_QUICK_CONTROLS_STYLE", "Basic");              // QWK main.cpp:12-16：Qt6 用 Basic、Qt5 用 Default（按其版本分支设）；固定样式保证截图可对比
+       qputenv("QT_QUICK_CONTROLS_STYLE", "Basic");              // 无条件 Basic（Qt5/Qt6 均内置该样式，比 QWK main.cpp:12-16 的版本分支更简——QWK 给 Qt5 用 Default，此处两版统一 Basic 保证截图可对比）；必须在 QGuiApplication 构造前设（Qt 在构造期读该环境变量）
        QGuiApplication app(argc, argv);
        QQmlApplicationEngine engine;
        saRibbonRegisterQmlTypes(&engine);                        // QWK main.cpp:26-27 同款：load 之前；单轨下 Qt5/Qt6 都要调（S1.3）
@@ -272,7 +301,7 @@ private:
 - **固定 Quick Controls 样式**防系统样式插件干扰：`QQuickStyle::setStyle("Basic")`（KDDW 用 Material，`TestHelpers.cpp:73` 注释 "so we don't load KDE plugins"——重点是显式 set，不随系统）；
 - **窗口/根对象尺寸是延迟设置的**：KDDW 在 QQuickView 建根后固定 `QTest::qWait(100)`（`TestHelpers.cpp:103/145` 注释 "the root object gets sized delayed"）——SARibbon 用 `QTRY_*` 轮询替代硬等待（下骨架）。
 
-**QML 侧几何断言的关键坑**：`updatePolish()` 只对挂进 QQuickWindow 并进入 polish 阶段的 item 执行（S3 要点）——裸堆 item 断言几何必失败。测试统一模式：`QQuickView`（offscreen 下合法）承载场景 + `show()` + `QTest::qWaitForWindowExposed(&view)` + `QTRY_COMPARE(item->x()..., 黄金值)`；或（更快的白盒路径）直接调用宿主的内部布局入口函数后同步断言。二选一在 `tests/qml/` 内统一，写进测试 README 注释。**测试规范（round2 整合，kddw-qtquick-findings.md §三.5）**：场景 qml 内被测项**必须设 `objectName`**（findChild 定位的前提，KDDW tst_qtquick.cpp:325-329 模式）；叶子内部项经**握手属性**暴露为测试可达性通道（KDDW 明确惯例，Base 叶子内注释原话 "Setting just so the unit-tests can access the buttons"——TabBarBase.qml:70-71、TitleBar.qml:23-25）。这两条约定与上述"二选一"的模式选择一并写进 `tests/qml/` README 注释。
+**QML 侧几何断言的关键坑**：`updatePolish()` 只对挂进 QQuickWindow 并进入 polish 阶段的 item 执行（S3 要点）——裸堆 item 断言几何必失败。测试统一模式：`QQuickView`（offscreen 下合法）承载场景 + `show()` + `QTest::qWaitForWindowExposed(&view)` + `QTRY_COMPARE(item->x()..., 黄金值)`；或（更快的白盒路径）直接调用宿主的内部布局入口函数后同步断言。二选一在 `tests/qml/` 内统一，写进测试 README 注释。**测试规范（round2 整合，kddw-qtquick-findings.md §三.5）**：场景 qml 内被测项**必须设 `objectName`**（findChild 定位的前提，KDDW tst_qtquick.cpp:325-329 模式）；叶子内部项经**握手属性**暴露为测试可达性通道（KDDW 明确惯例，Base 叶子内注释原话 "Setting just so the unit-tests can access the buttons"——TabBarBase.qml:70-71、TitleBar.qml:23-25）。**字体变更测试统一改应用字体（round3 终审补，落地 04-dryrun 建议 5）**：涉及"字体变→metrics 重建"的用例一律经 `QGuiApplication::setFont` 设置**应用级**字体——widgets 侧监听的是各控件自身 `QEvent::FontChange`、QML metrics 单例监听的是应用级 `QEvent::ApplicationFontChange`（S2.2），只改单控件字体无法同时触发两端，会造成一致性套件的双端不同步假象。这些约定与上述"二选一"的模式选择一并写进 `tests/common/RibbonConformance.h` 头注释与 `tests/qml/` README 注释。
 
 **tests/qml C++ 测试骨架（照抄级，出处见行内注）**：
 
@@ -326,6 +355,7 @@ QTEST_MAIN(TestConformanceQml)   // 不链 Widgets → 展开为 QGuiApplication
 1. `tests/common/RibbonConformance.h`：场景数据结构（**纯头、零依赖**，两侧各自 include 编译——对应 KDDW 共享 utils.cpp 的做法）：场景 = 一组 (sizeHint, rowProportion) + metrics 输入 + 期望（黄金值引用 `tests/core/layout_fixtures.h`）。
 2. widgets 侧：`tests/widgets/tst_conformance_widgets.cpp` 构造真实 `SARibbonPanel` 场景，断言 `QWidget::geometry()` == 黄金。
 3. qml 侧：`tests/qml/tst_conformance_qml.cpp` 构造同场景 QML 树（内联组件串或 test 资源 qrc 中的 .qml），断言 `QQuickItem` 的 `x/y/width/height` == 黄金。
+   - **固定字体（round3 补，落地 round1 findings §三.3 遗留项）**：操作 2/3 构造的是**真实** widgets 控件与 QML 树，其 sizeHint 经 core metrics 由字体推导（见 S5 sizeHint 传导链）——**两端必须复用 tests/core 的固定部署字体**（02 S5.0-3：`tests/core/fonts/` 开源字体 + 启动 `QFontDatabase::addApplicationFont`，并 `QFontInfo(f).family()` 断言命中防静默 fallback），否则 linux-qt6.8 的 QML CI job（操作6）会因系统字体差异得到不同 sizeHint → 几何断言必挂。录制与回放的字体家族/字号必须严格一致（v2 R5 同样适用）；`RibbonConformance.h` 的 metrics 输入应以该固定字体构造。
 4. 主题切换断言：双端各注册监听 `SARibbonThemeData`，切换后各自重渲染标记变化。
 5. CMake 接线：`tests/CMakeLists.txt` 增加 `if(SARIBBON_BUILD_QML) add_subdirectory(qml) endif()`；`tests/qml/CMakeLists.txt` 仿 `tests/widgets/` 的 `add_saribbon_test()` 模式建 tst_* 可执行 + `add_test`（链 `SARibbon::Qml`、`Qt::Test`、`Qt::Quick`；需要 QApplication 的混合场景才链 Widgets——一致性套件 qml 侧**不应**链 Widgets，主题联动断言经 core 信号完成；QTEST_MAIN 因此自动落在 QGuiApplication 分支）。KDDW 组织对照：每前端一个测试可执行、`TESTING_SRCS/TESTING_RESOURCES` 共享编入两侧（tests/CMakeLists.txt:28-29/:55-76）——SARibbon 对应物是 `tests/common/RibbonConformance.h`（纯头）+ 各侧自己的场景资源；qml 侧场景 .qml 进 `tests/qml/test_resources.qrc`（AUTORCC 编入测试可执行，与库叶子 qrc 分离，避免测试场景污染库资源）。
 6. CI：`SARIBBON_BUILD_QML=ON` 的 job 跑 `tests/qml`（linux-qt6.8 增加 QML=ON matrix 项，win 本地为主验证；offscreen QPA 环境变量在 workflow step 设置）。
@@ -337,11 +367,11 @@ QTEST_MAIN(TestConformanceQml)   // 不链 Widgets → 展开为 QGuiApplication
 ### S8 QML 纯净与依赖矩阵 CI
 
 **操作**：
-1. `tools/check_core_purity.py` 扩展（脚本本体由计划 01 S9 新建，其 CLI 为**路径参数**形式 `python tools/check_core_purity.py <目录> [--forbid-include ...]`，01 规格中无 `--module` 参数）。两种落地任选其一（记 NOTES）：
-   - **a（推荐，零改脚本）**：直接复用路径形式，为 qml 指定专属禁用清单：
-     `python tools/check_core_purity.py src/qml --forbid-include QWidget QApplication QLayout QStyle QMainWindow QDialog QPushButton QToolBar SARibbonWidgets`（`SARibbonWidgets` 作为 include 前缀子串匹配即可拦截 `<SARibbonWidgets/...>`）；
+1. `tools/check_core_purity.py` 扩展（脚本本体由计划 01 S9 新建，其 CLI 为**路径参数**形式 `python3 tools/check_core_purity.py <目录> [--forbid-include ...]`，01 规格中无 `--module` 参数）。**调用名统一用 `python3`**——依据 01 S9 明定"调用名统一 `python3`（Linux CI runner 无 `python` 命令）"，01 的 CI step 与验收门亦全用 `python3`（01:778/883）。⚠️round3 发现既有不一致：README R2（:81）与计划 02（P5/S8-3/验收门）却写 `python`——**04 一律从 01 S9 的 `python3` 口径**；README/02 的 `python` 属跨文档待对齐项，供终审 agent 统一（04 不改它们）。两种落地任选其一（记 NOTES）：
+   - **a（推荐，零改脚本前提见下）**：直接复用路径形式，为 qml 指定专属禁用清单：
+     `python3 tools/check_core_purity.py src/qml --forbid-include QWidget QApplication QLayout QStyle QMainWindow QDialog QPushButton QToolBar SARibbonWidgets`（`SARibbonWidgets` 作为 include 前缀子串匹配即可拦截 `<SARibbonWidgets/...>`）；
    - **b**：给脚本新增 `--module qml` 开关（内置 qml 清单，等价于 a 的清单固化）。
-   - ⚠️ **qml 禁用清单 ≠ core 禁用清单**：core 清单（01 S9）禁 `QQuickItem/QQmlEngine/QQuickPaintedItem`，qml 模块**必须放行**这三者与 `QGuiApplication`；qml 禁的是 QtWidgets 模块类与 `SARibbonWidgets` 头。词法级"类型名出现"扫描同理需要 qml 白名单。`QAction` 在 qml 模块不禁止（Qt6 属 QtGui），但按 S5.2 决策 P0 不使用。
+   - ⚠️ **qml 禁用清单 ≠ core 禁用清单**：core 清单（01 S9）在 **include 扫描**里禁 `QQuickItem/QQmlEngine/QQuickPaintedItem`，qml 模块**必须放行**这三者与 `QGuiApplication`；qml 禁的是 QtWidgets 模块类与 `SARibbonWidgets` 头。**a 的"零改脚本"能否成立取决于 01 S9 的分层**：`--forbid-include` 只替换 **include 扫描清单**（换成上面的 qml 清单即自动移除了 QQuickItem/QQmlEngine/QQuickPaintedItem，放行达成）；而 01 S9 另有**词法级类型名扫描**（`qApp`/`QApplication::`/`QWidget`/`QLayout` 词边界匹配）——这套词法清单恰好也是 qml 该禁的子集，且 `QQuickItem`/`QQmlEngine`/`QGuiApplication` 都不在其列，**不会误伤 qml 合法代码**。故：若 01 S9 脚本的词法清单硬编码且正是这套（qml-safe），则 a 零改脚本成立；若落地时发现词法清单也需按模块切换（真需要 qml 白名单），则 a 退化为 b（改脚本）——**以 01 S9 脚本实际实现为准，记 NOTES 说明属哪种**。`QAction` 在 qml 模块不禁止（Qt6 属 QtGui），但按 S5.2 决策 P0 不使用。
 2. CI：新增（或并入现有）job：`SARIBBON_BUILD_QML=ON SARIBBON_BUILD_WIDGETS=OFF` 组合构建——验证 qml 不依赖 widgets（组合矩阵要求即 v2 §6.2 的两个矩阵项；原稿此处引"v1 §7.4"，**v1 计划文件从未入库、引用悬空**，内容已按 v2 §6.2 内联）。
 3. v2 §6.2 组合矩阵终态复核：`Widgets=OFF Qml=ON`、`Widgets=OFF Qml=OFF` 两项齐备。
 
@@ -352,44 +382,54 @@ QTEST_MAIN(TestConformanceQml)   // 不链 Widgets → 展开为 QGuiApplication
 **仓库现实（评审已核）**：`mkdocs.yml` 在（material 主题 + i18n 插件，`docs_structure: folder`，docs/en 默认语言 + docs/zh，**nav 为两种语言的显式列表**）；`docs/zh/` 现有 `build-guide/ dev-guide/ python-guide/ use-guide/ index.md faq.md doc-writing-guide.md`，**无 migration 目录**；API 文档 = Doxygen（`page.yml:27-34` 跑 `docs/doxygen-doc-file/Doxyfile-wiki-cn`，其 `INPUT = ../../src/SARibbonBar`（:952）、`RECURSIVE = NO`（:1049））+ mkdocs nav 外链 doxygen html；站点部署由 `page.yml` 在 push master 触发（:3-5），`mkdocs build --clean` 无 `--strict`（:50）——不在 nav 的 .md 只告警不失败，但验收要求"链接有效"，故新页必须进 nav。
 
 **操作**：
-1. `docs/zh/build-guide/`、`docs/zh/dev-guide/`（及 docs/en 对应页）：三模块架构总览、core 引擎与契约、QML 模块（类型清单/注册/主题桥）、贡献者指南更新（目录、规范、`dev-3.0` 流程）。dev-guide 增补 **QML 编码规范**（round2 整合，kddw-qtquick-findings.md §三.4）：叶子颜色/尺寸一律绑定 RibbonTheme/RibbonMetrics 单例、绑定点集中在 Base 层、**叶子出现字面量色值 = 评审打回**（S3"QML 叶子组织规范"的主题绑定规则；此为 SARibbon 特有增强、无 KDDW 先例——KDDW 叶子颜色硬编码属反面参照，TitleBar.qml:27、Group.qml:33-38）。
+1. `docs/zh/build-guide/`、`docs/zh/dev-guide/`（及 docs/en 对应页）：三模块架构总览、core 引擎与契约、QML 模块（类型清单/注册/主题桥）、贡献者指南更新（目录、规范、`dev-3.0` 流程）。dev-guide 增补 **QML 编码规范**（round2 整合，kddw-qtquick-findings.md §三.4）：叶子颜色/尺寸一律绑定 RibbonTheme/RibbonMetrics 单例、绑定点集中在 Base 层、**叶子出现字面量色值 = 评审打回**（S3"QML 叶子组织规范"的主题绑定规则；此为 SARibbon 特有增强、无 KDDW 先例——KDDW 叶子颜色硬编码属反面参照，TitleBar.qml:27、Group.qml:33-38）。**单例注册范式一并写入（round3 终审补，落地 04-dryrun 建议 6）**：SARibbon 的 QML 单例注册既定范式 = **回调式 `qmlRegisterSingletonType` + callback 内 `setObjectOwnership(CppOwnership)`，禁止 `qmlRegisterSingletonInstance`**（后者单引擎硬绑定，多引擎场景第二个引擎取 nullptr——S1.3"单例注册坑"的 Qt 源码实证；QWK/KDDW 均无单例注册先例，此为 SARibbon 自闯区的既定结论），防后续贡献者凭直觉退回 instance 式。
 2. **迁移指南** `docs/zh/migration-3.0.md` + `docs/en/migration-3.0.md`（docs/zh 根下，无 migration 目录即新建单页；**两语言 nav 都要加条目**，建议新增"迁移指南"分组或挂 dev-guide 下）：
    - include 路径 `<SARibbonBar/...>` → `<SARibbonWidgets/...>`（转发头过渡一个周期）；
    - CMake target `SARibbonBar` → `SARibbon::Widgets`（别名过渡）；
-   - 最低要求：CMake 3.16、Qt 5.15、C++17（计划 01 S4）；
+   - 最低要求：CMake **3.21**、Qt 5.15、C++17（计划 01 S4；round3 终审更正——原稿 3.16 系旧稿残留，01 S4 已定 floor 3.21，与 03 S7-1 草稿同改）；
    - `SARibbonPannel` 拼写：**已于 2.9.x（f553de7）改为 `SARibbonPanel`，3.0 无需别名**（v2 P7 的现实修正，照 NOTES.md B1 表述）；
    - **度量对照表**（计划 02 S3 产物 `docs/3.0/metrics-comparison.md` 链接；该 .md 在 mkdocs 根下未入 nav 会有构建告警——要么加 nav、要么挪 `docs/zh/` 内并入 nav，执行时定并记 NOTES）；
    - 单文件发行的使用方式变化（生成脚本）；
    - Python 绑定包名不变、版本 3.0。
 3. QML API 文档：**不用 QDoc**（仓库无 QDoc 设施；现 API 文档链路是 Doxygen）——① `Doxyfile-wiki-cn`（及 Doxyfile-qch-cn）的 `INPUT` 追加 `../../src/qml`（注意 INPUT 还停留在 `../../src/SARibbonBar`，计划 01 搬移后本就要改为 `../../src/widgets`，两处一起改）；② mkdocs 增手写"QML 类型清单"页（P0 类型 + 属性/信号表 + import 用法），进双语言 nav。
-4. `readme.md` / `readme-cn.md`（小写实名，根目录）：加 3.0 模块图与 QML 一节；**同步改 badge**：`readme.md:8` 现为 `Qt-5.14+`，3.0 最低 Qt 为 5.15（v2 D1）。
+4. `readme.md` / `readme-cn.md`（小写实名，根目录）：加 3.0 模块图与 QML 一节；**同步改 badge**：**`readme.md:8` 与 `readme-cn.md:8` 两处**现均为 `Qt-5.14+`（round3 grep 复核两文件同款 badge，原稿只点了 readme.md），3.0 最低 Qt 为 5.15（v2 D1），两处都改 `Qt-5.15+`。
 
 **提交**：`文档：3.0 架构/QML/迁移指南全套`
 
 ### S10 发布 3.0.0
 
-**仓库现实（评审已核）**：版本号现值——根 `CMakeLists.txt:7-13` 为 2.9.5（三变量 + `project(VERSION ...)`，计划 01 S4 已改为 `project(SARibbon VERSION 3.0.0)` 单一来源）；`pyproject.toml:9`、`pyproject-pyqt6.toml:9`、`pyside6/pyproject.toml:11` 现值均 `2.8.0`（落后于库版本，计划 03 S3.2/S3.4 已升 3.0.0，本步核对即可）；`changlog.md`（实名拼写无 e）条目格式 `## YYYY-MM-DD -> X.Y.Z`，计划 03 S7 已落"3.0.0（未发布）"草稿段；现有 tag 风格 `v2.5.7`…`v2.9.5`（`git tag -l`）→ `v3.0.0` 一致；`.github/workflows/` 只有 6 个 cmake-* + page.yml + publish-python-bindings.yml，**无 release 自动化 workflow**。
+**仓库现实（评审已核；round3 补全版本落点）**：版本号现值——根 `CMakeLists.txt:7-13` 为 2.9.5（三变量 + `project(VERSION ...)`，计划 01 S4 已改为 `project(SARibbon VERSION 3.0.0)` 单一来源）；**4 个 pyproject.toml**（round3 `find . -name 'pyproject*.toml'` 复核，原稿漏了 `pyqt6/pyproject.toml`）现值均 `2.8.0`：`pyproject.toml:9`、`pyproject-pyqt6.toml:9`、`pyqt6/pyproject.toml:12`、`pyside6/pyproject.toml:11`；另 `pyside6/CMakeLists.txt:3`（`project(... VERSION 2.8.0)`）与 `vcpkg.json:4`（`2.8.0`）——共 8 处版本落点全部由计划 03（S3.2/S3.3/S3.4/S7.2）升 3.0.0，本步只核对（完整清单以 03 S7.2 为准）。`changlog.md`（实名拼写无 e）条目格式 `## YYYY-MM-DD -> X.Y.Z`，计划 03 S7 已落"3.0.0（未发布）"草稿段；现有 tag 风格 `v2.5.7`…`v2.9.5`（`git tag -l`）→ `v3.0.0` 一致；`.github/workflows/` 只有 6 个 cmake-* + page.yml + publish-python-bindings.yml，**无 release 自动化 workflow**。
 
 **操作**：
 1. 全量回归：6 workflow 绿 + tests/core + tests/widgets + tests/qml + amalgamation + python dry-run。
-2. `changlog.md` 3.0.0 定稿（草稿段补日期、迁移要点与面向用户条目）；版本号核对四处：根 CMake `project(VERSION 3.0.0)`、pyproject×3（3.0.0）、QML module `VERSION 3.0`（S1）、readme badge（S9.4）。
+2. `changlog.md` 3.0.0 定稿（草稿段补日期、迁移要点与面向用户条目）；**版本号核对（round3 修正：原"四处 / pyproject×3"少计）**——先复核 03 S7.2 的**全部 8 处**为 3.0.0：根 CMake `project(VERSION 3.0.0)`、重新生成的 `SARibbonBarVersionInfo.h`、**4 个 pyproject**（`pyproject.toml` / `pyproject-pyqt6.toml` / `pyqt6/pyproject.toml` / `pyside6/pyproject.toml`）、`pyside6/CMakeLists.txt` 的 project VERSION、`vcpkg.json`；再加 04 特有 2 处：QML module `VERSION 3.0`（S1 的 `qmlRegisterType`/`qmlRegisterModule` 版本段 3,0）、readme badge（S9.4，`readme.md:8` 与 `readme-cn.md:8` 两处 `Qt-5.14+`→`Qt-5.15+`）。
 3. PR：`dev-3.0` → `master`（标题 `3.0.0`），人工 review 后合并；**不合并入 `dev`**（2.x 线）。合并即触发 page.yml 重建文档站（push master，page.yml:3-5）——S9 文档必须随本 PR 落地。
-4. **发布触发链核对（评审修正）**：`publish-python-bindings.yml` 现库（2.9.5）触发器是 `release: types:[published]` + `workflow_dispatch`（:3-6）——**并非 tag 触发**；计划 01 S10.4 暂停为仅 workflow_dispatch，计划 03 S4 恢复为 **tag `v3.0.*`** 触发。本步前提是 03 S4 已生效（P1 门保证）：打 tag `v3.0.0` 并 push → publish workflow 自动跑（真实上传需维护者密钥——agent 只验证 tag 事件触发的 workflow 启动与构建段，upload 段由维护者确认）。执行前 `grep -A3 "^on:" .github/workflows/publish-python-bindings.yml` 复核触发器实际状态，防止 03 未按预期落地时 tag 静默不触发。
-5. GitHub Release：无自动化 workflow，由维护者经 web 或 `gh release create v3.0.0 <附件>` 创建；agent 准备附件与文案——amalgamation 产物（`SARibbonCore.h/.cpp`、`SARibbonWidgets.h/.cpp` 打包 zip）、变更摘要、迁移指南链接。**顺序注意**：若触发器仍是旧版 `release:published`（第 4 步复核发现 03 S4 未生效），则"创建 Release"本身会触发 publish——此时先与维护者确认再建 Release，避免意外发 PyPI。
+4. **发布触发链核对（round3 修正——原文与 03 S4.1 终态冲突，已按 03 实际落地对齐）**：
+   - **触发链真相**：`publish-python-bindings.yml` 现库（2.9.5）触发器是 `release: types:[published]` + `workflow_dispatch`（:3-6，round3 复核未变）。计划 01 S10.4 的结论是**"不改此文件"**（维持 release:published + dispatch；01 S10.4 原文：dev-3.0 上的改动对 master 的 release 触发无效）。计划 03 S4.1 的结论是**"触发保持现状"**（round3 终审按 03 修订后文本对齐引文——03 早稿的"还原 release"措辞已随其 P4/S4 更正为"保持现状、无恢复动作"）并**明确否决** tag 触发（03 S4.1 现文："若改用 `push: tags:['v3.0.*']` 属**新增行为**而非'保持现状'……默认不采用"）。→ **04 早稿所称"03 S4 恢复为 tag `v3.0.*` 触发""打 tag push → publish 自动跑"是错的，已作废**。三处（01 S10-4 / 03 P4+S4.1 / 本节）表述已一致：**终态触发器 = `release:[published]` + `workflow_dispatch`，全链无"暂停/恢复"动作**。
+   - **正确触发关系**：终态触发器 = `release: types:[published]`。因此**触发 publish 的是"创建/发布 GitHub Release"这个动作（S10.5），不是打 tag、更不是 push tag**。tag `v3.0.0` 只是 Release 指向的 git ref（`gh release create v3.0.0` 会顺带建 tag）。单独 `git tag v3.0.0 && git push --tags` **不会**触发 publish。
+   - **01↔03 表述冲突已由 round3 终审确认消除**（03-dryrun 已把 03 P4/S4 更正为与 01 S10-4 一致的"01 不改、现状即 release+dispatch"；04 早稿的 tag 触发说法本轮已作废，见上条）。**尽管如此，本步仍不依赖任何声称的触发器演变链，一律以运行时实测为准**（防御性纪律保留）：执行 `grep -A5 "^on:" .github/workflows/publish-python-bindings.yml` 读出真值，再按下表分支：
+
+     | 实测触发器 | 含义 | 发布动作 |
+     |---|---|---|
+     | `release:[published]` + `workflow_dispatch`（03 S4.1 应落地的终态） | 建 Release 即触发 publish | 见 S10.5 顺序警告：Release 创建 = 真实触发 PyPI（需维护者 OIDC 密钥），agent 只备料、由维护者确认后再建 |
+     | 仅 `workflow_dispatch`（若 01/03 曾暂停且未恢复） | 只有手动 dispatch 触发 | 打 tag + 建 Release 不会自动发布；需要维护者手动 `workflow_dispatch` 跑 publish |
+     | 含 `push: tags:['v3.0.*']`（仅当有人违背 03 S4.1 改成了 tag 触发） | push tag 即触发 | 此时才"打 tag → publish 自动跑"；但这不是 03 的既定终态，出现即记 NOTES 并与维护者确认 |
+   - agent 职责边界：验证到"workflow 能被正确事件触发并跑完构建段"为止，**真实 PyPI 上传段由维护者确认**（需密钥）。
+5. GitHub Release：无自动化 workflow，由维护者经 web 或 `gh release create v3.0.0 <附件>` 创建；agent 准备附件与文案——amalgamation 产物（`SARibbonCore.h/.cpp`、`SARibbonWidgets.h/.cpp` 打包 zip）、变更摘要、迁移指南链接。**顺序警告（round3 按 release:published 终态改写）**：在终态触发器（`release:[published]`）下，**"创建 Release"本身就是 publish 的触发动作**——`gh release create v3.0.0`（或 web 上点 Publish release）会立即触发 publish workflow，进而尝试真实上传 PyPI。因此 agent **不得**为了"跑一次看看"而创建 Release；正确顺序是：①agent 备好 tag（可先 `git tag v3.0.0` 但不 push，或 push tag——tag 本身不触发）、附件、文案；②维护者核对 PyPI Trusted Publishing（OIDC）配置就绪；③由维护者执行/确认"创建 Release"这最后一步（= 真正发布）。若第 4 步实测触发器是"仅 workflow_dispatch"，则建 Release 不触发 publish，需另由维护者手动 dispatch。
 6. 2.x 转 `support/2.x` 分支只修严重 bug（原稿引"v1 §7.5"，**v1 文件从未入库、引用悬空**；按 v2 R7 双分支策略内联：2.x bugfix 落 `dev`/`support/2.x`，布局引擎相关 fix 须手动同步 core 并跑黄金测试）。
 
 **提交**：`发布：SARibbon 3.0.0`（changelog 与版本定稿）
 
 ## 6. 完成验收门（= v2 M3 + M4 交付判据）
 
-- [ ] `examples/qml/QmlMainWindowExample` 运行，与 widgets 版同屏对比**同字体下条高/间距/装箱一致**（截图存档）
+- [ ] `examples/qml/QmlMainWindowExample` 运行，与 widgets 版同屏对比**同字体下条高/间距/装箱一致**（截图存档 `docs/3.0/screenshots/`）。**"一致"的客观基准**（round3 补，消除纯目测判定）= 下一条跨前端一致性套件对同一组黄金几何值双端断言相等；截图为视觉佐证。截图规程：widgets 版与 qml 版在**同一固定字体（S7 固定字体）+ 同一主题 + 同一窗口尺寸**下各跑一次，各截三行/最小模式一张对比
 - [ ] 跨前端一致性套件全绿（`tests/common` 场景在 widgets 与 qml 双端断言通过）
 - [ ] `SARIBBON_BUILD_QML=ON` CI job 绿；`Widgets=OFF Qml=ON` 组合构建绿
 - [ ] qml 模块纯净扫描绿（S8 清单，不含 widgets 头）
 - [ ] `src/qml/` 无任何布局算法副本（铁律审查，**可操作判据**——原稿的 `rowIndex|columnIndex` grep 会误报：二者是契约接口的共享数据字段（计划 02 S4.1），QML 侧适配器实现契约必然出现这些名字）：
-  1. `git grep -nE "updateGeomArray|recalcExpandGeomArray|updateGeometryArr|calcMinTabBarWidth" src/qml/` **为空**（算法函数名，源出 `SARibbonPanelLayout.h:61/153/155`、`SARibbonCategoryLayout.h:74`、`SARibbonBarLayout.h:66`，不得在 qml 出现）；
-  2. `git grep -nE "SARibbonPanelLayout|SARibbonCategoryLayout|SARibbonBarLayout" src/qml/` **为空**（widgets 布局类名不得出现）；
-  3. `git grep -n "setPosition\|setSize\|setX(\|setY(\|setWidth\|setHeight" src/qml/` 列出全部几何应用点，**人工复核**：右值必须是引擎输出（契约 item 的 `geometry()`、metrics 字段）或常量边距，不得含行/列索引运算、比例分摊等局部几何计算表达式；
+  1. `git grep -nE "updateGeomArray|recalcExpandGeomArray|updateGeometryArr|calcMinTabBarWidth" src/qml/` **为空**（算法函数名，源出 `SARibbonPanelLayout.h:61/153/155`、`SARibbonCategoryLayout.h:74`、`SARibbonBarLayout.h:66`，round3 已逐行核实这些行号确为对应函数声明；这些是 widgets 专属壳函数，core 引擎入口叫 `layout()`，故 qml 不应出现）；
+  2. `git grep -nE "SARibbonPanelLayout|SARibbonCategoryLayout|SARibbonBarLayout" src/qml/ | grep -v "Engine"` **为空**（widgets 布局类名不得出现）。**round3 修正：必须管道过滤 `grep -v "Engine"`**——core 引擎实名 `SARibbonPanelLayoutEngine`/`SARibbonCategoryLayoutEngine`（02 S5.2/S6）**含 `SARibbonPanelLayout`/`SARibbonCategoryLayout` 子串**，而 QML 宿主合法调用它们（S3 操作1 `SARibbonPanelLayoutEngine::layout(...)`、S4.2 `SARibbonCategoryLayoutEngine`），不过滤则正确实现也**必然误报**、"为空"永远不成立（`SARibbonBarGeometryEngine` 不含 `SARibbonBarLayout` 子串，Bar 侧本无误报）。不用 `\b` 是因为 `git grep -E` 的 POSIX ERE 对 `\b` 支持不稳，`grep -v Engine` 管道最稳；
+  3. `git grep -n "setPosition\|setSize\|setX(\|setY(\|setWidth\|setHeight" src/qml/` 列出全部几何应用点，**人工复核**：右值必须是引擎输出（契约 item 的 `resultGeometry` 字段、metrics 字段）或常量边距，不得含行/列索引运算、比例分摊等局部几何计算表达式（round3：`geometry()` 笔误已改 `resultGeometry`，与 02 S4.1 契约字段名一致）；
   4. include 级规则由 S8 纯净扫描兜底。
 - [ ] 迁移指南、三模块文档、QML 文档、度量对照表齐备且链接有效（含 mkdocs nav 条目）
 - [ ] tag `v3.0.0` 创建，GitHub Release 发布，Python publish workflow 正常触发（触发器状态按 S10.4 复核）
@@ -404,7 +444,7 @@ QTEST_MAIN(TestConformanceQml)   // 不链 Widgets → 展开为 QGuiApplication
 | 视觉叶子与 widgets 版风格漂移 | 渲染允许双实现，但颜色/尺寸必须绑定 RibbonTheme/RibbonMetrics；同屏对比截图入验收 |
 | QML 类型注册踩坑 | **已单轨化（S1，第2轮设计级变更）**：命令式注册 Qt5/Qt6 同码同签名（本机双版本 qqml.h 复核），声明式轨整类坑（plugin 加载路径、RESOURCE_PREFIX、静态 plugin_init、`QML_*` 宏 Qt5 不存在）不再存在于 3.0 路径；残余风险=应用漏调 `saRibbonRegisterQmlTypes()` → `import SARibbon 3.0` 报"module not installed"——缓解：S1 导入专项检查、示例/迁移指南模板固定该行（S6.2/S9.2）、错误信息排障说明进 QML 文档；CI 两版本都跑（Qt5.15 走 CI） |
 | 静态库组合下叶子 qrc 未加载（`QFile::exists("qrc:/SARibbon/...")` 全失败，叶子静默为 null） | S1.3 `Q_INIT_RESOURCE(saribbon_qml)` 静态守卫（KDDW Platform.cpp:40-46/:82-84 同款）+ S1/S6 各做一次 `SARIBBON_BUILD_STATIC_LIBS=ON` 专项检查；叶子创建处带 errorString/exists 告警（S3 骨架注记，KDDW View.cpp:167-170/:857-860 同款） |
-| QML 单例所有权（引擎析构连带 delete 包装对象，多引擎测试悬空） | 注册前统一 `QQmlEngine::setObjectOwnership(CppOwnership)`（S1.3/S2.1）；tst_themeBridge 双引擎重复断言兜底 |
+| QML 单例所有权 + 多引擎绑定（两坑：①引擎析构 GC 掉无父包装对象；②`qmlRegisterSingletonInstance` 把实例硬绑首个引擎，第二个引擎取 nullptr——round3 对本机 Qt 源码实证） | **改用回调式 `qmlRegisterSingletonType`**（S1.3/S2.1：callback 返回 `instance()` 并在其中 `setObjectOwnership(CppOwnership)`）——回调式按引擎逐个调用（6.7.3 qqmlengine.cpp:1834）支持多引擎、CppOwnership 防删；**禁用 `qmlRegisterSingletonInstance`**（单引擎绑定，双引擎测试必挂）。tst_themeBridge 双引擎重复断言兜底，兼作"未误用 instance 式"的回归哨兵 |
 | 结构宿主需要 widgets 语义但 core 没有对应引擎（铁律触发） | 停下，回计划 02 补引擎（记 NOTES），禁止 QML 内重写 |
 | 发布流程需要维护者权限（tag/PyPI/Release 附件） | agent 完成到"可触发"状态并列 checklist 交维护者确认，不阻塞其余验收；触发器状态在 S10.4/S10.5 双重复核，防止意外发 PyPI |
 

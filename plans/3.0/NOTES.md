@@ -47,6 +47,9 @@
   `tools/Amalgamate.sh`：计划 01 S8 与 03 S1 修改该脚本（改 OPTS、双产物）时**保持 GBK 原编码
   编辑或整体决策转 UTF-8 并单独提交**，不得由编辑器静默转码；CMakeLists 重写（01 S4/S5/S6）
   无编码障碍，正常以 UTF-8 处理。
+- **round3 前向注**：计划 01 S8 对 GBK 脚本只做 sed 字节级替换（不触编码）；计划 03 S1-2 已定
+  **目标脚本全文 ASCII 化**（ASCII 字节在 GBK/UTF-8 一致，转码事故免疫，属受控内容重写而非静默
+  转码）——03 执行后由执行者把本条状态更新为"已消除"（03 §8-⑨ 有对应登记项）。
 
 ### B5：本机 Qt 5.14.2 低于 3.0 门槛（v2 D1 = 5.15）
 
@@ -81,7 +84,11 @@
 - 处理：保守方向——两分支同 commit，无内容分歧。执行 01 前可 `git checkout dev`（或直接以当前
   HEAD 为基），P2 门禁按"HEAD==7a617fc 且分支为 dev 或 v3"解读；`dev-3.0` 从该 HEAD 创建即等价。
   已记入 cross-findings 交 01 的修订 agent 更新 P2 文案。
-- 影响计划：01（P2/S1）
+- **round3 更新（终审）**：本条的"三者同指 7a617fc""P2 按 HEAD==7a617fc 解读"表述已过期——评审
+  提交已入库（`42b7dcc` round1、`eba8ebd` round2，round3 产物继续追加），`v3` 已前进、`dev` 仍指
+  `7a617fc`。计划 01 P1/P2/S1 已在 round3 重写为**执行时点稳健**的双门禁（`git merge-base
+  --is-ancestor 7a617fc HEAD` + 非文档 diff 为空），README 头部/事实快照同步改写；解读约定见 B11。
+- 影响计划：01（P1/P2/S1，round3 已重写）、README（头部/R4/快照，终审已改）
 
 ### B8：ctest 注册项为 26，此前文档写"约 24 个"有误
 
@@ -130,6 +137,61 @@
   薄壳、qm 翻译安装收进守卫）；01 S4.3 选项清单补行、S4.1 处置表同步、S4.2"不抄 1"翻转为
   "已采纳"、S5.3/S5.4/S6.7/S11 的 install 规则加守卫注记；03 S6-3 复核前提注明"以默认 ON 执行"
 - 影响计划：01（S4/S5/S6.7/S11/S12）、03（S6）、v2（§4.4/§6.1/§6.4）
+
+### B11：评审提交链入库与"执行时点门禁"的时点解读约定（round3 终审）
+
+- 日期：2026-09-29（round3 终审记录，采纳 01-dryrun 建议 1/2/4）
+- 发现位置：README 头部与事实快照"git 基线状态"行、本文件 B7、计划 01 P1/P2/S1
+- 证据：`git log --oneline 7a617fc..v3` → `42b7dcc`（round1 评审提交）、`eba8ebd`（round2 评审提交），
+  round3 产物（01~04 修订 + reviews/round3/）随后追加；`git diff 7a617fc HEAD -- ':!plans'
+  ':!SARibbon-3.0-plan-v2.md'` 为空（基线后零代码改动）；`git status --porcelain` 未跟踪项仅
+  `saribbon-dev-v2.8.0-plus.bundle`
+- 处理（**体系级约定，后续评审轮次与执行 agent 一体遵守**）：① 计划文档中一切 git 状态断言用
+  **相对表述**——祖先检查（`git merge-base --is-ancestor 7a617fc HEAD`）、非文档 diff 为空、
+  "以执行时 `git log` 为准"；绝对 commit 号只作评审轮次的时点备注，不作门禁判据；② 旧文档中
+  "未跟踪项 3 个"（round1 时点）一律按"仅 bundle"（评审提交入库后）解读；③ 每轮评审提交入库后，
+  README 事实快照的 git 行**不需要**再逐轮改写（已改为时点稳健表述），仅当代码基线本身变动
+  （如 2.x bugfix 合入）时更新"代码基线"字段
+- 影响计划：01（P1/P2/S1 已按此重写）、README（头部/R4/快照已改）、02~04（同类前置检查引用本条）
+
+### B12：三条仓库事实预登记（round3 新发现，执行期会反复引用；采纳 02-dryrun 建议 5）
+
+- 日期：2026-09-29（round3 终审预登记）
+- 内容：
+  1. **Category 滚动按钮标志双实现**：`SARibbonCategoryLayout.cpp` 的 `updateGeometryArr`（:469-505）
+     与 `updateScrollButtonVisibility`（:1053-1091，由 `updateScrollOffset` :1136 调用）逐分支重算
+     同一套 RTL/LTR 标志（唯一文本差异是 maxBase 的 `qMax(0,...)`，在 needsScrolling 前提
+     （total>categoryWidth）下恒正，语义等价）。计划 02 S6-3 将收敛为引擎单一纯函数
+     `scrollButtonFlags(totalWidth, viewportWidth, xBase, isRTL)`——这是 M1 期间**唯一一处
+     "两份源码合成一份"**的操作（§4-4 禁止双实现条款授权），执行时须 NOTES 单独记录并以
+     `SARibbonCategoryVisibilityTest` + 滚动/动画交互冒烟双验。
+  2. **`SARibbonBar.cpp:3810-3854` 存在整段注释掉的 layoutTitleRect 旧代码**：`contextRegionLeft/
+     titleStart` 等词在该注释段命中，是计划 02 S8-2 残留门的误报源（该门已限定三布局 .cpp 文件
+     范围将其排除）；可在 02 S8 清扫时一并删除该注释段并单独提交（良性，删除死注释不破坏 API）。
+  3. **`SARibbonBarLayout::init()` 是空桩**（:607-610，函数体仅注释"不需要初始化子控件，它们会
+     从ribbonBar获取"），BarLayout 的子控件实际全部由 `SARibbonBar` 侧创建持有；:623-696 区间是
+     `addItem/itemAt/takeAt/count` 四个 QLayout 协议函数（计划 02 附录 E 已按此修正，执行 02 S7
+     时勿再按"factory 创建子控件"的旧描述找代码）。
+- 影响计划：02（S6-3/S8-2/S7/附录 E）；03/04 无直接影响
+
+### B13：绑定构建=第五种消费场景；02 窗口内 sip 冒烟降级为 C++ 侧、顺延至 03 S3（round3 终审裁决）
+
+- 日期：2026-09-29（round3 终审裁决，采纳 03-dryrun 建议 1/2 与 02-dryrun 建议 4）
+- 发现位置：01 S6.2/S6.4（include 形态四态论证）、02 S1.1-4（sip 冒烟）、03 S3.0（绑定镜像）
+- 证据：三轨 Python 绑定（sip×2/pyside6）**直接编译源码树文件**，既不属于 01 S6.2 论证的四种
+  消费场景（源码树/同步目录/安装树/amalgamate），也不在 01（明文不动绑定文件）与 02 的落地范围；
+  且 01 S6 目录搬移后三份 sip toml 的 include-dirs/清单指向已不存在的 `src/SARibbonBar`，转发头的
+  `<SARibbonCore/...>` 在绑定构建场景无解析——**02 执行期绑定整体不可构建**，sip 冒烟必然失败
+  且无法归因（03-dryrun R3-04 的镜像缺失分析与 02-dryrun 建议 2 相互印证）
+- 处理：① 03 S3.0 的"绑定侧自建镜像"（sip 系仓库根 `build-binding-include/SARibbonCore/`、
+  pyside6 CMakeLists 内 `_sync_include/`，与 01 S8 的 `_amalg_include` 同构）确认为第五场景的
+  **唯一解**，01 S6.4 已补互认交叉引用；② 02 S1.1-4 的 sip/PyQt 构建冒烟**降级为 C++ 侧验证**
+  （widgets 全量编译 + QMetaEnum 消费者 grep + ctest==N₀），绑定侧验证**顺延至 03 S3**——
+  备选方案"把 03 S3 路径迁移提前到 01 之后"被否决：即便提前迁移路径，镜像与陈旧清单补齐
+  （03 S3.0/S3.2-2）完成前绑定仍不可构建，提前只会打乱"01/02 不动绑定文件"的边界与提交归属；
+  ③ 03 S3.2-1 已补"枚举别名化适配"承接条（RowProportion 三文件 + 02 S1.1 四枚举的对应条目，
+  按 02 实际执行结果——提升成功或降级留 widgets——分支处理）
+- 影响计划：01（S6.4 注）、02（S1/S1.1-4/风险表）、03（S3.0/S3.2）
 
 ---
 
