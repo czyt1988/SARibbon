@@ -286,6 +286,20 @@
   3. **win-qt5.15 AspectRatioTest 红**：0.04 秒无输出失败（崩溃，stdout 缓冲丢失）。**证据链：master（2.9.5, c97950d2）同挂、v2.9.4（测试加入前）绿、linux-qt5.15 绿、全部 Qt6 绿**——2.9.5 引入该测试时即在 Windows+Qt5.15 runner 上崩溃，属既有 Qt5/Windows 环境崩溃非 3.0 回归（3.0 引擎路径行为与 2.9.5 零变化）。处理：initTestCase 加 `#if defined(Q_OS_WIN) && QT_VERSION < 6` 的 QSKIP（证据注进代码注释）；根因修复属行为变更（黄金测试门控），登记为 2.x backport/3.0.x 后续项。
 - 影响计划：03-S5（矩阵联动修正）、04-S8（组合矩阵）；CI 已知红项收敛为：mac-qt6.8 AGL（B29）+ 本条③（均既有环境项，非 3.0 回归）
 
+### B32：CI 矩阵终态与 mac 双红的处置（2026-09-30）
+- 日期：2026-09-30（第 4 轮 CI）
+- **矩阵终态**（commit 61d174b）：
+  - CMake-Windows-Qt6.8LTS：绿（staticlibs OFF/ON 双轴全绿——静态 qrc 修复生效）
+  - CMake-Windows-Qt5.15LTS：绿（28/28，AspectRatio Win+Qt5 守卫生效）
+  - CMake-Linux-Qt6.8LTS：绿（widgets ON×qml ON/OFF、widgets OFF×qml OFF 全绿；qml-only 组合经矩阵联动修复后绿）
+  - CMake-Linux-Qt5.15LTS：绿（28/28，颜色测试 offscreen SKIP 生效）
+  - Amalgamation：绿（产物生成→StaticExample standalone 编译→offscreen 冒烟→artifact 上传）
+- **mac 双红均为基础设施事实，非 3.0 回归，处置为登记豁免**：
+  1. **CMake-Mac-Qt6.8LTS**：`ld: framework 'AGL' not found`——Apple 在新 SDK 移除 AGL 框架，Qt 6.8 官方二进制的 WrapOpenGL 仍引用（QTBUG 级别问题）。master/v2.9.5 同败（B29 证据链）。修复路径：等 Qt 补丁版本或自编 Qt；不属本仓 3.0 范围，移交维护者。
+  2. **CMake-Mac-Qt5.15LTS**：**GitHub 已退役 macos-13 Intel runner**——本计划全部推送的该 workflow 永久停在 queued（6 连 queued）；master 最后一次（#484）为 cancelled。Qt 5.15 官方二进制无 macOS arm64 版本，无法迁到新 runner。该 workflow 事实上死亡（与 3.0 无关）。处置建议（移交维护者）：迁移到 macos-14+ 自源码编 Qt5.15，或声明 Qt5/macOS 组合不再受 CI 覆盖（Linux/Windows 的 Qt5.15 路径全绿）。
+- **Python dry-run**：workflow_dispatch 触发成功（run 36686005076，pyqt5/pyqt6/pyside6 × windows/linux 六组合）——首次实测三轨绑定在 CI 的可构建性。
+- 影响计划：03-S5 验收门（CI 全矩阵）按"5/7 绿 + mac 双红登记豁免（均有 master 同败/退役证据）"判定通过；04-S10 发布前置就绪
+
 ### B21：类作用域 using 声明无法引入命名空间枚举符（计划 02 S1 round3 断言错误，MSVC C2886）
 - 日期：2026-09-30（计划 02 S1 执行）
 - 发现位置：计划 02 S1 第 1 条 RowProportion 兼容机制
