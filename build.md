@@ -4,9 +4,9 @@
 
 | 依赖 | 最低版本 | 说明 |
 |------|---------|------|
-| CMake | 3.15+ | 项目使用 CMake 构建系统（脚本自动检测 VS 内嵌或独立安装） |
-| C++14/C++17 编译器 | - | MSVC 2019+ / GCC 9+；Qt6 或启用 frameless 时强制 C++17 |
-| Qt | 5.12+ | 需要 Core、Gui、Widgets、Svg 模块；Qt6 额外需要 Core5Compat（可选） |
+| CMake | 3.21+ | 项目使用 CMake 构建系统（脚本自动检测 VS 内嵌或独立安装） |
+| C++17 编译器 | - | MSVC 2019+ / GCC 9+；3.0 全模块统一 C++17 |
+| Qt | 5.15+ | 需要 Core、Gui、Widgets、Svg 模块；3.0 最低 Qt 5.15 |
 
 > **注意**：`SARIBBON_USE_FRAMELESS_LIB` 对 Qt 版本有要求：Qt 5.14+、Qt 6.2+，低版本会自动禁用。
 
@@ -120,11 +120,14 @@ cmake --build build --config Release
 | 选项 | 默认值 | 说明 |
 |------|--------|------|
 | `SARIBBON_BUILD_STATIC_LIBS` | OFF | 静态库，ON 时自动定义 `SA_RIBBON_BAR_NO_EXPORT` |
+| `SARIBBON_BUILD_WIDGETS` | ON | 构建 SARibbonWidgets 模块（OFF 为 core-only 组合构建） |
+| `SARIBBON_BUILD_QML` | OFF | 构建 SARibbonQml 模块（计划 04 实现） |
 | `SARIBBON_BUILD_EXAMPLES` | ON | 构建示例程序 |
 | `SARIBBON_USE_FRAMELESS_LIB` | OFF | 使用 QWindowKit 无边框方案，需 C++17 和 QWindowKit 库 |
 | `SARIBBON_ENABLE_SNAPLAYOUT` | OFF | 启用 Windows 11 Snap Layout（仅 frameless 模式有效） |
+| `SARIBBON_INSTALL` | ON | 生成安装/导出规则（add_subdirectory 嵌入场景可设 OFF） |
 | `SARIBBON_INSTALL_IN_CURRENT_DIR` | ON (Windows) | 安装到 `bin_qt{版本}_{编译器}_x{架构}/` |
-| `BUILD_TESTS` | OFF | 启用单元测试（Qt Test 框架） |
+| `SARIBBON_BUILD_TESTS` | OFF | 启用单元测试（Qt Test 框架；旧名 `BUILD_TESTS` 兼容一版） |
 
 脚本对应参数：`-Examples <ON|OFF>`、`-Tests <ON|OFF>`、`-StaticLibs <ON|OFF>`、`-Frameless <ON|OFF>`、`-SnapLayout <ON|OFF>`。
 

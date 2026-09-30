@@ -2,7 +2,7 @@
 
 ## 禁止事项
 
-- **禁止读取或修改** `src/SARibbon.cpp` 和 `src/SARibbon.h` — 这是 amalgamate 工具生成的合并文件，所有源码改动应在 `src/SARibbonBar/` 下进行，源码改动后，运行`tools/Amalgamate.sh`脚本即可自动更新`src/SARibbon.cpp` 和 `src/SARibbon.h`
+- **禁止读取或修改** `src/SARibbon.cpp` 和 `src/SARibbon.h` — 这是 amalgamate 工具生成的合并文件，所有源码改动应在 `src/widgets/` 与 `src/core/` 下进行，源码改动后，运行`tools/Amalgamate.sh`脚本即可自动更新`src/SARibbon.cpp` 和 `src/SARibbon.h`
 - **禁止** `slots`/`signals`/`emit` → 用 `Q_SLOTS`/`Q_SIGNALS`/`Q_EMIT`
 - **禁止** 头文件 public 函数加双语 Doxygen → 仅用单行英文 `///`
 - **禁止** Q_PROPERTY 上加任何注释（分组注释如 `// == Ribbon properties ==` 可以）
@@ -12,14 +12,16 @@
 ## 项目结构
 
 ```
-src/SARibbonBar/          ← 所有源码（.h/.cpp），这是唯一应编辑的目录
+src/core/                 ← SARibbonCore：宏/枚举/契约基座（计划02起下沉算法），可编辑
+src/widgets/              ← SARibbonWidgets：全部控件源码（.h/.cpp），可编辑
+src/widgets/colorWidgets/ ← SAColorWidgets 子模块（SAColorToolButton等）
+src/widgets/i18n/         ← 翻译文件 (.ts/.qm)
+src/qml/                  ← SARibbonQml 骨架（计划04实现）
 src/SARibbon.cpp/.h       ← ⛔ 合并文件，禁止触碰，调用 tools/Amalgamate.sh 自动生成
-src/SARibbonBar/colorWidgets/  ← SAColorWidgets 子模块（SAColorToolButton等）
-src/SARibbonBar/3rdparty/      ← 第三方代码
-src/SARibbonBar/i18n/          ← 翻译文件 (.ts/.qm)
-example/                  ← 示例程序（MainWindowExample是最主要的）
-tests/                    ← 单元测试（Qt Test框架，需 BUILD_TESTS=ON）
-tools/                    ← Amalgamate合并工具，以及Python绑定构建脚本
+3rdparty/                 ← 第三方代码（qwindowkit submodule 等）
+examples/widgets/         ← 示例程序（MainWindowExample是最主要的）
+tests/widgets/            ← 单元测试（Qt Test框架，需 SARIBBON_BUILD_TESTS=ON）
+tools/                    ← Amalgamate合并工具、core纯净性扫描、Python绑定构建脚本
 sip/                      ← PyQt5 SIP绑定定义文件（.sip）
 pyqt6/sip/                ← PyQt6 SIP绑定定义文件（独立维护）
 pyside6/                  ← PySide6绑定（Shiboken6）：CMakeLists.txt、typesystem XML、glue代码
@@ -27,13 +29,16 @@ pyexamples/               ← Python示例程序（pyqt5/pyqt6/pyside6三个子�
 pyproject.toml            ← PyQt5 PyPI打包配置
 pyproject-pyqt6.toml      ← PyQt6 PyPI打包配置
 pyside6/pyproject.toml    ← PySide6 PyPI打包配置
+plans/3.0/                ← 3.0 重构执行计划与偏差记录（NOTES.md）
 docs/zh/dev-guide/        ← 开发规范文档（编码前必读）
 docs/zh/build-guide/      ← 构建指引
 docs/zh/python-guide/     ← Python绑定文档（中文）
 docs/en/python-guide/     ← Python绑定文档（英文）
 ```
 
-核心头文件 `src/SARibbonBar/SARibbonGlobal.h` 定义了：`SA_RIBBON_EXPORT`、`SA_RIBBON_DECLARE_PRIVATE`/`SA_RIBBON_DECLARE_PUBLIC`、`SA_RIBBON_IMPL_CONSTRUCT`、`SA_D`/`SA_DC`/`SA_Q`/`SA_QC`、`SARibbonAlignment`/`SARibbonTheme`/`SARibbonMainWindowStyleFlag` 枚举。
+3.0 开发在 `dev-3.0` 长期分支进行，合并进 master 前不与 `dev`（2.x 线）交互；期间 2.x bugfix 直接 cherry-pick 到 `dev-3.0`，布局引擎相关 fix 须手动同步 core 版并跑黄金测试。
+
+宏基座在 `src/core/SARibbonCoreGlobal.h`（PIMPL 宏族与 `SA_RIBBON_CORE_EXPORT`），`src/widgets/SARibbonGlobal.h` 为兼容转发头（`SARibbonAlignment`/`SARibbonTheme`/`SARibbonMainWindowStyleFlag` 枚举仍在其中，计划02下沉 core）。
 
 ## 构建
 

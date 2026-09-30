@@ -1,5 +1,12 @@
 # 版本更新记录(change log):
 
+## 未发布 -> 3.0.0（开发中，dev-3.0 分支）
+
+- 变更：目录重组为 src/core、src/widgets、src/qml 三模块（原 src/SARibbonBar），example → examples/widgets，tests → tests/widgets，qwindowkit submodule 上移顶层 3rdparty/；
+- 变更：CMake 现代化（floor 3.21、统一 `SARIBBON_*` 选项名、`SARIBBON_INSTALL` 安装守卫、`find_package(SARibbon COMPONENTS Core|Widgets)` 组件化，旧包名 SARibbonBar 兼容一个版本周期）；
+- 变更：最低要求 CMake 3.21 / Qt 5.15 / C++17；
+- 新增：SARibbonCore 纯净基座模块（宏/枚举基座，core-only 可独立编译，纯净性扫描门禁）。
+
 ## 2026-09-16 -> 2.9.5
 
 - Fix #118：跨屏拖动到另一台显示器或改变系统缩放比例后，窗口右上角的最小化/最大化/关闭按钮可能停留在旧位置；现在窗口所在屏幕或缩放比例变化时会自动重新定位，主屏幕切换时也会同步刷新；

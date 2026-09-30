@@ -17,7 +17,7 @@ git submodule update --init --recursive
 目前添加的submodule有如下：
 
 ```shell
-git submodule add https://github.com/stdware/qwindowkit ./src/SARibbonBar/3rdparty/qwindowkit
+git submodule add https://github.com/czyt1988/qwindowkit ./3rdparty/qwindowkit
 ```
 
 
@@ -26,7 +26,7 @@ git submodule add https://github.com/stdware/qwindowkit ./src/SARibbonBar/3rdpar
 如果submodule更新了，使用`git submodule update --remote {submodule}`进行更新，如：
 
 ```shell
-git submodule update --remote src/SARibbonBar/3rdparty/qwindowkit
+git submodule update --remote 3rdparty/qwindowkit
 ```
 
 关于如何编译，请看readme文档
