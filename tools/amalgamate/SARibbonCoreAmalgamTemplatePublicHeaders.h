@@ -1,0 +1,16 @@
+﻿// core headers (real sub-directory paths; the flattened <SARibbonCore/X.h>
+// form exists only in the build-tree sync dir / install tree)
+#include "../../src/core/SARibbonCoreGlobal.h"
+#include "../../src/core/SARibbonQt5Compat.hpp"
+#include "../../src/core/global/SARibbonEnums.h"
+#include "../../src/core/global/SARibbonCoreUtil.h"
+#include "../../src/core/theme/SARibbonThemePalette.h"
+#include "../../src/core/theme/SARibbonThemeData.h"
+#include "../../src/core/metrics/SARibbonMetrics.h"
+#include "../../src/core/contract/SARibbonAbstractLayoutItem.h"
+#include "../../src/core/contract/SARibbonAbstractLayoutHost.h"
+#include "../../src/core/data/SARibbonCustomizeRecord.h"
+#include "../../src/core/factory/SARibbonElementFactoryInterface.h"
+#include "../../src/core/layout/SARibbonPanelLayoutEngine.h"
+#include "../../src/core/layout/SARibbonCategoryLayoutEngine.h"
+#include "../../src/core/layout/SARibbonBarGeometryEngine.h"

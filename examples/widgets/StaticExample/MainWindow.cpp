@@ -1,5 +1,5 @@
 ﻿#include "MainWindow.h"
-#include "SARibbon.h"
+#include "SARibbonWidgets.h"
 #include <QComboBox>
 #include <QTimer>
 MainWindow::MainWindow(QWidget* parent) : SARibbonMainWindow(parent)

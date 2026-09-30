@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "SARibbon.h"
+#include "SARibbonWidgets.h"
 
 class MainWindow : public SARibbonMainWindow
 {

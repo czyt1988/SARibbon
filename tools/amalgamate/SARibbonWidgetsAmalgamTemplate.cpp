@@ -11,14 +11,8 @@
 #define SA_RIBBON_CORE_STATIC
 #endif
 
-/*@remap "SARibbonAmalgamTemplatePublicHeaders.h" "SARibbon.h" */
-/*@remap "SARibbonCore/SARibbonCoreGlobal.h" "SARibbon.h" */
-/*@remap "SARibbonCore/SARibbonQt5Compat.hpp" "SARibbon.h" */
-/*@remap "SARibbonCore/SARibbonEnums.h" "SARibbon.h" */
-/*@remap "SARibbonCore/SARibbonCoreUtil.h" "SARibbon.h" */
-/*@remap "SARibbonCore/SARibbonThemePalette.h" "SARibbon.h" */
-/*@remap "SARibbonCore/SARibbonThemeData.h" "SARibbon.h" */
-#include "SARibbonAmalgamTemplateHeaderGlue.h"
+/*@remap "SARibbonWidgetsAmalgamTemplatePublicHeaders.h" "SARibbonWidgets.h" */
+#include "SARibbonWidgetsAmalgamTemplateHeaderGlue.h"
 // 3.0 core sources (plan 02 S1)
 #include "../../src/core/global/SARibbonCoreUtil.cpp"
 #include "../../src/core/theme/SARibbonThemePalette.cpp"
@@ -29,10 +23,6 @@
 #include "../../src/core/layout/SARibbonPanelLayoutEngine.cpp"
 #include "../../src/core/layout/SARibbonCategoryLayoutEngine.cpp"
 #include "../../src/core/layout/SARibbonBarGeometryEngine.cpp"
-
-
-
-
 
 
 // disable warnings about unsafe standard library calls

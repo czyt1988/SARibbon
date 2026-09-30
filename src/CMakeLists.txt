@@ -12,10 +12,8 @@ if(SARIBBON_INSTALL)
         FILE SARibbonTargets.cmake
         NAMESPACE SARibbon::
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/SARibbon)
-    # 2.9.5 行为保持：单文件产物安装规则——原模块 CMakeLists 被 S6.1 删除后由这里承担
-    install(FILES ${CMAKE_CURRENT_SOURCE_DIR}/SARibbon.h
-                  ${CMAKE_CURRENT_SOURCE_DIR}/SARibbon.cpp
-        DESTINATION share/SARibbonBar_amalgamate)
+    # plan-03 S1-3-4: single-file products are no longer committed; the amalgamate
+    # install rule is dropped (release artifacts come from CI/Release assets).
 endif()
 # 组件化 SARibbonConfig 生成/安装（S11，SARibbon_INSTALL 守卫内）
 if(SARIBBON_INSTALL)

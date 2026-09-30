@@ -1,4 +1,6 @@
-﻿// Global
+﻿// core set first (nested): all SARibbonCore public headers come in through it
+#include "SARibbonCoreAmalgamTemplatePublicHeaders.h"
+// Global
 #include "../../src/widgets/colorWidgets/SAColorWidgetsGlobal.h"
 #include "../../src/widgets/SARibbonBarVersionInfo.h"
 #include "../../src/widgets/SARibbonGlobal.h"
@@ -9,18 +11,6 @@
 #include "../../src/widgets/colorWidgets/SAColorPaletteGridWidget.h"
 #include "../../src/widgets/colorWidgets/SAColorToolButton.h"
 // sa ribbon
-#include "../../src/core/theme/SARibbonThemePalette.h"
-#include "../../src/core/theme/SARibbonThemeData.h"
-#include "../../src/core/contract/SARibbonAbstractLayoutItem.h"
-#include "../../src/core/contract/SARibbonAbstractLayoutHost.h"
-#include "../../src/core/data/SARibbonCustomizeRecord.h"
-#include "../../src/core/factory/SARibbonElementFactoryInterface.h"
-#include "../../src/core/metrics/SARibbonMetrics.h"
-#include "../../src/core/layout/SARibbonPanelLayoutEngine.h"
-#include "../../src/core/layout/SARibbonCategoryLayoutEngine.h"
-#include "../../src/core/layout/SARibbonBarGeometryEngine.h"
-
-
 
 
 #include "../../src/widgets/SARibbonThemeManager.h"

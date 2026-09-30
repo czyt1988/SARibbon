@@ -62,9 +62,6 @@ CMakeLists.txt    text
 *.ts    text eol=lf
 *.qm    binary
 
-# --- amalgamate 工具生成的合并文件：字节冻结，永不转换（该文件禁止手工修改）---
-src/SARibbon.cpp -text
-src/SARibbon.h   -text
 
 # --- 二进制资源 ---
 *.png   binary

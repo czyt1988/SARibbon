@@ -53,9 +53,15 @@ endif()
 # 这里展示如何简单的使用SARibbon在CMake文件里
 # Here is an example of how to simply use SARibbon in a CMake file
 SET(SARIBBON_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../../src)
+# plan-03 S2: single-file product is now the module amalgamation; it is NOT
+# committed (generate with: cd tools && bash Amalgamate.sh). Guard the build.
+if(NOT (EXISTS "${SARIBBON_DIR}/SARibbonWidgets.h" AND EXISTS "${SARIBBON_DIR}/SARibbonWidgets.cpp"))
+    message(WARNING "SARibbonWidgets.h/.cpp not generated, skip StaticExample; run 'bash Amalgamate.sh' in tools/ first")
+    return()
+endif()
 set(SARIBBON_SIMPLE
-    ${SARIBBON_DIR}/SARibbon.h
-    ${SARIBBON_DIR}/SARibbon.cpp
+    ${SARIBBON_DIR}/SARibbonWidgets.h
+    ${SARIBBON_DIR}/SARibbonWidgets.cpp
 )
 
 set(PROJECT_SOURCES
