@@ -204,6 +204,16 @@
 - 处理（沙盒最小实验验证后采用）：类型别名 + **static constexpr 成员**：`using RowProportion = SARibbon::Core::SARibbonRowProportion;` + `static constexpr RowProportion None/ Large/Medium/Small = ...;`。三类存量用法全部保持可编译（沙盒+全仓构建验证）：`SARibbonPanelItem::Large` 类限定、类内裸名默认值、`QString::number(d.actionRowProportionValue)` 隐式 int 转换。枚举本体仍入 `SARibbon::Core` 命名空间、仍 unscoped（计划两目标不变）。
 - 影响计划：02-S1（兼容机制落地修正）；03-S3.2-1（绑定侧枚举适配按此现状核对）
 
+### B23：计划 02 S2 执行记录（theme/ 下沉）与 amalgamate 的 Q_OBJECT 双内联问题
+- 日期：2026-09-30
+- 内容：
+  1. `SARibbonThemePalette.h/.cpp` git mv 至 `src/core/theme/`（导出宏换 `SA_RIBBON_CORE_EXPORT`，include 换 `<SARibbonCore/SARibbonCoreGlobal.h>`）；widgets 留同名转发头，7 处消费者（MainWindow/Util/ThemeManager/tests/examples）零改动。
+  2. 新建 `src/core/theme/SARibbonThemeData.h/.cpp`：QObject 单例（Meyers 静态，`SARibbon::Core`），持 theme+palette+双信号；5 个静态表（margins/contextColors/highlights/baseline + 2 个高亮 lambda）纯 move 为静态查询接口；`FpContextCategoryHighlight` 提升为 `SARibbon::Core::SARibbonFpContextCategoryHighlight`（widgets 侧 `SARibbonBar::FpContextCategoryHighlight` 原拼写不动——2.x 公共 API，且两边同为 `std::function<QColor(const QColor&)>` 具体类型一致，零转换）。
+  3. `SARibbonThemeManager.cpp` 删除全部静态表，4 个查表块改为调 core 静态接口；QSS 加载/渲染与其余逻辑零改动（计划 S2.4"先只做数据表 move"选项）。
+- **amalgamate 新问题**：widgets 侧 `#include <SARibbonCore/SARibbonThemeData.h>` 在 .cpp 产物生成时经 `_amalg_include` 镜像被再次内联 → Q_OBJECT 类定义落进 .cpp 产物 → StaticExample 的 AUTOMOC 报错（"contains Q_OBJECT but does not include SARibbon.moc"）。@remap 对尖括号 include 无效（工具只匹配引号形式）。
+- 处理：`Amalgamate.sh` 拆分双 pass——`.h` 产物 pass 保留 `-i _amalg_include`，`.cpp` 产物 pass **去掉镜像目录**（尖括号 include 原样保留），后处理 sed 把 .cpp 产物中 `#include <SARibbonCore/X.h>` 改写为 `#include "SARibbon.h"`（内容已在 .h 产物）。模板同步：PublicHeaders 加 2 个 theme 头、cpp 模板加 2 个 theme 源、删陈旧 widgets/SARibbonThemePalette.cpp 行。验证：.cpp 产物无 Q_OBJECT、StaticExample 编译+运行通过；ctest 25/26（B15 项）+ 主题 4 测试全绿。
+- 影响计划：02-S2 完成；03-S1（双产物脚本必须继承"cpp pass 无镜像 + sed 改写"设计）
+
 ### B22：计划 02 S1 执行记录（枚举/Util 下沉）
 - 日期：2026-09-30
 - 内容与证据：
