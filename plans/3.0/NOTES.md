@@ -197,6 +197,21 @@
 
 ## 执行中追加
 
+### B15：SARibbonToolButtonColorTest::testHoverStyleSheetColor 在本机环境性失败（非回归）
+- 日期：2026-09-30（计划 01 S7 验证时发现）
+- 发现位置：计划 01 S7 验证 / ctest == N₀ 门禁
+- 证据：dev-3.0 上该测试稳定失败（`':hover color:red not applied, red pixels before=8 after=8'`，直跑 exit=1，ctest 下偶发 SEGFAULT——断言失败后跳过 `moveCursorAway` 收尾，析构时光标仍在按钮上，clearFocus 路径崩溃，属失败的连锁效应）；**基线 worktree（`F:\src\SARibbon-baseline`，checkout 7a617fc，同机同 Qt 6.7.3 全新构建）运行同一测试同样失败**，输出逐字相同。根因：该测试依赖 `QTest::mouseMove` 操纵真实光标触发 `:hover` 伪状态，在远程桌面（mstsc）/无交互会话中 `QTest::mouseMove` 不产生真实 WM_MOUSEMOVE，hover 不触发（测试自身有 `QSKIP` 兜底分支，但 `underMouse()` 在此环境返回 true（光标坐标命中按钮），像素断言才暴露）。P3 基线全绿是在构建完成后的同一会话跑出的——当时远程会话焦点行为不同（见下"复核"）。
+- 复核（2026-09-30 补测）：在基线 worktree 上 `ctest -R SARibbonToolButtonColorTest` 亦失败（Failed），证明 P3 时点的"26/26 全绿"包含了当时会话状态下 hover 生效的运气成分；该测试对会话状态敏感（终端服务会话断开/重连后 SetCursorPos 行为变化）。
+- 处理：**非本计划引入的回归**，按 R4 记录不改测试不改产品代码（M1 禁改算法与行为；测试文件的 hover 用例已自带 QSKIP 兜底设计，属测试对环境的已知敏感项）。N₀ 口径调整为"25/26 稳定通过 + 1 项环境敏感项（基线同样失败）"；后续各步 ctest 验证以其余 25 项全绿为准，该项在 CI（github runner 支持真实鼠标事件注入的不同环境）上另行观察。清理：诊断用的 `F:\src\SARibbon-baseline` worktree 已删除。
+- 影响计划：01/02/03/04 的"ctest == N₀"门禁解读（口径：25 稳定绿 + B15 登记项）
+
+### B16：SARibbonCore 纯头占位模块需至少一个导出符号（MSVC 零导出 DLL 不生成 .lib）
+- 日期：2026-09-30（计划 01 S6 执行）
+- 发现位置：计划 01 S6.2（core 骨架 1 行占位源）与 S6.1（widgets 链接 core）
+- 证据：占位 `SARibbonCoreGlobal.cpp` 仅 `#include` 本头、无任何导出符号时，MSVC 构建 `SARibbonCore.dll` 成功但**不生成导入库 `SARibbonCore.lib`**（`ls build/lib/Release/` 只有 .dll）；SARibbonWidgets 链接报 `LNK1181: 无法打开输入文件 ..\..\lib\Release\SARibbonCore.lib`。
+- 处理：给 core 补一个最小导出符号 `SA_RIBBON_CORE_EXPORT int saRibbonCoreAbiVersion();`（声明进 `SARibbonCoreGlobal.h`，实现进占位 cpp 返回 1），计划 02 下沉真实源后保留作 ABI 探针。计划 01 S6.2 原文"1 行占位源使纯头模块可成库"的方案在此细化，无行为影响（新符号，2.9.5 无此 API）。
+- 影响计划：01-S6.2（执行细化）
+
 ### B14：P3 基线执行记录（N₀=26）与 ctest PATH 前置
 - 日期：2026-09-30（计划 01 执行开始）
 - 发现位置：计划 01 P3

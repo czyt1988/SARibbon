@@ -14,6 +14,7 @@
 #ifndef SACOLORWIDGETSGLOBAL_H
 #define SACOLORWIDGETSGLOBAL_H
 #include <QScopedPointer>
+#include "../SARibbonWidgetsGlobal.h"   // D4: colorWidgets 导出宏并入 widgets
 
 /**
  * \if ENGLISH
@@ -94,20 +95,12 @@
  * @def 颜色组件库的API声明
  * \endif
  */
-#ifndef SA_COLOR_WIDGETS_NO_DLL
-#if defined(SA_COLOR_WIDGETS_MAKE_LIB)  // 定义此宏将构建library
 #ifndef SA_COLOR_WIDGETS_API
-#define SA_COLOR_WIDGETS_API Q_DECL_EXPORT
-#endif
-#else
-#ifndef SA_COLOR_WIDGETS_API
-#define SA_COLOR_WIDGETS_API Q_DECL_IMPORT
-#endif
-#endif
-#else
-#ifndef SA_COLOR_WIDGETS_API
-#define SA_COLOR_WIDGETS_API
-#endif
+#  ifdef SA_COLOR_WIDGETS_NO_DLL
+#    define SA_COLOR_WIDGETS_API                 // 2.x 语义保留：NO_DLL 最外层优先（round3 补）
+#  else
+#    define SA_COLOR_WIDGETS_API SA_RIBBON_WIDGETS_EXPORT
+#  endif
 #endif
 
 /**

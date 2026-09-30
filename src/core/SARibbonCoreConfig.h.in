@@ -1,0 +1,10 @@
+#ifndef SARIBBONCORECONFIG_H
+#define SARIBBONCORECONFIG_H
+/* Generated from src/core/SARibbonCoreConfig.h.in by cmake. Do not edit. */
+#define SARIBBON_VERSION_MAJOR @PROJECT_VERSION_MAJOR@
+#define SARIBBON_VERSION_MINOR @PROJECT_VERSION_MINOR@
+#define SARIBBON_VERSION_PATCH @PROJECT_VERSION_PATCH@
+#define SARIBBON_VERSION "@PROJECT_VERSION@"
+/* == SA_RIBBON_CONFIG feature switches (v2 §3.1) ==
+ * 计划 02 起在此追加 #cmakedefine01 SA_RIBBON_CONFIG_xxx 行 */
+#endif  // SARIBBONCORECONFIG_H

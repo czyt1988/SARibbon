@@ -196,8 +196,8 @@ include(SARibbonUtils)
 # 自动化生成配置头文件
 ########################################################
 configure_file (
-  "${CMAKE_CURRENT_LIST_DIR}/src/SARibbonBar/SARibbonBarVersionInfo.h.in"
-  "${CMAKE_CURRENT_LIST_DIR}/src/SARibbonBar/SARibbonBarVersionInfo.h"
+  "${CMAKE_CURRENT_LIST_DIR}/src/widgets/SARibbonBarVersionInfo.h.in"
+  "${CMAKE_CURRENT_LIST_DIR}/src/widgets/SARibbonBarVersionInfo.h"
 )
 
 ##################################
