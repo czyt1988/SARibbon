@@ -1,0 +1,65 @@
+font=SimSun 9
+qt=6.7.3
+=== case: threerow size=200x120
+item[0] rp=1 hidden=0 hint=50x105 maxW=16777215 -> geom=2,2,50,99 row=0 col=0 expand=0
+item[1] rp=3 hidden=0 hint=50x32 maxW=16777215 -> geom=54,2,50,32 row=0 col=1 expand=0
+item[2] rp=3 hidden=0 hint=50x32 maxW=16777215 -> geom=54,35,50,32 row=1 col=1 expand=0
+item[3] rp=2 hidden=0 hint=50x32 maxW=16777215 -> geom=106,13,50,32 row=0 col=2 expand=0
+item[4] rp=3 hidden=0 hint=50x32 maxW=16777215 -> geom=106,56,50,32 row=1 col=2 expand=0
+panel sizeHint=158x82
+=== case: threerow size=500x160
+item[0] rp=1 hidden=0 hint=50x145 maxW=16777215 -> geom=2,2,50,139 row=0 col=0 expand=0
+item[1] rp=3 hidden=0 hint=50x45 maxW=16777215 -> geom=54,2,50,45 row=0 col=1 expand=0
+item[2] rp=3 hidden=0 hint=50x45 maxW=16777215 -> geom=54,48,50,45 row=1 col=1 expand=0
+item[3] rp=2 hidden=0 hint=50x45 maxW=16777215 -> geom=106,18,50,45 row=0 col=2 expand=0
+item[4] rp=3 hidden=0 hint=50x45 maxW=16777215 -> geom=106,79,50,45 row=1 col=2 expand=0
+panel sizeHint=158x82
+=== case: threerow size=80x90
+item[0] rp=1 hidden=0 hint=50x75 maxW=16777215 -> geom=2,2,50,69 row=0 col=0 expand=0
+item[1] rp=3 hidden=0 hint=50x22 maxW=16777215 -> geom=54,2,50,22 row=0 col=1 expand=0
+item[2] rp=3 hidden=0 hint=50x22 maxW=16777215 -> geom=54,25,50,22 row=1 col=1 expand=0
+item[3] rp=2 hidden=0 hint=50x22 maxW=16777215 -> geom=106,10,50,22 row=0 col=2 expand=0
+item[4] rp=3 hidden=0 hint=50x22 maxW=16777215 -> geom=106,40,50,22 row=1 col=2 expand=0
+panel sizeHint=158x82
+=== case: tworow size=200x120
+item[0] rp=1 hidden=0 hint=50x105 maxW=16777215 -> geom=2,2,50,99 row=0 col=0 expand=0
+item[1] rp=3 hidden=0 hint=50x49 maxW=16777215 -> geom=54,2,50,49 row=0 col=1 expand=0
+item[2] rp=3 hidden=0 hint=50x49 maxW=16777215 -> geom=54,52,50,49 row=1 col=1 expand=0
+item[3] rp=2 hidden=0 hint=50x49 maxW=16777215 -> geom=106,2,50,49 row=0 col=2 expand=0
+item[4] rp=3 hidden=0 hint=50x49 maxW=16777215 -> geom=106,52,50,49 row=1 col=2 expand=0
+panel sizeHint=158x59
+=== case: tworow size=500x160
+item[0] rp=1 hidden=0 hint=50x145 maxW=16777215 -> geom=2,2,50,139 row=0 col=0 expand=0
+item[1] rp=3 hidden=0 hint=50x69 maxW=16777215 -> geom=54,2,50,69 row=0 col=1 expand=0
+item[2] rp=3 hidden=0 hint=50x69 maxW=16777215 -> geom=54,72,50,69 row=1 col=1 expand=0
+item[3] rp=2 hidden=0 hint=50x69 maxW=16777215 -> geom=106,2,50,69 row=0 col=2 expand=0
+item[4] rp=3 hidden=0 hint=50x69 maxW=16777215 -> geom=106,72,50,69 row=1 col=2 expand=0
+panel sizeHint=158x59
+=== case: tworow size=80x90
+item[0] rp=1 hidden=0 hint=50x75 maxW=16777215 -> geom=2,2,50,69 row=0 col=0 expand=0
+item[1] rp=3 hidden=0 hint=50x34 maxW=16777215 -> geom=54,2,50,34 row=0 col=1 expand=0
+item[2] rp=3 hidden=0 hint=50x34 maxW=16777215 -> geom=54,37,50,34 row=1 col=1 expand=0
+item[3] rp=2 hidden=0 hint=50x34 maxW=16777215 -> geom=106,2,50,34 row=0 col=2 expand=0
+item[4] rp=3 hidden=0 hint=50x34 maxW=16777215 -> geom=106,37,50,34 row=1 col=2 expand=0
+panel sizeHint=158x59
+=== case: singlerow size=200x120
+item[0] rp=1 hidden=0 hint=50x105 maxW=16777215 -> geom=2,2,50,99 row=0 col=0 expand=0
+item[1] rp=3 hidden=0 hint=50x99 maxW=16777215 -> geom=54,2,50,99 row=0 col=1 expand=0
+item[2] rp=3 hidden=0 hint=50x99 maxW=16777215 -> geom=106,2,50,99 row=0 col=2 expand=0
+item[3] rp=2 hidden=0 hint=50x99 maxW=16777215 -> geom=158,2,50,99 row=0 col=3 expand=0
+item[4] rp=3 hidden=0 hint=50x99 maxW=16777215 -> geom=210,2,50,99 row=0 col=4 expand=0
+panel sizeHint=262x22
+=== case: singlerow size=500x160
+item[0] rp=1 hidden=0 hint=50x145 maxW=16777215 -> geom=2,2,50,139 row=0 col=0 expand=0
+item[1] rp=3 hidden=0 hint=50x139 maxW=16777215 -> geom=54,2,50,139 row=0 col=1 expand=0
+item[2] rp=3 hidden=0 hint=50x139 maxW=16777215 -> geom=106,2,50,139 row=0 col=2 expand=0
+item[3] rp=2 hidden=0 hint=50x139 maxW=16777215 -> geom=158,2,50,139 row=0 col=3 expand=0
+item[4] rp=3 hidden=0 hint=50x139 maxW=16777215 -> geom=210,2,50,139 row=0 col=4 expand=0
+panel sizeHint=262x22
+=== case: singlerow size=80x90
+item[0] rp=1 hidden=0 hint=50x75 maxW=16777215 -> geom=2,2,50,69 row=0 col=0 expand=0
+item[1] rp=3 hidden=0 hint=50x69 maxW=16777215 -> geom=54,2,50,69 row=0 col=1 expand=0
+item[2] rp=3 hidden=0 hint=50x69 maxW=16777215 -> geom=106,2,50,69 row=0 col=2 expand=0
+item[3] rp=2 hidden=0 hint=50x69 maxW=16777215 -> geom=158,2,50,69 row=0 col=3 expand=0
+item[4] rp=3 hidden=0 hint=50x69 maxW=16777215 -> geom=210,2,50,69 row=0 col=4 expand=0
+panel sizeHint=262x22
