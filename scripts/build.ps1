@@ -329,7 +329,7 @@ if ($Action -eq 'configure' -or $Action -eq 'rebuild' -or $Action -eq 'full') {
         "-DSARIBBON_BUILD_STATIC_LIBS=$StaticLibs",
         "-DSARIBBON_USE_FRAMELESS_LIB=$Frameless",
         "-DSARIBBON_ENABLE_SNAPLAYOUT=$SnapLayout",
-        "-DBUILD_TESTS=$Tests"
+        "-DSARIBBON_BUILD_TESTS=$Tests"
     )
 
     Write-Host "  Command: $cmakeExe $($cmakeArgs -join ' ')" -ForegroundColor Gray
