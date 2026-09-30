@@ -1,5 +1,4 @@
 font=SimSun 9
-qt=6.7.3
 === case: threerow size=200x120
 item[0] rp=1 hidden=0 hint=50x105 maxW=16777215 -> geom=2,2,50,99 row=0 col=0 expand=0
 item[1] rp=3 hidden=0 hint=50x32 maxW=16777215 -> geom=54,2,50,32 row=0 col=1 expand=0

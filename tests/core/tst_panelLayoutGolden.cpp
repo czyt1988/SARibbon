@@ -80,12 +80,21 @@ void TestPanelLayoutGolden::goldenGeometry()
 {
     const QFont font("SimSun", 9);
     QApplication::setFont(font, "SARibbonToolButton");
+    // plan-02 S5.0-2: the golden values are recorded on Windows + Qt6 (SimSun 9
+    // via the system font database). Other platforms / Qt majors resolve different
+    // fonts and metrics, so the blob comparison is meaningless there -- the
+    // font-independent engine-level golden test (core_PanelLayoutEngine) is the
+    // CI gate; this test is the recording/replay fidelity check on the recording
+    // environment family. (QFontInfo cannot be used as the guard: it returns
+    // localized family names, e.g. SimSun resolves to the localized name.)
+#if !defined(Q_OS_WIN) || (QT_VERSION < QT_VERSION_CHECK(6, 0, 0))
+    QSKIP("widget-level golden blob is recorded on Windows/Qt6; see core_PanelLayoutEngine for the platform-independent golden gate");
+#endif
 
     QString blob;
     {
         QTextStream s(&blob);
         s << "font=" << font.family() << " " << font.pointSize() << "\n";
-        s << "qt=" << QT_VERSION_MAJOR << "." << QT_VERSION_MINOR << "." << QT_VERSION_PATCH << "\n";
     }
     // three-row / two-row / single-row, three panel sizes each
     const QVector< QPair< QString, SARibbonPanel::PanelLayoutMode > > modes = {
