@@ -104,7 +104,10 @@ Qt::Orientations SARibbonPanelItem::expandingDirections() const
  */
 int SARibbonPanelItem::stretchFactor() const
 {
-    if (SARibbonGallery* gallery = qobject_cast< SARibbonGallery* >(widget())) {
+    // Qt5 QLayoutItem::widget() is non-const (Qt6 adds a const overload);
+    // const_cast through the base keeps the contract const-correct on both
+    QWidget* w = const_cast< SARibbonPanelItem* >(this)->widget();
+    if (SARibbonGallery* gallery = qobject_cast< SARibbonGallery* >(w)) {
         return gallery->stretchFactor();
     }
     return 0;

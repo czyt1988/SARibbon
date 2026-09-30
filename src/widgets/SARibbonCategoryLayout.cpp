@@ -1270,7 +1270,9 @@ bool SARibbonCategoryLayoutItem::isHidden() const
 // （2.x 的判定源是 sizePolicy 的水平策略）
 Qt::Orientations SARibbonCategoryLayoutItem::expandingDirections() const
 {
-    if (SARibbonPanel* p = qobject_cast< SARibbonPanel* >(widget())) {
+    // Qt5 QLayoutItem::widget() is non-const (Qt6 adds a const overload)
+    QWidget* w = const_cast< SARibbonCategoryLayoutItem* >(this)->widget();
+    if (SARibbonPanel* p = qobject_cast< SARibbonPanel* >(w)) {
         return p->isExpanding() ? Qt::Horizontal : Qt::Orientations();
     }
     return Qt::Orientations();

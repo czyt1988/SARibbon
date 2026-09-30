@@ -263,6 +263,14 @@
 - 验收门汇总：29 项 ctest 28 绿（1=B15 环境项）；组合矩阵（core-only/qml-only/static）全通过；跨前端一致性（QML 端）PASS。
 - 影响计划：04 全部完成（除发布动作本身归维护者）；3.0 开发分支收尾
 
+### B29：CI 实跑结果与修复（dev-3.0 推送后）
+- 日期：2026-09-30
+- 推送：dev-3.0 → github 远端，7 个 workflow 全部触发。发现并修复**Amalgamate.sh 的 CI 阻塞缺陷**：Amalgamate.exe 在"产物无变化"（No need to write - new file is identical）时返回退出码 1，被 `set -e` 当作失败——本地验证时产物总是新写入未暴露。修复：脚本加 `run_amalg` 包装（接受 0/1，真实失败仍由产物存在性+sed 健全性检查兜底）。**此修复使 amalgamation job 从必红变为可绿。**
+- **mac-qt6.8 失败 = 环境漂移（非 3.0 回归）**：链接 libSARibbonCore 时 `ld: framework 'AGL' not found`。查运行历史：master/v2.9.5 的该 workflow 自 2026-09 起连续全红（run 254-261），同一错误——macOS 新 SDK 移除 AGL 框架而 Qt6Gui 的 WrapOpenGL 仍引用。2.x 亦无法构建，属上游/runner 环境问题，**不阻塞 3.0 验收**（与本仓改动无关；修复需 Qt 上游或 CI 换旧 SDK 镜像，移交维护者决策）。
+- **linux-qt5.15 失败 = 3.0 真实回归（已修）**：`SARibbonPanelItem::stretchFactor() const` 内调 `widget()`——Qt5 的 `QLayoutItem::widget()` 非 const（Qt6 才有 const 重载），GCC 严格报错（MSVC 宽松放行故本机未暴露）。同类问题同修 `SARibbonCategoryLayoutItem::expandingDirections() const`。修法：`const_cast<This*>(this)->widget()`（对基类非 const 接口的惯用桥接）。本机回归：PanelLayoutGolden/CategoryVisibility/GalleryStretchFactor 全绿。
+- 其余 workflow（linux-qt6.8 含 core-only/qml 轴、win-qt5.15、win-qt6.8 含 static 轴、Amalgamation）状态见推送后实跑。
+- 影响计划：01/02/04 的"CI 绿"验收口径——mac-qt6.8 一项按环境漂移豁免（有 master 同败证据），其余以实跑为准
+
 ### B21：类作用域 using 声明无法引入命名空间枚举符（计划 02 S1 round3 断言错误，MSVC C2886）
 - 日期：2026-09-30（计划 02 S1 执行）
 - 发现位置：计划 02 S1 第 1 条 RowProportion 兼容机制
