@@ -76,11 +76,11 @@ public:
     void setMinimumMode(bool isHide);
     bool isMinimumMode() const;
     void showMinimumModeButton(bool isShow = true);
-    bool haveShowMinimumModeButton() const;
+    bool isMinimumModeButtonVisible() const;
     QAction* minimumModeAction() const;
 
     bool isEnableTabDoubleClickToMinimumMode() const;
-    void setTabDoubleClickToMinimumMode(bool on = true) const;
+    void setTabDoubleClickToMinimumMode(bool on = true);
 
     RibbonMode currentRibbonState() const;
 
@@ -121,8 +121,8 @@ public:
     QColor tabBarBaseLineColor() const;
     void setTabBarBaseLineColor(const QColor& c);
 
-    Qt::Alignment windowTitleAligment() const;
-    void setWindowTitleAligment(Qt::Alignment a);
+    Qt::Alignment windowTitleAlignment() const;
+    void setWindowTitleAlignment(Qt::Alignment a);
 
     SARibbonQuickAccessBar* quickAccessBar();
     SARibbonButtonGroupWidget* rightButtonGroup();

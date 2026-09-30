@@ -13,16 +13,18 @@ requires-python = ">=3.8"
 dependencies = ["PyQt6 (>=6.2)"]
 
 [tool.sip.project]
-tag-prefix = "SARibbon"
-dunder-init = true
+# plan-03 S3: dunder-init off - sipbuild would generate an empty
+# PyQt6/__init__.py that clobbers pip-installed PyQt6 bootstrap
+# (find_qt) in the pyqt6 track; the bindings package imports fine
+# as a namespace package
 
 [tool.sip.bindings.saribbon]
 pep484-pyi = true
-define-macros = ["SA_RIBBON_BAR_NO_EXPORT", "SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=0", "NOMINMAX", "SA_COLOR_WIDGETS_NO_DLL"]
+define-macros = ["SA_RIBBON_BAR_NO_EXPORT", "SA_RIBBON_CORE_STATIC", "SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=0", "NOMINMAX", "SA_COLOR_WIDGETS_NO_DLL"]
 sip-file = "SARibbon.sip"
 include-dirs = ["src/core", "src/widgets", "src/widgets/colorWidgets", "binding-include"]
 qmake-QT = ["widgets"]
-builder-settings = ["RESOURCES += ../../src/widgets/SARibbonResource.qrc"]
+builder-settings = ["LIBS += -luser32"]
 headers = [
     "src/core/SARibbonCoreGlobal.h",
     "src/core/SARibbonQt5Compat.hpp",
@@ -126,7 +128,6 @@ sources = [
     "src/widgets/SARibbonPanelLayout.cpp",
     "src/widgets/SARibbonPanelOptionButton.cpp",
     "src/widgets/SARibbonQuickAccessBar.cpp",
-    "src/widgets/SARibbonResource.qrc",
     "src/widgets/SARibbonSeparatorWidget.cpp",
     "src/widgets/SARibbonStackedWidget.cpp",
     "src/widgets/SARibbonSystemButtonBar.cpp",

@@ -242,6 +242,13 @@ jobs:
         if: matrix.track != 'pyside6'
         run: python tools/sa_build_binding_include.py
 
+      - name: Install track build dependencies
+        shell: bash
+        run: |
+          if [ "${{ matrix.track }}" = "pyqt6" ]; then pip install sip PyQt-builder PyQt6 PyQt6-sip; fi
+          if [ "${{ matrix.track }}" = "pyqt5" ]; then pip install sip PyQt-builder PyQt5 PyQt5-sip; fi
+          if [ "${{ matrix.track }}" = "pyside6" ]; then pip install shiboken6-generator PySide6; fi
+
       - name: Build wheel
         shell: bash
         run: |
@@ -257,12 +264,12 @@ jobs:
           python -m venv /tmp/smoke-venv
           source /tmp/smoke-venv/Scripts/activate 2>/dev/null || source /tmp/smoke-venv/bin/activate
           if [ "${{ matrix.track }}" = "pyqt5" ]; then
-            pip install dist/*.whl PyQt5
-            python -c "from PyQtSARibbon import saribbon; print('PyQtSARibbon OK')"
+            pip install dist/*.whl PyQt5 PyQt5-sip
+            python -c "import PyQt5.QtWidgets; from PyQtSARibbon import saribbon; print('PyQtSARibbon OK')"
           fi
           if [ "${{ matrix.track }}" = "pyqt6" ]; then
-            pip install pyqt6/dist/*.whl PyQt6
-            python -c "from PyQt6SARibbon import saribbon; print('PyQt6SARibbon OK')"
+            pip install pyqt6/dist/*.whl PyQt6 PyQt6-sip
+            python -c "import PyQt6.QtWidgets; from PyQt6SARibbon import saribbon; print('PyQt6SARibbon OK')"
           fi
           if [ "${{ matrix.track }}" = "pyside6" ]; then
             pip install pyside6/dist/*.whl PySide6

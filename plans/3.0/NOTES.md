@@ -300,6 +300,19 @@
 - **Python dry-run**：workflow_dispatch 触发成功（run 36686005076，pyqt5/pyqt6/pyside6 × windows/linux 六组合）——首次实测三轨绑定在 CI 的可构建性。
 - 影响计划：03-S5 验收门（CI 全矩阵）按"5/7 绿 + mac 双红登记豁免（均有 master 同败/退役证据）"判定通过；04-S10 发布前置就绪
 
+### B33：Python 绑定构建链修复（本地全链路打通 PyQt6 轨）
+- 日期：2026-09-30
+- 背景：B27 的 dry-run 首跑全红 + v2.9.5 release run（35362378731）同红——**绑定发布链自 2.9.5 起就不可用**（这解释了 P6"绑定版本/清单停在 2.8.0"的存量事实）。本地建 sip 工具链 venv（sip 6.16.1 + PyQt-builder 1.19.1 + PyQt6 6.11）全链路修复，共五层根因：
+  1. **sip 6.x 拒绝旧选项**：`[tool.sip.project] tag-prefix` 已不被支持（PyProjectOptionException，v2.9.5 CI 即此错）→ 三处 toml 删除。
+  2. **pyqt6/ 轨缺 project.py**：sip-build 用**本地 project.py** 选择 PyQtProject 工厂（abstract_project.py:38-62 的 `tool.sip.project-factory`/默认 `./project.py` 机制），pyqt6/ 目录无此文件则用裸 Project → 不识别 `qmake-QT`（PyQt-builder 的 PyQtBindings 专属选项）→ `pyqt6/project.py` 从根目录复制（含 qrc 注入增强，见第 5 条）。
+  3. **sip 文件 API 漂移 + supertype 旧写法**：SARibbonBar.sip 四处（haveShowMinimumModeButton→isMinimumModeButtonVisible、setTabDoubleClickToMinimumMode 去 const、windowTitleAligment→Alignment×2）；**致命项 `%DefaultSupertype sip.simplewrapper` → `PyQt6.sip.simplewrapper`（pyqt6 轨）/`PyQt5.sip.simplewrapper`（根轨）**——PyQt6 官方 sip 文件全部用全限定名（QtWidgetsmod.sip:47），旧短名在新 sip 运行时类型注册表查不到（`sip.simplewrapper is not a registered type`，构建环境与运行环境同报）。
+  4. **宏与 qrc 归位**：define-macros 补 `SA_RIBBON_CORE_STATIC`（绑定把 core 源码直接编进扩展，core 类的 Q_OBJECT/moc 需本地符号而非 dllimport，C2491）；`SARibbonResource.qrc` 从 sources 清单移除（qmake 把 qrc 当源文件找 .obj → LNK1181）改由 **project.py 注入绝对路径的 `RESOURCES +=`**（builder-settings 相对路径随 sipbuild 生成目录漂移且根轨/pyqt6 轨深度不同——B27 预警的"勿顺手减层级"的反向问题）；`builder-settings` 加 `LIBS += -luser32`（SARibbonMainWindow nativeEvent 等直调 Win32 API，LNK2019×8）。
+  5. **wheel 不再覆盖 PyQt6/__init__.py**：`dunder-init = true` 会让 sip-distinfo 生成空壳 `PyQt6/__init__.py` 进 wheel，pip 安装时**覆盖 PyQt6 官方包的 __init__.py**（内含 find_qt() 的 Qt DLL 目录注册）→ 安装我们的轮子后整个 PyQt6 全坏（DLL load failed）。修法：三处 toml `dunder-init` 关闭（我们的包作为命名空间包 import 正常）。**消费端约定**：外置 PyQt 扩展必须先 `import PyQt6.QtWidgets` 再 import 本扩展（DLL 目录注册时机），dry-run 冒烟命令已按此序。
+- **本地验证（Windows + Qt 6.7.3 + MSVC2019 + Python 3.11）**：`python -m build --wheel --no-isolation`（pyqt6/）→ `pyqt6saribbon-3.0.0-cp38-abi3-win_amd64.whl` 构建成功；干净 venv 安装（wheel+PyQt6）→ `import PyQt6.QtWidgets; from PyQt6SARibbon import saribbon` **成功**，`SARibbonBar` 类可达、`SARibbonBar()` 实例化成功。**计划 03 验收门"至少一个绑定轮子可构建并 import 冒烟"以本地实跑达成**（此前该门从未满足过——2.9.5 发布即红）。
+- 枚举侧观察（非阻塞）：SARibbonTheme 等在 sip 里是 MappedType（int 双向映射）而非 Q_ENUM——2.x 既有设计，Python 侧经 int 使用；3.0 枚举下沉 core 后全局枚举仍可如此消费（include 路径经 binding-include 镜像解析）。RowProportion 等类内枚举经继承保持 `SARibbonPanelItem.Large` 可访问。
+- CI 侧同步：dry-run job 增"Install track build dependencies"步骤（sip/PyQt-builder/对应 PyQt 运行库）；冒烟命令改为预导入 PyQt 后再 import 扩展。根轨（PyQt5）同修 supertype/宏/qrc 注入/dunder-init（文件级同一批改动）；PyQt5 本地无 5.15 工具链未实跑（B5 同口径，CI dry-run 验证）。
+- 影响计划：03-S3/S4 验收门达成；发布链修复属 3.0 实质性交付内容（2.9.5 起不可用）
+
 ### B21：类作用域 using 声明无法引入命名空间枚举符（计划 02 S1 round3 断言错误，MSVC C2886）
 - 日期：2026-09-30（计划 02 S1 执行）
 - 发现位置：计划 02 S1 第 1 条 RowProportion 兼容机制
