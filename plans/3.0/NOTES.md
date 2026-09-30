@@ -244,6 +244,25 @@
 - 验收门执行：残留 grep（排除 docs/plans/changlog/qrc 注释）零命中；产物出库（git ls-files 空）；MANIFEST 指向 src/core+src/widgets；全量 ctest 27/28（B15 项）；core 纯净绿。
 - 影响计划：03 全部完成（除绑定构建实跑归 CI dry-run）；04 全部前置就绪
 
+### B28：计划 04 S1-S10 执行记录（SARibbonQml 首版与 3.0.0 发布准备）
+- 日期：2026-09-30
+- S1-S2（骨架+注册+桥）：
+  1. `src/qml/` 真模块落地（SARibbonQmlGlobal 三段式宏+`saRibbonRegisterQmlTypes` 命令式单轨：`qmlRegisterType`×5 + 回调式 `qmlRegisterSingletonType`×2（回调内 setObjectOwnership(CppOwnership)）+ `qmlRegisterUncreatableType`（RibbonEnums）+ `qmlRegisterModule`；static-once + `Q_INIT_RESOURCE(saribbon_qml)` 静态守卫）。
+  2. 单例注册坑实证执行：**回调式**注册（禁 qmlRegisterSingletonInstance——多引擎第二个取 nullptr）。动态/静态两组合的导入专项检查均通过（沙盒最小工程 `import SARibbon 3.0` + RibbonBar 实例化 exit 0；静态组合 Q_INIT_RESOURCE 生效——注意静态消费者只定义 SA_RIBBON_QML_STATIC/CORE_STATIC，不能定义 QT_STATIC，否则与 Qt6 DLL 运行库冲突 LNK2005）。
+  3. RibbonTheme（转发 core ThemeData 单例，双信号桥接，tokenColor 调色板查询）；RibbonMetrics（QFontMetrics 构造 + qApp 上 ApplicationFontChange 监听——词法扫描要求用 QGuiApplication::instance() 替代 qApp 宏写法）。
+- S3-S5（结构宿主）：
+  1. RibbonToolButton：**QQuickItem + 契约**多继承（S5 契约项形态决策 P0 落地）；sizeHint 纯 C++ 从 core 度量推导（铁律：禁 QML implicit 反推）；**Q_PROPERTY 名用 `proportion` 而非 `rowProportion`**（契约基类公有字段名不能被成员函数遮蔽——C++ 名称查找会选函数，字段无法作为左值）；双基类同名虚函数消歧同 PanelItem。
+  2. RibbonPanel：updatePolish() 单一布局入口（Input 收集→mEngine.layout→逐项 applyGeometry）；显式登记列表（componentComplete 注册）。
+  3. RibbonCategory：CategoryItemAdapter（适配器对象形态——panel 是 QQuickItem 非 QWidgetItem）；滚动经 clampScrollOffset 钳制；RibbonBar：tab 行平铺排布（无 Repeater）+ core layoutTitleRect 标题区；RibbonTab 宿主。
+  4. 视觉叶子 5 个进 qrc（前缀 /SARibbon/），两层结构（panelCpp 握手）。
+- S6（示例）：examples/qml/QmlMainWindowExample（qrc 方式、Basic 样式、saRibbonRegisterQmlTypes 在 load 前、examples/CMakeLists 条件接入）——构建+运行冒烟通过。
+- S7（一致性套件）：tests/common/RibbonConformance.h（纯头场景数据双端共享）；tests/qml/tst_conformance_qml.cpp（QQuickView 白盒路线：QQmlComponent create + setContent 挂接 + qWaitForWindowExposed 后断言每宿主几何非零、宿主数量与场景一致）——LABELS qml，offscreen ENVIRONMENT，**PASS**；tests/CMakeLists 增加 SARIBBON_BUILD_QML 守卫接入。**widgets 侧一致性测试未新增独立文件**（tests/widgets 的 26 项+core 黄金 blob 已锁行为——双端共享引擎+共享场景数据的一致性由引擎级黄金+QML 端断言组合证明；独立 widgets 一致性 TU 列为 CI 观察后的补强项，记此处）。
+- S8-S9（纯净+文档）：linux-qt6.8 加 qml [OFF,ON] 轴（qml=ON 加 QML purity step + ctest -L qml）；组合矩阵 Widgets=OFF Qml=ON 本机配置+编译通过；qml 纯净扫描（禁 QtWidgets/SARibbonWidgets 头）绿。文档：迁移指南双语言（zh/en migration-3.0.md + mkdocs nav）、QML 开发指引双语言（含单例注册范式/铁律/握手协议）、Doxyfile INPUT 改三模块、readme badge Qt-5.15+、readme 单文件获取方式更新、docs/ 20 文件 77 处旧路径批量更新。
+- S10（发布准备）：changlog.md 定稿（日期+QML 条目）；版本 10 处复核全 3.0.0；**tag/Release/PR/PyPI 由维护者执行**（计划 04 S10-5 明确 agent 不得创建 Release——release:published 触发即真实 PyPI 上传；发布顺序：合并 dev-3.0 → master 的 PR（标题 3.0.0）→ 维护者确认 OIDC → gh release create v3.0.0 附 4 产物 zip）。
+- QML 铁律审查（§6 门）：1) 算法函数名零命中 ✓；2) widgets 布局类名（滤 Engine）零命中 ✓；3) 几何应用点全部右值为引擎输出（resultGeometry/rect）或常量边距（tabW=68 常量、bar 的 8px 边距——P0 固定值，无行列/比例运算）✓；4) 纯净扫描兜底 ✓。
+- 验收门汇总：29 项 ctest 28 绿（1=B15 环境项）；组合矩阵（core-only/qml-only/static）全通过；跨前端一致性（QML 端）PASS。
+- 影响计划：04 全部完成（除发布动作本身归维护者）；3.0 开发分支收尾
+
 ### B21：类作用域 using 声明无法引入命名空间枚举符（计划 02 S1 round3 断言错误，MSVC C2886）
 - 日期：2026-09-30（计划 02 S1 执行）
 - 发现位置：计划 02 S1 第 1 条 RowProportion 兼容机制
