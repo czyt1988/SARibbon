@@ -1,15 +1,18 @@
 [build-system]
-# PySide6 must match the Qt version used at compile time: the wheel's
+# PySide6 must match the Qt version used at compile time (the wheel's
 # pyside6_qtcore_python.h includes Qt headers that only exist in the Qt the
-# PySide6 release was built against (e.g. 6.9+ added qjsonparseerror.h, which
-# Qt 6.8 lacks, so PySide6 6.9+ headers cannot compile against Qt 6.8).
-# The CI installs Qt 6.8.3 via aqt, so the build env pins PySide6 6.8.3.
-# Keep this pin in sync with the aqt Qt version in
+# PySide6 release was built against — e.g. Qt 6.9 added qjsonparseerror.h, so
+# PySide6 6.9+ cannot compile against Qt 6.8). Additionally, PySide6 <= 6.8
+# bundles a prehistoric libclang next to shiboken6.exe that cannot parse the
+# current MSVC STL (14.40+ uses __builtin_verbose_trap, needs clang 19+);
+# PySide6 6.10+ ships no bundled libclang and uses the system LLVM instead.
+# 6.10.3 is the sweet spot for the CI (aqt Qt 6.10.3 + system LLVM ≥19);
+# keep this pin in sync with the aqt Qt version in
 # .github/workflows/publish-python-bindings.yml.
 requires = [
     "scikit-build-core>=0.10",
-    "PySide6==6.8.3.*",
-    "shiboken6-generator==6.8.3.*",
+    "PySide6==6.10.3.*",
+    "shiboken6-generator==6.10.3.*",
 ]
 build-backend = "scikit_build_core.build"
 
@@ -19,9 +22,9 @@ version = "3.0.0"
 description = "Python bindings for SARibbon - a Qt Ribbon UI framework (PySide6)"
 license = "MIT"
 requires-python = ">=3.10"
-# libpyside6 carries a minor-versioned soname (libpyside6.abi3.so.6.8), so the
-# compiled module only resolves against the matching PySide6 6.8 runtime.
-dependencies = ["PySide6==6.8.3.*"]
+# libpyside6 carries a minor-versioned soname (libpyside6.abi3.so.6.10), so the
+# compiled module only resolves against the matching PySide6 6.10 runtime.
+dependencies = ["PySide6==6.10.3.*"]
 
 [project.urls]
 Homepage = "https://github.com/czyt1988/SARibbon"
