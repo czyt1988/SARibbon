@@ -160,7 +160,7 @@ Q_PROPERTY(bool minimumModeButton READ haveShowMinimumModeButton WRITE showMinim
 3. **特例**：Qt 信号（`Q_SIGNALS` 区域下的函数）和类的注释需在头文件中使用双语 Doxygen
 
 ```cpp
-// 以下为真实类 SARibbonCategory 的注释模板（参见 src/SARibbonBar/SARibbonCategory.h）
+// 以下为真实类 SARibbonCategory 的注释模板（参见 src/widgets/SARibbonCategory.h）
 /**
  * \if ENGLISH
  * @brief Ribbon category page containing multiple panels
@@ -370,5 +370,5 @@ Q_SIGNALS:
 ## 参考
 
 - 相关规范：[Qt集成规范](qt-integration.md)、[PIMPL开发规范](pimpl-dev-guide.md)
-- 源码位置：`src/SARibbonBar/`
+- 源码位置：`src/widgets/`
 - 核心头文件：`SARibbonGlobal.h`（包含SA_RIBBON_EXPORT、SA_RIBBON_DECLARE_PRIVATE等宏定义）

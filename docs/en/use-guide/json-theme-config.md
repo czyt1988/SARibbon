@@ -492,7 +492,7 @@ Map every token in `win7-default.json` to the QSS selector(s) it influences:
 | `:/SARibbonTheme/resource/palettes/win7-default.json` | Windows 7 | `false` |
 | `:/SARibbonTheme/resource/palettes/office2013-default.json` | Office 2013 | `false` |
 
-Source files on disk are in `src/SARibbonBar/resource/palettes/`.
+Source files on disk are in `src/widgets/resource/palettes/`.
 
 ## 8. Appendix: All Built-in Template Files
 
@@ -507,4 +507,4 @@ Source files on disk are in `src/SARibbonBar/resource/palettes/`.
 
 Additionally, `:/SARibbonTheme/resource/theme-base.qss` is always prepended to every template output. It contains shared selectors (transparent backgrounds, none borders, generic sizes) that don't have token placeholders.
 
-Source files on disk are in `src/SARibbonBar/resource/templates/`.
+Source files on disk are in `src/widgets/resource/templates/`.

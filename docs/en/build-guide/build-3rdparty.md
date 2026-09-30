@@ -13,7 +13,7 @@
 QWindowkit **must** be built with CMake; no qmake project is provided.
 
 For your convenience a ready-to-use `CMakeLists.txt` is placed in  
-`src/SARibbonBar/3rdparty`.  
+`src/widgets/3rdparty`.  
 Open or invoke that file to build and install the library.
 
 The steps are almost identical for **Qt Creator** and **Visual Studio**.
@@ -21,7 +21,7 @@ The steps are almost identical for **Qt Creator** and **Visual Studio**.
 
 ### Qt Creator route
 
-1. Open `src/SARibbonBar/3rdparty/CMakeLists.txt` in Qt Creator.  
+1. Open `src/widgets/3rdparty/CMakeLists.txt` in Qt Creator.  
    ![build-cmake-qwk-qtc](../../assets/pic/build-cmake-qwk-qtc-01.png)
 
 2. Press **Run** (Ctrl+R).  
@@ -44,7 +44,7 @@ Done.
 
 ### Visual Studio route
 
-1. Open the folder `src/SARibbonBar/3rdparty` as a CMake project in Visual Studio.  
+1. Open the folder `src/widgets/3rdparty` as a CMake project in Visual Studio.  
    ![build-cmake-vs](../../assets/pic/build-cmake-vs-01.png)
 
 2. Choose **Build → Build All** (or right-click `CMakeLists.txt` → **Build**).  
@@ -74,7 +74,7 @@ The bundled CMake in VS 2019 (or older) is often too old, so build from the term
    `C:\Qt\Qt5.14.2\5.14.2\msvc2017_64\lib\cmake\Qt5`
 
 4. Open a **Developer Command Prompt** for your compiler, cd to  
-   `src/SARibbonBar/3rdparty` and run:
+   `src/widgets/3rdparty` and run:
 
    ```cmd
    cmake -B build -S . -G "Visual Studio 15 2017" -A x64 ^

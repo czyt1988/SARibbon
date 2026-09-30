@@ -116,7 +116,7 @@ flowchart LR
 - 类注释仅使用 `@brief` / `@details` / `@note` / `@see`，禁止 `@param` / `@class`
 - 核心类使用 PIMPL 模式，`PrivateData` 定义在 `.cpp` 中
 - 4 空格缩进，120 字符行宽，指针靠左（`QWidget* p`）
-- 源码修改仅在 `src/SARibbonBar/` 目录下进行，禁止触碰合并文件 `src/SARibbon.h` / `src/SARibbon.cpp`
+- 源码修改仅在 `src/widgets/` 目录下进行，禁止触碰合并文件 `src/SARibbon.h` / `src/SARibbon.cpp`
 
 ## 联系我们
 

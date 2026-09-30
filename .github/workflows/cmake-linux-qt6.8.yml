@@ -9,7 +9,7 @@ env:
 jobs:
   build:
     runs-on: ubuntu-${{ matrix.ubuntu_version }}
-    name: Ubuntu-${{ matrix.ubuntu_version }}-Qt-${{ matrix.qt_version }}-shared-${{ matrix.shared }}-widgets-${{ matrix.widgets }}
+    name: Ubuntu-${{ matrix.ubuntu_version }}-Qt-${{ matrix.qt_version }}-shared-${{ matrix.shared }}-widgets-${{ matrix.widgets }}-qml-${{ matrix.qml }}
     strategy:
       fail-fast: false
       matrix:
@@ -17,6 +17,7 @@ jobs:
         qt_version: [6.8.*]
         shared: [ON]
         widgets: [ON, OFF]
+        qml: [OFF, ON]
 
     steps:
     - name: Checkout
@@ -36,11 +37,13 @@ jobs:
 
     - name: Core purity check
       run: python3 tools/check_core_purity.py src/core
+    - name: QML purity check (plan-04 S8)
+      run: python3 tools/check_core_purity.py src/qml --forbid-include QWidget QApplication QLayout QStyle QMainWindow QDialog QPushButton QToolBar SARibbonWidgets '<QtWidgets/'
 
     # widgets=OFF is the core-only combination: tests cannot link widgets,
     # so SARIBBON_BUILD_TESTS follows the widgets axis.
     - name: Configure CMake
-      run: cmake -DCMAKE_BUILD_TYPE="${{env.BUILD_TYPE}}" -DBUILD_SHARED_LIBS=${{ matrix.shared }} -DSARIBBON_BUILD_EXAMPLES=OFF -DSARIBBON_BUILD_WIDGETS=${{ matrix.widgets }} -DSARIBBON_BUILD_TESTS=${{ matrix.widgets }} -B "${{github.workspace}}/build"
+      run: cmake -DCMAKE_BUILD_TYPE="${{env.BUILD_TYPE}}" -DBUILD_SHARED_LIBS=${{ matrix.shared }} -DSARIBBON_BUILD_EXAMPLES=OFF -DSARIBBON_BUILD_QML=${{ matrix.qml }} -DSARIBBON_BUILD_WIDGETS=${{ matrix.widgets }} -DSARIBBON_BUILD_TESTS=${{ matrix.widgets }} -B "${{github.workspace}}/build"
 
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
@@ -50,6 +53,11 @@ jobs:
       env:
         QT_QPA_PLATFORM: offscreen
       run: ctest --test-dir ${{github.workspace}}/build -C ${{env.BUILD_TYPE}} -L core --output-on-failure --no-tests=error
+    - name: QML conformance tests
+      if: matrix.qml == 'ON'
+      env:
+        QT_QPA_PLATFORM: offscreen
+      run: ctest --test-dir ${{github.workspace}}/build -C ${{env.BUILD_TYPE}} -L qml --output-on-failure --no-tests=error
     - name: Test
       if: matrix.widgets == 'ON'
       env:

@@ -212,7 +212,7 @@ if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
     ```
 
 !!! tip "提示"
-    内置主题模板位于 `src/SARibbonBar/resource/templates/`，调色板位于 `src/SARibbonBar/resource/palettes/`，可直接参考这些文件编写自定义主题。如需完全自定义主题，请参阅 [自定义Ribbon主题](./design-your-theme.md)。如需详细的JSON调色板配置，请参阅 [JSON主题配置指南](./json-theme-config.md)。
+    内置主题模板位于 `src/widgets/resource/templates/`，调色板位于 `src/widgets/resource/palettes/`，可直接参考这些文件编写自定义主题。如需完全自定义主题，请参阅 [自定义Ribbon主题](./design-your-theme.md)。如需详细的JSON调色板配置，请参阅 [JSON主题配置指南](./json-theme-config.md)。
 
 ## Post-QSS 内部调整机制
 
@@ -286,7 +286,7 @@ SARibbon 采用**模板+调色板**架构生成主题 QSS。该系统使多个�
 
 ### 模板
 
-模板是位于 `src/SARibbonBar/resource/templates/` 的 `.qss` 文件，包含使用 `{{token}}` 占位符代替硬编码颜色值的 CSS 规则：
+模板是位于 `src/widgets/resource/templates/` 的 `.qss` 文件，包含使用 `{{token}}` 占位符代替硬编码颜色值的 CSS 规则：
 
 ```css
 SARibbonBar {
@@ -308,7 +308,7 @@ SARibbonBar {
 
 ### 调色板
 
-调色板是位于 `src/SARibbonBar/resource/palettes/` 的 `.json` 文件，定义用于填充模板中 `{{token}}` 占位符的颜色标记。每个调色板包含三个部分：
+调色板是位于 `src/widgets/resource/palettes/` 的 `.json` 文件，定义用于填充模板中 `{{token}}` 占位符的颜色标记。每个调色板包含三个部分：
 
 - **`keyColors`**（必填）— 主要设计标记：`accent`、`content-bg`、`text-color` 等
 - **`derived`**（可选）— 从键色通过变亮/变暗规则计算的颜色，例如 `accent-hover` 由 `accent` 经 `lighten(15)` 派生

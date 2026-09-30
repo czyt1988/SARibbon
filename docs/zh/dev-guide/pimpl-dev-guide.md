@@ -12,7 +12,7 @@ PIMPL模式是 Qt 项目的常见实践，它可以：
 
 ## PIMPL宏说明
 
-SARibbon的PIMPL模式所需的宏位于 `src/SARibbonBar/SARibbonGlobal.h`，主要涉及以下宏：
+SARibbon的PIMPL模式所需的宏位于 `src/widgets/SARibbonGlobal.h`，主要涉及以下宏：
 
 ### SA_RIBBON_DECLARE_PRIVATE
 
@@ -260,4 +260,4 @@ flowchart TD
 ## 参考
 
 - 相关规范：[Qt集成规范](qt-integration.md)、[代码风格与注释规范](coding-standards.md)
-- 源码位置：`src/SARibbonBar/SARibbonGlobal.h`（包含所有PIMPL宏定义）
+- 源码位置：`src/widgets/SARibbonGlobal.h`（包含所有PIMPL宏定义）

@@ -225,7 +225,7 @@ connect(grid, &SAColorGridWidget::colorToggled,
 ### 效果说明
 
 !!! example
-    完整使用示例见 `src/SARibbonBar/colorWidgets/tst/Widget.cpp`（约第 37-49 行）
+    完整使用示例见 `src/widgets/colorWidgets/tst/Widget.cpp`（约第 37-49 行）
 
     ```cpp
     // 列数为 0 时，所有颜色在同一行
@@ -290,7 +290,7 @@ connect(menu, &SAColorMenu::selectedColor,
 - 用户可直接通过 `SARibbonColorToolButton::setupStandardColorMenu()` 或 `SAColorToolButton::createColorMenu()` 一键创建，无需手动构建
 
 !!! example
-    详见 `src/SARibbonBar/SARibbonColorToolButton.cpp` 的 `setupStandardColorMenu` 函数（约第 260 行）展示的一键建站模式
+    详见 `src/widgets/SARibbonColorToolButton.cpp` 的 `setupStandardColorMenu` 函数（约第 260 行）展示的一键建站模式
 
 ## SAColorPaletteGridWidget 使用方法
 

@@ -492,7 +492,7 @@ SA::applyRibbonTheme(this, ribbonBar(), SARibbonTheme::RibbonThemeOffice2021Blue
 | `:/SARibbonTheme/resource/palettes/win7-default.json` | Windows 7 | `false` |
 | `:/SARibbonTheme/resource/palettes/office2013-default.json` | Office 2013 | `false` |
 
-磁盘上的源文件位于 `src/SARibbonBar/resource/palettes/`。
+磁盘上的源文件位于 `src/widgets/resource/palettes/`。
 
 ## 8. 附录：所有内置模板文件
 
@@ -507,4 +507,4 @@ SA::applyRibbonTheme(this, ribbonBar(), SARibbonTheme::RibbonThemeOffice2021Blue
 
 此外，`:/SARibbonTheme/resource/theme-base.qss` 总会附加到每个模板输出之前。它包含共享选择器（透明背景、无边框、通用尺寸等），不含标记占位符。
 
-磁盘上的源文件位于 `src/SARibbonBar/resource/templates/`。
+磁盘上的源文件位于 `src/widgets/resource/templates/`。

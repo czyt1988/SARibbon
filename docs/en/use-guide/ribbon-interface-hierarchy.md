@@ -334,11 +334,11 @@ The code above demonstrates the full workflow from obtaining `SARibbonBar` to cr
 ## References
 
 - Complete example project: `example/MainWindowExample/mainwindow.cpp`
-- SARibbonBar class reference: `src/SARibbonBar/SARibbonBar.h`
-- SARibbonCategory class reference: `src/SARibbonBar/SARibbonCategory.h`
-- SARibbonPanel class reference: `src/SARibbonBar/SARibbonPanel.h`
-- SARibbonToolButton class reference: `src/SARibbonBar/SARibbonToolButton.h`
-- SARibbonContextCategory class reference: `src/SARibbonBar/SARibbonContextCategory.h`
-- SARibbonGallery class reference: `src/SARibbonBar/SARibbonGallery.h`
+- SARibbonBar class reference: `src/widgets/SARibbonBar.h`
+- SARibbonCategory class reference: `src/widgets/SARibbonCategory.h`
+- SARibbonPanel class reference: `src/widgets/SARibbonPanel.h`
+- SARibbonToolButton class reference: `src/widgets/SARibbonToolButton.h`
+- SARibbonContextCategory class reference: `src/widgets/SARibbonContextCategory.h`
+- SARibbonGallery class reference: `src/widgets/SARibbonGallery.h`
 - Ribbon interface layout guide: [layout-of-SARibbon.md](../use-guide/layout-of-SARibbon.md)
 - Ribbon button layout guide: [layout-of-ribbonbutton.md](../use-guide/layout-of-ribbonbutton.md)

@@ -127,9 +127,9 @@ SARibbon/
 
 | 目录 | 职责 | 编辑频率 |
 |------|------|----------|
-| `src/SARibbonBar/` | 所有核心源码，包含全部 .h 和 .cpp 文件 | 高频 |
-| `src/SARibbonBar/colorWidgets/` | 颜色选择器子模块 | 低频 |
-| `src/SARibbonBar/3rdparty/` | 第三方代码，通常不需要修改 | 极低 |
+| `src/widgets/` | 所有核心源码，包含全部 .h 和 .cpp 文件 | 高频 |
+| `src/widgets/colorWidgets/` | 颜色选择器子模块 | 低频 |
+| `src/widgets/3rdparty/` | 第三方代码，通常不需要修改 | 极低 |
 | `example/` | 示例程序，用于验证和演示功能 | 中频 |
 | `tests/` | 单元测试，需 `BUILD_TESTS=ON` 启用 | 中频 |
 | `tools/` | Amalgamate 合并工具，用于生成单文件版本 | 极低 |
@@ -140,10 +140,10 @@ SARibbon/
 !!! danger "严格禁止修改的文件"
     以下文件和目录**绝对禁止**修改，任何改动都将导致构建问题或与合并工具冲突：
 
-    - **`src/SARibbon.cpp`** 和 **`src/SARibbon.h`**：这两个文件由 `tools/` 下的 Amalgamate 工具自动生成，将 `src/SARibbonBar/` 下的所有源文件合并为单文件。手动修改会在下次生成时被覆盖。
-    - **`src/SARibbonBar/SARibbonBarVersionInfo.h`**：由 CMake 的 `configure_file` 从 `.h.in` 模板自动生成，记录版本号信息。
+    - **`src/SARibbon.cpp`** 和 **`src/SARibbon.h`**：这两个文件由 `tools/` 下的 Amalgamate 工具自动生成，将 `src/widgets/` 下的所有源文件合并为单文件。手动修改会在下次生成时被覆盖。
+    - **`src/widgets/SARibbonBarVersionInfo.h`**：由 CMake 的 `configure_file` 从 `.h.in` 模板自动生成，记录版本号信息。
 
-    所有源码改动必须在 **`src/SARibbonBar/`** 目录下进行。
+    所有源码改动必须在 **`src/widgets/`** 目录下进行。
 
 ## 核心架构概览
 
@@ -301,7 +301,7 @@ flowchart TD
 
 关键步骤说明：
 
-1. **继承 SARibbonToolButton**：在 `src/SARibbonBar/` 下新建 `SARibbonMyButton.h` 和 `.cpp`，继承 `SARibbonToolButton`，重写 `paintEvent`、`sizeHint` 等方法。参考现有的 `SARibbonColorToolButton` 实现。
+1. **继承 SARibbonToolButton**：在 `src/widgets/` 下新建 `SARibbonMyButton.h` 和 `.cpp`，继承 `SARibbonToolButton`，重写 `paintEvent`、`sizeHint` 等方法。参考现有的 `SARibbonColorToolButton` 实现。
 
 2. **工厂注册**：在 `SARibbonElementFactory` 中添加虚方法 `virtual SARibbonMyButton* createRibbonMyButton(QWidget* parent)`，默认实现返回标准实例。
 
@@ -349,7 +349,7 @@ flowchart TD
 - 如果新控件是嵌入面板内的（如 ComboBox），继承 `SARibbonCtrlContainer` 包装
 - 如果新控件是独立容器（如新的 Gallery 变体），继承 `QFrame` 并使用 PIMPL 模式
 - 务必在 `SARibbonElementFactory` 中添加对应的虚创建方法，保持工厂模式的完整性
-- 新文件必须加入 `src/SARibbonBar/CMakeLists.txt` 的 `SARIBBON_HEADERS` 和 `SARIBBON_SOURCES` 列表
+- 新文件必须加入 `src/widgets/CMakeLists.txt` 的 `SARIBBON_HEADERS` 和 `SARIBBON_SOURCES` 列表
 
 ## 设计模式与约定
 
@@ -626,7 +626,7 @@ void SARibbonMyWidget::paintEvent(QPaintEvent* e)
 ```
 
 !!! warning "模板使用注意事项"
-    - 新建的 `.h` 和 `.cpp` 文件必须加入 `src/SARibbonBar/CMakeLists.txt` 的源文件列表
+    - 新建的 `.h` 和 `.cpp` 文件必须加入 `src/widgets/CMakeLists.txt` 的源文件列表
     - 文件换行格式必须为 **CRLF**，LF 会导致 `SARibbonAlignment` 枚举编译错误
     - `.h` 中 public 函数只用单行英文 `///` 注释，双语 Doxygen 写在 `.cpp` 中
 
@@ -729,7 +729,7 @@ bar->iteratePanel([](SARibbonPanel* panel) -> bool {
 
 ### Q2: 为什么不能直接修改 src/SARibbon.h 和 src/SARibbon.cpp？
 
-这两个文件由 `tools/` 目录下的 Amalgamate 工具自动从 `src/SARibbonBar/` 下的源文件合并生成。任何手动修改会在下次执行合并工具时被覆盖。所有改动必须在 `src/SARibbonBar/` 目录下的原始源文件中进行。
+这两个文件由 `tools/` 目录下的 Amalgamate 工具自动从 `src/widgets/` 下的源文件合并生成。任何手动修改会在下次执行合并工具时被覆盖。所有改动必须在 `src/widgets/` 目录下的原始源文件中进行。
 
 ### Q3: PIMPL 模式下，为什么析构函数必须在 .cpp 中定义？
 
@@ -737,7 +737,7 @@ bar->iteratePanel([](SARibbonPanel* panel) -> bool {
 
 ### Q4: 如何让新增的文件参与编译？
 
-在 `src/SARibbonBar/CMakeLists.txt` 中将新的 `.h` 文件加入 `SARIBBON_HEADERS` 列表，`.cpp` 文件加入 `SARIBBON_SOURCES` 列表。然后重新执行 CMake 配置命令。
+在 `src/widgets/CMakeLists.txt` 中将新的 `.h` 文件加入 `SARIBBON_HEADERS` 列表，`.cpp` 文件加入 `SARIBBON_SOURCES` 列表。然后重新执行 CMake 配置命令。
 
 ### Q5: Ribbon 的风格切换后布局不正确怎么办？
 

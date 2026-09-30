@@ -5,7 +5,7 @@
 <div align="center">
 <p>
 <img src="https://img.shields.io/badge/C++-17-blue"/>
-<img src="https://img.shields.io/badge/Qt-5.14+-green"/>
+<img src="https://img.shields.io/badge/Qt-5.15+-green"/>
 <img src="https://img.shields.io/badge/Qt-6-green"/>
 <img src="https://img.shields.io/badge/Python-PyQt5%20%7C%20PyQt6%20%7C%20PySide6-blueviolet"/>
 <img src="https://img.shields.io/badge/license-MIT-yellow"/>
@@ -112,7 +112,7 @@
 
 ## 构建及使用
 
-SARibbon提供了集成文件，位于src目录下，你只需要在项目中引入`SARibbon.h`和`SARibbon.cpp`即可使用
+SARibbon 3.0 提供两个合并集成文件（`SARibbonCore.h/.cpp` 与 `SARibbonWidgets.h/.cpp`），由 `tools/Amalgamate.sh` 生成（不再随仓库提交）。在 `tools/` 目录运行 `bash Amalgamate.sh` 本地生成，或从 GitHub Release 附件下载。
 
 如果你想编译为动态库，你可以参考下面文档[SARibbon构建说明](./docs/zh/build-guide/build-instructions.md)
 

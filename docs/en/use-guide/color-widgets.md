@@ -225,7 +225,7 @@ connect(grid, &SAColorGridWidget::colorToggled,
 ### Behavior Description
 
 !!! example
-    For a complete usage example, see `src/SARibbonBar/colorWidgets/tst/Widget.cpp` (around line 37-49)
+    For a complete usage example, see `src/widgets/colorWidgets/tst/Widget.cpp` (around line 37-49)
 
     ```cpp
     // When column count is 0, all colors are in a single row
@@ -290,7 +290,7 @@ connect(menu, &SAColorMenu::selectedColor,
 - Users can create the menu with one click via `SARibbonColorToolButton::setupStandardColorMenu()` or `SAColorToolButton::createColorMenu()`, without manually assembling `SAColorMenu`
 
 !!! example
-    See the `setupStandardColorMenu` function in `src/SARibbonBar/SARibbonColorToolButton.cpp` (around line 260) for the one-click menu creation pattern
+    See the `setupStandardColorMenu` function in `src/widgets/SARibbonColorToolButton.cpp` (around line 260) for the one-click menu creation pattern
 
 ## SAColorPaletteGridWidget Usage
 

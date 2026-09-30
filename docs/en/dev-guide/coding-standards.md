@@ -160,7 +160,7 @@ Header file comments follow these rules:
 3. **Exception**: Qt signals (functions under `Q_SIGNALS` section) and class comments must use bilingual Doxygen in the header file
 
 ```cpp
-// Below is the comment template for the real class SARibbonCategory (see src/SARibbonBar/SARibbonCategory.h)
+// Below is the comment template for the real class SARibbonCategory (see src/widgets/SARibbonCategory.h)
 /**
  * \if ENGLISH
  * @brief Ribbon category page containing multiple panels
@@ -370,5 +370,5 @@ Commit messages should ideally contain:
 ## References
 
 - Related guides: [Qt Integration Guide](qt-integration.md), [PIMPL Development Guide](pimpl-dev-guide.md)
-- Source location: `src/SARibbonBar/`
+- Source location: `src/widgets/`
 - Core header: `SARibbonGlobal.h` (contains macro definitions like SA_RIBBON_EXPORT, SA_RIBBON_DECLARE_PRIVATE)

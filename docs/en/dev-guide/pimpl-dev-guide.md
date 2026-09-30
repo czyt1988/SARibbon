@@ -12,7 +12,7 @@ The PIMPL pattern is a common practice in Qt projects. It provides:
 
 ## PIMPL Macro Reference
 
-The macros required for SARibbon's PIMPL pattern live in `src/SARibbonBar/SARibbonGlobal.h`. The main macros are:
+The macros required for SARibbon's PIMPL pattern live in `src/widgets/SARibbonGlobal.h`. The main macros are:
 
 ### SA_RIBBON_DECLARE_PRIVATE
 
@@ -269,4 +269,4 @@ flowchart TD
 ## References
 
 - Related standards: [Qt Integration Standard](qt-integration.md), [Code Style and Commenting Standard](coding-standards.md)
-- Source location: `src/SARibbonBar/SARibbonGlobal.h` (contains all PIMPL macro definitions)
+- Source location: `src/widgets/SARibbonGlobal.h` (contains all PIMPL macro definitions)

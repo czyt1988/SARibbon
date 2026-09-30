@@ -38,13 +38,13 @@ flowchart TD
 
 `QWindowkit`库仅提供CMake的编译方式，必须使用CMake进行编译。
 
-为简化操作，在`src/SARibbonBar/3rdparty`下提供了一个`CMakeLists.txt`文件，已对该库的必要配置进行了设置。你可以直接调用该文件进行编译。
+为简化操作，在`src/widgets/3rdparty`下提供了一个`CMakeLists.txt`文件，已对该库的必要配置进行了设置。你可以直接调用该文件进行编译。
 
 使用Qt Creator和Visual Studio进行构建和安装的方式基本相同。
 
 ### 使用Qt Creator构建和安装QWindowkit库
 
-1. 使用Qt Creator打开`src/SARibbonBar/3rdparty/CMakeLists.txt`文件。
+1. 使用Qt Creator打开`src/widgets/3rdparty/CMakeLists.txt`文件。
 
 ![build-cmake-qwk-qtc](../../assets/pic/build-cmake-qwk-qtc-01.png)
 
@@ -68,7 +68,7 @@ flowchart TD
 
 ### 使用visual studio构建和安装QWindowkit库
 
-1. 使用Visual Studio打开CMake项目，选择`src/SARibbonBar/3rdparty/CMakeLists.txt`文件。
+1. 使用Visual Studio打开CMake项目，选择`src/widgets/3rdparty/CMakeLists.txt`文件。
 
 ![build-cmake-vs](../../assets/pic/build-cmake-vs-01.png)
 
@@ -101,7 +101,7 @@ flowchart TD
 
 3. 找到Qt安装路径下`Qt5Config.cmake`所在的文件夹（例如：`C:\Qt\Qt5.14.2\5.14.2\msvc2017_64\lib\cmake\Qt5`）。
 
-4. 打开命令行，切换到`src/SARibbonBar/3rdparty`目录，执行以下命令：
+4. 打开命令行，切换到`src/widgets/3rdparty`目录，执行以下命令：
 
    ```shell
    "C:\Program Files (x86)\cmake3.27.9\bin\cmake.exe" -B build -S . -G "Visual Studio 15 2017" -A x64 -DQt5_DIR="C:\Qt\Qt5.14.2\5.14.2\msvc2017_64\lib\cmake\Qt5"
@@ -154,13 +154,13 @@ g++ --version      # 需要 GCC 9+
 
 ### 编译与安装
 
-切换到 SARibbon 的 `src/SARibbonBar/3rdparty` 目录，执行以下步骤：
+切换到 SARibbon 的 `src/widgets/3rdparty` 目录，执行以下步骤：
 
 1. 配置 CMake 项目（以 Qt6 为例，apt 安装的 Qt6 无需手动指定路径）：
 
 ```shell
 # 进入 3rdparty 目录
-cd src/SARibbonBar/3rdparty
+cd src/widgets/3rdparty
 
 # 使用 Ninja 生成器配置 — Release 模式
 cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=Release
@@ -233,7 +233,7 @@ clang++ --version  # 需要 Apple Clang 12+（支持 C++17）
 1. 配置 CMake 项目：
 
 ```shell
-cd src/SARibbonBar/3rdparty
+cd src/widgets/3rdparty
 
 # Qt6 — Apple Silicon
 cmake -B build -S . -G Ninja -DCMAKE_BUILD_TYPE=Release \

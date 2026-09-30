@@ -357,11 +357,11 @@ void MainWindow::setupRibbon()
 ## 参考资料
 
 - 完整示例项目：`example/MainWindowExample/mainwindow.cpp`
-- SARibbonBar 类参考：`src/SARibbonBar/SARibbonBar.h`
-- SARibbonCategory 类参考：`src/SARibbonBar/SARibbonCategory.h`
-- SARibbonPanel 类参考：`src/SARibbonBar/SARibbonPanel.h`
-- SARibbonToolButton 类参考：`src/SARibbonBar/SARibbonToolButton.h`
-- SARibbonContextCategory 类参考：`src/SARibbonBar/SARibbonContextCategory.h`
-- SARibbonGallery 类参考：`src/SARibbonBar/SARibbonGallery.h`
+- SARibbonBar 类参考：`src/widgets/SARibbonBar.h`
+- SARibbonCategory 类参考：`src/widgets/SARibbonCategory.h`
+- SARibbonPanel 类参考：`src/widgets/SARibbonPanel.h`
+- SARibbonToolButton 类参考：`src/widgets/SARibbonToolButton.h`
+- SARibbonContextCategory 类参考：`src/widgets/SARibbonContextCategory.h`
+- SARibbonGallery 类参考：`src/widgets/SARibbonGallery.h`
 - Ribbon 界面布局说明：[layout-of-SARibbon.md](../use-guide/layout-of-SARibbon.md)
 - Ribbon 按钮布局说明：[layout-of-ribbonbutton.md](../use-guide/layout-of-ribbonbutton.md)

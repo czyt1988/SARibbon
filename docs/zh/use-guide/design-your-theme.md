@@ -4,7 +4,7 @@
 - ✅ **原生边框模式**：UseNativeFrame 标志启用系统边框，适合无自定义标题栏的场景
 - ✅ **样式合并机制**：内置主题 QSS 与自定义 QSS 可合并叠加，不互相覆盖
 - ✅ **83种QSS选择器**：覆盖 SARibbonBar/Category/Panel/ToolButton/TabBar 等所有核心组件，10种内置主题（6模板+10调色板）可用性对照
-- ✅ **内置主题参考**：`src/SARibbonBar/resource/templates/` 目录提供6套 QSS 模板，`src/SARibbonBar/resource/palettes/` 目录提供10套调色板 JSON 文件
+- ✅ **内置主题参考**：`src/widgets/resource/templates/` 目录提供6套 QSS 模板，`src/widgets/resource/palettes/` 目录提供10套调色板 JSON 文件
 - ✅ **JSON调色板自定义**：无需编辑QSS即可更改颜色，详见 [JSON主题配置指南](./json-theme-config.md) 了解完整调色板规范和示例
 
 ## QSS选择器与组件对应关系
@@ -161,7 +161,7 @@ MainWindow::MainWindow(QWidget* par)
 
 ## SARibbon的QSS样式定制
 
-自定义`SARibbon`主题样式可以参考`SARibbon`的内置主题模板，模板位于`src/SARibbonBar/resource/templates/`，调色板位于`src/SARibbonBar/resource/palettes/`
+自定义`SARibbon`主题样式可以参考`SARibbon`的内置主题模板，模板位于`src/widgets/resource/templates/`，调色板位于`src/widgets/resource/palettes/`
 
 ### 1. 基本颜色定义
 
@@ -381,4 +381,4 @@ bar->setTabBarBaseLineColor(QColor(186, 201, 219));          // 设置基线颜�
 ```
 
 !!! tip "参考"
-    内置主题的后处理逻辑定义在 `src/SARibbonBar/SARibbonThemeManager.cpp` 中的四个静态 `std::map` 对象：`s_themeMargins`、`s_themeContextHighlights`、`s_themeContextColorLists` 和 `s_themeBaselineColors`。
+    内置主题的后处理逻辑定义在 `src/widgets/SARibbonThemeManager.cpp` 中的四个静态 `std::map` 对象：`s_themeMargins`、`s_themeContextHighlights`、`s_themeContextColorLists` 和 `s_themeBaselineColors`。

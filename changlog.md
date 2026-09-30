@@ -1,6 +1,6 @@
 # 版本更新记录(change log):
 
-## 未发布 -> 3.0.0（开发中，dev-3.0 分支）
+## 2026-09-30 -> 3.0.0
 
 - 变更：目录重组为 src/core、src/widgets、src/qml 三模块（原 src/SARibbonBar），example → examples/widgets，tests → tests/widgets，qwindowkit submodule 上移顶层 3rdparty/；
 - 变更：CMake 现代化（floor 3.21、统一 `SARIBBON_*` 选项名、`SARIBBON_INSTALL` 安装守卫、`find_package(SARibbon COMPONENTS Core|Widgets)` 组件化，旧包名 SARibbonBar 兼容一个版本周期）；
@@ -9,6 +9,8 @@
 - 新增：布局黄金几何测试（引擎级 FakeItem + widgets 级基线录制），证明引擎化后行为与 2.9.5 逐字节一致；度量对照表逐项相等（docs/3.0/metrics-comparison.md）；
 - 变更：单文件发行改为 SARibbonCore.h/.cpp 与 SARibbonWidgets.h/.cpp 双产物，由 tools/Amalgamate.sh 生成（ASCII 化、非交互、失败即停），不再随仓库提交，Release 附件提供；
 - 变更：Python 绑定（PyQtSARibbon/PyQt6SARibbon/PySideSARibbon）适配三模块源码树（含 core 头镜像机制），包名与导入名不变，版本 3.0.0；
+- 新增：SARibbonQml 模块首版（`import SARibbon 3.0`）：RibbonTheme/RibbonMetrics 单例、RibbonBar/Category/Tab/Panel/ToolButton 结构宿主——C++ 宿主驱动与 widgets 完全相同的 core 布局引擎，QML 只做视觉（examples/qml/QmlMainWindowExample）；
+- 新增：跨前端一致性测试（tests/common 场景双端共享）与 QML 纯净性门禁（禁 QtWidgets/SARibbonWidgets 头）；
 
 ## 2026-09-16 -> 2.9.5
 

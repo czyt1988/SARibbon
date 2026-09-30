@@ -216,7 +216,7 @@ if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
     ```
 
 !!! tip
-    Built-in theme templates are in `src/SARibbonBar/resource/templates/` and palettes in `src/SARibbonBar/resource/palettes/`. Use them as a reference when writing custom themes. For full customization, see [Design Your Own Theme](./design-your-theme.md). For detailed JSON palette configuration, see [JSON Theme Configuration Guide](./json-theme-config.md).
+    Built-in theme templates are in `src/widgets/resource/templates/` and palettes in `src/widgets/resource/palettes/`. Use them as a reference when writing custom themes. For full customization, see [Design Your Own Theme](./design-your-theme.md). For detailed JSON palette configuration, see [JSON Theme Configuration Guide](./json-theme-config.md).
 
 ## Post-QSS Internal Adjustment Mechanism
 
@@ -288,7 +288,7 @@ SARibbon uses a **template + palette** architecture to generate theme QSS. This 
 
 ### Templates
 
-Templates are `.qss` files located in `src/SARibbonBar/resource/templates/` that contain CSS-like rules with `{{token}}` placeholders instead of hardcoded color values:
+Templates are `.qss` files located in `src/widgets/resource/templates/` that contain CSS-like rules with `{{token}}` placeholders instead of hardcoded color values:
 
 ```css
 SARibbonBar {
@@ -310,7 +310,7 @@ There are 6 template files, each corresponding to a visual layout family:
 
 ### Palettes
 
-Palettes are `.json` files located in `src/SARibbonBar/resource/palettes/` that define the color tokens used to fill `{{token}}` placeholders in templates. Each palette has three sections:
+Palettes are `.json` files located in `src/widgets/resource/palettes/` that define the color tokens used to fill `{{token}}` placeholders in templates. Each palette has three sections:
 
 - **`keyColors`** (required) — Primary design tokens: `accent`, `content-bg`, `text-color`, etc.
 - **`derived`** (optional) — Colors computed from key colors via lighten/darken rules, e.g. `accent-hover` derived from `accent` by `lighten(15)`

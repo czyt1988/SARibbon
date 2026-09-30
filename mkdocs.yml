@@ -87,8 +87,10 @@ plugins:
                 - Coding Standards: en/dev-guide/coding-standards.md
                 - PIMPL Development Guide: en/dev-guide/pimpl-dev-guide.md
                 - Qt Integration Guide: en/dev-guide/qt-integration.md
+                - QML Development Guide: en/dev-guide/qml-guide.md
                 - Contributing: en/dev-guide/contributing.md
                 - Doc Writing Guide: en/doc-writing-guide.md
+                - Migration Guide 3.0: en/migration-3.0.md
             - Python Guide:
                 - Build Python Bindings: en/python-guide/build-python-bindings.md
                 - Build PySide6 Bindings: en/python-guide/build-pyside6-bindings.md
@@ -135,8 +137,10 @@ plugins:
                 - 编码规范: zh/dev-guide/coding-standards.md
                 - PIMPL开发指南: zh/dev-guide/pimpl-dev-guide.md
                 - Qt集成规范: zh/dev-guide/qt-integration.md
+                - QML开发指南: zh/dev-guide/qml-guide.md
                 - 贡献指南: zh/dev-guide/contributing.md
                 - 文档写作指南: zh/doc-writing-guide.md
+                - 3.0迁移指南: zh/migration-3.0.md
             - Python指南:
                 - 构建Python绑定: zh/python-guide/build-python-bindings.md
                 - 构建PySide6绑定: zh/python-guide/build-pyside6-bindings.md

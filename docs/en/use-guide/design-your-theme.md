@@ -4,7 +4,7 @@
 - ✅ **Native frame mode**: UseNativeFrame flag enables system border, suited for no-custom-titlebar scenarios
 - ✅ **QSS scoping**: QSS is applied via `setStyleSheet()` on SARibbonMainWindow — calling `setRibbonTheme()` after a custom `setStyleSheet()` replaces your custom QSS (see scoping section below)
 - ✅ **83 QSS selectors**: Covers every SARibbon component with per-theme availability across all 10 built-in themes (6 templates + 10 palettes)
-- ✅ **Built-in theme reference**: `src/SARibbonBar/resource/templates/` provides 6 QSS templates and `src/SARibbonBar/resource/palettes/` provides 10 palette JSON files as modification base
+- ✅ **Built-in theme reference**: `src/widgets/resource/templates/` provides 6 QSS templates and `src/widgets/resource/palettes/` provides 10 palette JSON files as modification base
 - ✅ **JSON palette customization**: change colors without editing QSS — see [JSON Theme Configuration Guide](./json-theme-config.md) for the full palette schema and examples
 
 ## QSS Selector-Component Mapping
@@ -149,7 +149,7 @@ MainWindow::MainWindow(QWidget* par)
 
 ## SARibbon QSS Styling
 
-For custom `SARibbon` themes, refer to the built-in theme templates located in `src/SARibbonBar/resource/templates/` and palettes in `src/SARibbonBar/resource/palettes/`.
+For custom `SARibbon` themes, refer to the built-in theme templates located in `src/widgets/resource/templates/` and palettes in `src/widgets/resource/palettes/`.
 
 ### 1. Define Base Colors
 
