@@ -4,6 +4,7 @@
 #include "../metrics/RibbonMetrics.h"
 #include "../SARibbonQmlTypes.h"
 #include <SARibbonCore/SARibbonCoreUtil.h>
+#include <QFontMetrics>
 
 namespace SARibbonQml {
 
@@ -56,6 +57,7 @@ void RibbonBar::ensureQmlItem()
         setBarQmlItem(leaf);  // handshake assigns it; fallback keeps the pair intact
     }
 }
+
 int RibbonBar::currentIndex() const
 {
     return mCurrentIndex;
@@ -63,11 +65,29 @@ int RibbonBar::currentIndex() const
 
 void RibbonBar::setCurrentIndex(int idx)
 {
-    if (mCurrentIndex == idx || idx < 0 || (!mCategories.isEmpty() && idx >= mCategories.size())) {
+    // bound by the TAB row (the tab row may be longer than the category list
+    // when tabs are declared beyond the categories; those show an empty page
+    // exactly like a QTabBar with more pages than stacked widgets)
+    if (mCurrentIndex == idx || idx < 0 || (!mTabs.isEmpty() && idx >= mTabs.size())) {
         return;
     }
     mCurrentIndex = idx;
     Q_EMIT currentIndexChanged();
+    polish();
+}
+
+QString RibbonBar::applicationLabel() const
+{
+    return mApplicationLabel;
+}
+
+void RibbonBar::setApplicationLabel(const QString& label)
+{
+    if (mApplicationLabel == label) {
+        return;
+    }
+    mApplicationLabel = label;
+    Q_EMIT applicationLabelChanged();
     polish();
 }
 
@@ -85,25 +105,61 @@ void RibbonBar::setBarQmlItem(QQuickItem* item)
     Q_EMIT barQmlItemChanged();
 }
 
+int RibbonBar::tabBarHeight() const
+{
+    return mTabBarHeight;
+}
+
+int RibbonBar::titleBarHeight() const
+{
+    return mTitleBarHeight;
+}
+
+int RibbonBar::categoryRowY() const
+{
+    return mCategoryRowY;
+}
+
+QRectF RibbonBar::applicationButtonRect() const
+{
+    return mApplicationButtonRect;
+}
+
 void RibbonBar::registerCategory(RibbonCategory* category)
 {
     if (!mCategories.contains(category)) {
         mCategories.append(category);
         category->setParentItem(this);
+        // auto tabs track their category title (addCategoryPage semantics)
+        const int idx = mCategories.size() - 1;
+        if (idx < mTabs.size() && mAutoTabs.contains(mTabs[ idx ])) {
+            mTabs[ idx ]->setText(category->title());
+        }
+        connect(category, &RibbonCategory::titleChanged, this, [this, category]() {
+            const int i = mCategories.indexOf(category);
+            if (i >= 0 && i < mTabs.size() && mAutoTabs.contains(mTabs[ i ])) {
+                mTabs[ i ]->setText(category->title());
+            }
+        });
         polish();
     }
 }
 
 void RibbonBar::unregisterCategory(RibbonCategory* category)
 {
-    if (mCategories.removeOne(category)) {
-        polish();
+    const int idx = mCategories.indexOf(category);
+    if (idx < 0) {
+        return;
     }
+    disconnect(category, nullptr, this, nullptr);
+    mCategories.remove(idx);
+    polish();
 }
 
 void RibbonBar::registerTab(RibbonTab* tab)
 {
     if (!mTabs.contains(tab)) {
+        const int idx = mTabs.size();
         mTabs.append(tab);
         tab->setParentItem(this);
         // clicking a tab selects the category of the same index
@@ -113,12 +169,35 @@ void RibbonBar::registerTab(RibbonTab* tab)
                 setCurrentIndex(idx);
             }
         });
+        // an explicit tab takes over the pairing slot: drop the auto tab that
+        // may already sit there and inherit the category title as fallback
+        if (idx < mCategories.size()) {
+            connect(mCategories[ idx ], &RibbonCategory::titleChanged, tab, [this, tab]() {
+                const int i = mTabs.indexOf(tab);
+                if (i >= 0 && i < mCategories.size() && tab->text().isEmpty()) {
+                    tab->setText(mCategories[ i ]->title());
+                }
+            });
+            if (tab->text().isEmpty()) {
+                tab->setText(mCategories[ idx ]->title());
+            }
+        }
         polish();
     }
 }
 
 void RibbonBar::unregisterTab(RibbonTab* tab)
 {
+    if (mAutoTabs.contains(tab)) {
+        // auto tabs are owned here: unparent + deleteLater, NEVER direct delete
+        mAutoTabs.removeOne(tab);
+        mTabs.removeOne(tab);
+        tab->setParentItem(nullptr);
+        tab->setParent(nullptr);
+        tab->deleteLater();
+        polish();
+        return;
+    }
     if (mTabs.removeOne(tab)) {
         disconnect(tab, &RibbonTab::clicked, this, nullptr);
         polish();
@@ -158,23 +237,81 @@ void RibbonBar::updatePolish()
     relayout();
 }
 
+RibbonTab* RibbonBar::createAutoTab(int index)
+{
+    // C++-created host (no QML context of its own): createVisualLeaf resolves
+    // the engine through the parentItem chain (SARibbonQmlTypes.cpp fallback).
+    // componentComplete() never runs for C++-created items, so the leaf is
+    // created explicitly here instead.
+    RibbonTab* tab = new RibbonTab();
+    tab->setParent(this);
+    tab->setParentItem(this);
+    if (index < mCategories.size()) {
+        tab->setText(mCategories[ index ]->title());
+    }
+    registerTab(tab);
+    tab->ensureQmlItem();
+    return tab;
+}
+
+void RibbonBar::syncTabCount()
+{
+    // one tab row entry per max(explicit tabs, categories): the tail beyond
+    // the explicit declarations is auto-generated and bound to category titles
+    const int needed = qMax(mTabs.size() - mAutoTabs.size(), mCategories.size());
+    while (mTabs.size() < needed) {
+        RibbonTab* tab = createAutoTab(mTabs.size());
+        mAutoTabs.append(tab);
+    }
+    // shrink: drop trailing auto tabs that lost their category
+    while (mTabs.size() > needed && !mAutoTabs.isEmpty() && mAutoTabs.last() == mTabs.last()) {
+        RibbonTab* tab = mAutoTabs.takeLast();
+        mTabs.removeLast();
+        disconnect(tab, &RibbonTab::clicked, this, nullptr);
+        tab->setParentItem(nullptr);
+        tab->setParent(nullptr);
+        tab->deleteLater();
+    }
+    if (mCurrentIndex >= mTabs.size() && !mTabs.isEmpty()) {
+        mCurrentIndex = mTabs.size() - 1;
+        Q_EMIT currentIndexChanged();
+    }
+}
+
 void RibbonBar::relayout()
 {
     if (width() <= 0) {
         return;
     }
-    RibbonMetrics* metrics = RibbonMetrics::instance();
-    const int tabH   = metrics->tabBarHeight();
-    const int titleH = metrics->titleBarHeight();
-    const int catH   = metrics->categoryHeight();
+    syncTabCount();
 
-    // 1. tab row: plain sequence (no Repeater), from the left after 8px margin
+    RibbonMetrics* metrics = RibbonMetrics::instance();
+    const QFontMetrics fm  = metrics->coreMetrics().fontMetrics();
+    const int tabH         = metrics->tabBarHeight();
+    const int titleH       = metrics->titleBarHeight();
+    const int catH         = metrics->categoryHeight();
+
+    // 0. application button: spans the title row + the tab row (widgets
+    // vertically-expanding app button), office-2021 tab-row-left placement
+    const bool hasAppButton = !mApplicationLabel.isEmpty();
+    int appBtnW = 0;
+    if (hasAppButton) {
+        appBtnW = qMax(50, fm.horizontalAdvance(mApplicationLabel) + 30);
+        mApplicationButtonRect = QRectF(0, 1, appBtnW, titleH + tabH - 2);
+    } else {
+        mApplicationButtonRect = QRectF();
+    }
+
+    // 1. tab row: plain sequence (no Repeater), starting after the app button;
+    //    text-driven width (widgets tabSizeHint: text width + hspace, min 50,
+    //    office-2021 QSS adds 5+5 margins)
     const int tabBarY = titleH;
     const int tabSpacing = 2;
-    int x = 8;
+    int x = (hasAppButton ? appBtnW : 0) + 4;
     for (int i = 0; i < mTabs.size(); ++i) {
         RibbonTab* tab = mTabs[ i ];
-        const int tabW = 60 + 8;  // fixed P0 tab width (text-driven sizing: 3.1+)
+        const int textW = fm.horizontalAdvance(tab->text());
+        const int tabW  = qMax(50, textW + 24);
         tab->setCurrent(i == mCurrentIndex);
         tab->setPosition(QPointF(x, tabBarY));
         tab->setSize(QSizeF(tabW, tabH));
@@ -203,6 +340,11 @@ void RibbonBar::relayout()
     input.hasContextTabs      = false;
     input.tabBarGeometry      = QRect(8, tabBarY, qMin(x - 8 - tabSpacing, int(width()) - 8), tabH);
     mTitleRect = SARibbon::Core::SARibbonBarGeometryEngine::layoutTitleRect(input);
+
+    mTabBarHeight   = tabH;
+    mTitleBarHeight = titleH;
+    mCategoryRowY   = categoryY;
+    Q_EMIT layoutChanged();
 }
 
 }

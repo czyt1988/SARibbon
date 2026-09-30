@@ -24,6 +24,17 @@ QQuickItem* createVisualLeaf(QQuickItem* host, const QUrl& leafUrl, const char* 
     }
     QQmlEngine* engine = qmlEngine(host);
     if (!engine) {
+        // C++-created hosts (e.g. the auto tabs the bar builds for categories
+        // without an explicit RibbonTab) carry no QML context of their own:
+        // walk the parentItem chain to the nearest QML-created ancestor
+        // (KDDW View.cpp same fallback shape, plan-04 S3 note)
+        QQuickItem* p = host->parentItem();
+        while (p && !engine) {
+            engine = qmlEngine(p);
+            p = p->parentItem();
+        }
+    }
+    if (!engine) {
         qWarning() << "SARibbonQml: no QML engine reachable from host, cannot create leaf" << leafUrl;
         return nullptr;
     }

@@ -3,4 +3,18 @@
     <qresource prefix="/">
         <file>main.qml</file>
     </qresource>
+    <qresource prefix="/icon">
+        <file>icon/bold.svg</file>
+        <file>icon/chinese-char.svg</file>
+        <file>icon/delete.svg</file>
+        <file>icon/file.svg</file>
+        <file>icon/folder-checkmark.svg</file>
+        <file>icon/Italic.svg</file>
+        <file>icon/item.svg</file>
+        <file>icon/layout.svg</file>
+        <file>icon/redo.svg</file>
+        <file>icon/save.svg</file>
+        <file>icon/Underline.svg</file>
+        <file>icon/undo.svg</file>
+    </qresource>
 </RCC>

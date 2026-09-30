@@ -175,7 +175,7 @@ void RibbonPanel::runLayout()
     input.hasTitleLabel   = true;
     input.hasOptionAction = false;
     input.isRTL           = SA::saIsRTL();
-    input.contentsMargins = QMargins(1, 1, 1, 1);
+    input.contentsMargins = QMargins(2, 2, 2, 2);  // widgets parity (SARibbonPanelLayout)
     input.spacing         = 2;
     input.titleTextWidth  = -1;  // no option button in P0; title width only feeds min width
     input.optionBtnSize   = QSize();
@@ -214,6 +214,15 @@ void RibbonPanel::runLayout()
         if (!b->isHidden()) {
             b->applyGeometry(b->resultGeometry);
         }
+    }
+    // publish the fresh large row height to every button (widgets parity:
+    // SARibbonToolButton::sizeHint depends on the panel's largeButtonHeight,
+    // so the width hint must follow the height whenever it changes). A change
+    // invalidates the button hints and re-requests polish; the second pass
+    // repacks with the final widths (the engine cache is keyed on largeHeight
+    // and drops together with this notification)
+    for (RibbonToolButton* b : mChildButtons) {
+        b->setLargeButtonHeightContext(r.largeHeight);
     }
 }
 

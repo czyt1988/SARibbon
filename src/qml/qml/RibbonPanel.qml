@@ -1,10 +1,10 @@
-import QtQuick 2.15
+import QtQuick 2.12
 import SARibbon 3.0
 
-// RibbonPanel default visual leaf (plan-04 S3): colors ONLY via the
-// RibbonTheme singleton — a literal color value here is a review-reject.
-// The title strip geometry comes from the engine via panelCpp.titleGeometry
-// (leaf renders, the C++ host computes — geometry authority stays in C++).
+// RibbonPanel default visual leaf: content background + the title caption
+// rendered inside the engine-reserved strip (panelCpp.titleGeometry — leaf
+// renders, the C++ host computes). QSS parity: subtitle color, centered,
+// pixelSize = panelTitleHeight * 0.8 (SARibbonPanel::resetTitleLabelFont).
 Rectangle {
     id: root
 
@@ -17,7 +17,7 @@ Rectangle {
     readonly property rect titleRect: panelCpp ? panelCpp.titleGeometry : Qt.rect(0, 0, 0, 0)
 
     anchors.fill: parent
-    color: "transparent"
+    color: RibbonTheme.contentBg
     border.width: 0
     radius: 0
 
@@ -29,7 +29,8 @@ Rectangle {
         height: root.titleRect.height
         text: root.title
         visible: root.title.length > 0 && height > 0
-        color: RibbonTheme.tokenColor("text-color")
+        font.pixelSize: Math.round(RibbonMetrics.panelTitleHeight * 0.8)
+        color: RibbonTheme.subtitle
         horizontalAlignment: Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter
         elide: Text.ElideRight

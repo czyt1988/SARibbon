@@ -29,6 +29,7 @@ class RibbonCategory : public QQuickItem
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
     Q_PROPERTY(QQuickItem* categoryQmlItem READ categoryQmlItem WRITE setCategoryQmlItem NOTIFY categoryQmlItemChanged)
     Q_PROPERTY(int scrollPosition READ scrollPosition WRITE setScrollPosition NOTIFY scrollPositionChanged)
+    Q_PROPERTY(QVariantList separatorXs READ separatorXs NOTIFY separatorXsChanged)
 public:
     explicit RibbonCategory(QQuickItem* parent = nullptr);
     ~RibbonCategory() override;
@@ -42,6 +43,10 @@ public:
     int scrollPosition() const;
     void setScrollPosition(int pos);
 
+    // Panel separator x positions (engine-written resultSeparatorGeometry),
+    // re-published per relayout for the visual leaf to render
+    QVariantList separatorXs() const;
+
     void registerPanel(RibbonPanel* panel);
     void unregisterPanel(RibbonPanel* panel);
 
@@ -51,6 +56,7 @@ Q_SIGNALS:
     void titleChanged();
     void categoryQmlItemChanged();
     void scrollPositionChanged();
+    void separatorXsChanged();
 
 protected:
     void componentComplete() override;
@@ -71,6 +77,7 @@ private:
     int mScrollXBase = 0;
     int mTotalWidth = 0;
     QVector< RibbonPanel* > mPanels;
+    QVariantList mSeparatorXs;
     SARibbon::Core::SARibbonCategoryLayoutEngine mEngine;
 };
 

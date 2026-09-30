@@ -451,6 +451,13 @@
 - 处理：N₀ = **26**（与预期一致）。bash 非交互环境无 Qt bin 的 PATH（build.ps1 探测的 Qt 路径不会注入后续 shell），后续所有 ctest 验证统一带 Qt 6.7.3 bin 前缀执行，属环境细节而非仓库偏差。
 - 影响计划：01/02/03/04 所有 ctest 验证命令（口径补充，不改计划）
 
+### B39：QML 叶子交互/主题补全（用户驱动，对照 widgets 实现）
+- 日期：2026-10-06（用户缺陷报告驱动，非计划步)
+- 发现位置：计划 04 S4-S6 遗留（示例实测"按钮无图标、按钮不可点击、Tab 不可切换"）
+- 证据：旧 `RibbonBar::setCurrentIndex` 以 `idx >= mCategories.size()` 拒绝切换（3 tab/1 category 的示例点第 2/3 个 tab 无效）；`RibbonToolButton` 无 clicked/checked 面；视觉叶子无图标元素；纯 QML 进程的 core palette 恒空（widgets 的 applyRibbonTheme 才加载 JSON），token 全部落到 QPalette 灰底。`qml_Conformance` 新增 3 用例（barAutoTabsAndSwitch / toolButtonClick / svgIconLoads）+ 手动点击验证（tab 切换、footer 反馈、三主题切换截图）全绿。
+- 处理：① `RibbonBar::setCurrentIndex` 改按 tab 数界定并支持"无显式 RibbonTab 的 category 自动建 tab（addCategoryPage 语义，C++ 创建的 tab 经 parentItem 链回退解析 engine 并显式 `ensureQmlItem()`——C++ 创建项无 componentComplete）"；② `RibbonToolButton` 增 `clicked()/toggled()/checkable/checked/click()`（叶子 MouseArea 调宿主 Q_INVOKABLE，状态权威在 C++）；③ 视觉叶子按 office-2021 QSS 全量重写（tab 4px 底线、按钮 4 状态、panel 标题/分隔线、bar 应用按钮），颜色全部经 RibbonTheme token 属性；④ `RibbonTheme` 在初始化时加载当前主题默认调色板 JSON（共享 widgets 的同一批源文件，qml qrc 以相同资源前缀注册，重复注册内容一致无害）并把常用 token 暴露为 NOTIFY paletteChanged 的 QColor 属性（Q_INVOKABLE tokenColor 无绑定刷新能力，必须走属性）；⑤ 叶子 import 统一降至 `QtQuick 2.12`（HoverHandler 5.12 起可用；原 2.15 在 5.12-5.14 加载必失败）。布局铁律未破：所有几何仍由 core 引擎计算（面板引擎黄金几何经宿主逐项 applyGeometry 验证）。
+- 影响计划：04-S3/S4/S5（叶子从"最小占位"升级为对照 widgets 的完整视觉+交互）；04-S2（RibbonTheme 增调色板加载职责）；04-S6（示例重写为图标+可点击+主题切换形态）
+
 ---
 
 ## 执行中追加（模板，勿删）

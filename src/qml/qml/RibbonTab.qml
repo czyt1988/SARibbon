@@ -1,8 +1,11 @@
-import QtQuick 2.15
+import QtQuick 2.12
 import SARibbon 3.0
 
-// RibbonTab default visual leaf (plan-04 S4): colors via RibbonTheme tokens
-// only (no literals, plan-04 S3 theme rule); geometry from the host.
+// RibbonTab default visual leaf (office-2021): no background, no radius; the
+// selected tab carries a 4px tab-accent underline, hover a tab-accent-hover
+// one (widgets QSS SARibbonTabBar::tab). Click handling stays in the C++ host
+// (SARibbonQml::RibbonTab::mousePressEvent); the HoverHandler here only
+// drives the underline and never touches mouse events.
 Rectangle {
     id: root
 
@@ -14,12 +17,23 @@ Rectangle {
 
     anchors.fill: parent
     color: "transparent"
-    radius: 3
 
     Text {
+        // keep the optical center of the text above the 4px underline
         anchors.centerIn: parent
+        anchors.verticalCenterOffset: -2
         text: root.label
-        font.bold: root.current
-        color: root.current ? RibbonTheme.tokenColor("accent") : RibbonTheme.tokenColor("text-color")
+        color: root.current ? RibbonTheme.tabAccent : RibbonTheme.textColor
+    }
+    Rectangle {
+        anchors.bottom: parent.bottom
+        anchors.left: parent.left
+        anchors.right: parent.right
+        height: 4
+        color: root.current ? RibbonTheme.tabAccent : RibbonTheme.tabAccentHover
+        visible: root.current || tabHover.hovered
+    }
+    HoverHandler {
+        id: tabHover
     }
 }

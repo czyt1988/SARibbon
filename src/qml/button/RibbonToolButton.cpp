@@ -5,6 +5,17 @@
 
 namespace SARibbonQml {
 
+namespace {
+// Icon side lengths (widgets parity: SARibbonBar small icon 20, large 32).
+// Rendering parameters may live per front end (v2 §2.2 double-render rule);
+// the layout *algorithm* stays in the core engines.
+constexpr int kSmallIconSide = 20;
+constexpr int kLargeIconSide = 32;
+// Widget-side SARibbonToolButton layout factors (SARibbonToolButton.cpp)
+constexpr qreal kLargeMinWidthRatio = 0.75;  ///< largeButtonMinimumWidthRatio
+constexpr qreal kMaxAspectRatio     = 1.4;   ///< buttonMaximumAspectRatio
+}  // namespace
+
 RibbonToolButton::RibbonToolButton(QQuickItem* parent)
     : QQuickItem(parent), SARibbon::Core::SARibbonAbstractLayoutItem()
 {
@@ -95,6 +106,52 @@ void RibbonToolButton::setProportion(RibbonEnums::RowProportion rp)
     updateSizeHint();
 }
 
+bool RibbonToolButton::isCheckable() const
+{
+    return mCheckable;
+}
+
+void RibbonToolButton::setCheckable(bool on)
+{
+    if (mCheckable == on) {
+        return;
+    }
+    mCheckable = on;
+    Q_EMIT checkableChanged();
+}
+
+bool RibbonToolButton::isChecked() const
+{
+    return mChecked;
+}
+
+void RibbonToolButton::setChecked(bool on)
+{
+    if (mChecked == on) {
+        return;
+    }
+    mChecked = on;
+    Q_EMIT checkedChanged();
+    Q_EMIT toggled(mChecked);
+}
+
+void RibbonToolButton::click()
+{
+    if (mCheckable) {
+        setChecked(!mChecked);
+    }
+    Q_EMIT clicked();
+}
+
+void RibbonToolButton::setLargeButtonHeightContext(int h)
+{
+    if (mLargeButtonHeightContext == h) {
+        return;
+    }
+    mLargeButtonHeightContext = h;
+    updateSizeHint();
+}
+
 QQuickItem* RibbonToolButton::buttonQmlItem() const
 {
     return mButtonQmlItem;
@@ -171,13 +228,30 @@ QSize RibbonToolButton::computeSizeHintFromMetrics()
     const QFontMetrics fm = m.fontMetrics();
     const int textW = fm.horizontalAdvance(mText);
     const bool isLarge = (rowProportion == SARibbon::Core::SARibbonRowProportion::Large);
-    const int iconSide = isLarge ? 32 : 16;
     if (isLarge) {
-        const int largeH = m.calcCategoryHeight(true, false) - m.panelTitleHeight - 2;
-        return QSize(qMax(textW + 8, iconSide + 8), qMax(largeH, 22));
+        // Large button (icon above, text below). The effective large height is
+        // panel-driven; before the first engine pass falls back to the metrics
+        // derivation (three-row category minus title strip and margins).
+        const int largeH = mLargeButtonHeightContext > 0
+                               ? mLargeButtonHeightContext
+                               : m.calcCategoryHeight(true, false) - m.panelTitleHeight - 4 - 2;
+        // single line when the text fits the aspect-ratio box, otherwise the
+        // two-line wrap estimate (widgets uses a binary search here; the
+        // half-width approximation stays within a few pixels)
+        int w;
+        if (textW <= int(largeH * kMaxAspectRatio)) {
+            w = textW + 2;
+        } else {
+            w = textW / 2 + fm.horizontalAdvance(QLatin1String("xx")) + 8;
+        }
+        w = qMax(w, qMax(int(largeH * kLargeMinWidthRatio), kLargeIconSide + 4));
+        return QSize(w, qMax(largeH, 22));
     }
-    const int rowH = qMax(fm.lineSpacing(), 16);
-    return QSize(textW + iconSide + 12, rowH);
+    // Small/Medium button (icon left, text right): mirrors the widgets
+    // sizeHint iconW + spacing + text width (+ two trailing spaces of slack)
+    const int spaceW = 2 * fm.horizontalAdvance(QLatin1Char(' '));
+    return QSize(kSmallIconSide + 3 + textW + spaceW,
+                 qMax(qMax(fm.lineSpacing(), kSmallIconSide), 16));
 }
 
 }

@@ -4,6 +4,7 @@
 #include "../bar/RibbonBar.h"
 #include "../SARibbonQmlTypes.h"
 #include <SARibbonCore/SARibbonCoreUtil.h>
+#include <QVariantList>
 
 namespace SARibbonQml {
 
@@ -140,6 +141,11 @@ int RibbonCategory::contentWidth() const
     return mTotalWidth;
 }
 
+QVariantList RibbonCategory::separatorXs() const
+{
+    return mSeparatorXs;
+}
+
 void RibbonCategory::itemChange(ItemChange change, const ItemChangeData& data)
 {
     if (change == QQuickItem::ItemChildAddedChange) {
@@ -193,6 +199,20 @@ void RibbonCategory::relayout()
 
     auto r = mEngine.layout(items, input);
     mTotalWidth = r.totalWidth;
+
+    // publish the engine-written separator geometry to the leaf (the QSS
+    // margin-top/bottom 3px of `SARibbonCategory > SARibbonSeparatorWidget`
+    // stays leaf-side; only the x positions are geometry authority)
+    QVariantList separators;
+    for (int i = 0; i < items.size(); ++i) {
+        if (!items[ i ]->isHidden() && !items[ i ]->isSeparatorHidden) {
+            separators.append(QVariant(qreal(items[ i ]->resultSeparatorGeometry.x())));
+        }
+    }
+    if (separators != mSeparatorXs) {
+        mSeparatorXs = separators;
+        Q_EMIT separatorXsChanged();
+    }
 
     for (int i = 0; i < items.size(); ++i) {
         items[ i ]->applyGeometry(items[ i ]->resultGeometry);

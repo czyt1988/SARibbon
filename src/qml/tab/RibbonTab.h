@@ -42,6 +42,11 @@ public:
     QQuickItem* tabQmlItem() const;
     void setTabQmlItem(QQuickItem* item);
 
+    // Create the visual leaf if not yet present. Public because C++-created
+    // tabs (RibbonBar auto tabs) never get componentComplete() — the bar
+    // calls this explicitly right after construction
+    void ensureQmlItem();
+
 Q_SIGNALS:
     void textChanged();
     void currentChanged();
@@ -54,7 +59,6 @@ protected:
     void mousePressEvent(QMouseEvent* event) override;
 
 private:
-    void ensureQmlItem();
     QString mText;
     bool mCurrent = false;
     QColor mContextColor;
