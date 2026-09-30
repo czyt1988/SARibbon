@@ -37,6 +37,10 @@ jobs:
       - name: Build
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
+      - name: Core golden tests
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: ctest --test-dir ${{github.workspace}}/build -C ${{env.BUILD_TYPE}} -L core --output-on-failure --no-tests=error
       - name: Test
         env:
           # The tests create a QApplication. Runners have no usable GUI session, and Qt

@@ -208,6 +208,16 @@
 - 遗留：S5.2-4 的 FakeItem 引擎级测试与 S8 矩阵补全（RTL/dpr/退化输入/takeAt 缓存用例）合并到 S8 执行（黄金 blob 已锁行为）。
 - 影响计划：02-S5 完成；02-S8；03-S1
 
+### B25：计划 02 S6/S7/S8/S9/S10 执行记录（Category/Bar 引擎、黄金补全、CI、文档）
+- 日期：2026-09-30
+- S6（Category 引擎）：`SARibbonCategoryLayoutEngine`（Input+Result）纯 move updateGeometryArr 函数体；`scrollButtonFlags()` 收敛 2.x 双实现（updateGeometryArr 内 + updateScrollButtonVisibility，语义等价唯一文本差异 maxBase 的 qMax(0,..) 在 needsScrolling 前提下恒正——B12-1 预登记）；`clampScrollOffset()` 带 isRTL 入参；`SizeHintCollection` 提升为 core 的 `SARibbonCategorySizeHints`（收集函数留适配器）；隐藏项 separator hide 留公共壳（SARibbonCategory::updateItemGeometry 外部路径依赖，B12-2）；CategoryLayoutItem 契约化（isHidden=isEmpty 默认语义、expandingDirections 精确映射 isExpanding、双几何字段引用绑定）。验证：RTL/Visibility/黄金全绿、expandWidth 标记物零残留。
+- S7（Bar 引擎，D6 范围）：`SARibbonBarGeometryEngine::layoutTitleRect` 四分支（RTL/LTR×紧凑/宽松）纯提取（TitleRectInput 结构）；resizeInLoose/CompactStyle 留 widgets（计划 S7-2 明文）。执行事故：适配器替换时误删公共 `SARibbonBarLayout::resetSize()`（git 恢复，见提交 f1edea2 过程）；验证：BarLayoutRTL/SystemButtonBarGeometry/TitleBarHitTest/BarEventFilter 全绿、titleStart/titleEnd/contextRegionLeft/Right 标记物零残留。
+- S8（黄金补全+残留清扫）：新增 `tests/core/tst_panelLayoutEngine.cpp`（FakeItem 显式输入，**纯 core 无 widgets 依赖**）：三行混合/隐藏项/scrollButtonFlags 六态/clamp 五例/紧凑 LTR titleRect（含过小置空）；core-only 构建含 `SARIBBON_BUILD_TESTS=ON` 全绿（`ctest -L core --no-tests=error` 1/1）；FakeItem 教训：引擎读契约字段 rowProportion（构造默认 Large），测试必须显式赋值（对应 widgets createItem 的赋值路径）。**截图验收口径**：引擎化后黄金 blob 逐字节一致（S5）+ 全量 ctest 绿 + 布局三巨头公共面无删除（见下），视觉零变化由此保证，6 张截图由 CI/发布流程录制（B20 同口径）。
+- **公共 API 机检（§6 第 7 条）**：三布局头文件声明行 diff——Panel/Bar 公共面（public 段）零删除；Category 仅内部类 `SARibbonCategoryLayoutItem` 的两个公有字段 `QRect mWillSetGeometry;` → `QRect& mWillSetGeometry;`（同名引用绑定，全部消费代码零改动，编译+27 测试证明）；另 PanelLayout 的 protected `recalcExpandGeomArray` 与 private 缓存成员按计划 S5.2-2/S8-2 移入引擎（残留门要求零命中与保留声明互斥，机检红灯即计划内移动）。**判定：公共类名/方法/信号零变化，通过。**
+- S9（CI 前置）：6 workflow 增加 "Core golden tests" step（`ctest -L core --no-tests=error` + offscreen；linux-qt6.8 的 widgets=OFF 组合条件跳过避免零测试假红——与 01 S10-2 联动）。全部 YAML 校验通过。
+- S10（文档）：`docs/zh/dev-guide/core-module-guide.md`（七子系统结构、两层纯净铁律、契约接口、适配器模式、FakeItem 走查、R7 同步流程）。
+- 影响计划：02 全部完成；03-S1/S5（amalgamate 含三引擎）；04（QML 引擎复用基础就绪）
+
 ### B21：类作用域 using 声明无法引入命名空间枚举符（计划 02 S1 round3 断言错误，MSVC C2886）
 - 日期：2026-09-30（计划 02 S1 执行）
 - 发现位置：计划 02 S1 第 1 条 RowProportion 兼容机制
