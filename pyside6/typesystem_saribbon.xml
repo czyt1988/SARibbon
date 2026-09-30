@@ -56,6 +56,14 @@
            (SARibbonCoreUtil.h) is an internal helper — exclude it, its
            wrapper TU has no include for that header anyway (B38). -->
       <modify-function signature="clampScrollOffset(int,int,int,bool)" remove="all"/>
+      <!-- Base of SARibbonCustomizeData: the ActionType enum actually lives
+           here (plan 02 S4.2 lifted it into core). Register the record so
+           the enum resolves; classes in namespaces must be XML-nested —
+           '::' in the type name is rejected by shiboken (B38). -->
+      <value-type name="SARibbonCustomizeRecord">
+        <include file-name="SARibbonCore/SARibbonCustomizeRecord.h" location="global"/>
+        <enum-type name="ActionType"/>
+      </value-type>
     </namespace-type>
   </namespace-type>
 
@@ -345,7 +353,6 @@
        ============================================================ -->
   <value-type name="SARibbonCustomizeData">
     <include file-name="SARibbonCustomizeData.h" location="global"/>
-    <enum-type name="ActionType"/>
   </value-type>
 
   <!-- ============================================================

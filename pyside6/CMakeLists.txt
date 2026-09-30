@@ -355,6 +355,7 @@ set(GENERATED_SOURCES
     ${GENERATED_DIR}/saribbon_module_wrapper.cpp
     ${GENERATED_DIR}/saribbon_core_wrapper.cpp
     ${GENERATED_DIR}/saribbon_wrapper.cpp
+    ${GENERATED_DIR}/saribbon_core_saribboncustomizerecord_wrapper.cpp
     ${GENERATED_DIR}/saribbonbar_wrapper.cpp
     ${GENERATED_DIR}/saribbonmainwindow_wrapper.cpp
     ${GENERATED_DIR}/saribboncategory_wrapper.cpp
