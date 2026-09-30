@@ -1963,6 +1963,146 @@ void SARibbonPanelLayoutEngine::recalcExpandGeomArray(QVector< SARibbonAbstractL
 
 /*** End of inlined file: SARibbonPanelLayoutEngine.cpp ***/
 
+
+/*** Start of inlined file: SARibbonCategoryLayoutEngine.cpp ***/
+#include "SARibbon.h"
+
+// 计划 02 S6 Step B：函数体自 src/widgets/SARibbonCategoryLayout.cpp 的
+// updateGeometryArr() 纯 move。机械替换表（其余一字不改）：
+//   SARibbonCategoryLayoutItem* -> SARibbonAbstractCategoryItem*
+//   item->isEmpty()             -> item->isHidden()
+//   item->mWillSetGeometry      -> item->resultGeometry
+//   item->mWillSetSeparatorGeometry -> item->resultSeparatorGeometry
+//   item->separatorWidget->hide()（widget 操作）-> 输出 isSeparatorHidden（适配器执行）
+//   SARibbonCategoryLayout 私有字段（mXBase/mTotalWidth/mIs*ScrollBtnShow/
+//   mCachedSizeHint/mCachedMinSizeHint）-> Result 带回（引擎不直写适配器状态）
+//   SA::saIsRTL()               -> input.isRTL
+//   SA::saMirrorX(...)          -> 内联镜像算术（w - x - width）
+//   滚动按钮标志双实现           -> scrollButtonFlags() 单一纯函数（NOTES B12-1/S6-3）
+//   调试打印宏块不随迁
+namespace SARibbon
+{
+namespace Core
+{
+
+SARibbonCategoryLayoutEngine::SARibbonCategoryLayoutEngine()
+{
+}
+
+SARibbonCategoryLayoutEngine::Result SARibbonCategoryLayoutEngine::layout(QVector< SARibbonAbstractCategoryItem* > items,
+																		 const Input& input)
+{
+	Result result;
+
+	int categoryWidth = input.categoryWidth;
+	QMargins mag      = input.margins;
+	int height        = input.height;
+	int y             = input.y;
+
+	if (!mag.isNull()) {
+		y = mag.top();
+		height -= (mag.top() + mag.bottom());
+		// categoryWidth不能把mag减去，减去后会导致categoryWidth不是实际的categoryWidth
+		// categoryWidth -= (mag.right() + mag.left());
+	}
+	// total 是总宽，不是x坐标系，x才是坐标系
+	// 单次遍历收集 sizeHint，避免后续重复调用
+	const SARibbonCategorySizeHints& hints = input.sizeHints;
+	int total = hints.totalWidth;
+
+	// 扩展的宽度
+	int expandWidth = 0;
+
+	// 判断是否需要滚动，总长度超过宽度就需要滚动
+	bool needsScrolling = (total > categoryWidth);
+
+	result.scrollFlags = scrollButtonFlags(total, categoryWidth, input.xBase, input.isRTL);
+
+	if (!needsScrolling) {
+		// 说明total 小于 categoryWidth
+		// 这个是避免一开始totalWidth > categorySize.width()，通过滚动按钮调整了m_d->mBaseX
+		// 随之调整了窗体尺寸，调整后totalWidth < categorySize.width()导致category在原来位置
+		// 无法显示，必须这里把mBaseX设置为0
+		result.newXBase = 0;
+
+		// 计算可扩展的宽度，canExpandingCount 已由 collectSizeHints 收集
+		if (hints.canExpandingCount > 0) {
+			expandWidth = (categoryWidth - total) / hints.canExpandingCount;
+		} else {
+			expandWidth = 0;
+		}
+	}
+	int x = input.xBase + mag.left();
+	if (!needsScrolling && (0 == expandWidth)) {
+		// Alignment offset when no scrolling needed and no expanding panels
+		SARibbonAlignment align = input.alignment;
+		if (align == SARibbonAlignment::AlignCenter) {
+			// Center alignment: panels centered within category width
+			x = (categoryWidth - total) / 2;
+		} else if (align == SARibbonAlignment::AlignRight) {
+			// Right alignment: panels start from right edge
+			x = categoryWidth - total;
+		}
+		// AlignLeft: x = input.xBase (default, starts from left edge)
+	}
+	total = 0;  // total重新计算
+	// 先按照sizeHint设置所有的尺寸，使用 collectSizeHints 收集的结果避免重复调用
+	for (int i = 0; i < items.size(); ++i) {
+		SARibbonAbstractCategoryItem* item = items[ i ];
+		if (item->isHidden()) {
+			// 如果是hide就直接跳过
+			// panel hide分割线也要hide（widget 操作经输出标志交适配器执行）
+			item->isSeparatorHidden = true;
+			item->resultGeometry          = QRect(0, 0, 0, 0);
+			item->resultSeparatorGeometry = QRect(0, 0, 0, 0);
+			continue;
+		}
+		// 使用 collectSizeHints 收集的 sizeHint，避免重复调用
+		QSize panelSize     = hints.panelSizes[ i ];
+		QSize SeparatorSize = hints.separatorSizes[ i ];
+		if (item->expandingDirections() & Qt::Horizontal) {
+			// 可扩展，就把panel扩展到最大（2.x 经 SARibbonPanel::isExpanding 判定，
+			// 经契约 expandingDirections 泛化——仅 widgets 适配器实现该语义）
+			panelSize.setWidth(panelSize.width() + expandWidth);
+		}
+		int w = panelSize.width();
+
+		item->resultGeometry = QRect(x, y, w, height);
+		x += w;
+		total += w;
+		w                               = SeparatorSize.width();
+		item->resultSeparatorGeometry = QRect(x, y, w, height);
+		x += w;
+		total += w;
+	}
+	result.totalWidth  = total;
+	result.sizeHint    = QSize(total, height);
+	result.minSizeHint = QSize(categoryWidth, height);
+
+	// RTL mirroring: mirror panel and separator x-coordinates
+	if (input.isRTL) {
+		for (SARibbonAbstractCategoryItem* item : items) {
+			if (!item->isHidden()) {
+				// Mirror panel geometry
+				QRect panelGeo           = item->resultGeometry;
+				int mirroredX            = categoryWidth - panelGeo.x() - panelGeo.width();
+				item->resultGeometry = QRect(mirroredX, panelGeo.y(), panelGeo.width(), panelGeo.height());
+
+				// Mirror separator geometry
+				QRect sepGeo             = item->resultSeparatorGeometry;
+				int mirroredSepX         = categoryWidth - sepGeo.x() - sepGeo.width();
+				item->resultSeparatorGeometry = QRect(mirroredSepX, sepGeo.y(), sepGeo.width(), sepGeo.height());
+			}
+		}
+	}
+	return result;
+}
+
+}
+}
+
+/*** End of inlined file: SARibbonCategoryLayoutEngine.cpp ***/
+
 // disable warnings about unsafe standard library calls
 #ifdef _MSC_VER
 #pragma push_macro ("_CRT_SECURE_NO_WARNINGS")
@@ -20169,13 +20309,9 @@ static int s_debug_seq = 0;  ///< 全局调用序号，用于日志关联与观�
  * @details 此结构体供 collectSizeHints() 使用，在单次遍历中返回总宽度、可扩展面板数量和每个 item 的 sizeHint
  * \endif
  */
-struct SizeHintCollection
-{
-	int totalWidth { 0 };            ///< Total width including margins
-	int canExpandingCount { 0 };     ///< Number of expanding panels
-	QVector<QSize> panelSizes;       ///< Per-item panel size hints
-	QVector<QSize> separatorSizes;   ///< Per-item separator size hints
-};
+// plan-02 S6: the struct moved into core as SARibbonCategorySizeHints (engine input
+// carrier); the collector stays here (separator size hints are widget queries)
+using SizeHintCollection = SARibbon::Core::SARibbonCategorySizeHints;
 
 /**
  * \if ENGLISH
@@ -20577,161 +20713,43 @@ void SARibbonCategoryLayout::updateGeometryArr()
 	if (nullptr == category) {
 		return;
 	}
-	int categoryWidth = category->width();
-	QMargins mag      = contentsMargins();
-	int height        = category->height();
-	int y             = 0;
+	// 计划 02 S6 Step B：算法体已纯搬移至 core 的 SARibbonCategoryLayoutEngine
+	// （机械替换表见引擎 cpp 头部注释），本函数为适配器壳：
+	// 收集 Input -> 调引擎 -> 回写状态 + 执行 widget 副作用（隐藏分割线 hide；
+	// 外部调用路径 SARibbonCategory::updateItemGeometry 依赖本壳的副作用，NOTES B12-2）
+	SARibbon::Core::SARibbonCategoryLayoutEngine::Input input;
+	input.categoryWidth = category->width();
+	input.margins       = contentsMargins();
+	input.height        = category->height();
+	input.y             = 0;
+	input.alignment     = categoryAlignment();
+	input.isRTL         = SA::saIsRTL();
+	input.xBase         = d_ptr->mXBase;
+	input.sizeHints     = d_ptr->collectSizeHints();
 
-	if (!mag.isNull()) {
-		y = mag.top();
-		height -= (mag.top() + mag.bottom());
-		// categoryWidth不能把mag减去，减去后会导致categoryWidth不是实际的categoryWidth
-		// categoryWidth -= (mag.right() + mag.left());
+	QVector< SARibbon::Core::SARibbonAbstractCategoryItem* > items;
+	items.reserve(d_ptr->mItemList.size());
+	for (SARibbonCategoryLayoutItem* i : d_ptr->mItemList) {
+		items.append(i);
 	}
-	// total 是总宽，不是x坐标系，x才是坐标系
-	// 单次遍历收集 sizeHint，避免后续重复调用
-	SizeHintCollection hints = d_ptr->collectSizeHints();
-	int total = hints.totalWidth;
 
-	// 扩展的宽度
-	int expandWidth = 0;
+	SARibbon::Core::SARibbonCategoryLayoutEngine::Result r = mCategoryLayoutEngine.layout(items, input);
 
-	// 判断是否需要滚动，总长度超过宽度就需要滚动
-	bool needsScrolling = (total > categoryWidth);
+	// 回写 2.x 状态
+	d_ptr->mXBase                = r.newXBase;
+	d_ptr->mTotalWidth           = r.totalWidth;
+	mCachedSizeHint              = r.sizeHint;
+	mCachedMinSizeHint           = r.minSizeHint;
+	d_ptr->mIsRightScrollBtnShow = r.scrollFlags.showRight;
+	d_ptr->mIsLeftScrollBtnShow  = r.scrollFlags.showLeft;
 
-#if SARibbonCategoryLayout_DEBUG_PRINT
-	qDebug() << "[seq" << ++s_debug_seq << "] SARibbonCategoryLayout::updateGeometryArr"   //
-			 << "\n  |-category name=" << category->categoryName()                         //
-			 << "\n  |-category height=" << height                                          //
-			 << "\n  |-totalSizeHintWidth=" << total                                        //
-			 << "\n  |-y=" << y                                                             //
-			 << "\n  |-expandWidth:" << expandWidth                                         //
-			 << "\n  |-mag=" << mag;
-#endif
-
-	if (needsScrolling) {
-		if (SA::saIsRTL()) {
-			// RTL: mXBase ranges from 0 (start, rightmost) to total-categoryWidth (end, leftmost)
-			const int maxBase = total - categoryWidth;
-			if (0 == d_ptr->mXBase) {
-				// At start (rightmost), can scroll left only
-				d_ptr->mIsRightScrollBtnShow = false;
-				d_ptr->mIsLeftScrollBtnShow  = true;
-			} else if (d_ptr->mXBase >= maxBase) {
-				// At end (leftmost), can scroll right only
-				d_ptr->mIsRightScrollBtnShow = true;
-				d_ptr->mIsLeftScrollBtnShow  = false;
-			} else {
-				// In between: both buttons
-				d_ptr->mIsRightScrollBtnShow = true;
-				d_ptr->mIsLeftScrollBtnShow  = true;
-			}
-		} else {
-			// LTR: mXBase ranges from categoryWidth-total (negative, end, rightmost) to 0 (start, leftmost)
-			if (0 == d_ptr->mXBase) {
-				// Already moved to leftmost, can scroll right
-				d_ptr->mIsRightScrollBtnShow = true;
-				d_ptr->mIsLeftScrollBtnShow  = false;
-			} else if (d_ptr->mXBase <= (categoryWidth - total)) {
-				// Already moved to rightmost, can scroll left
-				d_ptr->mIsRightScrollBtnShow = false;
-				d_ptr->mIsLeftScrollBtnShow  = true;
-			} else {
-				// In between: both buttons
-				d_ptr->mIsRightScrollBtnShow = true;
-				d_ptr->mIsLeftScrollBtnShow  = true;
-			}
-		}
-	} else {
-		// 说明total 小于 categoryWidth
-		d_ptr->mIsRightScrollBtnShow = false;
-		d_ptr->mIsLeftScrollBtnShow  = false;
-		// 这个是避免一开始totalWidth > categorySize.width()，通过滚动按钮调整了m_d->mBaseX
-		// 随之调整了窗体尺寸，调整后totalWidth < categorySize.width()导致category在原来位置
-		// 无法显示，必须这里把mBaseX设置为0
-
-		d_ptr->mXBase = 0;
-
-		// 计算可扩展的宽度，canExpandingCount 已由 collectSizeHints 收集
-		if (hints.canExpandingCount > 0) {
-			expandWidth = (categoryWidth - total) / hints.canExpandingCount;
-		} else {
-			expandWidth = 0;
+	// widget 副作用：隐藏项的分割线 hide（2.x 在函数体内执行，留在壳内；
+	// doLayout 的批处理照旧，两条路径幂等）
+	for (SARibbonCategoryLayoutItem* item : d_ptr->mItemList) {
+		if (item->isHidden() && item->separatorWidget) {
+			item->separatorWidget->hide();
 		}
 	}
-	int x = d_ptr->mXBase + mag.left();
-	if (!needsScrolling && (0 == expandWidth)) {
-		// Alignment offset when no scrolling needed and no expanding panels
-		SARibbonAlignment align = categoryAlignment();
-		if (align == SARibbonAlignment::AlignCenter) {
-			// Center alignment: panels centered within category width
-			x = (categoryWidth - total) / 2;
-		} else if (align == SARibbonAlignment::AlignRight) {
-			// Right alignment: panels start from right edge
-			x = categoryWidth - total;
-		}
-		// AlignLeft: x = d_ptr->mXBase (default, starts from left edge)
-	}
-	total = 0;  // total重新计算
-	// 先按照sizeHint设置所有的尺寸，使用 collectSizeHints 收集的结果避免重复调用 sizeHint()
-	for (int i = 0; i < d_ptr->mItemList.size(); ++i) {
-		SARibbonCategoryLayoutItem* item = d_ptr->mItemList[ i ];
-		if (item->isEmpty()) {
-			// 如果是hide就直接跳过
-			if (item->separatorWidget) {
-				// panel hide分割线也要hide
-				item->separatorWidget->hide();
-			}
-			item->mWillSetGeometry          = QRect(0, 0, 0, 0);
-			item->mWillSetSeparatorGeometry = QRect(0, 0, 0, 0);
-			continue;
-		}
-		SARibbonPanel* p = item->toPanelWidget();
-		if (nullptr == p) {
-			qDebug() << "unknow widget in SARibbonCategoryLayout";
-			continue;
-		}
-		// 使用 collectSizeHints 收集的 sizeHint，避免重复调用
-		QSize panelSize     = hints.panelSizes[ i ];
-		QSize SeparatorSize = hints.separatorSizes[ i ];
-		if (p->isExpanding()) {
-			// 可扩展，就把panel扩展到最大
-			panelSize.setWidth(panelSize.width() + expandWidth);
-		}
-		int w = panelSize.width();
-
-		item->mWillSetGeometry = QRect(x, y, w, height);
-		x += w;
-		total += w;
-		w                               = SeparatorSize.width();
-		item->mWillSetSeparatorGeometry = QRect(x, y, w, height);
-		x += w;
-		total += w;
-	}
-	d_ptr->mTotalWidth      = total;
-	mCachedSizeHint         = QSize(d_ptr->mTotalWidth, height);
-	mCachedMinSizeHint      = QSize(categoryWidth, height);
-
-	// RTL mirroring: mirror panel and separator x-coordinates
-	if (SA::saIsRTL()) {
-		for (SARibbonCategoryLayoutItem* item : sa_as_const(d_ptr->mItemList)) {
-			if (!item->isEmpty()) {
-				// Mirror panel geometry
-				QRect panelGeo     = item->mWillSetGeometry;
-				int mirroredX      = SA::saMirrorX(panelGeo.x(), categoryWidth, panelGeo.width());
-				item->mWillSetGeometry = QRect(mirroredX, panelGeo.y(), panelGeo.width(), panelGeo.height());
-
-				// Mirror separator geometry
-				QRect sepGeo       = item->mWillSetSeparatorGeometry;
-				int mirroredSepX   = SA::saMirrorX(sepGeo.x(), categoryWidth, sepGeo.width());
-				item->mWillSetSeparatorGeometry = QRect(mirroredSepX, sepGeo.y(), sepGeo.width(), sepGeo.height());
-			}
-		}
-	}
-#if SARibbonCategoryLayout_DEBUG_PRINT
-	qDebug() << "  SARibbonCategoryLayout updateGeometryArr,SizeHint=" << mCachedSizeHint
-			 << ",Category name=" << category->categoryName();
-#endif
 }
 
 /**
@@ -21195,41 +21213,12 @@ int SARibbonCategoryLayout::scrollPosition() const
  */
 void SARibbonCategoryLayout::updateScrollButtonVisibility()
 {
-	const int categoryWidth   = categoryContentSize().width();
-	const int total           = d_ptr->mTotalWidth;
-	const bool needsScrolling = (total > categoryWidth);
-
-	if (!needsScrolling) {
-		d_ptr->mIsRightScrollBtnShow = false;
-		d_ptr->mIsLeftScrollBtnShow  = false;
-		return;
-	}
-	if (SA::saIsRTL()) {
-		// RTL: mXBase ranges from 0 (start, rightmost) to total-categoryWidth (end, leftmost)
-		const int maxBase = qMax(0, total - categoryWidth);
-		if (0 == d_ptr->mXBase) {
-			d_ptr->mIsRightScrollBtnShow = false;
-			d_ptr->mIsLeftScrollBtnShow  = true;
-		} else if (d_ptr->mXBase >= maxBase) {
-			d_ptr->mIsRightScrollBtnShow = true;
-			d_ptr->mIsLeftScrollBtnShow  = false;
-		} else {
-			d_ptr->mIsRightScrollBtnShow = true;
-			d_ptr->mIsLeftScrollBtnShow  = true;
-		}
-	} else {
-		// LTR: mXBase ranges from categoryWidth-total (negative, end) to 0 (start, leftmost)
-		if (0 == d_ptr->mXBase) {
-			d_ptr->mIsRightScrollBtnShow = true;
-			d_ptr->mIsLeftScrollBtnShow  = false;
-		} else if (d_ptr->mXBase <= (categoryWidth - total)) {
-			d_ptr->mIsRightScrollBtnShow = false;
-			d_ptr->mIsLeftScrollBtnShow  = true;
-		} else {
-			d_ptr->mIsRightScrollBtnShow = true;
-			d_ptr->mIsLeftScrollBtnShow  = true;
-		}
-	}
+	// 计划 02 S6-3：标志判定收敛为 core 单一纯函数（原 2.x 双实现之一，
+	// 与 updateGeometryArr 内的判定语义等价，NOTES B12-1）
+	SARibbon::Core::SARibbonScrollFlags f = SARibbon::Core::scrollButtonFlags(
+		d_ptr->mTotalWidth, categoryContentSize().width(), d_ptr->mXBase, SA::saIsRTL());
+	d_ptr->mIsRightScrollBtnShow = f.showRight;
+	d_ptr->mIsLeftScrollBtnShow  = f.showLeft;
 }
 
 /**
@@ -21298,29 +21287,14 @@ void SARibbonCategoryLayout::updateScrollOffset(int newXBase)
  */
 void SARibbonCategoryLayout::setScrollPosition(int pos)
 {
-	// Boundary check
+	// 计划 02 S6-3：钳制逻辑纯搬移至 core 的 clampScrollOffset（带 isRTL 入参）
 	const int availableWidth = categoryContentSize().width();
-	if (SA::saIsRTL()) {
-		// RTL: mXBase ranges from 0 (start, rightmost) to totalWidth-availableWidth (end, leftmost)
-		const int maxBase  = qMax(0, d_ptr->mTotalWidth - availableWidth);
-		const int newXBase = qBound(0, pos, maxBase);
-
-		if (d_ptr->mXBase != newXBase) {
-			updateScrollOffset(newXBase);
-			if (parentWidget()) {
-				parentWidget()->update();
-			}
-		}
-	} else {
-		// LTR: mXBase ranges from availableWidth-totalWidth (negative, end) to 0 (start, leftmost)
-		const int minBase  = qMin(availableWidth - d_ptr->mTotalWidth, 0);
-		const int newXBase = qBound(minBase, pos, 0);
-
-		if (d_ptr->mXBase != newXBase) {
-			updateScrollOffset(newXBase);
-			if (parentWidget()) {
-				parentWidget()->update();
-			}
+	const int newXBase       = SARibbon::Core::clampScrollOffset(
+		pos, d_ptr->mTotalWidth, availableWidth, SA::saIsRTL());
+	if (d_ptr->mXBase != newXBase) {
+		updateScrollOffset(newXBase);
+		if (parentWidget()) {
+			parentWidget()->update();
 		}
 	}
 }
@@ -21553,7 +21527,8 @@ void SARibbonCategoryLayout::setGeometry(const QRect& rect)
 // SARibbonCategoryLayoutItem
 //=============================================================
 
-SARibbonCategoryLayoutItem::SARibbonCategoryLayoutItem(SARibbonPanel* w) : QWidgetItem(w)
+SARibbonCategoryLayoutItem::SARibbonCategoryLayoutItem(SARibbonPanel* w)
+	: QWidgetItem(w), mWillSetGeometry(resultGeometry), mWillSetSeparatorGeometry(resultSeparatorGeometry)
 {
 	separatorWidget = nullptr;
 }
@@ -21565,6 +21540,35 @@ SARibbonCategoryLayoutItem::~SARibbonCategoryLayoutItem()
 SARibbonPanel* SARibbonCategoryLayoutItem::toPanelWidget()
 {
 	return qobject_cast< SARibbonPanel* >(widget());
+}
+
+// plan-02 S6：契约实现——isHidden 用 QWidgetItem::isEmpty 默认语义（控件隐藏且非窗口，
+// 与 Panel 侧 action 可见性语义不同，两个布局各按各自 2.x 语义实现，不得统一）
+bool SARibbonCategoryLayoutItem::isHidden() const
+{
+	return isEmpty();
+}
+
+// plan-02 S6：契约实现——expandingDirections 精确映射 SARibbonPanel::isExpanding
+// （2.x 的判定源是 sizePolicy 的水平策略）
+Qt::Orientations SARibbonCategoryLayoutItem::expandingDirections() const
+{
+	if (SARibbonPanel* p = qobject_cast< SARibbonPanel* >(widget())) {
+		return p->isExpanding() ? Qt::Horizontal : Qt::Orientations();
+	}
+	return Qt::Orientations();
+}
+
+// plan-02 S6：契约 applyGeometry：转 QWidgetItem::setGeometry
+void SARibbonCategoryLayoutItem::applyGeometry(const QRect& rect)
+{
+	setGeometry(rect);
+}
+
+// plan-02 S6：双基类同名虚函数消歧（转 QWidgetItem 实现）
+QSize SARibbonCategoryLayoutItem::sizeHint() const
+{
+	return QWidgetItem::sizeHint();
 }
 
 /*** End of inlined file: SARibbonCategoryLayout.cpp ***/

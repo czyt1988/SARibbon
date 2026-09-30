@@ -1,6 +1,8 @@
 #ifndef SARIBBONCATEGORYLAYOUT_H
 #define SARIBBONCATEGORYLAYOUT_H
 #include "SARibbonGlobal.h"
+#include <SARibbonCore/SARibbonAbstractLayoutItem.h>
+#include <SARibbonCore/SARibbonCategoryLayoutEngine.h>
 #include <QLayout>
 #include <QList>
 #include <QMap>
@@ -24,6 +26,8 @@ class SARibbonSeparatorWidget;
 class SA_RIBBON_EXPORT SARibbonCategoryLayout : public QLayout
 {
     Q_OBJECT
+    // plan-02 S6 Step B: category layout algorithm moved into the core engine
+    SARibbon::Core::SARibbonCategoryLayoutEngine mCategoryLayoutEngine;
     SA_RIBBON_DECLARE_PRIVATE(SARibbonCategoryLayout)
 public:
     Q_PROPERTY(int scrollPosition READ scrollPosition WRITE setScrollPosition)
@@ -142,7 +146,8 @@ private:
  * @details 此类用于标识 SARibbonCategoryLayout 中的项目，包括面板及其关联的分隔符
  * \endif
  */
-class SA_RIBBON_EXPORT SARibbonCategoryLayoutItem : public QWidgetItem
+class SA_RIBBON_EXPORT SARibbonCategoryLayoutItem : public QWidgetItem,
+                                        public SARibbon::Core::SARibbonAbstractCategoryItem
 {
 public:
     // Constructor for SARibbonCategoryLayoutItem
@@ -152,7 +157,15 @@ public:
     SARibbonSeparatorWidget* separatorWidget;
     // Convert the internal widget to a SARibbonPanel
     SARibbonPanel* toPanelWidget();
-    QRect mWillSetGeometry;           ///< panel将要设置的Geometry
-    QRect mWillSetSeparatorGeometry;  ///< panel将要设置的Separator的Geometry
+    // plan-02 S6：引擎写契约字段 resultGeometry/resultSeparatorGeometry（单真源），
+    // 2.x 的两个字段名以引用成员绑定（存量 doLayout/updateScrollOffset 读写零改动）
+    QRect& mWillSetGeometry;
+    QRect& mWillSetSeparatorGeometry;
+    // 契约：Category 侧 isHidden = QWidgetItem::isEmpty 默认语义（控件隐藏且非窗口）
+    bool isHidden() const Q_DECL_OVERRIDE;
+    // 契约：expandingDirections 精确映射 SARibbonPanel::isExpanding（2.x 判定源）
+    void applyGeometry(const QRect& rect) Q_DECL_OVERRIDE;
+    QSize sizeHint() const Q_DECL_OVERRIDE;
+    Qt::Orientations expandingDirections() const Q_DECL_OVERRIDE;
 };
 #endif  // SARIBBONCATEGORYLAYOUT_H
