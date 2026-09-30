@@ -97,20 +97,12 @@
  * @def 颜色组件库的API声明
  * \endif
  */
-#ifndef SA_COLOR_WIDGETS_NO_DLL
-#if defined(SA_COLOR_WIDGETS_MAKE_LIB)  // 定义此宏将构建library
 #ifndef SA_COLOR_WIDGETS_API
-#define SA_COLOR_WIDGETS_API Q_DECL_EXPORT
-#endif
-#else
-#ifndef SA_COLOR_WIDGETS_API
-#define SA_COLOR_WIDGETS_API Q_DECL_IMPORT
-#endif
-#endif
-#else
-#ifndef SA_COLOR_WIDGETS_API
-#define SA_COLOR_WIDGETS_API
-#endif
+#  ifdef SA_COLOR_WIDGETS_NO_DLL
+#    define SA_COLOR_WIDGETS_API                 // 2.x 语义保留：NO_DLL 最外层优先（round3 补）
+#  else
+#    define SA_COLOR_WIDGETS_API SA_RIBBON_WIDGETS_EXPORT
+#  endif
 #endif
 
 /**
@@ -150,26 +142,26 @@
  * @def ribbon的数字版本 {MAJ}.MIN.PAT
  */
 #ifndef SA_RIBBON_BAR_VERSION_MAJ
-#define SA_RIBBON_BAR_VERSION_MAJ 2
+#define SA_RIBBON_BAR_VERSION_MAJ 3
 #endif
 /**
  * @def ribbon的数字版本 MAJ.{MIN}.PAT
  */
 #ifndef SA_RIBBON_BAR_VERSION_MIN
-#define SA_RIBBON_BAR_VERSION_MIN 9
+#define SA_RIBBON_BAR_VERSION_MIN 0
 #endif
 /**
  * @def ribbon的数字版本 MAJ.MIN.{PAT}
  */
 #ifndef SA_RIBBON_BAR_VERSION_PAT
-#define SA_RIBBON_BAR_VERSION_PAT 5
+#define SA_RIBBON_BAR_VERSION_PAT 0
 #endif
 
 /**
  * @def 版本号（字符串）
  */
 #ifndef SARIBBON_VERSION
-#define SARIBBON_VERSION "2.9.5"
+#define SARIBBON_VERSION "3.0.0"
 #endif
 
 #endif // SARIBBONVERSIONINFO_H
@@ -180,23 +172,39 @@
 /*** Start of inlined file: SARibbonGlobal.h ***/
 #ifndef SARIBBONGLOBAL_H
 #define SARIBBONGLOBAL_H
+// 3.0 兼容转发头：原内容拆分至 SARibbonCore/SARibbonCoreGlobal.h（PIMPL/导出宏基座）
+// 与 SARibbonWidgetsGlobal.h（widgets 导出宏），本文件保留以兼容既有 include。
+
+/*** Start of inlined file: SARibbonCoreGlobal.h ***/
+#ifndef SARIBBONCOREGLOBAL_H
+#define SARIBBONCOREGLOBAL_H
 #include <memory>
 #include <QtGlobal>
 #include <QObject>
+// 注意：不要在此 include SARibbonCoreConfig.h —— 它由 configure_file 生成到 build 树
+// （${CMAKE_BINARY_DIR}/include/SARibbonCore/），源码树与 amalgamate 单文件场景都看不到该文件。
+// 需要 feature 开关的翻译单元显式 include <SARibbonCore/SARibbonCoreConfig.h>（计划 02 起使用）。
 
-class QWidget;
+// 三段式导出宏（模板见计划 01 S5.2，QWK qwkglobal.h:12-22 同款）
+#ifndef SA_RIBBON_CORE_EXPORT
+#  ifdef SA_RIBBON_CORE_STATIC
+#    define SA_RIBBON_CORE_EXPORT
+#  else
+#    ifdef SA_RIBBON_CORE_LIBRARY
+#      define SA_RIBBON_CORE_EXPORT Q_DECL_EXPORT
+#    else
+#      define SA_RIBBON_CORE_EXPORT Q_DECL_IMPORT
+#    endif
+#  endif
+#endif
 
-#ifndef SA_RIBBON_BAR_NO_EXPORT
-#if defined(SA_RIBBON_BAR_MAKE_LIB)  // 定义此宏将构建library
-#define SA_RIBBON_EXPORT Q_DECL_EXPORT
-#else
-#define SA_RIBBON_EXPORT Q_DECL_IMPORT
-#endif
-#endif
-#ifndef SA_RIBBON_EXPORT
-#define SA_RIBBON_EXPORT
-#endif
+// 占位导出符号：纯头模块成 DLL 时若没有任何导出符号，MSVC 不会生成导入库（.lib），
+// 下游模块无法链接（计划 01 S6.2 的落地修正，见 NOTES）；计划 02 下沉真实源后保留作 ABI 探针。
+SA_RIBBON_CORE_EXPORT int saRibbonCoreAbiVersion();
 
+// ==== 以下 PIMPL 宏区 = 原 SARibbonGlobal.h L20-184 整段原样 move ====
+// SA_RIBBON_DECLARE_PRIVATE / SA_RIBBON_DECLARE_PUBLIC / SA_RIBBON_IMPL_CONSTRUCT
+// SA_D / SA_DC / SA_Q / SA_QC（含全部双语 Doxygen 注释，宏名与定义体一字不改）
 /**
  * \if ENGLISH
  * @def SA_RIBBON_DECLARE_PRIVATE
@@ -363,6 +371,70 @@ class QWidget;
 #define SA_QC(pointerName) const auto* pointerName = q_ptr
 #endif
 
+// sa_as_const：原 SARibbonGlobal.h L274-283 整段 move（C++17 std::as_const / C++14 qAsConst 分支）
+#if (__cplusplus >= 201703L) || (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)
+#ifndef sa_as_const
+#define sa_as_const std::as_const
+#endif
+#else
+// C++14 及以下版本使用 Qt 的 qwt_as_const
+#ifndef sa_as_const
+#define sa_as_const qAsConst
+#endif
+#endif
+
+#endif  // SARIBBONCOREGLOBAL_H
+
+/*** End of inlined file: SARibbonCoreGlobal.h ***/
+
+
+
+/*** Start of inlined file: SARibbonWidgetsGlobal.h ***/
+#ifndef SARIBBONWIDGETSGLOBAL_H
+#define SARIBBONWIDGETSGLOBAL_H
+
+// 2.x 兼容：旧构建脚本 / amalgamate 产物定义 SA_RIBBON_BAR_MAKE_LIB / SA_RIBBON_BAR_NO_EXPORT。
+// 顺序不可调换：#ifdef 指令在定义处即时求值（非惰性），本映射必须先于三段式，
+// 否则旧宏场景下 SA_RIBBON_WIDGETS_EXPORT 被固化为 Q_DECL_IMPORT（round3 修正）。
+#if defined(SA_RIBBON_BAR_NO_EXPORT) && !defined(SA_RIBBON_WIDGETS_STATIC)
+#  define SA_RIBBON_WIDGETS_STATIC
+#endif
+#if defined(SA_RIBBON_BAR_MAKE_LIB) && !defined(SA_RIBBON_WIDGETS_LIBRARY)
+#  define SA_RIBBON_WIDGETS_LIBRARY
+#endif
+
+// 三段式导出宏（S5.2 模板；STATIC 优先于 LIBRARY，与 2.9.5 的 NO_EXPORT 外层优先一致）
+#ifndef SA_RIBBON_WIDGETS_EXPORT
+#  ifdef SA_RIBBON_WIDGETS_STATIC
+#    define SA_RIBBON_WIDGETS_EXPORT
+#  else
+#    ifdef SA_RIBBON_WIDGETS_LIBRARY
+#      define SA_RIBBON_WIDGETS_EXPORT Q_DECL_EXPORT
+#    else
+#      define SA_RIBBON_WIDGETS_EXPORT Q_DECL_IMPORT
+#    endif
+#  endif
+#endif
+
+// 2.x 公共符号：SA_RIBBON_EXPORT ≡ SA_RIBBON_WIDGETS_EXPORT（v2 §4.4 兼容层；
+// 对象宏惰性展开，此定义位置不受上面顺序影响）
+#ifndef SA_RIBBON_EXPORT
+#  define SA_RIBBON_EXPORT SA_RIBBON_WIDGETS_EXPORT
+#endif
+
+#endif  // SARIBBONWIDGETSGLOBAL_H
+
+/*** End of inlined file: SARibbonWidgetsGlobal.h ***/
+
+// 原 Global.h:6 行为保持：版本宏随全局头可见
+// （注释单独成行，不放 include 行尾注：Amalgamate 对带尾注的重复 include 行无法去重，见 NOTES B17）
+
+class QWidget;                        // 原 Global.h:7 前置声明保留（widgets 侧需要）
+
+// ==== 三个枚举（SARibbonAlignment/SARibbonTheme/SARibbonMainWindowStyleFlag，
+//      含注释与 Q_DECLARE_FLAGS/Q_DECLARE_OPERATORS_FOR_FLAGS）与
+//      SA_RIBBON_BAR_PROP_CAN_CUSTOMIZE 原样保留在本文件，计划 02 再下沉 core ====
+
 /**
  * \if ENGLISH
  * @brief Define the alignment mode of Ribbon, supports left alignment, center alignment and right alignment
@@ -451,21 +523,14 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(SARibbonMainWindowStyles)
 #define SA_RIBBON_BAR_PROP_CAN_CUSTOMIZE "_sa_isCanCustomize"
 #endif
 
-#if (__cplusplus >= 201703L) || (defined(_MSVC_LANG) && _MSVC_LANG >= 201703L)
-#ifndef sa_as_const
-#define sa_as_const std::as_const
-#endif
-#else
-// C++14 及以下版本使用 Qt 的 qwt_as_const
-#ifndef sa_as_const
-#define sa_as_const qAsConst
-#endif
-#endif
-
 #endif  // SARIBBONGLOBAL_H
 
 /*** End of inlined file: SARibbonGlobal.h ***/
 
+
+/*** Start of inlined file: SARibbonQt5Compat.hpp ***/
+#pragma once
+// 3.0 compatibility forwarding header: the real file moved to SARibbonCore (plan-01 S6.2).
 
 /*** Start of inlined file: SARibbonQt5Compat.hpp ***/
 #ifndef SARIBBONQT5COMPAT_HPP
@@ -612,6 +677,9 @@ inline int wheelEventDelta(QWheelEvent* e)
 }  // namespace   compat
 }  // namespace   SA
 #endif  // SARIBBONQT5COMPAT_HPP
+
+/*** End of inlined file: SARibbonQt5Compat.hpp ***/
+
 
 /*** End of inlined file: SARibbonQt5Compat.hpp ***/
 

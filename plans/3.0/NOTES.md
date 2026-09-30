@@ -197,6 +197,18 @@
 
 ## 执行中追加
 
+### B17：Amalgamate 工具的两个解析限制（S8 执行发现）
+- 日期：2026-09-30（计划 01 S8 执行）
+- 发现位置：计划 01 S8（amalgamate 应急适配）
+- 证据（沙盒最小复现，`/tmp/at*` 系列实验，对照真实模板结构）：
+  1. **`-i` 目录不解析 `../x.h` 形式的相对 include**：工具只把 `-i` 目录与 include 文件名做字面拼接查找（`<dir>/../x.h` 落在 `-i` 目录自身之外即失败）；且当文件 A 经 `dir/../A.h` 形式内联后，A 内部的 `"../B.h"` 以 A 的**解析路径**（含 `..`）为基准拼接，`dir/../../B.h` 不存在 → B 不内联、行原样残留。实测：`#include "../SARibbonWidgetsGlobal.h"`（SAColorWidgetsGlobal.h 内，S6.4 要求的相对上一级形式）在产物中残留导致 StaticExample 编译失败（C1083）。
+  2. **带行尾注释的 include 行不被去重/二次解析**：`#include "X.h"  // comment` 形式的行，若 X 已内联过一次，该行会原样残留（工具的去重只匹配裸 include 文本）。实测：`#include "SARibbonBarVersionInfo.h"   // 原 Global.h:6...` 在产物中残留（SARibbonGlobal.h 转发头改造时新增的尾注写法触发）。
+- 处理（保守，全部在生成链内解决，源码语义零变化）：
+  1. 脚本后处理 sed 删除产物中残留的 `#include "../SARibbonWidgetsGlobal.h"` 行——其内容已必然经平铺链（SARibbonGlobal.h → `#include "SARibbonWidgetsGlobal.h"`）内联，include guard 保证语义等价；
+  2. 源头修正：`src/widgets/SARibbonGlobal.h` 的 VersionInfo include 尾注移到上一行（注释单独成行，工具兼容）。
+  两点均已通过 StaticExample 全量编译 + 运行冒烟（4 秒无崩溃）验证。产物 diff：`src/SARibbon.h` 107 增 40 删（core 头内容并入 + 路径替换），`src/SARibbon.cpp` 无逻辑 diff。
+- 影响计划：01-S8（执行细化）；03-S1（双产物改造须继承 sed 后处理与"include 行禁尾注"约束——新模板与 core 头编写时注意）
+
 ### B15：SARibbonToolButtonColorTest::testHoverStyleSheetColor 在本机环境性失败（非回归）
 - 日期：2026-09-30（计划 01 S7 验证时发现）
 - 发现位置：计划 01 S7 验证 / ctest == N₀ 门禁
