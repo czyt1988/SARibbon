@@ -218,6 +218,18 @@
 - S10（文档）：`docs/zh/dev-guide/core-module-guide.md`（七子系统结构、两层纯净铁律、契约接口、适配器模式、FakeItem 走查、R7 同步流程）。
 - 影响计划：02 全部完成；03-S1/S5（amalgamate 含三引擎）；04（QML 引擎复用基础就绪）
 
+### B26：计划 03 S1/S2 执行记录（amalgamate 双产物 + 出库 + StaticExample 切换）
+- 日期：2026-09-30
+- 内容：
+  1. 模板双套化（git mv 保留历史）：Core 4 文件 + Widgets 4 文件（原 4 文件改名重写）。Widgets PublicHeaders 首行嵌套 include CorePublicHeaders（core 头整体并入、10 条直接条目删除避免双路径重复内联）；Widgets 模板宏段保留 SA_RIBBON_BAR_NO_EXPORT/SA_COLOR_WIDGETS_NO_DLL（兼容层消费）+ 补 SA_RIBBON_CORE_STATIC。
+  2. Amalgamate.sh 全文 ASCII 化（NOTES B4 状态"已消除"达成）+ set -e + 产物存在性检查 + [ -t 0 ] 交互守卫 + 镜像段扩展（find ../src/core 全量平铺 + build 树 SARibbonCoreConfig.h 拾取）+ 双 pass 设计：Core 双 pass 均带镜像；Widgets h pass 带镜像、cpp pass 不带（B23 的 Q_OBJECT 双内联教训），sed 把 cpp 产物中 <SARibbonCore/X.h> 改写为对应产物头。
+  3. 出库四动作：git rm --cached（工作区保留）；.gitignore +6 行；.gitattributes 删字节冻结 2 行及段注释；src/CMakeLists.txt 的 share/SARibbonBar_amalgamate 安装规则移除（选"移除"：产物已出库 fresh clone 无文件可守卫；Release 附件归计划 04）。
+  4. StaticExample 切换：SARIBBON_SIMPLE 指向 SARibbonWidgets.{h,cpp} + EXISTS 守卫 + 两处 include 改名；提交时序按计划 round3 双笔方案。
+  5. SARibbonCore.moc 尾行：SARibbonThemeData（Q_OBJECT）在 core 单文件 .cpp 内，AUTOMOC 需要 #include "SARibbonCore.moc"（widgets 产物无此问题——其 Q_OBJECT 头全在 .h 产物侧）。沙盒验证：SARibbonCore 单文件独立工程编译+运行 exit=0。
+- 产物健全性门禁偏差登记：计划 03 §6 期望产物 cpp 仅 1 处 include "产物.h"（@remap 假设）；实测 @remap 不匹配尖括号 include（B17/B23 实证），经 sed 改写后产物 cpp 有多个指向产物自身头的 include 行（include guard 去重，编译安全），非镜像失效；StaticExample 与沙盒双编译验证通过，以此替代该 grep 字面口径。
+- 验证：双产物生成 exit 0（非交互）；StaticExample 编译+运行冒烟通过；SARibbonCore 单文件编译+运行通过；git ls-files src/SARibbon* 空输出。
+- 影响计划：03-S1/S2 完成；04-S10（Release 附件为产物 zip）
+
 ### B21：类作用域 using 声明无法引入命名空间枚举符（计划 02 S1 round3 断言错误，MSVC C2886）
 - 日期：2026-09-30（计划 02 S1 执行）
 - 发现位置：计划 02 S1 第 1 条 RowProportion 兼容机制
