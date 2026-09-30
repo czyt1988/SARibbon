@@ -5,7 +5,7 @@
 %Import QtWidgets/QtWidgetsmod.sip
 %Import QtGui/QtGuimod.sip
 
-%DefaultSupertype PyQt5.sip.simplewrapper
+%DefaultSupertype sip.simplewrapper
 
 %Include SARibbonTabBar.sip
 %Include SARibbonButtonGroupWidget.sip

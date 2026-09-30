@@ -258,6 +258,7 @@ target_compile_definitions(saribbon_lib PRIVATE
     NOMINMAX
     SA_COLOR_WIDGETS_NO_DLL
     SA_RIBBON_BAR_MAKE_LIB
+    SA_RIBBON_CORE_STATIC   # plan-02 core classes compiled in: local symbols, not dllimport (B36)
 )
 
 target_include_directories(saribbon_lib PUBLIC

@@ -2,9 +2,10 @@
 #define SARIBBONWIDGETSGLOBAL_H
 #include <SARibbonCore/SARibbonCoreGlobal.h>
 
-// 2.x 兼容：旧构建脚本 / amalgamate 产物定义 SA_RIBBON_BAR_MAKE_LIB / SA_RIBBON_BAR_NO_EXPORT。
-// 顺序不可调换：#ifdef 指令在定义处即时求值（非惰性），本映射必须先于三段式，
-// 否则旧宏场景下 SA_RIBBON_WIDGETS_EXPORT 被固化为 Q_DECL_IMPORT（round3 修正）。
+// 2.x compat: old build scripts / amalgamate products define SA_RIBBON_BAR_MAKE_LIB
+// or SA_RIBBON_BAR_NO_EXPORT. The mapping must precede the three-way macro below:
+// #ifdef directives are evaluated at their definition point (not lazily), otherwise
+// SA_RIBBON_WIDGETS_EXPORT would be pinned to Q_DECL_IMPORT in the legacy-macro case.
 #if defined(SA_RIBBON_BAR_NO_EXPORT) && !defined(SA_RIBBON_WIDGETS_STATIC)
 #  define SA_RIBBON_WIDGETS_STATIC
 #endif
@@ -12,7 +13,8 @@
 #  define SA_RIBBON_WIDGETS_LIBRARY
 #endif
 
-// 三段式导出宏（S5.2 模板；STATIC 优先于 LIBRARY，与 2.9.5 的 NO_EXPORT 外层优先一致）
+// Three-way export macro (plan-01 S5.2; STATIC wins over LIBRARY, matching the
+// 2.9.5 NO_EXPORT outer-priority order).
 #ifndef SA_RIBBON_WIDGETS_EXPORT
 #  ifdef SA_RIBBON_WIDGETS_STATIC
 #    define SA_RIBBON_WIDGETS_EXPORT
@@ -25,8 +27,8 @@
 #  endif
 #endif
 
-// 2.x 公共符号：SA_RIBBON_EXPORT ≡ SA_RIBBON_WIDGETS_EXPORT（v2 §4.4 兼容层；
-// 对象宏惰性展开，此定义位置不受上面顺序影响）
+// 2.x public symbol: SA_RIBBON_EXPORT == SA_RIBBON_WIDGETS_EXPORT (v2 4.4 compat;
+// object-like macros expand lazily so this position is unaffected by the order above).
 #ifndef SA_RIBBON_EXPORT
 #  define SA_RIBBON_EXPORT SA_RIBBON_WIDGETS_EXPORT
 #endif

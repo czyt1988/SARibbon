@@ -51,6 +51,15 @@ class saribbon(PyQtBindings):
         if os.name == 'nt':
             self.builder_settings.append('LIBS += -luser32')
 
+        # Qt5 qmake defaults to C++14 on MSVC; core headers use std::optional (B36)
+        self.builder_settings.append('CONFIG += c++17')
+        # The bindings compile the SAME UTF-8 sources as the main build; MSVC
+        # under a GBK system codepage misreads multi-byte comments (the shift
+        # swallows declarations -> C3668/C1070/C2447). /utf-8 declares the
+        # true encoding - it does not modify any file (NOTES B4 constraint).
+        if os.name == 'nt':
+            self.builder_settings.append('QMAKE_CXXFLAGS += /utf-8')
+
         if self.saribbon_lib is not None:
             self.libraries.append(self.saribbon_lib)
 

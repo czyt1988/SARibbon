@@ -268,6 +268,11 @@ jobs:
         env:
           CMAKE_PREFIX_PATH: ${{ runner.os == 'Windows' && format('{0}/Qt/6.8.3/msvc2022_64', github.workspace) || '/usr/lib/qt6' }}
         run: |
+          # Git Bash ships /usr/bin/link (coreutils) which shadows MSVC link.exe
+          # inside nmake-driven builds; put the MSVC tools first (NOTES B36).
+          if [ "$RUNNER_OS" = "Windows" ] && [ -n "$VCToolsInstallDir" ]; then
+            export PATH="$(cygpath -u "$VCToolsInstallDir")bin/Hostx64/x64:$PATH"
+          fi
           if [ "${{ matrix.track }}" = "pyside6" ]; then python -m build --wheel pyside6/; fi
           if [ "${{ matrix.track }}" = "pyqt6" ]; then python -m build --wheel --no-isolation pyqt6/; fi
           if [ "${{ matrix.track }}" = "pyqt5" ]; then python -m build --wheel --no-isolation; fi

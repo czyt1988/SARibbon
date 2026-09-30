@@ -340,6 +340,16 @@
 - 迭代计数：绑定 CI 修复至今六轮共 15+ 缺陷（B33×5、B34×3、B35×4、B36×3），每轮全绿数 0→0→0→0→1→待验证。
 - 影响计划：03-S3/S4
 
+### B37：绑定构建的 MSVC cp936 编码地雷与 PyQt5 supertype 前缀（第 6/7 轮）
+- 日期：2026-09-30
+- **本地全链双轨打通**（Windows + MSVC + Python 3.11）：PyQt5 轨 `pyqtsaribbon-3.0.0` 与 PyQt6 轨 `pyqt6saribbon-3.0.0` 均本地构建成功、干净 venv 安装、import 冒烟通过（`import PyQt5/6.QtWidgets; from PySARibbon import saribbon`）。
+- **MSVC cp936 编码地雷（三连根因，dry-r6/本地暴露）**：MSVC 在 GBK 系统代码页下读 UTF-8 无 BOM 源文件时，中文注释的 UTF-8 多字节序列被按 cp936 配对移位解读，**特定字节组合会吞掉后续声明的换行/反斜杠语义**——C1070（#if/#endif 不匹配）、C3668（override 无基类虚函数）、C2447（函数声明被吞）三种编译错全部同源。复现路径：最小多继承 TU（QWidgetItem + 契约）在 Qt5.14 include 集下 C3668，把契约头 ASCII 化后同 TU 通过——**字节级实证**。修法（双管齐下）：
+  1. **project.py 的 builder-settings 加 `QMAKE_CXXFLAGS += /utf-8`**（Windows 分支）——绑定编译的是与主构建相同的 UTF-8 源文件，/utf-8 声明的是真实编码，不修改任何文件（B4 约束不破）；qmake 传给 cl 生效（重建后 C4819 消失）。**教训：主构建 root CMakeLists 一直有 /wd4819 压警告但没 /utf-8，绑定 qmake 构建两者皆无——C4819 警告消失不等于解析正确，cp936 误读在警告还在时就已经破坏语法层。**
+  2. **两个 3.0 新建头 ASCII 化**：`src/widgets/SARibbonWidgetsGlobal.h`、`src/core/contract/SARibbonAbstractLayoutItem.h` 的中文注释改英文（自建文件，无历史编码承诺；主构建有 CMake /wd4819 兜底、绑定有 /utf-8 兜底后仍 ASCII 化属纵深防御——这两个头是绑定的必经包含路径）。
+- **PyQt5 supertype 前缀（B35 的反向修正）**：`%DefaultSupertype PyQt5.sip.simplewrapper` 在运行时报 "not a registered type"——PyQt5.sip 模块（12.19）的内部类型注册键是**旧前缀 `sip.`**（`simplewrapper.__module__ == 'sip'` 实证；PyQt5 官方 QtWidgetsmod.sip:47 用 `sip.simplewrapper`）。PyQt6.sip 则注册全名 `PyQt6.sip.simplewrapper`（PyQt6 官方同名同款）。修法：根轨回退 `sip.simplewrapper`，pyqt6 轨保持 `PyQt6.sip.simplewrapper`——**两代 sip 模块的注册前缀不同，官方 mod 文件是最权威参照**。
+- 其余 dry-r6 修复（一并入库）：pyside6 `SA_RIBBON_CORE_STATIC` 补宏（C2491，B33 同款）；dry-run Build wheel 步骤 MSVC bin PATH 前置（Git Bash `/usr/bin/link` coreutils 遮蔽 MSVC link.exe，`/usr/bin/link: extra operand '/NXCOMPAT'` 实证）；`CONFIG += c++17` 进绑定 qmake（Qt5+MSVC 默认 C++14，core 头的 std::optional 需要）。
+- 影响计划：03-S3/S4 验收门（"至少一个绑定轮子可构建并 import"→ 本地两轨达成）；绑定 CI 修复累计 20+ 缺陷（B33-B37）
+
 ### B21：类作用域 using 声明无法引入命名空间枚举符（计划 02 S1 round3 断言错误，MSVC C2886）
 - 日期：2026-09-30（计划 02 S1 执行）
 - 发现位置：计划 02 S1 第 1 条 RowProportion 兼容机制
