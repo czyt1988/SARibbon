@@ -1,4 +1,5 @@
-%Module(name=PyQtSARibbon.saribbon, call_super_init=True, keyword_arguments="Optional", use_limited_api=True)
+%Module(name=PyQtSARibbon.saribbon, keyword_arguments="Optional", use_limited_api=True)
+%MinimumABIVersion "12.0"
 
 %Import QtCore/QtCoremod.sip
 %Import QtWidgets/QtWidgetsmod.sip

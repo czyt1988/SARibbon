@@ -331,6 +331,15 @@
 - 迭代教训（写入后续开发指引）：**绑定 CI 从 2.9.5 起从未绿过**——本计划补齐的 dry-run job 是这条链路五年来第一次被系统性执行，四轮共暴露 10+ 个真实缺陷（B33×5 + B34×3 + B35×4），全部有日志证据链。这正是"CI 绿"验收门存在的意义。
 - 影响计划：03-S3/S4（绑定 CI 与 dry-run）
 
+### B36：dry-run 第 5 轮修复（路径全正斜杠化、PyQt5 MinimumABIVersion、CMAKE_PREFIX_PATH）
+- 日期：2026-09-30
+- 第 5 轮（6ecf664）：**pyqt6-ubuntu 首次全绿**（轮子构建+venv 安装+import 冒烟完整通过——绑定链路五年来第一个绿灯）。剩余四红三个根因：
+  1. **Windows 双轨仍 qmake 异常**：`-O` 正斜杠修复只替换了每个版本的**第一处**（`str.replace count=1`），dry-run 的两步与 release-path 的 pyside6 步共 5 处中漏了 3 处（版本相同的重复行）；GITHUB_PATH echo 行的 `\Q`/``/`\m`/`` 在 bash 双引号内虽字面保留但与 -O 目录不一致 → qmake 不在 PATH 声明位置。修法：全仓 5 处 `-O` + 5 处 echo 全部正斜杠化（Windows 下 bash/GITHUB_PATH/CMake 均接受）。
+  2. **PyQt5 轨 ABI v12 报错的真根因**（B35 的 sip-module 声明是必要非充分）：`sip-module = "PyQt5.sip"` 让 sipbuild 以 ABI 12 生成，但我们的模块未声明支持 v12（无 `%MinimumABIVersion` 指令）→ parser_manager.py:1954 的 for-else 分支报 "doesn't support it"。**bisect 实证**（最小 sip 文件仅含三个 %Import 仍报错 → 排除我们内容；QtCoremod.sip 官方文件 `call_super_init=True` + v12 并存 → 排除 call_super_init 假设）。修法：`sip/SARibbon.sip` 加 `%MinimumABIVersion "12.0"`（STRING 需引号，parser tokens.py:338 实证；顺带移除 call_super_init 以贴近 QtWidgets 官方形态）。**本地验证：PyQt5 轨 configure+生成通过**（Qt 5.14.2 本地， deprecated 警告属 PyQt5 官方 sip 文件自带的已知项）。
+  3. **pyside6-win CMAKE_PREFIX_PATH 双反斜杠**：`format('{0}\Qt\...')` 的 `\` 经 GH 表达式输出字面 `\` → CMake 收到 `D:\...\Qt\...` 解析失败。修法：format 串内改**正斜杠** `format('{0}/Qt/6.8.3/msvc2022_64')`（CMake Windows 全兼容）——dry-run 与 release-path 两处。
+- 迭代计数：绑定 CI 修复至今六轮共 15+ 缺陷（B33×5、B34×3、B35×4、B36×3），每轮全绿数 0→0→0→0→1→待验证。
+- 影响计划：03-S3/S4
+
 ### B21：类作用域 using 声明无法引入命名空间枚举符（计划 02 S1 round3 断言错误，MSVC C2886）
 - 日期：2026-09-30（计划 02 S1 执行）
 - 发现位置：计划 02 S1 第 1 条 RowProportion 兼容机制

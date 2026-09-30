@@ -46,7 +46,7 @@ jobs:
         run: |
           pip install aqtinstall
           python -m aqt install-qt windows desktop 6.8.3 win64_msvc2022_64 -O "${{ github.workspace }}/Qt"
-          echo "${{ github.workspace }}\Qt\6.8.3\msvc2022_64\bin" >> $GITHUB_PATH
+          echo "${{ github.workspace }}/Qt/6.8.3/msvc2022_64/bin" >> $GITHUB_PATH
 
       - name: Set MSVC environment (Windows)
         if: runner.os == 'Windows'
@@ -65,7 +65,7 @@ jobs:
           pip install -U pip build
           python -m build --wheel pyside6/
         env:
-          CMAKE_PREFIX_PATH: ${{ runner.os == 'Windows' && format('{0}\\Qt\\6.8.3\\msvc2022_64', github.workspace) || '' }}
+          CMAKE_PREFIX_PATH: ${{ runner.os == 'Windows' && format('{0}/Qt/6.8.3/msvc2022_64', github.workspace) || '' }}
 
       - name: Check wheel
         run: twine check pyside6/dist/*.whl
@@ -112,7 +112,7 @@ jobs:
         run: |
           pip install aqtinstall
           python -m aqt install-qt windows desktop 5.15.2 win64_msvc2019_64 -O "${{ github.workspace }}/Qt"
-          echo "${{ github.workspace }}\Qt\5.15.2\msvc2019_64\bin" >> $GITHUB_PATH
+          echo "${{ github.workspace }}/Qt/5.15.2/msvc2019_64/bin" >> $GITHUB_PATH
 
       - name: Set MSVC environment (Windows)
         if: runner.os == 'Windows'
@@ -169,8 +169,8 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           pip install aqtinstall
-          python -m aqt install-qt windows desktop 6.8.3 win64_msvc2022_64 -O ${{ github.workspace }}\Qt
-          echo "${{ github.workspace }}\Qt\6.8.3\msvc2022_64\bin" >> $GITHUB_PATH
+          python -m aqt install-qt windows desktop 6.8.3 win64_msvc2022_64 -O "${{ github.workspace }}/Qt"
+          echo "${{ github.workspace }}/Qt/6.8.3/msvc2022_64/bin" >> $GITHUB_PATH
 
       - name: Set MSVC environment (Windows)
         if: runner.os == 'Windows'
@@ -226,16 +226,16 @@ jobs:
         shell: bash
         run: |
           pip install aqtinstall
-          python -m aqt install-qt windows desktop 5.15.2 win64_msvc2019_64 -O ${{ github.workspace }}\Qt
-          echo "${{ github.workspace }}\Qt\5.15.2\msvc2019_64\bin" >> $GITHUB_PATH
+          python -m aqt install-qt windows desktop 5.15.2 win64_msvc2019_64 -O "${{ github.workspace }}/Qt"
+          echo "${{ github.workspace }}/Qt/5.15.2/msvc2019_64/bin" >> $GITHUB_PATH
 
       - name: Install Qt (Windows, qt6/pyside6 tracks)
         if: runner.os == 'Windows' && matrix.track != 'pyqt5'
         shell: bash
         run: |
           pip install aqtinstall
-          python -m aqt install-qt windows desktop 6.8.3 win64_msvc2022_64 -O ${{ github.workspace }}\Qt
-          echo "${{ github.workspace }}\Qt\6.8.3\msvc2022_64\bin" >> $GITHUB_PATH
+          python -m aqt install-qt windows desktop 6.8.3 win64_msvc2022_64 -O "${{ github.workspace }}/Qt"
+          echo "${{ github.workspace }}/Qt/6.8.3/msvc2022_64/bin" >> $GITHUB_PATH
       - name: Install Qt (Linux, qt5 track)
         if: runner.os == 'Linux' && matrix.track == 'pyqt5'
         run: sudo apt-get update && sudo apt-get install -y qtbase5-dev qt5-qmake qtbase5-dev-tools libqt5svg5-dev
@@ -266,7 +266,7 @@ jobs:
       - name: Build wheel
         shell: bash
         env:
-          CMAKE_PREFIX_PATH: ${{ runner.os == 'Windows' && format('{0}\\Qt\\6.8.3\\msvc2022_64', github.workspace) || '/usr/lib/qt6' }}
+          CMAKE_PREFIX_PATH: ${{ runner.os == 'Windows' && format('{0}/Qt/6.8.3/msvc2022_64', github.workspace) || '/usr/lib/qt6' }}
         run: |
           if [ "${{ matrix.track }}" = "pyside6" ]; then python -m build --wheel pyside6/; fi
           if [ "${{ matrix.track }}" = "pyqt6" ]; then python -m build --wheel --no-isolation pyqt6/; fi
