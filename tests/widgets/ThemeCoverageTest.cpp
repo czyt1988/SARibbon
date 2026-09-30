@@ -45,7 +45,7 @@ QString ThemeCoverageTest::resourceDir() const
 {
     // QT_TESTCASE_SOURCEDIR is defined by CMake as the test source directory
     return QDir(QLatin1String(QT_TESTCASE_SOURCEDIR))
-               .absoluteFilePath(QStringLiteral("../src/SARibbonBar/resource"));
+               .absoluteFilePath(QStringLiteral("../../src/widgets/resource"));
 }
 
 QStringList ThemeCoverageTest::keySelectors() const
