@@ -366,6 +366,7 @@
   4. **flags 属性语义**：`flags="yes" flags-name="X"` 是错误写法（shiboken 警告 flags-name 未用、SBK_X_IDX 不生成）——正确写法是 `flags="X"`（属性值即 QFlags typedef 名，PySide6 官方 typesystem 同款）。
   5. **CMake 侧**：namespace-type 会生成两个额外 wrapper 源（`saribbon_core_wrapper.cpp`、`saribbon_wrapper.cpp`——外层命名空间容器也有 TU）加入 GENERATED_SOURCES，否则 LNK2019 `init_saribbonSARibbon[_Core]`；shiboken 头文件位置双兼容（6.9+ 在 `shiboken6/include`，旧版在 `shiboken6_generator/include`，EXISTS 探测切换）。
   6. Python 侧 API 变化（3.0 破坏性，与 C++ 枚举上移一致）：`SARibbonPanelItem.RowProportion.Large` → `SARibbon.Core.SARibbonRowProportion.Large`。
+- **第 10 轮终态（run 36788896961，commit 285877a）：绑定 dry-run 矩阵全绿**——pyqt5/pyqt6/pyside6 × windows/ubuntu 六 job 全部 success，主矩阵（Amalgamation、CMake Windows/Linux × Qt5.15/Qt6.8）同步全绿，mac 双红为已登记豁免（B29/B32）。release 安全门实证生效：dispatch 下三个 publish build job 正确 skipped。期间主机外部网络中断约 4.5 小时（GitHub/Gitee/DNS 全不可达），恢复后由后台管线自动完成推送→dispatch→轮询。附加加固：审计发现 `SARibbonCustomizeData::ActionType` 实际定义在基类 `SARibbon::Core::SARibbonCustomizeRecord`（计划 02 S4.2），同类问题预修——基类 value-type 嵌套注册 + CMake 补 `saribbon_core_saribboncustomizerecord_wrapper.cpp`（本地验证 `ActionType.AddCategoryActionType==1`、子类继承暴露）。
 - 影响计划：03-S4 验收门（绑定矩阵绿 = dry-run 全绿目标达成路径）；发布 workflow 与 aqt 版本联动关系已在两处注释中登记。
 
 ### B21：类作用域 using 声明无法引入命名空间枚举符（计划 02 S1 round3 断言错误，MSVC C2886）
