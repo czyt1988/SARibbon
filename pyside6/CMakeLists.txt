@@ -103,9 +103,17 @@ set(SARIBBON_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../src/widgets")
 set(SARIBBON_CORE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../src/core")
 # plan-03 S3.0: binding-side <SARibbonCore/...> mirror (self-contained wheel build)
 set(SARIBBON_CORE_INCLUDE_MIRROR "${CMAKE_CURRENT_BINARY_DIR}/_sync_include")
+# plan-03 S3.0: binding-side <SARibbonCore/...> mirror (self-contained wheel build).
+# Headers are consumed FLAT (<SARibbonCore/X.h>) although they physically live in
+# src/core/<subsystem>/ subdirs (plan-02 S1-5 flattening decision), so copy each
+# file flattened - a plain directory COPY would keep the subdir layout and the
+# flat includes would not resolve.
 file(MAKE_DIRECTORY "${SARIBBON_CORE_INCLUDE_MIRROR}/SARibbonCore")
-file(COPY "${SARIBBON_CORE_DIR}/" DESTINATION "${SARIBBON_CORE_INCLUDE_MIRROR}/SARibbonCore"
-     FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp" PATTERN "*.cpp")
+file(GLOB_RECURSE _sa_core_files RELATIVE "${SARIBBON_CORE_DIR}"
+     "${SARIBBON_CORE_DIR}/*.h" "${SARIBBON_CORE_DIR}/*.hpp")
+foreach(_f IN LISTS _sa_core_files)
+    configure_file("${SARIBBON_CORE_DIR}/${_f}" "${SARIBBON_CORE_INCLUDE_MIRROR}/SARibbonCore/${_f}" COPYONLY)
+endforeach()
 set(SARIBBON_COLORWIDGETS_DIR "${SARIBBON_SOURCE_DIR}/colorWidgets")
 
 # =====================================================================

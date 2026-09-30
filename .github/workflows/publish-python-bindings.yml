@@ -223,6 +223,7 @@ jobs:
 
       - name: Install Qt (Windows, qt5 track)
         if: runner.os == 'Windows' && matrix.track == 'pyqt5'
+        shell: bash
         run: |
           pip install aqtinstall
           python -m aqt install-qt windows desktop 5.15.2 win64_msvc2019_64 -O ${{ github.workspace }}\Qt
@@ -230,6 +231,7 @@ jobs:
 
       - name: Install Qt (Windows, qt6/pyside6 tracks)
         if: runner.os == 'Windows' && matrix.track != 'pyqt5'
+        shell: bash
         run: |
           pip install aqtinstall
           python -m aqt install-qt windows desktop 6.8.3 win64_msvc2022_64 -O ${{ github.workspace }}\Qt

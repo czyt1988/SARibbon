@@ -313,6 +313,14 @@
 - CI 侧同步：dry-run job 增"Install track build dependencies"步骤（sip/PyQt-builder/对应 PyQt 运行库）；冒烟命令改为预导入 PyQt 后再 import 扩展。根轨（PyQt5）同修 supertype/宏/qrc 注入/dunder-init（文件级同一批改动）；PyQt5 本地无 5.15 工具链未实跑（B5 同口径，CI dry-run 验证）。
 - 影响计划：03-S3/S4 验收门达成；发布链修复属 3.0 实质性交付内容（2.9.5 起不可用）
 
+### B34：dry-run 第3轮三连修（pwsh/bash、Qt 6.4 事件枚举、pyside6 镜像平铺）
+- 日期：2026-09-30
+- 第 3 轮（89dc5c2）六 job 仍全红，三个独立根因：
+  1. **Windows Qt 步骤的 pwsh/bash 语法冲突**：`echo "..." >> $GITHUB_PATH` 是 bash 语法，但默认 shell 是 pwsh（PowerShell 不展开 `$GITHUB_PATH` 为环境变量，把它当未定义 PS 变量）→ Qt bin 从未进 PATH → sip-build 报 PyProjectOptionException('qmake', ...)（pyqt5-win/pyqt6-win 两轨同根因）。修法：两个 Windows Qt install 步骤加 `shell: bash`。**教训（与 B33 dunder-init 教训同族）：dry-run job 的多行 run 块必须显式声明 shell——跨平台的 `>> $GITHUB_PATH`/`if [ ]` 语法只在 bash 下成立，pwsh 默认 shell 会静默错误。**
+  2. **Qt 6.4（ubuntu apt）没有 `QEvent::DevicePixelRatioChange`**（6.6 才加入；本机 6.7.3 有所以本地从未暴露）：SARibbonSystemButtonBar.cpp 的版本守卫原写 `>= 6.2`（错误来源：该枚举实际 6.6 引入）→ 改 `>= 6.6`。**Qt 版本宏守卫必须实测枚举引入版本**——6.2 是 QScreen 相关 API 的版本，不是这个事件枚举的。SARibbonToolButton.cpp 同款守卫已是 6.6（正确）。注意 `QEvent::ScreenChangeInternal` 5.14 存在 ✓。
+  3. **pyside6 的 `_sync_include` 镜像未平铺**：pyside6/CMakeLists.txt 的 `file(COPY "${SARIBBON_CORE_DIR}/" DESTINATION ".../SARibbonCore" FILES_MATCHING ...)` **保留子目录层级**（global/SARibbonEnums.h），而 core 源码的 include 是平铺形式 `<SARibbonCore/SARibbonEnums.h>`（计划 02 S1-5 平铺决策）→ 找不到头（linux+windows 两轨同报）。修法：改 `file(GLOB_RECURSE)` + 逐文件 `configure_file(... COPYONLY)` 平铺复制（与 sa_build_binding_include.py/amalgamate 镜像同构）。**B33 的"绑定侧镜像"设计在 pyside6 轨首跑即暴露此缺陷——B27 登记的镜像机制总算经受了第一次真实 CI 检验。**
+- 影响计划：03-S3.0/S4（绑定 CI）；本条后 dry-run 三大根因全部消除，第 4 轮预期至少一轨可全绿
+
 ### B21：类作用域 using 声明无法引入命名空间枚举符（计划 02 S1 round3 断言错误，MSVC C2886）
 - 日期：2026-09-30（计划 02 S1 执行）
 - 发现位置：计划 02 S1 第 1 条 RowProportion 兼容机制
