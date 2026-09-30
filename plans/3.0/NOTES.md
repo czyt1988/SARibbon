@@ -197,6 +197,17 @@
 
 ## 执行中追加
 
+### B24：计划 02 S5 执行记录（PanelLayoutEngine Step A/B）
+- 日期：2026-09-30
+- 内容：
+  1. **S5.0 基线**：`tests/core/tst_panelLayoutGolden.cpp`（LABELS core + offscreen ENVIRONMENT）以文本 blob 锁定 updateGeomArray 输入→输出映射（3 模式 × 3 尺寸 × 5 按钮，65 行黄金值，`SARIBBON_GOLDEN_REGEN=1` 重录）；录制与回放确定性均验证。**字体口径调整**：未随仓库部署字体，采用 `QApplication::setFont(SimSun 9, "SARibbonToolButton")` 固定按钮字体——Windows 本机可复现；黄金值头部记录字体名，跨平台 CI 字体差异将显式失败（非静默），复验移交 CI。
+  2. **Step A**：`SARibbonPanelItem : QWidgetItem + 契约`（多继承）；`isHidden()=isEmpty()`（action 可见性语义）；`sizeHint/expandingDirections` 显式覆写消歧（双基类同名虚函数缺最终覆写会 C2259）；契约按"接口最小"原则**删除 minimumSizeHint 纯虚**（三算法均不调用）。
+  3. **Step B**：`src/core/layout/SARibbonPanelLayoutEngine.h/.cpp`——算法体纯 move（cpp 头注释列全机械替换表）；Input 含 `previousSizeHintWidth`（**语义保真点**：2.x recalcExpand 读上一次 mSizeHint——函数在覆写前调用，引擎经 Input 传入上一次值而非本次 totalWidth）；sizeHint 缓存 key 改契约 item 指针；`removeFromCache/clearCache` 承接 takeAt/invalidate 不变量。
+  4. **widgets 适配器**：updateGeomArray = 收集 Input → 引擎 layout() → 回写五输出 + RTL label 对齐；**遮蔽字段取消**：`itemWillSetGeometry` 改为绑定 resultGeometry 的 `QRect&` 引用成员（单真源、存量读写零改动）；rowIndex/columnIndex/isExpandItem/rowProportion 直接用契约基类字段（2.x rowIndex 为 short、契约定 int，无取址消费者）；`invalidateButtonSizeHintCache(QWidget*)` 按 widget 反查 item 转发引擎缓存。
+  5. **验证**：黄金测试 PASS（引擎化后与基线逐字节一致）；ctest 26/27（B15）；纯净绿；确定性层扫描绿；**残留门 Panel 标记物全零**（SARibbonToolButton.cpp:887 的 v2.9.4 历史注释措辞同步更新）；amalgamate 模板补引擎条目并重生成，StaticExample 编译+运行通过。
+- 遗留：S5.2-4 的 FakeItem 引擎级测试与 S8 矩阵补全（RTL/dpr/退化输入/takeAt 缓存用例）合并到 S8 执行（黄金 blob 已锁行为）。
+- 影响计划：02-S5 完成；02-S8；03-S1
+
 ### B21：类作用域 using 声明无法引入命名空间枚举符（计划 02 S1 round3 断言错误，MSVC C2886）
 - 日期：2026-09-30（计划 02 S1 执行）
 - 发现位置：计划 02 S1 第 1 条 RowProportion 兼容机制
