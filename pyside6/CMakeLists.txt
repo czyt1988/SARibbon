@@ -49,8 +49,13 @@ execute_process(
 )
 
 # --- Shiboken6 include and lib ---
-# Shiboken headers ship in the shiboken6 runtime package, not in shiboken6_generator
-set(SHIBOKEN6_INCLUDE_DIR "${PYTHON_SITE_PACKAGES}/shiboken6/include")
+# Shiboken headers ship either in the shiboken6 runtime package (6.9+) or in
+# shiboken6_generator (older releases) — accept both (B38).
+if(EXISTS "${PYTHON_SITE_PACKAGES}/shiboken6/include/shiboken.h")
+    set(SHIBOKEN6_INCLUDE_DIR "${PYTHON_SITE_PACKAGES}/shiboken6/include")
+else()
+    set(SHIBOKEN6_INCLUDE_DIR "${PYTHON_SITE_PACKAGES}/shiboken6_generator/include")
+endif()
 set(SHIBOKEN6_LIB_DIR "${PYTHON_SITE_PACKAGES}/shiboken6")
 
 # Find shiboken6 generator executable
@@ -348,6 +353,8 @@ set(GENERATED_DIR "${CMAKE_CURRENT_BINARY_DIR}/PySideSARibbon/saribbon")
 
 set(GENERATED_SOURCES
     ${GENERATED_DIR}/saribbon_module_wrapper.cpp
+    ${GENERATED_DIR}/saribbon_core_wrapper.cpp
+    ${GENERATED_DIR}/saribbon_wrapper.cpp
     ${GENERATED_DIR}/saribbonbar_wrapper.cpp
     ${GENERATED_DIR}/saribbonmainwindow_wrapper.cpp
     ${GENERATED_DIR}/saribboncategory_wrapper.cpp
