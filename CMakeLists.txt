@@ -1,4 +1,4 @@
-
+﻿
 # Cmake的命令不区分大小写，例如message，set等命令；但Cmake的变量区分大小写
 # 为统一风格，本项目的Cmake命令全部采用小写，变量全部采用大写加下划线组合。
 
@@ -53,8 +53,8 @@ if(VCPKG_TOOLCHAIN)
 endif()
 
 # load Qt library, minimum version required is 5.15
-# cn:Qt库加载,最低版本要求为5.15
-set(SARIBBON_MIN_QT_VERSION 5.15)
+# cn:Qt库加载,最低版本要求为5.12
+set(SARIBBON_MIN_QT_VERSION 5.12)
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core Widgets Svg REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} ${SARIBBON_MIN_QT_VERSION} COMPONENTS
     Core
