@@ -350,6 +350,15 @@
 - 其余 dry-r6 修复（一并入库）：pyside6 `SA_RIBBON_CORE_STATIC` 补宏（C2491，B33 同款）；dry-run Build wheel 步骤 MSVC bin PATH 前置（Git Bash `/usr/bin/link` coreutils 遮蔽 MSVC link.exe，`/usr/bin/link: extra operand '/NXCOMPAT'` 实证）；`CONFIG += c++17` 进绑定 qmake（Qt5+MSVC 默认 C++14，core 头的 std::optional 需要）。
 - 影响计划：03-S3/S4 验收门（"至少一个绑定轮子可构建并 import"→ 本地两轨达成）；绑定 CI 修复累计 20+ 缺陷（B33-B37）
 
+### B38：dry-run 第 7 轮终态与 pyside6 版本对齐（sip 轨道 CI 首绿）
+- 日期：2026-09-30
+- **第 7 轮矩阵（run 36714649119，commit db73682）**：pyqt5/pyqt6 × windows/ubuntu 四个 job 全绿——**sip 轨道在 CI 上首次通过**（2.9.5 以来绑定 CI 从未绿过），与 B37 本地验证一致。仅剩 pyside6 双平台红。
+- **pyside6 Windows 根因：PySide6 与编译期 Qt 的版本错配**。CI 构建隔离环境装了最新 `PySide6 6.11.2`（`python -m build` 按 pyproject 的宽松 `>=6.5` 解析），其捆绑头 `pyside6_qtcore_python.h` include `qjsonparseerror.h`——该头 Qt 6.9 才引入，而编译用 aqt Qt 6.8.3 没有（本地 F:/Qt、D:/Qt 实证：6.10.1 有此头、6.8.3/6.7.3 无）→ C1083。修法：**pyproject `[build-system] requires` 与 `dependencies` 钉死 `PySide6==6.8.3.*` + `shiboken6-generator==6.8.3.*`**，与 aqt Qt 6.8.3 同源对齐；runtime 依赖也钉 6.8.3（libpyside6 的 soname 是 minor 版本化 `libpyside6.abi3.so.6.8`，运行时也必须同 minor）。钉版注释已声明与 workflow 的 aqt 版本联动。
+- **pyside6 Linux 根因：两个**。(1) shiboken6 的 libclang 找不到 builtin includes：pip `shiboken6_generator` 只带 libclang 库不带 clang 内建头（`/usr/include/wchar.h:35: fatal error: 'stddef.h' file not found`）→ `libclang-dev` + `LLVM_INSTALL_DIR=/usr/lib/llvm-*` 环境变量（shiboken 官方文档要求的查找方式）。(2) distro Qt（ubuntu-24.04 的 6.4）低于 PySide6 6.8.3 所需 → Linux 弃 apt Qt 改 aqt `6.8.3 gcc_64`（与 Windows 同源），CMAKE_PREFIX_PATH 相应指向 gcc_64；另补 `libgl1-mesa-dev libxcb1-dev`（与主 CI CMake-Linux-Qt6.8 绿配方式一致）。
+- **publish job 同步修复**：`build-pyside6` 同样钉版 + Linux 改 aqt + libclang + LLVM_INSTALL_DIR + CMAKE_PREFIX_PATH 经 GITHUB_ENV（macOS brew keg-only 前缀也经 GITHUB_ENV）；`build-pyqt5/build-pyqt6` 补缺失的 **Build binding include mirror** 步骤（无 `binding-include/` 镜像 sip 构建必然红，dry-run 有而 publish job 漏）；`build-pyqt5` 剔除 macOS 轴（qt@5 formula 已禁用、Qt 5.15 无 arm64 包、Intel runner 已退役——B32 同款环境性死亡）。
+- 顺带：`pyside6/PySideSARibbon/__init__.py` 的 `__version__` 2.8.0 → 3.0.0（陈旧漏改）。
+- 影响计划：03-S4 验收门（绑定矩阵绿 = dry-run 全绿目标达成路径）；发布 workflow 与 aqt 版本联动关系已在两处注释中登记。
+
 ### B21：类作用域 using 声明无法引入命名空间枚举符（计划 02 S1 round3 断言错误，MSVC C2886）
 - 日期：2026-09-30（计划 02 S1 执行）
 - 发现位置：计划 02 S1 第 1 条 RowProportion 兼容机制
