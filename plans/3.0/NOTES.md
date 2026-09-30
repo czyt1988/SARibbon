@@ -195,6 +195,17 @@
 
 ---
 
+## 执行中追加
+
+### B14：P3 基线执行记录（N₀=26）与 ctest PATH 前置
+- 日期：2026-09-30（计划 01 执行开始）
+- 发现位置：计划 01 P3
+- 证据：`pwsh -NoProfile -File scripts/build.ps1 rebuild -Tests ON -Examples ON` 全绿（Qt 6.7.3 自动探测）；`ctest --test-dir build -C Release --output-on-failure` 裸跑 26 项全部 `Exit code 0xc0000135`（STATUS_DLL_NOT_FOUND，`Qt6Test.dll: cannot open shared object file`）；`PATH=/d/Qt/6.7.3/msvc2019_64/bin:$PATH ctest ...` 后 26/26 全绿（46.82s）。
+- 处理：N₀ = **26**（与预期一致）。bash 非交互环境无 Qt bin 的 PATH（build.ps1 探测的 Qt 路径不会注入后续 shell），后续所有 ctest 验证统一带 Qt 6.7.3 bin 前缀执行，属环境细节而非仓库偏差。
+- 影响计划：01/02/03/04 所有 ctest 验证命令（口径补充，不改计划）
+
+---
+
 ## 执行中追加（模板，勿删）
 
 ```
