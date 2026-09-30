@@ -17,6 +17,8 @@ sa_add_library(SARibbonCore
         theme/SARibbonThemePalette.cpp
         theme/SARibbonThemeData.h
         theme/SARibbonThemeData.cpp
+        metrics/SARibbonMetrics.h
+        metrics/SARibbonMetrics.cpp
         "${CMAKE_BINARY_DIR}/include/SARibbonCore/SARibbonCoreConfig.h"
     PREFIX SA_RIBBON_CORE
     QT_LINKS Core Gui

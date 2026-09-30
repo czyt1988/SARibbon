@@ -1,4 +1,5 @@
 #include "SARibbonBarLayout.h"
+#include <SARibbonCore/SARibbonMetrics.h>
 #include <QStyle>
 #include <QApplication>
 #include <QScreen>
@@ -20,18 +21,11 @@ public:
     SARibbonBar* ribbonBar;
     QList< QLayoutItem* > items;
     QRect titleRect;
-    int titleBarHeight { 30 };    ///< Title bar height
-    int tabBarHeight { 28 };      ///< Tab bar height
-    int panelTitleHeight { 15 };  ///< Panel title default height
-    int categoryHeight { 60 };    ///< Category height
+    // plan-02 S3: metrics collected into core SARibbonMetrics (public API and behavior unchanged)
+    SARibbon::Core::SARibbonMetrics metrics;  ///< title bar height / tab bar height / panel title height / category height (2.9.5 defaults 30/28/15/60)
 
-    int maxMinWidth { 1000 };  ///< Maximum minimum width, usually 0.8 of screen width to avoid exceeding screen
-    int minWidth { 500 };
-    int minHeight { 0 };
+    // maxMinWidth/minWidth/minHeight now live in metrics (plan-02 S3); access via metrics.
     bool isTabOnTitle { false };  ///< Whether tab is on title bar
-    std::unique_ptr< int > userDefTitleBarHeight;  ///< User-defined title bar height, normally auto-calculated
-    std::unique_ptr< int > userDefTabBarHeight;  ///< User-defined tab bar height, normally auto-calculated
-    std::unique_ptr< int > userDefCategoryHeight;  ///< User-defined category height, normally auto-calculated
     QSize systemButtonSize;  ///< System button size (close, maximize, etc.) from SARibbonMainWindow
     bool isApplicationButtonVerticalExpansion {
         false
@@ -51,17 +45,25 @@ public:
      */
     PrivateData(SARibbonBar* bar) : ribbonBar(bar), systemButtonSize(0, 0)
     {
+        // plan-02 S3: feed platform inputs (font metrics + QStyle pixel metrics)
+        // into core SARibbonMetrics; core never queries widgets itself
+        QStyle* style = bar->style();
+        metrics.setStylePixelMetrics(style->pixelMetric(QStyle::PM_TabBarBaseHeight),
+                                     style->pixelMetric(QStyle::PM_TabBarTabHSpace),
+                                     style->pixelMetric(QStyle::PM_TabBarTabOverlap),
+                                     style->pixelMetric(QStyle::PM_TitleBarHeight));
+        metrics.setFontMetrics(bar->fontMetrics());
         // Get primary screen size
         QScreen* primaryScreen = QGuiApplication::primaryScreen();
         if (currentRibbonMode() == SARibbonBar::MinimumRibbonMode) {
-            minHeight = getActualTitleBarHeight() + (isTabOnTitle ? 0 : getActualTabBarHeight());
+            metrics.minHeight = getActualTitleBarHeight() + (isTabOnTitle ? 0 : getActualTabBarHeight());
         } else {
-            minHeight = getActualTitleBarHeight() + getActualCategoryHeight()
-                        + (isTabOnTitle ? 0 : getActualTabBarHeight());
+            metrics.minHeight = getActualTitleBarHeight() + getActualCategoryHeight()
+                               + (isTabOnTitle ? 0 : getActualTabBarHeight());
         }
         if (primaryScreen) {
             QRect screenGeometry = primaryScreen->geometry();
-            maxMinWidth = screenGeometry.width() * 0.8;  // Screen width
+            metrics.maxMinWidth = screenGeometry.width() * 0.8;  // Screen width
         }
     }
 
@@ -222,11 +224,7 @@ public:
      */
     void setTitleBarHeight(int h)
     {
-        if (!userDefTitleBarHeight) {
-            userDefTitleBarHeight = std::make_unique< int >(h);
-        } else {
-            *userDefTitleBarHeight = h;
-        }
+        metrics.setTitleBarHeight(h);
     }
 
     /**
@@ -242,11 +240,7 @@ public:
      */
     void setTabBarHeight(int h)
     {
-        if (!userDefTabBarHeight) {
-            userDefTabBarHeight = std::make_unique< int >(h);
-        } else {
-            *userDefTabBarHeight = h;
-        }
+        metrics.setTabBarHeight(h);
     }
 
     /**
@@ -262,11 +256,7 @@ public:
      */
     void setCategoryHeight(int h)
     {
-        if (!userDefCategoryHeight) {
-            userDefCategoryHeight = std::make_unique< int >(h);
-        } else {
-            *userDefCategoryHeight = h;
-        }
+        metrics.setCategoryHeight(h);
     }
 
     /**
@@ -282,11 +272,7 @@ public:
      */
     int getActualTitleBarHeight() const
     {
-        if (userDefTitleBarHeight) {
-            return *userDefTitleBarHeight;
-        } else {
-            return titleBarHeight;
-        }
+        return metrics.getActualTitleBarHeight();
     }
 
     /**
@@ -302,11 +288,7 @@ public:
      */
     int getActualTabBarHeight() const
     {
-        if (userDefTabBarHeight) {
-            return *userDefTabBarHeight;
-        } else {
-            return tabBarHeight;
-        }
+        return metrics.getActualTabBarHeight();
     }
 
     /**
@@ -322,11 +304,7 @@ public:
      */
     int getActualCategoryHeight() const
     {
-        if (userDefCategoryHeight) {
-            return *userDefCategoryHeight;
-        } else {
-            return categoryHeight;
-        }
+        return metrics.getActualCategoryHeight();
     }
 
     /**
@@ -340,146 +318,14 @@ public:
      */
     void estimateSizeHint()
     {
-        titleBarHeight = calcDefaultTitleBarHeight();
-        // If tabBarHeight is greater than 0, use user-set value
-        tabBarHeight   = calcDefaultTabBarHeight();
-        categoryHeight = calcCategoryHeight();
-    }
-
-    /**
-     * \if ENGLISH
-     * @brief Get the system tab bar height
-     * @return The system tab bar height
-     * \endif
-     * 
-     * \if CHINESE
-     * @brief 获取系统标签栏高度
-     * @return 系统标签栏高度
-     * \endif
-     */
-    int systemTabBarHeight() const
-    {
+        // plan-02 S3: re-feed inputs before deriving (font may have changed, cpp:4118 path)
         QStyle* style = ribbonBar->style();
-        return style->pixelMetric(QStyle::PM_TabBarBaseHeight) + style->pixelMetric(QStyle::PM_TabBarTabHSpace)
-               + style->pixelMetric(QStyle::PM_TabBarTabOverlap);
-    }
-
-    /**
-     * \if ENGLISH
-     * @brief Calculate default tab bar height
-     * @return The calculated tab bar height
-     * \endif
-     * 
-     * \if CHINESE
-     * @brief 估算标签栏的高度
-     * @return 计算出的标签栏高度
-     * \endif
-     */
-    int calcDefaultTabBarHeight()
-    {
-        int defaultHeight = systemTabBarHeight();
-        int fontHeight = ribbonBar->fontMetrics().lineSpacing();  // Use lineSpacing instead of height for better font compatibility
-        int defaultHeight2 = fontHeight * 1.6;
-        if (defaultHeight2 < fontHeight + 10) {
-            defaultHeight2 = fontHeight + 10;  // To accommodate office2021 theme with 4px bottom bar
-        }
-        int r = qMax(defaultHeight, defaultHeight2);
-        if (r < 20) {
-            r = 20;
-        }
-        return r;
-    }
-
-    /**
-     * \if ENGLISH
-     * @brief Calculate default title bar height
-     * @return The calculated title bar height
-     * \endif
-     * 
-     * \if CHINESE
-     * @brief 估算标题栏的高度
-     * @return 计算出的标题栏高度
-     * \endif
-     */
-    int calcDefaultTitleBarHeight()
-    {
-        int defaultHeight  = ribbonBar->style()->pixelMetric(QStyle::PM_TitleBarHeight);
-        int defaultHeight2 = ribbonBar->fontMetrics().height() * 1.8;
-        int r              = qMax(defaultHeight, defaultHeight2);
-        if (r < 25) {
-            r = 25;
-        }
-        return r;
-    }
-
-    /**
-     * \if ENGLISH
-     * @brief Calculate category height based on current ribbon style
-     * @note 1.6 line height is close to Office's height.
-     *       SingleRow mode has no panel title, so panelTitleHeight is not added.
-     * @return The calculated category height
-     * \endif
-     *
-     * \if CHINESE
-     * @brief 根据当前Ribbon风格估算类别的高度
-     * @note 经过对照，1.6行高和office的高度比较接近。
-     *       SingleRow模式下面板标题隐藏，因此不添加panelTitleHeight。
-     * @return 计算出的类别高度
-     * \endif
-     */
-    int calcCategoryHeight()
-    {
-        int textH = ribbonBar->fontMetrics().lineSpacing();
-        if (ribbonBar->isThreeRowStyle()) {
-            // 4.8 = 3*1.6 for three rows
-            return textH * 4.8 + panelTitleHeight;
-        } else if (ribbonBar->isSingleRowStyle()) {
-            // 1.8 for single row, no panel title in single-row mode
-            return textH * 2;
-        } else {
-            // 3.2 = 2*1.6 for two rows
-            return textH * 3.2 + panelTitleHeight;
-        }
-    }
-
-    /**
-     * \if ENGLISH
-     * @brief Calculate main bar height
-     * @param tabHegith Tab bar height
-     * @param titleHeight Title bar height
-     * @param categoryHeight Category height
-     * @param tabOnTitle Whether tab is on title
-     * @param rMode Ribbon mode
-     * @return The calculated main bar height
-     * \endif
-     * 
-     * \if CHINESE
-     * @brief 计算主栏高度
-     * @param tabHegith 标签栏高度
-     * @param titleHeight 标题栏高度
-     * @param categoryHeight 类别高度
-     * @param tabOnTitle 标签是否在标题栏上
-     * @param rMode 功能区模式
-     * @return 计算出的主栏高度
-     * \endif
-     */
-    static int
-    calcMainBarHeight(int tabHegith, int titleHeight, int categoryHeight, bool tabOnTitle, SARibbonBar::RibbonMode rMode)
-    {
-        if (rMode == SARibbonBar::MinimumRibbonMode) {
-            // Minimum mode, no category height
-            if (tabOnTitle) {
-                return titleHeight;
-            } else {
-                return titleHeight + tabHegith;
-            }
-        } else {
-            if (tabOnTitle) {
-                return titleHeight + categoryHeight;
-            } else {
-                return tabHegith + titleHeight + categoryHeight;
-            }
-        }
+        metrics.setStylePixelMetrics(style->pixelMetric(QStyle::PM_TabBarBaseHeight),
+                                     style->pixelMetric(QStyle::PM_TabBarTabHSpace),
+                                     style->pixelMetric(QStyle::PM_TabBarTabOverlap),
+                                     style->pixelMetric(QStyle::PM_TitleBarHeight));
+        metrics.setFontMetrics(ribbonBar->fontMetrics());
+        metrics.estimateSizeHint(ribbonBar->isThreeRowStyle(), ribbonBar->isSingleRowStyle());
     }
 
     /**
@@ -494,11 +340,12 @@ public:
     void resetSize()
     {
         estimateSizeHint();
-        int mainBarHeight = calcMainBarHeight(getActualTabBarHeight(),
-                                              getActualTitleBarHeight(),
-                                              getActualCategoryHeight(),
-                                              isTabOnTitle,
-                                              ribbonBar->currentRibbonState());
+        int mainBarHeight = SARibbon::Core::SARibbonMetrics::calcMainBarHeight(
+            getActualTabBarHeight(),
+            getActualTitleBarHeight(),
+            getActualCategoryHeight(),
+            isTabOnTitle,
+            ribbonBar->currentRibbonState() == SARibbonBar::MinimumRibbonMode);
         // In minimum mode, bar height is tab bar bottom, this adjustment must be after resize event
         // After upgrading to Qt 6, setFixedHeight can cause exceptions because:
         // void QWidget::setFixedHeight(int h) {
@@ -515,7 +362,7 @@ public:
             ribbonBar->setMaximumHeight(QWIDGETSIZE_MAX);
         }
         ribbonBar->setFixedHeight(mainBarHeight);
-        minHeight = mainBarHeight;  // minHeight matches mainBarHeight
+        metrics.minHeight = mainBarHeight;  // minHeight matches mainBarHeight
     }
 
     /**
@@ -531,11 +378,11 @@ public:
      */
     int minimumModeMainBarHeight()
     {
-        return calcMainBarHeight(getActualTabBarHeight(),
+        return SARibbon::Core::SARibbonMetrics::calcMainBarHeight(getActualTabBarHeight(),
                                  getActualTitleBarHeight(),
                                  getActualCategoryHeight(),
                                  isTabOnTitle,
-                                 SARibbonBar::MinimumRibbonMode);
+                                 true);
     }
 
     /**
@@ -551,11 +398,11 @@ public:
      */
     int normalModeMainBarHeight()
     {
-        return calcMainBarHeight(getActualTabBarHeight(),
+        return SARibbon::Core::SARibbonMetrics::calcMainBarHeight(getActualTabBarHeight(),
                                  getActualTitleBarHeight(),
                                  getActualCategoryHeight(),
                                  isTabOnTitle,
-                                 SARibbonBar::NormalRibbonMode);
+                                 false);
     }
 };
 
@@ -696,10 +543,10 @@ int SARibbonBarLayout::count() const
  */
 QSize SARibbonBarLayout::sizeHint() const
 {
-    int height = d_ptr->minHeight;
-    int width  = d_ptr->minWidth;
-    if (width > d_ptr->maxMinWidth) {
-        width = d_ptr->maxMinWidth;
+    int height = d_ptr->metrics.minHeight;
+    int width  = d_ptr->metrics.minWidth;
+    if (width > d_ptr->metrics.maxMinWidth) {
+        width = d_ptr->metrics.maxMinWidth;
     }
     return QSize(width, height);
 }
@@ -1026,7 +873,7 @@ void SARibbonBarLayout::setCategoryHeight(int h)
  */
 int SARibbonBarLayout::panelTitleHeight() const
 {
-    return d_ptr->panelTitleHeight;
+    return d_ptr->metrics.panelTitleHeight;
 }
 
 /**
@@ -1042,7 +889,7 @@ int SARibbonBarLayout::panelTitleHeight() const
  */
 void SARibbonBarLayout::setPanelTitleHeight(int h)
 {
-    d_ptr->panelTitleHeight = h;
+    d_ptr->metrics.panelTitleHeight = h;
 }
 
 /**
@@ -1580,7 +1427,7 @@ void SARibbonBarLayout::resizeInLooseStyle()
             }
         }
 
-        d_ptr->minWidth = barMinWidth;
+        d_ptr->metrics.minWidth = barMinWidth;
         layoutTitleRect();
         layoutStackedContainerWidget();
     } else {
@@ -1721,7 +1568,7 @@ void SARibbonBarLayout::resizeInLooseStyle()
             }
         }
 
-        d_ptr->minWidth = barMinWidth;
+        d_ptr->metrics.minWidth = barMinWidth;
 
         // 5. 更新标题区域
         layoutTitleRect();
@@ -1861,7 +1708,7 @@ void SARibbonBarLayout::resizeInCompactStyle()
             }
         }
 
-        d_ptr->minWidth = barMinWidth;
+        d_ptr->metrics.minWidth = barMinWidth;
         layoutTitleRect();
         layoutStackedContainerWidget();
     } else {
@@ -1983,7 +1830,7 @@ void SARibbonBarLayout::resizeInCompactStyle()
             }
         }
 
-        d_ptr->minWidth = barMinWidth;
+        d_ptr->metrics.minWidth = barMinWidth;
 
         // 5. 更新标题区域
         layoutTitleRect();
