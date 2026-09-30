@@ -11,6 +11,7 @@ class TestThemePalette : public QObject
     Q_OBJECT
 
 private Q_SLOTS:
+    void initTestCase();
     void testLoadFromJson();
     void testDerivation();
     void testDarkDerivation();
@@ -26,6 +27,16 @@ private Q_SLOTS:
     void testDarkSetterRecalculate();
     void testVariablesPriority();
 };
+
+void TestThemePalette::initTestCase()
+{
+#if defined(SA_RIBBON_WIDGETS_STATIC) || defined(SARIBBON_BUILD_STATIC_LIBS) || defined(QT_STATIC)
+    // Static library builds: the widgets archive member carrying the qrc objects
+    // is only pulled in when referenced — the Q_INIT_RESOURCE reference here is
+    // exactly what pulls it (palette fixtures live in :/SARibbonTheme/...).
+    Q_INIT_RESOURCE(SARibbonResource);
+#endif
+}
 
 void TestThemePalette::testLoadFromJson()
 {

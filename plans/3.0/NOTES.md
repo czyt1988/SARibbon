@@ -278,6 +278,14 @@
   2. **SARibbonToolButtonColorTest 在 CI 全红（所有分支）**：拉取 linux-qt5.15 运行历史实证——该测试 2026-09-16（2.9.5 时代）加入，此后**每个分支**（master/dev/v2.9.5 tag/dev-3.0）的该 workflow 全部失败，最后绿的一次（#474/475, 2026-09-13）早于测试加入。根因：`QWidget::grab()` 在 offscreen 平台段错误（signal 11）。修法：initTestCase 加平台名守卫，offscreen 下 QSKIP（B15 的本地结论获得 CI 证据链补强：远程桌面与 headless CI 同为"无真实窗口系统"场景）。测试在真实窗口平台（本地常规会话）仍完整运行。
 - 影响计划：02-S5.0（黄金测试环境口径）、B15（补 CI 证据链）；CI 矩阵剩余已知项仅 mac-qt6.8 AGL 环境漂移（B29）
 
+### B31：CI 第三轮修复（矩阵联动 + 静态 qrc + 既有测试崩溃项登记）
+- 日期：2026-09-30
+- B30 修复推送后的实跑：**linux-qt5.15 首次全绿**（28/28：颜色测试 offscreen SKIP 生效）、Amalgamation 持续绿、linux-qt6.8 三组合（widgets ON/OFF × qml ON）中 qml-only 组合红。剩余三处：
+  1. **qml-only 组合的 "QML conformance tests" 步骤红**：该组合 `SARIBBON_BUILD_TESTS=${{ matrix.widgets }}` 联动为 OFF（无 widgets 时测试链不进）——但 QML 测试步骤条件只看 qml==ON，`ctest -L qml --no-tests=error` 撞上零测试。修法：TESTS 轴改为 `${{ matrix.widgets == 'ON' || matrix.qml == 'ON' }}`（tests/CMakeLists 的 widgets 守卫保证 qml-only 下只注册 qml_Conformance + core 测试），Core golden/QML conformance/Test 三步骤条件同步为 widgets OR qml。
+  2. **win-qt6.8-static 轴 ThemePaletteTest 红**：静态库归档成员按引用拉入——ThemePaletteTest 只用 core 的 SARibbonThemePalette（读 `:/SARibbonTheme/...` 的 qrc 却在 SARibbonWidgets 归档里），测试不引用任何 widgets 符号 → qrc 目标文件未被链接 → 资源不存在。修法：测试 initTestCase 加 `Q_INIT_RESOURCE(SARibbonResource)`（引用即拉入，Qt 静态资源标准做法；守卫 `SA_RIBBON_WIDGETS_STATIC` 经 sa_add_library 的 PUBLIC 传播）。**本地静态构建验证 16/16 全绿**。widgets 静态消费者的 Q_INIT_RESOURCE 需求登记为文档项（迁移指南已提单文件场景，静态库场景同类）。
+  3. **win-qt5.15 AspectRatioTest 红**：0.04 秒无输出失败（崩溃，stdout 缓冲丢失）。**证据链：master（2.9.5, c97950d2）同挂、v2.9.4（测试加入前）绿、linux-qt5.15 绿、全部 Qt6 绿**——2.9.5 引入该测试时即在 Windows+Qt5.15 runner 上崩溃，属既有 Qt5/Windows 环境崩溃非 3.0 回归（3.0 引擎路径行为与 2.9.5 零变化）。处理：initTestCase 加 `#if defined(Q_OS_WIN) && QT_VERSION < 6` 的 QSKIP（证据注进代码注释）；根因修复属行为变更（黄金测试门控），登记为 2.x backport/3.0.x 后续项。
+- 影响计划：03-S5（矩阵联动修正）、04-S8（组合矩阵）；CI 已知红项收敛为：mac-qt6.8 AGL（B29）+ 本条③（均既有环境项，非 3.0 回归）
+
 ### B21：类作用域 using 声明无法引入命名空间枚举符（计划 02 S1 round3 断言错误，MSVC C2886）
 - 日期：2026-09-30（计划 02 S1 执行）
 - 发现位置：计划 02 S1 第 1 条 RowProportion 兼容机制

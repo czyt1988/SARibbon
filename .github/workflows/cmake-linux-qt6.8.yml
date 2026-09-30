@@ -43,13 +43,13 @@ jobs:
     # widgets=OFF is the core-only combination: tests cannot link widgets,
     # so SARIBBON_BUILD_TESTS follows the widgets axis.
     - name: Configure CMake
-      run: cmake -DCMAKE_BUILD_TYPE="${{env.BUILD_TYPE}}" -DBUILD_SHARED_LIBS=${{ matrix.shared }} -DSARIBBON_BUILD_EXAMPLES=OFF -DSARIBBON_BUILD_QML=${{ matrix.qml }} -DSARIBBON_BUILD_WIDGETS=${{ matrix.widgets }} -DSARIBBON_BUILD_TESTS=${{ matrix.widgets }} -B "${{github.workspace}}/build"
+      run: cmake -DCMAKE_BUILD_TYPE="${{env.BUILD_TYPE}}" -DBUILD_SHARED_LIBS=${{ matrix.shared }} -DSARIBBON_BUILD_EXAMPLES=OFF -DSARIBBON_BUILD_QML=${{ matrix.qml }} -DSARIBBON_BUILD_WIDGETS=${{ matrix.widgets }} -DSARIBBON_BUILD_TESTS=${{ matrix.widgets == 'ON' || matrix.qml == 'ON' }} -B "${{github.workspace}}/build"
 
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
     - name: Core golden tests
-      if: matrix.widgets == 'ON'
+      if: matrix.widgets == 'ON' || matrix.qml == 'ON'
       env:
         QT_QPA_PLATFORM: offscreen
       run: ctest --test-dir ${{github.workspace}}/build -C ${{env.BUILD_TYPE}} -L core --output-on-failure --no-tests=error
@@ -59,7 +59,7 @@ jobs:
         QT_QPA_PLATFORM: offscreen
       run: ctest --test-dir ${{github.workspace}}/build -C ${{env.BUILD_TYPE}} -L qml --output-on-failure --no-tests=error
     - name: Test
-      if: matrix.widgets == 'ON'
+      if: matrix.widgets == 'ON' || matrix.qml == 'ON'
       env:
         QT_QPA_PLATFORM: offscreen
       run: ctest --output-on-failure --no-tests=error -C ${{env.BUILD_TYPE}}
