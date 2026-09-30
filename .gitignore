@@ -196,3 +196,4 @@ src/SARibbonCore.h
 src/SARibbonCore.cpp
 src/SARibbonWidgets.h
 src/SARibbonWidgets.cpp
+binding-include/

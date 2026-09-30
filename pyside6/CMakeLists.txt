@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.22)
 
-project(PySideSARibbon VERSION 2.8.0 LANGUAGES CXX)
+project(PySideSARibbon VERSION 3.0.0 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -99,106 +99,138 @@ message(STATUS "PYSIDE6_LIBRARY: ${PYSIDE6_LIBRARY}")
 # =====================================================================
 # Paths
 # =====================================================================
-set(SARIBBON_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../src/SARibbonBar")
+set(SARIBBON_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../src/widgets")
+set(SARIBBON_CORE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../src/core")
+# plan-03 S3.0: binding-side <SARibbonCore/...> mirror (self-contained wheel build)
+set(SARIBBON_CORE_INCLUDE_MIRROR "${CMAKE_CURRENT_BINARY_DIR}/_sync_include")
+file(MAKE_DIRECTORY "${SARIBBON_CORE_INCLUDE_MIRROR}/SARibbonCore")
+file(COPY "${SARIBBON_CORE_DIR}/" DESTINATION "${SARIBBON_CORE_INCLUDE_MIRROR}/SARibbonCore"
+     FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp" PATTERN "*.cpp")
 set(SARIBBON_COLORWIDGETS_DIR "${SARIBBON_SOURCE_DIR}/colorWidgets")
 
 # =====================================================================
 # Header files for shiboken
 # =====================================================================
 set(SARIBBON_HEADERS
-    ${SARIBBON_SOURCE_DIR}/SARibbonGlobal.h
-    ${SARIBBON_SOURCE_DIR}/SARibbonBarVersionInfo.h
-    ${SARIBBON_SOURCE_DIR}/SARibbonQt5Compat.hpp
-    ${SARIBBON_SOURCE_DIR}/SARibbonMainWindow.h
-    ${SARIBBON_SOURCE_DIR}/SARibbonBar.h
-    ${SARIBBON_SOURCE_DIR}/SARibbonBarLayout.h
-    ${SARIBBON_SOURCE_DIR}/SARibbonCategory.h
-    ${SARIBBON_SOURCE_DIR}/SARibbonCategoryLayout.h
-    ${SARIBBON_SOURCE_DIR}/SARibbonPanel.h
-    ${SARIBBON_SOURCE_DIR}/SARibbonPanelLayout.h
-    ${SARIBBON_SOURCE_DIR}/SARibbonPanelItem.h
-    ${SARIBBON_SOURCE_DIR}/SARibbonPanelOptionButton.h
-    ${SARIBBON_SOURCE_DIR}/SARibbonToolButton.h
-    ${SARIBBON_SOURCE_DIR}/SARibbonContextCategory.h
-    ${SARIBBON_SOURCE_DIR}/SARibbonGallery.h
-    ${SARIBBON_SOURCE_DIR}/SARibbonGalleryGroup.h
-    ${SARIBBON_SOURCE_DIR}/SARibbonGalleryItem.h
-    ${SARIBBON_SOURCE_DIR}/SARibbonTabBar.h
-    ${SARIBBON_SOURCE_DIR}/SARibbonMenu.h
-    ${SARIBBON_SOURCE_DIR}/SARibbonApplicationButton.h
-    ${SARIBBON_SOURCE_DIR}/SARibbonApplicationWidget.h
-    ${SARIBBON_SOURCE_DIR}/SARibbonButtonGroupWidget.h
-    ${SARIBBON_SOURCE_DIR}/SARibbonStackedWidget.h
-    ${SARIBBON_SOURCE_DIR}/SARibbonQuickAccessBar.h
-    ${SARIBBON_SOURCE_DIR}/SARibbonSystemButtonBar.h
-    ${SARIBBON_SOURCE_DIR}/SARibbonCtrlContainer.h
-    ${SARIBBON_SOURCE_DIR}/SARibbonLineWidgetContainer.h
-    ${SARIBBON_SOURCE_DIR}/SARibbonSeparatorWidget.h
-    ${SARIBBON_SOURCE_DIR}/SARibbonTitleIconWidget.h
-    ${SARIBBON_SOURCE_DIR}/SARibbonElementFactory.h
-    ${SARIBBON_SOURCE_DIR}/SARibbonElementManager.h
-    ${SARIBBON_SOURCE_DIR}/SARibbonActionsManager.h
-    ${SARIBBON_SOURCE_DIR}/SARibbonCustomizeData.h
-    ${SARIBBON_SOURCE_DIR}/SARibbonCustomizeDialog.h
-    ${SARIBBON_SOURCE_DIR}/SARibbonCustomizeWidget.h
-    ${SARIBBON_SOURCE_DIR}/SARibbonUtil.h
-    ${SARIBBON_SOURCE_DIR}/SAFramelessHelper.h
-    ${SARIBBON_SOURCE_DIR}/SARibbonWidget.h
-    ${SARIBBON_SOURCE_DIR}/SARibbonColorToolButton.h
-    ${SARIBBON_COLORWIDGETS_DIR}/SAColorWidgetsGlobal.h
-    ${SARIBBON_COLORWIDGETS_DIR}/SAColorToolButton.h
-    ${SARIBBON_COLORWIDGETS_DIR}/SAColorGridWidget.h
-    ${SARIBBON_COLORWIDGETS_DIR}/SAColorPaletteGridWidget.h
-    ${SARIBBON_COLORWIDGETS_DIR}/SAColorMenu.h
+    "${SARIBBON_CORE_DIR}/SARibbonCoreGlobal.h"
+    "${SARIBBON_CORE_DIR}/SARibbonQt5Compat.hpp"
+    "${SARIBBON_CORE_DIR}/contract/SARibbonAbstractLayoutHost.h"
+    "${SARIBBON_CORE_DIR}/contract/SARibbonAbstractLayoutItem.h"
+    "${SARIBBON_CORE_DIR}/data/SARibbonCustomizeRecord.h"
+    "${SARIBBON_CORE_DIR}/factory/SARibbonElementFactoryInterface.h"
+    "${SARIBBON_CORE_DIR}/global/SARibbonCoreUtil.h"
+    "${SARIBBON_CORE_DIR}/global/SARibbonEnums.h"
+    "${SARIBBON_CORE_DIR}/layout/SARibbonBarGeometryEngine.h"
+    "${SARIBBON_CORE_DIR}/layout/SARibbonCategoryLayoutEngine.h"
+    "${SARIBBON_CORE_DIR}/layout/SARibbonPanelLayoutEngine.h"
+    "${SARIBBON_CORE_DIR}/metrics/SARibbonMetrics.h"
+    "${SARIBBON_CORE_DIR}/theme/SARibbonThemeData.h"
+    "${SARIBBON_CORE_DIR}/theme/SARibbonThemePalette.h"
+    "${SARIBBON_SOURCE_DIR}/SAFramelessHelper.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonActionsManager.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonApplicationButton.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonApplicationWidget.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonBar.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonBarLayout.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonBarVersionInfo.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonButtonGroupWidget.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonCategory.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonCategoryLayout.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonColorToolButton.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonContextCategory.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonCtrlContainer.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonCustomizeData.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonCustomizeDialog.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonCustomizeWidget.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonElementFactory.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonElementManager.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonGallery.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonGalleryGroup.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonGalleryItem.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonGlobal.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonLineWidgetContainer.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonMainWindow.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonMdiControlsStyle.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonMenu.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonPanel.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonPanelItem.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonPanelLayout.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonPanelOptionButton.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonQuickAccessBar.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonSeparatorWidget.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonStackedWidget.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonSystemButtonBar.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonTabBar.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonThemeManager.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonThemePalette.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonTitleIconWidget.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonToolButton.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonUtil.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonWidget.h"
+    "${SARIBBON_SOURCE_DIR}/SARibbonWidgetsGlobal.h"
+    "${SARIBBON_COLORWIDGETS_DIR}/SAColorGridWidget.h"
+    "${SARIBBON_COLORWIDGETS_DIR}/SAColorMenu.h"
+    "${SARIBBON_COLORWIDGETS_DIR}/SAColorPaletteGridWidget.h"
+    "${SARIBBON_COLORWIDGETS_DIR}/SAColorToolButton.h"
+    "${SARIBBON_COLORWIDGETS_DIR}/SAColorWidgetsGlobal.h"
 )
 
 # =====================================================================
 # C++ source files
 # =====================================================================
 set(SARIBBON_SOURCES
-    ${SARIBBON_SOURCE_DIR}/SARibbonMainWindow.cpp
-    ${SARIBBON_SOURCE_DIR}/SARibbonBar.cpp
-    ${SARIBBON_SOURCE_DIR}/SARibbonBarLayout.cpp
-    ${SARIBBON_SOURCE_DIR}/SARibbonMdiControlsStyle.cpp
-    ${SARIBBON_SOURCE_DIR}/SARibbonCategory.cpp
-    ${SARIBBON_SOURCE_DIR}/SARibbonCategoryLayout.cpp
-    ${SARIBBON_SOURCE_DIR}/SARibbonPanel.cpp
-    ${SARIBBON_SOURCE_DIR}/SARibbonPanelLayout.cpp
-    ${SARIBBON_SOURCE_DIR}/SARibbonPanelItem.cpp
-    ${SARIBBON_SOURCE_DIR}/SARibbonPanelOptionButton.cpp
-    ${SARIBBON_SOURCE_DIR}/SARibbonToolButton.cpp
-    ${SARIBBON_SOURCE_DIR}/SARibbonContextCategory.cpp
-    ${SARIBBON_SOURCE_DIR}/SARibbonGallery.cpp
-    ${SARIBBON_SOURCE_DIR}/SARibbonGalleryGroup.cpp
-    ${SARIBBON_SOURCE_DIR}/SARibbonGalleryItem.cpp
-    ${SARIBBON_SOURCE_DIR}/SARibbonTabBar.cpp
-    ${SARIBBON_SOURCE_DIR}/SARibbonMenu.cpp
-    ${SARIBBON_SOURCE_DIR}/SARibbonApplicationButton.cpp
-    ${SARIBBON_SOURCE_DIR}/SARibbonApplicationWidget.cpp
-    ${SARIBBON_SOURCE_DIR}/SARibbonButtonGroupWidget.cpp
-    ${SARIBBON_SOURCE_DIR}/SARibbonStackedWidget.cpp
-    ${SARIBBON_SOURCE_DIR}/SARibbonQuickAccessBar.cpp
-    ${SARIBBON_SOURCE_DIR}/SARibbonSystemButtonBar.cpp
-    ${SARIBBON_SOURCE_DIR}/SARibbonCtrlContainer.cpp
-    ${SARIBBON_SOURCE_DIR}/SARibbonLineWidgetContainer.cpp
-    ${SARIBBON_SOURCE_DIR}/SARibbonSeparatorWidget.cpp
-    ${SARIBBON_SOURCE_DIR}/SARibbonTitleIconWidget.cpp
-    ${SARIBBON_SOURCE_DIR}/SARibbonElementFactory.cpp
-    ${SARIBBON_SOURCE_DIR}/SARibbonElementManager.cpp
-    ${SARIBBON_SOURCE_DIR}/SARibbonActionsManager.cpp
-    ${SARIBBON_SOURCE_DIR}/SARibbonCustomizeData.cpp
-    ${SARIBBON_SOURCE_DIR}/SARibbonCustomizeDialog.cpp
-    ${SARIBBON_SOURCE_DIR}/SARibbonCustomizeWidget.cpp
-    ${SARIBBON_SOURCE_DIR}/SARibbonUtil.cpp
-    ${SARIBBON_SOURCE_DIR}/SARibbonThemeManager.cpp
-    ${SARIBBON_SOURCE_DIR}/SARibbonThemePalette.cpp
-    ${SARIBBON_SOURCE_DIR}/SAFramelessHelper.cpp
-    ${SARIBBON_SOURCE_DIR}/SARibbonWidget.cpp
-    ${SARIBBON_SOURCE_DIR}/SARibbonColorToolButton.cpp
-    ${SARIBBON_COLORWIDGETS_DIR}/SAColorToolButton.cpp
-    ${SARIBBON_COLORWIDGETS_DIR}/SAColorGridWidget.cpp
-    ${SARIBBON_COLORWIDGETS_DIR}/SAColorPaletteGridWidget.cpp
-    ${SARIBBON_COLORWIDGETS_DIR}/SAColorMenu.cpp
+    "${SARIBBON_CORE_DIR}/SARibbonCoreGlobal.cpp"
+    "${SARIBBON_CORE_DIR}/contract/SARibbonContract.cpp"
+    "${SARIBBON_CORE_DIR}/data/SARibbonCustomizeRecord.cpp"
+    "${SARIBBON_CORE_DIR}/global/SARibbonCoreUtil.cpp"
+    "${SARIBBON_CORE_DIR}/layout/SARibbonBarGeometryEngine.cpp"
+    "${SARIBBON_CORE_DIR}/layout/SARibbonCategoryLayoutEngine.cpp"
+    "${SARIBBON_CORE_DIR}/layout/SARibbonPanelLayoutEngine.cpp"
+    "${SARIBBON_CORE_DIR}/metrics/SARibbonMetrics.cpp"
+    "${SARIBBON_CORE_DIR}/theme/SARibbonThemeData.cpp"
+    "${SARIBBON_CORE_DIR}/theme/SARibbonThemePalette.cpp"
+    "${SARIBBON_SOURCE_DIR}/SAFramelessHelper.cpp"
+    "${SARIBBON_SOURCE_DIR}/SARibbonActionsManager.cpp"
+    "${SARIBBON_SOURCE_DIR}/SARibbonApplicationButton.cpp"
+    "${SARIBBON_SOURCE_DIR}/SARibbonApplicationWidget.cpp"
+    "${SARIBBON_SOURCE_DIR}/SARibbonBar.cpp"
+    "${SARIBBON_SOURCE_DIR}/SARibbonBarLayout.cpp"
+    "${SARIBBON_SOURCE_DIR}/SARibbonButtonGroupWidget.cpp"
+    "${SARIBBON_SOURCE_DIR}/SARibbonCategory.cpp"
+    "${SARIBBON_SOURCE_DIR}/SARibbonCategoryLayout.cpp"
+    "${SARIBBON_SOURCE_DIR}/SARibbonColorToolButton.cpp"
+    "${SARIBBON_SOURCE_DIR}/SARibbonContextCategory.cpp"
+    "${SARIBBON_SOURCE_DIR}/SARibbonCtrlContainer.cpp"
+    "${SARIBBON_SOURCE_DIR}/SARibbonCustomizeData.cpp"
+    "${SARIBBON_SOURCE_DIR}/SARibbonCustomizeDialog.cpp"
+    "${SARIBBON_SOURCE_DIR}/SARibbonCustomizeWidget.cpp"
+    "${SARIBBON_SOURCE_DIR}/SARibbonElementFactory.cpp"
+    "${SARIBBON_SOURCE_DIR}/SARibbonElementManager.cpp"
+    "${SARIBBON_SOURCE_DIR}/SARibbonGallery.cpp"
+    "${SARIBBON_SOURCE_DIR}/SARibbonGalleryGroup.cpp"
+    "${SARIBBON_SOURCE_DIR}/SARibbonGalleryItem.cpp"
+    "${SARIBBON_SOURCE_DIR}/SARibbonLineWidgetContainer.cpp"
+    "${SARIBBON_SOURCE_DIR}/SARibbonMainWindow.cpp"
+    "${SARIBBON_SOURCE_DIR}/SARibbonMdiControlsStyle.cpp"
+    "${SARIBBON_SOURCE_DIR}/SARibbonMenu.cpp"
+    "${SARIBBON_SOURCE_DIR}/SARibbonPanel.cpp"
+    "${SARIBBON_SOURCE_DIR}/SARibbonPanelItem.cpp"
+    "${SARIBBON_SOURCE_DIR}/SARibbonPanelLayout.cpp"
+    "${SARIBBON_SOURCE_DIR}/SARibbonPanelOptionButton.cpp"
+    "${SARIBBON_SOURCE_DIR}/SARibbonQuickAccessBar.cpp"
+    "${SARIBBON_SOURCE_DIR}/SARibbonSeparatorWidget.cpp"
+    "${SARIBBON_SOURCE_DIR}/SARibbonStackedWidget.cpp"
+    "${SARIBBON_SOURCE_DIR}/SARibbonSystemButtonBar.cpp"
+    "${SARIBBON_SOURCE_DIR}/SARibbonTabBar.cpp"
+    "${SARIBBON_SOURCE_DIR}/SARibbonThemeManager.cpp"
+    "${SARIBBON_SOURCE_DIR}/SARibbonTitleIconWidget.cpp"
+    "${SARIBBON_SOURCE_DIR}/SARibbonToolButton.cpp"
+    "${SARIBBON_SOURCE_DIR}/SARibbonUtil.cpp"
+    "${SARIBBON_SOURCE_DIR}/SARibbonWidget.cpp"
+    "${SARIBBON_COLORWIDGETS_DIR}/SAColorGridWidget.cpp"
+    "${SARIBBON_COLORWIDGETS_DIR}/SAColorMenu.cpp"
+    "${SARIBBON_COLORWIDGETS_DIR}/SAColorPaletteGridWidget.cpp"
+    "${SARIBBON_COLORWIDGETS_DIR}/SAColorToolButton.cpp"
 )
 
 # =====================================================================
@@ -221,6 +253,8 @@ target_compile_definitions(saribbon_lib PRIVATE
 
 target_include_directories(saribbon_lib PUBLIC
     ${SARIBBON_SOURCE_DIR}
+    ${SARIBBON_CORE_DIR}
+    ${SARIBBON_CORE_INCLUDE_MIRROR}
     ${SARIBBON_COLORWIDGETS_DIR}
     ${OPENGL_INCLUDE_DIR}
 )
@@ -250,6 +284,11 @@ set(SHIBOKEN_OPTIONS
     --output-directory=${CMAKE_CURRENT_BINARY_DIR}
 )
 
+# plan-03 S3.0: project include paths (core + mirror + widgets) for the shiboken parser
+list(APPEND SHIBOKEN_OPTIONS "-I${SARIBBON_CORE_DIR}")
+list(APPEND SHIBOKEN_OPTIONS "-I${SARIBBON_CORE_INCLUDE_MIRROR}")
+list(APPEND SHIBOKEN_OPTIONS "-I${SARIBBON_SOURCE_DIR}")
+list(APPEND SHIBOKEN_OPTIONS "-I${SARIBBON_COLORWIDGETS_DIR}")
 # Add Qt include directories
 foreach(module Core Gui Widgets)
     get_property(module_includes TARGET Qt6::${module} PROPERTY INTERFACE_INCLUDE_DIRECTORIES)
@@ -354,6 +393,8 @@ target_compile_definitions(saribbon PRIVATE
 
 target_include_directories(saribbon PRIVATE
     ${SHIBOKEN6_INCLUDE_DIR}
+    ${SARIBBON_CORE_DIR}
+    ${SARIBBON_CORE_INCLUDE_MIRROR}
     ${PYSIDE_INCLUDE_DIR}
     ${PYSIDE_INCLUDE_DIR}/QtCore
     ${PYSIDE_INCLUDE_DIR}/QtGui
