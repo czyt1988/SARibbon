@@ -271,6 +271,13 @@
 - 其余 workflow（linux-qt6.8 含 core-only/qml 轴、win-qt5.15、win-qt6.8 含 static 轴、Amalgamation）状态见推送后实跑。
 - 影响计划：01/02/04 的"CI 绿"验收口径——mac-qt6.8 一项按环境漂移豁免（有 master 同败证据），其余以实跑为准
 
+### B30：CI 第二轮修复（黄金 blob 环境守卫 + 颜色测试 offscreen 段错误）
+- 日期：2026-09-30
+- 接 B29：修复推送后的 CI 实跑暴露两个测试基础设施问题（均非布局引擎/产品代码问题）：
+  1. **core_PanelLayoutGolden 在 linux-qt5.15 必败**：黄金 blob 是在 Windows/Qt6.7.3 + SimSun 9 环境录制的，含字体相关的按钮 sizeHint 值（CI 无 SimSun → fallback 字体 hint 宽 54 vs 50）且 blob 头有 `qt=6.7.3` 版本行。**教训：QFontInfo 不能当字体可用性守卫**（返回本地化 family 名，SimSun 在中文 Windows 解析为本地名，字符串比较永假）。修法：`#if !defined(Q_OS_WIN) || (QT_VERSION < QT_VERSION_CHECK(6,0,0)) QSKIP`——blob 测试限定录制环境族（Windows/Qt6）运行，golden 文件去掉 qt= 行重录；**CI 的跨平台黄金门是引擎级 core_PanelLayoutEngine**（FakeItem 显式输入，零字体依赖，S5.2-4 设计意图本就如此）。
+  2. **SARibbonToolButtonColorTest 在 CI 全红（所有分支）**：拉取 linux-qt5.15 运行历史实证——该测试 2026-09-16（2.9.5 时代）加入，此后**每个分支**（master/dev/v2.9.5 tag/dev-3.0）的该 workflow 全部失败，最后绿的一次（#474/475, 2026-09-13）早于测试加入。根因：`QWidget::grab()` 在 offscreen 平台段错误（signal 11）。修法：initTestCase 加平台名守卫，offscreen 下 QSKIP（B15 的本地结论获得 CI 证据链补强：远程桌面与 headless CI 同为"无真实窗口系统"场景）。测试在真实窗口平台（本地常规会话）仍完整运行。
+- 影响计划：02-S5.0（黄金测试环境口径）、B15（补 CI 证据链）；CI 矩阵剩余已知项仅 mac-qt6.8 AGL 环境漂移（B29）
+
 ### B21：类作用域 using 声明无法引入命名空间枚举符（计划 02 S1 round3 断言错误，MSVC C2886）
 - 日期：2026-09-30（计划 02 S1 执行）
 - 发现位置：计划 02 S1 第 1 条 RowProportion 兼容机制

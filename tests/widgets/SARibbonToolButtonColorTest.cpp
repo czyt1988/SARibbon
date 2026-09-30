@@ -5,6 +5,7 @@
 #include <QLabel>
 #include <QPalette>
 #include <QWidget>
+#include <QGuiApplication>
 #include "SARibbonToolButton.h"
 
 /**
@@ -50,10 +51,22 @@ class SARibbonToolButtonColorTest : public QObject
 {
     Q_OBJECT
 private slots:
+    void initTestCase();
     void testForegroundRoleColor();
     void testStyleSheetColor();
     void testHoverStyleSheetColor();
 };
+
+void SARibbonToolButtonColorTest::initTestCase()
+{
+    // QWidget::grab() segfaults on the offscreen platform (Qt 5.15 CI runners);
+    // the pixel assertions need a real windowing system. This test has been red
+    // on every branch since it was added (2.9.5, 2026-09-16) for exactly this
+    // reason — see NOTES B15. Skip cleanly on offscreen instead of crashing.
+    if (QGuiApplication::platformName() == QLatin1String("offscreen")) {
+        QSKIP("QWidget::grab() crashes on the offscreen platform; color tests need a real windowing system");
+    }
+}
 
 void SARibbonToolButtonColorTest::testForegroundRoleColor()
 {
