@@ -1123,6 +1123,258 @@ QColor SARibbonThemeData::themeBaselineColor(SARibbonTheme theme)
 
 /*** End of inlined file: SARibbonThemeData.cpp ***/
 
+
+/*** Start of inlined file: SARibbonMetrics.cpp ***/
+#include "SARibbon.h"
+
+namespace SARibbon
+{
+namespace Core
+{
+
+SARibbonMetrics::SARibbonMetrics() : mFontMetrics(QFont())
+{
+}
+
+SARibbonMetrics::SARibbonMetrics(const QFontMetrics& fm, qreal devicePixelRatio)
+	: mFontMetrics(fm), mDevicePixelRatio(devicePixelRatio)
+{
+}
+
+void SARibbonMetrics::setFontMetrics(const QFontMetrics& fm)
+{
+	mFontMetrics = fm;
+}
+
+void SARibbonMetrics::setDevicePixelRatio(qreal dpr)
+{
+	mDevicePixelRatio = dpr;
+}
+
+void SARibbonMetrics::setStylePixelMetrics(int pmTabBarBaseHeight, int pmTabBarTabHSpace, int pmTabBarTabOverlap, int pmTitleBarHeight)
+{
+	mPmTabBarBaseHeight = pmTabBarBaseHeight;
+	mPmTabBarTabHSpace  = pmTabBarTabHSpace;
+	mPmTabBarTabOverlap = pmTabBarTabOverlap;
+	mPmTitleBarHeight   = pmTitleBarHeight;
+}
+
+int SARibbonMetrics::systemTabBarHeight() const
+{
+	return mPmTabBarBaseHeight + mPmTabBarTabHSpace + mPmTabBarTabOverlap;
+}
+
+/**
+ * @brief 估算标签栏的高度（自 SARibbonBarLayout.cpp 纯 move）
+ * @return 计算出的标签栏高度
+ */
+int SARibbonMetrics::calcDefaultTabBarHeight() const
+{
+	int defaultHeight = systemTabBarHeight();
+	int fontHeight = mFontMetrics.lineSpacing();  // Use lineSpacing instead of height for better font compatibility
+	int defaultHeight2 = fontHeight * 1.6;
+	if (defaultHeight2 < fontHeight + 10) {
+		defaultHeight2 = fontHeight + 10;  // To accommodate office2021 theme with 4px bottom bar
+	}
+	int r = qMax(defaultHeight, defaultHeight2);
+	if (r < 20) {
+		r = 20;
+	}
+	return r;
+}
+
+/**
+ * @brief 估算标题栏的高度（自 SARibbonBarLayout.cpp 纯 move）
+ * @return 计算出的标题栏高度
+ */
+int SARibbonMetrics::calcDefaultTitleBarHeight() const
+{
+	int defaultHeight  = mPmTitleBarHeight;
+	int defaultHeight2 = mFontMetrics.height() * 1.8;
+	int r              = qMax(defaultHeight, defaultHeight2);
+	if (r < 25) {
+		r = 25;
+	}
+	return r;
+}
+
+/**
+ * @brief 根据当前Ribbon风格估算类别的高度（自 SARibbonBarLayout.cpp 纯 move）
+ * @note 经过对照，1.6行高和office的高度比较接近。
+ *       SingleRow模式下面板标题隐藏，因此不添加panelTitleHeight。
+ * @return 计算出的类别高度
+ */
+int SARibbonMetrics::calcCategoryHeight(bool isThreeRowStyle, bool isSingleRowStyle) const
+{
+	int textH = mFontMetrics.lineSpacing();
+	if (isThreeRowStyle) {
+		// 4.8 = 3*1.6 for three rows
+		return textH * 4.8 + panelTitleHeight;
+	} else if (isSingleRowStyle) {
+		// 1.8 for single row, no panel title in single-row mode
+		return textH * 2;
+	} else {
+		// 3.2 = 2*1.6 for two rows
+		return textH * 3.2 + panelTitleHeight;
+	}
+}
+
+/**
+ * @brief 计算主栏高度（自 SARibbonBarLayout.cpp 静态纯函数纯 move）
+ * @param tabBarHeight Tab bar height
+ * @param titleHeight Title bar height
+ * @param categoryHeight Category height
+ * @param tabOnTitle Whether tab is on title
+ * @param minimumMode Whether the ribbon is in minimum mode
+ * @return 计算出的主栏高度
+ */
+int SARibbonMetrics::calcMainBarHeight(int tabBarHeight, int titleHeight, int categoryHeight, bool tabOnTitle, bool minimumMode)
+{
+	if (minimumMode) {
+		// Minimum mode, no category height
+		if (tabOnTitle) {
+			return titleHeight;
+		} else {
+			return titleHeight + tabBarHeight;
+		}
+	} else {
+		if (tabOnTitle) {
+			return titleHeight + categoryHeight;
+		} else {
+			return tabBarHeight + titleHeight + categoryHeight;
+		}
+	}
+}
+
+void SARibbonMetrics::estimateSizeHint(bool isThreeRowStyle, bool isSingleRowStyle)
+{
+	titleBarHeight = calcDefaultTitleBarHeight();
+	// If tabBarHeight is greater than 0, use user-set value
+	tabBarHeight   = calcDefaultTabBarHeight();
+	categoryHeight = calcCategoryHeight(isThreeRowStyle, isSingleRowStyle);
+}
+
+int SARibbonMetrics::getActualTitleBarHeight() const
+{
+	if (mUserDefTitleBarHeight) {
+		return *mUserDefTitleBarHeight;
+	} else {
+		return titleBarHeight;
+	}
+}
+
+int SARibbonMetrics::getActualTabBarHeight() const
+{
+	if (mUserDefTabBarHeight) {
+		return *mUserDefTabBarHeight;
+	} else {
+		return tabBarHeight;
+	}
+}
+
+int SARibbonMetrics::getActualCategoryHeight() const
+{
+	if (mUserDefCategoryHeight) {
+		return *mUserDefCategoryHeight;
+	} else {
+		return categoryHeight;
+	}
+}
+
+void SARibbonMetrics::setTitleBarHeight(int h)
+{
+	mUserDefTitleBarHeight = h;
+}
+
+void SARibbonMetrics::setTabBarHeight(int h)
+{
+	mUserDefTabBarHeight = h;
+}
+
+void SARibbonMetrics::setCategoryHeight(int h)
+{
+	mUserDefCategoryHeight = h;
+}
+
+QFontMetrics SARibbonMetrics::fontMetrics() const
+{
+	return mFontMetrics;
+}
+
+qreal SARibbonMetrics::devicePixelRatio() const
+{
+	return mDevicePixelRatio;
+}
+
+}
+}
+
+/*** End of inlined file: SARibbonMetrics.cpp ***/
+
+
+/*** Start of inlined file: SARibbonCustomizeRecord.cpp ***/
+namespace SARibbon
+{
+namespace Core
+{
+
+SARibbonCustomizeRecord::SARibbonCustomizeRecord()
+	: indexValue(-1)
+	, actionRowProportionValue(SARibbonRowProportion::Large)
+	, mType(UnknowActionType)
+{
+}
+
+SARibbonCustomizeRecord::SARibbonCustomizeRecord(ActionType type)
+	: indexValue(-1)
+	, actionRowProportionValue(SARibbonRowProportion::Large)
+	, mType(type)
+{
+}
+
+SARibbonCustomizeRecord::~SARibbonCustomizeRecord()
+{
+}
+
+SARibbonCustomizeRecord::ActionType SARibbonCustomizeRecord::actionType() const
+{
+	return (mType);
+}
+
+void SARibbonCustomizeRecord::setActionType(SARibbonCustomizeRecord::ActionType a)
+{
+	mType = a;
+}
+
+bool SARibbonCustomizeRecord::isValid() const
+{
+	return (actionType() != UnknowActionType);
+}
+
+}
+}
+
+/*** End of inlined file: SARibbonCustomizeRecord.cpp ***/
+
+
+/*** Start of inlined file: SARibbonContract.cpp ***/
+#include "SARibbon.h"
+#include "SARibbon.h"
+
+namespace SARibbon
+{
+namespace Core
+{
+
+SARibbonAbstractLayoutItem::~SARibbonAbstractLayoutItem() = default;
+SARibbonAbstractCategoryItem::~SARibbonAbstractCategoryItem() = default;
+SARibbonAbstractLayoutHost::~SARibbonAbstractLayoutHost() = default;
+
+}
+}
+
+/*** End of inlined file: SARibbonContract.cpp ***/
+
 // disable warnings about unsafe standard library calls
 #ifdef _MSC_VER
 #pragma push_macro ("_CRT_SECURE_NO_WARNINGS")
@@ -28507,6 +28759,7 @@ void SARibbonBar::paintWindowTitle(QPainter& painter, const QString& title, cons
 
 
 /*** Start of inlined file: SARibbonBarLayout.cpp ***/
+#include "SARibbon.h"
 #include <QStyle>
 #include <QApplication>
 #include <QScreen>
@@ -28517,18 +28770,11 @@ public:
 	SARibbonBar* ribbonBar;
 	QList< QLayoutItem* > items;
 	QRect titleRect;
-	int titleBarHeight { 30 };    ///< Title bar height
-	int tabBarHeight { 28 };      ///< Tab bar height
-	int panelTitleHeight { 15 };  ///< Panel title default height
-	int categoryHeight { 60 };    ///< Category height
+	// plan-02 S3: metrics collected into core SARibbonMetrics (public API and behavior unchanged)
+	SARibbon::Core::SARibbonMetrics metrics;  ///< title bar height / tab bar height / panel title height / category height (2.9.5 defaults 30/28/15/60)
 
-	int maxMinWidth { 1000 };  ///< Maximum minimum width, usually 0.8 of screen width to avoid exceeding screen
-	int minWidth { 500 };
-	int minHeight { 0 };
+	// maxMinWidth/minWidth/minHeight now live in metrics (plan-02 S3); access via metrics.
 	bool isTabOnTitle { false };  ///< Whether tab is on title bar
-	std::unique_ptr< int > userDefTitleBarHeight;  ///< User-defined title bar height, normally auto-calculated
-	std::unique_ptr< int > userDefTabBarHeight;  ///< User-defined tab bar height, normally auto-calculated
-	std::unique_ptr< int > userDefCategoryHeight;  ///< User-defined category height, normally auto-calculated
 	QSize systemButtonSize;  ///< System button size (close, maximize, etc.) from SARibbonMainWindow
 	bool isApplicationButtonVerticalExpansion {
 		false
@@ -28548,17 +28794,25 @@ public:
 	 */
 	PrivateData(SARibbonBar* bar) : ribbonBar(bar), systemButtonSize(0, 0)
 	{
+		// plan-02 S3: feed platform inputs (font metrics + QStyle pixel metrics)
+		// into core SARibbonMetrics; core never queries widgets itself
+		QStyle* style = bar->style();
+		metrics.setStylePixelMetrics(style->pixelMetric(QStyle::PM_TabBarBaseHeight),
+									 style->pixelMetric(QStyle::PM_TabBarTabHSpace),
+									 style->pixelMetric(QStyle::PM_TabBarTabOverlap),
+									 style->pixelMetric(QStyle::PM_TitleBarHeight));
+		metrics.setFontMetrics(bar->fontMetrics());
 		// Get primary screen size
 		QScreen* primaryScreen = QGuiApplication::primaryScreen();
 		if (currentRibbonMode() == SARibbonBar::MinimumRibbonMode) {
-			minHeight = getActualTitleBarHeight() + (isTabOnTitle ? 0 : getActualTabBarHeight());
+			metrics.minHeight = getActualTitleBarHeight() + (isTabOnTitle ? 0 : getActualTabBarHeight());
 		} else {
-			minHeight = getActualTitleBarHeight() + getActualCategoryHeight()
-						+ (isTabOnTitle ? 0 : getActualTabBarHeight());
+			metrics.minHeight = getActualTitleBarHeight() + getActualCategoryHeight()
+							   + (isTabOnTitle ? 0 : getActualTabBarHeight());
 		}
 		if (primaryScreen) {
 			QRect screenGeometry = primaryScreen->geometry();
-			maxMinWidth = screenGeometry.width() * 0.8;  // Screen width
+			metrics.maxMinWidth = screenGeometry.width() * 0.8;  // Screen width
 		}
 	}
 
@@ -28719,11 +28973,7 @@ public:
 	 */
 	void setTitleBarHeight(int h)
 	{
-		if (!userDefTitleBarHeight) {
-			userDefTitleBarHeight = std::make_unique< int >(h);
-		} else {
-			*userDefTitleBarHeight = h;
-		}
+		metrics.setTitleBarHeight(h);
 	}
 
 	/**
@@ -28739,11 +28989,7 @@ public:
 	 */
 	void setTabBarHeight(int h)
 	{
-		if (!userDefTabBarHeight) {
-			userDefTabBarHeight = std::make_unique< int >(h);
-		} else {
-			*userDefTabBarHeight = h;
-		}
+		metrics.setTabBarHeight(h);
 	}
 
 	/**
@@ -28759,11 +29005,7 @@ public:
 	 */
 	void setCategoryHeight(int h)
 	{
-		if (!userDefCategoryHeight) {
-			userDefCategoryHeight = std::make_unique< int >(h);
-		} else {
-			*userDefCategoryHeight = h;
-		}
+		metrics.setCategoryHeight(h);
 	}
 
 	/**
@@ -28779,11 +29021,7 @@ public:
 	 */
 	int getActualTitleBarHeight() const
 	{
-		if (userDefTitleBarHeight) {
-			return *userDefTitleBarHeight;
-		} else {
-			return titleBarHeight;
-		}
+		return metrics.getActualTitleBarHeight();
 	}
 
 	/**
@@ -28799,11 +29037,7 @@ public:
 	 */
 	int getActualTabBarHeight() const
 	{
-		if (userDefTabBarHeight) {
-			return *userDefTabBarHeight;
-		} else {
-			return tabBarHeight;
-		}
+		return metrics.getActualTabBarHeight();
 	}
 
 	/**
@@ -28819,11 +29053,7 @@ public:
 	 */
 	int getActualCategoryHeight() const
 	{
-		if (userDefCategoryHeight) {
-			return *userDefCategoryHeight;
-		} else {
-			return categoryHeight;
-		}
+		return metrics.getActualCategoryHeight();
 	}
 
 	/**
@@ -28837,146 +29067,14 @@ public:
 	 */
 	void estimateSizeHint()
 	{
-		titleBarHeight = calcDefaultTitleBarHeight();
-		// If tabBarHeight is greater than 0, use user-set value
-		tabBarHeight   = calcDefaultTabBarHeight();
-		categoryHeight = calcCategoryHeight();
-	}
-
-	/**
-	 * \if ENGLISH
-	 * @brief Get the system tab bar height
-	 * @return The system tab bar height
-	 * \endif
-	 *
-	 * \if CHINESE
-	 * @brief 获取系统标签栏高度
-	 * @return 系统标签栏高度
-	 * \endif
-	 */
-	int systemTabBarHeight() const
-	{
+		// plan-02 S3: re-feed inputs before deriving (font may have changed, cpp:4118 path)
 		QStyle* style = ribbonBar->style();
-		return style->pixelMetric(QStyle::PM_TabBarBaseHeight) + style->pixelMetric(QStyle::PM_TabBarTabHSpace)
-			   + style->pixelMetric(QStyle::PM_TabBarTabOverlap);
-	}
-
-	/**
-	 * \if ENGLISH
-	 * @brief Calculate default tab bar height
-	 * @return The calculated tab bar height
-	 * \endif
-	 *
-	 * \if CHINESE
-	 * @brief 估算标签栏的高度
-	 * @return 计算出的标签栏高度
-	 * \endif
-	 */
-	int calcDefaultTabBarHeight()
-	{
-		int defaultHeight = systemTabBarHeight();
-		int fontHeight = ribbonBar->fontMetrics().lineSpacing();  // Use lineSpacing instead of height for better font compatibility
-		int defaultHeight2 = fontHeight * 1.6;
-		if (defaultHeight2 < fontHeight + 10) {
-			defaultHeight2 = fontHeight + 10;  // To accommodate office2021 theme with 4px bottom bar
-		}
-		int r = qMax(defaultHeight, defaultHeight2);
-		if (r < 20) {
-			r = 20;
-		}
-		return r;
-	}
-
-	/**
-	 * \if ENGLISH
-	 * @brief Calculate default title bar height
-	 * @return The calculated title bar height
-	 * \endif
-	 *
-	 * \if CHINESE
-	 * @brief 估算标题栏的高度
-	 * @return 计算出的标题栏高度
-	 * \endif
-	 */
-	int calcDefaultTitleBarHeight()
-	{
-		int defaultHeight  = ribbonBar->style()->pixelMetric(QStyle::PM_TitleBarHeight);
-		int defaultHeight2 = ribbonBar->fontMetrics().height() * 1.8;
-		int r              = qMax(defaultHeight, defaultHeight2);
-		if (r < 25) {
-			r = 25;
-		}
-		return r;
-	}
-
-	/**
-	 * \if ENGLISH
-	 * @brief Calculate category height based on current ribbon style
-	 * @note 1.6 line height is close to Office's height.
-	 *       SingleRow mode has no panel title, so panelTitleHeight is not added.
-	 * @return The calculated category height
-	 * \endif
-	 *
-	 * \if CHINESE
-	 * @brief 根据当前Ribbon风格估算类别的高度
-	 * @note 经过对照，1.6行高和office的高度比较接近。
-	 *       SingleRow模式下面板标题隐藏，因此不添加panelTitleHeight。
-	 * @return 计算出的类别高度
-	 * \endif
-	 */
-	int calcCategoryHeight()
-	{
-		int textH = ribbonBar->fontMetrics().lineSpacing();
-		if (ribbonBar->isThreeRowStyle()) {
-			// 4.8 = 3*1.6 for three rows
-			return textH * 4.8 + panelTitleHeight;
-		} else if (ribbonBar->isSingleRowStyle()) {
-			// 1.8 for single row, no panel title in single-row mode
-			return textH * 2;
-		} else {
-			// 3.2 = 2*1.6 for two rows
-			return textH * 3.2 + panelTitleHeight;
-		}
-	}
-
-	/**
-	 * \if ENGLISH
-	 * @brief Calculate main bar height
-	 * @param tabHegith Tab bar height
-	 * @param titleHeight Title bar height
-	 * @param categoryHeight Category height
-	 * @param tabOnTitle Whether tab is on title
-	 * @param rMode Ribbon mode
-	 * @return The calculated main bar height
-	 * \endif
-	 *
-	 * \if CHINESE
-	 * @brief 计算主栏高度
-	 * @param tabHegith 标签栏高度
-	 * @param titleHeight 标题栏高度
-	 * @param categoryHeight 类别高度
-	 * @param tabOnTitle 标签是否在标题栏上
-	 * @param rMode 功能区模式
-	 * @return 计算出的主栏高度
-	 * \endif
-	 */
-	static int
-	calcMainBarHeight(int tabHegith, int titleHeight, int categoryHeight, bool tabOnTitle, SARibbonBar::RibbonMode rMode)
-	{
-		if (rMode == SARibbonBar::MinimumRibbonMode) {
-			// Minimum mode, no category height
-			if (tabOnTitle) {
-				return titleHeight;
-			} else {
-				return titleHeight + tabHegith;
-			}
-		} else {
-			if (tabOnTitle) {
-				return titleHeight + categoryHeight;
-			} else {
-				return tabHegith + titleHeight + categoryHeight;
-			}
-		}
+		metrics.setStylePixelMetrics(style->pixelMetric(QStyle::PM_TabBarBaseHeight),
+									 style->pixelMetric(QStyle::PM_TabBarTabHSpace),
+									 style->pixelMetric(QStyle::PM_TabBarTabOverlap),
+									 style->pixelMetric(QStyle::PM_TitleBarHeight));
+		metrics.setFontMetrics(ribbonBar->fontMetrics());
+		metrics.estimateSizeHint(ribbonBar->isThreeRowStyle(), ribbonBar->isSingleRowStyle());
 	}
 
 	/**
@@ -28991,11 +29089,12 @@ public:
 	void resetSize()
 	{
 		estimateSizeHint();
-		int mainBarHeight = calcMainBarHeight(getActualTabBarHeight(),
-											  getActualTitleBarHeight(),
-											  getActualCategoryHeight(),
-											  isTabOnTitle,
-											  ribbonBar->currentRibbonState());
+		int mainBarHeight = SARibbon::Core::SARibbonMetrics::calcMainBarHeight(
+			getActualTabBarHeight(),
+			getActualTitleBarHeight(),
+			getActualCategoryHeight(),
+			isTabOnTitle,
+			ribbonBar->currentRibbonState() == SARibbonBar::MinimumRibbonMode);
 		// In minimum mode, bar height is tab bar bottom, this adjustment must be after resize event
 		// After upgrading to Qt 6, setFixedHeight can cause exceptions because:
 		// void QWidget::setFixedHeight(int h) {
@@ -29012,7 +29111,7 @@ public:
 			ribbonBar->setMaximumHeight(QWIDGETSIZE_MAX);
 		}
 		ribbonBar->setFixedHeight(mainBarHeight);
-		minHeight = mainBarHeight;  // minHeight matches mainBarHeight
+		metrics.minHeight = mainBarHeight;  // minHeight matches mainBarHeight
 	}
 
 	/**
@@ -29028,11 +29127,11 @@ public:
 	 */
 	int minimumModeMainBarHeight()
 	{
-		return calcMainBarHeight(getActualTabBarHeight(),
+		return SARibbon::Core::SARibbonMetrics::calcMainBarHeight(getActualTabBarHeight(),
 								 getActualTitleBarHeight(),
 								 getActualCategoryHeight(),
 								 isTabOnTitle,
-								 SARibbonBar::MinimumRibbonMode);
+								 true);
 	}
 
 	/**
@@ -29048,11 +29147,11 @@ public:
 	 */
 	int normalModeMainBarHeight()
 	{
-		return calcMainBarHeight(getActualTabBarHeight(),
+		return SARibbon::Core::SARibbonMetrics::calcMainBarHeight(getActualTabBarHeight(),
 								 getActualTitleBarHeight(),
 								 getActualCategoryHeight(),
 								 isTabOnTitle,
-								 SARibbonBar::NormalRibbonMode);
+								 false);
 	}
 };
 
@@ -29193,10 +29292,10 @@ int SARibbonBarLayout::count() const
  */
 QSize SARibbonBarLayout::sizeHint() const
 {
-	int height = d_ptr->minHeight;
-	int width  = d_ptr->minWidth;
-	if (width > d_ptr->maxMinWidth) {
-		width = d_ptr->maxMinWidth;
+	int height = d_ptr->metrics.minHeight;
+	int width  = d_ptr->metrics.minWidth;
+	if (width > d_ptr->metrics.maxMinWidth) {
+		width = d_ptr->metrics.maxMinWidth;
 	}
 	return QSize(width, height);
 }
@@ -29523,7 +29622,7 @@ void SARibbonBarLayout::setCategoryHeight(int h)
  */
 int SARibbonBarLayout::panelTitleHeight() const
 {
-	return d_ptr->panelTitleHeight;
+	return d_ptr->metrics.panelTitleHeight;
 }
 
 /**
@@ -29539,7 +29638,7 @@ int SARibbonBarLayout::panelTitleHeight() const
  */
 void SARibbonBarLayout::setPanelTitleHeight(int h)
 {
-	d_ptr->panelTitleHeight = h;
+	d_ptr->metrics.panelTitleHeight = h;
 }
 
 /**
@@ -30077,7 +30176,7 @@ void SARibbonBarLayout::resizeInLooseStyle()
 			}
 		}
 
-		d_ptr->minWidth = barMinWidth;
+		d_ptr->metrics.minWidth = barMinWidth;
 		layoutTitleRect();
 		layoutStackedContainerWidget();
 	} else {
@@ -30218,7 +30317,7 @@ void SARibbonBarLayout::resizeInLooseStyle()
 			}
 		}
 
-		d_ptr->minWidth = barMinWidth;
+		d_ptr->metrics.minWidth = barMinWidth;
 
 		// 5. 更新标题区域
 		layoutTitleRect();
@@ -30358,7 +30457,7 @@ void SARibbonBarLayout::resizeInCompactStyle()
 			}
 		}
 
-		d_ptr->minWidth = barMinWidth;
+		d_ptr->metrics.minWidth = barMinWidth;
 		layoutTitleRect();
 		layoutStackedContainerWidget();
 	} else {
@@ -30480,7 +30579,7 @@ void SARibbonBarLayout::resizeInCompactStyle()
 			}
 		}
 
-		d_ptr->minWidth = barMinWidth;
+		d_ptr->metrics.minWidth = barMinWidth;
 
 		// 5. 更新标题区域
 		layoutTitleRect();
@@ -30915,6 +31014,8 @@ void SARibbonElementManager::setupFactory(SARibbonElementFactory* fac)
 
 
 /*** Start of inlined file: SARibbonCustomizeData.cpp ***/
+#include "SARibbon.h"
+
 #include <QDebug>
 #include <QObject>
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -30922,66 +31023,14 @@ void SARibbonElementManager::setupFactory(SARibbonElementFactory* fac)
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 SARibbonCustomizeData::SARibbonCustomizeData()
-	: indexValue(-1)
-	, actionRowProportionValue(SARibbonPanelItem::Large)
-	, mType(UnknowActionType)
+	: SARibbon::Core::SARibbonCustomizeRecord()
 	, mActionsManagerPointer(nullptr)
 {
 }
 
 SARibbonCustomizeData::SARibbonCustomizeData(ActionType type, SARibbonActionsManager* mgr)
-	: indexValue(-1), actionRowProportionValue(SARibbonPanelItem::Large), mType(type), mActionsManagerPointer(mgr)
+	: SARibbon::Core::SARibbonCustomizeRecord(type), mActionsManagerPointer(mgr)
 {
-}
-
-/**
- * \if ENGLISH
- * @brief Get the action type of the CustomizeData
- * @return Action type
- * \endif
- *
- * \if CHINESE
- * @brief 获取CustomizeData的action type
- * @return 操作类型
- * \endif
- */
-SARibbonCustomizeData::ActionType SARibbonCustomizeData::actionType() const
-{
-	return (mType);
-}
-
-/**
- * \if ENGLISH
- * @brief Set the action type of the CustomizeData
- * @param a Action type to set
- * \endif
- *
- * \if CHINESE
- * @brief 设置CustomizeData的action type
- * @param a 要设置的操作类型
- * \endif
- */
-void SARibbonCustomizeData::setActionType(SARibbonCustomizeData::ActionType a)
-{
-	mType = a;
-}
-
-/**
- * \if ENGLISH
- * @brief Check if this is a valid CustomizeData
- * @details Actual logic: actionType() != UnknowActionType
- * @return true if the CustomizeData is valid
- * \endif
- *
- * \if CHINESE
- * @brief 判断是否是一个正常的CustomizeData
- * @details 实际逻辑actionType() != UnknowActionType
- * @return 有用的CustomizeData返回true
- * \endif
- */
-bool SARibbonCustomizeData::isValid() const
-{
-	return (actionType() != UnknowActionType);
 }
 
 /**
@@ -31807,147 +31856,10 @@ void SARibbonCustomizeData::setCanCustomize(QObject* obj, bool canbe)
 	obj->setProperty(SA_RIBBON_BAR_PROP_CAN_CUSTOMIZE, canbe);
 }
 
-QList< SARibbonCustomizeData > remove_indexs(const QList< SARibbonCustomizeData >& csd, const QList< int >& willremoveIndex);
-
-QList< SARibbonCustomizeData > remove_indexs(const QList< SARibbonCustomizeData >& csd, const QList< int >& willremoveIndex)
-{
-	QList< SARibbonCustomizeData > res;
-
-	for (int i = 0; i < csd.size(); ++i) {
-		if (!willremoveIndex.contains(i)) {
-			res << csd[ i ];
-		}
-	}
-	return (res);
-}
-
-/**
- * @brief 对QList<SARibbonCustomizeData>进行简化操作
- *
- * 此函数会执行如下操作：
- * 1、针对同一个category/panel连续出现的添加和删除操作进行移除（前一步添加，后一步删除）
- *
- * 2、针对VisibleCategoryActionType，对于连续出现的操作只保留最后一步
- *
- * 3、针对RenameCategoryActionType和RenamePanelActionType操作，只保留最后一个
- *
- * 4、针对连续的ChangeCategoryOrderActionType，ChangePanelOrderActionType，ChangeActionOrderActionType进行合并为一个动作，
- * 如果合并后原地不动，则删除
- *
- * @param csd
- * @return 返回简化的QList<SARibbonCustomizeData>
- */
 QList< SARibbonCustomizeData > SARibbonCustomizeData::simplify(const QList< SARibbonCustomizeData >& csd)
 {
-	int size = csd.size();
-
-	if (size <= 1) {
-		return (csd);
-	}
-	QList< SARibbonCustomizeData > res;
-	QList< int > willremoveIndex;  // 记录要删除的index
-
-	//! 首先针对连续出现的添加和删除操作进行优化
-	for (int i = 1; i < size; ++i) {
-		if ((csd[ i - 1 ].actionType() == AddCategoryActionType) && (csd[ i ].actionType() == RemoveCategoryActionType)) {
-			if (csd[ i - 1 ].categoryObjNameValue == csd[ i ].categoryObjNameValue) {
-				willremoveIndex << i - 1 << i;
-			}
-		} else if ((csd[ i - 1 ].actionType() == AddPanelActionType) && (csd[ i ].actionType() == RemovePanelActionType)) {
-			if ((csd[ i - 1 ].panelObjNameValue == csd[ i ].panelObjNameValue)
-				&& (csd[ i - 1 ].categoryObjNameValue == csd[ i ].categoryObjNameValue)) {
-				willremoveIndex << i - 1 << i;
-			}
-		} else if ((csd[ i - 1 ].actionType() == AddActionActionType) && (csd[ i ].actionType() == RemoveActionActionType)) {
-			if ((csd[ i - 1 ].keyValue == csd[ i ].keyValue) && (csd[ i - 1 ].panelObjNameValue == csd[ i ].panelObjNameValue)
-				&& (csd[ i - 1 ].categoryObjNameValue == csd[ i ].categoryObjNameValue)) {
-				willremoveIndex << i - 1 << i;
-			}
-		}
-	}
-	res = remove_indexs(csd, willremoveIndex);
-	willremoveIndex.clear();
-
-	//! 筛选VisibleCategoryActionType，对于连续出现的操作只保留最后一步
-	size = res.size();
-	for (int i = 1; i < size; ++i) {
-		if ((res[ i - 1 ].actionType() == VisibleCategoryActionType)
-			&& (res[ i ].actionType() == VisibleCategoryActionType)) {
-			if (res[ i - 1 ].categoryObjNameValue == res[ i ].categoryObjNameValue) {
-				// 要保证操作的是同一个内容
-				willremoveIndex << i - 1;  // 删除前一个只保留最后一个
-			}
-		}
-	}
-	res = remove_indexs(res, willremoveIndex);
-	willremoveIndex.clear();
-
-	//! 针对RenameCategoryActionType和RenamePanelActionType操作，只需保留最后一个
-	size = res.size();
-	for (int i = 0; i < size; ++i) {
-		if (res[ i ].actionType() == RenameCategoryActionType) {
-			// 向后查询，如果查询到有同一个Category改名，把这个索引加入删除队列
-			for (int j = i + 1; j < size; ++j) {
-				if ((res[ j ].actionType() == RenameCategoryActionType)
-					&& (res[ i ].categoryObjNameValue == res[ j ].categoryObjNameValue)) {
-					willremoveIndex << i;
-				}
-			}
-		} else if (res[ i ].actionType() == RenamePanelActionType) {
-			// 向后查询，如果查询到有同一个panel改名，把这个索引加入删除队列
-			for (int j = i + 1; j < size; ++j) {
-				if ((res[ j ].actionType() == RenamePanelActionType)
-					&& (res[ i ].panelObjNameValue == res[ j ].panelObjNameValue)
-					&& (res[ i ].categoryObjNameValue == res[ j ].categoryObjNameValue)) {
-					willremoveIndex << i;
-				}
-			}
-		}
-	}
-	res = remove_indexs(res, willremoveIndex);
-	willremoveIndex.clear();
-
-	//! 针对连续的ChangeCategoryOrderActionType，ChangePanelOrderActionType，ChangeActionOrderActionType进行合并
-	size = res.size();
-	for (int i = 1; i < size; ++i) {
-		if ((res[ i - 1 ].actionType() == ChangeCategoryOrderActionType)
-			&& (res[ i ].actionType() == ChangeCategoryOrderActionType)
-			&& (res[ i - 1 ].categoryObjNameValue == res[ i ].categoryObjNameValue)) {
-			// 说明连续两个顺序调整，把前一个indexvalue和后一个indexvalue相加，前一个删除
-			res[ i ].indexValue += res[ i - 1 ].indexValue;
-			willremoveIndex << i - 1;
-		} else if ((res[ i - 1 ].actionType() == ChangePanelOrderActionType)
-				   && (res[ i ].actionType() == ChangePanelOrderActionType)
-				   && (res[ i - 1 ].panelObjNameValue == res[ i ].panelObjNameValue)
-				   && (res[ i - 1 ].categoryObjNameValue == res[ i ].categoryObjNameValue)) {
-			// 说明连续两个顺序调整，把前一个indexvalue和后一个indexvalue相加，前一个删除
-			res[ i ].indexValue += res[ i - 1 ].indexValue;
-			willremoveIndex << i - 1;
-		} else if ((res[ i - 1 ].actionType() == ChangeActionOrderActionType)
-				   && (res[ i ].actionType() == ChangeActionOrderActionType) && (res[ i - 1 ].keyValue == res[ i ].keyValue)
-				   && (res[ i - 1 ].panelObjNameValue == res[ i ].panelObjNameValue)
-				   && (res[ i - 1 ].categoryObjNameValue == res[ i ].categoryObjNameValue)) {
-			// 说明连续两个顺序调整，把前一个indexvalue和后一个indexvalue相加，前一个删除
-			res[ i ].indexValue += res[ i - 1 ].indexValue;
-			willremoveIndex << i - 1;
-		}
-	}
-	res = remove_indexs(res, willremoveIndex);
-	willremoveIndex.clear();
-
-	//! 上一步操作可能会产生indexvalue为0的情况，此操作把indexvalue为0的删除
-	size = res.size();
-	for (int i = 0; i < size; ++i) {
-		if ((res[ i ].actionType() == ChangeCategoryOrderActionType) || (res[ i ].actionType() == ChangePanelOrderActionType)
-			|| (res[ i ].actionType() == ChangeActionOrderActionType)) {
-			if (0 == res[ i ].indexValue) {
-				willremoveIndex << i;
-			}
-		}
-	}
-	res = remove_indexs(res, willremoveIndex);
-	willremoveIndex.clear();
-	return (res);
+	// plan-02 S4.2: algorithm moved verbatim to the core template (SARibbonCustomizeRecord::simplify)
+	return SARibbon::Core::SARibbonCustomizeRecord::simplify(csd);
 }
 
 /*** End of inlined file: SARibbonCustomizeData.cpp ***/

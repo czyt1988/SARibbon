@@ -1,4 +1,5 @@
-﻿#include "SARibbonCustomizeData.h"
+#include "SARibbonCustomizeData.h"
+#include <SARibbonCore/SARibbonCustomizeRecord.h>
 #include "SARibbonBar.h"
 #include "SARibbonQuickAccessBar.h"
 #include <QDebug>
@@ -8,66 +9,14 @@
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 SARibbonCustomizeData::SARibbonCustomizeData()
-    : indexValue(-1)
-    , actionRowProportionValue(SARibbonPanelItem::Large)
-    , mType(UnknowActionType)
+    : SARibbon::Core::SARibbonCustomizeRecord()
     , mActionsManagerPointer(nullptr)
 {
 }
 
 SARibbonCustomizeData::SARibbonCustomizeData(ActionType type, SARibbonActionsManager* mgr)
-    : indexValue(-1), actionRowProportionValue(SARibbonPanelItem::Large), mType(type), mActionsManagerPointer(mgr)
+    : SARibbon::Core::SARibbonCustomizeRecord(type), mActionsManagerPointer(mgr)
 {
-}
-
-/**
- * \if ENGLISH
- * @brief Get the action type of the CustomizeData
- * @return Action type
- * \endif
- *
- * \if CHINESE
- * @brief 获取CustomizeData的action type
- * @return 操作类型
- * \endif
- */
-SARibbonCustomizeData::ActionType SARibbonCustomizeData::actionType() const
-{
-    return (mType);
-}
-
-/**
- * \if ENGLISH
- * @brief Set the action type of the CustomizeData
- * @param a Action type to set
- * \endif
- *
- * \if CHINESE
- * @brief 设置CustomizeData的action type
- * @param a 要设置的操作类型
- * \endif
- */
-void SARibbonCustomizeData::setActionType(SARibbonCustomizeData::ActionType a)
-{
-    mType = a;
-}
-
-/**
- * \if ENGLISH
- * @brief Check if this is a valid CustomizeData
- * @details Actual logic: actionType() != UnknowActionType
- * @return true if the CustomizeData is valid
- * \endif
- *
- * \if CHINESE
- * @brief 判断是否是一个正常的CustomizeData
- * @details 实际逻辑actionType() != UnknowActionType
- * @return 有用的CustomizeData返回true
- * \endif
- */
-bool SARibbonCustomizeData::isValid() const
-{
-    return (actionType() != UnknowActionType);
 }
 
 /**
@@ -893,145 +842,8 @@ void SARibbonCustomizeData::setCanCustomize(QObject* obj, bool canbe)
     obj->setProperty(SA_RIBBON_BAR_PROP_CAN_CUSTOMIZE, canbe);
 }
 
-QList< SARibbonCustomizeData > remove_indexs(const QList< SARibbonCustomizeData >& csd, const QList< int >& willremoveIndex);
-
-QList< SARibbonCustomizeData > remove_indexs(const QList< SARibbonCustomizeData >& csd, const QList< int >& willremoveIndex)
-{
-    QList< SARibbonCustomizeData > res;
-
-    for (int i = 0; i < csd.size(); ++i) {
-        if (!willremoveIndex.contains(i)) {
-            res << csd[ i ];
-        }
-    }
-    return (res);
-}
-
-/**
- * @brief 对QList<SARibbonCustomizeData>进行简化操作
- *
- * 此函数会执行如下操作：
- * 1、针对同一个category/panel连续出现的添加和删除操作进行移除（前一步添加，后一步删除）
- *
- * 2、针对VisibleCategoryActionType，对于连续出现的操作只保留最后一步
- *
- * 3、针对RenameCategoryActionType和RenamePanelActionType操作，只保留最后一个
- *
- * 4、针对连续的ChangeCategoryOrderActionType，ChangePanelOrderActionType，ChangeActionOrderActionType进行合并为一个动作，
- * 如果合并后原地不动，则删除
- *
- * @param csd
- * @return 返回简化的QList<SARibbonCustomizeData>
- */
 QList< SARibbonCustomizeData > SARibbonCustomizeData::simplify(const QList< SARibbonCustomizeData >& csd)
 {
-    int size = csd.size();
-
-    if (size <= 1) {
-        return (csd);
-    }
-    QList< SARibbonCustomizeData > res;
-    QList< int > willremoveIndex;  // 记录要删除的index
-
-    //! 首先针对连续出现的添加和删除操作进行优化
-    for (int i = 1; i < size; ++i) {
-        if ((csd[ i - 1 ].actionType() == AddCategoryActionType) && (csd[ i ].actionType() == RemoveCategoryActionType)) {
-            if (csd[ i - 1 ].categoryObjNameValue == csd[ i ].categoryObjNameValue) {
-                willremoveIndex << i - 1 << i;
-            }
-        } else if ((csd[ i - 1 ].actionType() == AddPanelActionType) && (csd[ i ].actionType() == RemovePanelActionType)) {
-            if ((csd[ i - 1 ].panelObjNameValue == csd[ i ].panelObjNameValue)
-                && (csd[ i - 1 ].categoryObjNameValue == csd[ i ].categoryObjNameValue)) {
-                willremoveIndex << i - 1 << i;
-            }
-        } else if ((csd[ i - 1 ].actionType() == AddActionActionType) && (csd[ i ].actionType() == RemoveActionActionType)) {
-            if ((csd[ i - 1 ].keyValue == csd[ i ].keyValue) && (csd[ i - 1 ].panelObjNameValue == csd[ i ].panelObjNameValue)
-                && (csd[ i - 1 ].categoryObjNameValue == csd[ i ].categoryObjNameValue)) {
-                willremoveIndex << i - 1 << i;
-            }
-        }
-    }
-    res = remove_indexs(csd, willremoveIndex);
-    willremoveIndex.clear();
-
-    //! 筛选VisibleCategoryActionType，对于连续出现的操作只保留最后一步
-    size = res.size();
-    for (int i = 1; i < size; ++i) {
-        if ((res[ i - 1 ].actionType() == VisibleCategoryActionType)
-            && (res[ i ].actionType() == VisibleCategoryActionType)) {
-            if (res[ i - 1 ].categoryObjNameValue == res[ i ].categoryObjNameValue) {
-                // 要保证操作的是同一个内容
-                willremoveIndex << i - 1;  // 删除前一个只保留最后一个
-            }
-        }
-    }
-    res = remove_indexs(res, willremoveIndex);
-    willremoveIndex.clear();
-
-    //! 针对RenameCategoryActionType和RenamePanelActionType操作，只需保留最后一个
-    size = res.size();
-    for (int i = 0; i < size; ++i) {
-        if (res[ i ].actionType() == RenameCategoryActionType) {
-            // 向后查询，如果查询到有同一个Category改名，把这个索引加入删除队列
-            for (int j = i + 1; j < size; ++j) {
-                if ((res[ j ].actionType() == RenameCategoryActionType)
-                    && (res[ i ].categoryObjNameValue == res[ j ].categoryObjNameValue)) {
-                    willremoveIndex << i;
-                }
-            }
-        } else if (res[ i ].actionType() == RenamePanelActionType) {
-            // 向后查询，如果查询到有同一个panel改名，把这个索引加入删除队列
-            for (int j = i + 1; j < size; ++j) {
-                if ((res[ j ].actionType() == RenamePanelActionType)
-                    && (res[ i ].panelObjNameValue == res[ j ].panelObjNameValue)
-                    && (res[ i ].categoryObjNameValue == res[ j ].categoryObjNameValue)) {
-                    willremoveIndex << i;
-                }
-            }
-        }
-    }
-    res = remove_indexs(res, willremoveIndex);
-    willremoveIndex.clear();
-
-    //! 针对连续的ChangeCategoryOrderActionType，ChangePanelOrderActionType，ChangeActionOrderActionType进行合并
-    size = res.size();
-    for (int i = 1; i < size; ++i) {
-        if ((res[ i - 1 ].actionType() == ChangeCategoryOrderActionType)
-            && (res[ i ].actionType() == ChangeCategoryOrderActionType)
-            && (res[ i - 1 ].categoryObjNameValue == res[ i ].categoryObjNameValue)) {
-            // 说明连续两个顺序调整，把前一个indexvalue和后一个indexvalue相加，前一个删除
-            res[ i ].indexValue += res[ i - 1 ].indexValue;
-            willremoveIndex << i - 1;
-        } else if ((res[ i - 1 ].actionType() == ChangePanelOrderActionType)
-                   && (res[ i ].actionType() == ChangePanelOrderActionType)
-                   && (res[ i - 1 ].panelObjNameValue == res[ i ].panelObjNameValue)
-                   && (res[ i - 1 ].categoryObjNameValue == res[ i ].categoryObjNameValue)) {
-            // 说明连续两个顺序调整，把前一个indexvalue和后一个indexvalue相加，前一个删除
-            res[ i ].indexValue += res[ i - 1 ].indexValue;
-            willremoveIndex << i - 1;
-        } else if ((res[ i - 1 ].actionType() == ChangeActionOrderActionType)
-                   && (res[ i ].actionType() == ChangeActionOrderActionType) && (res[ i - 1 ].keyValue == res[ i ].keyValue)
-                   && (res[ i - 1 ].panelObjNameValue == res[ i ].panelObjNameValue)
-                   && (res[ i - 1 ].categoryObjNameValue == res[ i ].categoryObjNameValue)) {
-            // 说明连续两个顺序调整，把前一个indexvalue和后一个indexvalue相加，前一个删除
-            res[ i ].indexValue += res[ i - 1 ].indexValue;
-            willremoveIndex << i - 1;
-        }
-    }
-    res = remove_indexs(res, willremoveIndex);
-    willremoveIndex.clear();
-
-    //! 上一步操作可能会产生indexvalue为0的情况，此操作把indexvalue为0的删除
-    size = res.size();
-    for (int i = 0; i < size; ++i) {
-        if ((res[ i ].actionType() == ChangeCategoryOrderActionType) || (res[ i ].actionType() == ChangePanelOrderActionType)
-            || (res[ i ].actionType() == ChangeActionOrderActionType)) {
-            if (0 == res[ i ].indexValue) {
-                willremoveIndex << i;
-            }
-        }
-    }
-    res = remove_indexs(res, willremoveIndex);
-    willremoveIndex.clear();
-    return (res);
+    // plan-02 S4.2: algorithm moved verbatim to the core template (SARibbonCustomizeRecord::simplify)
+    return SARibbon::Core::SARibbonCustomizeRecord::simplify(csd);
 }

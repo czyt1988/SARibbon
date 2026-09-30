@@ -1654,6 +1654,541 @@ private:
 /*** End of inlined file: SARibbonThemeData.h ***/
 
 
+/*** Start of inlined file: SARibbonAbstractLayoutItem.h ***/
+#ifndef SARIBBONABSTRACTLAYOUTITEM_H
+#define SARIBBONABSTRACTLAYOUTITEM_H
+
+#include <QRect>
+#include <QSize>
+#include <QString>
+#include <Qt>
+
+namespace SARibbon
+{
+namespace Core
+{
+
+/**
+ * \if ENGLISH
+ * @brief Narrow contract interface between layout engines and front ends (plan 02 S4.1)
+ * @details The engines only read geometry constraints through this interface and write
+ * results back through public fields; they never see widgets. Panel-side isHidden()
+ * means "action not visible", Category-side means the QWidgetItem::isEmpty() widget
+ * semantics — each front end implements its own 2.x semantics, they must not be unified.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 布局引擎与前端之间的窄契约接口（计划 02 S4.1）
+ * @details 引擎只经本接口读几何约束、经公有字段回写结果，不见任何控件。
+ * Panel 侧 isHidden() 语义为 "action 不可见"；Category 侧为 QWidgetItem::isEmpty()
+ * 的控件语义——各前端按各自 2.x 语义实现，不得统一。
+ * @note 输出字段命名 resultGeometry（非 geometry）：与 QLayoutItem::geometry()
+ * 成员函数在双继承下冲突，v2 草案字段名已废弃（计划 02 S4.1-2）。
+ * \endif
+ */
+class SA_RIBBON_CORE_EXPORT SARibbonAbstractLayoutItem
+{
+public:
+	virtual ~SARibbonAbstractLayoutItem();
+	// —— front end provides (engine inputs, pure virtual) ——
+	virtual QSize sizeHint() const = 0;
+	virtual QSize minimumSizeHint() const = 0;
+	virtual bool isHidden() const = 0;   // Panel: action not visible; Category: QWidgetItem::isEmpty semantics
+	virtual Qt::Orientations expandingDirections() const = 0;
+	// —— front end provides (with defaults, override as needed) ——
+	virtual int maximumWidth() const { return 16777215; }  // QWIDGETSIZE_MAX value (macro is QtWidgets, core forbids)
+	virtual int stretchFactor() const { return 0; }        // only the Gallery adapter overrides
+	virtual QString debugName() const { return {}; }       // diagnostics name for golden-test dumps
+	// —— front end implements (engine output application) ——
+	virtual void applyGeometry(const QRect& rect) = 0;
+	// —— engine-written result fields (both ends read) ——
+	int rowIndex = -1;                 // 2.x was short; contract uses int (plan 02 S4.1-3)
+	int columnIndex = -1;
+	QRect resultGeometry;              // corresponds to 2.x itemWillSetGeometry / mWillSetGeometry
+	bool isExpandItem = false;
+	// —— shared data ——
+	SARibbonRowProportion rowProportion = SARibbonRowProportion::Large;  // 2.x ctor default (PanelItem.cpp:15)
+};
+
+/**
+ * \if ENGLISH
+ * @brief Category-side extension: panel body + separator dual geometry (plan 02 S4.1-1)
+ * \endif
+ *
+ * \if CHINESE
+ * @brief Category 侧扩展：panel 本体 + 分割线双几何（计划 02 S4.1-1）
+ * \endif
+ */
+class SA_RIBBON_CORE_EXPORT SARibbonAbstractCategoryItem : public SARibbonAbstractLayoutItem
+{
+public:
+	~SARibbonAbstractCategoryItem() override;
+	QRect resultSeparatorGeometry;      // corresponds to 2.x mWillSetSeparatorGeometry
+	bool isSeparatorHidden = false;     // engine output, adapter hides/shows separatorWidget accordingly
+};
+
+}
+}
+
+#endif  // SARIBBONABSTRACTLAYOUTITEM_H
+
+/*** End of inlined file: SARibbonAbstractLayoutItem.h ***/
+
+
+/*** Start of inlined file: SARibbonAbstractLayoutHost.h ***/
+#ifndef SARIBBONABSTRACTLAYOUTHOST_H
+#define SARIBBONABSTRACTLAYOUTHOST_H
+
+namespace SARibbon
+{
+namespace Core
+{
+
+class SARibbonMetrics;
+
+/**
+ * \if ENGLISH
+ * @brief Host side of the layout contract (plan 02 S4.1)
+ * @details Only one pure virtual: engines get isRTL / margins / spacing as plain
+ * Input values instead of querying the host, keeping the engines stateless.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 布局契约的宿主侧（计划 02 S4.1）
+ * @details 仅一个纯虚：isRTL/边距/间距一律作为引擎 Input 值传入，
+ * 引擎不查询宿主，保持无状态。
+ * \endif
+ */
+class SA_RIBBON_CORE_EXPORT SARibbonAbstractLayoutHost
+{
+public:
+	virtual ~SARibbonAbstractLayoutHost();
+	virtual const SARibbonMetrics& metrics() const = 0;
+};
+
+}
+}
+
+#endif  // SARIBBONABSTRACTLAYOUTHOST_H
+
+/*** End of inlined file: SARibbonAbstractLayoutHost.h ***/
+
+
+/*** Start of inlined file: SARibbonCustomizeRecord.h ***/
+#ifndef SARIBBONCUSTOMIZERECORD_H
+#define SARIBBONCUSTOMIZERECORD_H
+
+#include <QString>
+#include <QList>
+
+namespace SARibbon
+{
+namespace Core
+{
+
+/**
+ * \if ENGLISH
+ * @brief Pure-data record base of SARibbonCustomizeData (plan 02 S4.2)
+ * @details Holds the ActionType enum, the five public data fields, the private
+ * type field and the pure functions isValid()/simplify() — everything from the
+ * 2.x class that has no manager/widget dependency. The widgets-side
+ * SARibbonCustomizeData publicly inherits this record (161 direct field accesses
+ * keep compiling) and keeps the manager pointer, apply() and the make* factories.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief SARibbonCustomizeData 的纯数据记录基类（计划 02 S4.2）
+ * @details 持有 ActionType 枚举、五个公有数据字段、私有类型字段与纯函数
+ * isValid()/simplify()——2.x 类中无 manager/widget 依赖的全部内容。
+ * widgets 侧 SARibbonCustomizeData 公有继承本记录（161 处直接字段访问
+ * 保持可编译），manager 指针、apply() 与 make* 工厂留在派生类。
+ * \endif
+ */
+class SA_RIBBON_CORE_EXPORT SARibbonCustomizeRecord
+{
+public:
+	/**
+	 * \if ENGLISH
+	 * @brief Action type enumeration
+	 * \endif
+	 *
+	 * \if CHINESE
+	 * @brief 操作类型枚举
+	 * \endif
+	 */
+	enum ActionType
+	{
+		UnknowActionType = 0,           ///< 未知操作
+		AddCategoryActionType,          ///< 添加category操作(1)
+		AddPanelActionType,             ///< 添加panel操作(2)
+		AddActionActionType,            ///< 添加action操作(3)
+		RemoveCategoryActionType,       ///< 删除category操作(4)
+		RemovePanelActionType,          ///< 删除panel操作(5)
+		RemoveActionActionType,         ///< 删除action操作(6)
+		ChangeCategoryOrderActionType,  ///< 改变category顺序的操作(7)
+		ChangePanelOrderActionType,     ///< 改变panel顺序的操作(8)
+		ChangeActionOrderActionType,    ///< 改变action顺序的操作(9)
+		RenameCategoryActionType,       ///< 对category更名操作(10)
+		RenamePanelActionType,          ///< 对Panel更名操作(11)
+		VisibleCategoryActionType,      ///< 对category执行隐藏/显示操作(12)
+		AddQuickActionActionType,       ///< 添加action到快速访问栏操作(13)
+		RemoveQuickActionActionType,    ///< 从快速访问栏移除action操作(14)
+		ChangeQuickActionOrderActionType  ///< 改变快速访问栏action顺序的操作(15)
+	};
+	// Default constructor
+	SARibbonCustomizeRecord();
+	// Constructor with action type
+	explicit SARibbonCustomizeRecord(ActionType type);
+	// Destructor
+	virtual ~SARibbonCustomizeRecord();
+	// Get the action type of the record
+	ActionType actionType() const;
+
+	// Set the action type
+	void setActionType(ActionType a);
+
+	// Check if this is a valid record
+	bool isValid() const;
+
+	// Simplify QList (pure algorithm; see the simplify template below the class)
+	template< typename CustomizeDataT >
+	static QList< CustomizeDataT > simplify(const QList< CustomizeDataT >& csd);
+
+	/**
+	 * \if ENGLISH
+	 * @brief Parameter for recording order
+	 * \endif
+	 *
+	 * \if CHINESE
+	 * @brief 记录顺序的参数
+	 * \endif
+	 */
+	int indexValue;
+
+	/**
+	 * \if ENGLISH
+	 * @brief Parameter for recording title, index, etc.
+	 * \endif
+	 *
+	 * \if CHINESE
+	 * @brief 记录标题、索引等参数
+	 * \endif
+	 */
+	QString keyValue;
+
+	/**
+	 * \if ENGLISH
+	 * @brief Record categoryObjName for locating Category
+	 * \endif
+	 *
+	 * \if CHINESE
+	 * @brief 记录categoryObjName，用于定位Category
+	 * \endif
+	 */
+	QString categoryObjNameValue;
+
+	/**
+	 * \if CHINESE
+	 * @brief 记录panelObjName，saribbon的Customize索引大部分基于objname
+	 * \endif
+	 */
+	QString panelObjNameValue;
+
+	SARibbonRowProportion actionRowProportionValue;  ///< 行的占比（原 SARibbonPanelItem::RowProportion，core 提升枚举）
+
+private:
+	ActionType mType;  ///< 标记这个data是category还是panel亦或是action
+};
+
+// Simplify QList (template: single core implementation, derived extras preserved)
+template< typename CustomizeDataT >
+QList< CustomizeDataT > remove_indexs(const QList< CustomizeDataT >& csd, const QList< int >& willremoveIndex)
+{
+	QList< CustomizeDataT > res;
+
+	for (int i = 0; i < csd.size(); ++i) {
+		if (!willremoveIndex.contains(i)) {
+			res << csd[ i ];
+		}
+	}
+	return (res);
+}
+
+template< typename CustomizeDataT >
+QList< CustomizeDataT > SARibbonCustomizeRecord::simplify(const QList< CustomizeDataT >& csd)
+{
+	int size = csd.size();
+
+	if (size <= 1) {
+		return (csd);
+	}
+	QList< CustomizeDataT > res;
+	QList< int > willremoveIndex;  // 记录要删除的index
+
+	//! 首先针对连续出现的添加和删除操作进行优化
+	for (int i = 1; i < size; ++i) {
+		if ((csd[ i - 1 ].actionType() == AddCategoryActionType) && (csd[ i ].actionType() == RemoveCategoryActionType)) {
+			if (csd[ i - 1 ].categoryObjNameValue == csd[ i ].categoryObjNameValue) {
+				willremoveIndex << i - 1 << i;
+			}
+		} else if ((csd[ i - 1 ].actionType() == AddPanelActionType) && (csd[ i ].actionType() == RemovePanelActionType)) {
+			if ((csd[ i - 1 ].panelObjNameValue == csd[ i ].panelObjNameValue)
+				&& (csd[ i - 1 ].categoryObjNameValue == csd[ i ].categoryObjNameValue)) {
+				willremoveIndex << i - 1 << i;
+			}
+		} else if ((csd[ i - 1 ].actionType() == AddActionActionType) && (csd[ i ].actionType() == RemoveActionActionType)) {
+			if ((csd[ i - 1 ].keyValue == csd[ i ].keyValue) && (csd[ i - 1 ].panelObjNameValue == csd[ i ].panelObjNameValue)
+				&& (csd[ i - 1 ].categoryObjNameValue == csd[ i ].categoryObjNameValue)) {
+				willremoveIndex << i - 1 << i;
+			}
+		}
+	}
+	res = remove_indexs(csd, willremoveIndex);
+	willremoveIndex.clear();
+
+	//! 筛选VisibleCategoryActionType，对于连续出现的操作只保留最后一步
+	size = res.size();
+	for (int i = 1; i < size; ++i) {
+		if ((res[ i - 1 ].actionType() == VisibleCategoryActionType)
+			&& (res[ i ].actionType() == VisibleCategoryActionType)) {
+			if (res[ i - 1 ].categoryObjNameValue == res[ i ].categoryObjNameValue) {
+				// 要保证操作的是同一个内容
+				willremoveIndex << i - 1;  // 删除前一个只保留最后一个
+			}
+		}
+	}
+	res = remove_indexs(res, willremoveIndex);
+	willremoveIndex.clear();
+
+	//! 针对RenameCategoryActionType和RenamePanelActionType操作，只需保留最后一个
+	size = res.size();
+	for (int i = 0; i < size; ++i) {
+		if (res[ i ].actionType() == RenameCategoryActionType) {
+			// 向后查询，如果查询到有同一个Category改名，把这个索引加入删除队列
+			for (int j = i + 1; j < size; ++j) {
+				if ((res[ j ].actionType() == RenameCategoryActionType)
+					&& (res[ i ].categoryObjNameValue == res[ j ].categoryObjNameValue)) {
+					willremoveIndex << i;
+				}
+			}
+		} else if (res[ i ].actionType() == RenamePanelActionType) {
+			// 向后查询，如果查询到有同一个panel改名，把这个索引加入删除队列
+			for (int j = i + 1; j < size; ++j) {
+				if ((res[ j ].actionType() == RenamePanelActionType)
+					&& (res[ i ].panelObjNameValue == res[ j ].panelObjNameValue)
+					&& (res[ i ].categoryObjNameValue == res[ j ].categoryObjNameValue)) {
+					willremoveIndex << i;
+				}
+			}
+		}
+	}
+	res = remove_indexs(res, willremoveIndex);
+	willremoveIndex.clear();
+
+	//! 针对连续的ChangeCategoryOrderActionType，ChangePanelOrderActionType，ChangeActionOrderActionType进行合并
+	size = res.size();
+	for (int i = 1; i < size; ++i) {
+		if ((res[ i - 1 ].actionType() == ChangeCategoryOrderActionType)
+			&& (res[ i ].actionType() == ChangeCategoryOrderActionType)
+			&& (res[ i - 1 ].categoryObjNameValue == res[ i ].categoryObjNameValue)) {
+			// 说明连续两个顺序调整，把前一个indexvalue和后一个indexvalue相加，前一个删除
+			res[ i ].indexValue += res[ i - 1 ].indexValue;
+			willremoveIndex << i - 1;
+		} else if ((res[ i - 1 ].actionType() == ChangePanelOrderActionType)
+				   && (res[ i ].actionType() == ChangePanelOrderActionType)
+				   && (res[ i - 1 ].panelObjNameValue == res[ i ].panelObjNameValue)
+				   && (res[ i - 1 ].categoryObjNameValue == res[ i ].categoryObjNameValue)) {
+			// 说明连续两个顺序调整，把前一个indexvalue和后一个indexvalue相加，前一个删除
+			res[ i ].indexValue += res[ i - 1 ].indexValue;
+			willremoveIndex << i - 1;
+		} else if ((res[ i - 1 ].actionType() == ChangeActionOrderActionType)
+				   && (res[ i ].actionType() == ChangeActionOrderActionType) && (res[ i - 1 ].keyValue == res[ i ].keyValue)
+				   && (res[ i - 1 ].panelObjNameValue == res[ i ].panelObjNameValue)
+				   && (res[ i - 1 ].categoryObjNameValue == res[ i ].categoryObjNameValue)) {
+			// 说明连续两个顺序调整，把前一个indexvalue和后一个indexvalue相加，前一个删除
+			res[ i ].indexValue += res[ i - 1 ].indexValue;
+			willremoveIndex << i - 1;
+		}
+	}
+	res = remove_indexs(res, willremoveIndex);
+	willremoveIndex.clear();
+
+	//! 上一步操作可能会产生indexvalue为0的情况，此操作把indexvalue为0的删除
+	size = res.size();
+	for (int i = 0; i < size; ++i) {
+		if ((res[ i ].actionType() == ChangeCategoryOrderActionType) || (res[ i ].actionType() == ChangePanelOrderActionType)
+			|| (res[ i ].actionType() == ChangeActionOrderActionType)) {
+			if (0 == res[ i ].indexValue) {
+				willremoveIndex << i;
+			}
+		}
+	}
+	res = remove_indexs(res, willremoveIndex);
+	willremoveIndex.clear();
+	return (res);
+}
+
+}
+}
+
+#endif  // SARIBBONCUSTOMIZERECORD_H
+
+/*** End of inlined file: SARibbonCustomizeRecord.h ***/
+
+
+/*** Start of inlined file: SARibbonElementFactoryInterface.h ***/
+#ifndef SARIBBONELEMENTFACTORYINTERFACE_H
+#define SARIBBONELEMENTFACTORYINTERFACE_H
+
+namespace SARibbon
+{
+namespace Core
+{
+
+/**
+ * \if ENGLISH
+ * @brief Placeholder for the element factory interface (plan 02 S4.3, D6/D7 deferred)
+ * @details The real 17-create-function SARibbonElementFactory is deeply coupled to
+ * widgets return types; interfacing it into core has no consumer until QML needs it
+ * (D7 gate, Tier 2). This header pins the seam for plan 04 / 3.1+.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 元素工厂接口占位（计划 02 S4.3，D6/D7 降级决策）
+ * @details 真实的 17 个 create 函数的 SARibbonElementFactory 返回值深度耦合
+ * widgets 类型；QML 需要前（D7 gate，Tier 2）core 无消费者。本头文件为
+ * 计划 04 / 3.1+ 预留衔接点。
+ * \endif
+ */
+class SARibbonElementFactoryInterface
+{
+public:
+	virtual ~SARibbonElementFactoryInterface() = default;
+};
+
+}
+}
+
+#endif  // SARIBBONELEMENTFACTORYINTERFACE_H
+
+/*** End of inlined file: SARibbonElementFactoryInterface.h ***/
+
+
+/*** Start of inlined file: SARibbonMetrics.h ***/
+#ifndef SARIBBONMETRICS_H
+#define SARIBBONMETRICS_H
+
+#include <QFontMetrics>
+#include <QSize>
+#include <optional>
+
+namespace SARibbon
+{
+namespace Core
+{
+
+/**
+ * \if ENGLISH
+ * @brief Metric collection and derivation for the ribbon bar (plan 02 S3)
+ * @details Gathers the size constants and row-height derivations that used to
+ * live inside SARibbonBarLayout::PrivateData. Core never queries any widget:
+ * style-derived pixel metrics and the font metrics are inputs supplied by the
+ * widgets adapter (v2 section 3.3), so all derivation formulas are pure
+ * functions of the stored state. Formula bodies were moved verbatim from
+ * SARibbonBarLayout.cpp (calcDefaultTabBarHeight / calcDefaultTitleBarHeight /
+ * calcCategoryHeight / calcMainBarHeight).
+ * \endif
+ *
+ * \if CHINESE
+ * @brief Ribbon 栏的度量收口类（计划 02 S3）
+ * @details 收口原 SARibbonBarLayout::PrivateData 中的尺寸常量与行高推导。
+ * core 不查询任何控件：style 派生的 pixelMetric 与字体度量均由 widgets
+ * 适配器作为输入传入（v2 §3.3），全部推导公式是所存状态的纯函数。
+ * 公式体自 SARibbonBarLayout.cpp 纯 move（calcDefaultTabBarHeight /
+ * calcDefaultTitleBarHeight / calcCategoryHeight / calcMainBarHeight）。
+ * @note 2.9.5 默认值：titleBarHeight=30、tabBarHeight=28、categoryHeight=60、
+ * panelTitleHeight=15（首值会被 estimateSizeHint() 的推导结果覆写）
+ * \endif
+ */
+class SA_RIBBON_CORE_EXPORT SARibbonMetrics
+{
+public:
+	SARibbonMetrics();
+	SARibbonMetrics(const QFontMetrics& fm, qreal devicePixelRatio);
+
+	// ---- inputs (adapter collects; core never queries QStyle/widget) ----
+	void setFontMetrics(const QFontMetrics& fm);
+	void setDevicePixelRatio(qreal dpr);
+	// Style pixel metrics: PM_TabBarBaseHeight / PM_TabBarTabHSpace /
+	// PM_TabBarTabOverlap / PM_TitleBarHeight (QStyle is QtWidgets, core forbids)
+	void setStylePixelMetrics(int pmTabBarBaseHeight, int pmTabBarTabHSpace, int pmTabBarTabOverlap, int pmTitleBarHeight);
+
+	// ---- derivation formulas (moved verbatim, SARibbonBarLayout.cpp) ----
+
+	// System tab bar height: sum of the three style pixel metrics
+	int systemTabBarHeight() const;
+
+	// Calculate default tab bar height (SARibbonBarLayout.cpp calcDefaultTabBarHeight)
+	int calcDefaultTabBarHeight() const;
+
+	// Calculate default title bar height (SARibbonBarLayout.cpp calcDefaultTitleBarHeight)
+	int calcDefaultTitleBarHeight() const;
+
+	// Calculate category height (SARibbonBarLayout.cpp calcCategoryHeight);
+	// isThreeRowStyle/isSingleRowStyle replace the ribbonBar->isXxxStyle() queries
+	int calcCategoryHeight(bool isThreeRowStyle, bool isSingleRowStyle) const;
+
+	// Calculate main bar height (static pure, SARibbonBarLayout.cpp calcMainBarHeight);
+	// minimumMode replaces the SARibbonBar::RibbonMode comparison
+	static int calcMainBarHeight(int tabBarHeight, int titleHeight, int categoryHeight, bool tabOnTitle, bool minimumMode);
+
+	// ---- estimate & actual (moved from SARibbonBarLayout.cpp estimateSizeHint / getActual*) ----
+
+	// Recalculate the default heights from current font/style inputs
+	void estimateSizeHint(bool isThreeRowStyle, bool isSingleRowStyle);
+
+	// User-defined overrides win over the (estimated) defaults
+	int getActualTitleBarHeight() const;
+	int getActualTabBarHeight() const;
+	int getActualCategoryHeight() const;
+
+	void setTitleBarHeight(int h);
+	void setTabBarHeight(int h);
+	void setCategoryHeight(int h);
+
+	// ---- fields (2.9.5 defaults; panelTitleHeight participates in calcCategoryHeight) ----
+	int titleBarHeight { 30 };    ///< Title bar height
+	int tabBarHeight { 28 };      ///< Tab bar height
+	int panelTitleHeight { 15 };  ///< Panel title default height
+	int categoryHeight { 60 };    ///< Category height
+
+	int maxMinWidth { 1000 };  ///< Maximum minimum width, usually 0.8 of screen width
+	int minWidth { 500 };
+	int minHeight { 0 };
+
+	QFontMetrics fontMetrics() const;
+	qreal devicePixelRatio() const;
+
+private:
+	QFontMetrics mFontMetrics;
+	qreal mDevicePixelRatio { 1.0 };
+	int mPmTabBarBaseHeight { 0 };
+	int mPmTabBarTabHSpace { 0 };
+	int mPmTabBarTabOverlap { 0 };
+	int mPmTitleBarHeight { 0 };
+	std::optional< int > mUserDefTitleBarHeight;
+	std::optional< int > mUserDefTabBarHeight;
+	std::optional< int > mUserDefCategoryHeight;
+};
+
+}
+}
+
+#endif  // SARIBBONMETRICS_H
+
+/*** End of inlined file: SARibbonMetrics.h ***/
+
+
 /*** Start of inlined file: SARibbonThemeManager.h ***/
 #ifndef SARIBBONTHEMEMANAGER_H
 #define SARIBBONTHEMEMANAGER_H
@@ -6029,22 +6564,38 @@ private:
 #ifndef SARIBBONCUSTOMIZEDATA_H
 #define SARIBBONCUSTOMIZEDATA_H
 
+
+/*** Start of inlined file: SARibbonCustomizeRecord.h ***/
+#ifndef SARIBBONCUSTOMIZERECORD_H
+#define SARIBBONCUSTOMIZERECORD_H
+
+#include <QString>
 #include <QList>
-class SARibbonBar;
-class SARibbonMainWindow;
+
+namespace SARibbon
+{
+namespace Core
+{
 
 /**
  * \if ENGLISH
- * @brief Data class for recording all customization operations
- * @note This data depends on @ref SARibbonActionsManager, use this class after SARibbonActionsManager
+ * @brief Pure-data record base of SARibbonCustomizeData (plan 02 S4.2)
+ * @details Holds the ActionType enum, the five public data fields, the private
+ * type field and the pure functions isValid()/simplify() — everything from the
+ * 2.x class that has no manager/widget dependency. The widgets-side
+ * SARibbonCustomizeData publicly inherits this record (161 direct field accesses
+ * keep compiling) and keeps the manager pointer, apply() and the make* factories.
  * \endif
  *
  * \if CHINESE
- * @brief 记录所有自定义操作的数据类
- * @note 此数据依赖于@ref SARibbonActionsManager 要在SARibbonActionsManager之后使用此类
+ * @brief SARibbonCustomizeData 的纯数据记录基类（计划 02 S4.2）
+ * @details 持有 ActionType 枚举、五个公有数据字段、私有类型字段与纯函数
+ * isValid()/simplify()——2.x 类中无 manager/widget 依赖的全部内容。
+ * widgets 侧 SARibbonCustomizeData 公有继承本记录（161 处直接字段访问
+ * 保持可编译），manager 指针、apply() 与 make* 工厂留在派生类。
  * \endif
  */
-class SA_RIBBON_EXPORT SARibbonCustomizeData
+class SA_RIBBON_CORE_EXPORT SARibbonCustomizeRecord
 {
 public:
 	/**
@@ -6076,18 +6627,232 @@ public:
 		ChangeQuickActionOrderActionType  ///< 改变快速访问栏action顺序的操作(15)
 	};
 	// Default constructor
+	SARibbonCustomizeRecord();
+	// Constructor with action type
+	explicit SARibbonCustomizeRecord(ActionType type);
+	// Destructor
+	virtual ~SARibbonCustomizeRecord();
+	// Get the action type of the record
+	ActionType actionType() const;
+
+	// Set the action type
+	void setActionType(ActionType a);
+
+	// Check if this is a valid record
+	bool isValid() const;
+
+	// Simplify QList (pure algorithm; see the simplify template below the class)
+	template< typename CustomizeDataT >
+	static QList< CustomizeDataT > simplify(const QList< CustomizeDataT >& csd);
+
+	/**
+	 * \if ENGLISH
+	 * @brief Parameter for recording order
+	 * \endif
+	 *
+	 * \if CHINESE
+	 * @brief 记录顺序的参数
+	 * \endif
+	 */
+	int indexValue;
+
+	/**
+	 * \if ENGLISH
+	 * @brief Parameter for recording title, index, etc.
+	 * \endif
+	 *
+	 * \if CHINESE
+	 * @brief 记录标题、索引等参数
+	 * \endif
+	 */
+	QString keyValue;
+
+	/**
+	 * \if ENGLISH
+	 * @brief Record categoryObjName for locating Category
+	 * \endif
+	 *
+	 * \if CHINESE
+	 * @brief 记录categoryObjName，用于定位Category
+	 * \endif
+	 */
+	QString categoryObjNameValue;
+
+	/**
+	 * \if CHINESE
+	 * @brief 记录panelObjName，saribbon的Customize索引大部分基于objname
+	 * \endif
+	 */
+	QString panelObjNameValue;
+
+	SARibbonRowProportion actionRowProportionValue;  ///< 行的占比（原 SARibbonPanelItem::RowProportion，core 提升枚举）
+
+private:
+	ActionType mType;  ///< 标记这个data是category还是panel亦或是action
+};
+
+// Simplify QList (template: single core implementation, derived extras preserved)
+template< typename CustomizeDataT >
+QList< CustomizeDataT > remove_indexs(const QList< CustomizeDataT >& csd, const QList< int >& willremoveIndex)
+{
+	QList< CustomizeDataT > res;
+
+	for (int i = 0; i < csd.size(); ++i) {
+		if (!willremoveIndex.contains(i)) {
+			res << csd[ i ];
+		}
+	}
+	return (res);
+}
+
+template< typename CustomizeDataT >
+QList< CustomizeDataT > SARibbonCustomizeRecord::simplify(const QList< CustomizeDataT >& csd)
+{
+	int size = csd.size();
+
+	if (size <= 1) {
+		return (csd);
+	}
+	QList< CustomizeDataT > res;
+	QList< int > willremoveIndex;  // 记录要删除的index
+
+	//! 首先针对连续出现的添加和删除操作进行优化
+	for (int i = 1; i < size; ++i) {
+		if ((csd[ i - 1 ].actionType() == AddCategoryActionType) && (csd[ i ].actionType() == RemoveCategoryActionType)) {
+			if (csd[ i - 1 ].categoryObjNameValue == csd[ i ].categoryObjNameValue) {
+				willremoveIndex << i - 1 << i;
+			}
+		} else if ((csd[ i - 1 ].actionType() == AddPanelActionType) && (csd[ i ].actionType() == RemovePanelActionType)) {
+			if ((csd[ i - 1 ].panelObjNameValue == csd[ i ].panelObjNameValue)
+				&& (csd[ i - 1 ].categoryObjNameValue == csd[ i ].categoryObjNameValue)) {
+				willremoveIndex << i - 1 << i;
+			}
+		} else if ((csd[ i - 1 ].actionType() == AddActionActionType) && (csd[ i ].actionType() == RemoveActionActionType)) {
+			if ((csd[ i - 1 ].keyValue == csd[ i ].keyValue) && (csd[ i - 1 ].panelObjNameValue == csd[ i ].panelObjNameValue)
+				&& (csd[ i - 1 ].categoryObjNameValue == csd[ i ].categoryObjNameValue)) {
+				willremoveIndex << i - 1 << i;
+			}
+		}
+	}
+	res = remove_indexs(csd, willremoveIndex);
+	willremoveIndex.clear();
+
+	//! 筛选VisibleCategoryActionType，对于连续出现的操作只保留最后一步
+	size = res.size();
+	for (int i = 1; i < size; ++i) {
+		if ((res[ i - 1 ].actionType() == VisibleCategoryActionType)
+			&& (res[ i ].actionType() == VisibleCategoryActionType)) {
+			if (res[ i - 1 ].categoryObjNameValue == res[ i ].categoryObjNameValue) {
+				// 要保证操作的是同一个内容
+				willremoveIndex << i - 1;  // 删除前一个只保留最后一个
+			}
+		}
+	}
+	res = remove_indexs(res, willremoveIndex);
+	willremoveIndex.clear();
+
+	//! 针对RenameCategoryActionType和RenamePanelActionType操作，只需保留最后一个
+	size = res.size();
+	for (int i = 0; i < size; ++i) {
+		if (res[ i ].actionType() == RenameCategoryActionType) {
+			// 向后查询，如果查询到有同一个Category改名，把这个索引加入删除队列
+			for (int j = i + 1; j < size; ++j) {
+				if ((res[ j ].actionType() == RenameCategoryActionType)
+					&& (res[ i ].categoryObjNameValue == res[ j ].categoryObjNameValue)) {
+					willremoveIndex << i;
+				}
+			}
+		} else if (res[ i ].actionType() == RenamePanelActionType) {
+			// 向后查询，如果查询到有同一个panel改名，把这个索引加入删除队列
+			for (int j = i + 1; j < size; ++j) {
+				if ((res[ j ].actionType() == RenamePanelActionType)
+					&& (res[ i ].panelObjNameValue == res[ j ].panelObjNameValue)
+					&& (res[ i ].categoryObjNameValue == res[ j ].categoryObjNameValue)) {
+					willremoveIndex << i;
+				}
+			}
+		}
+	}
+	res = remove_indexs(res, willremoveIndex);
+	willremoveIndex.clear();
+
+	//! 针对连续的ChangeCategoryOrderActionType，ChangePanelOrderActionType，ChangeActionOrderActionType进行合并
+	size = res.size();
+	for (int i = 1; i < size; ++i) {
+		if ((res[ i - 1 ].actionType() == ChangeCategoryOrderActionType)
+			&& (res[ i ].actionType() == ChangeCategoryOrderActionType)
+			&& (res[ i - 1 ].categoryObjNameValue == res[ i ].categoryObjNameValue)) {
+			// 说明连续两个顺序调整，把前一个indexvalue和后一个indexvalue相加，前一个删除
+			res[ i ].indexValue += res[ i - 1 ].indexValue;
+			willremoveIndex << i - 1;
+		} else if ((res[ i - 1 ].actionType() == ChangePanelOrderActionType)
+				   && (res[ i ].actionType() == ChangePanelOrderActionType)
+				   && (res[ i - 1 ].panelObjNameValue == res[ i ].panelObjNameValue)
+				   && (res[ i - 1 ].categoryObjNameValue == res[ i ].categoryObjNameValue)) {
+			// 说明连续两个顺序调整，把前一个indexvalue和后一个indexvalue相加，前一个删除
+			res[ i ].indexValue += res[ i - 1 ].indexValue;
+			willremoveIndex << i - 1;
+		} else if ((res[ i - 1 ].actionType() == ChangeActionOrderActionType)
+				   && (res[ i ].actionType() == ChangeActionOrderActionType) && (res[ i - 1 ].keyValue == res[ i ].keyValue)
+				   && (res[ i - 1 ].panelObjNameValue == res[ i ].panelObjNameValue)
+				   && (res[ i - 1 ].categoryObjNameValue == res[ i ].categoryObjNameValue)) {
+			// 说明连续两个顺序调整，把前一个indexvalue和后一个indexvalue相加，前一个删除
+			res[ i ].indexValue += res[ i - 1 ].indexValue;
+			willremoveIndex << i - 1;
+		}
+	}
+	res = remove_indexs(res, willremoveIndex);
+	willremoveIndex.clear();
+
+	//! 上一步操作可能会产生indexvalue为0的情况，此操作把indexvalue为0的删除
+	size = res.size();
+	for (int i = 0; i < size; ++i) {
+		if ((res[ i ].actionType() == ChangeCategoryOrderActionType) || (res[ i ].actionType() == ChangePanelOrderActionType)
+			|| (res[ i ].actionType() == ChangeActionOrderActionType)) {
+			if (0 == res[ i ].indexValue) {
+				willremoveIndex << i;
+			}
+		}
+	}
+	res = remove_indexs(res, willremoveIndex);
+	willremoveIndex.clear();
+	return (res);
+}
+
+}
+}
+
+#endif  // SARIBBONCUSTOMIZERECORD_H
+
+/*** End of inlined file: SARibbonCustomizeRecord.h ***/
+
+#include <QList>
+class SARibbonBar;
+class SARibbonMainWindow;
+
+/**
+ * \if ENGLISH
+ * @brief Data class for recording all customization operations
+ * @note This data depends on @ref SARibbonActionsManager, use this class after SARibbonActionsManager
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 记录所有自定义操作的数据类
+ * @note 此数据依赖于@ref SARibbonActionsManager 要在SARibbonActionsManager之后使用此类
+ * \endif
+ */
+class SA_RIBBON_EXPORT SARibbonCustomizeData : public SARibbon::Core::SARibbonCustomizeRecord
+
+{
+
+public:
+
+	// 计划 02 S4.2：ActionType 枚举、五个公有数据字段、mType、actionType()/setActionType()/isValid()
+	// 与 simplify() 算法均下沉 core 的 SARibbonCustomizeRecord（公有继承，存量字段直接访问零改动）
+	// Default constructor
 	SARibbonCustomizeData();
 	// Constructor with action type and manager
 	SARibbonCustomizeData(ActionType type, SARibbonActionsManager* mgr = nullptr);
-	// Get the action type of the CustomizeData
-	ActionType actionType() const;
-
-	// Set the action type of the CustomizeData
-	void setActionType(ActionType a);
-
-	// Check if this is a valid CustomizeData
-	bool isValid() const;
-
 	// Apply SARibbonCustomizeData to SARibbonBar
 	bool apply(SARibbonBar* bar) const;
 
@@ -6167,65 +6932,8 @@ public:
 	static QList< SARibbonCustomizeData > simplify(const QList< SARibbonCustomizeData >& csd);
 
 public:
-	/**
-	 * \if ENGLISH
-	 * @brief Parameter for recording order
-	 * @details When actionType==AddCategoryActionType, this parameter records the insert position of Category,
-	 *          When actionType==AddPanelActionType, this parameter records the insert position of panel,
-	 *          When actionType==AddActionActionType, this parameter records the insert position of action
-	 * \endif
-	 *
-	 * \if CHINESE
-	 * @brief 记录顺序的参数
-	 * @details 在actionType==AddCategoryActionType时，此参数记录Category的insert位置,
-	 *          在actionType==AddPanelActionType时，此参数记录panel的insert位置,
-	 *          在actionType==AddActionActionType时，此参数记录panel的insert位置
-	 * \endif
-	 */
-	int indexValue;
 
-	/**
-	 * \if ENGLISH
-	 * @brief Parameter for recording title, index, etc.
-	 * @details When actionType==AddCategoryActionType, key is the category title,
-	 *          When actionType==AddPanelActionType, key is the panel title,
-	 *          When actionType==AddActionActionType, key is the action query basis, based on SARibbonActionsManager::action query
-	 * \endif
-	 *
-	 * \if CHINESE
-	 * @brief 记录标题、索引等参数
-	 * @details 在actionType==AddCategoryActionType时，key为category标题，
-	 *          在actionType==AddPanelActionType时，key为panel标题，
-	 *          在actionType==AddActionActionType时，key为action的查询依据，基于SARibbonActionsManager::action查询
-	 * \endif
-	 */
-	QString keyValue;
-
-	/**
-	 * \if ENGLISH
-	 * @brief Record categoryObjName for locating Category
-	 * \endif
-	 *
-	 * \if CHINESE
-	 * @brief 记录categoryObjName，用于定位Category
-	 * \endif
-	 */
-	QString categoryObjNameValue;
-
-	/**
-	 * \if ENGLISH
-	 * @brief Record panelObjName, SARibbon's Customize index is mostly based on objname
-	 * \endif
-	 *
-	 * \if CHINESE
-	 * @brief 记录panelObjName，saribbon的Customize索引大部分基于objname
-	 * \endif
-	 */
-	QString panelObjNameValue;
-
-	SARibbonPanelItem::RowProportion actionRowProportionValue;  ///< 行的占比，ribbon中有large，media和small三种占比,见@ref RowProportion
 private:
-	ActionType mType;  ///< 标记这个data是category还是panel亦或是action
 	SARibbonActionsManager* mActionsManagerPointer;
 };
 Q_DECLARE_METATYPE(SARibbonCustomizeData)

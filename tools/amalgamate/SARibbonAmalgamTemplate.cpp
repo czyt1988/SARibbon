@@ -23,6 +23,10 @@
 #include "../../src/core/global/SARibbonCoreUtil.cpp"
 #include "../../src/core/theme/SARibbonThemePalette.cpp"
 #include "../../src/core/theme/SARibbonThemeData.cpp"
+#include "../../src/core/metrics/SARibbonMetrics.cpp"
+#include "../../src/core/data/SARibbonCustomizeRecord.cpp"
+#include "../../src/core/contract/SARibbonContract.cpp"
+
 
 
 // disable warnings about unsafe standard library calls
