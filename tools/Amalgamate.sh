@@ -6,6 +6,20 @@
 set -e
 DEST=../src
 
+# Amalgamate.exe returns 1 when the output file is unchanged ("No need to write -
+# new file is identical"); that is SUCCESS for us. Real failures are still caught
+# by the artifact existence + sanity checks at the end of this script.
+run_amalg() {
+    set +e
+    "$@"
+    local rc=$?
+    set -e
+    if [ "$rc" -ne 0 ] && [ "$rc" -ne 1 ]; then
+        echo "ERROR: Amalgamate.exe failed with exit code $rc" >&2
+        exit "$rc"
+    fi
+}
+
 # --- namespaced-include mirror (plan-01 S8, extended plan-03 S1) ---
 # Forwarding headers in src/widgets and cross-includes inside src/core use
 # <SARibbonCore/xxx.h>; that layout only exists in the build-tree sync dir /
@@ -26,8 +40,8 @@ done
 # <SARibbonCore/X.h> flat form (dedup path identical to the mirror path), and
 # no core header carries Q_OBJECT into the .cpp product.
 OPTS_CORE='-i "../src/core" -i "_amalg_include" -i "_amalg_include/SARibbonCore" -w "*.cpp;*.h;*.hpp" -s'
-./Amalgamate.exe $OPTS_CORE ./amalgamate/SARibbonCoreAmalgamTemplate.h   $DEST/SARibbonCore.h
-./Amalgamate.exe $OPTS_CORE ./amalgamate/SARibbonCoreAmalgamTemplate.cpp $DEST/SARibbonCore.cpp
+run_amalg ./Amalgamate.exe $OPTS_CORE ./amalgamate/SARibbonCoreAmalgamTemplate.h   $DEST/SARibbonCore.h
+run_amalg ./Amalgamate.exe $OPTS_CORE ./amalgamate/SARibbonCoreAmalgamTemplate.cpp $DEST/SARibbonCore.cpp
 
 # --- SARibbonWidgets single file (core + widgets) ---
 # The .h pass needs the mirror to resolve <SARibbonCore/...> forwarding includes.
@@ -37,8 +51,8 @@ OPTS_CORE='-i "../src/core" -i "_amalg_include" -i "_amalg_include/SARibbonCore"
 # verified in plan-02 S2, NOTES B23).
 OPTS_WIDGETS_H='-i "../src/widgets" -i "../src/widgets/colorWidgets" -i "../src/core" -i "_amalg_include" -w "*.cpp;*.h;*.hpp" -s'
 OPTS_WIDGETS_CPP='-i "../src/widgets" -i "../src/widgets/colorWidgets" -i "../src/core" -w "*.cpp;*.h;*.hpp" -s'
-./Amalgamate.exe $OPTS_WIDGETS_H ./amalgamate/SARibbonWidgetsAmalgamTemplate.h   $DEST/SARibbonWidgets.h
-./Amalgamate.exe $OPTS_WIDGETS_CPP ./amalgamate/SARibbonWidgetsAmalgamTemplate.cpp $DEST/SARibbonWidgets.cpp
+run_amalg ./Amalgamate.exe $OPTS_WIDGETS_H ./amalgamate/SARibbonWidgetsAmalgamTemplate.h   $DEST/SARibbonWidgets.h
+run_amalg ./Amalgamate.exe $OPTS_WIDGETS_CPP ./amalgamate/SARibbonWidgetsAmalgamTemplate.cpp $DEST/SARibbonWidgets.cpp
 
 # --- artifact sanity: all 4 files must exist (set -e + explicit check) ---
 for f in SARibbonCore.h SARibbonCore.cpp SARibbonWidgets.h SARibbonWidgets.cpp; do
