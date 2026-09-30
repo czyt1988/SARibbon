@@ -197,6 +197,12 @@
 
 ## 执行中追加
 
+### B19：docs/ 下含 src/SARibbonBar 旧路径引用的文件清单（计划 01 S12-5 登记，计划 04 批量处理）
+- 日期：2026-09-30（计划 01 S12 执行）
+- 证据：`git grep -l "src/SARibbonBar" docs` 实测 **22 个文件**（round3 预估口径一致）。完整清单（按 git grep 输出）：docs/doxygen-doc-file/Doxyfile-wiki-cn、Doxyfile-qch-cn（INPUT 路径，计划 04 S9-3 与 src/qml 一并改），docs/zh/build-guide/ 与 docs/en/build-guide/ 下 5×2 篇中的 build-3rdparty.md、build-SARibbon.md 等，docs/zh/use-guide/、docs/zh/dev-guide/、faq 等散见引用。
+- 处理：计划 01 不动 docs/（批量文档更新归计划 04），本条登记清单即完成 S12-5。
+- 影响计划：04-S9（批量处理时以此为基线清单，届时用 grep 重新生成）
+
 ### B18：sa_sync_include 需排除 colorWidgets/tst/（遗留 qmake 测试工程混入公共头同步集）
 - 日期：2026-09-30（计划 01 S11 安装树复核）
 - 发现位置：计划 01 S11.5（安装树清单检查）
