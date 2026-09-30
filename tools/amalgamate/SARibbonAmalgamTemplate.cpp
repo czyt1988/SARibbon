@@ -26,6 +26,8 @@
 #include "../../src/core/metrics/SARibbonMetrics.cpp"
 #include "../../src/core/data/SARibbonCustomizeRecord.cpp"
 #include "../../src/core/contract/SARibbonContract.cpp"
+#include "../../src/core/layout/SARibbonPanelLayoutEngine.cpp"
+
 
 
 

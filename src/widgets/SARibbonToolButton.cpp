@@ -883,8 +883,9 @@ QSize SARibbonToolButton::PrivateData::calcLargeButtonSizeHint(const QStyleOptio
     // 小于等于0时取消高度比例约束，仅以icon宽度作为下限，宽度由icon和文字内容决定。
     // 注意：minW必须基于字体行高推算的h计算，不能基于SARibbonPanel::largeButtonHeight()：
     // sizeHint可能在panel尚未获得真实几何时被查询（如隐藏category被QStackedLayout::sizeHint
-    // 遍历），此时largeButtonHeight()是任意值，而脏sizeHint会被按钮mSizeHint与面板
-    // mButtonSizeHintCache双层缓存固化，导致大按钮宽度异常收缩（v2.9.4回归缺陷）
+    // 遍历），此时largeButtonHeight()是任意值，而脏sizeHint会被按钮mSizeHint与面板的
+    // 按钮sizeHint缓存（v3.0起位于core的SARibbonPanelLayoutEngine）双层固化，
+    // 导致大按钮宽度异常收缩（v2.9.4回归缺陷，约束对引擎同样成立）
     qreal minWRatio = layoutFactor.largeButtonMinimumWidthRatio;
     int minW        = 0;
     if (minWRatio > 0.0) {

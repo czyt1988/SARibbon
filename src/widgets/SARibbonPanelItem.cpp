@@ -1,4 +1,5 @@
 #include "SARibbonPanelItem.h"
+#include "SARibbonGallery.h"
 
 /**
  * \if ENGLISH
@@ -12,7 +13,7 @@
  * \endif
  */
 SARibbonPanelItem::SARibbonPanelItem(QWidget* widget)
-    : QWidgetItem(widget), rowIndex(-1), columnIndex(-1), action(nullptr), customWidget(false), rowProportion(Large)
+    : QWidgetItem(widget), itemWillSetGeometry(resultGeometry), action(nullptr), customWidget(false)
 {
 }
 
@@ -90,4 +91,21 @@ QSize SARibbonPanelItem::sizeHint() const
 Qt::Orientations SARibbonPanelItem::expandingDirections() const
 {
     return QWidgetItem::expandingDirections();
+}
+
+/**
+ * \if ENGLISH
+ * @brief Contract stretchFactor: forward to SARibbonGallery when the wrapped widget is one (plan-02 S5.1-1)
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 契约 stretchFactor：包裹的控件是 Gallery 时转发其拉伸系数（计划 02 S5.1-1）
+ * \endif
+ */
+int SARibbonPanelItem::stretchFactor() const
+{
+    if (SARibbonGallery* gallery = qobject_cast< SARibbonGallery* >(widget())) {
+        return gallery->stretchFactor();
+    }
+    return 0;
 }

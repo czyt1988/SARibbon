@@ -1,6 +1,7 @@
 #ifndef SARIBBONPANELLAYOUT_H
 #define SARIBBONPANELLAYOUT_H
 #include "SARibbonGlobal.h"
+#include <SARibbonCore/SARibbonPanelLayoutEngine.h>
 #include <QLayout>
 #include <QHash>
 #include "SARibbonPanelItem.h"
@@ -152,7 +153,6 @@ protected:
     // Update geometry array
     void updateGeomArray(const QRect& setrect);
     // Recalculate expansion bar code, this function must be called after updateGeomArray function
-    void recalcExpandGeomArray(const QRect& setrect);
     // Set text wrap enabled
     void setEnableWordWrap(bool on);
     // Set maximum aspect ratio of buttons, this coefficient determines the maximum width of buttons
@@ -171,8 +171,7 @@ private:
     QList< SARibbonPanelItem* > mItems;
     int mColumnCount { 0 };                       ///< 记录有多少列
     QSize mSizeHint;                              ///< sizeHint返回的尺寸
-    QHash<QWidget*, QSize> mButtonSizeHintCache;  ///< 缓存按钮的sizeHint，避免重复计算
-    int mButtonSizeHintCacheLargeHeight { -1 };   ///< 缓存sizeHint时依据的大按钮高度，高度变化则缓存失效
+    SARibbon::Core::SARibbonPanelLayoutEngine mPanelLayoutEngine;  // plan-02 S5 Step B: algorithm + sizeHint cache moved into the core engine
     QSize mSmallToolButtonIconSize { 22, 22 };    ///< 记录小按钮图标尺寸
     QSize mLargeToolButtonIconSize { 32, 32 };    ///< 记录大按钮图标尺寸
     bool mDirty { true };                         ///< 用于标记是否需要刷新元素，参考QToolBarLayout源码

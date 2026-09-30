@@ -59,16 +59,15 @@ public:
 	bool isHidden() const Q_DECL_OVERRIDE;
 	// Contract: engine geometry application (widgets: QWidgetItem::setGeometry path)
 	void applyGeometry(const QRect& rect) Q_DECL_OVERRIDE;
+	// Contract stretchFactor: only the Gallery item overrides (issue #47); the
+	// engine must not qobject_cast to SARibbonGallery (plan-02 S5.1-1)
+	int stretchFactor() const Q_DECL_OVERRIDE;
 
-	// Step A（计划 02 S5.1）：本类同时实现 core 契约（SARibbonAbstractLayoutItem）。
-	// rowIndex/columnIndex/itemWillSetGeometry/isExpandItem/rowProportion 与契约的同名字段
-	// 构成遮蔽（2.x 拼写保持，算法读写这五个名字零改动）；Step B 搬移时统一为契约字段。
-	short rowIndex;             ///< Record which row the current item belongs to, -1 in hide mode
-	int columnIndex;            ///< Record which column the current item belongs to, -1 in hide mode
-	QRect itemWillSetGeometry;  ///< This will be updated when calling SARibbonPanelLayout::updateGeomArray, the actual setting will use QWidgetItem::setGeometry to set Geometry
+	// plan-02 S5 Step B: rowIndex/columnIndex/isExpandItem/rowProportion live in the contract base
+	// (single source of truth written by the engine); itemWillSetGeometry is a 2.x name bound
+	// by reference to the contract resultGeometry so every existing consumer keeps compiling.
+	QRect& itemWillSetGeometry;
 	QAction* action;            /// < Record action, reference QToolBarLayoutItem
 	bool customWidget;  ///< For action without window, there will actually be a SARibbonToolButton, which needs to be deleted during destruction
-	SARibbonPanelItem::RowProportion rowProportion;  ///< Row proportion, there are three types of proportions in ribbon: large, medium and small, see @ref RowProportion
-	bool isExpandItem { false };  ///< Temporary flag used by recalcExpandGeomArray to mark expandable items
 };
 #endif  // SARIBBONPANELITEM_H

@@ -16,6 +16,8 @@
 #include "../../src/core/data/SARibbonCustomizeRecord.h"
 #include "../../src/core/factory/SARibbonElementFactoryInterface.h"
 #include "../../src/core/metrics/SARibbonMetrics.h"
+#include "../../src/core/layout/SARibbonPanelLayoutEngine.h"
+
 
 #include "../../src/widgets/SARibbonThemeManager.h"
 #include "../../src/widgets/SARibbonThemePalette.h"

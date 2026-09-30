@@ -1692,7 +1692,6 @@ public:
 	virtual ~SARibbonAbstractLayoutItem();
 	// —— front end provides (engine inputs, pure virtual) ——
 	virtual QSize sizeHint() const = 0;
-	virtual QSize minimumSizeHint() const = 0;
 	virtual bool isHidden() const = 0;   // Panel: action not visible; Category: QWidgetItem::isEmpty semantics
 	virtual Qt::Orientations expandingDirections() const = 0;
 	// —— front end provides (with defaults, override as needed) ——
@@ -2187,6 +2186,183 @@ private:
 #endif  // SARIBBONMETRICS_H
 
 /*** End of inlined file: SARibbonMetrics.h ***/
+
+
+/*** Start of inlined file: SARibbonPanelLayoutEngine.h ***/
+#ifndef SARIBBONPANELLAYOUTENGINE_H
+#define SARIBBONPANELLAYOUTENGINE_H
+
+
+/*** Start of inlined file: SARibbonAbstractLayoutItem.h ***/
+#ifndef SARIBBONABSTRACTLAYOUTITEM_H
+#define SARIBBONABSTRACTLAYOUTITEM_H
+
+#include <QRect>
+#include <QSize>
+#include <QString>
+#include <Qt>
+
+namespace SARibbon
+{
+namespace Core
+{
+
+/**
+ * \if ENGLISH
+ * @brief Narrow contract interface between layout engines and front ends (plan 02 S4.1)
+ * @details The engines only read geometry constraints through this interface and write
+ * results back through public fields; they never see widgets. Panel-side isHidden()
+ * means "action not visible", Category-side means the QWidgetItem::isEmpty() widget
+ * semantics — each front end implements its own 2.x semantics, they must not be unified.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 布局引擎与前端之间的窄契约接口（计划 02 S4.1）
+ * @details 引擎只经本接口读几何约束、经公有字段回写结果，不见任何控件。
+ * Panel 侧 isHidden() 语义为 "action 不可见"；Category 侧为 QWidgetItem::isEmpty()
+ * 的控件语义——各前端按各自 2.x 语义实现，不得统一。
+ * @note 输出字段命名 resultGeometry（非 geometry）：与 QLayoutItem::geometry()
+ * 成员函数在双继承下冲突，v2 草案字段名已废弃（计划 02 S4.1-2）。
+ * \endif
+ */
+class SA_RIBBON_CORE_EXPORT SARibbonAbstractLayoutItem
+{
+public:
+	virtual ~SARibbonAbstractLayoutItem();
+	// —— front end provides (engine inputs, pure virtual) ——
+	virtual QSize sizeHint() const = 0;
+	virtual bool isHidden() const = 0;   // Panel: action not visible; Category: QWidgetItem::isEmpty semantics
+	virtual Qt::Orientations expandingDirections() const = 0;
+	// —— front end provides (with defaults, override as needed) ——
+	virtual int maximumWidth() const { return 16777215; }  // QWIDGETSIZE_MAX value (macro is QtWidgets, core forbids)
+	virtual int stretchFactor() const { return 0; }        // only the Gallery adapter overrides
+	virtual QString debugName() const { return {}; }       // diagnostics name for golden-test dumps
+	// —— front end implements (engine output application) ——
+	virtual void applyGeometry(const QRect& rect) = 0;
+	// —— engine-written result fields (both ends read) ——
+	int rowIndex = -1;                 // 2.x was short; contract uses int (plan 02 S4.1-3)
+	int columnIndex = -1;
+	QRect resultGeometry;              // corresponds to 2.x itemWillSetGeometry / mWillSetGeometry
+	bool isExpandItem = false;
+	// —— shared data ——
+	SARibbonRowProportion rowProportion = SARibbonRowProportion::Large;  // 2.x ctor default (PanelItem.cpp:15)
+};
+
+/**
+ * \if ENGLISH
+ * @brief Category-side extension: panel body + separator dual geometry (plan 02 S4.1-1)
+ * \endif
+ *
+ * \if CHINESE
+ * @brief Category 侧扩展：panel 本体 + 分割线双几何（计划 02 S4.1-1）
+ * \endif
+ */
+class SA_RIBBON_CORE_EXPORT SARibbonAbstractCategoryItem : public SARibbonAbstractLayoutItem
+{
+public:
+	~SARibbonAbstractCategoryItem() override;
+	QRect resultSeparatorGeometry;      // corresponds to 2.x mWillSetSeparatorGeometry
+	bool isSeparatorHidden = false;     // engine output, adapter hides/shows separatorWidget accordingly
+};
+
+}
+}
+
+#endif  // SARIBBONABSTRACTLAYOUTITEM_H
+
+/*** End of inlined file: SARibbonAbstractLayoutItem.h ***/
+
+#include <QMargins>
+#include <QRect>
+#include <QSize>
+#include <QVector>
+#include <QHash>
+#include <QFontMetrics>
+
+namespace SARibbon
+{
+namespace Core
+{
+
+/**
+ * \if ENGLISH
+ * @brief Layout engine for the panel box algorithm (plan 02 S5, Step B pure move)
+ * @details The updateGeomArray(QRect) / recalcExpandGeomArray bodies were moved
+ * verbatim from SARibbonPanelLayout.cpp; widget touchpoints became Input values
+ * and contract calls. The engine is stateful only through the button sizeHint
+ * cache (key = contract item pointer, invalidated when largeHeight changes);
+ * the adapter keeps one engine instance alive for the panel's lifetime.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief Panel 装箱布局引擎（计划 02 S5，Step B 纯搬移）
+ * @details updateGeomArray(QRect) / recalcExpandGeomArray 函数体自
+ * SARibbonPanelLayout.cpp 纯 move；widget 触点换为 Input 值与契约调用。
+ * 引擎的唯一状态是按钮 sizeHint 缓存（key=契约 item 指针，largeHeight
+ * 变化时整体失效）；适配器为 panel 生命周期持有一个引擎实例。
+ * \endif
+ */
+class SA_RIBBON_CORE_EXPORT SARibbonPanelLayoutEngine
+{
+public:
+	struct Input
+	{
+		int rowCount { 3 };  ///< 3/2/1 rows (mapped from PanelLayoutMode by the adapter)
+		bool showPanelTitle { true };
+		bool hasTitleLabel { true };
+		bool hasOptionAction { false };
+		bool isRTL { false };
+		QMargins contentsMargins;
+		int spacing { 2 };
+		int titleTextWidth { -1 };  ///< -1 = no title (adapter computes label fm advance + 4)
+		QSize optionBtnSize;
+		int titleHeight { 15 };  ///< effective (0 when title disabled)
+		int titleSpace { 2 };    ///< effective (0 when title disabled)
+		QFontMetrics fontMetrics { QFont() };  ///< for the sizeHint height derivation
+		int previousSizeHintWidth { 0 };  ///< sizeHint width from the PREVIOUS layout pass (2.x reads stale mSizeHint in recalcExpandGeomArray)
+	};
+
+	struct Result
+	{
+		QSize sizeHint;
+		int columnCount { 0 };
+		int largeHeight { 0 };
+		int totalWidth { 0 };
+		QRect titleGeometry;
+		QRect optionBtnGeometry;
+	};
+
+	SARibbonPanelLayoutEngine();
+
+	// Core entry: layout all items inside setrect. Writes each item's
+	// resultGeometry / rowIndex / columnIndex / isExpandItem.
+	Result layout(QVector< SARibbonAbstractLayoutItem* > items, const QRect& setrect, const Input& input);
+
+	// Cache lifetime invariants (plan-02 S5.1-2): the adapter calls these from
+	// takeAt()/invalidate(); a stale entry would be reused when a new item
+	// happens to get the same address.
+	void removeFromCache(SARibbonAbstractLayoutItem* item);
+	void clearCache();
+
+	// Height hint derived from the font metrics (moved verbatim from
+	// SARibbonPanel::panelHeightHint; rowCount replaces the PanelLayoutMode switch)
+	static int panelHeightHint(const QFontMetrics& fm, int rowCount, int panelTitleHeight);
+
+private:
+	void recalcExpandGeomArray(QVector< SARibbonAbstractLayoutItem* >& items,
+							   const QRect& setrect,
+							   const Input& input);
+
+	QHash< const SARibbonAbstractLayoutItem*, QSize > mButtonSizeHintCache;
+	int mButtonSizeHintCacheLargeHeight { -1 };
+};
+
+}
+}
+
+#endif  // SARIBBONPANELLAYOUTENGINE_H
+
+/*** End of inlined file: SARibbonPanelLayoutEngine.h ***/
 
 
 /*** Start of inlined file: SARibbonThemeManager.h ***/
@@ -3751,7 +3927,7 @@ class SARibbonToolButton;
  * @details 无窗口的action会在内部生成一个SARibbonToolButton
  * \endif
  */
-class SA_RIBBON_EXPORT SARibbonPanelItem : public QWidgetItem
+class SA_RIBBON_EXPORT SARibbonPanelItem : public QWidgetItem, public SARibbon::Core::SARibbonAbstractLayoutItem
 {
 public:
 	/**
@@ -3780,13 +3956,24 @@ public:
 	// Check if the item is empty
 	bool isEmpty() const Q_DECL_OVERRIDE;
 
-	short rowIndex;             ///< Record which row the current item belongs to, -1 in hide mode
-	int columnIndex;            ///< Record which column the current item belongs to, -1 in hide mode
-	QRect itemWillSetGeometry;  ///< This will be updated when calling SARibbonPanelLayout::updateGeomArray, the actual setting will use QWidgetItem::setGeometry to set Geometry
+	// Contract + QLayoutItem same-signature virtuals: explicit override disambiguates
+	// the two base declarations (no unique final overrider otherwise), plan-02 S5.1-1
+	QSize sizeHint() const Q_DECL_OVERRIDE;
+	Qt::Orientations expandingDirections() const Q_DECL_OVERRIDE;
+	// Contract: Panel-side isHidden == action not visible (2.x isEmpty semantics, plan-02 S5.1-1)
+	bool isHidden() const Q_DECL_OVERRIDE;
+	// Contract: engine geometry application (widgets: QWidgetItem::setGeometry path)
+	void applyGeometry(const QRect& rect) Q_DECL_OVERRIDE;
+	// Contract stretchFactor: only the Gallery item overrides (issue #47); the
+	// engine must not qobject_cast to SARibbonGallery (plan-02 S5.1-1)
+	int stretchFactor() const Q_DECL_OVERRIDE;
+
+	// plan-02 S5 Step B: rowIndex/columnIndex/isExpandItem/rowProportion live in the contract base
+	// (single source of truth written by the engine); itemWillSetGeometry is a 2.x name bound
+	// by reference to the contract resultGeometry so every existing consumer keeps compiling.
+	QRect& itemWillSetGeometry;
 	QAction* action;            /// < Record action, reference QToolBarLayoutItem
 	bool customWidget;  ///< For action without window, there will actually be a SARibbonToolButton, which needs to be deleted during destruction
-	SARibbonPanelItem::RowProportion rowProportion;  ///< Row proportion, there are three types of proportions in ribbon: large, medium and small, see @ref RowProportion
-	bool isExpandItem { false };  ///< Temporary flag used by recalcExpandGeomArray to mark expandable items
 };
 #endif  // SARIBBONPANELITEM_H
 
@@ -3796,6 +3983,103 @@ public:
 /*** Start of inlined file: SARibbonPanelLayout.h ***/
 #ifndef SARIBBONPANELLAYOUT_H
 #define SARIBBONPANELLAYOUT_H
+
+
+/*** Start of inlined file: SARibbonPanelLayoutEngine.h ***/
+#ifndef SARIBBONPANELLAYOUTENGINE_H
+#define SARIBBONPANELLAYOUTENGINE_H
+
+#include <QMargins>
+#include <QRect>
+#include <QSize>
+#include <QVector>
+#include <QHash>
+#include <QFontMetrics>
+
+namespace SARibbon
+{
+namespace Core
+{
+
+/**
+ * \if ENGLISH
+ * @brief Layout engine for the panel box algorithm (plan 02 S5, Step B pure move)
+ * @details The updateGeomArray(QRect) / recalcExpandGeomArray bodies were moved
+ * verbatim from SARibbonPanelLayout.cpp; widget touchpoints became Input values
+ * and contract calls. The engine is stateful only through the button sizeHint
+ * cache (key = contract item pointer, invalidated when largeHeight changes);
+ * the adapter keeps one engine instance alive for the panel's lifetime.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief Panel 装箱布局引擎（计划 02 S5，Step B 纯搬移）
+ * @details updateGeomArray(QRect) / recalcExpandGeomArray 函数体自
+ * SARibbonPanelLayout.cpp 纯 move；widget 触点换为 Input 值与契约调用。
+ * 引擎的唯一状态是按钮 sizeHint 缓存（key=契约 item 指针，largeHeight
+ * 变化时整体失效）；适配器为 panel 生命周期持有一个引擎实例。
+ * \endif
+ */
+class SA_RIBBON_CORE_EXPORT SARibbonPanelLayoutEngine
+{
+public:
+	struct Input
+	{
+		int rowCount { 3 };  ///< 3/2/1 rows (mapped from PanelLayoutMode by the adapter)
+		bool showPanelTitle { true };
+		bool hasTitleLabel { true };
+		bool hasOptionAction { false };
+		bool isRTL { false };
+		QMargins contentsMargins;
+		int spacing { 2 };
+		int titleTextWidth { -1 };  ///< -1 = no title (adapter computes label fm advance + 4)
+		QSize optionBtnSize;
+		int titleHeight { 15 };  ///< effective (0 when title disabled)
+		int titleSpace { 2 };    ///< effective (0 when title disabled)
+		QFontMetrics fontMetrics { QFont() };  ///< for the sizeHint height derivation
+		int previousSizeHintWidth { 0 };  ///< sizeHint width from the PREVIOUS layout pass (2.x reads stale mSizeHint in recalcExpandGeomArray)
+	};
+
+	struct Result
+	{
+		QSize sizeHint;
+		int columnCount { 0 };
+		int largeHeight { 0 };
+		int totalWidth { 0 };
+		QRect titleGeometry;
+		QRect optionBtnGeometry;
+	};
+
+	SARibbonPanelLayoutEngine();
+
+	// Core entry: layout all items inside setrect. Writes each item's
+	// resultGeometry / rowIndex / columnIndex / isExpandItem.
+	Result layout(QVector< SARibbonAbstractLayoutItem* > items, const QRect& setrect, const Input& input);
+
+	// Cache lifetime invariants (plan-02 S5.1-2): the adapter calls these from
+	// takeAt()/invalidate(); a stale entry would be reused when a new item
+	// happens to get the same address.
+	void removeFromCache(SARibbonAbstractLayoutItem* item);
+	void clearCache();
+
+	// Height hint derived from the font metrics (moved verbatim from
+	// SARibbonPanel::panelHeightHint; rowCount replaces the PanelLayoutMode switch)
+	static int panelHeightHint(const QFontMetrics& fm, int rowCount, int panelTitleHeight);
+
+private:
+	void recalcExpandGeomArray(QVector< SARibbonAbstractLayoutItem* >& items,
+							   const QRect& setrect,
+							   const Input& input);
+
+	QHash< const SARibbonAbstractLayoutItem*, QSize > mButtonSizeHintCache;
+	int mButtonSizeHintCacheLargeHeight { -1 };
+};
+
+}
+}
+
+#endif  // SARIBBONPANELLAYOUTENGINE_H
+
+/*** End of inlined file: SARibbonPanelLayoutEngine.h ***/
 
 #include <QLayout>
 #include <QHash>
@@ -3948,7 +4232,6 @@ protected:
 	// Update geometry array
 	void updateGeomArray(const QRect& setrect);
 	// Recalculate expansion bar code, this function must be called after updateGeomArray function
-	void recalcExpandGeomArray(const QRect& setrect);
 	// Set text wrap enabled
 	void setEnableWordWrap(bool on);
 	// Set maximum aspect ratio of buttons, this coefficient determines the maximum width of buttons
@@ -3967,8 +4250,7 @@ private:
 	QList< SARibbonPanelItem* > mItems;
 	int mColumnCount { 0 };                       ///< 记录有多少列
 	QSize mSizeHint;                              ///< sizeHint返回的尺寸
-	QHash<QWidget*, QSize> mButtonSizeHintCache;  ///< 缓存按钮的sizeHint，避免重复计算
-	int mButtonSizeHintCacheLargeHeight { -1 };   ///< 缓存sizeHint时依据的大按钮高度，高度变化则缓存失效
+	SARibbon::Core::SARibbonPanelLayoutEngine mPanelLayoutEngine;  // plan-02 S5 Step B: algorithm + sizeHint cache moved into the core engine
 	QSize mSmallToolButtonIconSize { 22, 22 };    ///< 记录小按钮图标尺寸
 	QSize mLargeToolButtonIconSize { 32, 32 };    ///< 记录大按钮图标尺寸
 	bool mDirty { true };                         ///< 用于标记是否需要刷新元素，参考QToolBarLayout源码
