@@ -221,17 +221,29 @@ jobs:
       - name: Install build tools
         run: pip install -U pip build
 
-      - name: Install Qt (Windows)
-        if: runner.os == 'Windows'
+      - name: Install Qt (Windows, qt5 track)
+        if: runner.os == 'Windows' && matrix.track == 'pyqt5'
+        run: |
+          pip install aqtinstall
+          python -m aqt install-qt windows desktop 5.15.2 win64_msvc2019_64 -O ${{ github.workspace }}\Qt
+          echo "${{ github.workspace }}\Qt\5.15.2\msvc2019_64\bin" >> $GITHUB_PATH
+
+      - name: Install Qt (Windows, qt6/pyside6 tracks)
+        if: runner.os == 'Windows' && matrix.track != 'pyqt5'
         run: |
           pip install aqtinstall
           python -m aqt install-qt windows desktop 6.8.3 win64_msvc2022_64 -O ${{ github.workspace }}\Qt
           echo "${{ github.workspace }}\Qt\6.8.3\msvc2022_64\bin" >> $GITHUB_PATH
+      - name: Install Qt (Linux, qt5 track)
+        if: runner.os == 'Linux' && matrix.track == 'pyqt5'
+        run: sudo apt-get update && sudo apt-get install -y qtbase5-dev qt5-qmake qtbase5-dev-tools libqt5svg5-dev
 
-      - name: Install Qt (Linux)
-        if: runner.os == 'Linux'
-        run: sudo apt-get update && sudo apt-get install -y qt6-base-dev qt6-base-dev-tools libqt6svg6-dev
-
+      - name: Install Qt (Linux, qt6/pyside6 tracks)
+        if: runner.os == 'Linux' && matrix.track != 'pyqt5'
+        run: |
+          sudo apt-get update && sudo apt-get install -y qt6-base-dev qt6-base-dev-tools qt6-svg-dev
+          # apt installs qmake6, the sip toolchain looks for plain qmake
+          sudo ln -sf /usr/lib/qt6/bin/qmake6 /usr/local/bin/qmake
       - name: Set MSVC environment (Windows)
         if: runner.os == 'Windows'
         uses: ilammy/msvc-dev-cmd@v1
@@ -251,6 +263,8 @@ jobs:
 
       - name: Build wheel
         shell: bash
+        env:
+          CMAKE_PREFIX_PATH: ${{ runner.os == 'Windows' && format('{0}\\Qt\\6.8.3\\msvc2022_64', github.workspace) || '/usr/lib/qt6' }}
         run: |
           if [ "${{ matrix.track }}" = "pyside6" ]; then python -m build --wheel pyside6/; fi
           if [ "${{ matrix.track }}" = "pyqt6" ]; then python -m build --wheel --no-isolation pyqt6/; fi
