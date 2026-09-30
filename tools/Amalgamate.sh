@@ -4,8 +4,10 @@ DEST=../src
 OPTS='-i "../src/widgets" -i "../src/widgets/colorWidgets" -i "../src/core" -i "_amalg_include" -w "*.cpp;*.h;*.hpp" -s'
 # 3.0 namespace-include mirror: <SARibbonCore/xxx> only exists in build-tree
 # sync dir / install tree, mirror it here so forwarding headers resolve
+# mirror all core headers flat (plan 02 S1: headers now live in src/core/global/ etc.
+# and are consumed via the flattened <SARibbonCore/X.h> namespace form)
 rm -rf _amalg_include && mkdir -p _amalg_include/SARibbonCore
-cp ../src/core/SARibbonCoreGlobal.h ../src/core/SARibbonQt5Compat.hpp _amalg_include/SARibbonCore/
+find ../src/core -type f \( -name '*.h' -o -name '*.hpp' \) -exec cp {} _amalg_include/SARibbonCore/ \;
 ./Amalgamate.exe $OPTS ./amalgamate/SARibbonAmalgamTemplate.h $DEST/SARibbon.h
 ./Amalgamate.exe $OPTS ./amalgamate/SARibbonAmalgamTemplate.cpp $DEST/SARibbon.cpp
 rm -rf _amalg_include   # transient; never committed

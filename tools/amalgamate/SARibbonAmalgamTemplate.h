@@ -7,6 +7,10 @@
 //定义此宏，将SA_COLOR_WIDGETS_API定义为空
 #ifndef SA_COLOR_WIDGETS_NO_DLL
 #define SA_COLOR_WIDGETS_NO_DLL
+//3.0: core macros are defined as static within the single file
+#ifndef SA_RIBBON_CORE_STATIC
+#define SA_RIBBON_CORE_STATIC
+#endif
 #endif
 
 #include "SARibbonAmalgamTemplatePublicHeaders.h"

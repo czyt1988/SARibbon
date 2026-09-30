@@ -30,10 +30,27 @@ DEFAULT_FORBID_INCLUDE = [
     "QLayout",
     "QAction",
     "QQuickItem",
+    "QQuickPaintedItem",
     "QQml",
     "<QtWidgets/",
     "<QtQuick/",
 ]
+
+# QtGui names that merely share a prefix with a forbidden QtWidgets name:
+# QStyleHints (QtGui) must NOT be flagged by the "QStyle" rule, so include
+# rules match the basename exactly OR with a QtWidgets-style suffix boundary
+# (forbidden::QWidget also catches QWidgetItem-style derived header names via
+# the exact-prefix + capital-letter heuristic below).
+EXPLICIT_LEGAL_INCLUDES = {
+    "QStyleHints",
+    "QGuiApplication",
+    "QScreen",
+    "QFontMetrics",
+    "QFontMetricsF",
+    "QColor",
+    "QIcon",
+    "QPixmap",
+}
 
 # QLayout family regex: QLayout itself plus QGridLayout/QVBoxLayout/QBoxLayout/
 # QFormLayout/QStackedLayout/... (v2 section 3.7 "QLayout and the Q*Layout family")
@@ -53,14 +70,20 @@ SCAN_EXTS = (".h", ".hpp", ".cpp")
 
 def check_include_target(target: str, forbidden: list) -> str | None:
     """Return the violated rule if the include target is forbidden."""
+    base = os.path.basename(target)
+    if base in EXPLICIT_LEGAL_INCLUDES:
+        return None
     for rule in forbidden:
         if rule.startswith("<"):
             if target.startswith(rule[1:]):
                 return rule
         else:
-            # bare class-name / prefix match on the file base name
-            base = os.path.basename(target)
-            if base.startswith(rule):
+            # bare class-name match: exact name, or prefix followed by an
+            # uppercase letter (QApplication -> QApplicationStyle-like derived
+            # names; QWidget -> QWidgetItem), so QStyle does not hit QStyleHints
+            if base == rule or (
+                base.startswith(rule) and len(base) > len(rule) and base[len(rule)].isupper()
+            ):
                 return rule
             if LAYOUT_FAMILY.match(base):
                 return f"{base} (Q*Layout family)"

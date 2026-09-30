@@ -33,13 +33,15 @@ public:
 	 * @brief 定义了行的占比，ribbon中有large，media和small三种占比
 	 * \endif
 	 */
-	enum RowProportion
-	{
-		None,  ///< Undefined proportion, at this time it will be judged based on expandingDirections, if there is Qt::Vertical, it is equivalent to Large, otherwise it is Small
-		Large,   ///< Large proportion, the height of a widget will fill the entire panel
-		Medium,  ///< Medium proportion, only works when @ref SARibbonPanel::panelLayoutMode is @ref SARibbonPanel::ThreeRowMode, and when both in the same column are Medium, they will occupy two rows in three rows
-		Small  ///< Small proportion, occupies one row of SARibbonPanel, Medium will also become Small when conditions are not met, but will not become Large
-	};
+	// 计划 02 S1：枚举本体已提升至 SARibbon::Core::SARibbonRowProportion（core/global/SARibbonEnums.h）。
+	// 类作用域的 using 声明无法引入命名空间枚举符（MSVC C2886/标准 [namespace.udecl]，
+	// 计划 round3 断言有误，见 NOTES B21），改用类型别名 + static constexpr 成员，
+	// SARibbonPanelItem::Large / 类内裸名 / 隐式 int 转换三类存量用法全部保持可编译。
+	using RowProportion = SARibbon::Core::SARibbonRowProportion;
+	static constexpr RowProportion None   = SARibbon::Core::None;   ///< Undefined proportion, judged by expandingDirections
+	static constexpr RowProportion Large  = SARibbon::Core::Large;  ///< Large proportion, fills the entire panel height
+	static constexpr RowProportion Medium = SARibbon::Core::Medium; ///< Medium proportion, only works in ThreeRowMode
+	static constexpr RowProportion Small  = SARibbon::Core::Small;  ///< Small proportion, occupies one row
 	// Constructor for SARibbonPanelItem
 	explicit SARibbonPanelItem(QWidget* widget);
 	// Destructor for SARibbonPanelItem
@@ -56,13 +58,4 @@ public:
 	SARibbonPanelItem::RowProportion rowProportion;  ///< Row proportion, there are three types of proportions in ribbon: large, medium and small, see @ref RowProportion
 	bool isExpandItem { false };  ///< Temporary flag used by recalcExpandGeomArray to mark expandable items
 };
-#ifndef SA_ActionPropertyName_RowProportion
-#define SA_ActionPropertyName_RowProportion "_sa_RowProportion"
-#endif
-#ifndef SA_ActionPropertyName_ToolButtonPopupMode
-#define SA_ActionPropertyName_ToolButtonPopupMode "_sa_ToolButtonPopupMode"
-#endif
-#ifndef SA_ActionPropertyName_ToolButtonStyle
-#define SA_ActionPropertyName_ToolButtonStyle "_sa_ToolButtonStyle"
-#endif
 #endif  // SARIBBONPANELITEM_H

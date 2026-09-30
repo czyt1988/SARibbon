@@ -95,7 +95,11 @@ function(sa_add_library _target)
 endfunction()
 
 # sa_sync_include: mirror public headers into ${CMAKE_BINARY_DIR}/include/<module>/
+# FLATTEN (plan 02 S1-5): copy headers flat into include/<module>/ root instead of
+# keeping the physical sub-directory layout — used by core, whose headers physically
+# live in global/ theme/ metrics/ ... but are consumed as <SARibbonCore/Xxx.h>.
 function(sa_sync_include _target _module)
+    cmake_parse_arguments(FUNC_SYNC "FLATTEN" "" "" ${ARGN})
     set(_src_root "${CMAKE_CURRENT_SOURCE_DIR}")
     set(_dst_root "${CMAKE_BINARY_DIR}/include/${_module}")
     file(GLOB_RECURSE _headers RELATIVE "${_src_root}"
@@ -108,9 +112,14 @@ function(sa_sync_include _target _module)
         if(_h MATCHES "_p\\.h$")
             continue()   # private headers are neither synced nor installed
         endif()
-        get_filename_component(_sub "${_h}" DIRECTORY)   # e.g. colorWidgets
-        file(COPY "${_src_root}/${_h}" DESTINATION "${_dst_root}/${_sub}")
-        list(APPEND _synced "${_dst_root}/${_h}")
+        if(FUNC_SYNC_FLATTEN)
+            file(COPY "${_src_root}/${_h}" DESTINATION "${_dst_root}")
+            list(APPEND _synced "${_dst_root}/${_h}")
+        else()
+            get_filename_component(_sub "${_h}" DIRECTORY)   # e.g. colorWidgets
+            file(COPY "${_src_root}/${_h}" DESTINATION "${_dst_root}/${_sub}")
+            list(APPEND _synced "${_dst_root}/${_h}")
+        endif()
     endforeach()
     set(${_target}_SYNC_FILES "${_synced}" PARENT_SCOPE)
     if(SARIBBON_INSTALL)   # v2 §6.4 (round2 D1)

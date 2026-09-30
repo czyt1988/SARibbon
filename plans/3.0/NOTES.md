@@ -197,6 +197,25 @@
 
 ## 执行中追加
 
+### B21：类作用域 using 声明无法引入命名空间枚举符（计划 02 S1 round3 断言错误，MSVC C2886）
+- 日期：2026-09-30（计划 02 S1 执行）
+- 发现位置：计划 02 S1 第 1 条 RowProportion 兼容机制
+- 证据：MSVC 19.29 对 `class SARibbonPanelItem { using SARibbon::Core::None; ... }` 报 `error C2886: "SARibbon::Core::None": 在成员 using 声明中不能使用符号`——C++ 标准 [namespace.udecl]/7 要求成员 using 声明的名字必须是基类成员；命名空间枚举符不满足。计划 02 round3"using 声明把命名空间成员引入类作用域，合法 C++"的断言有误。
+- 处理（沙盒最小实验验证后采用）：类型别名 + **static constexpr 成员**：`using RowProportion = SARibbon::Core::SARibbonRowProportion;` + `static constexpr RowProportion None/ Large/Medium/Small = ...;`。三类存量用法全部保持可编译（沙盒+全仓构建验证）：`SARibbonPanelItem::Large` 类限定、类内裸名默认值、`QString::number(d.actionRowProportionValue)` 隐式 int 转换。枚举本体仍入 `SARibbon::Core` 命名空间、仍 unscoped（计划两目标不变）。
+- 影响计划：02-S1（兼容机制落地修正）；03-S3.2-1（绑定侧枚举适配按此现状核对）
+
+### B22：计划 02 S1 执行记录（枚举/Util 下沉）
+- 日期：2026-09-30
+- 内容与证据：
+  1. `src/core/global/SARibbonEnums.h`：三自由枚举（Alignment/Theme/MainWindowStyleFlag，含 Q_DECLARE_METATYPE/FLAGS）+ `SA_RIBBON_BAR_PROP_CAN_CUSTOMIZE` 宏（纯 move，全局命名空间维持）+ `SARibbon::Core::SARibbonRowProportion`（提升）+ 三个属性名宏（移自 PanelItem.h）。widgets/SARibbonGlobal.h 转发 include 之，38 个既有 include 零改动。
+  2. **四个 Q_ENUM 枚举（PanelLayoutMode/RibbonStyleFlag/RibbonMode/RibbonButtonType）按计划 S1.1 的降级出口留 widgets 原地**（计划明文允许："任何一步造成 moc/编译失败且无法在不改行为前提下解决时允许留在 widgets，枚举下沉不是 M1 验收硬门"）。决策理由：RibbonStyleFlag/RibbonMode/PanelLayoutMode 深度耦合 Q_PROPERTY+Q_ENUM+Q_FLAG+SARibbonMainWindow 侧的 Q_DECLARE_OPERATORS_FOR_FLAGS，提升+别名方案在这些 moc 元对象链上属工具链灰区（round3 final-audit §五已预警），而 M1 的验收硬门是引擎提取；降级后引擎 Input 用 int/独立值即可，零行为风险。
+  3. `src/core/global/SARibbonCoreUtil.h/.cpp`：8 个 core 函数纯 move（makeColorVibrant/scaleSizeByHeight×2/scaleSizeByWidth/iconToPixmap/saMirrorX/isOperatingSystemInDarkMode/set+isEnableSystemDarkModeAutoSwitch）；saIsRTL 的 `QApplication::layoutDirection()` 换 `QGuiApplication::layoutDirection()`（行为等价，QtGui）；`iconToPixmap` 补 `SA_RIBBON_CORE_EXPORT`（2.9.5 本就无导出宏，属 S1 计划内补漏）。widgets/SARibbonUtil.h/.cpp 留 3 个（widgetDevicePixelRatio/replaceQssTokens/getBuiltInRibbonThemeQss），include `<SARibbonCore/SARibbonCoreUtil.h>` 保持 SA:: 拼写零变化。
+  4. `sa_sync_include` 增加 FLATTEN 选项（core 专用，widgets 层级不变）。
+  5. tests POST_BUILD 增加 SARibbonCore.dll 拷贝（S1 后 widgets 双 DLL 依赖）。
+  6. Amalgamate.sh 镜像段扩展为 `find ../src/core -name '*.h|*.hpp'` 全量平铺；两个模板补 `SA_RIBBON_CORE_STATIC` 定义与 `../../src/core/global/SARibbonCoreUtil.cpp` 枚举——单文件产物重新生成，StaticExample 编译链接通过。
+- 验证：构建绿；ctest 25/26（B15 环境项）；`check_core_purity.py src/core` 绿（扫描器顺带修正：include 前缀改为"完全相等或后随大写字母"边界，QStyleHints 等 QtGui 类不再被 QStyle 前缀误伤；补 QQuickPaintedItem 规则）。
+- 影响计划：02-S1 完成；03-S1（双产物模板以此现状为基础）
+
 ### B20：计划 01 验收门执行记录（2026-09-30）
 - 门禁逐项结果：
   - `git log --follow`（src/widgets/SARibbonBar.cpp、tests/widgets/ThemeCoverageTest.cpp）：✅ 历史可追溯至 2.9.5；

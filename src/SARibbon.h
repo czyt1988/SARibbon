@@ -7,6 +7,10 @@
 //定义此宏，将SA_COLOR_WIDGETS_API定义为空
 #ifndef SA_COLOR_WIDGETS_NO_DLL
 #define SA_COLOR_WIDGETS_NO_DLL
+//3.0: core macros are defined as static within the single file
+#ifndef SA_RIBBON_CORE_STATIC
+#define SA_RIBBON_CORE_STATIC
+#endif
 #endif
 
 
@@ -426,14 +430,16 @@ SA_RIBBON_CORE_EXPORT int saRibbonCoreAbiVersion();
 
 /*** End of inlined file: SARibbonWidgetsGlobal.h ***/
 
-// 原 Global.h:6 行为保持：版本宏随全局头可见
-// （注释单独成行，不放 include 行尾注：Amalgamate 对带尾注的重复 include 行无法去重，见 NOTES B17）
+// 计划 02 S1：公共枚举与属性名常量已下沉 core/global/SARibbonEnums.h
 
-class QWidget;                        // 原 Global.h:7 前置声明保留（widgets 侧需要）
-
-// ==== 三个枚举（SARibbonAlignment/SARibbonTheme/SARibbonMainWindowStyleFlag，
-//      含注释与 Q_DECLARE_FLAGS/Q_DECLARE_OPERATORS_FOR_FLAGS）与
-//      SA_RIBBON_BAR_PROP_CAN_CUSTOMIZE 原样保留在本文件，计划 02 再下沉 core ====
+/*** Start of inlined file: SARibbonEnums.h ***/
+#ifndef SARIBBONENUMS_H
+#define SARIBBONENUMS_H
+#include <QMetaType>
+#include <QFlags>
+// 计划 02 S1：公共枚举与属性名常量下沉 core（原 src/widgets/SARibbonGlobal.h 与 SARibbonPanelItem.h 的内容，
+// 值序与字符串值一字不改）。三个自由枚举维持全局命名空间（2.x 用户零改名）；
+// core 新增类型名放 namespace SARibbon::Core（v2 §3.5）。
 
 /**
  * \if ENGLISH
@@ -522,6 +528,43 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(SARibbonMainWindowStyles)
 #ifndef SA_RIBBON_BAR_PROP_CAN_CUSTOMIZE
 #define SA_RIBBON_BAR_PROP_CAN_CUSTOMIZE "_sa_isCanCustomize"
 #endif
+
+namespace SARibbon
+{
+namespace Core
+{
+// 提升自 SARibbonPanelItem::RowProportion（SARibbonPanelItem.h L36-42），保持 unscoped：
+// SARibbonCustomizeWidget.cpp 依赖枚举到 int 的隐式转换；放命名空间避免 None/Large 泄漏到全局（X11 None 宏）。
+// widgets 侧 SARibbonPanelItem 以类型别名 + static constexpr 成员保持 SARibbonPanelItem::Large 等拼写兼容（NOTES B21）。
+enum SARibbonRowProportion
+{
+	None,   ///< Undefined proportion, at this time it will be judged based on expandingDirections
+	Large,  ///< Large proportion, the height of a widget will fill the entire panel
+	Medium, ///< Medium proportion, only works in ThreeRowMode
+	Small   ///< Small proportion, occupies one row of SARibbonPanel
+};
+}  // namespace Core
+}  // namespace SARibbon
+
+#ifndef SA_ActionPropertyName_RowProportion
+#define SA_ActionPropertyName_RowProportion "_sa_RowProportion"
+#endif
+#ifndef SA_ActionPropertyName_ToolButtonPopupMode
+#define SA_ActionPropertyName_ToolButtonPopupMode "_sa_ToolButtonPopupMode"
+#endif
+#ifndef SA_ActionPropertyName_ToolButtonStyle
+#define SA_ActionPropertyName_ToolButtonStyle "_sa_ToolButtonStyle"
+#endif
+
+#endif  // SARIBBONENUMS_H
+
+/*** End of inlined file: SARibbonEnums.h ***/
+
+
+// 原 Global.h:6 行为保持：版本宏随全局头可见
+// （注释单独成行，不放 include 行尾注：Amalgamate 对带尾注的重复 include 行无法去重，见 NOTES B17）
+
+class QWidget;                        // 原 Global.h:7 前置声明保留（widgets 侧需要）
 
 #endif  // SARIBBONGLOBAL_H
 
@@ -1371,30 +1414,40 @@ private:
 #include <QColor>
 #include <QSize>
 #include <QIcon>
+
+/*** Start of inlined file: SARibbonCoreUtil.h ***/
+#ifndef SARIBBONCOREUTIL_H
+#define SARIBBONCOREUTIL_H
+
+#include <QColor>
+#include <QSize>
+#include <QIcon>
+#include <QPixmap>
+
+// 计划 02 S1：SARibbonUtil 中无 widget 依赖的函数下沉 core（函数体纯 move，一字不改）。
+// namespace SA 维持不变（2.x 既有 API 拼写，v2 §3.5：仅新增类型入 SARibbon::Core）。
+// QSS 渲染（replaceQssTokens/getBuiltInRibbonThemeQss）与 widgetDevicePixelRatio 留 widgets（v2 §3.2）。
 namespace SA
 {
 
 // 让颜色鲜艳
-QColor SA_RIBBON_EXPORT makeColorVibrant(const QColor& c, int saturationDelta = 150, int valueDelta = 30);
+QColor SA_RIBBON_CORE_EXPORT makeColorVibrant(const QColor& c, int saturationDelta = 150, int valueDelta = 30);
 
 // 按照指定的新高度，保持宽高比缩放 QSize
-QSize SA_RIBBON_EXPORT scaleSizeByHeight(const QSize& originalSize, int newHeight);
+QSize SA_RIBBON_CORE_EXPORT scaleSizeByHeight(const QSize& originalSize, int newHeight);
 
 // 按照指定的新高度，宽高比为1:factor缩放 QSize。
-QSize SA_RIBBON_EXPORT scaleSizeByHeight(const QSize& originalSize, int newHeight, qreal factor);
+QSize SA_RIBBON_CORE_EXPORT scaleSizeByHeight(const QSize& originalSize, int newHeight, qreal factor);
 
 // 按照指定的新宽度，保持宽高比缩放 QSize
-QSize SA_RIBBON_EXPORT scaleSizeByWidth(const QSize& originalSize, int newWidth);
+QSize SA_RIBBON_CORE_EXPORT scaleSizeByWidth(const QSize& originalSize, int newWidth);
 
 // 提供类似QIcon::pixmap(const QSize &size, qreal devicePixelRatio, Mode mode, State state) const（Qt6新增）的兼容函数
-QPixmap iconToPixmap(const QIcon& icon,
-					 const QSize& size,
-					 qreal devicePixelRatio,
-					 QIcon::Mode mode   = QIcon::Normal,
-					 QIcon::State state = QIcon::Off);
-
-// 获取窗口当前所在屏幕的dpr
-qreal widgetDevicePixelRatio(QWidget* w);
+QPixmap SA_RIBBON_CORE_EXPORT iconToPixmap(const QIcon& icon,
+										   const QSize& size,
+										   qreal devicePixelRatio,
+										   QIcon::Mode mode   = QIcon::Normal,
+										   QIcon::State state = QIcon::Off);
 
 /**
  * \if ENGLISH
@@ -1404,10 +1457,11 @@ qreal widgetDevicePixelRatio(QWidget* w);
  *
  * \if CHINESE
  * @brief 检查应用程序布局方向是否为从右到左（RTL）
- * @return 如果布局方向为 Qt::RightToLeft 返回 true，否则返回 false
+ * @note core 版改用 QGuiApplication::layoutDirection()（QtGui，行为与 widgets 版等价）；
+ * 三个布局引擎一律经 Input.isRTL 入参取该值，不得直接调用本函数（确定性层禁区）
  * \endif
  */
-bool SA_RIBBON_EXPORT saIsRTL();
+bool SA_RIBBON_CORE_EXPORT saIsRTL();
 
 /**
  * \if ENGLISH
@@ -1426,16 +1480,32 @@ bool SA_RIBBON_EXPORT saIsRTL();
  * @return RTL 时返回 containerWidth - x - elementWidth，LTR 时返回 x 不变
  * \endif
  */
-int SA_RIBBON_EXPORT saMirrorX(int x, int containerWidth, int elementWidth);
+int SA_RIBBON_CORE_EXPORT saMirrorX(int x, int containerWidth, int elementWidth);
 
 // Check if the operating system uses dark mode (cross-platform)
-bool SA_RIBBON_EXPORT isOperatingSystemInDarkMode();
+bool SA_RIBBON_CORE_EXPORT isOperatingSystemInDarkMode();
 
 // Enable or disable automatic switching from the default theme to RibbonThemeDark when the operating system is in dark mode (enabled by default)
-void SA_RIBBON_EXPORT setEnableSystemDarkModeAutoSwitch(bool on);
+void SA_RIBBON_CORE_EXPORT setEnableSystemDarkModeAutoSwitch(bool on);
 
 // Query whether automatic theme switching by operating system dark mode is enabled
-bool SA_RIBBON_EXPORT isEnableSystemDarkModeAutoSwitch();
+bool SA_RIBBON_CORE_EXPORT isEnableSystemDarkModeAutoSwitch();
+
+}
+
+#endif  // SARIBBONCOREUTIL_H
+
+/*** End of inlined file: SARibbonCoreUtil.h ***/
+
+
+// 计划 02 S1：无 widget 依赖的函数已下沉 core（<SARibbonCore/SARibbonCoreUtil.h>，
+// namespace SA 不变，SA::makeColorVibrant 等拼写零变化）；本文件保留 widgets 专属：
+// widgetDevicePixelRatio（QWidget/QScreen）与 QSS 渲染两函数（v2 §3.2 决策）。
+namespace SA
+{
+
+// 获取窗口当前所在屏幕的dpr
+qreal widgetDevicePixelRatio(QWidget* w);
 
 // Forward declaration
 class SARibbonThemePalette;
@@ -2878,13 +2948,15 @@ public:
 	 * @brief 定义了行的占比，ribbon中有large，media和small三种占比
 	 * \endif
 	 */
-	enum RowProportion
-	{
-		None,  ///< Undefined proportion, at this time it will be judged based on expandingDirections, if there is Qt::Vertical, it is equivalent to Large, otherwise it is Small
-		Large,   ///< Large proportion, the height of a widget will fill the entire panel
-		Medium,  ///< Medium proportion, only works when @ref SARibbonPanel::panelLayoutMode is @ref SARibbonPanel::ThreeRowMode, and when both in the same column are Medium, they will occupy two rows in three rows
-		Small  ///< Small proportion, occupies one row of SARibbonPanel, Medium will also become Small when conditions are not met, but will not become Large
-	};
+	// 计划 02 S1：枚举本体已提升至 SARibbon::Core::SARibbonRowProportion（core/global/SARibbonEnums.h）。
+	// 类作用域的 using 声明无法引入命名空间枚举符（MSVC C2886/标准 [namespace.udecl]，
+	// 计划 round3 断言有误，见 NOTES B21），改用类型别名 + static constexpr 成员，
+	// SARibbonPanelItem::Large / 类内裸名 / 隐式 int 转换三类存量用法全部保持可编译。
+	using RowProportion = SARibbon::Core::SARibbonRowProportion;
+	static constexpr RowProportion None   = SARibbon::Core::None;   ///< Undefined proportion, judged by expandingDirections
+	static constexpr RowProportion Large  = SARibbon::Core::Large;  ///< Large proportion, fills the entire panel height
+	static constexpr RowProportion Medium = SARibbon::Core::Medium; ///< Medium proportion, only works in ThreeRowMode
+	static constexpr RowProportion Small  = SARibbon::Core::Small;  ///< Small proportion, occupies one row
 	// Constructor for SARibbonPanelItem
 	explicit SARibbonPanelItem(QWidget* widget);
 	// Destructor for SARibbonPanelItem
@@ -2901,15 +2973,6 @@ public:
 	SARibbonPanelItem::RowProportion rowProportion;  ///< Row proportion, there are three types of proportions in ribbon: large, medium and small, see @ref RowProportion
 	bool isExpandItem { false };  ///< Temporary flag used by recalcExpandGeomArray to mark expandable items
 };
-#ifndef SA_ActionPropertyName_RowProportion
-#define SA_ActionPropertyName_RowProportion "_sa_RowProportion"
-#endif
-#ifndef SA_ActionPropertyName_ToolButtonPopupMode
-#define SA_ActionPropertyName_ToolButtonPopupMode "_sa_ToolButtonPopupMode"
-#endif
-#ifndef SA_ActionPropertyName_ToolButtonStyle
-#define SA_ActionPropertyName_ToolButtonStyle "_sa_ToolButtonStyle"
-#endif
 #endif  // SARIBBONPANELITEM_H
 
 /*** End of inlined file: SARibbonPanelItem.h ***/

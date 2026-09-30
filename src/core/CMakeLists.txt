@@ -8,10 +8,13 @@ configure_file(
 sa_add_library(SARibbonCore
     SOURCES
         SARibbonCoreGlobal.h
-        SARibbonCoreGlobal.cpp   # 1 行占位源（仅 include 本头），使纯头模块可成库，计划 02 被真实源取代
+        SARibbonCoreGlobal.cpp   # 占位源（含 ABI 探针导出符号），计划 02 起被真实源逐步取代
         SARibbonQt5Compat.hpp
+        global/SARibbonEnums.h
+        global/SARibbonCoreUtil.h
+        global/SARibbonCoreUtil.cpp
         "${CMAKE_BINARY_DIR}/include/SARibbonCore/SARibbonCoreConfig.h"
     PREFIX SA_RIBBON_CORE
     QT_LINKS Core Gui
 )
-sa_sync_include(SARibbonCore SARibbonCore)
+sa_sync_include(SARibbonCore SARibbonCore FLATTEN)

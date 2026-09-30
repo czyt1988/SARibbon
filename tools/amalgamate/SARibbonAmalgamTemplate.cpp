@@ -6,9 +6,16 @@
 #ifndef SA_COLOR_WIDGETS_NO_DLL
 #define SA_COLOR_WIDGETS_NO_DLL
 #endif
+//3.0: core macros are defined as static within the single file
+#ifndef SA_RIBBON_CORE_STATIC
+#define SA_RIBBON_CORE_STATIC
+#endif
 
 /*@remap "SARibbonAmalgamTemplatePublicHeaders.h" "SARibbon.h" */
 #include "SARibbonAmalgamTemplateHeaderGlue.h"
+// 3.0 core sources (plan 02 S1)
+#include "../../src/core/global/SARibbonCoreUtil.cpp"
+
 
 // disable warnings about unsafe standard library calls
 #ifdef _MSC_VER
