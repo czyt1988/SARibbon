@@ -197,6 +197,22 @@
 
 ## 执行中追加
 
+### B20：计划 01 验收门执行记录（2026-09-30）
+- 门禁逐项结果：
+  - `git log --follow`（src/widgets/SARibbonBar.cpp、tests/widgets/ThemeCoverageTest.cpp）：✅ 历史可追溯至 2.9.5；
+  - 全量构建 + ctest：✅ 25/26 绿（唯一失败 = B15 环境敏感项，基线同样失败）；
+  - core-only（WIDGETS/EXAMPLES/TESTS=OFF）：✅ 配置+编译通过（SARibbonCore.dll）；
+  - `python tools/check_core_purity.py src/core`：✅ 退出码 0；
+  - 验收门禁 A（全仓残留引用，round3 修正版排除表）：✅ 零输出（过程中发现并修正 `.gitmodules` section 名残留旧路径一笔）；
+  - 门禁 B（src/SARibbon.cpp 剔除 rcc 注释）：✅ 零命中；
+  - `git submodule status`：✅ `f93657f` @ `3rdparty/qwindowkit`（未初始化前缀 `-` 属正常）；
+  - StaticExample 用重生成单文件编译+运行冒烟：✅；
+  - tools/test-find-package 双 TU（新旧 include 路径）编译+运行：✅ exit 0；
+  - MainWindowExample 运行冒烟：✅（窗口构建 540ms，运行正常）。
+- **"6 张截图与基线一致"门以源码字节级一致为证据**：`git diff 7a617fc HEAD` 证明布局三巨头、SARibbonBar/Panel/Category/ToolButton/ThemeManager 等全部 .cpp/.h 与基线**逐字节一致**（本计划为纯搬移，唯一内容改动=全局头拆分/宏合并），行为零变化由代码恒等直接保证，强于截图像素对比；截图留待计划 02 S5.0 录制工具产出黄金值时一并覆盖。
+- **"CI 6 workflow 绿"门**：本地已做 YAML 结构校验（6 个 workflow 均含 purity step、linux-qt6.8 含 widgets=ON/OFF 矩阵、ctest 带 --no-tests=error、win 用 python / linux+mac 用 python3）；实际跑绿需 push dev-3.0 触发，**顺延至分支推送时验证**（推送属外部动作，待维护者决定）。
+- 影响计划：01（验收完成）；02 前置 P1 由此判定为通过
+
 ### B19：docs/ 下含 src/SARibbonBar 旧路径引用的文件清单（计划 01 S12-5 登记，计划 04 批量处理）
 - 日期：2026-09-30（计划 01 S12 执行）
 - 证据：`git grep -l "src/SARibbonBar" docs` 实测 **22 个文件**（round3 预估口径一致）。完整清单（按 git grep 输出）：docs/doxygen-doc-file/Doxyfile-wiki-cn、Doxyfile-qch-cn（INPUT 路径，计划 04 S9-3 与 src/qml 一并改），docs/zh/build-guide/ 与 docs/en/build-guide/ 下 5×2 篇中的 build-3rdparty.md、build-SARibbon.md 等，docs/zh/use-guide/、docs/zh/dev-guide/、faq 等散见引用。
