@@ -236,3 +236,22 @@ endif()
 # ---- 旧 target 名兼容（D2），过渡一个版本周期，计划 03 统一改 SARibbon::Widgets ----
 add_library(SARibbonBar ALIAS SARibbonWidgets)
 add_library(SARibbonBar::SARibbonBar ALIAS SARibbonWidgets)
+
+# 3.0 兼容转发头：include/SARibbonBar/<name>.h -> #include <SARibbonWidgets/<name>.h>
+set(_compat_dir "${CMAKE_BINARY_DIR}/compat-include/SARibbonBar")
+file(MAKE_DIRECTORY "${_compat_dir}")
+foreach(_h IN LISTS SARIBBON_HEADER_FILES)
+    get_filename_component(_name "${_h}" NAME)
+    file(WRITE "${_compat_dir}/${_name}"
+        "#pragma once\n#include <SARibbonWidgets/${_name}>\n")
+endforeach()
+# colorWidgets 头的旧路径转发
+file(MAKE_DIRECTORY "${_compat_dir}/colorWidgets")
+foreach(_h IN LISTS SACOLOR_HEADER_FILES)
+    get_filename_component(_name "${_h}" NAME)
+    file(WRITE "${_compat_dir}/colorWidgets/${_name}"
+        "#pragma once\n#include <SARibbonWidgets/colorWidgets/${_name}>\n")
+endforeach()
+if(SARIBBON_INSTALL)   # v2 §6.4 (round2 D1)
+    install(DIRECTORY "${_compat_dir}/" DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/SARibbonBar")
+endif()

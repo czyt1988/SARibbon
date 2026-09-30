@@ -86,10 +86,7 @@ if(SARIBBON_USE_FRAMELESS_LIB)
     endif()
 endif()
 
-# 3.0 全模块统一 C++17（过渡期目录级设定，S6 三模块经 sa_add_library 的
-# target_compile_features 覆盖后移除）
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+# 3.0 全模块统一 C++17（各模块经 sa_add_library 的 target_compile_features PUBLIC 传播）
 message(STATUS "SARibbon 3.0 requires C++17")
 
 set(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "add a postfix, usually d on windows")

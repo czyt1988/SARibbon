@@ -197,6 +197,13 @@
 
 ## 执行中追加
 
+### B18：sa_sync_include 需排除 colorWidgets/tst/（遗留 qmake 测试工程混入公共头同步集）
+- 日期：2026-09-30（计划 01 S11 安装树复核）
+- 发现位置：计划 01 S11.5（安装树清单检查）
+- 证据：安装树 `include/SARibbonWidgets/colorWidgets/tst/` 出现 `Widget.h` 等文件——`src/widgets/colorWidgets/tst/` 是 SAColorWidgets 遗留的 qmake 测试工程（.pro/.ui/main.cpp，2.9.5 基线就有、不参与 CMake 构建、旧安装规则从不安装它），`sa_sync_include` 的 GLOB_RECURSE 按目录把它扫了进来。首版排除正则 `^tst/` 未命中（相对路径实为 `colorWidgets/tst/...`），已改为 `(^|/)tst/`。
+- 处理：`sa_sync_include` 增加 `list(FILTER _headers EXCLUDE REGEX "(^|/)tst/")`；重装后同步集与安装树均无 tst。与 S5.4 已登记的 `SARibbonMdiControlsStyle.h` 差异同为 GLOB 机制带来的良性集合差异（本条是收窄、那条是放宽，均记 NOTES 不改 2.9.5 清单）。
+- 影响计划：01-S5.4/S11.5（执行细化）；02/03 的同步/安装集合复核以无 tst 为准
+
 ### B17：Amalgamate 工具的两个解析限制（S8 执行发现）
 - 日期：2026-09-30（计划 01 S8 执行）
 - 发现位置：计划 01 S8（amalgamate 应急适配）

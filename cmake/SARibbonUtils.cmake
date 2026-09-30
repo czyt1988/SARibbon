@@ -100,6 +100,9 @@ function(sa_sync_include _target _module)
     set(_dst_root "${CMAKE_BINARY_DIR}/include/${_module}")
     file(GLOB_RECURSE _headers RELATIVE "${_src_root}"
         "${_src_root}/*.h" "${_src_root}/*.hpp")
+    # tst/ is colorWidgets' legacy qmake test project (not part of the CMake build,
+    # 2.9.5 never installed its headers); keep it out of the public sync set.
+    list(FILTER _headers EXCLUDE REGEX "(^|/)tst/")
     set(_synced)
     foreach(_h IN LISTS _headers)
         if(_h MATCHES "_p\\.h$")

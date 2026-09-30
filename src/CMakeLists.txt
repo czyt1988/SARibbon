@@ -17,4 +17,40 @@ if(SARIBBON_INSTALL)
                   ${CMAKE_CURRENT_SOURCE_DIR}/SARibbon.cpp
         DESTINATION share/SARibbonBar_amalgamate)
 endif()
-# 组件化 SARibbonConfig 的生成/安装见 S11（同样在 SARIBBON_INSTALL 守卫内）
+# 组件化 SARibbonConfig 生成/安装（S11，SARibbon_INSTALL 守卫内）
+if(SARIBBON_INSTALL)
+    configure_package_config_file(
+        "${CMAKE_CURRENT_SOURCE_DIR}/../cmake/SARibbonConfig.cmake.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/SARibbonConfig.cmake"
+        INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/SARibbon
+    )
+    write_basic_package_version_file(
+        "${CMAKE_CURRENT_BINARY_DIR}/SARibbonConfigVersion.cmake"
+        VERSION ${SARIBBON_VERSION}
+        COMPATIBILITY SameMajorVersion
+    )
+    install(FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/SARibbonConfig.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/SARibbonConfigVersion.cmake"
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/SARibbon
+    )
+    # 旧包名 SARibbonBar 兼容薄壳（S11.2，保留一个版本周期）
+    if(SARIBBON_BUILD_WIDGETS)
+        configure_package_config_file(
+            "${CMAKE_CURRENT_SOURCE_DIR}/widgets/SARibbonBarConfig.cmake.in"
+            "${CMAKE_CURRENT_BINARY_DIR}/SARibbonBarConfig.cmake"
+            INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/SARibbonBar
+        )
+        write_basic_package_version_file(
+            "${CMAKE_CURRENT_BINARY_DIR}/SARibbonBarConfigVersion.cmake"
+            VERSION ${SARIBBON_VERSION}
+            COMPATIBILITY SameMajorVersion
+        )
+        install(FILES
+            "${CMAKE_CURRENT_BINARY_DIR}/SARibbonBarConfig.cmake"
+            "${CMAKE_CURRENT_BINARY_DIR}/SARibbonBarConfigVersion.cmake"
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/SARibbonBar
+        )
+    endif()
+endif()
+
