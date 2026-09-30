@@ -195,6 +195,89 @@ jobs:
   # ==================================================================
   # Publish to PyPI
   # ==================================================================
+  # ==================================================================
+  # Dry-run: manual dispatch only, no PyPI upload (plan-03 S4-3).
+  # Each track runs in its own venv - PyQt5/PyQt6/PySide6 runtime
+  # libraries interfere when installed into the same environment.
+  # ==================================================================
+  dry-run:
+    name: Dry-run ${{ matrix.track }} ${{ matrix.os }}
+    if: github.event_name == 'workflow_dispatch'
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+        track: [pyqt5, pyqt6, pyside6]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install build tools
+        run: pip install -U pip build
+
+      - name: Install Qt (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          pip install aqtinstall
+          python -m aqt install-qt windows desktop 6.8.3 win64_msvc2022_64 -O ${{ github.workspace }}\Qt
+          echo "${{ github.workspace }}\Qt\6.8.3\msvc2022_64\bin" >> $GITHUB_PATH
+
+      - name: Install Qt (Linux)
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y qt6-base-dev qt6-base-dev-tools libqt6svg6-dev
+
+      - name: Set MSVC environment (Windows)
+        if: runner.os == 'Windows'
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      - name: Build binding include mirror (sip tracks)
+        if: matrix.track != 'pyside6'
+        run: python tools/sa_build_binding_include.py
+
+      - name: Build wheel
+        shell: bash
+        run: |
+          if [ "${{ matrix.track }}" = "pyside6" ]; then python -m build --wheel pyside6/; fi
+          if [ "${{ matrix.track }}" = "pyqt6" ]; then python -m build --wheel --no-isolation pyqt6/; fi
+          if [ "${{ matrix.track }}" = "pyqt5" ]; then python -m build --wheel --no-isolation; fi
+
+      - name: Install wheel and smoke test
+        shell: bash
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: |
+          python -m venv /tmp/smoke-venv
+          source /tmp/smoke-venv/Scripts/activate 2>/dev/null || source /tmp/smoke-venv/bin/activate
+          if [ "${{ matrix.track }}" = "pyqt5" ]; then
+            pip install dist/*.whl PyQt5
+            python -c "from PyQtSARibbon import saribbon; print('PyQtSARibbon OK')"
+          fi
+          if [ "${{ matrix.track }}" = "pyqt6" ]; then
+            pip install pyqt6/dist/*.whl PyQt6
+            python -c "from PyQt6SARibbon import saribbon; print('PyQt6SARibbon OK')"
+          fi
+          if [ "${{ matrix.track }}" = "pyside6" ]; then
+            pip install pyside6/dist/*.whl PySide6
+            python -c "from PySideSARibbon import saribbon; print('PySideSARibbon OK')"
+          fi
+
+      - name: Upload wheel artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dryrun-${{ matrix.track }}-${{ matrix.os }}
+          path: |
+            dist/*.whl
+            pyside6/dist/*.whl
+            pyqt6/dist/*.whl
+
   publish:
     name: Publish to PyPI
     needs: [build-pyside6, build-pyqt5, build-pyqt6]

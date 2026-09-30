@@ -8,7 +8,7 @@ env:
 
 jobs:
   MSVC:
-    name: windows-${{ matrix.win_version }}-Qt-${{ matrix.qt_version }}-shared-${{ matrix.shared }}
+    name: windows-${{ matrix.win_version }}-Qt-${{ matrix.qt_version }}-shared-${{ matrix.shared }}-staticlibs-${{ matrix.staticlibs }}
     runs-on: windows-${{ matrix.win_version }}
     strategy:
       fail-fast: false
@@ -16,6 +16,7 @@ jobs:
         win_version: [latest]
         qt_version: [6.8.*]
         shared: [ON]
+        staticlibs: [OFF, ON]
 
     steps:
       - name: Checkout
@@ -34,7 +35,7 @@ jobs:
       - name: Core purity check
         run: python tools/check_core_purity.py src/core
       - name: Configure CMake
-        run: cmake -DCMAKE_BUILD_TYPE="${{env.BUILD_TYPE}}" -DBUILD_SHARED_LIBS=${{ matrix.shared }} -DSARIBBON_BUILD_EXAMPLES=OFF -DSARIBBON_BUILD_TESTS=ON -B "${{github.workspace}}/build"
+        run: cmake -DCMAKE_BUILD_TYPE="${{env.BUILD_TYPE}}" -DBUILD_SHARED_LIBS=${{ matrix.shared }} -DSARIBBON_BUILD_STATIC_LIBS=${{ matrix.staticlibs }} -DSARIBBON_BUILD_EXAMPLES=OFF -DSARIBBON_BUILD_TESTS=ON -B "${{github.workspace}}/build"
 
       - name: Build
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}

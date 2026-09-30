@@ -5,7 +5,10 @@
 - 变更：目录重组为 src/core、src/widgets、src/qml 三模块（原 src/SARibbonBar），example → examples/widgets，tests → tests/widgets，qwindowkit submodule 上移顶层 3rdparty/；
 - 变更：CMake 现代化（floor 3.21、统一 `SARIBBON_*` 选项名、`SARIBBON_INSTALL` 安装守卫、`find_package(SARibbon COMPONENTS Core|Widgets)` 组件化，旧包名 SARibbonBar 兼容一个版本周期）；
 - 变更：最低要求 CMake 3.21 / Qt 5.15 / C++17；
-- 新增：SARibbonCore 纯净基座模块（宏/枚举基座，core-only 可独立编译，纯净性扫描门禁）。
+- 新增：SARibbonCore 纯算法库——主题数据层（ThemeData/ThemePalette/静态主题表）、度量收口（SARibbonMetrics）、布局契约接口、三个布局引擎（Panel 装箱/Category 含滚动标志收敛/Bar 标题区几何）、CustomizeData 纯数据记录，core 可脱离 Widgets 独立编译消费（两道纯净性门禁）；
+- 新增：布局黄金几何测试（引擎级 FakeItem + widgets 级基线录制），证明引擎化后行为与 2.9.5 逐字节一致；度量对照表逐项相等（docs/3.0/metrics-comparison.md）；
+- 变更：单文件发行改为 SARibbonCore.h/.cpp 与 SARibbonWidgets.h/.cpp 双产物，由 tools/Amalgamate.sh 生成（ASCII 化、非交互、失败即停），不再随仓库提交，Release 附件提供；
+- 变更：Python 绑定（PyQtSARibbon/PyQt6SARibbon/PySideSARibbon）适配三模块源码树（含 core 头镜像机制），包名与导入名不变，版本 3.0.0；
 
 ## 2026-09-16 -> 2.9.5
 

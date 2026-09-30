@@ -230,6 +230,20 @@
 - 验证：双产物生成 exit 0（非交互）；StaticExample 编译+运行冒烟通过；SARibbonCore 单文件编译+运行通过；git ls-files src/SARibbon* 空输出。
 - 影响计划：03-S1/S2 完成；04-S10（Release 附件为产物 zip）
 
+### B27：计划 03 S3-S7 执行记录（绑定迁移、CI 矩阵、版本收口）
+- 日期：2026-09-30
+- S3（三轨绑定）：
+  1. **绑定镜像**：`tools/sa_build_binding_include.py` 生成 `binding-include/SARibbonCore/`（14 头平铺+build 树 Config 拾取；命名避开 .gitignore 的 `build*` 通配——初版 build-binding-include 被 L2 的 `build*` 规则误吞，记此教训）。
+  2. **sip 双轨 toml**：三份 pyproject 的 include-dirs 改 [src/core, src/widgets, src/widgets/colorWidgets, (../)binding-include]，headers/sources 以 `git ls-files src/core src/widgets` 为准整体重生成（114 项与树完全对齐；2.8.0 时代缺失的 ThemeManager/MdiControlsStyle 引擎层全量补齐），RESOURCES 指 src/widgets/SARibbonResource.qrc，版本 3.0.0。
+  3. **pyside6 轨**：CMakeLists 的 SARIBBON_SOURCE_DIR → src/widgets，新增 SARIBBON_CORE_DIR + `_sync_include` 镜像（file(COPY) 自包含，S3.0-2 落点）；SARIBBON_HEADERS/SOURCES 按 git ls-files 重生成（SARIBBON_* 变量前缀形式）；saribbon_lib 与 saribbon 包装 target 的 include dirs 及 shiboken -I 参数补 core+镜像；版本 3.0.0。
+  4. 绑定构建/轮子/冒烟验证：本机无 sip/shiboken 工具链，全部顺延至 CI dry-run job（计划 03 §S3 尾注允许，非静默跳过）。
+- S4（publish CI）：三个 build job 触发保持现状（release+dispatch，01-S10-4 结论）；build-pyqt5/pyqt6 各加镜像前置 step（pyside6 不加——其镜像在 CMakeLists 内自足）；新增 dry-run job（dispatch-only，windows+ubuntu × pyqt5/pyqt6/pyside6，每轨独立 venv 安装+import 冒烟，artifact 留存）。
+- S5（CI 全矩阵）：win-qt6.8 加 `staticlibs: [OFF, ON]` 轴（SARIBBON_BUILD_STATIC_LIBS 实名；BUILD_SHARED_LIBS 维持无效传参不动，NOTES 记录）；新增 amalgamation.yml（windows-latest：bash Amalgamate.sh → standalone StaticExample configure+build → offscreen 冒烟 → 4 产物 artifact）；vcpkg preset 本机配置通过（VCPKG_ROOT 未设只打印变量清单——语法与 preset 链验证达成，依赖安装归 CI）。
+- S6（安装收尾）：tools/test-find-package 增 test_find_package_core TU（`find_package(SARibbon COMPONENTS Core)` + 纯 core 头 + 链 SARibbon::Core），双消费者编译+运行 exit 0（需要先刷新 install 树——计划 02 后的安装树是陈旧的，已重装）；tests 内部链接切 SARibbon::Widgets（别名保留对外）；i18n 翻译块随目录迁移正常（构建日志 translations 复制行存在，SARIBBON_UPDATE_TRANSLATIONS 选项在位）。
+- S7（版本与 changelog）：vcpkg.json 3.0.0；changlog.md 3.0.0 草稿段补齐（core 引擎/黄金测试/双产物/绑定四类条目）；8 处版本落点全部 3.0.0（根 CMake/project、4 pyproject、pyside6 CMakeLists、vcpkg.json；VersionInfo.h 由 configure 生成自动跟随）。
+- 验收门执行：残留 grep（排除 docs/plans/changlog/qrc 注释）零命中；产物出库（git ls-files 空）；MANIFEST 指向 src/core+src/widgets；全量 ctest 27/28（B15 项）；core 纯净绿。
+- 影响计划：03 全部完成（除绑定构建实跑归 CI dry-run）；04 全部前置就绪
+
 ### B21：类作用域 using 声明无法引入命名空间枚举符（计划 02 S1 round3 断言错误，MSVC C2886）
 - 日期：2026-09-30（计划 02 S1 执行）
 - 发现位置：计划 02 S1 第 1 条 RowProportion 兼容机制

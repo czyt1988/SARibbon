@@ -11,3 +11,10 @@ add_executable(test_find_package
     main_new_include.cpp
 )
 target_link_libraries(test_find_package PRIVATE SARibbon::Widgets)
+
+# Core-only consumer TU (plan-03 S6-3): proves core is independently consumable
+find_package(SARibbon 3.0 REQUIRED COMPONENTS Core)
+add_executable(test_find_package_core
+    core_only.cpp
+)
+target_link_libraries(test_find_package_core PRIVATE SARibbon::Core)

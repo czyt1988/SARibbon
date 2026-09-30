@@ -1,0 +1,61 @@
+name: Amalgamation
+
+on: [pull_request, push, workflow_dispatch]
+
+env:
+  BUILD_TYPE: Release
+
+jobs:
+  amalgamation:
+    name: windows-amalgamation
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+            version: 6.8.*
+            cache: 'false'
+            dir: ${{ github.workspace }}/Qt
+            host: 'windows'
+            arch: 'win64_msvc2022_64'
+
+      - name: Set MSVC environment
+        uses: ilammy/msvc-dev-cmd@v1
+        with:
+          arch: x64
+
+      # tools/Amalgamate.exe is a Windows binary (no source in repo); the script
+      # is non-interactive (plan-03 S1-2: [ -t 0 ] guard + set -e).
+      - name: Generate single-file products
+        working-directory: tools
+        shell: bash
+        run: bash Amalgamate.sh
+
+      - name: Build StaticExample (standalone)
+        run: |
+          cmake -S examples/widgets/StaticExample -B build-static
+          cmake --build build-static --config Release
+
+      - name: Smoke run (offscreen)
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: |
+          $proc = Start-Process -FilePath "build-static/Release/StaticExample.exe" -PassThru
+          Start-Sleep -Seconds 5
+          if ($proc.HasExited) { throw "StaticExample exited early with code $($proc.ExitCode)" }
+          Stop-Process -Id $proc.Id -Force
+        shell: powershell
+
+      - name: Upload single-file products
+        uses: actions/upload-artifact@v4
+        with:
+          name: amalgamation-products
+          path: |
+            src/SARibbonCore.h
+            src/SARibbonCore.cpp
+            src/SARibbonWidgets.h
+            src/SARibbonWidgets.cpp
