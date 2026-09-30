@@ -78,6 +78,39 @@
         "VCPKG_TARGET_TRIPLET": "x64-windows",
         "VCPKG_MANIFEST_FEATURES": "frameless"
       }
+    },
+    {
+      "name": "win-msvc-qt6-debug",
+      "displayName": "MSVC Qt6 Debug",
+      "description": "Plain MSVC x64 Debug build (set CMAKE_PREFIX_PATH to your Qt6)",
+      "generator": "Visual Studio 17 2022",
+      "binaryDir": "${sourceDir}/build-win-msvc-qt6-debug",
+      "cacheVariables": {
+        "CMAKE_PREFIX_PATH": "${sourceDir}",
+        "SARIBBON_BUILD_TESTS": "ON"
+      }
+    },
+    {
+      "name": "win-msvc-qt6-release",
+      "displayName": "MSVC Qt6 Release",
+      "description": "Plain MSVC x64 Release build (set CMAKE_PREFIX_PATH to your Qt6)",
+      "generator": "Visual Studio 17 2022",
+      "binaryDir": "${sourceDir}/build-win-msvc-qt6-release",
+      "cacheVariables": {
+        "CMAKE_PREFIX_PATH": "${sourceDir}",
+        "SARIBBON_BUILD_TESTS": "ON"
+      }
+    },
+    {
+      "name": "linux-ninja-release",
+      "displayName": "Linux Ninja Release",
+      "description": "Plain Linux Ninja Release build (Qt from system packages)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build-linux-ninja-release",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "SARIBBON_BUILD_TESTS": "ON"
+      }
     }
   ],
   "buildPresets": [
@@ -100,12 +133,45 @@
     {
       "name": "vcpkg-msvc-x64-debug-frameless",
       "configurePreset": "vcpkg-msvc-x64-debug-frameless"
+    },
+    {
+      "name": "win-msvc-qt6-debug",
+      "configurePreset": "win-msvc-qt6-debug"
+    },
+    {
+      "name": "win-msvc-qt6-release",
+      "configurePreset": "win-msvc-qt6-release"
+    },
+    {
+      "name": "linux-ninja-release",
+      "configurePreset": "linux-ninja-release"
     }
   ],
   "testPresets": [
     {
       "name": "vcpkg-msvc-x64-debug",
       "configurePreset": "vcpkg-msvc-x64-debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "win-msvc-qt6-debug",
+      "configurePreset": "win-msvc-qt6-debug",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "win-msvc-qt6-release",
+      "configurePreset": "win-msvc-qt6-release",
+      "output": {
+        "outputOnFailure": true
+      }
+    },
+    {
+      "name": "linux-ninja-release",
+      "configurePreset": "linux-ninja-release",
       "output": {
         "outputOnFailure": true
       }
