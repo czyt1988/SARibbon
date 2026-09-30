@@ -89,7 +89,6 @@ SET(SARIBBON_SOURCE_FILES
     SARibbonApplicationButton.cpp
     SARibbonTabBar.cpp
     SARibbonThemeManager.cpp
-    SARibbonThemePalette.cpp
     SARibbonCategory.cpp
     SARibbonContextCategory.cpp
     SARibbonPanel.cpp

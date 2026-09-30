@@ -12,9 +12,17 @@
 #endif
 
 /*@remap "SARibbonAmalgamTemplatePublicHeaders.h" "SARibbon.h" */
+/*@remap "SARibbonCore/SARibbonCoreGlobal.h" "SARibbon.h" */
+/*@remap "SARibbonCore/SARibbonQt5Compat.hpp" "SARibbon.h" */
+/*@remap "SARibbonCore/SARibbonEnums.h" "SARibbon.h" */
+/*@remap "SARibbonCore/SARibbonCoreUtil.h" "SARibbon.h" */
+/*@remap "SARibbonCore/SARibbonThemePalette.h" "SARibbon.h" */
+/*@remap "SARibbonCore/SARibbonThemeData.h" "SARibbon.h" */
 #include "SARibbonAmalgamTemplateHeaderGlue.h"
 // 3.0 core sources (plan 02 S1)
 #include "../../src/core/global/SARibbonCoreUtil.cpp"
+#include "../../src/core/theme/SARibbonThemePalette.cpp"
+#include "../../src/core/theme/SARibbonThemeData.cpp"
 
 
 // disable warnings about unsafe standard library calls
@@ -43,7 +51,6 @@
 //sa ribbon
 #include "../../src/widgets/SARibbonUtil.cpp"
 #include "../../src/widgets/SARibbonThemeManager.cpp"
-#include "../../src/widgets/SARibbonThemePalette.cpp"
 #include "../../src/widgets/SAFramelessHelper.cpp"
 #include "../../src/widgets/SARibbonApplicationButton.cpp"
 #include "../../src/widgets/SARibbonSystemButtonBar.cpp"

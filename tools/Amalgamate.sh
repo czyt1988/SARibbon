@@ -8,8 +8,13 @@ OPTS='-i "../src/widgets" -i "../src/widgets/colorWidgets" -i "../src/core" -i "
 # and are consumed via the flattened <SARibbonCore/X.h> namespace form)
 rm -rf _amalg_include && mkdir -p _amalg_include/SARibbonCore
 find ../src/core -type f \( -name '*.h' -o -name '*.hpp' \) -exec cp {} _amalg_include/SARibbonCore/ \;
+# The .h pass needs the mirror to resolve <SARibbonCore/...> forwarding includes.
+# The .cpp pass deliberately omits it: the angle includes stay raw and are
+# rewritten to "SARibbon.h" by the sed below (inlining through the mirror
+# would duplicate Q_OBJECT headers into the .cpp product and break AUTOMOC).
+OPTS_CPP='-i "../src/widgets" -i "../src/widgets/colorWidgets" -i "../src/core" -w "*.cpp;*.h;*.hpp" -s'
 ./Amalgamate.exe $OPTS ./amalgamate/SARibbonAmalgamTemplate.h $DEST/SARibbon.h
-./Amalgamate.exe $OPTS ./amalgamate/SARibbonAmalgamTemplate.cpp $DEST/SARibbon.cpp
+./Amalgamate.exe $OPTS_CPP ./amalgamate/SARibbonAmalgamTemplate.cpp $DEST/SARibbon.cpp
 rm -rf _amalg_include   # transient; never committed
 
 
@@ -34,6 +39,9 @@ if [ -f "$DEST/SARibbon.cpp" ]; then
     # in the product is safe to strip (otherwise the product does not
     # compile: the relative path does not exist next to the single file).
     sed -i '/#include "\.\.\/SARibbonWidgetsGlobal.h"/d' "$DEST/SARibbon.h" "$DEST/SARibbon.cpp"
+    # <SARibbonCore/X.h> angle includes left raw by the cpp pass (see OPTS_CPP
+    # note): their content is already inside SARibbon.h, point them at it.
+    sed -i 's|#include <SARibbonCore/[A-Za-z0-9_]*\.h*>|#include "SARibbon.h"|g' "$DEST/SARibbon.cpp"
 
 else
     echo "Warning: SARibbon.cpp file does not exist"

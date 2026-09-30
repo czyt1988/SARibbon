@@ -13,6 +13,10 @@ sa_add_library(SARibbonCore
         global/SARibbonEnums.h
         global/SARibbonCoreUtil.h
         global/SARibbonCoreUtil.cpp
+        theme/SARibbonThemePalette.h
+        theme/SARibbonThemePalette.cpp
+        theme/SARibbonThemeData.h
+        theme/SARibbonThemeData.cpp
         "${CMAKE_BINARY_DIR}/include/SARibbonCore/SARibbonCoreConfig.h"
     PREFIX SA_RIBBON_CORE
     QT_LINKS Core Gui
