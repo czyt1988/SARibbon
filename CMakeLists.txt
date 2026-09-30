@@ -221,7 +221,7 @@ add_subdirectory(src)
 
 if(SARIBBON_BUILD_EXAMPLES)
     message(STATUS "build example")
-    add_subdirectory(example)
+    add_subdirectory(examples)
 endif()
 
 if(BUILD_TESTS)
