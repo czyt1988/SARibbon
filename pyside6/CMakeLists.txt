@@ -112,7 +112,8 @@ file(MAKE_DIRECTORY "${SARIBBON_CORE_INCLUDE_MIRROR}/SARibbonCore")
 file(GLOB_RECURSE _sa_core_files RELATIVE "${SARIBBON_CORE_DIR}"
      "${SARIBBON_CORE_DIR}/*.h" "${SARIBBON_CORE_DIR}/*.hpp")
 foreach(_f IN LISTS _sa_core_files)
-    configure_file("${SARIBBON_CORE_DIR}/${_f}" "${SARIBBON_CORE_INCLUDE_MIRROR}/SARibbonCore/${_f}" COPYONLY)
+    get_filename_component(_name "${_f}" NAME)
+    configure_file("${SARIBBON_CORE_DIR}/${_f}" "${SARIBBON_CORE_INCLUDE_MIRROR}/SARibbonCore/${_name}" COPYONLY)
 endforeach()
 set(SARIBBON_COLORWIDGETS_DIR "${SARIBBON_SOURCE_DIR}/colorWidgets")
 

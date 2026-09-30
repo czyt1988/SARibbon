@@ -321,6 +321,16 @@
   3. **pyside6 的 `_sync_include` 镜像未平铺**：pyside6/CMakeLists.txt 的 `file(COPY "${SARIBBON_CORE_DIR}/" DESTINATION ".../SARibbonCore" FILES_MATCHING ...)` **保留子目录层级**（global/SARibbonEnums.h），而 core 源码的 include 是平铺形式 `<SARibbonCore/SARibbonEnums.h>`（计划 02 S1-5 平铺决策）→ 找不到头（linux+windows 两轨同报）。修法：改 `file(GLOB_RECURSE)` + 逐文件 `configure_file(... COPYONLY)` 平铺复制（与 sa_build_binding_include.py/amalgamate 镜像同构）。**B33 的"绑定侧镜像"设计在 pyside6 轨首跑即暴露此缺陷——B27 登记的镜像机制总算经受了第一次真实 CI 检验。**
 - 影响计划：03-S3.0/S4（绑定 CI）；本条后 dry-run 三大根因全部消除，第 4 轮预期至少一轨可全绿
 
+### B35：dry-run 第 4/5 轮修复（aqt -O 路径、user32 平台守卫、镜像真平铺、PyQt5 sip-module）
+- 日期：2026-09-30
+- 第 4 轮（c37a897）六 job 仍红，四个新根因（全部为绑定 CI 首次真实执行的暴露）：
+  1. **aqt -O 反斜杠被 bash 吞**：dry-run Windows Qt 步骤改 `shell: bash` 后，YAML 双引号外的 `${{ github.workspace }}\Qt` 在 bash 双引号内反斜杠逐字保留——但 GitHub 渲染 `${{ }}` 后的 `D:\...\Qt` 中 ``/`\S` 被 bash 处理为转义剥离 → Qt 装进 `D:aSARibbonSARibbonQt` 幽灵目录（aqt 日志的 Arguments 行实证）→ qmake 不在 GITHUB_PATH 声明的位置 → PyProjectOptionException('qmake')。修法：-O 参数用**正斜杠** `"${{ github.workspace }}/Qt"`（aqt/Windows 均接受），PATH echo 行保留反斜杠（GITHUB_PATH 文件内容不经 bash 转义）。
+  2. **`-luser32` 是 Windows-only**（B33 引入的 builder-settings）：ubuntu 上 `ld: cannot find -luser32`。修法：从三处 toml 的 builder-settings 移除，改 project.py 内 `if os.name == 'nt'` 平台守卫注入（B33 的 RESOURCES 注入同款机制顺带吸收）。
+  3. **pyside6 镜像"平铺"修复无效**：B34 的 configure_file 目标路径 `${_f}` 来自 `GLOB_RECURSE RELATIVE`——**含子目录前缀**（global/SARibbonEnums.h），复制出的仍是层级布局（B34 修复自欺）。真修：`get_filename_component(_name "${_f}" NAME)` 剥离目录后作目标文件名。
+  4. **PyQt5 轨 ABI 错配**：`ABI v12 is being targeted but the PyQtSARibbon.saribbon module doesn't support it`——根轨未声明 `sip-module`，sipbuild 生成代码默认 ABI 13.8 而 PyQt5.sip 运行时是 v12。修法：根轨 `[tool.sip.project]` 加 `sip-module = "PyQt5.sip"`（pyqt6 双轨显式 `PyQt6.sip`，与生成代码的 import 一致）。
+- 迭代教训（写入后续开发指引）：**绑定 CI 从 2.9.5 起从未绿过**——本计划补齐的 dry-run job 是这条链路五年来第一次被系统性执行，四轮共暴露 10+ 个真实缺陷（B33×5 + B34×3 + B35×4），全部有日志证据链。这正是"CI 绿"验收门存在的意义。
+- 影响计划：03-S3/S4（绑定 CI 与 dry-run）
+
 ### B21：类作用域 using 声明无法引入命名空间枚举符（计划 02 S1 round3 断言错误，MSVC C2886）
 - 日期：2026-09-30（计划 02 S1 执行）
 - 发现位置：计划 02 S1 第 1 条 RowProportion 兼容机制

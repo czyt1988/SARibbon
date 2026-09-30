@@ -46,6 +46,11 @@ class saribbon(PyQtBindings):
                 self.builder_settings.append('RESOURCES += ' + cand.replace(os.sep, '/'))
                 break
 
+        # Win32 API usage (SARibbonMainWindow nativeEvent, TitleIconWidget);
+        # - user32 only exists on Windows, guard by platform (NOTES B34)
+        if os.name == 'nt':
+            self.builder_settings.append('LIBS += -luser32')
+
         if self.saribbon_lib is not None:
             self.libraries.append(self.saribbon_lib)
 

@@ -17,6 +17,7 @@ Homepage = "https://github.com/czyt1988/SARibbon"
 Repository = "https://github.com/czyt1988/SARibbon"
 
 [tool.sip.project]
+sip-module = "PyQt5.sip"
 # plan-03 S3: dunder-init off - sipbuild would generate an empty
 # PyQt6/__init__.py that clobbers pip-installed PyQt6 bootstrap
 # (find_qt) in the pyqt6 track; the bindings package imports fine
@@ -28,7 +29,6 @@ define-macros = ["SA_RIBBON_BAR_NO_EXPORT", "SA_RIBBON_CORE_STATIC", "SARIBBON_U
 sip-file = "SARibbon.sip"
 include-dirs = ["src/core", "src/widgets", "src/widgets/colorWidgets", "binding-include"]
 qmake-QT = ["widgets"]
-builder-settings = ["LIBS += -luser32"]
 headers = [
     "src/core/SARibbonCoreGlobal.h",
     "src/core/SARibbonQt5Compat.hpp",

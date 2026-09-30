@@ -45,7 +45,7 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           pip install aqtinstall
-          python -m aqt install-qt windows desktop 6.8.3 win64_msvc2022_64 -O ${{ github.workspace }}\Qt
+          python -m aqt install-qt windows desktop 6.8.3 win64_msvc2022_64 -O "${{ github.workspace }}/Qt"
           echo "${{ github.workspace }}\Qt\6.8.3\msvc2022_64\bin" >> $GITHUB_PATH
 
       - name: Set MSVC environment (Windows)
@@ -111,7 +111,7 @@ jobs:
         if: runner.os == 'Windows'
         run: |
           pip install aqtinstall
-          python -m aqt install-qt windows desktop 5.15.2 win64_msvc2019_64 -O ${{ github.workspace }}\Qt
+          python -m aqt install-qt windows desktop 5.15.2 win64_msvc2019_64 -O "${{ github.workspace }}/Qt"
           echo "${{ github.workspace }}\Qt\5.15.2\msvc2019_64\bin" >> $GITHUB_PATH
 
       - name: Set MSVC environment (Windows)
