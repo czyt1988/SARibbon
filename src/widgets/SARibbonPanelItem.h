@@ -1,6 +1,7 @@
 #ifndef SARIBBONPANELITEM_H
 #define SARIBBONPANELITEM_H
 #include "SARibbonGlobal.h"
+#include <SARibbonCore/SARibbonAbstractLayoutItem.h>
 #include <QWidgetItem>
 #include <QAction>
 class SARibbonToolButton;
@@ -21,7 +22,7 @@ class SARibbonToolButton;
  * @details 无窗口的action会在内部生成一个SARibbonToolButton
  * \endif
  */
-class SA_RIBBON_EXPORT SARibbonPanelItem : public QWidgetItem
+class SA_RIBBON_EXPORT SARibbonPanelItem : public QWidgetItem, public SARibbon::Core::SARibbonAbstractLayoutItem
 {
 public:
 	/**
@@ -50,6 +51,18 @@ public:
 	// Check if the item is empty
 	bool isEmpty() const Q_DECL_OVERRIDE;
 
+	// Contract + QLayoutItem same-signature virtuals: explicit override disambiguates
+	// the two base declarations (no unique final overrider otherwise), plan-02 S5.1-1
+	QSize sizeHint() const Q_DECL_OVERRIDE;
+	Qt::Orientations expandingDirections() const Q_DECL_OVERRIDE;
+	// Contract: Panel-side isHidden == action not visible (2.x isEmpty semantics, plan-02 S5.1-1)
+	bool isHidden() const Q_DECL_OVERRIDE;
+	// Contract: engine geometry application (widgets: QWidgetItem::setGeometry path)
+	void applyGeometry(const QRect& rect) Q_DECL_OVERRIDE;
+
+	// Step A（计划 02 S5.1）：本类同时实现 core 契约（SARibbonAbstractLayoutItem）。
+	// rowIndex/columnIndex/itemWillSetGeometry/isExpandItem/rowProportion 与契约的同名字段
+	// 构成遮蔽（2.x 拼写保持，算法读写这五个名字零改动）；Step B 搬移时统一为契约字段。
 	short rowIndex;             ///< Record which row the current item belongs to, -1 in hide mode
 	int columnIndex;            ///< Record which column the current item belongs to, -1 in hide mode
 	QRect itemWillSetGeometry;  ///< This will be updated when calling SARibbonPanelLayout::updateGeomArray, the actual setting will use QWidgetItem::setGeometry to set Geometry

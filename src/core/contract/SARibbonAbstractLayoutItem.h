@@ -36,7 +36,6 @@ public:
     virtual ~SARibbonAbstractLayoutItem();
     // —— front end provides (engine inputs, pure virtual) ——
     virtual QSize sizeHint() const = 0;
-    virtual QSize minimumSizeHint() const = 0;
     virtual bool isHidden() const = 0;   // Panel: action not visible; Category: QWidgetItem::isEmpty semantics
     virtual Qt::Orientations expandingDirections() const = 0;
     // —— front end provides (with defaults, override as needed) ——

@@ -44,3 +44,50 @@ bool SARibbonPanelItem::isEmpty() const
 {
     return (action == nullptr || !action->isVisible());
 }
+
+/**
+ * \if ENGLISH
+ * @brief Contract isHidden: action not visible (2.x isEmpty semantics, plan-02 S5.1-1)
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 契约 isHidden：action 不可见（2.x isEmpty 语义，计划 02 S5.1-1）
+ * \endif
+ */
+bool SARibbonPanelItem::isHidden() const
+{
+    return isEmpty();
+}
+
+/**
+ * \if ENGLISH
+ * @brief Contract applyGeometry: delegate to QWidgetItem::setGeometry (plan-02 S5.1-1)
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 契约 applyGeometry：转 QWidgetItem::setGeometry（计划 02 S5.1-1）
+ * \endif
+ */
+void SARibbonPanelItem::applyGeometry(const QRect& rect)
+{
+    setGeometry(rect);
+}
+
+/**
+ * \if ENGLISH
+ * @brief Disambiguation override: forward to QWidgetItem (plan-02 S5.1-1)
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 消歧覆写：转调 QWidgetItem 实现（计划 02 S5.1-1）
+ * \endif
+ */
+QSize SARibbonPanelItem::sizeHint() const
+{
+    return QWidgetItem::sizeHint();
+}
+
+Qt::Orientations SARibbonPanelItem::expandingDirections() const
+{
+    return QWidgetItem::expandingDirections();
+}

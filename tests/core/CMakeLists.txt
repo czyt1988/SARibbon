@@ -30,7 +30,8 @@ if(TARGET SARibbonWidgets)
         )
     endif()
     add_test(NAME core_PanelLayoutGolden COMMAND core_PanelLayoutGolden)
-    set_tests_properties(core_PanelLayoutGolden PROPERTIES LABELS core TIMEOUT 120)
+    set_tests_properties(core_PanelLayoutGolden PROPERTIES LABELS core TIMEOUT 120
+        ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
     set_target_properties(core_PanelLayoutGolden PROPERTIES
         AUTOMOC ON
         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests
