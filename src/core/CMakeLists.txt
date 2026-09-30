@@ -29,6 +29,8 @@ sa_add_library(SARibbonCore
         layout/SARibbonPanelLayoutEngine.cpp
         layout/SARibbonCategoryLayoutEngine.h
         layout/SARibbonCategoryLayoutEngine.cpp
+        layout/SARibbonBarGeometryEngine.h
+        layout/SARibbonBarGeometryEngine.cpp
         "${CMAKE_BINARY_DIR}/include/SARibbonCore/SARibbonCoreConfig.h"
     PREFIX SA_RIBBON_CORE
     QT_LINKS Core Gui

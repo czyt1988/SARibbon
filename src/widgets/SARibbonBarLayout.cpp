@@ -1,5 +1,6 @@
 #include "SARibbonBarLayout.h"
 #include <SARibbonCore/SARibbonMetrics.h>
+#include <SARibbonCore/SARibbonBarGeometryEngine.h>
 #include <QStyle>
 #include <QApplication>
 #include <QScreen>
@@ -1091,125 +1092,28 @@ void SARibbonBarLayout::layoutTitleRect()
     SARibbonBar* ribbon                    = d_ptr->ribbonBar;
     SARibbonQuickAccessBar* quickAccessBar = d_ptr->quickAccessBar();
     SARibbonTabBar* ribbonTabBar           = d_ptr->ribbonTabBar();
-    const QMargins border                  = d_ptr->contentsMargins();
-    const int validTitleBarHeight          = d_ptr->getActualTitleBarHeight();
-
-    // 计算标题栏区域
-    if (SA::saIsRTL()) {
-        // RTL mode: title rect positions are mirrored
-        if (isCompactStyle()) {
-            // 紧凑模式 RTL: title bar in the remaining space left of tabbar
-            // In RTL, titleEnd is the left edge of tabbar (mirrored from right)
-            int titleEnd   = ribbonTabBar->geometry().left();
-            int titleWidth = quickAccessBar ? (titleEnd - quickAccessBar->geometry().right())
-                                            : (titleEnd - border.left());
-            if (titleWidth > 10) {
-                d_ptr->titleRect = QRect(titleEnd - titleWidth, border.top(), titleWidth, validTitleBarHeight);
-            } else {
-                d_ptr->titleRect = QRect();
-            }
-        } else {
-            // 三行宽松模式 RTL
-            const int tabX = ribbonTabBar->geometry().x();
-            // In RTL, contextRegionLeft becomes the leftmost (visual rightmost) tab boundary
-            // and contextRegionRight becomes the rightmost (visual leftmost) tab boundary
-            // We swap the variable semantics to reflect the mirrored geometry
-            int contextRegionLeft  = -1;   // In RTL: the left boundary of context region (visual rightmost)
-            int contextRegionRight = ribbon->width();  // In RTL: the right boundary of context region (visual leftmost)
-
-            QList< int > visibleContextIndex = ribbon->currentVisibleContextCategoryTabIndexs();
-            if (!visibleContextIndex.empty()) {
-                // In RTL, first context tab rect's left() is visually the rightmost edge
-                int edgeVal = ribbonTabBar->tabRect(visibleContextIndex.first()).left() + tabX;
-                if (edgeVal > contextRegionLeft) {
-                    contextRegionLeft = edgeVal;
-                }
-                // In RTL, last context tab rect's right() is visually the leftmost edge
-                edgeVal = d_ptr->ribbonTabBar()->tabRect(visibleContextIndex.last()).right() + tabX;
-                if (edgeVal < contextRegionRight) {
-                    contextRegionRight = edgeVal;
-                }
-            }
-
-            // In RTL, x1 is the right side of the quickAccessBar (which is now on the right)
-            int x1 = border.left();
-            if (quickAccessBar) {
-                // In RTL, quickAccessBar is at right side, so title area starts from its left edge
-                x1 = quickAccessBar->geometry().x();
-            }
-            // In RTL, x2 is the left side (system buttons are at left)
-            int x2 = border.left() + d_ptr->systemButtonSize.width();
-
-            if (contextRegionLeft < 0) {
-                // No context category: title between system buttons (left) and quickAccessBar (right)
-                d_ptr->titleRect = QRect(QPoint(x2, border.top()), QPoint(x1, validTitleBarHeight + border.top()));
-            } else {
-                int leftwidth  = contextRegionRight - x2;
-                int rightwidth = x1 - contextRegionLeft;
-                if (leftwidth > rightwidth) {
-                    d_ptr->titleRect =
-                        QRect(QPoint(x2, border.top()), QPoint(contextRegionRight, validTitleBarHeight + border.top()));
-                } else {
-                    d_ptr->titleRect =
-                        QRect(QPoint(contextRegionLeft, border.top()), QPoint(x1, validTitleBarHeight + border.top()));
-                }
-            }
-        }
-    } else {
-        // LTR mode: original title rect logic unchanged
-        if (isCompactStyle()) {
-            // 紧凑模式,紧凑模式的标题栏在tabbar的剩余空间中
-            int titleStart = ribbonTabBar->geometry().right();
-            int titleWidth = quickAccessBar ? (quickAccessBar->x() - titleStart)
-                                            : (ribbon->width() - titleStart - d_ptr->systemButtonSize.width());
-            if (titleWidth > 10) {
-                d_ptr->titleRect = QRect(titleStart, border.top(), titleWidth, validTitleBarHeight);
-            } else {
-                // 标题栏过小，就不显示
-                d_ptr->titleRect = QRect();
-            }
-        } else {
-            const int tabX = ribbonTabBar->geometry().x();
-            // 三行宽松模式
-            int contextRegionLeft  = ribbon->width();
-            int contextRegionRight = -1;
-
-            // 使用上下文标签的视觉数据
-            // 上下文标签会占用宽松模式下的标题栏位置，因此，要计算此时标题栏应该在哪里显示
-            QList< int > visibleContextIndex = ribbon->currentVisibleContextCategoryTabIndexs();
-            if (!visibleContextIndex.empty()) {
-                int edgeVal = ribbonTabBar->tabRect(visibleContextIndex.first()).left() + tabX;
-                if (edgeVal < contextRegionLeft) {
-                    contextRegionLeft = edgeVal;
-                }
-                edgeVal = d_ptr->ribbonTabBar()->tabRect(visibleContextIndex.last()).right() + tabX;
-                if (edgeVal > contextRegionRight) {
-                    contextRegionRight = edgeVal;
-                }
-            }
-
-            int x1 = border.left();
-            if (quickAccessBar) {
-                x1 = quickAccessBar->geometry().right() + 1;
-            }
-            int x2 = ribbon->width() - d_ptr->systemButtonSize.width() - border.right();
-
-            if (contextRegionRight < 0) {
-                // 说明没有上下文标签，那么标题直接放在quickAccessBar到systembar之间
-                d_ptr->titleRect = QRect(QPoint(x1, border.top()), QPoint(x2, validTitleBarHeight + border.top()));
-            } else {
-                int leftwidth  = contextRegionLeft - x1;
-                int rightwidth = x2 - contextRegionRight;
-                if (rightwidth > leftwidth) {
-                    d_ptr->titleRect =
-                        QRect(QPoint(contextRegionRight, border.top()), QPoint(x2, validTitleBarHeight + border.top()));
-                } else {
-                    d_ptr->titleRect =
-                        QRect(QPoint(x1, border.top()), QPoint(contextRegionLeft, validTitleBarHeight + border.top()));
-                }
-            }
-        }
+    // 计划 02 S7（D6 范围）：标题栏几何四分支已纯搬移至 core 的
+    // SARibbonBarGeometryEngine::layoutTitleRect（机械替换表见引擎 cpp 头部注释），
+    // 本函数采集控件值填 Input 后回写 d_ptr->titleRect
+    SARibbon::Core::SARibbonBarGeometryEngine::TitleRectInput input;
+    input.isRTL               = SA::saIsRTL();
+    input.isCompactStyle      = isCompactStyle();
+    input.ribbonWidth         = ribbon->width();
+    input.border              = d_ptr->contentsMargins();
+    input.validTitleBarHeight = d_ptr->getActualTitleBarHeight();
+    input.tabBarGeometry      = ribbonTabBar->geometry();
+    input.hasQuickAccessBar   = (nullptr != quickAccessBar);
+    if (quickAccessBar) {
+        input.quickAccessBarGeometry = quickAccessBar->geometry();
     }
+    input.systemButtonSize    = d_ptr->systemButtonSize;
+    QList< int > visibleContextIndex = ribbon->currentVisibleContextCategoryTabIndexs();
+    input.hasContextTabs = !visibleContextIndex.empty();
+    if (input.hasContextTabs) {
+        input.contextFirstTabRect = ribbonTabBar->tabRect(visibleContextIndex.first());
+        input.contextLastTabRect  = ribbonTabBar->tabRect(visibleContextIndex.last());
+    }
+    d_ptr->titleRect = SARibbon::Core::SARibbonBarGeometryEngine::layoutTitleRect(input);
 }
 
 /**
