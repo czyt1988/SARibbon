@@ -1,10 +1,40 @@
 #include "RibbonTab.h"
+#include "../bar/RibbonBar.h"
+#include "../SARibbonQmlTypes.h"
 
 namespace SARibbonQml {
 
 RibbonTab::RibbonTab(QQuickItem* parent) : QQuickItem(parent)
 {
     setAcceptedMouseButtons(Qt::LeftButton);
+}
+
+RibbonTab::~RibbonTab()
+{
+    // leaf destruction: unparent + deleteLater, NEVER direct delete (KDDW Group.cpp rule)
+    if (mTabQmlItem) {
+        mTabQmlItem->setParentItem(nullptr);
+        mTabQmlItem->setParent(nullptr);
+        mTabQmlItem->deleteLater();
+        mTabQmlItem = nullptr;
+    }
+}
+
+void RibbonTab::componentComplete()
+{
+    QQuickItem::componentComplete();
+    ensureQmlItem();
+}
+
+void RibbonTab::ensureQmlItem()
+{
+    if (mTabQmlItem) {
+        return;
+    }
+    QQuickItem* leaf = createVisualLeaf(this, SARibbonQmlLeafUrls::tabLeaf(), "tabCpp");
+    if (leaf && !mTabQmlItem) {
+        setTabQmlItem(leaf);  // handshake assigns it; fallback keeps the pair intact
+    }
 }
 
 QString RibbonTab::text() const

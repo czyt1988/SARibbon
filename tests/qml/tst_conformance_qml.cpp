@@ -64,10 +64,14 @@ void TestConformanceQml::panelThreeRowMixed()
     QVERIFY2(qFuzzyCompare(root->width(), 500) || root->width() > 0, "panel has a size");
 
     // find the registered buttons and assert the engine geometry was applied
+    // (EXACT class name: the visual leaf meta names also CONTAIN
+    // "RibbonToolButton" — RibbonToolButton_QMLTYPE_n — so a substring match
+    // would double-count once the leaves exist)
     const auto buttons = root->findChildren< QQuickItem* >();
     int hostCount = 0;
     for (QQuickItem* item : buttons) {
-        if (QString::fromLatin1(item->metaObject()->className()).contains(QLatin1String("RibbonToolButton"))) {
+        if (QString::fromLatin1(item->metaObject()->className())
+            == QLatin1String("SARibbonQml::RibbonToolButton")) {
             ++hostCount;
             QVERIFY(item->width() > 0);
             QVERIFY(item->height() > 0);

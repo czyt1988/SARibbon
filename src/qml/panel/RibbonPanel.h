@@ -35,6 +35,7 @@ class RibbonPanel : public QQuickItem
     Q_PROPERTY(QString panelTitle READ panelTitle WRITE setPanelTitle NOTIFY panelTitleChanged)
     Q_PROPERTY(RibbonEnums::LayoutMode layoutMode READ layoutMode WRITE setLayoutMode NOTIFY layoutModeChanged)
     Q_PROPERTY(QQuickItem* panelQmlItem READ panelQmlItem WRITE setPanelQmlItem NOTIFY panelQmlItemChanged)
+    Q_PROPERTY(QRectF titleGeometry READ titleGeometry NOTIFY titleGeometryChanged)
 public:
     explicit RibbonPanel(QQuickItem* parent = nullptr);
     ~RibbonPanel() override;
@@ -53,18 +54,31 @@ public:
     void registerChildItem(RibbonToolButton* item);
     void unregisterChildItem(RibbonToolButton* item);
 
+    // drop the engine sizeHint cache entry of a button and re-run the layout
+    void invalidateChildCache(RibbonToolButton* item);
+
+    // engine-computed title strip rect; the leaf renders the caption inside it
+    QRectF titleGeometry() const;
+
 Q_SIGNALS:
     void panelTitleChanged();
     void layoutModeChanged();
     void panelQmlItemChanged();
+    void titleGeometryChanged();
 
 protected:
     void updatePolish() override;          // THE layout entry (scene-graph polished)
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    void geometryChange(const QRectF& newGeometry, const QRectF& oldGeometry) override;
+#else
+    void geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry) override;
+#endif
     void itemChange(ItemChange change, const ItemChangeData& data) override;
     void componentComplete() override;
 
 private:
     void runLayout();
+    void ensureQmlItem();
     int rowCountForMode() const;
 
     QString mPanelTitle;
@@ -75,6 +89,7 @@ private:
     QSize mLastSizeHint;
     int mLastColumnCount = 0;
     int mLastLargeHeight = 0;
+    QRect mLastTitleGeometry;
 };
 
 }

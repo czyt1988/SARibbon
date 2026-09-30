@@ -1,21 +1,12 @@
 #include "RibbonPanel.h"
 #include "../button/RibbonToolButton.h"
+#include "../category/RibbonCategory.h"
 #include "../metrics/RibbonMetrics.h"
+#include "../SARibbonQmlTypes.h"
 #include <SARibbonCore/SARibbonCoreUtil.h>
 #include <QQuickItem>
-#include <QQmlEngine>
-#include <QQmlComponent>
-#include <QFile>
 
 namespace SARibbonQml {
-
-// leaf URL table (plan-04 S3 leaf organization rule: centralized, no factory class in P0)
-namespace LeafUrls {
-QUrl panelLeaf()
-{
-    return QUrl("qrc:/SARibbon/RibbonPanel.qml");
-}
-}  // namespace LeafUrls
 
 RibbonPanel::RibbonPanel(QQuickItem* parent) : QQuickItem(parent)
 {
@@ -88,8 +79,17 @@ void RibbonPanel::registerChildItem(RibbonToolButton* item)
 void RibbonPanel::unregisterChildItem(RibbonToolButton* item)
 {
     if (mChildButtons.removeOne(item)) {
+        mEngine.removeFromCache(item);
         polish();
     }
+}
+
+void RibbonPanel::invalidateChildCache(RibbonToolButton* item)
+{
+    // engine caches button sizeHints keyed by largeHeight only: a text/proportion
+    // change must drop the entry explicitly, then a fresh pass repacks the columns
+    mEngine.removeFromCache(item);
+    polish();
 }
 
 int RibbonPanel::rowCountForMode() const
@@ -108,12 +108,48 @@ int RibbonPanel::rowCountForMode() const
 void RibbonPanel::componentComplete()
 {
     QQuickItem::componentComplete();
+    ensureQmlItem();
     polish();
+}
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+void RibbonPanel::geometryChange(const QRectF& newGeometry, const QRectF& oldGeometry)
+{
+    QQuickItem::geometryChange(newGeometry, oldGeometry);
+#else
+void RibbonPanel::geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry)
+{
+    QQuickItem::geometryChanged(newGeometry, oldGeometry);
+#endif
+    if (newGeometry.size() != oldGeometry.size()) {
+        polish();  // the category host sizes this item: re-run the engine on resize
+    }
+}
+
+void RibbonPanel::ensureQmlItem()
+{
+    if (mPanelQmlItem) {
+        return;
+    }
+    QQuickItem* leaf = createVisualLeaf(this, SARibbonQmlLeafUrls::panelLeaf(), "panelCpp");
+    if (leaf && !mPanelQmlItem) {
+        setPanelQmlItem(leaf);  // handshake assigns it; fallback keeps the pair intact
+    }
+}
+
+QRectF RibbonPanel::titleGeometry() const
+{
+    return QRectF(mLastTitleGeometry);
 }
 
 void RibbonPanel::itemChange(ItemChange change, const ItemChangeData& data)
 {
-    if (change == QQuickItem::ItemChildRemovedChange) {
+    if (change == QQuickItem::ItemChildAddedChange) {
+        // declaration order (sibling componentComplete runs reversed)
+        if (RibbonToolButton* btn = qobject_cast< RibbonToolButton* >(data.item)) {
+            registerChildItem(btn);
+        }
+    } else if (change == QQuickItem::ItemChildRemovedChange) {
         if (RibbonToolButton* btn = qobject_cast< RibbonToolButton* >(data.item)) {
             unregisterChildItem(btn);
         }
@@ -130,7 +166,7 @@ void RibbonPanel::updatePolish()
 
 void RibbonPanel::runLayout()
 {
-    if (mChildButtons.isEmpty() || width() <= 0 || height() <= 0) {
+    if (mChildButtons.isEmpty()) {
         return;
     }
     SARibbon::Core::SARibbonPanelLayoutEngine::Input input;
@@ -143,7 +179,7 @@ void RibbonPanel::runLayout()
     input.spacing         = 2;
     input.titleTextWidth  = -1;  // no option button in P0; title width only feeds min width
     input.optionBtnSize   = QSize();
-    input.titleHeight     = 15;
+    input.titleHeight     = RibbonMetrics::instance()->panelTitleHeight();
     input.titleSpace      = 2;
     input.fontMetrics     = RibbonMetrics::instance()->coreMetrics().fontMetrics();
     input.previousSizeHintWidth = mLastSizeHint.width();
@@ -156,18 +192,29 @@ void RibbonPanel::runLayout()
 
     SARibbon::Core::SARibbonPanelLayoutEngine::Result r = mEngine.layout(items, QRect(0, 0, int(width()), int(height())), input);
 
+    mLastSizeHint = r.sizeHint;
+    mLastColumnCount = r.columnCount;
+    mLastLargeHeight = r.largeHeight;
+    if (r.titleGeometry != mLastTitleGeometry) {
+        mLastTitleGeometry = r.titleGeometry;
+        Q_EMIT titleGeometryChanged();
+    }
+    // publish implicit sizes even at zero geometry: the sizeHint derives from the
+    // C++ button hints (metrics-driven, rect-independent), and the category reads
+    // implicitWidth as its layout hint — gating this on our own size would
+    // deadlock the hint chain (category waits for the panel, panel for category)
+    setImplicitWidth(qMax(qreal(r.sizeHint.width()), width()));
+    setImplicitHeight(qreal(r.sizeHint.height()));
+
+    if (width() <= 0 || height() <= 0) {
+        return;  // degenerate rect: hints published, button placement skipped
+    }
     // apply engine outputs to the REAL quick items
     for (RibbonToolButton* b : mChildButtons) {
         if (!b->isHidden()) {
             b->applyGeometry(b->resultGeometry);
         }
     }
-    mLastSizeHint = r.sizeHint;
-    mLastColumnCount = r.columnCount;
-    mLastLargeHeight = r.largeHeight;
-    // panel implicit height from the engine's height hint
-    setImplicitWidth(qMax(qreal(r.sizeHint.width()), width()));
-    setImplicitHeight(qreal(r.sizeHint.height()));
 }
 
 }

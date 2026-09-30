@@ -1,6 +1,7 @@
 #include "RibbonToolButton.h"
 #include "../panel/RibbonPanel.h"
 #include "../metrics/RibbonMetrics.h"
+#include "../SARibbonQmlTypes.h"
 
 namespace SARibbonQml {
 
@@ -13,6 +14,13 @@ RibbonToolButton::RibbonToolButton(QQuickItem* parent)
 
 RibbonToolButton::~RibbonToolButton()
 {
+    // leaf destruction: unparent + deleteLater, NEVER direct delete (KDDW Group.cpp rule)
+    if (mButtonQmlItem) {
+        mButtonQmlItem->setParentItem(nullptr);
+        mButtonQmlItem->setParent(nullptr);
+        mButtonQmlItem->deleteLater();
+        mButtonQmlItem = nullptr;
+    }
 }
 
 QString RibbonToolButton::text() const
@@ -130,8 +138,17 @@ QString RibbonToolButton::debugName() const
 void RibbonToolButton::componentComplete()
 {
     QQuickItem::componentComplete();
-    if (RibbonPanel* panel = qobject_cast< RibbonPanel* >(parentItem())) {
-        panel->registerChildItem(this);
+    ensureQmlItem();
+}
+
+void RibbonToolButton::ensureQmlItem()
+{
+    if (mButtonQmlItem) {
+        return;
+    }
+    QQuickItem* leaf = createVisualLeaf(this, SARibbonQmlLeafUrls::toolButtonLeaf(), "buttonCpp");
+    if (leaf && !mButtonQmlItem) {
+        setButtonQmlItem(leaf);  // handshake assigns it; fallback keeps the pair intact
     }
 }
 
@@ -142,6 +159,10 @@ void RibbonToolButton::updateSizeHint()
     mCachedSizeHint = computeSizeHintFromMetrics();
     setImplicitWidth(mCachedSizeHint.width());
     setImplicitHeight(mCachedSizeHint.height());
+    // hint changed: drop the stale engine cache entry and re-run the panel layout
+    if (RibbonPanel* panel = qobject_cast< RibbonPanel* >(parentItem())) {
+        panel->invalidateChildCache(this);
+    }
 }
 
 QSize RibbonToolButton::computeSizeHintFromMetrics()

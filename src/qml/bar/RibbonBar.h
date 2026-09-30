@@ -32,6 +32,7 @@ class RibbonBar : public QQuickItem
     Q_PROPERTY(QQuickItem* barQmlItem READ barQmlItem WRITE setBarQmlItem NOTIFY barQmlItemChanged)
 public:
     explicit RibbonBar(QQuickItem* parent = nullptr);
+    ~RibbonBar() override;
 
     int currentIndex() const;
     void setCurrentIndex(int idx);
@@ -53,11 +54,18 @@ Q_SIGNALS:
     void barQmlItemChanged();
 
 protected:
+    void componentComplete() override;
     void updatePolish() override;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    void geometryChange(const QRectF& newGeometry, const QRectF& oldGeometry) override;
+#else
+    void geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry) override;
+#endif
     void itemChange(ItemChange change, const ItemChangeData& data) override;
 
 private:
     void relayout();
+    void ensureQmlItem();
 
     int mCurrentIndex = 0;
     QQuickItem* mBarQmlItem = nullptr;

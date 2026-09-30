@@ -8,6 +8,9 @@
 #include <QFont>
 #include <QColor>
 #include <QMargins>
+#include <QUrl>
+
+class QQuickItem;
 
 namespace SARibbonQml {
 
@@ -57,6 +60,20 @@ public:
 static_assert(int(RibbonEnums::Large) == int(SARibbon::Core::SARibbonRowProportion::Large), "RowProportion drift");
 static_assert(int(RibbonEnums::Medium) == int(SARibbon::Core::SARibbonRowProportion::Medium), "RowProportion drift");
 static_assert(int(RibbonEnums::Small) == int(SARibbon::Core::SARibbonRowProportion::Small), "RowProportion drift");
+
+// Leaf resource URL table (centralized, no factory class in P0, plan-04 S3)
+namespace SARibbonQmlLeafUrls {
+inline QUrl barLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/RibbonBar.qml")); }
+inline QUrl categoryLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/RibbonCategory.qml")); }
+inline QUrl tabLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/RibbonTab.qml")); }
+inline QUrl panelLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/RibbonPanel.qml")); }
+inline QUrl toolButtonLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/RibbonToolButton.qml")); }
+}
+
+// Create the visual leaf of a host from qrc: QQmlComponent create -> handshake
+// property injection -> reparent onto the host (plan-04 S3 creation trilogy);
+// returns nullptr with a warning on engine/resource/creation failure
+SA_RIBBON_QML_EXPORT QQuickItem* createVisualLeaf(QQuickItem* host, const QUrl& leafUrl, const char* handshakeProperty);
 
 }  // namespace SARibbonQml
 

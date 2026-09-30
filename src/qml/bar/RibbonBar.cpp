@@ -2,6 +2,7 @@
 #include "../category/RibbonCategory.h"
 #include "../tab/RibbonTab.h"
 #include "../metrics/RibbonMetrics.h"
+#include "../SARibbonQmlTypes.h"
 #include <SARibbonCore/SARibbonCoreUtil.h>
 
 namespace SARibbonQml {
@@ -10,6 +11,51 @@ RibbonBar::RibbonBar(QQuickItem* parent) : QQuickItem(parent)
 {
 }
 
+RibbonBar::~RibbonBar()
+{
+    // leaf destruction: unparent + deleteLater, NEVER direct delete (a QML item may
+    // sit inside its own mouse-handling call stack, KDDW Group.cpp same rule)
+    if (mBarQmlItem) {
+        mBarQmlItem->setParentItem(nullptr);
+        mBarQmlItem->setParent(nullptr);
+        mBarQmlItem->deleteLater();
+        mBarQmlItem = nullptr;
+    }
+}
+
+void RibbonBar::componentComplete()
+{
+    QQuickItem::componentComplete();
+    // children (tabs/categories) complete before the parent, so the register
+    // lists are already filled here
+    ensureQmlItem();
+    polish();
+}
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+void RibbonBar::geometryChange(const QRectF& newGeometry, const QRectF& oldGeometry)
+{
+    QQuickItem::geometryChange(newGeometry, oldGeometry);
+#else
+void RibbonBar::geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry)
+{
+    QQuickItem::geometryChanged(newGeometry, oldGeometry);
+#endif
+    if (newGeometry.size() != oldGeometry.size()) {
+        polish();  // width comes from anchors/consumer: relayout on every resize
+    }
+}
+
+void RibbonBar::ensureQmlItem()
+{
+    if (mBarQmlItem) {
+        return;
+    }
+    QQuickItem* leaf = createVisualLeaf(this, SARibbonQmlLeafUrls::barLeaf(), "barCpp");
+    if (leaf && !mBarQmlItem) {
+        setBarQmlItem(leaf);  // handshake assigns it; fallback keeps the pair intact
+    }
+}
 int RibbonBar::currentIndex() const
 {
     return mCurrentIndex;
@@ -60,6 +106,13 @@ void RibbonBar::registerTab(RibbonTab* tab)
     if (!mTabs.contains(tab)) {
         mTabs.append(tab);
         tab->setParentItem(this);
+        // clicking a tab selects the category of the same index
+        connect(tab, &RibbonTab::clicked, this, [this, tab]() {
+            const int idx = mTabs.indexOf(tab);
+            if (idx >= 0) {
+                setCurrentIndex(idx);
+            }
+        });
         polish();
     }
 }
@@ -67,6 +120,7 @@ void RibbonBar::registerTab(RibbonTab* tab)
 void RibbonBar::unregisterTab(RibbonTab* tab)
 {
     if (mTabs.removeOne(tab)) {
+        disconnect(tab, &RibbonTab::clicked, this, nullptr);
         polish();
     }
 }
@@ -78,7 +132,16 @@ QRectF RibbonBar::titleRect() const
 
 void RibbonBar::itemChange(ItemChange change, const ItemChangeData& data)
 {
-    if (change == QQuickItem::ItemChildRemovedChange) {
+    if (change == QQuickItem::ItemChildAddedChange) {
+        // declarative children arrive here in DECLARATION order; sibling
+        // componentComplete runs in reverse creation order, so registration
+        // must happen here to keep the tab/category sequence correct
+        if (RibbonCategory* c = qobject_cast< RibbonCategory* >(data.item)) {
+            registerCategory(c);
+        } else if (RibbonTab* t = qobject_cast< RibbonTab* >(data.item)) {
+            registerTab(t);
+        }
+    } else if (change == QQuickItem::ItemChildRemovedChange) {
         if (RibbonCategory* c = qobject_cast< RibbonCategory* >(data.item)) {
             unregisterCategory(c);
         } else if (RibbonTab* t = qobject_cast< RibbonTab* >(data.item)) {
@@ -112,6 +175,7 @@ void RibbonBar::relayout()
     for (int i = 0; i < mTabs.size(); ++i) {
         RibbonTab* tab = mTabs[ i ];
         const int tabW = 60 + 8;  // fixed P0 tab width (text-driven sizing: 3.1+)
+        tab->setCurrent(i == mCurrentIndex);
         tab->setPosition(QPointF(x, tabBarY));
         tab->setSize(QSizeF(tabW, tabH));
         x += tabW + tabSpacing;

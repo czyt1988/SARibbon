@@ -9,7 +9,57 @@
 #include "bar/RibbonBar.h"
 #include <QQmlEngine>
 #include <QQmlContext>
+#include <QQmlComponent>
+#include <QQuickItem>
+#include <QFile>
+#include <QDebug>
 #include <QtQml>
+
+namespace SARibbonQml {
+
+QQuickItem* createVisualLeaf(QQuickItem* host, const QUrl& leafUrl, const char* handshakeProperty)
+{
+    if (!host || !handshakeProperty) {
+        return nullptr;
+    }
+    QQmlEngine* engine = qmlEngine(host);
+    if (!engine) {
+        qWarning() << "SARibbonQml: no QML engine reachable from host, cannot create leaf" << leafUrl;
+        return nullptr;
+    }
+    // QFile understands the ":/..." form but not "qrc:/..." URLs (exists() would
+    // always report false for the URL form) — convert for the existence check
+    QString resourcePath = leafUrl.toString();
+    if (leafUrl.scheme() == QLatin1String("qrc")) {
+        resourcePath = QLatin1Char(':') + leafUrl.path();
+    }
+    if (!QFile::exists(resourcePath)) {
+        qWarning() << "SARibbonQml: leaf resource missing (static build without Q_INIT_RESOURCE?)" << leafUrl;
+        return nullptr;
+    }
+    QQmlComponent component(engine, leafUrl);
+    QObject* obj = component.create();
+    if (!obj) {
+        qWarning() << "SARibbonQml: leaf create() failed:" << leafUrl << component.errorString();
+        return nullptr;
+    }
+    QQuickItem* leaf = qobject_cast< QQuickItem* >(obj);
+    if (!leaf) {
+        qWarning() << "SARibbonQml: leaf root is not a QQuickItem:" << leafUrl;
+        obj->deleteLater();
+        return nullptr;
+    }
+    // trilogy step 2: handshake injection — the leaf's onXxxCppChanged handler
+    // assigns itself back into the host's xxxQmlItem property
+    leaf->setProperty(handshakeProperty, QVariant::fromValue(host));
+    // trilogy step 3: reparent onto the host (both parents, KDDW Group.cpp rule)
+    leaf->setParentItem(host);
+    leaf->setParent(host);
+    leaf->setZ(-1);  // background layer under any structural children
+    return leaf;
+}
+
+}  // namespace SARibbonQml
 
 void saRibbonRegisterQmlTypes(QQmlEngine* engine)
 {

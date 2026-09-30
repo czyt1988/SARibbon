@@ -1,6 +1,8 @@
 #include "RibbonCategory.h"
 #include "../panel/RibbonPanel.h"
 #include "../button/RibbonToolButton.h"
+#include "../bar/RibbonBar.h"
+#include "../SARibbonQmlTypes.h"
 #include <SARibbonCore/SARibbonCoreUtil.h>
 
 namespace SARibbonQml {
@@ -23,6 +25,48 @@ public:
 
 RibbonCategory::RibbonCategory(QQuickItem* parent) : QQuickItem(parent)
 {
+}
+
+RibbonCategory::~RibbonCategory()
+{
+    // leaf destruction: unparent + deleteLater, NEVER direct delete (KDDW Group.cpp rule)
+    if (mCategoryQmlItem) {
+        mCategoryQmlItem->setParentItem(nullptr);
+        mCategoryQmlItem->setParent(nullptr);
+        mCategoryQmlItem->deleteLater();
+        mCategoryQmlItem = nullptr;
+    }
+}
+
+void RibbonCategory::componentComplete()
+{
+    QQuickItem::componentComplete();
+    ensureQmlItem();
+}
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+void RibbonCategory::geometryChange(const QRectF& newGeometry, const QRectF& oldGeometry)
+{
+    QQuickItem::geometryChange(newGeometry, oldGeometry);
+#else
+void RibbonCategory::geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry)
+{
+    QQuickItem::geometryChanged(newGeometry, oldGeometry);
+#endif
+    if (newGeometry.size() != oldGeometry.size()) {
+        polish();  // the bar host sizes this item: relayout panels on every resize
+    }
+}
+
+void RibbonCategory::ensureQmlItem()
+{
+    if (mCategoryQmlItem) {
+        return;
+    }
+    QQuickItem* leaf = createVisualLeaf(this, SARibbonQmlLeafUrls::categoryLeaf(), "categoryCpp");
+    if (leaf && !mCategoryQmlItem) {
+        setCategoryQmlItem(leaf);  // handshake assigns it; fallback keeps the pair intact
+    }
 }
 
 QString RibbonCategory::title() const
@@ -76,6 +120,9 @@ void RibbonCategory::registerPanel(RibbonPanel* panel)
 {
     if (!mPanels.contains(panel)) {
         mPanels.append(panel);
+        // panel implicit sizes are the layout hints: any change re-runs relayout
+        connect(panel, &QQuickItem::implicitWidthChanged, this, [this]() { polish(); });
+        connect(panel, &QQuickItem::implicitHeightChanged, this, [this]() { polish(); });
         polish();
     }
 }
@@ -83,6 +130,7 @@ void RibbonCategory::registerPanel(RibbonPanel* panel)
 void RibbonCategory::unregisterPanel(RibbonPanel* panel)
 {
     if (mPanels.removeOne(panel)) {
+        disconnect(panel, nullptr, this, nullptr);
         polish();
     }
 }
@@ -94,7 +142,12 @@ int RibbonCategory::contentWidth() const
 
 void RibbonCategory::itemChange(ItemChange change, const ItemChangeData& data)
 {
-    if (change == QQuickItem::ItemChildRemovedChange) {
+    if (change == QQuickItem::ItemChildAddedChange) {
+        // declaration order (sibling componentComplete runs reversed)
+        if (RibbonPanel* p = qobject_cast< RibbonPanel* >(data.item)) {
+            registerPanel(p);
+        }
+    } else if (change == QQuickItem::ItemChildRemovedChange) {
         if (RibbonPanel* p = qobject_cast< RibbonPanel* >(data.item)) {
             unregisterPanel(p);
         }

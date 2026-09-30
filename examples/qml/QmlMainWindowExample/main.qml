@@ -23,16 +23,12 @@ ApplicationWindow {
             title: "Home"
             RibbonPanel {
                 panelTitle: "Clipboard"
-                width: 140
-                height: parent ? parent.height : 100
                 RibbonToolButton { text: "Paste"; proportion: Ribbon.Large }
                 RibbonToolButton { text: "Cut"; proportion: Ribbon.Small }
                 RibbonToolButton { text: "Copy"; proportion: Ribbon.Small }
             }
             RibbonPanel {
                 panelTitle: "Font"
-                width: 140
-                height: parent ? parent.height : 100
                 RibbonToolButton { text: "B"; proportion: Ribbon.Medium }
                 RibbonToolButton { text: "I"; proportion: Ribbon.Small }
                 RibbonToolButton { text: "U"; proportion: Ribbon.Small }

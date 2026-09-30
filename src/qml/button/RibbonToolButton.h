@@ -71,6 +71,7 @@ protected:
 
 private:
     void updateSizeHint();
+    void ensureQmlItem();
     QSize computeSizeHintFromMetrics();
 
     QString mText;

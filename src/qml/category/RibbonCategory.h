@@ -31,6 +31,7 @@ class RibbonCategory : public QQuickItem
     Q_PROPERTY(int scrollPosition READ scrollPosition WRITE setScrollPosition NOTIFY scrollPositionChanged)
 public:
     explicit RibbonCategory(QQuickItem* parent = nullptr);
+    ~RibbonCategory() override;
 
     QString title() const;
     void setTitle(const QString& t);
@@ -52,11 +53,18 @@ Q_SIGNALS:
     void scrollPositionChanged();
 
 protected:
+    void componentComplete() override;
     void updatePolish() override;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    void geometryChange(const QRectF& newGeometry, const QRectF& oldGeometry) override;
+#else
+    void geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry) override;
+#endif
     void itemChange(ItemChange change, const ItemChangeData& data) override;
 
 private:
     void relayout();
+    void ensureQmlItem();
 
     QString mTitle;
     QQuickItem* mCategoryQmlItem = nullptr;

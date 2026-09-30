@@ -28,6 +28,7 @@ class RibbonTab : public QQuickItem
     Q_PROPERTY(QQuickItem* tabQmlItem READ tabQmlItem WRITE setTabQmlItem NOTIFY tabQmlItemChanged)
 public:
     explicit RibbonTab(QQuickItem* parent = nullptr);
+    ~RibbonTab() override;
 
     QString text() const;
     void setText(const QString& t);
@@ -49,9 +50,11 @@ Q_SIGNALS:
     void clicked();
 
 protected:
+    void componentComplete() override;
     void mousePressEvent(QMouseEvent* event) override;
 
 private:
+    void ensureQmlItem();
     QString mText;
     bool mCurrent = false;
     QColor mContextColor;

@@ -1,12 +1,14 @@
 import QtQuick 2.15
+import SARibbon 3.0
 
-// RibbonBar default visual leaf (plan-04 S4): background + title strip bound
-// to the RibbonTheme singleton by consumers; geometry comes from the host.
+// RibbonBar default visual leaf (plan-04 S4): background bound to the
+// RibbonTheme singleton; geometry comes from the host (anchors.fill).
 Rectangle {
     id: root
 
     property QtObject barCpp: null
     onBarCppChanged: if (barCpp) barCpp.barQmlItem = root
 
-    color: "transparent"
+    anchors.fill: parent
+    color: RibbonTheme.tokenColor("content-bg")
 }

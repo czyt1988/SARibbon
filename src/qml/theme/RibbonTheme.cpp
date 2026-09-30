@@ -1,4 +1,6 @@
 #include "RibbonTheme.h"
+#include <QGuiApplication>
+#include <QPalette>
 
 namespace SARibbonQml {
 
@@ -46,7 +48,28 @@ QColor RibbonTheme::tokenColor(const QString& name) const
 {
     const QString raw = coreData()->palette().rawValue(name);
     QColor c(raw);
-    return c.isValid() ? c : QColor();
+    if (c.isValid()) {
+        return c;
+    }
+    // QML-only apps never run the widgets theme manager, so the core palette
+    // stays empty: fall back to the application palette for the core token
+    // names, keeping the leaves literal-color-free (plan-04 S3 theme rule)
+    if (QGuiApplication::instance()) {
+        const QPalette pal = QGuiApplication::palette();
+        if (name == QLatin1String("text-color")) {
+            return pal.color(QPalette::Active, QPalette::Text);
+        }
+        if (name == QLatin1String("content-bg")) {
+            return pal.color(QPalette::Active, QPalette::Window);
+        }
+        if (name == QLatin1String("accent")) {
+            return pal.color(QPalette::Active, QPalette::Highlight);
+        }
+        if (name == QLatin1String("accent-text")) {
+            return pal.color(QPalette::Active, QPalette::HighlightedText);
+        }
+    }
+    return QColor();
 }
 
 }
