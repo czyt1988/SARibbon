@@ -8,8 +8,8 @@ import SARibbon 3.0
 // Tabs are auto-generated from the category titles (addCategoryPage parity).
 ApplicationWindow {
     id: window
-    width: 1000
-    height: 420
+    width: 1300
+    height: 460
     visible: true
     title: "SARibbon QML Example"
 
@@ -86,6 +86,210 @@ ApplicationWindow {
                     iconSource: "qrc:/icon/icon/redo.svg"
                     proportion: Ribbon.Medium
                     onClicked: feedback.text = qsTr("Redo clicked")
+                }
+            }
+
+            // Mirrors the widgets "button states" demo: every large button
+            // state (normal / checked / disabled / checkable / long text /
+            // very short text) side by side.
+            RibbonPanel {
+                panelTitle: "button states"
+
+                RibbonToolButton {
+                    text: "Normal"
+                    iconSource: "qrc:/icon/icon/file.svg"
+                    proportion: Ribbon.Large
+                    onClicked: feedback.text = qsTr("Normal clicked")
+                }
+                RibbonToolButton {
+                    text: "Checked"
+                    iconSource: "qrc:/icon/icon/enableTest.svg"
+                    proportion: Ribbon.Large
+                    checkable: true
+                    checked: true
+                    onClicked: feedback.text = qsTr("Checked toggled: %1").arg(checked)
+                }
+                RibbonToolButton {
+                    id: disableButton
+                    text: "Disabled"
+                    iconSource: "qrc:/icon/icon/disable.svg"
+                    proportion: Ribbon.Large
+                    enabled: false
+                    onClicked: feedback.text = qsTr("this click must never fire")
+                }
+                RibbonToolButton {
+                    text: "unlock"
+                    iconSource: "qrc:/icon/icon/unlock.svg"
+                    proportion: Ribbon.Large
+                    onClicked: {
+                        disableButton.enabled = true;
+                        disableButton.text = "Enabled";
+                        feedback.text = qsTr("disabled button unlocked");
+                    }
+                }
+                RibbonToolButton {
+                    text: "very long text in a button, balabalabala etc"
+                    iconSource: "qrc:/icon/icon/long-text.svg"
+                    proportion: Ribbon.Large
+                    onClicked: feedback.text = qsTr("long text clicked")
+                }
+                RibbonToolButton {
+                    text: "1"
+                    iconSource: "qrc:/icon/icon/setText.svg"
+                    proportion: Ribbon.Large
+                    toolTip: "very short string"
+                    onClicked: feedback.text = qsTr("short text clicked")
+                }
+            }
+
+            // Mirrors the widgets "sa ribbon toolbutton style" panel: the
+            // three popup modes (MenuButtonPopup splits action/menu zones,
+            // InstantPopup is menu-only, DelayedPopup opens on press-hold),
+            // checkable variants and a disabled button with a menu.
+            RibbonPanel {
+                panelTitle: "toolbutton style"
+
+                RibbonToolButton {
+                    text: "test 1"
+                    iconSource: "qrc:/icon/icon/test1.svg"
+                    proportion: Ribbon.Small
+                    toolTip: "use MenuButtonPopup mode: the trailing arrow opens the menu, the icon clicks"
+                    popupMode: Ribbon.MenuButtonPopup
+                    menuItems: [
+                        RibbonMenuItem { text: "item 1"; iconSource: "qrc:/icon/icon/item.svg" },
+                        RibbonMenuItem { text: "item 2"; iconSource: "qrc:/icon/icon/item.svg" },
+                        RibbonMenuItem { text: "item 3"; iconSource: "qrc:/icon/icon/item.svg" },
+                        RibbonMenuItem { separator: true },
+                        RibbonMenuItem { text: "item 4"; iconSource: "qrc:/icon/icon/item.svg" },
+                        RibbonMenuItem { text: "item 5"; iconSource: "qrc:/icon/icon/item.svg" }
+                    ]
+                    onClicked: feedback.text = qsTr("test 1 action zone clicked")
+                    onMenuTriggered: feedback.text = qsTr("test 1 menu: %1").arg(item.text)
+                }
+                RibbonToolButton {
+                    text: "test 2"
+                    iconSource: "qrc:/icon/icon/test2.svg"
+                    proportion: Ribbon.Small
+                    toolTip: "use InstantPopup mode: the whole button opens the menu"
+                    popupMode: Ribbon.InstantPopup
+                    menuItems: [
+                        RibbonMenuItem { text: "item 1"; iconSource: "qrc:/icon/icon/item.svg" },
+                        RibbonMenuItem { text: "item 2"; iconSource: "qrc:/icon/icon/item.svg" },
+                        RibbonMenuItem { separator: true },
+                        RibbonMenuItem { text: "item 3"; iconSource: "qrc:/icon/icon/item.svg" }
+                    ]
+                    onMenuTriggered: feedback.text = qsTr("test 2 menu: %1").arg(item.text)
+                }
+                RibbonToolButton {
+                    text: "Delayed\nPopup"
+                    iconSource: "qrc:/icon/icon/folder-cog.svg"
+                    proportion: Ribbon.Large
+                    popupMode: Ribbon.DelayedPopup
+                    menuItems: [
+                        RibbonMenuItem { text: "item 1"; iconSource: "qrc:/icon/icon/item.svg" },
+                        RibbonMenuItem { text: "item 2"; iconSource: "qrc:/icon/icon/item.svg" },
+                        RibbonMenuItem { text: "item 3"; iconSource: "qrc:/icon/icon/item.svg" }
+                    ]
+                    onClicked: feedback.text = qsTr("Delayed Popup clicked (press and hold opens the menu)")
+                    onMenuTriggered: feedback.text = qsTr("Delayed Popup menu: %1").arg(item.text)
+                }
+                RibbonToolButton {
+                    text: "Menu Button Popup"
+                    iconSource: "qrc:/icon/icon/folder-star.svg"
+                    proportion: Ribbon.Large
+                    popupMode: Ribbon.MenuButtonPopup
+                    menuItems: [
+                        RibbonMenuItem { text: "item 1"; iconSource: "qrc:/icon/icon/item.svg" },
+                        RibbonMenuItem { text: "item 2"; iconSource: "qrc:/icon/icon/item.svg" }
+                    ]
+                    onClicked: feedback.text = qsTr("Menu Button Popup action zone clicked")
+                    onMenuTriggered: feedback.text = qsTr("Menu Button Popup menu: %1").arg(item.text)
+                }
+                RibbonToolButton {
+                    text: "Instant Popup"
+                    iconSource: "qrc:/icon/icon/folder-stats.svg"
+                    proportion: Ribbon.Large
+                    popupMode: Ribbon.InstantPopup
+                    menuItems: [
+                        RibbonMenuItem { text: "item 1"; iconSource: "qrc:/icon/icon/item.svg" },
+                        RibbonMenuItem { text: "item 2"; iconSource: "qrc:/icon/icon/item.svg" }
+                    ]
+                    onMenuTriggered: feedback.text = qsTr("Instant Popup menu: %1").arg(item.text)
+                }
+                RibbonToolButton {
+                    text: "Delayed Popup checkable"
+                    iconSource: "qrc:/icon/icon/folder-table.svg"
+                    proportion: Ribbon.Large
+                    checkable: true
+                    popupMode: Ribbon.DelayedPopup
+                    menuItems: [
+                        RibbonMenuItem { text: "item 1"; iconSource: "qrc:/icon/icon/item.svg" },
+                        RibbonMenuItem { text: "item 2"; iconSource: "qrc:/icon/icon/item.svg" }
+                    ]
+                    onClicked: feedback.text = qsTr("Delayed Popup checkable toggled: %1").arg(checked)
+                    onMenuTriggered: feedback.text = qsTr("Delayed Popup checkable menu: %1").arg(item.text)
+                }
+                RibbonToolButton {
+                    text: "Menu Button Popup checkable"
+                    iconSource: "qrc:/icon/icon/folder-checkmark.svg"
+                    proportion: Ribbon.Large
+                    checkable: true
+                    popupMode: Ribbon.MenuButtonPopup
+                    menuItems: [
+                        RibbonMenuItem { text: "item 1"; iconSource: "qrc:/icon/icon/item.svg" },
+                        RibbonMenuItem { text: "item 2"; iconSource: "qrc:/icon/icon/item.svg" }
+                    ]
+                    onClicked: feedback.text = qsTr("Menu Button Popup checkable toggled: %1").arg(checked)
+                    onMenuTriggered: feedback.text = qsTr("Menu Button Popup checkable menu: %1").arg(item.text)
+                }
+            }
+
+            // Mirrors the widgets "widget test" panel: arbitrary controls
+            // embedded into the ribbon panel through RibbonControlContainer.
+            RibbonPanel {
+                panelTitle: "widget test"
+
+                RibbonControlContainer {
+                    text: "ComboBox:"
+                    proportion: Ribbon.Small
+                    control: ComboBox {
+                        editable: true
+                        model: [
+                            "testItem 1", "testItem 2", "testItem 3", "testItem 4", "testItem 5",
+                            "testItem 6", "testItem 7", "testItem 8", "testItem 9", "testItem 10"
+                        ]
+                        onActivated: feedback.text = qsTr("ComboBox selected: %1").arg(currentText)
+                    }
+                }
+                RibbonControlContainer {
+                    text: "ComboBox2:"
+                    proportion: Ribbon.Small
+                    control: ComboBox {
+                        model: [ "option 1", "option 2", "option 3" ]
+                        onActivated: feedback.text = qsTr("ComboBox2 selected: %1").arg(currentText)
+                    }
+                }
+                RibbonControlContainer {
+                    text: "Line Edit:"
+                    proportion: Ribbon.Small
+                    control: TextField {
+                        placeholderText: qsTr("type and press Enter")
+                        onEditingFinished: feedback.text = qsTr("Line Edit: %1").arg(text)
+                    }
+                }
+                RibbonControlContainer {
+                    text: "CheckBox:"
+                    proportion: Ribbon.Small
+                    control: CheckBox {
+                        onToggled: feedback.text = qsTr("CheckBox toggled: %1").arg(checked)
+                    }
+                }
+                RibbonControlContainer {
+                    text: "SpinBox:"
+                    proportion: Ribbon.Small
+                    control: SpinBox {
+                        onValueModified: feedback.text = qsTr("SpinBox value: %1").arg(value)
+                    }
                 }
             }
         }

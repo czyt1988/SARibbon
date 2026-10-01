@@ -1,8 +1,8 @@
 #ifndef RIBBONBAR_H
 #define RIBBONBAR_H
 #include "SARibbonQmlGlobal.h"
+#include "../host/RibbonQuickHost.h"
 #include <SARibbonCore/SARibbonBarGeometryEngine.h>
-#include <QQuickItem>
 #include <QRectF>
 #include <QVector>
 
@@ -34,12 +34,11 @@ class RibbonTab;
  *          点击信号，office-2021 外观）由 bar 叶子按本宿主发布的矩形渲染。
  * \endif
  */
-class RibbonBar : public QQuickItem
+class RibbonBar : public RibbonQuickHost
 {
     Q_OBJECT
     Q_PROPERTY(int currentIndex READ currentIndex WRITE setCurrentIndex NOTIFY currentIndexChanged)
     Q_PROPERTY(QString applicationLabel READ applicationLabel WRITE setApplicationLabel NOTIFY applicationLabelChanged)
-    Q_PROPERTY(QQuickItem* barQmlItem READ barQmlItem WRITE setBarQmlItem NOTIFY barQmlItemChanged)
     Q_PROPERTY(int tabBarHeight READ tabBarHeight NOTIFY layoutChanged)
     Q_PROPERTY(int titleBarHeight READ titleBarHeight NOTIFY layoutChanged)
     Q_PROPERTY(int categoryRowY READ categoryRowY NOTIFY layoutChanged)
@@ -53,9 +52,6 @@ public:
 
     QString applicationLabel() const;
     void setApplicationLabel(const QString& label);
-
-    QQuickItem* barQmlItem() const;
-    void setBarQmlItem(QQuickItem* item);
 
     // layout values consumed by the visual leaf (re-published on relayout)
     int tabBarHeight() const;
@@ -77,11 +73,11 @@ public:
 Q_SIGNALS:
     void currentIndexChanged();
     void applicationLabelChanged();
-    void barQmlItemChanged();
     void layoutChanged();
     void applicationButtonClicked();
 
 protected:
+    QUrl leafUrl() const override;
     void componentComplete() override;
     void updatePolish() override;
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
@@ -93,16 +89,14 @@ protected:
 
 private:
     void relayout();
-    void ensureQmlItem();
     void syncTabCount();
     RibbonTab* createAutoTab(int index);
 
     int mCurrentIndex = 0;
     QString mApplicationLabel;
-    QQuickItem* mBarQmlItem = nullptr;
     QVector< RibbonCategory* > mCategories;
-    QVector< RibbonTab* > mTabs;        ///< explicit + auto tabs in row order
-    QVector< RibbonTab* > mAutoTabs;    ///< subset owned (and destroyed) by this bar
+    QVector< RibbonTab* > mTabs;      ///< explicit + auto tabs in row order
+    QVector< RibbonTab* > mAutoTabs;  ///< subset owned (and destroyed) by this bar
     QRect mTitleRect;
     QRectF mApplicationButtonRect;
     int mTabBarHeight   = 0;

@@ -458,6 +458,20 @@
 - 处理：① `RibbonBar::setCurrentIndex` 改按 tab 数界定并支持"无显式 RibbonTab 的 category 自动建 tab（addCategoryPage 语义，C++ 创建的 tab 经 parentItem 链回退解析 engine 并显式 `ensureQmlItem()`——C++ 创建项无 componentComplete）"；② `RibbonToolButton` 增 `clicked()/toggled()/checkable/checked/click()`（叶子 MouseArea 调宿主 Q_INVOKABLE，状态权威在 C++）；③ 视觉叶子按 office-2021 QSS 全量重写（tab 4px 底线、按钮 4 状态、panel 标题/分隔线、bar 应用按钮），颜色全部经 RibbonTheme token 属性；④ `RibbonTheme` 在初始化时加载当前主题默认调色板 JSON（共享 widgets 的同一批源文件，qml qrc 以相同资源前缀注册，重复注册内容一致无害）并把常用 token 暴露为 NOTIFY paletteChanged 的 QColor 属性（Q_INVOKABLE tokenColor 无绑定刷新能力，必须走属性）；⑤ 叶子 import 统一降至 `QtQuick 2.12`（HoverHandler 5.12 起可用；原 2.15 在 5.12-5.14 加载必失败）。布局铁律未破：所有几何仍由 core 引擎计算（面板引擎黄金几何经宿主逐项 applyGeometry 验证）。
 - 影响计划：04-S3/S4/S5（叶子从"最小占位"升级为对照 widgets 的完整视觉+交互）；04-S2（RibbonTheme 增调色板加载职责）；04-S6（示例重写为图标+可点击+主题切换形态）
 
+### B40：QML 宿主基类提取 + 按钮弹出模式/控件容器（用户驱动，QML 功能覆盖度对标 1/3）
+- 日期：2026-10-08（用户目标"QML 功能与 widgets 覆盖度对标"第 1 轮）
+- 发现位置：计划 04 范围外扩展（原 P0 类型集无弹出模式/控件嵌入；非目标清单的画廊/上下文标签属后续轮）
+- 证据：widgets MainWindowExample 功能清单（3144→3403 行分析）表明按钮三比例之外还需：popup 三模式（MenuButtonPopup 分区/InstantPopup/DelayedPopup 长按）、禁用态、菜单模型、控件嵌入（addSmallWidget 系）；QML 侧 5 个宿主各自复制 ~26 行叶子生命周期样板（析构安全拆除/ensure/握手属性），新类型每个再复制一份。
+- 处理（共性逻辑先提取——用户规则"widget 有 QML 也要有的逻辑先想是否下沉 core；模块内共性上移共享基类"）：
+  1. **宿主基类**（`src/qml/host/`，模块内共性，非 core 级——叶子生命周期是 QML 前端实现细节）：`RibbonQuickHost`（QQuickItem + 统一握手 `qmlLeaf` + `ensureQmlLeaf()` + 安全拆除；子类只实现 `leafUrl()`）与 `RibbonLayoutItemHost`（+= core 布局契约，基类实现 isHidden/applyGeometry/debugName/expandingDirections 默认与大行高上下文传递）。既有 5 宿主重构继承，类型化握手属性（barQmlItem 等 5 套）统一为 `cppHost`/`qmlLeaf` 一套（模块未发布，无兼容负担；qml-guide 两语言版同步）。
+  2. **RibbonToolButton 补全**：`popupMode`（枚举值对齐 QToolButton）+ `menuItems`（QQmlListProperty&lt;RibbonMenuItem&gt;，Qt5 int/Qt6 qsizetype 回调签名经 QT_VERSION 别名）+ 命中分区 `actionRect`/`menuRect`（宿主 C++ 计算，大按钮=底部分条/小按钮=尾部 12px，RTL 经 core `saMirrorX`）+ 禁用吞点击（`click()` 守卫 isEnabled）+ `menuTriggered` 中转（`activateMenuItem(index)` 忽略禁用/分隔项，测试无需弹窗）+ `openMenu/closeMenu`（宿主 QMetaObject::invokeMethod 调叶子 QML 函数——签名必须无括号形式，`indexOfMethod("openMenu")` 带不上 `()` 会误判；叶子无则 headless 兜底）。叶子：分区双 MouseArea + Controls `Popup` 自绘行（theme token 着色，Repeater 代理）+ 长按计时 + ToolTip + 禁用透明度灰态。
+  3. **RibbonControlContainer**（`src/qml/container/`）：对标 widgets SARibbonCtrlContainer（icon|text|widget）；`control` 属性嵌入任意 QQuickItem（赋值即双 setParent），标签条宽 C++ 度量推导（`labelWidth` 发布给叶子），sizeHint=标签+control implicit（Large 比例按大行高），control implicit 变化触发面板重排（QWidgetItem 传导对等）。
+  4. **RibbonPanel 泛化**：registerChildItem 由 `RibbonToolButton*` 改 `RibbonLayoutItemHost*`（itemChange qobject_cast），后续画廊/分隔符等零改动接入；引擎缓存失效入口改契约基指针。
+  5. 库链接加 **QuickControls2**（叶子用 Popup/ToolTip——计划 04 S1"叶子用 Controls 才链"条款触发）；示例新增"button states"（6 态）/“toolbutton style”（3 模式+checkable+禁用+unlock）/“widget test”（ComboBox×2/TextField/CheckBox/SpinBox）三面板对标 widgets Main category，图标 11 枚自 widgets 示例复制。
+  6. 测试：`toolButtonPopupStates`（禁用吞点击/命中分区 RTL 镜像值/activateMenuItem 模型中转/openMenu 弹出+真实鼠标点行+关闭/**Repeater 代理无 QObject 父级——必须走 childItems() item 树查找，findChild 永远找不到**）与 `controlContainerEmbedding`（引擎几何/标签条/控件重挂父+点击 ComboBox 弹出）。全 8 用例绿。
+  7. 构建修正两处：`examples/CMakeLists.txt` 补 `SARIBBON_BUILD_WIDGETS` 守卫（原 Widgets=OFF+Examples=ON 配置必炸：widgets 示例 find_package(SARibbonBar) 无安装包）；`tests/qml` 弃 POST_BUILD 拷贝改**测试可执行与 DLL 同目录输出**（`${CMAKE_BINARY_DIR}/bin`）——qrc-only 变更不触碰导入库、exe 不重链、旧拷贝残留旧 DLL（本轮实际踩中：ReferenceError 修复后错误依旧，tests/ 下 DLL 为 8:50 旧版）。attach 到库目标的拷贝方案因 AUTOMOC + add_dependencies 成环不可用（CMake 强连通分量报错）。
+- 影响计划：04 非目标清单（RibbonMenu 的 QML 版经按钮 popupMode+RibbonMenuItem 事实覆盖菜单场景）；04-S3（panel 子项模型泛化）；04-S6（示例对标扩展）；后续轮：上下文标签页/画廊/quick access bar/六样式按同思路推进。
+
 ---
 
 ## 执行中追加（模板，勿删）

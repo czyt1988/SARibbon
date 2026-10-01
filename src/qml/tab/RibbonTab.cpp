@@ -1,40 +1,20 @@
 #include "RibbonTab.h"
-#include "../bar/RibbonBar.h"
 #include "../SARibbonQmlTypes.h"
 
 namespace SARibbonQml {
 
-RibbonTab::RibbonTab(QQuickItem* parent) : QQuickItem(parent)
+RibbonTab::RibbonTab(QQuickItem* parent) : RibbonQuickHost(parent)
 {
     setAcceptedMouseButtons(Qt::LeftButton);
 }
 
 RibbonTab::~RibbonTab()
 {
-    // leaf destruction: unparent + deleteLater, NEVER direct delete (KDDW Group.cpp rule)
-    if (mTabQmlItem) {
-        mTabQmlItem->setParentItem(nullptr);
-        mTabQmlItem->setParent(nullptr);
-        mTabQmlItem->deleteLater();
-        mTabQmlItem = nullptr;
-    }
 }
 
-void RibbonTab::componentComplete()
+QUrl RibbonTab::leafUrl() const
 {
-    QQuickItem::componentComplete();
-    ensureQmlItem();
-}
-
-void RibbonTab::ensureQmlItem()
-{
-    if (mTabQmlItem) {
-        return;
-    }
-    QQuickItem* leaf = createVisualLeaf(this, SARibbonQmlLeafUrls::tabLeaf(), "tabCpp");
-    if (leaf && !mTabQmlItem) {
-        setTabQmlItem(leaf);  // handshake assigns it; fallback keeps the pair intact
-    }
+    return SARibbonQmlLeafUrls::tabLeaf();
 }
 
 QString RibbonTab::text() const
@@ -79,18 +59,10 @@ void RibbonTab::setContextColor(const QColor& c)
     Q_EMIT contextColorChanged();
 }
 
-QQuickItem* RibbonTab::tabQmlItem() const
+void RibbonTab::componentComplete()
 {
-    return mTabQmlItem;
-}
-
-void RibbonTab::setTabQmlItem(QQuickItem* item)
-{
-    if (mTabQmlItem == item) {
-        return;
-    }
-    mTabQmlItem = item;
-    Q_EMIT tabQmlItemChanged();
+    RibbonQuickHost::componentComplete();
+    ensureQmlLeaf();
 }
 
 void RibbonTab::mousePressEvent(QMouseEvent* event)

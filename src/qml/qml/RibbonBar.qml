@@ -8,11 +8,11 @@ import SARibbon 3.0
 Rectangle {
     id: root
 
-    property QtObject barCpp: null
-    onBarCppChanged: if (barCpp) barCpp.barQmlItem = root
+    property QtObject cppHost: null
+    onCppHostChanged: if (cppHost) cppHost.qmlLeaf = root
 
-    readonly property int categoryRowY: barCpp ? barCpp.categoryRowY : 0
-    readonly property rect appRect: barCpp && barCpp.applicationButtonRect.width > 0 ? barCpp.applicationButtonRect : Qt.rect(0, 0, 0, 0)
+    readonly property int categoryRowY: cppHost ? cppHost.categoryRowY : 0
+    readonly property rect appRect: cppHost && cppHost.applicationButtonRect.width > 0 ? cppHost.applicationButtonRect : Qt.rect(0, 0, 0, 0)
 
     anchors.fill: parent
     color: RibbonTheme.accent
@@ -52,14 +52,14 @@ Rectangle {
         }
         Text {
             anchors.centerIn: parent
-            text: root.barCpp ? root.barCpp.applicationLabel : ""
+            text: root.cppHost ? root.cppHost.applicationLabel : ""
             color: RibbonTheme.textColor
         }
         MouseArea {
             id: appMouse
             anchors.fill: parent
             hoverEnabled: true
-            onClicked: if (root.barCpp) root.barCpp.applicationButtonClicked()
+            onClicked: if (root.cppHost) root.cppHost.applicationButtonClicked()
         }
     }
 }

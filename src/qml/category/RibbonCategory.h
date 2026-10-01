@@ -1,8 +1,8 @@
 #ifndef RIBBONCATEGORY_H
 #define RIBBONCATEGORY_H
 #include "SARibbonQmlGlobal.h"
+#include "../host/RibbonQuickHost.h"
 #include <SARibbonCore/SARibbonCategoryLayoutEngine.h>
-#include <QQuickItem>
 #include <QVector>
 
 namespace SARibbonQml {
@@ -23,11 +23,10 @@ class RibbonPanel;
  *          （前端动画，v2 §3.4.3），目标值经引擎钳制。
  * \endif
  */
-class RibbonCategory : public QQuickItem
+class RibbonCategory : public RibbonQuickHost
 {
     Q_OBJECT
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
-    Q_PROPERTY(QQuickItem* categoryQmlItem READ categoryQmlItem WRITE setCategoryQmlItem NOTIFY categoryQmlItemChanged)
     Q_PROPERTY(int scrollPosition READ scrollPosition WRITE setScrollPosition NOTIFY scrollPositionChanged)
     Q_PROPERTY(QVariantList separatorXs READ separatorXs NOTIFY separatorXsChanged)
 public:
@@ -36,9 +35,6 @@ public:
 
     QString title() const;
     void setTitle(const QString& t);
-
-    QQuickItem* categoryQmlItem() const;
-    void setCategoryQmlItem(QQuickItem* item);
 
     int scrollPosition() const;
     void setScrollPosition(int pos);
@@ -54,11 +50,11 @@ public:
 
 Q_SIGNALS:
     void titleChanged();
-    void categoryQmlItemChanged();
     void scrollPositionChanged();
     void separatorXsChanged();
 
 protected:
+    QUrl leafUrl() const override;
     void componentComplete() override;
     void updatePolish() override;
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
@@ -70,10 +66,8 @@ protected:
 
 private:
     void relayout();
-    void ensureQmlItem();
 
     QString mTitle;
-    QQuickItem* mCategoryQmlItem = nullptr;
     int mScrollXBase = 0;
     int mTotalWidth = 0;
     QVector< RibbonPanel* > mPanels;

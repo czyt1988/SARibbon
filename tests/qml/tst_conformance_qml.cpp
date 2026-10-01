@@ -3,10 +3,16 @@
 #include <QQuickItem>
 #include <QQmlEngine>
 #include <QQmlContext>
+#include <QQmlComponent>
 #include <QSignalSpy>
 #include <QFile>
 #include <QImageReader>
+#include <memory>
+#include <functional>
 #include <SARibbonQml/SARibbonQmlGlobal.h>
+#include <SARibbonQml/button/RibbonToolButton.h>
+#include <SARibbonQml/container/RibbonControlContainer.h>
+#include <SARibbonQml/menu/RibbonMenuItem.h>
 #include "../common/RibbonConformance.h"
 
 /**
@@ -25,6 +31,11 @@ private Q_SLOTS:
     void barAutoTabsAndSwitch();
     void toolButtonClick();
     void svgIconLoads();
+    void toolButtonPopupStates();
+    void controlContainerEmbedding();
+
+private:
+    QQuickView* exposeScene(QQmlEngine& engine, QQmlComponent& component, const char* src, int w, int h);
 };
 
 void TestConformanceQml::panelThreeRowMixed()
@@ -291,6 +302,281 @@ Item {
     // QQuickImageBase status: 0=Null, 1=Ready, 2=Loading, 3=Error
     QTRY_COMPARE(img->property("status").toInt(), 1);
     QTRY_VERIFY(img->property("progress").toReal() >= 1.0);
+}
+
+QQuickView* TestConformanceQml::exposeScene(QQmlEngine& engine, QQmlComponent& component, const char* src, int w, int h)
+{
+    QObject::connect(&engine, &QQmlEngine::warnings, this, [](const QList< QQmlError >& warnings) {
+        for (const auto& w : warnings) {
+            qWarning() << "QML:" << w.toString();
+        }
+    });
+    component.setData(QByteArray(src), QUrl());
+    QObject* rootObj = component.create();
+    if (!rootObj) {
+        qWarning() << "component create failed:" << component.errorString();
+        return nullptr;
+    }
+    QQuickItem* rootItem = qobject_cast< QQuickItem* >(rootObj);
+    if (!rootItem) {
+        delete rootObj;
+        return nullptr;
+    }
+    QQuickView* view = new QQuickView(&engine, nullptr);
+    view->setResizeMode(QQuickView::SizeRootObjectToView);
+    view->resize(w, h);
+    rootItem->setParentItem(view->contentItem());
+    view->setContent(QUrl(), &component, rootObj);
+    view->show();
+    if (!QTest::qWaitForWindowExposed(view)) {
+        delete view;
+        return nullptr;
+    }
+    return view;
+}
+
+/**
+ * @brief Popup modes / disabled state / menu model of the tool button
+ * @details Mirrors the widgets "sa ribbon toolbutton style" panel: the three
+ *          popup modes publish host-computed hit zones, menu entries are
+ *          RibbonMenuItem objects mediated by menuTriggered, and a disabled
+ *          host swallows both invokable and real-mouse clicks.
+ */
+void TestConformanceQml::toolButtonPopupStates()
+{
+    QQmlEngine engine;
+    saRibbonRegisterQmlTypes(&engine);
+
+    QString src = QStringLiteral(R"QML(import QtQuick 2.12
+import SARibbon 3.0
+Item {
+    width: 600
+    height: 300
+    RibbonPanel {
+        objectName: "panel"
+        anchors.fill: parent
+        panelTitle: "P"
+        RibbonToolButton {
+            objectName: "disabledBtn"
+            text: "Disabled"
+            checkable: true
+            enabled: false
+        }
+        RibbonToolButton {
+            objectName: "menuBtn"
+            text: "Menu"
+            proportion: Ribbon.Small
+            checkable: true
+            popupMode: Ribbon.MenuButtonPopup
+            menuItems: [
+                RibbonMenuItem { text: "item 1" },
+                RibbonMenuItem { separator: true },
+                RibbonMenuItem { text: "item 2"; enabled: false },
+                RibbonMenuItem { text: "item 3" }
+            ]
+        }
+        RibbonToolButton {
+            objectName: "instantBtn"
+            text: "Inst"
+            proportion: Ribbon.Small
+            popupMode: Ribbon.InstantPopup
+            menuItems: [ RibbonMenuItem { text: "only" } ]
+        }
+        RibbonToolButton {
+            objectName: "delayedBtn"
+            text: "Del"
+            proportion: Ribbon.Small
+            popupMode: Ribbon.DelayedPopup
+            menuItems: [ RibbonMenuItem { text: "d1" } ]
+        }
+    }
+})QML");
+
+    QQmlComponent component(&engine);
+    std::unique_ptr< QQuickView > view(exposeScene(engine, component, src.toUtf8().constData(), 600, 300));
+    QVERIFY(view);
+    QQuickItem* rootItem = view->rootObject();
+    QVERIFY(rootItem);
+
+    // ---- disabled host swallows clicks (invokable AND real mouse) ----
+    auto* disabledBtn = rootItem->findChild< QQuickItem* >(QStringLiteral("disabledBtn"));
+    QVERIFY(disabledBtn);
+    QSignalSpy disabledClicked(disabledBtn, SIGNAL(clicked()));
+    QMetaObject::invokeMethod(disabledBtn, "click");
+    QVERIFY(disabledClicked.isEmpty());
+    const QPointF disCenter = disabledBtn->mapToScene(QPointF(disabledBtn->width() / 2, disabledBtn->height() / 2));
+    QTest::mouseClick(view.get(), Qt::LeftButton, Qt::NoModifier, disCenter.toPoint());
+    QTRY_VERIFY(disabledClicked.isEmpty());
+    QVERIFY(!disabledBtn->property("checked").toBool());
+
+    // ---- MenuButtonPopup hit zones: small button = trailing indicator strip ----
+    auto* menuBtn = rootItem->findChild< QQuickItem* >(QStringLiteral("menuBtn"));
+    QVERIFY(menuBtn);
+    QTRY_VERIFY(menuBtn->width() > 0 && menuBtn->height() > 0);
+    QVERIFY(menuBtn->property("hasMenu").toBool());
+    const QRectF actionRect = menuBtn->property("actionRect").toRectF();
+    const QRectF menuRect   = menuBtn->property("menuRect").toRectF();
+    QVERIFY(actionRect.width() > 0);
+    QVERIFY(menuRect.width() > 0);
+    // the menu strip sits on the trailing edge, the action zone before it
+    QVERIFY(qFuzzyCompare(menuRect.x() + menuRect.width(), qreal(menuBtn->width())));
+    QVERIFY(actionRect.x() + actionRect.width() <= menuRect.x() + 1.0);
+
+    // ---- menu model mediation: activateMenuItem -> menuTriggered ----
+    QSignalSpy menuSpy(menuBtn, SIGNAL(menuTriggered(SARibbonQml::RibbonMenuItem*)));
+    QMetaObject::invokeMethod(menuBtn, "activateMenuItem", Q_ARG(int, 0));
+    QCOMPARE(menuSpy.size(), 1);
+    {
+        auto* triggeredItem = qvariant_cast< QObject* >(menuSpy.at(0).at(0));
+        QVERIFY(triggeredItem);
+        QCOMPARE(triggeredItem->property("text").toString(), QStringLiteral("item 1"));
+    }
+    // separator / disabled / out-of-range entries are ignored
+    QMetaObject::invokeMethod(menuBtn, "activateMenuItem", Q_ARG(int, 1));
+    QMetaObject::invokeMethod(menuBtn, "activateMenuItem", Q_ARG(int, 2));
+    QMetaObject::invokeMethod(menuBtn, "activateMenuItem", Q_ARG(int, 99));
+    QMetaObject::invokeMethod(menuBtn, "activateMenuItem", Q_ARG(int, -1));
+    QCOMPARE(menuSpy.size(), 1);
+
+    // ---- openMenu with a rendered leaf opens the styled popup ----
+    QVERIFY(!menuBtn->property("menuVisible").toBool());
+    QMetaObject::invokeMethod(menuBtn, "openMenu");
+    QTRY_COMPARE(menuBtn->property("menuVisible").toBool(), true);
+    // the first menu row exists in the popup content and is clickable.
+    // NOTE: Repeater delegates carry no QObject parent, so findChild cannot
+    // reach them — walk the item tree instead
+    std::function< QQuickItem* (QQuickItem*, const QString&) > findItem
+        = [&findItem](QQuickItem* from, const QString& name) -> QQuickItem* {
+        if (from->objectName() == name) {
+            return from;
+        }
+        for (QQuickItem* child : from->childItems()) {
+            if (QQuickItem* hit = findItem(child, name)) {
+                return hit;
+            }
+        }
+        return nullptr;
+    };
+    QQuickItem* row = nullptr;
+    for (QQuickItem* top : view->contentItem()->childItems()) {
+        if ((row = findItem(top, QStringLiteral("menuRow")))) {
+            break;
+        }
+    }
+    QVERIFY(row);
+    QTRY_VERIFY(row->isVisible() && row->width() > 0);
+    const QPointF rowCenter = row->mapToScene(QPointF(row->width() / 2, row->height() / 2));
+    QTest::mouseClick(view.get(), Qt::LeftButton, Qt::NoModifier, rowCenter.toPoint());
+    QTRY_COMPARE(menuSpy.size(), 2);
+    // the activation closed the popup
+    QTRY_COMPARE(menuBtn->property("menuVisible").toBool(), false);
+
+    // ---- InstantPopup: the whole button is the menu zone ----
+    auto* instantBtn = rootItem->findChild< QQuickItem* >(QStringLiteral("instantBtn"));
+    QVERIFY(instantBtn);
+    QTRY_VERIFY(instantBtn->width() > 0);
+    const QRectF instMenu   = instantBtn->property("menuRect").toRectF();
+    const QRectF instAction = instantBtn->property("actionRect").toRectF();
+    QVERIFY(instAction.width() <= 0);
+    QVERIFY(qFuzzyCompare(instMenu.width(), qreal(instantBtn->width())));
+    // a real click anywhere on the button opens the menu
+    const QPointF instCenter = instantBtn->mapToScene(QPointF(instantBtn->width() / 2, instantBtn->height() / 2));
+    QTest::mouseClick(view.get(), Qt::LeftButton, Qt::NoModifier, instCenter.toPoint());
+    QTRY_COMPARE(instantBtn->property("menuVisible").toBool(), true);
+
+    // ---- DelayedPopup: whole button stays the action zone (menu on hold) ----
+    auto* delayedBtn = rootItem->findChild< QQuickItem* >(QStringLiteral("delayedBtn"));
+    QVERIFY(delayedBtn);
+    const QRectF delayAction = delayedBtn->property("actionRect").toRectF();
+    const QRectF delayMenu   = delayedBtn->property("menuRect").toRectF();
+    QVERIFY(delayMenu.width() <= 0);
+    QVERIFY(qFuzzyCompare(delayAction.width(), qreal(delayedBtn->width())));
+}
+
+/**
+ * @brief RibbonControlContainer embedding an arbitrary control into the panel
+ * @details Mirrors the widgets "widget test" panel (addSmallWidget parity): a
+ *          ComboBox rides inside the container, the label strip width is
+ *          computed by the host, the control is reparented after the strip,
+ *          and the panel engine lays out buttons and containers side by side.
+ */
+void TestConformanceQml::controlContainerEmbedding()
+{
+    QQmlEngine engine;
+    saRibbonRegisterQmlTypes(&engine);
+
+    QString src = QStringLiteral(R"QML(import QtQuick 2.12
+import QtQuick.Controls 2.12
+import SARibbon 3.0
+Item {
+    width: 600
+    height: 300
+    RibbonPanel {
+        objectName: "panel"
+        anchors.fill: parent
+        panelTitle: "P"
+        RibbonToolButton {
+            objectName: "btnA"
+            text: "A"
+        }
+        RibbonControlContainer {
+            objectName: "comboContainer"
+            text: "Font:"
+            control: ComboBox {
+                objectName: "combo"
+                model: [ "item 1", "item 2", "item 3" ]
+            }
+        }
+        RibbonControlContainer {
+            objectName: "bareContainer"
+            control: CheckBox {
+                objectName: "check"
+                text: "check me"
+            }
+        }
+    }
+})QML");
+
+    QQmlComponent component(&engine);
+    std::unique_ptr< QQuickView > view(exposeScene(engine, component, src.toUtf8().constData(), 600, 300));
+    QVERIFY(view);
+    QQuickItem* rootItem = view->rootObject();
+    QVERIFY(rootItem);
+
+    // ---- container participates in the panel layout ----
+    auto* container = rootItem->findChild< QQuickItem* >(QStringLiteral("comboContainer"));
+    QVERIFY(container);
+    QTRY_VERIFY(container->width() > 0 && container->height() > 0);
+    const qreal labelWidth = container->property("labelWidth").toReal();
+    QVERIFY(labelWidth > 0);  // "Font:" label strip computed from core metrics
+
+    // ---- the control was reparented into the container, after the strip ----
+    auto* combo = container->findChild< QQuickItem* >(QStringLiteral("combo"));
+    QVERIFY(combo);
+    QCOMPARE(combo->parentItem(), container);
+    QTRY_VERIFY(combo->width() > 0 && combo->height() > 0);
+    QVERIFY(combo->x() >= labelWidth - 1.0);
+
+    // ---- a container without a label still lays out (icon-less strip) ----
+    auto* bare = rootItem->findChild< QQuickItem* >(QStringLiteral("bareContainer"));
+    QVERIFY(bare);
+    QTRY_VERIFY(bare->width() > 0);
+    auto* check = bare->findChild< QQuickItem* >(QStringLiteral("check"));
+    QVERIFY(check);
+    QTRY_VERIFY(check->width() > 0);
+    QVERIFY(check->x() >= 0.0);
+
+    // ---- buttons and containers coexist in one engine pass ----
+    auto* btnA = rootItem->findChild< QQuickItem* >(QStringLiteral("btnA"));
+    QVERIFY(btnA);
+    QTRY_VERIFY(btnA->width() > 0 && btnA->height() > 0);
+
+    // ---- the embedded control is functional (real mouse opens the popup) ----
+    const QPointF comboCenter = combo->mapToScene(QPointF(combo->width() / 2, combo->height() / 2));
+    QTest::mouseClick(view.get(), Qt::LeftButton, Qt::NoModifier, comboCenter.toPoint());
+    QObject* comboPopup = combo->property("popup").value< QObject* >();
+    QVERIFY(comboPopup);
+    QTRY_COMPARE(comboPopup->property("visible").toBool(), true);
 }
 
 QTEST_MAIN(TestConformanceQml)

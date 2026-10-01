@@ -7,14 +7,25 @@
         <file>icon/bold.svg</file>
         <file>icon/chinese-char.svg</file>
         <file>icon/delete.svg</file>
+        <file>icon/disable.svg</file>
+        <file>icon/enableTest.svg</file>
         <file>icon/file.svg</file>
         <file>icon/folder-checkmark.svg</file>
+        <file>icon/folder-cog.svg</file>
+        <file>icon/folder-star.svg</file>
+        <file>icon/folder-stats.svg</file>
+        <file>icon/folder-table.svg</file>
         <file>icon/Italic.svg</file>
         <file>icon/item.svg</file>
         <file>icon/layout.svg</file>
+        <file>icon/long-text.svg</file>
         <file>icon/redo.svg</file>
         <file>icon/save.svg</file>
+        <file>icon/setText.svg</file>
+        <file>icon/test1.svg</file>
+        <file>icon/test2.svg</file>
         <file>icon/Underline.svg</file>
         <file>icon/undo.svg</file>
+        <file>icon/unlock.svg</file>
     </qresource>
 </RCC>

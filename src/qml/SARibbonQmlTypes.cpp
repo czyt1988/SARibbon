@@ -2,8 +2,12 @@
 #include "SARibbonQmlTypes.h"
 #include "theme/RibbonTheme.h"
 #include "metrics/RibbonMetrics.h"
+#include "host/RibbonQuickHost.h"
+#include "host/RibbonLayoutItemHost.h"
+#include "menu/RibbonMenuItem.h"
 #include "panel/RibbonPanel.h"
 #include "button/RibbonToolButton.h"
+#include "container/RibbonControlContainer.h"
 #include "category/RibbonCategory.h"
 #include "tab/RibbonTab.h"
 #include "bar/RibbonBar.h"
@@ -17,9 +21,9 @@
 
 namespace SARibbonQml {
 
-QQuickItem* createVisualLeaf(QQuickItem* host, const QUrl& leafUrl, const char* handshakeProperty)
+QQuickItem* createVisualLeaf(QQuickItem* host, const QUrl& leafUrl)
 {
-    if (!host || !handshakeProperty) {
+    if (!host) {
         return nullptr;
     }
     QQmlEngine* engine = qmlEngine(host);
@@ -60,9 +64,9 @@ QQuickItem* createVisualLeaf(QQuickItem* host, const QUrl& leafUrl, const char* 
         obj->deleteLater();
         return nullptr;
     }
-    // trilogy step 2: handshake injection — the leaf's onXxxCppChanged handler
-    // assigns itself back into the host's xxxQmlItem property
-    leaf->setProperty(handshakeProperty, QVariant::fromValue(host));
+    // trilogy step 2: handshake injection — the leaf's onCppHostChanged handler
+    // assigns itself back into the host's inherited qmlLeaf property
+    leaf->setProperty("cppHost", QVariant::fromValue(host));
     // trilogy step 3: reparent onto the host (both parents, KDDW Group.cpp rule)
     leaf->setParentItem(host);
     leaf->setParent(host);
@@ -101,12 +105,19 @@ void saRibbonRegisterQmlTypes(QQmlEngine* engine)
             return o;
         });
 
-    // ---- types (filled in plan-04 S3-S5) ----
+    // ---- types ----
     qmlRegisterType< SARibbonQml::RibbonBar >("SARibbon", 3, 0, "RibbonBar");
     qmlRegisterType< SARibbonQml::RibbonCategory >("SARibbon", 3, 0, "RibbonCategory");
     qmlRegisterType< SARibbonQml::RibbonTab >("SARibbon", 3, 0, "RibbonTab");
     qmlRegisterType< SARibbonQml::RibbonPanel >("SARibbon", 3, 0, "RibbonPanel");
     qmlRegisterType< SARibbonQml::RibbonToolButton >("SARibbon", 3, 0, "RibbonToolButton");
+    qmlRegisterType< SARibbonQml::RibbonControlContainer >("SARibbon", 3, 0, "RibbonControlContainer");
+    qmlRegisterType< SARibbonQml::RibbonMenuItem >("SARibbon", 3, 0, "RibbonMenuItem");
+    // shared host bases: reachable from QML only through their subclasses,
+    // registered for tooling/metaobject access (not creatable from QML)
+    qmlRegisterUncreatableType< SARibbonQml::RibbonQuickHost >("SARibbon", 3, 0, "RibbonQuickHost", "Base class only");
+    qmlRegisterUncreatableType< SARibbonQml::RibbonLayoutItemHost >(
+        "SARibbon", 3, 0, "RibbonLayoutItemHost", "Base class only");
 
     // Uncreatable enum holder (enums mirrored via Q_ENUM on registered classes;
     // Q_NAMESPACE route is closed: 3.0 enums stay in the global namespace, plan-02 S1)

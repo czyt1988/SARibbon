@@ -24,49 +24,36 @@ public:
 };
 }  // namespace
 
-RibbonCategory::RibbonCategory(QQuickItem* parent) : QQuickItem(parent)
+RibbonCategory::RibbonCategory(QQuickItem* parent) : RibbonQuickHost(parent)
 {
 }
 
 RibbonCategory::~RibbonCategory()
 {
-    // leaf destruction: unparent + deleteLater, NEVER direct delete (KDDW Group.cpp rule)
-    if (mCategoryQmlItem) {
-        mCategoryQmlItem->setParentItem(nullptr);
-        mCategoryQmlItem->setParent(nullptr);
-        mCategoryQmlItem->deleteLater();
-        mCategoryQmlItem = nullptr;
-    }
+}
+
+QUrl RibbonCategory::leafUrl() const
+{
+    return SARibbonQmlLeafUrls::categoryLeaf();
 }
 
 void RibbonCategory::componentComplete()
 {
-    QQuickItem::componentComplete();
-    ensureQmlItem();
+    RibbonQuickHost::componentComplete();
+    ensureQmlLeaf();
 }
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 void RibbonCategory::geometryChange(const QRectF& newGeometry, const QRectF& oldGeometry)
 {
-    QQuickItem::geometryChange(newGeometry, oldGeometry);
+    RibbonQuickHost::geometryChange(newGeometry, oldGeometry);
 #else
 void RibbonCategory::geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry)
 {
-    QQuickItem::geometryChanged(newGeometry, oldGeometry);
+    RibbonQuickHost::geometryChanged(newGeometry, oldGeometry);
 #endif
     if (newGeometry.size() != oldGeometry.size()) {
         polish();  // the bar host sizes this item: relayout panels on every resize
-    }
-}
-
-void RibbonCategory::ensureQmlItem()
-{
-    if (mCategoryQmlItem) {
-        return;
-    }
-    QQuickItem* leaf = createVisualLeaf(this, SARibbonQmlLeafUrls::categoryLeaf(), "categoryCpp");
-    if (leaf && !mCategoryQmlItem) {
-        setCategoryQmlItem(leaf);  // handshake assigns it; fallback keeps the pair intact
     }
 }
 
@@ -83,20 +70,6 @@ void RibbonCategory::setTitle(const QString& t)
     mTitle = t;
     Q_EMIT titleChanged();
     polish();
-}
-
-QQuickItem* RibbonCategory::categoryQmlItem() const
-{
-    return mCategoryQmlItem;
-}
-
-void RibbonCategory::setCategoryQmlItem(QQuickItem* item)
-{
-    if (mCategoryQmlItem == item) {
-        return;
-    }
-    mCategoryQmlItem = item;
-    Q_EMIT categoryQmlItemChanged();
 }
 
 int RibbonCategory::scrollPosition() const
@@ -160,7 +133,7 @@ void RibbonCategory::itemChange(ItemChange change, const ItemChangeData& data)
     } else if (change == QQuickItem::ItemVisibleHasChanged) {
         polish();
     }
-    QQuickItem::itemChange(change, data);
+    RibbonQuickHost::itemChange(change, data);
 }
 
 void RibbonCategory::updatePolish()

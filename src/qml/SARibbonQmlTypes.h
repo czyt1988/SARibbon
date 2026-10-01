@@ -54,6 +54,10 @@ public:
         RibbonThemeUserDefine = 1000
     };
     Q_ENUM(Theme)
+    // Tool button popup modes (values mirror QToolButton::ToolButtonPopupMode;
+    // the QML counterpart of the widgets SARibbonToolButton popup modes)
+    enum PopupMode { DelayedPopup = 0, MenuButtonPopup = 1, InstantPopup = 2 };
+    Q_ENUM(PopupMode)
 };
 
 // compile-time value checks against the core originals (plan-04 S4 note)
@@ -68,12 +72,16 @@ inline QUrl categoryLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/RibbonCat
 inline QUrl tabLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/RibbonTab.qml")); }
 inline QUrl panelLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/RibbonPanel.qml")); }
 inline QUrl toolButtonLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/RibbonToolButton.qml")); }
+inline QUrl controlContainerLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/RibbonControlContainer.qml")); }
 }
 
+// Uniform handshake contract: every leaf root declares `property QtObject
+// cppHost`; this function injects the host into that property and the leaf
+// assigns itself back into the host's inherited `qmlLeaf` property.
 // Create the visual leaf of a host from qrc: QQmlComponent create -> handshake
-// property injection -> reparent onto the host (plan-04 S3 creation trilogy);
+// injection -> reparent onto the host (plan-04 S3 creation trilogy);
 // returns nullptr with a warning on engine/resource/creation failure
-SA_RIBBON_QML_EXPORT QQuickItem* createVisualLeaf(QQuickItem* host, const QUrl& leafUrl, const char* handshakeProperty);
+SA_RIBBON_QML_EXPORT QQuickItem* createVisualLeaf(QQuickItem* host, const QUrl& leafUrl);
 
 }  // namespace SARibbonQml
 

@@ -9,11 +9,11 @@ import SARibbon 3.0
 Rectangle {
     id: root
 
-    property QtObject tabCpp: null
-    onTabCppChanged: if (tabCpp) tabCpp.tabQmlItem = root
+    property QtObject cppHost: null
+    onCppHostChanged: if (cppHost) cppHost.qmlLeaf = root
 
-    readonly property string label: tabCpp ? tabCpp.text : ""
-    readonly property bool current: tabCpp ? tabCpp.current : false
+    readonly property string label: cppHost ? cppHost.text : ""
+    readonly property bool current: cppHost ? cppHost.current : false
 
     anchors.fill: parent
     color: "transparent"

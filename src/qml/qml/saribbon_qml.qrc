@@ -6,6 +6,7 @@
         <file>RibbonBar.qml</file>
         <file>RibbonTab.qml</file>
         <file>RibbonCategory.qml</file>
+        <file>RibbonControlContainer.qml</file>
     </qresource>
     <!-- Shared theme palette data (the same on-disk JSONs the widgets module
          compiles in): a QML-only app must resolve theme tokens without

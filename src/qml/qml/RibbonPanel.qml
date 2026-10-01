@@ -9,12 +9,12 @@ Rectangle {
     id: root
 
     // contract face (plan-04 leaf organization rule)
-    property QtObject panelCpp: null
-    onPanelCppChanged: if (panelCpp) panelCpp.panelQmlItem = root
+    property QtObject cppHost: null
+    onCppHostChanged: if (cppHost) cppHost.qmlLeaf = root
 
     // state reads always null-guarded
-    readonly property string title: panelCpp ? panelCpp.panelTitle : ""
-    readonly property rect titleRect: panelCpp ? panelCpp.titleGeometry : Qt.rect(0, 0, 0, 0)
+    readonly property string title: cppHost ? cppHost.panelTitle : ""
+    readonly property rect titleRect: cppHost ? cppHost.titleGeometry : Qt.rect(0, 0, 0, 0)
 
     anchors.fill: parent
     color: RibbonTheme.contentBg

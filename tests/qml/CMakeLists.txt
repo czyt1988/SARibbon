@@ -12,20 +12,21 @@ if(TARGET SARibbonQml)
         Qt${QT_VERSION_MAJOR}::Qml
         Qt${QT_VERSION_MAJOR}::Quick
     )
+    set_target_properties(qml_Conformance PROPERTIES AUTOMOC ON)
     if(NOT SARIBBON_BUILD_STATIC_LIBS)
-        add_custom_command(TARGET qml_Conformance POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                $<TARGET_FILE:SARibbonQml> $<TARGET_FILE_DIR:qml_Conformance>
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                $<TARGET_FILE:SARibbonCore> $<TARGET_FILE_DIR:qml_Conformance>
-            COMMENT "Copy SARibbon runtime libraries next to qml_Conformance"
+        # Co-locate the test executable with the SARibbon runtime libraries
+        # (both output to ${CMAKE_BINARY_DIR}/bin): no DLL copy step can go
+        # stale when only the library re-links (a qrc-only change keeps the
+        # import lib untouched, so a copy hook on the exe would not re-run).
+        set_target_properties(qml_Conformance PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+        )
+    else()
+        set_target_properties(qml_Conformance PROPERTIES
+            RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests
         )
     endif()
     add_test(NAME qml_Conformance COMMAND qml_Conformance)
     set_tests_properties(qml_Conformance PROPERTIES LABELS qml TIMEOUT 120
-        ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
-    set_target_properties(qml_Conformance PROPERTIES
-        AUTOMOC ON
-        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests
-    )
+        ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QT_QUICK_CONTROLS_STYLE=Basic")
 endif()

@@ -7,7 +7,8 @@
 
 - **Build switch**: `SARIBBON_BUILD_QML=ON` (default OFF)
 - **import**: `import SARibbon 3.0`
-- **Dependencies**: SARibbonCore + Qt (Core/Gui/Qml/Quick) only — linking
+- **Dependencies**: SARibbonCore + Qt (Core/Gui/Qml/Quick/**QuickControls2** —
+  leaf popups use Controls Popup/ToolTip) only — linking
   SARibbonWidgets is FORBIDDEN (dependency matrix red line; the CI combination
   `Widgets=OFF Qml=ON` enforces it)
 
@@ -38,24 +39,62 @@ first engine; a second engine gets nullptr (verified against Qt 5.14/6.7 sources
 | `RibbonBar` | type | bar structural host (tab row, height, title free area) |
 | `RibbonCategory` | type | category structural host (panel layout + clamped scroll) |
 | `RibbonTab` | type | tab host (text/current/contextColor) |
-| `RibbonPanel` | type | panel structural host (drives PanelLayoutEngine) |
-| `RibbonToolButton` | type | button host (text/iconSource/proportion) |
-| `Ribbon` | uncreatable | enum holder (`Ribbon.Large` / `Ribbon.ThreeRowMode` / ...) |
+| `RibbonPanel` | type | panel structural host (drives PanelLayoutEngine; child registration is generic over any `RibbonLayoutItemHost`) |
+| `RibbonToolButton` | type | button host (text/iconSource/proportion/checkable/**three popupModes**/menuItems menu/disabled state) |
+| `RibbonControlContainer` | type | control container host (the `control` property embeds any QQuickItem: ComboBox/CheckBox/SpinBox/TextField/...; widgets SARibbonCtrlContainer counterpart) |
+| `RibbonMenuItem` | type | declarative menu entry (text/iconSource/enabled/separator) attached to a button's `menuItems` |
+| `Ribbon` | uncreatable | enum holder (`Ribbon.Large` / `Ribbon.ThreeRowMode` / `Ribbon.MenuButtonPopup` / ...) |
 
 Access enums through the `Ribbon.` prefix (e.g. `proportion: Ribbon.Large`).
+
+## Shared Host Bases
+
+When adding a structural host, do NOT copy the leaf boilerplate — inherit:
+
+- `RibbonQuickHost` (`src/qml/host/`): owns the visual leaf lifecycle (creation
+  trilogy + safe teardown), exposes the uniform `qmlLeaf` handshake property;
+  subclasses only implement `leafUrl()`.
+- `RibbonLayoutItemHost`: panel-child base = `RibbonQuickHost` + the core layout
+  contract (`SARibbonAbstractLayoutItem`). The base implements the
+  isHidden/applyGeometry/debugName/expandingDirections defaults and the large
+  row height context plumbing; subclasses only add `sizeHint()` (gallery-like
+  items also override stretchFactor). `RibbonPanel` collects children through a
+  `qobject_cast<RibbonLayoutItemHost*>`.
+
+## Button Popup Modes
+
+`popupMode` follows `QToolButton::ToolButtonPopupMode` semantics (same values):
+
+- `MenuButtonPopup`: the button splits into an action zone and a menu zone; the
+  hit zones are host-published as `actionRect`/`menuRect` (geometry authority in
+  C++; the leaf only renders them and binds its MouseAreas);
+- `InstantPopup`: the whole button is the menu zone (no action zone);
+- `DelayedPopup`: the whole button stays the action zone; press-and-hold opens
+  the menu (leaf-side timer).
+
+Menu entries are `RibbonMenuItem` objects (`QQmlListProperty`); activation is
+always mediated by the host's `menuTriggered` signal (leaf row click ->
+`activateMenuItem(index)`), so tests can drive it without a windowed popup;
+disabled entries and separators are ignored. A disabled host (`enabled: false`)
+swallows clicks in `click()`; the leaf renders the grey state via opacity.
 
 ## Visual Leaf Rules
 
 - Colors/sizes MUST bind to the RibbonTheme/RibbonMetrics singletons; a literal
   color value in a leaf is a review-reject (project-specific enhancement).
-- Host<->leaf pairing: the leaf root declares `property QtObject panelCpp`
-  (injected via C++ setProperty); `onPanelCppChanged` assigns itself back to the
-  host's `panelQmlItem` (handshake property, doubles as the test reachability
-  entry).
-- Leaf creation trilogy (host side): `QQmlComponent` -> `create()` ->
-  `setProperty("panelCpp")` -> double setParent; check `errorString()` and
-  `QFile::exists(qrc path)` on failure.
-- Destruction: `setParent(nullptr)` + `deleteLater()`; NEVER direct delete.
+- Host<->leaf pairing (uniform handshake contract): the leaf root declares
+  `property QtObject cppHost` (injected via C++ setProperty);
+  `onCppHostChanged` assigns itself back to the host's inherited `qmlLeaf`
+  property (doubles as the test reachability entry).
+- Leaf creation trilogy (base class `ensureQmlLeaf()`): `QQmlComponent` ->
+  `create()` -> `setProperty("cppHost")` -> double setParent; check
+  `errorString()` and `QFile::exists(qrc path)` on failure.
+- Destruction: the base class does `setParent(nullptr)` + `deleteLater()`;
+  NEVER direct delete.
+- Popups (menus etc.) use the Controls `Popup` with custom rows (Repeater
+  delegates), colored through RibbonTheme tokens. NOTE: Repeater delegates
+  carry no QObject parent — C++ tests must walk the `childItems()` item tree;
+  `findChild` cannot reach them.
 
 ## Iron Rule
 

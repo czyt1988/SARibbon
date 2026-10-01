@@ -8,10 +8,10 @@ import SARibbon 3.0
 Rectangle {
     id: root
 
-    property QtObject categoryCpp: null
-    onCategoryCppChanged: if (categoryCpp) categoryCpp.categoryQmlItem = root
+    property QtObject cppHost: null
+    onCppHostChanged: if (cppHost) cppHost.qmlLeaf = root
 
-    readonly property var sepXs: categoryCpp ? categoryCpp.separatorXs : []
+    readonly property var sepXs: cppHost ? cppHost.separatorXs : []
 
     anchors.fill: parent
     color: "transparent"

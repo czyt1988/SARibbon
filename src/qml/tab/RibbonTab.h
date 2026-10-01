@@ -1,7 +1,7 @@
 #ifndef RIBBONTAB_H
 #define RIBBONTAB_H
 #include "SARibbonQmlGlobal.h"
-#include <QQuickItem>
+#include "../host/RibbonQuickHost.h"
 #include <QColor>
 
 namespace SARibbonQml {
@@ -10,7 +10,7 @@ namespace SARibbonQml {
  * \if ENGLISH
  * @brief Tab host inside the bar's tab row (plan-04 S4)
  * @details Tab geometry is computed by the bar host and applied via
- * setPosition/setSize; this host exposes text/highlight state.
+ *          setPosition/setSize; this host exposes text/highlight state.
  * \endif
  *
  * \if CHINESE
@@ -19,13 +19,12 @@ namespace SARibbonQml {
  *          文本/高亮状态。
  * \endif
  */
-class RibbonTab : public QQuickItem
+class RibbonTab : public RibbonQuickHost
 {
     Q_OBJECT
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
     Q_PROPERTY(bool current READ isCurrent WRITE setCurrent NOTIFY currentChanged)
     Q_PROPERTY(QColor contextColor READ contextColor WRITE setContextColor NOTIFY contextColorChanged)
-    Q_PROPERTY(QQuickItem* tabQmlItem READ tabQmlItem WRITE setTabQmlItem NOTIFY tabQmlItemChanged)
 public:
     explicit RibbonTab(QQuickItem* parent = nullptr);
     ~RibbonTab() override;
@@ -39,22 +38,14 @@ public:
     QColor contextColor() const;
     void setContextColor(const QColor& c);
 
-    QQuickItem* tabQmlItem() const;
-    void setTabQmlItem(QQuickItem* item);
-
-    // Create the visual leaf if not yet present. Public because C++-created
-    // tabs (RibbonBar auto tabs) never get componentComplete() — the bar
-    // calls this explicitly right after construction
-    void ensureQmlItem();
-
 Q_SIGNALS:
     void textChanged();
     void currentChanged();
     void contextColorChanged();
-    void tabQmlItemChanged();
     void clicked();
 
 protected:
+    QUrl leafUrl() const override;
     void componentComplete() override;
     void mousePressEvent(QMouseEvent* event) override;
 
@@ -62,8 +53,8 @@ private:
     QString mText;
     bool mCurrent = false;
     QColor mContextColor;
-    QQuickItem* mTabQmlItem = nullptr;
 };
 
 }
+
 #endif  // RIBBONTAB_H

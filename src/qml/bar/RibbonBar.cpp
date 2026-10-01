@@ -8,53 +8,39 @@
 
 namespace SARibbonQml {
 
-RibbonBar::RibbonBar(QQuickItem* parent) : QQuickItem(parent)
+RibbonBar::RibbonBar(QQuickItem* parent) : RibbonQuickHost(parent)
 {
 }
 
 RibbonBar::~RibbonBar()
 {
-    // leaf destruction: unparent + deleteLater, NEVER direct delete (a QML item may
-    // sit inside its own mouse-handling call stack, KDDW Group.cpp same rule)
-    if (mBarQmlItem) {
-        mBarQmlItem->setParentItem(nullptr);
-        mBarQmlItem->setParent(nullptr);
-        mBarQmlItem->deleteLater();
-        mBarQmlItem = nullptr;
-    }
+}
+
+QUrl RibbonBar::leafUrl() const
+{
+    return SARibbonQmlLeafUrls::barLeaf();
 }
 
 void RibbonBar::componentComplete()
 {
-    QQuickItem::componentComplete();
+    RibbonQuickHost::componentComplete();
     // children (tabs/categories) complete before the parent, so the register
     // lists are already filled here
-    ensureQmlItem();
+    ensureQmlLeaf();
     polish();
 }
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 void RibbonBar::geometryChange(const QRectF& newGeometry, const QRectF& oldGeometry)
 {
-    QQuickItem::geometryChange(newGeometry, oldGeometry);
+    RibbonQuickHost::geometryChange(newGeometry, oldGeometry);
 #else
 void RibbonBar::geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry)
 {
-    QQuickItem::geometryChanged(newGeometry, oldGeometry);
+    RibbonQuickHost::geometryChanged(newGeometry, oldGeometry);
 #endif
     if (newGeometry.size() != oldGeometry.size()) {
         polish();  // width comes from anchors/consumer: relayout on every resize
-    }
-}
-
-void RibbonBar::ensureQmlItem()
-{
-    if (mBarQmlItem) {
-        return;
-    }
-    QQuickItem* leaf = createVisualLeaf(this, SARibbonQmlLeafUrls::barLeaf(), "barCpp");
-    if (leaf && !mBarQmlItem) {
-        setBarQmlItem(leaf);  // handshake assigns it; fallback keeps the pair intact
     }
 }
 
@@ -89,20 +75,6 @@ void RibbonBar::setApplicationLabel(const QString& label)
     mApplicationLabel = label;
     Q_EMIT applicationLabelChanged();
     polish();
-}
-
-QQuickItem* RibbonBar::barQmlItem() const
-{
-    return mBarQmlItem;
-}
-
-void RibbonBar::setBarQmlItem(QQuickItem* item)
-{
-    if (mBarQmlItem == item) {
-        return;
-    }
-    mBarQmlItem = item;
-    Q_EMIT barQmlItemChanged();
 }
 
 int RibbonBar::tabBarHeight() const
@@ -229,7 +201,7 @@ void RibbonBar::itemChange(ItemChange change, const ItemChangeData& data)
     } else if (change == QQuickItem::ItemVisibleHasChanged) {
         polish();
     }
-    QQuickItem::itemChange(change, data);
+    RibbonQuickHost::itemChange(change, data);
 }
 
 void RibbonBar::updatePolish()
@@ -250,7 +222,7 @@ RibbonTab* RibbonBar::createAutoTab(int index)
         tab->setText(mCategories[ index ]->title());
     }
     registerTab(tab);
-    tab->ensureQmlItem();
+    tab->ensureQmlLeaf();
     return tab;
 }
 
