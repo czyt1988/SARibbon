@@ -23,9 +23,14 @@ Rectangle {
     readonly property int cellW: cppHost ? cppHost.gridSize.width : 80
     readonly property int cellH: cppHost ? cppHost.gridSize.height : 24
     readonly property int scrollRow: cppHost ? cppHost.scrollRow : 0
-    readonly property int displayRow: cppHost ? cppHost.displayRow : 3
+    readonly property int displayRow: cppHost ? cppHost.displayRow : 1
     readonly property int stripW: cppHost ? cppHost.buttonStripWidth : 15
-    readonly property int textH: Math.round(RibbonMetrics.panelTitleHeight * 0.9)
+    // caption band + icon box come from the host (core calcGalleryCellMetrics,
+    // the very same derivation the widgets group feeds setIconSize with) — the
+    // leaf must not invent a band from the panel title height
+    readonly property int captionH: cppHost ? cppHost.captionHeight : 24
+    readonly property int iconW: cppHost ? cppHost.cellIconWidth : 60
+    readonly property int iconH: cppHost ? cppHost.cellIconHeight : 40
 
     // ---- entry points the C++ host invokes ----
     function openViewport()
@@ -58,6 +63,13 @@ Rectangle {
                 readonly property var entry: modelData
                 readonly property int col: index % root.columns
                 readonly property int row: Math.floor(index / root.columns)
+                // icon box: host-derived (core calcGalleryCellMetrics), clamped to
+                // the cell area above the caption band. Held as locals so the
+                // Image/Text bindings below never read `parent` — the shape that
+                // survives teardown (NOTES B48)
+                readonly property int bodyH: Math.max(root.cellH - root.captionH - 2, 0)
+                readonly property int iconBoxW: Math.min(root.iconW, Math.max(root.cellW - 2, 0))
+                readonly property int iconBoxH: Math.min(root.iconH, cell.bodyH)
                 x: cell.col * root.cellW
                 y: (cell.row - root.scrollRow) * root.cellH
                 width: root.cellW
@@ -76,28 +88,29 @@ Rectangle {
                 }
                 Image {
                     id: cellIcon
-                    anchors.top: parent.top
-                    anchors.topMargin: 2
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    width: parent.width - 4
-                    height: parent.height - root.textH - 4
+                    // centered in the cell area above the caption band
+                    x: (root.cellW - cell.iconBoxW) / 2
+                    y: 1 + (cell.bodyH - cell.iconBoxH) / 2
+                    width: cell.iconBoxW
+                    height: cell.iconBoxH
                     source: cell.entry ? cell.entry.iconSource : ""
                     fillMode: Image.PreserveAspectFit
                     opacity: !cell.entry || !cell.entry.enabled ? 0.45 : 1.0
                 }
                 Text {
-                    anchors.bottom: parent.bottom
-                    anchors.bottomMargin: 1
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    width: parent.width - 2
-                    height: root.textH
+                    x: 1
+                    y: root.cellH - root.captionH
+                    width: root.cellW - 2
+                    height: root.captionH
                     text: cell.entry ? cell.entry.text : ""
                     wrapMode: Text.WordWrap
                     maximumLineCount: 2
                     elide: Text.ElideRight
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignTop
-                    font.pixelSize: Math.max(root.textH - 4, 8)
+                    // the band is two line spacings wide, so half of it minus the
+                    // leading is the largest size that still fits both lines
+                    font.pixelSize: Math.max(Math.floor(root.captionH / 2) - 2, 8)
                     color: RibbonTheme.textColor
                     opacity: !cell.entry || !cell.entry.enabled ? 0.45 : 1.0
                 }
@@ -284,7 +297,6 @@ Rectangle {
                     Text {
                         text: vpGroup.groupModel ? vpGroup.groupModel.groupTitle : ""
                         color: RibbonTheme.subtitle
-                        font.pixelSize: Math.max(root.textH - 2, 8)
                         elide: Text.ElideRight
                         width: parent.width
                     }

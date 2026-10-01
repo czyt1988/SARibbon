@@ -336,7 +336,11 @@ SARibbonPanelLayoutEngine::Result SARibbonPanelLayoutEngine::layout(QVector< SAR
     const int yTitleBegin      = qMax(height - mag.bottom() - titleH, 1);
     bool isTitleWidthThanPanel = false;
     if (input.showPanelTitle && input.hasTitleLabel) {
-        result.titleGeometry.setRect(mag.left(), yTitleBegin, setrect.width() - mag.left() - mag.right(), titleH);
+        // 面板尚未参与布局时 setrect.width() 为 0，减去左右边距会得到负宽度，
+        // 直接把负几何发布出去，前端会拿到非法值（QML 的 Text.width 变成负数），
+        // 因此下限夹到 0：未布局的面板发布空标题带，前端据此不绘制标题
+        const int titleW = qMax(setrect.width() - mag.left() - mag.right(), 0);
+        result.titleGeometry.setRect(mag.left(), yTitleBegin, titleW, titleH);
         // 这里要确认标题宽度是否大于totalWidth，如果大于，则要把标题的宽度作为totalwidth
         if (input.titleTextWidth >= 0) {
             int textWidth = input.titleTextWidth;
@@ -351,13 +355,15 @@ SARibbonPanelLayoutEngine::Result SARibbonPanelLayoutEngine::layout(QVector< SAR
     if (input.hasOptionAction) {
         QSize optBtnSize = input.optionBtnSize;
         if (input.showPanelTitle) {
-            // 有标题
-            result.optionBtnGeometry.setRect(
-                result.titleGeometry.right() - result.titleGeometry.height(),
-                result.titleGeometry.y(),
-                result.titleGeometry.height(),
-                result.titleGeometry.height()
-            );
+            // 有标题；标题带为空（面板未布局）时不发布按钮几何，否则按钮会落到负坐标上
+            if (result.titleGeometry.width() > 0) {
+                result.optionBtnGeometry.setRect(
+                    result.titleGeometry.right() - result.titleGeometry.height(),
+                    result.titleGeometry.y(),
+                    result.titleGeometry.height(),
+                    result.titleGeometry.height()
+                );
+            }
 
             // 特殊情况，如果panel的标题长度大于totalWidth，那么说明totalWidth比较短
             // 这时候，optionActionBtn的宽度要加上到标题宽度上
@@ -399,7 +405,7 @@ SARibbonPanelLayoutEngine::Result SARibbonPanelLayoutEngine::layout(QVector< SAR
         }
 
         // Mirror option button position
-        if (input.hasOptionAction) {
+        if (input.hasOptionAction && result.optionBtnGeometry.isValid()) {
             int mirroredOptX = setrect.width() - result.optionBtnGeometry.x() - result.optionBtnGeometry.width();
             result.optionBtnGeometry.moveLeft(mirroredOptX);
         }

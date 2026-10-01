@@ -41,7 +41,7 @@ Rectangle {
         width: root.titleRect.width
         height: root.titleRect.height
         text: root.title
-        visible: root.title.length > 0 && height > 0
+        visible: root.title.length > 0 && width > 0 && height > 0
         font.pixelSize: Math.round(RibbonMetrics.panelTitleHeight * 0.8)
         color: RibbonTheme.subtitle
         horizontalAlignment: Text.AlignHCenter

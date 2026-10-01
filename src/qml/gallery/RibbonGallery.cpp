@@ -6,6 +6,7 @@
 #include <SARibbonCore/SARibbonCoreUtil.h>
 #include <SARibbonCore/SARibbonEnums.h>
 #include <QQuickItem>
+#include <QFontMetrics>
 
 namespace SARibbonQml {
 
@@ -15,6 +16,11 @@ constexpr int kButtonStripWidth = 15;
 // widgets parity: SARibbonGallery minimum width (addGallery gives it a Large
 // column; without expanding distribution this is the base width)
 constexpr int kGalleryBaseWidth = 200;
+// widgets parity: SARibbonGalleryGroup::PrivateData sets spacing(1)
+constexpr int kCellSpacing = 1;
+// the leaf renders the two-line caption, i.e. widgets IconWithWordWrapText
+// (which the widgets header documents as DisplayOneRow-only)
+constexpr SA::GalleryCaptionStyle kCaptionStyle = SA::GalleryCaptionStyle::WordWrap;
 }  // namespace
 
 RibbonGallery::RibbonGallery(QQuickItem* parent) : RibbonLayoutItemHost(parent)
@@ -147,6 +153,55 @@ int RibbonGallery::buttonStripWidth() const
     return kButtonStripWidth;
 }
 
+/**
+ * \if ENGLISH
+ * @brief Caption band height of one grid cell
+ * @details Published together with cellIconWidth/cellIconHeight as three plain
+ *          ints (not one QSize) so every leaf binding stays in the
+ *          single-dependency shape `cppHost ? cppHost.x : fallback` that
+ *          survives teardown (NOTES B48).
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 单个网格单元的标题带高度
+ * @details 与 cellIconWidth/cellIconHeight 一起以三个独立 int 发布（而非一个
+ *          QSize），使叶子的每条绑定都保持 `cppHost ? cppHost.x : fallback`
+ *          这种单依赖形状，从而能安全度过析构（NOTES B48）。
+ * \endif
+ */
+int RibbonGallery::captionHeight() const
+{
+    return mCaptionHeight;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Icon box width of one grid cell
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 单个网格单元的图标盒宽度
+ * \endif
+ */
+int RibbonGallery::cellIconWidth() const
+{
+    return mCellIconWidth;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Icon box height of one grid cell
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 单个网格单元的图标盒高度
+ * \endif
+ */
+int RibbonGallery::cellIconHeight() const
+{
+    return mCellIconHeight;
+}
+
 void RibbonGallery::scrollUp()
 {
     setScrollRow(scrollRow() - 1);
@@ -272,6 +327,16 @@ void RibbonGallery::updateGridMetrics()
     // SARibbonGalleryGroup::recalcGridSize for the same inputs)
     const int bodyH = qMax(int(height()) - 2, 0);
     mGridSize = SA::calcGalleryGridCellSize(bodyH, mDisplayRow, mGridMinimumWidth, 0);
+    // icon box + caption band from the same core helper the widgets group uses,
+    // so the leaf reserves exactly the band the widgets delegate paints into;
+    // only the line-spacing input comes from this side (RibbonMetrics, not a
+    // widget's fontMetrics())
+    const QFontMetrics fm = RibbonMetrics::instance()->coreMetrics().fontMetrics();
+    const SA::GalleryCellMetrics cm
+        = SA::calcGalleryCellMetrics(mGridSize.width(), mGridSize.height(), fm.lineSpacing(), kCellSpacing, kCaptionStyle);
+    mCaptionHeight  = cm.captionHeight;
+    mCellIconWidth  = cm.iconSize.width();
+    mCellIconHeight = cm.iconSize.height();
     // columns: available width minus the scroll strip, at least one column
     const int availW = qMax(int(width()) - kButtonStripWidth - 2, 1);
     mGridColumns = qMax(availW / qMax(mGridSize.width(), 1), 1);

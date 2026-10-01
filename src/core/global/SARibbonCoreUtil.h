@@ -101,6 +101,77 @@ QSize SA_RIBBON_CORE_EXPORT calcGalleryGridCellSize(int galleryHeight,
                                                     int gridMinimumWidth,
                                                     int gridMaximumWidth);
 
+/**
+ * \if ENGLISH
+ * @brief Caption style of one gallery grid cell
+ * @details Mirrors SARibbonGalleryGroup::GalleryGroupStyle; the enumeration
+ *          lives in core so both front ends reserve the same caption band.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 画廊网格单元的标题样式
+ * @details 对应 SARibbonGalleryGroup::GalleryGroupStyle；枚举放 core，两个
+ *          前端才能预留出相同的标题带高度。
+ * \endif
+ */
+enum class GalleryCaptionStyle
+{
+    None,        ///< icon only, no caption band
+    SingleLine,  ///< one caption line (widgets IconWithText)
+    WordWrap     ///< two caption lines (widgets IconWithWordWrapText)
+};
+
+/**
+ * \if ENGLISH
+ * @brief Icon box and caption band of one gallery grid cell
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 单个画廊网格单元的图标盒与标题带
+ * \endif
+ */
+struct SA_RIBBON_CORE_EXPORT GalleryCellMetrics
+{
+    QSize iconSize;      ///< icon box inside the cell (widgets setIconSize parity)
+    int captionHeight { 0 };  ///< caption band height reserved at the cell bottom
+};
+
+/**
+ * \if ENGLISH
+ * @brief Split a gallery grid cell into its icon box and caption band
+ * @param cellWidth Grid cell width (from calcGalleryGridCellSize)
+ * @param cellHeight Grid cell height (from calcGalleryGridCellSize)
+ * @param lineSpacing Font line spacing used for the caption
+ * @param spacing Cell spacing (widgets SARibbonGalleryGroup::spacing, default 1)
+ * @param captionStyle Caption style of the cell
+ * @return Icon box size and caption band height
+ * @details Moved from SARibbonGalleryGroup::recalcGridSize (icon-size part) so
+ *          the QML gallery reserves the very same caption band instead of
+ *          inventing one from the panel title height. The hover-shift reserve
+ *          (4px, widgets shiftpix) and the per-style fallback when the cell is
+ *          too short for the caption are preserved verbatim.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 把一个画廊网格单元切分为图标盒与标题带
+ * @param cellWidth 网格单元宽度（来自 calcGalleryGridCellSize）
+ * @param cellHeight 网格单元高度（来自 calcGalleryGridCellSize）
+ * @param lineSpacing 标题使用的字体行间距
+ * @param spacing 单元间距（widgets SARibbonGalleryGroup::spacing，默认 1）
+ * @param captionStyle 单元标题样式
+ * @return 图标盒尺寸与标题带高度
+ * @details 自 SARibbonGalleryGroup::recalcGridSize（图标尺寸部分）下沉，QML
+ *          画廊由此预留与 widgets 完全相同的标题带，而不是按面板标题高度自行
+ *          拼凑。悬停位移预留（4px，widgets shiftpix）与单元过矮时各样式的
+ *          回退分支一字未改。
+ * \endif
+ */
+GalleryCellMetrics SA_RIBBON_CORE_EXPORT calcGalleryCellMetrics(int cellWidth,
+                                                                int cellHeight,
+                                                                int lineSpacing,
+                                                                int spacing,
+                                                                GalleryCaptionStyle captionStyle);
+
 }
 
 #endif  // SARIBBONCOREUTIL_H

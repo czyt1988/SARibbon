@@ -338,4 +338,52 @@ QSize calcGalleryGridCellSize(int galleryHeight, int displayRow, int gridMinimum
     return QSize(w, h);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Split a gallery grid cell into its icon box and caption band
+ * @details Body moved from SARibbonGalleryGroup::recalcGridSize (icon-size
+ *          part): the three style branches, the 4px hover-shift reserve and
+ *          the too-short-cell fallbacks are unchanged.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 把一个画廊网格单元切分为图标盒与标题带
+ * @details 函数体自 SARibbonGalleryGroup::recalcGridSize（图标尺寸部分）纯
+ *          move：三个样式分支、4px 悬停位移预留与单元过矮时的回退均未改动。
+ * \endif
+ */
+GalleryCellMetrics calcGalleryCellMetrics(int cellWidth,
+                                          int cellHeight,
+                                          int lineSpacing,
+                                          int spacing,
+                                          GalleryCaptionStyle captionStyle)
+{
+    // 鼠标悬停时图标会有轻微位移，布局过满会超出显示范围，因此预留一点缩放余量
+    const int shiftpix = 4;
+    const int iconW    = cellWidth - 2 * spacing - shiftpix;
+    GalleryCellMetrics m;
+    switch (captionStyle) {
+    case GalleryCaptionStyle::SingleLine: {
+        m.captionHeight  = lineSpacing;
+        const int iconH  = cellHeight - m.captionHeight - 2 * spacing - shiftpix;
+        m.iconSize       = iconH > 0 ? QSize(iconW, iconH) : QSize(iconW, cellHeight - 2 * spacing - shiftpix);
+        break;
+    }
+    case GalleryCaptionStyle::WordWrap: {
+        m.captionHeight = lineSpacing * 2;
+        const int iconH = cellHeight - m.captionHeight;
+        m.iconSize      = iconH > 0 ? QSize(iconW, iconH - 2 * spacing - shiftpix)
+                                    : QSize(iconW, cellHeight - 2 * spacing - shiftpix);
+        break;
+    }
+    case GalleryCaptionStyle::None:
+    default: {
+        m.captionHeight = 0;
+        m.iconSize      = QSize(iconW, cellHeight - 2 * spacing - shiftpix);
+        break;
+    }
+    }
+    return m;
+}
+
 }

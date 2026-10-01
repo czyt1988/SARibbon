@@ -573,6 +573,19 @@
 - 证据：`build-verify` ctest 30/30 绿（含新增 `qml_LayoutParity` 15 个数据行）、`build-qml-test`（WIDGETS=OFF）2/2 绿、`python tools/check_core_purity.py src/core` 通过、`tools/Amalgamate.sh` 重新生成合并文件。
 - 影响计划：02（ToolButton 布局算法入 core，widgets 侧只剩样式与交互）；04（QML 按钮文字布局与 widgets 一致，缺口关闭，且由常驻测试防止回归）。
 
+### B50：画廊格子标题带下沉 core + 未布局面板标题负宽度夹紧（第 10 轮）
+- 日期：2026-10-01
+- 发现位置：计划 02（core 下沉）/ 计划 04（QML 前端）交界
+- **根因 1（画廊标题溢出）**：`RibbonGallery.qml` 的格子标题带高度是叶子自造的常量（`RibbonMetrics.panelTitleHeight * 0.9` ≈ 14px），与图标盒互不相干；widgets 侧 `SARibbonGalleryGroup::recalcGridSize` 里那套"图标盒 + 标题带"推导只存在于 widgets，QML 无从复用。长标题（"Document File"、"Drive File Four Word"）因此画出格子、压到图标上。按 qml-guide 铁律属 core 缺口。
+- **处理 1**：把该推导整体下沉为 `SA::calcGalleryCellMetrics(cellWidth, cellHeight, lineSpacing, spacing, GalleryCaptionStyle)`（新增 `GalleryCaptionStyle{None,SingleLine,WordWrap}` 与 `GalleryCellMetrics{iconSize,captionHeight}`），widgets `recalcGridSize` 改为纯委托（只有 `fontMetrics().lineSpacing()` 与 `spacing()` 两个输入留在 widgets 侧）；QML 宿主 `updateGridMetrics()` 调同一函数（lineSpacing 来自 `RibbonMetrics::instance()->coreMetrics().fontMetrics()`），并把 `captionHeight`/`cellIconWidth`/`cellIconHeight` 发布给叶子。叶子标题带与图标盒全部改读宿主值，字号由标题带高度反推（`floor(captionH/2)-2`，两行刚好放下）。发布三个 int 而非一个 QSize，是为了让叶子绑定保持 B48 的单依赖形状。
+- 顺带把 `mDisplayRow` 从 3 改为 1：叶子渲染的是 word-wrap 两行标题（widgets `DisplayOneRow` + `IconWithWordWrapText` 对等），3 行会让 core 算出的格子高度与叶子实际绘制不符。
+- **根因 2（未布局面板标题负宽度）**：`SARibbonPanelLayoutEngine` 计算标题带用 `setrect.width() - mag.left() - mag.right()`，无下限。从未参与布局的分类（隐藏 tab）其面板 `setrect.width()` 为 0，负宽度被直接发布出去，QML 叶子的 `Text.width` 变成 -4。
+- **处理 2**：标题带宽度 `qMax(..., 0)`；optionAction 按钮几何只在标题带宽度 > 0 时发布（否则按钮落到负坐标），RTL 镜像加 `isValid()` 守卫；`RibbonPanel.qml` 标题 `Text` 增加 `width > 0 && height > 0` 可见性条件。
+- **测试钉死**：`barAutoTabsAndSwitch` 增加"隐藏分类的面板标题带 / optionAction 几何非负"扫描；`galleryInPanel` 增加长标题项（"Document File"/"Drive File Four Word"/"Network Location File"），断言宿主发布的 `captionHeight` 与图标盒 == `calcGalleryCellMetrics` 结果、图标盒与标题带之和不超过格子高度、每个长标题 Text 的盒子恰为标题带高度且字号两行放得下。
+- **测试基础设施教训入档**：Repeater 生成的 delegate **不在** `findChildren<QQuickItem*>()` 能到达的 QObject 子树里（QObject parent 落在创建上下文而非视觉父项，实测 `gridArea->children().size() == 1` 而 `childItems().size() == 11`），原先用 `findChildren` 扫 `QQuickText` 的断言其实是空转。新增文件级 `collectVisualItems()` 沿 `childItems()` 走视觉树，两处扫描均补 `textCount > 0` / `captionTextCount > 0` 反空转断言。
+- 证据：`build-qml-test`（WIDGETS=OFF）ctest 2/2 绿（`qml_Conformance` 18 个用例）、`build-verify`（含 Widgets）ctest 30/30 绿、`python tools/check_core_purity.py src/core` 通过、`tools/Amalgamate.sh` 重新生成合并文件。
+- 影响计划：02（画廊格子度量入 core，widgets 侧只剩委托）；04（QML 画廊标题溢出与隐藏分类标题负宽度两个缺口关闭，并由常驻测试防回归）。
+
 ---
 
 ## 执行中追加（模板，勿删）

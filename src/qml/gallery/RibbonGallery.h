@@ -53,6 +53,9 @@ class SA_RIBBON_QML_EXPORT RibbonGallery : public RibbonLayoutItemHost
     Q_PROPERTY(QSize gridSize READ gridSize NOTIFY gridMetricsChanged)
     Q_PROPERTY(int gridColumns READ gridColumns NOTIFY gridMetricsChanged)
     Q_PROPERTY(int totalRows READ totalRows NOTIFY gridMetricsChanged)
+    Q_PROPERTY(int captionHeight READ captionHeight NOTIFY gridMetricsChanged)
+    Q_PROPERTY(int cellIconWidth READ cellIconWidth NOTIFY gridMetricsChanged)
+    Q_PROPERTY(int cellIconHeight READ cellIconHeight NOTIFY gridMetricsChanged)
     Q_PROPERTY(int buttonStripWidth READ buttonStripWidth CONSTANT)
 public:
     explicit RibbonGallery(QQuickItem* parent = nullptr);
@@ -85,6 +88,12 @@ public:
     QSize gridSize() const;
     int gridColumns() const;
     int totalRows() const;
+    /// Caption band height reserved at the bottom of each grid cell
+    int captionHeight() const;
+    /// Icon box width inside each grid cell (widgets setIconSize parity)
+    int cellIconWidth() const;
+    /// Icon box height inside each grid cell (widgets setIconSize parity)
+    int cellIconHeight() const;
     int buttonStripWidth() const;
 
     // Page the grid (leaf scroll buttons); clamped by setScrollRow
@@ -137,12 +146,15 @@ private:
     QVector< SARibbonQml::RibbonGalleryGroup* > mGroups;
     int mCurrentGroupIndex = 0;
     int mStretchFactor     = 0;  ///< 0 = legacy equal share (contract default)
-    int mDisplayRow        = 3;
+    int mDisplayRow        = 1;  ///< widgets DisplayOneRow parity (the leaf renders the word-wrap caption)
     int mGridMinimumWidth  = 80;  ///< widgets example gridMinimumWidth parity
     int mScrollRow         = 0;
     QSize mGridSize;
-    int mGridColumns = 1;
-    int mTotalRows   = 0;
+    int mGridColumns    = 1;
+    int mTotalRows      = 0;
+    int mCaptionHeight  = 0;  ///< caption band height at the cell bottom (core derived)
+    int mCellIconWidth  = 0;  ///< icon box width inside the cell (core derived)
+    int mCellIconHeight = 0;  ///< icon box height inside the cell (core derived)
 };
 
 }

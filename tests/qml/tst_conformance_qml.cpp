@@ -56,6 +56,23 @@ private:
     static int countPixelsNear(const QImage& img, const QColor& color, int tolerance = 8);
 };
 
+/**
+ * @brief Collect every item of a QML visual subtree
+ * @details Repeater delegates are QObject-parented outside their visual parent,
+ *          so findChildren() silently misses them; this walks childItems().
+ */
+static void collectVisualItems(QQuickItem* item, QList< QQuickItem* >* out)
+{
+    if (!item) {
+        return;
+    }
+    out->append(item);
+    const QList< QQuickItem* > kids = item->childItems();
+    for (QQuickItem* kid : kids) {
+        collectVisualItems(kid, out);
+    }
+}
+
 void TestConformanceQml::panelThreeRowMixed()
 {
     QQmlEngine engine;
@@ -197,6 +214,37 @@ Item {
     QCOMPARE(bar->property("currentIndex").toInt(), 0);
     QTRY_VERIFY(cat0->isVisible());
     QTRY_VERIFY(!cat1->isVisible());
+
+    // the hidden category never gets laid out, yet its panels still publish
+    // geometry: the title strip must be empty rather than negative (a negative
+    // width used to leak into the leaf's Text and draw the caption outside the
+    // panel — NOTES B50)
+    const auto sceneItems = rootItem->findChildren< QQuickItem* >();
+    int panelCount = 0;
+    for (QQuickItem* item : sceneItems) {
+        const QByteArray cls = item->metaObject()->className();
+        if (cls == QByteArrayLiteral("SARibbonQml::RibbonPanel")) {
+            ++panelCount;
+            const QRectF title = item->property("titleGeometry").toRectF();
+            QVERIFY2(title.width() >= 0 && title.height() >= 0, "panel titleGeometry must never be negative");
+            const QRectF opt = item->property("optionButtonRect").toRectF();
+            QVERIFY2(opt.width() >= 0 && opt.height() >= 0, "panel optionButtonRect must never be negative");
+        }
+    }
+    QCOMPARE(panelCount, 2);
+
+    // the Text sweep must run over the visual tree: the leaves' Text elements
+    // are Repeater/instantiated items that findChildren() does not reach
+    int textCount = 0;
+    QList< QQuickItem* > visualItems;
+    collectVisualItems(rootItem, &visualItems);
+    for (QQuickItem* item : visualItems) {
+        if (item->metaObject()->className() == QByteArrayLiteral("QQuickText")) {
+            ++textCount;
+            QVERIFY2(item->width() >= 0 && item->height() >= 0, "no Text may end up with a negative box");
+        }
+    }
+    QVERIFY2(textCount > 0, "the scene must actually render text for the sweep to mean anything");
 
     // real mouse click on the second tab switches the category (the user bug:
     // "Tab 标签页不可切换")
@@ -769,10 +817,10 @@ Item {
                 RibbonGalleryItem { text: "one" }
                 RibbonGalleryItem { text: "two" }
                 RibbonGalleryItem { text: "three" }
-                RibbonGalleryItem { text: "four" }
-                RibbonGalleryItem { text: "five" }
+                RibbonGalleryItem { text: "Document File" }
+                RibbonGalleryItem { text: "Drive File Four Word" }
                 RibbonGalleryItem { text: "six" }
-                RibbonGalleryItem { text: "seven" }
+                RibbonGalleryItem { text: "Network Location File" }
                 RibbonGalleryItem { text: "eight" }
                 RibbonGalleryItem { text: "nine" }
                 RibbonGalleryItem { text: "ten" }
@@ -811,6 +859,52 @@ Item {
     QCOMPARE(cell, expectCell);
     QVERIFY(cell.width() >= 80);
     QVERIFY(gallery->property("gridColumns").toInt() >= 1);
+
+    // ---- caption band + icon box: the host splits the cell with the very same
+    // core helper the widgets group feeds setIconSize with, so the two-line
+    // caption the leaf renders really fits inside the cell instead of spilling
+    // over the icon (NOTES B50). captionHeight is lineSpacing * 2 for the
+    // word-wrap style, which recovers the helper's font input ----
+    const int captionH  = gallery->property("captionHeight").toInt();
+    const QSize iconBox(gallery->property("cellIconWidth").toInt(), gallery->property("cellIconHeight").toInt());
+    QVERIFY2(captionH > 0 && captionH % 2 == 0, "the word-wrap caption band is two text lines");
+    const SA::GalleryCellMetrics cm = SA::calcGalleryCellMetrics(cell.width(),
+                                                                 cell.height(),
+                                                                 captionH / 2,
+                                                                 1,
+                                                                 SA::GalleryCaptionStyle::WordWrap);
+    QCOMPARE(captionH, cm.captionHeight);
+    QCOMPARE(iconBox, cm.iconSize);
+    QVERIFY2(iconBox.width() > 0 && iconBox.width() <= cell.width(), "icon box stays inside the cell");
+    QVERIFY2(captionH + iconBox.height() <= cell.height(), "icon box + caption band must fit the cell");
+
+    // ---- the rendered captions really sit in that band: the leaf's caption
+    // Text elements are the ones carrying the long item texts, and each must be
+    // a box of exactly captionHeight inside the cell width, with a font small
+    // enough for the two wrapped lines (this is what kept "Document File" /
+    // "Drive File Four Word" from drawing over the icon) ----
+    const QStringList longCaptions { QStringLiteral("Document File"),
+                                     QStringLiteral("Drive File Four Word"),
+                                     QStringLiteral("Network Location File") };
+    int captionTextCount = 0;
+    QList< QQuickItem* > leafItems;
+    collectVisualItems(gallery, &leafItems);
+    for (QQuickItem* it : leafItems) {
+        if (it->metaObject()->className() != QByteArrayLiteral("QQuickText")) {
+            continue;
+        }
+        if (!longCaptions.contains(it->property("text").toString())) {
+            continue;
+        }
+        ++captionTextCount;
+        QVERIFY2(it->width() > 0 && it->width() <= cell.width(), "caption Text stays inside the cell width");
+        QCOMPARE(it->height(), qreal(captionH));
+        const int px = it->property("font").value< QFont >().pixelSize();
+        QVERIFY2(px > 0 && px * 2 <= captionH, "caption font leaves room for both wrapped lines");
+        QVERIFY2(it->y() + it->height() <= cell.height() + 1, "caption band does not spill past the cell");
+    }
+    QVERIFY2(captionTextCount > 0, "the long captions are rendered by the leaf");
+
     // 10 items / columns -> totalRows follows
     const int columns = gallery->property("gridColumns").toInt();
     const int expectRows = (10 + columns - 1) / columns;
@@ -819,16 +913,17 @@ Item {
     // ---- scrolling clamps against totalRows - displayRow (derive the bound
     // from the actual layout: a wide gallery fits everything in one screen) ----
     const int maxScroll = qMax(expectRows - gallery->property("displayRow").toInt(), 0);
-    QMetaObject::invokeMethod(gallery, "scrollDown");
-    QMetaObject::invokeMethod(gallery, "scrollDown");
-    QMetaObject::invokeMethod(gallery, "scrollDown");
+    // page past the bound: the clamp, not the call count, must be what stops it
+    for (int i = 0; i < maxScroll + 2; ++i) {
+        QMetaObject::invokeMethod(gallery, "scrollDown");
+    }
     QTRY_COMPARE(gallery->property("scrollRow").toInt(), maxScroll);
     QMetaObject::invokeMethod(gallery, "scrollUp");
     QTRY_COMPARE(gallery->property("scrollRow").toInt(), qMax(maxScroll - 1, 0));
 
-    // ---- group switch ----
+    // ---- group switch (2 items; the row count follows the live column count) ----
     gallery->setProperty("currentGroupIndex", 1);
-    QTRY_COMPARE(gallery->property("totalRows").toInt(), 1);  // 2 items, >=1 column
+    QTRY_COMPARE(gallery->property("totalRows").toInt(), (2 + columns - 1) / columns);
     gallery->setProperty("currentGroupIndex", 0);
     QTRY_COMPARE(gallery->property("totalRows").toInt(), expectRows);
 

@@ -5,6 +5,32 @@
 #include <QItemSelectionModel>
 #include "SARibbonElementManager.h"
 #include <SARibbonCore/SARibbonCoreUtil.h>
+
+namespace
+{
+/**
+ * \if ENGLISH
+ * @brief Map the widgets gallery group style onto the core caption style
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 把 widgets 侧画廊组样式映射为 core 侧标题带样式
+ * \endif
+ */
+SA::GalleryCaptionStyle toCoreCaptionStyle(SARibbonGalleryGroup::GalleryGroupStyle style)
+{
+    switch (style) {
+    case SARibbonGalleryGroup::IconWithText:
+        return SA::GalleryCaptionStyle::SingleLine;
+    case SARibbonGalleryGroup::IconWithWordWrapText:
+        return SA::GalleryCaptionStyle::WordWrap;
+    case SARibbonGalleryGroup::IconOnly:
+    default:
+        return SA::GalleryCaptionStyle::None;
+    }
+}
+}
+
 /**
  * @brief The SARibbonGalleryGroupPrivate class
  */
@@ -598,52 +624,19 @@ void SARibbonGalleryGroup::recalcGridSize()
  */
 void SARibbonGalleryGroup::recalcGridSize(int galleryHeight)
 {
-    // 网格尺寸经 core 共性函数推导（QML 画廊同源）；图标尺寸依赖 widgets
-    // 侧 fontMetrics，留在本函数内
+    // 网格尺寸、图标盒与标题带高度全部经 core 共性函数推导（QML 画廊同源），
+    // 只有 fontMetrics().lineSpacing() 这一输入来自 widgets 侧
     const QSize gs = SA::calcGalleryGridCellSize(galleryHeight,
                                                  static_cast< int >(displayRow()),
                                                  gridMinimumWidth(),
                                                  gridMaximumWidth());
     setGridSize(gs);
-    const int w = gs.width();
-    const int h = gs.height();
-    // 在通过GalleryGroupStyle确定icon的尺寸
-    const int shiftpix =
-        4;  // 这个是移动像素，qt在鼠标移动到图标上时会移动一下，给用户明确的动态，导致如果布局很满会超出显示范围，因此要在此基础上缩放一点
-    switch (galleryGroupStyle()) {
-    case IconWithText: {
-        int textHeight = fontMetrics().lineSpacing();
-        int iconHeight = h - textHeight - 2 * spacing() - shiftpix;
-        if (iconHeight > 0) {
-            setIconSize(QSize(w - 2 * spacing() - shiftpix, iconHeight));
-        } else {
-            setIconSize(QSize(w - 2 * spacing() - shiftpix, h - 2 * spacing() - shiftpix));
-        }
-        break;
-    }
-    case IconWithWordWrapText: {
-        int textHeight = fontMetrics().lineSpacing() * 2;
-        int iconHeight = h - textHeight;
-        if (iconHeight > 0) {
-            setIconSize(QSize(w - 2 * spacing() - shiftpix, iconHeight - 2 * spacing() - shiftpix));
-        } else {
-            setIconSize(QSize(w - 2 * spacing() - shiftpix, h - 2 * spacing() - shiftpix));
-        }
-        break;
-    }
-    case IconOnly: {
-        setIconSize(QSize(w - 2 * spacing() - shiftpix, h - 2 * spacing() - shiftpix));
-        break;
-    }
-    default: {
-        setIconSize(QSize(w - 2 * spacing() - shiftpix, h - 2 * spacing() - shiftpix));
-        break;
-    }
-    }
-#if 0
-    qDebug() << "SARibbonGalleryGroup::recalcGridSize(" << galleryHeight << "): gridSize=" << gridSize()
-             << " iconSize=" << iconSize();
-#endif
+    const SA::GalleryCellMetrics cm = SA::calcGalleryCellMetrics(gs.width(),
+                                                                 gs.height(),
+                                                                 fontMetrics().lineSpacing(),
+                                                                 spacing(),
+                                                                 toCoreCaptionStyle(galleryGroupStyle()));
+    setIconSize(cm.iconSize);
 }
 
 /**
