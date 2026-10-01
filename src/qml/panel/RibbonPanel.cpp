@@ -240,15 +240,10 @@ void RibbonPanel::runLayout()
         mLastTitleGeometry = r.titleGeometry;
         Q_EMIT titleGeometryChanged();
     }
-    // NOTE (rounds 4-6, NOTES B44/B45/B46): publishing r.optionBtnGeometry
-    // crashes at the panel's QQmlData teardown on Qt 6.7.3 DEBUG builds —
-    // deterministically, in ANY consumption form (even a bare QRect member
-    // store with no data-flow effect, i.e. code-layout sensitivity) — while
-    // RELEASE runs the identical code 16/16 green. Signature constant across
-    // rounds: ~QQmlElement -> V4 (+0x4699be/+0x462d1b/+0x611117 frames).
-    // hasOptionAction keeps reserving engine space; the geometry publication
-    // stays deferred until the Qt debug-V4 interaction is understood
-    // (upstream minimal repro candidate + Release-first validation).
+    if (r.optionBtnGeometry != mLastOptionButtonGeometry) {
+        mLastOptionButtonGeometry = r.optionBtnGeometry;
+        Q_EMIT optionButtonRectChanged();
+    }
     // publish implicit sizes even at zero geometry: the sizeHint derives from the
     // C++ item hints (metrics-driven, rect-independent), and the category reads
     // implicitWidth as its layout hint — gating this on our own size would

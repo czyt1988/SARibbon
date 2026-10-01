@@ -1338,9 +1338,13 @@ Item {
 
     auto* panel = rootItem->findChild< QQuickItem* >(QStringLiteral("panel"));
     QVERIFY(panel);
-    // the property round-trips (geometry publication deferred on Qt 6.7.3
-    // debug — NOTES B46; Release-validated with full assertions)
-    QCOMPARE(panel->property("hasOptionAction").toBool(), true);
+    // the engine reserved a square on the title strip's right end
+    const QRectF optRect = panel->property("optionButtonRect").toRectF();
+    QVERIFY(optRect.width() > 0);
+    QVERIFY(optRect.height() == optRect.width());
+    const QRectF titleRect = panel->property("titleGeometry").toRectF();
+    QVERIFY(qFuzzyCompare(optRect.y(), titleRect.y()));
+    QVERIFY(optRect.x() >= titleRect.x());
 
     // the option action signal fires from the invokable (leaf-mediated click
     // parity; the visual button renders once geometry publication is enabled)

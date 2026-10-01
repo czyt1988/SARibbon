@@ -554,6 +554,14 @@
 - widgets 侧无改动；测试 18/18 双绿（Debug 基线；Release 树沿用第 6 轮验证）。
 - 影响计划：04 非目标清单（应用窗口模式完成——widgets MainWindowExample 功能清单全部对齐或登记差异）。
 
+### B48：optionAction 根因终局——叶子绑定形状（第 8 轮，B44-B46 崩溃链关闭）
+- 日期：2026-10-08（用户目标第 8 轮）
+- **根因**：第 4-6 轮的"消费路径崩溃"结论被修正——真正的触发器是**叶子的双依赖三目绑定** `cppHost && cppHost.hasOptionAction ? cppHost.optionButtonRect : Qt.rect(...)`（短路 + 双依赖的 V4 绑定求值路径在 Qt 6.7.3 Debug 构建的 QQmlData teardown 中踩坏堆），而**非**宿主消费代码。证据链（第 8 轮三步二分，根上下文修复后的干净基线）：①消费开+叶子绑定关=Debug 通过；②消费开+单依赖绑定（与 titleRect 完全同形 `cppHost ? cppHost.optionButtonRect : Qt.rect(...)`）=Debug 通过；③完整恢复（消费+单依赖绑定+几何断言）=Debug 与 Release 双 18/18 绿。第 5 轮"store-only 也崩"的旧结论系当时叶子绑定仍启用的污染（该轮二分只动了宿主侧）。
+- **修复**：叶子 optionRect 绑定改单依赖形状（行为等价：禁用时宿主发布空矩形），注释留档绑定形状约束。optionAction **全功能恢复**：hasOptionAction 属性 → 引擎预留 → optionButtonRect 发布 → 叶子对角按钮渲染 → optionActionTriggered 信号；示例 toolbutton style 面板重新启用；测试恢复完整几何断言（正方形、标题条带对齐）。
+- 教训入档：**QML 属性绑定中 `cppHost && cppHost.xxx ? cppHost.yyy : fallback` 的双依赖短路形状在本项目 Qt 6.7.3 Debug 环境有 teardown UAF 风险——一律用单依赖形状**（`cppHost ? cppHost.yyy : fallback`），qml-guide 已登记该规则。
+- 测试 18/18 双绿（Debug build-qml-test + Release build-qml-rel 两树独立验证）；示例 30s 稳定。
+- 影响计划：04（optionAction 从"已知缺口"转"完成"）；B44-B46 崩溃链全部关闭（根因=绑定形状，非消费路径、非引擎、非根上下文遗留）。
+
 ---
 
 ## 执行中追加（模板，勿删）

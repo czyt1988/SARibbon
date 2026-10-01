@@ -27,6 +27,7 @@ cmake --build build
 | ribbon style 面板 | RTL 切换（引擎经 saIsRTL 镜像布局） | Switch to RTL |
 | button states 面板 | 大按钮 6 态：Normal/Checked/Disabled（含解锁）/超长文本/超短文本 | 按钮状态演示 |
 | toolbutton style 面板 | 弹出三模式 × 比例混合：MenuButtonPopup（分区命中）/InstantPopup/DelayedPopup（长按）+ checkable 变体 + 禁用带菜单 | SARibbonMenu 演示 |
+| toolbutton style 面板 | optionAction（右下角对角按钮，点击触发信号） | 面板 optionAction |
 | toolbutton style 面板 | 分隔符（Large 比例独占一列） | addSeparator |
 | widget test 面板 | 控件嵌入：ComboBox（可编辑）/ComboBox/TextField/CheckBox/SpinBox | SARibbonCtrlContainer |
 | Context Category 面板 | 上下文标签显隐开关（彩色 tab + 色带 + 页面切换） | setContextCategoryVisible |
@@ -39,11 +40,10 @@ cmake --build build
 
 ## 与 widgets 版的已知差异
 
-- **面板 optionAction**（右下角对角按钮）：几何发布在 Qt 6.7.3 Debug 构建下有
-  V4 崩溃（Release 验证通过），暂缓渲染；API/引擎预留保留。详见
-  `plans/3.0/NOTES.md` B44-B46。
 - **定制系统**（customize widget/XML 加载）：2.x widgets 专属，QML 版暂无。
 - **无边框窗口**：示例使用普通 ApplicationWindow（QML 无边框为独立主题）。
+- 面板 optionAction 已恢复完整（引擎预留 + 对角按钮渲染 + 触发信号，
+  Debug/Release 双验证；早期 Qt 6.7.3 Debug 绑定形状问题见 NOTES B48）。
 
 ## 一致性测试
 

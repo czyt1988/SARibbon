@@ -393,6 +393,9 @@ ApplicationWindow {
             // checkable variants and a disabled button with a menu.
             RibbonPanel {
                 panelTitle: "toolbutton style"
+                // option action: the diagonal button at the panel's bottom-right
+                hasOptionAction: true
+                onOptionActionTriggered: log(qsTr("option action triggered (widgets shows a message box)"))
 
                 RibbonToolButton {
                     text: "test 1"

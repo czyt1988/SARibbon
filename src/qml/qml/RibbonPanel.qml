@@ -20,7 +20,14 @@ Rectangle {
     readonly property string title: cppHost ? cppHost.panelTitle : ""
     readonly property rect titleRect: cppHost ? cppHost.titleGeometry : Qt.rect(0, 0, 0, 0)
     readonly property bool hasOption: cppHost ? cppHost.hasOptionAction : false
-    readonly property rect optionRect: cppHost && cppHost.hasOptionAction ? cppHost.optionButtonRect : Qt.rect(0, 0, 0, 0)
+    // NOTE (round 8, NOTES B48): keep this a SINGLE-dependency binding, the
+    // exact shape of titleRect. The original two-dependency ternary
+    // (`cppHost && cppHost.hasOptionAction ? ... : Qt.rect(...)`) triggered a
+    // use-after-free at QQmlData teardown on Qt 6.7.3 DEBUG builds (V4 code
+    // path corruption from the short-circuit + double dependency), while the
+    // single-dependency shape is stable; a disabled host publishes a null
+    // rect, so the behavior is identical.
+    readonly property rect optionRect: cppHost ? cppHost.optionButtonRect : Qt.rect(0, 0, 0, 0)
 
     anchors.fill: parent
     color: RibbonTheme.contentBg

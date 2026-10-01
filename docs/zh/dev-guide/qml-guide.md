@@ -150,6 +150,11 @@ RibbonBar { ribbonStyle: Ribbon.RibbonStyleCompactTwoRow }
 
 - 颜色/尺寸**一律绑定 RibbonTheme/RibbonMetrics 单例**，禁止散落颜色常量——
   叶子里出现字面量色值 = 评审打回（本项目特有增强）。
+- **绑定形状铁律（第 8 轮实测）**：宿主属性绑定一律用单依赖形状
+  `cppHost ? cppHost.yyy : fallback`；**禁止** `cppHost && cppHost.xxx ? cppHost.yyy : fallback`
+  的双依赖短路形状——该形状在 Qt 6.7.3 Debug 构建的 QQmlData teardown 中
+  触发 V4 堆踩坏（NOTES B48，optionAction 崩溃链根因）。功能等价：禁用路径
+  由宿主发布空值承载，不由绑定条件承载。
 - 宿主↔叶子配对（统一握手契约）：叶子根声明 `property QtObject cppHost`
   （C++ `setProperty("cppHost")` 注入），`onCppHostChanged` 把自己赋回宿主继承自
   `RibbonQuickHost` 的 `qmlLeaf` 属性（兼作测试可达性入口）。

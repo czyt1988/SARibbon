@@ -180,6 +180,13 @@ RibbonBar { ribbonStyle: Ribbon.RibbonStyleCompactTwoRow }
 
 - Colors/sizes MUST bind to the RibbonTheme/RibbonMetrics singletons; a literal
   color value in a leaf is a review-reject (project-specific enhancement).
+- **Binding-shape iron rule (round 8)**: host-property bindings use the
+  single-dependency shape `cppHost ? cppHost.yyy : fallback`; the two-dependency
+  short-circuit shape `cppHost && cppHost.xxx ? cppHost.yyy : fallback` is
+  FORBIDDEN — it corrupts the V4 heap at QQmlData teardown on Qt 6.7.3 debug
+  builds (NOTES B48, the optionAction crash root cause). The functional
+  equivalent: disabled paths carry an empty value published BY THE HOST, not
+  a binding condition.
 - Host<->leaf pairing (uniform handshake contract): the leaf root declares
   `property QtObject cppHost` (injected via C++ setProperty);
   `onCppHostChanged` assigns itself back to the host's inherited `qmlLeaf`
