@@ -58,6 +58,21 @@ public:
     // the QML counterpart of the widgets SARibbonToolButton popup modes)
     enum PopupMode { DelayedPopup = 0, MenuButtonPopup = 1, InstantPopup = 2 };
     Q_ENUM(PopupMode)
+    // Ribbon styles (bit values mirror the widgets SARibbonBar::RibbonStyleFlag)
+    enum RibbonStyle {
+        RibbonStyleLoose           = 0x0001,
+        RibbonStyleCompact         = 0x0002,
+        RibbonStyleThreeRow        = 0x0010,
+        RibbonStyleTwoRow          = 0x0020,
+        RibbonStyleSingleRow       = 0x0040,
+        RibbonStyleLooseThreeRow   = 0x0011,
+        RibbonStyleCompactThreeRow = 0x0012,
+        RibbonStyleLooseTwoRow     = 0x0021,
+        RibbonStyleCompactTwoRow   = 0x0022,
+        RibbonStyleLooseSingleRow   = 0x0041,
+        RibbonStyleCompactSingleRow = 0x0042
+    };
+    Q_ENUM(RibbonStyle)
 };
 
 // compile-time value checks against the core originals (plan-04 S4 note)
@@ -74,6 +89,7 @@ inline QUrl panelLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/RibbonPanel.
 inline QUrl toolButtonLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/RibbonToolButton.qml")); }
 inline QUrl controlContainerLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/RibbonControlContainer.qml")); }
 inline QUrl galleryLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/RibbonGallery.qml")); }
+inline QUrl separatorLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/RibbonSeparator.qml")); }
 }
 
 // Uniform handshake contract: every leaf root declares `property QtObject

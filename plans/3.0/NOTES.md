@@ -485,6 +485,20 @@
   6. 测试：`contextCategoryActivation`（激活→可见 tab+2、bands 内容、currentIndex 走入 context 页、**grabWindow 像素断言色带颜色>200px**、去激活钳制回退）与 `galleryInPanel`（契约面、cell 与 core 函数一致、totalRows 推导、滚动钳制按实际布局取界、组切换、triggered 中转、帧内容渲染>300px）——全 10 用例绿；widgets 侧 build-verify 28/29（唯一失败为 B15 环境项）。
 - 影响计划：04 非目标清单（画廊+上下文标签提前实现）；04-S3（calcGalleryGridCellSize 为 core 新增共性 API）；01-S5.4/sa_sync_include 行为变更（头文件编辑自动重同步）。
 
+### B42：QML 六种 ribbon 样式 + 分隔符 + 主题/字体控制（用户驱动，QML 功能覆盖度对标 3/3）
+- 日期：2026-10-08（用户目标"QML 功能与 widgets 覆盖度对标"第 3 轮）
+- 发现位置：widgets "ribbon style" 面板（6 RadioButton + 主题下拉 + Larger/Smaller）与 addSeparator
+- 证据：widgets setRibbonStyle 传播表（three→wordwrap+title、single→无 title+iconRightText、compact→tabOnTitle）；core SARibbonMetrics 已参数化 calcCategoryHeight(three,single) 与 calcMainBarHeight(tabOnTitle)。
+- 处理：
+  1. **RibbonEnums::RibbonStyle**（位值对齐 widgets RibbonStyleFlag）+ **RibbonBar::ribbonStyle** 属性：传播链 bar→category→panel→按钮（行数/标题开关/wordWrap/iconRightText），迟注册面板/按钮经各层存储字段继承；relayout 按行数取 core 度量（单行类目高不含标题条），compact 时 tabBarY=titleH-tabH（tab 叠标题行）、app 按钮高度随收缩。
+  2. **RibbonToolButton**：`wordWrap`（false=单行省略，sizeHint 单行分支 + 叶子 NoWrap）与 `iconRightText`（effectiveButtonType 对等：小样式渲染/命中分区/sizeHint，叶子强制小布局）。
+  3. **RibbonPanel::enableShowPanelTitle**（单行样式隐藏标题条，feed input.showPanelTitle）+ **RibbonSeparator** 新类型（Large 比例独占一列，宽 2*3+1，叶子 1px 主题线）。
+  4. **RibbonMetrics 桥**：`categoryHeightForRows(rowCount)`/`normalModeMainBarHeightFor(tabOnTitle,rows)` 可调用 + `fontPointSize` 属性（QML 无法构造 QFont，Larger/Smaller 经它调整）。
+  5. 示例："ribbon style" 面板（6 RadioButton 经 RibbonControlContainer 嵌入 + ButtonGroup 互斥 + 主题 8 项 ComboBox + Larger/Smaller 字体按钮）对标 widgets；toolbutton style 面板补分隔符。
+  6. 测试 13/13：`ribbonStyleSwitching`（六样式往返：行数/wordWrap/iconRightText/标题开关/categoryRowY 收缩/bar 高度）、`styleRadioViaContainer`（**容器内嵌 RadioButton 真实点击→样式切换全链路**——首版漏 id: ribbonBar 致 ReferenceError，属测试场景笔误）、`separatorInPanel`（引擎几何+列间位置）。画廊视口 Repeater 瞬态 null 警告顺带清零（外层组模型防护）。
+  7. 视觉验证：示例点击 "wps style" 单选 → tab 行 y=68→42（+26px=tabH，紧凑样式 tab 叠标题行）截图留档 tmp/qml_r3_compact.png。
+- 影响计划：04 非目标清单（样式体系原不在 P0/P1）；04-S5（按钮 wordWrap/iconRightText 契约面扩展）。
+
 ---
 
 ## 执行中追加（模板，勿删）

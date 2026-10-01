@@ -55,6 +55,8 @@ class SA_RIBBON_QML_EXPORT RibbonToolButton : public RibbonLayoutItemHost
     Q_PROPERTY(RibbonEnums::RowProportion proportion READ proportion WRITE setProportion NOTIFY proportionChanged)
     Q_PROPERTY(bool checkable READ isCheckable WRITE setCheckable NOTIFY checkableChanged)
     Q_PROPERTY(bool checked READ isChecked WRITE setChecked NOTIFY checkedChanged)
+    Q_PROPERTY(bool wordWrap READ isWordWrap WRITE setWordWrap NOTIFY wordWrapChanged)
+    Q_PROPERTY(bool iconRightText READ isIconRightText WRITE setIconRightText NOTIFY iconRightTextChanged)
     Q_PROPERTY(QString toolTip READ toolTip WRITE setToolTip NOTIFY toolTipChanged)
     Q_PROPERTY(RibbonEnums::PopupMode popupMode READ popupMode WRITE setPopupMode NOTIFY popupModeChanged)
     Q_PROPERTY(QQmlListProperty< SARibbonQml::RibbonMenuItem > menuItems READ menuItems NOTIFY menuItemsChanged)
@@ -81,6 +83,16 @@ public:
 
     bool isChecked() const;
     void setChecked(bool on);
+
+    // Large-button text wrapping (bar ribbonStyle propagation; widgets
+    // setEnableWordWrap parity — false forces single-line elided captions)
+    bool isWordWrap() const;
+    void setWordWrap(bool on);
+
+    // Icon-left/text-right rendering regardless of proportion (widgets
+    // setEnableIconRightText parity — single-row styles enable it)
+    bool isIconRightText() const;
+    void setIconRightText(bool on);
 
     QString toolTip() const;
     void setToolTip(const QString& t);
@@ -125,6 +137,8 @@ Q_SIGNALS:
     void proportionChanged();
     void checkableChanged();
     void checkedChanged();
+    void wordWrapChanged();
+    void iconRightTextChanged();
     void toolTipChanged();
     void popupModeChanged();
     void menuItemsChanged();
@@ -165,6 +179,8 @@ private:
     QString mIconSource;
     bool mCheckable = false;
     bool mChecked   = false;
+    bool mWordWrap  = true;
+    bool mIconRightText = false;
     QString mToolTip;
     RibbonEnums::PopupMode mPopupMode = RibbonEnums::DelayedPopup;
     bool mMenuVisible = false;

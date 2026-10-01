@@ -85,6 +85,59 @@ void RibbonBar::setApplicationLabel(const QString& label)
     polish();
 }
 
+RibbonEnums::RibbonStyle RibbonBar::ribbonStyle() const
+{
+    return mRibbonStyle;
+}
+
+int RibbonBar::styleRowCount(RibbonEnums::RibbonStyle style)
+{
+    if (int(style) & int(RibbonEnums::RibbonStyleSingleRow)) {
+        return 1;
+    }
+    if (int(style) & int(RibbonEnums::RibbonStyleTwoRow)) {
+        return 2;
+    }
+    return 3;
+}
+
+bool RibbonBar::styleIsCompact(RibbonEnums::RibbonStyle style)
+{
+    return int(style) & int(RibbonEnums::RibbonStyleCompact);
+}
+
+void RibbonBar::setRibbonStyle(RibbonEnums::RibbonStyle style)
+{
+    if (mRibbonStyle == style) {
+        return;
+    }
+    mRibbonStyle = style;
+    mTabOnTitle  = styleIsCompact(style);
+    Q_EMIT ribbonStyleChanged();
+    propagateRibbonStyle();
+    polish();
+}
+
+void RibbonBar::propagateRibbonStyle()
+{
+    // widgets setRibbonStyle parity: three-row keeps word wrap + panel
+    // titles; single-row hides titles and switches buttons to icon-right
+    // text; two-row drops word wrap but keeps titles
+    const int rows = styleRowCount(mRibbonStyle);
+    const bool showTitle = (rows != 1);
+    const bool wordWrap  = (rows == 3);
+    const bool iconRight = (rows == 1);
+    for (RibbonCategory* cat : mCategories) {
+        cat->applyRibbonStyle(rows, showTitle, wordWrap, iconRight);
+    }
+    // context category pages ride the same style
+    for (RibbonContextCategory* ctx : mContexts) {
+        for (RibbonCategory* page : ctx->categories()) {
+            page->applyRibbonStyle(rows, showTitle, wordWrap, iconRight);
+        }
+    }
+}
+
 int RibbonBar::tabBarHeight() const
 {
     return mTabBarHeight;
@@ -110,6 +163,9 @@ void RibbonBar::registerCategory(RibbonCategory* category)
     if (!mCategories.contains(category)) {
         mCategories.append(category);
         category->setParentItem(this);
+        // a category registered after the style was set must match it
+        const int rows = styleRowCount(mRibbonStyle);
+        category->applyRibbonStyle(rows, rows != 1, rows == 3, rows == 1);
         // auto tabs track their category title (addCategoryPage semantics)
         const int idx = mCategories.size() - 1;
         if (idx < mTabs.size() && mAutoTabs.contains(mTabs[ idx ])) {
@@ -422,15 +478,20 @@ void RibbonBar::relayout()
     const QFontMetrics fm  = metrics->coreMetrics().fontMetrics();
     const int tabH         = metrics->tabBarHeight();
     const int titleH       = metrics->titleBarHeight();
-    const int catH         = metrics->categoryHeight();
+    // row-count aware category height (core calcCategoryHeight: single row
+    // hides the panel title strip, hence the shorter body)
+    const int styleRows    = styleRowCount(mRibbonStyle);
+    const int catH         = metrics->categoryHeight(styleRows >= 3, styleRows <= 1);
 
     // 0. application button: spans the title row + the tab row (widgets
-    // vertically-expanding app button), office-2021 tab-row-left placement
+    // vertically-expanding app button), office-2021 tab-row-left placement;
+    // with tabs on the title (compact styles) it spans the title row only
     const bool hasAppButton = !mApplicationLabel.isEmpty();
     int appBtnW = 0;
+    const int tabBarY = mTabOnTitle ? qMax(titleH - tabH, 0) : titleH;
     if (hasAppButton) {
         appBtnW = qMax(50, fm.horizontalAdvance(mApplicationLabel) + 30);
-        mApplicationButtonRect = QRectF(0, 1, appBtnW, titleH + tabH - 2);
+        mApplicationButtonRect = QRectF(0, 1, appBtnW, tabBarY + tabH - 2);
     } else {
         mApplicationButtonRect = QRectF();
     }
@@ -454,8 +515,8 @@ void RibbonBar::relayout()
 
     // 2. tab row geometry: plain sequence (no Repeater), starting after the
     //    app button; text-driven width (widgets tabSizeHint: text width +
-    //    hspace, min 50, office-2021 QSS adds 5+5 margins)
-    const int tabBarY = titleH;
+    //    hspace, min 50, office-2021 QSS adds 5+5 margins). Compact styles
+    //    ride the title row (tabOnTitle, widgets parity)
     const int tabSpacing = 2;
     int x = (hasAppButton ? appBtnW : 0) + 4;
     QVector< QRectF > tabRects;

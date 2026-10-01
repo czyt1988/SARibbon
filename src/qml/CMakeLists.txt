@@ -31,6 +31,8 @@ sa_add_library(SARibbonQml
         gallery/RibbonGalleryGroup.cpp
         gallery/RibbonGalleryItem.h
         gallery/RibbonGalleryItem.cpp
+        separator/RibbonSeparator.h
+        separator/RibbonSeparator.cpp
         category/RibbonCategory.h
         category/RibbonCategory.cpp
         tab/RibbonTab.h

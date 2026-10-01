@@ -48,6 +48,21 @@ void RibbonMetrics::setFont(const QFont& f)
     rebuild();
 }
 
+int RibbonMetrics::fontPointSize() const
+{
+    return font().pointSize();
+}
+
+void RibbonMetrics::setFontPointSize(int ps)
+{
+    if (ps <= 0) {
+        return;
+    }
+    QFont f = font();
+    f.setPointSize(ps);
+    setFont(f);
+}
+
 int RibbonMetrics::tabBarHeight() const
 {
     return mMetrics.calcDefaultTabBarHeight();
@@ -58,9 +73,14 @@ int RibbonMetrics::titleBarHeight() const
     return mMetrics.calcDefaultTitleBarHeight();
 }
 
-int RibbonMetrics::categoryHeight(bool threeRow) const
+int RibbonMetrics::categoryHeightForRows(int rowCount) const
 {
-    return mMetrics.calcCategoryHeight(threeRow, false);
+    return categoryHeight(rowCount >= 3, rowCount <= 1);
+}
+
+int RibbonMetrics::categoryHeight(bool threeRow, bool singleRow) const
+{
+    return mMetrics.calcCategoryHeight(threeRow, singleRow);
 }
 
 int RibbonMetrics::panelTitleHeight() const
@@ -75,6 +95,12 @@ void RibbonMetrics::setPanelTitleHeight(int h)
     }
     mMetrics.panelTitleHeight = h;
     Q_EMIT metricsChanged();
+}
+
+int RibbonMetrics::normalModeMainBarHeightFor(bool tabOnTitle, int rowCount) const
+{
+    return SARibbon::Core::SARibbonMetrics::calcMainBarHeight(
+        tabBarHeight(), titleBarHeight(), categoryHeightForRows(rowCount), tabOnTitle, false);
 }
 
 int RibbonMetrics::normalModeMainBarHeight(bool tabOnTitle) const

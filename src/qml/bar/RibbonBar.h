@@ -2,6 +2,7 @@
 #define RIBBONBAR_H
 #include "SARibbonQmlGlobal.h"
 #include "../host/RibbonQuickHost.h"
+#include "../SARibbonQmlTypes.h"
 #include <SARibbonCore/SARibbonBarGeometryEngine.h>
 #include <QHash>
 #include <QRectF>
@@ -42,6 +43,7 @@ class RibbonBar : public RibbonQuickHost
     Q_OBJECT
     Q_PROPERTY(int currentIndex READ currentIndex WRITE setCurrentIndex NOTIFY currentIndexChanged)
     Q_PROPERTY(QString applicationLabel READ applicationLabel WRITE setApplicationLabel NOTIFY applicationLabelChanged)
+    Q_PROPERTY(RibbonEnums::RibbonStyle ribbonStyle READ ribbonStyle WRITE setRibbonStyle NOTIFY ribbonStyleChanged)
     Q_PROPERTY(int tabBarHeight READ tabBarHeight NOTIFY layoutChanged)
     Q_PROPERTY(int titleBarHeight READ titleBarHeight NOTIFY layoutChanged)
     Q_PROPERTY(int categoryRowY READ categoryRowY NOTIFY layoutChanged)
@@ -56,6 +58,13 @@ public:
 
     QString applicationLabel() const;
     void setApplicationLabel(const QString& label);
+
+    // Six styles (Loose/Compact x 3/2/1 rows) mirroring the widgets
+    // SARibbonBar::RibbonStyleFlag values; propagation follows widgets
+    // setRibbonStyle: compact = tabs on the title row, single-row hides panel
+    // titles + enables icon-right-text, three-row enables word wrap
+    RibbonEnums::RibbonStyle ribbonStyle() const;
+    void setRibbonStyle(RibbonEnums::RibbonStyle style);
 
     // layout values consumed by the visual leaf (re-published on relayout)
     int tabBarHeight() const;
@@ -88,6 +97,7 @@ public:
 Q_SIGNALS:
     void currentIndexChanged();
     void applicationLabelChanged();
+    void ribbonStyleChanged();
     void layoutChanged();
     void applicationButtonClicked();
 
@@ -109,12 +119,17 @@ private:
     void rebuildContextTabs(RibbonContextCategory* ctx);
     void syncContextSignals(RibbonContextCategory* ctx);
     bool isOwnedContextTab(RibbonTab* tab) const;
+    void propagateRibbonStyle();
+    static int styleRowCount(RibbonEnums::RibbonStyle style);
+    static bool styleIsCompact(RibbonEnums::RibbonStyle style);
     int effectiveTabCount() const;
     QVector< RibbonTab* > effectiveTabs() const;
     QVector< RibbonCategory* > effectiveCategories() const;
 
     int mCurrentIndex = 0;
     QString mApplicationLabel;
+    RibbonEnums::RibbonStyle mRibbonStyle = RibbonEnums::RibbonStyleLooseThreeRow;
+    bool mTabOnTitle = false;
     QVector< RibbonCategory* > mCategories;
     QVector< RibbonTab* > mTabs;      ///< explicit + auto tabs in row order
     QVector< RibbonTab* > mAutoTabs;  ///< subset owned (and destroyed) by this bar

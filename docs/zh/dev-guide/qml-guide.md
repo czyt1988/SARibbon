@@ -43,7 +43,8 @@ engine.load(QUrl("qrc:///main.qml"));
 | `RibbonGallery` | 类型 | 画廊宿主（Large 比例 + 水平伸展 + stretchFactor 参与 core 引擎加权分配；网格度量经 core `calcGalleryGridCellSize`） |
 | `RibbonGalleryGroup` | 类型 | 画廊组（groupTitle + items，默认属性 items） |
 | `RibbonGalleryItem` | 类型 | 画廊条目（text/iconSource/enabled/toolTip） |
-| `Ribbon` | 不可实例化 | 枚举持有（`Ribbon.Large` / `Ribbon.ThreeRowMode` / `Ribbon.MenuButtonPopup` / ...） |
+| `RibbonSeparator` | 类型 | 面板分隔符（Large 比例独占一列的 1px 竖线，对标 widgets SARibbonSeparatorWidget） |
+| `Ribbon` | 不可实例化 | 枚举持有（`Ribbon.Large` / `Ribbon.ThreeRowMode` / `Ribbon.MenuButtonPopup` / `Ribbon.RibbonStyleCompactTwoRow` / ...） |
 
 枚举一律通过 `Ribbon.` 前缀访问（如 `proportion: Ribbon.Large`），不散进各类型。
 
@@ -106,6 +107,25 @@ RibbonGallery {
   `gridSize/gridColumns/totalRows/scrollRow`，叶子只按度量摆格子。
 - 模型类（GalleryGroup/GalleryItem）用 `Q_CLASSINFO("DefaultProperty", ...)`
   声明默认属性，声明式子项直接进列表；Repeater 代理无 QObject 父级（见叶子规范）。
+
+## 六种 Ribbon 样式
+
+`RibbonBar.ribbonStyle`（枚举值对齐 widgets `SARibbonBar::RibbonStyleFlag` 的位标志）
+遵循 widgets `setRibbonStyle` 的传播语义：
+
+- **Loose/Compact**：Compact（tabOnTitle）把 tab 行叠进标题行（`categoryRowY`
+  收缩为标题高，bar 总高少一个 tabH）；
+- **ThreeRow/TwoRow/SingleRow**：行数传播到所有面板（含上下文标签页的面板）的
+  layoutMode；三行开 wordWrap，单行隐藏面板标题并启用 iconRightText（按钮一律
+  图标左、文字右渲染，`effectiveButtonType` 对等）；
+- 传播链：bar → category → panel（行数 + 标题开关）→ 按钮（wordWrap/iconRightText），
+  迟注册的面板/按钮经各层存储的样式字段继承；
+- 类目高度经 core `SARibbonMetrics::calcCategoryHeight(three, single)`（单行不含
+  面板标题条）；主栏总高 = `calcMainBarHeight(tabOnTitle)`。
+
+```qml
+RibbonBar { ribbonStyle: Ribbon.RibbonStyleCompactTwoRow }
+```
 
 ## 视觉叶子规范
 

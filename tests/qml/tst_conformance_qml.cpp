@@ -12,6 +12,7 @@
 #include <memory>
 #include <functional>
 #include <SARibbonQml/SARibbonQmlGlobal.h>
+#include <SARibbonQml/SARibbonQmlTypes.h>
 #include <SARibbonCore/SARibbonCoreUtil.h>
 #include <SARibbonQml/button/RibbonToolButton.h>
 #include <SARibbonQml/container/RibbonControlContainer.h>
@@ -41,6 +42,9 @@ private Q_SLOTS:
     void controlContainerEmbedding();
     void contextCategoryActivation();
     void galleryInPanel();
+    void ribbonStyleSwitching();
+    void styleRadioViaContainer();
+    void separatorInPanel();
 
 private:
     QQuickView* exposeScene(QQmlEngine& engine, QQmlComponent& component, const char* src, int w, int h);
@@ -851,6 +855,213 @@ Item {
         }
     }
     QVERIFY2(ink > 300, "gallery grid must render visible content (items + strip + frame)");
+}
+
+/**
+ * @brief Six ribbon styles: row modes + tabOnTitle geometry + propagation
+ * @details Mirrors the widgets setRibbonStyle mapping: three-row keeps word
+ *          wrap + panel titles; single-row hides titles and switches buttons
+ *          to icon-right text; compact styles ride the tab row on the title
+ *          bar (categoryRowY collapses to the title height).
+ */
+void TestConformanceQml::ribbonStyleSwitching()
+{
+    QQmlEngine engine;
+    saRibbonRegisterQmlTypes(&engine);
+
+    QString src = QStringLiteral(R"QML(import QtQuick 2.12
+import SARibbon 3.0
+Item {
+    width: 800
+    height: 300
+    RibbonBar {
+        objectName: "bar"
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        RibbonCategory {
+            objectName: "cat"
+            title: "Home"
+            RibbonPanel {
+                objectName: "panel"
+                panelTitle: "Styles"
+                RibbonToolButton { objectName: "btn"; text: "Hello World Button" }
+            }
+        }
+    }
+})QML");
+
+    QQmlComponent component(&engine);
+    std::unique_ptr< QQuickView > view(exposeScene(engine, component, src.toUtf8().constData(), 800, 300));
+    QVERIFY(view);
+    QQuickItem* rootItem = view->rootObject();
+    QVERIFY(rootItem);
+
+    auto* bar    = rootItem->findChild< QQuickItem* >(QStringLiteral("bar"));
+    auto* panel  = rootItem->findChild< QQuickItem* >(QStringLiteral("panel"));
+    auto* btn    = rootItem->findChild< QQuickItem* >(QStringLiteral("btn"));
+    QVERIFY(bar && panel && btn);
+
+    // layout mode enum values: ThreeRowMode=3, TwoRowMode=2, SingleRowMode=1
+    const int threeRow = 3, twoRow = 2, singleRow = 1;
+
+    // ---- default LooseThreeRow ----
+    QTRY_COMPARE(bar->property("ribbonStyle").toInt(), int(SARibbonQml::RibbonEnums::RibbonStyleLooseThreeRow));
+    QTRY_COMPARE(panel->property("layoutMode").toInt(), threeRow);
+    QTRY_COMPARE(btn->property("wordWrap").toBool(), true);
+    QTRY_COMPARE(btn->property("iconRightText").toBool(), false);
+    QTRY_VERIFY(panel->property("enableShowPanelTitle").toBool());
+    const int looseCategoryRowY = bar->property("categoryRowY").toInt();
+    const int looseBarHeight    = int(bar->implicitHeight());
+    QVERIFY(looseCategoryRowY > 0);
+
+    // ---- CompactThreeRow: tabs on the title row ----
+    bar->setProperty("ribbonStyle", int(SARibbonQml::RibbonEnums::RibbonStyleCompactThreeRow));
+    QTRY_COMPARE(bar->property("ribbonStyle").toInt(), int(SARibbonQml::RibbonEnums::RibbonStyleCompactThreeRow));
+    QTRY_COMPARE(panel->property("layoutMode").toInt(), threeRow);
+    // the tab row rides inside the title strip: categoryRowY collapses
+    QTRY_VERIFY(bar->property("categoryRowY").toInt() < looseCategoryRowY);
+    QTRY_VERIFY(int(bar->implicitHeight()) < looseBarHeight);
+
+    // ---- LooseTwoRow: word wrap off, titles stay ----
+    bar->setProperty("ribbonStyle", int(SARibbonQml::RibbonEnums::RibbonStyleLooseTwoRow));
+    QTRY_COMPARE(panel->property("layoutMode").toInt(), twoRow);
+    QTRY_COMPARE(btn->property("wordWrap").toBool(), false);
+    QTRY_VERIFY(panel->property("enableShowPanelTitle").toBool());
+    QTRY_COMPARE(bar->property("categoryRowY").toInt(), looseCategoryRowY);
+
+    // ---- LooseSingleRow: titles hidden + icon-right text ----
+    bar->setProperty("ribbonStyle", int(SARibbonQml::RibbonEnums::RibbonStyleLooseSingleRow));
+    QTRY_COMPARE(panel->property("layoutMode").toInt(), singleRow);
+    QTRY_COMPARE(btn->property("wordWrap").toBool(), false);
+    QTRY_COMPARE(btn->property("iconRightText").toBool(), true);
+    QTRY_VERIFY(!panel->property("enableShowPanelTitle").toBool());
+
+    // ---- back to LooseThreeRow restores everything ----
+    bar->setProperty("ribbonStyle", int(SARibbonQml::RibbonEnums::RibbonStyleLooseThreeRow));
+    QTRY_COMPARE(panel->property("layoutMode").toInt(), threeRow);
+    QTRY_COMPARE(btn->property("wordWrap").toBool(), true);
+    QTRY_COMPARE(btn->property("iconRightText").toBool(), false);
+    QTRY_VERIFY(panel->property("enableShowPanelTitle").toBool());
+    QTRY_COMPARE(bar->property("categoryRowY").toInt(), looseCategoryRowY);
+}
+
+/**
+ * @brief Panel separator: Large-proportion line item between buttons
+ * @details Mirrors the widgets addSeparator: the separator rides its own
+ *          column at full body height; the engine must give it a geometry
+ *          distinct from the neighbouring buttons.
+ */
+void TestConformanceQml::separatorInPanel()
+{
+    QQmlEngine engine;
+    saRibbonRegisterQmlTypes(&engine);
+
+    QString src = QStringLiteral(R"QML(import QtQuick 2.12
+import SARibbon 3.0
+Item {
+    width: 600
+    height: 300
+    RibbonPanel {
+        objectName: "panel"
+        anchors.fill: parent
+        panelTitle: "Sep"
+        RibbonToolButton { objectName: "left"; text: "Left" }
+        RibbonSeparator { objectName: "sep" }
+        RibbonToolButton { objectName: "right"; text: "Right" }
+    }
+})QML");
+
+    QQmlComponent component(&engine);
+    std::unique_ptr< QQuickView > view(exposeScene(engine, component, src.toUtf8().constData(), 600, 300));
+    QVERIFY(view);
+    QQuickItem* rootItem = view->rootObject();
+    QVERIFY(rootItem);
+
+    auto* left  = rootItem->findChild< QQuickItem* >(QStringLiteral("left"));
+    auto* sep   = rootItem->findChild< QQuickItem* >(QStringLiteral("sep"));
+    auto* right = rootItem->findChild< QQuickItem* >(QStringLiteral("right"));
+    QVERIFY(left && sep && right);
+
+    QTRY_VERIFY(left->width() > 0 && right->width() > 0);
+    QTRY_VERIFY(sep->width() > 0 && sep->height() > 0);
+    // widgets parity: 2*3 margins + 1px line
+    QCOMPARE(sep->width(), 7.0);
+    // the separator column sits between the buttons
+    QVERIFY(left->x() < sep->x());
+    QVERIFY(sep->x() < right->x());
+}
+
+/**
+ * @brief Style radios embedded through a control container (example parity)
+ * @details The example drives ribbonStyle through RadioButtons inside
+ *          RibbonControlContainers; this reproduces the exact pattern and
+ *          clicks the radio with real mouse events to prove the whole chain
+ *          (container embedding -> radio toggle -> bar style switch).
+ */
+void TestConformanceQml::styleRadioViaContainer()
+{
+    QQmlEngine engine;
+    saRibbonRegisterQmlTypes(&engine);
+
+    QString src = QStringLiteral(R"QML(import QtQuick 2.12
+import QtQuick.Controls 2.12
+import SARibbon 3.0
+Item {
+    width: 600
+    height: 300
+    RibbonBar {
+        id: ribbonBar
+        objectName: "bar"
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        applicationLabel: "File"
+        RibbonCategory {
+            title: "Home"
+            RibbonPanel {
+                panelTitle: "style"
+                ButtonGroup { id: styleGroup }
+                RibbonControlContainer {
+                    control: RadioButton {
+                        objectName: "radioLoose"
+                        ButtonGroup.group: styleGroup
+                        text: "loose"
+                        checked: true
+                        onToggled: if (checked) ribbonBar.ribbonStyle = Ribbon.RibbonStyleLooseThreeRow
+                    }
+                }
+                RibbonControlContainer {
+                    control: RadioButton {
+                        objectName: "radioCompact"
+                        ButtonGroup.group: styleGroup
+                        text: "compact"
+                        onToggled: if (checked) ribbonBar.ribbonStyle = Ribbon.RibbonStyleCompactThreeRow
+                    }
+                }
+            }
+        }
+    }
+})QML");
+
+    QQmlComponent component(&engine);
+    std::unique_ptr< QQuickView > view(exposeScene(engine, component, src.toUtf8().constData(), 600, 300));
+    QVERIFY(view);
+    QQuickItem* rootItem = view->rootObject();
+    QVERIFY(rootItem);
+
+    auto* bar = rootItem->findChild< QQuickItem* >(QStringLiteral("bar"));
+    auto* radioCompact = rootItem->findChild< QQuickItem* >(QStringLiteral("radioCompact"));
+    QVERIFY(bar && radioCompact);
+    QTRY_COMPARE(bar->property("ribbonStyle").toInt(), int(SARibbonQml::RibbonEnums::RibbonStyleLooseThreeRow));
+
+    // real mouse click on the embedded radio toggles the style
+    const int looseRowY = bar->property("categoryRowY").toInt();
+    const QPointF center = radioCompact->mapToScene(QPointF(radioCompact->width() / 2, radioCompact->height() / 2));
+    QTest::mouseClick(view.get(), Qt::LeftButton, Qt::NoModifier, center.toPoint());
+    QTRY_COMPARE(radioCompact->property("checked").toBool(), true);
+    QTRY_COMPARE(bar->property("ribbonStyle").toInt(), int(SARibbonQml::RibbonEnums::RibbonStyleCompactThreeRow));
+    QTRY_VERIFY(bar->property("categoryRowY").toInt() < looseRowY);
 }
 
 QTEST_MAIN(TestConformanceQml)

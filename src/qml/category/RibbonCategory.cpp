@@ -94,11 +94,28 @@ void RibbonCategory::registerPanel(RibbonPanel* panel)
 {
     if (!mPanels.contains(panel)) {
         mPanels.append(panel);
+        // apply the last pushed bar style so dynamically added panels match
+        applyRibbonStyle(mStyleRowCount, mStyleShowPanelTitle, mStyleWordWrap, mStyleIconRightText);
         // panel implicit sizes are the layout hints: any change re-runs relayout
         connect(panel, &QQuickItem::implicitWidthChanged, this, [this]() { polish(); });
         connect(panel, &QQuickItem::implicitHeightChanged, this, [this]() { polish(); });
         polish();
     }
+}
+
+void RibbonCategory::applyRibbonStyle(int rowCount, bool showPanelTitle, bool wordWrap, bool iconRightText)
+{
+    mStyleRowCount       = rowCount;
+    mStyleShowPanelTitle = showPanelTitle;
+    mStyleWordWrap       = wordWrap;
+    mStyleIconRightText  = iconRightText;
+    const RibbonEnums::LayoutMode mode = (rowCount <= 1)  ? RibbonEnums::SingleRowMode
+                                         : (rowCount == 2) ? RibbonEnums::TwoRowMode
+                                                           : RibbonEnums::ThreeRowMode;
+    for (RibbonPanel* panel : mPanels) {
+        panel->applyRibbonStyle(mode, showPanelTitle, wordWrap, iconRightText);
+    }
+    polish();
 }
 
 void RibbonCategory::unregisterPanel(RibbonPanel* panel)

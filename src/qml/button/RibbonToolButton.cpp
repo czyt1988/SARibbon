@@ -141,6 +141,37 @@ void RibbonToolButton::setChecked(bool on)
     Q_EMIT toggled(mChecked);
 }
 
+bool RibbonToolButton::isWordWrap() const
+{
+    return mWordWrap;
+}
+
+void RibbonToolButton::setWordWrap(bool on)
+{
+    if (mWordWrap == on) {
+        return;
+    }
+    mWordWrap = on;
+    Q_EMIT wordWrapChanged();
+    updateSizeHint();
+}
+
+bool RibbonToolButton::isIconRightText() const
+{
+    return mIconRightText;
+}
+
+void RibbonToolButton::setIconRightText(bool on)
+{
+    if (mIconRightText == on) {
+        return;
+    }
+    mIconRightText = on;
+    Q_EMIT iconRightTextChanged();
+    updateSizeHint();
+    updateHitRects();
+}
+
 QString RibbonToolButton::toolTip() const
 {
     return mToolTip;
@@ -353,7 +384,9 @@ QSize RibbonToolButton::computeSizeHintFromMetrics()
     const SARibbon::Core::SARibbonMetrics& m = RibbonMetrics::instance()->coreMetrics();
     const QFontMetrics fm = m.fontMetrics();
     const int textW = fm.horizontalAdvance(mText);
-    const bool isLarge = (rowProportion == SARibbon::Core::SARibbonRowProportion::Large);
+    // iconRightText forces the small rendering/hint regardless of the
+    // proportion (widgets PrivateData::effectiveButtonType parity)
+    const bool isLarge = (rowProportion == SARibbon::Core::SARibbonRowProportion::Large) && !mIconRightText;
     const bool hasInd = hasMenu();
     if (isLarge) {
         // Large button (icon above, text below). The effective large height is
@@ -362,11 +395,12 @@ QSize RibbonToolButton::computeSizeHintFromMetrics()
         const int largeH = largeButtonHeightContext() > 0
                                ? largeButtonHeightContext()
                                : m.calcCategoryHeight(true, false) - m.panelTitleHeight - 4 - 2;
-        // single line when the text fits the aspect-ratio box, otherwise the
-        // two-line wrap estimate (widgets uses a binary search here; the
-        // half-width approximation stays within a few pixels)
+        // single line when the text fits the aspect-ratio box or word wrap is
+        // disabled (style propagation), otherwise the two-line wrap estimate
+        // (widgets uses a binary search here; the half-width approximation
+        // stays within a few pixels)
         int w;
-        if (textW <= int(largeH * kMaxAspectRatio)) {
+        if (!mWordWrap || textW <= int(largeH * kMaxAspectRatio)) {
             w = textW + 2 + (hasInd ? kLargeIndicatorLen : 0);
         } else {
             w = textW / 2 + fm.horizontalAdvance(QLatin1String("xx")) + 8 + (hasInd ? kLargeIndicatorLen : 0);
@@ -402,7 +436,7 @@ void RibbonToolButton::updateHitRects()
             break;
         }
         case RibbonEnums::MenuButtonPopup: {
-            if (rowProportion == SARibbon::Core::SARibbonRowProportion::Large) {
+            if ((rowProportion == SARibbon::Core::SARibbonRowProportion::Large) && !mIconRightText) {
                 // bottom strip below the icon zone (icon 32 + top margin 2 + gap)
                 const qreal stripTop = qMin(qreal(kLargeIconSide + 3), height());
                 newMenu   = QRectF(0, stripTop, width(), qMax(height() - stripTop, 0.0));

@@ -282,7 +282,7 @@ Rectangle {
                     width: viewportColumn.width
                     spacing: 1
                     Text {
-                        text: vpGroup.groupModel.groupTitle
+                        text: vpGroup.groupModel ? vpGroup.groupModel.groupTitle : ""
                         color: RibbonTheme.subtitle
                         font.pixelSize: Math.max(root.textH - 2, 8)
                         elide: Text.ElideRight
@@ -292,7 +292,7 @@ Rectangle {
                         columns: Math.max(Math.floor(vpGroup.width / 74), 1)
                         spacing: 1
                         Repeater {
-                            model: vpGroup.groupModel.items
+                            model: vpGroup.groupModel ? vpGroup.groupModel.items : []
                             Item {
                                 id: vpCell
                                 readonly property var entry: modelData

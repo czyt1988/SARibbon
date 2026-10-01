@@ -1,5 +1,6 @@
 #include "RibbonPanel.h"
 #include "../host/RibbonLayoutItemHost.h"
+#include "../button/RibbonToolButton.h"
 #include "../category/RibbonCategory.h"
 #include "../metrics/RibbonMetrics.h"
 #include "../SARibbonQmlTypes.h"
@@ -51,10 +52,46 @@ void RibbonPanel::setLayoutMode(RibbonEnums::LayoutMode mode)
     polish();
 }
 
+bool RibbonPanel::enableShowPanelTitle() const
+{
+    return mEnableShowPanelTitle;
+}
+
+void RibbonPanel::setEnableShowPanelTitle(bool on)
+{
+    if (mEnableShowPanelTitle == on) {
+        return;
+    }
+    mEnableShowPanelTitle = on;
+    Q_EMIT enableShowPanelTitleChanged();
+    polish();
+}
+
+void RibbonPanel::applyRibbonStyle(RibbonEnums::LayoutMode mode, bool showPanelTitle, bool wordWrap, bool iconRightText)
+{
+    // remember the flags so panels/buttons registered later inherit them
+    mWordWrap      = wordWrap;
+    mIconRightText = iconRightText;
+    setEnableShowPanelTitle(showPanelTitle);
+    setLayoutMode(mode);
+    // forward the item-level flags to the registered tool buttons
+    for (RibbonLayoutItemHost* item : mChildItems) {
+        if (auto* btn = qobject_cast< RibbonToolButton* >(item)) {
+            btn->setWordWrap(wordWrap);
+            btn->setIconRightText(iconRightText);
+        }
+    }
+}
+
 void RibbonPanel::registerChildItem(RibbonLayoutItemHost* item)
 {
     if (!mChildItems.contains(item)) {
         mChildItems.append(item);
+        // buttons registered later inherit the current style flags
+        if (auto* btn = qobject_cast< RibbonToolButton* >(item)) {
+            btn->setWordWrap(mWordWrap);
+            btn->setIconRightText(mIconRightText);
+        }
         polish();
     }
 }
@@ -143,7 +180,7 @@ void RibbonPanel::runLayout()
     }
     SARibbon::Core::SARibbonPanelLayoutEngine::Input input;
     input.rowCount        = rowCountForMode();
-    input.showPanelTitle  = !mPanelTitle.isEmpty();
+    input.showPanelTitle  = mEnableShowPanelTitle && !mPanelTitle.isEmpty();
     input.hasTitleLabel   = true;
     input.hasOptionAction = false;
     input.isRTL           = SA::saIsRTL();

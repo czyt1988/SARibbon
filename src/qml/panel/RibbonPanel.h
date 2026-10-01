@@ -41,6 +41,7 @@ class RibbonPanel : public RibbonQuickHost
     Q_OBJECT
     Q_PROPERTY(QString panelTitle READ panelTitle WRITE setPanelTitle NOTIFY panelTitleChanged)
     Q_PROPERTY(RibbonEnums::LayoutMode layoutMode READ layoutMode WRITE setLayoutMode NOTIFY layoutModeChanged)
+    Q_PROPERTY(bool enableShowPanelTitle READ enableShowPanelTitle WRITE setEnableShowPanelTitle NOTIFY enableShowPanelTitleChanged)
     Q_PROPERTY(QRectF titleGeometry READ titleGeometry NOTIFY titleGeometryChanged)
 public:
     explicit RibbonPanel(QQuickItem* parent = nullptr);
@@ -51,6 +52,16 @@ public:
 
     RibbonEnums::LayoutMode layoutMode() const;
     void setLayoutMode(RibbonEnums::LayoutMode mode);
+
+    // Panel title strip visibility (bar ribbonStyle propagation; single-row
+    // styles hide it — widgets setEnableShowPanelTitle parity)
+    bool enableShowPanelTitle() const;
+    void setEnableShowPanelTitle(bool on);
+
+    // Style push from the category (bar ribbonStyle propagation chain):
+    // row mode + title visibility land here, word wrap / icon-right flags
+    // forward to the registered tool buttons
+    void applyRibbonStyle(RibbonEnums::LayoutMode mode, bool showPanelTitle, bool wordWrap, bool iconRightText);
 
     // explicit child registration list (itemChange of the children calls in);
     // accepts every layout item host type
@@ -66,6 +77,7 @@ public:
 Q_SIGNALS:
     void panelTitleChanged();
     void layoutModeChanged();
+    void enableShowPanelTitleChanged();
     void titleGeometryChanged();
 
 protected:
@@ -85,6 +97,9 @@ private:
 
     QString mPanelTitle;
     RibbonEnums::LayoutMode mLayoutMode = RibbonEnums::ThreeRowMode;
+    bool mEnableShowPanelTitle = true;
+    bool mWordWrap             = true;
+    bool mIconRightText        = false;
     QVector< RibbonLayoutItemHost* > mChildItems;
     SARibbon::Core::SARibbonPanelLayoutEngine mEngine;
     QSize mLastSizeHint;

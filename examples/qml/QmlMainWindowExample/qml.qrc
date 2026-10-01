@@ -18,6 +18,8 @@
         <file>icon/Italic.svg</file>
         <file>icon/item.svg</file>
         <file>icon/layout.svg</file>
+        <file>icon/largerFont.svg</file>
+        <file>icon/smallFont.svg</file>
         <file>icon/long-text.svg</file>
         <file>icon/redo.svg</file>
         <file>icon/save.svg</file>

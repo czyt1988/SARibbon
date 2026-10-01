@@ -36,6 +36,7 @@ class RibbonContextCategory;
 class RibbonGallery;
 class RibbonGalleryGroup;
 class RibbonGalleryItem;
+class RibbonSeparator;
 }
 
 /**

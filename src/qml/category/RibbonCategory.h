@@ -46,6 +46,10 @@ public:
     void registerPanel(RibbonPanel* panel);
     void unregisterPanel(RibbonPanel* panel);
 
+    // Style push from the bar (ribbonStyle propagation chain); panels
+    // registered later inherit through the stored fields
+    void applyRibbonStyle(int rowCount, bool showPanelTitle, bool wordWrap, bool iconRightText);
+
     Q_INVOKABLE int contentWidth() const;
 
 Q_SIGNALS:
@@ -70,6 +74,10 @@ private:
     QString mTitle;
     int mScrollXBase = 0;
     int mTotalWidth = 0;
+    int mStyleRowCount = 3;       ///< last pushed bar style rows (default LooseThreeRow)
+    bool mStyleShowPanelTitle = true;
+    bool mStyleWordWrap = true;
+    bool mStyleIconRightText = false;
     QVector< RibbonPanel* > mPanels;
     QVariantList mSeparatorXs;
     SARibbon::Core::SARibbonCategoryLayoutEngine mEngine;

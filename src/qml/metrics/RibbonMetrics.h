@@ -30,6 +30,7 @@ class RibbonMetrics : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QFont font READ font WRITE setFont NOTIFY fontChanged)
+    Q_PROPERTY(int fontPointSize READ fontPointSize WRITE setFontPointSize NOTIFY fontChanged)
     Q_PROPERTY(int tabBarHeight READ tabBarHeight NOTIFY metricsChanged)
     Q_PROPERTY(int titleBarHeight READ titleBarHeight NOTIFY metricsChanged)
     Q_PROPERTY(int categoryHeight READ categoryHeight NOTIFY metricsChanged)
@@ -45,13 +46,22 @@ public:
     QFont font() const;
     void setFont(const QFont& f);
 
+    // QML-friendly pointSize accessor (QFont itself is awkward to build in QML)
+    int fontPointSize() const;
+    void setFontPointSize(int ps);
+
     // metric reads (formulas live in core SARibbonMetrics; style pixel metrics
     // are style-dependent only through the default style — QML has no QStyle)
     int tabBarHeight() const;
     int titleBarHeight() const;
-    int categoryHeight(bool threeRow = true) const;
+    // row-count aware category height (core calcCategoryHeight parity; QML
+    // cannot build the QFont needed for the panel-level font override, so the
+    // bridge carries the app-level one)
+    Q_INVOKABLE int categoryHeightForRows(int rowCount) const;
+    int categoryHeight(bool threeRow = true, bool singleRow = false) const;
     int panelTitleHeight() const;
     void setPanelTitleHeight(int h);
+    Q_INVOKABLE int normalModeMainBarHeightFor(bool tabOnTitle, int rowCount) const;
     int normalModeMainBarHeight(bool tabOnTitle = true) const;
     int minimumModeMainBarHeight(bool tabOnTitle = true) const;
 

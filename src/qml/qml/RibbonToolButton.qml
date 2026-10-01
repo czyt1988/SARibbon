@@ -25,7 +25,10 @@ Rectangle {
     readonly property string label: cppHost ? cppHost.text : ""
     readonly property string icon: cppHost ? cppHost.iconSource : ""
     readonly property string tip: cppHost ? cppHost.toolTip : ""
-    readonly property bool large: cppHost && cppHost.proportion === Ribbon.Large
+    // iconRightText (single-row styles) forces the small rendering regardless
+    // of the proportion (widgets effectiveButtonType parity)
+    readonly property bool large: cppHost && cppHost.proportion === Ribbon.Large && !cppHost.iconRightText
+    readonly property bool wordWrap: cppHost ? cppHost.wordWrap : true
     readonly property bool checked: cppHost ? cppHost.checked : false
     readonly property bool disabled: !cppHost || !cppHost.enabled
     readonly property bool hasMenu: cppHost ? cppHost.hasMenu : false
@@ -109,8 +112,8 @@ Rectangle {
         width: (root.split ? root.hitMenu.width : parent.width) - (root.split ? (indicator.width + 4) : 2)
         height: root.split ? root.hitMenu.height : implicitHeight
         text: root.label
-        wrapMode: Text.WordWrap
-        maximumLineCount: 2
+        wrapMode: root.wordWrap ? Text.WordWrap : Text.NoWrap
+        maximumLineCount: root.wordWrap ? 2 : 1
         elide: Text.ElideRight
         horizontalAlignment: root.split ? Text.AlignLeft : Text.AlignHCenter
         verticalAlignment: Text.AlignVCenter

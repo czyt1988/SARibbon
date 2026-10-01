@@ -26,6 +26,130 @@ ApplicationWindow {
         RibbonCategory {
             title: "Home"
 
+            // Mirrors the widgets "ribbon style" panel: six exclusive style
+            // radios (RibbonStyle* flag values), a theme combobox and the
+            // font size buttons, all embedded through RibbonControlContainer
+            RibbonPanel {
+                panelTitle: "ribbon style"
+
+                ButtonGroup { id: styleGroup }
+
+                RibbonControlContainer {
+                    text: ""
+                    control: RadioButton {
+                        ButtonGroup.group: styleGroup
+                        text: qsTr("office style")
+                        checked: true
+                        onToggled: if (checked) {
+                            ribbonBar.ribbonStyle = Ribbon.RibbonStyleLooseThreeRow;
+                            feedback.text = qsTr("LooseThreeRow: tabs below title, 3 rows, word wrap on");
+                        }
+                    }
+                }
+                RibbonControlContainer {
+                    text: ""
+                    control: RadioButton {
+                        ButtonGroup.group: styleGroup
+                        text: qsTr("wps style")
+                        onToggled: if (checked) {
+                            ribbonBar.ribbonStyle = Ribbon.RibbonStyleCompactThreeRow;
+                            feedback.text = qsTr("CompactThreeRow: tabs on title, 3 rows");
+                        }
+                    }
+                }
+                RibbonControlContainer {
+                    text: ""
+                    control: RadioButton {
+                        ButtonGroup.group: styleGroup
+                        text: qsTr("office 2 row")
+                        onToggled: if (checked) {
+                            ribbonBar.ribbonStyle = Ribbon.RibbonStyleLooseTwoRow;
+                            feedback.text = qsTr("LooseTwoRow: 2 rows, word wrap off");
+                        }
+                    }
+                }
+                RibbonControlContainer {
+                    text: ""
+                    control: RadioButton {
+                        ButtonGroup.group: styleGroup
+                        text: qsTr("wps 2 row")
+                        onToggled: if (checked) {
+                            ribbonBar.ribbonStyle = Ribbon.RibbonStyleCompactTwoRow;
+                            feedback.text = qsTr("CompactTwoRow: tabs on title, 2 rows");
+                        }
+                    }
+                }
+                RibbonControlContainer {
+                    text: ""
+                    control: RadioButton {
+                        ButtonGroup.group: styleGroup
+                        text: qsTr("loose single row")
+                        onToggled: if (checked) {
+                            ribbonBar.ribbonStyle = Ribbon.RibbonStyleLooseSingleRow;
+                            feedback.text = qsTr("LooseSingleRow: 1 row, panel titles hidden, icon-right text");
+                        }
+                    }
+                }
+                RibbonControlContainer {
+                    text: ""
+                    control: RadioButton {
+                        ButtonGroup.group: styleGroup
+                        text: qsTr("compact single row")
+                        onToggled: if (checked) {
+                            ribbonBar.ribbonStyle = Ribbon.RibbonStyleCompactSingleRow;
+                            feedback.text = qsTr("CompactSingleRow: 1 row + tabs on title");
+                        }
+                    }
+                }
+
+                RibbonSeparator { }
+
+                RibbonControlContainer {
+                    text: "Theme:"
+                    control: ComboBox {
+                        // index maps onto the RibbonEnums::Theme values below
+                        property var themeValues: [
+                            Ribbon.RibbonThemeWindows7,
+                            Ribbon.RibbonThemeOffice2013,
+                            Ribbon.RibbonThemeOffice2016Blue,
+                            Ribbon.RibbonThemeOffice2021Blue,
+                            Ribbon.RibbonThemeOffice2021Green,
+                            Ribbon.RibbonThemeOffice2021Dark,
+                            Ribbon.RibbonThemeDark,
+                            Ribbon.RibbonThemeDark2
+                        ]
+                        model: [
+                            qsTr("Windows 7"), qsTr("Office 2013"), qsTr("Office 2016 Blue"),
+                            qsTr("Office 2021 Blue"), qsTr("Office 2021 Green"), qsTr("Office 2021 Dark"),
+                            qsTr("Dark"), qsTr("Dark 2")
+                        ]
+                        onActivated: {
+                            RibbonTheme.currentTheme = themeValues[index];
+                            feedback.text = qsTr("theme switched: %1").arg(currentText);
+                        }
+                    }
+                }
+
+                RibbonToolButton {
+                    text: "Larger"
+                    iconSource: "qrc:/icon/icon/largerFont.svg"
+                    proportion: Ribbon.Small
+                    onClicked: {
+                        RibbonMetrics.fontPointSize = RibbonMetrics.fontPointSize + 1;
+                        feedback.text = qsTr("font point size: %1").arg(RibbonMetrics.fontPointSize);
+                    }
+                }
+                RibbonToolButton {
+                    text: "Smaller"
+                    iconSource: "qrc:/icon/icon/smallFont.svg"
+                    proportion: Ribbon.Small
+                    onClicked: {
+                        RibbonMetrics.fontPointSize = Math.max(RibbonMetrics.fontPointSize - 1, 6);
+                        feedback.text = qsTr("font point size: %1").arg(RibbonMetrics.fontPointSize);
+                    }
+                }
+            }
+
             RibbonPanel {
                 panelTitle: "Clipboard"
                 RibbonToolButton {
@@ -180,6 +304,9 @@ ApplicationWindow {
                     ]
                     onMenuTriggered: feedback.text = qsTr("test 2 menu: %1").arg(item.text)
                 }
+                // mirrors the widgets panel's separator between the small
+                // tests and the large popup buttons
+                RibbonSeparator { }
                 RibbonToolButton {
                     text: "Delayed\nPopup"
                     iconSource: "qrc:/icon/icon/folder-cog.svg"

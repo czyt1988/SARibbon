@@ -47,7 +47,8 @@ first engine; a second engine gets nullptr (verified against Qt 5.14/6.7 sources
 | `RibbonGallery` | type | gallery host (Large proportion + horizontal expanding + stretchFactor joins the core engine's weighted distribution; grid metrics via core `calcGalleryGridCellSize`) |
 | `RibbonGalleryGroup` | type | gallery group (groupTitle + items, default property items) |
 | `RibbonGalleryItem` | type | gallery entry (text/iconSource/enabled/toolTip) |
-| `Ribbon` | uncreatable | enum holder (`Ribbon.Large` / `Ribbon.ThreeRowMode` / `Ribbon.MenuButtonPopup` / ...) |
+| `RibbonSeparator` | type | panel separator (Large proportion, own column, 1px line; widgets SARibbonSeparatorWidget counterpart) |
+| `Ribbon` | uncreatable | enum holder (`Ribbon.Large` / `Ribbon.ThreeRowMode` / `Ribbon.MenuButtonPopup` / `Ribbon.RibbonStyleCompactTwoRow` / ...) |
 
 Access enums through the `Ribbon.` prefix (e.g. `proportion: Ribbon.Large`).
 
@@ -124,6 +125,31 @@ RibbonGallery {
 - The model classes (GalleryGroup/GalleryItem) declare their default property
   via `Q_CLASSINFO("DefaultProperty", ...)` so declarative children join the
   lists directly; Repeater delegates carry no QObject parent (see leaf rules).
+
+## Six Ribbon Styles
+
+`RibbonBar.ribbonStyle` (enum values mirror the widgets
+`SARibbonBar::RibbonStyleFlag` bits) follows the widgets setRibbonStyle
+propagation semantics:
+
+- **Loose/Compact**: Compact (tabOnTitle) rides the tab row on the title
+  strip (`categoryRowY` collapses to the title height, the bar loses one
+  tabBarHeight);
+- **ThreeRow/TwoRow/SingleRow**: the row count propagates to every panel
+  (context category pages included) as layoutMode; three-row keeps word
+  wrap, single-row hides panel titles and enables iconRightText (buttons
+  render icon-left/text-right regardless of proportion,
+  `effectiveButtonType` parity);
+- Propagation chain: bar -> category -> panel (rows + title switch) ->
+  buttons (wordWrap/iconRightText); panels/buttons registered later
+  inherit through the style fields stored at each level;
+- Category heights derive from core
+  `SARibbonMetrics::calcCategoryHeight(three, single)` (single row drops the
+  panel title strip); total bar height = `calcMainBarHeight(tabOnTitle)`.
+
+```qml
+RibbonBar { ribbonStyle: Ribbon.RibbonStyleCompactTwoRow }
+```
 
 ## Visual Leaf Rules
 
