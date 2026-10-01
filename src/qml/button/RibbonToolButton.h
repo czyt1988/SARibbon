@@ -152,6 +152,7 @@ protected:
     QUrl leafUrl() const override;
     void componentComplete() override;
     void largeHeightContextChanged() override;
+    void updatePolish() override;  // RTL flip re-mirrors the hit rects
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     void geometryChange(const QRectF& newGeometry, const QRectF& oldGeometry) override;
 #else

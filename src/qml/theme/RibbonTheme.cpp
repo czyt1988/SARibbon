@@ -96,6 +96,24 @@ void RibbonTheme::setCurrentTheme(int theme)
     coreData()->setTheme(t);
 }
 
+bool RibbonTheme::isRtl() const
+{
+    return QGuiApplication::layoutDirection() == Qt::RightToLeft;
+}
+
+void RibbonTheme::setRtl(bool on)
+{
+    // the core engines read the app layout direction through SA::saIsRTL();
+    // flipping it relayouts every host on the next polish pass (widgets
+    // "Switch to RTL" parity)
+    const Qt::LayoutDirection dir = on ? Qt::RightToLeft : Qt::LeftToRight;
+    if (QGuiApplication::layoutDirection() == dir) {
+        return;
+    }
+    QGuiApplication::setLayoutDirection(dir);
+    Q_EMIT rtlChanged();
+}
+
 bool RibbonTheme::isDark() const
 {
     return coreData()->palette().isDark();

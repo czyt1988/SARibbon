@@ -2,6 +2,7 @@
 #include "../panel/RibbonPanel.h"
 #include "../button/RibbonToolButton.h"
 #include "../bar/RibbonBar.h"
+#include "../theme/RibbonTheme.h"
 #include "../SARibbonQmlTypes.h"
 #include <SARibbonCore/SARibbonCoreUtil.h>
 #include <QVariantList>
@@ -26,6 +27,8 @@ public:
 
 RibbonCategory::RibbonCategory(QQuickItem* parent) : RibbonQuickHost(parent)
 {
+    // RTL flip re-runs the engine pass (SA::saIsRTL() re-read on polish)
+    connect(RibbonTheme::instance(), &RibbonTheme::rtlChanged, this, [this]() { polish(); });
 }
 
 RibbonCategory::~RibbonCategory()

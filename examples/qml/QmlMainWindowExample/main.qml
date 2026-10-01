@@ -207,6 +207,19 @@ ApplicationWindow {
                         log(qsTr("font point size: %1").arg(RibbonMetrics.fontPointSize));
                     }
                 }
+
+                // widgets "Switch to RTL" parity: flips the application
+                // layout direction; the core engines mirror through saIsRTL()
+                RibbonToolButton {
+                    text: qsTr("Switch to RTL")
+                    iconSource: "qrc:/icon/icon/layout.svg"
+                    proportion: Ribbon.Small
+                    onClicked: {
+                        RibbonTheme.rtl = !RibbonTheme.rtl;
+                        text = RibbonTheme.rtl ? qsTr("Switch to LTR") : qsTr("Switch to RTL");
+                        log(qsTr("layout direction: %1").arg(RibbonTheme.rtl ? "RTL" : "LTR"));
+                    }
+                }
             }
 
             RibbonPanel {

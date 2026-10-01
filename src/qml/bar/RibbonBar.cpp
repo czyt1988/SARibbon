@@ -20,6 +20,8 @@ RibbonBar::RibbonBar(QQuickItem* parent) : RibbonQuickHost(parent)
     // installs); recompute the published band data on theme switches
     connect(SARibbon::Core::SARibbonThemeData::instance(), &SARibbon::Core::SARibbonThemeData::themeChanged, this,
             [this]() { polish(); });
+    // RTL flip re-runs the title-rect engine pass (SA::saIsRTL() re-read)
+    connect(RibbonTheme::instance(), &RibbonTheme::rtlChanged, this, [this]() { polish(); });
 }
 
 RibbonBar::~RibbonBar()

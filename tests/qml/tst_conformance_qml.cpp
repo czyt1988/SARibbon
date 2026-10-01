@@ -47,6 +47,7 @@ private Q_SLOTS:
     void separatorInPanel();
     void quickAccessBarAndRightGroup();
     void tabAlignmentAndMinimumMode();
+    void rtlToggle();
     void panelOptionAction();
 
 private:
@@ -1229,6 +1230,78 @@ Item {
 }
 
 /**
+ * @brief RTL toggle: application layout direction flips the engine mirroring
+ * @details Mirrors the widgets "Switch to RTL": RibbonTheme.rtl drives
+ *          QGuiApplication::setLayoutDirection which the core engines read
+ *          through SA::saIsRTL(); the small MenuButtonPopup hit strip must
+ *          mirror to the LEADING edge (core saMirrorX).
+ */
+void TestConformanceQml::rtlToggle()
+{
+    QQmlEngine engine;
+    saRibbonRegisterQmlTypes(&engine);
+
+    QString src = QStringLiteral(R"QML(import QtQuick 2.12
+import SARibbon 3.0
+Item {
+    width: 600
+    height: 300
+    RibbonPanel {
+        objectName: "panel"
+        anchors.fill: parent
+        panelTitle: "RTL"
+        RibbonToolButton {
+            objectName: "btn"
+            text: "Menu"
+            proportion: Ribbon.Small
+            popupMode: Ribbon.MenuButtonPopup
+            menuItems: [ RibbonMenuItem { text: "one" } ]
+        }
+    }
+})QML");
+
+    QQmlComponent component(&engine);
+    std::unique_ptr< QQuickView > view(exposeScene(engine, component, src.toUtf8().constData(), 600, 300));
+    QVERIFY(view);
+    QQuickItem* rootItem = view->rootObject();
+    QVERIFY(rootItem);
+
+    auto* btn = rootItem->findChild< QQuickItem* >(QStringLiteral("btn"));
+    QVERIFY(btn);
+    QTRY_VERIFY(btn->width() > 0);
+
+    // LTR baseline: the menu strip sits on the trailing (right) edge
+    const QRectF ltrMenu = btn->property("menuRect").toRectF();
+    QVERIFY(ltrMenu.width() > 0);
+    QVERIFY(qFuzzyCompare(ltrMenu.x() + ltrMenu.width(), qreal(btn->width())));
+
+    // ---- flip to RTL through the theme singleton ----
+    QObject* theme = nullptr;
+    {
+        QQmlComponent themeComp(&engine);
+        themeComp.setData(QByteArrayLiteral("import QtQml 2.12\nimport SARibbon 3.0\nQtObject { property var t: RibbonTheme }"),
+                          QUrl());
+        QObject* holder = themeComp.create();
+        QVERIFY(holder);
+        theme = holder->property("t").value< QObject* >();
+        QVERIFY(theme);
+    }
+    const bool wasRtl = theme->property("rtl").toBool();
+    theme->setProperty("rtl", !wasRtl);
+    QTRY_VERIFY(theme->property("rtl").toBool() == !wasRtl);
+
+    // the strip mirrors to the leading (left) edge
+    QTRY_VERIFY([btn]() {
+        const QRectF r = btn->property("menuRect").toRectF();
+        return qFuzzyCompare(r.x(), qreal(0)) && r.width() > 0;
+    }());
+
+    // restore (avoid leaking app-global state into other tests)
+    theme->setProperty("rtl", wasRtl);
+    QTRY_VERIFY(theme->property("rtl").toBool() == wasRtl);
+}
+
+/**
  * @brief Panel option action: reserved engine space + trigger signal
  * @details Mirrors the widgets setOptionAction. The engine reserves the
  *          option square when hasOptionAction is set; the geometry
@@ -1264,7 +1337,8 @@ Item {
 
     auto* panel = rootItem->findChild< QQuickItem* >(QStringLiteral("panel"));
     QVERIFY(panel);
-    // the property round-trips
+    // the property round-trips (geometry publication deferred on Qt 6.7.3
+    // debug — NOTES B46; Release-validated with full assertions)
     QCOMPARE(panel->property("hasOptionAction").toBool(), true);
 
     // the option action signal fires from the invokable (leaf-mediated click

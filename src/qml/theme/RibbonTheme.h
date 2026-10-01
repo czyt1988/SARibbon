@@ -51,12 +51,19 @@ class RibbonTheme : public QObject
     Q_PROPERTY(QColor selectionBg READ selectionBg NOTIFY paletteChanged)
     Q_PROPERTY(QColor sysButtonHover READ sysButtonHover NOTIFY paletteChanged)
     Q_PROPERTY(QColor sysButtonPressed READ sysButtonPressed NOTIFY paletteChanged)
+    Q_PROPERTY(bool rtl READ isRtl WRITE setRtl NOTIFY rtlChanged)
 public:
     explicit RibbonTheme(QObject* parent = nullptr);
     ~RibbonTheme() override;
 
     // Singleton (Meyers static; registration via the callback form, plan-04 S1-3)
     static RibbonTheme* instance();
+
+    // Application layout direction mirror (QGuiApplication::setLayoutDirection;
+    // the core engines read it through SA::saIsRTL() — this QML setter lets
+    // examples toggle RTL like the widgets example's "Switch to RTL" action)
+    bool isRtl() const;
+    void setRtl(bool on);
 
     int currentTheme() const;
     void setCurrentTheme(int theme);
@@ -89,6 +96,7 @@ public:
 Q_SIGNALS:
     void currentThemeChanged();
     void paletteChanged();
+    void rtlChanged();
 
 private:
     SARibbon::Core::SARibbonThemeData* coreData() const;

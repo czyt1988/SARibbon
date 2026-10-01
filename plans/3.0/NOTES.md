@@ -533,6 +533,18 @@
 - 测试 16/16 绿（+对齐/最小模式 +optionAction API）；示例 30s 稳定。
 - 影响计划：04-S3（createVisualLeaf 根上下文=结构性修复，影响全部叶子）；B43 缺陷 A 同源关闭。
 
+### B46：optionAction Release/Debug 矩阵 + RTL 切换（第 6 轮）
+- 日期：2026-10-08（用户目标第 6 轮）
+- **optionAction Release/Debug 矩阵（B44/B45 续）**：新建 build-qml-rel（Release）复测——**完整消费（store+emit+叶子渲染+几何断言）在 Release 下 17/17 全绿**；同代码 Debug 下 panelOptionAction 依旧确定性崩溃（~QQmlElement→V4 +0x611117 帧族）。结论：**Qt 6.7.3 Debug 构建 V4 特有问题**（一个无数据流效果的 QRect 成员赋值即可触发=代码布局敏感）。决策：Debug 工作流不可带崩溃，几何发布保持延后（API/引擎预留/trigger 信号/叶子渲染块全保留，Release 验证过完整链路，恢复发布只需取消 runLayout 一处注释）。已同步核对源/同步头 MD5 一致（ABI 不同步排除）。
+- **RTL 切换（widgets "Switch to RTL" 对等）**：
+  1. `RibbonTheme.rtl` 属性（QGuiApplication::setLayoutDirection 镜像，rtlChanged 信号）；
+  2. 事件过滤器路线证伪：`ApplicationLayoutDirectionChange` 只发顶层窗口不过 app 对象（插桩实测），宿主改为直连 RibbonTheme 单例 rtlChanged→polish；
+  3. 各宿主接入：bar/category/panel 连 rtlChanged→polish（引擎经 saIsRTL 重读镜像）；**按钮例外**——offscreen 下深嵌按钮的 polish 送达不可靠（插桩：panel 的 updatePolish 送达、button 的从不送达），RTL lambda 直接调 updateHitRects()（纯矩形计算）+ polish 兜底；
+  4. 测试 `rtlToggle`：小按钮 MenuButtonPopup 命中条 LTR 尾缘→RTL 镜像到首缘（core saMirrorX 语义断言）+ 状态还原（应用级全局状态不泄漏给后续用例）；
+  5. 示例：ribbon style 面板加 "Switch to RTL" 按钮（文本随状态切换）。
+- 测试 17/17 绿（Debug 与 Release 双绿）；示例 30s 稳定。
+- 影响计划：04 非目标清单（RTL 完成）；optionAction 恢复发布的一行开关+完整证据链留档。
+
 ---
 
 ## 执行中追加（模板，勿删）

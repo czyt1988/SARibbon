@@ -43,7 +43,10 @@ Rectangle {
     }
 
     // option action: the diagonal-arrow button the engine reserves at the
-    // panel's bottom-right corner (widgets SARibbonPanelOptionButton parity)
+    // panel's bottom-right corner (widgets SARibbonPanelOptionButton parity).
+    // Renders once the host publishes the reserved geometry (deferred on Qt
+    // 6.7.3 debug — NOTES B46); the block stays connected so publication is
+    // a one-line host change when that lands.
     Item {
         visible: root.hasOption && root.optionRect.width > 0
         x: root.optionRect.x

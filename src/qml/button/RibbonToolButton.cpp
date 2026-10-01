@@ -2,6 +2,7 @@
 #include "../menu/RibbonMenuItem.h"
 #include "../panel/RibbonPanel.h"
 #include "../metrics/RibbonMetrics.h"
+#include "../theme/RibbonTheme.h"
 #include "../SARibbonQmlTypes.h"
 #include <SARibbonCore/SARibbonCoreUtil.h>
 #include <QRectF>
@@ -26,6 +27,14 @@ RibbonToolButton::RibbonToolButton(QQuickItem* parent) : RibbonLayoutItemHost(pa
 {
     // contract field default follows the 2.x createItem behavior (Large)
     rowProportion = SARibbon::Core::SARibbonRowProportion::Large;
+    // RTL flip re-mirrors the menu hit strip (SA::saIsRTL() re-read). The
+    // rect math runs directly — polish delivery to items deep in panel-
+    // driven geometry proved unreliable in offscreen tests (round-6 trace:
+    // the panel's updatePolish delivered, the button's never did)
+    connect(RibbonTheme::instance(), &RibbonTheme::rtlChanged, this, [this]() {
+        updateHitRects();
+        polish();
+    });
     updateSizeHint();
 }
 
@@ -299,6 +308,11 @@ void RibbonToolButton::componentComplete()
     RibbonLayoutItemHost::componentComplete();
     ensureQmlLeaf();
     updateHitRects();
+}
+
+void RibbonToolButton::updatePolish()
+{
+    updateHitRects();  // RTL flip re-mirrors the menu strip
 }
 
 void RibbonToolButton::largeHeightContextChanged()
