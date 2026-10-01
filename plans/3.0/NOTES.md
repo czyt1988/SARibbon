@@ -472,6 +472,19 @@
   7. 构建修正两处：`examples/CMakeLists.txt` 补 `SARIBBON_BUILD_WIDGETS` 守卫（原 Widgets=OFF+Examples=ON 配置必炸：widgets 示例 find_package(SARibbonBar) 无安装包）；`tests/qml` 弃 POST_BUILD 拷贝改**测试可执行与 DLL 同目录输出**（`${CMAKE_BINARY_DIR}/bin`）——qrc-only 变更不触碰导入库、exe 不重链、旧拷贝残留旧 DLL（本轮实际踩中：ReferenceError 修复后错误依旧，tests/ 下 DLL 为 8:50 旧版）。attach 到库目标的拷贝方案因 AUTOMOC + add_dependencies 成环不可用（CMake 强连通分量报错）。
 - 影响计划：04 非目标清单（RibbonMenu 的 QML 版经按钮 popupMode+RibbonMenuItem 事实覆盖菜单场景）；04-S3（panel 子项模型泛化）；04-S6（示例对标扩展）；后续轮：上下文标签页/画廊/quick access bar/六样式按同思路推进。
 
+### B41：QML 上下文标签页 + 画廊（用户驱动，QML 功能覆盖度对标 2/3）
+- 日期：2026-10-08（用户目标"QML 功能与 widgets 覆盖度对标"第 2 轮）
+- 发现位置：计划 04 非目标清单（画廊/上下文标签原推迟，用户目标显式点名，现补）
+- 证据：widgets 侧上下文标签 = showContextCategory 追加 tab + paintContextCategoryTab 色带（首个 context tab 左缘到最右 tab 右缘、窗口顶到 tab 行底-1、5px 顶部高亮=themeContextHighlight fp）；画廊 = Large 比例 + expanding(Horizontal) + stretchFactor 参与 recalcExpandGeomArray 加权分配 + recalcGridSize 网格。
+- 处理（共性下沉优先）：
+  1. **core 下沉**：`SA::calcGalleryGridCellSize(galleryHeight, displayRow, gridMinimumWidth, gridMaximumWidth)` 入 SARibbonCoreUtil（自 widgets SARibbonGalleryGroup::recalcGridSize 纯 move 网格部分；图标尺寸依赖 widgets fontMetrics 留原处），widgets 侧改为调用 core——QML 画廊以相同输入推导相同单元；纯净扫描绿。
+  2. **RibbonContextCategory**（`src/qml/context/`，QQuickItem 结构项）：contextTitle/contextColor/**active**（激活语义，非 item visible——结构容器透明，页面显隐由 bar 布局控制）；bar 泛化 effectiveTabs/effectiveCategories（普通 tab + 激活 context 的页面 tab 追加于尾部，widgets showContextCategory 对等），`contextBands` 发布色带 map（x/width/title/color/highlight/textColor，高亮经 core themeContextHighlight，textColor 按亮度），bar 叶子渲染色带（z=-1 位于 tab 下），tab 叶子按 contextColor 着色文字/下划线；去激活钳制 currentIndex；TitleRectInput.hasContextTabs 随激活置位。
+  3. **RibbonGallery/Group/Item**（`src/qml/gallery/`）：契约面 = Large+Horizontal+stretchFactor() 覆写（feed recalcExpandGeomArray）；宿主发布 gridSize/gridColumns/totalRows/scrollRow/buttonStripWidth，叶子只摆格子（IconWithWordWrapText 风格 + 滚动条带三键 + Popup viewport 列全部组）；模型类 `Q_CLASSINFO("DefaultProperty")`；`triggered(item,index)` 中转 + activateItem 可调用。
+  4. **两处真实缺陷修复**：① C++ 创建的 context tab 挂 bar 触发 itemChange 被误注册为普通 tab（挤占 Home 自动 tab 名额——症状：激活后 tab 行只有 2 个隐藏 tab）→ 先登记 mContextTabs 再挂父 + itemChange 经 `isOwnedContextTab` 排除；② `sa_sync_include` 仅 configure 期复制，头文件加导出宏后测试仍编译旧副本（LNK2001 staticMetaObject）→ sync 集合入 `CMAKE_CONFIGURE_DEPENDS`（存量头文件改动自动重同步）。另补三个多重继承宿主类漏掉的 `SA_RIBBON_QML_EXPORT`（RibbonToolButton/RibbonControlContainer/RibbonGallery——库内自用不暴露符号，外部消费者才炸）。
+  5. 示例：Design 类加 "Context Category" 双 toggle 面板（onToggled 用隐式参数注入保 5.12 兼容），Other 类加画廊面板（Files 11 项 + Apps 6 项，图标 17 枚复制自 widgets 示例）+ 画廊控制面板（切组/滚动）；两个 context（Page1 控件嵌入+Page2 popup zoo；context2 双空页）。
+  6. 测试：`contextCategoryActivation`（激活→可见 tab+2、bands 内容、currentIndex 走入 context 页、**grabWindow 像素断言色带颜色>200px**、去激活钳制回退）与 `galleryInPanel`（契约面、cell 与 core 函数一致、totalRows 推导、滚动钳制按实际布局取界、组切换、triggered 中转、帧内容渲染>300px）——全 10 用例绿；widgets 侧 build-verify 28/29（唯一失败为 B15 环境项）。
+- 影响计划：04 非目标清单（画廊+上下文标签提前实现）；04-S3（calcGalleryGridCellSize 为 core 新增共性 API）；01-S5.4/sa_sync_include 行为变更（头文件编辑自动重同步）。
+
 ---
 
 ## 执行中追加（模板，勿删）

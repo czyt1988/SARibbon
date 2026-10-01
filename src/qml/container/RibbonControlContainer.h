@@ -32,7 +32,7 @@ namespace SARibbonQml {
  *          对应 QWidgetItem::sizeHint 的传导。
  * \endif
  */
-class RibbonControlContainer : public RibbonLayoutItemHost
+class SA_RIBBON_QML_EXPORT RibbonControlContainer : public RibbonLayoutItemHost
 {
     Q_OBJECT
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)

@@ -121,6 +121,13 @@ function(sa_sync_include _target _module)
             list(APPEND _synced "${_dst_root}/${_h}")
         endif()
     endforeach()
+    # the sync runs at configure time only; without this, header EDITS (e.g. an
+    # export-macro fix) never refresh the mirrored copies and downstream TUs
+    # keep compiling against the stale headers (observed as LNK2001 on
+    # staticMetaObject after adding SA_RIBBON_QML_EXPORT). Newly ADDED headers
+    # still need a manual reconfigure (the CMake glob cannot see them yet).
+    list(TRANSFORM _headers PREPEND "${_src_root}/" OUTPUT_VARIABLE _sync_header_deps)
+    set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${_sync_header_deps}")
     set(${_target}_SYNC_FILES "${_synced}" PARENT_SCOPE)
     if(SARIBBON_INSTALL)   # v2 §6.4 (round2 D1)
         install(DIRECTORY "${_dst_root}/"

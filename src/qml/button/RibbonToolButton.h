@@ -47,7 +47,7 @@ class RibbonMenuItem;
  *          激活经 menuTriggered 中转，测试无需弹窗即可驱动。
  * \endif
  */
-class RibbonToolButton : public RibbonLayoutItemHost
+class SA_RIBBON_QML_EXPORT RibbonToolButton : public RibbonLayoutItemHost
 {
     Q_OBJECT
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)

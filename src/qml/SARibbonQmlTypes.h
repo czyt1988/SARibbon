@@ -73,6 +73,7 @@ inline QUrl tabLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/RibbonTab.qml"
 inline QUrl panelLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/RibbonPanel.qml")); }
 inline QUrl toolButtonLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/RibbonToolButton.qml")); }
 inline QUrl controlContainerLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/RibbonControlContainer.qml")); }
+inline QUrl galleryLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/RibbonGallery.qml")); }
 }
 
 // Uniform handshake contract: every leaf root declares `property QtObject

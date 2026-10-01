@@ -297,4 +297,45 @@ bool isEnableSystemDarkModeAutoSwitch()
     return systemDarkModeAutoSwitchFlag();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Gallery grid cell size shared by both front ends
+ * @details Body moved verbatim from SARibbonGalleryGroup::recalcGridSize
+ *          (grid size part); the icon-size part stays in the widgets group
+ *          because it depends on widget fontMetrics.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 画廊网格单元尺寸（双前端共用）
+ * @details 函数体自 SARibbonGalleryGroup::recalcGridSize 纯 move（网格
+ *          尺寸部分）；图标尺寸部分依赖 widgets 侧 fontMetrics，留在原处。
+ * \endif
+ */
+QSize calcGalleryGridCellSize(int galleryHeight, int displayRow, int gridMinimumWidth, int gridMaximumWidth)
+{
+    // 首先通过DisplayRow计算GridSize
+    int dr = displayRow;
+    if (dr < 1) {
+        dr = 1;
+    } else if (dr > 3) {
+        dr = 3;
+    }
+    int h = galleryHeight / dr;
+    if (h <= 1) {
+        h = galleryHeight;
+    }
+    int w = h;
+    if (gridMinimumWidth > 0) {
+        if (w < gridMinimumWidth) {
+            w = gridMinimumWidth;
+        }
+    }
+    if (gridMaximumWidth > 0) {
+        if (w > gridMaximumWidth) {
+            w = gridMaximumWidth;
+        }
+    }
+    return QSize(w, h);
+}
+
 }

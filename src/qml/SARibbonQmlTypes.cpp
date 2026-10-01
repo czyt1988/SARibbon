@@ -9,6 +9,10 @@
 #include "button/RibbonToolButton.h"
 #include "container/RibbonControlContainer.h"
 #include "category/RibbonCategory.h"
+#include "context/RibbonContextCategory.h"
+#include "gallery/RibbonGallery.h"
+#include "gallery/RibbonGalleryGroup.h"
+#include "gallery/RibbonGalleryItem.h"
 #include "tab/RibbonTab.h"
 #include "bar/RibbonBar.h"
 #include <QQmlEngine>
@@ -113,6 +117,10 @@ void saRibbonRegisterQmlTypes(QQmlEngine* engine)
     qmlRegisterType< SARibbonQml::RibbonToolButton >("SARibbon", 3, 0, "RibbonToolButton");
     qmlRegisterType< SARibbonQml::RibbonControlContainer >("SARibbon", 3, 0, "RibbonControlContainer");
     qmlRegisterType< SARibbonQml::RibbonMenuItem >("SARibbon", 3, 0, "RibbonMenuItem");
+    qmlRegisterType< SARibbonQml::RibbonContextCategory >("SARibbon", 3, 0, "RibbonContextCategory");
+    qmlRegisterType< SARibbonQml::RibbonGallery >("SARibbon", 3, 0, "RibbonGallery");
+    qmlRegisterType< SARibbonQml::RibbonGalleryGroup >("SARibbon", 3, 0, "RibbonGalleryGroup");
+    qmlRegisterType< SARibbonQml::RibbonGalleryItem >("SARibbon", 3, 0, "RibbonGalleryItem");
     // shared host bases: reachable from QML only through their subclasses,
     // registered for tooling/metaobject access (not creatable from QML)
     qmlRegisterUncreatableType< SARibbonQml::RibbonQuickHost >("SARibbon", 3, 0, "RibbonQuickHost", "Base class only");

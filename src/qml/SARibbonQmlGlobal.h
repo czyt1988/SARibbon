@@ -32,6 +32,10 @@ class RibbonControlContainer;
 class RibbonMenuItem;
 class RibbonQuickHost;
 class RibbonLayoutItemHost;
+class RibbonContextCategory;
+class RibbonGallery;
+class RibbonGalleryGroup;
+class RibbonGalleryItem;
 }
 
 /**

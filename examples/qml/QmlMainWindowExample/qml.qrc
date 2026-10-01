@@ -27,5 +27,25 @@
         <file>icon/Underline.svg</file>
         <file>icon/undo.svg</file>
         <file>icon/unlock.svg</file>
+        <file>icon/ContextCategory.svg</file>
+        <file>icon/showContext.svg</file>
+        <file>icon/deleteContext.svg</file>
+        <file>icon/gallery/Adobe.svg</file>
+        <file>icon/gallery/Document-File.svg</file>
+        <file>icon/gallery/Download-File.svg</file>
+        <file>icon/gallery/Drive-File.svg</file>
+        <file>icon/gallery/Dropbox-File.svg</file>
+        <file>icon/gallery/Email-File.svg</file>
+        <file>icon/gallery/Encode-File.svg</file>
+        <file>icon/gallery/Favorit-File.svg</file>
+        <file>icon/gallery/File-Error.svg</file>
+        <file>icon/gallery/File-Readonly.svg</file>
+        <file>icon/gallery/File-Settings.svg</file>
+        <file>icon/gallery/Google-Maps.svg</file>
+        <file>icon/gallery/Illustrator.svg</file>
+        <file>icon/gallery/Internet-Explorer.svg</file>
+        <file>icon/gallery/Photoshop.svg</file>
+        <file>icon/gallery/Presentation-File.svg</file>
+        <file>icon/gallery/Word.svg</file>
     </qresource>
 </RCC>

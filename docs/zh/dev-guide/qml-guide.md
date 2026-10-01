@@ -39,6 +39,10 @@ engine.load(QUrl("qrc:///main.qml"));
 | `RibbonToolButton` | 类型 | 按钮宿主（text/iconSource/proportion/checkable/**popupMode 三模式**/menuItems 菜单/禁用态） |
 | `RibbonControlContainer` | 类型 | 控件容器宿主（`control` 属性嵌入任意 QQuickItem：ComboBox/CheckBox/SpinBox/TextField…，对标 widgets SARibbonCtrlContainer） |
 | `RibbonMenuItem` | 类型 | 声明式菜单项（text/iconSource/enabled/separator），挂到按钮的 `menuItems` |
+| `RibbonContextCategory` | 类型 | 上下文标签宿主（contextTitle/contextColor/active；激活时 bar 追加着色 tab 并发布色带，对标 widgets SARibbonContextCategory） |
+| `RibbonGallery` | 类型 | 画廊宿主（Large 比例 + 水平伸展 + stretchFactor 参与 core 引擎加权分配；网格度量经 core `calcGalleryGridCellSize`） |
+| `RibbonGalleryGroup` | 类型 | 画廊组（groupTitle + items，默认属性 items） |
+| `RibbonGalleryItem` | 类型 | 画廊条目（text/iconSource/enabled/toolTip） |
 | `Ribbon` | 不可实例化 | 枚举持有（`Ribbon.Large` / `Ribbon.ThreeRowMode` / `Ribbon.MenuButtonPopup` / ...） |
 
 枚举一律通过 `Ribbon.` 前缀访问（如 `proportion: Ribbon.Large`），不散进各类型。
@@ -67,6 +71,41 @@ engine.load(QUrl("qrc:///main.qml"));
 `menuTriggered` 信号中转（叶子行点击 → `activateMenuItem(index)`），测试无需弹窗即可
 驱动；禁用项与分隔项被忽略。禁用态（`enabled: false`）由宿主 `click()` 吞掉点击，
 叶子以透明度呈现灰态。
+
+## 上下文标签页
+
+```qml
+RibbonContextCategory {
+    contextTitle: "context"; contextColor: "#2d7d9a"; active: false
+    RibbonCategory { title: "Page1" ... }   // 页面声明为子项，自动登记
+}
+```
+
+- 激活由 **`active` 属性**驱动（不是 item 的 visible——本项是透明结构容器，页面显隐
+  由 bar 布局控制）；激活时 bar 为每页追加一个着色 tab（`RibbonTab.contextColor`），
+  关闭时移除并钳制 currentIndex。
+- 色带经 bar 的 `contextBands` 属性发布（x/width/title/color/highlight/textColor 的
+  map 列表），由 bar 叶子渲染（z=-1 层，位于 tab 之下）；高亮色取 core
+  `SARibbonThemeData::themeContextHighlight`（与 widgets ThemeManager 安装的同一 fp）。
+- **已知陷阱**：C++ 创建的上下文 tab 挂到 bar 时会触发 bar 的 `itemChange`，必须经
+  `isOwnedContextTab` 排除，否则会被误注册为普通 tab（挤占自动 tab 名额）。
+
+## 画廊
+
+```qml
+RibbonGallery {
+    stretchFactor: 1
+    RibbonGalleryGroup { groupTitle: "Files"; RibbonGalleryItem { ... } ... }
+}
+```
+
+- 契约面对齐 widgets：Large 比例 + `expandingDirections()==Qt::Horizontal` +
+  `stretchFactor()` 参与 core 面板引擎的加权额外宽度分配（`recalcExpandGeomArray`）。
+- 网格单元尺寸 = core **`SA::calcGalleryGridCellSize`**（自 widgets
+  SARibbonGalleryGroup::recalcGridSize 下沉的双前端共性函数）；宿主发布
+  `gridSize/gridColumns/totalRows/scrollRow`，叶子只按度量摆格子。
+- 模型类（GalleryGroup/GalleryItem）用 `Q_CLASSINFO("DefaultProperty", ...)`
+  声明默认属性，声明式子项直接进列表；Repeater 代理无 QObject 父级（见叶子规范）。
 
 ## 视觉叶子规范
 

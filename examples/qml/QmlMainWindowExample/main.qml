@@ -338,6 +338,224 @@ ApplicationWindow {
                     onClicked: feedback.text = qsTr("Save clicked")
                 }
             }
+
+            // Mirrors the widgets "Context Category" panel: checkable toggles
+            // for the two context categories declared below (active drives
+            // the colored tabs + band, NOT the item visible)
+            RibbonPanel {
+                panelTitle: "Context Category"
+
+                RibbonToolButton {
+                    text: "Context Category 1"
+                    iconSource: "qrc:/icon/icon/ContextCategory.svg"
+                    proportion: Ribbon.Large
+                    checkable: true
+                    // implicit parameter injection keeps Qt 5.12 compatibility
+                    // (Qt 6.5+ only deprecates it with a warning)
+                    onToggled: {
+                        contextCategory1.active = checked;
+                        feedback.text = qsTr("context category 1 active: %1").arg(checked);
+                    }
+                }
+                RibbonToolButton {
+                    text: "Context Category 2"
+                    iconSource: "qrc:/icon/icon/ContextCategory.svg"
+                    proportion: Ribbon.Large
+                    checkable: true
+                    onToggled: {
+                        contextCategory2.active = checked;
+                        feedback.text = qsTr("context category 2 active: %1").arg(checked);
+                    }
+                }
+            }
+        }
+
+        // ---- Other ----
+        RibbonCategory {
+            title: "Other"
+
+            // Mirrors the widgets "panel one" gallery: two groups (Files +
+            // Apps), stretchFactor lets the gallery absorb the panel's extra
+            // width (core panel engine weighted distribution)
+            RibbonPanel {
+                panelTitle: "gallery"
+
+                RibbonGallery {
+                    id: gallery
+                    stretchFactor: 1
+
+                    RibbonGalleryGroup {
+                        groupTitle: "Files"
+                        RibbonGalleryItem { text: "Document File"; iconSource: "qrc:/icon/icon/gallery/Document-File.svg" }
+                        RibbonGalleryItem { text: "Download File"; iconSource: "qrc:/icon/icon/gallery/Download-File.svg" }
+                        RibbonGalleryItem { text: "Drive File Four Word"; iconSource: "qrc:/icon/icon/gallery/Drive-File.svg" }
+                        RibbonGalleryItem { text: "Dropbox File"; iconSource: "qrc:/icon/icon/gallery/Dropbox-File.svg" }
+                        RibbonGalleryItem { text: "Email File"; iconSource: "qrc:/icon/icon/gallery/Email-File.svg" }
+                        RibbonGalleryItem { text: "Encode File"; iconSource: "qrc:/icon/icon/gallery/Encode-File.svg" }
+                        RibbonGalleryItem { text: "Favorit File"; iconSource: "qrc:/icon/icon/gallery/Favorit-File.svg" }
+                        RibbonGalleryItem { text: "File Error"; iconSource: "qrc:/icon/icon/gallery/File-Error.svg" }
+                        RibbonGalleryItem { text: "File Read Only"; iconSource: "qrc:/icon/icon/gallery/File-Readonly.svg" }
+                        RibbonGalleryItem { text: "File Settings"; iconSource: "qrc:/icon/icon/gallery/File-Settings.svg" }
+                        RibbonGalleryItem { text: "Presentation File"; iconSource: "qrc:/icon/icon/gallery/Presentation-File.svg" }
+                    }
+                    RibbonGalleryGroup {
+                        groupTitle: "Apps"
+                        RibbonGalleryItem { text: "Photoshop"; iconSource: "qrc:/icon/icon/gallery/Photoshop.svg" }
+                        RibbonGalleryItem { text: "Internet Explorer"; iconSource: "qrc:/icon/icon/gallery/Internet-Explorer.svg" }
+                        RibbonGalleryItem { text: "Illustrator"; iconSource: "qrc:/icon/icon/gallery/Illustrator.svg" }
+                        RibbonGalleryItem { text: "Google Maps"; iconSource: "qrc:/icon/icon/gallery/Google-Maps.svg" }
+                        RibbonGalleryItem { text: "Adobe"; iconSource: "qrc:/icon/icon/gallery/Adobe.svg" }
+                        RibbonGalleryItem { text: "Word"; iconSource: "qrc:/icon/icon/gallery/Word.svg" }
+                    }
+                    onTriggered: feedback.text = qsTr("gallery: %1 triggered").arg(item.text)
+                }
+            }
+
+            RibbonPanel {
+                panelTitle: "gallery controls"
+
+                RibbonToolButton {
+                    text: "Switch Group"
+                    iconSource: "qrc:/icon/icon/item.svg"
+                    proportion: Ribbon.Small
+                    onClicked: {
+                        gallery.currentGroupIndex = (gallery.currentGroupIndex + 1) % 2;
+                        feedback.text = qsTr("gallery group switched: %1").arg(gallery.currentGroupIndex);
+                    }
+                }
+                RibbonToolButton {
+                    text: "Scroll"
+                    iconSource: "qrc:/icon/icon/redo.svg"
+                    proportion: Ribbon.Small
+                    onClicked: {
+                        gallery.scrollDown();
+                        feedback.text = qsTr("gallery scrolled to row %1").arg(gallery.scrollRow);
+                    }
+                }
+            }
+        }
+
+        // ---- Context Category 1 (mirrors the widgets context demo) ----
+        RibbonContextCategory {
+            id: contextCategory1
+            contextTitle: "context"
+            contextColor: "#2d7d9a"
+            active: false
+
+            RibbonCategory {
+                title: "context Page1"
+
+                RibbonPanel {
+                    panelTitle: "show and hide test"
+
+                    RibbonToolButton {
+                        text: "Disable"
+                        iconSource: "qrc:/icon/icon/enableTest.svg"
+                        proportion: Ribbon.Large
+                        enabled: false
+                        onClicked: feedback.text = qsTr("never fires while disabled")
+                    }
+                    RibbonToolButton {
+                        text: "unlock"
+                        iconSource: "qrc:/icon/icon/unlock.svg"
+                        proportion: Ribbon.Large
+                        onClicked: feedback.text = qsTr("unlock clicked")
+                    }
+                    RibbonToolButton {
+                        text: "1"
+                        iconSource: "qrc:/icon/icon/setText.svg"
+                        proportion: Ribbon.Large
+                        toolTip: "very short string"
+                        onClicked: feedback.text = qsTr("short text clicked")
+                    }
+                }
+
+                RibbonPanel {
+                    panelTitle: "widget"
+
+                    RibbonControlContainer {
+                        text: "spinbox:"
+                        control: SpinBox {
+                            onValueModified: feedback.text = qsTr("context spinbox: %1").arg(value)
+                        }
+                    }
+                    RibbonControlContainer {
+                        text: "linedit:"
+                        control: TextField {
+                            placeholderText: qsTr("context line edit")
+                            onEditingFinished: feedback.text = qsTr("context line edit: %1").arg(text)
+                        }
+                    }
+                }
+            }
+
+            RibbonCategory {
+                title: "context Page2"
+
+                RibbonPanel {
+                    panelTitle: "popup zoo"
+
+                    RibbonToolButton {
+                        text: "Instant Popup"
+                        iconSource: "qrc:/icon/icon/folder-stats.svg"
+                        proportion: Ribbon.Large
+                        popupMode: Ribbon.InstantPopup
+                        menuItems: [
+                            RibbonMenuItem { text: "ctx item 1"; iconSource: "qrc:/icon/icon/item.svg" },
+                            RibbonMenuItem { text: "ctx item 2"; iconSource: "qrc:/icon/icon/item.svg" }
+                        ]
+                        onMenuTriggered: feedback.text = qsTr("context menu: %1").arg(item.text)
+                    }
+                    RibbonToolButton {
+                        text: "Menu Button Popup"
+                        iconSource: "qrc:/icon/icon/folder-star.svg"
+                        proportion: Ribbon.Large
+                        popupMode: Ribbon.MenuButtonPopup
+                        menuItems: [
+                            RibbonMenuItem { text: "ctx item 1"; iconSource: "qrc:/icon/icon/item.svg" }
+                        ]
+                        onMenuTriggered: feedback.text = qsTr("context menu: %1").arg(item.text)
+                    }
+                }
+            }
+        }
+
+        // ---- Context Category 2 (multi-page structure demo) ----
+        RibbonContextCategory {
+            id: contextCategory2
+            contextTitle: "context2"
+            contextColor: "#217346"
+            active: false
+
+            RibbonCategory {
+                title: "context2 Page1"
+
+                RibbonPanel {
+                    panelTitle: "page one"
+
+                    RibbonToolButton {
+                        text: "Hello"
+                        iconSource: "qrc:/icon/icon/showContext.svg"
+                        proportion: Ribbon.Large
+                        onClicked: feedback.text = qsTr("context2 page one clicked")
+                    }
+                }
+            }
+
+            RibbonCategory {
+                title: "context2 Page2"
+
+                RibbonPanel {
+                    panelTitle: "page two"
+
+                    RibbonToolButton {
+                        text: "World"
+                        iconSource: "qrc:/icon/icon/showContext.svg"
+                        proportion: Ribbon.Large
+                        onClicked: feedback.text = qsTr("context2 page two clicked")
+                    }
+                }
+            }
         }
     }
 

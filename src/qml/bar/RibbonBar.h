@@ -3,13 +3,16 @@
 #include "SARibbonQmlGlobal.h"
 #include "../host/RibbonQuickHost.h"
 #include <SARibbonCore/SARibbonBarGeometryEngine.h>
+#include <QHash>
 #include <QRectF>
+#include <QVariantList>
 #include <QVector>
 
 namespace SARibbonQml {
 
 class RibbonCategory;
 class RibbonTab;
+class RibbonContextCategory;
 
 /**
  * \if ENGLISH
@@ -43,6 +46,7 @@ class RibbonBar : public RibbonQuickHost
     Q_PROPERTY(int titleBarHeight READ titleBarHeight NOTIFY layoutChanged)
     Q_PROPERTY(int categoryRowY READ categoryRowY NOTIFY layoutChanged)
     Q_PROPERTY(QRectF applicationButtonRect READ applicationButtonRect NOTIFY layoutChanged)
+    Q_PROPERTY(QVariantList contextBands READ contextBands NOTIFY layoutChanged)
 public:
     explicit RibbonBar(QQuickItem* parent = nullptr);
     ~RibbonBar() override;
@@ -67,8 +71,19 @@ public:
     void registerTab(RibbonTab* tab);
     void unregisterTab(RibbonTab* tab);
 
+    // Context categories: registered automatically when declared as children;
+    // active ones append colored tabs (one per page) after the normal tabs
+    // and publish their bands through the contextBands property
+    void registerContext(RibbonContextCategory* ctx);
+    void unregisterContext(RibbonContextCategory* ctx);
+
     // title free area (engine-computed); QML side binds the window title text
     QRectF titleRect() const;
+
+    // Active context bands for the visual leaf: list of maps
+    // {x, width, title, color, highlight, textColor}; y/height derive from
+    // the published tabBar/titleBar metrics (band spans them, under the tabs)
+    QVariantList contextBands() const;
 
 Q_SIGNALS:
     void currentIndexChanged();
@@ -91,12 +106,21 @@ private:
     void relayout();
     void syncTabCount();
     RibbonTab* createAutoTab(int index);
+    void rebuildContextTabs(RibbonContextCategory* ctx);
+    void syncContextSignals(RibbonContextCategory* ctx);
+    bool isOwnedContextTab(RibbonTab* tab) const;
+    int effectiveTabCount() const;
+    QVector< RibbonTab* > effectiveTabs() const;
+    QVector< RibbonCategory* > effectiveCategories() const;
 
     int mCurrentIndex = 0;
     QString mApplicationLabel;
     QVector< RibbonCategory* > mCategories;
     QVector< RibbonTab* > mTabs;      ///< explicit + auto tabs in row order
     QVector< RibbonTab* > mAutoTabs;  ///< subset owned (and destroyed) by this bar
+    QVector< RibbonContextCategory* > mContexts;  ///< declared context categories
+    QHash< RibbonContextCategory*, QVector< RibbonTab* > > mContextTabs;  ///< per-context page tabs (owned)
+    QVariantList mBands;
     QRect mTitleRect;
     QRectF mApplicationButtonRect;
     int mTabBarHeight   = 0;

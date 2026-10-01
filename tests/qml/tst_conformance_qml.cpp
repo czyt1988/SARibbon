@@ -1,17 +1,23 @@
 #include <QtTest>
 #include <QQuickView>
 #include <QQuickItem>
+#include <QQuickWindow>
 #include <QQmlEngine>
 #include <QQmlContext>
 #include <QQmlComponent>
 #include <QSignalSpy>
 #include <QFile>
 #include <QImageReader>
+#include <QImage>
 #include <memory>
 #include <functional>
 #include <SARibbonQml/SARibbonQmlGlobal.h>
+#include <SARibbonCore/SARibbonCoreUtil.h>
 #include <SARibbonQml/button/RibbonToolButton.h>
 #include <SARibbonQml/container/RibbonControlContainer.h>
+#include <SARibbonQml/gallery/RibbonGallery.h>
+#include <SARibbonQml/gallery/RibbonGalleryGroup.h>
+#include <SARibbonQml/gallery/RibbonGalleryItem.h>
 #include <SARibbonQml/menu/RibbonMenuItem.h>
 #include "../common/RibbonConformance.h"
 
@@ -33,9 +39,12 @@ private Q_SLOTS:
     void svgIconLoads();
     void toolButtonPopupStates();
     void controlContainerEmbedding();
+    void contextCategoryActivation();
+    void galleryInPanel();
 
 private:
     QQuickView* exposeScene(QQmlEngine& engine, QQmlComponent& component, const char* src, int w, int h);
+    static int countPixelsNear(const QImage& img, const QColor& color, int tolerance = 8);
 };
 
 void TestConformanceQml::panelThreeRowMixed()
@@ -577,6 +586,271 @@ Item {
     QObject* comboPopup = combo->property("popup").value< QObject* >();
     QVERIFY(comboPopup);
     QTRY_COMPARE(comboPopup->property("visible").toBool(), true);
+}
+
+int TestConformanceQml::countPixelsNear(const QImage& img, const QColor& color, int tolerance)
+{
+    int count = 0;
+    for (int y = 0; y < img.height(); ++y) {
+        for (int x = 0; x < img.width(); ++x) {
+            const QRgb rgb = img.pixel(x, y);
+            if (qAbs(qRed(rgb) - color.red()) <= tolerance && qAbs(qGreen(rgb) - color.green()) <= tolerance
+                && qAbs(qBlue(rgb) - color.blue()) <= tolerance) {
+                ++count;
+            }
+        }
+    }
+    return count;
+}
+
+/**
+ * @brief Context category activation: colored tabs + band + switching
+ * @details Mirrors the widgets showContextCategory/hideContextCategory
+ *          semantics: active appends one colored tab per page to the tab
+ *          row, publishes the band (title/color/highlight through the core
+ *          theme fp), and the current index can walk into the context
+ *          pages; deactivation removes them and clamps the index back.
+ *          The band color is verified on the real rendered frame
+ *          (QQuickWindow::grabWindow pixel count).
+ */
+void TestConformanceQml::contextCategoryActivation()
+{
+    QQmlEngine engine;
+    saRibbonRegisterQmlTypes(&engine);
+
+    QString src = QStringLiteral(R"QML(import QtQuick 2.12
+import SARibbon 3.0
+Item {
+    width: 800
+    height: 300
+    RibbonBar {
+        objectName: "bar"
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        RibbonCategory {
+            objectName: "normal"
+            title: "Home"
+            RibbonPanel {
+                panelTitle: "P"
+                RibbonToolButton { text: "A" }
+            }
+        }
+        RibbonContextCategory {
+            objectName: "ctx"
+            contextTitle: "context"
+            contextColor: "#2d7d9a"
+            active: false
+            RibbonCategory {
+                objectName: "page1"
+                title: "ctx Page1"
+                RibbonPanel {
+                    panelTitle: "CP"
+                    RibbonToolButton { objectName: "ctxBtn"; text: "B" }
+                }
+            }
+            RibbonCategory {
+                objectName: "page2"
+                title: "ctx Page2"
+                RibbonPanel { panelTitle: "CP2" }
+            }
+        }
+    }
+})QML");
+
+    QQmlComponent component(&engine);
+    std::unique_ptr< QQuickView > view(exposeScene(engine, component, src.toUtf8().constData(), 800, 300));
+    QVERIFY(view);
+    QQuickItem* rootItem = view->rootObject();
+    QVERIFY(rootItem);
+
+    auto* bar     = rootItem->findChild< QQuickItem* >(QStringLiteral("bar"));
+    auto* ctx     = rootItem->findChild< QQuickItem* >(QStringLiteral("ctx"));
+    auto* page1   = rootItem->findChild< QQuickItem* >(QStringLiteral("page1"));
+    auto* page2   = rootItem->findChild< QQuickItem* >(QStringLiteral("page2"));
+    QVERIFY(bar && ctx && page1 && page2);
+
+    // count VISIBLE tab hosts (exact class name — the leaf meta names also
+    // CONTAIN "RibbonTab"; context-owned tabs are created eagerly but stay
+    // hidden until their context activates)
+    auto countTabs = [rootItem]() -> int {
+        int n = 0;
+        const auto all = rootItem->findChildren< QQuickItem* >();
+        for (QQuickItem* item : all) {
+            if (QString::fromLatin1(item->metaObject()->className()) == QLatin1String("SARibbonQml::RibbonTab")
+                && item->isVisible()) {
+                ++n;
+            }
+        }
+        return n;
+    };
+    const int tabsBefore = [&]() {
+        for (int i = 0; i < 50; ++i) {
+            if (countTabs() >= 1) {
+                break;
+            }
+            QTest::qWait(20);  // auto tabs appear after the first relayout pass
+        }
+        return countTabs();
+    }();
+    QVERIFY2(tabsBefore >= 1, "the normal tab must be visible after relayout");
+    QVERIFY(bar->property("contextBands").toList().isEmpty());
+    QVERIFY(!page1->isVisible() && !page2->isVisible());
+
+    // ---- activation: tabs + band appear, index can walk into the pages ----
+    ctx->setProperty("active", true);
+    QTRY_COMPARE(countTabs(), tabsBefore + 2);
+    const QVariantList bands = bar->property("contextBands").toList();
+    QCOMPARE(bands.size(), 1);
+    {
+        const QVariantMap band = bands.at(0).toMap();
+        QCOMPARE(band.value(QStringLiteral("title")).toString(), QStringLiteral("context"));
+        QVERIFY(band.value(QStringLiteral("width")).toReal() > 0);
+        QVERIFY(band.value(QStringLiteral("highlight")).value< QColor >().isValid());
+    }
+    // switch onto the first context page through the property API
+    bar->setProperty("currentIndex", tabsBefore);
+    QTRY_VERIFY(page1->isVisible());
+    QVERIFY(!page2->isVisible());
+    bar->setProperty("currentIndex", tabsBefore + 1);
+    QTRY_VERIFY(page2->isVisible());
+
+    // the rendered frame carries the band color in the title area
+    const QImage frame = view->grabWindow();
+    QVERIFY(!frame.isNull());
+    QVERIFY2(countPixelsNear(frame, QColor(0x2d, 0x7d, 0x9a)) > 200,
+             "context band color must be visible in the rendered frame");
+
+    // ---- deactivation: tabs vanish, the index clamps back to normal tabs ----
+    ctx->setProperty("active", false);
+    QTRY_COMPARE(countTabs(), tabsBefore);
+    QTRY_VERIFY(bar->property("currentIndex").toInt() < tabsBefore);
+    QTRY_VERIFY(!page1->isVisible() && !page2->isVisible());
+    QVERIFY(bar->property("contextBands").toList().isEmpty());
+}
+
+/**
+ * @brief Gallery: expanding panel item with core grid metrics + activation
+ * @details Mirrors the widgets SARibbonGallery contract: Large cell,
+ *          expandingDirections Horizontal, stretchFactor feeding the core
+ *          engine's extra-width distribution; cell size derives from the
+ *          core calcGalleryGridCellSize (moved from the widgets group, so
+ *          both front ends agree), scrolling clamps, and activation is
+ *          mediated by triggered.
+ */
+void TestConformanceQml::galleryInPanel()
+{
+    QQmlEngine engine;
+    saRibbonRegisterQmlTypes(&engine);
+
+    QString src = QStringLiteral(R"QML(import QtQuick 2.12
+import SARibbon 3.0
+Item {
+    width: 700
+    height: 300
+    RibbonPanel {
+        objectName: "panel"
+        anchors.fill: parent
+        panelTitle: "Gallery Panel"
+        RibbonGallery {
+            objectName: "gallery"
+            stretchFactor: 1
+            RibbonGalleryGroup {
+                groupTitle: "Files"
+                RibbonGalleryItem { text: "one" }
+                RibbonGalleryItem { text: "two" }
+                RibbonGalleryItem { text: "three" }
+                RibbonGalleryItem { text: "four" }
+                RibbonGalleryItem { text: "five" }
+                RibbonGalleryItem { text: "six" }
+                RibbonGalleryItem { text: "seven" }
+                RibbonGalleryItem { text: "eight" }
+                RibbonGalleryItem { text: "nine" }
+                RibbonGalleryItem { text: "ten" }
+            }
+            RibbonGalleryGroup {
+                groupTitle: "Apps"
+                RibbonGalleryItem { text: "alpha" }
+                RibbonGalleryItem { text: "beta" }
+            }
+        }
+    }
+})QML");
+
+    QQmlComponent component(&engine);
+    std::unique_ptr< QQuickView > view(exposeScene(engine, component, src.toUtf8().constData(), 700, 300));
+    QVERIFY(view);
+    QQuickItem* rootItem = view->rootObject();
+    QVERIFY(rootItem);
+
+    auto* gallery = rootItem->findChild< QQuickItem* >(QStringLiteral("gallery"));
+    QVERIFY(gallery);
+    QTRY_VERIFY(gallery->width() > 0 && gallery->height() > 0);
+
+    // ---- contract face: expanding + stretch feed the core engine ----
+    auto* host = qobject_cast< SARibbonQml::RibbonGallery* >(gallery);
+    QVERIFY(host);
+    QCOMPARE(host->expandingDirections(), Qt::Orientations(Qt::Horizontal));
+    QCOMPARE(host->stretchFactor(), 1);
+    QVERIFY(gallery->width() >= 200);  // base width at least (widgets minimum)
+
+    // ---- grid metrics: cell size identical to the core helper ----
+    const QSize cell = gallery->property("gridSize").toSize();
+    const QSize expectCell
+        = SA::calcGalleryGridCellSize(int(gallery->height()) - 2, gallery->property("displayRow").toInt(),
+                                      gallery->property("gridMinimumWidth").toInt(), 0);
+    QCOMPARE(cell, expectCell);
+    QVERIFY(cell.width() >= 80);
+    QVERIFY(gallery->property("gridColumns").toInt() >= 1);
+    // 10 items / columns -> totalRows follows
+    const int columns = gallery->property("gridColumns").toInt();
+    const int expectRows = (10 + columns - 1) / columns;
+    QCOMPARE(gallery->property("totalRows").toInt(), expectRows);
+
+    // ---- scrolling clamps against totalRows - displayRow (derive the bound
+    // from the actual layout: a wide gallery fits everything in one screen) ----
+    const int maxScroll = qMax(expectRows - gallery->property("displayRow").toInt(), 0);
+    QMetaObject::invokeMethod(gallery, "scrollDown");
+    QMetaObject::invokeMethod(gallery, "scrollDown");
+    QMetaObject::invokeMethod(gallery, "scrollDown");
+    QTRY_COMPARE(gallery->property("scrollRow").toInt(), maxScroll);
+    QMetaObject::invokeMethod(gallery, "scrollUp");
+    QTRY_COMPARE(gallery->property("scrollRow").toInt(), qMax(maxScroll - 1, 0));
+
+    // ---- group switch ----
+    gallery->setProperty("currentGroupIndex", 1);
+    QTRY_COMPARE(gallery->property("totalRows").toInt(), 1);  // 2 items, >=1 column
+    gallery->setProperty("currentGroupIndex", 0);
+    QTRY_COMPARE(gallery->property("totalRows").toInt(), expectRows);
+
+    // ---- activation mediated by triggered ----
+    QSignalSpy trigSpy(gallery, SIGNAL(triggered(SARibbonQml::RibbonGalleryItem*, int)));
+    QMetaObject::invokeMethod(gallery, "activateItem", Q_ARG(int, 2));
+    QCOMPARE(trigSpy.size(), 1);
+    {
+        auto* item = qvariant_cast< QObject* >(trigSpy.at(0).at(0));
+        QVERIFY(item);
+        QCOMPARE(item->property("text").toString(), QStringLiteral("three"));
+        QCOMPARE(trigSpy.at(0).at(1).toInt(), 2);
+    }
+    QMetaObject::invokeMethod(gallery, "activateItem", Q_ARG(int, 99));  // out of range
+    QCOMPARE(trigSpy.size(), 1);
+
+    // ---- the grid renders (frame carries non-background content in the
+    // gallery area: cell hover/press styling aside, the captions render) ----
+    const QImage frame = view->grabWindow();
+    QVERIFY(!frame.isNull());
+    const QPointF galPos = gallery->mapToScene(QPointF(0, 0));
+    int ink = 0;
+    for (int y = int(galPos.y()); y < int(galPos.y() + gallery->height()) && y < frame.height(); ++y) {
+        for (int x = int(galPos.x()); x < int(galPos.x() + gallery->width()) && x < frame.width(); ++x) {
+            const QRgb rgb = frame.pixel(x, y);
+            if (qAbs(qRed(rgb) - 255) > 12 || qAbs(qGreen(rgb) - 255) > 12 || qAbs(qBlue(rgb) - 255) > 12) {
+                ++ink;
+            }
+        }
+    }
+    QVERIFY2(ink > 300, "gallery grid must render visible content (items + strip + frame)");
 }
 
 QTEST_MAIN(TestConformanceQml)

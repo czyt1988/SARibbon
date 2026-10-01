@@ -43,6 +43,10 @@ first engine; a second engine gets nullptr (verified against Qt 5.14/6.7 sources
 | `RibbonToolButton` | type | button host (text/iconSource/proportion/checkable/**three popupModes**/menuItems menu/disabled state) |
 | `RibbonControlContainer` | type | control container host (the `control` property embeds any QQuickItem: ComboBox/CheckBox/SpinBox/TextField/...; widgets SARibbonCtrlContainer counterpart) |
 | `RibbonMenuItem` | type | declarative menu entry (text/iconSource/enabled/separator) attached to a button's `menuItems` |
+| `RibbonContextCategory` | type | context category host (contextTitle/contextColor/active; activation appends colored tabs and publishes the band; widgets SARibbonContextCategory counterpart) |
+| `RibbonGallery` | type | gallery host (Large proportion + horizontal expanding + stretchFactor joins the core engine's weighted distribution; grid metrics via core `calcGalleryGridCellSize`) |
+| `RibbonGalleryGroup` | type | gallery group (groupTitle + items, default property items) |
+| `RibbonGalleryItem` | type | gallery entry (text/iconSource/enabled/toolTip) |
 | `Ribbon` | uncreatable | enum holder (`Ribbon.Large` / `Ribbon.ThreeRowMode` / `Ribbon.MenuButtonPopup` / ...) |
 
 Access enums through the `Ribbon.` prefix (e.g. `proportion: Ribbon.Large`).
@@ -77,6 +81,49 @@ always mediated by the host's `menuTriggered` signal (leaf row click ->
 `activateMenuItem(index)`), so tests can drive it without a windowed popup;
 disabled entries and separators are ignored. A disabled host (`enabled: false`)
 swallows clicks in `click()`; the leaf renders the grey state via opacity.
+
+## Context Categories
+
+```qml
+RibbonContextCategory {
+    contextTitle: "context"; contextColor: "#2d7d9a"; active: false
+    RibbonCategory { title: "Page1" ... }   // pages declared as children
+}
+```
+
+- Activation is driven by the **`active` property** — NOT the item visible
+  (the context is a transparent structural container; the bar layout controls
+  page visibility). While active, the bar appends one colored tab per page
+  (`RibbonTab.contextColor`); deactivation removes them and clamps
+  currentIndex.
+- Bands are published through the bar's `contextBands` property (a list of
+  x/width/title/color/highlight/textColor maps) and rendered by the bar leaf
+  (z=-1, under the tabs); the highlight color comes from core
+  `SARibbonThemeData::themeContextHighlight` (the same fp the widgets
+  ThemeManager installs).
+- **Known trap**: C++-created context tabs fire the bar's itemChange when
+  parented onto it — they MUST be excluded via `isOwnedContextTab`, or they
+  get adopted as normal tabs (eating an auto-tab slot).
+
+## Gallery
+
+```qml
+RibbonGallery {
+    stretchFactor: 1
+    RibbonGalleryGroup { groupTitle: "Files"; RibbonGalleryItem { ... } ... }
+}
+```
+
+- The contract face matches the widgets gallery: Large proportion +
+  `expandingDirections()==Qt::Horizontal` + `stretchFactor()` joining the core
+  panel engine's weighted extra-width distribution (`recalcExpandGeomArray`).
+- Grid cell sizes derive from the core **`SA::calcGalleryGridCellSize`**
+  (moved from the widgets SARibbonGalleryGroup::recalcGridSize — shared by
+  both front ends); the host publishes gridSize/gridColumns/totalRows/
+  scrollRow, the leaf only places cells inside those metrics.
+- The model classes (GalleryGroup/GalleryItem) declare their default property
+  via `Q_CLASSINFO("DefaultProperty", ...)` so declarative children join the
+  lists directly; Repeater delegates carry no QObject parent (see leaf rules).
 
 ## Visual Leaf Rules
 

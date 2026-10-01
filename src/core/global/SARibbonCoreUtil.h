@@ -73,6 +73,34 @@ void SA_RIBBON_CORE_EXPORT setEnableSystemDarkModeAutoSwitch(bool on);
 // Query whether automatic theme switching by operating system dark mode is enabled
 bool SA_RIBBON_CORE_EXPORT isEnableSystemDarkModeAutoSwitch();
 
+/**
+ * \if ENGLISH
+ * @brief Gallery grid cell size shared by both front ends
+ * @param galleryHeight The gallery body height (cell height derives from it)
+ * @param displayRow Visible grid rows, clamped to [1, 3]
+ * @param gridMinimumWidth Minimum cell width (<= 0 disables the lower bound)
+ * @param gridMaximumWidth Maximum cell width (<= 0 disables the upper bound)
+ * @return (width, height) of one grid cell
+ * @details Moved from SARibbonGalleryGroup::recalcGridSize so the QML gallery
+ *          derives identical cells from identical inputs.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 画廊网格单元尺寸（双前端共用）
+ * @param galleryHeight 画廊主体高度（单元高度由此推导）
+ * @param displayRow 可见网格行数，钳制到 [1, 3]
+ * @param gridMinimumWidth 单元最小宽度（<= 0 关闭下限）
+ * @param gridMaximumWidth 单元最大宽度（<= 0 关闭上限）
+ * @return 单个网格单元的 (width, height)
+ * @details 自 SARibbonGalleryGroup::recalcGridSize 下沉，QML 画廊以相同
+ *          输入推导出相同单元。
+ * \endif
+ */
+QSize SA_RIBBON_CORE_EXPORT calcGalleryGridCellSize(int galleryHeight,
+                                                    int displayRow,
+                                                    int gridMinimumWidth,
+                                                    int gridMaximumWidth);
+
 }
 
 #endif  // SARIBBONCOREUTIL_H

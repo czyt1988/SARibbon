@@ -4,6 +4,7 @@
 #include <QActionGroup>
 #include <QItemSelectionModel>
 #include "SARibbonElementManager.h"
+#include <SARibbonCore/SARibbonCoreUtil.h>
 /**
  * @brief The SARibbonGalleryGroupPrivate class
  */
@@ -597,29 +598,15 @@ void SARibbonGalleryGroup::recalcGridSize()
  */
 void SARibbonGalleryGroup::recalcGridSize(int galleryHeight)
 {
-    // 首先通过DisplayRow计算GridSize
-    int dr = static_cast< int >(displayRow());
-    if (dr < 1) {
-        dr = 1;
-    } else if (dr > 3) {
-        dr = 3;
-    }
-    int h = galleryHeight / dr;
-    if (h <= 1) {
-        h = galleryHeight;
-    }
-    int w = h;
-    if (gridMinimumWidth() > 0) {
-        if (w < gridMinimumWidth()) {
-            w = gridMinimumWidth();
-        }
-    }
-    if (gridMaximumWidth() > 0) {
-        if (w > gridMaximumWidth()) {
-            w = gridMaximumWidth();
-        }
-    }
-    setGridSize(QSize(w, h));
+    // 网格尺寸经 core 共性函数推导（QML 画廊同源）；图标尺寸依赖 widgets
+    // 侧 fontMetrics，留在本函数内
+    const QSize gs = SA::calcGalleryGridCellSize(galleryHeight,
+                                                 static_cast< int >(displayRow()),
+                                                 gridMinimumWidth(),
+                                                 gridMaximumWidth());
+    setGridSize(gs);
+    const int w = gs.width();
+    const int h = gs.height();
     // 在通过GalleryGroupStyle确定icon的尺寸
     const int shiftpix =
         4;  // 这个是移动像素，qt在鼠标移动到图标上时会移动一下，给用户明确的动态，导致如果布局很满会超出显示范围，因此要在此基础上缩放一点

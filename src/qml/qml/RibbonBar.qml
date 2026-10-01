@@ -12,7 +12,9 @@ Rectangle {
     onCppHostChanged: if (cppHost) cppHost.qmlLeaf = root
 
     readonly property int categoryRowY: cppHost ? cppHost.categoryRowY : 0
+    readonly property int titleBarHeight: cppHost ? cppHost.titleBarHeight : 0
     readonly property rect appRect: cppHost && cppHost.applicationButtonRect.width > 0 ? cppHost.applicationButtonRect : Qt.rect(0, 0, 0, 0)
+    readonly property var bands: cppHost ? cppHost.contextBands : []
 
     anchors.fill: parent
     color: RibbonTheme.accent
@@ -24,6 +26,43 @@ Rectangle {
         width: parent.width
         height: Math.max(parent.height - root.categoryRowY, 0)
         color: RibbonTheme.contentBg
+    }
+
+    // context category bands: span their tabs from the bar top through the
+    // tab row (widgets paintContextCategoryTab parity: base color + 5px
+    // vibrant highlight + centered title). This leaf sits at z=-1, so the
+    // structural tab items render on top of the band.
+    Repeater {
+        model: root.bands
+        Item {
+            x: modelData.x
+            y: 0
+            width: modelData.width
+            height: Math.max(root.categoryRowY - 1, 0)
+            Rectangle {
+                anchors.fill: parent
+                color: modelData.color
+            }
+            Rectangle {
+                anchors.top: parent.top
+                anchors.left: parent.left
+                anchors.right: parent.right
+                height: 5
+                color: modelData.highlight
+            }
+            Text {
+                x: 0
+                y: 5
+                width: parent.width
+                height: Math.max(root.titleBarHeight - 5, 0)
+                text: modelData.title
+                visible: text.length > 0 && height > 0
+                color: modelData.textColor
+                elide: Text.ElideRight
+                horizontalAlignment: Text.AlignHCenter
+                verticalAlignment: Text.AlignVCenter
+            }
+        }
     }
 
     // application button (widgets: vertically expanding, spans title+tab row;

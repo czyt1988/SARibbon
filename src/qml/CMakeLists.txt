@@ -17,12 +17,20 @@ sa_add_library(SARibbonQml
         metrics/RibbonMetrics.cpp
         menu/RibbonMenuItem.h
         menu/RibbonMenuItem.cpp
+        context/RibbonContextCategory.h
+        context/RibbonContextCategory.cpp
         panel/RibbonPanel.h
         panel/RibbonPanel.cpp
         button/RibbonToolButton.h
         button/RibbonToolButton.cpp
         container/RibbonControlContainer.h
         container/RibbonControlContainer.cpp
+        gallery/RibbonGallery.h
+        gallery/RibbonGallery.cpp
+        gallery/RibbonGalleryGroup.h
+        gallery/RibbonGalleryGroup.cpp
+        gallery/RibbonGalleryItem.h
+        gallery/RibbonGalleryItem.cpp
         category/RibbonCategory.h
         category/RibbonCategory.cpp
         tab/RibbonTab.h
