@@ -1,4 +1,5 @@
 import QtQuick 2.12
+import QtQuick.Controls 2.12
 import SARibbon 3.0
 
 // RibbonBar default visual leaf: office-2021 flavored. Geometry authority
@@ -15,6 +16,18 @@ Rectangle {
     readonly property int titleBarHeight: cppHost ? cppHost.titleBarHeight : 0
     readonly property rect appRect: cppHost && cppHost.applicationButtonRect.width > 0 ? cppHost.applicationButtonRect : Qt.rect(0, 0, 0, 0)
     readonly property var bands: cppHost ? cppHost.contextBands : []
+    readonly property bool hasAppMenu: cppHost ? cppHost.hasApplicationMenu : false
+
+    // ---- entry points (app menu) ----
+    function openAppMenu()
+    {
+        if (!appMenuLoader.active) {
+            appMenuLoader.active = true;  // lazy creation (see note below)
+        }
+        if (appMenuLoader.item && !appMenuLoader.item.visible) {
+            appMenuLoader.item.open();
+        }
+    }
 
     anchors.fill: parent
     color: RibbonTheme.accent
@@ -98,7 +111,106 @@ Rectangle {
             id: appMouse
             anchors.fill: parent
             hoverEnabled: true
-            onClicked: if (root.cppHost) root.cppHost.applicationButtonClicked()
+            onClicked: {
+                // menu-mode app button (widgets USE_APPLICATION_NORMAL_MENU):
+                // entries open the styled popup; the clicked signal always fires
+                if (root.hasAppMenu) {
+                    root.openAppMenu();
+                }
+                if (root.cppHost) {
+                    root.cppHost.applicationButtonClicked();
+                }
+            }
+        }
+    }
+
+    // ---- application menu (styled popup over theme tokens) ----
+    // NOTE: the popup is created LAZILY on first open. A Popup instantiated
+    // eagerly inside a bar leaf (during the bar's componentComplete, before
+    // the scene window is realized) becomes a standalone native window and
+    // breaks the main window's scene — observed as a blank 1316x499 main
+    // window plus a stray 336x179 popup window (round 4 bisect).
+    Loader {
+        id: appMenuLoader
+        active: false
+        sourceComponent: appMenuComponent
+    }
+    Component {
+        id: appMenuComponent
+        Popup {
+            id: appMenu
+            x: root.appRect.x
+            y: root.appRect.y + root.appRect.height
+            width: appMenuColumn.implicitWidth + 2
+            height: appMenuColumn.implicitHeight + 2
+            padding: 1
+            closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+            background: Rectangle {
+                color: RibbonTheme.contentBg
+                border.color: RibbonTheme.menuBorder
+                radius: 4
+            }
+            contentItem: Column {
+                id: appMenuColumn
+                Repeater {
+                    model: root.cppHost ? root.cppHost.applicationMenuItems : []
+                    Item {
+                        objectName: modelData.separator ? "appMenuSeparator" : "appMenuRow"
+                        width: Math.max(160, appRowText.implicitWidth + appRowIcon.width + 30)
+                        height: modelData.separator ? 9 : 26
+                        enabled: modelData.enabled
+                        Rectangle {
+                            visible: modelData.separator
+                            anchors.centerIn: parent
+                            width: parent.width - 8
+                            height: 1
+                            color: RibbonTheme.separator
+                        }
+                        Rectangle {
+                            visible: !modelData.separator
+                            anchors.fill: parent
+                            anchors.margins: 1
+                            radius: 3
+                            color: appRowMouse.pressed ? RibbonTheme.contentPressedBg
+                                   : (appRowMouse.containsMouse ? RibbonTheme.contentHoverBg : RibbonTheme.contentBg)
+                        }
+                        Row {
+                            visible: !modelData.separator
+                            anchors.verticalCenter: parent.verticalCenter
+                            anchors.left: parent.left
+                            anchors.leftMargin: 6
+                            spacing: 4
+                            Image {
+                                id: appRowIcon
+                                anchors.verticalCenter: parent.verticalCenter
+                                width: modelData.iconSource ? 16 : 0
+                                height: 16
+                                source: modelData.iconSource
+                                fillMode: Image.PreserveAspectFit
+                                opacity: modelData.enabled ? 1.0 : 0.45
+                            }
+                            Text {
+                                id: appRowText
+                                anchors.verticalCenter: parent.verticalCenter
+                                text: modelData.text
+                                color: RibbonTheme.textColor
+                                opacity: modelData.enabled ? 1.0 : 0.45
+                            }
+                        }
+                        MouseArea {
+                            id: appRowMouse
+                            visible: !modelData.separator
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            enabled: modelData.enabled
+                            onClicked: {
+                                root.cppHost.activateApplicationMenuItem(index);
+                                appMenu.close();
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 }

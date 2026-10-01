@@ -37,6 +37,8 @@ class RibbonGallery;
 class RibbonGalleryGroup;
 class RibbonGalleryItem;
 class RibbonSeparator;
+class RibbonQuickAccessBar;
+class RibbonButtonGroup;
 }
 
 /**

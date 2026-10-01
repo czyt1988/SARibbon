@@ -20,7 +20,66 @@ ApplicationWindow {
         anchors.top: parent.top
 
         applicationLabel: "File"
-        onApplicationButtonClicked: feedback.text = qsTr("application button clicked")
+        onApplicationButtonClicked: log(qsTr("application button clicked"))
+        applicationMenuItems: [
+            RibbonMenuItem { text: qsTr("test 1"); iconSource: "qrc:/icon/icon/action.svg" },
+            RibbonMenuItem { text: qsTr("test 2"); iconSource: "qrc:/icon/icon/action2.svg" },
+            RibbonMenuItem { separator: true },
+            RibbonMenuItem { text: qsTr("test 3"); iconSource: "qrc:/icon/icon/action3.svg" }
+        ]
+        onApplicationMenuTriggered: log(qsTr("application menu: %1").arg(item.text))
+
+        // quick access bar (widgets quick access parity): small buttons on
+        // the title row after the application button
+        RibbonQuickAccessBar {
+            RibbonToolButton {
+                text: qsTr("Save")
+                iconSource: "qrc:/icon/icon/save.svg"
+                proportion: Ribbon.Small
+                onClicked: log(qsTr("quick access: Save clicked"))
+            }
+            RibbonToolButton {
+                text: qsTr("Undo")
+                iconSource: "qrc:/icon/icon/undo.svg"
+                proportion: Ribbon.Small
+                onClicked: log(qsTr("quick access: Undo clicked"))
+            }
+            RibbonToolButton {
+                text: qsTr("Redo")
+                iconSource: "qrc:/icon/icon/redo.svg"
+                proportion: Ribbon.Small
+                onClicked: log(qsTr("quick access: Redo clicked"))
+            }
+            RibbonToolButton {
+                text: qsTr("Presentation File 1")
+                iconSource: "qrc:/icon/icon/file.svg"
+                proportion: Ribbon.Small
+                popupMode: Ribbon.InstantPopup
+                menuItems: [
+                    RibbonMenuItem { text: qsTr("file 1-1"); iconSource: "qrc:/icon/icon/item.svg" },
+                    RibbonMenuItem { text: qsTr("file 1-2"); iconSource: "qrc:/icon/icon/item.svg" }
+                ]
+                onMenuTriggered: log(qsTr("quick access menu: %1").arg(item.text))
+            }
+        }
+
+        // right button group (widgets right bar parity): help + toggle
+        RibbonButtonGroup {
+            RibbonToolButton {
+                text: qsTr("Help")
+                iconSource: "qrc:/icon/icon/help.svg"
+                proportion: Ribbon.Small
+                onClicked: log(qsTr("help clicked (widgets shows the version message box)"))
+            }
+            RibbonToolButton {
+                text: qsTr("Visible")
+                iconSource: "qrc:/icon/icon/showContext.svg"
+                proportion: Ribbon.Small
+                checkable: true
+                checked: true
+                onToggled: log(qsTr("right group visible toggle: %1").arg(checked))
+            }
+        }
 
         // ---- Home ----
         RibbonCategory {
@@ -42,7 +101,7 @@ ApplicationWindow {
                         checked: true
                         onToggled: if (checked) {
                             ribbonBar.ribbonStyle = Ribbon.RibbonStyleLooseThreeRow;
-                            feedback.text = qsTr("LooseThreeRow: tabs below title, 3 rows, word wrap on");
+                            log(qsTr("LooseThreeRow: tabs below title, 3 rows, word wrap on"));
                         }
                     }
                 }
@@ -53,7 +112,7 @@ ApplicationWindow {
                         text: qsTr("wps style")
                         onToggled: if (checked) {
                             ribbonBar.ribbonStyle = Ribbon.RibbonStyleCompactThreeRow;
-                            feedback.text = qsTr("CompactThreeRow: tabs on title, 3 rows");
+                            log(qsTr("CompactThreeRow: tabs on title, 3 rows"));
                         }
                     }
                 }
@@ -64,7 +123,7 @@ ApplicationWindow {
                         text: qsTr("office 2 row")
                         onToggled: if (checked) {
                             ribbonBar.ribbonStyle = Ribbon.RibbonStyleLooseTwoRow;
-                            feedback.text = qsTr("LooseTwoRow: 2 rows, word wrap off");
+                            log(qsTr("LooseTwoRow: 2 rows, word wrap off"));
                         }
                     }
                 }
@@ -75,7 +134,7 @@ ApplicationWindow {
                         text: qsTr("wps 2 row")
                         onToggled: if (checked) {
                             ribbonBar.ribbonStyle = Ribbon.RibbonStyleCompactTwoRow;
-                            feedback.text = qsTr("CompactTwoRow: tabs on title, 2 rows");
+                            log(qsTr("CompactTwoRow: tabs on title, 2 rows"));
                         }
                     }
                 }
@@ -86,7 +145,7 @@ ApplicationWindow {
                         text: qsTr("loose single row")
                         onToggled: if (checked) {
                             ribbonBar.ribbonStyle = Ribbon.RibbonStyleLooseSingleRow;
-                            feedback.text = qsTr("LooseSingleRow: 1 row, panel titles hidden, icon-right text");
+                            log(qsTr("LooseSingleRow: 1 row, panel titles hidden, icon-right text"));
                         }
                     }
                 }
@@ -97,7 +156,7 @@ ApplicationWindow {
                         text: qsTr("compact single row")
                         onToggled: if (checked) {
                             ribbonBar.ribbonStyle = Ribbon.RibbonStyleCompactSingleRow;
-                            feedback.text = qsTr("CompactSingleRow: 1 row + tabs on title");
+                            log(qsTr("CompactSingleRow: 1 row + tabs on title"));
                         }
                     }
                 }
@@ -125,7 +184,7 @@ ApplicationWindow {
                         ]
                         onActivated: {
                             RibbonTheme.currentTheme = themeValues[index];
-                            feedback.text = qsTr("theme switched: %1").arg(currentText);
+                            log(qsTr("theme switched: %1").arg(currentText));
                         }
                     }
                 }
@@ -136,7 +195,7 @@ ApplicationWindow {
                     proportion: Ribbon.Small
                     onClicked: {
                         RibbonMetrics.fontPointSize = RibbonMetrics.fontPointSize + 1;
-                        feedback.text = qsTr("font point size: %1").arg(RibbonMetrics.fontPointSize);
+                        log(qsTr("font point size: %1").arg(RibbonMetrics.fontPointSize));
                     }
                 }
                 RibbonToolButton {
@@ -145,7 +204,7 @@ ApplicationWindow {
                     proportion: Ribbon.Small
                     onClicked: {
                         RibbonMetrics.fontPointSize = Math.max(RibbonMetrics.fontPointSize - 1, 6);
-                        feedback.text = qsTr("font point size: %1").arg(RibbonMetrics.fontPointSize);
+                        log(qsTr("font point size: %1").arg(RibbonMetrics.fontPointSize));
                     }
                 }
             }
@@ -156,19 +215,19 @@ ApplicationWindow {
                     text: "Paste"
                     iconSource: "qrc:/icon/icon/folder-checkmark.svg"
                     proportion: Ribbon.Large
-                    onClicked: feedback.text = qsTr("Paste clicked")
+                    onClicked: log(qsTr("Paste clicked"))
                 }
                 RibbonToolButton {
                     text: "Cut"
                     iconSource: "qrc:/icon/icon/delete.svg"
                     proportion: Ribbon.Small
-                    onClicked: feedback.text = qsTr("Cut clicked")
+                    onClicked: log(qsTr("Cut clicked"))
                 }
                 RibbonToolButton {
                     text: "Copy"
                     iconSource: "qrc:/icon/icon/item.svg"
                     proportion: Ribbon.Small
-                    onClicked: feedback.text = qsTr("Copy clicked")
+                    onClicked: log(qsTr("Copy clicked"))
                 }
             }
 
@@ -179,21 +238,21 @@ ApplicationWindow {
                     iconSource: "qrc:/icon/icon/bold.svg"
                     proportion: Ribbon.Medium
                     checkable: true
-                    onClicked: feedback.text = qsTr("Bold toggled: %1").arg(checked)
+                    onClicked: log(qsTr("Bold toggled: %1").arg(checked))
                 }
                 RibbonToolButton {
                     text: "Italic"
                     iconSource: "qrc:/icon/icon/Italic.svg"
                     proportion: Ribbon.Small
                     checkable: true
-                    onClicked: feedback.text = qsTr("Italic toggled: %1").arg(checked)
+                    onClicked: log(qsTr("Italic toggled: %1").arg(checked))
                 }
                 RibbonToolButton {
                     text: "Underline"
                     iconSource: "qrc:/icon/icon/Underline.svg"
                     proportion: Ribbon.Small
                     checkable: true
-                    onClicked: feedback.text = qsTr("Underline toggled: %1").arg(checked)
+                    onClicked: log(qsTr("Underline toggled: %1").arg(checked))
                 }
             }
 
@@ -203,13 +262,13 @@ ApplicationWindow {
                     text: "Undo"
                     iconSource: "qrc:/icon/icon/undo.svg"
                     proportion: Ribbon.Large
-                    onClicked: feedback.text = qsTr("Undo clicked")
+                    onClicked: log(qsTr("Undo clicked"))
                 }
                 RibbonToolButton {
                     text: "Redo"
                     iconSource: "qrc:/icon/icon/redo.svg"
                     proportion: Ribbon.Medium
-                    onClicked: feedback.text = qsTr("Redo clicked")
+                    onClicked: log(qsTr("Redo clicked"))
                 }
             }
 
@@ -223,7 +282,7 @@ ApplicationWindow {
                     text: "Normal"
                     iconSource: "qrc:/icon/icon/file.svg"
                     proportion: Ribbon.Large
-                    onClicked: feedback.text = qsTr("Normal clicked")
+                    onClicked: log(qsTr("Normal clicked"))
                 }
                 RibbonToolButton {
                     text: "Checked"
@@ -231,7 +290,7 @@ ApplicationWindow {
                     proportion: Ribbon.Large
                     checkable: true
                     checked: true
-                    onClicked: feedback.text = qsTr("Checked toggled: %1").arg(checked)
+                    onClicked: log(qsTr("Checked toggled: %1").arg(checked))
                 }
                 RibbonToolButton {
                     id: disableButton
@@ -239,7 +298,7 @@ ApplicationWindow {
                     iconSource: "qrc:/icon/icon/disable.svg"
                     proportion: Ribbon.Large
                     enabled: false
-                    onClicked: feedback.text = qsTr("this click must never fire")
+                    onClicked: log(qsTr("this click must never fire"))
                 }
                 RibbonToolButton {
                     text: "unlock"
@@ -248,21 +307,21 @@ ApplicationWindow {
                     onClicked: {
                         disableButton.enabled = true;
                         disableButton.text = "Enabled";
-                        feedback.text = qsTr("disabled button unlocked");
+                        log(qsTr("disabled button unlocked"));
                     }
                 }
                 RibbonToolButton {
                     text: "very long text in a button, balabalabala etc"
                     iconSource: "qrc:/icon/icon/long-text.svg"
                     proportion: Ribbon.Large
-                    onClicked: feedback.text = qsTr("long text clicked")
+                    onClicked: log(qsTr("long text clicked"))
                 }
                 RibbonToolButton {
                     text: "1"
                     iconSource: "qrc:/icon/icon/setText.svg"
                     proportion: Ribbon.Large
                     toolTip: "very short string"
-                    onClicked: feedback.text = qsTr("short text clicked")
+                    onClicked: log(qsTr("short text clicked"))
                 }
             }
 
@@ -287,8 +346,8 @@ ApplicationWindow {
                         RibbonMenuItem { text: "item 4"; iconSource: "qrc:/icon/icon/item.svg" },
                         RibbonMenuItem { text: "item 5"; iconSource: "qrc:/icon/icon/item.svg" }
                     ]
-                    onClicked: feedback.text = qsTr("test 1 action zone clicked")
-                    onMenuTriggered: feedback.text = qsTr("test 1 menu: %1").arg(item.text)
+                    onClicked: log(qsTr("test 1 action zone clicked"))
+                    onMenuTriggered: log(qsTr("test 1 menu: %1").arg(item.text))
                 }
                 RibbonToolButton {
                     text: "test 2"
@@ -302,7 +361,7 @@ ApplicationWindow {
                         RibbonMenuItem { separator: true },
                         RibbonMenuItem { text: "item 3"; iconSource: "qrc:/icon/icon/item.svg" }
                     ]
-                    onMenuTriggered: feedback.text = qsTr("test 2 menu: %1").arg(item.text)
+                    onMenuTriggered: log(qsTr("test 2 menu: %1").arg(item.text))
                 }
                 // mirrors the widgets panel's separator between the small
                 // tests and the large popup buttons
@@ -317,8 +376,8 @@ ApplicationWindow {
                         RibbonMenuItem { text: "item 2"; iconSource: "qrc:/icon/icon/item.svg" },
                         RibbonMenuItem { text: "item 3"; iconSource: "qrc:/icon/icon/item.svg" }
                     ]
-                    onClicked: feedback.text = qsTr("Delayed Popup clicked (press and hold opens the menu)")
-                    onMenuTriggered: feedback.text = qsTr("Delayed Popup menu: %1").arg(item.text)
+                    onClicked: log(qsTr("Delayed Popup clicked (press and hold opens the menu)"))
+                    onMenuTriggered: log(qsTr("Delayed Popup menu: %1").arg(item.text))
                 }
                 RibbonToolButton {
                     text: "Menu Button Popup"
@@ -329,8 +388,8 @@ ApplicationWindow {
                         RibbonMenuItem { text: "item 1"; iconSource: "qrc:/icon/icon/item.svg" },
                         RibbonMenuItem { text: "item 2"; iconSource: "qrc:/icon/icon/item.svg" }
                     ]
-                    onClicked: feedback.text = qsTr("Menu Button Popup action zone clicked")
-                    onMenuTriggered: feedback.text = qsTr("Menu Button Popup menu: %1").arg(item.text)
+                    onClicked: log(qsTr("Menu Button Popup action zone clicked"))
+                    onMenuTriggered: log(qsTr("Menu Button Popup menu: %1").arg(item.text))
                 }
                 RibbonToolButton {
                     text: "Instant Popup"
@@ -341,7 +400,7 @@ ApplicationWindow {
                         RibbonMenuItem { text: "item 1"; iconSource: "qrc:/icon/icon/item.svg" },
                         RibbonMenuItem { text: "item 2"; iconSource: "qrc:/icon/icon/item.svg" }
                     ]
-                    onMenuTriggered: feedback.text = qsTr("Instant Popup menu: %1").arg(item.text)
+                    onMenuTriggered: log(qsTr("Instant Popup menu: %1").arg(item.text))
                 }
                 RibbonToolButton {
                     text: "Delayed Popup checkable"
@@ -353,8 +412,8 @@ ApplicationWindow {
                         RibbonMenuItem { text: "item 1"; iconSource: "qrc:/icon/icon/item.svg" },
                         RibbonMenuItem { text: "item 2"; iconSource: "qrc:/icon/icon/item.svg" }
                     ]
-                    onClicked: feedback.text = qsTr("Delayed Popup checkable toggled: %1").arg(checked)
-                    onMenuTriggered: feedback.text = qsTr("Delayed Popup checkable menu: %1").arg(item.text)
+                    onClicked: log(qsTr("Delayed Popup checkable toggled: %1").arg(checked))
+                    onMenuTriggered: log(qsTr("Delayed Popup checkable menu: %1").arg(item.text))
                 }
                 RibbonToolButton {
                     text: "Menu Button Popup checkable"
@@ -366,8 +425,8 @@ ApplicationWindow {
                         RibbonMenuItem { text: "item 1"; iconSource: "qrc:/icon/icon/item.svg" },
                         RibbonMenuItem { text: "item 2"; iconSource: "qrc:/icon/icon/item.svg" }
                     ]
-                    onClicked: feedback.text = qsTr("Menu Button Popup checkable toggled: %1").arg(checked)
-                    onMenuTriggered: feedback.text = qsTr("Menu Button Popup checkable menu: %1").arg(item.text)
+                    onClicked: log(qsTr("Menu Button Popup checkable toggled: %1").arg(checked))
+                    onMenuTriggered: log(qsTr("Menu Button Popup checkable menu: %1").arg(item.text))
                 }
             }
 
@@ -385,7 +444,7 @@ ApplicationWindow {
                             "testItem 1", "testItem 2", "testItem 3", "testItem 4", "testItem 5",
                             "testItem 6", "testItem 7", "testItem 8", "testItem 9", "testItem 10"
                         ]
-                        onActivated: feedback.text = qsTr("ComboBox selected: %1").arg(currentText)
+                        onActivated: log(qsTr("ComboBox selected: %1").arg(currentText))
                     }
                 }
                 RibbonControlContainer {
@@ -393,7 +452,7 @@ ApplicationWindow {
                     proportion: Ribbon.Small
                     control: ComboBox {
                         model: [ "option 1", "option 2", "option 3" ]
-                        onActivated: feedback.text = qsTr("ComboBox2 selected: %1").arg(currentText)
+                        onActivated: log(qsTr("ComboBox2 selected: %1").arg(currentText))
                     }
                 }
                 RibbonControlContainer {
@@ -401,21 +460,21 @@ ApplicationWindow {
                     proportion: Ribbon.Small
                     control: TextField {
                         placeholderText: qsTr("type and press Enter")
-                        onEditingFinished: feedback.text = qsTr("Line Edit: %1").arg(text)
+                        onEditingFinished: log(qsTr("Line Edit: %1").arg(text))
                     }
                 }
                 RibbonControlContainer {
                     text: "CheckBox:"
                     proportion: Ribbon.Small
                     control: CheckBox {
-                        onToggled: feedback.text = qsTr("CheckBox toggled: %1").arg(checked)
+                        onToggled: log(qsTr("CheckBox toggled: %1").arg(checked))
                     }
                 }
                 RibbonControlContainer {
                     text: "SpinBox:"
                     proportion: Ribbon.Small
                     control: SpinBox {
-                        onValueModified: feedback.text = qsTr("SpinBox value: %1").arg(value)
+                        onValueModified: log(qsTr("SpinBox value: %1").arg(value))
                     }
                 }
             }
@@ -431,13 +490,13 @@ ApplicationWindow {
                     text: "New File"
                     iconSource: "qrc:/icon/icon/file.svg"
                     proportion: Ribbon.Large
-                    onClicked: feedback.text = qsTr("New File clicked")
+                    onClicked: log(qsTr("New File clicked"))
                 }
                 RibbonToolButton {
                     text: "Open"
                     iconSource: "qrc:/icon/icon/chinese-char.svg"
                     proportion: Ribbon.Medium
-                    onClicked: feedback.text = qsTr("Open clicked")
+                    onClicked: log(qsTr("Open clicked"))
                 }
             }
 
@@ -447,7 +506,7 @@ ApplicationWindow {
                     text: "Layout"
                     iconSource: "qrc:/icon/icon/layout.svg"
                     proportion: Ribbon.Large
-                    onClicked: feedback.text = qsTr("Layout clicked")
+                    onClicked: log(qsTr("Layout clicked"))
                 }
             }
         }
@@ -462,7 +521,7 @@ ApplicationWindow {
                     text: "Save"
                     iconSource: "qrc:/icon/icon/save.svg"
                     proportion: Ribbon.Large
-                    onClicked: feedback.text = qsTr("Save clicked")
+                    onClicked: log(qsTr("Save clicked"))
                 }
             }
 
@@ -481,7 +540,7 @@ ApplicationWindow {
                     // (Qt 6.5+ only deprecates it with a warning)
                     onToggled: {
                         contextCategory1.active = checked;
-                        feedback.text = qsTr("context category 1 active: %1").arg(checked);
+                        log(qsTr("context category 1 active: %1").arg(checked));
                     }
                 }
                 RibbonToolButton {
@@ -491,7 +550,7 @@ ApplicationWindow {
                     checkable: true
                     onToggled: {
                         contextCategory2.active = checked;
-                        feedback.text = qsTr("context category 2 active: %1").arg(checked);
+                        log(qsTr("context category 2 active: %1").arg(checked));
                     }
                 }
             }
@@ -534,7 +593,7 @@ ApplicationWindow {
                         RibbonGalleryItem { text: "Adobe"; iconSource: "qrc:/icon/icon/gallery/Adobe.svg" }
                         RibbonGalleryItem { text: "Word"; iconSource: "qrc:/icon/icon/gallery/Word.svg" }
                     }
-                    onTriggered: feedback.text = qsTr("gallery: %1 triggered").arg(item.text)
+                    onTriggered: log(qsTr("gallery: %1 triggered").arg(item.text))
                 }
             }
 
@@ -547,7 +606,7 @@ ApplicationWindow {
                     proportion: Ribbon.Small
                     onClicked: {
                         gallery.currentGroupIndex = (gallery.currentGroupIndex + 1) % 2;
-                        feedback.text = qsTr("gallery group switched: %1").arg(gallery.currentGroupIndex);
+                        log(qsTr("gallery group switched: %1").arg(gallery.currentGroupIndex));
                     }
                 }
                 RibbonToolButton {
@@ -556,7 +615,83 @@ ApplicationWindow {
                     proportion: Ribbon.Small
                     onClicked: {
                         gallery.scrollDown();
-                        feedback.text = qsTr("gallery scrolled to row %1").arg(gallery.scrollRow);
+                        log(qsTr("gallery scrolled to row %1").arg(gallery.scrollRow));
+                    }
+                }
+            }
+        }
+
+        // ---- Delete (dynamic panel add/remove, widgets Delete category parity) ----
+        RibbonCategory {
+            title: "Delete"
+
+            // dynamic panels ride a ListModel + Repeater: insertions and
+            // removals flow through the bar/category registration chain
+            ListModel {
+                id: dynamicPanels
+                ListElement { name: "panel 1" }
+                ListElement { name: "panel 2" }
+            }
+
+            RibbonPanel {
+                panelTitle: "panel 1"
+
+                RibbonToolButton {
+                    text: "remove panel"
+                    iconSource: "qrc:/icon/icon/remove.svg"
+                    proportion: Ribbon.Large
+                    onClicked: {
+                        if (dynamicPanels.count > 0) {
+                            dynamicPanels.remove(dynamicPanels.count - 1);
+                            log(qsTr("removed the last dynamic panel (%1 left)").arg(dynamicPanels.count));
+                        } else {
+                            log(qsTr("no dynamic panel left to remove"));
+                        }
+                    }
+                }
+            }
+
+            RibbonPanel {
+                panelTitle: "insert panel test"
+
+                RibbonToolButton {
+                    text: "insert at 0"
+                    iconSource: "qrc:/icon/icon/test1.svg"
+                    proportion: Ribbon.Large
+                    onClicked: {
+                        dynamicPanels.insert(0, { name: qsTr("panel@0-%1").arg(dynamicPanels.count) });
+                        log(qsTr("inserted a panel at 0"));
+                    }
+                }
+                RibbonToolButton {
+                    text: "insert at end"
+                    iconSource: "qrc:/icon/icon/test2.svg"
+                    proportion: Ribbon.Large
+                    onClicked: {
+                        dynamicPanels.append({ name: qsTr("panel@end-%1").arg(dynamicPanels.count) });
+                        log(qsTr("inserted a panel at the end"));
+                    }
+                }
+                RibbonToolButton {
+                    text: "insert at -1"
+                    iconSource: "qrc:/icon/icon/item.svg"
+                    proportion: Ribbon.Large
+                    onClicked: {
+                        dynamicPanels.insert(-1, { name: qsTr("panel@-1") });
+                        log(qsTr("insert at -1 (edge case, ListModel clamps)"));
+                    }
+                }
+            }
+
+            Repeater {
+                model: dynamicPanels
+                delegate: RibbonPanel {
+                    panelTitle: model.name
+                    RibbonToolButton {
+                        text: "Text Only"
+                        iconSource: "qrc:/icon/icon/setText.svg"
+                        proportion: Ribbon.Large
+                        onClicked: log(qsTr("%1 button clicked").arg(model.name))
                     }
                 }
             }
@@ -580,20 +715,20 @@ ApplicationWindow {
                         iconSource: "qrc:/icon/icon/enableTest.svg"
                         proportion: Ribbon.Large
                         enabled: false
-                        onClicked: feedback.text = qsTr("never fires while disabled")
+                        onClicked: log(qsTr("never fires while disabled"))
                     }
                     RibbonToolButton {
                         text: "unlock"
                         iconSource: "qrc:/icon/icon/unlock.svg"
                         proportion: Ribbon.Large
-                        onClicked: feedback.text = qsTr("unlock clicked")
+                        onClicked: log(qsTr("unlock clicked"))
                     }
                     RibbonToolButton {
                         text: "1"
                         iconSource: "qrc:/icon/icon/setText.svg"
                         proportion: Ribbon.Large
                         toolTip: "very short string"
-                        onClicked: feedback.text = qsTr("short text clicked")
+                        onClicked: log(qsTr("short text clicked"))
                     }
                 }
 
@@ -603,14 +738,14 @@ ApplicationWindow {
                     RibbonControlContainer {
                         text: "spinbox:"
                         control: SpinBox {
-                            onValueModified: feedback.text = qsTr("context spinbox: %1").arg(value)
+                            onValueModified: log(qsTr("context spinbox: %1").arg(value))
                         }
                     }
                     RibbonControlContainer {
                         text: "linedit:"
                         control: TextField {
                             placeholderText: qsTr("context line edit")
-                            onEditingFinished: feedback.text = qsTr("context line edit: %1").arg(text)
+                            onEditingFinished: log(qsTr("context line edit: %1").arg(text))
                         }
                     }
                 }
@@ -631,7 +766,7 @@ ApplicationWindow {
                             RibbonMenuItem { text: "ctx item 1"; iconSource: "qrc:/icon/icon/item.svg" },
                             RibbonMenuItem { text: "ctx item 2"; iconSource: "qrc:/icon/icon/item.svg" }
                         ]
-                        onMenuTriggered: feedback.text = qsTr("context menu: %1").arg(item.text)
+                        onMenuTriggered: log(qsTr("context menu: %1").arg(item.text))
                     }
                     RibbonToolButton {
                         text: "Menu Button Popup"
@@ -641,7 +776,7 @@ ApplicationWindow {
                         menuItems: [
                             RibbonMenuItem { text: "ctx item 1"; iconSource: "qrc:/icon/icon/item.svg" }
                         ]
-                        onMenuTriggered: feedback.text = qsTr("context menu: %1").arg(item.text)
+                        onMenuTriggered: log(qsTr("context menu: %1").arg(item.text))
                     }
                 }
             }
@@ -664,7 +799,7 @@ ApplicationWindow {
                         text: "Hello"
                         iconSource: "qrc:/icon/icon/showContext.svg"
                         proportion: Ribbon.Large
-                        onClicked: feedback.text = qsTr("context2 page one clicked")
+                        onClicked: log(qsTr("context2 page one clicked"))
                     }
                 }
             }
@@ -679,25 +814,49 @@ ApplicationWindow {
                         text: "World"
                         iconSource: "qrc:/icon/icon/showContext.svg"
                         proportion: Ribbon.Large
-                        onClicked: feedback.text = qsTr("context2 page two clicked")
+                        onClicked: log(qsTr("context2 page two clicked"))
                     }
                 }
             }
         }
     }
 
-    // interaction feedback area (proves buttons/tabs are alive)
+    // Event log (the widgets example's central QTextBrowser counterpart):
+    // every handler routes through log(); the status line shows the last
+    // event, the scrolling area keeps the full history
+    function log(msg)
+    {
+        eventLog.append(msg);
+    }
+
     footer: ToolBar {
         RowLayout {
             anchors.fill: parent
-            anchors.margins: 8
+            anchors.margins: 4
             spacing: 12
 
-            Label {
-                id: feedback
-                text: qsTr("click a button or switch a tab")
+            Flickable {
+                id: logFlick
+                Layout.fillWidth: true
+                Layout.preferredHeight: 64
+                contentWidth: eventLog.width
+                contentHeight: eventLog.height
+                clip: true
+                TextArea {
+                    id: eventLog
+                    width: logFlick.width
+                    readOnly: true
+                    wrapMode: TextArea.Wrap
+                    text: qsTr("click a button or switch a tab")
+                    onHeightChanged: logFlick.contentY = Math.max(height - logFlick.height, 0)
+                    function append(msg)
+                    {
+                        text += "\n" + msg;
+                        cursorPosition = text.length;
+                    }
+                }
+                ScrollBar.vertical: ScrollBar { }
             }
-            Item { Layout.fillWidth: true }
             Button {
                 text: qsTr("Office 2021 Blue")
                 onClicked: RibbonTheme.currentTheme = Ribbon.RibbonThemeOffice2021Blue

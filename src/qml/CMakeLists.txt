@@ -11,6 +11,8 @@ sa_add_library(SARibbonQml
         host/RibbonQuickHost.cpp
         host/RibbonLayoutItemHost.h
         host/RibbonLayoutItemHost.cpp
+        host/RibbonButtonRowHost.h
+        host/RibbonButtonRowHost.cpp
         theme/RibbonTheme.h
         theme/RibbonTheme.cpp
         metrics/RibbonMetrics.h
@@ -33,6 +35,10 @@ sa_add_library(SARibbonQml
         gallery/RibbonGalleryItem.cpp
         separator/RibbonSeparator.h
         separator/RibbonSeparator.cpp
+        quickaccess/RibbonQuickAccessBar.h
+        quickaccess/RibbonQuickAccessBar.cpp
+        group/RibbonButtonGroup.h
+        group/RibbonButtonGroup.cpp
         category/RibbonCategory.h
         category/RibbonCategory.cpp
         tab/RibbonTab.h

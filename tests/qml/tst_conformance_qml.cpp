@@ -45,6 +45,7 @@ private Q_SLOTS:
     void ribbonStyleSwitching();
     void styleRadioViaContainer();
     void separatorInPanel();
+    void quickAccessBarAndRightGroup();
 
 private:
     QQuickView* exposeScene(QQmlEngine& engine, QQmlComponent& component, const char* src, int w, int h);
@@ -1062,6 +1063,87 @@ Item {
     QTRY_COMPARE(radioCompact->property("checked").toBool(), true);
     QTRY_COMPARE(bar->property("ribbonStyle").toInt(), int(SARibbonQml::RibbonEnums::RibbonStyleCompactThreeRow));
     QTRY_VERIFY(bar->property("categoryRowY").toInt() < looseRowY);
+}
+
+/**
+ * @brief Quick access bar + right button group on the title row
+ * @details Mirrors the widgets quick access bar / right button group: the
+ *          rows ride the title strip (after the app button / right-aligned
+ *          before the system strip), buttons size from their metrics
+ *          sizeHints and stay clickable.
+ */
+void TestConformanceQml::quickAccessBarAndRightGroup()
+{
+    QQmlEngine engine;
+    saRibbonRegisterQmlTypes(&engine);
+
+    QString src = QStringLiteral(R"QML(import QtQuick 2.12
+import SARibbon 3.0
+Item {
+    width: 800
+    height: 300
+    RibbonBar {
+        id: bar
+        objectName: "bar"
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        applicationLabel: "File"
+        RibbonQuickAccessBar {
+            objectName: "qab"
+            RibbonToolButton { objectName: "qabSave"; text: "Save"; iconSource: ""; proportion: Ribbon.Small }
+            RibbonToolButton { objectName: "qabUndo"; text: "Undo"; proportion: Ribbon.Small }
+        }
+        RibbonButtonGroup {
+            objectName: "rgroup"
+            RibbonToolButton { objectName: "rgHelp"; text: "Help"; proportion: Ribbon.Small }
+        }
+        RibbonCategory {
+            title: "Home"
+            RibbonPanel {
+                panelTitle: "P"
+                RibbonToolButton { text: "A" }
+            }
+        }
+    }
+})QML");
+
+    QQmlComponent component(&engine);
+    std::unique_ptr< QQuickView > view(exposeScene(engine, component, src.toUtf8().constData(), 800, 300));
+    QVERIFY(view);
+    QQuickItem* rootItem = view->rootObject();
+    QVERIFY(rootItem);
+
+    auto* qab    = rootItem->findChild< QQuickItem* >(QStringLiteral("qab"));
+    auto* rgroup = rootItem->findChild< QQuickItem* >(QStringLiteral("rgroup"));
+    auto* bar    = rootItem->findChild< QQuickItem* >(QStringLiteral("bar"));
+    auto* save   = rootItem->findChild< QQuickItem* >(QStringLiteral("qabSave"));
+    auto* undo   = rootItem->findChild< QQuickItem* >(QStringLiteral("qabUndo"));
+    auto* help   = rootItem->findChild< QQuickItem* >(QStringLiteral("rgHelp"));
+    QVERIFY(qab && rgroup && bar && save && undo && help);
+
+    // ---- the rows sit on the title strip, after the app button ----
+    const int titleH = bar->property("titleBarHeight").toInt();
+    QTRY_VERIFY(qab->width() > 0 && qab->height() > 0);
+    QCOMPARE(qab->height(), qreal(titleH));
+    QVERIFY(qab->x() > 0);        // after the application button
+    QVERIFY(qab->y() == 0.0);     // on the title row
+    // the buttons are laid out in a row inside the bar's coordinate space
+    QTRY_VERIFY(save->width() > 0 && undo->width() > 0);
+    QVERIFY(undo->x() > save->x());
+    QVERIFY(save->y() >= 0 && save->y() + save->height() <= titleH + 1);
+
+    // ---- right group: right-aligned before the system strip ----
+    QTRY_VERIFY(rgroup->width() > 0);
+    QVERIFY(rgroup->x() + rgroup->width() <= 800);
+    QVERIFY(rgroup->x() > 800 - 120 - rgroup->width() - 30);  // just before the strip
+    QVERIFY(help->width() > 0);
+
+    // ---- the embedded quick access button is clickable ----
+    QSignalSpy clickedSpy(save, SIGNAL(clicked()));
+    const QPointF center = save->mapToScene(QPointF(save->width() / 2, save->height() / 2));
+    QTest::mouseClick(view.get(), Qt::LeftButton, Qt::NoModifier, center.toPoint());
+    QTRY_COMPARE(clickedSpy.size(), 1);
 }
 
 QTEST_MAIN(TestConformanceQml)

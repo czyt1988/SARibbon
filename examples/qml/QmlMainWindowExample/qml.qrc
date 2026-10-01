@@ -5,6 +5,10 @@
     </qresource>
     <qresource prefix="/icon">
         <file>icon/bold.svg</file>
+        <file>icon/help.svg</file>
+        <file>icon/action3.svg</file>
+        <file>icon/action2.svg</file>
+        <file>icon/action.svg</file>
         <file>icon/chinese-char.svg</file>
         <file>icon/delete.svg</file>
         <file>icon/disable.svg</file>
@@ -22,6 +26,7 @@
         <file>icon/smallFont.svg</file>
         <file>icon/long-text.svg</file>
         <file>icon/redo.svg</file>
+        <file>icon/remove.svg</file>
         <file>icon/save.svg</file>
         <file>icon/setText.svg</file>
         <file>icon/test1.svg</file>

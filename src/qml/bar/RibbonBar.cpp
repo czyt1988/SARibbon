@@ -1,6 +1,9 @@
 #include "RibbonBar.h"
 #include "../category/RibbonCategory.h"
 #include "../context/RibbonContextCategory.h"
+#include "../quickaccess/RibbonQuickAccessBar.h"
+#include "../group/RibbonButtonGroup.h"
+#include "../menu/RibbonMenuItem.h"
 #include "../tab/RibbonTab.h"
 #include "../metrics/RibbonMetrics.h"
 #include "../theme/RibbonTheme.h"
@@ -384,6 +387,67 @@ QVariantList RibbonBar::contextBands() const
     return mBands;
 }
 
+QQmlListProperty< RibbonMenuItem > RibbonBar::applicationMenuItems()
+{
+    return QQmlListProperty< RibbonMenuItem >(this, this, &RibbonBar::appendAppMenuItemCb, &RibbonBar::appMenuItemCountCb, &RibbonBar::appMenuItemAtCb,
+                                              &RibbonBar::clearAppMenuItemsCb);
+}
+
+int RibbonBar::applicationMenuItemCount() const
+{
+    return mAppMenuItems.size();
+}
+
+RibbonMenuItem* RibbonBar::applicationMenuItemAt(int index) const
+{
+    return (index >= 0 && index < mAppMenuItems.size()) ? mAppMenuItems[ index ] : nullptr;
+}
+
+bool RibbonBar::hasApplicationMenu() const
+{
+    return !mAppMenuItems.isEmpty();
+}
+
+void RibbonBar::activateApplicationMenuItem(int index)
+{
+    RibbonMenuItem* item = applicationMenuItemAt(index);
+    if (!item || !item->isEnabled() || item->isSeparator()) {
+        return;
+    }
+    Q_EMIT applicationMenuTriggered(item);
+}
+
+void RibbonBar::appendAppMenuItemCb(QQmlListProperty< RibbonMenuItem >* prop, RibbonMenuItem* item)
+{
+    auto* self = static_cast< RibbonBar* >(prop->data);
+    if (self && item && !self->mAppMenuItems.contains(item)) {
+        self->mAppMenuItems.append(item);
+        item->setParent(self);
+        Q_EMIT self->applicationMenuItemsChanged();
+    }
+}
+
+RibbonBar::ListIndex RibbonBar::appMenuItemCountCb(QQmlListProperty< RibbonMenuItem >* prop)
+{
+    auto* self = static_cast< RibbonBar* >(prop->data);
+    return self ? self->mAppMenuItems.size() : ListIndex(0);
+}
+
+RibbonMenuItem* RibbonBar::appMenuItemAtCb(QQmlListProperty< RibbonMenuItem >* prop, ListIndex index)
+{
+    auto* self = static_cast< RibbonBar* >(prop->data);
+    return self ? self->applicationMenuItemAt(int(index)) : nullptr;
+}
+
+void RibbonBar::clearAppMenuItemsCb(QQmlListProperty< RibbonMenuItem >* prop)
+{
+    auto* self = static_cast< RibbonBar* >(prop->data);
+    if (self && !self->mAppMenuItems.isEmpty()) {
+        self->mAppMenuItems.clear();
+        Q_EMIT self->applicationMenuItemsChanged();
+    }
+}
+
 QRectF RibbonBar::titleRect() const
 {
     return QRectF(mTitleRect);
@@ -405,6 +469,18 @@ void RibbonBar::itemChange(ItemChange change, const ItemChangeData& data)
             }
         } else if (RibbonContextCategory* ctx = qobject_cast< RibbonContextCategory* >(data.item)) {
             registerContext(ctx);
+        } else if (RibbonQuickAccessBar* qab = qobject_cast< RibbonQuickAccessBar* >(data.item)) {
+            if (!mQuickAccessBar) {
+                mQuickAccessBar = qab;
+                connect(qab, &RibbonQuickAccessBar::rowWidthChanged, this, [this]() { polish(); });
+                polish();
+            }
+        } else if (RibbonButtonGroup* grp = qobject_cast< RibbonButtonGroup* >(data.item)) {
+            if (!mRightButtonGroup) {
+                mRightButtonGroup = grp;
+                connect(grp, &RibbonButtonGroup::rowWidthChanged, this, [this]() { polish(); });
+                polish();
+            }
         }
     } else if (change == QQuickItem::ItemChildRemovedChange) {
         if (RibbonCategory* c = qobject_cast< RibbonCategory* >(data.item)) {
@@ -415,11 +491,34 @@ void RibbonBar::itemChange(ItemChange change, const ItemChangeData& data)
             }
         } else if (RibbonContextCategory* ctx = qobject_cast< RibbonContextCategory* >(data.item)) {
             unregisterContext(ctx);
+        } else if (data.item == mQuickAccessBar) {
+            mQuickAccessBar = nullptr;
+            polish();
+        } else if (data.item == mRightButtonGroup) {
+            mRightButtonGroup = nullptr;
+            polish();
         }
     } else if (change == QQuickItem::ItemVisibleHasChanged) {
         polish();
     }
     RibbonQuickHost::itemChange(change, data);
+}
+
+void RibbonBar::placeTitleRowHosts(int titleH, int appBtnW, int systemStripW)
+{
+    // quick access row: after the application button, vertically centered on
+    // the title row (widgets quick access bar placement)
+    if (mQuickAccessBar) {
+        const int x = (appBtnW > 0 ? appBtnW : 0) + 8;
+        mQuickAccessBar->setPosition(QPointF(x, 0));
+        mQuickAccessBar->setSize(QSizeF(mQuickAccessBar->rowWidth(), titleH));
+    }
+    // right button group: right-aligned before the reserved system strip
+    if (mRightButtonGroup) {
+        const int w = mRightButtonGroup->rowWidth();
+        mRightButtonGroup->setPosition(QPointF(qMax(qreal(width()) - systemStripW - w - 8, 0.0), 0));
+        mRightButtonGroup->setSize(QSizeF(w, titleH));
+    }
 }
 
 void RibbonBar::updatePolish()
@@ -594,14 +693,16 @@ void RibbonBar::relayout()
     }
     mBands = bands;
 
-    // 5. title free area: core engine (TitleRectInput)
+    // 5. title free area: core engine (TitleRectInput); the quick access
+    //    row and the right group sit on the title row
+    placeTitleRowHosts(titleH, appBtnW, 120);
     SARibbon::Core::SARibbonBarGeometryEngine::TitleRectInput input;
     input.isRTL               = SA::saIsRTL();
     input.isCompactStyle      = false;
     input.ribbonWidth         = int(width());
     input.border              = QMargins(0, 0, 0, 0);
     input.validTitleBarHeight = titleH;
-    input.hasQuickAccessBar   = false;
+    input.hasQuickAccessBar   = (mQuickAccessBar != nullptr);
     input.systemButtonSize    = QSize(120, titleH);  // P0: reserved right strip
     input.hasContextTabs      = !mBands.isEmpty();
     input.tabBarGeometry      = QRect(8, tabBarY, qMin(x - 8 - tabSpacing, int(width()) - 8), tabH);

@@ -499,6 +499,19 @@
   7. 视觉验证：示例点击 "wps style" 单选 → tab 行 y=68→42（+26px=tabH，紧凑样式 tab 叠标题行）截图留档 tmp/qml_r3_compact.png。
 - 影响计划：04 非目标清单（样式体系原不在 P0/P1）；04-S5（按钮 wordWrap/iconRightText 契约面扩展）。
 
+### B43：QML 快速访问栏/右侧按钮组/应用菜单/动态面板 + 两处真实缺陷（用户驱动，QML 功能覆盖度对标 4/4）
+- 日期：2026-10-08（用户目标"QML 功能与 widgets 覆盖度对标"第 4 轮）
+- 发现位置：widgets quick access bar / right button group / 应用按钮菜单模式 / Delete 类别动态增删 / textBrowser 事件日志
+- 处理：
+  1. **RibbonButtonRowHost 共享基类**（`src/qml/host/`，模块内共性提取）：标题行按钮排的完整机制（itemChange 登记/sizeHint 排行/rowWidth 发布）；`RibbonQuickAccessBar` 与 `RibbonButtonGroup` 为薄壳子类（行高=标题行）。bar 在 relayout 里 placeTitleRowHosts（前者应用按钮之后，后者系统条前右对齐），宽度进 TitleRectInput.hasQuickAccessBar。
+  2. **应用按钮菜单**：bar 增 `applicationMenuItems`（QQmlListProperty<RibbonMenuItem>）+ `applicationMenuTriggered` + `activateApplicationMenuItem` 可调用；叶子渲染 theme-token 着色弹出菜单。
+  3. 示例：QAB（Save/Undo/Redo + InstantPopup 菜单按钮）+ 右组（Help/Visible）+ 应用菜单（test1-3+分隔符）+ Delete 类别（ListModel+Repeater 动态面板：remove 尾部/insert 0/end/-1，对标 widgets）+ 事件日志区（Flickable+TextArea 追加式，textBrowser 对等，58 处 feedback.text 机械转换为 log()）。
+  4. 测试 `quickAccessBarAndRightGroup`（行位置/尺寸/按钮排布/真实点击）——14/14 绿；示例 30s 稳定 + 截图像素验证（QAB 1369/右组 982/日志 5070 ink px）。
+- **两处真实缺陷（二分定位，均留档）**：
+  - **缺陷 A（已修）**：bar 叶子**急切实例化 Popup**（bar 的 componentComplete 期间，场景窗口未就绪）→ 产生游离原生窗口（336x179）并使主窗口（1316x499）场景空白；修复 = `Loader{active:false}` 首开时惰性创建（Qt Quick 通用范式）。二分法：禁用该 Popup → 单窗口正常。
+  - **缺陷 B（optionAction 延后，未修）**：面板 optionAction（引擎预留右下角对角按钮）在 Qt 6.7.3 Debug 下**确定性崩溃**（0xc0000005，Qt6Qml!QV4::Value::fromHeapObject，位于 ~QQmlElement<RibbonPanel> 析构链；cdb 留档完整栈）。二分矩阵：叶子弹 fully 禁用仍崩；引擎 hasOptionAction=false 不崩；runLayout 对 option 早退不崩；**仅存 `mLastOptionButtonGeometry = r.optionBtnGeometry`（ QRect 成员赋值！）即崩**、仅 Q_EMIT 也崩、两者都关不崩——指向引擎 option 输出消费路径上的堆/栈损坏在析构时显现（疑似 Qt 6.7 QQmlData teardown 边界，无 Qt PDB 无法进一步符号化）。**决策：延后该功能**（面板/叶子/示例/测试全部回退），后续轮可从"宿主在 updatePolish 之外消费 option 几何"或 C++ 侧渲染对角按钮两条路重新切入。
+- 影响计划：04 非目标清单（QAB/按钮组/应用菜单提前实现；optionAction 登记为已知缺口）；本轮证据（cdb 栈 + 二分矩阵）供后续轮复用。
+
 ---
 
 ## 执行中追加（模板，勿删）

@@ -48,6 +48,8 @@ first engine; a second engine gets nullptr (verified against Qt 5.14/6.7 sources
 | `RibbonGalleryGroup` | type | gallery group (groupTitle + items, default property items) |
 | `RibbonGalleryItem` | type | gallery entry (text/iconSource/enabled/toolTip) |
 | `RibbonSeparator` | type | panel separator (Large proportion, own column, 1px line; widgets SARibbonSeparatorWidget counterpart) |
+| `RibbonQuickAccessBar` | type | quick access bar (small-button row on the title row after the app button; width feeds TitleRectInput.hasQuickAccessBar; widgets SARibbonQuickAccessBar counterpart) |
+| `RibbonButtonGroup` | type | right button group (small-button row right-aligned before the system strip; widgets SARibbonButtonGroupWidget counterpart) |
 | `Ribbon` | uncreatable | enum holder (`Ribbon.Large` / `Ribbon.ThreeRowMode` / `Ribbon.MenuButtonPopup` / `Ribbon.RibbonStyleCompactTwoRow` / ...) |
 
 Access enums through the `Ribbon.` prefix (e.g. `proportion: Ribbon.Large`).
@@ -150,6 +152,22 @@ propagation semantics:
 ```qml
 RibbonBar { ribbonStyle: Ribbon.RibbonStyleCompactTwoRow }
 ```
+
+## Title-Row Containers & Application Menu
+
+- **RibbonQuickAccessBar / RibbonButtonGroup** share the `RibbonButtonRowHost`
+  base (buttons register through itemChange, rows flow by sizeHint, rowWidth
+  published); there is no panel engine here — the row host IS the layout
+  authority for its children. The bar places the former after the application
+  button and the latter right-aligned before the system strip; the width
+  feeds `TitleRectInput.hasQuickAccessBar`.
+- **Application menu** (`applicationMenuItems` +
+  `applicationMenuTriggered`, widgets menu-mode parity): **the popup must be
+  created lazily** — the bar leaf is created during the bar's
+  componentComplete (the scene window is not realized yet), and
+  instantiating a Popup at that point yields a stray native window and a
+  blank main window (round 4 observation); create it on first open through
+  `Loader { active: false }`.
 
 ## Visual Leaf Rules
 

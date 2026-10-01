@@ -5,6 +5,7 @@
 #include "../SARibbonQmlTypes.h"
 #include <SARibbonCore/SARibbonBarGeometryEngine.h>
 #include <QHash>
+#include <QQmlListProperty>
 #include <QRectF>
 #include <QVariantList>
 #include <QVector>
@@ -14,6 +15,9 @@ namespace SARibbonQml {
 class RibbonCategory;
 class RibbonTab;
 class RibbonContextCategory;
+class RibbonQuickAccessBar;
+class RibbonButtonGroup;
+class RibbonMenuItem;
 
 /**
  * \if ENGLISH
@@ -49,6 +53,8 @@ class RibbonBar : public RibbonQuickHost
     Q_PROPERTY(int categoryRowY READ categoryRowY NOTIFY layoutChanged)
     Q_PROPERTY(QRectF applicationButtonRect READ applicationButtonRect NOTIFY layoutChanged)
     Q_PROPERTY(QVariantList contextBands READ contextBands NOTIFY layoutChanged)
+    Q_PROPERTY(QQmlListProperty< SARibbonQml::RibbonMenuItem > applicationMenuItems READ applicationMenuItems NOTIFY applicationMenuItemsChanged)
+    Q_PROPERTY(bool hasApplicationMenu READ hasApplicationMenu NOTIFY applicationMenuItemsChanged)
 public:
     explicit RibbonBar(QQuickItem* parent = nullptr);
     ~RibbonBar() override;
@@ -94,12 +100,23 @@ public:
     // the published tabBar/titleBar metrics (band spans them, under the tabs)
     QVariantList contextBands() const;
 
+    // Application button menu (widgets menu-mode app button): when the list
+    // is non-empty the app button click opens it; activation is mediated by
+    // applicationMenuTriggered (tests drive it without a windowed popup)
+    QQmlListProperty< SARibbonQml::RibbonMenuItem > applicationMenuItems();
+    int applicationMenuItemCount() const;
+    SARibbonQml::RibbonMenuItem* applicationMenuItemAt(int index) const;
+    bool hasApplicationMenu() const;
+    Q_INVOKABLE void activateApplicationMenuItem(int index);
+
 Q_SIGNALS:
     void currentIndexChanged();
     void applicationLabelChanged();
     void ribbonStyleChanged();
     void layoutChanged();
     void applicationButtonClicked();
+    void applicationMenuItemsChanged();
+    void applicationMenuTriggered(SARibbonQml::RibbonMenuItem* item);
 
 protected:
     QUrl leafUrl() const override;
@@ -122,6 +139,16 @@ private:
     void propagateRibbonStyle();
     static int styleRowCount(RibbonEnums::RibbonStyle style);
     static bool styleIsCompact(RibbonEnums::RibbonStyle style);
+    void placeTitleRowHosts(int titleH, int appBtnW, int systemStripW);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    using ListIndex = qsizetype;
+#else
+    using ListIndex = int;
+#endif
+    static void appendAppMenuItemCb(QQmlListProperty< SARibbonQml::RibbonMenuItem >* prop, SARibbonQml::RibbonMenuItem* item);
+    static ListIndex appMenuItemCountCb(QQmlListProperty< SARibbonQml::RibbonMenuItem >* prop);
+    static SARibbonQml::RibbonMenuItem* appMenuItemAtCb(QQmlListProperty< SARibbonQml::RibbonMenuItem >* prop, ListIndex index);
+    static void clearAppMenuItemsCb(QQmlListProperty< SARibbonQml::RibbonMenuItem >* prop);
     int effectiveTabCount() const;
     QVector< RibbonTab* > effectiveTabs() const;
     QVector< RibbonCategory* > effectiveCategories() const;
@@ -135,6 +162,9 @@ private:
     QVector< RibbonTab* > mAutoTabs;  ///< subset owned (and destroyed) by this bar
     QVector< RibbonContextCategory* > mContexts;  ///< declared context categories
     QHash< RibbonContextCategory*, QVector< RibbonTab* > > mContextTabs;  ///< per-context page tabs (owned)
+    RibbonQuickAccessBar* mQuickAccessBar = nullptr;  ///< declared quick access row (single)
+    RibbonButtonGroup* mRightButtonGroup  = nullptr;  ///< declared right group (single)
+    QVector< RibbonMenuItem* > mAppMenuItems;
     QVariantList mBands;
     QRect mTitleRect;
     QRectF mApplicationButtonRect;
