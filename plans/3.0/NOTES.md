@@ -512,6 +512,27 @@
   - **缺陷 B（optionAction 延后，未修）**：面板 optionAction（引擎预留右下角对角按钮）在 Qt 6.7.3 Debug 下**确定性崩溃**（0xc0000005，Qt6Qml!QV4::Value::fromHeapObject，位于 ~QQmlElement<RibbonPanel> 析构链；cdb 留档完整栈）。二分矩阵：叶子弹 fully 禁用仍崩；引擎 hasOptionAction=false 不崩；runLayout 对 option 早退不崩；**仅存 `mLastOptionButtonGeometry = r.optionBtnGeometry`（ QRect 成员赋值！）即崩**、仅 Q_EMIT 也崩、两者都关不崩——指向引擎 option 输出消费路径上的堆/栈损坏在析构时显现（疑似 Qt 6.7 QQmlData teardown 边界，无 Qt PDB 无法进一步符号化）。**决策：延后该功能**（面板/叶子/示例/测试全部回退），后续轮可从"宿主在 updatePolish 之外消费 option 几何"或 C++ 侧渲染对角按钮两条路重新切入。
 - 影响计划：04 非目标清单（QAB/按钮组/应用菜单提前实现；optionAction 登记为已知缺口）；本轮证据（cdb 栈 + 二分矩阵）供后续轮复用。
 
+### B44：optionAction 崩溃第二轮调查（第 5 轮，未解决但证据大幅收敛）
+- 日期：2026-10-08（用户目标第 5 轮）
+- 背景：B43 延后的面板 optionAction 崩溃，本轮带插桩重启调查。
+- 新证据（清洁 ABI 构建 + `[TRACE]` 面板 ctor/dtor/runLayout 插桩）：
+  1. **崩溃真实且 option 专属**：同场景 hasOptionAction=false 通过、true 崩（清洁构建复核，B43 矩阵的 ABI 疑虑排除）。
+  2. **崩溃点先于面板 dtor 体**：trace 显示 ctor + 2 次 runLayout（optRect QRect(482,183 15x15) 几何完全正常）后直接崩溃——`~QQmlElement<RibbonPanel>` 的 `qdeclarativeelement_destructor`（qqmlprivate.h:100）内 3 层 V4 帧（QV4::Value::fromHeapObject 偏移巨大=最近导出符号误标，真实函数未知）读取已释放堆对象。
+  3. **叶子排除**：测试提前 delete 视觉叶子仍崩（该实验自身引入 mQmlLeaf 悬垂 UAF，已识别并移除）。
+  4. **无事件泵依赖**：去掉 qWait 循环直奔 teardown 仍崩。
+  5. PageHeap（gflags）需管理员权限，本会话不可用——损坏写入的当场捕获路径受阻。
+- 顺带修复的真实缺陷：**RibbonPanel 自第 1 轮起漏 SA_RIBBON_QML_EXPORT**（库内自用不暴露符号，外部消费者引用其 metaobject 即 LNK2001——本轮调查测试首次触发）。
+- 遗留假设（供第 6+ 轮）：损坏写入发生在 option 开启时的某次引擎/宿主代码路径，在析构时经 V4 堆邻接显现；下一步建议：①提权跑 PageHeap 定位写入点；②以 Release 构建复测（Debug 迭代器/堆布局差异可能改变表象）；③向 Qt BUG 报告方向准备最小纯 QML 复现。
+- 影响计划：04（optionAction 仍为已知缺口）；本轮净收益=RibbonPanel 导出宏修复 + 崩溃证据链升级。
+
+### B45：叶子创建上下文根因修复 + 对齐/最小模式（第 5 轮下半）
+- 日期：2026-10-08（用户目标第 5 轮）
+- **根因修复（B43 缺陷 A/B44 崩溃家族的共同底层原因）**：`createVisualLeaf` 中栈上 `QQmlComponent` 创建叶子——**组件析构即杀死叶子的 QML 上下文**，此后任何触碰叶子（含 ~RibbonQuickHost 的 setParentItem）都在死上下文的 V4 堆上释放（`_CrtIsValidHeapPointer` 断言弹窗=测试"挂起"的真身；`QV4::Value::fromHeapObject` 访问违例）。修复 = `component.create(engine->rootContext())`，叶子上下文挂引擎根上下文（引擎生命周期）。**修复后 bar 家族崩溃全部消失**（barAutoTabs/quickAccess/context/style 等 bar 测试在添加 bar 成员后全部触发该断言——并非对齐代码问题，而是成员变化改变堆布局令潜在 UAF 显形）。顺带：~RibbonQuickHost 不再 setParent(nullptr)+deleteLater（叶子本就是 QObject 子项，~QObject 同步删除且引擎仍存活）。
+- **新增功能**：RibbonBar `tabAlignment`（左/中/右，widgets setRibbonAlignment 对等；行宽预计算后在空闲条带内偏移，前端 tab 行几何）与 `minimumMode`（隐藏类目行、bar 收缩为标题+tab，widgets setMinimumMode 对等）；测试 `tabAlignmentAndMinimumMode`（左→居中→右→还原 x 断言 + 最小模式类目显隐/bar 高度）。
+- **optionAction 精确边界（B44 续）**：在根上下文修复后的基线上重新二分——引擎输入开+**消费关 = 不崩**；store-only（仅 `mLastOptionButtonGeometry = r.optionBtnGeometry`，一个 QRect 成员赋值）**也崩**；emit-only 崩。消费路径内某个与代码布局相关的确定性触发，Qt 6.7.3 Debug V4 内部（+0x611117 帧族）。**决策：几何发布继续延后**（hasOptionAction 属性/引擎预留/trigger 信号保留并已测试），下轮建议 Release 构建复测 + 向 Qt 上游投最小复现。
+- 测试 16/16 绿（+对齐/最小模式 +optionAction API）；示例 30s 稳定。
+- 影响计划：04-S3（createVisualLeaf 根上下文=结构性修复，影响全部叶子）；B43 缺陷 A 同源关闭。
+
 ---
 
 ## 执行中追加（模板，勿删）

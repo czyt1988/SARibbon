@@ -112,6 +112,31 @@ void RibbonPanel::invalidateChildCache(SARibbon::Core::SARibbonAbstractLayoutIte
     polish();
 }
 
+bool RibbonPanel::hasOptionAction() const
+{
+    return mHasOptionAction;
+}
+
+void RibbonPanel::setHasOptionAction(bool on)
+{
+    if (mHasOptionAction == on) {
+        return;
+    }
+    mHasOptionAction = on;
+    Q_EMIT hasOptionActionChanged();
+    polish();
+}
+
+void RibbonPanel::triggerOptionAction()
+{
+    Q_EMIT optionActionTriggered();
+}
+
+QRectF RibbonPanel::optionButtonRect() const
+{
+    return QRectF(mLastOptionButtonGeometry);
+}
+
 int RibbonPanel::rowCountForMode() const
 {
     switch (mLayoutMode) {
@@ -182,15 +207,18 @@ void RibbonPanel::runLayout()
     input.rowCount        = rowCountForMode();
     input.showPanelTitle  = mEnableShowPanelTitle && !mPanelTitle.isEmpty();
     input.hasTitleLabel   = true;
-    input.hasOptionAction = false;
+    input.hasOptionAction = mHasOptionAction;
     input.isRTL           = SA::saIsRTL();
     input.contentsMargins = QMargins(2, 2, 2, 2);  // widgets parity (SARibbonPanelLayout)
     input.spacing         = 2;
-    input.titleTextWidth  = -1;  // no option button in P0; title width only feeds min width
-    input.optionBtnSize   = QSize();
+    // widgets adapter contract (engine comment: titleTextWidth = fm advance + 4;
+    // -1 means "no title"); optionBtnSize mirrors the widgets option button
+    const QFontMetrics fm = RibbonMetrics::instance()->coreMetrics().fontMetrics();
+    input.titleTextWidth  = input.showPanelTitle ? fm.horizontalAdvance(mPanelTitle) + 4 : -1;
+    input.optionBtnSize   = mHasOptionAction ? QSize(16, 16) : QSize();
     input.titleHeight     = RibbonMetrics::instance()->panelTitleHeight();
     input.titleSpace      = 2;
-    input.fontMetrics     = RibbonMetrics::instance()->coreMetrics().fontMetrics();
+    input.fontMetrics     = fm;
     input.previousSizeHintWidth = mLastSizeHint.width();
 
     QVector< SARibbon::Core::SARibbonAbstractLayoutItem* > items;
@@ -208,6 +236,15 @@ void RibbonPanel::runLayout()
         mLastTitleGeometry = r.titleGeometry;
         Q_EMIT titleGeometryChanged();
     }
+    // NOTE (round 5, NOTES B44): consuming r.optionBtnGeometry in ANY form
+    // (store and/or emit) deterministically crashes at the panel's QQmlData
+    // teardown inside Qt 6.7.3 debug V4 (QV4::Value::fromHeapObject offsets
+    // +0x4699be/+0x462d1b/+0x611117) — engine input ON + consumption OFF is
+    // crash-free, so the trigger lives in the consumption path, not the
+    // engine. Deferred: hasOptionAction currently reserves engine space but
+    // the geometry is not published; revisit with a Release build and Qt
+    // upstream check (QTBUG-worthy minimal repro: any panel with a child +
+    // hasOptionAction, view teardown).
     // publish implicit sizes even at zero geometry: the sizeHint derives from the
     // C++ item hints (metrics-driven, rect-independent), and the category reads
     // implicitWidth as its layout hint — gating this on our own size would

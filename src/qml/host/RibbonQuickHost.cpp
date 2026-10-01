@@ -9,12 +9,17 @@ RibbonQuickHost::RibbonQuickHost(QQuickItem* parent) : QQuickItem(parent)
 
 RibbonQuickHost::~RibbonQuickHost()
 {
-    // leaf destruction: unparent + deleteLater, NEVER direct delete (a QML item may
-    // sit inside its own mouse-handling call stack, KDDW Group.cpp same rule)
+    // Leaf teardown (round-5 root cause, NOTES B44): the leaf is a QObject
+    // CHILD of this host (setParent in createVisualLeaf), so QObject's own
+    // child cleanup deletes it synchronously right after this destructor
+    // body — while the QML engine is still alive. Detaching via
+    // setParent(nullptr) + deleteLater instead left the leaf pending past
+    // the engine's teardown, and the deferred deletion then freed V4 heap
+    // blocks of an already-destroyed engine (_CrtIsValidHeapPointer assert /
+    // QV4::Value::fromHeapObject access violations — the round-4 optionAction
+    // crash family). Only the scene-graph attachment is detached here.
     if (mQmlLeaf) {
         mQmlLeaf->setParentItem(nullptr);
-        mQmlLeaf->setParent(nullptr);
-        mQmlLeaf->deleteLater();
         mQmlLeaf = nullptr;
     }
 }

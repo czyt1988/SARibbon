@@ -46,6 +46,8 @@ private Q_SLOTS:
     void styleRadioViaContainer();
     void separatorInPanel();
     void quickAccessBarAndRightGroup();
+    void tabAlignmentAndMinimumMode();
+    void panelOptionAction();
 
 private:
     QQuickView* exposeScene(QQmlEngine& engine, QQmlComponent& component, const char* src, int w, int h);
@@ -1144,6 +1146,138 @@ Item {
     const QPointF center = save->mapToScene(QPointF(save->width() / 2, save->height() / 2));
     QTest::mouseClick(view.get(), Qt::LeftButton, Qt::NoModifier, center.toPoint());
     QTRY_COMPARE(clickedSpy.size(), 1);
+}
+
+/**
+ * @brief Tab row alignment + minimum (collapsed) mode
+ * @details Alignment mirrors widgets setRibbonAlignment (left/center/right
+ *          inside the free strip); minimum mode mirrors setMinimumMode
+ *          (the category row hides, the bar keeps title + tab rows).
+ */
+void TestConformanceQml::tabAlignmentAndMinimumMode()
+{
+    QQmlEngine engine;
+    saRibbonRegisterQmlTypes(&engine);
+
+    QString src = QStringLiteral(R"QML(import QtQuick 2.12
+import SARibbon 3.0
+Item {
+    width: 900
+    height: 300
+    RibbonBar {
+        objectName: "bar"
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        applicationLabel: "File"
+        RibbonCategory {
+            objectName: "cat"
+            title: "Home"
+            RibbonPanel { panelTitle: "P"; RibbonToolButton { text: "A" } }
+        }
+    }
+})QML");
+
+    QQmlComponent component(&engine);
+    std::unique_ptr< QQuickView > view(exposeScene(engine, component, src.toUtf8().constData(), 900, 300));
+    QVERIFY(view);
+    QQuickItem* rootItem = view->rootObject();
+    QVERIFY(rootItem);
+
+    auto* bar = rootItem->findChild< QQuickItem* >(QStringLiteral("bar"));
+    auto* cat = rootItem->findChild< QQuickItem* >(QStringLiteral("cat"));
+    QVERIFY(bar && cat);
+
+    // leftmost visible tab host (exact class name)
+    auto firstTab = [rootItem]() -> QQuickItem* {
+        const auto all = rootItem->findChildren< QQuickItem* >();
+        QQuickItem* best = nullptr;
+        for (QQuickItem* item : all) {
+            if (QString::fromLatin1(item->metaObject()->className()) == QLatin1String("SARibbonQml::RibbonTab")
+                && item->isVisible()) {
+                if (!best || item->x() < best->x()) {
+                    best = item;
+                }
+            }
+        }
+        return best;
+    };
+    QQuickItem* tab = nullptr;
+    QTRY_VERIFY((tab = firstTab()) != nullptr);
+    const qreal leftX = tab->x();
+    QVERIFY(leftX > 0);
+
+    // ---- center alignment moves the row right ----
+    bar->setProperty("tabAlignment", int(SARibbonQml::RibbonEnums::AlignCenter));
+    QTRY_VERIFY(tab->x() > leftX + 50);
+    // ---- right alignment pushes it further ----
+    bar->setProperty("tabAlignment", int(SARibbonQml::RibbonEnums::AlignRight));
+    QTRY_VERIFY(tab->x() > leftX + 100);
+    // ---- back to left restores ----
+    bar->setProperty("tabAlignment", int(SARibbonQml::RibbonEnums::AlignLeft));
+    QTRY_COMPARE(tab->x(), leftX);
+
+    // ---- minimum mode: category hides, bar shrinks ----
+    const qreal normalHeight = bar->implicitHeight();
+    QTRY_VERIFY(cat->isVisible());
+    bar->setProperty("minimumMode", true);
+    QTRY_VERIFY(!cat->isVisible());
+    QTRY_VERIFY(bar->implicitHeight() < normalHeight);
+    bar->setProperty("minimumMode", false);
+    QTRY_VERIFY(cat->isVisible());
+    QTRY_COMPARE(bar->implicitHeight(), normalHeight);
+}
+
+/**
+ * @brief Panel option action: reserved engine space + trigger signal
+ * @details Mirrors the widgets setOptionAction. The engine reserves the
+ *          option square when hasOptionAction is set; the geometry
+ *          PUBLICATION stays deferred (consuming it crashes at teardown on
+ *          Qt 6.7.3 debug — NOTES B44), so this test guards the reservation
+ *          input, the property API and the trigger signal, plus a full
+ *          event-pumped teardown of the previously-crashing scene.
+ */
+void TestConformanceQml::panelOptionAction()
+{
+    QQmlEngine engine;
+    saRibbonRegisterQmlTypes(&engine);
+
+    QString src = QStringLiteral(R"QML(import QtQuick 2.12
+import SARibbon 3.0
+Item {
+    width: 500
+    height: 200
+    RibbonPanel {
+        objectName: "panel"
+        anchors.fill: parent
+        panelTitle: "Opt"
+        hasOptionAction: true
+        RibbonSeparator { objectName: "sep" }
+    }
+})QML");
+
+    QQmlComponent component(&engine);
+    std::unique_ptr< QQuickView > view(exposeScene(engine, component, src.toUtf8().constData(), 500, 200));
+    QVERIFY(view);
+    QQuickItem* rootItem = view->rootObject();
+    QVERIFY(rootItem);
+
+    auto* panel = rootItem->findChild< QQuickItem* >(QStringLiteral("panel"));
+    QVERIFY(panel);
+    // the property round-trips
+    QCOMPARE(panel->property("hasOptionAction").toBool(), true);
+
+    // the option action signal fires from the invokable (leaf-mediated click
+    // parity; the visual button renders once geometry publication is enabled)
+    QSignalSpy optSpy(panel, SIGNAL(optionActionTriggered()));
+    QMetaObject::invokeMethod(panel, "triggerOptionAction");
+    QCOMPARE(optSpy.size(), 1);
+
+    // full event pumping + teardown: the crash family lived HERE
+    for (int i = 0; i < 20; ++i) {
+        QTest::qWait(50);
+    }
+    QVERIFY(panel->isVisible());
 }
 
 QTEST_MAIN(TestConformanceQml)

@@ -36,13 +36,15 @@ class RibbonLayoutItemHost;
  *          侧 panel 布局驱动 QWidgetItem 包装器的做法。
  * \endif
  */
-class RibbonPanel : public RibbonQuickHost
+class SA_RIBBON_QML_EXPORT RibbonPanel : public RibbonQuickHost
 {
     Q_OBJECT
     Q_PROPERTY(QString panelTitle READ panelTitle WRITE setPanelTitle NOTIFY panelTitleChanged)
     Q_PROPERTY(RibbonEnums::LayoutMode layoutMode READ layoutMode WRITE setLayoutMode NOTIFY layoutModeChanged)
     Q_PROPERTY(bool enableShowPanelTitle READ enableShowPanelTitle WRITE setEnableShowPanelTitle NOTIFY enableShowPanelTitleChanged)
+    Q_PROPERTY(bool hasOptionAction READ hasOptionAction WRITE setHasOptionAction NOTIFY hasOptionActionChanged)
     Q_PROPERTY(QRectF titleGeometry READ titleGeometry NOTIFY titleGeometryChanged)
+    Q_PROPERTY(QRectF optionButtonRect READ optionButtonRect NOTIFY optionButtonRectChanged)
 public:
     explicit RibbonPanel(QQuickItem* parent = nullptr);
     ~RibbonPanel() override;
@@ -57,6 +59,15 @@ public:
     // styles hide it — widgets setEnableShowPanelTitle parity)
     bool enableShowPanelTitle() const;
     void setEnableShowPanelTitle(bool on);
+
+    // Option action (widgets setOptionAction parity): the engine reserves a
+    // square at the title strip's right end; the leaf renders the diagonal
+    // button there and the signal carries the trigger
+    bool hasOptionAction() const;
+    void setHasOptionAction(bool on);
+
+    // Trigger used by the leaf's option button click + tests
+    Q_INVOKABLE void triggerOptionAction();
 
     // Style push from the category (bar ribbonStyle propagation chain):
     // row mode + title visibility land here, word wrap / icon-right flags
@@ -74,11 +85,17 @@ public:
     // engine-computed title strip rect; the leaf renders the caption inside it
     QRectF titleGeometry() const;
 
+    // engine-computed option button rect (valid when hasOptionAction)
+    QRectF optionButtonRect() const;
+
 Q_SIGNALS:
     void panelTitleChanged();
     void layoutModeChanged();
     void enableShowPanelTitleChanged();
+    void hasOptionActionChanged();
+    void optionButtonRectChanged();
     void titleGeometryChanged();
+    void optionActionTriggered();
 
 protected:
     QUrl leafUrl() const override;
@@ -98,6 +115,7 @@ private:
     QString mPanelTitle;
     RibbonEnums::LayoutMode mLayoutMode = RibbonEnums::ThreeRowMode;
     bool mEnableShowPanelTitle = true;
+    bool mHasOptionAction      = false;
     bool mWordWrap             = true;
     bool mIconRightText        = false;
     QVector< RibbonLayoutItemHost* > mChildItems;
@@ -106,6 +124,7 @@ private:
     int mLastColumnCount = 0;
     int mLastLargeHeight = 0;
     QRect mLastTitleGeometry;
+    QRect mLastOptionButtonGeometry;
 };
 
 }

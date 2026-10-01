@@ -59,8 +59,17 @@ QQuickItem* createVisualLeaf(QQuickItem* host, const QUrl& leafUrl)
         qWarning() << "SARibbonQml: leaf resource missing (static build without Q_INIT_RESOURCE?)" << leafUrl;
         return nullptr;
     }
+    // The leaf must outlive this function, so its creation context must be
+    // parented to a context that outlives it too. A stack QQmlComponent owns
+    // the contexts created from it — creating with the default context makes
+    // the leaf's bindings reference a context that dies as soon as this
+    // function returns, and ANY later touch of the leaf (setParentItem at
+    // teardown included) then frees V4 blocks of the dead context
+    // (_CrtIsValidHeapPointer assert / QV4 access violations — the round-4/5
+    // crash family, NOTES B44). Creating in the engine's ROOT context keeps
+    // the leaf's context alive for the engine's lifetime.
     QQmlComponent component(engine, leafUrl);
-    QObject* obj = component.create();
+    QObject* obj = component.create(engine->rootContext());
     if (!obj) {
         qWarning() << "SARibbonQml: leaf create() failed:" << leafUrl << component.errorString();
         return nullptr;

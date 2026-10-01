@@ -121,6 +121,36 @@ void RibbonBar::setRibbonStyle(RibbonEnums::RibbonStyle style)
     polish();
 }
 
+RibbonEnums::Alignment RibbonBar::tabAlignment() const
+{
+    return mTabAlignment;
+}
+
+void RibbonBar::setTabAlignment(RibbonEnums::Alignment alignment)
+{
+    if (mTabAlignment == alignment) {
+        return;
+    }
+    mTabAlignment = alignment;
+    Q_EMIT tabAlignmentChanged();
+    polish();
+}
+
+bool RibbonBar::isMinimumMode() const
+{
+    return mMinimumMode;
+}
+
+void RibbonBar::setMinimumMode(bool on)
+{
+    if (mMinimumMode == on) {
+        return;
+    }
+    mMinimumMode = on;
+    Q_EMIT minimumModeChanged();
+    polish();
+}
+
 void RibbonBar::propagateRibbonStyle()
 {
     // widgets setRibbonStyle parity: three-row keeps word wrap + panel
@@ -615,9 +645,36 @@ void RibbonBar::relayout()
     // 2. tab row geometry: plain sequence (no Repeater), starting after the
     //    app button; text-driven width (widgets tabSizeHint: text width +
     //    hspace, min 50, office-2021 QSS adds 5+5 margins). Compact styles
-    //    ride the title row (tabOnTitle, widgets parity)
+    //    ride the title row (tabOnTitle, widgets parity). The row can be
+    //    aligned left/center/right inside the free strip (widgets
+    //    setRibbonAlignment parity; front-end tab-row geometry, core engine
+    //    stays authoritative for the title free area)
     const int tabSpacing = 2;
-    int x = (hasAppButton ? appBtnW : 0) + 4;
+    // total row width first (alignment offset needs it)
+    int rowWidth = -tabSpacing;
+    for (int i = 0; i < effTabs.size(); ++i) {
+        const int textW = fm.horizontalAdvance(effTabs[ i ]->text());
+        rowWidth += qMax(50, textW + 24) + tabSpacing;
+    }
+    // widgets setRibbonAlignment parity: the row shifts inside the free strip
+    // (left = after the app button, center/right = shifted; front-end tab-row
+    // geometry — the core engine stays authoritative for the title free area)
+    const int stripBegin = (hasAppButton ? appBtnW : 0) + 4;
+    const int stripEnd   = int(width()) - 124;  // reserved system strip
+    int x = stripBegin;
+    if (stripEnd > stripBegin && rowWidth < stripEnd - stripBegin) {
+        switch (mTabAlignment) {
+        case RibbonEnums::AlignCenter:
+            x = stripBegin + (stripEnd - stripBegin - rowWidth) / 2;
+            break;
+        case RibbonEnums::AlignRight:
+            x = stripEnd - rowWidth;
+            break;
+        case RibbonEnums::AlignLeft:
+        default:
+            break;
+        }
+    }
     QVector< QRectF > tabRects;
     tabRects.reserve(effTabs.size());
     for (int i = 0; i < effTabs.size(); ++i) {
@@ -633,11 +690,12 @@ void RibbonBar::relayout()
 
     // 3. current category below the tab row (context pages included: they are
     //    children of the context item which sits at the bar origin, so the
-    //    coordinates are already bar-relative)
+    //    coordinates are already bar-relative). Minimum mode hides the whole
+    //    category row (widgets setMinimumMode parity: only title + tabs stay)
     const int categoryY = tabBarY + tabH;
     for (int i = 0; i < effCats.size(); ++i) {
         RibbonCategory* cat = effCats[ i ];
-        cat->setVisible(i == mCurrentIndex);
+        cat->setVisible(!mMinimumMode && i == mCurrentIndex);
         cat->setPosition(QPointF(0, categoryY));
         cat->setSize(QSizeF(width(), catH));
     }
@@ -649,7 +707,7 @@ void RibbonBar::relayout()
             }
         }
     }
-    setImplicitHeight(categoryY + catH);
+    setImplicitHeight(mMinimumMode ? categoryY : categoryY + catH);
 
     // 4. context bands: one per ACTIVE context, spanning its tabs (first tab
     //    left .. last tab right) from the bar top through the tab row; the
