@@ -25,9 +25,9 @@ Rectangle {
     readonly property string label: cppHost ? cppHost.text : ""
     readonly property string icon: cppHost ? cppHost.iconSource : ""
     readonly property string tip: cppHost ? cppHost.toolTip : ""
-    // iconRightText (single-row styles) forces the small rendering regardless
-    // of the proportion (widgets effectiveButtonType parity)
-    readonly property bool large: cppHost && cppHost.proportion === Ribbon.Large && !cppHost.iconRightText
+    // large-type verdict comes from the host (core effectiveButtonType parity);
+    // single-dependency binding shape is mandatory (NOTES B48)
+    readonly property bool large: cppHost ? cppHost.largeType : false
     readonly property bool wordWrap: cppHost ? cppHost.wordWrap : true
     readonly property bool checked: cppHost ? cppHost.checked : false
     readonly property bool disabled: !cppHost || !cppHost.enabled
@@ -39,6 +39,14 @@ Rectangle {
     readonly property bool instant: root.hasMenu && root.popupMode === Ribbon.InstantPopup
     readonly property rect hitAction: cppHost ? cppHost.actionRect : Qt.rect(0, 0, 0, 0)
     readonly property rect hitMenu: cppHost ? cppHost.menuRect : Qt.rect(0, 0, 0, 0)
+    // ---- host-published draw geometry (core SARibbonToolButtonLayout) ----
+    readonly property rect iconBox: cppHost ? cppHost.iconGeometry : Qt.rect(0, 0, 0, 0)
+    readonly property rect textBox: cppHost ? cppHost.textGeometry : Qt.rect(0, 0, 0, 0)
+    readonly property rect indBox: cppHost ? cppHost.indicatorGeometry : Qt.rect(0, 0, 0, 0)
+    readonly property string caption: cppHost ? cppHost.displayText : ""
+    // true when the caption box is the two-line top-aligned budget
+    readonly property bool wrapCaption: cppHost ? cppHost.textWordWrap : false
+    readonly property int naturalIconSide: cppHost ? cppHost.iconSide : 0
 
     // long-press (DelayedPopup) suppresses the click that follows the hold
     property bool heldForMenu: false
@@ -97,114 +105,90 @@ Rectangle {
                   : RibbonTheme.contentBg)
     }
 
-    // icon sizes (widgets parity: 32 large / 20 small)
-    readonly property int iconSide: root.large ? 32 : 20
     // disabled content: opacity carries the grey (no literal colors)
     readonly property real contentOpacity: root.disabled ? 0.45 : 1.0
 
-    // ---- large button: icon centered in the action zone, text + arrow in
-    // the bottom strip (the menu zone when split, else the bottom area) ----
-    Text {
-        id: largeText
-        visible: root.large
-        x: root.split ? (root.hitMenu.x + 2) : 2
-        y: root.split ? root.hitMenu.y : parent.height - height - 1
-        width: (root.split ? root.hitMenu.width : parent.width) - (root.split ? (indicator.width + 4) : 2)
-        height: root.split ? root.hitMenu.height : implicitHeight
-        text: root.label
-        wrapMode: root.wordWrap ? Text.WordWrap : Text.NoWrap
-        maximumLineCount: root.wordWrap ? 2 : 1
-        elide: Text.ElideRight
-        horizontalAlignment: root.split ? Text.AlignLeft : Text.AlignHCenter
-        verticalAlignment: Text.AlignVCenter
-        color: root.stateText
-        opacity: root.contentOpacity
-    }
+    // ---- content, positioned by the host-published draw rects ----
+    // One icon item and one caption item serve both button types: the core
+    // layout already decided where they go (large = icon box above the bottom
+    // text box, small = icon box left of the text box), so the leaf never
+    // re-derives geometry (iron rule: rendering here, layout in core).
     Image {
-        id: largeIcon
-        visible: root.large
-        x: root.hitAction.x + 2
-        y: root.hitAction.y + 2
-        width: root.hitAction.width - 4
-        height: root.hitAction.height - 4
+        id: contentIcon
+        visible: root.naturalIconSide > 0 && root.icon.length > 0
+        // the icon is painted at its natural size, centered in the icon box
+        // (widgets drawItemPixmap(iconRect, Qt::AlignCenter, pixmap))
+        width: root.naturalIconSide
+        height: root.naturalIconSide
+        x: root.iconBox.x + (root.iconBox.width - width) / 2
+        y: root.iconBox.y + (root.iconBox.height - height) / 2
         source: root.icon
-        sourceSize.width: root.iconSide
-        sourceSize.height: root.iconSide
+        sourceSize.width: root.naturalIconSide
+        sourceSize.height: root.naturalIconSide
         fillMode: Image.PreserveAspectFit
         opacity: root.contentOpacity
     }
+    Text {
+        id: contentText
+        visible: root.caption.length > 0 && root.textBox.width > 0
+        x: root.textBox.x
+        y: root.textBox.y
+        width: root.textBox.width
+        height: root.textBox.height
+        text: root.caption
+        color: root.stateText
+        opacity: root.contentOpacity
+        // wrapped large caption: two-line budget, top aligned, centered
+        // (widgets TextWordWrap | AlignTop | AlignHCenter); everything else is
+        // a single centered line already elided by the host (AlignCenter)
+        wrapMode: root.wrapCaption ? Text.WordWrap : Text.NoWrap
+        maximumLineCount: root.wrapCaption ? 2 : 1
+        elide: root.wrapCaption ? Text.ElideNone : Text.ElideRight
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: root.wrapCaption ? Text.AlignTop : Text.AlignVCenter
+    }
 
-    // menu indicator arrow (filled triangle, theme-colored)
+    // menu indicator arrow: the widgets proxy style polyline (a stroked,
+    // bottom-pointing chevron centered in the indicator rect), not a filled
+    // triangle — both front ends must draw the same glyph
     Canvas {
         id: indicator
         property color arrowColor: root.stateText
         onArrowColorChanged: requestPaint()
-        visible: root.split && root.large
-        width: 8
-        height: 5
-        x: root.hitMenu.x + root.hitMenu.width - width - 3
-        y: root.hitMenu.y + root.hitMenu.height / 2 - height / 2
+        visible: root.indBox.width > 1 && root.indBox.height > 1
+        x: root.indBox.x
+        y: root.indBox.y
+        width: root.indBox.width
+        height: root.indBox.height
         opacity: root.contentOpacity
         onPaint: {
             var ctx = getContext("2d");
             ctx.reset();
-            ctx.fillStyle = arrowColor;
+            if (width <= 1 || height <= 1) {
+                return;
+            }
+            var size = Math.min(width, height);
+            var border = Math.floor(size / 4);
+            var sqsize = 2 * Math.floor(size / 2);
+            var ax = [border, sqsize / 2, sqsize - border];
+            var ay = [sqsize / 2, sqsize - border, sqsize / 2];
+            var minX = Math.min(ax[0], ax[1], ax[2]);
+            var maxX = Math.max(ax[0], ax[1], ax[2]);
+            var minY = Math.min(ay[0], ay[1], ay[2]);
+            var maxY = Math.max(ay[0], ay[1], ay[2]);
+            // QPolygon::boundingRect center (integer division like QRect)
+            var cx = minX + Math.floor((maxX - minX + 1) / 2);
+            var cy = minY + Math.floor((maxY - minY + 1) / 2);
+            var sx = sqsize / 2 - cx - 1;
+            var sy = sqsize / 2 - cy - 1;
+            ctx.translate((width - size) / 2 + sx, (height - size) / 2 + sy);
+            ctx.strokeStyle = arrowColor;
+            ctx.lineWidth = 1.4;
             ctx.beginPath();
-            ctx.moveTo(0, 0);
-            ctx.lineTo(width, 0);
-            ctx.lineTo(width / 2, height);
-            ctx.closePath();
-            ctx.fill();
-        }
-    }
-
-    // ---- small/medium button: icon left, text right, arrow strip trailing ----
-    Image {
-        id: smallIcon
-        visible: !root.large
-        x: 1
-        anchors.verticalCenter: parent.verticalCenter
-        width: root.iconSide
-        height: root.iconSide
-        source: root.icon
-        sourceSize.width: root.iconSide
-        sourceSize.height: root.iconSide
-        fillMode: Image.PreserveAspectFit
-        opacity: root.contentOpacity
-    }
-    Text {
-        id: smallText
-        visible: !root.large
-        anchors.left: smallIcon.right
-        anchors.leftMargin: 2
-        anchors.right: root.split ? indicatorSmall.left : parent.right
-        anchors.rightMargin: root.split ? 0 : 2
-        anchors.verticalCenter: parent.verticalCenter
-        text: root.label
-        elide: Text.ElideRight
-        color: root.stateText
-        opacity: root.contentOpacity
-    }
-    Canvas {
-        id: indicatorSmall
-        property color arrowColor: root.stateText
-        onArrowColorChanged: requestPaint()
-        visible: root.split && !root.large
-        width: 8
-        height: 5
-        x: root.hitMenu.x + root.hitMenu.width / 2 - width / 2
-        y: parent.height / 2 - height / 2
-        opacity: root.contentOpacity
-        onPaint: {
-            var ctx = getContext("2d");
-            ctx.reset();
-            ctx.fillStyle = arrowColor;
-            ctx.beginPath();
-            ctx.moveTo(0, 0);
-            ctx.lineTo(width, 0);
-            ctx.lineTo(width / 2, height);
-            ctx.closePath();
-            ctx.fill();
+            ctx.moveTo(ax[0], ay[0]);
+            ctx.lineTo(ax[1], ay[1]);
+            ctx.lineTo(ax[2], ay[2]);
+            ctx.stroke();
         }
     }
 

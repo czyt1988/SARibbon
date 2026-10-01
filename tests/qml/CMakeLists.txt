@@ -1,5 +1,5 @@
 # QML-side conformance tests (plan-04 S7). Every test sets LABELS qml.
-find_package(Qt${QT_VERSION_MAJOR} ${SARIBBON_MIN_QT_VERSION} REQUIRED COMPONENTS Test Core Gui Qml Quick)
+find_package(Qt${QT_VERSION_MAJOR} ${SARIBBON_MIN_QT_VERSION} REQUIRED COMPONENTS Test Core Gui Qml Quick Widgets)
 
 if(TARGET SARibbonQml)
     add_executable(qml_Conformance tst_conformance_qml.cpp)
@@ -28,5 +28,29 @@ if(TARGET SARibbonQml)
     endif()
     add_test(NAME qml_Conformance COMMAND qml_Conformance)
     set_tests_properties(qml_Conformance PROPERTIES LABELS qml TIMEOUT 120
+        ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QT_QUICK_CONTROLS_STYLE=Basic")
+endif()
+
+# QML ↔ widgets 布局一致性测试：需要同时链接两个前端（core 布局算法的唯一消费者），
+# 因此仅在 widgets 目标存在时构建。
+if(TARGET SARibbonQml AND TARGET SARibbonWidgets)
+    add_executable(qml_LayoutParity tst_layout_parity_qml.cpp)
+    target_link_libraries(qml_LayoutParity PRIVATE
+        SARibbonQml
+        SARibbon::Widgets
+        SARibbonCore
+        Qt${QT_VERSION_MAJOR}::Test
+        Qt${QT_VERSION_MAJOR}::Core
+        Qt${QT_VERSION_MAJOR}::Gui
+        Qt${QT_VERSION_MAJOR}::Widgets
+        Qt${QT_VERSION_MAJOR}::Qml
+        Qt${QT_VERSION_MAJOR}::Quick
+    )
+    set_target_properties(qml_LayoutParity PROPERTIES
+        AUTOMOC ON
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+    )
+    add_test(NAME qml_LayoutParity COMMAND qml_LayoutParity)
+    set_tests_properties(qml_LayoutParity PROPERTIES LABELS qml TIMEOUT 120
         ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QT_QUICK_CONTROLS_STYLE=Basic")
 endif()

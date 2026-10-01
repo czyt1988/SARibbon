@@ -4,6 +4,7 @@
 #include "../host/RibbonLayoutItemHost.h"
 #include "../SARibbonQmlTypes.h"
 #include <SARibbonCore/SARibbonEnums.h>
+#include <SARibbonCore/SARibbonToolButtonLayout.h>
 #include <QQuickItem>
 #include <QQmlListProperty>
 #include <QRectF>
@@ -64,6 +65,13 @@ class SA_RIBBON_QML_EXPORT RibbonToolButton : public RibbonLayoutItemHost
     Q_PROPERTY(bool hasMenu READ hasMenu NOTIFY menuItemsChanged)
     Q_PROPERTY(QRectF actionRect READ actionRect NOTIFY hitRectsChanged)
     Q_PROPERTY(QRectF menuRect READ menuRect NOTIFY hitRectsChanged)
+    Q_PROPERTY(bool largeType READ isLargeType NOTIFY layoutChanged)
+    Q_PROPERTY(QString displayText READ displayText NOTIFY layoutChanged)
+    Q_PROPERTY(QRectF iconGeometry READ iconGeometry NOTIFY layoutChanged)
+    Q_PROPERTY(QRectF textGeometry READ textGeometry NOTIFY layoutChanged)
+    Q_PROPERTY(QRectF indicatorGeometry READ indicatorGeometry NOTIFY layoutChanged)
+    Q_PROPERTY(bool textWordWrap READ isTextWordWrap NOTIFY layoutChanged)
+    Q_PROPERTY(int iconSide READ iconSide NOTIFY layoutChanged)
 public:
     explicit RibbonToolButton(QQuickItem* parent = nullptr);
     ~RibbonToolButton() override;
@@ -115,6 +123,19 @@ public:
     QRectF actionRect() const;
     QRectF menuRect() const;
 
+    // ---- core layout publication (SARibbonToolButtonLayout parity) ----
+    /// Effective large-button type (proportion Large and not iconRightText)
+    bool isLargeType() const;
+    /// Caption to render: elided for small/single-line large buttons, raw for wrapped large
+    QString displayText() const;
+    QRectF iconGeometry() const;
+    QRectF textGeometry() const;
+    QRectF indicatorGeometry() const;
+    /// True when the caption is laid out as a two-line top-aligned box
+    bool isTextWordWrap() const;
+    /// Natural icon side length the leaf renders (widgets realIconSize parity)
+    int iconSide() const;
+
     // Invokable trigger used by the visual leaf's MouseArea; also usable from
     // user QML/tests to simulate a click. A disabled host swallows the click
     Q_INVOKABLE void click();
@@ -144,6 +165,7 @@ Q_SIGNALS:
     void menuItemsChanged();
     void menuVisibleChanged();
     void hitRectsChanged();
+    void layoutChanged();
     void clicked();
     void toggled(bool checked);
     void menuTriggered(SARibbonQml::RibbonMenuItem* item);
@@ -172,8 +194,9 @@ private:
     static void clearMenuItems(QQmlListProperty< SARibbonQml::RibbonMenuItem >* prop);
 
     void updateSizeHint();
-    void updateHitRects();
+    void updateLayout();
     QSize computeSizeHintFromMetrics();
+    SARibbon::Core::SARibbonToolButtonLayout::Input layoutInput() const;
     void emitMenuItemsChanged();
 
     QString mText;
@@ -188,6 +211,11 @@ private:
     QSize mCachedSizeHint;
     QRectF mActionRect;
     QRectF mMenuRect;
+    QRectF mIconGeometry;
+    QRectF mTextGeometry;
+    QRectF mIndicatorGeometry;
+    QString mDisplayText;
+    bool mIsTextNeedWrap = false;
     QVector< RibbonMenuItem* > mMenuItems;
 };
 

@@ -562,6 +562,17 @@
 - 测试 18/18 双绿（Debug build-qml-test + Release build-qml-rel 两树独立验证）；示例 30s 稳定。
 - 影响计划：04（optionAction 从"已知缺口"转"完成"）；B44-B46 崩溃链全部关闭（根因=绑定形状，非消费路径、非引擎、非根上下文遗留）。
 
+### B49：按钮布局算法下沉 core，QML 与 widgets 布局一致性用测试钉死（第 9 轮）
+- 日期：2026-10-01（用户目标第 9 轮：QML 按钮文字显示异常）
+- 发现位置：计划 02（core 下沉）/ 计划 04（QML 前端）交界
+- **根因**：按钮布局算法（两行/单行文本预算、大按钮高度与最小宽度、宽高比上限、图标/文本/下拉箭头矩形切分、文本对齐）此前只存在于 `src/widgets/SARibbonToolButton.cpp` 的私有实现（619 行），QML 宿主只能自行拼凑尺寸——没有两行预算、没有宽高比约束，文字显示异常。按 qml-guide 铁律，这正是"QML 需要复制 widgets 算法 = core 缺口"，处理方向是补 core 而不是在 QML 里重写。
+- **处理**：新建 `src/core/layout/SARibbonToolButtonLayout.{h,cpp}`——`ToolButtonLayoutConstants` 常量族 + `SARibbonToolButtonLayout::{Input,SizeHintResult,DrawRectResult,Factors}` + `calcSizeHint/calcDrawRects/textDrawRectHeight/textAlignment/estimateLargeButtonTextWidth/adjustIconSize/indicatorHeight/simplifiedText`。widgets 侧改为纯委托（`git diff --numstat` = 66 插入 / 619 删除，行为不变）；QML 宿主 `layoutInput()` 组装同一 `Input`，并把 `iconGeometry/textGeometry/indicatorGeometry/textWordWrap/largeType/displayText` 发布给叶子渲染。
+- **过程中发现的真实分歧（已修）**：Qt6 `QToolButton::initStyleOption` 在按钮无图标时把 `ToolButtonTextBesideIcon` 降级为 `ToolButtonTextOnly`（Qt 5.14.2 源码无此逻辑），widgets 侧交给 core 的正是降级后的值；QML 宿主原先硬编码 `TextBesideIcon`，导致无图标小按钮**宽度多 23px 且预留了幻影图标矩形**。修复为 `layoutInput()` 内按 `QT_VERSION` 分支镜像 widgets 行为。
+- **新增一致性测试** `tests/qml/tst_layout_parity_qml.cpp`（目标 `qml_LayoutParity`，同时链接 SARibbonQml 与 SARibbon::Widgets，仅在两个 target 都存在时构建）：大按钮 sizeHint 在 7 种文本形状（短词/两词/触发换行/超长/手动 `\n`/单个超长词/CJK）上与 widgets 逐一相等 + 不换行变体；小按钮在统一宿主高度后相等；宿主发布的三个几何矩形 == `calcDrawRects` 结果；caption 模式（wordWrap 保留 `\n`、非 wordWrap 与小按钮去 `\n`）两端一致。
+- **测试可比性前提入档**：widgets `sizeHint()` 带缓存且小按钮 `textDrawRectHeight = rect.height() - 2`，跨端比较前必须 `resize()` + `invalidateSizeHint()` 把宿主高度对齐，否则比的是布局前的默认矩形。另：`RibbonMetrics` 未 DLL 导出，测试无法直接调用；两端字体本就同源（widgets 按钮继承应用字体，RibbonMetrics 默认取 `QGuiApplication::font()`），已实测 advance/lineSpacing 相等，故无需对齐字体。
+- 证据：`build-verify` ctest 30/30 绿（含新增 `qml_LayoutParity` 15 个数据行）、`build-qml-test`（WIDGETS=OFF）2/2 绿、`python tools/check_core_purity.py src/core` 通过、`tools/Amalgamate.sh` 重新生成合并文件。
+- 影响计划：02（ToolButton 布局算法入 core，widgets 侧只剩样式与交互）；04（QML 按钮文字布局与 widgets 一致，缺口关闭，且由常驻测试防止回归）。
+
 ---
 
 ## 执行中追加（模板，勿删）

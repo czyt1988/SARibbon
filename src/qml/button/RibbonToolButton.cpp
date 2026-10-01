@@ -9,18 +9,16 @@
 
 namespace SARibbonQml {
 
+namespace TBLC = SARibbon::Core::ToolButtonLayoutConstants;
+using SARibbonToolButtonLayout = SARibbon::Core::SARibbonToolButtonLayout;
+
 namespace {
-// Icon side lengths (widgets parity: SARibbonBar small icon 20, large 32).
+// Icon side lengths (widgets parity: SARibbonPanelLayout::mSmallToolButtonIconSize
+// defaults to 22, SARibbonToolButton::PrivateData::mLargeButtonSizeHint to 32).
 // Rendering parameters may live per front end (v2 §2.2 double-render rule);
-// the layout *algorithm* stays in the core engines.
-constexpr int kSmallIconSide = 20;
+// the layout *algorithm* itself lives in SARibbon::Core::SARibbonToolButtonLayout.
+constexpr int kSmallIconSide = 22;
 constexpr int kLargeIconSide = 32;
-// Widget-side SARibbonToolButton layout factors (SARibbonToolButton.cpp)
-constexpr qreal kLargeMinWidthRatio = 0.75;  ///< largeButtonMinimumWidthRatio
-constexpr qreal kMaxAspectRatio     = 1.4;   ///< buttonMaximumAspectRatio
-// Menu indicator lengths (widgets SARibbonToolButtonConstants)
-constexpr int kSmallIndicatorLen = 12;
-constexpr int kLargeIndicatorLen = 8;
 }  // namespace
 
 RibbonToolButton::RibbonToolButton(QQuickItem* parent) : RibbonLayoutItemHost(parent)
@@ -32,7 +30,7 @@ RibbonToolButton::RibbonToolButton(QQuickItem* parent) : RibbonLayoutItemHost(pa
     // driven geometry proved unreliable in offscreen tests (round-6 trace:
     // the panel's updatePolish delivered, the button's never did)
     connect(RibbonTheme::instance(), &RibbonTheme::rtlChanged, this, [this]() {
-        updateHitRects();
+        updateLayout();
         polish();
     });
     updateSizeHint();
@@ -60,7 +58,7 @@ void RibbonToolButton::setText(const QString& t)
     mText = t;
     Q_EMIT textChanged();
     updateSizeHint();
-    updateHitRects();
+    updateLayout();
 }
 
 QString RibbonToolButton::iconSource() const
@@ -76,6 +74,7 @@ void RibbonToolButton::setIconSource(const QString& s)
     mIconSource = s;
     Q_EMIT iconSourceChanged();
     updateSizeHint();
+    updateLayout();
 }
 
 RibbonEnums::RowProportion RibbonToolButton::proportion() const
@@ -118,7 +117,7 @@ void RibbonToolButton::setProportion(RibbonEnums::RowProportion rp)
     rowProportion = coreRp;
     Q_EMIT proportionChanged();
     updateSizeHint();
-    updateHitRects();
+    updateLayout();
 }
 
 bool RibbonToolButton::isCheckable() const
@@ -163,6 +162,7 @@ void RibbonToolButton::setWordWrap(bool on)
     mWordWrap = on;
     Q_EMIT wordWrapChanged();
     updateSizeHint();
+    updateLayout();
 }
 
 bool RibbonToolButton::isIconRightText() const
@@ -178,7 +178,7 @@ void RibbonToolButton::setIconRightText(bool on)
     mIconRightText = on;
     Q_EMIT iconRightTextChanged();
     updateSizeHint();
-    updateHitRects();
+    updateLayout();
 }
 
 QString RibbonToolButton::toolTip() const
@@ -208,7 +208,7 @@ void RibbonToolButton::setPopupMode(RibbonEnums::PopupMode mode)
     mPopupMode = mode;
     Q_EMIT popupModeChanged();
     updateSizeHint();
-    updateHitRects();
+    updateLayout();
 }
 
 QQmlListProperty< RibbonMenuItem > RibbonToolButton::menuItems()
@@ -245,6 +245,48 @@ QRectF RibbonToolButton::actionRect() const
 QRectF RibbonToolButton::menuRect() const
 {
     return mMenuRect;
+}
+
+bool RibbonToolButton::isLargeType() const
+{
+    // iconRightText forces the small rendering regardless of the proportion
+    // (widgets PrivateData::effectiveButtonType parity)
+    return (SARibbon::Core::SARibbonRowProportion::Large == rowProportion) && !mIconRightText;
+}
+
+QString RibbonToolButton::displayText() const
+{
+    return mDisplayText;
+}
+
+QRectF RibbonToolButton::iconGeometry() const
+{
+    return mIconGeometry;
+}
+
+QRectF RibbonToolButton::textGeometry() const
+{
+    return mTextGeometry;
+}
+
+QRectF RibbonToolButton::indicatorGeometry() const
+{
+    return mIndicatorGeometry;
+}
+
+bool RibbonToolButton::isTextWordWrap() const
+{
+    // the caption box is a top-aligned two-line budget whenever word wrap is
+    // on for a large button (widgets getTextAlignment keys off enableWordWrap,
+    // not off the binary-search wrap verdict)
+    return isLargeType() && mWordWrap;
+}
+
+int RibbonToolButton::iconSide() const
+{
+    const QSize origin = isLargeType() ? QSize(kLargeIconSide, kLargeIconSide) : QSize(kSmallIconSide, kSmallIconSide);
+    const QSize fit    = SARibbonToolButtonLayout::adjustIconSize(mIconGeometry.toRect(), origin);
+    return qMax(qMin(fit.width(), fit.height()), 0);
 }
 
 void RibbonToolButton::click()
@@ -307,12 +349,12 @@ void RibbonToolButton::componentComplete()
 {
     RibbonLayoutItemHost::componentComplete();
     ensureQmlLeaf();
-    updateHitRects();
+    updateLayout();
 }
 
 void RibbonToolButton::updatePolish()
 {
-    updateHitRects();  // RTL flip re-mirrors the menu strip
+    updateLayout();  // RTL flip re-mirrors the menu strip
 }
 
 void RibbonToolButton::largeHeightContextChanged()
@@ -330,7 +372,7 @@ void RibbonToolButton::geometryChanged(const QRectF& newGeometry, const QRectF& 
     RibbonLayoutItemHost::geometryChanged(newGeometry, oldGeometry);
 #endif
     if (newGeometry.size() != oldGeometry.size()) {
-        updateHitRects();
+        updateLayout();
     }
 }
 
@@ -370,7 +412,7 @@ void RibbonToolButton::emitMenuItemsChanged()
 {
     Q_EMIT menuItemsChanged();
     updateSizeHint();
-    updateHitRects();
+    updateLayout();
 }
 
 void RibbonToolButton::setMenuVisible(bool on)
@@ -395,51 +437,122 @@ void RibbonToolButton::updateSizeHint()
 
 QSize RibbonToolButton::computeSizeHintFromMetrics()
 {
-    const SARibbon::Core::SARibbonMetrics& m = RibbonMetrics::instance()->coreMetrics();
-    const QFontMetrics fm = m.fontMetrics();
-    const int textW = fm.horizontalAdvance(mText);
-    // iconRightText forces the small rendering/hint regardless of the
-    // proportion (widgets PrivateData::effectiveButtonType parity)
-    const bool isLarge = (rowProportion == SARibbon::Core::SARibbonRowProportion::Large) && !mIconRightText;
-    const bool hasInd = hasMenu();
-    if (isLarge) {
-        // Large button (icon above, text below). The effective large height is
-        // panel-driven; before the first engine pass falls back to the metrics
-        // derivation (three-row category minus title strip and margins).
-        const int largeH = largeButtonHeightContext() > 0
-                               ? largeButtonHeightContext()
-                               : m.calcCategoryHeight(true, false) - m.panelTitleHeight - 4 - 2;
-        // single line when the text fits the aspect-ratio box or word wrap is
-        // disabled (style propagation), otherwise the two-line wrap estimate
-        // (widgets uses a binary search here; the half-width approximation
-        // stays within a few pixels)
-        int w;
-        if (!mWordWrap || textW <= int(largeH * kMaxAspectRatio)) {
-            w = textW + 2 + (hasInd ? kLargeIndicatorLen : 0);
-        } else {
-            w = textW / 2 + fm.horizontalAdvance(QLatin1String("xx")) + 8 + (hasInd ? kLargeIndicatorLen : 0);
-        }
-        w = qMax(w, qMax(int(largeH * kLargeMinWidthRatio), kLargeIconSide + 4));
-        return QSize(w, qMax(largeH, 22));
-    }
-    // Small/Medium button (icon left, text right): mirrors the widgets
-    // sizeHint iconW + spacing + text width (+ two trailing spaces of slack)
-    const int spaceW = 2 * fm.horizontalAdvance(QLatin1Char(' '));
-    return QSize(kSmallIconSide + 3 + textW + spaceW + (hasInd ? kSmallIndicatorLen : 0),
-                 qMax(qMax(fm.lineSpacing(), kSmallIconSide), 16));
+    // the very same core algorithm the widgets button runs (NOTES B49): the
+    // large two-line text budget, the aspect-ratio cap and the binary-searched
+    // wrap width all come from SARibbon::Core::SARibbonToolButtonLayout, so a
+    // QML button and a widget button with equal text/font/panel height hint
+    // the same size
+    const SARibbonToolButtonLayout::SizeHintResult r = SARibbonToolButtonLayout::calcSizeHint(layoutInput());
+    mIsTextNeedWrap = r.isTextNeedWrap;
+    return r.sizeHint;
 }
 
-void RibbonToolButton::updateHitRects()
+/**
+ * \if ENGLISH
+ * @brief Fill the core layout Input from the host state
+ * @details Field-by-field counterpart of SARibbonToolButton::PrivateData::
+ *          layoutInput(): the style option becomes plain values, so both front
+ *          ends feed the algorithm identical numbers. Three QML-only details:
+ *          toolButtonStyle reproduces what QToolButton::initStyleOption hands
+ *          the widgets side (Qt6 downgrades TextBesideIcon to TextOnly when no
+ *          icon is set); the rect falls back to a font-derived height before
+ *          the first engine pass (the small-button text height derives from
+ *          rect.height()); and panelLargeButtonHeight falls back to the metrics
+ *          derivation of the three-row large height while
+ *          largeButtonHeightContext() is still unset — the widgets button reads
+ *          that number from its panel parent.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 用宿主状态填充 core 布局输入
+ * @details 与 SARibbonToolButton::PrivateData::layoutInput() 一一对应：样式选项
+ *          换成纯值，两个前端因此喂给算法完全相同的数值。三处 QML 特有处理：
+ *          toolButtonStyle 复现 QToolButton::initStyleOption 交给 widgets 侧的
+ *          结果（Qt6 在无图标时把 TextBesideIcon 降级为 TextOnly）；引擎首次
+ *          布局前 rect 退化为按字体推导的高度（小按钮的文字高度取自
+ *          rect.height()）；largeButtonHeightContext() 尚未赋值时，
+ *          panelLargeButtonHeight 退化为度量推导的三行制大按钮高度——widgets
+ *          按钮的这个数值直接来自其父 panel。
+ * \endif
+ */
+SARibbonToolButtonLayout::Input RibbonToolButton::layoutInput() const
 {
-    // Host-computed hit zones (geometry authority; the leaf binds MouseAreas
-    // to them). Mirrors the widgets SARibbonToolButton sub-control split:
+    const SARibbon::Core::SARibbonMetrics& m = RibbonMetrics::instance()->coreMetrics();
+    const QFontMetrics fm                    = m.fontMetrics();
+    SARibbonToolButtonLayout::Input in;
+    int w = int(width());
+    int h = int(height());
+    if (h <= 0) {
+        h = fm.lineSpacing() + 4;
+    }
+    if (w <= 0) {
+        w = qMax(mCachedSizeHint.width(), 1);
+    }
+    in.rect          = QRect(0, 0, w, h);
+    in.hasIcon       = !mIconSource.isEmpty();
+    in.isLargeButton = isLargeType();
+    in.enableWordWrap = mWordWrap;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    // Qt6 QToolButton::initStyleOption downgrades TextBesideIcon to TextOnly
+    // when the button carries no icon, and the widgets side hands core exactly
+    // that value; mirroring it keeps an icon-less small button from reserving
+    // an empty icon slot (Qt5 leaves TextBesideIcon alone, hence the split)
+    in.toolButtonStyle = in.hasIcon ? Qt::ToolButtonTextBesideIcon : Qt::ToolButtonTextOnly;
+#else
+    in.toolButtonStyle = Qt::ToolButtonTextBesideIcon;
+#endif
+    in.hasIndicator    = hasMenu();
+    in.isRTL           = SA::saIsRTL();
+    in.iconSize        = QSize(kSmallIconSide, kSmallIconSide);
+    in.largeIconSize   = QSize(kLargeIconSide, kLargeIconSide);
+    in.text            = mText;
+    in.fontMetrics     = fm;
+    in.spacing         = TBLC::DEFAULT_SPACING;
+    in.indicatorLen    = in.isLargeButton ? TBLC::DEFAULT_INDICATOR_LEN_LARGE : TBLC::DEFAULT_INDICATOR_LEN_SMALL;
+    if (largeButtonHeightContext() > 0) {
+        in.panelLargeButtonHeight = largeButtonHeightContext();
+    } else if (in.isLargeButton) {
+        // pre-engine fallback: the metrics derivation of the three-row large
+        // height (category height minus title strip and margins)
+        in.panelLargeButtonHeight = m.calcCategoryHeight(true, false) - m.panelTitleHeight - 4 - 2;
+    } else {
+        in.panelLargeButtonHeight = -1;
+    }
+    in.maximumWidth = TBLC::UNLIMITED_WIDTH;
+    return in;
+}
+
+void RibbonToolButton::updateLayout()
+{
+    // Geometry authority: the core algorithm computes the icon / text /
+    // indicator draw rects exactly as the widgets button paints them; the host
+    // publishes them and the QML leaf only renders. The hit zones follow the
+    // widgets sub-control split:
     // - small MenuButtonPopup: the indicator strip on the trailing edge opens
     //   the menu, the rest triggers the action
-    // - large MenuButtonPopup: the bottom text strip (+ arrow) opens the
-    //   menu, the icon zone above triggers the action
+    // - large MenuButtonPopup: the bottom text strip united with the arrow
+    //   (widgets mDrawTextRect.united(mDrawIndicatorArrowRect)) opens the menu,
+    //   the icon zone above triggers the action
     // - InstantPopup: the whole button opens the menu, there is no action zone
     // - DelayedPopup / no menu: the whole button triggers the action (menu
     //   opens on press-hold for DelayedPopup)
+    const SARibbonToolButtonLayout::Input in = layoutInput();
+    const SARibbonToolButtonLayout::DrawRectResult r = SARibbonToolButtonLayout::calcDrawRects(in, mIsTextNeedWrap);
+
+    const QRectF newIcon = r.iconRect.isValid() ? QRectF(r.iconRect) : QRectF();
+    const QRectF newText = r.textRect.isValid() ? QRectF(r.textRect) : QRectF();
+    const QRectF newInd  = r.indicatorArrowRect.isValid() ? QRectF(r.indicatorArrowRect) : QRectF();
+
+    // caption: a wrapping large button renders the raw text through its
+    // word-wrap box, everything else is elided to the box width (paintText)
+    QString newDisplay;
+    if (in.isLargeButton && in.enableWordWrap) {
+        newDisplay = in.text;
+    } else {
+        newDisplay = in.fontMetrics.elidedText(
+            SARibbonToolButtonLayout::simplifiedText(in.text), Qt::ElideRight, int(newText.width()), Qt::TextShowMnemonic);
+    }
+
     QRectF newAction;
     QRectF newMenu;
     const QRectF full(0, 0, width(), height());
@@ -450,13 +563,13 @@ void RibbonToolButton::updateHitRects()
             break;
         }
         case RibbonEnums::MenuButtonPopup: {
-            if ((rowProportion == SARibbon::Core::SARibbonRowProportion::Large) && !mIconRightText) {
-                // bottom strip below the icon zone (icon 32 + top margin 2 + gap)
-                const qreal stripTop = qMin(qreal(kLargeIconSide + 3), height());
+            if (in.isLargeButton) {
+                const QRectF strip = newText.united(newInd);
+                const qreal stripTop = qBound(qreal(0), strip.isEmpty() ? height() : strip.top(), height());
                 newMenu   = QRectF(0, stripTop, width(), qMax(height() - stripTop, 0.0));
                 newAction = QRectF(0, 0, width(), stripTop);
             } else {
-                const qreal stripW = qMin(qreal(kSmallIndicatorLen), width());
+                const qreal stripW = qMin(qreal(TBLC::DEFAULT_INDICATOR_LEN_SMALL), width());
                 qreal x            = width() - stripW;  // trailing edge (LTR)
                 if (SA::saIsRTL()) {
                     x = SA::saMirrorX(int(x), int(width()), int(stripW));
@@ -477,6 +590,14 @@ void RibbonToolButton::updateHitRects()
         mActionRect = newAction;
         mMenuRect   = newMenu;
         Q_EMIT hitRectsChanged();
+    }
+    if (newIcon != mIconGeometry || newText != mTextGeometry || newInd != mIndicatorGeometry
+        || newDisplay != mDisplayText) {
+        mIconGeometry      = newIcon;
+        mTextGeometry      = newText;
+        mIndicatorGeometry = newInd;
+        mDisplayText       = newDisplay;
+        Q_EMIT layoutChanged();
     }
 }
 
