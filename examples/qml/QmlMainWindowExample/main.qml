@@ -270,6 +270,26 @@ ApplicationWindow {
                     }
                 }
 
+                // widgets "select font" + QFontComboBox parity: family change
+                // rebuilds the metrics and relayouts every host
+                RibbonControlContainer {
+                    text: qsTr("Font:")
+                    control: ComboBox {
+                        id: fontFamilyCombo
+                        model: RibbonMetrics.commonFontFamilies()
+                        onActivated: {
+                            RibbonMetrics.fontFamily = currentText;
+                            log(qsTr("font family: %1").arg(currentText));
+                        }
+                        Component.onCompleted: {
+                            const idx = model.indexOf(RibbonMetrics.fontFamily);
+                            if (idx >= 0) {
+                                currentIndex = idx;
+                            }
+                        }
+                    }
+                }
+
                 // widgets "Alignment Center" parity: tab row alignment
                 // inside the free strip (left/center/right)
                 RibbonControlContainer {

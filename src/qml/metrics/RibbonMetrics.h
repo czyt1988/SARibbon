@@ -31,6 +31,7 @@ class RibbonMetrics : public QObject
     Q_OBJECT
     Q_PROPERTY(QFont font READ font WRITE setFont NOTIFY fontChanged)
     Q_PROPERTY(int fontPointSize READ fontPointSize WRITE setFontPointSize NOTIFY fontChanged)
+    Q_PROPERTY(QString fontFamily READ fontFamily WRITE setFontFamily NOTIFY fontChanged)
     Q_PROPERTY(int tabBarHeight READ tabBarHeight NOTIFY metricsChanged)
     Q_PROPERTY(int titleBarHeight READ titleBarHeight NOTIFY metricsChanged)
     Q_PROPERTY(int categoryHeight READ categoryHeight NOTIFY metricsChanged)
@@ -49,6 +50,14 @@ public:
     // QML-friendly pointSize accessor (QFont itself is awkward to build in QML)
     int fontPointSize() const;
     void setFontPointSize(int ps);
+
+    // QML-friendly family accessor (same rebuild chain as pointSize)
+    QString fontFamily() const;
+    void setFontFamily(const QString& family);
+
+    // Common font families for the example's combo (QFontComboBox parity;
+    // QFontDatabase is not exposed to QML)
+    Q_INVOKABLE QStringList commonFontFamilies() const;
 
     // metric reads (formulas live in core SARibbonMetrics; style pixel metrics
     // are style-dependent only through the default style — QML has no QStyle)

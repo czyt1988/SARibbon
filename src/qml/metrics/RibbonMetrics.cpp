@@ -63,6 +63,41 @@ void RibbonMetrics::setFontPointSize(int ps)
     setFont(f);
 }
 
+QString RibbonMetrics::fontFamily() const
+{
+    return font().family();
+}
+
+void RibbonMetrics::setFontFamily(const QString& family)
+{
+    if (family.isEmpty()) {
+        return;
+    }
+    QFont f = font();
+    f.setFamily(family);
+    setFont(f);
+}
+
+QStringList RibbonMetrics::commonFontFamilies() const
+{
+    // a compact, always-available selection for example combos
+    // (QFontComboBox parity without exposing QFontDatabase to QML)
+    QStringList families;
+    const auto all = QFontDatabase::families(QFontDatabase::Latin);
+    const QStringList preferred = { QStringLiteral("Microsoft YaHei"), QStringLiteral("Segoe UI"),
+                                    QStringLiteral("Arial"), QStringLiteral("Times New Roman"),
+                                    QStringLiteral("Courier New"), QStringLiteral("Consolas") };
+    for (const QString& p : preferred) {
+        if (all.contains(p)) {
+            families.append(p);
+        }
+    }
+    if (families.isEmpty() && !all.isEmpty()) {
+        families.append(all.first());
+    }
+    return families;
+}
+
 int RibbonMetrics::tabBarHeight() const
 {
     return mMetrics.calcDefaultTabBarHeight();
