@@ -269,6 +269,20 @@ ApplicationWindow {
                         log(qsTr("layout direction: %1").arg(RibbonTheme.rtl ? "RTL" : "LTR"));
                     }
                 }
+
+                // widgets "Alignment Center" parity: tab row alignment
+                // inside the free strip (left/center/right)
+                RibbonControlContainer {
+                    text: qsTr("Align:")
+                    control: ComboBox {
+                        model: [ qsTr("Left"), qsTr("Center"), qsTr("Right") ]
+                        currentIndex: 0
+                        onActivated: {
+                            ribbonBar.tabAlignment = index;  // 0/1/2 = AlignLeft/Center/Right
+                            log(qsTr("tab alignment: %1").arg(currentText));
+                        }
+                    }
+                }
             }
 
             RibbonPanel {

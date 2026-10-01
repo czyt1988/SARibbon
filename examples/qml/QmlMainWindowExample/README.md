@@ -25,6 +25,7 @@ cmake --build build
 | ribbon style 面板 | 主题 8 项下拉（Windows7/2013/2016/2021×3/Dark×2） | RibbonTheme QComboBox |
 | ribbon style 面板 | 字体增大/减小（应用级度量联动） | Larger/Smaller |
 | ribbon style 面板 | RTL 切换（引擎经 saIsRTL 镜像布局） | Switch to RTL |
+| ribbon style 面板 | tab 对齐（左/中/右） | Alignment Center |
 | button states 面板 | 大按钮 6 态：Normal/Checked/Disabled（含解锁）/超长文本/超短文本 | 按钮状态演示 |
 | toolbutton style 面板 | 弹出三模式 × 比例混合：MenuButtonPopup（分区命中）/InstantPopup/DelayedPopup（长按）+ checkable 变体 + 禁用带菜单 | SARibbonMenu 演示 |
 | toolbutton style 面板 | optionAction（右下角对角按钮，点击触发信号） | 面板 optionAction |
