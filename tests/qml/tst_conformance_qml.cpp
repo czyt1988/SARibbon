@@ -49,6 +49,7 @@ private Q_SLOTS:
     void tabAlignmentAndMinimumMode();
     void rtlToggle();
     void panelOptionAction();
+    void applicationWindow();
 
 private:
     QQuickView* exposeScene(QQmlEngine& engine, QQmlComponent& component, const char* src, int w, int h);
@@ -1352,6 +1353,93 @@ Item {
         QTest::qWait(50);
     }
     QVERIFY(panel->isVisible());
+}
+
+/**
+ * @brief Application window (widgets ApplicationWidget mode)
+ * @details A RibbonApplicationWindow declared as a bar child takes priority
+ *          over the application menu: the app button click shows it in a
+ *          popup below the button (Esc / outside click close), and the inner
+ *          close() invokable routes back through the bar to shut the popup.
+ */
+void TestConformanceQml::applicationWindow()
+{
+    QQmlEngine engine;
+    saRibbonRegisterQmlTypes(&engine);
+
+    QString src = QStringLiteral(R"QML(import QtQuick 2.12
+import QtQuick.Controls 2.12
+import SARibbon 3.0
+Item {
+    width: 800
+    height: 300
+    RibbonBar {
+        objectName: "bar"
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        applicationLabel: "File"
+        applicationMenuItems: [ RibbonMenuItem { text: "should not open" } ]
+        RibbonApplicationWindow {
+            objectName: "appwin"
+            width: 260
+            height: 160
+            Column {
+                anchors.fill: parent
+                spacing: 6
+                Label { text: qsTr("Press the Esc key to exit the window.") }
+                Button {
+                    objectName: "cancelBtn"
+                    text: qsTr("Cancel")
+                    onClicked: appwinClose()
+                }
+            }
+        }
+        RibbonCategory {
+            title: "Home"
+            RibbonPanel { panelTitle: "P"; RibbonToolButton { text: "A" } }
+        }
+    }
+    function appwinClose()
+    {
+        // route through the app window's close invokable
+        appwin.close();
+    }
+})QML");
+
+    QQmlComponent component(&engine);
+    std::unique_ptr< QQuickView > view(exposeScene(engine, component, src.toUtf8().constData(), 800, 300));
+    QVERIFY(view);
+    QQuickItem* rootItem = view->rootObject();
+    QVERIFY(rootItem);
+
+    auto* bar    = rootItem->findChild< QQuickItem* >(QStringLiteral("bar"));
+    auto* appwin = rootItem->findChild< QQuickItem* >(QStringLiteral("appwin"));
+    QVERIFY(bar && appwin);
+
+    // the bar publishes the application window (and it wins over the menu)
+    QVERIFY(bar->property("hasApplicationWindow").toBool());
+    QCOMPARE(bar->property("applicationWindowItem").value< QQuickItem* >(), appwin);
+    QVERIFY(!appwin->property("popupVisible").toBool());
+
+    // ---- real click on the application button opens the window popup ----
+    const QRectF appRect = bar->property("applicationButtonRect").toRectF();
+    QVERIFY(appRect.width() > 0);
+    const QPointF center = bar->mapToScene(QPointF(appRect.center()));
+    QTest::mouseClick(view.get(), Qt::LeftButton, Qt::NoModifier, center.toPoint());
+    QTRY_COMPARE(appwin->property("popupVisible").toBool(), true);
+
+    // ---- inner Cancel button closes through the invokable chain ----
+    auto* cancel = rootItem->findChild< QQuickItem* >(QStringLiteral("cancelBtn"));
+    QVERIFY(cancel);
+    const QPointF cancelCenter = cancel->mapToScene(QPointF(cancel->width() / 2, cancel->height() / 2));
+    QTest::mouseClick(view.get(), Qt::LeftButton, Qt::NoModifier, cancelCenter.toPoint());
+    QTRY_COMPARE(appwin->property("popupVisible").toBool(), false);
+
+    // ---- the headless close invokable also routes ----
+    QMetaObject::invokeMethod(bar, "requestApplicationWindowClose");
+    QTest::qWait(50);
+    QCOMPARE(appwin->property("popupVisible").toBool(), false);
 }
 
 QTEST_MAIN(TestConformanceQml)

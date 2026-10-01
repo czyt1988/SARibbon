@@ -17,8 +17,10 @@ Rectangle {
     readonly property rect appRect: cppHost && cppHost.applicationButtonRect.width > 0 ? cppHost.applicationButtonRect : Qt.rect(0, 0, 0, 0)
     readonly property var bands: cppHost ? cppHost.contextBands : []
     readonly property bool hasAppMenu: cppHost ? cppHost.hasApplicationMenu : false
+    readonly property bool hasAppWindow: cppHost ? cppHost.hasApplicationWindow : false
+    readonly property Item appWindowItem: cppHost && cppHost.hasApplicationWindow ? cppHost.applicationWindowItem : null
 
-    // ---- entry points (app menu) ----
+    // ---- entry points (app menu / app window) ----
     function openAppMenu()
     {
         if (!appMenuLoader.active) {
@@ -26,6 +28,21 @@ Rectangle {
         }
         if (appMenuLoader.item && !appMenuLoader.item.visible) {
             appMenuLoader.item.open();
+        }
+    }
+    function openApplicationWindow()
+    {
+        if (!appWindowLoader.active) {
+            appWindowLoader.active = true;  // lazy creation (popup-in-leaf rule)
+        }
+        if (appWindowLoader.item) {
+            appWindowLoader.item.open();
+        }
+    }
+    function closeApplicationWindow()
+    {
+        if (appWindowLoader.item) {
+            appWindowLoader.item.close();
         }
     }
 
@@ -112,9 +129,12 @@ Rectangle {
             anchors.fill: parent
             hoverEnabled: true
             onClicked: {
-                // menu-mode app button (widgets USE_APPLICATION_NORMAL_MENU):
-                // entries open the styled popup; the clicked signal always fires
-                if (root.hasAppMenu) {
+                // widgets ApplicationWidget mode first (the example default),
+                // then the menu mode (USE_APPLICATION_NORMAL_MENU); the
+                // clicked signal always fires
+                if (root.hasAppWindow) {
+                    root.openApplicationWindow();
+                } else if (root.hasAppMenu) {
                     root.openAppMenu();
                 }
                 if (root.cppHost) {
@@ -134,6 +154,37 @@ Rectangle {
         id: appMenuLoader
         active: false
         sourceComponent: appMenuComponent
+    }
+
+    // ---- application window (widgets ApplicationWidget mode) ----
+    // Same lazy-creation rule as the app menu. The user-declared
+    // RibbonApplicationWindow rides in as the popup contentItem; its own
+    // implicit size drives the popup size. Esc / outside click close
+    // (Popup semantics); inner close() routes through the host back here.
+    Loader {
+        id: appWindowLoader
+        active: false
+        sourceComponent: appWindowComponent
+    }
+    Component {
+        id: appWindowComponent
+        Popup {
+            id: appWinPopup
+            x: root.appRect.x
+            y: root.appRect.y + root.appRect.height
+            width: (root.appWindowItem ? Math.max(root.appWindowItem.implicitWidth, root.appWindowItem.width) : 200) + 2
+            height: (root.appWindowItem ? Math.max(root.appWindowItem.implicitHeight, root.appWindowItem.height) : 200) + 2
+            padding: 1
+            closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+            background: Rectangle {
+                color: RibbonTheme.contentBg
+                border.color: RibbonTheme.menuBorder
+                radius: 4
+            }
+            contentItem: root.appWindowItem
+            onOpened: if (root.appWindowItem) root.appWindowItem.popupVisible = true
+            onClosed: if (root.appWindowItem) root.appWindowItem.popupVisible = false
+        }
     }
     Component {
         id: appMenuComponent

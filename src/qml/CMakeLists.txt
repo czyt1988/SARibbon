@@ -39,6 +39,8 @@ sa_add_library(SARibbonQml
         quickaccess/RibbonQuickAccessBar.cpp
         group/RibbonButtonGroup.h
         group/RibbonButtonGroup.cpp
+        appwindow/RibbonApplicationWindow.h
+        appwindow/RibbonApplicationWindow.cpp
         category/RibbonCategory.h
         category/RibbonCategory.cpp
         tab/RibbonTab.h

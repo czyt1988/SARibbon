@@ -4,6 +4,7 @@
 #include "../quickaccess/RibbonQuickAccessBar.h"
 #include "../group/RibbonButtonGroup.h"
 #include "../menu/RibbonMenuItem.h"
+#include "../appwindow/RibbonApplicationWindow.h"
 #include "../tab/RibbonTab.h"
 #include "../metrics/RibbonMetrics.h"
 #include "../theme/RibbonTheme.h"
@@ -449,6 +450,29 @@ void RibbonBar::activateApplicationMenuItem(int index)
     Q_EMIT applicationMenuTriggered(item);
 }
 
+QQuickItem* RibbonBar::applicationWindowItem() const
+{
+    return mApplicationWindow;
+}
+
+bool RibbonBar::hasApplicationWindow() const
+{
+    return mApplicationWindow != nullptr;
+}
+
+void RibbonBar::requestApplicationWindowClose()
+{
+    // route to the leaf popup (same invoke pattern as the button menus);
+    // headless fallback keeps the visibility flag consistent for tests
+    QQuickItem* leaf = qmlLeaf();
+    if (leaf && QMetaObject::invokeMethod(leaf, "closeApplicationWindow")) {
+        return;
+    }
+    if (mApplicationWindow) {
+        mApplicationWindow->setPopupVisible(false);
+    }
+}
+
 void RibbonBar::appendAppMenuItemCb(QQmlListProperty< RibbonMenuItem >* prop, RibbonMenuItem* item)
 {
     auto* self = static_cast< RibbonBar* >(prop->data);
@@ -513,6 +537,13 @@ void RibbonBar::itemChange(ItemChange change, const ItemChangeData& data)
                 connect(grp, &RibbonButtonGroup::rowWidthChanged, this, [this]() { polish(); });
                 polish();
             }
+        } else if (RibbonApplicationWindow* aw = qobject_cast< RibbonApplicationWindow* >(data.item)) {
+            if (!mApplicationWindow) {
+                mApplicationWindow = aw;
+                // inner-content close() routes to the leaf popup
+                connect(aw, &RibbonApplicationWindow::closeRequested, this, [this]() { requestApplicationWindowClose(); });
+                Q_EMIT applicationWindowChanged();
+            }
         }
     } else if (change == QQuickItem::ItemChildRemovedChange) {
         if (RibbonCategory* c = qobject_cast< RibbonCategory* >(data.item)) {
@@ -529,6 +560,9 @@ void RibbonBar::itemChange(ItemChange change, const ItemChangeData& data)
         } else if (data.item == mRightButtonGroup) {
             mRightButtonGroup = nullptr;
             polish();
+        } else if (data.item == mApplicationWindow) {
+            mApplicationWindow = nullptr;
+            Q_EMIT applicationWindowChanged();
         }
     } else if (change == QQuickItem::ItemVisibleHasChanged) {
         polish();

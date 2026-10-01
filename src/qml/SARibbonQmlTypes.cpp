@@ -16,6 +16,7 @@
 #include "separator/RibbonSeparator.h"
 #include "quickaccess/RibbonQuickAccessBar.h"
 #include "group/RibbonButtonGroup.h"
+#include "appwindow/RibbonApplicationWindow.h"
 #include "tab/RibbonTab.h"
 #include "bar/RibbonBar.h"
 #include <QQmlEngine>
@@ -136,6 +137,7 @@ void saRibbonRegisterQmlTypes(QQmlEngine* engine)
     qmlRegisterType< SARibbonQml::RibbonSeparator >("SARibbon", 3, 0, "RibbonSeparator");
     qmlRegisterType< SARibbonQml::RibbonQuickAccessBar >("SARibbon", 3, 0, "RibbonQuickAccessBar");
     qmlRegisterType< SARibbonQml::RibbonButtonGroup >("SARibbon", 3, 0, "RibbonButtonGroup");
+    qmlRegisterType< SARibbonQml::RibbonApplicationWindow >("SARibbon", 3, 0, "RibbonApplicationWindow");
     // shared host bases: reachable from QML only through their subclasses,
     // registered for tooling/metaobject access (not creatable from QML)
     qmlRegisterUncreatableType< SARibbonQml::RibbonQuickHost >("SARibbon", 3, 0, "RibbonQuickHost", "Base class only");

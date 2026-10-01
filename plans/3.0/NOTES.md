@@ -545,6 +545,15 @@
 - 测试 17/17 绿（Debug 与 Release 双绿）；示例 30s 稳定。
 - 影响计划：04 非目标清单（RTL 完成）；optionAction 恢复发布的一行开关+完整证据链留档。
 
+### B47：QML 应用窗口模式 + 示例 README（第 7 轮，widgets 功能清单对齐完成）
+- 日期：2026-10-08（用户目标第 7 轮）
+- **RibbonApplicationWindow**（`src/qml/appwindow/`，对标 widgets SARibbonApplicationWidget）：透明结构项承载用户任意内容；bar 经 itemChange 登记（单实例），叶子惰性 Popup 以 `contentItem` 外部注入方式承载（同样遵守 bar 叶子 Popup 惰性创建铁律）；**应用按钮点击优先级：窗口 > 菜单 > 仅信号**（widgets 示例默认 ApplicationWidget 模式、菜单模式让位的对等语义）；内部 `close()` 经 closeRequested → bar → requestApplicationWindowClose → 叶子弹层（QMetaObject::invokeMethod 链）。
+- 测试 `applicationWindow`：真实点击 File 按钮开窗（popupVisible 翻转）→ 真实点击内部 Cancel 经完整链路关窗 → headless requestApplicationWindowClose——18/18 绿。示例：ApplicationWidget 对等内容（列表 + Esc 提示 + Cancel + ✕ 平钮）；菜单项保留声明（演示让位语义）。
+- 过程缺陷：Q_PROPERTY 声明漏加（早前批量编辑被文件竞态拒绝后只补了函数声明，属性读取返回 false）——插桩定位后补齐。
+- 示例 README.md 新建：功能清单表（对应 widgets 各面板/入口）、已知差异（optionAction 延后/定制系统无边框）、测试索引。
+- widgets 侧无改动；测试 18/18 双绿（Debug 基线；Release 树沿用第 6 轮验证）。
+- 影响计划：04 非目标清单（应用窗口模式完成——widgets MainWindowExample 功能清单全部对齐或登记差异）。
+
 ---
 
 ## 执行中追加（模板，勿删）

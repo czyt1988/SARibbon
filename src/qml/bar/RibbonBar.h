@@ -18,6 +18,7 @@ class RibbonContextCategory;
 class RibbonQuickAccessBar;
 class RibbonButtonGroup;
 class RibbonMenuItem;
+class RibbonApplicationWindow;
 
 /**
  * \if ENGLISH
@@ -57,6 +58,8 @@ class RibbonBar : public RibbonQuickHost
     Q_PROPERTY(QVariantList contextBands READ contextBands NOTIFY layoutChanged)
     Q_PROPERTY(QQmlListProperty< SARibbonQml::RibbonMenuItem > applicationMenuItems READ applicationMenuItems NOTIFY applicationMenuItemsChanged)
     Q_PROPERTY(bool hasApplicationMenu READ hasApplicationMenu NOTIFY applicationMenuItemsChanged)
+    Q_PROPERTY(QQuickItem* applicationWindowItem READ applicationWindowItem NOTIFY applicationWindowChanged)
+    Q_PROPERTY(bool hasApplicationWindow READ hasApplicationWindow NOTIFY applicationWindowChanged)
 public:
     explicit RibbonBar(QQuickItem* parent = nullptr);
     ~RibbonBar() override;
@@ -121,6 +124,14 @@ public:
     bool hasApplicationMenu() const;
     Q_INVOKABLE void activateApplicationMenuItem(int index);
 
+    // Application window (widgets ApplicationWidget mode): a
+    // RibbonApplicationWindow declared as a child shows below the app
+    // button on click (priority over the menu); close() from inner content
+    // routes through here
+    QQuickItem* applicationWindowItem() const;
+    bool hasApplicationWindow() const;
+    Q_INVOKABLE void requestApplicationWindowClose();
+
 Q_SIGNALS:
     void currentIndexChanged();
     void applicationLabelChanged();
@@ -131,6 +142,7 @@ Q_SIGNALS:
     void applicationButtonClicked();
     void applicationMenuItemsChanged();
     void applicationMenuTriggered(SARibbonQml::RibbonMenuItem* item);
+    void applicationWindowChanged();
 
 protected:
     QUrl leafUrl() const override;
@@ -180,6 +192,7 @@ private:
     QHash< RibbonContextCategory*, QVector< RibbonTab* > > mContextTabs;  ///< per-context page tabs (owned)
     RibbonQuickAccessBar* mQuickAccessBar = nullptr;  ///< declared quick access row (single)
     RibbonButtonGroup* mRightButtonGroup  = nullptr;  ///< declared right group (single)
+    RibbonApplicationWindow* mApplicationWindow = nullptr;  ///< declared app window (single)
     QVector< RibbonMenuItem* > mAppMenuItems;
     QVariantList mBands;
     QRect mTitleRect;

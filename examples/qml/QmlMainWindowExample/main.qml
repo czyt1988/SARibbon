@@ -21,6 +21,55 @@ ApplicationWindow {
 
         applicationLabel: "File"
         onApplicationButtonClicked: log(qsTr("application button clicked"))
+        // ApplicationWidget mode (widgets example default): a custom panel
+        // below the File button; the menu entries stay declared — click
+        // priority: window > menu > signal only (widgets parity)
+        RibbonApplicationWindow {
+            id: appWindow
+            width: 300
+            height: 210
+            Column {
+                anchors.fill: parent
+                anchors.margins: 10
+                spacing: 8
+                Label {
+                    text: qsTr("Application Window")
+                    font.bold: true
+                }
+                ListView {
+                    id: appWindowList
+                    width: parent.width
+                    height: 100
+                    clip: true
+                    model: [ qsTr("item 1"), qsTr("item 2"), qsTr("item 3"),
+                             qsTr("item 4"), qsTr("item 5"), qsTr("item 6") ]
+                    delegate: ItemDelegate {
+                        width: appWindowList.width
+                        text: modelData
+                        onClicked: log(qsTr("application window: %1").arg(modelData))
+                    }
+                    ScrollBar.vertical: ScrollBar { }
+                }
+                Label { text: qsTr("Press the Esc key to exit the window.") }
+                Row {
+                    spacing: 8
+                    Button {
+                        text: qsTr("Cancel")
+                        onClicked: appWindow.close()
+                    }
+                    Button {
+                        flat: true
+                        width: 36
+                        onClicked: appWindow.close()
+                        Text {
+                            anchors.centerIn: parent
+                            text: "\u2715"
+                            color: RibbonTheme.textColor
+                        }
+                    }
+                }
+            }
+        }
         applicationMenuItems: [
             RibbonMenuItem { text: qsTr("test 1"); iconSource: "qrc:/icon/icon/action.svg" },
             RibbonMenuItem { text: qsTr("test 2"); iconSource: "qrc:/icon/icon/action2.svg" },

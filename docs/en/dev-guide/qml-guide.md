@@ -50,6 +50,7 @@ first engine; a second engine gets nullptr (verified against Qt 5.14/6.7 sources
 | `RibbonSeparator` | type | panel separator (Large proportion, own column, 1px line; widgets SARibbonSeparatorWidget counterpart) |
 | `RibbonQuickAccessBar` | type | quick access bar (small-button row on the title row after the app button; width feeds TitleRectInput.hasQuickAccessBar; widgets SARibbonQuickAccessBar counterpart) |
 | `RibbonButtonGroup` | type | right button group (small-button row right-aligned before the system strip; widgets SARibbonButtonGroupWidget counterpart) |
+| `RibbonApplicationWindow` | type | application window (custom panel behind the app button; Esc/outside click close, inner close() programmatic; click priority: window > menu > signal; widgets ApplicationWidget counterpart) |
 | `Ribbon` | uncreatable | enum holder (`Ribbon.Large` / `Ribbon.ThreeRowMode` / `Ribbon.MenuButtonPopup` / `Ribbon.RibbonStyleCompactTwoRow` / ...) |
 
 Access enums through the `Ribbon.` prefix (e.g. `proportion: Ribbon.Large`).
@@ -153,7 +154,7 @@ propagation semantics:
 RibbonBar { ribbonStyle: Ribbon.RibbonStyleCompactTwoRow }
 ```
 
-## Title-Row Containers & Application Menu
+## Title-Row Containers & Application Button
 
 - **RibbonQuickAccessBar / RibbonButtonGroup** share the `RibbonButtonRowHost`
   base (buttons register through itemChange, rows flow by sizeHint, rowWidth
@@ -161,13 +162,19 @@ RibbonBar { ribbonStyle: Ribbon.RibbonStyleCompactTwoRow }
   authority for its children. The bar places the former after the application
   button and the latter right-aligned before the system strip; the width
   feeds `TitleRectInput.hasQuickAccessBar`.
-- **Application menu** (`applicationMenuItems` +
-  `applicationMenuTriggered`, widgets menu-mode parity): **the popup must be
-  created lazily** — the bar leaf is created during the bar's
-  componentComplete (the scene window is not realized yet), and
-  instantiating a Popup at that point yields a stray native window and a
-  blank main window (round 4 observation); create it on first open through
-  `Loader { active: false }`.
+- **Application button, three modes** (click priority: application window >
+  menu > signal only):
+  - `RibbonApplicationWindow` (widgets ApplicationWidget parity): a custom
+    content panel declared as a bar child; the leaf hosts it through a lazy
+    Popup (external `contentItem` injection); Esc / outside click close; the
+    inner `close()` routes closeRequested -> bar ->
+    requestApplicationWindowClose -> the leaf popup.
+  - `applicationMenuItems` + `applicationMenuTriggered` (widgets menu-mode
+    parity): **the popup must be created lazily** — the bar leaf is created
+    during the bar's componentComplete (the scene window is not realized
+    yet), and instantiating a Popup at that point yields a stray native
+    window and a blank main window (round 4 observation); create it on first
+    open through `Loader { active: false }`.
 
 ## Visual Leaf Rules
 

@@ -46,6 +46,7 @@ engine.load(QUrl("qrc:///main.qml"));
 | `RibbonSeparator` | 类型 | 面板分隔符（Large 比例独占一列的 1px 竖线，对标 widgets SARibbonSeparatorWidget） |
 | `RibbonQuickAccessBar` | 类型 | 快速访问栏（标题行应用按钮后的小按钮排，宽度进 core TitleRectInput.hasQuickAccessBar，对标 widgets SARibbonQuickAccessBar） |
 | `RibbonButtonGroup` | 类型 | 右侧按钮组（标题行系统按钮区前右对齐的小按钮排，对标 widgets SARibbonButtonGroupWidget） |
+| `RibbonApplicationWindow` | 类型 | 应用窗口（File 按钮弹出自定义内容面板，Esc/外点关闭，内部 close() 编程式关闭；点击优先级：窗口 > 菜单 > 仅信号，对标 widgets ApplicationWidget） |
 | `Ribbon` | 不可实例化 | 枚举持有（`Ribbon.Large` / `Ribbon.ThreeRowMode` / `Ribbon.MenuButtonPopup` / `Ribbon.RibbonStyleCompactTwoRow` / ...） |
 
 枚举一律通过 `Ribbon.` 前缀访问（如 `proportion: Ribbon.Large`），不散进各类型。
@@ -129,16 +130,21 @@ RibbonGallery {
 RibbonBar { ribbonStyle: Ribbon.RibbonStyleCompactTwoRow }
 ```
 
-## 标题行容器与应用按钮菜单
+## 标题行容器与应用按钮
 
 - **RibbonQuickAccessBar / RibbonButtonGroup**：共享基类 `RibbonButtonRowHost`
   （itemChange 登记按钮、按 sizeHint 排行、发布 rowWidth）；按钮无面板引擎——
   行宿主即子项布局权威。bar 把前者摆在应用按钮之后、后者右对齐于系统按钮区前，
   宽度进入 `TitleRectInput.hasQuickAccessBar`。
-- **应用按钮菜单**（`applicationMenuItems` + `applicationMenuTriggered`，widgets
-  菜单模式对等）：**弹出层必须惰性创建**——bar 叶子在 bar 的 componentComplete
-  期间创建（场景窗口尚未就绪），此时实例化 Popup 会得到一个游离的原生窗口并使
-  主窗口场景空白（第 4 轮实测）；用 `Loader { active: false }` 在首次打开时创建。
+- **应用按钮三种模式**（点击优先级：应用窗口 > 菜单 > 仅信号）：
+  - `RibbonApplicationWindow`（widgets ApplicationWidget 对等）：声明为 bar
+    子项的自定义内容面板，叶子惰性 Popup 承载（`contentItem` 外部注入），
+    Esc/外点关闭；内部 `close()` 经 closeRequested → bar →
+    requestApplicationWindowClose → 叶子弹层链路。
+  - `applicationMenuItems` + `applicationMenuTriggered`（widgets 菜单模式）：
+    弹出层**必须惰性创建**——bar 叶子在 bar 的 componentComplete 期间创建
+    （场景窗口尚未就绪），此时实例化 Popup 会得到一个游离的原生窗口并使
+    主窗口场景空白（第 4 轮实测）；用 `Loader { active: false }` 在首次打开时创建。
 
 ## 视觉叶子规范
 
