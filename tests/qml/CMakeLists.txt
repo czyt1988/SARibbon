@@ -78,3 +78,27 @@ if(TARGET SARibbonQml AND TARGET SARibbonWidgets)
     set_tests_properties(qml_Color PROPERTIES LABELS qml TIMEOUT 120
         ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QT_QUICK_CONTROLS_STYLE=Basic")
 endif()
+
+# 定制系统测试（WS-C2）：记录层是 core 共享的，因此跨前端 XML 兼容性用例需要
+# 同时链接两个前端（widgets 的 sa_customize_datas_to_xml / from_xml 是对照方）。
+if(TARGET SARibbonQml AND TARGET SARibbonWidgets)
+    add_executable(qml_Customize tst_customize_qml.cpp)
+    target_link_libraries(qml_Customize PRIVATE
+        SARibbonQml
+        SARibbon::Widgets
+        SARibbonCore
+        Qt${QT_VERSION_MAJOR}::Test
+        Qt${QT_VERSION_MAJOR}::Core
+        Qt${QT_VERSION_MAJOR}::Gui
+        Qt${QT_VERSION_MAJOR}::Widgets
+        Qt${QT_VERSION_MAJOR}::Qml
+        Qt${QT_VERSION_MAJOR}::Quick
+    )
+    set_target_properties(qml_Customize PROPERTIES
+        AUTOMOC ON
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+    )
+    add_test(NAME qml_Customize COMMAND qml_Customize)
+    set_tests_properties(qml_Customize PROPERTIES LABELS qml TIMEOUT 120
+        ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QT_QUICK_CONTROLS_STYLE=Basic")
+endif()
