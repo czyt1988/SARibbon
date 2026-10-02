@@ -650,6 +650,20 @@
 - **A2 未触碰 core**：计划要求"先确认 core metrics 对 `None`/`SingleLine` 的返回值语义与 widgets `SARibbonGalleryGroupItemDelegate` 三条 paint 路径一致"，核对结论是 core 的 `calcGalleryCellMetrics`（`shiftpix=4`，SingleLine→`lineSpacing`，WordWrap→`lineSpacing*2`，None→0 且图标吃满 `cellHeight-2*spacing-shiftpix`）本就三态完整，无需下沉也无需在 QML 侧补偿，故不跑 `Amalgamate.sh`。
 - 影响计划：04（WS-A2 完成，A5/A3 待做）；04-B48/B54（守卫同文件 id 的规则确认适用于所有 Repeater delegate）；WS-D（色板网格将复用本轮的"单元自报 + root 计数"悬停写法，不要再放覆盖层）。
 
+### B56：A5 容器尾随标签/标签条开关 + 按钮排互斥 —— "widgets 也没有的能力"该以什么名义补（第 16 轮）
+- 日期：2026-10-02
+- 发现位置：计划 04（QML 前端）WS-A5（`RibbonControlContainer` 后缀与显示开关、`RibbonButtonGroup` 互斥）
+- **命名依据的核查结论**：计划写的是"widgets 侧靠 QActionGroup"，实读 `src/widgets` 与 `src/core` 后确认——**widgets 侧的按钮组/快速访问栏并没有互斥能力**，整个仓库里 `QActionGroup` 只出现在 `SARibbonGalleryGroup` 内部。所以 `exclusive` 不是"移植一个 widgets API"，而是补 QML 侧因**没有 action 桥**而缺失的那一层语义（用户在 QML 里无法像 widgets 那样把一组 `QAction` 塞进 `QActionGroup`）。头文件注释按这个真实理由写，而不是编一个 widgets 对应物出来。
+- **归属决定：`exclusive` 放在共享基类 `RibbonButtonRowHost`，不放在 `RibbonButtonGroup`**。`RibbonQuickAccessBar` 与 `RibbonButtonGroup` 同源于该基类，互斥是"一排 checkable 小按钮"的通用能力而非右组专属；默认 `false`，QAB 行为逐像素不变（测试里显式断言 `qab->property("exclusive").toBool() == false`）。
+- **语义决定：`setExclusive(true)` 不追溯取消已有勾选，只约束下一次勾选**——这是 `QActionGroup::setExclusive` 的真实行为，也是最容易"顺手做对成错"的一点（很多人会期望打开开关时立刻收敛到第一个）。文档注释里明确写出这条，测试用"两个都已勾选 → 打开开关 → 断言两个仍是勾选态 → 点一次才收敛"钉死。
+- **重入闸就是 `isChecked()` 判据本身**：`enforceExclusivity` 在每个已登记按钮的 `checkedChanged` 上被调用；取消兄弟按钮的勾选会再发一次它自己的 `checkedChanged`，重入进来时它已不是勾选态，`if (!btn->isChecked()) return;` 直接短路，因此**不需要**另设"正在实施互斥"的标志位。这个判据同时保证未受影响的兄弟一个信号都不发（测试用 `QSignalSpy(rb3, SIGNAL(toggled(bool)))` 断言 `size()==0`）。
+- **两处文档谎言被自查推翻**（写注释时顺手断言、随后读源码否掉）：(a) "取消勾选一个非 checkable 按钮在 `RibbonToolButton` 里是空操作"——错，`RibbonToolButton::setChecked(bool)` **没有** `isCheckable` 守卫；(b) "`setCheckable(false)` 会清掉 checked"——错，该行为只存在于 `RibbonMenuItem`，`RibbonToolButton` 不清。两条都从注释里删掉，改为只陈述 `isChecked()` 判据的实际作用。**教训：注释里的每一条"因为 X 所以安全"都必须回源码验一次，否则就是把猜测固化成文档。**
+- **容器侧的几何不变量**：`computeSuffixWidthFromMetrics()` 对空后缀返回 0，`computeLabelWidthFromMetrics()` 对空文本/空图标各自跳槽，所以"不设后缀、不设图标"时 `sizeHint`/`labelWidth`/`positionControl` 与引入该能力之前逐项相同（测试第一段就是把这条钉成等式：`width - ctrl.x - ctrl.width == 2`，2 即 `kContentMargin`）。后缀是从**容器**里切出去的，不是从控件里扣的：`implicitWidth` 恰好增 `suffixWidth`，面板把这部分宽度批下来后控件的 `x` 与 `width` 都不动。`enableShowIcon`/`enableShowTitle` 对应 widgets 对两个 QLabel 调 `setVisible`，这里改为重算条宽并重摆控件，净效果一致；测试用"差值"而非魔数（`iconSlot = withIcon - textOnly`）断言，避免把 20/3 两个常量钉进测试。
+- **本轮唯一的失败：一个"看起来对"的 QTRY 在中间态就通过了**。最初写的是 `QTRY_COMPARE(qRound(w - x - ctrlW), suffixW + 2)` 紧跟 `QCOMPARE(ctrl->width(), spinW0)`，结果 `spin->width()` 是 63 而不是 90。诊断输出显示：`setProperty` 后**控件立即按新 tail 缩了**（`positionControl` 是同步的），而**容器宽度要等一个 polish 周期才由面板批下来**（`implicitWidth` 155→182 是同步的，`width` 155→182 是异步的）。于是 `155 - 63 - 63 == 29 == suffixW + 2` 在中间态成立，QTRY 立刻通过，下一条同步断言撞上还没长大的容器。**修法：先 `QTRY_COMPARE(sfx->width(), sfxW0 + suffixW)` 等面板批完，再断言控件的 x/width。**通用教训——涉及"host 同步改 + 引擎异步批"的量，QTRY 必须等**上游那个异步量**本身，不能等一个在中间态也成立的派生等式。
+- 证据：`build-qml-test`（Debug，Qt 6.7.3 msvc2019_64）ctest **30/30** 全绿；`build-qml-rel`（Release）ctest **30/30** 全绿；`qml_Conformance` Release `Totals: 23 passed, 0 failed`（**21 个用例**，按 B54 口径以 `-functions` 计数）。新增 `controlContainerSuffixAndShowFlags`（无后缀零尾条 → 后缀切出尾条且容器长大而控件不动 → 叶子真的画出 "px" 且落在尾条内 → 标题/图标槽位逐个收起再逐个恢复无漂移 → `implicitWidth` 跟随）与 `buttonRowExclusivity`（QAB 默认非互斥两者可同时勾选 → 右组互斥一次只留一个 → `checkedButton()` 对齐 `QActionGroup::checkedAction`、取消唯一勾选后回到 nullptr → 未受影响兄弟零信号 → 运行时打开开关只约束下一次勾选），全部用真实 `QTest::mouseClick`，不做属性戳。示例 offscreen 跑 12s 零输出（QAB 加 Icons/Details 单选对，widget test 面板 SpinBox 加 `suffixText: "px"`、ComboBox 容器加图标 + Label 四态切换按钮）。`python tools/check_core_purity.py src/core` 通过；`src/qml` 内无任何 widgets 头包含（该脚本对 `src/qml` 报的 18 条全是 `QQuickItem`/`QQml*` 规则误伤，其设计目标是 core）。
+- **A5 未触碰 core**：后缀条宽与标签槽位度量都在 QML host 内用 `RibbonMetrics::coreMetrics().fontMetrics()` 算，互斥是纯 host 逻辑，无需下沉，故不跑 `Amalgamate.sh`。
+- 影响计划：04（WS-A5 完成，A3 为 WS-A 最后一步）；WS-D（色板网格的互斥选中可直接复用 `enforceExclusivity` 的"`isChecked()` 即重入闸"写法）；WS-C（定制器若要在运行时改按钮排成员，注意 `unregisterButton` 会 `disconnect(btn,nullptr,this,nullptr)` 一并摘掉互斥连接，重新登记才会接回）。
+
 ---
 
 ## 执行中追加（模板，勿删）

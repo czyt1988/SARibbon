@@ -95,6 +95,10 @@ ApplicationWindow {
         // quick access bar (widgets quick access parity): small buttons on
         // the title row after the application button
         RibbonQuickAccessBar {
+            // single-choice group: the row host implements the QActionGroup
+            // behavior widgets gets from the action bridge (the two view
+            // buttons below can never be checked at the same time)
+            exclusive: true
             RibbonToolButton {
                 text: qsTr("Save")
                 iconSource: "qrc:/icon/icon/save.svg"
@@ -106,6 +110,19 @@ ApplicationWindow {
                 iconSource: "qrc:/icon/icon/undo.svg"
                 proportion: Ribbon.Small
                 onClicked: log(qsTr("quick access: Undo clicked"))
+            }
+            RibbonToolButton {
+                text: qsTr("Icons")
+                proportion: Ribbon.Small
+                checkable: true
+                checked: true
+                onToggled: if (checked) log(qsTr("quick access view: icons"))
+            }
+            RibbonToolButton {
+                text: qsTr("Details")
+                proportion: Ribbon.Small
+                checkable: true
+                onToggled: if (checked) log(qsTr("quick access view: details"))
             }
             RibbonToolButton {
                 text: qsTr("Redo")
@@ -569,7 +586,9 @@ ApplicationWindow {
                 panelTitle: "widget test"
 
                 RibbonControlContainer {
+                    id: comboContainer
                     text: "ComboBox:"
+                    iconSource: "qrc:/icon/icon/setText.svg"
                     proportion: Ribbon.Small
                     control: ComboBox {
                         editable: true
@@ -605,9 +624,35 @@ ApplicationWindow {
                 }
                 RibbonControlContainer {
                     text: "SpinBox:"
+                    // trailing label after the control (widgets
+                    // SARibbonLineWidgetContainer::setSuffix parity): the strip
+                    // is carved out of the container, the control keeps its width
+                    suffixText: "px"
                     proportion: Ribbon.Small
                     control: SpinBox {
                         onValueModified: log(qsTr("SpinBox value: %1").arg(value))
+                    }
+                }
+                RibbonToolButton {
+                    text: "Label"
+                    iconSource: "qrc:/icon/icon/long-text.svg"
+                    proportion: Ribbon.Small
+                    toolTip: "cycle the ComboBox container label strip: icon + text / icon only / text only / none"
+                    onClicked: {
+                        var showIcon = comboContainer.enableShowIcon;
+                        var showTitle = comboContainer.enableShowTitle;
+                        if (showIcon && showTitle) {
+                            showTitle = false;
+                        } else if (showIcon) {
+                            showIcon = false;
+                            showTitle = true;
+                        } else {
+                            showIcon = true;
+                        }
+                        comboContainer.enableShowIcon = showIcon;
+                        comboContainer.enableShowTitle = showTitle;
+                        log(qsTr("container label strip: icon %1 / title %2 (label width %3)")
+                            .arg(showIcon).arg(showTitle).arg(comboContainer.labelWidth));
                     }
                 }
             }

@@ -19,7 +19,7 @@ cmake --build build
 |------|------|--------------|
 | 应用按钮 | 自定义应用窗口（列表 + Cancel + Esc 关闭，**点击优先级高于菜单**） | ApplicationWidget 模式 |
 | 应用按钮 | 菜单模式（test1-3 + 分隔符 + 可勾选项/快捷键文本/多级子菜单，声明 RibbonApplicationWindow 后自动让位） | USE_APPLICATION_NORMAL_MENU |
-| 快速访问栏 | Save/Undo/Redo + InstantPopup 菜单按钮（标题行应用按钮之后，菜单内含二级子菜单） | SARibbonQuickAccessBar |
+| 快速访问栏 | Save/Undo/Redo + InstantPopup 菜单按钮（标题行应用按钮之后，菜单内含二级子菜单）+ Icons/Details 单选对（`exclusive: true`，行宿主实现 QActionGroup 语义） | SARibbonQuickAccessBar |
 | 右侧按钮组 | Help/Visible（系统按钮区前右对齐） | SARibbonButtonGroupWidget |
 | ribbon style 面板 | 6 种样式单选（Loose/Compact × 3/2/1 行，样式传播到全部面板与按钮） | 6 个 QRadioButton |
 | ribbon style 面板 | 主题 8 项下拉（Windows7/2013/2016/2021×3/Dark×2） | RibbonTheme QComboBox |
@@ -31,7 +31,7 @@ cmake --build build
 | toolbutton style 面板 | 弹出三模式 × 比例混合：MenuButtonPopup（分区命中）/InstantPopup/DelayedPopup（长按）+ checkable 变体 + 禁用带菜单 | SARibbonMenu 演示 |
 | toolbutton style 面板 | optionAction（右下角对角按钮，点击触发信号） | 面板 optionAction |
 | toolbutton style 面板 | 分隔符（Large 比例独占一列） | addSeparator |
-| widget test 面板 | 控件嵌入：ComboBox（可编辑）/ComboBox/TextField/CheckBox/SpinBox | SARibbonCtrlContainer |
+| widget test 面板 | 控件嵌入：ComboBox（可编辑，带图标 + 标签条四态切换）/ComboBox/TextField/CheckBox/SpinBox（带 `suffixText` 尾随单位标签） | SARibbonCtrlContainer + SARibbonLineWidgetContainer |
 | Context Category 面板 | 上下文标签显隐开关（彩色 tab + 色带 + 页面切换） | setContextCategoryVisible |
 | Delete 类别 | 动态面板增删（ListModel+Repeater：移除尾部/插入 0/尾/-1） | removePanel/insertPanel |
 | Other 类别 | 画廊：2 组 17 项（Files/Apps），伸展分配 + 滚动 + 弹出视口 + 切组/滚动控制 + 标题三态切换（仅图标/单行/自动换行） | SARibbonGallery |
@@ -52,11 +52,15 @@ cmake --build build
 
 ## 一致性测试
 
-`tests/qml/tst_conformance_qml.cpp`（19 用例）与示例同步维护：
+`tests/qml/tst_conformance_qml.cpp`（21 用例）与示例同步维护：
 面板装箱黄金几何、tab 切换、按钮点击/弹出/禁用、控件嵌入、上下文标签、画廊、
 六样式传播、分隔符、快速访问栏/右组、对齐/最小模式、RTL、optionAction、应用窗口、
 菜单勾选/快捷键/多级子菜单（索引路径寻址 + 叶子渲染断言）、
 画廊标题三态（度量逐项对齐 core `calcGalleryCellMetrics` + 叶子 wrapMode/字号/可见性）、
 悬停信号（真实 mouseMove 进出栅格）与 selectable 语义（拒绝成为当前项但不拒绝激活）、
 主题自定义（键色覆盖 + 派生 token 重算 + JSON/文件加载 + `RibbonThemeUserDefine`
-保持自定义调色板 + 系统暗色开关桥接，并用 grabWindow 断言渲染色真的变了）。
+保持自定义调色板 + 系统暗色开关桥接，并用 grabWindow 断言渲染色真的变了）、
+容器尾随标签与标签条开关（后缀从容器里切出而非从控件里扣，
+`enableShowIcon`/`enableShowTitle` 逐槽位让宽并断言无漂移）、
+标题行按钮排互斥（默认为非互斥、打开开关不追溯取消勾选、
+未受影响的兄弟按钮不产生 `toggled`、`checkedButton()` 对齐 `QActionGroup::checkedAction`）。

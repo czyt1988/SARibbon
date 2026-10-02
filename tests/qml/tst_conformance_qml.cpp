@@ -43,6 +43,7 @@ private Q_SLOTS:
     void toolButtonPopupStates();
     void menuCheckableShortcutAndSubmenu();
     void controlContainerEmbedding();
+    void controlContainerSuffixAndShowFlags();
     void contextCategoryActivation();
     void galleryInPanel();
     void galleryCaptionStylesHoverAndSelectable();
@@ -50,6 +51,7 @@ private Q_SLOTS:
     void styleRadioViaContainer();
     void separatorInPanel();
     void quickAccessBarAndRightGroup();
+    void buttonRowExclusivity();
     void tabAlignmentAndMinimumMode();
     void rtlToggle();
     void panelOptionAction();
@@ -902,6 +904,138 @@ Item {
     QObject* comboPopup = combo->property("popup").value< QObject* >();
     QVERIFY(comboPopup);
     QTRY_COMPARE(comboPopup->property("visible").toBool(), true);
+}
+
+/**
+ * @brief Container suffix label + the two enableShow* strip switches
+ * @details Parity check for SARibbonLineWidgetContainer::setSuffix and
+ *          SARibbonCtrlContainer::setEnableShowIcon/Title: the trailing strip is
+ *          carved out of the container (not out of the control), an unset suffix
+ *          keeps the pre-suffix geometry byte-identical, and hiding a strip slot
+ *          hands its width back so the control moves up.
+ */
+void TestConformanceQml::controlContainerSuffixAndShowFlags()
+{
+    const QString iconPath = QStringLiteral(QT_TESTCASE_BUILDDIR)
+                             + QStringLiteral("/../../../examples/widgets/MainWindowExample/icon/save.svg");
+    if (!QFile::exists(iconPath)) {
+        QSKIP("icon file not reachable from this build directory");
+    }
+
+    QQmlEngine engine;
+    saRibbonRegisterQmlTypes(&engine);
+
+    QString src = QStringLiteral(R"QML(import QtQuick 2.12
+import QtQuick.Controls 2.12
+import SARibbon 3.0
+Item {
+    width: 700
+    height: 300
+    RibbonPanel {
+        objectName: "panel"
+        anchors.fill: parent
+        panelTitle: "P"
+        RibbonControlContainer {
+            objectName: "sfx"
+            text: "Size:"
+            control: SpinBox {
+                objectName: "spin"
+                from: 0
+                to: 100
+                value: 12
+            }
+        }
+        RibbonControlContainer {
+            objectName: "iconed"
+            text: "Font:"
+            control: ComboBox {
+                objectName: "combo2"
+                model: [ "a", "b" ]
+            }
+        }
+    }
+})QML");
+
+    QQmlComponent component(&engine);
+    std::unique_ptr< QQuickView > view(exposeScene(engine, component, src.toUtf8().constData(), 700, 300));
+    QVERIFY(view);
+    QQuickItem* rootItem = view->rootObject();
+    QVERIFY(rootItem);
+
+    auto* sfx    = rootItem->findChild< QQuickItem* >(QStringLiteral("sfx"));
+    auto* iconed = rootItem->findChild< QQuickItem* >(QStringLiteral("iconed"));
+    auto* spin   = rootItem->findChild< QQuickItem* >(QStringLiteral("spin"));
+    auto* combo2 = rootItem->findChild< QQuickItem* >(QStringLiteral("combo2"));
+    QVERIFY(sfx && iconed && spin && combo2);
+    QTRY_VERIFY(sfx->width() > 0 && iconed->width() > 0);
+
+    // ---- no suffix by default: zero-width tail strip, unchanged geometry ----
+    QCOMPARE(sfx->property("suffixWidth").toReal(), 0.0);
+    const qreal labelW = sfx->property("labelWidth").toReal();
+    QVERIFY(labelW > 0);
+    QTRY_VERIFY(spin->width() > 0);
+    const qreal spinW0 = spin->width();
+    QCOMPARE(spin->x(), labelW);
+    // the control gets everything between the strip and the (empty) tail minus
+    // the content margin
+    QCOMPARE(qRound(sfx->width() - spin->x() - spinW0), 2);
+
+    // ---- the suffix carves a trailing strip out of the container ----
+    const qreal sfxW0 = sfx->width();
+    sfx->setProperty("suffixText", QStringLiteral("px"));
+    const qreal suffixW = sfx->property("suffixWidth").toReal();
+    QVERIFY(suffixW > 0);
+    // the hint grows by exactly the strip, and the panel grants it: the control
+    // keeps both its offset and its width, the tail is never taken out of it
+    QCOMPARE(sfx->property("implicitWidth").toReal(), sfxW0 + suffixW);
+    QTRY_COMPARE(sfx->width(), sfxW0 + suffixW);
+    QCOMPARE(spin->x(), labelW);
+    QCOMPARE(spin->width(), spinW0);
+    QCOMPARE(qRound(sfx->width() - spin->x() - spin->width()), qRound(suffixW) + 2);
+
+    // ---- the leaf actually paints the suffix inside the tail strip ----
+    QList< QQuickItem* > visualItems;
+    collectVisualItems(sfx, &visualItems);
+    QQuickItem* suffixText = nullptr;
+    for (QQuickItem* item : visualItems) {
+        if (item->metaObject()->className() == QByteArrayLiteral("QQuickText")
+            && item->property("text").toString() == QLatin1String("px")) {
+            suffixText = item;
+            break;
+        }
+    }
+    QVERIFY2(suffixText, "the container leaf must render the suffix label");
+    QVERIFY(suffixText->isVisible());
+    QVERIFY(suffixText->x() + suffixText->width() <= sfx->width() + 1.0);
+    QVERIFY(suffixText->x() + 1.0 >= spin->x() + spin->width());
+
+    // ---- enableShowTitle / enableShowIcon drop their slot from the metrics ----
+    const qreal textOnly = iconed->property("labelWidth").toReal();
+    QVERIFY(textOnly > 0);
+    iconed->setProperty("iconSource", QUrl::fromLocalFile(iconPath).toString());
+    const qreal withIcon = iconed->property("labelWidth").toReal();
+    QVERIFY(withIcon > textOnly);
+    const qreal iconSlot = withIcon - textOnly;
+    QTRY_COMPARE(combo2->x(), withIcon);
+
+    iconed->setProperty("enableShowTitle", false);
+    QCOMPARE(iconed->property("labelWidth").toReal(), iconSlot);
+    QTRY_COMPARE(combo2->x(), iconSlot);
+
+    iconed->setProperty("enableShowIcon", false);
+    QCOMPARE(iconed->property("labelWidth").toReal(), 0.0);
+    QTRY_COMPARE(combo2->x(), 0.0);
+
+    // both switches back on restore the exact strip (no drift)
+    iconed->setProperty("enableShowTitle", true);
+    iconed->setProperty("enableShowIcon", true);
+    QCOMPARE(iconed->property("labelWidth").toReal(), withIcon);
+    QTRY_COMPARE(combo2->x(), withIcon);
+
+    // the hint follows the strip, so the panel gives the width back
+    const qreal hintNoTitle = iconed->property("implicitWidth").toReal();
+    iconed->setProperty("enableShowTitle", false);
+    QTRY_COMPARE(iconed->property("implicitWidth").toReal(), hintNoTitle - textOnly);
 }
 
 int TestConformanceQml::countPixelsNear(const QImage& img, const QColor& color, int tolerance)
@@ -1773,6 +1907,125 @@ Item {
     const QPointF center = save->mapToScene(QPointF(save->width() / 2, save->height() / 2));
     QTest::mouseClick(view.get(), Qt::LeftButton, Qt::NoModifier, center.toPoint());
     QTRY_COMPARE(clickedSpy.size(), 1);
+}
+
+/**
+ * @brief Single-choice behavior of the title-row button containers
+ * @details The widgets side gets this for free from QActionGroup; the QML side
+ *          has no action bridge, so RibbonButtonRowHost implements it. Covers
+ *          the default (quick access bar stays multi-choice), the exclusive
+ *          right group, the checkedButton() accessor, the absence of a signal
+ *          storm on untouched siblings, and the QActionGroup rule that turning
+ *          the flag on does not retroactively uncheck anything.
+ */
+void TestConformanceQml::buttonRowExclusivity()
+{
+    QQmlEngine engine;
+    saRibbonRegisterQmlTypes(&engine);
+
+    QString src = QStringLiteral(R"QML(import QtQuick 2.12
+import SARibbon 3.0
+Item {
+    width: 900
+    height: 300
+    RibbonBar {
+        id: bar
+        objectName: "bar"
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        applicationLabel: "File"
+        RibbonQuickAccessBar {
+            objectName: "qab"
+            RibbonToolButton { objectName: "qa1"; text: "One"; checkable: true; proportion: Ribbon.Small }
+            RibbonToolButton { objectName: "qa2"; text: "Two"; checkable: true; proportion: Ribbon.Small }
+        }
+        RibbonButtonGroup {
+            objectName: "rgroup"
+            exclusive: true
+            RibbonToolButton { objectName: "rb1"; text: "A"; checkable: true; proportion: Ribbon.Small }
+            RibbonToolButton { objectName: "rb2"; text: "B"; checkable: true; proportion: Ribbon.Small }
+            RibbonToolButton { objectName: "rb3"; text: "C"; checkable: true; proportion: Ribbon.Small }
+        }
+        RibbonCategory {
+            title: "Home"
+            RibbonPanel {
+                panelTitle: "P"
+                RibbonToolButton { text: "X" }
+            }
+        }
+    }
+})QML");
+
+    QQmlComponent component(&engine);
+    std::unique_ptr< QQuickView > view(exposeScene(engine, component, src.toUtf8().constData(), 900, 300));
+    QVERIFY(view);
+    QQuickItem* rootItem = view->rootObject();
+    QVERIFY(rootItem);
+
+    auto* qab = rootItem->findChild< QQuickItem* >(QStringLiteral("qab"));
+    auto* rg  = rootItem->findChild< QQuickItem* >(QStringLiteral("rgroup"));
+    auto* qa1 = rootItem->findChild< QQuickItem* >(QStringLiteral("qa1"));
+    auto* qa2 = rootItem->findChild< QQuickItem* >(QStringLiteral("qa2"));
+    auto* rb1 = rootItem->findChild< QQuickItem* >(QStringLiteral("rb1"));
+    auto* rb2 = rootItem->findChild< QQuickItem* >(QStringLiteral("rb2"));
+    auto* rb3 = rootItem->findChild< QQuickItem* >(QStringLiteral("rb3"));
+    QVERIFY(qab && rg && qa1 && qa2 && rb1 && rb2 && rb3);
+
+    auto clickItem = [&view](QQuickItem* item) {
+        QTRY_VERIFY(item->width() > 0 && item->height() > 0);
+        const QPointF center = item->mapToScene(QPointF(item->width() / 2, item->height() / 2));
+        QTest::mouseClick(view.get(), Qt::LeftButton, Qt::NoModifier, center.toPoint());
+    };
+    auto checkedButtonOf = [](QQuickItem* row) -> SARibbonQml::RibbonToolButton* {
+        SARibbonQml::RibbonToolButton* result = nullptr;
+        QMetaObject::invokeMethod(row, "checkedButton", Q_RETURN_ARG(SARibbonQml::RibbonToolButton*, result));
+        return result;
+    };
+
+    // ---- defaults: the quick access row is multi-choice, the group is not ----
+    QCOMPARE(qab->property("exclusive").toBool(), false);
+    QCOMPARE(rg->property("exclusive").toBool(), true);
+    QVERIFY(checkedButtonOf(qab) == nullptr);
+    QVERIFY(checkedButtonOf(rg) == nullptr);
+
+    // ---- non-exclusive row: both stay checked (no QActionGroup semantics) ----
+    clickItem(qa1);
+    QTRY_COMPARE(qa1->property("checked").toBool(), true);
+    clickItem(qa2);
+    QTRY_COMPARE(qa2->property("checked").toBool(), true);
+    QVERIFY(qa1->property("checked").toBool());
+
+    // ---- exclusive group: a check unchecks the rest ----
+    QSignalSpy rb3Spy(rb3, SIGNAL(toggled(bool)));
+    clickItem(rb1);
+    QTRY_COMPARE(rb1->property("checked").toBool(), true);
+    QCOMPARE(checkedButtonOf(rg), qobject_cast< SARibbonQml::RibbonToolButton* >(rb1));
+    clickItem(rb2);
+    QTRY_COMPARE(rb2->property("checked").toBool(), true);
+    QTRY_COMPARE(rb1->property("checked").toBool(), false);
+    QCOMPARE(checkedButtonOf(rg), qobject_cast< SARibbonQml::RibbonToolButton* >(rb2));
+    // the untouched sibling was never written to
+    QCOMPARE(rb3Spy.size(), 0);
+    QCOMPARE(rb3->property("checked").toBool(), false);
+
+    // ---- unchecking the only checked button leaves the group empty ----
+    clickItem(rb2);
+    QTRY_COMPARE(rb2->property("checked").toBool(), false);
+    QVERIFY(checkedButtonOf(rg) == nullptr);
+
+    // ---- switching exclusivity on constrains the NEXT check only ----
+    qab->setProperty("exclusive", true);
+    QCOMPARE(qab->property("exclusive").toBool(), true);
+    QVERIFY(qa1->property("checked").toBool());
+    QVERIFY(qa2->property("checked").toBool());
+    clickItem(qa2);                                   // toggles qa2 off, nothing else to do
+    QTRY_COMPARE(qa2->property("checked").toBool(), false);
+    QVERIFY(qa1->property("checked").toBool());
+    clickItem(qa2);                                   // now the exclusivity bites
+    QTRY_COMPARE(qa2->property("checked").toBool(), true);
+    QTRY_COMPARE(qa1->property("checked").toBool(), false);
+    QCOMPARE(checkedButtonOf(qab), qobject_cast< SARibbonQml::RibbonToolButton* >(qa2));
 }
 
 /**

@@ -18,6 +18,7 @@ RibbonControlContainer::RibbonControlContainer(QQuickItem* parent) : RibbonLayou
     // contract default: widgets addSmallWidget wraps with Small proportion
     rowProportion = SARibbon::Core::SARibbonRowProportion::Small;
     updateLabelWidth();
+    updateSuffixWidth();
     updateSizeHint();
 }
 
@@ -44,6 +45,37 @@ void RibbonControlContainer::setText(const QString& t)
     Q_EMIT textChanged();
     updateLabelWidth();
     updateSizeHint();
+}
+
+QString RibbonControlContainer::suffixText() const
+{
+    return mSuffixText;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set the trailing label text drawn after the embedded control
+ * @details Parity with SARibbonLineWidgetContainer::setSuffix. An empty suffix
+ *          reserves zero width, so the container geometry is byte-identical to
+ *          the pre-suffix behaviour.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置画在内嵌控件之后的尾随标签文本
+ * @details 对应 SARibbonLineWidgetContainer::setSuffix。空后缀占用零宽度，
+ *          因此不设后缀时容器几何与引入该能力之前逐像素相同。
+ * \endif
+ */
+void RibbonControlContainer::setSuffixText(const QString& t)
+{
+    if (mSuffixText == t) {
+        return;
+    }
+    mSuffixText = t;
+    Q_EMIT suffixTextChanged();
+    updateSuffixWidth();
+    updateSizeHint();
+    positionControl();
 }
 
 QString RibbonControlContainer::iconSource() const
@@ -132,9 +164,77 @@ void RibbonControlContainer::setProportion(RibbonEnums::RowProportion rp)
     positionControl();
 }
 
+bool RibbonControlContainer::isEnableShowIcon() const
+{
+    return mEnableShowIcon;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Collapse the icon slot of the leading label strip
+ * @details Parity with SARibbonCtrlContainer::setEnableShowIcon, which toggles
+ *          the visibility of the icon QLabel so the box layout hands the freed
+ *          width to the embedded widget. Here the strip width is recomputed and
+ *          the control is repositioned, which is the same net effect.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 收起前端标签条里的图标槽位
+ * @details 对应 SARibbonCtrlContainer::setEnableShowIcon——widgets 侧切换图标
+ *          QLabel 的可见性，盒布局把腾出的宽度交给内嵌控件。这里改为重算标签
+ *          条宽度并重新摆放 control，净效果相同。
+ * \endif
+ */
+void RibbonControlContainer::setEnableShowIcon(bool on)
+{
+    if (mEnableShowIcon == on) {
+        return;
+    }
+    mEnableShowIcon = on;
+    Q_EMIT enableShowIconChanged();
+    updateLabelWidth();
+    updateSizeHint();
+    positionControl();
+}
+
+bool RibbonControlContainer::isEnableShowTitle() const
+{
+    return mEnableShowTitle;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Collapse the title slot of the leading label strip
+ * @note Parity with SARibbonCtrlContainer::setEnableShowTitle; the text stays
+ *       readable through text() and is only kept out of the metrics.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 收起前端标签条里的标题槽位
+ * @note 对应 SARibbonCtrlContainer::setEnableShowTitle；文本本身仍可由 text()
+ *       读到，只是不再计入度量。
+ * \endif
+ */
+void RibbonControlContainer::setEnableShowTitle(bool on)
+{
+    if (mEnableShowTitle == on) {
+        return;
+    }
+    mEnableShowTitle = on;
+    Q_EMIT enableShowTitleChanged();
+    updateLabelWidth();
+    updateSizeHint();
+    positionControl();
+}
+
 qreal RibbonControlContainer::labelWidth() const
 {
     return mLabelWidth;
+}
+
+qreal RibbonControlContainer::suffixWidth() const
+{
+    return mSuffixWidth;
 }
 
 void RibbonControlContainer::componentComplete()
@@ -164,19 +264,41 @@ void RibbonControlContainer::updateLabelWidth()
     }
 }
 
+void RibbonControlContainer::updateSuffixWidth()
+{
+    const int w = computeSuffixWidthFromMetrics();
+    if (mSuffixWidth != w) {
+        mSuffixWidth = w;
+        Q_EMIT suffixWidthChanged();
+    }
+}
+
 int RibbonControlContainer::computeLabelWidthFromMetrics() const
 {
     // label strip: [icon 20] spacing [text advance] trailing spacing; an
-    // empty label keeps the icon slot only when an icon exists
+    // empty label keeps the icon slot only when an icon exists. The two
+    // enableShow* switches drop their slot from the metrics entirely, which is
+    // what the widgets box layout does when the QLabel is hidden
     const QFontMetrics fm = RibbonMetrics::instance()->coreMetrics().fontMetrics();
     int w = 0;
-    if (!mIconSource.isEmpty()) {
+    if (mEnableShowIcon && !mIconSource.isEmpty()) {
         w += kSmallIconSide + kLabelSpacing;
     }
-    if (!mText.isEmpty()) {
+    if (mEnableShowTitle && !mText.isEmpty()) {
         w += fm.horizontalAdvance(mText) + kLabelSpacing;
     }
     return w;
+}
+
+int RibbonControlContainer::computeSuffixWidthFromMetrics() const
+{
+    // trailing strip: leading spacing + suffix advance; zero when unset so the
+    // no-suffix geometry stays untouched
+    if (mSuffixText.isEmpty()) {
+        return 0;
+    }
+    const QFontMetrics fm = RibbonMetrics::instance()->coreMetrics().fontMetrics();
+    return kLabelSpacing + fm.horizontalAdvance(mSuffixText);
 }
 
 QSize RibbonControlContainer::sizeHint() const
@@ -199,7 +321,7 @@ QSize RibbonControlContainer::sizeHint() const
         return QSize(w, qMax(largeH, 22));
     }
     const int h = qMax(qMax(int(ctrlH), fm.lineSpacing()), 16);
-    return QSize(mLabelWidth + int(ctrlW) + kContentMargin, h);
+    return QSize(mLabelWidth + int(ctrlW) + mSuffixWidth + kContentMargin, h);
 }
 
 void RibbonControlContainer::updateSizeHint()
@@ -216,10 +338,12 @@ void RibbonControlContainer::positionControl()
         return;
     }
     // control sits after the label strip, vertically centered, clamped to the
-    // container bounds (the label zone is reserved by the leaf rendering)
+    // container bounds (the label zone is reserved by the leaf rendering); the
+    // trailing suffix strip is reserved on the other side
     const bool isLarge = (rowProportion == SARibbon::Core::SARibbonRowProportion::Large);
     const qreal x  = isLarge ? kContentMargin : mLabelWidth;
-    const qreal availW = qMax(width() - x - kContentMargin, 0.0);
+    const qreal tail = isLarge ? kContentMargin : (mSuffixWidth + kContentMargin);
+    const qreal availW = qMax(width() - x - tail, 0.0);
     const qreal availH = qMax(height() - 2 * kContentMargin, 0.0);
     const qreal h  = qMin(qMax(mControl->implicitHeight(), 0.0), availH);
     mControl->setPosition(QPointF(x, (height() - h) / 2.0));
