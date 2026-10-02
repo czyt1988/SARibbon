@@ -4,6 +4,7 @@
 #include "../host/RibbonQuickHost.h"
 #include "../SARibbonQmlTypes.h"
 #include <SARibbonCore/SARibbonBarGeometryEngine.h>
+#include <SARibbonCore/SARibbonToolButtonLayout.h>
 #include <QHash>
 #include <QQmlListProperty>
 #include <QRectF>
@@ -51,6 +52,8 @@ class RibbonBar : public RibbonQuickHost
     Q_PROPERTY(RibbonEnums::RibbonStyle ribbonStyle READ ribbonStyle WRITE setRibbonStyle NOTIFY ribbonStyleChanged)
     Q_PROPERTY(RibbonEnums::Alignment tabAlignment READ tabAlignment WRITE setTabAlignment NOTIFY tabAlignmentChanged)
     Q_PROPERTY(bool minimumMode READ isMinimumMode WRITE setMinimumMode NOTIFY minimumModeChanged)
+    Q_PROPERTY(qreal buttonMaximumAspectRatio READ buttonMaximumAspectRatio WRITE setButtonMaximumAspectRatio NOTIFY buttonMaximumAspectRatioChanged)
+    Q_PROPERTY(qreal largeButtonMinimumWidthRatio READ largeButtonMinimumWidthRatio WRITE setLargeButtonMinimumWidthRatio NOTIFY largeButtonMinimumWidthRatioChanged)
     Q_PROPERTY(int tabBarHeight READ tabBarHeight NOTIFY layoutChanged)
     Q_PROPERTY(int titleBarHeight READ titleBarHeight NOTIFY layoutChanged)
     Q_PROPERTY(int categoryRowY READ categoryRowY NOTIFY layoutChanged)
@@ -86,6 +89,14 @@ public:
     // remain (widgets setMinimumMode parity)
     bool isMinimumMode() const;
     void setMinimumMode(bool on);
+
+    // Button width tuning pushed down the whole host tree (widgets
+    // SARibbonBar::setButtonMaximumAspectRatio parity — the documented entry
+    // point; the category/panel/button copies only relay it)
+    qreal buttonMaximumAspectRatio() const;
+    void setButtonMaximumAspectRatio(qreal fac);
+    qreal largeButtonMinimumWidthRatio() const;
+    void setLargeButtonMinimumWidthRatio(qreal fac);
 
     // layout values consumed by the visual leaf (re-published on relayout)
     int tabBarHeight() const;
@@ -138,6 +149,8 @@ Q_SIGNALS:
     void ribbonStyleChanged();
     void tabAlignmentChanged();
     void minimumModeChanged();
+    void buttonMaximumAspectRatioChanged();
+    void largeButtonMinimumWidthRatioChanged();
     void layoutChanged();
     void applicationButtonClicked();
     void applicationMenuItemsChanged();
@@ -163,6 +176,7 @@ private:
     void syncContextSignals(RibbonContextCategory* ctx);
     bool isOwnedContextTab(RibbonTab* tab) const;
     void propagateRibbonStyle();
+    void propagateLayoutFactors();
     static int styleRowCount(RibbonEnums::RibbonStyle style);
     static bool styleIsCompact(RibbonEnums::RibbonStyle style);
     void placeTitleRowHosts(int titleH, int appBtnW, int systemStripW);
@@ -185,6 +199,8 @@ private:
     RibbonEnums::Alignment mTabAlignment = RibbonEnums::AlignLeft;
     bool mTabOnTitle = false;
     bool mMinimumMode = false;
+    qreal mButtonMaximumAspectRatio     = SARibbon::Core::ToolButtonLayoutConstants::BUTTON_MAX_ASPECT_RATIO_DEFAULT;
+    qreal mLargeButtonMinimumWidthRatio = SARibbon::Core::ToolButtonLayoutConstants::LARGE_BUTTON_MIN_WIDTH_RATIO;
     QVector< RibbonCategory* > mCategories;
     QVector< RibbonTab* > mTabs;      ///< explicit + auto tabs in row order
     QVector< RibbonTab* > mAutoTabs;  ///< subset owned (and destroyed) by this bar

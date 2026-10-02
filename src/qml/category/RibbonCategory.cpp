@@ -99,6 +99,7 @@ void RibbonCategory::registerPanel(RibbonPanel* panel)
         mPanels.append(panel);
         // apply the last pushed bar style so dynamically added panels match
         applyRibbonStyle(mStyleRowCount, mStyleShowPanelTitle, mStyleWordWrap, mStyleIconRightText);
+        panel->applyLayoutFactors(mButtonMaximumAspectRatio, mLargeButtonMinimumWidthRatio);
         // panel implicit sizes are the layout hints: any change re-runs relayout
         connect(panel, &QQuickItem::implicitWidthChanged, this, [this]() { polish(); });
         connect(panel, &QQuickItem::implicitHeightChanged, this, [this]() { polish(); });
@@ -119,6 +120,17 @@ void RibbonCategory::applyRibbonStyle(int rowCount, bool showPanelTitle, bool wo
         panel->applyRibbonStyle(mode, showPanelTitle, wordWrap, iconRightText);
     }
     polish();
+}
+
+void RibbonCategory::applyLayoutFactors(qreal buttonMaximumAspectRatio, qreal largeButtonMinimumWidthRatio)
+{
+    // widgets SARibbonCategory::setButtonMaximumAspectRatio parity: remember the
+    // pushed pair (panels registered later inherit) and forward it downward
+    mButtonMaximumAspectRatio     = buttonMaximumAspectRatio;
+    mLargeButtonMinimumWidthRatio = largeButtonMinimumWidthRatio;
+    for (RibbonPanel* panel : mPanels) {
+        panel->applyLayoutFactors(buttonMaximumAspectRatio, largeButtonMinimumWidthRatio);
+    }
 }
 
 void RibbonCategory::unregisterPanel(RibbonPanel* panel)

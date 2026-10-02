@@ -32,6 +32,13 @@ class RibbonMenuItem;
  *          (leaf-side timer). Menu entries are declarative RibbonMenuItem
  *          objects; activation is mediated by menuTriggered so tests can drive
  *          it without a windowed popup.
+ *          The layout knobs are the core SARibbonToolButtonLayout::Factors and
+ *          Input fields published as properties (spacing, the two text height
+ *          factors, the aspect ratio pair, the two icon sizes), mirroring the
+ *          public setters of SARibbonToolButton. The two aspect ratios also
+ *          arrive through the bar propagation chain (widgets
+ *          SARibbonBar::setButtonMaximumAspectRatio parity): a bar-level change
+ *          overwrites the per-button value, exactly as on the widgets side.
  * \endif
  *
  * \if CHINESE
@@ -46,6 +53,11 @@ class RibbonMenuItem;
  *          InstantPopup 整个按钮即菜单区，DelayedPopup 整个按钮保持动作区、
  *          按住不放弹出菜单（叶子侧计时）。菜单项为声明式 RibbonMenuItem；
  *          激活经 menuTriggered 中转，测试无需弹窗即可驱动。
+ *          布局旋钮即 core SARibbonToolButtonLayout 的 Factors 与 Input 字段
+ *          （spacing、两个文字高度系数、宽高比一对、两个图标尺寸），以属性形式
+ *          发布，对应 SARibbonToolButton 的同名公开设置函数。两个宽高比还会经
+ *          bar 传播链下发（对应 widgets SARibbonBar::setButtonMaximumAspectRatio）：
+ *          bar 级改动会覆盖单按钮的值，与 widgets 侧行为一致。
  * \endif
  */
 class SA_RIBBON_QML_EXPORT RibbonToolButton : public RibbonLayoutItemHost
@@ -58,6 +70,13 @@ class SA_RIBBON_QML_EXPORT RibbonToolButton : public RibbonLayoutItemHost
     Q_PROPERTY(bool checked READ isChecked WRITE setChecked NOTIFY checkedChanged)
     Q_PROPERTY(bool wordWrap READ isWordWrap WRITE setWordWrap NOTIFY wordWrapChanged)
     Q_PROPERTY(bool iconRightText READ isIconRightText WRITE setIconRightText NOTIFY iconRightTextChanged)
+    Q_PROPERTY(int spacing READ spacing WRITE setSpacing NOTIFY spacingChanged)
+    Q_PROPERTY(qreal twoLineHeightFactor READ twoLineHeightFactor WRITE setTwoLineHeightFactor NOTIFY layoutFactorsChanged)
+    Q_PROPERTY(qreal oneLineHeightFactor READ oneLineHeightFactor WRITE setOneLineHeightFactor NOTIFY layoutFactorsChanged)
+    Q_PROPERTY(qreal buttonMaximumAspectRatio READ buttonMaximumAspectRatio WRITE setButtonMaximumAspectRatio NOTIFY layoutFactorsChanged)
+    Q_PROPERTY(qreal largeButtonMinimumWidthRatio READ largeButtonMinimumWidthRatio WRITE setLargeButtonMinimumWidthRatio NOTIFY layoutFactorsChanged)
+    Q_PROPERTY(QSize smallIconSize READ smallIconSize WRITE setSmallIconSize NOTIFY iconSizesChanged)
+    Q_PROPERTY(QSize largeIconSize READ largeIconSize WRITE setLargeIconSize NOTIFY iconSizesChanged)
     Q_PROPERTY(QString toolTip READ toolTip WRITE setToolTip NOTIFY toolTipChanged)
     Q_PROPERTY(RibbonEnums::PopupMode popupMode READ popupMode WRITE setPopupMode NOTIFY popupModeChanged)
     Q_PROPERTY(QQmlListProperty< SARibbonQml::RibbonMenuItem > menuItems READ menuItems NOTIFY menuItemsChanged)
@@ -101,6 +120,30 @@ public:
     // setEnableIconRightText parity — single-row styles enable it)
     bool isIconRightText() const;
     void setIconRightText(bool on);
+
+    // Gap between the drawn elements (widgets setSpacing parity)
+    int spacing() const;
+    void setSpacing(int v);
+
+    // Core SARibbonToolButtonLayout::Factors, exposed one by one; the defaults
+    // equal the ToolButtonLayoutConstants the host used to hardcode
+    qreal twoLineHeightFactor() const;
+    void setTwoLineHeightFactor(qreal v);
+    qreal oneLineHeightFactor() const;
+    void setOneLineHeightFactor(qreal v);
+    qreal buttonMaximumAspectRatio() const;
+    void setButtonMaximumAspectRatio(qreal v);
+    qreal largeButtonMinimumWidthRatio() const;
+    void setLargeButtonMinimumWidthRatio(qreal v);
+
+    // Icon boxes fed to the core algorithm and published to the leaf through
+    // iconSide (widgets setSmallIconSize/setLargeIconSize parity); the panel
+    // host pushes its own values down, the bar-level setters reach them through
+    // the propagation chain
+    QSize smallIconSize() const;
+    void setSmallIconSize(const QSize& size);
+    QSize largeIconSize() const;
+    void setLargeIconSize(const QSize& size);
 
     QString toolTip() const;
     void setToolTip(const QString& t);
@@ -160,6 +203,9 @@ Q_SIGNALS:
     void checkedChanged();
     void wordWrapChanged();
     void iconRightTextChanged();
+    void spacingChanged();
+    void layoutFactorsChanged();
+    void iconSizesChanged();
     void toolTipChanged();
     void popupModeChanged();
     void menuItemsChanged();
@@ -217,6 +263,10 @@ private:
     QString mDisplayText;
     bool mIsTextNeedWrap = false;
     QVector< RibbonMenuItem* > mMenuItems;
+    int mSpacing = SARibbon::Core::ToolButtonLayoutConstants::DEFAULT_SPACING;
+    SARibbon::Core::SARibbonToolButtonLayout::Factors mFactors;
+    QSize mSmallIconSize = QSize(22, 22);  ///< widgets SARibbonPanelLayout::mSmallToolButtonIconSize default
+    QSize mLargeIconSize = QSize(32, 32);  ///< widgets SARibbonToolButton::PrivateData::mLargeButtonSizeHint default
 };
 
 }

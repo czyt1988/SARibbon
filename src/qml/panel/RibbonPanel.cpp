@@ -91,12 +91,89 @@ void RibbonPanel::registerChildItem(RibbonLayoutItemHost* item)
 {
     if (!mChildItems.contains(item)) {
         mChildItems.append(item);
-        // buttons registered later inherit the current style flags
+        // buttons registered later inherit the current style flags and the
+        // layout knobs already pushed down from the category / bar
         if (auto* btn = qobject_cast< RibbonToolButton* >(item)) {
             btn->setWordWrap(mWordWrap);
             btn->setIconRightText(mIconRightText);
+            btn->setSmallIconSize(mSmallIconSize);
+            btn->setLargeIconSize(mLargeIconSize);
+            btn->setButtonMaximumAspectRatio(mButtonMaximumAspectRatio);
+            btn->setLargeButtonMinimumWidthRatio(mLargeButtonMinimumWidthRatio);
         }
         polish();
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Push the bar-level layout factors down to every registered button
+ * @details Counterpart of SARibbonPanel::setButtonMaximumAspectRatio /
+ *          setLargeButtonMinimumWidthRatio: the widgets panel forwards the pair
+ *          to its layout and to each SARibbonToolButton child, and the QML host
+ *          does the same through the button setters. The values are stored so a
+ *          button declared after the push inherits them (registerChildItem).
+ *          Each button setter drops the engine sizeHint cache entry and
+ *          re-polishes the panel, so no extra invalidate call is needed here.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 把 bar 级布局系数下发到每个已注册按钮
+ * @details 对应 SARibbonPanel::setButtonMaximumAspectRatio /
+ *          setLargeButtonMinimumWidthRatio：widgets 面板把这对系数转给自身布局
+ *          与每个 SARibbonToolButton 子项，QML 宿主经按钮设置函数做同样的事。
+ *          数值会被记住，以便下发之后才声明的按钮继承（registerChildItem）。
+ *          按钮的设置函数会丢弃引擎 sizeHint 缓存并重新 polish 面板，故此处
+ *          无需再调一次失效接口。
+ * \endif
+ */
+void RibbonPanel::applyLayoutFactors(qreal buttonMaximumAspectRatio, qreal largeButtonMinimumWidthRatio)
+{
+    mButtonMaximumAspectRatio     = buttonMaximumAspectRatio;
+    mLargeButtonMinimumWidthRatio = largeButtonMinimumWidthRatio;
+    for (RibbonLayoutItemHost* item : mChildItems) {
+        if (auto* btn = qobject_cast< RibbonToolButton* >(item)) {
+            btn->setButtonMaximumAspectRatio(buttonMaximumAspectRatio);
+            btn->setLargeButtonMinimumWidthRatio(largeButtonMinimumWidthRatio);
+        }
+    }
+}
+
+QSize RibbonPanel::smallIconSize() const
+{
+    return mSmallIconSize;
+}
+
+void RibbonPanel::setSmallIconSize(const QSize& size)
+{
+    if (mSmallIconSize == size) {
+        return;
+    }
+    mSmallIconSize = size;
+    Q_EMIT smallIconSizeChanged();
+    for (RibbonLayoutItemHost* item : mChildItems) {
+        if (auto* btn = qobject_cast< RibbonToolButton* >(item)) {
+            btn->setSmallIconSize(size);
+        }
+    }
+}
+
+QSize RibbonPanel::largeIconSize() const
+{
+    return mLargeIconSize;
+}
+
+void RibbonPanel::setLargeIconSize(const QSize& size)
+{
+    if (mLargeIconSize == size) {
+        return;
+    }
+    mLargeIconSize = size;
+    Q_EMIT largeIconSizeChanged();
+    for (RibbonLayoutItemHost* item : mChildItems) {
+        if (auto* btn = qobject_cast< RibbonToolButton* >(item)) {
+            btn->setLargeIconSize(size);
+        }
     }
 }
 

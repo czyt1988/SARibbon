@@ -12,15 +12,6 @@ namespace SARibbonQml {
 namespace TBLC = SARibbon::Core::ToolButtonLayoutConstants;
 using SARibbonToolButtonLayout = SARibbon::Core::SARibbonToolButtonLayout;
 
-namespace {
-// Icon side lengths (widgets parity: SARibbonPanelLayout::mSmallToolButtonIconSize
-// defaults to 22, SARibbonToolButton::PrivateData::mLargeButtonSizeHint to 32).
-// Rendering parameters may live per front end (v2 §2.2 double-render rule);
-// the layout *algorithm* itself lives in SARibbon::Core::SARibbonToolButtonLayout.
-constexpr int kSmallIconSide = 22;
-constexpr int kLargeIconSide = 32;
-}  // namespace
-
 RibbonToolButton::RibbonToolButton(QQuickItem* parent) : RibbonLayoutItemHost(parent)
 {
     // contract field default follows the 2.x createItem behavior (Large)
@@ -181,6 +172,123 @@ void RibbonToolButton::setIconRightText(bool on)
     updateLayout();
 }
 
+int RibbonToolButton::spacing() const
+{
+    return mSpacing;
+}
+
+void RibbonToolButton::setSpacing(int v)
+{
+    if (mSpacing == v) {
+        return;
+    }
+    mSpacing = v;
+    Q_EMIT spacingChanged();
+    updateSizeHint();
+    updateLayout();
+}
+
+qreal RibbonToolButton::twoLineHeightFactor() const
+{
+    return mFactors.twoLineHeightFactor;
+}
+
+void RibbonToolButton::setTwoLineHeightFactor(qreal v)
+{
+    if (qFuzzyCompare(mFactors.twoLineHeightFactor, v)) {
+        return;
+    }
+    mFactors.twoLineHeightFactor = v;
+    Q_EMIT layoutFactorsChanged();
+    updateSizeHint();
+    updateLayout();
+}
+
+qreal RibbonToolButton::oneLineHeightFactor() const
+{
+    return mFactors.oneLineHeightFactor;
+}
+
+void RibbonToolButton::setOneLineHeightFactor(qreal v)
+{
+    if (qFuzzyCompare(mFactors.oneLineHeightFactor, v)) {
+        return;
+    }
+    mFactors.oneLineHeightFactor = v;
+    Q_EMIT layoutFactorsChanged();
+    updateSizeHint();
+    updateLayout();
+}
+
+qreal RibbonToolButton::buttonMaximumAspectRatio() const
+{
+    return mFactors.buttonMaximumAspectRatio;
+}
+
+void RibbonToolButton::setButtonMaximumAspectRatio(qreal v)
+{
+    if (qFuzzyCompare(mFactors.buttonMaximumAspectRatio, v)) {
+        return;
+    }
+    mFactors.buttonMaximumAspectRatio = v;
+    Q_EMIT layoutFactorsChanged();
+    updateSizeHint();
+    updateLayout();
+}
+
+qreal RibbonToolButton::largeButtonMinimumWidthRatio() const
+{
+    return mFactors.largeButtonMinimumWidthRatio;
+}
+
+void RibbonToolButton::setLargeButtonMinimumWidthRatio(qreal v)
+{
+    // zero and negatives are meaningful here (they drop the height-based
+    // minimum width), so the comparison must tolerate them: qFuzzyCompare
+    // misbehaves around zero, hence the explicit zero test
+    const bool same = (qFuzzyIsNull(mFactors.largeButtonMinimumWidthRatio) && qFuzzyIsNull(v))
+                      || qFuzzyCompare(mFactors.largeButtonMinimumWidthRatio, v);
+    if (same) {
+        return;
+    }
+    mFactors.largeButtonMinimumWidthRatio = v;
+    Q_EMIT layoutFactorsChanged();
+    updateSizeHint();
+    updateLayout();
+}
+
+QSize RibbonToolButton::smallIconSize() const
+{
+    return mSmallIconSize;
+}
+
+void RibbonToolButton::setSmallIconSize(const QSize& size)
+{
+    if (mSmallIconSize == size) {
+        return;
+    }
+    mSmallIconSize = size;
+    Q_EMIT iconSizesChanged();
+    updateSizeHint();
+    updateLayout();
+}
+
+QSize RibbonToolButton::largeIconSize() const
+{
+    return mLargeIconSize;
+}
+
+void RibbonToolButton::setLargeIconSize(const QSize& size)
+{
+    if (mLargeIconSize == size) {
+        return;
+    }
+    mLargeIconSize = size;
+    Q_EMIT iconSizesChanged();
+    updateSizeHint();
+    updateLayout();
+}
+
 QString RibbonToolButton::toolTip() const
 {
     return mToolTip;
@@ -284,7 +392,7 @@ bool RibbonToolButton::isTextWordWrap() const
 
 int RibbonToolButton::iconSide() const
 {
-    const QSize origin = isLargeType() ? QSize(kLargeIconSide, kLargeIconSide) : QSize(kSmallIconSide, kSmallIconSide);
+    const QSize origin = isLargeType() ? mLargeIconSize : mSmallIconSize;
     const QSize fit    = SARibbonToolButtonLayout::adjustIconSize(mIconGeometry.toRect(), origin);
     return qMax(qMin(fit.width(), fit.height()), 0);
 }
@@ -503,11 +611,11 @@ SARibbonToolButtonLayout::Input RibbonToolButton::layoutInput() const
 #endif
     in.hasIndicator    = hasMenu();
     in.isRTL           = SA::saIsRTL();
-    in.iconSize        = QSize(kSmallIconSide, kSmallIconSide);
-    in.largeIconSize   = QSize(kLargeIconSide, kLargeIconSide);
+    in.iconSize        = mSmallIconSize;
+    in.largeIconSize   = mLargeIconSize;
     in.text            = mText;
     in.fontMetrics     = fm;
-    in.spacing         = TBLC::DEFAULT_SPACING;
+    in.spacing         = mSpacing;
     in.indicatorLen    = in.isLargeButton ? TBLC::DEFAULT_INDICATOR_LEN_LARGE : TBLC::DEFAULT_INDICATOR_LEN_SMALL;
     if (largeButtonHeightContext() > 0) {
         in.panelLargeButtonHeight = largeButtonHeightContext();
@@ -519,6 +627,7 @@ SARibbonToolButtonLayout::Input RibbonToolButton::layoutInput() const
         in.panelLargeButtonHeight = -1;
     }
     in.maximumWidth = TBLC::UNLIMITED_WIDTH;
+    in.factors      = mFactors;
     return in;
 }
 

@@ -3,6 +3,7 @@
 #include "SARibbonQmlGlobal.h"
 #include "../host/RibbonQuickHost.h"
 #include <SARibbonCore/SARibbonCategoryLayoutEngine.h>
+#include <SARibbonCore/SARibbonToolButtonLayout.h>
 #include <QVector>
 
 namespace SARibbonQml {
@@ -50,6 +51,11 @@ public:
     // registered later inherit through the stored fields
     void applyRibbonStyle(int rowCount, bool showPanelTitle, bool wordWrap, bool iconRightText);
 
+    // Layout factor push from the bar (widgets SARibbonCategory::
+    // setButtonMaximumAspectRatio parity); panels registered later inherit
+    // through the stored fields
+    void applyLayoutFactors(qreal buttonMaximumAspectRatio, qreal largeButtonMinimumWidthRatio);
+
     Q_INVOKABLE int contentWidth() const;
 
 Q_SIGNALS:
@@ -78,6 +84,8 @@ private:
     bool mStyleShowPanelTitle = true;
     bool mStyleWordWrap = true;
     bool mStyleIconRightText = false;
+    qreal mButtonMaximumAspectRatio     = SARibbon::Core::ToolButtonLayoutConstants::BUTTON_MAX_ASPECT_RATIO_DEFAULT;
+    qreal mLargeButtonMinimumWidthRatio = SARibbon::Core::ToolButtonLayoutConstants::LARGE_BUTTON_MIN_WIDTH_RATIO;
     QVector< RibbonPanel* > mPanels;
     QVariantList mSeparatorXs;
     SARibbon::Core::SARibbonCategoryLayoutEngine mEngine;

@@ -161,6 +161,72 @@ void RibbonBar::setMinimumMode(bool on)
     polish();
 }
 
+qreal RibbonBar::buttonMaximumAspectRatio() const
+{
+    return mButtonMaximumAspectRatio;
+}
+
+void RibbonBar::setButtonMaximumAspectRatio(qreal fac)
+{
+    if (qFuzzyCompare(mButtonMaximumAspectRatio, fac)) {
+        return;
+    }
+    mButtonMaximumAspectRatio = fac;
+    Q_EMIT buttonMaximumAspectRatioChanged();
+    propagateLayoutFactors();
+}
+
+qreal RibbonBar::largeButtonMinimumWidthRatio() const
+{
+    return mLargeButtonMinimumWidthRatio;
+}
+
+void RibbonBar::setLargeButtonMinimumWidthRatio(qreal fac)
+{
+    // zero and negatives are meaningful (they drop the height-based minimum
+    // width of large buttons), so the guard must tolerate them explicitly
+    const bool same = (qFuzzyIsNull(mLargeButtonMinimumWidthRatio) && qFuzzyIsNull(fac))
+                      || qFuzzyCompare(mLargeButtonMinimumWidthRatio, fac);
+    if (same) {
+        return;
+    }
+    mLargeButtonMinimumWidthRatio = fac;
+    Q_EMIT largeButtonMinimumWidthRatioChanged();
+    propagateLayoutFactors();
+}
+
+/**
+ * \if ENGLISH
+ * @brief Push the two width factors through the whole host tree
+ * @details Mirrors SARibbonBar::setButtonMaximumAspectRatio, which walks every
+ *          category (and the QML bar additionally walks the pages of every
+ *          declared context category, since those ride the same style). The
+ *          category relays to its panels, the panel relays to its buttons, and
+ *          each button drops its engine sizeHint cache entry, so the panels
+ *          repack on the next polish without a relayout call here.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 把两个宽度系数下发到整棵宿主树
+ * @details 对应 SARibbonBar::setButtonMaximumAspectRatio：遍历全部 category
+ *          （QML 侧还要遍历每个已声明上下文分类的页面，它们跟随同一样式）。
+ *          category 转给其面板，面板转给其按钮，每个按钮丢弃引擎 sizeHint 缓存，
+ *          因此下一次 polish 时面板会自动重新装箱，此处无需再请求重排。
+ * \endif
+ */
+void RibbonBar::propagateLayoutFactors()
+{
+    for (RibbonCategory* cat : mCategories) {
+        cat->applyLayoutFactors(mButtonMaximumAspectRatio, mLargeButtonMinimumWidthRatio);
+    }
+    for (RibbonContextCategory* ctx : mContexts) {
+        for (RibbonCategory* page : ctx->categories()) {
+            page->applyLayoutFactors(mButtonMaximumAspectRatio, mLargeButtonMinimumWidthRatio);
+        }
+    }
+    polish();
+}
+
 void RibbonBar::propagateRibbonStyle()
 {
     // widgets setRibbonStyle parity: three-row keeps word wrap + panel
@@ -209,6 +275,7 @@ void RibbonBar::registerCategory(RibbonCategory* category)
         // a category registered after the style was set must match it
         const int rows = styleRowCount(mRibbonStyle);
         category->applyRibbonStyle(rows, rows != 1, rows == 3, rows == 1);
+        category->applyLayoutFactors(mButtonMaximumAspectRatio, mLargeButtonMinimumWidthRatio);
         // auto tabs track their category title (addCategoryPage semantics)
         const int idx = mCategories.size() - 1;
         if (idx < mTabs.size() && mAutoTabs.contains(mTabs[ idx ])) {
@@ -367,6 +434,8 @@ void RibbonBar::rebuildContextTabs(RibbonContextCategory* ctx)
     QVector< RibbonTab* > tabs;
     const auto pages = ctx->categories();
     for (RibbonCategory* page : pages) {
+        // a page added after the bar-level push must still inherit the factors
+        page->applyLayoutFactors(mButtonMaximumAspectRatio, mLargeButtonMinimumWidthRatio);
         RibbonTab* tab = new RibbonTab();
         tab->setText(page->title());
         tab->setContextColor(ctx->contextColor());

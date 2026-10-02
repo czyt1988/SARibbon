@@ -5,6 +5,7 @@
 #include "../SARibbonQmlTypes.h"
 #include <SARibbonCore/SARibbonAbstractLayoutItem.h>
 #include <SARibbonCore/SARibbonPanelLayoutEngine.h>
+#include <SARibbonCore/SARibbonToolButtonLayout.h>
 #include <QVector>
 
 namespace SARibbonQml {
@@ -43,6 +44,8 @@ class SA_RIBBON_QML_EXPORT RibbonPanel : public RibbonQuickHost
     Q_PROPERTY(RibbonEnums::LayoutMode layoutMode READ layoutMode WRITE setLayoutMode NOTIFY layoutModeChanged)
     Q_PROPERTY(bool enableShowPanelTitle READ enableShowPanelTitle WRITE setEnableShowPanelTitle NOTIFY enableShowPanelTitleChanged)
     Q_PROPERTY(bool hasOptionAction READ hasOptionAction WRITE setHasOptionAction NOTIFY hasOptionActionChanged)
+    Q_PROPERTY(QSize smallIconSize READ smallIconSize WRITE setSmallIconSize NOTIFY smallIconSizeChanged)
+    Q_PROPERTY(QSize largeIconSize READ largeIconSize WRITE setLargeIconSize NOTIFY largeIconSizeChanged)
     Q_PROPERTY(QRectF titleGeometry READ titleGeometry NOTIFY titleGeometryChanged)
     Q_PROPERTY(QRectF optionButtonRect READ optionButtonRect NOTIFY optionButtonRectChanged)
 public:
@@ -66,6 +69,13 @@ public:
     bool hasOptionAction() const;
     void setHasOptionAction(bool on);
 
+    // Tool button icon boxes pushed down to every registered button (widgets
+    // SARibbonPanel::setSmallIconSize/setLargeIconSize parity)
+    QSize smallIconSize() const;
+    void setSmallIconSize(const QSize& size);
+    QSize largeIconSize() const;
+    void setLargeIconSize(const QSize& size);
+
     // Trigger used by the leaf's option button click + tests
     Q_INVOKABLE void triggerOptionAction();
 
@@ -73,6 +83,10 @@ public:
     // row mode + title visibility land here, word wrap / icon-right flags
     // forward to the registered tool buttons
     void applyRibbonStyle(RibbonEnums::LayoutMode mode, bool showPanelTitle, bool wordWrap, bool iconRightText);
+
+    // Layout factor push from the category (bar propagation chain); buttons
+    // registered later inherit through the stored fields
+    void applyLayoutFactors(qreal buttonMaximumAspectRatio, qreal largeButtonMinimumWidthRatio);
 
     // explicit child registration list (itemChange of the children calls in);
     // accepts every layout item host type
@@ -93,6 +107,8 @@ Q_SIGNALS:
     void layoutModeChanged();
     void enableShowPanelTitleChanged();
     void hasOptionActionChanged();
+    void smallIconSizeChanged();
+    void largeIconSizeChanged();
     void optionButtonRectChanged();
     void titleGeometryChanged();
     void optionActionTriggered();
@@ -118,6 +134,10 @@ private:
     bool mHasOptionAction      = false;
     bool mWordWrap             = true;
     bool mIconRightText        = false;
+    qreal mButtonMaximumAspectRatio     = SARibbon::Core::ToolButtonLayoutConstants::BUTTON_MAX_ASPECT_RATIO_DEFAULT;
+    qreal mLargeButtonMinimumWidthRatio = SARibbon::Core::ToolButtonLayoutConstants::LARGE_BUTTON_MIN_WIDTH_RATIO;
+    QSize mSmallIconSize = QSize(22, 22);  ///< widgets SARibbonPanelLayout::mSmallToolButtonIconSize default
+    QSize mLargeIconSize = QSize(32, 32);  ///< widgets SARibbonPanelLayout::mLargeToolButtonIconSize default
     QVector< RibbonLayoutItemHost* > mChildItems;
     SARibbon::Core::SARibbonPanelLayoutEngine mEngine;
     QSize mLastSizeHint;
