@@ -213,33 +213,10 @@ void SARibbonCategory::PrivateData::doWheelEvent(QWheelEvent* event)
     int totalWidth    = lay->categoryTotalWidth();
 
     if (totalWidth > contentSize.width()) {
-        int scrollStep = wheelScrollStep;
-
-        // 优先使用水平分量（水平滚轮/触控板水平手势），为 0 时回退到垂直分量
-        QPoint numPixels  = event->pixelDelta();
-        QPoint numDegrees = event->angleDelta() / 8;
-
-        int delta = 0;
-        if (numPixels.x() != 0) {
-            delta = numPixels.x();
-        } else if (numPixels.y() != 0) {
-            delta = numPixels.y();
-        } else if (numDegrees.x() != 0) {
-            delta = numDegrees.x();
-        } else if (numDegrees.y() != 0) {
-            delta = numDegrees.y();
-        }
-
-        if (delta != 0) {
-            scrollStep = (delta < 0) ? -scrollStep : scrollStep;
-            // 动态调整步长 - 滚动越快步长越大
-            const int absDelta = qAbs(delta);
-            if (absDelta > 60) {
-                scrollStep *= 2;
-            } else if (absDelta < 20) {
-                scrollStep /= 2;
-            }
-        }
+        // 增量选取（水平优先、角度按 8 度归一）与步长缩放（快滚翻倍、慢滚减半）
+        // 下沉为 core 纯函数，QML 前端共用（计划 04 WS-A3，§4-4 禁止双实现条款）
+        const int delta = SARibbon::Core::wheelScrollDelta(event->pixelDelta(), event->angleDelta());
+        int scrollStep  = SARibbon::Core::scaledWheelStep(wheelScrollStep, delta);
 
         // 根据设置选择滚动方式
         if (isUseAnimating) {

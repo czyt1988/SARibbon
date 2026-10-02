@@ -27,6 +27,7 @@ cmake --build build
 | ribbon style 面板 | 字体族选择（度量链重建+全局重排）+ 字体增大/减小（应用级度量联动） | QFontComboBox + Larger/Smaller |
 | ribbon style 面板 | RTL 切换（引擎经 saIsRTL 镜像布局） | Switch to RTL |
 | ribbon style 面板 | tab 对齐（左/中/右） | Alignment Center |
+| 类别区 | 内容溢出时自动出现左右滚动箭头（12px 贴边），滚轮横向滚动，箭头/滚轮走 300ms OutQuad 动画（`useAnimatingScroll` 可关，`wheelScrollStep` 可调） | SARibbonCategoryLayout 滚动按钮 |
 | button states 面板 | 大按钮 6 态：Normal/Checked/Disabled（含解锁）/超长文本/超短文本 | 按钮状态演示 |
 | toolbutton style 面板 | 弹出三模式 × 比例混合：MenuButtonPopup（分区命中）/InstantPopup/DelayedPopup（长按）+ checkable 变体 + 禁用带菜单 | SARibbonMenu 演示 |
 | toolbutton style 面板 | optionAction（右下角对角按钮，点击触发信号） | 面板 optionAction |
@@ -52,7 +53,7 @@ cmake --build build
 
 ## 一致性测试
 
-`tests/qml/tst_conformance_qml.cpp`（21 用例）与示例同步维护：
+`tests/qml/tst_conformance_qml.cpp`（22 用例）与示例同步维护：
 面板装箱黄金几何、tab 切换、按钮点击/弹出/禁用、控件嵌入、上下文标签、画廊、
 六样式传播、分隔符、快速访问栏/右组、对齐/最小模式、RTL、optionAction、应用窗口、
 菜单勾选/快捷键/多级子菜单（索引路径寻址 + 叶子渲染断言）、
@@ -63,4 +64,7 @@ cmake --build build
 容器尾随标签与标签条开关（后缀从容器里切出而非从控件里扣，
 `enableShowIcon`/`enableShowTitle` 逐槽位让宽并断言无漂移）、
 标题行按钮排互斥（默认为非互斥、打开开关不追溯取消勾选、
-未受影响的兄弟按钮不产生 `toggled`、`checkedButton()` 对齐 `QActionGroup::checkedAction`）。
+未受影响的兄弟按钮不产生 `toggled`、`checkedButton()` 对齐 `QActionGroup::checkedAction`）、
+类别滚动（溢出时只出现尾随箭头、箭头矩形等于 core `scrollButtonRects` 输出、
+真实点击箭头步进半视口并被 `clampScrollOffset` 夹住、滚轮走 core 的 delta 优先级与
+×2 / ÷2 缩放、动画途中滚轮被丢弃、内容放得下的类别必须 `ignore` 滚轮而不是吃掉它）。

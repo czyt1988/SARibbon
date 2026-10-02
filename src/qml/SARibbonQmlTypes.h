@@ -96,6 +96,9 @@ static_assert(int(RibbonEnums::GalleryIconWithWordWrapText) == int(SA::GalleryCa
 namespace SARibbonQmlLeafUrls {
 inline QUrl barLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/RibbonBar.qml")); }
 inline QUrl categoryLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/RibbonCategory.qml")); }
+// Overlay leaf (scroll arrows) of RibbonCategory: created in addition to the
+// background leaf and raised above the panels, see RibbonCategory::ensureScrollOverlay
+inline QUrl categoryScrollLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/RibbonCategoryScroll.qml")); }
 inline QUrl tabLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/RibbonTab.qml")); }
 inline QUrl panelLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/RibbonPanel.qml")); }
 inline QUrl toolButtonLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/RibbonToolButton.qml")); }

@@ -520,14 +520,12 @@ void SARibbonCategoryLayout::doLayout()
         return;
     }
     SARibbonCategory* category = ribbonCategory();
-    // Scroll button positions: in RTL, swap left/right button positions
-    if (SA::saIsRTL()) {
-        d_ptr->mLeftScrollBtn->setGeometry(category->width() - 12, 0, 12, category->height());
-        d_ptr->mRightScrollBtn->setGeometry(0, 0, 12, category->height());
-    } else {
-        d_ptr->mLeftScrollBtn->setGeometry(0, 0, 12, category->height());
-        d_ptr->mRightScrollBtn->setGeometry(category->width() - 12, 0, 12, category->height());
-    }
+    // 滚动按钮矩形（含 RTL 左右互换）由 core 纯函数给出，QML 前端共用同一份几何
+    // （计划 04 WS-A3，§4-4 禁止双实现条款）
+    const SARibbon::Core::SARibbonScrollButtonRects btnRects =
+        SARibbon::Core::scrollButtonRects(category->width(), category->height(), SA::saIsRTL());
+    d_ptr->mLeftScrollBtn->setGeometry(btnRects.left);
+    d_ptr->mRightScrollBtn->setGeometry(btnRects.right);
     QList< QWidget* > showWidgets, hideWidgets;
 #if SARibbonCategoryLayout_DEBUG_PRINT
     int debug_i__(0);
@@ -875,18 +873,10 @@ void SARibbonCategoryLayout::scrollToByAnimate(int targetX)
     if (isAnimatingScroll() && targetX == d_ptr->mTargetScrollPosition) {
         return;  // Already at target position
     }
-    // Calculate boundaries
-    if (SA::saIsRTL()) {
-        // RTL: mXBase ranges from 0 (start) to totalWidth-availableWidth (end)
-        const int availableWidth     = categoryContentSize().width();
-        const int maxBase            = qMax(0, d_ptr->mTotalWidth - availableWidth);
-        d_ptr->mTargetScrollPosition = qBound(0, targetX, maxBase);
-    } else {
-        // LTR: mXBase ranges from availableWidth-totalWidth (min) to 0 (max)
-        const int availableWidth     = categoryContentSize().width();
-        const int minBase            = qMin(availableWidth - d_ptr->mTotalWidth, 0);
-        d_ptr->mTargetScrollPosition = qBound(minBase, targetX, 0);
-    }
+    // 目标位置钳制走 core 纯函数（与 QML 前端共用，§4-4 禁止双实现条款）：
+    // LTR 下 mXBase ∈ [availableWidth-totalWidth, 0]，RTL 下 ∈ [0, totalWidth-availableWidth]
+    const int availableWidth     = categoryContentSize().width();
+    d_ptr->mTargetScrollPosition = SARibbon::Core::clampScrollOffset(targetX, d_ptr->mTotalWidth, availableWidth, SA::saIsRTL());
 
     // If animation is running, stop current animation
     if (animation->state() == QPropertyAnimation::Running) {
@@ -1148,8 +1138,9 @@ void SARibbonCategoryLayout::setupAnimateScroll()
     if (!d_ptr->mScrollAnimation) {
         // 初始化滚动动画
         d_ptr->mScrollAnimation = new QPropertyAnimation(this, "scrollPosition", this);
-        d_ptr->mScrollAnimation->setDuration(300);                       // 动画时长300ms
-        d_ptr->mScrollAnimation->setEasingCurve(QEasingCurve::OutQuad);  // 缓动曲线
+        // 动画时长与缓动曲线取自 core 常量，QML 前端共用（计划 04 WS-A3）
+        d_ptr->mScrollAnimation->setDuration(SARibbon::Core::SCROLL_ANIMATION_DURATION);
+        d_ptr->mScrollAnimation->setEasingCurve(QEasingCurve::OutQuad);
         d_ptr->mTargetScrollPosition = d_ptr->mXBase;
     }
 }
@@ -1168,14 +1159,8 @@ void SARibbonCategoryLayout::setupAnimateScroll()
 void SARibbonCategoryLayout::onLeftScrollButtonClicked()
 {
     SARibbonCategory* category = qobject_cast< SARibbonCategory* >(parentWidget());
-    int width                  = category->width();
-    width /= 2;
-    // In RTL mode, reverse scroll direction: left button scrolls left instead of right
-    if (SA::saIsRTL()) {
-        scrollByAnimate(-width);
-    } else {
-        scrollByAnimate(width);
-    }
+    // 步长（可视区宽度一半）与 RTL 符号翻转由 core 纯函数给出，QML 前端共用
+    scrollByAnimate(SARibbon::Core::scrollButtonStep(category->width(), true, SA::saIsRTL()));
 }
 
 /**
@@ -1192,14 +1177,8 @@ void SARibbonCategoryLayout::onLeftScrollButtonClicked()
 void SARibbonCategoryLayout::onRightScrollButtonClicked()
 {
     SARibbonCategory* category = qobject_cast< SARibbonCategory* >(parentWidget());
-    int width                  = category->width();
-    width /= 2;
-    // In RTL mode, reverse scroll direction: right button scrolls right instead of left
-    if (SA::saIsRTL()) {
-        scrollByAnimate(width);
-    } else {
-        scrollByAnimate(-width);
-    }
+    // 步长（可视区宽度一半）与 RTL 符号翻转由 core 纯函数给出，QML 前端共用
+    scrollByAnimate(SARibbon::Core::scrollButtonStep(category->width(), false, SA::saIsRTL()));
 }
 
 void SARibbonCategoryLayout::setGeometry(const QRect& rect)

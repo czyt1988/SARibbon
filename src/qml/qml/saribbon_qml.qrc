@@ -7,6 +7,7 @@
         <file>RibbonBar.qml</file>
         <file>RibbonTab.qml</file>
         <file>RibbonCategory.qml</file>
+        <file>RibbonCategoryScroll.qml</file>
         <file>RibbonControlContainer.qml</file>
         <file>RibbonGallery.qml</file>
         <file>RibbonSeparator.qml</file>

@@ -9,12 +9,15 @@
 #include <QFile>
 #include <QImageReader>
 #include <QImage>
+#include <QWheelEvent>
+#include <QGuiApplication>
 #include <memory>
 #include <functional>
 #include <SARibbonQml/SARibbonQmlGlobal.h>
 #include <SARibbonQml/SARibbonQmlTypes.h>
 #include <SARibbonCore/SARibbonCoreUtil.h>
 #include <SARibbonCore/SARibbonThemePalette.h>
+#include <SARibbonCore/SARibbonCategoryLayoutEngine.h>
 #include <SARibbonQml/theme/RibbonTheme.h>
 #include <SARibbonQml/button/RibbonToolButton.h>
 #include <SARibbonQml/container/RibbonControlContainer.h>
@@ -57,6 +60,7 @@ private Q_SLOTS:
     void panelOptionAction();
     void applicationWindow();
     void themeCustomization();
+    void categoryScrollWheelAndArrows();
 
 private:
     QQuickView* exposeScene(QQmlEngine& engine, QQmlComponent& component, const char* src, int w, int h);
@@ -2509,6 +2513,239 @@ Item {
     theme->setCurrentTheme(themeAtEntry);
     QVERIFY(!theme->hasCustomPalette());
     QTRY_COMPARE(theme->currentTheme(), themeAtEntry);
+}
+
+/**
+ * @brief Category scrolling: overflow flags, arrow buttons, wheel and animation
+ * @details WS-A3. The engine's Result::scrollFlags used to be discarded by the
+ *          QML host (only totalWidth was read), so a too-narrow category
+ *          clipped its panels with no way to reach them. This case pins the
+ *          widgets scroll parity end to end: the 12px arrow rectangles from the
+ *          core pure function, the half-viewport arrow step, the wheel delta
+ *          preference with its x2 / /2 scaling, wheels dropped while animating,
+ *          the OutQuad animation on scrollPosition, and the "content fits"
+ *          category that must ignore the wheel instead of eating it.
+ */
+void TestConformanceQml::categoryScrollWheelAndArrows()
+{
+    QQmlEngine engine;
+    saRibbonRegisterQmlTypes(&engine);
+
+    QString src = QStringLiteral(R"QML(import QtQuick 2.12
+import SARibbon 3.0
+Item {
+    width: 460
+    height: 300
+    RibbonBar {
+        objectName: "bar"
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        RibbonCategory {
+            objectName: "cat"
+            title: "Home"
+            RibbonPanel { objectName: "panel0"; panelTitle: "P0"; RibbonToolButton { text: "Alpha" } }
+            RibbonPanel { panelTitle: "P1"; RibbonToolButton { text: "Bravo" } }
+            RibbonPanel { panelTitle: "P2"; RibbonToolButton { text: "Charlie" } }
+            RibbonPanel { panelTitle: "P3"; RibbonToolButton { text: "Delta" } }
+            RibbonPanel { panelTitle: "P4"; RibbonToolButton { text: "Echo" } }
+            RibbonPanel { panelTitle: "P5"; RibbonToolButton { text: "Foxtrot" } }
+            RibbonPanel { panelTitle: "P6"; RibbonToolButton { text: "Golf" } }
+            RibbonPanel { panelTitle: "P7"; RibbonToolButton { text: "Hotel" } }
+            RibbonPanel { panelTitle: "P8"; RibbonToolButton { text: "India" } }
+            RibbonPanel { panelTitle: "P9"; RibbonToolButton { text: "Juliet" } }
+        }
+        RibbonCategory {
+            objectName: "catFit"
+            title: "Fit"
+            RibbonPanel { objectName: "fitPanel"; panelTitle: "F"; RibbonToolButton { text: "One" } }
+        }
+    }
+})QML");
+
+    QQmlComponent component(&engine);
+    std::unique_ptr< QQuickView > view(exposeScene(engine, component, src.toUtf8().constData(), 460, 300));
+    QVERIFY(view);
+    QQuickItem* rootItem = view->rootObject();
+    QVERIFY(rootItem);
+
+    auto* bar    = rootItem->findChild< QQuickItem* >(QStringLiteral("bar"));
+    auto* cat    = rootItem->findChild< QQuickItem* >(QStringLiteral("cat"));
+    auto* catFit = rootItem->findChild< QQuickItem* >(QStringLiteral("catFit"));
+    auto* panel0 = rootItem->findChild< QQuickItem* >(QStringLiteral("panel0"));
+    QVERIFY(bar && cat && catFit && panel0);
+
+    QTRY_VERIFY(cat->width() > 0 && cat->height() > 0);
+    QTRY_VERIFY(panel0->width() > 0 && panel0->height() > 0);
+
+    auto flagsOf = [cat]() { return cat->property("scrollButtonFlags").toMap(); };
+    auto geoOf   = [cat]() { return cat->property("scrollButtonGeometry").toMap(); };
+    auto posOf   = [cat]() { return cat->property("scrollPosition").toInt(); };
+    auto contentWidthOf = [](QQuickItem* category) {
+        int w = 0;
+        QMetaObject::invokeMethod(category, "contentWidth", Q_RETURN_ARG(int, w));
+        return w;
+    };
+
+    // ---- 1. the engine Result::scrollFlags reaches the host ----
+    QTRY_VERIFY(flagsOf().value(QStringLiteral("right")).toBool());
+    QVERIFY(!flagsOf().value(QStringLiteral("left")).toBool());
+    QCOMPARE(posOf(), 0);
+    const int viewport = int(cat->width());
+    const int total    = contentWidthOf(cat);
+    QVERIFY2(total > viewport, "the category must overflow for this case to mean anything");
+
+    // ---- 2. the arrow rectangles are the core pure function's output ----
+    const QVariantMap geo = geoOf();
+    QCOMPARE(geo.value(QStringLiteral("width")).toInt(), SARibbon::Core::SCROLL_BUTTON_WIDTH);
+    QCOMPARE(geo.value(QStringLiteral("height")).toInt(), int(cat->height()));
+    QCOMPARE(geo.value(QStringLiteral("leftX")).toInt(), 0);
+    QCOMPARE(geo.value(QStringLiteral("rightX")).toInt(), viewport - SARibbon::Core::SCROLL_BUTTON_WIDTH);
+
+    // the overlay leaf really instantiated the two buttons at those rectangles
+    auto* leftBtn  = cat->findChild< QQuickItem* >(QStringLiteral("categoryScrollLeftButton"));
+    auto* rightBtn = cat->findChild< QQuickItem* >(QStringLiteral("categoryScrollRightButton"));
+    QVERIFY(leftBtn && rightBtn);
+    QTRY_VERIFY(rightBtn->isVisible());
+    QVERIFY(!leftBtn->isVisible());
+    QTRY_COMPARE(rightBtn->width(), qreal(SARibbon::Core::SCROLL_BUTTON_WIDTH));
+    QTRY_COMPARE(rightBtn->height(), cat->height());
+    QTRY_COMPARE(rightBtn->x(), qreal(viewport - SARibbon::Core::SCROLL_BUTTON_WIDTH));
+
+    const qreal panelX0 = panel0->x();
+    auto clickItem = [&view](QQuickItem* item) {
+        QTRY_VERIFY(item->width() > 0 && item->height() > 0);
+        const QPointF center = item->mapToScene(QPointF(item->width() / 2, item->height() / 2));
+        QTest::mouseClick(view.get(), Qt::LeftButton, Qt::NoModifier, center.toPoint());
+    };
+
+    // ---- 3. deterministic scrolling moves the panels, the arrows follow ----
+    cat->setProperty("useAnimatingScroll", false);
+    QCOMPARE(cat->property("useAnimatingScroll").toBool(), false);
+
+    cat->setProperty("scrollPosition", -100);
+    QTRY_COMPARE(posOf(), -100);
+    QTRY_COMPARE(panel0->x(), panelX0 - 100);
+    QTRY_VERIFY(flagsOf().value(QStringLiteral("left")).toBool());
+    QVERIFY(flagsOf().value(QStringLiteral("right")).toBool());
+    QVERIFY(leftBtn->isVisible());
+
+    // a real click on the trailing arrow steps by half the viewport (LTR: negative)
+    clickItem(rightBtn);
+    const int afterRightClick = SARibbon::Core::clampScrollOffset(-100 - viewport / 2, total, viewport, false);
+    QVERIFY(afterRightClick < -100);
+    QTRY_COMPARE(posOf(), afterRightClick);
+    QTRY_COMPARE(panel0->x(), panelX0 + afterRightClick);
+
+    // and the leading arrow steps back the same amount
+    QVERIFY(leftBtn->isVisible());
+    clickItem(leftBtn);
+    const int afterLeftClick = SARibbon::Core::clampScrollOffset(afterRightClick + viewport / 2, total, viewport, false);
+    QCOMPARE(afterLeftClick, -100);
+    QTRY_COMPARE(posOf(), afterLeftClick);
+    QTRY_COMPARE(panel0->x(), panelX0 - 100);
+
+    // the base step never runs past the end of the content
+    cat->setProperty("scrollPosition", -1000000);
+    const int minBase = viewport - total;
+    QTRY_COMPARE(posOf(), minBase);
+    // the flags are republished by the next polish, not by setScrollPosition
+    QTRY_VERIFY(!flagsOf().value(QStringLiteral("right")).toBool());
+    QVERIFY(flagsOf().value(QStringLiteral("left")).toBool());
+    QVERIFY(!rightBtn->isVisible());
+    QVERIFY(leftBtn->isVisible());
+    cat->setProperty("scrollPosition", 0);
+    QTRY_COMPARE(posOf(), 0);
+
+    // ---- 4. wheel delta preference and step scaling (core pure functions) ----
+    QCOMPARE(SARibbon::Core::wheelScrollDelta(QPoint(7, 9), QPoint(0, 0)), 7);        // pixelDelta.x wins
+    QCOMPARE(SARibbon::Core::wheelScrollDelta(QPoint(0, 9), QPoint(0, 0)), 9);        // then pixelDelta.y
+    QCOMPARE(SARibbon::Core::wheelScrollDelta(QPoint(), QPoint(160, 0)), 20);         // then angleDelta/8 .x
+    QCOMPARE(SARibbon::Core::wheelScrollDelta(QPoint(), QPoint(0, -240)), -30);       // then angleDelta/8 .y
+    const int base = cat->property("wheelScrollStep").toInt();
+    QCOMPARE(base, 400);
+    QCOMPARE(SARibbon::Core::scaledWheelStep(base, 0), base);        // no delta leaves the step alone
+    QCOMPARE(SARibbon::Core::scaledWheelStep(base, 15), base / 2);   // |delta| < 20 -> half
+    QCOMPARE(SARibbon::Core::scaledWheelStep(base, -30), -base);     // neutral band
+    QCOMPARE(SARibbon::Core::scaledWheelStep(base, 120), 2 * base);  // |delta| > 60 -> double
+
+    // ---- 5. the real wheel path goes through the very same functions ----
+    const QPointF wheelAt = cat->mapToScene(QPointF(cat->width() / 2, cat->height() / 2));
+    auto sendWheel = [&view, wheelAt](int angleY) {
+        QWheelEvent ev(wheelAt, view->mapToGlobal(wheelAt.toPoint()), QPoint(0, 0), QPoint(0, angleY),
+                       Qt::NoButton, Qt::NoModifier, Qt::NoScrollPhase, false);
+        QGuiApplication::sendEvent(view.get(), &ev);
+        return ev.isAccepted();
+    };
+    int pos = posOf();
+    auto expectWheel = [&](int angleY, bool accepted = true) {
+        const int delta = SARibbon::Core::wheelScrollDelta(QPoint(), QPoint(0, angleY));
+        pos             = SARibbon::Core::clampScrollOffset(pos + SARibbon::Core::scaledWheelStep(base, delta),
+                                                            total, viewport, false);
+        QCOMPARE(sendWheel(angleY), accepted);
+        QTRY_COMPARE(posOf(), pos);
+    };
+    expectWheel(-120);  // |15| < 20 -> half step down
+    QVERIFY2(pos < 0, "the wheel must actually scroll the overflowing category");
+    QTRY_COMPARE(panel0->x(), panelX0 + pos);
+    expectWheel(120);   // back up, clamped at the start
+    QCOMPARE(pos, 0);
+
+    // wheelScrollStep is a real property, not a constant
+    cat->setProperty("wheelScrollStep", 60);
+    QSignalSpy stepSpy(cat, SIGNAL(wheelScrollStepChanged()));
+    QCOMPARE(cat->property("wheelScrollStep").toInt(), 60);
+    cat->setProperty("wheelScrollStep", 80);
+    QCOMPARE(stepSpy.count(), 1);
+    const int step80 = cat->property("wheelScrollStep").toInt();
+    QVERIFY(sendWheel(-120));
+    pos = SARibbon::Core::clampScrollOffset(0 - step80 / 2, total, viewport, false);
+    QTRY_COMPARE(posOf(), pos);
+    cat->setProperty("wheelScrollStep", base);
+
+    // ---- 6. the animated path lands on the same target ----
+    cat->setProperty("useAnimatingScroll", true);
+    QCOMPARE(cat->property("useAnimatingScroll").toBool(), true);
+    QCOMPARE(cat->property("animationDuration").toInt(), SARibbon::Core::SCROLL_ANIMATION_DURATION);
+    cat->setProperty("scrollPosition", 0);
+    QTRY_COMPARE(posOf(), 0);
+    const int animTarget = SARibbon::Core::clampScrollOffset(0 - viewport / 2, total, viewport, false);
+    QVERIFY(animTarget < 0);
+    QVERIFY(QMetaObject::invokeMethod(cat, "scrollByButton", Q_ARG(bool, false)));
+    QVERIFY(cat->property("isAnimatingScroll").toBool());
+    // a wheel arriving mid-animation is dropped instead of retargeting it
+    QVERIFY(!sendWheel(-120));
+    QTRY_COMPARE(posOf(), animTarget);
+    QTRY_VERIFY(!cat->property("isAnimatingScroll").toBool());
+    QTRY_COMPARE(panel0->x(), panelX0 + animTarget);
+
+    // ---- 7. a category whose content fits ignores the wheel ----
+    QVector< QQuickItem* > tabHosts;
+    const auto barKids = bar->findChildren< QQuickItem* >();
+    for (QQuickItem* item : barKids) {
+        if (QString::fromLatin1(item->metaObject()->className()) == QLatin1String("SARibbonQml::RibbonTab")) {
+            tabHosts.append(item);
+        }
+    }
+    QCOMPARE(tabHosts.size(), 2);
+    clickItem(tabHosts[ 1 ]);
+    QTRY_VERIFY(catFit->isVisible());
+    QTRY_VERIFY(!cat->isVisible());
+    int fitTotal = 0;
+    QTRY_VERIFY((fitTotal = contentWidthOf(catFit)) > 0);
+    QVERIFY2(fitTotal <= int(catFit->width()), "the second category must fit for this case to mean anything");
+    const QVariantMap fitFlags = catFit->property("scrollButtonFlags").toMap();
+    QVERIFY(!fitFlags.value(QStringLiteral("left")).toBool());
+    QVERIFY(!fitFlags.value(QStringLiteral("right")).toBool());
+    auto* fitLeftBtn = catFit->findChild< QQuickItem* >(QStringLiteral("categoryScrollLeftButton"));
+    QVERIFY(fitLeftBtn && !fitLeftBtn->isVisible());
+    QCOMPARE(catFit->property("scrollPosition").toInt(), 0);
+    const QPointF fitWheelAt = catFit->mapToScene(QPointF(catFit->width() / 2, catFit->height() / 2));
+    QWheelEvent fitEv(fitWheelAt, view->mapToGlobal(fitWheelAt.toPoint()), QPoint(0, 0), QPoint(0, -120),
+                      Qt::NoButton, Qt::NoModifier, Qt::NoScrollPhase, false);
+    QGuiApplication::sendEvent(view.get(), &fitEv);
+    QVERIFY2(!fitEv.isAccepted(), "a fitting category must not eat the wheel");
+    QCOMPARE(catFit->property("scrollPosition").toInt(), 0);
 }
 
 QTEST_MAIN(TestConformanceQml)
