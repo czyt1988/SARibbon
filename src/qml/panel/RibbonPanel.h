@@ -93,6 +93,23 @@ public:
     void registerChildItem(RibbonLayoutItemHost* item);
     void unregisterChildItem(RibbonLayoutItemHost* item);
 
+    // Registered child queries (WS-C2: the customizer addresses panel entries
+    // through them, widgets SARibbonPanel::actionIndex/panelItems parity)
+    int childItemCount() const;
+    SARibbonQml::RibbonLayoutItemHost* childItemAt(int index) const;
+    int childItemIndex(RibbonLayoutItemHost* item) const;
+
+    // Ordered child mutation (WS-C2). Attach re-parents the item under this
+    // panel and puts it at `index` (negative = append); detach un-parents and
+    // hides it WITHOUT destroying it, so a later record can attach it again —
+    // the counterpart of widgets removeAction, which keeps the QAction alive
+    // inside SARibbonActionsManager. Ownership of a detached item stays with
+    // whoever holds its QObject parent (the declaring QML context, or the
+    // customizer for items it created)
+    bool attachChildItem(RibbonLayoutItemHost* item, int index = -1);
+    bool detachChildItem(RibbonLayoutItemHost* item);
+    bool moveChildItem(int from, int to);
+
     // drop the engine sizeHint cache entry of an item and re-run the layout
     void invalidateChildCache(SARibbon::Core::SARibbonAbstractLayoutItem* item);
 
@@ -127,6 +144,9 @@ protected:
 private:
     void runLayout();
     int rowCountForMode() const;
+    // Move an already-registered item to `index` (negative = tail); the
+    // registration itself always happens through itemChange
+    void reorderChildItem(RibbonLayoutItemHost* item, int index);
 
     QString mPanelTitle;
     RibbonEnums::LayoutMode mLayoutMode = RibbonEnums::ThreeRowMode;

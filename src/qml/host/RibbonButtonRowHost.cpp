@@ -84,6 +84,67 @@ void RibbonButtonRowHost::unregisterButton(RibbonToolButton* btn)
     }
 }
 
+int RibbonButtonRowHost::buttonCount() const
+{
+    return mButtons.size();
+}
+
+RibbonToolButton* RibbonButtonRowHost::buttonAt(int index) const
+{
+    return (index >= 0 && index < mButtons.size()) ? mButtons[ index ] : nullptr;
+}
+
+int RibbonButtonRowHost::buttonIndex(RibbonToolButton* btn) const
+{
+    return mButtons.indexOf(btn);
+}
+
+void RibbonButtonRowHost::reorderButton(RibbonToolButton* btn, int index)
+{
+    const int from = mButtons.indexOf(btn);
+    if (from < 0) {
+        return;
+    }
+    const int to = (index < 0 || index >= mButtons.size()) ? (mButtons.size() - 1) : index;
+    if (from != to) {
+        mButtons.move(from, to);
+        polish();
+    }
+}
+
+bool RibbonButtonRowHost::attachButton(RibbonToolButton* btn, int index)
+{
+    if (!btn) {
+        return false;
+    }
+    if (btn->parentItem() != this) {
+        btn->setParentItem(this);  // itemChange -> registerButton (appends)
+    }
+    btn->setVisible(true);
+    reorderButton(btn, index);
+    return mButtons.contains(btn);
+}
+
+bool RibbonButtonRowHost::detachButton(RibbonToolButton* btn)
+{
+    if (!btn || !mButtons.contains(btn)) {
+        return false;
+    }
+    btn->setVisible(false);
+    btn->setParentItem(nullptr);  // itemChange -> unregisterButton
+    return !mButtons.contains(btn);
+}
+
+bool RibbonButtonRowHost::moveButton(int from, int to)
+{
+    if (from < 0 || from >= mButtons.size() || to < 0 || to >= mButtons.size() || from == to) {
+        return false;
+    }
+    mButtons.move(from, to);
+    polish();
+    return true;
+}
+
 int RibbonButtonRowHost::rowHeight() const
 {
     return RibbonMetrics::instance()->titleBarHeight();

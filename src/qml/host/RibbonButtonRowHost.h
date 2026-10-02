@@ -53,6 +53,21 @@ public:
     void registerButton(RibbonToolButton* btn);
     void unregisterButton(RibbonToolButton* btn);
 
+    // Registered button queries (WS-C2: the customizer addresses quick access /
+    // right group entries through them)
+    int buttonCount() const;
+    SARibbonQml::RibbonToolButton* buttonAt(int index) const;
+    int buttonIndex(RibbonToolButton* btn) const;
+
+    // Ordered button mutation (WS-C2). Attach re-parents under this row and
+    // puts the button at `index` (negative = append); detach un-parents and
+    // hides it without destroying it, mirroring widgets
+    // SARibbonQuickAccessBar::removeAction, which keeps the QAction alive in
+    // the manager so the record list can add it back
+    bool attachButton(RibbonToolButton* btn, int index = -1);
+    bool detachButton(RibbonToolButton* btn);
+    bool moveButton(int from, int to);
+
 Q_SIGNALS:
     void rowWidthChanged();
     void exclusiveChanged();
@@ -67,6 +82,8 @@ protected:
 private:
     void layoutButtons();
     void enforceExclusivity(RibbonToolButton* btn);
+    // Move an already-registered button to `index` (negative = tail)
+    void reorderButton(RibbonToolButton* btn, int index);
 
     QVector< RibbonToolButton* > mButtons;
     int mRowWidth = 0;

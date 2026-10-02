@@ -299,7 +299,166 @@ void RibbonBar::unregisterCategory(RibbonCategory* category)
     }
     disconnect(category, nullptr, this, nullptr);
     mCategories.remove(idx);
+    mHiddenCategories.removeOne(category);
     polish();
+}
+
+int RibbonBar::categoryCount() const
+{
+    return mCategories.size();
+}
+
+RibbonCategory* RibbonBar::categoryAt(int index) const
+{
+    return (index >= 0 && index < mCategories.size()) ? mCategories[ index ] : nullptr;
+}
+
+int RibbonBar::categoryIndex(RibbonCategory* category) const
+{
+    return mCategories.indexOf(category);
+}
+
+RibbonCategory* RibbonBar::categoryByObjectName(const QString& objName) const
+{
+    if (objName.isEmpty()) {
+        return nullptr;
+    }
+    for (RibbonCategory* cat : mCategories) {
+        if (cat->objectName() == objName) {
+            return cat;
+        }
+    }
+    return nullptr;
+}
+
+RibbonQuickAccessBar* RibbonBar::quickAccessBar() const
+{
+    return mQuickAccessBar;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Create a category at runtime and keep the tab row paired with it
+ * @details Widgets SARibbonBar::insertCategoryPage parity. The category is
+ *          C++-made, so its visual leaf has to be requested explicitly —
+ *          RibbonBar::createAutoTab already established that route. The tab row
+ *          needs care: syncTabCount only ever appends, so inserting into the
+ *          middle would leave the new category paired with the wrong tab. When
+ *          the row is entirely auto-generated (the case a customize record
+ *          always meets, since explicit tabs are declarations) the tab is
+ *          created here and moved into the same slot; a row with declared tabs
+ *          keeps its own pairing and only the category order changes.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 运行时创建一个 category 并保持 tab 行与之配对
+ * @details 对应 widgets SARibbonBar::insertCategoryPage。category 由 C++ 创建，
+ *          因此视觉叶子必须显式索取——RibbonBar::createAutoTab 已经确立了这条
+ *          路径。tab 行需要当心：syncTabCount 只会在末尾追加，所以往中间插入会
+ *          让新 category 配到错误的 tab 上。当整行 tab 都是自动生成时（定制记录
+ *          总会遇到这种情形，因为显式 tab 来自声明），tab 在此创建并搬到同一
+ *          槽位；带声明 tab 的行保留自己的配对，只改变 category 顺序。
+ * \endif
+ */
+RibbonCategory* RibbonBar::insertCategory(const QString& title, int index)
+{
+    const int at = (index < 0 || index > mCategories.size()) ? mCategories.size() : index;
+    // an all-auto (or still empty) tab row is grown here so the pairing holds
+    const bool autoRow = mTabs.isEmpty() || (mAutoTabs.size() == mTabs.size());
+    RibbonCategory* category = new RibbonCategory();
+    category->setParent(this);
+    category->setTitle(title);
+    registerCategory(category);  // setParentItem + style push + append
+    category->ensureQmlLeaf();
+    const int last = mCategories.size() - 1;
+    if (at < last) {
+        mCategories.move(last, at);
+    }
+    if (autoRow) {
+        // createAutoTab only builds + registers; ownership bookkeeping is the
+        // caller's job, exactly as in syncTabCount
+        RibbonTab* tab = createAutoTab(at);  // title from mCategories[at]
+        mAutoTabs.append(tab);
+        moveTabSlot(mTabs.size() - 1, at);
+    }
+    polish();
+    return category;
+}
+
+bool RibbonBar::removeCategory(RibbonCategory* category)
+{
+    const int idx = mCategories.indexOf(category);
+    if (idx < 0) {
+        return false;
+    }
+    // the paired auto tab is owned here and must go first, otherwise
+    // syncTabCount would recreate it on the next relayout
+    if (idx < mTabs.size() && mAutoTabs.contains(mTabs[ idx ])) {
+        unregisterTab(mTabs[ idx ]);
+    }
+    unregisterCategory(category);
+    category->setParentItem(nullptr);
+    category->setParent(nullptr);
+    category->deleteLater();
+    polish();
+    return true;
+}
+
+bool RibbonBar::moveCategory(int from, int to)
+{
+    if (from < 0 || from >= mCategories.size() || to < 0 || to >= mCategories.size() || from == to) {
+        return false;
+    }
+    mCategories.move(from, to);
+    // widgets moveCategory parity: the tab follows its category
+    if (from < mTabs.size() && to < mTabs.size()) {
+        moveTabSlot(from, to);
+    }
+    polish();
+    return true;
+}
+
+void RibbonBar::moveTabSlot(int from, int to)
+{
+    if (from < 0 || from >= mTabs.size() || to < 0 || to >= mTabs.size() || from == to) {
+        return;
+    }
+    mTabs.move(from, to);
+    // rebuild the auto subset in row order: syncTabCount's shrink test compares
+    // the two tails, which only holds while both lists stay consistently ordered
+    QVector< RibbonTab* > autos;
+    autos.reserve(mAutoTabs.size());
+    for (int i = 0; i < mTabs.size(); ++i) {
+        if (mAutoTabs.contains(mTabs[ i ])) {
+            autos.append(mTabs[ i ]);
+        }
+    }
+    mAutoTabs = autos;
+    polish();
+}
+
+void RibbonBar::showCategory(RibbonCategory* category)
+{
+    if (!category || !mCategories.contains(category) || !mHiddenCategories.contains(category)) {
+        return;
+    }
+    mHiddenCategories.removeOne(category);
+    polish();
+}
+
+void RibbonBar::hideCategory(RibbonCategory* category)
+{
+    if (!category || !mCategories.contains(category) || mHiddenCategories.contains(category)) {
+        return;
+    }
+    mHiddenCategories.append(category);
+    category->setVisible(false);
+    polish();
+}
+
+bool RibbonBar::isCategoryHidden(RibbonCategory* category) const
+{
+    return mHiddenCategories.contains(category);
 }
 
 void RibbonBar::registerTab(RibbonTab* tab)
@@ -460,18 +619,21 @@ void RibbonBar::rebuildContextTabs(RibbonContextCategory* ctx)
 
 int RibbonBar::effectiveTabCount() const
 {
-    int count = mTabs.size();
-    for (RibbonContextCategory* ctx : mContexts) {
-        if (ctx->isActive()) {
-            count += ctx->categories().size();
-        }
-    }
-    return count;
+    return effectiveTabs().size();
 }
 
 QVector< RibbonTab* > RibbonBar::effectiveTabs() const
 {
-    QVector< RibbonTab* > tabs = mTabs;
+    QVector< RibbonTab* > tabs;
+    tabs.reserve(mTabs.size());
+    for (int i = 0; i < mTabs.size(); ++i) {
+        // a user-hidden category takes its paired tab off the row as well
+        // (widgets hideCategory parity)
+        if (i < mCategories.size() && mHiddenCategories.contains(mCategories[ i ])) {
+            continue;
+        }
+        tabs.append(mTabs[ i ]);
+    }
     for (RibbonContextCategory* ctx : mContexts) {
         if (ctx->isActive()) {
             tabs += mContextTabs.value(ctx);
@@ -482,7 +644,13 @@ QVector< RibbonTab* > RibbonBar::effectiveTabs() const
 
 QVector< RibbonCategory* > RibbonBar::effectiveCategories() const
 {
-    QVector< RibbonCategory* > cats = mCategories;
+    QVector< RibbonCategory* > cats;
+    cats.reserve(mCategories.size());
+    for (RibbonCategory* cat : mCategories) {
+        if (!mHiddenCategories.contains(cat)) {
+            cats.append(cat);
+        }
+    }
     for (RibbonContextCategory* ctx : mContexts) {
         if (ctx->isActive()) {
             cats += ctx->categories();
@@ -831,6 +999,10 @@ void RibbonBar::relayout()
     //    coordinates are already bar-relative). Minimum mode hides the whole
     //    category row (widgets setMinimumMode parity: only title + tabs stay)
     const int categoryY = tabBarY + tabH;
+    // user-hidden categories are off the effective row, hence off the display
+    for (RibbonCategory* cat : mHiddenCategories) {
+        cat->setVisible(false);
+    }
     for (int i = 0; i < effCats.size(); ++i) {
         RibbonCategory* cat = effCats[ i ];
         cat->setVisible(!mMinimumMode && i == mCurrentIndex);

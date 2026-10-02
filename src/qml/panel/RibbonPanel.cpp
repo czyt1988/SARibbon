@@ -185,6 +185,109 @@ void RibbonPanel::unregisterChildItem(RibbonLayoutItemHost* item)
     }
 }
 
+int RibbonPanel::childItemCount() const
+{
+    return mChildItems.size();
+}
+
+RibbonLayoutItemHost* RibbonPanel::childItemAt(int index) const
+{
+    return (index >= 0 && index < mChildItems.size()) ? mChildItems[ index ] : nullptr;
+}
+
+int RibbonPanel::childItemIndex(RibbonLayoutItemHost* item) const
+{
+    return mChildItems.indexOf(item);
+}
+
+void RibbonPanel::reorderChildItem(RibbonLayoutItemHost* item, int index)
+{
+    const int from = mChildItems.indexOf(item);
+    if (from < 0) {
+        return;
+    }
+    const int to = (index < 0 || index >= mChildItems.size()) ? (mChildItems.size() - 1) : index;
+    if (from != to) {
+        mChildItems.move(from, to);
+        polish();
+    }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Put an existing host item into this panel at a given slot
+ * @details The registration itself is left to itemChange: setting the visual
+ *          parent makes the panel see an ItemChildAddedChange and append the
+ *          item, so this function only has to repair the resulting order. Doing
+ *          it this way keeps a single registration path — the declarative one —
+ *          and therefore a single place that pushes the inherited style flags
+ *          and layout knobs down to the newcomer. An item already living in
+ *          another panel is moved, which is what the customize dialog means by
+ *          "add this command here".
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 把一个既有宿主项放进本面板的指定位置
+ * @details 登记动作交给 itemChange：设置视觉父项会让面板收到
+ *          ItemChildAddedChange 并把该项追加进来，因此本函数只需修正由此得到的
+ *          顺序。这样做保证登记路径唯一——就是声明式那一条——因而也只有一处
+ *          负责把继承的样式开关与布局旋钮下发给新来的项。已经住在别的面板里的
+ *          项会被搬移过来，这正是定制对话框"把该命令加到这里"的含义。
+ * \endif
+ */
+bool RibbonPanel::attachChildItem(RibbonLayoutItemHost* item, int index)
+{
+    if (!item) {
+        return false;
+    }
+    if (item->parentItem() != this) {
+        item->setParentItem(this);
+    }
+    item->setVisible(true);
+    reorderChildItem(item, index);
+    return mChildItems.contains(item);
+}
+
+/**
+ * \if ENGLISH
+ * @brief Take an item out of the panel without destroying it
+ * @details Un-parenting fires ItemChildRemovedChange, which routes through
+ *          unregisterChildItem: the item leaves the list, drops its engine
+ *          sizeHint cache entry and the panel repacks. Visibility is cleared
+ *          first so an item that ends up re-parented elsewhere by the caller
+ *          never flashes in its old geometry. The QObject parent is untouched —
+ *          lifetime stays with whoever declared or created the item.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 把一项从面板取出但不销毁
+ * @details 解除视觉父子关系会触发 ItemChildRemovedChange，经
+ *          unregisterChildItem 处理：该项离开列表、丢弃引擎 sizeHint 缓存条目，
+ *          面板重新装箱。先清掉可见性，这样调用方稍后把它重新挂到别处时不会
+ *          以旧几何闪现一次。QObject 父子关系不动——生命周期仍归声明者或
+ *          创建者。
+ * \endif
+ */
+bool RibbonPanel::detachChildItem(RibbonLayoutItemHost* item)
+{
+    if (!item || !mChildItems.contains(item)) {
+        return false;
+    }
+    item->setVisible(false);
+    item->setParentItem(nullptr);
+    return !mChildItems.contains(item);
+}
+
+bool RibbonPanel::moveChildItem(int from, int to)
+{
+    if (from < 0 || from >= mChildItems.size() || to < 0 || to >= mChildItems.size() || from == to) {
+        return false;
+    }
+    mChildItems.move(from, to);
+    polish();
+    return true;
+}
+
 void RibbonPanel::invalidateChildCache(SARibbon::Core::SARibbonAbstractLayoutItem* item)
 {
     // engine caches button sizeHints keyed by largeHeight only: a text/proportion

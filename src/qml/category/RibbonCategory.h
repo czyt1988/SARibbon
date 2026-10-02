@@ -98,6 +98,22 @@ public:
     void registerPanel(RibbonPanel* panel);
     void unregisterPanel(RibbonPanel* panel);
 
+    // Registered panel queries (WS-C2: the customizer addresses panels through
+    // them, widgets SARibbonCategory::panelIndex/panelByObjectName parity)
+    int panelCount() const;
+    SARibbonQml::RibbonPanel* panelAt(int index) const;
+    int panelIndex(RibbonPanel* panel) const;
+    SARibbonQml::RibbonPanel* panelByObjectName(const QString& objName) const;
+
+    // Runtime panel creation / removal (WS-C2, widgets insertPanel/removePanel
+    // parity). insertPanel builds a host, gives it a visual leaf through the
+    // same path createAutoTab uses for C++-created hosts and returns it with
+    // the caller owning its lifetime through the QObject parent. removePanel
+    // destroys the host and everything declared under it
+    Q_INVOKABLE SARibbonQml::RibbonPanel* insertPanel(const QString& title, int index);
+    Q_INVOKABLE bool removePanel(RibbonPanel* panel);
+    Q_INVOKABLE bool movePanel(int from, int to);
+
     // Style push from the bar (ribbonStyle propagation chain); panels
     // registered later inherit through the stored fields
     void applyRibbonStyle(int rowCount, bool showPanelTitle, bool wordWrap, bool iconRightText);

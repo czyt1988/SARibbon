@@ -109,6 +109,34 @@ public:
     void registerCategory(RibbonCategory* category);
     void unregisterCategory(RibbonCategory* category);
 
+    // Registered category queries (WS-C2: the customizer addresses categories
+    // through them, widgets SARibbonBar::categoryIndex/categoryByObjectName
+    // parity). The queries walk the DECLARED row, hidden categories included —
+    // visibility is a separate flag, exactly as on the widgets side
+    int categoryCount() const;
+    SARibbonQml::RibbonCategory* categoryAt(int index) const;
+    int categoryIndex(RibbonCategory* category) const;
+    SARibbonQml::RibbonCategory* categoryByObjectName(const QString& objName) const;
+
+    // Runtime category creation / removal / reordering (WS-C2, widgets
+    // insertCategoryPage / removeCategory / moveCategory parity). insertCategory
+    // keeps the tab row paired: an all-auto tab row grows a tab at the same
+    // slot, an explicitly declared tab row is left to syncTabCount
+    Q_INVOKABLE SARibbonQml::RibbonCategory* insertCategory(const QString& title, int index);
+    Q_INVOKABLE bool removeCategory(RibbonCategory* category);
+    Q_INVOKABLE bool moveCategory(int from, int to);
+
+    // User-driven category visibility (widgets showCategory/hideCategory
+    // parity): a hidden category drops out of the effective tab row AND out of
+    // the category row, so it is neither clickable nor shown
+    Q_INVOKABLE void showCategory(RibbonCategory* category);
+    Q_INVOKABLE void hideCategory(RibbonCategory* category);
+    bool isCategoryHidden(RibbonCategory* category) const;
+
+    // Title-row host, reachable for the customizer (quick access entries are
+    // part of the customize record set)
+    SARibbonQml::RibbonQuickAccessBar* quickAccessBar() const;
+
     void registerTab(RibbonTab* tab);
     void unregisterTab(RibbonTab* tab);
 
@@ -193,6 +221,9 @@ private:
     int effectiveTabCount() const;
     QVector< RibbonTab* > effectiveTabs() const;
     QVector< RibbonCategory* > effectiveCategories() const;
+    // Move a tab row slot (the paired auto tab follows its category) and keep
+    // mAutoTabs in row order, which syncTabCount's tail-shrink test relies on
+    void moveTabSlot(int from, int to);
 
     int mCurrentIndex = 0;
     QString mApplicationLabel;
@@ -203,6 +234,7 @@ private:
     qreal mButtonMaximumAspectRatio     = SARibbon::Core::ToolButtonLayoutConstants::BUTTON_MAX_ASPECT_RATIO_DEFAULT;
     qreal mLargeButtonMinimumWidthRatio = SARibbon::Core::ToolButtonLayoutConstants::LARGE_BUTTON_MIN_WIDTH_RATIO;
     QVector< RibbonCategory* > mCategories;
+    QVector< RibbonCategory* > mHiddenCategories;  ///< user-hidden subset (customize visibility records)
     QVector< RibbonTab* > mTabs;      ///< explicit + auto tabs in row order
     QVector< RibbonTab* > mAutoTabs;  ///< subset owned (and destroyed) by this bar
     QVector< RibbonContextCategory* > mContexts;  ///< declared context categories

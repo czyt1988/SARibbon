@@ -433,6 +433,94 @@ void RibbonCategory::unregisterPanel(RibbonPanel* panel)
     }
 }
 
+int RibbonCategory::panelCount() const
+{
+    return mPanels.size();
+}
+
+RibbonPanel* RibbonCategory::panelAt(int index) const
+{
+    return (index >= 0 && index < mPanels.size()) ? mPanels[ index ] : nullptr;
+}
+
+int RibbonCategory::panelIndex(RibbonPanel* panel) const
+{
+    return mPanels.indexOf(panel);
+}
+
+RibbonPanel* RibbonCategory::panelByObjectName(const QString& objName) const
+{
+    if (objName.isEmpty()) {
+        return nullptr;
+    }
+    for (RibbonPanel* panel : mPanels) {
+        if (panel->objectName() == objName) {
+            return panel;
+        }
+    }
+    return nullptr;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Create a panel host at runtime and slot it into the row
+ * @details Widgets SARibbonCategory::insertPanel parity. The host is C++-made,
+ *          so componentComplete never runs for it and the visual leaf has to be
+ *          requested explicitly — the same route RibbonBar::createAutoTab takes.
+ *          Registration goes through setParentItem, which makes itemChange the
+ *          single place that pushes the inherited bar style and layout factors
+ *          down; only the resulting order is repaired here. The QObject parent
+ *          is this category, so the panel dies with it.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 运行时创建一个面板宿主并插入到排列中
+ * @details 对应 widgets SARibbonCategory::insertPanel。宿主由 C++ 创建，因此
+ *          componentComplete 不会为它运行，视觉叶子必须显式索取——与
+ *          RibbonBar::createAutoTab 走的是同一条路。登记经 setParentItem 完成，
+ *          这让 itemChange 成为唯一下发继承样式与布局系数的地方；此处只修正
+ *          由此得到的顺序。QObject 父项是本 category，面板随其一同销毁。
+ * \endif
+ */
+RibbonPanel* RibbonCategory::insertPanel(const QString& title, int index)
+{
+    RibbonPanel* panel = new RibbonPanel();
+    panel->setParent(this);
+    panel->setPanelTitle(title);
+    panel->setParentItem(this);  // itemChange -> registerPanel (appends)
+    panel->ensureQmlLeaf();
+    const int last = mPanels.size() - 1;
+    const int to   = (index < 0 || index > last) ? last : index;
+    if (last > 0 && to != last) {
+        mPanels.move(last, to);
+    }
+    polish();
+    return panel;
+}
+
+bool RibbonCategory::removePanel(RibbonPanel* panel)
+{
+    if (!panel || !mPanels.contains(panel)) {
+        return false;
+    }
+    unregisterPanel(panel);
+    panel->setParentItem(nullptr);
+    panel->setParent(nullptr);
+    panel->deleteLater();
+    polish();
+    return true;
+}
+
+bool RibbonCategory::movePanel(int from, int to)
+{
+    if (from < 0 || from >= mPanels.size() || to < 0 || to >= mPanels.size() || from == to) {
+        return false;
+    }
+    mPanels.move(from, to);
+    polish();
+    return true;
+}
+
 int RibbonCategory::contentWidth() const
 {
     return mTotalWidth;
