@@ -82,6 +82,15 @@ public:
     // static_asserts below pin the value mapping instead.
     enum GalleryCaptionStyle { GalleryIconOnly = 0, GalleryIconWithText = 1, GalleryIconWithWordWrapText = 2 };
     Q_ENUM(GalleryCaptionStyle)
+    // Color button rendering styles. Names and order mirror the widgets
+    // SARibbonColorToolButton::ColorStyle. No static_assert pins them: the
+    // originals live in a widgets header, which SARibbonQml must not include
+    enum ColorStyle { ColorUnderIcon = 0, ColorFillToIcon = 1 };
+    Q_ENUM(ColorStyle)
+    // Whether a color button builds its own color menu. Mirrors the widgets
+    // SAColorToolButton::ColorToolButtonStyle declaration order
+    enum ColorMenuStyle { WithColorMenu = 0, NoColorMenu = 1 };
+    Q_ENUM(ColorMenuStyle)
 };
 
 // compile-time value checks against the core originals (plan-04 S4 note)
@@ -107,6 +116,7 @@ inline QUrl galleryLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/RibbonGall
 inline QUrl separatorLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/RibbonSeparator.qml")); }
 inline QUrl colorGridLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/RibbonColorGrid.qml")); }
 inline QUrl colorMenuLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/RibbonColorMenu.qml")); }
+inline QUrl colorToolButtonLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/RibbonColorToolButton.qml")); }
 }
 
 // Uniform handshake contract: every leaf root declares `property QtObject

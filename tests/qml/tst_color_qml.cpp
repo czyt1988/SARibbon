@@ -10,8 +10,11 @@
 #include <QSignalSpy>
 #include <SARibbonCore/SARibbonCoreUtil.h>
 #include <SARibbonQml/SARibbonQmlGlobal.h>
+#include <SARibbonQml/SARibbonQmlTypes.h>
+#include <SARibbonQml/button/RibbonToolButton.h>
 #include <SARibbonQml/color/RibbonColorGrid.h>
 #include <SARibbonQml/color/RibbonColorMenu.h>
+#include <SARibbonQml/color/RibbonColorToolButton.h>
 #include "colorWidgets/SAColorGridWidget.h"
 #include "colorWidgets/SAColorMenu.h"
 #include "colorWidgets/SAColorPaletteGridWidget.h"
@@ -185,6 +188,60 @@ int countReddishPixels(const QImage& img)
 
 /// 叶子委托的 objectName（RibbonColorGrid.qml 约定），便于在视觉树里定位单元
 const char* const kCellName = "colorGridCell";
+
+/**
+ * @brief 用 QML 源码造一个场景并显示出来
+ * @details 颜色按钮这类宿主必须经 QML 声明才会跑 componentComplete（叶子创建、
+ *          菜单叶子创建、sizeHint 用派生版 layoutInput 重算都挂在那里），因此不能
+ *          像网格那样 C++ new 出来再 attachHost。组件挂在引擎上，活得比视图久
+ *          （NOTES B44 的上下文生命周期族）。
+ */
+QQuickItem* attachQmlSource(QQuickView& view, const QByteArray& src)
+{
+    QQmlEngine* engine = view.engine();
+    if (!engine) {
+        return nullptr;
+    }
+    QQmlComponent* comp = new QQmlComponent(engine, engine);
+    comp->setData(src, QUrl());
+    QObject* obj = comp->create();
+    QQuickItem* rootItem = qobject_cast< QQuickItem* >(obj);
+    if (!rootItem) {
+        qWarning("%s", qPrintable(comp->errorString()));
+        return nullptr;
+    }
+    rootItem->setParentItem(view.contentItem());
+    view.setContent(QUrl(), comp, obj);
+    view.show();
+    if (!QTest::qWaitForWindowExposed(&view)) {
+        return nullptr;
+    }
+    return rootItem;
+}
+
+/// 面板里放若干个颜色按钮的场景骨架（面板负责按 sizeHint 摆位置，按钮不自己写死宽高）
+/// @param panelHeight 面板高度；0 表示撑满窗口。默认给一个接近真实 ribbon 的高度，
+///                    否则大按钮的图标槽会被拉到两百多像素，几何虽然仍由 core 算出，
+///                    但弹窗会掉到窗口外面（QTest 的鼠标事件就废了）
+QByteArray colorButtonScene(const QByteArray& buttons, int w = 600, int h = 300, int panelHeight = 100)
+{
+    const QByteArray panelGeom = panelHeight > 0
+                                     ? QByteArrayLiteral("        anchors.top: parent.top\n"
+                                                         "        anchors.left: parent.left\n"
+                                                         "        anchors.right: parent.right\n"
+                                                         "        height: ")
+                                           + QByteArray::number(panelHeight) + QByteArrayLiteral("\n")
+                                     : QByteArrayLiteral("        anchors.fill: parent\n");
+    return QByteArrayLiteral("import QtQuick 2.12\n"
+                             "import SARibbon 3.0\n"
+                             "Item {\n"
+                             "    width: ")
+           + QByteArray::number(w) + QByteArrayLiteral("\n    height: ") + QByteArray::number(h)
+           + QByteArrayLiteral("\n    RibbonPanel {\n"
+                               "        objectName: \"panel\"\n")
+           + panelGeom + QByteArrayLiteral("        panelTitle: \"P\"\n") + buttons
+           + QByteArrayLiteral("    }\n}\n");
+}
 }  // namespace
 
 class TestColorQml : public QObject
@@ -200,6 +257,9 @@ private Q_SLOTS:
     void menuDataMatchesWidgets();
     void customColorRecordRules();
     void menuLeafOpensAndPicks();
+    void colorButtonGeometryFollowsCore();
+    void colorButtonRendersSwatch();
+    void colorButtonMenuPicksColor();
 };
 
 /**
@@ -914,6 +974,259 @@ void TestColorQml::menuLeafOpensAndPicks()
     QTRY_VERIFY(!noneRow->isVisible());
     host->closeMenu();
     QTRY_VERIFY(!host->isMenuVisible());
+}
+
+/**
+ * @brief 颜色按钮的绘制几何与 sizeHint 全部由 core 算出，叶子一个像素也不重算
+ * @details 色带矩形来自 core SA::calcColorUnderIconMetrics（与 widgets
+ *          SARibbonColorToolButton::PrivateData::createIconPixmap 同一套算式），
+ *          高度即 SA::colorBandHeight；ColorFillToIcon 走的是 widgets createColorIcon
+ *          的规则——在 32x32 的颜色图标里留 1px 边，图标被缩放到 side 后边也跟着缩。
+ *          按钮永远占着图标槽（layoutInput 里 hasIcon 恒真），因此没有菜单时
+ *          sizeHint 只差指示箭头那一条。这里同时钉住一处已记录的刻意差异：没有
+ *          iconSource 时 widgets 整块不画，QML 保留槽位并让色带占满槽宽。
+ */
+void TestColorQml::colorButtonGeometryFollowsCore()
+{
+    QQmlEngine engine;
+    saRibbonRegisterQmlTypes(&engine);
+
+    const QByteArray src = colorButtonScene(QByteArrayLiteral(
+        "        RibbonColorToolButton { objectName: \"underBtn\"; text: \"Font\" }\n"
+        "        RibbonColorToolButton { objectName: \"fillBtn\"; text: \"Font\"; colorStyle: Ribbon.ColorFillToIcon }\n"
+        "        RibbonColorToolButton { objectName: \"noMenuBtn\"; text: \"Font\"; colorMenuStyle: Ribbon.NoColorMenu }\n"
+        "        RibbonColorToolButton { objectName: \"smallBtn\"; text: \"Font\"; proportion: Ribbon.Small }\n"
+        "        RibbonColorToolButton { objectName: \"smallNoMenuBtn\"; text: \"Font\"; proportion: Ribbon.Small; colorMenuStyle: Ribbon.NoColorMenu }\n"),
+                                            900, 300);
+
+    QQuickView view(&engine, nullptr);
+    view.setResizeMode(QQuickView::SizeRootObjectToView);
+    view.resize(900, 300);
+    QQuickItem* rootItem = attachQmlSource(view, src);
+    QVERIFY(rootItem);
+
+    auto* under   = rootItem->findChild< SARibbonQml::RibbonColorToolButton* >(QStringLiteral("underBtn"));
+    auto* fill    = rootItem->findChild< SARibbonQml::RibbonColorToolButton* >(QStringLiteral("fillBtn"));
+    auto* noMenu  = rootItem->findChild< SARibbonQml::RibbonColorToolButton* >(QStringLiteral("noMenuBtn"));
+    auto* smallBtn = rootItem->findChild< SARibbonQml::RibbonColorToolButton* >(QStringLiteral("smallBtn"));
+    auto* smallNo  = rootItem->findChild< SARibbonQml::RibbonColorToolButton* >(QStringLiteral("smallNoMenuBtn"));
+    QVERIFY(under && fill && noMenu && smallBtn && smallNo);
+    // 面板布局要等一次 polish 才把宽高发下来
+    QTRY_VERIFY(under->width() > 0 && fill->width() > 0 && noMenu->width() > 0 && smallBtn->width() > 0);
+
+    // ---- 默认形态：WithColorMenu + MenuButtonPopup（widgets setupStandardColorMenu）----
+    QCOMPARE(int(under->colorMenuStyle()), int(SARibbonQml::RibbonEnums::WithColorMenu));
+    QCOMPARE(int(under->popupMode()), int(SARibbonQml::RibbonEnums::MenuButtonPopup));
+    QVERIFY(under->hasMenu());
+    QVERIFY(under->colorMenu());
+    QVERIFY(under->indicatorGeometry().width() > 0);
+    QVERIFY(!under->menuRect().isEmpty());
+    QVERIFY(!under->actionRect().isEmpty());
+    // 默认颜色是无效色，即 widgets 的"无颜色"标记
+    QVERIFY(!under->hasValidColor());
+    QVERIFY(under->isNoneColorEnabled());
+
+    // ---- ColorUnderIcon：色带矩形 = core 在图标槽上算出来的那一块 ----
+    const QRectF slot = under->iconGeometry();
+    QVERIFY(slot.width() > 0 && slot.height() > 0);
+    const QSize slotSize(int(slot.width()), int(slot.height()));
+    const SA::ColorUnderIconMetrics m = SA::calcColorUnderIconMetrics(slotSize, QSize());
+    QVERIFY(m.colorRect.isValid());
+    QCOMPARE(under->colorRect(), QRectF(m.colorRect).translated(slot.x(), slot.y()));
+    QCOMPARE(int(under->colorRect().height()), SA::colorBandHeight(slotSize.height()));
+    // 没有 iconSource：图标矩形无效，色带占满槽宽（已记录的刻意差异）
+    QVERIFY(!under->iconDrawRect().isValid());
+    QCOMPARE(int(under->colorRect().width()), slotSize.width());
+    // 斜线内缩量跟着色带矩形走，与 core 一致
+    QCOMPARE(under->colorSlashInset(),
+             SA::noneColorSlashLine(QRect(0, 0, int(under->colorRect().width()), int(under->colorRect().height()))).x1());
+
+    // ---- ColorFillToIcon：颜色铺满自然图标盒，四周留等比缩放的 1px 边 ----
+    const QRectF fslot = fill->iconGeometry();
+    const int side     = fill->iconSide();
+    QVERIFY(fslot.width() > 0 && side > 0);
+    const QRectF natural(fslot.x() + (fslot.width() - side) / 2.0, fslot.y() + (fslot.height() - side) / 2.0, side, side);
+    const qreal inset = SA::ColorToolButtonConstants::COLOR_BLOCK_MARGIN * qreal(side)
+                        / qreal(SA::ColorToolButtonConstants::DEFAULT_COLOR_ICON_SIZE);
+    QCOMPARE(fill->colorRect(), natural.adjusted(inset, inset, -inset, -inset));
+    QVERIFY(!fill->iconDrawRect().isValid());
+
+    // ---- NoColorMenu：菜单对象被销毁，指示箭头与菜单热区一并消失，宽度收窄 ----
+    QVERIFY(!noMenu->hasMenu());
+    QVERIFY(!noMenu->colorMenu());
+    QVERIFY(noMenu->indicatorGeometry().width() <= 0);
+    QVERIFY(noMenu->menuRect().isEmpty());
+    // 大按钮的箭头画在文本条里，不额外占宽（core sizeHint 只在小按钮分支加
+    // indicatorLen），因此同为 "Font" 的大按钮有无菜单宽度相同；小按钮则窄一条
+    QCOMPARE(noMenu->width(), under->width());
+    QVERIFY(smallNo->width() < smallBtn->width());
+    // 图标槽仍然保留：颜色按钮从来不因为"没图标"而塌成纯文本按钮
+    QVERIFY(noMenu->iconGeometry().width() > 0);
+    QVERIFY(noMenu->colorRect().width() > 0);
+}
+
+/**
+ * @brief 叶子按宿主发布的矩形上色：有效色填充、无效色画"无颜色"标记
+ * @details 判定方式沿用项目既有的 headless 做法——grabWindow 后直接读像素，不看图。
+ *          色带是纯色 Rectangle，中心像素必须逐分量相等；"无颜色"标记的斜线由
+ *          Canvas 抗锯齿绘制，绝大多数像素是红白混合色，因此数"偏红"像素而不是
+ *          逼近某个色值。ColorFillToIcon 下整个自然图标盒都是颜色，取盒心与色带
+ *          中心两处一起判。
+ */
+void TestColorQml::colorButtonRendersSwatch()
+{
+    QQmlEngine engine;
+    saRibbonRegisterQmlTypes(&engine);
+
+    const QByteArray src = colorButtonScene(QByteArrayLiteral(
+        "        RibbonColorToolButton { objectName: \"redBtn\"; text: \"Font\"; color: \"#e02020\" }\n"
+        "        RibbonColorToolButton { objectName: \"noneBtn\"; text: \"Font\" }\n"
+        "        RibbonColorToolButton { objectName: \"fillBtn\"; text: \"Font\"; colorStyle: Ribbon.ColorFillToIcon; color: \"#20e020\" }\n"));
+
+    QQuickView view(&engine, nullptr);
+    view.setResizeMode(QQuickView::SizeRootObjectToView);
+    view.resize(600, 300);
+    QQuickItem* rootItem = attachQmlSource(view, src);
+    QVERIFY(rootItem);
+
+    auto* redBtn  = rootItem->findChild< SARibbonQml::RibbonColorToolButton* >(QStringLiteral("redBtn"));
+    auto* noneBtn = rootItem->findChild< SARibbonQml::RibbonColorToolButton* >(QStringLiteral("noneBtn"));
+    auto* fillBtn = rootItem->findChild< SARibbonQml::RibbonColorToolButton* >(QStringLiteral("fillBtn"));
+    QVERIFY(redBtn && noneBtn && fillBtn);
+    QTRY_VERIFY(redBtn->colorRect().width() > 0 && noneBtn->colorRect().width() > 0 && fillBtn->colorRect().width() > 0);
+
+    const QColor bandColor(0xe0, 0x20, 0x20);
+    const QColor fillColor(0x20, 0xe0, 0x20);
+    // 色带中心的窗口坐标
+    const QPoint redCenter  = redBtn->mapToItem(nullptr, redBtn->colorRect().center()).toPoint();
+    const QPoint fillCenter = fillBtn->mapToItem(nullptr, fillBtn->colorRect().center()).toPoint();
+    const QRectF fillBand   = fillBtn->colorRect();
+    const QPoint fillTop    = fillBtn->mapToItem(nullptr, QPointF(fillBand.center().x(), fillBand.top() + 2)).toPoint();
+
+    QImage shot;
+    int redPixels = 0;
+    QRect noneArea;
+    auto grab = [&]() -> bool {
+        shot = view.grabWindow();
+        if (shot.pixelColor(redCenter) != bandColor || shot.pixelColor(fillCenter) != fillColor) {
+            return false;
+        }
+        noneArea  = QRect(noneBtn->mapToItem(nullptr, noneBtn->colorRect().topLeft()).toPoint(),
+                          QSize(int(noneBtn->colorRect().width()), int(noneBtn->colorRect().height())));
+        redPixels = countReddishPixels(shot.copy(noneArea));
+        return redPixels > 8;
+    };
+    QTRY_VERIFY_WITH_TIMEOUT(grab(), 3000);
+    // ColorFillToIcon：颜色铺满自然图标盒（widgets createColorIcon 的 32x32 减 1px 边，
+    // 缩放后边也跟着缩），而不是图标下方那一条色带
+    const int fillSide   = fillBtn->iconSide();
+    const qreal fillInset = SA::ColorToolButtonConstants::COLOR_BLOCK_MARGIN * qreal(fillSide)
+                            / qreal(SA::ColorToolButtonConstants::DEFAULT_COLOR_ICON_SIZE);
+    QVERIFY(fillSide > 0);
+    QCOMPARE(int(fillBand.height() + 0.5), fillSide - 2 * int(fillInset));
+    QVERIFY(fillBand.height() > SA::colorBandHeight(fillSide));
+    QCOMPARE(shot.pixelColor(fillTop), fillColor);
+    // "无颜色"格是白底红斜线：斜线两端内缩，最左一列不该有红色像素
+    QCOMPARE(countReddishPixels(shot.copy(noneArea.x(), noneArea.y(), 1, noneArea.height())), 0);
+    QVERIFY(countPixelsNear(shot.copy(noneArea), QColor(Qt::white), 24) * 4 > noneArea.width() * noneArea.height());
+    // 有效色的色带是一整块纯色填充，没有斜线也没有留白（边缘抗锯齿像素除外）
+    const QRect redArea(redBtn->mapToItem(nullptr, redBtn->colorRect().topLeft()).toPoint(),
+                        QSize(int(redBtn->colorRect().width()), int(redBtn->colorRect().height())));
+    QVERIFY(countPixelsNear(shot.copy(redArea), bandColor, 8) * 100 > redArea.width() * redArea.height() * 95);
+}
+
+/**
+ * @brief 真实点击走完颜色按钮的两条路径：动作区报色，菜单区取色
+ * @details 动作区点击发 colorClicked(颜色, 勾选态)，与 widgets
+ *          SARibbonColorToolButton::onButtonClicked 一致；菜单区打开的是宿主自己
+ *          那份 RibbonColorMenu，选色后按钮颜色跟着变并发 colorChanged（不额外发
+ *          colorClicked），选"无颜色"则回到无效色。切成 NoColorMenu 后菜单对象销毁，
+ *          openMenu 不再有任何效果。
+ */
+void TestColorQml::colorButtonMenuPicksColor()
+{
+    QQmlEngine engine;
+    saRibbonRegisterQmlTypes(&engine);
+
+    const QByteArray src = colorButtonScene(QByteArrayLiteral(
+        "        RibbonColorToolButton { objectName: \"btn\"; text: \"Font\"; color: \"#112233\" }\n"),
+                                            600, 520);
+
+    QQuickView view(&engine, nullptr);
+    view.setResizeMode(QQuickView::SizeRootObjectToView);
+    view.resize(600, 520);
+    QQuickItem* rootItem = attachQmlSource(view, src);
+    QVERIFY(rootItem);
+
+    auto* btn = rootItem->findChild< SARibbonQml::RibbonColorToolButton* >(QStringLiteral("btn"));
+    QVERIFY(btn);
+    QTRY_VERIFY(btn->width() > 0 && !btn->menuRect().isEmpty());
+    QVERIFY(btn->colorMenu());
+    QVERIFY(!btn->isMenuVisible());
+
+    QSignalSpy clicked(btn, SIGNAL(colorClicked(QColor, bool)));
+    QSignalSpy changed(btn, SIGNAL(colorChanged(QColor)));
+    QVERIFY(clicked.isValid() && changed.isValid());
+
+    // ---- 动作区：报当前颜色与勾选态 ----
+    const QPoint actionCenter = btn->mapToItem(nullptr, btn->actionRect().center()).toPoint();
+    QTest::mouseClick(&view, Qt::LeftButton, Qt::NoModifier, actionCenter);
+    QCOMPARE(clicked.count(), 1);
+    QCOMPARE(clicked.at(0).at(0).value< QColor >(), QColor(0x11, 0x22, 0x33));
+    QCOMPARE(clicked.at(0).at(1).toBool(), false);
+    QVERIFY(changed.isEmpty());
+
+    // ---- 菜单区：打开颜色菜单，选一个深浅色块 ----
+    const QPoint menuCenter = btn->mapToItem(nullptr, btn->menuRect().center()).toPoint();
+    QTest::mouseClick(&view, Qt::LeftButton, Qt::NoModifier, menuCenter);
+    QTRY_VERIFY(btn->isMenuVisible());
+    QVERIFY(btn->colorMenu()->isMenuVisible());
+
+    // Popup 的内容项被重挂到窗口 Overlay 下，只能从窗口 contentItem 起走视觉树（NOTES B59）
+    auto* shadeGrid = findGrid(view.contentItem(), "colorMenuShadeGrid");
+    QVERIFY(shadeGrid);
+    QTRY_VERIFY(shadeGrid->colorCount() > 12);
+    const QColor shade = shadeGrid->colorAt(12);
+    QVERIFY(shade.isValid());
+    QTest::mouseClick(&view, Qt::LeftButton, Qt::NoModifier, sceneCellCenter(shadeGrid, 12));
+    QTRY_VERIFY(!btn->isMenuVisible());
+    QCOMPARE(btn->color(), shade);
+    QCOMPARE(changed.count(), 1);
+    QCOMPARE(changed.at(0).at(0).value< QColor >(), shade);
+    QCOMPARE(clicked.count(), 1);  // 取色不算点击按钮
+
+    // ---- "无颜色"行：回到无效色，宿主与它那份菜单的开关是同一个 ----
+    btn->openMenu();
+    QTRY_VERIFY(btn->isMenuVisible());
+    QQuickItem* noneRow = findVisualItem(view.contentItem(), QLatin1String("colorMenuNoneRow"));
+    QVERIFY(noneRow);
+    QTRY_VERIFY(noneRow->isVisible());
+    QTest::mouseClick(&view, Qt::LeftButton, Qt::NoModifier, sceneCenter(noneRow));
+    QTRY_VERIFY(!btn->isMenuVisible());
+    QVERIFY(!btn->hasValidColor());
+    QCOMPARE(changed.count(), 2);
+    QVERIFY(!changed.at(1).at(0).value< QColor >().isValid());
+    QVERIFY(btn->colorMenu()->isNoneColorEnabled());
+
+    // ---- NoColorMenu：菜单销毁，openMenu 无效 ----
+    btn->setColorMenuStyle(SARibbonQml::RibbonEnums::NoColorMenu);
+    QVERIFY(!btn->hasMenu());
+    QVERIFY(!btn->colorMenu());
+    QVERIFY(!btn->isMenuVisible());
+    btn->openMenu();
+    QVERIFY(!btn->isMenuVisible());
+    QVERIFY(btn->menuRect().isEmpty());
+    // 颜色本身不受菜单样式影响
+    QVERIFY(!btn->hasValidColor());
+
+    // 切回来：菜单重新建立，且能再打开
+    btn->setColorMenuStyle(SARibbonQml::RibbonEnums::WithColorMenu);
+    QVERIFY(btn->hasMenu());
+    QVERIFY(btn->colorMenu());
+    btn->openMenu();
+    QTRY_VERIFY(btn->isMenuVisible());
+    btn->closeMenu();
+    QTRY_VERIFY(!btn->isMenuVisible());
 }
 
 QTEST_MAIN(TestColorQml)

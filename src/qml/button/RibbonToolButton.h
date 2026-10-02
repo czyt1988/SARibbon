@@ -158,7 +158,10 @@ public:
 
     bool isMenuVisible() const;
     void setMenuVisible(bool on);
-    bool hasMenu() const;
+    // Whether this button carries a popup at all. Virtual so a subclass owning a
+    // different popup (RibbonColorToolButton and its color menu) can take over:
+    // the indicator arrow, the hit-zone split and the popup modes all key off it
+    virtual bool hasMenu() const;
 
     // Hit zones (host-computed; the leaf binds its MouseAreas to them and the
     // tests assert them). actionRect is empty for InstantPopup, menuRect is
@@ -184,9 +187,10 @@ public:
     Q_INVOKABLE void click();
 
     // Popup control: the leaf layer renders the popup; the host tracks the
-    // visibility flag so tests can assert the open/close transitions
-    Q_INVOKABLE void openMenu();
-    Q_INVOKABLE void closeMenu();
+    // visibility flag so tests can assert the open/close transitions. Virtual
+    // for the same reason hasMenu() is: a subclass with its own popup takes over
+    Q_INVOKABLE virtual void openMenu();
+    Q_INVOKABLE virtual void closeMenu();
 
     // Activate a menu entry by index (leaf MenuItem triggers + tests); emits
     // menuTriggered; disabled/separators are ignored
@@ -226,6 +230,16 @@ protected:
     void componentComplete() override;
     void largeHeightContextChanged() override;
     void updatePolish() override;  // RTL flip re-mirrors the hit rects
+    // Recompute and publish the draw/hit geometry. Virtual so a subclass can run
+    // its own pass on top (every recompute entry point funnels through here)
+    virtual void updateLayout();
+    // The core algorithm's input. Virtual so a subclass can retarget a field: a
+    // color button always paints something into the icon slot, hence hasIcon
+    virtual SARibbon::Core::SARibbonToolButtonLayout::Input layoutInput() const;
+    // Recompute the cached sizeHint and re-run the panel layout. Protected so a
+    // subclass can retrigger it after changing what layoutInput() returns (the
+    // base constructor's own call still resolves to the base override)
+    void updateSizeHint();
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     void geometryChange(const QRectF& newGeometry, const QRectF& oldGeometry) override;
 #else
@@ -244,10 +258,7 @@ private:
     static SARibbonQml::RibbonMenuItem* menuItemAtCb(QQmlListProperty< SARibbonQml::RibbonMenuItem >* prop, ListIndex index);
     static void clearMenuItems(QQmlListProperty< SARibbonQml::RibbonMenuItem >* prop);
 
-    void updateSizeHint();
-    void updateLayout();
     QSize computeSizeHintFromMetrics();
-    SARibbon::Core::SARibbonToolButtonLayout::Input layoutInput() const;
     void emitMenuItemsChanged();
 
     QString mText;

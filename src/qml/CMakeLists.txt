@@ -37,6 +37,8 @@ sa_add_library(SARibbonQml
         color/RibbonColorGrid.cpp
         color/RibbonColorMenu.h
         color/RibbonColorMenu.cpp
+        color/RibbonColorToolButton.h
+        color/RibbonColorToolButton.cpp
         separator/RibbonSeparator.h
         separator/RibbonSeparator.cpp
         quickaccess/RibbonQuickAccessBar.h

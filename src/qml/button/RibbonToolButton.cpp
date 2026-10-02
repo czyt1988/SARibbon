@@ -694,7 +694,9 @@ void RibbonToolButton::updateLayout()
     QRectF newAction;
     QRectF newMenu;
     const QRectF full(0, 0, width(), height());
-    if (!mMenuItems.isEmpty()) {
+    // hasMenu(), not mMenuItems.isEmpty(): a subclass may own a popup that is
+    // not a RibbonMenuItem list (RibbonColorToolButton and its color menu)
+    if (hasMenu()) {
         switch (mPopupMode) {
         case RibbonEnums::InstantPopup: {
             newMenu = full;
