@@ -59,6 +59,8 @@ sa_add_library(SARibbonQml
         customize/RibbonActionRegistryModel.cpp
         customize/RibbonCustomizer.h
         customize/RibbonCustomizer.cpp
+        customize/RibbonCustomizeTreeModel.h
+        customize/RibbonCustomizeTreeModel.cpp
         qml/saribbon_qml.qrc
     PREFIX SA_RIBBON_QML
     QT_LINKS Core Gui Quick Qml QuickControls2

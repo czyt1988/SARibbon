@@ -146,6 +146,13 @@ public:
     void registerContext(RibbonContextCategory* ctx);
     void unregisterContext(RibbonContextCategory* ctx);
 
+    // Context category queries (WS-C3): the customize tree brackets a context
+    // page title and hides it from the "main category" scope, which is the
+    // widgets SARibbonCategory::isContextCategory test it has no QML equivalent
+    // for — a QML page belongs to a context by declaration, not by a flag
+    QVector< RibbonCategory* > contextCategories() const;
+    bool isContextCategory(RibbonCategory* category) const;
+
     // title free area (engine-computed); QML side binds the window title text
     QRectF titleRect() const;
 

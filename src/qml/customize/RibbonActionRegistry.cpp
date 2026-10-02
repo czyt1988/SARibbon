@@ -466,7 +466,9 @@ void RibbonActionRegistry::clear()
  *          widgets side the very same QAction objects are already reachable
  *          through their category tag, in QML they are hosts of their own.
  * @note Call this after the categories carry their titles, since the title is
- *       what names the tag.
+ *       what names the tag. Calling it again on the same bar is safe: items
+ *       that already hold a key keep it, so the tag table refreshes without
+ *       duplicating the catalogue.
  * \endif
  *
  * \if CHINESE
@@ -478,7 +480,9 @@ void RibbonActionRegistry::clear()
  *          category 表。快速访问栏按钮归入 QuickAccessActionTag：widgets 侧
  *          同一批 QAction 对象已可通过其 category tag 到达，QML 侧它们则是
  *          独立的宿主。
- * @note 请在 category 设置标题之后调用，因为标题就是 tag 名。
+ * @note 请在 category 设置标题之后调用，因为标题就是 tag 名。对同一个 bar 重复
+ *       调用是安全的：已持有 key 的项保持原 key，因此 tag 表会刷新而命令目录不
+ *       会重复。
  * \endif
  */
 QMap< int, RibbonCategory* > RibbonActionRegistry::autoRegister(RibbonBar* bar, bool enableEmit)
@@ -499,19 +503,30 @@ QMap< int, RibbonCategory* > RibbonActionRegistry::autoRegister(RibbonBar* bar, 
                 continue;
             }
             for (int k = 0; k < panel->childItemCount(); ++k) {
-                registeAction(panel->childItemAt(k), tag, QString(), false);
+                RibbonLayoutItemHost* item = panel->childItemAt(k);
+                // re-runnable (WS-C3): the customize dialog re-registers every
+                // time it opens, and generateKey is serial based, so an item
+                // that already has a key would be filed a second time under a
+                // different key instead of being rejected as a duplicate
+                if (!item || !key(item).isEmpty()) {
+                    continue;
+                }
+                registeAction(item, tag, QString(), false);
             }
         }
         setTagName(tag, c->title());
         res[ tag ] = c;
-        connect(c, &RibbonCategory::titleChanged, this, &RibbonActionRegistry::onCategoryTitleChanged);
+        connect(c, &RibbonCategory::titleChanged, this, &RibbonActionRegistry::onCategoryTitleChanged,
+                Qt::UniqueConnection);
         ++tag;
     }
 
     if (RibbonButtonRowHost* qab = bar->quickAccessBar()) {
         for (int i = 0; i < qab->buttonCount(); ++i) {
             if (RibbonLayoutItemHost* item = qobject_cast< RibbonLayoutItemHost* >(qab->buttonAt(i))) {
-                registeAction(item, QuickAccessActionTag, QString(), false);
+                if (key(item).isEmpty()) {
+                    registeAction(item, QuickAccessActionTag, QString(), false);
+                }
             }
         }
         if (d_ptr->mTagToActions.contains(QuickAccessActionTag)) {
@@ -530,6 +545,29 @@ QMap< int, RibbonCategory* > RibbonActionRegistry::autoRegister(RibbonBar* bar, 
         Q_EMIT registryChanged();
     }
     return res;
+}
+
+/**
+ * \if ENGLISH
+ * @brief QML entry point of autoRegister
+ * @details autoRegister returns a tag -> category map of C++ pointers, which
+ *          QML has no way to hold, so a picker written in QML could not call it
+ *          at all. This wrapper runs the same walk and reports the number of
+ *          descriptors the catalogue holds afterwards, which is the only figure
+ *          a QML caller can act on.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief autoRegister 的 QML 入口
+ * @details autoRegister 返回的是 tag -> category 的 C++ 指针 map，QML 无法持有，
+ *          因此用 QML 写的选取器根本调不到它。本包装跑同一套遍历，改为返回遍历
+ *          之后命令目录里的描述符数量——这是 QML 调用方唯一能用得上的数字。
+ * \endif
+ */
+int RibbonActionRegistry::autoRegisterBar(RibbonBar* bar)
+{
+    autoRegister(bar);
+    return count();
 }
 
 QVariantMap RibbonActionRegistry::actionInfo(const QString& key) const

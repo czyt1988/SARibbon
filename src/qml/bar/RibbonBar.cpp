@@ -540,6 +540,38 @@ void RibbonBar::unregisterContext(RibbonContextCategory* ctx)
     polish();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Every category page owned by a declared context category
+ * @details The customize tree walks the declared main categories through
+ *          categoryAt and then appends these, which reproduces the widgets
+ *          categoryPages order (main row first, context pages after) without
+ *          depending on context activation: a customization dialog lists what
+ *          the ribbon declares, not what happens to be active while it is open.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 由已声明上下文类别持有的全部 category 页
+ * @details 定制树先通过 categoryAt 遍历声明的主类别，再追加这些页，从而复现
+ *          widgets categoryPages 的顺序（主类别在前、上下文页在后），且不依赖
+ *          上下文的激活状态：定制对话框列出的是 ribbon 声明了什么，而不是打开
+ *          期间恰好激活了什么。
+ * \endif
+ */
+QVector< RibbonCategory* > RibbonBar::contextCategories() const
+{
+    QVector< RibbonCategory* > cats;
+    for (RibbonContextCategory* ctx : mContexts) {
+        cats += ctx->categories();
+    }
+    return cats;
+}
+
+bool RibbonBar::isContextCategory(RibbonCategory* category) const
+{
+    return category ? contextCategories().contains(category) : false;
+}
+
 bool RibbonBar::isOwnedContextTab(RibbonTab* tab) const
 {
     // owned context page tabs never join the normal tab registration (their

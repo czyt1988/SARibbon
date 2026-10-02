@@ -5,6 +5,7 @@
 #include <QQmlEngine>
 #include <QQuickItem>
 #include <QQuickView>
+#include <QQuickWindow>
 #include <QSignalSpy>
 #include <QXmlStreamReader>
 #include <QXmlStreamWriter>
@@ -17,6 +18,7 @@
 #include <SARibbonQml/category/RibbonCategory.h>
 #include <SARibbonQml/customize/RibbonActionRegistry.h>
 #include <SARibbonQml/customize/RibbonActionRegistryModel.h>
+#include <SARibbonQml/customize/RibbonCustomizeTreeModel.h>
 #include <SARibbonQml/customize/RibbonCustomizer.h>
 #include <SARibbonQml/host/RibbonLayoutItemHost.h>
 #include <SARibbonQml/panel/RibbonPanel.h>
@@ -25,7 +27,7 @@
 #include "SARibbonCustomizeWidget.h"
 
 /**
- * @brief QML 定制系统测试（计划 WS-C2）
+ * @brief QML 定制系统测试（计划 WS-C2 / WS-C3）
  * @details 定制系统在两个前端之间共享的只有记录层：core 的
  *          SARibbonCustomizeRecord（含 make* 工厂与 simplify）与
  *          SARibbonCustomizeXml（recordsToXml/recordsFromXml）。寻址层与执行层
@@ -48,6 +50,11 @@
  *             sa_customize_datas_to_xml 写出的字节流 QML 能直接 apply，QML
  *             appliedToXml 写出的字节流 widgets sa_customize_datas_from_xml 能
  *             逐字段读回。
+ *          7. WS-C3 的选取 UI：树模型把宿主树拍平成带完整地址的行（三档
+ *             showType、上下文页方括号标题与只读性），并把定制器的待应用记录
+ *             重放到影子树上做预览——**预览期间真树一根手指都不动**；
+ *             RibbonCustomizeDialog.qml 由叶子 URL 实例化，用真实鼠标点击走完
+ *             选行 → 加命令 → 改名 → 调序 → 显隐 → 重置 → 确定/取消的全流程。
  */
 namespace
 {
@@ -96,6 +103,46 @@ Item {
 }
 )QML";
 
+/// WS-C3 作用域场景：一个主类别 + 一个上下文页，用来钉死三档 showType 与
+/// 上下文页在扁平列表里的方括号标题/只读语义
+const char* kScopeQml = R"QML(import QtQuick 2.12
+import SARibbon 3.0
+Item {
+    width: 900
+    height: 320
+    RibbonBar {
+        objectName: "bar"
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        RibbonCategory {
+            objectName: "cat0"
+            title: "Home"
+            RibbonPanel {
+                objectName: "p0"
+                panelTitle: "Clip"
+                RibbonToolButton { objectName: "b0"; text: "Paste" }
+                RibbonToolButton { objectName: "b1"; text: "Cut" }
+            }
+        }
+        RibbonContextCategory {
+            objectName: "ctx"
+            contextTitle: "ctx"
+            active: false
+            RibbonCategory {
+                objectName: "page0"
+                title: "ctx Page"
+                RibbonPanel {
+                    objectName: "cp0"
+                    panelTitle: "CP"
+                    RibbonToolButton { objectName: "cb0"; text: "CtxBtn" }
+                }
+            }
+        }
+    }
+}
+)QML";
+
 /// 一个已布局的场景：引擎、组件、视图与 bar 宿主
 /// @note 组件与根对象都挂在引擎上，活得比函数调用久；bar 由 QML 声明创建，
 ///       因此叶子在 componentComplete 里自动建立，不需要 ensureQmlLeaf
@@ -104,16 +151,17 @@ struct Scene
     QQmlEngine engine;
     QQmlComponent component;
     QQuickView view;
-    SARibbonQml::RibbonBar* bar = nullptr;
+    SARibbonQml::RibbonBar* bar   = nullptr;
+    QQuickItem* rootItem          = nullptr;
 
-    explicit Scene(const char* src = kSceneQml) : component(&engine), view(&engine, nullptr)
+    explicit Scene(const char* src = kSceneQml, int w = 900, int h = 320) : component(&engine), view(&engine, nullptr)
     {
         saRibbonRegisterQmlTypes(&engine);
         view.setResizeMode(QQuickView::SizeRootObjectToView);
-        view.resize(900, 320);
+        view.resize(w, h);
         component.setData(QByteArray(src), QUrl());
         QObject* rootObj = component.create();
-        QQuickItem* rootItem = qobject_cast< QQuickItem* >(rootObj);
+        rootItem = qobject_cast< QQuickItem* >(rootObj);
         if (rootItem) {
             rootItem->setParentItem(view.contentItem());
             view.setContent(QUrl(), &component, rootObj);
@@ -151,6 +199,123 @@ QByteArray widgetsRecordsToXml(const QList< SARibbonCustomizeData >& cds)
     return data;
 }
 
+/// 树模型行的约定 key（NOTES B60：满 key 才敢在 QML 里直接读）
+QStringList treeRowKeys()
+{
+    return QStringList{ QStringLiteral("nodeType"),        QStringLiteral("depth"),
+                        QStringLiteral("title"),           QStringLiteral("categoryObjName"),
+                        QStringLiteral("panelObjName"),    QStringLiteral("key"),
+                        QStringLiteral("iconSource"),      QStringLiteral("tag"),
+                        QStringLiteral("proportion"),      QStringLiteral("nodeVisible"),
+                        QStringLiteral("contextCategory"), QStringLiteral("canCustomize"),
+                        QStringLiteral("pending"),         QStringLiteral("indexInParent"),
+                        QStringLiteral("siblingCount") };
+}
+
+/**
+ * \if ENGLISH
+ * @brief Harness that instantiates RibbonCustomizeDialog.qml over a live bar
+ * @details The dialog is a Popup owning further popups, so per NOTES B59 it is
+ *          never the QML root: the component is created from the leaf URL table
+ *          and parented onto the scene root item. The window is sized above the
+ *          dialog's 820x560 so the tree list and the footer buttons stay inside
+ *          the viewport and remain clickable. Everything is reached through
+ *          QObject property/invocation because QQuickPopup and QQuickListView
+ *          are private headers this project does not include.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 在活动 bar 之上实例化 RibbonCustomizeDialog.qml 的测试台
+ * @details 对话框本身是 Popup 且还持有子 Popup，按 NOTES B59 绝不能当 QML 根对象：
+ *          组件由叶子 URL 表创建，再挂到场景根 Item 上。窗口尺寸大于对话框的
+ *          820x560，树列表与底部按钮才落在视口内、点得到。由于 QQuickPopup 与
+ *          QQuickListView 都是本项目不引用的私有头，全部读写走 QObject 的
+ *          property/invokeMethod。
+ * \endif
+ */
+struct DialogHost
+{
+    Scene scene;
+    QQmlComponent component;
+    QObject* dialog = nullptr;
+
+    DialogHost()
+        : scene(kSceneQml, 1000, 700)
+        , component(&scene.engine, SARibbonQml::SARibbonQmlLeafUrls::customizeDialogLeaf())
+    {
+        QVERIFY2(!component.isError(), qPrintable(component.errorString()));
+        dialog = component.create();
+        QVERIFY2(dialog != nullptr, qPrintable(component.errorString()));
+        if (dialog) {
+            dialog->setProperty("parent", QVariant::fromValue(scene.rootItem));
+            dialog->setProperty("bar", QVariant::fromValue(scene.bar));
+        }
+    }
+    Q_DISABLE_COPY(DialogHost)
+
+    /// 按 objectName 找对话框内的可视项
+    QQuickItem* item(const char* name) const
+    {
+        return dialog ? dialog->findChild< QQuickItem* >(QString::fromLatin1(name)) : nullptr;
+    }
+    /// 按 objectName 找对话框里的嵌套 Popup：QQuickPopup 派生自 QObject 而不是
+    /// QQuickItem，findChild<QQuickItem*> 永远找不到它（NOTES B59）
+    QObject* popup(const char* name) const
+    {
+        if (!dialog) {
+            return nullptr;
+        }
+        const QList< QObject* > all = dialog->findChildren< QObject* >(QString::fromLatin1(name));
+        for (QObject* o : all) {
+            if (o && o->inherits("QQuickPopup")) {
+                return o;
+            }
+        }
+        return nullptr;
+    }
+    /// 调用对话框根对象上的一个 QML 函数
+    bool call(const char* method)
+    {
+        return QMetaObject::invokeMethod(dialog, method);
+    }
+    /// ListView 的 count / currentIndex（不引私有头，走属性）
+    static int countOf(QQuickItem* lv) { return lv ? lv->property("count").toInt() : -1; }
+    static int currentOf(QQuickItem* lv) { return lv ? lv->property("currentIndex").toInt() : -2; }
+    /// 对话框内部自建的那三个对象（各只有一个）
+    SARibbonQml::RibbonCustomizeTreeModel* treeModel() const
+    {
+        return dialog ? dialog->findChild< SARibbonQml::RibbonCustomizeTreeModel* >() : nullptr;
+    }
+    SARibbonQml::RibbonActionRegistryModel* actionModel() const
+    {
+        return dialog ? dialog->findChild< SARibbonQml::RibbonActionRegistryModel* >() : nullptr;
+    }
+    SARibbonQml::RibbonCustomizer* customizer() const
+    {
+        return dialog ? dialog->findChild< SARibbonQml::RibbonCustomizer* >() : nullptr;
+    }
+    SARibbonQml::RibbonActionRegistry* registry() const
+    {
+        return dialog ? dialog->findChild< SARibbonQml::RibbonActionRegistry* >() : nullptr;
+    }
+};
+
+/// 在窗口坐标里真实点一下某个可视项的中心
+void clickItem(QQuickWindow* w, QQuickItem* it)
+{
+    QVERIFY(it != nullptr);
+    const QPointF c = it->mapToScene(QPointF(it->width() / 2.0, it->height() / 2.0));
+    QTest::mouseClick(w, Qt::LeftButton, Qt::NoModifier, c.toPoint());
+}
+
+/// 在列表视图的第 row 行上真实点一下（叶子委托行高固定 22，边距 1）
+void clickListRow(QQuickWindow* w, QQuickItem* lv, int row)
+{
+    QVERIFY(lv != nullptr);
+    const QPointF c = lv->mapToScene(QPointF(lv->width() / 2.0, 1.0 + 11.0 + row * 22.0));
+    QTest::mouseClick(w, Qt::LeftButton, Qt::NoModifier, c.toPoint());
+}
+
 }
 
 class TestCustomizeQml : public QObject
@@ -164,6 +329,9 @@ private Q_SLOTS:
     void quickAccessRecords();
     void visibleCategoryRecord();
     void xmlRoundTripAndCrossFrontend();
+    void treeModelLevelsScopeAndAddressing();
+    void treeModelPreviewReplaysPending();
+    void dialogEditsAndAppliesOnOk();
 };
 
 /**
@@ -662,6 +830,395 @@ void TestCustomizeQml::xmlRoundTripAndCrossFrontend()
     QCOMPARE(back.at(1).categoryObjNameValue, QStringLiteral("newcat"));
     QCOMPARE(int(back.at(2).actionType()), int(SARibbon::Core::SARibbonCustomizeRecord::RenameCategoryActionType));
     QCOMPARE(back.at(2).keyValue, QStringLiteral("Home2"));
+}
+
+/**
+ * \if ENGLISH
+ * @brief The tree model flattens the host tree into fully addressed rows and
+ *        honours the three widgets scopes
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 树模型把宿主树拍平成带完整地址的行，并遵守 widgets 的三档作用域
+ * \endif
+ */
+void TestCustomizeQml::treeModelLevelsScopeAndAddressing()
+{
+    Scene scene(kScopeQml);
+    QVERIFY(scene.bar);
+    // categoryAt/categoryCount 只走声明的主类别行，上下文页要靠新查询接口
+    QCOMPARE(scene.bar->categoryCount(), 1);
+    QCOMPARE(scene.bar->contextCategories().size(), 1);
+    QVERIFY(scene.bar->isContextCategory(scene.bar->contextCategories().at(0)));
+    QVERIFY(!scene.bar->isContextCategory(scene.bar->categoryAt(0)));
+
+    SARibbonQml::RibbonActionRegistry registry;
+    registry.autoRegister(scene.bar);
+    // 上下文页里的按钮不进命令目录：autoRegister 只遍历主类别行，与 QML 寻址
+    // 能力（categoryByObjectName 也只覆盖主类别行）保持一致
+    QCOMPARE(registry.count(), 2);
+
+    SARibbonQml::RibbonCustomizeTreeModel model;
+    QCOMPARE(model.roleNames().size(), treeRowKeys().size());
+    QCOMPARE(model.showType(), int(SARibbonQml::RibbonEnums::ShowAllCategory));
+    model.setBar(scene.bar);
+    model.setRegistry(&registry);
+
+    const QString k0 = registry.key(qobject_cast< SARibbonQml::RibbonLayoutItemHost* >(
+        scene.rootItem->findChild< QQuickItem* >(QStringLiteral("b0"))));
+    QVERIFY(!k0.isEmpty());
+    const int tag0 = int(SARibbon::Core::AutoCategoryDistinguishBeginTag);
+
+    // ---- ShowAllCategory：主类别在前，上下文页在后且标题带方括号 ----
+    QCOMPARE(model.rowCount(), 7);
+    const QStringList keys = treeRowKeys();
+    for (int i = 0; i < model.rowCount(); ++i) {
+        verifyFullKeys(model.infoAt(i), keys);
+    }
+
+    const QVariantMap r0 = model.infoAt(0);
+    QCOMPARE(r0.value(QStringLiteral("nodeType")).toInt(), int(SARibbonQml::RibbonEnums::CategoryNode));
+    QCOMPARE(r0.value(QStringLiteral("depth")).toInt(), 0);
+    QCOMPARE(r0.value(QStringLiteral("title")).toString(), QStringLiteral("Home"));
+    QCOMPARE(r0.value(QStringLiteral("categoryObjName")).toString(), QStringLiteral("cat0"));
+    QVERIFY(r0.value(QStringLiteral("nodeVisible")).toBool());
+    QVERIFY(!r0.value(QStringLiteral("contextCategory")).toBool());
+    QVERIFY(r0.value(QStringLiteral("canCustomize")).toBool());
+    QVERIFY(!r0.value(QStringLiteral("pending")).toBool());
+    QCOMPARE(r0.value(QStringLiteral("indexInParent")).toInt(), 0);
+    QCOMPARE(r0.value(QStringLiteral("siblingCount")).toInt(), 2);
+
+    const QVariantMap r1 = model.infoAt(1);
+    QCOMPARE(r1.value(QStringLiteral("nodeType")).toInt(), int(SARibbonQml::RibbonEnums::PanelNode));
+    QCOMPARE(r1.value(QStringLiteral("depth")).toInt(), 1);
+    QCOMPARE(r1.value(QStringLiteral("title")).toString(), QStringLiteral("Clip"));
+    QCOMPARE(r1.value(QStringLiteral("panelObjName")).toString(), QStringLiteral("p0"));
+    QCOMPARE(r1.value(QStringLiteral("siblingCount")).toInt(), 1);
+
+    const QVariantMap r2 = model.infoAt(2);
+    QCOMPARE(r2.value(QStringLiteral("nodeType")).toInt(), int(SARibbonQml::RibbonEnums::ActionNode));
+    QCOMPARE(r2.value(QStringLiteral("depth")).toInt(), 2);
+    QCOMPARE(r2.value(QStringLiteral("title")).toString(), QStringLiteral("Paste"));
+    QCOMPARE(r2.value(QStringLiteral("key")).toString(), k0);
+    QCOMPARE(r2.value(QStringLiteral("tag")).toInt(), tag0);
+    QVERIFY(r2.value(QStringLiteral("canCustomize")).toBool());
+
+    // 上下文页：方括号标题、只读、其命令没有 key 因而也不可定制
+    const QVariantMap r4 = model.infoAt(4);
+    QCOMPARE(r4.value(QStringLiteral("title")).toString(), QStringLiteral("[ctx Page]"));
+    QCOMPARE(r4.value(QStringLiteral("categoryObjName")).toString(), QStringLiteral("page0"));
+    QVERIFY(r4.value(QStringLiteral("contextCategory")).toBool());
+    QVERIFY(!r4.value(QStringLiteral("canCustomize")).toBool());
+    QVERIFY(!model.infoAt(6).value(QStringLiteral("canCustomize")).toBool());
+    QVERIFY(model.infoAt(6).value(QStringLiteral("key")).toString().isEmpty());
+    // data() 与 infoAt() 说的是同一件事
+    QCOMPARE(model.data(model.index(4), SARibbonQml::RibbonCustomizeTreeModel::ContextCategoryRole).toBool(), true);
+    QCOMPARE(model.data(model.index(4), SARibbonQml::RibbonCustomizeTreeModel::TitleRole).toString(),
+             QStringLiteral("[ctx Page]"));
+
+    // ---- 寻址 ----
+    QCOMPARE(model.rowOfCategory(QStringLiteral("cat0")), 0);
+    QCOMPARE(model.rowOfCategory(QStringLiteral("page0")), 4);
+    QCOMPARE(model.rowOfCategory(QStringLiteral("nope")), -1);
+    QCOMPARE(model.rowOfPanel(QStringLiteral("cat0"), QStringLiteral("p0")), 1);
+    QCOMPARE(model.rowOfAction(QStringLiteral("cat0"), QStringLiteral("p0"), k0), 2);
+    QCOMPARE(model.rowOfQuickAction(k0), -1);
+
+    // ---- ShowMainCategory：上下文页整块消失 ----
+    model.setShowType(int(SARibbonQml::RibbonEnums::ShowMainCategory));
+    QCOMPARE(model.rowCount(), 4);
+    QCOMPARE(model.rowOfCategory(QStringLiteral("page0")), -1);
+    QCOMPARE(model.rowOfPanel(QStringLiteral("cat0"), QStringLiteral("p0")), 1);
+
+    // ---- ShowQuickAccessBar：本场景没有快速访问栏，一行都不给 ----
+    model.setShowType(int(SARibbonQml::RibbonEnums::ShowQuickAccessBar));
+    QCOMPARE(model.rowCount(), 0);
+
+    // 越界行也是满 key（NOTES B60）
+    verifyFullKeys(model.infoAt(-1), keys);
+    verifyFullKeys(model.infoAt(99), keys);
+    QCOMPARE(model.infoAt(99).value(QStringLiteral("title")).toString(), QString());
+    QCOMPARE(model.infoAt(99).value(QStringLiteral("nodeType")).toInt(),
+             int(SARibbonQml::RibbonEnums::CategoryNode));
+    QCOMPARE(model.infoAt(99).value(QStringLiteral("siblingCount")).toInt(), 0);
+}
+
+/**
+ * \if ENGLISH
+ * @brief Pending records show up in the preview and never in the live tree
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 待应用记录只出现在预览里，绝不落到活动树上
+ * \endif
+ */
+void TestCustomizeQml::treeModelPreviewReplaysPending()
+{
+    Scene scene;
+    QVERIFY(scene.bar);
+
+    SARibbonQml::RibbonActionRegistry registry;
+    registry.autoRegister(scene.bar);
+    SARibbonQml::RibbonCustomizer cz;
+    cz.setBar(scene.bar);
+    cz.setRegistry(&registry);
+
+    SARibbonQml::RibbonCustomizeTreeModel model;
+    model.setBar(scene.bar);
+    model.setRegistry(&registry);
+    // 绑定后 recordsChanged 自动重建，选取 UI 不必每点一次按钮就 update()
+    model.setCustomizer(&cz);
+    QCOMPARE(model.rowCount(), 9);
+    QCOMPARE(model.revision() > 0, true);
+
+    QSignalSpy resetSpy(&model, &QAbstractItemModel::modelReset);
+    const int revBefore = model.revision();
+
+    SARibbonQml::RibbonCategory* cat0 = scene.bar->categoryAt(0);
+    SARibbonQml::RibbonCategory* cat1 = scene.bar->categoryAt(1);
+    QVERIFY(cat0 && cat1);
+    const QString kTable = registry.key(qobject_cast< SARibbonQml::RibbonLayoutItemHost* >(
+        scene.rootItem->findChild< QQuickItem* >(QStringLiteral("b3"))));
+    QVERIFY(!kTable.isEmpty());
+
+    // ---- 新增类别 / 面板 / 命令：预览长出来，真树不动 ----
+    QVERIFY(cz.addCategory(QStringLiteral("NewCat"), -1, QStringLiteral("newcat")));
+    QCOMPARE(resetSpy.count(), 1);
+    QVERIFY(model.revision() > revBefore);
+    QCOMPARE(model.rowCount(), 10);
+    QCOMPARE(scene.bar->categoryCount(), 2);
+    const QVariantMap newCat = model.infoAt(9);
+    QCOMPARE(newCat.value(QStringLiteral("title")).toString(), QStringLiteral("NewCat"));
+    QCOMPARE(newCat.value(QStringLiteral("categoryObjName")).toString(), QStringLiteral("newcat"));
+    QVERIFY(newCat.value(QStringLiteral("pending")).toBool());
+    QCOMPARE(newCat.value(QStringLiteral("indexInParent")).toInt(), 2);
+    QCOMPARE(newCat.value(QStringLiteral("siblingCount")).toInt(), 3);
+
+    QVERIFY(cz.addPanel(QStringLiteral("NewPanel"), -1, QStringLiteral("newcat"), QStringLiteral("newpanel")));
+    QCOMPARE(model.rowCount(), 11);
+    QCOMPARE(model.infoAt(10).value(QStringLiteral("nodeType")).toInt(),
+             int(SARibbonQml::RibbonEnums::PanelNode));
+    QVERIFY(model.infoAt(10).value(QStringLiteral("pending")).toBool());
+    QCOMPARE(scene.bar->categoryCount(), 2);
+
+    QVERIFY(cz.addAction(kTable,
+                         int(SARibbon::Core::SARibbonRowProportion::Small),
+                         QStringLiteral("newcat"),
+                         QStringLiteral("newpanel")));
+    QCOMPARE(model.rowCount(), 12);
+    const QVariantMap newAct = model.infoAt(11);
+    QCOMPARE(newAct.value(QStringLiteral("title")).toString(), QStringLiteral("Table"));
+    QCOMPARE(newAct.value(QStringLiteral("key")).toString(), kTable);
+    QCOMPARE(newAct.value(QStringLiteral("proportion")).toInt(),
+             int(SARibbon::Core::SARibbonRowProportion::Small));
+    QVERIFY(newAct.value(QStringLiteral("pending")).toBool());
+    // 同一个命令仍在原面板里：影子树不是把宿主搬走了
+    QCOMPARE(cat1->panelAt(0)->childItemCount(), 1);
+
+    // ---- 改名 / 调序 / 显隐：预览变了，真树没变 ----
+    QVERIFY(cz.renameCategory(QStringLiteral("Home2"), QStringLiteral("cat0")));
+    QCOMPARE(model.infoAt(0).value(QStringLiteral("title")).toString(), QStringLiteral("Home2"));
+    QCOMPARE(cat0->title(), QStringLiteral("Home"));
+
+    QVERIFY(cz.changePanelOrder(QStringLiteral("cat0"), QStringLiteral("p1"), -1));
+    QCOMPARE(model.infoAt(1).value(QStringLiteral("panelObjName")).toString(), QStringLiteral("p1"));
+    QCOMPARE(model.infoAt(1).value(QStringLiteral("indexInParent")).toInt(), 0);
+    QCOMPARE(model.rowOfPanel(QStringLiteral("cat0"), QStringLiteral("p0")), 3);
+    QCOMPARE(cat0->panelAt(0)->objectName(), QStringLiteral("p0"));
+
+    QVERIFY(cz.visibleCategory(QStringLiteral("cat0"), false));
+    QVERIFY(!model.infoAt(model.rowOfCategory(QStringLiteral("cat0")))
+                 .value(QStringLiteral("nodeVisible"))
+                 .toBool());
+    QVERIFY(!scene.bar->isCategoryHidden(cat0));
+
+    // ---- 删除：预览少两行（面板 + 其命令），真树还在 ----
+    const int before = model.rowCount();
+    QVERIFY(cz.removePanel(QStringLiteral("cat1"), QStringLiteral("p2")));
+    QCOMPARE(model.rowCount(), before - 2);
+    QCOMPARE(model.rowOfPanel(QStringLiteral("cat1"), QStringLiteral("p2")), -1);
+    QCOMPARE(cat1->panelCount(), 1);
+
+    // ---- 重置：预览回到原样 ----
+    cz.clearRecords();
+    QCOMPARE(cz.recordCount(), 0);
+    QCOMPARE(model.rowCount(), 9);
+    QCOMPARE(model.infoAt(0).value(QStringLiteral("title")).toString(), QStringLiteral("Home"));
+    for (int i = 0; i < model.rowCount(); ++i) {
+        QVERIFY2(!model.infoAt(i).value(QStringLiteral("pending")).toBool(), qPrintable(QStringLiteral("row %1").arg(i)));
+    }
+
+    // ---- apply 之后预览读的就是新的真树，且不再有 pending 标记 ----
+    QVERIFY(cz.addCategory(QStringLiteral("Applied"), -1, QStringLiteral("applied")));
+    QVERIFY(model.infoAt(9).value(QStringLiteral("pending")).toBool());
+    QVERIFY(cz.apply());
+    QCOMPARE(cz.recordCount(), 0);
+    QCOMPARE(cz.appliedCount(), 1);
+    QCOMPARE(scene.bar->categoryCount(), 3);
+    QCOMPARE(model.rowCount(), 10);
+    QVERIFY(!model.infoAt(9).value(QStringLiteral("pending")).toBool());
+    QCOMPARE(model.infoAt(9).value(QStringLiteral("categoryObjName")).toString(), QStringLiteral("applied"));
+
+    // 撤销后预览跟着回去
+    QVERIFY(cz.reverse());
+    QCOMPARE(scene.bar->categoryCount(), 2);
+    QCOMPARE(model.rowCount(), 9);
+}
+
+/**
+ * \if ENGLISH
+ * @brief The dialog drives the whole flow through real mouse clicks
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 对话框用真实鼠标点击走完全流程
+ * \endif
+ */
+void TestCustomizeQml::dialogEditsAndAppliesOnOk()
+{
+    DialogHost h;
+    QVERIFY(h.dialog != nullptr);
+    QVERIFY(h.scene.bar != nullptr);
+
+    SARibbonQml::RibbonCustomizeTreeModel* tm = h.treeModel();
+    SARibbonQml::RibbonCustomizer* cz         = h.customizer();
+    QVERIFY(tm && cz);
+
+    QVERIFY(h.call("open"));
+    QTRY_VERIFY(h.dialog->property("visible").toBool());
+
+    QQuickItem* tree = h.item("treeViewResult");
+    QQuickItem* list = h.item("listViewSelect");
+    QVERIFY(tree && list);
+    // aboutToShow 里的 setup() 已经跑过：目录 5 项（4 个面板命令 + 1 个快速访问栏）
+    QTRY_COMPARE(DialogHost::countOf(list), 5);
+    QTRY_COMPARE(DialogHost::countOf(tree), 9);
+    QCOMPARE(cz->recordCount(), 0);
+
+    // ---- 三档作用域 ----
+    clickItem(&h.scene.view, h.item("radioButtonQuickAccessBar"));
+    QTRY_COMPARE(h.dialog->property("showType").toInt(), int(SARibbonQml::RibbonEnums::ShowQuickAccessBar));
+    QTRY_COMPARE(DialogHost::countOf(tree), 2);
+    QCOMPARE(tm->infoAt(0).value(QStringLiteral("nodeType")).toInt(),
+             int(SARibbonQml::RibbonEnums::QuickAccessNode));
+    QCOMPARE(tm->infoAt(1).value(QStringLiteral("tag")).toInt(),
+             SARibbonQml::RibbonActionRegistry::QuickAccessActionTag);
+    clickItem(&h.scene.view, h.item("radioButtonMainCategory"));
+    QTRY_COMPARE(DialogHost::countOf(tree), 9);
+    clickItem(&h.scene.view, h.item("radioButtonAllCategory"));
+    QTRY_COMPARE(DialogHost::countOf(tree), 9);
+
+    // ---- 选中面板行：各按钮的可用性按 widgets 的层级规则来 ----
+    clickListRow(&h.scene.view, tree, 1);
+    QTRY_COMPARE(DialogHost::currentOf(tree), 1);
+    QCOMPARE(h.item("pushButtonAdd")->property("enabled").toBool(), false);  // 目录里还没选命令
+    QCOMPARE(h.item("pushButtonDelete")->property("enabled").toBool(), true);
+    QCOMPARE(h.item("pushButtonRename")->property("enabled").toBool(), true);
+    QCOMPARE(h.item("pushButtonUp")->property("enabled").toBool(), false);   // p0 已是第一个面板
+    QCOMPARE(h.item("pushButtonDown")->property("enabled").toBool(), true);
+    QCOMPARE(h.item("pushButtonNewPanel")->property("enabled").toBool(), true);
+    QCOMPARE(h.item("pushButtonHide")->property("enabled").toBool(), false);  // 只有类别能显隐
+    QCOMPARE(h.item("pushButtonOk")->property("enabled").toBool(), false);
+
+    // ---- 改名（嵌套 Popup 就是 QInputDialog 的位置）----
+    clickItem(&h.scene.view, h.item("pushButtonRename"));
+    QObject* renamePopup = h.popup("renamePopup");
+    QVERIFY(renamePopup);    QTRY_VERIFY(renamePopup->property("visible").toBool());
+    QQuickItem* field = h.item("renameField");
+    QVERIFY(field);
+    QCOMPARE(field->property("text").toString(), QStringLiteral("Clip"));
+    field->setProperty("text", QStringLiteral("ClipX"));
+    clickItem(&h.scene.view, h.item("renameOkButton"));
+    QTRY_VERIFY(!renamePopup->property("visible").toBool());
+    QTRY_COMPARE(tm->infoAt(1).value(QStringLiteral("title")).toString(), QStringLiteral("ClipX"));
+    QCOMPARE(cz->recordCount(), 1);
+    QCOMPARE(h.dialog->property("pendingCount").toInt(), 1);
+    // 预览归预览，真树的面板标题没动
+    QCOMPARE(h.scene.bar->categoryAt(0)->panelAt(0)->panelTitle(), QStringLiteral("Clip"));
+
+    // ---- 加命令：目录里选 "Table"，落进当前面板并标 pending ----
+    clickListRow(&h.scene.view, list, 3);
+    QTRY_COMPARE(DialogHost::currentOf(list), 3);
+    QTRY_VERIFY(h.item("pushButtonAdd")->property("enabled").toBool());
+    clickItem(&h.scene.view, h.item("pushButtonAdd"));
+    QTRY_COMPARE(DialogHost::countOf(tree), 10);
+    const QVariantMap added = tm->infoAt(4);
+    QVERIFY(added.value(QStringLiteral("pending")).toBool());
+    QCOMPARE(added.value(QStringLiteral("title")).toString(), QStringLiteral("Table"));
+    QCOMPARE(added.value(QStringLiteral("categoryObjName")).toString(), QStringLiteral("cat0"));
+    QCOMPARE(added.value(QStringLiteral("panelObjName")).toString(), QStringLiteral("p0"));
+    QCOMPARE(added.value(QStringLiteral("proportion")).toInt(),
+             int(SARibbonQml::RibbonEnums::Medium));
+    QCOMPARE(h.scene.bar->categoryAt(0)->panelAt(0)->childItemCount(), 2);
+
+    // ---- 下移面板：预览里 Font 排到 ClipX 前面，选中行跟着被移走的那一行 ----
+    clickItem(&h.scene.view, h.item("pushButtonDown"));
+    QTRY_COMPARE(tm->infoAt(1).value(QStringLiteral("panelObjName")).toString(), QStringLiteral("p1"));
+    // 改名 + 加命令 + 面板调序，三条都还没 simplify（那一步在 apply 里）
+    QCOMPARE(cz->recordCount(), 3);
+    // 模型复位后 ListView 只会保住旧行号，对话框得按地址把选中行找回来，
+    // 否则"下移"点两下就变成了来回交换两个不同的面板
+    QTRY_COMPARE(DialogHost::currentOf(tree), 3);
+    QCOMPARE(h.item("pushButtonUp")->property("enabled").toBool(), true);
+    // ClipX 已经落到 cat0 的末尾，再下移就没有位置了（到头即拒绝，不做夹紧）
+    QCOMPARE(h.item("pushButtonDown")->property("enabled").toBool(), false);
+
+    // ---- 类别行不接受"加命令"：按钮禁用，硬调函数要发 operationRefused ----
+    QSignalSpy refused(h.dialog, SIGNAL(operationRefused(QString)));
+    clickListRow(&h.scene.view, tree, 0);
+    QTRY_COMPARE(DialogHost::currentOf(tree), 0);
+    QCOMPARE(h.item("pushButtonAdd")->property("enabled").toBool(), false);
+    QVERIFY(h.call("addSelected"));
+    QCOMPARE(refused.count(), 1);
+    QCOMPARE(cz->recordCount(), 3);
+
+    // ---- 重置：待应用记录清空，预览回到原样 ----
+    QTRY_VERIFY(h.item("pushButtonReset")->property("enabled").toBool());
+    clickItem(&h.scene.view, h.item("pushButtonReset"));
+    QTRY_COMPARE(h.dialog->property("pendingCount").toInt(), 0);
+    QTRY_COMPARE(DialogHost::countOf(tree), 9);
+    QCOMPARE(tm->infoAt(1).value(QStringLiteral("title")).toString(), QStringLiteral("Clip"));
+
+    // ---- 显隐 + 确定：这时候才落到真树上 ----
+    clickListRow(&h.scene.view, tree, 6);  // cat1 "Insert"
+    QTRY_COMPARE(DialogHost::currentOf(tree), 6);
+    QTRY_VERIFY(h.item("pushButtonHide")->property("enabled").toBool());
+    QCOMPARE(h.item("pushButtonHide")->property("text").toString(), QStringLiteral("Hide"));
+    clickItem(&h.scene.view, h.item("pushButtonHide"));
+    // 行数没变的复位也要刷新按钮：这就是模型 revision 存在的理由
+    QTRY_VERIFY(!tm->infoAt(6).value(QStringLiteral("nodeVisible")).toBool());
+    QCOMPARE(h.item("pushButtonHide")->property("text").toString(), QStringLiteral("Show"));
+    QVERIFY(!h.scene.bar->isCategoryHidden(h.scene.bar->categoryAt(1)));
+    QTRY_VERIFY(h.item("pushButtonOk")->property("enabled").toBool());
+
+    QSignalSpy accepted(h.dialog, SIGNAL(acceptedWithResult(bool)));
+    clickItem(&h.scene.view, h.item("pushButtonOk"));
+    QCOMPARE(accepted.count(), 1);
+    QCOMPARE(accepted.at(0).at(0).toBool(), true);
+    QTRY_VERIFY(!h.dialog->property("visible").toBool());
+    QVERIFY(h.scene.bar->isCategoryHidden(h.scene.bar->categoryAt(1)));
+    QCOMPARE(cz->recordCount(), 0);
+    QCOMPARE(cz->appliedCount(), 1);
+
+    // ---- 再开一次，取消：待应用记录被丢掉，真树不动 ----
+    QSignalSpy discarded(h.dialog, SIGNAL(discarded()));
+    QVERIFY(h.call("open"));
+    QTRY_VERIFY(h.dialog->property("visible").toBool());
+    QTRY_COMPARE(DialogHost::countOf(tree), 9);
+    clickItem(&h.scene.view, h.item("pushButtonNewCategory"));
+    QTRY_COMPARE(h.dialog->property("pendingCount").toInt(), 1);
+    QTRY_COMPARE(DialogHost::countOf(tree), 10);
+    QVERIFY(tm->infoAt(9).value(QStringLiteral("pending")).toBool());
+    QCOMPARE(h.scene.bar->categoryCount(), 2);
+
+    clickItem(&h.scene.view, h.item("pushButtonCancel"));
+    QCOMPARE(discarded.count(), 1);
+    QTRY_VERIFY(!h.dialog->property("visible").toBool());
+    QCOMPARE(cz->recordCount(), 0);
+    QCOMPARE(h.scene.bar->categoryCount(), 2);
+
+    // 上一轮确定过的隐藏仍然生效（取消不会撤销已应用的记录）
+    QVERIFY(h.scene.bar->isCategoryHidden(h.scene.bar->categoryAt(1)));
 }
 
 QTEST_MAIN(TestCustomizeQml)

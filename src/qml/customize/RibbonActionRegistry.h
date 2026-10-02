@@ -156,6 +156,9 @@ public:
 
     // Walk a bar host tree and register everything customizable in it
     QMap< int, SARibbonQml::RibbonCategory* > autoRegister(RibbonBar* bar, bool enableEmit = true);
+    // QML wrapper of autoRegister: the C++ return type is a map of category
+    // pointers that QML cannot consume, so this reports count() instead
+    Q_INVOKABLE int autoRegisterBar(RibbonBar* bar);
 
     // QML-facing views of the tables (full-key maps, NOTES B60)
     Q_INVOKABLE QVariantMap actionInfo(const QString& key) const;

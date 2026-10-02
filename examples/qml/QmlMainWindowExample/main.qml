@@ -842,6 +842,22 @@ ApplicationWindow {
                     }
                 }
             }
+
+            // The customize picker (widgets SARibbonCustomizeDialog parity):
+            // a command catalogue on the left, the ribbon tree preview on the
+            // right, every edit staged as a core customize record that only OK
+            // applies and Cancel drops
+            RibbonPanel {
+                panelTitle: "customize"
+
+                RibbonToolButton {
+                    text: "Customize"
+                    iconSource: "qrc:/icon/icon/item.svg"
+                    proportion: Ribbon.Large
+                    toolTip: "open the ribbon customize dialog (edits are staged until OK)"
+                    onClicked: window.openCustomizeDialog()
+                }
+            }
         }
 
         // ---- Delete (dynamic panel add/remove, widgets Delete category parity) ----
@@ -1201,6 +1217,40 @@ ApplicationWindow {
                 onClicked: customColorPicker.close()
             }
         }
+    }
+
+    // The customize picker ships as a QML-only leaf inside the module resource,
+    // so an application reaches it by URL: `import SARibbon 3.0` carries the
+    // C++ backed types only. It is created on first use and parented to the
+    // window — NOTES B59: an object owning popups must never be the root of its
+    // own component, and a Popup is no Loader item either.
+    property var customizeDialog: null
+
+    function openCustomizeDialog()
+    {
+        if (customizeDialog === null) {
+            var comp = Qt.createComponent("qrc:/SARibbon/RibbonCustomizeDialog.qml");
+            if (comp.status !== Component.Ready) {
+                log(qsTr("customize dialog unavailable: %1").arg(comp.errorString()));
+                return;
+            }
+            customizeDialog = comp.createObject(window.contentItem, {
+                                                    parent: window.contentItem,
+                                                    bar: ribbonBar
+                                                });
+            customizeDialog.acceptedWithResult.connect(function(applied) {
+                log(qsTr("customize applied: %1, %2 categories now")
+                    .arg(applied).arg(ribbonBar.categoryCount));
+            });
+            customizeDialog.discarded.connect(function() {
+                log(qsTr("customize discarded, the ribbon is untouched"));
+            });
+            customizeDialog.operationRefused.connect(function(reason) {
+                log(qsTr("customize refused: %1").arg(reason));
+            });
+        }
+        customizeDialog.bar = ribbonBar;
+        customizeDialog.open();
     }
 
     // Event log (the widgets example's central QTextBrowser counterpart):

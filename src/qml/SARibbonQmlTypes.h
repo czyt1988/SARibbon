@@ -91,6 +91,34 @@ public:
     // SAColorToolButton::ColorToolButtonStyle declaration order
     enum ColorMenuStyle { WithColorMenu = 0, NoColorMenu = 1 };
     Q_ENUM(ColorMenuStyle)
+    // Customize tree row kinds. Values mirror the widgets
+    // SARibbonCustomizeWidget LevelRole numbers so a record produced by either
+    // front end describes the same row shape; the widgets side keeps them as
+    // bare integers in its item model, hence no static_assert
+    enum CustomizeNodeType {
+        CategoryNode          = 0,
+        PanelNode             = 1,
+        ActionNode            = 2,
+        QuickAccessNode       = 3,
+        QuickAccessActionNode = 4
+    };
+    Q_ENUM(CustomizeNodeType)
+    // Customize tree scope. Mirrors the widgets
+    // SARibbonCustomizeWidget::RibbonTreeShowType declaration order
+    enum CustomizeTreeShowType { ShowAllCategory = 0, ShowMainCategory = 1, ShowQuickAccessBar = 2 };
+    Q_ENUM(CustomizeTreeShowType)
+    // Command catalogue tags, mirrored value-for-value from the core
+    // SARibbonActionTag so both front ends speak the same tag language
+    enum ActionTag {
+        UnknowActionTag                 = 0,
+        CommonlyUsedActionTag           = 0x01,
+        NotInFunctionalAreaActionTag    = 0x02,
+        AutoCategoryDistinguishBeginTag = 0x1000,
+        AutoCategoryDistinguishEndTag   = 0x2000,
+        NotInRibbonCategoryTag          = 0x2001,
+        UserDefineActionTag             = 0x8000
+    };
+    Q_ENUM(ActionTag)
 };
 
 // compile-time value checks against the core originals (plan-04 S4 note)
@@ -100,6 +128,16 @@ static_assert(int(RibbonEnums::Small) == int(SARibbon::Core::SARibbonRowProporti
 static_assert(int(RibbonEnums::GalleryIconOnly) == int(SA::GalleryCaptionStyle::None), "GalleryCaptionStyle drift");
 static_assert(int(RibbonEnums::GalleryIconWithText) == int(SA::GalleryCaptionStyle::SingleLine), "GalleryCaptionStyle drift");
 static_assert(int(RibbonEnums::GalleryIconWithWordWrapText) == int(SA::GalleryCaptionStyle::WordWrap), "GalleryCaptionStyle drift");
+static_assert(int(RibbonEnums::UnknowActionTag) == int(SARibbon::Core::UnknowActionTag), "ActionTag drift");
+static_assert(int(RibbonEnums::CommonlyUsedActionTag) == int(SARibbon::Core::CommonlyUsedActionTag), "ActionTag drift");
+static_assert(int(RibbonEnums::NotInFunctionalAreaActionTag) == int(SARibbon::Core::NotInFunctionalAreaActionTag),
+              "ActionTag drift");
+static_assert(int(RibbonEnums::AutoCategoryDistinguishBeginTag) == int(SARibbon::Core::AutoCategoryDistinguishBeginTag),
+              "ActionTag drift");
+static_assert(int(RibbonEnums::AutoCategoryDistinguishEndTag) == int(SARibbon::Core::AutoCategoryDistinguishEndTag),
+              "ActionTag drift");
+static_assert(int(RibbonEnums::NotInRibbonCategoryTag) == int(SARibbon::Core::NotInRibbonCategoryTag), "ActionTag drift");
+static_assert(int(RibbonEnums::UserDefineActionTag) == int(SARibbon::Core::UserDefineActionTag), "ActionTag drift");
 
 // Leaf resource URL table (centralized, no factory class in P0, plan-04 S3)
 namespace SARibbonQmlLeafUrls {
@@ -117,6 +155,9 @@ inline QUrl separatorLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/RibbonSe
 inline QUrl colorGridLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/RibbonColorGrid.qml")); }
 inline QUrl colorMenuLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/RibbonColorMenu.qml")); }
 inline QUrl colorToolButtonLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/RibbonColorToolButton.qml")); }
+// Application-facing customize picker (not a host leaf): an app instantiates it
+// by URL, the same way RibbonMenu nests itself
+inline QUrl customizeDialogLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/RibbonCustomizeDialog.qml")); }
 }
 
 // Uniform handshake contract: every leaf root declares `property QtObject

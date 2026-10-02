@@ -37,6 +37,7 @@ cmake --build build
 | Context Category 面板 | 上下文标签显隐开关（彩色 tab + 色带 + 页面切换） | setContextCategoryVisible |
 | Delete 类别 | 动态面板增删（ListModel+Repeater：移除尾部/插入 0/尾/-1） | removePanel/insertPanel |
 | Other 类别 | 画廊：2 组 17 项（Files/Apps），伸展分配 + 滚动 + 弹出视口 + 切组/滚动控制 + 标题三态切换（仅图标/单行/自动换行） | SARibbonGallery |
+| Other 类别 | 定制对话框：左侧命令目录（tag 过滤 + 搜索）、右侧 ribbon 树预览（三档显示范围）、中间增删/上下移/重命名/新类别/新组/显隐；编辑先记为 core 定制记录并在影子树上预览，只有"确定"才落到真树，"取消"整批丢弃 | SARibbonCustomizeDialog |
 | context 上下文 1 | 页 1：控件嵌入（SpinBox/TextField）+ 按钮态；页 2：弹出按钮组 | context category 页面 |
 | context 上下文 2 | 双空页（多页结构演示） | context2 |
 | 事件日志 | 底部追加式日志区（所有交互写入） | textBrowser |
@@ -44,7 +45,10 @@ cmake --build build
 
 ## 与 widgets 版的已知差异
 
-- **定制系统**（customize widget/XML 加载）：2.x widgets 专属，QML 版暂无。
+- **定制对话框按稳定字符串 key 寻址**：widgets 版靠 `QAction*` 指针 + `objectName`，
+  QML 版没有 action 桥（plan-04 D8 延后项），改用 `RibbonActionRegistry` 生成的
+  key 加宿主树查询 API。记录层与 XML 格式两端共用 core 实现，故 widgets 写出的
+  配置文件 QML 能直接加载并 apply，反之亦然。快速访问栏的用户勾选定制仍缺。
 - **无边框窗口**：示例使用普通 ApplicationWindow（QML 无边框为独立主题）。
 - **菜单内嵌任意控件**（`SARibbonMenu::addWidget`）：QML 版菜单只渲染 RibbonMenuItem 行。
 - **颜色菜单不含取色对话框**：`RibbonColorMenu` 的"自定义颜色"行只发
@@ -85,3 +89,15 @@ cmake --build build
 无菜单时 Large 宽度不变而 Small 收窄、图标槽仍保留）、
 色带与填充色的实际渲染色、以及点击分区（动作区触发 `colorClicked` 不弹菜单、
 箭头区弹菜单、菜单内选色/选无颜色、`NoColorMenu` 与 `WithColorMenu` 来回切换）。
+
+`tests/qml/tst_customize_qml.cpp`（12 用例）覆盖定制系统：注册表从声明式宿主树
+自动收集（tag 划分、tag 名跟随改名、搜索、key↔item 双向解析、命令模板与可定制
+标记）、目录模型按 tag/搜索词收窄且每行 role 满 key、记录经 core `simplify` 的
+合并规则与 widgets 一致、apply 真的改动宿主树而 reverse 按 widgets
+`sa_customize_datas_reverse` 的表恢复（含 Remove*/Rename* 无逆操作这一不对称性）、
+`enforceCanCustomize` 闸门、XML 往返一致与**跨前端兼容**（widgets
+`sa_customize_datas_to_xml` 的字节流 QML 能直接 apply，QML `appliedToXml` 的字节流
+widgets 能逐字段读回）、树模型的三档显示范围与上下文页方括号标题、影子树预览
+（预览期间真树一根手指都不动，`revision` 让行数不变的复位也能刷新按钮态），
+以及对话框用真实鼠标点击走完"选范围 → 改名 → 加命令 → 调序 → 显隐 → 确定/取消"
+全流程（选中行按地址跟随被移动的节点，而不是停在旧行号上）。

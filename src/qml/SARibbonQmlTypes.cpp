@@ -25,6 +25,7 @@
 #include "customize/RibbonActionRegistry.h"
 #include "customize/RibbonActionRegistryModel.h"
 #include "customize/RibbonCustomizer.h"
+#include "customize/RibbonCustomizeTreeModel.h"
 #include <QQmlEngine>
 #include <QQmlContext>
 #include <QQmlComponent>
@@ -154,6 +155,7 @@ void saRibbonRegisterQmlTypes(QQmlEngine* engine)
     qmlRegisterType< SARibbonQml::RibbonActionRegistry >("SARibbon", 3, 0, "RibbonActionRegistry");
     qmlRegisterType< SARibbonQml::RibbonActionRegistryModel >("SARibbon", 3, 0, "RibbonActionRegistryModel");
     qmlRegisterType< SARibbonQml::RibbonCustomizer >("SARibbon", 3, 0, "RibbonCustomizer");
+    qmlRegisterType< SARibbonQml::RibbonCustomizeTreeModel >("SARibbon", 3, 0, "RibbonCustomizeTreeModel");
     // shared host bases: reachable from QML only through their subclasses,
     // registered for tooling/metaobject access (not creatable from QML)
     qmlRegisterUncreatableType< SARibbonQml::RibbonQuickHost >("SARibbon", 3, 0, "RibbonQuickHost", "Base class only");

@@ -170,6 +170,11 @@ int RibbonCustomizer::recordCount() const
     return mRecords.size();
 }
 
+const QList< RibbonCustomizer::Record >& RibbonCustomizer::pendingRecords() const
+{
+    return mRecords;
+}
+
 /**
  * \if ENGLISH
  * @brief Publish one pending record as a full-key map

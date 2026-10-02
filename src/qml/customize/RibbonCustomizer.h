@@ -106,6 +106,9 @@ public:
 
     // Pending record list access
     int recordCount() const;
+    // Pending records in C++ shape: the customize tree model replays them into
+    // its preview, which a QVariant round trip would only slow down
+    const QList< Record >& pendingRecords() const;
     Q_INVOKABLE QVariantMap recordInfo(int index) const;
     Q_INVOKABLE QVariantList recordInfoList() const;
     // Drop the pending records (applied ones are untouched)
