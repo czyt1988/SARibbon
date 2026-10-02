@@ -41,6 +41,7 @@ private Q_SLOTS:
     void toolButtonClick();
     void svgIconLoads();
     void toolButtonPopupStates();
+    void menuCheckableShortcutAndSubmenu();
     void controlContainerEmbedding();
     void contextCategoryActivation();
     void galleryInPanel();
@@ -572,6 +573,248 @@ Item {
     const QRectF delayMenu   = delayedBtn->property("menuRect").toRectF();
     QVERIFY(delayMenu.width() <= 0);
     QVERIFY(qFuzzyCompare(delayAction.width(), qreal(delayedBtn->width())));
+}
+
+/**
+ * @brief Menu entries: check marks, shortcut captions and nested submenus
+ * @details Mirrors what QAction hands the widgets SARibbonMenu for free
+ *          (setCheckable / setShortcut / addRibbonMenu). Activation is
+ *          addressed by index path, so the host stays the only place that
+ *          knows the tree; a checkable entry flips BEFORE menuTriggered fires
+ *          (QAction::trigger ordering) and separators, disabled entries and
+ *          malformed paths are refused silently. On the leaf the shared
+ *          RibbonMenu renders a reserved mark column, a right-aligned
+ *          shortcut caption and a hover-opened submenu popup.
+ */
+void TestConformanceQml::menuCheckableShortcutAndSubmenu()
+{
+    QQmlEngine engine;
+    saRibbonRegisterQmlTypes(&engine);
+
+    QString src = QStringLiteral(R"QML(import QtQuick 2.12
+import SARibbon 3.0
+Item {
+    width: 600
+    height: 300
+    RibbonPanel {
+        objectName: "panel"
+        anchors.fill: parent
+        panelTitle: "P"
+        RibbonToolButton {
+            objectName: "menuBtn"
+            text: "Menu"
+            proportion: Ribbon.Small
+            popupMode: Ribbon.MenuButtonPopup
+            menuItems: [
+                RibbonMenuItem { objectName: "boldItem"; text: "Bold"; checkable: true },
+                RibbonMenuItem { objectName: "saveItem"; text: "Save"; shortcut: "Ctrl+S" },
+                RibbonMenuItem {
+                    objectName: "recentItem"
+                    text: "Recent"
+                    submenu: [
+                        RibbonMenuItem { objectName: "doc1Item"; text: "doc1" },
+                        RibbonMenuItem { objectName: "doc2Item"; text: "doc2"; checkable: true; checked: true }
+                    ]
+                }
+            ]
+        }
+    }
+}
+)QML");
+
+    QQmlComponent component(&engine);
+    std::unique_ptr< QQuickView > view(exposeScene(engine, component, src.toUtf8().constData(), 600, 300));
+    QVERIFY(view);
+    QQuickItem* rootItem = view->rootObject();
+    QVERIFY(rootItem);
+
+    auto* menuBtn = rootItem->findChild< QQuickItem* >(QStringLiteral("menuBtn"));
+    QVERIFY(menuBtn);
+    QTRY_VERIFY(menuBtn->width() > 0 && menuBtn->height() > 0);
+    auto* boldItem   = rootItem->findChild< SARibbonQml::RibbonMenuItem* >(QStringLiteral("boldItem"));
+    auto* saveItem   = rootItem->findChild< SARibbonQml::RibbonMenuItem* >(QStringLiteral("saveItem"));
+    auto* recentItem = rootItem->findChild< SARibbonQml::RibbonMenuItem* >(QStringLiteral("recentItem"));
+    auto* doc2Item   = rootItem->findChild< SARibbonQml::RibbonMenuItem* >(QStringLiteral("doc2Item"));
+    QVERIFY(boldItem && saveItem && recentItem && doc2Item);
+
+    // ---- declarative model ----
+    QVERIFY(boldItem->isCheckable());
+    QVERIFY(!boldItem->isChecked());
+    QCOMPARE(saveItem->shortcut(), QStringLiteral("Ctrl+S"));
+    QCOMPARE(recentItem->submenuCount(), 2);
+    QVERIFY(recentItem->hasSubmenu());
+    QVERIFY(!saveItem->hasSubmenu());
+    QCOMPARE(recentItem->submenuItemAt(1), doc2Item);
+    QVERIFY(doc2Item->isChecked());
+
+    // ---- a checkable entry flips before menuTriggered reaches the caller ----
+    QSignalSpy menuSpy(menuBtn, SIGNAL(menuTriggered(SARibbonQml::RibbonMenuItem*)));
+    QSignalSpy toggledSpy(boldItem, SIGNAL(toggled(bool)));
+    QSignalSpy triggeredSpy(boldItem, SIGNAL(triggered()));
+    bool checkedAtTrigger = false;
+    auto* btnHost = qobject_cast< SARibbonQml::RibbonToolButton* >(menuBtn);
+    QVERIFY(btnHost);
+    QObject::connect(btnHost, &SARibbonQml::RibbonToolButton::menuTriggered, this,
+                     [&](SARibbonQml::RibbonMenuItem* it) { checkedAtTrigger = (it == boldItem) ? it->isChecked() : checkedAtTrigger; });
+    QVariantList path;
+    path << 0;
+    QMetaObject::invokeMethod(menuBtn, "activateMenuItemPath", Q_ARG(QVariantList, path));
+    QCOMPARE(menuSpy.size(), 1);
+    QCOMPARE(qvariant_cast< QObject* >(menuSpy.at(0).at(0)), static_cast< QObject* >(boldItem));
+    QCOMPARE(boldItem->isChecked(), true);
+    QVERIFY(checkedAtTrigger);
+    QCOMPARE(toggledSpy.size(), 1);
+    QCOMPARE(toggledSpy.at(0).at(0).toBool(), true);
+    QCOMPARE(triggeredSpy.size(), 1);
+    // activating again flips it back (QAction toggle semantics)
+    QMetaObject::invokeMethod(menuBtn, "activateMenuItemPath", Q_ARG(QVariantList, path));
+    QCOMPARE(menuSpy.size(), 2);
+    QCOMPARE(boldItem->isChecked(), false);
+    QCOMPARE(toggledSpy.size(), 2);
+
+    // ---- the flat invokable is the one-element path ----
+    QMetaObject::invokeMethod(menuBtn, "activateMenuItem", Q_ARG(int, 0));
+    QCOMPARE(menuSpy.size(), 3);
+    QCOMPARE(boldItem->isChecked(), true);
+    // clearing checkable clears the mark (QAction parity)
+    boldItem->setCheckable(false);
+    QVERIFY(!boldItem->isChecked());
+    boldItem->setCheckable(true);
+
+    // ---- nested entries are addressed by path; bad paths are refused ----
+    const int before = menuSpy.size();
+    QVariantList docPath;
+    docPath << 2 << 1;
+    QMetaObject::invokeMethod(menuBtn, "activateMenuItemPath", Q_ARG(QVariantList, docPath));
+    QCOMPARE(menuSpy.size(), before + 1);
+    QCOMPARE(qvariant_cast< QObject* >(menuSpy.at(before).at(0)), static_cast< QObject* >(doc2Item));
+    // the second submenu entry was declared checked, so activating clears it
+    QCOMPARE(doc2Item->isChecked(), false);
+    for (const QVariantList& bad : { QVariantList{ 2, 9 }, QVariantList{ 9 }, QVariantList{ 0, 0 }, QVariantList(), QVariantList{ QStringLiteral("x") } }) {
+        QMetaObject::invokeMethod(menuBtn, "activateMenuItemPath", Q_ARG(QVariantList, bad));
+        QCOMPARE(menuSpy.size(), before + 1);
+    }
+    // the flat invokable only reaches the top level
+    QMetaObject::invokeMethod(menuBtn, "activateMenuItem", Q_ARG(int, 2));
+    QCOMPARE(menuSpy.size(), before + 2);
+    QCOMPARE(qvariant_cast< QObject* >(menuSpy.at(before + 1).at(0)), static_cast< QObject* >(recentItem));
+
+    // ---- leaf: three top-level rows, mark column reserved, shortcut drawn ----
+    QVERIFY(!menuBtn->property("menuVisible").toBool());
+    QMetaObject::invokeMethod(menuBtn, "openMenu");
+    QTRY_COMPARE(menuBtn->property("menuVisible").toBool(), true);
+
+    // Repeater delegates carry no QObject parent: walk the item tree (NOTES B50)
+    std::function< void(QQuickItem*, const QString&, QList< QQuickItem* >*) > collectNamed
+        = [&collectNamed](QQuickItem* from, const QString& name, QList< QQuickItem* >* out) {
+        if (from->objectName() == name) {
+            out->append(from);
+        }
+        const QList< QQuickItem* > kids = from->childItems();
+        for (QQuickItem* kid : kids) {
+            collectNamed(kid, name, out);
+        }
+    };
+    auto rowTexts = [](QQuickItem* row) {
+        QList< QQuickItem* > all;
+        collectVisualItems(row, &all);
+        QStringList out;
+        for (QQuickItem* it : all) {
+            if (it->metaObject()->className() == QByteArrayLiteral("QQuickText")) {
+                out << it->property("text").toString();
+            }
+        }
+        return out;
+    };
+    auto captionX = [](QQuickItem* row) {
+        QList< QQuickItem* > all;
+        collectVisualItems(row, &all);
+        for (QQuickItem* it : all) {
+            if (it->metaObject()->className() == QByteArrayLiteral("QQuickText")) {
+                return it->mapToItem(row, QPointF(0, 0)).x();
+            }
+        }
+        return qreal(-1);
+    };
+    auto visibleRowCount = [&collectNamed, &view]() {
+        QList< QQuickItem* > all;
+        collectNamed(view->contentItem(), QStringLiteral("menuRow"), &all);
+        int n = 0;
+        for (QQuickItem* r : all) {
+            if (r->isVisible()) {
+                ++n;
+            }
+        }
+        return n;
+    };
+
+    // restore the mark the path activation above cleared, so the leaf section
+    // asserts the checked rendering
+    doc2Item->setChecked(true);
+
+    QList< QQuickItem* > rows;
+    collectNamed(view->contentItem(), QStringLiteral("menuRow"), &rows);
+    QCOMPARE(rows.size(), 3);
+    QCOMPARE(rowTexts(rows.at(0)).first(), QStringLiteral("Bold"));
+    QVERIFY(rowTexts(rows.at(1)).contains(QStringLiteral("Ctrl+S")));
+    // every row reserves the mark column as soon as one entry is checkable,
+    // which is what keeps the captions aligned in a mixed menu
+    QVERIFY(captionX(rows.at(0)) > 10);
+    QCOMPARE(captionX(rows.at(0)), captionX(rows.at(1)));
+    // the tick of an unchecked entry exists but is not painted
+    {
+        QList< QQuickItem* > marks;
+        collectVisualItems(rows.at(1), &marks);
+        bool canvasFound = false;
+        for (QQuickItem* it : marks) {
+            // a Canvas carrying a custom property becomes a composite type
+            // (QQuickCanvasItem_QML_n), so match on the prefix
+            if (QByteArray(it->metaObject()->className()).startsWith("QQuickCanvasItem")) {
+                canvasFound = true;
+                QVERIFY(!it->isVisible());
+            }
+        }
+        QVERIFY(canvasFound);
+    }
+
+    // ---- hovering the submenu row opens a sibling popup with its own rows ----
+    const QPointF recentCenter = rows.at(2)->mapToScene(QPointF(rows.at(2)->width() / 2, rows.at(2)->height() / 2));
+    QTest::mouseMove(view.get(), recentCenter.toPoint());
+    // 3 top-level rows + 2 submenu rows (the nested popup rides the same
+    // window overlay, so both levels are reachable from contentItem)
+    QTRY_COMPARE(visibleRowCount(), 5);
+    QList< QQuickItem* > allRows;
+    collectNamed(view->contentItem(), QStringLiteral("menuRow"), &allRows);
+    QQuickItem* doc2Row = nullptr;
+    for (QQuickItem* r : allRows) {
+        if (r->isVisible() && rowTexts(r).first() == QStringLiteral("doc2")) {
+            doc2Row = r;
+        }
+    }
+    QVERIFY(doc2Row);
+    // the checked submenu entry paints its tick
+    {
+        QList< QQuickItem* > kids;
+        collectVisualItems(doc2Row, &kids);
+        bool tickVisible = false;
+        for (QQuickItem* it : kids) {
+            if (QByteArray(it->metaObject()->className()).startsWith("QQuickCanvasItem") && it->isVisible()) {
+                tickVisible = true;
+            }
+        }
+        QVERIFY(tickVisible);
+    }
+
+    // ---- clicking the submenu entry activates through the path and closes all ----
+    const int beforeSub = menuSpy.size();
+    const QPointF doc2Center = doc2Row->mapToScene(QPointF(doc2Row->width() / 2, doc2Row->height() / 2));
+    QTest::mouseClick(view.get(), Qt::LeftButton, Qt::NoModifier, doc2Center.toPoint());
+    QTRY_COMPARE(menuSpy.size(), beforeSub + 1);
+    QCOMPARE(qvariant_cast< QObject* >(menuSpy.at(beforeSub).at(0)), static_cast< QObject* >(doc2Item));
+    QCOMPARE(doc2Item->isChecked(), false);
+    // the host closed the button popup and the menu tore its submenu down
+    QTRY_COMPARE(menuBtn->property("menuVisible").toBool(), false);
+    QTRY_COMPARE(visibleRowCount(), 0);
 }
 
 /**

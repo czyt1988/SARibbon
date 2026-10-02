@@ -186,81 +186,25 @@ Rectangle {
             onClosed: if (root.appWindowItem) root.appWindowItem.popupVisible = false
         }
     }
+    // ---- application menu (shared RibbonMenu leaf) ----
+    // Same rendering as the button popup; rows are a touch taller/wider to
+    // match the widgets application menu. The popup stays inside the lazy
+    // Loader and closes itself after an activation reaches the host.
     Component {
         id: appMenuComponent
-        Popup {
+        RibbonMenu {
             id: appMenu
             x: root.appRect.x
             y: root.appRect.y + root.appRect.height
-            width: appMenuColumn.implicitWidth + 2
-            height: appMenuColumn.implicitHeight + 2
-            padding: 1
-            closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-            background: Rectangle {
-                color: RibbonTheme.contentBg
-                border.color: RibbonTheme.menuBorder
-                radius: 4
-            }
-            contentItem: Column {
-                id: appMenuColumn
-                Repeater {
-                    model: root.cppHost ? root.cppHost.applicationMenuItems : []
-                    Item {
-                        objectName: modelData.separator ? "appMenuSeparator" : "appMenuRow"
-                        width: Math.max(160, appRowText.implicitWidth + appRowIcon.width + 30)
-                        height: modelData.separator ? 9 : 26
-                        enabled: modelData.enabled
-                        Rectangle {
-                            visible: modelData.separator
-                            anchors.centerIn: parent
-                            width: parent.width - 8
-                            height: 1
-                            color: RibbonTheme.separator
-                        }
-                        Rectangle {
-                            visible: !modelData.separator
-                            anchors.fill: parent
-                            anchors.margins: 1
-                            radius: 3
-                            color: appRowMouse.pressed ? RibbonTheme.contentPressedBg
-                                   : (appRowMouse.containsMouse ? RibbonTheme.contentHoverBg : RibbonTheme.contentBg)
-                        }
-                        Row {
-                            visible: !modelData.separator
-                            anchors.verticalCenter: parent.verticalCenter
-                            anchors.left: parent.left
-                            anchors.leftMargin: 6
-                            spacing: 4
-                            Image {
-                                id: appRowIcon
-                                anchors.verticalCenter: parent.verticalCenter
-                                width: modelData.iconSource ? 16 : 0
-                                height: 16
-                                source: modelData.iconSource
-                                fillMode: Image.PreserveAspectFit
-                                opacity: modelData.enabled ? 1.0 : 0.45
-                            }
-                            Text {
-                                id: appRowText
-                                anchors.verticalCenter: parent.verticalCenter
-                                text: modelData.text
-                                color: RibbonTheme.textColor
-                                opacity: modelData.enabled ? 1.0 : 0.45
-                            }
-                        }
-                        MouseArea {
-                            id: appRowMouse
-                            visible: !modelData.separator
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            enabled: modelData.enabled
-                            onClicked: {
-                                root.cppHost.activateApplicationMenuItem(index);
-                                appMenu.close();
-                            }
-                        }
-                    }
-                }
+            menuModel: root.cppHost ? root.cppHost.applicationMenuItems : []
+            namePrefix: "appMenu"
+            rowHeight: 26
+            minRowWidth: 160
+            onItemActivated: {
+                // positional read: a var signal parameter is not injected as a
+                // named handler argument
+                root.cppHost.activateApplicationMenuItemPath(arguments[0]);
+                appMenu.close();
             }
         }
     }

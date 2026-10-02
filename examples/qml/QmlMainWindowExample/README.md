@@ -18,8 +18,8 @@ cmake --build build
 | 区域 | 功能 | 对应 widgets |
 |------|------|--------------|
 | 应用按钮 | 自定义应用窗口（列表 + Cancel + Esc 关闭，**点击优先级高于菜单**） | ApplicationWidget 模式 |
-| 应用按钮 | 菜单模式（test1-3 + 分隔符，声明 RibbonApplicationWindow 后自动让位） | USE_APPLICATION_NORMAL_MENU |
-| 快速访问栏 | Save/Undo/Redo + InstantPopup 菜单按钮（标题行应用按钮之后） | SARibbonQuickAccessBar |
+| 应用按钮 | 菜单模式（test1-3 + 分隔符 + 可勾选项/快捷键文本/多级子菜单，声明 RibbonApplicationWindow 后自动让位） | USE_APPLICATION_NORMAL_MENU |
+| 快速访问栏 | Save/Undo/Redo + InstantPopup 菜单按钮（标题行应用按钮之后，菜单内含二级子菜单） | SARibbonQuickAccessBar |
 | 右侧按钮组 | Help/Visible（系统按钮区前右对齐） | SARibbonButtonGroupWidget |
 | ribbon style 面板 | 6 种样式单选（Loose/Compact × 3/2/1 行，样式传播到全部面板与按钮） | 6 个 QRadioButton |
 | ribbon style 面板 | 主题 8 项下拉（Windows7/2013/2016/2021×3/Dark×2） | RibbonTheme QComboBox |
@@ -44,13 +44,17 @@ cmake --build build
 
 - **定制系统**（customize widget/XML 加载）：2.x widgets 专属，QML 版暂无。
 - **无边框窗口**：示例使用普通 ApplicationWindow（QML 无边框为独立主题）。
+- **菜单内嵌任意控件**（`SARibbonMenu::addWidget`）：QML 版菜单只渲染 RibbonMenuItem 行。
+- **菜单项 shortcut 仅为展示文本**：右对齐绘制在行尾，真正的按键绑定依赖
+  QAction 抽象桥（plan-04 D8 延后项），故不会响应键盘。
 - 面板 optionAction 已恢复完整（引擎预留 + 对角按钮渲染 + 触发信号，
   Debug/Release 双验证；早期 Qt 6.7.3 Debug 绑定形状问题见 NOTES B48）。
 
 ## 一致性测试
 
-`tests/qml/tst_conformance_qml.cpp`（19 用例）与示例同步维护：
+`tests/qml/tst_conformance_qml.cpp`（18 用例）与示例同步维护：
 面板装箱黄金几何、tab 切换、按钮点击/弹出/禁用、控件嵌入、上下文标签、画廊、
 六样式传播、分隔符、快速访问栏/右组、对齐/最小模式、RTL、optionAction、应用窗口、
+菜单勾选/快捷键/多级子菜单（索引路径寻址 + 叶子渲染断言）、
 主题自定义（键色覆盖 + 派生 token 重算 + JSON/文件加载 + `RibbonThemeUserDefine`
 保持自定义调色板 + 系统暗色开关桥接，并用 grabWindow 断言渲染色真的变了）。

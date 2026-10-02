@@ -2,6 +2,7 @@
 <RCC version="1.0">
     <qresource prefix="/SARibbon">
         <file>RibbonPanel.qml</file>
+        <file>RibbonMenu.qml</file>
         <file>RibbonToolButton.qml</file>
         <file>RibbonBar.qml</file>
         <file>RibbonTab.qml</file>

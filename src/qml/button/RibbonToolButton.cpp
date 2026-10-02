@@ -440,10 +440,39 @@ void RibbonToolButton::closeMenu()
 
 void RibbonToolButton::activateMenuItem(int index)
 {
-    RibbonMenuItem* item = menuItemAt(index);
+    QVariantList path;
+    path.append(index);
+    activateMenuItemPath(path);
+}
+
+/**
+ * \if ENGLISH
+ * @brief Activate the entry an index path addresses
+ * @details The leaf hands over a path instead of an item pointer: the host
+ *          stays the only place that knows the menu tree (widgets side knows it
+ *          through QAction parenting). A checkable entry flips its own state
+ *          before menuTriggered fires, so a handler observes the new checked
+ *          value — QAction::trigger ordering. Separators, disabled entries and
+ *          bad paths are refused silently, and a successful activation closes
+ *          the popup exactly like the flat index overload always did.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 激活索引路径指向的菜单项
+ * @details 叶子交上来的是路径而不是菜单项指针：认识整棵菜单树的地方仍然只有宿主
+ *          一个（widgets 侧靠 QAction 父子关系认识它）。可勾选的菜单项在
+ *          menuTriggered 之前翻转自身状态，因此槽函数看到的是新的 checked 值——
+ *          与 QAction::trigger 的顺序一致。分隔符、禁用项与非法路径一律静默拒绝；
+ *          激活成功后关闭弹窗，与一直以来的单下标重载行为相同。
+ * \endif
+ */
+void RibbonToolButton::activateMenuItemPath(const QVariantList& indexPath)
+{
+    RibbonMenuItem* item = RibbonMenuItem::resolvePath(mMenuItems, indexPath);
     if (!item || !item->isEnabled() || item->isSeparator()) {
         return;
     }
+    item->activate();
     Q_EMIT menuTriggered(item);
     closeMenu();
 }

@@ -519,10 +519,36 @@ bool RibbonBar::hasApplicationMenu() const
 
 void RibbonBar::activateApplicationMenuItem(int index)
 {
-    RibbonMenuItem* item = applicationMenuItemAt(index);
+    QVariantList path;
+    path.append(index);
+    activateApplicationMenuItemPath(path);
+}
+
+/**
+ * \if ENGLISH
+ * @brief Activate the application menu entry an index path addresses
+ * @details Same contract as RibbonToolButton::activateMenuItemPath (checkable
+ *          entries flip before applicationMenuTriggered fires, separators and
+ *          disabled entries are refused). Unlike the button the bar does NOT
+ *          close the popup here: the application menu leaf owns that decision,
+ *          which is why the leaf closes it right after the call.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 激活索引路径指向的应用菜单项
+ * @details 契约与 RibbonToolButton::activateMenuItemPath 相同（可勾选的菜单项在
+ *          applicationMenuTriggered 之前翻转，分隔符与禁用项被拒绝）。与按钮不同的
+ *          是这里不关闭弹窗：应用菜单的关闭决定权在叶子手里，所以叶子在调用之后
+ *          自行关闭。
+ * \endif
+ */
+void RibbonBar::activateApplicationMenuItemPath(const QVariantList& indexPath)
+{
+    RibbonMenuItem* item = RibbonMenuItem::resolvePath(mAppMenuItems, indexPath);
     if (!item || !item->isEnabled() || item->isSeparator()) {
         return;
     }
+    item->activate();
     Q_EMIT applicationMenuTriggered(item);
 }
 

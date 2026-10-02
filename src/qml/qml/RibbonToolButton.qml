@@ -13,9 +13,11 @@ import SARibbon 3.0
 // States follow the office-2021 QSS (radius 4): normal content-bg, hover
 // content-hover-bg, pressed/checked content-pressed-bg (checked adds a 1px
 // text-color border). A disabled host greys the content (opacity) and both
-// zones swallow input. The popup is a theme-token-styled Popup with
-// RibbonMenuItem rows; activation goes through the host's activateMenuItem
-// invokable (logic stays in the C++ host, rendering here).
+// zones swallow input. The popup itself is the shared RibbonMenu leaf: it
+// renders RibbonMenuItem rows (check marks, shortcuts, nested submenus) and
+// publishes an index path per activation, which this leaf forwards to the
+// host's activateMenuItemPath invokable (logic stays in the C++ host,
+// rendering in RibbonMenu.qml).
 Rectangle {
     id: root
 
@@ -233,81 +235,22 @@ Rectangle {
         onClicked: root.cppHost.openMenu()
     }
 
-    // ---- styled popup (theme tokens only) ----
-    Popup {
+    // ---- styled popup (shared RibbonMenu leaf, theme tokens only) ----
+    // The menu rendering lives in RibbonMenu.qml so the bar application menu
+    // and every nested submenu look identical; this leaf keeps the open/close
+    // entry points the C++ host invokes and mirrors the visibility back so
+    // menuVisible stays the single source of truth for tests.
+    RibbonMenu {
         id: popupMenu
-        y: root.height
         x: 0
-        width: menuColumn.implicitWidth + 2
-        height: menuColumn.implicitHeight + 2
-        padding: 1
-        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
-        background: Rectangle {
-            color: RibbonTheme.contentBg
-            border.color: RibbonTheme.menuBorder
-            radius: 4
-        }
-        contentItem: Column {
-            id: menuColumn
-            Repeater {
-                model: root.cppHost ? root.cppHost.menuItems : []
-                Item {
-                    // test reachability: rows are findable by objectName
-                    objectName: modelData.separator ? "menuSeparator" : "menuRow"
-                    width: Math.max(140, rowText.implicitWidth + rowIcon.width + 30)
-                    height: modelData.separator ? 9 : 24
-                    enabled: modelData.enabled
-                    // separator entry
-                    Rectangle {
-                        visible: modelData.separator
-                        anchors.centerIn: parent
-                        width: parent.width - 8
-                        height: 1
-                        color: RibbonTheme.separator
-                    }
-                    // normal entry
-                    Rectangle {
-                        visible: !modelData.separator
-                        anchors.fill: parent
-                        anchors.margins: 1
-                        radius: 3
-                        color: rowMouse.pressed ? RibbonTheme.contentPressedBg
-                               : (rowMouse.containsMouse ? RibbonTheme.contentHoverBg : RibbonTheme.contentBg)
-                    }
-                    Row {
-                        visible: !modelData.separator
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.left: parent.left
-                        anchors.leftMargin: 6
-                        spacing: 4
-                        Image {
-                            id: rowIcon
-                            anchors.verticalCenter: parent.verticalCenter
-                            width: modelData.iconSource ? 16 : 0
-                            height: 16
-                            source: modelData.iconSource
-                            fillMode: Image.PreserveAspectFit
-                            opacity: modelData.enabled ? 1.0 : 0.45
-                        }
-                        Text {
-                            id: rowText
-                            anchors.verticalCenter: parent.verticalCenter
-                            text: modelData.text
-                            color: RibbonTheme.textColor
-                            opacity: modelData.enabled ? 1.0 : 0.45
-                        }
-                    }
-                    MouseArea {
-                        id: rowMouse
-                        visible: !modelData.separator
-                        anchors.fill: parent
-                        hoverEnabled: true
-                        enabled: modelData.enabled
-                        onClicked: root.cppHost.activateMenuItem(index)
-                    }
-                }
-            }
-        }
+        y: root.height
+        menuModel: root.cppHost ? root.cppHost.menuItems : []
+        namePrefix: "menu"
+        rowHeight: 24
+        minRowWidth: 140
+        // the path arrives as a var signal parameter, which Qt does not inject
+        // as a named handler argument — read it positionally instead
+        onItemActivated: root.cppHost.activateMenuItemPath(arguments[0])
         onOpened: if (root.cppHost) root.cppHost.menuVisible = true
         onClosed: if (root.cppHost) root.cppHost.menuVisible = false
     }

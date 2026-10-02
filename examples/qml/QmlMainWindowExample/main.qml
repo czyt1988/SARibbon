@@ -74,9 +74,23 @@ ApplicationWindow {
             RibbonMenuItem { text: qsTr("test 1"); iconSource: "qrc:/icon/icon/action.svg" },
             RibbonMenuItem { text: qsTr("test 2"); iconSource: "qrc:/icon/icon/action2.svg" },
             RibbonMenuItem { separator: true },
+            RibbonMenuItem { text: qsTr("Auto save"); checkable: true; checked: true; shortcut: "Ctrl+Shift+S" },
+            RibbonMenuItem { text: qsTr("Save as..."); shortcut: "Ctrl+Shift+P" },
+            RibbonMenuItem {
+                text: qsTr("Recent files")
+                submenu: [
+                    RibbonMenuItem { text: qsTr("demo-1.saribbon"); iconSource: "qrc:/icon/icon/file.svg" },
+                    RibbonMenuItem { text: qsTr("demo-2.saribbon"); iconSource: "qrc:/icon/icon/file.svg" },
+                    RibbonMenuItem { separator: true },
+                    RibbonMenuItem { text: qsTr("Read only"); checkable: true }
+                ]
+            },
+            RibbonMenuItem { separator: true },
             RibbonMenuItem { text: qsTr("test 3"); iconSource: "qrc:/icon/icon/action3.svg" }
         ]
-        onApplicationMenuTriggered: log(qsTr("application menu: %1").arg(item.text))
+        onApplicationMenuTriggered: log(qsTr("application menu: %1%2")
+                                        .arg(item.text)
+                                        .arg(item.checkable ? (item.checked ? " [on]" : " [off]") : ""))
 
         // quick access bar (widgets quick access parity): small buttons on
         // the title row after the application button
@@ -106,7 +120,14 @@ ApplicationWindow {
                 popupMode: Ribbon.InstantPopup
                 menuItems: [
                     RibbonMenuItem { text: qsTr("file 1-1"); iconSource: "qrc:/icon/icon/item.svg" },
-                    RibbonMenuItem { text: qsTr("file 1-2"); iconSource: "qrc:/icon/icon/item.svg" }
+                    RibbonMenuItem { text: qsTr("file 1-2"); iconSource: "qrc:/icon/icon/item.svg" },
+                    RibbonMenuItem {
+                        text: qsTr("Open in")
+                        submenu: [
+                            RibbonMenuItem { text: qsTr("New window"); shortcut: "Ctrl+N" },
+                            RibbonMenuItem { text: qsTr("Preview pane"); checkable: true }
+                        ]
+                    }
                 ]
                 onMenuTriggered: log(qsTr("quick access menu: %1").arg(item.text))
             }

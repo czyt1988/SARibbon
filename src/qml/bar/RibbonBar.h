@@ -134,6 +134,7 @@ public:
     SARibbonQml::RibbonMenuItem* applicationMenuItemAt(int index) const;
     bool hasApplicationMenu() const;
     Q_INVOKABLE void activateApplicationMenuItem(int index);
+    Q_INVOKABLE void activateApplicationMenuItemPath(const QVariantList& indexPath);
 
     // Application window (widgets ApplicationWidget mode): a
     // RibbonApplicationWindow declared as a child shows below the app

@@ -192,6 +192,11 @@ public:
     // menuTriggered; disabled/separators are ignored
     Q_INVOKABLE void activateMenuItem(int index);
 
+    // Activate a nested entry by index path (the leaf publishes one path per
+    // activation, [row] for top level, [row, subrow, ...] below it); the same
+    // refusals as activateMenuItem apply at the addressed entry
+    Q_INVOKABLE void activateMenuItemPath(const QVariantList& indexPath);
+
     // ---- contract implementation (engine inputs/outputs) ----
     QSize sizeHint() const override;  // C++: core metrics derivation
 
