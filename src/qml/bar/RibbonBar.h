@@ -44,7 +44,7 @@ class RibbonApplicationWindow;
  *          点击信号，office-2021 外观）由 bar 叶子按本宿主发布的矩形渲染。
  * \endif
  */
-class RibbonBar : public RibbonQuickHost
+class SA_RIBBON_QML_EXPORT RibbonBar : public RibbonQuickHost
 {
     Q_OBJECT
     Q_PROPERTY(int currentIndex READ currentIndex WRITE setCurrentIndex NOTIFY currentIndexChanged)

@@ -22,6 +22,9 @@
 #include "appwindow/RibbonApplicationWindow.h"
 #include "tab/RibbonTab.h"
 #include "bar/RibbonBar.h"
+#include "customize/RibbonActionRegistry.h"
+#include "customize/RibbonActionRegistryModel.h"
+#include "customize/RibbonCustomizer.h"
 #include <QQmlEngine>
 #include <QQmlContext>
 #include <QQmlComponent>
@@ -145,6 +148,12 @@ void saRibbonRegisterQmlTypes(QQmlEngine* engine)
     qmlRegisterType< SARibbonQml::RibbonColorGrid >("SARibbon", 3, 0, "RibbonColorGrid");
     qmlRegisterType< SARibbonQml::RibbonColorMenu >("SARibbon", 3, 0, "RibbonColorMenu");
     qmlRegisterType< SARibbonQml::RibbonColorToolButton >("SARibbon", 3, 0, "RibbonColorToolButton");
+    // customization subsystem (widgets SARibbonActionsManager / SARibbonCustomizeWidget counterparts)
+    static_assert(SARibbonQml::RibbonActionRegistry::QuickAccessActionTag > int(SARibbon::Core::UserDefineActionTag),
+                  "QML-only quick access tag must live above the user-define tag base");
+    qmlRegisterType< SARibbonQml::RibbonActionRegistry >("SARibbon", 3, 0, "RibbonActionRegistry");
+    qmlRegisterType< SARibbonQml::RibbonActionRegistryModel >("SARibbon", 3, 0, "RibbonActionRegistryModel");
+    qmlRegisterType< SARibbonQml::RibbonCustomizer >("SARibbon", 3, 0, "RibbonCustomizer");
     // shared host bases: reachable from QML only through their subclasses,
     // registered for tooling/metaobject access (not creatable from QML)
     qmlRegisterUncreatableType< SARibbonQml::RibbonQuickHost >("SARibbon", 3, 0, "RibbonQuickHost", "Base class only");

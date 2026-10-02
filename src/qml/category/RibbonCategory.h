@@ -36,7 +36,7 @@ class RibbonPanel;
  *          `scrollButtonRects` / `scrollButtonStep`，发布给覆盖层叶子。
  * \endif
  */
-class RibbonCategory : public RibbonQuickHost
+class SA_RIBBON_QML_EXPORT RibbonCategory : public RibbonQuickHost
 {
     Q_OBJECT
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)

@@ -19,7 +19,7 @@ namespace SARibbonQml {
  *          文本/高亮状态。
  * \endif
  */
-class RibbonTab : public RibbonQuickHost
+class SA_RIBBON_QML_EXPORT RibbonTab : public RibbonQuickHost
 {
     Q_OBJECT
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
