@@ -5,11 +5,13 @@ import SARibbon 3.0
 // RibbonGallery default visual leaf. Geometry authority stays in the C++
 // host: cell size / columns / scroll row all come from the published grid
 // metrics (core calcGalleryGridCellSize), the leaf only places cells inside
-// them. Cells render the widgets IconWithWordWrapText style (icon above the
-// wrapped caption). The trailing strip carries the scroll-up / scroll-down /
-// more buttons (widgets gallery button column parity, 15px); the more button
-// opens a styled popup viewport listing every group, where a cell click
-// switches the group and activates the entry.
+// them. The caption band follows the host's captionStyle — no band (IconOnly),
+// one elided line (IconWithText) or two wrapped lines (IconWithWordWrapText) —
+// mirroring the three paint paths of the widgets
+// SARibbonGalleryGroupItemDelegate. The trailing strip carries the scroll-up /
+// scroll-down / more buttons (widgets gallery button column parity, 15px); the
+// more button opens a styled popup viewport listing every group, where a cell
+// click switches the group and activates the entry.
 // NOTE: no inline `component` syntax here — the module targets Qt 5.12.
 Rectangle {
     id: root
@@ -31,6 +33,20 @@ Rectangle {
     readonly property int captionH: cppHost ? cppHost.captionHeight : 24
     readonly property int iconW: cppHost ? cppHost.cellIconWidth : 60
     readonly property int iconH: cppHost ? cppHost.cellIconHeight : 40
+    // the caption style decides whether the cell draws a caption at all and
+    // how many lines it may use (host-published, Ribbon.GalleryCaptionStyle)
+    readonly property int captionStyle: cppHost ? cppHost.captionStyle : Ribbon.GalleryIconWithWordWrapText
+    readonly property bool drawsCaption: root.captionStyle !== Ribbon.GalleryIconOnly
+    readonly property bool wrapsCaption: root.captionStyle === Ribbon.GalleryIconWithWordWrapText
+    // current (selected) cell of the current group, -1 for none
+    readonly property int currentItemIndex: cppHost ? cppHost.currentItemIndex : -1
+
+    // how many cells currently see the pointer. Qt Quick delivers hover to the
+    // topmost hover-enabled item only, so a full-area MouseArea layered over the
+    // grid to catch "the pointer left" would swallow every cell hover instead;
+    // the cells therefore publish themselves and the host derives the leave from
+    // the count dropping back to zero
+    property int hoverCount: 0
 
     // ---- entry points the C++ host invokes ----
     function openViewport()
@@ -39,6 +55,18 @@ Rectangle {
             viewport.open();
         }
     }
+
+    // report a cell hover to the host (negative index = left the grid); the
+    // host resolves it to an entry and publishes hovered
+    function reportHover(index)
+    {
+        if (root.cppHost) {
+            root.cppHost.notifyCellHovered(index);
+        }
+    }
+
+    // no cell sees the pointer any more: clear any hover preview
+    onHoverCountChanged: if (root.hoverCount === 0) root.reportHover(-1)
 
     anchors.fill: parent
     color: RibbonTheme.contentBg
@@ -61,67 +89,103 @@ Rectangle {
                 // transiently null while the Repeater swaps models (group
                 // switch); guard every read
                 readonly property var entry: modelData
-                readonly property int col: index % root.columns
-                readonly property int row: Math.floor(index / root.columns)
+                // Every read of a same-file id is guarded and hoisted into a
+                // cell-local: during teardown the ids go null before the
+                // Repeater delegates are destroyed, and an unguarded read
+                // throws a TypeError into the binding (NOTES B48/B54). The
+                // children below therefore never read `root` / `gridArea` /
+                // `cellMouse` / `parent` themselves.
+                readonly property int columns: root ? root.columns : 1
+                readonly property int cellW: root ? root.cellW : 0
+                readonly property int cellH: root ? root.cellH : 0
+                readonly property int scrollRow: root ? root.scrollRow : 0
+                readonly property int displayRow: root ? root.displayRow : 1
+                readonly property int gridW: gridArea ? gridArea.width : 0
+                readonly property int captionH: root ? root.captionH : 0
+                readonly property int currentItemIndex: root ? root.currentItemIndex : -1
+                readonly property bool drawsCaption: root ? root.drawsCaption : false
+                readonly property bool wrapsCaption: root ? root.wrapsCaption : false
+                readonly property bool cellHovered: cellMouse ? cellMouse.containsMouse : false
+                readonly property bool cellPressed: cellMouse ? cellMouse.pressed : false
+                readonly property int col: index % Math.max(cell.columns, 1)
+                readonly property int row: Math.floor(index / Math.max(cell.columns, 1))
                 // icon box: host-derived (core calcGalleryCellMetrics), clamped to
-                // the cell area above the caption band. Held as locals so the
-                // Image/Text bindings below never read `parent` — the shape that
-                // survives teardown (NOTES B48)
-                readonly property int bodyH: Math.max(root.cellH - root.captionH - 2, 0)
-                readonly property int iconBoxW: Math.min(root.iconW, Math.max(root.cellW - 2, 0))
-                readonly property int iconBoxH: Math.min(root.iconH, cell.bodyH)
-                x: cell.col * root.cellW
-                y: (cell.row - root.scrollRow) * root.cellH
-                width: root.cellW
-                height: root.cellH
-                visible: cell.row >= root.scrollRow && cell.row < root.scrollRow + root.displayRow
-                          && cell.x + cell.width <= gridArea.width
-                enabled: cell.entry ? cell.entry.enabled : false
+                // the cell area above the caption band
+                readonly property int bodyH: Math.max(cell.cellH - cell.captionH - 2, 0)
+                readonly property int iconBoxW: Math.min(root ? root.iconW : 0, Math.max(cell.cellW - 2, 0))
+                readonly property int iconBoxH: Math.min(root ? root.iconH : 0, cell.bodyH)
+                readonly property bool isCurrent: index === cell.currentItemIndex
+                readonly property bool entryEnabled: cell.entry ? cell.entry.enabled : false
+                x: cell.col * cell.cellW
+                y: (cell.row - cell.scrollRow) * cell.cellH
+                width: cell.cellW
+                height: cell.cellH
+                visible: cell.row >= cell.scrollRow && cell.row < cell.scrollRow + cell.displayRow
+                          && cell.x + cell.width <= cell.gridW
+                enabled: cell.entryEnabled
 
                 Rectangle {
                     anchors.fill: parent
                     anchors.margins: 1
                     radius: 3
-                    color: !cell.entry || !cell.entry.enabled ? "transparent"
-                           : (cellMouse.pressed ? RibbonTheme.contentPressedBg
-                              : (cellMouse.containsMouse ? RibbonTheme.contentHoverBg : "transparent"))
+                    // the current cell keeps its selection fill under the hover
+                    // tint (widgets PE_PanelItemViewItem State_Selected parity)
+                    color: !cell.entryEnabled ? "transparent"
+                           : (cell.cellPressed ? RibbonTheme.contentPressedBg
+                              : (cell.cellHovered ? RibbonTheme.contentHoverBg
+                                 : (cell.isCurrent ? RibbonTheme.selectionBg : "transparent")))
                 }
                 Image {
                     id: cellIcon
                     // centered in the cell area above the caption band
-                    x: (root.cellW - cell.iconBoxW) / 2
+                    x: (cell.cellW - cell.iconBoxW) / 2
                     y: 1 + (cell.bodyH - cell.iconBoxH) / 2
                     width: cell.iconBoxW
                     height: cell.iconBoxH
                     source: cell.entry ? cell.entry.iconSource : ""
                     fillMode: Image.PreserveAspectFit
-                    opacity: !cell.entry || !cell.entry.enabled ? 0.45 : 1.0
+                    opacity: cell.entryEnabled ? 1.0 : 0.45
                 }
                 Text {
+                    // IconOnly reserves no band at all (host captionHeight == 0),
+                    // IconWithText draws one elided line, IconWithWordWrapText two
+                    // wrapped lines — the widgets delegate's three paint paths
+                    visible: cell.entryEnabled && cell.drawsCaption
                     x: 1
-                    y: root.cellH - root.captionH
-                    width: root.cellW - 2
-                    height: root.captionH
+                    y: cell.cellH - cell.captionH
+                    width: cell.cellW - 2
+                    height: cell.captionH
                     text: cell.entry ? cell.entry.text : ""
-                    wrapMode: Text.WordWrap
-                    maximumLineCount: 2
+                    wrapMode: cell.wrapsCaption ? Text.WordWrap : Text.NoWrap
+                    maximumLineCount: cell.wrapsCaption ? 2 : 1
                     elide: Text.ElideRight
                     horizontalAlignment: Text.AlignHCenter
                     verticalAlignment: Text.AlignTop
-                    // the band is two line spacings wide, so half of it minus the
-                    // leading is the largest size that still fits both lines
-                    font.pixelSize: Math.max(Math.floor(root.captionH / 2) - 2, 8)
+                    // WordWrap: the band is two line spacings wide, so half of it
+                    // minus the leading is the largest size that still fits both
+                    // lines. SingleLine: the whole band is one line spacing.
+                    font.pixelSize: cell.wrapsCaption ? Math.max(Math.floor(cell.captionH / 2) - 2, 8)
+                                                      : Math.max(cell.captionH - 4, 8)
                     color: RibbonTheme.textColor
-                    opacity: !cell.entry || !cell.entry.enabled ? 0.45 : 1.0
+                    opacity: 1.0
                 }
                 MouseArea {
                     id: cellMouse
                     anchors.fill: parent
                     hoverEnabled: true
-                    enabled: cell.entry && cell.entry.enabled
-                    onClicked: root.cppHost.activateItem(index)
+                    enabled: cell.entryEnabled
+                    onClicked: if (root) root.cppHost.activateItem(index)
+                    onContainsMouseChanged: {
+                        if (!root) {
+                            return;
+                        }
+                        root.hoverCount = Math.max(root.hoverCount + (containsMouse ? 1 : -1), 0);
+                        if (containsMouse) {
+                            root.reportHover(index);
+                        }
+                    }
                 }
-                ToolTip.visible: cellMouse.containsMouse && cell.entry && cell.entry.toolTip.length > 0
+                ToolTip.visible: cell.cellHovered && cell.entry && cell.entry.toolTip.length > 0
                 ToolTip.text: cell.entry ? cell.entry.toolTip : ""
                 ToolTip.delay: 400
             }

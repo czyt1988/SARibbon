@@ -44,6 +44,33 @@ Q_SIGNALS:
     void groupTitleChanged();
     void itemsChanged();
 
+    /**
+     * \if ENGLISH
+     * @brief The pointer entered one of this group's cells
+     * @param item The hovered entry, nullptr when the pointer left the grid
+     * @param index Its index in this group, -1 when the pointer left
+     * @details Counterpart of the widgets SARibbonGalleryGroup::hovered
+     *          (QActionGroup::hovered). A group is pure model data here and
+     *          owns no view, so the gallery host emits this on the group's
+     *          behalf while it forwards the same event as its own hovered —
+     *          the widgets direction (group emits, gallery forwards) is
+     *          inverted, but both signals fire, so either connection point
+     *          works. Only the CURRENT group reports hover.
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 指针进入本组的某个单元
+     * @param item 被悬停的条目；指针离开网格时为 nullptr
+     * @param index 其在本组中的下标；指针离开网格时为 -1
+     * @details 对应 widgets 的 SARibbonGalleryGroup::hovered（即
+     *          QActionGroup::hovered）。这里的组是纯模型数据、不持有视图，因此
+     *          由画廊宿主代它发出本信号，同时宿主也发出自己的 hovered 转发同一
+     *          事件——widgets 的方向（组发、画廊转发）被反转，但两个信号都会发，
+     *          连接哪一侧都能收到。只有**当前组**会上报悬停。
+     * \endif
+     */
+    void hovered(SARibbonQml::RibbonGalleryItem* item, int index);
+
 private:
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     using ListIndex = qsizetype;

@@ -45,6 +45,7 @@ private Q_SLOTS:
     void controlContainerEmbedding();
     void contextCategoryActivation();
     void galleryInPanel();
+    void galleryCaptionStylesHoverAndSelectable();
     void ribbonStyleSwitching();
     void styleRadioViaContainer();
     void separatorInPanel();
@@ -1213,6 +1214,277 @@ Item {
         }
     }
     QVERIFY2(ink > 300, "gallery grid must render visible content (items + strip + frame)");
+}
+
+/**
+ * @brief Gallery caption styles, hover reporting and the selectable flag
+ * @details The three captionStyle values are the QML face of the widgets
+ *          SARibbonGalleryGroup::GalleryGroupStyle and must reach the very same
+ *          core SA::calcGalleryCellMetrics branch the widgets group feeds
+ *          setIconSize with — the leaf then mirrors the style into its two
+ *          rendering switches (caption drawn at all / one elided line vs two
+ *          wrapped lines), which is the delegate's three paint paths. Hover is
+ *          reported cell-wise by the leaf and resolved by the host, publishing
+ *          on both the gallery and the owning group; leaving the grid publishes
+ *          the nullptr/-1 pair. selectable gates becoming current (widgets
+ *          Qt::ItemIsSelectable) but never activation.
+ */
+void TestConformanceQml::galleryCaptionStylesHoverAndSelectable()
+{
+    QQmlEngine engine;
+    saRibbonRegisterQmlTypes(&engine);
+
+    QString src = QStringLiteral(R"QML(import QtQuick 2.12
+import SARibbon 3.0
+RibbonGallery {
+    objectName: "gallery"
+    width: 600
+    height: 120
+    RibbonGalleryGroup {
+        objectName: "group0"
+        groupTitle: "Styles"
+        RibbonGalleryItem { objectName: "it0"; text: "alpha" }
+        RibbonGalleryItem { objectName: "it1"; text: "beta" }
+        RibbonGalleryItem { objectName: "it2"; text: "gamma"; selectable: false }
+        RibbonGalleryItem { objectName: "it3"; text: "delta"; enabled: false }
+    }
+    RibbonGalleryGroup {
+        objectName: "group1"
+        groupTitle: "Other"
+        RibbonGalleryItem { text: "solo" }
+    }
+}
+)QML");
+
+    QQmlComponent component(&engine);
+    std::unique_ptr< QQuickView > view(exposeScene(engine, component, src.toUtf8().constData(), 600, 120));
+    QVERIFY(view);
+    QQuickItem* rootItem = view->rootObject();
+    QVERIFY(rootItem);
+    auto* host = qobject_cast< SARibbonQml::RibbonGallery* >(rootItem);
+    QVERIFY2(host, "the scene root is the gallery host itself");
+    QQuickItem* gallery = host;
+    QTRY_VERIFY(gallery->width() > 0 && gallery->height() > 0);
+
+    // the cell delegates are the only items carrying both leaf-local hover /
+    // selection switches; collectVisualItems returns them in Repeater order,
+    // which is the item order of the current group
+    auto collectCells = [gallery]() {
+        QList< QQuickItem* > all;
+        collectVisualItems(gallery, &all);
+        QList< QQuickItem* > cells;
+        for (QQuickItem* it : all) {
+            if (it->property("isCurrent").isValid() && it->property("entryEnabled").isValid()) {
+                cells.append(it);
+            }
+        }
+        return cells;
+    };
+    // the caption Text is the delegate's only QQuickText child
+    auto captionOf = [](QQuickItem* cell) -> QQuickItem* {
+        const QList< QQuickItem* > kids = cell->childItems();
+        for (QQuickItem* k : kids) {
+            if (k->metaObject()->className() == QByteArrayLiteral("QQuickText")) {
+                return k;
+            }
+        }
+        return nullptr;
+    };
+
+    // ---- caption styles: host metrics follow the core helper, leaf follows the host ----
+    const QSize cell = gallery->property("gridSize").toSize();
+    QVERIFY(cell.width() > 0 && cell.height() > 0);
+    QCOMPARE(gallery->property("captionStyle").toInt(), int(SARibbonQml::RibbonEnums::GalleryIconWithWordWrapText));
+    const int wrapCaption = gallery->property("captionHeight").toInt();
+    QVERIFY2(wrapCaption > 0 && wrapCaption % 2 == 0, "the default style reserves a two-line caption band");
+    // the word-wrap band is exactly two core line spacings, which recovers the
+    // font input the host feeds calcGalleryCellMetrics with
+    const int lineSpacing = wrapCaption / 2;
+
+    // QQuickText::WrapMode values (QtQuick has no public QQuickText header, so
+    // the two constants the leaf switches between are spelled out here)
+    const int kWrapNone = 0;  // Text.NoWrap
+    const int kWrapWord = 1;  // Text.WordWrap
+
+    struct StyleCase
+    {
+        SARibbonQml::RibbonEnums::GalleryCaptionStyle style;
+        SA::GalleryCaptionStyle core;
+        const char* name;
+    };
+    const StyleCase cases[] = {
+        { SARibbonQml::RibbonEnums::GalleryIconOnly, SA::GalleryCaptionStyle::None, "IconOnly" },
+        { SARibbonQml::RibbonEnums::GalleryIconWithText, SA::GalleryCaptionStyle::SingleLine, "IconWithText" },
+        { SARibbonQml::RibbonEnums::GalleryIconWithWordWrapText, SA::GalleryCaptionStyle::WordWrap, "IconWithWordWrapText" },
+    };
+    for (const StyleCase& c : cases) {
+        QSignalSpy metricsSpy(gallery, SIGNAL(gridMetricsChanged()));
+        gallery->setProperty("captionStyle", int(c.style));
+        QCOMPARE(gallery->property("captionStyle").toInt(), int(c.style));
+        QVERIFY2(!metricsSpy.isEmpty(), "a caption style change republishes the grid metrics");
+        const SA::GalleryCellMetrics cm = SA::calcGalleryCellMetrics(cell.width(), cell.height(), lineSpacing, 1, c.core);
+        QCOMPARE(gallery->property("captionHeight").toInt(), cm.captionHeight);
+        QCOMPARE(gallery->property("cellIconWidth").toInt(), cm.iconSize.width());
+        QCOMPARE(gallery->property("cellIconHeight").toInt(), cm.iconSize.height());
+        if (c.core == SA::GalleryCaptionStyle::None) {
+            QCOMPARE(cm.captionHeight, 0);  // the band really disappears
+            QCOMPARE(cm.iconSize.height(), cell.height() - 2 - 4);
+        } else if (c.core == SA::GalleryCaptionStyle::SingleLine) {
+            QCOMPARE(cm.captionHeight, lineSpacing);
+        } else {
+            QCOMPARE(cm.captionHeight, lineSpacing * 2);
+        }
+
+        const bool draws = (c.core != SA::GalleryCaptionStyle::None);
+        const bool wraps = (c.core == SA::GalleryCaptionStyle::WordWrap);
+        const QList< QQuickItem* > cells = collectCells();
+        QVERIFY2(cells.size() >= 4, "every entry got a cell delegate");
+        int inspected = 0;
+        for (QQuickItem* cellItem : cells) {
+            QQuickItem* caption = captionOf(cellItem);
+            if (!caption) {
+                continue;
+            }
+            ++inspected;
+            QCOMPARE(caption->property("height").toInt(), cm.captionHeight);
+            QCOMPARE(caption->property("y").toInt(), cell.height() - cm.captionHeight);
+            const bool entryOn = cellItem->property("entryEnabled").toBool();
+            QCOMPARE(caption->property("visible").toBool(), draws && entryOn);
+            QCOMPARE(caption->property("wrapMode").toInt(), wraps ? kWrapWord : kWrapNone);
+            QCOMPARE(caption->property("maximumLineCount").toInt(), wraps ? 2 : 1);
+            const int px = caption->property("font").value< QFont >().pixelSize();
+            if (draws) {
+                QVERIFY2(px > 0 && px <= cm.captionHeight, "the caption font fits the band it is given");
+            }
+        }
+        QVERIFY2(inspected >= 4, qPrintable(QStringLiteral("leaf captions inspected for %1").arg(QLatin1String(c.name))));
+    }
+    // restore the contract default before the interaction checks below
+    gallery->setProperty("captionStyle", int(SARibbonQml::RibbonEnums::GalleryIconWithWordWrapText));
+
+    // ---- hover: leaf reports the cell index, host resolves it to an entry and
+    // publishes on the gallery AND on the owning group (widgets fires the group
+    // signal and the gallery forwards it; here the host fires both) ----
+    auto* group0 = host->groupAt(0);
+    QVERIFY(group0);
+    QSignalSpy hoverSpy(gallery, SIGNAL(hovered(SARibbonQml::RibbonGalleryItem*, int)));
+    QSignalSpy groupHoverSpy(group0, SIGNAL(hovered(SARibbonQml::RibbonGalleryItem*, int)));
+
+    const QList< QQuickItem* > cells = collectCells();
+    QVERIFY(cells.size() >= 4);
+    QVERIFY2(cells.at(1)->isVisible(), "the second cell is on screen for a real hover");
+    // Qt Quick flushes hover delivery in the frame-synchronous phase, so an
+    // otherwise idle window would never publish containsMouse: request a frame
+    // with every move
+    auto moveMouse = [&view](const QPointF& scenePos) {
+        QTest::mouseMove(view.get(), scenePos.toPoint());
+        view->requestUpdate();
+        QTest::qWait(80);
+    };
+    const QPointF over1 = cells.at(1)->mapToScene(QPointF(cells.at(1)->width() / 2, cells.at(1)->height() / 2));
+    moveMouse(over1);
+    QTRY_VERIFY(!hoverSpy.isEmpty());
+    QCOMPARE(hoverSpy.last().at(1).toInt(), 1);
+    {
+        auto* hoveredItem = qvariant_cast< QObject* >(hoverSpy.last().at(0));
+        QVERIFY(hoveredItem);
+        QCOMPARE(hoveredItem->property("text").toString(), QStringLiteral("beta"));
+    }
+    QCOMPARE(groupHoverSpy.size(), hoverSpy.size());
+
+    // the non-selectable entry still reports hover: hover is not selection
+    const QPointF over2 = cells.at(2)->mapToScene(QPointF(cells.at(2)->width() / 2, cells.at(2)->height() / 2));
+    moveMouse(over2);
+    QTRY_COMPARE(hoverSpy.last().at(1).toInt(), 2);
+    QCOMPARE(groupHoverSpy.size(), hoverSpy.size());
+
+    // leaving the grid publishes the nullptr/-1 pair so a hover preview clears
+    moveMouse(QPointF(gallery->width() - 2, 2));  // over the button strip, outside the grid
+    QTRY_VERIFY(qvariant_cast< QObject* >(hoverSpy.last().at(0)) == nullptr);
+    QCOMPARE(hoverSpy.last().at(1).toInt(), -1);
+    QCOMPARE(groupHoverSpy.size(), hoverSpy.size());
+
+    // ---- selectable: gates becoming current, never activation ----
+    QCOMPARE(host->currentItemIndex(), -1);
+    QVERIFY(host->currentItem() == nullptr);
+    QSignalSpy currentSpy(gallery, SIGNAL(currentItemChanged(SARibbonQml::RibbonGalleryItem*, int)));
+
+    gallery->setProperty("currentItemIndex", 0);
+    QCOMPARE(host->currentItemIndex(), 0);
+    QVERIFY(host->currentItem());
+    QCOMPARE(host->currentItem()->text(), QStringLiteral("alpha"));
+    QCOMPARE(currentSpy.size(), 1);
+    QCOMPARE(qvariant_cast< QObject* >(currentSpy.last().at(0)), static_cast< QObject* >(host->currentItem()));
+
+    // the current cell paints the selection fill, its neighbours stay clear
+    {
+        const QColor selBg = SARibbonQml::RibbonTheme::instance()->selectionBg();
+        const QList< QQuickItem* > painted = collectCells();
+        for (int i = 0; i < painted.size(); ++i) {
+            const QList< QQuickItem* > kids = painted.at(i)->childItems();
+            QVERIFY(!kids.isEmpty());
+            const QColor bg = kids.first()->property("color").value< QColor >();
+            if (i == 0) {
+                QCOMPARE(colorKey(bg), colorKey(selBg));
+            } else {
+                QCOMPARE(colorKey(bg), colorKey(QColor(Qt::transparent)));
+            }
+        }
+    }
+
+    // non-selectable / disabled / out-of-range are all refused and leave the
+    // stored mark where it was (widgets selection-model parity)
+    gallery->setProperty("currentItemIndex", 2);
+    gallery->setProperty("currentItemIndex", 3);
+    gallery->setProperty("currentItemIndex", 99);
+    QCOMPARE(host->currentItemIndex(), 0);
+    QCOMPARE(currentSpy.size(), 1);
+
+    // any negative index normalizes to the -1 "no current cell" sentinel, which
+    // is a clear request rather than a refusal
+    gallery->setProperty("currentItemIndex", -7);
+    QCOMPARE(host->currentItemIndex(), -1);
+    QVERIFY(host->currentItem() == nullptr);
+    QCOMPARE(currentSpy.size(), 2);
+    QCOMPARE(currentSpy.last().at(1).toInt(), -1);
+    gallery->setProperty("currentItemIndex", 0);
+    QCOMPARE(host->currentItemIndex(), 0);
+    QCOMPARE(currentSpy.size(), 3);
+
+    // activation is NOT gated: the click still fires, the mark does not move
+    QSignalSpy trigSpy(gallery, SIGNAL(triggered(SARibbonQml::RibbonGalleryItem*, int)));
+    QMetaObject::invokeMethod(gallery, "activateItem", Q_ARG(int, 2));
+    QCOMPARE(trigSpy.size(), 1);
+    QCOMPARE(trigSpy.at(0).at(1).toInt(), 2);
+    QCOMPARE(host->currentItemIndex(), 0);
+    // a selectable cell does move the mark when activated
+    QMetaObject::invokeMethod(gallery, "activateItem", Q_ARG(int, 1));
+    QCOMPARE(trigSpy.size(), 2);
+    QCOMPARE(host->currentItemIndex(), 1);
+    QCOMPARE(currentSpy.size(), 4);
+
+    // clearing selectable on the current entry drops the mark
+    auto* it1 = group0->itemAt(1);
+    QVERIFY(it1);
+    it1->setSelectable(false);
+    QCOMPARE(host->currentItemIndex(), -1);
+    QVERIFY(host->currentItem() == nullptr);
+    QCOMPARE(currentSpy.size(), 5);
+    QCOMPARE(currentSpy.last().at(1).toInt(), -1);
+    QVERIFY(qvariant_cast< QObject* >(currentSpy.last().at(0)) == nullptr);
+    // restoring the flag does not re-claim the mark on its own
+    it1->setSelectable(true);
+    QCOMPARE(host->currentItemIndex(), -1);
+    QCOMPARE(currentSpy.size(), 5);
+
+    // the mark is group-scoped: switching groups clears it
+    gallery->setProperty("currentItemIndex", 0);
+    QCOMPARE(host->currentItemIndex(), 0);
+    gallery->setProperty("currentGroupIndex", 1);
+    QCOMPARE(host->currentItemIndex(), -1);
+    QVERIFY(host->currentItem() == nullptr);
+    gallery->setProperty("currentGroupIndex", 0);
+    QCOMPARE(host->currentItemIndex(), -1);
 }
 
 /**

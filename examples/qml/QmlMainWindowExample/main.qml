@@ -751,6 +751,20 @@ ApplicationWindow {
                         log(qsTr("gallery scrolled to row %1").arg(gallery.scrollRow));
                     }
                 }
+                // cycles the three core caption styles; the cell metrics (icon
+                // box + caption height) come from SA::calcGalleryCellMetrics
+                RibbonToolButton {
+                    text: "Caption Style"
+                    iconSource: "qrc:/icon/icon/item.svg"
+                    proportion: Ribbon.Small
+                    toolTip: "cycle the gallery cell caption style: icon only / icon with text / icon with word wrap text"
+                    onClicked: {
+                        gallery.captionStyle = (gallery.captionStyle + 1) % 3;
+                        var names = ["icon only", "icon with text", "icon with word wrap text"];
+                        log(qsTr("gallery caption style: %1 (caption height %2)")
+                            .arg(names[gallery.captionStyle]).arg(gallery.captionHeight));
+                    }
+                }
             }
         }
 

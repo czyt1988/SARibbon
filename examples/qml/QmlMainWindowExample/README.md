@@ -34,7 +34,7 @@ cmake --build build
 | widget test 面板 | 控件嵌入：ComboBox（可编辑）/ComboBox/TextField/CheckBox/SpinBox | SARibbonCtrlContainer |
 | Context Category 面板 | 上下文标签显隐开关（彩色 tab + 色带 + 页面切换） | setContextCategoryVisible |
 | Delete 类别 | 动态面板增删（ListModel+Repeater：移除尾部/插入 0/尾/-1） | removePanel/insertPanel |
-| Other 类别 | 画廊：2 组 17 项（Files/Apps），伸展分配 + 滚动 + 弹出视口 + 切组/滚动控制 | SARibbonGallery |
+| Other 类别 | 画廊：2 组 17 项（Files/Apps），伸展分配 + 滚动 + 弹出视口 + 切组/滚动控制 + 标题三态切换（仅图标/单行/自动换行） | SARibbonGallery |
 | context 上下文 1 | 页 1：控件嵌入（SpinBox/TextField）+ 按钮态；页 2：弹出按钮组 | context category 页面 |
 | context 上下文 2 | 双空页（多页结构演示） | context2 |
 | 事件日志 | 底部追加式日志区（所有交互写入） | textBrowser |
@@ -52,9 +52,11 @@ cmake --build build
 
 ## 一致性测试
 
-`tests/qml/tst_conformance_qml.cpp`（18 用例）与示例同步维护：
+`tests/qml/tst_conformance_qml.cpp`（19 用例）与示例同步维护：
 面板装箱黄金几何、tab 切换、按钮点击/弹出/禁用、控件嵌入、上下文标签、画廊、
 六样式传播、分隔符、快速访问栏/右组、对齐/最小模式、RTL、optionAction、应用窗口、
 菜单勾选/快捷键/多级子菜单（索引路径寻址 + 叶子渲染断言）、
+画廊标题三态（度量逐项对齐 core `calcGalleryCellMetrics` + 叶子 wrapMode/字号/可见性）、
+悬停信号（真实 mouseMove 进出栅格）与 selectable 语义（拒绝成为当前项但不拒绝激活）、
 主题自定义（键色覆盖 + 派生 token 重算 + JSON/文件加载 + `RibbonThemeUserDefine`
 保持自定义调色板 + 系统暗色开关桥接，并用 grabWindow 断言渲染色真的变了）。

@@ -1,6 +1,7 @@
 #ifndef SARIBBONQMLTYPES_H
 #define SARIBBONQMLTYPES_H
 #include "SARibbonQmlGlobal.h"
+#include <SARibbonCore/SARibbonCoreUtil.h>
 #include <SARibbonCore/SARibbonEnums.h>
 #include <SARibbonCore/SARibbonMetrics.h>
 #include <SARibbonCore/SARibbonThemeData.h>
@@ -73,12 +74,23 @@ public:
         RibbonStyleCompactSingleRow = 0x0042
     };
     Q_ENUM(RibbonStyle)
+    // Gallery cell caption styles. NAMES follow the widgets
+    // SARibbonGalleryGroup::GalleryGroupStyle (the vocabulary a ribbon user
+    // already knows) while VALUES follow the core SA::GalleryCaptionStyle the
+    // metrics helper switches on; the widgets declaration order differs from
+    // the core one, so the two cannot both be mirrored value-for-value. The
+    // static_asserts below pin the value mapping instead.
+    enum GalleryCaptionStyle { GalleryIconOnly = 0, GalleryIconWithText = 1, GalleryIconWithWordWrapText = 2 };
+    Q_ENUM(GalleryCaptionStyle)
 };
 
 // compile-time value checks against the core originals (plan-04 S4 note)
 static_assert(int(RibbonEnums::Large) == int(SARibbon::Core::SARibbonRowProportion::Large), "RowProportion drift");
 static_assert(int(RibbonEnums::Medium) == int(SARibbon::Core::SARibbonRowProportion::Medium), "RowProportion drift");
 static_assert(int(RibbonEnums::Small) == int(SARibbon::Core::SARibbonRowProportion::Small), "RowProportion drift");
+static_assert(int(RibbonEnums::GalleryIconOnly) == int(SA::GalleryCaptionStyle::None), "GalleryCaptionStyle drift");
+static_assert(int(RibbonEnums::GalleryIconWithText) == int(SA::GalleryCaptionStyle::SingleLine), "GalleryCaptionStyle drift");
+static_assert(int(RibbonEnums::GalleryIconWithWordWrapText) == int(SA::GalleryCaptionStyle::WordWrap), "GalleryCaptionStyle drift");
 
 // Leaf resource URL table (centralized, no factory class in P0, plan-04 S3)
 namespace SARibbonQmlLeafUrls {
