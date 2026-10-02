@@ -116,7 +116,7 @@ public:
     Q_INVOKABLE void clearCheckedState();
 
     // Trailing expanding spring (widgets setHorizontalSpacerToRight parity):
-    // widens the implicit size by spacerWidth plus one horizontal gap
+    // widens the implicit size by spacerWidth and adds no extra gap
     bool isHorizontalSpacerToRight() const;
     void setHorizontalSpacerToRight(bool on);
     int spacerWidth() const;

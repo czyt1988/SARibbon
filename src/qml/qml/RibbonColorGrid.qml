@@ -75,39 +75,17 @@ Item {
                 color: cell.cellColor
             }
 
-            // "no color" cell: SAColorToolButton::paintNoneColor — a red
-            // round-cap slash on white plus a black outline. The slash inset is
+            // "no color" cell: SAColorToolButton::paintNoneColor, drawn by the
+            // shared mark the color menu row uses as well. The slash inset is
             // host published (core SA::noneColorSlashLine), so both front ends
-            // draw the identical mark; the +0.5 offsets centre the 1px stroke
-            // on the pixel row QPainter's integer coordinates address
-            Canvas {
-                id: noneMark
+            // draw the identical mark
+            RibbonColorNoneMark {
                 visible: cell.noneColor
                 x: cell.margin
                 y: cell.margin
                 width: cell.swatchW
                 height: cell.swatchH
-
-                property int inset: cell.slash
-                onInsetChanged: requestPaint()
-                onWidthChanged: requestPaint()
-                onHeightChanged: requestPaint()
-
-                onPaint: {
-                    var ctx = getContext("2d");
-                    ctx.reset();
-                    ctx.fillStyle = "#ffffff";
-                    ctx.fillRect(0, 0, width, height);
-                    ctx.lineWidth = 1;
-                    ctx.lineCap = "round";
-                    ctx.strokeStyle = "#ff0000";
-                    ctx.beginPath();
-                    ctx.moveTo(inset + 0.5, height - 0.5);
-                    ctx.lineTo(width - 1 - inset + 0.5, 0.5);
-                    ctx.stroke();
-                    ctx.strokeStyle = "#000000";
-                    ctx.strokeRect(0.5, 0.5, width - 1, height - 1);
-                }
+                slashInset: cell.slash
             }
 
             MouseArea {

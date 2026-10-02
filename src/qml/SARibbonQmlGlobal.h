@@ -38,6 +38,7 @@ class RibbonGalleryGroup;
 class RibbonGalleryItem;
 class RibbonSeparator;
 class RibbonColorGrid;
+class RibbonColorMenu;
 class RibbonQuickAccessBar;
 class RibbonButtonGroup;
 class RibbonApplicationWindow;

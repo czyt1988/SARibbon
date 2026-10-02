@@ -440,7 +440,8 @@ void RibbonColorGrid::componentComplete()
  *          the configured gaps. Row count is ceil(count / columns) with an
  *          unlimited column count meaning a single row
  *          (SAColorGridWidget::PrivateData::updateGridColor). The trailing
- *          spring sits in an extra column, so it adds one gap plus its width.
+ *          spring sits in a column of its own and holds no widget, so
+ *          QGridLayout counts no extra gap for it: it adds its width only.
  *          The swatch fills the cell inset by cellMargin on all four sides:
  *          calcSizeOfToolButtonIconOnly hands the whole button rect to
  *          colorRect when the icon is null, so a row grown through
@@ -452,10 +453,11 @@ void RibbonColorGrid::componentComplete()
  * @details 复现 widgets 的推导。一个单元即 icon-only 的 SAColorToolButton，其
  *          sizeHint 是图标尺寸在两个方向上各加上边距；QGridLayout 再添 1px 内容
  *          边距与配置的间隔。行数为 ceil(数量 / 列数)，列数不限定时只有一行
- *          （SAColorGridWidget::PrivateData::updateGridColor）。尾部弹簧占一列，
- *          因此额外增加一个间隔加其宽度。色块铺满单元四周内缩 cellMargin 后的
- *          区域：图标为空时 calcSizeOfToolButtonIconOnly 把整个按钮矩形交给
- *          colorRect，所以由 setRowMinimumHeight 撑高的行其色块也随之变高。
+ *          （SAColorGridWidget::PrivateData::updateGridColor）。尾部弹簧独占一列且
+ *          列内无 widget，QGridLayout 不为它再计一个间隔：只增加弹簧自身的宽度。
+ *          色块铺满单元四周内缩 cellMargin 后的区域：图标为空时
+ *          calcSizeOfToolButtonIconOnly 把整个按钮矩形交给 colorRect，所以由
+ *          setRowMinimumHeight 撑高的行其色块也随之变高。
  * \endif
  */
 void RibbonColorGrid::updateGridMetrics()

@@ -11,7 +11,10 @@
 #include <SARibbonCore/SARibbonCoreUtil.h>
 #include <SARibbonQml/SARibbonQmlGlobal.h>
 #include <SARibbonQml/color/RibbonColorGrid.h>
+#include <SARibbonQml/color/RibbonColorMenu.h>
 #include "colorWidgets/SAColorGridWidget.h"
+#include "colorWidgets/SAColorMenu.h"
+#include "colorWidgets/SAColorPaletteGridWidget.h"
 #include "colorWidgets/SAColorToolButton.h"
 
 /**
@@ -27,7 +30,13 @@
  *             colorClicked / checkedIndex；
  *          4. 无效 QColor 的单元画出"无颜色"标记（红色斜线），斜线内缩量来自 core
  *             SA::noneColorSlashLine，用 grabWindow 客观判定（项目既有 headless
- *             验证法，不依赖人眼看图）。
+ *             验证法，不依赖人眼看图）；
+ *          5. 颜色菜单（RibbonColorMenu）的默认数据与 widgets SAColorMenu 逐项相同，
+ *             自定义颜色的记录规则（先追加、满了左移、缩容量从前面裁）与
+ *             recordCustomColor 一致，叶子按 widgets 的条目顺序摆出三个网格与两行
+ *             文本，真实点击把颜色报告出来并关掉弹窗。菜单外框几何是刻意不同的一
+ *             处（QMenu 的 sizeHint 脱离 widgets 无法复现），因此只对照数据与顺序，
+ *             不逐像素对照外框。
  */
 namespace
 {
@@ -100,6 +109,47 @@ void collectVisualItems(QQuickItem* item, QList< QQuickItem* >* out)
     }
 }
 
+/**
+ * @brief 在视觉子树里按 objectName 找一项
+ * @details Popup 打开后其内容项会被重挂到窗口 Overlay 下，因此菜单内部的项从宿主
+ *          叶子上是找不到的，必须从窗口 contentItem 起走视觉树（仍是 NOTES B50 的
+ *          childItems 走法）。
+ */
+QQuickItem* findVisualItem(QQuickItem* item, const QString& name)
+{
+    if (!item) {
+        return nullptr;
+    }
+    if (item->objectName() == name) {
+        return item;
+    }
+    const QList< QQuickItem* > kids = item->childItems();
+    for (QQuickItem* kid : kids) {
+        if (QQuickItem* hit = findVisualItem(kid, name)) {
+            return hit;
+        }
+    }
+    return nullptr;
+}
+
+/// 视觉树里按 objectName 找一个颜色网格宿主
+SARibbonQml::RibbonColorGrid* findGrid(QQuickItem* root, const char* name)
+{
+    return qobject_cast< SARibbonQml::RibbonColorGrid* >(findVisualItem(root, QLatin1String(name)));
+}
+
+/// 项中心的窗口坐标（mapToItem(nullptr) 即映射到场景）
+QPoint sceneCenter(QQuickItem* item)
+{
+    return item->mapToItem(nullptr, QPointF(item->width() / 2.0, item->height() / 2.0)).toPoint();
+}
+
+/// 某个单元中心的窗口坐标
+QPoint sceneCellCenter(SARibbonQml::RibbonColorGrid* grid, int index)
+{
+    return grid->mapToItem(nullptr, grid->cellRects().at(index).toRect().center()).toPoint();
+}
+
 /// 统计接近某个颜色的像素数（headless 客观判定）
 int countPixelsNear(const QImage& img, const QColor& color, int tolerance = 8)
 {
@@ -147,6 +197,9 @@ private Q_SLOTS:
     void exclusiveCheckSemantics();
     void leafPlacesCellsAndClicks();
     void noneColorMarkRenders();
+    void menuDataMatchesWidgets();
+    void customColorRecordRules();
+    void menuLeafOpensAndPicks();
 };
 
 /**
@@ -563,6 +616,304 @@ void TestColorQml::noneColorMarkRenders()
     // 相邻的有效色块仍然是纯色填充
     const QRect validCell = host->cellRects().at(0).toRect().marginsRemoved(QMargins(host->cellMargin(), host->cellMargin(), host->cellMargin(), host->cellMargin()));
     QCOMPARE(shot.pixelColor(validCell.center()), QColor(0xff, 0x00, 0x00));
+}
+
+/**
+ * @brief 颜色菜单的默认数据与 widgets SAColorMenu 逐项相同
+ * @details 菜单宿主自己不造任何色值：标准色表与深浅因子取自 core，深浅行由 core
+ *          SA::colorPaletteShades 推导，因此与 widgets SAColorPaletteGridWidget 的
+ *          paletteColorList() 是同一份算式。这里对着一个真实的 widgets SAColorMenu
+ *          逐项核对，顺带钉住"无颜色"项在自定义颜色之上这条条目顺序（enableNoneColorAction
+ *          用的是 insertAction(mCustomColorAction, ...)）以及标记斜线的内缩算式。
+ */
+void TestColorQml::menuDataMatchesWidgets()
+{
+    SAColorMenu wmenu;
+    wmenu.enableNoneColorAction(true);
+    SAColorPaletteGridWidget* palette = wmenu.colorPaletteGridWidget();
+    QVERIFY(palette);
+    SAColorGridWidget* customGrid = wmenu.customColorsWidget();
+    QVERIFY(customGrid);
+
+    const QList< QAction* > acts = wmenu.actions();
+    const int noneIdx             = acts.indexOf(wmenu.noneColorAction());
+    const int customIdx           = acts.indexOf(wmenu.customColorAction());
+    QVERIFY(noneIdx >= 0);
+    QVERIFY2(noneIdx < customIdx, "widgets puts the none color action above the custom color one");
+
+    SARibbonQml::RibbonColorMenu host;
+    QCOMPARE(host.standardColors(), palette->colorList());
+    QCOMPARE(host.paletteFactors(), palette->factor());
+    QCOMPARE(host.paletteColors(), SA::colorPaletteShades(palette->colorList(), palette->factor()));
+    QCOMPARE(host.paletteColumns(), palette->colorList().size());
+    QCOMPARE(host.paletteColors().size(), palette->colorList().size() * palette->factor().size());
+    QCOMPARE(host.maxCustomColorCount(), customGrid->columnCount());
+    QCOMPARE(host.colorIconSize(), customGrid->colorIconSize());
+    QCOMPARE(host.customColorText(), wmenu.customColorAction()->text());
+    QCOMPARE(host.noneColorText(), wmenu.noneColorAction()->text());
+    QVERIFY(!host.themeColorsTitle().isEmpty());
+    // widgets 里两个网格都关掉了勾选，菜单宿主也按同样的形状把它们摆出来
+    QVERIFY(!customGrid->isColorCheckable());
+    // "无颜色"默认不开，与 enableNoneColorAction 必须显式调用一致
+    QVERIFY(!host.isNoneColorEnabled());
+
+    // 标记斜线：widgets 在 32x32 的盒子上内缩 1px 再画（createNoneColorIcon），
+    // 宿主发布的是同一算式作用在自己标记盒上的内缩量
+    QCOMPARE(host.noneMarkSlashInset(), SA::noneColorSlashLine(QRect(0, 0, host.noneMarkSide(), host.noneMarkSide()).adjusted(1, 1, -1, -1)).x1());
+    host.setNoneMarkSide(32);
+    QCOMPARE(host.noneMarkSlashInset(), SA::noneColorSlashLine(QRect(0, 0, 32, 32).adjusted(1, 1, -1, -1)).x1());
+
+    // 两个输入喂一个输出：任一变化都重算深浅行，并经同一个信号报告（B48 单依赖）
+    QSignalSpy shades(&host, &SARibbonQml::RibbonColorMenu::paletteColorsChanged);
+    QVERIFY(shades.isValid());
+    host.setPaletteFactors(QList< int >() << 150);
+    QCOMPARE(shades.count(), 1);
+    QCOMPARE(host.paletteColors().size(), host.standardColors().size());
+    QCOMPARE(host.paletteColors(), SA::colorPaletteShades(host.standardColors(), host.paletteFactors()));
+    host.setStandardColors(QList< QColor >() << QColor(Qt::red) << QColor(Qt::green));
+    QCOMPARE(shades.count(), 2);
+    QCOMPARE(host.paletteColumns(), 2);
+    QCOMPARE(host.paletteColors().size(), 2);
+    // 同样的值不再触发（属性写回自身不产生通知）
+    host.setStandardColors(host.standardColors());
+    host.setPaletteFactors(host.paletteFactors());
+    QCOMPARE(shades.count(), 2);
+}
+
+/**
+ * @brief 自定义颜色记录规则与 widgets recordCustomColor 一致
+ * @details 追加、满了整体左移、缩小容量从前面裁掉保留最新，无效色一律拒绝（"无
+ *          颜色"是一个选项，不是自定义颜色）。同时钉住菜单宿主对 widgets
+ *          onCustomColorActionTriggered / onNoneColorActionTriggered /
+ *          emitSelectedColor 三条路径的拆分：requestCustomColor 只发信号且菜单不关
+ *          （widgets 那边是模态对话框盖在菜单上），addCustomColor 与 selectNoneColor
+ *          都会报告颜色并关菜单。
+ */
+void TestColorQml::customColorRecordRules()
+{
+    SARibbonQml::RibbonColorMenu host;
+    host.setMaxCustomColorCount(3);
+    QCOMPARE(host.maxCustomColorCount(), 3);
+
+    QSignalSpy changed(&host, &SARibbonQml::RibbonColorMenu::customColorsChanged);
+    QSignalSpy requested(&host, &SARibbonQml::RibbonColorMenu::customColorRequested);
+    QSignalSpy selected(&host, &SARibbonQml::RibbonColorMenu::selectedColor);
+    QVERIFY(changed.isValid() && requested.isValid() && selected.isValid());
+
+    host.recordCustomColor(QColor());
+    QCOMPARE(host.customColors().size(), 0);
+    QCOMPARE(changed.count(), 0);
+
+    host.recordCustomColor(QColor(Qt::red));
+    host.recordCustomColor(QColor(Qt::green));
+    host.recordCustomColor(QColor(Qt::blue));
+    QCOMPARE(changed.count(), 3);
+    QList< QColor > expect;
+    expect << QColor(Qt::red) << QColor(Qt::green) << QColor(Qt::blue);
+    QCOMPARE(host.customColors(), expect);
+
+    // 满了以后整体左移，新色落在最后
+    host.recordCustomColor(QColor(Qt::cyan));
+    expect.clear();
+    expect << QColor(Qt::green) << QColor(Qt::blue) << QColor(Qt::cyan);
+    QCOMPARE(host.customColors(), expect);
+
+    // 缩小容量：从前面裁掉，保留最新的
+    host.setMaxCustomColorCount(2);
+    expect.clear();
+    expect << QColor(Qt::blue) << QColor(Qt::cyan);
+    QCOMPARE(host.customColors(), expect);
+    // 容量为 0：记录被裁空，且此后再也记不进去（记录功能整体关掉）
+    host.setMaxCustomColorCount(0);
+    QVERIFY(host.customColors().isEmpty());
+    host.recordCustomColor(QColor(Qt::magenta));
+    QVERIFY(host.customColors().isEmpty());
+    host.setMaxCustomColorCount(2);
+    host.setCustomColors(expect);
+    QCOMPARE(host.customColors(), expect);
+
+    // 取色请求：只发信号，不动记录也不关菜单
+    host.setMenuVisible(true);
+    host.requestCustomColor();
+    QCOMPARE(requested.count(), 1);
+    QCOMPARE(selected.count(), 0);
+    QVERIFY(host.isMenuVisible());
+
+    // 回灌：记录 + 报告 + 关菜单
+    host.addCustomColor(QColor(0x11, 0x22, 0x33));
+    QCOMPARE(selected.count(), 1);
+    QCOMPARE(selected.at(0).at(0).value< QColor >(), QColor(0x11, 0x22, 0x33));
+    QVERIFY(!host.isMenuVisible());
+    QCOMPARE(host.customColors().size(), 2);
+    QCOMPARE(host.customColors().at(1), QColor(0x11, 0x22, 0x33));
+    host.addCustomColor(QColor());
+    QCOMPARE(selected.count(), 1);
+    QCOMPARE(host.customColors().size(), 2);
+
+    // 无颜色：报告无效色并关菜单
+    host.setMenuVisible(true);
+    host.selectNoneColor();
+    QCOMPARE(selected.count(), 2);
+    QVERIFY(!selected.at(1).at(0).value< QColor >().isValid());
+    QVERIFY(!host.isMenuVisible());
+
+    // emitSelectedColor 原样报告传入的颜色（宿主不做有效性过滤）
+    host.emitSelectedColor(QColor());
+    QCOMPARE(selected.count(), 3);
+    QVERIFY(!selected.at(2).at(0).value< QColor >().isValid());
+
+    host.clearCustomColors();
+    QVERIFY(host.customColors().isEmpty());
+    host.clearCustomColors();  // 已空，幂等
+
+    // 直接整表写入
+    host.setCustomColors(expect);
+    QCOMPARE(host.customColors(), expect);
+}
+
+/**
+ * @brief 菜单叶子按 widgets 的条目顺序摆出内容，真实点击报告颜色并关菜单
+ * @details 叶子内部是三个 RibbonColorGrid（标准色一行、深浅行、自定义颜色）加两行
+ *          文本，全部数字来自宿主。这里把弹窗打开后从窗口 Overlay 起走视觉树，逐项
+ *          核对网格的输入与几何，再用真实鼠标点击走一遍三条路径：深浅色块 ->
+ *          selectedColor 且弹窗关闭；"无颜色"行 -> 无效色；"自定义颜色"行 ->
+ *          customColorRequested 且弹窗保持打开（widgets 那边此时正被模态对话框盖着），
+ *          回灌后弹窗才关、记录进网格。
+ */
+void TestColorQml::menuLeafOpensAndPicks()
+{
+    QQmlEngine engine;
+    saRibbonRegisterQmlTypes(&engine);
+
+    // 宿主不能当 QML 根对象：QQuickView 默认 SizeRootObjectToView 会把它撑到窗口
+    // 大小，弹窗按 root.height 落到窗口外面，于是包一层带尺寸的 Item
+    const char* src = "import QtQuick 2.12\n"
+                      "import SARibbon 3.0\n"
+                      "Item {\n"
+                      "    width: 420\n"
+                      "    height: 520\n"
+                      "    RibbonColorMenu {\n"
+                      "        objectName: \"colorMenuHost\"\n"
+                      "        x: 8\n"
+                      "        y: 8\n"
+                      "        width: 60\n"
+                      "        height: 24\n"
+                      "        noneColorEnabled: true\n"
+                      "        colorIconSize: Qt.size(12, 12)\n"
+                      "    }\n"
+                      "}\n";
+
+    QQmlComponent component(&engine);
+    component.setData(QByteArray(src), QUrl());
+    QObject* rootObj = component.create();
+    QVERIFY2(rootObj, qPrintable(component.errorString()));
+
+    QQuickView view(&engine, nullptr);
+    view.setResizeMode(QQuickView::SizeRootObjectToView);
+    view.resize(420, 520);
+    QQuickItem* rootItem = qobject_cast< QQuickItem* >(rootObj);
+    QVERIFY(rootItem);
+    rootItem->setParentItem(view.contentItem());
+    view.setContent(QUrl(), &component, rootObj);
+    view.show();
+    QVERIFY(QTest::qWaitForWindowExposed(&view));
+
+    auto* host = rootItem->findChild< SARibbonQml::RibbonColorMenu* >(QStringLiteral("colorMenuHost"));
+    QVERIFY(host);
+    QVERIFY(host->qmlLeaf());
+    QVERIFY(!host->isMenuVisible());
+
+    host->openMenu();
+    QTRY_VERIFY(host->isMenuVisible());
+
+    auto* mainGrid   = findGrid(view.contentItem(), "colorMenuMainGrid");
+    auto* shadeGrid  = findGrid(view.contentItem(), "colorMenuShadeGrid");
+    auto* customGrid = findGrid(view.contentItem(), "colorMenuCustomGrid");
+    QVERIFY(mainGrid && shadeGrid && customGrid);
+
+    // 标准色一行；深浅行按因子数排布且行间不留缝（SAColorPaletteGridWidget）
+    QCOMPARE(mainGrid->colorList(), host->standardColors());
+    QCOMPARE(mainGrid->gridRows(), 1);
+    QCOMPARE(mainGrid->gridColumns(), host->standardColors().size());
+    QCOMPARE(shadeGrid->colorList(), host->paletteColors());
+    QCOMPARE(shadeGrid->gridColumns(), host->paletteColumns());
+    QCOMPARE(shadeGrid->gridRows(), host->paletteFactors().size());
+    QCOMPARE(shadeGrid->verticalSpacing(), 0);
+    // 自定义颜色：列数即容量、带尾部弹簧、行最小高跟着色块盒
+    QCOMPARE(customGrid->columnCount(), host->maxCustomColorCount());
+    QVERIFY(customGrid->isHorizontalSpacerToRight());
+    QCOMPARE(customGrid->rowMinimumHeight(0), host->colorIconSize().height());
+    QCOMPARE(customGrid->colorCount(), 0);
+    // 菜单里的网格一律不可勾选
+    QVERIFY(!mainGrid->isColorCheckable());
+    QVERIFY(!shadeGrid->isColorCheckable());
+    QVERIFY(!customGrid->isColorCheckable());
+    // 色块盒传到了每个网格
+    QCOMPARE(mainGrid->colorIconSize(), host->colorIconSize());
+    QCOMPARE(shadeGrid->colorIconSize(), host->colorIconSize());
+    QCOMPARE(customGrid->colorIconSize(), host->colorIconSize());
+
+    QQuickItem* noneRow   = findVisualItem(view.contentItem(), QLatin1String("colorMenuNoneRow"));
+    QQuickItem* customRow = findVisualItem(view.contentItem(), QLatin1String("colorMenuCustomRow"));
+    QVERIFY(noneRow && customRow);
+    QTRY_VERIFY(noneRow->isVisible() && customRow->isVisible());
+    QCOMPARE(qRound(noneRow->height()), host->actionRowHeight());
+    QCOMPARE(qRound(customRow->height()), host->actionRowHeight());
+    // 条目顺序：深浅色板在"无颜色"之上，"无颜色"又在"自定义颜色"之上。
+    // Column 要等一次 polish 才摆放子项，因此轮询到摆好为止
+    QTRY_VERIFY(shadeGrid->mapToItem(nullptr, QPointF(0, 0)).y() < noneRow->mapToItem(nullptr, QPointF(0, 0)).y());
+    QTRY_VERIFY(noneRow->mapToItem(nullptr, QPointF(0, 0)).y() < customRow->mapToItem(nullptr, QPointF(0, 0)).y());
+
+    QSignalSpy selected(host, &SARibbonQml::RibbonColorMenu::selectedColor);
+    QSignalSpy requested(host, &SARibbonQml::RibbonColorMenu::customColorRequested);
+    QVERIFY(selected.isValid() && requested.isValid());
+
+    // 点一个深浅色块：报告颜色并关菜单
+    const QColor shade = shadeGrid->colorAt(12);
+    QVERIFY(shade.isValid());
+    QTest::mouseClick(&view, Qt::LeftButton, Qt::NoModifier, sceneCellCenter(shadeGrid, 12));
+    QCOMPARE(selected.count(), 1);
+    QCOMPARE(selected.at(0).at(0).value< QColor >(), shade);
+    QTRY_VERIFY(!host->isMenuVisible());
+
+    // "无颜色"行：报告无效色（斜线本身已由 noneColorMarkRenders 客观判过）
+    host->openMenu();
+    QTRY_VERIFY(host->isMenuVisible());
+    QTest::mouseClick(&view, Qt::LeftButton, Qt::NoModifier, sceneCenter(noneRow));
+    QCOMPARE(selected.count(), 2);
+    QVERIFY(!selected.at(1).at(0).value< QColor >().isValid());
+    QTRY_VERIFY(!host->isMenuVisible());
+
+    // "自定义颜色"行：只请求取色，菜单不关
+    host->openMenu();
+    QTRY_VERIFY(host->isMenuVisible());
+    QTest::mouseClick(&view, Qt::LeftButton, Qt::NoModifier, sceneCenter(customRow));
+    QCOMPARE(requested.count(), 1);
+    QCOMPARE(selected.count(), 2);
+    QVERIFY(host->isMenuVisible());
+
+    // 回灌取色结果：关菜单，颜色进记录，网格随之长出一个色块
+    host->addCustomColor(QColor(0x11, 0x22, 0x33));
+    QCOMPARE(selected.count(), 3);
+    QCOMPARE(selected.at(2).at(0).value< QColor >(), QColor(0x11, 0x22, 0x33));
+    QTRY_VERIFY(!host->isMenuVisible());
+    QCOMPARE(host->customColors().size(), 1);
+
+    host->openMenu();
+    QTRY_VERIFY(host->isMenuVisible());
+    QTRY_COMPARE(customGrid->colorCount(), 1);
+    QTest::mouseClick(&view, Qt::LeftButton, Qt::NoModifier, sceneCellCenter(customGrid, 0));
+    QCOMPARE(selected.count(), 4);
+    QCOMPARE(selected.at(3).at(0).value< QColor >(), QColor(0x11, 0x22, 0x33));
+    QTRY_VERIFY(!host->isMenuVisible());
+
+    // 关掉"无颜色"后该行不再出现
+    host->setNoneColorEnabled(false);
+    host->openMenu();
+    QTRY_VERIFY(host->isMenuVisible());
+    QTRY_VERIFY(!noneRow->isVisible());
+    host->closeMenu();
+    QTRY_VERIFY(!host->isMenuVisible());
 }
 
 QTEST_MAIN(TestColorQml)
