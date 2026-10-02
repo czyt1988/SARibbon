@@ -5,6 +5,9 @@
 #include <QSize>
 #include <QIcon>
 #include <QPixmap>
+#include <QList>
+#include <QRect>
+#include <QLine>
 
 // 计划 02 S1：SARibbonUtil 中无 widget 依赖的函数下沉 core（函数体纯 move，一字不改）。
 // namespace SA 维持不变（2.x 既有 API 拼写，v2 §3.5：仅新增类型入 SARibbon::Core）。
@@ -171,6 +174,164 @@ GalleryCellMetrics SA_RIBBON_CORE_EXPORT calcGalleryCellMetrics(int cellWidth,
                                                                 int lineSpacing,
                                                                 int spacing,
                                                                 GalleryCaptionStyle captionStyle);
+
+/**
+ * \if ENGLISH
+ * @brief The ten standard colors of the office-like color picker
+ * @return Standard color list, row-major, left to right
+ * @details Moved verbatim from the colorWidgets module so the QML front end
+ *          offers the same palette without linking widgets.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief office 风格取色器的十个标准色
+ * @return 标准色列表，按行优先、自左向右
+ * @details 自 colorWidgets 模块原样下沉，QML 前端由此获得同一套色板而无需
+ *          链接 widgets。
+ * \endif
+ */
+QList< QColor > SA_RIBBON_CORE_EXPORT getStandardColorList();
+
+/**
+ * \if ENGLISH
+ * @brief Default shade factors of a color palette grid
+ * @return { 180, 160, 140, 75, 50 } — three light rows then two dark rows
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 色板网格的默认深浅因子
+ * @return { 180, 160, 140, 75, 50 }，即三行浅色接两行深色
+ * \endif
+ */
+QList< int > SA_RIBBON_CORE_EXPORT defaultColorPaletteFactors();
+
+/**
+ * \if ENGLISH
+ * @brief Derive the shade rows of a color palette from its base colors
+ * @param base Base colors, one per palette column
+ * @param factors One factor per palette row; each is fed to QColor::lighter
+ * @return factors.size() * base.size() colors, row-major (factor outer loop)
+ * @details Moved from SAColorPaletteGridWidget::PrivateData::makeColorPalette;
+ *          the loop order is part of the contract because the grid fills its
+ *          cells row-major.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 由基准色推导出色板的深浅行
+ * @param base 基准色，每列一个
+ * @param factors 每行一个因子，逐个交给 QColor::lighter
+ * @return factors.size() * base.size() 个颜色，按行优先（因子在外层循环）
+ * \details 自 SAColorPaletteGridWidget::PrivateData::makeColorPalette 下沉；
+ *          循环次序属于契约的一部分，因为网格是按行优先填充单元的。
+ * \endif
+ */
+QList< QColor > SA_RIBBON_CORE_EXPORT colorPaletteShades(const QList< QColor >& base, const QList< int >& factors);
+
+/**
+ * \if ENGLISH
+ * @brief Geometry constants of a color tool button
+ * @details Moved from the file-local SARibbonColorToolButtonConstants namespace
+ *          of the widgets button so both front ends place the color band
+ *          identically.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 颜色按钮的几何常量
+ * @details 自 widgets 按钮内部的文件级 SARibbonColorToolButtonConstants 下沉，
+ *          两个前端由此把色带放在完全相同的位置。
+ * \endif
+ */
+namespace ColorToolButtonConstants
+{
+constexpr qreal COLOR_BLOCK_RATIO     = 0.25;  ///< band height as a ratio of the icon slot height
+constexpr int COLOR_BLOCK_MIN_HEIGHT  = 3;     ///< band height lower bound
+constexpr int COLOR_BLOCK_MARGIN      = 1;     ///< gap between the icon box and the band
+constexpr int DEFAULT_COLOR_ICON_SIZE = 32;    ///< side of the generated fill-to-icon swatch
+constexpr int INVALID_COLOR_PEN_WIDTH = 1;     ///< pen width of the invalid-color outline
+constexpr int INVALID_COLOR_LINE_RATIO = 3;    ///< denominator of the invalid-color slash inset
+}
+
+/**
+ * \if ENGLISH
+ * @brief Icon box and color band of a ColorUnderIcon button
+ * \endif
+ *
+ * \if CHINESE
+ * @brief ColorUnderIcon 按钮的图标盒与色带
+ * \endif
+ */
+struct SA_RIBBON_CORE_EXPORT ColorUnderIconMetrics
+{
+    QRect iconRect;   ///< where the icon is drawn: centred horizontally, bottom aligned
+    QRect colorRect;  ///< the color band directly under the icon box
+};
+
+/**
+ * \if ENGLISH
+ * @brief Height of the color band under an icon
+ * @param iconSlotHeight Height of the whole icon slot
+ * @return Band height: slot * COLOR_BLOCK_RATIO, floor COLOR_BLOCK_MIN_HEIGHT,
+ *         capped at half the slot; 0 when the slot has no height
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 图标下方色带的高度
+ * @param iconSlotHeight 整个图标槽的高度
+ * @return 色带高度：槽高乘 COLOR_BLOCK_RATIO，下限 COLOR_BLOCK_MIN_HEIGHT，
+ *         上限为槽高一半；槽高非正时返回 0
+ * \endif
+ */
+int SA_RIBBON_CORE_EXPORT colorBandHeight(int iconSlotHeight);
+
+/**
+ * \if ENGLISH
+ * @brief Split an icon slot into the icon box and the color band under it
+ * @param iconSlot The whole icon slot of the button (widgets iconSize)
+ * @param fittedIconSize Size the icon is actually drawn at; an empty size means
+ *        no icon, in which case the band spans the whole slot width
+ * @return Icon box and color band rectangles in icon-slot local coordinates;
+ *         both are null when the slot leaves no room for the band
+ * @details Placement rules moved from
+ *          SARibbonColorToolButton::PrivateData::createIconPixmap. Scaling the
+ *          icon into the remaining area stays with the caller because the
+ *          widgets side derives the fitted size from a device-pixel-ratio aware
+ *          QPixmap while the QML side derives it from the published iconSide —
+ *          this function only places what it is given.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 把图标槽切分为图标盒与其下方的色带
+ * @param iconSlot 按钮的整个图标槽（widgets 的 iconSize）
+ * @param fittedIconSize 图标实际绘制的尺寸；空尺寸表示没有图标，此时色带占满
+ *        整个槽宽
+ * @return 图标槽局部坐标下的图标盒与色带矩形；槽内放不下色带时两者皆为空
+ * @details 摆放规则自 SARibbonColorToolButton::PrivateData::createIconPixmap
+ *          下沉。把图标缩放进剩余区域这一步留给调用方：widgets 侧的缩放结果来
+ *          自带 devicePixelRatio 的 QPixmap，QML 侧来自已发布的 iconSide，本函
+ *          数只负责摆放拿到的尺寸。
+ * \endif
+ */
+ColorUnderIconMetrics SA_RIBBON_CORE_EXPORT calcColorUnderIconMetrics(const QSize& iconSlot, const QSize& fittedIconSize);
+
+/**
+ * \if ENGLISH
+ * @brief Diagonal of the "no color" swatch
+ * @param colorRect The swatch rectangle
+ * @return The red slash from the lower-left inset to the upper-right inset
+ * @details Moved from SAColorToolButton::paintNoneColor; the inset is the
+ *          rectangle width over INVALID_COLOR_LINE_RATIO. Only the line is
+ *          computed here — the surrounding black outline is the full rectangle.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief “无颜色”色块的对角斜线
+ * @param colorRect 色块矩形
+ * @return 自左下内缩点指向右上内缩点的红色斜线
+ * @details 自 SAColorToolButton::paintNoneColor 下沉；内缩量为矩形宽度除以
+ *          INVALID_COLOR_LINE_RATIO。此处只算斜线——外框黑线就是整个矩形。
+ * \endif
+ */
+QLine SA_RIBBON_CORE_EXPORT noneColorSlashLine(const QRect& colorRect);
 
 }
 

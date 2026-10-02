@@ -386,4 +386,167 @@ GalleryCellMetrics calcGalleryCellMetrics(int cellWidth,
     return m;
 }
 
+/**
+ * \if ENGLISH
+ * @brief The ten standard colors of the office-like color picker
+ * @details 列表内容自 colorWidgets 模块原样搬移，顺序即色板的列顺序。
+ * \endif
+ *
+ * \if CHINESE
+ * @brief office 风格取色器的十个标准色
+ * @details 列表内容自 colorWidgets 模块原样搬移，顺序即色板的列顺序。
+ * \endif
+ */
+QList< QColor > getStandardColorList()
+{
+    static QList< QColor > s_standardColorList({ QColor(192, 0, 0),
+                                                 QColor(255, 0, 0),
+                                                 QColor(255, 192, 0),
+                                                 QColor(255, 255, 0),
+                                                 QColor(146, 208, 80),
+                                                 QColor(0, 176, 80),
+                                                 QColor(0, 176, 240),
+                                                 QColor(0, 112, 192),
+                                                 QColor(0, 32, 96),
+                                                 QColor(112, 48, 160) });
+    return s_standardColorList;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Default shade factors of a color palette grid
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 色板网格的默认深浅因子
+ * \endif
+ */
+QList< int > defaultColorPaletteFactors()
+{
+    static const QList< int > s_factors { 180, 160, 140, 75, 50 };
+    return s_factors;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Derive the shade rows of a color palette from its base colors
+ * @details 函数体自 SAColorPaletteGridWidget::PrivateData::makeColorPalette 纯
+ *          move，仅把 sacolor_as_const 换成直接遍历（core 不依赖 colorWidgets
+ *          的兼容宏），并补一次 reserve。因子在外层、颜色在内层的次序未改动，
+ *          因为网格按行优先填充。
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 由基准色推导出色板的深浅行
+ * @details 函数体自 SAColorPaletteGridWidget::PrivateData::makeColorPalette 纯
+ *          move，仅把 sacolor_as_const 换成直接遍历（core 不依赖 colorWidgets
+ *          的兼容宏），并补一次 reserve。因子在外层、颜色在内层的次序未改动，
+ *          因为网格按行优先填充。
+ * \endif
+ */
+QList< QColor > colorPaletteShades(const QList< QColor >& base, const QList< int >& factors)
+{
+    QList< QColor > res;
+    res.reserve(base.size() * factors.size());
+    for (int f : factors) {
+        for (const QColor& c : base) {
+            res.append(c.lighter(f));
+        }
+    }
+    return res;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Height of the color band under an icon
+ * @details 算式自 SARibbonColorToolButton::PrivateData::createIconPixmap 纯 move。
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 图标下方色带的高度
+ * @details 算式自 SARibbonColorToolButton::PrivateData::createIconPixmap 纯 move。
+ * \endif
+ */
+int colorBandHeight(int iconSlotHeight)
+{
+    namespace Constants = ColorToolButtonConstants;
+    if (iconSlotHeight <= 0) {
+        return 0;
+    }
+    // 色带高度随图标槽等比缩放，保证大按钮和小按钮下都清晰可见；同时不超过槽高的一半
+    int h = qMax(Constants::COLOR_BLOCK_MIN_HEIGHT, qRound(iconSlotHeight * Constants::COLOR_BLOCK_RATIO));
+    return qMin(h, iconSlotHeight / 2);
+}
+
+/**
+ * \if ENGLISH
+ * @brief Split an icon slot into the icon box and the color band under it
+ * @details 摆放算式自 SARibbonColorToolButton::PrivateData::createIconPixmap 纯
+ *          move（只取几何，不涉及 pixmap 缓存与 dpr）。图标缩放进剩余区域那一
+ *          步留在调用方：widgets 侧的缩放结果来自带 devicePixelRatio 的
+ *          QPixmap，QML 侧来自已发布的 iconSide，两边输入口径不同但摆放规则必
+ *          须一致，故只下沉摆放。与 widgets 原版有一处刻意的差异：原版在图标为
+ *          空时提前返回空 pixmap、根本不算几何，该提前返回留在 widgets 侧，本
+ *          函数把"没有图标"定义为色带占满整个槽宽（对齐 SAColorToolButton 的
+ *          ToolButtonIconOnly 无图标语义），QML 前端由此不需要图标也能显示颜色。
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 把图标槽切分为图标盒与其下方的色带
+ * @details 摆放算式自 SARibbonColorToolButton::PrivateData::createIconPixmap 纯
+ *          move（只取几何，不涉及 pixmap 缓存与 dpr）。图标缩放进剩余区域那一
+ *          步留在调用方：widgets 侧的缩放结果来自带 devicePixelRatio 的
+ *          QPixmap，QML 侧来自已发布的 iconSide，两边输入口径不同但摆放规则必
+ *          须一致，故只下沉摆放。与 widgets 原版有一处刻意的差异：原版在图标为
+ *          空时提前返回空 pixmap、根本不算几何，该提前返回留在 widgets 侧，本
+ *          函数把"没有图标"定义为色带占满整个槽宽（对齐 SAColorToolButton 的
+ *          ToolButtonIconOnly 无图标语义），QML 前端由此不需要图标也能显示颜色。
+ * \endif
+ */
+ColorUnderIconMetrics calcColorUnderIconMetrics(const QSize& iconSlot, const QSize& fittedIconSize)
+{
+    ColorUnderIconMetrics m;
+    const int slotW = iconSlot.width();
+    const int slotH = iconSlot.height();
+    if (slotW <= 0 || slotH <= 0) {
+        return m;
+    }
+    const int colorHeight = colorBandHeight(slotH);
+    const int margin      = ColorToolButtonConstants::COLOR_BLOCK_MARGIN;
+    const int iconAreaHeight = slotH - colorHeight - margin;
+    if (colorHeight <= 0 || iconAreaHeight <= 0) {
+        return m;
+    }
+    const int iconW = fittedIconSize.width();
+    const int iconH = fittedIconSize.height();
+    if (iconW > 0 && iconH > 0) {
+        // 图标水平居中、底部与图标区域底边对齐
+        m.iconRect = QRect((slotW - iconW) / 2, iconAreaHeight - iconH, iconW, iconH);
+    }
+    // 色带位于图标正下方，上边缘与图标下边缘间隔 margin 像素
+    const int bandWidth = (iconW > 0) ? iconW : slotW;
+    const int bandX     = (slotW - bandWidth) / 2;
+    m.colorRect         = QRect(bandX, iconAreaHeight + margin, bandWidth, colorHeight);
+    return m;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Diagonal of the "no color" swatch
+ * @details 算式自 SAColorToolButton::paintNoneColor 纯 move：红色斜线自
+ *          (left + w/3, bottom) 到 (right - w/3, top)，外框黑线即整个矩形。
+ * \endif
+ *
+ * \if CHINESE
+ * @brief “无颜色”色块的对角斜线
+ * @details 算式自 SAColorToolButton::paintNoneColor 纯 move：红色斜线自
+ *          (left + w/3, bottom) 到 (right - w/3, top)，外框黑线即整个矩形。
+ * \endif
+ */
+QLine noneColorSlashLine(const QRect& colorRect)
+{
+    const int ss = colorRect.width() / ColorToolButtonConstants::INVALID_COLOR_LINE_RATIO;
+    return QLine(QPoint(colorRect.x() + ss, colorRect.bottom()), QPoint(colorRect.right() - ss, colorRect.top()));
+}
+
 }

@@ -6,6 +6,7 @@
 #include <QStyleOptionToolButton>
 #include <QResizeEvent>
 #include <QDebug>
+#include <SARibbonCore/SARibbonCoreUtil.h>
 #include "SAColorMenu.h"
 
 /**
@@ -589,8 +590,8 @@ void SAColorToolButton::paintNoneColor(QPainter* p, const QRect& colorRect)
     p->setPen(pen);
     p->setRenderHint(QPainter::SmoothPixmapTransform, true);
     p->setRenderHint(QPainter::Antialiasing, true);
-    int ss = colorRect.width() / 3;
-    p->drawLine(QPoint(colorRect.x() + ss, colorRect.bottom()), QPoint(colorRect.right() - ss, colorRect.top()));
+    // 斜线几何下沉 core（SA::noneColorSlashLine），QML 前端画同一个"无颜色"标记
+    p->drawLine(SA::noneColorSlashLine(colorRect));
     pen.setColor(Qt::black);
     p->setPen(pen);
     p->drawRect(colorRect);

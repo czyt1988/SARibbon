@@ -9,14 +9,16 @@
 //===================================================
 // SARibbonColorToolButton::PrivateData
 //===================================================
+// 常量已下沉 core（SA::ColorToolButtonConstants），此处仅保留本地别名以维持
+// 文件内既有的 Constants:: 拼写，避免同一组数值出现两份定义
 namespace SARibbonColorToolButtonConstants
 {
-constexpr qreal COLOR_BLOCK_RATIO        = 0.25;  ///< 颜色块高度占图标高度的比例
-constexpr int COLOR_BLOCK_MIN_HEIGHT     = 3;     ///< 颜色块最小高度
-constexpr int COLOR_BLOCK_MARGIN         = 1;     ///< 颜色块边距
-constexpr int DEFAULT_COLOR_ICON_SIZE    = 32;    ///< 默认颜色图标尺寸
-constexpr int INVALID_COLOR_PEN_WIDTH    = 1;     ///< 无效颜色时边框线宽
-constexpr int INVALID_COLOR_LINE_RATIO   = 3;     ///< 无效颜色对角线比例分母
+constexpr qreal COLOR_BLOCK_RATIO      = SA::ColorToolButtonConstants::COLOR_BLOCK_RATIO;        ///< 颜色块高度占图标高度的比例
+constexpr int COLOR_BLOCK_MIN_HEIGHT   = SA::ColorToolButtonConstants::COLOR_BLOCK_MIN_HEIGHT;   ///< 颜色块最小高度
+constexpr int COLOR_BLOCK_MARGIN       = SA::ColorToolButtonConstants::COLOR_BLOCK_MARGIN;       ///< 颜色块边距
+constexpr int DEFAULT_COLOR_ICON_SIZE  = SA::ColorToolButtonConstants::DEFAULT_COLOR_ICON_SIZE;  ///< 默认颜色图标尺寸
+constexpr int INVALID_COLOR_PEN_WIDTH  = SA::ColorToolButtonConstants::INVALID_COLOR_PEN_WIDTH;  ///< 无效颜色时边框线宽
+constexpr int INVALID_COLOR_LINE_RATIO = SA::ColorToolButtonConstants::INVALID_COLOR_LINE_RATIO; ///< 无效颜色对角线比例分母
 }
 
 /**
@@ -128,10 +130,10 @@ QPixmap SARibbonColorToolButton::PrivateData::createIconPixmap(const QStyleOptio
     // 颜色块高度随图标尺寸等比缩放，保证大按钮和小按钮下都清晰可见；同时不超过图标高度的一半
     // 注意：以下所有几何量均为逻辑像素。QPainter绘制在设置了devicePixelRatio的QPixmap上时
     // 会自动按dpr缩放，因此不能用设备像素坐标计算，否则高DPI下会被二次放大导致色块溢出被裁剪
+    // 色带高度规则下沉 core（SA::colorBandHeight），QML 前端共用同一套算式
     const int slotW = iconsize.width();
     const int slotH = iconsize.height();
-    int colorHeight = qMax(Constants::COLOR_BLOCK_MIN_HEIGHT, qRound(slotH * Constants::COLOR_BLOCK_RATIO));
-    colorHeight     = qMin(colorHeight, slotH / 2);
+    const int colorHeight    = SA::colorBandHeight(slotH);
     const int margin         = Constants::COLOR_BLOCK_MARGIN;
     const int iconAreaHeight = slotH - colorHeight - margin;
     if (slotW <= 0 || iconAreaHeight <= 0) {
@@ -144,7 +146,7 @@ QPixmap SARibbonColorToolButton::PrivateData::createIconPixmap(const QStyleOptio
     res.fill(Qt::transparent);
     QPainter painter(&res);
     painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
-    // 图标等比缩放到不超过上方区域（只缩小不放大），水平居中、底部与图标区域底边对齐
+    // 图标等比缩放到不超过上方区域（只缩小不放大）
     int iconW = 0;
     int iconH = 0;
     if (!iconPm.isNull()) {
@@ -154,15 +156,19 @@ QPixmap SARibbonColorToolButton::PrivateData::createIconPixmap(const QStyleOptio
         fit                = qMin(fit, qreal(1.0));
         iconW              = qRound(iconLogical.width() * fit);
         iconH              = qRound(iconLogical.height() * fit);
-        painter.drawPixmap(QRect((slotW - iconW) / 2, iconAreaHeight - iconH, iconW, iconH), iconPm);
     }
-    // 色块位于图标正下方，上边缘与图标下边缘间隔margin像素
-    int bandWidth = (iconW > 0) ? iconW : slotW;
-    int bandX     = (slotW - bandWidth) / 2;
-    QRectF colorRect(bandX, iconAreaHeight + margin, bandWidth, colorHeight);
+    // 摆放（图标水平居中、底对齐；色块在图标正下方、间隔 margin 像素）交给 core，
+    // 避免与 QML 前端形成双实现
+    const SA::ColorUnderIconMetrics metrics = SA::calcColorUnderIconMetrics(iconsize, QSize(iconW, iconH));
+    if (!iconPm.isNull()) {
+        painter.drawPixmap(metrics.iconRect, iconPm);
+    }
+    const QRectF colorRect(metrics.colorRect);
     if (mColor.isValid()) {
         painter.fillRect(colorRect, mColor);
     } else {
+        // 这里的斜线内缩量用 qreal 除法，与 core SA::noneColorSlashLine 的 int
+        // 除法相差不足 1px；不改写以免移动 widgets 既有的渲染结果
         QPen pen(Qt::red, Constants::INVALID_COLOR_PEN_WIDTH, Qt::SolidLine, Qt::RoundCap);
         painter.setPen(pen);
         painter.setRenderHint(QPainter::Antialiasing, true);

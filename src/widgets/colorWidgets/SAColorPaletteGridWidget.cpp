@@ -48,7 +48,7 @@ public:
     QList< QColor > makeColorPalette(const QList< QColor >& clrList) const;
 
 public:
-    QList< int > mFactor { 180, 160, 140, 75, 50 };  ///< palette的比例因子，将调用QColor的lighter函数执行
+    QList< int > mFactor { SA::defaultColorPaletteFactors() };  ///< palette的比例因子，将调用QColor的lighter函数执行
     QVBoxLayout* mLayout { nullptr };                ///< 垂直布局
     SAColorGridWidget* mMainColorList { nullptr };   ///< 这个用于显示标准颜色
     SAColorGridWidget* mPaletteColorGrid { nullptr };  ///< 这个用于生成3行亮色，2行暗色的palette
@@ -73,13 +73,8 @@ SAColorPaletteGridWidget::PrivateData::PrivateData(SAColorPaletteGridWidget* p) 
 
 QList< QColor > SAColorPaletteGridWidget::PrivateData::makeColorPalette(const QList< QColor >& clrList) const
 {
-    QList< QColor > res;
-    for (int f : sacolor_as_const(mFactor)) {
-        for (const QColor& c : sacolor_as_const(clrList)) {
-            res.append(c.lighter(f));
-        }
-    }
-    return res;
+    // 下沉 core 后转发（SA::colorPaletteShades），避免与 QML 前端形成双实现
+    return SA::colorPaletteShades(clrList, mFactor);
 }
 //==============================================================
 // SAColorPaletteGridWidget

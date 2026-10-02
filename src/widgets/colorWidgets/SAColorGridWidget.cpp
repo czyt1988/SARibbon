@@ -885,33 +885,3 @@ void SAColorGridWidget::onButtonReleased(QAbstractButton* btn)
         Q_EMIT colorReleased(t->color());
     }
 }
-
-namespace SA
-{
-
-/**
- * \if ENGLISH
- * @brief Get standard color list
- * @return Standard color list
- * \endif
- *
- * \if CHINESE
- * @brief 获取标准颜色列表
- * @return 标准颜色列表
- * \endif
- */
-QList< QColor > getStandardColorList()
-{
-    static QList< QColor > s_standardColorList({ QColor(192, 0, 0),
-                                                 QColor(255, 0, 0),
-                                                 QColor(255, 192, 0),
-                                                 QColor(255, 255, 0),
-                                                 QColor(146, 208, 80),
-                                                 QColor(0, 176, 80),
-                                                 QColor(0, 176, 240),
-                                                 QColor(0, 112, 192),
-                                                 QColor(0, 32, 96),
-                                                 QColor(112, 48, 160) });
-    return s_standardColorList;
-}
-}

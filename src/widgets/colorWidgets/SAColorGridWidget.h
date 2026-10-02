@@ -142,9 +142,8 @@ public:
     // Get size hint
     virtual QSize sizeHint() const Q_DECL_OVERRIDE;
 };
-namespace SA
-{
-// Get standard color list (10 colors in total)
-SA_COLOR_WIDGETS_API QList< QColor > getStandardColorList();
-}
+// SA::getStandardColorList() moved to core (SARibbonCoreUtil.h); the include
+// keeps `#include "SAColorGridWidget.h"` + `SA::getStandardColorList()` source
+// compatible for existing callers
+#include <SARibbonCore/SARibbonCoreUtil.h>
 #endif  // SACOLORGRIDWIDGET_H
