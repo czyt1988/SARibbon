@@ -249,7 +249,37 @@ constexpr int COLOR_BLOCK_MARGIN      = 1;     ///< gap between the icon box and
 constexpr int DEFAULT_COLOR_ICON_SIZE = 32;    ///< side of the generated fill-to-icon swatch
 constexpr int INVALID_COLOR_PEN_WIDTH = 1;     ///< pen width of the invalid-color outline
 constexpr int INVALID_COLOR_LINE_RATIO = 3;    ///< denominator of the invalid-color slash inset
+constexpr int ICON_ONLY_MIN_HINT_EXTRA_WIDTH  = 16;  ///< minimum size hint surplus over the icon box, horizontally
+constexpr int ICON_ONLY_MIN_HINT_EXTRA_HEIGHT = 15;  ///< minimum size hint surplus over the icon box, vertically
 }
+
+/**
+ * \if ENGLISH
+ * @brief Cell size of one entry of a color grid
+ * @param iconSize The swatch box the caller asked for (widgets setColorIconSize)
+ * @param cellMargin Inset from the cell edge to the swatch (widgets setMargins)
+ * @return The size a QGridLayout really gives the cell
+ * @details A grid cell is an icon-only autoRaise SAColorToolButton. Its size
+ *          hint is the icon box grown by the margins, but QToolButton also
+ *          reports a larger minimum size hint, and QGridLayout honours the
+ *          larger of the two — which is why the widgets grid never draws cells
+ *          as tight as the icon box. Both front ends must reproduce the same
+ *          number, so the surplus lives here instead of being rediscovered.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 颜色网格中一个单元的尺寸
+ * @param iconSize 调用方要求的色块盒（widgets 的 setColorIconSize）
+ * @param cellMargin 单元边缘到色块的内缩量（widgets 的 setMargins）
+ * @return QGridLayout 实际分给该单元的尺寸
+ * @details 网格单元是一个 icon-only 且 autoRaise 的 SAColorToolButton。它的
+ *          sizeHint 是图标盒加上边距，但 QToolButton 还会给出一个更大的
+ *          minimumSizeHint，而 QGridLayout 取两者中较大的那个——这正是 widgets
+ *          网格的单元永远不会紧到只有图标盒大小的原因。两个前端必须复现同一个
+ *          数字，因此这个增量放在这里，而不是各自重新推导。
+ * \endif
+ */
+QSize SA_RIBBON_CORE_EXPORT colorGridCellSize(const QSize& iconSize, int cellMargin);
 
 /**
  * \if ENGLISH

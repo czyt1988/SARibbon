@@ -11,6 +11,7 @@
         <file>RibbonControlContainer.qml</file>
         <file>RibbonGallery.qml</file>
         <file>RibbonSeparator.qml</file>
+        <file>RibbonColorGrid.qml</file>
     </qresource>
     <!-- Shared theme palette data (the same on-disk JSONs the widgets module
          compiles in): a QML-only app must resolve theme tokens without

@@ -549,4 +549,31 @@ QLine noneColorSlashLine(const QRect& colorRect)
     return QLine(QPoint(colorRect.x() + ss, colorRect.bottom()), QPoint(colorRect.right() - ss, colorRect.top()));
 }
 
+/**
+ * \if ENGLISH
+ * @brief Cell size of one entry of a color grid
+ * @details QGridLayout gives a cell the larger of its size hint (icon box plus
+ *          twice the margin) and its minimum size hint (icon box plus the
+ *          QToolButton surplus). Measured against SAColorGridWidget on every
+ *          Qt style shipped here, the surplus is a constant 16x15 regardless of
+ *          icon size, font or style.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 颜色网格中一个单元的尺寸
+ * @details QGridLayout 分给单元的是 sizeHint（图标盒加两倍边距）与
+ *          minimumSizeHint（图标盒加 QToolButton 的增量）中较大的那个。对本项目
+ *          涉及的每一种 Qt 样式实测，该增量恒为 16x15，与图标尺寸、字体、样式
+ *          均无关。
+ * \endif
+ */
+QSize colorGridCellSize(const QSize& iconSize, int cellMargin)
+{
+    const int hintW = iconSize.width() + 2 * cellMargin;
+    const int hintH = iconSize.height() + 2 * cellMargin;
+    const int minW  = iconSize.width() + ColorToolButtonConstants::ICON_ONLY_MIN_HINT_EXTRA_WIDTH;
+    const int minH  = iconSize.height() + ColorToolButtonConstants::ICON_ONLY_MIN_HINT_EXTRA_HEIGHT;
+    return QSize(qMax(hintW, minW), qMax(hintH, minH));
+}
+
 }

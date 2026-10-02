@@ -54,3 +54,27 @@ if(TARGET SARibbonQml AND TARGET SARibbonWidgets)
     set_tests_properties(qml_LayoutParity PROPERTIES LABELS qml TIMEOUT 120
         ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QT_QUICK_CONTROLS_STYLE=Basic")
 endif()
+
+# 颜色控件族一致性测试（WS-D）：同样需要两个前端并存，宿主几何直接对照
+# SAColorGridWidget 的 sizeHint 与单元 geometry。
+if(TARGET SARibbonQml AND TARGET SARibbonWidgets)
+    add_executable(qml_Color tst_color_qml.cpp)
+    target_link_libraries(qml_Color PRIVATE
+        SARibbonQml
+        SARibbon::Widgets
+        SARibbonCore
+        Qt${QT_VERSION_MAJOR}::Test
+        Qt${QT_VERSION_MAJOR}::Core
+        Qt${QT_VERSION_MAJOR}::Gui
+        Qt${QT_VERSION_MAJOR}::Widgets
+        Qt${QT_VERSION_MAJOR}::Qml
+        Qt${QT_VERSION_MAJOR}::Quick
+    )
+    set_target_properties(qml_Color PROPERTIES
+        AUTOMOC ON
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+    )
+    add_test(NAME qml_Color COMMAND qml_Color)
+    set_tests_properties(qml_Color PROPERTIES LABELS qml TIMEOUT 120
+        ENVIRONMENT "QT_QPA_PLATFORM=offscreen;QT_QUICK_CONTROLS_STYLE=Basic")
+endif()
