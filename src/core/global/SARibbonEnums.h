@@ -108,6 +108,38 @@ enum SARibbonRowProportion
     Medium, ///< Medium proportion, only works in ThreeRowMode
     Small   ///< Small proportion, occupies one row of SARibbonPanel
 };
+
+/**
+ * \if ENGLISH
+ * @brief Preset tag values of the customize registry (plan 04 WS-C1)
+ * @details Lifted from SARibbonActionsManager::ActionTag so the QML registry
+ *          (SARibbonQml) can share one set of tag values with the widgets
+ *          manager. Keep unscoped: both front ends rely on the implicit
+ *          conversion to int, and the values are the persistence format of
+ *          customize records. The widgets enum keeps its spelling through a
+ *          type alias plus static constexpr members (same pattern as
+ *          SARibbonPanelItem::RowProportion, NOTES B21).
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 定制注册表的预置标签值（计划 04 WS-C1）
+ * @details 自 SARibbonActionsManager::ActionTag 提升，使 QML 注册表
+ *          （SARibbonQml）与 widgets 管理器共用同一套标签值。保持 unscoped：
+ *          两个前端都依赖到 int 的隐式转换，且这些值是定制记录的持久化格式。
+ *          widgets 枚举通过类型别名 + static constexpr 成员保持原拼写
+ *          （与 SARibbonPanelItem::RowProportion 同一手法，NOTES B21）。
+ * \endif
+ */
+enum SARibbonActionTag
+{
+    UnknowActionTag                 = 0,     ///< Unknown tag
+    CommonlyUsedActionTag           = 0x01,  ///< Preset tag - commonly used commands
+    NotInFunctionalAreaActionTag    = 0x02,  ///< Preset tag - commands not in functional area
+    AutoCategoryDistinguishBeginTag = 0x1000,  ///< Auto category distinguish begin tag
+    AutoCategoryDistinguishEndTag   = 0x2000,  ///< Auto category distinguish end tag
+    NotInRibbonCategoryTag          = 0x2001,  ///< Tag for actions not in ribbon category
+    UserDefineActionTag             = 0x8000   ///< User defined tag, all custom tags should be greater than this
+};
 }  // namespace Core
 }  // namespace SARibbon
 

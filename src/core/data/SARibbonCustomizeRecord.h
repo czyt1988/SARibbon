@@ -4,6 +4,7 @@
 #include <SARibbonCore/SARibbonEnums.h>
 #include <QString>
 #include <QList>
+class QObject;
 
 namespace SARibbon
 {
@@ -18,6 +19,11 @@ namespace Core
  * 2.x class that has no manager/widget dependency. The widgets-side
  * SARibbonCustomizeData publicly inherits this record (161 direct field accesses
  * keep compiling) and keeps the manager pointer, apply() and the make* factories.
+ * @note Plan 04 WS-C1: the make* factories also live here (without the manager
+ *       argument, which only the widgets front end can supply), so the QML
+ *       customizer produces exactly the same records. SARibbonCustomizeData's
+ *       factories forward here. The customizable marking helpers
+ *       isCanCustomize()/setCanCustomize() are free functions below the class.
  * \endif
  *
  * \if CHINESE
@@ -26,6 +32,10 @@ namespace Core
  * isValid()/simplify()——2.x 类中无 manager/widget 依赖的全部内容。
  * widgets 侧 SARibbonCustomizeData 公有继承本记录（161 处直接字段访问
  * 保持可编译），manager 指针、apply() 与 make* 工厂留在派生类。
+ * @note 计划 04 WS-C1：make* 工厂同样落在这里（不带 manager 参数——只有
+ *       widgets 前端能提供），使 QML 定制器产出完全相同的记录，
+ *       SARibbonCustomizeData 的工厂改为转发。可定制标记辅助函数
+ *       isCanCustomize()/setCanCustomize() 是类下方的自由函数。
  * \endif
  */
 class SA_RIBBON_CORE_EXPORT SARibbonCustomizeRecord
@@ -78,6 +88,61 @@ public:
 	template< typename CustomizeDataT >
 	static QList< CustomizeDataT > simplify(const QList< CustomizeDataT >& csd);
 
+	// Make an AddCategoryActionType record
+	static SARibbonCustomizeRecord makeAddCategory(const QString& title, int index, const QString& objName);
+
+	// Make an AddPanelActionType record
+	static SARibbonCustomizeRecord
+	makeAddPanel(const QString& title, int index, const QString& categoryObjName, const QString& objName);
+
+	// Make an AddActionActionType record
+	static SARibbonCustomizeRecord makeAddAction(const QString& key,
+												SARibbonRowProportion rp,
+												const QString& categoryObjName,
+												const QString& panelObjName);
+
+	// Make a RemoveCategoryActionType record
+	static SARibbonCustomizeRecord makeRemoveCategory(const QString& categoryObjName);
+
+	// Make a RemovePanelActionType record
+	static SARibbonCustomizeRecord makeRemovePanel(const QString& categoryObjName, const QString& panelObjName);
+
+	// Make a RemoveActionActionType record
+	static SARibbonCustomizeRecord
+	makeRemoveAction(const QString& categoryObjName, const QString& panelObjName, const QString& key);
+
+	// Make a ChangeCategoryOrderActionType record
+	static SARibbonCustomizeRecord makeChangeCategoryOrder(const QString& categoryObjName, int moveIndex);
+
+	// Make a ChangePanelOrderActionType record
+	static SARibbonCustomizeRecord
+	makeChangePanelOrder(const QString& categoryObjName, const QString& panelObjName, int moveIndex);
+
+	// Make a ChangeActionOrderActionType record
+	static SARibbonCustomizeRecord makeChangeActionOrder(const QString& categoryObjName,
+														const QString& panelObjName,
+														const QString& key,
+														int moveIndex);
+
+	// Make a RenameCategoryActionType record
+	static SARibbonCustomizeRecord makeRenameCategory(const QString& newName, const QString& categoryObjName);
+
+	// Make a RenamePanelActionType record
+	static SARibbonCustomizeRecord
+	makeRenamePanel(const QString& newName, const QString& categoryObjName, const QString& panelObjName);
+
+	// Make a VisibleCategoryActionType record
+	static SARibbonCustomizeRecord makeVisibleCategory(const QString& categoryObjName, bool isShow);
+
+	// Make an AddQuickActionActionType record (index < 0 appends to the end)
+	static SARibbonCustomizeRecord makeAddQuickAction(const QString& key, int index = -1);
+
+	// Make a RemoveQuickActionActionType record
+	static SARibbonCustomizeRecord makeRemoveQuickAction(const QString& key);
+
+	// Make a ChangeQuickActionOrderActionType record
+	static SARibbonCustomizeRecord makeChangeQuickActionOrder(const QString& key, int moveIndex);
+
 	/**
 	 * \if ENGLISH
 	 * @brief Parameter for recording order
@@ -123,6 +188,12 @@ public:
 private:
 	ActionType mType;  ///< 标记这个data是category还是panel亦或是action
 };
+
+// Read the SA_RIBBON_BAR_PROP_CAN_CUSTOMIZE dynamic property of an object
+bool SA_RIBBON_CORE_EXPORT isCanCustomize(QObject* obj);
+
+// Write the SA_RIBBON_BAR_PROP_CAN_CUSTOMIZE dynamic property of an object
+void SA_RIBBON_CORE_EXPORT setCanCustomize(QObject* obj, bool canbe = true);
 
 // Simplify QList (template: single core implementation, derived extras preserved)
 template< typename CustomizeDataT >

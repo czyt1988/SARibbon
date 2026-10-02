@@ -24,10 +24,15 @@ class SA_RIBBON_EXPORT SARibbonCustomizeData : public SARibbon::Core::SARibbonCu
 public:
     // 计划 02 S4.2：ActionType 枚举、五个公有数据字段、mType、actionType()/setActionType()/isValid()
     // 与 simplify() 算法均下沉 core 的 SARibbonCustomizeRecord（公有继承，存量字段直接访问零改动）
+    // 计划 04 WS-C1：make* 工厂与 isCanCustomize/setCanCustomize 的实现同样下沉 core，
+    // 本类只保留 manager 指针、apply() 与转发；QML 定制器因此能产出完全相同的记录
 	// Default constructor
 	SARibbonCustomizeData();
 	// Constructor with action type and manager
 	SARibbonCustomizeData(ActionType type, SARibbonActionsManager* mgr = nullptr);
+	// Constructor adopting a pure core record (plan 04 WS-C1: the make* factories live in core)
+	explicit SARibbonCustomizeData(const SARibbon::Core::SARibbonCustomizeRecord& record,
+								   SARibbonActionsManager* mgr = nullptr);
 	// Apply SARibbonCustomizeData to SARibbonBar
 	bool apply(SARibbonBar* bar) const;
 

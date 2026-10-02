@@ -60,3 +60,28 @@ set_target_properties(core_PanelLayoutEngine PROPERTIES
     AUTOMOC ON
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests
 )
+
+# Customize record contract test (plan-04 WS-C1): pure core, no widgets dependency.
+# Locks the enum values, the make* factory field mapping and the XML byte format
+# that both front ends persist to.
+add_executable(core_CustomizeRecord tst_customizeRecord.cpp)
+target_link_libraries(core_CustomizeRecord PRIVATE
+    SARibbonCore
+    Qt${QT_VERSION_MAJOR}::Test
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Gui
+)
+if(NOT SARIBBON_BUILD_STATIC_LIBS)
+    add_custom_command(TARGET core_CustomizeRecord POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_FILE:SARibbonCore> $<TARGET_FILE_DIR:core_CustomizeRecord>
+        COMMENT "Copy SARibbonCore next to core_CustomizeRecord"
+    )
+endif()
+add_test(NAME core_CustomizeRecord COMMAND core_CustomizeRecord)
+set_tests_properties(core_CustomizeRecord PROPERTIES LABELS core TIMEOUT 120
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
+set_target_properties(core_CustomizeRecord PROPERTIES
+    AUTOMOC ON
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests
+)

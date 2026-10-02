@@ -24,6 +24,7 @@ sa_add_library(SARibbonCore
         contract/SARibbonContract.cpp
         data/SARibbonCustomizeRecord.h
         data/SARibbonCustomizeRecord.cpp
+        data/SARibbonCustomizeXml.h
         factory/SARibbonElementFactoryInterface.h
         layout/SARibbonPanelLayoutEngine.h
         layout/SARibbonPanelLayoutEngine.cpp

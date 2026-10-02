@@ -21,6 +21,27 @@ SARibbonCustomizeData::SARibbonCustomizeData(ActionType type, SARibbonActionsMan
 
 /**
  * \if ENGLISH
+ * @brief Adopt a pure core record
+ * @details The core factories (plan 04 WS-C1) return SARibbonCustomizeRecord, which
+ *          carries every persisted field but no manager; this constructor lifts one
+ *          into the widgets type and attaches the manager the caller supplied.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 接收一条 core 纯记录
+ * @details core 工厂（计划 04 WS-C1）返回 SARibbonCustomizeRecord，它带有全部
+ *          持久化字段但没有 manager；本构造函数把它提升为 widgets 类型，
+ *          并挂上调用方给出的 manager。
+ * \endif
+ */
+SARibbonCustomizeData::SARibbonCustomizeData(const SARibbon::Core::SARibbonCustomizeRecord& record,
+                                             SARibbonActionsManager* mgr)
+    : SARibbon::Core::SARibbonCustomizeRecord(record), mActionsManagerPointer(mgr)
+{
+}
+
+/**
+ * \if ENGLISH
  * @brief Apply SARibbonCustomizeData to SARibbonBar
  * @param m SARibbonBar to apply to
  * @return If application fails, returns false; if actionType==UnknowActionType, directly returns false
@@ -346,12 +367,8 @@ void SARibbonCustomizeData::setActionsManager(SARibbonActionsManager* mgr)
  */
 SARibbonCustomizeData SARibbonCustomizeData::makeAddCategoryCustomizeData(const QString& title, int index, const QString& objName)
 {
-    SARibbonCustomizeData d(AddCategoryActionType);
-
-    d.indexValue           = index;
-    d.keyValue             = title;
-    d.categoryObjNameValue = objName;
-    return (d);
+    // 计划 04 WS-C1：记录构造下沉 core，本函数保持原签名与原语义
+    return (SARibbonCustomizeData(SARibbon::Core::SARibbonCustomizeRecord::makeAddCategory(title, index, objName)));
 }
 
 /**
@@ -378,13 +395,8 @@ SARibbonCustomizeData SARibbonCustomizeData::makeAddPanelCustomizeData(const QSt
                                                                        const QString& categoryobjName,
                                                                        const QString& objName)
 {
-    SARibbonCustomizeData d(AddPanelActionType);
-
-    d.indexValue           = index;
-    d.keyValue             = title;
-    d.panelObjNameValue    = objName;
-    d.categoryObjNameValue = categoryobjName;
-    return (d);
+    // 计划 04 WS-C1：记录构造下沉 core，本函数保持原签名与原语义
+    return (SARibbonCustomizeData(SARibbon::Core::SARibbonCustomizeRecord::makeAddPanel(title, index, categoryobjName, objName)));
 }
 
 /**
@@ -414,14 +426,8 @@ SARibbonCustomizeData SARibbonCustomizeData::makeAddActionCustomizeData(const QS
                                                                         const QString& categoryObjName,
                                                                         const QString& panelObjName)
 {
-    SARibbonCustomizeData d(AddActionActionType, mgr);
-
-    d.keyValue                 = key;
-    d.categoryObjNameValue     = categoryObjName;
-    d.panelObjNameValue        = panelObjName;
-    d.actionRowProportionValue = rp;
-
-    return (d);
+    // 计划 04 WS-C1：记录构造下沉 core，本函数只补 manager 指针
+    return (SARibbonCustomizeData(SARibbon::Core::SARibbonCustomizeRecord::makeAddAction(key, rp, categoryObjName, panelObjName), mgr));
 }
 
 /**
@@ -442,17 +448,8 @@ SARibbonCustomizeData SARibbonCustomizeData::makeAddActionCustomizeData(const QS
 SARibbonCustomizeData SARibbonCustomizeData::makeRenameCategoryCustomizeData(const QString& newname,
                                                                              const QString& categoryobjName)
 {
-    SARibbonCustomizeData d(RenameCategoryActionType);
-
-    if (categoryobjName.isEmpty()) {
-        qDebug() << QObject::tr("SARibbon Warning !!! customize rename category,"
-                                "but get an empty category object name,"
-                                "if you want to customize SARibbon,"
-                                "please make sure every element has been set object name.");
-    }
-    d.keyValue             = newname;
-    d.categoryObjNameValue = categoryobjName;
-    return (d);
+    // 计划 04 WS-C1：记录构造下沉 core，本函数保持原签名与原语义
+    return (SARibbonCustomizeData(SARibbon::Core::SARibbonCustomizeRecord::makeRenameCategory(newname, categoryobjName)));
 }
 
 /**
@@ -476,18 +473,8 @@ SARibbonCustomizeData SARibbonCustomizeData::makeRenamePanelCustomizeData(const 
                                                                           const QString& categoryobjName,
                                                                           const QString& panelObjName)
 {
-    SARibbonCustomizeData d(RenamePanelActionType);
-
-    if (panelObjName.isEmpty() || categoryobjName.isEmpty()) {
-        qDebug() << QObject::tr("SARibbon Warning !!! customize rename panel,"
-                                "but get an empty category/panel object name,"
-                                "if you want to customize SARibbon,"
-                                "please make sure every element has been set object name.");
-    }
-    d.keyValue             = newname;
-    d.panelObjNameValue    = panelObjName;
-    d.categoryObjNameValue = categoryobjName;
-    return (d);
+    // 计划 04 WS-C1：记录构造下沉 core，本函数保持原签名与原语义
+    return (SARibbonCustomizeData(SARibbon::Core::SARibbonCustomizeRecord::makeRenamePanel(newname, categoryobjName, panelObjName)));
 }
 
 /**
@@ -508,17 +495,8 @@ SARibbonCustomizeData SARibbonCustomizeData::makeRenamePanelCustomizeData(const 
 SARibbonCustomizeData SARibbonCustomizeData::makeChangeCategoryOrderCustomizeData(const QString& categoryobjName,
                                                                                   int moveindex)
 {
-    SARibbonCustomizeData d(ChangeCategoryOrderActionType);
-
-    if (categoryobjName.isEmpty()) {
-        qDebug() << QObject::tr("SARibbon Warning !!! customize change category order,"
-                                "but get an empty category object name,"
-                                "if you want to customize SARibbon,"
-                                "please make sure every element has been set object name.");
-    }
-    d.categoryObjNameValue = categoryobjName;
-    d.indexValue           = moveindex;
-    return (d);
+    // 计划 04 WS-C1：记录构造下沉 core，本函数保持原签名与原语义
+    return (SARibbonCustomizeData(SARibbon::Core::SARibbonCustomizeRecord::makeChangeCategoryOrder(categoryobjName, moveindex)));
 }
 
 /**
@@ -542,18 +520,8 @@ SARibbonCustomizeData SARibbonCustomizeData::makeChangePanelOrderCustomizeData(c
                                                                                const QString& panelObjName,
                                                                                int moveindex)
 {
-    SARibbonCustomizeData d(ChangePanelOrderActionType);
-
-    if (categoryobjName.isEmpty() || panelObjName.isEmpty()) {
-        qDebug() << QObject::tr("SARibbon Warning !!! customize change panel order,"
-                                "but get an empty category/panel object name,"
-                                "if you want to customize SARibbon,"
-                                "please make sure every element has been set object name.");
-    }
-    d.categoryObjNameValue = categoryobjName;
-    d.panelObjNameValue    = panelObjName;
-    d.indexValue           = moveindex;
-    return (d);
+    // 计划 04 WS-C1：记录构造下沉 core，本函数保持原签名与原语义
+    return (SARibbonCustomizeData(SARibbon::Core::SARibbonCustomizeRecord::makeChangePanelOrder(categoryobjName, panelObjName, moveindex)));
 }
 
 /**
@@ -583,19 +551,8 @@ SARibbonCustomizeData SARibbonCustomizeData::makeChangeActionOrderCustomizeData(
                                                                                 SARibbonActionsManager* mgr,
                                                                                 int moveindex)
 {
-    SARibbonCustomizeData d(ChangeActionOrderActionType, mgr);
-
-    if (categoryobjName.isEmpty() || panelObjName.isEmpty() || key.isEmpty()) {
-        qDebug() << QObject::tr("SARibbon Warning !!! customize change action order,"
-                                "but get an empty category/panel/action object name,"
-                                "if you want to customize SARibbon,"
-                                "please make sure every element has been set object name.");
-    }
-    d.categoryObjNameValue = categoryobjName;
-    d.panelObjNameValue    = panelObjName;
-    d.keyValue             = key;
-    d.indexValue           = moveindex;
-    return (d);
+    // 计划 04 WS-C1：记录构造下沉 core，本函数只补 manager 指针
+    return (SARibbonCustomizeData(SARibbon::Core::SARibbonCustomizeRecord::makeChangeActionOrder(categoryobjName, panelObjName, key, moveindex), mgr));
 }
 
 /**
@@ -613,16 +570,8 @@ SARibbonCustomizeData SARibbonCustomizeData::makeChangeActionOrderCustomizeData(
  */
 SARibbonCustomizeData SARibbonCustomizeData::makeRemoveCategoryCustomizeData(const QString& categoryobjName)
 {
-    SARibbonCustomizeData d(RemoveCategoryActionType);
-
-    if (categoryobjName.isEmpty()) {
-        qDebug() << QObject::tr("SARibbon Warning !!! customize remove category,"
-                                "but get an empty category object name,"
-                                "if you want to customize SARibbon,"
-                                "please make sure every element has been set object name.");
-    }
-    d.categoryObjNameValue = categoryobjName;
-    return (d);
+    // 计划 04 WS-C1：记录构造下沉 core，本函数保持原签名与原语义
+    return (SARibbonCustomizeData(SARibbon::Core::SARibbonCustomizeRecord::makeRemoveCategory(categoryobjName)));
 }
 
 /**
@@ -643,17 +592,8 @@ SARibbonCustomizeData SARibbonCustomizeData::makeRemoveCategoryCustomizeData(con
 SARibbonCustomizeData SARibbonCustomizeData::makeRemovePanelCustomizeData(const QString& categoryobjName,
                                                                           const QString& panelObjName)
 {
-    SARibbonCustomizeData d(RemovePanelActionType);
-
-    if (categoryobjName.isEmpty() || panelObjName.isEmpty()) {
-        qDebug() << QObject::tr("SARibbon Warning !!! customize remove panel,"
-                                "but get an empty category/panel object name,"
-                                "if you want to customize SARibbon,"
-                                "please make sure every element has been set object name.");
-    }
-    d.categoryObjNameValue = categoryobjName;
-    d.panelObjNameValue    = panelObjName;
-    return (d);
+    // 计划 04 WS-C1：记录构造下沉 core，本函数保持原签名与原语义
+    return (SARibbonCustomizeData(SARibbon::Core::SARibbonCustomizeRecord::makeRemovePanel(categoryobjName, panelObjName)));
 }
 
 /**
@@ -680,18 +620,8 @@ SARibbonCustomizeData SARibbonCustomizeData::makeRemoveActionCustomizeData(const
                                                                            const QString& key,
                                                                            SARibbonActionsManager* mgr)
 {
-    SARibbonCustomizeData d(RemoveActionActionType, mgr);
-
-    if (categoryobjName.isEmpty() || panelObjName.isEmpty() || key.isEmpty()) {
-        qDebug() << QObject::tr("SARibbon Warning !!! customize remove action,"
-                                "but get an empty category/panel/action object name,"
-                                "if you want to customize SARibbon,"
-                                "please make sure every element has been set object name.");
-    }
-    d.categoryObjNameValue = categoryobjName;
-    d.panelObjNameValue    = panelObjName;
-    d.keyValue             = key;
-    return (d);
+    // 计划 04 WS-C1：记录构造下沉 core，本函数只补 manager 指针
+    return (SARibbonCustomizeData(SARibbon::Core::SARibbonCustomizeRecord::makeRemoveAction(categoryobjName, panelObjName, key), mgr));
 }
 
 /**
@@ -711,17 +641,8 @@ SARibbonCustomizeData SARibbonCustomizeData::makeRemoveActionCustomizeData(const
  */
 SARibbonCustomizeData SARibbonCustomizeData::makeVisibleCategoryCustomizeData(const QString& categoryobjName, bool isShow)
 {
-    SARibbonCustomizeData d(VisibleCategoryActionType);
-
-    if (categoryobjName.isEmpty()) {
-        qDebug() << QObject::tr("SARibbon Warning !!! customize visible category,"
-                                "but get an empty category object name,"
-                                "if you want to customize SARibbon,"
-                                "please make sure every element has been set object name.");
-    }
-    d.categoryObjNameValue = categoryobjName;
-    d.indexValue           = isShow ? 1 : 0;
-    return (d);
+    // 计划 04 WS-C1：记录构造下沉 core，本函数保持原签名与原语义
+    return (SARibbonCustomizeData(SARibbon::Core::SARibbonCustomizeRecord::makeVisibleCategory(categoryobjName, isShow)));
 }
 
 /**
@@ -742,11 +663,8 @@ SARibbonCustomizeData SARibbonCustomizeData::makeVisibleCategoryCustomizeData(co
 SARibbonCustomizeData SARibbonCustomizeData::makeAddQuickActionCustomizeData(const QString& key,
                                                                              SARibbonActionsManager* mgr)
 {
-    SARibbonCustomizeData d(AddQuickActionActionType, mgr);
-
-    d.keyValue   = key;
-    d.indexValue = -1;  // 默认追加到末尾
-    return (d);
+    // 计划 04 WS-C1：记录构造下沉 core，本函数只补 manager 指针
+    return (SARibbonCustomizeData(SARibbon::Core::SARibbonCustomizeRecord::makeAddQuickAction(key), mgr));
 }
 
 /**
@@ -767,10 +685,8 @@ SARibbonCustomizeData SARibbonCustomizeData::makeAddQuickActionCustomizeData(con
 SARibbonCustomizeData SARibbonCustomizeData::makeRemoveQuickActionCustomizeData(const QString& key,
                                                                                 SARibbonActionsManager* mgr)
 {
-    SARibbonCustomizeData d(RemoveQuickActionActionType, mgr);
-
-    d.keyValue = key;
-    return (d);
+    // 计划 04 WS-C1：记录构造下沉 core，本函数只补 manager 指针
+    return (SARibbonCustomizeData(SARibbon::Core::SARibbonCustomizeRecord::makeRemoveQuickAction(key), mgr));
 }
 
 /**
@@ -794,11 +710,8 @@ SARibbonCustomizeData SARibbonCustomizeData::makeChangeQuickActionOrderCustomize
                                                                                      SARibbonActionsManager* mgr,
                                                                                      int moveindex)
 {
-    SARibbonCustomizeData d(ChangeQuickActionOrderActionType, mgr);
-
-    d.keyValue   = key;
-    d.indexValue = moveindex;
-    return (d);
+    // 计划 04 WS-C1：记录构造下沉 core，本函数只补 manager 指针
+    return (SARibbonCustomizeData(SARibbon::Core::SARibbonCustomizeRecord::makeChangeQuickActionOrder(key, moveindex), mgr));
 }
 
 /**
@@ -816,12 +729,8 @@ SARibbonCustomizeData SARibbonCustomizeData::makeChangeQuickActionOrderCustomize
  */
 bool SARibbonCustomizeData::isCanCustomize(QObject* obj)
 {
-    QVariant v = obj->property(SA_RIBBON_BAR_PROP_CAN_CUSTOMIZE);
-
-    if (v.isValid()) {
-        return (v.toBool());
-    }
-    return (false);
+    // 计划 04 WS-C1：与 QML 前端共用 core 的动态属性实现
+    return (SARibbon::Core::isCanCustomize(obj));
 }
 
 /**
@@ -839,7 +748,8 @@ bool SARibbonCustomizeData::isCanCustomize(QObject* obj)
  */
 void SARibbonCustomizeData::setCanCustomize(QObject* obj, bool canbe)
 {
-    obj->setProperty(SA_RIBBON_BAR_PROP_CAN_CUSTOMIZE, canbe);
+    // 计划 04 WS-C1：与 QML 前端共用 core 的动态属性实现
+    SARibbon::Core::setCanCustomize(obj, canbe);
 }
 
 QList< SARibbonCustomizeData > SARibbonCustomizeData::simplify(const QList< SARibbonCustomizeData >& csd)

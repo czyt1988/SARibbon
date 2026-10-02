@@ -25,6 +25,7 @@
 #include <QDateTime>
 #include <QXmlStreamWriter>
 #include <QXmlStreamReader>
+#include <SARibbonCore/SARibbonCustomizeXml.h>
 #include "SARibbonCustomizeData.h"
 #include "SARibbonBar.h"
 #include "SARibbonQuickAccessBar.h"
@@ -35,91 +36,49 @@
 // SARibbonCustomizeWidget
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+/**
+ * \if ENGLISH
+ * @brief Write the customize data list to xml
+ * @details Plan 04 WS-C1: the format itself lives in the core template
+ *          SARibbon::Core::recordsToXml (data/SARibbonCustomizeXml.h), so the QML
+ *          customizer produces byte-identical files. This function only keeps the
+ *          2.x signature.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 将定制数据列表写入 xml
+ * \details 计划 04 WS-C1：格式本体在 core 模板
+ *          SARibbon::Core::recordsToXml（data/SARibbonCustomizeXml.h），
+ *          QML 定制器因此产出逐字节相同的文件。
+ *          本函数只保留 2.x 签名。
+ * \endif
+ */
 bool sa_customize_datas_to_xml(QXmlStreamWriter* xml, const QList< SARibbonCustomizeData >& cds)
 {
-    if (cds.size() <= 0) {
-        return (false);
-    }
-
-    xml->writeStartElement("sa-ribbon-customize");
-    for (const SARibbonCustomizeData& d : cds) {
-        xml->writeStartElement("customize-data");
-        xml->writeAttribute("type", QString::number(d.actionType()));
-        xml->writeAttribute("index", QString::number(d.indexValue));
-        xml->writeAttribute("key", d.keyValue);
-        xml->writeAttribute("category", d.categoryObjNameValue);
-        xml->writeAttribute("panel", d.panelObjNameValue);
-        xml->writeAttribute("row-prop", QString::number(d.actionRowProportionValue));
-
-        xml->writeEndElement();
-    }
-    xml->writeEndElement();
-    if (xml->hasError()) {
-        qWarning() << "write has error";
-    }
-    return (true);
+    return SARibbon::Core::recordsToXml(xml, cds);
 }
 
+/**
+ * \if ENGLISH
+ * @brief Read the customize data list from xml
+ * @details Plan 04 WS-C1: parsing lives in the core template
+ *          SARibbon::Core::recordsFromXml. The manager pointer is not part of the
+ *          file format, so it is attached here after reading, exactly as before.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 从 xml 读取定制数据列表
+ * \details 计划 04 WS-C1：解析在 core 模板
+ *          SARibbon::Core::recordsFromXml。manager 指针不属于文件格式，
+ *          因此仍在读取之后在此挂上，与 2.x 行为一致。
+ * \endif
+ */
 QList< SARibbonCustomizeData > sa_customize_datas_from_xml(QXmlStreamReader* xml, SARibbonActionsManager* mgr)
 {
-    // 先找到"sa-ribbon-customize"
-    while (!xml->atEnd()) {
+    QList< SARibbonCustomizeData > res = SARibbon::Core::recordsFromXml< SARibbonCustomizeData >(xml);
 
-        if (xml->isStartElement() && (xml->name().toString() == "sa-ribbon-customize")) {
-            break;
-        }
-        xml->readNext();
-    }
-    QList< SARibbonCustomizeData > res;
-
-    // 开始遍历"customize-data"
-    while (!xml->atEnd()) {
-        if (xml->isStartElement() && (xml->name().toString() == "customize-data")) {
-            // 首先读取属性type
-            SARibbonCustomizeData d;
-            QXmlStreamAttributes attrs = xml->attributes();
-            if (!attrs.hasAttribute("type")) {
-                // 说明异常，跳过这个
-                xml->readNextStartElement();
-                continue;
-            }
-            bool isOk = false;
-            int v     = xml->attributes().value("type").toInt(&isOk);
-            if (!isOk) {
-                // 说明异常，跳过这个
-                xml->readNextStartElement();
-                continue;
-            }
-            d.setActionType(static_cast< SARibbonCustomizeData::ActionType >(v));
-            // 开始读取子对象
-            if (attrs.hasAttribute("index")) {
-                v = xml->attributes().value("index").toInt(&isOk);
-                if (isOk) {
-                    d.indexValue = v;
-                }
-            }
-            if (attrs.hasAttribute("key")) {
-                d.keyValue = attrs.value("key").toString();
-            }
-            if (attrs.hasAttribute("category")) {
-                d.categoryObjNameValue = attrs.value("category").toString();
-            }
-            if (attrs.hasAttribute("panel")) {
-                d.panelObjNameValue = attrs.value("panel").toString();
-            }
-            if (attrs.hasAttribute("row-prop")) {
-                v = xml->attributes().value("row-prop").toInt(&isOk);
-                if (isOk) {
-                    d.actionRowProportionValue = static_cast< SARibbonPanelItem::RowProportion >(v);
-                }
-            }
-            d.setActionsManager(mgr);
-            res.append(d);
-        }
-        xml->readNext();
-    }
-    if (xml->hasError()) {
-        qWarning() << xml->errorString();
+    for (SARibbonCustomizeData& d : res) {
+        d.setActionsManager(mgr);
     }
     return (res);
 }

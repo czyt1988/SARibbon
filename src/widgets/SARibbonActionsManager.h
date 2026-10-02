@@ -33,16 +33,18 @@ class SA_RIBBON_EXPORT SARibbonActionsManager : public QObject
 
 public:
 	// Action tag definition
-	enum ActionTag
-	{
-		UnknowActionTag              = 0,     ///< Unknown tag
-		CommonlyUsedActionTag        = 0x01,  ///< Preset tag - commonly used commands
-		NotInFunctionalAreaActionTag = 0x02,  ///< Preset tag - commands not in functional area
-		AutoCategoryDistinguishBeginTag = 0x1000,  ///< Auto category distinguish begin tag
-		AutoCategoryDistinguishEndTag = 0x2000,  ///< Auto category distinguish end tag
-		NotInRibbonCategoryTag = 0x2001,  ///< Tag for actions not in ribbon category
-		UserDefineActionTag = 0x8000  ///< User defined tag, all custom tags should be greater than this
-	};
+	// 计划 04 WS-C1：枚举本体已提升至 SARibbon::Core::SARibbonActionTag（core/global/SARibbonEnums.h），
+	// 供 QML 侧注册表共用同一套标签值。类作用域的 using 声明无法引入命名空间枚举符（NOTES B21），
+	// 沿用 SARibbonPanelItem::RowProportion 的类型别名 + static constexpr 成员写法，
+	// SARibbonActionsManager::CommonlyUsedActionTag / 类内裸名 / 隐式 int 转换三类存量用法全部保持可编译。
+	using ActionTag = SARibbon::Core::SARibbonActionTag;
+	static constexpr ActionTag UnknowActionTag                 = SARibbon::Core::UnknowActionTag;                  ///< Unknown tag
+	static constexpr ActionTag CommonlyUsedActionTag           = SARibbon::Core::CommonlyUsedActionTag;            ///< Preset tag - commonly used commands
+	static constexpr ActionTag NotInFunctionalAreaActionTag    = SARibbon::Core::NotInFunctionalAreaActionTag;     ///< Preset tag - commands not in functional area
+	static constexpr ActionTag AutoCategoryDistinguishBeginTag = SARibbon::Core::AutoCategoryDistinguishBeginTag;  ///< Auto category distinguish begin tag
+	static constexpr ActionTag AutoCategoryDistinguishEndTag   = SARibbon::Core::AutoCategoryDistinguishEndTag;    ///< Auto category distinguish end tag
+	static constexpr ActionTag NotInRibbonCategoryTag          = SARibbon::Core::NotInRibbonCategoryTag;           ///< Tag for actions not in ribbon category
+	static constexpr ActionTag UserDefineActionTag             = SARibbon::Core::UserDefineActionTag;              ///< User defined tag, all custom tags should be greater than this
 	// Constructor
 	explicit SARibbonActionsManager(SARibbonBar* bar);
 	// Destructor

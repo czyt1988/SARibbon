@@ -10,6 +10,7 @@
 #include "../../src/core/contract/SARibbonAbstractLayoutItem.h"
 #include "../../src/core/contract/SARibbonAbstractLayoutHost.h"
 #include "../../src/core/data/SARibbonCustomizeRecord.h"
+#include "../../src/core/data/SARibbonCustomizeXml.h"
 #include "../../src/core/factory/SARibbonElementFactoryInterface.h"
 #include "../../src/core/layout/SARibbonPanelLayoutEngine.h"
 #include "../../src/core/layout/SARibbonCategoryLayoutEngine.h"
