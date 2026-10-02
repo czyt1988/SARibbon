@@ -17,6 +17,13 @@ namespace SARibbonQml {
 
 RibbonBar::RibbonBar(QQuickItem* parent) : RibbonQuickHost(parent)
 {
+    // system dark mode auto switch, mirroring SARibbonMainWindow/SARibbonWidget:
+    // when the OS is dark and the theme is still the default, start on Dark.
+    // Opt out with RibbonTheme.followSystemDarkMode = false before the bar exists
+    if (SA::isEnableSystemDarkModeAutoSwitch() && SA::isOperatingSystemInDarkMode()
+        && SARibbon::Core::SARibbonThemeData::instance()->theme() == SARibbonTheme::RibbonThemeOffice2021Blue) {
+        RibbonTheme::instance()->setCurrentTheme(int(SARibbonTheme::RibbonThemeDark));
+    }
     // band highlight follows the theme (same core fp the widgets ThemeManager
     // installs); recompute the published band data on theme switches
     connect(SARibbon::Core::SARibbonThemeData::instance(), &SARibbon::Core::SARibbonThemeData::themeChanged, this,

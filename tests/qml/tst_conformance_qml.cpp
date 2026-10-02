@@ -14,6 +14,8 @@
 #include <SARibbonQml/SARibbonQmlGlobal.h>
 #include <SARibbonQml/SARibbonQmlTypes.h>
 #include <SARibbonCore/SARibbonCoreUtil.h>
+#include <SARibbonCore/SARibbonThemePalette.h>
+#include <SARibbonQml/theme/RibbonTheme.h>
 #include <SARibbonQml/button/RibbonToolButton.h>
 #include <SARibbonQml/container/RibbonControlContainer.h>
 #include <SARibbonQml/gallery/RibbonGallery.h>
@@ -50,6 +52,7 @@ private Q_SLOTS:
     void rtlToggle();
     void panelOptionAction();
     void applicationWindow();
+    void themeCustomization();
 
 private:
     QQuickView* exposeScene(QQmlEngine& engine, QQmlComponent& component, const char* src, int w, int h);
@@ -71,6 +74,18 @@ static void collectVisualItems(QQuickItem* item, QList< QQuickItem* >* out)
     for (QQuickItem* kid : kids) {
         collectVisualItems(kid, out);
     }
+}
+
+/**
+ * @brief Normalize a QColor to a comparable string key
+ * @details QColor::operator== compares the color spec before the components, so
+ *          a color built from a token string and the same color built from an
+ *          integer constructor can differ while painting identically. Comparing
+ *          the ARGB hex keeps the assertions about the visible value.
+ */
+static QString colorKey(const QColor& c)
+{
+    return c.isValid() ? c.name(QColor::HexArgb) : QStringLiteral("<invalid>");
 }
 
 void TestConformanceQml::panelThreeRowMixed()
@@ -1539,6 +1554,193 @@ Item {
     QMetaObject::invokeMethod(bar, "requestApplicationWindowClose");
     QTest::qWait(50);
     QCOMPARE(appwin->property("popupVisible").toBool(), false);
+}
+
+/**
+ * @brief Theme customization entry points of the QML singleton bridge
+ * @details Covers the writable half of RibbonTheme: a single key color override
+ *          must reach the rendered leaf (the bar paints RibbonTheme.accent over
+ *          its whole background) and drag the derived tokens with it, a whole
+ *          palette can be installed from JSON text / a file / the declarative
+ *          customPaletteSource, and RibbonThemeUserDefine keeps the user palette
+ *          instead of silently retaining the previous theme's colors. Ends by
+ *          restoring the process-wide singleton state for the following cases.
+ */
+void TestConformanceQml::themeCustomization()
+{
+    QQmlEngine engine;
+    saRibbonRegisterQmlTypes(&engine);
+
+    SARibbonQml::RibbonTheme* theme = SARibbonQml::RibbonTheme::instance();
+    QVERIFY(theme);
+
+    QString src = QStringLiteral(R"QML(import QtQuick 2.12
+import SARibbon 3.0
+Item {
+    width: 600
+    height: 200
+    RibbonBar {
+        objectName: "bar"
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        RibbonCategory {
+            title: "Home"
+            RibbonPanel {
+                panelTitle: "P"
+                RibbonToolButton { text: "A" }
+            }
+        }
+    }
+}
+)QML");
+
+    QQmlComponent component(&engine);
+    std::unique_ptr< QQuickView > view(exposeScene(engine, component, src.toUtf8().constData(), 600, 200));
+    QVERIFY(view);
+
+    // captured AFTER the bar exists: RibbonBar's construction-time dark mode
+    // auto switch may already have moved the theme on a dark desktop
+    const int themeAtEntry = theme->currentTheme();
+
+    // deterministic starting point: a built-in theme with its own palette loaded
+    theme->setCustomPaletteSource(QUrl());
+    theme->setCurrentTheme(int(SARibbonTheme::RibbonThemeOffice2021Blue));
+    QVERIFY(!theme->hasCustomPalette());
+    const QColor builtinAccent = theme->accent();
+    QVERIFY(builtinAccent.isValid());
+    QTRY_VERIFY(theme->currentTheme() == int(SARibbonTheme::RibbonThemeOffice2021Blue));
+
+    // ---- 1. the built-in accent really is what the leaf paints ----
+    // grabWindow is polled: the palette notify has to travel through the QML
+    // bindings and the scene graph before the frame carries the new color
+    auto grabUntil = [&view](const QColor& want, int minPixels) -> QImage {
+        QImage img;
+        for (int i = 0; i < 50; ++i) {
+            img = view->grabWindow();
+            if (countPixelsNear(img, want) >= minPixels) {
+                break;
+            }
+            QTest::qWait(20);
+        }
+        return img;
+    };
+    QImage frame = grabUntil(builtinAccent, 201);
+    QVERIFY(!frame.isNull());
+    const int builtinPixels = countPixelsNear(frame, builtinAccent);
+    QVERIFY2(builtinPixels > 200, "the bar leaf must paint the theme accent");
+
+    // ---- 2. setAccentColor: key color, derived tokens and the rendered frame ----
+    QSignalSpy paletteSpy(theme, &SARibbonQml::RibbonTheme::paletteChanged);
+    QSignalSpy customSpy(theme, &SARibbonQml::RibbonTheme::hasCustomPaletteChanged);
+    const QColor custom(0xc0, 0x39, 0x2b);
+    theme->setAccentColor(custom);
+    QCOMPARE(colorKey(theme->accent()), colorKey(custom));
+    QVERIFY(theme->hasCustomPalette());
+    QCOMPARE(customSpy.count(), 1);
+    QVERIFY(paletteSpy.count() >= 1);
+    // the derived tokens were recomputed from the new key color (office2021-blue
+    // derives accent-pressed with darken/15 on a light palette -> darker(115))
+    QCOMPARE(colorKey(theme->accentPressed()), colorKey(custom.darker(115)));
+    QVERIFY(colorKey(theme->accentPressed()) != colorKey(builtinAccent.darker(115)));
+    frame = grabUntil(custom, 201);
+    const int customPixels = countPixelsNear(frame, custom);
+    QVERIFY2(customPixels > 200, "the overridden accent must reach the rendered leaf");
+    QVERIFY2(countPixelsNear(frame, builtinAccent) < customPixels,
+             "the built-in accent must be gone from the rendered leaf");
+
+    // an invalid color is rejected and leaves the palette untouched
+    theme->setAccentColor(QColor());
+    QCOMPARE(colorKey(theme->accent()), colorKey(custom));
+
+    // setContentBgColor / setTextColor go through the same mutation path
+    theme->setContentBgColor(QColor("#101010"));
+    QCOMPARE(colorKey(theme->contentBg()), colorKey(QColor("#101010")));
+    theme->setTextColor(QColor("#f5f5f5"));
+    QCOMPARE(colorKey(theme->textColor()), colorKey(QColor("#f5f5f5")));
+
+    // ---- 3. whole palette from JSON text ----
+    const QString json = QStringLiteral(R"JSON({
+        "name": "test-palette",
+        "isDark": true,
+        "keyColors": {
+            "accent": "#123456",
+            "content-bg": "#0a0a0a",
+            "text-color": "#f0f0f0"
+        },
+        "derived": {
+            "accent-hover": { "fn": "lighten", "base": "accent", "amount": 10 }
+        },
+        "fixed": {
+            "separator": "#202020"
+        }
+    })JSON");
+    QVERIFY(theme->loadPaletteFromJson(json));
+    QCOMPARE(colorKey(theme->tokenColor(QStringLiteral("accent"))), colorKey(QColor("#123456")));
+    QCOMPARE(colorKey(theme->tokenColor(QStringLiteral("separator"))), colorKey(QColor("#202020")));
+    // isDark reverses the derive direction: lighten/10 on a dark palette -> darker(110)
+    QCOMPARE(colorKey(theme->tokenColor(QStringLiteral("accent-hover"))), colorKey(QColor("#123456").darker(110)));
+    QVERIFY(theme->isDark());
+    QVERIFY(theme->hasCustomPalette());
+
+    // malformed JSON is refused and the previous palette survives
+    QVERIFY(!theme->loadPaletteFromJson(QStringLiteral("{ this is not json")));
+    QCOMPARE(colorKey(theme->tokenColor(QStringLiteral("accent"))), colorKey(QColor("#123456")));
+    QVERIFY(!theme->loadPaletteFromFile(QStringLiteral(":/does/not/exist.json")));
+    QCOMPARE(colorKey(theme->tokenColor(QStringLiteral("accent"))), colorKey(QColor("#123456")));
+
+    // ---- 4. declarative source: a qrc URL loads the very same file ----
+    const QUrl sourceUrl(QStringLiteral("qrc:/SARibbonTheme/resource/palettes/office2016-blue.json"));
+    SA::SARibbonThemePalette expected;
+    QVERIFY2(expected.loadFromFile(QStringLiteral(":/SARibbonTheme/resource/palettes/office2016-blue.json")),
+             "the palette JSON must be reachable from the QML module's resources");
+    QSignalSpy sourceSpy(theme, &SARibbonQml::RibbonTheme::customPaletteSourceChanged);
+    theme->setCustomPaletteSource(sourceUrl);
+    QCOMPARE(theme->customPaletteSource(), sourceUrl);
+    QCOMPARE(sourceSpy.count(), 1);
+    QCOMPARE(colorKey(theme->accent()), colorKey(expected.color(QStringLiteral("accent"))));
+    QVERIFY(theme->hasCustomPalette());
+
+    // ---- 5. RibbonThemeUserDefine keeps the user palette ----
+    theme->setCurrentTheme(int(SARibbonTheme::RibbonThemeUserDefine));
+    QCOMPARE(theme->currentTheme(), int(SARibbonTheme::RibbonThemeUserDefine));
+    QCOMPARE(colorKey(theme->accent()), colorKey(expected.color(QStringLiteral("accent"))));
+    QVERIFY(theme->hasCustomPalette());
+
+    // a built-in theme takes the palette back and clears the custom flag ...
+    theme->setCurrentTheme(int(SARibbonTheme::RibbonThemeOffice2021Blue));
+    QVERIFY(!theme->hasCustomPalette());
+    QCOMPARE(colorKey(theme->accent()), colorKey(builtinAccent));
+    // ... and switching to user-define again re-applies the declared source
+    // instead of leaving the built-in colors in place
+    theme->setCurrentTheme(int(SARibbonTheme::RibbonThemeUserDefine));
+    QVERIFY(theme->hasCustomPalette());
+    QCOMPARE(colorKey(theme->accent()), colorKey(expected.color(QStringLiteral("accent"))));
+
+    // ---- 6. the system dark mode bridge maps the core switch ----
+    const bool followAtEntry = theme->followSystemDarkMode();
+    QSignalSpy followSpy(theme, &SARibbonQml::RibbonTheme::followSystemDarkModeChanged);
+    theme->setFollowSystemDarkMode(!followAtEntry);
+    QCOMPARE(theme->followSystemDarkMode(), !followAtEntry);
+    QCOMPARE(SA::isEnableSystemDarkModeAutoSwitch(), !followAtEntry);
+    QCOMPARE(followSpy.count(), 1);
+    theme->setFollowSystemDarkMode(!followAtEntry);  // no-op: already there
+    QCOMPARE(followSpy.count(), 1);
+    // reading the OS color scheme must not perturb the palette (no notify loop
+    // between systemDarkMode and the palette-driven dark property)
+    const QColor accentBeforeQuery = theme->accent();
+    const bool sysDark = theme->isSystemDarkMode();
+    QCOMPARE(sysDark, SA::isOperatingSystemInDarkMode());
+    QCOMPARE(colorKey(theme->accent()), colorKey(accentBeforeQuery));
+    paletteSpy.clear();
+    theme->setFollowSystemDarkMode(followAtEntry);
+    QCOMPARE(paletteSpy.count(), 0);
+
+    // ---- restore the process-wide singleton for the following cases ----
+    theme->setCustomPaletteSource(QUrl());
+    theme->setCurrentTheme(themeAtEntry);
+    QVERIFY(!theme->hasCustomPalette());
+    QTRY_COMPARE(theme->currentTheme(), themeAtEntry);
 }
 
 QTEST_MAIN(TestConformanceQml)

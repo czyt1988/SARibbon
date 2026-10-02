@@ -600,6 +600,19 @@
 - 证据：模块化构建 `build-verify2` ctest 30/30（`qml_Conformance` 18 用例、`qml_LayoutParity` 15 数据行全绿）；合并构建（StaticExample）编译链接通过，`grep -c "include <SARibbonCore/" src/SARibbonWidgets.cpp src/SARibbonCore.cpp` = 0/0；`python tools/check_core_purity.py src/core` 通过。资源 blob 新鲜度用 `git hash-object` 而非 mtime 判定（`tools/qrc_SARibbonResource_Datas.cpp` 看似过期，实测 JSON blob 与 f22827a 一致，无需重新生成）。
 - 遗留（非本轮引入，未修）：widgets 侧 `SARibbonToolButtonColorTest` 在干净 HEAD 上 SEGFAULT，栈为 `QPlainTextEdit::documentTitle` ← `QApplication::notify` ← `QWidget::clearFocus` ← `QWidget::~QWidget` ← `QTest::qRun`，属测试用例生命周期问题，与本轮改动无关。
 - 影响计划：04（WS-B 前置完成：QML 主题入口不再有 qrc 跨模块依赖，`RibbonThemeUserDefine` 的半成品状态定位清楚）；02（调色板资源与主题映射归属 core）。
+
+### B52：QML 主题自定义入口落地 + 三个只在该轮显形的诊断陷阱（第 12 轮）
+- 日期：2026-10-02
+- 发现位置：计划 04（QML 前端）WS-B 主体
+- **处理**：`RibbonTheme` 增加写入口 `setAccentColor`/`setContentBgColor`/`setTextColor`（转发 core `SARibbonThemePalette` 的同名方法，内部统一走 `mutatePalette()`：调色板为空时先按当前主题补载，再拷贝—改写—回写）、`loadPaletteFromJson`/`loadPaletteFromFile`（失败时 `qWarning` 且保留原调色板，返回 false）、声明式 `customPaletteSource`（`qrc:`/本地文件/资源路径三种 URL 归一）。只读 `hasCustomPalette` 让"调色板是内置还是用户覆盖"可诊断，这是 `RibbonThemeUserDefine` 半成品状态的收尾：`applyThemePalette()` 拿到空路径时不再静默返回，而是重放已声明的 `customPaletteSource` 并无条件发一次 `paletteChanged`；载入内置主题时把该标志清零。深色模式桥接 `systemDarkMode`（Qt 6.5+ 才有 `QStyleHints::colorSchemeChanged`，低版本只读一次）与 `followSystemDarkMode` → `SA::setEnableSystemDarkModeAutoSwitch`。
+- **根因（自动切换开关在 QML 侧无消费者）**：core 的 `isEnableSystemDarkModeAutoSwitch()` 只在 `SARibbonMainWindow`/`SARibbonWidget` 构造时读取，QML 侧没有任何调用点，暴露 setter 等于暴露一个空开关。修复：`RibbonBar` 构造函数按 widgets 同样条件（开关开 + 系统暗色 + 主题仍是默认 `RibbonThemeOffice2021Blue`）切到 `RibbonThemeDark`，与 `SARibbonMainWindow.cpp` 逐条对齐。测试因此在 `exposeScene()` 之后才捕获 `themeAtEntry`——在暗色桌面上 bar 构造时主题已被移走。
+- **陷阱 1（LNK2019 ×20）**：`RibbonTheme` 类声明没有 `SA_RIBBON_QML_EXPORT`，同目录的 `RibbonToolButton`/`RibbonGallery` 都有。单例此前只被 DLL 内部的 `saRibbonRegisterQmlTypes()` 取用，所以缺导出宏一直没暴露；测试一旦直接 `RibbonTheme::instance()` 就全线未解析。教训：**模块内新增的 host/单例一律带导出宏**，即使当前只有模块内部使用者。
+- **陷阱 2（QColor 比较假失败）**：`QCOMPARE(theme->accentPressed(), custom.darker(115))` 失败，但 QTest 打印的两个值都是 `#ffa73225`。`QColor::operator==` 先比 `ct`（color spec）再比分量，`RibbonTheme::paletteColor()` 走 `rawValue()` → `QColor(QString)` 构造，与整数构造的 `QColor` spec 不同，值相同也不相等。修复：测试内新增 `colorKey()` 归一到 `name(QColor::HexArgb)` 再比。凡是"token 查询结果 vs 本地构造颜色"的断言都要归一，否则断言在测 spec 而不是测颜色。
+- **陷阱 3（测试零输出）**：`ctest` 与直接运行都拿不到 QTest 输出（日志显示 `<end of output>`，直接跑写出 0 字节日志且退出码 1），但 `-functions` 正常列出全部槽——stdout 在非 TTY 下是块缓冲，输出被丢弃/错位。可靠做法是让 QTest 自己写文件：`qml_Conformance.exe -o <path>,txt`。另注：`ctest` 的退出码是失败用例数而非 0/1。
+- **环境陷阱（vcvars 静默失败）**：`call vcvars64.bat >nul` 会让 MSVC 环境初始化整段失效（只打印"系统找不到指定的路径"且被重定向吞掉），后续 `cl.exe` 找不到 `<memory>`/`winres.h`。去掉重定向即恢复。凡是在 Git Bash 里包 `.bat` 驱动 MSVC 构建，都不要重定向 vcvars 的输出。
+- 证据：`build-qml-test`（Debug，WIDGETS=OFF）ctest 2/2 绿，`qml_Conformance` 19 用例全绿（新增 `themeCustomization`：内置 accent 渲染像素 > 200 → 覆盖后 `hasCustomPalette` 变真且派生 `accent-pressed == darker(115)`、渲染帧换新色旧色消失 → 非法 `QColor()` 被拒 → JSON/文件加载与错误输入拒绝 → `qrc:` URL 与独立加载的 `SARibbonThemePalette` 逐 token 相等 → 切 `RibbonThemeUserDefine` 保留用户调色板、切回内置复位、再切回重放 source → `followSystemDarkMode` 映射 core 开关且不触发 `paletteChanged`）；示例 `QmlMainWindowExample` offscreen 跑 12s 无任何 QML 警告；`python tools/check_core_purity.py src/core` 通过。示例取色器刻意用纯 QtQuick `Popup` + 色块网格而非 `QtQuick.Dialogs`，因为模块声明支持 Qt 5.12，而 ColorDialog 在 Qt5/Qt6 的属性名不同（`color` vs `selectedColor`）。
+- 影响计划：04（WS-B 完成，`RibbonThemeUserDefine` 不再是半成品；主题自定义从"已知差异"清单中移除）。
+
 ---
 
 ## 执行中追加（模板，勿删）

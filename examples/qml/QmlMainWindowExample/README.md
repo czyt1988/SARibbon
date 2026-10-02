@@ -23,6 +23,7 @@ cmake --build build
 | 右侧按钮组 | Help/Visible（系统按钮区前右对齐） | SARibbonButtonGroupWidget |
 | ribbon style 面板 | 6 种样式单选（Loose/Compact × 3/2/1 行，样式传播到全部面板与按钮） | 6 个 QRadioButton |
 | ribbon style 面板 | 主题 8 项下拉（Windows7/2013/2016/2021×3/Dark×2） | RibbonTheme QComboBox |
+| ribbon style 面板 | 主题色覆盖（Accent 取色弹窗，改键色后派生 token 全链重绘；切回内置主题即复位） | 无对应项（widgets 版走 QSS 换肤） |
 | ribbon style 面板 | 字体族选择（度量链重建+全局重排）+ 字体增大/减小（应用级度量联动） | QFontComboBox + Larger/Smaller |
 | ribbon style 面板 | RTL 切换（引擎经 saIsRTL 镜像布局） | Switch to RTL |
 | ribbon style 面板 | tab 对齐（左/中/右） | Alignment Center |
@@ -48,6 +49,8 @@ cmake --build build
 
 ## 一致性测试
 
-`tests/qml/tst_conformance_qml.cpp`（18 用例）与示例同步维护：
+`tests/qml/tst_conformance_qml.cpp`（19 用例）与示例同步维护：
 面板装箱黄金几何、tab 切换、按钮点击/弹出/禁用、控件嵌入、上下文标签、画廊、
-六样式传播、分隔符、快速访问栏/右组、对齐/最小模式、RTL、optionAction、应用窗口。
+六样式传播、分隔符、快速访问栏/右组、对齐/最小模式、RTL、optionAction、应用窗口、
+主题自定义（键色覆盖 + 派生 token 重算 + JSON/文件加载 + `RibbonThemeUserDefine`
+保持自定义调色板 + 系统暗色开关桥接，并用 grabWindow 断言渲染色真的变了）。

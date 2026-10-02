@@ -270,6 +270,19 @@ ApplicationWindow {
                     }
                 }
 
+                // theme customization entry: overriding the accent key color
+                // re-derives every dependent token, so the whole ribbon
+                // repaints without touching a single literal color
+                RibbonToolButton {
+                    text: qsTr("Accent")
+                    iconSource: "qrc:/icon/icon/setText.svg"
+                    proportion: Ribbon.Small
+                    onClicked: {
+                        accentPicker.current = RibbonTheme.accent;
+                        accentPicker.open();
+                    }
+                }
+
                 // widgets "select font" + QFontComboBox parity: family change
                 // rebuilds the metrics and relayouts every host
                 RibbonControlContainer {
@@ -915,6 +928,82 @@ ApplicationWindow {
                         proportion: Ribbon.Large
                         onClicked: log(qsTr("context2 page two clicked"))
                     }
+                }
+            }
+        }
+    }
+
+    // Accent picker for the theme customization entry. Deliberately plain
+    // QtQuick rather than QtQuick.Dialogs: the module supports Qt 5.12, where
+    // the ColorDialog API differs. Picking a swatch calls setAccentColor(),
+    // which overwrites the "accent" key color and re-derives every dependent
+    // token, so the whole ribbon repaints from the palette alone. Switching
+    // the theme back to a built-in one reloads that theme's JSON and clears
+    // the override (RibbonTheme.hasCustomPalette turns false again).
+    Popup {
+        id: accentPicker
+        property color current: RibbonTheme.accent
+        readonly property var swatches: [
+            "#2b579a", "#217346", "#b7472a", "#8764b8", "#c19224",
+            "#1f6f78", "#a13d63", "#4a5a6a", "#7a4a1f", "#1d3f73"
+        ]
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        anchors.centerIn: Overlay.overlay
+        padding: 12
+
+        contentItem: ColumnLayout {
+            spacing: 10
+
+            Label {
+                text: qsTr("Accent color")
+                font.bold: true
+                color: RibbonTheme.textColor
+            }
+            Grid {
+                columns: 5
+                spacing: 6
+                Repeater {
+                    model: accentPicker.swatches
+                    delegate: Rectangle {
+                        width: 34
+                        height: 34
+                        radius: 4
+                        color: modelData
+                        border.width: Qt.colorEqual(accentPicker.current, modelData) ? 3 : 1
+                        border.color: RibbonTheme.borderColor
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                accentPicker.current = modelData;
+                                RibbonTheme.setAccentColor(modelData);
+                                log(qsTr("accent overridden: %1 (hasCustomPalette=%2)")
+                                    .arg(modelData).arg(RibbonTheme.hasCustomPalette));
+                                accentPicker.close();
+                            }
+                        }
+                    }
+                }
+            }
+            RowLayout {
+                spacing: 8
+                Rectangle {
+                    Layout.preferredWidth: 26
+                    Layout.preferredHeight: 26
+                    radius: 3
+                    color: accentPicker.current
+                    border.width: 1
+                    border.color: RibbonTheme.borderColor
+                }
+                Label {
+                    text: accentPicker.current
+                    color: RibbonTheme.textColor
+                }
+                Item { Layout.fillWidth: true }
+                Button {
+                    text: qsTr("Close")
+                    onClicked: accentPicker.close()
                 }
             }
         }
