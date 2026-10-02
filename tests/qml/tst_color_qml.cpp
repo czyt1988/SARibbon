@@ -1140,7 +1140,9 @@ void TestColorQml::colorButtonRendersSwatch()
  * @details 动作区点击发 colorClicked(颜色, 勾选态)，与 widgets
  *          SARibbonColorToolButton::onButtonClicked 一致；菜单区打开的是宿主自己
  *          那份 RibbonColorMenu，选色后按钮颜色跟着变并发 colorChanged（不额外发
- *          colorClicked），选"无颜色"则回到无效色。切成 NoColorMenu 后菜单对象销毁，
+ *          colorClicked），选"无颜色"则回到无效色。点"自定义颜色"行时按钮转发菜单的
+ *          customColorRequested 且菜单保持打开，回灌 addCustomColor 才改颜色。
+ *          切成 NoColorMenu 后菜单对象销毁，
  *          openMenu 不再有任何效果。
  */
 void TestColorQml::colorButtonMenuPicksColor()
@@ -1208,6 +1210,28 @@ void TestColorQml::colorButtonMenuPicksColor()
     QVERIFY(!changed.at(1).at(0).value< QColor >().isValid());
     QVERIFY(btn->colorMenu()->isNoneColorEnabled());
 
+    // ---- "自定义颜色"行：按钮转发菜单的 customColorRequested，菜单保持打开 ----
+    // 宿主不含 QColorDialog，转发信号让 QML 侧不必伸手进 colorMenu
+    QSignalSpy customReq(btn, &SARibbonQml::RibbonColorToolButton::customColorRequested);
+    QVERIFY(customReq.isValid());
+    btn->openMenu();
+    QTRY_VERIFY(btn->isMenuVisible());
+    QQuickItem* customRow = findVisualItem(view.contentItem(), QLatin1String("colorMenuCustomRow"));
+    QVERIFY(customRow);
+    QTRY_VERIFY(customRow->isVisible());
+    QTest::mouseClick(&view, Qt::LeftButton, Qt::NoModifier, sceneCenter(customRow));
+    QCOMPARE(customReq.count(), 1);
+    QVERIFY(btn->isMenuVisible());  // 与菜单自己的语义一致：只发信号，不关闭
+
+    // 回灌：记录到自定义色并选中
+    const QColor picked(0x12, 0x34, 0x56);
+    btn->colorMenu()->addCustomColor(picked);
+    QCOMPARE(btn->color(), picked);
+    QCOMPARE(changed.count(), 3);
+    QCOMPARE(btn->colorMenu()->customColors().size(), 1);
+    btn->closeMenu();
+    QTRY_VERIFY(!btn->isMenuVisible());
+
     // ---- NoColorMenu：菜单销毁，openMenu 无效 ----
     btn->setColorMenuStyle(SARibbonQml::RibbonEnums::NoColorMenu);
     QVERIFY(!btn->hasMenu());
@@ -1216,8 +1240,10 @@ void TestColorQml::colorButtonMenuPicksColor()
     btn->openMenu();
     QVERIFY(!btn->isMenuVisible());
     QVERIFY(btn->menuRect().isEmpty());
+    // 无菜单时不存在转发路径
+    QCOMPARE(customReq.count(), 1);
     // 颜色本身不受菜单样式影响
-    QVERIFY(!btn->hasValidColor());
+    QCOMPARE(btn->color(), picked);
 
     // 切回来：菜单重新建立，且能再打开
     btn->setColorMenuStyle(SARibbonQml::RibbonEnums::WithColorMenu);

@@ -655,6 +655,37 @@ ApplicationWindow {
                             .arg(showIcon).arg(showTitle).arg(comboContainer.labelWidth));
                     }
                 }
+
+                // Color widgets (the widgets example's "color" panel). Both
+                // buttons own a RibbonColorMenu with the standard row and the
+                // shade rows; the font color one keeps the widgets
+                // ColorUnderIcon shape (icon on top, color band underneath) and
+                // the fill one paints the picked color into the icon box.
+                // The menu's custom color row is forwarded as the button's own
+                // customColorRequested(); customColorPicker stands in for the
+                // QColorDialog the widgets menu owns.
+                RibbonColorToolButton {
+                    id: fontColorButton
+                    text: "Font Color"
+                    iconSource: "qrc:/icon/icon/setText.svg"
+                    proportion: Ribbon.Large
+                    colorStyle: Ribbon.ColorUnderIcon
+                    color: "#c0392b"
+                    toolTip: "ColorUnderIcon: click for the color, click the arrow for the palette"
+                    onColorClicked: log(qsTr("font color: %1 (checked %2)").arg(color).arg(checked))
+                    onCustomColorRequested: customColorPicker.openFor(fontColorButton.colorMenu)
+                }
+                RibbonColorToolButton {
+                    id: fillColorButton
+                    text: "Fill Color"
+                    iconSource: "qrc:/icon/icon/Italic.svg"
+                    proportion: Ribbon.Small
+                    colorStyle: Ribbon.ColorFillToIcon
+                    color: "#2e6da4"
+                    toolTip: "ColorFillToIcon: the picked color fills the icon box"
+                    onColorClicked: log(qsTr("fill color: %1 (checked %2)").arg(color).arg(checked))
+                    onCustomColorRequested: customColorPicker.openFor(fillColorButton.colorMenu)
+                }
             }
         }
 
@@ -1085,6 +1116,89 @@ ApplicationWindow {
                     text: qsTr("Close")
                     onClicked: accentPicker.close()
                 }
+            }
+        }
+    }
+
+    // Stand-in for the QColorDialog that the widgets SAColorMenu owns. The QML
+    // menu deliberately ships without a dialog (it would drag a second toolkit
+    // into SARibbonQml), so activating its "More colors" row emits
+    // customColorRequested(); this popup answers it and hands the picked color
+    // back through addCustomColor(), which records it in the menu's custom row
+    // and selects it on the button.
+    Popup {
+        id: customColorPicker
+        property var targetMenu: null
+        readonly property var swatches: [
+            "#c0392b", "#e67e22", "#f1c40f", "#2ecc71", "#16a085",
+            "#2980b9", "#8e44ad", "#d35400", "#7f8c8d", "#2c3e50",
+            "#ff9ff3", "#feca57", "#48dbfb", "#1dd1a1", "#5f27cd",
+            "#576574", "#a29bfe", "#fab1a0", "#55efc4", "#fd79a8"
+        ]
+        modal: true
+        focus: true
+        closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+        anchors.centerIn: Overlay.overlay
+        padding: 12
+
+        // Remember which menu asked, then show the popup
+        function openFor(menu)
+        {
+            targetMenu = menu;
+            open();
+        }
+
+        contentItem: ColumnLayout {
+            spacing: 10
+
+            Label {
+                text: qsTr("Custom color")
+                font.bold: true
+                color: RibbonTheme.textColor
+            }
+            Grid {
+                columns: 5
+                spacing: 6
+                Repeater {
+                    model: customColorPicker.swatches
+                    delegate: Rectangle {
+                        width: 30
+                        height: 30
+                        radius: 3
+                        color: modelData
+                        border.width: 1
+                        border.color: RibbonTheme.borderColor
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: {
+                                var menu = customColorPicker.targetMenu;
+                                if (menu) {
+                                    menu.addCustomColor(modelData);
+                                    log(qsTr("custom color added: %1 (recorded %2)")
+                                        .arg(modelData).arg(menu.customColors.length));
+                                }
+                                customColorPicker.close();
+                            }
+                        }
+                    }
+                }
+            }
+            Label {
+                // The recorded custom colors of the menu that opened the popup;
+                // the menu keeps ten and shifts left once full, exactly like the
+                // widgets SAColorMenu
+                readonly property var recorded: customColorPicker.targetMenu ? customColorPicker.targetMenu.customColors : []
+                text: qsTr("Recorded: %1").arg(recorded.map(function(c) {
+                    return String(c);
+                }).join(", "))
+                color: RibbonTheme.subtitle
+                Layout.fillWidth: true
+                Layout.maximumWidth: 220
+                elide: Text.ElideRight
+            }
+            Button {
+                text: qsTr("Close")
+                onClicked: customColorPicker.close()
             }
         }
     }

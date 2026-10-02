@@ -128,6 +128,26 @@ Q_SIGNALS:
      */
     void colorClicked(const QColor& color, bool checked);
 
+    /**
+     * \if ENGLISH
+     * @brief The color menu's custom color row was activated
+     * @details Forwarded from the owned RibbonColorMenu so a button is usable
+     *          without reaching into colorMenu: connect a color dialog here and
+     *          feed the result back through colorMenu->addCustomColor(). The
+     *          signal never fires while colorMenuStyle is NoColorMenu, because
+     *          no menu object exists then.
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 颜色菜单的"自定义颜色"行被激活
+     * @details 从所持有的 RibbonColorMenu 转发而来，使按钮无需伸手进 colorMenu 即可
+     *          使用：把取色对话框接到该信号上，再把结果经
+     *          colorMenu->addCustomColor() 回灌。colorMenuStyle 为 NoColorMenu 时
+     *          菜单对象不存在，因此该信号永不触发。
+     * \endif
+     */
+    void customColorRequested();
+
 protected:
     QUrl leafUrl() const override;
     void componentComplete() override;

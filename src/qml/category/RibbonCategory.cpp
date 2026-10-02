@@ -35,6 +35,16 @@ RibbonCategory::RibbonCategory(QQuickItem* parent) : RibbonQuickHost(parent)
     // them by being a QWidget, QML needs the explicit clip (otherwise panels
     // scrolled past an edge paint over whatever sits next to the category)
     setClip(true);
+    // Publish a complete scroll state from the start: the arrow overlay leaf is
+    // created before the first engine pass, and its bindings read these maps'
+    // keys directly. An empty map is still a truthy object in QML, so "flags ?
+    // flags.left : false" would assign undefined and warn once per category.
+    mScrollFlags.insert(QStringLiteral("left"), false);
+    mScrollFlags.insert(QStringLiteral("right"), false);
+    mScrollGeometry.insert(QStringLiteral("leftX"), 0);
+    mScrollGeometry.insert(QStringLiteral("rightX"), 0);
+    mScrollGeometry.insert(QStringLiteral("width"), 0);
+    mScrollGeometry.insert(QStringLiteral("height"), 0);
 }
 
 RibbonCategory::~RibbonCategory()

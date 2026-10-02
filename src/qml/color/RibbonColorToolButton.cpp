@@ -294,6 +294,9 @@ void RibbonColorToolButton::ensureColorMenu()
             setMenuVisible(mColorMenu->isMenuVisible());
         }
     });
+    // Forwarded so the QML side never has to dig into colorMenu for the one
+    // interaction the host cannot serve itself (the color dialog)
+    connect(mColorMenu, &RibbonColorMenu::customColorRequested, this, &RibbonColorToolButton::customColorRequested);
     Q_EMIT colorMenuChanged();
 }
 

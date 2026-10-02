@@ -33,6 +33,7 @@ cmake --build build
 | toolbutton style 面板 | optionAction（右下角对角按钮，点击触发信号） | 面板 optionAction |
 | toolbutton style 面板 | 分隔符（Large 比例独占一列） | addSeparator |
 | widget test 面板 | 控件嵌入：ComboBox（可编辑，带图标 + 标签条四态切换）/ComboBox/TextField/CheckBox/SpinBox（带 `suffixText` 尾随单位标签） | SARibbonCtrlContainer + SARibbonLineWidgetContainer |
+| widget test 面板 | 颜色按钮 ×2：Font Color（`ColorUnderIcon`，图标下方色带）+ Fill Color（`ColorFillToIcon`，选中色填充图标框）；点击色带区直接触发 `colorClicked`，点击箭头弹出标准色 + 深浅色板 + 自定义色 + 无颜色项 | SARibbonColorToolButton（color 分类页） |
 | Context Category 面板 | 上下文标签显隐开关（彩色 tab + 色带 + 页面切换） | setContextCategoryVisible |
 | Delete 类别 | 动态面板增删（ListModel+Repeater：移除尾部/插入 0/尾/-1） | removePanel/insertPanel |
 | Other 类别 | 画廊：2 组 17 项（Files/Apps），伸展分配 + 滚动 + 弹出视口 + 切组/滚动控制 + 标题三态切换（仅图标/单行/自动换行） | SARibbonGallery |
@@ -46,6 +47,11 @@ cmake --build build
 - **定制系统**（customize widget/XML 加载）：2.x widgets 专属，QML 版暂无。
 - **无边框窗口**：示例使用普通 ApplicationWindow（QML 无边框为独立主题）。
 - **菜单内嵌任意控件**（`SARibbonMenu::addWidget`）：QML 版菜单只渲染 RibbonMenuItem 行。
+- **颜色菜单不含取色对话框**：`RibbonColorMenu` 的"自定义颜色"行只发
+  `customColorRequested()`，由示例接一个色块弹窗（`customColorPicker`）回灌
+  `addCustomColor()`。QColorDialog 属于 widgets/QtQuick Dialogs，不进本模块。
+  菜单内部的三张色块网格逐像素对齐 widgets，外框（Popup + Column）是 QML 原生的，
+  与 QMenu 的尺寸协商结果不同。
 - **菜单项 shortcut 仅为展示文本**：右对齐绘制在行尾，真正的按键绑定依赖
   QAction 抽象桥（plan-04 D8 延后项），故不会响应键盘。
 - 面板 optionAction 已恢复完整（引擎预留 + 对角按钮渲染 + 触发信号，
@@ -68,3 +74,14 @@ cmake --build build
 类别滚动（溢出时只出现尾随箭头、箭头矩形等于 core `scrollButtonRects` 输出、
 真实点击箭头步进半视口并被 `clampScrollOffset` 夹住、滚轮走 core 的 delta 优先级与
 ×2 / ÷2 缩放、动画途中滚轮被丢弃、内容放得下的类别必须 `ignore` 滚轮而不是吃掉它）。
+
+`tests/qml/tst_color_qml.cpp`（12 用例）覆盖颜色控件族：
+网格几何逐项对齐 core `colorGridCellSize`/`colorBandHeight`（含单行不限列、行最小高与
+右侧留白）、互斥勾选语义、叶子按 core 矩形摆放色块并真实点击回传颜色、
+无颜色斜线标记的渲染判定（grabWindow + 红像素计数）、
+菜单数据对齐 widgets（标准色行 = `getStandardColorList`、深浅行 = `colorPaletteShades`、
+行优先次序、自定义色记录满 10 后整体左移）、菜单叶子弹出后点选色块关闭并上报颜色、
+颜色按钮几何跟随 core（色带矩形 = `calcColorUnderIconMetrics`、FillToIcon 按比例内缩、
+无菜单时 Large 宽度不变而 Small 收窄、图标槽仍保留）、
+色带与填充色的实际渲染色、以及点击分区（动作区触发 `colorClicked` 不弹菜单、
+箭头区弹菜单、菜单内选色/选无颜色、`NoColorMenu` 与 `WithColorMenu` 来回切换）。
