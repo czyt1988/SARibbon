@@ -26,6 +26,7 @@
 #include "../../src/core/layout/SARibbonPanelLayoutEngine.cpp"
 #include "../../src/core/layout/SARibbonCategoryLayoutEngine.cpp"
 #include "../../src/core/layout/SARibbonBarGeometryEngine.cpp"
+#include "../../src/core/layout/SARibbonToolButtonLayout.cpp"
 
 #ifdef _MSC_VER
 #pragma warning (pop)

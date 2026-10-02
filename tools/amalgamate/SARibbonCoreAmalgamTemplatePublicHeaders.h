@@ -14,3 +14,4 @@
 #include "../../src/core/layout/SARibbonPanelLayoutEngine.h"
 #include "../../src/core/layout/SARibbonCategoryLayoutEngine.h"
 #include "../../src/core/layout/SARibbonBarGeometryEngine.h"
+#include "../../src/core/layout/SARibbonToolButtonLayout.h"

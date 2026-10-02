@@ -23,6 +23,7 @@
 #include "../../src/core/layout/SARibbonPanelLayoutEngine.cpp"
 #include "../../src/core/layout/SARibbonCategoryLayoutEngine.cpp"
 #include "../../src/core/layout/SARibbonBarGeometryEngine.cpp"
+#include "../../src/core/layout/SARibbonToolButtonLayout.cpp"
 
 
 // disable warnings about unsafe standard library calls

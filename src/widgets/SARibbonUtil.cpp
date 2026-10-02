@@ -1,5 +1,6 @@
 #include "SARibbonUtil.h"
 #include "SARibbonThemePalette.h"
+#include <SARibbonCore/SARibbonThemeData.h>
 #include <QFile>
 #include <QWidget>
 #include <QDebug>
@@ -59,36 +60,8 @@ QString getBuiltInRibbonThemeQss(SARibbonTheme theme)
         }
     };
 
-    // Resolve default palette resource path for the theme
-    auto themeToPalettePath = [](SARibbonTheme t) -> QString {
-        switch (t) {
-        case SARibbonTheme::RibbonThemeOffice2016Blue:
-            return ":/SARibbonTheme/resource/palettes/office2016-blue.json";
-        case SARibbonTheme::RibbonThemeOffice2016Green:
-            return ":/SARibbonTheme/resource/palettes/office2016-green.json";
-        case SARibbonTheme::RibbonThemeOffice2016Dark:
-            return ":/SARibbonTheme/resource/palettes/office2016-dark.json";
-        case SARibbonTheme::RibbonThemeOffice2021Blue:
-            return ":/SARibbonTheme/resource/palettes/office2021-blue.json";
-        case SARibbonTheme::RibbonThemeOffice2021Green:
-            return ":/SARibbonTheme/resource/palettes/office2021-green.json";
-        case SARibbonTheme::RibbonThemeOffice2021Dark:
-            return ":/SARibbonTheme/resource/palettes/office2021-dark.json";
-        case SARibbonTheme::RibbonThemeDark:
-            return ":/SARibbonTheme/resource/palettes/dark-default.json";
-        case SARibbonTheme::RibbonThemeDark2:
-            return ":/SARibbonTheme/resource/palettes/dark2-default.json";
-        case SARibbonTheme::RibbonThemeWindows7:
-            return ":/SARibbonTheme/resource/palettes/win7-default.json";
-        case SARibbonTheme::RibbonThemeOffice2013:
-            return ":/SARibbonTheme/resource/palettes/office2013-default.json";
-        default:
-            return QString();
-        }
-    };
-
     QString templatePath = themeToTemplatePath(theme);
-    QString palettePath  = themeToPalettePath(theme);
+    QString palettePath  = SARibbon::Core::SARibbonThemeData::themePalettePath(theme);
     if (templatePath.isEmpty() || palettePath.isEmpty()) {
         return baseQss;
     }

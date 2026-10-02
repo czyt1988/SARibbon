@@ -91,13 +91,10 @@ static QString loadResourceText(const QString& path)
     return QString();
 }
 
-// Forward declaration — defined later in this file
-static QString themeToPalettePath(SARibbonTheme theme);
-
 void applyRibbonTheme(QWidget* w, SARibbonBar* bar, SARibbonTheme theme)
 {
     SARibbonThemePalette palette;
-    QString palettePath = themeToPalettePath(theme);
+    QString palettePath = SARibbon::Core::SARibbonThemeData::themePalettePath(theme);
     if (!palettePath.isEmpty()) {
         if (palette.loadFromFile(palettePath)) {
             applyRibbonTheme(w, bar, theme, palette);
@@ -139,45 +136,6 @@ static QString themeToTemplatePath(SARibbonTheme theme)
         return ":/SARibbonTheme/resource/templates/win7.qss";
     case SARibbonTheme::RibbonThemeOffice2013:
         return ":/SARibbonTheme/resource/templates/office2013.qss";
-    default:
-        return QString();
-    }
-}
-
-/**
- * \if ENGLISH
- * @brief Map SARibbonTheme enum to the corresponding default palette JSON resource path
- * @return Resource path of the default palette JSON for the given theme, or an empty string if no palette exists
- * \endif
- *
- * \if CHINESE
- * @brief 将 SARibbonTheme 枚举映射到对应的默认调色板 JSON 资源路径
- * @return 给定主题对应的默认调色板 JSON 资源路径，若该主题无调色板则返回空字符串
- * \endif
- */
-static QString themeToPalettePath(SARibbonTheme theme)
-{
-    switch (theme) {
-    case SARibbonTheme::RibbonThemeOffice2016Blue:
-        return ":/SARibbonTheme/resource/palettes/office2016-blue.json";
-    case SARibbonTheme::RibbonThemeOffice2016Green:
-        return ":/SARibbonTheme/resource/palettes/office2016-green.json";
-    case SARibbonTheme::RibbonThemeOffice2016Dark:
-        return ":/SARibbonTheme/resource/palettes/office2016-dark.json";
-    case SARibbonTheme::RibbonThemeOffice2021Blue:
-        return ":/SARibbonTheme/resource/palettes/office2021-blue.json";
-    case SARibbonTheme::RibbonThemeOffice2021Green:
-        return ":/SARibbonTheme/resource/palettes/office2021-green.json";
-    case SARibbonTheme::RibbonThemeOffice2021Dark:
-        return ":/SARibbonTheme/resource/palettes/office2021-dark.json";
-    case SARibbonTheme::RibbonThemeDark:
-        return ":/SARibbonTheme/resource/palettes/dark-default.json";
-    case SARibbonTheme::RibbonThemeDark2:
-        return ":/SARibbonTheme/resource/palettes/dark2-default.json";
-    case SARibbonTheme::RibbonThemeWindows7:
-        return ":/SARibbonTheme/resource/palettes/win7-default.json";
-    case SARibbonTheme::RibbonThemeOffice2013:
-        return ":/SARibbonTheme/resource/palettes/office2013-default.json";
     default:
         return QString();
     }

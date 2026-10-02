@@ -4,40 +4,6 @@
 
 namespace SARibbonQml {
 
-namespace {
-// Theme enum to the default palette JSON resource (the SAME files the widgets
-// front end compiles in via SARibbonResource.qrc; the QML module registers the
-// shared on-disk files under the identical resource prefix so a mixed
-// widgets+QML app resolves either registration to identical content).
-QString themePalettePath(SARibbonTheme theme)
-{
-    switch (theme) {
-    case SARibbonTheme::RibbonThemeOffice2016Blue:
-        return QStringLiteral(":/SARibbonTheme/resource/palettes/office2016-blue.json");
-    case SARibbonTheme::RibbonThemeOffice2016Green:
-        return QStringLiteral(":/SARibbonTheme/resource/palettes/office2016-green.json");
-    case SARibbonTheme::RibbonThemeOffice2016Dark:
-        return QStringLiteral(":/SARibbonTheme/resource/palettes/office2016-dark.json");
-    case SARibbonTheme::RibbonThemeOffice2021Blue:
-        return QStringLiteral(":/SARibbonTheme/resource/palettes/office2021-blue.json");
-    case SARibbonTheme::RibbonThemeOffice2021Green:
-        return QStringLiteral(":/SARibbonTheme/resource/palettes/office2021-green.json");
-    case SARibbonTheme::RibbonThemeOffice2021Dark:
-        return QStringLiteral(":/SARibbonTheme/resource/palettes/office2021-dark.json");
-    case SARibbonTheme::RibbonThemeDark:
-        return QStringLiteral(":/SARibbonTheme/resource/palettes/dark-default.json");
-    case SARibbonTheme::RibbonThemeDark2:
-        return QStringLiteral(":/SARibbonTheme/resource/palettes/dark2-default.json");
-    case SARibbonTheme::RibbonThemeWindows7:
-        return QStringLiteral(":/SARibbonTheme/resource/palettes/win7-default.json");
-    case SARibbonTheme::RibbonThemeOffice2013:
-        return QStringLiteral(":/SARibbonTheme/resource/palettes/office2013-default.json");
-    default:
-        return QString();
-    }
-}
-}  // namespace
-
 RibbonTheme::RibbonTheme(QObject* parent) : QObject(parent)
 {
     // bridge the core signal source: any theme/palette change re-emits both
@@ -71,7 +37,10 @@ SARibbon::Core::SARibbonThemeData* RibbonTheme::coreData() const
 
 void RibbonTheme::applyThemePalette(SARibbonTheme theme)
 {
-    const QString path = themePalettePath(theme);
+    // the theme -> palette mapping lives in core (SARibbonThemeData), so the QML
+    // front end and the widgets front end can never drift apart; an empty path
+    // (RibbonThemeUserDefine) keeps whatever palette is currently loaded
+    const QString path = SARibbon::Core::SARibbonThemeData::themePalettePath(theme);
     if (path.isEmpty()) {
         return;
     }

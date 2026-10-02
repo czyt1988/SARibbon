@@ -69,10 +69,14 @@ done
 # includes left raw by the cpp pass (both verified by experiment, NOTES B17/B23).
 # The content of every core header is already inside the product headers, so:
 # 1) strip the leftover "../SARibbonWidgetsGlobal.h" lines (guard-identical content)
-# 2) point raw <SARibbonCore/X.h> lines at the product headers
+# 2) point raw <SARibbonCore/X.h> / <SARibbonCore/X.hpp> lines at the product
+#    headers. The extension must be matched with -E: the old BRE '\.h*' means
+#    "a dot then zero or more h", so it silently skipped the .hpp members
+#    (SARibbonQt5Compat.hpp), which only surfaced once a core .cpp started
+#    including one through the angle form.
 sed -i '/#include "\.\.\/SARibbonWidgetsGlobal.h"/d' "$DEST/SARibbonCore.h" "$DEST/SARibbonCore.cpp"                                              "$DEST/SARibbonWidgets.h" "$DEST/SARibbonWidgets.cpp"
-sed -i 's|#include <SARibbonCore/[A-Za-z0-9_]*\.h*>|#include "SARibbonCore.h"|g' "$DEST/SARibbonCore.cpp"
-sed -i 's|#include <SARibbonCore/[A-Za-z0-9_]*\.h*>|#include "SARibbonWidgets.h"|g' "$DEST/SARibbonWidgets.cpp"
+sed -i -E 's#include <SARibbonCore/[A-Za-z0-9_]+\.(h|hpp)>#include "SARibbonCore.h"#g' "$DEST/SARibbonCore.cpp"
+sed -i -E 's#include <SARibbonCore/[A-Za-z0-9_]+\.(h|hpp)>#include "SARibbonWidgets.h"#g' "$DEST/SARibbonWidgets.cpp"
 
 # LF -> CRLF (same awk logic as the 2.9.5 script, extended to 4 artifacts)
 convert_to_crlf() {

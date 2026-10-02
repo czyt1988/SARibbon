@@ -5,6 +5,7 @@
 #include "SARibbonTabBar.h"
 #include "SARibbonThemeManager.h"
 #include "SARibbonThemePalette.h"
+#include <SARibbonCore/SARibbonThemeData.h>
 #include <QApplication>
 #include <QDebug>
 #include <QFile>
@@ -38,37 +39,6 @@
 /**
  * @brief The SARibbonMainWindowPrivate class
  */
-namespace {
-// 主题对应的内置调色板路径（与 SARibbonThemeManager.cpp / SARibbonUtil.cpp 的同名映射一致），
-// 用于边框色跟随主题时解析 border-color token
-QString mainWindowThemePalettePath(SARibbonTheme theme)
-{
-    switch (theme) {
-    case SARibbonTheme::RibbonThemeOffice2016Blue:
-        return ":/SARibbonTheme/resource/palettes/office2016-blue.json";
-    case SARibbonTheme::RibbonThemeOffice2016Green:
-        return ":/SARibbonTheme/resource/palettes/office2016-green.json";
-    case SARibbonTheme::RibbonThemeOffice2016Dark:
-        return ":/SARibbonTheme/resource/palettes/office2016-dark.json";
-    case SARibbonTheme::RibbonThemeOffice2021Blue:
-        return ":/SARibbonTheme/resource/palettes/office2021-blue.json";
-    case SARibbonTheme::RibbonThemeOffice2021Green:
-        return ":/SARibbonTheme/resource/palettes/office2021-green.json";
-    case SARibbonTheme::RibbonThemeOffice2021Dark:
-        return ":/SARibbonTheme/resource/palettes/office2021-dark.json";
-    case SARibbonTheme::RibbonThemeDark:
-        return ":/SARibbonTheme/resource/palettes/dark-default.json";
-    case SARibbonTheme::RibbonThemeDark2:
-        return ":/SARibbonTheme/resource/palettes/dark2-default.json";
-    case SARibbonTheme::RibbonThemeWindows7:
-        return ":/SARibbonTheme/resource/palettes/win7-default.json";
-    case SARibbonTheme::RibbonThemeOffice2013:
-        return ":/SARibbonTheme/resource/palettes/office2013-default.json";
-    default:
-        return QString();
-    }
-}
-}  // namespace
 
 namespace SA {
 /**
@@ -850,7 +820,7 @@ void SARibbonMainWindow::paintEvent(QPaintEvent* e)
         if (!border.isValid()) {
             // 跟随主题：从当前主题的调色板取 border-color token
             SA::SARibbonThemePalette themePalette;
-            const QString palettePath = mainWindowThemePalettePath(d_ptr->mCurrentRibbonTheme);
+            const QString palettePath = SARibbon::Core::SARibbonThemeData::themePalettePath(d_ptr->mCurrentRibbonTheme);
             if (!palettePath.isEmpty() && themePalette.loadFromFile(palettePath)) {
                 border = themePalette.color("border-color");
             }

@@ -59,6 +59,9 @@ public:
 
     // ---- Static theme data tables (moved verbatim from SARibbonThemeManager.cpp) ----
 
+    // Built-in palette resource path of a theme (empty for RibbonThemeUserDefine)
+    static QString themePalettePath(SARibbonTheme theme);
+
     // Tab margin per theme (affects SARibbonContextCategory drawing)
     static QMargins themeMargins(SARibbonTheme theme);
 

@@ -586,6 +586,20 @@
 - 证据：`build-qml-test`（WIDGETS=OFF）ctest 2/2 绿（`qml_Conformance` 18 个用例）、`build-verify`（含 Widgets）ctest 30/30 绿、`python tools/check_core_purity.py src/core` 通过、`tools/Amalgamate.sh` 重新生成合并文件。
 - 影响计划：02（画廊格子度量入 core，widgets 侧只剩委托）；04（QML 画廊标题溢出与隐藏分类标题负宽度两个缺口关闭，并由常驻测试防回归）。
 
+### B51：调色板 JSON 迁入 core + 主题→调色板映射四合一 + 合并流水线三处潜伏缺陷（第 11 轮）
+- 日期：2026-10-02
+- 发现位置：QML/widgets 能力差异审计 → WS-B（主题自定义入口）前置步骤
+- **根因 1（构建卫生）**：`src/qml/qml/saribbon_qml.qrc` 用 `../../../src/widgets/resource/palettes/*.json` 别名引用 widgets 源码树里的 10 个调色板。SARibbonQml 在链接层只依赖 SARibbonCore，但 rcc 阶段实际要求 widgets 目录存在——单独构建 QML 模块（`SARIBBON_BUILD_WIDGETS=OFF`）时资源解析取决于源码树布局，而非 target 依赖图。
+- **根因 2（映射四处重复）**：主题 → 调色板 JSON 路径的 switch 在四个编译单元里逐字重复（widgets 的 `SARibbonMainWindow.cpp` / `SARibbonThemeManager.cpp` / `SARibbonUtil.cpp` 与 QML 的 `RibbonTheme.cpp`），任何一处漏改都会让混合应用里的两套前端解析到不同色值；QML 侧的副本还漏了 `RibbonThemeUserDefine` 分支，落到 `default` 返回空串后 `loadFromFile` 静默失败，调色板保留上一个主题的色值（半成品状态的真实来源）。
+- **处理**：10 个 JSON `git mv` 到 `src/core/resource/palettes/`（内容逐字节不变，`git hash-object` 对照 f22827a 确认），资源前缀 `/SARibbonTheme/resource` 保持不变以免破坏混合应用里的重复注册解析；两个 qrc 分别改指 core 路径。映射下沉为 `SARibbon::Core::SARibbonThemeData::themePalettePath(SARibbonTheme)`，`RibbonThemeUserDefine` 显式返回空串（语义：自定义主题无内置调色板，调用方保留已加载的用户调色板），四处副本全部删除改为委托。QSS 模板路径映射（`themeToQssTemplatePath` / `themeToTemplatePath`）刻意留在 widgets——QSS 是 widgets 独有的渲染路线。
+- **过程中暴露的合并流水线三处真实缺陷（a4cce06/B49 引入，单文件构建自那时起一直是坏的）**：
+  1. **C2039/C2878 ×30**：`SARibbonToolButtonLayout.h` 只被加进了 widgets 合并模板的 `.cpp` 列表，没登记到 `SARibbonCoreAmalgamTemplatePublicHeaders.h`，因此从未进入 `SARibbonWidgets.h`；Amalgamate.sh 把 `#include <SARibbonCore/X.h>` 重写成产品头后声明彻底丢失。修复：补进公共头模板（该模板被 core 与 widgets 两个 `.h` 模板共同包含，一处即覆盖）。已交叉核对全部 14 个 core 头，确认这是唯一遗漏项。
+  2. **LNK2019 ×4 → LNK1120**：`SARibbonToolButtonLayout.cpp` 未加入两个合并模板的 `.cpp` 列表，`calcSizeHint/calcDrawRects/textAlignment/simplifiedText` 全部未解析。修复：在 `SARibbonBarGeometryEngine.cpp` 之后补入 core 与 widgets 两个模板。
+  3. **C1083 `SARibbonCore/SARibbonQt5Compat.hpp`**：Amalgamate.sh 的后处理 sed 用 BRE `[A-Za-z0-9_]*\.h*`，`.h*` 意为"一个点加零个或多个 h"，永远匹配不到 `.hpp`；`SARibbonToolButtonLayout.cpp` 是第一个用尖括号形式包含 `.hpp` 的 core 源文件，缺陷因此才显形。修复：改 `sed -E` + `\.(h|hpp)`，定界符换成 `#`（ERE 里 `\|` 是字面竖线，若继续用 `|` 作定界符会提前截断正则）。
+- 教训入档：**合并流水线没有常驻验证**——`tools/Amalgamate.sh` 只在需要时被手工跑一次，生成物 `src/SARibbon*.cpp/.h` 又是 gitignore 的，所以"新增 core 文件"这类改动的合并侧后果不会在任何 CI/测试里暴露，只有唯一消费者 `examples/widgets/StaticExample` 会挂，而它默认不在构建集里。今后每次新增 core 头/源都必须同步检查三处：`SARibbonCoreAmalgamTemplatePublicHeaders.h`、两个 `.cpp` 模板、Amalgamate.sh 的 sed 覆盖面。
+- 证据：模块化构建 `build-verify2` ctest 30/30（`qml_Conformance` 18 用例、`qml_LayoutParity` 15 数据行全绿）；合并构建（StaticExample）编译链接通过，`grep -c "include <SARibbonCore/" src/SARibbonWidgets.cpp src/SARibbonCore.cpp` = 0/0；`python tools/check_core_purity.py src/core` 通过。资源 blob 新鲜度用 `git hash-object` 而非 mtime 判定（`tools/qrc_SARibbonResource_Datas.cpp` 看似过期，实测 JSON blob 与 f22827a 一致，无需重新生成）。
+- 遗留（非本轮引入，未修）：widgets 侧 `SARibbonToolButtonColorTest` 在干净 HEAD 上 SEGFAULT，栈为 `QPlainTextEdit::documentTitle` ← `QApplication::notify` ← `QWidget::clearFocus` ← `QWidget::~QWidget` ← `QTest::qRun`，属测试用例生命周期问题，与本轮改动无关。
+- 影响计划：04（WS-B 前置完成：QML 主题入口不再有 qrc 跨模块依赖，`RibbonThemeUserDefine` 的半成品状态定位清楚）；02（调色板资源与主题映射归属 core）。
 ---
 
 ## 执行中追加（模板，勿删）
