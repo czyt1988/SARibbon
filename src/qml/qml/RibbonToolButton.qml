@@ -48,17 +48,18 @@ Rectangle {
     readonly property string caption: cppHost ? cppHost.displayText : ""
     // true when the caption box is the two-line top-aligned budget
     readonly property bool wrapCaption: cppHost ? cppHost.textWordWrap : false
-    readonly property int naturalIconSide: cppHost ? cppHost.iconSide : 0
 
     // long-press (DelayedPopup) suppresses the click that follows the hold
     property bool heldForMenu: false
 
-    // office-2021 state colors (widgets QSS SARibbonToolButton)
+    // office-2021 state colors (widgets QSS SARibbonToolButton): the caption
+    // keeps the theme text color in EVERY state — a hover/pressed background
+    // is always a light tint of the content background, so recoloring the text
+    // with a background token made it invisible on hover
     readonly property color stateBg: mouse.pressed ? RibbonTheme.contentPressedBg
                                      : (mouse.containsMouse ? RibbonTheme.contentHoverBg
                                         : (root.checked ? RibbonTheme.contentPressedBg : RibbonTheme.contentBg))
-    readonly property color stateText: (mouse.containsMouse && !root.checked && !mouse.pressed)
-                                       ? RibbonTheme.contentPressedBg : RibbonTheme.textColor
+    readonly property color stateText: RibbonTheme.textColor
 
     // ---- entry points the C++ host invokes (openMenu/closeMenu) ----
     function openMenu()
@@ -117,18 +118,38 @@ Rectangle {
     // re-derives geometry (iron rule: rendering here, layout in core).
     Image {
         id: contentIcon
-        visible: root.naturalIconSide > 0 && root.icon.length > 0
-        // the icon is painted at its natural size, centered in the icon box
-        // (widgets drawItemPixmap(iconRect, Qt::AlignCenter, pixmap))
-        width: root.naturalIconSide
-        height: root.naturalIconSide
+        visible: root.iconBox.width > 0 && root.iconBox.height > 0 && root.icon.length > 0
+        // The icon height IS the host-published icon box height, which the core
+        // layout derives from the panel's large-button height (mode precomputed:
+        // three-row / two-row / single-row each fix the box, hence the icon),
+        // and the width follows the source aspect ratio, clamped to the box
+        // width. Every large button of a mode therefore draws the same icon
+        // height with a proportionally scaled width, and the text box below /
+        // beside it keeps its fixed budget.
+        // The natural aspect is captured once from the loaded source (before
+        // sourceSize is pinned to the draw size, which would otherwise feed
+        // back into itself); until then a square source is assumed.
+        property real natW: 0
+        property real natH: 0
+        readonly property real aspect: (natW > 0 && natH > 0) ? natW / natH : 1
+        readonly property real drawW: Math.min(root.iconBox.height * aspect, root.iconBox.width)
+        readonly property real drawH: drawW / aspect
+        width: drawW
+        height: drawH
         x: root.iconBox.x + (root.iconBox.width - width) / 2
         y: root.iconBox.y + (root.iconBox.height - height) / 2
         source: root.icon
-        sourceSize.width: root.naturalIconSide
-        sourceSize.height: root.naturalIconSide
         fillMode: Image.PreserveAspectFit
         opacity: root.contentOpacity
+        onStatusChanged: {
+            if (status === Image.Ready && natW <= 0 && sourceSize.width > 0) {
+                natW = sourceSize.width;
+                natH = sourceSize.height;
+            }
+        }
+        onWidthChanged: if (natW > 0) sourceSize = Qt.size(Math.max(width, 1), Math.max(height, 1))
+        onHeightChanged: if (natW > 0) sourceSize = Qt.size(Math.max(width, 1), Math.max(height, 1))
+        Component.onCompleted: if (natW > 0) sourceSize = Qt.size(Math.max(width, 1), Math.max(height, 1))
     }
     Text {
         id: contentText

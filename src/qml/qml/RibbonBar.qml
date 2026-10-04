@@ -10,7 +10,14 @@ Rectangle {
     id: root
 
     property QtObject cppHost: null
-    onCppHostChanged: if (cppHost) cppHost.qmlLeaf = root
+    onCppHostChanged: {
+        if (cppHost) {
+            cppHost.qmlLeaf = root;
+            // hand the host to the bottom border once (the border's own
+            // Component.onCompleted runs before this handshake injects cppHost)
+            bottomBorder.host = cppHost;
+        }
+    }
 
     readonly property int categoryRowY: cppHost ? cppHost.categoryRowY : 0
     readonly property int titleBarHeight: cppHost ? cppHost.titleBarHeight : 0
@@ -56,6 +63,34 @@ Rectangle {
         width: parent.width
         height: Math.max(parent.height - root.categoryRowY, 0)
         color: RibbonTheme.contentBg
+    }
+
+    // bottom edge line: the ribbon is a fixed-height band (the host publishes
+    // its implicit height from the mode metrics), and without a visible lower
+    // border the content zone melts into the window background below it.
+    // Leaves ride at z=-1 (background layer), so a line kept inside this leaf
+    // would be overpainted by the category / panel leaves that reach exactly
+    // to the bar's bottom edge — the line therefore hangs on the host itself,
+    // one layer above the structural children.
+    // Bindings deliberately reference the C++ host only (never this leaf):
+    // the line outlives the leaf root when the bar tears down, and a binding
+    // into the dying leaf root is exactly the teardown crash family NOTES B44
+    // recorded for this module.
+    Rectangle {
+        id: bottomBorder
+        // injected by the leaf root's onCppHostChanged (this item's own
+        // Component.onCompleted runs before the handshake); from then on no
+        // binding references the leaf root, so the line survives the leaf's
+        // teardown untouched (NOTES B44 crash family)
+        property QtObject host: null
+        parent: host
+        z: 1
+        x: 0
+        y: host ? Math.max(host.height - 1, 0) : 0
+        width: host ? host.width : 0
+        height: 1
+        visible: host !== null
+        color: RibbonTheme.borderColor
     }
 
     // context category bands: span their tabs from the bar top through the

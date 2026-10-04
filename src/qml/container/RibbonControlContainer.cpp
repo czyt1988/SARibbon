@@ -11,6 +11,14 @@ constexpr int kSmallIconSide = 20;  // widgets parity (SARibbonBar small icon)
 constexpr int kLargeIconSide = 32;
 constexpr int kLabelSpacing  = 3;
 constexpr int kContentMargin = 2;
+// Ribbon rows are compact (the panel engine derives them from the category
+// height), while QtQuick Controls 2 styles pad their controls for standalone
+// forms (Basic: 6..12px). An embedded control therefore gets its padding
+// squeezed to this value so its implicit height lands inside one row.
+constexpr int kControlPadding = 1;
+// Text elides as soon as a column is a fraction of a pixel narrower than the
+// control's implicit advance; the hint keeps a small slack against that.
+constexpr int kWidthSlack = 2;
 }  // namespace
 
 RibbonControlContainer::RibbonControlContainer(QQuickItem* parent) : RibbonLayoutItemHost(parent)
@@ -112,6 +120,13 @@ void RibbonControlContainer::setControl(QQuickItem* item)
         // the control belongs to this container from now on (both parents)
         mControl->setParentItem(this);
         mControl->setParent(this);
+        // adapt the control to the ribbon row it is embedded into: squeeze the
+        // style padding (Controls 2 defaults are form-sized, ribbon rows are
+        // not) and clip, so nothing the control draws can escape its row
+        if (mControl->property("padding").isValid()) {
+            mControl->setProperty("padding", kControlPadding);
+        }
+        mControl->setClip(true);
         // implicit size changes re-run the panel layout (QWidgetItem parity)
         connect(mControl, &QQuickItem::implicitWidthChanged, this, [this]() { updateSizeHint(); });
         connect(mControl, &QQuickItem::implicitHeightChanged, this, [this]() { updateSizeHint(); });
@@ -321,7 +336,7 @@ QSize RibbonControlContainer::sizeHint() const
         return QSize(w, qMax(largeH, 22));
     }
     const int h = qMax(qMax(int(ctrlH), fm.lineSpacing()), 16);
-    return QSize(mLabelWidth + int(ctrlW) + mSuffixWidth + kContentMargin, h);
+    return QSize(mLabelWidth + int(ctrlW) + mSuffixWidth + kContentMargin + kWidthSlack, h);
 }
 
 void RibbonControlContainer::updateSizeHint()
@@ -337,17 +352,18 @@ void RibbonControlContainer::positionControl()
     if (!mControl) {
         return;
     }
-    // control sits after the label strip, vertically centered, clamped to the
-    // container bounds (the label zone is reserved by the leaf rendering); the
-    // trailing suffix strip is reserved on the other side
+    // control sits after the label strip and fills the row height the panel
+    // engine assigned (the label zone is reserved by the leaf rendering, the
+    // trailing suffix strip on the other side): every embedded control of a
+    // row shares exactly the same height, which is what keeps a radio, a
+    // combo and a line edit visually aligned inside one ribbon row
     const bool isLarge = (rowProportion == SARibbon::Core::SARibbonRowProportion::Large);
     const qreal x  = isLarge ? kContentMargin : mLabelWidth;
     const qreal tail = isLarge ? kContentMargin : (mSuffixWidth + kContentMargin);
     const qreal availW = qMax(width() - x - tail, 0.0);
     const qreal availH = qMax(height() - 2 * kContentMargin, 0.0);
-    const qreal h  = qMin(qMax(mControl->implicitHeight(), 0.0), availH);
-    mControl->setPosition(QPointF(x, (height() - h) / 2.0));
-    mControl->setSize(QSizeF(availW, h));
+    mControl->setPosition(QPointF(x, kContentMargin));
+    mControl->setSize(QSizeF(availW, availH));
 }
 
 }

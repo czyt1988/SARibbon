@@ -2,6 +2,9 @@
 <RCC version="1.0">
     <qresource prefix="/">
         <file>main.qml</file>
+        <file>SlimComboBox.qml</file>
+        <file>SlimRadioButton.qml</file>
+        <file>SlimCheckBox.qml</file>
     </qresource>
     <qresource prefix="/icon">
         <file>icon/bold.svg</file>
