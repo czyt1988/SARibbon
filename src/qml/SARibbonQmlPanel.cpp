@@ -92,8 +92,11 @@ void RibbonPanel::registerChildItem(RibbonLayoutItemHost* item)
     if (!mChildItems.contains(item)) {
         mChildItems.append(item);
         // buttons registered later inherit the current style flags and the
-        // layout knobs already pushed down from the category / bar
+        // layout knobs already pushed down from the category / bar; a button
+        // arriving from a title-row host loses its flat flag (panel buttons
+        // paint the content background)
         if (auto* btn = qobject_cast< RibbonToolButton* >(item)) {
+            btn->setFlat(false);
             btn->setWordWrap(mWordWrap);
             btn->setIconRightText(mIconRightText);
             btn->setSmallIconSize(mSmallIconSize);
@@ -427,8 +430,12 @@ void RibbonPanel::runLayout()
     // publish implicit sizes even at zero geometry: the sizeHint derives from the
     // C++ item hints (metrics-driven, rect-independent), and the category reads
     // implicitWidth as its layout hint — gating this on our own size would
-    // deadlock the hint chain (category waits for the panel, panel for category)
-    setImplicitWidth(qMax(qreal(r.sizeHint.width()), width()));
+    // deadlock the hint chain (category waits for the panel, panel for category).
+    // The hint follows the engine output in BOTH directions: keeping the wider
+    // of sizeHint and width() would freeze the panel at its widest state, so a
+    // style switch that repacks buttons narrower (word wrap off, titles hidden)
+    // would leave the panel at its old width — a growing strip of dead space
+    setImplicitWidth(qreal(r.sizeHint.width()));
     setImplicitHeight(qreal(r.sizeHint.height()));
 
     if (width() <= 0 || height() <= 0) {

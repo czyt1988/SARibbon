@@ -52,13 +52,20 @@ Rectangle {
     // long-press (DelayedPopup) suppresses the click that follows the hold
     property bool heldForMenu: false
 
+    // title-row rendering context (host-published): the quick access bar and
+    // the right button group sit flat on the title row — widgets theme-base
+    // QSS `SARibbonButtonGroupWidget > QToolButton` paints them without
+    // normal-state background and border, only hover/pressed/checked tint
+    readonly property bool flat: cppHost ? cppHost.flat : false
+
     // office-2021 state colors (widgets QSS SARibbonToolButton): the caption
     // keeps the theme text color in EVERY state — a hover/pressed background
     // is always a light tint of the content background, so recoloring the text
     // with a background token made it invisible on hover
     readonly property color stateBg: mouse.pressed ? RibbonTheme.contentPressedBg
                                      : (mouse.containsMouse ? RibbonTheme.contentHoverBg
-                                        : (root.checked ? RibbonTheme.contentPressedBg : RibbonTheme.contentBg))
+                                        : (root.checked ? RibbonTheme.contentPressedBg
+                                           : (root.flat ? "transparent" : RibbonTheme.contentBg)))
     readonly property color stateText: RibbonTheme.textColor
 
     // ---- entry points the C++ host invokes (openMenu/closeMenu) ----
@@ -92,7 +99,8 @@ Rectangle {
         radius: 4
         color: !root.disabled && mouse.pressed ? RibbonTheme.contentPressedBg
                : (!root.disabled && mouse.containsMouse ? RibbonTheme.contentHoverBg
-                  : (root.checked ? RibbonTheme.contentPressedBg : RibbonTheme.contentBg))
+                  : (root.checked ? RibbonTheme.contentPressedBg
+                     : (root.flat ? "transparent" : RibbonTheme.contentBg)))
         border.width: root.checked ? 1 : 0
         border.color: RibbonTheme.textColor
     }
@@ -105,7 +113,7 @@ Rectangle {
         radius: 4
         color: !root.disabled && menuMouse.pressed ? RibbonTheme.contentPressedBg
                : (!root.disabled && menuMouse.containsMouse ? RibbonTheme.contentHoverBg
-                  : RibbonTheme.contentBg)
+                  : (root.flat ? "transparent" : RibbonTheme.contentBg))
     }
 
     // disabled content: opacity carries the grey (no literal colors)

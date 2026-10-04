@@ -75,6 +75,7 @@ class SA_RIBBON_QML_EXPORT RibbonToolButton : public RibbonLayoutItemHost
     Q_PROPERTY(bool checked READ isChecked WRITE setChecked NOTIFY checkedChanged)
     Q_PROPERTY(bool wordWrap READ isWordWrap WRITE setWordWrap NOTIFY wordWrapChanged)
     Q_PROPERTY(bool iconRightText READ isIconRightText WRITE setIconRightText NOTIFY iconRightTextChanged)
+    Q_PROPERTY(bool flat READ isFlat WRITE setFlat NOTIFY flatChanged)
     Q_PROPERTY(int spacing READ spacing WRITE setSpacing NOTIFY spacingChanged)
     Q_PROPERTY(qreal twoLineHeightFactor READ twoLineHeightFactor WRITE setTwoLineHeightFactor NOTIFY layoutFactorsChanged)
     Q_PROPERTY(qreal oneLineHeightFactor READ oneLineHeightFactor WRITE setOneLineHeightFactor NOTIFY layoutFactorsChanged)
@@ -125,6 +126,14 @@ public:
     // setEnableIconRightText parity — single-row styles enable it)
     bool isIconRightText() const;
     void setIconRightText(bool on);
+
+    // Transparent normal-state background (widgets theme-base QSS rule
+    // `SARibbonButtonGroupWidget > QToolButton`: border none, background
+    // transparent — only hover/pressed/checked paint). The quick access bar
+    // and the right button group flip it on so their buttons sit flat on the
+    // title row instead of carrying the content background box
+    bool isFlat() const;
+    void setFlat(bool on);
 
     // Gap between the drawn elements (widgets setSpacing parity)
     int spacing() const;
@@ -217,6 +226,7 @@ Q_SIGNALS:
     void checkedChanged();
     void wordWrapChanged();
     void iconRightTextChanged();
+    void flatChanged();
     void spacingChanged();
     void layoutFactorsChanged();
     void iconSizesChanged();
@@ -272,6 +282,7 @@ private:
     bool mChecked   = false;
     bool mWordWrap  = true;
     bool mIconRightText = false;
+    bool mFlat = false;
     QString mToolTip;
     RibbonEnums::PopupMode mPopupMode = RibbonEnums::DelayedPopup;
     bool mMenuVisible = false;

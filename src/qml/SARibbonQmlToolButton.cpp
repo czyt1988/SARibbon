@@ -172,6 +172,20 @@ void RibbonToolButton::setIconRightText(bool on)
     updateLayout();
 }
 
+bool RibbonToolButton::isFlat() const
+{
+    return mFlat;
+}
+
+void RibbonToolButton::setFlat(bool on)
+{
+    if (mFlat == on) {
+        return;
+    }
+    mFlat = on;
+    Q_EMIT flatChanged();
+}
+
 int RibbonToolButton::spacing() const
 {
     return mSpacing;

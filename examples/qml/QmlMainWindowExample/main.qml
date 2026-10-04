@@ -88,9 +88,11 @@ ApplicationWindow {
             RibbonMenuItem { separator: true },
             RibbonMenuItem { text: qsTr("test 3"); iconSource: "qrc:/icon/icon/action3.svg" }
         ]
-        onApplicationMenuTriggered: log(qsTr("application menu: %1%2")
-                                        .arg(item.text)
-                                        .arg(item.checkable ? (item.checked ? " [on]" : " [off]") : ""))
+        onApplicationMenuTriggered: function(item) {
+            log(qsTr("application menu: %1%2")
+                .arg(item.text)
+                .arg(item.checkable ? (item.checked ? " [on]" : " [off]") : ""))
+        }
 
         // quick access bar (widgets quick access parity): small buttons on
         // the title row after the application button
@@ -116,15 +118,14 @@ ApplicationWindow {
                 proportion: Ribbon.Small
                 checkable: true
                 checked: true
-                onToggled: if (checked) log(qsTr("quick access view: icons"))
+                onToggled: function(checked) { if (checked) log(qsTr("quick access view: icons")) }
             }
             RibbonToolButton {
                 text: qsTr("Details")
                 proportion: Ribbon.Small
                 checkable: true
-                onToggled: if (checked) log(qsTr("quick access view: details"))
-            }
-            RibbonToolButton {
+                onToggled: function(checked) { if (checked) log(qsTr("quick access view: details")) }
+            }            RibbonToolButton {
                 text: qsTr("Redo")
                 iconSource: "qrc:/icon/icon/redo.svg"
                 proportion: Ribbon.Small
@@ -146,7 +147,7 @@ ApplicationWindow {
                         ]
                     }
                 ]
-                onMenuTriggered: log(qsTr("quick access menu: %1").arg(item.text))
+                    onMenuTriggered: function(item) { log(qsTr("quick access menu: %1").arg(item.text)) }
             }
         }
 
@@ -164,7 +165,7 @@ ApplicationWindow {
                 proportion: Ribbon.Small
                 checkable: true
                 checked: true
-                onToggled: log(qsTr("right group visible toggle: %1").arg(checked))
+                onToggled: function(checked) { log(qsTr("right group visible toggle: %1").arg(checked)) }
             }
         }
 
@@ -186,9 +187,11 @@ ApplicationWindow {
                         ButtonGroup.group: styleGroup
                         text: qsTr("office style")
                         checked: true
-                        onToggled: if (checked) {
-                            ribbonBar.ribbonStyle = Ribbon.RibbonStyleLooseThreeRow;
-                            log(qsTr("LooseThreeRow: tabs below title, 3 rows, word wrap on"));
+                        onToggled: function(checked) {
+                            if (checked) {
+                                ribbonBar.ribbonStyle = Ribbon.RibbonStyleLooseThreeRow;
+                                log(qsTr("LooseThreeRow: tabs below title, 3 rows, word wrap on"));
+                            }
                         }
                     }
                 }
@@ -197,9 +200,11 @@ ApplicationWindow {
                     control: SlimRadioButton {
                         ButtonGroup.group: styleGroup
                         text: qsTr("wps style")
-                        onToggled: if (checked) {
-                            ribbonBar.ribbonStyle = Ribbon.RibbonStyleCompactThreeRow;
-                            log(qsTr("CompactThreeRow: tabs on title, 3 rows"));
+                        onToggled: function(checked) {
+                            if (checked) {
+                                ribbonBar.ribbonStyle = Ribbon.RibbonStyleCompactThreeRow;
+                                log(qsTr("CompactThreeRow: tabs on title, 3 rows"));
+                            }
                         }
                     }
                 }
@@ -208,9 +213,11 @@ ApplicationWindow {
                     control: SlimRadioButton {
                         ButtonGroup.group: styleGroup
                         text: qsTr("office 2 row")
-                        onToggled: if (checked) {
-                            ribbonBar.ribbonStyle = Ribbon.RibbonStyleLooseTwoRow;
-                            log(qsTr("LooseTwoRow: 2 rows, word wrap off"));
+                        onToggled: function(checked) {
+                            if (checked) {
+                                ribbonBar.ribbonStyle = Ribbon.RibbonStyleLooseTwoRow;
+                                log(qsTr("LooseTwoRow: 2 rows, word wrap off"));
+                            }
                         }
                     }
                 }
@@ -219,9 +226,11 @@ ApplicationWindow {
                     control: SlimRadioButton {
                         ButtonGroup.group: styleGroup
                         text: qsTr("wps 2 row")
-                        onToggled: if (checked) {
-                            ribbonBar.ribbonStyle = Ribbon.RibbonStyleCompactTwoRow;
-                            log(qsTr("CompactTwoRow: tabs on title, 2 rows"));
+                        onToggled: function(checked) {
+                            if (checked) {
+                                ribbonBar.ribbonStyle = Ribbon.RibbonStyleCompactTwoRow;
+                                log(qsTr("CompactTwoRow: tabs on title, 2 rows"));
+                            }
                         }
                     }
                 }
@@ -230,9 +239,11 @@ ApplicationWindow {
                     control: SlimRadioButton {
                         ButtonGroup.group: styleGroup
                         text: qsTr("loose single row")
-                        onToggled: if (checked) {
-                            ribbonBar.ribbonStyle = Ribbon.RibbonStyleLooseSingleRow;
-                            log(qsTr("LooseSingleRow: 1 row, panel titles hidden, icon-right text"));
+                        onToggled: function(checked) {
+                            if (checked) {
+                                ribbonBar.ribbonStyle = Ribbon.RibbonStyleLooseSingleRow;
+                                log(qsTr("LooseSingleRow: 1 row, panel titles hidden, icon-right text"));
+                            }
                         }
                     }
                 }
@@ -241,9 +252,11 @@ ApplicationWindow {
                     control: SlimRadioButton {
                         ButtonGroup.group: styleGroup
                         text: qsTr("compact single row")
-                        onToggled: if (checked) {
-                            ribbonBar.ribbonStyle = Ribbon.RibbonStyleCompactSingleRow;
-                            log(qsTr("CompactSingleRow: 1 row + tabs on title"));
+                        onToggled: function(checked) {
+                            if (checked) {
+                                ribbonBar.ribbonStyle = Ribbon.RibbonStyleCompactSingleRow;
+                                log(qsTr("CompactSingleRow: 1 row + tabs on title"));
+                            }
                         }
                     }
                 }
@@ -269,7 +282,7 @@ ApplicationWindow {
                             qsTr("Office 2021 Blue"), qsTr("Office 2021 Green"), qsTr("Office 2021 Dark"),
                             qsTr("Dark"), qsTr("Dark 2")
                         ]
-                        onActivated: {
+                        onActivated: function(index) {
                             RibbonTheme.currentTheme = themeValues[index];
                             log(qsTr("theme switched: %1").arg(currentText));
                         }
@@ -348,7 +361,7 @@ ApplicationWindow {
                     control: SlimComboBox {
                         model: [ qsTr("Left"), qsTr("Center"), qsTr("Right") ]
                         currentIndex: 0
-                        onActivated: {
+                        onActivated: function(index) {
                             ribbonBar.tabAlignment = index;  // 0/1/2 = AlignLeft/Center/Right
                             log(qsTr("tab alignment: %1").arg(currentText));
                         }
@@ -497,7 +510,7 @@ ApplicationWindow {
                         RibbonMenuItem { text: "item 5"; iconSource: "qrc:/icon/icon/item.svg" }
                     ]
                     onClicked: log(qsTr("test 1 action zone clicked"))
-                    onMenuTriggered: log(qsTr("test 1 menu: %1").arg(item.text))
+                    onMenuTriggered: function(item) { log(qsTr("test 1 menu: %1").arg(item.text)) }
                 }
                 RibbonToolButton {
                     text: "test 2"
@@ -511,7 +524,7 @@ ApplicationWindow {
                         RibbonMenuItem { separator: true },
                         RibbonMenuItem { text: "item 3"; iconSource: "qrc:/icon/icon/item.svg" }
                     ]
-                    onMenuTriggered: log(qsTr("test 2 menu: %1").arg(item.text))
+                    onMenuTriggered: function(item) { log(qsTr("test 2 menu: %1").arg(item.text)) }
                 }
                 // mirrors the widgets panel's separator between the small
                 // tests and the large popup buttons
@@ -527,7 +540,7 @@ ApplicationWindow {
                         RibbonMenuItem { text: "item 3"; iconSource: "qrc:/icon/icon/item.svg" }
                     ]
                     onClicked: log(qsTr("Delayed Popup clicked (press and hold opens the menu)"))
-                    onMenuTriggered: log(qsTr("Delayed Popup menu: %1").arg(item.text))
+                    onMenuTriggered: function(item) { log(qsTr("Delayed Popup menu: %1").arg(item.text)) }
                 }
                 RibbonToolButton {
                     text: "Menu Button Popup"
@@ -539,7 +552,7 @@ ApplicationWindow {
                         RibbonMenuItem { text: "item 2"; iconSource: "qrc:/icon/icon/item.svg" }
                     ]
                     onClicked: log(qsTr("Menu Button Popup action zone clicked"))
-                    onMenuTriggered: log(qsTr("Menu Button Popup menu: %1").arg(item.text))
+                    onMenuTriggered: function(item) { log(qsTr("Menu Button Popup menu: %1").arg(item.text)) }
                 }
                 RibbonToolButton {
                     text: "Instant Popup"
@@ -550,7 +563,7 @@ ApplicationWindow {
                         RibbonMenuItem { text: "item 1"; iconSource: "qrc:/icon/icon/item.svg" },
                         RibbonMenuItem { text: "item 2"; iconSource: "qrc:/icon/icon/item.svg" }
                     ]
-                    onMenuTriggered: log(qsTr("Instant Popup menu: %1").arg(item.text))
+                    onMenuTriggered: function(item) { log(qsTr("Instant Popup menu: %1").arg(item.text)) }
                 }
                 RibbonToolButton {
                     text: "Delayed Popup checkable"
@@ -563,7 +576,7 @@ ApplicationWindow {
                         RibbonMenuItem { text: "item 2"; iconSource: "qrc:/icon/icon/item.svg" }
                     ]
                     onClicked: log(qsTr("Delayed Popup checkable toggled: %1").arg(checked))
-                    onMenuTriggered: log(qsTr("Delayed Popup checkable menu: %1").arg(item.text))
+                    onMenuTriggered: function(item) { log(qsTr("Delayed Popup checkable menu: %1").arg(item.text)) }
                 }
                 RibbonToolButton {
                     text: "Menu Button Popup checkable"
@@ -576,7 +589,7 @@ ApplicationWindow {
                         RibbonMenuItem { text: "item 2"; iconSource: "qrc:/icon/icon/item.svg" }
                     ]
                     onClicked: log(qsTr("Menu Button Popup checkable toggled: %1").arg(checked))
-                    onMenuTriggered: log(qsTr("Menu Button Popup checkable menu: %1").arg(item.text))
+                    onMenuTriggered: function(item) { log(qsTr("Menu Button Popup checkable menu: %1").arg(item.text)) }
                 }
             }
 
@@ -619,7 +632,7 @@ ApplicationWindow {
                     text: "CheckBox:"
                     proportion: Ribbon.Small
                     control: SlimCheckBox {
-                        onToggled: log(qsTr("CheckBox toggled: %1").arg(checked))
+                        onToggled: function(checked) { log(qsTr("CheckBox toggled: %1").arg(checked)) }
                     }
                 }
                 RibbonControlContainer {
@@ -747,7 +760,7 @@ ApplicationWindow {
                     checkable: true
                     // implicit parameter injection keeps Qt 5.12 compatibility
                     // (Qt 6.5+ only deprecates it with a warning)
-                    onToggled: {
+                    onToggled: function(checked) {
                         contextCategory1.active = checked;
                         log(qsTr("context category 1 active: %1").arg(checked));
                     }
@@ -757,7 +770,7 @@ ApplicationWindow {
                     iconSource: "qrc:/icon/icon/ContextCategory.svg"
                     proportion: Ribbon.Large
                     checkable: true
-                    onToggled: {
+                    onToggled: function(checked) {
                         contextCategory2.active = checked;
                         log(qsTr("context category 2 active: %1").arg(checked));
                     }
@@ -802,7 +815,7 @@ ApplicationWindow {
                         RibbonGalleryItem { text: "Adobe"; iconSource: "qrc:/icon/icon/gallery/Adobe.svg" }
                         RibbonGalleryItem { text: "Word"; iconSource: "qrc:/icon/icon/gallery/Word.svg" }
                     }
-                    onTriggered: log(qsTr("gallery: %1 triggered").arg(item.text))
+                    onTriggered: function(item) { log(qsTr("gallery: %1 triggered").arg(item.text)) }
                 }
             }
 
@@ -1005,7 +1018,7 @@ ApplicationWindow {
                             RibbonMenuItem { text: "ctx item 1"; iconSource: "qrc:/icon/icon/item.svg" },
                             RibbonMenuItem { text: "ctx item 2"; iconSource: "qrc:/icon/icon/item.svg" }
                         ]
-                        onMenuTriggered: log(qsTr("context menu: %1").arg(item.text))
+                        onMenuTriggered: function(item) { log(qsTr("context menu: %1").arg(item.text)) }
                     }
                     RibbonToolButton {
                         text: "Menu Button Popup"
@@ -1015,7 +1028,7 @@ ApplicationWindow {
                         menuItems: [
                             RibbonMenuItem { text: "ctx item 1"; iconSource: "qrc:/icon/icon/item.svg" }
                         ]
-                        onMenuTriggered: log(qsTr("context menu: %1").arg(item.text))
+                        onMenuTriggered: function(item) { log(qsTr("context menu: %1").arg(item.text)) }
                     }
                 }
             }

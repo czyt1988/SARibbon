@@ -222,7 +222,7 @@ private:
     void propagateLayoutFactors();
     static int styleRowCount(RibbonEnums::RibbonStyle style);
     static bool styleIsCompact(RibbonEnums::RibbonStyle style);
-    void placeTitleRowHosts(int titleH, int appBtnW, int systemStripW);
+    void placeTitleRowHosts(int titleH, int tabBarY, int tabH, int appBtnW, int systemStripW);
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     using ListIndex = qsizetype;
 #else

@@ -68,6 +68,11 @@ void RibbonButtonRowHost::registerButton(RibbonToolButton* btn)
 {
     if (btn && !mButtons.contains(btn)) {
         mButtons.append(btn);
+        // title-row rendering context: flat buttons paint no normal-state
+        // background (widgets theme-base QSS `SARibbonButtonGroupWidget >
+        // QToolButton` parity); the panel host clears the flag again when a
+        // customize record moves the button back into a panel
+        btn->setFlat(true);
         // hint changes re-flow the row (text/icon edits)
         connect(btn, &QQuickItem::implicitWidthChanged, this, [this]() { polish(); });
         connect(btn, &QQuickItem::implicitHeightChanged, this, [this]() { polish(); });
@@ -80,6 +85,7 @@ void RibbonButtonRowHost::unregisterButton(RibbonToolButton* btn)
 {
     if (mButtons.removeOne(btn)) {
         disconnect(btn, nullptr, this, nullptr);
+        btn->setFlat(false);
         polish();
     }
 }
@@ -150,6 +156,24 @@ int RibbonButtonRowHost::rowHeight() const
     return RibbonMetrics::instance()->titleBarHeight();
 }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+void RibbonButtonRowHost::geometryChange(const QRectF& newGeometry, const QRectF& oldGeometry)
+#else
+void RibbonButtonRowHost::geometryChanged(const QRectF& newGeometry, const QRectF& oldGeometry)
+#endif
+{
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    QQuickItem::geometryChange(newGeometry, oldGeometry);
+#else
+    QQuickItem::geometryChanged(newGeometry, oldGeometry);
+#endif
+    if (newGeometry.height() != oldGeometry.height()) {
+        // the bar host sizes this row (title row height in compact styles,
+        // tab row height in loose ones): re-center the buttons vertically
+        polish();
+    }
+}
+
 void RibbonButtonRowHost::itemChange(ItemChange change, const ItemChangeData& data)
 {
     if (change == QQuickItem::ItemChildAddedChange) {
@@ -173,8 +197,10 @@ void RibbonButtonRowHost::layoutButtons()
 {
     // buttons flow horizontally, vertically centered in the row; sizes come
     // from the metrics-derived sizeHints (widgets quick-access/button-group
-    // internal row layout parity)
-    const int h0 = rowHeight();
+    // internal row layout parity). The row height follows whatever the bar
+    // host sized this item to (title row vs tab row placement), so buttons
+    // stay centered instead of hugging the top when the row is taller
+    const int h0 = (height() > 0) ? int(height()) : rowHeight();
     int x = 0;
     for (RibbonToolButton* btn : mButtons) {
         const QSize hint = btn->sizeHint();

@@ -119,9 +119,19 @@ Item {
         contentItem: Column {
             id: menuColumn
 
+            // Row width anchor: the two action rows span the widest
+            // FIXED-size sibling, never menuColumn.width — a Column's
+            // implicitWidth derives from its children's widths, so a row
+            // reading menuColumn.width (which the popup derives from
+            // menuColumn.implicitWidth) closes a layout cycle and ends in
+            // the "Column called polish() inside updatePolish()" loop
+            readonly property real contentRowWidth: Math.max(paletteColumn.implicitWidth, menuTitle.implicitWidth)
+
             spacing: 4
 
             Text {
+                id: menuTitle
+
                 visible: root.titleText.length > 0
                 leftPadding: 4
                 text: root.titleText
@@ -132,6 +142,8 @@ Item {
             // both inside a layout with 1px contents margins and spacing 8, and
             // the shade rows packed with no gap between them
             Column {
+                id: paletteColumn
+
                 leftPadding: 1
                 rightPadding: 1
                 topPadding: 1
@@ -173,7 +185,7 @@ Item {
 
                 visible: root.noneEnabled
                 objectName: "colorMenuNoneRow"
-                width: menuColumn.width
+                width: menuColumn.contentRowWidth
                 height: root.rowHeight
 
                 Rectangle {
@@ -217,7 +229,7 @@ Item {
                 id: customRow
 
                 objectName: "colorMenuCustomRow"
-                width: menuColumn.width
+                width: menuColumn.contentRowWidth
                 height: root.rowHeight
 
                 Rectangle {
