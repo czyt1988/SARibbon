@@ -9,7 +9,11 @@ jobs:
   # ==================================================================
   # PySide6 bindings — uses scikit-build-core (CMake backend)
   # ==================================================================
+  # Real builds upload to PyPI via the publish job below. Only a GitHub
+  # Release publication may reach this path — workflow_dispatch is reserved
+  # for the dry-run job (B38).
   build-pyside6:
+    if: github.event_name == 'release'
     name: PySide6 ${{ matrix.os }} py${{ matrix.python }}
     strategy:
       fail-fast: false
@@ -30,24 +34,27 @@ jobs:
           pip install build twine
 
       - name: Install PySide6 and shiboken6
-        # Pinned to the Qt the CI installs (aqt 6.8.3): PySide6 headers only
-        # compile against the Qt the release was built with (NOTES B38)
-        run: pip install "PySide6==6.8.3.*" "shiboken6-generator==6.8.3.*"
+        # Pinned to the Qt the CI installs (aqt 6.10.3): PySide6 headers only
+        # compile against the Qt the release was built with, and 6.10+ ships no
+        # bundled libclang (NOTES B38)
+        run: pip install "PySide6==6.10.3.*" "shiboken6-generator==6.10.3.*"
 
       # --- Qt installation per platform ---
-      # Distro Qt (6.4 on ubuntu-24.04) is too old for PySide6 6.8.3 headers,
-      # so Linux uses the same aqt Qt 6.8.3 as Windows (NOTES B38).
+      # Distro Qt (6.4 on ubuntu-24.04) is too old for PySide6 6.10.3 headers,
+      # so Linux uses the same aqt Qt 6.10.3 as Windows (NOTES B38).
       - name: Install Qt (Linux)
         if: runner.os == 'Linux'
         shell: bash
         run: |
           pip install aqtinstall
-          python -m aqt install-qt linux desktop 6.8.3 gcc_64 -O "${{ github.workspace }}/Qt"
+          # Qt 6.8+ renamed the linux arch from gcc_64 to linux_gcc_64;
+          # the install dir remains <Qt>/6.10.3/gcc_64 (B38)
+          python -m aqt install-qt linux desktop 6.10.3 linux_gcc_64 -O "${{ github.workspace }}/Qt"
           # shiboken6 needs a system libclang for clang's builtin headers (NOTES B38)
           sudo apt-get update && sudo apt-get install -y libgl1-mesa-dev libxcb1-dev libclang-dev
           LLVM_INSTALL_DIR=$(ls -d /usr/lib/llvm-* | sort -V | tail -1)
           echo "LLVM_INSTALL_DIR=$LLVM_INSTALL_DIR" >> $GITHUB_ENV
-          echo "CMAKE_PREFIX_PATH=${{ github.workspace }}/Qt/6.8.3/gcc_64" >> $GITHUB_ENV
+          echo "CMAKE_PREFIX_PATH=${{ github.workspace }}/Qt/6.10.3/gcc_64" >> $GITHUB_ENV
 
       - name: Install Qt (macOS)
         if: runner.os == 'macOS'
@@ -61,9 +68,20 @@ jobs:
         shell: bash
         run: |
           pip install aqtinstall
-          python -m aqt install-qt windows desktop 6.8.3 win64_msvc2022_64 -O "${{ github.workspace }}/Qt"
-          echo "${{ github.workspace }}/Qt/6.8.3/msvc2022_64/bin" >> $GITHUB_PATH
-          echo "CMAKE_PREFIX_PATH=${{ github.workspace }}/Qt/6.8.3/msvc2022_64" >> $GITHUB_ENV
+          python -m aqt install-qt windows desktop 6.10.3 win64_msvc2022_64 -O "${{ github.workspace }}/Qt"
+          echo "${{ github.workspace }}/Qt/6.10.3/msvc2022_64/bin" >> $GITHUB_PATH
+          echo "CMAKE_PREFIX_PATH=${{ github.workspace }}/Qt/6.10.3/msvc2022_64" >> $GITHUB_ENV
+
+      # shiboken6 6.10+ ships no bundled libclang and loads the system one;
+      # the windows-latest image has LLVM on PATH, choco is only a fallback (B38)
+      - name: Install LLVM for shiboken (Windows)
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          if [ ! -d "/c/Program Files/LLVM/bin" ]; then
+            choco install llvm -y --no-progress
+          fi
+          echo 'LLVM_INSTALL_DIR=C:\Program Files\LLVM' >> $GITHUB_ENV
 
       - name: Set MSVC environment (Windows)
         if: runner.os == 'Windows'
@@ -90,6 +108,7 @@ jobs:
   # PyQt5 bindings — uses SIP/PyQt-builder
   # ==================================================================
   build-pyqt5:
+    if: github.event_name == 'release'
     name: PyQt5 ${{ matrix.os }} py${{ matrix.python }}
     strategy:
       fail-fast: false
@@ -149,6 +168,7 @@ jobs:
   # PyQt6 bindings — uses SIP/PyQt-builder from pyqt6/ directory
   # ==================================================================
   build-pyqt6:
+    if: github.event_name == 'release'
     name: PyQt6 ${{ matrix.os }} py${{ matrix.python }}
     strategy:
       fail-fast: false
@@ -243,13 +263,37 @@ jobs:
           python -m aqt install-qt windows desktop 5.15.2 win64_msvc2019_64 -O "${{ github.workspace }}/Qt"
           echo "${{ github.workspace }}/Qt/5.15.2/msvc2019_64/bin" >> $GITHUB_PATH
 
-      - name: Install Qt (Windows, qt6/pyside6 tracks)
-        if: runner.os == 'Windows' && matrix.track != 'pyqt5'
+      - name: Install Qt (Windows, qt6 track)
+        if: runner.os == 'Windows' && matrix.track == 'pyqt6'
         shell: bash
         run: |
           pip install aqtinstall
           python -m aqt install-qt windows desktop 6.8.3 win64_msvc2022_64 -O "${{ github.workspace }}/Qt"
           echo "${{ github.workspace }}/Qt/6.8.3/msvc2022_64/bin" >> $GITHUB_PATH
+
+      # pyside6: PySide6 is pinned to 6.10.3 (see pyside6/pyproject.toml) and
+      # must compile against the Qt it was built with (NOTES B38)
+      - name: Install Qt (Windows, pyside6 track)
+        if: runner.os == 'Windows' && matrix.track == 'pyside6'
+        shell: bash
+        run: |
+          pip install aqtinstall
+          python -m aqt install-qt windows desktop 6.10.3 win64_msvc2022_64 -O "${{ github.workspace }}/Qt"
+          echo "${{ github.workspace }}/Qt/6.10.3/msvc2022_64/bin" >> $GITHUB_PATH
+          echo "CMAKE_PREFIX_PATH=${{ github.workspace }}/Qt/6.10.3/msvc2022_64" >> $GITHUB_ENV
+
+      # shiboken6 6.10+ ships no bundled libclang and loads the system one —
+      # the windows-latest image already has LLVM on PATH (proven: round-7
+      # PySide6 6.11 parsed with it); choco is only a fallback, and
+      # LLVM_INSTALL_DIR makes the builtin-include lookup deterministic (B38)
+      - name: Install LLVM for shiboken (Windows, pyside6 track)
+        if: runner.os == 'Windows' && matrix.track == 'pyside6'
+        shell: bash
+        run: |
+          if [ ! -d "/c/Program Files/LLVM/bin" ]; then
+            choco install llvm -y --no-progress
+          fi
+          echo 'LLVM_INSTALL_DIR=C:\Program Files\LLVM' >> $GITHUB_ENV
       - name: Install Qt (Linux, qt5 track)
         if: runner.os == 'Linux' && matrix.track == 'pyqt5'
         run: sudo apt-get update && sudo apt-get install -y qtbase5-dev qt5-qmake qtbase5-dev-tools libqt5svg5-dev
@@ -261,7 +305,7 @@ jobs:
           # apt installs qmake6, the sip toolchain looks for plain qmake
           sudo ln -sf /usr/lib/qt6/bin/qmake6 /usr/local/bin/qmake
 
-      # pyside6: PySide6 is pinned to 6.8.3 (see pyside6/pyproject.toml) and
+      # pyside6: PySide6 is pinned to 6.10.3 (see pyside6/pyproject.toml) and
       # must compile against the Qt it was built with — distro Qt (6.4 on
       # ubuntu-24.04) is too old, so install the matching aqt Qt like the
       # Windows leg (NOTES B38).
@@ -270,13 +314,15 @@ jobs:
         shell: bash
         run: |
           pip install aqtinstall
-          python -m aqt install-qt linux desktop 6.8.3 gcc_64 -O "${{ github.workspace }}/Qt"
-          # shiboken6 parses headers with libclang; the pip shiboken6_generator
-          # wheel ships libclang but not clang's builtin headers (stddef.h),
-          # so a system libclang is required (NOTES B38)
+          # Qt 6.8+ renamed the linux arch from gcc_64 to linux_gcc_64;
+          # the install dir remains <Qt>/<ver>/gcc_64 (B38)
+          python -m aqt install-qt linux desktop 6.10.3 linux_gcc_64 -O "${{ github.workspace }}/Qt"
+          # shiboken6 6.10+ ships no bundled libclang — a system one is
+          # required for both the parser and clang's builtin headers (B38)
           sudo apt-get update && sudo apt-get install -y libgl1-mesa-dev libxcb1-dev libclang-dev
           LLVM_INSTALL_DIR=$(ls -d /usr/lib/llvm-* | sort -V | tail -1)
           echo "LLVM_INSTALL_DIR=$LLVM_INSTALL_DIR" >> $GITHUB_ENV
+          echo "CMAKE_PREFIX_PATH=${{ github.workspace }}/Qt/6.10.3/gcc_64" >> $GITHUB_ENV
       - name: Set MSVC environment (Windows)
         if: runner.os == 'Windows'
         uses: ilammy/msvc-dev-cmd@v1
@@ -292,12 +338,10 @@ jobs:
         run: |
           if [ "${{ matrix.track }}" = "pyqt6" ]; then pip install sip PyQt-builder PyQt6 PyQt6-sip; fi
           if [ "${{ matrix.track }}" = "pyqt5" ]; then pip install sip PyQt-builder PyQt5 PyQt5-sip; fi
-          if [ "${{ matrix.track }}" = "pyside6" ]; then pip install "shiboken6-generator==6.8.3.*" "PySide6==6.8.3.*"; fi
+          if [ "${{ matrix.track }}" = "pyside6" ]; then pip install "shiboken6-generator==6.10.3.*" "PySide6==6.10.3.*"; fi
 
       - name: Build wheel
         shell: bash
-        env:
-          CMAKE_PREFIX_PATH: ${{ runner.os == 'Windows' && format('{0}/Qt/6.8.3/msvc2022_64', github.workspace) || (runner.os == 'Linux' && matrix.track == 'pyside6' && format('{0}/Qt/6.8.3/gcc_64', github.workspace)) || '/usr/lib/qt6' }}
         run: |
           # Git Bash ships /usr/bin/link (coreutils) which shadows MSVC link.exe
           # inside nmake-driven builds; put the MSVC tools first (NOTES B36).
@@ -324,7 +368,7 @@ jobs:
             python -c "import PyQt6.QtWidgets; from PyQt6SARibbon import saribbon; print('PyQt6SARibbon OK')"
           fi
           if [ "${{ matrix.track }}" = "pyside6" ]; then
-            pip install pyside6/dist/*.whl "PySide6==6.8.3.*"
+            pip install pyside6/dist/*.whl "PySide6==6.10.3.*"
             python -c "from PySideSARibbon import saribbon; print('PySideSARibbon OK')"
           fi
 

@@ -36,14 +36,42 @@
        ============================================================ -->
   <enum-type name="SARibbonAlignment"/>
   <enum-type name="SARibbonTheme"/>
-  <enum-type name="SARibbonMainWindowStyleFlag" flags="yes" flags-name="SARibbonMainWindowStyles"/>
+  <!-- flags attribute value is the QFlags typedef name (Q_DECLARE_FLAGS) -->
+  <enum-type name="SARibbonMainWindowStyleFlag" flags="SARibbonMainWindowStyles"/>
+
+  <!-- ============================================================
+       SARibbon::Core namespace — enums lifted from widgets in 3.0
+       (NOTES B21): SARibbonPanelItem::RowProportion is now a type
+       alias of SARibbon::Core::SARibbonRowProportion, so the real
+       enum must be registered at its namespace location; the old
+       class-scoped <enum-type name="RowProportion"/> matched no
+       real enum and generated references to a never-emitted
+       SBK_SARibbonPanelItem_RowProportion_IDX (B38).
+       ============================================================ -->
+  <namespace-type name="SARibbon">
+    <namespace-type name="Core">
+      <enum-type name="SARibbonRowProportion"/>
+      <!-- The namespace scope auto-gathers every free function inside it;
+           only the enum above is intended for Python. clampScrollOffset
+           (SARibbonCoreUtil.h) is an internal helper — exclude it, its
+           wrapper TU has no include for that header anyway (B38). -->
+      <modify-function signature="clampScrollOffset(int,int,int,bool)" remove="all"/>
+      <!-- Base of SARibbonCustomizeData: the ActionType enum actually lives
+           here (plan 02 S4.2 lifted it into core). Register the record so
+           the enum resolves; classes in namespaces must be XML-nested —
+           '::' in the type name is rejected by shiboken (B38). -->
+      <value-type name="SARibbonCustomizeRecord">
+        <include file-name="SARibbonCore/SARibbonCustomizeRecord.h" location="global"/>
+        <enum-type name="ActionType"/>
+      </value-type>
+    </namespace-type>
+  </namespace-type>
 
   <!-- ============================================================
        SARibbonPanelItem (QWidgetItem)
        ============================================================ -->
   <object-type name="SARibbonPanelItem">
     <include file-name="SARibbonPanelItem.h" location="global"/>
-    <enum-type name="RowProportion"/>
   </object-type>
 
   <!-- ============================================================
@@ -167,6 +195,21 @@
     <modify-function signature="addAction(QIcon,QString)" remove="all"/>
     <modify-function signature="addAction(QString,QKeySequence)" remove="all"/>
     <modify-function signature="addAction(QIcon,QString,QKeySequence)" remove="all"/>
+    <!-- Default args written as SARibbonPanelItem::Large resolve to the
+         static-constexpr class members (not enumerators), which shiboken
+         re-qualifies under the enum scope and emits broken C++
+         (SARibbon::Core::SARibbonRowProportion::SARibbonPanelItem::Large,
+         C2838). Replace with the real enumerators (B38). -->
+    <modify-function signature="addAction(QAction*,QToolButton::ToolButtonPopupMode,SARibbonPanelItem::RowProportion)">
+      <modify-argument index="3">
+        <replace-default-expression with="SARibbon::Core::SARibbonRowProportion::Large"/>
+      </modify-argument>
+    </modify-function>
+    <modify-function signature="addAction(QString,QIcon,QToolButton::ToolButtonPopupMode,SARibbonPanelItem::RowProportion)">
+      <modify-argument index="4">
+        <replace-default-expression with="SARibbon::Core::SARibbonRowProportion::Large"/>
+      </modify-argument>
+    </modify-function>
   </object-type>
 
   <!-- ============================================================
@@ -310,7 +353,6 @@
        ============================================================ -->
   <value-type name="SARibbonCustomizeData">
     <include file-name="SARibbonCustomizeData.h" location="global"/>
-    <enum-type name="ActionType"/>
   </value-type>
 
   <!-- ============================================================
