@@ -40,8 +40,8 @@ cmake --build build
 | Other 类别 | 定制对话框：左侧命令目录（tag 过滤 + 搜索）、右侧 ribbon 树预览（三档显示范围）、中间增删/上下移/重命名/新类别/新组/显隐；编辑先记为 core 定制记录并在影子树上预览，只有"确定"才落到真树，"取消"整批丢弃 | SARibbonCustomizeDialog |
 | context 上下文 1 | 页 1：控件嵌入（SpinBox/TextField）+ 按钮态；页 2：弹出按钮组 | context category 页面 |
 | context 上下文 2 | 双空页（多页结构演示） | context2 |
-| 事件日志 | 底部追加式日志区（所有交互写入） | textBrowser |
-| footer | 主题快捷按钮 ×3 | 主题演示 |
+| 事件日志 | 中心区域追加式日志区（所有交互写入，对应 widgets 版的 textBrowser） | textBrowser |
+| footer | 状态栏：主题快捷按钮 ×3 | 主题演示 |
 
 ## 与 widgets 版的已知差异
 

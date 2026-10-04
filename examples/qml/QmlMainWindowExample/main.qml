@@ -4,12 +4,13 @@ import QtQuick.Layouts 1.12
 import SARibbon 3.0
 
 // Mirrors the widgets MainWindowExample main scene: three categories with
-// mixed large/small buttons (icons!), theme switching and click feedback.
-// Tabs are auto-generated from the category titles (addCategoryPage parity).
+// mixed large/small buttons (icons!), theme switching, a central read-only
+// log area and a status line with quick theme presets. Tabs are
+// auto-generated from the category titles (addCategoryPage parity).
 ApplicationWindow {
     id: window
     width: 1300
-    height: 460
+    height: 600
     visible: true
     title: "SARibbon QML Example"
 
@@ -1265,42 +1266,57 @@ ApplicationWindow {
         customizeDialog.open();
     }
 
-    // Event log (the widgets example's central QTextBrowser counterpart):
-    // every handler routes through log(); the status line shows the last
-    // event, the scrolling area keeps the full history
+    // Central event log (the widgets example's central QTextBrowser
+    // counterpart): fills the area between the ribbon bar and the footer
+    // status line; every handler routes through log()
+    Flickable {
+        id: logFlick
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: ribbonBar.bottom
+        anchors.bottom: parent.bottom
+        anchors.margins: 4
+        contentWidth: eventLog.width
+        contentHeight: eventLog.height
+        clip: true
+        TextArea {
+            id: eventLog
+            width: logFlick.width
+            readOnly: true
+            selectByMouse: true
+            wrapMode: TextArea.Wrap
+            text: qsTr("click a button or switch a tab")
+            color: RibbonTheme.textColor
+            selectionColor: RibbonTheme.selectionBg
+            selectedTextColor: RibbonTheme.contentBg
+            background: Rectangle {
+                color: RibbonTheme.contentBg
+                border.width: 1
+                border.color: RibbonTheme.inputBorder
+            }
+            onHeightChanged: logFlick.contentY = Math.max(height - logFlick.height, 0)
+            function append(msg)
+            {
+                text += "\n" + msg;
+                cursorPosition = text.length;
+            }
+        }
+        ScrollBar.vertical: ScrollBar { }
+    }
+
     function log(msg)
     {
         eventLog.append(msg);
     }
 
+    // Status line: quick theme presets only; the scrolling event history
+    // lives in the central text area above
     footer: ToolBar {
         RowLayout {
             anchors.fill: parent
-            anchors.margins: 4
+            anchors.leftMargin: 8
             spacing: 12
 
-            Flickable {
-                id: logFlick
-                Layout.fillWidth: true
-                Layout.preferredHeight: 64
-                contentWidth: eventLog.width
-                contentHeight: eventLog.height
-                clip: true
-                TextArea {
-                    id: eventLog
-                    width: logFlick.width
-                    readOnly: true
-                    wrapMode: TextArea.Wrap
-                    text: qsTr("click a button or switch a tab")
-                    onHeightChanged: logFlick.contentY = Math.max(height - logFlick.height, 0)
-                    function append(msg)
-                    {
-                        text += "\n" + msg;
-                        cursorPosition = text.length;
-                    }
-                }
-                ScrollBar.vertical: ScrollBar { }
-            }
             Button {
                 text: qsTr("Office 2021 Blue")
                 onClicked: RibbonTheme.currentTheme = Ribbon.RibbonThemeOffice2021Blue
