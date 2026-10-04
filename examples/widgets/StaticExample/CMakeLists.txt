@@ -29,15 +29,16 @@ find_package(Qt${QT_VERSION_MAJOR} COMPONENTS Widgets Svg REQUIRED)
 
 
 # 注意后面所有SARIBBON_USE_FRAMELESS_LIB的判断，都是和framelss有关
-# 如果是使用frameless库，需要c++17，否则c++11足以
-if(SARIBBON_USE_FRAMELESS_LIB)
+# 3.0 起单文件产物恒为 C++17（core 的 std::optional 成员），与 frameless 无关；
+# frameless 之外仍然保留这个分支只为维持旧配置变量语义
+if(SARIBBON_USE_FRAMELESS_LIB OR 1)
     set(CMAKE_CXX_STANDARD 17)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)
     if(MSVC)
         # CMAKE_CXX_STANDARD对有些版本的msvc无效
         set(CMAKE_CXX_FLAGS"${CMAKE_CXX_FLAGS} /std:c++17")
     endif()
-    message(STATUS "The current QT version can use the frameless library and enable C++17")
+    message(STATUS "StaticExample uses C++17 (SARibbon 3.0 single-file amalgamation)")
 else()
     set(CMAKE_CXX_STANDARD 14)
     set(CMAKE_CXX_STANDARD_REQUIRED ON)

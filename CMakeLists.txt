@@ -108,7 +108,11 @@ else()
 endif()
 
 if(MSVC)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4819")
+    # /utf-8：源文件按 UTF-8（无 BOM）保存，中文注释在本地代码页（GBK）下会被
+    # 误解析——注释尾字节 0x5C 还会发生行拼接吞掉下一行，连带吞掉命名空间右括号，
+    # 让后续 Qt 头文件声明落入项目命名空间（表现为 SARibbon::QSet 之类的连锁
+    # C2039）。Qt6 的 CMake 包自带 /utf-8，Qt5 没有，必须在工程里显式补上
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4819 /utf-8")
     # Qt 6.5.3 的 qvarlengtharray.h 使用了 stdext::unchecked_array_iterator，
     # 新版 MSVC STL 在 C++17 模式下不再声明 stdext 命名空间（_HAS_AUTO_PTR_ETC=0）
     add_compile_definitions(_HAS_AUTO_PTR_ETC=1)

@@ -83,7 +83,14 @@ QStringList RibbonMetrics::commonFontFamilies() const
     // a compact, always-available selection for example combos
     // (QFontComboBox parity without exposing QFontDatabase to QML)
     QStringList families;
-    const auto all = QFontDatabase::families(QFontDatabase::Latin);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    // Qt6 made every QFontDatabase accessor static
+    const QStringList all = QFontDatabase::families(QFontDatabase::Latin);
+#else
+    // Qt5: non-static, query through an instance
+    const QFontDatabase db;
+    const QStringList all = db.families(QFontDatabase::Latin);
+#endif
     const QStringList preferred = { QStringLiteral("Microsoft YaHei"), QStringLiteral("Segoe UI"),
                                     QStringLiteral("Arial"), QStringLiteral("Times New Roman"),
                                     QStringLiteral("Courier New"), QStringLiteral("Consolas") };
