@@ -171,3 +171,7 @@ PIMPL 注意：`d_ptr` 用 `std::unique_ptr`（非 QScopedPointer），PrivateDa
 | [pimpl-dev-guide.md](docs/zh/dev-guide/pimpl-dev-guide.md) | PIMPL宏完整用法 |
 | [qt-integration.md](docs/zh/dev-guide/qt-integration.md) | Q_PROPERTY、信号槽、Qt宏 |
 | [build-SARibbon.md](docs/zh/build-guide/build-SARibbon.md) | CMake构建选项详解 |
+
+## 开发原则
+
+当前项目有三个模块：core、widgets 和 QML。这三个模块的依赖关系是，widgets 和 QML 都要依赖 core 模块。因此，如果某个功能 widgets 和 QML 都要用到，则要把这个功能提取到 core 模块里面去，形成一个共性功能，在开发过程中一定要时刻记住：在规划某个功能的时候，首先要想这个功能是否是共用的功能。如果是共用的功能，则把它提取到 core 内部去
