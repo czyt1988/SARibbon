@@ -786,6 +786,15 @@
 - 证据：模板修复后重跑 `Amalgamate.sh`，4 个产物中 `src/core/` 子目录路径残留 grep 为 0；`build-qml-test`（Debug）重建过（StaticExample 编译链接通过），ctest **32/33**——唯一失败 `SARibbonToolButtonColorTest` SEGFAULT 为 HEAD 既有环境失败；`build-qml-rel`（Release）ctest **33/33** 全绿（两像素测试均过，进一步佐证其抖动性）。`python tools/check_core_purity.py src/core` 通过。**本轮改了 core 物理路径但零内容改动（唯一内容改动是 SARibbonUtil.cpp 一行注释），已按规范重跑 `tools/Amalgamate.sh`**。pyside6 构建不在默认构建面内，清单改动按"逐路径存在性核验"验证（14/14 存在），未起 shiboken 全量构建。
 - 影响计划：04（core 源码布局扁平化完成，qml/core 两模块布局口径统一：源码拍平、资源不动）；通用（amalgamate 模板属"显式路径清单"，core 文件挪动必须同步四模板，且产物验证只认 grep/编译，不认 git status；B64/B65 合并口径——目录重组的检查面 = glob 型自动适配 + 显式清单型逐个改 + 产物消费者实测）。
 
+### B66：QML bar 的 120px 系统按钮预留改为属性 —— 原生边框下右侧组贴窗缘（第 26 轮）
+
+- 日期：2026-10-04
+- 发现位置：QmlMainWindowExample 顶栏观感（用户报告：quick access bar 右侧到窗口右缘一大片空白）
+- 动机与做法：plan-04 P0 落地时 `relayout()` 三处硬编码 frameless 系统按钮区（`placeTitleRowHosts(..., 120)`、`reservedRight = 124 + ...`、`input.systemButtonSize = QSize(120, titleH)`），但 QML 骨架没有无边框实现，示例跑在原生系统标题栏下，120px 预留区里什么都没有——item-tree dump 实测 RBB 右缘 = 1300-128（120 预留 + 8 边距），左侧标题行另有 titleRect 算出但从未渲染的空白（B44 家族同源：叶子只渲染宿主发布的几何，titleRect 无消费者是设计内行为）。widgets 对照：`resizeInLooseStyle`/`resizeInCompactStyle` 只在 `isUseRibbonFrame()` 时扣系统按钮区，原生边框下 rightButtonGroup 距窗缘仅 1px。处理：新增 `RibbonBar.systemButtonStripWidth`（int，默认 0，负值入口夹紧），三处硬编码全部改读该属性；tab 行右界从固定 124 改为 `4 + RBB宽 + 8 + 预留`（与 placeTitleRowHosts 的 8px 边距口径一致）。无边框支持落地时宿主把属性设为系统按钮组实际宽度即可，不再改布局代码。
+- 证据：改前 dump：RBB x=940 w=232 右缘 1172（=1300-120-8）；改后（默认 0）：RBB x=1060 右缘 1292（=1300-8），QAB 位置不变（x=86 紧跟应用按钮，与 widgets loose 布局一致）。`tst_conformance_qml::quickAccessBarAndRightGroup` 断言更新：默认 `x+w == 800-8`，设 `systemButtonStripWidth=120` 后 `== 800-128`（同时覆盖两个分支）。qml 四套件 ctest：qml_Color/qml_Customize 全绿；qml_Conformance 23/24、qml_LayoutParity 15/16 的两个失败（categoryScrollWheelAndArrows / layoutKnobsParity）经 stash A/B 对照在干净 HEAD 上**同样失败**（环境性，非本轮回归）；新断言所在用例通过。示例 offscreen 冒烟零 QML 错误。
+- 处理：保守方向——不改 core（`layoutTitleRect` 的 `x2 = ribbonWidth - systemButtonSize.width()` 在宽 0 时自然延伸到右缘，无除零风险），不动 widgets；预留语义保留为属性而非删除，等 plan-04 后续无边框轮次消费。
+- 影响计划：04（S4 bar 宿主布局；qml-guide 两语言版"右对齐于系统按钮区前"表述同步更新）。
+
 ## 执行中追加（模板，勿删）
 
 ```

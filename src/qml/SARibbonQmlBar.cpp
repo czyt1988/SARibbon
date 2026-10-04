@@ -195,6 +195,24 @@ void RibbonBar::setLargeButtonMinimumWidthRatio(qreal fac)
     propagateLayoutFactors();
 }
 
+int RibbonBar::systemButtonStripWidth() const
+{
+    return mSystemButtonStripWidth;
+}
+
+void RibbonBar::setSystemButtonStripWidth(int w)
+{
+    // negatives have no geometric meaning here: they would push the right
+    // hosts past the bar edge, so clamp on the way in
+    const int strip = qMax(w, 0);
+    if (mSystemButtonStripWidth == strip) {
+        return;
+    }
+    mSystemButtonStripWidth = strip;
+    Q_EMIT systemButtonStripWidthChanged();
+    polish();
+}
+
 /**
  * \if ENGLISH
  * @brief Push the two width factors through the whole host tree
@@ -874,6 +892,9 @@ void RibbonBar::itemChange(ItemChange change, const ItemChangeData& data)
 
 void RibbonBar::placeTitleRowHosts(int titleH, int tabBarY, int tabH, int appBtnW, int systemStripW)
 {
+    // native-frame windows reserve nothing (systemButtonStripWidth 0), so
+    // rightEdge sits 8px off the bar edge and the right hosts hug it — the
+    // widgets layouts only subtract the strip under isUseRibbonFrame()
     const int rightEdge = int(width()) - systemStripW - 8;
     if (mTabOnTitle) {
         // compact (WPS): the tab row rides the title row and shares it with
@@ -1019,8 +1040,10 @@ void RibbonBar::relayout()
     // right-side reservation keeps the tab row clear of the right hosts
     // (widgets tabBarWidth = endX - x parity): the right button group rides
     // the tab row in loose styles too, while compact styles additionally
-    // share the row with the quick access bar
-    int reservedRight = 124 + (mRightButtonGroup ? mRightButtonGroup->rowWidth() + 8 : 0);
+    // share the row with the quick access bar. The frameless strip joins the
+    // reservation only when actually reserved (native frame: 0)
+    int reservedRight = 4 + (mRightButtonGroup ? mRightButtonGroup->rowWidth() + 8 : 0)
+                        + mSystemButtonStripWidth;
     if (mTabOnTitle && mQuickAccessBar) {
         reservedRight += mQuickAccessBar->rowWidth() + 6;
     }
@@ -1125,7 +1148,7 @@ void RibbonBar::relayout()
 
     // 5. title free area: core engine (TitleRectInput); the quick access
     //    row and the right group sit on the title row
-    placeTitleRowHosts(titleH, tabBarY, tabH, appBtnW, 120);
+    placeTitleRowHosts(titleH, tabBarY, tabH, appBtnW, mSystemButtonStripWidth);
     SARibbon::Core::SARibbonBarGeometryEngine::TitleRectInput input;
     input.isRTL               = SA::saIsRTL();
     input.isCompactStyle      = false;
@@ -1133,7 +1156,7 @@ void RibbonBar::relayout()
     input.border              = QMargins(0, 0, 0, 0);
     input.validTitleBarHeight = titleH;
     input.hasQuickAccessBar   = (mQuickAccessBar != nullptr);
-    input.systemButtonSize    = QSize(120, titleH);  // P0: reserved right strip
+    input.systemButtonSize    = QSize(mSystemButtonStripWidth, titleH);
     input.hasContextTabs      = !mBands.isEmpty();
     input.tabBarGeometry      = QRect(8, tabBarY, qMin(x - 8 - tabSpacing, int(width()) - 8), tabH);
     mTitleRect = SARibbon::Core::SARibbonBarGeometryEngine::layoutTitleRect(input);

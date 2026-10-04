@@ -160,8 +160,11 @@ RibbonBar { ribbonStyle: Ribbon.RibbonStyleCompactTwoRow }
   base (buttons register through itemChange, rows flow by sizeHint, rowWidth
   published); there is no panel engine here — the row host IS the layout
   authority for its children. The bar places the former after the application
-  button and the latter right-aligned before the system strip; the width
-  feeds `TitleRectInput.hasQuickAccessBar`.
+  button and the latter right-aligned against the bar's 8px right margin; a
+  frameless host declares its system button area through
+  `RibbonBar.systemButtonStripWidth` (default 0 — a native frame reserves
+  nothing), which shifts the right group and the tab row's right boundary
+  left of the reservation; the width feeds `TitleRectInput.hasQuickAccessBar`.
 - **Application button, three modes** (click priority: application window >
   menu > signal only):
   - `RibbonApplicationWindow` (widgets ApplicationWidget parity): a custom

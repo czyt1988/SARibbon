@@ -1900,11 +1900,16 @@ Item {
     QVERIFY(undo->x() > save->x());
     QVERIFY(save->y() >= 0 && save->y() + save->height() <= titleH + 1);
 
-    // ---- right group: right-aligned before the system strip ----
+    // ---- right group: flush against the right margin (native frame) ----
     QTRY_VERIFY(rgroup->width() > 0);
-    QVERIFY(rgroup->x() + rgroup->width() <= 800);
-    QVERIFY(rgroup->x() > 800 - 120 - rgroup->width() - 30);  // just before the strip
+    // systemButtonStripWidth defaults to 0: no frameless system-button
+    // reservation, the group ends at the bar's 8px right margin (widgets
+    // only subtracts the strip under isUseRibbonFrame)
+    QTRY_COMPARE(rgroup->x() + rgroup->width(), qreal(800 - 8));
     QVERIFY(help->width() > 0);
+    // a frameless host declaring the strip pushes the group left of it
+    QVERIFY(bar->setProperty("systemButtonStripWidth", 120));
+    QTRY_COMPARE(rgroup->x() + rgroup->width(), qreal(800 - 120 - 8));
 
     // ---- the embedded quick access button is clickable ----
     QSignalSpy clickedSpy(save, SIGNAL(clicked()));

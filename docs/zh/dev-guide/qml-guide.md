@@ -134,7 +134,9 @@ RibbonBar { ribbonStyle: Ribbon.RibbonStyleCompactTwoRow }
 
 - **RibbonQuickAccessBar / RibbonButtonGroup**：共享基类 `RibbonButtonRowHost`
   （itemChange 登记按钮、按 sizeHint 排行、发布 rowWidth）；按钮无面板引擎——
-  行宿主即子项布局权威。bar 把前者摆在应用按钮之后、后者右对齐于系统按钮区前，
+  行宿主即子项布局权威。bar 把前者摆在应用按钮之后、后者右对齐到 bar 右缘
+  8px 边距处；无边框宿主经 `RibbonBar.systemButtonStripWidth`（默认 0，原生
+  边框不预留）声明系统按钮区后，右侧组与 tab 行右界整体左移让位，
   宽度进入 `TitleRectInput.hasQuickAccessBar`。
 - **应用按钮三种模式**（点击优先级：应用窗口 > 菜单 > 仅信号）：
   - `RibbonApplicationWindow`（widgets ApplicationWidget 对等）：声明为 bar

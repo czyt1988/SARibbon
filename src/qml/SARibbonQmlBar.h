@@ -61,6 +61,7 @@ class SA_RIBBON_QML_EXPORT RibbonBar : public RibbonQuickHost
     Q_PROPERTY(bool minimumMode READ isMinimumMode WRITE setMinimumMode NOTIFY minimumModeChanged)
     Q_PROPERTY(qreal buttonMaximumAspectRatio READ buttonMaximumAspectRatio WRITE setButtonMaximumAspectRatio NOTIFY buttonMaximumAspectRatioChanged)
     Q_PROPERTY(qreal largeButtonMinimumWidthRatio READ largeButtonMinimumWidthRatio WRITE setLargeButtonMinimumWidthRatio NOTIFY largeButtonMinimumWidthRatioChanged)
+    Q_PROPERTY(int systemButtonStripWidth READ systemButtonStripWidth WRITE setSystemButtonStripWidth NOTIFY systemButtonStripWidthChanged)
     Q_PROPERTY(int tabBarHeight READ tabBarHeight NOTIFY layoutChanged)
     Q_PROPERTY(int titleBarHeight READ titleBarHeight NOTIFY layoutChanged)
     Q_PROPERTY(int categoryRowY READ categoryRowY NOTIFY layoutChanged)
@@ -104,6 +105,15 @@ public:
     void setButtonMaximumAspectRatio(qreal fac);
     qreal largeButtonMinimumWidthRatio() const;
     void setLargeButtonMinimumWidthRatio(qreal fac);
+
+    // Reserved right edge for frameless window system buttons (min/max/
+    // close). Native-frame windows need no reservation, so the default is 0
+    // and the right button group hugs the window edge (widgets
+    // resizeInLooseStyle/resizeInCompactStyle only subtract the system strip
+    // when isUseRibbonFrame() is on). A future QML frameless integration
+    // sets this to the actual system button group width
+    int systemButtonStripWidth() const;
+    void setSystemButtonStripWidth(int w);
 
     // layout values consumed by the visual leaf (re-published on relayout)
     int tabBarHeight() const;
@@ -194,6 +204,7 @@ Q_SIGNALS:
     void minimumModeChanged();
     void buttonMaximumAspectRatioChanged();
     void largeButtonMinimumWidthRatioChanged();
+    void systemButtonStripWidthChanged();
     void layoutChanged();
     void applicationButtonClicked();
     void applicationMenuItemsChanged();
@@ -245,6 +256,7 @@ private:
     RibbonEnums::Alignment mTabAlignment = RibbonEnums::AlignLeft;
     bool mTabOnTitle = false;
     bool mMinimumMode = false;
+    int mSystemButtonStripWidth = 0;  ///< frameless system-button strip reservation (native frame: 0)
     qreal mButtonMaximumAspectRatio     = SARibbon::Core::ToolButtonLayoutConstants::BUTTON_MAX_ASPECT_RATIO_DEFAULT;
     qreal mLargeButtonMinimumWidthRatio = SARibbon::Core::ToolButtonLayoutConstants::LARGE_BUTTON_MIN_WIDTH_RATIO;
     QVector< RibbonCategory* > mCategories;
