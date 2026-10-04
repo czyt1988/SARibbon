@@ -179,6 +179,14 @@ ApplicationWindow {
             RibbonPanel {
                 panelTitle: "ribbon style"
 
+                // Six exclusive style radios. NOTE on the handlers' shape:
+                // QtQuick.Controls' AbstractButton::toggled() carries NO
+                // parameter, so `checked` inside onToggled resolves to the
+                // button's own property — that is legal, warning-free and the
+                // ONLY working form. Never rewrite these as
+                // `onToggled: function(checked)`: the formal parameter would
+                // shadow the property with undefined (the signal passes no
+                // arguments) and the style switch would silently stop working.
                 ButtonGroup { id: styleGroup }
 
                 RibbonControlContainer {
@@ -187,11 +195,9 @@ ApplicationWindow {
                         ButtonGroup.group: styleGroup
                         text: qsTr("office style")
                         checked: true
-                        onToggled: function(checked) {
-                            if (checked) {
-                                ribbonBar.ribbonStyle = Ribbon.RibbonStyleLooseThreeRow;
-                                log(qsTr("LooseThreeRow: tabs below title, 3 rows, word wrap on"));
-                            }
+                        onToggled: if (checked) {
+                            ribbonBar.ribbonStyle = Ribbon.RibbonStyleLooseThreeRow;
+                            log(qsTr("LooseThreeRow: tabs below title, 3 rows, word wrap on"));
                         }
                     }
                 }
@@ -200,11 +206,9 @@ ApplicationWindow {
                     control: SlimRadioButton {
                         ButtonGroup.group: styleGroup
                         text: qsTr("wps style")
-                        onToggled: function(checked) {
-                            if (checked) {
-                                ribbonBar.ribbonStyle = Ribbon.RibbonStyleCompactThreeRow;
-                                log(qsTr("CompactThreeRow: tabs on title, 3 rows"));
-                            }
+                        onToggled: if (checked) {
+                            ribbonBar.ribbonStyle = Ribbon.RibbonStyleCompactThreeRow;
+                            log(qsTr("CompactThreeRow: tabs on title, 3 rows"));
                         }
                     }
                 }
@@ -213,11 +217,9 @@ ApplicationWindow {
                     control: SlimRadioButton {
                         ButtonGroup.group: styleGroup
                         text: qsTr("office 2 row")
-                        onToggled: function(checked) {
-                            if (checked) {
-                                ribbonBar.ribbonStyle = Ribbon.RibbonStyleLooseTwoRow;
-                                log(qsTr("LooseTwoRow: 2 rows, word wrap off"));
-                            }
+                        onToggled: if (checked) {
+                            ribbonBar.ribbonStyle = Ribbon.RibbonStyleLooseTwoRow;
+                            log(qsTr("LooseTwoRow: 2 rows, word wrap off"));
                         }
                     }
                 }
@@ -226,11 +228,9 @@ ApplicationWindow {
                     control: SlimRadioButton {
                         ButtonGroup.group: styleGroup
                         text: qsTr("wps 2 row")
-                        onToggled: function(checked) {
-                            if (checked) {
-                                ribbonBar.ribbonStyle = Ribbon.RibbonStyleCompactTwoRow;
-                                log(qsTr("CompactTwoRow: tabs on title, 2 rows"));
-                            }
+                        onToggled: if (checked) {
+                            ribbonBar.ribbonStyle = Ribbon.RibbonStyleCompactTwoRow;
+                            log(qsTr("CompactTwoRow: tabs on title, 2 rows"));
                         }
                     }
                 }
@@ -239,11 +239,9 @@ ApplicationWindow {
                     control: SlimRadioButton {
                         ButtonGroup.group: styleGroup
                         text: qsTr("loose single row")
-                        onToggled: function(checked) {
-                            if (checked) {
-                                ribbonBar.ribbonStyle = Ribbon.RibbonStyleLooseSingleRow;
-                                log(qsTr("LooseSingleRow: 1 row, panel titles hidden, icon-right text"));
-                            }
+                        onToggled: if (checked) {
+                            ribbonBar.ribbonStyle = Ribbon.RibbonStyleLooseSingleRow;
+                            log(qsTr("LooseSingleRow: 1 row, panel titles hidden, icon-right text"));
                         }
                     }
                 }
@@ -252,11 +250,9 @@ ApplicationWindow {
                     control: SlimRadioButton {
                         ButtonGroup.group: styleGroup
                         text: qsTr("compact single row")
-                        onToggled: function(checked) {
-                            if (checked) {
-                                ribbonBar.ribbonStyle = Ribbon.RibbonStyleCompactSingleRow;
-                                log(qsTr("CompactSingleRow: 1 row + tabs on title"));
-                            }
+                        onToggled: if (checked) {
+                            ribbonBar.ribbonStyle = Ribbon.RibbonStyleCompactSingleRow;
+                            log(qsTr("CompactSingleRow: 1 row + tabs on title"));
                         }
                     }
                 }
@@ -632,7 +628,10 @@ ApplicationWindow {
                     text: "CheckBox:"
                     proportion: Ribbon.Small
                     control: SlimCheckBox {
-                        onToggled: function(checked) { log(qsTr("CheckBox toggled: %1").arg(checked)) }
+                        // Controls' toggled() has no parameter: `checked` is
+                        // the property, not an injected argument (see the
+                        // style radios' note above)
+                        onToggled: log(qsTr("CheckBox toggled: %1").arg(checked))
                     }
                 }
                 RibbonControlContainer {
