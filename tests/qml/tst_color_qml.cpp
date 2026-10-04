@@ -11,10 +11,10 @@
 #include <SARibbonCore/SARibbonCoreUtil.h>
 #include <SARibbonQml/SARibbonQmlGlobal.h>
 #include <SARibbonQml/SARibbonQmlTypes.h>
-#include <SARibbonQml/button/RibbonToolButton.h>
-#include <SARibbonQml/color/RibbonColorGrid.h>
-#include <SARibbonQml/color/RibbonColorMenu.h>
-#include <SARibbonQml/color/RibbonColorToolButton.h>
+#include <SARibbonQml/SARibbonQmlToolButton.h>
+#include <SARibbonQml/SARibbonQmlColorGrid.h>
+#include <SARibbonQml/SARibbonQmlColorMenu.h>
+#include <SARibbonQml/SARibbonQmlColorToolButton.h>
 #include "colorWidgets/SAColorGridWidget.h"
 #include "colorWidgets/SAColorMenu.h"
 #include "colorWidgets/SAColorPaletteGridWidget.h"

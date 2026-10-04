@@ -18,13 +18,13 @@
 #include <SARibbonCore/SARibbonCoreUtil.h>
 #include <SARibbonCore/SARibbonThemePalette.h>
 #include <SARibbonCore/SARibbonCategoryLayoutEngine.h>
-#include <SARibbonQml/theme/RibbonTheme.h>
-#include <SARibbonQml/button/RibbonToolButton.h>
-#include <SARibbonQml/container/RibbonControlContainer.h>
-#include <SARibbonQml/gallery/RibbonGallery.h>
-#include <SARibbonQml/gallery/RibbonGalleryGroup.h>
-#include <SARibbonQml/gallery/RibbonGalleryItem.h>
-#include <SARibbonQml/menu/RibbonMenuItem.h>
+#include <SARibbonQml/SARibbonQmlTheme.h>
+#include <SARibbonQml/SARibbonQmlToolButton.h>
+#include <SARibbonQml/SARibbonQmlControlContainer.h>
+#include <SARibbonQml/SARibbonQmlGallery.h>
+#include <SARibbonQml/SARibbonQmlGalleryGroup.h>
+#include <SARibbonQml/SARibbonQmlGalleryItem.h>
+#include <SARibbonQml/SARibbonQmlMenuItem.h>
 #include "../common/RibbonConformance.h"
 
 /**

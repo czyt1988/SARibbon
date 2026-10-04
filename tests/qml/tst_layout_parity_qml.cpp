@@ -6,7 +6,7 @@
 #include <QQuickItem>
 #include <memory>
 #include <SARibbonCore/SARibbonToolButtonLayout.h>
-#include <SARibbonQml/button/RibbonToolButton.h>
+#include <SARibbonQml/SARibbonQmlToolButton.h>
 #include "SARibbonPanel.h"
 #include "SARibbonToolButton.h"
 

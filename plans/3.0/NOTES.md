@@ -761,6 +761,19 @@
 - 证据：`tests/qml/tst_customize_qml.cpp` 从 7 例增到 **12 例**（按 B54 以 `-functions` 计数），新增 `treeModelLevelsScopeAndAddressing`（三档 `showType` 的行集、上下文类别归类、四个 `rowOf*` 寻址、越界行回落到满键空 map）、`treeModelPreviewReplaysPending`（影子树重放全部 16 种记录、撤销后行数复原——本轮 bug 就是它抓到的）、`dialogEditsAndAppliesOnOk`（按 URL 建对话框 → 搜索框过滤 → tag 菜单 → 加命令/改名/上下移 → `pendingCount` 与预览同步 → 取消整批丢弃、确定才落真树）。`build-qml-test`（Debug，Qt 6.7.3 msvc2019_64）ctest **33/33** 全绿，`build-qml-rel`（Release）ctest **33/33** 全绿。`python tools/check_core_purity.py src/core` 通过；`src/qml/**` 无任何 widgets include（唯一命中是 `SARibbonQmlTypes.h` 里一句说明性注释）。示例加"customize"面板与 `openCustomizeDialog()`，README 功能清单加一行、"已知差异"里"定制系统：QML 版暂无"删除并改写为"按稳定字符串 key 寻址（无 QAction 桥）+ 仍缺 QAB 用户勾选定制"。**本轮未改 core/widgets，无需跑 `tools/Amalgamate.sh`**。
 - 影响计划：04（WS-C3 完成，批次 4 收官；计划末尾"剩余已知差异"五项确认只剩无边框窗口/标题栏、元素工厂、QAction 抽象桥、`SARibbonMenu::addWidget`、QAB 用户勾选定制）；通用（含 `Popup` 的组件在测试里按 QObject 摸；任何"每步都 reset 的预览模型"配 `ListView` 时，选中状态必须按地址而非行号维护；给 QML 暴露的函数不能返回裸指针容器）。
 
+---
+
+### B64：qml 源码扁平化重组 —— moc 的 metatype 特化是"编译顺序幸运"，不是类型系统保证（第 24 轮）
+
+- 日期：2026-10-04
+- 发现位置：`src/qml` 目录重组（18 个子文件夹 → 扁平），对照物 B63 的 metatype 检查笔记
+- 动机与做法：qml 模块每个子文件夹只有一两对源文件，全部拍平到 `src/qml/` 根（与 `SARibbonQmlGlobal.h` 同目录），文件名加 `SARibbonQml` 前缀（`bar/RibbonBar.h` → `SARibbonQmlBar.h`；类名与 `SARibbonQml` 命名空间不变），`.qml` 资源仍在 `src/qml/qml/`。`src/qml/CMakeLists.txt`、测试的 `<SARibbonQml/...>` 同步头引用、qml-guide 两语言版的路径引用随之更新；`sa_sync_include` 不带 FLATTEN 时按相对目录镜像，源码拍平后同步目录自动变平，函数无需改。
+- **拍平后 `qml_Customize::dialogEditsAndAppliesOnOk` 必现失败，报 `qrc:/SARibbon/RibbonCustomizeDialog.qml:271: Error: Unknown method parameter type: RibbonBar*`**：stash 对照实验确认 HEAD 上通过、重组后失败（`DialogHost::countOf(list)` 因 `autoRegisterBar` 调用被拒而停在 0）。根因不是文件名本身：`SARibbonQmlActionRegistry.h` 只前置声明 `RibbonBar` 却声明了 `Q_INVOKABLE int autoRegisterBar(RibbonBar*)`；moc 输出中的 `QMetaType::fromType<RibbonBar*>` 在**类型不完整处**实例化时 SFINAE 落到"普通指针"特化（拿不到 QObject 元对象），QML 引擎因此无法把 JS 参数转成 `RibbonBar*`。旧目录布局下 AUTOMOC 把各头文件 moc 进 hash 子目录、`mocs_compilation.cpp` 按 hash 串排序，完整定义恰好排在前面——**纯靠顺序幸运**；拍平后排序翻转，隐患显形。B63 只修了 `RibbonCustomizeTreeModel.h` 一个头，同类隐患还散布在另外 7 个头里。
+- **修复口径（B63 先例推广成全集）**：凡 Q_PROPERTY / Q_INVOKABLE / Q_SIGNALS 签名里出现本模块类的指针，该头文件必须 include 对方完整定义。本轮共补 8 处：`SARibbonQmlActionRegistry.h`(Bar)、`SARibbonQmlCustomizer.h`(Registry+Bar)、`SARibbonQmlBar.h`(Category+MenuItem)、`SARibbonQmlCategory.h`(Panel)、`SARibbonQmlGallery.h`(GalleryGroup+GalleryItem)、`SARibbonQmlButtonRowHost.h`(ToolButton)、`SARibbonQmlToolButton.h`(MenuItem)、`SARibbonQmlColorToolButton.h`(ColorMenu)，互不成环。**记法**：属性/invokable/信号里的裸指针类型 = moc metatype 数组的一员 = 该头文件的"编译期完整性义务"；前置声明只够普通 C++ 成员函数签名用。
+- 证据：`build-qml-test`（Debug）与 `build-qml-rel`（Release）各 ctest **31/33**：4 个 qml_* 全绿（含此前必现失败的 `qml_Customize`，12/12 例）；仅剩 `SARibbonToolButtonColorTest` 与 `SARibbonMainWindowFrameBorderTest` 两个像素抓取类失败，**在未改动的 HEAD 上同样失败**（`bottom edge red pixels: 0`——本 Git Bash 会话拿不到合成器输出，环境性、与本轮无关）。`python tools/check_core_purity.py src/core` 通过；`src/qml/**` 无 widgets include。**本轮未改 core/widgets，无需跑 `tools/Amalgamate.sh`**。
+- 附带确认：(a) AUTOMOC 不清理旧 hash 目录里的 `moc_Ribbon*.cpp` 残留（现无引用、无害，但只有全新 configure 才能验证"干净构建"视角）；(b) `sa_sync_include` 只在 configure 时拷贝，头文件内容编辑后必须重新 configure，否则测试侧继续编译陈旧镜像（SARibbonUtils.cmake 注释既有警告，本轮实测再次踩实）；(c) Git Bash 直跑构建需手工导出 VS 的 `INCLUDE`/`LIB` 环境变量（否则 rc.exe 报 `winres.h` 找不到、link 报 `mpr.lib` 打不开），`scripts/build.ps1` 路径不受影响。
+- 影响计划：04（源码布局扁平化完成；qml-guide 宿主基类路径引用同步更新；plan-04 正文里的 `src/qml/<子目录>/...` 旧路径属历史记录不回改）；通用（新增结构宿主铁律：指针类型进 moc 可见面（属性/invokable/信号）就必须在头文件 include 完整定义，禁止依赖 mocs_compilation 的排序运气）。
+
 ## 执行中追加（模板，勿删）
 
 ```

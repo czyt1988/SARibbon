@@ -55,7 +55,7 @@ engine.load(QUrl("qrc:///main.qml"));
 
 新增结构宿主时**不要**再复制叶子样板，直接继承：
 
-- `RibbonQuickHost`（`src/qml/host/`）：持有视觉叶子生命周期（创建三部曲 + 安全拆除），
+- `RibbonQuickHost`（`src/qml/SARibbonQmlQuickHost.h`）：持有视觉叶子生命周期（创建三部曲 + 安全拆除），
   暴露统一握手属性 `qmlLeaf`；子类只实现 `leafUrl()`。
 - `RibbonLayoutItemHost`：面板子项基类 = `RibbonQuickHost` + core 布局契约
   （`SARibbonAbstractLayoutItem`）。基类已实现 isHidden/applyGeometry/debugName/

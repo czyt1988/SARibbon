@@ -13,16 +13,16 @@
 #include <SARibbonCore/SARibbonEnums.h>
 #include <SARibbonQml/SARibbonQmlGlobal.h>
 #include <SARibbonQml/SARibbonQmlTypes.h>
-#include <SARibbonQml/bar/RibbonBar.h>
-#include <SARibbonQml/button/RibbonToolButton.h>
-#include <SARibbonQml/category/RibbonCategory.h>
-#include <SARibbonQml/customize/RibbonActionRegistry.h>
-#include <SARibbonQml/customize/RibbonActionRegistryModel.h>
-#include <SARibbonQml/customize/RibbonCustomizeTreeModel.h>
-#include <SARibbonQml/customize/RibbonCustomizer.h>
-#include <SARibbonQml/host/RibbonLayoutItemHost.h>
-#include <SARibbonQml/panel/RibbonPanel.h>
-#include <SARibbonQml/quickaccess/RibbonQuickAccessBar.h>
+#include <SARibbonQml/SARibbonQmlBar.h>
+#include <SARibbonQml/SARibbonQmlToolButton.h>
+#include <SARibbonQml/SARibbonQmlCategory.h>
+#include <SARibbonQml/SARibbonQmlActionRegistry.h>
+#include <SARibbonQml/SARibbonQmlActionRegistryModel.h>
+#include <SARibbonQml/SARibbonQmlCustomizeTreeModel.h>
+#include <SARibbonQml/SARibbonQmlCustomizer.h>
+#include <SARibbonQml/SARibbonQmlLayoutItemHost.h>
+#include <SARibbonQml/SARibbonQmlPanel.h>
+#include <SARibbonQml/SARibbonQmlQuickAccessBar.h>
 #include "SARibbonCustomizeData.h"
 #include "SARibbonCustomizeWidget.h"
 

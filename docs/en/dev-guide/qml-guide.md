@@ -59,7 +59,7 @@ Access enums through the `Ribbon.` prefix (e.g. `proportion: Ribbon.Large`).
 
 When adding a structural host, do NOT copy the leaf boilerplate — inherit:
 
-- `RibbonQuickHost` (`src/qml/host/`): owns the visual leaf lifecycle (creation
+- `RibbonQuickHost` (`src/qml/SARibbonQmlQuickHost.h`): owns the visual leaf lifecycle (creation
   trilogy + safe teardown), exposes the uniform `qmlLeaf` handshake property;
   subclasses only implement `leafUrl()`.
 - `RibbonLayoutItemHost`: panel-child base = `RibbonQuickHost` + the core layout
