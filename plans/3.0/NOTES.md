@@ -774,6 +774,18 @@
 - 附带确认：(a) AUTOMOC 不清理旧 hash 目录里的 `moc_Ribbon*.cpp` 残留（现无引用、无害，但只有全新 configure 才能验证"干净构建"视角）；(b) `sa_sync_include` 只在 configure 时拷贝，头文件内容编辑后必须重新 configure，否则测试侧继续编译陈旧镜像（SARibbonUtils.cmake 注释既有警告，本轮实测再次踩实）；(c) Git Bash 直跑构建需手工导出 VS 的 `INCLUDE`/`LIB` 环境变量（否则 rc.exe 报 `winres.h` 找不到、link 报 `mpr.lib` 打不开），`scripts/build.ps1` 路径不受影响。
 - 影响计划：04（源码布局扁平化完成；qml-guide 宿主基类路径引用同步更新；plan-04 正文里的 `src/qml/<子目录>/...` 旧路径属历史记录不回改）；通用（新增结构宿主铁律：指针类型进 moc 可见面（属性/invokable/信号）就必须在头文件 include 完整定义，禁止依赖 mocs_compilation 的排序运气）。
 
+---
+
+### B65：core 源码扁平化重组 —— amalgamate 模板硬编码路径，工具对解析不了的 include 是"原样留在产物里"而不是报错（第 25 轮）
+
+- 日期：2026-10-04
+- 发现位置：`src/core` 目录重组（B64 同型操作），对照物 `tools/Amalgamate.sh` 与 `tools/amalgamate/` 模板
+- 动机与做法：core 的 7 个子文件夹（contract/data/factory/global/layout/metrics/theme）全部 `git mv` 拍平到 `src/core/` 根，**文件名不变**（core 命名规范本就带 `SARibbon` 前缀）；`resource/palettes/` JSON 调色板是资源（qrc 以 `../core/resource/palettes/` 引用、别名 `/SARibbonTheme/resource/palettes`），位置不动。core 内部 include 全部是 `<SARibbonCore/X.h>`（走 FLATTEN 同步目录）或同名引号形式，**拍平后零 include 改动**——这得益于 plan-02 S1-5 就定下的"消费扁平、物理分目录"决策，物理层跟上消费层后全部 include 天然有效。
+- **Amalgamate 模板坑（本轮唯一实质 bug）**：`tools/amalgamate/*.h/.cpp` 模板硬编码 `../../src/core/<subsystem>/Xxx.cpp` 路径；Amalgamate.exe 对**解析不到的 include 不报错，把原始行原样留在合并产物里**（`src/SARibbonWidgets.h:386` 残留 `#include "../../src/core/global/SARibbonEnums.h"`），单文件消费者 `StaticExample` 编译直接 C1083。第一遍跑完脚本看 git status 干净就断定"产物没问题"是**双重误判**：(a) 产物在 .gitignore（`src/SARibbon*.h/.cpp`），git status 永远干净；(b) 未解析 include 的静默透传让脚本"成功"输出掩盖了断链。**记法**：验证 amalgamate 产物要看内容（`grep "src/core/"` 残留）或让 StaticExample 编译过，git status 在被 ignore 的产物上没有信号量。
+- **必须跟着改的显式路径清单**（与 B64 的"glob 型工具全免改"相反，本轮是"显式清单型全要改"）：(1) `src/core/CMakeLists.txt` SOURCES；(2) `pyside6/CMakeLists.txt` 的 `SARIBBON_HEADERS` 显式清单 + mirror 注释（GLOB_RECURSE 按文件名拍平拷贝，本身布局无关）；(3) `tools/amalgamate/` 四个模板（`sed -E 's#.../(global|theme|...)/#.../#g'`，注意 BRE 的 `\(...\|...\)` 与 `|` 分隔符冲突，第一次没换成功）；(4) `tools/Amalgamate.sh` 过时注释；(5) `docs/zh/dev-guide/core-module-guide.md` 目录树与两处 `src/core/layout/` 引用；(6) `src/widgets/SARibbonUtil.cpp:11` 迁移注释里的旧路径（会被内联进 `SARibbonWidgets.cpp`）。免改项：`sa_sync_include ... FLATTEN`、pyside6 mirror 的 GLOB、`check_core_purity.py`（收目录参数）、qrc 别名、SARibbonCoreConfig.h.in 的 configure_file。
+- 证据：模板修复后重跑 `Amalgamate.sh`，4 个产物中 `src/core/` 子目录路径残留 grep 为 0；`build-qml-test`（Debug）重建过（StaticExample 编译链接通过），ctest **32/33**——唯一失败 `SARibbonToolButtonColorTest` SEGFAULT 为 HEAD 既有环境失败；`build-qml-rel`（Release）ctest **33/33** 全绿（两像素测试均过，进一步佐证其抖动性）。`python tools/check_core_purity.py src/core` 通过。**本轮改了 core 物理路径但零内容改动（唯一内容改动是 SARibbonUtil.cpp 一行注释），已按规范重跑 `tools/Amalgamate.sh`**。pyside6 构建不在默认构建面内，清单改动按"逐路径存在性核验"验证（14/14 存在），未起 shiboken 全量构建。
+- 影响计划：04（core 源码布局扁平化完成，qml/core 两模块布局口径统一：源码拍平、资源不动）；通用（amalgamate 模板属"显式路径清单"，core 文件挪动必须同步四模板，且产物验证只认 grep/编译，不认 git status；B64/B65 合并口径——目录重组的检查面 = glob 型自动适配 + 显式清单型逐个改 + 产物消费者实测）。
+
 ## 执行中追加（模板，勿删）
 
 ```

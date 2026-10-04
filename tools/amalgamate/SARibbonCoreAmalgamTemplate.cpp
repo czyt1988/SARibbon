@@ -17,16 +17,16 @@
 #endif
 
 #include "../../src/core/SARibbonCoreGlobal.cpp"
-#include "../../src/core/global/SARibbonCoreUtil.cpp"
-#include "../../src/core/theme/SARibbonThemePalette.cpp"
-#include "../../src/core/theme/SARibbonThemeData.cpp"
-#include "../../src/core/metrics/SARibbonMetrics.cpp"
-#include "../../src/core/data/SARibbonCustomizeRecord.cpp"
-#include "../../src/core/contract/SARibbonContract.cpp"
-#include "../../src/core/layout/SARibbonPanelLayoutEngine.cpp"
-#include "../../src/core/layout/SARibbonCategoryLayoutEngine.cpp"
-#include "../../src/core/layout/SARibbonBarGeometryEngine.cpp"
-#include "../../src/core/layout/SARibbonToolButtonLayout.cpp"
+#include "../../src/core/SARibbonCoreUtil.cpp"
+#include "../../src/core/SARibbonThemePalette.cpp"
+#include "../../src/core/SARibbonThemeData.cpp"
+#include "../../src/core/SARibbonMetrics.cpp"
+#include "../../src/core/SARibbonCustomizeRecord.cpp"
+#include "../../src/core/SARibbonContract.cpp"
+#include "../../src/core/SARibbonPanelLayoutEngine.cpp"
+#include "../../src/core/SARibbonCategoryLayoutEngine.cpp"
+#include "../../src/core/SARibbonBarGeometryEngine.cpp"
+#include "../../src/core/SARibbonToolButtonLayout.cpp"
 
 #ifdef _MSC_VER
 #pragma warning (pop)

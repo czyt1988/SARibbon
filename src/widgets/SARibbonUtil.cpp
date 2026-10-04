@@ -8,7 +8,7 @@
 #include <QScreen>
 #include <QRegularExpression>
 
-// 计划 02 S1：core 函数已迁至 src/core/global/SARibbonCoreUtil.cpp（纯 move）；
+// 计划 02 S1：core 函数已迁至 src/core/SARibbonCoreUtil.cpp（纯 move）；
 // 本文件只保留 widgets 专属实现（widgetDevicePixelRatio 与 QSS 渲染）。
 namespace SA
 {

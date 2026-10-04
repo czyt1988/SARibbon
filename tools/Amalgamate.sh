@@ -23,8 +23,9 @@ run_amalg() {
 # --- namespaced-include mirror (plan-01 S8, extended plan-03 S1) ---
 # Forwarding headers in src/widgets and cross-includes inside src/core use
 # <SARibbonCore/xxx.h>; that layout only exists in the build-tree sync dir /
-# install tree, so mirror it here (flat form; core headers physically live in
-# src/core/<subsystem>/).
+# install tree, so mirror it here. src/core is physically flat since the B65
+# reorganization (it used to live in <subsystem>/ subdirs); the recursive
+# find keeps working either way.
 rm -rf _amalg_include
 mkdir -p _amalg_include/SARibbonCore
 find ../src/core -type f \( -name '*.h' -o -name '*.hpp' \) -exec cp {} _amalg_include/SARibbonCore/ \;

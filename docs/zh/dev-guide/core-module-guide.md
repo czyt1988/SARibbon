@@ -2,40 +2,40 @@
 
 > 适用版本：3.0（dev-3.0 分支）。本文对应计划 02 交付的开发者文档。
 
-## core 模块结构（七子系统）
+## core 模块结构（七子系统，扁平布局）
+
+> 自 B65 起 C++ 源码全部平铺在 `src/core/` 根目录（不再分子文件夹）；`resource/palettes/`
+> 下的主题调色板 JSON 是资源文件，位置不变。七子系统仍体现在文件名前缀与依赖方向上。
 
 ```
 src/core/
 ├── SARibbonCoreGlobal.h/.cpp    # 导出宏三段式 + PIMPL 宏族 + ABI 探针
 ├── SARibbonCoreConfig.h.in      # 版本宏 + SA_RIBBON_CONFIG feature 开关（build 树生成）
 ├── SARibbonQt5Compat.hpp        # Qt5/Qt6 差异兼容（eventPos/horizontalAdvance 等）
-├── global/
-│   ├── SARibbonEnums.h          # 公共枚举（全局命名空间）+ RowProportion（SARibbon::Core）+ 属性名宏
-│   └── SARibbonCoreUtil.h/.cpp  # 无 widget 依赖的 SA:: 工具函数（saIsRTL 用 QGuiApplication）
-├── theme/
-│   ├── SARibbonThemePalette.h/.cpp  # JSON 调色板（namespace SA 保持）
-│   └── SARibbonThemeData.h/.cpp     # 主题数据单例（Meyers 静态）+ 静态主题表
-├── metrics/
-│   └── SARibbonMetrics.h/.cpp   # 度量收口（QStyle pixelMetric 与 QFontMetrics 由适配器喂入）
-├── contract/
-│   ├── SARibbonAbstractLayoutItem.h   # 布局项窄契约（含 Category 双几何扩展）
-│   ├── SARibbonAbstractLayoutHost.h   # 宿主契约（仅 metrics() 一个纯虚）
-│   └── SARibbonContract.cpp
-├── layout/
-│   ├── SARibbonPanelLayoutEngine.h/.cpp     # Panel 装箱引擎（含 sizeHint 缓存）
-│   ├── SARibbonCategoryLayoutEngine.h/.cpp  # Category 引擎 + scrollButtonFlags/clampScrollOffset 纯函数
-│   └── SARibbonBarGeometryEngine.h/.cpp     # Bar 标题区几何（D6 范围：metrics+titleRect）
-├── data/
-│   └── SARibbonCustomizeRecord.h/.cpp  # CustomizeData 纯数据基类（simplify 算法模板）
-└── factory/
-    └── SARibbonElementFactoryInterface.h  # 占位（D7 gate，QML 需要时实现）
+├── SARibbonEnums.h              # 公共枚举（全局命名空间）+ RowProportion（SARibbon::Core）+ 属性名宏
+├── SARibbonCoreUtil.h/.cpp      # 无 widget 依赖的 SA:: 工具函数（saIsRTL 用 QGuiApplication）
+├── SARibbonThemePalette.h/.cpp  # JSON 调色板（namespace SA 保持）
+├── SARibbonThemeData.h/.cpp     # 主题数据单例（Meyers 静态）+ 静态主题表
+├── SARibbonMetrics.h/.cpp       # 度量收口（QStyle pixelMetric 与 QFontMetrics 由适配器喂入）
+├── SARibbonAbstractLayoutItem.h   # 布局项窄契约（含 Category 双几何扩展）
+├── SARibbonAbstractLayoutHost.h   # 宿主契约（仅 metrics() 一个纯虚）
+├── SARibbonContract.cpp
+├── SARibbonPanelLayoutEngine.h/.cpp     # Panel 装箱引擎（含 sizeHint 缓存）
+├── SARibbonCategoryLayoutEngine.h/.cpp  # Category 引擎 + scrollButtonFlags/clampScrollOffset 纯函数
+├── SARibbonBarGeometryEngine.h/.cpp     # Bar 标题区几何（D6 范围：metrics+titleRect）
+├── SARibbonToolButtonLayout.h/.cpp      # 按钮行内度量（widgets/QML 双前端共用）
+├── SARibbonCustomizeRecord.h/.cpp  # CustomizeData 纯数据基类（simplify 算法模板）
+├── SARibbonCustomizeXml.h
+├── SARibbonElementFactoryInterface.h  # 占位（D7 gate，QML 需要时实现）
+└── resource/palettes/*.json        # 主题调色板资源（qrc 别名 /SARibbonTheme/resource/palettes）
 ```
 
 ## 纯净性铁律（两层）
 
 - **模块层（CI 硬门）**：`src/core/` 禁止 include QtWidgets/QtQuick 头、禁止 `qApp`/`QApplication`/`QWidget`/`QLayout`。
   扫描：`python3 tools/check_core_purity.py src/core`。
-- **确定性层（引擎专属）**：`src/core/layout/` 三引擎禁止调用 QGuiApplication 的动态状态
+- **确定性层（引擎专属）**：`src/core/` 三个布局引擎（PanelLayoutEngine/CategoryLayoutEngine/BarGeometryEngine）
+  禁止调用 QGuiApplication 的动态状态
   （`layoutDirection()/styleHints()/primaryScreen()`）——引擎必须"同输入同输出"，这些值只能经
   Input/Metrics 字段进来（`Input.isRTL` 等）。
 
@@ -77,7 +77,7 @@ widgets 侧 `SARibbonPanelItem : QWidgetItem + 契约`；2.x 的 `itemWillSetGeo
 
 布局算法的**唯一实现在 core 引擎**。修 bug：
 
-1. 修 `src/core/layout/SARibbonXxxEngine.cpp`；
+1. 修 `src/core/SARibbonXxxEngine.cpp`；
 2. 跑 `ctest -L core`（黄金几何测试必须全绿——黄金值来自 2.9.5 录制，若需改黄金值即为行为变化，
    必须查明原因并同步 changelog）；
 3. widgets 侧若有镜像逻辑（如 2.x 时代的双实现），一并删除。

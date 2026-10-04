@@ -10,30 +10,30 @@ sa_add_library(SARibbonCore
         SARibbonCoreGlobal.h
         SARibbonCoreGlobal.cpp   # 占位源（含 ABI 探针导出符号），计划 02 起被真实源逐步取代
         SARibbonQt5Compat.hpp
-        global/SARibbonEnums.h
-        global/SARibbonCoreUtil.h
-        global/SARibbonCoreUtil.cpp
-        theme/SARibbonThemePalette.h
-        theme/SARibbonThemePalette.cpp
-        theme/SARibbonThemeData.h
-        theme/SARibbonThemeData.cpp
-        metrics/SARibbonMetrics.h
-        metrics/SARibbonMetrics.cpp
-        contract/SARibbonAbstractLayoutItem.h
-        contract/SARibbonAbstractLayoutHost.h
-        contract/SARibbonContract.cpp
-        data/SARibbonCustomizeRecord.h
-        data/SARibbonCustomizeRecord.cpp
-        data/SARibbonCustomizeXml.h
-        factory/SARibbonElementFactoryInterface.h
-        layout/SARibbonPanelLayoutEngine.h
-        layout/SARibbonPanelLayoutEngine.cpp
-        layout/SARibbonCategoryLayoutEngine.h
-        layout/SARibbonCategoryLayoutEngine.cpp
-        layout/SARibbonBarGeometryEngine.h
-        layout/SARibbonBarGeometryEngine.cpp
-        layout/SARibbonToolButtonLayout.h
-        layout/SARibbonToolButtonLayout.cpp
+        SARibbonEnums.h
+        SARibbonCoreUtil.h
+        SARibbonCoreUtil.cpp
+        SARibbonThemePalette.h
+        SARibbonThemePalette.cpp
+        SARibbonThemeData.h
+        SARibbonThemeData.cpp
+        SARibbonMetrics.h
+        SARibbonMetrics.cpp
+        SARibbonAbstractLayoutItem.h
+        SARibbonAbstractLayoutHost.h
+        SARibbonContract.cpp
+        SARibbonCustomizeRecord.h
+        SARibbonCustomizeRecord.cpp
+        SARibbonCustomizeXml.h
+        SARibbonElementFactoryInterface.h
+        SARibbonPanelLayoutEngine.h
+        SARibbonPanelLayoutEngine.cpp
+        SARibbonCategoryLayoutEngine.h
+        SARibbonCategoryLayoutEngine.cpp
+        SARibbonBarGeometryEngine.h
+        SARibbonBarGeometryEngine.cpp
+        SARibbonToolButtonLayout.h
+        SARibbonToolButtonLayout.cpp
         "${CMAKE_BINARY_DIR}/include/SARibbonCore/SARibbonCoreConfig.h"
     PREFIX SA_RIBBON_CORE
     QT_LINKS Core Gui

@@ -104,10 +104,10 @@ set(SARIBBON_CORE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../src/core")
 # plan-03 S3.0: binding-side <SARibbonCore/...> mirror (self-contained wheel build)
 set(SARIBBON_CORE_INCLUDE_MIRROR "${CMAKE_CURRENT_BINARY_DIR}/_sync_include")
 # plan-03 S3.0: binding-side <SARibbonCore/...> mirror (self-contained wheel build).
-# Headers are consumed FLAT (<SARibbonCore/X.h>) although they physically live in
-# src/core/<subsystem>/ subdirs (plan-02 S1-5 flattening decision), so copy each
-# file flattened - a plain directory COPY would keep the subdir layout and the
-# flat includes would not resolve.
+# Headers are consumed FLAT (<SARibbonCore/X.h>); src/core is physically flat
+# since the B65 reorganization (they used to live in <subsystem>/ subdirs, the
+# per-file copy below kept working across the move), so the glob now yields
+# flat relative paths already.
 file(MAKE_DIRECTORY "${SARIBBON_CORE_INCLUDE_MIRROR}/SARibbonCore")
 file(GLOB_RECURSE _sa_core_files RELATIVE "${SARIBBON_CORE_DIR}"
      "${SARIBBON_CORE_DIR}/*.h" "${SARIBBON_CORE_DIR}/*.hpp")
@@ -123,18 +123,18 @@ set(SARIBBON_COLORWIDGETS_DIR "${SARIBBON_SOURCE_DIR}/colorWidgets")
 set(SARIBBON_HEADERS
     "${SARIBBON_CORE_DIR}/SARibbonCoreGlobal.h"
     "${SARIBBON_CORE_DIR}/SARibbonQt5Compat.hpp"
-    "${SARIBBON_CORE_DIR}/contract/SARibbonAbstractLayoutHost.h"
-    "${SARIBBON_CORE_DIR}/contract/SARibbonAbstractLayoutItem.h"
-    "${SARIBBON_CORE_DIR}/data/SARibbonCustomizeRecord.h"
-    "${SARIBBON_CORE_DIR}/factory/SARibbonElementFactoryInterface.h"
-    "${SARIBBON_CORE_DIR}/global/SARibbonCoreUtil.h"
-    "${SARIBBON_CORE_DIR}/global/SARibbonEnums.h"
-    "${SARIBBON_CORE_DIR}/layout/SARibbonBarGeometryEngine.h"
-    "${SARIBBON_CORE_DIR}/layout/SARibbonCategoryLayoutEngine.h"
-    "${SARIBBON_CORE_DIR}/layout/SARibbonPanelLayoutEngine.h"
-    "${SARIBBON_CORE_DIR}/metrics/SARibbonMetrics.h"
-    "${SARIBBON_CORE_DIR}/theme/SARibbonThemeData.h"
-    "${SARIBBON_CORE_DIR}/theme/SARibbonThemePalette.h"
+    "${SARIBBON_CORE_DIR}/SARibbonAbstractLayoutHost.h"
+    "${SARIBBON_CORE_DIR}/SARibbonAbstractLayoutItem.h"
+    "${SARIBBON_CORE_DIR}/SARibbonCustomizeRecord.h"
+    "${SARIBBON_CORE_DIR}/SARibbonElementFactoryInterface.h"
+    "${SARIBBON_CORE_DIR}/SARibbonCoreUtil.h"
+    "${SARIBBON_CORE_DIR}/SARibbonEnums.h"
+    "${SARIBBON_CORE_DIR}/SARibbonBarGeometryEngine.h"
+    "${SARIBBON_CORE_DIR}/SARibbonCategoryLayoutEngine.h"
+    "${SARIBBON_CORE_DIR}/SARibbonPanelLayoutEngine.h"
+    "${SARIBBON_CORE_DIR}/SARibbonMetrics.h"
+    "${SARIBBON_CORE_DIR}/SARibbonThemeData.h"
+    "${SARIBBON_CORE_DIR}/SARibbonThemePalette.h"
     "${SARIBBON_SOURCE_DIR}/SAFramelessHelper.h"
     "${SARIBBON_SOURCE_DIR}/SARibbonActionsManager.h"
     "${SARIBBON_SOURCE_DIR}/SARibbonApplicationButton.h"
