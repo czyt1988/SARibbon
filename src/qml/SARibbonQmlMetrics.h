@@ -26,7 +26,7 @@ namespace SARibbonQml {
  *          各控件 FontChange——一致性测试须设置应用级字体才能同时触发两端）。
  * \endif
  */
-class RibbonMetrics : public QObject
+class SA_RIBBON_QML_EXPORT RibbonMetrics : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QFont font READ font WRITE setFont NOTIFY fontChanged)

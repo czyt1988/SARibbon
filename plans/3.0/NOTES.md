@@ -795,6 +795,21 @@
 - 处理：保守方向——不改 core（`layoutTitleRect` 的 `x2 = ribbonWidth - systemButtonSize.width()` 在宽 0 时自然延伸到右缘，无除零风险），不动 widgets；预留语义保留为属性而非删除，等 plan-04 后续无边框轮次消费。
 - 影响计划：04（S4 bar 宿主布局；qml-guide 两语言版"右对齐于系统按钮区前"表述同步更新）。
 
+---
+
+### B67：基础输入控件五件套 —— QML 文档也能当类型注册，但"样式化根"会随应用换肤（第 27 轮）
+
+- 日期：2026-10-04
+- 发现位置：用户需求（示例为嵌入 CheckBox/RadioButton/ComboBox 自建 `Slim*.qml` 三个本地包装文件，通用库应开箱即用），落在 `src/qml/qml/` 五个新 QML 文件 + `SARibbonQmlTypes.cpp` 注册段
+- 动机与做法：新增 `RibbonCheckBox` / `RibbonRadioButton` / `RibbonComboBox` / `RibbonSpinBox` / `RibbonTextField` 五个**纯 QML 文档类型**，经 `qmlRegisterType(QUrl("qrc:/SARibbon/RibbonXxx.qml"), "SARibbon", 3, 0, ...)` 注册进模块——命令式单轨的自然延伸，仍无 qmldir/qmltypes 安装物，qrc 已在 CMake SOURCES 里故零 CMake 改动。**不建 C++ 宿主**：嵌入面板时几何权威属于 `RibbonControlContainer`（拉伸行高、压 padding、clip），控件文件只负责渲染；这五个文件也不做 cppHost 握手（不是结构宿主的叶子）。视觉对齐 widgets QSS 对 `SARibbonPanel > Q{CheckBox,RadioButton,ComboBox,LineEdit}` 的特化（1px inputBorder、hover→inputFocus、selectionBg 选区、勾选框透明底文字色），字号绑 `RibbonMetrics.fontPointSize`（裸 Controls 不跟随 ribbon 字体变化是既有缺陷，本批补上）。示例替换 12 处 Slim 用法 + 2 处裸 SpinBox + 2 处裸 TextField，三个 Slim 文件删除，`qml.qrc` 收缩。额外属性只有 `indicatorSide`（默认 14），其余全继承原生 Controls 属性。
+- **根类型必须用 `QtQuick.Templates` 的 `T.*`，不能用样式化控件**：写成 `ComboBox { ... }` 时 `ComboBox` 解析到**当前运行样式**的实现（Material 下行为/隐式尺寸/内边距全变），而 `T.ComboBox` 让本文件自身就是样式实现——SARibbonQml 的视觉契约是"ribbon 自己的样子"（对齐 widgets QSS），不随应用 `QQuickStyle` 换肤。连带要自己补齐官方样式模板里由模板层提供的东西：`implicitWidth/Height` 的三段式公式、`T.TextField` 的**占位符渲染**（模板只提供 `placeholderTextColor` 属性值，画占位符的是样式层——5.12 官方 Default 源码实证，本文件用普通 Text 覆盖层画）。
+- **Qt 5.12 兼容子集以官方 5.12 源码为准，不能拿 6.7 Basic 抄**：6.7 Basic 的模板用了 `pragma ComponentBehavior: Bound`、`required property`、`ListView.view.width`、`selectTextByMouse`（全部 5.15+/6.x）；5.14 Default 可用的写法（`width: parent.width`、`modelData`/`model[textRole]` 老式 delegate 上下文属性）才是安全集。`control.Window.height`（弹层高度按窗高钳制）在 5.12 官方 Default 里就存在，但**必须显式 `import QtQuick.Window 2.12`**（5.12 下 attached 类型经该 import 解析，6.7 保留该模块兼容）。
+- **`RibbonMetrics` 一直没带 `SA_RIBBON_QML_EXPORT`**（B62 同型漏洞的第 4 处）：此前无 C++ 消费方所以链接期从未暴露；新测试直接调 `setFontPointSize()` 立刻 LNK2019。补宏（`RibbonTheme` 一直有宏，两个单例现在一致）。**记法并入 B62**：凡 Q_PROPERTY/Q_INVOKABLE 可见的新类，导出宏是"第一个跨 DLL C++ 用户"的入场券。
+- **测试三条**：(a) ComboBox 弹层 delegate 对 `findChildren` 不可见（B50 家族：delegate 的 QObject 父不在视觉树上）——从 `view->contentItem()` 走 `collectVisualItems` 过滤 objectName；(b) `AbstractButton::toggled()` **无参数**（`SIGNAL(toggled(bool))` 会报 No such signal，示例 main.qml 顶部注释早有警告，测试字符串要写 `SIGNAL(toggled())`）；(c) `QTest::keyClicks` 在 qtest_gui.h（本目标只链 QtTest 核心）——改用 `QTest::keyEvent(QTest::Click, view, 'h')` 逐键。
+- 证据：新增 `embeddedRibbonBasicControls`（五控件经容器嵌入：容器拉伸 `height==rowH-4`、隐式尺寸 <26/30px、14px 指示器、真实点击翻转勾选/单选/SpinBox 步进、弹层背景色==`RibbonTheme.contentBg` 且点选 beta 行触发 `activated(1)` 并关层、TextField 键入后占位符消失）与 `ribbonBasicControlsThemeAndFont`（面板外独立使用：指示器填充/三个输入背景/占位符颜色逐项等于 token 值，主题切 Office2021Blue→Dark 全部 QTRY 重解析，`fontPointSize +3` 后控件字体与隐式高度跟随再复原）。`build-qml-test`（Debug，Qt 6.7.3 msvc2019_64）ctest **4/4 套件全绿**（`qml_Conformance` **24 用例**，`-functions` 口径）；`build-qml-rel`（Release）仅 `categoryScrollWheelAndArrows` 失败——本会话再次按 B66 方法做 stash A/B：干净 HEAD 上同样失败 3/3（同签名 `afterLeftClick 0 vs -100`，面板总宽在 `total ≥ 100+1.5×viewport` 临界值附近，字体度量微差即翻转），Debug 全量与 Release 单跑表现相反，进一步坐实环境性。示例 offscreen 12s **零 QML 警告**（仅字体目录/拆线程定时器两条既有环境噪音）；临时 `SA_DUMP_TREE` 探针 dump 1180 项：指示器 14×14、输入类 15px 行高、SpinBox 右列 18×7.5 上下钮、颜色全为 office2021-blue token 值（探针按 B60 惯例验证后移除）。`python tools/check_core_purity.py src/core` 通过。**本轮未改 core/widgets，无需跑 `tools/Amalgamate.sh`**。
+- 已知取舍入档：勾选标记的白色勾线/半选横线为**固定对比色**（同 `RibbonColorNoneMark` 的固定色先例，注释已注明；附带好处是该 Canvas 无需换主题重绘）；`RibbonComboBox` 弹层的 `ScrollIndicator` 用 Controls 原生件（不走主题 token，长列表才出现）。
+- 影响计划：04（新增"基础输入控件"族，原计划外的用户需求；qml-guide 中英文版新增专节与类型清单 5 行；示例 README widget test 行改写、用例数 22→24）；通用（纯 QML 类型的注册范式 = `qmlRegisterType(QUrl)` + qrc，错误只在实例化期暴露，首个测试必须实例化全部新类型；控件类新成员遵守"根用 T.*、颜色绑单例、Canvas 随色重绘"三条铁律）。
+
 ## 执行中追加（模板，勿删）
 
 ```

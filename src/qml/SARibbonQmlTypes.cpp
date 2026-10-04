@@ -136,6 +136,21 @@ void saRibbonRegisterQmlTypes(QQmlEngine* engine)
     qmlRegisterType< SARibbonQml::RibbonPanel >("SARibbon", 3, 0, "RibbonPanel");
     qmlRegisterType< SARibbonQml::RibbonToolButton >("SARibbon", 3, 0, "RibbonToolButton");
     qmlRegisterType< SARibbonQml::RibbonControlContainer >("SARibbon", 3, 0, "RibbonControlContainer");
+    // basic input controls (widgets QSS `SARibbonPanel > Q{CheckBox,RadioButton,
+    // ComboBox,LineEdit}` specializations): pure QML documents registered by
+    // URL — they carry no layout authority of their own, so unlike the
+    // structural types above they need no C++ host class; embedded into a
+    // panel through RibbonControlContainer.control (or usable standalone)
+    qmlRegisterType(QUrl(QStringLiteral("qrc:/SARibbon/RibbonCheckBox.qml")),
+                    "SARibbon", 3, 0, "RibbonCheckBox");
+    qmlRegisterType(QUrl(QStringLiteral("qrc:/SARibbon/RibbonRadioButton.qml")),
+                    "SARibbon", 3, 0, "RibbonRadioButton");
+    qmlRegisterType(QUrl(QStringLiteral("qrc:/SARibbon/RibbonComboBox.qml")),
+                    "SARibbon", 3, 0, "RibbonComboBox");
+    qmlRegisterType(QUrl(QStringLiteral("qrc:/SARibbon/RibbonSpinBox.qml")),
+                    "SARibbon", 3, 0, "RibbonSpinBox");
+    qmlRegisterType(QUrl(QStringLiteral("qrc:/SARibbon/RibbonTextField.qml")),
+                    "SARibbon", 3, 0, "RibbonTextField");
     qmlRegisterType< SARibbonQml::RibbonMenuItem >("SARibbon", 3, 0, "RibbonMenuItem");
     qmlRegisterType< SARibbonQml::RibbonContextCategory >("SARibbon", 3, 0, "RibbonContextCategory");
     qmlRegisterType< SARibbonQml::RibbonGallery >("SARibbon", 3, 0, "RibbonGallery");

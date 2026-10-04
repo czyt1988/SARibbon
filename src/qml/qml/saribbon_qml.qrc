@@ -9,6 +9,11 @@
         <file>RibbonCategory.qml</file>
         <file>RibbonCategoryScroll.qml</file>
         <file>RibbonControlContainer.qml</file>
+        <file>RibbonCheckBox.qml</file>
+        <file>RibbonRadioButton.qml</file>
+        <file>RibbonComboBox.qml</file>
+        <file>RibbonSpinBox.qml</file>
+        <file>RibbonTextField.qml</file>
         <file>RibbonGallery.qml</file>
         <file>RibbonSeparator.qml</file>
         <file>RibbonColorGrid.qml</file>

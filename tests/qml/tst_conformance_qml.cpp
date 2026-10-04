@@ -19,6 +19,7 @@
 #include <SARibbonCore/SARibbonThemePalette.h>
 #include <SARibbonCore/SARibbonCategoryLayoutEngine.h>
 #include <SARibbonQml/SARibbonQmlTheme.h>
+#include <SARibbonQml/SARibbonQmlMetrics.h>
 #include <SARibbonQml/SARibbonQmlToolButton.h>
 #include <SARibbonQml/SARibbonQmlControlContainer.h>
 #include <SARibbonQml/SARibbonQmlGallery.h>
@@ -61,6 +62,8 @@ private Q_SLOTS:
     void applicationWindow();
     void themeCustomization();
     void categoryScrollWheelAndArrows();
+    void embeddedRibbonBasicControls();
+    void ribbonBasicControlsThemeAndFont();
 
 private:
     QQuickView* exposeScene(QQmlEngine& engine, QQmlComponent& component, const char* src, int w, int h);
@@ -2751,6 +2754,266 @@ Item {
     QGuiApplication::sendEvent(view.get(), &fitEv);
     QVERIFY2(!fitEv.isAccepted(), "a fitting category must not eat the wheel");
     QCOMPARE(catFit->property("scrollPosition").toInt(), 0);
+}
+
+/**
+ * @brief The five URL-registered basic controls embedded through containers
+ * @details RibbonCheckBox/RadioButton/ComboBox/SpinBox/TextField are pure QML
+ *          documents registered by URL (no C++ host). This case pins their
+ *          contract end to end: every control is reparented into its
+ *          RibbonControlContainer and stretched to the engine-assigned row,
+ *          the implicit sizes stay compact (the stock Basic indicators are
+ *          28-40px tall and would blow the row), the indicators are the 14px
+ *          variants, and each control stays functional through real mouse
+ *          input — including the themed popup of the combo (the stock style
+ *          popup would keep white-on-black colors in dark themes).
+ */
+void TestConformanceQml::embeddedRibbonBasicControls()
+{
+    QQmlEngine engine;
+    saRibbonRegisterQmlTypes(&engine);
+
+    QString src = QStringLiteral(R"QML(import QtQuick 2.12
+import SARibbon 3.0
+Item {
+    width: 700
+    height: 400
+    RibbonPanel {
+        objectName: "panel"
+        anchors.fill: parent
+        panelTitle: "P"
+        RibbonControlContainer {
+            objectName: "checkContainer"
+            text: "Check:"
+            control: RibbonCheckBox { objectName: "check"; text: "check me" }
+        }
+        RibbonControlContainer {
+            objectName: "radioContainer"
+            text: "Radio:"
+            control: RibbonRadioButton { objectName: "radio"; text: "pick me" }
+        }
+        RibbonControlContainer {
+            objectName: "comboContainer"
+            text: "Combo:"
+            control: RibbonComboBox { objectName: "combo"; model: [ "alpha", "beta", "gamma" ] }
+        }
+        RibbonControlContainer {
+            objectName: "spinContainer"
+            text: "Spin:"
+            suffixText: "px"
+            control: RibbonSpinBox { objectName: "spin"; from: 0; to: 100; value: 10 }
+        }
+        RibbonControlContainer {
+            objectName: "fieldContainer"
+            text: "Edit:"
+            control: RibbonTextField { objectName: "field"; placeholderText: "type here" }
+        }
+    }
+}
+)QML");
+
+    QQmlComponent component(&engine);
+    std::unique_ptr< QQuickView > view(exposeScene(engine, component, src.toUtf8().constData(), 700, 400));
+    QVERIFY(view);
+    QQuickItem* rootItem = view->rootObject();
+    QVERIFY(rootItem);
+
+    auto clickItem = [&view](QQuickItem* item) {
+        QTRY_VERIFY(item->width() > 0 && item->height() > 0);
+        const QPointF center = item->mapToScene(QPointF(item->width() / 2, item->height() / 2));
+        QTest::mouseClick(view.get(), Qt::LeftButton, Qt::NoModifier, center.toPoint());
+    };
+
+    // ---- all five controls created, reparented into their containers ----
+    auto* check           = rootItem->findChild< QQuickItem* >(QStringLiteral("check"));
+    auto* radio           = rootItem->findChild< QQuickItem* >(QStringLiteral("radio"));
+    auto* combo           = rootItem->findChild< QQuickItem* >(QStringLiteral("combo"));
+    auto* spin            = rootItem->findChild< QQuickItem* >(QStringLiteral("spin"));
+    auto* field           = rootItem->findChild< QQuickItem* >(QStringLiteral("field"));
+    auto* checkContainer  = rootItem->findChild< QQuickItem* >(QStringLiteral("checkContainer"));
+    auto* comboContainer  = rootItem->findChild< QQuickItem* >(QStringLiteral("comboContainer"));
+    QVERIFY(check && radio && combo && spin && field && checkContainer && comboContainer);
+    for (QQuickItem* c : { check, radio, combo, spin, field }) {
+        QTRY_VERIFY(c->width() > 0 && c->height() > 0);
+        QCOMPARE(c->parentItem()->property("labelWidth").isValid(), true);  // inside a container
+    }
+
+    // ---- the container stretches the control to the engine-assigned row ----
+    // (host geometry: x = labelWidth, height = row height minus 2 * margin)
+    QTRY_VERIFY(checkContainer->height() > 0);
+    QCOMPARE(qRound(check->height()), qRound(checkContainer->height() - 4));
+    QVERIFY(check->x() >= checkContainer->property("labelWidth").toReal() - 1.0);
+    QCOMPARE(qRound(combo->height()), qRound(comboContainer->height() - 4));
+
+    // ---- compact implicit sizes: the stock Basic 28-40px defaults are gone ----
+    QVERIFY2(check->implicitHeight() < 26, "checkbox must fit a ribbon row");
+    QVERIFY2(radio->implicitHeight() < 26, "radio button must fit a ribbon row");
+    QVERIFY2(combo->implicitHeight() < 30, "combo must be font-derived, not the stock 40px");
+    QVERIFY2(spin->implicitHeight() < 30, "spin box must be font-derived, not the stock 40px");
+    QVERIFY2(field->implicitHeight() < 30, "text field must be font-derived, not the stock 40px");
+
+    // ---- the indicators are the compact 14px variants ----
+    auto* checkIndicator = check->findChild< QQuickItem* >(QStringLiteral("ribbonCheckBoxIndicator"));
+    auto* radioIndicator = radio->findChild< QQuickItem* >(QStringLiteral("ribbonRadioButtonIndicator"));
+    QVERIFY(checkIndicator && radioIndicator);
+    QCOMPARE(qRound(checkIndicator->width()), 14);
+    QCOMPARE(qRound(checkIndicator->height()), 14);
+    QCOMPARE(qRound(radioIndicator->width()), 14);
+    QCOMPARE(qRound(radioIndicator->height()), 14);
+
+    // ---- checkbox toggles through a real click on the indicator ----
+    // AbstractButton::toggled() carries NO parameter (checked is a property)
+    QSignalSpy toggleSpy(check, SIGNAL(toggled()));
+    QCOMPARE(check->property("checked").toBool(), false);
+    clickItem(checkIndicator);
+    QTRY_COMPARE(check->property("checked").toBool(), true);
+    QCOMPARE(toggleSpy.count(), 1);
+
+    // ---- radio button checks through a real click on the ring ----
+    QCOMPARE(radio->property("checked").toBool(), false);
+    clickItem(radioIndicator);
+    QTRY_COMPARE(radio->property("checked").toBool(), true);
+
+    // ---- combo popup opens themed and picks through a real click ----
+    QSignalSpy activatedSpy(combo, SIGNAL(activated(int)));
+    clickItem(combo);
+    QObject* popup = combo->property("popup").value< QObject* >();
+    QVERIFY(popup);
+    QTRY_COMPARE(popup->property("visible").toBool(), true);
+    auto* popupBg = popup->findChild< QQuickItem* >(QStringLiteral("ribbonComboBoxPopupBackground"));
+    QVERIFY(popupBg);
+    // themed dropdown: the background follows the palette token, not a style default
+    SARibbonQml::RibbonTheme* theme = SARibbonQml::RibbonTheme::instance();
+    QCOMPARE(colorKey(popupBg->property("color").value< QColor >()), colorKey(theme->contentBg()));
+    // delegate rows are invisible to findChildren (B50: delegates live outside
+    // their visual parent in the QObject tree) — walk the scene from the window
+    auto popupRows = [ &view ]() -> QVector< QQuickItem* > {
+        QVector< QQuickItem* > rows;
+        QList< QQuickItem* > all;
+        collectVisualItems(view->contentItem(), &all);
+        for (QQuickItem* it : all) {
+            if (it->objectName() == QLatin1String("ribbonComboBoxPopupRow")) {
+                rows.append(it);
+            }
+        }
+        return rows;
+    };
+    QTRY_COMPARE(popupRows().size(), 3);
+    clickItem(popupRows().value(1));
+    QTRY_COMPARE(popup->property("visible").toBool(), false);
+    QCOMPARE(combo->property("currentIndex").toInt(), 1);
+    QCOMPARE(combo->property("currentText").toString(), QStringLiteral("beta"));
+    QCOMPARE(activatedSpy.count(), 1);
+    QCOMPARE(activatedSpy.at(0).at(0).toInt(), 1);
+
+    // ---- spin steppers: a real click on the up indicator steps the value ----
+    QCOMPARE(spin->property("value").toInt(), 10);
+    auto* upBtn = spin->findChild< QQuickItem* >(QStringLiteral("ribbonSpinBoxUpIndicator"));
+    QVERIFY(upBtn);
+    clickItem(upBtn);
+    QTRY_COMPARE(spin->property("value").toInt(), 11);
+
+    // ---- text field: placeholder visible while empty, typing replaces it ----
+    auto* placeholder = field->findChild< QQuickItem* >(QStringLiteral("ribbonTextFieldPlaceholder"));
+    QVERIFY(placeholder);
+    QCOMPARE(placeholder->property("visible").toBool(), true);
+    clickItem(field);
+    // QTest::keyClicks lives in the GUI half of QtTest (qtest_gui.h), which
+    // this target does not link; the per-key form is in the core half
+    QTest::keyEvent(QTest::Click, view.get(), 'h');
+    QTest::keyEvent(QTest::Click, view.get(), 'i');
+    QTRY_COMPARE(field->property("text").toString(), QStringLiteral("hi"));
+    QCOMPARE(placeholder->property("visible").toBool(), false);
+}
+
+/**
+ * @brief The basic controls follow RibbonTheme and RibbonMetrics standalone
+ * @details The five controls bind their colors to RibbonTheme tokens and their
+ *          font to RibbonMetrics, so they follow theme switches and ribbon
+ *          font changes wherever they are placed (also outside a panel). This
+ *          case switches the palette twice and asserts every visible binding
+ *          re-resolves (indicator fill, input backgrounds, placeholder), and
+ *          that a font point size change grows the font-derived heights.
+ */
+void TestConformanceQml::ribbonBasicControlsThemeAndFont()
+{
+    QQmlEngine engine;
+    saRibbonRegisterQmlTypes(&engine);
+
+    SARibbonQml::RibbonTheme* theme   = SARibbonQml::RibbonTheme::instance();
+    SARibbonQml::RibbonMetrics* metrics = SARibbonQml::RibbonMetrics::instance();
+    QVERIFY(theme && metrics);
+
+    QString src = QStringLiteral(R"QML(import QtQuick 2.12
+import SARibbon 3.0
+Item {
+    width: 400
+    height: 260
+    Column {
+        spacing: 4
+        RibbonCheckBox { objectName: "check"; text: "c"; checked: true }
+        RibbonComboBox { objectName: "combo"; model: [ "a", "b" ] }
+        RibbonSpinBox { objectName: "spin"; from: 0; to: 10 }
+        RibbonTextField { objectName: "field"; placeholderText: "ph" }
+    }
+}
+)QML");
+
+    QQmlComponent component(&engine);
+    std::unique_ptr< QQuickView > view(exposeScene(engine, component, src.toUtf8().constData(), 400, 260));
+    QVERIFY(view);
+    QQuickItem* rootItem = view->rootObject();
+    QVERIFY(rootItem);
+
+    const int themeAtEntry = theme->currentTheme();
+    // deterministic starting point (themeCustomization may have left a custom
+    // palette behind): a built-in theme reloads its own palette
+    theme->setCustomPaletteSource(QUrl());
+    theme->setCurrentTheme(int(SARibbonTheme::RibbonThemeOffice2021Blue));
+
+    auto* check           = rootItem->findChild< QQuickItem* >(QStringLiteral("check"));
+    auto* combo           = rootItem->findChild< QQuickItem* >(QStringLiteral("combo"));
+    auto* spin            = rootItem->findChild< QQuickItem* >(QStringLiteral("spin"));
+    auto* field           = rootItem->findChild< QQuickItem* >(QStringLiteral("field"));
+    QVERIFY(check && combo && spin && field);
+    auto* checkIndicator = check->findChild< QQuickItem* >(QStringLiteral("ribbonCheckBoxIndicator"));
+    auto* comboBg        = combo->findChild< QQuickItem* >(QStringLiteral("ribbonComboBoxBackground"));
+    auto* spinBg         = spin->findChild< QQuickItem* >(QStringLiteral("ribbonSpinBoxBackground"));
+    auto* fieldBg        = field->findChild< QQuickItem* >(QStringLiteral("ribbonTextFieldBackground"));
+    auto* placeholder    = field->findChild< QQuickItem* >(QStringLiteral("ribbonTextFieldPlaceholder"));
+    QVERIFY(checkIndicator && comboBg && spinBg && fieldBg && placeholder);
+
+    // ---- colors resolve from the tokens of the running palette ----
+    QTRY_COMPARE(colorKey(checkIndicator->property("color").value< QColor >()), colorKey(theme->inputFocus()));
+    QCOMPARE(colorKey(comboBg->property("color").value< QColor >()), colorKey(theme->contentBg()));
+    QCOMPARE(colorKey(spinBg->property("color").value< QColor >()), colorKey(theme->contentBg()));
+    QCOMPARE(colorKey(fieldBg->property("color").value< QColor >()), colorKey(theme->contentBg()));
+    QCOMPARE(colorKey(placeholder->property("color").value< QColor >()), colorKey(theme->subtitle()));
+
+    // ---- theme switch: every visible binding re-resolves through the tokens ----
+    const QColor lightBg = theme->contentBg();
+    theme->setCurrentTheme(int(SARibbonTheme::RibbonThemeDark));
+    QVERIFY(colorKey(theme->contentBg()) != colorKey(lightBg));
+    QTRY_COMPARE(colorKey(comboBg->property("color").value< QColor >()), colorKey(theme->contentBg()));
+    QTRY_COMPARE(colorKey(spinBg->property("color").value< QColor >()), colorKey(theme->contentBg()));
+    QTRY_COMPARE(colorKey(fieldBg->property("color").value< QColor >()), colorKey(theme->contentBg()));
+    QTRY_COMPARE(colorKey(checkIndicator->property("color").value< QColor >()), colorKey(theme->inputFocus()));
+    QTRY_COMPARE(colorKey(placeholder->property("color").value< QColor >()), colorKey(theme->subtitle()));
+
+    // ---- the font follows RibbonMetrics and drives the implicit heights ----
+    const int fontAtEntry = metrics->fontPointSize();
+    QVERIFY2(fontAtEntry > 0, "the application font must be point-size based for this case");
+    QCOMPARE(check->property("font").value< QFont >().pointSize(), fontAtEntry);
+    const qreal comboH0 = combo->implicitHeight();
+    metrics->setFontPointSize(fontAtEntry + 3);
+    QTRY_COMPARE(check->property("font").value< QFont >().pointSize(), fontAtEntry + 3);
+    QTRY_VERIFY(combo->implicitHeight() > comboH0 + 2);
+
+    // ---- restore the process-wide singletons for the following cases ----
+    metrics->setFontPointSize(fontAtEntry);
+    theme->setCustomPaletteSource(QUrl());
+    theme->setCurrentTheme(themeAtEntry);
+    QTRY_COMPARE(theme->currentTheme(), themeAtEntry);
 }
 
 QTEST_MAIN(TestConformanceQml)

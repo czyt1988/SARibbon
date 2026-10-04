@@ -32,7 +32,7 @@ cmake --build build
 | toolbutton style 面板 | 弹出三模式 × 比例混合：MenuButtonPopup（分区命中）/InstantPopup/DelayedPopup（长按）+ checkable 变体 + 禁用带菜单 | SARibbonMenu 演示 |
 | toolbutton style 面板 | optionAction（右下角对角按钮，点击触发信号） | 面板 optionAction |
 | toolbutton style 面板 | 分隔符（Large 比例独占一列） | addSeparator |
-| widget test 面板 | 控件嵌入：ComboBox（可编辑，带图标 + 标签条四态切换）/ComboBox/TextField/CheckBox/SpinBox（带 `suffixText` 尾随单位标签） | SARibbonCtrlContainer + SARibbonLineWidgetContainer |
+| widget test 面板 | 控件嵌入：RibbonComboBox（可编辑，带图标 + 标签条四态切换）/RibbonComboBox/RibbonTextField/RibbonCheckBox/RibbonSpinBox（带 `suffixText` 尾随单位标签）——基础控件为**库自带类型**（`RibbonCheckBox` 等五个，`import SARibbon 3.0` 直接可用，无需示例本地包装） | SARibbonCtrlContainer + SARibbonLineWidgetContainer |
 | widget test 面板 | 颜色按钮 ×2：Font Color（`ColorUnderIcon`，图标下方色带）+ Fill Color（`ColorFillToIcon`，选中色填充图标框）；点击色带区直接触发 `colorClicked`，点击箭头弹出标准色 + 深浅色板 + 自定义色 + 无颜色项 | SARibbonColorToolButton（color 分类页） |
 | Context Category 面板 | 上下文标签显隐开关（彩色 tab + 色带 + 页面切换） | setContextCategoryVisible |
 | Delete 类别 | 动态面板增删（ListModel+Repeater：移除尾部/插入 0/尾/-1） | removePanel/insertPanel |
@@ -63,7 +63,7 @@ cmake --build build
 
 ## 一致性测试
 
-`tests/qml/tst_conformance_qml.cpp`（22 用例）与示例同步维护：
+`tests/qml/tst_conformance_qml.cpp`（24 用例）与示例同步维护：
 面板装箱黄金几何、tab 切换、按钮点击/弹出/禁用、控件嵌入、上下文标签、画廊、
 六样式传播、分隔符、快速访问栏/右组、对齐/最小模式、RTL、optionAction、应用窗口、
 菜单勾选/快捷键/多级子菜单（索引路径寻址 + 叶子渲染断言）、
@@ -77,7 +77,11 @@ cmake --build build
 未受影响的兄弟按钮不产生 `toggled`、`checkedButton()` 对齐 `QActionGroup::checkedAction`）、
 类别滚动（溢出时只出现尾随箭头、箭头矩形等于 core `scrollButtonRects` 输出、
 真实点击箭头步进半视口并被 `clampScrollOffset` 夹住、滚轮走 core 的 delta 优先级与
-×2 / ÷2 缩放、动画途中滚轮被丢弃、内容放得下的类别必须 `ignore` 滚轮而不是吃掉它）。
+×2 / ÷2 缩放、动画途中滚轮被丢弃、内容放得下的类别必须 `ignore` 滚轮而不是吃掉它）、
+基础输入控件五件套（URL 注册纯 QML 类型经容器嵌入：容器拉伸到行高、
+隐式尺寸紧凑、14px 指示器、真实点击翻转勾选/单选/步进/弹出主题化下拉并点选、
+TextField 占位符可见性，以及控件在面板外独立使用时颜色全量跟随主题切换、
+字号跟随 `RibbonMetrics.fontPointSize` 且隐式高度随字体增长）。
 
 `tests/qml/tst_color_qml.cpp`（12 用例）覆盖颜色控件族：
 网格几何逐项对齐 core `colorGridCellSize`/`colorBandHeight`（含单行不限列、行最小高与

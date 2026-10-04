@@ -42,6 +42,11 @@ first engine; a second engine gets nullptr (verified against Qt 5.14/6.7 sources
 | `RibbonPanel` | type | panel structural host (drives PanelLayoutEngine; child registration is generic over any `RibbonLayoutItemHost`) |
 | `RibbonToolButton` | type | button host (text/iconSource/proportion/checkable/**three popupModes**/menuItems menu/disabled state) |
 | `RibbonControlContainer` | type | control container host (the `control` property embeds any QQuickItem: ComboBox/CheckBox/SpinBox/TextField/...; widgets SARibbonCtrlContainer counterpart) |
+| `RibbonCheckBox` | type (pure QML) | compact themed check box (14px indicator, tunable via `indicatorSide`; URL-registered, no C++ host) |
+| `RibbonRadioButton` | type (pure QML) | compact themed radio button (14px ring; exclusivity via the Controls2 `ButtonGroup` attached property, the QButtonGroup counterpart) |
+| `RibbonComboBox` | type (pure QML) | compact themed combo box (the dropdown list follows the theme tokens too, so dark themes do not break; `editable`/`model`/`textRole` and all native properties inherited) |
+| `RibbonSpinBox` | type (pure QML) | compact themed spin box (Windows-style up/down stepper column on the trailing edge; `from`/`to`/`stepSize`/`prefix`/`suffix` and all native properties inherited) |
+| `RibbonTextField` | type (pure QML) | compact themed single-line editor (`placeholderText`/`validator` and all native properties inherited) |
 | `RibbonMenuItem` | type | declarative menu entry (text/iconSource/enabled/separator) attached to a button's `menuItems` |
 | `RibbonContextCategory` | type | context category host (contextTitle/contextColor/active; activation appends colored tabs and publishes the band; widgets SARibbonContextCategory counterpart) |
 | `RibbonGallery` | type | gallery host (Large proportion + horizontal expanding + stretchFactor joins the core engine's weighted distribution; grid metrics via core `calcGalleryGridCellSize`) |
@@ -68,6 +73,47 @@ When adding a structural host, do NOT copy the leaf boilerplate — inherit:
   row height context plumbing; subclasses only add `sizeHint()` (gallery-like
   items also override stretchFactor). `RibbonPanel` collects children through a
   `qobject_cast<RibbonLayoutItemHost*>`.
+
+## Basic Input Controls (URL-registered pure QML types)
+
+`RibbonCheckBox` / `RibbonRadioButton` / `RibbonComboBox` / `RibbonSpinBox` /
+`RibbonTextField` are **pure QML documents** registered through
+`qmlRegisterType(QUrl("qrc:/SARibbon/RibbonXxx.qml"))` — a natural extension of
+the imperative single track (still no qmldir/qmltypes install artifacts). They
+carry **no C++ host**: when embedded into a panel the geometry authority belongs
+to `RibbonControlContainer` (which stretches the control to the row height and
+squeezes its padding); the files themselves only render. The visuals follow the
+widgets QSS specializations for `SARibbonPanel > Q{CheckBox,RadioButton,ComboBox,LineEdit}`
+(1px inputBorder frame, hover switches to inputFocus, selection in selectionBg),
+and the combo dropdown follows the theme tokens as well. Every color binds to
+`RibbonTheme` and the font to `RibbonMetrics.fontPointSize` (panel rows grow
+with the ribbon font, and the text follows). The roots are `QtQuick.Templates`
+template types — not the styled controls — so the look does not depend on the
+application's `QQuickStyle`: these five files ARE the style implementation.
+
+```qml
+RibbonPanel {
+    panelTitle: "widget test"
+    RibbonControlContainer { text: "Check:"; control: RibbonCheckBox { } }
+    RibbonControlContainer { text: "Spin:"; suffixText: "px";
+        control: RibbonSpinBox { from: 0; to: 100; value: 12 } }
+    RibbonControlContainer { text: "Font:";
+        control: RibbonComboBox { model: [ "a", "b" ] } }
+    RibbonControlContainer { control: RibbonRadioButton { text: "pick me" } }
+    RibbonControlContainer { control: RibbonTextField { placeholderText: "type" } }
+}
+```
+
+- The only added property is `indicatorSide` on the check/radio buttons
+  (default 14, the indicator side length); everything else inherits the native
+  Controls properties (`editable`/`model`/`currentIndex`/`from`/`to`/
+  `stepSize`/`placeholderText`/`validator`/...).
+- They also work outside ribbon panels (they are ordinary Controls items).
+- Radio exclusivity: `ButtonGroup { id: g }` +
+  `RibbonRadioButton { ButtonGroup.group: g }`.
+- Canvas indicators (arrows) whose color follows a theme token must observe the
+  leaf repaint rule "color change triggers `requestPaint`", or the arrow keeps
+  stale colors after a theme switch.
 
 ## Button Popup Modes
 

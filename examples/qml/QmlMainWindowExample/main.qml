@@ -192,7 +192,7 @@ ApplicationWindow {
 
                 RibbonControlContainer {
                     text: ""
-                    control: SlimRadioButton {
+                    control: RibbonRadioButton {
                         ButtonGroup.group: styleGroup
                         text: qsTr("office style")
                         checked: true
@@ -204,7 +204,7 @@ ApplicationWindow {
                 }
                 RibbonControlContainer {
                     text: ""
-                    control: SlimRadioButton {
+                    control: RibbonRadioButton {
                         ButtonGroup.group: styleGroup
                         text: qsTr("wps style")
                         onToggled: if (checked) {
@@ -215,7 +215,7 @@ ApplicationWindow {
                 }
                 RibbonControlContainer {
                     text: ""
-                    control: SlimRadioButton {
+                    control: RibbonRadioButton {
                         ButtonGroup.group: styleGroup
                         text: qsTr("office 2 row")
                         onToggled: if (checked) {
@@ -226,7 +226,7 @@ ApplicationWindow {
                 }
                 RibbonControlContainer {
                     text: ""
-                    control: SlimRadioButton {
+                    control: RibbonRadioButton {
                         ButtonGroup.group: styleGroup
                         text: qsTr("wps 2 row")
                         onToggled: if (checked) {
@@ -237,7 +237,7 @@ ApplicationWindow {
                 }
                 RibbonControlContainer {
                     text: ""
-                    control: SlimRadioButton {
+                    control: RibbonRadioButton {
                         ButtonGroup.group: styleGroup
                         text: qsTr("loose single row")
                         onToggled: if (checked) {
@@ -248,7 +248,7 @@ ApplicationWindow {
                 }
                 RibbonControlContainer {
                     text: ""
-                    control: SlimRadioButton {
+                    control: RibbonRadioButton {
                         ButtonGroup.group: styleGroup
                         text: qsTr("compact single row")
                         onToggled: if (checked) {
@@ -262,7 +262,7 @@ ApplicationWindow {
 
                 RibbonControlContainer {
                     text: "Theme:"
-                    control: SlimComboBox {
+                    control: RibbonComboBox {
                         // index maps onto the RibbonEnums::Theme values below
                         property var themeValues: [
                             Ribbon.RibbonThemeWindows7,
@@ -335,7 +335,7 @@ ApplicationWindow {
                 // rebuilds the metrics and relayouts every host
                 RibbonControlContainer {
                     text: qsTr("Font:")
-                    control: SlimComboBox {
+                    control: RibbonComboBox {
                         id: fontFamilyCombo
                         model: RibbonMetrics.commonFontFamilies()
                         onActivated: {
@@ -355,7 +355,7 @@ ApplicationWindow {
                 // inside the free strip (left/center/right)
                 RibbonControlContainer {
                     text: qsTr("Align:")
-                    control: SlimComboBox {
+                    control: RibbonComboBox {
                         model: [ qsTr("Left"), qsTr("Center"), qsTr("Right") ]
                         currentIndex: 0
                         onActivated: function(index) {
@@ -600,7 +600,7 @@ ApplicationWindow {
                     text: "ComboBox:"
                     iconSource: "qrc:/icon/icon/setText.svg"
                     proportion: Ribbon.Small
-                    control: SlimComboBox {
+                    control: RibbonComboBox {
                         editable: true
                         model: [
                             "testItem 1", "testItem 2", "testItem 3", "testItem 4", "testItem 5",
@@ -612,7 +612,7 @@ ApplicationWindow {
                 RibbonControlContainer {
                     text: "ComboBox2:"
                     proportion: Ribbon.Small
-                    control: SlimComboBox {
+                    control: RibbonComboBox {
                         model: [ "option 1", "option 2", "option 3" ]
                         onActivated: log(qsTr("ComboBox2 selected: %1").arg(currentText))
                     }
@@ -620,7 +620,7 @@ ApplicationWindow {
                 RibbonControlContainer {
                     text: "Line Edit:"
                     proportion: Ribbon.Small
-                    control: TextField {
+                    control: RibbonTextField {
                         placeholderText: qsTr("type and press Enter")
                         onEditingFinished: log(qsTr("Line Edit: %1").arg(text))
                     }
@@ -628,7 +628,7 @@ ApplicationWindow {
                 RibbonControlContainer {
                     text: "CheckBox:"
                     proportion: Ribbon.Small
-                    control: SlimCheckBox {
+                    control: RibbonCheckBox {
                         // Controls' toggled() has no parameter: `checked` is
                         // the property, not an injected argument (see the
                         // style radios' note above)
@@ -642,7 +642,7 @@ ApplicationWindow {
                     // is carved out of the container, the control keeps its width
                     suffixText: "px"
                     proportion: Ribbon.Small
-                    control: SpinBox {
+                    control: RibbonSpinBox {
                         onValueModified: log(qsTr("SpinBox value: %1").arg(value))
                     }
                 }
@@ -989,13 +989,13 @@ ApplicationWindow {
 
                     RibbonControlContainer {
                         text: "spinbox:"
-                        control: SpinBox {
+                        control: RibbonSpinBox {
                             onValueModified: log(qsTr("context spinbox: %1").arg(value))
                         }
                     }
                     RibbonControlContainer {
                         text: "linedit:"
-                        control: TextField {
+                        control: RibbonTextField {
                             placeholderText: qsTr("context line edit")
                             onEditingFinished: log(qsTr("context line edit: %1").arg(text))
                         }

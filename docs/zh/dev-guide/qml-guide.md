@@ -38,6 +38,11 @@ engine.load(QUrl("qrc:///main.qml"));
 | `RibbonPanel` | 类型 | panel 结构宿主（驱动 PanelLayoutEngine，子项注册已泛化为任意 `RibbonLayoutItemHost`） |
 | `RibbonToolButton` | 类型 | 按钮宿主（text/iconSource/proportion/checkable/**popupMode 三模式**/menuItems 菜单/禁用态） |
 | `RibbonControlContainer` | 类型 | 控件容器宿主（`control` 属性嵌入任意 QQuickItem：ComboBox/CheckBox/SpinBox/TextField…，对标 widgets SARibbonCtrlContainer） |
+| `RibbonCheckBox` | 类型（纯 QML） | 紧凑主题化复选框（14px 指示器，`indicatorSide` 可调；URL 注册，无 C++ 宿主） |
+| `RibbonRadioButton` | 类型（纯 QML） | 紧凑主题化单选钮（14px 圆环；互斥用 Controls2 `ButtonGroup` 附加属性，对应 widgets QButtonGroup） |
+| `RibbonComboBox` | 类型（纯 QML） | 紧凑主题化下拉框（弹出列表同走主题 token，暗色主题不穿帮；`editable`/`model`/`textRole` 等原生属性全继承） |
+| `RibbonSpinBox` | 类型（纯 QML） | 紧凑主题化数字框（Windows 风格右侧上下步进钮；`from`/`to`/`stepSize`/`prefix`/`suffix` 等原生属性全继承） |
+| `RibbonTextField` | 类型（纯 QML） | 紧凑主题化单行编辑框（`placeholderText`/`validator` 等原生属性全继承） |
 | `RibbonMenuItem` | 类型 | 声明式菜单项（text/iconSource/enabled/separator），挂到按钮的 `menuItems` |
 | `RibbonContextCategory` | 类型 | 上下文标签宿主（contextTitle/contextColor/active；激活时 bar 追加着色 tab 并发布色带，对标 widgets SARibbonContextCategory） |
 | `RibbonGallery` | 类型 | 画廊宿主（Large 比例 + 水平伸展 + stretchFactor 参与 core 引擎加权分配；网格度量经 core `calcGalleryGridCellSize`） |
@@ -61,6 +66,40 @@ engine.load(QUrl("qrc:///main.qml"));
   （`SARibbonAbstractLayoutItem`）。基类已实现 isHidden/applyGeometry/debugName/
   expandingDirections 默认与大行高上下文传递；子类只补 `sizeHint()`（画廊类再加
   stretchFactor）。`RibbonPanel` 经 `qobject_cast<RibbonLayoutItemHost*>` 泛化收录子项。
+
+## 基础输入控件（URL 注册的纯 QML 类型）
+
+`RibbonCheckBox` / `RibbonRadioButton` / `RibbonComboBox` / `RibbonSpinBox` /
+`RibbonTextField` 是**纯 QML 文档**，经 `qmlRegisterType(QUrl("qrc:/SARibbon/RibbonXxx.qml"))`
+注册进模块（命令式单轨的自然延伸，仍无 qmldir/qmltypes 安装物）。它们**没有 C++ 宿主**：
+嵌入面板时几何权威属于 `RibbonControlContainer`（拉伸到行高、压缩 padding），
+自身只负责渲染。视觉对齐 widgets QSS 对 `SARibbonPanel > Q{CheckBox,RadioButton,ComboBox,LineEdit}`
+的特化（1px inputBorder 边框、hover 转 inputFocus、selectionBg 选区），
+弹出列表同样走主题 token。颜色全部绑定 `RibbonTheme`，字号绑定
+`RibbonMetrics.fontPointSize`（面板行高随 ribbon 字体变，文字同步变）。
+根类型是 `QtQuick.Templates` 的模板类（非样式化控件），外观不随应用的
+`QQuickStyle` 变化——这五个文件本身就是"样式实现"。
+
+```qml
+RibbonPanel {
+    panelTitle: "widget test"
+    RibbonControlContainer { text: "Check:"; control: RibbonCheckBox { } }
+    RibbonControlContainer { text: "Spin:"; suffixText: "px";
+        control: RibbonSpinBox { from: 0; to: 100; value: 12 } }
+    RibbonControlContainer { text: "Font:";
+        control: RibbonComboBox { model: [ "a", "b" ] } }
+    RibbonControlContainer { control: RibbonRadioButton { text: "pick me" } }
+    RibbonControlContainer { control: RibbonTextField { placeholderText: "type" } }
+}
+```
+
+- 额外属性只有 `RibbonCheckBox/RadioButton` 的 `indicatorSide`（默认 14，指示器边长）；
+  其余能力全部继承原生 Controls 属性（`editable`/`model`/`currentIndex`/`from`/`to`/
+  `stepSize`/`placeholderText`/`validator`……）。
+- 也可脱离 ribbon 面板独立使用（就是普通 Controls 控件）。
+- 单选互斥：`ButtonGroup { id: g }` + `RibbonRadioButton { ButtonGroup.group: g }`。
+- Canvas 型指示器（箭头）颜色依赖主题 token，必须遵守"颜色变化触发 `requestPaint`"
+  的叶子重绘规则，否则换主题后箭头颜色滞留。
 
 ## 按钮弹出模式
 
