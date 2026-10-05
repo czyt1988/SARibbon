@@ -55,7 +55,7 @@ first engine; a second engine gets nullptr (verified against Qt 5.14/6.7 sources
 | `RibbonSeparator` | type | panel separator (Large proportion, own column, 1px line; widgets SARibbonSeparatorWidget counterpart) |
 | `RibbonQuickAccessBar` | type | quick access bar (small-button row on the title row after the app button; width feeds TitleRectInput.hasQuickAccessBar; widgets SARibbonQuickAccessBar counterpart) |
 | `RibbonButtonGroup` | type | right button group (small-button row right-aligned before the system strip; widgets SARibbonButtonGroupWidget counterpart) |
-| `RibbonApplicationWindow` | type | application window (custom panel behind the app button; Esc/outside click close, inner close() programmatic; click priority: window > menu > signal; widgets ApplicationWidget counterpart) |
+| `RibbonApplicationWindow` | type | application window (office-backstage overlay behind the app button: coverageRatio coverage + slide/fade animation + top-right cross/Esc/outside click close, inner close() programmatic; click priority: window > menu > signal; widgets ApplicationWidget counterpart) |
 | `Ribbon` | uncreatable | enum holder (`Ribbon.Large` / `Ribbon.ThreeRowMode` / `Ribbon.MenuButtonPopup` / `Ribbon.RibbonStyleCompactTwoRow` / ...) |
 
 Access enums through the `Ribbon.` prefix (e.g. `proportion: Ribbon.Large`).
@@ -214,10 +214,21 @@ RibbonBar { ribbonStyle: Ribbon.RibbonStyleCompactTwoRow }
 - **Application button, three modes** (click priority: application window >
   menu > signal only):
   - `RibbonApplicationWindow` (widgets ApplicationWidget parity): a custom
-    content panel declared as a bar child; the leaf hosts it through a lazy
-    Popup (external `contentItem` injection); Esc / outside click close; the
-    inner `close()` routes closeRequested -> bar ->
-    requestApplicationWindowClose -> the leaf popup.
+    content item declared as a bar child; the leaf hosts it through a lazy
+    Popup presented as an **office-backstage overlay** — anchored on the
+    window's `Overlay.overlay`, covering the window by `coverageRatio`
+    (0.05..1.0; 1.0 fullscreen, 2/3 or any custom fraction), full height,
+    with a selectable slide/fade enter/exit animation (`animation` +
+    `animationDuration`). The content is **explicitly reparented into the
+    popup's contentItem at aboutToShow** — assigning `Popup.contentItem`
+    directly does NOT adopt an item that already has a visual parent
+    (QQuickControl only adopts parentless items; the content kept rendering
+    bare inside the bar — the "no background" bug). Esc / outside click /
+    the top-right cross (`showCloseButton`, mandated for fullscreen
+    coverage) close it; the inner `close()` routes closeRequested -> bar ->
+    requestApplicationWindowClose -> the leaf popup. The visual reparent
+    moves only the parentItem; the bar keeps the registration while the
+    QObject parent stays.
   - `applicationMenuItems` + `applicationMenuTriggered` (widgets menu-mode
     parity): **the popup must be created lazily** — the bar leaf is created
     during the bar's componentComplete (the scene window is not realized

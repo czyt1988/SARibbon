@@ -947,6 +947,16 @@ void RibbonBar::itemChange(ItemChange change, const ItemChangeData& data)
                 mApplicationWindow = aw;
                 // inner-content close() routes to the leaf popup
                 connect(aw, &RibbonApplicationWindow::closeRequested, this, [this]() { requestApplicationWindowClose(); });
+                // the leaf reparents the item VISUALLY into its overlay
+                // presentation on open (QML parent assignment moves only the
+                // parentItem, the QObject parent stays the bar); destruction
+                // is the only event that must revoke the registration
+                connect(aw, &QObject::destroyed, this, [this, aw]() {
+                    if (mApplicationWindow == aw) {
+                        mApplicationWindow = nullptr;
+                        Q_EMIT applicationWindowChanged();
+                    }
+                });
                 Q_EMIT applicationWindowChanged();
             }
         }
@@ -966,8 +976,14 @@ void RibbonBar::itemChange(ItemChange change, const ItemChangeData& data)
             mRightButtonGroup = nullptr;
             polish();
         } else if (data.item == mApplicationWindow) {
-            mApplicationWindow = nullptr;
-            Q_EMIT applicationWindowChanged();
+            // a purely visual removal (the leaf's overlay presentation keeps
+            // the QObject parent) must NOT unregister — only a real removal
+            // (Loader teardown, dynamic reparent) does; destruction itself is
+            // covered by the destroyed() hook registered on adoption
+            if (data.item->parent() != this) {
+                mApplicationWindow = nullptr;
+                Q_EMIT applicationWindowChanged();
+            }
         }
     } else if (change == QQuickItem::ItemVisibleHasChanged) {
         polish();

@@ -26,6 +26,7 @@
 #include <SARibbonQml/SARibbonQmlGalleryGroup.h>
 #include <SARibbonQml/SARibbonQmlGalleryItem.h>
 #include <SARibbonQml/SARibbonQmlMenuItem.h>
+#include <SARibbonQml/SARibbonQmlApplicationWindow.h>
 #include <SARibbonQml/SARibbonQmlBar.h>
 #include <SARibbonQml/SARibbonQmlWindowAgent.h>
 #include "../common/RibbonConformance.h"
@@ -2256,9 +2257,13 @@ Item {
 /**
  * @brief Application window (widgets ApplicationWidget mode)
  * @details A RibbonApplicationWindow declared as a bar child takes priority
- *          over the application menu: the app button click shows it in a
- *          popup below the button (Esc / outside click close), and the inner
- *          close() invokable routes back through the bar to shut the popup.
+ *          over the application menu: the app button click opens it as an
+ *          office-backstage overlay — a popup covering the whole window
+ *          (coverageRatio) whose content is the declared item reparented
+ *          into the popup's content host (the direct contentItem assignment
+ *          cannot adopt an item that already has a visual parent, which was
+ *          the no-background bug), with a close cross, Esc, outside-click
+ *          and the inner close() invokable all routing back through the bar.
  */
 void TestConformanceQml::applicationWindow()
 {
@@ -2279,6 +2284,7 @@ Item {
         applicationLabel: "File"
         applicationMenuItems: [ RibbonMenuItem { text: "should not open" } ]
         RibbonApplicationWindow {
+            id: appwin
             objectName: "appwin"
             width: 260
             height: 160
@@ -2320,14 +2326,65 @@ Item {
     QCOMPARE(bar->property("applicationWindowItem").value< QQuickItem* >(), appwin);
     QVERIFY(!appwin->property("popupVisible").toBool());
 
+    // ---- presentation defaults on the declared item ----
+    QCOMPARE(appwin->property("coverageRatio").toReal(), qreal(1.0));
+    QVERIFY(appwin->property("showCloseButton").toBool());
+    QCOMPARE(appwin->property("animation").toInt(), int(SARibbonQml::RibbonApplicationWindow::SlideFromLeft));
+    QCOMPARE(appwin->property("animationDuration").toInt(), 250);
+
     // ---- real click on the application button opens the window popup ----
     const QRectF appRect = bar->property("applicationButtonRect").toRectF();
     QVERIFY(appRect.width() > 0);
-    const QPointF center = bar->mapToScene(QPointF(appRect.center()));
-    QTest::mouseClick(view.get(), Qt::LeftButton, Qt::NoModifier, center.toPoint());
+    auto clickAppButton = [&]() {
+        const QPointF center = bar->mapToScene(QPointF(appRect.center()));
+        QTest::mouseClick(view.get(), Qt::LeftButton, Qt::NoModifier, center.toPoint());
+    };
+    clickAppButton();
     QTRY_COMPARE(appwin->property("popupVisible").toBool(), true);
 
+    // ---- the presentation popup covers the whole window (default ratio) ----
+    QObject* popup = rootItem->findChild< QObject* >(QStringLiteral("appWinPopup"));
+    QVERIFY(popup);
+    QCOMPARE(popup->property("parent").value< QQuickItem* >()->metaObject()->className(), "QQuickOverlay");
+    QTRY_COMPARE(popup->property("width").toReal(), qreal(800));
+    QCOMPARE(popup->property("height").toReal(), qreal(300));
+    // THE no-background fix: the declared item must live inside the popup's
+    // content host (a direct contentItem assignment leaves it in the bar)
+    QQuickItem* contentHost = appwin->parentItem();
+    QVERIFY(contentHost);
+    QCOMPARE(contentHost->objectName(), QStringLiteral("appWinContentHost"));
+    // the mandated exit for fullscreen coverage: the top-right close cross
+    auto* closeButton = rootItem->findChild< QQuickItem* >(QStringLiteral("appWinCloseButton"));
+    QVERIFY(closeButton);
+    QVERIFY(closeButton->isVisible());
+
+    // ---- the close cross really closes ----
+    QTest::qWait(350);  // let the default slide-in settle before clicking
+    const QPointF closeCenter = closeButton->mapToScene(QPointF(closeButton->width() / 2, closeButton->height() / 2));
+    QTest::mouseClick(view.get(), Qt::LeftButton, Qt::NoModifier, closeCenter.toPoint());
+    QTRY_COMPARE(appwin->property("popupVisible").toBool(), false);
+
+    // ---- Esc closes (instant cycles from here on) ----
+    QVERIFY(appwin->setProperty("animation", int(SARibbonQml::RibbonApplicationWindow::NoAnimation)));
+    clickAppButton();
+    QTRY_COMPARE(appwin->property("popupVisible").toBool(), true);
+    QTest::keyClick(view.get(), Qt::Key_Escape);
+    QTRY_COMPARE(appwin->property("popupVisible").toBool(), false);
+
+    // ---- 2/3 coverage: popup shrinks, clicking outside closes ----
+    QVERIFY(appwin->setProperty("coverageRatio", 2.0 / 3.0));
+    clickAppButton();
+    QTRY_COMPARE(appwin->property("popupVisible").toBool(), true);
+    QTRY_COMPARE(popup->property("width").toReal(), 800.0 * 2.0 / 3.0);
+    QCOMPARE(popup->property("height").toReal(), qreal(300));
+    // 700 lies beyond the 533-wide panel: outside press closes (popup rule)
+    QTest::mouseClick(view.get(), Qt::LeftButton, Qt::NoModifier, QPoint(700, 150));
+    QTRY_COMPARE(appwin->property("popupVisible").toBool(), false);
+
     // ---- inner Cancel button closes through the invokable chain ----
+    QVERIFY(appwin->setProperty("coverageRatio", 1.0));
+    clickAppButton();
+    QTRY_COMPARE(appwin->property("popupVisible").toBool(), true);
     auto* cancel = rootItem->findChild< QQuickItem* >(QStringLiteral("cancelBtn"));
     QVERIFY(cancel);
     const QPointF cancelCenter = cancel->mapToScene(QPointF(cancel->width() / 2, cancel->height() / 2));

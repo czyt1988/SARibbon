@@ -216,9 +216,9 @@ public:
     Q_INVOKABLE void activateApplicationMenuItemPath(const QVariantList& indexPath);
 
     // Application window (widgets ApplicationWidget mode): a
-    // RibbonApplicationWindow declared as a child shows below the app
-    // button on click (priority over the menu); close() from inner content
-    // routes through here
+    // RibbonApplicationWindow declared as a child opens as an office-backstage
+    // overlay on click (priority over the menu, coverage/animation follow the
+    // item's properties); close() from inner content routes through here
     QQuickItem* applicationWindowItem() const;
     bool hasApplicationWindow() const;
     Q_INVOKABLE void requestApplicationWindowClose();

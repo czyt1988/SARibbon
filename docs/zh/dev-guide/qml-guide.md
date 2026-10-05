@@ -51,7 +51,7 @@ engine.load(QUrl("qrc:///main.qml"));
 | `RibbonSeparator` | 类型 | 面板分隔符（Large 比例独占一列的 1px 竖线，对标 widgets SARibbonSeparatorWidget） |
 | `RibbonQuickAccessBar` | 类型 | 快速访问栏（标题行应用按钮后的小按钮排，宽度进 core TitleRectInput.hasQuickAccessBar，对标 widgets SARibbonQuickAccessBar） |
 | `RibbonButtonGroup` | 类型 | 右侧按钮组（标题行系统按钮区前右对齐的小按钮排，对标 widgets SARibbonButtonGroupWidget） |
-| `RibbonApplicationWindow` | 类型 | 应用窗口（File 按钮弹出自定义内容面板，Esc/外点关闭，内部 close() 编程式关闭；点击优先级：窗口 > 菜单 > 仅信号，对标 widgets ApplicationWidget） |
+| `RibbonApplicationWindow` | 类型 | 应用窗口（File 按钮弹出的 Office 后台式覆盖层：coverageRatio 覆盖比例 + animation 进出动画 + 右上角 ✕/Esc/外点关闭，内部 close() 编程式关闭；点击优先级：窗口 > 菜单 > 仅信号，对标 widgets ApplicationWidget） |
 | `Ribbon` | 不可实例化 | 枚举持有（`Ribbon.Large` / `Ribbon.ThreeRowMode` / `Ribbon.MenuButtonPopup` / `Ribbon.RibbonStyleCompactTwoRow` / ...） |
 
 枚举一律通过 `Ribbon.` 前缀访问（如 `proportion: Ribbon.Large`），不散进各类型。
@@ -179,9 +179,16 @@ RibbonBar { ribbonStyle: Ribbon.RibbonStyleCompactTwoRow }
   宽度进入 `TitleRectInput.hasQuickAccessBar`。
 - **应用按钮三种模式**（点击优先级：应用窗口 > 菜单 > 仅信号）：
   - `RibbonApplicationWindow`（widgets ApplicationWidget 对等）：声明为 bar
-    子项的自定义内容面板，叶子惰性 Popup 承载（`contentItem` 外部注入），
-    Esc/外点关闭；内部 `close()` 经 closeRequested → bar →
-    requestApplicationWindowClose → 叶子弹层链路。
+    子项的自定义内容项，叶子惰性 Popup 以 **Office 后台式覆盖层**承载——
+    挂在窗口 `Overlay.overlay` 上按 `coverageRatio`（0.05..1.0，1.0 全屏、
+    2/3 或自定义）覆盖窗口、全高、可选滑出/淡入进出动画（`animation` +
+    `animationDuration`）。内容在 `aboutToShow` **显式 reparent 进弹层
+    contentItem**——直接赋值 `Popup.contentItem` 不会收养已有视觉父项的
+    item（QQuickControl 只收养无父项者，内容会留在 bar 里裸渲染，即"无背景
+    融合"bug）。Esc/外点/右上角 ✕（`showCloseButton`，全屏覆盖必备）关闭；
+    内部 `close()` 经 closeRequested → bar → requestApplicationWindowClose →
+    叶子弹层链路。视觉 reparent 只动 parentItem，bar 的登记按 QObject 父项
+    判定存活。
   - `applicationMenuItems` + `applicationMenuTriggered`（widgets 菜单模式）：
     弹出层**必须惰性创建**——bar 叶子在 bar 的 componentComplete 期间创建
     （场景窗口尚未就绪），此时实例化 Popup 会得到一个游离的原生窗口并使

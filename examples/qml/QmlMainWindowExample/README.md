@@ -17,7 +17,7 @@ cmake --build build
 
 | 区域 | 功能 | 对应 widgets |
 |------|------|--------------|
-| 应用按钮 | 自定义应用窗口（列表 + Cancel + Esc 关闭，**点击优先级高于菜单**） | ApplicationWidget 模式 |
+| 应用按钮 | 自定义应用窗口（Office 后台式覆盖层：全屏/2/3/自定义覆盖比例 + 左滑/右滑/淡入/无动画 + 右上角 ✕ 与 Esc 关闭 + 点击外部（部分覆盖时）关闭，**点击优先级高于菜单**） | ApplicationWidget 模式 |
 | 应用按钮 | 菜单模式（test1-3 + 分隔符 + 可勾选项/快捷键文本/多级子菜单，声明 RibbonApplicationWindow 后自动让位） | USE_APPLICATION_NORMAL_MENU |
 | 快速访问栏 | Save/Undo/Redo + InstantPopup 菜单按钮（标题行应用按钮之后，菜单内含二级子菜单）+ Icons/Details 单选对（`exclusive: true`，行宿主实现 QActionGroup 语义） | SARibbonQuickAccessBar |
 | 右侧按钮组 | Help/Visible（系统按钮区前右对齐） | SARibbonButtonGroupWidget |
@@ -27,6 +27,7 @@ cmake --build build
 | ribbon style 面板 | 字体族选择（度量链重建+全局重排）+ 字体增大/减小（应用级度量联动） | QFontComboBox + Larger/Smaller |
 | ribbon style 面板 | RTL 切换（引擎经 saIsRTL 镜像布局） | Switch to RTL |
 | ribbon style 面板 | tab 对齐（左/中/右） | Alignment Center |
+| app window 面板 | 覆盖比例切换（Full/2/3/1/2 自定义）与进出动画切换（左滑/右滑/淡入/无） | 无对应项（widgets 版整窗覆盖、无动画配置） |
 | 类别区 | 内容溢出时自动出现左右滚动箭头（12px 贴边），滚轮横向滚动，箭头/滚轮走 300ms OutQuad 动画（`useAnimatingScroll` 可关，`wheelScrollStep` 可调） | SARibbonCategoryLayout 滚动按钮 |
 | button states 面板 | 大按钮 6 态：Normal/Checked/Disabled（含解锁）/超长文本/超短文本 | 按钮状态演示 |
 | toolbutton style 面板 | 弹出三模式 × 比例混合：MenuButtonPopup（分区命中）/InstantPopup/DelayedPopup（长按）+ checkable 变体 + 禁用带菜单 | SARibbonMenu 演示 |

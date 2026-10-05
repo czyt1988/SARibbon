@@ -820,6 +820,21 @@
 - 已知取舍入档：勾选标记的白色勾线/半选横线为**固定对比色**（同 `RibbonColorNoneMark` 的固定色先例，注释已注明；附带好处是该 Canvas 无需换主题重绘）；`RibbonComboBox` 弹层的 `ScrollIndicator` 用 Controls 原生件（不走主题 token，长列表才出现）。
 - 影响计划：04（新增"基础输入控件"族，原计划外的用户需求；qml-guide 中英文版新增专节与类型清单 5 行；示例 README widget test 行改写、用例数 22→24）；通用（纯 QML 类型的注册范式 = `qmlRegisterType(QUrl)` + qrc，错误只在实例化期暴露，首个测试必须实例化全部新类型；控件类新成员遵守"根用 T.*、颜色绑单例、Canvas 随色重绘"三条铁律）。
 
+### B68：QML 应用窗口无背景根因 + Office 后台式覆盖层重做（第 28 轮）
+
+- 日期：2026-10-06
+- 发现位置：用户报告（QML 示例点击 File 后弹出的窗口"没有背景，和主窗口融合"）
+- **根因（QQuickControl 的收养规则）**：`QQuickControlPrivate::setContentItem_helper` 只在 `if (!item->parentItem())` 时才把赋给 `contentItem` 的 item 挂进控件——而 `RibbonApplicationWindow` 声明为 bar 子项、天然有视觉父项，Qt **从不移动它**。于是旧叶子的 Popup 里只有背景矩形空转（overlay 下方一个空圆角矩形），用户内容继续留在 bar 里裸渲染（透明 QQuickItem 无背景）——正是"弹窗无背景、与主窗口融合"的观测。树 dump 实证：弹层 `QQuickPopupItem` 下只有 background，内容项仍在 `SARibbonQml::RibbonBar` 下 rect(1,1)。
+- **处理（叶子重做为 Office 后台覆盖层）**：Popup 挂 `parent: Overlay.overlay`（窗口坐标系），宽 = 窗宽 × `coverageRatio`、全高；`aboutToShow` **显式 reparent** 内容进弹层 contentItem（弹层收养的正规通道）+ `anchors.fill`；右上角 ✕ 关闭钮（`showCloseButton`，全屏覆盖无外部区域可点、必配）+ Esc + 外点关闭；进出动画 `animation`（NoAnimation/SlideFromLeft/SlideFromRight/Fade，默认左滑 250ms，经 Popup enter/exit Transition）+ `animationDuration`。`RibbonApplicationWindow` 新增四属性 + `Q_ENUM(AnimationEffect)`（纯 QML 前端能力，widgets 侧无此配置，不入 core）。
+- **bar 登记逻辑对视觉 reparent 容忍**：QML `parent` 赋值只动 parentItem 不动 QObject 父项——`ItemChildRemovedChange` 注销分支改为"QObject 父项仍是 bar 才保留登记"，销毁走 `destroyed()` 钩子（带 `aw` 指针守卫防错杀后继者）。
+- **顺带修复（退出动画残留态）**：滑出退出把 popupItem.x 留在 -width/winWidth，Fade 在 Qt<5.15.3 把 opacity 留 0——无过渡重开时 Qt 不重定位（实测重开后 Cancel 按钮 scene x=-750），`aboutToShow` 显式复位 `appWinContentHost.parent.x/opacity`。
+- **测试挖出被旧 bug 掩盖的测试缺陷**：`applicationWindow` 的 QML 引用 `appwin` 但声明处只有 `objectName`、**从未声明 `id:`**。旧实现下该点击落在旧弹层（y=53 起）之外触发 `CloseOnPressOutside` 关层，且内容随即隐藏、handler 根本没跑——ReferenceError 被"外点关闭 + 内容不可达"双重掩盖，18/18 绿是假绿。修复：补 `id: appwin`；新断言组（弹层挂 Overlay/几何=窗宽×比例/内容 parentItem==contentHost——即本 bug 的回归钉/✕ 可见可关/Esc/2/3 外点/Cancel 全链/headless）。
+- 陷阱入档：**从 C++ `QMetaObject::invokeMethod` 调 QML 函数时函数体内的 id 解析会失败**（`callingQmlContext()` 栈上无 QML 帧 → `ReferenceError: <id> is not defined`，新库旧库皆然）——探针/测试驱动 QML 逻辑必须走真实事件（点击/按键）或 QML 侧自查属性，不走 C++ invoke。
+- 证据：`qml_Conformance` **27/28**（`embeddedRibbonBasicControls` 经 stash A/B 在干净 HEAD 同样失败 3/3，环境性，B66/B67 同法；`applicationWindow` 扩展后全绿）；repro harness 树 dump 全状态核验（全屏：弹层 1000x500 + 内容在 contentHost 内 + ✕ z=1000 + 右缘分隔线隐藏；2/3：666.667 宽 + 分隔线可见 + ✕ 随板右移；动画退出后 NoAnimation 重开复位 x=0；✕ 点击关层零 QML 警告）；示例 offscreen 6s 零 QML 错误。本轮只改 src/qml + examples + tests + docs，未动 core/widgets，无需跑 `tools/Amalgamate.sh`。
+- 影响计划：04（应用窗口模式升级为后台覆盖层：覆盖比例/动画/✕ 退出，widgets 功能清单外的新能力；README 与 qml-guide 中英文同步）。
+
+---
+
 ## 执行中追加（模板，勿删）
 
 ```

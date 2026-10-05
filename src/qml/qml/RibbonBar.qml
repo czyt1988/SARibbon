@@ -25,7 +25,7 @@ Rectangle {
     readonly property var bands: cppHost ? cppHost.contextBands : []
     readonly property bool hasAppMenu: cppHost ? cppHost.hasApplicationMenu : false
     readonly property bool hasAppWindow: cppHost ? cppHost.hasApplicationWindow : false
-    readonly property Item appWindowItem: cppHost && cppHost.hasApplicationWindow ? cppHost.applicationWindowItem : null
+    readonly property Item appWindowItem: cppHost ? cppHost.applicationWindowItem : null
     // frameless state mirrors (published by the C++ host on agent changes)
     readonly property bool framelessActive: cppHost ? cppHost.framelessActive : false
     readonly property string windowTitle: cppHost ? cppHost.windowTitle : ""
@@ -243,10 +243,17 @@ Rectangle {
     }
 
     // ---- application window (widgets ApplicationWidget mode) ----
-    // Same lazy-creation rule as the app menu. The user-declared
-    // RibbonApplicationWindow rides in as the popup contentItem; its own
-    // implicit size drives the popup size. Esc / outside click close
-    // (Popup semantics); inner close() routes through the host back here.
+    // Same lazy-creation rule as the app menu. The presentation is an
+    // office-backstage overlay: a popup covering the window (width follows
+    // the declared coverageRatio — 1.0 fullscreen, 2/3, custom; always full
+    // height) with a selectable slide/fade enter/exit animation, closing on
+    // Esc, outside press and the top-right cross. The user-declared
+    // RibbonApplicationWindow rides in as a child of the popup's content
+    // item — reparented explicitly in aboutToShow, because assigning
+    // Popup.contentItem directly does NOT adopt an item that already has a
+    // visual parent (QQuickControl only reparents parentless items, so the
+    // content kept rendering inside the bar with no background behind it —
+    // the no-background bug this presentation fixes).
     Loader {
         id: appWindowLoader
         active: false
@@ -256,20 +263,149 @@ Rectangle {
         id: appWindowComponent
         Popup {
             id: appWinPopup
-            x: root.appRect.x
-            y: root.appRect.y + root.appRect.height
-            width: (root.appWindowItem ? Math.max(root.appWindowItem.implicitWidth, root.appWindowItem.width) : 200) + 2
-            height: (root.appWindowItem ? Math.max(root.appWindowItem.implicitHeight, root.appWindowItem.height) : 200) + 2
-            padding: 1
+            objectName: "appWinPopup"
+
+            // declared window content + presentation knobs (leaf-side
+            // mirrors of the RibbonApplicationWindow properties)
+            readonly property Item appWin: root.appWindowItem
+            readonly property real winWidth: Overlay.overlay ? Overlay.overlay.width : 0
+            readonly property real winHeight: Overlay.overlay ? Overlay.overlay.height : 0
+            readonly property real coverage: appWin ? appWin.coverageRatio : 1.0
+            readonly property int animEffect: appWin ? appWin.animation : RibbonApplicationWindow.NoAnimation
+            readonly property int animDuration: appWin ? appWin.animationDuration : 250
+
+            // window coordinates: parented to the window overlay so x/y and
+            // the coverage sizing address the whole window, not the bar band
+            parent: Overlay.overlay
+            x: 0
+            y: 0
+            width: Math.max(winWidth * coverage, 1)
+            height: winHeight
+            padding: 0
+            focus: true
             closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
+
+            // ---- enter/exit animations, selected by the declared effect ----
+            // the PropertyAction keeps the slides fully opaque even when the
+            // previous session ended on a fade (Qt < 5.15.3 does not restore
+            // opacity/scale after the exit transition)
+            property Transition enterSlideLeft: Transition {
+                PropertyAction { property: "opacity"; value: 1.0 }
+                NumberAnimation { property: "x"; from: -appWinPopup.width; to: 0;
+                                  duration: appWinPopup.animDuration; easing.type: Easing.OutCubic }
+            }
+            property Transition exitSlideLeft: Transition {
+                NumberAnimation { property: "x"; to: -appWinPopup.width;
+                                  duration: appWinPopup.animDuration; easing.type: Easing.InCubic }
+            }
+            property Transition enterSlideRight: Transition {
+                PropertyAction { property: "opacity"; value: 1.0 }
+                NumberAnimation { property: "x"; from: appWinPopup.winWidth; to: 0;
+                                  duration: appWinPopup.animDuration; easing.type: Easing.OutCubic }
+            }
+            property Transition exitSlideRight: Transition {
+                NumberAnimation { property: "x"; to: appWinPopup.winWidth;
+                                  duration: appWinPopup.animDuration; easing.type: Easing.InCubic }
+            }
+            property Transition enterFade: Transition {
+                NumberAnimation { property: "opacity"; from: 0.0; to: 1.0;
+                                  duration: appWinPopup.animDuration; easing.type: Easing.OutQuad }
+            }
+            property Transition exitFade: Transition {
+                NumberAnimation { property: "opacity"; from: 1.0; to: 0.0;
+                                  duration: appWinPopup.animDuration; easing.type: Easing.InQuad }
+            }
+
+            enter: animEffect === RibbonApplicationWindow.SlideFromLeft ? enterSlideLeft
+                 : animEffect === RibbonApplicationWindow.SlideFromRight ? enterSlideRight
+                 : animEffect === RibbonApplicationWindow.Fade ? enterFade
+                 : null
+            exit: animEffect === RibbonApplicationWindow.SlideFromLeft ? exitSlideLeft
+                : animEffect === RibbonApplicationWindow.SlideFromRight ? exitSlideRight
+                : animEffect === RibbonApplicationWindow.Fade ? exitFade
+                : null
+
+            // backstage panel chrome: theme content background; a separating
+            // right edge when the coverage leaves part of the window visible
+            // (fullscreen coverage is flush with the window border)
             background: Rectangle {
                 color: RibbonTheme.contentBg
-                border.color: RibbonTheme.menuBorder
-                radius: 4
+                Rectangle {
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
+                    anchors.right: parent.right
+                    width: 1
+                    visible: appWinPopup.coverage < 1.0
+                    color: RibbonTheme.borderColor
+                }
             }
-            contentItem: root.appWindowItem
-            onOpened: if (root.appWindowItem) root.appWindowItem.popupVisible = true
-            onClosed: if (root.appWindowItem) root.appWindowItem.popupVisible = false
+
+            // declared-content host; the close cross rides above the content
+            // through z (fullscreen coverage has no outside area to click,
+            // so the cross is the mandated exit next to Esc)
+            contentItem: Item {
+                id: appWinContentHost
+                objectName: "appWinContentHost"
+
+                Rectangle {
+                    id: appWinCloseButton
+                    objectName: "appWinCloseButton"
+                    z: 1000
+                    width: 40
+                    height: root.titleBarHeight
+                    anchors.top: parent.top
+                    anchors.right: parent.right
+                    visible: appWin ? appWin.showCloseButton : false
+                    color: appWinCloseMouse.pressed ? RibbonTheme.sysButtonPressed
+                           : (appWinCloseMouse.containsMouse ? RibbonTheme.sysButtonHover : "transparent")
+                    Text {
+                        anchors.centerIn: parent
+                        text: "\u2715"
+                        color: RibbonTheme.textColor
+                        font: RibbonMetrics.font
+                    }
+                    MouseArea {
+                        id: appWinCloseMouse
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        onClicked: appWinPopup.close()
+                    }
+                }
+            }
+
+            onAboutToShow: {
+                // reset whatever a previous exit animation left on the popup
+                // item (slides leave x displaced beyond the window edge,
+                // fades leave opacity down on Qt < 5.15.3; with no enter
+                // transition Qt never repositions, so a leftover would
+                // reopen the panel offscreen)
+                if (appWinContentHost.parent) {
+                    appWinContentHost.parent.x = 0;
+                    appWinContentHost.parent.opacity = 1.0;
+                }
+                // adopt the declared item explicitly (a direct contentItem
+                // assignment cannot — see the note above); the content fills
+                // the host so the coverage geometry drives its size
+                if (root.appWindowItem) {
+                    root.appWindowItem.parent = appWinContentHost;
+                    root.appWindowItem.anchors.fill = appWinContentHost;
+                    root.appWindowItem.popupVisible = true;
+                }
+            }
+            onClosed: {
+                if (root.appWindowItem) {
+                    root.appWindowItem.popupVisible = false;
+                }
+            }
+            Component.onDestruction: {
+                // the declared item is a QObject child of the bar host and
+                // outlives this popup: detach it instead of leaving a visual
+                // parent and anchors pointing into the dying content host
+                if (root.appWindowItem && root.appWindowItem.parent === appWinContentHost) {
+                    root.appWindowItem.anchors.fill = null;
+                    root.appWindowItem.parent = null;
+                }
+            }
         }
     }
     // ---- application menu (shared RibbonMenu leaf) ----
