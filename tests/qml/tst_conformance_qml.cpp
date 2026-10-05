@@ -67,6 +67,7 @@ private Q_SLOTS:
     void embeddedRibbonBasicControls();
     void ribbonBasicControlsThemeAndFont();
     void framelessAgentStripAndTitle();
+    void framelessAgentPanelHitTest();
 
 private:
     QQuickView* exposeScene(QQmlEngine& engine, QQmlComponent& component, const char* src, int w, int h);
@@ -3132,4 +3133,137 @@ Item {
     QVERIFY(bar->setSystemButton(QStringLiteral("maximize"), &dummy));
     QVERIFY(bar->setSystemButton(QStringLiteral("close"), &dummy));
     QVERIFY(!bar->setSystemButton(QStringLiteral("bogus"), &dummy));
+}
+
+/**
+ * \if ENGLISH
+ * @brief Frameless hit-test registration of the panel area
+ * @details Locks down the registration set QWK's native hit test consumes:
+ *          the whole category row (widgets setHitTestVisible(
+ *          ribbonStackedWidget) parity) must be registered, covering every
+ *          panel button; tabs stay registered; the bar's own leaf stays
+ *          unregistered (registering it would kill every draggable blank
+ *          area); and a frameless off/on flip — which rebuilds the QWK
+ *          context — must re-apply the whole set. The direct symptom of a
+ *          missing registration is that QWK resolves the point to
+ *          HTCAPTION: panel buttons then never receive Qt mouse events and
+ *          dragging inside the panel area moves the window.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 面板区域的无边框命中测试注册
+ * @details 锁定 QWK 原生命中测试所消费的注册集合：整个 category 行
+ *          （对位 widgets 的 setHitTestVisible(ribbonStackedWidget)）必须
+ *          注册，覆盖全部 panel 按钮；tab 保持注册；bar 自身叶子保持
+ *          未注册（注册它会杀死全部可拖动空白区）；frameless 关/开切换
+ *          会重建 QWK context，之后必须重新应用整套注册。注册缺失的直接
+ *          症状是 QWK 把该点判为 HTCAPTION：panel 按钮收不到 Qt 鼠标事件，
+ *          在面板区域内拖动会移动整个窗口。
+ * \endif
+ */
+void TestConformanceQml::framelessAgentPanelHitTest()
+{
+    QQmlEngine engine;
+    saRibbonRegisterQmlTypes(&engine);
+
+    QString src = QStringLiteral(R"QML(import QtQuick 2.12
+import SARibbon 3.0
+Item {
+    width: 800
+    height: 300
+    RibbonBar {
+        objectName: "bar"
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        windowAgent: RibbonWindowAgent { objectName: "agent" }
+        RibbonCategory {
+            objectName: "home"
+            title: "Home"
+            RibbonPanel {
+                panelTitle: "P1"
+                RibbonToolButton { objectName: "btn"; text: "A" }
+            }
+        }
+        RibbonContextCategory {
+            objectName: "ctx"
+            contextTitle: "context"
+            contextColor: "#2d7d9a"
+            active: true
+            RibbonCategory {
+                objectName: "ctxPage"
+                title: "Ctx"
+                RibbonPanel { panelTitle: "CP" }
+            }
+        }
+    }
+}
+)QML");
+
+    QQmlComponent component(&engine);
+    std::unique_ptr< QQuickView > view(exposeScene(engine, component, src.toUtf8().constData(), 800, 300));
+    QVERIFY(view);
+    QQuickItem* rootItem = view->rootObject();
+    QVERIFY(rootItem);
+
+    auto* bar = rootItem->findChild< SARibbonQml::RibbonBar* >(QStringLiteral("bar"));
+    QVERIFY(bar);
+    auto* agent = rootItem->findChild< SARibbonQml::RibbonWindowAgent* >(QStringLiteral("agent"));
+    QVERIFY(agent);
+    auto* home = rootItem->findChild< SARibbonQml::RibbonCategory* >(QStringLiteral("home"));
+    QVERIFY(home);
+    auto* ctxPage = rootItem->findChild< SARibbonQml::RibbonCategory* >(QStringLiteral("ctxPage"));
+    QVERIFY(ctxPage);
+    auto* btn = rootItem->findChild< SARibbonQml::RibbonToolButton* >(QStringLiteral("btn"));
+    QVERIFY(btn);
+    QVERIFY(bar->isFramelessActive());
+
+    // ---- the main regression: the category row is registered hit-test
+    // visible, so QWK hands the panel area back to the Qt event domain.
+    // Context pages are registered too — QWK checks item visibility at
+    // hit-test time, so a page is covered whenever it becomes current ----
+    QTRY_VERIFY_WITH_TIMEOUT(agent->isHitTestVisible(home), 5000);
+    QTRY_VERIFY_WITH_TIMEOUT(agent->isHitTestVisible(ctxPage), 5000);
+
+    // ---- registration geometry actually covers the panel controls ----
+    const QRectF homeRect(home->mapToScene(QPointF(0, 0)), home->size());
+    QVERIFY2(homeRect.width() > 0 && homeRect.height() > 0, "category scene rect must be valid");
+    const QRectF btnRect(btn->mapToScene(QPointF(0, 0)), btn->size());
+    QVERIFY2(homeRect.contains(btnRect),
+             "registered category rect must cover the panel button");
+
+    // ---- tabs stay registered (auto tab included; relayout keeps the set
+    // in step with the effective row) ----
+    QQuickItem* tabItem = nullptr;
+    for (int i = 0; i < 250 && !tabItem; ++i) {
+        for (QQuickItem* item : rootItem->findChildren< QQuickItem* >()) {
+            if (QString::fromLatin1(item->metaObject()->className())
+                == QLatin1String("SARibbonQml::RibbonTab")) {
+                tabItem = item;
+                break;
+            }
+        }
+        if (!tabItem) {
+            QTest::qWait(20);  // auto tabs appear after the first relayout
+        }
+    }
+    QVERIFY2(tabItem, "tab host must exist after relayout");
+    QTRY_VERIFY_WITH_TIMEOUT(agent->isHitTestVisible(tabItem), 5000);
+
+    // ---- the bar's own leaf stays UNREGISTERED: QWK exempts a registered
+    // item's whole geometry and the leaf spans the entire bar — registering
+    // it would kill every draggable blank area (appendix-A lesson) ----
+    QVERIFY(!agent->isHitTestVisible(bar->qmlLeaf()));
+
+    // ---- agent lifecycle: a frameless off/on flip rebuilds the QWK context
+    // (setup() re-applies only the title bar item), so the bar must re-sync
+    // the registrations afterwards — not only the categories but the tabs
+    // as well ----
+    agent->setFramelessEnabled(false);
+    QVERIFY(!agent->isHitTestVisible(home));
+    agent->setFramelessEnabled(true);
+    QTRY_VERIFY_WITH_TIMEOUT(bar->isFramelessActive(), 5000);
+    QTRY_VERIFY_WITH_TIMEOUT(agent->isHitTestVisible(home), 5000);
+    QTRY_VERIFY_WITH_TIMEOUT(agent->isHitTestVisible(ctxPage), 5000);
+    QTRY_VERIFY_WITH_TIMEOUT(agent->isHitTestVisible(tabItem), 5000);
 }

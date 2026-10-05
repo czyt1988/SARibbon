@@ -80,6 +80,10 @@ public:
     // (widgets setFramelessHitTestVisible parity)
     Q_INVOKABLE void setHitTestVisible(QQuickItem* item, bool visible = true);
 
+    // Whether the item is registered with the frameless hit test (QWK
+    // isHitTestVisible parity; false while the agent is detached or disabled)
+    Q_INVOKABLE bool isHitTestVisible(QQuickItem* item) const;
+
     // Native dark-mode attribute for the window (QWK "dark-mode" attribute);
     // keeps the DWM frame and caption consistent with RibbonTheme
     Q_INVOKABLE void setDarkMode(bool on);

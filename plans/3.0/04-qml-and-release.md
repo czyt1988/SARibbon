@@ -467,10 +467,16 @@ SARibbonQml 库内（与 widgets 的 `SARibbonMainWindow` 对称，v2 §5.5 的"
 - **RibbonBar 集成（SARibbonQmlBar）**：QML 声明 `windowAgent: RibbonWindowAgent { }`
   即全自动接线——bar 自任 titleBar（widgets `helper->setTitleBar(ribbon)` 对位）、
   `systemButtonStripWidth` 自动同步预留、窗口标题镜像到 `windowTitle` 属性、
-  `syncHitTestVisible()` 把 tabs/quickAccess/rightGroup 及叶子内交互区
-  （objectName `sysButtonRow`/`appButtonArea`）注册回 Qt 事件域。注意教训：
+  `syncHitTestVisible()` 把 tabs/全部 category 页（含上下文页，对位 widgets
+  `setHitTestVisible(ribbonStackedWidget)`）/quickAccess/rightGroup 及叶子内交互区
+  （objectName `sysButtonRow`/`appButtonArea`）注册回 Qt 事件域。两条教训：
   **不能把整片 bar 叶子注册为 hit-test visible**（QWK 按 item 几何整片豁免，
-  会杀死全部拖动区）——只注册具体交互控件，widgets 同款粒度。
+  会杀死全部拖动区）——只注册具体交互控件，widgets 同款粒度；**category 行必须
+  整片注册**——漏掉它时 QWK 把整个 panel 区域判为 HTCAPTION，panel 按钮收不到
+  Qt 鼠标事件、在面板区拖动会移动整个窗口（tab 可点而按钮不可点即此症状）。
+  另：agent 生命周期变化（frameless 关/开、换窗）会销毁重建 QWK context 且
+  `setup()` 只重放 titleBar，注册集合不随之存活——bar 必须在 `windowChanged`
+  后重放整套注册（`setHitTestVisible` 的幂等插入让重放无副作用）。
 - **视觉叶子（qml/RibbonBar.qml + RibbonWindowButtonRow.qml）**：标题文本绘制在
   core `layoutTitleRect` 的标题自由区（`paintWindowTitle` 对位）；系统按钮行由
   Loader 按需创建（framelessActive 时），min/max/close 三键、Canvas 矢量字形、
@@ -483,7 +489,9 @@ SARibbonQml 库内（与 widgets 的 `SARibbonMainWindow` 对称，v2 §5.5 的"
   最大化/还原/关闭全部通过，DWM 阴影保留（WS_CAPTION 位保留 + NCCALCSIZE 路线，
   客户区 == 窗口矩形）。
 - 测试：`tst_conformance_qml::framelessAgentStripAndTitle`（offscreen 可跑：QWK 的
-  Qt 层钩子对 offscreen QQuickWindow 一样生效）覆盖预留宽度/标题镜像/系统按钮注册。
+  Qt 层钩子对 offscreen QQuickWindow 一样生效）覆盖预留宽度/标题镜像/系统按钮注册；
+  `framelessAgentPanelHitTest` 覆盖 category 行注册（含上下文页）、注册几何覆盖
+  panel 按钮、bar 叶子保持未注册（拖动区保全）、frameless 关/开后整套注册重放。
 
 原第2轮评审的参考记录（保留供考古）：QWK 的暴露形态是普通注册类型 + 显式 setup
 （`qmlRegisterType<QuickWindowAgent>` / `WindowAgent { }` / `windowAgent.setup(window)`），

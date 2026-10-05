@@ -272,6 +272,10 @@ void RibbonBar::setWindowAgent(RibbonWindowAgent* agent)
             if (mWindowAgent && mWindowAgent->window()) {
                 setWindowTitle(mWindowAgent->window()->title());
             }
+            // setup() rebuilds the QWK context and re-applies only the title
+            // bar item — the hit-test registration set does not survive the
+            // recreation, so re-apply it here (no-op while detached/disabled)
+            syncHitTestVisible();
         });
         connect(mWindowAgent, &QObject::destroyed, this, [this]() {
             mWindowAgent = nullptr;
@@ -1082,6 +1086,8 @@ void RibbonBar::attachWindowAgent()
         // receive Qt mouse events again (widgets setHitTestVisible calls in
         // SARibbonMainWindow::setRibbonBar parity). Registered below:
         //   - tabs (relayout registers each effective tab)
+        //   - every category page, main row and context pages alike (the
+        //     panel area; widgets ribbonStackedWidget parity)
         //   - quick access bar / right button group (title row hosts)
         //   - application button (the leaf rect is interactive)
         //   - the leaf's system button row (RibbonWindowButtonRow)
@@ -1133,6 +1139,22 @@ void RibbonBar::syncHitTestVisible()
     for (RibbonTab* tab : effectiveTabs()) {
         if (tab) {
             mWindowAgent->setHitTestVisible(tab);
+        }
+    }
+    // the whole category row is client area (widgets setHitTestVisible(
+    // ribbonStackedWidget) parity): every category page — main row and
+    // context pages alike — is registered wholesale, which hands panels,
+    // galleries and all their controls back to the Qt event domain. QWK
+    // checks item visibility at hit-test time, so pages register once and
+    // are covered whenever they become the current page. Blank spaces in
+    // the category row are NOT draggable, exactly like the widgets module
+    // (and Office, where the ribbon body does not move the window)
+    for (RibbonCategory* cat : mCategories) {
+        mWindowAgent->setHitTestVisible(cat);
+    }
+    for (RibbonContextCategory* ctx : mContexts) {
+        for (RibbonCategory* page : ctx->categories()) {
+            mWindowAgent->setHitTestVisible(page);
         }
     }
     if (mQuickAccessBar) {

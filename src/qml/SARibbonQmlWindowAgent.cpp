@@ -144,6 +144,14 @@ void RibbonWindowAgent::setHitTestVisible(QQuickItem* item, bool visible)
     mAgent->setHitTestVisible(item, visible);
 }
 
+bool RibbonWindowAgent::isHitTestVisible(QQuickItem* item) const
+{
+    if (!item || !mWindow || !mFramelessEnabled) {
+        return false;
+    }
+    return mAgent->isHitTestVisible(item);
+}
+
 void RibbonWindowAgent::setDarkMode(bool on)
 {
     if (!mWindow || !mFramelessEnabled) {
