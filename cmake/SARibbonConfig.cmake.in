@@ -7,8 +7,26 @@ if(@SARIBBON_BUILD_WIDGETS@)
     find_dependency(Qt@QT_VERSION_MAJOR@ COMPONENTS Widgets Svg REQUIRED)
 endif()
 if(@SARIBBON_BUILD_QML@)
-    # 命令式单轨下 Qml 组件只需 Quick/Qml——无任何 qmldir/qmltypes 安装物
-    find_dependency(Qt@QT_VERSION_MAJOR@ COMPONENTS Qml Quick REQUIRED)
+    # 命令式单轨下 Qml 组件需要 Quick/Qml/QuickControls2——无任何 qmldir/qmltypes 安装物
+    find_dependency(Qt@QT_VERSION_MAJOR@ COMPONENTS Qml Quick QuickControls2 REQUIRED)
+endif()
+# frameless：SARibbon::Widgets 链接 QWindowKit::Widgets；SARibbonQml 强制
+# 开启 frameless 并链接 QWindowKit::Quick（导出 target 的 INTERFACE_LINK_LIBRARIES
+# 引用了这些名字，消费端必须先找到 QWindowKit）
+set(_saribbon_qwk_components)
+if(@_SARIBBON_USE_FRAMELESS_LIB@)
+    list(APPEND _saribbon_qwk_components Widgets)
+endif()
+if(@SARIBBON_BUILD_QML@)
+    list(APPEND _saribbon_qwk_components Quick)
+endif()
+if(_saribbon_qwk_components)
+    # 本地安装布局：QWindowKit 与 SARibbon 同前缀安装（bin_qtX 编译器隔离目录），
+    # 用户未显式指定 QWindowKit_DIR 时补一个同前缀查找提示
+    if(NOT QWindowKit_DIR AND EXISTS "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@/cmake/QWindowKit")
+        set(QWindowKit_DIR "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@/cmake/QWindowKit")
+    endif()
+    find_dependency(QWindowKit REQUIRED ${_saribbon_qwk_components})
 endif()
 include("${CMAKE_CURRENT_LIST_DIR}/SARibbonTargets.cmake")
 # 组件语义：COMPONENTS Core/Widgets/Qml 映射到 target 存在性

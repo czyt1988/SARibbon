@@ -21,6 +21,18 @@
         "qwindowkit"
       ]
     },
+    "qml": {
+      "description": "Build the SARibbonQml module (QML front end, frameless via QWindowKit Quick)",
+      "dependencies": [
+        "qtdeclarative",
+        {
+          "name": "saribbonbar",
+          "features": [
+            "frameless"
+          ]
+        }
+      ]
+    },
     "svg": {
       "description": "Enable SVG icon rendering support via Qt SVG module",
       "dependencies": [

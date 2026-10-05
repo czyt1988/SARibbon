@@ -3,6 +3,13 @@
 # component-based SARibbon package. Remove after one release cycle (plan 03).
 include(CMakeFindDependencyMacro)
 find_dependency(Qt@QT_VERSION_MAJOR@ COMPONENTS Core Gui Widgets Svg REQUIRED)
+# frameless：转发目标 SARibbon::Widgets 链接 QWindowKit::Widgets，消费端须先找到它
+if(@_SARIBBON_USE_FRAMELESS_LIB@)
+    if(NOT QWindowKit_DIR AND EXISTS "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@/cmake/QWindowKit")
+        set(QWindowKit_DIR "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@/cmake/QWindowKit")
+    endif()
+    find_dependency(QWindowKit REQUIRED Widgets)
+endif()
 include("${CMAKE_CURRENT_LIST_DIR}/../SARibbon/SARibbonTargets.cmake")
 if(NOT TARGET SARibbonBar::SARibbonBar)
     add_library(SARibbonBar::SARibbonBar INTERFACE IMPORTED)

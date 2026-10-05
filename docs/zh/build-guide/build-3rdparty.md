@@ -4,12 +4,15 @@
 - **多IDE支持**：Qt Creator、Visual Studio和命令行三种编译方式
 - **跨平台编译**：覆盖 Windows、Linux (Ubuntu/Debian) 和 macOS
 - **自动本地安装**：编译后自动安装到与SARibbon一致的版本隔离目录
+- **默认含Quick组件**：SARibbonQml（QML模式）所需，`QWK_BUILD_QUICK`默认`ON`
 
 !!! warning "注意"
     如果不开启QWindowkit,可以跳过此文档。
 
 !!! tip "提示"
     QWindowkit提供了更好的无边框方案，能适配操作系统原生的交互，能支持多屏幕多分辨率的移动。
+
+    `SARIBBON_BUILD_QML=ON`（QML模式）**必须**使用QWindowKit：其Quick组件（`QWKQuick`库）是SARibbonQml无边框方案的依赖。`3rdparty/CMakeLists.txt`默认开启`QWK_BUILD_QUICK=ON`，按本文流程编译安装即可；若无需QML模块，可通过 `-DQWK_BUILD_QUICK=OFF` 跳过Quick组件以缩短编译时间。
 
 ## 选择编译方式
 
@@ -312,6 +315,13 @@ QWindowKitTargets-release.cmake
 cmake -S . -B build -DSARIBBON_USE_FRAMELESS_LIB=ON
 
 # 如果 CMake 配置阶段未报 QWindowKit 相关错误，说明安装成功
+```
+
+QML 模式（`SARIBBON_BUILD_QML=ON`）的验证方式相同，且配置阶段会额外检查
+`QWindowKit::Quick` target 是否存在（即 Quick 组件是否已随本次安装一起构建）：
+
+```shell
+cmake -S . -B build -DSARIBBON_BUILD_QML=ON
 ```
 
 如果 CMake 仍然找不到 QWindowKit，手动指定路径：

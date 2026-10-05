@@ -18,9 +18,16 @@
 | `SARIBBON_BUILD_STATIC_LIBS` | `OFF`                                   | 控制SARibbon库的构建模式，`ON`为静态库，`OFF`为动态库               | 静态库模式下强制`BUILD_SHARED_LIBS=OFF`，动态库模式下强制`BUILD_SHARED_LIBS=ON`          |
 | `SARIBBON_BUILD_EXAMPLES`   | `ON`                                    | 控制是否构建`example`目录下的示例程序（如`MainWindowExample`等）     | 关闭可加快编译速度，仅编译库本身                                                         |
 | `SARIBBON_USE_FRAMELESS_LIB` | `OFF`                                   | 是否使用`QWindowKit`库作为无边框窗口解决方案                         | 需Qt 5.14+、Qt 6.2+版本；启用后强制使用C++17标准，依赖`QWindowKit`库                     |
+| `SARIBBON_BUILD_QML`        | `OFF`                                   | 是否构建SARibbonQml模块（QML前端）                                   | `ON`时自动强制`SARIBBON_USE_FRAMELESS_LIB=ON`：QML模式没有本地化无边框回退，必须使用`QWindowKit`（其Quick组件需已构建，见[build-3rdparty.md](build-3rdparty.md)）；Qt版本或QWindowKit不满足时配置直接失败 |
 | `SARIBBON_ENABLE_SNAPLAYOUT` | `OFF`                                   | 是否启用Windows 11的Snap Layout（窗口磁吸布局）效果                  | 仅当`SARIBBON_USE_FRAMELESS_LIB=ON`时有效，不同Qt版本可能存在兼容性问题                   |
 | `SARIBBON_INSTALL_IN_CURRENT_DIR` | Windows为`ON`，其他系统为`OFF` | 控制库的安装路径，`ON`安装到项目根目录下的版本区分文件夹，`OFF`使用系统默认路径 | 本地安装文件夹命名格式：`bin_qt<Qt版本>_<编译器>_x<架构>`（如`bin_qt5.14.2_msvc_x64`） |
 | `BUILD_TESTS` | `OFF` | 控制是否构建单元测试（tests目录下的Qt Test框架测试） | 需设置`BUILD_TESTS=ON`并确保测试依赖可用 |
+
+!!! tip "注意"
+    QML 模式与 QWindowKit 的绑定：
+    - `SARIBBON_BUILD_QML=ON` 时，`SARIBBON_USE_FRAMELESS_LIB` 会被自动强制开启（即使显式设为 `OFF`）
+    - QWindowKit 安装必须包含 Quick 组件：`3rdparty/CMakeLists.txt` 的 `QWK_BUILD_QUICK` 选项默认为 `ON`，无需额外操作；如曾手动关闭请重新开启并重装
+    - QWindowKit 缺失、Qt 版本过低时，CMake 配置阶段直接报错（不会静默降级到本地化无边框方案）
 
 !!! tip "注意"
     Qt 版本兼容性：

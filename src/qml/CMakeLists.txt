@@ -2,6 +2,10 @@
 find_package(Qt${QT_VERSION_MAJOR} ${SARIBBON_MIN_QT_VERSION} REQUIRED
     COMPONENTS Core Gui Qml Quick QuickControls2)
 
+# QML 模块的无边框窗口方案绑定 QWindowKit（QuickWindowAgent 路线）：
+# 根 CMakeLists 已保证 _SARIBBON_USE_FRAMELESS_LIB 与 QWindowKit::Quick 存在
+find_package(QWindowKit REQUIRED COMPONENTS Quick)
+
 sa_add_library(SARibbonQml
     SOURCES
         SARibbonQmlGlobal.h
@@ -64,6 +68,6 @@ sa_add_library(SARibbonQml
         qml/saribbon_qml.qrc
     PREFIX SA_RIBBON_QML
     QT_LINKS Core Gui Quick Qml QuickControls2
-    LINKS SARibbonCore
+    LINKS SARibbonCore QWindowKit::Quick
 )
 sa_sync_include(SARibbonQml SARibbonQml)

@@ -50,6 +50,21 @@ if(VCPKG_TOOLCHAIN)
         set(SARIBBON_USE_FRAMELESS_LIB ON CACHE BOOL "Auto-enabled by vcpkg frameless feature" FORCE)
         message(STATUS "  vcpkg feature 'frameless' is active, SARIBBON_USE_FRAMELESS_LIB=ON")
     endif()
+    # When vcpkg manifest feature "qml" is active, auto-enable the QML module
+    if("qml" IN_LIST VCPKG_MANIFEST_FEATURES)
+        set(SARIBBON_BUILD_QML ON CACHE BOOL "Auto-enabled by vcpkg qml feature" FORCE)
+        message(STATUS "  vcpkg feature 'qml' is active, SARIBBON_BUILD_QML=ON")
+    endif()
+endif()
+
+# QML 模块的无边框窗口方案固定使用 QWindowKit（QuickWindowAgent 路线）：
+# SARIBBON_BUILD_QML=ON 时强制开启 SARIBBON_USE_FRAMELESS_LIB（用户显式设 OFF
+# 也会被覆盖，因为 QML 模块没有本地化无边框回退路径）；Qt 版本门槛与 QWindowKit
+# 查找失败时在下方直接 FATAL_ERROR，不做静默降级
+if(SARIBBON_BUILD_QML AND NOT SARIBBON_USE_FRAMELESS_LIB)
+    set(SARIBBON_USE_FRAMELESS_LIB ON CACHE BOOL
+        "auto-enabled by SARIBBON_BUILD_QML: the QML module requires QWindowKit" FORCE)
+    message(STATUS "SARIBBON_BUILD_QML=ON: SARIBBON_USE_FRAMELESS_LIB auto-enabled (QWindowKit required)")
 endif()
 
 # load Qt library, minimum version required is 5.15
@@ -74,6 +89,11 @@ if(SARIBBON_USE_FRAMELESS_LIB)
         if(${QT_VERSION_MINOR} LESS 14)
             #5.14和5.15可以使用frameless
             set(_SARIBBON_USE_FRAMELESS_LIB OFF)
+            if(SARIBBON_BUILD_QML)
+                # QML 模块强制使用 QWindowKit，Qt 版本不满足时直接失败而非静默降级
+                message(FATAL_ERROR "SARIBBON_BUILD_QML=ON requires QWindowKit, which needs Qt >= 5.14 "
+                    "(current Qt${QT_VERSION}). Use a newer Qt or set SARIBBON_BUILD_QML=OFF.")
+            endif()
             message(WARNING "QT_VERSION = Qt${QT_VERSION} QT version minor is ${QT_VERSION_MINOR},less 14,will set SARIBBON_USE_FRAMELESS_LIB OFF")
         endif()
     elseif(${QT_VERSION_MAJOR} EQUAL 6)
@@ -81,6 +101,11 @@ if(SARIBBON_USE_FRAMELESS_LIB)
         if(${QT_VERSION_MINOR} LESS_EQUAL 1)
             #6.0及bug多多无法使用frameless
             set(_SARIBBON_USE_FRAMELESS_LIB OFF)
+            if(SARIBBON_BUILD_QML)
+                # QML 模块强制使用 QWindowKit，Qt 版本不满足时直接失败而非静默降级
+                message(FATAL_ERROR "SARIBBON_BUILD_QML=ON requires QWindowKit, which needs Qt >= 6.2 "
+                    "(current Qt${QT_VERSION}). Use a newer Qt or set SARIBBON_BUILD_QML=OFF.")
+            endif()
             message(WARNING "QT_VERSION = Qt${QT_VERSION} QT version minor is ${QT_VERSION_MINOR},less 1,will set SARIBBON_USE_FRAMELESS_LIB OFF")
         endif()
     endif()
@@ -178,8 +203,22 @@ if(_SARIBBON_USE_FRAMELESS_LIB)
     # 最终确认是否找到
     if(QWindowKit_FOUND)
         message(STATUS "QWindowKit found at: ${QWindowKit_DIR}")
+        # QML 模块需要 Quick 组件（QWindowKit::Quick）；无组件式 find_package
+        #（旧版本）导出全部 target，此时一并检查 Quick target 是否存在
+        if(SARIBBON_BUILD_QML AND NOT TARGET QWindowKit::Quick)
+            message(FATAL_ERROR "SARIBBON_BUILD_QML=ON requires QWindowKit's Quick component "
+                "(QWindowKit::Quick target). Please rebuild/install QWindowKit with "
+                "QWINDOWKIT_BUILD_QUICK=ON (see 3rdparty/CMakeLists.txt, option QWK_BUILD_QUICK).")
+        endif()
     else()
         set(_SARIBBON_USE_FRAMELESS_LIB OFF)
+        if(SARIBBON_BUILD_QML)
+            # QML 模块强制使用 QWindowKit，找不到时直接失败而非静默降级
+            message(FATAL_ERROR "SARIBBON_BUILD_QML=ON requires the QWindowKit library, which was "
+                "not found. Build and install it first (docs: build-3rdparty.md), optionally via "
+                "-DQWindowKit_DIR=<path-to-qwindowkit>/lib/cmake/QWindowKit. "
+                "Searched paths:\n  ${_qwk_search_paths}")
+        endif()
         message(WARNING "QWindowKit not found - disabling frameless support. Searched paths:\n  ${_qwk_search_paths}")
     endif()
 endif()

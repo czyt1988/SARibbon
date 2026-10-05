@@ -3,7 +3,7 @@
 #   Actions: configure | build | install | clean | rebuild | full | help
 #   Options: -QtPath <path>  -VSVersion <2019|2022>  -Config <Release|Debug>
 #            -Examples <ON|OFF>  -Tests <ON|OFF>  -StaticLibs <ON|OFF>
-#            -Frameless <ON|OFF>  -SnapLayout <ON|OFF>
+#            -Frameless <ON|OFF>  -SnapLayout <ON|OFF>  -Qml <ON|OFF>
 # Examples:
 #   .\scripts\build.ps1              # full: configure + build + install (Release)
 #   .\scripts\build.ps1 build        # incremental build only
@@ -30,7 +30,9 @@ param(
     [ValidateSet('ON','OFF')]
     [string]$Frameless = 'OFF',
     [ValidateSet('ON','OFF')]
-    [string]$SnapLayout = 'OFF'
+    [string]$SnapLayout = 'OFF',
+    [ValidateSet('ON','OFF')]
+    [string]$Qml = 'OFF'
 )
 
 $ErrorActionPreference = 'Stop'
@@ -221,6 +223,11 @@ Options:
   -StaticLibs <ON|OFF>   Build static library (default: OFF = shared DLL)
   -Frameless <ON|OFF>    Enable QWindowKit frameless (default: OFF)
   -SnapLayout <ON|OFF>   Enable Windows 11 Snap Layout, requires Frameless=ON (default: OFF)
+  -Qml <ON|OFF>          Build the SARibbonQml module (default: OFF);
+                         QML mode has no local frameless fallback, so it always
+                         uses QWindowKit: Frameless is auto-enabled and the
+                         QWindowKit library (with its Quick component) must be
+                         installed first — see docs/zh/build-guide/build-3rdparty.md
 
 Examples:
   .\scripts\build.ps1                                  # Full build (configure + build + install Release)
@@ -229,6 +236,7 @@ Examples:
   .\scripts\build.ps1 configure -Examples OFF          # Configure only, no examples
   .\scripts\build.ps1 configure -StaticLibs ON         # Configure static library
   .\scripts\build.ps1 full -Frameless ON -SnapLayout ON # Full build with frameless + snap layout
+  .\scripts\build.ps1 full -Qml ON                     # Full build with the QML module (frameless auto-ON)
   .\scripts\build.ps1 full -QtPath "D:\Qt\Qt5.15.16\5.15.16\msvc2019_64"
 
 Auto-detection:
@@ -269,6 +277,7 @@ Write-Host "  Tests:       $Tests"
 Write-Host "  StaticLibs:  $StaticLibs"
 Write-Host "  Frameless:   $Frameless"
 Write-Host "  SnapLayout:  $SnapLayout"
+Write-Host "  Qml:         $Qml"
 Write-Host ""
 
 # ============================================================
@@ -319,6 +328,13 @@ if ($Action -eq 'configure' -or $Action -eq 'rebuild' -or $Action -eq 'full') {
 
     Write-Host "[CONFIGURE] Running cmake configure..." -ForegroundColor Cyan
 
+    if($Qml -eq 'ON' -and $Frameless -eq 'OFF') {
+        # QML 模块的无边框方案强制走 QWindowKit（CMake 侧会自动开启 frameless），
+        # 这里同步参数显示并提前提示，错误信息保持一致
+        $Frameless = 'ON'
+        Write-Host "[INFO] -Qml ON: Frameless auto-enabled (QML requires QWindowKit)" -ForegroundColor Yellow
+    }
+
     $cmakeArgs = @(
         '-S', $ProjectRoot,
         '-B', $buildDir,
@@ -329,7 +345,8 @@ if ($Action -eq 'configure' -or $Action -eq 'rebuild' -or $Action -eq 'full') {
         "-DSARIBBON_BUILD_STATIC_LIBS=$StaticLibs",
         "-DSARIBBON_USE_FRAMELESS_LIB=$Frameless",
         "-DSARIBBON_ENABLE_SNAPLAYOUT=$SnapLayout",
-        "-DSARIBBON_BUILD_TESTS=$Tests"
+        "-DSARIBBON_BUILD_TESTS=$Tests",
+        "-DSARIBBON_BUILD_QML=$Qml"
     )
 
     Write-Host "  Command: $cmakeExe $($cmakeArgs -join ' ')" -ForegroundColor Gray

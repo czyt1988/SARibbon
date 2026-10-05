@@ -34,6 +34,19 @@ find_package(Qt${QT_VERSION_MAJOR} ${SARIBBON_MIN_QT_VERSION} COMPONENTS
     Widgets
     REQUIRED
 )
+
+# QWK_BUILD_QUICK：是否构建 QWindowKit 的 Quick 组件（QWKQuick 库）。
+# SARibbonQml 模块的无边框方案依赖 QWindowKit::Quick，默认构建；
+# 若仅使用 widgets 模块可设 OFF 以缩短编译时间
+option(QWK_BUILD_QUICK "Build QWindowKit's Quick component (QWKQuick, required by SARibbonQml)" ON)
+# QWKQuick（QWindowKit 的 Quick 组件）需要 Qml/Quick
+if(QWK_BUILD_QUICK)
+    find_package(Qt${QT_VERSION_MAJOR} ${SARIBBON_MIN_QT_VERSION} COMPONENTS
+        Qml
+        Quick
+        REQUIRED
+    )
+endif()
 # 平台判断
 if("${CMAKE_SIZEOF_VOID_P}" STREQUAL "4")
     set(SARIBBON_PLATFORM "x86")
@@ -56,7 +69,11 @@ endif()
 # 
 set(QWINDOWKIT_BUILD_WIDGETS ON CACHE BOOL "force set QWINDOWKIT_BUILD_WIDGETS ON" FORCE)
 set(QWINDOWKIT_BUILD_EXAMPLES OFF CACHE BOOL "force set QWINDOWKIT_BUILD_EXAMPLES OFF" FORCE)
-set(QWINDOWKIT_BUILD_QUICK OFF CACHE BOOL "force set QWINDOWKIT_BUILD_QUICK OFF" FORCE)
+if(QWK_BUILD_QUICK)
+    set(QWINDOWKIT_BUILD_QUICK ON CACHE BOOL "force set QWINDOWKIT_BUILD_QUICK ON" FORCE)
+else()
+    set(QWINDOWKIT_BUILD_QUICK OFF CACHE BOOL "force set QWINDOWKIT_BUILD_QUICK OFF" FORCE)
+endif()
 set(QWINDOWKIT_INSTALL ON CACHE BOOL "force set QWINDOWKIT_INSTALL ON" FORCE)
 ########################################################
 # 安装第三方库
