@@ -205,16 +205,61 @@ if(_SARIBBON_USE_FRAMELESS_LIB)
         message(STATUS "Adding local install path for QWindowKit: ${_local_qwk_dir}")
     endif()
 
-    # 尝试查找QWindowKit包
-    find_package(QWindowKit QUIET
-        PATHS ${_qwk_search_paths}
-        NO_DEFAULT_PATH  # 禁止在系统默认路径查找
-    )
+    # 配置覆盖预检：已安装包必须覆盖本构建会产出的配置，否则直接不调用
+    # find_package（IMPORTED target 不创建，树内构建的 namespace 别名才能建立）。
+    # 实测踩坑：Release-only 安装包（只装过 Release）被 Debug 构建链接后，
+    # 进程内同时出现 Debug Qt（Qt6Cored）与 Release Qt（QWKCore.dll 拉入）两个
+    # 运行时——QWK 的跨运行时线程亲和性检查全部假性失败（"Cannot create
+    # children / installEventFilter: different thread"），窗口钩子装不上，
+    # 无边框静默失效（原生边框保留）。树内构建与宿主同编译器/Qt/配置，天然 ABI 一致
+    set(_qwk_candidate_dir)
+    if(QWindowKit_DIR)
+        set(_qwk_candidate_dir "${QWindowKit_DIR}")
+    elseif(EXISTS "${_local_qwk_dir}")
+        set(_qwk_candidate_dir "${_local_qwk_dir}")
+    endif()
+    set(_qwk_config_covered TRUE)
+    if(_qwk_candidate_dir)
+        set(_qwk_configs)
+        get_property(_qwk_is_multi_config GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
+        if(_qwk_is_multi_config)
+            set(_qwk_configs ${CMAKE_CONFIGURATION_TYPES})
+        else()
+            set(_qwk_configs ${CMAKE_BUILD_TYPE})
+        endif()
+        set(_qwk_missing_configs)
+        foreach(_cfg ${_qwk_configs})
+            string(TOLOWER "${_cfg}" _cfg_lower)
+            if(_cfg_lower STREQUAL "debug")
+                if(NOT EXISTS "${_qwk_candidate_dir}/QWindowKitTargets-debug.cmake")
+                    list(APPEND _qwk_missing_configs "${_cfg}")
+                endif()
+            elseif(NOT _cfg_lower STREQUAL "")
+                if(NOT EXISTS "${_qwk_candidate_dir}/QWindowKitTargets-release.cmake")
+                    list(APPEND _qwk_missing_configs "${_cfg}")
+                endif()
+            endif()
+        endforeach()
+        if(_qwk_missing_configs)
+            message(STATUS "Installed QWindowKit at ${_qwk_candidate_dir} does not cover "
+                "configuration(s): ${_qwk_missing_configs} (Debug/Release QWK ABI mismatch) "
+                "- skipping it and building bundled instead")
+            set(_qwk_config_covered FALSE)
+        endif()
+    endif()
 
-    # 如果未找到，尝试系统路径作为最后手段
-    if(NOT QWindowKit_FOUND)
-        message(STATUS "QWindowKit not found in specified paths, trying system default...")
-        find_package(QWindowKit QUIET)
+    # 尝试查找QWindowKit包
+    if(_qwk_config_covered)
+        find_package(QWindowKit QUIET
+            PATHS ${_qwk_search_paths}
+            NO_DEFAULT_PATH  # 禁止在系统默认路径查找
+        )
+
+        # 如果未找到，尝试系统路径作为最后手段
+        if(NOT QWindowKit_FOUND)
+            message(STATUS "QWindowKit not found in specified paths, trying system default...")
+            find_package(QWindowKit QUIET)
+        endif()
     endif()
 
     if(NOT QWindowKit_FOUND AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/qwindowkit/CMakeLists.txt")

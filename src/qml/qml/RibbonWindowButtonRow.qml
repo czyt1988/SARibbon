@@ -49,14 +49,15 @@ Row {
             anchors.centerIn: parent
             width: 10
             height: 10
-            Connections {
-                target: RibbonTheme
-                onPaletteChanged: parent.requestPaint()
-            }
+            // theme-dependent glyph color: the binding change is the repaint
+            // trigger (property-change handlers work on every Qt from 5.12;
+            // Connections onFoo is deprecated in newer Qt)
+            property color glyphColor: RibbonTheme.textColor
+            onGlyphColorChanged: requestPaint()
             onPaint: {
                 var ctx = getContext("2d");
                 ctx.reset();
-                ctx.fillStyle = RibbonTheme.textColor;
+                ctx.fillStyle = glyphColor;
                 ctx.fillRect(0, 8, 10, 1.4);
             }
         }
@@ -83,14 +84,12 @@ Row {
             height: 10
             property bool maximized: root.windowMaximized
             onMaximizedChanged: requestPaint()
-            Connections {
-                target: RibbonTheme
-                onPaletteChanged: parent.requestPaint()
-            }
+            property color glyphColor: RibbonTheme.textColor
+            onGlyphColorChanged: requestPaint()
             onPaint: {
                 var ctx = getContext("2d");
                 ctx.reset();
-                ctx.strokeStyle = RibbonTheme.textColor;
+                ctx.strokeStyle = glyphColor;
                 if (maximized) {
                     // restore: back square outline + front filled square
                     ctx.strokeRect(2.5, 0.5, 7, 7);
@@ -132,14 +131,12 @@ Row {
             height: 10
             property bool hovered: mouseAreaClose.containsMouse
             onHoveredChanged: requestPaint()
-            Connections {
-                target: RibbonTheme
-                onPaletteChanged: parent.requestPaint()
-            }
+            property color glyphColor: RibbonTheme.textColor
+            onGlyphColorChanged: requestPaint()
             onPaint: {
                 var ctx = getContext("2d");
                 ctx.reset();
-                ctx.strokeStyle = hovered ? "#ffffff" : RibbonTheme.textColor;
+                ctx.strokeStyle = hovered ? "#ffffff" : glyphColor;
                 ctx.lineWidth = 1.2;
                 ctx.beginPath();
                 ctx.moveTo(0.5, 0.5);
