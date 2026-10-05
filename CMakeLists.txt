@@ -1,4 +1,4 @@
-﻿
+
 # Cmake的命令不区分大小写，例如message，set等命令；但Cmake的变量区分大小写
 # 为统一风格，本项目的Cmake命令全部采用小写，变量全部采用大写加下划线组合。
 
@@ -71,13 +71,28 @@ endif()
 # cn:Qt库加载,最低版本要求为5.12
 set(SARIBBON_MIN_QT_VERSION 5.12)
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core Widgets Svg REQUIRED)
-find_package(Qt${QT_VERSION_MAJOR} ${SARIBBON_MIN_QT_VERSION} COMPONENTS
-    Core
-    Gui
-    Widgets
-    Svg
-    REQUIRED
-)
+if(SARIBBON_BUILD_QML)
+    # QML 模式：根层就把 Quick/Qml 找齐——已安装 QWK 的导出 target 引用
+    # Qt::Quick，若根层未 find，QWK Targets 文件里的 Qt6::Quick 会缺定义
+    find_package(Qt${QT_VERSION_MAJOR} ${SARIBBON_MIN_QT_VERSION} COMPONENTS
+        Core
+        Gui
+        Widgets
+        Svg
+        Qml
+        Quick
+        QuickControls2
+        REQUIRED
+    )
+else()
+    find_package(Qt${QT_VERSION_MAJOR} ${SARIBBON_MIN_QT_VERSION} COMPONENTS
+        Core
+        Gui
+        Widgets
+        Svg
+        REQUIRED
+    )
+endif()
 message(STATUS "current Qt version is Qt${QT_VERSION_MAJOR}.${QT_VERSION_MINOR}.${QT_VERSION_PATCH}")
 
 # 根据qt版本确认能否使用frameless库，目前frameless库支持qt5.14,qt5.15,qt6.1+,除了上诉版本，都使用不了
@@ -169,6 +184,8 @@ endif()
 # 1. 用户通过-DQWindowKit_DIR指定的路径
 # 2. 项目本地安装目录 (bin_qtX.X.X_compiler_platform/lib/cmake/QWindowKit)
 # 3. 系统默认安装路径
+# 4. 3rdparty/qwindowkit submodule 树内构建（上述查找均未命中且 submodule 已初始化时
+#    自动触发：QWK 与 SARibbon 同一次构建一起编译链接，无需分开安装）
 # 对于开发者，可以在配置时指定路径：
 # cmake -DQWindowKit_DIR={path-to-qwindowkit/lib/cmake/QWindowKit}
 if(_SARIBBON_USE_FRAMELESS_LIB)
@@ -200,9 +217,56 @@ if(_SARIBBON_USE_FRAMELESS_LIB)
         find_package(QWindowKit QUIET)
     endif()
 
-    # 最终确认是否找到
-    if(QWindowKit_FOUND)
-        message(STATUS "QWindowKit found at: ${QWindowKit_DIR}")
+    if(NOT QWindowKit_FOUND AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/3rdparty/qwindowkit/CMakeLists.txt")
+        # ---- 树内兜底：把 3rdparty/qwindowkit submodule 直接编进本次构建 ----
+        # 用户无需先到 3rdparty/ 单独编译安装：打开顶层 CMakeLists.txt 一次构建即可
+        message(STATUS "QWindowKit not installed - building bundled from 3rdparty/qwindowkit")
+        # ABI 一致性：QWK 跟随 SARibbon 的静态/动态选择
+        set(QWINDOWKIT_BUILD_STATIC ${SARIBBON_BUILD_STATIC_LIBS} CACHE BOOL
+            "bundled build: follow SARIBBON_BUILD_STATIC_LIBS" FORCE)
+        set(QWINDOWKIT_BUILD_EXAMPLES OFF CACHE BOOL "bundled build: no examples" FORCE)
+        # Quick 组件是 SARibbonQml 的硬依赖，树内构建始终开启
+        set(QWINDOWKIT_BUILD_QUICK ON CACHE BOOL "bundled build: Quick required by SARibbonQml" FORCE)
+        # 安装跟随宿主：SARIBBON_INSTALL=ON 时 QWK 一并装到同一前缀
+        # （生成 lib/cmake/QWindowKit，之后无需 submodule 也能 find_package 命中）；
+        # add_subdirectory 嵌入场景（SARIBBON_INSTALL=OFF）时关闭，
+        # 避免污染宿主工程的 install/export 规则
+        set(QWINDOWKIT_INSTALL ${SARIBBON_INSTALL} CACHE BOOL
+            "bundled build: follow SARIBBON_INSTALL" FORCE)
+        add_subdirectory(3rdparty/qwindowkit)
+        foreach(_qwk_tgt QWKCore QWKWidgets QWKQuick)
+            if(TARGET ${_qwk_tgt})
+                if(WIN32)
+                    # QWK 的 Windows 头需要 NOMINMAX（3rdparty 独立构建同款处理）
+                    target_compile_definitions(${_qwk_tgt} PRIVATE NOMINMAX)
+                endif()
+                # QWK 默认输出到 out-<arch>-<config>/bin（qm_init_directories 行为），
+                # 与 SARibbon 的 ${BINARY}/bin/ 不一致：统一到同一 bin 目录，
+                # 示例/测试 exe 才能在运行时找到 QWK dll
+                set_target_properties(${_qwk_tgt} PROPERTIES
+                    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}"
+                    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}"
+                    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}"
+                )
+                # 多配置生成器（VS）下还要覆盖 per-config 变体，否则 VS 仍写
+                # out-<arch>-<config>/bin/Release
+                foreach(_cfg Debug Release RelWithDebInfo MinSizeRel)
+                    set_target_properties(${_qwk_tgt} PROPERTIES
+                        RUNTIME_OUTPUT_DIRECTORY_${_cfg} "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_BINDIR}"
+                        LIBRARY_OUTPUT_DIRECTORY_${_cfg} "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}"
+                        ARCHIVE_OUTPUT_DIRECTORY_${_cfg} "${CMAKE_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}"
+                    )
+                endforeach()
+            endif()
+        endforeach()
+        set(_SARIBBON_USE_BUNDLED_QWK ON)
+    endif()
+
+    # 最终确认是否可用（已安装包或树内构建）
+    if(_SARIBBON_USE_BUNDLED_QWK)
+        message(STATUS "QWindowKit: bundled in-tree build (targets QWindowKit::Core/Widgets/Quick)")
+    elseif(QWindowKit_FOUND)
+        message(STATUS "QWindowKit (installed) found at: ${QWindowKit_DIR}")
         # QML 模块需要 Quick 组件（QWindowKit::Quick）；无组件式 find_package
         #（旧版本）导出全部 target，此时一并检查 Quick target 是否存在
         if(SARIBBON_BUILD_QML AND NOT TARGET QWindowKit::Quick)
@@ -215,8 +279,10 @@ if(_SARIBBON_USE_FRAMELESS_LIB)
         if(SARIBBON_BUILD_QML)
             # QML 模块强制使用 QWindowKit，找不到时直接失败而非静默降级
             message(FATAL_ERROR "SARIBBON_BUILD_QML=ON requires the QWindowKit library, which was "
-                "not found. Build and install it first (docs: build-3rdparty.md), optionally via "
-                "-DQWindowKit_DIR=<path-to-qwindowkit>/lib/cmake/QWindowKit. "
+                "not found. Either build and install it first (docs: build-3rdparty.md, optionally "
+                "via -DQWindowKit_DIR=<path-to-qwindowkit>/lib/cmake/QWindowKit), or initialize the "
+                "submodule once with 'git submodule update --init --recursive' and reconfigure: "
+                "the top-level build will then compile QWindowKit automatically. "
                 "Searched paths:\n  ${_qwk_search_paths}")
         endif()
         message(WARNING "QWindowKit not found - disabling frameless support. Searched paths:\n  ${_qwk_search_paths}")

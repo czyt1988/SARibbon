@@ -1,4 +1,8 @@
 @PACKAGE_INIT@
+# 在任何 find_dependency 之前快照本包前缀：后续 find_dependency(Qt...) 会加载
+# Qt6Config.cmake，其 @PACKAGE_INIT@ 展开会把 PACKAGE_PREFIX_DIR 重算成 Qt 的前缀，
+# 覆盖本包的值（consumer 实测踩坑）
+set(_saribbon_prefix "${PACKAGE_PREFIX_DIR}")
 include(CMakeFindDependencyMacro)
 # REQUIRED 必带（QWK QWindowKitConfig.cmake.in:5-6 同款）：否则 Qt 缺失时
 # find_dependency 静默返回，错误延迟到 Targets 引用 Qt6::Core 时才爆出，难排查
@@ -21,12 +25,19 @@ if(@SARIBBON_BUILD_QML@)
     list(APPEND _saribbon_qwk_components Quick)
 endif()
 if(_saribbon_qwk_components)
-    # 本地安装布局：QWindowKit 与 SARibbon 同前缀安装（bin_qtX 编译器隔离目录），
-    # 用户未显式指定 QWindowKit_DIR 时补一个同前缀查找提示
-    if(NOT QWindowKit_DIR AND EXISTS "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@/cmake/QWindowKit")
-        set(QWindowKit_DIR "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@/cmake/QWindowKit")
+    # 本地安装布局：QWindowKit 与 SARibbon 同前缀安装（bin_qtX 编译器隔离目录）。
+    # 用户未显式指定 QWindowKit_DIR 时直接把同前缀候选传给 find_package 的
+    # 搜索路径（HINTS）。（_saribbon_prefix 是 @PACKAGE_INIT@ 后的快照，
+    # 见文件开头注释）
+    set(_saribbon_qwk_hint "")
+    if(NOT QWindowKit_DIR AND EXISTS "${_saribbon_prefix}/@CMAKE_INSTALL_LIBDIR@/cmake/QWindowKit")
+        set(_saribbon_qwk_hint "${_saribbon_prefix}/@CMAKE_INSTALL_LIBDIR@/cmake/QWindowKit")
     endif()
-    find_dependency(QWindowKit REQUIRED ${_saribbon_qwk_components})
+    if(_saribbon_qwk_hint)
+        find_dependency(QWindowKit REQUIRED ${_saribbon_qwk_components} HINTS ${_saribbon_qwk_hint})
+    else()
+        find_dependency(QWindowKit REQUIRED ${_saribbon_qwk_components})
+    endif()
 endif()
 include("${CMAKE_CURRENT_LIST_DIR}/SARibbonTargets.cmake")
 # 组件语义：COMPONENTS Core/Widgets/Qml 映射到 target 存在性

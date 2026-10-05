@@ -125,9 +125,13 @@ message(STATUS "SARibbon resource file:${SARIBBON_RESOURCE_FILES}")
 # ---- frameless（qwindowkit库 https://github.com/stdware/qwindowkit）----
 # Qt X11Extras was first introduced in 5.1 and got removed in 6.0
 # But it was again brought back as a private feature of QtGui in 6.2
+# 树内构建时 QWindowKit::Widgets 已由根 CMakeLists 的 add_subdirectory 提供，
+# 无需 find_package（target 直接可见）
 set(_SA_WIDGETS_PRIVATE_LINKS)
 if(_SARIBBON_USE_FRAMELESS_LIB)
-    find_package(QWindowKit REQUIRED)
+    if(NOT TARGET QWindowKit::Widgets)
+        find_package(QWindowKit REQUIRED)
+    endif()
     list(APPEND _SA_WIDGETS_PRIVATE_LINKS QWindowKit::Widgets)
 endif()
 

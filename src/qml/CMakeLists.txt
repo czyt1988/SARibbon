@@ -4,7 +4,10 @@ find_package(Qt${QT_VERSION_MAJOR} ${SARIBBON_MIN_QT_VERSION} REQUIRED
 
 # QML 模块的无边框窗口方案绑定 QWindowKit（QuickWindowAgent 路线）：
 # 根 CMakeLists 已保证 _SARIBBON_USE_FRAMELESS_LIB 与 QWindowKit::Quick 存在
-find_package(QWindowKit REQUIRED COMPONENTS Quick)
+# （已安装包 find_package 或 3rdparty 树内构建两种路径）
+if(NOT TARGET QWindowKit::Quick)
+    find_package(QWindowKit REQUIRED COMPONENTS Quick)
+endif()
 
 sa_add_library(SARibbonQml
     SOURCES

@@ -1,14 +1,22 @@
 @PACKAGE_INIT@
+# 快照本包前缀（理由同 SARibbonConfig.cmake.in：find_dependency(Qt) 会覆盖 PACKAGE_PREFIX_DIR）
+set(_saribbon_prefix "${PACKAGE_PREFIX_DIR}")
 # 3.0 compatibility shell: forwards the legacy SARibbonBar package name to the
 # component-based SARibbon package. Remove after one release cycle (plan 03).
 include(CMakeFindDependencyMacro)
 find_dependency(Qt@QT_VERSION_MAJOR@ COMPONENTS Core Gui Widgets Svg REQUIRED)
 # frameless：转发目标 SARibbon::Widgets 链接 QWindowKit::Widgets，消费端须先找到它
 if(@_SARIBBON_USE_FRAMELESS_LIB@)
-    if(NOT QWindowKit_DIR AND EXISTS "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@/cmake/QWindowKit")
-        set(QWindowKit_DIR "${PACKAGE_PREFIX_DIR}/@CMAKE_INSTALL_LIBDIR@/cmake/QWindowKit")
+    # 同前缀提示的写法理由见 SARibbonConfig.cmake.in（HINTS 透传给 find_package）
+    set(_saribbon_qwk_hint "")
+    if(NOT QWindowKit_DIR AND EXISTS "${_saribbon_prefix}/@CMAKE_INSTALL_LIBDIR@/cmake/QWindowKit")
+        set(_saribbon_qwk_hint "${_saribbon_prefix}/@CMAKE_INSTALL_LIBDIR@/cmake/QWindowKit")
     endif()
-    find_dependency(QWindowKit REQUIRED Widgets)
+    if(_saribbon_qwk_hint)
+        find_dependency(QWindowKit REQUIRED Widgets HINTS ${_saribbon_qwk_hint})
+    else()
+        find_dependency(QWindowKit REQUIRED Widgets)
+    endif()
 endif()
 include("${CMAKE_CURRENT_LIST_DIR}/../SARibbon/SARibbonTargets.cmake")
 if(NOT TARGET SARibbonBar::SARibbonBar)

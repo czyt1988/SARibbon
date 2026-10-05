@@ -93,7 +93,7 @@ vcpkg 的 `frameless` feature 会自动启用 `SARIBBON_USE_FRAMELESS_LIB`；`qm
 |------|--------|------|
 | `SARIBBON_BUILD_STATIC_LIBS` | OFF | 静态库，ON 时自动定义 `SA_RIBBON_BAR_NO_EXPORT` |
 | `SARIBBON_USE_FRAMELESS_LIB` | OFF | 使用 QWindowKit 无边框方案，需 C++17 和 QWindowKit 库 |
-| `SARIBBON_BUILD_QML` | OFF | 构建 SARibbonQml 模块；ON 时强制 `SARIBBON_USE_FRAMELESS_LIB=ON`（QML 模式无本地化无边框回退，必须引入 QWindowKit，其 Quick 组件需可用），QWindowKit 缺失或版本不满足时配置直接报错 |
+| `SARIBBON_BUILD_QML` | OFF | 构建 SARibbonQml 模块；ON 时强制 `SARIBBON_USE_FRAMELESS_LIB=ON`（QML 模式无本地化无边框回退，必须引入 QWindowKit，其 Quick 组件需可用）。QWK 查找顺序：已安装包 → 3rdparty/qwindowkit 树内自动构建（submodule 初始化后无需单独编译，QWK 随顶层构建一起编译）；两者皆无时配置直接报错 |
 | `SARIBBON_BUILD_EXAMPLES` | ON | 控制是否编译示例程序 |
 | `SARIBBON_ENABLE_SNAPLAYOUT` | OFF | 启用 Windows 11 Snap Layout（仅 frameless 模式有效） |
 | `SARIBBON_INSTALL_IN_CURRENT_DIR` | ON (Windows) | 安装到 `bin_qt{版本}_{编译器}_x{架构}/` |

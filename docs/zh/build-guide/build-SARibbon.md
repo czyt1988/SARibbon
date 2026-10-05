@@ -26,8 +26,9 @@
 !!! tip "注意"
     QML 模式与 QWindowKit 的绑定：
     - `SARIBBON_BUILD_QML=ON` 时，`SARIBBON_USE_FRAMELESS_LIB` 会被自动强制开启（即使显式设为 `OFF`）
-    - QWindowKit 安装必须包含 Quick 组件：`3rdparty/CMakeLists.txt` 的 `QWK_BUILD_QUICK` 选项默认为 `ON`，无需额外操作；如曾手动关闭请重新开启并重装
-    - QWindowKit 缺失、Qt 版本过低时，CMake 配置阶段直接报错（不会静默降级到本地化无边框方案）
+    - QWindowKit 缺失时的**最简路径**：初始化 submodule（`git submodule update --init --recursive 3rdparty/qwindowkit`）后直接配置——顶层 CMake 会自动把 QWindowKit（含 Quick 组件）和 SARibbon 一起编译链接，无需先单独安装；首次 `install` 后 QWK 落到同一版本隔离目录，后续构建直接复用
+    - QWindowKit 安装（单独编译路径）必须包含 Quick 组件：`3rdparty/CMakeLists.txt` 的 `QWK_BUILD_QUICK` 选项默认为 `ON`，无需额外操作；如曾手动关闭请重新开启并重装
+    - Qt 版本过低时，CMake 配置阶段直接报错（不会静默降级到本地化无边框方案）
 
 !!! tip "注意"
     Qt 版本兼容性：

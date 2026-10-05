@@ -1,10 +1,21 @@
 # 第三方库编译
 
 - **QWindowKit原生窗口**：支持Windows贴边/Snap Layout和多屏幕移动
+- **一键树内构建**：submodule 初始化后，顶层 CMakeLists 打开即自动编译 QWK，无需分开安装
 - **多IDE支持**：Qt Creator、Visual Studio和命令行三种编译方式
 - **跨平台编译**：覆盖 Windows、Linux (Ubuntu/Debian) 和 macOS
 - **自动本地安装**：编译后自动安装到与SARibbon一致的版本隔离目录
 - **默认含Quick组件**：SARibbonQml（QML模式）所需，`QWK_BUILD_QUICK`默认`ON`
+
+!!! tip "推荐：树内自动构建（无需本文档）"
+    只要初始化过一次 submodule（`git submodule update --init --recursive 3rdparty/qwindowkit`），
+    之后直接打开 SARibbon 顶层 `CMakeLists.txt` 配置即可：当 `SARIBBON_USE_FRAMELESS_LIB=ON`
+    （QML 模式会自动开启）且本机未找到已安装的 QWindowKit 时，顶层构建自动把
+    `3rdparty/qwindowkit` 一起编译链接（Quick 组件自动开启、静态/动态跟随 SARibbon、
+    输出目录与 SARibbon 同一 bin）。首次 `install` 后 QWK 会落到同一版本隔离目录，
+    后续配置将直接使用已安装副本，树内构建自动退位。
+
+    本文其余内容适用于：无法使用 submodule（离线环境）、或想单独发布 QWK 的场景。
 
 !!! warning "注意"
     如果不开启QWindowkit,可以跳过此文档。
@@ -12,7 +23,7 @@
 !!! tip "提示"
     QWindowkit提供了更好的无边框方案，能适配操作系统原生的交互，能支持多屏幕多分辨率的移动。
 
-    `SARIBBON_BUILD_QML=ON`（QML模式）**必须**使用QWindowKit：其Quick组件（`QWKQuick`库）是SARibbonQml无边框方案的依赖。`3rdparty/CMakeLists.txt`默认开启`QWK_BUILD_QUICK=ON`，按本文流程编译安装即可；若无需QML模块，可通过 `-DQWK_BUILD_QUICK=OFF` 跳过Quick组件以缩短编译时间。
+    `SARIBBON_BUILD_QML=ON`（QML模式）**必须**使用QWindowKit：其Quick组件（`QWKQuick`库）是SARibbonQml无边框方案的依赖。树内构建始终开启Quick组件；单独编译（本文流程）时`3rdparty/CMakeLists.txt`默认也是`QWK_BUILD_QUICK=ON`，若无需QML模块，可通过 `-DQWK_BUILD_QUICK=OFF` 跳过Quick组件以缩短编译时间。
 
 ## 选择编译方式
 
