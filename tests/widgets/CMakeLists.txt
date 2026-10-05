@@ -15,11 +15,21 @@ function(add_saribbon_test TEST_NAME TEST_SOURCE)
     # Windows does not search the build tree for DLLs, so without this copy the test
     # executable cannot start (STATUS_DLL_NOT_FOUND) outside of an IDE.
     # 计划 02 起 widgets 依赖 core：两个运行库都要拷贝。
+    # frameless 开启时（树内构建）SARibbonWidgets 还传递依赖 QWKWidgets/QWKCore，一并拷贝。
     if(NOT SARIBBON_BUILD_STATIC_LIBS)
+        set(_sa_test_runtime_libs
+            $<TARGET_FILE:SARibbonWidgets>
+            $<TARGET_FILE:SARibbonCore>
+        )
+        if(TARGET QWKWidgets)
+            list(APPEND _sa_test_runtime_libs
+                $<TARGET_FILE:QWKWidgets>
+                $<TARGET_FILE:QWKCore>
+            )
+        endif()
         add_custom_command(
             TARGET ${TEST_NAME} POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:SARibbonWidgets> $<TARGET_FILE_DIR:${TEST_NAME}>
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:SARibbonCore> $<TARGET_FILE_DIR:${TEST_NAME}>
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different ${_sa_test_runtime_libs} $<TARGET_FILE_DIR:${TEST_NAME}>
             COMMENT "Copy SARibbon runtime libraries next to ${TEST_NAME}"
         )
     endif()

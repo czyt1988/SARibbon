@@ -158,6 +158,9 @@ inline QUrl colorToolButtonLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/Ri
 // Application-facing customize picker (not a host leaf): an app instantiates it
 // by URL, the same way RibbonMenu nests itself
 inline QUrl customizeDialogLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/RibbonCustomizeDialog.qml")); }
+// Frameless system button row rendered inside the bar leaf (not a host leaf
+// either): loaded by RibbonBar.qml when the frameless agent is active
+inline QUrl windowButtonRowLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/RibbonWindowButtonRow.qml")); }
 }
 
 // Uniform handshake contract: every leaf root declares `property QtObject

@@ -26,6 +26,19 @@ Rectangle {
     readonly property bool hasAppMenu: cppHost ? cppHost.hasApplicationMenu : false
     readonly property bool hasAppWindow: cppHost ? cppHost.hasApplicationWindow : false
     readonly property Item appWindowItem: cppHost && cppHost.hasApplicationWindow ? cppHost.applicationWindowItem : null
+    // frameless state mirrors (published by the C++ host on agent changes)
+    readonly property bool framelessActive: cppHost ? cppHost.framelessActive : false
+    readonly property string windowTitle: cppHost ? cppHost.windowTitle : ""
+    readonly property int systemStripWidth: cppHost ? cppHost.systemButtonStripWidth : 0
+    readonly property rect titleRect: {
+        if (cppHost) {
+            var tr = cppHost.titleRect;
+            if (tr !== undefined && tr.width > 0) {
+                return tr;
+            }
+        }
+        return Qt.rect(0, 0, 0, 0);
+    }
 
     // ---- entry points (app menu / app window) ----
     function openAppMenu()
@@ -130,9 +143,47 @@ Rectangle {
         }
     }
 
+    // window title (widgets SARibbonBar::paintWindowTitle parity): painted
+    // into the core-engine title free rect, center-aligned by default, with
+    // the theme text color. Only rendered under the frameless decoration —
+    // the native frame carries its own caption otherwise.
+    Text {
+        visible: root.framelessActive && root.titleRect.width > 0
+                 && root.windowTitle.length > 0
+        x: root.titleRect.x
+        y: root.titleRect.y
+        width: root.titleRect.width
+        height: root.titleRect.height
+        text: root.windowTitle
+        color: RibbonTheme.textColor
+        elide: Text.ElideRight
+        horizontalAlignment: Text.AlignHCenter
+        verticalAlignment: Text.AlignVCenter
+        font: RibbonMetrics.font
+    }
+
+    // frameless system button row (widgets SARibbonSystemButtonBar parity):
+    // pinned to the bar's top-right corner inside the reserved strip; the
+    // C++ host already subtracts systemButtonStripWidth from every right
+    // host's anchor, so this row never overlaps the right button group
+    Loader {
+        id: sysButtonRowLoader
+        objectName: "sysButtonRow"
+        active: root.framelessActive
+        source: "qrc:/SARibbon/RibbonWindowButtonRow.qml"
+        anchors.top: parent.top
+        anchors.right: parent.right
+        height: root.titleBarHeight
+        width: root.systemStripWidth
+        onLoaded: {
+            item.cppHost = Qt.binding(function() { return root.cppHost; });
+        }
+    }
+
     // application button (widgets: vertically expanding, spans title+tab row;
     // office-2021: transparent, radius 2, hover/pressed 5px bottom underline)
     Item {
+        objectName: "appButtonArea"
         visible: root.appRect.width > 0
         x: root.appRect.x
         y: root.appRect.y

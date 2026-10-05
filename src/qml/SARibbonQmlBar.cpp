@@ -9,9 +9,12 @@
 #include "SARibbonQmlMetrics.h"
 #include "SARibbonQmlTheme.h"
 #include "SARibbonQmlTypes.h"
+#include "SARibbonQmlWindowAgent.h"
 #include <SARibbonCore/SARibbonCoreUtil.h>
 #include <SARibbonCore/SARibbonThemeData.h>
 #include <QFontMetrics>
+#include <QQuickWindow>
+#include <QWindow>
 
 namespace SARibbonQml {
 
@@ -47,6 +50,7 @@ void RibbonBar::componentComplete()
     // children (tabs/categories) complete before the parent, so the register
     // lists are already filled here
     ensureQmlLeaf();
+    attachWindowAgent();
     polish();
 }
 
@@ -211,6 +215,83 @@ void RibbonBar::setSystemButtonStripWidth(int w)
     mSystemButtonStripWidth = strip;
     Q_EMIT systemButtonStripWidthChanged();
     polish();
+}
+
+QString RibbonBar::windowTitle() const
+{
+    return mWindowTitle;
+}
+
+void RibbonBar::setWindowTitle(const QString& title)
+{
+    if (mWindowTitle == title) {
+        return;
+    }
+    mWindowTitle = title;
+    Q_EMIT windowTitleChanged();
+}
+
+bool RibbonBar::isFramelessActive() const
+{
+    return mWindowAgent != nullptr && mWindowAgent->window() != nullptr && mWindowAgent->isFramelessEnabled();
+}
+
+RibbonWindowAgent* RibbonBar::windowAgent() const
+{
+    return mWindowAgent;
+}
+
+void RibbonBar::setWindowAgent(RibbonWindowAgent* agent)
+{
+    if (mWindowAgent == agent) {
+        return;
+    }
+    if (mWindowAgent) {
+        detachWindowAgent();
+    }
+    mWindowAgent = agent;
+    if (mWindowAgent) {
+        if (mWindowAgent->parent() == nullptr) {
+            mWindowAgent->setParent(this);
+        }
+        // strip width follows the agent's frameless state and glyph metrics;
+        // every flip re-runs the layout with a new reservation
+        connect(mWindowAgent, &RibbonWindowAgent::buttonWidthChanged, this, [this]() {
+            if (mWindowAgent) {
+                setSystemButtonStripWidth(mWindowAgent->stripWidth());
+            }
+        });
+        connect(mWindowAgent, &RibbonWindowAgent::framelessEnabledChanged, this, [this]() {
+            if (mWindowAgent) {
+                setSystemButtonStripWidth(mWindowAgent->stripWidth());
+            }
+            Q_EMIT framelessActiveChanged();
+        });
+        connect(mWindowAgent, &RibbonWindowAgent::windowChanged, this, [this]() {
+            Q_EMIT framelessActiveChanged();
+            if (mWindowAgent && mWindowAgent->window()) {
+                setWindowTitle(mWindowAgent->window()->title());
+            }
+        });
+        connect(mWindowAgent, &QObject::destroyed, this, [this]() {
+            mWindowAgent = nullptr;
+            setSystemButtonStripWidth(0);
+            Q_EMIT framelessActiveChanged();
+            Q_EMIT windowAgentChanged();
+        });
+        setSystemButtonStripWidth(mWindowAgent->stripWidth());
+        // the property can be assigned after componentComplete (dynamic
+        // frameless toggling); attach immediately in that case
+        if (isComponentComplete()) {
+            attachWindowAgent();
+        }
+    }
+    Q_EMIT windowAgentChanged();
+}
+
+bool RibbonBar::setSystemButton(const QString& kind, QQuickItem* item)
+{
+    return mWindowAgent ? mWindowAgent->setSystemButton(kind, item) : false;
 }
 
 /**
@@ -886,6 +967,10 @@ void RibbonBar::itemChange(ItemChange change, const ItemChangeData& data)
         }
     } else if (change == QQuickItem::ItemVisibleHasChanged) {
         polish();
+    } else if (change == QQuickItem::ItemSceneChange && data.window) {
+        // the bar entered (or moved to) a window: attach the frameless agent
+        // now that a QQuickWindow exists (QWK setup needs it)
+        attachWindowAgent();
     }
     RibbonQuickHost::itemChange(change, data);
 }
@@ -975,6 +1060,95 @@ void RibbonBar::syncTabCount()
     // NOTE: currentIndex clamping happens in relayout against the EFFECTIVE
     // tab row (normal + active context tabs) — clamping here would wrongly
     // pull the index back while a context category is showing
+}
+
+void RibbonBar::attachWindowAgent()
+{
+    if (!mWindowAgent) {
+        return;
+    }
+    QQuickWindow* win = window();
+    if (!win) {
+        return;  // not in a scene yet; itemChange(ItemSceneChange) retries
+    }
+    if (mWindowAgent->window() == win) {
+        return;
+    }
+    mWindowAgent->setup(win);
+    if (mWindowAgent->window()) {
+        // THIS bar is the draggable title bar (widgets helper->setTitleBar
+        // parity): QWK turns the whole bar rect into HTCAPTION, and every
+        // interactive child must be registered as hit-test visible to
+        // receive Qt mouse events again (widgets setHitTestVisible calls in
+        // SARibbonMainWindow::setRibbonBar parity). Registered below:
+        //   - tabs (relayout registers each effective tab)
+        //   - quick access bar / right button group (title row hosts)
+        //   - application button (the leaf rect is interactive)
+        //   - the leaf's system button row (RibbonWindowButtonRow)
+        mWindowAgent->setTitleBarItem(this);
+        setWindowTitle(win->title());
+        // keep the leaf's title text in sync with the window title (the
+        // ApplicationWindow `title` property is what users edit)
+        connect(win, &QWindow::windowTitleChanged, this, [this](const QString& t) { setWindowTitle(t); });
+        // mirror the ribbon theme onto the DWM frame so the window border
+        // and caption follow dark/light palettes
+        connect(RibbonTheme::instance(), &RibbonTheme::paletteChanged, this, [this]() {
+            if (mWindowAgent) {
+                mWindowAgent->setDarkMode(RibbonTheme::instance()->isDark());
+            }
+        });
+        mWindowAgent->setDarkMode(RibbonTheme::instance()->isDark());
+        // initial interactive set (relayout keeps it fresh afterwards)
+        syncHitTestVisible();
+        Q_EMIT framelessActiveChanged();
+    }
+}
+
+void RibbonBar::detachWindowAgent()
+{
+    if (!mWindowAgent) {
+        return;
+    }
+    disconnect(mWindowAgent, nullptr, this, nullptr);
+    mWindowAgent->release();
+    mWindowAgent = nullptr;
+    setSystemButtonStripWidth(0);
+    Q_EMIT framelessActiveChanged();
+    Q_EMIT windowAgentChanged();
+}
+
+void RibbonBar::syncHitTestVisible()
+{
+    if (!mWindowAgent || !mWindowAgent->window()) {
+        return;
+    }
+    // interactive hosts (widgets setHitTestVisible parity): tabs ride the
+    // title row in compact styles and the tab row below it in loose ones —
+    // register every effective tab either way, plus the title-row hosts.
+    // NOTE: the leaf itself must NOT be registered — QWK excludes the whole
+    // hit-test item geometry from the draggable area, and the leaf spans the
+    // entire bar; registering it would kill the title drag everywhere.
+    // Leaf-internal interactive zones (the app button MouseArea, the system
+    // button row) are registered individually below by objectName lookup.
+    for (RibbonTab* tab : effectiveTabs()) {
+        if (tab) {
+            mWindowAgent->setHitTestVisible(tab);
+        }
+    }
+    if (mQuickAccessBar) {
+        mWindowAgent->setHitTestVisible(mQuickAccessBar);
+    }
+    if (mRightButtonGroup) {
+        mWindowAgent->setHitTestVisible(mRightButtonGroup);
+    }
+    if (QQuickItem* leaf = qmlLeaf()) {
+        // leaf-internal interactive zones, marked by objectName in RibbonBar.qml
+        for (const char* name : { "sysButtonRow", "appButtonArea" }) {
+            if (QQuickItem* zone = leaf->findChild< QQuickItem* >(QString::fromLatin1(name))) {
+                mWindowAgent->setHitTestVisible(zone);
+            }
+        }
+    }
 }
 
 void RibbonBar::relayout()
@@ -1165,6 +1339,8 @@ void RibbonBar::relayout()
     mTitleBarHeight = titleH;
     mCategoryRowY   = categoryY;
     Q_EMIT layoutChanged();
+    // keep the frameless hit-test registration in step with the new tab row
+    syncHitTestVisible();
 }
 
 }

@@ -20,6 +20,14 @@ ApplicationWindow {
         anchors.right: parent.right
         anchors.top: parent.top
 
+        // Frameless decoration (QWindowKit Quick route): one declaration
+        // wires the whole thing — the bar becomes the draggable title bar,
+        // the system button row renders on the bar's right edge, and the
+        // DWM frame follows the ribbon theme's dark/light mode
+        windowAgent: RibbonWindowAgent {
+            buttonWidth: 35
+        }
+
         applicationLabel: "File"
         onApplicationButtonClicked: log(qsTr("application button clicked"))
         // ApplicationWidget mode (widgets example default): a custom panel

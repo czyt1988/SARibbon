@@ -18,6 +18,7 @@ if(TARGET SARibbonQml)
         # (both output to ${CMAKE_BINARY_DIR}/bin): no DLL copy step can go
         # stale when only the library re-links (a qrc-only change keeps the
         # import lib untouched, so a copy hook on the exe would not re-run).
+        # 树内构建 QWK 时 QWKQuick/QWKCore 同在 bin 下，天然可见。
         set_target_properties(qml_Conformance PROPERTIES
             RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
         )

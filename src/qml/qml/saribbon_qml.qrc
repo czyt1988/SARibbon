@@ -21,6 +21,7 @@
         <file>RibbonColorMenu.qml</file>
         <file>RibbonColorToolButton.qml</file>
         <file>RibbonCustomizeDialog.qml</file>
+        <file>RibbonWindowButtonRow.qml</file>
     </qresource>
     <!-- Shared theme palette data (the same on-disk JSONs the widgets module
          compiles in): a QML-only app must resolve theme tokens without

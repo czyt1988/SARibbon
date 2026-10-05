@@ -68,6 +68,8 @@ sa_add_library(SARibbonQml
         SARibbonQmlCustomizer.cpp
         SARibbonQmlCustomizeTreeModel.h
         SARibbonQmlCustomizeTreeModel.cpp
+        SARibbonQmlWindowAgent.h
+        SARibbonQmlWindowAgent.cpp
         qml/saribbon_qml.qrc
     PREFIX SA_RIBBON_QML
     QT_LINKS Core Gui Quick Qml QuickControls2

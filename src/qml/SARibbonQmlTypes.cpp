@@ -26,6 +26,7 @@
 #include "SARibbonQmlActionRegistryModel.h"
 #include "SARibbonQmlCustomizer.h"
 #include "SARibbonQmlCustomizeTreeModel.h"
+#include "SARibbonQmlWindowAgent.h"
 #include <QQmlEngine>
 #include <QQmlContext>
 #include <QQmlComponent>
@@ -160,6 +161,9 @@ void saRibbonRegisterQmlTypes(QQmlEngine* engine)
     qmlRegisterType< SARibbonQml::RibbonQuickAccessBar >("SARibbon", 3, 0, "RibbonQuickAccessBar");
     qmlRegisterType< SARibbonQml::RibbonButtonGroup >("SARibbon", 3, 0, "RibbonButtonGroup");
     qmlRegisterType< SARibbonQml::RibbonApplicationWindow >("SARibbon", 3, 0, "RibbonApplicationWindow");
+    // frameless window agent (QWindowKit Quick route): declare as a child of
+    // RibbonBar; the leaf renders the system button row automatically
+    qmlRegisterType< SARibbonQml::RibbonWindowAgent >("SARibbon", 3, 0, "RibbonWindowAgent");
     // color widget family (widgets SAColorGridWidget / SAColorMenu counterparts)
     qmlRegisterType< SARibbonQml::RibbonColorGrid >("SARibbon", 3, 0, "RibbonColorGrid");
     qmlRegisterType< SARibbonQml::RibbonColorMenu >("SARibbon", 3, 0, "RibbonColorMenu");

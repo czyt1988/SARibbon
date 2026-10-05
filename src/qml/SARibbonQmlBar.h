@@ -10,6 +10,9 @@
 // happens to be compiled (NOTES B64)
 #include "SARibbonQmlCategory.h"
 #include "SARibbonQmlMenuItem.h"
+// full definition: the windowAgent Q_PROPERTY needs the type complete in
+// every TU including this header (moc pointer metatype, same B64 family)
+#include "SARibbonQmlWindowAgent.h"
 #include <SARibbonCore/SARibbonBarGeometryEngine.h>
 #include <SARibbonCore/SARibbonToolButtonLayout.h>
 #include <QHash>
@@ -27,6 +30,7 @@ class RibbonQuickAccessBar;
 class RibbonButtonGroup;
 class RibbonMenuItem;
 class RibbonApplicationWindow;
+class RibbonWindowAgent;
 
 /**
  * \if ENGLISH
@@ -71,6 +75,9 @@ class SA_RIBBON_QML_EXPORT RibbonBar : public RibbonQuickHost
     Q_PROPERTY(bool hasApplicationMenu READ hasApplicationMenu NOTIFY applicationMenuItemsChanged)
     Q_PROPERTY(QQuickItem* applicationWindowItem READ applicationWindowItem NOTIFY applicationWindowChanged)
     Q_PROPERTY(bool hasApplicationWindow READ hasApplicationWindow NOTIFY applicationWindowChanged)
+    Q_PROPERTY(QString windowTitle READ windowTitle WRITE setWindowTitle NOTIFY windowTitleChanged)
+    Q_PROPERTY(bool framelessActive READ isFramelessActive NOTIFY framelessActiveChanged)
+    Q_PROPERTY(SARibbonQml::RibbonWindowAgent* windowAgent READ windowAgent WRITE setWindowAgent NOTIFY windowAgentChanged)
 public:
     explicit RibbonBar(QQuickItem* parent = nullptr);
     ~RibbonBar() override;
@@ -110,10 +117,30 @@ public:
     // close). Native-frame windows need no reservation, so the default is 0
     // and the right button group hugs the window edge (widgets
     // resizeInLooseStyle/resizeInCompactStyle only subtract the system strip
-    // when isUseRibbonFrame() is on). A future QML frameless integration
-    // sets this to the actual system button group width
+    // when isUseRibbonFrame() is on). A declared RibbonWindowAgent child
+    // overrides this automatically with the actual system button strip width
     int systemButtonStripWidth() const;
     void setSystemButtonStripWidth(int w);
+
+    // Window title text the leaf paints into the title free area (widgets
+    // SARibbonBar::paintWindowTitle parity; the source is the attached
+    // QQuickWindow's title, kept in sync through windowTitleChanged)
+    QString windowTitle() const;
+    void setWindowTitle(const QString& title);
+
+    // True while the frameless agent is attached to a window and enabled;
+    // the leaf renders the system button row and hit-test registration runs
+    bool isFramelessActive() const;
+
+    // The frameless agent (optional; declare one through the `windowAgent`
+    // property: `windowAgent: RibbonWindowAgent { }` — setup wires this bar
+    // as the title bar and syncs the strip reservation)
+    RibbonWindowAgent* windowAgent() const;
+    void setWindowAgent(RibbonWindowAgent* agent);
+
+    // Register a QML-rendered system button (kind: minimize/maximize/close)
+    // with the frameless agent; no-op without an agent
+    Q_INVOKABLE bool setSystemButton(const QString& kind, QQuickItem* item);
 
     // layout values consumed by the visual leaf (re-published on relayout)
     int tabBarHeight() const;
@@ -210,6 +237,9 @@ Q_SIGNALS:
     void applicationMenuItemsChanged();
     void applicationMenuTriggered(SARibbonQml::RibbonMenuItem* item);
     void applicationWindowChanged();
+    void windowTitleChanged();
+    void framelessActiveChanged();
+    void windowAgentChanged();
 
 protected:
     QUrl leafUrl() const override;
@@ -234,6 +264,13 @@ private:
     static int styleRowCount(RibbonEnums::RibbonStyle style);
     static bool styleIsCompact(RibbonEnums::RibbonStyle style);
     void placeTitleRowHosts(int titleH, int tabBarY, int tabH, int appBtnW, int systemStripW);
+    // frameless: attach/detach the agent to the hosting QQuickWindow and
+    // keep the strip reservation in sync
+    void attachWindowAgent();
+    void detachWindowAgent();
+    // frameless: (re-)register every interactive child with the QWK agent so
+    // they receive Qt mouse events inside the HTCAPTION bar rect
+    void syncHitTestVisible();
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     using ListIndex = qsizetype;
 #else
@@ -268,6 +305,8 @@ private:
     RibbonQuickAccessBar* mQuickAccessBar = nullptr;  ///< declared quick access row (single)
     RibbonButtonGroup* mRightButtonGroup  = nullptr;  ///< declared right group (single)
     RibbonApplicationWindow* mApplicationWindow = nullptr;  ///< declared app window (single)
+    RibbonWindowAgent* mWindowAgent = nullptr;  ///< declared frameless agent (single)
+    QString mWindowTitle;  ///< mirrored window title for the leaf
     QVector< RibbonMenuItem* > mAppMenuItems;
     QVariantList mBands;
     QRect mTitleRect;

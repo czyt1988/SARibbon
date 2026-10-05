@@ -452,12 +452,40 @@ QTEST_MAIN(TestConformanceQml)   // 不链 Widgets → 展开为 QGuiApplication
 
 见 [NOTES.md](NOTES.md)。
 
-## 附录A QML 侧标题栏集成预案（Tier 2 参考，第2轮评审补，QWK 实证；P0 不实现）
+## 附录A QML 侧标题栏集成（**已落地为库内实现**，本节由预案转为实施记录）
 
-背景：3.0 QML 侧不做无边框（v2 留守 widgets/frameless 组合），但 M3 之后"RibbonBar 放进 QML `ApplicationWindow` 并兼任标题栏拖动区"的诉求几乎必然出现（widgets 侧 `SARibbonMainWindow` 已有对应形态）。为避免执行 agent 现场发明，按 QWK quick 模块的实证做法预留方案：
+背景与最终形态：QML 模块 3.0 起强制绑定 QWindowKit（`SARIBBON_BUILD_QML=ON` 强制
+`SARIBBON_USE_FRAMELESS_LIB=ON`，构建侧见 CMakeLists 联动），无边框实现落在
+SARibbonQml 库内（与 widgets 的 `SARibbonMainWindow` 对称，v2 §5.5 的"库不链 QWK"
+红线由 QML-必须-QWK 的产品决策取代）：
 
-- **QWK 的暴露形态不是 attached property，而是普通注册类型 + 显式 setup**：`WindowAgent` 经 `qmlRegisterType<QuickWindowAgent>("QWindowKit", 1, 0, "WindowAgent")` 注册（`src/quick/qwkquickglobal.cpp:23`），QML 侧声明 `WindowAgent { id: windowAgent }`（`examples/qml/main.qml:38-40`），在 `Component.onCompleted` 里 `windowAgent.setup(window)`（main.qml:14-17；C++ 侧 `Q_INVOKABLE bool setup(QQuickWindow*)`，`quickwindowagent.h:25`，实现 `quickwindowagent.cpp:36-54`——把窗口和一个 `QuickItemDelegate` 交给 core 的 WindowAgentBase）。
-- **标题栏 = QML 里随便一个 item，交给 agent**：`windowAgent.setTitleBar(titleBar)`（main.qml:57 在 titleBar Rectangle 的 `Component.onCompleted` 里调用；`quickwindowagent.h:28` `Q_INVOKABLE void setTitleBar(QQuickItem*)`）；标题栏内的可交互子项逐个豁免命中测试：`setHitTestVisible(item, true)`（`quickwindowagent.h:33-34`）。
-- **前端适配层**：`QuickItemDelegate : WindowItemDelegate`（`quickitemdelegate_p.h:25-48`）把 QQuickItem/QQuickWindow 映射到 core 的窗口语义（window/isVisible/mapGeometryToScene/setWindowState...）——与 SARibbon"QML 侧实现 core 契约接口"（S3 骨架 PrivateData 适配器）同构，可直接当模板抄。
-- **SARibbon 预案**：RibbonBar 宿主暴露只读属性（如 `titleBarDragArea`）指向其 tab 条空白区 item，按钮/交互子项列表供 `setHitTestVisible` 逐个登记；组合代码写在**示例层**（`examples/qml` 增加一个 frameless 变体 main_frameless.qml），SARibbonQml 库本体不链接 QWK（依赖矩阵红线，v2 §5.5 精神）；仅当 `SARIBBON_USE_FRAMELESS_LIB=ON` 且 QML 用户实际反馈需要时才升格为库内适配（Tier 2 gate，D7 同款流程，记 NOTES）。
-- 决策点：做与不做由 3.1 QML 用户反馈触发；P0 交付物不含任何 frameless/标题栏代码。
+- **`RibbonWindowAgent`（src/qml/SARibbonQmlWindowAgent.h/cpp）**：封装
+  `QWK::QuickWindowAgent` 的 QObject 宿主。`setup(QQuickWindow*)` 挂接、
+  `titleBarItem` 委派拖动区、`setSystemButton(kind, item)` 按字符串注册系统按钮
+  （minimize/maximize/close）、`setDarkMode` 同步 DWM 暗色、`stripWidth()` 按
+  widgets 4:3:3 拉伸比例（3×buttonWidth）发布预留宽度。
+- **RibbonBar 集成（SARibbonQmlBar）**：QML 声明 `windowAgent: RibbonWindowAgent { }`
+  即全自动接线——bar 自任 titleBar（widgets `helper->setTitleBar(ribbon)` 对位）、
+  `systemButtonStripWidth` 自动同步预留、窗口标题镜像到 `windowTitle` 属性、
+  `syncHitTestVisible()` 把 tabs/quickAccess/rightGroup 及叶子内交互区
+  （objectName `sysButtonRow`/`appButtonArea`）注册回 Qt 事件域。注意教训：
+  **不能把整片 bar 叶子注册为 hit-test visible**（QWK 按 item 几何整片豁免，
+  会杀死全部拖动区）——只注册具体交互控件，widgets 同款粒度。
+- **视觉叶子（qml/RibbonBar.qml + RibbonWindowButtonRow.qml）**：标题文本绘制在
+  core `layoutTitleRect` 的标题自由区（`paintWindowTitle` 对位）；系统按钮行由
+  Loader 按需创建（framelessActive 时），min/max/close 三键、Canvas 矢量字形、
+  `sys-button-hover/pressed` 与 `close-bg` 主题 token（office-2021 QSS 对位）。
+  按钮默认走 Qt 客户区事件（widgets 默认路径）；`registerSystemButtons: true`
+  才登记为 QWK 原生系统按钮（对应 widgets `SARIBBON_ENABLE_SNAP_LAYOUT` 门槛——
+  注册后按钮进入非客户区，Qt hover/click 语义让位给系统，Win11 Snap Layout 需要）。
+- **示例（examples/qml/QmlMainWindowExample）**：`windowAgent: RibbonWindowAgent{}`
+  一行启用；已实测（Win10 实机）：标题拖动、tab 点击、app 按钮弹窗、最小化/
+  最大化/还原/关闭全部通过，DWM 阴影保留（WS_CAPTION 位保留 + NCCALCSIZE 路线，
+  客户区 == 窗口矩形）。
+- 测试：`tst_conformance_qml::framelessAgentStripAndTitle`（offscreen 可跑：QWK 的
+  Qt 层钩子对 offscreen QQuickWindow 一样生效）覆盖预留宽度/标题镜像/系统按钮注册。
+
+原第2轮评审的参考记录（保留供考古）：QWK 的暴露形态是普通注册类型 + 显式 setup
+（`qmlRegisterType<QuickWindowAgent>` / `WindowAgent { }` / `windowAgent.setup(window)`），
+标题栏是任意 QQuickItem + `setTitleBar`，交互子项 `setHitTestVisible` 逐个豁免——
+SARibbon 的实现完全沿用这套形态，仅把组合代码从示例层收进库内（用户一行声明即用）。

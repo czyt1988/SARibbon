@@ -16,7 +16,7 @@ src/core/                 ← SARibbonCore：宏/枚举/契约基座（计划02�
 src/widgets/              ← SARibbonWidgets：全部控件源码（.h/.cpp），可编辑
 src/widgets/colorWidgets/ ← SAColorWidgets 子模块（SAColorToolButton等）
 src/widgets/i18n/         ← 翻译文件 (.ts/.qm)
-src/qml/                  ← SARibbonQml 骨架（计划04实现）
+src/qml/                  ← SARibbonQml 骨架（计划04实现；QML 模式强制 QWindowKit 无边框：`windowAgent: RibbonWindowAgent{}` 一行启用）
 src/SARibbon.cpp/.h       ← ⛔ 合并文件，禁止触碰，调用 tools/Amalgamate.sh 自动生成
 3rdparty/                 ← 第三方代码（qwindowkit submodule 等）
 examples/widgets/         ← 示例程序（MainWindowExample是最主要的）
