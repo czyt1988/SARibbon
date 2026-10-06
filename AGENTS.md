@@ -17,7 +17,7 @@
    ```bash
    git worktree add .worktree/<任务名> -b <feature|fix>/<任务名> <源分支>
    ```
-   此后改动、构建、提交只在 `.worktree/<任务名>` 内进行。worktree 共享主仓库 `.git` 对象库，拉取本身不需要网络。
+   此后改动、构建、提交只在 `.worktree/<任务名>` 内进行。worktree 共享主仓库 `.git` 对象库，拉取本身不需要网络。项目应把 `.worktree/` 加入 `.gitignore`，避免主工作树出现未跟踪目录。
 
 2. **submodule 离线复用**：含 submodule 的项目禁止直接 `git submodule update --init`——它会从远端重新克隆。改用主工作树已下载的 submodule 目录作本地克隆源（在**主工作树根目录**执行，`<sub>` 为 submodule 相对路径，如 `3rdparty/qwindowkit`）：
    ```bash
@@ -29,7 +29,7 @@
 
 3. **合并回源分支**：任务完成后，任务分支必须合并回当初拉取它的源分支——从哪个分支拉取，就合并回哪个分支，禁止合并到其他分支。源分支在主工作树时，切到源分支执行 `git merge <任务分支>`。
 
-4. **完成标准**：合并必须干净成功、无冲突并通过构建/测试验证后才算完成；冲突必须当场解决，不得把冲突、半合并或未验证状态留给用户。收尾：`git worktree remove .worktree/<任务名>` 清理现场，删除任务分支。
+4. **完成标准**：合并必须干净成功、无冲突并通过构建/测试验证后才算完成；冲突必须当场解决，不得把冲突、半合并或未验证状态留给用户。收尾：确认 worktree 内改动已全部提交并合并后，用 `git worktree remove --force .worktree/<任务名>` 清理现场（含 submodule 的 worktree 不加 `--force` 会被 git 拒绝删除），再删除任务分支。
 
 ## 项目结构
 
