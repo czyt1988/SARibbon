@@ -36,7 +36,7 @@ engine.load(QUrl("qrc:///main.qml"));
 | `RibbonCategory` | 类型 | category 结构宿主（panel 排布 + 引擎钳制滚动） |
 | `RibbonTab` | 类型 | tab 宿主（text/current/contextColor） |
 | `RibbonPanel` | 类型 | panel 结构宿主（驱动 PanelLayoutEngine，子项注册已泛化为任意 `RibbonLayoutItemHost`） |
-| `RibbonToolButton` | 类型 | 按钮宿主（text/iconSource/proportion/checkable/**popupMode 三模式**/menuItems 菜单/禁用态） |
+| `RibbonToolButton` | 类型 | 按钮宿主（text/iconSource/proportion/checkable/**popupMode 三模式**/menuItems 菜单/禁用态/**toolButtonStyle 图标文字显示方式**） |
 | `RibbonControlContainer` | 类型 | 控件容器宿主（`control` 属性嵌入任意 QQuickItem：ComboBox/CheckBox/SpinBox/TextField…，对标 widgets SARibbonCtrlContainer） |
 | `RibbonCheckBox` | 类型（纯 QML） | 紧凑主题化复选框（14px 指示器，`indicatorSide` 可调；URL 注册，无 C++ 宿主） |
 | `RibbonRadioButton` | 类型（纯 QML） | 紧凑主题化单选钮（14px 圆环；互斥用 Controls2 `ButtonGroup` 附加属性，对应 widgets QButtonGroup） |
@@ -49,8 +49,8 @@ engine.load(QUrl("qrc:///main.qml"));
 | `RibbonGalleryGroup` | 类型 | 画廊组（groupTitle + items，默认属性 items） |
 | `RibbonGalleryItem` | 类型 | 画廊条目（text/iconSource/enabled/toolTip） |
 | `RibbonSeparator` | 类型 | 面板分隔符（Large 比例独占一列的 1px 竖线，对标 widgets SARibbonSeparatorWidget） |
-| `RibbonQuickAccessBar` | 类型 | 快速访问栏（标题行应用按钮后的小按钮排，宽度进 core TitleRectInput.hasQuickAccessBar，对标 widgets SARibbonQuickAccessBar） |
-| `RibbonButtonGroup` | 类型 | 右侧按钮组（右对齐到 bar 右缘；紧凑样式在标题行系统按钮区前，宽松样式在 tab 行系统按钮条下方，对标 widgets SARibbonButtonGroupWidget） |
+| `RibbonQuickAccessBar` | 类型 | 快速访问栏（标题行应用按钮后的**工具栏按钮**排：内部 proportion 失效、默认只显图标，宽度进 core TitleRectInput.hasQuickAccessBar，对标 widgets SARibbonQuickAccessBar） |
+| `RibbonButtonGroup` | 类型 | 右侧按钮组（右对齐到 bar 右缘；紧凑样式在标题行系统按钮区前，宽松样式在 tab 行系统按钮条下方；与快速访问栏同为**工具栏渲染**，对标 widgets SARibbonButtonGroupWidget） |
 | `RibbonApplicationWindow` | 类型 | 应用窗口（File 按钮弹出的 Office 后台式覆盖层：coverageRatio 覆盖比例 + animation 进出动画 + 右上角 ✕/Esc/外点关闭，内部 close() 编程式关闭；点击优先级：窗口 > 菜单 > 仅信号，对标 widgets ApplicationWidget） |
 | `Ribbon` | 不可实例化 | 枚举持有（`Ribbon.Large` / `Ribbon.ThreeRowMode` / `Ribbon.MenuButtonPopup` / `Ribbon.RibbonStyleCompactTwoRow` / ...） |
 
@@ -185,6 +185,31 @@ RibbonBar { ribbonStyle: Ribbon.RibbonStyleCompactTwoRow }
   右侧组与 tab 行右界左移让位——宽松样式的右侧组在 tab 行上、位于只覆盖
   标题行的系统按钮条**下方**，必须贴到 bar 右缘（widgets resizeInLooseStyle
   对等：strip 只进标题自由区计算），宽度进入 `TitleRectInput.hasQuickAccessBar`。
+- **标题行容器内的按钮一律工具栏渲染**（widgets 对等：两容器在 widgets 侧是
+  QToolBar，按钮是 QToolButton::addAction 生成的普通 QToolButton，从来不是
+  SARibbonToolButton）：
+  - **proportion 失效**：登记进容器即压入标题行渲染上下文（`setTitleRow`），
+    `largeType` 恒为小按钮——设了 `Ribbon.Large` 也按工具栏样式显示；按钮移回
+    面板（定制记录 detach/attach、`attachButton`/`detachButton`）时上下文自动
+    翻转，proportion 恢复语义。原值只存不改，读回仍是所设值。
+  - **toolButtonStyle 三级解析**：显式设置（`toolButtonStyle: Ribbon.TextBesideIcon`
+    等）永远生效；未设置时按上下文取默认——面板 = `TextBesideIcon`（SARibbon
+    经典观感），标题行容器 = `IconOnly`（QToolBar 观感）；`IconOnly` 且无图标
+    时回退 `TextOnly`（纯文字按钮不至于渲染成空白），Qt6 下无图标的
+    `TextBesideIcon` 同样降级为 `TextOnly`（对齐 `QToolButton::initStyleOption`）。
+    枚举值与 `Qt::ToolButtonStyle` 逐一 static_assert 钉死。
+  - 叶子补一条工具栏语义：图标按钮只显图标时，未显式设置 `toolTip` 的按钮把
+    caption 作为 tooltip 兜底（QToolBar 显示 QAction 文字的同款行为）。
+- **窗口最小宽度自动计算**：`RibbonBar.minimumWidth`（只读，`minimumWidthChanged`
+  通知）由 core `SARibbonBarGeometryEngine::calcMinimumWidth` 推导——行区组合
+  区分宽松（tab 行与标题行两行取宽，窗口标题只加在标题行）与紧凑（单行共享，
+  标题骑在 tab 行右侧），行区内容 = 应用按钮 + 快速访问栏 + 生效 tab 行 +
+  右侧组 + 系统按钮条 + 前端间距。屏幕规则（屏幕可用宽度已知时）：1. 含标题
+  总宽不超过 2/3 屏宽（更不会超过屏幕整宽）；2. 超过时先牺牲标题预留，给用户
+  留缩小空间；3. 去掉标题仍超过则允许控件交叠，钳制在 2/3 屏宽。窗口接线是
+  一行绑定 `ApplicationWindow { minimumWidth: ribbonBar.minimumWidth }`——QML
+  窗口不会从内容推导最小尺寸，bar 也不主动改写窗口属性（避免与用户绑定打架）；
+  中央内容需要更大最小值时套 `Math.max()`。
 - **应用按钮三种模式**（点击优先级：应用窗口 > 菜单 > 仅信号）：
   - `RibbonApplicationWindow`（widgets ApplicationWidget 对等）：声明为 bar
     子项的自定义内容项，叶子惰性 Popup 以 **Office 后台式覆盖层**承载——

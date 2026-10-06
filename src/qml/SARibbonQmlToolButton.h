@@ -44,6 +44,11 @@ class RibbonMenuItem;
  *          arrive through the bar propagation chain (widgets
  *          SARibbonBar::setButtonMaximumAspectRatio parity): a bar-level change
  *          overwrites the per-button value, exactly as on the widgets side.
+ *          The icon/text display follows QToolButton::toolButtonStyle through
+ *          the toolButtonStyle property (explicit wins; an unset button keeps
+ *          TextBesideIcon in panels and resolves IconOnly inside the title-row
+ *          containers, which also force the small rendering — proportion is
+ *          meaningless there, matching the widgets QToolBar buttons).
  * \endif
  *
  * \if CHINESE
@@ -63,6 +68,10 @@ class RibbonMenuItem;
  *          发布，对应 SARibbonToolButton 的同名公开设置函数。两个宽高比还会经
  *          bar 传播链下发（对应 widgets SARibbonBar::setButtonMaximumAspectRatio）：
  *          bar 级改动会覆盖单按钮的值，与 widgets 侧行为一致。
+ *          图标/文字的显示方式经 toolButtonStyle 属性对照
+ *          QToolButton::toolButtonStyle（显式设置优先；未设置的面板按钮保持
+ *          TextBesideIcon，标题行容器内的按钮解析为 IconOnly，且一律按小按钮
+ *          渲染——proportion 在其中无意义，与 widgets 侧 QToolBar 按钮一致）。
  * \endif
  */
 class SA_RIBBON_QML_EXPORT RibbonToolButton : public RibbonLayoutItemHost
@@ -76,6 +85,7 @@ class SA_RIBBON_QML_EXPORT RibbonToolButton : public RibbonLayoutItemHost
     Q_PROPERTY(bool wordWrap READ isWordWrap WRITE setWordWrap NOTIFY wordWrapChanged)
     Q_PROPERTY(bool iconRightText READ isIconRightText WRITE setIconRightText NOTIFY iconRightTextChanged)
     Q_PROPERTY(bool flat READ isFlat WRITE setFlat NOTIFY flatChanged)
+    Q_PROPERTY(RibbonEnums::ToolButtonStyle toolButtonStyle READ toolButtonStyle WRITE setToolButtonStyle NOTIFY toolButtonStyleChanged)
     Q_PROPERTY(int spacing READ spacing WRITE setSpacing NOTIFY spacingChanged)
     Q_PROPERTY(qreal twoLineHeightFactor READ twoLineHeightFactor WRITE setTwoLineHeightFactor NOTIFY layoutFactorsChanged)
     Q_PROPERTY(qreal oneLineHeightFactor READ oneLineHeightFactor WRITE setOneLineHeightFactor NOTIFY layoutFactorsChanged)
@@ -134,6 +144,23 @@ public:
     // title row instead of carrying the content background box
     bool isFlat() const;
     void setFlat(bool on);
+
+    // Explicit icon/text display style (QToolButton::toolButtonStyle parity).
+    // Writing it through QML marks it explicit and it always wins; an unset
+    // button resolves through the rendering context: the panel default keeps
+    // TextBesideIcon, a title-row container (quick access bar / right group)
+    // defaults to IconOnly like the widgets QToolBar buttons
+    RibbonEnums::ToolButtonStyle toolButtonStyle() const;
+    void setToolButtonStyle(RibbonEnums::ToolButtonStyle style);
+
+    // Rendering context pushed by the title-row containers (quick access bar,
+    // right button group): while on, the button renders toolbar-style — the
+    // proportion is meaningless there (widgets parity: their quick access
+    // buttons are plain QToolButtons created by QToolBar, never
+    // SARibbonToolButtons) and the unset style default becomes IconOnly.
+    // Cleared again when the button moves back into a panel
+    bool isTitleRow() const;
+    void setTitleRow(bool on);
 
     // Gap between the drawn elements (widgets setSpacing parity)
     int spacing() const;
@@ -227,6 +254,7 @@ Q_SIGNALS:
     void wordWrapChanged();
     void iconRightTextChanged();
     void flatChanged();
+    void toolButtonStyleChanged();
     void spacingChanged();
     void layoutFactorsChanged();
     void iconSizesChanged();
@@ -274,6 +302,10 @@ private:
     static void clearMenuItems(QQmlListProperty< SARibbonQml::RibbonMenuItem >* prop);
 
     QSize computeSizeHintFromMetrics();
+    // Resolve the core style from the explicit value / rendering context and
+    // apply the icon-less fallback (an IconOnly button without an icon would
+    // render blank; text takes over instead)
+    Qt::ToolButtonStyle effectiveToolButtonStyle() const;
     void emitMenuItemsChanged();
 
     QString mText;
@@ -283,6 +315,9 @@ private:
     bool mWordWrap  = true;
     bool mIconRightText = false;
     bool mFlat = false;
+    bool mTitleRow = false;  ///< rendering context pushed by the title-row containers
+    RibbonEnums::ToolButtonStyle mToolButtonStyle = RibbonEnums::TextBesideIcon;  ///< explicit value (mToolButtonStyleSet gates it)
+    bool mToolButtonStyleSet = false;  ///< true once QML/C++ wrote the property
     QString mToolTip;
     RibbonEnums::PopupMode mPopupMode = RibbonEnums::DelayedPopup;
     bool mMenuVisible = false;

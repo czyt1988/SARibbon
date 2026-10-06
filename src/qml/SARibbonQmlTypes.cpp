@@ -28,6 +28,7 @@
 #include "SARibbonQmlCustomizeTreeModel.h"
 #include "SARibbonQmlWindowAgent.h"
 #include <QQmlEngine>
+#include <QMetaType>
 #include <QQmlContext>
 #include <QQmlComponent>
 #include <QQuickItem>
@@ -112,6 +113,27 @@ void saRibbonRegisterQmlTypes(QQmlEngine* engine)
 
 #if defined(SA_RIBBON_QML_STATIC) || defined(QT_STATIC)
     Q_INIT_RESOURCE(saribbon_qml);  // static library qrc does not auto-load
+#endif
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+    // Qt5: the RibbonEnums enums are Q_ENUM'd in a class other than the one
+    // owning the properties, and Qt5 never registers such enums with the
+    // metatype registry — every enum-typed property is then opaque to the
+    // QML engine ("Unable to assign int to [unknown property type]") and to
+    // the property system ("Unable to handle unregistered datatype"). The
+    // named qRegisterMetaType form registers each enum under its
+    // moc-normalized property name (no SARibbonQml:: qualifier — that is
+    // the name QMetaProperty looks up) as a typedef of the auto-named
+    // metatype. Qt6 registers Q_ENUM metatypes lazily and needs none of this
+    qRegisterMetaType< SARibbonQml::RibbonEnums::RowProportion >("RibbonEnums::RowProportion");
+    qRegisterMetaType< SARibbonQml::RibbonEnums::LayoutMode >("RibbonEnums::LayoutMode");
+    qRegisterMetaType< SARibbonQml::RibbonEnums::Alignment >("RibbonEnums::Alignment");
+    qRegisterMetaType< SARibbonQml::RibbonEnums::PopupMode >("RibbonEnums::PopupMode");
+    qRegisterMetaType< SARibbonQml::RibbonEnums::ToolButtonStyle >("RibbonEnums::ToolButtonStyle");
+    qRegisterMetaType< SARibbonQml::RibbonEnums::RibbonStyle >("RibbonEnums::RibbonStyle");
+    qRegisterMetaType< SARibbonQml::RibbonEnums::GalleryCaptionStyle >("RibbonEnums::GalleryCaptionStyle");
+    qRegisterMetaType< SARibbonQml::RibbonEnums::ColorStyle >("RibbonEnums::ColorStyle");
+    qRegisterMetaType< SARibbonQml::RibbonEnums::ColorMenuStyle >("RibbonEnums::ColorMenuStyle");
 #endif
 
     // ---- singletons (callback form; CppOwnership set inside, plan-04 S1-3) ----

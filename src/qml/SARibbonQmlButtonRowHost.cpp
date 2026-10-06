@@ -73,6 +73,11 @@ void RibbonButtonRowHost::registerButton(RibbonToolButton* btn)
         // QToolButton` parity); the panel host clears the flag again when a
         // customize record moves the button back into a panel
         btn->setFlat(true);
+        // toolbar rendering context (widgets parity: the quick access bar and
+        // the right group are QToolBars whose buttons are plain QToolButtons,
+        // never SARibbonToolButtons): the proportion carries no meaning here
+        // and the unset style default becomes icon-only
+        btn->setTitleRow(true);
         // hint changes re-flow the row (text/icon edits)
         connect(btn, &QQuickItem::implicitWidthChanged, this, [this]() { polish(); });
         connect(btn, &QQuickItem::implicitHeightChanged, this, [this]() { polish(); });
@@ -86,6 +91,7 @@ void RibbonButtonRowHost::unregisterButton(RibbonToolButton* btn)
     if (mButtons.removeOne(btn)) {
         disconnect(btn, nullptr, this, nullptr);
         btn->setFlat(false);
+        btn->setTitleRow(false);
         polish();
     }
 }

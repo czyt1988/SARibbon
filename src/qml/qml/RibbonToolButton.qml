@@ -288,7 +288,12 @@ Rectangle {
         id: hover
         enabled: !root.disabled
     }
-    ToolTip.visible: hover.hovered && root.tip.length > 0
-    ToolTip.text: root.tip
+    // toolbar parity: an icon-only button that hid its caption surfaces the
+    // caption through the tooltip when the user set none (a QToolBar shows
+    // the QAction text the same way); the fallback only fires while the
+    // caption is genuinely not rendered (empty text box)
+    readonly property bool captionHidden: root.textBox.width <= 0 && root.label.length > 0
+    ToolTip.visible: hover.hovered && (root.tip.length > 0 || root.captionHidden)
+    ToolTip.text: root.tip.length > 0 ? root.tip : root.label
     ToolTip.delay: 400
 }

@@ -138,5 +138,37 @@ QRect SARibbonBarGeometryEngine::layoutTitleRect(const TitleRectInput& input)
     }
 }
 
+int SARibbonBarGeometryEngine::calcMinimumWidth(const MinimumWidthInput& input)
+{
+    // 行区组合：宽松样式两行独立（tab 行带右侧组，标题行带快速访问栏 + 系统按钮条，
+    // 窗口标题只加在标题行上）；紧凑样式单行共享（标题在 tab 行右侧的剩余空间里，
+    // 因此标题宽度直接加进整行）。行区宽度由前端布局按自己的间距常数预先合成，
+    // core 只负责“两行取宽 + 标题落位”的结构知识
+    const int titleTextWidth = qMax(input.titleTextWidth, 0);
+    const int layoutWidth    = input.isCompactStyle
+                                   ? input.tabRowWidth
+                                   : qMax(input.tabRowWidth, input.titleRowWidth);
+    const int fullWidth = input.isCompactStyle
+                              ? (input.tabRowWidth + titleTextWidth)
+                              : qMax(input.tabRowWidth, input.titleRowWidth + titleTextWidth);
+
+    // 屏幕规则仅在屏幕宽度已知时生效（无窗口/无屏幕的 headless 场景跳过）
+    if (input.screenAvailableWidth <= 0) {
+        return qMax(fullWidth, 1);
+    }
+    // 规则 1：含标题的总宽不超过屏幕（cap = 2/3 屏宽 < 屏宽，天然满足）
+    const int cap = input.screenAvailableWidth * 2 / 3;
+    if (fullWidth <= cap) {
+        return qMax(fullWidth, 1);
+    }
+    // 规则 2：超过 cap 时先牺牲标题，给用户留出缩小空间
+    if (layoutWidth <= cap) {
+        return qMax(layoutWidth, 1);
+    }
+    // 规则 3：去掉标题仍超过 cap（含超出屏幕整宽的情形），允许控件交叠，
+    // 最小宽度钳制在 2/3 屏宽
+    return qMax(cap, 1);
+}
+
 }
 }

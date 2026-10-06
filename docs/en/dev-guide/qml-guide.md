@@ -40,7 +40,7 @@ first engine; a second engine gets nullptr (verified against Qt 5.14/6.7 sources
 | `RibbonCategory` | type | category structural host (panel layout + clamped scroll) |
 | `RibbonTab` | type | tab host (text/current/contextColor) |
 | `RibbonPanel` | type | panel structural host (drives PanelLayoutEngine; child registration is generic over any `RibbonLayoutItemHost`) |
-| `RibbonToolButton` | type | button host (text/iconSource/proportion/checkable/**three popupModes**/menuItems menu/disabled state) |
+| `RibbonToolButton` | type | button host (text/iconSource/proportion/checkable/**three popupModes**/menuItems menu/disabled state/**toolButtonStyle icon/text display**) |
 | `RibbonControlContainer` | type | control container host (the `control` property embeds any QQuickItem: ComboBox/CheckBox/SpinBox/TextField/...; widgets SARibbonCtrlContainer counterpart) |
 | `RibbonCheckBox` | type (pure QML) | compact themed check box (14px indicator, tunable via `indicatorSide`; URL-registered, no C++ host) |
 | `RibbonRadioButton` | type (pure QML) | compact themed radio button (14px ring; exclusivity via the Controls2 `ButtonGroup` attached property, the QButtonGroup counterpart) |
@@ -53,8 +53,8 @@ first engine; a second engine gets nullptr (verified against Qt 5.14/6.7 sources
 | `RibbonGalleryGroup` | type | gallery group (groupTitle + items, default property items) |
 | `RibbonGalleryItem` | type | gallery entry (text/iconSource/enabled/toolTip) |
 | `RibbonSeparator` | type | panel separator (Large proportion, own column, 1px line; widgets SARibbonSeparatorWidget counterpart) |
-| `RibbonQuickAccessBar` | type | quick access bar (small-button row on the title row after the app button; width feeds TitleRectInput.hasQuickAccessBar; widgets SARibbonQuickAccessBar counterpart) |
-| `RibbonButtonGroup` | type | right button group (right-aligned to the bar edge; before the system strip on the title row in compact styles, below the strip on the tab row in loose styles; widgets SARibbonButtonGroupWidget counterpart) |
+| `RibbonQuickAccessBar` | type | quick access bar (**toolbar-button** row on the title row after the app button: proportion is meaningless inside, icon-only by default; width feeds TitleRectInput.hasQuickAccessBar; widgets SARibbonQuickAccessBar counterpart) |
+| `RibbonButtonGroup` | type | right button group (right-aligned to the bar edge; before the system strip on the title row in compact styles, below the strip on the tab row in loose styles; **toolbar rendering** like the quick access bar; widgets SARibbonButtonGroupWidget counterpart) |
 | `RibbonApplicationWindow` | type | application window (office-backstage overlay behind the app button: coverageRatio coverage + slide/fade animation + top-right cross/Esc/outside click close, inner close() programmatic; click priority: window > menu > signal; widgets ApplicationWidget counterpart) |
 | `Ribbon` | uncreatable | enum holder (`Ribbon.Large` / `Ribbon.ThreeRowMode` / `Ribbon.MenuButtonPopup` / `Ribbon.RibbonStyleCompactTwoRow` / ...) |
 
@@ -225,6 +225,43 @@ RibbonBar { ribbonStyle: Ribbon.RibbonStyleCompactTwoRow }
   must hug the bar's right edge (widgets resizeInLooseStyle parity: the strip
   only feeds the title free rect); the width feeds
   `TitleRectInput.hasQuickAccessBar`.
+- **Buttons inside the title-row containers always render toolbar-style**
+  (widgets parity: over there both containers are QToolBars whose buttons are
+  plain QToolButtons created by QToolBar::addAction, never SARibbonToolButtons):
+  - **proportion is meaningless**: registration pushes the title-row rendering
+    context (`setTitleRow`) and `largeType` stays small — a `Ribbon.Large`
+    button still displays toolbar-style; moving the button back into a panel
+    (customize records, `attachButton`/`detachButton`) flips the context and
+    restores the proportion semantics. The stored value is left untouched and
+    still reads back.
+  - **toolButtonStyle resolves in three tiers**: an explicit value
+    (`toolButtonStyle: Ribbon.TextBesideIcon` etc.) always wins; unset follows
+    the context — panel = `TextBesideIcon` (the classic SARibbon look),
+    title-row container = `IconOnly` (the QToolBar look); an `IconOnly`
+    button without an icon falls back to `TextOnly` (a text-only entry never
+    renders blank), and on Qt6 an icon-less `TextBesideIcon` downgrades to
+    `TextOnly` as well (`QToolButton::initStyleOption` parity). The enum
+    values are pinned to `Qt::ToolButtonStyle` one by one via static_asserts.
+  - The leaf adds one toolbar touch: an icon-only button without an explicit
+    `toolTip` surfaces its caption as the tooltip fallback (the same thing a
+    QToolBar does with the QAction text).
+- **Auto-computed window minimum width**: `RibbonBar.minimumWidth` (readonly,
+  `minimumWidthChanged` notification) derives from core
+  `SARibbonBarGeometryEngine::calcMinimumWidth` — the row composition
+  distinguishes loose (max of the tab row and the title row, the window title
+  only added to the latter) from compact (one shared row, the title riding
+  the space right of the tab row); the row content is the application button
+  + quick access bar + effective tab row + right group + system button strip
+  + front-end spacing. Screen rules (when the available screen width is
+  known): 1. the title-inclusive width never exceeds 2/3 of the screen (a
+  fortiori never the screen itself); 2. over that cap the title reservation
+  is sacrificed first to keep shrink room for the user; 3. still over the cap
+  without the title, overlap is accepted and the minimum clamps at 2/3 of
+  the screen. Wiring the window is a one-line binding —
+  `ApplicationWindow { minimumWidth: ribbonBar.minimumWidth }` — because QML
+  windows derive no minimum from their content and the bar deliberately does
+  not write the window property (that would fight user bindings); wrap in
+  `Math.max()` when the central content needs more.
 - **Application button, three modes** (click priority: application window >
   menu > signal only):
   - `RibbonApplicationWindow` (widgets ApplicationWidget parity): a custom

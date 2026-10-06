@@ -6,6 +6,7 @@
 #include <QQmlContext>
 #include <QQmlComponent>
 #include <QSignalSpy>
+#include <QScreen>
 #include <QFile>
 #include <QImageReader>
 #include <QImage>
@@ -28,6 +29,8 @@
 #include <SARibbonQml/SARibbonQmlMenuItem.h>
 #include <SARibbonQml/SARibbonQmlApplicationWindow.h>
 #include <SARibbonQml/SARibbonQmlBar.h>
+#include <SARibbonQml/SARibbonQmlContextCategory.h>
+#include <SARibbonQml/SARibbonQmlQuickAccessBar.h>
 #include <SARibbonQml/SARibbonQmlWindowAgent.h>
 #include "../common/RibbonConformance.h"
 
@@ -60,6 +63,8 @@ private Q_SLOTS:
     void repeaterMixedPanelOrder();
     void quickAccessBarAndRightGroup();
     void buttonRowExclusivity();
+    void quickAccessToolbarDefaults();
+    void minimumWidthAutoCalc();
     void tabAlignmentAndMinimumMode();
     void rtlToggle();
     void panelOptionAction();
@@ -2174,6 +2179,224 @@ Item {
     QTRY_COMPARE(qa2->property("checked").toBool(), true);
     QTRY_COMPARE(qa1->property("checked").toBool(), false);
     QCOMPARE(checkedButtonOf(qab), qobject_cast< SARibbonQml::RibbonToolButton* >(qa2));
+}
+
+/**
+ * @brief Toolbar rendering defaults of the title-row button containers
+ * @details The quick access bar and the right button group bind their
+ *          buttons' display to the container (widgets parity: over there
+ *          both are QToolBars whose buttons are plain QToolButtons, never
+ *          SARibbonToolButtons):
+ *          1. the proportion is meaningless inside them — a default
+ *             (Large) or explicit Large button still renders small;
+ *          2. the unset toolButtonStyle resolves icon-only when the button
+ *             carries an icon, and text-only when it does not (a blank
+ *             button would be useless);
+ *          3. an explicit toolButtonStyle always wins;
+ *          4. panel buttons keep the classic behavior (Large stays large,
+ *             caption beside the icon).
+ */
+void TestConformanceQml::quickAccessToolbarDefaults()
+{
+    QQmlEngine engine;
+    saRibbonRegisterQmlTypes(&engine);
+
+    QString src = QStringLiteral(R"QML(import QtQuick 2.12
+import SARibbon 3.0
+Item {
+    width: 900
+    height: 300
+    RibbonBar {
+        objectName: "bar"
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        applicationLabel: "File"
+        RibbonQuickAccessBar {
+            objectName: "qab"
+            RibbonToolButton { objectName: "qaIcon"; text: "Save"; iconSource: "image://stub/save" }
+            RibbonToolButton { objectName: "qaText"; text: "Undo" }
+            RibbonToolButton { objectName: "qaLarge"; text: "Big"; iconSource: "image://stub/big"; proportion: Ribbon.Large }
+            RibbonToolButton { objectName: "qaBeside"; text: "Redo"; iconSource: "image://stub/redo"; toolButtonStyle: Ribbon.TextBesideIcon }
+        }
+        RibbonButtonGroup {
+            objectName: "rgroup"
+            RibbonToolButton { objectName: "rgLarge"; text: "H"; iconSource: "image://stub/help"; proportion: Ribbon.Large }
+        }
+        RibbonCategory {
+            title: "Home"
+            RibbonPanel {
+                panelTitle: "P"
+                RibbonToolButton { objectName: "panelLarge"; text: "Paste"; iconSource: "image://stub/paste" }
+            }
+        }
+    }
+})QML");
+
+    QQmlComponent component(&engine);
+    std::unique_ptr< QQuickView > view(exposeScene(engine, component, src.toUtf8().constData(), 900, 300));
+    QVERIFY(view);
+    QQuickItem* rootItem = view->rootObject();
+    QVERIFY(rootItem);
+
+    auto* qab      = rootItem->findChild< QQuickItem* >(QStringLiteral("qab"));
+    auto* qaIcon   = rootItem->findChild< SARibbonQml::RibbonToolButton* >(QStringLiteral("qaIcon"));
+    auto* qaText   = rootItem->findChild< SARibbonQml::RibbonToolButton* >(QStringLiteral("qaText"));
+    auto* qaLarge  = rootItem->findChild< SARibbonQml::RibbonToolButton* >(QStringLiteral("qaLarge"));
+    auto* qaBeside = rootItem->findChild< SARibbonQml::RibbonToolButton* >(QStringLiteral("qaBeside"));
+    auto* rgLarge  = rootItem->findChild< SARibbonQml::RibbonToolButton* >(QStringLiteral("rgLarge"));
+    auto* panelLarge = rootItem->findChild< SARibbonQml::RibbonToolButton* >(QStringLiteral("panelLarge"));
+    QVERIFY(qab && qaIcon && qaText && qaLarge && qaBeside && rgLarge && panelLarge);
+
+    const int titleH = [rootItem]() {
+        auto* bar = rootItem->findChild< SARibbonQml::RibbonBar* >(QStringLiteral("bar"));
+        return bar ? bar->titleBarHeight() : 0;
+    }();
+
+    // ---- 1. proportion is meaningless inside the title-row containers ----
+    // default proportion is Large, yet the buttons render toolbar-style:
+    // small type, no word wrap, height clamped to the title row
+    for (auto* btn : { qaIcon, qaText, qaLarge, rgLarge }) {
+        QTRY_VERIFY(btn->width() > 0 && btn->height() > 0);
+        QCOMPARE(btn->isLargeType(), false);
+        QCOMPARE(btn->isTextWordWrap(), false);
+        QVERIFY(btn->height() <= titleH + 1);
+        QVERIFY(btn->isTitleRow());
+        QCOMPARE(btn->isFlat(), true);
+        // the stored proportion is untouched (still readable), only its
+        // geometric meaning is suspended inside the container
+        QCOMPARE(btn->proportion(), SARibbonQml::RibbonEnums::Large);
+    }
+
+    // ---- 2. unset style: icon-only with an icon, text-only without ----
+    QTRY_VERIFY(qaIcon->textGeometry().isEmpty());
+    QVERIFY(qaIcon->iconGeometry().width() > 0);
+    QVERIFY(qaIcon->width() < 60);  // icon box + spacing, no caption
+    // the leaf surfaces the hidden caption through the tooltip fallback
+    if (QQuickItem* leaf = qaIcon->qmlLeaf()) {
+        QTRY_COMPARE(leaf->property("captionHidden").toBool(), true);
+    }
+    QTRY_VERIFY(qaText->iconGeometry().isEmpty());
+    QVERIFY(qaText->textGeometry().width() > 0);
+    QVERIFY(qaText->width() > 0);
+    if (QQuickItem* leaf = qaText->qmlLeaf()) {
+        QCOMPARE(leaf->property("captionHidden").toBool(), false);
+    }
+
+    // ---- 3. an explicit toolButtonStyle always wins ----
+    QTRY_VERIFY(qaBeside->textGeometry().width() > 0);
+    QVERIFY(qaBeside->iconGeometry().width() > 0);
+
+    // ---- 4. panel buttons keep the classic rendering ----
+    QCOMPARE(panelLarge->isLargeType(), true);
+    QCOMPARE(panelLarge->isTitleRow(), false);
+    QCOMPARE(panelLarge->isFlat(), false);
+    QVERIFY(panelLarge->isTextWordWrap());
+    QVERIFY(panelLarge->textGeometry().width() > 0);
+
+    // ---- moving a panel button into the row host flips the context ----
+    auto* bar = rootItem->findChild< SARibbonQml::RibbonBar* >(QStringLiteral("bar"));
+    auto* qabRow = rootItem->findChild< SARibbonQml::RibbonQuickAccessBar* >(QStringLiteral("qab"));
+    QVERIFY(bar && qabRow);
+    QVERIFY(qabRow->attachButton(panelLarge, -1));
+    QTRY_COMPARE(panelLarge->isTitleRow(), true);
+    QCOMPARE(panelLarge->isLargeType(), false);
+    QVERIFY(qabRow->detachButton(panelLarge));
+    QTRY_COMPARE(panelLarge->isTitleRow(), false);
+    QCOMPARE(panelLarge->isLargeType(), true);
+}
+
+/**
+ * @brief Auto-computed window minimum width
+ * @details The bar derives minimumWidth from its title-row / tab-row content
+ *          (application button, quick access bar, effective tab row, right
+ *          group, system button strip, window title) through the core
+ *          calcMinimumWidth engine:
+ *          1. positive and style-dependent (compact shares one row, so its
+ *             minimum is at least the loose one for the same content);
+ *          2. it follows the content (more effective tabs = larger);
+ *          3. a layout wider than 2/3 of the available screen is capped at
+ *             2/3 (overlap accepted beyond that; the title was already
+ *             sacrificed first inside the core rules).
+ */
+void TestConformanceQml::minimumWidthAutoCalc()
+{
+    QQmlEngine engine;
+    saRibbonRegisterQmlTypes(&engine);
+
+    QString src = QStringLiteral(R"QML(import QtQuick 2.12
+import SARibbon 3.0
+Item {
+    width: 1000
+    height: 300
+    RibbonBar {
+        objectName: "bar"
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        applicationLabel: "File"
+        RibbonQuickAccessBar {
+            objectName: "qab"
+            RibbonToolButton { text: "Save"; iconSource: "image://stub/save" }
+            RibbonToolButton { text: "Undo"; iconSource: "image://stub/undo" }
+        }
+        RibbonButtonGroup {
+            objectName: "rgroup"
+            RibbonToolButton { text: "H"; iconSource: "image://stub/help" }
+        }
+        RibbonCategory { title: "Home"; RibbonPanel { panelTitle: "P"; RibbonToolButton { text: "A" } } }
+        RibbonCategory { title: "Insert"; RibbonPanel { panelTitle: "Q"; RibbonToolButton { text: "B" } } }
+        RibbonContextCategory {
+            objectName: "ctx"
+            contextTitle: "ctx"
+            contextColor: "#2d7d9a"
+            active: false
+            RibbonCategory { title: "CtxPage"; RibbonPanel { panelTitle: "CP" } }
+        }
+    }
+})QML");
+
+    QQmlComponent component(&engine);
+    std::unique_ptr< QQuickView > view(exposeScene(engine, component, src.toUtf8().constData(), 1000, 300));
+    QVERIFY(view);
+    QQuickItem* rootItem = view->rootObject();
+    QVERIFY(rootItem);
+
+    auto* bar = rootItem->findChild< SARibbonQml::RibbonBar* >(QStringLiteral("bar"));
+    auto* ctx = rootItem->findChild< SARibbonQml::RibbonContextCategory* >(QStringLiteral("ctx"));
+    QVERIFY(bar && ctx);
+
+    // ---- 1. positive, and structurally above the title-row hosts' own
+    // footprint (application button + quick access row + right group) ----
+    QTRY_VERIFY(bar->minimumWidth() > 0);
+    const int qabW = bar->quickAccessBar() ? bar->quickAccessBar()->rowWidth() : 0;
+    QVERIFY(bar->minimumWidth() > qabW + 40);
+
+    // ---- 2. style dependency: compact shares one row (tabs + quick access
+    // + group + strip together), loose splits them across two rows ----
+    const int looseMin = bar->minimumWidth();
+    bar->setRibbonStyle(SARibbonQml::RibbonEnums::RibbonStyleCompactThreeRow);
+    QTRY_VERIFY(bar->minimumWidth() >= looseMin);
+    const int compactMin = bar->minimumWidth();
+    bar->setRibbonStyle(SARibbonQml::RibbonEnums::RibbonStyleLooseThreeRow);
+    QTRY_COMPARE(bar->minimumWidth(), looseMin);
+
+    // ---- 3. content dependency: activating the context category adds its
+    // page tabs to the effective row, the minimum follows ----
+    ctx->setActive(true);
+    QTRY_VERIFY(bar->minimumWidth() > looseMin);
+    const int withCtxMin = bar->minimumWidth();
+    ctx->setActive(false);
+    QTRY_COMPARE(bar->minimumWidth(), looseMin);
+    QVERIFY(withCtxMin > looseMin);
+
+    // ---- 4. screen cap: a layout far beyond 2/3 of the available screen
+    // clamps the minimum at exactly 2/3 (integer division parity with core) ----
+    while (bar->categoryCount() < 90) {
+        bar->insertCategory(QStringLiteral("T%1").arg(bar->categoryCount()), -1);
+    }
+    const int screenW = view->screen()->availableGeometry().width();
+    QTRY_COMPARE(bar->minimumWidth(), screenW * 2 / 3);
 }
 
 /**

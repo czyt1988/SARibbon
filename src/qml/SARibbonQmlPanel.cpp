@@ -104,10 +104,12 @@ void RibbonPanel::registerChildItem(RibbonLayoutItemHost* item)
         mPendingOrderItems.append(item);
         // buttons registered later inherit the current style flags and the
         // layout knobs already pushed down from the category / bar; a button
-        // arriving from a title-row host loses its flat flag (panel buttons
-        // paint the content background)
+        // arriving from a title-row host loses its flat flag and its toolbar
+        // rendering context (panel buttons paint the content background and
+        // follow their proportion again)
         if (auto* btn = qobject_cast< RibbonToolButton* >(item)) {
             btn->setFlat(false);
+            btn->setTitleRow(false);
             btn->setWordWrap(mWordWrap);
             btn->setIconRightText(mIconRightText);
             btn->setSmallIconSize(mSmallIconSize);

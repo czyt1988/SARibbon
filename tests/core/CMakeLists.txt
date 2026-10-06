@@ -85,3 +85,28 @@ set_target_properties(core_CustomizeRecord PROPERTIES
     AUTOMOC ON
     RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests
 )
+
+# Bar geometry engine minimum-width rules (plan-04): pure core, no widgets
+# dependency. Locks the per-style row composition and the three screen rules
+# (never above screen, title sacrificed first, overlap capped at 2/3 screen)
+add_executable(core_BarGeometryEngine tst_barGeometryEngine.cpp)
+target_link_libraries(core_BarGeometryEngine PRIVATE
+    SARibbonCore
+    Qt${QT_VERSION_MAJOR}::Test
+    Qt${QT_VERSION_MAJOR}::Core
+    Qt${QT_VERSION_MAJOR}::Gui
+)
+if(NOT SARIBBON_BUILD_STATIC_LIBS)
+    add_custom_command(TARGET core_BarGeometryEngine POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            $<TARGET_FILE:SARibbonCore> $<TARGET_FILE_DIR:core_BarGeometryEngine>
+        COMMENT "Copy SARibbonCore next to core_BarGeometryEngine"
+    )
+endif()
+add_test(NAME core_BarGeometryEngine COMMAND core_BarGeometryEngine)
+set_tests_properties(core_BarGeometryEngine PROPERTIES LABELS core TIMEOUT 120
+    ENVIRONMENT "QT_QPA_PLATFORM=offscreen")
+set_target_properties(core_BarGeometryEngine PROPERTIES
+    AUTOMOC ON
+    RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests
+)

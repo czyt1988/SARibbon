@@ -64,7 +64,7 @@ cmake --build build
 
 ## 一致性测试
 
-`tests/qml/tst_conformance_qml.cpp`（24 用例）与示例同步维护：
+`tests/qml/tst_conformance_qml.cpp`（29 用例）与示例同步维护：
 面板装箱黄金几何、tab 切换、按钮点击/弹出/禁用、控件嵌入、上下文标签、画廊、
 六样式传播、分隔符、快速访问栏/右组、对齐/最小模式、RTL、optionAction、应用窗口、
 菜单勾选/快捷键/多级子菜单（索引路径寻址 + 叶子渲染断言）、
@@ -76,6 +76,11 @@ cmake --build build
 `enableShowIcon`/`enableShowTitle` 逐槽位让宽并断言无漂移）、
 标题行按钮排互斥（默认为非互斥、打开开关不追溯取消勾选、
 未受影响的兄弟按钮不产生 `toggled`、`checkedButton()` 对齐 `QActionGroup::checkedAction`）、
+标题行容器工具栏默认（快速访问栏/右组内 proportion 失效一律小按钮渲染、
+未设样式时图标按钮只显图标而纯文字按钮回退文字、显式 `toolButtonStyle` 永远生效、
+面板大按钮不受影响、按钮在面板与行宿主间移动时上下文正确翻转）、
+窗口最小宽度自动计算（core `calcMinimumWidth`：宽松/紧凑行区组合、
+内容与样式变化跟随、上下文标签页激活变宽、超 2/3 屏宽钳制）、
 类别滚动（溢出时只出现尾随箭头、箭头矩形等于 core `scrollButtonRects` 输出、
 真实点击箭头步进半视口并被 `clampScrollOffset` 夹住、滚轮走 core 的 delta 优先级与
 ×2 / ÷2 缩放、动画途中滚轮被丢弃、内容放得下的类别必须 `ignore` 滚轮而不是吃掉它）、

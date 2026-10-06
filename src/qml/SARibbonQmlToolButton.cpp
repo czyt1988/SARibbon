@@ -186,6 +186,108 @@ void RibbonToolButton::setFlat(bool on)
     Q_EMIT flatChanged();
 }
 
+RibbonEnums::ToolButtonStyle RibbonToolButton::toolButtonStyle() const
+{
+    return mToolButtonStyle;
+}
+
+void RibbonToolButton::setToolButtonStyle(RibbonEnums::ToolButtonStyle style)
+{
+    if (mToolButtonStyleSet && mToolButtonStyle == style) {
+        return;
+    }
+    mToolButtonStyle    = style;
+    mToolButtonStyleSet = true;
+    Q_EMIT toolButtonStyleChanged();
+    updateSizeHint();
+    updateLayout();
+}
+
+bool RibbonToolButton::isTitleRow() const
+{
+    return mTitleRow;
+}
+
+void RibbonToolButton::setTitleRow(bool on)
+{
+    if (mTitleRow == on) {
+        return;
+    }
+    mTitleRow = on;
+    // the context changes both the effective type (proportion becomes
+    // meaningless: toolbar rendering) and the unset style default, so the
+    // sizeHint and the published draw geometry both need a recompute
+    updateSizeHint();
+    updateLayout();
+}
+
+/**
+ * \if ENGLISH
+ * @brief Resolve the core toolButtonStyle from the host state
+ * @details Priority: an explicitly written property always wins; an unset
+ *          button follows the rendering context (panel = TextBesideIcon, the
+ *          widgets SARibbonToolButton look; title-row container = IconOnly,
+ *          the widgets QToolBar look). Two fallbacks keep a button from ever
+ *          rendering blank: an IconOnly button without an icon renders its
+ *          text instead, and (Qt6 parity with QToolButton::initStyleOption)
+ *          a TextBesideIcon button without an icon downgrades to TextOnly so
+ *          no empty icon slot is reserved. Qt5 leaves TextBesideIcon alone,
+ *          mirroring the widgets side.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 由宿主状态解析出 core 侧的 toolButtonStyle
+ * @details 优先级：显式写入的属性永远生效；未设置的按钮跟随渲染上下文
+ *          （面板 = TextBesideIcon，即 widgets SARibbonToolButton 的观感；
+ *          标题行容器 = IconOnly，即 widgets QToolBar 的观感）。两个回退保证
+ *          按钮绝不渲染成空白：无图标的 IconOnly 按钮改渲染文字；无图标的
+ *          TextBesideIcon 按钮降级为 TextOnly（Qt6 与
+ *          QToolButton::initStyleOption 对齐，不预留空图标位）。Qt5 保留
+ *          TextBesideIcon 不降级，与 widgets 侧行为一致。
+ * \endif
+ */
+Qt::ToolButtonStyle RibbonToolButton::effectiveToolButtonStyle() const
+{
+    Qt::ToolButtonStyle style = Qt::ToolButtonTextBesideIcon;
+    if (mToolButtonStyleSet) {
+        switch (mToolButtonStyle) {
+        case RibbonEnums::IconOnly:
+            style = Qt::ToolButtonIconOnly;
+            break;
+        case RibbonEnums::TextOnly:
+            style = Qt::ToolButtonTextOnly;
+            break;
+        case RibbonEnums::TextBesideIcon:
+            style = Qt::ToolButtonTextBesideIcon;
+            break;
+        case RibbonEnums::TextUnderIcon:
+            style = Qt::ToolButtonTextUnderIcon;
+            break;
+        }
+    } else if (mTitleRow) {
+        // title-row containers render their buttons toolbar-style: icon only
+        // (text takes over below when the button carries no icon)
+        style = Qt::ToolButtonIconOnly;
+    }
+    const bool hasIcon = !mIconSource.isEmpty();
+    if (Qt::ToolButtonIconOnly == style && !hasIcon && !mText.isEmpty()) {
+        // icon-less fallback: an IconOnly button without an icon would render
+        // blank — the caption takes the slot instead (toolbar parity: a
+        // text-only entry still shows in a QToolBar)
+        style = Qt::ToolButtonTextOnly;
+    }
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    // Qt6 QToolButton::initStyleOption downgrades TextBesideIcon to TextOnly
+    // when the button carries no icon, and the widgets side hands core exactly
+    // that value; mirroring it keeps an icon-less small button from reserving
+    // an empty icon slot (Qt5 leaves TextBesideIcon alone, hence the split)
+    if (Qt::ToolButtonTextBesideIcon == style && !hasIcon) {
+        style = Qt::ToolButtonTextOnly;
+    }
+#endif
+    return style;
+}
+
 int RibbonToolButton::spacing() const
 {
     return mSpacing;
@@ -372,8 +474,11 @@ QRectF RibbonToolButton::menuRect() const
 bool RibbonToolButton::isLargeType() const
 {
     // iconRightText forces the small rendering regardless of the proportion
-    // (widgets PrivateData::effectiveButtonType parity)
-    return (SARibbon::Core::SARibbonRowProportion::Large == rowProportion) && !mIconRightText;
+    // (widgets PrivateData::effectiveButtonType parity); so does the title-row
+    // context — quick access bar / right group buttons are toolbar buttons
+    // there, the proportion carries no meaning (widgets parity: their quick
+    // access buttons are plain QToolButtons, never SARibbonToolButtons)
+    return (SARibbon::Core::SARibbonRowProportion::Large == rowProportion) && !mIconRightText && !mTitleRow;
 }
 
 QString RibbonToolButton::displayText() const
@@ -604,10 +709,11 @@ QSize RibbonToolButton::computeSizeHintFromMetrics()
  * @details Field-by-field counterpart of SARibbonToolButton::PrivateData::
  *          layoutInput(): the style option becomes plain values, so both front
  *          ends feed the algorithm identical numbers. Three QML-only details:
- *          toolButtonStyle reproduces what QToolButton::initStyleOption hands
- *          the widgets side (Qt6 downgrades TextBesideIcon to TextOnly when no
- *          icon is set); the rect falls back to a font-derived height before
- *          the first engine pass (the small-button text height derives from
+ *          toolButtonStyle comes from effectiveToolButtonStyle() (explicit
+ *          property over rendering context, then the icon-less fallbacks that
+ *          reproduce what QToolButton::initStyleOption hands the widgets side);
+ *          the rect falls back to a font-derived height before the first
+ *          engine pass (the small-button text height derives from
  *          rect.height()); and panelLargeButtonHeight falls back to the metrics
  *          derivation of the three-row large height while
  *          largeButtonHeightContext() is still unset — the widgets button reads
@@ -618,10 +724,10 @@ QSize RibbonToolButton::computeSizeHintFromMetrics()
  * @brief 用宿主状态填充 core 布局输入
  * @details 与 SARibbonToolButton::PrivateData::layoutInput() 一一对应：样式选项
  *          换成纯值，两个前端因此喂给算法完全相同的数值。三处 QML 特有处理：
- *          toolButtonStyle 复现 QToolButton::initStyleOption 交给 widgets 侧的
- *          结果（Qt6 在无图标时把 TextBesideIcon 降级为 TextOnly）；引擎首次
- *          布局前 rect 退化为按字体推导的高度（小按钮的文字高度取自
- *          rect.height()）；largeButtonHeightContext() 尚未赋值时，
+ *          toolButtonStyle 取自 effectiveToolButtonStyle()（显式属性优先于
+ *          渲染上下文，再叠加复现 QToolButton::initStyleOption 行为的无图标
+ *          回退）；引擎首次布局前 rect 退化为按字体推导的高度（小按钮的文字
+ *          高度取自 rect.height()）；largeButtonHeightContext() 尚未赋值时，
  *          panelLargeButtonHeight 退化为度量推导的三行制大按钮高度——widgets
  *          按钮的这个数值直接来自其父 panel。
  * \endif
@@ -643,15 +749,10 @@ SARibbonToolButtonLayout::Input RibbonToolButton::layoutInput() const
     in.hasIcon       = !mIconSource.isEmpty();
     in.isLargeButton = isLargeType();
     in.enableWordWrap = mWordWrap;
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    // Qt6 QToolButton::initStyleOption downgrades TextBesideIcon to TextOnly
-    // when the button carries no icon, and the widgets side hands core exactly
-    // that value; mirroring it keeps an icon-less small button from reserving
-    // an empty icon slot (Qt5 leaves TextBesideIcon alone, hence the split)
-    in.toolButtonStyle = in.hasIcon ? Qt::ToolButtonTextBesideIcon : Qt::ToolButtonTextOnly;
-#else
-    in.toolButtonStyle = Qt::ToolButtonTextBesideIcon;
-#endif
+    // effective style: explicit property > rendering context (panel =
+    // TextBesideIcon, title row = IconOnly), then the icon-less fallbacks
+    // (see effectiveToolButtonStyle)
+    in.toolButtonStyle = effectiveToolButtonStyle();
     in.hasIndicator    = hasMenu();
     in.isRTL           = SA::saIsRTL();
     in.iconSize        = mSmallIconSize;

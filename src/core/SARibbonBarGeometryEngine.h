@@ -49,9 +49,31 @@ public:
         QRect contextLastTabRect;         ///< last visible context tab rect (offset by tabX already)
     };
 
+    /// Minimum window width inputs; the row-zone widths come pre-composed from
+    /// the owning layout (front-end placement constants stay out of core)
+    struct MinimumWidthInput
+    {
+        bool isCompactStyle { false };  ///< compact: tab row rides the title row
+        int tabRowWidth { 0 };       ///< no-title minimum of the tab row content zone (compact: the whole shared row)
+        int titleRowWidth { 0 };     ///< no-title minimum of the title row content zone (loose only, 0 in compact)
+        int titleTextWidth { 0 };    ///< window title text width to reserve
+        int screenAvailableWidth { 0 };  ///< <= 0 = unknown, the screen rules are skipped
+    };
+
     // Pure geometry of the window-title free area (four branches moved verbatim).
     // Returns an empty QRect when the title area is too small to display.
     static QRect layoutTitleRect(const TitleRectInput& input);
+
+    // Minimum window width so the title-row / tab-row controls never overlap.
+    // Composition: loose = max(tab row, title row + title text); compact =
+    // shared row + title text. Screen rules (screenAvailableWidth > 0):
+    // 1. the title-inclusive width may never exceed 2/3 of the screen (hence
+    //    never the screen itself);
+    // 2. over that cap the title is sacrificed first (dropped from the
+    //    reservation) to keep shrink room for the user;
+    // 3. still over the cap without the title, overlap is allowed and the
+    //    minimum is capped at 2/3 of the screen.
+    static int calcMinimumWidth(const MinimumWidthInput& input);
 };
 
 }

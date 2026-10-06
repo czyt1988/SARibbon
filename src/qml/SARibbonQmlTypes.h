@@ -21,15 +21,19 @@ namespace SARibbonQml {
  * @details Mirrors the core enums via Q_ENUM on a registered-but-uncreatable class.
  *          Q_NAMESPACE / qmlRegisterUncreatableMetaObject is closed for 3.0:
  *          the core enums live in the global namespace (plan-02 S1 decision).
+ *          Exported (B62 family): a C++ consumer comparing a Q_ENUM value
+ *          pulls the class staticMetaObject across the DLL boundary.
  * \endif
  *
  * \if CHINESE
  * @brief 用户 QML 的枚举持有类（`Ribbon.Large` 等写法，计划 04 S3-4）
  * @details 通过已注册但不可实例化类的 Q_ENUM 镜像 core 枚举。
  *          Q_NAMESPACE 路线 3.0 封死：core 枚举维持全局命名空间（计划 02 S1 决策）。
+ *          带导出宏（B62 家族）：C++ 消费方对 Q_ENUM 值做比较会把类的
+ *          staticMetaObject 拉过 DLL 边界。
  * \endif
  */
-class RibbonEnums : public QObject
+class SA_RIBBON_QML_EXPORT RibbonEnums : public QObject
 {
     Q_OBJECT
 public:
@@ -59,6 +63,12 @@ public:
     // the QML counterpart of the widgets SARibbonToolButton popup modes)
     enum PopupMode { DelayedPopup = 0, MenuButtonPopup = 1, InstantPopup = 2 };
     Q_ENUM(PopupMode)
+    // Icon/text display styles of a tool button. Values mirror Qt::ToolButtonStyle
+    // (qnamespace.h, so core Input takes them without a QtWidgets dependency);
+    // the QML counterpart of QToolButton::toolButtonStyle, which the widgets
+    // SARibbonToolButton inherits directly
+    enum ToolButtonStyle { IconOnly = 0, TextOnly = 1, TextBesideIcon = 2, TextUnderIcon = 3 };
+    Q_ENUM(ToolButtonStyle)
     // Ribbon styles (bit values mirror the widgets SARibbonBar::RibbonStyleFlag)
     enum RibbonStyle {
         RibbonStyleLoose           = 0x0001,
@@ -128,6 +138,10 @@ static_assert(int(RibbonEnums::Small) == int(SARibbon::Core::SARibbonRowProporti
 static_assert(int(RibbonEnums::GalleryIconOnly) == int(SA::GalleryCaptionStyle::None), "GalleryCaptionStyle drift");
 static_assert(int(RibbonEnums::GalleryIconWithText) == int(SA::GalleryCaptionStyle::SingleLine), "GalleryCaptionStyle drift");
 static_assert(int(RibbonEnums::GalleryIconWithWordWrapText) == int(SA::GalleryCaptionStyle::WordWrap), "GalleryCaptionStyle drift");
+static_assert(int(RibbonEnums::IconOnly) == int(Qt::ToolButtonIconOnly), "ToolButtonStyle drift");
+static_assert(int(RibbonEnums::TextOnly) == int(Qt::ToolButtonTextOnly), "ToolButtonStyle drift");
+static_assert(int(RibbonEnums::TextBesideIcon) == int(Qt::ToolButtonTextBesideIcon), "ToolButtonStyle drift");
+static_assert(int(RibbonEnums::TextUnderIcon) == int(Qt::ToolButtonTextUnderIcon), "ToolButtonStyle drift");
 static_assert(int(RibbonEnums::UnknowActionTag) == int(SARibbon::Core::UnknowActionTag), "ActionTag drift");
 static_assert(int(RibbonEnums::CommonlyUsedActionTag) == int(SARibbon::Core::CommonlyUsedActionTag), "ActionTag drift");
 static_assert(int(RibbonEnums::NotInFunctionalAreaActionTag) == int(SARibbon::Core::NotInFunctionalAreaActionTag),
@@ -172,5 +186,24 @@ inline QUrl windowButtonRowLeaf() { return QUrl(QStringLiteral("qrc:/SARibbon/Ri
 SA_RIBBON_QML_EXPORT QQuickItem* createVisualLeaf(QQuickItem* host, const QUrl& leafUrl);
 
 }  // namespace SARibbonQml
+
+// Qt5 only: enum-typed Q_PROPERTYs cross a class boundary here (the enums are
+// Q_ENUM'd in RibbonEnums, the properties live in the host classes), and Qt5
+// never registers such enums with the metatype registry — QML assignments
+// like `proportion: Ribbon.Small` fail with "Unable to assign int to
+// [unknown property type]" and property reads return invalid QVariants. The
+// declarations feed the name registration in saRibbonRegisterQmlTypes. Qt6
+// registers Q_ENUM metatypes lazily and needs none of this
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
+Q_DECLARE_METATYPE(SARibbonQml::RibbonEnums::RowProportion)
+Q_DECLARE_METATYPE(SARibbonQml::RibbonEnums::LayoutMode)
+Q_DECLARE_METATYPE(SARibbonQml::RibbonEnums::Alignment)
+Q_DECLARE_METATYPE(SARibbonQml::RibbonEnums::PopupMode)
+Q_DECLARE_METATYPE(SARibbonQml::RibbonEnums::ToolButtonStyle)
+Q_DECLARE_METATYPE(SARibbonQml::RibbonEnums::RibbonStyle)
+Q_DECLARE_METATYPE(SARibbonQml::RibbonEnums::GalleryCaptionStyle)
+Q_DECLARE_METATYPE(SARibbonQml::RibbonEnums::ColorStyle)
+Q_DECLARE_METATYPE(SARibbonQml::RibbonEnums::ColorMenuStyle)
+#endif
 
 #endif  // SARIBBONQMLTYPES_H

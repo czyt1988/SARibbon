@@ -877,6 +877,24 @@
 
 ---
 
+### B71：标题行容器工具栏化 + toolButtonStyle + 窗口最小宽度自动计算（第 31 轮）
+
+- 日期：2026-10-07
+- 发现位置：用户报告（QML 模块三点：① RibbonToolButton 放进 RibbonQuickAccessBar 不设 `proportion: Ribbon.Small` 就按大按钮渲染；② 快速访问栏按钮带文字，应像工具栏一样只显图标；③ 主窗口最小宽度没有自动计算）
+- **① 根因（proportion 失效缺位）**：QML 侧 `RibbonQuickAccessBar`/`RibbonButtonGroup` 收的是 `RibbonToolButton` 宿主本身，而宿主默认 `rowProportion = Large`；widgets 侧两个容器是 `QToolBar`，按钮是 `QToolBar::addAction` 生成的**普通 QToolButton**，从来不是 SARibbonToolButton——proportion 在那里天然不存在，QML 直译时把这层语义丢了。
+- **① 处理（显示属性绑定父容器）**：`RibbonToolButton` 新增标题行渲染上下文（`isTitleRow`/`setTitleRow`，内部方法非 Q_PROPERTY——与 `setLargeButtonHeightContext` 同族，由容器推送）：`RibbonButtonRowHost::registerButton` 压入、`unregisterButton` 与面板 `registerChildItem` 清除（与 `flat` 同一条登记/注销链，定制记录来回搬按钮自动翻转）。上下文开启时 `isLargeType()` 恒 false——proportion 原值只存不改（读回仍是所设值），只是几何语义被挂起，即用户要的"副容器是 quick access bar 时大小属性无意义"。
+- **② 处理（toolButtonStyle 三级解析）**：`RibbonEnums::ToolButtonStyle`（IconOnly/TextOnly/TextBesideIcon/TextUnderIcon，值与 `Qt::ToolButtonStyle` static_assert 钉死——qnamespace.h 属 QtCore，core Input 无需 QtWidgets）+ 宿主 `toolButtonStyle` 属性（写即显式，显式永远生效）；未设置按上下文：面板 = TextBesideIcon（原行为，跨端一致性测试零漂移），标题行容器 = IconOnly（QToolBar 观感）。两个无图标回退保证按钮绝不渲染成空白：IconOnly 无图标 → TextOnly（纯文字按钮仍有形）；Qt6 下 TextBesideIcon 无图标 → TextOnly（原 initStyleOption 对齐逻辑移入 `effectiveToolButtonStyle()` 统一收口）。core `SARibbonToolButtonLayout` 本就完整实现四种样式的 sizeHint 与 drawRects，QML 侧此前只是硬编码喂 TextBesideIcon——本轮零 core 布局改动。叶子补工具栏语义：图标按钮只显图标且未设 toolTip 时 caption 作 tooltip 兜底。
+- **③ 设计（最小宽度进 core）**：`SARibbonBarGeometryEngine::calcMinimumWidth(MinimumWidthInput)` 纯函数承载共享知识：行区组合区分宽松（tab 行与标题行两行取宽，窗口标题只加在标题行——标题行富余时标题不占 tab 行宽度）与紧凑（单行共享，标题骑 tab 行右侧）；间距常数留给前端（QML 侧 tabRowWidth 直接复用 relayout 的 `stripBegin + rowWidth + reservedRight`，与摆放代码逐像素一致）。屏幕规则按用户三原则落地：1. 含标题总宽 ≤ 2/3 屏宽（更不会超屏幕整宽）；2. 超过先牺牲标题预留（标题自由区本就会在窄窗口塌缩为不显示）；3. 去掉标题仍超过 2/3 屏宽（含超屏）允许交叠，钳制 2/3 屏宽。无屏幕（headless/未入窗口）跳过钳制。
+- **③ QML 接线**：`RibbonBar.minimumWidth`（只读属性 + `minimumWidthChanged`）在 relayout 末尾经 core 推导；窗口标题与屏幕跟踪挂在 `itemChange(ItemSceneChange)`（原生边框窗口同样需要，故不在 frameless-only 的 attach 里；**Qt::UniqueConnection 对 lambda 在 Qt5 直接连接失败**，改幂等 handler + 普通连接）；`setWindowTitle` 补 polish（标题文本进最小宽度预留）。**不主动改写窗口属性**：QML 窗口不会从内容推导最小尺寸，C++ 直写会与用户 QML 绑定打架——示例用一行绑定 `ApplicationWindow { minimumWidth: ribbonBar.minimumWidth }` 接线，中央内容需要更大时套 `Math.max()`。
+- 测试：新增 `core_BarGeometryEngine`（7 用例：宽松/紧凑组合、屏幕未知跳过、牺牲标题先于交叠、2/3 钳制含整除取整与超屏、紧凑牺牲、退化输入）；`qml_Conformance` 新增 `quickAccessToolbarDefaults`（默认 Large 的 QAB/右组按钮一律小按钮渲染且 height ≤ titleH、图标按钮 textGeometry 为空 + 叶子 captionHidden、纯文字按钮回退文字、显式 TextBesideIcon 生效、面板大按钮不受影响、attachButton/detachButton 上下文翻转）与 `minimumWidthAutoCalc`（> 0 且 > 应用按钮+QAB 足迹、紧凑 ≥ 宽松、上下文页激活变宽、90 类目钳到 2/3 屏宽=core 整除口径）。示例 README 用例数 24→29。
+- 顺带修复（B62 家族第 5 处）：测试首次对 `RibbonEnums::RowProportion` 做 `QCOMPARE`（枚举类型直比）即 LNK2001 `RibbonEnums::staticMetaObject`——Q_ENUM 值的 QTest 比较路径会把外围类的 staticMetaObject 拉过 DLL 边界，而 `RibbonEnums` 一直没带 `SA_RIBBON_QML_EXPORT`（此前无 C++ 消费方所以从未暴露）。补宏。另：测试里 `bar->quickAccessBar()->rowWidth()` 需要 `SARibbonQmlQuickAccessBar.h` 全定义（bar 头只有前置声明）。
+- 顺带修复（Qt5 枚举属性元类型缺口，存量 bug）：枚举在 `RibbonEnums` 里 Q_ENUM、属性却声明在各宿主类——Qt5 对这种跨类枚举**不做元类型注册**，全部枚举型 Q_PROPERTY 对 QML 与属性系统都是黑盒（`proportion: Ribbon.Small` 赋值静默失败"Unable to assign int to [unknown property type]"、property 读取返回非法 QVariant；Qt6 惰性注册无此问题）。存量影响：Qt5 下示例面板里的 `proportion:`/`popupMode:` 声明全部没落地（按钮全按默认 Large 渲染）、`setProperty("ribbonStyle", int)` 后 B70 的紧凑切换断言失效。修复：`SARibbonQmlTypes.h` 补 Qt5-only `Q_DECLARE_METATYPE` 九连，`saRibbonRegisterQmlTypes` 开头用带名 `qRegisterMetaType<T>("RibbonEnums::X")` 按 moc 规范名（无 SARibbonQml:: 前缀，QMetaProperty 按它查找）注册为自动名元类型的 typedef。
+- Qt5 验证口径（`build-qt5-b71`，Qt 5.14.2 msvc2017_64 + 树内 QWK，注意本地安装的 bin_qt5.14.2_QWK 无 Quick 组件需 `-DCMAKE_DISABLE_FIND_PACKAGE_QWindowKit=TRUE` 走树内）：core 4/4 全绿；qml 套件存在**存量环境失败**（干净 HEAD 同样失败，stash A/B 实证）：offscreen 无字体目录（QFontDatabase 警告满屏、grabWindow 相关断言 `!frame.isNull()` 全挂）、`RibbonCustomizeDialog.qml` 的 TextField `placeholderText` 在 Qt5 Basic 样式不存在、`quickAccessBarAndRightGroup` 的紧凑切换在干净 HEAD 上同样 y=28≠0（正是上面枚举缺口：`setProperty("ribbonStyle", int)` 读回路径失效）。本轮新测试在 Qt5 上经元类型注册修复后行为与 Qt6 一致。
+- 证据：`build-qml-test`（Debug，Qt 6.7.3 msvc2019_64）全量编译零错误（首轮两个 widgets 测试的 DLL 拷贝失败为并行 copy_if_different 争用，重跑即过）；core/qml 测试套件结果见提交信息。`tools/Amalgamate.sh` 已跑（src/SARibbonCore.* 含 calcMinimumWidth），`python tools/check_core_purity.py src/core` 通过。
+- 影响计划：04（S4 bar 宿主：minimumWidth 发布；S5 按钮宿主：toolButtonStyle + 标题行上下文；qml-guide 中英文版类型表与标题行容器节同步；widgets 侧复用 calcMinimumWidth 为后续可选项——行区组合的间距常数各端自理；Qt5 枚举元类型注册为全模块存量修复）。
+
+---
+
 ## 执行中追加（模板，勿删）
 
 ```

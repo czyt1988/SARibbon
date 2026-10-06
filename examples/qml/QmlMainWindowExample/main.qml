@@ -13,6 +13,14 @@ ApplicationWindow {
     height: 600
     visible: true
     title: "SARibbon QML Example"
+    // auto-computed minimum width: the bar measures its title-row/tab-row
+    // content (application button, quick access bar, tab row, right group,
+    // system button strip, window title) and applies the screen rules —
+    // never above 2/3 of the screen, the title is sacrificed first when
+    // over the cap, overlap is accepted beyond that. QML windows derive no
+    // minimum from their content, so the one-line binding is the idiomatic
+    // wiring; wrap it in Math.max() if your central content needs more
+    minimumWidth: ribbonBar.minimumWidth
 
     RibbonBar {
         id: ribbonBar
@@ -48,7 +56,7 @@ ApplicationWindow {
                 ListView {
                     id: appWindowList
                     width: parent.width
-                    height: 100
+                    height: parent.height * 2.0 / 3.0
                     clip: true
                     model: [ qsTr("item 1"), qsTr("item 2"), qsTr("item 3"),
                              qsTr("item 4"), qsTr("item 5"), qsTr("item 6") ]
@@ -100,8 +108,15 @@ ApplicationWindow {
                 .arg(item.checkable ? (item.checked ? " [on]" : " [off]") : ""))
         }
 
-        // quick access bar (widgets quick access parity): small buttons on
-        // the title row after the application button
+        // quick access bar (widgets quick access parity): toolbar-style
+        // buttons on the title row after the application button. NOTE: no
+        // `proportion` here on purpose — inside the quick access bar (and
+        // the right button group) every button renders toolbar-style; the
+        // proportion is meaningless there, exactly like the widgets side
+        // whose quick access buttons are plain QToolButtons. The display
+        // style follows toolButtonStyle: unset (default) = icon only when
+        // an icon is set, text only otherwise; set it explicitly (e.g.
+        // Ribbon.TextBesideIcon) to show the caption
         RibbonQuickAccessBar {
             // single-choice group: the row host implements the QActionGroup
             // behavior widgets gets from the action bridge (the two view
@@ -110,37 +125,31 @@ ApplicationWindow {
             RibbonToolButton {
                 text: qsTr("Save")
                 iconSource: "qrc:/icon/icon/save.svg"
-                proportion: Ribbon.Small
                 onClicked: log(qsTr("quick access: Save clicked"))
             }
             RibbonToolButton {
                 text: qsTr("Undo")
                 iconSource: "qrc:/icon/icon/undo.svg"
-                proportion: Ribbon.Small
                 onClicked: log(qsTr("quick access: Undo clicked"))
             }
             RibbonToolButton {
                 text: qsTr("Icons")
-                proportion: Ribbon.Small
                 checkable: true
                 checked: true
                 onToggled: function(checked) { if (checked) log(qsTr("quick access view: icons")) }
             }
             RibbonToolButton {
                 text: qsTr("Details")
-                proportion: Ribbon.Small
                 checkable: true
                 onToggled: function(checked) { if (checked) log(qsTr("quick access view: details")) }
             }            RibbonToolButton {
                 text: qsTr("Redo")
                 iconSource: "qrc:/icon/icon/redo.svg"
-                proportion: Ribbon.Small
                 onClicked: log(qsTr("quick access: Redo clicked"))
             }
             RibbonToolButton {
                 text: qsTr("Presentation File 1")
                 iconSource: "qrc:/icon/icon/file.svg"
-                proportion: Ribbon.Small
                 popupMode: Ribbon.InstantPopup
                 menuItems: [
                     RibbonMenuItem { text: qsTr("file 1-1"); iconSource: "qrc:/icon/icon/item.svg" },
@@ -157,18 +166,18 @@ ApplicationWindow {
             }
         }
 
-        // right button group (widgets right bar parity): help + toggle
+        // right button group (widgets right bar parity): help + toggle.
+        // Same toolbar rendering as the quick access bar (proportion is
+        // meaningless here too)
         RibbonButtonGroup {
             RibbonToolButton {
                 text: qsTr("Help")
                 iconSource: "qrc:/icon/icon/help.svg"
-                proportion: Ribbon.Small
                 onClicked: log(qsTr("help clicked (widgets shows the version message box)"))
             }
             RibbonToolButton {
                 text: qsTr("Visible")
                 iconSource: "qrc:/icon/icon/showContext.svg"
-                proportion: Ribbon.Small
                 checkable: true
                 checked: true
                 onToggled: function(checked) { log(qsTr("right group visible toggle: %1").arg(checked)) }

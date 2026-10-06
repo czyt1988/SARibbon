@@ -14,6 +14,7 @@
 #include <SARibbonCore/SARibbonThemeData.h>
 #include <QFontMetrics>
 #include <QQuickWindow>
+#include <QScreen>
 #include <QWindow>
 
 namespace SARibbonQml {
@@ -229,6 +230,9 @@ void RibbonBar::setWindowTitle(const QString& title)
     }
     mWindowTitle = title;
     Q_EMIT windowTitleChanged();
+    // the title text feeds the minimum-width title reservation: recompute on
+    // every change (relayout re-reads it through the core engine)
+    polish();
 }
 
 bool RibbonBar::isFramelessActive() const
@@ -914,6 +918,11 @@ QRectF RibbonBar::titleRect() const
     return QRectF(mTitleRect);
 }
 
+int RibbonBar::minimumWidth() const
+{
+    return mMinimumWidth;
+}
+
 void RibbonBar::itemChange(ItemChange change, const ItemChangeData& data)
 {
     if (change == QQuickItem::ItemChildAddedChange) {
@@ -989,7 +998,15 @@ void RibbonBar::itemChange(ItemChange change, const ItemChangeData& data)
         polish();
     } else if (change == QQuickItem::ItemSceneChange && data.window) {
         // the bar entered (or moved to) a window: attach the frameless agent
-        // now that a QQuickWindow exists (QWK setup needs it)
+        // now that a QQuickWindow exists (QWK setup needs it). The title and
+        // screen tracking live here (not inside the frameless-only attach)
+        // because native-frame windows feed the same minimum-width rules:
+        // the window title is the title reservation, the screen's available
+        // width caps it. Handlers are idempotent, so a re-entry into the
+        // same window only stacks harmless no-op calls
+        setWindowTitle(data.window->title());
+        connect(data.window, &QWindow::windowTitleChanged, this, [this](const QString& t) { setWindowTitle(t); });
+        connect(data.window, &QWindow::screenChanged, this, [this]() { polish(); });
         attachWindowAgent();
     }
     RibbonQuickHost::itemChange(change, data);
@@ -1111,8 +1128,9 @@ void RibbonBar::attachWindowAgent()
         mWindowAgent->setTitleBarItem(this);
         setWindowTitle(win->title());
         // keep the leaf's title text in sync with the window title (the
-        // ApplicationWindow `title` property is what users edit)
-        connect(win, &QWindow::windowTitleChanged, this, [this](const QString& t) { setWindowTitle(t); });
+        // ApplicationWindow `title` property is what users edit). The
+        // connection itself lives in itemChange(ItemSceneChange) so
+        // native-frame windows get the same sync
         // mirror the ribbon theme onto the DWM frame so the window border
         // and caption follow dark/light palettes
         connect(RibbonTheme::instance(), &RibbonTheme::paletteChanged, this, [this]() {
@@ -1377,6 +1395,33 @@ void RibbonBar::relayout()
     input.hasContextTabs      = !mBands.isEmpty();
     input.tabBarGeometry      = QRect(8, tabBarY, qMin(x - 8 - tabSpacing, int(width()) - 8), tabH);
     mTitleRect = SARibbon::Core::SARibbonBarGeometryEngine::layoutTitleRect(input);
+
+    // 6. window minimum width (core calcMinimumWidth): the tab-row zone
+    //    minimum reuses the exact placement sums above (stripBegin +
+    //    rowWidth + reservedRight), the loose title-row zone adds the quick
+    //    access row after the application button plus the system strip; the
+    //    compact style shares one row, so the title rides inside it. The
+    //    screen rules (title sacrifice, 2/3 overlap cap) apply in core with
+    //    the window screen's available width
+    SARibbon::Core::SARibbonBarGeometryEngine::MinimumWidthInput minInput;
+    minInput.isCompactStyle = mTabOnTitle;
+    minInput.tabRowWidth    = stripBegin + rowWidth + reservedRight;
+    if (!mTabOnTitle) {
+        minInput.titleRowWidth = (hasAppButton ? appBtnW : 0)
+                                 + (mQuickAccessBar ? 8 + mQuickAccessBar->rowWidth() : 0)
+                                 + mSystemButtonStripWidth;
+    }
+    minInput.titleTextWidth = fm.horizontalAdvance(mWindowTitle);
+    if (QQuickWindow* win = window()) {
+        if (QScreen* scr = win->screen()) {
+            minInput.screenAvailableWidth = scr->availableGeometry().width();
+        }
+    }
+    const int newMinimumWidth = SARibbon::Core::SARibbonBarGeometryEngine::calcMinimumWidth(minInput);
+    if (newMinimumWidth != mMinimumWidth) {
+        mMinimumWidth = newMinimumWidth;
+        Q_EMIT minimumWidthChanged();
+    }
 
     mTabBarHeight   = tabH;
     mTitleBarHeight = titleH;

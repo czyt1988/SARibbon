@@ -71,6 +71,7 @@ class SA_RIBBON_QML_EXPORT RibbonBar : public RibbonQuickHost
     Q_PROPERTY(int categoryRowY READ categoryRowY NOTIFY layoutChanged)
     Q_PROPERTY(QRectF applicationButtonRect READ applicationButtonRect NOTIFY layoutChanged)
     Q_PROPERTY(QVariantList contextBands READ contextBands NOTIFY layoutChanged)
+    Q_PROPERTY(int minimumWidth READ minimumWidth NOTIFY minimumWidthChanged)
     Q_PROPERTY(QQmlListProperty< SARibbonQml::RibbonMenuItem > applicationMenuItems READ applicationMenuItems NOTIFY applicationMenuItemsChanged)
     Q_PROPERTY(bool hasApplicationMenu READ hasApplicationMenu NOTIFY applicationMenuItemsChanged)
     Q_PROPERTY(QQuickItem* applicationWindowItem READ applicationWindowItem NOTIFY applicationWindowChanged)
@@ -147,6 +148,19 @@ public:
     int titleBarHeight() const;
     int categoryRowY() const;
     QRectF applicationButtonRect() const;
+
+    // Auto-computed minimum width of the hosting window (core
+    // SARibbonBarGeometryEngine::calcMinimumWidth): the no-overlap width of
+    // the title-row / tab-row content (application button, quick access bar,
+    // effective tab row, right button group, system button strip) plus the
+    // window title, capped by the screen rules — never above 2/3 of the
+    // available screen width; the title is sacrificed first when over the
+    // cap, and beyond that overlap is accepted. Bind the hosting window:
+    // `ApplicationWindow { minimumWidth: ribbonBar.minimumWidth }`. The bar
+    // deliberately does not write the window property itself (QML windows
+    // derive no minimum from content, and a C++ write would fight user
+    // bindings)
+    int minimumWidth() const;
 
     // Tab pairing: categories without an explicit RibbonTab at their index
     // get an auto-created tab bound to the category title
@@ -233,6 +247,7 @@ Q_SIGNALS:
     void largeButtonMinimumWidthRatioChanged();
     void systemButtonStripWidthChanged();
     void layoutChanged();
+    void minimumWidthChanged();
     void applicationButtonClicked();
     void applicationMenuItemsChanged();
     void applicationMenuTriggered(SARibbonQml::RibbonMenuItem* item);
@@ -314,6 +329,7 @@ private:
     int mTabBarHeight   = 0;
     int mTitleBarHeight = 0;
     int mCategoryRowY   = 0;
+    int mMinimumWidth   = 0;  ///< core-derived window minimum (screen rules applied)
 };
 
 }
