@@ -997,10 +997,6 @@ void RibbonBar::itemChange(ItemChange change, const ItemChangeData& data)
 
 void RibbonBar::placeTitleRowHosts(int titleH, int tabBarY, int tabH, int appBtnW, int systemStripW)
 {
-    // native-frame windows reserve nothing (systemButtonStripWidth 0), so
-    // rightEdge sits 8px off the bar edge and the right hosts hug it — the
-    // widgets layouts only subtract the strip under isUseRibbonFrame()
-    const int rightEdge = int(width()) - systemStripW - 8;
     if (mTabOnTitle) {
         // compact (WPS): the tab row rides the title row and shares it with
         // the right-side hosts (widgets resizeInCompactStyle parity) — the
@@ -1008,6 +1004,7 @@ void RibbonBar::placeTitleRowHosts(int titleH, int tabBarY, int tabH, int appBtn
         // bar joins it from the left, so the two read as one right-aligned
         // toolbar while the tabs keep whatever strip remains after the
         // application button
+        const int rightEdge = int(width()) - systemStripW - 8;
         if (mRightButtonGroup) {
             const int w = mRightButtonGroup->rowWidth();
             mRightButtonGroup->setPosition(QPointF(qreal(qMax(rightEdge - w, 0)), 0));
@@ -1022,8 +1019,12 @@ void RibbonBar::placeTitleRowHosts(int titleH, int tabBarY, int tabH, int appBtn
     } else {
         // loose (office): the quick access row stays after the application
         // button on the title row (widgets resizeInLooseStyle parity), and
-        // the right button group rides the tab row's right end before the
-        // reserved system strip
+        // the right button group rides the tab row's right end — BELOW the
+        // system button strip, which only spans the title row. The strip is
+        // therefore NOT subtracted here (widgets resizeInLooseStyle keeps
+        // endX at the bar edge; the strip only feeds the title free rect),
+        // otherwise the group floats one strip-width off the right border
+        const int rightEdge = int(width()) - 8;
         if (mQuickAccessBar) {
             const int x = (appBtnW > 0 ? appBtnW : 0) + 8;
             mQuickAccessBar->setPosition(QPointF(x, 0));
@@ -1252,12 +1253,16 @@ void RibbonBar::relayout()
     // right-side reservation keeps the tab row clear of the right hosts
     // (widgets tabBarWidth = endX - x parity): the right button group rides
     // the tab row in loose styles too, while compact styles additionally
-    // share the row with the quick access bar. The frameless strip joins the
-    // reservation only when actually reserved (native frame: 0)
-    int reservedRight = 4 + (mRightButtonGroup ? mRightButtonGroup->rowWidth() + 8 : 0)
-                        + mSystemButtonStripWidth;
-    if (mTabOnTitle && mQuickAccessBar) {
-        reservedRight += mQuickAccessBar->rowWidth() + 6;
+    // share the row with the quick access bar. The frameless strip joins
+    // the reservation only in compact styles — their tab row rides the
+    // title row the strip spans, while the loose tab row sits below the
+    // strip and must run to the bar's right edge (native frame: 0 anyway)
+    int reservedRight = 4 + (mRightButtonGroup ? mRightButtonGroup->rowWidth() + 8 : 0);
+    if (mTabOnTitle) {
+        reservedRight += mSystemButtonStripWidth;
+        if (mQuickAccessBar) {
+            reservedRight += mQuickAccessBar->rowWidth() + 6;
+        }
     }
     // widgets setRibbonAlignment parity: the row shifts inside the free strip
     // (left = after the app button, center/right = shifted; front-end tab-row

@@ -54,7 +54,7 @@ first engine; a second engine gets nullptr (verified against Qt 5.14/6.7 sources
 | `RibbonGalleryItem` | type | gallery entry (text/iconSource/enabled/toolTip) |
 | `RibbonSeparator` | type | panel separator (Large proportion, own column, 1px line; widgets SARibbonSeparatorWidget counterpart) |
 | `RibbonQuickAccessBar` | type | quick access bar (small-button row on the title row after the app button; width feeds TitleRectInput.hasQuickAccessBar; widgets SARibbonQuickAccessBar counterpart) |
-| `RibbonButtonGroup` | type | right button group (small-button row right-aligned before the system strip; widgets SARibbonButtonGroupWidget counterpart) |
+| `RibbonButtonGroup` | type | right button group (right-aligned to the bar edge; before the system strip on the title row in compact styles, below the strip on the tab row in loose styles; widgets SARibbonButtonGroupWidget counterpart) |
 | `RibbonApplicationWindow` | type | application window (office-backstage overlay behind the app button: coverageRatio coverage + slide/fade animation + top-right cross/Esc/outside click close, inner close() programmatic; click priority: window > menu > signal; widgets ApplicationWidget counterpart) |
 | `Ribbon` | uncreatable | enum holder (`Ribbon.Large` / `Ribbon.ThreeRowMode` / `Ribbon.MenuButtonPopup` / `Ribbon.RibbonStyleCompactTwoRow` / ...) |
 
@@ -209,8 +209,12 @@ RibbonBar { ribbonStyle: Ribbon.RibbonStyleCompactTwoRow }
   button and the latter right-aligned against the bar's 8px right margin; a
   frameless host declares its system button area through
   `RibbonBar.systemButtonStripWidth` (default 0 — a native frame reserves
-  nothing), which shifts the right group and the tab row's right boundary
-  left of the reservation; the width feeds `TitleRectInput.hasQuickAccessBar`.
+  nothing), and **only compact styles** (tab row riding the title row) shift
+  the right group and the tab row's right boundary left of the reservation —
+  the loose right group rides the tab row BELOW the title-row-only strip and
+  must hug the bar's right edge (widgets resizeInLooseStyle parity: the strip
+  only feeds the title free rect); the width feeds
+  `TitleRectInput.hasQuickAccessBar`.
 - **Application button, three modes** (click priority: application window >
   menu > signal only):
   - `RibbonApplicationWindow` (widgets ApplicationWidget parity): a custom

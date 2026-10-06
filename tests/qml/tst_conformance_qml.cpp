@@ -1915,9 +1915,23 @@ Item {
     // only subtracts the strip under isUseRibbonFrame)
     QTRY_COMPARE(rgroup->x() + rgroup->width(), qreal(800 - 8));
     QVERIFY(help->width() > 0);
-    // a frameless host declaring the strip pushes the group left of it
+    // the group rides the TAB row in this loose (office) style — below the
+    // system button strip, which only spans the title row — so declaring
+    // the strip must NOT push it left (widgets resizeInLooseStyle keeps
+    // endX at the bar edge; the strip only feeds the title free rect)
     QVERIFY(bar->setProperty("systemButtonStripWidth", 120));
+    QTRY_COMPARE(rgroup->y(), qreal(bar->property("titleBarHeight").toInt()));
+    QTRY_COMPARE(rgroup->x() + rgroup->width(), qreal(800 - 8));
+    // compact (WPS) style: the tab row rides the title row and the group
+    // joins the title-row hosts left of the strip — exactly the one place
+    // the widgets layout subtracts it under isUseRibbonFrame
+    bar->setProperty("ribbonStyle", int(SARibbonQml::RibbonEnums::RibbonStyleCompactThreeRow));
+    QTRY_COMPARE(rgroup->y(), qreal(0));
     QTRY_COMPARE(rgroup->x() + rgroup->width(), qreal(800 - 120 - 8));
+    // back to loose: the group returns to the tab row's right edge
+    bar->setProperty("ribbonStyle", int(SARibbonQml::RibbonEnums::RibbonStyleLooseThreeRow));
+    QTRY_COMPARE(rgroup->y(), qreal(bar->property("titleBarHeight").toInt()));
+    QTRY_COMPARE(rgroup->x() + rgroup->width(), qreal(800 - 8));
 
     // ---- the embedded quick access button is clickable ----
     QSignalSpy clickedSpy(save, SIGNAL(clicked()));
@@ -3199,9 +3213,10 @@ Item {
     QVERIFY2(titleRect.x() + titleRect.width() <= 800 - 120 + 1,
              "title rect must not reach into the reserved strip");
 
-    // ---- right button group anchor: strip pushes hosts left of it ----
-    // (asserted through the bar geometry: rightEdge = width - strip - 8)
-    // sanity only — full layout assertions live in the layout parity suite
+    // ---- right button group anchor: only compact styles shift the hosts
+    // left of the strip (their tab row rides the title row); the loose right
+    // group rides the tab row below the strip and hugs the bar edge —
+    // asserted in quickAccessBarAndRightGroup, sanity here only
 
     // ---- system button registration round trip (QWK object identity) ----
     // register a plain item directly; the offscreen window is enough for the

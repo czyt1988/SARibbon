@@ -850,6 +850,18 @@
 
 ---
 
+### B70：宽松样式右侧组被无边框 strip 多让一位 —— widgets 只有紧凑样式才在标题行扣 strip（第 30 轮）
+
+- 日期：2026-10-06（用户报告第三轮）
+- 发现位置：用户报告（无边框 QWK + Office 宽松 3 行：Right button bar 到窗口右缘之间有一条 system button 宽的空白；WPS 紧凑模式布局正确——右侧组与系统按钮同排）
+- **根因**：QML 宿主 `placeTitleRowHosts` 的宽松分支共用 `rightEdge = width - systemStripW - 8`，把 strip 从**tab 行**的右界里扣掉了；但系统按钮条只覆盖**标题行**（y 0..titleH），宽松样式的 tab 行在标题行下方、与 strip 根本不重叠——扣掉即凭空多出一条 strip 宽的空白。`relayout()` 的 tab 行右预留（`reservedRight += mSystemButtonStripWidth`）同病。widgets 对照（SARibbonBarLayout.cpp）：**紧凑 LTR**（:1652-1655）`endX -= systemButtonSize.width()`——标题行宿主让位 strip；**宽松 LTR**（:1410-1436）`endX = width - border.right()` 不扣 strip——rightButtonGroup 在 tab 行贴右缘，strip 只进标题自由区（`layoutTitleRect`）。
+- **处理**：`placeTitleRowHosts` 把 `rightEdge` 下放到各分支——紧凑仍 `width - strip - 8`（标题行，strip 真实存在），宽松改 `width - 8`（tab 行贴 bar 右缘）；`relayout()` 的 strip 预留改为仅 `mTabOnTitle` 时并入（紧凑的 tab 行骑在标题行上才与 strip 重叠）。`layoutTitleRect` 的 `input.systemButtonSize` 不动——标题自由区两种样式都该避开 strip。
+- 测试：`quickAccessBarAndRightGroup` 的 strip 断言原本钉死了错误行为（宽松 + strip=120 期望 `800-120-8`），改为三段：宽松 + strip → 右侧组 y==titleBarHeight（tab 行）且 rightEdge==800-8（**不再让位**）；切紧凑 → y==0 且 rightEdge==800-120-8（标题行让位）；切回宽松 → 复原。`framelessAgentStripAndTitle` 里同语义的过期注释同步修正。
+- 证据：repro harness 几何 dump（agent strip=105、bar 宽 1000）：宽松 3/2 行 rgroup y=28 rightEdge=992（=1000-8，系统按钮正下方）；紧凑 3/2 行 rgroup y=0 rightEdge=887（=1000-105-8，strip 左侧），qab 在其左同排。`qml_Conformance` **27/28**（`embeddedRibbonBasicControls` 为 HEAD 既有环境失败）。示例 offscreen 6s 零 QML 错误。只改 `src/qml` + 测试 + 文档。
+- 影响计划：04（S4 bar 宿主布局：宽松样式右侧组贴右缘，widgets resizeInLooseStyle 对等；qml-guide 中英文右侧组锚定表述同步）。
+
+---
+
 ## 执行中追加（模板，勿删）
 
 ```
