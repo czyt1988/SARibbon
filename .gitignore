@@ -1,4 +1,4 @@
-﻿bin_*
+bin_*
 build*
 # 针对文档添加否定规则
 !docs/zh/build-guide
@@ -197,3 +197,6 @@ src/SARibbonCore.cpp
 src/SARibbonWidgets.h
 src/SARibbonWidgets.cpp
 binding-include/
+
+# agent worktrees (see AGENTS.md Worktree 工作流)
+.worktree/
