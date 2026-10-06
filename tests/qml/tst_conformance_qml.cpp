@@ -2516,8 +2516,31 @@ Item {
     QVERIFY(appwin->setProperty("animation", int(SARibbonQml::RibbonApplicationWindow::NoAnimation)));
     clickAppButton();
     QTRY_COMPARE(appwin->property("popupVisible").toBool(), true);
+    // a no-animation reopen after the slide exit must be ON SCREEN: the
+    // exit dragged the popup origin offscreen and the positioner syncs the
+    // item geometry from the POPUP's x (the authoritative origin) — the
+    // aboutToShow reset targets exactly that (an item-level x reset gets
+    // undone by the next reposition)
+    QTRY_COMPARE(popupItem->x(), 0.0);
+    QCOMPARE(popupItem->y(), 0.0);
     QTest::keyClick(view.get(), Qt::Key_Escape);
     QTRY_COMPARE(appwin->property("popupVisible").toBool(), false);
+
+    // ---- fade reopen: no x animation to mask a leftover origin ----
+    QVERIFY(appwin->setProperty("animation", int(SARibbonQml::RibbonApplicationWindow::Fade)));
+    clickAppButton();
+    QTRY_COMPARE(appwin->property("popupVisible").toBool(), true);
+    QTest::qWait(350);  // let the fade settle
+    QTRY_COMPARE(popupItem->x(), 0.0);
+    QVERIFY(agent->isHitTestVisible(popupItem));
+    // painted, not just flagged open: the window center carries the panel
+    // background (the offscreen reopen passed every flag/geometry assertion
+    // before — only pixels catch it)
+    QImage grabbed = view->grabWindow();
+    QVERIFY(countPixelsNear(grabbed, SARibbonQml::RibbonTheme::instance()->contentBg()) > 1000);
+    QTest::keyClick(view.get(), Qt::Key_Escape);
+    QTRY_COMPARE(appwin->property("popupVisible").toBool(), false);
+    QVERIFY(appwin->setProperty("animation", int(SARibbonQml::RibbonApplicationWindow::NoAnimation)));
 
     // ---- 2/3 coverage: popup shrinks, clicking outside closes ----
     QVERIFY(appwin->setProperty("coverageRatio", 2.0 / 3.0));

@@ -374,13 +374,20 @@ Rectangle {
             }
 
             onAboutToShow: {
-                // reset whatever a previous exit animation left on the popup
-                // item (slides leave x displaced beyond the window edge,
-                // fades leave opacity down on Qt < 5.15.3; with no enter
-                // transition Qt never repositions, so a leftover would
-                // reopen the panel offscreen)
+                // The exit animations drag the popup item beyond the window
+                // edge, and the popup positioner syncs that back into the
+                // POPUP's own x/y (its authoritative origin: reposition
+                // rebuilds the item geometry from it). Reset the POPUP
+                // coordinates here — resetting only the item's x is undone
+                // by the very next reposition. Without this, a fade or
+                // no-animation reopen parks the panel at the leftover
+                // offscreen origin (slides masked it: their `to: 0` x
+                // animation pulled the panel back by itself)
+                appWinPopup.x = 0;
+                appWinPopup.y = 0;
+                // fade exits can leave the item transparent on Qt < 5.15.3
+                // (no opacity/scale restore after exit transitions there)
                 if (appWinContentHost.parent) {
-                    appWinContentHost.parent.x = 0;
                     appWinContentHost.parent.opacity = 1.0;
                 }
                 // the bar is the frameless draggable title bar and QWK's hit
