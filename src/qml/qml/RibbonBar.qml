@@ -383,6 +383,18 @@ Rectangle {
                     appWinContentHost.parent.x = 0;
                     appWinContentHost.parent.opacity = 1.0;
                 }
+                // the bar is the frameless draggable title bar and QWK's hit
+                // test is purely geometric (it knows nothing of the overlay
+                // stacking): without this exemption every click inside the
+                // popup area that overlaps the bar band is swallowed as a
+                // window drag — the close cross went dead at partial
+                // coverage exactly this way (at full coverage it only kept
+                // working because it happened to sit inside the registered
+                // system-button strip)
+                var agent = root.cppHost ? root.cppHost.windowAgent : null;
+                if (agent && appWinContentHost.parent) {
+                    agent.setHitTestVisible(appWinContentHost.parent, true);
+                }
                 // adopt the declared item explicitly (a direct contentItem
                 // assignment cannot — see the note above); the content fills
                 // the host so the coverage geometry drives its size
@@ -393,6 +405,11 @@ Rectangle {
                 }
             }
             onClosed: {
+                // hand the covered area back to the title-bar drag
+                var agent = root.cppHost ? root.cppHost.windowAgent : null;
+                if (agent && appWinContentHost.parent) {
+                    agent.setHitTestVisible(appWinContentHost.parent, false);
+                }
                 if (root.appWindowItem) {
                     root.appWindowItem.popupVisible = false;
                 }

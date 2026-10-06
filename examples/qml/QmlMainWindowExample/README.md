@@ -27,7 +27,7 @@ cmake --build build
 | ribbon style 面板 | 字体族选择（度量链重建+全局重排）+ 字体增大/减小（应用级度量联动） | QFontComboBox + Larger/Smaller |
 | ribbon style 面板 | RTL 切换（引擎经 saIsRTL 镜像布局） | Switch to RTL |
 | ribbon style 面板 | tab 对齐（左/中/右） | Alignment Center |
-| app window 面板 | 覆盖比例切换（Full/2/3/1/2 自定义）与进出动画切换（左滑/右滑/淡入/无） | 无对应项（widgets 版整窗覆盖、无动画配置） |
+| app window 面板 | 覆盖比例切换（Full/2/3/1/2，互斥单选）与进出动画切换（左滑/右滑/淡入/无，互斥单选），默认预选 Full + 左滑 | 无对应项（widgets 版整窗覆盖、无动画配置） |
 | 类别区 | 内容溢出时自动出现左右滚动箭头（12px 贴边），滚轮横向滚动，箭头/滚轮走 300ms OutQuad 动画（`useAnimatingScroll` 可关，`wheelScrollStep` 可调） | SARibbonCategoryLayout 滚动按钮 |
 | button states 面板 | 大按钮 6 态：Normal/Checked/Disabled（含解锁）/超长文本/超短文本 | 按钮状态演示 |
 | toolbutton style 面板 | 弹出三模式 × 比例混合：MenuButtonPopup（分区命中）/InstantPopup/DelayedPopup（长按）+ checkable 变体 + 禁用带菜单 | SARibbonMenu 演示 |

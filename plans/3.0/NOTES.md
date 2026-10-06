@@ -835,6 +835,21 @@
 
 ---
 
+### B69：应用窗口 ✕ 在部分覆盖下失效 —— QWK 命中测试是纯几何的，不知道 overlay 遮挡（第 29 轮）
+
+- 日期：2026-10-06（用户报告第二轮）
+- 发现位置：用户报告（① 示例 app window 面板选项不互斥；② 选 2/3 或 1/2 时右上角 ✕ 点不动，只能点外部区域关窗）
+- **根因 ②（✕ 失效）**：bar 整体注册为 QWK 可拖动标题栏（`attachWindowAgent` → `setTitleBarItem(this)`），而 QWK 的 `AbstractWindowContext::isInTitleBarDraggableArea` 是**纯几何**判定：光标在 titleBar 矩形内、且不在已注册系统按钮/hitTestVisible 项的场景矩形内 → HTCAPTION。它完全不知道 overlay 里的弹层在视觉上盖住了标题栏。部分覆盖（2/3、1/2）时 ✕ 移到窗口左半部、落在纯标题栏带 → **每次点击被原生窗口管理器当作拖动**，Qt 场景收不到事件；全屏时 ✕ 恰好落在已注册 `sysButtonRow` 区域内（HTCLIENT）才"碰巧能用"——同一缺陷的两种表现。
+- **修复 ②**：叶子 `aboutToShow`/`onClosed` 把弹层 popupItem 经 `agent.setHitTestVisible(item, true/false)` 注册/注销（QWK 的 hitTestVisible 集合按场景矩形把该区域从拖动区排除 → HTCLIENT → ✕ 与弹层内容恢复可点击；agent 未声明/未挂接时守卫跳过，offscreen 测试路径零影响）。全屏覆盖期间整个窗口不可拖动 = Office Backstage 同款语义。
+- **根因 ①（不互斥）**：`RibbonToolButton` 是 QQuickItem 宿主**不是 AbstractButton**，Controls 的 `ButtonGroup.group` 附加属性对它静默无效（上一轮直接照抄 ButtonGroup 写法是我的失误）；且其 `click()` 的 `setChecked` 写入会破坏 `checked` 上的声明式绑定，绑定驱动的选中同步也不可行。
+- **修复 ①**：示例面板改为两组 `Repeater` + model 数组（覆盖 3 项 / 动画 4 项），`onClicked` 里经 `itemAt(i)` 循环重申整组选中态——单选语义（重复点击已选项保持选中），`index === 0` 为类型默认（Full / SlideFromLeft）预选，`modelData.ratio/effect` 直接写入 `appWindow` 属性。
+- 测试钉死：`applicationWindow` 用例声明 `RibbonWindowAgent`，断言 popupItem 的 `isHitTestVisible` 开窗为真（全屏与 2/3 两处）、关窗为假——把"弹层必须豁免拖动命中"变成回归钉。repro harness 验证 Repeater 模式全语义（默认预选 [x][ ][ ] / 点击互斥 / 重选保持 / coverageRatio 与 animation 跟随）+ 1/2 覆盖下真实点击 ✕ 关层。
+- 陷阱入档：**overlay 弹层与根 item 是视觉兄弟**——从根 item 走 `childItems()` 视觉树扫不到弹层内容；Repeater delegate 又反之只在视觉树（B50）。两类目标的查找路径要分开：弹层内条目（✕、contentHost）走 QObject 树 `findChild`（Popup 的 QObject 父链经 Loader→叶子→bar→根可达），Repeater delegate 走视觉树遍历。
+- 证据：`qml_Conformance` **27/28**（`embeddedRibbonBasicControls` 为干净 HEAD 既有环境失败，非本轮回归；`applicationWindow` 扩展断言全绿）；示例 offscreen 6s 零 QML 错误。只改 `src/qml` 叶子 + 示例 + 测试 + 文档，未动 core/widgets。
+- 影响计划：04（应用窗口在无边框模式下的交互补全：覆盖期间拖动豁免；示例互斥单选语义对齐 office 设置面板惯例）。
+
+---
+
 ## 执行中追加（模板，勿删）
 
 ```

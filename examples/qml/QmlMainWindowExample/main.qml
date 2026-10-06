@@ -373,84 +373,58 @@ ApplicationWindow {
 
             // app-window presentation knobs: coverage (full / 2/3 / custom)
             // and enter/exit animation (slide from left etc.) — the File
-            // button opens the window with whatever is selected here
+            // button opens the window with whatever is selected here.
+            // RibbonToolButton is a plain QQuickItem host, NOT an
+            // AbstractButton, so Controls' ButtonGroup cannot manage it —
+            // each group is an exclusive set synced imperatively: a click
+            // re-asserts the whole selection (radio semantics, re-clicking
+            // the checked entry keeps it checked), index 0 of each group is
+            // the RibbonApplicationWindow type default and starts selected
             RibbonPanel {
                 panelTitle: "app window"
 
-                ButtonGroup { id: appWinCoverageGroup }
-                ButtonGroup { id: appWinAnimGroup }
-
-                RibbonToolButton {
-                    text: qsTr("Full")
-                    proportion: Ribbon.Small
-                    checkable: true
-                    checked: true
-                    ButtonGroup.group: appWinCoverageGroup
-                    onClicked: {
-                        appWindow.coverageRatio = 1.0;
-                        log(qsTr("app window coverage: full screen"));
-                    }
-                }
-                RibbonToolButton {
-                    text: qsTr("2/3")
-                    proportion: Ribbon.Small
-                    checkable: true
-                    ButtonGroup.group: appWinCoverageGroup
-                    onClicked: {
-                        appWindow.coverageRatio = 2 / 3;
-                        log(qsTr("app window coverage: 2/3 of the window"));
-                    }
-                }
-                RibbonToolButton {
-                    text: qsTr("1/2")
-                    proportion: Ribbon.Small
-                    checkable: true
-                    ButtonGroup.group: appWinCoverageGroup
-                    onClicked: {
-                        appWindow.coverageRatio = 0.5;
-                        log(qsTr("app window coverage: half window (custom ratio)"));
+                Repeater {
+                    id: appWinCoverageGroup
+                    model: [
+                        { label: qsTr("Full"), ratio: 1.0 },
+                        { label: qsTr("2/3"), ratio: 2 / 3 },
+                        { label: qsTr("1/2"), ratio: 0.5 }
+                    ]
+                    RibbonToolButton {
+                        text: modelData.label
+                        proportion: Ribbon.Small
+                        checkable: true
+                        checked: index === 0
+                        onClicked: {
+                            appWindow.coverageRatio = modelData.ratio;
+                            for (var i = 0; i < appWinCoverageGroup.count; ++i) {
+                                appWinCoverageGroup.itemAt(i).checked = (i === index);
+                            }
+                            log(qsTr("app window coverage: %1").arg(modelData.label));
+                        }
                     }
                 }
                 RibbonSeparator { }
-                RibbonToolButton {
-                    text: qsTr("Slide L")
-                    proportion: Ribbon.Small
-                    checkable: true
-                    checked: true
-                    ButtonGroup.group: appWinAnimGroup
-                    onClicked: {
-                        appWindow.animation = RibbonApplicationWindow.SlideFromLeft;
-                        log(qsTr("app window animation: slide from left"));
-                    }
-                }
-                RibbonToolButton {
-                    text: qsTr("Slide R")
-                    proportion: Ribbon.Small
-                    checkable: true
-                    ButtonGroup.group: appWinAnimGroup
-                    onClicked: {
-                        appWindow.animation = RibbonApplicationWindow.SlideFromRight;
-                        log(qsTr("app window animation: slide from right"));
-                    }
-                }
-                RibbonToolButton {
-                    text: qsTr("Fade")
-                    proportion: Ribbon.Small
-                    checkable: true
-                    ButtonGroup.group: appWinAnimGroup
-                    onClicked: {
-                        appWindow.animation = RibbonApplicationWindow.Fade;
-                        log(qsTr("app window animation: fade"));
-                    }
-                }
-                RibbonToolButton {
-                    text: qsTr("None")
-                    proportion: Ribbon.Small
-                    checkable: true
-                    ButtonGroup.group: appWinAnimGroup
-                    onClicked: {
-                        appWindow.animation = RibbonApplicationWindow.NoAnimation;
-                        log(qsTr("app window animation: none"));
+                Repeater {
+                    id: appWinAnimGroup
+                    model: [
+                        { label: qsTr("Slide L"), effect: RibbonApplicationWindow.SlideFromLeft },
+                        { label: qsTr("Slide R"), effect: RibbonApplicationWindow.SlideFromRight },
+                        { label: qsTr("Fade"), effect: RibbonApplicationWindow.Fade },
+                        { label: qsTr("None"), effect: RibbonApplicationWindow.NoAnimation }
+                    ]
+                    RibbonToolButton {
+                        text: modelData.label
+                        proportion: Ribbon.Small
+                        checkable: true
+                        checked: index === 0
+                        onClicked: {
+                            appWindow.animation = modelData.effect;
+                            for (var i = 0; i < appWinAnimGroup.count; ++i) {
+                                appWinAnimGroup.itemAt(i).checked = (i === index);
+                            }
+                            log(qsTr("app window animation: %1").arg(modelData.label));
+                        }
                     }
                 }
             }

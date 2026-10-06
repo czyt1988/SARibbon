@@ -2283,6 +2283,7 @@ Item {
         anchors.top: parent.top
         applicationLabel: "File"
         applicationMenuItems: [ RibbonMenuItem { text: "should not open" } ]
+        windowAgent: RibbonWindowAgent { objectName: "agent" }
         RibbonApplicationWindow {
             id: appwin
             objectName: "appwin"
@@ -2358,11 +2359,27 @@ Item {
     QVERIFY(closeButton);
     QVERIFY(closeButton->isVisible());
 
+    // ---- frameless hit-test exemption follows the open state ----
+    // the bar is the QWK draggable title bar and its hit test is purely
+    // geometric: the popup item must be registered as hit-test visible
+    // while open, or every click on the covered bar band is swallowed as a
+    // window drag (the close cross went dead at partial coverage exactly
+    // this way — at full coverage it only kept working because it happened
+    // to sit inside the registered system-button strip)
+    auto* agent = rootItem->findChild< SARibbonQml::RibbonWindowAgent* >(QStringLiteral("agent"));
+    QVERIFY(agent);
+    QVERIFY(agent->window() == view.get());
+    QQuickItem* popupItem = contentHost->parentItem();
+    QVERIFY(popupItem);
+    QVERIFY(agent->isHitTestVisible(popupItem));
+
     // ---- the close cross really closes ----
     QTest::qWait(350);  // let the default slide-in settle before clicking
     const QPointF closeCenter = closeButton->mapToScene(QPointF(closeButton->width() / 2, closeButton->height() / 2));
     QTest::mouseClick(view.get(), Qt::LeftButton, Qt::NoModifier, closeCenter.toPoint());
     QTRY_COMPARE(appwin->property("popupVisible").toBool(), false);
+    // closing hands the covered area back to the title-bar drag
+    QVERIFY(!agent->isHitTestVisible(popupItem));
 
     // ---- Esc closes (instant cycles from here on) ----
     QVERIFY(appwin->setProperty("animation", int(SARibbonQml::RibbonApplicationWindow::NoAnimation)));
@@ -2377,6 +2394,10 @@ Item {
     QTRY_COMPARE(appwin->property("popupVisible").toBool(), true);
     QTRY_COMPARE(popup->property("width").toReal(), 800.0 * 2.0 / 3.0);
     QCOMPARE(popup->property("height").toReal(), qreal(300));
+    // the partial-coverage reopen keeps the drag exemption — at 2/3 and 1/2
+    // the cross sits in pure title-bar band, without the exemption it is a
+    // window drag instead of a click
+    QVERIFY(agent->isHitTestVisible(popupItem));
     // 700 lies beyond the 533-wide panel: outside press closes (popup rule)
     QTest::mouseClick(view.get(), Qt::LeftButton, Qt::NoModifier, QPoint(700, 150));
     QTRY_COMPARE(appwin->property("popupVisible").toBool(), false);
