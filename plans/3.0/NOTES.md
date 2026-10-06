@@ -862,6 +862,21 @@
 
 ---
 
+### B71：面板子项登记顺序错乱 + 分隔符叶子从未创建 —— Repeater 代理的通知时序（第 31 轮）
+
+- 日期：2026-10-07（用户报告第四轮）
+- 发现位置：用户报告（示例 app window 面板：① 渲染顺序反了——先 Slide 组再覆盖组，与声明顺序相反；② RibbonSeparator 不显示、无换列效果；共性问题：panel 内部分隔线从来不显示）
+- **根因 ①（顺序错乱）**：`RibbonPanel` 按到达序登记子项，但到达序 ≠ 声明序——两层时序：**Repeater 代理在其 Repeater 的 componentComplete 才创建，而兄弟 componentComplete 按创建的逆序运行**（后声明的 RepeaterB 先完成、其代理先登记）；且插桩实测（registerChildItem 的 fprintf 追踪）**`ItemChildAddedChange` 触发时代理还在 childItems 末尾**——QQuickRepeater 的 `stackBefore` 重排发生在通知之后，注册时读到的 visualIndex 是末尾（无效锚点）。静态声明的分隔符先登记（创建期），于是 [RepeaterA, sep, RepeaterB] 面板登记成 [sep, B×4, A×3]，且 A 组内部也倒序。
+- **修复 ①**：`registerChildItem` 不再即时锚定——新登记项进 `mPendingOrderItems`，**下一次布局**（`runLayout` 入口 `settlePendingOrder()`）时按已稳定的视觉顺序落位：按视觉序逐项处理，锚定在"最近的已落位前驱之后 / 后继之前"（跳过尚未处理的 pending 项，首个无锚点项落 0 位——它视觉上先于一切已落位项）。`attachChildItem`/`moveChildItem`/`reorderChildItem` 的显式顺序**清出 pending**（优先于延迟锚定），`unregisterChildItem` 同步清 pending——定制系统的调序/装卸语义零影响（qml_Customize 12/12 全绿）。
+- **根因 ②（分隔线不显示）**：`RibbonSeparator` 是**唯一忘了创建视觉叶子的叶子宿主类型**——没有 componentComplete、从不调 `ensureQmlLeaf()`（其余全部类型都调：button/panel/category/tab/gallery/container/colorgrid/colormenu/colortoolbutton/customizer）。引擎几何一直是对的（separatorInPanel 测试只断言了宽 7 与 x 夹在按钮之间），所以缺叶子从未暴露——1px 竖线从未画出来过。
+- **修复 ②**：`RibbonSeparator::componentComplete()` 补 `ensureQmlLeaf()`。**长度即用户预期**：分隔符以 Large 比例参与引擎（独占一列），几何 = 面板正文高度（标题带上方）——落位项 y=2 h=70（面板 91），叶子线内缩 3px → 线区 5..69，标题带 y=74 起：**从顶部到标题截止、比面板间分隔线（85px）短**，与"panel 内部分割线应该短一点"的要求一致，无需另改。
+- 测试：`separatorInPanel` 扩展（叶子存在且可见、叶子尺寸 == 宿主、宿主底边 ≤ 标题带顶、高度 < 面板高-6）；新增 `repeaterMixedPanelOrder`（[Repeater×3, RibbonSeparator, Repeater×4] 面板：A 组全部左于分隔符、B 组全部右于分隔符、组内 Repeater 顺序保持）。
+- 证据：harness 登记/视觉双序 dump——修复前 [sep, sbtn0..3, btn2, btn1, btn0]，修复后 [btn0, btn1, btn2, sep, sbtn0..3]（x: 2 | 30 | 39）；**像素级验证**叶子线：采样线心 (39,91) 得 `#ffbec0c2` == `RibbonTheme.separator`，线 1×64、止于标题带上方；四套件 ctest：Conformance 28/29（embeddedRibbonBasicControls 为 HEAD 既有环境失败）、Customize 12/12、LayoutParity 16/16、Color 14/14；示例 offscreen 6s 零 QML 错误。
+- 陷阱入档：**QQuickRepeater 代理的 `ItemChildAddedChange` 在 setParentItem（追加到末尾）时同步触发，`stackBefore` 重排在其后**——任何依赖"通知时刻的 childItems 序 == 最终视觉序"的锚定都会错位；正确做法是把顺序决定推迟到下一帧/下一布局（此时序与 B50"代理无 QObject 父级"是同一个 Repeater 两面）。qml-guide 中英文已登记该规则与 pending-settle 机制。
+- 影响计划：04（面板子项混排静态/Repeater 声明成为安全模式；面板内分隔符视觉补全——Large 比例独列 + 正文高度短线）。
+
+---
+
 ## 执行中追加（模板，勿删）
 
 ```

@@ -27,6 +27,16 @@ RibbonSeparator::~RibbonSeparator()
 {
 }
 
+void RibbonSeparator::componentComplete()
+{
+    RibbonLayoutItemHost::componentComplete();
+    // every leaf-hosting type must demand its visual leaf here or the line
+    // never renders — the separator was the one type that forgot (the
+    // conformance test only checked the engine geometry, so the missing
+    // leaf went unnoticed)
+    ensureQmlLeaf();
+}
+
 QUrl RibbonSeparator::leafUrl() const
 {
     return SARibbonQmlLeafUrls::separatorLeaf();

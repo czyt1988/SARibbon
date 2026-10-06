@@ -33,6 +33,7 @@ public:
     QSize sizeHint() const override;
 
 protected:
+    void componentComplete() override;
     QUrl leafUrl() const override;
     void largeHeightContextChanged() override;
 

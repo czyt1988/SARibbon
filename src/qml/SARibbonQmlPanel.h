@@ -147,6 +147,13 @@ private:
     // Move an already-registered item to `index` (negative = tail); the
     // registration itself always happens through itemChange
     void reorderChildItem(RibbonLayoutItemHost* item, int index);
+    // Deferred declaration-order anchoring: newly registered items wait in
+    // mPendingOrderItems until the next layout pass, where they are placed
+    // relative to the settled visual order (Repeater delegates restack after
+    // their ItemChildAddedChange, so their final position is unknowable at
+    // registration time)
+    void settlePendingOrder();
+    int settleInsertIndex(RibbonLayoutItemHost* item, const QVector< RibbonLayoutItemHost* >& stillPending) const;
 
     QString mPanelTitle;
     RibbonEnums::LayoutMode mLayoutMode = RibbonEnums::ThreeRowMode;
@@ -159,6 +166,7 @@ private:
     QSize mSmallIconSize = QSize(22, 22);  ///< widgets SARibbonPanelLayout::mSmallToolButtonIconSize default
     QSize mLargeIconSize = QSize(32, 32);  ///< widgets SARibbonPanelLayout::mLargeToolButtonIconSize default
     QVector< RibbonLayoutItemHost* > mChildItems;
+    QVector< RibbonLayoutItemHost* > mPendingOrderItems;  ///< registrations awaiting position settle
     SARibbon::Core::SARibbonPanelLayoutEngine mEngine;
     QSize mLastSizeHint;
     int mLastColumnCount = 0;

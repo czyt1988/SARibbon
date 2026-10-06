@@ -90,7 +90,18 @@ void RibbonPanel::applyRibbonStyle(RibbonEnums::LayoutMode mode, bool showPanelT
 void RibbonPanel::registerChildItem(RibbonLayoutItemHost* item)
 {
     if (!mChildItems.contains(item)) {
+        // The arrival order is NOT the declaration order, and it cannot be
+        // repaired here: Repeater delegates arrive at the Repeater's
+        // componentComplete (which runs in REVERSE sibling order), and
+        // ItemChildAddedChange fires while the delegate still sits at the
+        // END of childItems — QQuickRepeater restacks it to its final
+        // position only AFTER the notification. Anchor the newcomer at the
+        // next layout pass instead, when the visual order has settled
+        // (settlePendingOrder); a panel declaring [Repeater A, separator,
+        // Repeater B] packed [separator, B..., A...] exactly through the
+        // arrival-order scramble.
         mChildItems.append(item);
+        mPendingOrderItems.append(item);
         // buttons registered later inherit the current style flags and the
         // layout knobs already pushed down from the category / bar; a button
         // arriving from a title-row host loses its flat flag (panel buttons
@@ -105,6 +116,60 @@ void RibbonPanel::registerChildItem(RibbonLayoutItemHost* item)
             btn->setLargeButtonMinimumWidthRatio(mLargeButtonMinimumWidthRatio);
         }
         polish();
+    }
+}
+
+int RibbonPanel::settleInsertIndex(RibbonLayoutItemHost* item, const QVector< RibbonLayoutItemHost* >& stillPending) const
+{
+    // anchor between the nearest settled registered siblings in the VISUAL
+    // order: after the nearest preceding one, else before the nearest
+    // following one
+    const auto kids = childItems();
+    const int visualIndex = kids.indexOf(item);
+    for (int i = visualIndex - 1; i >= 0; --i) {
+        auto* prev = qobject_cast< RibbonLayoutItemHost* >(kids[ i ]);
+        if (prev && !stillPending.contains(prev)) {
+            const int at = mChildItems.indexOf(prev);
+            if (at >= 0) {
+                return at + 1;
+            }
+        }
+    }
+    for (int i = visualIndex + 1; i < kids.size(); ++i) {
+        auto* next = qobject_cast< RibbonLayoutItemHost* >(kids[ i ]);
+        if (next && !stillPending.contains(next)) {
+            const int at = mChildItems.indexOf(next);
+            if (at >= 0) {
+                return at;
+            }
+        }
+    }
+    // no settled sibling on either side: the item visually precedes every
+    // settled registration — it starts the list
+    return 0;
+}
+
+void RibbonPanel::settlePendingOrder()
+{
+    if (mPendingOrderItems.isEmpty()) {
+        return;
+    }
+    QVector< RibbonLayoutItemHost* > pending = mPendingOrderItems;
+    mPendingOrderItems.clear();
+    // settle in VISUAL order so every processed item becomes a valid anchor
+    // for the next one (the walk skips the not-yet-processed tail)
+    const auto kids = childItems();
+    std::sort(pending.begin(), pending.end(),
+              [ &kids ](RibbonLayoutItemHost* a, RibbonLayoutItemHost* b) {
+                  return kids.indexOf(a) < kids.indexOf(b);
+              });
+    while (!pending.isEmpty()) {
+        RibbonLayoutItemHost* item = pending.takeFirst();
+        if (!mChildItems.contains(item)) {
+            continue;  // unregistered in between
+        }
+        mChildItems.removeOne(item);
+        mChildItems.insert(settleInsertIndex(item, pending), item);
     }
 }
 
@@ -182,6 +247,7 @@ void RibbonPanel::setLargeIconSize(const QSize& size)
 
 void RibbonPanel::unregisterChildItem(RibbonLayoutItemHost* item)
 {
+    mPendingOrderItems.removeOne(item);
     if (mChildItems.removeOne(item)) {
         mEngine.removeFromCache(item);
         polish();
@@ -211,6 +277,8 @@ void RibbonPanel::reorderChildItem(RibbonLayoutItemHost* item, int index)
     }
     const int to = (index < 0 || index >= mChildItems.size()) ? (mChildItems.size() - 1) : index;
     if (from != to) {
+        // an explicit order overrides the deferred visual anchoring
+        mPendingOrderItems.removeOne(item);
         mChildItems.move(from, to);
         polish();
     }
@@ -286,6 +354,8 @@ bool RibbonPanel::moveChildItem(int from, int to)
     if (from < 0 || from >= mChildItems.size() || to < 0 || to >= mChildItems.size() || from == to) {
         return false;
     }
+    // an explicit order overrides the deferred visual anchoring
+    mPendingOrderItems.removeOne(mChildItems[ from ]);
     mChildItems.move(from, to);
     polish();
     return true;
@@ -387,6 +457,10 @@ void RibbonPanel::updatePolish()
 
 void RibbonPanel::runLayout()
 {
+    // the arrival order settles to the visual one before every engine pass
+    // (Repeater delegates restack after their ItemChildAddedChange, so their
+    // final position is only reliable here)
+    settlePendingOrder();
     if (mChildItems.isEmpty()) {
         return;
     }

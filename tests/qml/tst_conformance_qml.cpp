@@ -57,6 +57,7 @@ private Q_SLOTS:
     void ribbonStyleSwitching();
     void styleRadioViaContainer();
     void separatorInPanel();
+    void repeaterMixedPanelOrder();
     void quickAccessBarAndRightGroup();
     void buttonRowExclusivity();
     void tabAlignmentAndMinimumMode();
@@ -1754,10 +1755,11 @@ Item {
     QQuickItem* rootItem = view->rootObject();
     QVERIFY(rootItem);
 
+    auto* panel = rootItem->findChild< QQuickItem* >(QStringLiteral("panel"));
     auto* left  = rootItem->findChild< QQuickItem* >(QStringLiteral("left"));
     auto* sep   = rootItem->findChild< QQuickItem* >(QStringLiteral("sep"));
     auto* right = rootItem->findChild< QQuickItem* >(QStringLiteral("right"));
-    QVERIFY(left && sep && right);
+    QVERIFY(panel && left && sep && right);
 
     QTRY_VERIFY(left->width() > 0 && right->width() > 0);
     QTRY_VERIFY(sep->width() > 0 && sep->height() > 0);
@@ -1766,6 +1768,121 @@ Item {
     // the separator column sits between the buttons
     QVERIFY(left->x() < sep->x());
     QVERIFY(sep->x() < right->x());
+    // the visual leaf really exists (the separator was the one leaf-hosting
+    // type that never called ensureQmlLeaf — the geometry was right but the
+    // 1px line never rendered)
+    QQuickItem* sepLeaf = sep->property("qmlLeaf").value< QQuickItem* >();
+    QVERIFY(sepLeaf);
+    QVERIFY(sepLeaf->isVisible());
+    QCOMPARE(sepLeaf->width(), sep->width());
+    QCOMPARE(sepLeaf->height(), sep->height());
+    // the in-panel line spans the panel BODY only: it must end above the
+    // title strip and stay shorter than a between-panel separator (which
+    // spans the whole panel height minus 3px top/bottom insets)
+    const QRectF titleRect = panel->property("titleGeometry").toRectF();
+    QVERIFY(titleRect.height() > 0);
+    QVERIFY(sep->y() + sep->height() <= titleRect.top() + 1.0);
+    QVERIFY(sep->height() < panel->height() - 6.0);
+}
+
+/**
+ * @brief Declaration order of Repeater-built vs statically declared panel items
+ * @details Repeater delegates arrive at the Repeater's componentComplete,
+ *          which runs in REVERSE sibling order — a panel mixing a Repeater,
+ *          a static RibbonSeparator and another Repeater must still pack in
+ *          declaration order (the app-window demo panel rendered its second
+ *          group first and lost the separator between them exactly through
+ *          the arrival-order scramble).
+ */
+void TestConformanceQml::repeaterMixedPanelOrder()
+{
+    QQmlEngine engine;
+    saRibbonRegisterQmlTypes(&engine);
+
+    QString src = QStringLiteral(R"QML(import QtQuick 2.12
+import SARibbon 3.0
+Item {
+    width: 700
+    height: 300
+    RibbonBar {
+        objectName: "bar"
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        RibbonCategory {
+            title: "Home"
+            RibbonPanel {
+                objectName: "panel"
+                panelTitle: "mixed"
+                Repeater {
+                    model: [ "A1", "A2", "A3" ]
+                    RibbonToolButton {
+                        objectName: "btn" + index
+                        text: modelData
+                        proportion: Ribbon.Small
+                    }
+                }
+                RibbonSeparator { objectName: "sep" }
+                Repeater {
+                    model: [ "B1", "B2", "B3", "B4" ]
+                    RibbonToolButton {
+                        objectName: "sbtn" + index
+                        text: modelData
+                        proportion: Ribbon.Small
+                    }
+                }
+            }
+        }
+    }
+}
+)QML");
+
+    QQmlComponent component(&engine);
+    std::unique_ptr< QQuickView > view(exposeScene(engine, component, src.toUtf8().constData(), 700, 300));
+    QVERIFY(view);
+    QQuickItem* rootItem = view->rootObject();
+    QVERIFY(rootItem);
+
+    // Repeater delegates live in the visual tree only (B50) — walk it
+    QList< QQuickItem* > all;
+    collectVisualItems(view->contentItem(), &all);
+    auto findVisual = [ &all ](const QString& name) -> QQuickItem* {
+        for (QQuickItem* it : all) {
+            if (it->objectName() == name) {
+                return it;
+            }
+        }
+        return nullptr;
+    };
+    QVector< QQuickItem* > first, second;
+    for (int i = 0; i < 3; ++i) {
+        first.append(findVisual(QStringLiteral("btn%1").arg(i)));
+    }
+    for (int i = 0; i < 4; ++i) {
+        second.append(findVisual(QStringLiteral("sbtn%1").arg(i)));
+    }
+    QQuickItem* sep = findVisual(QStringLiteral("sep"));
+    QVERIFY(sep);
+    for (QQuickItem* b : first + second) {
+        QVERIFY2(b, "all Repeater buttons must be found in the visual tree");
+        QTRY_VERIFY(b->width() > 0);
+    }
+    QTRY_VERIFY(sep->width() > 0);
+
+    // declaration order: every first-group button is left of the separator,
+    // the separator is left of every second-group button (3-row mode packs
+    // each small group into its own column stack)
+    for (QQuickItem* b : first) {
+        QVERIFY(b->x() < sep->x());
+    }
+    for (QQuickItem* b : second) {
+        QVERIFY(sep->x() < b->x());
+    }
+    // within a group the Repeater order is preserved (top to bottom in the
+    // shared column stack)
+    QVERIFY(first[ 0 ]->y() < first[ 1 ]->y());
+    QVERIFY(first[ 1 ]->y() < first[ 2 ]->y());
+    QVERIFY(second[ 0 ]->y() < second[ 1 ]->y());
 }
 
 /**

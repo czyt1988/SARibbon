@@ -66,6 +66,12 @@ engine.load(QUrl("qrc:///main.qml"));
   （`SARibbonAbstractLayoutItem`）。基类已实现 isHidden/applyGeometry/debugName/
   expandingDirections 默认与大行高上下文传递；子类只补 `sizeHint()`（画廊类再加
   stretchFactor）。`RibbonPanel` 经 `qobject_cast<RibbonLayoutItemHost*>` 泛化收录子项。
+- **面板子项的登记顺序 ≠ 声明顺序**：Repeater 代理在其 Repeater 的
+  componentComplete（**反向**兄弟序）才到达，且 `ItemChildAddedChange` 触发时代理
+  还挂在 childItems **末尾**（QQuickRepeater 在通知之后才 restack 到最终位置）——
+  注册时无从锚定。面板把新登记项挂入 pending 列表，在**下一次布局**时按已稳定的
+  视觉顺序落位（`settlePendingOrder`）；`attachChildItem`/`moveChildItem` 的显式
+  顺序优先于延迟锚定。混排静态声明与 Repeater 生成子项因此安全。
 
 ## 基础输入控件（URL 注册的纯 QML 类型）
 

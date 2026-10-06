@@ -73,6 +73,16 @@ When adding a structural host, do NOT copy the leaf boilerplate — inherit:
   row height context plumbing; subclasses only add `sizeHint()` (gallery-like
   items also override stretchFactor). `RibbonPanel` collects children through a
   `qobject_cast<RibbonLayoutItemHost*>`.
+- **Panel-child arrival order is NOT the declaration order**: Repeater
+  delegates arrive at the Repeater's componentComplete (which runs in REVERSE
+  sibling order), and `ItemChildAddedChange` fires while the delegate still
+  sits at the END of childItems (QQuickRepeater restacks it to its final
+  position only after the notification) — anchoring at registration time is
+  impossible. The panel parks newcomers in a pending list and places them by
+  the settled visual order at the NEXT layout pass (`settlePendingOrder`);
+  explicit orders from `attachChildItem`/`moveChildItem` override the
+  deferred anchoring. Mixing statically declared and Repeater-built children
+  is therefore safe.
 
 ## Basic Input Controls (URL-registered pure QML types)
 
