@@ -143,14 +143,4 @@ enum SARibbonActionTag
 }  // namespace Core
 }  // namespace SARibbon
 
-#ifndef SA_ActionPropertyName_RowProportion
-#define SA_ActionPropertyName_RowProportion "_sa_RowProportion"
-#endif
-#ifndef SA_ActionPropertyName_ToolButtonPopupMode
-#define SA_ActionPropertyName_ToolButtonPopupMode "_sa_ToolButtonPopupMode"
-#endif
-#ifndef SA_ActionPropertyName_ToolButtonStyle
-#define SA_ActionPropertyName_ToolButtonStyle "_sa_ToolButtonStyle"
-#endif
-
 #endif  // SARIBBONENUMS_H

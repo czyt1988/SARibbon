@@ -60,8 +60,8 @@ class SARibbonTitleIconWidget;
  * @code
  * SARibbonCategory * SARibbonBar::addCategoryPage(const QString& title);
  * SARibbonPanel * SARibbonCategory::addPanel(const QString& title);
- * SARibbonToolButton * SARibbonPanel::addLargeAction(QAction *action);
- * SARibbonToolButton * SARibbonPanel::addSmallAction(QAction *action);
+ * void SARibbonPanel::addLargeAction(QAction *action);
+ * void SARibbonPanel::addSmallAction(QAction *action);
  * @endcode
  *
  * Therefore, the creation steps are as follows:
@@ -135,8 +135,8 @@ class SARibbonTitleIconWidget;
  * @code
  * SARibbonCategory * SARibbonBar::addCategoryPage(const QString& title);
  * SARibbonPanel * SARibbonCategory::addPanel(const QString& title);
- * SARibbonToolButton * SARibbonPanel::addLargeAction(QAction *action);
- * SARibbonToolButton * SARibbonPanel::addSmallAction(QAction *action);
+ * void SARibbonPanel::addLargeAction(QAction *action);
+ * void SARibbonPanel::addSmallAction(QAction *action);
  * @endcode
  *
  * 因此生成步骤如下：

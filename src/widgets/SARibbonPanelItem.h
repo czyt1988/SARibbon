@@ -4,6 +4,7 @@
 #include <SARibbonCore/SARibbonAbstractLayoutItem.h>
 #include <QWidgetItem>
 #include <QAction>
+#include <QToolButton>
 class SARibbonToolButton;
 /**
  * \if ENGLISH
@@ -66,8 +67,11 @@ public:
 	// plan-02 S5 Step B: rowIndex/columnIndex/isExpandItem/rowProportion live in the contract base
 	// (single source of truth written by the engine); itemWillSetGeometry is a 2.x name bound
 	// by reference to the contract resultGeometry so every existing consumer keeps compiling.
-	QRect& itemWillSetGeometry;
-	QAction* action;            /// < Record action, reference QToolBarLayoutItem
-	bool customWidget;  ///< For action without window, there will actually be a SARibbonToolButton, which needs to be deleted during destruction
+    QRect& itemWillSetGeometry;
+    QAction* action;            /// < Record action, reference QToolBarLayoutItem
+    bool customWidget;  ///< For action without window, there will actually be a SARibbonToolButton, which needs to be deleted during destruction
+    // plan-07 S2: placement params live on the item, captured at add time.
+    // The popup mode is owned by this placement, not by the action.
+    QToolButton::ToolButtonPopupMode popupMode = QToolButton::InstantPopup;
 };
 #endif  // SARIBBONPANELITEM_H

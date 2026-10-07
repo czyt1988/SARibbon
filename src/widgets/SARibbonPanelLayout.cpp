@@ -154,6 +154,7 @@ void SARibbonPanelLayout::addItem(QLayoutItem* item)
  * @param index The index at which to insert the action
  * @param act The action to insert
  * @param rp The row proportion for the action
+ * @param popMode The placement popup mode applied to the created tool button (plan-07: placement param, not an action property)
  * \endif
  *
  * \if CHINESE
@@ -164,13 +165,17 @@ void SARibbonPanelLayout::addItem(QLayoutItem* item)
  * @param index 插入action的索引
  * @param act 要插入的action
  * @param rp action的行占比
+ * @param popMode 作用于所创建工具按钮的放置弹出模式（计划 07：放置参数，非action属性）
  * \endif
  */
-void SARibbonPanelLayout::insertAction(int index, QAction* act, SARibbonPanelItem::RowProportion rp)
+void SARibbonPanelLayout::insertAction(int index,
+                                       QAction* act,
+                                       SARibbonPanelItem::RowProportion rp,
+                                       QToolButton::ToolButtonPopupMode popMode)
 {
     index                   = qMax(0, index);
     index                   = qMin(mItems.count(), index);
-    SARibbonPanelItem* item = createItem(act, rp);
+    SARibbonPanelItem* item = createItem(act, rp, popMode);
 
     if (item) {
         mItems.insert(index, item);
@@ -722,7 +727,9 @@ void SARibbonPanelLayout::doLayout()
  * 否则会内部生成一个SARibbonToolButton
  * \endif
  */
-SARibbonPanelItem* SARibbonPanelLayout::createItem(QAction* action, SARibbonPanelItem::RowProportion rp)
+SARibbonPanelItem* SARibbonPanelLayout::createItem(QAction* action,
+                                                   SARibbonPanelItem::RowProportion rp,
+                                                   QToolButton::ToolButtonPopupMode popMode)
 {
     bool customWidget    = false;
     QWidget* widget      = nullptr;
@@ -759,8 +766,7 @@ SARibbonPanelItem* SARibbonPanelLayout::createItem(QAction* action, SARibbonPane
         button->setEnableWordWrap(isEnableWordWrap());
         button->setButtonMaximumAspectRatio(mButtonMaximumAspectRatio);
         button->setLargeButtonMinimumWidthRatio(mLargeButtonMinWidthRatio);
-        // 属性设置
-        QToolButton::ToolButtonPopupMode popMode = SARibbonPanel::getActionToolButtonPopupModeProperty(action);
+        // 弹出模式：plan-07 S2 起由调用方作为放置参数传入（item 自持，见下方 result->popupMode）
         button->setPopupMode(popMode);
         // 根据QAction的属性设置按钮的大小
 
@@ -782,6 +788,7 @@ SARibbonPanelItem* SARibbonPanelLayout::createItem(QAction* action, SARibbonPane
     SARibbonPanelItem* result = new SARibbonPanelItem(widget);
 
     result->rowProportion = rp;
+    result->popupMode     = popMode;
     result->customWidget  = customWidget;
     result->action        = action;
     return (result);

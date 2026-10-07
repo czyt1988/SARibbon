@@ -342,18 +342,6 @@ public:
 public:
     // Recommended panel height
     static int panelHeightHint(const QFontMetrics& fm, PanelLayoutMode layMode, int panelTitleHeight);
-    // Set action row proportion property into action, action itself carries row property
-    static void setActionRowProportionProperty(QAction* action, SARibbonPanelItem::RowProportion rp);
-    // Get action row proportion property
-    static SARibbonPanelItem::RowProportion getActionRowProportionProperty(QAction* action);
-    // Set action PopupMode property into action, action itself carries PopupMode property
-    static void setActionToolButtonPopupModeProperty(QAction* action, QToolButton::ToolButtonPopupMode popMode);
-    // Get action PopupMode property
-    static QToolButton::ToolButtonPopupMode getActionToolButtonPopupModeProperty(QAction* action);
-    // Set action ToolButtonStyle property into action, action itself carries ToolButtonStyle property
-    static void setActionToolButtonStyleProperty(QAction* action, Qt::ToolButtonStyle buttonStyle);
-    // Get action ToolButtonStyle property
-    static Qt::ToolButtonStyle getActionToolButtonStyleProperty(QAction* action);
 
 Q_SIGNALS:
 

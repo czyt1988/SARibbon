@@ -52,6 +52,28 @@ target_link_libraries(app PRIVATE SARibbon::Widgets)
 | — | `SARIBBON_BUILD_QML`（默认 OFF） |
 | — | `SARIBBON_INSTALL`（add_subdirectory 嵌入场景可 OFF） |
 
+## API 破坏性变更（3.0 API 冻结前重构）
+
+### 放置属性通道废除（计划 07）
+
+2.x 把放置参数（行占比/弹出模式/按钮样式）经 `_sa_RowProportion` 等 QAction 动态属性走私，
+`SARibbonPanel` 的六个静态属性读写函数族已**删除**：
+
+- `SARibbonPanel::setActionRowProportionProperty` / `getActionRowProportionProperty`
+- `SARibbonPanel::setActionToolButtonPopupModeProperty` / `getActionToolButtonPopupModeProperty`
+- `SARibbonPanel::setActionToolButtonStyleProperty` / `getActionToolButtonStyleProperty`
+
+迁移：**改用带参重载**。`addAction(act, rp)` / `addAction(act, popMode, rp)` /
+`addLargeAction` / `addMediumAction` / `addSmallAction`（含 popMode 重载）的签名与语义不变，
+"先 `setActionRowProportionProperty` 再 `addAction`"的用法直接删除属性设置行即可。
+放置参数现在是面板私有的放置记录，同一 action 进两个面板给不同比例互不覆盖。
+
+### 命令级 isCanCustomize 标记归置（计划 07）
+
+QAction 上的 `_sa_isCanCustomize` 动态属性通道对**命令级**标记不再使用：改由
+`SARibbonActionsManager::setCanCustomize(act)` / `isCanCustomize(act)` 持有（未注册进
+管理器的 action 恒不可定制）。category/panel 的 `isCanCustomize` 仍为 Q_PROPERTY，不变。
+
 ## 单文件发行
 
 `src/SARibbon.h/.cpp` 不再随仓库分发。获取方式：

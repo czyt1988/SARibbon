@@ -101,7 +101,8 @@ bool SARibbonCustomizeData::apply(SARibbonBar* bar) const
         if (nullptr == act) {
             return (false);
         }
-        SARibbonCustomizeData::setCanCustomize(act);
+        // plan-07 S3: 命令级可定制标记由 ActionsManager 持有（原 _sa_isCanCustomize 动态属性通道废除）
+        mActionsManagerPointer->setCanCustomize(act);
         panel->addAction(act, actionRowProportionValue);
         return (true);
     }
@@ -245,7 +246,8 @@ bool SARibbonCustomizeData::apply(SARibbonBar* bar) const
         if (nullptr == act) {
             return (false);
         }
-        SARibbonCustomizeData::setCanCustomize(act);
+        // plan-07 S3: 命令级可定制标记由 ActionsManager 持有
+        mActionsManagerPointer->setCanCustomize(act);
         if (indexValue >= 0) {
             // 插到指定位置：取当前该位置的 action 作为 before 锚点
             const QList< QAction* > acts = quickBar->actions();

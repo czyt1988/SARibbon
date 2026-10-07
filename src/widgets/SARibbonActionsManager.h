@@ -58,11 +58,17 @@ public:
 	// Remove tag and clean up orphan actions
 	void removeTag(int tag);
 
-	// Register action
-	bool registeAction(QAction* act, int tag, const QString& key = QString(), bool enableEmit = true);
+    // Register action
+    bool registeAction(QAction* act, int tag, const QString& key = QString(), bool enableEmit = true);
 
-	// Unregister action
-	void unregisteAction(QAction* act, bool enableEmit = true);
+    // Unregister action
+    void unregisteAction(QAction* act, bool enableEmit = true);
+
+    // Check if an action is marked customizable (command-level flag, plan-07: replaces the `_sa_isCanCustomize` action property)
+    bool isCanCustomize(QAction* act) const;
+
+    // Mark an action customizable; only marked actions can be removed or reordered by SARibbonCustomizeWidget
+    void setCanCustomize(QAction* act, bool canCustomize = true);
 
 	// Filter actions by tag, returns a reference
 	QList< QAction* >& filter(int tag);

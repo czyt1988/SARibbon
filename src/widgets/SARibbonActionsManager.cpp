@@ -16,6 +16,7 @@ public:
     QMap< int, QString > mTagToName;                ///< tag对应的名字
     QHash< QString, QAction* > mKeyToAction;        ///< key对应action
     QHash< QAction*, QString > mActionToKey;        ///< action对应key
+    QSet< QAction* > mCanCustomizeActions;          ///< plan-07 S3: 命令级可定制标记（_sa_isCanCustomize 动态属性的归置目标）
     QMap< int, SARibbonCategory* > mTagToCategory;  ///< 仅仅在autoRegisteActions函数会有用
     int mSale;  ///< 盐用于生成固定的id，在用户不主动设置key时，id基于msale生成，只要SARibbonActionsManager的调用registeAction顺序不变，生成的id都不变，因为它是基于自增实现的
 };
@@ -30,6 +31,7 @@ void SARibbonActionsManager::PrivateData::clear()
     mTagToName.clear();
     mKeyToAction.clear();
     mActionToKey.clear();
+    mCanCustomizeActions.clear();
     mTagToCategory.clear();
     mSale = 0;
 }
@@ -267,6 +269,8 @@ void SARibbonActionsManager::removeAction(QAction* act, bool enableEmit)
 
     d_ptr->mActionToKey.remove(act);
     d_ptr->mKeyToAction.remove(key);
+    // plan-07 S3: 命令级可定制标记随注册条目一起移除
+    d_ptr->mCanCustomizeActions.remove(act);
 
     // 置换
     d_ptr->mTagToActions.swap(tagToActions);
@@ -549,6 +553,54 @@ QList< QAction* > SARibbonActionsManager::search(const QString& text)
 void SARibbonActionsManager::clear()
 {
     d_ptr->clear();
+}
+
+/**
+ * \if ENGLISH
+ * @brief Checks if an action is marked customizable
+ * @details Command-level flag owned by the manager (plan-07 S3). Independent of
+ *          registration: an unregistered action can also be marked (e.g. removable
+ *          in place without entering the add-list); unregistering, destroying or
+ *          clearing removes the flag.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 查询action是否被标记为可定制
+ * @details 命令级标记，由管理器持有（计划 07 S3）；与注册状态解耦——未注册的action
+ *          也可标记（如"仅允许就地移除、不进添加列表"的用法），取消注册、action销毁
+ *          或clear时标记一并移除。
+ * \endif
+ */
+bool SARibbonActionsManager::isCanCustomize(QAction* act) const
+{
+    if (nullptr == act) {
+        return (false);
+    }
+    return (d_ptr->mCanCustomizeActions.contains(act));
+}
+
+/**
+ * \if ENGLISH
+ * @brief Marks an action customizable
+ * @details The flag lives with the registration entry and is removed with it
+ *          (unregister / action destroyed / clear).
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 标记action为可定制
+ * @details 标记随注册条目存亡：取消注册、action销毁或clear时一并移除。
+ * \endif
+ */
+void SARibbonActionsManager::setCanCustomize(QAction* act, bool canCustomize)
+{
+    if (nullptr == act) {
+        return;
+    }
+    if (canCustomize) {
+        d_ptr->mCanCustomizeActions.insert(act);
+    } else {
+        d_ptr->mCanCustomizeActions.remove(act);
+    }
 }
 
 /**

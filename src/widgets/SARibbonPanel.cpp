@@ -10,6 +10,7 @@
 #include <QDebug>
 #include <QFontMetrics>
 #include <QGridLayout>
+#include <QHash>
 #include <QIcon>
 #include <QMenu>
 #include <QPainter>
@@ -62,6 +63,17 @@ public:
     // 标题
     QString panelName() const;
     void setPanelName(const QString& title);
+    // plan-07 S2: placement of an action that is about to enter this panel via
+    // QWidget::addAction. Recorded by the add* convenience calls, consumed once
+    // by actionEvent(ActionAdded). Kept per panel so the same action can carry
+    // different proportions in different panels.
+    struct ActionPlacement
+    {
+        SARibbonPanelItem::RowProportion rowProportion = SARibbonPanelItem::Large;
+        QToolButton::ToolButtonPopupMode popupMode     = QToolButton::InstantPopup;
+    };
+    void recordPlacement(QAction* action, SARibbonPanelItem::RowProportion rp, QToolButton::ToolButtonPopupMode popMode);
+    ActionPlacement takePlacement(QAction* action);
 
 public:
     bool m_isCanCustomize { true };                                                    ///< 记录是否可自定义
@@ -69,7 +81,30 @@ public:
     SARibbonPanelOptionButton* m_optionActionButton { nullptr };                       ///< 标题栏的 y 距离
     SARibbonPanelLabel* m_label { nullptr };
     bool enableIconRightText { false };                                                ///< 是否启用图标右侧文字模式
+    QHash< QAction*, ActionPlacement > mPendingPlacement;  ///< plan-07 S2: 待消费的放置参数（key 的生命周期 = recordPlacement 到 ActionAdded，同调用栈内即取即消）
 };
+
+void SARibbonPanel::PrivateData::recordPlacement(QAction* action,
+                                                 SARibbonPanelItem::RowProportion rp,
+                                                 QToolButton::ToolButtonPopupMode popMode)
+{
+    ActionPlacement pl;
+    pl.rowProportion = rp;
+    pl.popupMode      = popMode;
+    mPendingPlacement.insert(action, pl);
+}
+
+SARibbonPanel::PrivateData::ActionPlacement SARibbonPanel::PrivateData::takePlacement(QAction* action)
+{
+    // 无记录（外部裸 QWidget::addAction）时与 2.x 默认行为一致：Large / InstantPopup
+    ActionPlacement pl;
+    auto it = mPendingPlacement.find(action);
+    if (it != mPendingPlacement.end()) {
+        pl = it.value();
+        mPendingPlacement.erase(it);
+    }
+    return (pl);
+}
 
 SARibbonPanel::PrivateData::PrivateData(SARibbonPanel* p) : q_ptr(p)
 {
@@ -199,196 +234,56 @@ SARibbonPanel::~SARibbonPanel()
 
 /**
  * \if ENGLISH
- * @brief Sets the row proportion property for an action
- *
- * This property determines how much vertical space the corresponding button will occupy within the panel.
- * It should be set before adding the action to the panel.
- *
- * @param action The action to modify
- * @param rp The row proportion (Large, Medium, Small)
- * @sa addAction, getActionRowProportionProperty
- * \endif
- *
- * \if CHINESE
- * @brief 为一个action设置行占比属性
- *
- * 此属性决定了对应按钮在面板内占据的垂直空间比例。
- * 应在将action添加到面板之前设置。
- *
- * @param action 要修改的action
- * @param rp 行占比（大、中、小）
- * @sa addAction, getActionRowProportionProperty
- * \endif
- */
-void SARibbonPanel::setActionRowProportionProperty(QAction* action, SARibbonPanelItem::RowProportion rp)
-{
-    Q_CHECK_PTR(action);
-    action->setProperty(SA_ActionPropertyName_RowProportion, static_cast< int >(rp));
-}
-
-/**
- * \if ENGLISH
- * @brief Gets the row proportion property from an action
- * @param action The action to query
- * @return The row proportion, defaults to Large if not set
- * @sa setActionRowProportionProperty
- * \endif
- *
- * \if CHINESE
- * @brief 从一个action获取行占比属性
- * @param action 要查询的action
- * @return 行占比，如果未设置则默认为Large
- * @sa setActionRowProportionProperty
- * \endif
- */
-SARibbonPanelItem::RowProportion SARibbonPanel::getActionRowProportionProperty(QAction* action)
-{
-    bool isok = false;
-    int r     = action->property(SA_ActionPropertyName_RowProportion).toInt(&isok);
-
-    if (isok) {
-        return (static_cast< SARibbonPanelItem::RowProportion >(r));
-    }
-    return (SARibbonPanelItem::Large);
-}
-
-/**
- * \if ENGLISH
- * @brief Sets the ToolButtonPopupMode property for an action
- * @param action The action to modify
- * @param popMode The popup mode (e.g., InstantPopup, MenuButtonPopup)
- * @sa getActionToolButtonPopupModeProperty
- * \endif
- *
- * \if CHINESE
- * @brief 为一个action设置ToolButtonPopupMode属性
- * @param action 要修改的action
- * @param popMode 弹出模式（例如，InstantPopup, MenuButtonPopup）
- * @sa getActionToolButtonPopupModeProperty
- * \endif
- */
-void SARibbonPanel::setActionToolButtonPopupModeProperty(QAction* action, QToolButton::ToolButtonPopupMode popMode)
-{
-    Q_CHECK_PTR(action);
-    action->setProperty(SA_ActionPropertyName_ToolButtonPopupMode, static_cast< int >(popMode));
-}
-
-/**
- * \if ENGLISH
- * @brief Gets the ToolButtonPopupMode property from an action
- * @param action The action to query
- * @return The popup mode, defaults to InstantPopup if not set
- * @sa setActionToolButtonPopupModeProperty
- * \endif
- *
- * \if CHINESE
- * @brief 从一个action获取ToolButtonPopupMode属性
- * @param action 要查询的action
- * @return 弹出模式，如果未设置则默认为InstantPopup
- * @sa setActionToolButtonPopupModeProperty
- * \endif
- */
-QToolButton::ToolButtonPopupMode SARibbonPanel::getActionToolButtonPopupModeProperty(QAction* action)
-{
-    bool isok = false;
-    int r     = action->property(SA_ActionPropertyName_ToolButtonPopupMode).toInt(&isok);
-
-    if (isok) {
-        return (static_cast< QToolButton::ToolButtonPopupMode >(r));
-    }
-    // 使用 QToolButton 的默认值 InstantPopup，保持一致性
-    return (QToolButton::InstantPopup);
-}
-
-/**
- * \if ENGLISH
- * @brief Sets the ToolButtonStyle property for an action
- * @param action The action to modify
- * @param buttonStyle The button style (e.g., ToolButtonIconOnly, ToolButtonTextBesideIcon)
- * @sa getActionToolButtonStyleProperty
- * \endif
- *
- * \if CHINESE
- * @brief 为一个action设置ToolButtonStyle属性
- * @param action 要修改的action
- * @param buttonStyle 按钮样式（例如，ToolButtonIconOnly, ToolButtonTextBesideIcon）
- * @sa getActionToolButtonStyleProperty
- * \endif
- */
-void SARibbonPanel::setActionToolButtonStyleProperty(QAction* action, Qt::ToolButtonStyle buttonStyle)
-{
-    Q_CHECK_PTR(action);
-    action->setProperty(SA_ActionPropertyName_ToolButtonStyle, static_cast< int >(buttonStyle));
-}
-
-/**
- * \if ENGLISH
- * @brief Gets the ToolButtonStyle property from an action
- * @param action The action to query
- * @return The button style, defaults to ToolButtonIconOnly if not set
- * @sa setActionToolButtonStyleProperty
- * \endif
- *
- * \if CHINESE
- * @brief 从一个action获取ToolButtonStyle属性
- * @param action 要查询的action
- * @return 按钮样式，如果未设置则默认为ToolButtonIconOnly
- * @sa setActionToolButtonStyleProperty
- * \endif
- */
-Qt::ToolButtonStyle SARibbonPanel::getActionToolButtonStyleProperty(QAction* action)
-{
-    bool isok = false;
-    int r     = action->property(SA_ActionPropertyName_ToolButtonStyle).toInt(&isok);
-
-    if (isok) {
-        return (static_cast< Qt::ToolButtonStyle >(r));
-    }
-    return (Qt::ToolButtonIconOnly);
-}
-
-/**
- * \if ENGLISH
  * @brief Adds an action to the panel
  *
- * This is the primary method for populating the panel. The button created for this action will use the
- * row proportion and popup mode previously set via the static property functions.
+ * This is the primary method for populating the panel. The placement (row proportion) is passed
+ * directly to this panel and consumed when the action enters the layout; it never becomes a
+ * property of the action itself (plan-07: the `_sa_*` dynamic property channel is removed).
  *
  * @param action The action to add
- * @param rp The row proportion for this action
+ * @param rowProportion The row proportion for this action
  * @sa addLargeAction, addMediumAction, addSmallAction
  * \endif
  *
  * \if CHINESE
  * @brief 向面板添加一个action
  *
- * 这是填充面板的主要方法。为此action创建的按钮将使用之前通过静态属性函数设置的行占比和弹出模式。
+ * 这是填充面板的主要方法。放置参数（行占比）直接传给本面板并在进入布局时消费，
+ * 不会成为action自身的属性（计划 07：`_sa_*` 动态属性通道已废除）。
  *
  * @param action 要添加的action
- * @param rp 此action的行占比
+ * @param rowProportion 此action的行占比
  * @sa addLargeAction, addMediumAction, addSmallAction
  * \endif
  */
 void SARibbonPanel::addAction(QAction* action, SARibbonPanelItem::RowProportion rowProportion)
 {
     Q_CHECK_PTR(action);
-    setActionRowProportionProperty(action, rowProportion);
+    SA_D(d);
+    d->recordPlacement(action, rowProportion, QToolButton::InstantPopup);
     addAction(action);
 }
 
 /**
  * \if ENGLISH
  * @brief Adds an action with a specified popup mode
+ *
+ * The popup mode, like the row proportion, is a placement parameter of this panel, not a
+ * property of the action (plan-07).
+ *
  * @param act The action to add
  * @param popMode The popup mode for the button
- * @param rp The row proportion for this action
+ * @param rowProportion The row proportion for this action
  * \endif
  *
  * \if CHINESE
  * @brief 添加一个具有指定弹出模式的action
+ *
+ * 弹出模式与行占比一样是本面板的放置参数，不是action的属性（计划 07）。
+ *
  * @param act 要添加的action
  * @param popMode 按钮的弹出模式
- * @param rp 此action的行占比
+ * @param rowProportion 此action的行占比
  * \endif
  */
 void SARibbonPanel::addAction(QAction* act,
@@ -396,8 +291,8 @@ void SARibbonPanel::addAction(QAction* act,
                               SARibbonPanelItem::RowProportion rowProportion)
 {
     Q_CHECK_PTR(act);
-    setActionRowProportionProperty(act, rowProportion);
-    setActionToolButtonPopupModeProperty(act, popMode);
+    SA_D(d);
+    d->recordPlacement(act, rowProportion, popMode);
     addAction(act);
 }
 
@@ -679,7 +574,10 @@ QAction* SARibbonPanel::addWidget(QWidget* w, SARibbonPanelItem::RowProportion r
         action->setObjectName("action." + w->objectName());
     }
     w->setAttribute(Qt::WA_Hover);
-    setActionRowProportionProperty(action, rowProportion);
+    {
+        SA_D(d);
+        d->recordPlacement(action, rowProportion, QToolButton::InstantPopup);
+    }
     addAction(action);
     return (action);
 }
@@ -786,7 +684,10 @@ QAction* SARibbonPanel::addSeparator()
     QAction* action = new QAction(this);
 
     action->setSeparator(true);
-    setActionRowProportionProperty(action, SARibbonPanelItem::Large);
+    {
+        SA_D(d);
+        d->recordPlacement(action, SARibbonPanelItem::Large, QToolButton::InstantPopup);
+    }
     addAction(action);
     return (action);
 }
@@ -1683,7 +1584,12 @@ void SARibbonPanel::actionEvent(QActionEvent* e)
                 index = lay->count();  // 找不到的时候就插入到最后
             }
         }
-        lay->insertAction(index, action, getActionRowProportionProperty(action));
+        // plan-07 S2: placement comes from this panel's pending table (recorded by
+        // the add* convenience calls); a bare QWidget::addAction has no record and
+        // falls back to Large / InstantPopup, matching 2.x defaults.
+        SA_D(d);
+        const PrivateData::ActionPlacement placement = d->takePlacement(action);
+        lay->insertAction(index, action, placement.rowProportion, placement.popupMode);
         // 通知父布局这个控件的尺寸提示(sizeHint())可能已改变
         updateGeometry();
     } break;

@@ -55,6 +55,32 @@ for one release cycle; the in-tree bare target name `SARibbonBar` and the
 | — | `SARIBBON_BUILD_QML` (default OFF) |
 | — | `SARIBBON_INSTALL` (OFF for add_subdirectory embedding) |
 
+## Breaking API Changes (pre-freeze refactor)
+
+### Placement property channel removed (plan 07)
+
+2.x smuggled placement parameters (row proportion / popup mode / button style)
+through `_sa_RowProportion` dynamic properties on the QAction. The six static
+property accessors on `SARibbonPanel` are **removed**:
+
+- `setActionRowProportionProperty` / `getActionRowProportionProperty`
+- `setActionToolButtonPopupModeProperty` / `getActionToolButtonPopupModeProperty`
+- `setActionToolButtonStyleProperty` / `getActionToolButtonStyleProperty`
+
+Migration: **use the parameterized overloads**. `addAction(act, rp)`,
+`addAction(act, popMode, rp)` and `addLargeAction` / `addMediumAction` /
+`addSmallAction` (with their popMode overloads) keep their signatures and
+semantics — delete the "set property, then addAction" lines. Placement is now a
+per-panel record; the same action can carry different proportions in different
+panels without interference.
+
+### Command-level isCanCustomize flag relocated (plan 07)
+
+The `_sa_isCanCustomize` dynamic property on a QAction is no longer the
+command-level channel: use `SARibbonActionsManager::setCanCustomize(act)` /
+`isCanCustomize(act)` instead (actions not registered with a manager are never
+customizable). The `isCanCustomize` Q_PROPERTY on category/panel is unchanged.
+
 ## Single-File Distribution
 
 `src/SARibbon.h/.cpp` is no longer committed to the repository. Get the

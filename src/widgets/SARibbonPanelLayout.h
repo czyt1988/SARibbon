@@ -4,6 +4,7 @@
 #include <SARibbonCore/SARibbonPanelLayoutEngine.h>
 #include <QLayout>
 #include <QHash>
+#include <QToolButton>
 #include "SARibbonPanelItem.h"
 class QToolButton;
 class SARibbonPanel;
@@ -36,8 +37,11 @@ public:
     // Gets the SARibbonPanel that owns this layout
     SARibbonPanel* ribbonPanel() const;
 
-    // Inserts an action at a specific index
-    void insertAction(int index, QAction* act, SARibbonPanelItem::RowProportion rp = SARibbonPanelItem::None);
+    // Inserts an action at a specific index with explicit placement (plan-07: popup mode is a placement param, no longer read from the action)
+    void insertAction(int index,
+                      QAction* act,
+                      SARibbonPanelItem::RowProportion rp = SARibbonPanelItem::None,
+                      QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
 
     // Sets the option action for the panel
     void setOptionAction(QAction* action);
@@ -149,7 +153,10 @@ protected:
     void doLayout();
     // Convert action to item, for pure Action, this function will create SARibbonToolButton
     // rp is used to tell Layout what kind of window to generate, see SARibbonPanelItem::RowProportion for details
-    SARibbonPanelItem* createItem(QAction* action, SARibbonPanelItem::RowProportion rp = SARibbonPanelItem::None);
+    // popMode is the placement popup mode applied to the created tool button (plan-07: carried by the caller, not the action)
+    SARibbonPanelItem* createItem(QAction* action,
+                                  SARibbonPanelItem::RowProportion rp = SARibbonPanelItem::None,
+                                  QToolButton::ToolButtonPopupMode popMode = QToolButton::InstantPopup);
     // Update geometry array
     void updateGeomArray(const QRect& setrect);
     // Recalculate expansion bar code, this function must be called after updateGeomArray function

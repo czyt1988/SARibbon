@@ -3035,13 +3035,14 @@ void MainWindow::createActionsManager()
 
     // 快速访问栏的动作允许自定义（issue #67）：注册进动作管理器，
     // 使自定义对话框的"快速访问栏"视图可检索并增删移这些动作
-    // （createQuickAccessBar 先于本函数执行，此处从快速访问栏遍历注册）
+    // （createQuickAccessBar 先于本函数执行，此处从快速访问栏遍历注册；
+    // plan-07 S3: 命令级可定制标记由管理器持有，替代原 _sa_isCanCustomize 动态属性）
     if (SARibbonQuickAccessBar* quickAccessBar = ribbonBar()->quickAccessBar()) {
         const QList< QAction* > quickActions = quickAccessBar->actions();
         for (QAction* act : quickActions) {
             if (!act->isSeparator()) {
-                SARibbonCustomizeData::setCanCustomize(act);
                 mActionsManager->registeAction(act, SARibbonActionsManager::CommonlyUsedActionTag);
+                mActionsManager->setCanCustomize(act);
             }
         }
     }

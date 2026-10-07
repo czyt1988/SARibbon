@@ -476,7 +476,8 @@ void SARibbonCustomizeWidget::PrivateData::updateModel()
                 continue;
             }
             QStandardItem* ai = new QStandardItem(act->icon(), act->text());
-            if (SARibbonCustomizeData::isCanCustomize(act)) {
+            // plan-07 S3: 命令级可定制标记改由 ActionsManager 持有；未配置管理器时快速访问栏条目不可增删移
+            if (mActionMgr && mActionMgr->isCanCustomize(act)) {
                 ai->setData(true, SARibbonCustomizeWidget::CanCustomizeRole);
             }
             ai->setData(4, SARibbonCustomizeWidget::LevelRole);
@@ -545,7 +546,8 @@ void SARibbonCustomizeWidget::PrivateData::updateModel()
                 //                }
                 ii->setText(i->action->text());
                 ii->setIcon(i->action->icon());
-                if (SARibbonCustomizeData::isCanCustomize(i->action)) {
+                // plan-07 S3: 命令级可定制标记改由 ActionsManager 持有
+                if (mActionMgr && mActionMgr->isCanCustomize(i->action)) {
                     ii->setData(true, SARibbonCustomizeWidget::CanCustomizeRole);  // 标记这个是可以自定义的
                 }
                 ii->setData(2, SARibbonCustomizeWidget::LevelRole);
