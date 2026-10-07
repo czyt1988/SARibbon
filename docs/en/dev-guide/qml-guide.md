@@ -40,14 +40,14 @@ first engine; a second engine gets nullptr (verified against Qt 5.14/6.7 sources
 | `RibbonCategory` | type | category structural host (panel layout + clamped scroll) |
 | `RibbonTab` | type | tab host (text/current/contextColor) |
 | `RibbonPanel` | type | panel structural host (drives PanelLayoutEngine; child registration is generic over any `RibbonLayoutItemHost`) |
-| `RibbonToolButton` | type | button host (text/iconSource/proportion/checkable/**three popupModes**/menuItems menu/disabled state/**toolButtonStyle icon/text display**) |
+| `RibbonToolButton` | type | button host (text/iconSource/proportion/checkable/**three popupModes**/menuActions menu/**action command binding**/disabled state/**toolButtonStyle icon/text display**) |
 | `RibbonControlContainer` | type | control container host (the `control` property embeds any QQuickItem: ComboBox/CheckBox/SpinBox/TextField/...; widgets SARibbonCtrlContainer counterpart) |
 | `RibbonCheckBox` | type (pure QML) | compact themed check box (14px indicator, tunable via `indicatorSide`; URL-registered, no C++ host) |
 | `RibbonRadioButton` | type (pure QML) | compact themed radio button (14px ring; exclusivity via the Controls2 `ButtonGroup` attached property, the QButtonGroup counterpart) |
 | `RibbonComboBox` | type (pure QML) | compact themed combo box (the dropdown list follows the theme tokens too, so dark themes do not break; `editable`/`model`/`textRole` and all native properties inherited) |
 | `RibbonSpinBox` | type (pure QML) | compact themed spin box (Windows-style up/down stepper column on the trailing edge; `from`/`to`/`stepSize`/`prefix`/`suffix` and all native properties inherited) |
 | `RibbonTextField` | type (pure QML) | compact themed single-line editor (`placeholderText`/`validator` and all native properties inherited) |
-| `RibbonMenuItem` | type | declarative menu entry (text/iconSource/enabled/separator) attached to a button's `menuItems` |
+| `RibbonAction` | type | QAction-derived command object (iconSource/shortcutText/separator/menuActions), usable as a menu entry or a button command directly |
 | `RibbonContextCategory` | type | context category host (contextTitle/contextColor/active; activation appends colored tabs and publishes the band; widgets SARibbonContextCategory counterpart) |
 | `RibbonGallery` | type | gallery host (Large proportion + horizontal expanding + stretchFactor joins the core engine's weighted distribution; grid metrics via core `calcGalleryGridCellSize`) |
 | `RibbonGalleryGroup` | type | gallery group (groupTitle + items, default property items) |
@@ -215,11 +215,17 @@ checkable/checked state), available since Qt 5.12 (one leaf, both lanes).
 - `DelayedPopup`: the whole button stays the action zone; press-and-hold opens
   the menu (leaf-side timer).
 
-Menu entries are `RibbonMenuItem` objects (`QQmlListProperty`); activation is
-always mediated by the host's `menuTriggered` signal (leaf row click ->
-`activateMenuItem(index)`), so tests can drive it without a windowed popup;
-disabled entries and separators are ignored. A disabled host (`enabled: false`)
-swallows clicks in `click()`; the leaf renders the grey state via opacity.
+Menu entries are QAction objects (`menuActions`; declare them as
+`RibbonAction`, or reference the very same command object a panel button binds
+— menu and panel share one command, checked/disabled/text stay in sync).
+Submenus nest through `RibbonAction.menuActions` (bare QAction entries are
+flat-menu only). Activation is always mediated by the host's `menuTriggered`
+signal (leaf row click -> `activateMenuItem(index)` -> `action->trigger()`),
+so tests can drive it without a windowed popup; disabled entries and
+separators are ignored. A disabled host (`enabled: false`) swallows clicks in
+`click()`; the leaf renders the grey state via opacity. The shortcut column
+shows the REAL `QAction::shortcut` sequence (the bar-level matcher fires it,
+see the Command Layer chapter).
 
 ## Context Categories
 

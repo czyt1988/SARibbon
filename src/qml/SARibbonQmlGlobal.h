@@ -29,7 +29,6 @@ class RibbonTab;
 class RibbonPanel;
 class RibbonToolButton;
 class RibbonControlContainer;
-class RibbonMenuItem;
 class RibbonQuickHost;
 class RibbonLayoutItemHost;
 class RibbonContextCategory;

@@ -1,6 +1,8 @@
 #ifndef RIBBONGALLERYITEM_H
 #define RIBBONGALLERYITEM_H
 #include "SARibbonQmlGlobal.h"
+// the single QAction include face of the module (contract D5, plan-05 S1)
+#include "SARibbonQmlActionCompat.h"
 #include <QObject>
 
 namespace SARibbonQml {
@@ -32,6 +34,7 @@ namespace SARibbonQml {
 class SA_RIBBON_QML_EXPORT RibbonGalleryItem : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QAction* action READ action WRITE setAction NOTIFY actionChanged)
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
     Q_PROPERTY(QString iconSource READ iconSource WRITE setIconSource NOTIFY iconSourceChanged)
     Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
@@ -39,6 +42,12 @@ class SA_RIBBON_QML_EXPORT RibbonGalleryItem : public QObject
     Q_PROPERTY(bool selectable READ isSelectable WRITE setSelectable NOTIFY selectableChanged)
 public:
     explicit RibbonGalleryItem(QObject* parent = nullptr);
+
+    // Bound command (plan-06 S4, the widgets addActionItem parity): non-null
+    // derivation mirrors text/iconSource/enabled from the QAction and the
+    // gallery activates it through QAction::trigger
+    QAction* action() const;
+    void setAction(QAction* act);
 
     QString text() const;
     void setText(const QString& t);
@@ -57,6 +66,7 @@ public:
     void setSelectable(bool on);
 
 Q_SIGNALS:
+    void actionChanged();
     void textChanged();
     void iconSourceChanged();
     void enabledChanged();
@@ -64,6 +74,10 @@ Q_SIGNALS:
     void selectableChanged();
 
 private:
+    // re-derive the mirrored fields off the coarse QAction::changed
+    void onActionChanged();
+
+    QAction* mAction = nullptr;
     QString mText;
     QString mIconSource;
     bool mEnabled = true;

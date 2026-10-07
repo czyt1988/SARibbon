@@ -36,14 +36,14 @@ engine.load(QUrl("qrc:///main.qml"));
 | `RibbonCategory` | 类型 | category 结构宿主（panel 排布 + 引擎钳制滚动） |
 | `RibbonTab` | 类型 | tab 宿主（text/current/contextColor） |
 | `RibbonPanel` | 类型 | panel 结构宿主（驱动 PanelLayoutEngine，子项注册已泛化为任意 `RibbonLayoutItemHost`） |
-| `RibbonToolButton` | 类型 | 按钮宿主（text/iconSource/proportion/checkable/**popupMode 三模式**/menuItems 菜单/禁用态/**toolButtonStyle 图标文字显示方式**） |
+| `RibbonToolButton` | 类型 | 按钮宿主（text/iconSource/proportion/checkable/**popupMode 三模式**/menuActions 菜单/**action 命令绑定**/禁用态/**toolButtonStyle 图标文字显示方式**） |
 | `RibbonControlContainer` | 类型 | 控件容器宿主（`control` 属性嵌入任意 QQuickItem：ComboBox/CheckBox/SpinBox/TextField…，对标 widgets SARibbonCtrlContainer） |
 | `RibbonCheckBox` | 类型（纯 QML） | 紧凑主题化复选框（14px 指示器，`indicatorSide` 可调；URL 注册，无 C++ 宿主） |
 | `RibbonRadioButton` | 类型（纯 QML） | 紧凑主题化单选钮（14px 圆环；互斥用 Controls2 `ButtonGroup` 附加属性，对应 widgets QButtonGroup） |
 | `RibbonComboBox` | 类型（纯 QML） | 紧凑主题化下拉框（弹出列表同走主题 token，暗色主题不穿帮；`editable`/`model`/`textRole` 等原生属性全继承） |
 | `RibbonSpinBox` | 类型（纯 QML） | 紧凑主题化数字框（Windows 风格右侧上下步进钮；`from`/`to`/`stepSize`/`prefix`/`suffix` 等原生属性全继承） |
 | `RibbonTextField` | 类型（纯 QML） | 紧凑主题化单行编辑框（`placeholderText`/`validator` 等原生属性全继承） |
-| `RibbonMenuItem` | 类型 | 声明式菜单项（text/iconSource/enabled/separator），挂到按钮的 `menuItems` |
+| `RibbonAction` | 类型 | QAction 派生命令对象（iconSource/shortcutText/separator/menuActions），可直接声明为菜单项或按钮命令 |
 | `RibbonContextCategory` | 类型 | 上下文标签宿主（contextTitle/contextColor/active；激活时 bar 追加着色 tab 并发布色带，对标 widgets SARibbonContextCategory） |
 | `RibbonGallery` | 类型 | 画廊宿主（Large 比例 + 水平伸展 + stretchFactor 参与 core 引擎加权分配；网格度量经 core `calcGalleryGridCellSize`） |
 | `RibbonGalleryGroup` | 类型 | 画廊组（groupTitle + items，默认属性 items） |
@@ -181,10 +181,14 @@ name=text、checkable/checked 状态），Qt5.12 起可用（双车道同叶）�
 - `InstantPopup`：整个按钮即菜单区（无动作区）；
 - `DelayedPopup`：整个按钮保持动作区，长按弹菜单（叶子侧计时）。
 
-菜单项为 `RibbonMenuItem` 列表（`QQmlListProperty`），激活一律经宿主的
-`menuTriggered` 信号中转（叶子行点击 → `activateMenuItem(index)`），测试无需弹窗即可
-驱动；禁用项与分隔项被忽略。禁用态（`enabled: false`）由宿主 `click()` 吞掉点击，
-叶子以透明度呈现灰态。
+菜单项为 QAction 列表（`menuActions`，元素以 `RibbonAction` 声明，也可引用同一
+命令对象实现"菜单与面板共享命令"——勾选/禁用/文本单点同步）。子菜单经
+`RibbonAction.menuActions` 嵌套（裸 QAction 条目限平面菜单）。激活一律经宿主的
+`menuTriggered` 信号中转（叶子行点击 → `activateMenuItem(index)` →
+`action->trigger()`），测试无需弹窗即可驱动；禁用项与分隔项被忽略。禁用态
+（`enabled: false`）由宿主 `click()` 吞掉点击，叶子以透明度呈现灰态。
+快捷键列显示的是 `QAction::shortcut` 的真实键序（bar 级匹配器使其真实触发，
+见"命令层"章节）。
 
 ## 上下文标签页
 

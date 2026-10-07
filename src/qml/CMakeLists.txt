@@ -41,8 +41,6 @@ sa_add_library(SARibbonQml
         SARibbonQmlTheme.cpp
         SARibbonQmlMetrics.h
         SARibbonQmlMetrics.cpp
-        SARibbonQmlMenuItem.h
-        SARibbonQmlMenuItem.cpp
         SARibbonQmlContextCategory.h
         SARibbonQmlContextCategory.cpp
         SARibbonQmlPanel.h

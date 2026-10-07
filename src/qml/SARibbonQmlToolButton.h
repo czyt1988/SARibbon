@@ -4,13 +4,11 @@
 #include "SARibbonQmlLayoutItemHost.h"
 #include "SARibbonQmlTypes.h"
 // the single QAction include face of the module (contract D5, plan-05 S1);
-// full type: the action Q_PROPERTY / pointer members need it complete here
+// full type: the action Q_PROPERTY / menuTriggered(QAction*) signal need it
+// complete here (moc pointer metatype, the B64 family). RibbonAction too:
+// the menuActions QQmlListProperty template parameter
 #include "SARibbonQmlActionCompat.h"
-// full definition, not a forward declaration: RibbonMenuItem* appears in the
-// menuTriggered signal, so the moc output instantiates QMetaType::fromType and
-// silently loses the QObject specialization if the type is incomplete where
-// that moc file happens to be compiled (NOTES B64)
-#include "SARibbonQmlMenuItem.h"
+#include "SARibbonQmlAction.h"
 #include <SARibbonCore/SARibbonEnums.h>
 #include <SARibbonCore/SARibbonToolButtonLayout.h>
 #include <QQuickItem>
@@ -20,7 +18,7 @@
 
 namespace SARibbonQml {
 
-class RibbonMenuItem;
+class RibbonMenuModel;
 class RibbonBar;
 
 /**
@@ -38,8 +36,8 @@ class RibbonBar;
  *          actionRect/menuRect — geometry authority stays here), InstantPopup
  *          turns the whole button into the menu zone, DelayedPopup keeps the
  *          whole button as the action zone and opens the menu on press-hold
- *          (leaf-side timer). Menu entries are declarative RibbonMenuItem
- *          objects; activation is mediated by menuTriggered so tests can drive
+ *          (leaf-side timer). Menu entries are QAction objects; activation is
+ *          mediated by menuTriggered so tests can drive
  *          it without a windowed popup.
  *          The layout knobs are the core SARibbonToolButtonLayout::Factors and
  *          Input fields published as properties (spacing, the two text height
@@ -65,8 +63,8 @@ class RibbonBar;
  *          QToolButton::ToolButtonPopupMode 语义：MenuButtonPopup 把按钮分为
  *          动作区与菜单区（发布为 actionRect/menuRect——几何权威留在宿主），
  *          InstantPopup 整个按钮即菜单区，DelayedPopup 整个按钮保持动作区、
- *          按住不放弹出菜单（叶子侧计时）。菜单项为声明式 RibbonMenuItem；
- *          激活经 menuTriggered 中转，测试无需弹窗即可驱动。
+ *          按住不放弹出菜单（叶子侧计时）。菜单项为 QAction 列表；激活经
+ *          menuTriggered 中转，测试无需弹窗即可驱动。
  *          布局旋钮即 core SARibbonToolButtonLayout 的 Factors 与 Input 字段
  *          （spacing、两个文字高度系数、宽高比一对、两个图标尺寸），以属性形式
  *          发布，对应 SARibbonToolButton 的同名公开设置函数。两个宽高比还会经
@@ -100,9 +98,10 @@ class SA_RIBBON_QML_EXPORT RibbonToolButton : public RibbonLayoutItemHost
     Q_PROPERTY(QSize largeIconSize READ largeIconSize WRITE setLargeIconSize NOTIFY iconSizesChanged)
     Q_PROPERTY(QString toolTip READ toolTip WRITE setToolTip NOTIFY toolTipChanged)
     Q_PROPERTY(RibbonEnums::PopupMode popupMode READ popupMode WRITE setPopupMode NOTIFY popupModeChanged)
-    Q_PROPERTY(QQmlListProperty< SARibbonQml::RibbonMenuItem > menuItems READ menuItems NOTIFY menuItemsChanged)
+    Q_PROPERTY(QQmlListProperty< SARibbonQml::RibbonAction > menuActions READ menuActions NOTIFY menuActionsChanged)
+    Q_PROPERTY(QVariantList menuModel READ menuModel NOTIFY menuModelChanged)
     Q_PROPERTY(bool menuVisible READ isMenuVisible WRITE setMenuVisible NOTIFY menuVisibleChanged)
-    Q_PROPERTY(bool hasMenu READ hasMenu NOTIFY menuItemsChanged)
+    Q_PROPERTY(bool hasMenu READ hasMenu NOTIFY menuModelChanged)
     Q_PROPERTY(QRectF actionRect READ actionRect NOTIFY hitRectsChanged)
     Q_PROPERTY(QRectF menuRect READ menuRect NOTIFY hitRectsChanged)
     Q_PROPERTY(bool largeType READ isLargeType NOTIFY layoutChanged)
@@ -204,10 +203,19 @@ public:
     RibbonEnums::PopupMode popupMode() const;
     void setPopupMode(RibbonEnums::PopupMode mode);
 
-    // Declarative menu entries (rendered by the leaf, mediated by menuTriggered)
-    QQmlListProperty< SARibbonQml::RibbonMenuItem > menuItems();
-    int menuItemCount() const;
-    RibbonMenuItem* menuItemAt(int index) const;
+    // Menu entries as QAction objects (plan-06 S3): authoring surface —
+    // object literals, id references and C++ appends all land here. The leaf
+    // renders the derived menuModel rows; activation resolves back to the
+    // QAction and triggers it (contract §5: submenus via
+    // RibbonAction.menuActions, bare QAction entries are flat-only)
+    QQmlListProperty< SARibbonQml::RibbonAction > menuActions();
+    int menuActionCount() const;
+    QAction* menuActionAt(int index) const;
+    // C++ append of any QAction (bare ones included)
+    void addMenuAction(QAction* action);
+
+    // Derived row maps for the leaf (live: rebuilt on every action change)
+    QVariantList menuModel() const;
 
     bool isMenuVisible() const;
     void setMenuVisible(bool on);
@@ -273,13 +281,14 @@ Q_SIGNALS:
     void iconSizesChanged();
     void toolTipChanged();
     void popupModeChanged();
-    void menuItemsChanged();
+    void menuActionsChanged();
+    void menuModelChanged();
     void menuVisibleChanged();
     void hitRectsChanged();
     void layoutChanged();
     void clicked();
     void toggled(bool checked);
-    void menuTriggered(SARibbonQml::RibbonMenuItem* item);
+    void menuTriggered(QAction* item);
 
 protected:
     QUrl leafUrl() const override;
@@ -314,10 +323,21 @@ private:
 #else
     using ListIndex = int;
 #endif
-    static void appendMenuItem(QQmlListProperty< SARibbonQml::RibbonMenuItem >* prop, SARibbonQml::RibbonMenuItem* item);
-    static ListIndex menuItemCountCb(QQmlListProperty< SARibbonQml::RibbonMenuItem >* prop);
-    static SARibbonQml::RibbonMenuItem* menuItemAtCb(QQmlListProperty< SARibbonQml::RibbonMenuItem >* prop, ListIndex index);
-    static void clearMenuItems(QQmlListProperty< SARibbonQml::RibbonMenuItem >* prop);
+    // ---- menu model (plan-06 S3) ----
+    RibbonMenuModel* mMenuModel;
+    void syncMenuModel();
+    QVector< QAction* > mMenuActions;
+
+    // QQmlListProperty callback types differ between Qt5 (int) and Qt6 (qsizetype)
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    using ListIndex = qsizetype;
+#else
+    using ListIndex = int;
+#endif
+    static void appendMenuActionCb(QQmlListProperty< SARibbonQml::RibbonAction >* prop, SARibbonQml::RibbonAction* action);
+    static ListIndex menuActionCountCb(QQmlListProperty< SARibbonQml::RibbonAction >* prop);
+    static SARibbonQml::RibbonAction* menuActionAtCb(QQmlListProperty< SARibbonQml::RibbonAction >* prop, ListIndex index);
+    static void clearMenuActionsCb(QQmlListProperty< SARibbonQml::RibbonAction >* prop);
 
     // ---- action binding (plan-05 S4) ----
     // QAction::changed is field-less: re-derive every mirrored property and
@@ -368,7 +388,6 @@ private:
     QRectF mIndicatorGeometry;
     QString mDisplayText;
     bool mIsTextNeedWrap = false;
-    QVector< RibbonMenuItem* > mMenuItems;
     int mSpacing = SARibbon::Core::ToolButtonLayoutConstants::DEFAULT_SPACING;
     SARibbon::Core::SARibbonToolButtonLayout::Factors mFactors;
     QSize mSmallIconSize = QSize(22, 22);  ///< widgets SARibbonPanelLayout::mSmallToolButtonIconSize default

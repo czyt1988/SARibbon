@@ -1,7 +1,9 @@
 #include "SARibbonQmlActionRegistry.h"
 #include <SARibbonCore/SARibbonCustomizeRecord.h>
+#include "SARibbonQmlAction.h"
 #include "SARibbonQmlBar.h"
 #include "SARibbonQmlCategory.h"
+#include "SARibbonQmlIconProvider.h"
 #include "SARibbonQmlPanel.h"
 #include "SARibbonQmlLayoutItemHost.h"
 #include "SARibbonQmlButtonRowHost.h"
@@ -14,14 +16,43 @@
 namespace SARibbonQml {
 
 // ---- RibbonActionDescriptor ----
+QString RibbonActionDescriptor::key() const
+{
+    return action ? action->objectName() : QString();
+}
+
+QString RibbonActionDescriptor::text() const
+{
+    return action ? action->text() : QString();
+}
+
+QString RibbonActionDescriptor::iconSource() const
+{
+    if (!action) {
+        return QString();
+    }
+    if (auto* ribbonAction = qobject_cast< RibbonAction* >(action.data())) {
+        return ribbonAction->iconSource().toString();
+    }
+    if (!action->icon().isNull()) {
+        return SAIconImageProvider::iconUrl(action.data()).toString();
+    }
+    return QString();
+}
+
 bool RibbonActionDescriptor::isValid() const
 {
-    return !key.isEmpty();
+    return action != nullptr && !action->objectName().isEmpty();
 }
 
 bool RibbonActionDescriptor::hasItem() const
 {
-    return item != nullptr;
+    for (RibbonLayoutItemHost* it : items) {
+        if (it) {
+            return true;
+        }
+    }
+    return false;
 }
 
 /**
@@ -30,24 +61,25 @@ bool RibbonActionDescriptor::hasItem() const
  * @details Every key is present from construction (NOTES B60): a QML binding
  *          that reads a missing map key silently yields undefined and the V4
  *          compiler of Qt 6.7 does not recover when the key shows up later.
- *          `item` is published as a boolean, not as the pointer — QML code that
- *          needs the host goes through RibbonActionRegistry::item(key).
+ *          The values are live reads of the action; `hasItem` tells whether
+ *          the command is currently placed, QML reaches the host itself
+ *          through the button's `action` property, never through the map.
  * \endif
  *
  * \if CHINESE
  * @brief 把描述符转成 QML 侧看到的 map 形状
  * @details 每个 key 自构造起就存在（NOTES B60）：QML 绑定读到缺失的 map key 会
  *          静默得到 undefined，而 Qt 6.7 的 V4 编译器在该 key 后来出现时并不会
- *          恢复。`item` 以布尔发布而非指针——需要宿主的 QML 代码走
- *          RibbonActionRegistry::item(key)。
+ *          恢复。取值是对 action 的活读取；`hasItem` 标明命令当前是否已摆出，
+ *          QML 需要宿主时经按钮的 `action` 属性自行到达，不经 map。
  * \endif
  */
 QVariantMap RibbonActionDescriptor::toVariantMap() const
 {
     QVariantMap m;
-    m.insert(QStringLiteral("key"), key);
-    m.insert(QStringLiteral("text"), text);
-    m.insert(QStringLiteral("iconSource"), iconSource);
+    m.insert(QStringLiteral("key"), key());
+    m.insert(QStringLiteral("text"), text());
+    m.insert(QStringLiteral("iconSource"), iconSource());
     m.insert(QStringLiteral("tag"), tag);
     m.insert(QStringLiteral("proportion"), int(proportion));
     m.insert(QStringLiteral("hasItem"), hasItem());
@@ -64,12 +96,11 @@ public:
 
     QMap< int, QList< RibbonActionDescriptor > > mTagToActions;  ///< tag -> descriptors in registration order
     QMap< int, QString > mTagToName;                             ///< tag -> display name
-    QHash< QString, RibbonLayoutItemHost* > mKeyToItem;          ///< key -> live host item (absent for templates)
+    QHash< QString, QAction* > mKeyToAction;                     ///< key (objectName) -> command object
     QMap< int, RibbonCategory* > mTagToCategory;                 ///< tag -> category, filled by autoRegister only
-    int mSale;  ///< salt for generated keys: stable as long as the registration order is
 };
 
-RibbonActionRegistry::PrivateData::PrivateData(RibbonActionRegistry* p) : q_ptr(p), mSale(0)
+RibbonActionRegistry::PrivateData::PrivateData(RibbonActionRegistry* p) : q_ptr(p)
 {
 }
 
@@ -77,9 +108,8 @@ void RibbonActionRegistry::PrivateData::clear()
 {
     mTagToActions.clear();
     mTagToName.clear();
-    mKeyToItem.clear();
+    mKeyToAction.clear();
     mTagToCategory.clear();
-    mSale = 0;
 }
 
 RibbonActionRegistry::RibbonActionRegistry(QObject* parent)
@@ -110,17 +140,16 @@ QString RibbonActionRegistry::tagName(int tag) const
  * @brief Remove a tag together with everything filed under it
  * @details Unlike unregisteAction this is a bulk drop: the descriptors of the
  *          tag leave the key table as well, so a later registeAction of the
- *          same item produces a fresh key. The tag name goes too — widgets
- *          removeTag keeps the name only while actions remain, and an empty
- *          tag with a lingering name would show up as a blank group header.
+ *          same command produces a fresh entry. The tag name goes too — an
+ *          empty tag with a lingering name would show up as a blank group
+ *          header.
  * \endif
  *
  * \if CHINESE
  * @brief 移除某个 tag 连同其下全部描述符
  * @details 与 unregisteAction 不同，这是批量丢弃：该 tag 下的描述符同时离开
- *          key 表，因此之后对同一项再调 registeAction 会得到新的 key。tag 名
- *          也一并去掉——widgets 的 removeTag 只在仍有 action 时保留名字，而一
- *          个空 tag 拖着名字会显示成一个空白的分组标题。
+ *          key 表，因此之后对同一命令再调 registeAction 会得到新条目。tag 名
+ *          也一并去掉——一个空 tag 拖着名字会显示成一个空白的分组标题。
  * \endif
  */
 void RibbonActionRegistry::removeTag(int tag)
@@ -130,7 +159,7 @@ void RibbonActionRegistry::removeTag(int tag)
     }
     const QList< RibbonActionDescriptor > list = d_ptr->mTagToActions.value(tag);
     for (const RibbonActionDescriptor& d : list) {
-        d_ptr->mKeyToItem.remove(d.key);
+        d_ptr->mKeyToAction.remove(d.key());
     }
     d_ptr->mTagToActions.remove(tag);
     d_ptr->mTagToName.remove(tag);
@@ -141,57 +170,55 @@ void RibbonActionRegistry::removeTag(int tag)
 
 /**
  * \if ENGLISH
- * @brief Register a live host item under a tag
- * @details Widgets registeAction parity, including the two behaviours that are
- *          easy to lose: an empty key falls back to the salt generator (so the
- *          same registration order always yields the same keys), and a key that
- *          is already taken is refused with a warning instead of silently
- *          shadowing the previous entry. The item's destroyed signal is hooked
- *          so a host that goes away takes its descriptor with it.
+ * @brief Register a command under a tag
+ * @details The key is the action's objectName (contract §5); an explicit key
+ *          argument must equal it, an action without one is refused with a
+ *          warning — a command without an identity cannot be addressed by a
+ *          customize record. The action's destroyed signal is hooked so a
+ *          command that goes away takes its descriptor with it.
  * \endif
  *
  * \if CHINESE
- * @brief 把一个活动宿主项注册到某个 tag 下
- * @details 与 widgets registeAction 对齐，包括两个容易丢失的行为：key 为空时
- *          退回盐值生成器（因此相同的注册顺序总是得到相同的 key）；key 已被占
- *          用时带告警拒绝，而不是静默覆盖前一条。同时挂上项的 destroyed 信号，
- *          宿主销毁时其描述符一并离开注册表。
+ * @brief 把一条命令注册到某个 tag 下
+ * @details key 即 action 的 objectName（契约 §5）；显式传入的 key 必须与之相等，
+ *          没有 objectName 的 action 会被带告警拒绝——没有身份的命令无法被
+ *          定制记录寻址。同时挂上 action 的 destroyed 信号，命令销毁时其描述符
+ *          一并离开注册表。
  * \endif
  */
-bool RibbonActionRegistry::registeAction(RibbonLayoutItemHost* item, int tag, const QString& key, bool enableEmit)
+bool RibbonActionRegistry::registeAction(QAction* act, int tag, const QString& key, bool enableEmit)
 {
-    if (!item) {
+    if (!act) {
         return false;
     }
-    QString k = key;
+    const QString k = act->objectName();
     if (k.isEmpty()) {
-        k = generateKey(item);
+        qWarning() << "RibbonActionRegistry::registeAction refuses an action without objectName — the objectName "
+                      "is the persistent command identity (contract §5)";
+        return false;
     }
-    const QList< RibbonActionDescriptor > existing = d_ptr->mTagToActions.value(tag);
-    if (!existing.isEmpty()) {
-        for (const RibbonActionDescriptor& d : existing) {
-            if (d.key == k) {
-                qWarning() << "key: " << k << " have been exist,you can set key in an unique value when use "
-                              "RibbonActionRegistry::registeAction";
-                return false;
-            }
-        }
+    if (!key.isEmpty() && key != k) {
+        qWarning() << "RibbonActionRegistry::registeAction: key" << key << "differs from the action objectName"
+                   << k << "— the objectName is the registry key (contract §5)";
+        return false;
+    }
+    if (d_ptr->mKeyToAction.contains(k)) {
+        qWarning() << "key: " << k << " have been exist,you can set key in an unique value when use "
+                      "RibbonActionRegistry::registeAction";
+        return false;
     }
 
     RibbonActionDescriptor d;
-    d.key         = k;
-    d.tag         = tag;
-    d.item        = item;
-    d.text        = item->property("text").toString();
-    d.iconSource  = item->property("iconSource").toString();
-    const QVariant rp = item->property("proportion");
-    d.proportion  = rp.isValid() ? SARibbon::Core::SARibbonRowProportion(rp.toInt())
+    d.action     = act;
+    d.tag        = tag;
+    const QVariant rp = act->property("saRibbonDefaultProportion");
+    d.proportion = rp.isValid() ? SARibbon::Core::SARibbonRowProportion(rp.toInt())
                                  : SARibbon::Core::SARibbonRowProportion::Medium;
 
     const bool isNewTag = !d_ptr->mTagToActions.contains(tag);
     d_ptr->mTagToActions[ tag ].append(d);
-    d_ptr->mKeyToItem.insert(k, item);
-    connect(item, &QObject::destroyed, this, &RibbonActionRegistry::onItemDestroyed);
+    d_ptr->mKeyToAction.insert(k, act);
+    connect(act, &QObject::destroyed, this, &RibbonActionRegistry::onActionDestroyed);
     if (isNewTag && enableEmit) {
         Q_EMIT actionTagChanged(tag, false);
     }
@@ -201,21 +228,21 @@ bool RibbonActionRegistry::registeAction(RibbonLayoutItemHost* item, int tag, co
 
 /**
  * \if ENGLISH
- * @brief Register a command template — a command with no live host item
+ * @brief Declare a command template — a command not placed anywhere yet
  * @details This is the QML substitute for the widgets capability of collecting
  *          the actions that sit on the main window but nowhere in the ribbon:
  *          QML has no enumerable action owner to walk, so the application
- *          declares those commands explicitly. The descriptor keeps a null
- *          item; RibbonCustomizer materializes a host when the command is
- *          placed into a panel or into the quick access bar.
+ *          declares those commands explicitly. A bare QAction is created here
+ *          (owned by the registry) carrying the identity and display data; the
+ *          customizer binds views to it when the command is placed.
  * \endif
  *
  * \if CHINESE
- * @brief 注册命令模板——没有活动宿主项的命令
+ * @brief 声明命令模板——尚未摆到任何位置的命令
  * @details 这是 QML 对 widgets "收集挂在主窗口上但不在 ribbon 任何位置的
  *          action" 能力的替代：QML 没有可枚举的 action 宿主可遍历，因此由应用
- *          显式声明这些命令。描述符的 item 为空；命令被放进面板或快速访问栏
- *          时由 RibbonCustomizer 落地创建宿主。
+ *          显式声明这些命令。这里创建一个裸 QAction（归注册表所有）承载身份与
+ *          显示数据；命令被放置时由定制器把视图绑定上去。
  * \endif
  */
 bool RibbonActionRegistry::registeCommand(int tag,
@@ -226,25 +253,42 @@ bool RibbonActionRegistry::registeCommand(int tag,
                                          bool enableEmit)
 {
     if (key.isEmpty()) {
-        qWarning() << "RibbonActionRegistry::registeCommand needs a non-empty key (a template has no item to derive one from)";
+        qWarning() << "RibbonActionRegistry::registeCommand needs a non-empty key (the command identity)";
         return false;
     }
-    if (d_ptr->mKeyToItem.contains(key) || descriptor(key).isValid()) {
+    if (d_ptr->mKeyToAction.contains(key)) {
         qWarning() << "key: " << key << " have been exist,you can set key in an unique value when use "
                       "RibbonActionRegistry::registeCommand";
         return false;
     }
 
+    QAction* act = new QAction(this);
+    act->setObjectName(key);
+    act->setText(text);
+    act->setProperty("saRibbonDefaultProportion", int(proportion));
+    if (!iconSource.isEmpty()) {
+        // mirror the url into the QIcon so the widgets world sees the same icon
+        QUrl url(iconSource);
+        QString path;
+        if (url.scheme() == QLatin1String("qrc")) {
+            path = QLatin1Char(':') + url.path();
+        } else if (url.isLocalFile()) {
+            path = url.toLocalFile();
+        } else {
+            path = iconSource;
+        }
+        act->setIcon(QIcon(path));
+    }
+
     RibbonActionDescriptor d;
-    d.key        = key;
+    d.action     = act;
     d.tag        = tag;
-    d.text       = text;
-    d.iconSource = iconSource;
     d.proportion = proportion;
-    d.item       = nullptr;
 
     const bool isNewTag = !d_ptr->mTagToActions.contains(tag);
     d_ptr->mTagToActions[ tag ].append(d);
+    d_ptr->mKeyToAction.insert(key, act);
+    connect(act, &QObject::destroyed, this, &RibbonActionRegistry::onActionDestroyed);
     if (isNewTag && enableEmit) {
         Q_EMIT actionTagChanged(tag, false);
     }
@@ -252,12 +296,12 @@ bool RibbonActionRegistry::registeCommand(int tag,
     return true;
 }
 
-void RibbonActionRegistry::unregisteAction(RibbonLayoutItemHost* item, bool enableEmit)
+void RibbonActionRegistry::unregisteAction(QAction* act, bool enableEmit)
 {
-    if (!item) {
+    if (!act) {
         return;
     }
-    unregisteKey(key(item), enableEmit);
+    unregisteKey(act->objectName(), enableEmit);
 }
 
 void RibbonActionRegistry::unregisteKey(const QString& key, bool enableEmit)
@@ -270,32 +314,35 @@ void RibbonActionRegistry::unregisteKey(const QString& key, bool enableEmit)
 
 /**
  * \if ENGLISH
- * @brief Point an existing key at a live host item
- * @details The customizer calls this after it materialized a command template:
- *          the descriptor keeps its key (records already written against that
- *          key stay valid) and gains the item, so later records address the new
- *          host through the very same key. A key that is not registered is
- *          ignored — bindItem repairs a descriptor, it never creates one.
+ * @brief Track a live host item as a placement of the key's command
+ * @details The binding itself is expressed by the button's `action` property
+ *          (plan-05 S4) — this bookkeeping only keeps the descriptor's
+ *          placement list current, so hasItem() and the QML views can answer
+ *          "is this command placed". The item's destroyed signal detaches it
+ *          from the list.
  * \endif
  *
  * \if CHINESE
- * @brief 让一个已存在的 key 指向活动宿主项
- * \details 定制器在把命令模板落地后调用本函数：描述符保留其 key（已针对该 key
- *          写下的记录继续有效）并获得 item，因此后续记录可以通过同一个 key 寻址
- *          新宿主。未注册的 key 直接忽略——bindItem 修补描述符，绝不新建。
+ * @brief 把一个活动宿主项登记为某命令的一次放置
+ * @details 绑定关系本身已由按钮的 `action` 属性表达（计划 05 S4）——这里的
+ *          簿记只是让描述符的放置列表保持新鲜，使 hasItem() 与 QML 视图能回答
+ *          "该命令当前是否已摆出"。项销毁时自动离开列表。
  * \endif
  */
-void RibbonActionRegistry::bindItem(const QString& key, RibbonLayoutItemHost* item)
+void RibbonActionRegistry::attachItem(const QString& key, RibbonLayoutItemHost* item)
 {
     if (key.isEmpty() || !item) {
         return;
     }
     for (auto it = d_ptr->mTagToActions.begin(); it != d_ptr->mTagToActions.end(); ++it) {
         for (RibbonActionDescriptor& d : it.value()) {
-            if (d.key == key) {
-                d.item = item;
-                d_ptr->mKeyToItem.insert(key, item);
-                connect(item, &QObject::destroyed, this, &RibbonActionRegistry::onItemDestroyed);
+            if (d.key() == key) {
+                if (!d.items.contains(item)) {
+                    d.items.append(item);
+                    connect(item, &QObject::destroyed, this, [this, item](QObject*) {
+                        detachItem(item);
+                    });
+                }
                 Q_EMIT registryChanged();
                 return;
             }
@@ -303,24 +350,34 @@ void RibbonActionRegistry::bindItem(const QString& key, RibbonLayoutItemHost* it
     }
 }
 
+void RibbonActionRegistry::detachItem(RibbonLayoutItemHost* item)
+{
+    if (!item) {
+        return;
+    }
+    for (auto it = d_ptr->mTagToActions.begin(); it != d_ptr->mTagToActions.end(); ++it) {
+        for (RibbonActionDescriptor& d : it.value()) {
+            d.items.removeAll(item);
+        }
+    }
+}
+
 /**
  * \if ENGLISH
- * @brief Mark every placed command customizable
- * @details Writes the core SA_RIBBON_BAR_PROP_CAN_CUSTOMIZE dynamic property on
- *          each descriptor's live item. This is the QML stand-in for the widgets
- *          flow, where the application marks its own QAction objects: declarative
- *          QML hosts have no natural marking point, so the registry — which
- *          already walked the whole tree — offers to do it in one call. Only
- *          matters while RibbonCustomizer::enforceCanCustomize is on.
+ * @brief Mark every registered command customizable
+ * @details Writes the core SA_RIBBON_BAR_PROP_CAN_CUSTOMIZE marker on each
+ *          command object. The command-level flag belongs to the QAction —
+ *          the same object the widgets manager marks since plan-07 S3 — so
+ *          every placement inherits it for free. Only matters while
+ *          RibbonCustomizer::enforceCanCustomize is on.
  * \endif
  *
  * \if CHINESE
- * @brief 把每个已摆出的命令标记为可定制
- * \details 对每条描述符的活动项写入 core 的 SA_RIBBON_BAR_PROP_CAN_CUSTOMIZE
- *          动态属性。这是 QML 对 widgets 流程的替代——widgets 侧由应用自行标记
- *          其 QAction 对象，而声明式 QML 宿主没有天然的标记点，因此由已经遍历过
- *          整棵树的注册表一次调用完成。仅在 RibbonCustomizer::enforceCanCustomize
- *          打开时才有意义。
+ * @brief 把每条已注册命令标记为可定制
+ * @details 对每个命令对象写入 core 的 SA_RIBBON_BAR_PROP_CAN_CUSTOMIZE 标记。
+ *          命令级标记属于 QAction——与计划 07 S3 起 widgets 管理器标记的是同一
+ *          种对象——因此每次放置都免费继承它。仅在 RibbonCustomizer::
+ *          enforceCanCustomize 打开时才有意义。
  * \endif
  */
 int RibbonActionRegistry::markCustomizable(bool canbe)
@@ -328,8 +385,8 @@ int RibbonActionRegistry::markCustomizable(bool canbe)
     int n = 0;
     for (auto it = d_ptr->mTagToActions.constBegin(); it != d_ptr->mTagToActions.constEnd(); ++it) {
         for (const RibbonActionDescriptor& d : it.value()) {
-            if (d.item) {
-                SARibbon::Core::setCanCustomize(d.item, canbe);
+            if (d.action) {
+                SARibbon::Core::setCanCustomize(d.action.data(), canbe);
                 ++n;
             }
         }
@@ -351,23 +408,6 @@ QList< int > RibbonActionRegistry::actionTags() const
     return d_ptr->mTagToActions.keys();
 }
 
-/**
- * \if ENGLISH
- * @brief Look a descriptor up by key
- * @details The key table only stores live items (a template has none), so the
- *          search walks the tag lists. That is O(n) per lookup but n is the
- *          number of ribbon commands — a few hundred at most — and it keeps one
- *          single source of truth for the descriptor contents instead of a
- *          second hash that could drift.
- * \endif
- *
- * \if CHINESE
- * @brief 按 key 查找描述符
- * @details key 表只存活动项（模板没有），因此查找遍历 tag 列表。这是 O(n)
- *          的，但 n 是 ribbon 命令数——最多几百条——并且它让描述符内容只有
- *          一个真相来源，避免第二张可能漂移的哈希表。
- * \endif
- */
 RibbonActionDescriptor RibbonActionRegistry::descriptor(const QString& key) const
 {
     if (key.isEmpty()) {
@@ -375,7 +415,7 @@ RibbonActionDescriptor RibbonActionRegistry::descriptor(const QString& key) cons
     }
     for (auto it = d_ptr->mTagToActions.constBegin(); it != d_ptr->mTagToActions.constEnd(); ++it) {
         for (const RibbonActionDescriptor& d : it.value()) {
-            if (d.key == key) {
+            if (d.key() == key) {
                 return d;
             }
         }
@@ -383,27 +423,22 @@ RibbonActionDescriptor RibbonActionRegistry::descriptor(const QString& key) cons
     return RibbonActionDescriptor();
 }
 
-RibbonLayoutItemHost* RibbonActionRegistry::item(const QString& key) const
+QAction* RibbonActionRegistry::action(const QString& key) const
 {
-    return d_ptr->mKeyToItem.value(key, nullptr);
+    return d_ptr->mKeyToAction.value(key, nullptr);
 }
 
-QString RibbonActionRegistry::key(RibbonLayoutItemHost* item) const
+QString RibbonActionRegistry::key(QAction* act) const
 {
-    if (!item) {
+    if (!act) {
         return QString();
     }
-    for (auto it = d_ptr->mKeyToItem.constBegin(); it != d_ptr->mKeyToItem.constEnd(); ++it) {
-        if (it.value() == item) {
-            return it.key();
-        }
-    }
-    return QString();
+    return d_ptr->mKeyToAction.key(act, QString());
 }
 
-int RibbonActionRegistry::tagOf(RibbonLayoutItemHost* item) const
+int RibbonActionRegistry::tagOf(QAction* act) const
 {
-    const QString k = key(item);
+    const QString k = key(act);
     if (k.isEmpty()) {
         return int(SARibbon::Core::UnknowActionTag);
     }
@@ -436,7 +471,7 @@ QList< RibbonActionDescriptor > RibbonActionRegistry::search(const QString& text
     }
     const QList< RibbonActionDescriptor > all = allActions();
     for (const RibbonActionDescriptor& d : all) {
-        if (d.text.contains(text, Qt::CaseInsensitive)) {
+        if (d.text().contains(text, Qt::CaseInsensitive)) {
             res.append(d);
         }
     }
@@ -455,34 +490,28 @@ void RibbonActionRegistry::clear()
 
 /**
  * \if ENGLISH
- * @brief Walk a bar host tree and register everything customizable in it
- * @details Widgets autoRegisteActions parity in the part that matters for the
- *          customize dialog: one tag per category, taken from
- *          AutoCategoryDistinguishBeginTag upwards in category row order, the
- *          tag name set to the category title and kept in sync with later
- *          renames, and every panel child filed under the tag of the category
- *          that owns its panel. The returned map is the tag -> category table.
- *          Quick access bar buttons are filed under QuickAccessActionTag: on the
- *          widgets side the very same QAction objects are already reachable
- *          through their category tag, in QML they are hosts of their own.
- * @note Call this after the categories carry their titles, since the title is
- *       what names the tag. Calling it again on the same bar is safe: items
- *       that already hold a key keep it, so the tag table refreshes without
- *       duplicating the catalogue.
+ * @brief Walk a bar host tree and register every action-bound button in it
+ * @details One tag per category, taken from AutoCategoryDistinguishBeginTag
+ *          upwards in category row order, the tag name set to the category
+ *          title and kept in sync with later renames. Only buttons carrying
+ *          an `action` are filed (contract D6 two-level semantics: plain
+ *          declarative buttons are not commands, the widgets customizer
+ *          equally ignores addWidget content). The placement bookkeeping of
+ *          every filed button is registered along with the command itself.
+ * @note Call this after the categories carry their titles. Calling it again
+ *       on the same bar is safe: commands that already hold a key keep it,
+ *       so the tag table refreshes without duplicating the catalogue.
  * \endif
  *
  * \if CHINESE
- * @brief 遍历 bar 宿主树，把其中所有可定制内容注册进来
- * @details 在定制对话框真正需要的部分上与 widgets autoRegisteActions 对齐：
- *          每个 category 一个 tag，自 AutoCategoryDistinguishBeginTag 起按
- *          category 行序递增，tag 名取 category 标题并跟随后续改名同步，每个
- *          面板子项归入其面板所属 category 的 tag。返回的 map 即 tag ->
- *          category 表。快速访问栏按钮归入 QuickAccessActionTag：widgets 侧
- *          同一批 QAction 对象已可通过其 category tag 到达，QML 侧它们则是
- *          独立的宿主。
- * @note 请在 category 设置标题之后调用，因为标题就是 tag 名。对同一个 bar 重复
- *       调用是安全的：已持有 key 的项保持原 key，因此 tag 表会刷新而命令目录不
- *       会重复。
+ * @brief 遍历 bar 宿主树，把其中所有 action 绑定按钮注册进来
+ * @details 每个 category 一个 tag，自 AutoCategoryDistinguishBeginTag 起按
+ *          category 行序递增，tag 名取 category 标题并跟随后续改名同步。只
+ *          归档携带 `action` 的按钮（契约 D6 两级语义：纯声明按钮不是命令，
+ *          widgets 定制器同样不管 addWidget 内容）。已归档命令的放置簿记随
+ *          命令本身一并登记。
+ * @note 请在 category 设置标题之后调用。对同一个 bar 重复调用是安全的：已持有
+ *       key 的命令保持原 key，因此 tag 表会刷新而命令目录不会重复。
  * \endif
  */
 QMap< int, RibbonCategory* > RibbonActionRegistry::autoRegister(RibbonBar* bar, bool enableEmit)
@@ -491,6 +520,24 @@ QMap< int, RibbonCategory* > RibbonActionRegistry::autoRegister(RibbonBar* bar, 
     if (!bar) {
         return res;
     }
+    auto fileItem = [this](RibbonLayoutItemHost* item, int tag) {
+        if (auto* btn = qobject_cast< RibbonToolButton* >(item)) {
+            QAction* act = btn->action();
+            if (!act) {
+                return;  // plain-declarative button: not a command (contract D6)
+            }
+            const QString k = act->objectName();
+            if (k.isEmpty()) {
+                qWarning() << "autoRegister skips action without objectName, text:"
+                           << act->text();
+                return;
+            }
+            if (key(act).isEmpty()) {
+                registeAction(act, tag, QString(), false);
+            }
+            attachItem(k, item);
+        }
+    };
     int tag = int(SARibbon::Core::AutoCategoryDistinguishBeginTag);
     for (int i = 0; i < bar->categoryCount(); ++i) {
         RibbonCategory* c = bar->categoryAt(i);
@@ -503,15 +550,7 @@ QMap< int, RibbonCategory* > RibbonActionRegistry::autoRegister(RibbonBar* bar, 
                 continue;
             }
             for (int k = 0; k < panel->childItemCount(); ++k) {
-                RibbonLayoutItemHost* item = panel->childItemAt(k);
-                // re-runnable (WS-C3): the customize dialog re-registers every
-                // time it opens, and generateKey is serial based, so an item
-                // that already has a key would be filed a second time under a
-                // different key instead of being rejected as a duplicate
-                if (!item || !key(item).isEmpty()) {
-                    continue;
-                }
-                registeAction(item, tag, QString(), false);
+                fileItem(panel->childItemAt(k), tag);
             }
         }
         setTagName(tag, c->title());
@@ -524,9 +563,7 @@ QMap< int, RibbonCategory* > RibbonActionRegistry::autoRegister(RibbonBar* bar, 
     if (RibbonButtonRowHost* qab = bar->quickAccessBar()) {
         for (int i = 0; i < qab->buttonCount(); ++i) {
             if (RibbonLayoutItemHost* item = qobject_cast< RibbonLayoutItemHost* >(qab->buttonAt(i))) {
-                if (key(item).isEmpty()) {
-                    registeAction(item, QuickAccessActionTag, QString(), false);
-                }
+                fileItem(item, QuickAccessActionTag);
             }
         }
         if (d_ptr->mTagToActions.contains(QuickAccessActionTag)) {
@@ -547,23 +584,6 @@ QMap< int, RibbonCategory* > RibbonActionRegistry::autoRegister(RibbonBar* bar, 
     return res;
 }
 
-/**
- * \if ENGLISH
- * @brief QML entry point of autoRegister
- * @details autoRegister returns a tag -> category map of C++ pointers, which
- *          QML has no way to hold, so a picker written in QML could not call it
- *          at all. This wrapper runs the same walk and reports the number of
- *          descriptors the catalogue holds afterwards, which is the only figure
- *          a QML caller can act on.
- * \endif
- *
- * \if CHINESE
- * @brief autoRegister 的 QML 入口
- * @details autoRegister 返回的是 tag -> category 的 C++ 指针 map，QML 无法持有，
- *          因此用 QML 写的选取器根本调不到它。本包装跑同一套遍历，改为返回遍历
- *          之后命令目录里的描述符数量——这是 QML 调用方唯一能用得上的数字。
- * \endif
- */
 int RibbonActionRegistry::autoRegisterBar(RibbonBar* bar)
 {
     autoRegister(bar);
@@ -614,18 +634,18 @@ QVariantList RibbonActionRegistry::searchInfo(const QString& text) const
     return res;
 }
 
-void RibbonActionRegistry::onItemDestroyed(QObject* o)
+void RibbonActionRegistry::onActionDestroyed(QObject* o)
 {
-    // the item is gone: drop its descriptor but keep the tag alive if other
-    // descriptors remain (removeDescriptor handles the emptied-tag case).
-    // static_cast, not qobject_cast: destroyed fires from ~QObject, by which
-    // time the derived metaobject is already gone (widgets onActionDestroyed
-    // does the same)
-    RibbonLayoutItemHost* item = static_cast< RibbonLayoutItemHost* >(o);
-    const QList< QString > keys = d_ptr->mKeyToItem.keys(item);
-    for (const QString& k : keys) {
-        removeDescriptor(k, true);
+    // the command object is gone: drop its descriptor but keep the tag alive
+    // if other descriptors remain. static_cast, not qobject_cast: destroyed
+    // fires from ~QObject, by which time the derived metaobject is already
+    // gone (widgets onActionDestroyed does the same)
+    QAction* act = static_cast< QAction* >(o);
+    const QString k = act->objectName();
+    if (!k.isEmpty()) {
+        d_ptr->mKeyToAction.remove(k);
     }
+    removeDescriptor(k, true);
 }
 
 void RibbonActionRegistry::onCategoryTitleChanged()
@@ -642,36 +662,17 @@ void RibbonActionRegistry::onCategoryTitleChanged()
     }
 }
 
-/**
- * \if ENGLISH
- * @brief Drop one descriptor from every table
- * @details A descriptor is filed under exactly one tag, but the removal still
- *          walks all tags: that is what makes the function correct for entries
- *          whose tag was changed behind the registry's back, and it costs one
- *          pass over a handful of lists. When the tag loses its last descriptor
- *          the tag itself goes, which is the widgets removeAction contract the
- *          customize dialog's group list relies on.
- * \endif
- *
- * \if CHINESE
- * @brief 从所有表中删除一条描述符
- * @details 一条描述符只归在一个 tag 下，但删除仍然遍历全部 tag：这使得即使某
- *          条目的 tag 在注册表之外被改动，本函数依然正确，代价只是对几条列表
- *          走一遍。当某个 tag 失去最后一条描述符时该 tag 一并消失——这正是
- *          定制对话框分组列表所依赖的 widgets removeAction 契约。
- * \endif
- */
 void RibbonActionRegistry::removeDescriptor(const QString& key, bool enableEmit)
 {
     if (key.isEmpty()) {
         return;
     }
-    d_ptr->mKeyToItem.remove(key);
+    d_ptr->mKeyToAction.remove(key);
     QList< int > emptiedTags;
     for (auto it = d_ptr->mTagToActions.begin(); it != d_ptr->mTagToActions.end();) {
         QList< RibbonActionDescriptor >& list = it.value();
         for (int i = list.size() - 1; i >= 0; --i) {
-            if (list[ i ].key == key) {
+            if (list[ i ].key() == key) {
                 list.removeAt(i);
             }
         }
@@ -691,29 +692,15 @@ void RibbonActionRegistry::removeDescriptor(const QString& key, bool enableEmit)
     }
 }
 
-/**
- * \if ENGLISH
- * @brief Generate the fallback key of an item that carries no objectName
- * @details Widgets registeAction parity: `id_<salt>_<objectName>`. The salt is
- *          a plain counter, so the generated keys are reproducible for as long
- *          as the registration order does not change — which is exactly the
- *          guarantee the widgets manager documents. Declarative items that must
- *          stay addressable across sessions should set objectName; the
- *          generated key is a fallback, not a stable identity.
- * \endif
- *
- * \if CHINESE
- * @brief 为没有 objectName 的项生成兜底 key
- * @details 与 widgets registeAction 对齐：`id_<盐值>_<objectName>`。盐值是普通
- *          计数器，因此只要注册顺序不变，生成的 key 就可复现——这正是 widgets
- *          管理器所承诺的保证。需要跨会话保持可寻址的声明式项应当设置
- *          objectName；生成的 key 是兜底，不是稳定身份。
- * \endif
- */
-QString RibbonActionRegistry::generateKey(RibbonLayoutItemHost* item)
+RibbonLayoutItemHost* RibbonActionRegistry::firstItem(const QString& key) const
 {
-    const QString objName = item ? item->objectName() : QString();
-    return QStringLiteral("id_%1_%2").arg(d_ptr->mSale++).arg(objName);
+    const RibbonActionDescriptor d = descriptor(key);
+    for (RibbonLayoutItemHost* it : d.items) {
+        if (it) {
+            return it;
+        }
+    }
+    return nullptr;
 }
 
 }

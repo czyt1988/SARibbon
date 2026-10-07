@@ -33,11 +33,11 @@ QVariant RibbonActionRegistryModel::data(const QModelIndex& index, int role) con
     switch (role) {
     case Qt::DisplayRole:
     case TextRole:
-        return d.text;
+        return d.text();
     case KeyRole:
-        return d.key;
+        return d.key();
     case IconSourceRole:
-        return d.iconSource;
+        return d.iconSource();
     case TagRole:
         return d.tag;
     case TagNameRole:
@@ -175,7 +175,7 @@ int RibbonActionRegistryModel::rowOfKey(const QString& key) const
         return -1;
     }
     for (int i = 0; i < mRows.size(); ++i) {
-        if (mRows[ i ].key == key) {
+        if (mRows[ i ].key() == key) {
             return i;
         }
     }
@@ -184,7 +184,7 @@ int RibbonActionRegistryModel::rowOfKey(const QString& key) const
 
 QString RibbonActionRegistryModel::keyAt(int row) const
 {
-    return descriptorAt(row).key;
+    return descriptorAt(row).key();
 }
 
 QVariantMap RibbonActionRegistryModel::infoAt(int row) const

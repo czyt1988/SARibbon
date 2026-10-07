@@ -550,14 +550,14 @@ bool RibbonCustomizer::applyRecord(const Record& r, QString* reason)
             // already attached: the record's end state holds, so this is a no-op
             // success rather than an error. An undo of an add+remove pair replays
             // AddAction against a host a later record already put back
-            SARibbon::Core::setCanCustomize(item, true);
+            SARibbon::Core::setCanCustomize(mRegistry->action(r.keyValue), true);
             return true;
         }
         if (!p->attachChildItem(item, -1)) {
             return fail(QStringLiteral("attachChildItem failed"));
         }
         item->ensureQmlLeaf();
-        SARibbon::Core::setCanCustomize(item, true);
+        SARibbon::Core::setCanCustomize(mRegistry->action(r.keyValue), true);
         return true;
     }
 
@@ -589,11 +589,16 @@ bool RibbonCustomizer::applyRecord(const Record& r, QString* reason)
         if (!p) {
             return false;
         }
-        RibbonLayoutItemHost* item = mRegistry ? mRegistry->item(r.keyValue) : nullptr;
-        if (!item) {
-            return fail(QStringLiteral("key has no live item: ") + r.keyValue);
+        QAction* act = mRegistry ? mRegistry->action(r.keyValue) : nullptr;
+        if (!act) {
+            return fail(QStringLiteral("key not in registry: ") + r.keyValue);
         }
-        if (!canCustomize(item, reason)) {
+        RibbonLayoutItemHost* item = mRegistry->firstItem(r.keyValue);
+        if (!item) {
+            // no live view: nothing to detach (the record states an end state)
+            return true;
+        }
+        if (!canCustomize(act, reason)) {
             return false;
         }
         if (p->childItemIndex(item) < 0) {
@@ -637,7 +642,7 @@ bool RibbonCustomizer::applyRecord(const Record& r, QString* reason)
         if (!p) {
             return false;
         }
-        RibbonLayoutItemHost* item = mRegistry ? mRegistry->item(r.keyValue) : nullptr;
+        RibbonLayoutItemHost* item = mRegistry ? mRegistry->firstItem(r.keyValue) : nullptr;
         if (!item) {
             return fail(QStringLiteral("key has no live item: ") + r.keyValue);
         }
@@ -698,7 +703,7 @@ bool RibbonCustomizer::applyRecord(const Record& r, QString* reason)
             return fail(QStringLiteral("attachButton failed"));
         }
         btn->ensureQmlLeaf();
-        SARibbon::Core::setCanCustomize(btn, true);
+        SARibbon::Core::setCanCustomize(mRegistry->action(r.keyValue), true);
         return true;
     }
 
@@ -707,7 +712,7 @@ bool RibbonCustomizer::applyRecord(const Record& r, QString* reason)
         if (!qab) {
             return fail(QStringLiteral("bar has no quick access bar"));
         }
-        RibbonToolButton* btn = mRegistry ? qobject_cast< RibbonToolButton* >(mRegistry->item(r.keyValue)) : nullptr;
+        RibbonToolButton* btn = mRegistry ? qobject_cast< RibbonToolButton* >(mRegistry->firstItem(r.keyValue)) : nullptr;
         if (!btn) {
             return fail(QStringLiteral("key has no live button: ") + r.keyValue);
         }
@@ -719,7 +724,7 @@ bool RibbonCustomizer::applyRecord(const Record& r, QString* reason)
         if (!qab) {
             return fail(QStringLiteral("bar has no quick access bar"));
         }
-        RibbonToolButton* btn = mRegistry ? qobject_cast< RibbonToolButton* >(mRegistry->item(r.keyValue)) : nullptr;
+        RibbonToolButton* btn = mRegistry ? qobject_cast< RibbonToolButton* >(mRegistry->firstItem(r.keyValue)) : nullptr;
         if (!btn) {
             return fail(QStringLiteral("key has no live button: ") + r.keyValue);
         }
@@ -802,7 +807,7 @@ RibbonLayoutItemHost* RibbonCustomizer::resolveItem(const QString& key)
     if (!mRegistry || key.isEmpty()) {
         return nullptr;
     }
-    if (RibbonLayoutItemHost* live = mRegistry->item(key)) {
+    if (RibbonLayoutItemHost* live = mRegistry->firstItem(key)) {
         return live;
     }
     return materialize(key);
@@ -815,33 +820,36 @@ RibbonLayoutItemHost* RibbonCustomizer::resolveItem(const QString& key)
  *          panel it lands in. That is deliberate: a materialized command can be
  *          detached by an undo and re-attached by a redo, and can be moved
  *          between panels and into the quick access bar, so its lifetime must not
- *          be tied to any one container. The registry entry is repaired through
- *          bindItem, which keeps the key stable — records already written against
- *          that key stay valid.
+ *          be tied to any one container. The registry placement bookkeeping is
+ *          repaired through attachItem; the key (the QAction objectName) never
+ *          moves — records already written against it stay valid.
  * \endif
  *
  * \if CHINESE
  * @brief 为命令模板创建宿主
  * @details 新按钮的 QObject 父级是本定制器，而不是它落进去的面板。这是有意为之：
  *          落地的命令可以被撤销摘下、被重做重新挂上，还可以在面板之间以及快速
- *          访问栏之间移动，因此其生命周期不能绑死在任何一个容器上。注册表条目
- *          通过 bindItem 修补，key 保持稳定——已针对该 key 写下的记录继续有效。
+ *          访问栏之间移动，因此其生命周期不能绑死在任何一个容器上。注册表的放置
+ *          簿记经 attachItem 修补；key（QAction 的 objectName）永不移动——已针对
+ *          该 key 写下的记录继续有效。
  * \endif
  */
 RibbonToolButton* RibbonCustomizer::materialize(const QString& key)
 {
     const RibbonActionDescriptor d = mRegistry ? mRegistry->descriptor(key) : RibbonActionDescriptor();
-    if (!d.isValid() || d.item) {
+    if (!d.isValid() || d.hasItem()) {
         return nullptr;
     }
+    // plan-06 S2: the template's QAction IS the command — the created button
+    // binds to it, so text/icon/tooltip/checked/enabled derive and stay in
+    // sync for free (the 2.x snapshot lost the menu/popup/toolTip data on
+    // materialize; that loss is structurally impossible now)
     RibbonToolButton* btn = new RibbonToolButton();
     btn->setParent(this);
-    btn->setObjectName(key);
-    btn->setText(d.text);
-    btn->setIconSource(d.iconSource);
+    btn->setObjectName(QStringLiteral("button.") + key);
+    btn->setAction(d.action.data());
     btn->setProportion(RibbonEnums::RowProportion(int(d.proportion)));
-    btn->setToolTip(d.text);
-    mRegistry->bindItem(key, btn);
+    mRegistry->attachItem(key, btn);
     return btn;
 }
 

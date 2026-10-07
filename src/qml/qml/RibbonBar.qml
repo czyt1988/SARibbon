@@ -442,7 +442,7 @@ Rectangle {
             id: appMenu
             x: root.appRect.x
             y: root.appRect.y + root.appRect.height
-            menuModel: root.cppHost ? root.cppHost.applicationMenuItems : []
+            menuModel: root.cppHost ? root.cppHost.applicationMenuModel : []
             namePrefix: "appMenu"
             rowHeight: 26
             minRowWidth: 160

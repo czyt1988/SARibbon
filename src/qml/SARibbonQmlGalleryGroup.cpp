@@ -36,6 +36,17 @@ RibbonGalleryItem* RibbonGalleryGroup::itemAt(int index) const
     return (index >= 0 && index < mItems.size()) ? mItems[ index ] : nullptr;
 }
 
+RibbonGalleryItem* RibbonGalleryGroup::addAction(QAction* action)
+{
+    if (nullptr == action) {
+        return nullptr;
+    }
+    auto* item = new RibbonGalleryItem(this);
+    item->setAction(action);
+    appendItem(item);
+    return item;
+}
+
 void RibbonGalleryGroup::appendItem(RibbonGalleryItem* item)
 {
     if (item && !mItems.contains(item)) {

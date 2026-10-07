@@ -5,6 +5,7 @@
 #include <QQmlEngine>
 #include <QQmlComponent>
 #include <QQmlContext>
+#include <QRegularExpression>
 #include <QSignalSpy>
 #include <QCoreApplication>
 #include <QDir>
@@ -16,7 +17,9 @@
 #include <SARibbonQml/SARibbonQmlGlobal.h>
 #include <SARibbonQml/SARibbonQmlTypes.h>
 #include <SARibbonQml/SARibbonQmlAction.h>
+#include <SARibbonQml/SARibbonQmlActionRegistry.h>
 #include <SARibbonQml/SARibbonQmlToolButton.h>
+#include <SARibbonQml/SARibbonQmlGalleryGroup.h>
 #include <SARibbonQml/SARibbonQmlPanel.h>
 #include <SARibbonQml/SARibbonQmlBar.h>
 #include <SARibbonQml/SARibbonQmlShortcutMatcher.h>
@@ -46,6 +49,10 @@ private Q_SLOTS:
     void shortcutTriggersThroughWindow();
     void keyboardSpaceTriggers();
     void ribbonActionQmlRoute();
+    void menuPanelSharedCommand();
+    void menuCheckableFlipOrder();
+    void galleryActionActivation();
+    void registryObjectNameAddressing();
 
 private:
     QQuickView* exposeScene(const QByteArray& qml, int w, int h);
@@ -409,6 +416,164 @@ RibbonBar {
     QSignalSpy spy(save, &QAction::triggered);
     QTest::keyClick(&view, Qt::Key_Space);
     QTRY_COMPARE(spy.count(), 1);
+}
+
+/**
+ * @brief One command shared by a panel button and a menu entry (plan-06 gate 2)
+ * @details A checkable RibbonAction sits in the button's menuActions AND as a
+ *          panel button's bound action. Toggling through the MENU path
+ *          (activateMenuItemPath) flips the same QAction state the panel
+ *          button mirrors; disabling the command kills both views.
+ */
+void TestActionQml::menuPanelSharedCommand()
+{
+    QQuickView view;
+    QQmlEngine engine;
+    saRibbonRegisterQmlTypes(&engine);
+    QQmlComponent component(&engine);
+    component.setData(R"(
+import QtQuick 2.12
+import SARibbon 3.0
+RibbonBar {
+    width: 600
+    height: 90
+    RibbonCategory {
+        title: "Home"
+        RibbonPanel {
+            panelTitle: "Commands"
+            RibbonAction { id: sharedCmd; objectName: "actionShared"; text: "Grid"; checkable: true }
+            RibbonToolButton { action: sharedCmd; proportion: Ribbon.Small }
+            RibbonToolButton {
+                objectName: "menuHost"
+                text: "View"
+                proportion: Ribbon.Small
+                popupMode: Ribbon.InstantPopup
+                menuActions: [ sharedCmd ]
+            }
+        }
+    }
+}
+)",
+                      QUrl());
+    QVERIFY2(!component.isError(), qPrintable(component.errorString()));
+    std::unique_ptr< QObject > root(component.create());
+    QVERIFY(root != nullptr);
+    view.resize(640, 200);
+    view.setContent(QUrl(), &component, root.get());
+    view.show();
+    QTRY_VERIFY(view.isExposed());
+
+    // walk to the two views of the same command
+    SARibbonQml::RibbonToolButton *panelBtn = nullptr, *menuHost = nullptr;
+    QList< QQuickItem* > pending { view.contentItem() };
+    while (!pending.isEmpty()) {
+        QQuickItem* candidate = pending.takeFirst();
+        if (auto* b = qobject_cast< SARibbonQml::RibbonToolButton* >(candidate)) {
+            if (b->objectName() == "menuHost") {
+                menuHost = b;
+            } else {
+                panelBtn = b;
+            }
+        }
+        pending.append(candidate->childItems());
+    }
+    QVERIFY(panelBtn != nullptr);
+    QVERIFY(menuHost != nullptr);
+    QCOMPARE(menuHost->menuActionCount(), 1);
+
+    // activate through the MENU path: the shared QAction flips, the panel
+    // view follows (single state, two placements — contract §6)
+    QAction* act = menuHost->menuActionAt(0);
+    QCOMPARE(act, panelBtn->action());
+    QSignalSpy panelSpy(panelBtn, &SARibbonQml::RibbonToolButton::checkedChanged);
+    QSignalSpy menuSpy(menuHost, &SARibbonQml::RibbonToolButton::menuTriggered);
+    menuHost->activateMenuItem(0);
+    QVERIFY(panelBtn->isChecked());
+    QCOMPARE(panelSpy.count(), 1);
+    QCOMPARE(menuSpy.count(), 1);
+    QCOMPARE(menuSpy.at(0).at(0).value< QAction* >(), act);
+
+    // disabling the command disables both views (command authority)
+    act->setEnabled(false);
+    QTRY_VERIFY(!panelBtn->isEnabled());
+    menuHost->activateMenuItem(0);  // disabled entries are refused
+    QVERIFY(panelBtn->isChecked());  // unchanged
+}
+
+/**
+ * @brief Menu activation ordering: flip before menuTriggered (plan-06 S3)
+ */
+void TestActionQml::menuCheckableFlipOrder()
+{
+    SARibbonQml::RibbonToolButton btn;
+    auto* cmd = new SARibbonQml::RibbonAction(&btn);
+    cmd->setCheckable(true);
+    cmd->setText("Flip");
+    btn.addMenuAction(cmd);
+    QSignalSpy toggleSpy(cmd, &QAction::toggled);
+    QSignalSpy menuSpy(&btn, &SARibbonQml::RibbonToolButton::menuTriggered);
+    btn.activateMenuItem(0);
+    QCOMPARE(toggleSpy.count(), 1);
+    QCOMPARE(menuSpy.count(), 1);
+    QVERIFY(cmd->isChecked());
+    // the sequence: the action flipped first, menuTriggered reported second
+    QCOMPARE(menuSpy.at(0).at(0).value< QAction* >(), qobject_cast< QAction* >(cmd));
+}
+
+/**
+ * @brief Gallery command binding and derivation (plan-06 S4)
+ */
+void TestActionQml::galleryActionActivation()
+{
+    SARibbonQml::RibbonGalleryGroup group;
+    auto* cmd = new SARibbonQml::RibbonAction(&group);
+    cmd->setObjectName("actionGallery");
+    cmd->setText("Cell");
+    auto* item = group.addAction(cmd);
+    QVERIFY(item != nullptr);
+    QCOMPARE(item->action(), qobject_cast< QAction* >(cmd));
+    QCOMPARE(item->text(), QStringLiteral("Cell"));  // derived from the command
+
+    QSignalSpy triggeredSpy(cmd, &QAction::triggered);
+    cmd->trigger();
+    QCOMPARE(triggeredSpy.count(), 1);
+    // live derivation: a command text change reaches the cell
+    cmd->setText("Renamed cell");
+    QCOMPARE(item->text(), QStringLiteral("Renamed cell"));
+}
+
+/**
+ * @brief Registry addressing by objectName (plan-06 S1, contract §5)
+ */
+void TestActionQml::registryObjectNameAddressing()
+{
+    SARibbonQml::RibbonActionRegistry reg;
+    QAction withName;
+    withName.setObjectName("named.command");
+    withName.setText("Named");
+    QVERIFY(reg.registeAction(&withName, 1));
+    QCOMPARE(reg.action("named.command"), &withName);
+    QCOMPARE(reg.key(&withName), QStringLiteral("named.command"));
+    QCOMPARE(reg.descriptor("named.command").text(), QStringLiteral("Named"));
+
+    // no objectName: refused (contract §5 — the identity IS the objectName)
+    QAction anon;
+    QTest::ignoreMessage(QtWarningMsg, QRegularExpression(".*refuses an action without objectName.*"));
+    QVERIFY(!reg.registeAction(&anon, 1));
+
+    // key mismatch: refused
+    QTest::ignoreMessage(QtWarningMsg, QRegularExpression(".*differs from the action objectName.*"));
+    QVERIFY(!reg.registeAction(&withName, 1, "other.key"));
+
+    // a text change is a LIVE read, not a registration snapshot
+    withName.setText("Renamed");
+    QCOMPARE(reg.descriptor("named.command").text(), QStringLiteral("Renamed"));
+
+    // a command template holds its data on a real QAction
+    QVERIFY(reg.registeCommand(2, "template.cmd", "Template Text", QString(), SARibbon::Core::SARibbonRowProportion::Small));
+    QAction* tmpl = reg.action("template.cmd");
+    QVERIFY(tmpl != nullptr);
+    QCOMPARE(tmpl->text(), QStringLiteral("Template Text"));
 }
 
 // custom main: QTEST_MAIN switches to QApplication once QtWidgets is linked

@@ -45,6 +45,10 @@ ApplicationWindow {
         // "app window" panel below.
         RibbonApplicationWindow {
             id: appWindow
+            // plan-06 S5: coverage/animation come from the backend's
+            // QActionGroup state — the same actions the panel buttons bind
+            coverageRatio: backend.currentCoverage
+            animation: backend.currentAnimation
             Column {
                 anchors.fill: parent
                 anchors.margins: 10
@@ -84,23 +88,28 @@ ApplicationWindow {
                 }
             }
         }
-        applicationMenuItems: [
-            RibbonMenuItem { text: qsTr("test 1"); iconSource: "qrc:/icon/icon/action.svg" },
-            RibbonMenuItem { text: qsTr("test 2"); iconSource: "qrc:/icon/icon/action2.svg" },
-            RibbonMenuItem { separator: true },
-            RibbonMenuItem { text: qsTr("Auto save"); checkable: true; checked: true; shortcut: "Ctrl+Shift+S" },
-            RibbonMenuItem { text: qsTr("Save as..."); shortcut: "Ctrl+Shift+P" },
-            RibbonMenuItem {
+        // plan-06 S3: the application menu is a QAction list — RibbonAction
+        // entries carry the identity (objectName) plus the command data;
+        // submenus nest through RibbonAction.menuActions, the shortcut column
+        // shows the REAL key sequence (Ctrl+Shift+S truly fires)
+        applicationMenuActions: [
+            RibbonAction { objectName: "appMenuTest1"; text: qsTr("test 1"); iconSource: "qrc:/icon/icon/action.svg" },
+            RibbonAction { objectName: "appMenuTest2"; text: qsTr("test 2"); iconSource: "qrc:/icon/icon/action2.svg" },
+            RibbonAction { objectName: "appMenuSep1"; separator: true },
+            RibbonAction { objectName: "appMenuAutoSave"; text: qsTr("Auto save"); checkable: true; checked: true; shortcutText: "Ctrl+Shift+S" },
+            RibbonAction { objectName: "appMenuSaveAs"; text: qsTr("Save as..."); shortcutText: "Ctrl+Shift+P" },
+            RibbonAction {
+                objectName: "appMenuRecent"
                 text: qsTr("Recent files")
-                submenu: [
-                    RibbonMenuItem { text: qsTr("demo-1.saribbon"); iconSource: "qrc:/icon/icon/file.svg" },
-                    RibbonMenuItem { text: qsTr("demo-2.saribbon"); iconSource: "qrc:/icon/icon/file.svg" },
-                    RibbonMenuItem { separator: true },
-                    RibbonMenuItem { text: qsTr("Read only"); checkable: true }
+                menuActions: [
+                    RibbonAction { objectName: "appMenuRecent1"; text: qsTr("demo-1.saribbon"); iconSource: "qrc:/icon/icon/file.svg" },
+                    RibbonAction { objectName: "appMenuRecent2"; text: qsTr("demo-2.saribbon"); iconSource: "qrc:/icon/icon/file.svg" },
+                    RibbonAction { objectName: "appMenuRecentSep"; separator: true },
+                    RibbonAction { objectName: "appMenuReadOnly"; text: qsTr("Read only"); checkable: true }
                 ]
             },
-            RibbonMenuItem { separator: true },
-            RibbonMenuItem { text: qsTr("test 3"); iconSource: "qrc:/icon/icon/action3.svg" }
+            RibbonAction { objectName: "appMenuSep2"; separator: true },
+            RibbonAction { objectName: "appMenuTest3"; text: qsTr("test 3"); iconSource: "qrc:/icon/icon/action3.svg" }
         ]
         onApplicationMenuTriggered: function(item) {
             log(qsTr("application menu: %1%2")
@@ -158,14 +167,15 @@ ApplicationWindow {
                 text: qsTr("Presentation File 1")
                 iconSource: "qrc:/icon/icon/file.svg"
                 popupMode: Ribbon.InstantPopup
-                menuItems: [
-                    RibbonMenuItem { text: qsTr("file 1-1"); iconSource: "qrc:/icon/icon/item.svg" },
-                    RibbonMenuItem { text: qsTr("file 1-2"); iconSource: "qrc:/icon/icon/item.svg" },
-                    RibbonMenuItem {
+                menuActions: [
+                    RibbonAction { objectName: "qabFile11"; text: qsTr("file 1-1"); iconSource: "qrc:/icon/icon/item.svg" },
+                    RibbonAction { objectName: "qabFile12"; text: qsTr("file 1-2"); iconSource: "qrc:/icon/icon/item.svg" },
+                    RibbonAction {
+                        objectName: "qabOpenIn"
                         text: qsTr("Open in")
-                        submenu: [
-                            RibbonMenuItem { text: qsTr("New window"); shortcut: "Ctrl+N" },
-                            RibbonMenuItem { text: qsTr("Preview pane"); checkable: true }
+                        menuActions: [
+                            RibbonAction { objectName: "qabNewWindow"; text: qsTr("New window"); shortcutText: "Ctrl+N" },
+                            RibbonAction { objectName: "qabPreviewPane"; text: qsTr("Preview pane"); checkable: true }
                         ]
                     }
                 ]
@@ -390,63 +400,40 @@ ApplicationWindow {
             // app-window presentation knobs: coverage (full / 2/3 / custom)
             // and enter/exit animation (slide from left etc.) — the File
             // button opens the window with whatever is selected here.
-            // RibbonToolButton is a plain QQuickItem host, NOT an
-            // AbstractButton, so Controls' ButtonGroup cannot manage it —
-            // each group is an exclusive set synced imperatively: a click
-            // re-asserts the whole selection (radio semantics, re-clicking
-            // the checked entry keeps it checked), index 0 of each group is
-            // the RibbonApplicationWindow type default and starts selected
+            // plan-06 S5: the buttons bind the backend's QActionGroup
+            // actions — exclusivity is native QActionGroup behavior, the
+            // app window binds the group's checked state, and no QML code
+            // re-asserts any selection (the imperative sync of 2.x is gone)
             RibbonPanel {
                 panelTitle: "app window"
 
                 Repeater {
-                    id: appWinCoverageGroup
-                    model: [
-                        { label: qsTr("Full"), ratio: 1.0 },
-                        { label: qsTr("2/3"), ratio: 2 / 3 },
-                        { label: qsTr("1/2"), ratio: 0.5 }
-                    ]
+                    model: backend.coverageActions
                     RibbonToolButton {
-                        text: modelData.label
+                        action: modelData
                         proportion: Ribbon.Small
-                        checkable: true
-                        checked: index === 0
-                        onClicked: {
-                            appWindow.coverageRatio = modelData.ratio;
-                            for (var i = 0; i < appWinCoverageGroup.count; ++i) {
-                                appWinCoverageGroup.itemAt(i).checked = (i === index);
-                            }
-                            log(qsTr("app window coverage: %1").arg(modelData.label));
-                        }
                     }
                 }
                 RibbonSeparator { }
                 Repeater {
-                    id: appWinAnimGroup
-                    model: [
-                        { label: qsTr("Slide L"), effect: RibbonApplicationWindow.SlideFromLeft },
-                        { label: qsTr("Slide R"), effect: RibbonApplicationWindow.SlideFromRight },
-                        { label: qsTr("Fade"), effect: RibbonApplicationWindow.Fade },
-                        { label: qsTr("None"), effect: RibbonApplicationWindow.NoAnimation }
-                    ]
+                    model: backend.animationActions
                     RibbonToolButton {
-                        text: modelData.label
+                        action: modelData
                         proportion: Ribbon.Small
-                        checkable: true
-                        checked: index === 0
-                        onClicked: {
-                            appWindow.animation = modelData.effect;
-                            for (var i = 0; i < appWinAnimGroup.count; ++i) {
-                                appWinAnimGroup.itemAt(i).checked = (i === index);
-                            }
-                            log(qsTr("app window animation: %1").arg(modelData.label));
-                        }
                     }
                 }
             }
 
             // ---- command layer (plan-05): two declaration routes over the
             // SAME QAction abstraction (contract D1) ----
+            // observation of the backend groups (logging only — the state
+            // itself lives on the QActionGroup, never in QML)
+            Connections {
+                target: backend
+                function onCoverageChanged() { log(qsTr("app window coverage: %1").arg(backend.currentCoverageLabel)) }
+                function onAnimationChanged() { log(qsTr("app window animation: %1").arg(backend.currentAnimationLabel)) }
+            }
+
             RibbonPanel {
                 id: commandsPanel
                 panelTitle: "Commands (action)"
@@ -491,6 +478,44 @@ ApplicationWindow {
                 RibbonToolButton {
                     action: qmlCmd
                     proportion: Ribbon.Small
+                }
+
+                // one command, TWO kinds of placement (plan-06 gate): the same
+                // checkable QAction sits in this panel AND in the "View" menu
+                // below — toggling from either view is a single state change
+                RibbonAction {
+                    id: sharedViewCmd
+                    objectName: "actionShowGrid"
+                    text: qsTr("Show grid")
+                    toolTip: qsTr("Toggle the grid overlay (shared with the View menu)")
+                    checkable: true
+                    iconSource: "qrc:/icon/icon/layout.svg"
+                    onToggled: function(checked) { log(qsTr("show grid: %1 (menu and panel in sync)").arg(checked)) }
+                }
+                RibbonAction {
+                    id: rulerCmd
+                    objectName: "viewRuler"
+                    text: qsTr("Rulers")
+                    checkable: true
+                    iconSource: "qrc:/icon/icon/layout.svg"
+                }
+                RibbonAction {
+                    id: guidesCmd
+                    objectName: "viewGuides"
+                    text: qsTr("Guides")
+                    checkable: true
+                }
+                RibbonToolButton {
+                    action: sharedViewCmd
+                    proportion: Ribbon.Small
+                }
+                RibbonToolButton {
+                    text: qsTr("View")
+                    iconSource: "qrc:/icon/icon/folder-cog.svg"
+                    proportion: Ribbon.Small
+                    popupMode: Ribbon.InstantPopup
+                    // the very same command objects the panel button binds
+                    menuActions: [ sharedViewCmd, rulerCmd, guidesCmd ]
                 }
 
                 // backend-driven insertion (plan-05 S6): the C++ side can
@@ -657,13 +682,13 @@ ApplicationWindow {
                     proportion: Ribbon.Small
                     toolTip: "use MenuButtonPopup mode: the trailing arrow opens the menu, the icon clicks"
                     popupMode: Ribbon.MenuButtonPopup
-                    menuItems: [
-                        RibbonMenuItem { text: "item 1"; iconSource: "qrc:/icon/icon/item.svg" },
-                        RibbonMenuItem { text: "item 2"; iconSource: "qrc:/icon/icon/item.svg" },
-                        RibbonMenuItem { text: "item 3"; iconSource: "qrc:/icon/icon/item.svg" },
-                        RibbonMenuItem { separator: true },
-                        RibbonMenuItem { text: "item 4"; iconSource: "qrc:/icon/icon/item.svg" },
-                        RibbonMenuItem { text: "item 5"; iconSource: "qrc:/icon/icon/item.svg" }
+                    menuActions: [
+                        RibbonAction { objectName: "test1Item1"; text: "item 1"; iconSource: "qrc:/icon/icon/item.svg" },
+                        RibbonAction { objectName: "test1Item2"; text: "item 2"; iconSource: "qrc:/icon/icon/item.svg" },
+                        RibbonAction { objectName: "test1Item3"; text: "item 3"; iconSource: "qrc:/icon/icon/item.svg" },
+                        RibbonAction { objectName: "test1Sep"; separator: true },
+                        RibbonAction { objectName: "test1Item4"; text: "item 4"; iconSource: "qrc:/icon/icon/item.svg" },
+                        RibbonAction { objectName: "test1Item5"; text: "item 5"; iconSource: "qrc:/icon/icon/item.svg" }
                     ]
                     onClicked: log(qsTr("test 1 action zone clicked"))
                     onMenuTriggered: function(item) { log(qsTr("test 1 menu: %1").arg(item.text)) }
@@ -674,11 +699,11 @@ ApplicationWindow {
                     proportion: Ribbon.Small
                     toolTip: "use InstantPopup mode: the whole button opens the menu"
                     popupMode: Ribbon.InstantPopup
-                    menuItems: [
-                        RibbonMenuItem { text: "item 1"; iconSource: "qrc:/icon/icon/item.svg" },
-                        RibbonMenuItem { text: "item 2"; iconSource: "qrc:/icon/icon/item.svg" },
-                        RibbonMenuItem { separator: true },
-                        RibbonMenuItem { text: "item 3"; iconSource: "qrc:/icon/icon/item.svg" }
+                    menuActions: [
+                        RibbonAction { objectName: "menuCmd1"; text: "item 1"; iconSource: "qrc:/icon/icon/item.svg" },
+                        RibbonAction { objectName: "menuCmd2"; text: "item 2"; iconSource: "qrc:/icon/icon/item.svg" },
+                        RibbonAction { objectName: "menuCmd3"; separator: true },
+                        RibbonAction { objectName: "menuCmd4"; text: "item 3"; iconSource: "qrc:/icon/icon/item.svg" }
                     ]
                     onMenuTriggered: function(item) { log(qsTr("test 2 menu: %1").arg(item.text)) }
                 }
@@ -690,10 +715,10 @@ ApplicationWindow {
                     iconSource: "qrc:/icon/icon/folder-cog.svg"
                     proportion: Ribbon.Large
                     popupMode: Ribbon.DelayedPopup
-                    menuItems: [
-                        RibbonMenuItem { text: "item 1"; iconSource: "qrc:/icon/icon/item.svg" },
-                        RibbonMenuItem { text: "item 2"; iconSource: "qrc:/icon/icon/item.svg" },
-                        RibbonMenuItem { text: "item 3"; iconSource: "qrc:/icon/icon/item.svg" }
+                    menuActions: [
+                        RibbonAction { objectName: "menuCmd5"; text: "item 1"; iconSource: "qrc:/icon/icon/item.svg" },
+                        RibbonAction { objectName: "menuCmd6"; text: "item 2"; iconSource: "qrc:/icon/icon/item.svg" },
+                        RibbonAction { objectName: "menuCmd7"; text: "item 3"; iconSource: "qrc:/icon/icon/item.svg" }
                     ]
                     onClicked: log(qsTr("Delayed Popup clicked (press and hold opens the menu)"))
                     onMenuTriggered: function(item) { log(qsTr("Delayed Popup menu: %1").arg(item.text)) }
@@ -703,9 +728,9 @@ ApplicationWindow {
                     iconSource: "qrc:/icon/icon/folder-star.svg"
                     proportion: Ribbon.Large
                     popupMode: Ribbon.MenuButtonPopup
-                    menuItems: [
-                        RibbonMenuItem { text: "item 1"; iconSource: "qrc:/icon/icon/item.svg" },
-                        RibbonMenuItem { text: "item 2"; iconSource: "qrc:/icon/icon/item.svg" }
+                    menuActions: [
+                        RibbonAction { objectName: "menuCmd8"; text: "item 1"; iconSource: "qrc:/icon/icon/item.svg" },
+                        RibbonAction { objectName: "menuCmd9"; text: "item 2"; iconSource: "qrc:/icon/icon/item.svg" }
                     ]
                     onClicked: log(qsTr("Menu Button Popup action zone clicked"))
                     onMenuTriggered: function(item) { log(qsTr("Menu Button Popup menu: %1").arg(item.text)) }
@@ -715,9 +740,9 @@ ApplicationWindow {
                     iconSource: "qrc:/icon/icon/folder-stats.svg"
                     proportion: Ribbon.Large
                     popupMode: Ribbon.InstantPopup
-                    menuItems: [
-                        RibbonMenuItem { text: "item 1"; iconSource: "qrc:/icon/icon/item.svg" },
-                        RibbonMenuItem { text: "item 2"; iconSource: "qrc:/icon/icon/item.svg" }
+                    menuActions: [
+                        RibbonAction { objectName: "menuCmd10"; text: "item 1"; iconSource: "qrc:/icon/icon/item.svg" },
+                        RibbonAction { objectName: "menuCmd11"; text: "item 2"; iconSource: "qrc:/icon/icon/item.svg" }
                     ]
                     onMenuTriggered: function(item) { log(qsTr("Instant Popup menu: %1").arg(item.text)) }
                 }
@@ -727,9 +752,9 @@ ApplicationWindow {
                     proportion: Ribbon.Large
                     checkable: true
                     popupMode: Ribbon.DelayedPopup
-                    menuItems: [
-                        RibbonMenuItem { text: "item 1"; iconSource: "qrc:/icon/icon/item.svg" },
-                        RibbonMenuItem { text: "item 2"; iconSource: "qrc:/icon/icon/item.svg" }
+                    menuActions: [
+                        RibbonAction { objectName: "menuCmd12"; text: "item 1"; iconSource: "qrc:/icon/icon/item.svg" },
+                        RibbonAction { objectName: "menuCmd13"; text: "item 2"; iconSource: "qrc:/icon/icon/item.svg" }
                     ]
                     onClicked: log(qsTr("Delayed Popup checkable toggled: %1").arg(checked))
                     onMenuTriggered: function(item) { log(qsTr("Delayed Popup checkable menu: %1").arg(item.text)) }
@@ -740,9 +765,9 @@ ApplicationWindow {
                     proportion: Ribbon.Large
                     checkable: true
                     popupMode: Ribbon.MenuButtonPopup
-                    menuItems: [
-                        RibbonMenuItem { text: "item 1"; iconSource: "qrc:/icon/icon/item.svg" },
-                        RibbonMenuItem { text: "item 2"; iconSource: "qrc:/icon/icon/item.svg" }
+                    menuActions: [
+                        RibbonAction { objectName: "menuCmd14"; text: "item 1"; iconSource: "qrc:/icon/icon/item.svg" },
+                        RibbonAction { objectName: "menuCmd15"; text: "item 2"; iconSource: "qrc:/icon/icon/item.svg" }
                     ]
                     onClicked: log(qsTr("Menu Button Popup checkable toggled: %1").arg(checked))
                     onMenuTriggered: function(item) { log(qsTr("Menu Button Popup checkable menu: %1").arg(item.text)) }
@@ -965,6 +990,19 @@ ApplicationWindow {
                         RibbonGalleryItem { text: "File Settings"; iconSource: "qrc:/icon/icon/gallery/File-Settings.svg" }
                         RibbonGalleryItem { text: "Presentation File"; iconSource: "qrc:/icon/icon/gallery/Presentation-File.svg" }
                     }
+                    // command-driven group (plan-06 S4, widgets addActionItem
+                    // parity): the cells bind RibbonActions, activation
+                    // triggers the command; pure-declarative cells above stay
+                    // first-class (two-level semantics)
+                    RibbonGalleryGroup {
+                        id: galleryCmdGroup
+                        groupTitle: "Commands"
+                        Component.onCompleted: {
+                            galleryCmdGroup.addAction(sharedViewCmd)
+                            galleryCmdGroup.addAction(backend.actionUndo)
+                            galleryCmdGroup.addAction(backend.actionRedo)
+                        }
+                    }
                     RibbonGalleryGroup {
                         groupTitle: "Apps"
                         RibbonGalleryItem { text: "Photoshop"; iconSource: "qrc:/icon/icon/gallery/Photoshop.svg" }
@@ -1173,9 +1211,9 @@ ApplicationWindow {
                         iconSource: "qrc:/icon/icon/folder-stats.svg"
                         proportion: Ribbon.Large
                         popupMode: Ribbon.InstantPopup
-                        menuItems: [
-                            RibbonMenuItem { text: "ctx item 1"; iconSource: "qrc:/icon/icon/item.svg" },
-                            RibbonMenuItem { text: "ctx item 2"; iconSource: "qrc:/icon/icon/item.svg" }
+                        menuActions: [
+                            RibbonAction { objectName: "menuCmd16"; text: "ctx item 1"; iconSource: "qrc:/icon/icon/item.svg" },
+                            RibbonAction { objectName: "menuCmd17"; text: "ctx item 2"; iconSource: "qrc:/icon/icon/item.svg" }
                         ]
                         onMenuTriggered: function(item) { log(qsTr("context menu: %1").arg(item.text)) }
                     }
@@ -1184,8 +1222,8 @@ ApplicationWindow {
                         iconSource: "qrc:/icon/icon/folder-star.svg"
                         proportion: Ribbon.Large
                         popupMode: Ribbon.MenuButtonPopup
-                        menuItems: [
-                            RibbonMenuItem { text: "ctx item 1"; iconSource: "qrc:/icon/icon/item.svg" }
+                        menuActions: [
+                            RibbonAction { objectName: "menuCmd18"; text: "ctx item 1"; iconSource: "qrc:/icon/icon/item.svg" }
                         ]
                         onMenuTriggered: function(item) { log(qsTr("context menu: %1").arg(item.text)) }
                     }

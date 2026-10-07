@@ -46,19 +46,19 @@ cmake --build build
 
 ## 与 widgets 版的已知差异
 
-- **定制对话框按稳定字符串 key 寻址**：widgets 版靠 `QAction*` 指针 + `objectName`，
-  QML 版没有 action 桥（plan-04 D8 延后项），改用 `RibbonActionRegistry` 生成的
-  key 加宿主树查询 API。记录层与 XML 格式两端共用 core 实现，故 widgets 写出的
-  配置文件 QML 能直接加载并 apply，反之亦然。快速访问栏的用户勾选定制仍缺。
+- **定制对话框按 QAction 寻址**：与 widgets 相同的 QAction 命令模型（架构契约
+  D1）——注册表 key = action 的 objectName，两前端互认。记录层与 XML 格式两端
+  共用 core 实现，故 widgets 写出的配置文件 QML 能直接加载并 apply，反之亦然。
 - **无边框窗口**：示例使用普通 ApplicationWindow（QML 无边框为独立主题）。
-- **菜单内嵌任意控件**（`SARibbonMenu::addWidget`）：QML 版菜单只渲染 RibbonMenuItem 行。
+- **菜单内嵌任意控件**（`SARibbonMenu::addWidget`）：QML 版菜单只渲染 QAction 行
+  （命令与菜单共享同一 QAction，勾选/禁用/文本单点同步）。
 - **颜色菜单不含取色对话框**：`RibbonColorMenu` 的"自定义颜色"行只发
   `customColorRequested()`，由示例接一个色块弹窗（`customColorPicker`）回灌
   `addCustomColor()`。QColorDialog 属于 widgets/QtQuick Dialogs，不进本模块。
   菜单内部的三张色块网格逐像素对齐 widgets，外框（Popup + Column）是 QML 原生的，
   与 QMenu 的尺寸协商结果不同。
-- **菜单项 shortcut 仅为展示文本**：右对齐绘制在行尾，真正的按键绑定依赖
-  QAction 抽象桥（plan-04 D8 延后项），故不会响应键盘。
+- **菜单项 shortcut 是真实快捷键**：显示文本与触发同源自 `QAction::shortcut`
+  （bar 级匹配器，架构契约 D8-1），Ctrl+S/Ctrl+L 在本示例真实生效。
 - 面板 optionAction 已恢复完整（引擎预留 + 对角按钮渲染 + 触发信号，
   Debug/Release 双验证；早期 Qt 6.7.3 Debug 绑定形状问题见 NOTES B48）。
 

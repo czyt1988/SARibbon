@@ -1,9 +1,57 @@
 #include "SARibbonQmlGalleryItem.h"
+#include "SARibbonQmlAction.h"
+#include "SARibbonQmlIconProvider.h"
 
 namespace SARibbonQml {
 
 RibbonGalleryItem::RibbonGalleryItem(QObject* parent) : QObject(parent)
 {
+}
+
+QAction* RibbonGalleryItem::action() const
+{
+    return mAction;
+}
+
+void RibbonGalleryItem::setAction(QAction* act)
+{
+    if (mAction == act) {
+        return;
+    }
+    if (mAction) {
+        QObject::disconnect(mAction, &QAction::changed, this, &RibbonGalleryItem::onActionChanged);
+    }
+    mAction = act;
+    if (mAction) {
+        QObject::connect(mAction, &QAction::changed, this, &RibbonGalleryItem::onActionChanged);
+        onActionChanged();
+    }
+    Q_EMIT actionChanged();
+}
+
+void RibbonGalleryItem::onActionChanged()
+{
+    if (!mAction) {
+        return;
+    }
+    if (mText != mAction->text()) {
+        mText = mAction->text();
+        Q_EMIT textChanged();
+    }
+    QString icon;
+    if (auto* ribbonAction = qobject_cast< RibbonAction* >(mAction)) {
+        icon = ribbonAction->iconSource().toString();
+    } else if (!mAction->icon().isNull()) {
+        icon = SAIconImageProvider::iconUrl(mAction).toString();
+    }
+    if (mIconSource != icon) {
+        mIconSource = icon;
+        Q_EMIT iconSourceChanged();
+    }
+    if (mEnabled != mAction->isEnabled()) {
+        mEnabled = mAction->isEnabled();
+        Q_EMIT enabledChanged();
+    }
 }
 
 QString RibbonGalleryItem::text() const
@@ -18,6 +66,9 @@ void RibbonGalleryItem::setText(const QString& t)
     }
     mText = t;
     Q_EMIT textChanged();
+    if (mAction) {
+        mAction->setText(t);  // write-through: the action is the authority
+    }
 }
 
 QString RibbonGalleryItem::iconSource() const

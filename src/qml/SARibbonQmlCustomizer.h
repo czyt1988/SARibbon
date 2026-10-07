@@ -172,7 +172,8 @@ private:
     static Record reverseRecord(const Record& r);
     // Resolve the live host item behind a key, materializing a template if needed
     RibbonLayoutItemHost* resolveItem(const QString& key);
-    // Create a host for a command template and bind it back into the registry
+    // Create an action-bound host for a command template (plan-06 S2: the
+    // QAction is the command; the button derives everything from it)
     RibbonToolButton* materialize(const QString& key);
     // Locate a category / panel by objectName (nullptr with a diagnostic)
     RibbonCategory* findCategory(const QString& objName, QString* reason) const;

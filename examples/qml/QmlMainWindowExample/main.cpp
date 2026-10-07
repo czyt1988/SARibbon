@@ -1,6 +1,8 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
+#include <QQmlError>
+#include <cstdio>
 #include <QQuickStyle>
 #include <QFont>
 #include <SARibbonQml/SARibbonQmlGlobal.h>
@@ -17,6 +19,13 @@ int main(int argc, char* argv[])
 #endif
 
     QGuiApplication app(argc, argv);
+    // a GUI-subsystem app has no stderr by default; route Qt messages there
+    // so a failed QML load is diagnosable under headless verification
+    qInstallMessageHandler([](QtMsgType, const QMessageLogContext&, const QString& msg) {
+        std::fputs(qPrintable(msg), stderr);
+        std::fputc('\n', stderr);
+        std::fflush(stderr);
+    });
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
     QQuickStyle::setStyle(QStringLiteral("Default"));
 #else
@@ -35,6 +44,16 @@ int main(int argc, char* argv[])
     // bound by the QML views through their `action` properties
     RibbonBackend backend;
     engine.rootContext()->setContextProperty(QStringLiteral("backend"), &backend);
+    // surface QML load diagnostics: a silent -1 exit helps nobody (headless
+    // verification reads stderr through redirections)
+    QObject::connect(&engine, &QQmlApplicationEngine::warnings, &engine,
+                     [](const QList< QQmlError >& warnings) {
+                         for (const QQmlError& w : warnings) {
+                             std::fputs(qPrintable(w.toString()), stderr);
+                             std::fputc('\n', stderr);
+                         }
+                         std::fflush(stderr);
+                     });
     engine.load(QUrl(QStringLiteral("qrc:///main.qml")));
     if (engine.rootObjects().isEmpty()) {
         return -1;

@@ -107,3 +107,33 @@ saRibbonRegisterQmlTypes(&engine);
 ```
 
 注意：单例注册使用回调式 API，多引擎场景安全；详见 QML 开发文档。
+
+## QAction 命令层（widgets ↔ QML 迁移故事）
+
+3.0 的两个前端共享**同一命令模型**：QAction 是唯一命令抽象（架构契约 D1）。
+widgets 应用转 QML：**后端 QAction 创建/连接/快捷键/状态管理代码零改动**，QML 只写
+视图声明：
+
+```cpp
+// C++ 后端（widgets 版与 QML 版完全一致）
+mActionSave = new QAction(QIcon(":/save.svg"), tr("Save"), this);
+mActionSave->setShortcut(QKeySequence("Ctrl+S"));
+mActionSave->setCheckable(true);
+```
+
+```qml
+// QML 视图——命令以 action 属性绑定，放置参数在按钮实例上
+RibbonPanel {
+    panelTitle: qsTr("Main")
+    RibbonToolButton { action: backend.actionSave; proportion: Ribbon.Large }
+}
+```
+
+反向（QML → widgets）同理：`RibbonAction`（QAction 派生）持有的命令可经
+`QAction::icon/text/triggered` 直接喂给 widgets 面板。同一 QAction 可出现在面板、
+快速访问栏、菜单与画廊的任意多个位置，每处一个独立视图，状态天然同步；
+`QAction::shortcut` 经 bar 级匹配器真实触发（与 QML `Shortcut` 类型不双触发）。
+定制体系按 action 的 `objectName` 寻址，两前端的 customize XML 互认。
+
+纯声明按钮（无 action）保持一等公民语义（对应 widgets `addWidget`），
+菜单为 QAction 列表（`menuActions`），2.x 的 `RibbonMenuItem` 类型已移除。

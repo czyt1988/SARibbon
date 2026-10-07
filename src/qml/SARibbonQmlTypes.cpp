@@ -6,7 +6,6 @@
 #include "SARibbonQmlMetrics.h"
 #include "SARibbonQmlQuickHost.h"
 #include "SARibbonQmlLayoutItemHost.h"
-#include "SARibbonQmlMenuItem.h"
 #include "SARibbonQmlPanel.h"
 #include "SARibbonQmlToolButton.h"
 #include "SARibbonQmlControlContainer.h"
@@ -189,7 +188,6 @@ void saRibbonRegisterQmlTypes(QQmlEngine* engine)
                     "SARibbon", 3, 0, "RibbonSpinBox");
     qmlRegisterType(QUrl(QStringLiteral("qrc:/SARibbon/RibbonTextField.qml")),
                     "SARibbon", 3, 0, "RibbonTextField");
-    qmlRegisterType< SARibbonQml::RibbonMenuItem >("SARibbon", 3, 0, "RibbonMenuItem");
     qmlRegisterType< SARibbonQml::RibbonContextCategory >("SARibbon", 3, 0, "RibbonContextCategory");
     qmlRegisterType< SARibbonQml::RibbonGallery >("SARibbon", 3, 0, "RibbonGallery");
     qmlRegisterType< SARibbonQml::RibbonGalleryGroup >("SARibbon", 3, 0, "RibbonGalleryGroup");

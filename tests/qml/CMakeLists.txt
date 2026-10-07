@@ -45,6 +45,10 @@ if(TARGET SARibbonQml)
         Qt${QT_VERSION_MAJOR}::Qml
         Qt${QT_VERSION_MAJOR}::Quick
     )
+    # Qt5 lane: QAction lives in QtWidgets; the conformance test drives it directly
+    if(QT_VERSION_MAJOR EQUAL 5)
+        target_link_libraries(qml_Conformance PRIVATE Qt5::Widgets)
+    endif()
     set_target_properties(qml_Conformance PROPERTIES AUTOMOC ON)
     if(NOT SARIBBON_BUILD_STATIC_LIBS)
         # Co-locate the test executable with the SARibbon runtime libraries

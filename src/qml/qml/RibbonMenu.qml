@@ -5,7 +5,7 @@ import SARibbon 3.0
 // Shared ribbon popup menu leaf. Extracted from RibbonToolButton.qml so the
 // button popup, the bar application menu and every nested submenu render the
 // same way — the widgets front end gets that for free from SARibbonMenu/QMenu.
-// Rendering only: the owning host publishes the RibbonMenuItem list, this file
+// Rendering only: the owning host publishes the derived menu row maps, this file
 // publishes back an index path per activation and the host resolves it
 // (activateMenuItemPath / activateApplicationMenuItemPath). Submenus nest by
 // instantiating this very type at runtime, which is the QML counterpart of the
@@ -14,7 +14,7 @@ import SARibbon 3.0
 Popup {
     id: menuRoot
 
-    // RibbonMenuItem list published by the owning host (QQmlListProperty)
+    // row maps derived from the QAction list of the owning host (live)
     property var menuModel: []
     // objectName stem: rows come out as "<prefix>Row" / "<prefix>Separator".
     // Repeater delegates carry no QObject parent, so tests walk the visual tree

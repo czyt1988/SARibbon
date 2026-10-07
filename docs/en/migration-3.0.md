@@ -119,5 +119,38 @@ renders. Applications call once before `engine.load()`:
 saRibbonRegisterQmlTypes(&engine);
 ```
 
-Note: singleton registration uses the callback-form API and is safe with
-multiple engines; see the QML development docs.
+## The QAction command layer (widgets <-> QML migration story)
+
+Both front ends of 3.0 share **one command model**: QAction is the only
+command abstraction (architecture contract D1). A widgets application moving
+to QML keeps its backend QAction creation / connection / shortcut / state
+code **unchanged** and writes only view declarations in QML:
+
+```cpp
+// C++ backend — identical for the widgets and the QML front end
+mActionSave = new QAction(QIcon(":/save.svg"), tr("Save"), this);
+mActionSave->setShortcut(QKeySequence("Ctrl+S"));
+mActionSave->setCheckable(true);
+```
+
+```qml
+// QML view — commands bind through the action property, placement stays
+// on the button instance
+RibbonPanel {
+    panelTitle: qsTr("Main")
+    RibbonToolButton { action: backend.actionSave; proportion: Ribbon.Large }
+}
+```
+
+The reverse (QML -> widgets) works the same way: a `RibbonAction` (a QAction
+subclass) feeds a widgets panel directly through `QAction::icon/text/triggered`.
+The same QAction may sit in a panel, the quick access bar, a menu and a
+gallery at once — one independent view per placement, state synced for free;
+`QAction::shortcut` really fires through the bar-level matcher (no double
+triggering with the QML `Shortcut` type). The customize system addresses
+commands by the action's `objectName`; the customize XML of one front end
+loads in the other.
+
+Plain-declarative buttons (no action) keep first-class semantics (the
+widgets `addWidget` parity). Menus are QAction lists (`menuActions`); the
+2.x `RibbonMenuItem` type is gone.

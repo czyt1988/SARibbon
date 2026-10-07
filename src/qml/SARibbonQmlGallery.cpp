@@ -328,6 +328,12 @@ void RibbonGallery::activateItem(int index)
     // a click moves the current mark first (refused for non-selectable entries,
     // which still activate — widgets QAbstractItemView::clicked parity)
     setCurrentItemIndex(index);
+    // plan-06 S4: a command-bound cell triggers its QAction (widgets
+    // addActionItem parity — the triggered signal stays for pure-declarative
+    // entries and general observation, contract D6 two levels)
+    if (QAction* act = item->action()) {
+        act->trigger();
+    }
     Q_EMIT triggered(item, index);
 }
 

@@ -14,7 +14,7 @@ import SARibbon 3.0
 // content-hover-bg, pressed/checked content-pressed-bg (checked adds a 1px
 // text-color border). A disabled host greys the content (opacity) and both
 // zones swallow input. The popup itself is the shared RibbonMenu leaf: it
-// renders RibbonMenuItem rows (check marks, shortcuts, nested submenus) and
+// renders the derived menu rows (check marks, real shortcut captions, nested
 // publishes an index path per activation, which this leaf forwards to the
 // host's activateMenuItemPath invokable (logic stays in the C++ host,
 // rendering in RibbonMenu.qml).
@@ -297,7 +297,7 @@ Rectangle {
         id: popupMenu
         x: 0
         y: root.height
-        menuModel: root.cppHost ? root.cppHost.menuItems : []
+        menuModel: root.cppHost ? root.cppHost.menuModel : []
         namePrefix: "menu"
         rowHeight: 24
         minRowWidth: 140

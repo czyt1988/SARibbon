@@ -4,15 +4,16 @@
 #include "SARibbonQmlQuickHost.h"
 #include "SARibbonQmlTypes.h"
 // the single QAction include face of the module (contract D5, plan-05 S1);
-// full type: the shortcut collection API carries QAction*
+// full type: the shortcut collection API carries QAction*; RibbonAction is
+// the applicationMenuActions QQmlListProperty template parameter
 #include "SARibbonQmlActionCompat.h"
-// full definitions, not forward declarations: RibbonCategory*/RibbonMenuItem*
-// appear in Q_INVOKABLE signatures and the applicationMenuTriggered signal, so
+#include "SARibbonQmlAction.h"
+// full definitions, not forward declarations: the pointer types below appear
+// in Q_PROPERTY / signal signatures, so
 // the moc output instantiates QMetaType::fromType and silently loses the
 // QObject specialization if the types are incomplete where that moc file
 // happens to be compiled (NOTES B64)
 #include "SARibbonQmlCategory.h"
-#include "SARibbonQmlMenuItem.h"
 // full definition: the windowAgent Q_PROPERTY needs the type complete in
 // every TU including this header (moc pointer metatype, same B64 family)
 #include "SARibbonQmlWindowAgent.h"
@@ -31,7 +32,7 @@ class RibbonTab;
 class RibbonContextCategory;
 class RibbonQuickAccessBar;
 class RibbonButtonGroup;
-class RibbonMenuItem;
+class RibbonMenuModel;
 class RibbonApplicationWindow;
 class RibbonWindowAgent;
 class RibbonShortcutMatcher;
@@ -76,8 +77,9 @@ class SA_RIBBON_QML_EXPORT RibbonBar : public RibbonQuickHost
     Q_PROPERTY(QRectF applicationButtonRect READ applicationButtonRect NOTIFY layoutChanged)
     Q_PROPERTY(QVariantList contextBands READ contextBands NOTIFY layoutChanged)
     Q_PROPERTY(int minimumWidth READ minimumWidth NOTIFY minimumWidthChanged)
-    Q_PROPERTY(QQmlListProperty< SARibbonQml::RibbonMenuItem > applicationMenuItems READ applicationMenuItems NOTIFY applicationMenuItemsChanged)
-    Q_PROPERTY(bool hasApplicationMenu READ hasApplicationMenu NOTIFY applicationMenuItemsChanged)
+    Q_PROPERTY(QQmlListProperty< SARibbonQml::RibbonAction > applicationMenuActions READ applicationMenuActions NOTIFY applicationMenuActionsChanged)
+    Q_PROPERTY(QVariantList applicationMenuModel READ applicationMenuModel NOTIFY applicationMenuModelChanged)
+    Q_PROPERTY(bool hasApplicationMenu READ hasApplicationMenu NOTIFY applicationMenuModelChanged)
     Q_PROPERTY(QQuickItem* applicationWindowItem READ applicationWindowItem NOTIFY applicationWindowChanged)
     Q_PROPERTY(bool hasApplicationWindow READ hasApplicationWindow NOTIFY applicationWindowChanged)
     Q_PROPERTY(QString windowTitle READ windowTitle WRITE setWindowTitle NOTIFY windowTitleChanged)
@@ -236,9 +238,16 @@ public:
     // Application button menu (widgets menu-mode app button): when the list
     // is non-empty the app button click opens it; activation is mediated by
     // applicationMenuTriggered (tests drive it without a windowed popup)
-    QQmlListProperty< SARibbonQml::RibbonMenuItem > applicationMenuItems();
-    int applicationMenuItemCount() const;
-    SARibbonQml::RibbonMenuItem* applicationMenuItemAt(int index) const;
+    // Application menu entries as QAction objects (plan-06 S3, contract §5:
+    // submenus via RibbonAction.menuActions, bare QAction entries flat-only).
+    // Object literals, id references and C++ appends all land here; the leaf
+    // renders the derived applicationMenuModel rows
+    QQmlListProperty< SARibbonQml::RibbonAction > applicationMenuActions();
+    int applicationMenuActionCount() const;
+    QAction* applicationMenuActionAt(int index) const;
+    // C++ append of any QAction (bare ones included)
+    void addApplicationMenuAction(QAction* action);
+    QVariantList applicationMenuModel() const;
     bool hasApplicationMenu() const;
     Q_INVOKABLE void activateApplicationMenuItem(int index);
     Q_INVOKABLE void activateApplicationMenuItemPath(const QVariantList& indexPath);
@@ -263,8 +272,9 @@ Q_SIGNALS:
     void layoutChanged();
     void minimumWidthChanged();
     void applicationButtonClicked();
-    void applicationMenuItemsChanged();
-    void applicationMenuTriggered(SARibbonQml::RibbonMenuItem* item);
+    void applicationMenuActionsChanged();
+    void applicationMenuModelChanged();
+    void applicationMenuTriggered(QAction* item);
     void applicationWindowChanged();
     void windowTitleChanged();
     void framelessActiveChanged();
@@ -305,10 +315,6 @@ private:
 #else
     using ListIndex = int;
 #endif
-    static void appendAppMenuItemCb(QQmlListProperty< SARibbonQml::RibbonMenuItem >* prop, SARibbonQml::RibbonMenuItem* item);
-    static ListIndex appMenuItemCountCb(QQmlListProperty< SARibbonQml::RibbonMenuItem >* prop);
-    static SARibbonQml::RibbonMenuItem* appMenuItemAtCb(QQmlListProperty< SARibbonQml::RibbonMenuItem >* prop, ListIndex index);
-    static void clearAppMenuItemsCb(QQmlListProperty< SARibbonQml::RibbonMenuItem >* prop);
     int effectiveTabCount() const;
     QVector< RibbonTab* > effectiveTabs() const;
     QVector< RibbonCategory* > effectiveCategories() const;
@@ -337,7 +343,13 @@ private:
     RibbonWindowAgent* mWindowAgent = nullptr;  ///< declared frameless agent (single)
     RibbonShortcutMatcher* mShortcutMatcher = nullptr;  ///< plan-05 S5: QAction shortcut real triggering
     QString mWindowTitle;  ///< mirrored window title for the leaf
-    QVector< RibbonMenuItem* > mAppMenuItems;
+    RibbonMenuModel* mAppMenuModel = nullptr;  ///< plan-06 S3: QAction application menu derivation
+    QVector< QAction* > mAppMenuActions;
+    void syncAppMenuModel();
+    static void appendAppMenuActionCb(QQmlListProperty< SARibbonQml::RibbonAction >* prop, SARibbonQml::RibbonAction* action);
+    static ListIndex appMenuActionCountCb(QQmlListProperty< SARibbonQml::RibbonAction >* prop);
+    static SARibbonQml::RibbonAction* appMenuActionAtCb(QQmlListProperty< SARibbonQml::RibbonAction >* prop, ListIndex index);
+    static void clearAppMenuActionsCb(QQmlListProperty< SARibbonQml::RibbonAction >* prop);
     QVariantList mBands;
     QRect mTitleRect;
     QRectF mApplicationButtonRect;

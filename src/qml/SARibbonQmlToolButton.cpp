@@ -2,7 +2,6 @@
 #include "SARibbonQmlAction.h"
 #include "SARibbonQmlBar.h"
 #include "SARibbonQmlIconProvider.h"
-#include "SARibbonQmlMenuItem.h"
 #include "SARibbonQmlPanel.h"
 #include "SARibbonQmlMetrics.h"
 #include "SARibbonQmlTheme.h"
@@ -31,6 +30,14 @@ RibbonToolButton::RibbonToolButton(QQuickItem* parent) : RibbonLayoutItemHost(pa
         updateLayout();
         polish();
     });
+    mMenuModel = new RibbonMenuModel(this);
+    connect(mMenuModel, &RibbonMenuModel::rowsChanged, this, [this]() {
+        Q_EMIT menuModelChanged();
+        updateSizeHint();
+        updateLayout();
+    });
+    // a menu action list change (QAction::changed anywhere in the tree) also
+    // refreshes hasMenu — handled through rowsChanged above
     updateSizeHint();
 }
 
@@ -167,6 +174,15 @@ RibbonBar* RibbonToolButton::findOwningBar() const
         }
     }
     return nullptr;
+}
+
+void RibbonToolButton::syncMenuModel()
+{
+    QVariantList list;
+    for (QAction* a : mMenuActions) {
+        list.append(QVariant::fromValue(a));
+    }
+    mMenuModel->setActions(list);
 }
 
 void RibbonToolButton::syncShortcutCollection()
@@ -599,20 +615,67 @@ void RibbonToolButton::setPopupMode(RibbonEnums::PopupMode mode)
     updateLayout();
 }
 
-QQmlListProperty< RibbonMenuItem > RibbonToolButton::menuItems()
+QQmlListProperty< RibbonAction > RibbonToolButton::menuActions()
 {
-    return QQmlListProperty< RibbonMenuItem >(this, this, &RibbonToolButton::appendMenuItem, &RibbonToolButton::menuItemCountCb,
-                                              &RibbonToolButton::menuItemAtCb, &RibbonToolButton::clearMenuItems);
+    return QQmlListProperty< RibbonAction >(this, this, &RibbonToolButton::appendMenuActionCb,
+                                            &RibbonToolButton::menuActionCountCb, &RibbonToolButton::menuActionAtCb,
+                                            &RibbonToolButton::clearMenuActionsCb);
 }
 
-int RibbonToolButton::menuItemCount() const
+int RibbonToolButton::menuActionCount() const
 {
-    return mMenuItems.size();
+    return mMenuActions.size();
 }
 
-RibbonMenuItem* RibbonToolButton::menuItemAt(int index) const
+QAction* RibbonToolButton::menuActionAt(int index) const
 {
-    return (index >= 0 && index < mMenuItems.size()) ? mMenuItems[ index ] : nullptr;
+    return (index >= 0 && index < mMenuActions.size()) ? mMenuActions[ index ] : nullptr;
+}
+
+void RibbonToolButton::addMenuAction(QAction* action)
+{
+    if (action && !mMenuActions.contains(action)) {
+        mMenuActions.append(action);
+        syncMenuModel();
+        Q_EMIT menuActionsChanged();
+    }
+}
+
+QVariantList RibbonToolButton::menuModel() const
+{
+    return mMenuModel->rows();
+}
+
+void RibbonToolButton::appendMenuActionCb(QQmlListProperty< RibbonAction >* prop, RibbonAction* action)
+{
+    auto* self = static_cast< RibbonToolButton* >(prop->data);
+    if (self && action) {
+        self->addMenuAction(action);
+    }
+}
+
+RibbonToolButton::ListIndex RibbonToolButton::menuActionCountCb(QQmlListProperty< RibbonAction >* prop)
+{
+    auto* self = static_cast< RibbonToolButton* >(prop->data);
+    return self ? self->mMenuActions.size() : ListIndex(0);
+}
+
+RibbonAction* RibbonToolButton::menuActionAtCb(QQmlListProperty< RibbonAction >* prop, ListIndex index)
+{
+    // AtFunction must return the element type; a C++-appended bare QAction
+    // stays reachable through menuActionAt, not through the QML view
+    auto* self = static_cast< RibbonToolButton* >(prop->data);
+    return self ? qobject_cast< RibbonAction* >(self->menuActionAt(int(index))) : nullptr;
+}
+
+void RibbonToolButton::clearMenuActionsCb(QQmlListProperty< RibbonAction >* prop)
+{
+    auto* self = static_cast< RibbonToolButton* >(prop->data);
+    if (self && !self->mMenuActions.isEmpty()) {
+        self->mMenuActions.clear();
+        self->syncMenuModel();
+        Q_EMIT self->menuActionsChanged();
+    }
 }
 
 bool RibbonToolButton::isMenuVisible() const
@@ -622,7 +685,7 @@ bool RibbonToolButton::isMenuVisible() const
 
 bool RibbonToolButton::hasMenu() const
 {
-    return !mMenuItems.isEmpty();
+    return !mMenuActions.isEmpty();
 }
 
 QRectF RibbonToolButton::actionRect() const
@@ -701,7 +764,7 @@ void RibbonToolButton::click()
 
 void RibbonToolButton::openMenu()
 {
-    if (!isEnabled() || mMenuItems.isEmpty() || mMenuVisible) {
+    if (!isEnabled() || mMenuActions.isEmpty() || mMenuVisible) {
         return;
     }
     QQuickItem* leaf = qmlLeaf();
@@ -758,11 +821,14 @@ void RibbonToolButton::activateMenuItem(int index)
  */
 void RibbonToolButton::activateMenuItemPath(const QVariantList& indexPath)
 {
-    RibbonMenuItem* item = RibbonMenuItem::resolvePath(mMenuItems, indexPath);
-    if (!item || !item->isEnabled() || item->isSeparator()) {
+    QAction* item = mMenuModel->resolvePath(indexPath);
+    if (!item) {
         return;
     }
-    item->activate();
+    // QAction::trigger flips checkable state first, then emits triggered —
+    // the exact ordering the old menu-entry activation mirrored, so
+    // menuTriggered handlers observe the new checked value
+    item->trigger();
     Q_EMIT menuTriggered(item);
     closeMenu();
 }
@@ -839,44 +905,6 @@ void RibbonToolButton::geometryChanged(const QRectF& newGeometry, const QRectF& 
     }
 }
 
-// ---- menu list property callbacks ----
-void RibbonToolButton::appendMenuItem(QQmlListProperty< RibbonMenuItem >* prop, RibbonMenuItem* item)
-{
-    auto* self = static_cast< RibbonToolButton* >(prop->data);
-    if (self && item && !self->mMenuItems.contains(item)) {
-        self->mMenuItems.append(item);
-        item->setParent(self);
-        self->emitMenuItemsChanged();
-    }
-}
-
-RibbonToolButton::ListIndex RibbonToolButton::menuItemCountCb(QQmlListProperty< RibbonMenuItem >* prop)
-{
-    auto* self = static_cast< RibbonToolButton* >(prop->data);
-    return self ? self->mMenuItems.size() : RibbonToolButton::ListIndex(0);
-}
-
-RibbonMenuItem* RibbonToolButton::menuItemAtCb(QQmlListProperty< RibbonMenuItem >* prop, ListIndex index)
-{
-    auto* self = static_cast< RibbonToolButton* >(prop->data);
-    return self ? self->menuItemAt(int(index)) : nullptr;
-}
-
-void RibbonToolButton::clearMenuItems(QQmlListProperty< RibbonMenuItem >* prop)
-{
-    auto* self = static_cast< RibbonToolButton* >(prop->data);
-    if (self && !self->mMenuItems.isEmpty()) {
-        self->mMenuItems.clear();
-        self->emitMenuItemsChanged();
-    }
-}
-
-void RibbonToolButton::emitMenuItemsChanged()
-{
-    Q_EMIT menuItemsChanged();
-    updateSizeHint();
-    updateLayout();
-}
 
 void RibbonToolButton::setMenuVisible(bool on)
 {
@@ -1016,8 +1044,8 @@ void RibbonToolButton::updateLayout()
     QRectF newAction;
     QRectF newMenu;
     const QRectF full(0, 0, width(), height());
-    // hasMenu(), not mMenuItems.isEmpty(): a subclass may own a popup that is
-    // not a RibbonMenuItem list (RibbonColorToolButton and its color menu)
+    // hasMenu(), not the menu action count: a subclass may own a popup that is
+    // not a menuActions list (RibbonColorToolButton and its color menu)
     if (hasMenu()) {
         switch (mPopupMode) {
         case RibbonEnums::InstantPopup: {

@@ -8,6 +8,8 @@
 #include "SARibbonQmlLayoutItemHost.h"
 #include "SARibbonQmlButtonRowHost.h"
 #include "SARibbonQmlToolButton.h"
+#include "SARibbonQmlAction.h"
+#include "SARibbonQmlIconProvider.h"
 #include "SARibbonQmlQuickAccessBar.h"
 #include <SARibbonCore/SARibbonCustomizeRecord.h>
 #include <SARibbonCore/SARibbonEnums.h>
@@ -144,6 +146,41 @@ int findShadowQuickItem(const QVector< ShadowItem >& items, const QString& key)
  *          在这里同样互相抵消。
  * \endif
  */
+// Fill one shadow row from a live host item through its bound QAction
+// (plan-06 S2): the key is the action objectName, the display data is a live
+// read of the command, and the customizable gate reads the command-level
+// marker. A plain-declarative button (no action) keeps an empty key — it is
+// content, not a command (contract D6).
+static void fillItemFromHost(ShadowItem& si, RibbonLayoutItemHost* item, RibbonActionRegistry* reg, bool gate)
+{
+    si.key = QString();
+    si.text = item->property("text").toString();
+    si.iconSource = item->property("iconSource").toString();
+    si.tag = int(SARibbon::Core::UnknowActionTag);
+    si.proportion = item->property("proportion").toInt();
+    si.canCustomize = false;
+    QAction* act = nullptr;
+    if (auto* btn = qobject_cast< SARibbonQml::RibbonToolButton* >(item)) {
+        act = btn->action();
+    }
+    if (!act) {
+        return;
+    }
+    si.key = act->objectName();
+    si.text = act->text();
+    if (auto* ribbonAction = qobject_cast< SARibbonQml::RibbonAction* >(act)) {
+        si.iconSource = ribbonAction->iconSource().toString();
+    } else if (!act->icon().isNull()) {
+        si.iconSource = SARibbonQml::SAIconImageProvider::iconUrl(act).toString();
+    }
+    // the row's tag keeps the command's registry tag when registered
+    // (quick access rows override it with QuickAccessActionTag below)
+    if (reg) {
+        si.tag = reg->tagOf(act);
+    }
+    si.canCustomize = !si.key.isEmpty() && (!gate || SARibbon::Core::isCanCustomize(act));
+}
+
 static void replayRecord(const SARibbon::Core::SARibbonCustomizeRecord& r,
                          QVector< ShadowCategory >& cats,
                          QVector< ShadowItem >& quick,
@@ -208,8 +245,8 @@ static void replayRecord(const SARibbon::Core::SARibbonCustomizeRecord& r,
         si.pending     = true;
         if (reg) {
             const RibbonActionDescriptor d = reg->descriptor(r.keyValue);
-            si.text       = d.text;
-            si.iconSource = d.iconSource;
+            si.text       = d.text();
+            si.iconSource = d.iconSource();
             si.tag        = d.tag;
         }
         p->items.append(si);
@@ -297,8 +334,8 @@ static void replayRecord(const SARibbon::Core::SARibbonCustomizeRecord& r,
         si.pending     = true;
         if (reg) {
             const RibbonActionDescriptor d = reg->descriptor(r.keyValue);
-            si.text       = d.text;
-            si.iconSource = d.iconSource;
+            si.text       = d.text();
+            si.iconSource = d.iconSource();
             si.proportion = int(d.proportion);
         }
         insertShadow(quick, si, r.indexValue);
@@ -652,12 +689,7 @@ void RibbonCustomizeTreeModel::rebuild()
                         continue;
                     }
                     ShadowItem si;
-                    si.key         = mRegistry ? mRegistry->key(item) : QString();
-                    si.text        = item->property("text").toString();
-                    si.iconSource  = item->property("iconSource").toString();
-                    si.tag         = mRegistry ? mRegistry->tagOf(item) : int(SARibbon::Core::UnknowActionTag);
-                    si.proportion  = item->property("proportion").toInt();
-                    si.canCustomize = !si.key.isEmpty() && (!gate || SARibbon::Core::isCanCustomize(item));
+                    fillItemFromHost(si, item, mRegistry, gate);
                     sp.items.append(si);
                 }
                 sc.panels.append(sp);
@@ -691,11 +723,7 @@ void RibbonCustomizeTreeModel::rebuild()
                         continue;
                     }
                     ShadowItem si;
-                    si.key        = mRegistry ? mRegistry->key(item) : QString();
-                    si.text       = item->property("text").toString();
-                    si.iconSource = item->property("iconSource").toString();
-                    si.tag        = mRegistry ? mRegistry->tagOf(item) : int(SARibbon::Core::UnknowActionTag);
-                    si.proportion = item->property("proportion").toInt();
+                    fillItemFromHost(si, item, mRegistry, false);
                     sp.items.append(si);
                 }
                 sc.panels.append(sp);
@@ -711,12 +739,8 @@ void RibbonCustomizeTreeModel::rebuild()
                     continue;
                 }
                 ShadowItem si;
-                si.key         = mRegistry ? mRegistry->key(item) : QString();
-                si.text        = item->property("text").toString();
-                si.iconSource  = item->property("iconSource").toString();
-                si.tag         = RibbonActionRegistry::QuickAccessActionTag;
-                si.proportion  = item->property("proportion").toInt();
-                si.canCustomize = !si.key.isEmpty() && (!gate || SARibbon::Core::isCanCustomize(item));
+                fillItemFromHost(si, item, mRegistry, gate);
+                si.tag = RibbonActionRegistry::QuickAccessActionTag;  // placements in the quick bar file here
                 quick.append(si);
             }
         }

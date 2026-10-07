@@ -5,9 +5,9 @@
 | 文档 | 内容 | 状态 |
 |------|------|------|
 | [00-architecture-contract.md](00-architecture-contract.md) | **架构契约（一切任务开工前必读）**：QAction 统一命令模型、三层分工、命令/放置属性分离、模块版本边界、已否决方案登记 | 生效中 |
-| [05-qml-action-core.md](05-qml-action-core.md) | QML 命令层核心：RibbonAction、按钮 action 绑定、快捷键真实化、双车道基线（Qt6 基准 + Qt5 兼容）、无障碍基线 | 待执行 |
-| [06-qml-action-ecosystem.md](06-qml-action-ecosystem.md) | QML 命令生态：注册表/定制器 QAction 寻址、菜单树、Gallery、示例重写、跨端一致性 | 待执行（依赖 05） |
-| [07-widgets-placement-cleanup.md](07-widgets-placement-cleanup.md) | widgets 放置属性清理：废除 `_sa_*` 动态属性通道，参数直达 PanelItem | 待执行（可与 05/06 并行） |
+| [05-qml-action-core.md](05-qml-action-core.md) | QML 命令层核心：RibbonAction、按钮 action 绑定、快捷键真实化、双车道基线（Qt6 基准 + Qt5 兼容）、无障碍基线 | **已完成**（9e27704，S0 核验结论已回填契约 §9） |
+| [06-qml-action-ecosystem.md](06-qml-action-ecosystem.md) | QML 命令生态：注册表/定制器 QAction 寻址、菜单树、Gallery、示例重写、跨端一致性 | **已完成**（RibbonMenuItem/bindItem 退役，双车道验证） |
+| [07-widgets-placement-cleanup.md](07-widgets-placement-cleanup.md) | widgets 放置属性清理：废除 `_sa_*` 动态属性通道，参数直达 PanelItem | **已完成**（5aba319，黄金快照零回归） |
 
 ## 执行顺序
 

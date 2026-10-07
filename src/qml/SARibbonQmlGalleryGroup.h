@@ -1,6 +1,8 @@
 #ifndef RIBBONGALLERYGROUP_H
 #define RIBBONGALLERYGROUP_H
 #include "SARibbonQmlGlobal.h"
+// the single QAction include face of the module (contract D5, plan-05 S1)
+#include "SARibbonQmlActionCompat.h"
 #include "SARibbonQmlGalleryItem.h"
 #include <QQmlListProperty>
 #include <QObject>
@@ -39,6 +41,11 @@ public:
     SARibbonQml::RibbonGalleryItem* itemAt(int index) const;
     void appendItem(SARibbonQml::RibbonGalleryItem* item);
     void clearItems();
+
+    // Command-driven filling (plan-06 S4, widgets addActionItem(QAction*)
+    // parity): create an action-bound cell and append it; the item derives
+    // text/icon/enabled from the command and activation triggers it
+    Q_INVOKABLE SARibbonQml::RibbonGalleryItem* addAction(QAction* action);
 
 Q_SIGNALS:
     void groupTitleChanged();

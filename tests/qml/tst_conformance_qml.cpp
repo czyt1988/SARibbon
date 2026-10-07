@@ -26,7 +26,7 @@
 #include <SARibbonQml/SARibbonQmlGallery.h>
 #include <SARibbonQml/SARibbonQmlGalleryGroup.h>
 #include <SARibbonQml/SARibbonQmlGalleryItem.h>
-#include <SARibbonQml/SARibbonQmlMenuItem.h>
+#include <SARibbonQml/SARibbonQmlAction.h>
 #include <SARibbonQml/SARibbonQmlApplicationWindow.h>
 #include <SARibbonQml/SARibbonQmlBar.h>
 #include <SARibbonQml/SARibbonQmlContextCategory.h>
@@ -442,8 +442,9 @@ QQuickView* TestConformanceQml::exposeScene(QQmlEngine& engine, QQmlComponent& c
  * @brief Popup modes / disabled state / menu model of the tool button
  * @details Mirrors the widgets "sa ribbon toolbutton style" panel: the three
  *          popup modes publish host-computed hit zones, menu entries are
- *          RibbonMenuItem objects mediated by menuTriggered, and a disabled
- *          host swallows both invokable and real-mouse clicks.
+ *          QAction commands (RibbonAction-declared, plan-06 S3) mediated by
+ *          menuTriggered, and a disabled host swallows both invokable and
+ *          real-mouse clicks.
  */
 void TestConformanceQml::toolButtonPopupStates()
 {
@@ -471,11 +472,11 @@ Item {
             proportion: Ribbon.Small
             checkable: true
             popupMode: Ribbon.MenuButtonPopup
-            menuItems: [
-                RibbonMenuItem { text: "item 1" },
-                RibbonMenuItem { separator: true },
-                RibbonMenuItem { text: "item 2"; enabled: false },
-                RibbonMenuItem { text: "item 3" }
+            menuActions: [
+                RibbonAction { objectName: "entry1"; text: "item 1" },
+                RibbonAction { objectName: "entry2"; text: "item 2" },
+                RibbonAction { objectName: "entry3"; text: "item 3"; enabled: false },
+                RibbonAction { objectName: "entry4"; text: "item 4" }
             ]
         }
         RibbonToolButton {
@@ -483,14 +484,14 @@ Item {
             text: "Inst"
             proportion: Ribbon.Small
             popupMode: Ribbon.InstantPopup
-            menuItems: [ RibbonMenuItem { text: "only" } ]
+            menuActions: [ RibbonAction { text: "only" } ]
         }
         RibbonToolButton {
             objectName: "delayedBtn"
             text: "Del"
             proportion: Ribbon.Small
             popupMode: Ribbon.DelayedPopup
-            menuItems: [ RibbonMenuItem { text: "d1" } ]
+            menuActions: [ RibbonAction { text: "d1" } ]
         }
     }
 })QML");
@@ -526,13 +527,25 @@ Item {
     QVERIFY(actionRect.x() + actionRect.width() <= menuRect.x() + 1.0);
 
     // ---- menu model mediation: activateMenuItem -> menuTriggered ----
-    QSignalSpy menuSpy(menuBtn, SIGNAL(menuTriggered(SARibbonQml::RibbonMenuItem*)));
+    // QAction::separator has no Q_PROPERTY in Qt 6.7, so QML cannot write it;
+    // the separator entry is declared as a plain RibbonAction and flipped
+    // through the QAction API here
+    auto* menuHost = qobject_cast< SARibbonQml::RibbonToolButton* >(menuBtn);
+    QVERIFY(menuHost);
+    QCOMPARE(menuHost->menuActionCount(), 4);
+    QAction* sepAction = menuHost->menuActionAt(1);
+    QVERIFY(sepAction);
+    QVERIFY(!sepAction->isSeparator());
+    sepAction->setSeparator(true);
+    QVERIFY(sepAction->isSeparator());
+
+    QSignalSpy menuSpy(menuBtn, SIGNAL(menuTriggered(QAction*)));
     QMetaObject::invokeMethod(menuBtn, "activateMenuItem", Q_ARG(int, 0));
     QCOMPARE(menuSpy.size(), 1);
     {
-        auto* triggeredItem = qvariant_cast< QObject* >(menuSpy.at(0).at(0));
+        auto* triggeredItem = qvariant_cast< QAction* >(menuSpy.at(0).at(0));
         QVERIFY(triggeredItem);
-        QCOMPARE(triggeredItem->property("text").toString(), QStringLiteral("item 1"));
+        QCOMPARE(triggeredItem->text(), QStringLiteral("item 1"));
     }
     // separator / disabled / out-of-range entries are ignored
     QMetaObject::invokeMethod(menuBtn, "activateMenuItem", Q_ARG(int, 1));
@@ -626,15 +639,15 @@ Item {
             text: "Menu"
             proportion: Ribbon.Small
             popupMode: Ribbon.MenuButtonPopup
-            menuItems: [
-                RibbonMenuItem { objectName: "boldItem"; text: "Bold"; checkable: true },
-                RibbonMenuItem { objectName: "saveItem"; text: "Save"; shortcut: "Ctrl+S" },
-                RibbonMenuItem {
+            menuActions: [
+                RibbonAction { objectName: "boldItem"; text: "Bold"; checkable: true },
+                RibbonAction { objectName: "saveItem"; text: "Save"; shortcutText: "Ctrl+S" },
+                RibbonAction {
                     objectName: "recentItem"
                     text: "Recent"
-                    submenu: [
-                        RibbonMenuItem { objectName: "doc1Item"; text: "doc1" },
-                        RibbonMenuItem { objectName: "doc2Item"; text: "doc2"; checkable: true; checked: true }
+                    menuActions: [
+                        RibbonAction { objectName: "doc1Item"; text: "doc1" },
+                        RibbonAction { objectName: "doc2Item"; text: "doc2"; checkable: true; checked: true }
                     ]
                 }
             ]
@@ -652,31 +665,42 @@ Item {
     auto* menuBtn = rootItem->findChild< QQuickItem* >(QStringLiteral("menuBtn"));
     QVERIFY(menuBtn);
     QTRY_VERIFY(menuBtn->width() > 0 && menuBtn->height() > 0);
-    auto* boldItem   = rootItem->findChild< SARibbonQml::RibbonMenuItem* >(QStringLiteral("boldItem"));
-    auto* saveItem   = rootItem->findChild< SARibbonQml::RibbonMenuItem* >(QStringLiteral("saveItem"));
-    auto* recentItem = rootItem->findChild< SARibbonQml::RibbonMenuItem* >(QStringLiteral("recentItem"));
-    auto* doc2Item   = rootItem->findChild< SARibbonQml::RibbonMenuItem* >(QStringLiteral("doc2Item"));
-    QVERIFY(boldItem && saveItem && recentItem && doc2Item);
+    // menu entries are QAction commands now (plan-06 S3): reach them through
+    // the host's menuActionAt — RibbonAction objects created inside a list
+    // property ride QQmlListProperty bookkeeping, findChild is not the way
+    auto* btnHost = qobject_cast< SARibbonQml::RibbonToolButton* >(menuBtn);
+    QVERIFY(btnHost);
+    QCOMPARE(btnHost->menuActionCount(), 3);
+    auto* boldItem   = btnHost->menuActionAt(0);
+    auto* saveItem   = btnHost->menuActionAt(1);
+    auto* recentItem = btnHost->menuActionAt(2);
+    QVERIFY(boldItem && saveItem && recentItem);
+    auto* recentAction = qobject_cast< SARibbonQml::RibbonAction* >(recentItem);
+    QVERIFY(recentAction);
+    QCOMPARE(recentAction->menuActionCount(), 2);
+    auto* doc2Item = recentAction->menuActionAt(1);
+    QVERIFY(doc2Item);
 
     // ---- declarative model ----
     QVERIFY(boldItem->isCheckable());
     QVERIFY(!boldItem->isChecked());
-    QCOMPARE(saveItem->shortcut(), QStringLiteral("Ctrl+S"));
-    QCOMPARE(recentItem->submenuCount(), 2);
-    QVERIFY(recentItem->hasSubmenu());
-    QVERIFY(!saveItem->hasSubmenu());
-    QCOMPARE(recentItem->submenuItemAt(1), doc2Item);
+    QCOMPARE(saveItem->shortcut(), QKeySequence(QStringLiteral("Ctrl+S")));
+    // derived rows (live reads: shortcut caption drawn from the REAL sequence)
+    const QVariantList modelRows = btnHost->menuModel();
+    QCOMPARE(modelRows.size(), 3);
+    QCOMPARE(modelRows.at(1).toMap().value(QStringLiteral("shortcut")).toString(), QStringLiteral("Ctrl+S"));
+    QVERIFY(modelRows.at(2).toMap().value(QStringLiteral("hasSubmenu")).toBool());
+    QVERIFY(!modelRows.at(1).toMap().value(QStringLiteral("hasSubmenu")).toBool());
+    QCOMPARE(modelRows.at(2).toMap().value(QStringLiteral("submenu")).toList().size(), 2);
     QVERIFY(doc2Item->isChecked());
 
     // ---- a checkable entry flips before menuTriggered reaches the caller ----
-    QSignalSpy menuSpy(menuBtn, SIGNAL(menuTriggered(SARibbonQml::RibbonMenuItem*)));
+    QSignalSpy menuSpy(menuBtn, SIGNAL(menuTriggered(QAction*)));
     QSignalSpy toggledSpy(boldItem, SIGNAL(toggled(bool)));
-    QSignalSpy triggeredSpy(boldItem, SIGNAL(triggered()));
+    QSignalSpy triggeredSpy(boldItem, SIGNAL(triggered(bool)));
     bool checkedAtTrigger = false;
-    auto* btnHost = qobject_cast< SARibbonQml::RibbonToolButton* >(menuBtn);
-    QVERIFY(btnHost);
     QObject::connect(btnHost, &SARibbonQml::RibbonToolButton::menuTriggered, this,
-                     [&](SARibbonQml::RibbonMenuItem* it) { checkedAtTrigger = (it == boldItem) ? it->isChecked() : checkedAtTrigger; });
+                     [&](QAction* it) { checkedAtTrigger = (it == boldItem) ? it->isChecked() : checkedAtTrigger; });
     QVariantList path;
     path << 0;
     QMetaObject::invokeMethod(menuBtn, "activateMenuItemPath", Q_ARG(QVariantList, path));
@@ -711,10 +735,17 @@ Item {
     QCOMPARE(qvariant_cast< QObject* >(menuSpy.at(before).at(0)), static_cast< QObject* >(doc2Item));
     // the second submenu entry was declared checked, so activating clears it
     QCOMPARE(doc2Item->isChecked(), false);
-    for (const QVariantList& bad : { QVariantList{ 2, 9 }, QVariantList{ 9 }, QVariantList{ 0, 0 }, QVariantList(), QVariantList{ QStringLiteral("x") } }) {
+    for (const QVariantList& bad : { QVariantList{ 2, 9 }, QVariantList{ 9 }, QVariantList{ 0, 0 }, QVariantList() }) {
         QMetaObject::invokeMethod(menuBtn, "activateMenuItemPath", Q_ARG(QVariantList, bad));
         QCOMPARE(menuSpy.size(), before + 1);
     }
+    // a non-numeric path element is refused exactly as the 2.x resolver
+    // refused it: the strict numeric acceptance in RibbonMenuModel::
+    // resolvePath keeps a malformed path from addressing the first entry
+    // (QVariant::toInt would coerce "x" to 0 — pinned against that trap)
+    QMetaObject::invokeMethod(menuBtn, "activateMenuItemPath",
+                              Q_ARG(QVariantList, QVariantList{ QStringLiteral("x") }));
+    QCOMPARE(menuSpy.size(), before + 1);
     // the flat invokable only reaches the top level
     QMetaObject::invokeMethod(menuBtn, "activateMenuItem", Q_ARG(int, 2));
     QCOMPARE(menuSpy.size(), before + 2);
@@ -2505,7 +2536,7 @@ Item {
             text: "Menu"
             proportion: Ribbon.Small
             popupMode: Ribbon.MenuButtonPopup
-            menuItems: [ RibbonMenuItem { text: "one" } ]
+            menuActions: [ RibbonAction { text: "one" } ]
         }
     }
 })QML");
@@ -2636,7 +2667,7 @@ Item {
         anchors.right: parent.right
         anchors.top: parent.top
         applicationLabel: "File"
-        applicationMenuItems: [ RibbonMenuItem { text: "should not open" } ]
+        applicationMenuActions: [ RibbonAction { text: "should not open" } ]
         windowAgent: RibbonWindowAgent { objectName: "agent" }
         RibbonApplicationWindow {
             id: appwin

@@ -60,7 +60,9 @@ namespace
 {
 
 /// 场景 QML：两个 category（其中一个两面板）+ 一个快速访问栏按钮，全部带 objectName
-/// 以便按名寻址（与 widgets 侧定制记录依赖 objectName 的做法一致）
+/// 以便按名寻址（与 widgets 侧定制记录依赖 objectName 的做法一致）。命令经
+/// RibbonAction 声明并绑定到按钮（契约 D1/D6：autoRegister 只收集 action 绑定
+/// 按钮，action 的 objectName 即注册表 key）
 const char* kSceneQml = R"QML(import QtQuick 2.12
 import SARibbon 3.0
 Item {
@@ -73,7 +75,8 @@ Item {
         anchors.top: parent.top
         RibbonQuickAccessBar {
             objectName: "qab"
-            RibbonToolButton { objectName: "q0"; text: "Save" }
+            RibbonAction { id: cmdSave; objectName: "q0"; text: "Save" }
+            RibbonToolButton { objectName: "q0"; action: cmdSave }
         }
         RibbonCategory {
             objectName: "cat0"
@@ -81,13 +84,16 @@ Item {
             RibbonPanel {
                 objectName: "p0"
                 panelTitle: "Clip"
-                RibbonToolButton { objectName: "b0"; text: "Paste" }
-                RibbonToolButton { objectName: "b1"; text: "Cut" }
+                RibbonAction { id: cmdPaste; objectName: "b0"; text: "Paste" }
+                RibbonAction { id: cmdCut; objectName: "b1"; text: "Cut" }
+                RibbonToolButton { objectName: "b0"; action: cmdPaste }
+                RibbonToolButton { objectName: "b1"; action: cmdCut }
             }
             RibbonPanel {
                 objectName: "p1"
                 panelTitle: "Font"
-                RibbonToolButton { objectName: "b2"; text: "Bold" }
+                RibbonAction { id: cmdBold; objectName: "b2"; text: "Bold" }
+                RibbonToolButton { objectName: "b2"; action: cmdBold }
             }
         }
         RibbonCategory {
@@ -96,7 +102,8 @@ Item {
             RibbonPanel {
                 objectName: "p2"
                 panelTitle: "Tables"
-                RibbonToolButton { objectName: "b3"; text: "Table" }
+                RibbonAction { id: cmdTable; objectName: "b3"; text: "Table" }
+                RibbonToolButton { objectName: "b3"; action: cmdTable }
             }
         }
     }
@@ -104,7 +111,9 @@ Item {
 )QML";
 
 /// WS-C3 作用域场景：一个主类别 + 一个上下文页，用来钉死三档 showType 与
-/// 上下文页在扁平列表里的方括号标题/只读语义
+/// 上下文页在扁平列表里的方括号标题/只读语义。上下文页里的按钮保持纯声明
+/// （契约 D6：无 action 的按钮是内容不是命令，行上无 key 因而不可定制；且
+/// autoRegister 本就只遍历主类别行）
 const char* kScopeQml = R"QML(import QtQuick 2.12
 import SARibbon 3.0
 Item {
@@ -121,8 +130,10 @@ Item {
             RibbonPanel {
                 objectName: "p0"
                 panelTitle: "Clip"
-                RibbonToolButton { objectName: "b0"; text: "Paste" }
-                RibbonToolButton { objectName: "b1"; text: "Cut" }
+                RibbonAction { id: cmdPaste; objectName: "b0"; text: "Paste" }
+                RibbonAction { id: cmdCut; objectName: "b1"; text: "Cut" }
+                RibbonToolButton { objectName: "b0"; action: cmdPaste }
+                RibbonToolButton { objectName: "b1"; action: cmdCut }
             }
         }
         RibbonContextCategory {
@@ -376,17 +387,22 @@ void TestCustomizeQml::registryAutoRegisterAndModel()
     // 搜索按显示名匹配（widgets search 的 contains 语义）
     const QList< SARibbonQml::RibbonActionDescriptor > hits = registry.search(QStringLiteral("Cut"));
     QCOMPARE(hits.size(), 1);
-    QCOMPARE(hits.first().text, QStringLiteral("Cut"));
+    QCOMPARE(hits.first().text(), QStringLiteral("Cut"));
     QVERIFY(hits.first().hasItem());
 
-    // key ↔ item 双向解析，且 key 稳定
+    // key ↔ action/item 双向解析，且 key 稳定（key 即 action 的 objectName）
     SARibbonQml::RibbonLayoutItemHost* item = scene.bar->categoryAt(0)->panelAt(0)->childItemAt(1);
     QVERIFY(item);
-    const QString key = registry.key(item);
+    auto* cutBtn = qobject_cast< SARibbonQml::RibbonToolButton* >(item);
+    QVERIFY(cutBtn);
+    QAction* cutAction = cutBtn->action();
+    QVERIFY(cutAction);
+    const QString key = registry.key(cutAction);
     QVERIFY(!key.isEmpty());
-    QCOMPARE(registry.item(key), item);
-    QCOMPARE(registry.descriptor(key).text, QStringLiteral("Cut"));
-    QCOMPARE(registry.tagOf(item), tag0);
+    QCOMPARE(registry.firstItem(key), cutBtn);
+    QCOMPARE(registry.action(key), cutAction);
+    QCOMPARE(registry.descriptor(key).text(), QStringLiteral("Cut"));
+    QCOMPARE(registry.tagOf(cutAction), tag0);
 
     // 描述符 map 满 key
     verifyFullKeys(registry.actionInfo(key),
@@ -410,7 +426,7 @@ void TestCustomizeQml::registryAutoRegisterAndModel()
     const SARibbonQml::RibbonActionDescriptor tpl = registry.descriptor(QStringLiteral("cmd_template"));
     QVERIFY(tpl.isValid());
     QVERIFY(!tpl.hasItem());
-    QCOMPARE(registry.item(QStringLiteral("cmd_template")), nullptr);
+    QCOMPARE(registry.firstItem(QStringLiteral("cmd_template")), nullptr);
     // 重复 key 被拒
     QVERIFY(!registry.registeCommand(int(SARibbon::Core::CommonlyUsedActionTag),
                                      QStringLiteral("cmd_template"),
@@ -420,8 +436,9 @@ void TestCustomizeQml::registryAutoRegisterAndModel()
     QVERIFY(!registry.descriptor(QStringLiteral("cmd_template")).isValid());
 
     // 可定制标记：widgets 侧由应用自己给 QAction 打标，QML 侧由注册表批量打
+    // （标记落在命令对象上，plan-07 S3 语义；每次放置经 action 继承同一标记）
     QCOMPARE(registry.markCustomizable(true), 5);
-    QVERIFY(SARibbon::Core::isCanCustomize(item));
+    QVERIFY(SARibbon::Core::isCanCustomize(cutAction));
 
     // ---- 列表模型 ----
     SARibbonQml::RibbonActionRegistryModel model;
@@ -565,8 +582,8 @@ void TestCustomizeQml::applyAndReverseHostTree()
     QVERIFY(made);
     QCOMPARE(made->property("text").toString(), QStringLiteral("New Command"));
     QCOMPARE(int(made->property("proportion").toInt()), int(SARibbon::Core::SARibbonRowProportion::Large));
-    // 落地后 key 仍然指向同一个宿主（bindItem 修补了描述符）
-    QCOMPARE(registry.item(QStringLiteral("cmd_new")), made);
+    // 落地后 key 仍然指向同一个宿主（materialize 内部的 attachItem 修补了放置簿记）
+    QCOMPARE(registry.firstItem(QStringLiteral("cmd_new")), made);
     QVERIFY(made->qmlLeaf());
     // 新叶子真的挂进了视觉树（新面板自己的叶子已由 insertPanel 建立）
     QVERIFY(newPanel->qmlLeaf());
@@ -576,7 +593,8 @@ void TestCustomizeQml::applyAndReverseHostTree()
     QVERIFY(cz.removeAction(QStringLiteral("newcat"), QStringLiteral("newpanel"), QStringLiteral("cmd_new")));
     QVERIFY(cz.apply());
     QCOMPARE(newPanel->childItemCount(), 0);
-    QVERIFY(registry.item(QStringLiteral("cmd_new")) == made);  // 宿主仍活着
+    // 宿主仍活着且簿记未摘（RemoveAction 不动注册表放置列表，撤销重挂要走它）
+    QVERIFY(registry.firstItem(QStringLiteral("cmd_new")) == made);
     QVERIFY(made->parentItem() == nullptr || !made->isVisible());
 
     // 撤销：结构恢复，改名与删除不恢复（widgets sa_customize_datas_reverse 的不对称性）
@@ -662,7 +680,7 @@ void TestCustomizeQml::quickAccessRecords()
     QVERIFY(registry.registeCommand(int(SARibbon::Core::CommonlyUsedActionTag),
                                     QStringLiteral("cmd_undo"),
                                     QStringLiteral("Undo")));
-    const QString q0Key = registry.key(q0);
+    const QString q0Key = registry.key(q0->action());
     QVERIFY(!q0Key.isEmpty());
 
     SARibbonQml::RibbonCustomizer cz;
@@ -674,7 +692,7 @@ void TestCustomizeQml::quickAccessRecords()
     QVERIFY(cz.apply());
     QCOMPARE(qab->buttonCount(), 2);
     SARibbonQml::RibbonToolButton* undoBtn = qobject_cast< SARibbonQml::RibbonToolButton* >(
-        registry.item(QStringLiteral("cmd_undo")));
+        registry.firstItem(QStringLiteral("cmd_undo")));
     QVERIFY(undoBtn);
     QCOMPARE(qab->buttonIndex(undoBtn), 1);
     QVERIFY(undoBtn->qmlLeaf());
@@ -855,7 +873,8 @@ void TestCustomizeQml::treeModelLevelsScopeAndAddressing()
     SARibbonQml::RibbonActionRegistry registry;
     registry.autoRegister(scene.bar);
     // 上下文页里的按钮不进命令目录：autoRegister 只遍历主类别行，与 QML 寻址
-    // 能力（categoryByObjectName 也只覆盖主类别行）保持一致
+    // 能力（categoryByObjectName 也只覆盖主类别行）保持一致；场景里上下文页
+    // 按钮同时保持纯声明（契约 D6：无 action 即非命令）
     QCOMPARE(registry.count(), 2);
 
     SARibbonQml::RibbonCustomizeTreeModel model;
@@ -864,8 +883,9 @@ void TestCustomizeQml::treeModelLevelsScopeAndAddressing()
     model.setBar(scene.bar);
     model.setRegistry(&registry);
 
-    const QString k0 = registry.key(qobject_cast< SARibbonQml::RibbonLayoutItemHost* >(
-        scene.rootItem->findChild< QQuickItem* >(QStringLiteral("b0"))));
+    const QString k0 = registry.key(qobject_cast< SARibbonQml::RibbonToolButton* >(
+                                        scene.rootItem->findChild< QQuickItem* >(QStringLiteral("b0")))
+                                        ->action());
     QVERIFY(!k0.isEmpty());
     const int tag0 = int(SARibbon::Core::AutoCategoryDistinguishBeginTag);
 
@@ -900,7 +920,10 @@ void TestCustomizeQml::treeModelLevelsScopeAndAddressing()
     QCOMPARE(r2.value(QStringLiteral("depth")).toInt(), 2);
     QCOMPARE(r2.value(QStringLiteral("title")).toString(), QStringLiteral("Paste"));
     QCOMPARE(r2.value(QStringLiteral("key")).toString(), k0);
+    // 行 tag 保留命令的注册表 tag（fillItemFromHost 经 tagOf 活读取；
+    // quick access 行覆盖为 QuickAccessActionTag，pending 行带记录里的 tag）
     QCOMPARE(r2.value(QStringLiteral("tag")).toInt(), tag0);
+    QCOMPARE(registry.tagOf(registry.action(k0)), tag0);
     QVERIFY(r2.value(QStringLiteral("canCustomize")).toBool());
 
     // 上下文页：方括号标题、只读、其命令没有 key 因而也不可定制
@@ -977,8 +1000,9 @@ void TestCustomizeQml::treeModelPreviewReplaysPending()
     SARibbonQml::RibbonCategory* cat0 = scene.bar->categoryAt(0);
     SARibbonQml::RibbonCategory* cat1 = scene.bar->categoryAt(1);
     QVERIFY(cat0 && cat1);
-    const QString kTable = registry.key(qobject_cast< SARibbonQml::RibbonLayoutItemHost* >(
-        scene.rootItem->findChild< QQuickItem* >(QStringLiteral("b3"))));
+    const QString kTable = registry.key(qobject_cast< SARibbonQml::RibbonToolButton* >(
+                                            scene.rootItem->findChild< QQuickItem* >(QStringLiteral("b3")))
+                                            ->action());
     QVERIFY(!kTable.isEmpty());
 
     // ---- 新增类别 / 面板 / 命令：预览长出来，真树不动 ----

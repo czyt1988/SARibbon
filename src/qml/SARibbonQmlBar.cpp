@@ -1,9 +1,9 @@
 #include "SARibbonQmlBar.h"
+#include "SARibbonQmlAction.h"
 #include "SARibbonQmlCategory.h"
 #include "SARibbonQmlContextCategory.h"
 #include "SARibbonQmlQuickAccessBar.h"
 #include "SARibbonQmlButtonGroup.h"
-#include "SARibbonQmlMenuItem.h"
 #include "SARibbonQmlApplicationWindow.h"
 #include "SARibbonQmlShortcutMatcher.h"
 #include "SARibbonQmlTab.h"
@@ -35,6 +35,13 @@ RibbonBar::RibbonBar(QQuickItem* parent) : RibbonQuickHost(parent)
             [this]() { polish(); });
     // RTL flip re-runs the title-rect engine pass (SA::saIsRTL() re-read)
     connect(RibbonTheme::instance(), &RibbonTheme::rtlChanged, this, [this]() { polish(); });
+    // plan-06 S3: QAction application menu derivation (replaces the 2.x
+    // QAction menu list)
+    mAppMenuModel = new RibbonMenuModel(this);
+    connect(mAppMenuModel, &RibbonMenuModel::rowsChanged, this, [this]() {
+        Q_EMIT applicationMenuModelChanged();
+        polish();  // the hasApplicationMenu indicator affects the title layout
+    });
 }
 
 RibbonBar::~RibbonBar()
@@ -826,25 +833,83 @@ QVariantList RibbonBar::contextBands() const
     return mBands;
 }
 
-QQmlListProperty< RibbonMenuItem > RibbonBar::applicationMenuItems()
+QQmlListProperty< RibbonAction > RibbonBar::applicationMenuActions()
 {
-    return QQmlListProperty< RibbonMenuItem >(this, this, &RibbonBar::appendAppMenuItemCb, &RibbonBar::appMenuItemCountCb, &RibbonBar::appMenuItemAtCb,
-                                              &RibbonBar::clearAppMenuItemsCb);
+    return QQmlListProperty< RibbonAction >(this, this, &RibbonBar::appendAppMenuActionCb, &RibbonBar::appMenuActionCountCb,
+                                            &RibbonBar::appMenuActionAtCb, &RibbonBar::clearAppMenuActionsCb);
 }
 
-int RibbonBar::applicationMenuItemCount() const
+int RibbonBar::applicationMenuActionCount() const
 {
-    return mAppMenuItems.size();
+    return mAppMenuActions.size();
 }
 
-RibbonMenuItem* RibbonBar::applicationMenuItemAt(int index) const
+QAction* RibbonBar::applicationMenuActionAt(int index) const
 {
-    return (index >= 0 && index < mAppMenuItems.size()) ? mAppMenuItems[ index ] : nullptr;
+    return (index >= 0 && index < mAppMenuActions.size()) ? mAppMenuActions[ index ] : nullptr;
+}
+
+void RibbonBar::addApplicationMenuAction(QAction* action)
+{
+    if (action && !mAppMenuActions.contains(action)) {
+        mAppMenuActions.append(action);
+        syncAppMenuModel();
+        Q_EMIT applicationMenuActionsChanged();
+    }
+}
+
+void RibbonBar::appendAppMenuActionCb(QQmlListProperty< RibbonAction >* prop, RibbonAction* action)
+{
+    auto* self = static_cast< RibbonBar* >(prop->data);
+    if (self && action) {
+        self->addApplicationMenuAction(action);
+    }
+}
+
+RibbonBar::ListIndex RibbonBar::appMenuActionCountCb(QQmlListProperty< RibbonAction >* prop)
+{
+    auto* self = static_cast< RibbonBar* >(prop->data);
+    return self ? self->mAppMenuActions.size() : ListIndex(0);
+}
+
+RibbonAction* RibbonBar::appMenuActionAtCb(QQmlListProperty< RibbonAction >* prop, ListIndex index)
+{
+    // AtFunction must return the element type; a C++-appended bare QAction
+    // stays reachable through applicationMenuActionAt, not through the QML view
+    auto* self = static_cast< RibbonBar* >(prop->data);
+    return self ? qobject_cast< RibbonAction* >(self->applicationMenuActionAt(int(index))) : nullptr;
+}
+
+void RibbonBar::clearAppMenuActionsCb(QQmlListProperty< RibbonAction >* prop)
+{
+    auto* self = static_cast< RibbonBar* >(prop->data);
+    if (self && !self->mAppMenuActions.isEmpty()) {
+        self->mAppMenuActions.clear();
+        self->syncAppMenuModel();
+        Q_EMIT self->applicationMenuActionsChanged();
+    }
+}
+
+void RibbonBar::syncAppMenuModel()
+{
+    if (!mAppMenuModel) {
+        return;
+    }
+    QVariantList list;
+    for (QAction* a : mAppMenuActions) {
+        list.append(QVariant::fromValue(a));
+    }
+    mAppMenuModel->setActions(list);
+}
+
+QVariantList RibbonBar::applicationMenuModel() const
+{
+    return mAppMenuModel ? mAppMenuModel->rows() : QVariantList();
 }
 
 bool RibbonBar::hasApplicationMenu() const
 {
-    return !mAppMenuItems.isEmpty();
+    return !mAppMenuActions.isEmpty();
 }
 
 void RibbonBar::activateApplicationMenuItem(int index)
@@ -874,11 +939,13 @@ void RibbonBar::activateApplicationMenuItem(int index)
  */
 void RibbonBar::activateApplicationMenuItemPath(const QVariantList& indexPath)
 {
-    RibbonMenuItem* item = RibbonMenuItem::resolvePath(mAppMenuItems, indexPath);
-    if (!item || !item->isEnabled() || item->isSeparator()) {
+    QAction* item = mAppMenuModel ? mAppMenuModel->resolvePath(indexPath) : nullptr;
+    if (!item) {
         return;
     }
-    item->activate();
+    // QAction::trigger flips checkable state first, then emits triggered;
+    // applicationMenuTriggered handlers observe the new checked value
+    item->trigger();
     Q_EMIT applicationMenuTriggered(item);
 }
 
@@ -905,36 +972,8 @@ void RibbonBar::requestApplicationWindowClose()
     }
 }
 
-void RibbonBar::appendAppMenuItemCb(QQmlListProperty< RibbonMenuItem >* prop, RibbonMenuItem* item)
-{
-    auto* self = static_cast< RibbonBar* >(prop->data);
-    if (self && item && !self->mAppMenuItems.contains(item)) {
-        self->mAppMenuItems.append(item);
-        item->setParent(self);
-        Q_EMIT self->applicationMenuItemsChanged();
-    }
-}
 
-RibbonBar::ListIndex RibbonBar::appMenuItemCountCb(QQmlListProperty< RibbonMenuItem >* prop)
-{
-    auto* self = static_cast< RibbonBar* >(prop->data);
-    return self ? self->mAppMenuItems.size() : ListIndex(0);
-}
 
-RibbonMenuItem* RibbonBar::appMenuItemAtCb(QQmlListProperty< RibbonMenuItem >* prop, ListIndex index)
-{
-    auto* self = static_cast< RibbonBar* >(prop->data);
-    return self ? self->applicationMenuItemAt(int(index)) : nullptr;
-}
-
-void RibbonBar::clearAppMenuItemsCb(QQmlListProperty< RibbonMenuItem >* prop)
-{
-    auto* self = static_cast< RibbonBar* >(prop->data);
-    if (self && !self->mAppMenuItems.isEmpty()) {
-        self->mAppMenuItems.clear();
-        Q_EMIT self->applicationMenuItemsChanged();
-    }
-}
 
 QRectF RibbonBar::titleRect() const
 {
