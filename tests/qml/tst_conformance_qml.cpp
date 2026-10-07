@@ -2033,9 +2033,9 @@ Item {
     // ---- right group: flush against the right margin (native frame) ----
     QTRY_VERIFY(rgroup->width() > 0);
     // systemButtonStripWidth defaults to 0: no frameless system-button
-    // reservation, the group ends at the bar's 8px right margin (widgets
-    // only subtracts the strip under isUseRibbonFrame)
-    QTRY_COMPARE(rgroup->x() + rgroup->width(), qreal(800 - 8));
+    // reservation, the group ends 1px short of the bar's right edge (widgets
+    // resizeInLooseStyle endX -= 1 parity)
+    QTRY_COMPARE(rgroup->x() + rgroup->width(), qreal(800 - 1));
     QVERIFY(help->width() > 0);
     // the group rides the TAB row in this loose (office) style — below the
     // system button strip, which only spans the title row — so declaring
@@ -2043,17 +2043,17 @@ Item {
     // endX at the bar edge; the strip only feeds the title free rect)
     QVERIFY(bar->setProperty("systemButtonStripWidth", 120));
     QTRY_COMPARE(rgroup->y(), qreal(bar->property("titleBarHeight").toInt()));
-    QTRY_COMPARE(rgroup->x() + rgroup->width(), qreal(800 - 8));
+    QTRY_COMPARE(rgroup->x() + rgroup->width(), qreal(800 - 1));
     // compact (WPS) style: the tab row rides the title row and the group
-    // joins the title-row hosts left of the strip — exactly the one place
-    // the widgets layout subtracts it under isUseRibbonFrame
+    // joins the title-row hosts flush at the strip edge — exactly the one
+    // place the widgets layout subtracts it under isUseRibbonFrame
     bar->setProperty("ribbonStyle", int(SARibbonQml::RibbonEnums::RibbonStyleCompactThreeRow));
     QTRY_COMPARE(rgroup->y(), qreal(0));
-    QTRY_COMPARE(rgroup->x() + rgroup->width(), qreal(800 - 120 - 8));
+    QTRY_COMPARE(rgroup->x() + rgroup->width(), qreal(800 - 120));
     // back to loose: the group returns to the tab row's right edge
     bar->setProperty("ribbonStyle", int(SARibbonQml::RibbonEnums::RibbonStyleLooseThreeRow));
     QTRY_COMPARE(rgroup->y(), qreal(bar->property("titleBarHeight").toInt()));
-    QTRY_COMPARE(rgroup->x() + rgroup->width(), qreal(800 - 8));
+    QTRY_COMPARE(rgroup->x() + rgroup->width(), qreal(800 - 1));
 
     // ---- the embedded quick access button is clickable ----
     QSignalSpy clickedSpy(save, SIGNAL(clicked()));
@@ -3550,6 +3550,37 @@ Item {
     QCOMPARE(agent->stripWidth(), 120);
     QTRY_COMPARE(bar->systemButtonStripWidth(), 120);
     QCOMPARE(bar->isFramelessActive(), true);
+
+    // ---- the leaf's system button row fills the strip edge to edge ----
+    // The row spans the full reserved strip anchored at the bar's right
+    // edge, and the three buttons stretch 4:3:3 over it (36/36/48 at the
+    // 120px strip) so the close button's right edge lands exactly on the
+    // window border — the pre-fix row rendered fixed 30/30/40 pixels
+    // left-aligned inside the strip and left a 5px gap at the border. The
+    // close button carries radius 2, the window-corner treatment the
+    // application button's top-left corner uses, mirrored top-right.
+    {
+        // the loaded row comes through the meta-object (QQuickLoader's
+        // header is private in Qt 6): "item" is its Q_PROPERTY
+        auto* sysRowLoader = rootItem->findChild< QQuickItem* >(QStringLiteral("sysButtonRow"));
+        QVERIFY(sysRowLoader);
+        QQuickItem* sysRow = nullptr;
+        QTRY_VERIFY_WITH_TIMEOUT((sysRow = sysRowLoader->property("item").value< QQuickItem* >()) != nullptr, 5000);
+        QTRY_COMPARE(sysRow->width(), qreal(120));
+        // row right edge in BAR coordinates: the loader is right-anchored on
+        // the bar, the row fills the loader (its own x stays 0 in loader
+        // space, so map through the item tree)
+        QTRY_COMPARE(sysRow->mapToItem(bar, QPointF(0, 0)).x() + sysRow->width(), qreal(800));
+        QCOMPARE(sysRow->childItems().size(), 3);
+        QQuickItem* minRect   = sysRow->childItems().at(0);
+        QQuickItem* maxRect   = sysRow->childItems().at(1);
+        QQuickItem* closeRect = sysRow->childItems().at(2);
+        QTRY_COMPARE(minRect->width(), qreal(120 * 0.3));
+        QTRY_COMPARE(maxRect->width(), qreal(120 * 0.3));
+        QTRY_COMPARE(closeRect->width(), qreal(120 * 0.4));
+        QCOMPARE(closeRect->x() + closeRect->width(), sysRow->width());
+        QCOMPARE(closeRect->property("radius").toReal(), qreal(2.0));
+    }
 
     // ---- flipping off drops both (reservation follows the flag; native
     // frame parity: the widgets layouts reserve nothing without

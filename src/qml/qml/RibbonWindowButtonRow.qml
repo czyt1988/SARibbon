@@ -15,6 +15,12 @@ import SARibbon 3.0
 // SARIBBON_ENABLE_SNAP_LAYOUT gate.
 // NOTE: no `component` inline types here — Qt 5.12 has no inline components;
 // the three buttons repeat the small template instead.
+// The buttons stretch 4:3:3 (close:max:min) over the row width, exactly the
+// widgets SARibbonSystemButtonBar stretch over 3*buttonWidth — the row rides
+// the full reserved strip (RibbonBar.qml sizes the Loader to
+// systemButtonStripWidth), so the close button's right edge lands flush on
+// the window's right border with no gap, mirroring the app button's flush
+// left edge.
 Row {
     id: root
 
@@ -40,7 +46,7 @@ Row {
 
     Rectangle {
         id: minButton
-        width: 30
+        width: root.width * 0.3
         height: root.height
         color: mouseAreaMin.pressed ? RibbonTheme.sysButtonPressed
                : (mouseAreaMin.containsMouse ? RibbonTheme.sysButtonHover : "transparent")
@@ -72,7 +78,7 @@ Row {
 
     Rectangle {
         id: maxButton
-        width: 30
+        width: root.width * 0.3
         height: root.height
         color: mouseAreaMax.pressed ? RibbonTheme.sysButtonPressed
                : (mouseAreaMax.containsMouse ? RibbonTheme.sysButtonHover : "transparent")
@@ -120,8 +126,12 @@ Row {
 
     Rectangle {
         id: closeButton
-        width: 40
+        width: root.width * 0.4
         height: root.height
+        // the button's top-right corner sits on the window's rounded corner:
+        // same treatment as the application button's top-left (radius 2 rides
+        // under the frameless window's own corner clipping)
+        radius: 2
         color: mouseAreaClose.pressed ? RibbonTheme.tokenColor("close-bg-pressed")
                : (mouseAreaClose.containsMouse ? RibbonTheme.tokenColor("close-bg") : "transparent")
         Canvas {
