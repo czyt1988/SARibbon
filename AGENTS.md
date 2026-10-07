@@ -11,7 +11,7 @@
 
 ## 架构契约（3.0 迭代期间一切任务强制）
 
-任何任务（实现、修复、示例、测试、文档）开工前必须先读 [plans/3.0/00-architecture-contract.md](plans/3.0/00-architecture-contract.md)。契约规定了 QAction 统一命令模型（两前端共享的命令层）、命令/放置属性分离、模块版本边界（QML 模块 Qt6-only）等已定裁决，并登记了已否决方案。与契约冲突的方案不得开工；执行中发现契约与 Qt 现实冲突时停下提请评审，禁止局部变通。
+任何任务（实现、修复、示例、测试、文档）开工前必须先读 [plans/3.0/00-architecture-contract.md](plans/3.0/00-architecture-contract.md)。契约规定了 QAction 统一命令模型（两前端共享的命令层）、命令/放置属性分离、模块版本边界（QML 模块 Qt5/Qt6 双车道、Qt6 为基准车道）等已定裁决，并登记了已否决方案。与契约冲突的方案不得开工；执行中发现契约与 Qt 现实冲突时停下提请评审，禁止局部变通。
 
 ## Worktree 工作流（所有任务强制）
 
@@ -42,7 +42,7 @@ src/core/                 ← SARibbonCore：宏/枚举/契约基座（布局引
 src/widgets/              ← SARibbonWidgets：全部控件源码（.h/.cpp），可编辑
 src/widgets/colorWidgets/ ← SAColorWidgets 子模块（SAColorToolButton等）
 src/widgets/i18n/         ← 翻译文件 (.ts/.qm)
-src/qml/                  ← SARibbonQml 模块（Qt6-only；QAction 命令模型，架构见 plans/3.0/00-architecture-contract.md；强制 QWindowKit 无边框：`windowAgent: RibbonWindowAgent{}` 一行启用）
+src/qml/                  ← SARibbonQml 模块（Qt5/Qt6 双车道、Qt6 为基准；QAction 命令模型，架构见 plans/3.0/00-architecture-contract.md；强制 QWindowKit 无边框：`windowAgent: RibbonWindowAgent{}` 一行启用）
 src/SARibbon.cpp/.h       ← ⛔ 合并文件，禁止触碰，调用 tools/Amalgamate.sh 自动生成
 3rdparty/                 ← 第三方代码（qwindowkit submodule 等）
 examples/widgets/         ← 示例程序（MainWindowExample是最主要的）
@@ -68,7 +68,7 @@ docs/en/python-guide/     ← Python绑定文档（英文）
 
 ## 构建
 
-CMake 构建，最低 Qt 5.12，支持 Qt5 和 Qt6（**QML 模块除外：3.0 起 Qt6-only，Qt5 下开启 `SARIBBON_BUILD_QML` 配置报错**），C++ 标准由 CMakeLists 根据 Qt 版本和选项自动设定（最低 C++14）。完整构建指引见 [build.md](build.md)。
+CMake 构建，最低 Qt 5.12，支持 Qt5 和 Qt6（QML 模块为双车道：Qt6 基准 + Qt5 兼容车道，见架构契约 D5），C++ 标准由 CMakeLists 根据 Qt 版本和选项自动设定（最低 C++14）。完整构建指引见 [build.md](build.md)。
 
 ### 构建环境
 
@@ -119,7 +119,7 @@ vcpkg 的 `frameless` feature 会自动启用 `SARIBBON_USE_FRAMELESS_LIB`；`qm
 |------|--------|------|
 | `SARIBBON_BUILD_STATIC_LIBS` | OFF | 静态库，ON 时自动定义 `SA_RIBBON_BAR_NO_EXPORT` |
 | `SARIBBON_USE_FRAMELESS_LIB` | OFF | 使用 QWindowKit 无边框方案，需 C++17 和 QWindowKit 库 |
-| `SARIBBON_BUILD_QML` | OFF | 构建 SARibbonQml 模块；ON 时强制 `SARIBBON_USE_FRAMELESS_LIB=ON`（QML 模式无本地化无边框回退，必须引入 QWindowKit，其 Quick 组件需可用）。QWK 查找顺序：已安装包 → 3rdparty/qwindowkit 树内自动构建（submodule 初始化后无需单独编译，QWK 随顶层构建一起编译）；两者皆无时配置直接报错。**Qt6-only（架构契约 D5）** |
+| `SARIBBON_BUILD_QML` | OFF | 构建 SARibbonQml 模块；ON 时强制 `SARIBBON_USE_FRAMELESS_LIB=ON`（QML 模式无本地化无边框回退，必须引入 QWindowKit，其 Quick 组件需可用）。QWK 查找顺序：已安装包 → 3rdparty/qwindowkit 树内自动构建（submodule 初始化后无需单独编译，QWK 随顶层构建一起编译）；两者皆无时配置直接报错。**Qt5/Qt6 双车道（架构契约 D5：Qt6 为基准车道，Qt5 车道 PRIVATE 链 QtWidgets）** |
 | `SARIBBON_BUILD_EXAMPLES` | ON | 控制是否编译示例程序 |
 | `SARIBBON_ENABLE_SNAPLAYOUT` | OFF | 启用 Windows 11 Snap Layout（仅 frameless 模式有效） |
 | `SARIBBON_INSTALL_IN_CURRENT_DIR` | ON (Windows) | 安装到 `bin_qt{版本}_{编译器}_x{架构}/` |

@@ -1,6 +1,7 @@
 # SARibbon 3.0 架构契约：QAction 统一命令模型
 
 > **状态**：生效中——2026-10-07 架构评审确立，取代已删除的 v2 总计划（根目录 `SARibbon-3.0-plan-v2.md`）与旧 `plans/3.0/01–04` 计划（内容可查 git 历史）
+> **修订记录**：R1（2026-10-07）D5 由"QML 模块 Qt6-only"修订为"双车道"（Qt6 基准 + Qt5 兼容车道全维护），推翻理由见 D5 修订注
 > **效力范围**：dev-3.0 分支上的全部开发，直至 3.0.0 发布
 > **阅读要求（强制）**：任何任务——功能实现、bugfix、示例、测试、文档——开工前必须通读本文件。与本文冲突的旧文档、旧代码注释一律以本文为准；执行中发现契约与 Qt 现实冲突时，停下提请架构评审修订契约，**禁止局部变通**：妥协一次，技术债务一生。
 
@@ -57,7 +58,7 @@ RibbonPanel {
 | D2 | 三层分工（§3） | QML 前后端结合模式 |
 | D3 | 命令属性与放置属性严格分离 | widgets 的 `_sa_*` 动态属性通道 |
 | D4 | QML 按钮 = C++ QQuickItem 宿主（路线 A），不继承 AbstractButton | Controls 原生按钮基类路线 |
-| D5 | QML 模块 Qt6-only；widgets 维持 Qt ≥ 5.12；core 永不 include QAction | QML 模块的 Qt5 兼容分支 |
+| D5 | 双车道：Qt6 为 QML 模块基准车道，Qt5 兼容车道全维护（R1）；widgets 维持 Qt ≥ 5.12；core 永不 include QAction | 原"Qt6-only"裁决（R1 修订推翻） |
 | D6 | action 可选，两级语义（action 绑定 / 纯声明） | — |
 | D7 | 重构在 3.0 API 冻结前完成（计划 05/06/07） | "3.1 再补" |
 | D8 | 快捷键真实化、无障碍、键盘导航为路线 A 必修欠账 | — |
@@ -89,15 +90,21 @@ RibbonPanel {
 - 路线 A 的代价即义务（见 D8）：无障碍与键盘导航必须自建，不得延后。
 - 现有分工保持：**布局在 core，渲染在叶子，逻辑在宿主**。C++ 宿主是注册类型（承载 Q_PROPERTY 与 core 布局契约多继承），QML 叶子是纯渲染文档。
 
-### D5 版本与模块边界
+### D5 版本与模块边界（R1 修订：双车道）
 
 | 模块 | Qt 下限 | 边界 |
 |------|--------|------|
 | core | 5.12（随 widgets） | **永不 include QAction**；记录/枚举/引擎/XML 已无 QAction 依赖，保持 |
 | widgets | 5.12 | QAction 消费方（Qt5 中 QAction 属 QtWidgets） |
-| qml | Qt6-only（最低小版本由计划 05 S0 构建核验钉死；开发/CI 基准 6.7+） | QAction 消费方 + RibbonAction 薄适配 |
+| qml | Qt6 基准车道（最低小版本由计划 05 S0 核验钉死，CI 基准 6.7+）；Qt5 兼容车道（验证基座 5.14.2，仅对此版本承诺） | QAction 消费方 + RibbonAction 薄适配 |
 
-QML 模块放弃 Qt5 的理由：Qt5 中 QAction 属 QtWidgets，支持它意味着 QML 应用背上整个 widgets 依赖或维护双份行为分支（现有 `QT_VERSION` 分支即此债）；Qt5 开源版早已停止维护。
+**双车道三条纪律（违反任何一条即视为契约破裂）：**
+
+1. **Qt6 是基准车道**：API 形态与行为以 Qt6 为准裁决。Qt5 车道只许滞后（某功能暂缺、待补），不许分叉（同一 API 两种行为）。
+2. **条件编译面钉死在三处**：`SARibbonQmlActionCompat.h`（QAction/QActionGroup 的 QtGui/QtWidgets include 分发）、CMake（Qt5 车道 PRIVATE 链 `Qt5::Widgets`）、既有注册/字体守卫（qRegisterMetaType 块、QFontDatabase 实例化守卫）。`#if QT_VERSION` 出现在任何业务逻辑中都是债务信号，禁止。
+3. **两车道同时过闸**：CI 必须构建并测试两条车道。Qt5 车道验证基座 5.14.2（offscreen 无字体渲染，视觉回归仅在 Qt6 车道执行，逻辑测试两车道都跑）。
+
+**R1 修订注（推翻原 Qt6-only 的理由，按 D10 记录）**：原论据"Qt5 兼容分支是纯债"经复核不成立——QML 模块本就按"Qt5/Qt6 同一份代码"设计（`src/qml/CMakeLists.txt:1`），Qt5.14.2 全量构建已验证通过（commit a3f8af）。引入 QAction 后的全部新分歧收敛为一个 shim 头 + 一处 CMake 私有链接；Qt5 车道 QML 应用部署仅多一个 Qt5Widgets.dll，无功能冲突（QGuiApplication 下 QAction 可用性待计划 05 S0-V3 实测回填）。真实成本是每版本的验证税与"5.14 里有没有"的 API 天花板检查——用户裁决承担（选项 B：双车道全维护）。
 
 ### D6 两级语义
 
@@ -117,7 +124,7 @@ QML 模块放弃 Qt5 的理由：Qt5 中 QAction 属 QtWidgets，支持它意味
 
 ### D8 路线 A 的必修欠账
 
-1. **快捷键真实化**：`QAction::shortcut` 在 QML 场景必须真实触发（机制含核验与回退设计，见计划 05 S4）。
+1. **快捷键真实化**：`QAction::shortcut` 在 QML 场景必须真实触发（机制含核验与回退设计，见计划 05 S5）。
 2. **无障碍**：QQuickAccessibleAttached（role=Button、name=text）。
 3. **键盘导航基线**：tab 焦点、Space/Enter 触发。
 
@@ -156,7 +163,7 @@ v2 D8 引用 KDDW 论证"不做自研 Action"，但结论用反了：KDDW 自研
 | AbstractButton 作为 QML 按钮基类 | 同上；且 core 布局引擎跨前端复用丢失 | 同上 |
 | KDDW 式自研 Core::Action | 两前端皆 Qt，QAction 是不动点；自研 = 第三种命令类型 | 出现非 Qt 前端 |
 | proportion/大小放命令对象 | Office/WPF/QToolBar 横评反证 + 快速访问栏反例 | 无 |
-| QML 模块继续支持 Qt5 | QAction 归属分裂（QtWidgets vs QtGui），双份分支纯债 | 无 |
+| 条件编译渗入业务逻辑（`#if QT_VERSION` 扩散出 D5 钉死的三处兼容面） | 双车道债务的主要形态，D5 纪律 2 明令禁止 | 无 |
 | "静态声明为中心"的模块定位 | 前后端分离后，动态驱动经命令层成为一等公民，声明式只是编写表面 | 无 |
 | 快捷键仅做展示文本（现状） | 显示 Ctrl+S 却不响应 = 谎言式 UI | 无 |
 
@@ -177,13 +184,14 @@ v2 D8 引用 KDDW 论证"不做自研 Action"，但结论用反了：KDDW 自研
 
 | 项 | 内容 | 核验位置 |
 |----|------|---------|
-| Qt 最低小版本 | QML 模块在 6.x 最低可构建版本（预期 6.2 可行） | 计划 05 S0-V1 |
+| Qt6 基准车道最低小版本 | QML 模块在 6.x 最低可构建版本（预期 6.2 可行） | 计划 05 S0-V1 |
 | QAction::shortcut 在 Quick 场景的自动触发性 | 决定快捷键机制走原生还是回退设计 | 计划 05 S0-V2 |
+| QGuiApplication 下 QAction 可用性（Qt5 车道） | Qt5.14.2 + QGuiApplication 中 QAction 的创建/属性/triggered 实测（QObject 级预期无碍） | 计划 05 S0-V3 |
 
 ## 10. 执行计划索引
 
 | 计划 | 内容 | 状态 | 依赖 |
 |------|------|------|------|
-| [05-qml-action-core.md](05-qml-action-core.md) | RibbonAction 类型、按钮 action 绑定、快捷键真实化、容器/后端驱动适配、Qt6-only 切换、无障碍基线 | 待执行 | 无 |
+| [05-qml-action-core.md](05-qml-action-core.md) | RibbonAction 类型、按钮 action 绑定、快捷键真实化、容器/后端驱动适配、双车道基线（Qt6 基准 + Qt5 兼容，D5 R1）、无障碍基线 | 待执行 | 无 |
 | [06-qml-action-ecosystem.md](06-qml-action-ecosystem.md) | 注册表/定制器 QAction 寻址、菜单树 QAction 化、Gallery、示例重写、跨端一致性、文档 | 待执行 | 05 |
 | [07-widgets-placement-cleanup.md](07-widgets-placement-cleanup.md) | 废除 `_sa_*` 动态属性通道、参数直达 PanelItem、isCanCustomize 归置 | 待执行 | 无（可与 05/06 并行） |

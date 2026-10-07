@@ -10,7 +10,7 @@
 2. `RibbonToolButton` 支持 `action: QAction*`：text/icon/toolTip/checked/enabled 全部派生自 action，click → `action->trigger()`
 3. 快捷键**真实触发**（废除"纯展示文本"现状）
 4. C++ 后端可在运行期以 QAction 为单位动态构建 ribbon
-5. QML 模块切换 **Qt6-only**（契约 D5）
+5. QML 模块确立**双车道兼容基线**（契约 D5 R1：Qt6 基准 + Qt5 兼容车道全维护，条件编译面钉死三处）
 6. 无障碍与键盘导航基线（契约 D8）
 
 ## 2. 非目标
@@ -24,23 +24,24 @@
 
 | # | 核验项 | 方法 | 结论去向 |
 |---|-------|------|---------|
-| V1 | Qt 最低小版本 | 以可得的最低 Qt 6.x（预期 6.2 LTS）完整构建 QML 模块 + 示例 + 测试；失败则逐级上调 | 回填契约 D5 |
-| V2 | `QAction::shortcut` 在 QQuickWindow 场景是否自动触发 | 最小测试程序：QQuickView + `QAction::setShortcut("Ctrl+S")`，**不经任何 QML Shortcut 类型**，按键看 triggered 是否发出；同时验证 shortcutContext 语义 | 决定 S4 走原生还是回退设计 |
-| V3 | Qt5 兼容分支清单 | `grep -rn "QT_VERSION\|QT_CONFIG" src/qml/` + qml 相关 CMake 条件 | S1 删除清单 |
+| V1 | Qt6 基准车道最低小版本 | 以可得的最低 Qt 6.x（预期 6.2 LTS）完整构建 QML 模块 + 示例 + 测试；失败则逐级上调 | 回填契约 D5 |
+| V2 | `QAction::shortcut` 在 QQuickWindow 场景是否自动触发 | 最小测试程序：QQuickView + `QAction::setShortcut("Ctrl+S")`，**不经任何 QML Shortcut 类型**，按键看 triggered 是否发出；同时验证 shortcutContext 语义（Qt5 车道预期恒不触发，不必测） | 决定 S5 走原生还是回退设计 |
+| V3 | QGuiApplication 下 QAction 可用性（Qt5 车道关键实测） | Qt5.14.2 + **QGuiApplication**（非 QApplication）：创建 QAction、设置 text/icon/shortcut/checkable、`trigger()`、监听 `changed`/`triggered`——确认 QObject 级无碍 | 回填契约 D5 修订注；若失败，文档化为 Qt5 车道已知差异并回契约评审 |
 | V4 | QML 字符串 → QKeySequence 赋值 | `RibbonAction { shortcut: "Ctrl+S" }` 是否经 QVariant 转换成功 | 不行则 S2 补 `shortcutText` 便捷属性 |
 
 ## 4. 执行步骤
 
-### S1 Qt6-only 切换（V3 清单执行）
+### S1 双车道兼容基线确立（契约 D5 R1）
 
-- 删除 `SARibbonQmlTypes.cpp:118-137` 的 Qt5 `qRegisterMetaType` 块及全模块版本宏分支（含 Qt5 QFontDatabase 等历史 workaround）
-- CMake：`SARIBBON_BUILD_QML=ON` 时强制 `find_package(Qt6 ...)`；Qt5 下配置**明确报错**并说明原因（契约 D5）
-- CI 矩阵更新：Qt5 线 = widgets-only（QML OFF），Qt6 线 = 全量
-- 回填 V1 结论到契约 D5
+- **保留**既有 Qt5 守卫：`SARibbonQmlTypes.cpp:118-137` 的 qRegisterMetaType 块、`SARibbonQmlMetrics.cpp` 的 QFontDatabase 实例化守卫——a3f8af 已验证有效，且属于契约 D5 钉死的兼容面
+- **新增** `src/qml/SARibbonQmlActionCompat.h`：`#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)` 时 include `<QtGui/QAction>` / `<QtGui/QActionGroup>`，否则 `<QtWidgets/QAction>` / `<QtWidgets/QActionGroup>`——全模块对 QAction/QActionGroup 的 include 一律经此头，**这是唯一新增的条件编译点**（契约 D5 纪律 2）
+- CMake：Qt5 车道 `find_package(Qt5 REQUIRED COMPONENTS Quick Widgets)` + `target_link_libraries(SARibbonQml PRIVATE Qt5::Widgets)`；Qt6 车道不变（Quick + Gui）
+- CI 矩阵：**两车道同时过闸**——Qt5 线（5.14.2：构建 + 逻辑测试，视觉回归豁免——offscreen 无字体）+ Qt6 线（6.7+：全量）；Qt5 线含 V3 的 QGuiApplication+QAction 用例
+- 回填 V1 / V3 结论到契约 D5
 
 ### S2 RibbonAction 类型（src/qml/SARibbonQmlAction.h/.cpp）
 
-- `class RibbonAction : public QAction`，Q_OBJECT；注册 `"SARibbon", 3, 0, "RibbonAction"`
+- `class RibbonAction : public QAction`，Q_OBJECT；注册 `"SARibbon", 3, 0, "RibbonAction"`；对 QAction/QActionGroup 的 include 一律经 `SARibbonQmlActionCompat.h`（契约 D5 纪律 2）
 - 属性（契约 §5 边界内）：
   - `iconSource: QUrl` — WRITE 时惰性构建 QIcon 并 `QAction::setIcon` 同步（同一 action 可喂 widgets 世界）；`setIcon` 反向变化时同步回 url 可为空（QIcon 侧以 provider 链路渲染，见 S3）
   - `toolTip: QString` — QAction 无此属性，补齐
@@ -78,7 +79,8 @@
   - 事件过滤 `window->contentItem()` 的 ShortcutOverride / KeyPress
   - 匹配 → `action->trigger()`；尊重 enabled / visible / shortcutContext（Window/Application 近似语义）
   - 单次按键单次触发；预计 100–150 行，全部公开 API
-- 验收：示例中 Ctrl+S 等真实可用；与 QML Shortcut 类型并存不双触发
+- Qt5 车道：V2 预期恒不触发 → 回退设计在 Qt5 车道恒启用（同一条代码路径，非行为分叉；契约 D5 纪律 1）
+- 验收：**两车道**示例中 Ctrl+S 等真实可用；与 QML Shortcut 类型并存不双触发
 
 ### S6 容器与后端驱动适配
 
@@ -109,7 +111,7 @@
 
 1. 契约 §3 典型代码段与迁移故事在示例中真实可跑（C++ 裸 QAction 与 QML RibbonAction 各演示一路）
 2. 同一 QAction 同时出现在面板 + 快速访问栏：状态单点同步、快捷键真实触发
-3. Qt5 配置下 `SARIBBON_BUILD_QML=ON` 明确报错；Qt6 全量绿
+3. **双车道全绿**：Qt5.14.2 车道全量构建 + 逻辑测试通过（含 V3 的 QGuiApplication+QAction 实测用例）；Qt6 车道全量通过
 4. 无障碍/键盘基线验收（S7）
 5. 既有 QML 布局/渲染测试全绿（重构不得引入视觉回归）
 
@@ -121,3 +123,4 @@
 | image provider 高频刷新开销 | 缓存 + 仅 iconChanged 时失效 |
 | QAction 只有 changed() 单信号，派生属性 NOTIFY 粒度粗 | 宿主统一 re-emit 全部派生 NOTIFY，接受冗余刷新（正确性优先） |
 | 写穿语义与 QML 绑定冲突（绑定写回） | 单测覆盖：绑定 + 手写并存场景 |
+| Qt5 车道 QGuiApplication 下 QAction 异常（V3 失败） | 文档化为 Qt5 车道已知差异；严重则回契约评审，不得局部变通 |
