@@ -9,6 +9,10 @@
 - **禁止** 类注释用 `@param`/`@class`/`@ingroup` → 仅 `@brief`/`@details`/`@note`/`@see`
 - **禁止** `as any`/`@ts-ignore` 类型的类型安全压制（本项目无 TypeScript，但精神一致：不压制编译错误）
 
+## 架构契约（3.0 迭代期间一切任务强制）
+
+任何任务（实现、修复、示例、测试、文档）开工前必须先读 [plans/3.0/00-architecture-contract.md](plans/3.0/00-architecture-contract.md)。契约规定了 QAction 统一命令模型（两前端共享的命令层）、命令/放置属性分离、模块版本边界（QML 模块 Qt6-only）等已定裁决，并登记了已否决方案。与契约冲突的方案不得开工；执行中发现契约与 Qt 现实冲突时停下提请评审，禁止局部变通。
+
 ## Worktree 工作流（所有任务强制）
 
 多任务并行时互不干扰：任何改动都不在主工作树进行，一律在 `.worktree/` 下的独立 worktree 内完成。开始工作前必须执行以下四步：
@@ -34,11 +38,11 @@
 ## 项目结构
 
 ```
-src/core/                 ← SARibbonCore：宏/枚举/契约基座（计划02起下沉算法），可编辑
+src/core/                 ← SARibbonCore：宏/枚举/契约基座（布局引擎等共用算法），可编辑，永不 include QAction
 src/widgets/              ← SARibbonWidgets：全部控件源码（.h/.cpp），可编辑
 src/widgets/colorWidgets/ ← SAColorWidgets 子模块（SAColorToolButton等）
 src/widgets/i18n/         ← 翻译文件 (.ts/.qm)
-src/qml/                  ← SARibbonQml 骨架（计划04实现；QML 模式强制 QWindowKit 无边框：`windowAgent: RibbonWindowAgent{}` 一行启用）
+src/qml/                  ← SARibbonQml 模块（Qt6-only；QAction 命令模型，架构见 plans/3.0/00-architecture-contract.md；强制 QWindowKit 无边框：`windowAgent: RibbonWindowAgent{}` 一行启用）
 src/SARibbon.cpp/.h       ← ⛔ 合并文件，禁止触碰，调用 tools/Amalgamate.sh 自动生成
 3rdparty/                 ← 第三方代码（qwindowkit submodule 等）
 examples/widgets/         ← 示例程序（MainWindowExample是最主要的）
@@ -51,7 +55,7 @@ pyexamples/               ← Python示例程序（pyqt5/pyqt6/pyside6三个子�
 pyproject.toml            ← PyQt5 PyPI打包配置
 pyproject-pyqt6.toml      ← PyQt6 PyPI打包配置
 pyside6/pyproject.toml    ← PySide6 PyPI打包配置
-plans/3.0/                ← 3.0 重构执行计划与偏差记录（NOTES.md）
+plans/3.0/                ← 3.0 架构契约（00-architecture-contract.md，任务开工前必读）与执行计划 05–07
 docs/zh/dev-guide/        ← 开发规范文档（编码前必读）
 docs/zh/build-guide/      ← 构建指引
 docs/zh/python-guide/     ← Python绑定文档（中文）
@@ -60,11 +64,11 @@ docs/en/python-guide/     ← Python绑定文档（英文）
 
 3.0 开发在 `dev-3.0` 长期分支进行，合并进 master 前不与 `dev`（2.x 线）交互；期间 2.x bugfix 直接 cherry-pick 到 `dev-3.0`，布局引擎相关 fix 须手动同步 core 版并跑黄金测试。
 
-宏基座在 `src/core/SARibbonCoreGlobal.h`（PIMPL 宏族与 `SA_RIBBON_CORE_EXPORT`），`src/widgets/SARibbonGlobal.h` 为兼容转发头（`SARibbonAlignment`/`SARibbonTheme`/`SARibbonMainWindowStyleFlag` 枚举仍在其中，计划02下沉 core）。
+宏基座在 `src/core/SARibbonCoreGlobal.h`（PIMPL 宏族与 `SA_RIBBON_CORE_EXPORT`），`src/widgets/SARibbonGlobal.h` 为兼容转发头（`SARibbonAlignment`/`SARibbonTheme`/`SARibbonMainWindowStyleFlag` 枚举仍在其中，待下沉 core）。
 
 ## 构建
 
-CMake 构建，最低 Qt 5.12，支持 Qt5 和 Qt6，C++ 标准由 CMakeLists 根据 Qt 版本和选项自动设定（最低 C++14）。完整构建指引见 [build.md](build.md)。
+CMake 构建，最低 Qt 5.12，支持 Qt5 和 Qt6（**QML 模块除外：3.0 起 Qt6-only，Qt5 下开启 `SARIBBON_BUILD_QML` 配置报错**），C++ 标准由 CMakeLists 根据 Qt 版本和选项自动设定（最低 C++14）。完整构建指引见 [build.md](build.md)。
 
 ### 构建环境
 
@@ -115,7 +119,7 @@ vcpkg 的 `frameless` feature 会自动启用 `SARIBBON_USE_FRAMELESS_LIB`；`qm
 |------|--------|------|
 | `SARIBBON_BUILD_STATIC_LIBS` | OFF | 静态库，ON 时自动定义 `SA_RIBBON_BAR_NO_EXPORT` |
 | `SARIBBON_USE_FRAMELESS_LIB` | OFF | 使用 QWindowKit 无边框方案，需 C++17 和 QWindowKit 库 |
-| `SARIBBON_BUILD_QML` | OFF | 构建 SARibbonQml 模块；ON 时强制 `SARIBBON_USE_FRAMELESS_LIB=ON`（QML 模式无本地化无边框回退，必须引入 QWindowKit，其 Quick 组件需可用）。QWK 查找顺序：已安装包 → 3rdparty/qwindowkit 树内自动构建（submodule 初始化后无需单独编译，QWK 随顶层构建一起编译）；两者皆无时配置直接报错 |
+| `SARIBBON_BUILD_QML` | OFF | 构建 SARibbonQml 模块；ON 时强制 `SARIBBON_USE_FRAMELESS_LIB=ON`（QML 模式无本地化无边框回退，必须引入 QWindowKit，其 Quick 组件需可用）。QWK 查找顺序：已安装包 → 3rdparty/qwindowkit 树内自动构建（submodule 初始化后无需单独编译，QWK 随顶层构建一起编译）；两者皆无时配置直接报错。**Qt6-only（架构契约 D5）** |
 | `SARIBBON_BUILD_EXAMPLES` | ON | 控制是否编译示例程序 |
 | `SARIBBON_ENABLE_SNAPLAYOUT` | OFF | 启用 Windows 11 Snap Layout（仅 frameless 模式有效） |
 | `SARIBBON_INSTALL_IN_CURRENT_DIR` | ON (Windows) | 安装到 `bin_qt{版本}_{编译器}_x{架构}/` |
@@ -190,6 +194,7 @@ PIMPL 注意：`d_ptr` 用 `std::unique_ptr`（非 QScopedPointer），PrivateDa
 
 | 文档 | 内容 |
 |------|------|
+| [3.0 架构契约](plans/3.0/00-architecture-contract.md) | QAction 统一命令模型、模块边界、已否决方案（**一切任务必读**） |
 | [coding-standards.md](docs/zh/dev-guide/coding-standards.md) | 命名规范、Doxygen注释、Git提交 |
 | [pimpl-dev-guide.md](docs/zh/dev-guide/pimpl-dev-guide.md) | PIMPL宏完整用法 |
 | [qt-integration.md](docs/zh/dev-guide/qt-integration.md) | Q_PROPERTY、信号槽、Qt宏 |
@@ -197,4 +202,4 @@ PIMPL 注意：`d_ptr` 用 `std::unique_ptr`（非 QScopedPointer），PrivateDa
 
 ## 开发原则
 
-当前项目有三个模块：core、widgets 和 QML。这三个模块的依赖关系是，widgets 和 QML 都要依赖 core 模块。因此，如果某个功能 widgets 和 QML 都要用到，则要把这个功能提取到 core 模块里面去，形成一个共性功能，在开发过程中一定要时刻记住：在规划某个功能的时候，首先要想这个功能是否是共用的功能。如果是共用的功能，则把它提取到 core 内部去
+当前项目有三个模块：core、widgets 和 QML。这三个模块的依赖关系是，widgets 和 QML 都要依赖 core 模块。因此，如果某个功能 widgets 和 QML 都要用到，则要把这个功能提取到 core 模块里面去，形成一个共性功能，在开发过程中一定要时刻记住：在规划某个功能的时候，首先要想这个功能是否是共用的功能。如果是共用的功能，则把它提取到 core 内部去。唯一例外是 QAction 命令对象：它是 Qt 原生的共享类型，由两前端各自消费，永不 include 进 core（见架构契约 D5）
