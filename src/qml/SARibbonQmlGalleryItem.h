@@ -4,6 +4,7 @@
 // the single QAction include face of the module (contract D5, plan-05 S1)
 #include "SARibbonQmlActionCompat.h"
 #include <QObject>
+#include <QPointer>
 
 namespace SARibbonQml {
 
@@ -77,7 +78,8 @@ private:
     // re-derive the mirrored fields off the coarse QAction::changed
     void onActionChanged();
 
-    QAction* mAction = nullptr;
+    // QPointer (review P1-2): the bound command may die on the C++ side
+    QPointer< QAction > mAction;
     QString mText;
     QString mIconSource;
     bool mEnabled = true;

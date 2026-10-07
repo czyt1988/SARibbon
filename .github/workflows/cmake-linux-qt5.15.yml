@@ -9,17 +9,23 @@ env:
 jobs:
   build:
     runs-on: ubuntu-${{ matrix.ubuntu_version }}
-    name: Ubuntu-${{ matrix.ubuntu_version }}-Qt-${{ matrix.qt_version }}-shared-${{ matrix.shared }}
+    name: Ubuntu-${{ matrix.ubuntu_version }}-Qt-${{ matrix.qt_version }}-shared-${{ matrix.shared }}-qml-${{ matrix.qml }}
     strategy:
       fail-fast: false
       matrix:
         ubuntu_version: [latest]
         qt_version: [5.15.*]
         shared: [ON]
+        # Qt5 compat lane of the QML module (contract D5 R1 discipline 3:
+        # both lanes must pass the gate — build + logic tests here; visual
+        # regression runs on the Qt6 lane only, offscreen has no fonts)
+        qml: [OFF, ON]
 
     steps:
     - name: Checkout
       uses: actions/checkout@v4
+      with:
+          submodules: ${{ matrix.qml == 'ON' && 'recursive' || 'false' }}
 
     - name: Install Qt
       uses: jurplel/install-qt-action@v4
@@ -28,14 +34,17 @@ jobs:
           cache: 'true'
           cache-key-prefix: ${{ runner.os }}-Qt-Cache-${{ matrix.qt_version }}
           dir: ${{ github.workspace }}/Qt
-    
+
     - name: Install Linux dependencies
-      run: sudo apt install -y libgl1-mesa-dev libxcb1-dev libgtk-3-dev
+      run: sudo apt install -y libgl1-mesa-dev libxcb1-dev libgtk-3-dev libxcb-cursor0
 
     - name: Core purity check
       run: python3 tools/check_core_purity.py src/core
+    - name: QML purity check (QAction family allowed through SARibbonQmlActionCompat.h, the contract D5 pinned face)
+      if: matrix.qml == 'ON'
+      run: python3 tools/check_core_purity.py src/qml --forbid-include QWidget QApplication QLayout QStyle QMainWindow QDialog QPushButton QToolBar SARibbonWidgets '<QtWidgets/' --allow-include QAction QActionGroup
     - name: Configure CMake
-      run: cmake -DCMAKE_BUILD_TYPE="${{env.BUILD_TYPE}}" -DBUILD_SHARED_LIBS=${{ matrix.shared }} -DSARIBBON_BUILD_EXAMPLES=OFF -DSARIBBON_BUILD_TESTS=ON -B "${{github.workspace}}/build"
+      run: cmake -DCMAKE_BUILD_TYPE="${{env.BUILD_TYPE}}" -DBUILD_SHARED_LIBS=${{ matrix.shared }} -DSARIBBON_BUILD_EXAMPLES=OFF -DSARIBBON_BUILD_TESTS=ON -DSARIBBON_BUILD_QML=${{ matrix.qml }} -B "${{github.workspace}}/build"
 
     - name: Build
       run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
@@ -44,6 +53,12 @@ jobs:
       env:
         QT_QPA_PLATFORM: offscreen
       run: ctest --test-dir ${{github.workspace}}/build -C ${{env.BUILD_TYPE}} -L core --output-on-failure --no-tests=error
+    - name: QML logic tests (Qt5 lane: logic only — visual regression is Qt6-lane only)
+      if: matrix.qml == 'ON'
+      env:
+        QT_QPA_PLATFORM: offscreen
+        QT_QUICK_CONTROLS_STYLE: Default
+      run: ctest --test-dir ${{github.workspace}}/build -C ${{env.BUILD_TYPE }} -L qml -R "qml_Action" --output-on-failure --no-tests=error
     - name: Test
       env:
         QT_QPA_PLATFORM: offscreen

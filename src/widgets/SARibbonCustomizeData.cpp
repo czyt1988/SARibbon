@@ -130,6 +130,9 @@ bool SARibbonCustomizeData::apply(SARibbonBar* bar) const
     }
 
     case RemoveActionActionType: {
+        if (nullptr == mActionsManagerPointer) {
+            return (false);
+        }
         SARibbonCategory* c = bar->categoryByObjectName(categoryObjNameValue);
         if (nullptr == c) {
             return (false);
@@ -178,6 +181,9 @@ bool SARibbonCustomizeData::apply(SARibbonBar* bar) const
     }
 
     case ChangeActionOrderActionType: {
+        if (nullptr == mActionsManagerPointer) {
+            return (false);
+        }
         SARibbonCategory* c = bar->categoryByObjectName(categoryObjNameValue);
         if (nullptr == c) {
             return (false);

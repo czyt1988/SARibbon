@@ -11,6 +11,7 @@
 #include "SARibbonQmlAction.h"
 #include <SARibbonCore/SARibbonEnums.h>
 #include <SARibbonCore/SARibbonToolButtonLayout.h>
+#include <QPointer>
 #include <QQuickItem>
 #include <QQmlListProperty>
 #include <QRectF>
@@ -317,13 +318,7 @@ protected:
 #endif
 
 private:
-    // QQmlListProperty callback types differ between Qt5 (int) and Qt6 (qsizetype)
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    using ListIndex = qsizetype;
-#else
-    using ListIndex = int;
-#endif
-    // ---- menu model (plan-06 S3) ----
+        // ---- menu model (plan-06 S3) ----
     RibbonMenuModel* mMenuModel;
     void syncMenuModel();
     QVector< QAction* > mMenuActions;
@@ -357,7 +352,9 @@ private:
     void syncShortcutCollection();
     // guard so action-driven updates never write back to the action
     bool mSyncingFromAction = false;
-    QAction* mAction        = nullptr;
+    // QPointer (review P1-2): the bound command may be deleted on the C++
+    // side at any moment — every mAction use is a null-checked use
+    QPointer< QAction > mAction;
     qint64 mLastIconKey     = 0;  ///< QIcon::cacheKey of the derived icon (change detection)
 
     QSize computeSizeHintFromMetrics();

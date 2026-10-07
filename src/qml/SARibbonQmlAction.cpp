@@ -109,6 +109,13 @@ void RibbonAction::addMenuAction(QAction* action)
 {
     if (action && !mMenuActions.contains(action)) {
         mMenuActions.append(action);
+        // review P1-1: a destroyed submenu command must leave the list
+        // instead of leaving a dangling pointer menuActionAt would hand out
+        connect(action, &QObject::destroyed, this, [this](QObject* gone) {
+            if (mMenuActions.removeAll(static_cast< QAction* >(gone)) > 0) {
+                Q_EMIT menuActionsChanged();
+            }
+        });
         Q_EMIT menuActionsChanged();
     }
 }
@@ -270,6 +277,10 @@ void RibbonMenuModel::rewatch()
         }
         seen.insert(a);
         mWatched.append(connect(a, &QAction::changed, this, &RibbonMenuModel::rebuild));
+        // review P1-1: a destroyed command must leave the list, not dangle in
+        // it — the changed hook dies with the sender, so destroyed is the only
+        // reliable cleanup signal (the Registry onActionDestroyed pattern)
+        mWatched.append(connect(a, &QObject::destroyed, this, [this](QObject* gone) { onActionDestroyed(gone); }));
         if (auto* ribbonAction = qobject_cast< RibbonAction* >(a)) {
             for (const QVariant& v : ribbonAction->menuActionList()) {
                 if (QAction* sub = v.value< QAction* >()) {
@@ -284,6 +295,24 @@ void RibbonMenuModel::rebuild()
 {
     mRows = saRibbonMenuRows(mActions);
     Q_EMIT rowsChanged();
+}
+
+void RibbonMenuModel::onActionDestroyed(QObject* gone)
+{
+    QVariantList kept;
+    bool dropped = false;
+    for (const QVariant& v : mActions) {
+        if (v.value< QObject* >() == gone) {
+            dropped = true;
+            continue;
+        }
+        kept.append(v);
+    }
+    if (dropped) {
+        mActions = kept;
+        rewatch();
+        rebuild();
+    }
 }
 
 QVariantList saRibbonMenuRows(const QVariantList& actions)

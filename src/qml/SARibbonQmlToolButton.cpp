@@ -636,6 +636,14 @@ void RibbonToolButton::addMenuAction(QAction* action)
 {
     if (action && !mMenuActions.contains(action)) {
         mMenuActions.append(action);
+        // review P1-1: a destroyed menu command must leave the list instead
+        // of leaving a dangling pointer menuActionAt would hand out
+        connect(action, &QObject::destroyed, this, [this](QObject* gone) {
+            if (mMenuActions.removeAll(static_cast< QAction* >(gone)) > 0) {
+                syncMenuModel();
+                Q_EMIT menuActionsChanged();
+            }
+        });
         syncMenuModel();
         Q_EMIT menuActionsChanged();
     }

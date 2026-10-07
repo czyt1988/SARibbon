@@ -33,7 +33,7 @@ namespace SARibbonQml {
  * @details S0-V2 结论：QAction 快捷键在 QQuickWindow 场景不会自动触发（已确认
  *          按键送达了焦点 item，孤儿 action 从未发射），Qt5 车道同样不触发——
  *          因此匹配器是两条车道共用的同一条代码路径（无行为分叉，契约 D5 纪律
- *          1）。它经事件过滤盯住窗口 contentItem：ShortcutOverride 按键命中收集
+ *          1）。它经事件过滤盯住 bar 的 QQuickWindow：KeyPress 命中收集
  *          到的 (action, QKeySequence) 即触发该 action——仅限启用且可见者。bar
  *          在按钮 attach/detach 与 action 属性变化时维护收集表；未绑定到任何
  *          可见按钮的 action 被忽略，这是 Qt::WindowShortcut 语义的 Quick 域

@@ -366,18 +366,20 @@ void RibbonActionRegistry::detachItem(RibbonLayoutItemHost* item)
  * \if ENGLISH
  * @brief Mark every registered command customizable
  * @details Writes the core SA_RIBBON_BAR_PROP_CAN_CUSTOMIZE marker on each
- *          command object. The command-level flag belongs to the QAction —
- *          the same object the widgets manager marks since plan-07 S3 — so
- *          every placement inherits it for free. Only matters while
- *          RibbonCustomizer::enforceCanCustomize is on.
+          command object. The command-level flag belongs to the QAction — on
+          the widgets side the flag lives in the SARibbonActionsManager table
+          since plan-07 S3, here it rides the core dynamic property on the
+          same kind of object; every placement inherits it for free. Only
+          matters while RibbonCustomizer::enforceCanCustomize is on.
  * \endif
  *
  * \if CHINESE
  * @brief 把每条已注册命令标记为可定制
  * @details 对每个命令对象写入 core 的 SA_RIBBON_BAR_PROP_CAN_CUSTOMIZE 标记。
- *          命令级标记属于 QAction——与计划 07 S3 起 widgets 管理器标记的是同一
- *          种对象——因此每次放置都免费继承它。仅在 RibbonCustomizer::
- *          enforceCanCustomize 打开时才有意义。
+ \*          命令级标记属于 QAction——widgets 侧自计划 07 S3 起该标记保存在
+ \*          SARibbonActionsManager 的表里，这里则以 core 动态属性落在同类对象上；
+ \*          每次放置都免费继承它。仅在 RibbonCustomizer::enforceCanCustomize
+ \*          打开时才有意义。
  * \endif
  */
 int RibbonActionRegistry::markCustomizable(bool canbe)

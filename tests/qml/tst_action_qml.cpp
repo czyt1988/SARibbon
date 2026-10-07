@@ -50,6 +50,7 @@ private Q_SLOTS:
     void keyboardSpaceTriggers();
     void ribbonActionQmlRoute();
     void menuPanelSharedCommand();
+    void destroyedActionCleanup();
     void menuCheckableFlipOrder();
     void galleryActionActivation();
     void registryObjectNameAddressing();
@@ -574,6 +575,59 @@ void TestActionQml::registryObjectNameAddressing()
     QAction* tmpl = reg.action("template.cmd");
     QVERIFY(tmpl != nullptr);
     QCOMPARE(tmpl->text(), QStringLiteral("Template Text"));
+}
+
+/**
+ * @brief Review P1-1/P1-2 regression: a deleted command must not dangle
+ * @details The menu model, the button menu lists and the bound action all
+ *          hold raw QAction pointers — the destroyed hooks must drop the
+ *          entries so no later derivation dereferences a dead command.
+ */
+void TestActionQml::destroyedActionCleanup()
+{
+    SARibbonQml::RibbonToolButton btn;
+    auto* cmd1 = new SARibbonQml::RibbonAction;
+    cmd1->setObjectName("dying1");
+    cmd1->setText("First");
+    auto* cmd2 = new SARibbonQml::RibbonAction;
+    cmd2->setObjectName("dying2");
+    cmd2->setText("Second");
+    btn.addMenuAction(cmd1);
+    btn.addMenuAction(cmd2);
+    QCOMPARE(btn.menuActionCount(), 2);
+    QCOMPARE(btn.menuModel().size(), 2);
+
+    // a submenu entry dying must leave the parent's nested list too
+    auto* parent = new SARibbonQml::RibbonAction;
+    parent->setObjectName("parent");
+    auto* child = new SARibbonQml::RibbonAction;
+    child->setObjectName("child");
+    parent->addMenuAction(child);
+
+    // bound command dying: the button survives, action() nulls out
+    auto* bound = new SARibbonQml::RibbonAction;
+    bound->setObjectName("bound");
+    btn.setAction(bound);
+    QCOMPARE(btn.action(), qobject_cast< QAction* >(bound));
+    delete bound;
+    QVERIFY(btn.action() == nullptr);  // QPointer, not a dangling raw pointer
+
+    // menu entry dying: the list drops it, the derived rows follow
+    delete cmd1;
+    QCOMPARE(btn.menuActionCount(), 1);
+    QCOMPARE(btn.menuModel().size(), 1);
+    QCOMPARE(btn.menuActionAt(0), qobject_cast< QAction* >(cmd2));
+
+    // submenu child dying: the nested derivation no longer shows it
+    // (RibbonMenuModel drives the nested rows of an entry's menuActions)
+    SARibbonQml::RibbonMenuModel nestedModel;
+    nestedModel.setActions(parent->menuActionList());
+    QCOMPARE(nestedModel.rows().size(), 1);
+    delete child;
+    QCOMPARE(parent->menuActionCount(), 0);
+    QCOMPARE(nestedModel.rows().size(), 0);  // the destroyed hook dropped it
+    delete parent;
+    delete cmd2;
 }
 
 // custom main: QTEST_MAIN switches to QApplication once QtWidgets is linked

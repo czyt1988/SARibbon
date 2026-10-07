@@ -146,6 +146,10 @@ Q_SIGNALS:
 private:
     void rewatch();
     void rebuild();
+    // drop a destroyed action from the list and rebuild (the QVariantList
+    // holds raw pointers — without this, a deleted command leaves dangling
+    // entries the next derivation would dereference)
+    void onActionDestroyed(QObject* gone);
 
     QVariantList mActions;
     QVariantList mRows;

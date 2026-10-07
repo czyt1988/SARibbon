@@ -853,6 +853,14 @@ void RibbonBar::addApplicationMenuAction(QAction* action)
 {
     if (action && !mAppMenuActions.contains(action)) {
         mAppMenuActions.append(action);
+        // review P1-1: a destroyed menu command must leave the list instead
+        // of leaving a dangling pointer applicationMenuActionAt would hand out
+        connect(action, &QObject::destroyed, this, [this](QObject* gone) {
+            if (mAppMenuActions.removeAll(static_cast< QAction* >(gone)) > 0) {
+                syncAppMenuModel();
+                Q_EMIT applicationMenuActionsChanged();
+            }
+        });
         syncAppMenuModel();
         Q_EMIT applicationMenuActionsChanged();
     }

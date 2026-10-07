@@ -71,8 +71,10 @@ void RibbonShortcutMatcher::collectAction(QObject* button, QAction* action)
             forgetButton(dead);
         });
     }
-    // a shortcut rebind on the action must reach the match table
-    QObject::connect(action, &QAction::changed, this, [this]() { rebuildMap(); });
+    // a shortcut rebind on the action must reach the match table. Unique:
+    // several buttons may bind the same command — one hookup per action, the
+    // rebuild is idempotent anyway
+    QObject::connect(action, &QAction::changed, this, [this]() { rebuildMap(); }, Qt::UniqueConnection);
     rebuildMap();
 }
 
