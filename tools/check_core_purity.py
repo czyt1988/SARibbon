@@ -68,10 +68,10 @@ INCLUDE_RE = re.compile(r'^\s*#\s*include\s*(?:<([^>]+)>|"([^"]+)")')
 SCAN_EXTS = (".h", ".hpp", ".cpp")
 
 
-def check_include_target(target: str, forbidden: list) -> str | None:
+def check_include_target(target: str, forbidden: list, legal: set) -> str | None:
     """Return the violated rule if the include target is forbidden."""
     base = os.path.basename(target)
-    if base in EXPLICIT_LEGAL_INCLUDES:
+    if base in EXPLICIT_LEGAL_INCLUDES or base in legal:
         return None
     for rule in forbidden:
         if rule.startswith("<"):
@@ -90,14 +90,14 @@ def check_include_target(target: str, forbidden: list) -> str | None:
     return None
 
 
-def scan_file(path: str, forbidden: list) -> list:
+def scan_file(path: str, forbidden: list, legal: set) -> list:
     violations = []
     with open(path, "r", encoding="utf-8", errors="replace") as f:
         for lineno, line in enumerate(f, 1):
             m = INCLUDE_RE.match(line)
             if m:
                 target = m.group(1) or m.group(2)
-                hit = check_include_target(target, forbidden)
+                hit = check_include_target(target, forbidden, legal)
                 if hit:
                     violations.append(
                         f"{path}:{lineno}: forbidden include <{target}> (rule: {hit})"
@@ -120,7 +120,20 @@ def main() -> int:
         default=DEFAULT_FORBID_INCLUDE,
         help="include rules (prefix or <Mod/ match), default: core module list",
     )
+    parser.add_argument(
+        "--allow-include",
+        nargs="*",
+        default=[],
+        help="names removed from the forbid list for this scan (e.g. the QML "
+        "module scans the QAction family through SARibbonQmlActionCompat.h, "
+        "contract D5 pinned face; the core list itself never allows them)",
+    )
     args = parser.parse_args()
+
+    # --allow-include adds base names to the legal set for THIS scan (they
+    # are checked before every forbid rule, including the <QtWidgets/ prefix
+    # rule); the core module list never passes it
+    legal = set(args.allow_include)
 
     root = args.directory
     if not os.path.isdir(root):
@@ -131,7 +144,7 @@ def main() -> int:
     for dirpath, _dirnames, filenames in os.walk(root):
         for name in sorted(filenames):
             if name.endswith(SCAN_EXTS):
-                violations.extend(scan_file(os.path.join(dirpath, name), args.forbid_include))
+                violations.extend(scan_file(os.path.join(dirpath, name), args.forbid_include, legal))
 
     if violations:
         print(f"core purity check FAILED: {len(violations)} violation(s)")

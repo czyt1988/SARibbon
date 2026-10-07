@@ -86,8 +86,32 @@ Rectangle {
     radius: 4
     // whole-button background only when there is no split (single zone)
     color: root.split ? RibbonTheme.contentBg : root.stateBg
-    border.width: root.checked && !root.split ? 1 : 0
+    // 1px border on checked or on the keyboard focus (plan-05 S7 baseline:
+    // the tab focus must be visible; it reuses the checked border weight)
+    border.width: (root.checked && !root.split) || root.activeFocus ? 1 : 0
     border.color: RibbonTheme.textColor
+
+    // ---- plan-05 S7: keyboard + accessibility baseline ----
+    // tab focus lands here (the leaf is the visual item; the host stays the
+    // layout/logic authority), Space/Enter/Return trigger the host click
+    // path — a disabled host swallows the key exactly like a mouse click
+    activeFocusOnTab: true
+    Keys.onPressed: {
+        if ((event.key === Qt.Key_Space || event.key === Qt.Key_Enter || event.key === Qt.Key_Return)
+                && cppHost && cppHost.enabled) {
+            event.accepted = true;
+            cppHost.click();
+        }
+    }
+    // public attached properties (the QQuickAccessibleAttached face is
+    // private in C++ on Qt <= 6.7; its QML form is the public route). The
+    // subset is kept to the members Qt 5.12 already had — both lanes share
+    // this leaf verbatim
+    Accessible.role: Accessible.Button
+    Accessible.name: root.label
+    Accessible.description: root.tip
+    Accessible.checked: root.checked
+    Accessible.checkable: cppHost ? cppHost.checkable : false
 
     // ---- split-zone backgrounds (MenuButtonPopup) ----
     Rectangle {

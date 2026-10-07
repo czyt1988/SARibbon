@@ -1,8 +1,10 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
+#include <QQmlContext>
 #include <QQuickStyle>
 #include <QFont>
 #include <SARibbonQml/SARibbonQmlGlobal.h>
+#include "ribbonbackend.h"
 
 int main(int argc, char* argv[])
 {
@@ -29,6 +31,10 @@ int main(int argc, char* argv[])
 
     QQmlApplicationEngine engine;
     saRibbonRegisterQmlTypes(&engine);  // imperative single-track: before load()
+    // command-layer backend (plan-05): plain QAction objects owned by C++,
+    // bound by the QML views through their `action` properties
+    RibbonBackend backend;
+    engine.rootContext()->setContextProperty(QStringLiteral("backend"), &backend);
     engine.load(QUrl(QStringLiteral("qrc:///main.qml")));
     if (engine.rootObjects().isEmpty()) {
         return -1;

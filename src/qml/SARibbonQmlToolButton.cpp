@@ -1,10 +1,17 @@
 #include "SARibbonQmlToolButton.h"
+#include "SARibbonQmlAction.h"
+#include "SARibbonQmlBar.h"
+#include "SARibbonQmlIconProvider.h"
 #include "SARibbonQmlMenuItem.h"
 #include "SARibbonQmlPanel.h"
 #include "SARibbonQmlMetrics.h"
 #include "SARibbonQmlTheme.h"
 #include "SARibbonQmlTypes.h"
 #include <SARibbonCore/SARibbonCoreUtil.h>
+#include <QEvent>
+#include <QIcon>
+#include <QKeyEvent>
+#include <QQuickWindow>
 #include <QRectF>
 
 namespace SARibbonQml {
@@ -36,6 +43,145 @@ QUrl RibbonToolButton::leafUrl() const
     return SARibbonQmlLeafUrls::toolButtonLeaf();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Bind a command object to this button
+ * @details Detach semantics (contract D6): clearing the property only unbinds,
+ *          the action itself is never destroyed, and the mirrored values stay
+ *          as the button's plain storage. Binding drives a full derivation
+ *          (text/icon url/toolTip/checkable/checked/enabled) and hooks the
+ *          coarse QAction::changed for live re-derivation plus
+ *          QAction::triggered re-emitted as clicked(); the button also joins
+ *          the owning bar's shortcut collection (plan-05 S5) so
+ *          QAction::shortcut really fires.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 为本按钮绑定命令对象
+ * @details detach 语义（契约 D6）：清空属性只解除绑定，绝不销毁 action，镜像值
+ *          保留为按钮的自有存储。绑定即全量派生（text/图标url/toolTip/
+ *          checkable/checked/enabled），并挂上粗粒度的 QAction::changed 做活
+ *          派生、QAction::triggered 转发为 clicked()；按钮同时加入所属 bar 的
+ *          快捷键收集表（计划 05 S5），使 QAction::shortcut 真实生效。
+ * \endif
+ */
+void RibbonToolButton::setAction(QAction* act)
+{
+    if (mAction == act) {
+        return;
+    }
+    if (mAction) {
+        QObject::disconnect(mAction, &QAction::changed, this, &RibbonToolButton::onActionChanged);
+        QObject::disconnect(mAction, &QAction::triggered, this, &RibbonToolButton::onActionTriggered);
+    }
+    mAction = act;
+    if (mAction) {
+        QObject::connect(mAction, &QAction::changed, this, &RibbonToolButton::onActionChanged);
+        QObject::connect(mAction, &QAction::triggered, this, &RibbonToolButton::onActionTriggered);
+        onActionChanged();
+    }
+    Q_EMIT actionChanged();
+    syncShortcutCollection();
+}
+
+QAction* RibbonToolButton::action() const
+{
+    return mAction;
+}
+
+QString RibbonToolButton::actionIconSource() const
+{
+    if (nullptr == mAction) {
+        return QString();
+    }
+    if (auto* ribbonAction = qobject_cast< RibbonAction* >(mAction)) {
+        return ribbonAction->iconSource().toString();
+    }
+    // bare-QAction route: a non-empty QIcon goes through the image provider
+    // (plan-05 S3); an icon-less action renders text-only
+    if (!mAction->icon().isNull()) {
+        return SAIconImageProvider::registerAction(mAction).toString();
+    }
+    return QString();
+}
+
+void RibbonToolButton::onActionChanged()
+{
+    if (nullptr == mAction || mSyncingFromAction) {
+        return;
+    }
+    mSyncingFromAction = true;
+
+    const QString newText = mAction->text();
+    if (mText != newText) {
+        mText = newText;
+        Q_EMIT textChanged();
+    }
+    const QString newIcon = actionIconSource();
+    const qint64 iconKey  = mAction->icon().cacheKey();
+    if (mIconSource != newIcon || iconKey != mLastIconKey) {
+        mIconSource   = newIcon;
+        mLastIconKey  = iconKey;
+        Q_EMIT iconSourceChanged();
+    }
+    const QString newTip = mAction->toolTip();
+    if (mToolTip != newTip) {
+        mToolTip = newTip;
+        Q_EMIT toolTipChanged();
+    }
+    const bool newCheckable = mAction->isCheckable();
+    if (mCheckable != newCheckable) {
+        mCheckable = newCheckable;
+        Q_EMIT checkableChanged();
+    }
+    const bool newChecked = mAction->isChecked();
+    if (mChecked != newChecked) {
+        mChecked = newChecked;
+        Q_EMIT checkedChanged();
+        Q_EMIT toggled(mChecked);
+    }
+    const bool newEnabled = mAction->isEnabled();
+    if (isEnabled() != newEnabled) {
+        setEnabled(newEnabled);
+    }
+    // the shortcut may have been (re)bound; the collection must follow
+    syncShortcutCollection();
+
+    mSyncingFromAction = false;
+    updateSizeHint();
+    updateLayout();
+}
+
+void RibbonToolButton::onActionTriggered()
+{
+    // QAction::triggered arrives after its own state flip was re-derived via
+    // changed(), so toggled/checkedChanged already fired in order
+    Q_EMIT clicked();
+}
+
+RibbonBar* RibbonToolButton::findOwningBar() const
+{
+    for (QQuickItem* p = parentItem(); p != nullptr; p = p->parentItem()) {
+        if (RibbonBar* bar = qobject_cast< RibbonBar* >(p)) {
+            return bar;
+        }
+    }
+    return nullptr;
+}
+
+void RibbonToolButton::syncShortcutCollection()
+{
+    RibbonBar* bar = findOwningBar();
+    if (nullptr == bar) {
+        return;  // not under a bar (yet): componentComplete/parent change retries
+    }
+    if (mAction) {
+        bar->collectShortcut(this, mAction);
+    } else {
+        bar->dropShortcut(this);
+    }
+}
+
 QString RibbonToolButton::text() const
 {
     return mText;
@@ -48,6 +194,9 @@ void RibbonToolButton::setText(const QString& t)
     }
     mText = t;
     Q_EMIT textChanged();
+    if (mAction && !mSyncingFromAction) {
+        mAction->setText(t);  // write-through: the action stays the authority
+    }
     updateSizeHint();
     updateLayout();
 }
@@ -64,6 +213,12 @@ void RibbonToolButton::setIconSource(const QString& s)
     }
     mIconSource = s;
     Q_EMIT iconSourceChanged();
+    if (auto* ribbonAction = qobject_cast< RibbonAction* >(mAction)) {
+        if (!mSyncingFromAction) {
+            QUrl url(s);
+            ribbonAction->setIconSource(url);  // write-through into the command
+        }
+    }
     updateSizeHint();
     updateLayout();
 }
@@ -123,6 +278,9 @@ void RibbonToolButton::setCheckable(bool on)
     }
     mCheckable = on;
     Q_EMIT checkableChanged();
+    if (mAction && !mSyncingFromAction) {
+        mAction->setCheckable(on);  // write-through
+    }
 }
 
 bool RibbonToolButton::isChecked() const
@@ -138,6 +296,9 @@ void RibbonToolButton::setChecked(bool on)
     mChecked = on;
     Q_EMIT checkedChanged();
     Q_EMIT toggled(mChecked);
+    if (mAction && !mSyncingFromAction) {
+        mAction->setChecked(on);  // write-through
+    }
 }
 
 bool RibbonToolButton::isWordWrap() const
@@ -417,6 +578,9 @@ void RibbonToolButton::setToolTip(const QString& t)
     }
     mToolTip = t;
     Q_EMIT toolTipChanged();
+    if (mAction && !mSyncingFromAction) {
+        mAction->setToolTip(t);  // write-through
+    }
 }
 
 RibbonEnums::PopupMode RibbonToolButton::popupMode() const
@@ -522,6 +686,13 @@ void RibbonToolButton::click()
     if (!isEnabled()) {
         return;
     }
+    if (mAction) {
+        // QAction owns the toggle semantics (checkable flip happens inside
+        // trigger(); the changed/triggered chain re-derives this host and
+        // re-emits clicked in the toggled-before-clicked order)
+        mAction->trigger();
+        return;
+    }
     if (mCheckable) {
         setChecked(!mChecked);
     }
@@ -606,6 +777,42 @@ void RibbonToolButton::componentComplete()
     RibbonLayoutItemHost::componentComplete();
     ensureQmlLeaf();
     updateLayout();
+    // the QML declaration finished: the bar is reachable through the parent
+    // chain now, so the action (if bound) joins the shortcut collection
+    syncShortcutCollection();
+}
+
+void RibbonToolButton::keyPressEvent(QKeyEvent* event)
+{
+    // plan-05 S7 keyboard baseline: the tab focus lands on the leaf, which
+    // has no key handling of its own — this host-level hook is the single
+    // trigger path (a disabled button swallows the key like a click)
+    if ((Qt::Key_Space == event->key() || Qt::Key_Enter == event->key() || Qt::Key_Return == event->key())
+        && isEnabled()) {
+        click();
+        event->accept();
+        return;
+    }
+    RibbonLayoutItemHost::keyPressEvent(event);
+}
+
+void RibbonToolButton::itemChange(ItemChange change, const ItemChangeData& data)
+{
+    RibbonLayoutItemHost::itemChange(change, data);
+    if (QQuickItem::ItemParentHasChanged == change || QQuickItem::ItemSceneChange == change) {
+        // entering/leaving the host tree may move the button under another bar
+        syncShortcutCollection();
+    }
+    if (QQuickItem::ItemEnabledHasChanged == change && mAction && !mSyncingFromAction) {
+        mAction->setEnabled(isEnabled());  // write-through (the action is the authority)
+    }
+    if (QQuickItem::ItemSceneChange == change && data.window && nullptr == qmlLeaf()) {
+        // C++-created buttons (panel->addAction, plan-05 S6) never run
+        // componentComplete; entering a window is the first moment the
+        // engine is reachable through the parent chain
+        ensureQmlLeaf();
+        updateLayout();
+    }
 }
 
 void RibbonToolButton::updatePolish()

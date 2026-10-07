@@ -147,6 +147,13 @@ ApplicationWindow {
                 iconSource: "qrc:/icon/icon/redo.svg"
                 onClicked: log(qsTr("quick access: Redo clicked"))
             }
+            // command-layer demo (plan-05): the SAME QAction as the panel
+            // button below — one checkable state, two independent views;
+            // the small flat rendering here comes from the container, the
+            // state does not (contract D3: placement vs command)
+            RibbonToolButton {
+                action: backend.actionAutoWrap
+            }
             RibbonToolButton {
                 text: qsTr("Presentation File 1")
                 iconSource: "qrc:/icon/icon/file.svg"
@@ -435,6 +442,86 @@ ApplicationWindow {
                             log(qsTr("app window animation: %1").arg(modelData.label));
                         }
                     }
+                }
+            }
+
+            // ---- command layer (plan-05): two declaration routes over the
+            // SAME QAction abstraction (contract D1) ----
+            RibbonPanel {
+                id: commandsPanel
+                panelTitle: "Commands (action)"
+
+                // route 1, the widgets-migration story: bare QAction objects
+                // owned by the C++ backend, bound through the `action`
+                // property — text/icon/tooltip/checked/enabled derive from
+                // the command, clicks trigger it, Ctrl+S really fires
+                RibbonToolButton {
+                    action: backend.actionSave
+                    proportion: Ribbon.Large
+                }
+                RibbonToolButton {
+                    action: backend.actionUndo
+                    proportion: Ribbon.Small
+                }
+                RibbonToolButton {
+                    action: backend.actionRedo
+                    proportion: Ribbon.Small
+                }
+                // one checkable command, another placement: its state is
+                // shared with the quick access bar entry above
+                RibbonToolButton {
+                    action: backend.actionAutoWrap
+                    proportion: Ribbon.Small
+                }
+
+                // route 2, the pure-QML route: a RibbonAction declared here;
+                // the convenience properties (iconSource/shortcutText) mirror
+                // into the QAction half, the shortcut is real (Ctrl+L)
+                RibbonAction {
+                    id: qmlCmd
+                    text: qsTr("Clear log")
+                    toolTip: qsTr("Clear the event log (Ctrl+L)")
+                    shortcutText: "Ctrl+L"
+                    iconSource: "qrc:/icon/icon/delete.svg"
+                    onTriggered: {
+                        eventLog.clear()
+                        log(qsTr("log cleared (RibbonAction)"))
+                    }
+                }
+                RibbonToolButton {
+                    action: qmlCmd
+                    proportion: Ribbon.Small
+                }
+
+                // backend-driven insertion (plan-05 S6): the C++ side can
+                // grow the panel at runtime, action-first
+                RibbonToolButton {
+                    text: qsTr("+ backend insert")
+                    iconSource: "qrc:/icon/icon/action.svg"
+                    proportion: Ribbon.Small
+                    onClicked: {
+                        var btn = commandsPanel.addAction(backend.actionUndo, Ribbon.Small)
+                        log(btn ? qsTr("backend insert: ok (panel count %1)").arg(commandsPanel.childItemCount)
+                                : qsTr("backend insert: failed"))
+                    }
+                }
+
+                // plain-declarative buttons stay first-class (contract D6):
+                // no action, own state, not in any command registry
+                RibbonToolButton {
+                    text: qsTr("plain")
+                    iconSource: "qrc:/icon/icon/item.svg"
+                    proportion: Ribbon.Small
+                    onClicked: log(qsTr("plain button clicked"))
+                }
+
+                Connections {
+                    target: backend.actionSave
+                    function onTriggered() { log(qsTr("save #%1 (Ctrl+S works)").arg(backend.saveCount)) }
+                }
+                Connections {
+                    target: backend.actionAutoWrap
+                    function onToggled(checked) { log(qsTr("auto wrap: %1 (shared state, two views)").arg(checked)) }
                 }
             }
 

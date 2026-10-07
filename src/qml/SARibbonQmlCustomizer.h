@@ -36,7 +36,7 @@ class RibbonToolButton;
  *          layer: widgets resolves QAction pointers through
  *          SARibbonActionsManager, this customizer resolves stable string keys
  *          through RibbonActionRegistry, and mutations run against the host tree
- *          query/mutation API instead of QToolBar/QLayout calls.
+ *          query/mutation API instead of direct widget-toolbox calls.
  *          Two lists are kept, exactly as on the widgets side: the pending
  *          records a picker UI accumulates, and the applied records that undo
  *          and persistence operate on.
@@ -55,7 +55,7 @@ class RibbonToolButton;
  *          recordsToXml/recordsFromXml，因此一个前端写出的文件另一个前端能读。
  *          不同的是寻址层：widgets 通过 SARibbonActionsManager 解析 QAction
  *          指针，本定制器通过 RibbonActionRegistry 解析稳定字符串 key，变更操作
- *          落在宿主树的查询/修改 API 上而非 QToolBar/QLayout 调用。
+ *          落在宿主树的查询/修改 API 上而非直接的工具栏/布局调用。
  *          与 widgets 一致地维护两张列表：选取 UI 累积的待应用记录，以及撤销与
  *          持久化所操作的已应用记录。
  * @note 对命令模板执行 AddAction 会落地创建一个归本定制器所有的

@@ -1,5 +1,7 @@
 #include "SARibbonQmlGlobal.h"
 #include "SARibbonQmlTypes.h"
+#include "SARibbonQmlAction.h"
+#include "SARibbonQmlIconProvider.h"
 #include "SARibbonQmlTheme.h"
 #include "SARibbonQmlMetrics.h"
 #include "SARibbonQmlQuickHost.h"
@@ -28,9 +30,9 @@
 #include "SARibbonQmlCustomizeTreeModel.h"
 #include "SARibbonQmlWindowAgent.h"
 #include <QQmlEngine>
-#include <QMetaType>
 #include <QQmlContext>
 #include <QQmlComponent>
+#include <QMetaType>
 #include <QQuickItem>
 #include <QFile>
 #include <QDebug>
@@ -104,7 +106,17 @@ QQuickItem* createVisualLeaf(QQuickItem* host, const QUrl& leafUrl)
 
 void saRibbonRegisterQmlTypes(QQmlEngine* engine)
 {
-    Q_UNUSED(engine);  // registration goes into the global QQmlMetaType registry
+    // per-engine image provider (plan-05 S3): the QAction icon bridge is not
+    // global state — every engine that renders SARibbon leaves needs its own
+    // provider instance (addImageProvider ownership). Tracked through an
+    // engine property so it dies with the engine. Runs on EVERY call: engines
+    // come and go within one process (tests), while the type registrations
+    // below are once-only global state
+    if (engine && !engine->property("_saRibbonImageProviderInstalled").toBool()) {
+        engine->addImageProvider(QStringLiteral("saribbon"), new SARibbonQml::SAIconImageProvider());
+        engine->setProperty("_saRibbonImageProviderInstalled", true);
+    }
+
     static bool once = false;
     if (once) {
         return;
@@ -154,6 +166,9 @@ void saRibbonRegisterQmlTypes(QQmlEngine* engine)
 
     // ---- types ----
     qmlRegisterType< SARibbonQml::RibbonBar >("SARibbon", 3, 0, "RibbonBar");
+    // command object (plan-05 S2): QAction-derived thin QML type — a bare
+    // QAction from C++ binds to the same `action` properties without it
+    qmlRegisterType< SARibbonQml::RibbonAction >("SARibbon", 3, 0, "RibbonAction");
     qmlRegisterType< SARibbonQml::RibbonCategory >("SARibbon", 3, 0, "RibbonCategory");
     qmlRegisterType< SARibbonQml::RibbonTab >("SARibbon", 3, 0, "RibbonTab");
     qmlRegisterType< SARibbonQml::RibbonPanel >("SARibbon", 3, 0, "RibbonPanel");

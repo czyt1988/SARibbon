@@ -37,8 +37,8 @@ jobs:
 
     - name: Core purity check
       run: python3 tools/check_core_purity.py src/core
-    - name: QML purity check (plan-04 S8)
-      run: python3 tools/check_core_purity.py src/qml --forbid-include QWidget QApplication QLayout QStyle QMainWindow QDialog QPushButton QToolBar SARibbonWidgets '<QtWidgets/'
+    - name: QML purity check (plan-04 S8; QAction/QActionGroup allowed through SARibbonQmlActionCompat.h, the contract D5 pinned face, plan-05 S1)
+      run: python3 tools/check_core_purity.py src/qml --forbid-include QWidget QApplication QLayout QStyle QMainWindow QDialog QPushButton QToolBar SARibbonWidgets '<QtWidgets/' --allow-include QAction QActionGroup
 
     # widgets=OFF is the core-only combination: tests cannot link widgets,
     # so SARIBBON_BUILD_TESTS follows the widgets axis.

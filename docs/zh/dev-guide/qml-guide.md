@@ -107,6 +107,71 @@ RibbonPanel {
 - Canvas 型指示器（箭头）颜色依赖主题 token，必须遵守"颜色变化触发 `requestPaint`"
   的叶子重绘规则，否则换主题后箭头颜色滞留。
 
+## 命令层（QAction）
+
+QML 模块的命令对象就是 **QAction**（架构契约 D1）：C++ 后端持有的裸 QAction 经
+`RibbonToolButton.action` 属性直接绑定，QML 声明侧用 `RibbonAction`（QAction 的薄
+QML 适配）。命令状态（text/icon/toolTip/checkable/checked/enabled/shortcut）唯一
+权威在 QAction 上，视图只镜像；本地写穿回 action。
+
+### 两条声明路线
+
+```qml
+// 路线一：C++ 后端裸 QAction（widgets 迁移故事——后端代码零改动）
+RibbonToolButton {
+    action: backend.actionSave        // QAction* 属性绑定
+    proportion: Ribbon.Large          // 放置参数在按钮上（契约 D3）
+}
+
+// 路线二：QML 内声明的 RibbonAction
+RibbonAction {
+    id: cmd
+    text: "Paste"; toolTip: "粘贴"
+    shortcutText: "Ctrl+V"            // QML 无法直接赋 QKeySequence，用字符串便捷属性
+    iconSource: "qrc:/icon/icon/paste.svg"
+    onTriggered: doPaste()
+}
+RibbonToolButton { action: cmd; proportion: Ribbon.Small }
+```
+
+### 派生与写穿
+
+`action` 非空时：text/iconSource/toolTip/checkable/checked/enabled 全部派生自
+action（icon 经 `image://saribbon/act/<id>` 桥渲染裸 QAction 的 QIcon）；
+`btn.text = "x"` 之类本地写会写穿到 action（`action->setText`）。`click()` 转发为
+`action->trigger()`，勾选翻转交给 QAction 原生语义。**同一 action 绑多个按钮**
+（面板大按钮 + 快速访问栏小按钮）状态天然同步。`action` 置空 = 解绑不销毁，镜像值
+降级为按钮自有存储（对应 widgets 的 addWidget 语义，契约 D6 两级语义）。
+
+### 快捷键真实触发（契约 D8-1）
+
+`QAction::shortcut` 在 QQuickWindow 场景**不会自动触发**（已实测：按键送达焦点
+item，孤儿 action 从未发射；Qt5/Qt6 皆然）。SARibbon 用 **bar 级匹配器**补上：
+`RibbonBar` 过滤其窗口的 KeyPress，命中已收集的 (action, QKeySequence) 即
+`action->trigger()`——同一条代码路径在两条 Qt 车道上运行（无行为分叉，契约
+D5 纪律 1）。行为规则：
+
+- 收集范围 = 绑定到某按钮且位于某 bar 之下的 action（attach/detach/换父自动维护）；
+- 仅响应启用且可见的 action；auto-repeat 不重复触发；
+- 命中的按键被消费——同键位的 QML `Shortcut` 不会双触发（action 优先）；
+- 多步序列（如 Ctrl+X,Ctrl+C）暂不在回退范围内，需要时用 QML `Shortcut` 自行绑定。
+
+### 后端驱动放置（对应 widgets `panel->addAction(act, rp)`）
+
+```cpp
+auto* btn = panel->addAction(act, SARibbon::Core::Small);  // 返回 RibbonToolButton*
+```
+
+QML 侧同样可调：`var btn = panel.addAction(backend.actionUndo, Ribbon.Small)`。
+按钮由面板创建并父级化，放置参数（proportion）在按钮实例上，命令状态在 action
+上——两者永不混同。C++ 创建的按钮进入窗口时自动补视觉叶子。
+
+### 键盘与无障碍基线（契约 D8-2/3）
+
+按钮叶子 `activeFocusOnTab: true`，Space/Enter/Return 触发点击路径；焦点态以
+1px 边框可视化。无障碍经叶子上的 `Accessible.*` attached 属性（role=Button、
+name=text、checkable/checked 状态），Qt5.12 起可用（双车道同叶）。
+
 ## 按钮弹出模式
 
 `popupMode` 遵循 `QToolButton::ToolButtonPopupMode` 语义（枚举值一致）：

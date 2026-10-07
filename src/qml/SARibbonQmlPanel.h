@@ -2,7 +2,12 @@
 #define RIBBONPANEL_H
 #include "SARibbonQmlGlobal.h"
 #include "SARibbonQmlQuickHost.h"
+#include "SARibbonQmlToolButton.h"
 #include "SARibbonQmlTypes.h"
+// the single QAction include face of the module (contract D5, plan-05 S1);
+// full type: the addAction Q_INVOKABLE signature carries QAction* (moc
+// pointer metatype, the B64 family)
+#include "SARibbonQmlActionCompat.h"
 #include <SARibbonCore/SARibbonAbstractLayoutItem.h>
 #include <SARibbonCore/SARibbonPanelLayoutEngine.h>
 #include <SARibbonCore/SARibbonToolButtonLayout.h>
@@ -112,6 +117,16 @@ public:
 
     // drop the engine sizeHint cache entry of an item and re-run the layout
     void invalidateChildCache(SARibbon::Core::SARibbonAbstractLayoutItem* item);
+
+    // Backend-driven command placement (plan-05 S6, widgets
+    // SARibbonPanel::addAction(QAction*, rp) parity): creates an action-bound
+    // RibbonToolButton (action may be a bare QAction or a RibbonAction), sets
+    // its proportion and attaches it at `index` (negative = append). The
+    // button's QObject parent becomes this panel. Pure placement stays on the
+    // button instance (contract D3), the command state stays on the action
+    // (contract D1) — detach later through detachChildItem, the action is
+    // never destroyed (contract D6)
+    Q_INVOKABLE SARibbonQml::RibbonToolButton* addAction(QAction* action, int proportion, int index = -1);
 
     // engine-computed title strip rect; the leaf renders the caption inside it
     QRectF titleGeometry() const;

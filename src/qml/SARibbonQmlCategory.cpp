@@ -32,7 +32,7 @@ RibbonCategory::RibbonCategory(QQuickItem* parent) : RibbonQuickHost(parent)
     // RTL flip re-runs the engine pass (SA::saIsRTL() re-read on polish)
     connect(RibbonTheme::instance(), &RibbonTheme::rtlChanged, this, [this]() { polish(); });
     // A scrolled category offsets panels outside its own rectangle; widgets clips
-    // them by being a QWidget, QML needs the explicit clip (otherwise panels
+    // them by being a native widget, QML needs the explicit clip (otherwise panels
     // scrolled past an edge paint over whatever sits next to the category)
     setClip(true);
     // Publish a complete scroll state from the start: the arrow overlay leaf is

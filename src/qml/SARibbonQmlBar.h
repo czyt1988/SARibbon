@@ -3,6 +3,9 @@
 #include "SARibbonQmlGlobal.h"
 #include "SARibbonQmlQuickHost.h"
 #include "SARibbonQmlTypes.h"
+// the single QAction include face of the module (contract D5, plan-05 S1);
+// full type: the shortcut collection API carries QAction*
+#include "SARibbonQmlActionCompat.h"
 // full definitions, not forward declarations: RibbonCategory*/RibbonMenuItem*
 // appear in Q_INVOKABLE signatures and the applicationMenuTriggered signal, so
 // the moc output instantiates QMetaType::fromType and silently loses the
@@ -31,6 +34,7 @@ class RibbonButtonGroup;
 class RibbonMenuItem;
 class RibbonApplicationWindow;
 class RibbonWindowAgent;
+class RibbonShortcutMatcher;
 
 /**
  * \if ENGLISH
@@ -195,6 +199,16 @@ public:
     // part of the customize record set)
     SARibbonQml::RibbonQuickAccessBar* quickAccessBar() const;
 
+    // ---- shortcut fallback (plan-05 S5, contract D8-1) ----
+    // The bar-level matcher owning QAction::shortcut real triggering: the
+    // action-bound buttons collect into it (attach/detach/property change),
+    // it filters the bar's QQuickWindow key presses. Same code path on both
+    // lanes — QAction shortcuts never auto-trigger in a Quick scene
+    SARibbonQml::RibbonShortcutMatcher* shortcutMatcher();
+    // Called by the action-bound buttons through the parent chain
+    void collectShortcut(QObject* button, QAction* action);
+    void dropShortcut(QObject* button);
+
     void registerTab(RibbonTab* tab);
     void unregisterTab(RibbonTab* tab);
 
@@ -321,6 +335,7 @@ private:
     RibbonButtonGroup* mRightButtonGroup  = nullptr;  ///< declared right group (single)
     RibbonApplicationWindow* mApplicationWindow = nullptr;  ///< declared app window (single)
     RibbonWindowAgent* mWindowAgent = nullptr;  ///< declared frameless agent (single)
+    RibbonShortcutMatcher* mShortcutMatcher = nullptr;  ///< plan-05 S5: QAction shortcut real triggering
     QString mWindowTitle;  ///< mirrored window title for the leaf
     QVector< RibbonMenuItem* > mAppMenuItems;
     QVariantList mBands;

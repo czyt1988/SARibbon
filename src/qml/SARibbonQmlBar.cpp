@@ -5,6 +5,7 @@
 #include "SARibbonQmlButtonGroup.h"
 #include "SARibbonQmlMenuItem.h"
 #include "SARibbonQmlApplicationWindow.h"
+#include "SARibbonQmlShortcutMatcher.h"
 #include "SARibbonQmlTab.h"
 #include "SARibbonQmlMetrics.h"
 #include "SARibbonQmlTheme.h"
@@ -441,6 +442,28 @@ RibbonCategory* RibbonBar::categoryByObjectName(const QString& objName) const
 RibbonQuickAccessBar* RibbonBar::quickAccessBar() const
 {
     return mQuickAccessBar;
+}
+
+RibbonShortcutMatcher* RibbonBar::shortcutMatcher()
+{
+    // lazy: the matcher only exists once an action-bound button arrived
+    if (!mShortcutMatcher) {
+        mShortcutMatcher = new RibbonShortcutMatcher(this);
+        mShortcutMatcher->watch(this);  // no-op until the bar enters a window
+    }
+    return mShortcutMatcher;
+}
+
+void RibbonBar::collectShortcut(QObject* button, QAction* action)
+{
+    shortcutMatcher()->collectAction(button, action);
+}
+
+void RibbonBar::dropShortcut(QObject* button)
+{
+    if (mShortcutMatcher) {
+        mShortcutMatcher->forgetButton(button);
+    }
 }
 
 /**
@@ -996,18 +1019,27 @@ void RibbonBar::itemChange(ItemChange change, const ItemChangeData& data)
         }
     } else if (change == QQuickItem::ItemVisibleHasChanged) {
         polish();
-    } else if (change == QQuickItem::ItemSceneChange && data.window) {
-        // the bar entered (or moved to) a window: attach the frameless agent
-        // now that a QQuickWindow exists (QWK setup needs it). The title and
-        // screen tracking live here (not inside the frameless-only attach)
+    } else if (change == QQuickItem::ItemSceneChange) {
+        // the bar entered (or moved to / left) a window: attach the frameless
+        // agent now that a QQuickWindow exists (QWK setup needs it). The title
+        // and screen tracking live here (not inside the frameless-only attach)
         // because native-frame windows feed the same minimum-width rules:
         // the window title is the title reservation, the screen's available
         // width caps it. Handlers are idempotent, so a re-entry into the
         // same window only stacks harmless no-op calls
-        setWindowTitle(data.window->title());
-        connect(data.window, &QWindow::windowTitleChanged, this, [this](const QString& t) { setWindowTitle(t); });
-        connect(data.window, &QWindow::screenChanged, this, [this]() { polish(); });
-        attachWindowAgent();
+        if (data.window) {
+            setWindowTitle(data.window->title());
+            connect(data.window, &QWindow::windowTitleChanged, this, [this](const QString& t) { setWindowTitle(t); });
+            connect(data.window, &QWindow::screenChanged, this, [this]() { polish(); });
+            attachWindowAgent();
+        }
+        // plan-05 S5: the shortcut matcher follows the bar in and out of its
+        // window — the leaving case MUST stop the event filter, or a window
+        // destroyed before the bar leaves the matcher with a dangling filter
+        // target (crash at matcher teardown)
+        if (mShortcutMatcher) {
+            mShortcutMatcher->watch(this);
+        }
     }
     RibbonQuickHost::itemChange(change, data);
 }

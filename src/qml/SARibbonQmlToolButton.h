@@ -3,6 +3,9 @@
 #include "SARibbonQmlGlobal.h"
 #include "SARibbonQmlLayoutItemHost.h"
 #include "SARibbonQmlTypes.h"
+// the single QAction include face of the module (contract D5, plan-05 S1);
+// full type: the action Q_PROPERTY / pointer members need it complete here
+#include "SARibbonQmlActionCompat.h"
 // full definition, not a forward declaration: RibbonMenuItem* appears in the
 // menuTriggered signal, so the moc output instantiates QMetaType::fromType and
 // silently loses the QObject specialization if the type is incomplete where
@@ -18,6 +21,7 @@
 namespace SARibbonQml {
 
 class RibbonMenuItem;
+class RibbonBar;
 
 /**
  * \if ENGLISH
@@ -77,6 +81,7 @@ class RibbonMenuItem;
 class SA_RIBBON_QML_EXPORT RibbonToolButton : public RibbonLayoutItemHost
 {
     Q_OBJECT
+    Q_PROPERTY(QAction* action READ action WRITE setAction NOTIFY actionChanged)
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
     Q_PROPERTY(QString iconSource READ iconSource WRITE setIconSource NOTIFY iconSourceChanged)
     Q_PROPERTY(RibbonEnums::RowProportion proportion READ proportion WRITE setProportion NOTIFY proportionChanged)
@@ -110,6 +115,13 @@ class SA_RIBBON_QML_EXPORT RibbonToolButton : public RibbonLayoutItemHost
 public:
     explicit RibbonToolButton(QQuickItem* parent = nullptr);
     ~RibbonToolButton() override;
+
+    // Bound command (contract D1/D6). Non-null derivation: text/iconSource/
+    // toolTip/checked/enabled/checkable mirror the action; a local write is
+    // written through to it (the action stays the single authority). A null
+    // action restores the plain-declarative storage (addWidget semantics)
+    QAction* action() const;
+    void setAction(QAction* act);
 
     QString text() const;
     void setText(const QString& t);
@@ -246,6 +258,7 @@ public:
     QSize sizeHint() const override;  // C++: core metrics derivation
 
 Q_SIGNALS:
+    void actionChanged();
     void textChanged();
     void iconSourceChanged();
     void proportionChanged();
@@ -273,6 +286,11 @@ protected:
     void componentComplete() override;
     void largeHeightContextChanged() override;
     void updatePolish() override;  // RTL flip re-mirrors the hit rects
+    // plan-05 S7 keyboard baseline: Space/Enter trigger the click path
+    void keyPressEvent(QKeyEvent* event) override;
+    // the shortcut collection follows the button across containers; an
+    // enabled flip also writes through to the action (plan-05 S4)
+    void itemChange(ItemChange change, const ItemChangeData& data) override;
     // Recompute and publish the draw/hit geometry. Virtual so a subclass can run
     // its own pass on top (every recompute entry point funnels through here)
     virtual void updateLayout();
@@ -300,6 +318,27 @@ private:
     static ListIndex menuItemCountCb(QQmlListProperty< SARibbonQml::RibbonMenuItem >* prop);
     static SARibbonQml::RibbonMenuItem* menuItemAtCb(QQmlListProperty< SARibbonQml::RibbonMenuItem >* prop, ListIndex index);
     static void clearMenuItems(QQmlListProperty< SARibbonQml::RibbonMenuItem >* prop);
+
+    // ---- action binding (plan-05 S4) ----
+    // QAction::changed is field-less: re-derive every mirrored property and
+    // re-emit the notifies whose value actually moved (the plan-05 risk table
+    // accepts the coarse granularity; correctness first)
+    void onActionChanged();
+    // QAction::triggered re-emitted as clicked() — the existing signal face
+    // stays intact for leaves and tests
+    void onActionTriggered();
+    // Resolve the icon url of the bound action: RibbonAction route (direct
+    // url) or bare-QAction route (image provider, plan-05 S3)
+    QString actionIconSource() const;
+    // (re)collect this button's action into the owning bar's shortcut matcher
+    // (plan-05 S5); the ancestor walk resolves lazily because buttons attach
+    // to their panel before the panel reaches a bar
+    RibbonBar* findOwningBar() const;
+    void syncShortcutCollection();
+    // guard so action-driven updates never write back to the action
+    bool mSyncingFromAction = false;
+    QAction* mAction        = nullptr;
+    qint64 mLastIconKey     = 0;  ///< QIcon::cacheKey of the derived icon (change detection)
 
     QSize computeSizeHintFromMetrics();
     // Resolve the core style from the explicit value / rendering context and

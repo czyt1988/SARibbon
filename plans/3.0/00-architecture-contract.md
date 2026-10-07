@@ -182,11 +182,12 @@ v2 D8 引用 KDDW 论证"不做自研 Action"，但结论用反了：KDDW 自研
 
 ## 9. 待核验项（不视为已定，核验后回填本文）
 
-| 项 | 内容 | 核验位置 |
-|----|------|---------|
-| Qt6 基准车道最低小版本 | QML 模块在 6.x 最低可构建版本（预期 6.2 可行） | 计划 05 S0-V1 |
-| QAction::shortcut 在 Quick 场景的自动触发性 | 决定快捷键机制走原生还是回退设计 | 计划 05 S0-V2 |
-| QGuiApplication 下 QAction 可用性（Qt5 车道） | Qt5.14.2 + QGuiApplication 中 QAction 的创建/属性/triggered 实测（QObject 级预期无碍） | 计划 05 S0-V3 |
+| 项 | 内容 | 核验位置 | 结论（S0 实测回填） |
+|----|------|---------|------|
+| Qt6 基准车道最低小版本 | QML 模块在 6.x 最低可构建版本（预期 6.2 可行） | 计划 05 S0-V1 | **6.2 维持下限**：根 CMake 对 QML 于 Qt6<6.2 FATAL_ERROR；本机 6.7.3 全量构建+测试通过，命令层新增面（QAction/QKeySequence/QQuickImageProvider/Accessible attached）无 6.2 后 API。6.2 实机构建因本机无副本未执行，CI 基准 6.7+/6.8 不变 |
+| QAction::shortcut 在 Quick 场景的自动触发性 | 决定快捷键机制走原生还是回退设计 | 计划 05 S0-V2 | **不自动触发**（实测：按键送达焦点 item，孤儿 action 的 triggered 从未发射，WindowShortcut/ApplicationShortcut 皆然；Qt5 车道同结论）→ S5 落地 bar 级回退匹配器，两车道同一代码路径 |
+| QGuiApplication 下 QAction 可用性（Qt5 车道） | Qt5.14.2 + QGuiApplication 中 QAction 的创建/属性/triggered 实测（QObject 级预期无碍） | 计划 05 S0-V3 | **通过**（5.14.2 msvc2017_64 + QGuiApplication：对象级 text/icon/shortcut/checkable/trigger/changed/triggered/toggled 全部正常；QML 构造 QAction 派生类型亦正常）→ Qt5 车道前提成立 |
+| QML 字符串 → QKeySequence 赋值 | `RibbonAction { shortcut: "Ctrl+S" }` 是否经 QVariant 转换成功 | 计划 05 S0-V4 | **失败**（QML 报 "unsupported type QKeySequence"；QVariant 路径可转换但字面量赋值不可用）→ RibbonAction 增设 `shortcutText: QString` 便捷属性（S2 既定回退） |
 
 ## 10. 执行计划索引
 

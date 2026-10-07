@@ -323,6 +323,60 @@ bool RibbonPanel::attachChildItem(RibbonLayoutItemHost* item, int index)
 
 /**
  * \if ENGLISH
+ * @brief Place a command into the panel from C++ or QML
+ * @details Plan-05 S6 backend-driven route (widgets addAction parity): a fresh
+ *          action-bound button is created, the placement proportion lands on
+ *          the button instance (contract D3) and the attach goes through the
+ *          same single registration path as a declared child (itemChange), so
+ *          the style/factor pushes apply to it too.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 从 C++ 或 QML 把一条命令放进面板
+ * @details 计划 05 S6 的后端驱动路径（对应 widgets 的 addAction）：新建一个
+ *          action 绑定按钮，放置比例落在按钮实例上（契约 D3），并经与声明式
+ *          子项相同的唯一登记路径（itemChange）挂入面板，样式/系数下发同样
+ *          覆盖它。
+ * \endif
+ */
+SARibbonQml::RibbonToolButton* RibbonPanel::addAction(QAction* action, int proportion, int index)
+{
+    if (nullptr == action) {
+        return nullptr;
+    }
+    // construct WITHOUT a visual parent: a parented-in-ctor QQuickItem fires
+    // ItemChildAddedChange while still inside the base-class constructor,
+    // where the derived vtable is not installed yet and the panel's
+    // qobject_cast<RibbonLayoutItemHost*> in itemChange would fail silently.
+    // The QObject parent is set explicitly, the visual parenting goes through
+    // attachChildItem so the single registration path runs at a safe moment
+    auto* btn = new RibbonToolButton();
+    btn->setParent(this);
+    btn->setAction(action);
+    RibbonEnums::RowProportion rp = RibbonEnums::Large;
+    switch (proportion) {
+    case int(SARibbon::Core::SARibbonRowProportion::None):
+        rp = RibbonEnums::None;
+        break;
+    case int(SARibbon::Core::SARibbonRowProportion::Medium):
+        rp = RibbonEnums::Medium;
+        break;
+    case int(SARibbon::Core::SARibbonRowProportion::Small):
+        rp = RibbonEnums::Small;
+        break;
+    default:
+        break;
+    }
+    btn->setProportion(rp);
+    if (!attachChildItem(btn, index)) {
+        delete btn;
+        return nullptr;
+    }
+    return btn;
+}
+
+/**
+ * \if ENGLISH
  * @brief Take an item out of the panel without destroying it
  * @details Un-parenting fires ItemChildRemovedChange, which routes through
  *          unregisterChildItem: the item leaves the list, drops its engine

@@ -320,7 +320,7 @@ QSize RibbonControlContainer::sizeHint() const
 {
     // iron rule: derived in C++ from core metrics + the control's implicit
     // size (the control is a QQuickItem — its implicit size IS the front-end
-    // equivalent of QWidget::sizeHint, not a QML leaf of this module)
+    // equivalent of the widgets-side sizeHint, not a QML leaf of this module)
     const SARibbon::Core::SARibbonMetrics& m = RibbonMetrics::instance()->coreMetrics();
     const QFontMetrics fm = m.fontMetrics();
     const qreal ctrlW = mControl ? mControl->implicitWidth() : 0;

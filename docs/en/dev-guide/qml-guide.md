@@ -125,6 +125,85 @@ RibbonPanel {
   leaf repaint rule "color change triggers `requestPaint`", or the arrow keeps
   stale colors after a theme switch.
 
+## Command Layer (QAction)
+
+The command object of the QML module IS **QAction** (architecture contract D1):
+a bare QAction owned by a C++ backend binds through the `RibbonToolButton.action`
+property, the QML declaration side uses `RibbonAction` (a thin QML adapter over
+QAction). The command state (text/icon/toolTip/checkable/checked/enabled/
+shortcut) has its single authority on the QAction; views only mirror it, local
+writes are written through to the action.
+
+### Two declaration routes
+
+```qml
+// route 1: bare QAction from a C++ backend (the widgets migration story —
+// the backend code stays unchanged)
+RibbonToolButton {
+    action: backend.actionSave        // QAction* property binding
+    proportion: Ribbon.Large          // placement stays on the button (D3)
+}
+
+// route 2: a RibbonAction declared in QML
+RibbonAction {
+    id: cmd
+    text: "Paste"; toolTip: "Paste here"
+    shortcutText: "Ctrl+V"            // QML cannot assign a QKeySequence
+                                      // directly; use the string convenience
+    iconSource: "qrc:/icon/icon/paste.svg"
+    onTriggered: doPaste()
+}
+RibbonToolButton { action: cmd; proportion: Ribbon.Small }
+```
+
+### Derivation and write-through
+
+With a non-null `action`: text/iconSource/toolTip/checkable/checked/enabled all
+derive from it (the QIcon of a bare QAction renders through the
+`image://saribbon/act/<id>` bridge); a local write like `btn.text = "x"` lands
+on the action (`action->setText`). `click()` forwards to `action->trigger()`;
+the checkable flip is native QAction semantics. **The same action on several
+buttons** (panel large button + quick access small button) stays in sync for
+free. Clearing `action` unbinds without destroying — the mirrored values decay
+into the button's own storage (the widgets addWidget semantics, contract D6).
+
+### Real shortcut triggering (contract D8-1)
+
+`QAction::shortcut` does NOT auto-trigger inside a QQuickWindow scene
+(measured: the key reaches the focused item, the orphan action never fires;
+true on both Qt majors). SARibbon closes the gap with a **bar-level matcher**:
+`RibbonBar` filters the key presses of its window and calls
+`action->trigger()` on a collected (action, QKeySequence) match — the same
+code path runs on both Qt lanes (no behavior fork, contract D5 discipline 1).
+Rules:
+
+- collected = actions bound to a button living under a bar (maintained on
+  attach/detach/reparent automatically);
+- only enabled AND visible actions fire; auto-repeat does not re-trigger;
+- a matched key is consumed — a QML `Shortcut` on the same key never
+  double-fires (the action wins);
+- multi-step sequences (e.g. Ctrl+X,Ctrl+C) are out of scope for the
+  fallback; bind a QML `Shortcut` yourself if you need them.
+
+### Backend-driven placement (widgets `panel->addAction(act, rp)` parity)
+
+```cpp
+auto* btn = panel->addAction(act, SARibbon::Core::Small);  // returns the RibbonToolButton*
+```
+
+Callable from QML as well: `var btn = panel.addAction(backend.actionUndo,
+Ribbon.Small)`. The button is created and parented by the panel; the placement
+(proportion) lives on the button instance, the command state on the action —
+the two never mix. C++-created buttons pick up their visual leaf when they
+enter a window.
+
+### Keyboard and accessibility baseline (contract D8-2/3)
+
+The button leaf sets `activeFocusOnTab: true`; Space/Enter/Return trigger the
+click path; the focus state shows as a 1px border. Accessibility goes through
+the leaf's `Accessible.*` attached properties (role=Button, name=text,
+checkable/checked state), available since Qt 5.12 (one leaf, both lanes).
+
 ## Button Popup Modes
 
 `popupMode` follows `QToolButton::ToolButtonPopupMode` semantics (same values):
