@@ -14,6 +14,7 @@
 #include <SARibbonCore/SARibbonCoreUtil.h>
 #include <SARibbonCore/SARibbonThemeData.h>
 #include <QFontMetrics>
+#include <QMouseEvent>
 #include <QQuickWindow>
 #include <QScreen>
 #include <QWindow>
@@ -170,8 +171,108 @@ void RibbonBar::setMinimumMode(bool on)
         return;
     }
     mMinimumMode = on;
+    // leaving minimum mode shows the category row in place: the preview has
+    // nothing left to preview (widgets drops the popup the same way, the
+    // stacked container returns to inline mode)
+    setMinimumModeExpanded(false);
     Q_EMIT minimumModeChanged();
     polish();
+}
+
+bool RibbonBar::isTabDoubleClickToMinimumMode() const
+{
+    return mTabDoubleClickToMinimumMode;
+}
+
+void RibbonBar::setTabDoubleClickToMinimumMode(bool on)
+{
+    if (mTabDoubleClickToMinimumMode == on) {
+        return;
+    }
+    mTabDoubleClickToMinimumMode = on;
+    Q_EMIT tabDoubleClickToMinimumModeChanged();
+}
+
+bool RibbonBar::isMinimumModeExpanded() const
+{
+    return mMinimumModeExpanded;
+}
+
+int RibbonBar::categoryPreviewHeight() const
+{
+    return mCategoryPreviewHeight;
+}
+
+void RibbonBar::setMinimumModeExpanded(bool on)
+{
+    // the preview only exists in minimum mode (the category row is already
+    // inline otherwise)
+    if (!mMinimumMode) {
+        on = false;
+    }
+    if (mMinimumModeExpanded == on) {
+        return;
+    }
+    mMinimumModeExpanded = on;
+    Q_EMIT minimumModeExpandedChanged();
+    syncMinimumPreviewFilter();
+    polish();
+}
+
+void RibbonBar::syncMinimumPreviewFilter()
+{
+    // the filter is only needed while the preview is up; it follows the bar
+    // in and out of its window so a destroyed window cannot stay watched
+    // (QPointer guards the teardown race, mirroring the matcher's watch)
+    QQuickWindow* win = mMinimumModeExpanded ? window() : nullptr;
+    if (win == mPreviewFilterWindow.data()) {
+        return;
+    }
+    if (mPreviewFilterWindow) {
+        mPreviewFilterWindow->removeEventFilter(this);
+    }
+    mPreviewFilterWindow = win;
+    if (win) {
+        win->installEventFilter(this);
+    }
+}
+
+QRectF RibbonBar::minimumPreviewRect() const
+{
+    if (!mMinimumModeExpanded) {
+        return QRectF();
+    }
+    // the preview area is the category row: from the row top down through the
+    // current category height, in scene coordinates
+    return mapRectToScene(QRectF(0, mCategoryRowY, width(), qreal(mCategoryPreviewHeight)));
+}
+
+bool RibbonBar::eventFilter(QObject* watched, QEvent* event)
+{
+    // QQuickWindow receives the mouse press before its delivery agent runs,
+    // so the preview drops before any item consumes the same press (a tab
+    // press therefore re-raises the preview for its own category, the
+    // widgets re-open-on-tab-click semantics). pos() (window-local QPoint)
+    // is the ONE coordinate accessor both lanes share without a deprecation
+    // trail — and it carries the synthesized coordinates of test presses,
+    // which QCursor::pos() would miss
+    if (QEvent::MouseButtonPress == event->type() && watched == mPreviewFilterWindow.data()
+        && mMinimumModeExpanded) {
+        const QPointF pos = static_cast< QMouseEvent* >(event)->pos();
+        if (!minimumPreviewRect().contains(pos)) {
+            setMinimumModeExpanded(false);
+        }
+    }
+    return RibbonQuickHost::eventFilter(watched, event);
+}
+
+void RibbonBar::onTabDoubleClicked()
+{
+    // widgets onCurrentRibbonTabDoubleClicked parity: double click toggles
+    // between normal and minimum mode, gated by the enable flag
+    if (mTabDoubleClickToMinimumMode) {
+        setMinimumMode(!mMinimumMode);
+    }
 }
 
 qreal RibbonBar::buttonMaximumAspectRatio() const
@@ -604,13 +705,23 @@ void RibbonBar::registerTab(RibbonTab* tab)
         const int idx = mTabs.size();
         mTabs.append(tab);
         tab->setParentItem(this);
-        // clicking a tab selects the category of the same index
+        // clicking a tab selects the category of the same index; in minimum
+        // mode it also (re-)raises the category preview (widgets
+        // onCurrentRibbonTabClicked exec parity)
         connect(tab, &RibbonTab::clicked, this, [this, tab]() {
             const int idx = mTabs.indexOf(tab);
-            if (idx >= 0) {
-                setCurrentIndex(idx);
+            if (idx < 0) {
+                return;
+            }
+            setCurrentIndex(idx);
+            if (mMinimumMode) {
+                setMinimumModeExpanded(true);
             }
         });
+        // double click toggles the minimum mode (widgets
+        // tabBarDoubleClicked parity); the first click of the pair has already
+        // run above — Qt Quick delivers press/DoubleClick in that order
+        connect(tab, &RibbonTab::doubleClicked, this, &RibbonBar::onTabDoubleClicked);
         // an explicit tab takes over the pairing slot: drop the auto tab that
         // may already sit there and inherit the category title as fallback
         if (idx < mCategories.size()) {
@@ -642,6 +753,7 @@ void RibbonBar::unregisterTab(RibbonTab* tab)
     }
     if (mTabs.removeOne(tab)) {
         disconnect(tab, &RibbonTab::clicked, this, nullptr);
+        disconnect(tab, &RibbonTab::doubleClicked, this, nullptr);
         polish();
     }
 }
@@ -768,13 +880,19 @@ void RibbonBar::rebuildContextTabs(RibbonContextCategory* ctx)
         tab->setText(page->title());
         tab->setContextColor(ctx->contextColor());
         // clicking switches the current index (the effective row includes
-        // these tabs while active)
+        // these tabs while active); in minimum mode it raises the preview
+        // over the context pages like over the normal row
         connect(tab, &RibbonTab::clicked, this, [this, tab]() {
             const int idx = effectiveTabs().indexOf(tab);
-            if (idx >= 0) {
-                setCurrentIndex(idx);
+            if (idx < 0) {
+                return;
+            }
+            setCurrentIndex(idx);
+            if (mMinimumMode) {
+                setMinimumModeExpanded(true);
             }
         });
+        connect(tab, &RibbonTab::doubleClicked, this, &RibbonBar::onTabDoubleClicked);
         tabs.append(tab);
     }
     mContextTabs.insert(ctx, tabs);
@@ -1087,6 +1205,9 @@ void RibbonBar::itemChange(ItemChange change, const ItemChangeData& data)
         if (mShortcutMatcher) {
             mShortcutMatcher->watch(this);
         }
+        // the preview dismiss filter follows the same in/out rule (a dangling
+        // watch here would crash the bar teardown the same way)
+        syncMinimumPreviewFilter();
     }
     RibbonQuickHost::itemChange(change, data);
 }
@@ -1171,6 +1292,7 @@ void RibbonBar::syncTabCount()
         RibbonTab* tab = mAutoTabs.takeLast();
         mTabs.removeLast();
         disconnect(tab, &RibbonTab::clicked, this, nullptr);
+        disconnect(tab, &RibbonTab::doubleClicked, this, nullptr);
         tab->setParentItem(nullptr);
         tab->setParent(nullptr);
         tab->deleteLater();
@@ -1400,14 +1522,19 @@ void RibbonBar::relayout()
     //    children of the context item which sits at the bar origin, so the
     //    coordinates are already bar-relative). Minimum mode hides the whole
     //    category row (widgets setMinimumMode parity: only title + tabs stay)
+    //    EXCEPT while the collapsed-mode preview is up: the current category
+    //    stays laid out and visible past the bar's bottom edge — no clip, the
+    //    bar z raised below — so it overlays the central content exactly like
+    //    the widgets Qt::Popup instead of pushing the content down
     const int categoryY = tabBarY + tabH;
+    const bool preview  = mMinimumMode && mMinimumModeExpanded;
     // user-hidden categories are off the effective row, hence off the display
     for (RibbonCategory* cat : mHiddenCategories) {
         cat->setVisible(false);
     }
     for (int i = 0; i < effCats.size(); ++i) {
         RibbonCategory* cat = effCats[ i ];
-        cat->setVisible(!mMinimumMode && i == mCurrentIndex);
+        cat->setVisible(i == mCurrentIndex && (!mMinimumMode || preview));
         cat->setPosition(QPointF(0, categoryY));
         cat->setSize(QSizeF(width(), catH));
     }
@@ -1420,6 +1547,11 @@ void RibbonBar::relayout()
         }
     }
     setImplicitHeight(mMinimumMode ? categoryY : categoryY + catH);
+    mCategoryPreviewHeight = catH;
+    // the preview paints past the bar's bounds; only a raised bar z keeps it
+    // above the central-content siblings of the bar (back to baseline z when
+    // the preview drops, restoring the user's own stacking)
+    setZ(preview ? 10 : 0);
 
     // 4. context bands: one per ACTIVE context, spanning its tabs (first tab
     //    left .. last tab right) from the bar top through the tab row; the

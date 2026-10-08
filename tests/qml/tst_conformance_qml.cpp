@@ -66,6 +66,9 @@ private Q_SLOTS:
     void quickAccessToolbarDefaults();
     void minimumWidthAutoCalc();
     void tabAlignmentAndMinimumMode();
+    void tabDoubleClickMinimumMode();
+    void minimumModePreviewPopup();
+    void minimumModeRightGroupButton();
     void rtlToggle();
     void panelOptionAction();
     void applicationWindow();
@@ -2506,6 +2509,254 @@ Item {
     QTRY_VERIFY(!cat->isVisible());
     QTRY_VERIFY(bar->implicitHeight() < normalHeight);
     bar->setProperty("minimumMode", false);
+    QTRY_VERIFY(cat->isVisible());
+    QTRY_COMPARE(bar->implicitHeight(), normalHeight);
+}
+
+/**
+ * @brief Tab double click toggles the minimum mode
+ * @details Mirrors the widgets tabBarDoubleClicked wiring: a double click on
+ *          any tab collapses the category row (only title + tabs stay), and
+ *          a second double click restores it. The tabDoubleClickToMinimumMode
+ *          gate (widgets setTabDoubleClickToMinimumMode parity) turns the
+ *          gesture off.
+ */
+void TestConformanceQml::tabDoubleClickMinimumMode()
+{
+    QQmlEngine engine;
+    saRibbonRegisterQmlTypes(&engine);
+
+    QString src = QStringLiteral(R"QML(import QtQuick 2.12
+import SARibbon 3.0
+Item {
+    width: 900
+    height: 300
+    RibbonBar {
+        objectName: "bar"
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        applicationLabel: "File"
+        RibbonCategory {
+            objectName: "cat"
+            title: "Home"
+            RibbonPanel { panelTitle: "P"; RibbonToolButton { text: "A" } }
+        }
+    }
+})QML");
+
+    QQmlComponent component(&engine);
+    std::unique_ptr< QQuickView > view(exposeScene(engine, component, src.toUtf8().constData(), 900, 300));
+    QVERIFY(view);
+    QQuickItem* rootItem = view->rootObject();
+    QVERIFY(rootItem);
+
+    auto* bar = rootItem->findChild< QQuickItem* >(QStringLiteral("bar"));
+    auto* cat = rootItem->findChild< QQuickItem* >(QStringLiteral("cat"));
+    QVERIFY(bar && cat);
+
+    auto firstTab = [rootItem]() -> QQuickItem* {
+        const auto all = rootItem->findChildren< QQuickItem* >();
+        QQuickItem* best = nullptr;
+        for (QQuickItem* item : all) {
+            if (QString::fromLatin1(item->metaObject()->className()) == QLatin1String("SARibbonQml::RibbonTab")
+                && item->isVisible()) {
+                if (!best || item->x() < best->x()) {
+                    best = item;
+                }
+            }
+        }
+        return best;
+    };
+    QQuickItem* tab = nullptr;
+    QTRY_VERIFY((tab = firstTab()) != nullptr);
+    const QPointF tabCenter = tab->mapToScene(QPointF(tab->width() / 2, tab->height() / 2));
+    const qreal normalHeight = bar->implicitHeight();
+    QVERIFY(cat->isVisible());
+
+    // ---- double click collapses ----
+    QTest::mouseDClick(view.get(), Qt::LeftButton, Qt::NoModifier, tabCenter.toPoint());
+    QTRY_VERIFY(bar->property("minimumMode").toBool());
+    QTRY_VERIFY(!cat->isVisible());
+    QTRY_VERIFY(bar->implicitHeight() < normalHeight);
+    // second double click restores (the bar's collapsed height keeps the tab
+    // under the same point, no re-lookup needed)
+    QTest::mouseDClick(view.get(), Qt::LeftButton, Qt::NoModifier, tabCenter.toPoint());
+    QTRY_VERIFY(!bar->property("minimumMode").toBool());
+    QTRY_VERIFY(cat->isVisible());
+    QTRY_COMPARE(bar->implicitHeight(), normalHeight);
+
+    // ---- the gate disables the gesture ----
+    bar->setProperty("tabDoubleClickToMinimumMode", false);
+    QTest::mouseDClick(view.get(), Qt::LeftButton, Qt::NoModifier, tabCenter.toPoint());
+    QTRY_VERIFY(!bar->property("minimumMode").toBool());
+    QVERIFY(cat->isVisible());
+    QCOMPARE(bar->implicitHeight(), normalHeight);
+    bar->setProperty("tabDoubleClickToMinimumMode", true);
+}
+
+/**
+ * @brief Minimum-mode tab click raises the category preview
+ * @details Mirrors the widgets minimum-mode popup: in minimum mode a single
+ *          tab click shows the current category (over the content below, the
+ *          bar height stays collapsed), and a click outside the preview area
+ *          dismisses it. Leaving minimum mode drops the preview.
+ */
+void TestConformanceQml::minimumModePreviewPopup()
+{
+    QQmlEngine engine;
+    saRibbonRegisterQmlTypes(&engine);
+
+    QString src = QStringLiteral(R"QML(import QtQuick 2.12
+import SARibbon 3.0
+Item {
+    objectName: "root"
+    width: 900
+    height: 300
+    RibbonBar {
+        objectName: "bar"
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        applicationLabel: "File"
+        RibbonCategory {
+            objectName: "cat"
+            title: "Home"
+            RibbonPanel { panelTitle: "P"; RibbonToolButton { text: "A" } }
+        }
+    }
+    // stand-in for the central content: a press here is outside the preview
+    Item { objectName: "central"; anchors.fill: parent }
+})QML");
+
+    QQmlComponent component(&engine);
+    std::unique_ptr< QQuickView > view(exposeScene(engine, component, src.toUtf8().constData(), 900, 300));
+    QVERIFY(view);
+    QQuickItem* rootItem = view->rootObject();
+    QVERIFY(rootItem);
+
+    auto* bar = rootItem->findChild< QQuickItem* >(QStringLiteral("bar"));
+    auto* cat = rootItem->findChild< QQuickItem* >(QStringLiteral("cat"));
+    QVERIFY(bar && cat);
+
+    auto firstTab = [rootItem]() -> QQuickItem* {
+        const auto all = rootItem->findChildren< QQuickItem* >();
+        QQuickItem* best = nullptr;
+        for (QQuickItem* item : all) {
+            if (QString::fromLatin1(item->metaObject()->className()) == QLatin1String("SARibbonQml::RibbonTab")
+                && item->isVisible()) {
+                if (!best || item->x() < best->x()) {
+                    best = item;
+                }
+            }
+        }
+        return best;
+    };
+    QQuickItem* tab = nullptr;
+    QTRY_VERIFY((tab = firstTab()) != nullptr);
+    const QPointF tabCenter = tab->mapToScene(QPointF(tab->width() / 2, tab->height() / 2));
+
+    // ---- enter minimum mode: collapsed, category hidden ----
+    bar->setProperty("minimumMode", true);
+    QTRY_VERIFY(!cat->isVisible());
+    QTRY_VERIFY(!bar->property("minimumModeExpanded").toBool());
+
+    // ---- a tab click raises the preview: category visible, bar collapsed ----
+    QTest::mouseClick(view.get(), Qt::LeftButton, Qt::NoModifier, tabCenter.toPoint());
+    QTRY_VERIFY(bar->property("minimumModeExpanded").toBool());
+    QTRY_VERIFY(cat->isVisible());
+    QVERIFY(bar->property("minimumMode").toBool());
+    QTRY_VERIFY(bar->implicitHeight() < cat->y() + cat->height());
+
+    // ---- a click inside the preview area keeps it up (no dismiss) ----
+    const QPointF inPreview = cat->mapToScene(QPointF(cat->width() / 2, cat->height() / 2));
+    QTest::mouseClick(view.get(), Qt::LeftButton, Qt::NoModifier, inPreview.toPoint());
+    QVERIFY(bar->property("minimumModeExpanded").toBool());
+    QVERIFY(cat->isVisible());
+
+    // ---- a click outside dismisses the preview (still minimum mode) ----
+    QTest::mouseClick(view.get(), Qt::LeftButton, Qt::NoModifier, QPoint(450, 290));
+    QTRY_VERIFY(!bar->property("minimumModeExpanded").toBool());
+    QTRY_VERIFY(!cat->isVisible());
+    QVERIFY(bar->property("minimumMode").toBool());
+
+    // ---- leaving minimum mode while previewing drops the preview ----
+    QTest::mouseClick(view.get(), Qt::LeftButton, Qt::NoModifier, tabCenter.toPoint());
+    QTRY_VERIFY(bar->property("minimumModeExpanded").toBool());
+    bar->setProperty("minimumMode", false);
+    QTRY_VERIFY(!bar->property("minimumModeExpanded").toBool());
+    QTRY_VERIFY(cat->isVisible());
+}
+
+/**
+ * @brief Right-group button drives the minimum mode toggle
+ * @details Mirrors the example's collapse pin (widgets showMinimumModeButton
+ *          parity): a RibbonToolButton in the right button group flipping
+ *          bar.minimumMode on click — the plain QML binding route the
+ *          QmlMainWindowExample uses for its collapse/restore button.
+ */
+void TestConformanceQml::minimumModeRightGroupButton()
+{
+    QQmlEngine engine;
+    saRibbonRegisterQmlTypes(&engine);
+
+    QString src = QStringLiteral(R"QML(import QtQuick 2.12
+import SARibbon 3.0
+Item {
+    width: 900
+    height: 300
+    RibbonBar {
+        id: theBar
+        objectName: "bar"
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.top: parent.top
+        applicationLabel: "File"
+        RibbonCategory {
+            objectName: "cat"
+            title: "Home"
+            RibbonPanel { panelTitle: "P"; RibbonToolButton { text: "A" } }
+        }
+        RibbonButtonGroup {
+            objectName: "rightGroup"
+            RibbonToolButton {
+                objectName: "collapseBtn"
+                text: "Collapse"
+                onClicked: theBar.minimumMode = !theBar.minimumMode
+            }
+        }
+    }
+})QML");
+
+    QQmlComponent component(&engine);
+    std::unique_ptr< QQuickView > view(exposeScene(engine, component, src.toUtf8().constData(), 900, 300));
+    QVERIFY(view);
+    QQuickItem* rootItem = view->rootObject();
+    QVERIFY(rootItem);
+
+    auto* bar  = rootItem->findChild< QQuickItem* >(QStringLiteral("bar"));
+    auto* cat  = rootItem->findChild< QQuickItem* >(QStringLiteral("cat"));
+    auto* btn  = rootItem->findChild< QQuickItem* >(QStringLiteral("collapseBtn"));
+    auto* rgrp = rootItem->findChild< QQuickItem* >(QStringLiteral("rightGroup"));
+    QVERIFY(bar && cat && btn && rgrp);
+
+    // the button sits at the right end of the tab row (loose style placement)
+    QTRY_VERIFY(rgrp->width() > 0 && rgrp->height() > 0);
+    QVERIFY(rgrp->x() > bar->width() / 2);
+
+    const qreal normalHeight = bar->implicitHeight();
+    QVERIFY(cat->isVisible());
+
+    // ---- click collapse: minimum mode on, category hidden ----
+    const QPointF btnCenter = btn->mapToScene(QPointF(btn->width() / 2, btn->height() / 2));
+    QTest::mouseClick(view.get(), Qt::LeftButton, Qt::NoModifier, btnCenter.toPoint());
+    QTRY_VERIFY(bar->property("minimumMode").toBool());
+    QTRY_VERIFY(!cat->isVisible());
+    QTRY_VERIFY(bar->implicitHeight() < normalHeight);
+
+    // ---- click again: restore ----
+    QTest::mouseClick(view.get(), Qt::LeftButton, Qt::NoModifier, btnCenter.toPoint());
+    QTRY_VERIFY(!bar->property("minimumMode").toBool());
     QTRY_VERIFY(cat->isVisible());
     QTRY_COMPARE(bar->implicitHeight(), normalHeight);
 }

@@ -183,9 +183,9 @@ ApplicationWindow {
             }
         }
 
-        // right button group (widgets right bar parity): help + toggle.
-        // Same toolbar rendering as the quick access bar (proportion is
-        // meaningless here too)
+        // right button group (widgets right bar parity): help + toggle +
+        // collapse. Same toolbar rendering as the quick access bar
+        // (proportion is meaningless here too)
         RibbonButtonGroup {
             RibbonToolButton {
                 text: qsTr("Help")
@@ -198,6 +198,21 @@ ApplicationWindow {
                 checkable: true
                 checked: true
                 onToggled: function(checked) { log(qsTr("right group visible toggle: %1").arg(checked)) }
+            }
+            // collapse/restore the ribbon (widgets showMinimumModeButton
+            // parity: the shade/unshade pin at the right end of the group).
+            // The icon and caption follow the mode: collapsed = chevron down
+            // (restore), expanded = chevron up (collapse). Double clicking a
+            // tab toggles the same state; while collapsed, a single tab click
+            // previews the category until a click outside dismisses it
+            RibbonToolButton {
+                text: ribbonBar.minimumMode ? qsTr("Restore") : qsTr("Collapse")
+                iconSource: ribbonBar.minimumMode ? "qrc:/icon/icon/chevron-down.svg"
+                                                  : "qrc:/icon/icon/chevron-up.svg"
+                onClicked: {
+                    ribbonBar.minimumMode = !ribbonBar.minimumMode;
+                    log(qsTr("minimum mode: %1").arg(ribbonBar.minimumMode));
+                }
             }
         }
 

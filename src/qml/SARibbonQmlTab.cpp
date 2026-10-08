@@ -71,4 +71,10 @@ void RibbonTab::mousePressEvent(QMouseEvent* event)
     Q_EMIT clicked();
 }
 
+void RibbonTab::mouseDoubleClickEvent(QMouseEvent* event)
+{
+    Q_UNUSED(event);
+    Q_EMIT doubleClicked();
+}
+
 }

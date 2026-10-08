@@ -20,6 +20,8 @@
 #include <SARibbonCore/SARibbonBarGeometryEngine.h>
 #include <SARibbonCore/SARibbonToolButtonLayout.h>
 #include <QHash>
+#include <QEvent>
+#include <QPointer>
 #include <QQmlListProperty>
 #include <QRectF>
 #include <QVariantList>
@@ -68,6 +70,9 @@ class SA_RIBBON_QML_EXPORT RibbonBar : public RibbonQuickHost
     Q_PROPERTY(RibbonEnums::RibbonStyle ribbonStyle READ ribbonStyle WRITE setRibbonStyle NOTIFY ribbonStyleChanged)
     Q_PROPERTY(RibbonEnums::Alignment tabAlignment READ tabAlignment WRITE setTabAlignment NOTIFY tabAlignmentChanged)
     Q_PROPERTY(bool minimumMode READ isMinimumMode WRITE setMinimumMode NOTIFY minimumModeChanged)
+    Q_PROPERTY(bool tabDoubleClickToMinimumMode READ isTabDoubleClickToMinimumMode WRITE setTabDoubleClickToMinimumMode NOTIFY tabDoubleClickToMinimumModeChanged)
+    Q_PROPERTY(bool minimumModeExpanded READ isMinimumModeExpanded NOTIFY minimumModeExpandedChanged)
+    Q_PROPERTY(int categoryPreviewHeight READ categoryPreviewHeight NOTIFY layoutChanged)
     Q_PROPERTY(qreal buttonMaximumAspectRatio READ buttonMaximumAspectRatio WRITE setButtonMaximumAspectRatio NOTIFY buttonMaximumAspectRatioChanged)
     Q_PROPERTY(qreal largeButtonMinimumWidthRatio READ largeButtonMinimumWidthRatio WRITE setLargeButtonMinimumWidthRatio NOTIFY largeButtonMinimumWidthRatioChanged)
     Q_PROPERTY(int systemButtonStripWidth READ systemButtonStripWidth WRITE setSystemButtonStripWidth NOTIFY systemButtonStripWidthChanged)
@@ -111,6 +116,27 @@ public:
     // remain (widgets setMinimumMode parity)
     bool isMinimumMode() const;
     void setMinimumMode(bool on);
+
+    // Whether double clicking a tab toggles minimum mode (widgets
+    // setTabDoubleClickToMinimumMode parity; default on). A double click
+    // first clicks (Qt Quick delivery), so the click's select/preview
+    // already ran when the toggle arrives
+    bool isTabDoubleClickToMinimumMode() const;
+    void setTabDoubleClickToMinimumMode(bool on);
+
+    // Collapsed-mode preview: while in minimum mode, a single click on a tab
+    // temporarily shows the category row (widgets pops the stacked container
+    // as a Qt::Popup window over the central area, re-popped per tab click).
+    // The preview collapses on a mouse press outside the preview area and on
+    // leaving minimum mode (Qt::Popup close-on-outside-click parity; the
+    // widgets module closes the same way and defines no Esc handling). The
+    // preview does NOT resize the bar or reflow the central content — the
+    // category row overlays what is below, exactly like the widgets popup
+    bool isMinimumModeExpanded() const;
+
+    // Normal-mode category row height, published for the preview overlay's
+    // bottom border (leaf-side rendering hint)
+    int categoryPreviewHeight() const;
 
     // Button width tuning pushed down the whole host tree (widgets
     // SARibbonBar::setButtonMaximumAspectRatio parity — the documented entry
@@ -266,6 +292,8 @@ Q_SIGNALS:
     void ribbonStyleChanged();
     void tabAlignmentChanged();
     void minimumModeChanged();
+    void tabDoubleClickToMinimumModeChanged();
+    void minimumModeExpandedChanged();
     void buttonMaximumAspectRatioChanged();
     void largeButtonMinimumWidthRatioChanged();
     void systemButtonStripWidthChanged();
@@ -284,6 +312,13 @@ protected:
     QUrl leafUrl() const override;
     void componentComplete() override;
     void updatePolish() override;
+    // collapsed-mode preview dismiss: a mouse press outside the preview area
+    // (the category row below the tab row) collapses it, wherever in the
+    // window that press lands (widgets Qt::Popup close-on-outside-click
+    // parity). Window-level, so it works over the central content which the
+    // bar does not own. The shortcut matcher uses its own window filter for
+    // key presses; mouse dismiss lives here
+    bool eventFilter(QObject* watched, QEvent* event) override;
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     void geometryChange(const QRectF& newGeometry, const QRectF& oldGeometry) override;
 #else
@@ -321,6 +356,17 @@ private:
     // Move a tab row slot (the paired auto tab follows its category) and keep
     // mAutoTabs in row order, which syncTabCount's tail-shrink test relies on
     void moveTabSlot(int from, int to);
+    // widgets onCurrentRibbonTabDoubleClicked parity: toggle minimum mode when
+    // the enable flag allows; leaving minimum mode also drops the preview
+    void onTabDoubleClicked();
+    // collapsed-mode preview state change; a no-op outside minimum mode
+    void setMinimumModeExpanded(bool on);
+    // (re-)install the window press filter on the current window; the preview
+    // dismiss filter follows the bar in and out of its window
+    void syncMinimumPreviewFilter();
+    // scene rect the preview occupies (empty when not expanded) — presses
+    // inside it are content interaction, presses outside dismiss
+    QRectF minimumPreviewRect() const;
 
     int mCurrentIndex = 0;
     QString mApplicationLabel;
@@ -328,6 +374,10 @@ private:
     RibbonEnums::Alignment mTabAlignment = RibbonEnums::AlignLeft;
     bool mTabOnTitle = false;
     bool mMinimumMode = false;
+    bool mTabDoubleClickToMinimumMode = true;  ///< widgets setTabDoubleClickToMinimumMode parity, default on
+    bool mMinimumModeExpanded = false;         ///< collapsed-mode category preview (Qt::Popup parity)
+    QPointer< QQuickWindow > mPreviewFilterWindow;  ///< window carrying the preview dismiss filter
+    int mCategoryPreviewHeight = 0;  ///< normal-mode category row height, leaf rendering hint
     int mSystemButtonStripWidth = 0;  ///< frameless system-button strip reservation (native frame: 0)
     qreal mButtonMaximumAspectRatio     = SARibbon::Core::ToolButtonLayoutConstants::BUTTON_MAX_ASPECT_RATIO_DEFAULT;
     qreal mLargeButtonMinimumWidthRatio = SARibbon::Core::ToolButtonLayoutConstants::LARGE_BUTTON_MIN_WIDTH_RATIO;
