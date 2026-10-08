@@ -1,6 +1,7 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.12
 import QtQuick.Layouts 1.12
+import QtQuick.Window 2.12
 import SARibbon 3.0
 
 // Mirrors the widgets MainWindowExample main scene: three categories with
@@ -11,6 +12,10 @@ ApplicationWindow {
     id: window
     width: 1300
     height: 600
+    // widgets parity: open filling the whole screen (the widgets example
+    // calls showMaximized at startup); the 1300x600 above stays the restore
+    // size after un-maximizing
+    visibility: Window.Maximized
     visible: true
     title: "SARibbon QML Example"
     // auto-computed minimum width: the bar measures its title-row/tab-row

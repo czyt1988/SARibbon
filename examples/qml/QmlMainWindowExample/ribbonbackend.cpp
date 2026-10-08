@@ -1,4 +1,5 @@
 #include "ribbonbackend.h"
+#include <SARibbonQml/SARibbonQmlApplicationWindow.h>
 
 // The command half of the migration story: plain QAction wiring that a
 // widgets application already has (icons land on the actions directly; the
@@ -57,17 +58,23 @@ RibbonBackend::RibbonBackend(QObject* parent)
     mCoverageGroup.actions().first()->setChecked(true);
     connect(&mCoverageGroup, &QActionGroup::triggered, this, [this](QAction*) { Q_EMIT coverageChanged(); });
 
-    struct Anim { const char* key; int effect; const char* label; };
-    const Anim anims[] = { { "actionAnimSlideL", 0, QT_TRANSLATE_NOOP("RibbonBackend", "Slide L") },
-                           { "actionAnimSlideR", 1, QT_TRANSLATE_NOOP("RibbonBackend", "Slide R") },
-                           { "actionAnimFade", 2, QT_TRANSLATE_NOOP("RibbonBackend", "Fade") },
-                           { "actionAnimNone", 3, QT_TRANSLATE_NOOP("RibbonBackend", "None") } };
+    // The effect values must be RibbonApplicationWindow::AnimationEffect
+    // itself: the QML side binds backend.currentAnimation straight onto the
+    // app window's animation property, so hand-written numbers drift against
+    // the enum and every button ends up firing its neighbor's effect (the
+    // enum order is NoAnimation=0/SlideFromLeft=1/SlideFromRight=2/Fade=3).
+    typedef SARibbonQml::RibbonApplicationWindow::AnimationEffect AnimEffect;
+    struct Anim { const char* key; AnimEffect effect; const char* label; };
+    const Anim anims[] = { { "actionAnimSlideL", AnimEffect::SlideFromLeft, QT_TRANSLATE_NOOP("RibbonBackend", "Slide L") },
+                           { "actionAnimSlideR", AnimEffect::SlideFromRight, QT_TRANSLATE_NOOP("RibbonBackend", "Slide R") },
+                           { "actionAnimFade", AnimEffect::Fade, QT_TRANSLATE_NOOP("RibbonBackend", "Fade") },
+                           { "actionAnimNone", AnimEffect::NoAnimation, QT_TRANSLATE_NOOP("RibbonBackend", "None") } };
     for (const Anim& e : anims) {
         QAction* a = new QAction(&mAnimationGroup);
         a->setObjectName(e.key);
         a->setText(QObject::tr(e.label));
         a->setCheckable(true);
-        a->setProperty("effect", e.effect);
+        a->setProperty("effect", int(e.effect));
         mAnimationGroup.addAction(a);
     }
     mAnimationGroup.setExclusive(true);
