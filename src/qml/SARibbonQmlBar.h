@@ -257,8 +257,11 @@ public:
     QRectF titleRect() const;
 
     // Active context bands for the visual leaf: list of maps
-    // {x, width, title, color, highlight, textColor}; y/height derive from
-    // the published tabBar/titleBar metrics (band spans them, under the tabs)
+    // {x, width, title, color, highlight, textColor, showTitle}; y/height
+    // derive from the published tabBar/titleBar metrics (band spans them,
+    // under the tabs). showTitle is false in compact (WPS) styles — the tab
+    // row rides the title row there, leaving no band strip for the caption
+    // (widgets paintContextCategoryTab isLooseStyle() parity)
     QVariantList contextBands() const;
 
     // Application button menu (widgets menu-mode app button): when the list

@@ -1591,6 +1591,11 @@ void RibbonBar::relayout()
         band[ QStringLiteral("color") ]    = base;
         band[ QStringLiteral("highlight") ] = highlight;
         band[ QStringLiteral("textColor") ] = (base.lightness() > 150) ? QColor(Qt::black) : QColor(Qt::white);
+        // widgets paintContextCategoryTab draws the title under isLooseStyle()
+        // only: compact (WPS) styles put the tab row on the title row, which
+        // leaves no band strip for the caption — the leaf must hide it there
+        // or it collides with the tab texts
+        band[ QStringLiteral("showTitle") ] = !mTabOnTitle;
         bands.append(band);
     }
     mBands = bands;
