@@ -35,6 +35,48 @@ public:
     QRect mApplied;
 };
 
+class FakeCategoryItem : public SARibbon::Core::SARibbonAbstractCategoryItem
+{
+public:
+    explicit FakeCategoryItem(int panelWidth) : mPanelHint(panelWidth, 90)
+    {
+    }
+    QSize sizeHint() const override { return mPanelHint; }
+    bool isHidden() const override { return mHidden; }
+    Qt::Orientations expandingDirections() const override { return Qt::Orientations(); }
+    void applyGeometry(const QRect& rect) override { mApplied = rect; }
+    QString debugName() const override { return mName; }
+
+    QSize mPanelHint;
+    bool mHidden = false;
+    QString mName;
+    QRect mApplied;
+};
+
+// Mirrors SARibbonCategoryLayout::PrivateData::collectSizeHints() so the engine
+// Input carries exactly what the widgets adapter would feed it (separator width 1,
+// margins added once into totalWidth)
+SARibbon::Core::SARibbonCategorySizeHints collectFakeCategoryHints(const QVector< SARibbon::Core::SARibbonAbstractCategoryItem* >& items,
+                                                                   const QMargins& margins)
+{
+    SARibbon::Core::SARibbonCategorySizeHints hints;
+    hints.panelSizes.resize(items.size());
+    hints.separatorSizes.resize(items.size());
+    if (!margins.isNull()) {
+        hints.totalWidth += (margins.left() + margins.right());
+    }
+    for (int i = 0; i < items.size(); ++i) {
+        if (items[ i ]->isHidden()) {
+            continue;
+        }
+        hints.panelSizes[ i ]     = items[ i ]->sizeHint();
+        hints.separatorSizes[ i ] = QSize(1, 90);
+        hints.totalWidth += hints.panelSizes[ i ].width();
+        hints.totalWidth += hints.separatorSizes[ i ].width();
+    }
+    return hints;
+}
+
 }  // namespace
 
 class TestPanelLayoutEngine : public QObject
@@ -44,6 +86,8 @@ private Q_SLOTS:
     void threeRowMixed();
     void hiddenItemSkipped();
     void categoryScrollFlagsAndClamp();
+    void categoryLayoutKeepsScrollBaseWhenScrolling();
+    void categoryLayoutResetsScrollBaseWhenContentFits();
     void barTitleRectCompactLtr();
 };
 
@@ -147,6 +191,89 @@ void TestPanelLayoutEngine::categoryScrollFlagsAndClamp()
     QCOMPARE(clampScrollOffset(999, 300, 200, true), 100);
     // no scrolling case: LTR collapses to 0
     QCOMPARE(clampScrollOffset(50, 100, 200, false), 0);
+}
+
+/**
+ * @brief Regression: the scrolling branch must carry input.xBase through Result::newXBase
+ * @details 2.x never wrote mXBase when scrolling was needed, and the placement origin was
+ *          computed from the live value. After the move into the core engine the widgets
+ *          adapter unconditionally writes r.newXBase back, so a default 0 turned every
+ *          geometry recalculation (resize, arrow show/hide invalidation) into a silent
+ *          scroll reset while the placed geometries stayed offset — the dev-3.0 middle-
+ *          wheel overflow blank / cannot-scroll-back-to-left bug. newXBase and the
+ *          placement origin must be the very same value.
+ */
+void TestPanelLayoutEngine::categoryLayoutKeepsScrollBaseWhenScrolling()
+{
+    using namespace SARibbon::Core;
+    SARibbonCategoryLayoutEngine engine;
+
+    QVector< SARibbonAbstractCategoryItem* > items;
+    items << new FakeCategoryItem(120) << new FakeCategoryItem(120) << new FakeCategoryItem(120) << new FakeCategoryItem(120);
+
+    SARibbonCategoryLayoutEngine::Input input;
+    input.categoryWidth = 300;
+    input.height        = 100;
+    input.y             = 0;
+    input.margins       = QMargins(1, 1, 1, 1);
+    input.alignment     = SARibbonAlignment::AlignLeft;
+    input.isRTL         = false;
+    input.xBase         = -200;
+    input.sizeHints     = collectFakeCategoryHints(items, input.margins);
+
+    // total = 4 panels + 4 separators + margins = 484+2+2 > 300 -> needs scrolling
+    QVERIFY(input.sizeHints.totalWidth > input.categoryWidth);
+
+    auto r = engine.layout(items, input);
+    // the scrolled base survives the layout pass (2.x: the scrolling branch never wrote it)
+    QCOMPARE(r.newXBase, -200);
+    // placement origin derives from the SAME base: first panel sits at xBase + margin.left()
+    QCOMPARE(items[ 0 ]->resultGeometry.x(), -200 + 1);
+    // moving the base shifts the placement, not the state
+    input.xBase = -100;
+    r           = engine.layout(items, input);
+    QCOMPARE(r.newXBase, -100);
+    QCOMPARE(items[ 0 ]->resultGeometry.x(), -100 + 1);
+
+    qDeleteAll(items);
+}
+
+/**
+ * @brief Regression: the non-scrolling branch resets the base to 0 BEFORE placement
+ * @details 2.x resets mXBase inside the !needsScrolling branch and the placement origin
+ *          is computed after it, so content that no longer overflows never stays visually
+ *          stuck at the old offset. The reset and the placement origin must be the same
+ *          value, otherwise state and placed geometries desynchronize.
+ */
+void TestPanelLayoutEngine::categoryLayoutResetsScrollBaseWhenContentFits()
+{
+    using namespace SARibbon::Core;
+    SARibbonCategoryLayoutEngine engine;
+
+    QVector< SARibbonAbstractCategoryItem* > items;
+    items << new FakeCategoryItem(60) << new FakeCategoryItem(60);
+
+    SARibbonCategoryLayoutEngine::Input input;
+    input.categoryWidth = 400;
+    input.height        = 100;
+    input.y             = 0;
+    input.margins       = QMargins(1, 1, 1, 1);
+    input.alignment     = SARibbonAlignment::AlignLeft;
+    input.isRTL         = false;
+    input.xBase         = -200;  // stale offset from a previously wider content
+    input.sizeHints     = collectFakeCategoryHints(items, input.margins);
+
+    // total = 2 panels + 2 separators + margins = 124 < 400 -> fits
+    QVERIFY(input.sizeHints.totalWidth <= input.categoryWidth);
+
+    auto r = engine.layout(items, input);
+    // the stale base is reset in the state...
+    QCOMPARE(r.newXBase, 0);
+    // ...and the placement origin derives from the reset value, not the stale one
+    QCOMPARE(items[ 0 ]->resultGeometry.x(), 0 + 1);
+    QVERIFY(!r.scrollFlags.showLeft && !r.scrollFlags.showRight);
+
+    qDeleteAll(items);
 }
 
 void TestPanelLayoutEngine::barTitleRectCompactLtr()

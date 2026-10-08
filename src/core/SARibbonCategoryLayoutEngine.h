@@ -326,7 +326,7 @@ public:
         int totalWidth { 0 };
         QSize sizeHint;
         QSize minSizeHint;
-        int newXBase { 0 };  ///< 2.x non-scrolling branch resets mXBase to 0 (state side effect brought back)
+        int newXBase { 0 };  ///< carries input.xBase when scrolling is needed (2.x never wrote it in that branch); 0 after the non-scrolling reset
         SARibbonScrollFlags scrollFlags;
     };
 

@@ -51,12 +51,19 @@ SARibbonCategoryLayoutEngine::Result SARibbonCategoryLayoutEngine::layout(QVecto
 
     result.scrollFlags = scrollButtonFlags(total, categoryWidth, input.xBase, input.isRTL);
 
+    // 有效滚动基：需要滚动时原值携带（2.x 该分支从不写 mXBase）；不需要滚动时先复位
+    // 为 0 再参与摆放起点计算（2.x 的复位发生在 x 计算之前，缩小的内容不会停在旧偏移）。
+    // Result.newXBase 与摆放起点必须同源——适配器无条件回写 r.newXBase，若滚动分支的
+    // newXBase 留默认 0，每次几何重算都会把滚动位置悄悄归零，状态与已摆放几何脱钩
+    // （dev-3.0 滚轮中键越界空白/回滚不到最左的根因）
+    int xBase = input.xBase;
+
     if (!needsScrolling) {
         // 说明total 小于 categoryWidth
         // 这个是避免一开始totalWidth > categorySize.width()，通过滚动按钮调整了m_d->mBaseX
         // 随之调整了窗体尺寸，调整后totalWidth < categorySize.width()导致category在原来位置
         // 无法显示，必须这里把mBaseX设置为0
-        result.newXBase = 0;
+        xBase = 0;
 
         // 计算可扩展的宽度，canExpandingCount 已由 collectSizeHints 收集
         if (hints.canExpandingCount > 0) {
@@ -65,7 +72,8 @@ SARibbonCategoryLayoutEngine::Result SARibbonCategoryLayoutEngine::layout(QVecto
             expandWidth = 0;
         }
     }
-    int x = input.xBase + mag.left();
+    result.newXBase = xBase;
+    int x = xBase + mag.left();
     if (!needsScrolling && (0 == expandWidth)) {
         // Alignment offset when no scrolling needed and no expanding panels
         SARibbonAlignment align = input.alignment;
@@ -76,7 +84,7 @@ SARibbonCategoryLayoutEngine::Result SARibbonCategoryLayoutEngine::layout(QVecto
             // Right alignment: panels start from right edge
             x = categoryWidth - total;
         }
-        // AlignLeft: x = input.xBase (default, starts from left edge)
+        // AlignLeft: x = xBase (default, starts from left edge)
     }
     total = 0;  // total重新计算
     // 先按照sizeHint设置所有的尺寸，使用 collectSizeHints 收集的结果避免重复调用
