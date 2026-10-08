@@ -38,11 +38,15 @@ int main(int argc, char* argv[])
     f.setPointSize(9);
     app.setFont(f);
 
+    // command-layer backend (plan-05): plain QAction objects owned by C++,
+    // bound by the QML views through their `action` properties.
+    // Declaration order = reverse destruction order: the backend must be
+    // declared BEFORE the engine so it dies after it — a backend destroyed
+    // first nulls the context property while the QML scene still lives and
+    // every backend.* binding re-evaluates into a shutdown TypeError
+    RibbonBackend backend;
     QQmlApplicationEngine engine;
     saRibbonRegisterQmlTypes(&engine);  // imperative single-track: before load()
-    // command-layer backend (plan-05): plain QAction objects owned by C++,
-    // bound by the QML views through their `action` properties
-    RibbonBackend backend;
     engine.rootContext()->setContextProperty(QStringLiteral("backend"), &backend);
     // surface QML load diagnostics: a silent -1 exit helps nobody (headless
     // verification reads stderr through redirections)
