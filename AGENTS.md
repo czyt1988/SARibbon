@@ -72,8 +72,8 @@ CMake 构建，最低 Qt 5.12，支持 Qt5 和 Qt6（QML 模块为双车道：Qt
 
 ### 构建环境
 
-- **Windows**：CMake 3.15+，Visual Studio 2019（MSVC 14.29+）或 2022（MSVC 14.34+），Qt 6.7+ 或 Qt 5.12+
-- **Linux / WSL**：CMake 3.15+，GCC 9+（推荐 GCC 13+），Qt 6.x（apt）或 Qt 5.12+（手动安装）
+- **Windows**：CMake 3.21+，Visual Studio 2019（MSVC 14.29+）或 2022（MSVC 14.34+），Qt 6.7+ 或 Qt 5.12+
+- **Linux / WSL**：CMake 3.21+，GCC 9+（推荐 GCC 13+），Qt 6.x（apt）或 Qt 5.12+（手动安装）
 
 ### 快速构建（推荐使用 scripts/build.ps1 脚本）
 
