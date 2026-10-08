@@ -74,7 +74,10 @@ void RibbonShortcutMatcher::collectAction(QObject* button, QAction* action)
     // a shortcut rebind on the action must reach the match table. Unique:
     // several buttons may bind the same command — one hookup per action, the
     // rebuild is idempotent anyway
-    QObject::connect(action, &QAction::changed, this, [this]() { rebuildMap(); }, Qt::UniqueConnection);
+    // Qt::UniqueConnection requires a member-function pointer slot; a lambda
+    // here fires Qt's fatal "Unique connection" assert
+    QObject::connect(action, &QAction::changed, this, &RibbonShortcutMatcher::rebuildMap,
+                     Qt::UniqueConnection);
     rebuildMap();
 }
 
