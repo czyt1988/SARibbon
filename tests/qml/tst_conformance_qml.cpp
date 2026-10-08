@@ -3745,6 +3745,15 @@ Item {
         return rows;
     };
     QTRY_COMPARE(popupRows().size(), 3);
+    // The delegate rows are created culled: QQuickComboBox hands a freshly
+    // created delegate over with setCulled(true) and the popup list view's
+    // first layout/polish cycle un-culls it. Pointer delivery skips culled
+    // items, so a click landing before that cycle is silently dropped (the
+    // rows exist on the first QTRY check, which settles nothing) — pump the
+    // event loop to let the first layout land before clicking.
+    for (int i = 0; i < 10; ++i) {
+        QTest::qWait(50);
+    }
     clickItem(popupRows().value(1));
     QTRY_COMPARE(popup->property("visible").toBool(), false);
     QCOMPARE(combo->property("currentIndex").toInt(), 1);
