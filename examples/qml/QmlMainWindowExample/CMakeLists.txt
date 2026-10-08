@@ -10,6 +10,12 @@ add_executable(QmlMainWindowExample main.cpp ribbonbackend.h ribbonbackend.cpp q
 if(WIN32)
     set_target_properties(QmlMainWindowExample PROPERTIES WIN32_EXECUTABLE TRUE)
 endif()
+# exe must land in ${CMAKE_BINARY_DIR}/bin next to the SARibbonQml dlls,
+# otherwise the Windows loader cannot find them at startup (same as widgets examples)
+set_target_properties(QmlMainWindowExample PROPERTIES
+    DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX}
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+)
 
 if(NOT TARGET SARibbonQml)
     find_package(SARibbon 3.0 REQUIRED COMPONENTS Qml)
