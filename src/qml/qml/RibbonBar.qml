@@ -109,7 +109,10 @@ Rectangle {
     // context category bands: span their tabs from the bar top through the
     // tab row (widgets paintContextCategoryTab parity: base color + 5px
     // vibrant highlight + centered title). This leaf sits at z=-1, so the
-    // structural tab items render on top of the band.
+    // structural tab items render on top of the band. The title hides in
+    // compact (WPS) styles — showTitle comes from the host because the tab
+    // row placement is a layout decision (widgets draws it isLooseStyle()
+    // only: the compact tab row rides the title row, no band strip remains).
     Repeater {
         model: root.bands
         Item {
@@ -134,7 +137,7 @@ Rectangle {
                 width: parent.width
                 height: Math.max(root.titleBarHeight - 5, 0)
                 text: modelData.title
-                visible: text.length > 0 && height > 0
+                visible: modelData.showTitle && text.length > 0 && height > 0
                 color: modelData.textColor
                 elide: Text.ElideRight
                 horizontalAlignment: Text.AlignHCenter

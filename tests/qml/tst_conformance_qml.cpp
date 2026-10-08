@@ -1110,7 +1110,12 @@ int TestConformanceQml::countPixelsNear(const QImage& img, const QColor& color, 
  *          theme fp), and the current index can walk into the context
  *          pages; deactivation removes them and clamps the index back.
  *          The band color is verified on the real rendered frame
- *          (QQuickWindow::grabWindow pixel count).
+ *          (QQuickWindow::grabWindow pixel count). Tab captions must keep
+ *          the theme palette (text-color / tab-accent, never the context
+ *          color — widgets QSS parity), and the band caption hides in
+ *          compact styles (widgets paintContextCategoryTab isLooseStyle()
+ *          parity: the compact tab row rides the title row, no strip
+ *          remains for the caption).
  */
 void TestConformanceQml::contextCategoryActivation()
 {
@@ -1219,6 +1224,106 @@ Item {
     QVERIFY(!frame.isNull());
     QVERIFY2(countPixelsNear(frame, QColor(0x2d, 0x7d, 0x9a)) > 200,
              "context band color must be visible in the rendered frame");
+    // regression guard: theme-colored caption pixels inside the band's
+    // tab-row region. The leaf once painted the captions in the context
+    // color itself, which leaves ZERO theme-text pixels there (the captions
+    // were invisible on the same-colored band behind the row)
+    {
+        const QVariantMap bandGeo = bar->property("contextBands").toList().at(0).toMap();
+        const int bx     = int(bandGeo.value(QStringLiteral("x")).toReal());
+        const int bw     = int(bandGeo.value(QStringLiteral("width")).toReal());
+        const int ty     = bar->property("categoryRowY").toInt() - bar->property("tabBarHeight").toInt();
+        const int th     = bar->property("tabBarHeight").toInt();
+        const QColor tc  = SARibbonQml::RibbonTheme::instance()->textColor();
+        int textPixels = 0;
+        for (int y = ty; y < ty + th && y < frame.height(); ++y) {
+            for (int x = bx; x < bx + bw && x < frame.width(); ++x) {
+                const QRgb rgb = frame.pixel(x, y);
+                if (qAbs(qRed(rgb) - tc.red()) <= 8 && qAbs(qGreen(rgb) - tc.green()) <= 8
+                    && qAbs(qBlue(rgb) - tc.blue()) <= 8) {
+                    ++textPixels;
+                }
+            }
+        }
+        QVERIFY2(textPixels > 100, "context tab captions must render in the theme text color on the band");
+    }
+
+    // ---- context tab captions follow the THEME palette, not the context
+    // color (widgets QSS parity: SARibbonTabBar::tab keeps text-color /
+    // tab-accent for every tab; painting the caption in the context color
+    // drops it invisibly onto the same-colored band behind the row) ----
+    auto visibleTabLeaf = [rootItem](const QString& title) -> QQuickItem* {
+        const auto all = rootItem->findChildren< QQuickItem* >();
+        for (QQuickItem* item : all) {
+            if (QString::fromLatin1(item->metaObject()->className()) == QLatin1String("SARibbonQml::RibbonTab")
+                && item->isVisible() && item->property("text").toString() == title) {
+                return item->property("qmlLeaf").value< QQuickItem* >();
+            }
+        }
+        return nullptr;
+    };
+    auto leafTextColor = [](QQuickItem* leaf) -> QColor {
+        const auto children = leaf->findChildren< QQuickItem* >();
+        for (QQuickItem* t : children) {
+            if (QString::fromLatin1(t->metaObject()->className()) == QLatin1String("QQuickText")) {
+                return t->property("color").value< QColor >();
+            }
+        }
+        return QColor();
+    };
+    QQuickItem* ctxLeaf1 = visibleTabLeaf(QStringLiteral("ctx Page1"));
+    QQuickItem* ctxLeaf2 = visibleTabLeaf(QStringLiteral("ctx Page2"));
+    QVERIFY(ctxLeaf1 && ctxLeaf2);
+    // page2 is the current tab (currentIndex walk above), page1 is not: the
+    // palette colors differ per state, but neither may be the context color
+    const QColor ctxBase(0x2d, 0x7d, 0x9a);
+    QCOMPARE(leafTextColor(ctxLeaf1), SARibbonQml::RibbonTheme::instance()->textColor());
+    QCOMPARE(leafTextColor(ctxLeaf2), SARibbonQml::RibbonTheme::instance()->tabAccent());
+    QVERIFY(leafTextColor(ctxLeaf1) != ctxBase);
+    QVERIFY(leafTextColor(ctxLeaf2) != ctxBase);
+
+    // ---- band caption visibility follows the style (widgets
+    // paintContextCategoryTab draws the title isLooseStyle() only: the
+    // compact tab row rides the title row, no strip remains for the caption
+    // — keeping it would collide with the tab texts) ----
+    // NOTE: the band delegates are Repeater-created items — they carry NO
+    // QObject parent under the leaf root (Repeater only reparents visually),
+    // so the lookup walks the visual childItems tree, not findChildren
+    auto bandTitleVisible = [bar]() -> bool {
+        QQuickItem* barLeaf = bar->property("qmlLeaf").value< QQuickItem* >();
+        if (!barLeaf) {
+            return false;
+        }
+        std::function< bool(QQuickItem*) > walk = [&](QQuickItem* it) -> bool {
+            const auto kids = it->childItems();
+            for (QQuickItem* k : kids) {
+                if (QString::fromLatin1(k->metaObject()->className()) == QLatin1String("QQuickText")
+                    && k->property("text").toString() == QStringLiteral("context")) {
+                    return k->isVisible();
+                }
+                if (walk(k)) {
+                    return true;
+                }
+            }
+            return false;
+        };
+        return walk(barLeaf);
+    };
+    QVERIFY(bandTitleVisible());
+    QCOMPARE(bar->property("contextBands").toList().at(0).toMap()
+                 .value(QStringLiteral("showTitle"))
+                 .toBool(),
+             true);
+    // compact (WPS): the caption must hide
+    bar->setProperty("ribbonStyle", int(SARibbonQml::RibbonEnums::RibbonStyleCompactThreeRow));
+    QTRY_VERIFY(!bandTitleVisible());
+    QCOMPARE(bar->property("contextBands").toList().at(0).toMap()
+                 .value(QStringLiteral("showTitle"))
+                 .toBool(),
+             false);
+    // back to loose: the caption returns
+    bar->setProperty("ribbonStyle", int(SARibbonQml::RibbonEnums::RibbonStyleLooseThreeRow));
+    QTRY_VERIFY(bandTitleVisible());
 
     // ---- deactivation: tabs vanish, the index clamps back to normal tabs ----
     ctx->setProperty("active", false);
