@@ -43,11 +43,16 @@ Q_SIGNALS:
     void currentChanged();
     void contextColorChanged();
     void clicked();
+    // Qt Quick delivers press/release/DoubleClick/release for a double click,
+    // so a double click always emits clicked() first (widgets tabBarClicked +
+    // tabBarDoubleClicked parity); the bar treats the pair as one toggle
+    void doubleClicked();
 
 protected:
     QUrl leafUrl() const override;
     void componentComplete() override;
     void mousePressEvent(QMouseEvent* event) override;
+    void mouseDoubleClickEvent(QMouseEvent* event) override;
 
 private:
     QString mText;

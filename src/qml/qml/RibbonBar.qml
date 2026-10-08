@@ -69,12 +69,19 @@ Rectangle {
     anchors.fill: parent
     color: RibbonTheme.accent
 
-    // category content zone below the tab row (office-2021: content-bg)
+    // category content zone below the tab row (office-2021: content-bg).
+    // In the collapsed-mode preview the zone extends past the bar's (and this
+    // leaf's) bottom edge by the preview height the host publishes — the bar
+    // does not clip, and the raised bar z keeps it above the central content
+    // below (widgets Qt::Popup overlay parity; the bar's own height stays
+    // collapsed so the central content never reflows)
     Rectangle {
         x: 0
         y: root.categoryRowY
         width: parent.width
-        height: Math.max(parent.height - root.categoryRowY, 0)
+        height: (cppHost && cppHost.minimumModeExpanded)
+                ? cppHost.categoryPreviewHeight
+                : Math.max(parent.height - root.categoryRowY, 0)
         color: RibbonTheme.contentBg
     }
 
@@ -85,6 +92,8 @@ Rectangle {
     // would be overpainted by the category / panel leaves that reach exactly
     // to the bar's bottom edge — the line therefore hangs on the host itself,
     // one layer above the structural children.
+    // While the collapsed-mode preview is up, the line rides the preview's
+    // bottom edge (the popup's lower frame, one row below the tab row).
     // Bindings deliberately reference the C++ host only (never this leaf):
     // the line outlives the leaf root when the bar tears down, and a binding
     // into the dying leaf root is exactly the teardown crash family NOTES B44
@@ -99,7 +108,10 @@ Rectangle {
         parent: host
         z: 1
         x: 0
-        y: host ? Math.max(host.height - 1, 0) : 0
+        y: host ? (host.minimumModeExpanded
+                   ? Math.max(host.categoryRowY + host.categoryPreviewHeight - 1, 0)
+                   : Math.max(host.height - 1, 0))
+               : 0
         width: host ? host.width : 0
         height: 1
         visible: host !== null
