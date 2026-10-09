@@ -10,6 +10,7 @@
 // compiled (NOTES B64)
 #include "SARibbonQmlGalleryGroup.h"
 #include "SARibbonQmlGalleryItem.h"
+#include "SARibbonQmlGalleryViewportWidget.h"
 #include <QQmlListProperty>
 #include <QSize>
 #include <QVector>
@@ -54,6 +55,9 @@ class SA_RIBBON_QML_EXPORT RibbonGallery : public RibbonLayoutItemHost
     Q_OBJECT
     Q_CLASSINFO("DefaultProperty", "groups")
     Q_PROPERTY(QQmlListProperty< SARibbonQml::RibbonGalleryGroup > groups READ groups NOTIFY groupsChanged)
+    // expanded-viewport custom sections (widgets SARibbonGalleryViewport
+    // addWidget parity); declared by assignment, not the default property
+    Q_PROPERTY(QQmlListProperty< SARibbonQml::RibbonGalleryViewportWidget > viewportWidgets READ viewportWidgets NOTIFY viewportWidgetsChanged)
     Q_PROPERTY(int currentGroupIndex READ currentGroupIndex WRITE setCurrentGroupIndex NOTIFY currentGroupIndexChanged)
     Q_PROPERTY(int stretchFactor READ stretchFactor WRITE setStretchFactor NOTIFY stretchFactorChanged)
     Q_PROPERTY(int displayRow READ displayRow WRITE setDisplayRow NOTIFY displayRowChanged)
@@ -77,6 +81,14 @@ public:
     int groupCount() const;
     // QML-facing (the leaf resolves its current group through it)
     Q_INVOKABLE SARibbonQml::RibbonGalleryGroup* groupAt(int index) const;
+
+    // ---- expanded viewport custom sections (widgets addWidget parity) ----
+    QQmlListProperty< SARibbonQml::RibbonGalleryViewportWidget > viewportWidgets();
+    int viewportWidgetCount() const;
+    Q_INVOKABLE SARibbonQml::RibbonGalleryViewportWidget* viewportWidgetAt(int index) const;
+    // Visually attach a section into the expanded viewport (leaf slot call);
+    // an implicit-only section receives the slot width (contract §6)
+    Q_INVOKABLE void attachViewportWidget(SARibbonQml::RibbonGalleryViewportWidget* section, QQuickItem* slot);
 
     int currentGroupIndex() const;
     void setCurrentGroupIndex(int idx);
@@ -137,6 +149,7 @@ public:
 
 Q_SIGNALS:
     void groupsChanged();
+    void viewportWidgetsChanged();
     void currentGroupIndexChanged();
     void stretchFactorChanged();
     void displayRowChanged();
@@ -207,6 +220,12 @@ private:
     static ListIndex groupCountCb(QQmlListProperty< SARibbonQml::RibbonGalleryGroup >* prop);
     static SARibbonQml::RibbonGalleryGroup* groupAtCb(QQmlListProperty< SARibbonQml::RibbonGalleryGroup >* prop, ListIndex index);
     static void clearGroupsCb(QQmlListProperty< SARibbonQml::RibbonGalleryGroup >* prop);
+    static void appendViewportWidgetCb(QQmlListProperty< SARibbonQml::RibbonGalleryViewportWidget >* prop,
+                                       SARibbonQml::RibbonGalleryViewportWidget* section);
+    static ListIndex viewportWidgetCountCb(QQmlListProperty< SARibbonQml::RibbonGalleryViewportWidget >* prop);
+    static SARibbonQml::RibbonGalleryViewportWidget* viewportWidgetAtCb(QQmlListProperty< SARibbonQml::RibbonGalleryViewportWidget >* prop,
+                                                                        ListIndex index);
+    static void clearViewportWidgetsCb(QQmlListProperty< SARibbonQml::RibbonGalleryViewportWidget >* prop);
 
     void updateGridMetrics();
     void emitGroupsChanged();
@@ -218,6 +237,9 @@ private:
     void validateCurrentItemIndex();
 
     QVector< SARibbonQml::RibbonGalleryGroup* > mGroups;
+    // custom sections rendered inside the expanded viewport (host-owned; the
+    // leaf attaches them visually into its popup slots)
+    QVector< SARibbonQml::RibbonGalleryViewportWidget* > mViewportWidgets;
     int mCurrentGroupIndex = 0;
     int mStretchFactor     = 0;  ///< 0 = legacy equal share (contract default)
     int mDisplayRow        = 1;  ///< widgets DisplayOneRow parity

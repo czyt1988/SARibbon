@@ -1032,6 +1032,133 @@ ApplicationWindow {
                         RibbonGalleryItem { text: "Adobe"; iconSource: "qrc:/icon/icon/gallery/Adobe.svg" }
                         RibbonGalleryItem { text: "Word"; iconSource: "qrc:/icon/icon/gallery/Word.svg" }
                     }
+                    // widgets viewport addWidget parity (issue #78 demo): the
+                    // expanded viewport (the "more" button popup) hosts custom
+                    // content sections below its groups — the widgets example
+                    // embeds a checkbox + combobox panel the same way
+                    // (galleryViewport->addWidget(w, title)). Section sizing:
+                    // the gallery pushes the viewport width to the section,
+                    // the section's own content drives its height
+                    viewportWidgets: [
+                        RibbonGalleryViewportWidget {
+                            sectionTitle: qsTr("custom widgets")
+                            Column {
+                                spacing: 4
+                                CheckBox {
+                                    text: qsTr("checkbox in gallery popup")
+                                    onToggled: log(qsTr("gallery popup checkbox: %1").arg(checked))
+                                }
+                                ComboBox {
+                                    width: 170
+                                    model: [ qsTr("popup option A"), qsTr("popup option B") ]
+                                    onActivated: log(qsTr("gallery popup combo: %1").arg(currentText))
+                                }
+                            }
+                        },
+                        // an embedded "other window" inside the gallery: any
+                        // QQuickItem is valid section content, so a mini
+                        // window (chrome + live controls) renders below the
+                        // gallery groups like a nested document window
+                        RibbonGalleryViewportWidget {
+                            sectionTitle: qsTr("embedded window")
+                            Rectangle {
+                                id: embeddedWindow
+                                anchors.left: parent.left
+                                anchors.right: parent.right
+                                height: embeddedTitleBar.height + embeddedBody.implicitHeight + 2
+                                color: RibbonTheme.contentBg
+                                border.width: 1
+                                border.color: RibbonTheme.borderColor
+                                // window title bar (drag look-alike, close glyph)
+                                Rectangle {
+                                    id: embeddedTitleBar
+                                    anchors.top: parent.top
+                                    anchors.left: parent.left
+                                    anchors.right: parent.right
+                                    height: 22
+                                    color: RibbonTheme.selectionBg
+                                    Text {
+                                        anchors.left: parent.left
+                                        anchors.leftMargin: 6
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        text: embeddedWindowTitle
+                                        color: RibbonTheme.textColor
+                                        elide: Text.ElideRight
+                                        width: parent.width - 24
+                                    }
+                                    Rectangle {
+                                        anchors.right: parent.right
+                                        anchors.top: parent.top
+                                        anchors.bottom: parent.bottom
+                                        width: 20
+                                        color: embeddedCloseMouse.containsMouse ? RibbonTheme.contentHoverBg : "transparent"
+                                        Text {
+                                            anchors.centerIn: parent
+                                            text: "\u00d7"
+                                            color: RibbonTheme.textColor
+                                        }
+                                        MouseArea {
+                                            id: embeddedCloseMouse
+                                            anchors.fill: parent
+                                            hoverEnabled: true
+                                            onClicked: {
+                                                embeddedWindowVisible = false;
+                                                log(qsTr("embedded window closed"));
+                                            }
+                                        }
+                                    }
+                                }
+                                // window body: live controls, interactive
+                                Column {
+                                    id: embeddedBody
+                                    anchors.top: embeddedTitleBar.bottom
+                                    anchors.left: parent.left
+                                    anchors.right: parent.right
+                                    anchors.margins: 6
+                                    spacing: 6
+                                    visible: embeddedWindowVisible
+                                    Row {
+                                        spacing: 6
+                                        CheckBox {
+                                            id: embeddedCheck
+                                            text: qsTr("embedded checkbox")
+                                        }
+                                        ComboBox {
+                                            model: [ qsTr("window item 1"), qsTr("window item 2") ]
+                                        }
+                                    }
+                                    Slider {
+                                        id: embeddedSlider
+                                        width: parent.width
+                                        value: 0.5
+                                    }
+                                    Text {
+                                        width: parent.width
+                                        wrapMode: Text.WordWrap
+                                        text: qsTr("slider %1, checkbox %2").arg(
+                                                  Math.round(embeddedSlider.value * 100)).arg(
+                                                  embeddedCheck.checked)
+                                        color: RibbonTheme.subtitle
+                                    }
+                                }
+                                // closed state: a hint row to reopen it
+                                Text {
+                                    visible: !embeddedWindowVisible
+                                    anchors.centerIn: parent
+                                    text: qsTr("window closed")
+                                    color: RibbonTheme.subtitle
+                                }
+                                MouseArea {
+                                    visible: !embeddedWindowVisible
+                                    anchors.fill: parent
+                                    onClicked: {
+                                        embeddedWindowVisible = true;
+                                        log(qsTr("embedded window reopened"));
+                                    }
+                                }
+                            }
+                        }
+                    ]
                     onTriggered: function(item) { log(qsTr("gallery: %1 triggered").arg(item.text)) }
                 }
             }
@@ -1455,6 +1582,11 @@ ApplicationWindow {
     // window — NOTES B59: an object owning popups must never be the root of its
     // own component, and a Popup is no Loader item either.
     property var customizeDialog: null
+
+    // state of the mini window embedded in the gallery expanded viewport
+    // (the "embedded window" section of the gallery panel)
+    property bool embeddedWindowVisible: true
+    property string embeddedWindowTitle: qsTr("embedded document window")
 
     function openCustomizeDialog()
     {

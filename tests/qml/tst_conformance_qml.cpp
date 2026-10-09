@@ -26,6 +26,7 @@
 #include <SARibbonQml/SARibbonQmlGallery.h>
 #include <SARibbonQml/SARibbonQmlGalleryGroup.h>
 #include <SARibbonQml/SARibbonQmlGalleryItem.h>
+#include <SARibbonQml/SARibbonQmlGalleryViewportWidget.h>
 #include <SARibbonQml/SARibbonQmlAction.h>
 #include <SARibbonQml/SARibbonQmlApplicationWindow.h>
 #include <SARibbonQml/SARibbonQmlBar.h>
@@ -57,6 +58,7 @@ private Q_SLOTS:
     void contextCategoryActivation();
     void galleryInPanel();
     void galleryCaptionStylesHoverAndSelectable();
+    void galleryViewportPopupAndCustomSections();
     void ribbonStyleSwitching();
     void styleRadioViaContainer();
     void separatorInPanel();
@@ -1776,6 +1778,240 @@ RibbonGallery {
     QVERIFY(host->currentItem() == nullptr);
     gallery->setProperty("currentGroupIndex", 0);
     QCOMPARE(host->currentItemIndex(), -1);
+}
+
+/**
+ * @brief Gallery expanded viewport: same-size cells, scroll fit, custom sections
+ * @details The expanded viewport (the "more" popup) must render every group at
+ *          the very cell size the inline grid shows — the widgets side pops
+ *          the very same SARibbonGalleryGroup widgets into its viewport, so a
+ *          downscaled copy has no counterpart there (the fixed 74x44 cells
+ *          with 22px icons were that bug). The popup scrolls when the content
+ *          outgrows the space below the gallery (widgets viewport is a
+ *          QScrollArea). Custom sections (widgets SARibbonGalleryViewport
+ *          addWidget parity, the widgets example embeds a checkbox + combo
+ *          panel) are host-owned items the leaf attaches into popup slots;
+ *          the section content must stay interactive after the attach.
+ */
+void TestConformanceQml::galleryViewportPopupAndCustomSections()
+{
+    QQmlEngine engine;
+    saRibbonRegisterQmlTypes(&engine);
+
+    QString src = QStringLiteral(R"QML(import QtQuick 2.12
+import QtQuick.Controls 2.12
+import SARibbon 3.0
+// fixed-height shell: the view resizes its root, but the gallery must keep
+// its own height so the popup opens below it INSIDE the window
+Item {
+    width: 500
+    height: 86
+    RibbonGallery {
+        objectName: "gallery"
+        anchors.fill: parent
+        RibbonGalleryGroup {
+            groupTitle: "Files"
+            RibbonGalleryItem { objectName: "it0"; text: "one" }
+            RibbonGalleryItem { objectName: "it1"; text: "two" }
+            RibbonGalleryItem { objectName: "it2"; text: "three" }
+            RibbonGalleryItem { objectName: "it3"; text: "four" }
+            RibbonGalleryItem { objectName: "it4"; text: "five" }
+        }
+        RibbonGalleryGroup {
+            groupTitle: "Apps"
+            RibbonGalleryItem { objectName: "app0"; text: "alpha" }
+            RibbonGalleryItem { objectName: "app1"; text: "beta" }
+        }
+        viewportWidgets: [
+            RibbonGalleryViewportWidget {
+                objectName: "section"
+                sectionTitle: "custom widgets"
+                Column {
+                    CheckBox {
+                        id: sectionCheck
+                        objectName: "sectionCheck"
+                        text: "popup checkbox"
+                    }
+                    ComboBox {
+                        objectName: "sectionCombo"
+                        width: 160
+                        model: [ "option A", "option B" ]
+                    }
+                }
+            }
+        ]
+    }
+}
+)QML");
+
+    QQmlComponent component(&engine);
+    std::unique_ptr< QQuickView > view(exposeScene(engine, component, src.toUtf8().constData(), 500, 700));
+    QVERIFY(view);
+    QQuickItem* rootItem = view->rootObject();
+    QVERIFY(rootItem);
+    // SizeRootObjectToView stretched the fixed-height shell to the (tiny
+    // offscreen) window — restore the declared scene size and let the metrics
+    // rebuild, otherwise the popup opens a full-window height below
+    rootItem->setWidth(500);
+    rootItem->setHeight(86);
+    QQuickItem* galleryItem = rootItem->findChild< QQuickItem* >(QStringLiteral("gallery"));
+    QVERIFY(galleryItem);
+    auto* host = qobject_cast< SARibbonQml::RibbonGallery* >(galleryItem);
+    QVERIFY2(host, "the gallery host renders inside the shell");
+    QTRY_COMPARE(int(galleryItem->height()), 86);
+
+    // ---- the custom section is declared through the list property, not the
+    // default groups channel ----
+    QCOMPARE(host->viewportWidgetCount(), 1);
+    QVERIFY(host->viewportWidgetAt(0) != nullptr);
+    QCOMPARE(host->viewportWidgetAt(0)->sectionTitle(), QStringLiteral("custom widgets"));
+    // the section is a QObject child of the gallery, and the leaf already
+    // attached it visually (the popup content is created eagerly, closed
+    // popups keep their content parented under the leaf)
+    QCOMPARE(host->viewportWidgetAt(0)->parent(), host);
+    QTRY_VERIFY(host->viewportWidgetAt(0)->parentItem() != nullptr);
+
+    // ---- opening the viewport: the leaf's entry point, exactly what the
+    // more button click invokes ----
+    QQuickItem* leaf = host->property("qmlLeaf").value< QQuickItem* >();
+    QVERIFY(leaf);
+    QMetaObject::invokeMethod(leaf, "openViewport");
+    // the Popup's content renders inside the window OVERLAY (a child of the
+    // window content item), not under the leaf — search the whole window
+    // content subtree with a retry loop, the creation happens on open
+    QQuickItem* popupItem = nullptr;
+    {
+        std::function< QQuickItem* (QQuickItem*) > findPopup = [&findPopup](QQuickItem* from) -> QQuickItem* {
+            if (from->metaObject()->className() == QByteArrayLiteral("QQuickPopupItem")) {
+                return from;
+            }
+            for (QQuickItem* child : from->childItems()) {
+                if (QQuickItem* hit = findPopup(child)) {
+                    return hit;
+                }
+            }
+            return nullptr;
+        };
+        QTRY_VERIFY((popupItem = findPopup(view->contentItem())) != nullptr);
+    }
+    QVERIFY2(popupItem, "the expanded viewport popup rendered");
+    // the height condition really waits: visible flips synchronously, while
+    // the popup height only settles after the content polish + the reactive
+    // fit binding ran (both need event-loop iterations)
+    QTRY_VERIFY(popupItem->isVisible() && popupItem->width() > 0);
+    QTRY_VERIFY(popupItem->height() > 100);
+
+    // ---- same-size cells: the viewport cells reuse the host grid metrics
+    // (cell / icon box / caption band), never a hardcoded downscaled box ----
+    const QSize cell     = host->gridSize();
+    const int captionH   = host->captionHeight();
+    const int iconW      = host->cellIconWidth();
+    const int iconH      = host->cellIconHeight();
+    QVERIFY(cell.width() >= 80 && cell.height() > captionH);
+    QList< QQuickItem* > all;
+    collectVisualItems(popupItem, &all);
+    int vpCellCount   = 0;
+    int vpIconChecked = 0;
+    for (QQuickItem* it : all) {
+        // viewport cells are the items carrying the entryEnabled property the
+        // inline cell also carries (both delegates publish the same face)
+        if (!it->property("entryEnabled").isValid() || it->property("isCurrent").isValid()) {
+            continue;
+        }
+        ++vpCellCount;
+        QCOMPARE(int(it->width()), cell.width());
+        QCOMPARE(int(it->height()), cell.height());
+        // the icon box inside: same clamped box the inline cell derives
+        const int bodyH   = qMax(int(it->height()) - captionH - 2, 0);
+        const int boxW    = qMin(iconW, qMax(int(it->width()) - 2, 0));
+        const int boxH    = qMin(iconH, bodyH);
+        for (QQuickItem* kid : it->childItems()) {
+            if (kid->metaObject()->className() == QByteArrayLiteral("QQuickImage")) {
+                QCOMPARE(int(kid->width()), boxW);
+                QCOMPARE(int(kid->height()), boxH);
+                ++vpIconChecked;
+            }
+        }
+    }
+    QVERIFY2(vpCellCount == 7, qPrintable(QStringLiteral("both groups render all cells, saw %1").arg(vpCellCount)));
+    QVERIFY2(vpIconChecked == 7, "every cell renders its icon at the inline grid size");
+
+    // ---- activation from the viewport switches the group and fires ----
+    QSignalSpy trigSpy(host, SIGNAL(triggered(SARibbonQml::RibbonGalleryItem*, int)));
+    {
+        // click the first cell of the second group (Apps, "alpha")
+        QList< QQuickItem* > cells;
+        collectVisualItems(popupItem, &cells);
+        QQuickItem* appsCell = nullptr;
+        for (QQuickItem* it : cells) {
+            if (it->property("entryEnabled").isValid() && !it->property("isCurrent").isValid()
+                    && it->property("entry").isValid()) {
+                QVariant v = it->property("entry");
+                if (v.canConvert< QObject* >() && qvariant_cast< QObject* >(v)
+                        && qvariant_cast< QObject* >(v)->property("text").toString() == QStringLiteral("alpha")) {
+                    appsCell = it;
+                    break;
+                }
+            }
+        }
+        QVERIFY(appsCell);
+        QTRY_VERIFY(appsCell->isVisible());
+        const QPointF c = appsCell->mapToScene(QPointF(appsCell->width() / 2, appsCell->height() / 2));
+        QTest::mouseClick(view.get(), Qt::LeftButton, Qt::NoModifier, c.toPoint());
+    }
+    QCOMPARE(host->currentGroupIndex(), 1);
+    QTRY_COMPARE(trigSpy.size(), 1);
+    {
+        auto* item = qvariant_cast< QObject* >(trigSpy.at(0).at(0));
+        QVERIFY(item);
+        QCOMPARE(item->property("text").toString(), QStringLiteral("alpha"));
+    }
+    // activation closed the popup (its overlay item is no longer visible)
+    {
+        std::function< bool(QQuickItem*) > visiblePopup
+            = [&visiblePopup](QQuickItem* from) -> bool {
+            if (from->metaObject()->className() == QByteArrayLiteral("QQuickPopupItem") && from->isVisible()) {
+                return true;
+            }
+            for (QQuickItem* child : from->childItems()) {
+                if (visiblePopup(child)) {
+                    return true;
+                }
+            }
+            return false;
+        };
+        QTRY_VERIFY(!visiblePopup(view->contentItem()));
+    }
+
+    // ---- reopen and check the custom section attach ----
+    QMetaObject::invokeMethod(leaf, "openViewport");
+    QTRY_VERIFY(popupItem->isVisible() && popupItem->width() > 0);
+    auto* section = host->viewportWidgetAt(0);
+    QTRY_VERIFY(section->parentItem() != nullptr);
+    // attached INSIDE the popup subtree
+    {
+        QQuickItem* p = section->parentItem();
+        bool insidePopup = false;
+        while (p) {
+            if (p == popupItem) {
+                insidePopup = true;
+                break;
+            }
+            p = p->parentItem();
+        }
+        QVERIFY2(insidePopup, "the section attached into the popup subtree");
+    }
+    // the slot pushed the popup width to the implicit-only section
+    QVERIFY2(section->width() > 0, "the section received the viewport content width");
+    // the interactive content arrived with it and stays enabled
+    auto* sectionCheck = section->findChild< QQuickItem* >(QStringLiteral("sectionCheck"));
+    QVERIFY(sectionCheck);
+    QTRY_VERIFY(sectionCheck->isVisible() && sectionCheck->isEnabled());
+    QVERIFY2(sectionCheck->width() > 0, "the embedded checkbox laid out");
+    // a real click flips it (the section is live content, not a dead copy)
+    const QPointF cc = sectionCheck->mapToScene(QPointF(sectionCheck->width() / 2, sectionCheck->height() / 2));
+    QTest::mouseClick(view.get(), Qt::LeftButton, Qt::NoModifier, cc.toPoint());
+    QTRY_COMPARE(sectionCheck->property("checked").toBool(), true);
 }
 
 /**

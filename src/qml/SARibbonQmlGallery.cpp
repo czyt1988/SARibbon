@@ -67,6 +67,56 @@ RibbonGalleryGroup* RibbonGallery::groupAt(int index) const
     return (index >= 0 && index < mGroups.size()) ? mGroups[ index ] : nullptr;
 }
 
+QQmlListProperty< RibbonGalleryViewportWidget > RibbonGallery::viewportWidgets()
+{
+    return QQmlListProperty< RibbonGalleryViewportWidget >(this, this, &RibbonGallery::appendViewportWidgetCb,
+                                                           &RibbonGallery::viewportWidgetCountCb,
+                                                           &RibbonGallery::viewportWidgetAtCb,
+                                                           &RibbonGallery::clearViewportWidgetsCb);
+}
+
+int RibbonGallery::viewportWidgetCount() const
+{
+    return mViewportWidgets.size();
+}
+
+RibbonGalleryViewportWidget* RibbonGallery::viewportWidgetAt(int index) const
+{
+    return (index >= 0 && index < mViewportWidgets.size()) ? mViewportWidgets[ index ] : nullptr;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Visually attach a viewport section into the leaf's popup slot
+ * @details widgets SARibbonGalleryViewport::addWidget parity: the widgets
+ *          side re-parents the handed QWidget into the popped viewport;
+ *          here the leaf renders the popup, so it hands its section slot
+ *          over and the host performs the visual reparent. The QObject
+ *          parent stays the gallery — the section must survive a leaf
+ *          teardown (a destroyed slot only un-parents its visual children,
+ *          it does not delete them) — and only sections the host owns may
+ *          be attached.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 把视口节视觉挂载进叶子弹窗的节槽位
+ * @details 对应 widgets 的 SARibbonGalleryViewport::addWidget：widgets 侧由
+ *          弹出的视口窗口直接收养传入的 QWidget；QML 侧弹窗由叶子渲染，
+ *          因此叶子交出自己的节槽位，由宿主执行视觉重挂。QObject 父对象
+ *          保持为画廊——节必须能在叶子析构后存活（槽位销毁只会解除视觉
+ *          父子关系，不会删除子项）——且只允许挂载宿主纳管的节。
+ * \endif
+ */
+void RibbonGallery::attachViewportWidget(RibbonGalleryViewportWidget* section, QQuickItem* slot)
+{
+    if (!section || !slot || !mViewportWidgets.contains(section)) {
+        return;
+    }
+    section->setParentItem(slot);
+    section->setX(0);
+    section->setY(0);
+}
+
 int RibbonGallery::currentGroupIndex() const
 {
     return mCurrentGroupIndex;
@@ -459,6 +509,49 @@ void RibbonGallery::clearGroupsCb(QQmlListProperty< RibbonGalleryGroup >* prop)
         }
         self->mGroups.clear();
         self->emitGroupsChanged();
+    }
+}
+
+// ---- viewport widget list property callbacks ----
+void RibbonGallery::appendViewportWidgetCb(QQmlListProperty< RibbonGalleryViewportWidget >* prop,
+                                            RibbonGalleryViewportWidget* section)
+{
+    auto* self = static_cast< RibbonGallery* >(prop->data);
+    if (self && section && !self->mViewportWidgets.contains(section)) {
+        self->mViewportWidgets.append(section);
+        // adoption mirrors appendGroupCb: the gallery becomes the QObject
+        // parent; the section stays visually unparented until the leaf
+        // attaches it into a popup slot
+        section->setParent(self);
+        Q_EMIT self->viewportWidgetsChanged();
+    }
+}
+
+RibbonGallery::ListIndex RibbonGallery::viewportWidgetCountCb(QQmlListProperty< RibbonGalleryViewportWidget >* prop)
+{
+    auto* self = static_cast< RibbonGallery* >(prop->data);
+    return self ? self->mViewportWidgets.size() : ListIndex(0);
+}
+
+RibbonGalleryViewportWidget* RibbonGallery::viewportWidgetAtCb(QQmlListProperty< RibbonGalleryViewportWidget >* prop,
+                                                               ListIndex index)
+{
+    auto* self = static_cast< RibbonGallery* >(prop->data);
+    return self ? self->viewportWidgetAt(int(index)) : nullptr;
+}
+
+void RibbonGallery::clearViewportWidgetsCb(QQmlListProperty< RibbonGalleryViewportWidget >* prop)
+{
+    auto* self = static_cast< RibbonGallery* >(prop->data);
+    if (self && !self->mViewportWidgets.isEmpty()) {
+        // detach only: visually un-parent every section, they stay alive as
+        // QObject children until the declaration document is destroyed (the
+        // same detach-only semantics clearGroupsCb applies to groups)
+        for (RibbonGalleryViewportWidget* w : self->mViewportWidgets) {
+            w->setParentItem(nullptr);
+        }
+        self->mViewportWidgets.clear();
+        Q_EMIT self->viewportWidgetsChanged();
     }
 }
 

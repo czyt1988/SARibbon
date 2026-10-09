@@ -14,6 +14,7 @@
 #include "SARibbonQmlGallery.h"
 #include "SARibbonQmlGalleryGroup.h"
 #include "SARibbonQmlGalleryItem.h"
+#include "SARibbonQmlGalleryViewportWidget.h"
 #include "SARibbonQmlSeparator.h"
 #include "SARibbonQmlColorGrid.h"
 #include "SARibbonQmlColorMenu.h"
@@ -192,6 +193,8 @@ void saRibbonRegisterQmlTypes(QQmlEngine* engine)
     qmlRegisterType< SARibbonQml::RibbonGallery >("SARibbon", 3, 0, "RibbonGallery");
     qmlRegisterType< SARibbonQml::RibbonGalleryGroup >("SARibbon", 3, 0, "RibbonGalleryGroup");
     qmlRegisterType< SARibbonQml::RibbonGalleryItem >("SARibbon", 3, 0, "RibbonGalleryItem");
+    // expanded-viewport custom section (widgets SARibbonGalleryViewport::addWidget parity)
+    qmlRegisterType< SARibbonQml::RibbonGalleryViewportWidget >("SARibbon", 3, 0, "RibbonGalleryViewportWidget");
     qmlRegisterType< SARibbonQml::RibbonSeparator >("SARibbon", 3, 0, "RibbonSeparator");
     qmlRegisterType< SARibbonQml::RibbonQuickAccessBar >("SARibbon", 3, 0, "RibbonQuickAccessBar");
     qmlRegisterType< SARibbonQml::RibbonButtonGroup >("SARibbon", 3, 0, "RibbonButtonGroup");

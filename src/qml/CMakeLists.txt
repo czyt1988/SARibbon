@@ -55,6 +55,8 @@ sa_add_library(SARibbonQml
         SARibbonQmlGalleryGroup.cpp
         SARibbonQmlGalleryItem.h
         SARibbonQmlGalleryItem.cpp
+        SARibbonQmlGalleryViewportWidget.h
+        SARibbonQmlGalleryViewportWidget.cpp
         SARibbonQmlColorGrid.h
         SARibbonQmlColorGrid.cpp
         SARibbonQmlColorMenu.h

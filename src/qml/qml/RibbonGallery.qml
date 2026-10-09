@@ -10,8 +10,12 @@ import SARibbon 3.0
 // mirroring the three paint paths of the widgets
 // SARibbonGalleryGroupItemDelegate. The trailing strip carries the scroll-up /
 // scroll-down / more buttons (widgets gallery button column parity, 15px); the
-// more button opens a styled popup viewport listing every group, where a cell
-// click switches the group and activates the entry.
+// more button opens a styled popup viewport listing every group at the very
+// same cell size the inline grid renders (host metrics — the widgets viewport
+// re-shows the same group widgets, never a downscaled copy), scrollable with
+// its height refitted on every open, plus the custom widget sections
+// (widgets viewport addWidget parity) attached below the groups; a cell click
+// switches the group and activates the entry.
 // NOTE: no inline `component` syntax here — the module targets Qt 5.12.
 Rectangle {
     id: root
@@ -330,13 +334,21 @@ Rectangle {
         }
     }
 
-    // ---- popup viewport: every group with its grid ----
+    // ---- popup viewport: every group with its grid + custom sections ----
+    // The expanded content renders at the very cell size the inline grid
+    // shows: cell / icon box / caption band all come from the host-published
+    // metrics (core calcGalleryGridCellSize + calcGalleryCellMetrics), exactly
+    // like the widgets side — its viewport pops the very same gallery group
+    // widgets, so the expanded view is never a downscaled copy. Tall content
+    // scrolls (the widgets viewport is a QScrollArea) and the popup height
+    // refits the space below the gallery on every open (widgets
+    // showMoreDetail parity). Custom sections (widgets viewport addWidget
+    // parity) are host-owned items attached into the slots below the groups.
     Popup {
         id: viewport
         y: root.height
         x: 0
         width: Math.max(root.width, 300)
-        height: Math.min(viewportColumn.implicitHeight + 12, 420)
         padding: 4
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
         background: Rectangle {
@@ -344,80 +356,177 @@ Rectangle {
             border.color: RibbonTheme.menuBorder
             radius: 4
         }
-        contentItem: Column {
-            id: viewportColumn
-            spacing: 2
-            Repeater {
-                model: root.cppHost ? root.cppHost.groups : []
-                // outer delegate: one group (title + mini grid). groupIndex
-                // captures the OUTER index — the inner Repeater's index
-                // shadows `index` inside its own delegate
-                Column {
-                    id: vpGroup
-                    readonly property int groupIndex: index
-                    readonly property var groupModel: modelData
-                    width: viewportColumn.width
-                    spacing: 1
-                    Text {
-                        text: vpGroup.groupModel ? vpGroup.groupModel.groupTitle : ""
-                        color: RibbonTheme.subtitle
-                        elide: Text.ElideRight
-                        width: parent.width
-                    }
-                    Grid {
-                        columns: Math.max(Math.floor(vpGroup.width / 74), 1)
+        // height: content height clamped to the window space below the
+        // gallery. A binding, not an onAboutToShow snapshot: at aboutToShow
+        // the content column has not polished yet (implicitHeight still 0),
+        // while the binding re-fits on every content change; each
+        // re-evaluation takes a fresh mapToItem, and the window height side
+        // is reactive (QQuickItem::window carries windowChanged)
+        height: {
+            if (!root) {
+                return 420;
+            }
+            var wanted = viewportColumn.implicitHeight + 12;
+            var win = root.window;
+            if (!win) {
+                return Math.min(wanted, 420);
+            }
+            var below = win.height - root.mapToItem(win.contentItem, 0, root.height).y - 8;
+            return Math.min(wanted, Math.max(below, 200));
+        }
+        contentItem: Flickable {
+            id: viewportFlick
+            clip: true
+            boundsBehavior: Flickable.StopAtBounds
+            contentWidth: width
+            contentHeight: viewportColumn.implicitHeight
+            ScrollBar.vertical: ScrollBar { }
+            Column {
+                id: viewportColumn
+                width: viewportFlick.width
+                spacing: 2
+                Repeater {
+                    model: root.cppHost ? root.cppHost.groups : []
+                    // outer delegate: one group (title + grid). groupIndex
+                    // captures the OUTER index — the inner Repeater's index
+                    // shadows `index` inside its own delegate
+                    Column {
+                        id: vpGroup
+                        readonly property int groupIndex: index
+                        readonly property var groupModel: modelData
+                        readonly property int cellW: root ? root.cellW : 80
+                        width: viewportColumn.width
                         spacing: 1
-                        Repeater {
-                            model: vpGroup.groupModel ? vpGroup.groupModel.items : []
-                            Item {
-                                id: vpCell
-                                readonly property var entry: modelData
-                                width: 74
-                                height: 44
-                                enabled: vpCell.entry ? vpCell.entry.enabled : false
-                                Rectangle {
-                                    anchors.fill: parent
-                                    radius: 3
-                                    color: !vpCell.entry || !vpCell.entry.enabled ? "transparent"
-                                           : (vpMouse.pressed ? RibbonTheme.contentPressedBg
-                                              : (vpMouse.containsMouse ? RibbonTheme.contentHoverBg : "transparent"))
+                        Text {
+                            text: vpGroup.groupModel ? vpGroup.groupModel.groupTitle : ""
+                            color: RibbonTheme.subtitle
+                            elide: Text.ElideRight
+                            width: parent.width
+                        }
+                        Grid {
+                            // same cell width as the inline grid — the expanded
+                            // content stays the size the ribbon panel shows
+                            columns: Math.max(Math.floor(vpGroup.width / Math.max(vpGroup.cellW, 1)), 1)
+                            spacing: 1
+                            Repeater {
+                                model: vpGroup.groupModel ? vpGroup.groupModel.items : []
+                                Item {
+                                    id: vpCell
+                                    readonly property var entry: modelData
+                                    // same guarded-read discipline as the inline
+                                    // grid cell (NOTES B48/B54: ids go null
+                                    // before the delegates are destroyed on
+                                    // teardown)
+                                    readonly property int cellW: root ? root.cellW : 0
+                                    readonly property int cellH: root ? root.cellH : 0
+                                    readonly property int captionH: root ? root.captionH : 0
+                                    readonly property int iconW: root ? root.iconW : 0
+                                    readonly property int iconH: root ? root.iconH : 0
+                                    readonly property bool drawsCaption: root ? root.drawsCaption : false
+                                    readonly property bool wrapsCaption: root ? root.wrapsCaption : false
+                                    readonly property int bodyH: Math.max(vpCell.cellH - vpCell.captionH - 2, 0)
+                                    readonly property int iconBoxW: Math.min(vpCell.iconW, Math.max(vpCell.cellW - 2, 0))
+                                    readonly property int iconBoxH: Math.min(vpCell.iconH, vpCell.bodyH)
+                                    readonly property bool entryEnabled: vpCell.entry ? vpCell.entry.enabled : false
+                                    width: vpCell.cellW
+                                    height: vpCell.cellH
+                                    enabled: vpCell.entryEnabled
+                                    Rectangle {
+                                        anchors.fill: parent
+                                        radius: 3
+                                        color: !vpCell.entryEnabled ? "transparent"
+                                               : (vpMouse.pressed ? RibbonTheme.contentPressedBg
+                                                  : (vpMouse.containsMouse ? RibbonTheme.contentHoverBg : "transparent"))
+                                    }
+                                    Image {
+                                        // centered exactly like the inline grid
+                                        // cell: same icon box, same caption band
+                                        x: (vpCell.cellW - vpCell.iconBoxW) / 2
+                                        y: 1 + (vpCell.bodyH - vpCell.iconBoxH) / 2
+                                        width: vpCell.iconBoxW
+                                        height: vpCell.iconBoxH
+                                        source: vpCell.entry ? vpCell.entry.iconSource : ""
+                                        fillMode: Image.PreserveAspectFit
+                                        opacity: vpCell.entryEnabled ? 1.0 : 0.45
+                                    }
+                                    Text {
+                                        visible: vpCell.entryEnabled && vpCell.drawsCaption
+                                        x: 1
+                                        y: vpCell.cellH - vpCell.captionH
+                                        width: vpCell.cellW - 2
+                                        height: vpCell.captionH
+                                        text: vpCell.entry ? vpCell.entry.text : ""
+                                        wrapMode: vpCell.wrapsCaption ? Text.WordWrap : Text.NoWrap
+                                        maximumLineCount: vpCell.wrapsCaption ? 2 : 1
+                                        elide: Text.ElideRight
+                                        horizontalAlignment: Text.AlignHCenter
+                                        verticalAlignment: Text.AlignTop
+                                        font.pixelSize: vpCell.wrapsCaption
+                                                        ? Math.max(Math.floor(vpCell.captionH / 2) - 2, 8)
+                                                        : Math.max(vpCell.captionH - 4, 8)
+                                        color: RibbonTheme.textColor
+                                    }
+                                    MouseArea {
+                                        id: vpMouse
+                                        anchors.fill: parent
+                                        hoverEnabled: true
+                                        enabled: vpCell.entryEnabled
+                                        onClicked: {
+                                            if (!root || !root.cppHost) {
+                                                return;
+                                            }
+                                            // switch the group first, then
+                                            // activate (activateItem is
+                                            // current-group scoped). Plain
+                                            // `index` (Repeater context
+                                            // property): `model.index` is only
+                                            // valid for QAbstractItemModel
+                                            // models — a plain list model
+                                            // leaves it undefined
+                                            root.cppHost.currentGroupIndex = vpGroup.groupIndex;
+                                            root.cppHost.activateItem(index);
+                                            viewport.close();
+                                        }
+                                    }
+                                    ToolTip.visible: vpMouse.containsMouse && vpCell.entry && vpCell.entry.toolTip.length > 0
+                                    ToolTip.text: vpCell.entry ? vpCell.entry.toolTip : ""
+                                    ToolTip.delay: 400
                                 }
-                                Image {
-                                    anchors.top: parent.top
-                                    anchors.topMargin: 2
-                                    anchors.horizontalCenter: parent.horizontalCenter
-                                    width: parent.width - 8
-                                    height: 22
-                                    source: vpCell.entry ? vpCell.entry.iconSource : ""
-                                    fillMode: Image.PreserveAspectFit
-                                    opacity: !vpCell.entry || !vpCell.entry.enabled ? 0.45 : 1.0
-                                }
-                                Text {
-                                    anchors.bottom: parent.bottom
-                                    anchors.bottomMargin: 1
-                                    width: parent.width - 2
-                                    height: 16
-                                    text: vpCell.entry ? vpCell.entry.text : ""
-                                    wrapMode: Text.WordWrap
-                                    maximumLineCount: 2
-                                    elide: Text.ElideRight
-                                    horizontalAlignment: Text.AlignHCenter
-                                    verticalAlignment: Text.AlignTop
-                                    font.pixelSize: 9
-                                    color: RibbonTheme.textColor
-                                    opacity: !vpCell.entry || !vpCell.entry.enabled ? 0.45 : 1.0
-                                }
-                                MouseArea {
-                                    id: vpMouse
-                                    anchors.fill: parent
-                                    hoverEnabled: true
-                                    enabled: vpCell.entry && vpCell.entry.enabled
-                                    onClicked: {
-                                        // switch the group first, then activate
-                                        // (activateItem is current-group scoped)
-                                        root.cppHost.currentGroupIndex = vpGroup.groupIndex;
-                                        root.cppHost.activateItem(model.index);
-                                        viewport.close();
+                            }
+                        }
+                    }
+                }
+                // custom sections (widgets viewport addWidget parity):
+                // host-owned items the leaf attaches visually into the slot;
+                // the slot width binding pushes the rendering context
+                // (contract §6), the section content drives the slot height
+                // (its implicitHeight follows childrenRect from C++)
+                Repeater {
+                    model: root.cppHost ? root.cppHost.viewportWidgets : []
+                    Column {
+                        id: vpSection
+                        readonly property var sectionModel: modelData
+                        readonly property real contentH: vpSection.sectionModel ? vpSection.sectionModel.implicitHeight : 0
+                        width: viewportColumn.width
+                        spacing: 1
+                        Text {
+                            text: vpSection.sectionModel ? vpSection.sectionModel.sectionTitle : ""
+                            color: RibbonTheme.subtitle
+                            elide: Text.ElideRight
+                            width: parent.width
+                        }
+                        Item {
+                            id: sectionSlot
+                            width: parent.width
+                            height: Math.max(vpSection.contentH, 1)
+                            Component.onCompleted: {
+                                if (vpSection.sectionModel && root && root.cppHost) {
+                                    root.cppHost.attachViewportWidget(vpSection.sectionModel, sectionSlot);
+                                    // a section that sized itself keeps its
+                                    // width; an implicit-only section receives
+                                    // the slot width as rendering context
+                                    if (vpSection.sectionModel.width <= 0) {
+                                        vpSection.sectionModel.width = Qt.binding(function() { return sectionSlot.width; });
                                     }
                                 }
                             }
