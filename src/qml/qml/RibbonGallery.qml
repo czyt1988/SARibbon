@@ -1,5 +1,6 @@
 import QtQuick 2.12
 import QtQuick.Controls 2.12
+import QtQuick.Window 2.2
 import SARibbon 3.0
 
 // RibbonGallery default visual leaf. Geometry authority stays in the C++
@@ -344,8 +345,13 @@ Rectangle {
     // refits the space below the gallery on every open (widgets
     // showMoreDetail parity). Custom sections (widgets viewport addWidget
     // parity) are host-owned items attached into the slots below the groups.
+    // A size grip sits on the bottom-right corner (widgets viewport QSizeGrip
+    // parity): a drag sets an explicit user size that wins over the fitted
+    // defaults until the popup is reopened, and width/height stay clamped to
+    // the window so the grip can never push the popup off-screen.
     Popup {
         id: viewport
+        objectName: "viewportPopup"
         y: root.height
         x: 0
         width: Math.max(root.width, 300)
@@ -356,31 +362,188 @@ Rectangle {
             border.color: RibbonTheme.menuBorder
             radius: 4
         }
-        // height: content height clamped to the window space below the
-        // gallery. A binding, not an onAboutToShow snapshot: at aboutToShow
-        // the content column has not polished yet (implicitHeight still 0),
-        // while the binding re-fits on every content change; each
-        // re-evaluation takes a fresh mapToItem, and the window height side
-        // is reactive (QQuickItem::window carries windowChanged)
-        height: {
+        // the fit expression as a named function so the height binding and
+        // the reopen rewire below share one body
+        function heightFit()
+        {
             if (!root) {
                 return 420;
             }
             var wanted = viewportColumn.implicitHeight + 12;
-            var win = root.window;
+            var win = root.Window.window;
             if (!win) {
                 return Math.min(wanted, 420);
             }
             var below = win.height - root.mapToItem(win.contentItem, 0, root.height).y - 8;
             return Math.min(wanted, Math.max(below, 200));
         }
+        // height: content height clamped to the window space below the
+        // gallery. A binding, not an onAboutToShow snapshot: at aboutToShow
+        // the content column has not polished yet (implicitHeight still 0),
+        // while the binding re-fits on every content change; each
+        // re-evaluation takes a fresh mapToItem, and the window height side
+        // is reactive (the Window.window attached property notifies)
+        height: heightFit()
+        // reopen restarts from the fitted defaults — a user size is one-shot,
+        // exactly like the widgets viewport (every showMoreDetail sizes from
+        // heightHintForWidth before the grip is dragged)
+        onAboutToShow: {
+            if (grip.userSized) {
+                grip.userSized = false;
+                // an RTL drag shifted x alongside the width; restore the
+                // gallery-aligned origin before the fitted sizes come back
+                viewport.x = 0;
+                viewport.width = Qt.binding(function() { return Math.max(root.width, 300); });
+                viewport.height = Qt.binding(viewport.heightFit);
+            }
+        }
         contentItem: Flickable {
             id: viewportFlick
             clip: true
             boundsBehavior: Flickable.StopAtBounds
+            // not interactive: the flickable must never steal mouse events
+            // from the size grip (its drag axis locks, so a vertical resize
+            // drag stole the following horizontal one). Scrolling stays with
+            // the scrollbar and the wheel — the widgets QScrollArea behaves
+            // the same way (no drag-scroll either)
+            interactive: false
             contentWidth: width
             contentHeight: viewportColumn.implicitHeight
             ScrollBar.vertical: ScrollBar { }
+            // size grip overlaying the content bottom-right corner. Popup
+            // routes declared children into the content ITEM — the Flickable
+            // — and the Flickable in turn routes ITS declared children into
+            // the scrolling content wrapper, where the grip would travel
+            // with the content and lose the stacking tie against the
+            // scrollbar (created after the wrapper, same z). The explicit
+            // parent assignment re-homes the grip onto the Flickable
+            // itself: pinned to the visible corner, and its z: 100 now
+            // wins against the scrollbar sibling (both Qt lanes route
+            // Popup contentData and Flickable children this way — verified
+            // in qquickpopup.cpp / qquickflickable.cpp)
+            Item {
+                id: grip
+                objectName: "viewportGrip"
+                parent: viewportFlick
+                // the user size set by a drag; while true the popup stays at
+                // the explicit width/height and ignores the fitted defaults
+                property bool userSized: false
+                readonly property int gripSize: 16
+                // RTL mirrors the grip to the bottom-LEFT corner (widgets
+                // viewport parity); the theme singleton is the module's
+                // single RTL source (it drives the app-global layout
+                // direction and carries rtlChanged)
+                readonly property bool rtl: RibbonTheme.rtl
+                // position off the popup's own geometry (padding included):
+                // the popup applies width/height synchronously while the
+                // contentItem — the parent here — re-layouts on polish, so a
+                // parent-size-bound grip lagged one layout behind and sat
+                // outside the popup bounds right after a shrink (the next
+                // press then closed the popup through CloseOnPressOutside)
+                x: grip.rtl ? 0 : viewport.width - 2 * viewport.padding - grip.gripSize - 2
+                y: viewport.height - 2 * viewport.padding - grip.gripSize - 2
+                width: grip.gripSize
+                height: grip.gripSize
+                // always on (widgets QSizeGrip parity) and above the content:
+                // the grip owns its 16x16 corner, exactly like the grip the
+                // widgets viewport paints over its scroll view corner
+                z: 100
+                MouseArea {
+                    id: gripMouse
+                    anchors.fill: parent
+                    // SizeFDiagCursor grows towards bottom-right (the LTR
+                    // corner); SizeBDiagCursor grows towards bottom-left (the
+                    // RTL corner) — the widgets viewport grip mirrors the
+                    // same way on RTL
+                    cursorShape: grip.rtl ? Qt.SizeBDiagCursor : Qt.SizeFDiagCursor
+                    // swallow the drag so the Flickable underneath never
+                    // steals it (press-and-drag on a Flickable child starts
+                    // a flick gesture otherwise)
+                    preventStealing: true
+                    property real startX: 0
+                    property real startY: 0
+                    property real startW: 0
+                    property real startH: 0
+                    property real startVx: 0
+                    onPressed: {
+                        grip.userSized = true;
+                        startX = mouseX;
+                        startY = mouseY;
+                        startW = viewport.width;
+                        startH = viewport.height;
+                        startVx = viewport.x;
+                    }
+                    onPositionChanged: {
+                        if (!pressed) {
+                            return;
+                        }
+                        // one write breaks the width/height bindings for good
+                        // (writes from a mouse handler need no event loop), so
+                        // the explicit size wins until the reopen rewires
+                        var w = grip.clampW(startW + (grip.rtl ? startX - mouseX : mouseX - startX));
+                        var h = grip.clampH(startH + mouseY - startY);
+                        // RTL grows leftward: the popup's left edge moves with
+                        // the drag, so x shifts by the same delta (right edge
+                        // stays put)
+                        if (grip.rtl) {
+                            viewport.x = startVx - (w - startW);
+                        }
+                        viewport.width = w;
+                        viewport.height = h;
+                    }
+                }
+                // resize clamps stay window-aware live during the drag
+                function clampW(w)
+                {
+                    if (!root) {
+                        return Math.max(w, 300);
+                    }
+                    var win = root.Window.window;
+                    if (!win) {
+                        return Math.max(w, 300);
+                    }
+                    // window-space left edge of the popup
+                    var winX = root.mapToItem(win.contentItem, 0, 0).x + viewport.x;
+                    // LTR: the right edge may reach the window right edge;
+                    // RTL: the left edge may reach the window left edge (the
+                    // right edge stays put), so the span to it is the max
+                    var maxW = grip.rtl ? (winX + viewport.width) : (win.width - winX);
+                    return Math.max(300, Math.min(w, Math.max(maxW, 300)));
+                }
+                function clampH(h)
+                {
+                    if (!root) {
+                        return Math.max(h, 200);
+                    }
+                    var win = root.Window.window;
+                    var below = win ? (win.height - root.mapToItem(win.contentItem, 0, root.height).y - 8) : 4096;
+                    return Math.max(200, Math.min(h, Math.max(below, 200)));
+                }
+                // the grip glyph: three diagonal dents, widgets QSizeGrip
+                // style (theme colors, no hardcoded palette)
+                Canvas {
+                    anchors.fill: parent
+                    property color glyphColor: RibbonTheme.textColor
+                    onGlyphColorChanged: requestPaint()
+                    onPaint: {
+                        var ctx = getContext("2d");
+                        ctx.reset();
+                        if (width <= 2 || height <= 2) {
+                            return;
+                        }
+                        ctx.strokeStyle = glyphColor;
+                        ctx.lineWidth = 1;
+                        var n = 3;
+                        for (var i = 1; i <= n; ++i) {
+                            var off = i * 4;
+                            ctx.beginPath();
+                            ctx.moveTo(width - off, height - 2);
+                            ctx.lineTo(width - 2, height - off);
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
             Column {
                 id: viewportColumn
                 width: viewportFlick.width

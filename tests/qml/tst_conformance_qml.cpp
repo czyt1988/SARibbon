@@ -59,6 +59,7 @@ private Q_SLOTS:
     void galleryInPanel();
     void galleryCaptionStylesHoverAndSelectable();
     void galleryViewportPopupAndCustomSections();
+    void galleryViewportResizeGrip();
     void ribbonStyleSwitching();
     void styleRadioViaContainer();
     void separatorInPanel();
@@ -2012,6 +2013,201 @@ Item {
     const QPointF cc = sectionCheck->mapToScene(QPointF(sectionCheck->width() / 2, sectionCheck->height() / 2));
     QTest::mouseClick(view.get(), Qt::LeftButton, Qt::NoModifier, cc.toPoint());
     QTRY_COMPARE(sectionCheck->property("checked").toBool(), true);
+}
+
+/**
+ * @brief Gallery expanded viewport: the bottom-right size grip
+ * @details Widgets SARibbonGalleryViewport parity: a QSizeGrip lets the user
+ *          resize the popped viewport by dragging its bottom corner. The QML
+ *          grip sets an explicit popup size that wins over the fitted
+ *          defaults; width and height stay clamped to the window space so a
+ *          drag can never push the popup off-screen, and a reopen discards
+ *          the user size (widgets showMoreDetail re-fits before every show).
+ *          RTL mirrors the grip to the bottom-LEFT corner and grows the
+ *          popup leftward (the right edge stays put, x shifts).
+ */
+void TestConformanceQml::galleryViewportResizeGrip()
+{
+    QQmlEngine engine;
+    saRibbonRegisterQmlTypes(&engine);
+
+    QString src = QStringLiteral(R"QML(import QtQuick 2.12
+import QtQuick.Controls 2.12
+import SARibbon 3.0
+Item {
+    width: 500
+    height: 86
+    RibbonGallery {
+        objectName: "gallery"
+        anchors.fill: parent
+        RibbonGalleryGroup {
+            groupTitle: "Files"
+            RibbonGalleryItem { text: "one" }
+            RibbonGalleryItem { text: "two" }
+            RibbonGalleryItem { text: "three" }
+            RibbonGalleryItem { text: "four" }
+            RibbonGalleryItem { text: "five" }
+            RibbonGalleryItem { text: "six" }
+            RibbonGalleryItem { text: "seven" }
+            RibbonGalleryItem { text: "eight" }
+        }
+        RibbonGalleryGroup {
+            groupTitle: "Apps"
+            RibbonGalleryItem { text: "alpha" }
+            RibbonGalleryItem { text: "beta" }
+        }
+    }
+}
+)QML");
+
+    QQmlComponent component(&engine);
+    std::unique_ptr< QQuickView > view(exposeScene(engine, component, src.toUtf8().constData(), 500, 700));
+    QVERIFY(view);
+    QQuickItem* rootItem = view->rootObject();
+    QVERIFY(rootItem);
+    // SizeRootObjectToView stretched the fixed-height shell to the (tiny
+    // offscreen) window — restore the declared scene size, then the metrics
+    rootItem->setWidth(500);
+    rootItem->setHeight(86);
+    QQuickItem* galleryItem = rootItem->findChild< QQuickItem* >(QStringLiteral("gallery"));
+    QVERIFY(galleryItem);
+    auto* host = qobject_cast< SARibbonQml::RibbonGallery* >(galleryItem);
+    QVERIFY(host);
+    QTRY_COMPARE(int(galleryItem->height()), 86);
+
+    QQuickItem* leaf = host->property("qmlLeaf").value< QQuickItem* >();
+    QVERIFY(leaf);
+    // the Popup is a QObject (not an Item) — address it through property()
+    // and invokeMethod so the test needs no QtQuickTemplates2 header
+    QObject* popupObj = leaf->findChild< QObject* >(QStringLiteral("viewportPopup"));
+    QVERIFY(popupObj);
+    QMetaObject::invokeMethod(leaf, "openViewport");
+
+    // the popup's visual item lives in the window overlay
+    QQuickItem* popupItem = nullptr;
+    {
+        std::function< QQuickItem* (QQuickItem*) > findPopup = [&findPopup](QQuickItem* from) -> QQuickItem* {
+            if (from->metaObject()->className() == QByteArrayLiteral("QQuickPopupItem")) {
+                return from;
+            }
+            for (QQuickItem* child : from->childItems()) {
+                if (QQuickItem* hit = findPopup(child)) {
+                    return hit;
+                }
+            }
+            return nullptr;
+        };
+        QTRY_VERIFY((popupItem = findPopup(view->contentItem())) != nullptr);
+    }
+    QTRY_VERIFY(popupItem->isVisible() && popupItem->width() > 0);
+    QTRY_VERIFY(popupItem->height() > 100);
+    QQuickItem* grip = popupObj->findChild< QQuickItem* >(QStringLiteral("viewportGrip"));
+    QVERIFY(grip);
+    QTRY_VERIFY(grip->isVisible() && grip->width() > 0);
+
+    // ---- LTR: the grip pins to the visible bottom-right corner of the
+    // content area (16x16, 2px inset), not of the scrolled content ----
+    QQuickItem* flick = nullptr;
+    {
+        QList< QQuickItem* > all;
+        collectVisualItems(popupItem, &all);
+        for (QQuickItem* it : all) {
+            if (QString::fromLatin1(it->metaObject()->className()).contains(QLatin1String("Flickable"))) {
+                flick = it;
+                break;
+            }
+        }
+    }
+    QVERIFY(flick);
+    QTRY_VERIFY(grip->x() + grip->width() <= flick->width() + 1
+                 && grip->x() + grip->width() >= flick->width() - 4);
+
+    // ---- drag helper: press on the grip (inset to stay clear of the
+    // scrollbar strip), one move, release; the grip re-reads its own
+    // geometry each drag because the last resize moved it ----
+    auto gripScene = [grip]() { return grip->mapToScene(QPointF(grip->width() / 3, grip->height() / 2)); };
+    // Let every press / move / release run its own event-loop spin, and
+    // wait for the grip to catch up with the popup's CURRENT size before
+    // taking the press point: the popup applies a resize synchronously while
+    // the grip's position binding refreshes on polish, so a p0 read right
+    // after a resize targets the grip's previous corner and misses
+    auto drag = [&](int dx, int dy) {
+        QTRY_VERIFY(qAbs(grip->y() - (popupItem->height() - 2 * 4 - 16 - 2)) <= 3);
+        const QPointF p0 = gripScene();
+        QTest::mousePress(view.get(), Qt::LeftButton, Qt::NoModifier, p0.toPoint());
+        QTest::qWait(20);
+        QTest::mouseMove(view.get(), QPointF(p0.x() + dx, p0.y() + dy).toPoint());
+        QTest::qWait(20);
+        QTest::mouseRelease(view.get(), Qt::LeftButton, Qt::NoModifier, QPointF(p0.x() + dx, p0.y() + dy).toPoint());
+        QTest::qWait(20);
+    };
+    auto closeTo = [](qreal v, qreal expected, qreal tol = 3.0) { return qAbs(v - expected) <= tol; };
+
+    const qreal baseW = popupItem->width();   // = max(gallery width, 300) = 500
+    const qreal baseH = popupItem->height();  // fitted content height
+
+    // ---- a down/right drag grows the popup by the drag delta ----
+    drag(0, 250);
+    QVERIFY2(closeTo(popupItem->height(), baseH + 250), "a downward drag grows the height");
+    QVERIFY2(closeTo(popupItem->width(), baseW), "a vertical drag leaves the width alone");
+
+    // ---- clamps: never past the window bounds, never below the minimums.
+    // Drag deltas are chosen to exceed the clamp bounds while keeping every
+    // synthesized mouse event inside the window — far-out events get clamped
+    // by the test system itself and never reach the grip ----
+    // width at the window right edge already: a right drag cannot grow it
+    drag(400, 0);
+    QVERIFY2(closeTo(popupItem->width(), baseW), "the width stays clamped to the window space");
+    // a left drag shrinks freely
+    drag(-150, 0);
+    QVERIFY2(closeTo(popupItem->width(), baseW - 150), "a leftward drag shrinks the width");
+    // past the window bottom (606 fits, 743 does not)
+    drag(0, 200);
+    QVERIFY2(closeTo(popupItem->height(), 700 - 86 - 8), "the height clamps at the window bottom margin");
+    // below the height minimum (606 - 450 = 156 < 200)
+    drag(0, -450);
+    QVERIFY2(closeTo(popupItem->height(), 200), "the height clamps at the minimum");
+    // below the width minimum (350 - 250 = 100 < 300)
+    drag(-250, 0);
+    QVERIFY2(closeTo(popupItem->width(), 300), "the width clamps at the minimum");
+
+    // ---- the user size is one-shot: a reopen returns to the fitted size ----
+    QMetaObject::invokeMethod(popupObj, "close");
+    QTRY_VERIFY(!popupItem->isVisible());
+    QMetaObject::invokeMethod(leaf, "openViewport");
+    QTRY_VERIFY(popupItem->isVisible());
+    QTRY_VERIFY(closeTo(popupItem->width(), baseW));
+    QTRY_VERIFY(closeTo(popupItem->height(), baseH));
+
+    // ---- RTL: the grip mirrors to the bottom-left corner and the popup
+    // grows leftward (right edge fixed, x shifts with the width) ----
+    const bool wasRtl = SARibbonQml::RibbonTheme::instance()->isRtl();
+    SARibbonQml::RibbonTheme::instance()->setRtl(true);
+    QTRY_VERIFY(closeTo(grip->x(), 0.0, 2.0));
+    // RTL drag helper inset: stay clear of the mirrored scrollbar strip
+    {
+        const QPointF p0 = grip->mapToScene(QPointF(2 * grip->width() / 3, grip->height() / 2));
+        // shrink: drag right, the left edge follows
+        QTest::mousePress(view.get(), Qt::LeftButton, Qt::NoModifier, p0.toPoint());
+        QTest::mouseMove(view.get(), QPointF(p0.x() + 150, p0.y()).toPoint());
+        QTest::mouseRelease(view.get(), Qt::LeftButton, Qt::NoModifier, QPointF(p0.x() + 150, p0.y()).toPoint());
+        QTest::qWait(20);
+    }
+    QVERIFY2(closeTo(popupObj->property("width").toReal(), baseW - 150), "an RTL rightward drag shrinks the width");
+    QVERIFY2(closeTo(popupObj->property("x").toReal(), 150.0), "the left edge moved with the shrink");
+    {
+        const QPointF p0 = grip->mapToScene(QPointF(2 * grip->width() / 3, grip->height() / 2));
+        // grow: drag left, the right edge stays put
+        QTest::mousePress(view.get(), Qt::LeftButton, Qt::NoModifier, p0.toPoint());
+        QTest::mouseMove(view.get(), QPointF(p0.x() - 100, p0.y()).toPoint());
+        QTest::mouseRelease(view.get(), Qt::LeftButton, Qt::NoModifier, QPointF(p0.x() - 100, p0.y()).toPoint());
+        QTest::qWait(20);
+    }
+    QVERIFY2(closeTo(popupObj->property("width").toReal(), baseW - 50), "an RTL leftward drag grows the width");
+    QVERIFY2(closeTo(popupObj->property("x").toReal(), 50.0), "the right edge stayed put while growing");
+
+    SARibbonQml::RibbonTheme::instance()->setRtl(wasRtl);
+    QTRY_COMPARE(SARibbonQml::RibbonTheme::instance()->isRtl(), wasRtl);
 }
 
 /**
