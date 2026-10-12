@@ -6,3 +6,4 @@ recursive-include pyqt6 *.sip *.toml
 recursive-include pyside6 *.xml *.txt *.py *.h CMakeLists.txt pyproject.toml
 recursive-include src/core *.h *.hpp *.cpp
 recursive-include src/widgets *.h *.hpp *.cpp *.qrc
+recursive-include skills *.md

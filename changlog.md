@@ -5,6 +5,7 @@
 - 新增：QML Gallery 的动态数据入口——`RibbonGalleryGroup::addItem(text, iconSource, toolTip, userData)`（创建并追加数据驱动的单元，负载经 `userData` 原样随 `triggered` 回传）、`RibbonGalleryGroup::clear()` 与 `RibbonGallery::addGroup(title)` / `clear()`（运行期建组/重建，与声明式 groups 同一条接线与度量路径）。声明式 `items`/`groups` 仍是静态文档场景的正道；动态 API 服务「用户数据、增删都要重建列表」的消费方，QML 侧不必再为它自绘一套 gallery 宿主；
 - 新增：`RibbonGalleryItem::userData`——消费侧负载（模型 id、键……），画廊不解释该值，`triggered(item, index)` 原样带回，动态画廊无需在 QML 里挂平行数组做映射；
 - 文档：RibbonBar 头注释补折叠态 category 预览的**嵌入契约**——预览越过 bar 底边绘制、bar 自身 z 只在兄弟之间生效：bar 作为窗口 contentItem 直接子项时开箱即用；bar 住在 Loader/布局深处时，消费方必须在 `minimumModeExpanded` 为真期间抬升宿主 Item 的 z，否则预览被下方内容盖住（表现为「折叠后点 tab 没反应」）。
+- 新增：`skills/` 目录随库发布可安装的 agent skill（`saribbon-qml`）——把 QML 模块的集成步骤、组合模型、动态 Gallery API、主题桥、折叠预览嵌入契约、Qt 5.15 兼容车道与测试手法整理成面向 AI 编码 agent 的使用说明，供使用 SARibbon 的项目自行安装（安装方式见 `skills/README.md`）；
 
 ## 2026-09-30 -> 3.0.0
 
