@@ -5,6 +5,7 @@
 #include "SARibbonQmlActionCompat.h"
 #include <QObject>
 #include <QPointer>
+#include <QVariant>
 
 namespace SARibbonQml {
 
@@ -41,6 +42,11 @@ class SA_RIBBON_QML_EXPORT RibbonGalleryItem : public QObject
     Q_PROPERTY(bool enabled READ isEnabled WRITE setEnabled NOTIFY enabledChanged)
     Q_PROPERTY(QString toolTip READ toolTip WRITE setToolTip NOTIFY toolTipChanged)
     Q_PROPERTY(bool selectable READ isSelectable WRITE setSelectable NOTIFY selectableChanged)
+    // Q_PROPERTY userData: consumer-side payload (e.g. a model id). The gallery
+    // never interprets it; triggered(item, index) hands it back verbatim, so a
+    // dynamic gallery can map a cell back to the row it was built from without
+    // keeping a parallel array in QML.
+    Q_PROPERTY(QVariant userData READ userData WRITE setUserData NOTIFY userDataChanged)
 public:
     explicit RibbonGalleryItem(QObject* parent = nullptr);
 
@@ -66,6 +72,9 @@ public:
     bool isSelectable() const;
     void setSelectable(bool on);
 
+    QVariant userData() const;
+    void setUserData(const QVariant& data);
+
 Q_SIGNALS:
     void actionChanged();
     void textChanged();
@@ -73,6 +82,7 @@ Q_SIGNALS:
     void enabledChanged();
     void toolTipChanged();
     void selectableChanged();
+    void userDataChanged();
 
 private:
     // re-derive the mirrored fields off the coarse QAction::changed
@@ -85,6 +95,7 @@ private:
     bool mEnabled = true;
     QString mToolTip;
     bool mSelectable = true;
+    QVariant mUserData;
 };
 
 }

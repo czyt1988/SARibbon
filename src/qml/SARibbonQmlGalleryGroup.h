@@ -47,6 +47,51 @@ public:
     // text/icon/enabled from the command and activation triggers it
     Q_INVOKABLE SARibbonQml::RibbonGalleryItem* addAction(QAction* action);
 
+    /**
+     * \if ENGLISH
+     * @brief Create and append a data-driven cell (dynamic model parity)
+     * @details Data-driven counterpart of the declarative items list and of
+     *          addAction(QAction*): the cell carries text/icon/tooltip plus an
+     *          opaque userData payload, and the gallery host reports it back
+     *          through triggered(item, index). Cells created here are owned by
+     *          this group, so the rebuild pattern is clear() followed by an
+     *          addItem() loop; no parallel model bookkeeping is needed on the
+     *          QML side.
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 创建并追加一个数据驱动的单元（动态模型对等）
+     * @details 与声明式 items 列表及 addAction(QAction*) 相对应的数据驱动
+     *          入口：单元携带 text/icon/tooltip 与不透明的 userData 负载，
+     *          画廊宿主经 triggered(item, index) 原样带回。此处创建的单元
+     *          归本组所有，重建模式就是 clear() 后接 addItem() 循环，QML
+     *          侧无需另挂模型记账。
+     * \endif
+     */
+    Q_INVOKABLE SARibbonQml::RibbonGalleryItem* addItem(const QString& text,
+                                                        const QString& iconSource = QString(),
+                                                        const QString& toolTip = QString(),
+                                                        const QVariant& userData = QVariant());
+
+    /**
+     * \if ENGLISH
+     * @brief Detach every cell and delete the dynamically created ones
+     * @details Programmatic-rebuild half of the dynamic-data API: the cells
+     *          created by addItem()/addAction() are owned by this group and
+     *          are scheduled for deletion here; the group is left empty either
+     *          way. Do not call it on a group whose cells were declared in a
+     *          QML document.
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 卸下全部单元并删除动态创建的那部分
+     * @details 动态数据 API 的重建半边：addItem()/addAction() 创建的单元归
+     *          本组所有，在这里排入删除队列；无论来源，组都会被清空。不要对
+     *          在 QML 文档里声明 items 的组调用它。
+     * \endif
+     */
+    Q_INVOKABLE void clear();
+
 Q_SIGNALS:
     void groupTitleChanged();
     void itemsChanged();

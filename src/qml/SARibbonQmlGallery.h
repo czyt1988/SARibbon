@@ -82,6 +82,44 @@ public:
     // QML-facing (the leaf resolves its current group through it)
     Q_INVOKABLE SARibbonQml::RibbonGalleryGroup* groupAt(int index) const;
 
+    /**
+     * \if ENGLISH
+     * @brief Create and append a group at runtime (dynamic model parity)
+     * @details Runtime counterpart of declaring groups in a QML document: the
+     *          group is created owned by this gallery and wired exactly like a
+     *          declared one (item notifications, grid metrics). Combine with
+     *          RibbonGalleryGroup::addItem() for the
+     *          clear() → addGroup() → addItem() rebuild pattern when the
+     *          backing data changes.
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 运行期创建并追加一个组（动态模型对等）
+     * @details 与在 QML 文档里声明 groups 相对应的运行期入口：组由本画廊
+     *          创建并持有，接线与声明式一致（条目通知、网格度量）。数据源
+     *          变化时用 clear() → addGroup() → addItem() 的重建模式配合
+     *          RibbonGalleryGroup::addItem()。
+     * \endif
+     */
+    Q_INVOKABLE SARibbonQml::RibbonGalleryGroup* addGroup(const QString& title = QString());
+
+    /**
+     * \if ENGLISH
+     * @brief Detach every group and delete the dynamically created ones
+     * @details Groups created by addGroup() are owned by this gallery and are
+     *          scheduled for deletion here; the gallery is left with no groups
+     *          either way. Do not call it while declared groups from a QML
+     *          document are still attached.
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 卸下全部组并删除动态创建的那部分
+     * @details addGroup() 创建的组归本画廊所有，在这里排入删除队列；无论
+     *          来源，画廊都会清空。QML 文档声明的组还挂着时不要调用它。
+     * \endif
+     */
+    Q_INVOKABLE void clear();
+
     // ---- expanded viewport custom sections (widgets addWidget parity) ----
     QQmlListProperty< SARibbonQml::RibbonGalleryViewportWidget > viewportWidgets();
     int viewportWidgetCount() const;
@@ -229,6 +267,8 @@ private:
 
     void updateGridMetrics();
     void emitGroupsChanged();
+    // shared append path of the declarative list property and addGroup()
+    void appendGroupInternal(RibbonGalleryGroup* group);
     // Watch every item of a group so a selectable flip on the current entry can
     // clear the selection (the widgets selection model refuses such an index)
     void watchGroupItems(SARibbonQml::RibbonGalleryGroup* group);

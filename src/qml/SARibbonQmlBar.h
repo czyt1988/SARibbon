@@ -131,7 +131,16 @@ public:
     // leaving minimum mode (Qt::Popup close-on-outside-click parity; the
     // widgets module closes the same way and defines no Esc handling). The
     // preview does NOT resize the bar or reflow the central content — the
-    // category row overlays what is below, exactly like the widgets popup
+    // category row overlays what is below, exactly like the widgets popup.
+    //
+    // Embedding contract: the preview paints past the bar's bottom edge and
+    // raises the bar's z among its siblings, which is enough when the bar is
+    // a direct child of the window's content item (the recommended hosting).
+    // When the bar sits deeper — inside a Loader or a layout whose siblings
+    // follow the bar and paint over it — the CONSUMER must lift that host
+    // while minimumModeExpanded is true (bind the host item's z to it):
+    // z is per-sibling-group, so the bar's own raise cannot cross the extra
+    // ancestor levels, and the preview would render under the central content.
     bool isMinimumModeExpanded() const;
 
     // Normal-mode category row height, published for the preview overlay's

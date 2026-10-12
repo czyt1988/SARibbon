@@ -64,6 +64,37 @@ void RibbonGalleryGroup::clearItems()
     }
 }
 
+SARibbonQml::RibbonGalleryItem* RibbonGalleryGroup::addItem(const QString& text,
+                                                            const QString& iconSource,
+                                                            const QString& toolTip,
+                                                            const QVariant& userData)
+{
+    auto* item = new RibbonGalleryItem(this);
+    item->setText(text);
+    if (!iconSource.isEmpty()) {
+        item->setIconSource(iconSource);
+    }
+    if (!toolTip.isEmpty()) {
+        item->setToolTip(toolTip);
+    }
+    item->setUserData(userData);
+    appendItem(item);
+    return item;
+}
+
+void RibbonGalleryGroup::clear()
+{
+    // the items are QObject children of this group (appendItem reparents them),
+    // so detaching the vector and deferring the deletion is ownership-safe both
+    // ways: nothing dangles before the event loop runs, and a deletion racing
+    // the group's own destruction is settled by the parent-child link
+    const QVector< RibbonGalleryItem* > doomed = mItems;
+    clearItems();
+    for (RibbonGalleryItem* item : doomed) {
+        item->deleteLater();
+    }
+}
+
 void RibbonGalleryGroup::appendItemCb(QQmlListProperty< RibbonGalleryItem >* prop, RibbonGalleryItem* item)
 {
     auto* self = static_cast< RibbonGalleryGroup* >(prop->data);

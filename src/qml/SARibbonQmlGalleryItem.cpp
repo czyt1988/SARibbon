@@ -144,4 +144,33 @@ void RibbonGalleryItem::setSelectable(bool on)
     Q_EMIT selectableChanged();
 }
 
+/**
+ * \if ENGLISH
+ * @brief Consumer-side payload of the cell
+ * @details The gallery never interprets this value; it exists so a dynamic
+ *          gallery can map triggered(item, index) back to the row the cell was
+ *          built from (a model id, a key, ...) without a parallel array.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 单元的消费侧负载数据
+ * @details 画廊不解释该值；它存在的意义是让动态画廊能把 triggered(item,
+ *          index) 映回构建该单元的那行数据（模型 id、键……），而不必在 QML 里
+ *          另挂一份平行数组。
+ * \endif
+ */
+QVariant RibbonGalleryItem::userData() const
+{
+    return mUserData;
+}
+
+void RibbonGalleryItem::setUserData(const QVariant& data)
+{
+    if (mUserData == data) {
+        return;
+    }
+    mUserData = data;
+    Q_EMIT userDataChanged();
+}
+
 }

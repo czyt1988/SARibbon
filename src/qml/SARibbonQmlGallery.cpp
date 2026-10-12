@@ -67,6 +67,31 @@ RibbonGalleryGroup* RibbonGallery::groupAt(int index) const
     return (index >= 0 && index < mGroups.size()) ? mGroups[ index ] : nullptr;
 }
 
+RibbonGalleryGroup* RibbonGallery::addGroup(const QString& title)
+{
+    auto* group = new RibbonGalleryGroup(this);
+    group->setGroupTitle(title);
+    // the shared append path (declarative and dynamic alike): ownership,
+    // item-notification wiring and grid-metric invalidation
+    appendGroupInternal(group);
+    return group;
+}
+
+void RibbonGallery::clear()
+{
+    // mirror of RibbonGalleryGroup::clear(): detach every group, delete the
+    // dynamically created ones (they are QObject children of this gallery)
+    const QVector< RibbonGalleryGroup* > doomed = mGroups;
+    for (RibbonGalleryGroup* g : doomed) {
+        disconnect(g, nullptr, this, nullptr);
+    }
+    mGroups.clear();
+    emitGroupsChanged();
+    for (RibbonGalleryGroup* g : doomed) {
+        g->deleteLater();
+    }
+}
+
 QQmlListProperty< RibbonGalleryViewportWidget > RibbonGallery::viewportWidgets()
 {
     return QQmlListProperty< RibbonGalleryViewportWidget >(this, this, &RibbonGallery::appendViewportWidgetCb,
@@ -473,18 +498,25 @@ void RibbonGallery::geometryChanged(const QRectF& newGeometry, const QRectF& old
 void RibbonGallery::appendGroupCb(QQmlListProperty< RibbonGalleryGroup >* prop, RibbonGalleryGroup* group)
 {
     auto* self = static_cast< RibbonGallery* >(prop->data);
-    if (self && group && !self->mGroups.contains(group)) {
-        self->mGroups.append(group);
-        group->setParent(self);
+    if (self) {
+        self->appendGroupInternal(group);
+    }
+}
+
+void RibbonGallery::appendGroupInternal(RibbonGalleryGroup* group)
+{
+    if (group && !mGroups.contains(group)) {
+        mGroups.append(group);
+        group->setParent(this);
         // item list changes alter the row count of the grid AND may bring in
         // items whose selectable flag the host has to watch (re-wiring drops
         // the old connections first, so this cannot double-connect)
-        QObject::connect(group, &RibbonGalleryGroup::itemsChanged, self, [self, group]() {
-            self->watchGroupItems(group);
-            self->updateGridMetrics();
+        QObject::connect(group, &RibbonGalleryGroup::itemsChanged, this, [this, group]() {
+            watchGroupItems(group);
+            updateGridMetrics();
         });
-        self->watchGroupItems(group);
-        self->emitGroupsChanged();
+        watchGroupItems(group);
+        emitGroupsChanged();
     }
 }
 
