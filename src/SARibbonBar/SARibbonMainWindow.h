@@ -12,6 +12,7 @@ class SAFramelessHelper;
 class QAction;
 class SARibbonBar;
 class SARibbonSystemButtonBar;
+class SARibbonApplicationWidget;
 class QScreen;
 class QColor;
 
@@ -150,6 +151,10 @@ public:
     SARibbonSystemButtonBar* windowButtonBar() const;
     // Get the current mainwindow style
     SARibbonMainWindowStyles ribbonMainwindowStyle() const;
+    // Set the application widget that toggles its visibility when the ribbon application button is clicked
+    void setApplicationWidget(SARibbonApplicationWidget* w);
+    // Get the application widget, returns nullptr if not set
+    SARibbonApplicationWidget* applicationWidget() const;
     // Check whether the 1px window frame border is drawn (default off, keeping current appearance)
     bool isFrameBorderEnabled() const;
     // Enable/disable drawing of the 1px window frame border

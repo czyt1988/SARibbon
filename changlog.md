@@ -1,5 +1,14 @@
 # 版本更新记录(change log):
 
+## 2026-10-21 -> 2.9.6
+
+- 新增：`SARibbonApplicationWidget` 应用窗口能力增强，配合 `SARibbonMainWindow::setApplicationWidget` 可快速实现 Office Backstage 式应用面板：
+  - `setWidthRatio`：应用窗口宽度按父窗口比例显示（如 2/3 宽、贴左边缘伸出），默认 1.0 保持完全覆盖的既有行为不变；
+  - `setMaskWidgetEnabled` / `setMaskColor`：可选半透明遮罩盖住父窗口剩余区域（默认关闭；颜色默认半透明黑），点击遮罩关闭应用窗口，Escape 键关闭行为保持不变；
+  - `setAnimationEnabled` / `setAnimationDuration`：显示时应用窗口从左侧滑入、遮罩同步淡入（默认开启，250 毫秒，OutCubic 缓动），关闭时立即隐藏；
+  - `SARibbonMainWindow::setApplicationWidget`：把应用窗口绑定到应用按钮，点击按钮自动切换显示/隐藏（此前需要用户手写 connect；应用按钮绑定应用窗口后不应再挂弹出菜单）；
+  - 合并版（SARibbon.h / SARibbon.cpp）已用 amalgamate 工具同步重新生成。
+
 ## 2026-09-16 -> 2.9.5
 
 - Fix #118：跨屏拖动到另一台显示器或改变系统缩放比例后，窗口右上角的最小化/最大化/关闭按钮可能停留在旧位置；现在窗口所在屏幕或缩放比例变化时会自动重新定位，主屏幕切换时也会同步刷新；

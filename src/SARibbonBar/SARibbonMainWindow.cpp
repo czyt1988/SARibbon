@@ -1,11 +1,13 @@
 #include "SARibbonMainWindow.h"
 #include "SARibbonUtil.h"
 #include "SARibbonBar.h"
+#include "SARibbonApplicationWidget.h"
 #include "SARibbonElementManager.h"
 #include "SARibbonTabBar.h"
 #include "SARibbonThemeManager.h"
 #include "SARibbonThemePalette.h"
 #include <QApplication>
+#include <QAbstractButton>
 #include <QDebug>
 #include <QFile>
 #include <QHash>
@@ -131,6 +133,8 @@ public:
     SAFramelessHelper* mFramelessHelper { nullptr };
 #endif
     SARibbonMainWindowEventFilter* mEventFilter { nullptr };
+    SARibbonApplicationWidget* mApplicationWidget { nullptr };  ///< 应用按钮弹出的应用窗口
+    QMetaObject::Connection mApplicationButtonConnection;      ///< 应用按钮点击信号的连接
 };
 
 SARibbonMainWindow::PrivateData::PrivateData(SARibbonMainWindow* p) : q_ptr(p)
@@ -385,6 +389,77 @@ void SARibbonMainWindow::setRibbonBar(SARibbonBar* ribbon)
         d_ptr->mEventFilter = new SARibbonMainWindowEventFilter(this);
         installEventFilter(d_ptr->mEventFilter);
     }
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set the application widget that toggles its visibility when the ribbon application button is clicked
+ * @param w The application widget, typically a SARibbonApplicationWidget subclass
+ * @details Once set, clicking the application button shows/hides the widget alternately. If the widget's parent
+ * is not this main window it will be reparented automatically. Passing nullptr unbinds the application button.
+ * @note This conflicts with the application button's popup menu (SARibbonApplicationButton::setMenu); the
+ * application button should not have a menu attached while an application widget is bound.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置应用按钮点击时切换显示/隐藏的应用窗口
+ * @param w 应用窗口，通常是 SARibbonApplicationWidget 的派生类
+ * @details 设置后点击应用按钮将交替显示/隐藏该窗口；若窗口父对象不是本主窗口会自动重新设置父对象。
+ * 传入 nullptr 可解除应用按钮的绑定。
+ * @note 此能力与应用按钮的弹出菜单（SARibbonApplicationButton::setMenu）互斥，绑定应用窗口时应用按钮不应再挂菜单
+ * \endif
+ */
+void SARibbonMainWindow::setApplicationWidget(SARibbonApplicationWidget* w)
+{
+    SA_D(d);
+    if (d->mApplicationWidget == w) {
+        return;
+    }
+    if (d->mApplicationButtonConnection) {
+        disconnect(d->mApplicationButtonConnection);
+        d->mApplicationButtonConnection = QMetaObject::Connection();
+    }
+    d->mApplicationWidget = w;
+    if (nullptr == w) {
+        return;
+    }
+    if (w->parentWidget() != this) {
+        w->setParent(this);
+    }
+    SARibbonBar* bar       = ribbonBar();
+    QAbstractButton* btn   = (nullptr == bar) ? nullptr : bar->applicationButton();
+    if (nullptr == btn) {
+        return;
+    }
+    d->mApplicationButtonConnection = connect(btn, &QAbstractButton::clicked, this, [ this ]() {
+        SA_D(d);
+        SARibbonApplicationWidget* w = d->mApplicationWidget;
+        if (nullptr == w) {
+            return;
+        }
+        if (w->isVisible()) {
+            w->hide();
+        } else {
+            w->show();
+        }
+    });
+}
+
+/**
+ * \if ENGLISH
+ * @brief Get the application widget
+ * @return The application widget, nullptr if not set
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取应用窗口
+ * @return 应用窗口，未设置时返回 nullptr
+ * \endif
+ */
+SARibbonApplicationWidget* SARibbonMainWindow::applicationWidget() const
+{
+    SA_DC(d);
+    return d->mApplicationWidget;
 }
 
 #if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
