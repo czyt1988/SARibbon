@@ -99,6 +99,8 @@ private Q_SLOTS:
     void testStaleHintNotReusedAfterPanelGetsRealGeometry();
     /// 之后每次高度变化都要重新按新高度生效
     void testHintRecomputedOnEveryHeightChange();
+    /// panel控件高度大于布局实际高度时（DPI/字体变化后可能残留），换行判断必须按布局高度
+    void testWrapUsesLayoutHeightWhenWidgetIsTaller();
 };
 
 void SARibbonLargeButtonAspectRatioTest::testStaleHintNotReusedAfterPanelGetsRealGeometry()
@@ -129,6 +131,37 @@ void SARibbonLargeButtonAspectRatioTest::testHintRecomputedOnEveryHeightChange()
 
     relayoutPanel(&panel, 400, 80);
     verifyAspectRatioApplied(&panel, "height=80");
+}
+
+void SARibbonLargeButtonAspectRatioTest::testWrapUsesLayoutHeightWhenWidgetIsTaller()
+{
+    // 模拟225%等非整数缩放/DPI切换后遗留的状态：panel控件仍然保留旧字号对应的高度，
+    // 而panel布局已经按当前可见高度完成排布。换行判断必须使用布局实际高度，否则会按
+    // 偏高的控件高度认为“单行放得下”，导致按钮变成整行宽度并溢出ribbon可见区。
+    SARibbonPanel panel(QStringLiteral("panel two"));
+    fillLongTextButtons(&panel);
+    panel.resize(600, 300);
+    panel.layout()->setGeometry(QRect(0, 0, 600, 60));
+    // 字体变化会触发invalidate，随后的sizeHint必须复用最近一次布局矩形的高度（60），
+    // 不能回退到控件高度（300）
+    panel.layout()->invalidate();
+    panel.layout()->sizeHint();
+
+    const QList< SARibbonToolButton* > buttons = largeButtonsOf(&panel);
+    QCOMPARE(buttons.size(), 2);
+    for (SARibbonToolButton* btn : buttons) {
+        const QFontMetrics fm(btn->font());
+        const int singleLineWidth = fm.size(Qt::TextShowMnemonic, btn->text()).width();
+        QVERIFY2(btn->sizeHint().width() < singleLineWidth,
+                 qPrintable(QStringLiteral("layout height=60: \"%1\" sizeHint width=%2 not wrapped (single line needs %3)")
+                                .arg(btn->text())
+                                .arg(btn->sizeHint().width())
+                                .arg(singleLineWidth)));
+        QVERIFY2(btn->height() <= 60,
+                 qPrintable(QStringLiteral("layout height=60: \"%1\" height=%2 exceeds layout height")
+                                .arg(btn->text())
+                                .arg(btn->height())));
+    }
 }
 
 QTEST_MAIN(SARibbonLargeButtonAspectRatioTest)

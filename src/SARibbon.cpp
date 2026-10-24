@@ -9019,6 +9019,7 @@ public:
 	int mSizeHintBaseHeight { -1 };  ///< 计算mSizeHint时依据的大按钮高度，-1表示不依赖panel几何
 	QSize mLargeButtonSizeHint { 32, 32 };                                           ///< 大按钮的尺寸
 	bool mIsTextNeedWrap { false };                                                  ///< 标记文字是否需要换行显示
+	bool mDrawRectsDirty { true };                                                   ///< 标记绘制矩形是否需要在下次绘制前重算
 	SARibbonToolButton::LayoutFactor layoutFactor;                                   ///< 布局系数
 	std::unique_ptr< SARibbonToolButtonProxyStyle > mStyle;                          ///< 按钮样式，主要为了绘制箭头
 
@@ -9099,6 +9100,7 @@ void SARibbonToolButton::PrivateData::updateDrawRect(const QStyleOptionToolButto
 		}
 	}
 	calcDrawRects(opt, mDrawIconRect, mDrawTextRect, mDrawIndicatorArrowRect, mSpacing, mIndicatorLen);
+	mDrawRectsDirty = false;
 }
 
 /**
@@ -9108,6 +9110,8 @@ void SARibbonToolButton::PrivateData::updateDrawRect(const QStyleOptionToolButto
 void SARibbonToolButton::PrivateData::updateSizeHint(const QStyleOptionToolButton& opt)
 {
 	mSizeHint = calcSizeHint(opt);
+	// sizehint变化可能改变换行结论，绘制矩形必须在下一次绘制前重算
+	mDrawRectsDirty = true;
 }
 
 /**
@@ -10411,6 +10415,11 @@ void SARibbonToolButton::paintEvent(QPaintEvent* e)
 	QPainter p(this);
 	QStyleOptionToolButton opt;
 	initStyleOption(&opt);
+	if (d_ptr->mDrawRectsDirty) {
+		// 字体/DPI/样式变化后sizeHint可能已失效但按钮几何未变（不会触发resizeEvent），
+		// 必须在绘制前用当前rect重算绘制矩形，否则会沿用旧的换行结论和文字区域
+		d_ptr->updateDrawRect(opt);
+	}
 	if (opt.features & QStyleOptionToolButton::MenuButtonPopup || opt.features & QStyleOptionToolButton::HasMenu) {
 		// 在菜单弹出消失后，需要通过此方法取消掉鼠标停留
 		if (!rect().contains(mapFromGlobal(QCursor::pos()))) {
@@ -10638,6 +10647,7 @@ void SARibbonToolButton::paintIndicator(QPainter& p, const QStyleOptionToolButto
 void SARibbonToolButton::invalidateSizeHint()
 {
 	d_ptr->mSizeHint = QSize();
+	d_ptr->mDrawRectsDirty = true;
 	// Notify parent panel layout to invalidate this button's cache entry
 	// This avoids stale cached sizeHints when button properties change
 	if (SARibbonPanel* panel = qobject_cast< SARibbonPanel* >(parentWidget())) {
@@ -10744,14 +10754,12 @@ void SARibbonToolButton::drawArrow(const QStyle* style,
 //===================================================
 namespace SARibbonColorToolButtonConstants
 {
-constexpr int COLOR_BLOCK_HEIGHT       = 5;   ///< 颜色块的高度
-constexpr int COLOR_BLOCK_MARGIN       = 1;   ///< 颜色块边距
-constexpr int COLOR_BLOCK_EXTRA_WIDTH  = 4;   ///< 颜色块额外宽度
-constexpr int COLOR_BLOCK_EXTRA_HEIGHT = 4;   ///< 颜色块额外高度
-constexpr int ICON_OFFSET_ADJUSTMENT   = 2;   ///< 图标偏移调整值
-constexpr int DEFAULT_COLOR_ICON_SIZE  = 32;  ///< 默认颜色图标尺寸
-constexpr int INVALID_COLOR_PEN_WIDTH  = 1;   ///< 无效颜色时边框线宽
-constexpr int INVALID_COLOR_LINE_RATIO = 3;   ///< 无效颜色对角线比例分母
+constexpr qreal COLOR_BLOCK_RATIO        = 0.25;  ///< 颜色块高度占图标高度的比例
+constexpr int COLOR_BLOCK_MIN_HEIGHT     = 3;     ///< 颜色块最小高度
+constexpr int COLOR_BLOCK_MARGIN         = 1;     ///< 颜色块边距
+constexpr int DEFAULT_COLOR_ICON_SIZE    = 32;    ///< 默认颜色图标尺寸
+constexpr int INVALID_COLOR_PEN_WIDTH    = 1;     ///< 无效颜色时边框线宽
+constexpr int INVALID_COLOR_LINE_RATIO   = 3;     ///< 无效颜色对角线比例分母
 }
 
 /**
@@ -10818,6 +10826,7 @@ public:
 	mutable QIcon::State mCachedColorPixmapState { QIcon::Off };    ///< 缓存对应的状态
 	mutable QColor mCachedColorPixmapColor;                         ///< 缓存对应的颜色
 	mutable qint64 mCachedColorPixmapIconKey { 0 };                 ///< 缓存对应图标的 cacheKey
+	mutable qreal mCachedColorPixmapDpr { 0 };                      ///< 缓存对应的devicePixelRatio
 	mutable bool mColorPixmapCacheValid { false };                  ///< 缓存是否有效
 
 	/// Invalidate the color pixmap cache so the next paint regenerates it
@@ -10833,6 +10842,7 @@ SARibbonColorToolButton::PrivateData::PrivateData(SARibbonColorToolButton* p) : 
 
 QPixmap SARibbonColorToolButton::PrivateData::createIconPixmap(const QStyleOptionToolButton& opt, const QSize& iconsize) const
 {
+	namespace Constants = SARibbonColorToolButtonConstants;
 	if (opt.icon.isNull()) {  // 没有有图标
 		return QPixmap();
 	}
@@ -10846,53 +10856,62 @@ QPixmap SARibbonColorToolButton::PrivateData::createIconPixmap(const QStyleOptio
 	} else {
 		mode = QIcon::Normal;
 	}
-	// Check color pixmap cache — key includes icon cache key, size, mode, state, and color
-	qint64 iconKey = opt.icon.cacheKey();
+	// Check color pixmap cache — key includes icon cache key, size, mode, state, color and dpr
+	const qreal dpr = SA::widgetDevicePixelRatio(q_ptr);
+	qint64 iconKey  = opt.icon.cacheKey();
 	if (mColorPixmapCacheValid
 		&& mCachedColorPixmapSize == iconsize
 		&& mCachedColorPixmapMode == mode
 		&& mCachedColorPixmapState == state
 		&& mCachedColorPixmapColor == mColor
-		&& mCachedColorPixmapIconKey == iconKey) {
+		&& mCachedColorPixmapIconKey == iconKey
+		&& qFuzzyCompare(mCachedColorPixmapDpr + 1.0, dpr + 1.0)) {
 		return mCachedColorPixmap;
 	}
-	QSize realIconSize = iconsize
-						 - QSize(0,
-								 SARibbonColorToolButtonConstants::COLOR_BLOCK_HEIGHT
-									 + SARibbonColorToolButtonConstants::COLOR_BLOCK_MARGIN);
-	if (realIconSize.isEmpty()) {
+	// 颜色块高度随图标尺寸等比缩放，保证大按钮和小按钮下都清晰可见；同时不超过图标高度的一半
+	// 注意：以下所有几何量均为逻辑像素。QPainter绘制在设置了devicePixelRatio的QPixmap上时
+	// 会自动按dpr缩放，因此不能用设备像素坐标计算，否则高DPI下会被二次放大导致色块溢出被裁剪
+	const int slotW = iconsize.width();
+	const int slotH = iconsize.height();
+	int colorHeight = qMax(Constants::COLOR_BLOCK_MIN_HEIGHT, qRound(slotH * Constants::COLOR_BLOCK_RATIO));
+	colorHeight     = qMin(colorHeight, slotH / 2);
+	const int margin         = Constants::COLOR_BLOCK_MARGIN;
+	const int iconAreaHeight = slotH - colorHeight - margin;
+	if (slotW <= 0 || iconAreaHeight <= 0) {
 		return QPixmap();
 	}
-	QPixmap pixmap = SA::iconToPixmap(opt.icon, realIconSize, SA::widgetDevicePixelRatio(q_ptr), mode, state);
-	// QPixmap pixmap     = opt.icon.pixmap(q_ptr->window()->windowHandle(), realIconSize, mode, state);
-	QPixmap res(pixmap.size()
-				+ QSize(SARibbonColorToolButtonConstants::COLOR_BLOCK_EXTRA_WIDTH,
-						SARibbonColorToolButtonConstants::COLOR_BLOCK_EXTRA_HEIGHT
-							+ SARibbonColorToolButtonConstants::COLOR_BLOCK_HEIGHT));
+	QPixmap iconPm = SA::iconToPixmap(opt.icon, QSize(slotW, iconAreaHeight), dpr, mode, state);
+	// 合成结果严格等于图标槽尺寸（含正确的devicePixelRatio），避免超出绘制区域被裁剪
+	QPixmap res(qRound(slotW * dpr), qRound(slotH * dpr));
+	res.setDevicePixelRatio(dpr);
 	res.fill(Qt::transparent);
 	QPainter painter(&res);
-	int xpixmap = (res.width() - pixmap.width()) / 2;
-	int ypixmap = (res.height() - SARibbonColorToolButtonConstants::COLOR_BLOCK_HEIGHT
-				   - SARibbonColorToolButtonConstants::ICON_OFFSET_ADJUSTMENT - pixmap.height())
-				  / 2;
-	int w         = pixmap.width();
-	int h         = pixmap.height();
-	QRect rpixmap = QRect(xpixmap, ypixmap, w, h);
-	painter.drawPixmap(rpixmap, pixmap);
-	QRect colorRect = rpixmap.adjusted(0,
-									   h + SARibbonColorToolButtonConstants::COLOR_BLOCK_MARGIN,
-									   0,
-									   SARibbonColorToolButtonConstants::COLOR_BLOCK_HEIGHT
-										   + SARibbonColorToolButtonConstants::COLOR_BLOCK_MARGIN);
+	painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+	// 图标等比缩放到不超过上方区域（只缩小不放大），水平居中、底部与图标区域底边对齐
+	int iconW = 0;
+	int iconH = 0;
+	if (!iconPm.isNull()) {
+		const qreal pmDpr = iconPm.devicePixelRatio();
+		QSizeF iconLogical(iconPm.width() / pmDpr, iconPm.height() / pmDpr);
+		qreal fit          = qMin(slotW / iconLogical.width(), iconAreaHeight / iconLogical.height());
+		fit                = qMin(fit, qreal(1.0));
+		iconW              = qRound(iconLogical.width() * fit);
+		iconH              = qRound(iconLogical.height() * fit);
+		painter.drawPixmap(QRect((slotW - iconW) / 2, iconAreaHeight - iconH, iconW, iconH), iconPm);
+	}
+	// 色块位于图标正下方，上边缘与图标下边缘间隔margin像素
+	int bandWidth = (iconW > 0) ? iconW : slotW;
+	int bandX     = (slotW - bandWidth) / 2;
+	QRectF colorRect(bandX, iconAreaHeight + margin, bandWidth, colorHeight);
 	if (mColor.isValid()) {
 		painter.fillRect(colorRect, mColor);
 	} else {
-		QPen pen(Qt::red, SARibbonColorToolButtonConstants::INVALID_COLOR_PEN_WIDTH, Qt::SolidLine, Qt::RoundCap);
+		QPen pen(Qt::red, Constants::INVALID_COLOR_PEN_WIDTH, Qt::SolidLine, Qt::RoundCap);
 		painter.setPen(pen);
-		painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
 		painter.setRenderHint(QPainter::Antialiasing, true);
-		int ss = colorRect.width() / SARibbonColorToolButtonConstants::INVALID_COLOR_LINE_RATIO;
-		painter.drawLine(QPoint(colorRect.x() + ss, colorRect.bottom()), QPoint(colorRect.right() - ss, colorRect.top()));
+		qreal ss = colorRect.width() / Constants::INVALID_COLOR_LINE_RATIO;
+		painter.drawLine(QPointF(colorRect.left() + ss, colorRect.bottom()),
+						 QPointF(colorRect.right() - ss, colorRect.top()));
 		pen.setColor(Qt::black);
 		painter.setPen(pen);
 		painter.drawRect(colorRect);
@@ -10904,34 +10923,37 @@ QPixmap SARibbonColorToolButton::PrivateData::createIconPixmap(const QStyleOptio
 	mCachedColorPixmapState   = state;
 	mCachedColorPixmapColor   = mColor;
 	mCachedColorPixmapIconKey = iconKey;
-	mColorPixmapCacheValid   = true;
+	mCachedColorPixmapDpr     = dpr;
+	mColorPixmapCacheValid    = true;
 	return res;
 }
 
 QIcon SARibbonColorToolButton::PrivateData::createColorIcon(const QColor& c, const QSize& size) const
 {
-	// using Constants = SARibbonColorToolButtonConstants;
-	QPixmap res(size);
+	namespace Constants = SARibbonColorToolButtonConstants;
+	const qreal dpr = SA::widgetDevicePixelRatio(q_ptr);
+	// 以设备像素创建并设置devicePixelRatio，保证高DPI下颜色图标清晰且尺寸正确
+	QPixmap res(qRound(size.width() * dpr), qRound(size.height() * dpr));
+	res.setDevicePixelRatio(dpr);
 	res.fill(Qt::transparent);
 	QPainter painter(&res);
-	QRect colorRect(SARibbonColorToolButtonConstants::COLOR_BLOCK_MARGIN,
-					SARibbonColorToolButtonConstants::COLOR_BLOCK_MARGIN,
-					res.width() - 2 * SARibbonColorToolButtonConstants::COLOR_BLOCK_MARGIN,
-					res.height() - 2 * SARibbonColorToolButtonConstants::COLOR_BLOCK_MARGIN);
+	// QPainter在设置了devicePixelRatio的pixmap上已自动按dpr缩放，此处直接使用逻辑坐标
+	QRectF colorRect(Constants::COLOR_BLOCK_MARGIN,
+					 Constants::COLOR_BLOCK_MARGIN,
+					 size.width() - 2 * Constants::COLOR_BLOCK_MARGIN,
+					 size.height() - 2 * Constants::COLOR_BLOCK_MARGIN);
 	if (c.isValid()) {
 		painter.fillRect(colorRect, c);
 	} else {
-		QPen pen(Qt::black, SARibbonColorToolButtonConstants::INVALID_COLOR_PEN_WIDTH, Qt::SolidLine, Qt::RoundCap);
+		QPen pen(Qt::black, Constants::INVALID_COLOR_PEN_WIDTH, Qt::SolidLine, Qt::RoundCap);
 		painter.setPen(pen);
 		painter.drawRect(colorRect);
 		pen.setColor(Qt::red);
 		painter.setPen(pen);
 		painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
 		painter.setRenderHint(QPainter::Antialiasing, true);
-		painter.drawLine(QPoint(SARibbonColorToolButtonConstants::COLOR_BLOCK_MARGIN,
-								size.height() - SARibbonColorToolButtonConstants::COLOR_BLOCK_MARGIN),
-						 QPoint(size.width() - SARibbonColorToolButtonConstants::COLOR_BLOCK_MARGIN,
-								SARibbonColorToolButtonConstants::COLOR_BLOCK_MARGIN));
+		painter.drawLine(QPointF(Constants::COLOR_BLOCK_MARGIN, size.height() - Constants::COLOR_BLOCK_MARGIN),
+						 QPointF(size.width() - Constants::COLOR_BLOCK_MARGIN, Constants::COLOR_BLOCK_MARGIN));
 	}
 	return QIcon(res);
 }
@@ -14415,7 +14437,13 @@ bool SARibbonPanelLayout::isDirty() const
  */
 void SARibbonPanelLayout::updateGeomArray()
 {
-	updateGeomArray(geometry());
+	// 优先使用最近一次setGeometry传入的矩形：QLayout::geometry()在部分路径下可能返回无效矩形，
+	// 而布局高度必须与真正排布子控件时使用的高度保持一致
+	if (mLastLayoutRect.width() > 0 && mLastLayoutRect.height() > 0) {
+		updateGeomArray(mLastLayoutRect);
+	} else {
+		updateGeomArray(geometry());
+	}
 }
 
 /**
@@ -14686,10 +14714,13 @@ void SARibbonPanelLayout::updateGeomArray(const QRect& setrect)
 	const short rowCount = (panel->panelLayoutMode() == SARibbonPanel::ThreeRowMode) ? 3
 					  : (panel->panelLayoutMode() == SARibbonPanel::TwoRowMode) ? 2
 					  : 1;
-	// largeHeight是对应large占比的高度
-	const int largeHeight = qMax(height - mag.bottom() - mag.top() - titleH - titleSpace, 2);  // 大按钮高度不小于2
+	// largeHeight是对应large占比的高度。setrect无效时（布局尚未获得几何）用panel控件高度兜底，
+	// 保证首次sizeHint仍然能按字号推算出合理的大按钮高度
+	const int layoutHeight = (height > 0) ? height : panel->height();
+	const int largeHeight  = qMax(layoutHeight - mag.bottom() - mag.top() - titleH - titleSpace, 2);  // 大按钮高度不小于2
 
-	mLargeHeight = largeHeight;
+	mLargeHeight       = largeHeight;
+	mHasLayoutGeometry = (setrect.width() > 0 && height > 0);
 	// sizeHint缓存和大按钮高度绑定：高度变化（panel首次获得真实几何、调整category高度或
 	// panel标题高度等）时必须丢弃缓存，否则按钮宽度会一直沿用旧高度算出来的结果
 	if (largeHeight != mButtonSizeHintCacheLargeHeight) {
@@ -15697,6 +15728,16 @@ int SARibbonPanelLayout::largeButtonHeight() const
 	return mLargeHeight;
 }
 
+/**
+ * @brief Checks whether largeButtonHeight() comes from a real layout pass / 判断大按钮高度是否来自一次有效布局
+ *
+ * @return true if the layout has been laid out with a valid size / 布局已按有效尺寸完成排布时返回true
+ */
+bool SARibbonPanelLayout::hasLayoutGeometry() const
+{
+	return mHasLayoutGeometry;
+}
+
 void SARibbonPanelLayout::setGeometry(const QRect& rect)
 {
 	// 重入守卫：doLayout()对子控件执行show()时，QWidgetPrivate::setVisible会同步invalidate
@@ -15725,6 +15766,7 @@ void SARibbonPanelLayout::setGeometry(const QRect& rect)
 	if (rect.width() <= 0 || rect.height() <= 0) {
 		return;
 	}
+	mLastLayoutRect = rect;
 	QLayout::setGeometry(rect);
 	mDirty = false;
 	updateGeomArray(rect);
@@ -17152,18 +17194,31 @@ void SARibbonPanel::setPanelName(const QString& title)
 /**
  * \if ENGLISH
  * @brief Gets the height of the large buttons in this panel
+ * @details Returns the smaller of the widget height and the height used by the current layout
+ *          pass. After a font/DPI change the widget may temporarily keep the old height while
+ *          the layout has already been laid out for a smaller visible rect; using the layout
+ *          height keeps the button wrap decision consistent with the actual geometry.
  * @return The height of large buttons
  * \endif
  *
  * \if CHINESE
  * @brief 获取此面板中大按钮的高度
+ * @details 返回控件高度与当前布局实际使用高度中的较小值。字体/DPI变化后，控件可能暂时保留
+ *          旧字号对应的高度，而布局已经按更小的可见矩形排布；使用布局高度可保证按钮换行
+ *          判断与实际几何一致。
  * @return 大按钮的高度
  * \endif
  */
 int SARibbonPanel::largeButtonHeight() const
 {
 	const QMargins& mag = contentsMargins();
-	return qMax(0, height() - mag.top() - mag.bottom() - titleHeight());
+	const int widgetHeight = qMax(0, height() - mag.top() - mag.bottom() - titleHeight());
+	if (SARibbonPanelLayout* lay = d_ptr->panelLayout()) {
+		if (lay->hasLayoutGeometry()) {
+			return qMin(widgetHeight, lay->largeButtonHeight());
+		}
+	}
+	return widgetHeight;
 }
 
 /**
@@ -28015,7 +28070,18 @@ void SARibbonBar::changeEvent(QEvent* e)
 		// 字体改变总体布局调整
 		if (SARibbonBarLayout* lay = qobject_cast< SARibbonBarLayout* >(layout())) {
 			lay->resetSize();
+			// 字体变化可能只改变行高而不改变取整后的总高度，此时也必须让布局重新执行，
+			// 否则category/panel会保留旧字体的几何（panel可能高于可见区，导致大按钮按
+			// 旧高度判断换行而溢出，尤其出现在225%等非整数DPI缩放的主流流程中）
+			lay->invalidate();
 		}
+		// category/panel的布局同样需要重排，确保panel几何与新字号一致
+		iterateCategory([](SARibbonCategory* c) -> bool {
+			if (QLayout* cly = c->layout()) {
+				cly->invalidate();
+			}
+			return true;
+		});
 		return; // 已调用父类处理，不再走末尾的 QMenuBar::changeEvent(e)
 	}
 	case QEvent::StyleChange: {
@@ -33718,6 +33784,7 @@ SARibbonCustomizeWidget* SARibbonCustomizeDialog::customizeWidget() const
 
 /*** Start of inlined file: SARibbonMainWindow.cpp ***/
 #include <QApplication>
+#include <QAbstractButton>
 #include <QDebug>
 #include <QFile>
 #include <QHash>
@@ -33835,6 +33902,8 @@ public:
 	SAFramelessHelper* mFramelessHelper { nullptr };
 #endif
 	SARibbonMainWindowEventFilter* mEventFilter { nullptr };
+	SARibbonApplicationWidget* mApplicationWidget { nullptr };  ///< 应用按钮弹出的应用窗口
+	QMetaObject::Connection mApplicationButtonConnection;      ///< 应用按钮点击信号的连接
 };
 
 SARibbonMainWindow::PrivateData::PrivateData(SARibbonMainWindow* p) : q_ptr(p)
@@ -34089,6 +34158,77 @@ void SARibbonMainWindow::setRibbonBar(SARibbonBar* ribbon)
 		d_ptr->mEventFilter = new SARibbonMainWindowEventFilter(this);
 		installEventFilter(d_ptr->mEventFilter);
 	}
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set the application widget that toggles its visibility when the ribbon application button is clicked
+ * @param w The application widget, typically a SARibbonApplicationWidget subclass
+ * @details Once set, clicking the application button shows/hides the widget alternately. If the widget's parent
+ * is not this main window it will be reparented automatically. Passing nullptr unbinds the application button.
+ * @note This conflicts with the application button's popup menu (SARibbonApplicationButton::setMenu); the
+ * application button should not have a menu attached while an application widget is bound.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置应用按钮点击时切换显示/隐藏的应用窗口
+ * @param w 应用窗口，通常是 SARibbonApplicationWidget 的派生类
+ * @details 设置后点击应用按钮将交替显示/隐藏该窗口；若窗口父对象不是本主窗口会自动重新设置父对象。
+ * 传入 nullptr 可解除应用按钮的绑定。
+ * @note 此能力与应用按钮的弹出菜单（SARibbonApplicationButton::setMenu）互斥，绑定应用窗口时应用按钮不应再挂菜单
+ * \endif
+ */
+void SARibbonMainWindow::setApplicationWidget(SARibbonApplicationWidget* w)
+{
+	SA_D(d);
+	if (d->mApplicationWidget == w) {
+		return;
+	}
+	if (d->mApplicationButtonConnection) {
+		disconnect(d->mApplicationButtonConnection);
+		d->mApplicationButtonConnection = QMetaObject::Connection();
+	}
+	d->mApplicationWidget = w;
+	if (nullptr == w) {
+		return;
+	}
+	if (w->parentWidget() != this) {
+		w->setParent(this);
+	}
+	SARibbonBar* bar       = ribbonBar();
+	QAbstractButton* btn   = (nullptr == bar) ? nullptr : bar->applicationButton();
+	if (nullptr == btn) {
+		return;
+	}
+	d->mApplicationButtonConnection = connect(btn, &QAbstractButton::clicked, this, [ this ]() {
+		SA_D(d);
+		SARibbonApplicationWidget* w = d->mApplicationWidget;
+		if (nullptr == w) {
+			return;
+		}
+		if (w->isVisible()) {
+			w->hide();
+		} else {
+			w->show();
+		}
+	});
+}
+
+/**
+ * \if ENGLISH
+ * @brief Get the application widget
+ * @return The application widget, nullptr if not set
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取应用窗口
+ * @return 应用窗口，未设置时返回 nullptr
+ * \endif
+ */
+SARibbonApplicationWidget* SARibbonMainWindow::applicationWidget() const
+{
+	SA_DC(d);
+	return d->mApplicationWidget;
 }
 
 #if SARIBBON_USE_3RDPARTY_FRAMELESSHELPER
@@ -35105,8 +35245,207 @@ void SARibbonWidget::onPrimaryScreenChanged(QScreen* screen)
 #include <QEvent>
 #include <QKeyEvent>
 #include <QResizeEvent>
-#include <QDebug>
+#include <QHideEvent>
+#include <QMouseEvent>
+#include <QVariantAnimation>
+#include <QPropertyAnimation>
 #include <QPainter>
+#include <QColor>
+
+namespace SA {
+/**
+ * \if ENGLISH
+ * @brief Internal translucent mask widget that covers the rest of the main window area
+ * @details Left-clicking the mask hides the owner SARibbonApplicationWidget
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 覆盖主窗口剩余区域的内部半透明遮罩
+ * @details 鼠标左键点击遮罩将隐藏所属的 SARibbonApplicationWidget
+ * \endif
+ */
+class SARibbonApplicationWidgetMask : public QWidget
+{
+public:
+	// Constructor with the owner application widget and the parent widget (the main window)
+	explicit SARibbonApplicationWidgetMask(SARibbonApplicationWidget* owner, QWidget* parent) : QWidget(parent), mOwner(owner)
+	{
+		setCursor(Qt::ArrowCursor);
+	}
+	// Set the mask color (alpha included)
+	void setMaskColor(const QColor& c)
+	{
+		mMaskColor = c;
+		update();
+	}
+	// Set the mask opacity (0.0~1.0), used by the fade-in animation; 1.0 is the full effect
+	void setMaskOpacity(qreal op)
+	{
+		mMaskOpacity = op;
+		update();
+	}
+
+protected:
+	// Paints the translucent mask color
+	void paintEvent(QPaintEvent* e) override
+	{
+		Q_UNUSED(e);
+		QPainter p(this);
+		QColor c = mMaskColor;
+		c.setAlpha(int(c.alpha() * mMaskOpacity));
+		p.fillRect(rect(), c);
+	}
+	// Left-click hides the owner application widget
+	void mousePressEvent(QMouseEvent* e) override
+	{
+		if (e && (Qt::LeftButton == e->button())) {
+			mOwner->hide();
+			e->accept();
+			return;
+		}
+		QWidget::mousePressEvent(e);
+	}
+
+private:
+	SARibbonApplicationWidget* mOwner;
+	QColor mMaskColor { 0, 0, 0, 120 };
+	qreal mMaskOpacity { 1.0 };
+};
+}  // namespace SA
+
+/**
+ * \if ENGLISH
+ * @brief Private data of SARibbonApplicationWidget
+ * \endif
+ *
+ * \if CHINESE
+ * @brief SARibbonApplicationWidget 的私有数据
+ * \endif
+ */
+class SARibbonApplicationWidget::PrivateData
+{
+	SA_RIBBON_DECLARE_PUBLIC(SARibbonApplicationWidget)
+public:
+	PrivateData(SARibbonApplicationWidget* p);
+	void ensureMaskWidget();
+	void showMask(bool fadein);
+	void hideMask();
+	void syncMaskGeometry();
+
+public:
+	qreal mWidthRatio { 1.0 };               ///< width ratio against the parent window, range (0.0, 1.0]
+	bool mMaskEnabled { false };             ///< whether the translucent mask is enabled
+	QColor mMaskColor { 0, 0, 0, 120 };      ///< mask color with alpha
+	bool mAnimationEnabled { true };         ///< whether the slide-in animation is enabled
+	int mAnimationDuration { 250 };          ///< animation duration in milliseconds
+	SA::SARibbonApplicationWidgetMask* mMaskWidget { nullptr };
+	QPropertyAnimation* mSlideAnimation { nullptr };    ///< slides the widget in from the left edge
+	QVariantAnimation* mMaskFadeAnimation { nullptr };  ///< fades the mask in
+};
+
+SARibbonApplicationWidget::PrivateData::PrivateData(SARibbonApplicationWidget* p) : q_ptr(p)
+{
+	mSlideAnimation = new QPropertyAnimation(p, "pos", p);
+	mSlideAnimation->setEasingCurve(QEasingCurve::OutCubic);
+	mMaskFadeAnimation = new QVariantAnimation(p);
+	mMaskFadeAnimation->setEasingCurve(QEasingCurve::OutCubic);
+	QObject::connect(mMaskFadeAnimation, &QVariantAnimation::valueChanged, p, [ this ](const QVariant& v) {
+		if (mMaskWidget) {
+			mMaskWidget->setMaskOpacity(v.toReal());
+		}
+	});
+}
+
+/**
+ * \if ENGLISH
+ * @brief Lazily creates the mask widget as a child of the parent window
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 惰性创建遮罩，遮罩的父对象为父窗口（主窗口）
+ * \endif
+ */
+void SARibbonApplicationWidget::PrivateData::ensureMaskWidget()
+{
+	if (mMaskWidget) {
+		return;
+	}
+	QWidget* par = q_ptr->parentWidget();
+	if (nullptr == par) {
+		return;
+	}
+	mMaskWidget = new SA::SARibbonApplicationWidgetMask(q_ptr, par);
+	mMaskWidget->setMaskColor(mMaskColor);
+	mMaskWidget->hide();
+}
+
+/**
+ * \if ENGLISH
+ * @brief Shows the mask below the application widget, optionally with a fade-in
+ * @param fadein Whether to fade the mask in
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 显示遮罩（位于应用窗口之下），可选淡入效果
+ * @param fadein 是否淡入
+ * \endif
+ */
+void SARibbonApplicationWidget::PrivateData::showMask(bool fadein)
+{
+	ensureMaskWidget();
+	if (nullptr == mMaskWidget) {
+		return;
+	}
+	syncMaskGeometry();
+	if (fadein) {
+		mMaskWidget->setMaskOpacity(0.0);
+		mMaskWidget->show();
+		mMaskWidget->raise();
+		mMaskFadeAnimation->stop();
+		mMaskFadeAnimation->setDuration(mAnimationDuration);
+		mMaskFadeAnimation->setStartValue(0.0);
+		mMaskFadeAnimation->setEndValue(1.0);
+		mMaskFadeAnimation->start();
+	} else {
+		mMaskWidget->setMaskOpacity(1.0);
+		mMaskWidget->show();
+		mMaskWidget->raise();
+	}
+}
+
+/**
+ * \if ENGLISH
+ * @brief Hides the mask if it exists
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 隐藏遮罩（若已创建）
+ * \endif
+ */
+void SARibbonApplicationWidget::PrivateData::hideMask()
+{
+	if (mMaskWidget) {
+		mMaskWidget->hide();
+	}
+}
+
+/**
+ * \if ENGLISH
+ * @brief Syncs the mask geometry to cover the whole parent window
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 同步遮罩几何，使其覆盖整个父窗口
+ * \endif
+ */
+void SARibbonApplicationWidget::PrivateData::syncMaskGeometry()
+{
+	if (mMaskWidget) {
+		if (QWidget* par = q_ptr->parentWidget()) {
+			mMaskWidget->setGeometry(0, 0, par->width(), par->height());
+		}
+	}
+}
 
 /**
  * \if ENGLISH
@@ -35121,7 +35460,7 @@ void SARibbonWidget::onPrimaryScreenChanged(QScreen* screen)
  * @details 创建一个无框窗口，跟随父窗口大小变化
  * \endif
  */
-SARibbonApplicationWidget::SARibbonApplicationWidget(SARibbonMainWindow* parent) : QFrame(parent)
+SARibbonApplicationWidget::SARibbonApplicationWidget(SARibbonMainWindow* parent) : QFrame(parent), SA_RIBBON_IMPL_CONSTRUCT
 {
 	setWindowFlags(windowFlags() | Qt::FramelessWindowHint);  // 去除边框
 	if (parent) {
@@ -35132,20 +35471,225 @@ SARibbonApplicationWidget::SARibbonApplicationWidget(SARibbonMainWindow* parent)
 	}
 }
 
+SARibbonApplicationWidget::~SARibbonApplicationWidget()
+{
+}
+
 /**
  * \if ENGLISH
- * @brief Resizes the widget to match the parent's size
+ * @brief Set the width ratio of the widget against its parent window
+ * @param ratio Valid range is (0.0, 1.0]; 1.0 (default) means covering the whole parent window. Values outside the range fall back to 1.0
+ * @details The widget is always anchored to the top-left corner of the parent window
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置窗口宽度相对父窗口的比例
+ * @param ratio 有效范围为 (0.0, 1.0]；1.0（默认）表示完全覆盖父窗口，范围外的值回退为 1.0
+ * @details 窗口始终贴住父窗口左上角
+ * \endif
+ */
+void SARibbonApplicationWidget::setWidthRatio(qreal ratio)
+{
+	SA_D(d);
+	if (ratio <= 0.0 || ratio > 1.0) {
+		ratio = 1.0;
+	}
+	if (d->mWidthRatio == ratio) {
+		return;
+	}
+	d->mWidthRatio = ratio;
+	if (QWidget* par = parentWidget()) {
+		resizeToParent(par->size());
+	}
+}
+
+/**
+ * \if ENGLISH
+ * @brief Get the width ratio
+ * @return The width ratio
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取宽度比例
+ * @return 宽度比例
+ * \endif
+ */
+qreal SARibbonApplicationWidget::widthRatio() const
+{
+	SA_DC(d);
+	return d->mWidthRatio;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Enable/disable the translucent mask covering the rest of the parent window
+ * @param on True to enable the mask; clicking the mask hides this widget. Default off
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 启用/禁用覆盖父窗口剩余区域的半透明遮罩
+ * @param on true 启用遮罩，点击遮罩将隐藏本窗口；默认关闭
+ * \endif
+ */
+void SARibbonApplicationWidget::setMaskWidgetEnabled(bool on)
+{
+	SA_D(d);
+	if (d->mMaskEnabled == on) {
+		return;
+	}
+	d->mMaskEnabled = on;
+	if (on) {
+		if (isVisible()) {
+			d->showMask(false);
+			raise();
+		}
+	} else {
+		d->hideMask();
+	}
+}
+
+/**
+ * \if ENGLISH
+ * @brief Check whether the mask is enabled
+ * @return True if the mask is enabled
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 判断遮罩是否启用
+ * @return 启用返回 true
+ * \endif
+ */
+bool SARibbonApplicationWidget::isMaskWidgetEnabled() const
+{
+	SA_DC(d);
+	return d->mMaskEnabled;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set the mask color
+ * @param color The mask color with alpha, the default is translucent black (0, 0, 0, 120)
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置遮罩颜色
+ * @param color 带透明度的颜色，默认为半透明黑 (0, 0, 0, 120)
+ * \endif
+ */
+void SARibbonApplicationWidget::setMaskColor(const QColor& color)
+{
+	SA_D(d);
+	d->mMaskColor = color;
+	if (d->mMaskWidget) {
+		d->mMaskWidget->setMaskColor(color);
+	}
+}
+
+/**
+ * \if ENGLISH
+ * @brief Get the mask color
+ * @return The mask color
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取遮罩颜色
+ * @return 遮罩颜色
+ * \endif
+ */
+QColor SARibbonApplicationWidget::maskColor() const
+{
+	SA_DC(d);
+	return d->mMaskColor;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Enable/disable the slide-in animation when showing
+ * @param on True to slide in from the left edge with the mask fading in. Default on
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 启用/禁用显示时的滑入动画
+ * @param on true 表示从左侧滑入且遮罩淡入；默认开启
+ * \endif
+ */
+void SARibbonApplicationWidget::setAnimationEnabled(bool on)
+{
+	SA_D(d);
+	d->mAnimationEnabled = on;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Check whether the animation is enabled
+ * @return True if the animation is enabled
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 判断动画是否启用
+ * @return 启用返回 true
+ * \endif
+ */
+bool SARibbonApplicationWidget::isAnimationEnabled() const
+{
+	SA_DC(d);
+	return d->mAnimationEnabled;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Set the animation duration
+ * @param ms Duration in milliseconds, default is 250
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置动画时长
+ * @param ms 毫秒数，默认 250
+ * \endif
+ */
+void SARibbonApplicationWidget::setAnimationDuration(int ms)
+{
+	SA_D(d);
+	d->mAnimationDuration = ms;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Get the animation duration
+ * @return Duration in milliseconds
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取动画时长
+ * @return 毫秒数
+ * \endif
+ */
+int SARibbonApplicationWidget::animationDuration() const
+{
+	SA_DC(d);
+	return d->mAnimationDuration;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Resizes the widget to match the parent's size multiplied by widthRatio
  * @param parentSize The size of the parent widget
  * \endif
  *
  * \if CHINESE
- * @brief 将窗口大小调整为父窗口大小
+ * @brief 将窗口大小调整为父窗口大小乘以宽度比例
  * @param parentSize 父窗口的大小
  * \endif
  */
 void SARibbonApplicationWidget::resizeToParent(const QSize& parentSize)
 {
-	setGeometry(0, 0, parentSize.width(), parentSize.height());
+	SA_D(d);
+	qreal ratio = d->mWidthRatio;
+	if (ratio <= 0.0 || ratio > 1.0) {
+		ratio = 1.0;
+	}
+	setGeometry(0, 0, int(parentSize.width() * ratio), parentSize.height());
+	d->syncMaskGeometry();
 }
 
 /**
@@ -35185,23 +35729,63 @@ bool SARibbonApplicationWidget::eventFilter(QObject* obj, QEvent* ev)
  * \if ENGLISH
  * @brief Handles the show event
  * @param event The show event
- * @details Resizes the widget to match parent size and requests focus
+ * @details Resizes the widget to match parent size, shows the mask below the widget, requests focus
+ *          and optionally starts the slide-in animation from the left edge
  * \endif
  *
  * \if CHINESE
  * @brief 处理显示事件
  * @param event 显示事件
- * @details 将窗口大小调整为父窗口大小并请求焦点
+ * @details 将窗口大小调整为父窗口大小，显示遮罩（位于本窗口之下），请求焦点，
+ *          并可选启动从左侧滑入的动画
  * \endif
  */
 void SARibbonApplicationWidget::showEvent(QShowEvent* event)
 {
+	SA_D(d);
 	QWidget* par = parentWidget();
 	if (par) {
 		resizeToParent(par->size());
 	}
+	// 遮罩显示并置于本窗口之下
+	if (d->mMaskEnabled && par) {
+		d->showMask(d->mAnimationEnabled);
+		d->mMaskWidget->raise();
+	}
 	setFocus();  // 显示窗口时请求焦点
+	raise();     // 确保本窗口位于遮罩之上
+	// 从左侧滑入
+	if (d->mAnimationEnabled) {
+		d->mSlideAnimation->stop();
+		d->mSlideAnimation->setDuration(d->mAnimationDuration);
+		d->mSlideAnimation->setStartValue(QPoint(-width(), y()));
+		d->mSlideAnimation->setEndValue(QPoint(0, y()));
+		move(-width(), y());
+		d->mSlideAnimation->start();
+	}
 	QFrame::showEvent(event);
+}
+
+/**
+ * \if ENGLISH
+ * @brief Handles the hide event
+ * @param event The hide event
+ * @details Stops the running animations and hides the mask
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 处理隐藏事件
+ * @param event 隐藏事件
+ * @details 停止进行中的动画并隐藏遮罩
+ * \endif
+ */
+void SARibbonApplicationWidget::hideEvent(QHideEvent* event)
+{
+	SA_D(d);
+	d->mSlideAnimation->stop();
+	d->mMaskFadeAnimation->stop();
+	d->hideMask();
+	QFrame::hideEvent(event);
 }
 
 /**
@@ -35222,7 +35806,6 @@ void SARibbonApplicationWidget::keyPressEvent(QKeyEvent* ev)
 	if (ev) {
 		if (ev->key() == Qt::Key_Escape) {
 			hide();
-			qDebug() << "Key_Escape";
 			ev->accept();
 			return;
 		}

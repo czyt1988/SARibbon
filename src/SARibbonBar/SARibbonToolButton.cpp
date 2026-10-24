@@ -287,6 +287,7 @@ public:
     int mSizeHintBaseHeight { -1 };  ///< 计算mSizeHint时依据的大按钮高度，-1表示不依赖panel几何
     QSize mLargeButtonSizeHint { 32, 32 };                                           ///< 大按钮的尺寸
     bool mIsTextNeedWrap { false };                                                  ///< 标记文字是否需要换行显示
+    bool mDrawRectsDirty { true };                                                   ///< 标记绘制矩形是否需要在下次绘制前重算
     SARibbonToolButton::LayoutFactor layoutFactor;                                   ///< 布局系数
     std::unique_ptr< SARibbonToolButtonProxyStyle > mStyle;                          ///< 按钮样式，主要为了绘制箭头
 
@@ -367,6 +368,7 @@ void SARibbonToolButton::PrivateData::updateDrawRect(const QStyleOptionToolButto
         }
     }
     calcDrawRects(opt, mDrawIconRect, mDrawTextRect, mDrawIndicatorArrowRect, mSpacing, mIndicatorLen);
+    mDrawRectsDirty = false;
 }
 
 /**
@@ -376,6 +378,8 @@ void SARibbonToolButton::PrivateData::updateDrawRect(const QStyleOptionToolButto
 void SARibbonToolButton::PrivateData::updateSizeHint(const QStyleOptionToolButton& opt)
 {
     mSizeHint = calcSizeHint(opt);
+    // sizehint变化可能改变换行结论，绘制矩形必须在下一次绘制前重算
+    mDrawRectsDirty = true;
 }
 
 /**
@@ -1679,6 +1683,11 @@ void SARibbonToolButton::paintEvent(QPaintEvent* e)
     QPainter p(this);
     QStyleOptionToolButton opt;
     initStyleOption(&opt);
+    if (d_ptr->mDrawRectsDirty) {
+        // 字体/DPI/样式变化后sizeHint可能已失效但按钮几何未变（不会触发resizeEvent），
+        // 必须在绘制前用当前rect重算绘制矩形，否则会沿用旧的换行结论和文字区域
+        d_ptr->updateDrawRect(opt);
+    }
     if (opt.features & QStyleOptionToolButton::MenuButtonPopup || opt.features & QStyleOptionToolButton::HasMenu) {
         // 在菜单弹出消失后，需要通过此方法取消掉鼠标停留
         if (!rect().contains(mapFromGlobal(QCursor::pos()))) {
@@ -1906,6 +1915,7 @@ void SARibbonToolButton::paintIndicator(QPainter& p, const QStyleOptionToolButto
 void SARibbonToolButton::invalidateSizeHint()
 {
     d_ptr->mSizeHint = QSize();
+    d_ptr->mDrawRectsDirty = true;
     // Notify parent panel layout to invalidate this button's cache entry
     // This avoids stale cached sizeHints when button properties change
     if (SARibbonPanel* panel = qobject_cast< SARibbonPanel* >(parentWidget())) {

@@ -11,14 +11,12 @@
 //===================================================
 namespace SARibbonColorToolButtonConstants
 {
-constexpr int COLOR_BLOCK_HEIGHT       = 5;   ///< 颜色块的高度
-constexpr int COLOR_BLOCK_MARGIN       = 1;   ///< 颜色块边距
-constexpr int COLOR_BLOCK_EXTRA_WIDTH  = 4;   ///< 颜色块额外宽度
-constexpr int COLOR_BLOCK_EXTRA_HEIGHT = 4;   ///< 颜色块额外高度
-constexpr int ICON_OFFSET_ADJUSTMENT   = 2;   ///< 图标偏移调整值
-constexpr int DEFAULT_COLOR_ICON_SIZE  = 32;  ///< 默认颜色图标尺寸
-constexpr int INVALID_COLOR_PEN_WIDTH  = 1;   ///< 无效颜色时边框线宽
-constexpr int INVALID_COLOR_LINE_RATIO = 3;   ///< 无效颜色对角线比例分母
+constexpr qreal COLOR_BLOCK_RATIO        = 0.25;  ///< 颜色块高度占图标高度的比例
+constexpr int COLOR_BLOCK_MIN_HEIGHT     = 3;     ///< 颜色块最小高度
+constexpr int COLOR_BLOCK_MARGIN         = 1;     ///< 颜色块边距
+constexpr int DEFAULT_COLOR_ICON_SIZE    = 32;    ///< 默认颜色图标尺寸
+constexpr int INVALID_COLOR_PEN_WIDTH    = 1;     ///< 无效颜色时边框线宽
+constexpr int INVALID_COLOR_LINE_RATIO   = 3;     ///< 无效颜色对角线比例分母
 }
 
 /**
@@ -85,6 +83,7 @@ public:
     mutable QIcon::State mCachedColorPixmapState { QIcon::Off };    ///< 缓存对应的状态
     mutable QColor mCachedColorPixmapColor;                         ///< 缓存对应的颜色
     mutable qint64 mCachedColorPixmapIconKey { 0 };                 ///< 缓存对应图标的 cacheKey
+    mutable qreal mCachedColorPixmapDpr { 0 };                      ///< 缓存对应的devicePixelRatio
     mutable bool mColorPixmapCacheValid { false };                  ///< 缓存是否有效
 
     /// Invalidate the color pixmap cache so the next paint regenerates it
@@ -100,6 +99,7 @@ SARibbonColorToolButton::PrivateData::PrivateData(SARibbonColorToolButton* p) : 
 
 QPixmap SARibbonColorToolButton::PrivateData::createIconPixmap(const QStyleOptionToolButton& opt, const QSize& iconsize) const
 {
+    namespace Constants = SARibbonColorToolButtonConstants;
     if (opt.icon.isNull()) {  // 没有有图标
         return QPixmap();
     }
@@ -113,53 +113,62 @@ QPixmap SARibbonColorToolButton::PrivateData::createIconPixmap(const QStyleOptio
     } else {
         mode = QIcon::Normal;
     }
-    // Check color pixmap cache — key includes icon cache key, size, mode, state, and color
-    qint64 iconKey = opt.icon.cacheKey();
+    // Check color pixmap cache — key includes icon cache key, size, mode, state, color and dpr
+    const qreal dpr = SA::widgetDevicePixelRatio(q_ptr);
+    qint64 iconKey  = opt.icon.cacheKey();
     if (mColorPixmapCacheValid
         && mCachedColorPixmapSize == iconsize
         && mCachedColorPixmapMode == mode
         && mCachedColorPixmapState == state
         && mCachedColorPixmapColor == mColor
-        && mCachedColorPixmapIconKey == iconKey) {
+        && mCachedColorPixmapIconKey == iconKey
+        && qFuzzyCompare(mCachedColorPixmapDpr + 1.0, dpr + 1.0)) {
         return mCachedColorPixmap;
     }
-    QSize realIconSize = iconsize
-                         - QSize(0,
-                                 SARibbonColorToolButtonConstants::COLOR_BLOCK_HEIGHT
-                                     + SARibbonColorToolButtonConstants::COLOR_BLOCK_MARGIN);
-    if (realIconSize.isEmpty()) {
+    // 颜色块高度随图标尺寸等比缩放，保证大按钮和小按钮下都清晰可见；同时不超过图标高度的一半
+    // 注意：以下所有几何量均为逻辑像素。QPainter绘制在设置了devicePixelRatio的QPixmap上时
+    // 会自动按dpr缩放，因此不能用设备像素坐标计算，否则高DPI下会被二次放大导致色块溢出被裁剪
+    const int slotW = iconsize.width();
+    const int slotH = iconsize.height();
+    int colorHeight = qMax(Constants::COLOR_BLOCK_MIN_HEIGHT, qRound(slotH * Constants::COLOR_BLOCK_RATIO));
+    colorHeight     = qMin(colorHeight, slotH / 2);
+    const int margin         = Constants::COLOR_BLOCK_MARGIN;
+    const int iconAreaHeight = slotH - colorHeight - margin;
+    if (slotW <= 0 || iconAreaHeight <= 0) {
         return QPixmap();
     }
-    QPixmap pixmap = SA::iconToPixmap(opt.icon, realIconSize, SA::widgetDevicePixelRatio(q_ptr), mode, state);
-    // QPixmap pixmap     = opt.icon.pixmap(q_ptr->window()->windowHandle(), realIconSize, mode, state);
-    QPixmap res(pixmap.size()
-                + QSize(SARibbonColorToolButtonConstants::COLOR_BLOCK_EXTRA_WIDTH,
-                        SARibbonColorToolButtonConstants::COLOR_BLOCK_EXTRA_HEIGHT
-                            + SARibbonColorToolButtonConstants::COLOR_BLOCK_HEIGHT));
+    QPixmap iconPm = SA::iconToPixmap(opt.icon, QSize(slotW, iconAreaHeight), dpr, mode, state);
+    // 合成结果严格等于图标槽尺寸（含正确的devicePixelRatio），避免超出绘制区域被裁剪
+    QPixmap res(qRound(slotW * dpr), qRound(slotH * dpr));
+    res.setDevicePixelRatio(dpr);
     res.fill(Qt::transparent);
     QPainter painter(&res);
-    int xpixmap = (res.width() - pixmap.width()) / 2;
-    int ypixmap = (res.height() - SARibbonColorToolButtonConstants::COLOR_BLOCK_HEIGHT
-                   - SARibbonColorToolButtonConstants::ICON_OFFSET_ADJUSTMENT - pixmap.height())
-                  / 2;
-    int w         = pixmap.width();
-    int h         = pixmap.height();
-    QRect rpixmap = QRect(xpixmap, ypixmap, w, h);
-    painter.drawPixmap(rpixmap, pixmap);
-    QRect colorRect = rpixmap.adjusted(0,
-                                       h + SARibbonColorToolButtonConstants::COLOR_BLOCK_MARGIN,
-                                       0,
-                                       SARibbonColorToolButtonConstants::COLOR_BLOCK_HEIGHT
-                                           + SARibbonColorToolButtonConstants::COLOR_BLOCK_MARGIN);
+    painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
+    // 图标等比缩放到不超过上方区域（只缩小不放大），水平居中、底部与图标区域底边对齐
+    int iconW = 0;
+    int iconH = 0;
+    if (!iconPm.isNull()) {
+        const qreal pmDpr = iconPm.devicePixelRatio();
+        QSizeF iconLogical(iconPm.width() / pmDpr, iconPm.height() / pmDpr);
+        qreal fit          = qMin(slotW / iconLogical.width(), iconAreaHeight / iconLogical.height());
+        fit                = qMin(fit, qreal(1.0));
+        iconW              = qRound(iconLogical.width() * fit);
+        iconH              = qRound(iconLogical.height() * fit);
+        painter.drawPixmap(QRect((slotW - iconW) / 2, iconAreaHeight - iconH, iconW, iconH), iconPm);
+    }
+    // 色块位于图标正下方，上边缘与图标下边缘间隔margin像素
+    int bandWidth = (iconW > 0) ? iconW : slotW;
+    int bandX     = (slotW - bandWidth) / 2;
+    QRectF colorRect(bandX, iconAreaHeight + margin, bandWidth, colorHeight);
     if (mColor.isValid()) {
         painter.fillRect(colorRect, mColor);
     } else {
-        QPen pen(Qt::red, SARibbonColorToolButtonConstants::INVALID_COLOR_PEN_WIDTH, Qt::SolidLine, Qt::RoundCap);
+        QPen pen(Qt::red, Constants::INVALID_COLOR_PEN_WIDTH, Qt::SolidLine, Qt::RoundCap);
         painter.setPen(pen);
-        painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
         painter.setRenderHint(QPainter::Antialiasing, true);
-        int ss = colorRect.width() / SARibbonColorToolButtonConstants::INVALID_COLOR_LINE_RATIO;
-        painter.drawLine(QPoint(colorRect.x() + ss, colorRect.bottom()), QPoint(colorRect.right() - ss, colorRect.top()));
+        qreal ss = colorRect.width() / Constants::INVALID_COLOR_LINE_RATIO;
+        painter.drawLine(QPointF(colorRect.left() + ss, colorRect.bottom()),
+                         QPointF(colorRect.right() - ss, colorRect.top()));
         pen.setColor(Qt::black);
         painter.setPen(pen);
         painter.drawRect(colorRect);
@@ -171,34 +180,37 @@ QPixmap SARibbonColorToolButton::PrivateData::createIconPixmap(const QStyleOptio
     mCachedColorPixmapState   = state;
     mCachedColorPixmapColor   = mColor;
     mCachedColorPixmapIconKey = iconKey;
-    mColorPixmapCacheValid   = true;
+    mCachedColorPixmapDpr     = dpr;
+    mColorPixmapCacheValid    = true;
     return res;
 }
 
 QIcon SARibbonColorToolButton::PrivateData::createColorIcon(const QColor& c, const QSize& size) const
 {
-    // using Constants = SARibbonColorToolButtonConstants;
-    QPixmap res(size);
+    namespace Constants = SARibbonColorToolButtonConstants;
+    const qreal dpr = SA::widgetDevicePixelRatio(q_ptr);
+    // 以设备像素创建并设置devicePixelRatio，保证高DPI下颜色图标清晰且尺寸正确
+    QPixmap res(qRound(size.width() * dpr), qRound(size.height() * dpr));
+    res.setDevicePixelRatio(dpr);
     res.fill(Qt::transparent);
     QPainter painter(&res);
-    QRect colorRect(SARibbonColorToolButtonConstants::COLOR_BLOCK_MARGIN,
-                    SARibbonColorToolButtonConstants::COLOR_BLOCK_MARGIN,
-                    res.width() - 2 * SARibbonColorToolButtonConstants::COLOR_BLOCK_MARGIN,
-                    res.height() - 2 * SARibbonColorToolButtonConstants::COLOR_BLOCK_MARGIN);
+    // QPainter在设置了devicePixelRatio的pixmap上已自动按dpr缩放，此处直接使用逻辑坐标
+    QRectF colorRect(Constants::COLOR_BLOCK_MARGIN,
+                     Constants::COLOR_BLOCK_MARGIN,
+                     size.width() - 2 * Constants::COLOR_BLOCK_MARGIN,
+                     size.height() - 2 * Constants::COLOR_BLOCK_MARGIN);
     if (c.isValid()) {
         painter.fillRect(colorRect, c);
     } else {
-        QPen pen(Qt::black, SARibbonColorToolButtonConstants::INVALID_COLOR_PEN_WIDTH, Qt::SolidLine, Qt::RoundCap);
+        QPen pen(Qt::black, Constants::INVALID_COLOR_PEN_WIDTH, Qt::SolidLine, Qt::RoundCap);
         painter.setPen(pen);
         painter.drawRect(colorRect);
         pen.setColor(Qt::red);
         painter.setPen(pen);
         painter.setRenderHint(QPainter::SmoothPixmapTransform, true);
         painter.setRenderHint(QPainter::Antialiasing, true);
-        painter.drawLine(QPoint(SARibbonColorToolButtonConstants::COLOR_BLOCK_MARGIN,
-                                size.height() - SARibbonColorToolButtonConstants::COLOR_BLOCK_MARGIN),
-                         QPoint(size.width() - SARibbonColorToolButtonConstants::COLOR_BLOCK_MARGIN,
-                                SARibbonColorToolButtonConstants::COLOR_BLOCK_MARGIN));
+        painter.drawLine(QPointF(Constants::COLOR_BLOCK_MARGIN, size.height() - Constants::COLOR_BLOCK_MARGIN),
+                         QPointF(size.width() - Constants::COLOR_BLOCK_MARGIN, Constants::COLOR_BLOCK_MARGIN));
     }
     return QIcon(res);
 }
