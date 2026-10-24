@@ -18,9 +18,9 @@ jobs:
         python: ["3.10", "3.11", "3.12"]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python }}
 
@@ -71,7 +71,7 @@ jobs:
         run: twine check pyside6/dist/*.whl
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: pyside6-wheel-${{ matrix.os }}-${{ matrix.python }}
           path: pyside6/dist/*.whl
@@ -88,9 +88,9 @@ jobs:
         python: ["3.10", "3.11", "3.12"]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python }}
 
@@ -129,7 +129,7 @@ jobs:
         run: twine check dist/*.whl
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: pyqt5-wheel-${{ matrix.os }}-${{ matrix.python }}
           path: dist/*.whl
@@ -146,9 +146,9 @@ jobs:
         python: ["3.10", "3.11", "3.12"]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python }}
 
@@ -187,7 +187,7 @@ jobs:
         run: twine check pyqt6/dist/*.whl
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: pyqt6-wheel-${{ matrix.os }}-${{ matrix.python }}
           path: pyqt6/dist/*.whl
@@ -204,7 +204,7 @@ jobs:
       id-token: write  # Trusted publishing (OIDC)
     steps:
       - name: Download all artifacts
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: dist
           merge-multiple: true
