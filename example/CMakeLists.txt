@@ -1,10 +1,16 @@
-cmake_minimum_required(VERSION 3.15)
+﻿cmake_minimum_required(VERSION 3.15)
 project(SARibbonExamples LANGUAGES CXX)
 
 add_subdirectory(MainWindowExample)
 add_subdirectory(UseNativeFrameExample)
 add_subdirectory(MultiScreenDpiExample)
-add_subdirectory(Qt3DWindowExample)
+# Qt3DWindowExample 依赖可选的 Qt 3D 模块，未安装时跳过
+find_package(Qt${QT_VERSION_MAJOR} COMPONENTS 3DCore 3DRender 3DInput 3DLogic 3DExtras 3DAnimation QUIET)
+if(TARGET Qt${QT_VERSION_MAJOR}::3DCore)
+    add_subdirectory(Qt3DWindowExample)
+else()
+    message(STATUS "Qt 3D modules not found, skip Qt3DWindowExample")
+endif()
 add_subdirectory(WidgetWithRibbon)
 add_subdirectory(NormalMenuBarExample)
 add_subdirectory(MdiAreaWindowExample)
