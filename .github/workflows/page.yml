@@ -3,6 +3,8 @@ name: Deploy MkDocs to GitHub Pages
 on:
   push:
     branches: [master]
+  pull_request:
+    branches: [master]        # 校验依赖升级 PR，只构建不部署
   workflow_dispatch:          # 手动触发按钮
 
 permissions:
@@ -11,7 +13,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: pages
+  group: pages-${{ github.ref }}  # PR 构建不取消 master 的部署任务
   cancel-in-progress: true
 
 jobs:
@@ -55,6 +57,7 @@ jobs:
           path: site/          # MkDocs 默认输出目录
 
   deploy:
+    if: github.event_name != 'pull_request'  # PR 只构建校验，不部署 Pages
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
