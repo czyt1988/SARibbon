@@ -546,7 +546,13 @@ bool SARibbonPanelLayout::isDirty() const
  */
 void SARibbonPanelLayout::updateGeomArray()
 {
-    updateGeomArray(geometry());
+    // 优先使用最近一次setGeometry传入的矩形：QLayout::geometry()在部分路径下可能返回无效矩形，
+    // 而布局高度必须与真正排布子控件时使用的高度保持一致
+    if (mLastLayoutRect.width() > 0 && mLastLayoutRect.height() > 0) {
+        updateGeomArray(mLastLayoutRect);
+    } else {
+        updateGeomArray(geometry());
+    }
 }
 
 /**
@@ -817,10 +823,13 @@ void SARibbonPanelLayout::updateGeomArray(const QRect& setrect)
     const short rowCount = (panel->panelLayoutMode() == SARibbonPanel::ThreeRowMode) ? 3
                       : (panel->panelLayoutMode() == SARibbonPanel::TwoRowMode) ? 2
                       : 1;
-    // largeHeight是对应large占比的高度
-    const int largeHeight = qMax(height - mag.bottom() - mag.top() - titleH - titleSpace, 2);  // 大按钮高度不小于2
+    // largeHeight是对应large占比的高度。setrect无效时（布局尚未获得几何）用panel控件高度兜底，
+    // 保证首次sizeHint仍然能按字号推算出合理的大按钮高度
+    const int layoutHeight = (height > 0) ? height : panel->height();
+    const int largeHeight  = qMax(layoutHeight - mag.bottom() - mag.top() - titleH - titleSpace, 2);  // 大按钮高度不小于2
 
-    mLargeHeight = largeHeight;
+    mLargeHeight       = largeHeight;
+    mHasLayoutGeometry = (setrect.width() > 0 && height > 0);
     // sizeHint缓存和大按钮高度绑定：高度变化（panel首次获得真实几何、调整category高度或
     // panel标题高度等）时必须丢弃缓存，否则按钮宽度会一直沿用旧高度算出来的结果
     if (largeHeight != mButtonSizeHintCacheLargeHeight) {
@@ -1828,6 +1837,16 @@ int SARibbonPanelLayout::largeButtonHeight() const
     return mLargeHeight;
 }
 
+/**
+ * @brief Checks whether largeButtonHeight() comes from a real layout pass / 判断大按钮高度是否来自一次有效布局
+ *
+ * @return true if the layout has been laid out with a valid size / 布局已按有效尺寸完成排布时返回true
+ */
+bool SARibbonPanelLayout::hasLayoutGeometry() const
+{
+    return mHasLayoutGeometry;
+}
+
 void SARibbonPanelLayout::setGeometry(const QRect& rect)
 {
     // 重入守卫：doLayout()对子控件执行show()时，QWidgetPrivate::setVisible会同步invalidate
@@ -1856,6 +1875,7 @@ void SARibbonPanelLayout::setGeometry(const QRect& rect)
     if (rect.width() <= 0 || rect.height() <= 0) {
         return;
     }
+    mLastLayoutRect = rect;
     QLayout::setGeometry(rect);
     mDirty = false;
     updateGeomArray(rect);

@@ -82,6 +82,9 @@ public:
     // Gets the height of large buttons
     int largeButtonHeight() const;
 
+    // Checks whether largeButtonHeight() comes from a real layout pass
+    bool hasLayoutGeometry() const;
+
     // Gets the spacing between the title and the buttons
     int panelTitleSpace() const;
 
@@ -177,6 +180,8 @@ private:
     QSize mLargeToolButtonIconSize { 32, 32 };    ///< 记录大按钮图标尺寸
     bool mDirty { true };                         ///< 用于标记是否需要刷新元素，参考QToolBarLayout源码
     int mLargeHeight { 0 };                       ///< 记录大图标的高度
+    bool mHasLayoutGeometry { false };            ///< mLargeHeight是否来自一次真实（有效尺寸）的布局
+    QRect mLastLayoutRect;                        ///< 最近一次setGeometry传入的布局矩形
     int mTitleHeight { 15 };                      ///< 标题区域高度
     int mTitleSpace { 2 };                        ///< 标题区域和按钮的间隔
     bool mEnableShowTitle { true };               ///< 是否运行显示panel标题

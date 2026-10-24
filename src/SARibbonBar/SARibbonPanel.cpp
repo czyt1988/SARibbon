@@ -1422,18 +1422,31 @@ void SARibbonPanel::setPanelName(const QString& title)
 /**
  * \if ENGLISH
  * @brief Gets the height of the large buttons in this panel
+ * @details Returns the smaller of the widget height and the height used by the current layout
+ *          pass. After a font/DPI change the widget may temporarily keep the old height while
+ *          the layout has already been laid out for a smaller visible rect; using the layout
+ *          height keeps the button wrap decision consistent with the actual geometry.
  * @return The height of large buttons
  * \endif
  *
  * \if CHINESE
  * @brief 获取此面板中大按钮的高度
+ * @details 返回控件高度与当前布局实际使用高度中的较小值。字体/DPI变化后，控件可能暂时保留
+ *          旧字号对应的高度，而布局已经按更小的可见矩形排布；使用布局高度可保证按钮换行
+ *          判断与实际几何一致。
  * @return 大按钮的高度
  * \endif
  */
 int SARibbonPanel::largeButtonHeight() const
 {
     const QMargins& mag = contentsMargins();
-    return qMax(0, height() - mag.top() - mag.bottom() - titleHeight());
+    const int widgetHeight = qMax(0, height() - mag.top() - mag.bottom() - titleHeight());
+    if (SARibbonPanelLayout* lay = d_ptr->panelLayout()) {
+        if (lay->hasLayoutGeometry()) {
+            return qMin(widgetHeight, lay->largeButtonHeight());
+        }
+    }
+    return widgetHeight;
 }
 
 /**

@@ -9019,6 +9019,7 @@ public:
 	int mSizeHintBaseHeight { -1 };  ///< 计算mSizeHint时依据的大按钮高度，-1表示不依赖panel几何
 	QSize mLargeButtonSizeHint { 32, 32 };                                           ///< 大按钮的尺寸
 	bool mIsTextNeedWrap { false };                                                  ///< 标记文字是否需要换行显示
+	bool mDrawRectsDirty { true };                                                   ///< 标记绘制矩形是否需要在下次绘制前重算
 	SARibbonToolButton::LayoutFactor layoutFactor;                                   ///< 布局系数
 	std::unique_ptr< SARibbonToolButtonProxyStyle > mStyle;                          ///< 按钮样式，主要为了绘制箭头
 
@@ -9099,6 +9100,7 @@ void SARibbonToolButton::PrivateData::updateDrawRect(const QStyleOptionToolButto
 		}
 	}
 	calcDrawRects(opt, mDrawIconRect, mDrawTextRect, mDrawIndicatorArrowRect, mSpacing, mIndicatorLen);
+	mDrawRectsDirty = false;
 }
 
 /**
@@ -9108,6 +9110,8 @@ void SARibbonToolButton::PrivateData::updateDrawRect(const QStyleOptionToolButto
 void SARibbonToolButton::PrivateData::updateSizeHint(const QStyleOptionToolButton& opt)
 {
 	mSizeHint = calcSizeHint(opt);
+	// sizehint变化可能改变换行结论，绘制矩形必须在下一次绘制前重算
+	mDrawRectsDirty = true;
 }
 
 /**
@@ -10411,6 +10415,11 @@ void SARibbonToolButton::paintEvent(QPaintEvent* e)
 	QPainter p(this);
 	QStyleOptionToolButton opt;
 	initStyleOption(&opt);
+	if (d_ptr->mDrawRectsDirty) {
+		// 字体/DPI/样式变化后sizeHint可能已失效但按钮几何未变（不会触发resizeEvent），
+		// 必须在绘制前用当前rect重算绘制矩形，否则会沿用旧的换行结论和文字区域
+		d_ptr->updateDrawRect(opt);
+	}
 	if (opt.features & QStyleOptionToolButton::MenuButtonPopup || opt.features & QStyleOptionToolButton::HasMenu) {
 		// 在菜单弹出消失后，需要通过此方法取消掉鼠标停留
 		if (!rect().contains(mapFromGlobal(QCursor::pos()))) {
@@ -10638,6 +10647,7 @@ void SARibbonToolButton::paintIndicator(QPainter& p, const QStyleOptionToolButto
 void SARibbonToolButton::invalidateSizeHint()
 {
 	d_ptr->mSizeHint = QSize();
+	d_ptr->mDrawRectsDirty = true;
 	// Notify parent panel layout to invalidate this button's cache entry
 	// This avoids stale cached sizeHints when button properties change
 	if (SARibbonPanel* panel = qobject_cast< SARibbonPanel* >(parentWidget())) {
@@ -14427,7 +14437,13 @@ bool SARibbonPanelLayout::isDirty() const
  */
 void SARibbonPanelLayout::updateGeomArray()
 {
-	updateGeomArray(geometry());
+	// 优先使用最近一次setGeometry传入的矩形：QLayout::geometry()在部分路径下可能返回无效矩形，
+	// 而布局高度必须与真正排布子控件时使用的高度保持一致
+	if (mLastLayoutRect.width() > 0 && mLastLayoutRect.height() > 0) {
+		updateGeomArray(mLastLayoutRect);
+	} else {
+		updateGeomArray(geometry());
+	}
 }
 
 /**
@@ -14698,10 +14714,13 @@ void SARibbonPanelLayout::updateGeomArray(const QRect& setrect)
 	const short rowCount = (panel->panelLayoutMode() == SARibbonPanel::ThreeRowMode) ? 3
 					  : (panel->panelLayoutMode() == SARibbonPanel::TwoRowMode) ? 2
 					  : 1;
-	// largeHeight是对应large占比的高度
-	const int largeHeight = qMax(height - mag.bottom() - mag.top() - titleH - titleSpace, 2);  // 大按钮高度不小于2
+	// largeHeight是对应large占比的高度。setrect无效时（布局尚未获得几何）用panel控件高度兜底，
+	// 保证首次sizeHint仍然能按字号推算出合理的大按钮高度
+	const int layoutHeight = (height > 0) ? height : panel->height();
+	const int largeHeight  = qMax(layoutHeight - mag.bottom() - mag.top() - titleH - titleSpace, 2);  // 大按钮高度不小于2
 
-	mLargeHeight = largeHeight;
+	mLargeHeight       = largeHeight;
+	mHasLayoutGeometry = (setrect.width() > 0 && height > 0);
 	// sizeHint缓存和大按钮高度绑定：高度变化（panel首次获得真实几何、调整category高度或
 	// panel标题高度等）时必须丢弃缓存，否则按钮宽度会一直沿用旧高度算出来的结果
 	if (largeHeight != mButtonSizeHintCacheLargeHeight) {
@@ -15709,6 +15728,16 @@ int SARibbonPanelLayout::largeButtonHeight() const
 	return mLargeHeight;
 }
 
+/**
+ * @brief Checks whether largeButtonHeight() comes from a real layout pass / 判断大按钮高度是否来自一次有效布局
+ *
+ * @return true if the layout has been laid out with a valid size / 布局已按有效尺寸完成排布时返回true
+ */
+bool SARibbonPanelLayout::hasLayoutGeometry() const
+{
+	return mHasLayoutGeometry;
+}
+
 void SARibbonPanelLayout::setGeometry(const QRect& rect)
 {
 	// 重入守卫：doLayout()对子控件执行show()时，QWidgetPrivate::setVisible会同步invalidate
@@ -15737,6 +15766,7 @@ void SARibbonPanelLayout::setGeometry(const QRect& rect)
 	if (rect.width() <= 0 || rect.height() <= 0) {
 		return;
 	}
+	mLastLayoutRect = rect;
 	QLayout::setGeometry(rect);
 	mDirty = false;
 	updateGeomArray(rect);
@@ -17164,18 +17194,31 @@ void SARibbonPanel::setPanelName(const QString& title)
 /**
  * \if ENGLISH
  * @brief Gets the height of the large buttons in this panel
+ * @details Returns the smaller of the widget height and the height used by the current layout
+ *          pass. After a font/DPI change the widget may temporarily keep the old height while
+ *          the layout has already been laid out for a smaller visible rect; using the layout
+ *          height keeps the button wrap decision consistent with the actual geometry.
  * @return The height of large buttons
  * \endif
  *
  * \if CHINESE
  * @brief 获取此面板中大按钮的高度
+ * @details 返回控件高度与当前布局实际使用高度中的较小值。字体/DPI变化后，控件可能暂时保留
+ *          旧字号对应的高度，而布局已经按更小的可见矩形排布；使用布局高度可保证按钮换行
+ *          判断与实际几何一致。
  * @return 大按钮的高度
  * \endif
  */
 int SARibbonPanel::largeButtonHeight() const
 {
 	const QMargins& mag = contentsMargins();
-	return qMax(0, height() - mag.top() - mag.bottom() - titleHeight());
+	const int widgetHeight = qMax(0, height() - mag.top() - mag.bottom() - titleHeight());
+	if (SARibbonPanelLayout* lay = d_ptr->panelLayout()) {
+		if (lay->hasLayoutGeometry()) {
+			return qMin(widgetHeight, lay->largeButtonHeight());
+		}
+	}
+	return widgetHeight;
 }
 
 /**
@@ -28027,7 +28070,18 @@ void SARibbonBar::changeEvent(QEvent* e)
 		// 字体改变总体布局调整
 		if (SARibbonBarLayout* lay = qobject_cast< SARibbonBarLayout* >(layout())) {
 			lay->resetSize();
+			// 字体变化可能只改变行高而不改变取整后的总高度，此时也必须让布局重新执行，
+			// 否则category/panel会保留旧字体的几何（panel可能高于可见区，导致大按钮按
+			// 旧高度判断换行而溢出，尤其出现在225%等非整数DPI缩放的主流流程中）
+			lay->invalidate();
 		}
+		// category/panel的布局同样需要重排，确保panel几何与新字号一致
+		iterateCategory([](SARibbonCategory* c) -> bool {
+			if (QLayout* cly = c->layout()) {
+				cly->invalidate();
+			}
+			return true;
+		});
 		return; // 已调用父类处理，不再走末尾的 QMenuBar::changeEvent(e)
 	}
 	case QEvent::StyleChange: {

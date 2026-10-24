@@ -4116,7 +4116,18 @@ void SARibbonBar::changeEvent(QEvent* e)
         // 字体改变总体布局调整
         if (SARibbonBarLayout* lay = qobject_cast< SARibbonBarLayout* >(layout())) {
             lay->resetSize();
+            // 字体变化可能只改变行高而不改变取整后的总高度，此时也必须让布局重新执行，
+            // 否则category/panel会保留旧字体的几何（panel可能高于可见区，导致大按钮按
+            // 旧高度判断换行而溢出，尤其出现在225%等非整数DPI缩放的主流流程中）
+            lay->invalidate();
         }
+        // category/panel的布局同样需要重排，确保panel几何与新字号一致
+        iterateCategory([](SARibbonCategory* c) -> bool {
+            if (QLayout* cly = c->layout()) {
+                cly->invalidate();
+            }
+            return true;
+        });
         return; // 已调用父类处理，不再走末尾的 QMenuBar::changeEvent(e)
     }
     case QEvent::StyleChange: {
