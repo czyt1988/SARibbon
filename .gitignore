@@ -54,7 +54,7 @@ nul
 .agent/
 .github/copilot/
 .zcode/
-
+.worktree/
 #文档目录
 site
 site-doxygen
