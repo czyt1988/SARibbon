@@ -44,6 +44,31 @@ endif()
 
 # load Qt library, minimum version required is 5.12
 # cn:Qt库加载,最低版本要求为5.12
+# macOS 26 SDK 移除了 AGL.framework（运行时仍保留），而 Qt 6.8 及更早版本的
+# FindWrapOpenGL.cmake 会在 Apple 平台上链接 AGL，导致 ld 报 "framework 'AGL' not found"。
+# Qt 的 find_library(WrapOpenGL_AGL NAMES AGL) 在系统里找不到 SDK 内的 framework，
+# 这里按 Qt 的查找逻辑预置该缓存变量指向 SDK 内已有的 OpenGL.framework（已链接，重复无害）；
+# Qt 6.9 起不再链接 AGL，此段对更新版本是空操作。
+if(APPLE)
+    set(_SARIBBON_MACOS_SDK_PATH "${CMAKE_OSX_SYSROOT}")
+    if(NOT IS_ABSOLUTE "${_SARIBBON_MACOS_SDK_PATH}")
+        execute_process(
+            COMMAND xcrun --show-sdk-path
+            OUTPUT_VARIABLE _SARIBBON_MACOS_SDK_PATH
+            OUTPUT_STRIP_TRAILING_WHITESPACE
+            ERROR_QUIET
+        )
+    endif()
+    if(_SARIBBON_MACOS_SDK_PATH
+       AND NOT EXISTS "${_SARIBBON_MACOS_SDK_PATH}/System/Library/Frameworks/AGL.framework"
+       AND NOT DEFINED CACHE{WrapOpenGL_AGL})
+        set(WrapOpenGL_AGL "${_SARIBBON_MACOS_SDK_PATH}/System/Library/Frameworks/OpenGL.framework"
+            CACHE FILEPATH "AGL.framework is absent from the macOS SDK; use OpenGL.framework for Qt's WrapOpenGL")
+        message(STATUS "AGL.framework not found in macOS SDK, WrapOpenGL will link OpenGL.framework instead")
+    endif()
+    unset(_SARIBBON_MACOS_SDK_PATH)
+endif()
+
 set(SARIBBON_MIN_QT_VERSION 5.12)
 find_package(QT NAMES Qt6 Qt5 COMPONENTS Core Widgets Svg REQUIRED)
 find_package(Qt${QT_VERSION_MAJOR} ${SARIBBON_MIN_QT_VERSION} COMPONENTS
@@ -122,6 +147,9 @@ endif()
 
 if(MSVC)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4819")
+    # 源码统一按 UTF-8 解析：测试/示例中存在中文窄字符串字面量，缺省按系统代码页
+    # 解析会在非中文代码页的 CI（windows-latest）上产生 C2001/C1057 编译错误
+    add_compile_options(/utf-8)
     # Qt 6.5.3 的 qvarlengtharray.h 使用了 stdext::unchecked_array_iterator，
     # 新版 MSVC STL 在 C++17 模式下不再声明 stdext 命名空间（_HAS_AUTO_PTR_ETC=0）
     add_compile_definitions(_HAS_AUTO_PTR_ETC=1)
