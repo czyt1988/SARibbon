@@ -9,6 +9,9 @@
   - `SARibbonMainWindow::setApplicationWidget`：把应用窗口绑定到应用按钮，点击按钮自动切换显示/隐藏（此前需要用户手写 connect；应用按钮绑定应用窗口后不应再挂弹出菜单）；
   - 合并版（SARibbon.h / SARibbon.cpp）已用 amalgamate 工具同步重新生成。
 - 修复：225% 等非整数屏幕上大按钮文字不换行、按钮被拉宽后溢出可见区，面板标题被挤出。根因是字体/DPI 变化后 panel 控件可能保留旧字号对应的高度，而 panel 布局已经按更小的可见矩形排布，大按钮的换行阈值读取控件高度时按偏大的旧高度判定“单行放得下”。现在换行判断改用「控件高度与布局实际高度的较小值」，字体变化时强制 ribbon/category 重新布局，绘制矩形也会在字体/DPI 变化后的首次绘制前重算；已由 `SARibbonLargeButtonAspectRatioTest::testWrapUsesLayoutHeightWhenWidgetIsTaller` 固化。
+- 修复：部分字体（Windows 下的回退字体等）两行文字的 boundingRect 高度接近 2×lineSpacing，而大按钮换行判定的两行预算只按「单行高度×2+2」计算，导致二分查找永远判定“超过两行”、宽度退化为单行全宽，`buttonMaximumAspectRatio` 上限静默失效。现在两行预算取「单行高度×2」与「lineSpacing×2」的较大值。
+- 构建：适配 macOS 26 SDK 移除 `AGL.framework`。Qt 6.8 及更早版本的 `FindWrapOpenGL.cmake` 仍会链接 AGL，导致 `ld: framework 'AGL' not found`；CMake 现在会在 SDK 缺少 AGL 时把 Qt 的 `WrapOpenGL_AGL` 指向 SDK 内已有的 `OpenGL.framework`（Qt 6.9 起不再依赖 AGL，此处理自动失效）。
+- 测试：`SARibbonToolButtonColorTest` 的颜色断言改为纯离屏 `grab()` 渲染，不再创建/显示窗口、不参与焦点链；`:hover` 断言在无头平台（offscreen/minimal）跳过。此前在 Qt5 的 GitHub Actions 无头环境下，带 QSS 的按钮在窗口析构清理焦点时会崩溃（signal 11）。
 
 ## 2026-09-16 -> 2.9.5
 

@@ -2,7 +2,6 @@
 #include <QApplication>
 #include <QCursor>
 #include <QImage>
-#include <QLabel>
 #include <QPalette>
 #include <QWidget>
 #include "SARibbonToolButton.h"
@@ -11,7 +10,13 @@
  * @brief SARibbonToolButton 前景色回归测试（GitHub #101）
  *
  * 稳定层：向控件 QPalette 的 foregroundRole 注入前景色，验证文字绘制真的取该角色的颜色；
- * 伪状态层：验证 QSS 的 :hover 伪状态 color 是否生效（依赖真实光标移动，环境不支持时跳过）。
+ * QSS 层：验证 QSS 的 color 是否生效。
+ *
+ * 这两层都只依赖 QWidget::grab() 的离屏渲染，不 show 窗口、不移动光标：无头 CI
+ * （QT_QPA_PLATFORM=offscreen）上没有可用窗口系统，创建真实窗口并让它获得焦点会在
+ * Qt5 上触发 QStyleSheetStyle 析构期间的崩溃（见 GitHub Actions 日志）。
+ *
+ * 伪状态层（:hover）依赖真实光标，仅在桌面平台手动验证；无头平台直接跳过。
  */
 namespace {
 // 红/蓝判定使用松阈值并要求数量下限：文字抗锯齿的边缘是混合色，不能做精确颜色相等
@@ -38,11 +43,10 @@ int countPixels(const QImage& img, bool (*pred)(const QRgb&))
     return count;
 }
 
-// 把真实光标移到 w 之外（避免 hover 状态污染像素断言）
-void moveCursorAway(QWidget* w)
+bool isHeadlessPlatform()
 {
-    QCursor::setPos(w->window()->mapToGlobal(QPoint(5, w->window()->height() - 5)));
-    QTest::qWait(50);
+    const QString name = QGuiApplication::platformName();
+    return name == QLatin1String("offscreen") || name == QLatin1String("minimal");
 }
 }  // namespace
 
@@ -57,16 +61,13 @@ private slots:
 
 void SARibbonToolButtonColorTest::testForegroundRoleColor()
 {
-    QWidget host;
-    host.resize(300, 200);
-    SARibbonToolButton btn(&host);
+    // 不 show：grab() 离屏渲染即可，避免无头环境下窗口/焦点带来的平台差异
+    SARibbonToolButton btn;
+    // 与 SARibbonPanelLayout 创建按钮时的配置一致：按钮不参与焦点链，
+    // 避免无头平台上窗口获得焦点后样式析构触发 Qt5 的崩溃路径
+    btn.setFocusPolicy(Qt::NoFocus);
     btn.setText(u8"ColorText");
     btn.resize(150, 40);
-    btn.move(75, 80);
-    host.show();
-    QVERIFY(QTest::qWaitForWindowExposed(&host));
-    moveCursorAway(&host);
-    QApplication::processEvents();
 
     // 前景色注入为红色
     QPalette pal = btn.palette();
@@ -97,16 +98,11 @@ void SARibbonToolButtonColorTest::testForegroundRoleColor()
 // 静态 QSS 的 color（非伪状态）不依赖鼠标，可稳定验证 QStyleSheetStyle 路径
 void SARibbonToolButtonColorTest::testStyleSheetColor()
 {
-    QWidget host;
-    host.resize(300, 200);
-    SARibbonToolButton btn(&host);
+    SARibbonToolButton btn;
+    btn.setFocusPolicy(Qt::NoFocus);
     btn.setText(u8"QssText");
     btn.setStyleSheet("SARibbonToolButton { color: red; }");
     btn.resize(150, 40);
-    btn.move(75, 80);
-    host.show();
-    QVERIFY(QTest::qWaitForWindowExposed(&host));
-    moveCursorAway(&host);
     QApplication::processEvents();
     const QImage img = btn.grab().toImage();
 
@@ -116,16 +112,24 @@ void SARibbonToolButtonColorTest::testStyleSheetColor()
 
 void SARibbonToolButtonColorTest::testHoverStyleSheetColor()
 {
+    if (isHeadlessPlatform()) {
+        QSKIP("hover 伪状态需要真实窗口系统与光标，无头平台无法验证，转为手动验证项");
+    }
+
     QWidget host;
     host.resize(300, 200);
     SARibbonToolButton btn(&host);
+    btn.setFocusPolicy(Qt::NoFocus);
     btn.setText(u8"HoverText");
     btn.setStyleSheet("SARibbonToolButton:hover { color: red; }");
     btn.resize(150, 40);
     btn.move(75, 80);
     host.show();
     QVERIFY(QTest::qWaitForWindowExposed(&host));
-    moveCursorAway(&host);
+    host.activateWindow();
+    // 把真实光标移到 host 之外（避免 hover 状态污染像素断言）
+    QCursor::setPos(host.mapToGlobal(QPoint(5, host.height() - 5)));
+    QTest::qWait(50);
     QVERIFY(!btn.underMouse());
     QApplication::processEvents();
     const QImage noHoverImg = btn.grab().toImage();
@@ -145,9 +149,6 @@ void SARibbonToolButtonColorTest::testHoverStyleSheetColor()
              qPrintable(QString(":hover color:red not applied, red pixels before=%1 after=%2")
                             .arg(redNoHover)
                             .arg(redHover)));
-
-    // 收尾：把光标移开，避免影响后续测试
-    moveCursorAway(&host);
 }
 
 QTEST_MAIN(SARibbonToolButtonColorTest)

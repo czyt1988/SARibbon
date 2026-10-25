@@ -153,6 +153,9 @@ public:
     // 重新布局
     void relayout();
 
+    // 把stacked widget的当前页同步到tabbar的当前索引
+    void syncCurrentCategory();
+
     // 初始化新的父对象
     void initNewParent(QWidget* par);
 };
@@ -418,6 +421,27 @@ void SARibbonBar::PrivateData::relayout()
 #if SARIBBONBAR_DEBUG_PRINT
         qDebug() << "SARibbonBar relayout";
 #endif
+    }
+}
+
+/**
+ * @brief 把stacked widget的当前页同步到tabbar的当前索引
+ *
+ * QTabBar在insertTab/removeTab时会在函数内部同步发出currentChanged信号，
+ * 而insertTab之后才会调用setCategoryToTab写入category指针，
+ * 因此onCurrentRibbonTabChanged在tabbar从空变为非空时无法解析出category，
+ * stacked widget的页面不会被切换（issue #160）。
+ * 建立tab和category的映射后需要调用此函数补一次同步。
+ */
+void SARibbonBar::PrivateData::syncCurrentCategory()
+{
+    const int index = mRibbonTabBar->currentIndex();
+    if (index < 0) {
+        return;
+    }
+    SARibbonCategory* category = categoryFromTab(index);
+    if (category && mStackedContainerWidget->currentWidget() != category) {
+        mStackedContainerWidget->setCurrentWidget(category);
     }
 }
 
@@ -834,6 +858,8 @@ void SARibbonBar::insertCategoryPage(SARibbonCategory* category, int index)
 
     d_ptr->setCategoryToTab(i, category);
     d_ptr->mStackedContainerWidget->insertWidget(index, category);
+    // tabbar为空时insertTab会同步发出currentChanged，此时tabData还未写入，页面需要在此补同步
+    d_ptr->syncCurrentCategory();
     // 更新上下文标签的索引信息
     d_ptr->updateTabData();
     connect(category, &QWidget::windowTitleChanged, this, &SARibbonBar::onCategoryWindowTitleChanged);
@@ -1056,6 +1082,8 @@ void SARibbonBar::setCategoriesVisible(const QList<SARibbonCategory*>& categorie
     }
     // Only update tab data and relayout ONCE at the end
     d_ptr->updateTabData();
+    // tabbar为空时第一个tab的currentChanged先于setCategoryToTab发出，页面需要补同步
+    d_ptr->syncCurrentCategory();
     d_ptr->relayout();
     update();
 }
@@ -1296,6 +1324,8 @@ void SARibbonBar::showContextCategory(SARibbonContextCategory* context)
     }
     d_ptr->mCurrentShowingContextCategory.append(contextCategoryData);
     // 由于上下文都是在最后追加，不需要调用updateTabData();
+    // tabbar为空时第一个tab的currentChanged先于setCategoryToTab发出，页面需要补同步
+    d_ptr->syncCurrentCategory();
 
     d_ptr->relayout();
 
@@ -2456,6 +2486,8 @@ void SARibbonBar::setCurrentIndex(int index)
 {
     d_ptr->mRibbonTabBar->setCurrentIndex(index);
     // onCurrentRibbonTabChanged(index);
+    // index本来就是当前索引时不会发出currentChanged，这里补一次页面同步
+    d_ptr->syncCurrentCategory();
 }
 
 /**
@@ -2490,6 +2522,8 @@ void SARibbonBar::raiseCategory(SARibbonCategory* category)
     int idx = d_ptr->tabIndexForCategory(category);
     if (idx >= 0) {
         d_ptr->mRibbonTabBar->setCurrentIndex(idx);
+        // idx本来就是当前索引时setCurrentIndex不会发出currentChanged，这里补一次页面同步
+        d_ptr->syncCurrentCategory();
     }
 }
 
