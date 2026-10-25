@@ -2,6 +2,7 @@
 #include <QApplication>
 #include "SARibbonBar.h"
 #include "SARibbonCategory.h"
+#include "SARibbonStackedWidget.h"
 #include "SARibbonTabBar.h"
 
 class SARibbonCategoryVisibilityTest : public QObject
@@ -13,6 +14,8 @@ private slots:
     void testMultipleCategoryHideShow();
     void testBatchSetCategoriesVisible();
     void testTabBarPresenceAfterVisibilityChange();
+    void testAddCategoryAfterHidingCurrent();
+    void testShowCategoryAfterHidingAll();
 };
 
 void SARibbonCategoryVisibilityTest::testSingleCategoryHideShow()
@@ -202,6 +205,70 @@ void SARibbonCategoryVisibilityTest::testTabBarPresenceAfterVisibilityChange()
     ribbonBar.setCategoriesVisible(allCats, true);
     QApplication::processEvents();
     QCOMPARE(tabBar->count(), 3);
+}
+
+/*
+ * Issue #160: 添加新 category 前，前面的 category 都被 hideCategory 隐藏，
+ * 此时 stacked widget 必须切换到新添加的 category 页面
+ */
+void SARibbonCategoryVisibilityTest::testAddCategoryAfterHidingCurrent()
+{
+    SARibbonBar ribbonBar;
+    ribbonBar.resize(800, 200);
+    ribbonBar.show();
+    QApplication::processEvents();
+
+    const QStringList names = {"Main", "Other", "Delete", "Size", "Color"};
+    QList<SARibbonCategory*> pages;
+    for (const QString& name : names) {
+        SARibbonCategory* c = ribbonBar.addCategoryPage(name);
+        QVERIFY(c);
+        pages.append(c);
+        if (name != names.last()) {
+            ribbonBar.hideCategory(c);
+            QApplication::processEvents();
+        }
+    }
+    QApplication::processEvents();
+
+    QCOMPARE(ribbonBar.ribbonTabBar()->count(), 1);
+    QCOMPARE(ribbonBar.ribbonTabBar()->currentIndex(), 0);
+    QCOMPARE(ribbonBar.ribbonStackedWidget()->currentWidget(), pages.last());
+}
+
+/*
+ * 所有 category 隐藏后（tabbar 为空），重新显示一个 category，
+ * stacked widget 必须切换到该 category 页面
+ */
+void SARibbonCategoryVisibilityTest::testShowCategoryAfterHidingAll()
+{
+    SARibbonBar ribbonBar;
+    ribbonBar.resize(800, 200);
+    SARibbonCategory* cat1 = ribbonBar.addCategoryPage("Category 1");
+    SARibbonCategory* cat2 = ribbonBar.addCategoryPage("Category 2");
+    SARibbonCategory* cat3 = ribbonBar.addCategoryPage("Category 3");
+    ribbonBar.show();
+    QApplication::processEvents();
+
+    ribbonBar.setCategoriesVisible(ribbonBar.categoryPages(), false);
+    QApplication::processEvents();
+    QCOMPARE(ribbonBar.ribbonTabBar()->count(), 0);
+
+    // showCategory 显示单个分类
+    ribbonBar.showCategory(cat3);
+    QApplication::processEvents();
+    QCOMPARE(ribbonBar.ribbonTabBar()->count(), 1);
+    QCOMPARE(ribbonBar.ribbonStackedWidget()->currentWidget(), cat3);
+
+    // 再次全部隐藏，用 setCategoriesVisible 批量显示
+    ribbonBar.setCategoriesVisible(ribbonBar.categoryPages(), false);
+    QApplication::processEvents();
+    QCOMPARE(ribbonBar.ribbonTabBar()->count(), 0);
+
+    ribbonBar.setCategoriesVisible({cat1, cat2}, true);
+    QApplication::processEvents();
+    QCOMPARE(ribbonBar.ribbonTabBar()->count(), 2);
+    QCOMPARE(ribbonBar.ribbonStackedWidget()->currentWidget(), cat1);
 }
 
 QTEST_MAIN(SARibbonCategoryVisibilityTest)
