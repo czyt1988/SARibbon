@@ -414,6 +414,7 @@ SARibbonCategoryScrollButton:hover {
 SARibbonSystemToolButton {
   background-color: transparent;
   border:none;
+  qproperty-glyphColor: {{titlebar-icon}};
 }
 
 SARibbonSystemToolButton:focus {
@@ -423,7 +424,6 @@ SARibbonSystemToolButton:focus {
 /* 深色模式的系统按钮设置 */
 /*Min*/
 SARibbonSystemToolButton#SAMinimizeWindowButton {
-  image: url(:/SARibbon/image/resource/Titlebar_Min_Hover.svg);
   padding: 4px;
 }
 SARibbonSystemToolButton#SAMinimizeWindowButton:hover{
@@ -434,7 +434,6 @@ SARibbonSystemToolButton#SAMinimizeWindowButton:pressed{
 }
 /*Max*/
 SARibbonSystemToolButton#SAMaximizeWindowButton {
-    image: url(:/SARibbon/image/resource/Titlebar_Max_Hover.svg);
     padding: 4px;
 }
 SARibbonSystemToolButton#SAMaximizeWindowButton:hover {
@@ -443,14 +442,10 @@ SARibbonSystemToolButton#SAMaximizeWindowButton:hover {
 SARibbonSystemToolButton#SAMaximizeWindowButton:pressed {
     background-color: {{accent-pressed}};
 }
-SARibbonSystemToolButton#SAMaximizeWindowButton:checked {
-    image: url(:/SARibbon/image/resource/Titlebar_Normal_Hover.svg);
-}
 
 
 /*Close*/
 SARibbonSystemToolButton#SACloseWindowButton {
-    image: url(:/SARibbon/image/resource/Titlebar_Close_Hover.svg);
     padding: 4px;
 }
 SARibbonSystemToolButton#SACloseWindowButton:hover {

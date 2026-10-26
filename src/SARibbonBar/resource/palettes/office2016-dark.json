@@ -24,7 +24,8 @@
     "close-bg":           "#e81123",
     "close-bg-pressed":   "#f1707a",
     "sys-button-hover":   "#404040",
-    "sys-button-pressed": "#505050"
+    "sys-button-pressed": "#505050",
+    "titlebar-icon":      "#ffffff"
   },
 
   "derived": {},
@@ -44,6 +45,7 @@
     "content-bg":      "Category/Panel background",
     "content-hover-bg":"Slightly lighter for hover",
     "content-pressed-bg":"Pressed state",
-    "text-color":      "#e0e0e0 light text on dark background"
+    "text-color":      "#e0e0e0 light text on dark background",
+    "titlebar-icon":   "Window system button glyph color (minimize/maximize/close), white on dark titlebar, black on light titlebar"
   }
 }
