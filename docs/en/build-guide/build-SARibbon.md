@@ -18,7 +18,9 @@ The `SARibbon` library provides two build methods: `CMake` and `QMake`, with `CM
 |-------------|---------------|-------------|-------|
 | `SARIBBON_BUILD_STATIC_LIBS` | `OFF` | Controls SARibbon build mode: `ON` for static, `OFF` for dynamic | Static mode forces `BUILD_SHARED_LIBS=OFF`, dynamic mode forces `BUILD_SHARED_LIBS=ON` |
 | `SARIBBON_BUILD_EXAMPLES` | `ON` | Controls whether to build example programs under `example/` (e.g. `MainWindowExample`) | Disable to speed up compilation, builds only the library itself |
-| `SARIBBON_USE_FRAMELESS_LIB` | `OFF` | Whether to use `QWindowKit` as borderless window solution | Requires Qt 5.14+, Qt 6.2+; forces C++17 standard, depends on `QWindowKit` library |
+| `SARIBBON_USE_FRAMELESS_LIB` | `OFF` | Whether to use `QWindowKit` as borderless window solution | Requires Qt 5.14+, Qt 6.2+; forces C++17 standard. The bundled QWindowKit source is built automatically by default (requires CMake 3.19+); use `QWindowKit_DIR` to point at a prebuilt package |
+| `SARIBBON_QWK_AUTO_INIT_SUBMODULE` | `ON` | Whether to run `git submodule update --init --recursive` automatically when the QWindowKit source is missing | Source ZIP downloads have no git metadata and must provide the source or use `QWindowKit_DIR` |
+| `SARIBBON_QWK_SOURCE_DIR` | `src/SARibbonBar/3rdparty/qwindowkit` | QWindowKit source tree used when no installed package is found | May point to any QWindowKit source tree; leave empty to only search installed packages |
 | `SARIBBON_ENABLE_SNAPLAYOUT` | `OFF` | Whether to enable Windows 11 Snap Layout effect | Only effective when `SARIBBON_USE_FRAMELESS_LIB=ON`, compatibility issues possible with different Qt versions |
 | `SARIBBON_INSTALL_IN_CURRENT_DIR` | `ON` on Windows, `OFF` on other systems | Controls install path: `ON` installs to version-distinguished folder under project root, `OFF` uses system default | Local install folder naming: `bin_qt<Qt version>_<compiler>_x<architecture>` (e.g. `bin_qt5.14.2_msvc_x64`) |
 | `BUILD_TESTS` | `OFF` | Controls whether to build unit tests (Qt Test framework tests under `tests/`) | Requires `BUILD_TESTS=ON` and test dependencies available |
@@ -36,7 +38,7 @@ The `SARibbon` library provides two build methods: `CMake` and `QMake`, with `CM
 
 !!! tip "Note"
     Third-party dependencies:
-    If `SARIBBON_USE_FRAMELESS_LIB` is enabled, ensure QWindowKit is properly compiled and discoverable by CMake (use `-DQWindowKit_DIR` to specify its path).
+    Enabling `SARIBBON_USE_FRAMELESS_LIB` does not require a manual QWindowKit build: the top-level project compiles the bundled source. If QWindowKit is already installed and should take priority, point `-DQWindowKit_DIR=<prefix>/lib/cmake/QWindowKit` at it.
 
 ### Building under Visual Studio
 
@@ -68,7 +70,7 @@ Click File -> Open File or Project, select CMakeLists.txt, and after loading, th
 
 ![build-cmake-qtc](../../assets/pic/build-cmake-qtc-01.png)
 
-Qt Creator allows modifying the value of `SARIBBON_USE_FRAMELESS_LIB` in the interface, or you can modify it manually. In Qt Creator, click the left sidebar to switch to Project mode (Ctrl+5), and set `SARIBBON_USE_FRAMELESS_LIB` to ON in Current Configuration to enable `QWindowKit`, provided that `QWindowKit` has been compiled first.
+Qt Creator allows modifying the value of `SARIBBON_USE_FRAMELESS_LIB` in the interface, or you can modify it manually. In Qt Creator, click the left sidebar to switch to Project mode (Ctrl+5), and set `SARIBBON_USE_FRAMELESS_LIB` to ON in Current Configuration to enable `QWindowKit`; it is built together with the main project, no separate installation is needed.
 
 Click the run button.
 

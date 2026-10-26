@@ -150,7 +150,7 @@ When a window crosses a DPI boundary, Qt recalculates the logical size based on 
     ```
 
     !!! note
-        Enabling QWindowKit requires C++17 and the [QWindowKit](https://github.com/stdware/qwindowkit) library to be installed. For configuration details, see the [Build Guide](./build-guide/build-SARibbon.md).
+        Enabling QWindowKit requires C++17. The [QWindowKit](https://github.com/stdware/qwindowkit) source is bundled in the repository and is built automatically, so no separate installation is needed. For configuration details, see the [Build Guide](./build-guide/build-SARibbon.md).
 
 2. **Use Qt6 with the latest SARibbon**
 

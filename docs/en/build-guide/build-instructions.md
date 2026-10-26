@@ -15,24 +15,23 @@ If you are not familiar with building, we recommend the static approach: simply 
 | Document | Content |
 |----------|---------|
 | [Building SARibbon Library](./build-SARibbon.md) | CMake build options and detailed steps |
-| [Third-Party Library Build](./build-3rdparty.md) | How to compile QWindowKit |
+| [Third-Party Library Build](./build-3rdparty.md) | Optional: build, upgrade or debug QWindowKit separately |
 | [Common Build Errors](./common-build-errors.md) | Troubleshooting compilation issues |
 | [Internationalization](./i18n.md) | Translation file generation and new languages |
 
 ## Build Workflow Overview
 
-SARibbon building is divided into two parts: third-party dependencies (optional) and SARibbon itself. The following flowchart shows the overall build route:
+SARibbon builds from a single project: with `SARIBBON_USE_FRAMELESS_LIB` enabled, the top-level CMake automatically builds the bundled QWindowKit, so there is no separate third-party build step.
 
 ```mermaid
 flowchart TD
     A[Start Build] --> B{Need native window features?}
-    B -->|Yes| C[Build QWindowKit third-party library]
-    B -->|No| D[Skip third-party library]
+    B -->|Yes| C[Set SARIBBON_USE_FRAMELESS_LIB=ON<br/>top-level build compiles QWindowKit]
+    B -->|No| D[Skip QWindowKit]
     C --> E[Build SARibbon library]
     D --> E
-    E --> F[CMake Build]
-    F --> G[Install to local directory]
-    G --> H[Reference library in project]
+    E --> F[Install to local directory]
+    F --> G[Reference library in project]
 ```
 
 !!! warning "Note"
@@ -46,13 +45,25 @@ After enabling QWindowKit, you will be able to achieve effects like:
 
 ![set-qwindowkit-on-snap](../../assets/pic/set-qwindowkit-on-snap.gif)
 
-To enable [QWindowKit](https://github.com/stdware/qwindowkit), you need to compile the library first. For detailed steps, see [Third-Party Library Build](./build-3rdparty.md).
+To enable [QWindowKit](https://github.com/stdware/qwindowkit), just turn on `SARIBBON_USE_FRAMELESS_LIB` in the top-level CMake:
 
-!!! warning "Note"
-    As a submodule of the SARibbon project, if you did not use the `--recursive` flag during `git clone`, run:
-    ```shell
-    git submodule update --init --recursive
-    ```
+```shell
+cmake -S . -B build -DSARIBBON_USE_FRAMELESS_LIB=ON
+```
+
+QWindowKit is resolved in this order:
+
+1. A package specified by `-DQWindowKit_DIR`, or provided by vcpkg;
+2. The bundled source at `src/SARibbonBar/3rdparty/qwindowkit`, built directly as a subdirectory (recommended, no extra steps);
+3. A package previously installed under `bin_qt.../lib/cmake/QWindowKit`;
+4. The system installation path.
+
+Building from source requires CMake 3.19 or newer. The first configure also builds QWindowKit's qmsetup helper, so it takes a little longer; later configures reuse the cache.
+
+!!! note
+    If the repository was cloned without `--recursive` (or nested submodules are incomplete), CMake runs `git submodule update --init --recursive` automatically at configure time (disable with `-DSARIBBON_QWK_AUTO_INIT_SUBMODULE=OFF`). Users who downloaded a source ZIP have no git metadata and must either place the QWindowKit source at `src/SARibbonBar/3rdparty/qwindowkit` manually or point `-DQWindowKit_DIR` at a prebuilt package.
+
+To build, upgrade or debug QWindowKit separately, see [Third-Party Library Build](./build-3rdparty.md).
 
 ## Building the SARibbon Library
 

@@ -10,24 +10,23 @@
 | 文档 | 内容 |
 |------|------|
 | [SARibbon库构建](./build-SARibbon.md) | CMake构建选项和详细步骤 |
-| [第三方库编译](./build-3rdparty.md) | QWindowKit库的编译方法 |
+| [第三方库编译](./build-3rdparty.md) | 可选：单独编译、升级或调试 QWindowKit |
 | [构建常见错误](./common-build-errors.md) | 编译问题排查与解决 |
 | [多语言翻译](./i18n.md) | 翻译文件生成与新增语言 |
 
 ## 构建流程总览
 
-SARibbon 的构建分为两个部分：第三方依赖库（可选）和 SARibbon 本身。下面的流程图展示了构建的整体路线：
+SARibbon 只需要构建一个工程：开启 `SARIBBON_USE_FRAMELESS_LIB` 后，顶层 CMake 会自动编译仓库内的 QWindowKit，不再需要先单独构建第三方库。
 
 ```mermaid
 flowchart TD
     A[开始构建] --> B{是否需要原生窗口特性?}
-    B -->|是| C[构建 QWindowKit 第三方库]
-    B -->|否| D[跳过第三方库]
+    B -->|是| C[设置 SARIBBON_USE_FRAMELESS_LIB=ON<br/>顶层工程自动编译 QWindowKit]
+    B -->|否| D[跳过 QWindowKit]
     C --> E[构建 SARibbon 库]
     D --> E
-    E --> F[CMake 构建]
-    F --> G[安装到本地目录]
-    G --> H[在项目中引用库]
+    E --> F[安装到本地目录]
+    F --> G[在项目中引用库]
 ```
 
 !!! warning "注意"
@@ -41,13 +40,25 @@ SARibbon 采用 [QWindowKit](https://github.com/stdware/qwindowkit) 作为无边
 
 ![set-qwindowkit-on-snap](../../assets/pic/set-qwindowkit-on-snap.gif)
 
-若要启用 [QWindowKit](https://github.com/stdware/qwindowkit)，需先编译该库。详细步骤请参阅 [第三方库构建](./build-3rdparty.md)。
+若要启用 [QWindowKit](https://github.com/stdware/qwindowkit)，只需在顶层 CMake 中打开 `SARIBBON_USE_FRAMELESS_LIB`：
 
-!!! warning "注意"
-    作为SARibbon项目的子模块，如果你在`git clone`时没有使用`--recursive`参数，需执行`submodule update`命令：
-    ```shell
-    git submodule update --init --recursive
-    ```
+```shell
+cmake -S . -B build -DSARIBBON_USE_FRAMELESS_LIB=ON
+```
+
+配置时会按以下顺序查找 QWindowKit：
+
+1. 用户通过 `-DQWindowKit_DIR` 指定的安装包，或 vcpkg 提供的包；
+2. 仓库内的源码 `src/SARibbonBar/3rdparty/qwindowkit`，直接作为子目录编译（推荐，无需额外步骤）；
+3. 之前安装到 `bin_qt.../lib/cmake/QWindowKit` 的包；
+4. 系统安装路径。
+
+用源码构建要求 CMake 3.19 及以上。首次配置会自动编译 QWindowKit 依赖的 qmsetup，耗时略长，之后会使用缓存。
+
+!!! note "说明"
+    如果克隆时没有使用 `--recursive`（或嵌套依赖不完整），CMake 会在配置时自动执行 `git submodule update --init --recursive`（可用 `-DSARIBBON_QWK_AUTO_INIT_SUBMODULE=OFF` 关闭）。下载源码 ZIP 的用户没有 git 仓库，需要手动把 QWindowKit 源码放到 `src/SARibbonBar/3rdparty/qwindowkit`，或通过 `-DQWindowKit_DIR` 指定已安装的包。
+
+如果需要单独编译、升级或调试 QWindowKit，仍可参考 [第三方库构建](./build-3rdparty.md)。
 
 ## 构建 SARibbon 库
 

@@ -15,7 +15,7 @@
 | `CMake 3.5 or higher is required` | CMake 版本过低 | 升级 CMake 至 3.5+ |
 | `Could not find a package configuration file provided by Qt6/Qt5` | `CMAKE_PREFIX_PATH` 未设置 | 指定 Qt 安装路径下的 cmake 目录 |
 | `error C2039: 'xxx' is not a member of 'std'` | 编译器未启用 C++17 | 升级编译器或手动设置 C++ 标准 |
-| `Could not find QWindowKit` | 未编译或安装 QWindowKit | 先编译 QWindowKit 或指定路径 |
+| `Could not find QWindowKit` | QWindowKit 源码缺失或安装包路径不对 | 初始化子模块/放置源码，或指定 `QWindowKit_DIR` |
 | `undefined reference to _imp__xxx` | 静态/动态库链接不匹配 | 添加 `SA_RIBBON_BAR_NO_EXPORT` 宏定义 |
 | `error D8050: 无法执行 c1xx.dll` | 构建路径含中文或超过260字符限制 | 设置英文构建路径，启用Win32长路径 |
 | MOC相关编译错误 | 首次构建批量MOC操作异常 | 保留build目录，重新构建1-2次 |
@@ -32,7 +32,7 @@ flowchart TD
     C -->|否| E{错误信息包含<br/>Could not find Qt?}
     E -->|是| F[检查 CMAKE_PREFIX_PATH<br/>指向 Qt cmake 目录]
     E -->|否| G{错误信息包含<br/>QWindowKit?}
-    G -->|是| H[按 build-3rdparty.md<br/>编译 QWindowKit]
+    G -->|是| H[初始化子模块或放置<br/>QWindowKit 源码]
     G -->|否| I[查看完整 CMake 输出日志]
     B -->|否| J{编译阶段?}
     J -->|是| K{C++ 标准相关错误?}
@@ -171,15 +171,20 @@ cmake -S . -B build -DCMAKE_CXX_STANDARD=17
 >   QWindowKitConfig.cmake
 >   qwindowkit-config.cmake
 
-当构建时启用了 `SARIBBON_USE_FRAMELESS_LIB=ON`，CMake 需要找到 QWindowKit 库。如果该库未编译安装，或安装路径不在 CMake 搜索范围内，就会报此错误。
+当构建时启用了 `SARIBBON_USE_FRAMELESS_LIB=ON`，CMake 会按以下顺序获取 QWindowKit：
 
-**QWindowKit 的查找路径有三种：**
+1. **仓库内源码（默认，推荐）** — 直接把 `src/SARibbonBar/3rdparty/qwindowkit` 作为子目录编译，无需单独安装。源码缺失时 CMake 会自动执行 `git submodule update --init --recursive`；下载源码 ZIP 的用户需要手动放置源码。
+2. **`-DQWindowKit_DIR` 指定的安装包** — 已有安装好的 QWindowKit 时优先使用。
+3. **本地安装目录 / 系统安装路径** — 之前编译并安装过的 QWindowKit。
 
-1. **SARibbon 自动安装目录** — 按 [第三方库编译](./build-3rdparty.md) 文档编译后，QWindowKit 会自动安装到 SARibbon 根目录下的 `bin_qt{版本}_{编译器}_x{架构}/` 目录，CMake 能自动找到。
+只有在上述来源都不可用时才会报此错误。常见原因：
 
-2. **系统全局安装路径** — 如果 QWindowKit 安装到了 `/usr/local` 或 `C:\Program Files` 等系统路径，CMake 默认搜索即可。
+- 子模块未初始化或嵌套依赖不完整，且自动初始化失败（网络或代理问题）→ 手动执行 `git submodule update --init --recursive`；
+- QWindowKit 源码目录被移动 → 用 `-DSARIBBON_QWK_SOURCE_DIR=...` 指定；
+- CMake 低于 3.19 且没有已安装的包 → 升级 CMake；
+- `QWindowKit_DIR` 指向了错误的目录。
 
-3. **手动指定路径** — 通过 CMake 变量显式指定：
+如需手动指定已安装的包：
 
 ```shell
 # 指向 QWindowKitConfig.cmake 所在目录
