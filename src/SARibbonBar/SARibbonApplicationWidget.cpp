@@ -210,13 +210,14 @@ void SARibbonApplicationWidget::PrivateData::syncMaskGeometry()
  * \if ENGLISH
  * @brief Constructor for SARibbonApplicationWidget
  * @param parent The parent SARibbonMainWindow
- * @details Creates a frameless widget that follows the parent window's size
+ * @details Creates a frameless widget that follows the parent window's size. The widget starts hidden;
+ * call show() to display it
  * \endif
  *
  * \if CHINESE
  * @brief SARibbonApplicationWidget 构造函数
  * @param parent 父窗口 SARibbonMainWindow
- * @details 创建一个无框窗口，跟随父窗口大小变化
+ * @details 创建一个无框窗口，跟随父窗口大小变化；窗口创建后保持隐藏，需要调用 show() 显示
  * \endif
  */
 SARibbonApplicationWidget::SARibbonApplicationWidget(SARibbonMainWindow* parent) : QFrame(parent), SA_RIBBON_IMPL_CONSTRUCT
@@ -228,6 +229,9 @@ SARibbonApplicationWidget::SARibbonApplicationWidget(SARibbonMainWindow* parent)
     } else {
         setGeometry(0, 0, 300, 300);
     }
+    // 创建即隐藏：主窗口此时通常还未显示，未显式隐藏的子控件会在主窗口显示时被一并显示，
+    // 导致程序启动就弹出应用面板（且尺寸停留在显示前的旧 Geometry）
+    hide();
 }
 
 SARibbonApplicationWidget::~SARibbonApplicationWidget()
@@ -472,9 +476,13 @@ bool SARibbonApplicationWidget::eventFilter(QObject* obj, QEvent* ev)
 {
     if (obj && ev && (obj == parent())) {
         switch (ev->type()) {
-        case QEvent::Resize: {
-            // 跟随父窗口的尺寸变化
-            resizeToParent(static_cast< QResizeEvent* >(ev)->size());
+        case QEvent::Resize:
+        case QEvent::WindowStateChange: {
+            // 跟随父窗口的尺寸变化：读取父窗口当前尺寸而非事件携带的尺寸，
+            // 避免最大化/还原过程中事件尺寸与父窗口实际尺寸不一致
+            if (QWidget* par = parentWidget()) {
+                resizeToParent(par->size());
+            }
             break;
         }
         default:

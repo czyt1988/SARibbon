@@ -404,8 +404,8 @@ void SARibbonMainWindow::setRibbonBar(SARibbonBar* ribbon)
  * \if CHINESE
  * @brief 设置应用按钮点击时切换显示/隐藏的应用窗口
  * @param w 应用窗口，通常是 SARibbonApplicationWidget 的派生类
- * @details 设置后点击应用按钮将交替显示/隐藏该窗口；若窗口父对象不是本主窗口会自动重新设置父对象。
- * 传入 nullptr 可解除应用按钮的绑定。
+ * @details 设置后点击应用按钮将交替显示/隐藏该窗口；若窗口父对象不是本主窗口会自动重新设置父对象；
+ * 绑定后窗口保持隐藏，程序启动时不会自动弹出。传入 nullptr 可解除应用按钮的绑定。
  * @note 此能力与应用按钮的弹出菜单（SARibbonApplicationButton::setMenu）互斥，绑定应用窗口时应用按钮不应再挂菜单
  * \endif
  */
@@ -426,6 +426,9 @@ void SARibbonMainWindow::setApplicationWidget(SARibbonApplicationWidget* w)
     if (w->parentWidget() != this) {
         w->setParent(this);
     }
+    // 绑定后保持隐藏：父窗口未显示时创建的子控件会在父窗口显示时被自动显示，
+    // 不隐藏会导致程序启动即弹出应用面板（只在点击应用按钮时显示）
+    w->hide();
     SARibbonBar* bar       = ribbonBar();
     QAbstractButton* btn   = (nullptr == bar) ? nullptr : bar->applicationButton();
     if (nullptr == btn) {
