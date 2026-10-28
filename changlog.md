@@ -8,6 +8,7 @@
   - `setAnimationEnabled` / `setAnimationDuration`：显示时应用窗口从左侧滑入、遮罩同步淡入（默认开启，250 毫秒，OutCubic 缓动），关闭时立即隐藏；
   - `SARibbonMainWindow::setApplicationWidget`：把应用窗口绑定到应用按钮，点击按钮自动切换显示/隐藏（此前需要用户手写 connect；应用按钮绑定应用窗口后不应再挂弹出菜单）；
   - 合并版（SARibbon.h / SARibbon.cpp）已用 amalgamate 工具同步重新生成。
+- 修复：`SARibbonApplicationWidget` 在程序启动时自动弹出的问题——父窗口未显示时创建的子控件会在父窗口显示时被一并显示，且尺寸停留在显示前的旧几何（不再是 `setWidthRatio` 设定的 2/3 宽度、全高）。现在构造与 `SARibbonMainWindow::setApplicationWidget` 绑定后都保持隐藏，仅在点击应用按钮时显示；事件过滤器改为读取父窗口当前尺寸并响应 `WindowStateChange`，最大化/还原时面板尺寸不再滞后。
 
 ## 2026-09-16 -> 2.9.5
 
