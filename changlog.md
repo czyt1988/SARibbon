@@ -13,6 +13,7 @@
 - 构建：适配 macOS 26 SDK 移除 `AGL.framework`。Qt 6.8 及更早版本的 `FindWrapOpenGL.cmake` 仍会链接 AGL，导致 `ld: framework 'AGL' not found`；CMake 现在会在 SDK 缺少 AGL 时把 Qt 的 `WrapOpenGL_AGL` 指向 SDK 内已有的 `OpenGL.framework`（Qt 6.9 起不再依赖 AGL，此处理自动失效）。
 - 测试：`SARibbonToolButtonColorTest` 的颜色断言改为纯离屏 `grab()` 渲染，不再创建/显示窗口、不参与焦点链；`:hover` 断言在无头平台（offscreen/minimal）跳过。此前在 Qt5 的 GitHub Actions 无头环境下，带 QSS 的按钮在窗口析构清理焦点时会崩溃（signal 11）。
 - 构建：开启 `SARIBBON_USE_FRAMELESS_LIB` 后不再需要先单独编译安装 QWindowKit。顶层 CMake 会优先使用 `QWindowKit_DIR`/vcpkg 提供的包，否则直接把 `src/SARibbonBar/3rdparty/qwindowkit` 作为子目录编译；子模块未初始化时自动执行 `git submodule update --init --recursive`（可用 `SARIBBON_QWK_AUTO_INIT_SUBMODULE=OFF` 关闭）。QWindowKit 的输出目录与 SARibbon 统一，`cmake --install` 的安装布局与原来的两步法一致。
+- 修复：`SARibbonApplicationWidget` 在程序启动时自动弹出的问题——父窗口未显示时创建的子控件会在父窗口显示时被一并显示，且尺寸停留在显示前的旧几何（不再是 `setWidthRatio` 设定的 2/3 宽度、全高）。现在构造与 `SARibbonMainWindow::setApplicationWidget` 绑定后都保持隐藏，仅在点击应用按钮时显示；事件过滤器改为读取父窗口当前尺寸并响应 `WindowStateChange`，最大化/还原时面板尺寸不再滞后。
 
 ## 2026-09-16 -> 2.9.5
 
