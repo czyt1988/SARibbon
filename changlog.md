@@ -8,12 +8,24 @@
   - `setAnimationEnabled` / `setAnimationDuration`：显示时应用窗口从左侧滑入、遮罩同步淡入（默认开启，250 毫秒，OutCubic 缓动），关闭时立即隐藏；
   - `SARibbonMainWindow::setApplicationWidget`：把应用窗口绑定到应用按钮，点击按钮自动切换显示/隐藏（此前需要用户手写 connect；应用按钮绑定应用窗口后不应再挂弹出菜单）；
   - 合并版（SARibbon.h / SARibbon.cpp）已用 amalgamate 工具同步重新生成。
+- 新增：系统窗口按钮（最小化/最大化/关闭）图元改为 `SARibbonSystemToolButton::paintEvent` 中代码绘制，线宽 1 逻辑像素，任意 DPI 下保持清晰；按钮几何参照 Windows 11 原生标题栏按钮比例（约按钮尺寸的 36%），最大化按钮的 checked 状态绘制还原双框，关闭按钮悬停/按下时红底白字。新增 `glyphColor` 属性（QSS 中为 `qproperty-glyphColor`），颜色无效时按所属主窗口的 ribbon 主题自动推导；6 个主题模板移除 `Titlebar_*.svg` 的 image 规则，10 个调色板新增 `titlebar-icon` token，修复 Office 2021 Dark 等暗色主题下黑色图标贴黑底不可见的问题。
+- 新增：补齐 49 条中英文翻译（覆盖功能区自定义与窗口按钮）。
+- 修复 #160：隐藏全部分类后新增/显示分类时页面不同步。`QTabBar` 在标签栏从空变为非空时会在 `insertTab()` 内部同步发出 `currentChanged`，而分类指针在 `insertTab()` 之后才写入 `tabData`，导致 `onCurrentRibbonTabChanged` 解析不到分类并提前返回，stacked widget 停留在旧页面；此后 `currentIndex` 已等于目标索引，`setCurrentIndex` 不再发信号，状态无法自行恢复。新增 `PrivateData::syncCurrentCategory()`，在 `insertCategoryPage`、`setCategoriesVisible`、`showContextCategory`、`setCurrentIndex` 和 `raiseCategory` 中补齐页面同步，并补充两个回归测试覆盖隐藏后新增/显示分类的场景。
+- 修复：`SARibbonColorToolButton` 色块显示异常：
+  - 高 DPI（dpr ≥ 1.5）下色块消失、图标被撑大压住色块：QPainter 在已设置 devicePixelRatio 的 QPixmap 上绘制时会自动按 dpr 缩放，而色块合成按设备像素计算坐标，形成二次放大。现在全程使用逻辑像素计算，并移除 `createColorIcon` 中多余的 `painter.scale`；布局改为图标等比缩放后底部对齐，色块紧随其下、与图标下边缘保持 1 像素间隔，色块宽度与图标同宽；
+  - 3 行模式下色块被裁剪：色块原先被合成为比图标槽更大的 pixmap，而 `drawItemPixmap` 不缩放，按钮变矮后超出部分（即底部色块）被裁掉。改为严格合成到图标槽尺寸；
+  - 大按钮模式下色块固定 5px、比例过小不明显：色块高度改为随图标等比缩放（最小 3px、不超过图标一半）；
+  - 合成 pixmap 与颜色图标均设置 devicePixelRatio，色块缓存 key 加入 dpr，跨不同 DPI 屏幕时正确失效。
 - 修复：225% 等非整数屏幕上大按钮文字不换行、按钮被拉宽后溢出可见区，面板标题被挤出。根因是字体/DPI 变化后 panel 控件可能保留旧字号对应的高度，而 panel 布局已经按更小的可见矩形排布，大按钮的换行阈值读取控件高度时按偏大的旧高度判定“单行放得下”。现在换行判断改用「控件高度与布局实际高度的较小值」，字体变化时强制 ribbon/category 重新布局，绘制矩形也会在字体/DPI 变化后的首次绘制前重算；已由 `SARibbonLargeButtonAspectRatioTest::testWrapUsesLayoutHeightWhenWidgetIsTaller` 固化。
 - 修复：部分字体（Windows 下的回退字体等）两行文字的 boundingRect 高度接近 2×lineSpacing，而大按钮换行判定的两行预算只按「单行高度×2+2」计算，导致二分查找永远判定“超过两行”、宽度退化为单行全宽，`buttonMaximumAspectRatio` 上限静默失效。现在两行预算取「单行高度×2」与「lineSpacing×2」的较大值。
+- 修复：`QEvent::DevicePixelRatioChange` 自 Qt 6.6 才引入，原判断写成 6.2，导致 Qt 6.2–6.5 编译失败（#158，感谢 @CokeStudios）。
 - 构建：适配 macOS 26 SDK 移除 `AGL.framework`。Qt 6.8 及更早版本的 `FindWrapOpenGL.cmake` 仍会链接 AGL，导致 `ld: framework 'AGL' not found`；CMake 现在会在 SDK 缺少 AGL 时把 Qt 的 `WrapOpenGL_AGL` 指向 SDK 内已有的 `OpenGL.framework`（Qt 6.9 起不再依赖 AGL，此处理自动失效）。
 - 测试：`SARibbonToolButtonColorTest` 的颜色断言改为纯离屏 `grab()` 渲染，不再创建/显示窗口、不参与焦点链；`:hover` 断言在无头平台（offscreen/minimal）跳过。此前在 Qt5 的 GitHub Actions 无头环境下，带 QSS 的按钮在窗口析构清理焦点时会崩溃（signal 11）。
-- 构建：开启 `SARIBBON_USE_FRAMELESS_LIB` 后不再需要先单独编译安装 QWindowKit。顶层 CMake 会优先使用 `QWindowKit_DIR`/vcpkg 提供的包，否则直接把 `src/SARibbonBar/3rdparty/qwindowkit` 作为子目录编译；子模块未初始化时自动执行 `git submodule update --init --recursive`（可用 `SARIBBON_QWK_AUTO_INIT_SUBMODULE=OFF` 关闭）。QWindowKit 的输出目录与 SARibbon 统一，`cmake --install` 的安装布局与原来的两步法一致。
+- 构建：开启 `SARIBBON_USE_FRAMELESS_LIB` 后不再需要先单独编译安装 QWindowKit。顶层 CMake 会优先使用 `QWindowKit_DIR`/vcpkg 提供的包，否则直接把 `src/SARibbonBar/3rdparty/qwindowkit` 作为子目录编译；子模块未初始化时自动执行 `git submodule update --init --recursive`（可用 `SARIBBON_QWK_AUTO_INIT_SUBMODULE=OFF` 关闭）。QWindowKit 的输出目录与 SARibbon 统一，`cmake --install` 的安装布局与原来的两步法一致；内置 QWindowKit 更新到上游最新版本（1.5.0 发布前的提交）。
 - 构建：示例和测试编译完成后会自动把 QWindowKit 的运行时库复制到自身输出目录（Windows），修复使用已安装的 QWindowKit 包时从 Qt Creator 直接运行示例弹出「缺少 QWKWidgets.dll」的问题：Windows 没有 RPATH，DLL 留在安装目录时进程找不到。逻辑封装在 `cmake/SARibbonQwkDeploy.cmake` 的 `saribbon_deploy_qwindowkit_runtime()`，源码构建与安装包两种来源行为一致；静态链接 QWindowKit 时不产生多余命令。
+- 构建：没有 Qt 3D 模块的 Qt 也能配置编译，Qt 3D 示例只在模块可用时构建。
+- 构建：MSVC 统一使用 `/utf-8` 解析源码，避免英文代码页的 CI 机器上中文字面量触发 C2001/C1057。
+- CI：新增 Dependabot 依赖自动升级配置（GitHub Actions 与文档依赖）；升级全部 GitHub Actions；mkdocs-material 升级到 9.8.0 修复 CVE-2026-73295，并固定 mkdocs-with-pdf 与 pymdown-extensions 版本；文档站在针对 master 的 PR 上参与构建校验（不部署）。
 
 ## 2026-09-16 -> 2.9.5
 
