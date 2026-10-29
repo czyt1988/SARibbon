@@ -10,6 +10,10 @@ set(CMAKE_AUTORCC ON)
 
 # frameless能提供windows的窗口特效，如边缘吸附，且对高分屏多屏幕的支持更好,默认开启
 option(SARIBBON_USE_FRAMELESS_LIB "Using the QWindowKit library as a frameless solution" OFF)
+# 作为主工程子目录构建时，顶层CMake已根据Qt版本决定是否真正启用frameless
+if(DEFINED _SARIBBON_USE_FRAMELESS_LIB)
+    set(SARIBBON_USE_FRAMELESS_LIB ${_SARIBBON_USE_FRAMELESS_LIB})
+endif()
 
 # QtCreator supports the following variables for Android, which are identical to qmake Android variables.
 # Check https://doc.qt.io/qt/deployment-android.html for more information.
@@ -94,8 +98,11 @@ target_include_directories(StaticExample PUBLIC
 
 
 if(SARIBBON_USE_FRAMELESS_LIB)
-    find_package(QWindowKit QUIET)
-    if(QWindowKit_FOUND)
+    # QWindowKit可能已由顶层CMake以子目录方式构建（此时没有QWindowKit_FOUND）
+    if(NOT TARGET QWindowKit::Widgets)
+        find_package(QWindowKit QUIET)
+    endif()
+    if(TARGET QWindowKit::Widgets)
         target_link_libraries(StaticExample PRIVATE QWindowKit::Widgets)
         target_compile_definitions(StaticExample PRIVATE SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=1)
     else()
@@ -107,7 +114,22 @@ else()
     target_compile_definitions(StaticExample PRIVATE SARIBBON_USE_3RDPARTY_FRAMELESSHELPER=0)
 endif()
 
+set_target_properties(StaticExample PROPERTIES
+    AUTOMOC ON
+    AUTORCC ON
+    AUTOUIC ON
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+)
+
 include(GNUInstallDirs)
+# QWindowKit 的运行时库复制到示例输出目录：QWK 来自已安装包时 DLL 留在安装目录，
+# Windows 没有 RPATH，不复制就无法在构建树里直接运行
+if(COMMAND saribbon_deploy_qwindowkit_runtime)
+    saribbon_deploy_qwindowkit_runtime(StaticExample)
+endif()
+
 install(TARGETS StaticExample
     BUNDLE DESTINATION .
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

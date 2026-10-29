@@ -8,7 +8,8 @@
 |---------------|-------|----------|
 | `error D8050: cannot execute c1xx.dll` | Build path contains non-ASCII characters or exceeds 260 chars | Set English build path, enable Win32 long paths |
 | MOC-related compile errors | First-build batch MOC operations glitch | Keep build directory, rebuild 1-2 times |
-| `Could not find QWindowKit` | QWindowKit not compiled or installed | Build QWindowKit first, or specify `-DQWindowKit_DIR` path |
+| `Could not find QWindowKit` | QWindowKit source missing or a wrong package path | Initialize the submodule / provide the source, or set `-DQWindowKit_DIR` |
+| `QWKWidgets.dll was not found` at runtime | QWindowKit DLLs from an installed package are not next to the example (Windows has no RPATH) | Re-run the CMake configure step; examples copy the QWK runtime automatically |
 
 !!! bug "VS 2017 compiler error"
 
@@ -66,10 +67,38 @@ Keep the existing build folder and re-invoke CMake/ninja/make; the issue disappe
 
 !!! bug "QWindowKit not found"
 
-If you enabled `SARIBBON_USE_FRAMELESS_LIB=ON` but get `Could not find a package configuration file provided by "QWindowKit"`, QWindowKit is not compiled or installed correctly.
+If you enabled `SARIBBON_USE_FRAMELESS_LIB=ON` but get `Could not find a package configuration file provided by "QWindowKit"`, CMake could not obtain QWindowKit from any of these sources:
 
-Solution:
+1. **Bundled source (default, recommended)** — `src/SARibbonBar/3rdparty/qwindowkit` is built as a subdirectory, no separate install needed. When the source is missing, CMake runs `git submodule update --init --recursive` automatically; source ZIP downloads must provide the source manually.
+2. **A package specified by `-DQWindowKit_DIR`** — takes priority when QWindowKit is already installed.
+3. **Local install directory / system path** — a previously built and installed QWindowKit.
 
-1. Build and install QWindowKit first, see [Third-Party Library Build](./build-3rdparty.md)
-2. Or specify the path manually in CMake configuration: `-DQWindowKit_DIR=<install-path>/lib/cmake/QWindowKit`
-3. If you don't need QWindowKit, set `SARIBBON_USE_FRAMELESS_LIB` to `OFF`
+Common causes: the submodule or its nested dependencies are missing and auto-initialization failed (network/proxy), the source tree was moved (use `-DSARIBBON_QWK_SOURCE_DIR=...`), CMake is older than 3.19 with no installed package, or `QWindowKit_DIR` points to the wrong directory.
+
+To point at a prebuilt package manually:
+
+```shell
+cmake -S . -B build -DSARIBBON_USE_FRAMELESS_LIB=ON -DQWindowKit_DIR=<install-path>/lib/cmake/QWindowKit
+```
+
+If you don't need QWindowKit, set `SARIBBON_USE_FRAMELESS_LIB` to `OFF`.
+
+---
+
+!!! bug "Missing QWKWidgets.dll when running an example"
+
+> The code execution cannot proceed because QWKWidgets.dll was not found.
+
+With `SARIBBON_USE_FRAMELESS_LIB=ON`, `SARibbonBar.dll` depends on the QWindowKit shared libraries. Windows has no RPATH: a process only looks for dependencies next to the executable and on `PATH`, while the QWindowKit DLLs may live elsewhere:
+
+- When QWindowKit is built from the bundled source, its output directory is already redirected to the build tree `bin`, so this rarely happens.
+- When QWindowKit comes from `find_package` (an installed package), its DLLs stay in that installation (e.g. `<QtKit>/bin`, `vcpkg_installed/x64-windows/bin`).
+
+Examples and tests now copy the QWindowKit runtime libraries next to their own output directory as a post-build step on Windows (implemented in `cmake/SARibbonQwkDeploy.cmake`), so no manual copying is needed. If the error persists:
+
+- Make sure the fixed CMake scripts are used and re-run the CMake configure step (recompiling alone does not refresh post-build commands).
+- When running your own application, call the same helper on your target:
+
+```cmake
+saribbon_deploy_qwindowkit_runtime(YourTarget)
+```

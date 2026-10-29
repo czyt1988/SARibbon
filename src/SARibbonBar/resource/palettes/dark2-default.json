@@ -25,7 +25,8 @@
     "close-bg":           "#e81123",
     "close-bg-pressed":   "#f1707a",
     "sys-button-hover":   "#375d77",
-    "sys-button-pressed": "#cacacb"
+    "sys-button-pressed": "#cacacb",
+    "titlebar-icon":      "#ffffff"
   },
 
   "derived": {},

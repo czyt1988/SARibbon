@@ -4,9 +4,8 @@
 - ✅ **Multi-IDE support**: three build routes — Qt Creator, Visual Studio, and command-line
 - ✅ **Auto local install**: compiled library auto-installs into the same version-isolated directory as SARibbon
 
-!!! warning 
-    Skip this document if you do not plan to enable **QWindowkit**.  
-    QWindowkit offers a superior borderless-window solution that respects native OS behaviors (snap, maximize animations, etc.) and handles multi-monitor / mixed-DPI relocation correctly.
+!!! note
+    Since v2.9.6, enabling `SARIBBON_USE_FRAMELESS_LIB=ON` makes the top-level SARibbon build compile and install the bundled QWindowKit automatically, so this document is normally not needed. It is only for building, upgrading or debugging QWindowKit separately.
 
 ## Building the QWindowkit library
 

@@ -35,6 +35,7 @@
     "menu-border":             "#c2d0df",
     "sys-button-hover":        "#e5e5e5",
     "sys-button-pressed":      "#cacacb",
+    "titlebar-icon":           "#000000",
     "close-bg":                "#e81123",
     "close-bg-pressed":        "#f1707a"
   }

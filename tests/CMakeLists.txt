@@ -29,6 +29,10 @@ function(add_saribbon_test TEST_NAME TEST_SOURCE)
             COMMENT "Copy SARibbonBar runtime library next to ${TEST_NAME}"
         )
     endif()
+    # Tests need the QWindowKit runtime as well (SARibbonBar links it when frameless is on).
+    if(COMMAND saribbon_deploy_qwindowkit_runtime)
+        saribbon_deploy_qwindowkit_runtime(${TEST_NAME})
+    endif()
     add_test(NAME ${TEST_NAME} COMMAND ${TEST_NAME})
     set_target_properties(${TEST_NAME} PROPERTIES
         AUTOMOC ON

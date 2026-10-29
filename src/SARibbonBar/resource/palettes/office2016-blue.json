@@ -20,7 +20,8 @@
     "close-bg":           "#e81123",
     "close-bg-pressed":   "#f1707a",
     "sys-button-hover":   "#b8b8b8",
-    "sys-button-pressed": "#cacacb"
+    "sys-button-pressed": "#cacacb",
+    "titlebar-icon":      "#ffffff"
   },
 
   "derived": {
@@ -48,6 +49,7 @@
     "content-bg":      "Category/Panel/ToolButton/Gallery/Menu background",
     "content-hover-bg":"Hover state for buttons, scroll buttons, menu items",
     "content-pressed-bg":"Pressed state for tool buttons",
-    "text-color":      "#333333 primary text (tool buttons, menus, gallery)"
+    "text-color":      "#333333 primary text (tool buttons, menus, gallery)",
+    "titlebar-icon":   "Window system button glyph color (minimize/maximize/close), white on dark titlebar, black on light titlebar"
   }
 }

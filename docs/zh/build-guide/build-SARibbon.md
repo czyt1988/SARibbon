@@ -17,7 +17,9 @@
 |----------------------------|-----------------------------------------|----------------------------------------------------------------------|------------------------------------------------------------------------------------------|
 | `SARIBBON_BUILD_STATIC_LIBS` | `OFF`                                   | 控制SARibbon库的构建模式，`ON`为静态库，`OFF`为动态库               | 静态库模式下强制`BUILD_SHARED_LIBS=OFF`，动态库模式下强制`BUILD_SHARED_LIBS=ON`          |
 | `SARIBBON_BUILD_EXAMPLES`   | `ON`                                    | 控制是否构建`example`目录下的示例程序（如`MainWindowExample`等）     | 关闭可加快编译速度，仅编译库本身                                                         |
-| `SARIBBON_USE_FRAMELESS_LIB` | `OFF`                                   | 是否使用`QWindowKit`库作为无边框窗口解决方案                         | 需Qt 5.14+、Qt 6.2+版本；启用后强制使用C++17标准，依赖`QWindowKit`库                     |
+| `SARIBBON_USE_FRAMELESS_LIB` | `OFF`                                   | 是否使用`QWindowKit`库作为无边框窗口解决方案                         | 需Qt 5.14+、Qt 6.2+版本；启用后强制使用C++17标准。默认自动编译仓库内的QWindowKit源码（需CMake 3.19+），也可通过`QWindowKit_DIR`指定已安装的库 |
+| `SARIBBON_QWK_AUTO_INIT_SUBMODULE` | `ON` | QWindowKit源码缺失时是否自动执行`git submodule update --init --recursive` | 下载源码ZIP的用户无法自动初始化，需手动放置源码或指定`QWindowKit_DIR` |
+| `SARIBBON_QWK_SOURCE_DIR` | `src/SARibbonBar/3rdparty/qwindowkit` | 没有已安装的QWindowKit时使用的源码目录 | 可指向任意QWindowKit源码树，留空则只查找已安装的包 |
 | `SARIBBON_ENABLE_SNAPLAYOUT` | `OFF`                                   | 是否启用Windows 11的Snap Layout（窗口磁吸布局）效果                  | 仅当`SARIBBON_USE_FRAMELESS_LIB=ON`时有效，不同Qt版本可能存在兼容性问题                   |
 | `SARIBBON_INSTALL_IN_CURRENT_DIR` | Windows为`ON`，其他系统为`OFF` | 控制库的安装路径，`ON`安装到项目根目录下的版本区分文件夹，`OFF`使用系统默认路径 | 本地安装文件夹命名格式：`bin_qt<Qt版本>_<编译器>_x<架构>`（如`bin_qt5.14.2_msvc_x64`） |
 | `BUILD_TESTS` | `OFF` | 控制是否构建单元测试（tests目录下的Qt Test框架测试） | 需设置`BUILD_TESTS=ON`并确保测试依赖可用 |
@@ -35,7 +37,7 @@
 
 !!! tip "注意"
     第三方依赖：
-    若启用 SARIBBON_USE_FRAMELESS_LIB，需确保 QWindowKit 库已正确编译并可被 CMake 找到（可通过 -DQWindowKit_DIR 指定路径）。
+    启用 `SARIBBON_USE_FRAMELESS_LIB` 后不需要手动编译 QWindowKit：顶层工程会直接编译仓库内的源码。若已有安装好的 QWindowKit 并希望优先使用，可通过 `-DQWindowKit_DIR=<安装目录>/lib/cmake/QWindowKit` 指定。
 
 ### 使用vs下构建
 
@@ -67,7 +69,7 @@
 
 ![build-cmake-qtc](../../assets/pic/build-cmake-qtc-01.png)
 
-Qt Creator可以在界面修改`SARIBBON_USE_FRAMELESS_LIB`值，也可以手动修改，在Qt Creator中，点击左侧边，切换到项目模式（Ctrl+5），在Current Configuration中设置`SARIBBON_USE_FRAMELESS_LIB`为ON即可开启`QWindowKit`，前提是要先编译`QWindowKit`
+Qt Creator可以在界面修改`SARIBBON_USE_FRAMELESS_LIB`值，也可以手动修改，在Qt Creator中，点击左侧边，切换到项目模式（Ctrl+5），在Current Configuration中设置`SARIBBON_USE_FRAMELESS_LIB`为ON即可开启`QWindowKit`，QWindowKit会随主工程一起自动编译，无需预先安装
 
 点击运行按钮
 

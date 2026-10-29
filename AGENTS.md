@@ -2,7 +2,7 @@
 
 ## 禁止事项
 
-- **禁止读取或修改** `src/SARibbon.cpp` 和 `src/SARibbon.h` — 这是 amalgamate 工具生成的合并文件，所有源码改动应在 `src/SARibbonBar/` 下进行，源码改动后，运行`tools/Amalgamate.sh`脚本即可自动更新`src/SARibbon.cpp` 和 `src/SARibbon.h`
+- **禁止读取或修改** `src/SARibbon.cpp` 和 `src/SARibbon.h` — 这是 amalgamate 工具生成的合并文件，所有源码改动应在 `src/SARibbonBar/` 下进行，运行`tools/Amalgamate.sh`脚本即可自动更新`src/SARibbon.cpp` 和 `src/SARibbon.h`，仅在合并入master分支之前或者打入tag之前运行，避免每次改动都要跟踪此文件的变化
 - **禁止** `slots`/`signals`/`emit` → 用 `Q_SLOTS`/`Q_SIGNALS`/`Q_EMIT`
 - **禁止** 头文件 public 函数加双语 Doxygen → 仅用单行英文 `///`
 - **禁止** Q_PROPERTY 上加任何注释（分组注释如 `// == Ribbon properties ==` 可以）
@@ -82,12 +82,16 @@ cmake --build --preset=vcpkg-msvc-x64-release
 
 vcpkg 的 `frameless` feature 会自动启用 `SARIBBON_USE_FRAMELESS_LIB`。
 
+> `SARIBBON_USE_FRAMELESS_LIB=ON` 时无需单独编译安装 QWindowKit：顶层 CMake 会优先使用 `QWindowKit_DIR`/vcpkg 提供的包，否则直接把 `src/SARibbonBar/3rdparty/qwindowkit` 作为子目录构建。
+
 ### CMake 选项
 
 | 选项 | 默认值 | 说明 |
 |------|--------|------|
 | `SARIBBON_BUILD_STATIC_LIBS` | OFF | 静态库，ON 时自动定义 `SA_RIBBON_BAR_NO_EXPORT` |
-| `SARIBBON_USE_FRAMELESS_LIB` | OFF | 使用 QWindowKit 无边框方案，需 C++17 和 QWindowKit 库 |
+| `SARIBBON_USE_FRAMELESS_LIB` | OFF | 使用 QWindowKit 无边框方案，需 C++17；默认自动编译仓库内 QWindowKit 源码（需 CMake 3.19+），已安装的包可通过 `QWindowKit_DIR` 优先指定 |
+| `SARIBBON_QWK_AUTO_INIT_SUBMODULE` | ON | QWindowKit 源码缺失时自动执行 `git submodule update --init --recursive` |
+| `SARIBBON_QWK_SOURCE_DIR` | `src/SARibbonBar/3rdparty/qwindowkit` | 无已安装包时使用的 QWindowKit 源码目录，留空则只查找已安装的包 |
 | `SARIBBON_BUILD_EXAMPLES` | ON | 控制是否编译示例程序 |
 | `SARIBBON_ENABLE_SNAPLAYOUT` | OFF | 启用 Windows 11 Snap Layout（仅 frameless 模式有效） |
 | `SARIBBON_INSTALL_IN_CURRENT_DIR` | ON (Windows) | 安装到 `bin_qt{版本}_{编译器}_x{架构}/` |

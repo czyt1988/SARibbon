@@ -20,7 +20,8 @@
     "close-bg":           "#e81123",
     "close-bg-pressed":   "#f1707a",
     "sys-button-hover":   "#b8b8b8",
-    "sys-button-pressed": "#cacacb"
+    "sys-button-pressed": "#cacacb",
+    "titlebar-icon":      "#ffffff"
   },
 
   "derived": {

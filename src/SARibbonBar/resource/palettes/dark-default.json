@@ -26,7 +26,8 @@
     "close-bg":           "#e81123",
     "close-bg-pressed":   "#f1707a",
     "sys-button-hover":   "#4a4a4a",
-    "sys-button-pressed": "#555555"
+    "sys-button-pressed": "#555555",
+    "titlebar-icon":      "#ffffff"
   },
 
   "derived": {},
@@ -47,6 +48,7 @@
     "content-hover-bg":"Slightly lighter for hover states",
     "content-pressed-bg":"Pressed/checked state for buttons, menu items, gallery",
     "text-color":      "Light text on dark background",
-    "text-disabled":   "Disabled text color"
+    "text-disabled":   "Disabled text color",
+    "titlebar-icon":   "Window system button glyph color (minimize/maximize/close), white on dark titlebar, black on light titlebar"
   }
 }

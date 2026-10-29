@@ -5,8 +5,8 @@
 - **跨平台编译**：覆盖 Windows、Linux (Ubuntu/Debian) 和 macOS
 - **自动本地安装**：编译后自动安装到与SARibbon一致的版本隔离目录
 
-!!! warning "注意"
-    如果不开启QWindowkit,可以跳过此文档。
+!!! note "说明"
+    从 v2.9.6 起，开启 `SARIBBON_USE_FRAMELESS_LIB=ON` 后，SARibbon 顶层工程会自动编译并安装仓库内的 QWindowKit，通常不需要按本文档单独构建。本文档仅用于需要单独编译、升级或调试 QWindowKit 的场景。
 
 !!! tip "提示"
     QWindowkit提供了更好的无边框方案，能适配操作系统原生的交互，能支持多屏幕多分辨率的移动。
