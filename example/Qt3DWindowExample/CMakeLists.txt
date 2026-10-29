@@ -65,6 +65,12 @@ set_target_properties(Qt3DWindowExample PROPERTIES
 )
 
 include(GNUInstallDirs)
+# QWindowKit 的运行时库复制到示例输出目录：QWK 来自已安装包时 DLL 留在安装目录，
+# Windows 没有 RPATH，不复制就无法在构建树里直接运行
+if(COMMAND saribbon_deploy_qwindowkit_runtime)
+    saribbon_deploy_qwindowkit_runtime(Qt3DWindowExample)
+endif()
+
 install(TARGETS Qt3DWindowExample
     BUNDLE DESTINATION .
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}

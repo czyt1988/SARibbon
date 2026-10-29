@@ -283,6 +283,21 @@ if(_SARIBBON_USE_FRAMELESS_LIB)
         endif()
     endif()
 
+    # QWindowKit 的运行时目标，示例/测试通过 saribbon_deploy_qwindowkit_runtime() 复制到自身目录。
+    # 使用已安装包时 DLL 留在安装目录，不复制就无法在构建树里直接运行
+    set(SARIBBON_QWK_RUNTIME_TARGETS)
+    if(TARGET QWindowKit::Widgets)
+        foreach(_qwk_target QWindowKit::Widgets QWindowKit::Core)
+            if(TARGET ${_qwk_target})
+                list(APPEND SARIBBON_QWK_RUNTIME_TARGETS ${_qwk_target})
+            endif()
+        endforeach()
+        # qmsetup 在部分版本里是动态库，静态/接口库会在部署时自动过滤
+        if(TARGET qmsetup::library)
+            list(APPEND SARIBBON_QWK_RUNTIME_TARGETS qmsetup::library)
+        endif()
+    endif()
+
     # 最终确认是否可用
     if(TARGET QWindowKit::Widgets)
         if(QWindowKit_DIR)
@@ -303,6 +318,7 @@ endif()
 
 
 include(cmake/WinResource.cmake)
+include(cmake/SARibbonQwkDeploy.cmake)
 
 ########################################################
 # 自动化生成配置头文件

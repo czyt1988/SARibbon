@@ -16,6 +16,7 @@
 | `Could not find a package configuration file provided by Qt6/Qt5` | `CMAKE_PREFIX_PATH` 未设置 | 指定 Qt 安装路径下的 cmake 目录 |
 | `error C2039: 'xxx' is not a member of 'std'` | 编译器未启用 C++17 | 升级编译器或手动设置 C++ 标准 |
 | `Could not find QWindowKit` | QWindowKit 源码缺失或安装包路径不对 | 初始化子模块/放置源码，或指定 `QWindowKit_DIR` |
+| 运行示例提示缺少 `QWKWidgets.dll` | 使用已安装的 QWindowKit 时 DLL 不在示例目录（Windows 无 RPATH） | 重新执行 CMake 配置，示例会自动复制 QWK 运行时库 |
 | `undefined reference to _imp__xxx` | 静态/动态库链接不匹配 | 添加 `SA_RIBBON_BAR_NO_EXPORT` 宏定义 |
 | `error D8050: 无法执行 c1xx.dll` | 构建路径含中文或超过260字符限制 | 设置英文构建路径，启用Win32长路径 |
 | MOC相关编译错误 | 首次构建批量MOC操作异常 | 保留build目录，重新构建1-2次 |
@@ -193,6 +194,26 @@ cmake -S . -B build -DSARIBBON_USE_FRAMELESS_LIB=ON -DQWindowKit_DIR="D:/libs/QW
 
 !!! tip "提示"
     如果不需要无边框窗口功能，将 `SARIBBON_USE_FRAMELESS_LIB` 设为 `OFF` 即可跳过 QWindowKit 依赖。
+
+---
+
+!!! bug "运行示例时提示缺少 QWKWidgets.dll"
+
+> 无法启动此程序，因为计算机中丢失 QWKWidgets.dll。尝试重新安装该程序以解决此问题。
+
+`SARIBBON_USE_FRAMELESS_LIB=ON` 时，`SARibbonBar.dll` 依赖 QWindowKit 的动态库。Windows 没有 RPATH，进程只会在可执行文件所在目录和 `PATH` 中查找依赖库，而 QWindowKit 的 DLL 可能在别处：
+
+- 源码构建时 QWindowKit 的输出目录已统一到构建树的 `bin`，通常不会出现此问题；
+- 通过 `find_package` 使用已安装的 QWindowKit 时，DLL 留在安装目录（如 `<QtKit>/bin`、`vcpkg_installed/x64-windows/bin`）。
+
+现在示例和测试在链接完成后会自动把 QWindowKit 的运行时库复制到自身输出目录（Windows，由 `cmake/SARibbonQwkDeploy.cmake` 实现），无需手工拷贝。如果仍然报错：
+
+- 确认构建使用的是修复后的 CMake 脚本，重新运行一次 CMake 配置（仅重新编译不会更新 POST_BUILD 指令）；
+- 若运行的是自己编写的程序，可对目标调用同一函数：
+
+```cmake
+saribbon_deploy_qwindowkit_runtime(YourTarget)
+```
 
 ---
 

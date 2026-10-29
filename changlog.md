@@ -13,6 +13,7 @@
 - 构建：适配 macOS 26 SDK 移除 `AGL.framework`。Qt 6.8 及更早版本的 `FindWrapOpenGL.cmake` 仍会链接 AGL，导致 `ld: framework 'AGL' not found`；CMake 现在会在 SDK 缺少 AGL 时把 Qt 的 `WrapOpenGL_AGL` 指向 SDK 内已有的 `OpenGL.framework`（Qt 6.9 起不再依赖 AGL，此处理自动失效）。
 - 测试：`SARibbonToolButtonColorTest` 的颜色断言改为纯离屏 `grab()` 渲染，不再创建/显示窗口、不参与焦点链；`:hover` 断言在无头平台（offscreen/minimal）跳过。此前在 Qt5 的 GitHub Actions 无头环境下，带 QSS 的按钮在窗口析构清理焦点时会崩溃（signal 11）。
 - 构建：开启 `SARIBBON_USE_FRAMELESS_LIB` 后不再需要先单独编译安装 QWindowKit。顶层 CMake 会优先使用 `QWindowKit_DIR`/vcpkg 提供的包，否则直接把 `src/SARibbonBar/3rdparty/qwindowkit` 作为子目录编译；子模块未初始化时自动执行 `git submodule update --init --recursive`（可用 `SARIBBON_QWK_AUTO_INIT_SUBMODULE=OFF` 关闭）。QWindowKit 的输出目录与 SARibbon 统一，`cmake --install` 的安装布局与原来的两步法一致。
+- 构建：示例和测试编译完成后会自动把 QWindowKit 的运行时库复制到自身输出目录（Windows），修复使用已安装的 QWindowKit 包时从 Qt Creator 直接运行示例弹出「缺少 QWKWidgets.dll」的问题：Windows 没有 RPATH，DLL 留在安装目录时进程找不到。逻辑封装在 `cmake/SARibbonQwkDeploy.cmake` 的 `saribbon_deploy_qwindowkit_runtime()`，源码构建与安装包两种来源行为一致；静态链接 QWindowKit 时不产生多余命令。
 
 ## 2026-09-16 -> 2.9.5
 
