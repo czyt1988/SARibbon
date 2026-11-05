@@ -3,7 +3,7 @@
 - **自定义标题高度**: 通过 `setTitleBarHeight()` 精确控制标题栏高度
 - **标题颜色定制**: 支持设置标题文字颜色和背景色（QBrush），可用于未注册/只读等状态提示
 - **标题对齐方式**: 支持左对齐、居中对齐，可模拟 WPS 风格
-- **标题图标支持**: 通过 `SARibbonTitleIconWidget` 显示窗口图标，支持左键点击和右键菜单
+- **标题图标支持**: 通过 `SARibbonTitleIconWidget` 显示窗口图标，支持左键点击和右键菜单，并可禁用点击或自定义点击行为
 - **显示/隐藏切换**: 支持动态隐藏或显示标题栏，适配紧凑模式
 
 SARibbon 的标题栏（Title Bar）是位于 Ribbon 界面最顶部的区域，用于显示应用程序的窗口标题（windowTitle）。SARibbon 允许您完整定制标题栏的高度、背景颜色、文字颜色、对齐方式，以及标题图标和功能按钮。
@@ -53,6 +53,16 @@ flowchart TD
 | `isTitleIconVisible()` | 无 | `bool` | 查询标题图标是否可见 |
 | `titleIconWidget()` | 无 | `SARibbonTitleIconWidget*` | 获取标题图标控件指针 |
 
+通过 `titleIconWidget()` 取得 `SARibbonTitleIconWidget` 后，还可以控制图标的点击行为：
+
+| 方法 | 参数 | 返回值 | 说明 |
+|------|------|--------|------|
+| `setClickEnabled()` | `bool` | `void` | 启用/禁用图标点击（默认为启用）；禁用后左键和右键都不响应 |
+| `isClickEnabled()` | 无 | `bool` | 查询点击是否启用 |
+| `setMenuEnabled()` | `bool` | `void` | 启用/禁用内置窗口控制菜单（默认为启用） |
+| `isMenuEnabled()` | 无 | `bool` | 查询内置菜单是否启用 |
+| `titleIconClicked()` | 信号 | `int, const QPoint&` | 内置菜单禁用时，点击图标会发射该信号，参数为鼠标按键（`Qt::MouseButton`）和全局坐标 |
+
 ## 常见场景
 
 | 场景 | 推荐方法 | 说明 |
@@ -62,6 +72,8 @@ flowchart TD
 | 隐藏标题栏 | `setTitleVisible(false)` | 适用于紧凑模式、原生边框模式 |
 | 自定义对齐 | `setWindowTitleAligment(Qt::AlignLeft)` | 标题左对齐，类似 WPS 风格 |
 | 标题图标显示 | `setTitleIconVisible(true)` | 显示窗口图标，支持左键点击和右键菜单 |
+| 禁用图标点击 | `titleIconWidget()->setClickEnabled(false)` | 图标仍显示，但点击和右键都不响应 |
+| 自定义图标点击 | `titleIconWidget()->setMenuEnabled(false)` + 连接 `titleIconClicked` | 接管点击行为，例如弹出自己的菜单 |
 
 ## 设置标题栏颜色和样式
 
@@ -182,6 +194,35 @@ MainWindow::MainWindow(QWidget* parent)
 
 !!! note
     该菜单仅在无边框模式（`UseRibbonFrame`）下可用——原生边框模式（`UseNativeFrame`）使用系统自带菜单，标题图标被隐藏。
+
+### 禁用或自定义图标点击
+
+如果不希望点击图标弹出内置菜单，可以关闭内置菜单，改为由应用自己处理：
+
+```cpp
+SARibbonTitleIconWidget* iconWidget = ribbonBar()->titleIconWidget();
+if (iconWidget) {
+    // 只禁用点击，不弹菜单也不做任何处理
+    iconWidget->setClickEnabled(false);
+}
+```
+
+需要自定义点击行为（例如弹出自己的菜单）时，关闭内置菜单并连接 `titleIconClicked` 信号：
+
+```cpp
+SARibbonTitleIconWidget* iconWidget = ribbonBar()->titleIconWidget();
+if (iconWidget) {
+    iconWidget->setMenuEnabled(false);
+    connect(iconWidget, &SARibbonTitleIconWidget::titleIconClicked, this,
+            [](int button, const QPoint& globalPos) {
+                QMenu menu;
+                menu.addAction(tr("关于"));
+                menu.exec(globalPos);
+            });
+}
+```
+
+`titleIconClicked` 的 `button` 参数是 `Qt::MouseButton` 的值，左键点击来自鼠标按下事件，右键点击来自上下文菜单事件。若只想恢复默认行为，调用 `setMenuEnabled(true)` 即可。
 
 ## 主窗口边框绘制
 

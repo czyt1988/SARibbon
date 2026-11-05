@@ -32,6 +32,35 @@ public:
     void setPadding(int v);
     int padding() const;
 
+    // Enable or disable click handling on the title icon (default enabled)
+    void setClickEnabled(bool on = true);
+    // Check whether click handling on the title icon is enabled
+    bool isClickEnabled() const;
+
+    // Enable or disable the built-in window control menu (default enabled)
+    void setMenuEnabled(bool on = true);
+    // Check whether the built-in window control menu is enabled
+    bool isMenuEnabled() const;
+
+Q_SIGNALS:
+    /**
+     * \if ENGLISH
+     * @brief Emitted when the title icon is clicked while the built-in menu is disabled
+     * @details Connect to this signal after calling setMenuEnabled(false) to provide a custom
+     * click behavior (for example, showing your own menu).
+     * @param button The mouse button that triggered the click, as a Qt::MouseButton value
+     * @param globalPos The click position in global coordinates
+     * \endif
+     *
+     * \if CHINESE
+     * @brief 内置菜单禁用时，标题图标被点击会发射此信号
+     * @details 调用 setMenuEnabled(false) 后连接此信号，即可自定义点击行为（例如弹出自己的菜单）。
+     * @param button 触发点击的鼠标按键，取值为 Qt::MouseButton
+     * @param globalPos 点击位置（全局坐标）
+     * \endif
+     */
+    void titleIconClicked(int button, const QPoint& globalPos);
+
 public:
     virtual QSize sizeHint() const override;
 
@@ -51,6 +80,9 @@ private:
 
     // 设置菜单动作
     void setupMenuActions();
+
+    // 处理图标点击，决定弹出内置菜单还是发射信号
+    void handleClick(Qt::MouseButton button, const QPoint& globalPos);
 
 private Q_SLOTS:
     // 还原窗口
@@ -76,6 +108,8 @@ private:
     QIcon m_icon;                  ///< 显示的图标
     QSize m_iconSize;              ///< 图标大小
     QMenu* m_contextMenu;          ///< 上下文菜单
+    bool m_clickEnabled;           ///< 是否处理点击
+    bool m_menuEnabled;            ///< 是否弹出内置窗口菜单
     int mPadding;
 };
 

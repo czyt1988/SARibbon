@@ -20,7 +20,12 @@
  * @param parent 父窗口部件
  */
 SARibbonTitleIconWidget::SARibbonTitleIconWidget(QWidget* parent)
-    : QWidget(parent), m_widget(nullptr), m_iconSize(16, 16), mPadding(1)
+    : QWidget(parent)
+    , m_widget(nullptr)
+    , m_iconSize(16, 16)
+    , m_clickEnabled(true)
+    , m_menuEnabled(true)
+    , mPadding(1)
 {
     setCursor(Qt::ArrowCursor);
     createContextMenu();
@@ -103,6 +108,77 @@ void SARibbonTitleIconWidget::setPadding(int v)
     mPadding = v;
 }
 
+/**
+ * \if ENGLISH
+ * @brief Enable or disable click handling on the title icon
+ * @details When disabled, left-click and right-click are ignored: neither the built-in menu is
+ * shown nor the titleIconClicked signal is emitted.
+ * @param on Whether click handling is enabled
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 启用或禁用标题图标的点击处理
+ * @details 禁用后左键和右键点击都会被忽略：既不弹出内置菜单，也不发射 titleIconClicked 信号。
+ * @param on 是否启用点击处理
+ * \endif
+ */
+void SARibbonTitleIconWidget::setClickEnabled(bool on)
+{
+    m_clickEnabled = on;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Check whether click handling on the title icon is enabled
+ * @return True if click handling is enabled
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 标题图标的点击处理是否启用
+ * @return 启用返回 true
+ * \endif
+ */
+bool SARibbonTitleIconWidget::isClickEnabled() const
+{
+    return m_clickEnabled;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Enable or disable the built-in window control menu
+ * @details When disabled, clicking the title icon emits titleIconClicked instead of showing the
+ * built-in menu, so the application can provide its own menu or click behavior.
+ * @param on Whether the built-in menu is enabled
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 启用或禁用内置的窗口控制菜单
+ * @details 禁用后，点击标题图标不再弹出内置菜单，而是发射 titleIconClicked 信号，
+ * 由应用程序自行决定弹什么菜单或做什么处理。
+ * @param on 是否启用内置菜单
+ * \endif
+ */
+void SARibbonTitleIconWidget::setMenuEnabled(bool on)
+{
+    m_menuEnabled = on;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Check whether the built-in window control menu is enabled
+ * @return True if the built-in menu is enabled
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 内置的窗口控制菜单是否启用
+ * @return 启用返回 true
+ * \endif
+ */
+bool SARibbonTitleIconWidget::isMenuEnabled() const
+{
+    return m_menuEnabled;
+}
+
 QSize SARibbonTitleIconWidget::sizeHint() const
 {
     return QSize(m_iconSize.width() + 2 * mPadding, m_iconSize.height() + 2 * mPadding);
@@ -127,26 +203,53 @@ void SARibbonTitleIconWidget::paintEvent(QPaintEvent* event)
 
 void SARibbonTitleIconWidget::mousePressEvent(QMouseEvent* event)
 {
-    if (event->button() == Qt::LeftButton && m_widget) {
-        if (m_contextMenu) {
-            QPoint menuPos = mapToGlobal(QPoint(0, height()));
-            m_contextMenu->popup(menuPos);
-            event->accept();
-            return;
-        }
+    if (event->button() == Qt::LeftButton) {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        handleClick(Qt::LeftButton, event->globalPosition().toPoint());
+#else
+        handleClick(Qt::LeftButton, event->globalPos());
+#endif
+        event->accept();
+        return;
     }
     QWidget::mousePressEvent(event);
 }
 
 void SARibbonTitleIconWidget::contextMenuEvent(QContextMenuEvent* event)
 {
-    if (m_contextMenu && m_widget) {
-        QPoint menuPos = event->globalPos();
-        m_contextMenu->popup(menuPos);
-        event->accept();
+    handleClick(Qt::RightButton, event->globalPos());
+    event->accept();
+}
+
+/**
+ * \if ENGLISH
+ * @brief Handle a click on the title icon
+ * @details Shows the built-in menu when it is enabled and a window is attached; otherwise emits
+ * titleIconClicked so the caller can implement custom behavior.
+ * @param button The mouse button that triggered the click
+ * @param globalPos The click position in global coordinates
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 处理标题图标的点击
+ * @details 内置菜单启用且已关联窗口时弹出菜单，否则发射 titleIconClicked 信号，
+ * 由调用方实现自定义行为。
+ * @param button 触发点击的鼠标按键
+ * @param globalPos 点击位置（全局坐标）
+ * \endif
+ */
+void SARibbonTitleIconWidget::handleClick(Qt::MouseButton button, const QPoint& globalPos)
+{
+    if (!m_clickEnabled) {
         return;
     }
-    QWidget::contextMenuEvent(event);
+    if (m_menuEnabled && m_widget && m_contextMenu) {
+        // 左键沿用原行为：菜单贴在图标下沿弹出；右键跟随鼠标位置
+        const QPoint menuPos = (Qt::LeftButton == button) ? mapToGlobal(QPoint(0, height())) : globalPos;
+        m_contextMenu->popup(menuPos);
+        return;
+    }
+    Q_EMIT titleIconClicked(static_cast< int >(button), globalPos);
 }
 
 /**

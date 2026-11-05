@@ -2,6 +2,7 @@
 #include <QApplication>
 #include <QAction>
 #include <QMenu>
+#include <QContextMenuEvent>
 #include "SARibbonMainWindow.h"
 #include "SARibbonBar.h"
 #include "SARibbonTitleIconWidget.h"
@@ -18,6 +19,8 @@ class SARibbonTitleIconMenuTest : public QObject
 private slots:
     void testMenuActionsExist();
     void testMoveSizeClickedNoCrash();
+    void testClickDisabled();
+    void testCustomClickSignal();
 };
 
 void SARibbonTitleIconMenuTest::testMenuActionsExist()
@@ -87,6 +90,77 @@ void SARibbonTitleIconMenuTest::testMoveSizeClickedNoCrash()
         }
     }
     QVERIFY(w.isVisible());
+    w.hide();
+}
+
+void SARibbonTitleIconMenuTest::testClickDisabled()
+{
+    SARibbonMainWindow w;
+    w.resize(800, 600);
+    w.show();
+    QVERIFY(QTest::qWaitForWindowExposed(&w));
+    QApplication::processEvents();
+
+    SARibbonTitleIconWidget* iconWidget = w.ribbonBar()->titleIconWidget();
+    QVERIFY(iconWidget != nullptr);
+
+    QSignalSpy spy(iconWidget, &SARibbonTitleIconWidget::titleIconClicked);
+    QVERIFY(spy.isValid());
+
+    iconWidget->setClickEnabled(false);
+    QVERIFY(!iconWidget->isClickEnabled());
+
+    QTest::mouseClick(iconWidget, Qt::LeftButton);
+    QApplication::processEvents();
+    QCOMPARE(spy.count(), 0);
+
+    // 禁用后内置菜单也不能弹出
+    for (QMenu* menu : iconWidget->findChildren< QMenu* >()) {
+        QVERIFY(!menu->isVisible());
+    }
+
+    iconWidget->setClickEnabled(true);
+    QVERIFY(iconWidget->isClickEnabled());
+    w.hide();
+}
+
+void SARibbonTitleIconMenuTest::testCustomClickSignal()
+{
+    SARibbonMainWindow w;
+    w.resize(800, 600);
+    w.show();
+    QVERIFY(QTest::qWaitForWindowExposed(&w));
+    QApplication::processEvents();
+
+    SARibbonTitleIconWidget* iconWidget = w.ribbonBar()->titleIconWidget();
+    QVERIFY(iconWidget != nullptr);
+
+    QSignalSpy spy(iconWidget, &SARibbonTitleIconWidget::titleIconClicked);
+    QVERIFY(spy.isValid());
+
+    // 关闭内置菜单后，点击交由信号处理
+    iconWidget->setMenuEnabled(false);
+    QVERIFY(!iconWidget->isMenuEnabled());
+
+    QTest::mouseClick(iconWidget, Qt::LeftButton);
+    QApplication::processEvents();
+    QCOMPARE(spy.count(), 1);
+    QCOMPARE(spy.at(0).at(0).toInt(), static_cast< int >(Qt::LeftButton));
+
+    for (QMenu* menu : iconWidget->findChildren< QMenu* >()) {
+        QVERIFY(!menu->isVisible());
+    }
+
+    // 右键通过 contextMenuEvent 触发，同样发信号而不是弹菜单
+    const QPoint localPos(5, 5);
+    QContextMenuEvent contextEvent(QContextMenuEvent::Mouse, localPos, iconWidget->mapToGlobal(localPos));
+    QApplication::sendEvent(iconWidget, &contextEvent);
+    QApplication::processEvents();
+    QCOMPARE(spy.count(), 2);
+    QCOMPARE(spy.at(1).at(0).toInt(), static_cast< int >(Qt::RightButton));
+
+    iconWidget->setMenuEnabled(true);
+    QVERIFY(iconWidget->isMenuEnabled());
     w.hide();
 }
 

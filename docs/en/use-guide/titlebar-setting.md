@@ -7,7 +7,7 @@ The SARibbon title bar is the area at the very top of the Ribbon interface, used
 - ✅ **Custom title height**: precisely control title bar height via `setTitleBarHeight()`
 - ✅ **Title color customization**: support setting title text color and background color (QBrush)
 - ✅ **Title alignment**: support left-aligned and center-aligned, simulating WPS style
-- ✅ **Title icon support**: display window icon and right-click menu via `SARibbonTitleIconWidget`
+- ✅ **Title icon support**: display window icon and right-click menu via `SARibbonTitleIconWidget`, with options to disable clicks or customize the click behavior
 - ✅ **Show/hide toggle**: support dynamically hiding or showing the title bar
 - ✅ **Word wrap control**: control whether title text automatically wraps via `enableWordWrap`
 
@@ -39,6 +39,16 @@ The SARibbon title bar is the area at the very top of the Ribbon interface, used
 | `isTitleIconVisible()` | None | `bool` | Query whether the title icon is visible |
 | `titleIconWidget()` | None | `SARibbonTitleIconWidget*` | Get title icon widget pointer |
 
+After obtaining the `SARibbonTitleIconWidget` via `titleIconWidget()`, you can also control the icon's click behavior:
+
+| Method | Parameters | Return Value | Description |
+|------|------|--------|------|
+| `setClickEnabled()` | `bool` | `void` | Enable/disable icon clicks (enabled by default); when disabled, left and right clicks are ignored |
+| `isClickEnabled()` | None | `bool` | Query whether click handling is enabled |
+| `setMenuEnabled()` | `bool` | `void` | Enable/disable the built-in window control menu (enabled by default) |
+| `isMenuEnabled()` | None | `bool` | Query whether the built-in menu is enabled |
+| `titleIconClicked()` | Signal | `int, const QPoint&` | Emitted when the icon is clicked while the built-in menu is disabled; parameters are the mouse button (`Qt::MouseButton`) and the global position |
+
 ## Common Scenarios
 
 | Scenario | Recommended Method | Description |
@@ -48,6 +58,8 @@ The SARibbon title bar is the area at the very top of the Ribbon interface, used
 | Hide title bar | `setTitleVisible(false)` | Suitable for compact mode, native frame mode |
 | Custom alignment | `setWindowTitleAligment(Qt::AlignLeft)` | Title left-aligned, similar to WPS style |
 | Title icon display | `setTitleIconVisible(true)` | Display window icon, supports left-click and right-click menu |
+| Disable icon clicks | `titleIconWidget()->setClickEnabled(false)` | The icon stays visible, but left/right clicks are ignored |
+| Customize icon clicks | `titleIconWidget()->setMenuEnabled(false)` + connect `titleIconClicked` | Take over the click behavior, for example showing a custom menu |
 
 ## Setting Title Bar Color and Style
 
@@ -167,6 +179,35 @@ In frameless mode (`UseRibbonFrame`), clicking (or right-clicking) the applicati
 
 !!! note
     This menu is only available in frameless mode (`UseRibbonFrame`) — in native frame mode (`UseNativeFrame`) the system menu is provided by the OS and the title icon is hidden.
+
+### Disabling or Customizing Icon Clicks
+
+If you do not want clicking the icon to open the built-in menu, disable click handling entirely:
+
+```cpp
+SARibbonTitleIconWidget* iconWidget = ribbonBar()->titleIconWidget();
+if (iconWidget) {
+    // No menu, no further handling
+    iconWidget->setClickEnabled(false);
+}
+```
+
+To take over the click behavior (for example, show your own menu), disable the built-in menu and connect to `titleIconClicked`:
+
+```cpp
+SARibbonTitleIconWidget* iconWidget = ribbonBar()->titleIconWidget();
+if (iconWidget) {
+    iconWidget->setMenuEnabled(false);
+    connect(iconWidget, &SARibbonTitleIconWidget::titleIconClicked, this,
+            [](int button, const QPoint& globalPos) {
+                QMenu menu;
+                menu.addAction(tr("About"));
+                menu.exec(globalPos);
+            });
+}
+```
+
+The `button` parameter is a `Qt::MouseButton` value: left clicks come from the mouse press event and right clicks from the context menu event. Call `setMenuEnabled(true)` to restore the default behavior.
 
 ## Main Window Frame Border
 
