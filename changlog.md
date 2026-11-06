@@ -26,6 +26,7 @@
 - 构建：没有 Qt 3D 模块的 Qt 也能配置编译，Qt 3D 示例只在模块可用时构建。
 - 构建：MSVC 统一使用 `/utf-8` 解析源码，避免英文代码页的 CI 机器上中文字面量触发 C2001/C1057。
 - CI：新增 Dependabot 依赖自动升级配置（GitHub Actions 与文档依赖）；升级全部 GitHub Actions；mkdocs-material 升级到 9.8.0 修复 CVE-2026-73295，并固定 mkdocs-with-pdf 与 pymdown-extensions 版本；文档站在针对 master 的 PR 上参与构建校验（不部署）。
+- 修复：`SARibbonApplicationWidget` 在程序启动时自动弹出的问题——父窗口未显示时创建的子控件会在父窗口显示时被一并显示，且尺寸停留在显示前的旧几何（不再是 `setWidthRatio` 设定的 2/3 宽度、全高）。现在构造与 `SARibbonMainWindow::setApplicationWidget` 绑定后都保持隐藏，仅在点击应用按钮时显示；事件过滤器改为读取父窗口当前尺寸并响应 `WindowStateChange`，最大化/还原时面板尺寸不再滞后。
 
 ## 2026-09-16 -> 2.9.5
 
