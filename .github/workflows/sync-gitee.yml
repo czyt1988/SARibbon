@@ -1,0 +1,143 @@
+name: Sync Release To Gitee
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag to sync (e.g. v2.9.6)
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-gitee-${{ github.event.release.tag_name || inputs.tag }}
+  cancel-in-progress: false
+
+env:
+  GITEE_REPO: czyt1988/SARibbon
+  GITEE_GIT_URL: https://gitee.com/czyt1988/SARibbon.git
+  GITEE_API: https://gitee.com/api/v5
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout release tag
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.release.tag_name || inputs.tag }}
+          fetch-depth: 0
+
+      - name: Push the release tag to Gitee
+        env:
+          GITEE_USER: ${{ secrets.GITEE_USERNAME }}
+          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+          TAG: ${{ github.event.release.tag_name || inputs.tag }}
+        run: |
+          if [ -z "${GITEE_USER}" ] || [ -z "${GITEE_TOKEN}" ]; then
+            echo "::error::Missing repository secrets GITEE_USERNAME / GITEE_TOKEN"
+            exit 1
+          fi
+          git config --global credential.helper store
+          printf 'https://%s:%s@gitee.com\n' "${GITEE_USER}" "${GITEE_TOKEN}" > ~/.git-credentials
+          chmod 600 ~/.git-credentials
+          git remote add gitee "${GITEE_GIT_URL}"
+          # Only the tag is required by the release. Branches are not pushed:
+          # Gitee is the primary development remote, so it can legitimately be
+          # ahead of GitHub and a branch push would be rejected as non-fast-forward.
+          git rev-parse -q --verify "refs/tags/${TAG}" > /dev/null \
+            || git fetch origin "refs/tags/${TAG}:refs/tags/${TAG}"
+          git push gitee "refs/tags/${TAG}:refs/tags/${TAG}"
+
+      - name: Create or update the Gitee release
+        env:
+          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.event.release.tag_name || inputs.tag }}
+          TARGET_COMMITISH: ${{ github.event.release.target_commitish || 'master' }}
+          RELEASE_NAME: ${{ github.event.release.name }}
+          RELEASE_BODY: ${{ github.event.release.body }}
+        run: |
+          TAG_ENC=$(jq -rn --arg t "${TAG}" '$t|@uri')
+          EXISTING_ID=$(curl -sS "${GITEE_API}/repos/${GITEE_REPO}/releases/tags/${TAG_ENC}?access_token=${GITEE_TOKEN}" | jq -r '.id // empty')
+
+          # A workflow_dispatch run carries no release payload: read the notes
+          # back from the GitHub release, and fall back to the checked-in file.
+          if [ -z "${RELEASE_BODY}" ]; then
+            RELEASE_BODY=$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${TAG}" --jq '.body' 2>/dev/null || true)
+          fi
+          if [ -z "${RELEASE_BODY}" ] && [ -f ".github/release-notes/${TAG}.md" ]; then
+            RELEASE_BODY=$(cat ".github/release-notes/${TAG}.md")
+          fi
+          if [ -z "${RELEASE_BODY}" ]; then
+            echo "::warning::No release notes found for ${TAG}"
+          fi
+          printf '%s' "${RELEASE_BODY}" > /tmp/gitee-body.txt
+
+          NAME="${RELEASE_NAME}"
+          if [ -z "${NAME}" ] || [ "${NAME}" = "null" ]; then
+            NAME=$(gh api "repos/${GITHUB_REPOSITORY}/releases/tags/${TAG}" --jq '.name' 2>/dev/null || true)
+          fi
+          if [ -z "${NAME}" ] || [ "${NAME}" = "null" ]; then
+            NAME="SARibbon ${TAG}"
+          fi
+
+          if [ -n "${EXISTING_ID}" ]; then
+            echo "Gitee release ${TAG} already exists (id=${EXISTING_ID}), updating it"
+            curl -sS -X PATCH "${GITEE_API}/repos/${GITEE_REPO}/releases/${EXISTING_ID}" \
+              --data-urlencode "access_token=${GITEE_TOKEN}" \
+              --data-urlencode "tag_name=${TAG}" \
+              --data-urlencode "name=${NAME}" \
+              --data-urlencode "body@/tmp/gitee-body.txt" \
+              --data-urlencode "prerelease=false" > /tmp/gitee-update.json || true
+            if ! jq -e '.id' /tmp/gitee-update.json > /dev/null 2>&1; then
+              echo "::warning::Failed to update the existing Gitee release, its notes are unchanged"
+              cat /tmp/gitee-update.json
+            fi
+            echo "RELEASE_ID=${EXISTING_ID}" >> "$GITHUB_ENV"
+            exit 0
+          fi
+
+          RESP=$(curl -sS -X POST "${GITEE_API}/repos/${GITEE_REPO}/releases" \
+            --data-urlencode "access_token=${GITEE_TOKEN}" \
+            --data-urlencode "tag_name=${TAG}" \
+            --data-urlencode "target_commitish=${TARGET_COMMITISH}" \
+            --data-urlencode "name=${NAME}" \
+            --data-urlencode "body@/tmp/gitee-body.txt" \
+            --data-urlencode "prerelease=false")
+          echo "${RESP}" | jq -e '.id' > /dev/null || { echo "Gitee release creation failed:"; echo "${RESP}"; exit 1; }
+          RELEASE_ID=$(echo "${RESP}" | jq -r '.id')
+          echo "Gitee release created: id=${RELEASE_ID} tag=${TAG}"
+          echo "RELEASE_ID=${RELEASE_ID}" >> "$GITHUB_ENV"
+
+      - name: Attach amalgamated sources to the Gitee release
+        env:
+          GITEE_TOKEN: ${{ secrets.GITEE_TOKEN }}
+        run: |
+          if [ -z "${RELEASE_ID}" ]; then
+            echo "::error::No Gitee release id available"
+            exit 1
+          fi
+          API="${GITEE_API}/repos/${GITEE_REPO}/releases/${RELEASE_ID}"
+          for f in src/SARibbon.h src/SARibbon.cpp; do
+            NAME=$(basename "${f}")
+            # Replace a same-named attachment so re-runs update the file instead
+            # of leaving duplicates behind.
+            for attach_id in $(curl -sS "${API}/attach_files?access_token=${GITEE_TOKEN}" \
+                | jq -r --arg n "${NAME}" '.[]? | select(.name == $n) | .id'); do
+              curl -sS -X DELETE "${API}/attach_files/${attach_id}?access_token=${GITEE_TOKEN}" > /dev/null || true
+            done
+            echo "Uploading ${NAME}"
+            RESP=$(curl -sS -X POST "${API}/attach_files" \
+              -F "access_token=${GITEE_TOKEN}" \
+              -F "file=@${f}")
+            if ! echo "${RESP}" | jq -e '.id' > /dev/null 2>&1; then
+              echo "::error::Attaching ${NAME} to the Gitee release failed"
+              echo "${RESP}"
+              exit 1
+            fi
+          done

@@ -1638,18 +1638,37 @@ protected Q_SLOTS:
 /**
  * \if ENGLISH
  * @brief System maximize/minimize button
+ * @details The button glyph (minimize line, maximize/restore frame, close cross) is drawn
+ * by code in paintEvent with a 1-logical-pixel pen, so it stays sharp at any DPI.
+ * The glyph color can be set through the glyphColor property (qproperty-glyphColor in qss);
+ * when it is invalid, the color is derived from the ribbon theme of the owner main window.
  * \endif
  *
  * \if CHINESE
  * @brief 系统最大最小化按钮
+ * @details 按钮图元（最小化横线、最大化/还原方框、关闭交叉线）在 paintEvent 中代码绘制，
+ * 线宽为1逻辑像素，任意DPI下保持清晰。图元颜色可通过glyphColor属性设置
+ * （qss中为qproperty-glyphColor），颜色无效时根据所属主窗口的ribbon主题自动推导。
  * \endif
  */
 class SARibbonSystemToolButton : public QToolButton
 {
 	Q_OBJECT
+	Q_PROPERTY(QColor glyphColor READ glyphColor WRITE setGlyphColor)
 public:
 	// Constructor for SARibbonSystemToolButton
 	SARibbonSystemToolButton(QWidget* p = nullptr);
+	// Set the glyph color, an invalid color means auto deriving from the ribbon theme
+	void setGlyphColor(const QColor& color);
+	// Get the glyph color
+	QColor glyphColor() const;
+
+protected:
+	// Draw the qss background first, then draw the button glyph on top
+	virtual void paintEvent(QPaintEvent* e) Q_DECL_OVERRIDE;
+
+private:
+	QColor m_glyphColor;  ///< Invalid by default, means auto derive
 };
 
 #endif  // SARIBBONSYSTEMBUTTONBAR_H

@@ -1,0 +1,49 @@
+name: Attach Amalgamated Sources
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing release tag to attach the amalgamated files to (e.g. v2.9.6)
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: attach-amalgamated-${{ github.event.release.tag_name || inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  attach:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout release tag
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ github.event.release.tag_name || inputs.tag }}
+
+      - name: Check the amalgamated files
+        env:
+          TAG: ${{ github.event.release.tag_name || inputs.tag }}
+        run: |
+          for f in src/SARibbon.h src/SARibbon.cpp; do
+            test -s "${f}" || { echo "::error::${f} is missing at tag ${TAG}"; exit 1; }
+          done
+          FILE_VERSION=$(grep -a -m1 -o 'SARIBBON_VERSION "[^"]*"' src/SARibbon.h | sed 's/.*"\(.*\)"/\1/')
+          if [ "v${FILE_VERSION}" != "${TAG}" ]; then
+            echo "::warning::src/SARibbon.h reports version ${FILE_VERSION} but the release tag is ${TAG}; the amalgamated files may be stale"
+          else
+            echo "Amalgamated files match version ${FILE_VERSION}"
+          fi
+
+      - name: Upload to the GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.event.release.tag_name || inputs.tag }}
+        run: |
+          gh release upload "${TAG}" src/SARibbon.h src/SARibbon.cpp \
+            --repo "${GITHUB_REPOSITORY}" --clobber

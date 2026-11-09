@@ -7796,6 +7796,9 @@ SARibbonApplicationButton::~SARibbonApplicationButton()
 #include <QDebug>
 #include <QScopedPointer>
 #include <QWindowStateChangeEvent>
+#include <QPainter>
+#include <QPainterPath>
+#include <QPaintEvent>
 
 // 为了避免使用此框架的app设置了全局的qpushbutton 的 qss样式影响此按钮，定义了一个类
 
@@ -8066,6 +8069,125 @@ public:
 //===================================================
 // SARibbonSystemToolButton
 //===================================================
+namespace
+{
+// Glyph kinds of the window system buttons
+enum SaSysButtonGlyph
+{
+	SaSysButtonGlyphNone = 0,
+	SaSysButtonGlyphMinimize,
+	SaSysButtonGlyphMaximize,
+	SaSysButtonGlyphRestore,
+	SaSysButtonGlyphClose
+};
+
+/**
+ * \if ENGLISH
+ * @brief Whether the ribbon theme uses a dark title bar background
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 判断ribbon主题的标题栏背景是否为深色
+ * \endif
+ */
+bool saIsDarkRibbonTheme(SARibbonTheme theme)
+{
+	switch (theme) {
+	case SARibbonTheme::RibbonThemeOffice2016Dark:
+	case SARibbonTheme::RibbonThemeOffice2021Dark:
+	case SARibbonTheme::RibbonThemeDark:
+	case SARibbonTheme::RibbonThemeDark2:
+		return true;
+	default:
+		return false;
+	}
+}
+
+/**
+ * \if ENGLISH
+ * @brief Derive a visible glyph color from the ribbon theme of the top level window
+ * @details Fallback used when the glyphColor property was never set (e.g. custom palettes
+ * without the titlebar-icon token or user stylesheets without qproperty-glyphColor)
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 根据顶层窗口的ribbon主题推导可见的图元颜色
+ * @details 作为glyphColor属性未设置时的兜底（例如自定义调色板缺少titlebar-icon标记，
+ * 或用户样式表未包含qproperty-glyphColor的情况）
+ * \endif
+ */
+QColor saAutoGlyphColor(const QWidget* w)
+{
+	const QWidget* top = w ? w->window() : nullptr;
+	SARibbonTheme theme;
+	if (const SARibbonMainWindow* mw = qobject_cast< const SARibbonMainWindow* >(top)) {
+		theme = mw->ribbonTheme();
+	} else if (const SARibbonWidget* rw = qobject_cast< const SARibbonWidget* >(top)) {
+		theme = rw->ribbonTheme();
+	} else {
+		return w ? w->palette().windowText().color() : QColor(Qt::black);
+	}
+	return saIsDarkRibbonTheme(theme) ? QColor(Qt::white) : QColor(Qt::black);
+}
+
+/**
+ * \if ENGLISH
+ * @brief Draw one window system button glyph with a 1 logical pixel pen
+ * @details Vector drawing keeps the glyph sharp at any DPI, the geometry follows the
+ * native Windows 11 caption button proportions (glyph box about 36% of the button size)
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 以1逻辑像素线宽绘制单个窗口系统按钮图元
+ * @details 矢量绘制保证任意DPI下清晰，几何比例参照Windows 11原生标题栏按钮
+ * （图元约为按钮尺寸的36%）
+ * \endif
+ */
+void saDrawSysButtonGlyph(QPainter* painter, const QRectF& buttonRect, int glyph, const QColor& color)
+{
+	const qreal glyphSize = qMin(buttonRect.width(), buttonRect.height()) * 0.36;
+	const QPointF center  = buttonRect.center();
+	QPen pen(color);
+	pen.setWidthF(1.0);
+	pen.setCapStyle(Qt::FlatCap);
+	painter->setPen(pen);
+	painter->setBrush(Qt::NoBrush);
+	switch (glyph) {
+	case SaSysButtonGlyphMinimize: {
+		// 最小化：居中横线
+		painter->drawLine(QPointF(center.x() - glyphSize / 2, center.y()), QPointF(center.x() + glyphSize / 2, center.y()));
+	} break;
+	case SaSysButtonGlyphMaximize: {
+		// 最大化：方框
+		painter->drawRect(QRectF(center.x() - glyphSize / 2, center.y() - glyphSize / 2, glyphSize, glyphSize));
+	} break;
+	case SaSysButtonGlyphRestore: {
+		// 还原：两个错位的方框，只绘制背框露出的部分，避免线条交叉
+		const qreal s  = glyphSize;
+		const qreal x0 = center.x() - s / 2;
+		const qreal y0 = center.y() - s / 2;
+		QPainterPath path;
+		path.moveTo(x0 + s * 0.25, y0 + s * 0.25);
+		path.lineTo(x0 + s * 0.25, y0);
+		path.lineTo(x0 + s, y0);
+		path.lineTo(x0 + s, y0 + s * 0.75);
+		path.lineTo(x0 + s * 0.75, y0 + s * 0.75);
+		path.addRect(QRectF(x0, y0 + s * 0.25, s * 0.75, s * 0.75));
+		painter->drawPath(path);
+	} break;
+	case SaSysButtonGlyphClose: {
+		// 关闭：交叉线
+		const qreal half = glyphSize / 2;
+		painter->drawLine(QPointF(center.x() - half, center.y() - half), QPointF(center.x() + half, center.y() + half));
+		painter->drawLine(QPointF(center.x() + half, center.y() - half), QPointF(center.x() - half, center.y() + half));
+	} break;
+	default:
+		break;
+	}
+}
+
+}  // namespace
+
 /**
  * \if ENGLISH
  * @brief Constructs a SARibbonSystemToolButton instance
@@ -8080,6 +8202,82 @@ public:
 SARibbonSystemToolButton::SARibbonSystemToolButton(QWidget* p) : QToolButton(p)
 {
 	setAutoRaise(true);
+}
+
+/**
+ * \if ENGLISH
+ * @brief Sets the glyph color, an invalid color means auto deriving from the ribbon theme
+ * @param color Glyph color
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 设置图元颜色，无效颜色表示根据ribbon主题自动推导
+ * @param color 图元颜色
+ * \endif
+ */
+void SARibbonSystemToolButton::setGlyphColor(const QColor& color)
+{
+	if (m_glyphColor == color) {
+		return;
+	}
+	m_glyphColor = color;
+	update();
+}
+
+/**
+ * \if ENGLISH
+ * @brief Gets the glyph color
+ * @return Glyph color, may be invalid which means auto deriving
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 获取图元颜色
+ * @return 图元颜色，可能无效，无效表示自动推导
+ * \endif
+ */
+QColor SARibbonSystemToolButton::glyphColor() const
+{
+	return m_glyphColor;
+}
+
+/**
+ * \if ENGLISH
+ * @brief Draws the qss background first, then draws the button glyph on top
+ * @details The glyph is identified by objectName (SAMinimizeWindowButton / SAMaximizeWindowButton /
+ * SACloseWindowButton), the maximize button draws the restore glyph when checked.
+ * The close button uses a white glyph on hover/pressed since its background turns red
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 先绘制qss背景，再在其上绘制按钮图元
+ * @details 图元类型通过objectName识别（SAMinimizeWindowButton / SAMaximizeWindowButton /
+ * SACloseWindowButton），最大化按钮在checked状态绘制还原图元。
+ * 关闭按钮悬停/按下时背景变红，图元使用白色
+ * \endif
+ */
+void SARibbonSystemToolButton::paintEvent(QPaintEvent* e)
+{
+	QToolButton::paintEvent(e);
+	const QString name = objectName();
+	int glyph          = SaSysButtonGlyphNone;
+	if (name == QLatin1String("SAMinimizeWindowButton")) {
+		glyph = SaSysButtonGlyphMinimize;
+	} else if (name == QLatin1String("SAMaximizeWindowButton")) {
+		glyph = isChecked() ? SaSysButtonGlyphRestore : SaSysButtonGlyphMaximize;
+	} else if (name == QLatin1String("SACloseWindowButton")) {
+		glyph = SaSysButtonGlyphClose;
+	}
+	if (SaSysButtonGlyphNone == glyph) {
+		return;
+	}
+	QColor color = m_glyphColor.isValid() ? m_glyphColor : saAutoGlyphColor(this);
+	if (SaSysButtonGlyphClose == glyph && (isDown() || underMouse())) {
+		// 关闭按钮悬停/按下背景为红色（close-bg），图元用白色，与原生Windows一致
+		color = QColor(Qt::white);
+	}
+	QPainter painter(this);
+	painter.setRenderHint(QPainter::Antialiasing, true);
+	saDrawSysButtonGlyph(&painter, QRectF(rect()), glyph, color);
 }
 //===================================================
 // SARibbonSystemButtonBar
@@ -8427,7 +8625,7 @@ bool SARibbonSystemButtonBar::eventFilter(QObject* obj, QEvent* event)
 		} break;
 #if QT_VERSION >= QT_VERSION_CHECK(5, 14, 0)
 		case QEvent::ScreenChangeInternal:
-#if QT_VERSION >= QT_VERSION_CHECK(6, 2, 0)
+#if QT_VERSION >= QT_VERSION_CHECK(6, 6, 0)
 		case QEvent::DevicePixelRatioChange:
 #endif
 		{
@@ -9724,11 +9922,11 @@ int SARibbonToolButton::PrivateData::estimateLargeButtonTextWidth(int buttonHeig
 		int maxWidth  = textSize.width();      // 最大宽度（原始宽度）
 		int bestWidth = maxWidth;              // 最佳宽度
 
-		// 两行判定基准用单行实测高度而非 lineSpacing：部分字体（如 Microsoft YaHei UI）的
-		// boundingRect 多行高度按单行高度累计（2 行 = 2×单行高），大于 2×lineSpacing，
-		// 用 lineSpacing*2 判定会使二分查找永远判为"超过两行"、宽度退化为单行全宽，
-		// buttonMaximumAspectRatio 宽度上限对这些字体静默失效
-		const int twoLineHeightBudget = 2 * textSize.height() + 2;
+		// 两行判定基准取「单行实测高度×2」与「lineSpacing×2」的较大值再加余量：
+		// 部分字体（如 Microsoft YaHei UI）的多行高度按单行高度累计，而西文/回退字体的
+		// 两行高度接近 2×lineSpacing；只采用其中一个基准，另一类字体的二分查找会永远
+		// 判为“超过两行”，宽度退化为单行全宽，buttonMaximumAspectRatio 上限静默失效
+		const int twoLineHeightBudget = qMax(2 * textSize.height(), 2 * fm.lineSpacing()) + 2;
 
 		// 二分查找，最多10次迭代
 		for (int i = 0; i < 10; ++i) {
