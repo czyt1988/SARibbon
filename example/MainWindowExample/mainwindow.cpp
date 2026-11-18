@@ -10,12 +10,14 @@
 #include <QCheckBox>
 #include "SARibbonColorToolButton.h"
 #include <QComboBox>
+#include <QDoubleSpinBox>
 #include "SARibbonCustomizeDialog.h"
 #include "SARibbonCustomizeWidget.h"
 #include "SARibbonGallery.h"
 
 #include "SARibbonMenu.h"
 #include "SARibbonPanel.h"
+#include "SARibbonParamGrid.h"
 #include "SARibbonQuickAccessBar.h"
 #include "SARibbonCustomizeData.h"
 #include "SARibbonToolButton.h"
@@ -2172,6 +2174,64 @@ void MainWindow::createCategoryMain(SARibbonCategory* categoryPage)
     panelWidgetTest->setOptionAction(calendarOptionAction);
 
     panelWidgetTest->setVisible(true);
+
+    // 参数网格（SARibbonParamGrid）：一行 = 前标签 | 控件 | 后标签，
+    // 所有行共享标签列宽，切换 3 行 / 2 行 / 1 行样式时自动横向分列而不会被压扁
+    SARibbonPanel* panelParamGrid = categoryPage->addPanel(tr("Param Grid"));
+    panelParamGrid->setObjectName(QStringLiteral("panelParamGrid"));
+
+    SARibbonParamGrid* paramGrid = new SARibbonParamGrid(panelParamGrid);
+    paramGrid->setObjectName(QStringLiteral("paramGrid"));
+
+    QComboBox* comboChannel = new QComboBox(paramGrid);
+    comboChannel->setObjectName(QStringLiteral("paramGridChannel"));
+    comboChannel->addItem(tr("CH1"));
+    comboChannel->addItem(tr("CH2"));
+    comboChannel->addItem(tr("CH3"));
+    comboChannel->addItem(tr("CH4"));
+    comboChannel->setMinimumWidth(120);
+    paramGrid->addRow(tr("Channel"), comboChannel);
+
+    QComboBox* comboWindow = new QComboBox(paramGrid);
+    comboWindow->setObjectName(QStringLiteral("paramGridWindow"));
+    comboWindow->addItem(tr("Rectangular"));
+    comboWindow->addItem(tr("Hann"));
+    comboWindow->addItem(tr("Hamming"));
+    comboWindow->addItem(tr("Blackman"));
+    comboWindow->setMinimumWidth(96);
+    paramGrid->addRow(tr("Window"), comboWindow);
+
+    QComboBox* comboAmplitude = new QComboBox(paramGrid);
+    comboAmplitude->setObjectName(QStringLiteral("paramGridAmplitude"));
+    comboAmplitude->addItem(tr("Peak"));
+    comboAmplitude->addItem(tr("RMS"));
+    comboAmplitude->addItem(tr("Peak-Peak"));
+    comboAmplitude->setMinimumWidth(118);
+    paramGrid->addRow(tr("Amplitude"), comboAmplitude);
+
+    QDoubleSpinBox* spinResolution = new QDoubleSpinBox(paramGrid);
+    spinResolution->setObjectName(QStringLiteral("paramGridResolution"));
+    spinResolution->setDecimals(1);
+    spinResolution->setRange(0.1, 1000.0);
+    spinResolution->setSingleStep(0.1);
+    spinResolution->setValue(1.0);
+    spinResolution->setSuffix(tr(" Hz"));
+    spinResolution->setMinimumWidth(112);
+    paramGrid->addRow(tr("Resolution"), spinResolution);
+
+    // 跨列只读提示：随频率分辨率联动，验证网格里的控件确实生效
+    QLabel* labelResolutionHint = new QLabel(paramGrid);
+    labelResolutionHint->setObjectName(QStringLiteral("paramGridResolutionHint"));
+    labelResolutionHint->setText(tr("Δf = %1 Hz").arg(spinResolution->value(), 0, 'f', 1));
+    paramGrid->addSpanRow(labelResolutionHint);
+    connect(spinResolution,
+            QOverload< double >::of(&QDoubleSpinBox::valueChanged),
+            this,
+            [ labelResolutionHint ](double hz) {
+                labelResolutionHint->setText(tr("Δf = %1 Hz").arg(hz, 0, 'f', 1));
+            });
+
+    panelParamGrid->addLargeWidget(paramGrid);
 }
 
 /**
