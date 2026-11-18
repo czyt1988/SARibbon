@@ -2456,6 +2456,12 @@ void SARibbonBar::endUpdate()
         });
     }
 
+    // 面板布局模式（行数）变化：在重新布局之前发一次信号，嵌在面板里的控件可以在本次
+    // relayout 之前重算 sizeHint，避免「先按旧宽度排一遍、再被信号纠正」的二次重排
+    if (hasPanelLayoutMode) {
+        Q_EMIT panelLayoutModeChanged(panelLayoutMode());
+    }
+
     // Single relayout + item geometry update
     if (SARibbonBarLayout* lay = qobject_cast< SARibbonBarLayout* >(layout())) {
         lay->resetSize();
@@ -2743,6 +2749,9 @@ void SARibbonBar::setPanelLayoutMode(SARibbonPanel::PanelLayoutMode m)
         c->setPanelLayoutMode(m);
         return true;
     });
+    // 面板布局模式（行数）已下发给所有 category，此时发出信号让嵌入控件先调整自身尺寸，
+    // 后续由 Qt 触发的重新布局即可拿到新的 sizeHint
+    Q_EMIT panelLayoutModeChanged(m);
 }
 
 /**
