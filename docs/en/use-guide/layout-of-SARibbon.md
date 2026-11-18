@@ -171,6 +171,9 @@ enum PanelLayoutMode
 
 The 3-row mode is the traditional panel layout method. It has three row proportions: Large, Medium, and Small. Panel titles are shown by default.
 
+> **💡 Parameter grid**
+> To place a group of "label + field" parameters instead of buttons, use `SARibbonParamGrid`: it aligns the label and field columns across all rows and reflows into side-by-side blocks when switching between 3-row, 2-row, and single-row modes. See [Parameter Grid](./parameter-grid.md).
+
 ### 2-row Mode
 
 In the 2-row mode, Medium and Small row proportions are the same and not distinguished. Panel titles are hidden by default.

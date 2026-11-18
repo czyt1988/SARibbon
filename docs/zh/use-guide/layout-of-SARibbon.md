@@ -163,6 +163,9 @@ enum RowProportion {
 
 `SARibbonPanel`里管理的每个action都会带有一个私有的属性（`SARibbonPanelItem::RowProportion`），这个属性决定了这个action在panel里的布局
 
+> **💡 参数网格**
+> 如果面板里放的不是按钮而是一组「标签 + 控件」参数，请使用 `SARibbonParamGrid`：它让所有行的标签列与控件列对齐，并在 3 行 / 2 行 / 1 行模式切换时自动横向分列，详见 [参数网格](./parameter-grid.md)。
+
 panel的布局方式可以通过`SARibbonPanel::setPanelLayoutMode`来设置，这个函数接收`SARibbonPanel::PanelLayoutMode`枚举，枚举定义如下：
 
 ```cpp

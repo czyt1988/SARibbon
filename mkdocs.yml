@@ -70,6 +70,7 @@ plugins:
                 - Creating the Ribbon UI: en/use-guide/create-ribbon-ui.md
                 - Title Bar Settings: en/use-guide/titlebar-setting.md
                 - Ribbon Layout Options: en/use-guide/layout-of-SARibbon.md
+                - Parameter Grid: en/use-guide/parameter-grid.md
                 - Ribbon Button Layout Guide: en/use-guide/layout-of-ribbonbutton.md
                 - Ribbon Size Settings: en/use-guide/SARibbon-size-settings.md
                 - Content Margins: en/use-guide/contents-margins-of-ribbon.md
@@ -118,6 +119,7 @@ plugins:
                 - 创建Ribbon界面: zh/use-guide/create-ribbon-ui.md
                 - 标题栏的设置: zh/use-guide/titlebar-setting.md
                 - Ribbon的布局方式: zh/use-guide/layout-of-SARibbon.md
+                - 参数网格: zh/use-guide/parameter-grid.md
                 - Ribbon按钮布局说明: zh/use-guide/layout-of-ribbonbutton.md
                 - Ribbon尺寸设置: zh/use-guide/SARibbon-size-settings.md
                 - 内容边距设置: zh/use-guide/contents-margins-of-ribbon.md
