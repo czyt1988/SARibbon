@@ -115,6 +115,7 @@ set(SARIBBON_HEADERS
     ${SARIBBON_SOURCE_DIR}/SARibbonCategory.h
     ${SARIBBON_SOURCE_DIR}/SARibbonCategoryLayout.h
     ${SARIBBON_SOURCE_DIR}/SARibbonPanel.h
+    ${SARIBBON_SOURCE_DIR}/SARibbonParamGrid.h
     ${SARIBBON_SOURCE_DIR}/SARibbonPanelLayout.h
     ${SARIBBON_SOURCE_DIR}/SARibbonPanelItem.h
     ${SARIBBON_SOURCE_DIR}/SARibbonPanelOptionButton.h
@@ -163,6 +164,7 @@ set(SARIBBON_SOURCES
     ${SARIBBON_SOURCE_DIR}/SARibbonCategory.cpp
     ${SARIBBON_SOURCE_DIR}/SARibbonCategoryLayout.cpp
     ${SARIBBON_SOURCE_DIR}/SARibbonPanel.cpp
+    ${SARIBBON_SOURCE_DIR}/SARibbonParamGrid.cpp
     ${SARIBBON_SOURCE_DIR}/SARibbonPanelLayout.cpp
     ${SARIBBON_SOURCE_DIR}/SARibbonPanelItem.cpp
     ${SARIBBON_SOURCE_DIR}/SARibbonPanelOptionButton.cpp
@@ -303,6 +305,7 @@ set(GENERATED_SOURCES
     ${GENERATED_DIR}/saribbonmainwindow_wrapper.cpp
     ${GENERATED_DIR}/saribboncategory_wrapper.cpp
     ${GENERATED_DIR}/saribbonpanel_wrapper.cpp
+    ${GENERATED_DIR}/saribbonparamgrid_wrapper.cpp
     ${GENERATED_DIR}/saribbonpanellabel_wrapper.cpp
     ${GENERATED_DIR}/saribbonpanelitem_wrapper.cpp
     ${GENERATED_DIR}/saribbontoolbutton_wrapper.cpp

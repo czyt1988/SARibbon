@@ -12,6 +12,7 @@
 %Include SARibbonMainWindow.sip
 %Include SARibbonCategory.sip
 %Include SARibbonPanel.sip
+%Include SARibbonParamGrid.sip
 %Include SARibbonPanelItem.sip
 %Include SARibbonToolButton.sip
 %Include SARibbonContextCategory.sip

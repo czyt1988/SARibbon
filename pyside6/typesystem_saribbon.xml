@@ -11,6 +11,7 @@
     #include "SARibbonBar.h"
     #include "SARibbonCategory.h"
     #include "SARibbonPanel.h"
+    #include "SARibbonParamGrid.h"
     #include "SARibbonPanelItem.h"
     #include "SARibbonToolButton.h"
     #include "SARibbonColorToolButton.h"
@@ -167,6 +168,15 @@
     <modify-function signature="addAction(QIcon,QString)" remove="all"/>
     <modify-function signature="addAction(QString,QKeySequence)" remove="all"/>
     <modify-function signature="addAction(QIcon,QString,QKeySequence)" remove="all"/>
+  </object-type>
+
+  <!-- ============================================================
+       SARibbonParamGrid (QWidget)
+       ============================================================ -->
+  <object-type name="SARibbonParamGrid">
+    <include file-name="SARibbonParamGrid.h" location="global"/>
+    <enum-type name="LabelSides"/>
+    <enum-type name="FlowPolicy"/>
   </object-type>
 
   <!-- ============================================================
