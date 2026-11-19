@@ -8,6 +8,7 @@
 #include "SARibbonParamGrid.h"
 #include "SARibbonBar.h"
 #include "SARibbonCategory.h"
+#include "SARibbonContextCategory.h"
 #include "SARibbonPanel.h"
 
 namespace
@@ -56,6 +57,8 @@ private Q_SLOTS:
     void testTextChangeRecomputesWidth();
     void testHeightDerivedBudgetWithoutPanel();
     void testRowBudgetFollowsPanel();
+    void testContextCategoryInheritsRibbonStyle();
+    void testRibbonStyleReappliedToExistingCategories();
 };
 
 void SARibbonParamGridTest::testAutoLabelColumnWidth()
@@ -324,6 +327,43 @@ void SARibbonParamGridTest::testRowBudgetFollowsPanel()
     QCoreApplication::processEvents();
     QCOMPARE(grid->currentRows(), 1);
     QCOMPARE(grid->currentColumns(), 4);
+}
+
+void SARibbonParamGridTest::testContextCategoryInheritsRibbonStyle()
+{
+    // Plugins add their context tabs after the host already applied the ribbon style. Those pages must
+    // inherit the row mode and the word-wrap state instead of keeping the category defaults
+    SARibbonBar bar;
+    bar.setRibbonStyle(SARibbonBar::RibbonStyleCompactTwoRow);
+
+    SARibbonContextCategory* context = bar.addContextCategory(QStringLiteral("Context"));
+    QVERIFY(context != nullptr);
+    SARibbonCategory* page = context->addCategoryPage(QStringLiteral("Analysis"));
+    QVERIFY(page != nullptr);
+
+    QCOMPARE(page->panelLayoutMode(), SARibbonPanel::TwoRowMode);
+    QVERIFY(!page->isEnableWordWrap());
+    QVERIFY(!page->isEnableShowPanelTitle());
+}
+
+void SARibbonParamGridTest::testRibbonStyleReappliedToExistingCategories()
+{
+    // Setting the style again with the same value must still push the state to categories that were created
+    // while the bar-level property already equalled the target value
+    SARibbonBar bar;
+    SARibbonContextCategory* context = bar.addContextCategory(QStringLiteral("Context"));
+    QVERIFY(context != nullptr);
+    SARibbonCategory* page = context->addCategoryPage(QStringLiteral("Analysis"));
+    QVERIFY(page != nullptr);
+    QCOMPARE(page->panelLayoutMode(), SARibbonPanel::ThreeRowMode);
+
+    const SARibbonBar::RibbonStyles twoRow = SARibbonBar::RibbonStyleCompactTwoRow;
+    bar.setRibbonStyle(twoRow);
+    QCOMPARE(page->panelLayoutMode(), SARibbonPanel::TwoRowMode);
+    // Applying the very same style a second time must keep the category in sync as well
+    bar.setRibbonStyle(twoRow);
+    QCOMPARE(page->panelLayoutMode(), SARibbonPanel::TwoRowMode);
+    QVERIFY(!page->isEnableWordWrap());
 }
 
 QTEST_MAIN(SARibbonParamGridTest)

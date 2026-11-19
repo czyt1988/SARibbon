@@ -827,6 +827,41 @@ SARibbonCategory* SARibbonBar::insertCategoryPage(const QString& title, int inde
 
 /**
  * \if ENGLISH
+ * @brief Push the current ribbon style state to one category
+ * @details The setters used to be inlined in insertCategoryPage(), but a category can also arrive through a
+ *          context category (a plugin adds its context tab after the ribbon style was already applied).
+ *          Keeping the state push in one place makes sure every category, regular or context, honours the
+ *          current style.
+ * @param category Category to update, ignored when null
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 把当前丝带样式状态下发给一个 category
+ * @details 以前这些 setter 内联在 insertCategoryPage() 里；但 category 也可能通过上下文标签进来
+ *          （插件在丝带样式设置之后才加自己的上下文标签）。集中成一处，保证普通标签与上下文标签
+ *          都遵守当前样式。
+ * @param category 要更新的 category，空指针时忽略
+ * \endif
+ */
+void SARibbonBar::applyRibbonStyleToCategory(SARibbonCategory* category)
+{
+    if (nullptr == category) {
+        return;
+    }
+    category->setPanelLayoutMode(panelLayoutMode());
+    category->setPanelSpacing(panelSpacing());
+    category->setPanelLargeIconSize(panelLargeIconSize());
+    category->setPanelSmallIconSize(panelSmallIconSize());
+    category->setEnableWordWrap(isEnableWordWrap());
+    category->setEnableShowPanelTitle(isEnableShowPanelTitle());
+    category->setEnableIconRightText(isEnableIconRightText());
+    category->setButtonMaximumAspectRatio(buttonMaximumAspectRatio());
+    category->setLargeButtonMinimumWidthRatio(largeButtonMinimumWidthRatio());
+    category->setPanelTitleHeight(panelTitleHeight());
+}
+
+/**
+ * \if ENGLISH
  * @brief Insert a category
  * @param category SARibbonCategory pointer
  * @param index Insert position, if out of range, will be inserted at the end
@@ -843,16 +878,7 @@ void SARibbonBar::insertCategoryPage(SARibbonCategory* category, int index)
     if (nullptr == category) {
         return;
     }
-    category->setPanelLayoutMode(panelLayoutMode());
-    category->setPanelSpacing(panelSpacing());
-    category->setPanelLargeIconSize(panelLargeIconSize());
-    category->setPanelSmallIconSize(panelSmallIconSize());
-    category->setEnableWordWrap(isEnableWordWrap());
-    category->setEnableShowPanelTitle(isEnableShowPanelTitle());
-    category->setEnableIconRightText(isEnableIconRightText());
-    category->setButtonMaximumAspectRatio(buttonMaximumAspectRatio());
-    category->setLargeButtonMinimumWidthRatio(largeButtonMinimumWidthRatio());
-    category->setPanelTitleHeight(panelTitleHeight());
+    applyRibbonStyleToCategory(category);
 
     int i = d_ptr->mRibbonTabBar->insertTab(index, category->categoryName());
 
@@ -1315,8 +1341,9 @@ void SARibbonBar::showContextCategory(SARibbonContextCategory* context)
     contextCategoryData.contextCategory = context;
     for (int i = 0; i < context->categoryCount(); ++i) {
         SARibbonCategory* category = context->categoryPage(i);
-        // 此句如果模式重复设置不会进行多余操作
-        category->setPanelLayoutMode(d_ptr->mDefaultPanelLayoutMode);
+        // 显示上下文标签前再下发一次完整样式（行模式/换行/面板标题/图标右文字），重复设置不会有多余操作
+        applyRibbonStyleToCategory(category);
+        category->updateItemGeometry();
         // 切换模式后会改变高度，上下文标签显示时要保证显示出来
         int index = d_ptr->mRibbonTabBar->addTab(category->categoryName());
         contextCategoryData.tabPageIndex.append(index);
@@ -2019,6 +2046,10 @@ void SARibbonBar::onCurrentRibbonTabDoubleClicked(int index)
 void SARibbonBar::onContextsCategoryPageAdded(SARibbonCategory* category)
 {
     Q_ASSERT_X(category != nullptr, "onContextsCategoryPageAdded", "add nullptr page");
+    // 上下文标签里的 category 是插件在丝带样式设置之后才加进来的，必须补一次样式下发，
+    // 否则它会按自己的默认值（3 行 + 文字换行）排版，与当前 2 行样式的高度对不上
+    applyRibbonStyleToCategory(category);
+    category->updateItemGeometry();
     d_ptr->mStackedContainerWidget->addWidget(category);  // 这里stackedWidget用append，其他地方都应该使用insert
 }
 
@@ -2355,6 +2386,22 @@ void SARibbonBar::setRibbonStyle(SARibbonBar::RibbonStyles v)
         setEnableIconRightText(false);
     }
     endUpdate();  // 此处执行单次遍历 + 单次 relayout
+
+    // 批量下发的 setter 只有在属性「发生变化」时才排入 pending：如果 bar 的值早已等于目标值
+    // （典型场景：样式在 category 创建之前就设置过，插件随后才添加上下文标签），批量里什么都没做，
+    // 这些 category 会一直沿用默认值（3 行 + 文字换行）。这里再完整下发一次，保证普通标签与
+    // 上下文标签都遵守当前样式。
+    const QList< SARibbonCategory* > allCategories = findChildren< SARibbonCategory* >();
+    if (!allCategories.isEmpty()) {
+        for (SARibbonCategory* category : allCategories) {
+            applyRibbonStyleToCategory(category);
+            category->updateItemGeometry();
+        }
+        if (SARibbonBarLayout* lay = qobject_cast< SARibbonBarLayout* >(layout())) {
+            lay->resetSize();
+        }
+        d_ptr->relayout();
+    }
 
     Q_EMIT ribbonStyleChanged(d_ptr->mRibbonStyle);
 }

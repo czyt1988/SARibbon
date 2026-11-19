@@ -688,6 +688,8 @@ protected Q_SLOTS:
 
 private:
     int tabIndex(SARibbonCategory* obj);
+    // Push the current style state (row mode / word wrap / panel title / icon-right-text ...) to one category
+    void applyRibbonStyleToCategory(SARibbonCategory* category);
     void paintInLooseStyle(const QRect& paintRect);
     void paintInCompactStyle(const QRect& paintRect);
 
