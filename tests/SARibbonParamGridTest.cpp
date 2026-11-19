@@ -50,6 +50,8 @@ private Q_SLOTS:
     void testBalancedFlow();
     void testColumnFirstFlow();
     void testSpanRowWidth();
+    void testPerBlockLabelWidth();
+    void testSpanRowGetsOwnFullWidthRow();
     void testNoVerticalOverlap();
     void testTextChangeRecomputesWidth();
     void testHeightDerivedBudgetWithoutPanel();
@@ -210,8 +212,45 @@ void SARibbonParamGridTest::testSpanRowWidth()
     grid.addSpanRow(hint);
     grid.resize(400, 40);
 
-    QCOMPARE(grid.currentColumns(), 1);
+    // A grid with only a span row has no column blocks, the span row defines the grid width
+    QCOMPARE(grid.currentColumns(), 0);
     QCOMPARE(hint->width(), grid.sizeHint().width());
+}
+
+void SARibbonParamGridTest::testPerBlockLabelWidth()
+{
+    SARibbonParamGrid grid;
+    grid.setMaxRows(2);
+    grid.addRow(QStringLiteral("A"), makeField(&grid));
+    grid.addRow(QStringLiteral("B"), makeField(&grid));
+    grid.addRow(QStringLiteral("Amplitude"), makeField(&grid));
+    grid.addRow(QStringLiteral("Resolution"), makeField(&grid));
+    grid.resize(900, 80);
+
+    QCOMPARE(grid.currentColumns(), 2);
+    // Block 1 keeps the tight width of its own short labels, it is not padded by block 2's long label
+    const int shortWidth =
+        qMax(expectedAutoLabelWidth(grid, QStringLiteral("A")), expectedAutoLabelWidth(grid, QStringLiteral("B")));
+    QCOMPARE(grid.fieldAt(1)->x(), shortWidth + 4);
+    QCOMPARE(grid.fieldAt(2)->x(), shortWidth + 4);
+    QVERIFY(grid.fieldAt(3)->x() > grid.fieldAt(1)->x());
+}
+
+void SARibbonParamGridTest::testSpanRowGetsOwnFullWidthRow()
+{
+    SARibbonParamGrid grid;
+    grid.setMaxRows(3);
+    addRows(grid, 3);
+    QLabel* hint = new QLabel(QStringLiteral("delta f = 10.0 Hz"), &grid);
+    grid.addSpanRow(hint);
+    grid.resize(900, 120);
+
+    // A span row consumes one ribbon row, so 3 normal rows over a budget of 2 leave two blocks
+    QCOMPARE(grid.currentColumns(), 2);
+    QCOMPARE(grid.currentRows(), 2);
+    QCOMPARE(hint->width(), grid.sizeHint().width());
+    QWidget* lastBlockRow = grid.fieldAt(2);
+    QVERIFY(hint->y() >= lastBlockRow->y() + lastBlockRow->height());
 }
 
 void SARibbonParamGridTest::testNoVerticalOverlap()

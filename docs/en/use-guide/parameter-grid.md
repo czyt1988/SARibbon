@@ -31,7 +31,7 @@ One row always follows a three-segment structure:
 | `LabelTrailing` | `0x2` | field + trailing label |
 | `LabelBoth` | `LabelLeading` + `LabelTrailing` | leading label + field + trailing label |
 
-All rows in a grid share the same column widths, so the field column stays aligned no matter how long each label is.
+All rows of **one column block** share the same column widths, so the field column stays aligned inside that block. Every block sizes its own label column, so a short label in one block is not padded by a long label living in another block.
 
 ## Quick Start
 
@@ -86,7 +86,7 @@ grid->clearRows();                                        // remove every row
 
 ### addSpanRow
 
-A row added with `addSpanRow(QWidget*)` spans the full width of its **column block** (not the whole grid). It is meant for read-only hints, separators, and status text. Span rows take part in row distribution just like ordinary rows.
+A row added with `addSpanRow(QWidget*)` is a **full-width row below the column blocks**. It is meant for read-only hints, separators, and status text. It consumes one row of the panel row budget: with a three-row panel the blocks get at most two rows, with a two-row panel only one row is left for the blocks. When the budget cannot host it (single-row mode), it falls back to an ordinary block row.
 
 ## Label Column Width
 
@@ -94,7 +94,7 @@ A row added with `addSpanRow(QWidget*)` spans the full width of its **column blo
 
 By default the label column width is computed from the current font:
 
-- leading column width = pixel width of the widest leading label + 10, clamped to `[0, 200]` (the lower bound defaults to 0, so a short label column is never padded wider than needed);
+- leading column width = pixel width of the widest leading label **in that block** + 10, clamped to `[0, 200]` (the lower bound defaults to 0 and every block computes its own width);
 - the trailing column is computed independently with the same rule;
 - when the grid has no non-empty leading labels (or no trailing labels), that column width is 0 and no space is reserved.
 - the horizontal gap between a label column and the field column is controlled by `setLabelSpacing(px)`, default 4 px (plus the 10 px text padding, roughly 14 px between text and field).
@@ -147,7 +147,7 @@ The row height is not the available height divided by the number of content rows
 
 A field is `min(field sizeHint height, row height)` tall and vertically centered, so a 22 px ribbon row never clips a 24 px combo box. Column blocks run left to right, rows inside a block run top to bottom, and leftover block height stays at the bottom.
 
-The number of blocks is `ceil(total rows / rows per block)`. For four parameter rows:
+The number of blocks is `ceil(block rows / rows per block)`, where "block rows" excludes span rows (they get their own rows). For four parameter rows:
 
 ```text
 3-row mode (3 rows per block) -> 2 columns x 2 rows (BalancedFlow)
@@ -159,6 +159,13 @@ The number of blocks is `ceil(total rows / rows per block)`. For four parameter 
 
 2-row mode (2 rows per block) -> 2 columns x 2 rows
 Single-row mode (1 row per block) -> 4 columns x 1 row
+```
+
+Span rows are deducted from the row budget first. For a grid of two ordinary rows plus one Δf hint row:
+
+```text
+3-row mode: 3-1 = 2 rows per block -> 1 column x 2 rows, plus one full-width Δf row
+2-row mode: 2-1 = 1 row per block  -> 2 columns x 1 row, plus one full-width Δf row
 ```
 
 ### flowPolicy: how remaining rows are spread

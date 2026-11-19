@@ -58,12 +58,25 @@ public:
 
     int rowBudget() const;
     void updateMetrics();
-    QVector< int > blockRowCounts() const;
+    QVector< int > distributeRows(int totalRows, int rowsPerBlock) const;
     void layoutChildren();
     void notifySizeHintChanged();
     void attachToPanel(SARibbonPanel* p);
     void connectRibbonBar();
     void showLabel(QWidget* w, bool on) const;
+
+public:
+    // One side-by-side column block; every block owns its own label column width so a short label in one
+    // block is not padded by a long label that happens to live in another block
+    struct Block
+    {
+        int rowCount { 0 };            ///< rows of this block
+        int leadingWidth { 0 };        ///< leading label column width of this block
+        int trailingWidth { 0 };       ///< trailing label column width of this block
+        int blockWidth { 0 };          ///< full block width
+        int minimumBlockWidth { 0 };   ///< block width using the minimum field width
+        int x { 0 };                   ///< left edge relative to the grid
+    };
 
 public:
     QList< Row > rows;
@@ -82,14 +95,15 @@ public:
     // metrics
     bool metricsDirty { true };
     int naturalRowHeight { 0 };
-    int leadingColumnWidth { 0 };
-    int trailingColumnWidth { 0 };
     int fieldColumnWidth { 0 };
     int fieldMinimumWidth { 0 };
     int blockCount { 0 };
     int rowsPerBlock { 0 };
+    int spanRowCount { 0 };
+    bool spanRowsInBlocks { false };  ///< fallback: no row budget left for standalone span rows
     int totalWidth { 0 };
     int minimumTotalWidth { 0 };
+    QVector< Block > blocks;
     int lastNotifiedWidth { -1 };
     int lastBudget { -1 };
 };
@@ -159,83 +173,163 @@ void SARibbonParamGrid::PrivateData::updateMetrics()
     int rowHeight     = 0;
     int fieldWidth    = 0;
     int fieldMinWidth = 0;
-    int leadingTextW  = 0;
-    int trailingTextW = 0;
-    bool anyLeading   = false;
-    bool anyTrailing  = false;
-
+    int spanCount     = 0;
     for (const Row& r : rowsRef) {
         if (r.field) {
-            rowHeight    = qMax(rowHeight, qMax(r.field->sizeHint().height(), r.field->minimumSizeHint().height()));
+            rowHeight = qMax(rowHeight, qMax(r.field->sizeHint().height(), r.field->minimumSizeHint().height()));
             // minimumSize() carries setMinimumWidth(), which QWidgetItem uses as a hard lower bound
             const int fieldHintWidth =
                 qMax(r.field->sizeHint().width(), qMax(r.field->minimumSizeHint().width(), r.field->minimumSize().width()));
             fieldMinWidth = qMax(fieldMinWidth, fieldHintWidth);
-            if (!r.span) {
+            if (r.span) {
+                ++spanCount;
+            } else {
                 fieldWidth = qMax(fieldWidth, fieldHintWidth);
             }
-        }
-        if (r.leading && (r.sides & SARibbonParamGrid::LabelLeading) && !r.leading->text().isEmpty()) {
-            anyLeading  = true;
-            leadingTextW = qMax(leadingTextW, fm.horizontalAdvance(r.leading->text()));
-        }
-        if (r.trailing && (r.sides & SARibbonParamGrid::LabelTrailing) && !r.trailing->text().isEmpty()) {
-            anyTrailing   = true;
-            trailingTextW = qMax(trailingTextW, fm.horizontalAdvance(r.trailing->text()));
+        } else if (r.span) {
+            ++spanCount;
         }
     }
 
-    naturalRowHeight = qMax(rowHeight, cFallbackRowHeight);
-    fieldColumnWidth = qMax(fieldWidth, cMinimumFieldWidth);
+    naturalRowHeight  = qMax(rowHeight, cFallbackRowHeight);
+    fieldColumnWidth  = qMax(fieldWidth, cMinimumFieldWidth);
     fieldMinimumWidth = qMax(fieldMinWidth, cMinimumFieldWidth);
 
+    // Span rows are laid out as full-width rows below the column blocks, so they eat into the row budget.
+    // When the panel is too short for that, fall back to treating them as ordinary block rows.
+    spanRowCount     = spanCount;
+    spanRowsInBlocks = false;
+    int rowsForBlocks = budget;
+    if (spanRowCount > 0) {
+        if (budget - spanRowCount >= 1) {
+            rowsForBlocks = budget - spanRowCount;
+        } else {
+            spanRowsInBlocks = true;
+        }
+    }
+
+    blocks.clear();
+    blockCount        = 0;
+    rowsPerBlock      = 0;
+    totalWidth        = 0;
+    minimumTotalWidth = 0;
+
+    int normalRows = 0;
+    for (const Row& r : rowsRef) {
+        if (!r.span || spanRowsInBlocks) {
+            ++normalRows;
+        }
+    }
+    if (normalRows <= 0) {
+        // Only span rows: they are full-width rows, a wide hint label defines the grid width
+        if (!spanRowsInBlocks) {
+            int spanWidth = 0;
+            for (const Row& r : rowsRef) {
+                if (r.span && r.field) {
+                    spanWidth = qMax(spanWidth,
+                                     qMax(r.field->sizeHint().width(),
+                                          qMax(r.field->minimumSizeHint().width(), r.field->minimumSize().width())));
+                }
+            }
+            totalWidth        = spanWidth;
+            minimumTotalWidth = spanWidth;
+        }
+        return;
+    }
+
+    // Collect the row indices that take part in the blocks, keeping the insertion order
+    QVector< int > rowIndices;
+    rowIndices.reserve(normalRows);
+    for (int i = 0; i < rowsRef.size(); ++i) {
+        const Row& r = rowsRef.at(i);
+        if (!r.span || spanRowsInBlocks) {
+            rowIndices.append(i);
+        }
+    }
+
+    const QVector< int > counts = distributeRows(normalRows, rowsForBlocks);
+    blockCount                  = counts.size();
+
     const int maxLabelWidth = qMax(labelMinWidth, labelMaxWidth);
-    if (anyLeading) {
-        leadingColumnWidth = (labelWidth >= 0) ? labelWidth
-                                               : qBound(labelMinWidth, leadingTextW + cLabelTextPadding, maxLabelWidth);
-    } else {
-        leadingColumnWidth = 0;
-    }
-    if (anyTrailing) {
-        trailingColumnWidth = (labelWidth >= 0) ? labelWidth
-                                                : qBound(labelMinWidth, trailingTextW + cLabelTextPadding, maxLabelWidth);
-    } else {
-        trailingColumnWidth = 0;
-    }
-
-    const QVector< int > counts = blockRowCounts();
-    blockCount    = counts.size();
-    rowsPerBlock  = 0;
+    int firstRow  = 0;
+    int x         = 0;
+    int minTotal  = 0;
     for (int c : counts) {
+        Block blk;
+        blk.rowCount = c;
+
+        // Label columns are per block: a short label in one block is not padded by a long label of another
+        int leadingTextW  = 0;
+        int trailingTextW = 0;
+        bool anyLeading   = false;
+        bool anyTrailing  = false;
+        for (int k = 0; k < c; ++k) {
+            const Row& r = rowsRef.at(rowIndices.at(firstRow + k));
+            if (r.leading && (r.sides & SARibbonParamGrid::LabelLeading) && !r.leading->text().isEmpty()) {
+                anyLeading   = true;
+                leadingTextW = qMax(leadingTextW, fm.horizontalAdvance(r.leading->text()));
+            }
+            if (r.trailing && (r.sides & SARibbonParamGrid::LabelTrailing) && !r.trailing->text().isEmpty()) {
+                anyTrailing   = true;
+                trailingTextW = qMax(trailingTextW, fm.horizontalAdvance(r.trailing->text()));
+            }
+        }
+        if (anyLeading) {
+            blk.leadingWidth =
+                (labelWidth >= 0) ? labelWidth : qBound(labelMinWidth, leadingTextW + cLabelTextPadding, maxLabelWidth);
+        }
+        if (anyTrailing) {
+            blk.trailingWidth =
+                (labelWidth >= 0) ? labelWidth : qBound(labelMinWidth, trailingTextW + cLabelTextPadding, maxLabelWidth);
+        }
+        const int segments  = 1 + (blk.leadingWidth > 0 ? 1 : 0) + (blk.trailingWidth > 0 ? 1 : 0);
+        const int labelGaps = labelSpacing * qMax(0, segments - 1);
+        blk.blockWidth        = blk.leadingWidth + fieldColumnWidth + blk.trailingWidth + labelGaps;
+        blk.minimumBlockWidth = blk.leadingWidth + fieldMinimumWidth + blk.trailingWidth + labelGaps;
+        blk.x                 = x;
+        x += blk.blockWidth + columnSpacing;
+        minTotal += blk.minimumBlockWidth + columnSpacing;
         rowsPerBlock = qMax(rowsPerBlock, c);
+        firstRow += c;
+        blocks.append(blk);
     }
+    minimumTotalWidth = qMax(0, minTotal - columnSpacing);
+    totalWidth        = blocks.isEmpty() ? 0 : (blocks.last().x + blocks.last().blockWidth);
 
-    const int segments = 1 + (leadingColumnWidth > 0 ? 1 : 0) + (trailingColumnWidth > 0 ? 1 : 0);
-    const int blockWidth = leadingColumnWidth + fieldColumnWidth + trailingColumnWidth
-                           + labelSpacing * qMax(0, segments - 1);
-    const int minimumBlockWidth =
-        leadingColumnWidth + fieldMinimumWidth + trailingColumnWidth + labelSpacing * qMax(0, segments - 1);
-
-    totalWidth = blockCount > 0 ? blockCount * blockWidth + (blockCount - 1) * columnSpacing : 0;
-    minimumTotalWidth = blockCount > 0 ? blockCount * minimumBlockWidth + (blockCount - 1) * columnSpacing : 0;
+    // Standalone span rows are full-width: a wide hint label can widen the whole grid
+    if (!spanRowsInBlocks && spanRowCount > 0) {
+        int spanWidth = 0;
+        for (const Row& r : rowsRef) {
+            if (r.span && r.field) {
+                spanWidth = qMax(spanWidth,
+                                 qMax(r.field->sizeHint().width(),
+                                      qMax(r.field->minimumSizeHint().width(), r.field->minimumSize().width())));
+            }
+        }
+        totalWidth        = qMax(totalWidth, spanWidth);
+        minimumTotalWidth = qMax(minimumTotalWidth, spanWidth);
+    }
 }
 
 /**
  * \if ENGLISH
  * @brief Split the logical rows over the column blocks according to the flow policy
- * @return Row count of every block, empty when the grid has no rows
+ * @param totalRows Rows that take part in the blocks (span rows are excluded when they get their own rows)
+ * @param rowsPerBlock Row budget of one block
+ * @return Row count of every block, empty when there is nothing to distribute
  * \endif
  *
  * \if CHINESE
  * @brief 按流式策略把逻辑行分配到各列块
- * @return 每个列块的行数；网格为空时返回空数组
+ * @param totalRows 参与分块的行数（span 行单独占行时不计入）
+ * @param rowsPerBlock 每块行数预算
+ * @return 每个列块的行数；没有行时返回空数组
  * \endif
  */
-QVector< int > SARibbonParamGrid::PrivateData::blockRowCounts() const
+QVector< int > SARibbonParamGrid::PrivateData::distributeRows(int totalRows, int rowsPerBlock) const
 {
     QVector< int > counts;
-    const int totalRows = rows.size();
-    const int budget    = qMax(1, rowBudget());
+    const int budget = qMax(1, rowsPerBlock);
     if (totalRows <= 0) {
         return counts;
     }
@@ -280,15 +374,15 @@ void SARibbonParamGrid::PrivateData::showLabel(QWidget* w, bool on) const
 
 /**
  * \if ENGLISH
- * @brief Lay out every child without touching the row metrics
- * @details The row height is the available height divided by the tallest block, children are vertically
- *          centered inside their row and never stretched, so a 22 px ribbon row never clips a 24 px combo.
+ * @brief Lay out every child
+ * @details The row height follows the ribbon row grid and every column block uses its own label column width.
+ *          Span rows are full-width rows below the blocks, children are vertically centered inside their row
+ *          and never stretched, so a 22 px ribbon row never clips a 24 px combo.
  * \endif
  *
  * \if CHINESE
- * @brief 只重排子控件几何，不改动行数指标
- * @details 行高跟随丝带行网格：行高 = (可用高度 − 行间距) / 面板行数，而不是按内容行数均分。
- *          因此 3 行面板里只有 2 行的网格会占满前两行、第三行留空，和相邻面板的小号项对齐；
+ * @brief 重排所有子控件
+ * @details 行高跟随丝带行网格，每个列块用自己那块标签列宽；span 行是列块下方的整宽行。
  *          子控件在行内垂直居中、不拉伸，22px 的丝带行不会把 24px 的下拉框裁掉。
  *          不在面板里时退化为自然行高、贴顶排列。
  * \endif
@@ -302,12 +396,8 @@ void SARibbonParamGrid::PrivateData::layoutChildren()
         return;
     }
 
-    const QRect area    = q_ptr->rect();
-    const bool rtl      = (q_ptr->layoutDirection() == Qt::RightToLeft);
-    const QVector< int > counts = blockRowCounts();
-    const int segments  = 1 + (leadingColumnWidth > 0 ? 1 : 0) + (trailingColumnWidth > 0 ? 1 : 0);
-    const int blockWidth = leadingColumnWidth + fieldColumnWidth + trailingColumnWidth
-                           + labelSpacing * qMax(0, segments - 1);
+    const QRect area = q_ptr->rect();
+    const bool rtl   = (q_ptr->layoutDirection() == Qt::RightToLeft);
 
     // Line height mirrors the ribbon row grid, not the number of content rows: a two-row grid inside a
     // three-row panel keeps the first two ribbon rows and leaves the third one empty, so it lines up with
@@ -333,9 +423,6 @@ void SARibbonParamGrid::PrivateData::layoutChildren()
     const int rowHeight    = (panelRows > 0) ? qMax(1, (usableHeight - (panelRows - 1) * rowSpacing) / panelRows)
                                              : qMax(1, naturalRowHeight);
 
-    const int fieldOffset = (leadingColumnWidth > 0) ? (leadingColumnWidth + labelSpacing) : 0;
-    const int trailingOffset = fieldOffset + fieldColumnWidth + ((trailingColumnWidth > 0) ? labelSpacing : 0);
-
     // Fit a child into its row without ever exceeding the row height
     auto fittedHeight = [](QWidget* w, int maxHeight) -> int {
         if (!w) {
@@ -355,21 +442,35 @@ void SARibbonParamGrid::PrivateData::layoutChildren()
         w->setGeometry(x, rowTop + qMax(0, (maxHeight - h) / 2), qMax(0, width), h);
     };
 
+    // Rows that take part in the column blocks (insertion order), span rows keep their own order too
+    QVector< int > blockRowIndices;
+    QVector< int > spanRowIndices;
+    blockRowIndices.reserve(rows.size());
+    for (int i = 0; i < rows.size(); ++i) {
+        const Row& r = rows.at(i);
+        if (r.span && !spanRowsInBlocks) {
+            spanRowIndices.append(i);
+        } else {
+            blockRowIndices.append(i);
+        }
+    }
+
     int rowIndex = 0;
-    for (int b = 0; b < counts.size(); ++b) {
-        const int rowsInBlock = counts.at(b);
-        const int ltrLeft     = b * (blockWidth + columnSpacing);
-        const int blockTop    = area.top();
-        for (int r = 0; r < rowsInBlock; ++r) {
-            if (rowIndex >= rows.size()) {
+    for (int b = 0; b < blocks.size(); ++b) {
+        const Block& blk = blocks.at(b);
+        const int fieldOffset = (blk.leadingWidth > 0) ? (blk.leadingWidth + labelSpacing) : 0;
+        const int trailingOffset = fieldOffset + fieldColumnWidth + ((blk.trailingWidth > 0) ? labelSpacing : 0);
+        for (int r = 0; r < blk.rowCount; ++r) {
+            if (rowIndex >= blockRowIndices.size()) {
                 break;
             }
-            Row& row = rows[rowIndex];
+            Row& row        = rows[blockRowIndices.at(rowIndex)];
+            const int rowTop = area.top() + r * (rowHeight + rowSpacing);
             ++rowIndex;
-            const int rowTop = blockTop + r * (rowHeight + rowSpacing);
 
             if (row.span) {
-                placeWidget(row.field, ltrLeft, rowTop, blockWidth, rowHeight);
+                // Fallback mode: a span row behaves like a block row and spans the whole block
+                placeWidget(row.field, blk.x, rowTop, blk.blockWidth, rowHeight);
                 showLabel(row.leading, false);
                 showLabel(row.trailing, false);
                 if (row.field) {
@@ -378,13 +479,13 @@ void SARibbonParamGrid::PrivateData::layoutChildren()
                 continue;
             }
 
-            if (leadingColumnWidth > 0 && row.leading) {
-                placeWidget(row.leading, ltrLeft, rowTop, leadingColumnWidth, rowHeight);
+            if (blk.leadingWidth > 0 && row.leading) {
+                placeWidget(row.leading, blk.x, rowTop, blk.leadingWidth, rowHeight);
                 showLabel(row.leading, (row.sides & SARibbonParamGrid::LabelLeading) && !row.leading->text().isEmpty());
             }
             if (row.trailing) {
-                if (trailingColumnWidth > 0) {
-                    placeWidget(row.trailing, ltrLeft + trailingOffset, rowTop, trailingColumnWidth, rowHeight);
+                if (blk.trailingWidth > 0) {
+                    placeWidget(row.trailing, blk.x + trailingOffset, rowTop, blk.trailingWidth, rowHeight);
                     showLabel(row.trailing,
                               (row.sides & SARibbonParamGrid::LabelTrailing) && !row.trailing->text().isEmpty());
                 } else {
@@ -392,12 +493,27 @@ void SARibbonParamGrid::PrivateData::layoutChildren()
                 }
             }
             if (row.field) {
-                placeWidget(row.field, ltrLeft + fieldOffset, rowTop, fieldColumnWidth, rowHeight);
+                placeWidget(row.field, blk.x + fieldOffset, rowTop, fieldColumnWidth, rowHeight);
                 row.field->show();
             }
             // Leading label hidden when this row has no leading side
             if (row.leading && !(row.sides & SARibbonParamGrid::LabelLeading)) {
                 showLabel(row.leading, false);
+            }
+        }
+    }
+
+    // Standalone span rows: full grid width, one row each, right below the column blocks
+    if (!spanRowIndices.isEmpty()) {
+        const int spanTop = area.top() + rowsPerBlock * (rowHeight + rowSpacing);
+        for (int s = 0; s < spanRowIndices.size(); ++s) {
+            Row& row = rows[spanRowIndices.at(s)];
+            const int rowTop = spanTop + s * (rowHeight + rowSpacing);
+            placeWidget(row.field, 0, rowTop, totalWidth, rowHeight);
+            showLabel(row.leading, false);
+            showLabel(row.trailing, false);
+            if (row.field) {
+                row.field->show();
             }
         }
     }
@@ -632,14 +748,19 @@ int SARibbonParamGrid::addRow(QWidget* field, SARibbonParamGrid::LabelSides side
 
 /**
  * \if ENGLISH
- * @brief Add a row whose widget spans the whole block width
- * @param widget Widget that spans the block, for example a read-only hint label
+ * @brief Add a full-width row below the column blocks
+ * @details The row spans the whole grid width and consumes one row of the panel row budget, so a two-row
+ *          panel leaves one row for the column blocks. When the budget cannot host it, it falls back to a
+ *          normal block row.
+ * @param widget Widget that spans the grid, for example a read-only hint label
  * @return Row id (>= 1), or -1 when widget is null
  * \endif
  *
  * \if CHINESE
- * @brief 追加一个横跨整个列块的行
- * @param widget 跨块的控件，例如只读提示标签
+ * @brief 在列块下方追加一条整宽行
+ * @details 该行横跨整个网格宽度，并占掉面板行预算的一行；两行面板里就只剩一行留给列块。
+ *          行预算不够时会退化为普通列块行。
+ * @param widget 跨整个网格的控件，例如只读提示标签
  * @return 行 id（>= 1）；widget 为空时返回 -1
  * \endif
  */
@@ -922,7 +1043,8 @@ int SARibbonParamGrid::labelColumnWidth() const
 {
     SA_DC(d);
     const_cast< PrivateData* >(d)->updateMetrics();
-    return d->leadingColumnWidth;
+    // Column blocks size their label columns independently; report the first block (0 when there is none)
+    return d->blocks.isEmpty() ? 0 : d->blocks.first().leadingWidth;
 }
 
 /**
@@ -1210,8 +1332,9 @@ QSize SARibbonParamGrid::sizeHint() const
 {
     SA_DC(d);
     const_cast< PrivateData* >(d)->updateMetrics();
+    const int layoutRows = d->rowsPerBlock + (d->spanRowsInBlocks ? 0 : d->spanRowCount);
     const int blockHeight =
-        (d->rowsPerBlock > 0) ? (d->rowsPerBlock * d->naturalRowHeight + (d->rowsPerBlock - 1) * d->rowSpacing) : 0;
+        (layoutRows > 0) ? (layoutRows * d->naturalRowHeight + (layoutRows - 1) * d->rowSpacing) : 0;
     return QSize(d->totalWidth, blockHeight);
 }
 

@@ -21,7 +21,9 @@ class SARibbonPanel;
  * - `LabelNone`     : | field |
  *
  * Rows are distributed into blocks with `ceil(rowCount / maxRows)` blocks; see @ref FlowPolicy for how the
- * remainder rows are spread. A row added with addSpanRow() stretches across its whole block.
+ * remainder rows are spread. A row added with addSpanRow() is a full-width row placed below the column
+ * blocks and consumes one row of the panel row budget. Every block sizes its own label column, so a short
+ * label in one block is not padded by a long label living in another block.
  *
  * @note The grid keeps a Preferred width policy on purpose: the ribbon panel gives its items the width reported
  *       by sizeHint() and never stretches them, so the grid cannot steal width from its neighbouring panels.
@@ -41,7 +43,8 @@ class SARibbonPanel;
  * - `LabelNone`     : | 控件 |
  *
  * 列块数固定为 `ceil(行数 / maxRows)`；余下几行怎么摊见 @ref FlowPolicy。用 addSpanRow() 加入的行
- * 会横跨整个列块。
+ * 是列块下方的一条整宽行，占掉面板行预算的一行。每个列块各自计算自己的标签列宽，所以一个列块里的
+ * 短标签不会被另一个列块里的长标签撑宽。
  *
  * @note 网格刻意保持 Preferred 宽度策略：丝带面板给 item 的宽度就是 sizeHint() 报的宽度、且不会拉伸，
  *       因此网格不会抢走相邻面板的宽度。
@@ -86,7 +89,7 @@ public:
     // Add a row with explicit label sides, returns the row id or -1 on failure
     int addRow(QWidget* field, SARibbonParamGrid::LabelSides sides, const QString& leading = QString(),
                const QString& trailing = QString());
-    // Add a row whose widget spans the whole block width, returns the row id or -1 on failure
+    // Add a full-width row below the column blocks, returns the row id or -1 on failure
     int addSpanRow(QWidget* widget);
     // Remove a row by id, returns false when the id is unknown
     bool removeRow(int rowId);
