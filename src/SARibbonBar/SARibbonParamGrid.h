@@ -134,6 +134,10 @@ public:
     void setRowSpacing(int px);
     // Horizontal spacing between blocks in pixels
     void setColumnSpacing(int px);
+    // Horizontal gap between a label column and the field column in pixels
+    void setLabelSpacing(int px);
+    // Horizontal gap between a label column and the field column
+    int labelSpacing() const;
 
     // --- panel integration ---
     // Attach the grid to a panel, the enclosing panel is resolved automatically when not called

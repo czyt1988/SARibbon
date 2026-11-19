@@ -94,13 +94,23 @@ grid->clearRows();                                         // 清空所有行
 
 默认情况下，标签列宽按当前字体自动计算：
 
-- 前标签列宽 = 所有前标签文本中最宽者的像素宽度 + 10，再 clamp 到 `[60, 200]`；
+- 前标签列宽 = 所有前标签文本中最宽者的像素宽度 + 10，再 clamp 到 `[0, 200]`（默认下限 0，标签列不会为了"统一"被撑宽）；
 - 后标签列宽同理独立计算；
 - 若网格里没有任何非空的前标签（或后标签），对应列宽为 0，不会被预留。
-
-10 像素是标签与控件之间的呼吸空间，避免文字与控件贴在一起。可用 `setLabelColumnWidthRange(minPx, maxPx)` 调整 clamp 区间，默认是 `[60, 200]`。
+- 标签列与控件列之间的间隙由 `setLabelSpacing(px)` 控制，默认 4px（加上自动宽度里的 10px padding，文字与控件之间约 14px）。
 
 字体变化或翻译切换后，调用 `recalcColumnWidths()` 重新计算；`addRow()`、`setRowText()` 内部已经会重算，通常不需要手动调用。
+
+### 标签与控件的间距
+
+如果觉得标签离控件太近或太远，用 `setLabelSpacing(px)` 调整（默认 4）：
+
+```cpp
+grid->setLabelSpacing(2);   // 更紧凑
+grid->setLabelSpacing(12);  // 更宽松
+```
+
+行高不在这一层控制：行高始终跟随丝带的面板行网格（见下一节），网格只用这个间隙微调标签与控件的水平距离。
 
 ### 覆盖为固定宽度
 
@@ -126,6 +136,16 @@ grid->setLabelColumnWidth(-1);   // 恢复自动宽度
 | `SARibbonPanel::SingleRowMode` | 1 |
 
 网格会自己监听 `SARibbonBar::panelLayoutModeChanged` 信号，在样式切换时重新分列，不需要业务代码再连一遍信号。
+
+### 行高跟随丝带行网格
+
+行高不是按内容行数均分，而是**跟随面板的行网格**：`行高 = (可用高度 − 行间距) / 面板行数`。所以：
+
+- 3 行面板里只有 2 行的网格，占满前两行、第三行留空，和相邻面板的小号项对齐；
+- 2 行面板里 2 行的网格正好铺满；
+- 1 行面板里每个列块正好一行。
+
+控件高度取 `min(控件 sizeHint 高度, 行高)` 并垂直居中，所以 22px 的丝带行不会把 24px 的下拉框裁掉。列块之间横向排列、每块内部从上往下排行，块内剩余高度留在底部。
 
 列块数固定为 `ceil(总行数 / 每块行数)`。以 4 行参数为例：
 
@@ -170,7 +190,7 @@ qDebug() << grid->rowCount() << grid->currentRows() << grid->currentColumns();
 ## 注意事项
 
 > **⚠️ 面板高度由 Ribbon 行高决定**
-> 网格本身不决定高度：面板把可用高度除以最高列块的行数得到行高，控件在行内垂直居中，且高度不会超过行高。因此放进网格的控件要足够紧凑——一个 `sizeHint()` 很高的控件（比如日历）在 1 行模式下几乎必被裁切。
+> 网格本身不决定高度：行高 = (可用高度 − 行间距) / 面板行数，控件在行内垂直居中，且高度不会超过行高。因此放进网格的控件要足够紧凑——一个 `sizeHint()` 很高的控件（比如日历）在 1 行模式下几乎必被裁切。
 
 > **⚠️ 网格宽度不拉伸**
 > 网格刻意保持 `QSizePolicy::Preferred`，面板只按 `sizeHint()` 报的宽度给它，不会把相邻面板的宽度抢过来。想控制宽度，请给字段控件设 `setMinimumWidth()`（控件列宽取所有控件 `sizeHint()` / `minimumSizeHint()` / `minimumSize()` 的最大值）。
@@ -186,7 +206,7 @@ qDebug() << grid->rowCount() << grid->currentRows() << grid->currentColumns();
 | 分组 | 方法 |
 |------|------|
 | 内容 | `addRow`（4 个重载）、`addSpanRow`、`removeRow`、`clearRows`、`rowCount`、`fieldAt` |
-| 标签 | `setRowText`、`setRowLabelSides`、`leadingLabel`、`trailingLabel`、`setLabelAlignment`、`labelColumnWidth`、`setLabelColumnWidth`、`setLabelColumnWidthRange`、`recalcColumnWidths` |
+| 标签 | `setRowText`、`setRowLabelSides`、`leadingLabel`、`trailingLabel`、`setLabelAlignment`、`labelColumnWidth`、`setLabelColumnWidth`、`setLabelColumnWidthRange`、`setLabelSpacing`、`recalcColumnWidths` |
 | 行列策略 | `setMaxRows`、`maxRows`、`setFlowPolicy`、`flowPolicy`、`currentRows`、`currentColumns`、`setRowSpacing`、`setColumnSpacing` |
 | 面板集成 | `attachToPanel`、`panel` |
 

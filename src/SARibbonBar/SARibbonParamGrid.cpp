@@ -71,7 +71,7 @@ public:
     int maxRows { 0 };
     SARibbonParamGrid::FlowPolicy flowPolicy { SARibbonParamGrid::BalancedFlow };
     int labelWidth { -1 };
-    int labelMinWidth { 60 };
+    int labelMinWidth { 0 };
     int labelMaxWidth { 200 };
     Qt::Alignment labelAlignment { Qt::AlignLeft | Qt::AlignVCenter };
     int rowSpacing { 2 };
@@ -287,8 +287,10 @@ void SARibbonParamGrid::PrivateData::showLabel(QWidget* w, bool on) const
  *
  * \if CHINESE
  * @brief 只重排子控件几何，不改动行数指标
- * @details 行高 = 可用高度 / 最高列块的行数；子控件在行内垂直居中、不拉伸，因此 22px 的丝带行
- *          不会把 24px 的下拉框裁掉。
+ * @details 行高跟随丝带行网格：行高 = (可用高度 − 行间距) / 面板行数，而不是按内容行数均分。
+ *          因此 3 行面板里只有 2 行的网格会占满前两行、第三行留空，和相邻面板的小号项对齐；
+ *          子控件在行内垂直居中、不拉伸，22px 的丝带行不会把 24px 的下拉框裁掉。
+ *          不在面板里时退化为自然行高、贴顶排列。
  * \endif
  */
 void SARibbonParamGrid::PrivateData::layoutChildren()
@@ -307,13 +309,29 @@ void SARibbonParamGrid::PrivateData::layoutChildren()
     const int blockWidth = leadingColumnWidth + fieldColumnWidth + trailingColumnWidth
                            + labelSpacing * qMax(0, segments - 1);
 
-    int maxRowsInBlock = 0;
-    for (int c : counts) {
-        maxRowsInBlock = qMax(maxRowsInBlock, c);
+    // Line height mirrors the ribbon row grid, not the number of content rows: a two-row grid inside a
+    // three-row panel keeps the first two ribbon rows and leaves the third one empty, so it lines up with
+    // the small items of the neighbouring panels. Outside a panel the natural row height is used.
+    int panelRows = 0;
+    if (panel) {
+        switch (panel->panelLayoutMode()) {
+        case SARibbonPanel::ThreeRowMode: {
+            panelRows = 3;
+            break;
+        }
+        case SARibbonPanel::TwoRowMode: {
+            panelRows = 2;
+            break;
+        }
+        case SARibbonPanel::SingleRowMode: {
+            panelRows = 1;
+            break;
+        }
+        }
     }
     const int usableHeight = area.height();
-    const int rowHeight =
-        (maxRowsInBlock > 0) ? qMax(1, (usableHeight - (maxRowsInBlock - 1) * rowSpacing) / maxRowsInBlock) : usableHeight;
+    const int rowHeight    = (panelRows > 0) ? qMax(1, (usableHeight - (panelRows - 1) * rowSpacing) / panelRows)
+                                             : qMax(1, naturalRowHeight);
 
     const int fieldOffset = (leadingColumnWidth > 0) ? (leadingColumnWidth + labelSpacing) : 0;
     const int trailingOffset = fieldOffset + fieldColumnWidth + ((trailingColumnWidth > 0) ? labelSpacing : 0);
@@ -1102,6 +1120,43 @@ void SARibbonParamGrid::setColumnSpacing(int px)
     d->updateMetrics();
     d->layoutChildren();
     updateGeometry();
+}
+
+/**
+ * \if ENGLISH
+ * @brief Horizontal gap between a label column and the field column in pixels
+ * @details The gap is added on top of the automatic label column width, so the default 4px plus the
+ *          text padding keeps the label text and the field close together.
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 标签列与控件列之间的水平间隙（像素）
+ * @details 间隙加在自动标签列宽之外，默认 4px 加上文本 padding，让标签文字与控件保持紧凑。
+ * \endif
+ */
+void SARibbonParamGrid::setLabelSpacing(int px)
+{
+    SA_D(d);
+    d->labelSpacing = qMax(0, px);
+    d->markDirty();
+    d->updateMetrics();
+    d->layoutChildren();
+    updateGeometry();
+}
+
+/**
+ * \if ENGLISH
+ * @brief Horizontal gap between a label column and the field column
+ * \endif
+ *
+ * \if CHINESE
+ * @brief 标签列与控件列之间的水平间隙
+ * \endif
+ */
+int SARibbonParamGrid::labelSpacing() const
+{
+    SA_DC(d);
+    return d->labelSpacing;
 }
 
 /**

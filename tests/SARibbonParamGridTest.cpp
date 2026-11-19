@@ -32,7 +32,7 @@ void addRows(SARibbonParamGrid& grid, int count)
 int expectedAutoLabelWidth(const QWidget& w, const QString& text)
 {
     const int textW = QFontMetrics(w.font()).horizontalAdvance(text);
-    return qBound(60, textW + 10, 200);
+    return qBound(0, textW + 10, 200);
 }
 }  // namespace
 
@@ -41,6 +41,8 @@ class SARibbonParamGridTest : public QObject
     Q_OBJECT
 private Q_SLOTS:
     void testAutoLabelColumnWidth();
+    void testLabelSpacing();
+    void testRowsDoNotStretchOutsidePanel();
     void testLabelColumnWidthOverride();
     void testLeadingAlignment();
     void testTrailingAlignment();
@@ -63,6 +65,39 @@ void SARibbonParamGridTest::testAutoLabelColumnWidth()
     QVERIFY(rowId >= 1);
     QCOMPARE(grid.rowCount(), 1);
     QCOMPARE(grid.labelColumnWidth(), expectedAutoLabelWidth(grid, QStringLiteral("Channel")));
+
+    // Short labels must not be padded up to a wide fixed column: the automatic width stays tight
+    SARibbonParamGrid shortGrid;
+    shortGrid.addRow(QStringLiteral("AB"), makeField(&shortGrid));
+    QCOMPARE(shortGrid.labelColumnWidth(), expectedAutoLabelWidth(shortGrid, QStringLiteral("AB")));
+    QVERIFY(shortGrid.labelColumnWidth() < 60);
+}
+
+void SARibbonParamGridTest::testLabelSpacing()
+{
+    SARibbonParamGrid grid;
+    grid.setMaxRows(3);
+    QComboBox* field = makeField(&grid);
+    grid.addRow(QStringLiteral("Channel"), field);
+    grid.resize(400, 60);
+
+    const int before = field->x();
+    QCOMPARE(grid.labelSpacing(), 4);
+    grid.setLabelSpacing(20);
+    QCOMPARE(grid.labelSpacing(), 20);
+    QCOMPARE(field->x(), before + 16);
+}
+
+void SARibbonParamGridTest::testRowsDoNotStretchOutsidePanel()
+{
+    SARibbonParamGrid grid;
+    grid.setMaxRows(0);
+    QComboBox* field = makeField(&grid);
+    grid.addRow(QStringLiteral("Row"), field);
+    // A very tall grid outside a ribbon panel keeps the natural row height instead of stretching the row
+    grid.resize(400, 300);
+    QVERIFY(field->height() <= field->sizeHint().height() + 1);
+    QVERIFY(field->height() < 100);
 }
 
 void SARibbonParamGridTest::testLabelColumnWidthOverride()
@@ -129,7 +164,8 @@ void SARibbonParamGridTest::testBothSidesAlignment()
     QVERIFY(grid.labelColumnWidth() > 0);
     QCOMPARE(spin->x(), grid.leadingLabel(1)->x() + grid.leadingLabel(1)->width() + 4);
     QCOMPARE(grid.trailingLabel(1)->x(), spin->x() + spin->width() + 4);
-    QCOMPARE(grid.trailingLabel(1)->width(), grid.labelColumnWidth());
+    // Leading and trailing columns are sized independently from their own texts
+    QCOMPARE(grid.trailingLabel(1)->width(), expectedAutoLabelWidth(grid, QStringLiteral("ms")));
 }
 
 void SARibbonParamGridTest::testBalancedFlow()

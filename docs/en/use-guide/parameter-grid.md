@@ -94,13 +94,23 @@ A row added with `addSpanRow(QWidget*)` spans the full width of its **column blo
 
 By default the label column width is computed from the current font:
 
-- leading column width = pixel width of the widest leading label + 10, clamped to `[60, 200]`;
+- leading column width = pixel width of the widest leading label + 10, clamped to `[0, 200]` (the lower bound defaults to 0, so a short label column is never padded wider than needed);
 - the trailing column is computed independently with the same rule;
 - when the grid has no non-empty leading labels (or no trailing labels), that column width is 0 and no space is reserved.
-
-The 10 px is breathing room between a label and its field. Use `setLabelColumnWidthRange(minPx, maxPx)` to change the clamp range; the default is `[60, 200]`.
+- the horizontal gap between a label column and the field column is controlled by `setLabelSpacing(px)`, default 4 px (plus the 10 px text padding, roughly 14 px between text and field).
 
 After a font change or a translation switch, call `recalcColumnWidths()` to recompute. `addRow()` and `setRowText()` already do this internally, so manual calls are rarely needed.
+
+### Label-to-field gap
+
+If the label sits too close to its field (or too far), tune it with `setLabelSpacing(px)` (default 4):
+
+```cpp
+grid->setLabelSpacing(2);   // tighter
+grid->setLabelSpacing(12);  // looser
+```
+
+The row height is not controlled here: it always follows the ribbon panel row grid (see the next section); this gap only affects the horizontal distance between a label and its field.
 
 ### Overriding with a fixed width
 
@@ -126,6 +136,16 @@ grid->setLabelColumnWidth(-1);   // back to automatic
 | `SARibbonPanel::SingleRowMode` | 1 |
 
 The grid listens to `SARibbonBar::panelLayoutModeChanged` itself and reflows when the style changes, so application code does not need to connect that signal again.
+
+### Row height follows the ribbon row grid
+
+The row height is not the available height divided by the number of content rows; it follows the panel row grid: `row height = (available height - row spacing) / panel row count`. Therefore:
+
+- a two-row grid inside a three-row panel fills the first two ribbon rows and leaves the third one empty, lining up with the small items of the neighbouring panels;
+- a two-row grid inside a two-row panel fills the panel exactly;
+- in single-row mode every column block is exactly one row tall.
+
+A field is `min(field sizeHint height, row height)` tall and vertically centered, so a 22 px ribbon row never clips a 24 px combo box. Column blocks run left to right, rows inside a block run top to bottom, and leftover block height stays at the bottom.
 
 The number of blocks is `ceil(total rows / rows per block)`. For four parameter rows:
 
@@ -170,7 +190,7 @@ qDebug() << grid->rowCount() << grid->currentRows() << grid->currentColumns();
 ## Caveats
 
 > **⚠️ Panel height comes from the Ribbon row height**
-> The grid does not decide its own height: the panel divides the available height by the row count of the tallest block, and each child is vertically centered and fitted to that row height. Keep the widgets inside a grid compact—a widget with a tall `sizeHint()` (a calendar, for example) will almost certainly be clipped in single-row mode.
+> The grid does not decide its own height: the row height is `(available height - row spacing) / panel row count`, and each child is vertically centered and fitted to that row height. Keep the widgets inside a grid compact—a widget with a tall `sizeHint()` (a calendar, for example) will almost certainly be clipped in single-row mode.
 
 > **⚠️ The grid does not stretch**
 > The grid deliberately keeps `QSizePolicy::Preferred`: the panel gives it exactly the width reported by `sizeHint()` and it never steals width from neighbouring panels. To control width, call `setMinimumWidth()` on the field widgets (the field column is the maximum of their `sizeHint()`, `minimumSizeHint()`, and `minimumSize()` widths).
@@ -186,7 +206,7 @@ qDebug() << grid->rowCount() << grid->currentRows() << grid->currentColumns();
 | Group | Methods |
 |-------|---------|
 | Content | `addRow` (4 overloads), `addSpanRow`, `removeRow`, `clearRows`, `rowCount`, `fieldAt` |
-| Labels | `setRowText`, `setRowLabelSides`, `leadingLabel`, `trailingLabel`, `setLabelAlignment`, `labelColumnWidth`, `setLabelColumnWidth`, `setLabelColumnWidthRange`, `recalcColumnWidths` |
+| Labels | `setRowText`, `setRowLabelSides`, `leadingLabel`, `trailingLabel`, `setLabelAlignment`, `labelColumnWidth`, `setLabelColumnWidth`, `setLabelColumnWidthRange`, `setLabelSpacing`, `recalcColumnWidths` |
 | Row/column policy | `setMaxRows`, `maxRows`, `setFlowPolicy`, `flowPolicy`, `currentRows`, `currentColumns`, `setRowSpacing`, `setColumnSpacing` |
 | Panel integration | `attachToPanel`, `panel` |
 

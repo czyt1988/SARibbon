@@ -56,6 +56,8 @@ public:
     int currentColumns() const;
     void setRowSpacing(int px);
     void setColumnSpacing(int px);
+    void setLabelSpacing(int px);
+    int labelSpacing() const;
 
     void attachToPanel(SARibbonPanel* panel);
     SARibbonPanel* panel() const;
