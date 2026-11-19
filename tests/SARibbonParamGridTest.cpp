@@ -215,8 +215,8 @@ void SARibbonParamGridTest::testSpanRowWidth()
     grid.addSpanRow(hint);
     grid.resize(400, 40);
 
-    // A grid with only a span row has no column blocks, the span row defines the grid width
-    QCOMPARE(grid.currentColumns(), 0);
+    // A grid with only a span row is a single block sized by the span content
+    QCOMPARE(grid.currentColumns(), 1);
     QCOMPARE(hint->width(), grid.sizeHint().width());
 }
 
@@ -248,12 +248,13 @@ void SARibbonParamGridTest::testSpanRowGetsOwnFullWidthRow()
     grid.addSpanRow(hint);
     grid.resize(900, 120);
 
-    // A span row consumes one ribbon row, so 3 normal rows over a budget of 2 leave two blocks
+    // A span row takes part in the row distribution like an ordinary row: 4 rows over a budget of 3
+    // split into 2 + 2, so the hint sits in the second block, second row, spanning that block only
     QCOMPARE(grid.currentColumns(), 2);
     QCOMPARE(grid.currentRows(), 2);
-    QCOMPARE(hint->width(), grid.sizeHint().width());
-    QWidget* lastBlockRow = grid.fieldAt(2);
-    QVERIFY(hint->y() >= lastBlockRow->y() + lastBlockRow->height());
+    QVERIFY(hint->x() > grid.fieldAt(1)->x());
+    QVERIFY(hint->width() < grid.sizeHint().width());
+    QVERIFY(hint->y() > grid.fieldAt(3)->y());
 }
 
 void SARibbonParamGridTest::testNoVerticalOverlap()

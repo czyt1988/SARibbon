@@ -86,7 +86,7 @@ grid->clearRows();                                        // remove every row
 
 ### addSpanRow
 
-A row added with `addSpanRow(QWidget*)` is a **full-width row below the column blocks**. It is meant for read-only hints, separators, and status text. It consumes one row of the panel row budget: with a three-row panel the blocks get at most two rows, with a two-row panel only one row is left for the blocks. When the budget cannot host it (single-row mode), it falls back to an ordinary block row.
+A row added with `addSpanRow(QWidget*)` takes part in the row distribution like an ordinary row but **spans the whole width of the block it lands in**. It is meant for read-only hints, separators, and status text. A block holding only span rows is sized by the span content, so a hint row neither reserves an empty label + field column nor leaves a wide blank on its right.
 
 ## Label Column Width
 
@@ -161,11 +161,12 @@ The number of blocks is `ceil(block rows / rows per block)`, where "block rows" 
 Single-row mode (1 row per block) -> 4 columns x 1 row
 ```
 
-Span rows are deducted from the row budget first. For a grid of two ordinary rows plus one Δf hint row:
+Span rows are distributed together with ordinary rows. For a grid of two ordinary rows plus one Δf hint row:
 
 ```text
-3-row mode: 3-1 = 2 rows per block -> 1 column x 2 rows, plus one full-width Δf row
-2-row mode: 2-1 = 1 row per block  -> 2 columns x 1 row, plus one full-width Δf row
+3-row mode: all three rows fit -> 1 column x 3 rows (the Δf row spans that column)
+2-row mode: three rows do not fit -> 2 columns (2+1); the Δf row in the second column spans that column
+            and the column is sized by the Δf content
 ```
 
 ### flowPolicy: how remaining rows are spread
