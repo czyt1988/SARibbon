@@ -32,6 +32,7 @@
 #include "../../src/SARibbonBar/SARibbonPanelItem.h"
 #include "../../src/SARibbonBar/SARibbonPanelLayout.h"
 #include "../../src/SARibbonBar/SARibbonPanel.h"
+#include "../../src/SARibbonBar/SARibbonParamGrid.h"
 #include "../../src/SARibbonBar/SARibbonCategory.h"
 #include "../../src/SARibbonBar/SARibbonCategoryLayout.h"
 #include "../../src/SARibbonBar/SARibbonContextCategory.h"

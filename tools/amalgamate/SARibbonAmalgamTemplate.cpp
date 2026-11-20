@@ -57,6 +57,7 @@
 #include "../../src/SARibbonBar/SARibbonPanelItem.cpp"
 #include "../../src/SARibbonBar/SARibbonPanelLayout.cpp"
 #include "../../src/SARibbonBar/SARibbonPanel.cpp"
+#include "../../src/SARibbonBar/SARibbonParamGrid.cpp"
 #include "../../src/SARibbonBar/SARibbonCategory.cpp"
 #include "../../src/SARibbonBar/SARibbonCategoryLayout.cpp"
 #include "../../src/SARibbonBar/SARibbonContextCategory.cpp"

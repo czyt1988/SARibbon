@@ -1,5 +1,23 @@
 # 版本更新记录(change log):
 
+## 2026-11-20 -> 2.9.7
+
+- 新增：`SARibbonParamGrid` 参数网格控件，把一组「标签 + 控件」参数行排进丝带面板：
+  - 三列制（前标签 | 控件 | 后标签）：`addRow()` 支持只有控件、前置标签、双侧标签，也可用 `LabelSides` 显式指定标签侧；`addSpanRow()` 增加跨列提示行；
+  - 所有行共享同一个标签列宽与控件列宽，标签与控件左边界齐平；自动标签列宽按列块内最长标签计算并限制在可设置的范围内，每个列块各自计算，短标签列块不会被另一列块的长标签撑宽；`setLabelSpacing()` 调整标签与控件的间距；
+  - 行数超出面板行预算时自动横向分列：`ceil(行数 / 面板行数)` 个列块，`FlowPolicy` 可选均衡摊分（默认）或先填满一列；跨列行与普通行一起参与分列，横跨它所在的列块，只含跨列行的列块按内容定宽；
+  - 行高跟随面板行网格（3 行面板里的 2 行网格占前两行、第三行留空，与相邻面板的小项对齐），控件垂直居中不拉伸；不在面板里时退化为自然行高；
+  - 跟随 `SARibbonBar::panelLayoutMode` 自动重排，宽度变化时清面板的 sizeHint 缓存；可用 `attachToPanel()` 手动挂接，也可按父控件自动解析所属面板。
+- 新增：`SARibbonBar::panelLayoutMode` 属性补上 `panelLayoutModeChanged` 通知信号（参数为 `SARibbonPanel::PanelLayoutMode`）。面板行数变化时通知嵌入控件，嵌入控件可在同一次布局中先更新 `sizeHint()`，避免二次重排；批量切换样式（`setRibbonStyle`）时在 `endUpdate` 重排之前只发一次。
+- 新增：标题栏图标点击控制——`SARibbonTitleIconWidget::setClickEnabled()` / `isClickEnabled()` 可完全禁用图标点击，`setMenuEnabled()` / `isMenuEnabled()` 可关闭内置窗口控制菜单；关闭内置菜单后点击图标发射 `titleIconClicked(int button, const QPoint& globalPos)` 信号，由使用方接管点击行为（例如弹出自己的菜单）。
+- 修复：上下文标签（context category）与在样式设置之后新建的 category 不继承当前丝带样式。`setRibbonStyle()` 的批量 setter 只在值变化时才排 pending，若 bar 的值早已等于目标值（样式在 category 创建前设置、插件随后添加上下文标签），新页面会一直沿用默认的 3 行 + 文字换行，2 行样式下表现为文字换行、行高错乱。现在抽出 `applyRibbonStyleToCategory()`，插入分类、上下文分类显示与 `setRibbonStyle()` 末尾统一走它下发，并在 `setRibbonStyle()` 末尾对所有 category 再完整下发一次。
+- 修复：`SARibbonApplicationWidget` 在程序启动时自动弹出——父窗口未显示时创建的子控件会在父窗口显示时被一并显示，且尺寸停留在显示前的旧几何（不再是 `setWidthRatio` 设定的 2/3 宽度、全高）。现在构造与 `SARibbonMainWindow::setApplicationWidget` 绑定后都保持隐藏，仅在点击应用按钮时显示；事件过滤器改为读取父窗口当前尺寸并响应 `WindowStateChange`，最大化/还原时面板尺寸不再滞后。
+- 构建：PyQt5 / PyQt6 / PySide6 三套 Python 绑定补齐 `SARibbonParamGrid`（sip 定义、`pyproject` 头/源列表、PySide6 typesystem 与 CMake 列表）。
+- 构建：合并文件 `src/SARibbon.h` / `src/SARibbon.cpp` 已用 amalgamate 重新生成，含参数网格、标题图标点击配置 API、`panelLayoutModeChanged` 等 2.9.6 之后的全部改动。
+- 文档：新增参数网格中英文文档（`docs/zh|en/use-guide/parameter-grid.md`：三列制模型、标签列宽算法、行数自适应与分列示意、API 速查）并挂到 mkdocs nav；`layout-of-SARibbon.md` 的三种占位段落补「参数网格」交叉引用；标题栏文档补点击/菜单控制说明与示例。
+- 示例：`MainWindowExample` 增加参数网格演示面板（通道 / 窗函数 / 幅值口径 / 频率分辨率 + 跨列提示行），切换 3 行 / 2 行 / 1 行样式可见自动分列。
+- 测试：新增 `SARibbonParamGridTest`（列宽、对齐、分列、重叠、跨列行、面板行模式跟随、样式继承等 20 项）与 `SARibbonTitleIconMenuTest`。
+
 ## 2026-10-21 -> 2.9.6
 
 - 新增：`SARibbonApplicationWidget` 应用窗口能力增强，配合 `SARibbonMainWindow::setApplicationWidget` 可快速实现 Office Backstage 式应用面板：
@@ -26,7 +44,6 @@
 - 构建：没有 Qt 3D 模块的 Qt 也能配置编译，Qt 3D 示例只在模块可用时构建。
 - 构建：MSVC 统一使用 `/utf-8` 解析源码，避免英文代码页的 CI 机器上中文字面量触发 C2001/C1057。
 - CI：新增 Dependabot 依赖自动升级配置（GitHub Actions 与文档依赖）；升级全部 GitHub Actions；mkdocs-material 升级到 9.8.0 修复 CVE-2026-73295，并固定 mkdocs-with-pdf 与 pymdown-extensions 版本；文档站在针对 master 的 PR 上参与构建校验（不部署）。
-- 修复：`SARibbonApplicationWidget` 在程序启动时自动弹出的问题——父窗口未显示时创建的子控件会在父窗口显示时被一并显示，且尺寸停留在显示前的旧几何（不再是 `setWidthRatio` 设定的 2/3 宽度、全高）。现在构造与 `SARibbonMainWindow::setApplicationWidget` 绑定后都保持隐藏，仅在点击应用按钮时显示；事件过滤器改为读取父窗口当前尺寸并响应 `WindowStateChange`，最大化/还原时面板尺寸不再滞后。
 
 ## 2026-09-16 -> 2.9.5
 
