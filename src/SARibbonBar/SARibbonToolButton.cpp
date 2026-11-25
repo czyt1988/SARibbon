@@ -1004,7 +1004,12 @@ int SARibbonToolButton::PrivateData::estimateLargeButtonTextWidth(int buttonHeig
             QRect textRect(0, 0, midWidth, textDrawRectHeight);
             textRect = fm.boundingRect(textRect, alignment, text);
 
-            if (textRect.height() <= twoLineHeightBudget) {
+            // 接受一个宽度必须同时满足两点：换行后不超过两行，且换行后的文本没有超出试探宽度。
+            // Qt::TextWordWrap 不会在单词内部断行，当某个单词比试探宽度更宽时文本依然只有两行，
+            // 但 boundingRect 返回的矩形会比试探宽度更宽：只看高度会让二分查找一路收缩到
+            // 「单行宽度的一半」，最终按钮比最长单词还窄，单词被截断（issue #163）。
+            // 加上宽度判断后，收缩的下限就是最长单词自身的宽度。
+            if (textRect.height() <= twoLineHeightBudget && textRect.width() <= midWidth) {
                 // 可以在两行内显示，尝试更小的宽度
                 bestWidth = midWidth;
                 maxWidth  = midWidth - 1;
